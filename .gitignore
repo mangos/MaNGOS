@@ -1,6 +1,4 @@
-FILES
 INSTALL
-build-log.txt
 
 *.pyc
 *.[oa]
@@ -26,9 +24,6 @@ doc/html
 doc/Doxyfile
 doc/doxygen.log
 
-mangos2-*.tar.bz2
-mangos2-*.tar.gz
-
 aclocal.m4
 autom4te.cache
 config.guess
@@ -48,9 +43,3 @@ stamp-h1
 config.h
 
 callgrind.out.*
-
-dep/src/tolua++/bin/tolua
-src/realmlist/mangos2-realmlist
-src/shared/svn_revision.h
-src/tools/tolua/bin/tolua
-src/worldserver/mangos2-worldserver

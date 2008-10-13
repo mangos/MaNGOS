@@ -1,6 +1,6 @@
 = MaNGOS -- README =
 
-Copyright (C) 2005-2008 MaNGOS project <http://www.mangosproject.org/>
+Copyright (C) 2005-2008 MaNGOS project <http://getmangos.com/>
 
   MaNGOS is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ Copyright (C) 2005-2008 MaNGOS project <http://www.mangosproject.org/>
 
 Comments are welcome.
 
-	- theluda <theluda@googlemail.com>
+	- theluda <theluda@getmangos.com>
 
 == Welcome to MaNGOS ==
 
@@ -37,7 +37,7 @@ implementation for a MMORPG server system. Please see the file COPYING for
 license details.
 
 For further information on the MaNGOS project, please visit our project web
-site at <http://www.mangosproject.org/>
+site at <http://getmangos.com/>
 
 Documenation on various development related topics can be found in the doc/
 subdirectory, including Doxygen-generated API documentation.
@@ -50,7 +50,7 @@ directory.
 In order to build and install MaNGOS under Linux, follow the instructions
 described in the INSTALL file.
 
-In case you have checked out MaNGOS from the SubVersion repository, please run
+In case you have checked out MaNGOS from the GIT repository, please run
 
 $ autoreconf --install --force
 
