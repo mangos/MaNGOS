@@ -22,12 +22,12 @@ AM_CPPFLAGS = $(MANGOS_INCLUDES) -I$(top_builddir)/src/shared -I$(srcdir)/../../
 ## Build realm list daemon as standalone program
 bin_PROGRAMS = mangos-realmd
 mangos_realmd_SOURCES = \
-	AuthCodes.h \
-	AuthSocket.cpp \
-	AuthSocket.h \
-	Main.cpp \
-	RealmList.cpp \
-	RealmList.h
+    AuthCodes.h \
+    AuthSocket.cpp \
+    AuthSocket.h \
+    Main.cpp \
+    RealmList.cpp \
+    RealmList.h
 
 ## Link realm list daemon against the shared library
 mangos_realmd_LDADD = ../shared/Database/libmangosdatabase.a ../shared/Config/libmangosconfig.a ../shared/Auth/libmangosauth.a ../shared/libmangosshared.a ../framework/libmangosframework.a ../../dep/src/sockets/libmangossockets.a ../../dep/src/zthread/libZThread.la
@@ -36,22 +36,22 @@ mangos_realmd_LDFLAGS = -L../../dep/src/sockets -L../../dep/src/zthread -L$(libd
 ## Additional files to include when running 'make dist'
 #  Include realm list daemon configuration
 EXTRA_DIST = \
-	realmd.conf.dist
+    realmd.conf.dist
 
 ## Additional files to install
 sysconf_DATA = \
-	realmd.conf.dist
+    realmd.conf.dist
 
 install-data-hook:
-	@list='$(sysconf_DATA)'; for p in $$list; do \
+    @list='$(sysconf_DATA)'; for p in $$list; do \
       dest=`echo $$p | sed -e s/.dist//`; \
-	  if test -f $(DESTDIR)$(sysconfdir)/$$dest; then \
+      if test -f $(DESTDIR)$(sysconfdir)/$$dest; then \
         echo "$@ will not overwrite existing $(DESTDIR)$(sysconfdir)/$$dest"; \
       else \
-	    echo " $(INSTALL_DATA) $$p $(DESTDIR)$(sysconfdir)/$$dest"; \
-	    $(INSTALL_DATA) $$p $(DESTDIR)$(sysconfdir)/$$dest; \
-	  fi; \
-	done
+        echo " $(INSTALL_DATA) $$p $(DESTDIR)$(sysconfdir)/$$dest"; \
+        $(INSTALL_DATA) $$p $(DESTDIR)$(sysconfdir)/$$dest; \
+      fi; \
+    done
 
 clean-local:
-	rm -f $(sysconf_DATA)
+    rm -f $(sysconf_DATA)
