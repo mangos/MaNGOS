@@ -3193,6 +3193,8 @@ void Player::InitVisibleBits()
 {
     updateVisualBits.SetCount(PLAYER_END);
 
+    // TODO: really implement OWNER_ONLY and GROUP_ONLY. Flags can be found in UpdateFields.h
+
     updateVisualBits.SetBit(OBJECT_FIELD_GUID);
     updateVisualBits.SetBit(OBJECT_FIELD_TYPE);
     updateVisualBits.SetBit(OBJECT_FIELD_SCALE_X);
@@ -3204,6 +3206,7 @@ void Player::InitVisibleBits()
     updateVisualBits.SetBit(UNIT_FIELD_SUMMON+1);
 
     updateVisualBits.SetBit(UNIT_FIELD_CHARMEDBY);
+    updateVisualBits.SetBit(UNIT_FIELD_CHARMEDBY+1);
 
     updateVisualBits.SetBit(UNIT_FIELD_TARGET);
     updateVisualBits.SetBit(UNIT_FIELD_TARGET+1);
@@ -3235,14 +3238,12 @@ void Player::InitVisibleBits()
     updateVisualBits.SetBit(UNIT_FIELD_AURASTATE);
     updateVisualBits.SetBit(UNIT_FIELD_BASEATTACKTIME);
     updateVisualBits.SetBit(UNIT_FIELD_BASEATTACKTIME + 1);
-    updateVisualBits.SetBit(UNIT_FIELD_RANGEDATTACKTIME);
     updateVisualBits.SetBit(UNIT_FIELD_BOUNDINGRADIUS);
     updateVisualBits.SetBit(UNIT_FIELD_COMBATREACH);
     updateVisualBits.SetBit(UNIT_FIELD_DISPLAYID);
     updateVisualBits.SetBit(UNIT_FIELD_NATIVEDISPLAYID);
     updateVisualBits.SetBit(UNIT_FIELD_MOUNTDISPLAYID);
     updateVisualBits.SetBit(UNIT_FIELD_BYTES_1);
-    updateVisualBits.SetBit(UNIT_FIELD_MOUNTDISPLAYID);
     updateVisualBits.SetBit(UNIT_FIELD_PETNUMBER);
     updateVisualBits.SetBit(UNIT_FIELD_PET_NAME_TIMESTAMP);
     updateVisualBits.SetBit(UNIT_DYNAMIC_FLAGS);
@@ -3250,16 +3251,16 @@ void Player::InitVisibleBits()
     updateVisualBits.SetBit(UNIT_MOD_CAST_SPEED);
     updateVisualBits.SetBit(UNIT_FIELD_BYTES_2);
 
+    updateVisualBits.SetBit(PLAYER_DUEL_ARBITER);
+    updateVisualBits.SetBit(PLAYER_DUEL_ARBITER+1);
     updateVisualBits.SetBit(PLAYER_FLAGS);
+    updateVisualBits.SetBit(PLAYER_GUILDID);
+    updateVisualBits.SetBit(PLAYER_GUILDRANK);
     updateVisualBits.SetBit(PLAYER_BYTES);
     updateVisualBits.SetBit(PLAYER_BYTES_2);
     updateVisualBits.SetBit(PLAYER_BYTES_3);
-    updateVisualBits.SetBit(PLAYER_GUILDID);
-    updateVisualBits.SetBit(PLAYER_GUILDRANK);
-    updateVisualBits.SetBit(PLAYER_GUILD_TIMESTAMP);
     updateVisualBits.SetBit(PLAYER_DUEL_TEAM);
-    updateVisualBits.SetBit(PLAYER_DUEL_ARBITER);
-    updateVisualBits.SetBit(PLAYER_DUEL_ARBITER+1);
+    updateVisualBits.SetBit(PLAYER_GUILD_TIMESTAMP);
 
     // PLAYER_QUEST_LOG_x also visible bit on official (but only on party/raid)...
     for(uint16 i = PLAYER_QUEST_LOG_1_1; i < PLAYER_QUEST_LOG_25_2; i+=4)
@@ -3288,16 +3289,6 @@ void Player::InitVisibleBits()
     }
 
     updateVisualBits.SetBit(PLAYER_CHOSEN_TITLE);
-
-    updateVisualBits.SetBit(UNIT_VIRTUAL_ITEM_SLOT_DISPLAY);
-    updateVisualBits.SetBit(UNIT_VIRTUAL_ITEM_SLOT_DISPLAY + 1);
-    updateVisualBits.SetBit(UNIT_VIRTUAL_ITEM_SLOT_DISPLAY + 2);
-    updateVisualBits.SetBit(UNIT_VIRTUAL_ITEM_INFO);
-    updateVisualBits.SetBit(UNIT_VIRTUAL_ITEM_INFO + 1);
-    updateVisualBits.SetBit(UNIT_VIRTUAL_ITEM_INFO + 2);
-    updateVisualBits.SetBit(UNIT_VIRTUAL_ITEM_INFO + 3);
-    updateVisualBits.SetBit(UNIT_VIRTUAL_ITEM_INFO + 4);
-    updateVisualBits.SetBit(UNIT_VIRTUAL_ITEM_INFO + 5);
 }
 
 void Player::BuildCreateUpdateBlockForPlayer( UpdateData *data, Player *target ) const
