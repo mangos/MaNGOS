@@ -30,25 +30,25 @@ noinst_LIBRARIES = libmangosshared.a
 
 #  libmangosshared library will later be reused by ...
 libmangosshared_a_SOURCES = \
-	Base.cpp \
-	Base.h \
-	ByteBuffer.h \
-	Common.cpp \
-	Common.h \
-	Errors.h \
-	Log.cpp \
-	Log.h \
-	MemoryLeaks.cpp \
-	MemoryLeaks.h \
-	Mthread.cpp \
-	Mthread.h \
-	ProgressBar.cpp \
-	ProgressBar.h \
-	Timer.h \
-	Util.cpp \
-	Util.h \
-	WorldPacket.h \
-	svn_revision.h
+    Base.cpp \
+    Base.h \
+    ByteBuffer.h \
+    Common.cpp \
+    Common.h \
+    Errors.h \
+    Log.cpp \
+    Log.h \
+    MemoryLeaks.cpp \
+    MemoryLeaks.h \
+    Mthread.cpp \
+    Mthread.h \
+    ProgressBar.cpp \
+    ProgressBar.h \
+    Timer.h \
+    Util.cpp \
+    Util.h \
+    WorldPacket.h \
+    svn_revision.h
 
 # Get svn revision
 SVN_REVISION_FILE = svn_revision.h
@@ -59,21 +59,21 @@ CLEANFILES = $(SVN_REVISION_FILE)
 FORCE:
 
 $(SVN_REVISION_FILE) : $(top_builddir)/src/tools/gensvnrevision/gensvnrevision FORCE
-	$(top_builddir)/src/tools/gensvnrevision/gensvnrevision $(top_srcdir)
+    $(top_builddir)/src/tools/gensvnrevision/gensvnrevision $(top_srcdir)
 
 ## Additional files to include when running 'make dist'
 #  Disabled packet logger
 EXTRA_DIST = \
-	PacketLog.cpp \
-	PacketLog.h
+    PacketLog.cpp \
+    PacketLog.h
 
 # System configuration
 EXTRA_DIST += \
-	SystemConfig.h
+    SystemConfig.h
 
 # System Win32 files
 EXTRA_DIST += \
-	ServiceWin32.cpp \
-	ServiceWin32.h \
-	WheatyExceptionReport.cpp \
-	WheatyExceptionReport.h
+    ServiceWin32.cpp \
+    ServiceWin32.h \
+    WheatyExceptionReport.cpp \
+    WheatyExceptionReport.h

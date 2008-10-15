@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2005-2008 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -99,7 +99,7 @@ bool Utf8toWStr(std::string utf8str, std::wstring& wstr);
 // in wsize==max size of buffer, out wsize==real string size
 bool Utf8toWStr(char const* utf8str, size_t csize, wchar_t* wstr, size_t& wsize);
 inline bool Utf8toWStr(std::string utf8str, wchar_t* wstr, size_t& wsize)
-{ 
+{
     return Utf8toWStr(utf8str.c_str(), utf8str.size(), wstr, wsize);
 }
 
@@ -159,7 +159,7 @@ inline bool isEastAsianCharacter(wchar_t wchar)
         return true;
     if(wchar >= 0x31F0 && wchar <= 0x31FF)                  // Katakana Phonetic Ext.
         return true;
-    if(wchar >= 0x3400 && wchar <= 0x4DB5)                  // CJK Ideographs Ext. A 
+    if(wchar >= 0x3400 && wchar <= 0x4DB5)                  // CJK Ideographs Ext. A
         return true;
     if(wchar >= 0x4E00 && wchar <= 0x9FC3)                  // Unified CJK Ideographs
         return true;
