@@ -46,7 +46,7 @@ sysconf_DATA = \
     mangosd.conf.dist
 
 install-data-hook:
-    @list='$(sysconf_DATA)'; for p in $$list; do \
+	@list='$(sysconf_DATA)'; for p in $$list; do \
       dest=`echo $$p | sed -e s/.dist//`; \
       if test -f $(DESTDIR)$(sysconfdir)/$$dest; then \
         echo "$@ will not overwrite existing $(DESTDIR)$(sysconfdir)/$$dest"; \
@@ -57,4 +57,4 @@ install-data-hook:
     done
 
 clean-local:
-    rm -f $(sysconf_DATA)
+	rm -f $(sysconf_DATA)

@@ -59,7 +59,7 @@ CLEANFILES = $(SVN_REVISION_FILE)
 FORCE:
 
 $(SVN_REVISION_FILE) : $(top_builddir)/src/tools/gensvnrevision/gensvnrevision FORCE
-    $(top_builddir)/src/tools/gensvnrevision/gensvnrevision $(top_srcdir)
+	$(top_builddir)/src/tools/gensvnrevision/gensvnrevision $(top_srcdir)
 
 ## Additional files to include when running 'make dist'
 #  Disabled packet logger
