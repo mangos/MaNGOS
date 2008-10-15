@@ -17,6 +17,8 @@ Makefile.in
 Makefile
 
 core
+core.*
+!core.h
 vgcore*
 
 doc/html
