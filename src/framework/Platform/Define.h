@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2005-2008 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -29,21 +29,21 @@ All rights reserved.
 
 TERMS
 
-Redistribution and use in source and binary forms, with or without 
+Redistribution and use in source and binary forms, with or without
 modification, are permitted subject to the following conditions:
 
-1. Redistributions of source code must retain the above copyright 
-notice, this list of conditions and the following disclaimer. 
+1. Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
 
 2. Redistributions in binary form must reproduce the above copyright
-notice, this list of conditions and the following disclaimer in the 
-documentation and/or other materials provided with the distribution. 
+notice, this list of conditions and the following disclaimer in the
+documentation and/or other materials provided with the distribution.
 
-3. The copyright holder's name must not be used to endorse or promote 
-any products derived from this software without his specific prior 
-written permission. 
+3. The copyright holder's name must not be used to endorse or promote
+any products derived from this software without his specific prior
+written permission.
 
-This software is provided 'as is' with no express or implied warranties 
+This software is provided 'as is' with no express or implied warranties
 of correctness or fitness for purpose.
 -------------------------------------------------------------------------
 */
@@ -79,11 +79,11 @@ of correctness or fitness for purpose.
 
 /*  2. BYTE ORDER IN 32-BIT WORDS
 
-To obtain the highest speed on processors with 32-bit words, this code 
+To obtain the highest speed on processors with 32-bit words, this code
 needs to determine the order in which bytes are packed into such words.
-The following block of code is an attempt to capture the most obvious 
-ways in which various environemnts specify their endian definitions. 
-It may well fail, in which case the definitions will need to be set by 
+The following block of code is an attempt to capture the most obvious
+ways in which various environemnts specify their endian definitions.
+It may well fail, in which case the definitions will need to be set by
 editing at the points marked **** EDIT HERE IF NECESSARY **** below.
 */
 
@@ -100,7 +100,7 @@ editing at the points marked **** EDIT HERE IF NECESSARY **** below.
 #          define MANGOS_ENDIAN MANGOS_BIGENDIAN
 #        endif
 #      endif
-#    elif defined(LITTLE_ENDIAN) && !defined(BIG_ENDIAN) 
+#    elif defined(LITTLE_ENDIAN) && !defined(BIG_ENDIAN)
 #      define MANGOS_ENDIAN MANGOS_LITTLEENDIAN
 #    elif !defined(LITTLE_ENDIAN) && defined(BIG_ENDIAN)
 #      define MANGOS_ENDIAN MANGOS_BIGENDIAN
@@ -114,7 +114,7 @@ editing at the points marked **** EDIT HERE IF NECESSARY **** below.
 #          define MANGOS_ENDIAN MANGOS_BIGENDIAN
 #        endif
 #      endif
-#    elif defined(_LITTLE_ENDIAN) && !defined(_BIG_ENDIAN) 
+#    elif defined(_LITTLE_ENDIAN) && !defined(_BIG_ENDIAN)
 #      define MANGOS_ENDIAN MANGOS_LITTLE_ENDIAN
 #    elif !defined(_LITTLE_ENDIAN) && defined(_BIG_ENDIAN)
 #      define MANGOS_ENDIAN MANGOS_BIGENDIAN
