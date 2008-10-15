@@ -20,6 +20,7 @@ Makefile
 
 core
 core.*
+!core.h
 vgcore*
 
 doc/html
@@ -36,12 +37,9 @@ depcomp
 install-sh
 ltmain.sh
 missing
-config.h
 config.log
 config.status
 libtool
 stamp-h1
-
-config.h
 
 callgrind.out.*
