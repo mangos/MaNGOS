@@ -269,14 +269,14 @@ void LoadDBCStores(std::string dataPath)
     for (uint32 j = 0; j < sSkillLineAbilityStore.GetNumRows(); ++j)
     {
         SkillLineAbilityEntry const *skillLine = sSkillLineAbilityStore.LookupEntry(j);
-    
+
         if(!skillLine)
             continue;
 
         SpellEntry const* spellInfo = sSpellStore.LookupEntry(skillLine->spellId);
 
         if(spellInfo && (spellInfo->Attributes & 0x1D0) == 0x1D0)
-        {      
+        {
             for (unsigned int i = 1; i < sCreatureFamilyStore.GetNumRows(); ++i)
             {
                 CreatureFamilyEntry const* cFamily = sCreatureFamilyStore.LookupEntry(i);
@@ -440,11 +440,11 @@ void LoadDBCStores(std::string dataPath)
     // check at up-to-date DBC files (2425 is last item extended cost added in 2.4.3)
     // check at up-to-date DBC files (71 is last char title added in 2.4.3)
     // check at up-to-date DBC files (1768 is last area added in 2.4.3)
-    if( !sSpellStore.LookupEntry(53085)            || 
-        !sSkillLineAbilityStore.LookupEntry(17514) || 
+    if( !sSpellStore.LookupEntry(53085)            ||
+        !sSkillLineAbilityStore.LookupEntry(17514) ||
         !sMapStore.LookupEntry(598)                ||
-        !sGemPropertiesStore.LookupEntry(1127)     || 
-        !sItemExtendedCostStore.LookupEntry(2425)  || 
+        !sGemPropertiesStore.LookupEntry(1127)     ||
+        !sItemExtendedCostStore.LookupEntry(2425)  ||
         !sCharTitlesStore.LookupEntry(71)          ||
         !sAreaStore.LookupEntry(1768)              )
     {

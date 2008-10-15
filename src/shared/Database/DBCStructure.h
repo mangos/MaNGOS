@@ -155,8 +155,8 @@ struct CreatureDisplayInfoEntry
 struct CreatureFamilyEntry
 {
     uint32    ID;                                           // 0
-    float     minScale;                                     // 1  
-    uint32    minScaleLevel;                                // 2 0/1      
+    float     minScale;                                     // 1
+    uint32    minScaleLevel;                                // 2 0/1
     float     maxScale;                                     // 3
     uint32    maxScaleLevel;                                // 4 0/60
     uint32    skillLine[2];                                 // 5-6
@@ -430,7 +430,7 @@ struct MapEntry
 
     bool IsMountAllowed() const
     {
-        return !IsDungeon() || 
+        return !IsDungeon() ||
             MapID==568 || MapID==309 || MapID==209 || MapID==534 ||
             MapID==560 || MapID==509 || MapID==269;
     }
