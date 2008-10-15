@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2005-2008 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -81,15 +81,15 @@ public:
             uint32 curtime = getMSTime();
             //DEBUG_LOG("anti-freeze: time=%u, counters=[%u; %u]",curtime,Master::m_masterLoopCounter,World::m_worldLoopCounter);
 
-            // There is no Master anymore 
-            // TODO: clear the rest of the code 
+            // There is no Master anymore
+            // TODO: clear the rest of the code
 //            // normal work
 //            if(m_loops != Master::m_masterLoopCounter)
 //            {
 //                m_lastchange = curtime;
 //                m_loops = Master::m_masterLoopCounter;
 //            }
-//            // possible freeze 
+//            // possible freeze
 //            else if(getMSTimeDiff(m_lastchange,curtime) > _delaytime)
 //            {
 //                sLog.outError("Main/Sockets Thread hangs, kicking out server!");
@@ -102,7 +102,7 @@ public:
                 w_lastchange = curtime;
                 w_loops = World::m_worldLoopCounter;
             }
-            // possible freeze 
+            // possible freeze
             else if(getMSTimeDiff(w_lastchange,curtime) > _delaytime)
             {
                 sLog.outError("World Thread hangs, kicking out server!");
@@ -250,7 +250,7 @@ int Master::Run()
         ///- Launch CliRunnable thread
         ZThread::Thread td1(new CliRunnable);
     }
-    
+
     ZThread::Thread td2(new RARunnable);
 
     ///- Handle affinity for multiple processors and process priority on Windows
@@ -328,7 +328,7 @@ int Master::Run()
     }
 
     sWorldSocketMgr->Wait ();
-    
+
     // set server offline
     loginDatabase.PExecute("UPDATE realmlist SET color = 2 WHERE id = '%d'",realmID);
 
@@ -339,7 +339,7 @@ int Master::Run()
     // since worldrunnable uses them, it will crash if unloaded after master
     t.wait();
     td2.wait ();
-    
+
     ///- Clean database before leaving
     clearOnlineAccounts();
 
@@ -479,7 +479,7 @@ void Master::clearOnlineAccounts()
     loginDatabase.PExecute(
         "UPDATE account SET online = 0 WHERE online > 0 "
         "AND id IN (SELECT acctid FROM realmcharacters WHERE realmid = '%d')",realmID);
-    
+
 
     CharacterDatabase.Execute("UPDATE characters SET online = 0");
 }

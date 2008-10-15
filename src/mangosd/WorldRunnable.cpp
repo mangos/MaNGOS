@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2005-2008 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -75,7 +75,7 @@ void WorldRunnable::run()
     sWorld.KickAllQueued();                                 // kick all queued players (and prevent its login at kick in game players)
     sWorld.KickAll();                                       // save and kick all players
     sWorld.UpdateSessions( 1 );                             // real players unload required UpdateSessions call
-    
+
     sWorldSocketMgr->StopNetwork();
 
     MapManager::Instance().UnloadAll();                     // unload all grids (including locked in memory)

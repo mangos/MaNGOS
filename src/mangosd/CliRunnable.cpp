@@ -300,7 +300,7 @@ void CliCharDelete(char*command,pPrintf zprintf)
         account_id = objmgr.GetPlayerAccountIdByGUID(character_guid);
     }
 
-    Player::DeleteFromDB(character_guid, account_id, true); 
+    Player::DeleteFromDB(character_guid, account_id, true);
     zprintf("Player %s (Guid: %u AccountId: %u) deleted\r\n",character_name.c_str(),GUID_LOPART(character_guid),account_id);
 }
 
@@ -904,7 +904,7 @@ void CliKick(char*command,pPrintf zprintf)
     std::string name;
     if(!consoleToUtf8(kickName,name))                       // convert from console encoding to utf8
         return;
-    
+
     if(!normalizePlayerName(name))
         return;
 

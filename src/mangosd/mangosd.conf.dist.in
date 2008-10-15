@@ -17,7 +17,7 @@ ConfVersion=2008080101
 #    LogsDir
 #        Logs directory setting.
 #        Important: Logs dir must exists, or all logs need to be disabled
-#        Default: "" - no log directory prefix, if used log names isn't absolute path 
+#        Default: "" - no log directory prefix, if used log names isn't absolute path
 #        then logs will be stored in current directory for run program.
 #
 #
@@ -67,7 +67,7 @@ BindIP = "0.0.0.0"
 #
 #    Compression
 #        Compression level for update packages sent to client (1..9)
-#        Default: 1 (speed) 
+#        Default: 1 (speed)
 #                 9 (best compression)
 #
 #    TcpNoDelay
@@ -134,19 +134,19 @@ BindIP = "0.0.0.0"
 #        List of ids with delimiter ','
 #
 #    DetectPosCollision
-#        Check final move position, summon position, etc for visible collision with other objects or 
+#        Check final move position, summon position, etc for visible collision with other objects or
 #        wall (wall only if vmaps are enabled)
 #        Default: 1 (enable, required more CPU power usage)
 #                 0 (disable, less nice position selection but will less CPU power usage)
 #
 #    TargetPosRecalculateRange
-#        Max distance from movement target point (+moving unit size) and targeted object (+size) 
+#        Max distance from movement target point (+moving unit size) and targeted object (+size)
 #        after that new target movmeent point calculated. Max: melee attack range (5), min: contact range (0.5)
 #        More distance let have better performence, less distance let have more sensitive reaction at target move.
 #        Default: 1.5
 #
 #    UpdateUptimeInterval
-#        Update realm uptime period in minutes (for save data in 'uptime' table). Must be > 0 
+#        Update realm uptime period in minutes (for save data in 'uptime' table). Must be > 0
 #        Default: 10 (minutes)
 #
 #    MaxCoreStuckTime
@@ -252,10 +252,10 @@ AddonChannel = 1
 #
 #    CharLogDump
 #        Write character dump before deleting in Char.log
-#        For restoration, cut character data from log starting from 
+#        For restoration, cut character data from log starting from
 #        line == START DUMP == to line == END DUMP == (without its) in file and load it using loadpdump command
 #        Default: 0 - don't include dumping chars to log
-#                 1 - include dumping chars to log 
+#                 1 - include dumping chars to log
 #
 #    GmLogFile
 #        Log file of gm commands
@@ -268,12 +268,12 @@ AddonChannel = 1
 #
 #    RaLogFile
 #        Log file of RA commands
-#        Default: "Ra.log" 
+#        Default: "Ra.log"
 #                 "" - Empty name for disable
 #
 #    LogColors
 #        Color for messages (format "normal_color details_color debug_color error_color")
-#        Colors: 0 - BLACK, 1 - RED, 2 - GREEN,  3 - BROWN, 4 - BLUE, 5 - MAGENTA, 6 -  CYAN, 7 - GREY, 
+#        Colors: 0 - BLACK, 1 - RED, 2 - GREEN,  3 - BROWN, 4 - BLUE, 5 - MAGENTA, 6 -  CYAN, 7 - GREY,
 #                8 - YELLOW, 9 - LRED, 10 - LGREEN, 11 - LBLUE, 12 - LMAGENTA, 13 - LCYAN, 14 - WHITE
 #        Default: "" - none colors
 #        Example: "13 7 11 9"
@@ -306,47 +306,47 @@ LogColors = ""
 #    GameType
 #        Server realm style
 #        0 = NORMAL;1 = PVP; 4 = NORMAL; 6 = RP; 8 = RPPVP
-#        also custom type: 16 FFA_PVP (free for all pvp mode like arena PvP in all zones except rest 
+#        also custom type: 16 FFA_PVP (free for all pvp mode like arena PvP in all zones except rest
 #        activated places and sanctuaries)
 #
 #    RealmZone
 #        Server realm zone (set allowed alphabet in character names/etc). See also Strict*Names options.
 #
-#	 1 Development    - any language (Default)
-#	 2 United States  - extended-Latin
-#	 3 Oceanic        - extended-Latin
-#	 4 Latin America  - extended-Latin 
-#	 5 Tournament     - basic-Latin at create, any at login
-#	 6 Korea          - East-Asian
-#	 7 Tournament     - basic-Latin at create, any at login
-#	 8 English        - extended-Latin
-#	 9 German         - extended-Latin
-#	 10 French        - extended-Latin
-#	 11 Spanish       - extended-Latin
-#	 12 Russian       - Cyrillic
-#	 13 Tournament    - basic-Latin at create, any at login
-#	 14 Taiwan        - East-Asian
-#	 15 Tournament    - basic-Latin at create, any at login
-#	 16 China         - East-Asian
-#	 17 CN1           - basic-Latin at create, any at login
-#	 18 CN2           - basic-Latin at create, any at login
-#	 19 CN3           - basic-Latin at create, any at login
-#	 20 CN4           - basic-Latin at create, any at login
-#	 21 CN5           - basic-Latin at create, any at login
-#	 22 CN6           - basic-Latin at create, any at login
-#	 23 CN7           - basic-Latin at create, any at login
-#	 24 CN8           - basic-Latin at create, any at login
-#	 25 Tournament    - basic-Latin at create, any at login
-#	 26 Test Server   - any language
-#	 27 Tournament    - basic-Latin at create, any at login
-#	 28 QA Server     - any language
-#	 29 CN9           - basic-Latin at create, any at login
+#    1 Development    - any language (Default)
+#    2 United States  - extended-Latin
+#    3 Oceanic        - extended-Latin
+#    4 Latin America  - extended-Latin
+#    5 Tournament     - basic-Latin at create, any at login
+#    6 Korea          - East-Asian
+#    7 Tournament     - basic-Latin at create, any at login
+#    8 English        - extended-Latin
+#    9 German         - extended-Latin
+#    10 French        - extended-Latin
+#    11 Spanish       - extended-Latin
+#    12 Russian       - Cyrillic
+#    13 Tournament    - basic-Latin at create, any at login
+#    14 Taiwan        - East-Asian
+#    15 Tournament    - basic-Latin at create, any at login
+#    16 China         - East-Asian
+#    17 CN1           - basic-Latin at create, any at login
+#    18 CN2           - basic-Latin at create, any at login
+#    19 CN3           - basic-Latin at create, any at login
+#    20 CN4           - basic-Latin at create, any at login
+#    21 CN5           - basic-Latin at create, any at login
+#    22 CN6           - basic-Latin at create, any at login
+#    23 CN7           - basic-Latin at create, any at login
+#    24 CN8           - basic-Latin at create, any at login
+#    25 Tournament    - basic-Latin at create, any at login
+#    26 Test Server   - any language
+#    27 Tournament    - basic-Latin at create, any at login
+#    28 QA Server     - any language
+#    29 CN9           - basic-Latin at create, any at login
 #
 #    Expansion
-#        Allow server use content from expansion 
-#                 2 - check expansion 2 maps existence, and if client support expansion 2 and account have 
+#        Allow server use content from expansion
+#                 2 - check expansion 2 maps existence, and if client support expansion 2 and account have
 #                     expansion 2 setting then allow visit expansion 2 maps, allow create new class character)
-#        Default: 1 - check expansion 1 maps existence, and if client support expansion 1 and account have 
+#        Default: 1 - check expansion 1 maps existence, and if client support expansion 1 and account have
 #                     expansion 1 setting then allow visit expansion 1 maps, allow create new races character)
 #                 0 - not check expansion maps existence, not allow wisit its, not allow create new race or new class
 #                     characters, ignore account expansion setting)
@@ -357,16 +357,16 @@ LogColors = ""
 #        8 = Russian; 255 = Auto Detect (Default)
 #
 #    DeclinedNames
-#	 Allow russian clients to set and use declined names
-#	 Default: 0 - do not use declined names, except when the Russian RealmZone is set
-#		  1 - use declined names
+#    Allow russian clients to set and use declined names
+#    Default: 0 - do not use declined names, except when the Russian RealmZone is set
+#         1 - use declined names
 #
 #    StrictPlayerNames
 #        Limit player name to language specific symbols set, not allow create characters, and set rename request and disconnect at not allowed symbols name
 #        Default: 0 disable (but limited server timezone dependent client check)
 #                 1 basic latin characters  (strict)
-#                 2 realm zone specific (strict). See RealmZone setting. 
-#                   Note: In any case if you want correctly see character name at client this client must have apporopriate fonts 
+#                 2 realm zone specific (strict). See RealmZone setting.
+#                   Note: In any case if you want correctly see character name at client this client must have apporopriate fonts
 #                   (included in client by default, with active official localization or custom localization fonts in clientdir/Fonts).
 #                 3 basic latin characters + server timezone specific
 #
@@ -374,8 +374,8 @@ LogColors = ""
 #        Limit guild/arena team charter names to language specific symbols set, not allow create charters with allowed symbols in name
 #        Default: 0 disable
 #                 1 basic latin characters  (strict)
-#                 2 realm zone specific (strict). See RealmZone setting. 
-#                   Note: In any case if you want correctly see character name at client this client must have apporopriate fonts 
+#                 2 realm zone specific (strict). See RealmZone setting.
+#                   Note: In any case if you want correctly see character name at client this client must have apporopriate fonts
 #                   (included in client by default, with active official localization or custom localization fonts in clientdir/Fonts).
 #                 3 basic latin characters + server timezone specific
 #
@@ -383,8 +383,8 @@ LogColors = ""
 #        Limit pet names to language specific symbols set
 #        Default: 0 disable
 #                 1 basic latin characters  (strict)
-#                 2 realm zone specific (strict). See RealmZone setting. 
-#                   Note: In any case if you want correctly see character name at client this client must have apporopriate fonts 
+#                 2 realm zone specific (strict). See RealmZone setting.
+#                   Note: In any case if you want correctly see character name at client this client must have apporopriate fonts
 #                   (included in client by default, with active official localization or custom localization fonts in clientdir/Fonts).
 #                 3 basic latin characters + server timezone specific
 #
@@ -398,7 +398,7 @@ LogColors = ""
 #    CharactersPerAccount
 #        Limit numbers of characters per account (at all realms).
 #        Note: this setting limit character creating at _current_ realm base at characters amount at all realms
-#        Default: 50 
+#        Default: 50
 #                The number must be >= CharactersPerRealm
 #
 #    CharactersPerRealm
@@ -474,16 +474,16 @@ LogColors = ""
 #                 0 (instance maps are kept in memory until they are reset)
 #
 #    Quests.LowLevelHideDiff
-#        Quest level difference to hide for player low level quests: 
+#        Quest level difference to hide for player low level quests:
 #        if player_level > quest_level + LowLevelQuestsHideDiff then quest "!" mark not show for quest giver
 #        Default: 4
-#                -1 (show all available quests marks) 
+#                -1 (show all available quests marks)
 #
 #    Quests.HighLevelHideDiff
-#        Quest level difference to hide for player high level quests: 
+#        Quest level difference to hide for player high level quests:
 #        if player_level < quest_min_level - HighLevelQuestsHideDiff then quest "!" mark not show for quest giver
 #        Default: 7
-#                -1 (show all available quests marks) 
+#                -1 (show all available quests marks)
 #
 #    MaxPrimaryTradeSkill
 #        Max count that player can learn the primary trade skill.
@@ -571,7 +571,7 @@ Motd = "Welcome to the Massive Network Game Object Server."
 #    AllowTwoSide.Interaction.Guild
 #    AllowTwoSide.Interaction.Auction
 #    AllowTwoSide.Interaction.Mail
-#        Allow or not common :chat(say,yell);channel(chat)group(join)guild(join);merge all auction houses for players from 
+#        Allow or not common :chat(say,yell);channel(chat)group(join)guild(join);merge all auction houses for players from
 #        different teams, send mail to different team.
 #        Default: 0 (Not allowed)
 #                 1 (Allowed)
@@ -587,7 +587,7 @@ Motd = "Welcome to the Massive Network Game Object Server."
 #                 1 (Allowed)
 #
 #    TalentsInspecting
-#        Allow other players see character talents in inspect dialog (Characters in Gamemaster mode can 
+#        Allow other players see character talents in inspect dialog (Characters in Gamemaster mode can
 #        inspect talents always)
 #        Default: 1 (allow)
 #                 0 (not allow)
@@ -712,7 +712,7 @@ ListenRange.Yell = 300
 #
 #    ChatFakeMessagePreventing
 #        Chat protection from creating fake messages using a lot spaces (other invisible symbols),
-#        not applied to addon language messages, but can prevent working old addons 
+#        not applied to addon language messages, but can prevent working old addons
 #        that use normal languages for sending data to another clients.
 #        Default: 0 (disible fake messages preventing)
 #                 1 (enabled fake messages preventing)
@@ -812,7 +812,7 @@ GM.LogTrade = 1
 #
 #    Visibility.Distance.Creature
 #    Visibility.Distance.Player
-#        Visibility distance for different in game object 
+#        Visibility distance for different in game object
 #        Max limited by active player zone: ~ 166
 #        Min limit dependent from objects
 #        Default: 66 (cell size)
@@ -852,7 +852,7 @@ Visibility.Distance.Grey.Object = 10
 # SERVER RATES
 #
 #    Rate.Health
-#    Rate.Mana 
+#    Rate.Mana
 #    Rate.Rage.Income
 #    Rate.Rage.Loss
 #    Rate.Focus
@@ -908,7 +908,7 @@ Visibility.Distance.Grey.Object = 10
 #
 #    Rate.Mining.Amount
 #    Rate.Mining.Next
-#        Mining Rates (Mining.Amount changes minimum/maximum usetimes of a deposit, 
+#        Mining Rates (Mining.Amount changes minimum/maximum usetimes of a deposit,
 #        Mining.Next changes chance to have next use of a deposit)
 #
 #    Rate.Talent
@@ -934,12 +934,12 @@ Visibility.Distance.Grey.Object = 10
 #    SkillChance.Yellow
 #    SkillChance.Green
 #    SkillChance.Grey
-#        Skill chance values (0..100) 
+#        Skill chance values (0..100)
 #        Default: 100-75-25-0
 #
 #    SkillChance.MiningSteps
 #    SkillChance.SkinningSteps
-#         For skinning and Mining chance decrease with skill level. 
+#         For skinning and Mining chance decrease with skill level.
 #         Default: 0  - no decrease
 #                  75 - in 2 times each 75 skill points
 #
@@ -967,7 +967,7 @@ Visibility.Distance.Grey.Object = 10
 #
 #    Death.CorpseReclaimDelay.PvP
 #    Death.CorpseReclaimDelay.PvE
-#         Enabled/disabled increase corpse reclaim delay at often PvP/PvE deaths 
+#         Enabled/disabled increase corpse reclaim delay at often PvP/PvE deaths
 #         Default: 1 (enabled)
 #                  0 (disabled)
 #
