@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2005-2008 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -716,7 +716,7 @@ class ObjectMgr
             CacheNpcTextIdMap::const_iterator iter = m_mCacheNpcTextIdMap.find(entry);
             if(iter == m_mCacheNpcTextIdMap.end())
                 return 0;
-            
+
             return iter->second;
         }
 

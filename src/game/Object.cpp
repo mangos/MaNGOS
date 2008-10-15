@@ -1172,7 +1172,7 @@ namespace MaNGOS
     {
         public:
             MessageChatLocaleCacheDo(WorldObject const& obj, ChatMsg msgtype, int32 textId, uint32 language, uint64 targetGUID, float dist)
-                : i_object(obj), i_msgtype(msgtype), i_textId(textId), i_language(language), 
+                : i_object(obj), i_msgtype(msgtype), i_textId(textId), i_language(language),
                 i_targetGUID(targetGUID), i_dist(dist)
             {
             }

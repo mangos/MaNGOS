@@ -527,7 +527,7 @@ class World
 
         //Player Queue
         Queue m_QueuedPlayer;
-        
+
         //sessions that are added async
         void AddSession_(WorldSession* s);
         ZThread::LockedQueue<WorldSession*, ZThread::FastMutex> addSessQueue;

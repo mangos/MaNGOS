@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2005-2008 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  */
 
 #include "Common.h"
-#include "WorldSocket.h" 
+#include "WorldSocket.h"
 #include <ace/Message_Block.h>
 #include <ace/OS_NS_string.h>
 #include <ace/OS_NS_unistd.h>
@@ -301,7 +301,7 @@ int WorldSocket::handle_output (ACE_HANDLE)
 #else
     ssize_t n = this->peer ().send (m_OutBuffer->rd_ptr (), send_len);
 #endif // MSG_NOSIGNAL
-          
+
     if (n == 0)
         return -1;
     else if (n == -1)
@@ -402,7 +402,7 @@ int WorldSocket::handle_input_header (void)
 
     if(header.size > 0)
     {
-        m_RecvWPct->resize (header.size);  
+        m_RecvWPct->resize (header.size);
         m_RecvPct.base ((char*) m_RecvWPct->contents (), m_RecvWPct->size ());
     }
     else
@@ -567,7 +567,7 @@ int WorldSocket::schedule_wakeup_output (GuardType& g)
 int WorldSocket::ProcessIncoming (WorldPacket* new_pct)
 {
     ACE_ASSERT (new_pct);
-  
+
     // manage memory ;)
     ACE_Auto_Ptr<WorldPacket> aptr (new_pct);
 
@@ -799,7 +799,7 @@ int WorldSocket::HandleAuthSession (WorldPacket& recvPacket)
 
     delete result;
 
-    // Re-check account ban (same check as in realmd) 
+    // Re-check account ban (same check as in realmd)
     QueryResult *banresult =
           loginDatabase.PQuery ("SELECT "
                                 "bandate, "
@@ -977,7 +977,7 @@ int WorldSocket::iSendPacket (const WorldPacket& pct)
 #if ACE_BYTE_ORDER == ACE_BIG_ENDIAN
     header.cmd = ACE_SWAP_WORD (header.cmd)
 #endif
-          
+
     header.size = (uint16) pct.size () + 2;
     header.size = ACE_HTONS (header.size);
 

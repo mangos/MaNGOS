@@ -265,7 +265,7 @@ Player::Player (WorldSession *session): Unit()
     if(GetSession()->GetSecurity() >= SEC_GAMEMASTER)
         SetAcceptTicket(true);
 
-    // players always accept 
+    // players always accept
     if(GetSession()->GetSecurity() == SEC_PLAYER)
         SetAcceptWhispers(true);
 
@@ -18134,7 +18134,7 @@ void Player::UpdateUnderwaterState( Map* m, float x, float y, float z )
 void Player::SetCanParry( bool value )
 {
     if(m_canParry==value)
-        return; 
+        return;
 
     m_canParry = value;
     UpdateParryPercentage();
@@ -18143,7 +18143,7 @@ void Player::SetCanParry( bool value )
 void Player::SetCanBlock( bool value )
 {
     if(m_canBlock==value)
-        return; 
+        return;
 
     m_canBlock = value;
     UpdateBlockPercentage();

@@ -50,7 +50,7 @@ RandomMovementGenerator<Creature>::_setRandomLocation(Creature &creature)
     nx = X + distanceX;
     ny = Y + distanceY;
 
-    // prevent invalid coordinates generation 
+    // prevent invalid coordinates generation
     MaNGOS::NormalizeMapCoord(nx);
     MaNGOS::NormalizeMapCoord(ny);
 

@@ -1177,7 +1177,7 @@ void Spell::EffectDummy(uint32 i)
                     {
                         //Polymorph Cast Visual Rank 1
                         const uint32 spell_list[6] = {32813, 32816, 32817, 32818, 32819, 32820};
-                        unitTarget->CastSpell( unitTarget, spell_list[urand(0, 5)], true); 
+                        unitTarget->CastSpell( unitTarget, spell_list[urand(0, 5)], true);
                     }
                     return;
                 }

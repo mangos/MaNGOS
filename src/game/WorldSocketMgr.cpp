@@ -44,8 +44,8 @@
 #include "Database/DatabaseEnv.h"
 #include "WorldSocket.h"
 
-/** 
- * This is a helper class to WorldSocketMgr ,that manages 
+/**
+ * This is a helper class to WorldSocketMgr ,that manages
  * network threads, and assigning connections from acceptor thread
  * to other network threads
  */
@@ -122,14 +122,14 @@ public:
 
     return 0;
   }
-  
+
   ACE_Reactor* GetReactor ()
   {
     return m_Reactor;
   }
-  
+
 protected:
-  
+
   void
   AddNewSockets ()
   {
@@ -167,7 +167,7 @@ protected:
 
     while (!m_Reactor->reactor_event_loop_done ())
       {
-        // dont be too smart to move this outside the loop 
+        // dont be too smart to move this outside the loop
         // the run_reactor_event_loop will modify interval
         ACE_Time_Value interval (0, 10000);
 
@@ -227,7 +227,7 @@ WorldSocketMgr::~WorldSocketMgr ()
 {
   if (m_NetThreads)
     delete [] m_NetThreads;
-  
+
   if(m_Acceptor)
     delete m_Acceptor;
 }
@@ -306,11 +306,11 @@ WorldSocketMgr::StopNetwork ()
       for (size_t i = 0; i < m_NetThreadsCount; ++i)
         m_NetThreads[i].Stop ();
     }
-  
+
   this->Wait ();
 }
 
-void 
+void
 WorldSocketMgr::Wait ()
 {
   if (m_NetThreadsCount != 0)
@@ -346,7 +346,7 @@ WorldSocketMgr::OnSocketOpen (WorldSocket* sock)
         sLog.outError ("WorldSocketMgr::OnSocketOpen: peer ().set_option TCP_NODELAY errno = %s", ACE_OS::strerror (errno));
         return -1;
       }
-  
+
   sock->m_OutBufferSize = static_cast<size_t> (m_SockOutUBuff);
 
   // we skip the Acceptor Thread

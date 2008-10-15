@@ -1976,7 +1976,7 @@ uint32 Creature::GetVendorItemCurrentCount(VendorItem const* vItem)
         uint32 diff = uint32((ptime - vCount->lastIncrementTime)/vItem->incrtime);
         if((vCount->count + diff * pProto->BuyCount) >= vItem->maxcount )
         {
-            m_vendorItemCounts.erase(itr);        
+            m_vendorItemCounts.erase(itr);
             return vItem->maxcount;
         }
 

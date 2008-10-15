@@ -123,7 +123,7 @@ World::~World()
     VMAP::VMapFactory::clear();
 
     if(m_resultQueue) delete m_resultQueue;
-    
+
     //TODO free addSessQueue
 }
 
@@ -208,7 +208,7 @@ World::AddSession_ (WorldSession* s)
   uint32 pLimit = GetPlayerAmountLimit ();
   uint32 QueueSize = GetQueueSize (); //number of players in the queue
   bool inQueue = false;
-  //so we don't count the user trying to 
+  //so we don't count the user trying to
   //login as a session and queue the socket that we are using
   --Sessions;
 
@@ -219,7 +219,7 @@ World::AddSession_ (WorldSession* s)
       sLog.outDetail ("PlayerQueue: Account id %u is in Queue Position (%u).", s->GetAccountId (), ++QueueSize);
       return;
     }
-  
+
   WorldPacket packet(SMSG_AUTH_RESPONSE, 1 + 4 + 1 + 4 + 1);
   packet << uint8 (AUTH_OK);
   packet << uint32 (0); // unknown random value...
@@ -255,7 +255,7 @@ int32 World::GetQueuePos(WorldSession* sess)
 void World::AddQueuedPlayer(WorldSession* sess)
 {
     m_QueuedPlayer.push_back (sess);
-    
+
     // The 1st SMSG_AUTH_RESPONSE needs to contain other info too.
     WorldPacket packet (SMSG_AUTH_RESPONSE, 1 + 4 + 1 + 4 + 1);
     packet << uint8 (AUTH_WAIT_QUEUE);
@@ -265,7 +265,7 @@ void World::AddQueuedPlayer(WorldSession* sess)
     packet << uint8 (sess->Expansion()); // 0 - normal, 1 - TBC, must be set in database manually for each account
     packet << uint32(GetQueuePos (sess));
     sess->SendPacket (&packet);
-    
+
     //sess->SendAuthWaitQue (GetQueuePos (sess));
 }
 
@@ -787,7 +787,7 @@ void World::LoadConfigSettings(bool reload)
     m_configs[CONFIG_THREAT_RADIUS] = sConfig.GetIntDefault("ThreatRadius", 100);
 
     // always use declined names in the russian client
-    m_configs[CONFIG_DECLINED_NAMES_USED] = 
+    m_configs[CONFIG_DECLINED_NAMES_USED] =
         (m_configs[CONFIG_REALM_ZONE] == REALM_ZONE_RUSSIAN) ? true : sConfig.GetBoolDefault("DeclinedNames", false);
 
     m_configs[CONFIG_LISTEN_RANGE_SAY]       = sConfig.GetIntDefault("ListenRange.Say", 25);
@@ -2429,7 +2429,7 @@ void World::UpdateSessions( time_t diff )
       WorldSession* sess = addSessQueue.next ();
       AddSession_ (sess);
     }
-        
+
     ///- Delete kicked sessions at add new session
     for (std::set<WorldSession*>::iterator itr = m_kicked_sessions.begin(); itr != m_kicked_sessions.end(); ++itr)
         delete *itr;

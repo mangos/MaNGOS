@@ -219,7 +219,7 @@ void WorldSession::HandleTrainerBuySpellOpcode( WorldPacket & recv_data )
     // check present spell in trainer spell list
     TrainerSpellData const* trainer_spells = unit->GetTrainerSpells();
     if(!trainer_spells)
-        return; 
+        return;
 
     // not found, cheat?
     TrainerSpell const* trainer_spell = trainer_spells->Find(spellId);

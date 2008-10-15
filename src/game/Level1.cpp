@@ -1882,13 +1882,13 @@ bool ChatHandler::HandleSendMailCommand(const char* args)
     // get from tail next item str
     while(char* itemStr = strtok(tail, " "))
     {
-        // and get new tail 
+        // and get new tail
         tail = strtok(NULL, "");
 
         // parse item str
         char* itemIdStr = strtok(itemStr, ":");
         char* itemCountStr = strtok(NULL, " ");
-        
+
         uint32 item_id = atoi(itemIdStr);
         if(!item_id)
             return false;

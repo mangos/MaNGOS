@@ -6650,7 +6650,7 @@ bool ObjectMgr::AddGameTele(GameTele& tele)
     for(GameTeleMap::const_iterator itr = m_GameTeleMap.begin(); itr != m_GameTeleMap.end(); ++itr)
         if(itr->first > new_id)
             new_id = itr->first;
-    
+
     // use next
     ++new_id;
 
@@ -6690,7 +6690,7 @@ bool ObjectMgr::DeleteGameTele(std::string name)
 
 void ObjectMgr::LoadTrainerSpell()
 {
-    // For reload case 
+    // For reload case
     for (CacheTrainerSpellMap::iterator itr = m_mCacheTrainerSpellMap.begin(); itr != m_mCacheTrainerSpellMap.end(); ++itr)
         itr->second.Clear();
     m_mCacheTrainerSpellMap.clear();
@@ -6781,7 +6781,7 @@ void ObjectMgr::LoadTrainerSpell()
 
 void ObjectMgr::LoadVendors()
 {
-    // For reload case 
+    // For reload case
     for (CacheVendorItemMap::iterator itr = m_mCacheVendorItemMap.begin(); itr != m_mCacheVendorItemMap.end(); ++itr)
         itr->second.Clear();
     m_mCacheVendorItemMap.clear();

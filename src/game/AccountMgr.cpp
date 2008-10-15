@@ -97,7 +97,7 @@ AccountOpResult AccountMgr::DeleteAccount(uint32 accid)
 
     loginDatabase.BeginTransaction();
 
-    bool res =  
+    bool res =
         loginDatabase.PExecute("DELETE FROM account WHERE id='%d'", accid) &&
         loginDatabase.PExecute("DELETE FROM realmcharacters WHERE acctid='%d'", accid);
 
