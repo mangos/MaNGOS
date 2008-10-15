@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2005-2008 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -82,11 +82,11 @@ namespace VMAP
         // See if the ray will ever hit this node or its children
         Vector3 location;
         bool alreadyInsideBounds = false;
-        bool rayWillHitBounds = 
+        bool rayWillHitBounds =
             MyCollisionDetection::collisionLocationForMovingPointFixedAABox(
             pRay.origin, pRay.direction, pBox, location, alreadyInsideBounds);
 
-        bool canHitThisNode = (alreadyInsideBounds ||                
+        bool canHitThisNode = (alreadyInsideBounds ||
             (rayWillHitBounds && ((location - pRay.origin).squaredLength() < (pMaxDist * pMaxDist))));
 
         return canHitThisNode;

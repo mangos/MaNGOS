@@ -1,4 +1,4 @@
-/* 
+/*
 * Copyright (C) 2005-2008 MaNGOS <http://getmangos.com/>
 *
 * This program is free software; you can redistribute it and/or modify
@@ -32,7 +32,7 @@ The collision detection is modified to return true, if we are inside an object.
 
 namespace VMAP
 {
-    template<class TValue> 
+    template<class TValue>
     class IntersectionCallBack {
     public:
         TValue*      closestEntity;

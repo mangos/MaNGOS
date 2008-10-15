@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2005-2008 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -66,7 +66,7 @@ namespace VMAP
         nSubModels += pNode.valueArray.size();
         for(int i=0;i<pNode.valueArray.size(); i++)
         {
-	    G3D::_AABSPTree::Handle<SubModel*>* h= pNode.valueArray[i];
+        G3D::_AABSPTree::Handle<SubModel*>* h= pNode.valueArray[i];
             SubModel *m = h->value;
             // add the internal nodes as well
             nNodes += m->getNNodes();
