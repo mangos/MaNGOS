@@ -866,7 +866,7 @@ void PatcherRunnable::run()
 
 /// Preload MD5 hashes of existing patch files on server
 #ifndef _WIN32
-#include <sys/dir.h>
+#include <dirent.h>
 #include <errno.h>
 void Patcher::LoadPatchesInfo()
 {
