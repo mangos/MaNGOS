@@ -47,11 +47,11 @@ _player(NULL), m_Socket(sock),_security(sec), _accountId(id), m_expansion(expans
 m_sessionDbcLocale(sWorld.GetAvailableDbcLocale(locale)), m_sessionDbLocaleIndex(objmgr.GetIndexForLocale(locale)),
 _logoutTime(0), m_playerLoading(false), m_playerLogout(false), m_playerRecentlyLogout(false), m_latency(0)
 {
-   if (sock)
-     {
-       m_Address = sock->GetRemoteAddress ();
-       sock->AddReference ();
-     }
+    if (sock)
+    {
+        m_Address = sock->GetRemoteAddress ();
+        sock->AddReference ();
+    }
 }
 
 /// WorldSession destructor
@@ -96,7 +96,9 @@ void WorldSession::SendPacket(WorldPacket const* packet)
 {
     if (!m_Socket)
         return;
+
     #ifdef MANGOS_DEBUG
+
     // Code for network use statistic
     static uint64 sendPacketCount = 0;
     static uint64 sendPacketBytes = 0;
@@ -128,12 +130,11 @@ void WorldSession::SendPacket(WorldPacket const* packet)
         sendLastPacketCount = 1;
         sendLastPacketBytes = packet->wpos();               // wpos is real written size
     }
-#endif                                                  // !MANGOS_DEBUG
 
-  if (m_Socket->SendPacket (*packet) == -1)
-    {
-      m_Socket->CloseSocket ();
-    }
+    #endif                                                  // !MANGOS_DEBUG
+
+    if (m_Socket->SendPacket (*packet) == -1)
+        m_Socket->CloseSocket ();
 }
 
 /// Add an incoming packet to the queue
@@ -154,12 +155,11 @@ void WorldSession::logUnexpectedOpcode(WorldPacket* packet, const char *reason)
 /// Update the WorldSession (triggered by World update)
 bool WorldSession::Update(uint32 /*diff*/)
 {
-  if (m_Socket)
-    if (m_Socket->IsClosed ())
-      {
+    if (m_Socket && m_Socket->IsClosed ())
+    {
         m_Socket->RemoveReference ();
         m_Socket = NULL;
-      }
+    }
 
     WorldPacket *packet;
 
@@ -386,7 +386,8 @@ void WorldSession::LogoutPlayer(bool Save)
 
         ///- Since each account can only have one online character at any given time, ensure all characters for active account are marked as offline
         //No SQL injection as AccountId is uint32
-        CharacterDatabase.PExecute("UPDATE characters SET online = 0 WHERE account = '%u'", GetAccountId());
+        CharacterDatabase.PExecute("UPDATE characters SET online = 0 WHERE account = '%u'",
+            GetAccountId());
         sLog.outDebug( "SESSION: Sent SMSG_LOGOUT_COMPLETE Message" );
     }
 
@@ -398,10 +399,8 @@ void WorldSession::LogoutPlayer(bool Save)
 /// Kick a player out of the World
 void WorldSession::KickPlayer()
 {
-  if (m_Socket)
-    {
-      m_Socket->CloseSocket ();
-    }
+    if (m_Socket)
+        m_Socket->CloseSocket ();
 }
 
 /// Cancel channeling handler
