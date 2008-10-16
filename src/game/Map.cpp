@@ -577,14 +577,6 @@ void Map::Update(const uint32 &t_diff)
     }
 }
 
-void InstanceMap::Update(const uint32& t_diff)
-{
-    Map::Update(t_diff);
-
-    if(i_data)
-        i_data->Update(t_diff);
-}
-
 void Map::Remove(Player *player, bool remove)
 {
     CellPair p = MaNGOS::ComputeCellPair(player->GetPositionX(), player->GetPositionY());
@@ -1545,6 +1537,14 @@ bool InstanceMap::Add(Player *player)
     // this will acquire the same mutex so it cannot be in the previous block
     Map::Add(player);
     return true;
+}
+
+void InstanceMap::Update(const uint32& t_diff)
+{
+    Map::Update(t_diff);
+
+    if(i_data)
+        i_data->Update(t_diff);
 }
 
 void InstanceMap::Remove(Player *player, bool remove)
