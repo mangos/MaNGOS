@@ -70,11 +70,6 @@ BindIP = "0.0.0.0"
 #        Default: 1 (speed)
 #                 9 (best compression)
 #
-#    TcpNoDelay
-#        TCP Nagle algorithm setting
-#        Default: 0 (enable Nagle algorithm, less traffic, more latency)
-#                 1 (TCP_NO_DELAY, disable Nagle algorithm, more traffic but less latency)
-#
 #    PlayerLimit
 #        Maximum number of players in the world. Excluding Mods, GM's and Admins
 #        Default: 100
@@ -1026,23 +1021,24 @@ Death.CorpseReclaimDelay.PvE = 1
 
 ###################################################################################################################
 #
-# Network config
+# NETWORK CONFIG
 #
-# Threads: Number of threads for network, recommend 1 thread per 1000 connections.
-#        Default: 1
+#    Network.Threads
+#         Number of threads for network, recommend 1 thread per 1000 connections.
+#         Default: 1
 #
-# OutKBuff: The size of the output kernel buffer used ( SO_SNDBUF socket option, tcp manual ).
-#           Default: -1 (Use system default setting)
+#    Network.OutKBuff
+#         The size of the output kernel buffer used ( SO_SNDBUF socket option, tcp manual ).
+#         Default: -1 (Use system default setting)
 #
-# OutUBuff: Userspace buffer for output. This is amount of memory reserved per each connection.
-#        Default: 65536
+#    Network.OutUBuff
+#         Userspace buffer for output. This is amount of memory reserved per each connection.
+#         Default: 65536
 #
-# TcpNoDelay:
-#        TCP Nagle algorithm setting
-#        Default: 0 (enable Nagle algorithm, less traffic, more latency)
-#                 1 (TCP_NO_DELAY, disable Nagle algorithm, more traffic but less latency)
-#
-#
+#    Network.TcpNoDelay:
+#         TCP Nagle algorithm setting
+#         Default: 0 (enable Nagle algorithm, less traffic, more latency)
+#                  1 (TCP_NO_DELAY, disable Nagle algorithm, more traffic but less latency)
 #
 ###################################################################################################################
 
