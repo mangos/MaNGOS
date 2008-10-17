@@ -135,7 +135,7 @@ typedef struct XFER_INIT
 {
     uint8 cmd;                                              // XFER_INITIATE
     uint8 fileNameLen;                                      // strlen(fileName);
-    uint8 fileName[1];                                      // fileName[fileNameLen]
+    uint8 fileName[5];                                      // fileName[fileNameLen]
     uint64 file_size;                                       // file size (bytes)
     uint8 md5[MD5_DIGEST_LENGTH];                           // MD5
 }XFER_INIT;
@@ -215,7 +215,7 @@ AuthSocket::AuthSocket(ISocketHandler &h) : TcpSocket(h)
     N.SetHexStr("894B645E89E1535BBDAD5B8B290650530801B18EBFBF5E8FAB3C82872A3E9BB7");
     g.SetDword(7);
     _authed = false;
-    pPatch=NULL;
+    pPatch = NULL;
 
     _accountSecurityLevel = SEC_PLAYER;
 }
@@ -223,6 +223,7 @@ AuthSocket::AuthSocket(ISocketHandler &h) : TcpSocket(h)
 /// Close patch file descriptor before leaving
 AuthSocket::~AuthSocket()
 {
+    ZThread::Guard<ZThread::Mutex> g(patcherLock);
     if(pPatch)
         fclose(pPatch);
 }
@@ -358,6 +359,7 @@ bool AuthSocket::_HandleLogonChallenge()
     ByteBuffer pkt;
 
     _login = (const char*)ch->I;
+    _build = ch->build;
 
     ///- Normalize account name
     //utf8ToUpperOnlyLatin(_login); -- client already send account in expected form
@@ -367,154 +369,169 @@ bool AuthSocket::_HandleLogonChallenge()
     _safelogin=_login;
     dbRealmServer.escape_string(_safelogin);
 
+    pkt << (uint8) AUTH_LOGON_CHALLENGE;
+    pkt << (uint8) 0x00;
+
+    ///- Verify that this IP is not in the ip_banned table
+    // No SQL injection possible (paste the IP address as passed by the socket)
+    dbRealmServer.Execute("DELETE FROM ip_banned WHERE unbandate<=UNIX_TIMESTAMP() AND unbandate<>bandate");
+
+    std::string address = GetRemoteAddress();
+    dbRealmServer.escape_string(address);
+    QueryResult *result = dbRealmServer.PQuery(  "SELECT * FROM ip_banned WHERE ip = '%s'",address.c_str());
+    if(result)
+    {
+        pkt << (uint8)REALM_AUTH_ACCOUNT_BANNED;
+        sLog.outBasic("[AuthChallenge] Banned ip %s tries to login!",GetRemoteAddress().c_str ());
+        delete result;
+    }
+    else
+    {
+        ///- Get the account details from the account table
+        // No SQL injection (escaped user name)
+
+        result = dbRealmServer.PQuery("SELECT sha_pass_hash,id,locked,last_ip,gmlevel FROM account WHERE username = '%s'",_safelogin.c_str ());
+        if( result )
+        {
+            ///- If the IP is 'locked', check that the player comes indeed from the correct IP address
+            bool locked = false;
+            if((*result)[2].GetUInt8() == 1)            // if ip is locked
+            {
+                DEBUG_LOG("[AuthChallenge] Account '%s' is locked to IP - '%s'", _login.c_str(), (*result)[3].GetString());
+                DEBUG_LOG("[AuthChallenge] Player address is '%s'", GetRemoteAddress().c_str());
+                if ( strcmp((*result)[3].GetString(),GetRemoteAddress().c_str()) )
+                {
+                    DEBUG_LOG("[AuthChallenge] Account IP differs");
+                    pkt << (uint8) REALM_AUTH_ACCOUNT_FREEZED;
+                    locked=true;
+                }
+                else
+                {
+                    DEBUG_LOG("[AuthChallenge] Account IP matches");
+                }
+            }
+            else
+            {
+                DEBUG_LOG("[AuthChallenge] Account '%s' is not locked to ip", _login.c_str());
+            }
+
+            if (!locked)
+            {
+                //set expired bans to inactive
+                dbRealmServer.Execute("UPDATE account_banned SET active = 0 WHERE unbandate<=UNIX_TIMESTAMP() AND unbandate<>bandate");
+                ///- If the account is banned, reject the logon attempt
+                QueryResult *banresult = dbRealmServer.PQuery("SELECT bandate,unbandate FROM account_banned WHERE id = %u AND active = 1", (*result)[1].GetUInt32());
+                if(banresult)
+                {
+                    if((*banresult)[0].GetUInt64() == (*banresult)[1].GetUInt64())
+                    {
+                        pkt << (uint8) REALM_AUTH_ACCOUNT_BANNED;
+                        sLog.outBasic("[AuthChallenge] Banned account %s tries to login!",_login.c_str ());
+                    }
+                    else
+                    {
+                        pkt << (uint8) REALM_AUTH_ACCOUNT_FREEZED;
+                        sLog.outBasic("[AuthChallenge] Temporarily banned account %s tries to login!",_login.c_str ());
+                    }
+
+                    delete banresult;
+                }
+                else
+                {
+                    ///- Get the password from the account table, upper it, and make the SRP6 calculation
+                    std::string rI = (*result)[0].GetCppString();
+                    _SetVSFields(rI);
+
+                    b.SetRand(19 * 8);
+                    BigNumber gmod=g.ModExp(b, N);
+                    B = ((v * 3) + gmod) % N;
+
+                    ASSERT(gmod.GetNumBytes() <= 32);
+
+                    BigNumber unk3;
+                    unk3.SetRand(16*8);
+
+                    ///- Fill the response packet with the result
+                    pkt << (uint8)REALM_AUTH_SUCCESS;
+
+                    // B may be calculated < 32B so we force minnimal length to 32B
+                    pkt.append(B.AsByteArray(32), 32);   // 32 bytes
+                    pkt << (uint8)1;
+                    pkt.append(g.AsByteArray(), 1);
+                    pkt << (uint8)32;
+                    pkt.append(N.AsByteArray(), 32);
+                    pkt.append(s.AsByteArray(), s.GetNumBytes());   // 32 bytes
+                    pkt.append(unk3.AsByteArray(), 16);
+                    pkt << (uint8)0;                    // Added in 1.12.x client branch
+
+                    uint8 secLevel = (*result)[4].GetUInt8();
+                    _accountSecurityLevel = secLevel <= SEC_ADMINISTRATOR ? AccountTypes(secLevel) : SEC_ADMINISTRATOR;
+
+                    _localizationName.resize(4);
+                    for(int i = 0; i <4; ++i)
+                        _localizationName[i] = ch->country[4-i-1];
+
+                    sLog.outBasic("[AuthChallenge] account %s is using '%c%c%c%c' locale (%u)", _login.c_str (), ch->country[3],ch->country[2],ch->country[1],ch->country[0], GetLocaleByName(_localizationName));
+                }
+            }
+            delete result;
+        }
+        else                                            //no account
+        {
+            pkt<< (uint8) REALM_AUTH_NO_MATCH;
+        }
+    }
+    SendBuf((char const*)pkt.contents(), pkt.size());
+    return true;
+}
+
+/// Logon Proof command handler
+bool AuthSocket::_HandleLogonProof()
+{
+    DEBUG_LOG("Entering _HandleLogonProof");
+    ///- Read the packet
+    if (ibuf.GetLength() < sizeof(sAuthLogonProof_C))
+        return false;
+    sAuthLogonProof_C lp;
+    ibuf.Read((char *)&lp, sizeof(sAuthLogonProof_C));
+
     ///- Check if the client has one of the expected version numbers
     bool valid_version=false;
     int accepted_versions[]=EXPECTED_MANGOS_CLIENT_BUILD;
     for(int i=0;accepted_versions[i];i++)
-        if(ch->build==accepted_versions[i])
     {
-        valid_version=true;
-        break;
+        if(_build==accepted_versions[i])
+        {
+            valid_version=true;
+            break;
+        }
     }
 
-    /// <ul><li> if this is a valid version
-    if(valid_version)
-    {
-        pkt << (uint8) AUTH_LOGON_CHALLENGE;
-        pkt << (uint8) 0x00;
-
-        ///- Verify that this IP is not in the ip_banned table
-        // No SQL injection possible (paste the IP address as passed by the socket)
-        dbRealmServer.Execute("DELETE FROM ip_banned WHERE unbandate<=UNIX_TIMESTAMP() AND unbandate<>bandate");
-
-        std::string address = GetRemoteAddress();
-        dbRealmServer.escape_string(address);
-        QueryResult *result = dbRealmServer.PQuery(  "SELECT * FROM ip_banned WHERE ip = '%s'",address.c_str());
-        if(result)
-        {
-            pkt << (uint8)REALM_AUTH_ACCOUNT_BANNED;
-            sLog.outBasic("[AuthChallenge] Banned ip %s tries to login!",GetRemoteAddress().c_str ());
-            delete result;
-        }
-        else
-        {
-            ///- Get the account details from the account table
-            // No SQL injection (escaped user name)
-
-            result = dbRealmServer.PQuery("SELECT sha_pass_hash,id,locked,last_ip,gmlevel FROM account WHERE username = '%s'",_safelogin.c_str ());
-            if( result )
-            {
-                ///- If the IP is 'locked', check that the player comes indeed from the correct IP address
-                bool locked = false;
-                if((*result)[2].GetUInt8() == 1)            // if ip is locked
-                {
-                    DEBUG_LOG("[AuthChallenge] Account '%s' is locked to IP - '%s'", _login.c_str(), (*result)[3].GetString());
-                    DEBUG_LOG("[AuthChallenge] Player address is '%s'", GetRemoteAddress().c_str());
-                    if ( strcmp((*result)[3].GetString(),GetRemoteAddress().c_str()) )
-                    {
-                        DEBUG_LOG("[AuthChallenge] Account IP differs");
-                        pkt << (uint8) REALM_AUTH_ACCOUNT_FREEZED;
-                        locked=true;
-                    }
-                    else
-                    {
-                        DEBUG_LOG("[AuthChallenge] Account IP matches");
-                    }
-                }
-                else
-                {
-                    DEBUG_LOG("[AuthChallenge] Account '%s' is not locked to ip", _login.c_str());
-                }
-
-                if (!locked)
-                {
-                    //set expired bans to inactive
-                    dbRealmServer.Execute("UPDATE account_banned SET active = 0 WHERE unbandate<=UNIX_TIMESTAMP() AND unbandate<>bandate");
-                    ///- If the account is banned, reject the logon attempt
-                    QueryResult *banresult = dbRealmServer.PQuery("SELECT bandate,unbandate FROM account_banned WHERE id = %u AND active = 1", (*result)[1].GetUInt32());
-                    if(banresult)
-                    {
-                        if((*banresult)[0].GetUInt64() == (*banresult)[1].GetUInt64())
-                        {
-                            pkt << (uint8) REALM_AUTH_ACCOUNT_BANNED;
-                            sLog.outBasic("[AuthChallenge] Banned account %s tries to login!",_login.c_str ());
-                        }
-                        else
-                        {
-                            pkt << (uint8) REALM_AUTH_ACCOUNT_FREEZED;
-                            sLog.outBasic("[AuthChallenge] Temporarily banned account %s tries to login!",_login.c_str ());
-                        }
-
-                        delete banresult;
-                    }
-                    else
-                    {
-                        ///- Get the password from the account table, upper it, and make the SRP6 calculation
-                        std::string rI = (*result)[0].GetCppString();
-                        _SetVSFields(rI);
-
-                        b.SetRand(19 * 8);
-                        BigNumber gmod=g.ModExp(b, N);
-                        B = ((v * 3) + gmod) % N;
-
-                        ASSERT(gmod.GetNumBytes() <= 32);
-
-                        BigNumber unk3;
-                        unk3.SetRand(16*8);
-
-                        ///- Fill the response packet with the result
-                        pkt << (uint8)REALM_AUTH_SUCCESS;
-
-                        // B may be calculated < 32B so we force minnimal length to 32B
-                        pkt.append(B.AsByteArray(32), 32);   // 32 bytes
-                        pkt << (uint8)1;
-                        pkt.append(g.AsByteArray(), 1);
-                        pkt << (uint8)32;
-                        pkt.append(N.AsByteArray(), 32);
-                        pkt.append(s.AsByteArray(), s.GetNumBytes());   // 32 bytes
-                        pkt.append(unk3.AsByteArray(), 16);
-                        pkt << (uint8)0;                    // Added in 1.12.x client branch
-
-                        uint8 secLevel = (*result)[4].GetUInt8();
-                        _accountSecurityLevel = secLevel <= SEC_ADMINISTRATOR ? AccountTypes(secLevel) : SEC_ADMINISTRATOR;
-
-                        std::string localeName;
-                        localeName.resize(4);
-                        for(int i = 0; i <4; ++i)
-                            localeName[i] = ch->country[4-i-1];
-
-                        _localization = GetLocaleByName(localeName);
-
-                        sLog.outBasic("[AuthChallenge] account %s is using '%c%c%c%c' locale (%u)", _login.c_str (), ch->country[3],ch->country[2],ch->country[1],ch->country[0], _localization);
-                    }
-                }
-                delete result;
-            }
-            else                                            //no account
-            {
-                pkt<< (uint8) REALM_AUTH_NO_MATCH;
-            }
-        }
-    }                                                       //valid version
-    else
-        ///<li> else
+    /// <ul><li> If the client has no valid version
+    if(!valid_version)
     {
         ///- Check if we have the apropriate patch on the disk
-        char tmp[64];
+
+        // 24 = len("./patches/65535enGB.mpq")+1
+        char tmp[24];
         // No buffer overflow (fixed length of arguments)
-        sprintf(tmp,"./patches/%d%c%c%c%c.mpq",ch->build,ch->country[3],
-            ch->country[2],ch->country[1],ch->country[0]);
+        sprintf(tmp,"./patches/%d%s.mpq",_build, _localizationName.c_str());
         // This will be closed at the destruction of the AuthSocket (client deconnection)
         FILE *pFile=fopen(tmp,"rb");
+
         if(!pFile)
         {
+            ByteBuffer pkt;
             pkt << (uint8) AUTH_LOGON_CHALLENGE;
             pkt << (uint8) 0x00;
             pkt << (uint8) REALM_AUTH_WRONG_BUILD_NUMBER;
-            DEBUG_LOG("[AuthChallenge] %u is not a valid client version!", ch->build);
+            DEBUG_LOG("[AuthChallenge] %u is not a valid client version!", _build);
             DEBUG_LOG("[AuthChallenge] Patch %s not found",tmp);
-        }else
-        {                                                   //have patch
+            SendBuf((char const*)pkt.contents(), pkt.size());
+            return true;
+        }
+        else                                                // have patch
+        {
             pPatch=pFile;
             XFER_INIT xferh;
 
@@ -544,20 +561,6 @@ bool AuthSocket::_HandleLogonChallenge()
         }
     }
     /// </ul>
-    SendBuf((char const*)pkt.contents(), pkt.size());
-    return true;
-}
-
-/// Logon Proof command handler
-bool AuthSocket::_HandleLogonProof()
-{
-    DEBUG_LOG("Entering _HandleLogonProof");
-    ///- Read the packet
-    if (ibuf.GetLength() < sizeof(sAuthLogonProof_C))
-        return false;
-
-    sAuthLogonProof_C lp;
-    ibuf.Read((char *)&lp, sizeof(sAuthLogonProof_C));
 
     ///- Continue the SRP6 calculation based on data received from the client
     BigNumber A;
@@ -636,7 +639,7 @@ bool AuthSocket::_HandleLogonProof()
         ///- Update the sessionkey, last_ip, last login time and reset number of failed logins in the account table for this account
         // No SQL injection (escaped user name) and IP address as received by socket
         const char* K_hex = K.AsHexStr();
-        dbRealmServer.PExecute("UPDATE account SET sessionkey = '%s', last_ip = '%s', last_login = NOW(), locale = '%u', failed_logins = 0 WHERE username = '%s'", K_hex, GetRemoteAddress().c_str(),  _localization, _safelogin.c_str() );
+        dbRealmServer.PExecute("UPDATE account SET sessionkey = '%s', last_ip = '%s', last_login = NOW(), locale = '%u', failed_logins = 0 WHERE username = '%s'", K_hex, GetRemoteAddress().c_str(), GetLocaleByName(_localizationName), _safelogin.c_str() );
         OPENSSL_free((void*)K_hex);
 
         ///- Finish SRP6 and send the final result to the client
@@ -848,6 +851,7 @@ PatcherRunnable::PatcherRunnable(class AuthSocket * as)
 /// Send content of patch file to the client
 void PatcherRunnable::run()
 {
+    ZThread::Guard<ZThread::Mutex> g(mySocket->patcherLock);
     XFER_DATA_STRUCT xfdata;
     xfdata.opcode = XFER_DATA;
 
@@ -909,10 +913,11 @@ void Patcher::LoadPatchesInfo()
     if(hFil==INVALID_HANDLE_VALUE)
         return;                                             //no patches were found
 
-    LoadPatchMD5(fil.cFileName);
-
-    while(FindNextFile(hFil,&fil))
+    do
+    {
         LoadPatchMD5(fil.cFileName);
+    }
+    while(FindNextFile(hFil,&fil));
 }
 #endif
 
