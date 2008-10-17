@@ -12,22 +12,25 @@ To see if you need an update, the file names have been given a fixed structure
 that should enable you to see if you need an update or not.
 
 === File name descriptin ===
-File names are divided into two parts. First part is the revision that will be 
-compatible with database after apply update. The second part of the name, 
-is the table that needs and update or has been added. See an example below:
+File names are divided into two parts. First part is the date+counter 
+that show commit apply date that will be compatible with database after apply update. 
+The second part of the name, is the table that needs and update or has been added. 
+See an example below:
 
-         1123_characters_character_spell.sql
-         |    |          |
-         |    |          |
-         |    |          The table character_spell
-         |    |          will need an update.
-         |    |
-         |    Name of affected DB (default recommended name)
-         |    Can be: characters, mangos, realmd
+         2008_10_17_01_characters_character_spell.sql
+         |          |  |          |
+         |          |  |          |
+         |          |  |          The table character_spell
+         |          |  |          will need an update.
+         |          |  |
+         |          |  Name of affected DB (default recommended name)
+         |          |   Can be: characters, mangos, realmd
+         |          |
+         |          Counter show number of sql update in updates list for provided data
+         |          and set proper order for sql updates for some date
          |
-         MaNGOS revision older 1123 will need this update.
-         After appling this update DB compatiable with revision 1122
-         will be compatibale with revision 1123.
-         Revision 1123 and any revision after 1123, e.g. 1124 or 1137,
-         already includes this update in the default database
-         file mangos.sql.
+         MaNGOS commit date related to sql update. For related commit
+         you can see http://github.com/mangos/mangos/commits/master
+         Expected commit will be in commits list for provided date and it will have
+         sql update file name (2008_10_17_01_characters_character_spell.sql in our case) in list
+         changed files, After appling this update DB compatiable with found commit.
