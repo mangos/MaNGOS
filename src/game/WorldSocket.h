@@ -88,144 +88,144 @@ typedef ACE_Svc_Handler<ACE_SOCK_STREAM, ACE_NULL_SYNCH> WorldHandler;
  */
 class WorldSocket : protected WorldHandler
 {
-public:
-  /// Declare some friends
-  friend class ACE_Acceptor< WorldSocket, ACE_SOCK_ACCEPTOR >;
-  friend class WorldSocketMgr;
-  friend class ReactorRunnable;
+    public:
+        /// Declare some friends
+        friend class ACE_Acceptor< WorldSocket, ACE_SOCK_ACCEPTOR >;
+        friend class WorldSocketMgr;
+        friend class ReactorRunnable;
 
-  /// Declare the acceptor for this class
-  typedef ACE_Acceptor< WorldSocket, ACE_SOCK_ACCEPTOR > Acceptor;
+        /// Declare the acceptor for this class
+        typedef ACE_Acceptor< WorldSocket, ACE_SOCK_ACCEPTOR > Acceptor;
 
-  /// Mutex type used for various syncronizations.
-  typedef ACE_Thread_Mutex LockType;
-  typedef ACE_Guard<LockType> GuardType;
+        /// Mutex type used for various syncronizations.
+        typedef ACE_Thread_Mutex LockType;
+        typedef ACE_Guard<LockType> GuardType;
 
-  /// Queue for storing packets for which there is no space.
-  typedef ACE_Unbounded_Queue< WorldPacket* > PacketQueueT;
+        /// Queue for storing packets for which there is no space.
+        typedef ACE_Unbounded_Queue< WorldPacket* > PacketQueueT;
 
-  /// Check if socket is closed.
-  bool IsClosed (void) const;
+        /// Check if socket is closed.
+        bool IsClosed (void) const;
 
-  /// Close the socket.
-  void CloseSocket (void);
+        /// Close the socket.
+        void CloseSocket (void);
 
-  /// Get address of connected peer.
-  const std::string& GetRemoteAddress (void) const;
+        /// Get address of connected peer.
+        const std::string& GetRemoteAddress (void) const;
 
-  /// Send A packet on the socket, this function is reentrant.
-  /// @param pct packet to send
-  /// @return -1 of failure
-  int SendPacket (const WorldPacket& pct);
+        /// Send A packet on the socket, this function is reentrant.
+        /// @param pct packet to send
+        /// @return -1 of failure
+        int SendPacket (const WorldPacket& pct);
 
-  /// Add refference to this object.
-  long AddReference (void);
+        /// Add refference to this object.
+        long AddReference (void);
 
-  /// Remove refference to this object.
-  long RemoveReference (void);
+        /// Remove refference to this object.
+        long RemoveReference (void);
 
-protected:
-  /// things called by ACE framework.
-  WorldSocket (void);
-  virtual ~WorldSocket (void);
+    protected:
+        /// things called by ACE framework.
+        WorldSocket (void);
+        virtual ~WorldSocket (void);
 
-  /// Called on open ,the void* is the acceptor.
-  virtual int open (void *);
+        /// Called on open ,the void* is the acceptor.
+        virtual int open (void *);
 
-  /// Called on failures inside of the acceptor, don't call from your code.
-  virtual int close (int);
+        /// Called on failures inside of the acceptor, don't call from your code.
+        virtual int close (int);
 
-  /// Called when we can read from the socket.
-  virtual int handle_input (ACE_HANDLE = ACE_INVALID_HANDLE);
+        /// Called when we can read from the socket.
+        virtual int handle_input (ACE_HANDLE = ACE_INVALID_HANDLE);
 
-  /// Called when the socket can write.
-  virtual int handle_output (ACE_HANDLE = ACE_INVALID_HANDLE);
+        /// Called when the socket can write.
+        virtual int handle_output (ACE_HANDLE = ACE_INVALID_HANDLE);
 
-  /// Called when connection is closed or error happens.
-  virtual int handle_close (ACE_HANDLE = ACE_INVALID_HANDLE,
-                            ACE_Reactor_Mask = ACE_Event_Handler::ALL_EVENTS_MASK);
+        /// Called when connection is closed or error happens.
+        virtual int handle_close (ACE_HANDLE = ACE_INVALID_HANDLE,
+            ACE_Reactor_Mask = ACE_Event_Handler::ALL_EVENTS_MASK);
 
-  /// Called by WorldSocketMgr/ReactorRunnable.
-  int Update (void);
+        /// Called by WorldSocketMgr/ReactorRunnable.
+        int Update (void);
 
-private:
-  /// Helper functions for processing incoming data.
-  int handle_input_header (void);
-  int handle_input_payload (void);
-  int handle_input_missing_data (void);
+    private:
+        /// Helper functions for processing incoming data.
+        int handle_input_header (void);
+        int handle_input_payload (void);
+        int handle_input_missing_data (void);
 
-  /// Help functions to mark/unmark the socket for output.
-  /// @param g the guard is for m_OutBufferLock, the function will release it
-  int cancel_wakeup_output (GuardType& g);
-  int schedule_wakeup_output (GuardType& g);
+        /// Help functions to mark/unmark the socket for output.
+        /// @param g the guard is for m_OutBufferLock, the function will release it
+        int cancel_wakeup_output (GuardType& g);
+        int schedule_wakeup_output (GuardType& g);
 
-  /// process one incoming packet.
-  /// @param new_pct received packet ,note that you need to delete it.
-  int ProcessIncoming (WorldPacket* new_pct);
+        /// process one incoming packet.
+        /// @param new_pct received packet ,note that you need to delete it.
+        int ProcessIncoming (WorldPacket* new_pct);
 
-  /// Called by ProcessIncoming() on CMSG_AUTH_SESSION.
-  int HandleAuthSession (WorldPacket& recvPacket);
+        /// Called by ProcessIncoming() on CMSG_AUTH_SESSION.
+        int HandleAuthSession (WorldPacket& recvPacket);
 
-  /// Called by ProcessIncoming() on CMSG_PING.
-  int HandlePing (WorldPacket& recvPacket);
+        /// Called by ProcessIncoming() on CMSG_PING.
+        int HandlePing (WorldPacket& recvPacket);
 
-  /// Try to write WorldPacket to m_OutBuffer ,return -1 if no space
-  /// Need to be called with m_OutBufferLock lock held
-  int iSendPacket (const WorldPacket& pct);
+        /// Try to write WorldPacket to m_OutBuffer ,return -1 if no space
+        /// Need to be called with m_OutBufferLock lock held
+        int iSendPacket (const WorldPacket& pct);
 
-  /// Flush m_PacketQueue if there are packets in it
-  /// Need to be called with m_OutBufferLock lock held
-  /// @return true if it wrote to the buffer ( AKA you need
-  /// to mark the socket for output ).
-  bool iFlushPacketQueue ();
+        /// Flush m_PacketQueue if there are packets in it
+        /// Need to be called with m_OutBufferLock lock held
+        /// @return true if it wrote to the buffer ( AKA you need
+        /// to mark the socket for output ).
+        bool iFlushPacketQueue ();
 
-private:
-  /// Time in which the last ping was received
-  ACE_Time_Value m_LastPingTime;
+    private:
+        /// Time in which the last ping was received
+        ACE_Time_Value m_LastPingTime;
 
-  /// Keep track of overspeed pings ,to prevent ping flood.
-  uint32 m_OverSpeedPings;
+        /// Keep track of overspeed pings ,to prevent ping flood.
+        uint32 m_OverSpeedPings;
 
-  /// Address of the remote peer
-  std::string m_Address;
+        /// Address of the remote peer
+        std::string m_Address;
 
-  /// Class used for managing encryption of the headers
-  AuthCrypt m_Crypt;
+        /// Class used for managing encryption of the headers
+        AuthCrypt m_Crypt;
 
-  /// Mutex lock to protect m_Session
-  LockType m_SessionLock;
+        /// Mutex lock to protect m_Session
+        LockType m_SessionLock;
 
-  /// Session to which recieved packets are routed
-  WorldSession* m_Session;
+        /// Session to which recieved packets are routed
+        WorldSession* m_Session;
 
-  /// here are stored the fragmens of the recieved data
-  WorldPacket* m_RecvWPct;
+        /// here are stored the fragmens of the recieved data
+        WorldPacket* m_RecvWPct;
 
-  /// This block actually refers to m_RecvWPct contents,
-  /// which alows easy and safe writing to it.
-  /// It wont free memory when its deleted. m_RecvWPct takes care of freeing.
-  ACE_Message_Block m_RecvPct;
+        /// This block actually refers to m_RecvWPct contents,
+        /// which alows easy and safe writing to it.
+        /// It wont free memory when its deleted. m_RecvWPct takes care of freeing.
+        ACE_Message_Block m_RecvPct;
 
-  /// Fragment of the recieved header.
-  ACE_Message_Block m_Header;
+        /// Fragment of the recieved header.
+        ACE_Message_Block m_Header;
 
-  /// Mutex for protecting otuput related data.
-  LockType m_OutBufferLock;
+        /// Mutex for protecting otuput related data.
+        LockType m_OutBufferLock;
 
-  /// Buffer used for writing output.
-  ACE_Message_Block *m_OutBuffer;
+        /// Buffer used for writing output.
+        ACE_Message_Block *m_OutBuffer;
 
-  /// Size of the m_OutBuffer.
-  size_t m_OutBufferSize;
+        /// Size of the m_OutBuffer.
+        size_t m_OutBufferSize;
 
-  /// Here are stored packets for which there was no space on m_OutBuffer,
-  /// this alows not-to kick player if its buffer is overflowed.
-  PacketQueueT m_PacketQueue;
+        /// Here are stored packets for which there was no space on m_OutBuffer,
+        /// this alows not-to kick player if its buffer is overflowed.
+        PacketQueueT m_PacketQueue;
 
-  /// True if the socket is registered with the reactor for output
-  bool m_OutActive;
+        /// True if the socket is registered with the reactor for output
+        bool m_OutActive;
 
-  uint32 m_Seed;
+        uint32 m_Seed;
 };
 
 #endif  /* _WORLDSOCKET_H */

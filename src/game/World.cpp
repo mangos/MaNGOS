@@ -558,7 +558,6 @@ void World::LoadConfigSettings(bool reload)
     else
         m_configs[CONFIG_SOCKET_SELECTTIME] = sConfig.GetIntDefault("SocketSelectTime", DEFAULT_SOCKET_SELECT_TIME);
 
-    m_configs[CONFIG_TCP_NO_DELAY] = sConfig.GetBoolDefault("TcpNoDelay", false);
     m_configs[CONFIG_GROUP_XP_DISTANCE] = sConfig.GetIntDefault("MaxGroupXPDistance", 74);
     /// \todo Add MonsterSight and GuarderSight (with meaning) in mangosd.conf or put them as define
     m_configs[CONFIG_SIGHT_MONSTER] = sConfig.GetIntDefault("MonsterSight", 50);
