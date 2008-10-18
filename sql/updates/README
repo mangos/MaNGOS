@@ -26,11 +26,14 @@ See an example below:
          |          |  Name of affected DB (default recommended name)
          |          |   Can be: characters, mangos, realmd
          |          |
-         |          Counter show number of sql update in updates list for provided data
-         |          and set proper order for sql updates for some date
+         |          Counter show number of sql update in updates list for provided date
+         |          and set proper order for sql updates for same date
          |
          MaNGOS commit date related to sql update. For related commit
          you can see http://github.com/mangos/mangos/commits/master
          Expected commit will be in commits list for provided date and it will have
          sql update file name (2008_10_17_01_characters_character_spell.sql in our case) in list
          changed files, After appling this update DB compatiable with found commit.
+
+=== For commiters ====
+Please, include sql update name in first line of commit description for simplify it search by users in commits list.
