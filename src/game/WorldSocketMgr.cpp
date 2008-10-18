@@ -357,8 +357,6 @@ WorldSocketMgr::OnSocketOpen (WorldSocket* sock)
             min = i;
 
     return m_NetThreads[min].AddSocket (sock);
-
-    return 0;
 }
 
 WorldSocketMgr*
