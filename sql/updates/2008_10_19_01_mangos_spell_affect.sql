@@ -1,0 +1,11 @@
+DELETE FROM spell_affect WHERE entry IN (30017,30280,44373) AND effectId = 0;
+INSERT INTO spell_affect (entry, effectId, SpellFamilyMask) VALUES
+(30017,0,0x0000000000000000),
+(30280,0,0x0000000000000000),
+(44373,0,0x0000000000000000);
+
+
+DELETE FROM spell_affect WHERE entry IN (34520,37508) AND effectId = 1;
+INSERT INTO spell_affect (entry, effectId, SpellFamilyMask) VALUES
+(34520,1,0x0000000000000000),
+(37508,1,0x0000000000000000);
