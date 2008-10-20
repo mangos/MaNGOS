@@ -550,14 +550,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\shared\Mthread.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\shared\Mthread.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\src\shared\ProgressBar.cpp"
 				>
 			</File>

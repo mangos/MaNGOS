@@ -22,7 +22,6 @@
 #include "Common.h"
 #include "Object.h"
 #include "Opcodes.h"
-#include "Mthread.h"
 #include "SpellAuraDefines.h"
 #include "UpdateFields.h"
 #include "SharedDefines.h"
