@@ -40,8 +40,6 @@ libmangosshared_a_SOURCES = \
     Log.h \
     MemoryLeaks.cpp \
     MemoryLeaks.h \
-    Mthread.cpp \
-    Mthread.h \
     ProgressBar.cpp \
     ProgressBar.h \
     Timer.h \
