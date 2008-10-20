@@ -702,7 +702,8 @@ bool ChatHandler::ShowHelpForSubCommands(ChatCommand *table, char const* cmd, ch
         if(m_session->GetSecurity() < table[i].SecurityLevel)
             continue;
 
-        if( !hasStringAbbr(table[i].Name, subcmd) )
+        /// for empty subcmd show all available
+        if( *subcmd && !hasStringAbbr(table[i].Name, subcmd))
             continue;
 
         (list += "\n    ") += table[i].Name;
