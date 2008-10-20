@@ -429,6 +429,31 @@
 			RelativePath="..\..\src\shared\ServiceWin32.h">
 		</File>
 		<File
+			RelativePath="..\..\src\shared\svn_revision.h">
+			<FileConfiguration
+				Name="Release|Win32">
+				<Tool
+					Name="VCCustomBuildTool"
+					Description="Extract SVN revision"
+					CommandLine="cd &quot;$(SolutionDir)..\src\shared&quot;
+&quot;$(TargetDir)\..\gensvnrevision__$(PlatformName)_$(ConfigurationName)\gensvnrevision.exe&quot; &quot;..\..&quot;
+"
+					AdditionalDependencies="$(SolutionDir)../.svn/entries"
+					Outputs="svn_revision.h"/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Debug|Win32">
+				<Tool
+					Name="VCCustomBuildTool"
+					Description="Extract SVN revision"
+					CommandLine="cd &quot;$(SolutionDir)..\src\shared&quot;
+&quot;$(TargetDir)\..\gensvnrevision__$(PlatformName)_$(ConfigurationName)\gensvnrevision.exe&quot; &quot;..\..&quot;
+"
+					AdditionalDependencies="$(SolutionDir)../.svn/entries"
+					Outputs="svn_revision.h"/>
+			</FileConfiguration>
+		</File>
+		<File
 			RelativePath="..\..\src\shared\SystemConfig.h.in">
 			<FileConfiguration
 				Name="Release|Win32">
