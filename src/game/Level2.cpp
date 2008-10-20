@@ -94,7 +94,7 @@ bool ChatHandler::HandleMuteCommand(const char* args)
     else
     {
         account_id = objmgr.GetPlayerAccountIdByGUID(guid);
-        security = objmgr.GetSecurityByAccount(account_id);
+        security = accmgr.GetSecurity(account_id);
     }
 
     if(security >= m_session->GetSecurity())
@@ -160,7 +160,7 @@ bool ChatHandler::HandleUnmuteCommand(const char* args)
     else
     {
         account_id = objmgr.GetPlayerAccountIdByGUID(guid);
-        security = objmgr.GetSecurityByAccount(account_id);
+        security = accmgr.GetSecurity(account_id);
     }
 
     if(security >= m_session->GetSecurity())

@@ -37,6 +37,7 @@
 #include "GameEvent.h"
 #include "Spell.h"
 #include "Chat.h"
+#include "AccountMgr.h"
 #include "InstanceSaveMgr.h"
 #include "SpellAuras.h"
 #include "Util.h"
@@ -317,7 +318,7 @@ void ObjectMgr::SendAuctionWonMail( AuctionEntry *auction )
         else
         {
             bidder_accId = GetPlayerAccountIdByGUID(bidder_guid);
-            bidder_security = GetSecurityByAccount(bidder_accId);
+            bidder_security = accmgr.GetSecurity(bidder_accId);
 
             if(bidder_security > SEC_PLAYER )               // not do redundant DB requests
             {
@@ -1290,46 +1291,6 @@ uint32 ObjectMgr::GetPlayerAccountIdByGUID(const uint64 &guid) const
         uint32 acc = (*result)[0].GetUInt32();
         delete result;
         return acc;
-    }
-
-    return 0;
-}
-
-uint32 ObjectMgr::GetSecurityByAccount(uint32 acc_id) const
-{
-    QueryResult *result = loginDatabase.PQuery("SELECT gmlevel FROM account WHERE id = '%u'", acc_id);
-    if(result)
-    {
-        uint32 sec = (*result)[0].GetUInt32();
-        delete result;
-        return sec;
-    }
-
-    return 0;
-}
-
-bool ObjectMgr::GetAccountNameByAccount(uint32 acc_id, std::string &name) const
-{
-    QueryResult *result = loginDatabase.PQuery("SELECT username FROM account WHERE id = '%u'", acc_id);
-    if(result)
-    {
-        name = (*result)[0].GetCppString();
-        delete result;
-        return true;
-    }
-
-    return false;
-}
-
-uint32 ObjectMgr::GetAccountByAccountName(std::string name) const
-{
-    loginDatabase.escape_string(name);
-    QueryResult *result = loginDatabase.PQuery("SELECT id FROM account WHERE username = '%s'", name.c_str());
-    if(result)
-    {
-        uint32 id = (*result)[0].GetUInt32();
-        delete result;
-        return id;
     }
 
     return 0;

@@ -22,6 +22,7 @@
 #include "WorldSession.h"
 #include "World.h"
 #include "ObjectMgr.h"
+#include "AccountMgr.h"
 #include "PlayerDump.h"
 #include "SpellMgr.h"
 #include "Player.h"
@@ -711,7 +712,7 @@ bool ChatHandler::HandleSecurityCommand(const char* args)
                 return false;
             }
             targetAccountId = objmgr.GetPlayerAccountIdByGUID(targetGUID);
-            targetSecurity = objmgr.GetSecurityByAccount(targetAccountId);
+            targetSecurity = accmgr.GetSecurity(targetAccountId);
         }
 
         arg2 = strtok(NULL, " ");
@@ -4964,14 +4965,14 @@ bool ChatHandler::HandleLoadPDumpCommand(const char *args)
     if(!file || !acc)
         return false;
 
-    uint32 account_id = objmgr.GetAccountByAccountName(acc);
+    uint32 account_id = accmgr.GetId(acc);
     if(!account_id)
     {
         account_id = atoi(acc);
         if(account_id)
         {
             std::string acc_name;
-            if(!objmgr.GetAccountNameByAccount(account_id,acc_name))
+            if(!accmgr.GetName(account_id,acc_name))
                 return false;
         }
         else
