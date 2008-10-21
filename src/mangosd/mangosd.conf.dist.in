@@ -160,7 +160,6 @@ BindIP = "0.0.0.0"
 UseProcessors = 0
 ProcessPriority = 1
 Compression = 1
-TcpNoDelay = 0
 PlayerLimit = 100
 SaveRespawnTimeImmediately = 1
 MaxOverspeedPings = 2
