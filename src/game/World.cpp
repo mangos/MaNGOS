@@ -2455,20 +2455,25 @@ void World::UpdateSessions( time_t diff )
 // This handles the issued and queued CLI commands
 void World::ProcessCliCommands()
 {
-    if (cliCmdQueue.empty()) return;
+    if (cliCmdQueue.empty())
+        return;
 
-    CliCommandHolder *command;
-    pPrintf p_zprintf;
+    CliCommandHolder::Print* zprint;
+
     while (!cliCmdQueue.empty())
     {
         sLog.outDebug("CLI command under processing...");
-        command = cliCmdQueue.next();
-        command->Execute();
-        p_zprintf=command->GetOutputMethod();
+        CliCommandHolder *command = cliCmdQueue.next();
+
+        zprint = command->m_print;
+
+        CliHandler(zprint).ParseCommands(command->m_command);
+
         delete command;
     }
+
     // print the console message here so it looks right
-    p_zprintf("mangos>");
+    zprint("mangos>");
 }
 
 void World::InitResultQueue()

@@ -40,6 +40,7 @@
 #include <iostream>
 #include <fstream>
 #include <map>
+#include "GlobalEvents.h"
 
 static uint32 ReputationRankStrIndex[MAX_REPUTATION_RANK] =
 {
@@ -1699,7 +1700,7 @@ bool ChatHandler::HandleKickPlayerCommand(const char *args)
             return false;
         }
 
-        if(name==m_session->GetPlayer()->GetName())
+        if(m_session && name==m_session->GetPlayer()->GetName())
         {
             SendSysMessage(LANG_COMMAND_KICKSELF);
             SetSentErrorMessage(true);
@@ -4004,5 +4005,12 @@ bool ChatHandler::LookupPlayerSearchCommand(QueryResult* result, int32 limit)
 
     delete result;
 
+    return true;
+}
+
+/// Triggering corpses expire check in world
+bool ChatHandler::HandleServerCorpsesCommand(const char* /*args*/)
+{
+    CorpsesErase();
     return true;
 }

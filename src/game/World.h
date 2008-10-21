@@ -38,7 +38,6 @@ class Player;
 class Weather;
 struct ScriptAction;
 struct ScriptInfo;
-class CliCommandHolder;
 class SqlResultQueue;
 class QueryResult;
 class WorldSocket;
@@ -295,37 +294,23 @@ enum BanReturn
 #define SCRIPT_COMMAND_REMOVE_AURA          14              // source (datalong2!=0) or target (datalong==0) unit, datalong = spell_id
 #define SCRIPT_COMMAND_CAST_SPELL           15              // source (datalong2!=0) or target (datalong==0) unit, datalong = spell_id
 
-/// CLI related stuff, define here to prevent cyclic dependancies
-
-typedef int(* pPrintf)(const char*,...);
-typedef void(* pCliFunc)(char *,pPrintf);
-
-/// Command Template class
-struct CliCommand
-{
-    char const * cmd;
-    pCliFunc Func;
-    char const * description;
-};
-
 /// Storage class for commands issued for delayed execution
-class CliCommandHolder
+struct CliCommandHolder
 {
-    private:
-        const CliCommand *cmd;
-        char *args;
-        pPrintf m_zprintf;
-    public:
-        CliCommandHolder(const CliCommand *command, const char *arguments, pPrintf p_zprintf)
-            : cmd(command), m_zprintf(p_zprintf)
-        {
-            size_t len = strlen(arguments)+1;
-            args = new char[len];
-            memcpy(args, arguments, len);
-        }
-        ~CliCommandHolder() { delete[] args; }
-        void Execute() const { cmd->Func(args, m_zprintf); }
-        pPrintf GetOutputMethod() const {return (m_zprintf);}
+    typedef void Print(const char*);
+
+    char *m_command;
+    Print* m_print;
+
+    CliCommandHolder(const char *command, Print* zprint)
+        : m_print(zprint)
+    {
+        size_t len = strlen(command)+1;
+        m_command = new char[len];
+        memcpy(m_command, command, len);
+    }
+
+    ~CliCommandHolder() { delete[] m_command; }
 };
 
 /// The World
@@ -463,7 +448,7 @@ class World
         static float GetVisibleObjectGreyDistance()     { return m_VisibleObjectGreyDistance;     }
 
         void ProcessCliCommands();
-        void QueueCliCommand(CliCommandHolder* command) { cliCmdQueue.add(command); }
+        void QueueCliCommand( CliCommandHolder::Print* zprintf, char const* input ) { cliCmdQueue.add(new CliCommandHolder(input, zprintf)); }
 
         void UpdateResultQueue();
         void InitResultQueue();

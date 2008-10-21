@@ -2016,8 +2016,13 @@ bool ChatHandler::HandleNameTeleCommand(const char * args)
 
         PSendSysMessage(LANG_TELEPORTING_TO, chr->GetName(),"", tele->name.c_str());
 
-        if (m_session->GetPlayer()->IsVisibleGloballyFor(chr))
-            ChatHandler(chr).PSendSysMessage(LANG_TELEPORTED_TO_BY, m_session->GetPlayer()->GetName());
+        if (m_session)
+        {
+            if(m_session->GetPlayer()->IsVisibleGloballyFor(chr))
+                ChatHandler(chr).PSendSysMessage(LANG_TELEPORTED_TO_BY, m_session->GetPlayer()->GetName());
+        }
+        else
+            ChatHandler(chr).SendSysMessage(LANG_TELEPORTED_TO_BY_CONSOLE);
 
         // stop flight if need
         if(chr->isInFlight())

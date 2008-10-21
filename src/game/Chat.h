@@ -33,6 +33,7 @@ class ChatCommand
     public:
         const char *       Name;
         uint32             SecurityLevel;                   // function pointer required correct align (use uint32)
+        bool               AllowConsole;
         bool (ChatHandler::*Handler)(const char* args);
         std::string        Help;
         ChatCommand *      ChildCommands;
@@ -59,9 +60,9 @@ class ChatHandler
 
         static char* LineFromMessage(char*& pos) { char* start = strtok(pos,"\n"); pos = NULL; return start; }
 
-        const char *GetMangosString(int32 entry);
+        virtual const char *GetMangosString(int32 entry) const;
 
-        void SendSysMessage(          const char *str);
+        virtual void SendSysMessage(  const char *str);
         void SendSysMessage(          int32     entry);
         void PSendSysMessage(         const char *format, ...) ATTR_PRINTF(2,3);
         void PSendSysMessage(         int32     entry, ...  );
@@ -69,7 +70,12 @@ class ChatHandler
         int ParseCommands(const char* text);
 
     protected:
+        explicit ChatHandler() : m_session(NULL) {}      // for CLI subclass
+
         bool hasStringAbbr(const char* name, const char* part);
+
+        virtual bool isAvailable(ChatCommand const& cmd) const;
+
         void SendGlobalSysMessage(const char *str);
 
         bool ExecuteCommandInTable(ChatCommand *table, const char* text, std::string fullcommand);
@@ -78,14 +84,22 @@ class ChatHandler
 
         ChatCommand* getCommandTable();
 
+        bool HandleAccountCommand(const char* args);
+        bool HandleAccountCreateCommand(const char* args);
+        bool HandleAccountDeleteCommand(const char* args);
+        bool HandleAccountOnlineListCommand(const char* args);
+        bool HandleAccountSetAddonCommand(const char* args);
+        bool HandleAccountSetGmLevelCommand(const char* args);
+        bool HandleAccountSetPasswordCommand(const char* args);
+
         bool HandleHelpCommand(const char* args);
         bool HandleCommandsCommand(const char* args);
-        bool HandleAcctCommand(const char* args);
         bool HandleStartCommand(const char* args);
         bool HandleInfoCommand(const char* args);
         bool HandleDismountCommand(const char* args);
         bool HandleSaveCommand(const char* args);
-        bool HandleGMListCommand(const char* args);
+        bool HandleGMListOnlineCommand(const char* args);
+        bool HandleGMListFullCommand(const char* args);
 
         bool HandleNamegoCommand(const char* args);
         bool HandleGonameCommand(const char* args);
@@ -204,6 +218,12 @@ class ChatHandler
         bool HandleInstanceStatsCommand(const char* args);
         bool HandleInstanceSaveDataCommand(const char * args);
 
+        bool HandleServerCorpsesCommand(const char* args);
+        bool HandleServerExitCommand(const char* args);
+        bool HandleServerMotdCommand(const char* args);
+        bool HandleServerSetMotdCommand(const char* args);
+        bool HandleServerSetLogLevelCommand(const char* args);
+
         bool HandleAddHonorCommand(const char* args);
         bool HandleHonorAddKillCommand(const char* args);
         bool HandleUpdateHonorFieldsCommand(const char* args);
@@ -249,6 +269,7 @@ class ChatHandler
         bool HandleUnmuteCommand(const char* args);
         bool HandleMovegensCommand(const char* args);
 
+        bool HandleCharacterDeleteCommand(const char* args);
         bool HandleBanCommand(const char* args);
         bool HandleUnBanCommand(const char* args);
         bool HandleBanInfoCommand(const char* args);
@@ -257,7 +278,6 @@ class ChatHandler
         bool HandleIdleShutDownCommand(const char* args);
         bool HandleShutDownCommand(const char* args);
         bool HandleRestartCommand(const char* args);
-        bool HandleSecurityCommand(const char* args);
         bool HandleGoXYCommand(const char* args);
         bool HandleGoXYZCommand(const char* args);
         bool HandleGoZoneXYCommand(const char* args);
@@ -375,6 +395,7 @@ class ChatHandler
         bool HandleCastTargetCommand(const char *args);
         bool HandleComeToMeCommand(const char *args);
         bool HandleCombatStopCommand(const char *args);
+        bool HandleSendMessageCommand(const char * args);
 
         //! Development Commands
         bool HandleSetValue(const char* args);
@@ -398,8 +419,6 @@ class ChatHandler
 
         GameObject* GetObjectGlobalyWithGuidOrNearWithDbGuid(uint32 lowguid,uint32 entry);
 
-        WorldSession * m_session;
-
         // Utility methods for commands
         void ShowTicket(uint64 guid, char const* text, char const* time);
         uint32 GetTicketIDByNum(uint32 num);
@@ -407,10 +426,28 @@ class ChatHandler
 
         void SetSentErrorMessage(bool val){ sentErrorMessage = val;};
     private:
+        WorldSession * m_session;                           // != NULL for chat command call and NULL for CLI command
+
         // common global flag
         static bool load_command_table;
         bool sentErrorMessage;
 };
-#endif
+
+class CliHandler : public ChatHandler
+{
+    public:
+        typedef void Print(char const*);
+        explicit CliHandler(Print* zprint) : m_print(zprint) {}
+
+        // overwrite functions
+        const char *GetMangosString(int32 entry) const;
+        bool isAvailable(ChatCommand const& cmd) const;
+        void SendSysMessage(const char *str);
+
+    private:
+        Print* m_print;
+};
 
 char const *fmtstring( char const *format, ... );
+
+#endif

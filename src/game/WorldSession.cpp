@@ -457,7 +457,7 @@ void WorldSession::SendNotification(int32 string_id,...)
     }
 }
 
-const char * WorldSession::GetMangosString( int32 entry )
+const char * WorldSession::GetMangosString( int32 entry ) const
 {
     return objmgr.GetMangosString(entry,GetSessionDbLocaleIndex());
 }
