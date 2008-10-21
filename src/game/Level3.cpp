@@ -4835,32 +4835,25 @@ bool ChatHandler::HandleBanInfoCommand(const char* args)
         }
         else if(type == "character")
         {
-            if(!normalizePlayerName(nameOrIP))
+            if (!normalizePlayerName(nameOrIP))
             {
-                SendSysMessage(LANG_PLAYER_NOT_FOUND);
-                SetSentErrorMessage(true);
+                SendSysMessage (LANG_PLAYER_NOT_FOUND);
+                SetSentErrorMessage (true);
                 return false;
             }
 
-            loginDatabase.escape_string(nameOrIP);
-            QueryResult *result = CharacterDatabase.PQuery("SELECT account FROM characters WHERE name = '%s'", nameOrIP.c_str());
-            if (!result)
+            accountid = objmgr.GetPlayerAccountIdByPlayerName (nameOrIP);
+            if (!accountid)
             {
-                PSendSysMessage(LANG_BANINFO_NOCHARACTER);
+                PSendSysMessage (LANG_BANINFO_NOCHARACTER);
                 return true;
             }
-            fields = result->Fetch();
-            accountid = fields[0].GetUInt32();
-            delete result;
-            result = loginDatabase.PQuery("SELECT username FROM account WHERE id = '%u'", accountid);
-            if (!result)
+
+            if (!accmgr.GetName (accountid,accountname))
             {
-                PSendSysMessage(LANG_BANINFO_NOCHARACTER);
+                PSendSysMessage (LANG_BANINFO_NOCHARACTER);
                 return true;
             }
-            fields = result->Fetch();
-            accountname = fields[0].GetCppString();
-            delete result;
         }
         else
             return false;
