@@ -98,7 +98,7 @@ class ChatHandler
         bool HandleInfoCommand(const char* args);
         bool HandleDismountCommand(const char* args);
         bool HandleSaveCommand(const char* args);
-        bool HandleGMListOnlineCommand(const char* args);
+        bool HandleGMListIngameCommand(const char* args);
         bool HandleGMListFullCommand(const char* args);
 
         bool HandleNamegoCommand(const char* args);
@@ -270,10 +270,18 @@ class ChatHandler
         bool HandleMovegensCommand(const char* args);
 
         bool HandleCharacterDeleteCommand(const char* args);
-        bool HandleBanCommand(const char* args);
-        bool HandleUnBanCommand(const char* args);
-        bool HandleBanInfoCommand(const char* args);
-        bool HandleBanListCommand(const char* args);
+        bool HandleBanAccountCommand(const char* args);
+        bool HandleBanCharacterCommand(const char* args);
+        bool HandleBanIPCommand(const char* args);
+        bool HandleUnBanAccountCommand(const char* args);
+        bool HandleUnBanCharacterCommand(const char* args);
+        bool HandleUnBanIPCommand(const char* args);
+        bool HandleBanInfoAccountCommand(const char* args);
+        bool HandleBanInfoCharacterCommand(const char* args);
+        bool HandleBanInfoIPCommand(const char* args);
+        bool HandleBanListAccountCommand(const char* args);
+        bool HandleBanListCharacterCommand(const char* args);
+        bool HandleBanListIPCommand(const char* args);
         bool HandleIdleRestartCommand(const char* args);
         bool HandleIdleShutDownCommand(const char* args);
         bool HandleShutDownCommand(const char* args);
@@ -423,6 +431,10 @@ class ChatHandler
         void ShowTicket(uint64 guid, char const* text, char const* time);
         uint32 GetTicketIDByNum(uint32 num);
         bool LookupPlayerSearchCommand(QueryResult* result, int32 limit);
+        bool HandleBanListHelper(QueryResult* result);
+        bool HandleBanHelper(BanMode mode,char const* args);
+        bool HandleBanInfoHelper(uint32 accountid, char const* accountname);
+        bool HandleUnBanHelper(BanMode mode,char const* args);
 
         void SetSentErrorMessage(bool val){ sentErrorMessage = val;};
     private:

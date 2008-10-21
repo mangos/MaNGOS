@@ -26,6 +26,7 @@
 #include "Common.h"
 #include "Timer.h"
 #include "Policies/Singleton.h"
+#include "SharedDefines.h"
 
 #include <map>
 #include <set>
@@ -269,14 +270,6 @@ enum RealmZone
     REALM_ZONE_CN9           = 29                           // basic-Latin at create, any at login
 };
 
-/// Ban function return codes
-enum BanReturn
-{
-    BAN_SUCCESS,
-    BAN_SYNTAX_ERROR,
-    BAN_NOTFOUND
-};
-
 // DB scripting commands
 #define SCRIPT_COMMAND_TALK                  0              // source = unit, target=any, datalong ( 0=say, 1=whisper, 2=yell, 3=emote text)
 #define SCRIPT_COMMAND_EMOTE                 1              // source = unit, datalong = anim_id
@@ -432,8 +425,8 @@ class World
         void KickAll();
         void KickAllLess(AccountTypes sec);
         void KickAllQueued();
-        uint8 BanAccount(std::string type, std::string nameOrIP, std::string duration, std::string reason, std::string author);
-        bool RemoveBanAccount(std::string type, std::string nameOrIP);
+        BanReturn BanAccount(BanMode mode, std::string nameOrIP, std::string duration, std::string reason, std::string author);
+        bool RemoveBanAccount(BanMode mode, std::string nameOrIP);
 
         void ScriptsStart(std::map<uint32, std::multimap<uint32, ScriptInfo> > const& scripts, uint32 id, Object* source, Object* target);
         void ScriptCommandStart(ScriptInfo const& script, uint32 delay, Object* source, Object* target);
