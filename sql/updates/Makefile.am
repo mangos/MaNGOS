@@ -99,6 +99,7 @@ pkgdata_DATA = \
 	2008_10_21_01_mangos_mangos_string.sql \
 	2008_10_21_02_mangos_command.sql \
 	2008_10_21_03_mangos_command.sql \
+	2008_10_22_01_mangos_quest_template.sql \
 	README
 
 ## Additional files to include when running 'make dist'
@@ -179,4 +180,5 @@ EXTRA_DIST = \
 	2008_10_21_01_mangos_mangos_string.sql \
 	2008_10_21_02_mangos_command.sql \
 	2008_10_21_03_mangos_command.sql \
+	2008_10_22_01_mangos_quest_template.sql \
 	README
