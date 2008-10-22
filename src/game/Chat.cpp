@@ -580,7 +580,7 @@ const char *ChatHandler::GetMangosString(int32 entry) const
 bool ChatHandler::isAvailable(ChatCommand const& cmd) const
 {
     // check security level only for simple  command (without child commands)
-    return cmd.Handler && m_session->GetSecurity() >= cmd.SecurityLevel;
+    return m_session->GetSecurity() >= cmd.SecurityLevel;
 }
 
 bool ChatHandler::hasStringAbbr(const char* name, const char* part)
@@ -703,7 +703,8 @@ bool ChatHandler::ExecuteCommandInTable(ChatCommand *table, const char* text, st
             return true;
         }
 
-        if(!isAvailable(table[i]))
+        // must be available and have handler
+        if(!table[i].Handler || !isAvailable(table[i]))
             continue;
 
         SetSentErrorMessage(false);
@@ -778,6 +779,7 @@ bool ChatHandler::ShowHelpForSubCommands(ChatCommand *table, char const* cmd, ch
     std::string list;
     for(uint32 i = 0; table[i].Name != NULL; ++i)
     {
+        // must be available (ignore handler existence for show command with possibe avalable subcomands
         if(!isAvailable(table[i]))
             continue;
 
@@ -808,6 +810,7 @@ bool ChatHandler::ShowHelpForCommand(ChatCommand *table, const char* cmd)
     {
         for(uint32 i = 0; table[i].Name != NULL; ++i)
         {
+            // must be available (ignore handler existence for show command with possibe avalable subcomands
             if(!isAvailable(table[i]))
                 continue;
 
@@ -837,6 +840,7 @@ bool ChatHandler::ShowHelpForCommand(ChatCommand *table, const char* cmd)
     {
         for(uint32 i = 0; table[i].Name != NULL; ++i)
         {
+            // must be available (ignore handler existence for show command with possibe avalable subcomands
             if(!isAvailable(table[i]))
                 continue;
 
@@ -1190,7 +1194,7 @@ const char *CliHandler::GetMangosString(int32 entry) const
 bool CliHandler::isAvailable(ChatCommand const& cmd) const
 {
     // skip non-console commands in console case
-    return cmd.Handler && cmd.AllowConsole;
+    return cmd.AllowConsole;
 }
 
 void CliHandler::SendSysMessage(const char *str)
