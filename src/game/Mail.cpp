@@ -190,6 +190,12 @@ void WorldSession::HandleSendMail(WorldPacket & recv_data )
                 pl->SendMailResult(0, 0, MAIL_ERR_INTERNAL_ERROR);
                 return;
             }
+
+            if(COD && mailItem.item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAGS_WRAPPED))
+            {
+                pl->SendMailResult(0, 0, MAIL_ERR_CANT_SEND_WRAPPED_COD);
+                return;
+            }
         }
     }
     pl->SendMailResult(0, 0, MAIL_OK);
