@@ -370,13 +370,12 @@ bool PlayerDumpReader::LoadDump(std::string file, uint32 account, std::string na
             delete result;
 
             if (charcount >= 10)
-            {
                 return false;
-            }
         }
     }
     FILE *fin = fopen(file.c_str(), "r");
-    if(!fin) return false;
+    if(!fin)
+        return false;
 
     QueryResult * result = NULL;
     char newguid[20], chraccount[20], newpetid[20], currpetid[20], lastpetid[20];

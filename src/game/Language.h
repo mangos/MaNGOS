@@ -447,16 +447,16 @@ enum MangosStrings
     LANG_ITEMLIST_AUCTION               = 510,
 
     LANG_WRONG_LINK_TYPE                = 511,
-    LANG_ITEM_LIST                      = 512,
-    LANG_QUEST_LIST                     = 513,
-    LANG_CREATURE_ENTRY_LIST            = 514,
-    LANG_CREATURE_LIST                  = 515,
-    LANG_GO_ENTRY_LIST                  = 516,
-    LANG_GO_LIST                        = 517,
-    LANG_ITEMSET_LIST                   = 518,
+    LANG_ITEM_LIST_CHAT                 = 512,
+    LANG_QUEST_LIST_CHAT                = 513,
+    LANG_CREATURE_ENTRY_LIST_CHAT       = 514,
+    LANG_CREATURE_LIST_CHAT             = 515,
+    LANG_GO_ENTRY_LIST_CHAT             = 516,
+    LANG_GO_LIST_CHAT                   = 517,
+    LANG_ITEMSET_LIST_CHAT              = 518,
     LANG_TELE_LIST                      = 519,
     LANG_SPELL_LIST                     = 520,
-    LANG_SKILL_LIST                     = 521,
+    LANG_SKILL_LIST_CHAT                = 521,
 
     LANG_GAMEOBJECT_NOT_EXIST           = 522,
 
@@ -529,7 +529,7 @@ enum MangosStrings
     LANG_COMMAND_NEAROBJMESSAGE         = 581,
     LANG_COMMAND_RAWPAWNTIMES           = 582,
 
-    LANG_EVENT_ENTRY_LIST               = 583,
+    LANG_EVENT_ENTRY_LIST_CHAT          = 583,
     LANG_NOEVENTFOUND                   = 584,
     LANG_EVENT_NOT_EXIST                = 585,
     LANG_EVENT_INFO                     = 586,
@@ -667,7 +667,16 @@ enum MangosStrings
     LANG_MOTD_NEW                       = 1100,
     LANG_ACCOUNT_SETADDON               = 1101,
     LANG_SENDMESSAGE                    = 1102,
-    // Room for more level 3              1103-1199 not used
+    LANG_EVENT_ENTRY_LIST_CONSOLE       = 1103,
+    LANG_CREATURE_ENTRY_LIST_CONSOLE    = 1104,
+    LANG_ITEM_LIST_CONSOLE              = 1105,
+    LANG_ITEMSET_LIST_CONSOLE           = 1106,
+    LANG_GO_ENTRY_LIST_CONSOLE          = 1107,
+    LANG_QUEST_LIST_CONSOLE             = 1108,
+    LANG_SKILL_LIST_CONSOLE             = 1109,
+    LANG_CREATURE_LIST_CONSOLE          = 1110,
+    LANG_GO_LIST_CONSOLE                = 1111,
+    // Room for more level 3              1112-1199 not used
 
     // FREE IDS                           1200-9999
 
