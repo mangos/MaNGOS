@@ -1,3 +1,3 @@
-ALTER TABLE `creature_addon` 
+ALTER TABLE `creature_addon`
     DROP KEY `guid`,
     ADD PRIMARY KEY (`guid`);

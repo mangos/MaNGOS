@@ -7,9 +7,9 @@ INSERT INTO `spell_proc_event` VALUES
 (40470,0,0,0,10,0x00000000C0800000,0x00004000,0);
 
 DELETE FROM `spell_proc_event` WHERE `entry` = 40485;
-INSERT INTO `spell_proc_event` VALUES 
+INSERT INTO `spell_proc_event` VALUES
 (40485,0,0,0,9,0x0000000100000000,0x00080000,0);
 
 DELETE FROM `spell_proc_event` WHERE `entry` = 40478;
-INSERT INTO `spell_proc_event` VALUES 
+INSERT INTO `spell_proc_event` VALUES
 (40478,0,0,0,5,0x0000000000000002,0x00020000,0);

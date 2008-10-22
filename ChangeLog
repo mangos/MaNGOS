@@ -192,7 +192,7 @@ MaNGOS 0.9    (Dec 14 2007)
  * Improved: existing chat and console commands for server gamemasters/administrators, and added new commands.
 
  ==== Statistics ====
- * Fixed Bugs: 161 
+ * Fixed Bugs: 161
  * Total number of changes: 228
 
 MaNGOS 0.8    (Oct 16, 2007)
@@ -200,7 +200,7 @@ MaNGOS 0.8    (Oct 16, 2007)
  MaNGOS 0.8 - Codename "Innkeeper" - adds further improvements to the
  server core as well as to the majority of game classes and the game content
  database.
- 
+
  Important License Change Notice: MaNGOS still is licensed under the terms
  of the GPL v2, but we now have added an exception to officially allow our
  users to link MaNGOS against the OpenSSL libraries.
@@ -217,7 +217,7 @@ MaNGOS 0.8    (Oct 16, 2007)
  * Added: support for instance specific scripts and data,
  * Added: support for localization of names, texts, etc.,
  * Added: support for multiple battleground instances,
- * Added: support for scripted game object buttons, 
+ * Added: support for scripted game object buttons,
  * Improved: battlegrounds should be mostly working, only a few issues left,
  * Improved: dungeon system has seen a few improvements,
  * Improved: formulas for most aspects of the game,
@@ -272,7 +272,7 @@ MaNGOS 0.7    (Jul 9, 2007)
  * Improved: the mail system and implemented the delay for mails containing items.
  * Added: an initial version of the battleground system. One type of battleground is mostly done, still needs more work.
  * Added: the jewelry profession, prospecting and support for inserting gems in sockets including meta gems bonuses.
- * Added: support for multi-mining veins. 
+ * Added: support for multi-mining veins.
  * Added: support for auto-renaming of characters on login at the request of GMs.
  * Added: a new, more correct visibility system, invisibility is also implemented correctly now.
  * Improved: durability cost calculation.
@@ -398,7 +398,7 @@ MaNGOS 0.1    (Dec 04, 2005)
  * Added: Weapon damage genrator now adds extra damage types for some items.
  * Add Tools,DBC Editer,you can use it to edit all .dbc File,
  * AI delivery
- * Fix duel flag object position 
+ * Fix duel flag object position
  * Fixed and sped up the players array code.
  * Fixed: Armor settings.
  * Fixed: Bug fixes for crash and other stuff.
@@ -432,7 +432,7 @@ MaNGOS 0.1    (Dec 04, 2005)
  * Fix two player in the same zone cores. Fix mem leaks in 1.8 mask deletion. And fix core dump for npc handler due to GUI only takes lower part.
  * Function _ApplyItemMods() is protected... then i created a public function ApplyItemMods() that calls it... Object Oriented Project, guys!
  * Function SetStanding() has been created. Now needs to put it on places where the standing of the reputation is increased.
- * Initial delivery of the AI framework.. 
+ * Initial delivery of the AI framework..
  * Major CPU usage improvements with grid system disabled.
  * msg of ignore list fixed
  * Now Faction.dbc is being loaded.
@@ -495,7 +495,7 @@ MaNGOS 0.0.2  (Oct 31, 2005)
  MaNGOS 0.0.2 - Codename "Library" - adds another bunch of improvements, bug
  fixes and major enhancements to the overall functionality of the daemon. A
  complete list of all updated items follows below:
- 
+
  ==== Game Features ====
  * Added support for area exploration.
  * Added support for duels.
@@ -560,4 +560,4 @@ MaNGOS 0.0.1  (Sept 13, 2005)
  ==== Statistics ====
  * Fixed Bugs: #2, #3, #9, #10, #11
  * Total number of changes: 53.
- 
+

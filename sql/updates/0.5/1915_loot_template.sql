@@ -6,14 +6,14 @@ CREATE TABLE `creature_loot_template` AS SELECT DISTINCT
 FROM `loot_template`, `creature_template` WHERE `loot_template`.`entry` = `creature_template`.`lootid`;
 
 CREATE TABLE `gameobject_loot_template` AS SELECT DISTINCT
-   `loot_template`.`entry`        AS `entry`, 
+   `loot_template`.`entry`        AS `entry`,
    `loot_template`.`item`         AS `item`,
    `loot_template`.`chance`       AS `chance`,
    `loot_template`.`questchance`  AS `questchance`
 FROM `loot_template`, `gameobject` WHERE `loot_template`.`entry` = `gameobject`.`loot`;
 
-CREATE TABLE `fishing_loot_template` AS SELECT 
-   (`loot_template`.`entry` - 30000) AS `entry`, 
+CREATE TABLE `fishing_loot_template` AS SELECT
+   (`loot_template`.`entry` - 30000) AS `entry`,
    `loot_template`.`item`  AS `item`,
    `loot_template`.`chance` AS `chance`,
    `loot_template`.`questchance`  AS `questchance`

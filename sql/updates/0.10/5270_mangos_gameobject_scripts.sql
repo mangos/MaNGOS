@@ -1,1 +1,1 @@
-ALTER TABLE `button_scripts` RENAME TO `gameobject_scripts`; 
+ALTER TABLE `button_scripts` RENAME TO `gameobject_scripts`;

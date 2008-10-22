@@ -4,7 +4,7 @@ ALTER TABLE `character_queststatus`
     CHANGE `status`          `status`     int(11)    unsigned NOT NULL default '0',
     CHANGE `rewarded`        `rewarded`   int(11)    unsigned NOT NULL default '0',
     CHANGE `explored`        `explored`   int(11)    unsigned NOT NULL default '0' AFTER `rewarded` ,
-    CHANGE `timer`           `timer`      bigint(20) unsigned NOT NULL default '0' AFTER `explored` ,   
+    CHANGE `timer`           `timer`      bigint(20) unsigned NOT NULL default '0' AFTER `explored` ,
     CHANGE `questMobCount1`  `mobcount1`  int(11)    unsigned NOT NULL default '0',
     CHANGE `questMobCount2`  `mobcount2`  int(11)    unsigned NOT NULL default '0',
     CHANGE `questMobCount3`  `mobcount3`  int(11)    unsigned NOT NULL default '0',

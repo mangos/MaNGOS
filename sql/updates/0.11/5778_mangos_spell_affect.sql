@@ -1,3 +1,3 @@
-ALTER TABLE `spell_affect` 
-   DROP `SpellFamily`, 
+ALTER TABLE `spell_affect`
+   DROP `SpellFamily`,
    DROP `Charges`;

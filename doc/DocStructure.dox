@@ -10,22 +10,22 @@
  * - <A HREF="http://getmangos.com/wiki/">On the wiki</A> to get an overview of the different modules of the server
  * - <A HREF="./modules.html">In this source doumentation</A>, starting at the module hierarchy
  */
- 
+
 /*! \defgroup realmd Realm Daemon
  */
- 
+
 /*! \defgroup mangos Mangos Deamon
  */
 
 /*! \defgroup mangosd Daemon starter
     \ingroup mangos
  */
- 
+
 /*! \defgroup u2w User Connections
     \ingroup mangos
- */ 
+ */
 
 /*! \defgroup world The World
     \ingroup mangos
- */ 
+ */
 

@@ -1,3 +1,3 @@
-ALTER IGNORE TABLE `playercreateinfo_skill` 
+ALTER IGNORE TABLE `playercreateinfo_skill`
     ADD PRIMARY KEY (`createid`,`Skill`);
 

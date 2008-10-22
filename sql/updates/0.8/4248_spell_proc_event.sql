@@ -1,6 +1,6 @@
 /* fix scholl mask */
 DELETE FROM `spell_proc_event` WHERE `entry` IN (11103,11119,11120,11129,11180,11255,12357,12358,12359,12360,12598,12846,12847,12848,14892,15268,15286,15323,15324,15325,15326,15362,15363,16164,17793,17796,17801,17802,17803,18073,18096,19407,19412,19413,19414,19415,20234,20235,23551,23572,23721,28592,28593,28594,28595,28719,28809,28823,28847,28849,29074,29075,29076,34914,34916,34917);
-INSERT INTO `spell_proc_event` (entry, SchoolMask, Category, SkillID, SpellFamilyName, SpellFamilyMask, procFlags, ppmRate) VALUES 
+INSERT INTO `spell_proc_event` (entry, SchoolMask, Category, SkillID, SpellFamilyName, SpellFamilyMask, procFlags, ppmRate) VALUES
 (11103,4,0,0,0,0,131072,0),
 (11119,4,0,0,0,0,65536,0),
 (11120,4,0,0,0,0,65536,0),
@@ -59,12 +59,12 @@ INSERT INTO `spell_proc_event` (entry, SchoolMask, Category, SkillID, SpellFamil
 (34917,32,0,0,0,0,32768,0);
 
 DELETE FROM `spell_proc_event` WHERE `entry` IN (6866,18189);
-INSERT INTO `spell_proc_event` (entry, SchoolMask, Category, SkillID, SpellFamilyName, SpellFamilyMask, procFlags, ppmRate) VALUES 
+INSERT INTO `spell_proc_event` (entry, SchoolMask, Category, SkillID, SpellFamilyName, SpellFamilyMask, procFlags, ppmRate) VALUES
 (6866,0,0,0,0,0,114,0),
 (18189,0,0,0,0,0,131072,0);
 
 
 DELETE FROM `spell_proc_event` WHERE `entry` IN (37377,39437);
-INSERT INTO `spell_proc_event` (entry, SchoolMask, Category, SkillID, SpellFamilyName, SpellFamilyMask, procFlags, ppmRate) VALUES 
+INSERT INTO `spell_proc_event` (entry, SchoolMask, Category, SkillID, SpellFamilyName, SpellFamilyMask, procFlags, ppmRate) VALUES
 (37377,32,0,0,0,0,16384,0),
 (39437,4,0,0,0,0,16384,0);

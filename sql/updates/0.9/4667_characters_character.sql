@@ -1,2 +1,2 @@
-ALTER TABLE `character` 
+ALTER TABLE `character`
   DROP COLUMN `pending_kills`;

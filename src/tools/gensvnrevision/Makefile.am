@@ -25,11 +25,11 @@ gensvnrevision_SOURCES = \
 	gensvnrevision.cpp
 
 ## Link world daemon against the shared library
-gensvnrevision_LDADD = 
+gensvnrevision_LDADD =
 gensvnrevision_LDFLAGS = -L$(libdir)
 
 ## Additional files to include when running 'make dist'
 #  Include world daemon configuration
-#EXTRA_DIST = 
+#EXTRA_DIST =
 
 ## Additional files to install

@@ -27,15 +27,15 @@ AM_MAINTAINER_MODE
 
 ## Prevent the configure script from continuing any further if
 # configuration is being performed in the top-level directory.
-# The idea is to prevent this ,because some maintainers tend 
+# The idea is to prevent this ,because some maintainers tend
 # to break parallel build trees (a.k.a. VPATH builds).
 if test "$srcdir" = "." && test "$enable_maintainer_mode" != "yes"; then
   AC_MSG_ERROR(
      [
       Please configure and build in a directory other than the
       top-level source directory. This is needed because a lot
-      of maintainers tend to break parallel build trees 
-      (a.k.a. VPATH builds). This is kinda real ensurance they 
+      of maintainers tend to break parallel build trees
+      (a.k.a. VPATH builds). This is kinda real ensurance they
       will not do it (by enforcing everybody to do VPATH builds).
 
       For example, try the following from the top-level source
@@ -86,7 +86,7 @@ fi
 AM_CONDITIONAL(DOXYGEN_ENABLED, test x$enable_doxygen_support = xyes)
 
 ## Check for required libraries.
-AC_CHECK_LIB( pthread, pthread_create, [], 
+AC_CHECK_LIB( pthread, pthread_create, [],
     [LDFLAGS="-pthread $LDFLAGS"
      AC_TRY_LINK([char pthread_create();],
          pthread_create();,
@@ -105,7 +105,7 @@ AC_ARG_WITH(postgresql,
 	*)   AC_MSG_ERROR(Bad value ${withval} for --with-postgresql) ;;
     esac],
 [DO_POSTGRESQL=no])
-				 
+
 AC_ARG_WITH(mysql,
 [  --with-mysql            Use MySQL as a backend (default: yes)],
 [case "${withval}" in
@@ -125,7 +125,7 @@ POSTGRE_LIBS="-L/usr/lib/postresql -lpq -lz -lpthread -lcrypt -lnsl -lm -lpthrea
 CXXFLAGS="-DDO_POSTGRESQL $CXXFLAGS"
 fi
 AC_MSG_RESULT($DO_POSTGRESQL)
-	
+
 # here mysql
 AC_MSG_CHECKING(whether to build/link MYSQL)
 if test "x$DO_MYSQL" = "xyes"; then

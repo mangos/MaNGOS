@@ -1,4 +1,4 @@
-ALTER TABLE `playercreateinfo` 
+ALTER TABLE `playercreateinfo`
     DROP `attackpower`,
     DROP `mindmg`,
     DROP `maxdmg`,

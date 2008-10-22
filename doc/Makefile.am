@@ -45,5 +45,5 @@ doc:
 	@echo "You must enable at configure time: ./configure --enable-doxygen"
 endif
 
-clean-local: 
+clean-local:
 	rm -rf $(DOC_OUT_HTML)

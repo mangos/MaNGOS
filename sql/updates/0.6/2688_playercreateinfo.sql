@@ -10,4 +10,4 @@ ALTER TABLE `playercreateinfo`
   DROP `BaseRage`,
   DROP `BaseFocus`,
   DROP `BaseEnergy`;
-	
+

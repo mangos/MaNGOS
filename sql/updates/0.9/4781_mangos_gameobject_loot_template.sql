@@ -1,6 +1,6 @@
 -- Addgo command change
 DELETE FROM `command` WHERE `name`='addgo';
-INSERT INTO `command` (`name`,`security`,`help`) VALUES 
+INSERT INTO `command` (`name`,`security`,`help`) VALUES
  ('addgo',2,'Syntax: .addgo #id <spawntimeSecs>\r\n\r\nAdd a game object from game object templates to the world at your current location using the #id.\r\nspawntimesecs sets the spawntime, it is optional.\r\n\r\nNote: this is a copy of .gameobject.');
 
 -- Creation of first temp table

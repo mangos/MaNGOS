@@ -39,7 +39,7 @@ UNLOCK TABLES;
 -- Table structure for table `areatrigger_scripts`
 --
 
-DROP TABLE IF EXISTS `areatrigger_scripts`; 
+DROP TABLE IF EXISTS `areatrigger_scripts`;
 CREATE TABLE `areatrigger_scripts` (
     `entry` MEDIUMINT( 8 ) NOT NULL ,
     `ScriptName` CHAR( 64 ) NOT NULL ,
@@ -14075,8 +14075,8 @@ LOCK TABLES `spell_learn_spell` WRITE;
 /*!40000 ALTER TABLE `spell_learn_spell` DISABLE KEYS */;
 INSERT INTO `spell_learn_spell` VALUES
 (2842,8681),
-(5784,33388), 
-(13819,33388), 
+(5784,33388),
+(13819,33388),
 (17002,24867),
 (23161,33391),
 (23214,33391),

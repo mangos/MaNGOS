@@ -1,4 +1,4 @@
-ALTER TABLE `item_template` 
+ALTER TABLE `item_template`
   ADD COLUMN `spellppmRate_1` float NOT NULL default '0' AFTER `spellcharges_1`,
   ADD COLUMN `spellppmRate_2` float NOT NULL default '0' AFTER `spellcharges_2`,
   ADD COLUMN `spellppmRate_3` float NOT NULL default '0' AFTER `spellcharges_3`,

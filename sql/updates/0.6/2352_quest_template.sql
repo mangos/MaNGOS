@@ -1,4 +1,4 @@
-ALTER TABLE `quest_template` 
+ALTER TABLE `quest_template`
   CHANGE `ReqKillMobOrGOId1` `ReqCreatureOrGOId1` int(11) NOT NULL default '0',
   CHANGE `ReqKillMobOrGOId2` `ReqCreatureOrGOId2` int(11) NOT NULL default '0',
   CHANGE `ReqKillMobOrGOId3` `ReqCreatureOrGOId3` int(11) NOT NULL default '0',

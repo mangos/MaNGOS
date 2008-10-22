@@ -1,5 +1,5 @@
 DELETE FROM `command` WHERE `name`='learn';
-INSERT INTO `command` VALUES 
+INSERT INTO `command` VALUES
 ('learn',3,'Syntax: .learn #parameter\r\n\r\nSelected character learn a spell of id #parameter.'),
 ('learn all',3,'Syntax: .learn all\r\n\r\nLearn all big set different spell maybe useful for Administaror.'),
 ('learn all_crafts',2,'Syntax: .learn crafts\r\n\r\nLearn all professions and recipes.'),

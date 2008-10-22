@@ -13,7 +13,7 @@ INSERT INTO `spell_proc_event` VALUES
 DELETE FROM `spell_proc_event` WHERE `entry` IN (35083);
 INSERT INTO `spell_proc_event` VALUES
  (35083,0,0,0,0,0x0000000000000000,0x00020000,0);
- 
+
 DELETE FROM `spell_proc_event` WHERE `entry` IN (35086);
 INSERT INTO `spell_proc_event` VALUES
  (35086,0,0,0,0,0x0000000000000000,0x08020000,0);

@@ -2,7 +2,7 @@ delete from command where name in('honor', 'honor add', 'honor addkill', 'honor 
 
 update `command` set `help` = 'Syntax: .modify $parameter $value\r\n\r\nModify the value of various parameters. Use .help modify $parameter to get help on specific parameter usage.\r\n\r\nSupported parameters include hp, mana, rage, energy, money, speed, swim, scale, bit, bwalk, aspeed, faction, spell, tp and honor.' where `name` = 'modify';
 
-INSERT INTO `command` ( `name` , `security` , `help` ) VALUES 
+INSERT INTO `command` ( `name` , `security` , `help` ) VALUES
 ('honor',2,'Syntax: .honor $command [$value] Various honor related commands. Use .help honor $command to get help on specific parameter usage. Supported parameters include add, addkill, flushkills, update'),
 ('honor add',2,'Syntax: .honor add $amount\r\n\r\nAdd a certain amount of honor (gained today) to the selected player.'),
 ('honor addkill',2,'Syntax: .honor addkikll\r\n\r\nAdd the targeted unit as one of your pvp kills today (you only get honor if it\'s a racial leader or a player)'),

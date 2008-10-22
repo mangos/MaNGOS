@@ -1,10 +1,10 @@
-ALTER TABLE `realmd`.`ip_banned` 
+ALTER TABLE `realmd`.`ip_banned`
     ADD COLUMN `bandate` INT NOT NULL AFTER `ip`,
     ADD COLUMN `unbandate` INT NOT NULL AFTER `bandate`,
     ADD COLUMN `bannedby` VARCHAR(50) NOT NULL DEFAULT '[Console]' AFTER `unbandate`,
     ADD COLUMN `banreason` VARCHAR(50) NOT NULL DEFAULT 'no reason' AFTER `bannedby`;
 
-ALTER TABLE `realmd`.`account` 
+ALTER TABLE `realmd`.`account`
     DROP KEY `idx_banned`,
     DROP COLUMN `banned`;
 

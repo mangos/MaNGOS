@@ -1,3 +1,3 @@
-ALTER TABLE `character_aura` 
+ALTER TABLE `character_aura`
     DROP KEY `guid` ,
-    ADD PRIMARY KEY (`guid`,`spell`) ; 
+    ADD PRIMARY KEY (`guid`,`spell`) ;

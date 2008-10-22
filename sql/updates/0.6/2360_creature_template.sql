@@ -1,4 +1,4 @@
-ALTER TABLE `creature_template` 
+ALTER TABLE `creature_template`
   ADD COLUMN `MovementType` int(11) unsigned NOT NULL default '0' AFTER `MoveName`;
 
 UPDATE `creature_template`
@@ -6,10 +6,10 @@ UPDATE `creature_template`
 UPDATE `creature_template`
   SET `MovementType` = '2' WHERE `MoveName` = 'Waypoint';
 
-ALTER TABLE `creature_template` 
+ALTER TABLE `creature_template`
   DROP `MoveName`;
 
-ALTER TABLE `creature` 
+ALTER TABLE `creature`
   ADD COLUMN `MovementType` int(11) unsigned NOT NULL default '0' AFTER `faction`;
 
 UPDATE `creature`, `creature_template`

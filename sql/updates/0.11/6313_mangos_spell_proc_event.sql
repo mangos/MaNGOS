@@ -1,5 +1,5 @@
 DELETE FROM spell_proc_event WHERE entry IN (37982, 37617, 37213, 37237, 37228);
-INSERT INTO spell_proc_event VALUES 
+INSERT INTO spell_proc_event VALUES
 -- Earthstun (Brutal Earthstorm-Diamond)
 (37982,0,0,0,0,0x0000000000000000,0x00000001,0),
 -- Desolation Battlegear 4 pieces

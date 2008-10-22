@@ -14,7 +14,7 @@ CREATE TABLE `skinning_loot_template_alternative` (
   PRIMARY KEY  (`item`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Loot System';
 
-update `creature_template` set `skinloot` = 
+update `creature_template` set `skinloot` =
 case `type`
   when 2 then 100001  #CREATURE_TYPE_DRAGON
   when 1 then         #CREATURE_TYPE_BEAST
@@ -22,14 +22,14 @@ case `type`
       when 7  then 0       #CREATURE_FAMILY_CARRION_BIRD
       when 26 then 0       #CREATURE_FAMILY_OWL
       when 21 then 100002  #CREATURE_FAMILY_TURTLE
-      else if (`minlevel` > 48, 100003, 
-           if (`minlevel` > 36, 100004, 
-           if (`minlevel` > 25, 100005, 
-           if (`minlevel` > 15, 100006, 
-           if (`minlevel` >  3, 100007, 
+      else if (`minlevel` > 48, 100003,
+           if (`minlevel` > 36, 100004,
+           if (`minlevel` > 25, 100005,
+           if (`minlevel` > 15, 100006,
+           if (`minlevel` >  3, 100007,
                                 100008 )))))
     end
-  else 0 
+  else 0
 end;
 
 insert into `skinning_loot_template` values

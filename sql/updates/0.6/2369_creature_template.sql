@@ -1,4 +1,4 @@
-ALTER TABLE `creature_template` 
+ALTER TABLE `creature_template`
   CHANGE `level`     `minlevel`  int(3) unsigned default '1',
   CHANGE `level_max` `maxlevel`  int(3) unsigned default '1' AFTER `minlevel`,
   ADD COLUMN         `minhealth` int(5) unsigned default '0' AFTER `maxlevel`,

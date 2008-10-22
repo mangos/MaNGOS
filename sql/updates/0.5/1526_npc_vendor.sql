@@ -1,4 +1,4 @@
-ALTER TABLE `npc_vendor` 
+ALTER TABLE `npc_vendor`
     DROP PRIMARY KEY,
     DROP KEY `vendor_id` ,
     DROP `index_id`,

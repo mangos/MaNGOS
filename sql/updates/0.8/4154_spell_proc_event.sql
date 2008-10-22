@@ -14,7 +14,7 @@ CREATE TABLE `spell_proc_event` (
 */
 
 DELETE FROM `spell_proc_event` WHERE `entry` IN ( 30675, 30678, 30679, 30680, 30681 );
-INSERT INTO `spell_proc_event` VALUES 
+INSERT INTO `spell_proc_event` VALUES
 (30675,0,0,0,11,3,16384,0),
 (30678,0,0,0,11,3,16384,0),
 (30679,0,0,0,11,3,16384,0),

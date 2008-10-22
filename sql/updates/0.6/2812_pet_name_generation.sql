@@ -206,6 +206,6 @@ INSERT INTO `pet_name_generation` (`word`, `entry`, `half`) VALUES ('roon',417,1
 INSERT INTO `pet_name_generation` (`word`, `entry`, `half`) VALUES ('tom',417,1);
 INSERT INTO `pet_name_generation` (`word`, `entry`, `half`) VALUES ('zhem',417,1);
 INSERT INTO `pet_name_generation` (`word`, `entry`, `half`) VALUES ('zhum',417,1);
-INSERT INTO `pet_name_generation` (`word`, `entry`, `half`) VALUES ('zun',417,1); 
+INSERT INTO `pet_name_generation` (`word`, `entry`, `half`) VALUES ('zun',417,1);
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `pet_name_generation` ENABLE KEYS */;

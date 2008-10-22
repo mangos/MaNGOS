@@ -1,2 +1,2 @@
-ALTER  TABLE  creature_movement 
+ALTER  TABLE  creature_movement
     DROP aiscript;

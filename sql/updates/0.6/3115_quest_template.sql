@@ -1,4 +1,4 @@
-ALTER TABLE `quest_template` 
+ALTER TABLE `quest_template`
     ADD COLUMN `RewRepFaction3` int(11) unsigned NOT NULL default '0' AFTER `RewRepFaction2`,
     ADD COLUMN `RewRepFaction4` int(11) unsigned NOT NULL default '0' AFTER `RewRepFaction3`,
     ADD COLUMN `RewRepFaction5` int(11) unsigned NOT NULL default '0' AFTER `RewRepFaction4`,

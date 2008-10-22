@@ -12,9 +12,9 @@ To see if you need an update, the file names have been given a fixed structure
 that should enable you to see if you need an update or not.
 
 === File name descriptin ===
-File names are divided into two parts. First part is the date+counter 
-that show commit apply date that will be compatible with database after apply update. 
-The second part of the name, is the table that needs and update or has been added. 
+File names are divided into two parts. First part is the date+counter
+that show commit apply date that will be compatible with database after apply update.
+The second part of the name, is the table that needs and update or has been added.
 See an example below:
 
          2008_10_17_01_characters_character_spell.sql

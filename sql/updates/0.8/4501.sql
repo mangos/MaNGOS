@@ -3,7 +3,7 @@
 ALTER TABLE `creature` ADD INDEX `index_id` (id);
 
 -- Add suport to creature table for equipment and model overwritting
-ALTER TABLE `creature` 
+ALTER TABLE `creature`
     ADD COLUMN `equipment_id` int(11) NOT NULL default '0' AFTER `map`,
     ADD COLUMN `modelid` int(11) unsigned default '0' AFTER `map`;
 
@@ -73,7 +73,7 @@ CREATE TABLE `creature_equip_template` (
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Creature System (Equipment)';
 
 -- Fill the creature_equip_template table with values from creature_template
-INSERT INTO `creature_equip_template` (`equipmodel1`,`equipmodel2`,`equipmodel3`,`equipinfo1`,`equipinfo2`,`equipinfo3`,`equipslot1`,`equipslot2`,`equipslot3`) 
+INSERT INTO `creature_equip_template` (`equipmodel1`,`equipmodel2`,`equipmodel3`,`equipinfo1`,`equipinfo2`,`equipinfo3`,`equipslot1`,`equipslot2`,`equipslot3`)
     (SELECT DISTINCT `equipmodel1`,`equipmodel2`,`equipmodel3`,`equipinfo1`,`equipinfo2`,`equipinfo3`,`equipslot1`,`equipslot2`,`equipslot3` FROM `creature_template` WHERE `equipmodel1`<>0 OR `equipmodel2`<>0 OR `equipmodel3`<>0);
 
 -- Then add to creature_template the id generated for equipements

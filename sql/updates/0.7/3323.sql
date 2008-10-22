@@ -1,4 +1,4 @@
-ALTER TABLE `character_pet` 
+ALTER TABLE `character_pet`
   ADD COLUMN `slot` tinyint(1) unsigned NOT NULL default '0',
   CHANGE COLUMN `id` `id` int(11) unsigned NOT NULL default '0';
 
@@ -10,15 +10,15 @@ UPDATE `character_pet`
   SET `slot` = 3 WHERE `current` = 0;
 
 /* current = (`slot`==0) */
-ALTER TABLE `character_pet` 
+ALTER TABLE `character_pet`
   DROP COLUMN `current`;
 
 UPDATE `character_pet`, `character_stable`
   SET `character_pet`.`slot`     =`character_stable`.`slot`
-  WHERE `character_pet`.`id`=`character_stable`.`petnumber` 
+  WHERE `character_pet`.`id`=`character_stable`.`petnumber`
     AND `character_pet`.`owner`=`character_stable`.`owner` AND `character_pet`.`id`=`character_stable`.`petnumber`;
 
-ALTER TABLE `character` 
+ALTER TABLE `character`
   ADD COLUMN `stable_slots` tinyint(1) unsigned NOT NULL default '0';
 
 UPDATE `character`, (

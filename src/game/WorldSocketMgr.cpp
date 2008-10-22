@@ -53,7 +53,7 @@ class ReactorRunnable : protected ACE_Task_Base
 {
     public:
 
-        ReactorRunnable () : 
+        ReactorRunnable () :
             m_ThreadId (-1),
             m_Connections (0),
             m_Reactor (0)

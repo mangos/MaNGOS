@@ -3,7 +3,7 @@
 DELETE FROM command WHERE name IN ('lookupitem','lookupitemset','lookupcreature','lookupobject','lookupquest','lookupskill','lookupspell','lookuptele');
 
 
-INSERT INTO `command` VALUES 
+INSERT INTO `command` VALUES
  ('lookup creature',3,'Syntax: .lookup creature $namepart\r\n\r\nLooks up a creature by $namepart, and returns all matches with their creature ID\'s.'),
  ('lookup item',3,'Syntax: .lookup item $itemname\r\n\r\nLooks up an item by $itemname, and returns all matches with their Item ID\'s.'),
  ('lookup itemset',3,'Syntax: .lookup itemset $itemname\r\n\r\nLooks up an item set by $itemname, and returns all matches with their Item set ID\'s.'),

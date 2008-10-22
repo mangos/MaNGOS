@@ -1,4 +1,4 @@
-ALTER TABLE `object_questrelation` 
+ALTER TABLE `object_questrelation`
     RENAME TO `gameobject_questrelation`,
     DROP PRIMARY KEY,
     DROP `Id`,

@@ -1,4 +1,4 @@
-ALTER TABLE `object_involvedrelation` 
+ALTER TABLE `object_involvedrelation`
     RENAME TO `gameobject_involvedrelation`,
     DROP PRIMARY KEY,
     DROP `Id`,

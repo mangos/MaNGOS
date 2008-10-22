@@ -15,5 +15,5 @@ CREATE TABLE `spell_affect` (
 */
 
 DELETE FROM `spell_affect` WHERE `entry` IN (34936);
-INSERT INTO `spell_affect` VALUES 
+INSERT INTO `spell_affect` VALUES
 (34936,0,0,0,0,0,0,274877906945,1);

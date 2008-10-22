@@ -1,2 +1,2 @@
-ALTER TABLE `creature_addon` 
+ALTER TABLE `creature_addon`
     DROP COLUMN `RefId`;

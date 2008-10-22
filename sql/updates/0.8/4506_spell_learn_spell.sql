@@ -1,4 +1,4 @@
-INSERT IGNORE INTO `spell_learn_spell` VALUES 
+INSERT IGNORE INTO `spell_learn_spell` VALUES
 (71,355,0),
 (71,7386,0),
 (264,3018,0),

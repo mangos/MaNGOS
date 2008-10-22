@@ -1,4 +1,4 @@
-update `quest_template` set `RewRepFaction1` = 
+update `quest_template` set `RewRepFaction1` =
 case `RewRepFaction1`
   when    0 then   0
   when   11 then  72
@@ -47,7 +47,7 @@ case `RewRepFaction1`
   else `RewRepFaction1`*'-1'
 end;
 
-update `quest_template` set `RewRepFaction2` = 
+update `quest_template` set `RewRepFaction2` =
 case `RewRepFaction2`
   when    0 then   0
   when   11 then  72

@@ -1,4 +1,4 @@
-ALTER TABLE `creature_template` 
+ALTER TABLE `creature_template`
   ADD COLUMN `pickpocketloot` int(10) unsigned NOT NULL default '0' AFTER `lootid`;
 
 UPDATE `creature_template`,`pickpocketing_loot_template`

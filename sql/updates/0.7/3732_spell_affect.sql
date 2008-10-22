@@ -11,7 +11,7 @@ CREATE TABLE `spell_affect` (
   PRIMARY KEY  (`entry`,`effectId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-INSERT INTO `spell_affect` VALUES 
+INSERT INTO `spell_affect` VALUES
 (11070, 1, 0, 0, 0, 0, 0, 32),
 (11069, 1, 0, 0, 0, 0, 0, 1),
 (11083, 0, 0, 0, 0, 8, 0, 0),

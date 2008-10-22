@@ -1,20 +1,20 @@
 -- phpMyAdmin SQL Dump
 -- version 2.7.0-pl2
 -- http://www.phpmyadmin.net
--- 
+--
 -- Host: localhost
 -- Generation Time: Sep 04, 2006 at 05:27 AM
 -- Server version: 5.0.22
 -- PHP Version: 5.2.0-dev
--- 
+--
 -- Database: `mangos`
--- 
+--
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `player_levelupgains`
--- 
+--
 
 CREATE TABLE `player_levelupgains` (
   `entry` smallint(5) unsigned NOT NULL auto_increment,
@@ -31,9 +31,9 @@ CREATE TABLE `player_levelupgains` (
   PRIMARY KEY  (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 PACK_KEYS=0 COMMENT='Stores level up stat gains.' AUTO_INCREMENT=2401 ;
 
--- 
+--
 -- Dumping data for table `player_levelupgains`
--- 
+--
 
 INSERT INTO `player_levelupgains` VALUES (2, 3, 3, 1, 17, 6, 0, 1, 1, 1, 1);
 INSERT INTO `player_levelupgains` VALUES (3, 3, 3, 2, 17, 21, 1, 1, 1, 0, 0);

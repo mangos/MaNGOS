@@ -1,5 +1,5 @@
 delete from command where name in('goxyz','resetall','reset','reset honor','reset level','reset spells','reset stats','reset talents');
-INSERT INTO `command` VALUES 
+INSERT INTO `command` VALUES
 ('goxyz',1,'Syntax: .goxyz #x #y #z [#mapid]\r\n\r\nTeleport player to point with (#x,#y,#z) coordinates at ground(water) level at map #mapid or same map if #mapid not provided.'),
 ('resetall',3,'Syntax: .resetall spells\r\n\r\nSyntax: .resetall talents\r\n\r\nRequest reset spells or talents at next login each existed character.'),
 ('reset honor',3,'Syntax:\r\n.reset honor [Playername]\r\n  Reset all honor data for targeted character.'),

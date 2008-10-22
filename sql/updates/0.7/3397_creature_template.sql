@@ -1,4 +1,4 @@
-ALTER TABLE `creature_template` 
+ALTER TABLE `creature_template`
   ADD COLUMN `InhabitType` tinyint(1) unsigned NOT NULL default '3' AFTER `MovementType`;
 
 /*

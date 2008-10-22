@@ -15,7 +15,7 @@ CREATE TABLE `battleground_template` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Records 
+-- Records
 -- ----------------------------
 
 INSERT INTO `battleground_template` VALUES ('1', '0', '0', '0',  '611', '2.72532',  '610','2.27452');

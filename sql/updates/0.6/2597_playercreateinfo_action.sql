@@ -3,7 +3,7 @@ ALTER TABLE `playercreateinfo_action`
   ADD `class` tinyint(3) unsigned NOT NULL default '0' AFTER `race`;
 
 UPDATE `playercreateinfo_action`,`playercreateinfo`
-  SET `playercreateinfo_action`.`race` = `playercreateinfo`.`race`, 
+  SET `playercreateinfo_action`.`race` = `playercreateinfo`.`race`,
       `playercreateinfo_action`.`class` = `playercreateinfo`.`class`
   WHERE `playercreateinfo_action`.`createid` = `playercreateinfo`.`createid`;
 

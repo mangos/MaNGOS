@@ -17,9 +17,9 @@ CREATE TABLE `player_levelstats` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 PACK_KEYS=0 COMMENT='Stores levels stats.';
 
 -- ----------------------------
--- Records 
+-- Records
 -- ----------------------------
-INSERT INTO `player_levelstats` VALUES 
+INSERT INTO `player_levelstats` VALUES
 ('1', '1', '1', '60', '0', '23', '20', '22', '20', '21'),
 ('1', '1', '2', '79', '0', '24', '21', '23', '20', '21'),
 ('1', '1', '3', '98', '0', '25', '21', '24', '20', '22'),

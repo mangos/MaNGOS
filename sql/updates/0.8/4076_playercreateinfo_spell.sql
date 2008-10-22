@@ -8,7 +8,7 @@ CREATE TABLE `playercreateinfo_spell` (
   PRIMARY KEY  (`race`,`class`,`Spell`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-INSERT INTO `playercreateinfo_spell` VALUES 
+INSERT INTO `playercreateinfo_spell` VALUES
 (1,1,78,'Heroic Strike',1),
 (1,1,81,'Dodge',1),
 (1,1,107,'Block',1),

@@ -7,7 +7,7 @@ CREATE TABLE `pet_name_generation` (
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-INSERT INTO `pet_name_generation` (`word`,`entry`,`half`) VALUES 
+INSERT INTO `pet_name_generation` (`word`,`entry`,`half`) VALUES
 ('Aba',416,0),
 ('Az',416,0),
 ('Bel',416,0),

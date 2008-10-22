@@ -1,5 +1,5 @@
 -- custom
--- UNIT_NPC_FLAG_GUARD                 = 0x00010000, old 
+-- UNIT_NPC_FLAG_GUARD                 = 0x00010000, old
 -- UNIT_NPC_FLAG_GUARD                 = 0x10000000, new
 UPDATE `creature_template` SET `npcflag` = (`npcflag` | 0x10000000) & ~0x00010000 WHERE `npcflag` & 0x00010000;
 

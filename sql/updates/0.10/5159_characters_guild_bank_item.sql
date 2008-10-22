@@ -1,4 +1,4 @@
-ALTER TABLE `guild_bank_item` 
+ALTER TABLE `guild_bank_item`
   ADD COLUMN `item_entry` int(11) unsigned NOT NULL default '0',
   ADD KEY `item_guid_key` (`item_guid`),
   ADD KEY `guildid_key` (`guildid`);

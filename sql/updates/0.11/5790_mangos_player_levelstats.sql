@@ -1,3 +1,3 @@
-ALTER TABLE `player_levelstats` 
-   DROP `basehp`, 
+ALTER TABLE `player_levelstats`
+   DROP `basehp`,
    DROP `basemana`;

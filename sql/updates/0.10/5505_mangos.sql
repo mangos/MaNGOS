@@ -458,7 +458,7 @@ ALTER TABLE `locales_quest`
 ALTER TABLE `mangos_string`
     CHANGE COLUMN `content_default` `content_default` text NOT NULL,
     CHANGE COLUMN `entry` `entry` mediumint unsigned NOT NULL DEFAULT 0;
-ALTER TABLE `npc_gossip`   
+ALTER TABLE `npc_gossip`
     CHANGE COLUMN `npc_guid` `npc_guid` integer unsigned NOT NULL DEFAULT 0,
     CHANGE COLUMN `textid` `textid` mediumint unsigned NOT NULL DEFAULT 0;
 ALTER TABLE `npc_gossip_textid`

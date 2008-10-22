@@ -23,7 +23,7 @@ CREATE TABLE `player_levelstats` (
 
 LOCK TABLES `player_levelstats` WRITE;
 /*!40000 ALTER TABLE `player_levelstats` DISABLE KEYS */;
-INSERT INTO `player_levelstats` VALUES 
+INSERT INTO `player_levelstats` VALUES
 (1,1,1,60,0,23,20,22,20,20),
 (1,1,2,79,0,24,21,23,20,20),
 (1,1,3,98,0,26,22,24,20,21),

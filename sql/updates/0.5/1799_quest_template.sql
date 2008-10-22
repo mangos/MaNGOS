@@ -1,4 +1,4 @@
-ALTER TABLE `quest_template` 
+ALTER TABLE `quest_template`
     ADD COLUMN `RequiredRepFaction` int(11) unsigned NOT NULL default '0' AFTER `RequiredTradeskill`,
     ADD COLUMN `RequiredRepValue` int(11) unsigned NOT NULL default '0' AFTER `RequiredRepFaction`,
     CHANGE `ReqKillMobId1` `ReqKillMobOrGOId1` int(11) NOT NULL default '0',

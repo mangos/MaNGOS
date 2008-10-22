@@ -14,4 +14,4 @@ CREATE TABLE `mail` (
   `checked` tinyint(3) unsigned NOT NULL default '0',
   PRIMARY KEY  (`id`),
   KEY `idx_receiver` (`receiver`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Mail System'; 
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Mail System';

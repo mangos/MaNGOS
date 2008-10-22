@@ -5091,7 +5091,7 @@ bool ChatHandler::HandleBanListHelper(QueryResult* result)
             // "account" case, name can be get in same quary
             if(result->GetFieldCount() > 1)
                 account_name = fields[1].GetCppString();
-            // "character" case, name need extract from another DB 
+            // "character" case, name need extract from another DB
             else
                 accmgr.GetName (account_id,account_name);
 
@@ -5140,7 +5140,7 @@ bool ChatHandler::HandleBanListIPCommand(const char* args)
     loginDatabase.escape_string(filter);
 
     QueryResult* result;
-    
+
     if(filter.empty())
     {
         result = loginDatabase.Query ("SELECT ip,bandate,unbandate,bannedby,banreason FROM ip_banned"

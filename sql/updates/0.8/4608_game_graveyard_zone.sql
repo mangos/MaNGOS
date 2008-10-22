@@ -1,4 +1,4 @@
-ALTER TABLE `game_graveyard_zone` 
+ALTER TABLE `game_graveyard_zone`
   DROP COLUMN `ghost_map`;
 
 UPDATE `game_graveyard_zone` as G1,`game_graveyard_zone` as G2

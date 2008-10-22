@@ -28,11 +28,11 @@ CREATE TABLE `quest_start_scripts` (
 
 
 INSERT INTO `quest_end_scripts`
-SELECT `id`,`delay`,`command`,`datalong`,`datalong2`,`datatext`,`x`,`y`,`z`,`o` 
+SELECT `id`,`delay`,`command`,`datalong`,`datalong2`,`datatext`,`x`,`y`,`z`,`o`
 FROM `scripts` WHERE `StartOrFinish` = 0;
 
 INSERT INTO `quest_start_scripts`
-SELECT `id`,`delay`,`command`,`datalong`,`datalong2`,`datatext`,`x`,`y`,`z`,`o` 
+SELECT `id`,`delay`,`command`,`datalong`,`datalong2`,`datatext`,`x`,`y`,`z`,`o`
 FROM `scripts` WHERE `StartOrFinish` = 1;
 
 DROP TABLE IF EXISTS `scripts`;

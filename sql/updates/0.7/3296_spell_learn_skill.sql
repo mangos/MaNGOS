@@ -8,7 +8,7 @@ CREATE TABLE `spell_learn_skill` (
   UNIQUE KEY spell_skill(`entry`,`SkillID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Item System';
 
-INSERT INTO `spell_learn_skill` VALUES 
+INSERT INTO `spell_learn_skill` VALUES
 /*================== Armor ============*/
 /*Cloth            */( 9078,415,  1,  1),
 /*Leather          */( 9077,414,  1,  1),

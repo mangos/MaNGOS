@@ -6,7 +6,7 @@ CREATE TABLE `spell_learn_spell` (
   PRIMARY KEY (`entry`,`SpellID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Item System';
 
-INSERT INTO `spell_learn_spell` VALUES 
+INSERT INTO `spell_learn_spell` VALUES
 /*SKILL_ENGINERING*/
 (4036,3918,0),
 (4036,3919,0),
