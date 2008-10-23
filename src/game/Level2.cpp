@@ -98,7 +98,7 @@ bool ChatHandler::HandleMuteCommand(const char* args)
         security = accmgr.GetSecurity(account_id);
     }
 
-    if(security >= m_session->GetSecurity())
+    if(m_session && security >= m_session->GetSecurity())
     {
         SendSysMessage(LANG_YOURS_SECURITY_IS_LOW);
         SetSentErrorMessage(true);
@@ -164,7 +164,7 @@ bool ChatHandler::HandleUnmuteCommand(const char* args)
         security = accmgr.GetSecurity(account_id);
     }
 
-    if(security >= m_session->GetSecurity())
+    if(m_session && security >= m_session->GetSecurity())
     {
         SendSysMessage(LANG_YOURS_SECURITY_IS_LOW);
         SetSentErrorMessage(true);
@@ -1810,7 +1810,8 @@ bool ChatHandler::HandlePInfoCommand(const char* args)
         Field* fields = result->Fetch();
         username = fields[0].GetCppString();
         security = fields[1].GetUInt32();
-        if(m_session->GetSecurity() >= security)
+
+        if(!m_session || m_session->GetSecurity() >= security)
         {
             last_ip = fields[2].GetCppString();
             last_login = fields[3].GetCppString();
@@ -1892,6 +1893,13 @@ bool ChatHandler::HandleTicketCommand(const char* args)
     // ticket<end>
     if (!px)
     {
+        if(!m_session)
+        {
+            SendSysMessage(LANG_PLAYER_NOT_FOUND);
+            SetSentErrorMessage(true);
+            return false;
+        }
+
         size_t count;
         QueryResult *result = CharacterDatabase.Query("SELECT COUNT(ticket_id) FROM character_ticket");
         if(result)
@@ -1902,13 +1910,22 @@ bool ChatHandler::HandleTicketCommand(const char* args)
         else
             count = 0;
 
-        PSendSysMessage(LANG_COMMAND_TICKETCOUNT, count, m_session->GetPlayer()->isAcceptTickets() ?  GetMangosString(LANG_ON) : GetMangosString(LANG_OFF));
+        bool accept = m_session->GetPlayer()->isAcceptTickets();
+
+        PSendSysMessage(LANG_COMMAND_TICKETCOUNT, count, accept ?  GetMangosString(LANG_ON) : GetMangosString(LANG_OFF));
         return true;
     }
 
     // ticket on
     if(strncmp(px,"on",3) == 0)
     {
+        if(!m_session)
+        {
+            SendSysMessage(LANG_PLAYER_NOT_FOUND);
+            SetSentErrorMessage(true);
+            return false;
+        }
+
         m_session->GetPlayer()->SetAcceptTicket(true);
         SendSysMessage(LANG_COMMAND_TICKETON);
         return true;
@@ -1917,6 +1934,13 @@ bool ChatHandler::HandleTicketCommand(const char* args)
     // ticket off
     if(strncmp(px,"off",4) == 0)
     {
+        if(!m_session)
+        {
+            SendSysMessage(LANG_PLAYER_NOT_FOUND);
+            SetSentErrorMessage(true);
+            return false;
+        }
+
         m_session->GetPlayer()->SetAcceptTicket(false);
         SendSysMessage(LANG_COMMAND_TICKETOFF);
         return true;

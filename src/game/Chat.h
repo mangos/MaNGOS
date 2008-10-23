@@ -335,7 +335,6 @@ class ChatHandler
         bool HandleUnAuraCommand(const char* args);
         bool HandleLinkGraveCommand(const char* args);
         bool HandleNearGraveCommand(const char* args);
-        bool HandleSpawnTransportCommand(const char* args);
         bool HandleExploreCheatCommand(const char* args);
         bool HandleTextEmoteCommand(const char* args);
         bool HandleNpcInfoCommand(const char* args);

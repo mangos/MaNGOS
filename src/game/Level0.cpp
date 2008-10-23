@@ -33,15 +33,17 @@
 
 bool ChatHandler::HandleHelpCommand(const char* args)
 {
-    if(!*args)
-        return false;
-
     char* cmd = strtok((char*)args, " ");
     if(!cmd)
-        return false;
-
-    if(!ShowHelpForCommand(getCommandTable(), cmd))
-        SendSysMessage(LANG_NO_HELP_CMD);
+    {
+        ShowHelpForCommand(getCommandTable(), "help");
+        ShowHelpForCommand(getCommandTable(), "");
+    }
+    else
+    {
+        if(!ShowHelpForCommand(getCommandTable(), cmd))
+            SendSysMessage(LANG_NO_HELP_CMD);
+    }
 
     return true;
 }

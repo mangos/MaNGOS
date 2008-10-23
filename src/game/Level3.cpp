@@ -3590,11 +3590,6 @@ bool ChatHandler::HandleNearGraveCommand(const char* args)
     return true;
 }
 
-bool ChatHandler::HandleSpawnTransportCommand(const char* /*args*/)
-{
-    return true;
-}
-
 //play npc emote
 bool ChatHandler::HandlePlayEmoteCommand(const char* args)
 {
