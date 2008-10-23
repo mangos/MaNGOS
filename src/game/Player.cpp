@@ -17816,9 +17816,10 @@ bool Player::RewardPlayerAndGroupAtKill(Unit* pVictim)
 
         if(member_with_max_level)
         {
-            xp = PvP ? 0 : MaNGOS::XP::Gain(not_gray_member_with_max_level, pVictim);
+            /// not get Xp in PvP or no not gray players in group
+            xp = (PvP || !not_gray_member_with_max_level) ? 0 : MaNGOS::XP::Gain(not_gray_member_with_max_level, pVictim);
 
-            // skip in check PvP case (for speed, not used)
+            /// skip in check PvP case (for speed, not used)
             bool is_raid = PvP ? false : sMapStore.LookupEntry(GetMapId())->IsRaid() && pGroup->isRaidGroup();
             bool is_dungeon = PvP ? false : sMapStore.LookupEntry(GetMapId())->IsDungeon();
             float group_rate = MaNGOS::XP::xp_in_group_rate(count,is_raid);
