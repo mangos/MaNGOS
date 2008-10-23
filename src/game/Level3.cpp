@@ -5346,24 +5346,82 @@ bool ChatHandler::HandleLoadPDumpCommand(const char *args)
             SetSentErrorMessage(true);
             return false;
         }
+    }
 
-        if(!accmgr.GetName(account_id,account_name))
+    if(!accmgr.GetName(account_id,account_name))
+    {
+        PSendSysMessage(LANG_ACCOUNT_NOT_EXIST,account_name.c_str());
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    char* guid_str = NULL;
+    char* name_str = strtok(NULL, " ");
+
+    std::string name;
+    if(name_str)
+    {
+        name = name_str;
+        // normalize the name if specified and check if it exists
+        if(!normalizePlayerName(name))
         {
-            PSendSysMessage(LANG_ACCOUNT_NOT_EXIST,account_name.c_str());
+            PSendSysMessage(LANG_INVALID_CHARACTER_NAME);
+            SetSentErrorMessage(true);
+            return false;
+        }
+
+        if(!ObjectMgr::IsValidName(name,true))
+        {
+            PSendSysMessage(LANG_INVALID_CHARACTER_NAME);
+            SetSentErrorMessage(true);
+            return false;
+        }
+
+        guid_str = strtok(NULL, " ");
+    }
+
+    uint32 guid = 0;
+
+    if(guid_str)
+    {
+        guid = atoi(guid_str);
+        if(!guid)
+        {
+            PSendSysMessage(LANG_INVALID_CHARACTER_GUID);
+            SetSentErrorMessage(true);
+            return false;
+        }
+
+        if(objmgr.GetPlayerAccountIdByGUID(guid))
+        {
+            PSendSysMessage(LANG_CHARACTER_GUID_IN_USE,guid);
             SetSentErrorMessage(true);
             return false;
         }
     }
 
-    char * name = strtok(NULL, " ");
-    char * guid_str = name ? strtok(NULL, " ") : NULL;
-
-    uint32 guid = guid_str ? atoi(guid_str) : 0;
-
-    if(PlayerDumpReader().LoadDump(file, account_id, name ? name : "", guid))
-        PSendSysMessage(LANG_COMMAND_IMPORT_SUCCESS);
-    else
-        PSendSysMessage(LANG_COMMAND_IMPORT_FAILED);
+    switch(PlayerDumpReader().LoadDump(file, account_id, name, guid))
+    {
+        case DUMP_SUCCESS:
+            PSendSysMessage(LANG_COMMAND_IMPORT_SUCCESS);
+            break;
+        case DUMP_FILE_OPEN_ERROR:
+            PSendSysMessage(LANG_FILE_OPEN_FAIL,file);
+            SetSentErrorMessage(true);
+            return false;
+        case DUMP_FILE_BROKEN:
+            PSendSysMessage(LANG_DUMP_BROKEN,file);
+            SetSentErrorMessage(true);
+            return false;
+        case DUMP_TOO_MANY_CHARS:
+            PSendSysMessage(LANG_ACCOUNT_CHARACTER_LIST_FULL,account_name,account_id);
+            SetSentErrorMessage(true);
+            return false;
+        default:
+            PSendSysMessage(LANG_COMMAND_IMPORT_FAILED);
+            SetSentErrorMessage(true);
+            return false;
+    }
 
     return true;
 }
@@ -5407,10 +5465,27 @@ bool ChatHandler::HandleWritePDumpCommand(const char *args)
     if(!guid)
         guid = atoi(p2);
 
-    if (PlayerDumpWriter().WriteDump(file, guid))
-        PSendSysMessage(LANG_COMMAND_EXPORT_SUCCESS);
-    else
-        PSendSysMessage(LANG_COMMAND_EXPORT_FAILED);
+    if(!objmgr.GetPlayerAccountIdByGUID(guid))
+    {
+        PSendSysMessage(LANG_PLAYER_NOT_FOUND);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    switch(PlayerDumpWriter().WriteDump(file, guid))
+    {
+        case DUMP_SUCCESS:
+            PSendSysMessage(LANG_COMMAND_EXPORT_SUCCESS);
+            break;
+        case DUMP_FILE_OPEN_ERROR:
+            PSendSysMessage(LANG_FILE_OPEN_FAIL,file);
+            SetSentErrorMessage(true);
+            return false;
+        default:
+            PSendSysMessage(LANG_COMMAND_EXPORT_FAILED);
+            SetSentErrorMessage(true);
+            return false;
+    }
 
     return true;
 }

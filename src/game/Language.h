@@ -676,7 +676,13 @@ enum MangosStrings
     LANG_SKILL_LIST_CONSOLE             = 1109,
     LANG_CREATURE_LIST_CONSOLE          = 1110,
     LANG_GO_LIST_CONSOLE                = 1111,
-    // Room for more level 3              1112-1199 not used
+    LANG_FILE_OPEN_FAIL                 = 1112,
+    LANG_ACCOUNT_CHARACTER_LIST_FULL    = 1113,
+    LANG_DUMP_BROKEN                    = 1114,
+    LANG_INVALID_CHARACTER_NAME         = 1115,
+    LANG_INVALID_CHARACTER_GUID         = 1116,
+    LANG_CHARACTER_GUID_IN_USE          = 1117,
+    // Room for more level 3              1118-1199 not used
 
     // FREE IDS                           1200-9999
 
