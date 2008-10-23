@@ -2194,14 +2194,53 @@ bool ChatHandler::HandleListItemCommand(const char* args)
         delete result;
     }
 
-    if(inv_count+mail_count+auc_count == 0)
+    // guild bank case
+    uint32 guild_count = 0;
+    result=CharacterDatabase.PQuery("SELECT COUNT(item_entry) FROM guild_bank_item WHERE item_entry='%u'",item_id);
+    if(result)
+    {
+        guild_count = (*result)[0].GetUInt32();
+        delete result;
+    }
+
+    result=CharacterDatabase.PQuery(
+        //      0             1           2
+        "SELECT gi.item_guid, gi.guildid, guild.name "
+        "FROM guild_bank_item AS gi, guild WHERE gi.item_entry='%u' AND gi.guildid = guild.guildid LIMIT %u ",
+        item_id,uint32(count));
+
+    if(result)
+    {
+        do
+        {
+            Field *fields = result->Fetch();
+            uint32 item_guid = fields[0].GetUInt32();
+            uint32 guild_guid = fields[1].GetUInt32();
+            std::string guild_name = fields[2].GetCppString();
+
+            char const* item_pos = "[in guild bank]";
+
+            PSendSysMessage(LANG_ITEMLIST_GUILD,item_guid,guild_name.c_str(),guild_guid,item_pos);
+        } while (result->NextRow());
+
+        int64 res_count = result->GetRowCount();
+
+        delete result;
+
+        if(count > res_count)
+            count-=res_count;
+        else if(count)
+            count = 0;
+    }
+
+    if(inv_count+mail_count+auc_count+guild_count == 0)
     {
         SendSysMessage(LANG_COMMAND_NOITEMFOUND);
         SetSentErrorMessage(true);
         return false;
     }
 
-    PSendSysMessage(LANG_COMMAND_LISTITEMMESSAGE,item_id,inv_count+mail_count+auc_count,inv_count,mail_count,auc_count);
+    PSendSysMessage(LANG_COMMAND_LISTITEMMESSAGE,item_id,inv_count+mail_count+auc_count+guild_count,inv_count,mail_count,auc_count,guild_count);
 
     return true;
 }
