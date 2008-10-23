@@ -17810,12 +17810,13 @@ bool Player::RewardPlayerAndGroupAtKill(Unit* pVictim)
         uint32 count = 0;
         uint32 sum_level = 0;
         Player* member_with_max_level = NULL;
+        Player* not_gray_member_with_max_level = NULL;
 
-        pGroup->GetDataForXPAtKill(pVictim,count,sum_level,member_with_max_level);
+        pGroup->GetDataForXPAtKill(pVictim,count,sum_level,member_with_max_level,not_gray_member_with_max_level);
 
         if(member_with_max_level)
         {
-            xp = PvP ? 0 : MaNGOS::XP::Gain(member_with_max_level, pVictim);
+            xp = PvP ? 0 : MaNGOS::XP::Gain(not_gray_member_with_max_level, pVictim);
 
             // skip in check PvP case (for speed, not used)
             bool is_raid = PvP ? false : sMapStore.LookupEntry(GetMapId())->IsRaid() && pGroup->isRaidGroup();
@@ -17845,9 +17846,10 @@ bool Player::RewardPlayerAndGroupAtKill(Unit* pVictim)
                     pGroupGuy->RewardReputation(pVictim,is_dungeon ? 1.0f : rate);
 
                     // XP updated only for alive group member
-                    if(pGroupGuy->isAlive())
+                    if(pGroupGuy->isAlive() && not_gray_member_with_max_level &&
+                       pGroupGuy->getLevel() <= not_gray_member_with_max_level->getLevel())
                     {
-                        uint32 itr_xp = uint32(xp*rate);
+                        uint32 itr_xp = (member_with_max_level == not_gray_member_with_max_level) ? uint32(xp*rate) : uint32((xp*rate/2)+1);
 
                         pGroupGuy->GiveXP(itr_xp, pVictim);
                         if(Pet* pet = pGroupGuy->GetPet())
