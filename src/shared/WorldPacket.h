@@ -22,6 +22,8 @@
 #include "Common.h"
 #include "ByteBuffer.h"
 
+// Note: m_opcode and size stored in platfom dependent format
+// ignore endianess until send, and converted at receive
 class WorldPacket : public ByteBuffer
 {
     public:

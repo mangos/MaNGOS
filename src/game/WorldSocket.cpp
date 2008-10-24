@@ -377,21 +377,14 @@ int WorldSocket::handle_input_header (void)
 
     ClientPktHeader& header = *((ClientPktHeader*) m_Header.rd_ptr ());
 
-    header.size = ACE_NTOHS (header.size);
+    EndianConvertReverse(header.size);
+    EndianConvert(header.cmd);
 
-#if ACE_BYTE_ORDER == ACE_BIG_ENDIAN
-    header.cmd = ACE_SWAP_LONG (header.cmd)
-#endif // ACE_BIG_ENDIAN
-
-    if ((header.size < 4) ||
-        (header.size > 10240) ||
-        (header.cmd < 0) ||
-        (header.cmd > 10240)
-        )
+    if ((header.size < 4) || (header.size > 10240) ||
+        (header.cmd  < 0) || (header.cmd  > 10240) )
     {
         sLog.outError ("WorldSocket::handle_input_header: client sent mailformed packet size = %d , cmd = %d",
-                        header.size,
-                        header.cmd);
+                       header.size, header.cmd);
 
         errno = EINVAL;
         return -1;
@@ -664,7 +657,7 @@ int WorldSocket::HandleAuthSession (WorldPacket& recvPacket)
     }
 
     // Read the content of the packet
-    recvPacket >> BuiltNumberClient; // for now no use
+    recvPacket >> BuiltNumberClient;                        // for now no use
     recvPacket >> unk2;
     recvPacket >> account;
 
@@ -974,13 +967,10 @@ int WorldSocket::iSendPacket (const WorldPacket& pct)
     ServerPktHeader header;
 
     header.cmd = pct.GetOpcode ();
-
-#if ACE_BYTE_ORDER == ACE_BIG_ENDIAN
-    header.cmd = ACE_SWAP_WORD (header.cmd)
-#endif
+    EndianConvert(header.cmd);
 
     header.size = (uint16) pct.size () + 2;
-    header.size = ACE_HTONS (header.size);
+    EndianConvertReverse(header.size);
 
     m_Crypt.EncryptSend ((uint8*) & header, sizeof (header));
 
