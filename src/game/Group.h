@@ -181,8 +181,8 @@ class MANGOS_DLL_SPEC Group
         ItemQualities GetLootThreshold() const { return m_lootThreshold; }
 
         // member manipulation methods
-        bool IsMember(uint64 guid) const { return _getMemberCSlot(guid) != m_memberSlots.end(); }
-        bool IsLeader(uint64 guid) const { return (GetLeaderGUID() == guid); }
+        bool IsMember(const uint64& guid) const { return _getMemberCSlot(guid) != m_memberSlots.end(); }
+        bool IsLeader(const uint64& guid) const { return (GetLeaderGUID() == guid); }
         bool IsAssistant(uint64 guid) const
         {
             member_citerator mslot = _getMemberCSlot(guid);
@@ -192,7 +192,7 @@ class MANGOS_DLL_SPEC Group
             return mslot->assistant;
         }
 
-        bool SameSubGroup(uint64 guid1, uint64 guid2) const
+        bool SameSubGroup(uint64 guid1,const uint64& guid2) const
         {
             member_citerator mslot2 = _getMemberCSlot(guid2);
             if(mslot2==m_memberSlots.end())
@@ -208,6 +208,11 @@ class MANGOS_DLL_SPEC Group
                 return false;
 
             return (mslot1->group==slot2->group);
+        }
+
+        bool HasFreeSlotSubGroup(uint8 subgroup) const
+        {
+            return (m_subGroupsCounts && m_subGroupsCounts[subgroup] < MAXGROUPSIZE);
         }
 
         bool SameSubGroup(Player const* member1, Player const* member2) const;
@@ -228,7 +233,11 @@ class MANGOS_DLL_SPEC Group
         // some additional raid methods
         void ConvertToRaid()
         {
-            _convertToRaid();
+            m_groupType = GROUPTYPE_RAID;
+
+            _initRaidSubGroupsCounter();
+
+            if(!isBGGroup()) CharacterDatabase.PExecute("UPDATE groups SET isRaid = 1 WHERE leaderGuid='%u'", GUID_LOPART(m_leaderGuid));
             SendUpdate();
         }
         void SetBattlegroundGroup(BattleGround *bg) { m_bgGroup = bg; }
@@ -236,14 +245,14 @@ class MANGOS_DLL_SPEC Group
         void ChangeMembersGroup(const uint64 &guid, const uint8 &group);
         void ChangeMembersGroup(Player *player, const uint8 &group);
 
-        void SetAssistant(const uint64 &guid, const bool &state)
+        void SetAssistant(uint64 guid, const bool &state)
         {
             if(!isRaidGroup())
                 return;
             if(_setAssistantFlag(guid, state))
                 SendUpdate();
         }
-        void SetMainTank(const uint64 &guid)
+        void SetMainTank(uint64 guid)
         {
             if(!isRaidGroup())
                 return;
@@ -251,7 +260,7 @@ class MANGOS_DLL_SPEC Group
             if(_setMainTank(guid))
                 SendUpdate();
         }
-        void SetMainAssistant(const uint64 &guid)
+        void SetMainAssistant(uint64 guid)
         {
             if(!isRaidGroup())
                 return;
@@ -282,12 +291,12 @@ class MANGOS_DLL_SPEC Group
         /*********************************************************/
 
         void SendLootStartRoll(uint32 CountDown, const Roll &r);
-        void SendLootRoll(uint64 SourceGuid, uint64 TargetGuid, uint8 RollNumber, uint8 RollType, const Roll &r);
-        void SendLootRollWon(uint64 SourceGuid, uint64 TargetGuid, uint8 RollNumber, uint8 RollType, const Roll &r);
+        void SendLootRoll(const uint64& SourceGuid, const uint64& TargetGuid, uint8 RollNumber, uint8 RollType, const Roll &r);
+        void SendLootRollWon(const uint64& SourceGuid, const uint64& TargetGuid, uint8 RollNumber, uint8 RollType, const Roll &r);
         void SendLootAllPassed(uint32 NumberOfPlayers, const Roll &r);
-        void GroupLoot(uint64 playerGUID, Loot *loot, Creature *creature);
-        void NeedBeforeGreed(uint64 playerGUID, Loot *loot, Creature *creature);
-        void MasterLoot(uint64 playerGUID, Loot *loot, Creature *creature);
+        void GroupLoot(const uint64& playerGUID, Loot *loot, Creature *creature);
+        void NeedBeforeGreed(const uint64& playerGUID, Loot *loot, Creature *creature);
+        void MasterLoot(const uint64& playerGUID, Loot *loot, Creature *creature);
         Rolls::iterator GetRoll(uint64 Guid)
         {
             Rolls::iterator iter;
@@ -301,7 +310,7 @@ class MANGOS_DLL_SPEC Group
             return RollId.end();
         }
         void CountTheRoll(Rolls::iterator roll, uint32 NumberOfPlayers);
-        void CountRollVote(uint64 playerGUID, uint64 Guid, uint32 NumberOfPlayers, uint8 Choise);
+        void CountRollVote(const uint64& playerGUID, const uint64& Guid, uint32 NumberOfPlayers, uint8 Choise);
         void EndRoll();
 
         void LinkMember(GroupReference *pRef) { m_memberMgr.insertFirst(pRef); }
@@ -328,6 +337,18 @@ class MANGOS_DLL_SPEC Group
 
         void _homebindIfInstance(Player *player);
 
+        void _initRaidSubGroupsCounter()
+        {
+            // Sub group counters initialization
+            if (!m_subGroupsCounts)
+                m_subGroupsCounts = new uint8[MAXRAIDSIZE / MAXGROUPSIZE];
+
+            memset((void*)m_subGroupsCounts, 0, (MAXRAIDSIZE / MAXGROUPSIZE)*sizeof(uint8));
+
+            for (member_citerator itr = m_memberSlots.begin(); itr != m_memberSlots.end(); ++itr)
+                ++m_subGroupsCounts[itr->group];
+        }
+
         member_citerator _getMemberCSlot(uint64 Guid) const
         {
             for(member_citerator itr = m_memberSlots.begin(); itr != m_memberSlots.end(); ++itr)
@@ -348,6 +369,18 @@ class MANGOS_DLL_SPEC Group
             return m_memberSlots.end();
         }
 
+        void SubGroupCounterIncrease(uint8 subgroup)
+        {
+            if (m_subGroupsCounts)
+                ++m_subGroupsCounts[subgroup];
+        }
+
+        void SubGroupCounterDecrease(uint8 subgroup)
+        {
+            if (m_subGroupsCounts)
+                --m_subGroupsCounts[subgroup];
+        }
+
         MemberSlotList      m_memberSlots;
         GroupRefManager     m_memberMgr;
         InvitesList         m_invitees;
@@ -364,5 +397,6 @@ class MANGOS_DLL_SPEC Group
         uint64              m_looterGuid;
         Rolls               RollId;
         BoundInstancesMap   m_boundInstances[TOTAL_DIFFICULTIES];
+        uint8*              m_subGroupsCounts;
 };
 #endif
