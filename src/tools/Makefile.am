@@ -17,7 +17,7 @@
 ## Process this file with automake to produce Makefile.in
 
 ## Sub-directories to parse
-SUBDIRS = gensvnrevision
+SUBDIRS = genrevision
 
 ## Additional files to include when running 'make dist'
 #  Nothing yet.

@@ -172,12 +172,12 @@ bool extractDataFromGit(std::string filename, std::string path, bool url, RawDat
 std::string generateHeader(char const* rev_str, char const* date_str, char const* time_str)
 {
     std::ostringstream newData;
-    newData << "#ifndef __SVN_REVISION_H__" << std::endl;
-    newData << "#define __SVN_REVISION_H__"  << std::endl;
-    newData << " #define SVN_REVISION \"" << rev_str << "\"" << std::endl;
-    newData << " #define SVN_DATE \"" << date_str << "\"" << std::endl;
-    newData << " #define SVN_TIME \"" << time_str << "\""<< std::endl;
-    newData << "#endif // __SVN_REVISION_H__" << std::endl;
+    newData << "#ifndef __REVISION_H__" << std::endl;
+    newData << "#define __REVISION_H__"  << std::endl;
+    newData << " #define REVISION_ID \"" << rev_str << "\"" << std::endl;
+    newData << " #define REVISION_DATE \"" << date_str << "\"" << std::endl;
+    newData << " #define REVISION_TIME \"" << time_str << "\""<< std::endl;
+    newData << "#endif // __REVISION_H__" << std::endl;
     return newData.str();
 }
 
@@ -263,7 +263,7 @@ int main(int argc, char **argv)
     /// get existed header data for compare
     std::string oldData;
 
-    if(FILE* HeaderFile = fopen("svn_revision.h","rb"))
+    if(FILE* HeaderFile = fopen("revision.h","rb"))
     {
         while(!feof(HeaderFile))
         {
@@ -279,7 +279,7 @@ int main(int argc, char **argv)
     /// update header only if different data
     if(newData != oldData)
     {
-        if(FILE* OutputFile = fopen("svn_revision.h","wb"))
+        if(FILE* OutputFile = fopen("revision.h","wb"))
         {
             fprintf(OutputFile,"%s",newData.c_str());
             fclose(OutputFile);

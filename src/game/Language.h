@@ -687,7 +687,9 @@ enum MangosStrings
 
     // FREE IDS                           1200-9999
 
-    // Use for not-in-svn patches         10000-10999
+    // Use for not-in-offcial-sources patches
+    //                                    10000-10999
+
     // Use for custom patches             11000-11999
 
     // NOT RESERVED IDS                   12000-

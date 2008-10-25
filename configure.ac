@@ -298,7 +298,7 @@ AC_CONFIG_FILES([
    sql/updates/Makefile
    src/Makefile
    src/tools/Makefile
-   src/tools/gensvnrevision/Makefile
+   src/tools/genrevision/Makefile
    src/framework/Makefile
    src/shared/Makefile
    src/shared/Auth/Makefile

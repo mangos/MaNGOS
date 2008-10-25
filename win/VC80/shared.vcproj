@@ -762,17 +762,17 @@
 			>
 		</File>
 		<File
-			RelativePath="..\..\src\shared\svn_revision.h"
+			RelativePath="..\..\src\shared\revision.h"
 			>
 			<FileConfiguration
 				Name="Release|Win32"
 				>
 				<Tool
 					Name="VCCustomBuildTool"
-					Description="Extract SVN revision"
-					CommandLine="cd &quot;$(SolutionDir)..\src\shared&quot;&#x0D;&#x0A;&quot;$(TargetDir)\..\gensvnrevision__$(PlatformName)_$(ConfigurationName)\gensvnrevision.exe&quot; &quot;..\..&quot;&#x0D;&#x0A;"
-					AdditionalDependencies="$(SolutionDir)../.svn/entries"
-					Outputs="svn_revision.h"
+					Description="Extract revision"
+					CommandLine="cd &quot;$(SolutionDir)..\src\shared&quot;&#x0D;&#x0A;&quot;$(TargetDir)\..\genrevision__$(PlatformName)_$(ConfigurationName)\genrevision.exe&quot; &quot;..\..&quot;&#x0D;&#x0A;"
+					AdditionalDependencies="$(SolutionDir)../.svn/entries;$(SolutionDir)../.git/FETCH_HEAD"
+					Outputs="revision.h"
 				/>
 			</FileConfiguration>
 			<FileConfiguration
@@ -780,10 +780,10 @@
 				>
 				<Tool
 					Name="VCCustomBuildTool"
-					Description="Extract SVN revision"
-					CommandLine="cd &quot;$(SolutionDir)..\src\shared&quot;&#x0D;&#x0A;&quot;$(TargetDir)\..\gensvnrevision__$(PlatformName)_$(ConfigurationName)\gensvnrevision.exe&quot; &quot;..\..&quot;&#x0D;&#x0A;"
-					AdditionalDependencies="$(SolutionDir)../.svn/entries"
-					Outputs="svn_revision.h"
+					Description="Extract revision"
+					CommandLine="cd &quot;$(SolutionDir)..\src\shared&quot;&#x0D;&#x0A;&quot;$(TargetDir)\..\genrevision__$(PlatformName)_$(ConfigurationName)\genrevision.exe&quot; &quot;..\..&quot;&#x0D;&#x0A;"
+					AdditionalDependencies="$(SolutionDir)../.svn/entries;$(SolutionDir)../.git/FETCH_HEAD"
+					Outputs="revision.h"
 				/>
 			</FileConfiguration>
 			<FileConfiguration
@@ -791,10 +791,10 @@
 				>
 				<Tool
 					Name="VCCustomBuildTool"
-					Description="Extract SVN revision"
-					CommandLine="cd &quot;$(SolutionDir)..\src\shared&quot;&#x0D;&#x0A;&quot;$(TargetDir)\..\gensvnrevision__$(PlatformName)_$(ConfigurationName)\gensvnrevision.exe&quot; &quot;..\..&quot;&#x0D;&#x0A;"
-					AdditionalDependencies="$(SolutionDir)../.svn/entries"
-					Outputs="svn_revision.h"
+					Description="Extract revision"
+					CommandLine="cd &quot;$(SolutionDir)..\src\shared&quot;&#x0D;&#x0A;&quot;$(TargetDir)\..\genrevision__$(PlatformName)_$(ConfigurationName)\genrevision.exe&quot; &quot;..\..&quot;&#x0D;&#x0A;"
+					AdditionalDependencies="$(SolutionDir)../.svn/entries;$(SolutionDir)../.git/FETCH_HEAD"
+					Outputs="revision.h"
 				/>
 			</FileConfiguration>
 			<FileConfiguration
@@ -802,10 +802,10 @@
 				>
 				<Tool
 					Name="VCCustomBuildTool"
-					Description="Extract SVN revision"
-					CommandLine="cd &quot;$(SolutionDir)..\src\shared&quot;&#x0D;&#x0A;&quot;$(TargetDir)\..\gensvnrevision__$(PlatformName)_$(ConfigurationName)\gensvnrevision.exe&quot; &quot;..\..&quot;&#x0D;&#x0A;"
-					AdditionalDependencies="$(SolutionDir)../.svn/entries"
-					Outputs="svn_revision.h"
+					Description="Extract revision"
+					CommandLine="cd &quot;$(SolutionDir)..\src\shared&quot;&#x0D;&#x0A;&quot;$(TargetDir)\..\genrevision__$(PlatformName)_$(ConfigurationName)\genrevision.exe&quot; &quot;..\..&quot;&#x0D;&#x0A;"
+					AdditionalDependencies="$(SolutionDir)../.svn/entries;$(SolutionDir)../.git/FETCH_HEAD"
+					Outputs="revision.h"
 				/>
 			</FileConfiguration>
 		</File>

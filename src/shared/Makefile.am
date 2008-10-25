@@ -46,18 +46,18 @@ libmangosshared_a_SOURCES = \
     Util.cpp \
     Util.h \
     WorldPacket.h \
-    svn_revision.h
+    revision.h
 
-# Get svn revision
-SVN_REVISION_FILE = svn_revision.h
+# Get revision (git or svn)
+REVISION_FILE = revision.h
 
-BUILT_SOURCES = $(SVN_REVISION_FILE)
-CLEANFILES = $(SVN_REVISION_FILE)
+BUILT_SOURCES = $(REVISION_FILE)
+CLEANFILES = $(REVISION_FILE)
 
 FORCE:
 
-$(SVN_REVISION_FILE) : $(top_builddir)/src/tools/gensvnrevision/gensvnrevision FORCE
-	$(top_builddir)/src/tools/gensvnrevision/gensvnrevision $(top_srcdir)
+$(REVISION_FILE) : $(top_builddir)/src/tools/genrevision/genrevision FORCE
+	$(top_builddir)/src/tools/genrevision/genrevision $(top_srcdir)
 
 ## Additional files to include when running 'make dist'
 #  Disabled packet logger

@@ -29,7 +29,7 @@
 #include "Language.h"
 #include "AccountMgr.h"
 #include "SystemConfig.h"
-#include "svn_revision.h"
+#include "revision.h"
 #include "Util.h"
 
 bool ChatHandler::HandleHelpCommand(const char* args)
@@ -95,9 +95,9 @@ bool ChatHandler::HandleInfoCommand(const char* /*args*/)
 
     char const* full;
     if(m_session)
-        full = _FULLVERSION(SVN_DATE,SVN_TIME,"|cffffffff|Hurl:" SVN_REVISION "|h" SVN_REVISION "|h|r");
+        full = _FULLVERSION(REVISION_DATE,REVISION_TIME,"|cffffffff|Hurl:" REVISION_ID "|h" REVISION_ID "|h|r");
     else
-        full = _FULLVERSION(SVN_DATE,SVN_TIME,SVN_REVISION);
+        full = _FULLVERSION(REVISION_DATE,REVISION_TIME,REVISION_ID);
 
     PSendSysMessage(full);
     PSendSysMessage(LANG_CONNECTED_USERS, activeClientsNum, maxActiveClientsNum, queuedClientsNum, maxQueuedClientsNum);
