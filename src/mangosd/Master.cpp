@@ -32,6 +32,7 @@
 #include "Timer.h"
 #include "Policies/SingletonImp.h"
 #include "SystemConfig.h"
+#include "svn_revision.h"
 #include "Config/ConfigEnv.h"
 #include "Database/DatabaseEnv.h"
 #include "CliRunnable.h"
@@ -195,7 +196,7 @@ Master::~Master()
 /// Main function
 int Master::Run()
 {
-    sLog.outString( "%s (world-daemon)", _FULLVERSION );
+    sLog.outString( "%s [world-daemon]", _FULLVERSION(SVN_DATE,SVN_TIME,SVN_REVISION) );
     sLog.outString( "<Ctrl-C> to stop.\n\n" );
 
     sLog.outTitle( "MM   MM         MM   MM  MMMMM   MMMM   MMMMM");

@@ -27,7 +27,6 @@
 #include "ScriptCalls.h"
 #include "ObjectMgr.h"
 #include "WorldSession.h"
-#include "SystemConfig.h"
 #include "Config/ConfigEnv.h"
 #include "Util.h"
 #include "AccountMgr.h"
