@@ -512,6 +512,7 @@ struct ItemPrototype
     uint32 MaxCount;
     uint32 Stackable;
     uint32 ContainerSlots;
+    uint32 StatsCount;
     _ItemStat ItemStat[10];
     uint32 ScalingStatDistribution;                         // id from ScalingStatDistribution.dbc
     uint32 ScalingStatValue;                                // mask for selecting column in ScalingStatValues.dbc
