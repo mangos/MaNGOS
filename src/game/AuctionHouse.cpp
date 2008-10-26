@@ -745,3 +745,9 @@ void WorldSession::HandleAuctionListItems( WorldPacket & recv_data )
     data << (uint32) 300;                                   // unk 2.3.0 const?
     SendPacket(&data);
 }
+
+void WorldSession::HandleAuctionListPendingSales( WorldPacket & recv_data )
+{
+    sLog.outDebug("CMSG_AUCTION_LIST_PENDING_SALES");
+    recv_data.hexlike();
+}
