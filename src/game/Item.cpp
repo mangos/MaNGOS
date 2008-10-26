@@ -204,6 +204,10 @@ bool ItemCanGoIntoBag(ItemPrototype const *pProto, ItemPrototype const *pBagProt
                     if(!(pProto->BagFamily & BAG_FAMILY_MASK_LEATHERWORKING_SUPP))
                         return false;
                     return true;
+                case ITEM_SUBCLASS_INSCRIPTION_CONTAINER:
+                    if(!(pProto->BagFamily & BAG_FAMILY_MASK_INSCRIPTION_SUPP))
+                        return false;
+                    return true;
                 default:
                     return false;
             }
@@ -448,7 +452,7 @@ uint32 Item::GetSkill()
 
     const static uint32 item_armor_skills[MAX_ITEM_SUBCLASS_ARMOR] =
     {
-        0,SKILL_CLOTH,SKILL_LEATHER,SKILL_MAIL,SKILL_PLATE_MAIL,0,SKILL_SHIELD,0,0,0
+        0,SKILL_CLOTH,SKILL_LEATHER,SKILL_MAIL,SKILL_PLATE_MAIL,0,SKILL_SHIELD,0,0,0,0
     };
 
     ItemPrototype const* proto = GetProto();
@@ -763,9 +767,9 @@ void Item::SetEnchantment(EnchantmentSlot slot, uint32 id, uint32 duration, uint
     if((GetEnchantmentId(slot) == id) && (GetEnchantmentDuration(slot) == duration) && (GetEnchantmentCharges(slot) == charges))
         return;
 
-    SetUInt32Value(ITEM_FIELD_ENCHANTMENT + slot*MAX_ENCHANTMENT_OFFSET + ENCHANTMENT_ID_OFFSET,id);
-    SetUInt32Value(ITEM_FIELD_ENCHANTMENT + slot*MAX_ENCHANTMENT_OFFSET + ENCHANTMENT_DURATION_OFFSET,duration);
-    SetUInt32Value(ITEM_FIELD_ENCHANTMENT + slot*MAX_ENCHANTMENT_OFFSET + ENCHANTMENT_CHARGES_OFFSET,charges);
+    SetUInt32Value(ITEM_FIELD_ENCHANTMENT_1_1 + slot*MAX_ENCHANTMENT_OFFSET + ENCHANTMENT_ID_OFFSET,id);
+    SetUInt32Value(ITEM_FIELD_ENCHANTMENT_1_1 + slot*MAX_ENCHANTMENT_OFFSET + ENCHANTMENT_DURATION_OFFSET,duration);
+    SetUInt32Value(ITEM_FIELD_ENCHANTMENT_1_1 + slot*MAX_ENCHANTMENT_OFFSET + ENCHANTMENT_CHARGES_OFFSET,charges);
     SetState(ITEM_CHANGED);
 }
 
@@ -774,7 +778,7 @@ void Item::SetEnchantmentDuration(EnchantmentSlot slot, uint32 duration)
     if(GetEnchantmentDuration(slot) == duration)
         return;
 
-    SetUInt32Value(ITEM_FIELD_ENCHANTMENT + slot*MAX_ENCHANTMENT_OFFSET + ENCHANTMENT_DURATION_OFFSET,duration);
+    SetUInt32Value(ITEM_FIELD_ENCHANTMENT_1_1 + slot*MAX_ENCHANTMENT_OFFSET + ENCHANTMENT_DURATION_OFFSET,duration);
     SetState(ITEM_CHANGED);
 }
 
@@ -783,7 +787,7 @@ void Item::SetEnchantmentCharges(EnchantmentSlot slot, uint32 charges)
     if(GetEnchantmentCharges(slot) == charges)
         return;
 
-    SetUInt32Value(ITEM_FIELD_ENCHANTMENT + slot*MAX_ENCHANTMENT_OFFSET + ENCHANTMENT_CHARGES_OFFSET,charges);
+    SetUInt32Value(ITEM_FIELD_ENCHANTMENT_1_1 + slot*MAX_ENCHANTMENT_OFFSET + ENCHANTMENT_CHARGES_OFFSET,charges);
     SetState(ITEM_CHANGED);
 }
 
@@ -793,7 +797,7 @@ void Item::ClearEnchantment(EnchantmentSlot slot)
         return;
 
     for(uint8 x = 0; x < 3; ++x)
-        SetUInt32Value(ITEM_FIELD_ENCHANTMENT + slot*MAX_ENCHANTMENT_OFFSET + x, 0);
+        SetUInt32Value(ITEM_FIELD_ENCHANTMENT_1_1 + slot*MAX_ENCHANTMENT_OFFSET + x, 0);
     SetState(ITEM_CHANGED);
 }
 
