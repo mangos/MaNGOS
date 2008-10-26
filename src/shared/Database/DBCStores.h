@@ -132,6 +132,7 @@ class DBCStorage
 extern DBCStorage <AreaTableEntry>               sAreaStore;// recommend access using functions
 extern DBCStorage <AreaTriggerEntry>             sAreaTriggerStore;
 extern DBCStorage <BankBagSlotPricesEntry>       sBankBagSlotPricesStore;
+extern DBCStorage <BarberShopStyleEntry>         sBarberShopStyleStore;
 extern DBCStorage <BattlemasterListEntry>        sBattlemasterListStore;
 //extern DBCStorage <ChatChannelsEntry>           sChatChannelsStore; -- accessed using function, no usable index
 extern DBCStorage <CharTitlesEntry>              sCharTitlesStore;
@@ -146,7 +147,10 @@ extern DBCStorage <EmotesTextEntry>              sEmotesTextStore;
 extern DBCStorage <FactionEntry>                 sFactionStore;
 extern DBCStorage <FactionTemplateEntry>         sFactionTemplateStore;
 extern DBCStorage <GemPropertiesEntry>           sGemPropertiesStore;
+extern DBCStorage <GlyphPropertiesEntry>         sGlyphPropertiesStore;
+extern DBCStorage <GlyphSlotEntry>               sGlyphSlotStore;
 
+extern DBCStorage <GtBarberShopCostBaseEntry>    sGtBarberShopCostBaseStore;
 extern DBCStorage <GtCombatRatingsEntry>         sGtCombatRatingsStore;
 extern DBCStorage <GtChanceToMeleeCritBaseEntry> sGtChanceToMeleeCritBaseStore;
 extern DBCStorage <GtChanceToMeleeCritEntry>     sGtChanceToMeleeCritStore;
@@ -167,6 +171,8 @@ extern DBCStorage <MailTemplateEntry>            sMailTemplateStore;
 extern DBCStorage <MapEntry>                     sMapStore;
 extern DBCStorage <QuestSortEntry>               sQuestSortStore;
 extern DBCStorage <RandomPropertiesPointsEntry>  sRandomPropertiesPointsStore;
+extern DBCStorage <ScalingStatDistributionEntry> sScalingStatDistributionStore;
+extern DBCStorage <ScalingStatValuesEntry>       sScalingStatValuesStore;
 extern DBCStorage <SkillLineEntry>               sSkillLineStore;
 extern DBCStorage <SkillLineAbilityEntry>        sSkillLineAbilityStore;
 extern DBCStorage <SoundEntriesEntry>            sSoundEntriesStore;
@@ -179,6 +185,7 @@ extern SpellCategoryStore                        sSpellCategoryStore;
 extern PetFamilySpellsStore                      sPetFamilySpellsStore;
 extern DBCStorage <SpellRadiusEntry>             sSpellRadiusStore;
 extern DBCStorage <SpellRangeEntry>              sSpellRangeStore;
+extern DBCStorage <SpellRuneCostEntry>           sSpellRuneCostStore;
 extern DBCStorage <SpellShapeshiftEntry>         sSpellShapeshiftStore;
 extern DBCStorage <SpellEntry>                   sSpellStore;
 extern DBCStorage <StableSlotPricesEntry>        sStableSlotPricesStore;

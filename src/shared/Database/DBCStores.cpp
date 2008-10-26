@@ -36,6 +36,7 @@ static AreaFlagByMapID  sAreaFlagByMapID;                   // for instances wit
 DBCStorage <AreaTriggerEntry> sAreaTriggerStore(AreaTriggerEntryfmt);
 DBCStorage <BankBagSlotPricesEntry> sBankBagSlotPricesStore(BankBagSlotPricesEntryfmt);
 DBCStorage <BattlemasterListEntry> sBattlemasterListStore(BattlemasterListEntryfmt);
+DBCStorage <BarberShopStyleEntry> sBarberShopStyleStore(BarberShopStyleEntryfmt);
 DBCStorage <CharTitlesEntry> sCharTitlesStore(CharTitlesEntryfmt);
 DBCStorage <ChatChannelsEntry> sChatChannelsStore(ChatChannelsEntryfmt);
 DBCStorage <ChrClassesEntry> sChrClassesStore(ChrClassesEntryfmt);
@@ -55,7 +56,10 @@ DBCStorage <FactionEntry> sFactionStore(FactionEntryfmt);
 DBCStorage <FactionTemplateEntry> sFactionTemplateStore(FactionTemplateEntryfmt);
 
 DBCStorage <GemPropertiesEntry> sGemPropertiesStore(GemPropertiesEntryfmt);
+DBCStorage <GlyphPropertiesEntry> sGlyphPropertiesStore(GlyphPropertiesfmt);
+DBCStorage <GlyphSlotEntry> sGlyphSlotStore(GlyphSlotfmt);
 
+DBCStorage <GtBarberShopCostBaseEntry>    sGtBarberShopCostBaseStore(GtBarberShopCostBasefmt);
 DBCStorage <GtCombatRatingsEntry>         sGtCombatRatingsStore(GtCombatRatingsfmt);
 DBCStorage <GtChanceToMeleeCritBaseEntry> sGtChanceToMeleeCritBaseStore(GtChanceToMeleeCritBasefmt);
 DBCStorage <GtChanceToMeleeCritEntry>     sGtChanceToMeleeCritStore(GtChanceToMeleeCritfmt);
@@ -81,6 +85,8 @@ DBCStorage <MapEntry> sMapStore(MapEntryfmt);
 DBCStorage <QuestSortEntry> sQuestSortStore(QuestSortEntryfmt);
 
 DBCStorage <RandomPropertiesPointsEntry> sRandomPropertiesPointsStore(RandomPropertiesPointsfmt);
+DBCStorage <ScalingStatDistributionEntry> sScalingStatDistributionStore(ScalingStatDistributionfmt);
+DBCStorage <ScalingStatValuesEntry> sScalingStatValuesStore(ScalingStatValuesfmt);
 
 DBCStorage <SkillLineEntry> sSkillLineStore(SkillLinefmt);
 DBCStorage <SkillLineAbilityEntry> sSkillLineAbilityStore(SkillLineAbilityfmt);
@@ -98,6 +104,7 @@ DBCStorage <SpellDurationEntry> sSpellDurationStore(SpellDurationfmt);
 DBCStorage <SpellFocusObjectEntry> sSpellFocusObjectStore(SpellFocusObjectfmt);
 DBCStorage <SpellRadiusEntry> sSpellRadiusStore(SpellRadiusfmt);
 DBCStorage <SpellRangeEntry> sSpellRangeStore(SpellRangefmt);
+DBCStorage <SpellRuneCostEntry> sSpellRuneCostStore(SpellRuneCostfmt);
 DBCStorage <SpellShapeshiftEntry> sSpellShapeshiftStore(SpellShapeshiftfmt);
 DBCStorage <StableSlotPricesEntry> sStableSlotPricesStore(StableSlotPricesfmt);
 DBCStorage <TalentEntry> sTalentStore(TalentEntryfmt);
@@ -175,7 +182,7 @@ void LoadDBCStores(std::string dataPath)
 {
     std::string dbcPath = dataPath+"dbc/";
 
-    const uint32 DBCFilesCount = 56;
+    const uint32 DBCFilesCount = 60;
 
     barGoLink bar( DBCFilesCount );
 
@@ -201,6 +208,7 @@ void LoadDBCStores(std::string dataPath)
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sAreaTriggerStore,         dbcPath,"AreaTrigger.dbc");
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sBankBagSlotPricesStore,   dbcPath,"BankBagSlotPrices.dbc");
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sBattlemasterListStore,    dbcPath,"BattlemasterList.dbc");
+    LoadDBC(availableDbcLocales,bar,bad_dbc_files,sBarberShopStyleStore,     dbcPath,"BarberShopStyle.dbc");
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sCharTitlesStore,          dbcPath,"CharTitles.dbc");
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sChatChannelsStore,        dbcPath,"ChatChannels.dbc");
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sChrClassesStore,          dbcPath,"ChrClasses.dbc");
@@ -224,7 +232,10 @@ void LoadDBCStores(std::string dataPath)
 
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sFactionTemplateStore,     dbcPath,"FactionTemplate.dbc");
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sGemPropertiesStore,       dbcPath,"GemProperties.dbc");
+    LoadDBC(availableDbcLocales,bar,bad_dbc_files,sGlyphPropertiesStore,     dbcPath,"GlyphProperties.dbc");
+    LoadDBC(availableDbcLocales,bar,bad_dbc_files,sGlyphSlotStore,           dbcPath,"GlyphSlot.dbc");
 
+    LoadDBC(availableDbcLocales,bar,bad_dbc_files,sGtBarberShopCostBaseStore,dbcPath,"gtBarberShopCostBase.dbc");
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sGtCombatRatingsStore,     dbcPath,"gtCombatRatings.dbc");
 
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sGtChanceToMeleeCritBaseStore, dbcPath,"gtChanceToMeleeCritBase.dbc");
@@ -249,6 +260,8 @@ void LoadDBCStores(std::string dataPath)
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sMapStore,                 dbcPath,"Map.dbc");
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sQuestSortStore,           dbcPath,"QuestSort.dbc");
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sRandomPropertiesPointsStore, dbcPath,"RandPropPoints.dbc");
+    LoadDBC(availableDbcLocales,bar,bad_dbc_files,sScalingStatDistributionStore, dbcPath,"ScalingStatDistribution.dbc");
+    LoadDBC(availableDbcLocales,bar,bad_dbc_files,sScalingStatValuesStore,   dbcPath,"ScalingStatValues.dbc");
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sSkillLineStore,           dbcPath,"SkillLine.dbc");
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sSkillLineAbilityStore,    dbcPath,"SkillLineAbility.dbc");
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sSoundEntriesStore,        dbcPath,"SoundEntries.dbc");
@@ -298,6 +311,7 @@ void LoadDBCStores(std::string dataPath)
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sSpellItemEnchantmentConditionStore,dbcPath,"SpellItemEnchantmentCondition.dbc");
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sSpellRadiusStore,         dbcPath,"SpellRadius.dbc");
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sSpellRangeStore,          dbcPath,"SpellRange.dbc");
+    LoadDBC(availableDbcLocales,bar,bad_dbc_files,sSpellRuneCostStore,       dbcPath,"SpellRuneCost.dbc");
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sSpellShapeshiftStore,     dbcPath,"SpellShapeshiftForm.dbc");
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sStableSlotPricesStore,    dbcPath,"StableSlotPrices.dbc");
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sTalentStore,              dbcPath,"Talent.dbc");
@@ -402,7 +416,10 @@ void LoadDBCStores(std::string dataPath)
     pathLength.resize(pathCount);                           // 0 and some other indexes not used
     for(uint32 i = 1; i < sTaxiPathNodeStore.GetNumRows(); ++i)
         if(TaxiPathNodeEntry const* entry = sTaxiPathNodeStore.LookupEntry(i))
-            ++pathLength[entry->path];
+        {
+            if (pathLength[entry->path] < entry->index + 1)
+                pathLength[entry->path] = entry->index + 1;
+        }
     // Set path length
     sTaxiPathNodesByPath.resize(pathCount);                 // 0 and some other indexes not used
     for(uint32 i = 1; i < sTaxiPathNodesByPath.size(); ++i)
@@ -433,20 +450,20 @@ void LoadDBCStores(std::string dataPath)
         exit(1);
     }
 
-    // check at up-to-date DBC files (53085 is last added spell in 2.4.3)
-    // check at up-to-date DBC files (17514 is last ID in SkillLineAbilities in 2.4.3)
-    // check at up-to-date DBC files (598 is last map added in 2.4.3)
-    // check at up-to-date DBC files (1127 is last gem property added in 2.4.3)
-    // check at up-to-date DBC files (2425 is last item extended cost added in 2.4.3)
-    // check at up-to-date DBC files (71 is last char title added in 2.4.3)
-    // check at up-to-date DBC files (1768 is last area added in 2.4.3)
-    if( !sSpellStore.LookupEntry(53085)            ||
-        !sSkillLineAbilityStore.LookupEntry(17514) ||
-        !sMapStore.LookupEntry(598)                ||
-        !sGemPropertiesStore.LookupEntry(1127)     ||
-        !sItemExtendedCostStore.LookupEntry(2425)  ||
-        !sCharTitlesStore.LookupEntry(71)          ||
-        !sAreaStore.LookupEntry(1768)              )
+    // check at up-to-date DBC files (54909 is last added spell in 3.0.1)
+    // check at up-to-date DBC files (19162 is last added spell in abilities in 3.0.1)
+    // check at up-to-date DBC files (619 is last map added in 3.0.1)
+    // check at up-to-date DBC files (1361 is last gem property added in 3.0.1)
+    // check at up-to-date DBC files (2425 is last item extended cost added in 3.0.1)
+    // check at up-to-date DBC files (76 is last char title added in 3.0.1)
+    // check at up-to-date DBC files (2311 is last area added in 3.0.1)
+    if( !sSpellStore.LookupEntry(54909)            || 
+        !sSkillLineAbilityStore.LookupEntry(19162) || 
+        !sMapStore.LookupEntry(619)                ||
+        !sGemPropertiesStore.LookupEntry(1361)     || 
+        !sItemExtendedCostStore.LookupEntry(2425)  || 
+        !sCharTitlesStore.LookupEntry(76)          ||
+        !sAreaStore.LookupEntry(2311)              )
     {
         sLog.outError("\nYou have _outdated_ DBC files. Please extract correct versions from current using client.");
         exit(1);
