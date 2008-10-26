@@ -203,9 +203,11 @@ enum ConditionType
     CONDITION_QUESTREWARDED         = 8,                    // quest_id     0
     CONDITION_QUESTTAKEN            = 9,                    // quest_id     0,      for condition true while quest active.
     CONDITION_AD_COMMISSION_AURA    = 10,                   // 0            0,      for condition true while one from AD ñommission aura active
+    CONDITION_NO_AURA               = 11,                   // spell_id     effindex
+    CONDITION_ACTIVE_EVENT          = 12,                   // event_id
 };
 
-#define MAX_CONDITION                 11                    // maximum value in ConditionType enum
+#define MAX_CONDITION                 13                    // maximum value in ConditionType enum
 
 struct PlayerCondition
 {
