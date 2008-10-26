@@ -123,10 +123,10 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map *map, float x, float
     SetFloatValue(GAMEOBJECT_POS_Z, z);
     SetFloatValue(GAMEOBJECT_FACING, ang);                  //this is not facing angle
 
-    SetFloatValue (GAMEOBJECT_ROTATION, rotation0);
-    SetFloatValue (GAMEOBJECT_ROTATION+1, rotation1);
-    SetFloatValue (GAMEOBJECT_ROTATION+2, rotation2);
-    SetFloatValue (GAMEOBJECT_ROTATION+3, rotation3);
+    SetFloatValue(GAMEOBJECT_PARENTROTATION, rotation0);
+    SetFloatValue(GAMEOBJECT_PARENTROTATION+1, rotation1);
+    SetFloatValue(GAMEOBJECT_PARENTROTATION+2, rotation2);
+    SetFloatValue(GAMEOBJECT_PARENTROTATION+3, rotation3);
 
     SetFloatValue(OBJECT_FIELD_SCALE_X, goinfo->size);
 
@@ -510,10 +510,10 @@ void GameObject::SaveToDB(uint32 mapid, uint8 spawnMask)
     data.posY = GetFloatValue(GAMEOBJECT_POS_Y);
     data.posZ = GetFloatValue(GAMEOBJECT_POS_Z);
     data.orientation = GetFloatValue(GAMEOBJECT_FACING);
-    data.rotation0 = GetFloatValue(GAMEOBJECT_ROTATION+0);
-    data.rotation1 = GetFloatValue(GAMEOBJECT_ROTATION+1);
-    data.rotation2 = GetFloatValue(GAMEOBJECT_ROTATION+2);
-    data.rotation3 = GetFloatValue(GAMEOBJECT_ROTATION+3);
+    data.rotation0 = GetFloatValue(GAMEOBJECT_PARENTROTATION+0);
+    data.rotation1 = GetFloatValue(GAMEOBJECT_PARENTROTATION+1);
+    data.rotation2 = GetFloatValue(GAMEOBJECT_PARENTROTATION+2);
+    data.rotation3 = GetFloatValue(GAMEOBJECT_PARENTROTATION+3);
     data.spawntimesecs = m_spawnedByDefault ? m_respawnDelayTime : -(int32)m_respawnDelayTime;
     data.animprogress = GetGoAnimProgress();
     data.go_state = GetGoState();
@@ -530,10 +530,10 @@ void GameObject::SaveToDB(uint32 mapid, uint8 spawnMask)
         << GetFloatValue(GAMEOBJECT_POS_Y) << ", "
         << GetFloatValue(GAMEOBJECT_POS_Z) << ", "
         << GetFloatValue(GAMEOBJECT_FACING) << ", "
-        << GetFloatValue(GAMEOBJECT_ROTATION) << ", "
-        << GetFloatValue(GAMEOBJECT_ROTATION+1) << ", "
-        << GetFloatValue(GAMEOBJECT_ROTATION+2) << ", "
-        << GetFloatValue(GAMEOBJECT_ROTATION+3) << ", "
+        << GetFloatValue(GAMEOBJECT_PARENTROTATION) << ", "
+        << GetFloatValue(GAMEOBJECT_PARENTROTATION+1) << ", "
+        << GetFloatValue(GAMEOBJECT_PARENTROTATION+2) << ", "
+        << GetFloatValue(GAMEOBJECT_PARENTROTATION+3) << ", "
         << m_respawnDelayTime << ", "
         << (uint32)GetGoAnimProgress() << ", "
         << (uint32)GetGoState() << ")";
@@ -1221,6 +1221,26 @@ void GameObject::Use(Unit* user)
                 Delete();
             }
             break;
+        }
+        case GAMEOBJECT_TYPE_BARBER_CHAIR:                  //32
+        {
+            GameObjectInfo const* info = GetGOInfo();
+            if(!info)
+                return;
+
+            if(user->GetTypeId()!=TYPEID_PLAYER)
+                return;
+
+            Player* player = (Player*)user;
+
+            // fallback, will always work
+            player->TeleportTo(GetMapId(), GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation(),TELE_TO_NOT_LEAVE_TRANSPORT | TELE_TO_NOT_LEAVE_COMBAT | TELE_TO_NOT_UNSUMMON_PET);
+
+            WorldPacket data(SMSG_ENABLE_BARBER_SHOP, 0);
+            player->GetSession()->SendPacket(&data);
+
+            player->SetStandState(PLAYER_STATE_SIT_LOW_CHAIR+info->barberChair.chairheight);
+            return;
         }
         default:
             sLog.outDebug("Unknown Object Type %u", GetGoType());

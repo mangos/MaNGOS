@@ -183,6 +183,8 @@ Unit::Unit()
     m_ShapeShiftFormSpellId = 0;
     m_canModifyStats = false;
 
+    for (int i = 0; i < MAX_AURAS; ++i)
+        m_visibleAuras[i] = 0;
     for (int i = 0; i < MAX_SPELL_IMMUNITY; i++)
         m_spellImmune[i].clear();
     for (int i = 0; i < UNIT_MOD_END; i++)
@@ -2124,7 +2126,7 @@ void Unit::DoAttackDamage (Unit *pVictim, uint32 *damage, CleanDamage *cleanDama
                 ((*itr).second->GetCasterGUID() == GetGUID() && (!spellCasted || spellCasted->Id == 35395)) )
             {
                 (*itr).second->SetAuraDuration((*itr).second->GetAuraMaxDuration());
-                (*itr).second->UpdateAuraDuration();
+                (*itr).second->SendAuraUpdate(false);
             }
         }
     }
@@ -4170,7 +4172,7 @@ void Unit::DelayAura(uint32 spellId, uint32 effindex, int32 delaytime)
             iter->second->SetAuraDuration(0);
         else
             iter->second->SetAuraDuration(iter->second->GetAuraDuration() - delaytime);
-        iter->second->UpdateAuraDuration();
+        iter->second->SendAuraUpdate(false);
         sLog.outDebug("Aura %u partially interrupted on unit %u, new duration: %u ms",iter->second->GetModifier()->m_auraname, GetGUIDLow(), iter->second->GetAuraDuration());
     }
 }
@@ -4344,6 +4346,7 @@ void Unit::SendSpellNonMeleeDamageLog(Unit *target,uint32 SpellID,uint32 Damage,
     data.append(GetPackGUID());
     data << uint32(SpellID);
     data << uint32(Damage-AbsorbedDamage-Resist-Blocked);
+    data << uint32(0);                                      // wotlk
     data << uint8(damageSchoolMask);                        // spell school
     data << uint32(AbsorbedDamage);                         // AbsorbedDamage
     data << uint32(Resist);                                 // resist
@@ -4377,28 +4380,63 @@ void Unit::SendAttackStateUpdate(uint32 HitInfo, Unit *target, uint8 SwingType, 
     data << (uint32)HitInfo;
     data.append(GetPackGUID());
     data.append(target->GetPackGUID());
-    data << (uint32)(Damage-AbsorbDamage-Resist-BlockedAmount);
+    data << uint32(Damage-AbsorbDamage-Resist-BlockedAmount);
+    data << uint32(0);                                      // WotLK
 
     data << (uint8)SwingType;                               // count?
 
     // for(i = 0; i < SwingType; ++i)
     data << (uint32)damageSchoolMask;
     data << (float)(Damage-AbsorbDamage-Resist-BlockedAmount);
-    // still need to double check damage
     data << (uint32)(Damage-AbsorbDamage-Resist-BlockedAmount);
-    data << (uint32)AbsorbDamage;
-    data << (uint32)Resist;
     // end loop
 
-    data << (uint32)TargetState;
+    if(HitInfo & (HITINFO_RESIST | HITINFO_ABSORB))
+    {
+        // for(i = 0; i < SwingType; ++i)
+        data << (uint32)Resist;
+        // end loop
+    }
 
-    if( AbsorbDamage == 0 )                                 //also 0x3E8 = 0x3E8, check when that happens
-        data << (uint32)0;
-    else
-        data << (uint32)-1;
+    if(HitInfo & (HITINFO_CRITICALHIT | HITINFO_UNK2))
+    {
+        // for(i = 0; i < SwingType; ++i)
+        data << uint32(0);                                  // what is it?
+        // end loop
+    }
 
+    data << (uint8)TargetState;
     data << (uint32)0;
-    data << (uint32)BlockedAmount;
+    data << (uint32)0;
+
+    if(HitInfo & HITINFO_UNK3)
+    {
+        data << uint32(0);
+    }
+
+    /*if(unknown & HitInfo)
+    {
+        data << uint32(0);
+    }*/
+
+    /*if(HitInfo & HITINFO_UNK1)
+    {
+        data << uint32(0);
+        data << float(0);
+        data << float(0);
+        data << float(0);
+        data << float(0);
+        data << float(0);
+        data << float(0);
+        data << float(0);
+        data << float(0);
+        for(uint8 i = 0; i < 5; ++i)
+        {
+            data << float(0);
+            data << float(0);
+        }
+        data << uint32(0);
+    }*/
 
     SendMessageToSet( &data, true );
 }
@@ -7089,7 +7127,7 @@ Unit* Unit::GetCharm() const
 
 void Unit::SetPet(Pet* pet)
 {
-    SetUInt64Value(UNIT_FIELD_SUMMON,pet ? pet->GetGUID() : 0);
+    SetUInt64Value(UNIT_FIELD_SUMMON, pet ? pet->GetGUID() : 0);
 
     // FIXME: hack, speed must be set only at follow
     if(pet)
@@ -8896,7 +8934,7 @@ void Unit::SetSpeed(UnitMoveType mtype, float rate, bool forced)
 
         data.append(GetPackGUID());
         data << uint32(0);                                  //movement flags
-        data << uint8(0);                                   //unk
+        data << uint16(0);                                  //unk
         data << uint32(getMSTime());
         data << float(GetPositionX());
         data << float(GetPositionY());
@@ -9648,6 +9686,12 @@ void Unit::SetPower(Powers power, uint32 val)
 
     SetStatInt32Value(UNIT_FIELD_POWER1 + power, val);
 
+    WorldPacket data(SMSG_POWER_UPDATE);
+    data.append(GetPackGUID());
+    data << uint8(power);
+    data << uint32(val);
+    SendMessageToSet(&data, GetTypeId() == TYPEID_PLAYER ? true : false);
+
     // group update
     if(GetTypeId() == TYPEID_PLAYER)
     {
@@ -9761,6 +9805,7 @@ uint32 Unit::GetCreatePowers( Powers power ) const
         case POWER_FOCUS:     return (GetTypeId()==TYPEID_PLAYER || !((Creature const*)this)->isPet() || ((Pet const*)this)->getPetType()!=HUNTER_PET ? 0 : 100);
         case POWER_ENERGY:    return 100;
         case POWER_HAPPINESS: return (GetTypeId()==TYPEID_PLAYER || !((Creature const*)this)->isPet() || ((Pet const*)this)->getPetType()!=HUNTER_PET ? 0 : 1050000);
+        case POWER_RUNIC_POWER: return 1000;
     }
 
     return 0;
@@ -10272,8 +10317,11 @@ void Unit::SendPetCastFail(uint32 spellid, uint8 msg)
         return;
 
     WorldPacket data(SMSG_PET_CAST_FAILED, (4+1));
+    data << uint8(0);                                       // cast count?
     data << uint32(spellid);
     data << uint8(msg);
+    // uint32 for some reason
+    // uint32 for some reason
     ((Player*)owner)->GetSession()->SendPacket(&data);
 }
 

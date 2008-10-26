@@ -413,10 +413,11 @@ enum CombatRating
     CR_WEAPON_SKILL_MAINHAND    = 20,
     CR_WEAPON_SKILL_OFFHAND     = 21,
     CR_WEAPON_SKILL_RANGED      = 22,
-    CR_EXPERTISE                = 23
+    CR_EXPERTISE                = 23,
+    CR_ARMOR_PENETRATION        = 24
 };
 
-#define MAX_COMBAT_RATING         24
+#define MAX_COMBAT_RATING         25
 
 enum DamageEffectType
 {
@@ -1125,6 +1126,9 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void removeHatedBy(HostilReference* /*pHostilReference*/ ) { /* nothing to do yet */ }
         HostilRefManager& getHostilRefManager() { return m_HostilRefManager; }
 
+        uint32 GetVisibleAura(uint32 slot) { return m_visibleAuras[slot]; }
+        void SetVisibleAura(uint32 slot, uint32 spellid) { m_visibleAuras[slot] = spellid; }
+
         Aura* GetAura(uint32 spellId, uint32 effindex);
         AuraMap      & GetAuras()       { return m_Auras; }
         AuraMap const& GetAuras() const { return m_Auras; }
@@ -1297,6 +1301,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         float m_weaponDamage[MAX_ATTACK][2];
         bool m_canModifyStats;
         //std::list< spellEffectPair > AuraSpells[TOTAL_AURAS];  // TODO: use this if ok for mem
+        uint32 m_visibleAuras[MAX_AURAS];
 
         float m_speed_rate[MAX_MOVE_TYPE];
 

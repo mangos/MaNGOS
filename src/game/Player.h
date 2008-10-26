@@ -540,7 +540,7 @@ enum PlayerSlots
     // first slot for item stored (in any way in player m_items data)
     PLAYER_SLOT_START           = 0,
     // last+1 slot for item stored (in any way in player m_items data)
-    PLAYER_SLOT_END             = 118,
+    PLAYER_SLOT_END             = 200,
     PLAYER_SLOTS_COUNT          = (PLAYER_SLOT_END - PLAYER_SLOT_START)
 };
 
@@ -668,6 +668,24 @@ enum KeyRingSlots
     KEYRING_SLOT_END            = 118
 };
 
+enum VanityPetSlots
+{
+    VANITYPET_SLOT_START        = 118,
+    VANITYPET_SLOT_END          = 136
+};
+
+enum CurrencyTokenSlots
+{
+    CURRENCYTOKEN_SLOT_START    = 136,
+    CURRENCYTOKEN_SLOT_END      = 168
+};
+
+enum QuestBagSlots
+{
+    QUESTBAG_SLOT_START         = 168,
+    QUESTBAG_SLOT_END           = 200
+};
+
 struct ItemPosCount
 {
     ItemPosCount(uint16 _pos, uint8 _count) : pos(_pos), count(_count) {}
@@ -714,14 +732,15 @@ struct MovementInfo
 {
     // common
     //uint32  flags;
-    uint8   unk1;
+    uint16  unk1;
     uint32  time;
     float   x, y, z, o;
     // transport
     uint64  t_guid;
     float   t_x, t_y, t_z, t_o;
     uint32  t_time;
-    // swimming and unk
+    uint8   t_unk;
+    // swimming and unknown
     float   s_pitch;
     // last fall time
     uint32  fallTime;
@@ -942,6 +961,8 @@ class MANGOS_DLL_SPEC Player : public Unit
         uint8 chatTag() const;
         std::string afkMsg;
         std::string dndMsg;
+
+        uint32 GetBarberShopCost(uint8 newhairstyle, uint8 newhaircolor, uint8 newfacialhair);
 
         PlayerSocial *GetSocial() { return m_social; }
 
@@ -1410,6 +1431,12 @@ class MANGOS_DLL_SPEC Player : public Unit
         uint32 resetTalentsCost() const;
         void InitTalentForLevel();
 
+        void InitGlyphsForLevel();
+        void SetGlyphSlot(uint8 slot, uint32 slottype) { SetUInt32Value(PLAYER_FIELD_GLYPH_SLOTS_1 + slot, slottype); }
+        uint32 GetGlyphSlot(uint8 slot) { return GetUInt32Value(PLAYER_FIELD_GLYPH_SLOTS_1 + slot); }
+        void SetGlyph(uint8 slot, uint32 glyph) { SetUInt32Value(PLAYER_FIELD_GLYPHS_1 + slot, glyph); }
+        uint32 GetGlyph(uint8 slot) { return GetUInt32Value(PLAYER_FIELD_GLYPHS_1 + slot); }
+
         uint32 GetFreePrimaryProffesionPoints() const { return GetUInt32Value(PLAYER_CHARACTER_POINTS2); }
         void SetFreePrimaryProffesions(uint16 profs) { SetUInt32Value(PLAYER_CHARACTER_POINTS2,profs); }
         void InitPrimaryProffesions();
@@ -1782,7 +1809,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void SendUpdateWorldState(uint32 Field, uint32 Value);
         void SendDirectMessage(WorldPacket *data);
 
-        void SendAuraDurationsForTarget(Unit* target);
+        void SendAurasForTarget(Unit *target);
 
         PlayerMenu* PlayerTalkClass;
         std::vector<ItemSetEffect *> ItemSetEff;
@@ -1930,6 +1957,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         float GetTransOffsetZ() const { return m_movementInfo.t_z; }
         float GetTransOffsetO() const { return m_movementInfo.t_o; }
         uint32 GetTransTime() const { return m_movementInfo.t_time; }
+        uint8 GetTransUnk() const { return m_movementInfo.t_unk; }
 
         uint32 GetSaveTimer() const { return m_nextSave; }
         void   SetSaveTimer(uint32 timer) { m_nextSave = timer; }

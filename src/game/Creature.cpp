@@ -645,8 +645,11 @@ bool Creature::isCanIneractWithBattleMaster(Player* pPlayer, bool msg) const
             case BATTLEGROUND_NA:
             case BATTLEGROUND_BE:
             case BATTLEGROUND_AA:
-            case BATTLEGROUND_RL:  pPlayer->PlayerTalkClass->SendGossipMenu(10024,GetGUID()); break;
-            break;
+            case BATTLEGROUND_RL:
+            case BATTLEGROUND_SA:
+            case BATTLEGROUND_DS:
+            case BATTLEGROUND_RV: pPlayer->PlayerTalkClass->SendGossipMenu(10024,GetGUID()); break;
+            default: break;
         }
         return false;
     }
@@ -1353,11 +1356,7 @@ void Creature::LoadEquipment(uint32 equip_entry, bool force)
         if (force)
         {
             for (uint8 i = 0; i < 3; i++)
-            {
-                SetUInt32Value( UNIT_VIRTUAL_ITEM_SLOT_DISPLAY + i, 0);
-                SetUInt32Value( UNIT_VIRTUAL_ITEM_INFO + (i * 2), 0);
-                SetUInt32Value( UNIT_VIRTUAL_ITEM_INFO + (i * 2) + 1, 0);
-            }
+                SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + i, 0);
             m_equipmentId = 0;
         }
         return;
@@ -1369,11 +1368,7 @@ void Creature::LoadEquipment(uint32 equip_entry, bool force)
 
     m_equipmentId = equip_entry;
     for (uint8 i = 0; i < 3; i++)
-    {
-        SetUInt32Value( UNIT_VIRTUAL_ITEM_SLOT_DISPLAY + i, einfo->equipmodel[i]);
-        SetUInt32Value( UNIT_VIRTUAL_ITEM_INFO + (i * 2), einfo->equipinfo[i]);
-        SetUInt32Value( UNIT_VIRTUAL_ITEM_INFO + (i * 2) + 1, einfo->equipslot[i]);
-    }
+        SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + i, einfo->equipentry[i]);
 }
 
 bool Creature::hasQuest(uint32 quest_id) const

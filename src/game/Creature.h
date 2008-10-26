@@ -210,9 +210,7 @@ struct CreatureLocale
 struct EquipmentInfo
 {
     uint32  entry;
-    uint32  equipmodel[3];
-    uint32  equipinfo[3];
-    uint32  equipslot[3];
+    uint32  equipentry[3];
 };
 
 // from `creature` table
