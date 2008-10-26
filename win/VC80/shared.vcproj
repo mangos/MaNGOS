@@ -771,7 +771,7 @@
 					Name="VCCustomBuildTool"
 					Description="Extract revision"
 					CommandLine="cd &quot;$(SolutionDir)..\src\shared&quot;&#x0D;&#x0A;&quot;$(TargetDir)\..\genrevision__$(PlatformName)_$(ConfigurationName)\genrevision.exe&quot; &quot;..\..&quot;&#x0D;&#x0A;"
-					AdditionalDependencies="$(SolutionDir)../.svn/entries;$(SolutionDir)../.git/FETCH_HEAD"
+					AdditionalDependencies="$(SolutionDir)../.svn/entries;$(SolutionDir)../_svn/entries;$(SolutionDir)../.git/FETCH_HEAD"
 					Outputs="revision.h"
 				/>
 			</FileConfiguration>
@@ -782,7 +782,7 @@
 					Name="VCCustomBuildTool"
 					Description="Extract revision"
 					CommandLine="cd &quot;$(SolutionDir)..\src\shared&quot;&#x0D;&#x0A;&quot;$(TargetDir)\..\genrevision__$(PlatformName)_$(ConfigurationName)\genrevision.exe&quot; &quot;..\..&quot;&#x0D;&#x0A;"
-					AdditionalDependencies="$(SolutionDir)../.svn/entries;$(SolutionDir)../.git/FETCH_HEAD"
+					AdditionalDependencies="$(SolutionDir)../.svn/entries;$(SolutionDir)../_svn/entries;$(SolutionDir)../.git/FETCH_HEAD"
 					Outputs="revision.h"
 				/>
 			</FileConfiguration>
@@ -793,7 +793,7 @@
 					Name="VCCustomBuildTool"
 					Description="Extract revision"
 					CommandLine="cd &quot;$(SolutionDir)..\src\shared&quot;&#x0D;&#x0A;&quot;$(TargetDir)\..\genrevision__$(PlatformName)_$(ConfigurationName)\genrevision.exe&quot; &quot;..\..&quot;&#x0D;&#x0A;"
-					AdditionalDependencies="$(SolutionDir)../.svn/entries;$(SolutionDir)../.git/FETCH_HEAD"
+					AdditionalDependencies="$(SolutionDir)../.svn/entries;$(SolutionDir)../_svn/entries;$(SolutionDir)../.git/FETCH_HEAD"
 					Outputs="revision.h"
 				/>
 			</FileConfiguration>
@@ -804,7 +804,7 @@
 					Name="VCCustomBuildTool"
 					Description="Extract revision"
 					CommandLine="cd &quot;$(SolutionDir)..\src\shared&quot;&#x0D;&#x0A;&quot;$(TargetDir)\..\genrevision__$(PlatformName)_$(ConfigurationName)\genrevision.exe&quot; &quot;..\..&quot;&#x0D;&#x0A;"
-					AdditionalDependencies="$(SolutionDir)../.svn/entries;$(SolutionDir)../.git/FETCH_HEAD"
+					AdditionalDependencies="$(SolutionDir)../.svn/entries;$(SolutionDir)../_svn/entries;$(SolutionDir)../.git/FETCH_HEAD"
 					Outputs="revision.h"
 				/>
 			</FileConfiguration>
