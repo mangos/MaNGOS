@@ -211,6 +211,9 @@
 				RelativePath="..\..\src\game\BattleGroundWS.h">
 			</File>
 			<File
+				RelativePath="..\..\src\game\CalendarHandler.cpp">
+			</File>
+			<File
 				RelativePath="..\..\src\game\Cell.h">
 			</File>
 			<File
@@ -479,6 +482,12 @@
 			</File>
 			<File
 				RelativePath="..\..\src\game\Bag.h">
+			</File>
+			<File
+				RelativePath="..\..\src\game\Calendar.cpp">
+			</File>
+			<File
+				RelativePath="..\..\src\game\Calendar.h">
 			</File>
 			<File
 				RelativePath="..\..\src\game\ConfusedMovementGenerator.cpp">
