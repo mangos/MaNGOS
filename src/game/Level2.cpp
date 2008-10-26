@@ -4156,3 +4156,67 @@ bool ChatHandler::HandleNpcUnFollowCommand(const char* /*args*/)
     PSendSysMessage(LANG_CREATURE_NOT_FOLLOW_YOU_NOW, creature->GetName());
     return true;
 }
+
+bool ChatHandler::HandleNpcTameCommand(const char* args)
+{
+    Creature *creatureTarget = getSelectedCreature ();
+    if (!creatureTarget || creatureTarget->isPet ())
+    {
+        PSendSysMessage (LANG_SELECT_CREATURE);
+        SetSentErrorMessage (true);
+        return false;
+    }
+
+    Player *player = m_session->GetPlayer ();
+
+    if(player->GetPetGUID ())
+    {
+        SendSysMessage (LANG_YOU_ALREADY_HAVE_PET);
+        SetSentErrorMessage (true);
+        return false;
+    }
+
+    CreatureInfo const* cInfo = creatureTarget->GetCreatureInfo();
+
+    if (!cInfo->isTameable ())
+    {
+        PSendSysMessage (LANG_CREATURE_NON_TAMEABLE,cInfo->Entry);
+        SetSentErrorMessage (true);
+        return false;
+    }
+
+    // Everything looks OK, create new pet
+    Pet* pet = player->CreateTamedPetFrom (creatureTarget);
+    if (!pet)
+    {
+        PSendSysMessage (LANG_CREATURE_NON_TAMEABLE,cInfo->Entry);
+        SetSentErrorMessage (true);
+        return false;
+    }
+
+    // place pet before player
+    float x,y,z;
+    player->GetClosePoint (x,y,z,creatureTarget->GetObjectSize (),CONTACT_DISTANCE);
+    pet->Relocate (x,y,z,M_PI-player->GetOrientation ());
+
+    // set pet to defensive mode by default (some classes can't control contolled pets in fact).
+    pet->GetCharmInfo()->SetReactState(REACT_DEFENSIVE);
+
+
+    // prepare visual effect for levelup
+    pet->SetUInt32Value(UNIT_FIELD_LEVEL,creatureTarget->getLevel()-1);
+
+    // add to world
+    MapManager::Instance().GetMap(pet->GetMapId(), pet)->Add((Creature*)pet);
+
+    // visual effect for levelup
+    pet->SetUInt32Value(UNIT_FIELD_LEVEL,creatureTarget->getLevel());
+
+    // caster have pet now
+    player->SetPet(pet);
+
+    pet->SavePetToDB(PET_SAVE_AS_CURRENT);
+    player->PetSpellInitialize();
+
+    return true;
+}

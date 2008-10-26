@@ -324,7 +324,9 @@ enum MangosStrings
     LANG_CREATURE_FOLLOW_YOU_NOW        = 340,
     LANG_CREATURE_NOT_FOLLOW_YOU        = 341,
     LANG_CREATURE_NOT_FOLLOW_YOU_NOW    = 342,
-    // Room for more level 2              343-399 not used
+    LANG_CREATURE_NON_TAMEABLE          = 343,
+    LANG_YOU_ALREADY_HAVE_PET           = 344,
+    // Room for more level 2              345-399 not used
 
     // level 3 chat
     LANG_SCRIPTS_RELOADED               = 400,
