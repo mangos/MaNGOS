@@ -22,6 +22,7 @@
 
 #include "Platform/Define.h"
 #include "ScriptCalls.h"
+#include "World.h"
 
 ScriptsSet Script=NULL;
 
@@ -55,6 +56,7 @@ bool LoadScriptingModule(char const* libName)
 
     if(   !(testScript->ScriptsInit         =(scriptCallScriptsInit         )MANGOS_GET_PROC_ADDR(testScript->hScriptsLib,"ScriptsInit"         ))
         ||!(testScript->ScriptsFree         =(scriptCallScriptsFree         )MANGOS_GET_PROC_ADDR(testScript->hScriptsLib,"ScriptsFree"         ))
+        ||!(testScript->ScriptsVersion      =(scriptCallScriptsVersion      )MANGOS_GET_PROC_ADDR(testScript->hScriptsLib,"ScriptsVersion"      ))
         ||!(testScript->GossipHello         =(scriptCallGossipHello         )MANGOS_GET_PROC_ADDR(testScript->hScriptsLib,"GossipHello"         ))
         ||!(testScript->GOChooseReward      =(scriptCallGOChooseReward      )MANGOS_GET_PROC_ADDR(testScript->hScriptsLib,"GOChooseReward"      ))
         ||!(testScript->QuestAccept         =(scriptCallQuestAccept         )MANGOS_GET_PROC_ADDR(testScript->hScriptsLib,"QuestAccept"         ))
@@ -90,6 +92,8 @@ bool LoadScriptingModule(char const* libName)
 
     Script=testScript;
     Script->ScriptsInit();
+
+    sWorld.SetScriptsVersion(Script->ScriptsVersion());
 
     return true;
 }

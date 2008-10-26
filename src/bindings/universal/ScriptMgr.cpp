@@ -64,6 +64,12 @@ void ScriptsInit()
 
 }
 
+MANGOS_DLL_EXPORT
+char const* ScriptsVersion()
+{
+    return "Default MaNGOS scripting library";
+}
+
 Script* GetScriptByName(std::string Name)
 {
     if(Name.empty())

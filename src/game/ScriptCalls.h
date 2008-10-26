@@ -37,6 +37,7 @@ void UnloadScriptingModule();
 
 typedef void(MANGOS_IMPORT * scriptCallScriptsInit) ();
 typedef void(MANGOS_IMPORT * scriptCallScriptsFree) ();
+typedef char const* (MANGOS_IMPORT * scriptCallScriptsVersion) ();
 
 typedef bool(MANGOS_IMPORT * scriptCallGossipHello) (Player *player, Creature *_Creature );
 typedef bool(MANGOS_IMPORT * scriptCallQuestAccept) (Player *player, Creature *_Creature, Quest const *);
@@ -62,6 +63,7 @@ typedef struct
 {
     scriptCallScriptsInit ScriptsInit;
     scriptCallScriptsFree ScriptsFree;
+    scriptCallScriptsVersion ScriptsVersion;
 
     scriptCallGossipHello GossipHello;
     scriptCallGOChooseReward GOChooseReward;

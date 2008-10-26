@@ -19,6 +19,8 @@
 #include <fstream>
 #include <sstream>
 #include <time.h>
+#include <stdio.h>
+#include <string.h>
 
 #pragma warning(disable:4996)
 
@@ -56,12 +58,28 @@ void extractDataFromSvn(FILE* EntriesFile, bool url, RawData& data)
 void extractDataFromGit(FILE* EntriesFile, std::string path, bool url, RawData& data)
 {
     char buf[200];
-    fgets(buf,200,EntriesFile);
 
     char hash_str[200];
     char branch_str[200];
     char url_str[200];
-    sscanf(buf,"%s		branch %s of %s",hash_str,branch_str,url_str);
+
+    bool found = false;
+    while(fgets(buf,200,EntriesFile))
+    {
+        if(sscanf(buf,"%s		branch %s of %s",hash_str,branch_str,url_str)==3)
+        {
+            found = true;
+            break;
+        }
+    }
+
+    if(!found)
+    {
+        strcpy(data.rev_str,"Unknown");
+        strcpy(data.date_str,"Unknown");
+        strcpy(data.time_str,"Unknown");
+        return;
+    }
 
     if(url)
     {
