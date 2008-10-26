@@ -273,7 +273,9 @@ void LoadMPQFiles(int const locale)
     //need those files only if extract maps
     if(extract & EXTRACT_MAP)
     {
-        sprintf(filename,"%s/Data/common.MPQ",input_path);
+        sprintf(filename,"%s/Data/common-2.MPQ",input_path);
+        new MPQArchive(filename);
+        sprintf(filename,"%s/Data/lichking.MPQ",input_path);
         new MPQArchive(filename);
         sprintf(filename,"%s/Data/expansion.MPQ",input_path);
         new MPQArchive(filename);

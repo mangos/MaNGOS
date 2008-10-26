@@ -419,7 +419,7 @@ void TransformData()
     delete mcells;
 }
 
-const char MAP_MAGIC[] = "MAP_2.00";
+const char MAP_MAGIC[] = "MAP_2.01";
 
 bool ConvertADT(char * filename,char * filename2)
 {
@@ -441,7 +441,7 @@ bool ConvertADT(char * filename,char * filename2)
     {
         for(unsigned int y=0;y<16;y++)
         {
-            if(mcells->ch[y][x].area_id && mcells->ch[y][x].area_id < 0x102D)
+            if(mcells->ch[y][x].area_id && mcells->ch[y][x].area_id < 0x121F)
             {
                 if(areas[mcells->ch[y][x].area_id]==0xffff)
                     printf("\nCan't find area flag for areaid %u.\n",mcells->ch[y][x].area_id);
