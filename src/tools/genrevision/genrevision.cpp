@@ -19,6 +19,8 @@
 #include <fstream>
 #include <sstream>
 #include <time.h>
+#include <stdio.h>
+#include <string.h>
 
 #pragma warning(disable:4996)
 
