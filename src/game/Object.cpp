@@ -251,11 +251,14 @@ void Object::DestroyForPlayer(Player *target) const
 
     WorldPacket data(SMSG_DESTROY_OBJECT, 8);
     data << GetGUID();
+    data << uint8(0);                                       // WotLK (bool)
     target->GetSession()->SendPacket( &data );
 }
 
 void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2 ) const
 {
+    uint16 unk_flags = ((GetTypeId() == TYPEID_PLAYER) ? ((Player*)this)->m_movementInfo.unk1 : 0);
+
     *data << (uint8)flags;                                  // update flags
 
     // 0x20
@@ -290,7 +293,7 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2 
         }
 
         *data << uint32(flags2);                            // movement flags
-        *data << uint8(0);                                  // unk 2.3.0
+        *data << uint16(unk_flags);                         // unknown 2.3.0
         *data << uint32(getMSTime());                       // time (in milliseconds)
     }
 
@@ -328,12 +331,13 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2 
                 *data << (float)((Player*)this)->GetTransOffsetZ();
                 *data << (float)((Player*)this)->GetTransOffsetO();
                 *data << (uint32)((Player*)this)->GetTransTime();
+                *data << (uint8)((Player*)this)->GetTransUnk();
             }
             //MaNGOS currently not have support for other than player on transport
         }
 
         // 0x02200000
-        if(flags2 & (MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_FLYING2))
+        if((flags2 & (MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_FLYING2)) || (unk_flags & 0x20))
         {
             if(GetTypeId() == TYPEID_PLAYER)
                 *data << (float)((Player*)this)->m_movementInfo.s_pitch;
@@ -382,6 +386,7 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2 
         *data << ((Unit*)this)->GetSpeed( MOVE_FLY );
         *data << ((Unit*)this)->GetSpeed( MOVE_FLYBACK );
         *data << ((Unit*)this)->GetSpeed( MOVE_TURN );
+        *data << float(7);
 
         // 0x08000000
         if(flags2 & MOVEMENTFLAG_SPLINE2)
@@ -483,7 +488,7 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2 
                 break;
             case TYPEID_PLAYER:
                 if(flags & UPDATEFLAG_SELF)
-                    *data << uint32(0x00000015);            // unk, can be 0x15 or 0x22
+                    *data << uint32(0x0000002F);            // unk, can be 0x15 or 0x22
                 else
                     *data << uint32(0x00000008);            // unk, can be 0x7 or 0x8
                 break;
@@ -506,6 +511,15 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2 
             case TYPEID_CORPSE:
                 *data << uint32(GetGUIDHigh());             // GetGUIDHigh()
                 break;
+            case TYPEID_UNIT:
+                *data << uint32(-1);
+                break;
+            case TYPEID_PLAYER:
+                if(flags & UPDATEFLAG_SELF)
+                    *data << uint32(0x0000002F);            // unk, can be 0x15 or 0x22
+                else
+                    *data << uint32(-1);                    // unk, can be 0x7 or 0x8
+                break;
             default:
                 *data << uint32(0x00000000);                // unk
                 break;
@@ -523,6 +537,13 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2 
     {
         *data << uint32(getMSTime());                       // ms time
     }
+
+    // 0x80
+    if(flags & UPDATEFLAG_WOTLK)                            // unused for now
+    {
+        *data << float(0);
+        *data << uint32(0);
+    }
 }
 
 void Object::_BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask *updateMask, Player *target) const
@@ -538,7 +559,7 @@ void Object::_BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask 
             if ( ((GameObject*)this)->ActivateToQuest(target) || target->isGameMaster())
             {
                 IsActivateToQuest = true;
-                updateMask->SetBit(GAMEOBJECT_DYN_FLAGS);
+                updateMask->SetBit(GAMEOBJECT_DYNAMIC);
             }
         }
     }
@@ -550,8 +571,8 @@ void Object::_BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask 
             {
                 IsActivateToQuest = true;
             }
-            updateMask->SetBit(GAMEOBJECT_DYN_FLAGS);
-            updateMask->SetBit(GAMEOBJECT_ANIMPROGRESS);
+            updateMask->SetBit(GAMEOBJECT_DYNAMIC);
+            updateMask->SetBit(GAMEOBJECT_BYTES_1);
         }
     }
 
@@ -612,7 +633,7 @@ void Object::_BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask 
             if( updateMask->GetBit( index ) )
             {
                 // send in current format (float as float, uint32 as uint32)
-                if ( index == GAMEOBJECT_DYN_FLAGS )
+                if ( index == GAMEOBJECT_DYNAMIC )
                 {
                     if(IsActivateToQuest )
                     {
@@ -1317,7 +1338,7 @@ void WorldObject::BuildHeartBeatMsg(WorldPacket *data) const
     data->Initialize(MSG_MOVE_HEARTBEAT, 32);
     data->append(GetPackGUID());
     *data << uint32(((Unit*)this)->GetUnitMovementFlags()); // movement flags
-    *data << uint8(0);                                      // 2.3.0
+    *data << uint16(0);                                     // 2.3.0
     *data << getMSTime();                                   // time
     *data << m_positionX;
     *data << m_positionY;
@@ -1336,7 +1357,7 @@ void WorldObject::BuildTeleportAckMsg(WorldPacket *data, float x, float y, float
     data->append(GetPackGUID());
     *data << uint32(0);                                     // this value increments every time
     *data << uint32(((Unit*)this)->GetUnitMovementFlags()); // movement flags
-    *data << uint8(0);                                      // 2.3.0
+    *data << uint16(0);                                     // 2.3.0
     *data << getMSTime();                                   // time
     *data << x;
     *data << y;
