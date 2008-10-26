@@ -407,6 +407,7 @@ class ChatHandler
         bool HandleCombatStopCommand(const char *args);
         bool HandleSendMessageCommand(const char * args);
         bool HandleRepairitemsCommand(const char* args);
+        bool HandleWaterwalkCommand(const char* args);
 
         //! Development Commands
         bool HandleSetValue(const char* args);

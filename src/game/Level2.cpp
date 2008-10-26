@@ -4057,7 +4057,7 @@ bool ChatHandler::HandleRepairitemsCommand(const char* args)
         PSendSysMessage(LANG_NO_CHAR_SELECTED);
         SetSentErrorMessage(true);
         return false;
-	}
+    }
 
     // Repair items
     target->DurabilityRepairAll(false, 0, false);
@@ -4065,5 +4065,35 @@ bool ChatHandler::HandleRepairitemsCommand(const char* args)
     PSendSysMessage(LANG_YOU_REPAIR_ITEMS, target->GetName());
     if(needReportToTarget(target))
         ChatHandler(target).PSendSysMessage(LANG_YOUR_ITEMS_REPAIRED, GetName());
+    return true;
+}
+
+bool ChatHandler::HandleWaterwalkCommand(const char* args)
+{
+    if(!*args)
+        return false;
+
+    Player *player = getSelectedPlayer();
+
+    if(!player)
+    {
+        PSendSysMessage(LANG_NO_CHAR_SELECTED);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    if (strncmp(args, "on", 3) == 0)
+        player->SetMovement(MOVE_WATER_WALK);               // ON
+    else if (strncmp(args, "off", 4) == 0)
+        player->SetMovement(MOVE_LAND_WALK);                // OFF
+    else
+    {
+        SendSysMessage(LANG_USE_BOL);
+        return false;
+    }
+
+    PSendSysMessage(LANG_YOU_SET_WATERWALK, args, player->GetName());
+    if(needReportToTarget(player))
+        ChatHandler(player).PSendSysMessage(LANG_YOUR_WATERWALK_SET, args, GetName());
     return true;
 }

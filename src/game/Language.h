@@ -319,7 +319,9 @@ enum MangosStrings
     LANG_GM_CHAT_OFF                    = 335,
     LANG_YOU_REPAIR_ITEMS               = 336,
     LANG_YOUR_ITEMS_REPAIRED            = 337,
-    // Room for more level 2              338-399 not used
+    LANG_YOU_SET_WATERWALK              = 338,
+    LANG_YOUR_WATERWALK_SET             = 339,
+    // Room for more level 2              340-399 not used
 
     // level 3 chat
     LANG_SCRIPTS_RELOADED               = 400,

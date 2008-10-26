@@ -528,6 +528,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { "chardelete",     SEC_CONSOLE,        true,  &ChatHandler::HandleCombatStopCommand,          "", NULL },
         { "sendmessage",    SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleSendMessageCommand,         "", NULL },
         { "repairitems",    SEC_GAMEMASTER,     false, &ChatHandler::HandleRepairitemsCommand,         "", NULL },
+        { "waterwalk",      SEC_GAMEMASTER,     false, &ChatHandler::HandleWaterwalkCommand,           "", NULL },
 
         { NULL,             0,                  false, NULL,                                           "", NULL }
     };
