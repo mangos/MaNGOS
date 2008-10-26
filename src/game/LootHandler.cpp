@@ -314,7 +314,7 @@ void WorldSession::DoLootRelease( uint64 lguid )
                             int32 ReqValue = 175;
                             LockEntry const *lockInfo = sLockStore.LookupEntry(go->GetGOInfo()->chest.lockId);
                             if(lockInfo)
-                                ReqValue = lockInfo->requiredminingskill;
+                                ReqValue = lockInfo->Skill[0];
                             float skill = float(player->GetSkillValue(SKILL_MINING))/(ReqValue+25);
                             double chance = pow(0.8*chance_rate,4*(1/double(max_amount))*double(uses));
                             if(roll_chance_f(100*chance+skill))

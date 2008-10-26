@@ -69,7 +69,7 @@ void WorldSession::SendTaxiStatus( uint64 guid )
     sLog.outDebug( "WORLD: Sent SMSG_TAXINODE_STATUS" );
 }
 
-void WorldSession::HandleTaxiQueryAvailableNodesOpcode( WorldPacket & recv_data )
+void WorldSession::HandleTaxiQueryAvailableNodes( WorldPacket & recv_data )
 {
     CHECK_PACKET_SIZE(recv_data,8);
 
@@ -82,7 +82,7 @@ void WorldSession::HandleTaxiQueryAvailableNodesOpcode( WorldPacket & recv_data 
     Creature *unit = ObjectAccessor::GetNPCIfCanInteractWith(*_player, guid, UNIT_NPC_FLAG_FLIGHTMASTER);
     if (!unit)
     {
-        sLog.outDebug( "WORLD: HandleTaxiQueryAvailableNodesOpcode - Unit (GUID: %u) not found or you can't interact with him.", uint32(GUID_LOPART(guid)) );
+        sLog.outDebug( "WORLD: HandleTaxiQueryAvailableNodes - Unit (GUID: %u) not found or you can't interact with him.", uint32(GUID_LOPART(guid)) );
         return;
     }
 

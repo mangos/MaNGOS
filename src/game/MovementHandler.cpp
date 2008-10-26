@@ -170,7 +170,7 @@ void WorldSession::HandleMoveWorldportAckOpcode()
 
 void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 {
-    CHECK_PACKET_SIZE(recv_data, 4+1+4+4+4+4+4);
+    CHECK_PACKET_SIZE(recv_data, 4+2+4+4+4+4+4);
 
     if(GetPlayer()->GetDontMove())
         return;
@@ -193,7 +193,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
     if(MovementFlags & MOVEMENTFLAG_ONTRANSPORT)
     {
         // recheck
-        CHECK_PACKET_SIZE(recv_data, recv_data.rpos()+8+4+4+4+4+4);
+        CHECK_PACKET_SIZE(recv_data, recv_data.rpos()+8+4+4+4+4+4+1);
 
         recv_data >> movementInfo.t_guid;
         recv_data >> movementInfo.t_x;
@@ -201,9 +201,10 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
         recv_data >> movementInfo.t_z;
         recv_data >> movementInfo.t_o;
         recv_data >> movementInfo.t_time;
+        recv_data >> movementInfo.t_unk;
     }
 
-    if(MovementFlags & (MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_FLYING2))
+    if((MovementFlags & (MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_FLYING2)) || (movementInfo.unk1 & 0x20))
     {
         // recheck
         CHECK_PACKET_SIZE(recv_data, recv_data.rpos()+4);
@@ -351,7 +352,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
     /*----------------------*/
 
     /* process position-change */
-    recv_data.put<uint32>(5, getMSTime());                  // offset flags(4) + unk(1)
+    recv_data.put<uint32>(6, getMSTime());                  // offset flags(4) + unk(2)
     WorldPacket data(recv_data.GetOpcode(), (GetPlayer()->GetPackGUID().size()+recv_data.size()));
     data.append(GetPlayer()->GetPackGUID());
     data.append(recv_data.contents(), recv_data.size());
@@ -384,17 +385,18 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 
 void WorldSession::HandleForceSpeedChangeAck(WorldPacket &recv_data)
 {
-    CHECK_PACKET_SIZE(recv_data, 8+4+4+1+4+4+4+4+4);
+    CHECK_PACKET_SIZE(recv_data, 8+4+4+2+4+4+4+4+4);
 
     /* extract packet */
     uint64 guid;
-    uint8  unkB;
+    uint16 unkB;
     uint32 unk1, flags, time, fallTime;
     float x, y, z, orientation;
 
     uint64 t_GUID;
     float  t_x, t_y, t_z, t_o;
     uint32 t_time;
+    uint8  t_unk;
     float  s_pitch;
     float  j_unk1, j_sinAngle, j_cosAngle, j_xyspeed;
     float  u_unk1;
@@ -414,12 +416,12 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket &recv_data)
     if (flags & MOVEMENTFLAG_ONTRANSPORT)
     {
         // recheck
-        CHECK_PACKET_SIZE(recv_data, recv_data.rpos()+8+4+4+4+4+4);
+        CHECK_PACKET_SIZE(recv_data, recv_data.rpos()+8+4+4+4+4+4+1);
 
         recv_data >> t_GUID;
-        recv_data >> t_x >> t_y >> t_z >> t_o >> t_time;
+        recv_data >> t_x >> t_y >> t_z >> t_o >> t_time >> t_unk;
     }
-    if (flags & (MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_FLYING2))
+    if ((flags & (MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_FLYING2)) || (unkB & 0x20))
     {
         // recheck
         CHECK_PACKET_SIZE(recv_data, recv_data.rpos()+4);

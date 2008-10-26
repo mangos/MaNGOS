@@ -1066,16 +1066,35 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
     GetPlayer()->TeleportTo(at->target_mapId,at->target_X,at->target_Y,at->target_Z,at->target_Orientation,TELE_TO_NOT_LEAVE_TRANSPORT);
 }
 
-void WorldSession::HandleUpdateAccountData(WorldPacket &/*recv_data*/)
+void WorldSession::HandleUpdateAccountData(WorldPacket &recv_data)
 {
     sLog.outDetail("WORLD: Received CMSG_UPDATE_ACCOUNT_DATA");
-    //recv_data.hexlike();
+    recv_data.hexlike();
+
+    uint32 id1, id2, decompressedSize;
+    recv_data >> id1 >> id2 >> decompressedSize;
+
+    if(decompressedSize == 0)
+        return;
+
+    ByteBuffer dest;
+    dest.resize(decompressedSize);
+
+    uLongf realSize = decompressedSize;
+    if(uncompress(const_cast<uint8*>(dest.contents()), &realSize, const_cast<uint8*>(recv_data.contents() + recv_data.rpos()), recv_data.size() - recv_data.rpos()) == Z_OK)
+    {
+        dest.hexlike();
+    }
+    else
+    {
+        sLog.outError("UAD: Failed to decompress packet");
+    }
 }
 
-void WorldSession::HandleRequestAccountData(WorldPacket& /*recv_data*/)
+void WorldSession::HandleRequestAccountData(WorldPacket& recv_data)
 {
     sLog.outDetail("WORLD: Received CMSG_REQUEST_ACCOUNT_DATA");
-    //recv_data.hexlike();
+    recv_data.hexlike();
 }
 
 void WorldSession::HandleSetActionButtonOpcode(WorldPacket& recv_data)
@@ -1753,4 +1772,22 @@ void WorldSession::HandleSetTaxiBenchmarkOpcode( WorldPacket & recv_data )
     recv_data >> mode;
 
     sLog.outDebug("Client used \"/timetest %d\" command", mode);
+}
+
+void WorldSession::HandleSpellClick( WorldPacket & recv_data )
+{
+    CHECK_PACKET_SIZE(recv_data, 8);
+
+    uint64 guid;
+    recv_data >> guid;
+
+    Unit *vehicle = ObjectAccessor::GetUnit(*_player, guid);
+
+    if(!vehicle)
+        return;
+
+    _player->SetClientControl(vehicle, 1);
+    _player->CastSpell(_player, 43768, true);
+    _player->SetUInt64Value(UNIT_FIELD_CHARM, guid);
+    _player->SetUInt64Value(PLAYER_FARSIGHT, guid);
 }

@@ -497,9 +497,11 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder * holder)
     data << pCurrChar->GetOrientation();
     SendPacket(&data);
 
-    data.Initialize( SMSG_ACCOUNT_DATA_TIMES, 128 );
-    for(int i = 0; i < 32; i++)
-        data << uint32(0);
+    data.Initialize( SMSG_ACCOUNT_DATA_TIMES, 128 );        // changed in WotLK
+    data << uint32(0);                                      // unix time of something
+    data << uint8(1);
+    for(int i = 0; i < 8; i++)
+        data << uint32(0);                                  // also unix time
     SendPacket(&data);
 
     data.Initialize(SMSG_FEATURE_SYSTEM_STATUS, 2);         // added in 2.2.0
@@ -581,11 +583,16 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder * holder)
     {
         pCurrChar->setCinematic(1);
 
-        ChrRacesEntry const* rEntry = sChrRacesStore.LookupEntry(pCurrChar->getRace());
-        if(rEntry)
+        if(ChrClassesEntry const* cEntry = sChrClassesStore.LookupEntry(pCurrChar->getClass()))
         {
-            data.Initialize( SMSG_TRIGGER_CINEMATIC,4 );
-            data << uint32(rEntry->startmovie);
+            data.Initialize(SMSG_TRIGGER_CINEMATIC, 4);
+            data << uint32(cEntry->CinematicSequence);
+            SendPacket( &data );
+        }
+        else if(ChrRacesEntry const* rEntry = sChrRacesStore.LookupEntry(pCurrChar->getRace()))
+        {
+            data.Initialize(SMSG_TRIGGER_CINEMATIC, 4);
+            data << uint32(rEntry->CinematicSequence);
             SendPacket( &data );
         }
     }
@@ -1077,4 +1084,74 @@ void WorldSession::HandleDeclinedPlayerNameOpcode(WorldPacket& recv_data)
     data << uint32(0);                                      // OK
     data << uint64(guid);
     SendPacket(&data);
+}
+
+void WorldSession::HandleAlterAppearance( WorldPacket & recv_data )
+{
+    sLog.outDebug("CMSG_ALTER_APPEARANCE");
+
+    CHECK_PACKET_SIZE(recv_data, 4+4+4);
+
+    uint32 Hair, Color, FacialHair;
+    recv_data >> Hair >> Color >> FacialHair;
+
+    BarberShopStyleEntry const* bs_hair = sBarberShopStyleStore.LookupEntry(Hair);
+
+    if(!bs_hair)
+        return;
+
+    BarberShopStyleEntry const* bs_facialHair = sBarberShopStyleStore.LookupEntry(FacialHair);
+
+    if(!bs_facialHair)
+        return;
+
+    uint32 Cost = _player->GetBarberShopCost(bs_hair->hair_id, Color, bs_facialHair->hair_id);
+
+    // 0 - ok
+    // 1,3 - not enough money
+    // 2 - you have to seat on barber chair
+    if(_player->GetMoney() < Cost)
+    {
+        WorldPacket data(SMSG_BARBER_SHOP_RESULT, 4);
+        data << uint32(1);                                  // no money
+        SendPacket(&data);
+        return;
+    }
+    else
+    {
+        WorldPacket data(SMSG_BARBER_SHOP_RESULT, 4);
+        data << uint32(0);                                  // ok
+        SendPacket(&data);
+    }
+
+    _player->SetMoney(_player->GetMoney() - Cost);          // it isn't free
+
+    _player->SetByteValue(PLAYER_BYTES, 2, uint8(bs_hair->hair_id));
+    _player->SetByteValue(PLAYER_BYTES, 3, uint8(Color));
+    _player->SetByteValue(PLAYER_BYTES_2, 0, uint8(bs_facialHair->hair_id));
+
+    _player->SetStandState(0);                              // stand up
+}
+
+void WorldSession::HandleRemoveGlyph( WorldPacket & recv_data )
+{
+    CHECK_PACKET_SIZE(recv_data, 4);
+
+    uint32 slot;
+    recv_data >> slot;
+
+	if(slot > 5)
+	{
+		sLog.outDebug("Client sent wrong glyph slot number in opcode CMSG_REMOVE_GLYPH %u", slot);
+		return;
+	}
+
+	if(uint32 glyph = _player->GetGlyph(slot))
+    {
+        if(GlyphPropertiesEntry const *gp = sGlyphPropertiesStore.LookupEntry(glyph))
+        {
+            _player->RemoveAurasDueToSpell(gp->SpellId);
+            _player->SetGlyph(slot, 0);
+        }
+    }
 }
