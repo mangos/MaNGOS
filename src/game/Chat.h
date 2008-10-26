@@ -95,7 +95,6 @@ class ChatHandler
         bool HandleHelpCommand(const char* args);
         bool HandleCommandsCommand(const char* args);
         bool HandleStartCommand(const char* args);
-        bool HandleInfoCommand(const char* args);
         bool HandleDismountCommand(const char* args);
         bool HandleSaveCommand(const char* args);
         bool HandleGMListIngameCommand(const char* args);
@@ -220,6 +219,7 @@ class ChatHandler
 
         bool HandleServerCorpsesCommand(const char* args);
         bool HandleServerExitCommand(const char* args);
+        bool HandleServerInfoCommand(const char* args);
         bool HandleServerMotdCommand(const char* args);
         bool HandleServerSetMotdCommand(const char* args);
         bool HandleServerSetLogLevelCommand(const char* args);
