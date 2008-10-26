@@ -4040,10 +4040,6 @@ void Spell::EffectSummonPet(uint32 i)
     uint32 faction = m_caster->getFaction();
     if(m_caster->GetTypeId() == TYPEID_UNIT)
     {
-        Unit* owner = ((Totem*)m_caster)->GetOwner();
-        if(owner)
-            faction = owner->getFaction();
-
         if ( ((Creature*)m_caster)->isTotem() )
             NewSummon->GetCharmInfo()->SetReactState(REACT_AGGRESSIVE);
         else
