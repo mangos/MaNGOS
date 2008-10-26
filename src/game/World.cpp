@@ -928,6 +928,9 @@ void World::SetInitialWorldSettings()
     sLog.outString( "Loading InstanceTemplate" );
     objmgr.LoadInstanceTemplate();
 
+    sLog.outString( "Loading AchievementCriteriaList..." );
+    objmgr.LoadAchievementCriteriaList();
+
     sLog.outString( "Loading SkillLineAbilityMultiMap Data..." );
     spellmgr.LoadSkillLineAbilityMap();
 

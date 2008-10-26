@@ -33,6 +33,8 @@ DBCStorage <AreaTableEntry> sAreaStore(AreaTableEntryfmt);
 static AreaFlagByAreaID sAreaFlagByAreaID;
 static AreaFlagByMapID  sAreaFlagByMapID;                   // for instances without generated *.map files
 
+DBCStorage <AchievementEntry> sAchievementStore(Achievementfmt);
+DBCStorage <AchievementCriteriaEntry> sAchievementCriteriaStore(AchievementCriteriafmt);
 DBCStorage <AreaTriggerEntry> sAreaTriggerStore(AreaTriggerEntryfmt);
 DBCStorage <BankBagSlotPricesEntry> sBankBagSlotPricesStore(BankBagSlotPricesEntryfmt);
 DBCStorage <BattlemasterListEntry> sBattlemasterListStore(BattlemasterListEntryfmt);
@@ -182,7 +184,7 @@ void LoadDBCStores(std::string dataPath)
 {
     std::string dbcPath = dataPath+"dbc/";
 
-    const uint32 DBCFilesCount = 60;
+    const uint32 DBCFilesCount = 65;
 
     barGoLink bar( DBCFilesCount );
 
@@ -205,6 +207,8 @@ void LoadDBCStores(std::string dataPath)
         }
     }
 
+    LoadDBC(availableDbcLocales,bar,bad_dbc_files,sAchievementStore,         dbcPath,"Achievement.dbc");
+    LoadDBC(availableDbcLocales,bar,bad_dbc_files,sAchievementCriteriaStore, dbcPath,"Achievement_Criteria.dbc");
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sAreaTriggerStore,         dbcPath,"AreaTrigger.dbc");
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sBankBagSlotPricesStore,   dbcPath,"BankBagSlotPrices.dbc");
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sBattlemasterListStore,    dbcPath,"BattlemasterList.dbc");

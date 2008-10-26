@@ -231,6 +231,8 @@ typedef HM_NAMESPACE::hash_map<uint32, uint32> CacheNpcTextIdMap;
 typedef HM_NAMESPACE::hash_map<uint32, VendorItemData> CacheVendorItemMap;
 typedef HM_NAMESPACE::hash_map<uint32, TrainerSpellData> CacheTrainerSpellMap;
 
+typedef std::list<const AchievementCriteriaEntry*> AchievementCriteriaEntryList;
+
 enum SkillRangeType
 {
     SKILL_RANGE_LANGUAGE,                                   // 300..300
@@ -739,6 +741,7 @@ class ObjectMgr
         void AddVendorItem(uint32 entry,uint32 item, uint32 maxcount, uint32 incrtime, uint32 ExtendedCost);
         bool RemoveVendorItem(uint32 entry,uint32 item);
         bool IsVendorItemValid( uint32 vendor_entry, uint32 item, uint32 maxcount, uint32 ptime, uint32 ExtendedCost, Player* pl = NULL, std::set<uint32>* skip_vendors = NULL ) const;
+        void LoadAchievementCriteriaList();
     protected:
         uint32 m_auctionid;
         uint32 m_mailid;
@@ -803,6 +806,8 @@ class ObjectMgr
         int GetOrNewIndexForLocale(LocaleConstant loc);
 
         int DBCLocaleIndex;
+
+        AchievementCriteriaEntryList const& GetAchievementCriteriaByType(AchievementCriteriaTypes type);
     private:
         void LoadScripts(ScriptMapMap& scripts, char const* tablename);
         void ConvertCreatureAddonAuras(CreatureDataAddon* addon, char const* table, char const* guidEntryStr);
@@ -850,6 +855,9 @@ class ObjectMgr
         CacheNpcTextIdMap m_mCacheNpcTextIdMap;
         CacheVendorItemMap m_mCacheVendorItemMap;
         CacheTrainerSpellMap m_mCacheTrainerSpellMap;
+
+        // store achievement criterias by type to speed up lookup
+        AchievementCriteriaEntryList m_AchievementCriteriasByType[ACHIEVEMENT_CRITERIA_TYPE_TOTAL];
 };
 
 #define objmgr MaNGOS::Singleton<ObjectMgr>::Instance()

@@ -63,6 +63,9 @@ libmangosgame_a_SOURCES = \
     BattleGroundHandler.cpp \
     BattleGroundMgr.cpp \
     BattleGroundMgr.h \
+    Calendar.cpp \
+    Calendar.h \
+    CalendarHandler.cpp \
     Cell.h \
     CellImpl.h \
     Channel.cpp \

@@ -6046,6 +6046,23 @@ int ObjectMgr::GetOrNewIndexForLocale( LocaleConstant loc )
     return m_LocalForIndex.size()-1;
 }
 
+AchievementCriteriaEntryList const& ObjectMgr::GetAchievementCriteriaByType(AchievementCriteriaTypes type)
+{
+    return m_AchievementCriteriasByType[type];
+}
+
+void ObjectMgr::LoadAchievementCriteriaList()
+{
+    for (uint32 entryId = 0; entryId<sAchievementCriteriaStore.GetNumRows(); entryId++)
+    {
+        AchievementCriteriaEntry const* criteria = sAchievementCriteriaStore.LookupEntry(entryId);
+        if(!criteria)
+            continue;
+
+        m_AchievementCriteriasByType[criteria->requiredType].push_back(criteria);
+    }
+}
+
 void ObjectMgr::LoadBattleMastersEntry()
 {
     mBattleMastersMap.clear();                              // need for reload case
