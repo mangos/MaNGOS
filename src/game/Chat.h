@@ -149,6 +149,9 @@ class ChatHandler
         bool HandleModifyRepCommand(const char* args);
         bool HandleModifyArenaCommand(const char* args);
 
+        bool HandleNpcFollowCommand(const char* args);
+        bool HandleNpcUnFollowCommand(const char* args);
+
         bool HandleReloadCommand(const char* args);
         bool HandleReloadAllCommand(const char* args);
         bool HandleReloadAllAreaCommand(const char* args);
