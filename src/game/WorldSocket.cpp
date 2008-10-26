@@ -638,7 +638,7 @@ int WorldSocket::HandleAuthSession (WorldPacket& recvPacket)
     // NOTE: ATM the socket is singlethreaded, have this in mind ...
     uint8 digest[20];
     uint32 clientSeed;
-    uint32 unk2;
+    uint32 unk2, unk3;
     uint32 BuiltNumberClient;
     uint32 id, security;
     uint8 expansion = 0;
@@ -660,6 +660,7 @@ int WorldSocket::HandleAuthSession (WorldPacket& recvPacket)
     recvPacket >> BuiltNumberClient;                        // for now no use
     recvPacket >> unk2;
     recvPacket >> account;
+    recvPacket >> unk3;
 
     if (recvPacket.size () < (4 + 4 + (account.size () + 1) + 4 + 20))
     {
@@ -825,7 +826,7 @@ int WorldSocket::HandleAuthSession (WorldPacket& recvPacket)
 
         SendPacket (packet);
 
-        sLog.outBasic ("WorldSocket::HandleAuthSession: User tryes to login but his security level is not enough");
+        sLog.outBasic ("WorldSocket::HandleAuthSession: User tries to login but his security level is not enough");
         return -1;
     }
 
@@ -924,7 +925,7 @@ int WorldSocket::HandlePing (WorldPacket& recvPacket)
                 if (m_Session && m_Session->GetSecurity () == SEC_PLAYER)
                 {
                     sLog.outError  ("WorldSocket::HandlePing: Player kicked for "
-                                    "overspeeded pings adress = %s",
+                                    "overspeeded pings address = %s",
                                     GetRemoteAddress ().c_str ());
 
                     return -1;
@@ -940,12 +941,12 @@ int WorldSocket::HandlePing (WorldPacket& recvPacket)
         ACE_GUARD_RETURN (LockType, Guard, m_SessionLock, -1);
 
         if (m_Session)
-        m_Session->SetLatency (latency);
+            m_Session->SetLatency (latency);
         else
         {
             sLog.outError ("WorldSocket::HandlePing: peer sent CMSG_PING, "
                             "but is not authenticated or got recently kicked,"
-                            " adress = %s",
+                            " address = %s",
                             this->GetRemoteAddress ().c_str ());
              return -1;
         }
