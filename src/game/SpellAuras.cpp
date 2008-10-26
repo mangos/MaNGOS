@@ -286,7 +286,7 @@ pAuraHandler AuraHandler[TOTAL_AURAS]=
     &Aura::HandleNULL,                                      //233 set model id to the one of the creature with id m_modifier.m_miscvalue
     &Aura::HandleNoImmediateEffect,                         //234 SPELL_AURA_MECHANIC_DURATION_MOD_NOT_STACK implement in Unit::CalculateSpellDuration
     &Aura::HandleAuraModDispelResist,                       //235 SPELL_AURA_MOD_DISPEL_RESIST               implement in Unit::MagicSpellHitResult
-    &Aura::HandleUnused,                                    //236 unused
+    &Aura::HandleAuraControlVehicle,                        //236 SPELL_AURA_CONTROL_VEHICLE
     &Aura::HandleModSpellDamagePercentFromAttackPower,      //237 SPELL_AURA_MOD_SPELL_DAMAGE_OF_ATTACK_POWER  implemented in Unit::SpellBaseDamageBonus
     &Aura::HandleModSpellHealingPercentFromAttackPower,     //238 SPELL_AURA_MOD_SPELL_HEALING_OF_ATTACK_POWER implemented in Unit::SpellBaseHealingBonus
     &Aura::HandleAuraModScale,                              //239 SPELL_AURA_MOD_SCALE_2 only in Noggenfogger Elixir (16595) before 2.3.0 aura 61
@@ -302,16 +302,23 @@ pAuraHandler AuraHandler[TOTAL_AURAS]=
     &Aura::HandleNULL,                                      //249
     &Aura::HandleAuraModIncreaseHealth,                     //250 SPELL_AURA_MOD_INCREASE_HEALTH_2
     &Aura::HandleNULL,                                      //251 SPELL_AURA_MOD_ENEMY_DODGE
-    &Aura::HandleUnused,                                    //252 unused
-    &Aura::HandleUnused,                                    //253 unused
-    &Aura::HandleUnused,                                    //254 unused
-    &Aura::HandleUnused,                                    //255 unused
-    &Aura::HandleUnused,                                    //256 unused
-    &Aura::HandleUnused,                                    //257 unused
-    &Aura::HandleUnused,                                    //258 unused
-    &Aura::HandleUnused,                                    //259 unused
-    &Aura::HandleUnused,                                    //260 unused
-    &Aura::HandleNULL                                       //261 SPELL_AURA_261 some phased state (44856 spell)
+    &Aura::HandleNULL,                                      //252
+    &Aura::HandleNULL,                                      //253
+    &Aura::HandleNULL,                                      //254
+    &Aura::HandleNULL,                                      //255 SPELL_AURA_MOD_DAMAGE_PERCENT_MECHANIC
+    &Aura::HandleNULL,                                      //256
+    &Aura::HandleNULL,                                      //257 SPELL_AURA_MOD_TARGET_RESIST_BY_SPELL_CLASS
+    &Aura::HandleNULL,                                      //258 SPELL_AURA_MOD_SPELL_VISUAL
+    &Aura::HandleNULL,                                      //259 corrupt healing over time spell
+    &Aura::HandleNULL,                                      //260
+    &Aura::HandleNULL,                                      //261 out of phase?
+    &Aura::HandleNULL,                                      //262
+    &Aura::HandleNULL,                                      //263
+    &Aura::HandleNULL,                                      //264
+    &Aura::HandleNULL,                                      //265
+    &Aura::HandleNULL,                                      //266
+    &Aura::HandleNULL,                                      //267
+    &Aura::HandleNULL                                       //268
 };
 
 Aura::Aura(SpellEntry const* spellproto, uint32 eff, int32 *currentBasePoints, Unit *target, Unit *caster, Item* castItem) :
@@ -401,7 +408,7 @@ m_periodicTimer(0), m_PeriodicEventId(0), m_AuraDRGroup(DIMINISHING_NONE)
             modOwner->ApplySpellMod(GetId(), SPELLMOD_CHARGES, m_procCharges);
     }
     else
-        m_procCharges = -1;
+        m_procCharges = 0;
 
     m_isRemovedOnShapeLost = (m_caster_guid==m_target->GetGUID() && m_spellProto->Stances &&
                             !(m_spellProto->AttributesEx2 & 0x80000) && !(m_spellProto->Attributes & 0x10000));
@@ -809,47 +816,6 @@ void Aura::ApplyModifier(bool apply, bool Real)
     m_in_use = false;
 }
 
-void Aura::UpdateAuraDuration()
-{
-    if(m_auraSlot >= MAX_AURAS || m_isPassive)
-        return;
-
-    if( m_target->GetTypeId() == TYPEID_PLAYER)
-    {
-        WorldPacket data(SMSG_UPDATE_AURA_DURATION, 5);
-        data << (uint8)m_auraSlot << (uint32)m_duration;
-        ((Player*)m_target)->SendDirectMessage(&data);
-
-        data.Initialize(SMSG_SET_EXTRA_AURA_INFO, (8+1+4+4+4));
-        data.append(m_target->GetPackGUID());
-        data << uint8(m_auraSlot);
-        data << uint32(GetId());
-        data << uint32(GetAuraMaxDuration());
-        data << uint32(GetAuraDuration());
-        ((Player*)m_target)->SendDirectMessage(&data);
-    }
-
-    // not send in case player loading (will not work anyway until player not added to map), sent in visibility change code
-    if(m_target->GetTypeId() == TYPEID_PLAYER && ((Player*)m_target)->GetSession()->PlayerLoading())
-        return;
-
-    Unit* caster = GetCaster();
-
-    if(caster && caster->GetTypeId() == TYPEID_PLAYER && caster != m_target)
-        SendAuraDurationForCaster((Player*)caster);
-}
-
-void Aura::SendAuraDurationForCaster(Player* caster)
-{
-    WorldPacket data(SMSG_SET_EXTRA_AURA_INFO_NEED_UPDATE, (8+1+4+4+4));
-    data.append(m_target->GetPackGUID());
-    data << uint8(m_auraSlot);
-    data << uint32(GetId());
-    data << uint32(GetAuraMaxDuration());                   // full
-    data << uint32(GetAuraDuration());                      // remain
-    caster->GetSession()->SendPacket(&data);
-}
-
 void Aura::_AddAura()
 {
     if (!GetId())
@@ -913,7 +879,7 @@ void Aura::_AddAura()
             {
                 for (uint8 i = 0; i < MAX_POSITIVE_AURAS; i++)
                 {
-                    if (m_target->GetUInt32Value((uint16)(UNIT_FIELD_AURA + i)) == 0)
+                    if (m_target->GetVisibleAura(i) == 0)
                     {
                         slot = i;
                         break;
@@ -924,7 +890,7 @@ void Aura::_AddAura()
             {
                 for (uint8 i = MAX_POSITIVE_AURAS; i < MAX_AURAS; i++)
                 {
-                    if (m_target->GetUInt32Value((uint16)(UNIT_FIELD_AURA + i)) == 0)
+                    if (m_target->GetVisibleAura(i) == 0)
                     {
                         slot = i;
                         break;
@@ -939,16 +905,15 @@ void Aura::_AddAura()
             {
                 if(slot < MAX_AURAS)                        // slot found
                 {
-                    SetAura(slot, false);
-                    SetAuraFlag(slot, true);
-                    SetAuraLevel(slot,caster ? caster->getLevel() : sWorld.getConfig(CONFIG_MAX_PLAYER_LEVEL));
+                    SetAura(false);
+                    SetAuraFlags(AFLAG_EFF_INDEX_0 | AFLAG_NOT_GUID | (GetAuraMaxDuration() ? AFLAG_DURATION : AFLAG_NONE) | (IsPositive() ? AFLAG_UNK1 : AFLAG_NONE));
+                    SetAuraLevel(caster ? caster->getLevel() : sWorld.getConfig(CONFIG_MAX_PLAYER_LEVEL));
                     UpdateAuraCharges();
+                    SendAuraUpdate(false);
 
                     // update for out of range group members
                     m_target->UpdateAuraForGroup(slot);
                 }
-
-                UpdateAuraDuration();
             }
         }
         else                                                // use found slot
@@ -1005,7 +970,7 @@ void Aura::_RemoveAura()
     if(slot >= MAX_AURAS)                                   // slot not set
         return;
 
-    if(m_target->GetUInt32Value((uint16)(UNIT_FIELD_AURA + slot)) == 0)
+    if(m_target->GetVisibleAura(slot) == 0)
         return;
 
     bool samespell = false;
@@ -1034,11 +999,12 @@ void Aura::_RemoveAura()
     // only remove icon when the last aura of the spell is removed (current aura already removed from list)
     if (!samespell)
     {
-        SetAura(slot, true);
-        SetAuraFlag(slot, false);
-        SetAuraLevel(slot,caster ? caster->getLevel() : sWorld.getConfig(CONFIG_MAX_PLAYER_LEVEL));
+        SetAura(true);
+        SetAuraFlags(AFLAG_NONE);
+        SetAuraLevel(0);
+        SetAuraCharges(0);
+        SendAuraUpdate(true);
 
-        SetAuraApplication(slot, 0);
         // update for out of range group members
         m_target->UpdateAuraForGroup(slot);
 
@@ -1075,44 +1041,40 @@ void Aura::_RemoveAura()
                 ((Player*)caster)->SendCooldownEvent(GetSpellProto());
         }
     }
-    else if(sameaura)                                       // decrease count for spell, only for same aura effect, or this spell auras in remove proccess.
+    else if(sameaura)                                       // decrease count for spell, only for same aura effect, or this spell auras in remove process.
         UpdateSlotCounterAndDuration(false);
 }
 
-void Aura::SetAuraFlag(uint32 slot, bool add)
+void Aura::SendAuraUpdate(bool remove)
 {
-    uint32 index    = slot / 4;
-    uint32 byte     = (slot % 4) * 8;
-    uint32 val      = m_target->GetUInt32Value(UNIT_FIELD_AURAFLAGS + index);
-    val &= ~((uint32)AFLAG_MASK << byte);
-    if(add)
+    WorldPacket data(SMSG_AURA_UPDATE);
+    data.append(m_target->GetPackGUID());
+    data << uint8(GetAuraSlot());
+    data << uint32(remove ? 0 : GetId());
+
+    if(remove)
     {
-        if (IsPositive())
-            val |= ((uint32)AFLAG_POSITIVE << byte);
-        else
-            val |= ((uint32)AFLAG_NEGATIVE << byte);
+        m_target->SendMessageToSet(&data, true);
+        return;
     }
-    m_target->SetUInt32Value(UNIT_FIELD_AURAFLAGS + index, val);
-}
 
-void Aura::SetAuraLevel(uint32 slot,uint32 level)
-{
-    uint32 index    = slot / 4;
-    uint32 byte     = (slot % 4) * 8;
-    uint32 val      = m_target->GetUInt32Value(UNIT_FIELD_AURALEVELS + index);
-    val &= ~(0xFF << byte);
-    val |= (level << byte);
-    m_target->SetUInt32Value(UNIT_FIELD_AURALEVELS + index, val);
-}
+    uint8 auraFlags = GetAuraFlags();
+    data << uint8(auraFlags);
+    data << uint8(GetAuraLevel());
+    data << uint8(GetAuraCharges());
 
-void Aura::SetAuraApplication(uint32 slot, int8 count)
-{
-    uint32 index    = slot / 4;
-    uint32 byte     = (slot % 4) * 8;
-    uint32 val      = m_target->GetUInt32Value(UNIT_FIELD_AURAAPPLICATIONS + index);
-    val &= ~(0xFF << byte);
-    val |= ((uint8(count)) << byte);
-    m_target->SetUInt32Value(UNIT_FIELD_AURAAPPLICATIONS + index, val);
+    /*if(!(auraFlags & AFLAG_NOT_GUID))
+    {
+        data << uint8(0);                                   // pguid
+    }*/
+
+    if(auraFlags & AFLAG_DURATION)
+    {
+        data << uint32(GetAuraMaxDuration());
+        data << uint32(GetAuraDuration());
+    }
+
+    m_target->SendMessageToSet(&data, true);
 }
 
 void Aura::UpdateSlotCounterAndDuration(bool add)
@@ -1143,9 +1105,8 @@ void Aura::UpdateSlotCounterAndDuration(bool add)
     if(!add)
         --count;
 
-    SetAuraApplication(slot, count);
-
-    UpdateAuraDuration();
+    SetAuraCharges(count);
+    SendAuraUpdate(false);
 }
 
 /*********************************************************/
@@ -2933,6 +2894,7 @@ void Aura::HandleModPossess(bool apply, bool Real)
         {
             WorldPacket data(SMSG_PET_SPELLS, 8);
             data << uint64(0);
+            data << uint32(0);
             ((Player*)caster)->GetSession()->SendPacket(&data);
         }
         if(m_target->GetTypeId() == TYPEID_UNIT)
@@ -3065,6 +3027,7 @@ void Aura::HandleModCharm(bool apply, bool Real)
             {
                 WorldPacket data(SMSG_PET_SPELLS, 8);
                 data << uint64(0);
+                data << uint32(0);
                 ((Player*)caster)->GetSession()->SendPacket(&data);
             }
             if(m_target->GetTypeId() == TYPEID_UNIT)
@@ -5634,6 +5597,7 @@ void Aura::PeriodicTick()
             data << (uint32)GetSpellSchoolMask(GetSpellProto()); // will be mask in 2.4.x
             data << (uint32)absorb;
             data << (uint32)resist;
+            data << uint32(0);                              // wotlk
             m_target->SendMessageToSet(&data,true);
 
             Unit* target = m_target;                        // aura can be deleted in DealDamage
@@ -5811,6 +5775,7 @@ void Aura::PeriodicTick()
             data << uint32(1);
             data << uint32(m_modifier.m_auraname);
             data << (uint32)pdamage;
+            data << uint32(0);                              // wotlk
             m_target->SendMessageToSet(&data,true);
 
             int32 gain = m_target->ModifyHealth(pdamage);
@@ -6339,4 +6304,19 @@ void Aura::HandleArenaPreparation(bool apply, bool Real)
         m_target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREPARATION);
     else
         m_target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREPARATION);
+}
+
+void Aura::HandleAuraControlVehicle(bool apply, bool Real)
+{
+    if(!Real)
+        return;
+
+    if(m_target->GetTypeId() != TYPEID_PLAYER)
+        return;
+
+    if(Pet *pet = m_target->GetPet())
+        pet->Remove(PET_SAVE_AS_CURRENT);
+
+    WorldPacket data(SMSG_UNKNOWN_1181, 0);
+    ((Player*)m_target)->GetSession()->SendPacket(&data);
 }

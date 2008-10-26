@@ -1549,12 +1549,12 @@ void SpellMgr::LoadSpellChains()
                     continue;
                 }
 
-                if(node.req!=talentEntry->DependsOnSpell)
+                /*if(node.req!=talentEntry->DependsOnSpell)
                 {
                     sLog.outErrorDb("Talent %u (prev: %u, first: %u, rank: %d, req: %u) listed in `spell_chain` has wrong required spell.",
                         spell_id,node.prev,node.first,node.rank,node.req);
                     continue;
-                }
+                }*/
             }
         }
 
@@ -2046,7 +2046,7 @@ bool SpellMgr::IsSpellValid(SpellEntry const* spellInfo, Player* pl, bool msg)
 bool IsSpellAllowedInLocation(SpellEntry const *spellInfo,uint32 map_id,uint32 zone_id,uint32 area_id)
 {
     // normal case
-    if( spellInfo->AreaId && spellInfo->AreaId != zone_id && spellInfo->AreaId != area_id )
+    if( spellInfo->AreaId > 0 && spellInfo->AreaId != zone_id && spellInfo->AreaId != area_id )
         return false;
 
     // elixirs (all area dependent elixirs have family SPELLFAMILY_POTION, use this for speedup)

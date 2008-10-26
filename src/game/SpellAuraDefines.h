@@ -18,11 +18,20 @@
 #ifndef MANGOS_SPELLAURADEFINES_H
 #define MANGOS_SPELLAURADEFINES_H
 
-#define MAX_AURAS 56
+#define MAX_AURAS 56                                        // probably changes to 64 in WotLK
 #define MAX_POSITIVE_AURAS 40
 
 enum AURA_FLAGS
 {
+    AFLAG_NONE              = 0x00,
+    AFLAG_EFF_INDEX_0       = 0x01,
+    AFLAG_EFF_INDEX_1       = 0x02,
+    AFLAG_EFF_INDEX_2       = 0x04,
+    AFLAG_NOT_GUID          = 0x08,
+    AFLAG_UNK1              = 0x10,                         // positive?
+    AFLAG_DURATION          = 0x20,
+    AFLAG_UNK2              = 0x40,
+    AFLAG_UNK3              = 0x80,
     AFLAG_NEGATIVE          = 0x09,
     AFLAG_POSITIVE          = 0x1F,
     AFLAG_MASK              = 0xFF
@@ -273,7 +282,7 @@ enum AuraType
     SPELL_AURA_233 = 233,
     SPELL_AURA_MECHANIC_DURATION_MOD_NOT_STACK = 234,
     SPELL_AURA_MOD_DISPEL_RESIST = 235,
-    SPELL_AURA_236 = 236,
+    SPELL_AURA_CONTROL_VEHICLE = 236,
     SPELL_AURA_MOD_SPELL_DAMAGE_OF_ATTACK_POWER = 237,
     SPELL_AURA_MOD_SPELL_HEALING_OF_ATTACK_POWER = 238,
     SPELL_AURA_MOD_SCALE_2 = 239,
@@ -299,7 +308,14 @@ enum AuraType
     SPELL_AURA_259 = 259,
     SPELL_AURA_260 = 260,
     SPELL_AURA_261 = 261,
-    TOTAL_AURAS=262
+    SPELL_AURA_262 = 262,
+    SPELL_AURA_263 = 263,
+    SPELL_AURA_264 = 264,
+    SPELL_AURA_265 = 265,
+    SPELL_AURA_266 = 266,
+    SPELL_AURA_267 = 267,
+    SPELL_AURA_268 = 268,
+    TOTAL_AURAS = 269
 };
 
 enum AreaAuraType

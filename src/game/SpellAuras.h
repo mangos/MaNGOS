@@ -198,6 +198,7 @@ class MANGOS_DLL_SPEC Aura
         void HandleModSpellDamagePercentFromStat(bool apply, bool Real);
         void HandleModSpellHealingPercentFromStat(bool apply, bool Real);
         void HandleAuraModDispelResist(bool apply, bool Real);
+        void HandleAuraControlVehicle(bool apply, bool Real);
         void HandleModSpellDamagePercentFromAttackPower(bool apply, bool Real);
         void HandleModSpellHealingPercentFromAttackPower(bool apply, bool Real);
         void HandleAuraModPacifyAndSilence(bool Apply, bool Real);
@@ -229,8 +230,6 @@ class MANGOS_DLL_SPEC Aura
         int32 GetAuraDuration() const { return m_duration; }
         void SetAuraDuration(int32 duration) { m_duration = duration; }
         time_t GetAuraApplyTime() { return m_applyTime; }
-        void UpdateAuraDuration();
-        void SendAuraDurationForCaster(Player* caster);
 
         uint64 const& GetCasterGUID() const { return m_caster_guid; }
         Unit* GetCaster() const;
@@ -247,13 +246,19 @@ class MANGOS_DLL_SPEC Aura
 
         uint8 GetAuraSlot() const { return m_auraSlot; }
         void SetAuraSlot(uint8 slot) { m_auraSlot = slot; }
+        uint8 GetAuraFlags() const { return m_auraFlags; }
+        void SetAuraFlags(uint8 flags) { m_auraFlags = flags; }
+        uint8 GetAuraLevel() const { return m_auraLevel; }
+        void SetAuraLevel(uint8 level) { m_auraLevel = level; }
+        uint8 GetAuraCharges() const { return m_procCharges; }
+        void SetAuraCharges(uint8 charges) { m_procCharges = charges; }
+        void SetAura(bool remove) { m_target->SetVisibleAura(m_auraSlot, remove ? 0 : GetId()); }
+        void SendAuraUpdate(bool remove);
         void UpdateAuraCharges()
         {
-            uint8 slot = GetAuraSlot();
-
             // only aura in slot with charges and without stack limitation
-            if (slot < MAX_AURAS && m_procCharges >= 1 && GetSpellProto()->StackAmount==0)
-                SetAuraApplication(slot, m_procCharges - 1);
+            if (m_auraSlot < MAX_AURAS && m_procCharges >= 1 && GetSpellProto()->StackAmount==0)
+                SetAuraCharges(m_procCharges - 1);
         }
 
         bool IsPositive() { return m_positive; }
@@ -314,6 +319,8 @@ class MANGOS_DLL_SPEC Aura
         AuraRemoveMode m_removeMode;
 
         uint8 m_auraSlot;
+        uint8 m_auraFlags;
+        uint8 m_auraLevel;
 
         bool m_positive:1;
         bool m_permanent:1;
@@ -333,10 +340,6 @@ class MANGOS_DLL_SPEC Aura
     private:
         void UpdateSlotCounterAndDuration(bool add);
         void CleanupTriggeredSpells();
-        void SetAura(uint32 slot, bool remove) { m_target->SetUInt32Value(UNIT_FIELD_AURA + slot, remove ? 0 : GetId()); }
-        void SetAuraFlag(uint32 slot, bool add);
-        void SetAuraLevel(uint32 slot, uint32 level);
-        void SetAuraApplication(uint32 slot, int8 count);
 };
 
 class MANGOS_DLL_SPEC AreaAura : public Aura

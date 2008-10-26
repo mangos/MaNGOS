@@ -56,7 +56,8 @@ enum SpellCastTargetFlags
     TARGET_FLAG_STRING          = 0x00002000,               // string
     TARGET_FLAG_UNK1            = 0x00004000,               // ?
     TARGET_FLAG_CORPSE          = 0x00008000,               // pguid
-    TARGET_FLAG_UNK2            = 0x00010000                // pguid
+    TARGET_FLAG_UNK2            = 0x00010000,               // pguid
+    TARGET_FLAG_GLYPH           = 0x00020000
 };
 
 enum SpellCastFlags
@@ -252,6 +253,7 @@ class Spell
         void EffectStuck(uint32 i);
         void EffectSummonPlayer(uint32 i);
         void EffectActivateObject(uint32 i);
+        void EffectApplyGlyph(uint32 i);
         void EffectSummonTotem(uint32 i);
         void EffectEnchantHeldItem(uint32 i);
         void EffectSummonObject(uint32 i);
@@ -362,6 +364,7 @@ class Spell
         int32 m_currentBasePoints[3];                       // cache SpellEntry::EffectBasePoints and use for set custom base points
         Item* m_CastItem;
         uint8 m_cast_count;
+        uint32 m_glyphIndex;
         SpellCastTargets m_targets;
 
         int32 GetCastTime() const { return m_casttime; }
