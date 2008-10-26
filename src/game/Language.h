@@ -317,7 +317,9 @@ enum MangosStrings
     LANG_GM_OFF                         = 333,
     LANG_GM_CHAT_ON                     = 334,
     LANG_GM_CHAT_OFF                    = 335,
-    // Room for more level 2              336-399 not used
+    LANG_YOU_REPAIR_ITEMS               = 336,
+    LANG_YOUR_ITEMS_REPAIRED            = 337,
+    // Room for more level 2              338-399 not used
 
     // level 3 chat
     LANG_SCRIPTS_RELOADED               = 400,
