@@ -140,7 +140,10 @@ enum BattleGroundTypeId
     BATTLEGROUND_BE     = 5,
     BATTLEGROUND_AA     = 6,
     BATTLEGROUND_EY     = 7,
-    BATTLEGROUND_RL     = 8
+    BATTLEGROUND_RL     = 8,
+    BATTLEGROUND_SA     = 9,
+    BATTLEGROUND_DS     = 10,
+    BATTLEGROUND_RV     = 11
 };
 
 enum ScoreType
