@@ -246,7 +246,7 @@ const int32 Player::ReputationRank_Length[MAX_REPUTATION_RANK] = {36000, 3000, 3
 
 UpdateMask Player::updateVisualBits;
 
-Player::Player (WorldSession *session): Unit()
+Player::Player (WorldSession *session): Unit(), m_achievementMgr(this)
 {
     m_transport = 0;
 
@@ -421,7 +421,6 @@ Player::Player (WorldSession *session): Unit()
     m_contestedPvPTimer = 0;
 
     m_declinedname = NULL;
-    m_achievementMgr = NULL;
 }
 
 Player::~Player ()
@@ -468,7 +467,6 @@ Player::~Player ()
             itr->second.save->RemovePlayer(this);
 
     delete m_declinedname;
-    delete m_achievementMgr;
 }
 
 void Player::CleanupsBeforeDelete()
@@ -2146,6 +2144,7 @@ void Player::GiveLevel(uint32 level)
     Pet* pet = GetPet();
     if(pet && pet->getPetType()==SUMMON_PET)
         pet->GivePetLevel(level);
+    GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_LEVEL, level);
 }
 
 void Player::InitTalentForLevel()
@@ -13974,8 +13973,7 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
 
     m_social = sSocialMgr.LoadFromDB(holder->GetResult(PLAYER_LOGIN_QUERY_LOADSOCIALLIST), GetGUIDLow());
 
-    m_achievementMgr = new AchievementMgr(this);
-    m_achievementMgr->LoadFromDB();
+    m_achievementMgr.LoadFromDB();
 
     if(!_LoadHomeBind(holder->GetResult(PLAYER_LOGIN_QUERY_LOADHOMEBIND)))
         return false;
@@ -15196,7 +15194,7 @@ void Player::SaveToDB()
     // save pet (hunter pet level and experience and all type pets health/mana).
     if(Pet* pet = GetPet())
         pet->SavePetToDB(PET_SAVE_AS_CURRENT);
-    m_achievementMgr->SaveToDB();
+    m_achievementMgr.SaveToDB();
 }
 
 // fast save function for item/money cheating preventing - save only inventory and money state

@@ -744,6 +744,7 @@ class ObjectMgr
         bool RemoveVendorItem(uint32 entry,uint32 item);
         bool IsVendorItemValid( uint32 vendor_entry, uint32 item, uint32 maxcount, uint32 ptime, uint32 ExtendedCost, Player* pl = NULL, std::set<uint32>* skip_vendors = NULL ) const;
         void LoadAchievementCriteriaList();
+        AchievementCriteriaEntryList const& GetAchievementCriteriaByType(AchievementCriteriaTypes type);
 
     protected:
         uint32 m_auctionid;
@@ -810,7 +811,6 @@ class ObjectMgr
 
         int DBCLocaleIndex;
 
-        AchievementCriteriaEntryList const& GetAchievementCriteriaByType(AchievementCriteriaTypes type);
     private:
         void LoadScripts(ScriptMapMap& scripts, char const* tablename);
         void ConvertCreatureAddonAuras(CreatureDataAddon* addon, char const* table, char const* guidEntryStr);

@@ -18,7 +18,14 @@
 #ifndef __MANGOS_ACHIEVEMENTMGR_H
 #define __MANGOS_ACHIEVEMENTMGR_H
 
-#include "Player.h"
+#include "Common.h"
+#include "Database/DBCEnums.h"
+#include "Database/DBCStores.h"
+
+typedef HM_NAMESPACE::hash_map<uint32, uint32> CriteriaProgressMap;
+typedef std::set<uint32> CompletedAchievementSet;
+
+class Player;
 
 class AchievementMgr
 {
@@ -27,13 +34,22 @@ class AchievementMgr
 
         void LoadFromDB();
         void SaveToDB();
-        void SendAchievementEarned(uint32 achievementId);
-        void SendCriteriaUpdate(uint32 criteriaId, uint32 counter);
+        void UpdateAchievementCriteria(AchievementCriteriaTypes type, uint32 miscvalue1=0, uint32 miscvalue2=0, uint32 time=0);
 
         Player* GetPlayer() { return m_player;}
 
     private:
+        void SendAchievementEarned(uint32 achievementId);
+        void SendCriteriaUpdate(uint32 criteriaId, uint32 counter);
+        void SetCriteriaProgress(AchievementCriteriaEntry const* entry, uint32 newValue);
+        void CompletedCriteria(AchievementCriteriaEntry const* entry);
+        void CompletedAchievement(AchievementEntry const* entry);
+        bool IsCompletedCriteria(AchievementCriteriaEntry const* entry);
+
         Player* m_player;
+        CriteriaProgressMap m_criteriaProgress;
+        CompletedAchievementSet m_completedAchievements;
+
 };
 
 
