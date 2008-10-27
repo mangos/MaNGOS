@@ -139,6 +139,7 @@ typedef HM_NAMESPACE::hash_map<uint32,QuestLocale> QuestLocaleMap;
 typedef HM_NAMESPACE::hash_map<uint32,NpcTextLocale> NpcTextLocaleMap;
 typedef HM_NAMESPACE::hash_map<uint32,PageTextLocale> PageTextLocaleMap;
 typedef HM_NAMESPACE::hash_map<uint32,MangosStringLocale> MangosStringLocaleMap;
+typedef HM_NAMESPACE::hash_map<uint32,NpcOptionLocale> NpcOptionLocaleMap;
 
 typedef std::multimap<uint32,uint32> QuestRelations;
 
@@ -515,6 +516,7 @@ class ObjectMgr
         void LoadQuestLocales();
         void LoadNpcTextLocales();
         void LoadPageTextLocales();
+        void LoadNpcOptionLocales();
         void LoadInstanceTemplate();
 
         void LoadGossipText();
@@ -637,6 +639,12 @@ class ObjectMgr
         {
             PageTextLocaleMap::const_iterator itr = mPageTextLocaleMap.find(entry);
             if(itr==mPageTextLocaleMap.end()) return NULL;
+            return &itr->second;
+        }
+        NpcOptionLocale const* GetNpcOptionLocale(uint32 entry) const
+        {
+            NpcOptionLocaleMap::const_iterator itr = mNpcOptionLocaleMap.find(entry);
+            if(itr==mNpcOptionLocaleMap.end()) return NULL;
             return &itr->second;
         }
 
@@ -844,6 +852,7 @@ class ObjectMgr
         NpcTextLocaleMap mNpcTextLocaleMap;
         PageTextLocaleMap mPageTextLocaleMap;
         MangosStringLocaleMap mMangosStringLocaleMap;
+        NpcOptionLocaleMap mNpcOptionLocaleMap;
         RespawnTimes mCreatureRespawnTimes;
         RespawnTimes mGORespawnTimes;
 

@@ -738,14 +738,30 @@ void Creature::prepareGossipMenu( Player *pPlayer,uint32 gossipid )
                     case GOSSIP_OPTION_AUCTIONEER:
                         break;                              // no checks
                     default:
-                        sLog.outErrorDb("Creature %u (entry: %u) have unknown gossip option %u",GetGUIDLow(),GetEntry(),gso->Action);
+                        sLog.outErrorDb("Creature %u (entry: %u) have unknown gossip option %u",GetDBTableGUIDLow(),GetEntry(),gso->Action);
                         break;
                 }
             }
 
             //note for future dev: should have database fields for BoxMessage & BoxMoney
             if(!gso->OptionText.empty() && cantalking)
-                pm->GetGossipMenu().AddMenuItem((uint8)gso->Icon,gso->OptionText, gossipid,gso->Action,"",0,false);
+            {
+                std::string OptionText = gso->OptionText;
+                std::string BoxText = gso->BoxText;
+                int loc_idx = pPlayer->GetSession()->GetSessionDbLocaleIndex();
+                if (loc_idx >= 0)
+                {
+                    NpcOptionLocale const *no = objmgr.GetNpcOptionLocale(gso->Id);
+                    if (no)
+                    {
+                        if (no->OptionText.size() > loc_idx && !no->OptionText[loc_idx].empty())
+                            OptionText=no->OptionText[loc_idx];
+                        if (no->BoxText.size() > loc_idx && !no->BoxText[loc_idx].empty())
+                            BoxText=no->BoxText[loc_idx];
+                    }
+                }
+                pm->GetGossipMenu().AddMenuItem((uint8)gso->Icon,OptionText, gossipid,gso->Action,BoxText,gso->BoxMoney,gso->Coded);
+            }
         }
     }
 
