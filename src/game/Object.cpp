@@ -955,6 +955,56 @@ void Object::RemoveFlag( uint16 index, uint32 oldFlag )
     }
 }
 
+void Object::SetByteFlag( uint16 index, uint8 offset, uint8 newFlag )
+{
+    ASSERT( index < m_valuesCount || PrintIndexError( index , true ) );
+
+    if(offset > 4)
+    {
+        sLog.outError("Object::SetByteFlag: wrong offset %u", offset);
+        return;
+    }
+
+    if(!(uint8(m_uint32Values[ index ] >> (offset * 8)) & newFlag))
+    {
+        m_uint32Values[ index ] |= uint32(uint32(newFlag) << (offset * 8));
+
+        if(m_inWorld)
+        {
+            if(!m_objectUpdated)
+            {
+                ObjectAccessor::Instance().AddUpdateObject(this);
+                m_objectUpdated = true;
+            }
+        }
+    }
+}
+
+void Object::RemoveByteFlag( uint16 index, uint8 offset, uint8 oldFlag )
+{
+    ASSERT( index < m_valuesCount || PrintIndexError( index , true ) );
+
+    if(offset > 4)
+    {
+        sLog.outError("Object::RemoveByteFlag: wrong offset %u", offset);
+        return;
+    }
+
+    if(uint8(m_uint32Values[ index ] >> (offset * 8)) & oldFlag)
+    {
+        m_uint32Values[ index ] &= ~uint32(uint32(oldFlag) << (offset * 8));
+
+        if(m_inWorld)
+        {
+            if(!m_objectUpdated)
+            {
+                ObjectAccessor::Instance().AddUpdateObject(this);
+                m_objectUpdated = true;
+            }
+        }
+    }
+}
+
 bool Object::PrintIndexError(uint32 index, bool set) const
 {
     sLog.outError("ERROR: Attempt %s non-existed value field: %u (count: %u) for object typeid: %u type mask: %u",(set ? "set value to" : "get value from"),index,m_valuesCount,GetTypeId(),m_objectType);

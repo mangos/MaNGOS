@@ -227,6 +227,24 @@ class MANGOS_DLL_SPEC Object
             return (m_uint32Values[ index ] & flag) != 0;
         }
 
+        void SetByteFlag( uint16 index, uint8 offset, uint8 newFlag );
+        void RemoveByteFlag( uint16 index, uint8 offset, uint8 newFlag );
+
+        void ToggleFlag( uint16 index, uint8 offset, uint8 flag )
+        {
+            if(HasByteFlag(index, offset, flag))
+                RemoveByteFlag(index, offset, flag);
+            else
+                SetByteFlag(index, offset, flag);
+        }
+
+        bool HasByteFlag( uint16 index, uint8 offset, uint8 flag ) const
+        {
+            ASSERT( index < m_valuesCount || PrintIndexError( index , false ) );
+            ASSERT( offset < 4 );
+            return (((uint8*)m_uint32Values[index])[offset] & flag) != 0;
+        }
+
         void ApplyModFlag( uint16 index, uint32 flag, bool apply)
         {
             if(apply) SetFlag(index,flag); else RemoveFlag(index,flag);

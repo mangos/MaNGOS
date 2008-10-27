@@ -163,14 +163,14 @@ enum SheathState
 // byte (1 from 0..3) of UNIT_FIELD_BYTES_2
 enum UnitBytes2_Flags
 {
-    UNIT_BYTE2_FLAG_UNK0  = 0x01,
-    UNIT_BYTE2_FLAG_UNK1  = 0x02,
-    UNIT_BYTE2_FLAG_UNK2  = 0x04,
-    UNIT_BYTE2_FLAG_UNK3  = 0x08,
-    UNIT_BYTE2_FLAG_AURAS = 0x10,                           // show possitive auras as positive, and allow its dispel
-    UNIT_BYTE2_FLAG_UNK5  = 0x20,
-    UNIT_BYTE2_FLAG_UNK6  = 0x40,
-    UNIT_BYTE2_FLAG_UNK7  = 0x80
+    UNIT_BYTE2_FLAG_PVP     = 0x01,
+    UNIT_BYTE2_FLAG_UNK1    = 0x02,
+    UNIT_BYTE2_FLAG_FFA_PVP = 0x04,
+    UNIT_BYTE2_FLAG_UNK3    = 0x08,
+    UNIT_BYTE2_FLAG_AURAS   = 0x10,                         // show possitive auras as positive, and allow its dispel
+    UNIT_BYTE2_FLAG_UNK5    = 0x20,
+    UNIT_BYTE2_FLAG_UNK6    = 0x40,
+    UNIT_BYTE2_FLAG_UNK7    = 0x80
 };
 
 // byte (2 from 0..3) of UNIT_FIELD_BYTES_2
@@ -451,19 +451,19 @@ enum UnitFlags
     UNIT_FLAG_UNKNOWN9         = 0x00000040,
     UNIT_FLAG_NOT_ATTACKABLE_1 = 0x00000080,                // ?? (UNIT_FLAG_PVP_ATTACKABLE | UNIT_FLAG_NOT_ATTACKABLE_1) is NON_PVP_ATTACKABLE
     UNIT_FLAG_UNKNOWN2         = 0x00000100,                // 2.0.8
-    UNIT_FLAG_UNKNOWN11        = 0x00000200,
+    UNIT_FLAG_UNKNOWN11        = 0x00000200,                // 3.0.3 - makes you unable to attack everything
     UNIT_FLAG_LOOTING          = 0x00000400,                // loot animation
     UNIT_FLAG_PET_IN_COMBAT    = 0x00000800,                // in combat?, 2.0.8
-    UNIT_FLAG_PVP              = 0x00001000,
+    UNIT_FLAG_PVP              = 0x00001000,                // changed in 3.0.3
     UNIT_FLAG_SILENCED         = 0x00002000,                // silenced, 2.1.1
     UNIT_FLAG_UNKNOWN4         = 0x00004000,                // 2.0.8
     UNIT_FLAG_UNKNOWN13        = 0x00008000,
     UNIT_FLAG_UNKNOWN14        = 0x00010000,
-    UNIT_FLAG_PACIFIED         = 0x00020000,
-    UNIT_FLAG_DISABLE_ROTATE   = 0x00040000,                // stunned, 2.1.1
+    UNIT_FLAG_PACIFIED         = 0x00020000,                // 3.0.3 ok
+    UNIT_FLAG_STUNNED          = 0x00040000,                // 3.0.3 ok
     UNIT_FLAG_IN_COMBAT        = 0x00080000,
     UNIT_FLAG_TAXI_FLIGHT      = 0x00100000,                // disable casting at client side spell not allowed by taxi flight (mounted?), probably used with 0x4 flag
-    UNIT_FLAG_DISARMED         = 0x00200000,                // disable melee spells casting..., "Required melee weapon" added to melee spells tooltip.
+    UNIT_FLAG_DISARMED         = 0x00200000,                // 3.0.3, disable melee spells casting..., "Required melee weapon" added to melee spells tooltip.
     UNIT_FLAG_CONFUSED         = 0x00400000,
     UNIT_FLAG_FLEEING          = 0x00800000,
     UNIT_FLAG_UNKNOWN5         = 0x01000000,                // used in spell Eyes of the Beast for pet...
@@ -814,8 +814,14 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
             return false;
         }
-        bool IsPvP() const { return HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP); }
-        void SetPvP(bool state) { if(state) SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP); else RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP); }
+        bool IsPvP() const { return HasByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_PVP); }
+        void SetPvP(bool state)
+        {
+            if(state)
+                SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_PVP);
+            else
+                RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_PVP);
+        }
         uint32 GetCreatureType() const;
         uint32 GetCreatureTypeMask() const
         {

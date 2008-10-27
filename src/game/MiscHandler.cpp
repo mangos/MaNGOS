@@ -545,10 +545,12 @@ void WorldSession::HandleTogglePvP( WorldPacket & recv_data )
         bool newPvPStatus;
         recv_data >> newPvPStatus;
         GetPlayer()->ApplyModFlag(PLAYER_FLAGS, PLAYER_FLAGS_IN_PVP, newPvPStatus);
+        GetPlayer()->ApplyModFlag(PLAYER_FLAGS, PLAYER_FLAGS_PVP, newPvPStatus);
     }
     else
     {
         GetPlayer()->ToggleFlag(PLAYER_FLAGS, PLAYER_FLAGS_IN_PVP);
+        GetPlayer()->ToggleFlag(PLAYER_FLAGS, PLAYER_FLAGS_PVP);
     }
 
     if(GetPlayer()->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_IN_PVP))
@@ -1071,8 +1073,8 @@ void WorldSession::HandleUpdateAccountData(WorldPacket &recv_data)
     sLog.outDetail("WORLD: Received CMSG_UPDATE_ACCOUNT_DATA");
     recv_data.hexlike();
 
-    uint32 id1, id2, decompressedSize;
-    recv_data >> id1 >> id2 >> decompressedSize;
+    uint32 id1, timestamp, decompressedSize;
+    recv_data >> id1 >> timestamp >> decompressedSize;
 
     if(decompressedSize == 0)
         return;
@@ -1089,12 +1091,29 @@ void WorldSession::HandleUpdateAccountData(WorldPacket &recv_data)
     {
         sLog.outError("UAD: Failed to decompress packet");
     }
+
+    WorldPacket data(SMSG_UPDATE_ACCOUNT_DATA_COMPLETE, 4+4);
+    data << uint32(id1);
+    data << uint32(0);
+    SendPacket(&data);
 }
 
 void WorldSession::HandleRequestAccountData(WorldPacket& recv_data)
 {
     sLog.outDetail("WORLD: Received CMSG_REQUEST_ACCOUNT_DATA");
     recv_data.hexlike();
+
+    CHECK_PACKET_SIZE(recv_data, 4);
+
+    uint32 id;
+    recv_data >> id;
+
+    WorldPacket data (SMSG_UPDATE_ACCOUNT_DATA, 8+4+4+4);
+    data << uint64(_player->GetGUID());
+    data << uint32(id);
+    data << uint32(time(NULL));
+    data << uint32(0);                                      // decompressed length
+    // data << account_data(data_len);
 }
 
 void WorldSession::HandleSetActionButtonOpcode(WorldPacket& recv_data)

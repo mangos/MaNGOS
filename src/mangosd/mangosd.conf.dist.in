@@ -517,7 +517,7 @@ LogColors = ""
 
 GameType = 1
 RealmZone = 1
-Expansion = 1
+Expansion = 2
 DBC.Locale = 255
 DeclinedNames = 0
 StrictPlayerNames = 0
