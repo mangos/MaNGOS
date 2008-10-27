@@ -552,7 +552,7 @@ void WorldSession::HandleStablePet( WorldPacket & recv_data )
 {
     CHECK_PACKET_SIZE(recv_data, 8);
 
-    sLog.outDebug("WORLD: Recv CMSG_STABLE_PET not dispose.");
+    sLog.outDebug("WORLD: Recv CMSG_STABLE_PET");
     uint64 npcGUID;
 
     recv_data >> npcGUID;

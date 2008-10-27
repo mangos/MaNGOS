@@ -44,6 +44,16 @@ class CharacterHandler;
 
 #define CHECK_PACKET_SIZE(P,S) if((P).size() < (S)) return SizeError((P),(S));
 
+#define NUM_ACCOUNT_DATA_TYPES 8
+
+struct AccountData
+{
+    AccountData() : Time(NULL), Data("") {}
+
+    time_t Time;
+    std::string Data;
+};
+
 enum PartyOperation
 {
     PARTY_OP_INVITE = 0,
@@ -146,6 +156,20 @@ class MANGOS_DLL_SPEC WorldSession
 
         //pet
         void SendPetNameQuery(uint64 guid, uint32 petnumber);
+
+        // Account Data
+        AccountData *GetAccountData(uint32 type)
+        {
+            return &m_accountData[type];
+        }
+        void SetAccountData(uint32 type, time_t time_, std::string data)
+        {
+            m_accountData[type].Time = time_;
+            m_accountData[type].Data = data;
+        }
+
+        void LoadAccountData();
+        void SaveAccountData(uint32 type);
 
         //mail
                                                             //used with item_page table
@@ -661,6 +685,7 @@ class MANGOS_DLL_SPEC WorldSession
         LocaleConstant m_sessionDbcLocale;
         int m_sessionDbLocaleIndex;
         uint32 m_latency;
+        AccountData m_accountData[NUM_ACCOUNT_DATA_TYPES];
 
         ZThread::LockedQueue<WorldPacket*,ZThread::FastMutex> _recvQueue;
 };

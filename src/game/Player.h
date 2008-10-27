@@ -221,12 +221,6 @@ struct Areas
     float y2;
 };
 
-struct AccountData
-{
-    time_t Time;
-    std::string Data;
-};
-
 enum FactionFlags
 {
     FACTION_FLAG_VISIBLE            = 0x01,                 // makes visible in client (set or can be set at interaction with target of this faction)
@@ -841,10 +835,9 @@ enum PlayerLoginQueryIndex
     PLAYER_LOGIN_QUERY_LOADSPELLCOOLDOWNS       = 15,
     PLAYER_LOGIN_QUERY_LOADDECLINEDNAMES        = 16,
     PLAYER_LOGIN_QUERY_LOADGUILD                = 17,
-    PLAYER_LOGIN_QUERY_LOADACCOUNTDATA          = 18,
 };
 
-#define MAX_PLAYER_LOGIN_QUERY                    19
+#define MAX_PLAYER_LOGIN_QUERY                    18
 
 // Player summoning auto-decline time (in secs)
 #define MAX_PLAYER_SUMMON_DELAY                   (2*MINUTE)
@@ -1351,18 +1344,6 @@ class MANGOS_DLL_SPEC Player : public Unit
                 m_TutorialsChanged = true;
             }
         }
-
-        AccountData *GetAccountData(uint32 type)
-        {
-            return &m_accountData[type];
-        }
-        void SetAccountData(uint32 type, time_t time_, std::string data)
-        {
-            m_accountData[type].Time = time_;
-            m_accountData[type].Data = data;
-        }
-        void LoadAccountData(QueryResult *result);
-        void SaveAccountData(uint32 type);
 
         QuestStatusMap& getQuestStatusMap() { return mQuestStatus; };
 
@@ -2235,8 +2216,6 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         uint32 m_Tutorials[8];
         bool   m_TutorialsChanged;
-
-        AccountData m_accountData[NUM_ACCOUNT_DATA_TYPES];
 
         bool   m_DailyQuestChanged;
         time_t m_lastDailyQuestTime;

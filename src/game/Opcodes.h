@@ -1210,13 +1210,13 @@ enum Opcodes
     UMSG_UNKNOWN_1179                               = 0x49B,    // not found in client
     CMSG_UNKNOWN_1180                               = 0x49C,    // lua: HearthAndResurrectFromArea
     SMSG_UNKNOWN_1181                               = 0x49D,    // empty
-    SMSG_UNKNOWN_1182                               = 0x49E,    // uint32
-    SMSG_UNKNOWN_1183                               = 0x49F,    // uint32
+    SMSG_UNKNOWN_1182                               = 0x49E,    // uint32 EVENT_CRITERIA_UPDATE
+    SMSG_UNKNOWN_1183                               = 0x49F,    // uint32 EVENT_ACHIEVEMENT_EARNED
     UMSG_UNKNOWN_1184                               = 0x4A0,    // not found in client
-    UMSG_UNKNOWN_1185                               = 0x4A1,
-    UMSG_UNKNOWN_1186                               = 0x4A2,
-    UMSG_UNKNOWN_1187                               = 0x4A3,
-    UMSG_UNKNOWN_1188                               = 0x4A4,
+    UMSG_UNKNOWN_1185                               = 0x4A1,    // not found in client
+    UMSG_UNKNOWN_1186                               = 0x4A2,    // not found in client
+    UMSG_UNKNOWN_1187                               = 0x4A3,    // not found in client
+    UMSG_UNKNOWN_1188                               = 0x4A4,    // not found in client
     NUM_MSG_TYPES                                   = 0x4A5
 };
 

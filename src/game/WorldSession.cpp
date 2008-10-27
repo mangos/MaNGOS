@@ -509,3 +509,38 @@ void WorldSession::SendAuthWaitQue(uint32 position)
         SendPacket(&packet);
     }
 }
+
+void WorldSession::LoadAccountData()
+{
+    for (uint32 i = 0; i < NUM_ACCOUNT_DATA_TYPES; ++i)
+    {
+        AccountData data;
+        m_accountData[i] = data;
+    }
+
+    QueryResult *result = CharacterDatabase.PQuery("SELECT type, time, data FROM account_data WHERE account='%u'", GetAccountId());
+
+    if(!result)
+        return;
+
+    do 
+    {
+        Field *fields = result->Fetch();
+
+        uint32 type = fields[0].GetUInt32();
+        if(type < NUM_ACCOUNT_DATA_TYPES)
+        {
+            m_accountData[type].Time = fields[1].GetUInt32();
+            m_accountData[type].Data = fields[2].GetCppString();
+        }
+    } while (result->NextRow());
+
+    delete result;
+}
+
+void WorldSession::SaveAccountData(uint32 type)
+{
+    uint32 acc = GetAccountId();
+    CharacterDatabase.PExecute("DELETE FROM account_data WHERE account='%u' AND type='%u'", acc, type);
+    CharacterDatabase.PExecute("INSERT INTO account_data VALUES ('%u','%u','%u','%s')", acc, type, (uint32)m_accountData[type].Time, m_accountData[type].Data.c_str());
+}

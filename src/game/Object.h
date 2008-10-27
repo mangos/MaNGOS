@@ -242,7 +242,9 @@ class MANGOS_DLL_SPEC Object
         {
             ASSERT( index < m_valuesCount || PrintIndexError( index , false ) );
             ASSERT( offset < 4 );
-            return (((uint8*)m_uint32Values[index])[offset] & flag) != 0;
+            //return *(((uint16*)&m_uint32Values[ index ])+offset);
+            //return (((uint8*)m_uint32Values[index])[offset] & flag) != 0;
+            return (((uint8*)&m_uint32Values[index])[offset] & flag) != 0;
         }
 
         void ApplyModFlag( uint16 index, uint32 flag, bool apply)
