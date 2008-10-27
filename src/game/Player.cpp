@@ -2298,7 +2298,7 @@ void Player::InitStatsForLevel(bool reapplyMods)
     RemoveFlag( UNIT_FIELD_FLAGS,
         UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NOT_ATTACKABLE_1 |
         UNIT_FLAG_PET_IN_COMBAT  | UNIT_FLAG_SILENCED     | UNIT_FLAG_PACIFIED         |
-        UNIT_FLAG_DISABLE_ROTATE | UNIT_FLAG_IN_COMBAT    | UNIT_FLAG_DISARMED         |
+        UNIT_FLAG_STUNNED        | UNIT_FLAG_IN_COMBAT    | UNIT_FLAG_DISARMED         |
         UNIT_FLAG_CONFUSED       | UNIT_FLAG_FLEEING      | UNIT_FLAG_NOT_SELECTABLE   |
         UNIT_FLAG_SKINNABLE      | UNIT_FLAG_MOUNT        | UNIT_FLAG_TAXI_FLIGHT      );
     SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE );   // must be set
@@ -15050,7 +15050,7 @@ void Player::SaveToDB()
     SetByteValue(UNIT_FIELD_BYTES_1, 0, 0);                 // stand state
     SetByteValue(UNIT_FIELD_BYTES_2, 3, 0);                 // shapeshift
     SetByteValue(UNIT_FIELD_BYTES_1, 3, 0);                 // stand flags?
-    RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_ROTATE);
+    RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
     SetDisplayId(GetNativeDisplayId());
 
     bool inworld = IsInWorld();
@@ -18567,4 +18567,29 @@ void Player::InitGlyphsForLevel()
         value |= 0x20;
 
     SetUInt32Value(PLAYER_GLYPHS_ENABLED, value);
+}
+
+void Player::LoadAccountData(QueryResult *result)
+{
+    do 
+    {
+        Field *fields = result->Fetch();
+
+        AccountData data;
+        uint32 type = fields[0].GetUInt32();
+        data.Time = fields[1].GetUInt32();
+        data.Data = fields[2].GetCppString();
+
+        if(type < NUM_ACCOUNT_DATA_TYPES)
+            m_accountData[type] = data;
+    } while (result->NextRow());
+
+    delete result;
+}
+
+void Player::SaveAccountData(uint32 type)
+{
+    uint32 lowguid = GetGUIDLow();
+    CharacterDatabase.PExecute("DELETE FROM account_data WHERE guid=%u AND type=%u", lowguid, type);
+    CharacterDatabase.PExecute("INSERT INTO account_data VALUES (%u,%u,%u,%s)", lowguid, type, (uint32)m_accountData[type].Time, m_accountData[type].Data.c_str());
 }

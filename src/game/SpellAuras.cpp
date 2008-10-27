@@ -3162,7 +3162,7 @@ void Aura::HandleAuraModStun(bool apply, bool Real)
         m_target->addUnitState(UNIT_STAT_STUNNED);
         m_target->SetUInt64Value(UNIT_FIELD_TARGET, 0);
 
-        m_target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_ROTATE);
+        m_target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
         m_target->CastStop(m_target->GetGUID() == GetCasterGUID() ? GetId() : 0);
 
         // Creature specific
@@ -3184,7 +3184,7 @@ void Aura::HandleAuraModStun(bool apply, bool Real)
             return;
 
         m_target->clearUnitState(UNIT_STAT_STUNNED);
-        m_target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_ROTATE);
+        m_target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
 
         if(!m_target->hasUnitState(UNIT_STAT_ROOT))         // prevent allow move if have also root effect
         {

@@ -82,6 +82,7 @@ enum Classes
 #define CLASSMASK_WAND_USERS ((1<<(CLASS_PRIEST-1))|(1<<(CLASS_MAGE-1))|(1<<(CLASS_WARLOCK-1)))
 
 #define PLAYER_MAX_BATTLEGROUND_QUEUES 3
+#define NUM_ACCOUNT_DATA_TYPES 8
 
 enum ReputationRank
 {

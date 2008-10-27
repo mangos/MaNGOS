@@ -6,6 +6,7 @@
 	ProjectGUID="{1DC6C4DA-A028-41F3-877D-D5400C594F88}"
 	RootNamespace="game"
 	Keyword="Win32Proj"
+	TargetFrameworkVersion="0"
 	>
 	<Platforms>
 		<Platform
@@ -353,6 +354,14 @@
 			</File>
 			<File
 				RelativePath="..\..\src\game\AccountMgr.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\AchievementMgr.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\AchievementMgr.h"
 				>
 			</File>
 			<File

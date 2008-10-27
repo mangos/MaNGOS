@@ -311,7 +311,7 @@ void WorldSession::HandleLogoutRequestOpcode( WorldPacket & /*recv_data*/ )
         data.append(GetPlayer()->GetPackGUID());
         data << (uint32)2;
         SendPacket( &data );
-        GetPlayer()->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_ROTATE);
+        GetPlayer()->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
     }
 
     WorldPacket data( SMSG_LOGOUT_RESPONSE, 5 );
@@ -348,7 +348,7 @@ void WorldSession::HandleLogoutCancelOpcode( WorldPacket & /*recv_data*/ )
         GetPlayer()->SetStandState(PLAYER_STATE_NONE);
 
         //! DISABLE_ROTATE
-        GetPlayer()->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_ROTATE);
+        GetPlayer()->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
     }
 
     sLog.outDebug( "WORLD: sent SMSG_LOGOUT_CANCEL_ACK Message" );
@@ -1073,27 +1073,37 @@ void WorldSession::HandleUpdateAccountData(WorldPacket &recv_data)
     sLog.outDetail("WORLD: Received CMSG_UPDATE_ACCOUNT_DATA");
     recv_data.hexlike();
 
-    uint32 id1, timestamp, decompressedSize;
-    recv_data >> id1 >> timestamp >> decompressedSize;
+    uint32 type, timestamp, decompressedSize;
+    recv_data >> type >> timestamp >> decompressedSize;
 
-    if(decompressedSize == 0)
+    if(type > NUM_ACCOUNT_DATA_TYPES)
         return;
+
+    if(decompressedSize == 0)                               // erase
+    {
+        _player->SetAccountData(type, timestamp, "");
+        _player->SaveAccountData(type);
+        return;
+    }
 
     ByteBuffer dest;
     dest.resize(decompressedSize);
 
     uLongf realSize = decompressedSize;
-    if(uncompress(const_cast<uint8*>(dest.contents()), &realSize, const_cast<uint8*>(recv_data.contents() + recv_data.rpos()), recv_data.size() - recv_data.rpos()) == Z_OK)
-    {
-        dest.hexlike();
-    }
-    else
+    if(uncompress(const_cast<uint8*>(dest.contents()), &realSize, const_cast<uint8*>(recv_data.contents() + recv_data.rpos()), recv_data.size() - recv_data.rpos()) != Z_OK)
     {
         sLog.outError("UAD: Failed to decompress packet");
+        return;
     }
 
+    std::string adata;
+    dest >> adata;
+
+    _player->SetAccountData(type, timestamp, adata);
+    _player->SaveAccountData(type);
+
     WorldPacket data(SMSG_UPDATE_ACCOUNT_DATA_COMPLETE, 4+4);
-    data << uint32(id1);
+    data << uint32(type);
     data << uint32(0);
     SendPacket(&data);
 }
@@ -1105,15 +1115,33 @@ void WorldSession::HandleRequestAccountData(WorldPacket& recv_data)
 
     CHECK_PACKET_SIZE(recv_data, 4);
 
-    uint32 id;
-    recv_data >> id;
+    uint32 type;
+    recv_data >> type;
 
-    WorldPacket data (SMSG_UPDATE_ACCOUNT_DATA, 8+4+4+4);
-    data << uint64(_player->GetGUID());
-    data << uint32(id);
-    data << uint32(time(NULL));
-    data << uint32(0);                                      // decompressed length
-    // data << account_data(data_len);
+    if(type > NUM_ACCOUNT_DATA_TYPES)
+        return;
+
+    AccountData *adata = _player->GetAccountData(type);
+    uint32 size = adata->Data.size();
+    uLongf destSize = compressBound(size);
+    ByteBuffer dest;
+
+    //if(compress(const_cast<uint8*>(dest.contents()), &destSize, const_cast<uint8*>(adata->Data.c_str()), size) != Z_OK)
+    if(compress(const_cast<uint8*>(dest.contents()), &destSize, (uint8*)adata->Data.c_str(), size) != Z_OK)
+    {
+        sLog.outDebug("RAD: Failed to compress account data, error");
+        return;
+    }
+    
+    dest.resize(destSize);
+
+    WorldPacket data (SMSG_UPDATE_ACCOUNT_DATA, 8+4+4+4+destSize);
+    data << uint64(_player->GetGUID());                     // player guid
+    data << uint32(type);                                   // type (0-7)
+    data << uint32(adata->Time);                            // unix time
+    data << uint32(size);                                   // decompressed length
+    data.append(dest);                                      // compressed data
+    SendPacket(&data);
 }
 
 void WorldSession::HandleSetActionButtonOpcode(WorldPacket& recv_data)

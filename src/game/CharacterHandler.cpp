@@ -79,6 +79,7 @@ bool LoginQueryHolder::Initialize()
         res &= SetPQuery(PLAYER_LOGIN_QUERY_LOADDECLINEDNAMES,   "SELECT genitive, dative, accusative, instrumental, prepositional FROM character_declinedname WHERE guid = '%u'",GUID_LOPART(m_guid));
     // in other case still be dummy query
     res &= SetPQuery(PLAYER_LOGIN_QUERY_LOADGUILD,           "SELECT guildid,rank FROM guild_member WHERE guid = '%u'", GUID_LOPART(m_guid));
+    res &= SetPQuery(PLAYER_LOGIN_QUERY_LOADACCOUNTDATA,     "SELECT type,time,data FROM account_data WHERE guid = '%u'", GUID_LOPART(m_guid));
 
     return res;
 }
@@ -497,11 +498,11 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder * holder)
     data << pCurrChar->GetOrientation();
     SendPacket(&data);
 
-    data.Initialize( SMSG_ACCOUNT_DATA_TIMES, 128 );        // changed in WotLK
-    data << uint32(0);                                      // unix time of something
+    data.Initialize( SMSG_ACCOUNT_DATA_TIMES, 4+1+8*4 );    // changed in WotLK
+    data << uint32(time(NULL));                             // unix time of something
     data << uint8(1);
-    for(int i = 0; i < 8; i++)
-        data << uint32(0);                                  // also unix time
+    for(int i = 0; i < NUM_ACCOUNT_DATA_TYPES; i++)
+        data << uint32(pCurrChar->GetAccountData(i)->Time); // also unix time
     SendPacket(&data);
 
     data.Initialize(SMSG_FEATURE_SYSTEM_STATUS, 2);         // added in 2.2.0
