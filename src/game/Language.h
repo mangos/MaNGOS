@@ -695,7 +695,10 @@ enum MangosStrings
     LANG_INVALID_CHARACTER_GUID         = 1116,
     LANG_CHARACTER_GUID_IN_USE          = 1117,
     LANG_ITEMLIST_GUILD                 = 1118,
-    // Room for more level 3              1119-1199 not used
+    LANG_MUST_MALE_OR_FEMALE            = 1119,
+    LANG_YOU_CHANGE_GENDER              = 1120,
+    LANG_YOUR_GENDER_CHANGED            = 1121,
+    // Room for more level 3              1122-1199 not used
 
     // FREE IDS                           1200-9999
 
