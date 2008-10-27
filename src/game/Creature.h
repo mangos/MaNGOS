@@ -109,7 +109,7 @@ struct GossipOption
     uint32 NpcFlag;
     uint32 Icon;
     uint32 Action;
-    std::string Option;
+    std::string OptionText;
 };
 
 enum CreatureFlagsExtra

@@ -6882,6 +6882,51 @@ void ObjectMgr::LoadNpcTextId()
     sLog.outString( ">> Loaded %d NpcTextId ", count );
 }
 
+void ObjectMgr::LoadNpcOptions()
+{
+    m_mCacheNpcOptionList.clear();                          // For reload case
+
+    QueryResult *result = WorldDatabase.Query( "SELECT id,gossip_id,npcflag,icon,action,option_text FROM npc_option");
+    if( !result )
+    {
+        barGoLink bar( 1 );
+
+        bar.step();
+
+        sLog.outString();
+        sLog.outErrorDb(">> Loaded `npc_option`, table is empty!");
+        return;
+    }
+
+    barGoLink bar( result->GetRowCount() );
+
+    uint32 count = 0;
+
+    do
+    {
+        bar.step();
+
+        Field* fields = result->Fetch();
+
+        GossipOption go;
+        go.Id         = fields[0].GetUInt32();
+        go.GossipId   = fields[1].GetUInt32();
+        go.NpcFlag    = fields[2].GetUInt32();
+        go.Icon       = fields[3].GetUInt32();
+        go.Action     = fields[4].GetUInt32();
+        go.OptionText = fields[5].GetCppString();
+
+        m_mCacheNpcOptionList.push_back(go);
+
+        ++count;
+
+    } while (result->NextRow());
+    delete result;
+
+    sLog.outString();
+    sLog.outString( ">> Loaded %d npc_option entries", count );
+}
+
 void ObjectMgr::AddVendorItem( uint32 entry,uint32 item, uint32 maxcount, uint32 incrtime, uint32 extendedcost )
 {
     VendorItemData& vList = m_mCacheVendorItemMap[entry];

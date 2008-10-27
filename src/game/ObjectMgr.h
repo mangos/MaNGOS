@@ -229,6 +229,7 @@ struct PlayerCondition
 
 // NPC gossip text id
 typedef HM_NAMESPACE::hash_map<uint32, uint32> CacheNpcTextIdMap;
+typedef std::list<GossipOption> CacheNpcOptionList;
 
 typedef HM_NAMESPACE::hash_map<uint32, VendorItemData> CacheVendorItemMap;
 typedef HM_NAMESPACE::hash_map<uint32, TrainerSpellData> CacheTrainerSpellMap;
@@ -544,6 +545,7 @@ class ObjectMgr
         void LoadWeatherZoneChances();
         void LoadGameTele();
 
+        void LoadNpcOptions();
         void LoadNpcTextId();
         void LoadVendors();
         void LoadTrainerSpell();
@@ -712,6 +714,8 @@ class ObjectMgr
         bool AddGameTele(GameTele& data);
         bool DeleteGameTele(std::string name);
 
+        CacheNpcOptionList const& GetNpcOptions() const { return m_mCacheNpcOptionList; }
+
         uint32 GetNpcGossip(uint32 entry) const
         {
             CacheNpcTextIdMap::const_iterator iter = m_mCacheNpcTextIdMap.find(entry);
@@ -850,6 +854,7 @@ class ObjectMgr
         typedef std::vector<PlayerCondition> ConditionStore;
         ConditionStore mConditions;
 
+        CacheNpcOptionList m_mCacheNpcOptionList;
         CacheNpcTextIdMap m_mCacheNpcTextIdMap;
         CacheVendorItemMap m_mCacheVendorItemMap;
         CacheTrainerSpellMap m_mCacheTrainerSpellMap;
