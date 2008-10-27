@@ -148,9 +148,9 @@ bool ChatHandler::HandleSendOpcodeCommand(const char* args)
 
         if(type == "uint8")
         {
-            uint8 val1;
+            uint16 val1;
             ifs >> val1;
-            data << val1;
+            data << uint8(val1);
         }
         else if(type == "uint16")
         {
