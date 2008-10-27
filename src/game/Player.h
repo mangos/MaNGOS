@@ -45,6 +45,7 @@ class PlayerMenu;
 class Transport;
 class UpdateMask;
 class PlayerSocial;
+class AchievementMgr;
 
 typedef std::deque<Mail*> PlayerMails;
 
@@ -2054,6 +2055,7 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         DeclinedName const* GetDeclinedNames() const { return m_declinedname; }
 
+        AchievementMgr *GetAchievementMgr() { return m_achievementMgr; }
     protected:
 
         /*********************************************************/
@@ -2284,6 +2286,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         WorldLocation m_teleport_dest;
 
         DeclinedName *m_declinedname;
+        AchievementMgr *m_achievementMgr;
     private:
         // internal common parts for CanStore/StoreItem functions
         uint8 _CanStoreItem_InSpecificSlot( uint8 bag, uint8 slot, ItemPosCountVec& dest, ItemPrototype const *pProto, uint32& count, bool swap, Item *pSrcItem ) const;

@@ -30,6 +30,8 @@ noinst_LIBRARIES = libmangosgame.a
 libmangosgame_a_SOURCES = \
     AccountMgr.cpp \
     AccountMgr.h \
+    AchievementMgr.h \
+    AchievementMgr.cpp \
     AddonHandler.cpp \
     AddonHandler.h \
     AggressorAI.cpp \

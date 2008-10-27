@@ -58,6 +58,7 @@
 #include "Database/DatabaseImpl.h"
 #include "Spell.h"
 #include "SocialMgr.h"
+#include "AchievementMgr.h"
 
 #include <cmath>
 
@@ -420,6 +421,7 @@ Player::Player (WorldSession *session): Unit()
     m_contestedPvPTimer = 0;
 
     m_declinedname = NULL;
+    m_achievementMgr = NULL;
 }
 
 Player::~Player ()
@@ -466,6 +468,7 @@ Player::~Player ()
             itr->second.save->RemovePlayer(this);
 
     delete m_declinedname;
+    delete m_achievementMgr;
 }
 
 void Player::CleanupsBeforeDelete()
@@ -13971,6 +13974,9 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
 
     m_social = sSocialMgr.LoadFromDB(holder->GetResult(PLAYER_LOGIN_QUERY_LOADSOCIALLIST), GetGUIDLow());
 
+    m_achievementMgr = new AchievementMgr(this);
+    m_achievementMgr->LoadFromDB();
+
     if(!_LoadHomeBind(holder->GetResult(PLAYER_LOGIN_QUERY_LOADHOMEBIND)))
         return false;
 
@@ -15190,6 +15196,7 @@ void Player::SaveToDB()
     // save pet (hunter pet level and experience and all type pets health/mana).
     if(Pet* pet = GetPet())
         pet->SavePetToDB(PET_SAVE_AS_CURRENT);
+    m_achievementMgr->SaveToDB();
 }
 
 // fast save function for item/money cheating preventing - save only inventory and money state
