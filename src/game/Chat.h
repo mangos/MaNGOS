@@ -69,12 +69,14 @@ class ChatHandler
 
         int ParseCommands(const char* text);
 
+        virtual char const* GetName() const;
     protected:
         explicit ChatHandler() : m_session(NULL) {}      // for CLI subclass
 
         bool hasStringAbbr(const char* name, const char* part);
 
         virtual bool isAvailable(ChatCommand const& cmd) const;
+        virtual bool needReportToTarget(Player* chr) const;
 
         void SendGlobalSysMessage(const char *str);
 
@@ -455,6 +457,8 @@ class CliHandler : public ChatHandler
         const char *GetMangosString(int32 entry) const;
         bool isAvailable(ChatCommand const& cmd) const;
         void SendSysMessage(const char *str);
+        char const* GetName() const;
+        bool needReportToTarget(Player* chr) const;
 
     private:
         Print* m_print;

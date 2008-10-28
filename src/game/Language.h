@@ -166,8 +166,9 @@ enum MangosStrings
 
     LANG_MAIL_SENT                      = 169,
     LANG_SOUND_NOT_EXIST                = 170,
-    LANG_TELEPORTED_TO_BY_CONSOLE       = 171,
-    // Room for more level 1              172-199 not used
+    //                                    171,              // not used
+    LANG_CONSOLE_COMMAND                = 172,
+    // Room for more level 1              173-199 not used
 
     // level 2 chat
     LANG_NO_SELECTION                   = 200,

@@ -1194,6 +1194,17 @@ GameTele const* ChatHandler::extractGameTeleFromLink(char* text)
     return objmgr.GetGameTele(cId);
 }
 
+const char *ChatHandler::GetName() const
+{
+    return m_session->GetPlayer()->GetName();
+}
+
+bool ChatHandler::needReportToTarget(Player* chr) const
+{
+    Player* pl = m_session->GetPlayer();
+    return pl != chr && pl->IsVisibleGloballyFor(chr);
+}
+
 const char *CliHandler::GetMangosString(int32 entry) const
 {
     return objmgr.GetMangosStringForDBCLocale(entry);
@@ -1210,3 +1221,14 @@ void CliHandler::SendSysMessage(const char *str)
     m_print(str);
     m_print("\r\n");
 }
+
+const char *CliHandler::GetName() const
+{
+    return GetMangosString(LANG_CONSOLE_COMMAND);
+}
+
+bool CliHandler::needReportToTarget(Player* /*chr*/) const
+{
+    return true;
+}
+

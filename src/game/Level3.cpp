@@ -741,7 +741,7 @@ bool ChatHandler::HandleAccountSetGmLevelCommand(const char* args)
 
     if(targetPlayer)
     {
-        ChatHandler(targetPlayer).PSendSysMessage(LANG_YOURS_SECURITY_CHANGED,m_session->GetPlayer()->GetName(), gm);
+        ChatHandler(targetPlayer).PSendSysMessage(LANG_YOURS_SECURITY_CHANGED,GetName(), gm);
         targetPlayer->GetSession()->SetSecurity(gm);
     }
 
@@ -3680,14 +3680,14 @@ bool ChatHandler::HandleExploreCheatCommand(const char* args)
     if (flag != 0)
     {
         PSendSysMessage(LANG_YOU_SET_EXPLORE_ALL, chr->GetName());
-        if(chr!=m_session->GetPlayer())
-            ChatHandler(chr).PSendSysMessage(LANG_YOURS_EXPLORE_SET_ALL,m_session->GetPlayer()->GetName());
+        if (needReportToTarget(chr))
+            ChatHandler(chr).PSendSysMessage(LANG_YOURS_EXPLORE_SET_ALL,GetName());
     }
     else
     {
         PSendSysMessage(LANG_YOU_SET_EXPLORE_NOTHING, chr->GetName());
-        if(chr!=m_session->GetPlayer())
-            ChatHandler(chr).PSendSysMessage(LANG_YOURS_EXPLORE_SET_NOTHING,m_session->GetPlayer()->GetName());
+        if (needReportToTarget(chr))
+            ChatHandler(chr).PSendSysMessage(LANG_YOURS_EXPLORE_SET_NOTHING,GetName());
     }
 
     for (uint8 i=0; i<128; i++)

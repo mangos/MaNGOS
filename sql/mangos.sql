@@ -2266,7 +2266,7 @@ INSERT INTO `mangos_string` VALUES
 (168,'Locations found are:\n %s',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (169,'Mail sent to %s',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (170,'You try to hear sound %u but it doesn\'t exist.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
-(171,'You are being teleported by server console command.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(172,'server console command',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (200,'No selection.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (201,'Object GUID is: lowpart %u highpart %X',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (202,'The name was too long by %i characters.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
