@@ -231,15 +231,8 @@ class MANGOS_DLL_SPEC Group
         }
 
         // some additional raid methods
-        void ConvertToRaid()
-        {
-            m_groupType = GROUPTYPE_RAID;
+        void ConvertToRaid();
 
-            _initRaidSubGroupsCounter();
-
-            if(!isBGGroup()) CharacterDatabase.PExecute("UPDATE groups SET isRaid = 1 WHERE leaderGuid='%u'", GUID_LOPART(m_leaderGuid));
-            SendUpdate();
-        }
         void SetBattlegroundGroup(BattleGround *bg) { m_bgGroup = bg; }
 
         void ChangeMembersGroup(const uint64 &guid, const uint8 &group);
@@ -329,7 +322,6 @@ class MANGOS_DLL_SPEC Group
 
         void _removeRolls(const uint64 &guid);
 
-        void _convertToRaid();
         bool _setMembersGroup(const uint64 &guid, const uint8 &group);
         bool _setAssistantFlag(const uint64 &guid, const bool &state);
         bool _setMainTank(const uint64 &guid);

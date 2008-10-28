@@ -195,6 +195,16 @@ bool Group::LoadMemberFromDB(uint32 guidLow, uint8 subgroup, bool assistant)
     return true;
 }
 
+void Group::ConvertToRaid()
+{
+    m_groupType = GROUPTYPE_RAID;
+
+    _initRaidSubGroupsCounter();
+
+    if(!isBGGroup()) CharacterDatabase.PExecute("UPDATE groups SET isRaid = 1 WHERE leaderGuid='%u'", GUID_LOPART(m_leaderGuid));
+    SendUpdate();
+}
+
 bool Group::AddInvite(Player *player)
 {
     if(!player || player->GetGroupInvite() || player->GetGroup())
