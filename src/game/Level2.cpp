@@ -4047,3 +4047,23 @@ bool ChatHandler::HandleServerCorpsesCommand(const char* /*args*/)
     CorpsesErase();
     return true;
 }
+
+bool ChatHandler::HandleRepairitemsCommand(const char* args)
+{
+    Player *target = getSelectedPlayer();
+
+    if(!target)
+    {
+        PSendSysMessage(LANG_NO_CHAR_SELECTED);
+        SetSentErrorMessage(true);
+        return false;
+	}
+
+    // Repair items
+    target->DurabilityRepairAll(false, 0, false);
+
+    PSendSysMessage(LANG_YOU_REPAIR_ITEMS, target->GetName());
+    if(needReportToTarget(target))
+        ChatHandler(target).PSendSysMessage(LANG_YOUR_ITEMS_REPAIRED, GetName());
+    return true;
+}

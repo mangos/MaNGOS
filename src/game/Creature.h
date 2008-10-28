@@ -109,7 +109,10 @@ struct GossipOption
     uint32 NpcFlag;
     uint32 Icon;
     uint32 Action;
-    std::string Option;
+    uint32 BoxMoney;
+    bool Coded;
+    std::string OptionText;
+    std::string BoxText;
 };
 
 enum CreatureFlagsExtra
@@ -205,6 +208,12 @@ struct CreatureLocale
 {
     std::vector<std::string> Name;
     std::vector<std::string> SubName;
+};
+
+struct NpcOptionLocale
+{
+    std::vector<std::string> OptionText;
+    std::vector<std::string> BoxText;
 };
 
 struct EquipmentInfo
@@ -465,8 +474,8 @@ class MANGOS_DLL_SPEC Creature : public Unit
         CreatureDataAddon const* GetCreatureAddon() const;
         char const* GetScriptName() const;
 
-        void prepareGossipMenu( Player *pPlayer,uint32 gossipid );
-        void sendPreparedGossip( Player* player);
+        void prepareGossipMenu( Player *pPlayer, uint32 gossipid = 0 );
+        void sendPreparedGossip( Player* player );
         void OnGossipSelect(Player* player, uint32 option);
         void OnPoiSelect(Player* player, GossipOption const *gossip);
 

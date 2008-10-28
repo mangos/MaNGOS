@@ -139,6 +139,7 @@ typedef HM_NAMESPACE::hash_map<uint32,QuestLocale> QuestLocaleMap;
 typedef HM_NAMESPACE::hash_map<uint32,NpcTextLocale> NpcTextLocaleMap;
 typedef HM_NAMESPACE::hash_map<uint32,PageTextLocale> PageTextLocaleMap;
 typedef HM_NAMESPACE::hash_map<uint32,MangosStringLocale> MangosStringLocaleMap;
+typedef HM_NAMESPACE::hash_map<uint32,NpcOptionLocale> NpcOptionLocaleMap;
 
 typedef std::multimap<uint32,uint32> QuestRelations;
 
@@ -229,6 +230,7 @@ struct PlayerCondition
 
 // NPC gossip text id
 typedef HM_NAMESPACE::hash_map<uint32, uint32> CacheNpcTextIdMap;
+typedef std::list<GossipOption> CacheNpcOptionList;
 
 typedef HM_NAMESPACE::hash_map<uint32, VendorItemData> CacheVendorItemMap;
 typedef HM_NAMESPACE::hash_map<uint32, TrainerSpellData> CacheTrainerSpellMap;
@@ -516,6 +518,7 @@ class ObjectMgr
         void LoadQuestLocales();
         void LoadNpcTextLocales();
         void LoadPageTextLocales();
+        void LoadNpcOptionLocales();
         void LoadInstanceTemplate();
 
         void LoadGossipText();
@@ -546,6 +549,7 @@ class ObjectMgr
         void LoadWeatherZoneChances();
         void LoadGameTele();
 
+        void LoadNpcOptions();
         void LoadNpcTextId();
         void LoadVendors();
         void LoadTrainerSpell();
@@ -639,6 +643,12 @@ class ObjectMgr
             if(itr==mPageTextLocaleMap.end()) return NULL;
             return &itr->second;
         }
+        NpcOptionLocale const* GetNpcOptionLocale(uint32 entry) const
+        {
+            NpcOptionLocaleMap::const_iterator itr = mNpcOptionLocaleMap.find(entry);
+            if(itr==mNpcOptionLocaleMap.end()) return NULL;
+            return &itr->second;
+        }
 
         GameObjectData const* GetGOData(uint32 guid) const
         {
@@ -713,6 +723,8 @@ class ObjectMgr
         GameTeleMap const& GetGameTeleMap() const { return m_GameTeleMap; }
         bool AddGameTele(GameTele& data);
         bool DeleteGameTele(std::string name);
+
+        CacheNpcOptionList const& GetNpcOptions() const { return m_mCacheNpcOptionList; }
 
         uint32 GetNpcGossip(uint32 entry) const
         {
@@ -845,6 +857,7 @@ class ObjectMgr
         NpcTextLocaleMap mNpcTextLocaleMap;
         PageTextLocaleMap mPageTextLocaleMap;
         MangosStringLocaleMap mMangosStringLocaleMap;
+        NpcOptionLocaleMap mNpcOptionLocaleMap;
         RespawnTimes mCreatureRespawnTimes;
         RespawnTimes mGORespawnTimes;
 
@@ -855,6 +868,7 @@ class ObjectMgr
         typedef std::vector<PlayerCondition> ConditionStore;
         ConditionStore mConditions;
 
+        CacheNpcOptionList m_mCacheNpcOptionList;
         CacheNpcTextIdMap m_mCacheNpcTextIdMap;
         CacheVendorItemMap m_mCacheVendorItemMap;
         CacheTrainerSpellMap m_mCacheTrainerSpellMap;

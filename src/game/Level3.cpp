@@ -100,6 +100,7 @@ bool ChatHandler::HandleReloadAllLootCommand(const char*)
 bool ChatHandler::HandleReloadAllNpcCommand(const char* /*args*/)
 {
     HandleReloadNpcGossipCommand("a");
+    HandleReloadNpcOptionCommand("a");
     HandleReloadNpcTrainerCommand("a");
     HandleReloadNpcVendorCommand("a");
     return true;
@@ -342,6 +343,14 @@ bool ChatHandler::HandleReloadMangosStringCommand(const char*)
     sLog.outString( "Re-Loading mangos_string Table!" );
     objmgr.LoadMangosStrings();
     SendGlobalSysMessage("DB table `mangos_string` reloaded.");
+    return true;
+}
+
+bool ChatHandler::HandleReloadNpcOptionCommand(const char*)
+{
+    sLog.outString( "Re-Loading `npc_option` Table!" );
+    objmgr.LoadNpcOptions();
+    SendGlobalSysMessage("DB table `npc_option` reloaded.");
     return true;
 }
 
@@ -732,7 +741,7 @@ bool ChatHandler::HandleAccountSetGmLevelCommand(const char* args)
 
     if(targetPlayer)
     {
-        ChatHandler(targetPlayer).PSendSysMessage(LANG_YOURS_SECURITY_CHANGED,m_session->GetPlayer()->GetName(), gm);
+        ChatHandler(targetPlayer).PSendSysMessage(LANG_YOURS_SECURITY_CHANGED,GetName(), gm);
         targetPlayer->GetSession()->SetSecurity(gm);
     }
 
@@ -3671,14 +3680,14 @@ bool ChatHandler::HandleExploreCheatCommand(const char* args)
     if (flag != 0)
     {
         PSendSysMessage(LANG_YOU_SET_EXPLORE_ALL, chr->GetName());
-        if(chr!=m_session->GetPlayer())
-            ChatHandler(chr).PSendSysMessage(LANG_YOURS_EXPLORE_SET_ALL,m_session->GetPlayer()->GetName());
+        if (needReportToTarget(chr))
+            ChatHandler(chr).PSendSysMessage(LANG_YOURS_EXPLORE_SET_ALL,GetName());
     }
     else
     {
         PSendSysMessage(LANG_YOU_SET_EXPLORE_NOTHING, chr->GetName());
-        if(chr!=m_session->GetPlayer())
-            ChatHandler(chr).PSendSysMessage(LANG_YOURS_EXPLORE_SET_NOTHING,m_session->GetPlayer()->GetName());
+        if (needReportToTarget(chr))
+            ChatHandler(chr).PSendSysMessage(LANG_YOURS_EXPLORE_SET_NOTHING,GetName());
     }
 
     for (uint8 i=0; i<128; i++)
@@ -5308,6 +5317,22 @@ bool ChatHandler::HandleBanListIPCommand(const char* args)
 
 bool ChatHandler::HandleRespawnCommand(const char* /*args*/)
 {
+    Unit* target = getSelectedUnit();
+
+    if(target)
+    {
+        if(target->GetTypeId()!=TYPEID_UNIT)
+        {
+            SendSysMessage(LANG_SELECT_CREATURE);
+            SetSentErrorMessage(true);
+            return false;
+        }
+
+        if(target->isDead())
+            ((Creature*)target)->Respawn();
+        return true;
+    }
+
     Player* pl = m_session->GetPlayer();
 
     CellPair p(MaNGOS::ComputeCellPair(pl->GetPositionX(), pl->GetPositionY()));
