@@ -22,6 +22,7 @@
 #include "WorldPacket.h"
 #include "Database/DBCEnums.h"
 #include "ObjectMgr.h"
+#include "Guild.h"
 
 AchievementMgr::AchievementMgr(Player *player)
 {
@@ -41,23 +42,40 @@ void AchievementMgr::LoadFromDB()
 void AchievementMgr::SendAchievementEarned(uint32 achievementId)
 {
     sLog.outString("AchievementMgr::SendAchievementEarned(%u)", achievementId);
+
     WorldPacket data(SMSG_MESSAGECHAT, 200);
     data << uint8(CHAT_MSG_ACHIEVEMENT);
     data << uint32(LANG_UNIVERSAL);
     data << uint64(GetPlayer()->GetGUID());
-    data << uint32(0);
+    data << uint32(5);
     data << uint64(GetPlayer()->GetGUID());
     const char *msg = "|Hplayer:$N|h[$N]|h has earned the achievement $a!";
-    data << uint32(strlen(msg));
+    data << uint32(strlen(msg)+1);
     data << msg;
     data << uint8(0);
     data << uint32(achievementId);
     GetPlayer()->SendMessageToSet(&data, true);
 
+    if(Guild* guild = objmgr.GetGuildById(GetPlayer()->GetGuildId()))
+    {
+        data.Initialize(SMSG_MESSAGECHAT, 200);
+        data << uint8(CHAT_MSG_GUILD_ACHIEVEMENT);
+        data << uint32(LANG_UNIVERSAL);
+        data << uint64(GetPlayer()->GetGUID());
+        data << uint32(5);
+        data << uint64(GetPlayer()->GetGUID());
+        data << uint32(strlen(msg)+1);
+        data << msg;
+        data << uint8(0);
+        data << uint32(achievementId);
+        guild->BroadcastPacket(&data);
+    }
+
     data.Initialize(SMSG_ACHIEVEMENT_EARNED, 8+4+8);
     data.append(GetPlayer()->GetPackGUID());
     data << uint32(achievementId);
-    data << uint64(0x0000000); // magic number? same as in SMSG_CRITERIA_UPDATE. static for every player?
+    data << uint32(secsToTimeBitFields(time(NULL)));
+    data << uint32(0);
     GetPlayer()->SendMessageToSet(&data, true);
 }
 
@@ -71,16 +89,21 @@ void AchievementMgr::SendCriteriaUpdate(uint32 criteriaId, uint32 counter)
     data.appendPackGUID(counter);
 
     data.append(GetPlayer()->GetPackGUID());
-    /*
-    data << uint32(counter);
-    data << uint32(counter+1);//timer1
-    data << uint32(counter+2);//timer2
-    */
     data << uint32(0);
-    data << uint32(0);
-    data << uint32(0);
-    data << uint32(0);
+    data << uint32(secsToTimeBitFields(time(NULL)));
+    data << uint32(0);  // timer 1
+    data << uint32(0);  // timer 2
     GetPlayer()->SendMessageToSet(&data, true);
+}
+
+/**
+ * called at player login. The player might have fulfilled some achievements when the achievement system wasn't working yet
+ */
+void AchievementMgr::CheckAllAchievementCriteria()
+{
+    // suppress sending packets
+    for(uint32 i=0; i<ACHIEVEMENT_CRITERIA_TYPE_TOTAL; i++)
+        UpdateAchievementCriteria(AchievementCriteriaTypes(i));
 }
 
 /**
@@ -96,9 +119,11 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
         switch (type)
         {
             case ACHIEVEMENT_CRITERIA_TYPE_REACH_LEVEL:
+                SetCriteriaProgress(achievementCriteria, GetPlayer()->getLevel());
+                break;
             case ACHIEVEMENT_CRITERIA_TYPE_BUY_BANK_SLOT:
-                SetCriteriaProgress(achievementCriteria, miscvalue1);
-            break;
+                SetCriteriaProgress(achievementCriteria, GetPlayer()->GetByteValue(PLAYER_BYTES_2, 2)+1);
+                break;
             default:
                 return;
         }
@@ -136,24 +161,29 @@ void AchievementMgr::CompletedCriteria(AchievementCriteriaEntry const* criteria)
     if(achievement->flags & ACHIEVEMENT_FLAG_COUNTER)
         return;
 
-    if(criteria->completionFlag & ACHIEVEMENT_CRITERIA_COMPLETE_FLAG_ALL)
+    if(criteria->completionFlag & ACHIEVEMENT_CRITERIA_COMPLETE_FLAG_ALL || IsCompletedAchievement(achievement))
     {
         CompletedAchievement(achievement);
-        return;
     }
+}
 
-    // Check if there are also other critiera which have to be fulfilled for that achievement
+bool AchievementMgr::IsCompletedAchievement(AchievementEntry const* achievement)
+{
+    bool foundOutstanding = false;
     for (uint32 entryId = 0; entryId<sAchievementCriteriaStore.GetNumRows(); entryId++)
     {
          AchievementCriteriaEntry const* criteria = sAchievementCriteriaStore.LookupEntry(entryId);
          if(!criteria || criteria->referredAchievement!= achievement->ID)
              continue;
 
-         // found an outstanding criteria, return
+         if(IsCompletedCriteria(criteria) && criteria->completionFlag & ACHIEVEMENT_CRITERIA_COMPLETE_FLAG_ALL)
+             return true;
+
+         // found an umcompleted criteria, but DONT return false - there might be a completed criteria with ACHIEVEMENT_CRITERIA_COMPLETE_FLAG_ALL
          if(!IsCompletedCriteria(criteria))
-             return;
+             foundOutstanding = true;
     }
-    CompletedAchievement(achievement);
+    return !foundOutstanding;
 }
 
 void AchievementMgr::SetCriteriaProgress(AchievementCriteriaEntry const* entry, uint32 newValue)
@@ -170,7 +200,49 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
         return;
 
     SendAchievementEarned(achievement->ID);
-    m_completedAchievements.insert(achievement->ID);
+    m_completedAchievements[achievement->ID] = time(NULL);
     // TODO: reward titles and items
+}
+
+void AchievementMgr::SendAllAchievementData()
+{
+    // since we don't know the exact size of the packed GUIDs this is just an approximation
+    WorldPacket data(SMSG_ALL_ACHIEVEMENT_DATA,4*2+m_completedAchievements.size()*4*2+m_completedAchievements.size()*7*4);
+    BuildAllDataPacket(&data);
+    GetPlayer()->GetSession()->SendPacket(&data);
+}
+
+void AchievementMgr::SendRespondInspectAchievements(Player* player)
+{
+    // since we don't know the exact size of the packed GUIDs this is just an approximation
+    WorldPacket data(SMSG_ALL_ACHIEVEMENT_DATA,4+4*2+m_completedAchievements.size()*4*2+m_completedAchievements.size()*7*4);
+    data.append(GetPlayer()->GetPackGUID());
+    BuildAllDataPacket(&data);
+    player->GetSession()->SendPacket(&data);
+}
+
+/**
+ * used by both SMSG_ALL_ACHIEVEMENT_DATA  and SMSG_RESPOND_INSPECT_ACHIEVEMENT
+ */
+void AchievementMgr::BuildAllDataPacket(WorldPacket *data)
+{
+    for(CompletedAchievementMap::iterator iter = m_completedAchievements.begin(); iter!=m_completedAchievements.end(); ++iter)
+    {
+        *data << uint32(iter->first);
+        *data << uint32(secsToTimeBitFields(iter->second));
+    }
+    *data << int32(-1);
+    for(CriteriaProgressMap::iterator iter = m_criteriaProgress.begin(); iter!=m_criteriaProgress.end(); ++iter)
+    {
+        *data << uint32(iter->first);
+        data->appendPackGUID(iter->second);
+        data->append(GetPlayer()->GetPackGUID());
+        *data << uint32(0);
+        *data << uint32(secsToTimeBitFields(time(NULL)));
+        *data << uint32(0);
+        *data << uint32(0);
+    }
+    *data << int32(-1);
+
 }
 

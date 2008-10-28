@@ -23,9 +23,10 @@
 #include "Database/DBCStores.h"
 
 typedef HM_NAMESPACE::hash_map<uint32, uint32> CriteriaProgressMap;
-typedef std::set<uint32> CompletedAchievementSet;
+typedef HM_NAMESPACE::hash_map<uint32, time_t> CompletedAchievementMap;
 
 class Player;
+class WorldPacket;
 
 class AchievementMgr
 {
@@ -35,6 +36,9 @@ class AchievementMgr
         void LoadFromDB();
         void SaveToDB();
         void UpdateAchievementCriteria(AchievementCriteriaTypes type, uint32 miscvalue1=0, uint32 miscvalue2=0, uint32 time=0);
+        void CheckAllAchievementCriteria();
+        void SendAllAchievementData();
+        void SendRespondInspectAchievements(Player* player);
 
         Player* GetPlayer() { return m_player;}
 
@@ -45,11 +49,12 @@ class AchievementMgr
         void CompletedCriteria(AchievementCriteriaEntry const* entry);
         void CompletedAchievement(AchievementEntry const* entry);
         bool IsCompletedCriteria(AchievementCriteriaEntry const* entry);
+        bool IsCompletedAchievement(AchievementEntry const* entry);
+        void BuildAllDataPacket(WorldPacket *data);
 
         Player* m_player;
         CriteriaProgressMap m_criteriaProgress;
-        CompletedAchievementSet m_completedAchievements;
-
+        CompletedAchievementMap m_completedAchievements;
 };
 
 
