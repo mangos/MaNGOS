@@ -1157,7 +1157,7 @@ OpcodeHandler opcodeTable[NUM_MSG_TYPES] =
     /*0x468*/ { "SMSG_ACHIEVEMENT_EARNED",          STATUS_NEVER,    &WorldSession::Handle_ServerSide               },
     /*0x469*/ { "SMSG_DYNAMIC_DROP_ROLL_RESULT",    STATUS_NEVER,    &WorldSession::Handle_ServerSide               },
     /*0x46A*/ { "SMSG_CRITERIA_UPDATE",             STATUS_NEVER,    &WorldSession::Handle_ServerSide               },
-    /*0x46B*/ { "CMSG_QUERY_INSPECT_ACHIEVEMENTS",  STATUS_NEVER,    &WorldSession::Handle_NULL                     },
+    /*0x46B*/ { "CMSG_QUERY_INSPECT_ACHIEVEMENTS",  STATUS_LOGGEDIN, &WorldSession::HandleInspectAchievements       },
     /*0x46C*/ { "SMSG_RESPOND_INSPECT_ACHIEVEMENTS",STATUS_NEVER,    &WorldSession::Handle_ServerSide               },
     /*0x46D*/ { "CMSG_DISMISS_CONTROLLED_VEHICLE",  STATUS_NEVER,    &WorldSession::Handle_NULL                     },
     /*0x46E*/ { "CMSG_COMPLETE_ACHIEVEMENT_CHEAT",  STATUS_NEVER,    &WorldSession::Handle_NULL                     },

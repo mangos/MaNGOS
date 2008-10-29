@@ -40,6 +40,7 @@
 #include "SpellAuras.h"
 #include "Pet.h"
 #include "SocialMgr.h"
+#include "Tools.h"
 
 void WorldSession::HandleRepopRequestOpcode( WorldPacket & /*recv_data*/ )
 {
@@ -1850,3 +1851,18 @@ void WorldSession::HandleSpellClick( WorldPacket & recv_data )
     _player->SetUInt64Value(UNIT_FIELD_CHARM, guid);
     _player->SetUInt64Value(PLAYER_FARSIGHT, guid);
 }
+
+void WorldSession::HandleInspectAchievements( WorldPacket & recv_data )
+{
+    sLog.outString("WorldSession::HandleInspectAchievements");
+    uint64 guid;
+    if(!readGUID(recv_data, guid))
+        return;
+
+    Player *player = objmgr.GetPlayer(guid);
+    if(!player)
+        return;
+
+    player->GetAchievementMgr().SendRespondInspectAchievements(_player);
+}
+

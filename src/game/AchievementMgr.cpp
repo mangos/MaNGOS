@@ -220,7 +220,7 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
 void AchievementMgr::SendAllAchievementData()
 {
     // since we don't know the exact size of the packed GUIDs this is just an approximation
-    WorldPacket data(SMSG_ALL_ACHIEVEMENT_DATA,4*2+m_completedAchievements.size()*4*2+m_completedAchievements.size()*7*4);
+    WorldPacket data(SMSG_ALL_ACHIEVEMENT_DATA, 4*2+m_completedAchievements.size()*4*2+m_completedAchievements.size()*7*4);
     BuildAllDataPacket(&data);
     GetPlayer()->GetSession()->SendPacket(&data);
 }
@@ -228,7 +228,7 @@ void AchievementMgr::SendAllAchievementData()
 void AchievementMgr::SendRespondInspectAchievements(Player* player)
 {
     // since we don't know the exact size of the packed GUIDs this is just an approximation
-    WorldPacket data(SMSG_ALL_ACHIEVEMENT_DATA,4+4*2+m_completedAchievements.size()*4*2+m_completedAchievements.size()*7*4);
+    WorldPacket data(SMSG_RESPOND_INSPECT_ACHIEVEMENTS, 4+4*2+m_completedAchievements.size()*4*2+m_completedAchievements.size()*7*4);
     data.append(GetPlayer()->GetPackGUID());
     BuildAllDataPacket(&data);
     player->GetSession()->SendPacket(&data);
@@ -245,6 +245,7 @@ void AchievementMgr::BuildAllDataPacket(WorldPacket *data)
         *data << uint32(secsToTimeBitFields(iter->second));
     }
     *data << int32(-1);
+
     for(CriteriaProgressMap::iterator iter = m_criteriaProgress.begin(); iter!=m_criteriaProgress.end(); ++iter)
     {
         *data << uint32(iter->first);
@@ -255,6 +256,7 @@ void AchievementMgr::BuildAllDataPacket(WorldPacket *data)
         *data << uint32(0);
         *data << uint32(0);
     }
+
     *data << int32(-1);
 
 }

@@ -654,6 +654,7 @@ class MANGOS_DLL_SPEC WorldSession
         void HandleSpellClick(WorldPacket& recv_data);
         void HandleAlterAppearance(WorldPacket& recv_data);
         void HandleRemoveGlyph(WorldPacket& recv_data);
+        void HandleInspectAchievements(WorldPacket& recv_data);
     private:
         // private trade methods
         void moveItems(Item* myItems[], Item* hisItems[]);
