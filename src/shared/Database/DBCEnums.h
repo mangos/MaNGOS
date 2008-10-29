@@ -34,6 +34,7 @@ enum AchievementFactionFlags
 
 enum AchievementFlags
 {
+    ACHIEVEMENT_FLAG_COUNTER  = 0x00000001,
 };
 
 enum AchievementCriteriaCondition

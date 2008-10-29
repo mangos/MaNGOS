@@ -136,14 +136,17 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
             CompletedCriteria(achievementCriteria);
     }
 }
-
 bool AchievementMgr::IsCompletedCriteria(AchievementCriteriaEntry const* achievementCriteria)
 {
     AchievementEntry const* achievement = sAchievementStore.LookupEntry(achievementCriteria->referredAchievement);
     if(!achievement)
         return false;
+
     // counter can never complete
-    if(achievement->points == 0)
+    if(achievement->flags & ACHIEVEMENT_FLAG_COUNTER)
+        return false;
+
+    if(m_criteriaProgress.find(achievementCriteria->ID) == m_criteriaProgress.end())
         return false;
 
     switch(achievementCriteria->requiredType)
@@ -152,7 +155,6 @@ bool AchievementMgr::IsCompletedCriteria(AchievementCriteriaEntry const* achieve
             return m_criteriaProgress[achievementCriteria->ID] >= achievementCriteria->reach_level.level;
         case ACHIEVEMENT_CRITERIA_TYPE_BUY_BANK_SLOT:
             return m_criteriaProgress[achievementCriteria->ID] >= achievementCriteria->buy_bank_slot.numberOfSlots;
-
     }
     return false;
 }
@@ -163,32 +165,38 @@ void AchievementMgr::CompletedCriteria(AchievementCriteriaEntry const* criteria)
     if(!achievement)
         return;
     // counter can never complete
-    if(achievement->points ==0)
+    if(achievement->flags & ACHIEVEMENT_FLAG_COUNTER)
         return;
 
-    if(criteria->completionFlag & ACHIEVEMENT_CRITERIA_COMPLETE_FLAG_ALL || IsCompletedAchievement(achievement))
+    if(criteria->completionFlag & ACHIEVEMENT_CRITERIA_COMPLETE_FLAG_ALL || GetAchievementCompletionState(achievement)==ACHIEVEMENT_COMPLETED_COMPLETED_NOT_STORED)
     {
         CompletedAchievement(achievement);
     }
 }
 
-bool AchievementMgr::IsCompletedAchievement(AchievementEntry const* achievement)
+AchievementCompletionState AchievementMgr::GetAchievementCompletionState(AchievementEntry const* entry)
 {
+    if(m_completedAchievements.find(entry->ID)!=m_completedAchievements.end())
+        return ACHIEVEMENT_COMPLETED_COMPLETED_STORED;
+
     bool foundOutstanding = false;
     for (uint32 entryId = 0; entryId<sAchievementCriteriaStore.GetNumRows(); entryId++)
     {
          AchievementCriteriaEntry const* criteria = sAchievementCriteriaStore.LookupEntry(entryId);
-         if(!criteria || criteria->referredAchievement!= achievement->ID)
+         if(!criteria || criteria->referredAchievement!= entry->ID)
              continue;
 
          if(IsCompletedCriteria(criteria) && criteria->completionFlag & ACHIEVEMENT_CRITERIA_COMPLETE_FLAG_ALL)
-             return true;
+             return ACHIEVEMENT_COMPLETED_COMPLETED_NOT_STORED;
 
          // found an umcompleted criteria, but DONT return false - there might be a completed criteria with ACHIEVEMENT_CRITERIA_COMPLETE_FLAG_ALL
          if(!IsCompletedCriteria(criteria))
              foundOutstanding = true;
     }
-    return !foundOutstanding;
+    if(foundOutstanding)
+        return ACHIEVEMENT_COMPLETED_NONE;
+    else
+        return ACHIEVEMENT_COMPLETED_COMPLETED_NOT_STORED;
 }
 
 void AchievementMgr::SetCriteriaProgress(AchievementCriteriaEntry const* entry, uint32 newValue)
@@ -201,7 +209,7 @@ void AchievementMgr::SetCriteriaProgress(AchievementCriteriaEntry const* entry, 
 void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
 {
     sLog.outString("AchievementMgr::CompletedAchievement(%u)", achievement->ID);
-    if(achievement->points==0 || m_completedAchievements.find(achievement->ID)!=m_completedAchievements.end())
+    if(achievement->flags & ACHIEVEMENT_FLAG_COUNTER || m_completedAchievements.find(achievement->ID)!=m_completedAchievements.end())
         return;
 
     SendAchievementEarned(achievement->ID);

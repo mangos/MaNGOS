@@ -47,8 +47,8 @@ struct AchievementEntry
     uint32    categoryId;                                   // 38
     uint32    points;                                       // 39 reward points
     //uint32 OrderInCategory;                               // 40
-    //uint32 Flags;                                         // 41
-    uint32    flags;                                        // 42 not flags, some unknown value...
+    uint32    flags;                                        // 41
+    //uint32    flags;                                      // 42 not flags, some unknown value...
     //char *unk1[16];                                       // 43-58
     //uint32 unk_flags;                                     // 59
     //uint32 count;                                         // 60
@@ -447,10 +447,10 @@ struct AchievementCriteriaEntry
         {
             uint32  field3;                                 // 3 main requirement
             uint32  field4;                                 // 4 main requirement count
-            uint32  field5;                                 // 5 additional requirement 1 type
-            uint32  field6;                                 // 6 additional requirement 1 value
-            uint32  field7;                                 // 7 additional requirement 2 type
-            uint32  field8;                                 // 8 additional requirement 1 value
+            uint32  additionalRequirement1_type;            // 5 additional requirement 1 type
+            uint32  additionalRequirement1_value;           // 6 additional requirement 1 value
+            uint32  additionalRequirement2_type;            // 7 additional requirement 2 type
+            uint32  additionalRequirement2_value;           // 8 additional requirement 1 value
         } raw;
     };
     //char*  name[16];                                      // 9-24

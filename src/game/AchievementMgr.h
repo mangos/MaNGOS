@@ -28,6 +28,13 @@ typedef HM_NAMESPACE::hash_map<uint32, time_t> CompletedAchievementMap;
 class Player;
 class WorldPacket;
 
+enum AchievementCompletionState
+{
+    ACHIEVEMENT_COMPLETED_NONE,
+    ACHIEVEMENT_COMPLETED_COMPLETED_NOT_STORED,
+    ACHIEVEMENT_COMPLETED_COMPLETED_STORED,
+};
+
 class AchievementMgr
 {
     public:
@@ -49,7 +56,7 @@ class AchievementMgr
         void CompletedCriteria(AchievementCriteriaEntry const* entry);
         void CompletedAchievement(AchievementEntry const* entry);
         bool IsCompletedCriteria(AchievementCriteriaEntry const* entry);
-        bool IsCompletedAchievement(AchievementEntry const* entry);
+        AchievementCompletionState GetAchievementCompletionState(AchievementEntry const* entry);
         void BuildAllDataPacket(WorldPacket *data);
 
         Player* m_player;

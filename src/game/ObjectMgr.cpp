@@ -899,6 +899,42 @@ void ObjectMgr::LoadEquipmentTemplates()
 {
     sEquipmentStorage.Load();
 
+    for(uint32 i=0; i< sEquipmentStorage.MaxEntry; ++i)
+    {
+        EquipmentInfo const* eqInfo = sEquipmentStorage.LookupEntry<EquipmentInfo>(i);
+
+        if(!eqInfo)
+            continue;
+
+        for(uint8 j=0; j<3; j++)
+        {
+            if(!eqInfo->equipentry[j])
+               continue;
+
+            ItemPrototype const* proto = objmgr.GetItemPrototype(eqInfo->equipentry[j]);
+
+            if(!proto)
+            {
+                sLog.outErrorDb("Unknown item (entry=%u) in creature_equip_template.equipentry%u for entry = %u, forced to 0.", eqInfo->equipentry[j], j+1, i);
+                const_cast<EquipmentInfo*>(eqInfo)->equipentry[j] = 0;
+                continue;
+            }
+
+            if(proto->InventoryType != INVTYPE_WEAPON &&
+                    proto->InventoryType != INVTYPE_SHIELD &&
+                    proto->InventoryType != INVTYPE_RANGED &&
+                    proto->InventoryType != INVTYPE_2HWEAPON &&
+                    proto->InventoryType != INVTYPE_WEAPONMAINHAND &&
+                    proto->InventoryType != INVTYPE_WEAPONOFFHAND &&
+                    proto->InventoryType != INVTYPE_HOLDABLE &&
+                    proto->InventoryType != INVTYPE_THROWN &&
+                    proto->InventoryType != INVTYPE_RANGEDRIGHT)
+            {
+                sLog.outErrorDb("Item (entry=%u) in creature_equip_template.equipentry%u for entry = %u is not equipable in a hand, forced to 0.", eqInfo->equipentry[j], j+1, i);
+                const_cast<EquipmentInfo*>(eqInfo)->equipentry[j] = 0;
+            }
+        }
+    }
     sLog.outString( ">> Loaded %u equipment template", sEquipmentStorage.RecordCount );
     sLog.outString();
 }
