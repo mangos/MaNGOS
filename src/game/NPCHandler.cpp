@@ -517,8 +517,7 @@ void WorldSession::SendStablePet(uint64 guid )
         data << uint32(pet->GetEntry());
         data << uint32(pet->getLevel());
         data << pet->GetName();                             // petname
-        data << uint32(0);                                  // was loyalty
-        data << uint8(0x01);                                // client slot 1 == current pet (0)
+        data << uint8(0x01);                                // flags?, client slot 1 == current pet (0)
         ++num;
     }
 
@@ -535,7 +534,6 @@ void WorldSession::SendStablePet(uint64 guid )
             data << uint32(fields[3].GetUInt32());          // creature entry
             data << uint32(fields[4].GetUInt32());          // level
             data << fields[5].GetString();                  // name
-            data << uint32(0);                              // was loyalty
             data << uint8(fields[1].GetUInt32()+1);         // slot
 
             ++num;
