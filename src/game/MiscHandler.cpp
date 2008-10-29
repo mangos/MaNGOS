@@ -545,7 +545,7 @@ void WorldSession::HandleTogglePvP( WorldPacket & recv_data )
         bool newPvPStatus;
         recv_data >> newPvPStatus;
         GetPlayer()->ApplyModFlag(PLAYER_FLAGS, PLAYER_FLAGS_IN_PVP, newPvPStatus);
-        GetPlayer()->ApplyModFlag(PLAYER_FLAGS, PLAYER_FLAGS_PVP, newPvPStatus);
+        GetPlayer()->ApplyModFlag(PLAYER_FLAGS, PLAYER_FLAGS_PVP, !newPvPStatus);
     }
     else
     {
@@ -1135,7 +1135,8 @@ void WorldSession::HandleRequestAccountData(WorldPacket& recv_data)
 
     uint32 size = adata->Data.size();
 
-    ByteBuffer dest(size);
+    ByteBuffer dest;
+    dest.resize(size);
 
     uLongf destSize = size;
     if(compress(const_cast<uint8*>(dest.contents()), &destSize, (uint8*)adata->Data.c_str(), size) != Z_OK)

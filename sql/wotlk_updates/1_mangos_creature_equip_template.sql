@@ -1,3 +1,5 @@
+TRUNCATE creature_equip_template;
+
 alter table `creature_equip_template`
     drop column `equipinfo1`,
     drop column `equipinfo2`,
