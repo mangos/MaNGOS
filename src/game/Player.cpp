@@ -3686,7 +3686,7 @@ void Player::ResurrectPlayer(float restore_percent, bool updateToWorld, bool app
         SetPower(POWER_ENERGY, uint32(GetMaxPower(POWER_ENERGY)*restore_percent));
     }
 
-    // update visbility
+    // update visibility
     ObjectAccessor::UpdateVisibilityForPlayer(this);
 
     // some items limited to specific map
