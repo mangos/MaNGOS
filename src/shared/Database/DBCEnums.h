@@ -34,8 +34,6 @@ enum AchievementFactionFlags
 
 enum AchievementFlags
 {
-    // This achievement is a counter and can never be "fulfilled"
-    ACHIEVEMENT_FLAG_COUNTER  = 0x00000001,
 };
 
 enum AchievementCriteriaCompletionFlags

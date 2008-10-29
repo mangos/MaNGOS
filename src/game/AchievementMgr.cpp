@@ -116,6 +116,11 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
     for(AchievementCriteriaEntryList::const_iterator i = achievementCriteriaList.begin(); i!=achievementCriteriaList.end(); ++i)
     {
         AchievementCriteriaEntry const *achievementCriteria = (*i);
+
+        // don't update already completed criteria
+        if(IsCompletedCriteria(achievementCriteria))
+            continue;
+
         switch (type)
         {
             case ACHIEVEMENT_CRITERIA_TYPE_REACH_LEVEL:
@@ -138,7 +143,7 @@ bool AchievementMgr::IsCompletedCriteria(AchievementCriteriaEntry const* achieve
     if(!achievement)
         return false;
     // counter can never complete
-    if(achievement->flags & ACHIEVEMENT_FLAG_COUNTER)
+    if(achievement->points == 0)
         return false;
 
     switch(achievementCriteria->requiredType)
@@ -158,7 +163,7 @@ void AchievementMgr::CompletedCriteria(AchievementCriteriaEntry const* criteria)
     if(!achievement)
         return;
     // counter can never complete
-    if(achievement->flags & ACHIEVEMENT_FLAG_COUNTER)
+    if(achievement->points ==0)
         return;
 
     if(criteria->completionFlag & ACHIEVEMENT_CRITERIA_COMPLETE_FLAG_ALL || IsCompletedAchievement(achievement))
@@ -196,7 +201,7 @@ void AchievementMgr::SetCriteriaProgress(AchievementCriteriaEntry const* entry, 
 void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
 {
     sLog.outString("AchievementMgr::CompletedAchievement(%u)", achievement->ID);
-    if(achievement->flags & ACHIEVEMENT_FLAG_COUNTER || m_completedAchievements.find(achievement->ID)!=m_completedAchievements.end())
+    if(achievement->points==0 || m_completedAchievements.find(achievement->ID)!=m_completedAchievements.end())
         return;
 
     SendAchievementEarned(achievement->ID);
