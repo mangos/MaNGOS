@@ -792,7 +792,8 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `db_version`;
 CREATE TABLE `db_version` (
-  `version` varchar(120) default NULL
+  `version` varchar(120) default NULL,
+  `required_2008_10_29_03_mangos_db_version` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
