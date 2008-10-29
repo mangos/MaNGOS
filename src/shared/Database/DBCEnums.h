@@ -36,6 +36,17 @@ enum AchievementFlags
 {
 };
 
+enum AchievementCriteriaCondition
+{
+    ACHIEVEMENT_CRITERIA_CONDITION_NONE      = 0,
+    ACHIEVEMENT_CRITERIA_CONDITION_NO_DEATH  = 1,
+    ACHIEVEMENT_CRITERIA_CONDITION_UNK1      = 2,           // only used in "Complete a daily quest every day for five consecutive days"
+    ACHIEVEMENT_CRITERIA_CONDITION_MAP       = 3,           // requires you to be on specific map
+    ACHIEVEMENT_CRITERIA_CONDITION_NO_LOOSE  = 4,           // only used in "Win 10 arenas without losing"
+    ACHIEVEMENT_CRITERIA_CONDITION_UNK2      = 9,           // unk
+    ACHIEVEMENT_CRITERIA_CONDITION_UNK3      = 13,          // unk
+};
+
 enum AchievementCriteriaCompletionFlags
 {
     // some Achievements (like 698) have several criteria but only one has to be fulfilled. These are identified by this flag.

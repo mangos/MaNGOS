@@ -40,15 +40,27 @@ struct AchievementEntry
     uint32    ID;                                           // 0
     uint32    factionFlag;                                  // 1 -1=all, 0=horde, 1=alliance
     uint32    mapID;                                        // 2 -1=none
+    //char *name[16];                                       // 3-19
+    //uint32 name_flags;                                    // 20
+    //char *description[16];                                // 21-36
+    //uint32 desc_flags;                                    // 37
     uint32    categoryId;                                   // 38
-    uint32    points;                                       // 39
-    uint32    flags;                                        // 42
+    uint32    points;                                       // 39 reward points
+    //uint32 OrderInCategory;                               // 40
+    //uint32 Flags;                                         // 41
+    uint32    flags;                                        // 42 not flags, some unknown value...
+    //char *unk1[16];                                       // 43-58
+    //uint32 unk_flags;                                     // 59
+    //uint32 count;                                         // 60
+    //uint32 refAchievement;                                // 61
 };
 
 struct AchievementCategoryEntry
 {
     uint32    ID;                                           // 0
     uint32    parentCategory;                               // 1 -1 for main category
+    //char *name[16];                                       // 2-17
+    //uint32 name_flags;                                    // 18
     uint32    sortOrder;                                    // 19
 };
 
@@ -433,17 +445,20 @@ struct AchievementCriteriaEntry
 
         struct
         {
-            uint32  field3;                                 // 3
-            uint32  field4;                                 // 4
-            uint32  field5;                                 // 5
-            uint32  field6;                                 // 6
-            uint32  field7;                                 // 7
-            uint32  field8;                                 // 8
+            uint32  field3;                                 // 3 main requirement
+            uint32  field4;                                 // 4 main requirement count
+            uint32  field5;                                 // 5 additional requirement 1 type
+            uint32  field6;                                 // 6 additional requirement 1 value
+            uint32  field7;                                 // 7 additional requirement 2 type
+            uint32  field8;                                 // 8 additional requirement 1 value
         } raw;
     };
+    //char*  name[16];                                      // 9-24
+    //uint32 name_flags;                                    // 25
     uint32  completionFlag;                                 // 26
     uint32  groupFlag;                                      // 27
     uint32  timeLimit;                                      // 29 time limit in seconds
+    //uint32 unk1;                                          // 30
 };
 
 struct AreaTableEntry
