@@ -1071,7 +1071,8 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
 void WorldSession::HandleUpdateAccountData(WorldPacket &recv_data)
 {
     sLog.outDetail("WORLD: Received CMSG_UPDATE_ACCOUNT_DATA");
-    recv_data.hexlike();
+
+    CHECK_PACKET_SIZE(recv_data, 4+4+4);
 
     uint32 type, timestamp, decompressedSize;
     recv_data >> type >> timestamp >> decompressedSize;
@@ -1082,7 +1083,18 @@ void WorldSession::HandleUpdateAccountData(WorldPacket &recv_data)
     if(decompressedSize == 0)                               // erase
     {
         SetAccountData(type, timestamp, "");
-        SaveAccountData(type);
+
+        WorldPacket data(SMSG_UPDATE_ACCOUNT_DATA_COMPLETE, 4+4);
+        data << uint32(type);
+        data << uint32(0);
+        SendPacket(&data);
+
+        return;
+    }
+
+    if(decompressedSize > 0xFFFF)
+    {
+        sLog.outError("UAD: Account data packet too big, size %u", decompressedSize);
         return;
     }
 
@@ -1092,7 +1104,7 @@ void WorldSession::HandleUpdateAccountData(WorldPacket &recv_data)
     uLongf realSize = decompressedSize;
     if(uncompress(const_cast<uint8*>(dest.contents()), &realSize, const_cast<uint8*>(recv_data.contents() + recv_data.rpos()), recv_data.size() - recv_data.rpos()) != Z_OK)
     {
-        sLog.outError("UAD: Failed to decompress packet");
+        sLog.outError("UAD: Failed to decompress account data");
         return;
     }
 
@@ -1100,7 +1112,6 @@ void WorldSession::HandleUpdateAccountData(WorldPacket &recv_data)
     dest >> adata;
 
     SetAccountData(type, timestamp, adata);
-    SaveAccountData(type);
 
     WorldPacket data(SMSG_UPDATE_ACCOUNT_DATA_COMPLETE, 4+4);
     data << uint32(type);
@@ -1111,7 +1122,6 @@ void WorldSession::HandleUpdateAccountData(WorldPacket &recv_data)
 void WorldSession::HandleRequestAccountData(WorldPacket& recv_data)
 {
     sLog.outDetail("WORLD: Received CMSG_REQUEST_ACCOUNT_DATA");
-    recv_data.hexlike();
 
     CHECK_PACKET_SIZE(recv_data, 4);
 
@@ -1122,14 +1132,15 @@ void WorldSession::HandleRequestAccountData(WorldPacket& recv_data)
         return;
 
     AccountData *adata = GetAccountData(type);
-    uint32 size = adata->Data.size();
-    uLongf destSize = size;
-    ByteBuffer dest;
-    dest.resize(size);
 
+    uint32 size = adata->Data.size();
+
+    ByteBuffer dest(size);
+
+    uLongf destSize = size;
     if(compress(const_cast<uint8*>(dest.contents()), &destSize, (uint8*)adata->Data.c_str(), size) != Z_OK)
     {
-        sLog.outDebug("RAD: Failed to compress account data, error");
+        sLog.outDebug("RAD: Failed to compress account data");
         return;
     }
 

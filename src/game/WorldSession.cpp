@@ -539,9 +539,12 @@ void WorldSession::LoadAccountData()
     delete result;
 }
 
-void WorldSession::SaveAccountData(uint32 type)
+void WorldSession::SetAccountData(uint32 type, time_t time_, std::string data)
 {
+    m_accountData[type].Time = time_;
+    m_accountData[type].Data = data;
+
     uint32 acc = GetAccountId();
     CharacterDatabase.PExecute("DELETE FROM account_data WHERE account='%u' AND type='%u'", acc, type);
-    CharacterDatabase.PExecute("INSERT INTO account_data VALUES ('%u','%u','%u','%s')", acc, type, (uint32)m_accountData[type].Time, m_accountData[type].Data.c_str());
+    CharacterDatabase.PExecute("INSERT INTO account_data VALUES ('%u','%u','%u','%s')", acc, type, (uint32)time_, data.c_str());
 }

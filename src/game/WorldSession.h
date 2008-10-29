@@ -158,18 +158,9 @@ class MANGOS_DLL_SPEC WorldSession
         void SendPetNameQuery(uint64 guid, uint32 petnumber);
 
         // Account Data
-        AccountData *GetAccountData(uint32 type)
-        {
-            return &m_accountData[type];
-        }
-        void SetAccountData(uint32 type, time_t time_, std::string data)
-        {
-            m_accountData[type].Time = time_;
-            m_accountData[type].Data = data;
-        }
-
+        AccountData *GetAccountData(uint32 type) { return &m_accountData[type]; }
+        void SetAccountData(uint32 type, time_t time_, std::string data);
         void LoadAccountData();
-        void SaveAccountData(uint32 type);
 
         //mail
                                                             //used with item_page table
