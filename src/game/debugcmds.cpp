@@ -146,6 +146,9 @@ bool ChatHandler::HandleSendOpcodeCommand(const char* args)
         std::string type;
         ifs >> type;
 
+        if(type == "")
+            break;
+
         if(type == "uint8")
         {
             uint16 val1;
@@ -189,6 +192,7 @@ bool ChatHandler::HandleSendOpcodeCommand(const char* args)
         else
         {
             sLog.outDebug("Sending opcode: unknown type %s", type.c_str());
+            break;
         }
     }
     ifs.close();
