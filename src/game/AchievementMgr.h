@@ -21,8 +21,22 @@
 #include "Common.h"
 #include "Database/DBCEnums.h"
 #include "Database/DBCStores.h"
+#include "Database/DatabaseEnv.h"
 
-typedef HM_NAMESPACE::hash_map<uint32, uint32> CriteriaProgressMap;
+struct CriteriaProgress
+{
+    CriteriaProgress(uint32 id, uint32 counter, time_t date = time(NULL))
+    {
+        this->id = id;
+        this->counter = counter;
+        this->date = date;
+    }
+    uint32 id;
+    uint32 counter;
+    time_t date;
+};
+
+typedef HM_NAMESPACE::hash_map<uint32, CriteriaProgress*> CriteriaProgressMap;
 typedef HM_NAMESPACE::hash_map<uint32, time_t> CompletedAchievementMap;
 
 class Player;
@@ -39,8 +53,9 @@ class AchievementMgr
 {
     public:
         AchievementMgr(Player* pl);
+        ~AchievementMgr();
 
-        void LoadFromDB();
+        void LoadFromDB(QueryResult *achievementResult, QueryResult *criteriaResult);
         void SaveToDB();
         void UpdateAchievementCriteria(AchievementCriteriaTypes type, uint32 miscvalue1=0, uint32 miscvalue2=0, uint32 time=0);
         void CheckAllAchievementCriteria();
@@ -51,7 +66,7 @@ class AchievementMgr
 
     private:
         void SendAchievementEarned(uint32 achievementId);
-        void SendCriteriaUpdate(uint32 criteriaId, uint32 counter);
+        void SendCriteriaUpdate(CriteriaProgress *progress);
         void SetCriteriaProgress(AchievementCriteriaEntry const* entry, uint32 newValue);
         void CompletedCriteria(AchievementCriteriaEntry const* entry);
         void CompletedAchievement(AchievementEntry const* entry);

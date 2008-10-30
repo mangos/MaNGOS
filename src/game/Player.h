@@ -836,9 +836,11 @@ enum PlayerLoginQueryIndex
     PLAYER_LOGIN_QUERY_LOADSPELLCOOLDOWNS       = 15,
     PLAYER_LOGIN_QUERY_LOADDECLINEDNAMES        = 16,
     PLAYER_LOGIN_QUERY_LOADGUILD                = 17,
+    PLAYER_LOGIN_QUERY_LOADACHIEVEMENTS         = 18,
+    PLAYER_LOGIN_QUERY_LOADCRITERIAPROGRESS     = 19,
+    MAX_PLAYER_LOGIN_QUERY                      = 20
 };
 
-#define MAX_PLAYER_LOGIN_QUERY                    18
 
 // Player summoning auto-decline time (in secs)
 #define MAX_PLAYER_SUMMON_DELAY                   (2*MINUTE)

@@ -23,20 +23,76 @@
 #include "Database/DBCEnums.h"
 #include "ObjectMgr.h"
 #include "Guild.h"
+#include "Database/DatabaseEnv.h"
 
 AchievementMgr::AchievementMgr(Player *player)
 {
     m_player = player;
 }
 
-void AchievementMgr::SaveToDB()
+AchievementMgr::~AchievementMgr()
 {
-    // TODO store achievements
+    for(CriteriaProgressMap::iterator iter = m_criteriaProgress.begin(); iter!=m_criteriaProgress.end(); ++iter)
+        delete iter->second;
+    m_criteriaProgress.clear();
 }
 
-void AchievementMgr::LoadFromDB()
+void AchievementMgr::SaveToDB()
 {
-    // TODO load achievements
+    if(!m_completedAchievements.empty())
+    {
+        CharacterDatabase.PExecute("DELETE FROM character_achievement WHERE guid = %u", GetPlayer()->GetGUIDLow());
+
+        std::ostringstream ss;
+        ss << "INSERT INTO character_achievement (guid, achievement, date) VALUES ";
+        for(CompletedAchievementMap::iterator iter = m_completedAchievements.begin(); iter!=m_completedAchievements.end(); iter++)
+        {
+            if(iter != m_completedAchievements.begin())
+                ss << ", ";
+            ss << "("<<GetPlayer()->GetGUIDLow() << ", " << iter->first << ", " << iter->second << ")";
+        }
+        CharacterDatabase.Execute( ss.str().c_str() );
+    }
+
+    if(!m_criteriaProgress.empty())
+    {
+        CharacterDatabase.PExecute("DELETE FROM character_achievement_progress WHERE guid = %u", GetPlayer()->GetGUIDLow());
+
+        std::ostringstream ss;
+        ss << "INSERT INTO character_achievement_progress (guid, criteria, counter, date) VALUES ";
+        for(CriteriaProgressMap::iterator iter = m_criteriaProgress.begin(); iter!=m_criteriaProgress.end(); ++iter)
+        {
+            if(iter != m_criteriaProgress.begin())
+                ss << ", ";
+            ss << "(" << GetPlayer()->GetGUIDLow() << ", " << iter->first << ", " << iter->second->counter << ", " << iter->second->date << ")";
+        }
+        CharacterDatabase.Execute( ss.str().c_str() );
+    }
+}
+
+void AchievementMgr::LoadFromDB(QueryResult *achievementResult, QueryResult *criteriaResult)
+{
+    if(achievementResult)
+    {
+        do
+        {
+            Field *fields = achievementResult->Fetch();
+            m_completedAchievements[fields[0].GetUInt32()] = fields[1].GetUInt32();
+        } while(achievementResult->NextRow());
+        delete achievementResult;
+    }
+
+    if(criteriaResult)
+    {
+        do
+        {
+            Field *fields = criteriaResult->Fetch();
+            CriteriaProgress *progress = new CriteriaProgress(fields[0].GetUInt32(), fields[1].GetUInt32(), fields[2].GetUInt64());
+            m_criteriaProgress[progress->id] = progress;
+        } while(criteriaResult->NextRow());
+        delete criteriaResult;
+    }
+
 }
 
 void AchievementMgr::SendAchievementEarned(uint32 achievementId)
@@ -79,18 +135,17 @@ void AchievementMgr::SendAchievementEarned(uint32 achievementId)
     GetPlayer()->SendMessageToSet(&data, true);
 }
 
-void AchievementMgr::SendCriteriaUpdate(uint32 criteriaId, uint32 counter)
+void AchievementMgr::SendCriteriaUpdate(CriteriaProgress *progress)
 {
-    sLog.outString("AchievementMgr::SendCriteriaUpdate(%u, %u)", criteriaId, counter);
     WorldPacket data(SMSG_CRITERIA_UPDATE, 8+4+8);
-    data << uint32(criteriaId);
+    data << uint32(progress->id);
 
     // the counter is packed like a packed Guid
-    data.appendPackGUID(counter);
+    data.appendPackGUID(progress->counter);
 
     data.append(GetPlayer()->GetPackGUID());
     data << uint32(0);
-    data << uint32(secsToTimeBitFields(time(NULL)));
+    data << uint32(secsToTimeBitFields(progress->date));
     data << uint32(0);  // timer 1
     data << uint32(0);  // timer 2
     GetPlayer()->SendMessageToSet(&data, true);
@@ -121,6 +176,9 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
         if(IsCompletedCriteria(achievementCriteria))
             continue;
 
+        if(achievementCriteria->groupFlag & ACHIEVEMENT_CRITERIA_GROUP_NOT_IN_GROUP && GetPlayer()->GetGroup())
+            continue;
+
         switch (type)
         {
             case ACHIEVEMENT_CRITERIA_TYPE_REACH_LEVEL:
@@ -129,8 +187,6 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
             case ACHIEVEMENT_CRITERIA_TYPE_BUY_BANK_SLOT:
                 SetCriteriaProgress(achievementCriteria, GetPlayer()->GetByteValue(PLAYER_BYTES_2, 2)+1);
                 break;
-            default:
-                return;
         }
         if(IsCompletedCriteria(achievementCriteria))
             CompletedCriteria(achievementCriteria);
@@ -146,15 +202,20 @@ bool AchievementMgr::IsCompletedCriteria(AchievementCriteriaEntry const* achieve
     if(achievement->flags & ACHIEVEMENT_FLAG_COUNTER)
         return false;
 
-    if(m_criteriaProgress.find(achievementCriteria->ID) == m_criteriaProgress.end())
+    CriteriaProgressMap::iterator itr = m_criteriaProgress.find(achievementCriteria->ID);
+    if(itr == m_criteriaProgress.end())
         return false;
+
+    CriteriaProgress *progress = itr->second;
 
     switch(achievementCriteria->requiredType)
     {
         case ACHIEVEMENT_CRITERIA_TYPE_REACH_LEVEL:
-            return m_criteriaProgress[achievementCriteria->ID] >= achievementCriteria->reach_level.level;
+            return progress->counter >= achievementCriteria->reach_level.level;
         case ACHIEVEMENT_CRITERIA_TYPE_BUY_BANK_SLOT:
-            return m_criteriaProgress[achievementCriteria->ID] >= achievementCriteria->buy_bank_slot.numberOfSlots;
+            return progress->counter >= achievementCriteria->buy_bank_slot.numberOfSlots;
+        case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_ARCHIEVEMENT:
+            return m_completedAchievements.find(achievementCriteria->complete_achievement.linkedAchievement) != m_completedAchievements.end();
     }
     return false;
 }
@@ -189,7 +250,7 @@ AchievementCompletionState AchievementMgr::GetAchievementCompletionState(Achieve
          if(IsCompletedCriteria(criteria) && criteria->completionFlag & ACHIEVEMENT_CRITERIA_COMPLETE_FLAG_ALL)
              return ACHIEVEMENT_COMPLETED_COMPLETED_NOT_STORED;
 
-         // found an umcompleted criteria, but DONT return false - there might be a completed criteria with ACHIEVEMENT_CRITERIA_COMPLETE_FLAG_ALL
+         // found an umcompleted criteria, but DONT return false yet - there might be a completed criteria with ACHIEVEMENT_CRITERIA_COMPLETE_FLAG_ALL
          if(!IsCompletedCriteria(criteria))
              foundOutstanding = true;
     }
@@ -202,8 +263,21 @@ AchievementCompletionState AchievementMgr::GetAchievementCompletionState(Achieve
 void AchievementMgr::SetCriteriaProgress(AchievementCriteriaEntry const* entry, uint32 newValue)
 {
     sLog.outString("AchievementMgr::SetCriteriaProgress(%u, %u)", entry->ID, newValue);
-    m_criteriaProgress[entry->ID] = newValue;
-    SendCriteriaUpdate(entry->ID, newValue);
+    CriteriaProgress *progress = NULL;
+
+    if(m_criteriaProgress.find(entry->ID) == m_criteriaProgress.end())
+    {
+        progress = new CriteriaProgress(entry->ID, newValue);
+        m_criteriaProgress[entry->ID]=progress;
+    }
+    else
+    {
+        progress = m_criteriaProgress[entry->ID];
+        if(progress->counter == newValue)
+            return;
+        progress->counter = newValue;
+    }
+    SendCriteriaUpdate(progress);
 }
 
 void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
@@ -214,6 +288,8 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
 
     SendAchievementEarned(achievement->ID);
     m_completedAchievements[achievement->ID] = time(NULL);
+
+    UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_ARCHIEVEMENT);
     // TODO: reward titles and items
 }
 
@@ -248,16 +324,15 @@ void AchievementMgr::BuildAllDataPacket(WorldPacket *data)
 
     for(CriteriaProgressMap::iterator iter = m_criteriaProgress.begin(); iter!=m_criteriaProgress.end(); ++iter)
     {
-        *data << uint32(iter->first);
-        data->appendPackGUID(iter->second);
+        *data << uint32(iter->second->id);
+        data->appendPackGUID(iter->second->counter);
         data->append(GetPlayer()->GetPackGUID());
         *data << uint32(0);
-        *data << uint32(secsToTimeBitFields(time(NULL)));
+        *data << uint32(secsToTimeBitFields(iter->second->date));
         *data << uint32(0);
         *data << uint32(0);
     }
 
     *data << int32(-1);
-
 }
 
