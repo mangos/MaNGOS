@@ -871,7 +871,7 @@ bool ChatHandler::HandleItemMoveCommand(const char* args)
 }
 
 //add spawn of creature
-bool ChatHandler::HandleAddSpwCommand(const char* args)
+bool ChatHandler::HandleNpcAddCommand(const char* args)
 {
     if(!*args)
         return false;
@@ -921,7 +921,7 @@ bool ChatHandler::HandleAddSpwCommand(const char* args)
     return true;
 }
 
-bool ChatHandler::HandleDelCreatureCommand(const char* args)
+bool ChatHandler::HandleNpcDeleteCommand(const char* args)
 {
     Creature* unit = NULL;
 
@@ -1069,7 +1069,7 @@ bool ChatHandler::HandleTurnObjectCommand(const char* args)
 }
 
 //move selected creature
-bool ChatHandler::HandleMoveCreatureCommand(const char* args)
+bool ChatHandler::HandleNpcMoveCommand(const char* args)
 {
     uint32 lowguid = 0;
 
@@ -1321,7 +1321,7 @@ bool ChatHandler::HandleDelVendorItemCommand(const char* args)
 }
 
 //add move for creature
-bool ChatHandler::HandleAddMoveCommand(const char* args)
+bool ChatHandler::HandleNpcAddMoveCommand(const char* args)
 {
     if(!*args)
         return false;
@@ -1395,7 +1395,7 @@ bool ChatHandler::HandleAddMoveCommand(const char* args)
  * additional parameter: NODEL - so no waypoints are deleted, if you
  *                       change the movement type
  */
-bool ChatHandler::HandleSetMoveTypeCommand(const char* args)
+bool ChatHandler::HandleNpcSetMoveTypeCommand(const char* args)
 {
     if(!*args)
         return false;
@@ -1523,7 +1523,7 @@ bool ChatHandler::HandleSetMoveTypeCommand(const char* args)
     }
 
     return true;
-}                                                           // HandleSetMoveTypeCommand
+}                                                           // HandleNpcSetMoveTypeCommand
 
 //change level of creature or pet
 bool ChatHandler::HandleChangeLevelCommand(const char* args)
@@ -1563,7 +1563,7 @@ bool ChatHandler::HandleChangeLevelCommand(const char* args)
 }
 
 //set npcflag of creature
-bool ChatHandler::HandleNPCFlagCommand(const char* args)
+bool ChatHandler::HandleNpcFlagCommand(const char* args)
 {
     if (!*args)
         return false;
@@ -1589,7 +1589,7 @@ bool ChatHandler::HandleNPCFlagCommand(const char* args)
 }
 
 //set model of creature
-bool ChatHandler::HandleSetModelCommand(const char* args)
+bool ChatHandler::HandleNpcSetModelCommand(const char* args)
 {
     if (!*args)
         return false;
@@ -1630,8 +1630,8 @@ bool ChatHandler::HandleMorphCommand(const char* args)
     return true;
 }
 
-//set faction of creature  or go
-bool ChatHandler::HandleFactionIdCommand(const char* args)
+//set faction of creature
+bool ChatHandler::HandleNpcFactionIdCommand(const char* args)
 {
     if (!*args)
         return false;
@@ -2120,7 +2120,7 @@ bool ChatHandler::HandleDelTicketCommand(const char *args)
 }
 
 //set spawn dist of creature
-bool ChatHandler::HandleSpawnDistCommand(const char* args)
+bool ChatHandler::HandleNpcSpawnDistCommand(const char* args)
 {
     if(!*args)
         return false;
@@ -2158,7 +2158,7 @@ bool ChatHandler::HandleSpawnDistCommand(const char* args)
     return true;
 }
 
-bool ChatHandler::HandleSpawnTimeCommand(const char* args)
+bool ChatHandler::HandleNpcSpawnTimeCommand(const char* args)
 {
     if(!*args)
         return false;
