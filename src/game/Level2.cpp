@@ -1794,7 +1794,8 @@ bool ChatHandler::HandlePInfoCommand(const char* args)
     else
     {
         accId = objmgr.GetPlayerAccountIdByGUID(targetGUID);
-        Player plr(m_session);                              // use current session for temporary load
+        WorldSession session(0,NULL,SEC_PLAYER,0,0,LOCALE_enUS);
+        Player plr(&session);                               // use fake session for temporary load
         plr.MinimalLoadFromDB(NULL, targetGUID);
         money = plr.GetMoney();
         total_player_time = plr.GetTotalPlayedTime();
