@@ -860,18 +860,18 @@ struct MailTemplateEntry
 
 struct MapEntry
 {
-    uint32      MapID;                                      // 0
+    uint32  MapID;                                          // 0
     //char*       internalname;                             // 1 unused
-    uint32      map_type;                                   // 2
+    uint32  map_type;                                       // 2
                                                             // 3 0 or 1 for battlegrounds (not arenas)
-    char*       name[16];                                   // 4-19
+    char*   name[16];                                       // 4-19
                                                             // 20 name flags, unused
-    uint32      linked_zone;                                // 21 common zone for instance and continent map
+    uint32  linked_zone;                                    // 21 common zone for instance and continent map
     //char*     hordeIntro[16];                             // 23-37 text for PvP Zones
                                                             // 38 intro text flags
     //char*     allianceIntro[16];                          // 39-54 text for PvP Zones
                                                             // 55 intro text flags
-    uint32      multimap_id;                                // 56
+    uint32  multimap_id;                                    // 56
                                                             // 57
     //chat*     unknownText1[16];                           // 58-73 unknown empty text fields, possible normal Intro text.
                                                             // 74 text flags
@@ -879,14 +879,14 @@ struct MapEntry
                                                             // 91 text flags
     //chat*     unknownText2[16];                           // 92-107 unknown empty text fields
                                                             // 108 text flags
-    int32       parent_map;                                 // 109 map_id of parent map
-    //float start_x                                         // 110 enter x coordinate (if exist single entry)
-    //float start_y                                         // 111 enter y coordinate (if exist single entry)
-    uint32 resetTimeRaid;                                   // 112
-    uint32 resetTimeHeroic;                                 // 113
+    int32   entrance_map;                                   // 109 map_id of entrance map
+    float   entrance_x;                                     // 110 entrance x coordinate (if exist single entry)
+    float   entrance_y;                                     // 111 entrance y coordinate (if exist single entry)
+    uint32  resetTimeRaid;                                  // 112
+    uint32  resetTimeHeroic;                                // 113
                                                             // 114 all 0
                                                             // 115 -1, 0 and 720
-    uint32      addon;                                      // 116 (0-original maps,1-tbc addon)
+    uint32  addon;                                          // 116 (0-original maps,1-tbc addon)
                                                             // 117 some kind of time?
 
     // Helpers

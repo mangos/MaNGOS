@@ -1791,9 +1791,7 @@ void Unit::DoAttackDamage (Unit *pVictim, uint32 *damage, CleanDamage *cleanDama
         case MELEE_HIT_BLOCK_CRIT:
         case MELEE_HIT_CRIT:
         {
-            //*hitInfo = 0xEA;
-            // 0xEA
-            *hitInfo  = HITINFO_CRITICALHIT | HITINFO_NORMALSWING2 | 0x8;
+            *hitInfo  = HITINFO_CRITICALHIT | HITINFO_NORMALSWING2 | HITINFO_UNK2;
 
             // Crit bonus calc
             uint32 crit_bonus;
@@ -4377,11 +4375,11 @@ void Unit::SendAttackStateUpdate(uint32 HitInfo, Unit *target, uint8 SwingType, 
     sLog.outDebug("WORLD: Sending SMSG_ATTACKERSTATEUPDATE");
 
     WorldPacket data(SMSG_ATTACKERSTATEUPDATE, (16+45));    // we guess size
-    data << (uint32)HitInfo;
+    data << uint32(HitInfo);                                // flags
     data.append(GetPackGUID());
     data.append(target->GetPackGUID());
-    data << uint32(Damage-AbsorbDamage-Resist-BlockedAmount);
-    data << uint32(0);                                      // WotLK
+    data << uint32(Damage-AbsorbDamage-Resist-BlockedAmount);// damage
+    data << uint32(0);                                      // overkill value
 
     data << (uint8)SwingType;                               // count?
 
@@ -4391,17 +4389,17 @@ void Unit::SendAttackStateUpdate(uint32 HitInfo, Unit *target, uint8 SwingType, 
     data << (uint32)(Damage-AbsorbDamage-Resist-BlockedAmount);
     // end loop
 
-    if(HitInfo & (HITINFO_RESIST | HITINFO_ABSORB))
+    if(HitInfo & (HITINFO_ABSORB | HITINFO_ABSORB2))
     {
         // for(i = 0; i < SwingType; ++i)
-        data << (uint32)Resist;
+        data << uint32(AbsorbDamage);
         // end loop
     }
 
-    if(HitInfo & (HITINFO_CRITICALHIT | HITINFO_UNK2))
+    if(HitInfo & (HITINFO_RESIST | HITINFO_RESIST2))
     {
         // for(i = 0; i < SwingType; ++i)
-        data << uint32(0);                                  // what is it?
+        data << uint32(Resist);
         // end loop
     }
 
@@ -4409,17 +4407,17 @@ void Unit::SendAttackStateUpdate(uint32 HitInfo, Unit *target, uint8 SwingType, 
     data << (uint32)0;
     data << (uint32)0;
 
+    if(HitInfo & HITINFO_BLOCK)
+    {
+        data << uint32(BlockedAmount);
+    }
+
     if(HitInfo & HITINFO_UNK3)
     {
         data << uint32(0);
     }
 
-    /*if(unknown & HitInfo)
-    {
-        data << uint32(0);
-    }*/
-
-    /*if(HitInfo & HITINFO_UNK1)
+    if(HitInfo & HITINFO_UNK1)
     {
         data << uint32(0);
         data << float(0);
@@ -4436,7 +4434,7 @@ void Unit::SendAttackStateUpdate(uint32 HitInfo, Unit *target, uint8 SwingType, 
             data << float(0);
         }
         data << uint32(0);
-    }*/
+    }
 
     SendMessageToSet( &data, true );
 }

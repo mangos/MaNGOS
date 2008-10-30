@@ -5020,7 +5020,7 @@ AreaTrigger const* ObjectMgr::GetGoBackTrigger(uint32 Map) const
     if(!mapEntry) return NULL;
     for (AreaTriggerMap::const_iterator itr = mAreaTriggers.begin(); itr != mAreaTriggers.end(); itr++)
     {
-        if(itr->second.target_mapId == mapEntry->parent_map)
+        if(itr->second.target_mapId == mapEntry->entrance_map)
         {
             AreaTriggerEntry const* atEntry = sAreaTriggerStore.LookupEntry(itr->first);
             if(atEntry && atEntry->mapid == Map)
