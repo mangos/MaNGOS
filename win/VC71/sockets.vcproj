@@ -3,357 +3,260 @@
 	ProjectType="Visual C++"
 	Version="7.10"
 	Name="sockets"
-	ProjectGUID="{04BAF755-0D67-46F8-B1C6-77AE5368F3CB}"
-	TargetFrameworkVersion="0"
-	>
+	ProjectGUID="{04BAF755-0D67-46F8-B1C6-77AE5368F3CB}">
 	<Platforms>
 		<Platform
-			Name="Win32"
-		/>
+			Name="Win32"/>
 	</Platforms>
-	<ToolFiles>
-	</ToolFiles>
 	<Configurations>
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory=".\sockets__$(PlatformName)_$(ConfigurationName)"
 			IntermediateDirectory=".\sockets__$(PlatformName)_$(ConfigurationName)"
 			ConfigurationType="4"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="0"
-			ATLMinimizesCRunTimeLibraryUsage="false"
-			CharacterSet="2"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-			/>
+			ATLMinimizesCRunTimeLibraryUsage="FALSE"
+			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
 				InlineFunctionExpansion="1"
 				AdditionalIncludeDirectories="..\..\dep\include\sockets"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE"
-				StringPooling="true"
-				RuntimeLibrary="0"
-				EnableFunctionLevelLinking="true"
+				StringPooling="TRUE"
+				RuntimeLibrary="2"
+				EnableFunctionLevelLinking="TRUE"
 				EnableEnhancedInstructionSet="1"
-				RuntimeTypeInfo="true"
+				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderFile=".\sockets__$(PlatformName)_$(ConfigurationName)/sockets.pch"
 				AssemblerListingLocation=".\sockets__$(PlatformName)_$(ConfigurationName)\"
 				ObjectFile=".\sockets__$(PlatformName)_$(ConfigurationName)\"
 				ProgramDataBaseFileName=".\sockets__$(PlatformName)_$(ConfigurationName)\"
 				WarningLevel="3"
-				SuppressStartupBanner="true"
-				Detect64BitPortabilityProblems="false"
+				SuppressStartupBanner="TRUE"
+				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="3"
-				CompileAs="0"
-			/>
+				CompileAs="0"/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="NDEBUG"
-				Culture="1033"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
+				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLibrarianTool"
 				OutputFile=".\sockets__$(PlatformName)_$(ConfigurationName)\sockets.lib"
-				SuppressStartupBanner="true"
-			/>
+				SuppressStartupBanner="TRUE"/>
 			<Tool
-				Name="VCALinkTool"
-			/>
+				Name="VCMIDLTool"/>
 			<Tool
-				Name="VCXDCMakeTool"
-			/>
+				Name="VCPostBuildEventTool"/>
 			<Tool
-				Name="VCBscMakeTool"
-			/>
+				Name="VCPreBuildEventTool"/>
 			<Tool
-				Name="VCFxCopTool"
-			/>
+				Name="VCPreLinkEventTool"/>
 			<Tool
-				Name="VCPostBuildEventTool"
-			/>
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="NDEBUG"
+				Culture="1033"/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"/>
+			<Tool
+				Name="VCManagedWrapperGeneratorTool"/>
+			<Tool
+				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
 		</Configuration>
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory=".\sockets__$(PlatformName)_$(ConfigurationName)"
 			IntermediateDirectory=".\sockets__$(PlatformName)_$(ConfigurationName)"
 			ConfigurationType="4"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="0"
-			ATLMinimizesCRunTimeLibraryUsage="false"
-			CharacterSet="2"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-			/>
+			ATLMinimizesCRunTimeLibraryUsage="FALSE"
+			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..\dep\include\sockets"
 				PreprocessorDefinitions="WIN32;_DEBUG;MANGOS_DEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="1"
-				RuntimeTypeInfo="true"
+				RuntimeLibrary="3"
+				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderFile=".\sockets__$(PlatformName)_$(ConfigurationName)\sockets.pch"
 				AssemblerListingLocation=".\sockets__$(PlatformName)_$(ConfigurationName)\"
 				ObjectFile=".\sockets__$(PlatformName)_$(ConfigurationName)\"
 				ProgramDataBaseFileName=".\sockets__$(PlatformName)_$(ConfigurationName)\"
 				WarningLevel="3"
-				SuppressStartupBanner="true"
-				Detect64BitPortabilityProblems="false"
+				SuppressStartupBanner="TRUE"
+				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="3"
-				CompileAs="0"
-			/>
+				CompileAs="0"/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="_DEBUG"
-				Culture="1033"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
+				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLibrarianTool"
 				OutputFile=".\sockets__$(PlatformName)_$(ConfigurationName)\sockets.lib"
-				SuppressStartupBanner="true"
-			/>
+				SuppressStartupBanner="TRUE"/>
 			<Tool
-				Name="VCALinkTool"
-			/>
+				Name="VCMIDLTool"/>
 			<Tool
-				Name="VCXDCMakeTool"
-			/>
+				Name="VCPostBuildEventTool"/>
 			<Tool
-				Name="VCBscMakeTool"
-			/>
+				Name="VCPreBuildEventTool"/>
 			<Tool
-				Name="VCFxCopTool"
-			/>
+				Name="VCPreLinkEventTool"/>
 			<Tool
-				Name="VCPostBuildEventTool"
-			/>
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_DEBUG"
+				Culture="1033"/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"/>
+			<Tool
+				Name="VCManagedWrapperGeneratorTool"/>
+			<Tool
+				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
 		</Configuration>
 	</Configurations>
 	<References>
 	</References>
 	<Files>
 		<Filter
-			Name="Header Files"
-			>
+			Name="Header Files">
 			<File
-				RelativePath="..\..\dep\include\sockets\Base64.h"
-				>
+				RelativePath="..\..\dep\include\sockets\Base64.h">
 			</File>
 			<File
-				RelativePath="..\..\dep\include\sockets\Exception.h"
-				>
+				RelativePath="..\..\dep\include\sockets\Exception.h">
 			</File>
 			<File
-				RelativePath="..\..\dep\include\sockets\File.h"
-				>
+				RelativePath="..\..\dep\include\sockets\File.h">
 			</File>
 			<File
-				RelativePath="..\..\dep\include\sockets\IFile.h"
-				>
+				RelativePath="..\..\dep\include\sockets\IFile.h">
 			</File>
 			<File
-				RelativePath="..\..\dep\include\sockets\Ipv4Address.h"
-				>
+				RelativePath="..\..\dep\include\sockets\Ipv4Address.h">
 			</File>
 			<File
-				RelativePath="..\..\dep\include\sockets\Ipv6Address.h"
-				>
+				RelativePath="..\..\dep\include\sockets\Ipv6Address.h">
 			</File>
 			<File
-				RelativePath="..\..\dep\include\sockets\ISocketHandler.h"
-				>
+				RelativePath="..\..\dep\include\sockets\ISocketHandler.h">
 			</File>
 			<File
-				RelativePath="..\..\dep\include\sockets\ListenSocket.h"
-				>
+				RelativePath="..\..\dep\include\sockets\ListenSocket.h">
 			</File>
 			<File
-				RelativePath="..\..\dep\include\sockets\Lock.h"
-				>
+				RelativePath="..\..\dep\include\sockets\Lock.h">
 			</File>
 			<File
-				RelativePath="..\..\dep\include\sockets\Mutex.h"
-				>
+				RelativePath="..\..\dep\include\sockets\Mutex.h">
 			</File>
 			<File
-				RelativePath="..\..\dep\include\sockets\Parse.h"
-				>
+				RelativePath="..\..\dep\include\sockets\Parse.h">
 			</File>
 			<File
-				RelativePath="..\..\dep\include\sockets\ResolvServer.h"
-				>
+				RelativePath="..\..\dep\include\sockets\ResolvServer.h">
 			</File>
 			<File
-				RelativePath="..\..\dep\include\sockets\ResolvSocket.h"
-				>
+				RelativePath="..\..\dep\include\sockets\ResolvSocket.h">
 			</File>
 			<File
-				RelativePath="..\..\dep\include\sockets\SctpSocket.h"
-				>
+				RelativePath="..\..\dep\include\sockets\SctpSocket.h">
 			</File>
 			<File
-				RelativePath="..\..\dep\include\sockets\Socket.h"
-				>
+				RelativePath="..\..\dep\include\sockets\Socket.h">
 			</File>
 			<File
-				RelativePath="..\..\dep\include\sockets\socket_include.h"
-				>
+				RelativePath="..\..\dep\include\sockets\socket_include.h">
 			</File>
 			<File
-				RelativePath="..\..\dep\include\sockets\SocketAddress.h"
-				>
+				RelativePath="..\..\dep\include\sockets\SocketAddress.h">
 			</File>
 			<File
-				RelativePath="..\..\dep\include\sockets\SocketHandler.h"
-				>
+				RelativePath="..\..\dep\include\sockets\SocketHandler.h">
 			</File>
 			<File
-				RelativePath="..\..\dep\include\sockets\sockets-config.h"
-				>
+				RelativePath="..\..\dep\include\sockets\sockets-config.h">
 			</File>
 			<File
-				RelativePath="..\..\dep\include\sockets\StdLog.h"
-				>
+				RelativePath="..\..\dep\include\sockets\StdLog.h">
 			</File>
 			<File
-				RelativePath="..\..\dep\include\sockets\StdoutLog.h"
-				>
+				RelativePath="..\..\dep\include\sockets\StdoutLog.h">
 			</File>
 			<File
-				RelativePath="..\..\dep\include\sockets\StreamSocket.h"
-				>
+				RelativePath="..\..\dep\include\sockets\StreamSocket.h">
 			</File>
 			<File
-				RelativePath="..\..\dep\include\sockets\TcpSocket.h"
-				>
+				RelativePath="..\..\dep\include\sockets\TcpSocket.h">
 			</File>
 			<File
-				RelativePath="..\..\dep\include\sockets\Thread.h"
-				>
+				RelativePath="..\..\dep\include\sockets\Thread.h">
 			</File>
 			<File
-				RelativePath="..\..\dep\include\sockets\UdpSocket.h"
-				>
+				RelativePath="..\..\dep\include\sockets\UdpSocket.h">
 			</File>
 			<File
-				RelativePath="..\..\dep\include\sockets\Utility.h"
-				>
+				RelativePath="..\..\dep\include\sockets\Utility.h">
 			</File>
 		</Filter>
 		<Filter
-			Name="Source Files"
-			>
+			Name="Source Files">
 			<File
-				RelativePath="..\..\dep\src\sockets\Base64.cpp"
-				>
+				RelativePath="..\..\dep\src\sockets\Base64.cpp">
 			</File>
 			<File
-				RelativePath="..\..\dep\src\sockets\Exception.cpp"
-				>
+				RelativePath="..\..\dep\src\sockets\Exception.cpp">
 			</File>
 			<File
-				RelativePath="..\..\dep\src\sockets\Ipv4Address.cpp"
-				>
+				RelativePath="..\..\dep\src\sockets\Ipv4Address.cpp">
 			</File>
 			<File
-				RelativePath="..\..\dep\src\sockets\Ipv6Address.cpp"
-				>
+				RelativePath="..\..\dep\src\sockets\Ipv6Address.cpp">
 			</File>
 			<File
-				RelativePath="..\..\dep\src\sockets\Lock.cpp"
-				>
+				RelativePath="..\..\dep\src\sockets\Lock.cpp">
 			</File>
 			<File
-				RelativePath="..\..\dep\src\sockets\Mutex.cpp"
-				>
+				RelativePath="..\..\dep\src\sockets\Mutex.cpp">
 			</File>
 			<File
-				RelativePath="..\..\dep\src\sockets\Parse.cpp"
-				>
+				RelativePath="..\..\dep\src\sockets\Parse.cpp">
 			</File>
 			<File
-				RelativePath="..\..\dep\src\sockets\ResolvServer.cpp"
-				>
+				RelativePath="..\..\dep\src\sockets\ResolvServer.cpp">
 			</File>
 			<File
-				RelativePath="..\..\dep\src\sockets\ResolvSocket.cpp"
-				>
+				RelativePath="..\..\dep\src\sockets\ResolvSocket.cpp">
 			</File>
 			<File
-				RelativePath="..\..\dep\src\sockets\Socket.cpp"
-				>
+				RelativePath="..\..\dep\src\sockets\Socket.cpp">
 			</File>
 			<File
-				RelativePath="..\..\dep\src\sockets\socket_include.cpp"
-				>
+				RelativePath="..\..\dep\src\sockets\socket_include.cpp">
 			</File>
 			<File
-				RelativePath="..\..\dep\src\sockets\SocketHandler.cpp"
-				>
+				RelativePath="..\..\dep\src\sockets\SocketHandler.cpp">
 			</File>
 			<File
-				RelativePath="..\..\dep\src\sockets\StdoutLog.cpp"
-				>
+				RelativePath="..\..\dep\src\sockets\StdoutLog.cpp">
 			</File>
 			<File
-				RelativePath="..\..\dep\src\sockets\StreamSocket.cpp"
-				>
+				RelativePath="..\..\dep\src\sockets\StreamSocket.cpp">
 			</File>
 			<File
-				RelativePath="..\..\dep\src\sockets\TcpSocket.cpp"
-				>
+				RelativePath="..\..\dep\src\sockets\TcpSocket.cpp">
 			</File>
 			<File
-				RelativePath="..\..\dep\src\sockets\Thread.cpp"
-				>
+				RelativePath="..\..\dep\src\sockets\Thread.cpp">
 			</File>
 			<File
-				RelativePath="..\..\dep\src\sockets\UdpSocket.cpp"
-				>
+				RelativePath="..\..\dep\src\sockets\UdpSocket.cpp">
 			</File>
 			<File
-				RelativePath="..\..\dep\src\sockets\Utility.cpp"
-				>
+				RelativePath="..\..\dep\src\sockets\Utility.cpp">
 			</File>
 		</Filter>
 	</Files>

@@ -78,7 +78,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="libmySQL.lib libeay32.lib ws2_32.lib winmm.lib odbc32.lib odbccp32.lib advapi32.lib dbghelp.lib"
+				AdditionalDependencies="libmySQL.lib libeay32.lib ws2_32.lib winmm.lib odbc32.lib odbccp32.lib advapi32.lib dbghelp.lib msvcrt.lib"
 				OutputFile="..\..\bin\$(PlatformName)_$(ConfigurationName)\mangosd.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -179,7 +179,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libmySQL.lib libeay32.lib ws2_32.lib winmm.lib odbc32.lib odbccp32.lib advapi32.lib dbghelp.lib"
+				AdditionalDependencies="libmySQL.lib libeay32.lib ws2_32.lib winmm.lib odbc32.lib odbccp32.lib advapi32.lib dbghelp.lib msvcrt.lib"
 				OutputFile="..\..\bin\$(PlatformName)_$(ConfigurationName)\mangosd.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -279,7 +279,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="libmySQL.lib libeay32.lib ws2_32.lib winmm.lib odbc32.lib odbccp32.lib advapi32.lib dbghelp.lib"
+				AdditionalDependencies="libmySQL.lib libeay32.lib ws2_32.lib winmm.lib odbc32.lib odbccp32.lib advapi32.lib dbghelp.lib msvcrtd.lib"
 				OutputFile="..\..\bin\$(PlatformName)_$(ConfigurationName)\mangosd.exe"
 				Version=""
 				LinkIncremental="2"
@@ -380,7 +380,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libmySQL.lib libeay32.lib ws2_32.lib winmm.lib odbc32.lib odbccp32.lib advapi32.lib dbghelp.lib"
+				AdditionalDependencies="libmySQL.lib libeay32.lib ws2_32.lib winmm.lib odbc32.lib odbccp32.lib advapi32.lib dbghelp.lib msvcrtd.lib"
 				OutputFile="..\..\bin\$(PlatformName)_$(ConfigurationName)\mangosd.exe"
 				Version=""
 				LinkIncremental="2"
