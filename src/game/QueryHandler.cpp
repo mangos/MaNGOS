@@ -273,7 +273,13 @@ void WorldSession::HandleCorpseQueryOpcode(WorldPacket & /*recv_data*/)
 
     Corpse *corpse = GetPlayer()->GetCorpse();
 
-    uint8 found = corpse ? 1 : 0;
+    if(!corpse)
+    {
+        WorldPacket data(MSG_CORPSE_QUERY, 1);
+        data << uint8(0);                                   // corpse not found
+        SendPacket(&data);
+        return;
+    }
 
     int32 mapid = corpse->GetMapId();
     float x = corpse->GetPositionX();
@@ -281,35 +287,29 @@ void WorldSession::HandleCorpseQueryOpcode(WorldPacket & /*recv_data*/)
     float z = corpse->GetPositionZ();
     int32 corpsemapid = _player->GetMapId();
 
-    if(found)
+    if(Map *map = corpse->GetMap())
     {
-        if(Map *map = corpse->GetMap())
+        if(map->IsDungeon())
         {
-            if(map->IsDungeon())
-            {
-                if(!map->GetEntrancePos(mapid, x, y))
-                    return;
+            if(!map->GetEntrancePos(mapid, x, y))
+                return;
 
-                Map *entrance_map = MapManager::Instance().GetMap(mapid, _player);
-                if(!entrance_map)
-                    return;
+            Map *entrance_map = MapManager::Instance().GetMap(mapid, _player);
+            if(!entrance_map)
+                return;
 
-                z = entrance_map->GetHeight(x, y, MAX_HEIGHT);
-                corpsemapid = corpse->GetMapId();
-            }
+            z = entrance_map->GetHeight(x, y, MAX_HEIGHT);
+            corpsemapid = corpse->GetMapId();
         }
     }
 
-    WorldPacket data(MSG_CORPSE_QUERY, (1+found*(5*4)));
-    data << uint8(found);
-    if(found)
-    {
-        data << int32(mapid);
-        data << float(x);
-        data << float(y);
-        data << float(z);
-        data << int32(corpsemapid);
-    }
+    WorldPacket data(MSG_CORPSE_QUERY, 1+(5*4));
+    data << uint8(1);                                       // corpse found
+    data << int32(mapid);
+    data << float(x);
+    data << float(y);
+    data << float(z);
+    data << int32(corpsemapid);
     SendPacket(&data);
 }
 
