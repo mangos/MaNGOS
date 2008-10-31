@@ -42,6 +42,8 @@
 #include <map>
 #include "GlobalEvents.h"
 
+#include "TargetedMovementGenerator.h"                      // for HandleNpcUnFollowCommand
+
 static uint32 ReputationRankStrIndex[MAX_REPUTATION_RANK] =
 {
     LANG_REP_HATED,    LANG_REP_HOSTILE, LANG_REP_UNFRIENDLY, LANG_REP_NEUTRAL,
@@ -869,7 +871,7 @@ bool ChatHandler::HandleItemMoveCommand(const char* args)
 }
 
 //add spawn of creature
-bool ChatHandler::HandleAddSpwCommand(const char* args)
+bool ChatHandler::HandleNpcAddCommand(const char* args)
 {
     if(!*args)
         return false;
@@ -919,7 +921,7 @@ bool ChatHandler::HandleAddSpwCommand(const char* args)
     return true;
 }
 
-bool ChatHandler::HandleDelCreatureCommand(const char* args)
+bool ChatHandler::HandleNpcDeleteCommand(const char* args)
 {
     Creature* unit = NULL;
 
@@ -1067,7 +1069,7 @@ bool ChatHandler::HandleTurnObjectCommand(const char* args)
 }
 
 //move selected creature
-bool ChatHandler::HandleMoveCreatureCommand(const char* args)
+bool ChatHandler::HandleNpcMoveCommand(const char* args)
 {
     uint32 lowguid = 0;
 
@@ -1319,7 +1321,7 @@ bool ChatHandler::HandleDelVendorItemCommand(const char* args)
 }
 
 //add move for creature
-bool ChatHandler::HandleAddMoveCommand(const char* args)
+bool ChatHandler::HandleNpcAddMoveCommand(const char* args)
 {
     if(!*args)
         return false;
@@ -1393,7 +1395,7 @@ bool ChatHandler::HandleAddMoveCommand(const char* args)
  * additional parameter: NODEL - so no waypoints are deleted, if you
  *                       change the movement type
  */
-bool ChatHandler::HandleSetMoveTypeCommand(const char* args)
+bool ChatHandler::HandleNpcSetMoveTypeCommand(const char* args)
 {
     if(!*args)
         return false;
@@ -1521,7 +1523,7 @@ bool ChatHandler::HandleSetMoveTypeCommand(const char* args)
     }
 
     return true;
-}                                                           // HandleSetMoveTypeCommand
+}                                                           // HandleNpcSetMoveTypeCommand
 
 //change level of creature or pet
 bool ChatHandler::HandleChangeLevelCommand(const char* args)
@@ -1561,7 +1563,7 @@ bool ChatHandler::HandleChangeLevelCommand(const char* args)
 }
 
 //set npcflag of creature
-bool ChatHandler::HandleNPCFlagCommand(const char* args)
+bool ChatHandler::HandleNpcFlagCommand(const char* args)
 {
     if (!*args)
         return false;
@@ -1587,7 +1589,7 @@ bool ChatHandler::HandleNPCFlagCommand(const char* args)
 }
 
 //set model of creature
-bool ChatHandler::HandleSetModelCommand(const char* args)
+bool ChatHandler::HandleNpcSetModelCommand(const char* args)
 {
     if (!*args)
         return false;
@@ -1628,8 +1630,8 @@ bool ChatHandler::HandleMorphCommand(const char* args)
     return true;
 }
 
-//set faction of creature  or go
-bool ChatHandler::HandleFactionIdCommand(const char* args)
+//set faction of creature
+bool ChatHandler::HandleNpcFactionIdCommand(const char* args)
 {
     if (!*args)
         return false;
@@ -2118,7 +2120,7 @@ bool ChatHandler::HandleDelTicketCommand(const char *args)
 }
 
 //set spawn dist of creature
-bool ChatHandler::HandleSpawnDistCommand(const char* args)
+bool ChatHandler::HandleNpcSpawnDistCommand(const char* args)
 {
     if(!*args)
         return false;
@@ -2156,7 +2158,7 @@ bool ChatHandler::HandleSpawnDistCommand(const char* args)
     return true;
 }
 
-bool ChatHandler::HandleSpawnTimeCommand(const char* args)
+bool ChatHandler::HandleNpcSpawnTimeCommand(const char* args)
 {
     if(!*args)
         return false;
@@ -4048,7 +4050,7 @@ bool ChatHandler::HandleServerCorpsesCommand(const char* /*args*/)
     return true;
 }
 
-bool ChatHandler::HandleRepairitemsCommand(const char* args)
+bool ChatHandler::HandleRepairitemsCommand(const char* /*args*/)
 {
     Player *target = getSelectedPlayer();
 
@@ -4057,7 +4059,7 @@ bool ChatHandler::HandleRepairitemsCommand(const char* args)
         PSendSysMessage(LANG_NO_CHAR_SELECTED);
         SetSentErrorMessage(true);
         return false;
-	}
+    }
 
     // Repair items
     target->DurabilityRepairAll(false, 0, false);
@@ -4065,5 +4067,91 @@ bool ChatHandler::HandleRepairitemsCommand(const char* args)
     PSendSysMessage(LANG_YOU_REPAIR_ITEMS, target->GetName());
     if(needReportToTarget(target))
         ChatHandler(target).PSendSysMessage(LANG_YOUR_ITEMS_REPAIRED, GetName());
+    return true;
+}
+
+bool ChatHandler::HandleWaterwalkCommand(const char* args)
+{
+    if(!*args)
+        return false;
+
+    Player *player = getSelectedPlayer();
+
+    if(!player)
+    {
+        PSendSysMessage(LANG_NO_CHAR_SELECTED);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    if (strncmp(args, "on", 3) == 0)
+        player->SetMovement(MOVE_WATER_WALK);               // ON
+    else if (strncmp(args, "off", 4) == 0)
+        player->SetMovement(MOVE_LAND_WALK);                // OFF
+    else
+    {
+        SendSysMessage(LANG_USE_BOL);
+        return false;
+    }
+
+    PSendSysMessage(LANG_YOU_SET_WATERWALK, args, player->GetName());
+    if(needReportToTarget(player))
+        ChatHandler(player).PSendSysMessage(LANG_YOUR_WATERWALK_SET, args, GetName());
+    return true;
+}
+
+bool ChatHandler::HandleNpcFollowCommand(const char* /*args*/)
+{
+    Player *player = m_session->GetPlayer();
+    Creature *creature = getSelectedCreature();
+
+    if(!creature)
+    {
+        PSendSysMessage(LANG_SELECT_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    // Follow player - Using pet's default dist and angle
+    creature->GetMotionMaster()->MoveFollow(player, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
+
+    PSendSysMessage(LANG_CREATURE_FOLLOW_YOU_NOW, creature->GetName());
+    return true;
+}
+
+bool ChatHandler::HandleNpcUnFollowCommand(const char* /*args*/)
+{
+    Player *player = m_session->GetPlayer();
+    Creature *creature = getSelectedCreature();
+
+    if(!creature)
+    {
+        PSendSysMessage(LANG_SELECT_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    if (creature->GetMotionMaster()->empty() ||
+        creature->GetMotionMaster()->GetCurrentMovementGeneratorType ()!=TARGETED_MOTION_TYPE)
+    {
+        PSendSysMessage(LANG_CREATURE_NOT_FOLLOW_YOU);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    TargetedMovementGenerator<Creature> const* mgen
+        = static_cast<TargetedMovementGenerator<Creature> const*>((creature->GetMotionMaster()->top()));
+
+    if(mgen->GetTarget()!=player)
+    {
+        PSendSysMessage(LANG_CREATURE_NOT_FOLLOW_YOU);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    // reset movement
+    creature->GetMotionMaster()->MovementExpired(true);
+
+    PSendSysMessage(LANG_CREATURE_NOT_FOLLOW_YOU_NOW, creature->GetName());
     return true;
 }

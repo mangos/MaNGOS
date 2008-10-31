@@ -66,7 +66,7 @@ void extractDataFromGit(FILE* EntriesFile, std::string path, bool url, RawData& 
     bool found = false;
     while(fgets(buf,200,EntriesFile))
     {
-        if(sscanf(buf,"%s		branch %s of %s",hash_str,branch_str,url_str)==3)
+        if(sscanf(buf,"%s\t\tbranch %s of %s",hash_str,branch_str,url_str)==3)
         {
             found = true;
             break;
