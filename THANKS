@@ -21,6 +21,9 @@ similar to this one:
  community with a great server. We have not gained too much help from them,
  but we have recieved some.
 
+ Thanks to WCell team (especially Ralek) for reseach on realm reconnect sequence,
+ item scaling stats algorithm, gameobject rotation issues.
+
 The easiest policy with this file is to thank everyone who contributes to the
 project, without judging the value of the contribution.
 
