@@ -38,7 +38,6 @@ struct CriteriaProgress
 
 typedef HM_NAMESPACE::hash_map<uint32, CriteriaProgress*> CriteriaProgressMap;
 typedef HM_NAMESPACE::hash_map<uint32, time_t> CompletedAchievementMap;
-typedef std::set<uint32> AchievementSet;
 
 class Player;
 class WorldPacket;

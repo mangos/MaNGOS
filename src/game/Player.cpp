@@ -4582,6 +4582,7 @@ bool Player::UpdateSkill(uint32 skill_id, uint32 step)
             new_value = max;
 
         SetUInt32Value(PLAYER_SKILL_VALUE_INDEX(i),MAKE_SKILL_VALUE(new_value,max));
+        GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL);
         return true;
     }
 
@@ -4706,6 +4707,7 @@ bool Player::UpdateSkillPro(uint16 SkillId, int32 Chance, uint32 step)
             new_value = MaxValue;
 
         SetUInt32Value(PLAYER_SKILL_VALUE_INDEX(i),MAKE_SKILL_VALUE(new_value,MaxValue));
+        GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL);
         sLog.outDebug("Player::UpdateSkillPro Chance=%3.1f%% taken", Chance/10.0);
         return true;
     }
@@ -4885,7 +4887,10 @@ void Player::SetSkill(uint32 id, uint16 currVal, uint16 maxVal)
     if(i<PLAYER_MAX_SKILLS)                                 //has skill
     {
         if(currVal)
+        {
             SetUInt32Value(PLAYER_SKILL_VALUE_INDEX(i),MAKE_SKILL_VALUE(currVal,maxVal));
+            GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL);
+        }
         else                                                //remove
         {
             // clear skill fields
@@ -4933,6 +4938,7 @@ void Player::SetSkill(uint32 id, uint16 currVal, uint16 maxVal)
             else
                 SetUInt32Value(PLAYER_SKILL_INDEX(i), MAKE_PAIR32(id,0));
             SetUInt32Value(PLAYER_SKILL_VALUE_INDEX(i),MAKE_SKILL_VALUE(currVal,maxVal));
+            GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL);
 
             // apply skill bonuses
             SetUInt32Value(PLAYER_SKILL_BONUS_INDEX(i),0);
@@ -12425,7 +12431,10 @@ void Player::RewardQuest( Quest const *pQuest, uint32 reward, Object* questGiver
     }
 
     if(pQuest->IsDaily())
+    {
         SetDailyQuestStatus(quest_id);
+        GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_DAILY_QUEST, 1);
+    }
 
     if ( !pQuest->IsRepeatable() )
         SetQuestStatus(quest_id, QUEST_STATUS_COMPLETE);
@@ -12438,6 +12447,7 @@ void Player::RewardQuest( Quest const *pQuest, uint32 reward, Object* questGiver
         SendQuestReward( pQuest, XP, questGiver );
 
     if (q_status.uState != QUEST_NEW) q_status.uState = QUEST_CHANGED;
+    GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST_COUNT);
 }
 
 void Player::FailQuest( uint32 quest_id )

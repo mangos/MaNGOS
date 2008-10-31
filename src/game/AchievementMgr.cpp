@@ -202,6 +202,47 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                 if(achievementCriteria->kill_creature.creatureID != miscvalue1)
                     continue;
                 SetCriteriaProgress(achievementCriteria, miscvalue2, true);
+                break;
+            case ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL:
+                if(uint32 skillvalue = GetPlayer()->GetBaseSkillValue(achievementCriteria->reach_skill_level.skillID))
+                    SetCriteriaProgress(achievementCriteria, skillvalue);
+                break;
+            case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST_COUNT:
+            {
+                uint32 counter =0;
+                for(QuestStatusMap::iterator itr = GetPlayer()->getQuestStatusMap().begin(); itr!=GetPlayer()->getQuestStatusMap().end(); itr++)
+                    if(itr->second.m_rewarded)
+                        counter++;
+                SetCriteriaProgress(achievementCriteria, counter);
+                break;
+            }
+            case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUESTS_IN_ZONE:
+            {
+                uint32 counter =0;
+                for(QuestStatusMap::iterator itr = GetPlayer()->getQuestStatusMap().begin(); itr!=GetPlayer()->getQuestStatusMap().end(); itr++)
+                {
+                    Quest const* quest = objmgr.GetQuestTemplate(itr->first);
+                    if(itr->second.m_rewarded && quest->GetZoneOrSort() == achievementCriteria->complete_quests_in_zone.zoneID)
+                        counter++;
+                }
+                SetCriteriaProgress(achievementCriteria, counter);
+                break;
+            }
+            case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_DAILY_QUEST:
+                // AchievementMgr::UpdateAchievementCriteria might also be called on login - skip in this case
+                if(!miscvalue1)
+                    continue;
+                SetCriteriaProgress(achievementCriteria, miscvalue1, true);
+                break;
+            case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_BATTLEGROUND:
+                // AchievementMgr::UpdateAchievementCriteria might also be called on login - skip in this case
+                if(!miscvalue1)
+                    continue;
+                if(GetPlayer()->GetMapID() != achievementCriteria->complete_battleground.mapID)
+                    continue;
+                SetCriteriaProgress(achievementCriteria, miscvalue1, true);
+                break;
+
         }
         if(IsCompletedCriteria(achievementCriteria))
             CompletedCriteria(achievementCriteria);
@@ -262,6 +303,15 @@ bool AchievementMgr::IsCompletedCriteria(AchievementCriteriaEntry const* achieve
             return progress->counter >= achievementCriteria->kill_creature.creatureCount;
         case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_ACHIEVEMENT:
             return m_completedAchievements.find(achievementCriteria->complete_achievement.linkedAchievement) != m_completedAchievements.end();
+        case ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL:
+            return progress->counter >= achievementCriteria->reach_skill_level.skillLevel;
+        case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUESTS_IN_ZONE:
+            return progress->counter >= achievementCriteria->complete_quests_in_zone.questCount;
+        case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_DAILY_QUEST:
+            return progress->counter >= achievementCriteria->complete_daily_quest.questCount;
+        case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_BATTLEGROUND:
+            // just used as a counter - return false
+            return false;
     }
     return false;
 }
@@ -281,6 +331,7 @@ void AchievementMgr::CompletedCriteria(AchievementCriteriaEntry const* criteria)
     }
 }
 
+// TODO: achievement 705 requires 4 criteria to be fulfilled
 AchievementCompletionState AchievementMgr::GetAchievementCompletionState(AchievementEntry const* entry)
 {
     if(m_completedAchievements.find(entry->ID)!=m_completedAchievements.end())
