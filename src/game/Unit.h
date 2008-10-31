@@ -985,6 +985,8 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         CharmInfo* GetCharmInfo() { return m_charmInfo; }
         CharmInfo* InitCharmInfo(Unit* charm);
 
+        Pet* CreateTamedPetFrom(Creature* creatureTarget,uint32 spell_id = 0);
+
         bool AddAura(Aura *aur);
 
         void RemoveAura(AuraMap::iterator &i, AuraRemoveMode mode = AURA_REMOVE_BY_DEFAULT);
