@@ -179,6 +179,14 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
         if(achievementCriteria->groupFlag & ACHIEVEMENT_CRITERIA_GROUP_NOT_IN_GROUP && GetPlayer()->GetGroup())
             continue;
 
+        AchievementEntry const *achievement = sAchievementStore.LookupEntry(achievementCriteria->referredAchievement);
+        if(!achievement)
+            continue;
+
+        if(achievement->factionFlag == ACHIEVEMENT_FACTION_FLAG_HORDE && GetPlayer()->GetTeam() != HORDE ||
+            achievement->factionFlag == ACHIEVEMENT_FACTION_FLAG_ALLIANCE && GetPlayer()->GetTeam() != ALLIANCE)
+            continue;
+
         switch (type)
         {
             case ACHIEVEMENT_CRITERIA_TYPE_REACH_LEVEL:
@@ -187,6 +195,13 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
             case ACHIEVEMENT_CRITERIA_TYPE_BUY_BANK_SLOT:
                 SetCriteriaProgress(achievementCriteria, GetPlayer()->GetByteValue(PLAYER_BYTES_2, 2)+1);
                 break;
+            case ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE:
+                // AchievementMgr::UpdateAchievementCriteria might also be called on login - skip in this case
+                if(!miscvalue1)
+                    continue;
+                if(achievementCriteria->kill_creature.creatureID != miscvalue1)
+                    continue;
+                SetCriteriaProgress(achievementCriteria, miscvalue2, true);
         }
         if(IsCompletedCriteria(achievementCriteria))
             CompletedCriteria(achievementCriteria);
@@ -243,6 +258,8 @@ bool AchievementMgr::IsCompletedCriteria(AchievementCriteriaEntry const* achieve
             return progress->counter >= achievementCriteria->reach_level.level;
         case ACHIEVEMENT_CRITERIA_TYPE_BUY_BANK_SLOT:
             return progress->counter >= achievementCriteria->buy_bank_slot.numberOfSlots;
+        case ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE:
+            return progress->counter >= achievementCriteria->kill_creature.creatureCount;
         case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_ACHIEVEMENT:
             return m_completedAchievements.find(achievementCriteria->complete_achievement.linkedAchievement) != m_completedAchievements.end();
     }
@@ -289,7 +306,7 @@ AchievementCompletionState AchievementMgr::GetAchievementCompletionState(Achieve
         return ACHIEVEMENT_COMPLETED_COMPLETED_NOT_STORED;
 }
 
-void AchievementMgr::SetCriteriaProgress(AchievementCriteriaEntry const* entry, uint32 newValue)
+void AchievementMgr::SetCriteriaProgress(AchievementCriteriaEntry const* entry, uint32 newValue, bool relative)
 {
     sLog.outString("AchievementMgr::SetCriteriaProgress(%u, %u)", entry->ID, newValue);
     CriteriaProgress *progress = NULL;
@@ -302,6 +319,8 @@ void AchievementMgr::SetCriteriaProgress(AchievementCriteriaEntry const* entry, 
     else
     {
         progress = m_criteriaProgress[entry->ID];
+        if(relative)
+            newValue += progress->counter;
         if(progress->counter == newValue)
             return;
         progress->counter = newValue;

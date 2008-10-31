@@ -67,7 +67,7 @@ class AchievementMgr
     private:
         void SendAchievementEarned(uint32 achievementId);
         void SendCriteriaUpdate(CriteriaProgress *progress);
-        void SetCriteriaProgress(AchievementCriteriaEntry const* entry, uint32 newValue);
+        void SetCriteriaProgress(AchievementCriteriaEntry const* entry, uint32 newValue, bool relative=false);
         void CompletedCriteria(AchievementCriteriaEntry const* entry);
         void CompletedAchievement(AchievementEntry const* entry);
         bool IsCompletedCriteria(AchievementCriteriaEntry const* entry);
