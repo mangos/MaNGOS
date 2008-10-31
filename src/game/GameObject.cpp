@@ -123,7 +123,16 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map *map, float x, float
     SetFloatValue(GAMEOBJECT_POS_Z, z);
     SetFloatValue(GAMEOBJECT_FACING, ang);                  //this is not facing angle
 
-    SetFloatValue(GAMEOBJECT_PARENTROTATION, rotation0);
+    int64 rotation = 0;
+    float f_rot = sin(ang / 2.0f);
+    int64 i_rot = f_rot / atan(pow(2.0f, -20.0f));
+    rotation |= (i_rot << 43 >> 43) & 0x00000000001FFFFF;
+
+    sLog.outDebug("go_create: ang: %f, rot: " SI64FMTD, ang, rotation);
+
+    SetUInt64Value(GAMEOBJECT_ROTATION, rotation);
+
+    SetFloatValue(GAMEOBJECT_PARENTROTATION+0, rotation0);
     SetFloatValue(GAMEOBJECT_PARENTROTATION+1, rotation1);
     SetFloatValue(GAMEOBJECT_PARENTROTATION+2, rotation2);
     SetFloatValue(GAMEOBJECT_PARENTROTATION+3, rotation3);
