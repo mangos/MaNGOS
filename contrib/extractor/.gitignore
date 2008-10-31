@@ -7,9 +7,10 @@
 # command after changing this file, to see if there are
 # any tracked files which get ignored after the change.
 #
-# MaNGOS generated files at Windows build
+# Extractor generated files at Windows build
 #
 
+*.bsc
 *.ncb
 *.suo
 debug
