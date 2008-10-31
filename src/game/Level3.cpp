@@ -5315,9 +5315,11 @@ bool ChatHandler::HandleBanListIPCommand(const char* args)
 
 bool ChatHandler::HandleRespawnCommand(const char* /*args*/)
 {
-    Unit* target = getSelectedUnit();
+    Player* pl = m_session->GetPlayer();
 
-    if(target)
+    // accept only explictly selected target (not implicitly self targeting case)
+    Unit* target = getSelectedUnit();
+    if(pl->GetSelection() && target)
     {
         if(target->GetTypeId()!=TYPEID_UNIT)
         {
@@ -5330,8 +5332,6 @@ bool ChatHandler::HandleRespawnCommand(const char* /*args*/)
             ((Creature*)target)->Respawn();
         return true;
     }
-
-    Player* pl = m_session->GetPlayer();
 
     CellPair p(MaNGOS::ComputeCellPair(pl->GetPositionX(), pl->GetPositionY()));
     Cell cell(p);
