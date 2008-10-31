@@ -238,9 +238,13 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                 // AchievementMgr::UpdateAchievementCriteria might also be called on login - skip in this case
                 if(!miscvalue1)
                     continue;
-                if(GetPlayer()->GetMapID() != achievementCriteria->complete_battleground.mapID)
+                if(GetPlayer()->GetMapId() != achievementCriteria->complete_battleground.mapID)
                     continue;
                 SetCriteriaProgress(achievementCriteria, miscvalue1, true);
+                break;
+            case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SPELL:
+                if(GetPlayer()->HasSpell(achievementCriteria->learn_spell.spellID))
+                    SetCriteriaProgress(achievementCriteria, 1);
                 break;
 
         }
@@ -312,6 +316,8 @@ bool AchievementMgr::IsCompletedCriteria(AchievementCriteriaEntry const* achieve
         case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_BATTLEGROUND:
             // just used as a counter - return false
             return false;
+        case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SPELL:
+            return progress->counter >= 1;
     }
     return false;
 }
