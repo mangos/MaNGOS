@@ -563,6 +563,22 @@ void ObjectMgr::LoadCreatureLocales()
     sLog.outString( ">> Loaded %u creature locale strings", mCreatureLocaleMap.size() );
 }
 
+void ObjectMgr::LoadCompletedAchievements()
+{
+    QueryResult *result = WorldDatabase.Query("SELECT achievement FROM character_achievement GROUP BY achievement");
+
+    if(!result)
+        return;
+
+    do
+    {
+        Field *fields = result->Fetch();
+        allCompletedAchievements.insert(fields[0].GetUInt32());
+    } while(result->NextRow());
+
+    delete result;
+}
+
 void ObjectMgr::LoadNpcOptionLocales()
 {
     mNpcOptionLocaleMap.clear();                              // need for reload case

@@ -38,6 +38,7 @@ struct CriteriaProgress
 
 typedef HM_NAMESPACE::hash_map<uint32, CriteriaProgress*> CriteriaProgressMap;
 typedef HM_NAMESPACE::hash_map<uint32, time_t> CompletedAchievementMap;
+typedef std::set<uint32> AchievementSet;
 
 class Player;
 class WorldPacket;
@@ -61,7 +62,6 @@ class AchievementMgr
         void CheckAllAchievementCriteria();
         void SendAllAchievementData();
         void SendRespondInspectAchievements(Player* player);
-
         Player* GetPlayer() { return m_player;}
 
     private:
@@ -77,7 +77,7 @@ class AchievementMgr
         Player* m_player;
         CriteriaProgressMap m_criteriaProgress;
         CompletedAchievementMap m_completedAchievements;
-};
 
+};
 
 #endif

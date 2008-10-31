@@ -101,7 +101,7 @@ struct AchievementCriteriaEntry
             uint32  skillLevel;                             // 4
         } reach_skill_level;
 
-        // ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_ARCHIEVEMENT = 8
+        // ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_ACHIEVEMENT = 8
         struct
         {
             uint32  linkedAchievement;                      // 3

@@ -931,6 +931,9 @@ void World::SetInitialWorldSettings()
     sLog.outString( "Loading AchievementCriteriaList..." );
     objmgr.LoadAchievementCriteriaList();
 
+    sLog.outString( "Loading completed achievements..." );
+    objmgr.LoadCompletedAchievements();
+
     sLog.outString( "Loading SkillLineAbilityMultiMap Data..." );
     spellmgr.LoadSkillLineAbilityMap();
 
