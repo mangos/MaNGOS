@@ -3859,10 +3859,9 @@ void Player::DurabilityLossAll(double percent, bool inventory)
 
         for(int i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; i++)
             if(Bag* pBag = (Bag*)GetItemByPos( INVENTORY_SLOT_BAG_0, i ))
-                if(ItemPrototype const *pBagProto = pBag->GetProto())
-                    for(uint32 j = 0; j < pBagProto->ContainerSlots; j++)
-                        if(Item* pItem = GetItemByPos( i, j ))
-                            DurabilityLoss(pItem,percent);
+                for(uint32 j = 0; j < pBag->GetBagSize(); j++)
+                    if(Item* pItem = GetItemByPos( i, j ))
+                        DurabilityLoss(pItem,percent);
     }
 }
 
@@ -3904,10 +3903,9 @@ void Player::DurabilityPointsLossAll(int32 points, bool inventory)
 
         for(int i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; i++)
             if(Bag* pBag = (Bag*)GetItemByPos( INVENTORY_SLOT_BAG_0, i ))
-                if(ItemPrototype const *pBagProto = pBag->GetProto())
-                    for(uint32 j = 0; j < pBagProto->ContainerSlots; j++)
-                        if(Item* pItem = GetItemByPos( i, j ))
-                            DurabilityPointsLoss(pItem,points);
+                for(uint32 j = 0; j < pBag->GetBagSize(); j++)
+                    if(Item* pItem = GetItemByPos( i, j ))
+                        DurabilityPointsLoss(pItem,points);
     }
 }
 
@@ -8074,24 +8072,19 @@ uint8 Player::CanUnequipItems( uint32 item, uint32 count ) const
         }
     }
     Bag *pBag;
-    ItemPrototype const *pBagProto;
     for(int i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; i++)
     {
         pBag = (Bag*)GetItemByPos( INVENTORY_SLOT_BAG_0, i );
         if( pBag )
         {
-            pBagProto = pBag->GetProto();
-            if( pBagProto )
+            for(uint32 j = 0; j < pBag->GetBagSize(); j++)
             {
-                for(uint32 j = 0; j < pBagProto->ContainerSlots; j++)
+                pItem = GetItemByPos( i, j );
+                if( pItem && pItem->GetEntry() == item )
                 {
-                    pItem = GetItemByPos( i, j );
-                    if( pItem && pItem->GetEntry() == item )
-                    {
-                        tempcount += pItem->GetCount();
-                        if( tempcount >= count )
-                            return EQUIP_ERR_OK;
-                    }
+                    tempcount += pItem->GetCount();
+                    if( tempcount >= count )
+                        return EQUIP_ERR_OK;
                 }
             }
         }
@@ -8182,15 +8175,11 @@ Item* Player::GetItemByGuid( uint64 guid ) const
         Bag *pBag = (Bag*)GetItemByPos( INVENTORY_SLOT_BAG_0, i );
         if( pBag )
         {
-            ItemPrototype const *pBagProto = pBag->GetProto();
-            if( pBagProto )
+            for(uint32 j = 0; j < pBag->GetBagSize(); j++)
             {
-                for(uint32 j = 0; j < pBagProto->ContainerSlots; j++)
-                {
-                    Item* pItem = pBag->GetItemByPos( j );
-                    if( pItem && pItem->GetGUID() == guid )
-                        return pItem;
-                }
+                Item* pItem = pBag->GetItemByPos( j );
+                if( pItem && pItem->GetGUID() == guid )
+                    return pItem;
             }
         }
     }
@@ -8199,15 +8188,11 @@ Item* Player::GetItemByGuid( uint64 guid ) const
         Bag *pBag = (Bag*)GetItemByPos( INVENTORY_SLOT_BAG_0, i );
         if( pBag )
         {
-            ItemPrototype const *pBagProto = pBag->GetProto();
-            if( pBagProto )
+            for(uint32 j = 0; j < pBag->GetBagSize(); j++)
             {
-                for(uint32 j = 0; j < pBagProto->ContainerSlots; j++)
-                {
-                    Item* pItem = pBag->GetItemByPos( j );
-                    if( pItem && pItem->GetGUID() == guid )
-                        return pItem;
-                }
+                Item* pItem = pBag->GetItemByPos( j );
+                if( pItem && pItem->GetGUID() == guid )
+                    return pItem;
             }
         }
     }
@@ -8365,17 +8350,14 @@ bool Player::HasItemCount( uint32 item, uint32 count, bool inBankAlso ) const
     {
         if(Bag* pBag = (Bag*)GetItemByPos( INVENTORY_SLOT_BAG_0, i ))
         {
-            if(ItemPrototype const *pBagProto = pBag->GetProto())
+            for(uint32 j = 0; j < pBag->GetBagSize(); j++)
             {
-                for(uint32 j = 0; j < pBagProto->ContainerSlots; j++)
+                Item* pItem = GetItemByPos( i, j );
+                if( pItem && pItem->GetEntry() == item )
                 {
-                    Item* pItem = GetItemByPos( i, j );
-                    if( pItem && pItem->GetEntry() == item )
-                    {
-                        tempcount += pItem->GetCount();
-                        if( tempcount >= count )
-                            return true;
-                    }
+                    tempcount += pItem->GetCount();
+                    if( tempcount >= count )
+                        return true;
                 }
             }
         }
@@ -8397,17 +8379,14 @@ bool Player::HasItemCount( uint32 item, uint32 count, bool inBankAlso ) const
         {
             if(Bag* pBag = (Bag*)GetItemByPos( INVENTORY_SLOT_BAG_0, i ))
             {
-                if(ItemPrototype const *pBagProto = pBag->GetProto())
+                for(uint32 j = 0; j < pBag->GetBagSize(); j++)
                 {
-                    for(uint32 j = 0; j < pBagProto->ContainerSlots; j++)
+                    Item* pItem = GetItemByPos( i, j );
+                    if( pItem && pItem->GetEntry() == item )
                     {
-                        Item* pItem = GetItemByPos( i, j );
-                        if( pItem && pItem->GetEntry() == item )
-                        {
-                            tempcount += pItem->GetCount();
-                            if( tempcount >= count )
-                                return true;
-                        }
+                        tempcount += pItem->GetCount();
+                        if( tempcount >= count )
+                            return true;
                     }
                 }
             }
@@ -8485,22 +8464,15 @@ bool Player::HasItemTotemCategory( uint32 TotemCategory ) const
         if( pItem && IsTotemCategoryCompatiableWith(pItem->GetProto()->TotemCategory,TotemCategory ))
             return true;
     }
-    Bag *pBag;
-    ItemPrototype const *pBagProto;
     for(uint8 i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
     {
-        pBag = (Bag*)GetItemByPos( INVENTORY_SLOT_BAG_0, i );
-        if( pBag )
+        if(Bag *pBag = (Bag*)GetItemByPos( INVENTORY_SLOT_BAG_0, i ))
         {
-            pBagProto = pBag->GetProto();
-            if( pBagProto )
+            for(uint32 j = 0; j < pBag->GetBagSize(); ++j)
             {
-                for(uint32 j = 0; j < pBagProto->ContainerSlots; ++j)
-                {
-                    pItem = GetItemByPos( i, j );
-                    if( pItem && IsTotemCategoryCompatiableWith(pItem->GetProto()->TotemCategory,TotemCategory ))
-                        return true;
-                }
+                pItem = GetItemByPos( i, j );
+                if( pItem && IsTotemCategoryCompatiableWith(pItem->GetProto()->TotemCategory,TotemCategory ))
+                    return true;
             }
         }
     }
@@ -8606,7 +8578,7 @@ uint8 Player::_CanStoreItem_InBag( uint8 bag, ItemPosCountVec &dest, ItemPrototy
     if( !ItemCanGoIntoBag(pProto,pBagProto) )
         return EQUIP_ERR_ITEM_DOESNT_GO_INTO_BAG;
 
-    for(uint32 j = 0; j < pBagProto->ContainerSlots; j++)
+    for(uint32 j = 0; j < pBag->GetBagSize(); j++)
     {
         // skip specific slot already processed in first called _CanStoreItem_InSpecificSlot
         if(j==skip_slot)
@@ -9269,23 +9241,14 @@ uint8 Player::CanStoreItems( Item **pItems,int count) const
 
     for(int i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; i++)
     {
-        Bag     *pBag;
-        ItemPrototype const *pBagProto;
-
-        pBag = (Bag*)GetItemByPos( INVENTORY_SLOT_BAG_0, i );
-        if( pBag )
+        if(Bag* pBag = (Bag*)GetItemByPos( INVENTORY_SLOT_BAG_0, i ))
         {
-            pBagProto = pBag->GetProto();
-
-            if( pBagProto )
+            for(uint32 j = 0; j < pBag->GetBagSize(); j++)
             {
-                for(uint32 j = 0; j < pBagProto->ContainerSlots; j++)
+                pItem2 = GetItemByPos( i, j );
+                if (pItem2 && !pItem2->IsInTrade())
                 {
-                    pItem2 = GetItemByPos( i, j );
-                    if (pItem2 && !pItem2->IsInTrade())
-                    {
-                        inv_bags[i-INVENTORY_SLOT_BAG_START][j] = pItem2->GetCount();
-                    }
+                    inv_bags[i-INVENTORY_SLOT_BAG_START][j] = pItem2->GetCount();
                 }
             }
         }
@@ -9388,18 +9351,14 @@ uint8 Player::CanStoreItems( Item **pItems,int count) const
                 pBag = (Bag*)GetItemByPos( INVENTORY_SLOT_BAG_0, t );
                 if( pBag )
                 {
-                    pBagProto = pBag->GetProto();
-                    if( pBagProto )
+                    for(uint32 j = 0; j < pBag->GetBagSize(); j++)
                     {
-                        for(uint32 j = 0; j < pBagProto->ContainerSlots; j++)
+                        pItem2 = GetItemByPos( t, j );
+                        if( pItem2 && pItem2->GetEntry() == pItem->GetEntry() && inv_bags[t-INVENTORY_SLOT_BAG_START][j] + pItem->GetCount() <= pProto->Stackable )
                         {
-                            pItem2 = GetItemByPos( t, j );
-                            if( pItem2 && pItem2->GetEntry() == pItem->GetEntry() && inv_bags[t-INVENTORY_SLOT_BAG_START][j] + pItem->GetCount() <= pProto->Stackable )
-                            {
-                                inv_bags[t-INVENTORY_SLOT_BAG_START][j] += pItem->GetCount();
-                                b_found = true;
-                                break;
-                            }
+                            inv_bags[t-INVENTORY_SLOT_BAG_START][j] += pItem->GetCount();
+                            b_found = true;
+                            break;
                         }
                     }
                 }
@@ -9483,7 +9442,7 @@ uint8 Player::CanStoreItems( Item **pItems,int count) const
                     if( pBagProto && (pBagProto->Class != ITEM_CLASS_CONTAINER || pBagProto->SubClass != ITEM_SUBCLASS_CONTAINER) &&
                         ItemCanGoIntoBag(pProto,pBagProto) )
                     {
-                        for(uint32 j = 0; j < pBagProto->ContainerSlots; j++)
+                        for(uint32 j = 0; j < pBag->GetBagSize(); j++)
                         {
                             if( inv_bags[t-INVENTORY_SLOT_BAG_START][j] == 0 )
                             {
@@ -9517,17 +9476,13 @@ uint8 Player::CanStoreItems( Item **pItems,int count) const
             pBag = (Bag*)GetItemByPos( INVENTORY_SLOT_BAG_0, t );
             if( pBag )
             {
-                pBagProto = pBag->GetProto();
-                if( pBagProto && ItemCanGoIntoBag(pProto,pBagProto))
+                for(uint32 j = 0; j < pBag->GetBagSize(); j++)
                 {
-                    for(uint32 j = 0; j < pBagProto->ContainerSlots; j++)
+                    if( inv_bags[t-INVENTORY_SLOT_BAG_START][j] == 0 )
                     {
-                        if( inv_bags[t-INVENTORY_SLOT_BAG_START][j] == 0 )
-                        {
-                            inv_bags[t-INVENTORY_SLOT_BAG_START][j] = 1;
-                            b_found = true;
-                            break;
-                        }
+                        inv_bags[t-INVENTORY_SLOT_BAG_START][j] = 1;
+                        b_found = true;
+                        break;
                     }
                 }
             }
@@ -10620,40 +10575,33 @@ void Player::DestroyItemCount( uint32 item, uint32 count, bool update, bool uneq
     }
 
     // in inventory bags
-    Bag *pBag;
-    ItemPrototype const *pBagProto;
     for(int i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; i++)
     {
-        pBag = (Bag*)GetItemByPos( INVENTORY_SLOT_BAG_0, i );
-        if( pBag )
+        if(Bag *pBag = (Bag*)GetItemByPos( INVENTORY_SLOT_BAG_0, i ))
         {
-            pBagProto = pBag->GetProto();
-            if( pBagProto )
+            for(uint32 j = 0; j < pBag->GetBagSize(); j++)
             {
-                for(uint32 j = 0; j < pBagProto->ContainerSlots; j++)
+                pItem = pBag->GetItemByPos(j);
+                if( pItem && pItem->GetEntry() == item )
                 {
-                    pItem = pBag->GetItemByPos(j);
-                    if( pItem && pItem->GetEntry() == item )
+                    // all items in bags can be unequipped
+                    if( pItem->GetCount() + remcount <= count )
                     {
-                        // all items in bags can be unequipped
-                        if( pItem->GetCount() + remcount <= count )
-                        {
-                            remcount += pItem->GetCount();
-                            DestroyItem( i, j, update );
+                        remcount += pItem->GetCount();
+                        DestroyItem( i, j, update );
 
-                            if(remcount >=count)
-                                return;
-                        }
-                        else
-                        {
-                            pProto = pItem->GetProto();
-                            ItemRemovedQuestCheck( pItem->GetEntry(), count - remcount );
-                            pItem->SetCount( pItem->GetCount() - count + remcount );
-                            if( IsInWorld() && update )
-                                pItem->SendUpdateToPlayer( this );
-                            pItem->SetState(ITEM_CHANGED, this);
+                        if(remcount >=count)
                             return;
-                        }
+                    }
+                    else
+                    {
+                        pProto = pItem->GetProto();
+                        ItemRemovedQuestCheck( pItem->GetEntry(), count - remcount );
+                        pItem->SetCount( pItem->GetCount() - count + remcount );
+                        if( IsInWorld() && update )
+                            pItem->SendUpdateToPlayer( this );
+                        pItem->SetState(ITEM_CHANGED, this);
+                        return;
                     }
                 }
             }
@@ -10715,15 +10663,11 @@ void Player::DestroyZoneLimitedItem( bool update, uint32 new_zone )
         Bag* pBag = (Bag*)GetItemByPos( INVENTORY_SLOT_BAG_0, i );
         if( pBag )
         {
-            ItemPrototype const *pBagProto = pBag->GetProto();
-            if( pBagProto )
+            for(uint32 j = 0; j < pBag->GetBagSize(); j++)
             {
-                for(uint32 j = 0; j < pBagProto->ContainerSlots; j++)
-                {
-                    Item* pItem = pBag->GetItemByPos(j);
-                    if( pItem && pItem->IsLimitedToAnotherMapOrZone(GetMapId(),new_zone) )
-                        DestroyItem( i, j, update);
-                }
+                Item* pItem = pBag->GetItemByPos(j);
+                if( pItem && pItem->IsLimitedToAnotherMapOrZone(GetMapId(),new_zone) )
+                    DestroyItem( i, j, update);
             }
         }
     }
@@ -10759,17 +10703,13 @@ void Player::DestroyConjuredItems( bool update )
         Bag* pBag = (Bag*)GetItemByPos( INVENTORY_SLOT_BAG_0, i );
         if( pBag )
         {
-            ItemPrototype const *pBagProto = pBag->GetProto();
-            if( pBagProto )
+            for(uint32 j = 0; j < pBag->GetBagSize(); j++)
             {
-                for(uint32 j = 0; j < pBagProto->ContainerSlots; j++)
-                {
-                    Item* pItem = pBag->GetItemByPos(j);
-                    if( pItem && pItem->GetProto() &&
-                        (pItem->GetProto()->Class == ITEM_CLASS_CONSUMABLE) &&
-                        (pItem->GetProto()->Flags & ITEM_FLAGS_CONJURED) )
-                        DestroyItem( i, j, update);
-                }
+                Item* pItem = pBag->GetItemByPos(j);
+                if( pItem && pItem->GetProto() &&
+                    (pItem->GetProto()->Class == ITEM_CLASS_CONSUMABLE) &&
+                    (pItem->GetProto()->Flags & ITEM_FLAGS_CONJURED) )
+                    DestroyItem( i, j, update);
             }
         }
     }
@@ -11417,15 +11357,11 @@ void Player::RemoveAllEnchantments(EnchantmentSlot slot)
         Bag* pBag = (Bag*)GetItemByPos( INVENTORY_SLOT_BAG_0, i );
         if( pBag )
         {
-            ItemPrototype const *pBagProto = pBag->GetProto();
-            if( pBagProto )
+            for(uint32 j = 0; j < pBag->GetBagSize(); j++)
             {
-                for(uint32 j = 0; j < pBagProto->ContainerSlots; j++)
-                {
-                    Item* pItem = pBag->GetItemByPos(j);
-                    if( pItem && pItem->GetEnchantmentId(slot) )
-                        pItem->ClearEnchantment(slot);
-                }
+                Item* pItem = pBag->GetItemByPos(j);
+                if( pItem && pItem->GetEnchantmentId(slot) )
+                    pItem->ClearEnchantment(slot);
             }
         }
     }

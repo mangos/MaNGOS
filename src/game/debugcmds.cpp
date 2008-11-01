@@ -324,8 +324,7 @@ bool ChatHandler::HandleGetItemState(const char* args)
             else
             {
                 Bag *bag = (Bag*)item;
-                const ItemPrototype *proto = bag->GetProto();
-                for (uint8 j = 0; j < proto->ContainerSlots; ++j)
+                for (uint8 j = 0; j < bag->GetBagSize(); ++j)
                 {
                     Item* item = bag->GetItemByPos(j);
                     if (item && item->GetState() == state)
@@ -421,8 +420,7 @@ bool ChatHandler::HandleGetItemState(const char* args)
             if(item->IsBag())
             {
                 Bag *bag = (Bag*)item;
-                const ItemPrototype *proto = bag->GetProto();
-                for (uint8 j = 0; j < proto->ContainerSlots; ++j)
+                for (uint8 j = 0; j < bag->GetBagSize(); ++j)
                 {
                     Item* item = bag->GetItemByPos(j);
                     if (!item) continue;
