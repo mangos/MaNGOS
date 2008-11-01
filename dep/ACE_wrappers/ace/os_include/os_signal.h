@@ -25,6 +25,7 @@
 #endif /* ACE_LACKS_PRAGMA_ONCE */
 
 #include "ace/os_include/sys/os_types.h"
+#include "ace/os_include/os_pthread.h"
 
 #if !defined (ACE_LACKS_SIGNAL_H)
    extern "C" {
