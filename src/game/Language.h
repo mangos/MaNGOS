@@ -324,7 +324,9 @@ enum MangosStrings
     LANG_CREATURE_FOLLOW_YOU_NOW        = 340,
     LANG_CREATURE_NOT_FOLLOW_YOU        = 341,
     LANG_CREATURE_NOT_FOLLOW_YOU_NOW    = 342,
-    // Room for more level 2              343-399 not used
+    LANG_CREATURE_NON_TAMEABLE          = 343,
+    LANG_YOU_ALREADY_HAVE_PET           = 344,
+    // Room for more level 2              345-399 not used
 
     // level 3 chat
     LANG_SCRIPTS_RELOADED               = 400,
@@ -674,8 +676,8 @@ enum MangosStrings
     // Room for more level 4              1012-1099 not used
 
     // Level 3 (continue)
-    LANG_MOTD_NEW                       = 1100,
-    LANG_ACCOUNT_SETADDON               = 1101,
+    LANG_ACCOUNT_SETADDON               = 1100,
+    LANG_MOTD_NEW                       = 1101,
     LANG_SENDMESSAGE                    = 1102,
     LANG_EVENT_ENTRY_LIST_CONSOLE       = 1103,
     LANG_CREATURE_ENTRY_LIST_CONSOLE    = 1104,
@@ -693,7 +695,10 @@ enum MangosStrings
     LANG_INVALID_CHARACTER_GUID         = 1116,
     LANG_CHARACTER_GUID_IN_USE          = 1117,
     LANG_ITEMLIST_GUILD                 = 1118,
-    // Room for more level 3              1119-1199 not used
+    LANG_MUST_MALE_OR_FEMALE            = 1119,
+    LANG_YOU_CHANGE_GENDER              = 1120,
+    LANG_YOUR_GENDER_CHANGED            = 1121,
+    // Room for more level 3              1122-1199 not used
 
     // FREE IDS                           1200-9999
 

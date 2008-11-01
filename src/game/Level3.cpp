@@ -5317,9 +5317,11 @@ bool ChatHandler::HandleBanListIPCommand(const char* args)
 
 bool ChatHandler::HandleRespawnCommand(const char* /*args*/)
 {
-    Unit* target = getSelectedUnit();
+    Player* pl = m_session->GetPlayer();
 
-    if(target)
+    // accept only explictly selected target (not implicitly self targeting case)
+    Unit* target = getSelectedUnit();
+    if(pl->GetSelection() && target)
     {
         if(target->GetTypeId()!=TYPEID_UNIT)
         {
@@ -5332,8 +5334,6 @@ bool ChatHandler::HandleRespawnCommand(const char* /*args*/)
             ((Creature*)target)->Respawn();
         return true;
     }
-
-    Player* pl = m_session->GetPlayer();
 
     CellPair p(MaNGOS::ComputeCellPair(pl->GetPositionX(), pl->GetPositionY()));
     Cell cell(p);
@@ -6155,5 +6155,65 @@ bool ChatHandler::HandleSendMessageCommand(const char* args)
 
     //Confirmation message
     PSendSysMessage(LANG_SENDMESSAGE,name.c_str(),msg_str);
+    return true;
+}
+
+bool ChatHandler::HandleModifyGenderCommand(const char *args)
+{
+    if(!*args)
+        return false;
+
+    Player *player = getSelectedPlayer();
+
+    if(!player)
+    {
+        PSendSysMessage(LANG_NO_PLAYER);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    char const* gender_str = (char*)args;
+    int gender_len = strlen(gender_str);
+
+    uint32 displayId = player->GetNativeDisplayId();
+    char const* gender_full = NULL;
+    uint32 new_displayId = displayId;
+    Gender gender;
+
+    if(!strncmp(gender_str,"male",gender_len))              // MALE
+    {
+        if(player->getGender() == GENDER_MALE)
+            return true;
+
+        gender_full = "male";
+        new_displayId = player->getRace() == RACE_BLOODELF ? displayId+1 : displayId-1;
+        gender = GENDER_MALE;
+    }
+    else if (!strncmp(gender_str,"female",gender_len))      // FEMALE
+    {
+        if(player->getGender() == GENDER_FEMALE)
+            return true;
+
+        gender_full = "female";
+        new_displayId = player->getRace() == RACE_BLOODELF ? displayId-1 : displayId+1;
+        gender = GENDER_FEMALE;
+    }
+    else
+    {
+        SendSysMessage(LANG_MUST_MALE_OR_FEMALE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    // Set gender
+    player->SetByteValue(UNIT_FIELD_BYTES_0, 2, gender);
+
+    // Change display ID
+    player->SetDisplayId(new_displayId);
+    player->SetNativeDisplayId(new_displayId);
+
+    PSendSysMessage(LANG_YOU_CHANGE_GENDER, player->GetName(),gender_full);
+    if (needReportToTarget(player))
+        ChatHandler(player).PSendSysMessage(LANG_YOUR_GENDER_CHANGED, gender_full,GetName());
     return true;
 }

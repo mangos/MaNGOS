@@ -1553,6 +1553,13 @@ enum CreatureFamily
     CREATURE_FAMILY_SPIRIT_BEAST   = 46
 };
 
+enum CreatureTypeFlags
+{
+    CREATURE_TYPEFLAGS_TAMEBLE    = 0x0001,
+    CREATURE_TYPEFLAGS_HERBLOOT   = 0x0100,
+    CREATURE_TYPEFLAGS_MININGLOOT = 0x0200,
+};
+
 enum CreatureEliteType
 {
     CREATURE_ELITE_NORMAL          = 0,
