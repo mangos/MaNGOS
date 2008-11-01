@@ -8258,6 +8258,78 @@ bool Player::IsBagPos( uint16 pos )
     return false;
 }
 
+bool Player::IsValidPos( uint8 bag, uint8 slot )
+{
+    // post selected
+    if(bag == NULL_BAG)
+        return true;
+
+    if (bag == INVENTORY_SLOT_BAG_0)
+    {
+        // any post selected
+        if (slot == NULL_SLOT)
+            return true;
+
+        // equipment
+        if (slot < EQUIPMENT_SLOT_END)
+            return true;
+
+        // bag equip slots
+        if (slot >= INVENTORY_SLOT_BAG_START && slot < INVENTORY_SLOT_BAG_END)
+            return true;
+
+        // backpack slots
+        if (slot >= INVENTORY_SLOT_ITEM_START && slot < INVENTORY_SLOT_ITEM_END)
+            return true;
+
+        // keyring slots
+        if (slot >= KEYRING_SLOT_START && slot < KEYRING_SLOT_END)
+            return true;
+
+        // bank main slots
+        if (slot >= BANK_SLOT_ITEM_START && slot < BANK_SLOT_ITEM_END)
+            return true;
+
+        // bank bag slots
+        if (slot >= BANK_SLOT_BAG_START && slot < BANK_SLOT_BAG_END)
+            return true;
+
+        return false;
+    }
+
+    // bag content slots
+    if (bag >= INVENTORY_SLOT_BAG_START && bag < INVENTORY_SLOT_BAG_END)
+    {
+        Bag* pBag = (Bag*)GetItemByPos (INVENTORY_SLOT_BAG_0, bag);
+        if(!pBag)
+            return false;
+
+        // any post selected
+        if (slot == NULL_SLOT)
+            return true;
+
+        return slot < pBag->GetBagSize();
+    }
+
+    // bank bag content slots
+    if( bag >= BANK_SLOT_BAG_START && bag < BANK_SLOT_BAG_END )
+    {
+        Bag* pBag = (Bag*)GetItemByPos (INVENTORY_SLOT_BAG_0, bag);
+        if(!pBag)
+            return false;
+
+        // any post selected
+        if (slot == NULL_SLOT)
+            return true;
+
+        return slot < pBag->GetBagSize();
+    }
+
+    // where this?
+    return false;
+}
+
+
 bool Player::HasItemCount( uint32 item, uint32 count, bool inBankAlso ) const
 {
     uint32 tempcount = 0;
