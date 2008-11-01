@@ -1799,13 +1799,30 @@ bool ChatHandler::HandlePInfoCommand(const char* args)
     // get additional information from DB
     else
     {
+        //                                                     0
+        QueryResult *result = CharacterDatabase.PQuery("SELECT totaltime FROM characters WHERE guid = '%u'", GUID_LOPART(targetGUID));
+        if (!result)
+        {
+            SendSysMessage(LANG_PLAYER_NOT_FOUND);
+            SetSentErrorMessage(true);
+            return false;
+        }
+        Field *fields = result->Fetch();
+        total_player_time = fields[0].GetUInt32();
+        delete result;
+
+        Tokens data;
+        if (!Player::LoadValuesArrayFromDB(data,targetGUID))
+        {
+            SendSysMessage(LANG_PLAYER_NOT_FOUND);
+            SetSentErrorMessage(true);
+            return false;
+        }
+
+        money = Player::GetUInt32ValueFromArray(data, PLAYER_FIELD_COINAGE);
+        level = Player::GetUInt32ValueFromArray(data, UNIT_FIELD_LEVEL);
+
         accId = objmgr.GetPlayerAccountIdByGUID(targetGUID);
-        WorldSession session(0,NULL,SEC_PLAYER,0,0,LOCALE_enUS);
-        Player plr(&session);                               // use fake session for temporary load
-        plr.MinimalLoadFromDB(NULL, targetGUID);
-        money = plr.GetMoney();
-        total_player_time = plr.GetTotalPlayedTime();
-        level = plr.getLevel();
     }
 
     std::string username = GetMangosString(LANG_ERROR);
@@ -2861,12 +2878,7 @@ bool ChatHandler::HandleWpShowCommand(const char* args)
     std::string show = show_str;
     uint32 Maxpoint;
 
-    sLog.outDebug("DEBUG: HandleWpShowCommand: lowguid: %u", lowguid);
-
-    sLog.outDebug("DEBUG: HandleWpShowCommand: Habe creature: %ld", target );
-
-    sLog.outDebug("DEBUG: HandleWpShowCommand: wpshow - show: %s", show_str);
-    //PSendSysMessage("wpshow - show: %s", show);
+    sLog.outDebug("DEBUG: HandleWpShowCommand: lowguid: %u show: %s", lowguid, show_str);
 
     // Show info for the selected waypoint
     if(show == "info")
@@ -2887,7 +2899,7 @@ bool ChatHandler::HandleWpShowCommand(const char* args)
 
         QueryResult *result =
             WorldDatabase.PQuery( "SELECT id, point, waittime, emote, spell, text1, text2, text3, text4, text5, model1, model2 FROM creature_movement WHERE wpguid = %u",
-            target->GetGUID() );
+            target->GetGUIDLow() );
         if(!result)
         {
             // Since we compare float values, we have to deal with
@@ -3387,7 +3399,7 @@ bool ChatHandler::HandleWpImportCommand(const char *args)
         {
             getline (infile,line);
             //cout << line << endl;
-            QueryResult *result = WorldDatabase.PQuery(line.c_str());
+            QueryResult *result = WorldDatabase.Query(line.c_str());
             delete result;
         }
         infile.close();
