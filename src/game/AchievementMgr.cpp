@@ -24,6 +24,7 @@
 #include "ObjectMgr.h"
 #include "Guild.h"
 #include "Database/DatabaseEnv.h"
+#include "GameEvent.h"
 
 AchievementMgr::AchievementMgr(Player *player)
 {
@@ -246,7 +247,50 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                 if(GetPlayer()->HasSpell(achievementCriteria->learn_spell.spellID))
                     SetCriteriaProgress(achievementCriteria, 1);
                 break;
-
+            case ACHIEVEMENT_CRITERIA_TYPE_DEATH_AT_MAP:
+                // AchievementMgr::UpdateAchievementCriteria might also be called on login - skip in this case
+                if(!miscvalue1)
+                    continue;
+                if(GetPlayer()->GetMapId() != achievementCriteria->death_at_map.mapID)
+                    continue;
+                SetCriteriaProgress(achievementCriteria, 1, true);
+                break;
+            case ACHIEVEMENT_CRITERIA_TYPE_KILLED_BY_CREATURE:
+                // AchievementMgr::UpdateAchievementCriteria might also be called on login - skip in this case
+                if(!miscvalue1)
+                    continue;
+                if(miscvalue1 != achievementCriteria->killed_by_creature.creatureEntry)
+                    continue;
+                SetCriteriaProgress(achievementCriteria, 1, true);
+                break;
+            case ACHIEVEMENT_CRITERIA_TYPE_KILLED_BY_PLAYER:
+                // AchievementMgr::UpdateAchievementCriteria might also be called on login - skip in this case
+                if(!miscvalue1)
+                    continue;
+                SetCriteriaProgress(achievementCriteria, 1, true);
+                break;
+            case ACHIEVEMENT_CRITERIA_TYPE_FALL_WITHOUT_DYING:
+            {
+                // AchievementMgr::UpdateAchievementCriteria might also be called on login - skip in this case
+                if(!miscvalue1)
+                    continue;
+                if(achievement->ID == 1260)
+                {
+                    if(Player::GetDrunkenstateByValue(GetPlayer()->GetDrunkValue()) != DRUNKEN_SMASHED)
+                        continue;
+                    // TODO: hardcoding eventid is bad, it can differ from DB to DB - maye implement something using HolidayNames.dbc?
+                    if(!gameeventmgr.IsActiveEvent(26))
+                        continue;
+                }
+                // miscvalue1 is falltime, calculate to fall height format given in dbc
+                uint32 fallHeight = uint32(0.06f*miscvalue1-91.5)*100;
+                SetCriteriaProgress(achievementCriteria, fallHeight);
+                break;
+            }
+            case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST:
+                if(GetPlayer()->GetQuestRewardStatus(achievementCriteria->complete_quest.questID))
+                    SetCriteriaProgress(achievementCriteria, 1);
+                break;
         }
         if(IsCompletedCriteria(achievementCriteria))
             CompletedCriteria(achievementCriteria);
@@ -313,11 +357,19 @@ bool AchievementMgr::IsCompletedCriteria(AchievementCriteriaEntry const* achieve
             return progress->counter >= achievementCriteria->complete_quests_in_zone.questCount;
         case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_DAILY_QUEST:
             return progress->counter >= achievementCriteria->complete_daily_quest.questCount;
-        case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_BATTLEGROUND:
-            // just used as a counter - return false
-            return false;
         case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SPELL:
             return progress->counter >= 1;
+        case ACHIEVEMENT_CRITERIA_TYPE_FALL_WITHOUT_DYING:
+            return progress->counter >= achievementCriteria->fall_without_dying.fallHeight;
+        case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST:
+            return progress->counter >= 1;
+
+        // handle all statistic-only criteria here
+        case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_BATTLEGROUND:
+        case ACHIEVEMENT_CRITERIA_TYPE_DEATH_AT_MAP:
+        case ACHIEVEMENT_CRITERIA_TYPE_KILLED_BY_CREATURE:
+        case ACHIEVEMENT_CRITERIA_TYPE_KILLED_BY_PLAYER:
+            return false;
     }
     return false;
 }

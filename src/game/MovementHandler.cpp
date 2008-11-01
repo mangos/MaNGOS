@@ -322,6 +322,9 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
                         damage = target->GetMaxHealth()/2;
 
                     target->EnvironmentalDamage(target->GetGUID(), DAMAGE_FALL, damage);
+
+                    if(target->isAlive())
+                        target->GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_FALL_WITHOUT_DYING, movementInfo.fallTime);
                 }
 
                 //Z given by moveinfo, LastZ, FallTime, WaterZ, MapZ, Damage, Safefall reduction

@@ -1250,6 +1250,7 @@ void Player::setDeathState(DeathState s)
         // passive spell
         if(!ressSpellId)
             ressSpellId = GetResurrectionSpellId();
+        GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_DEATH_AT_MAP, 1);
     }
     Unit::setDeathState(s);
 
@@ -12451,6 +12452,7 @@ void Player::RewardQuest( Quest const *pQuest, uint32 reward, Object* questGiver
 
     if (q_status.uState != QUEST_NEW) q_status.uState = QUEST_CHANGED;
     GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST_COUNT);
+    GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST);
 }
 
 void Player::FailQuest( uint32 quest_id )

@@ -690,6 +690,15 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
         if (GetTypeId() == TYPEID_UNIT && ((Creature*)this)->AI())
             ((Creature*)this)->AI()->KilledUnit(pVictim);
 
+        // achievement stuff
+        if ( pVictim->GetTypeId() == TYPEID_PLAYER)
+        {
+            if(GetTypeId() == TYPEID_UNIT)
+                ((Player*)pVictim)->GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KILLED_BY_CREATURE, GetEntry());
+            else if(GetTypeId() == TYPEID_PLAYER)
+                ((Player*)pVictim)->GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KILLED_BY_PLAYER, 1);
+        }
+
         // 10% durability loss on death
         // clean InHateListOf
         if (pVictim->GetTypeId() == TYPEID_PLAYER)
