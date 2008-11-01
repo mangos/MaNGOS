@@ -135,12 +135,6 @@ void PlayerMenu::SendGossipMenu( uint32 TitleTextId, uint64 npcGUID )
         GossipMenuItem const& gItem = mGossipMenu.GetItem(iI);
         data << uint32( iI );
         data << uint8( gItem.m_gIcon );
-        // icons:
-        // 0 unlearn talents/misc
-        // 1 trader
-        // 2 taxi
-        // 3 trainer
-        // 9 BG/arena
         data << uint8( gItem.m_gCoded );                    // makes pop up box password
         data << uint32(gItem.m_gBoxMoney);                  // money required to open menu, 2.0.3
         data << gItem.m_gMessage;                           // text for gossip item
@@ -155,7 +149,7 @@ void PlayerMenu::SendGossipMenu( uint32 TitleTextId, uint64 npcGUID )
         uint32 questID = qItem.m_qId;
         Quest const* pQuest = objmgr.GetQuestTemplate(questID);
 
-        data << questID;
+        data << uint32(questID);
         data << uint32( qItem.m_qIcon );
         data << uint32( pQuest ? pQuest->GetQuestLevel() : 0 );
         std::string Title = pQuest->GetTitle();
