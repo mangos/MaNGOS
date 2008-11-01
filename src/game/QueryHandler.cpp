@@ -97,7 +97,7 @@ void WorldSession::SendNameQueryOpcodeFromDBCallBack(QueryResult *result, uint32
     else
         field        = fields[2].GetUInt32();
 
-                                                        // guess size
+                                                            // guess size
     WorldPacket data( SMSG_NAME_QUERY_RESPONSE, (8+1+4+4+4+10) );
     data << MAKE_NEW_GUID(guid, 0, HIGHGUID_PLAYER);
     data << name;
@@ -180,7 +180,7 @@ void WorldSession::HandleCreatureQueryOpcode( WorldPacket & recv_data )
         data << uint8(0) << uint8(0) << uint8(0);           // name2, name3, name4, always empty
         data << SubName;
         data << ci->IconName;                               // "Directions" for guard, string for Icons 2.3.0
-        data << (uint32)ci->type_flags;                          // flags          wdbFeild7=wad flags1
+        data << (uint32)ci->type_flags;                     // flags          wdbFeild7=wad flags1
         data << (uint32)ci->type;
         data << (uint32)ci->family;                         // family         wdbFeild9
         data << (uint32)ci->rank;                           // rank           wdbFeild10
