@@ -47,6 +47,8 @@ class AuthSocket: public TcpSocket
 
         bool _HandleLogonChallenge();
         bool _HandleLogonProof();
+        bool _HandleReconnectChallenge();
+        bool _HandleReconnectProof();
         bool _HandleRealmList();
         //data transfer handle for patch
 
@@ -65,6 +67,7 @@ class AuthSocket: public TcpSocket
         BigNumber N, s, g, v;
         BigNumber b, B;
         BigNumber K;
+        BigNumber _reconnectProof;
 
         bool _authed;
 
