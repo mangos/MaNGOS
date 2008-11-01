@@ -132,7 +132,7 @@ void WorldSession::HandleWhoOpcode( WorldPacket & recv_data )
 
         wstrToLower(str[i]);
 
-        sLog.outDebug("String %u: %s", i, str[i].c_str());
+        sLog.outDebug("String %u: %s", i, temp.c_str());
     }
 
     std::wstring wplayer_name;
@@ -966,7 +966,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
             (fabs(rotateDy) > atEntry->box_y/2 + delta) ||
             (fabs(dz) > atEntry->box_z/2 + delta) )
         {
-            sLog.outDebug("Player '%s' (GUID: %u) too far (1/2 box X: %f 1/2 box Y: %u 1/2 box Z: %u rotate dX: %f rotate dY: %f dZ:%f), ignore Area Trigger ID: %u",
+            sLog.outDebug("Player '%s' (GUID: %u) too far (1/2 box X: %f 1/2 box Y: %f 1/2 box Z: %f rotate dX: %f rotate dY: %f dZ:%f), ignore Area Trigger ID: %u",
                 pl->GetName(), pl->GetGUIDLow(), atEntry->box_x/2, atEntry->box_y/2, atEntry->box_z/2, rotateDx, rotateDy, dz, Trigger_ID);
             return;
         }

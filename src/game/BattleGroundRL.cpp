@@ -98,7 +98,7 @@ void BattleGroundRL::AddPlayer(Player *plr)
     m_PlayerScores[plr->GetGUID()] = sc;
 }
 
-void BattleGroundRL::RemovePlayer(Player *plr, uint64 guid)
+void BattleGroundRL::RemovePlayer(Player* /*plr*/, uint64 /*guid*/)
 {
 
 }
