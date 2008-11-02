@@ -704,7 +704,7 @@ void WorldSession::HandleAddFriendOpcode( WorldPacket & recv_data )
         sLog.outDebug( "WORLD: %s Guid not found.", friendName.c_str() );
     }
 
-    sSocialMgr.SendFriendStatus(GetPlayer(), friendResult, GUID_LOPART(friendGuid), friendName, false);
+    sSocialMgr.SendFriendStatus(GetPlayer(), friendResult, GUID_LOPART(friendGuid), false);
 
     sLog.outDebug( "WORLD: Sent (SMSG_FRIEND_STATUS)" );
 }
@@ -721,7 +721,7 @@ void WorldSession::HandleDelFriendOpcode( WorldPacket & recv_data )
 
     _player->GetSocial()->RemoveFromSocialList(GUID_LOPART(FriendGUID), false);
 
-    sSocialMgr.SendFriendStatus(GetPlayer(), FRIEND_REMOVED, GUID_LOPART(FriendGUID), "", false);
+    sSocialMgr.SendFriendStatus(GetPlayer(), FRIEND_REMOVED, GUID_LOPART(FriendGUID), false);
 
     sLog.outDebug( "WORLD: Sent motd (SMSG_FRIEND_STATUS)" );
 }
@@ -733,8 +733,6 @@ void WorldSession::HandleAddIgnoreOpcode( WorldPacket & recv_data )
     sLog.outDebug( "WORLD: Received CMSG_ADD_IGNORE" );
 
     std::string IgnoreName = GetMangosString(LANG_FRIEND_IGNORE_UNKNOWN);
-    FriendsResult ignoreResult = FRIEND_IGNORE_NOT_FOUND;
-    uint64 IgnoreGuid = 0;
 
     recv_data >> IgnoreName;
 
@@ -746,40 +744,40 @@ void WorldSession::HandleAddIgnoreOpcode( WorldPacket & recv_data )
     sLog.outDebug( "WORLD: %s asked to Ignore: '%s'",
         GetPlayer()->GetName(), IgnoreName.c_str() );
 
-    IgnoreGuid = objmgr.GetPlayerGUIDByName(IgnoreName);
+    CharacterDatabase.AsyncPQuery(&WorldSession::HandleAddIgnoreOpcodeCallBack, GetAccountId(), "SELECT guid FROM characters WHERE name = '%s'", IgnoreName.c_str());
+}
 
+void WorldSession::HandleAddIgnoreOpcodeCallBack(QueryResult *result, uint32 accountId)
+{
+    if(!result)
+        return;
+
+    uint64 IgnoreGuid = MAKE_NEW_GUID((*result)[0].GetUInt32(), 0, HIGHGUID_PLAYER);
+
+    delete result;
+
+    WorldSession * session = sWorld.FindSession(accountId);
+    if(!session)
+        return;
+
+    FriendsResult ignoreResult = FRIEND_IGNORE_NOT_FOUND;
     if(IgnoreGuid)
     {
-        if(IgnoreGuid==GetPlayer()->GetGUID())
+        if(IgnoreGuid==session->GetPlayer()->GetGUID())              //not add yourself
             ignoreResult = FRIEND_IGNORE_SELF;
+        else if( session->GetPlayer()->GetSocial()->HasIgnore(GUID_LOPART(IgnoreGuid)) )
+            ignoreResult = FRIEND_IGNORE_ALREADY;
         else
         {
-            if( GetPlayer()->GetSocial()->HasIgnore(GUID_LOPART(IgnoreGuid)) )
-                ignoreResult = FRIEND_IGNORE_ALREADY;
+            ignoreResult = FRIEND_IGNORE_ADDED;
+
+            // ignore list full
+            if(!session->GetPlayer()->GetSocial()->AddToSocialList(GUID_LOPART(IgnoreGuid), true))
+                ignoreResult = FRIEND_IGNORE_FULL;
         }
     }
 
-    if (IgnoreGuid && ignoreResult == FRIEND_IGNORE_NOT_FOUND)
-    {
-        ignoreResult = FRIEND_IGNORE_ADDED;
-
-        if(!_player->GetSocial()->AddToSocialList(GUID_LOPART(IgnoreGuid), true))
-            ignoreResult = FRIEND_IGNORE_FULL;
-    }
-    else if(ignoreResult==FRIEND_IGNORE_ALREADY)
-    {
-        sLog.outDebug( "WORLD: %s Guid Already Ignored.", IgnoreName.c_str() );
-    }
-    else if(ignoreResult==FRIEND_IGNORE_SELF)
-    {
-        sLog.outDebug( "WORLD: %s Guid can't add himself.", IgnoreName.c_str() );
-    }
-    else
-    {
-        sLog.outDebug( "WORLD: %s Guid not found.", IgnoreName.c_str() );
-    }
-
-    sSocialMgr.SendFriendStatus(GetPlayer(), ignoreResult, GUID_LOPART(IgnoreGuid), "", false);
+    sSocialMgr.SendFriendStatus(session->GetPlayer(), ignoreResult, GUID_LOPART(IgnoreGuid), false);
 
     sLog.outDebug( "WORLD: Sent (SMSG_FRIEND_STATUS)" );
 }
@@ -796,7 +794,7 @@ void WorldSession::HandleDelIgnoreOpcode( WorldPacket & recv_data )
 
     _player->GetSocial()->RemoveFromSocialList(GUID_LOPART(IgnoreGUID), true);
 
-    sSocialMgr.SendFriendStatus(GetPlayer(), FRIEND_IGNORE_REMOVED, GUID_LOPART(IgnoreGUID), "", false);
+    sSocialMgr.SendFriendStatus(GetPlayer(), FRIEND_IGNORE_REMOVED, GUID_LOPART(IgnoreGUID), false);
 
     sLog.outDebug( "WORLD: Sent motd (SMSG_FRIEND_STATUS)" );
 }

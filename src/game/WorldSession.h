@@ -281,6 +281,7 @@ class MANGOS_DLL_SPEC WorldSession
         void HandleAddFriendOpcode(WorldPacket& recvPacket);
         void HandleDelFriendOpcode(WorldPacket& recvPacket);
         void HandleAddIgnoreOpcode(WorldPacket& recvPacket);
+        static void HandleAddIgnoreOpcodeCallBack(QueryResult *result, uint32 accountId);
         void HandleDelIgnoreOpcode(WorldPacket& recvPacket);
         void HandleSetFriendNoteOpcode(WorldPacket& recvPacket);
         void HandleBugOpcode(WorldPacket& recvPacket);
