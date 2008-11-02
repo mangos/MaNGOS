@@ -6023,7 +6023,7 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
                 break;
             }
             // Shadowguard
-            if((auraSpellInfo->SpellFamilyFlags & 0x80000000LL) && auraSpellInfo->SpellVisual==7958)
+            if((auraSpellInfo->SpellFamilyFlags & 0x80000000LL) && auraSpellInfo->SpellVisual[0]==7958)
             {
                 switch(triggeredByAura->GetSpellProto()->Id)
                 {
@@ -6382,14 +6382,14 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
             }
 
             // Water Shield (we can't set cooldown for main spell - it's player casted spell
-            if((auraSpellInfo->SpellFamilyFlags & 0x0000002000000000LL) && auraSpellInfo->SpellVisual==7358)
+            if((auraSpellInfo->SpellFamilyFlags & 0x0000002000000000LL) && auraSpellInfo->SpellVisual[0]==7358)
             {
                 target = this;
                 break;
             }
 
             // Lightning Shield
-            if((auraSpellInfo->SpellFamilyFlags & 0x00000400) && auraSpellInfo->SpellVisual==37)
+            if((auraSpellInfo->SpellFamilyFlags & 0x00000400) && auraSpellInfo->SpellVisual[0]==37)
             {
                 // overwrite non existing triggered spell call in spell.dbc
                 switch(triggeredByAura->GetSpellProto()->Id)
@@ -6475,21 +6475,21 @@ bool Unit::HandleOverrideClassScriptAuraProc(Unit *pVictim, int32 scriptId, uint
     {
         case 836:                                           // Improved Blizzard (Rank 1)
         {
-            if (!procSpell || procSpell->SpellVisual!=9487)
+            if (!procSpell || procSpell->SpellVisual[0]!=9487)
                 return false;
             triggered_spell_id = 12484;
             break;
         }
         case 988:                                           // Improved Blizzard (Rank 2)
         {
-            if (!procSpell || procSpell->SpellVisual!=9487)
+            if (!procSpell || procSpell->SpellVisual[0]!=9487)
                 return false;
             triggered_spell_id = 12485;
             break;
         }
         case 989:                                           // Improved Blizzard (Rank 3)
         {
-            if (!procSpell || procSpell->SpellVisual!=9487)
+            if (!procSpell || procSpell->SpellVisual[0]!=9487)
                 return false;
             triggered_spell_id = 12486;
             break;
@@ -7772,7 +7772,7 @@ uint32 Unit::SpellHealingBonus(SpellEntry const *spellProto, uint32 healamount, 
         AuraList const& mDummyAuras = pVictim->GetAurasByType(SPELL_AURA_DUMMY);
         for(AuraList::const_iterator i = mDummyAuras.begin();i != mDummyAuras.end(); ++i)
         {
-            if((*i)->GetSpellProto()->SpellVisual == 9180)
+            if((*i)->GetSpellProto()->SpellVisual[0] == 9180)
             {
                 // Flash of Light
                 if ((spellProto->SpellFamilyFlags & 0x0000000040000000LL) && (*i)->GetEffIndex() == 1)

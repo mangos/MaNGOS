@@ -4066,7 +4066,7 @@ void Aura::HandlePeriodicDamage(bool apply, bool Real)
         case SPELLFAMILY_ROGUE:
         {
             // Deadly poison aura state
-            if((m_spellProto->SpellFamilyFlags & 0x10000) && m_spellProto->SpellVisual==5100)
+            if((m_spellProto->SpellFamilyFlags & 0x10000) && m_spellProto->SpellVisual[0]==5100)
             {
                 if(apply)
                     m_target->ModifyAuraState(AURA_STATE_DEADLY_POISON,true);
@@ -4078,7 +4078,7 @@ void Aura::HandlePeriodicDamage(bool apply, bool Real)
                     for(Unit::AuraList::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
                     {
                         SpellEntry const* itr_spell = (*itr)->GetSpellProto();
-                        if(itr_spell && itr_spell->SpellFamilyName==SPELLFAMILY_ROGUE && (itr_spell->SpellFamilyFlags & 0x10000) && itr_spell->SpellVisual==5100)
+                        if(itr_spell && itr_spell->SpellFamilyName==SPELLFAMILY_ROGUE && (itr_spell->SpellFamilyFlags & 0x10000) && itr_spell->SpellVisual[0]==5100)
                         {
                             found = true;
                             break;
@@ -5765,7 +5765,7 @@ void Aura::PeriodicTick()
                 return;
 
             // heal for caster damage (must be alive)
-            if(m_target != pCaster && GetSpellProto()->SpellVisual==163 && !pCaster->isAlive())
+            if(m_target != pCaster && GetSpellProto()->SpellVisual[0]==163 && !pCaster->isAlive())
                 return;
 
             // ignore non positive values (can be result apply spellmods to aura damage
@@ -5810,7 +5810,7 @@ void Aura::PeriodicTick()
             bool haveCastItem = GetCastItemGUID()!=0;
 
             // heal for caster damage
-            if(m_target!=pCaster && spellProto->SpellVisual==163)
+            if(m_target!=pCaster && spellProto->SpellVisual[0]==163)
             {
                 uint32 dmg = spellProto->manaPerSecond;
                 if(pCaster->GetHealth() <= dmg && pCaster->GetTypeId()==TYPEID_PLAYER)

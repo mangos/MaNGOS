@@ -1088,8 +1088,7 @@ struct SpellEntry
     //uint32    EffectSpellClassMaskA[3];                   // 125-127  m_effectSpellClassMaskA not used
     //uint32    EffectSpellClassMaskB[3];                   // 128-130  m_effectSpellClassMaskB not used
     //uint32    EffectSpellClassMaskC[3];                   // 131-133  m_effectSpellClassMaskC not used
-    uint32    SpellVisual;                                  // 134      m_spellVisualID
-                                                            // 135 not used - no data and name in client?
+    uint32    SpellVisual[2];                               // 134-135  m_spellVisualID
     uint32    SpellIconID;                                  // 136      m_spellIconID
     uint32    activeIconID;                                 // 137      m_activeIconID
     //uint32    spellPriority;                              // 138      m_spellPriority not used
@@ -1107,19 +1106,20 @@ struct SpellEntry
     uint32    MaxTargetLevel;                               // 210      m_maxTargetLevel
     uint32    SpellFamilyName;                              // 211      m_spellClassSet
     uint64    SpellFamilyFlags;                             // 212-213  m_spellClassMask
-    uint32    MaxAffectedTargets;                           // 214      m_maxTargets
-    uint32    DmgClass;                                     // 215      m_defenseType
-    uint32    PreventionType;                               // 216      m_preventionType
-    //uint32    StanceBarOrder;                             // 217      m_stanceBarOrder not used
-    float     DmgMultiplier[3];                             // 218-220  m_effectChainAmplitude
-    //uint32    MinFactionId;                               // 221      m_minFactionID not used
-    //uint32    MinReputation;                              // 222      m_minReputation not used
-    //uint32    RequiredAuraVision;                         // 223      m_requiredAuraVision not used
-    uint32    TotemCategory[2];                             // 224-225  m_requiredTotemCategoryID
-    int32     AreaId;                                       // 226      m_requiredAreasID
-    uint32    SchoolMask;                                   // 227      m_schoolMask
-    uint32    runeCostID;                                   // 228      m_runeCostID
-    //uint32    spellMissileID;                             // 229      m_spellMissileID not used
+    uint32    SpellFamilyFlags2;                            // 214      addition to m_spellClassMask
+    uint32    MaxAffectedTargets;                           // 215      m_maxTargets
+    uint32    DmgClass;                                     // 216      m_defenseType
+    uint32    PreventionType;                               // 217      m_preventionType
+    //uint32    StanceBarOrder;                             // 218      m_stanceBarOrder not used
+    float     DmgMultiplier[3];                             // 219-221  m_effectChainAmplitude
+    //uint32    MinFactionId;                               // 222      m_minFactionID not used
+    //uint32    MinReputation;                              // 223      m_minReputation not used
+    //uint32    RequiredAuraVision;                         // 224      m_requiredAuraVision not used
+    uint32    TotemCategory[2];                             // 225-226  m_requiredTotemCategoryID
+    int32     AreaId;                                       // 227      m_requiredAreasID
+    uint32    SchoolMask;                                   // 228      m_schoolMask
+    uint32    runeCostID;                                   // 229      m_runeCostID
+    //uint32    spellMissileID;                             // 230      m_spellMissileID not used
 
     private:
         // prevent creating custom entries (copy data from original in fact)

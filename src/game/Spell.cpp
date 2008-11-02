@@ -1550,7 +1550,7 @@ void Spell::SetTargetMap(uint32 i,uint32 cur,std::list<Unit*> &TagUnitMap)
             cell.data.Part.reserved = ALL_DISTRICT;
             cell.SetNoCreate();
 
-            bool inFront = m_spellInfo->SpellVisual != 3879;
+            bool inFront = m_spellInfo->SpellVisual[0] != 3879;
             MaNGOS::SpellNotifierCreatureAndPlayer notifier(*this, TagUnitMap, radius, inFront ? PUSH_IN_FRONT : PUSH_IN_BACK,SPELL_TARGETS_AOE_DAMAGE);
 
             TypeContainerVisitor<MaNGOS::SpellNotifierCreatureAndPlayer, WorldTypeMapContainer > world_object_notifier(notifier);
@@ -3551,7 +3551,7 @@ uint8 Spell::CanCast(bool strict)
             case SPELL_EFFECT_SCHOOL_DAMAGE:
             {
                 // Hammer of Wrath
-                if(m_spellInfo->SpellVisual == 7250)
+                if(m_spellInfo->SpellVisual[0] == 7250)
                 {
                     if (!m_targets.getUnitTarget())
                         return SPELL_FAILED_BAD_IMPLICIT_TARGETS;

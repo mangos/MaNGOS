@@ -386,7 +386,7 @@ void Spell::EffectSchoolDMG(uint32 effect_idx)
             case SPELLFAMILY_DRUID:
             {
                 // Ferocious Bite
-                if((m_spellInfo->SpellFamilyFlags & 0x000800000) && m_spellInfo->SpellVisual==6587)
+                if((m_spellInfo->SpellFamilyFlags & 0x000800000) && m_spellInfo->SpellVisual[0]==6587)
                 {
                     // converts each extra point of energy into ($f1+$AP/630) additional damage
                     float multiple = m_caster->GetTotalAttackPowerValue(BASE_ATTACK) / 630 + m_spellInfo->DmgMultiplier[effect_idx];
@@ -466,7 +466,7 @@ void Spell::EffectSchoolDMG(uint32 effect_idx)
                         {
                             // Deadly poison (only attacker applied)
                             if( (*itr)->GetSpellProto()->SpellFamilyName==SPELLFAMILY_ROGUE && ((*itr)->GetSpellProto()->SpellFamilyFlags & 0x10000) &&
-                                (*itr)->GetSpellProto()->SpellVisual==5100 && (*itr)->GetCasterGUID()==m_caster->GetGUID() )
+                                (*itr)->GetSpellProto()->SpellVisual[0]==5100 && (*itr)->GetCasterGUID()==m_caster->GetGUID() )
                             {
                                 --combo;
                                 ++doses;
@@ -504,7 +504,7 @@ void Spell::EffectSchoolDMG(uint32 effect_idx)
             case SPELLFAMILY_HUNTER:
             {
                 // Mongoose Bite
-                if((m_spellInfo->SpellFamilyFlags & 0x000000002) && m_spellInfo->SpellVisual==342)
+                if((m_spellInfo->SpellFamilyFlags & 0x000000002) && m_spellInfo->SpellVisual[0]==342)
                 {
                     damage += int32(m_caster->GetTotalAttackPowerValue(BASE_ATTACK)*0.2);
                 }
@@ -1191,7 +1191,7 @@ void Spell::EffectDummy(uint32 i)
             break;
         case SPELLFAMILY_WARRIOR:
             // Charge
-            if(m_spellInfo->SpellFamilyFlags & 0x1 && m_spellInfo->SpellVisual == 867)
+            if(m_spellInfo->SpellFamilyFlags & 0x1 && m_spellInfo->SpellVisual[0] == 867)
             {
                 int32 chargeBasePoints0 = damage;
                 m_caster->CastCustomSpell(m_caster,34846,&chargeBasePoints0,NULL,NULL,true);
@@ -3838,13 +3838,13 @@ void Spell::EffectEnchantItemTmp(uint32 i)
     else if(m_spellInfo->SpellFamilyName==SPELLFAMILY_SHAMAN)
         duration = 1800;                                    // 30 mins
     // other cases with this SpellVisual already selected
-    else if(m_spellInfo->SpellVisual==215)
+    else if(m_spellInfo->SpellVisual[0]==215)
         duration = 1800;                                    // 30 mins
     // some fishing pole bonuses
-    else if(m_spellInfo->SpellVisual==563)
+    else if(m_spellInfo->SpellVisual[0]==563)
         duration = 600;                                     // 10 mins
     // shaman rockbiter enchantments
-    else if(m_spellInfo->SpellVisual==0)
+    else if(m_spellInfo->SpellVisual[0]==0)
         duration = 1800;                                    // 30 mins
     else if(m_spellInfo->Id==29702)
         duration = 300;                                     // 5 mins
@@ -4177,7 +4177,7 @@ void Spell::EffectWeaponDmg(uint32 i)
                     spell_bonus += m_caster->CalculateDamage (OFF_ATTACK, normalized);
             }
             // Devastate bonus and sunder armor refresh
-            else if(m_spellInfo->SpellVisual == 671 && m_spellInfo->SpellIconID == 1508)
+            else if(m_spellInfo->SpellVisual[0] == 671 && m_spellInfo->SpellIconID == 1508)
             {
                 customBonusDamagePercentMod = true;
                 bonusDamagePercentMod = 0.0f;               // only applied if auras found
@@ -4186,7 +4186,7 @@ void Spell::EffectWeaponDmg(uint32 i)
                 for(Unit::AuraList::const_iterator itr=list.begin();itr!=list.end();++itr)
                 {
                     SpellEntry const *proto = (*itr)->GetSpellProto();
-                    if(proto->SpellVisual == 406 && proto->SpellIconID == 565)
+                    if(proto->SpellVisual[0] == 406 && proto->SpellIconID == 565)
                     {
                         int32 duration = GetSpellDuration(proto);
                         (*itr)->SetAuraDuration(duration);
