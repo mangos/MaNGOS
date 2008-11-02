@@ -3946,24 +3946,20 @@ uint32 Player::DurabilityRepair(uint16 pos, bool cost, float discountMod, bool g
         uint32 LostDurability = maxDurability - curDurability;
         if(LostDurability>0)
         {
-            ItemPrototype const *ditemProto = sItemStorage.LookupEntry<ItemPrototype>(item->GetEntry());
-            if(!ditemProto)
-            {
-                sLog.outError("ERROR: RepairDurability: Unknown item id %u", ditemProto);
-                return TotalCost;
-            }
+            ItemPrototype const *ditemProto = item->GetProto();
 
             DurabilityCostsEntry const *dcost = sDurabilityCostsStore.LookupEntry(ditemProto->ItemLevel);
             if(!dcost)
             {
-                sLog.outError("ERROR: RepairDurability: Wrong item lvl %u", dcost);
+                sLog.outError("ERROR: RepairDurability: Wrong item lvl %u", ditemProto->ItemLevel);
                 return TotalCost;
             }
 
-            DurabilityQualityEntry const *dQualitymodEntry = sDurabilityQualityStore.LookupEntry((ditemProto->Quality+1)*2);
+            uint32 dQualitymodEntryId = (ditemProto->Quality+1)*2;
+            DurabilityQualityEntry const *dQualitymodEntry = sDurabilityQualityStore.LookupEntry(dQualitymodEntryId);
             if(!dQualitymodEntry)
             {
-                sLog.outError("ERROR: RepairDurability: Wrong dQualityModEntry %u", dQualitymodEntry);
+                sLog.outError("ERROR: RepairDurability: Wrong dQualityModEntry %u", dQualitymodEntryId);
                 return TotalCost;
             }
 

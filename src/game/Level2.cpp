@@ -1800,7 +1800,7 @@ bool ChatHandler::HandlePInfoCommand(const char* args)
     else
     {
         //                                                     0
-        QueryResult *result = CharacterDatabase.PQuery("SELECT totaltime FROM characters WHERE guid = '%u'", targetGUID);
+        QueryResult *result = CharacterDatabase.PQuery("SELECT totaltime FROM characters WHERE guid = '%u'", GUID_LOPART(targetGUID));
         if (!result)
         {
             SendSysMessage(LANG_PLAYER_NOT_FOUND);
