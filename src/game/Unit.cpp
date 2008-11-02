@@ -233,9 +233,11 @@ Unit::~Unit()
     // set current spells as deletable
     for (uint32 i = 0; i < CURRENT_MAX_SPELL; i++)
     {
-                                                            // spell may be safely deleted now
-        if (m_currentSpells[i]) m_currentSpells[i]->SetDeletable(true);
-        m_currentSpells[i] = NULL;
+        if (m_currentSpells[i])
+        {
+            m_currentSpells[i]->SetReferencedFromCurrent(false);
+            m_currentSpells[i] = NULL;
+        }
     }
 
     RemoveAllGameObjects();
@@ -3145,7 +3147,7 @@ void Unit::_UpdateSpells( uint32 time )
     {
         if (m_currentSpells[i] && m_currentSpells[i]->getState() == SPELL_STATE_FINISHED)
         {
-            m_currentSpells[i]->SetDeletable(true);         // spell may be safely deleted now
+            m_currentSpells[i]->SetReferencedFromCurrent(false);
             m_currentSpells[i] = NULL;                      // remove pointer
         }
     }
@@ -3258,7 +3260,6 @@ void Unit::SetCurrentCastedSpell( Spell * pSpell )
 
     uint32 CSpellType = pSpell->GetCurrentContainer();
 
-    pSpell->SetDeletable(false);                            // spell will not be deleted until gone from current pointers
     if (pSpell == m_currentSpells[CSpellType]) return;      // avoid breaking self
 
     // break same type spell if it is not delayed
@@ -3315,10 +3316,11 @@ void Unit::SetCurrentCastedSpell( Spell * pSpell )
 
     // current spell (if it is still here) may be safely deleted now
     if (m_currentSpells[CSpellType])
-        m_currentSpells[CSpellType]->SetDeletable(true);
+        m_currentSpells[CSpellType]->SetReferencedFromCurrent(false);
 
     // set new current spell
     m_currentSpells[CSpellType] = pSpell;
+    pSpell->SetReferencedFromCurrent(true);
 }
 
 void Unit::InterruptSpell(uint32 spellType, bool withDelayed)
@@ -3336,7 +3338,7 @@ void Unit::InterruptSpell(uint32 spellType, bool withDelayed)
 
         if (m_currentSpells[spellType]->getState() != SPELL_STATE_FINISHED)
             m_currentSpells[spellType]->cancel();
-        m_currentSpells[spellType]->SetDeletable(true);
+        m_currentSpells[spellType]->SetReferencedFromCurrent(false);
         m_currentSpells[spellType] = NULL;
     }
 }
@@ -3372,7 +3374,7 @@ void Unit::InterruptNonMeleeSpells(bool withDelayed, uint32 spell_id)
         if  ( (m_currentSpells[CURRENT_GENERIC_SPELL]->getState() != SPELL_STATE_FINISHED) &&
             (withDelayed || m_currentSpells[CURRENT_GENERIC_SPELL]->getState() != SPELL_STATE_DELAYED) )
             m_currentSpells[CURRENT_GENERIC_SPELL]->cancel();
-        m_currentSpells[CURRENT_GENERIC_SPELL]->SetDeletable(true);
+        m_currentSpells[CURRENT_GENERIC_SPELL]->SetReferencedFromCurrent(false);
         m_currentSpells[CURRENT_GENERIC_SPELL] = NULL;
     }
 
@@ -3386,7 +3388,7 @@ void Unit::InterruptNonMeleeSpells(bool withDelayed, uint32 spell_id)
         if ( (m_currentSpells[CURRENT_AUTOREPEAT_SPELL]->getState() != SPELL_STATE_FINISHED) &&
             (withDelayed || m_currentSpells[CURRENT_AUTOREPEAT_SPELL]->getState() != SPELL_STATE_DELAYED) )
             m_currentSpells[CURRENT_AUTOREPEAT_SPELL]->cancel();
-        m_currentSpells[CURRENT_AUTOREPEAT_SPELL]->SetDeletable(true);
+        m_currentSpells[CURRENT_AUTOREPEAT_SPELL]->SetReferencedFromCurrent(false);
         m_currentSpells[CURRENT_AUTOREPEAT_SPELL] = NULL;
     }
 
@@ -3395,7 +3397,7 @@ void Unit::InterruptNonMeleeSpells(bool withDelayed, uint32 spell_id)
     {
         if (m_currentSpells[CURRENT_CHANNELED_SPELL]->getState() != SPELL_STATE_FINISHED)
             m_currentSpells[CURRENT_CHANNELED_SPELL]->cancel();
-        m_currentSpells[CURRENT_CHANNELED_SPELL]->SetDeletable(true);
+        m_currentSpells[CURRENT_CHANNELED_SPELL]->SetReferencedFromCurrent(false);
         m_currentSpells[CURRENT_CHANNELED_SPELL] = NULL;
     }
 }
@@ -9791,7 +9793,7 @@ void Unit::CleanupsBeforeDelete()
     if(m_uint32Values)                                      // only for fully created object
     {
         InterruptNonMeleeSpells(true);
-        m_Events.KillAllEvents();
+        m_Events.KillAllEvents(false);                      // non-delatable (currently casted spells) will not deleted ans will deleated at call in Map::RemoveAllObjectsInRemoveList
         CombatStop();
         ClearComboPointHolders();
         DeleteThreatList();
