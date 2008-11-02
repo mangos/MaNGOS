@@ -309,7 +309,7 @@ void WorldSession::HandleCharCreateOpcode( WorldPacket & recv_data )
     bool have_same_race = false;
     if(!AllowTwoSideAccounts || skipCinematics == 1)
     {
-        QueryResult *result2 = CharacterDatabase.PQuery("SELECT DISTINCT race FROM characters WHERE account = '%u' %s", GetAccountId(),skipCinematics == 1 ? "" : "LIMIT 1");
+        QueryResult *result2 = CharacterDatabase.Query("SELECT DISTINCT race FROM characters WHERE account = '%u' %s", GetAccountId(),skipCinematics == 1 ? "" : "LIMIT 1");
         if(result2)
         {
             uint32 team_= Player::TeamForRace(race_);

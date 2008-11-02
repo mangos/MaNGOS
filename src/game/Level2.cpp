@@ -3399,7 +3399,7 @@ bool ChatHandler::HandleWpImportCommand(const char *args)
         {
             getline (infile,line);
             //cout << line << endl;
-            QueryResult *result = WorldDatabase.PQuery(line.c_str());
+            QueryResult *result = WorldDatabase.Query(line.c_str());
             delete result;
         }
         infile.close();
