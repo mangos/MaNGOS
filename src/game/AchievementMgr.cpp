@@ -25,6 +25,7 @@
 #include "Guild.h"
 #include "Database/DatabaseEnv.h"
 #include "GameEvent.h"
+#include "World.h"
 
 AchievementMgr::AchievementMgr(Player *player)
 {
@@ -96,26 +97,15 @@ void AchievementMgr::LoadFromDB(QueryResult *achievementResult, QueryResult *cri
 
 }
 
-void AchievementMgr::SendAchievementEarned(uint32 achievementId)
+void AchievementMgr::SendAchievementEarned(AchievementEntry const* achievement)
 {
-    sLog.outString("AchievementMgr::SendAchievementEarned(%u)", achievementId);
+    sLog.outString("AchievementMgr::SendAchievementEarned(%u)", achievement->ID);
 
-    WorldPacket data(SMSG_MESSAGECHAT, 200);
-    data << uint8(CHAT_MSG_ACHIEVEMENT);
-    data << uint32(LANG_UNIVERSAL);
-    data << uint64(GetPlayer()->GetGUID());
-    data << uint32(5);
-    data << uint64(GetPlayer()->GetGUID());
     const char *msg = "|Hplayer:$N|h[$N]|h has earned the achievement $a!";
-    data << uint32(strlen(msg)+1);
-    data << msg;
-    data << uint8(0);
-    data << uint32(achievementId);
-    GetPlayer()->SendMessageToSet(&data, true);
-
     if(Guild* guild = objmgr.GetGuildById(GetPlayer()->GetGuildId()))
     {
-        data.Initialize(SMSG_MESSAGECHAT, 200);
+        WorldPacket data(SMSG_MESSAGECHAT, 200);
+        data << uint8(CHAT_MSG_ACHIEVEMENT);
         data << uint8(CHAT_MSG_GUILD_ACHIEVEMENT);
         data << uint32(LANG_UNIVERSAL);
         data << uint64(GetPlayer()->GetGUID());
@@ -124,13 +114,37 @@ void AchievementMgr::SendAchievementEarned(uint32 achievementId)
         data << uint32(strlen(msg)+1);
         data << msg;
         data << uint8(0);
-        data << uint32(achievementId);
+        data << uint32(achievement->ID);
         guild->BroadcastPacket(&data);
     }
+    if(achievement->flags & (ACHIEVEMENT_FLAG_REALM_FIRST_KILL|ACHIEVEMENT_FLAG_REALM_FIRST_REACH))
+    {
+        // broadcast realm first reached
+        WorldPacket data(SMSG_SERVER_FIRST_ACHIEVEMENT, strlen(GetPlayer()->GetName())+1+8+4+4);
+        data << GetPlayer()->GetName();
+        data << uint64(GetPlayer()->GetGUID());
+        data << uint32(achievement->ID);
+        data << uint32(0);  // 1=link supplied string as player name, 0=display plain string
+        sWorld.SendGlobalMessage(&data);
+    }
+    else
+    {
+        WorldPacket data(SMSG_MESSAGECHAT, 200);
+        data << uint8(CHAT_MSG_ACHIEVEMENT);
+        data << uint32(LANG_UNIVERSAL);
+        data << uint64(GetPlayer()->GetGUID());
+        data << uint32(5);
+        data << uint64(GetPlayer()->GetGUID());
+        data << uint32(strlen(msg)+1);
+        data << msg;
+        data << uint8(0);
+        data << uint32(achievement->ID);
+        GetPlayer()->SendMessageToSet(&data, true);
 
-    data.Initialize(SMSG_ACHIEVEMENT_EARNED, 8+4+8);
+    }
+    WorldPacket data(SMSG_ACHIEVEMENT_EARNED, 8+4+8);
     data.append(GetPlayer()->GetPackGUID());
-    data << uint32(achievementId);
+    data << uint32(achievement->ID);
     data << uint32(secsToTimeBitFields(time(NULL)));
     data << uint32(0);
     GetPlayer()->SendMessageToSet(&data, true);
@@ -443,7 +457,7 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
     if(achievement->flags & ACHIEVEMENT_FLAG_COUNTER || m_completedAchievements.find(achievement->ID)!=m_completedAchievements.end())
         return;
 
-    SendAchievementEarned(achievement->ID);
+    SendAchievementEarned(achievement);
     m_completedAchievements[achievement->ID] = time(NULL);
 
     // don't insert for ACHIEVEMENT_FLAG_REALM_FIRST_KILL since otherwise only the first group member would reach that achievement

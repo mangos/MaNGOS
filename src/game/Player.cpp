@@ -3572,6 +3572,8 @@ void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmC
     CharacterDatabase.PExecute("DELETE FROM mail_items WHERE receiver = '%u'",guid);
     CharacterDatabase.PExecute("DELETE FROM character_pet WHERE owner = '%u'",guid);
     CharacterDatabase.PExecute("DELETE FROM character_pet_declinedname WHERE owner = '%u'",guid);
+    CharacterDatabase.PExecute("DELETE FROM character_achievement WHERE guid = '%u'",guid);
+    CharacterDatabase.PExecute("DELETE FROM character_achievement_progress WHERE guid = '%u'",guid);
     CharacterDatabase.CommitTransaction();
 
     //loginDatabase.PExecute("UPDATE realmcharacters SET numchars = numchars - 1 WHERE acctid = %d AND realmid = %d", accountId, realmID);

@@ -64,7 +64,7 @@ class AchievementMgr
         Player* GetPlayer() { return m_player;}
 
     private:
-        void SendAchievementEarned(uint32 achievementId);
+        void SendAchievementEarned(AchievementEntry const* achievement);
         void SendCriteriaUpdate(CriteriaProgress *progress);
         void SetCriteriaProgress(AchievementCriteriaEntry const* entry, uint32 newValue, bool relative=false);
         void CompletedCriteria(AchievementCriteriaEntry const* entry);
