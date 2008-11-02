@@ -565,7 +565,7 @@ void ObjectMgr::LoadCreatureLocales()
 
 void ObjectMgr::LoadCompletedAchievements()
 {
-    QueryResult *result = WorldDatabase.Query("SELECT achievement FROM character_achievement GROUP BY achievement");
+    QueryResult *result = CharacterDatabase.Query("SELECT achievement FROM character_achievement GROUP BY achievement");
 
     if(!result)
         return;
