@@ -1652,56 +1652,60 @@ void Unit::CalcAbsorbResist(Unit *pVictim,SpellSchoolMask schoolMask, DamageEffe
         RemainingDamage -= currentAbsorb;
     }
 
-    AuraList const& vSplitDamageFlat = pVictim->GetAurasByType(SPELL_AURA_SPLIT_DAMAGE_FLAT);
-    for(AuraList::const_iterator i = vSplitDamageFlat.begin(), next; i != vSplitDamageFlat.end() && RemainingDamage >= 0; i = next)
+    // only split damage if not damaing yourself
+    if(pVictim != this)
     {
-        next = i; ++next;
+        AuraList const& vSplitDamageFlat = pVictim->GetAurasByType(SPELL_AURA_SPLIT_DAMAGE_FLAT);
+        for(AuraList::const_iterator i = vSplitDamageFlat.begin(), next; i != vSplitDamageFlat.end() && RemainingDamage >= 0; i = next)
+        {
+            next = i; ++next;
 
-        // check damage school mask
-        if(((*i)->GetModifier()->m_miscvalue & schoolMask)==0)
-            continue;
+            // check damage school mask
+            if(((*i)->GetModifier()->m_miscvalue & schoolMask)==0)
+                continue;
 
-        // Damage can be splitted only if aura has an alive caster
-        Unit *caster = (*i)->GetCaster();
-        if(!caster || caster == pVictim || !caster->IsInWorld() || !caster->isAlive())
-            continue;
+            // Damage can be splitted only if aura has an alive caster
+            Unit *caster = (*i)->GetCaster();
+            if(!caster || caster == pVictim || !caster->IsInWorld() || !caster->isAlive())
+                continue;
 
-        int32 currentAbsorb;
-        if (RemainingDamage >= (*i)->GetModifier()->m_amount)
-            currentAbsorb = (*i)->GetModifier()->m_amount;
-        else
-            currentAbsorb = RemainingDamage;
+            int32 currentAbsorb;
+            if (RemainingDamage >= (*i)->GetModifier()->m_amount)
+                currentAbsorb = (*i)->GetModifier()->m_amount;
+            else
+                currentAbsorb = RemainingDamage;
 
-        RemainingDamage -= currentAbsorb;
+            RemainingDamage -= currentAbsorb;
 
-        SendSpellNonMeleeDamageLog(caster, (*i)->GetSpellProto()->Id, currentAbsorb, schoolMask, 0, 0, false, 0, false);
+            SendSpellNonMeleeDamageLog(caster, (*i)->GetSpellProto()->Id, currentAbsorb, schoolMask, 0, 0, false, 0, false);
 
-        CleanDamage cleanDamage = CleanDamage(currentAbsorb, BASE_ATTACK, MELEE_HIT_NORMAL);
-        DealDamage(caster, currentAbsorb, &cleanDamage, DIRECT_DAMAGE, schoolMask, (*i)->GetSpellProto(), false);
-    }
+            CleanDamage cleanDamage = CleanDamage(currentAbsorb, BASE_ATTACK, MELEE_HIT_NORMAL);
+            DealDamage(caster, currentAbsorb, &cleanDamage, DIRECT_DAMAGE, schoolMask, (*i)->GetSpellProto(), false);
+        }
 
-    AuraList const& vSplitDamagePct = pVictim->GetAurasByType(SPELL_AURA_SPLIT_DAMAGE_PCT);
-    for(AuraList::const_iterator i = vSplitDamagePct.begin(), next; i != vSplitDamagePct.end() && RemainingDamage >= 0; i = next)
-    {
-        next = i; ++next;
+        AuraList const& vSplitDamagePct = pVictim->GetAurasByType(SPELL_AURA_SPLIT_DAMAGE_PCT);
+        for(AuraList::const_iterator i = vSplitDamagePct.begin(), next; i != vSplitDamagePct.end() && RemainingDamage >= 0; i = next)
+        {
+            next = i; ++next;
 
-        // check damage school mask
-        if(((*i)->GetModifier()->m_miscvalue & schoolMask)==0)
-            continue;
+            // check damage school mask
+            if(((*i)->GetModifier()->m_miscvalue & schoolMask)==0)
+                continue;
 
-        // Damage can be splitted only if aura has an alive caster
-        Unit *caster = (*i)->GetCaster();
-        if(!caster || caster == pVictim || !caster->IsInWorld() || !caster->isAlive())
-            continue;
+            // Damage can be splitted only if aura has an alive caster
+            Unit *caster = (*i)->GetCaster();
+            if(!caster || caster == pVictim || !caster->IsInWorld() || !caster->isAlive())
+                continue;
 
-        int32 splitted = int32(RemainingDamage * (*i)->GetModifier()->m_amount / 100.0f);
+            int32 splitted = int32(RemainingDamage * (*i)->GetModifier()->m_amount / 100.0f);
 
-        RemainingDamage -= splitted;
+            RemainingDamage -= splitted;
 
-        SendSpellNonMeleeDamageLog(caster, (*i)->GetSpellProto()->Id, splitted, schoolMask, 0, 0, false, 0, false);
+            SendSpellNonMeleeDamageLog(caster, (*i)->GetSpellProto()->Id, splitted, schoolMask, 0, 0, false, 0, false);
 
-        CleanDamage cleanDamage = CleanDamage(splitted, BASE_ATTACK, MELEE_HIT_NORMAL);
-        DealDamage(caster, splitted, &cleanDamage, DIRECT_DAMAGE, schoolMask, (*i)->GetSpellProto(), false);
+            CleanDamage cleanDamage = CleanDamage(splitted, BASE_ATTACK, MELEE_HIT_NORMAL);
+            DealDamage(caster, splitted, &cleanDamage, DIRECT_DAMAGE, schoolMask, (*i)->GetSpellProto(), false);
+        }
     }
 
     *absorb = damage - RemainingDamage - *resist;
