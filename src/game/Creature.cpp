@@ -818,18 +818,20 @@ void Creature::OnGossipSelect(Player* player, uint32 option)
             return;
     }
 
-    uint32 textid=GetGossipTextId( action, zoneid);
-    if(textid==0)
-        textid=GetNpcTextId();
-
     switch (gossip->Action)
     {
         case GOSSIP_OPTION_GOSSIP:
+        {
+            uint32 textid = GetGossipTextId(action, zoneid);
+            if (textid == 0)
+                textid=GetNpcTextId();
+
             player->PlayerTalkClass->CloseGossip();
-            player->PlayerTalkClass->SendTalking( textid );
+            player->PlayerTalkClass->SendTalking(textid);
             break;
+        }
         case GOSSIP_OPTION_SPIRITHEALER:
-            if( player->isDead() )
+            if (player->isDead())
                 CastSpell(this,17251,true,NULL,NULL,player->GetGUID());
             break;
         case GOSSIP_OPTION_QUESTGIVER:
