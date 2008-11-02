@@ -279,6 +279,7 @@ class MANGOS_DLL_SPEC WorldSession
         void HandleEmoteOpcode(WorldPacket& recvPacket);
         void HandleFriendListOpcode(WorldPacket& recvPacket);
         void HandleAddFriendOpcode(WorldPacket& recvPacket);
+        static void HandleAddFriendOpcodeCallBack(QueryResult *result, uint32 accountId, std::string friendNote);
         void HandleDelFriendOpcode(WorldPacket& recvPacket);
         void HandleAddIgnoreOpcode(WorldPacket& recvPacket);
         static void HandleAddIgnoreOpcodeCallBack(QueryResult *result, uint32 accountId);

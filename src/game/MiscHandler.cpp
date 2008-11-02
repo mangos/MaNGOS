@@ -640,11 +640,8 @@ void WorldSession::HandleAddFriendOpcode( WorldPacket & recv_data )
 
     sLog.outDebug( "WORLD: Received CMSG_ADD_FRIEND" );
 
-    std::string friendName  = GetMangosString(LANG_FRIEND_IGNORE_UNKNOWN);
+    std::string friendName = GetMangosString(LANG_FRIEND_IGNORE_UNKNOWN);
     std::string friendNote;
-    FriendsResult friendResult = FRIEND_NOT_FOUND;
-    Player *pFriend     = NULL;
-    uint64 friendGuid   = 0;
 
     recv_data >> friendName;
 
@@ -661,50 +658,51 @@ void WorldSession::HandleAddFriendOpcode( WorldPacket & recv_data )
     sLog.outDebug( "WORLD: %s asked to add friend : '%s'",
         GetPlayer()->GetName(), friendName.c_str() );
 
-    friendGuid = objmgr.GetPlayerGUIDByName(friendName);
+    CharacterDatabase.AsyncPQuery(&WorldSession::HandleAddFriendOpcodeCallBack, GetAccountId(), friendNote, "SELECT guid, race FROM characters WHERE name = '%s'", friendName.c_str());
+}
 
+void WorldSession::HandleAddFriendOpcodeCallBack(QueryResult *result, uint32 accountId, std::string friendNote)
+{
+    if(!result)
+        return;
+
+    uint64 friendGuid = MAKE_NEW_GUID((*result)[0].GetUInt32(), 0, HIGHGUID_PLAYER);
+    uint32 team = Player::TeamForRace((*result)[1].GetUInt8());
+
+    delete result;
+
+    WorldSession * session = sWorld.FindSession(accountId);
+    if(!session)
+        return;
+
+    FriendsResult friendResult = FRIEND_NOT_FOUND;
     if(friendGuid)
     {
-        pFriend = ObjectAccessor::FindPlayer(friendGuid);
-        if(pFriend==GetPlayer())
+        if(friendGuid==session->GetPlayer()->GetGUID())
             friendResult = FRIEND_SELF;
-        else if(GetPlayer()->GetTeam()!=objmgr.GetPlayerTeamByGUID(friendGuid) && !sWorld.getConfig(CONFIG_ALLOW_TWO_SIDE_ADD_FRIEND) && GetSecurity() < SEC_MODERATOR)
+        else if(session->GetPlayer()->GetTeam() != team && !sWorld.getConfig(CONFIG_ALLOW_TWO_SIDE_ADD_FRIEND) && session->GetSecurity() < SEC_MODERATOR)
             friendResult = FRIEND_ENEMY;
-        else if(GetPlayer()->GetSocial()->HasFriend(GUID_LOPART(friendGuid)))
+        else if(session->GetPlayer()->GetSocial()->HasFriend(GUID_LOPART(friendGuid)))
             friendResult = FRIEND_ALREADY;
-    }
-
-    if (friendGuid && friendResult==FRIEND_NOT_FOUND)
-    {
-        if( pFriend && pFriend->IsInWorld() && pFriend->IsVisibleGloballyFor(GetPlayer()))
-            friendResult = FRIEND_ADDED_ONLINE;
         else
-            friendResult = FRIEND_ADDED_OFFLINE;
-
-        if(!_player->GetSocial()->AddToSocialList(GUID_LOPART(friendGuid), false))
         {
-            friendResult = FRIEND_LIST_FULL;
-            sLog.outDebug( "WORLD: %s's friend list is full.", GetPlayer()->GetName());
+            Player* pFriend = ObjectAccessor::FindPlayer(friendGuid);
+            if( pFriend && pFriend->IsInWorld() && pFriend->IsVisibleGloballyFor(session->GetPlayer()))
+                friendResult = FRIEND_ADDED_ONLINE;
+            else
+                friendResult = FRIEND_ADDED_OFFLINE;
+
+            if(!session->GetPlayer()->GetSocial()->AddToSocialList(GUID_LOPART(friendGuid), false))
+            {
+                friendResult = FRIEND_LIST_FULL;
+                sLog.outDebug( "WORLD: %s's friend list is full.", session->GetPlayer()->GetName());
+            }
+
+            session->GetPlayer()->GetSocial()->SetFriendNote(GUID_LOPART(friendGuid), friendNote);
         }
-
-        _player->GetSocial()->SetFriendNote(GUID_LOPART(friendGuid), friendNote);
-
-        sLog.outDebug( "WORLD: %s Guid found '%u'.", friendName.c_str(), GUID_LOPART(friendGuid));
-    }
-    else if(friendResult==FRIEND_ALREADY)
-    {
-        sLog.outDebug( "WORLD: %s Guid Already a Friend.", friendName.c_str() );
-    }
-    else if(friendResult==FRIEND_SELF)
-    {
-        sLog.outDebug( "WORLD: %s Guid can't add himself.", friendName.c_str() );
-    }
-    else
-    {
-        sLog.outDebug( "WORLD: %s Guid not found.", friendName.c_str() );
     }
 
-    sSocialMgr.SendFriendStatus(GetPlayer(), friendResult, GUID_LOPART(friendGuid), false);
+    sSocialMgr.SendFriendStatus(session->GetPlayer(), friendResult, GUID_LOPART(friendGuid), false);
 
     sLog.outDebug( "WORLD: Sent (SMSG_FRIEND_STATUS)" );
 }
