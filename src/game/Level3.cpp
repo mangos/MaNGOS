@@ -6274,6 +6274,95 @@ bool ChatHandler::HandleSendItemsCommand(const char* args)
     return true;
 }
 
+///Send money by mail
+bool ChatHandler::HandleSendMoneyCommand(const char* args)
+{
+    if (!*args)
+        return false;
+
+    /// format: name "subject text" "mail text" money
+
+    char* pName = strtok((char*)args, " ");
+    if (!pName)
+        return false;
+
+    char* tail1 = strtok(NULL, "");
+    if (!tail1)
+        return false;
+
+    char* msgSubject;
+    if (*tail1=='"')
+        msgSubject = strtok(tail1+1, "\"");
+    else
+    {
+        char* space = strtok(tail1, "\"");
+        if (!space)
+            return false;
+        msgSubject = strtok(NULL, "\"");
+    }
+
+    if (!msgSubject)
+        return false;
+
+    char* tail2 = strtok(NULL, "");
+    if (!tail2)
+        return false;
+
+    char* msgText;
+    if (*tail2=='"')
+        msgText = strtok(tail2+1, "\"");
+    else
+    {
+        char* space = strtok(tail2, "\"");
+        if (!space)
+            return false;
+        msgText = strtok(NULL, "\"");
+    }
+
+    if (!msgText)
+        return false;
+
+    int32 money = atoi(strtok(NULL, ""));
+    if (money <= 0)
+        return false;
+
+    // pName, msgSubject, msgText isn't NUL after prev. check
+    std::string name    = pName;
+    std::string subject = msgSubject;
+    std::string text    = msgText;
+
+    if (!normalizePlayerName(name))
+    {
+        SendSysMessage(LANG_PLAYER_NOT_FOUND);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    uint64 receiver_guid = objmgr.GetPlayerGUIDByName(name);
+    if (!receiver_guid)
+    {
+        SendSysMessage(LANG_PLAYER_NOT_FOUND);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    uint32 mailId = objmgr.GenerateMailID();
+
+    // from console show not existed sender
+    uint32 sender_guidlo = m_session ? m_session->GetPlayer()->GetGUIDLow() : 0;
+
+    uint32 messagetype = MAIL_NORMAL;
+    uint32 stationery = MAIL_STATIONERY_GM;
+    uint32 itemTextId = !text.empty() ? objmgr.CreateItemText( text ) : 0;
+
+    Player *receiver = objmgr.GetPlayer(receiver_guid);
+
+    WorldSession::SendMailTo(receiver,messagetype, stationery, sender_guidlo, GUID_LOPART(receiver_guid), subject, itemTextId, NULL, money, 0, MAIL_CHECK_MASK_NONE);
+
+    PSendSysMessage(LANG_MAIL_SENT, name.c_str());
+    return true;
+}
+
 /// Send a message to a player in game
 bool ChatHandler::HandleSendMessageCommand(const char* args)
 {

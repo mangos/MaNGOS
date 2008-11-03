@@ -119,6 +119,7 @@ class ChatHandler
         bool HandleDrunkCommand(const char* args);
         bool HandleSendItemsCommand(const char* args);
         bool HandleSendMailCommand(const char* args);
+        bool HandleSendMoneyCommand(const char* args);
 
         bool HandleEventActiveListCommand(const char* args);
         bool HandleEventStartCommand(const char* args);
@@ -414,7 +415,6 @@ class ChatHandler
         bool HandleSendMessageCommand(const char * args);
         bool HandleRepairitemsCommand(const char* args);
         bool HandleWaterwalkCommand(const char* args);
-        bool HandleSendMoneyCommand(const char* args);
 
         //! Development Commands
         bool HandleSetValue(const char* args);
