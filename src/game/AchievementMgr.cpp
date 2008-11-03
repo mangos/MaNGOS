@@ -90,6 +90,14 @@ void AchievementMgr::LoadFromDB(QueryResult *achievementResult, QueryResult *cri
         {
             Field *fields = criteriaResult->Fetch();
             CriteriaProgress *progress = new CriteriaProgress(fields[0].GetUInt32(), fields[1].GetUInt32(), fields[2].GetUInt64());
+
+            AchievementCriteriaEntry const* criteria = sAchievementCriteriaStore.LookupEntry(progress->id);
+            if(!criteria ||
+                    criteria->timeLimit && progress->date + criteria->timeLimit < time(NULL))
+            {
+                delete progress;
+                continue;
+            }
             m_criteriaProgress[progress->id] = progress;
         } while(criteriaResult->NextRow());
         delete criteriaResult;
@@ -305,6 +313,14 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                 if(GetPlayer()->GetQuestRewardStatus(achievementCriteria->complete_quest.questID))
                     SetCriteriaProgress(achievementCriteria, 1);
                 break;
+            case ACHIEVEMENT_CRITERIA_TYPE_USE_ITEM:
+                // AchievementMgr::UpdateAchievementCriteria might also be called on login - skip in this case
+                if(!miscvalue1)
+                    continue;
+                if(achievementCriteria->use_item.itemID != miscvalue1)
+                    continue;
+                SetCriteriaProgress(achievementCriteria, 1, true);
+                break;
         }
         if(IsCompletedCriteria(achievementCriteria))
             CompletedCriteria(achievementCriteria);
@@ -377,6 +393,8 @@ bool AchievementMgr::IsCompletedCriteria(AchievementCriteriaEntry const* achieve
             return progress->counter >= achievementCriteria->fall_without_dying.fallHeight;
         case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST:
             return progress->counter >= 1;
+        case ACHIEVEMENT_CRITERIA_TYPE_USE_ITEM:
+            return progress->counter >= achievementCriteria->use_item.itemCount;
 
         // handle all statistic-only criteria here
         case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_BATTLEGROUND:
@@ -447,6 +465,16 @@ void AchievementMgr::SetCriteriaProgress(AchievementCriteriaEntry const* entry, 
         if(progress->counter == newValue)
             return;
         progress->counter = newValue;
+    }
+    if(entry->timeLimit)
+    {
+        time_t now = time(NULL);
+        if(progress->date + entry->timeLimit < now)
+        {
+            progress->counter = 1;
+        }
+        // also it seems illogical, the timeframe will be extended at every criteria update
+        progress->date = now;
     }
     SendCriteriaUpdate(progress);
 }

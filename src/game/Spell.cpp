@@ -2081,6 +2081,9 @@ void Spell::cast(bool skipCheck)
     // set to real guid to be sent later to the client
     m_targets.updateTradeSlotItem();
 
+    if(m_CastItem && m_caster->GetTypeId() == TYPEID_PLAYER)
+        ((Player*)m_caster)->GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_USE_ITEM, m_CastItem->GetEntry());
+
     // CAST SPELL
     SendSpellCooldown();
 

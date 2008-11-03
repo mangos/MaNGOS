@@ -52,7 +52,7 @@ struct AchievementEntry
     //char *unk1[16];                                       // 43-58
     //uint32 unk_flags;                                     // 59
     //uint32 count;                                         // 60
-    //uint32 refAchievement;                                // 61
+    uint32 refAchievement;                                  // 61
 };
 
 struct AchievementCategoryEntry
