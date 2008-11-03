@@ -6016,7 +6016,9 @@ uint32 Player::GetArenaTeamIdFromDB(uint64 guid, uint8 type)
     if(!result)
         return 0;
 
-    return (*result)[0].GetUInt32();
+    uint32 id = (*result)[0].GetUInt32();
+    delete result;
+    return id;
 }
 
 uint32 Player::GetZoneIdFromDB(uint64 guid)
