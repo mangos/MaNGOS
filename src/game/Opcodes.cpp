@@ -1121,7 +1121,7 @@ OpcodeHandler opcodeTable[NUM_MSG_TYPES] =
     /*0x444*/ { "SMSG_CALENDAR_EVENT_UPDATED_ALERT",STATUS_NEVER,    &WorldSession::Handle_ServerSide               },
     /*0x445*/ { "SMSG_CALENDAR_EVENT_MODERATOR_STATUS_ALERT",STATUS_NEVER,&WorldSession::Handle_ServerSide          },
     /*0x446*/ { "CMSG_CALENDAR_COMPLAIN",           STATUS_LOGGEDIN, &WorldSession::HandleCalendarComplain          },
-    /*0x447*/ { "SMSG_CALENDAR_EVENT_RESERVED_2",   STATUS_NEVER,    &WorldSession::Handle_NULL                     },
+    /*0x447*/ { "CMSG_CALENDAR_GET_CALENDAR_ON_LOGIN",STATUS_LOGGEDIN,&WorldSession::HandleCalendarGetCalendar      },
     /*0x448*/ { "SMSG_CALENDAR_EVENT_RESERVED_3",   STATUS_NEVER,    &WorldSession::Handle_NULL                     },
     /*0x449*/ { "CMSG_SAVE_DANCE",                  STATUS_NEVER,    &WorldSession::Handle_NULL                     },
     /*0x44A*/ { "SMSG_NOTIFY_DANCE",                STATUS_NEVER,    &WorldSession::Handle_ServerSide               },

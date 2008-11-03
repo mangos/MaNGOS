@@ -1123,7 +1123,7 @@ enum Opcodes
     SMSG_CALENDAR_EVENT_UPDATED_ALERT               = 0x444,
     SMSG_CALENDAR_EVENT_MODERATOR_STATUS_ALERT      = 0x445,
     CMSG_CALENDAR_COMPLAIN                          = 0x446,
-    SMSG_CALENDAR_EVENT_RESERVED_2                  = 0x447, // CMSG_CALENDAR_GET_CALENDAR in 9155
+    CMSG_CALENDAR_GET_CALENDAR_ON_LOGIN             = 0x447,
     SMSG_CALENDAR_EVENT_RESERVED_3                  = 0x448,
     CMSG_SAVE_DANCE                                 = 0x449,
     SMSG_NOTIFY_DANCE                               = 0x44A,
