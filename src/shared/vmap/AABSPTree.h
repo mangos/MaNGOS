@@ -261,7 +261,7 @@ public:
 
     /** Returns the bounds of the sub array. Used by makeNode. */
     static AABox computeBounds(
-    const Array<_AABSPTree::Handle<T>*>& point,
+        const Array<_AABSPTree::Handle<T>*>& point,
         int                   beginIndex,
         int                   endIndex) {
 
@@ -770,9 +770,11 @@ public:
 
                 // Some of the elements in the lt or gt array might really overlap the split location.
                 // Move them as needed.
-                for (int i = 0; i < lt.size(); ++i) {
-                    const AABox& bounds = lt[i]->bounds;
-                    if ((bounds.low()[splitAxis] <= splitLocation) && (bounds.high()[splitAxis] >= splitLocation)) {
+                for (int i = 0; i < lt.size(); ++i)
+                {
+                    const AABox& lt_bounds = lt[i]->bounds;
+                    if ((bounds.low()[splitAxis] <= splitLocation) && (lt_bounds.high()[splitAxis] >= splitLocation))
+                    {
                         node->valueArray.append(lt[i]);
                         // Remove this element and process the new one that
                         // is swapped in in its place.
@@ -780,9 +782,11 @@ public:
                     }
                 }
 
-                for (int i = 0; i < gt.size(); ++i) {
-                    const AABox& bounds = gt[i]->bounds;
-                    if ((bounds.low()[splitAxis] <= splitLocation) && (bounds.high()[splitAxis] >= splitLocation)) {
+                for (int i = 0; i < gt.size(); ++i)
+                {
+                    const AABox& gt_bounds = gt[i]->bounds;
+                    if ((bounds.low()[splitAxis] <= splitLocation) && (gt_bounds.high()[splitAxis] >= splitLocation))
+                    {
                         node->valueArray.append(gt[i]);
                         // Remove this element and process the new one that
                         // is swapped in in its place.
@@ -819,19 +823,20 @@ public:
                 // Verify that all objects ended up on the correct side of the split.
                 // (i.e., make sure that the Array partition was correct)
                 for (int i = 0; i < lt.size(); ++i) {
-                    const AABox& bounds  = lt[i]->bounds;
-                    debugAssert(bounds.high()[splitAxis] < splitLocation);
+                    const AABox& lt_bounds  = lt[i]->bounds;
+                    debugAssert(lt_bounds.high()[splitAxis] < splitLocation);
                 }
 
                 for (int i = 0; i < gt.size(); ++i) {
-                    const AABox& bounds  = gt[i]->bounds;
-                    debugAssert(bounds.low()[splitAxis] > splitLocation);
+                    const AABox& gt_bounds  = gt[i]->bounds;
+                    debugAssert(gt_bounds.low()[splitAxis] > splitLocation);
                 }
 
-                for (int i = 0; i < node->valueArray.size(); ++i) {
-                    const AABox& bounds  = node->valueArray[i]->bounds;
-                    debugAssert(bounds.high()[splitAxis] >= splitLocation);
-                    debugAssert(bounds.low()[splitAxis] <= splitLocation);
+                for (int i = 0; i < node->valueArray.size(); ++i)
+                {
+                    const AABox& node_bounds  = node->valueArray[i]->bounds;
+                    debugAssert(node_bounds.high()[splitAxis] >= splitLocation);
+                    debugAssert(node_bounds.low()[splitAxis] <= splitLocation);
                 }
 #           endif
 
@@ -925,16 +930,17 @@ public:
     /**
      Throws out all elements of the set.
      */
-    void clear() {
+    void clear()
+    {
         typedef typename Table<_internal::Indirector<_AABSPTree::Handle<T> >, Node* >::Iterator It;
 
         // Delete all handles stored in the member table
-        It cur = memberTable.begin();
-        It end = memberTable.end();
-        while (cur != end) {
-            delete cur->key.handle;
-            cur->key.handle = NULL;
-            ++cur;
+        It tab_cur = memberTable.begin();
+        It tab_end = memberTable.end();
+        while (tab_cur != tab_end) {
+            delete tab_cur->key.handle;
+            tab_cur->key.handle = NULL;
+            ++tab_cur;
         }
         memberTable.clear();
 
@@ -1542,10 +1548,6 @@ public:
     class Iterator {
     private:
         friend class AABSPTree<T>;
-
-        // Note: this is a Table iterator, we are currently defining
-        // Set iterator
-        typename Table<Member, Node*>::Iterator it;
 
         Iterator(const typename Table<Member, Node*>::Iterator& it) : it(it) {}
 

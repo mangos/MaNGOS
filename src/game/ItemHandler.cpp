@@ -311,9 +311,9 @@ void WorldSession::HandleItemQuerySingleOpcode( WorldPacket & recv_data )
             ItemLocale const *il = objmgr.GetItemLocale(pProto->ItemId);
             if (il)
             {
-                if (il->Name.size() > loc_idx && !il->Name[loc_idx].empty())
+                if (il->Name.size() > size_t(loc_idx) && !il->Name[loc_idx].empty())
                     Name = il->Name[loc_idx];
-                if (il->Description.size() > loc_idx && !il->Description[loc_idx].empty())
+                if (il->Description.size() > size_t(loc_idx) && !il->Description[loc_idx].empty())
                     Description = il->Description[loc_idx];
             }
         }
@@ -977,7 +977,7 @@ void WorldSession::HandleItemNameQueryOpcode(WorldPacket & recv_data)
             ItemLocale const *il = objmgr.GetItemLocale(pProto->ItemId);
             if (il)
             {
-                if (il->Name.size() > loc_idx && !il->Name[loc_idx].empty())
+                if (il->Name.size() > size_t(loc_idx) && !il->Name[loc_idx].empty())
                     Name = il->Name[loc_idx];
             }
         }

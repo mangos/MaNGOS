@@ -126,8 +126,8 @@ namespace VMAP
             }
 
             const G3D::Array<unsigned int>& getMaps() const { return iMapIds; }
-            inline bool isAlreadyProcessedSingleFile(std::string pName) { return(iProcesseSingleFiles.containsKey(pName)); }
-            inline void addAlreadyProcessedSingleFile(std::string pName) { iProcesseSingleFiles.set(pName,pName); }
+            bool isAlreadyProcessedSingleFile(std::string pName) const { return iProcesseSingleFiles.containsKey(pName); }
+            void addAlreadyProcessedSingleFile(std::string pName) { iProcesseSingleFiles.set(pName,pName); }
 
             inline void addWorldAreaMap(unsigned int pMapId)
             {
@@ -136,7 +136,7 @@ namespace VMAP
                     iWorldAreaGroups.append(pMapId);
                 }
             }
-            inline bool isWorldAreaMap(unsigned int pMapId) { return(iWorldAreaGroups.contains(pMapId)); }
+            bool isWorldAreaMap(unsigned int pMapId) const { return(iWorldAreaGroups.contains(pMapId)); }
             void setModelNameFilterMethod(bool (*pFilterMethod)(char *pName)) { iFilterMethod = pFilterMethod; }
 
     };

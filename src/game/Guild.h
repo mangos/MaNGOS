@@ -197,7 +197,7 @@ struct GuildBankEvent
     uint8  DestTabId;
     uint64 TimeStamp;
 
-    const bool isMoneyEvent()
+    bool isMoneyEvent() const
     {
         return LogEntry == GUILD_BANK_LOG_DEPOSIT_MONEY ||
             LogEntry == GUILD_BANK_LOG_WITHDRAW_MONEY ||
@@ -356,7 +356,7 @@ class Guild
         void   SetGuildBankTabInfo(uint8 TabId, std::string name, std::string icon);
         void   CreateBankRightForTab(uint32 rankid, uint8 TabId);
         const  GuildBankTab *GetBankTab(uint8 index) { if(index >= m_TabListMap.size()) return NULL; return m_TabListMap[index]; }
-        const  uint8 GetPurchasedTabs() const { return purchased_tabs; }
+        uint8 GetPurchasedTabs() const { return purchased_tabs; }
         uint32 GetBankRights(uint32 rankId, uint8 TabId) const;
         bool   IsMemberHaveRights(uint32 LowGuid, uint8 TabId,uint32 rights) const;
         bool   CanMemberViewTab(uint32 LowGuid, uint8 TabId) const;

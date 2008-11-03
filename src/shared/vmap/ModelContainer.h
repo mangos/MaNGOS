@@ -52,8 +52,9 @@ namespace VMAP
             SubModel *iSubModel;
             G3D::AABox iBox;
 
-            ModelContainer (const ModelContainer& c): BaseModel(c) {}
-            ModelContainer& operator=(const ModelContainer& ) {}
+            // not allowed copy
+            explicit ModelContainer (const ModelContainer&);
+            ModelContainer& operator=(const ModelContainer&);
 
         public:
             ModelContainer() : BaseModel() { iNSubModel =0; iSubModel = 0; };
@@ -65,7 +66,7 @@ namespace VMAP
 
             ~ModelContainer(void);
 
-            inline const void setSubModel(const SubModel& pSubModel, int pPos) { iSubModel[pPos] = pSubModel; }
+            inline void setSubModel(const SubModel& pSubModel, int pPos) { iSubModel[pPos] = pSubModel; }
 
             inline const SubModel& getSubModel(int pPos) const { return iSubModel[pPos]; }
 
