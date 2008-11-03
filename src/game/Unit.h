@@ -383,10 +383,11 @@ enum UnitMoveType
     MOVE_SWIMBACK   = 4,
     MOVE_TURN       = 5,
     MOVE_FLY        = 6,
-    MOVE_FLYBACK    = 7
+    MOVE_FLYBACK    = 7,
+    MOVE_PITCH      = 8
 };
 
-#define MAX_MOVE_TYPE 8
+#define MAX_MOVE_TYPE 9
 
 extern float baseMoveSpeed[MAX_MOVE_TYPE];
 

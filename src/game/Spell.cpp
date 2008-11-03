@@ -2584,18 +2584,18 @@ void Spell::SendCastResult(uint8 result)
             case SPELL_FAILED_EQUIPPED_ITEM_CLASS:
                 data << uint32(m_spellInfo->EquippedItemClass);
                 data << uint32(m_spellInfo->EquippedItemSubClassMask);
-                data << uint32(m_spellInfo->EquippedItemInventoryTypeMask);
+                //data << uint32(m_spellInfo->EquippedItemInventoryTypeMask);
                 break;
         }
         ((Player*)m_caster)->GetSession()->SendPacket(&data);
     }
-    else
+    /*else
     {
         WorldPacket data(SMSG_CLEAR_EXTRA_AURA_INFO_OBSOLETE, (8+4));
         data.append(m_caster->GetPackGUID());
         data << uint32(m_spellInfo->Id);
         ((Player*)m_caster)->GetSession()->SendPacket(&data);
-    }
+    }*/
 }
 
 void Spell::SendSpellStart()
@@ -2603,13 +2603,13 @@ void Spell::SendSpellStart()
     if(!IsNeedSendToClient())
         return;
 
-    sLog.outDebug("Sending SMSG_SPELL_START id=%u",m_spellInfo->Id);
+    sLog.outDebug("Sending SMSG_SPELL_START id=%u", m_spellInfo->Id);
 
     uint32 castFlags = CAST_FLAG_UNKNOWN1;
     if(IsRangedSpell())
         castFlags |= CAST_FLAG_AMMO;
 
-    Unit * target;
+    Unit *target;
     if(!m_targets.getUnitTarget())
         target = m_caster;
     else
@@ -2800,7 +2800,7 @@ void Spell::SendLogExecute()
     data << uint32(count1);                                 // count1 (effect count?)
     for(uint32 i = 0; i < count1; ++i)
     {
-        data << uint32(m_spellInfo->Effect[0]);             // spell effect?
+        data << uint32(m_spellInfo->Effect[0]);             // spell effect
         uint32 count2 = 1;
         data << uint32(count2);                             // count2 (target count?)
         for(uint32 j = 0; j < count2; ++j)
@@ -2846,30 +2846,19 @@ void Spell::SendLogExecute()
                         data << uint8(0);
                     break;
                 case SPELL_EFFECT_CREATE_ITEM:
+                case SPELL_EFFECT_157:
                     data << uint32(m_spellInfo->EffectItemType[0]);
                     break;
                 case SPELL_EFFECT_SUMMON:
-                case SPELL_EFFECT_SUMMON_WILD:
-                case SPELL_EFFECT_SUMMON_GUARDIAN:
                 case SPELL_EFFECT_TRANS_DOOR:
                 case SPELL_EFFECT_SUMMON_PET:
-                case SPELL_EFFECT_SUMMON_POSSESSED:
-                //case SPELL_EFFECT_SUMMON_TOTEM:
                 case SPELL_EFFECT_SUMMON_OBJECT_WILD:
                 case SPELL_EFFECT_CREATE_HOUSE:
                 case SPELL_EFFECT_DUEL:
-                case SPELL_EFFECT_SUMMON_TOTEM_SLOT1:
-                case SPELL_EFFECT_SUMMON_TOTEM_SLOT2:
-                case SPELL_EFFECT_SUMMON_TOTEM_SLOT3:
-                case SPELL_EFFECT_SUMMON_TOTEM_SLOT4:
-                case SPELL_EFFECT_SUMMON_PHANTASM:
-                case SPELL_EFFECT_SUMMON_CRITTER:
                 case SPELL_EFFECT_SUMMON_OBJECT_SLOT1:
                 case SPELL_EFFECT_SUMMON_OBJECT_SLOT2:
                 case SPELL_EFFECT_SUMMON_OBJECT_SLOT3:
                 case SPELL_EFFECT_SUMMON_OBJECT_SLOT4:
-                case SPELL_EFFECT_SUMMON_DEMON:
-                case SPELL_EFFECT_150:
                     if(Unit *unit = m_targets.getUnitTarget())
                         data.append(unit->GetPackGUID());
                     else if(m_targets.getItemTargetGUID())
@@ -2883,6 +2872,13 @@ void Spell::SendLogExecute()
                     data << uint32(m_targets.getItemTargetEntry());
                     break;
                 case SPELL_EFFECT_DISMISS_PET:
+                    if(Unit *unit = m_targets.getUnitTarget())
+                        data.append(unit->GetPackGUID());
+                    else
+                        data << uint8(0);
+                    break;
+                case SPELL_EFFECT_RESURRECT:
+                case SPELL_EFFECT_RESURRECT_NEW:
                     if(Unit *unit = m_targets.getUnitTarget())
                         data.append(unit->GetPackGUID());
                     else
@@ -2927,7 +2923,7 @@ void Spell::SendChannelUpdate(uint32 time)
 
     WorldPacket data( MSG_CHANNEL_UPDATE, 8+4 );
     data.append(m_caster->GetPackGUID());
-    data << time;
+    data << uint32(time);
 
     ((Player*)m_caster)->GetSession()->SendPacket( &data );
 }
@@ -2964,8 +2960,8 @@ void Spell::SendChannelStart(uint32 duration)
     {
         WorldPacket data( MSG_CHANNEL_START, (8+4+4) );
         data.append(m_caster->GetPackGUID());
-        data << m_spellInfo->Id;
-        data << duration;
+        data << uint32(m_spellInfo->Id);
+        data << uint32(duration);
 
         ((Player*)m_caster)->GetSession()->SendPacket( &data );
     }
@@ -2979,9 +2975,15 @@ void Spell::SendChannelStart(uint32 duration)
 void Spell::SendResurrectRequest(Player* target)
 {
     WorldPacket data(SMSG_RESURRECT_REQUEST, (8+4+2+4));
-    data << m_caster->GetGUID();
-    data << uint32(1) << uint16(0) << uint32(1);
+    data << uint64(m_caster->GetGUID());
+    uint32 count = 1;
+    data << uint32(count);                                  // amount of bytes to read
 
+    for(uint32 i = 0; i < count; ++i)
+        data << uint8(0);
+
+    data << uint8(0);
+    data << uint8(0);
     target->GetSession()->SendPacket(&data);
 }
 
@@ -2991,8 +2993,8 @@ void Spell::SendPlaySpellVisual(uint32 SpellID)
         return;
 
     WorldPacket data(SMSG_PLAY_SPELL_VISUAL, 12);
-    data << m_caster->GetGUID();
-    data << SpellID;
+    data << uint64(m_caster->GetGUID());
+    data << uint32(SpellID);                                // spell visual id?
     ((Player*)m_caster)->GetSession()->SendPacket(&data);
 }
 
@@ -4163,7 +4165,7 @@ uint8 Spell::CheckCasterAuras() const
     else if(m_caster->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED) && m_spellInfo->PreventionType==SPELL_PREVENTION_TYPE_PACIFY)
         prevented_reason = SPELL_FAILED_PACIFIED;
 
-    // Attr must make flag drop spell totally immuned from all effects
+    // Attr must make flag drop spell totally immune from all effects
     if(prevented_reason)
     {
         if(school_immune || mechanic_immune || dispel_immune)
@@ -4630,7 +4632,7 @@ uint8 Spell::CheckItems()
                     return SPELL_FAILED_CANT_BE_DISENCHANTED;
 
                 uint32 item_quality = itemProto->Quality;
-                // 2.0.x addon: Check player enchanting level agains the item desenchanting requirements
+                // 2.0.x addon: Check player enchanting level against the item desenchanting requirements
                 uint32 item_disenchantskilllevel = itemProto->RequiredDisenchantSkill;
                 if (item_disenchantskilllevel == uint32(-1))
                     return SPELL_FAILED_CANT_BE_DISENCHANTED;

@@ -386,7 +386,7 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2 
         *data << ((Unit*)this)->GetSpeed( MOVE_FLY );
         *data << ((Unit*)this)->GetSpeed( MOVE_FLYBACK );
         *data << ((Unit*)this)->GetSpeed( MOVE_TURN );
-        *data << float(7);
+        *data << ((Unit*)this)->GetSpeed( MOVE_PITCH );
 
         // 0x08000000
         if(flags2 & MOVEMENTFLAG_SPLINE2)
@@ -539,10 +539,10 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2 
     }
 
     // 0x80
-    if(flags & UPDATEFLAG_WOTLK)                            // unused for now
+    if(flags & UPDATEFLAG_VEHICLE)                          // unused for now
     {
+        *data << uint32(0);                                 // vehicle id
         *data << float(0);
-        *data << uint32(0);
     }
 }
 
