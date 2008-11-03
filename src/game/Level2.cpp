@@ -4220,6 +4220,7 @@ bool ChatHandler::HandleNpcTameCommand(const char* args)
     // set pet to defensive mode by default (some classes can't control controlled pets in fact).
     pet->GetCharmInfo()->SetReactState(REACT_DEFENSIVE);
 
+    // calculate proper level
     uint32 level = (creatureTarget->getLevel() < (player->getLevel() - 5)) ? (player->getLevel() - 5) : creatureTarget->getLevel();
 
     // prepare visual effect for levelup

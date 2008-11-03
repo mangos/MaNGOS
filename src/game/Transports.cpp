@@ -114,7 +114,7 @@ void MapManager::LoadTransports()
     sLog.outString( ">> Loaded %u transports", count );
 
     // check transport data DB integrity
-    result = WorldDatabase.PQuery("SELECT gameobject.guid,gameobject.id,transports.name FROM gameobject,transports WHERE gameobject.id = transports.entry");
+    result = WorldDatabase.Query("SELECT gameobject.guid,gameobject.id,transports.name FROM gameobject,transports WHERE gameobject.id = transports.entry");
     if(result)                                              // wrong data found
     {
         do
@@ -146,7 +146,8 @@ bool Transport::Create(uint32 guidlow, uint32 mapid, float x, float y, float z, 
 
     if(!IsPositionValid())
     {
-        sLog.outError("ERROR: Transport (GUID: %u) not created. Suggested coordinates isn't valid (X: %d Y: ^%d)",guidlow,x,y);
+        sLog.outError("ERROR: Transport (GUID: %u) not created. Suggested coordinates isn't valid (X: %f Y: %f)",
+            guidlow,x,y);
         return false;
     }
 

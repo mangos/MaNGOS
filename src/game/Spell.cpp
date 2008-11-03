@@ -268,7 +268,8 @@ Spell::Spell( Unit* Caster, SpellEntry const *info, bool triggered, uint64 origi
     m_caster = Caster;
     m_selfContainer = NULL;
     m_triggeringContainer = triggeringContainer;
-    m_deletable = true;
+    m_referencedFromCurrentSpell = false;
+    m_executedCurrently = false;
     m_delayAtDamageCount = 0;
 
     m_applyMultiplierMask = 0;
@@ -2020,6 +2021,8 @@ void Spell::cancel()
 
 void Spell::cast(bool skipCheck)
 {
+    SetExecutedCurrently(true);
+
     uint8 castResult = 0;
 
     // update pointers base at GUIDs to prevent access to non-existed already object
@@ -2029,6 +2032,7 @@ void Spell::cast(bool skipCheck)
     if(!m_targets.getUnitTarget() && m_targets.getUnitTargetGUID() && m_targets.getUnitTargetGUID() != m_caster->GetGUID())
     {
         cancel();
+        SetExecutedCurrently(false);
         return;
     }
 
@@ -2040,6 +2044,7 @@ void Spell::cast(bool skipCheck)
     {
         SendCastResult(castResult);
         finish(false);
+        SetExecutedCurrently(false);
         return;
     }
 
@@ -2051,6 +2056,7 @@ void Spell::cast(bool skipCheck)
         {
             SendCastResult(castResult);
             finish(false);
+            SetExecutedCurrently(false);
             return;
         }
     }
@@ -2083,7 +2089,10 @@ void Spell::cast(bool skipCheck)
     FillTargetMap();
 
     if(m_spellState == SPELL_STATE_FINISHED)                // stop cast if spell marked as finish somewhere in Take*/FillTargetMap
+    {
+        SetExecutedCurrently(false);
         return;
+    }
 
     SendCastResult(castResult);
     SendSpellGo();                                          // we must send smsg_spell_go packet before m_castItem delete in TakeCastItem()...
@@ -2115,6 +2124,8 @@ void Spell::cast(bool skipCheck)
         // Immediate spell, no big deal
         handle_immediate();
     }
+
+    SetExecutedCurrently(false);
 }
 
 void Spell::handle_immediate()
@@ -5105,4 +5116,9 @@ void SpellEvent::Abort(uint64 /*e_time*/)
     // oops, the spell we try to do is aborted
     if (m_Spell->getState() != SPELL_STATE_FINISHED)
         m_Spell->cancel();
+}
+
+bool SpellEvent::IsDeletable() const
+{
+    return m_Spell->IsDeletable();
 }
