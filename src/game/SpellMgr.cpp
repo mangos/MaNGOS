@@ -2107,7 +2107,7 @@ void SpellMgr::LoadPetLevelupSpellMap()
                             continue;
                         break;
                     case CREATURE_FAMILY_TALLSTRIDER:
-                        if(spell->SpellIconID != 262 (spell->SpellIconID != 157 && (spell->Attributes & 0x4000000)))      // Claw and Dust Cloud
+                        if(spell->SpellIconID != 262 && (spell->SpellIconID != 157 && (spell->Attributes & 0x4000000)))      // Claw and Dust Cloud
                             continue;
                         break;
                     case CREATURE_FAMILY_TURTLE:
