@@ -56,6 +56,7 @@
 #include "CellImpl.h"
 #include "InstanceSaveMgr.h"
 #include "WaypointManager.h"
+#include "GMTicketMgr.h"
 #include "Util.h"
 
 INSTANTIATE_SINGLETON_1( World );
@@ -1133,6 +1134,9 @@ void World::SetInitialWorldSettings()
 
     sLog.outString( "Loading Waypoints..." );
     WaypointMgr.Load();
+
+    sLog.outString( "Loading GM tickets...");
+    ticketmgr.LoadGMTickets();
 
     ///- Handle outdated emails (delete/return)
     sLog.outString( "Returning old mails..." );

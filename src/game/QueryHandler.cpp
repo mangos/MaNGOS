@@ -166,9 +166,9 @@ void WorldSession::HandleCreatureQueryOpcode( WorldPacket & recv_data )
             CreatureLocale const *cl = objmgr.GetCreatureLocale(entry);
             if (cl)
             {
-                if (cl->Name.size() > loc_idx && !cl->Name[loc_idx].empty())
+                if (cl->Name.size() > size_t(loc_idx) && !cl->Name[loc_idx].empty())
                     Name = cl->Name[loc_idx];
-                if (cl->SubName.size() > loc_idx && !cl->SubName[loc_idx].empty())
+                if (cl->SubName.size() > size_t(loc_idx) && !cl->SubName[loc_idx].empty())
                     SubName = cl->SubName[loc_idx];
             }
         }
@@ -233,9 +233,9 @@ void WorldSession::HandleGameObjectQueryOpcode( WorldPacket & recv_data )
             GameObjectLocale const *gl = objmgr.GetGameObjectLocale(entryID);
             if (gl)
             {
-                if (gl->Name.size() > loc_idx && !gl->Name[loc_idx].empty())
+                if (gl->Name.size() > size_t(loc_idx) && !gl->Name[loc_idx].empty())
                     Name = gl->Name[loc_idx];
-                if (gl->CastBarCaption.size() > loc_idx && !gl->CastBarCaption[loc_idx].empty())
+                if (gl->CastBarCaption.size() > size_t(loc_idx) && !gl->CastBarCaption[loc_idx].empty())
                     CastBarCaption = gl->CastBarCaption[loc_idx];
             }
         }
@@ -368,9 +368,9 @@ void WorldSession::HandleNpcTextQueryOpcode( WorldPacket & recv_data )
             {
                 for (int i=0;i<8;i++)
                 {
-                    if (nl->Text_0[i].size() > loc_idx && !nl->Text_0[i][loc_idx].empty())
+                    if (nl->Text_0[i].size() > size_t(loc_idx) && !nl->Text_0[i][loc_idx].empty())
                         Text_0[i]=nl->Text_0[i][loc_idx];
-                    if (nl->Text_1[i].size() > loc_idx && !nl->Text_1[i][loc_idx].empty())
+                    if (nl->Text_1[i].size() > size_t(loc_idx) && !nl->Text_1[i][loc_idx].empty())
                         Text_1[i]=nl->Text_1[i][loc_idx];
                 }
             }
@@ -440,7 +440,7 @@ void WorldSession::HandlePageQueryOpcode( WorldPacket & recv_data )
                 PageTextLocale const *pl = objmgr.GetPageTextLocale(pageID);
                 if (pl)
                 {
-                    if (pl->Text.size() > loc_idx && !pl->Text[loc_idx].empty())
+                    if (pl->Text.size() > size_t(loc_idx) && !pl->Text[loc_idx].empty())
                         Text = pl->Text[loc_idx];
                 }
             }

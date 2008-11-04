@@ -23,13 +23,13 @@
 namespace VMAP
 {
     //=====================================
-    #define MAX_CAN_FALL_DISTANCE 10.0
+    #define MAX_CAN_FALL_DISTANCE 10.0f
     const char VMAP_MAGIC[] = "VMAP_2.0";
 
     class VMapDefinitions
     {
         public:
-            static const double getMaxCanFallDistance() { return(MAX_CAN_FALL_DISTANCE); }
+            static float getMaxCanFallDistance() { return MAX_CAN_FALL_DISTANCE; }
     };
 
     //======================================

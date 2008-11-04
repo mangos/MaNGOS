@@ -714,7 +714,7 @@ void WorldSession::HandleAuctionListItems( WorldPacket & recv_data )
                                             ItemLocale const *il = objmgr.GetItemLocale(proto->ItemId);
                                             if (il)
                                             {
-                                                if (il->Name.size() > loc_idx && !il->Name[loc_idx].empty())
+                                                if (il->Name.size() > size_t(loc_idx) && !il->Name[loc_idx].empty())
                                                     name = il->Name[loc_idx];
                                             }
                                         }
