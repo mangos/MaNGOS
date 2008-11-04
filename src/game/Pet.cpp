@@ -1264,7 +1264,7 @@ bool Pet::addSpell(uint16 spell_id, uint16 active, PetSpellState state, uint16 s
 
     uint32 chainstart = spellmgr.GetFirstSpellInChain(spell_id);
 
-    for (PetSpellMap::iterator itr = m_spells.begin(); itr != m_spells.end(); itr++)
+    for (PetSpellMap::iterator itr = m_spells.begin(); itr != m_spells.end(); ++itr)
     {
         if(itr->second->state == PETSPELL_REMOVED) continue;
 
@@ -1278,6 +1278,7 @@ bool Pet::addSpell(uint16 spell_id, uint16 active, PetSpellState state, uint16 s
 
             oldspell_id = itr->first;
             removeSpell(itr->first);
+            break;
         }
     }
 
@@ -1482,23 +1483,23 @@ void Pet::ToggleAutocast(uint32 spellid, bool apply)
     if(apply)
     {
         for (i = 0; i < m_autospells.size() && m_autospells[i] != spellid; i++);
-        if (i == m_autospells.size())
-        {
-            m_autospells.push_back(spellid);
-            itr->second->active = ACT_ENABLED;
-            itr->second->state = PETSPELL_CHANGED;
-        }
+            if (i == m_autospells.size())
+            {
+                m_autospells.push_back(spellid);
+                itr->second->active = ACT_ENABLED;
+                itr->second->state = PETSPELL_CHANGED;
+            }
     }
     else
     {
         AutoSpellList::iterator itr2 = m_autospells.begin();
         for (i = 0; i < m_autospells.size() && m_autospells[i] != spellid; i++, itr2++);
-        if (i < m_autospells.size())
-        {
-            m_autospells.erase(itr2);
-            itr->second->active = ACT_DISABLED;
-            itr->second->state = PETSPELL_CHANGED;
-        }
+            if (i < m_autospells.size())
+            {
+                m_autospells.erase(itr2);
+                itr->second->active = ACT_DISABLED;
+                itr->second->state = PETSPELL_CHANGED;
+            }
     }
 }
 

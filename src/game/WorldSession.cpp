@@ -544,5 +544,6 @@ void WorldSession::SetAccountData(uint32 type, time_t time_, std::string data)
 
     uint32 acc = GetAccountId();
     CharacterDatabase.PExecute("DELETE FROM account_data WHERE account='%u' AND type='%u'", acc, type);
+    CharacterDatabase.escape_string(data);
     CharacterDatabase.PExecute("INSERT INTO account_data VALUES ('%u','%u','%u','%s')", acc, type, (uint32)time_, data.c_str());
 }

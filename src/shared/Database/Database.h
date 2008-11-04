@@ -31,7 +31,7 @@ class SqlQueryHolder;
 typedef HM_NAMESPACE::hash_map<ZThread::ThreadImpl*, SqlTransaction*> TransactionQueues;
 typedef HM_NAMESPACE::hash_map<ZThread::ThreadImpl*, SqlResultQueue*> QueryQueues;
 
-#define MAX_QUERY_LEN   5*1024
+#define MAX_QUERY_LEN   32*1024
 
 class MANGOS_DLL_SPEC Database
 {

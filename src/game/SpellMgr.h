@@ -632,7 +632,7 @@ struct PetLevelupSpell
     uint32 ReqLevel;
 };
 
-typedef std::list<PetLevelupSpell> PetLevelupSpellList;
+typedef std::vector<PetLevelupSpell> PetLevelupSpellList;
 typedef std::map<uint32, PetLevelupSpellList> PetLevelupSpellMap;
 
 inline bool IsPrimaryProfessionSkill(uint32 skill)
