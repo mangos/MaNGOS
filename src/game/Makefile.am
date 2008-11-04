@@ -122,7 +122,6 @@ libmangosgame_a_SOURCES = \
     Guild.cpp \
     Guild.h \
     GuildHandler.cpp \
-    HateMatrix.h \
     HomeMovementGenerator.cpp \
     HomeMovementGenerator.h \
     HostilRefManager.cpp \

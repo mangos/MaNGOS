@@ -935,10 +935,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\game\HateMatrix.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\src\game\HomeMovementGenerator.cpp"
 				>
 			</File>
