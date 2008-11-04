@@ -626,6 +626,15 @@ typedef std::multimap<uint32, SpellLearnSpellNode> SpellLearnSpellMap;
 
 typedef std::multimap<uint32, SkillLineAbilityEntry const*> SkillLineAbilityMap;
 
+struct PetLevelupSpell
+{
+    uint32 SpellId;
+    uint32 ReqLevel;
+};
+
+typedef std::list<PetLevelupSpell> PetLevelupSpellList;
+typedef std::map<uint32, PetLevelupSpellList> PetLevelupSpellMap;
+
 inline bool IsPrimaryProfessionSkill(uint32 skill)
 {
     SkillLineEntry const *pSkill = sSkillLineStore.LookupEntry(skill);
@@ -841,6 +850,15 @@ class SpellMgr
                 return NULL;
         }
 
+        PetLevelupSpellList const* GetPetLevelupSpellList(uint32 petFamily) const
+        {
+            PetLevelupSpellMap::const_iterator itr = mPetLevelupSpellMap.find(petFamily);
+            if(itr != mPetLevelupSpellMap.end())
+                return &itr->second;
+            else
+                return NULL;
+        }
+
         // Modifiers
     public:
         static SpellMgr& Instance();
@@ -857,6 +875,7 @@ class SpellMgr
         void LoadSpellThreats();
         void LoadSkillLineAbilityMap();
         void LoadSpellPetAuras();
+        void LoadPetLevelupSpellMap();
 
     private:
         SpellScriptTarget  mSpellScriptTarget;
@@ -870,6 +889,7 @@ class SpellMgr
         SpellProcEventMap  mSpellProcEventMap;
         SkillLineAbilityMap mSkillLineAbilityMap;
         SpellPetAuraMap     mSpellPetAuraMap;
+        PetLevelupSpellMap mPetLevelupSpellMap;
 };
 
 #define spellmgr SpellMgr::Instance()

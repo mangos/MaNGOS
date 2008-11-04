@@ -146,15 +146,9 @@ void Object::BuildCreateUpdateBlockForPlayer(UpdateData *data, Player *target) c
 
     /** lower flag1 **/
     if(target == this)                                      // building packet for oneself
-    {
         flags |= UPDATEFLAG_SELF;
 
-        /*** temporary reverted - until real source of stack corruption will not found
-        updatetype = UPDATETYPE_CREATE_OBJECT2;
-        ****/
-    }
-
-    if(flags & UPDATEFLAG_HASPOSITION)
+    if(flags & UPDATEFLAG_HAS_POSITION)
     {
         // UPDATETYPE_CREATE_OBJECT2 dynamic objects, corpses...
         if(isType(TYPEMASK_DYNAMICOBJECT) || isType(TYPEMASK_CORPSE) || isType(TYPEMASK_PLAYER))
@@ -179,6 +173,12 @@ void Object::BuildCreateUpdateBlockForPlayer(UpdateData *data, Player *target) c
                     flags |= UPDATEFLAG_TRANSPORT;
                     break;
             }
+        }
+
+        if(isType(TYPEMASK_UNIT))
+        {
+            if(((Unit*)this)->getVictim())
+                flags |= UPDATEFLAG_HAS_TARGET;
         }
     }
 
@@ -255,7 +255,7 @@ void Object::DestroyForPlayer(Player *target) const
     target->GetSession()->SendPacket( &data );
 }
 
-void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2 ) const
+void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2) const
 {
     uint16 unk_flags = ((GetTypeId() == TYPEID_PLAYER) ? ((Player*)this)->m_movementInfo.unk1 : 0);
 
@@ -298,7 +298,7 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2 
     }
 
     // 0x40
-    if (flags & UPDATEFLAG_HASPOSITION)
+    if (flags & UPDATEFLAG_HAS_POSITION)
     {
         // 0x02
         if(flags & UPDATEFLAG_TRANSPORT && ((GameObject*)this)->GetGoType() == GAMEOBJECT_TYPE_MO_TRANSPORT)
@@ -512,13 +512,13 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2 
                 *data << uint32(GetGUIDHigh());             // GetGUIDHigh()
                 break;
             case TYPEID_UNIT:
-                *data << uint32(-1);
+                *data << uint32(0x0000000B);                // unk, can be 0xB or 0xC
                 break;
             case TYPEID_PLAYER:
                 if(flags & UPDATEFLAG_SELF)
                     *data << uint32(0x0000002F);            // unk, can be 0x15 or 0x22
                 else
-                    *data << uint32(-1);                    // unk, can be 0x7 or 0x8
+                    *data << uint32(0x00000008);            // unk, can be 0x7 or 0x8
                 break;
             default:
                 *data << uint32(0x00000000);                // unk
@@ -527,9 +527,12 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2 
     }
 
     // 0x4
-    if(flags & UPDATEFLAG_FULLGUID)
+    if(flags & UPDATEFLAG_HAS_TARGET)                       // packed guid (current target guid)
     {
-        *data << uint8(0);                                  // packed guid (probably target guid)
+        if(Unit *victim = ((Unit*)this)->getVictim())
+            data->append(victim->GetPackGUID());
+        else
+            *data << uint8(0);
     }
 
     // 0x2
@@ -542,7 +545,7 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2 
     if(flags & UPDATEFLAG_VEHICLE)                          // unused for now
     {
         *data << uint32(0);                                 // vehicle id
-        *data << float(0);
+        *data << float(0);                                  // facing adjustment
     }
 }
 
@@ -646,7 +649,7 @@ void Object::_BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask 
                                 *data << uint32(1);
                                 break;
                             default:
-                                *data << uint32(0);         //unknown. not happen.
+                                *data << uint32(0);         // unknown. not happen.
                                 break;
                         }
                     }

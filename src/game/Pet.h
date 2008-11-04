@@ -190,6 +190,7 @@ class Pet : public Creature
 
         bool addSpell(uint16 spell_id,uint16 active = ACT_DECIDE, PetSpellState state = PETSPELL_NEW, uint16 slot_id=0xffff, PetSpellType type = PETSPELL_NORMAL);
         bool learnSpell(uint16 spell_id);
+        void learnLevelupSpells();
         void removeSpell(uint16 spell_id);
         bool _removeSpell(uint16 spell_id);
 

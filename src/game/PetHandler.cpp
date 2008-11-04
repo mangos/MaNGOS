@@ -731,6 +731,9 @@ void WorldSession::HandlePetLearnTalent( WorldPacket & recv_data )
     if(!pet_family)
         return;
 
+    if(pet_family->petTalentType < 0)                       // not hunter pet
+        return;
+
     // prevent learn talent for different family (cheating)
     if(!((1 << pet_family->petTalentType) & talentTabInfo->petTalentMask))
         return;

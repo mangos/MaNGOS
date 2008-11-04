@@ -904,7 +904,7 @@ bool Pet::InitStatsForLevel(uint32 petlevel)
         case HUNTER_PET:
         {
             SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, uint32((MaNGOS::XP::xp_to_level(petlevel))/4));
-
+            learnLevelupSpells();
             //these formula may not be correct; however, it is designed to be close to what it should be
             //this makes dps 0.5 of pets level
             SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel - (petlevel / 4)) );
@@ -1329,6 +1329,21 @@ bool Pet::learnSpell(uint16 spell_id)
     if(owner->GetTypeId() == TYPEID_PLAYER)
         ((Player*)owner)->PetSpellInitialize();
     return true;
+}
+
+void Pet::learnLevelupSpells()
+{
+    PetLevelupSpellList const *levelupSpells = spellmgr.GetPetLevelupSpellList(GetCreatureInfo()->family);
+    if(!levelupSpells)
+        return;
+
+    for(PetLevelupSpellList::const_iterator itr = levelupSpells->begin(); itr != levelupSpells->end(); ++itr)
+    {
+        if(itr->ReqLevel <= getLevel())
+            learnSpell(itr->SpellId);
+        else
+            removeSpell(itr->SpellId);
+    }
 }
 
 void Pet::removeSpell(uint16 spell_id)

@@ -317,7 +317,7 @@ class MANGOS_DLL_SPEC Object
         {
             int32  *m_int32Values;
             uint32 *m_uint32Values;
-            float *m_floatValues;
+            float  *m_floatValues;
         };
 
         uint32 *m_uint32Values_mirror;

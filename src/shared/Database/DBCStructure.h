@@ -613,7 +613,7 @@ struct CreatureFamilyEntry
     uint32  maxScaleLevel;                                  // 4        m_maxScaleLevel
     uint32  skillLine[2];                                   // 5-6      m_skillLine
     uint32  petFoodMask;                                    // 7        m_petFoodMask
-    uint32  petTalentType;                                  // 8        m_petTalentType
+    int32   petTalentType;                                  // 8        m_petTalentType
                                                             // 9        m_categoryEnumID
     char*   Name[16];                                       // 10-25    m_name_lang
                                                             // 26 string flags, unused
