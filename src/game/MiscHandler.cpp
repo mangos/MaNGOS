@@ -892,6 +892,8 @@ void WorldSession::HandleUpdateAccountData(WorldPacket &recv_data)
     uint32 type, timestamp, decompressedSize;
     recv_data >> type >> timestamp >> decompressedSize;
 
+    sLog.outDebug("UAD: type %u, time %u, decompressedSize %u", type, timestamp, decompressedSize);
+
     if(type > NUM_ACCOUNT_DATA_TYPES)
         return;
 
@@ -942,6 +944,8 @@ void WorldSession::HandleRequestAccountData(WorldPacket& recv_data)
 
     uint32 type;
     recv_data >> type;
+
+    sLog.outDebug("RAD: type %u", type);
 
     if(type > NUM_ACCOUNT_DATA_TYPES)
         return;

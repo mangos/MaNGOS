@@ -593,8 +593,18 @@ struct CleanDamage
 
 struct UnitActionBarEntry
 {
-    uint32 Type;
-    uint32 SpellOrAction;
+    union
+    {
+        struct 
+        {
+            uint16 Type;
+            uint16 SpellOrAction;
+        };
+        struct
+        {
+            uint32 Raw;
+        };
+    };
 };
 
 #define MAX_DECLINED_NAME_CASES 5
@@ -616,13 +626,12 @@ enum CurrentSpellTypes
 
 enum ActiveStates
 {
-    ACT_ENABLED  = 0xC100,
-    ACT_DISABLED = 0x8100,
-    ACT_COMMAND  = 0x0700,
-    ACT_REACTION = 0x0600,
-    ACT_CAST     = 0x0100,
-    ACT_PASSIVE  = 0x0000,
-    ACT_DECIDE   = 0x0001
+    ACT_PASSIVE  = 0x0100,                                  // 0x0100 - passive
+    ACT_DISABLED = 0x8100,                                  // 0x8000 - castable
+    ACT_ENABLED  = 0xC100,                                  // 0x4000 | 0x8000 - auto cast + castable
+    ACT_COMMAND  = 0x0700,                                  // 0x0100 | 0x0200 | 0x0400
+    ACT_REACTION = 0x0600,                                  // 0x0200 | 0x0400
+    ACT_DECIDE   = 0x0001                                   // what is it?
 };
 
 enum ReactStates

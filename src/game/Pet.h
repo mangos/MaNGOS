@@ -68,6 +68,7 @@ struct PetSpell
 {
     uint16 slotId;
     uint16 active;
+
     PetSpellState state : 16;
     PetSpellType type   : 16;
 };
@@ -191,7 +192,8 @@ class Pet : public Creature
         bool addSpell(uint16 spell_id,uint16 active = ACT_DECIDE, PetSpellState state = PETSPELL_NEW, uint16 slot_id=0xffff, PetSpellType type = PETSPELL_NORMAL);
         bool learnSpell(uint16 spell_id);
         void learnLevelupSpells();
-        void removeSpell(uint16 spell_id);
+        bool unlearnSpell(uint16 spell_id);
+        bool removeSpell(uint16 spell_id);
         bool _removeSpell(uint16 spell_id);
 
         PetSpellMap     m_spells;
@@ -222,6 +224,7 @@ class Pet : public Creature
         int32   m_duration;                                 // time until unsummon (used mostly for summoned guardians and not used for controlled pets)
         int32   m_bonusdamage;
         uint64  m_auraUpdateMask;
+        bool    m_loading;
 
         DeclinedName *m_declinedname;
 

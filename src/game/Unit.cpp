@@ -9897,7 +9897,7 @@ void CharmInfo::InitEmptyActionBar()
 {
     for(uint32 x = 1; x < 10; ++x)
     {
-        PetActionBar[x].Type = ACT_CAST;
+        PetActionBar[x].Type = ACT_ENABLED;
         PetActionBar[x].SpellOrAction = 0;
     }
     PetActionBar[0].Type = ACT_COMMAND;
@@ -9916,7 +9916,7 @@ void CharmInfo::InitPossessCreateSpells()
         if (IsPassiveSpell(((Creature*)m_unit)->m_spells[x]))
             m_unit->CastSpell(m_unit, ((Creature*)m_unit)->m_spells[x], true);
         else
-            AddSpellToAB(0, ((Creature*)m_unit)->m_spells[x], ACT_CAST);
+            AddSpellToAB(0, ((Creature*)m_unit)->m_spells[x], ACT_ENABLED);
     }
 }
 
@@ -9959,7 +9959,7 @@ void CharmInfo::InitCharmCreateSpells()
             if(onlyselfcast || !IsPositiveSpell(spellId))   //only self cast and spells versus enemies are autocastable
                 newstate = ACT_DISABLED;
             else
-                newstate = ACT_CAST;
+                newstate = ACT_ENABLED;
 
             AddSpellToAB(0, spellId, newstate);
         }
@@ -9970,7 +9970,7 @@ bool CharmInfo::AddSpellToAB(uint32 oldid, uint32 newid, ActiveStates newstate)
 {
     for(uint8 i = 0; i < 10; i++)
     {
-        if((PetActionBar[i].Type == ACT_DISABLED || PetActionBar[i].Type == ACT_ENABLED || PetActionBar[i].Type == ACT_CAST) && PetActionBar[i].SpellOrAction == oldid)
+        if((PetActionBar[i].Type == ACT_DISABLED || PetActionBar[i].Type == ACT_ENABLED) && PetActionBar[i].SpellOrAction == oldid)
         {
             PetActionBar[i].SpellOrAction = newid;
             if(!oldid)

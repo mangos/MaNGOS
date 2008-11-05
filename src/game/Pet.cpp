@@ -56,6 +56,8 @@ Pet::Pet(PetType type) : Creature()
 
     m_auraUpdateMask = 0;
 
+    m_loading = false;
+
     // pets always have a charminfo, even if they are not actually charmed
     CharmInfo* charmInfo = InitCharmInfo(this);
 
@@ -101,6 +103,8 @@ void Pet::RemoveFromWorld()
 
 bool Pet::LoadPetFromDB( Unit* owner, uint32 petentry, uint32 petnumber, bool current )
 {
+    m_loading = true;
+
     uint32 ownerid = owner->GetGUIDLow();
 
     QueryResult *result;
@@ -341,6 +345,7 @@ bool Pet::LoadPetFromDB( Unit* owner, uint32 petentry, uint32 petnumber, bool cu
         }
     }
 
+    m_loading = false;
     return true;
 }
 
@@ -1277,7 +1282,8 @@ bool Pet::addSpell(uint16 spell_id, uint16 active, PetSpellState state, uint16 s
                 ToggleAutocast(itr->first, false);
 
             oldspell_id = itr->first;
-            removeSpell(itr->first);
+            //removeSpell(itr->first);
+            unlearnSpell(itr->first);
             break;
         }
     }
@@ -1299,16 +1305,6 @@ bool Pet::addSpell(uint16 spell_id, uint16 active, PetSpellState state, uint16 s
     newspell->slotId = tmpslot;
     m_spells[spell_id] = newspell;
 
-    if(GetOwner()->GetTypeId() == TYPEID_PLAYER)
-    {
-        if(!IsPassiveSpell(spell_id))
-        {
-            WorldPacket data(SMSG_PET_LEARNED_SPELL, 2);
-            data << uint16(spell_id);
-            ((Player*)GetOwner())->GetSession()->SendPacket(&data);
-        }
-    }
-
     if (IsPassiveSpell(spell_id))
         CastSpell(this, spell_id, true);
     else if(state == PETSPELL_NEW)
@@ -1325,6 +1321,16 @@ bool Pet::learnSpell(uint16 spell_id)
     // prevent duplicated entires in spell book
     if (!addSpell(spell_id))
         return false;
+
+    if(GetOwner()->GetTypeId() == TYPEID_PLAYER)
+    {
+        if(!m_loading)
+        {
+            WorldPacket data(SMSG_PET_LEARNED_SPELL, 2);
+            data << uint16(spell_id);
+            ((Player*)GetOwner())->GetSession()->SendPacket(&data);
+        }
+    }
 
     Unit* owner = GetOwner();
     if(owner->GetTypeId() == TYPEID_PLAYER)
@@ -1343,18 +1349,36 @@ void Pet::learnLevelupSpells()
         if(itr->ReqLevel <= getLevel())
             learnSpell(itr->SpellId);
         else
-            removeSpell(itr->SpellId);
+            unlearnSpell(itr->SpellId);
     }
 }
 
-void Pet::removeSpell(uint16 spell_id)
+bool Pet::unlearnSpell(uint16 spell_id)
+{
+    if(removeSpell(spell_id))
+    {
+        if(GetOwner()->GetTypeId() == TYPEID_PLAYER)
+        {
+            if(!m_loading)
+            {
+                WorldPacket data(SMSG_PET_UNLEARNED_SPELL, 2);
+                data << uint16(spell_id);
+                ((Player*)GetOwner())->GetSession()->SendPacket(&data);
+            }
+        }
+        return true;
+    }
+    return false;
+}
+
+bool Pet::removeSpell(uint16 spell_id)
 {
     PetSpellMap::iterator itr = m_spells.find(spell_id);
     if (itr == m_spells.end())
-        return;
+        return false;
 
     if(itr->second->state == PETSPELL_REMOVED)
-        return;
+        return false;
 
     if(itr->second->state == PETSPELL_NEW)
     {
@@ -1366,15 +1390,7 @@ void Pet::removeSpell(uint16 spell_id)
 
     RemoveAurasDueToSpell(spell_id);
 
-    if(GetOwner()->GetTypeId() == TYPEID_PLAYER)
-    {
-        if(!IsPassiveSpell(spell_id))
-        {
-            WorldPacket data(SMSG_PET_UNLEARNED_SPELL, 2);
-            data << uint16(spell_id);
-            ((Player*)GetOwner())->GetSession()->SendPacket(&data);
-        }
-    }
+    return true;
 }
 
 bool Pet::_removeSpell(uint16 spell_id)

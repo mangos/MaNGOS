@@ -65,7 +65,7 @@ Quest::Quest(Field * questRecord)
         ReqItemId[i] = questRecord[39+i].GetUInt32();
 
     for (int i = 0; i < QUEST_OBJECTIVES_COUNT; ++i)
-        ReqItemCount[i] = questRecord[42+i].GetUInt32();
+        ReqItemCount[i] = questRecord[43+i].GetUInt32();
 
     for (int i = 0; i < QUEST_SOURCE_ITEM_IDS_COUNT; ++i)
         ReqSourceId[i] = questRecord[47+i].GetUInt32();
