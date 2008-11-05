@@ -16045,18 +16045,30 @@ void Player::PetSpellInitialize()
     uint8 cooldownsCount = pet->m_CreatureSpellCooldowns.size() + pet->m_CreatureCategoryCooldowns.size();
     data << uint8(cooldownsCount);
 
+    time_t curTime = time(NULL);
+
     for(CreatureSpellCooldowns::const_iterator itr = pet->m_CreatureSpellCooldowns.begin(); itr != pet->m_CreatureSpellCooldowns.end(); ++itr)
     {
+        time_t cooldown = 0;
+
+        if(itr->second > curTime)
+            cooldown = (itr->second - curTime) * 1000;
+
         data << uint16(itr->first);                         // spellid
-        data << uint16(0);                                  // unk
+        data << uint16(0);                                  // spell category?
         data << uint32(itr->second);                        // cooldown
         data << uint32(0);                                  // category cooldown
     }
 
     for(CreatureSpellCooldowns::const_iterator itr = pet->m_CreatureCategoryCooldowns.begin(); itr != pet->m_CreatureCategoryCooldowns.end(); ++itr)
     {
+        time_t cooldown = 0;
+
+        if(itr->second > curTime)
+            cooldown = (itr->second - curTime) * 1000;
+
         data << uint16(itr->first);                         // spellid
-        data << uint16(0);                                  // unk
+        data << uint16(0);                                  // spell category?
         data << uint32(0);                                  // cooldown
         data << uint32(itr->second);                        // category cooldown
     }
