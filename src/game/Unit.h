@@ -597,8 +597,8 @@ struct UnitActionBarEntry
     {
         struct 
         {
-            uint16 Type;
             uint16 SpellOrAction;
+            uint16 Type;
         };
         struct
         {
