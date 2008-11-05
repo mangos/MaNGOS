@@ -324,6 +324,7 @@ class Guild
         {
             return ((GetRankRights(rankId) & right) != GR_RIGHT_EMPTY) ? true : false;
         }
+        int32 GetRank(uint32 LowGuid);
 
         void Roster(WorldSession *session);
         void Query(WorldSession *session);
