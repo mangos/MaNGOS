@@ -35,7 +35,7 @@ Totem::Totem() : Creature()
 void Totem::Update( uint32 time )
 {
     Unit *owner = GetOwner();
-    if (!owner || !owner->isAlive() || !this->isAlive())
+    if (!owner || !owner->isAlive() || !isAlive())
     {
         UnSummon();                                         // remove self
         return;
@@ -89,7 +89,7 @@ void Totem::UnSummon()
 
     CombatStop();
     RemoveAurasDueToSpell(GetSpell());
-    Unit *owner = this->GetOwner();
+    Unit *owner = GetOwner();
     if (owner)
     {
         // clear owenr's totem slot
@@ -130,11 +130,11 @@ void Totem::SetOwner(uint64 guid)
 {
     SetUInt64Value(UNIT_FIELD_SUMMONEDBY, guid);
     SetUInt64Value(UNIT_FIELD_CREATEDBY, guid);
-    Unit *owner = this->GetOwner();
+    Unit *owner = GetOwner();
     if (owner)
     {
-        this->setFaction(owner->getFaction());
-        this->SetLevel(owner->getLevel());
+        setFaction(owner->getFaction());
+        SetLevel(owner->getLevel());
     }
 }
 

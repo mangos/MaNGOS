@@ -57,13 +57,7 @@ bool ArenaTeam::create(uint64 captainGuid, uint32 type, std::string ArenaTeamNam
     Name = ArenaTeamName;
     Type = type;
 
-    QueryResult *result = CharacterDatabase.Query("SELECT MAX(arenateamid) FROM arena_team");
-    if( result )
-    {
-        Id = (*result)[0].GetUInt32()+1;
-        delete result;
-    }
-    else Id = 1;
+    Id = objmgr.GenerateArenaTeamId();
 
     // ArenaTeamName already assigned to ArenaTeam::name, use it to encode string for DB
     CharacterDatabase.escape_string(ArenaTeamName);

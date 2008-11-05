@@ -1476,7 +1476,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
     // The player was ported to another map and looses the duel immediatly.
     // We have to perform this check before the teleport, otherwise the
     // ObjectAccessor won't find the flag.
-    if (duel && this->GetMapId()!=mapid)
+    if (duel && GetMapId()!=mapid)
     {
         GameObject* obj = ObjectAccessor::GetGameObject(*this, GetUInt64Value(PLAYER_DUEL_ARBITER));
         if (obj)
@@ -1486,7 +1486,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
     // reset movement flags at teleport, because player will continue move with these flags after teleport
     SetUnitMovementFlags(0);
 
-    if ((this->GetMapId() == mapid) && (!m_transport))
+    if ((GetMapId() == mapid) && (!m_transport))
     {
         // prepare zone change detect
         uint32 old_zone = GetZoneId();
@@ -6779,7 +6779,7 @@ void Player::CastItemCombatSpell(Item *item,Unit* Target, WeaponAttackType attTy
         }
 
         if (roll_chance_f(chance))
-            this->CastSpell(Target, spellInfo->Id, true, item);
+            CastSpell(Target, spellInfo->Id, true, item);
     }
 
     // item combat enchantments
@@ -18133,7 +18133,7 @@ void Player::SetCanBlock( bool value )
 bool ItemPosCount::isContainedIn(ItemPosCountVec const& vec) const
 {
     for(ItemPosCountVec::const_iterator itr = vec.begin(); itr != vec.end();++itr)
-        if(itr->pos == this->pos)
+        if(itr->pos == pos)
             return true;
 
     return false;

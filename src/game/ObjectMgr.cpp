@@ -355,7 +355,7 @@ void ObjectMgr::SendAuctionWonMail( AuctionEntry *auction )
         sLog.outDebug( "AuctionWon body string : %s", msgAuctionWonBody.str().c_str() );
 
         //prepare mail data... :
-        uint32 itemTextId = this->CreateItemText( msgAuctionWonBody.str() );
+        uint32 itemTextId = CreateItemText( msgAuctionWonBody.str() );
 
         // set owner to bidder (to prevent delete item with sender char deleting)
         // owner in `data` will set at mail receive and item extracting
@@ -406,7 +406,7 @@ void ObjectMgr::SendAuctionSalePendingMail( AuctionEntry * auction )
 
         sLog.outDebug("AuctionSalePending body string : %s", msgAuctionSalePendingBody.str().c_str());
 
-        uint32 itemTextId = this->CreateItemText( msgAuctionSalePendingBody.str() );
+        uint32 itemTextId = CreateItemText( msgAuctionSalePendingBody.str() );
 
         WorldSession::SendMailTo(owner, MAIL_AUCTION, MAIL_STATIONERY_AUCTION, auction->location, auction->owner, msgAuctionSalePendingSubject.str(), itemTextId, NULL, 0, 0, MAIL_CHECK_MASK_AUCTION);
     }
@@ -438,7 +438,7 @@ void ObjectMgr::SendAuctionSuccessfulMail( AuctionEntry * auction )
 
         sLog.outDebug("AuctionSuccessful body string : %s", auctionSuccessfulBody.str().c_str());
 
-        uint32 itemTextId = this->CreateItemText( auctionSuccessfulBody.str() );
+        uint32 itemTextId = CreateItemText( auctionSuccessfulBody.str() );
 
         uint32 profit = auction->bid + auction->deposit - auctionCut;
 
@@ -1418,7 +1418,7 @@ void ObjectMgr::LoadAuctions()
         aItem->deposit = fields[10].GetUInt32();
         aItem->location = fields[11].GetUInt8();
         //check if sold item exists
-        if ( this->GetAItem( aItem->item_guidlow ) )
+        if ( GetAItem( aItem->item_guidlow ) )
         {
             GetAuctionsMap( aItem->location )->AddAuction(aItem);
         }
@@ -5016,13 +5016,8 @@ void ObjectMgr::SetHighestGuids()
         delete result;
     }
 
-    result = CharacterDatabase.Query( "SELECT MAX(id) FROM character_pet" );
-    if( result )
-    {
-        m_hiPetGuid = (*result)[0].GetUInt32()+1;
-
-        delete result;
-    }
+    // pet guids are not saved to DB, set to 0 (pet guid != pet id)
+    m_hiPetGuid = 0;
 
     result = CharacterDatabase.Query( "SELECT MAX(guid) FROM item_instance" );
     if( result )
@@ -5085,6 +5080,44 @@ void ObjectMgr::SetHighestGuids()
 
         delete result;
     }
+
+    result = CharacterDatabase.Query("SELECT MAX(arenateamid) FROM arena_team");
+    if (result)
+    {
+        m_arenaTeamId = (*result)[0].GetUInt32()+1;
+
+        delete result;
+    }
+
+    result = CharacterDatabase.Query( "SELECT MAX(guildid) FROM guild" );
+    if (result)
+    {
+        m_guildId = (*result)[0].GetUInt32()+1;
+
+        delete result;
+    }
+}
+
+uint32 ObjectMgr::GenerateArenaTeamId()
+{
+   ++m_arenaTeamId;
+    if(m_arenaTeamId>=0xFFFFFFFF)
+    {
+        sLog.outError("Arena team ids overflow!! Can't continue, shuting down server. ");
+        sWorld.m_stopEvent = true;
+    }
+    return m_arenaTeamId;
+}
+
+uint32 ObjectMgr::GenerateGuildId()
+{
+   ++m_guildId;
+    if(m_guildId>=0xFFFFFFFF)
+    {
+        sLog.outError("Guild ids overflow!! Can't continue, shuting down server. ");
+        sWorld.m_stopEvent = true;
+    }
+    return m_guildId;
 }
 
 uint32 ObjectMgr::GenerateAuctionID()

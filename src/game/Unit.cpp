@@ -1374,7 +1374,7 @@ uint32 Unit::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 {
     if(!this || !pVictim)
         return 0;
-    if(!this->isAlive() || !pVictim->isAlive())
+    if(!isAlive() || !pVictim->isAlive())
         return 0;
 
     SpellEntry const *spellInfo = sSpellStore.LookupEntry(spellID);
@@ -8076,7 +8076,7 @@ void Unit::MeleeDamageBonus(Unit *pVictim, uint32 *pdamage,WeaponAttackType attT
     int32 TakenFlatBenefit = 0;
 
     // ..done (for creature type by mask) in taken
-    AuraList const& mDamageDoneCreature = this->GetAurasByType(SPELL_AURA_MOD_DAMAGE_DONE_CREATURE);
+    AuraList const& mDamageDoneCreature = GetAurasByType(SPELL_AURA_MOD_DAMAGE_DONE_CREATURE);
     for(AuraList::const_iterator i = mDamageDoneCreature.begin();i != mDamageDoneCreature.end(); ++i)
         if(creatureTypeMask & uint32((*i)->GetModifier()->m_miscvalue))
             DoneFlatBenefit += (*i)->GetModifier()->m_amount;
@@ -8144,7 +8144,7 @@ void Unit::MeleeDamageBonus(Unit *pVictim, uint32 *pdamage,WeaponAttackType attT
     // SPELL_AURA_MOD_DAMAGE_PERCENT_DONE included in weapon damage
     // SPELL_AURA_MOD_OFFHAND_DAMAGE_PCT  included in weapon damage
 
-    AuraList const& mDamageDoneVersus = this->GetAurasByType(SPELL_AURA_MOD_DAMAGE_DONE_VERSUS);
+    AuraList const& mDamageDoneVersus = GetAurasByType(SPELL_AURA_MOD_DAMAGE_DONE_VERSUS);
     for(AuraList::const_iterator i = mDamageDoneVersus.begin();i != mDamageDoneVersus.end(); ++i)
         if(creatureTypeMask & uint32((*i)->GetModifier()->m_miscvalue))
             DoneTotalMod *= ((*i)->GetModifier()->m_amount+100.0f)/100.0f;
@@ -8684,7 +8684,7 @@ bool Unit::isVisibleForOrDetect(Unit const* u, bool detect, bool inVisibleList) 
 
         //Visible distance is modified by
         //-Level Diff (every level diff = 1.0f in visible distance)
-        visibleDistance += int32(u->getLevelForTarget(this)) - int32(this->getLevelForTarget(u));
+        visibleDistance += int32(u->getLevelForTarget(this)) - int32(getLevelForTarget(u));
 
         //This allows to check talent tree and will add addition stealth dependent on used points)
         int32 stealthMod = GetTotalAuraModifier(SPELL_AURA_MOD_STEALTH_LEVEL);
@@ -10830,9 +10830,9 @@ Pet* Unit::CreateTamedPetFrom(Creature* creatureTarget,uint32 spell_id)
         return NULL;
     }
 
-    pet->SetUInt64Value(UNIT_FIELD_SUMMONEDBY, this->GetGUID());
-    pet->SetUInt64Value(UNIT_FIELD_CREATEDBY, this->GetGUID());
-    pet->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE,this->getFaction());
+    pet->SetUInt64Value(UNIT_FIELD_SUMMONEDBY, GetGUID());
+    pet->SetUInt64Value(UNIT_FIELD_CREATEDBY, GetGUID());
+    pet->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE,getFaction());
     pet->SetUInt32Value(UNIT_CREATED_BY_SPELL, spell_id);
 
     if(!pet->InitStatsForLevel(creatureTarget->getLevel()))

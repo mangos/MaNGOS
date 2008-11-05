@@ -80,7 +80,7 @@ void BattleGroundQueue::AddPlayer(Player *plr, uint32 bgTypeId)
     else
         ++m_QueuedPlayers[queue_id].Horde;
 
-    this->Update(bgTypeId, queue_id);
+    Update(bgTypeId, queue_id);
 
     if( sWorld.getConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_ENABLE) )
     {
@@ -183,7 +183,7 @@ void BattleGroundQueue::Update(uint32 bgTypeId, uint32 queue_id)
     }
 
     //if no players in queue ... do nothing
-    if (this->m_QueuedPlayers[queue_id].Alliance == 0 && this->m_QueuedPlayers[queue_id].Horde == 0)
+    if (m_QueuedPlayers[queue_id].Alliance == 0 && m_QueuedPlayers[queue_id].Horde == 0)
         return;
 
     //battleground with free slot for player should be always the last in this queue
@@ -625,7 +625,7 @@ void BattleGroundMgr::BuildPlayerJoinedBattleGroundPacket(WorldPacket *data, Pla
 void BattleGroundMgr::InvitePlayer(Player* plr, uint32 bgInstanceGUID)
 {
     // set invited player counters:
-    BattleGround* bg = this->GetBattleGround(bgInstanceGUID);
+    BattleGround* bg = GetBattleGround(bgInstanceGUID);
     if(!bg)
         return;
 

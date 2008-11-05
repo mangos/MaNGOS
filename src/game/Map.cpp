@@ -418,7 +418,7 @@ Map::LoadGrid(const Cell& cell, bool no_unload)
 
 bool Map::Add(Player *player)
 {
-    player->SetInstanceId(this->GetInstanceId());
+    player->SetInstanceId(GetInstanceId());
 
     // update player state for other player and visa-versa
     CellPair p = MaNGOS::ComputeCellPair(player->GetPositionX(), player->GetPositionY());

@@ -119,7 +119,7 @@ struct MANGOS_DLL_DECL Cell
 
     Cell& operator=(const Cell &cell)
     {
-        this->data.All = cell.data.All;
+        data.All = cell.data.All;
         return *this;
     }
 
@@ -154,7 +154,7 @@ struct MANGOS_DLL_DECL CellLock
     operator const Cell &(void) const { return i_cell; }
     CellLock<T>& operator=(const CellLock<T> &cell)
     {
-        this->~CellLock();
+        ~CellLock();
         new (this) CellLock<T>(cell);
         return *this;
     }

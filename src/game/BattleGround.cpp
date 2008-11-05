@@ -673,7 +673,7 @@ void BattleGround::Reset()
     m_PlayerScores.clear();
 
     // reset BGSubclass
-    this->ResetBGSubclass();
+    ResetBGSubclass();
 }
 
 void BattleGround::StartBattleGround()
@@ -1033,7 +1033,7 @@ bool BattleGround::AddSpiritGuide(uint32 type, float x, float y, float z, float 
     if(!pCreature)
     {
         sLog.outError("Can't create Spirit guide. BattleGround not created!");
-        this->EndNow();
+        EndNow();
         return false;
     }
 

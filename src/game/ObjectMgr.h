@@ -569,6 +569,8 @@ class ObjectMgr
         uint32 GenerateMailID();
         uint32 GenerateItemTextID();
         uint32 GeneratePetNumber();
+        uint32 GenerateArenaTeamId();
+        uint32 GenerateGuildId();
 
         uint32 CreateItemText(std::string text);
         std::string GetItemText( uint32 id )
@@ -758,6 +760,8 @@ class ObjectMgr
         uint32 m_auctionid;
         uint32 m_mailid;
         uint32 m_ItemTextId;
+        uint32 m_arenaTeamId;
+        uint32 m_guildId;
 
         uint32 m_hiCharGuid;
         uint32 m_hiCreatureGuid;

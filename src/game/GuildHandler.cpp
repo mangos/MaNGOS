@@ -347,7 +347,7 @@ void WorldSession::HandleGuildPromoteOpcode(WorldPacket& recvPacket)
         SendGuildCommandResult(GUILD_INVITE_S, "", GUILD_PERMISSIONS);
         return;
     }
-    else if((plRankId-1) == 0 || (plRankId-1) < this->GetPlayer()->GetRank())
+    else if((plRankId-1) == 0 || (plRankId-1) < GetPlayer()->GetRank())
         return;
 
     if(plRankId < 1)
@@ -434,7 +434,7 @@ void WorldSession::HandleGuildDemoteOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    if((plRankId+1) >= guild->GetNrRanks() || plRankId <= this->GetPlayer()->GetRank())
+    if((plRankId+1) >= guild->GetNrRanks() || plRankId <= GetPlayer()->GetRank())
         return;
 
     guild->ChangeRank(plGuid, (plRankId+1));

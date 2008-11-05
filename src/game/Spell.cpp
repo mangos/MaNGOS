@@ -3142,7 +3142,7 @@ void Spell::TriggerSpell()
 {
     for(TriggerSpells::iterator si=m_TriggerSpells.begin(); si!=m_TriggerSpells.end(); ++si)
     {
-        Spell* spell = new Spell(m_caster, (*si), true, m_originalCasterGUID, this->m_selfContainer);
+        Spell* spell = new Spell(m_caster, (*si), true, m_originalCasterGUID, m_selfContainer);
         spell->prepare(&m_targets);                         // use original spell original targets
     }
 }

@@ -69,13 +69,7 @@ bool Guild::create(uint64 lGuid, std::string gname)
     guildbank_money = 0;
     purchased_tabs = 0;
 
-    QueryResult *result = CharacterDatabase.Query( "SELECT MAX(guildid) FROM guild" );
-    if( result )
-    {
-        Id = (*result)[0].GetUInt32()+1;
-        delete result;
-    }
-    else Id = 1;
+    Id = objmgr.GenerateGuildId();
 
     // gname already assigned to Guild::name, use it to encode string for DB
     CharacterDatabase.escape_string(gname);
@@ -410,18 +404,16 @@ void Guild::LoadPlayerStatsByGuid(uint64 guid)
 void Guild::SetLeader(uint64 guid)
 {
     leaderGuid = guid;
-    this->ChangeRank(guid, GR_GUILDMASTER);
+    ChangeRank(guid, GR_GUILDMASTER);
 
     CharacterDatabase.PExecute("UPDATE guild SET leaderguid='%u' WHERE guildid='%u'", GUID_LOPART(guid), Id);
 }
 
 void Guild::DelMember(uint64 guid, bool isDisbanding)
 {
-    if(this->leaderGuid == guid && !isDisbanding)
+    if(leaderGuid == guid && !isDisbanding)
     {
-        std::ostringstream ss;
-        ss<<"SELECT guid FROM guild_member WHERE guildid='"<<Id<<"' AND guid!='"<<this->leaderGuid<<"' ORDER BY rank ASC LIMIT 1";
-        QueryResult *result = CharacterDatabase.Query( ss.str().c_str() );
+        QueryResult *result = CharacterDatabase.PQuery("SELECT guid FROM guild_member WHERE guildid='%u' AND guid != '%u' ORDER BY rank ASC LIMIT 1", Id, GUID_LOPART(leaderGuid));
         if( result )
         {
             uint64 newLeaderGUID;
@@ -431,7 +423,7 @@ void Guild::DelMember(uint64 guid, bool isDisbanding)
             newLeaderGUID = (*result)[0].GetUInt64();
             delete result;
 
-            this->SetLeader(newLeaderGUID);
+            SetLeader(newLeaderGUID);
 
             newLeader = objmgr.GetPlayer(newLeaderGUID);
             if(newLeader)
@@ -453,20 +445,20 @@ void Guild::DelMember(uint64 guid, bool isDisbanding)
                 data << (uint8)2;
                 data << oldLeaderName;
                 data << newLeaderName;
-                this->BroadcastPacket(&data);
+                BroadcastPacket(&data);
 
                 data.Initialize(SMSG_GUILD_EVENT, (1+1+oldLeaderName.size()+1));
                 data << (uint8)GE_LEFT;
                 data << (uint8)1;
                 data << oldLeaderName;
-                this->BroadcastPacket(&data);
+                BroadcastPacket(&data);
             }
 
             sLog.outDebug( "WORLD: Sent (SMSG_GUILD_EVENT)" );
         }
         else
         {
-            this->Disband();
+            Disband();
             return;
         }
     }
@@ -662,7 +654,7 @@ void Guild::Disband()
 {
     WorldPacket data(SMSG_GUILD_EVENT, 1);
     data << (uint8)GE_DISBANDED;
-    this->BroadcastPacket(&data);
+    BroadcastPacket(&data);
 
     while (!members.empty())
     {
@@ -762,11 +754,11 @@ void Guild::Query(WorldSession *session)
 
 void Guild::SetEmblem(uint32 emblemStyle, uint32 emblemColor, uint32 borderStyle, uint32 borderColor, uint32 backgroundColor)
 {
-    this->EmblemStyle = emblemStyle;
-    this->EmblemColor = emblemColor;
-    this->BorderStyle = borderStyle;
-    this->BorderColor = borderColor;
-    this->BackgroundColor = backgroundColor;
+    EmblemStyle = emblemStyle;
+    EmblemColor = emblemColor;
+    BorderStyle = borderStyle;
+    BorderColor = borderColor;
+    BackgroundColor = backgroundColor;
 
     CharacterDatabase.PExecute("UPDATE guild SET EmblemStyle=%u, EmblemColor=%u, BorderStyle=%u, BorderColor=%u, BackgroundColor=%u WHERE guildid = %u", EmblemStyle, EmblemColor, BorderStyle, BorderColor, BackgroundColor, Id);
 }
@@ -1950,7 +1942,7 @@ void Guild::SendGuildBankTabText(WorldSession *session, uint8 TabId)
 bool GuildItemPosCount::isContainedIn(GuildItemPosCountVec const &vec) const
 {
     for(GuildItemPosCountVec::const_iterator itr = vec.begin(); itr != vec.end();++itr)
-        if(itr->slot == this->slot)
+        if(itr->slot == slot)
             return true;
 
     return false;

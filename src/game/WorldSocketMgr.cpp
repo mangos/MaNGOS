@@ -79,8 +79,8 @@ class ReactorRunnable : protected ACE_Task_Base
 
         virtual ~ReactorRunnable ()
         {
-            this->Stop ();
-            this->Wait ();
+            Stop ();
+            Wait ();
 
             if (m_Reactor)
                 delete m_Reactor;
@@ -96,7 +96,7 @@ class ReactorRunnable : protected ACE_Task_Base
             if (m_ThreadId != -1)
                 return -1;
 
-            return (m_ThreadId = this->activate ());
+            return (m_ThreadId = activate ());
         }
 
         void Wait () { ACE_Task_Base::wait (); }
@@ -278,7 +278,7 @@ WorldSocketMgr::StartNetwork (ACE_UINT16 port, const char* address)
     if (!sLog.IsOutDebug ())
         ACE_Log_Msg::instance ()->priority_mask (LM_ERROR, ACE_Log_Msg::PROCESS);
 
-    if (this->StartReactiveIO (port, address) == -1)
+    if (StartReactiveIO (port, address) == -1)
         return -1;
 
     return 0;
@@ -301,7 +301,7 @@ WorldSocketMgr::StopNetwork ()
             m_NetThreads[i].Stop ();
     }
 
-    this->Wait ();
+    Wait ();
 }
 
 void

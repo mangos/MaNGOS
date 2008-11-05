@@ -1305,7 +1305,7 @@ void Group::UpdateLooterGuid( Creature* creature, bool ifneed )
 void Roll::targetObjectBuildLink()
 {
     // called from link()
-    this->getTarget()->addLootValidatorRef(this);
+    getTarget()->addLootValidatorRef(this);
 }
 
 void Group::SetDifficulty(uint8 difficulty)
