@@ -652,7 +652,7 @@ void Spell::FillTargetMap()
 
         for (std::list<Unit*>::iterator itr = tmpUnitMap.begin() ; itr != tmpUnitMap.end();)
         {
-            if(!CheckTarget(*itr, i, false ))
+            if (!CheckTarget (*itr, i))
             {
                 itr = tmpUnitMap.erase(itr);
                 continue;
@@ -3342,8 +3342,6 @@ uint8 Spell::CanCast(bool strict)
                 m_spellInfo->EffectImplicitTargetA[j] == TARGET_SCRIPT_COORDINATES ||
                 m_spellInfo->EffectImplicitTargetB[j] == TARGET_SCRIPT_COORDINATES )
             {
-                bool okDoo = false;
-
                 SpellScriptTarget::const_iterator lower = spellmgr.GetBeginSpellScriptTarget(m_spellInfo->Id);
                 SpellScriptTarget::const_iterator upper = spellmgr.GetEndSpellScriptTarget(m_spellInfo->Id);
                 if(lower==upper)
@@ -4840,7 +4838,7 @@ CurrentSpellTypes Spell::GetCurrentContainer()
         return(CURRENT_GENERIC_SPELL);
 }
 
-bool Spell::CheckTarget( Unit* target, uint32 eff, bool hitPhase )
+bool Spell::CheckTarget( Unit* target, uint32 eff )
 {
     // Check targets for creature type mask and remove not appropriate (skip explicit self target case, maybe need other explicit targets)
     if(m_spellInfo->EffectImplicitTargetA[eff]!=TARGET_SELF )

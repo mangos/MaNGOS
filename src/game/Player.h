@@ -1630,7 +1630,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void CreateCorpse();
         void KillPlayer();
         uint32 GetResurrectionSpellId();
-        void ResurrectPlayer(float restore_percent, bool updateToWorld = true, bool applySickness = false);
+        void ResurrectPlayer(float restore_percent, bool applySickness = false);
         void BuildPlayerRepop();
         void RepopAtGraveyard();
 
@@ -1754,7 +1754,7 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         void SetRegularAttackTime();
         void SetBaseModValue(BaseModGroup modGroup, BaseModType modType, float value) { m_auraBaseMod[modGroup][modType] = value; }
-        void HandleBaseModValue(BaseModGroup modGroup, BaseModType modType, float amount, bool apply, bool affectStats = true);
+        void HandleBaseModValue(BaseModGroup modGroup, BaseModType modType, float amount, bool apply);
         float GetBaseModValue(BaseModGroup modGroup, BaseModType modType) const;
         float GetTotalBaseModValue(BaseModGroup modGroup) const;
         float GetTotalPercentageModValue(BaseModGroup modGroup) const { return m_auraBaseMod[modGroup][FLAT_MOD] + m_auraBaseMod[modGroup][PCT_MOD]; }

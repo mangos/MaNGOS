@@ -749,7 +749,7 @@ bool ChatHandler::HandleModifyRepCommand(const char * args)
     return true;
 }
 
-bool ChatHandler::HandleNameCommand(const char* args)
+bool ChatHandler::HandleNameCommand(const char* /*args*/)
 {
     /* Temp. disabled
         if(!*args)
@@ -3591,7 +3591,7 @@ bool ChatHandler::HandleLookupEventCommand(const char* args)
     return true;
 }
 
-bool ChatHandler::HandleEventActiveListCommand(const char* args)
+bool ChatHandler::HandleEventActiveListCommand(const char* /*args*/)
 {
     uint32 counter = 0;
 
@@ -3849,8 +3849,6 @@ bool ChatHandler::HandleLearnAllRecipesCommand(const char* args)
 
     if(!Utf8toWStr(args,wnamepart))
         return false;
-
-    uint32 counter = 0;                                     // Counter for figure out that we found smth.
 
     // converting string that we try to find to lower case
     wstrToLower( wnamepart );
@@ -4117,7 +4115,7 @@ bool ChatHandler::HandleNpcUnFollowCommand(const char* /*args*/)
     return true;
 }
 
-bool ChatHandler::HandleNpcTameCommand(const char* args)
+bool ChatHandler::HandleNpcTameCommand(const char* /*args*/)
 {
     Creature *creatureTarget = getSelectedCreature ();
     if (!creatureTarget || creatureTarget->isPet ())

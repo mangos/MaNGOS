@@ -24,7 +24,7 @@
 #include "InstanceSaveMgr.h"
 #include "World.h"
 
-MapInstanced::MapInstanced(uint32 id, time_t expiry, uint32 aInstanceId) : Map(id, expiry, 0, 0)
+MapInstanced::MapInstanced(uint32 id, time_t expiry) : Map(id, expiry, 0, 0)
 {
     // initialize instanced maps list
     m_InstancedMaps.clear();

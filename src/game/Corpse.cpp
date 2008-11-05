@@ -137,7 +137,7 @@ void Corpse::DeleteFromDB()
         CharacterDatabase.PExecute("DELETE FROM corpse WHERE player = '%d' AND corpse_type <> '0'",  GUID_LOPART(GetOwnerGUID()));
 }
 
-bool Corpse::LoadFromDB(uint32 guid, QueryResult *result, uint32 InstanceId)
+bool Corpse::LoadFromDB(uint32 guid, QueryResult *result)
 {
     bool external = (result != NULL);
     if (!external)

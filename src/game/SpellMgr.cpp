@@ -1648,8 +1648,6 @@ void SpellMgr::LoadSpellLearnSkills()
                     dbc_node.value    = (entry->EffectBasePoints[i]+1)*75;
                 dbc_node.maxvalue = (entry->EffectBasePoints[i]+1)*75;
 
-                SpellLearnSkillNode const* db_node = GetSpellLearnSkill(spell);
-
                 mSpellLearnSkills[spell] = dbc_node;
                 ++dbc_count;
                 break;

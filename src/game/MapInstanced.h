@@ -28,7 +28,7 @@ class MANGOS_DLL_DECL MapInstanced : public Map
     public:
         typedef HM_NAMESPACE::hash_map< uint32, Map* > InstancedMaps;
 
-        MapInstanced(uint32 id, time_t, uint32 aInstanceId);
+        MapInstanced(uint32 id, time_t expiry);
         ~MapInstanced() {}
 
         // functions overwrite Map versions

@@ -159,7 +159,7 @@ bool ChatHandler::HandleReloadAllItemCommand(const char*)
     return true;
 }
 
-bool ChatHandler::HandleReloadAllLocalesCommand(const char* args)
+bool ChatHandler::HandleReloadAllLocalesCommand(const char* /*args*/)
 {
     HandleReloadLocalesCreatureCommand("a");
     HandleReloadLocalesGameobjectCommand("a");
@@ -170,7 +170,7 @@ bool ChatHandler::HandleReloadAllLocalesCommand(const char* args)
     return true;
 }
 
-bool ChatHandler::HandleReloadConfigCommand(const char* arg)
+bool ChatHandler::HandleReloadConfigCommand(const char* /*args*/)
 {
     sLog.outString( "Re-Loading config settings..." );
     sWorld.LoadConfigSettings(true);
@@ -5754,7 +5754,7 @@ bool ChatHandler::HandleCastBackCommand(const char* args)
     caster->BuildHeartBeatMsg(&data);
     caster->SendMessageToSet(&data,true);
 
-    caster->CastSpell(m_session->GetPlayer(),spell,false);
+    caster->CastSpell(m_session->GetPlayer(),spell,triggered);
 
     return true;
 }
@@ -5845,7 +5845,7 @@ bool ChatHandler::HandleCastTargetCommand(const char* args)
     caster->BuildHeartBeatMsg(&data);
     caster->SendMessageToSet(&data,true);
 
-    caster->CastSpell(caster->getVictim(),spell,false);
+    caster->CastSpell(caster->getVictim(),spell,triggered);
 
     return true;
 }

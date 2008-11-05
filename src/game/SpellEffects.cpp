@@ -2212,7 +2212,7 @@ void Spell::EffectPowerDrain(uint32 i)
 
         m_caster->ModifyPower(POWER_MANA,gain);
         //send log
-        m_caster->SendEnergizeSpellLog(m_caster, m_spellInfo->Id,gain,POWER_MANA,false);
+        m_caster->SendEnergizeSpellLog(m_caster, m_spellInfo->Id,gain,POWER_MANA);
     }
 }
 
@@ -5337,7 +5337,7 @@ void Spell::EffectSummonObject(uint32 i)
     m_caster->m_ObjectSlot[slot] = pGameObj->GetGUID();
 }
 
-void Spell::EffectResurrect(uint32 i)
+void Spell::EffectResurrect(uint32 /*effIndex*/)
 {
     if(!unitTarget)
         return;

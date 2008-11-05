@@ -109,7 +109,7 @@ MapManager::_GetBaseMap(uint32 id)
         const MapEntry* entry = sMapStore.LookupEntry(id);
         if (entry && entry->IsDungeon())
         {
-            m = new MapInstanced(id, i_gridCleanUpDelay, 0);
+            m = new MapInstanced(id, i_gridCleanUpDelay);
         }
         else
         {
@@ -220,7 +220,7 @@ bool MapManager::CanPlayerEnter(uint32 mapid, Player* player)
         return true;
 }
 
-void MapManager::DeleteInstance(uint32 mapid, uint32 instanceId, uint8 mode)
+void MapManager::DeleteInstance(uint32 mapid, uint32 instanceId)
 {
     Map *m = _GetBaseMap(mapid);
     if (m && m->Instanceable())

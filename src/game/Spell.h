@@ -341,7 +341,7 @@ class Spell
         void SetTargetMap(uint32 i,uint32 cur,std::list<Unit*> &TagUnitMap);
 
         Unit* SelectMagnetTarget();
-        bool CheckTarget( Unit* target, uint32 eff, bool hitPhase );
+        bool CheckTarget( Unit* target, uint32 eff );
 
         void SendCastResult(uint8 result);
         void SendSpellStart();

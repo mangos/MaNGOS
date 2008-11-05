@@ -1090,8 +1090,6 @@ void Unit::DealFlatDamage(Unit *pVictim, SpellEntry const *spellInfo, uint32 *da
             // Physical Damage
             if ( GetSpellSchoolMask(spellInfo) & SPELL_SCHOOL_MASK_NORMAL )
             {
-                uint32 modDamage=*damage;
-
                 // apply spellmod to Done damage
                 if(Player* modOwner = GetSpellModOwner())
                     modOwner->ApplySpellMod(spellInfo->Id, SPELLMOD_DAMAGE, *damage);
@@ -4544,7 +4542,7 @@ void Unit::CastMeleeProcDamageAndSpell(Unit* pVictim, uint32 damage, SpellSchool
         ProcDamageAndSpell(pVictim, procAttacker, procVictim, damage, damageSchoolMask, spellCasted, isTriggeredSpell, attType);
 }
 
-bool Unit::HandleHasteAuraProc(Unit *pVictim, SpellEntry const *hasteSpell, uint32 /*effIndex*/, uint32 damage, Aura* triggeredByAura, SpellEntry const * procSpell, uint32 /*procFlag*/, uint32 cooldown)
+bool Unit::HandleHasteAuraProc(Unit *pVictim, SpellEntry const *hasteSpell, uint32 /*effIndex*/, uint32 damage, Aura* triggeredByAura, SpellEntry const * /*procSpell*/, uint32 /*procFlag*/, uint32 cooldown)
 {
     Item* castItem = triggeredByAura->GetCastItemGUID() && GetTypeId()==TYPEID_PLAYER
         ? ((Player*)this)->GetItemByGuid(triggeredByAura->GetCastItemGUID()) : NULL;
@@ -6192,7 +6190,6 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
                         if(!pVictim || !pVictim->isAlive())
                             return false;
 
-                        uint32 spell = 0;
                         switch(triggeredByAura->GetSpellProto()->Id)
                         {
                             case 20186:
@@ -6222,7 +6219,6 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
                             return false;
 
                         // overwrite non existing triggered spell call in spell.dbc
-                        uint32 spell = 0;
                         switch(triggeredByAura->GetSpellProto()->Id)
                         {
                             case 20185:
@@ -6422,7 +6418,7 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
     return true;
 }
 
-bool Unit::HandleOverrideClassScriptAuraProc(Unit *pVictim, int32 scriptId, uint32 damage, Aura *triggeredByAura, SpellEntry const *procSpell, uint32 cooldown)
+bool Unit::HandleOverrideClassScriptAuraProc(Unit *pVictim, int32 scriptId, uint32 /*damage*/, Aura *triggeredByAura, SpellEntry const *procSpell, uint32 cooldown)
 {
     if(!pVictim || !pVictim->isAlive())
         return false;
@@ -7134,7 +7130,7 @@ void Unit::SendHealSpellLog(Unit *pVictim, uint32 SpellID, uint32 Damage, bool c
     SendMessageToSet(&data, true);
 }
 
-void Unit::SendEnergizeSpellLog(Unit *pVictim, uint32 SpellID, uint32 Damage, Powers powertype, bool critical)
+void Unit::SendEnergizeSpellLog(Unit *pVictim, uint32 SpellID, uint32 Damage, Powers powertype)
 {
     WorldPacket data(SMSG_SPELLENERGIZELOG, (8+8+4+4+4+1));
     data.append(pVictim->GetPackGUID());
@@ -10352,7 +10348,7 @@ void Unit::StopMoving()
 
     // send explicit stop packet
     // rely on vmaps here because for exemple stormwind is in air
-    float z = MapManager::Instance().GetBaseMap(GetMapId())->GetHeight(GetPositionX(), GetPositionY(), GetPositionZ(), true);
+    //float z = MapManager::Instance().GetBaseMap(GetMapId())->GetHeight(GetPositionX(), GetPositionY(), GetPositionZ(), true);
     //if (fabs(GetPositionZ() - z) < 2.0f)
     //    Relocate(GetPositionX(), GetPositionY(), z);
     Relocate(GetPositionX(), GetPositionY(),GetPositionZ());

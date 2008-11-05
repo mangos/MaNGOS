@@ -1168,7 +1168,6 @@ void WorldSession::HandleGuildBankDepositItem( WorldPacket & recv_data )
     uint8 BankTab, BankTabSlot, AutoStore, AutoStoreCount, PlayerSlot, PlayerBag, SplitedAmount = 0;
     uint8 BankTabDst, BankTabSlotDst, unk2, ToChar = 1;
     uint32 ItemEntry, unk1;
-    bool BankToChar = false;
 
     CHECK_PACKET_SIZE(recv_data,8+1);
     recv_data >> GoGuid >> BankToBank;

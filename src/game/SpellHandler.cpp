@@ -263,7 +263,6 @@ void WorldSession::HandleGameObjectUseOpcode( WorldPacket & recv_data )
     CHECK_PACKET_SIZE(recv_data,8);
 
     uint64 guid;
-    uint32 spellId = OPEN_CHEST;
 
     recv_data >> guid;
 

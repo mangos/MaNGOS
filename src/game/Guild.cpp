@@ -950,15 +950,10 @@ void Guild::DisplayGuildBankMoneyUpdate()
     WorldPacket data(SMSG_GUILD_BANK_LIST, 8+1+4+1+1);
 
     data << uint64(GetGuildBankMoney());
-    data << uint8(0);
-    // remaining slots for today
-
-    size_t rempos = data.wpos();
-    data << uint32(0);                                      // will be filled later
+    data << uint8(0);                                       // TabId, default 0
+    data << uint32(0);                                      // slot withdrow, default 0
     data << uint8(0);                                       // Tell client this is a tab content packet
-
     data << uint8(0);                                       // not send items
-
     BroadcastPacket(&data);
 
     sLog.outDebug("WORLD: Sent (SMSG_GUILD_BANK_LIST)");

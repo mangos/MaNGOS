@@ -345,7 +345,7 @@ void BattleGroundWS::EventPlayerClickedOnFlag(Player *Source, GameObject* target
     if(GetStatus() != STATUS_IN_PROGRESS)
         return;
 
-    const char *message;
+    const char *message = NULL;
     uint8 type = 0;
 
     //alliance flag picked up from base
