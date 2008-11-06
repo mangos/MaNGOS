@@ -62,7 +62,7 @@ GameObject::~GameObject()
 {
     if(m_uint32Values)                                      // field array can be not exist if GameOBject not loaded
     {
-        // crash possable at access to deleted GO in Unit::m_gameobj
+        // crash possible at access to deleted GO in Unit::m_gameobj
         uint64 owner_guid = GetOwnerGUID();
         if(owner_guid)
         {
@@ -70,7 +70,7 @@ GameObject::~GameObject()
             if(owner)
                 owner->RemoveGameObject(this,false);
             else if(!IS_PLAYER_GUID(owner_guid))
-                sLog.outError("Delete GameObject (GUID: %u Entry: %u ) that have references in not found creature %u GO list. Crash possable later.",GetGUIDLow(),GetGOInfo()->id,GUID_LOPART(owner_guid));
+                sLog.outError("Delete GameObject (GUID: %u Entry: %u ) that have references in not found creature %u GO list. Crash possible later.",GetGUIDLow(),GetGOInfo()->id,GUID_LOPART(owner_guid));
         }
     }
 }
@@ -204,7 +204,7 @@ void GameObject::Update(uint32 /*p_time*/)
                             ((Player*)caster)->SendMessageToSet(&data,true);
                         }
 
-                        m_lootState = GO_READY;                 // can be succesfully open with some chance
+                        m_lootState = GO_READY;                 // can be successfully open with some chance
                     }
                     return;
                 }
@@ -281,7 +281,7 @@ void GameObject::Update(uint32 /*p_time*/)
                 float radius = goInfo->trap.radius;
                 if(!radius)
                 {
-                    if(goInfo->trap.cooldown != 3)            // cast in other case (at some triggring/linked go/etc explicit call)
+                    if(goInfo->trap.cooldown != 3)            // cast in other case (at some triggering/linked go/etc explicit call)
                         return;
                     else
                     {
@@ -480,7 +480,7 @@ void GameObject::getFishLoot(Loot *fishloot)
 void GameObject::SaveToDB()
 {
     // this should only be used when the gameobject has already been loaded
-    // perferably after adding to map, because mapid may not be valid otherwise
+    // preferably after adding to map, because mapid may not be valid otherwise
     GameObjectData const *data = objmgr.GetGOData(m_DBTableGuid);
     if(!data)
     {

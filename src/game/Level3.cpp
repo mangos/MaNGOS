@@ -430,7 +430,7 @@ bool ChatHandler::HandleReloadSpellElixirCommand(const char*)
 {
     sLog.outString( "Re-Loading Spell Elixir types..." );
     spellmgr.LoadSpellElixirs();
-    SendGlobalSysMessage("DB table `spell_elixir` (spell exlixir types) reloaded.");
+    SendGlobalSysMessage("DB table `spell_elixir` (spell elixir types) reloaded.");
     return true;
 }
 
@@ -1395,7 +1395,7 @@ bool ChatHandler::HandleLearnAllCommand(const char* /*args*/)
         "2426",
         "5916",
         "6634",
-        //"6718", phasing stealth, annoing for learn all case.
+        //"6718", phasing stealth, annoying for learn all case.
         "6719",
         "8822",
         "9591",
@@ -1755,7 +1755,7 @@ bool ChatHandler::HandleLearnAllMyTalentsCommand(const char* /*args*/)
             }
         }
 
-        if(!spellid)                                        // ??? none spells in telent
+        if(!spellid)                                        // ??? none spells in talent
             continue;
 
         SpellEntry const* spellInfo = sSpellStore.LookupEntry(spellid);
@@ -2694,15 +2694,15 @@ bool ChatHandler::HandleLookupSpellCommand(const char* args)
                 bool known = target && target->HasSpell(id);
                 bool learn = (spellInfo->Effect[0] == SPELL_EFFECT_LEARN_SPELL);
 
-                uint32 telentCost = GetTalentSpellCost(id);
+                uint32 talentCost = GetTalentSpellCost(id);
 
-                bool talent = (telentCost > 0);
+                bool talent = (talentCost > 0);
                 bool passive = IsPassiveSpell(id);
                 bool active = target && (target->HasAura(id,0) || target->HasAura(id,1) || target->HasAura(id,2));
 
                 // unit32 used to prevent interpreting uint8 as char at output
                 // find rank of learned spell for learning spell, or talent rank
-                uint32 rank = telentCost ? telentCost : spellmgr.GetSpellRank(learn ? spellInfo->EffectTriggerSpell[0] : id);
+                uint32 rank = talentCost ? talentCost : spellmgr.GetSpellRank(learn ? spellInfo->EffectTriggerSpell[0] : id);
 
                 // send spell in "id - [name, rank N] [talent] [passive] [learn] [known]" format
                 std::ostringstream ss;
@@ -3062,7 +3062,7 @@ bool ChatHandler::HandleGuildInviteCommand(const char *args)
     if (!plGuid)
         false;
 
-    // players's guild membership checked in AddMember before add
+    // player's guild membership checked in AddMember before add
     if (!targetGuild->AddMember (plGuid,targetGuild->GetLowestRank ()))
         return false;
 
@@ -3746,7 +3746,7 @@ bool ChatHandler::HandleLevelUpCommand(const char* args)
         else                                                // .levelup level
             addlevel = atoi(px);
     }
-    // else .levelup - nothing do for prepering
+    // else .levelup - nothing do for preparing
 
     // player
     Player *chr = NULL;
@@ -3816,7 +3816,7 @@ bool ChatHandler::HandleLevelUpCommand(const char* args)
     }
     else
     {
-        // update levle and XP at level, all other will be updated at loading
+        // update level and XP at level, all other will be updated at loading
         Tokens values;
         Player::LoadValuesArrayFromDB(values,chr_guid);
         Player::SetUInt32ValueInArray(values,UNIT_FIELD_LEVEL,newlevel);
@@ -5199,7 +5199,7 @@ bool ChatHandler::HandleBanListHelper(QueryResult* result)
 
             std::string account_name;
 
-            // "account" case, name can be get in same quary
+            // "account" case, name can be get in same query
             if(result->GetFieldCount() > 1)
                 account_name = fields[1].GetCppString();
             // "character" case, name need extract from another DB
@@ -5320,7 +5320,7 @@ bool ChatHandler::HandleRespawnCommand(const char* /*args*/)
 {
     Player* pl = m_session->GetPlayer();
 
-    // accept only explictly selected target (not implicitly self targeting case)
+    // accept only explicitly selected target (not implicitly self targeting case)
     Unit* target = getSelectedUnit();
     if(pl->GetSelection() && target)
     {

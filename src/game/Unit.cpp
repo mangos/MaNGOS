@@ -443,7 +443,7 @@ void Unit::RemoveSpellbyDamageTaken(AuraType auraType, uint32 damage)
     if(!HasAuraType(auraType))
         return;
 
-    // The chance to dispell an aura depends on the damage taken with respect to the casters level.
+    // The chance to dispel an aura depends on the damage taken with respect to the casters level.
     uint32 max_dmg = getLevel() > 8 ? 25 * getLevel() - 150 : 50;
     float chance = float(damage) / max_dmg * 100.0f;
     if (roll_chance_f(chance))
@@ -498,7 +498,7 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
     }
 
     pVictim->RemoveSpellbyDamageTaken(SPELL_AURA_MOD_FEAR, damage);
-    // root type spells do not dispell the root effect
+    // root type spells do not dispel the root effect
     if(!spellProto || spellProto->Mechanic != MECHANIC_ROOT)
         pVictim->RemoveSpellbyDamageTaken(SPELL_AURA_MOD_ROOT, damage);
 
@@ -780,7 +780,7 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
         {
             if(getVictim())
             {
-                // if have target and damage pVictim just call AI recation
+                // if have target and damage pVictim just call AI reaction
                 if(pVictim != getVictim() && pVictim->GetTypeId()==TYPEID_UNIT && ((Creature*)pVictim)->AI())
                     ((Creature*)pVictim)->AI()->AttackedBy(this);
             }
@@ -927,7 +927,7 @@ void Unit::CastStop(uint32 except_spellid)
             InterruptSpell(i,false);
 }
 
-void Unit::CastSpell(Unit* Victim, uint32 spellId, bool triggered, Item *castItem, Aura* triggredByAura, uint64 originalCaster)
+void Unit::CastSpell(Unit* Victim, uint32 spellId, bool triggered, Item *castItem, Aura* triggeredByAura, uint64 originalCaster)
 {
     SpellEntry const *spellInfo = sSpellStore.LookupEntry(spellId );
 
@@ -937,10 +937,10 @@ void Unit::CastSpell(Unit* Victim, uint32 spellId, bool triggered, Item *castIte
         return;
     }
 
-    CastSpell(Victim,spellInfo,triggered,castItem,triggredByAura, originalCaster);
+    CastSpell(Victim,spellInfo,triggered,castItem,triggeredByAura, originalCaster);
 }
 
-void Unit::CastSpell(Unit* Victim,SpellEntry const *spellInfo, bool triggered, Item *castItem, Aura* triggredByAura, uint64 originalCaster)
+void Unit::CastSpell(Unit* Victim,SpellEntry const *spellInfo, bool triggered, Item *castItem, Aura* triggeredByAura, uint64 originalCaster)
 {
     if(!spellInfo)
     {
@@ -951,18 +951,18 @@ void Unit::CastSpell(Unit* Victim,SpellEntry const *spellInfo, bool triggered, I
     if (castItem)
         DEBUG_LOG("WORLD: cast Item spellId - %i", spellInfo->Id);
 
-    if(!originalCaster && triggredByAura)
-        originalCaster = triggredByAura->GetCasterGUID();
+    if(!originalCaster && triggeredByAura)
+        originalCaster = triggeredByAura->GetCasterGUID();
 
     Spell *spell = new Spell(this, spellInfo, triggered, originalCaster );
 
     SpellCastTargets targets;
     targets.setUnitTarget( Victim );
     spell->m_CastItem = castItem;
-    spell->prepare(&targets, triggredByAura);
+    spell->prepare(&targets, triggeredByAura);
 }
 
-void Unit::CastCustomSpell(Unit* Victim,uint32 spellId, int32 const* bp0, int32 const* bp1, int32 const* bp2, bool triggered, Item *castItem, Aura* triggredByAura, uint64 originalCaster)
+void Unit::CastCustomSpell(Unit* Victim,uint32 spellId, int32 const* bp0, int32 const* bp1, int32 const* bp2, bool triggered, Item *castItem, Aura* triggeredByAura, uint64 originalCaster)
 {
     SpellEntry const *spellInfo = sSpellStore.LookupEntry(spellId );
 
@@ -972,10 +972,10 @@ void Unit::CastCustomSpell(Unit* Victim,uint32 spellId, int32 const* bp0, int32 
         return;
     }
 
-    CastCustomSpell(Victim,spellInfo,bp0,bp1,bp2,triggered,castItem,triggredByAura, originalCaster);
+    CastCustomSpell(Victim,spellInfo,bp0,bp1,bp2,triggered,castItem,triggeredByAura, originalCaster);
 }
 
-void Unit::CastCustomSpell(Unit* Victim,SpellEntry const *spellInfo, int32 const* bp0, int32 const* bp1, int32 const* bp2, bool triggered, Item *castItem, Aura* triggredByAura, uint64 originalCaster)
+void Unit::CastCustomSpell(Unit* Victim,SpellEntry const *spellInfo, int32 const* bp0, int32 const* bp1, int32 const* bp2, bool triggered, Item *castItem, Aura* triggeredByAura, uint64 originalCaster)
 {
     if(!spellInfo)
     {
@@ -986,8 +986,8 @@ void Unit::CastCustomSpell(Unit* Victim,SpellEntry const *spellInfo, int32 const
     if (castItem)
         DEBUG_LOG("WORLD: cast Item spellId - %i", spellInfo->Id);
 
-    if(!originalCaster && triggredByAura)
-        originalCaster = triggredByAura->GetCasterGUID();
+    if(!originalCaster && triggeredByAura)
+        originalCaster = triggeredByAura->GetCasterGUID();
 
     Spell *spell = new Spell(this, spellInfo, triggered, originalCaster);
 
@@ -1003,11 +1003,11 @@ void Unit::CastCustomSpell(Unit* Victim,SpellEntry const *spellInfo, int32 const
     SpellCastTargets targets;
     targets.setUnitTarget( Victim );
     spell->m_CastItem = castItem;
-    spell->prepare(&targets, triggredByAura);
+    spell->prepare(&targets, triggeredByAura);
 }
 
 // used for scripting
-void Unit::CastSpell(float x, float y, float z, uint32 spellId, bool triggered, Item *castItem, Aura* triggredByAura, uint64 originalCaster)
+void Unit::CastSpell(float x, float y, float z, uint32 spellId, bool triggered, Item *castItem, Aura* triggeredByAura, uint64 originalCaster)
 {
     SpellEntry const *spellInfo = sSpellStore.LookupEntry(spellId );
 
@@ -1017,11 +1017,11 @@ void Unit::CastSpell(float x, float y, float z, uint32 spellId, bool triggered, 
         return;
     }
 
-    CastSpell(x, y, z,spellInfo,triggered,castItem,triggredByAura, originalCaster);
+    CastSpell(x, y, z,spellInfo,triggered,castItem,triggeredByAura, originalCaster);
 }
 
 // used for scripting
-void Unit::CastSpell(float x, float y, float z, SpellEntry const *spellInfo, bool triggered, Item *castItem, Aura* triggredByAura, uint64 originalCaster)
+void Unit::CastSpell(float x, float y, float z, SpellEntry const *spellInfo, bool triggered, Item *castItem, Aura* triggeredByAura, uint64 originalCaster)
 {
     if(!spellInfo)
     {
@@ -1032,15 +1032,15 @@ void Unit::CastSpell(float x, float y, float z, SpellEntry const *spellInfo, boo
     if (castItem)
         DEBUG_LOG("WORLD: cast Item spellId - %i", spellInfo->Id);
 
-    if(!originalCaster && triggredByAura)
-        originalCaster = triggredByAura->GetCasterGUID();
+    if(!originalCaster && triggeredByAura)
+        originalCaster = triggeredByAura->GetCasterGUID();
 
     Spell *spell = new Spell(this, spellInfo, triggered, originalCaster );
 
     SpellCastTargets targets;
     targets.setDestination(x, y, z);
     spell->m_CastItem = castItem;
-    spell->prepare(&targets, triggredByAura);
+    spell->prepare(&targets, triggeredByAura);
 }
 
 void Unit::DealFlatDamage(Unit *pVictim, SpellEntry const *spellInfo, uint32 *damage, CleanDamage *cleanDamage, bool *crit, bool isTriggeredSpell)
@@ -1048,7 +1048,7 @@ void Unit::DealFlatDamage(Unit *pVictim, SpellEntry const *spellInfo, uint32 *da
     // TODO this in only generic way, check for exceptions
     DEBUG_LOG("DealFlatDamage (BEFORE) >> DMG:%u", *damage);
 
-    // Per-damage calss calculation
+    // Per-damage class calculation
     switch (spellInfo->DmgClass)
     {
         // Melee and Ranged Spells
@@ -1652,7 +1652,7 @@ void Unit::CalcAbsorbResist(Unit *pVictim,SpellSchoolMask schoolMask, DamageEffe
         RemainingDamage -= currentAbsorb;
     }
 
-    // only split damage if not damaing yourself
+    // only split damage if not damaging yourself
     if(pVictim != this)
     {
         AuraList const& vSplitDamageFlat = pVictim->GetAurasByType(SPELL_AURA_SPLIT_DAMAGE_FLAT);
@@ -2173,7 +2173,7 @@ void Unit::AttackerStateUpdate (Unit *pVictim, WeaponAttackType attType, bool ex
     else if (attType == OFF_ATTACK)
         hitInfo = HITINFO_LEFTSWING;
     else
-        return;                                             // ignore ranaged case
+        return;                                             // ignore ranged case
 
     uint32 extraAttacks = m_extraAttacks;
 
@@ -2287,7 +2287,7 @@ MeleeHitOutcome Unit::RollPhysicalOutcomeAgainst (Unit const *pVictim, WeaponAtt
     }
     else
     {
-        // parry can be avoided only by some abilites
+        // parry can be avoided only by some abilities
         parry_chance = pVictim->GetUnitParryChance();
         // block might be bypassed by it as well
         block_chance = pVictim->GetUnitBlockChance();
@@ -2301,7 +2301,7 @@ MeleeHitOutcome Unit::RollPhysicalOutcomeAgainst (Unit const *pVictim, WeaponAtt
         // Increase from SPELL_AURA_MOD_SPELL_CRIT_CHANCE_SCHOOL aura
         crit_chance += GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_SPELL_CRIT_CHANCE_SCHOOL, spellInfo->SchoolMask);
 
-        if( dodge_chance != 0.0f )                          // if dodge chance is already 0, ignore talents fpr speed
+        if( dodge_chance != 0.0f )                          // if dodge chance is already 0, ignore talents for speed
         {
             AuraList const& mCanNotBeDodge = GetAurasByType(SPELL_AURA_IGNORE_COMBAT_RESULT);
             for(AuraList::const_iterator i = mCanNotBeDodge.begin(); i != mCanNotBeDodge.end(); ++i)
@@ -2862,7 +2862,7 @@ SpellMissInfo Unit::SpellHitResult(Unit *pVictim, SpellEntry const *spell, bool 
     }
 
     // TODO need use this code for spell hit result calculation
-    // now code commented for compotability
+    // now code commented for computability
     switch (spell->DmgClass)
     {
         case SPELL_DAMAGE_CLASS_RANGED:
@@ -3033,7 +3033,7 @@ float Unit::GetUnitBlockChance() const
             if(tmpitem && !tmpitem->IsBroken() && tmpitem->GetProto()->Block)
                 return GetFloatValue(PLAYER_BLOCK_PERCENTAGE);
         }
-        // is player but has no block ability or no not broken shield equiped
+        // is player but has no block ability or no not broken shield equipped
         return 0.0f;
     }
     else
@@ -3114,7 +3114,7 @@ uint32 Unit::GetWeaponSkillValue (WeaponAttackType attType, Unit const* target) 
         if(((Player*)this)->IsInFeralForm())
             return GetMaxSkillValueForLevel();              // always maximized SKILL_FERAL_COMBAT in fact
 
-        // weaon skill or (unarmed for base attack)
+        // weapon skill or (unarmed for base attack)
         uint32  skill = item ? item->GetSkill() : SKILL_UNARMED;
 
         // in PvP use full skill instead current skill value
@@ -3459,13 +3459,13 @@ int32 Unit::GetTotalAuraModifier(AuraType auratype) const
 
 float Unit::GetTotalAuraMultiplier(AuraType auratype) const
 {
-    float multipler = 1.0f;
+    float multiplier = 1.0f;
 
     AuraList const& mTotalAuraList = GetAurasByType(auratype);
     for(AuraList::const_iterator i = mTotalAuraList.begin();i != mTotalAuraList.end(); ++i)
-        multipler *= (100.0f + (*i)->GetModifier()->m_amount)/100.0f;
+        multiplier *= (100.0f + (*i)->GetModifier()->m_amount)/100.0f;
 
-    return multipler;
+    return multiplier;
 }
 
 int32 Unit::GetMaxPositiveAuraModifier(AuraType auratype) const
@@ -3508,16 +3508,16 @@ int32 Unit::GetTotalAuraModifierByMiscMask(AuraType auratype, uint32 misc_mask) 
 
 float Unit::GetTotalAuraMultiplierByMiscMask(AuraType auratype, uint32 misc_mask) const
 {
-    float multipler = 1.0f;
+    float multiplier = 1.0f;
 
     AuraList const& mTotalAuraList = GetAurasByType(auratype);
     for(AuraList::const_iterator i = mTotalAuraList.begin();i != mTotalAuraList.end(); ++i)
     {
         Modifier* mod = (*i)->GetModifier();
         if (mod->m_miscvalue & misc_mask)
-            multipler *= (100.0f + mod->m_amount)/100.0f;
+            multiplier *= (100.0f + mod->m_amount)/100.0f;
     }
-    return multipler;
+    return multiplier;
 }
 
 int32 Unit::GetMaxPositiveAuraModifierByMiscMask(AuraType auratype, uint32 misc_mask) const
@@ -3566,16 +3566,16 @@ int32 Unit::GetTotalAuraModifierByMiscValue(AuraType auratype, int32 misc_value)
 
 float Unit::GetTotalAuraMultiplierByMiscValue(AuraType auratype, int32 misc_value) const
 {
-    float multipler = 1.0f;
+    float multiplier = 1.0f;
 
     AuraList const& mTotalAuraList = GetAurasByType(auratype);
     for(AuraList::const_iterator i = mTotalAuraList.begin();i != mTotalAuraList.end(); ++i)
     {
         Modifier* mod = (*i)->GetModifier();
         if (mod->m_miscvalue == misc_value)
-            multipler *= (100.0f + mod->m_amount)/100.0f;
+            multiplier *= (100.0f + mod->m_amount)/100.0f;
     }
-    return multipler;
+    return multiplier;
 }
 
 int32 Unit::GetMaxPositiveAuraModifierByMiscValue(AuraType auratype, int32 misc_value) const
@@ -3691,7 +3691,7 @@ bool Unit::AddAura(Aura *Aur)
         if (!RemoveNoStackAurasDueToAura(Aur))
         {
             delete Aur;
-            return false;                                   // couldnt remove conflicting aura with higher rank
+            return false;                                   // couldn't remove conflicting aura with higher rank
         }
     }
 
@@ -3823,7 +3823,7 @@ bool Unit::RemoveNoStackAurasDueToAura(Aura *Aur)
         for(int j = 0; j < 3; ++j)
         {
             // prevent remove dummy triggered spells at next effect aura add
-            switch(spellProto->Effect[j])                   // main spell auras added added after triggred spell
+            switch(spellProto->Effect[j])                   // main spell auras added added after triggered spell
             {
                 case SPELL_EFFECT_DUMMY:
                     switch(spellId)
@@ -3836,7 +3836,7 @@ bool Unit::RemoveNoStackAurasDueToAura(Aura *Aur)
             if(is_triggered_by_spell)
                 break;
 
-            // prevent remove form main spell by triggred passive spells
+            // prevent remove form main spell by triggered passive spells
             switch(i_spellProto->EffectApplyAuraName[j])    // main aura added before triggered spell
             {
                 case SPELL_AURA_MOD_SHAPESHIFT:
@@ -4005,7 +4005,7 @@ void Unit::RemoveAurasWithDispelType( DispelType type )
 {
     // Create dispel mask by dispel type
     uint32 dispelMask = GetDispellMask(type);
-    // Dispel all existing auras vs current dispell type
+    // Dispel all existing auras vs current dispel type
     AuraMap& auras = GetAuras();
     for(AuraMap::iterator itr = auras.begin(); itr != auras.end(); )
     {
@@ -4414,7 +4414,7 @@ void Unit::ProcDamageAndSpell(Unit *pVictim, uint32 procAttacker, uint32 procVic
         sLog.outDebug("ProcDamageAndSpell: invoked due to spell id %u %s", procSpell->Id, (isTriggeredSpell?"(triggered)":""));
 
     // Assign melee/ranged proc flags for magic attacks, that are actually melee/ranged abilities
-    // not assign for spell proc triggered spell to prevent infinity (or unexpacted 2-3 times) melee damage spell proc call with melee damage effect
+    // not assign for spell proc triggered spell to prevent infinity (or unexpected 2-3 times) melee damage spell proc call with melee damage effect
     // That is the question though if it's fully correct
     if(procSpell && !isTriggeredSpell)
     {
@@ -4441,7 +4441,7 @@ void Unit::ProcDamageAndSpell(Unit *pVictim, uint32 procAttacker, uint32 procVic
     // Not much to do if no flags are set.
     if (procAttacker)
     {
-        // procces auras that not generate casts at proc event before auras that generate casts to prevent proc aura added at prev. proc aura execute in set
+        // processing auras that not generate casts at proc event before auras that generate casts to prevent proc aura added at prev. proc aura execute in set
         ProcDamageAndSpellFor(false,pVictim,procAttacker,attackerProcEffectAuraTypes,attType, procSpell, damage, damageSchoolMask);
         ProcDamageAndSpellFor(false,pVictim,procAttacker,attackerProcCastAuraTypes,attType, procSpell, damage, damageSchoolMask);
     }
@@ -4450,7 +4450,7 @@ void Unit::ProcDamageAndSpell(Unit *pVictim, uint32 procAttacker, uint32 procVic
     // Not much to do if no flags are set or there is no victim
     if(pVictim && pVictim->isAlive() && procVictim)
     {
-        // procces auras that not generate casts at proc event before auras that generate casts to prevent proc aura added at prev. proc aura execute in set
+        // processing auras that not generate casts at proc event before auras that generate casts to prevent proc aura added at prev. proc aura execute in set
         pVictim->ProcDamageAndSpellFor(true,this,procVictim,victimProcEffectAuraTypes,attType,procSpell, damage, damageSchoolMask);
         pVictim->ProcDamageAndSpellFor(true,this,procVictim,victimProcCastAuraTypes,attType,procSpell, damage, damageSchoolMask);
     }
@@ -4639,7 +4639,7 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, SpellEntry const *dummySpell, uint
                 case 18765:
                 case 35429:
                 {
-                    // prevent chain of triggred spell from same triggred spell
+                    // prevent chain of triggered spell from same triggered spell
                     if(procSpell && procSpell->Id==26654)
                         return false;
 
@@ -5659,7 +5659,7 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, SpellEntry const *dummySpell, uint
                     return false;
 
                 uint32 spellId = 0;
-                // Every Lightning Bolt and Chain Lightning spell have dublicate vs half damage and zero cost
+                // Every Lightning Bolt and Chain Lightning spell have duplicate vs half damage and zero cost
                 switch (procSpell->Id)
                 {
                     // Lightning Bolt
@@ -5702,7 +5702,7 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, SpellEntry const *dummySpell, uint
                 if (procSpell->SpellFamilyFlags & 0x0000000000000002LL)
                     ((Player*)this)->RemoveSpellCooldown(spellId);
 
-                // Hmmm.. in most case spells alredy set half basepoints but...
+                // Hmmm.. in most case spells already set half basepoints but...
                 // Lightning Bolt (2-10 rank) have full basepoint and half bonus from level
                 // As on wiki:
                 // BUG: Rank 2 to 10 (and maybe 11) of Lightning Bolt will proc another Bolt with FULL damage (not halved). This bug is known and will probably be fixed soon.
@@ -5920,7 +5920,7 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
                 if( pVictim == this )
                     return false;
 
-                // custom chnace
+                // custom chance
                 float chance = 0;
                 switch (triggeredByAura->GetId())
                 {
@@ -6982,7 +6982,7 @@ void Unit::RemoveAllAttackers()
         AttackerSet::iterator iter = m_attackers.begin();
         if(!(*iter)->AttackStop())
         {
-            sLog.outError("WORLD: Unit has an attacker that isnt attacking it!");
+            sLog.outError("WORLD: Unit has an attacker that isn't attacking it!");
             m_attackers.erase(iter);
         }
     }
@@ -8278,7 +8278,7 @@ void Unit::ApplySpellDispelImmunity(const SpellEntry * spellProto, DispelType ty
 float Unit::GetWeaponProcChance() const
 {
     // normalized proc chance for weapon attack speed
-    // (odd formulae...)
+    // (odd formula...)
     if(isAttackReady(BASE_ATTACK))
         return (GetAttackTime(BASE_ATTACK) * 1.8f / 1000.0f);
     else if (haveOffhandWeapon() && isAttackReady(OFF_ATTACK))
@@ -8507,7 +8507,7 @@ bool Unit::isVisibleForOrDetect(Unit const* u, bool detect, bool inVisibleList) 
         if(!IsVisibleInGridForPlayer((Player *)u))
             return false;
 
-        // if player is dead then he can't detect anyone in anycases
+        // if player is dead then he can't detect anyone in any cases
         if(!u->isAlive())
             detect = false;
     }
@@ -9115,7 +9115,7 @@ bool Unit::SelectHostilTarget()
     assert(GetTypeId()== TYPEID_UNIT);
     Unit* target = NULL;
 
-    //This function only useful once AI has been initilazied
+    //This function only useful once AI has been initialized
     if (!((Creature*)this)->AI())
         return false;
 
@@ -9389,7 +9389,7 @@ bool Unit::HandleStatModifier(UnitMods unitMod, UnitModifierType modifierType, f
 {
     if(unitMod >= UNIT_MOD_END || modifierType >= MODIFIER_TYPE_END)
     {
-        sLog.outError("ERROR in HandleStatModifier(): nonexisted UnitMods or wrong UnitModifierType!");
+        sLog.outError("ERROR in HandleStatModifier(): non existed UnitMods or wrong UnitModifierType!");
         return false;
     }
 
@@ -9459,7 +9459,7 @@ float Unit::GetModifierValue(UnitMods unitMod, UnitModifierType modifierType) co
 {
     if( unitMod >= UNIT_MOD_END || modifierType >= MODIFIER_TYPE_END)
     {
-        sLog.outError("ERROR: trial to access nonexisted modifier value from UnitMods!");
+        sLog.outError("ERROR: trial to access non existed modifier value from UnitMods!");
         return 0.0f;
     }
 
@@ -9489,7 +9489,7 @@ float Unit::GetTotalAuraModValue(UnitMods unitMod) const
 {
     if(unitMod >= UNIT_MOD_END)
     {
-        sLog.outError("ERROR: trial to access nonexisted UnitMods in GetTotalAuraModValue()!");
+        sLog.outError("ERROR: trial to access non existed UnitMods in GetTotalAuraModValue()!");
         return 0.0f;
     }
 
@@ -9789,7 +9789,7 @@ void Unit::CleanupsBeforeDelete()
     if(m_uint32Values)                                      // only for fully created object
     {
         InterruptNonMeleeSpells(true);
-        m_Events.KillAllEvents(false);                      // non-delatable (currently casted spells) will not deleted ans will deleated at call in Map::RemoveAllObjectsInRemoveList
+        m_Events.KillAllEvents(false);                      // non-delatable (currently casted spells) will not deleted now but it will deleted at call in Map::RemoveAllObjectsInRemoveList
         CombatStop();
         ClearComboPointHolders();
         DeleteThreatList();
@@ -10097,7 +10097,7 @@ void Unit::ProcDamageAndSpellFor( bool isVictim, Unit * pTarget, uint32 procFlag
                 if(!found)
                 {
                     sLog.outError("Spell aura %u (id:%u effect:%u) has been deleted before call spell proc event handler",*aur,i->triggeredByAura_SpellPair.first,i->triggeredByAura_SpellPair.second);
-                    sLog.outError("It can be deleted one from early proccesed auras:");
+                    sLog.outError("It can be deleted one from early processed auras:");
                     for(ProcTriggeredList::iterator i2 = procTriggered.begin(); i != i2; ++i2)
                         sLog.outError("     Spell aura %u (id:%u effect:%u)",*aur,i2->triggeredByAura_SpellPair.first,i2->triggeredByAura_SpellPair.second);
                     sLog.outError("     <end of list>");
@@ -10347,7 +10347,7 @@ void Unit::StopMoving()
     clearUnitState(UNIT_STAT_MOVING);
 
     // send explicit stop packet
-    // rely on vmaps here because for exemple stormwind is in air
+    // rely on vmaps here because for example stormwind is in air
     //float z = MapManager::Instance().GetBaseMap(GetMapId())->GetHeight(GetPositionX(), GetPositionY(), GetPositionZ(), true);
     //if (fabs(GetPositionZ() - z) < 2.0f)
     //    Relocate(GetPositionX(), GetPositionY(), z);

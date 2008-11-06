@@ -708,7 +708,7 @@ void Spell::EffectDummy(uint32 i)
                 }
                 case 13567:                                 // Dummy Trigger
                 {
-                    // can be used for different aura triggreing, so select by aura
+                    // can be used for different aura triggering, so select by aura
                     if(!m_triggeredByAuraSpell || !unitTarget)
                         return;
 
@@ -2640,31 +2640,31 @@ void Spell::EffectEnergize(uint32 i)
         return;
 
     // Some level depends spells
-    int multipler  = 0;
+    int multiplier = 0;
     int level_diff = 0;
     switch (m_spellInfo->Id)
     {
         // Restore Energy
         case 9512:
             level_diff = m_caster->getLevel() - 40;
-            multipler  = 2;
+            multiplier = 2;
             break;
         // Blood Fury
         case 24571:
             level_diff = m_caster->getLevel() - 60;
-            multipler  = 10;
+            multiplier = 10;
             break;
         // Burst of Energy
         case 24532:
             level_diff = m_caster->getLevel() - 60;
-            multipler  = 4;
+            multiplier = 4;
             break;
         default:
             break;
     }
 
     if (level_diff > 0)
-        damage -= multipler * level_diff;
+        damage -= multiplier * level_diff;
 
     if(damage < 0)
         return;

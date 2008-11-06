@@ -362,7 +362,7 @@ Player::Player (WorldSession *session): Unit()
 
     m_temporaryUnsummonedPetNumber = 0;
     //cache for UNIT_CREATED_BY_SPELL to allow
-    //returning reagests for temporarily removed pets
+    //returning reagents for temporarily removed pets
     //when dying/logging out
     m_oldpetspell = 0;
 
@@ -596,7 +596,7 @@ bool Player::Create( uint32 guidlow, std::string name, uint8 race, uint8 class_,
     SetHealth(GetMaxHealth());
     if (getPowerType()==POWER_MANA)
     {
-        UpdateMaxPower(POWER_MANA);                         // Update max Mana (for add bonus from intelect)
+        UpdateMaxPower(POWER_MANA);                         // Update max Mana (for add bonus from intellect)
         SetPower(POWER_MANA,GetMaxPower(POWER_MANA));
     }
 
@@ -762,7 +762,7 @@ void Player::HandleDrowning()
         return;
     }
 
-    uint32 UnderWaterTime = 1*MINUTE*1000;                  // default leangthL 1 min
+    uint32 UnderWaterTime = 1*MINUTE*1000;                  // default length 1 min
 
     AuraList const& mModWaterBreathing = GetAurasByType(SPELL_AURA_MOD_WATER_BREATHING);
     for(AuraList::const_iterator i = mModWaterBreathing.begin(); i != mModWaterBreathing.end(); ++i)
@@ -1445,7 +1445,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
     // client without expansion support
     if(GetSession()->Expansion() < mEntry->Expansion())
     {
-        sLog.outDebug("Player %s using client without required expansion tried teleport to non accessable map %u", GetName(), mapid);
+        sLog.outDebug("Player %s using client without required expansion tried teleport to non accessible map %u", GetName(), mapid);
 
         if(GetTransport())
             RepopAtGraveyard();                             // teleport to near graveyard if on transport, looks blizz like :)
@@ -1473,7 +1473,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
 
     SetSemaphoreTeleport(true);
 
-    // The player was ported to another map and looses the duel immediatly.
+    // The player was ported to another map and looses the duel immediately.
     // We have to perform this check before the teleport, otherwise the
     // ObjectAccessor won't find the flag.
     if (duel && GetMapId()!=mapid)
@@ -3668,7 +3668,7 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
         SetPower(POWER_ENERGY, uint32(GetMaxPower(POWER_ENERGY)*restore_percent));
     }
 
-    // update visbility
+    // update visibility
     ObjectAccessor::UpdateVisibilityForPlayer(this);
 
     // some items limited to specific map
@@ -4135,7 +4135,7 @@ void Player::UpdateLocalChannels(uint32 newZone )
 
             // leave old channel
             (*i)->Leave(GetGUID(),false);                   // not send leave channel, it already replaced at client
-            std::string name = (*i)->GetName();             // stroe name, (*i)erase in LeftChannel
+            std::string name = (*i)->GetName();             // store name, (*i)erase in LeftChannel
             LeftChannel(*i);                                // remove from player's channel list
             cMgr->LeftChannel(name);                        // delete if empty
         }
@@ -4170,7 +4170,7 @@ void Player::HandleBaseModValue(BaseModGroup modGroup, BaseModType modType, floa
 {
     if(modGroup >= BASEMOD_END || modType >= MOD_END)
     {
-        sLog.outError("ERROR in HandleBaseModValue(): nonexisted BaseModGroup of wrong BaseModType!");
+        sLog.outError("ERROR in HandleBaseModValue(): non existed BaseModGroup of wrong BaseModType!");
         return;
     }
 
@@ -4207,7 +4207,7 @@ float Player::GetBaseModValue(BaseModGroup modGroup, BaseModType modType) const
 {
     if(modGroup >= BASEMOD_END || modType > MOD_END)
     {
-        sLog.outError("ERROR: trial to access nonexisted BaseModGroup or wrong BaseModType!");
+        sLog.outError("ERROR: trial to access non existed BaseModGroup or wrong BaseModType!");
         return 0.0f;
     }
 
@@ -4879,7 +4879,7 @@ void Player::SetSkill(uint32 id, uint16 currVal, uint16 maxVal)
                 {
                     if (_spell_idx->second->skillId == id)
                     {
-                        // this may remove more than one spell (dependants)
+                        // this may remove more than one spell (dependents)
                         removeSpell(itr->first);
                         next = m_spells.begin();
                         break;
@@ -6169,7 +6169,7 @@ void Player::UpdateZone(uint32 newZone)
                 RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING);
                 SetRestType(REST_TYPE_NO);
 
-                // Set player to FFA PVP when not in rested enviroment.
+                // Set player to FFA PVP when not in rested environment.
                 if(sWorld.IsFFAPvPRealm())
                     SetFlag(PLAYER_FLAGS,PLAYER_FLAGS_FFA_PVP);
             }
@@ -7568,7 +7568,7 @@ void Player::SendInitWorldStates()
                 data << uint32(0xaa8) << uint32(0x1);       // 22 2728 Mage Tower uncontrolled (1 - yes, 0 - no)
                 data << uint32(0xaa7) << uint32(0x0);       // 23 2727 Fel Reaver - Horde control
                 data << uint32(0xaa6) << uint32(0x0);       // 24 2726 Fel Reaver - Alliance control
-                data << uint32(0xaa5) << uint32(0x1);       // 25 2725 Fel Reaver uncontroled (1 - yes, 0 - no)
+                data << uint32(0xaa5) << uint32(0x1);       // 25 2725 Fel Reaver uncontrolled (1 - yes, 0 - no)
                 data << uint32(0xaa4) << uint32(0x0);       // 26 2724 Boold Elf - Horde control
                 data << uint32(0xaa3) << uint32(0x0);       // 27 2723 Boold Elf - Alliance control
                 data << uint32(0xaa2) << uint32(0x1);       // 28 2722 Boold Elf uncontrolled (1 - yes, 0 - no)
@@ -8718,7 +8718,7 @@ uint8 Player::_CanStoreItem( uint8 bag, uint8 slot, ItemPosCountVec &dest, uint3
         }
     }
 
-    // not specific slot or have spece for partly store only in specific slot
+    // not specific slot or have space for partly store only in specific slot
 
     // in specific bag
     if( bag != NULL_BAG )
@@ -9373,7 +9373,7 @@ uint8 Player::CanEquipItem( uint8 slot, uint16 &dest, Item *pItem, bool swap, bo
                 if(eslot != EQUIPMENT_SLOT_MAINHAND)
                     return EQUIP_ERR_ITEM_CANT_BE_EQUIPPED;
 
-                // offhand item must can be stored in inventitory for offhand item and it also must be unequipped
+                // offhand item must can be stored in inventory for offhand item and it also must be unequipped
                 Item *offItem = GetItemByPos( INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND );
                 ItemPosCountVec off_dest;
                 if( offItem && (!not_loading ||
@@ -9484,7 +9484,7 @@ uint8 Player::CanBankItem( uint8 bag, uint8 slot, ItemPosCountVec &dest, Item *p
             return EQUIP_ERR_OK;
     }
 
-    // not specific slot or have spece for partly store only in specific slot
+    // not specific slot or have space for partly store only in specific slot
 
     // in specific bag
     if( bag != NULL_BAG )
@@ -9546,7 +9546,7 @@ uint8 Player::CanBankItem( uint8 bag, uint8 slot, ItemPosCountVec &dest, Item *p
         }
     }
 
-    // not specific bag or have spece for partly store only in specific bag
+    // not specific bag or have space for partly store only in specific bag
 
     // search stack for merge to
     if( pProto->Stackable > 1 )
@@ -10178,7 +10178,7 @@ void Player::MoveItemToInventory(ItemPosCountVec const& dest, Item* pItem, bool 
             pLastItem->SetOwnerGUID(GetGUID());
 
         // if this original item then it need create record in inventory
-        // in case trade we laready have item in other player inventory
+        // in case trade we already have item in other player inventory
         pLastItem->SetState(in_characterInventoryDB ? ITEM_CHANGED : ITEM_NEW, this);
     }
 }
@@ -10420,7 +10420,7 @@ void Player::DestroyZoneLimitedItem( bool update, uint32 new_zone )
 void Player::DestroyConjuredItems( bool update )
 {
     // used when entering arena
-    // distroys all conjured items
+    // destroys all conjured items
     sLog.outDebug( "STORAGE: DestroyConjuredItems" );
 
     // in inventory
@@ -10968,7 +10968,7 @@ void Player::TradeCancel(bool sendback)
 {
     if(pTrader)
     {
-        // send yellow "Trade cancelled" message to both traders
+        // send yellow "Trade canceled" message to both traders
         WorldSession* ws;
         ws = GetSession();
         if(sendback)
@@ -11183,7 +11183,7 @@ void Player::ApplyEnchantment(Item *item,EnchantmentSlot slot,bool apply, bool a
                     if(apply)
                     {
                         int32 basepoints = int32(enchant_amount);
-                        // Random Property Exist - try found basepoints for spell (basepoints depencs from item suffix factor)
+                        // Random Property Exist - try found basepoints for spell (basepoints depends from item suffix factor)
                         if (item->GetItemRandomPropertyId() !=0 && !enchant_amount)
                         {
                             ItemRandomSuffixEntry const *item_rand = sItemRandomSuffixStore.LookupEntry(abs(item->GetItemRandomPropertyId()));
@@ -12252,7 +12252,7 @@ bool Player::SatisfyQuestPreviousQuest( Quest const* qInfo, bool msg )
                     return true;
 
                 // each-from-all exclusive group ( < 0)
-                // can be start if only all quests in prev quest exclusive group complited and rewarded
+                // can be start if only all quests in prev quest exclusive group completed and rewarded
                 ObjectMgr::ExclusiveQuestGroups::iterator iter = objmgr.mExclusiveQuestGroups.lower_bound(qPrevInfo->GetExclusiveGroup());
                 ObjectMgr::ExclusiveQuestGroups::iterator end  = objmgr.mExclusiveQuestGroups.upper_bound(qPrevInfo->GetExclusiveGroup());
 
@@ -13916,7 +13916,7 @@ void Player::_LoadInventory(QueryResult *result, uint32 timediff)
     std::map<uint64, Bag*> bagMap;                          // fast guid lookup for bags
     //NOTE: the "order by `bag`" is important because it makes sure
     //the bagMap is filled before items in the bags are loaded
-    //NOTE2: the "order by `slot`" is needed becaue mainhand weapons are (wrongly?)
+    //NOTE2: the "order by `slot`" is needed because mainhand weapons are (wrongly?)
     //expected to be equipped before offhand items (TODO: fixme)
 
     uint32 zone = GetZoneId();
@@ -14043,7 +14043,7 @@ void Player::_LoadInventory(QueryResult *result, uint32 timediff)
         while(!problematicItems.empty())
         {
             // fill mail
-            MailItemsInfo mi;                               // item list prepering
+            MailItemsInfo mi;                               // item list preparing
 
             for(int i = 0; !problematicItems.empty() && i < MAX_MAIL_ITEMS; ++i)
             {
@@ -14591,7 +14591,7 @@ void Player::SendSavedInstances()
         }
     }
 
-    //Send opcode 811. true or flase means, whether you have current raid/heroic instances
+    //Send opcode 811. true or false means, whether you have current raid/heroic instances
     data.Initialize(SMSG_UPDATE_INSTANCE_OWNERSHIP);
     data << uint32(hasBeenSaved);
     GetSession()->SendPacket(&data);
@@ -16641,7 +16641,7 @@ void Player::SendCooldownEvent(SpellEntry const *spellInfo)
     if ( !(spellInfo->Attributes & SPELL_ATTR_DISABLED_WHILE_ACTIVE) )
         return;
 
-    // Get spell cooldwn
+    // Get spell cooldown
     int32 cooldown = GetSpellRecoveryTime(spellInfo);
     // Apply spellmods
     ApplySpellMod(spellInfo->Id, SPELLMOD_COOLDOWN, cooldown);
@@ -17104,7 +17104,7 @@ void Player::SetGroup(Group *group, int8 subgroup)
 void Player::SendInitialPacketsBeforeAddToMap()
 {
     WorldPacket data(SMSG_SET_REST_START, 4);
-    data << uint32(0);                                      // unknown, may be rest state time or expirience
+    data << uint32(0);                                      // unknown, may be rest state time or experience
     GetSession()->SendPacket(&data);
 
     // Homebind
@@ -17696,7 +17696,7 @@ bool Player::HasItemFitToSpellReqirements(SpellEntry const* spellInfo, Item cons
             break;
         }
         default:
-            sLog.outError("HasItemFitToSpellReqirements: Not handeled spell reqirement for item class %u",spellInfo->EquippedItemClass);
+            sLog.outError("HasItemFitToSpellReqirements: Not handled spell requirement for item class %u",spellInfo->EquippedItemClass);
             break;
     }
 
@@ -17741,7 +17741,7 @@ void Player::RemoveItemDependentAurasAndCasts( Item * pItem )
 
 uint32 Player::GetResurrectionSpellId()
 {
-    // search priceless resurrection possabilities
+    // search priceless resurrection possibilities
     uint32 prio = 0;
     uint32 spell_id = 0;
     AuraList const& dummyAuras = GetAurasByType(SPELL_AURA_DUMMY);
@@ -17895,7 +17895,7 @@ uint32 Player::GetBaseWeaponSkillValue (WeaponAttackType attType) const
 {
     Item* item = GetWeaponForAttack(attType,true);
 
-    // unarmmed only with base attack
+    // unarmed only with base attack
     if(attType != BASE_ATTACK && !item)
         return 0;
 
