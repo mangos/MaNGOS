@@ -682,6 +682,7 @@ bool ChatHandler::HandleAccountSetGmLevelCommand(const char* args)
     if( !arg1 )
         return false;
 
+    /// must be NULL if targeted syntax and must be not nULL if not targeted
     char* arg2 = strtok(NULL, " ");
 
     std::string targetAccountName;
@@ -696,6 +697,9 @@ bool ChatHandler::HandleAccountSetGmLevelCommand(const char* args)
         if(arg2)
             return false;
 
+        /// security level expected in arg2 after this if.
+        arg2 = arg1;
+
         targetAccountId = targetPlayer->GetSession()->GetAccountId();
         targetSecurity = targetPlayer->GetSession()->GetSecurity();
         if(!accmgr.GetName(targetAccountId,targetAccountName))
@@ -707,6 +711,10 @@ bool ChatHandler::HandleAccountSetGmLevelCommand(const char* args)
     }
     else
     {
+        /// wrong command syntax (second arg expected)
+        if(!arg2)
+            return false;
+
         targetAccountName = arg1;
         if(!AccountMgr::normilizeString(targetAccountName))
         {
