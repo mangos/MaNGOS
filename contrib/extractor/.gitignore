@@ -12,6 +12,7 @@
 
 *.bsc
 *.ncb
+*.pdb
 *.suo
 debug
 release
