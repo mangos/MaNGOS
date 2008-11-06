@@ -105,7 +105,7 @@ void WorldSession::HandleGMTicketCreateOpcode( WorldPacket & recv_data )
 
     CharacterDatabase.escape_string(ticketText);
 
-    if(GMTicket* ticket = ticketmgr.GetGMTicket(GetPlayer()->GetGUIDLow()))
+    if(ticketmgr.GetGMTicket(GetPlayer()->GetGUIDLow()))
     {
         WorldPacket data( SMSG_GMTICKET_CREATE, 4 );
         data << uint32(1);

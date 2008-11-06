@@ -43,7 +43,7 @@ class MANGOS_DLL_DECL MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::
 
         // only const version for outer users
         Map const* GetBaseMap(uint32 id) const { return const_cast<MapManager*>(this)->_GetBaseMap(id); }
-        void DeleteInstance(uint32 mapid, uint32 instanceId, uint8 mode);
+        void DeleteInstance(uint32 mapid, uint32 instanceId);
 
         inline uint16 GetAreaFlag(uint32 mapid, float x, float y) const
         {

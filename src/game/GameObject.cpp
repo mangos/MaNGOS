@@ -423,7 +423,7 @@ void GameObject::Update(uint32 /*p_time*/)
             //burning flags in some battlegrounds, if you find better condition, just add it
             if (GetGoAnimProgress() > 0)
             {
-                SendObjectDeSpawnAnim(this->GetGUID());
+                SendObjectDeSpawnAnim(GetGUID());
                 //reset flags
                 SetUInt32Value(GAMEOBJECT_FLAGS, GetGOInfo()->flags);
             }
@@ -571,7 +571,7 @@ bool GameObject::LoadFromDB(uint32 guid, Map *map)
     }
 
     uint32 entry = data->id;
-    uint32 map_id = data->mapid;
+    //uint32 map_id = data->mapid;                          // already used before call
     float x = data->posX;
     float y = data->posY;
     float z = data->posZ;

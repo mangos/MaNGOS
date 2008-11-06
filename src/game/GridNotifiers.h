@@ -472,7 +472,7 @@ namespace MaNGOS
 
                 return false;
             }
-            template<class NOT_INTERESTED> bool operator()(NOT_INTERESTED* u) { return false; }
+            template<class NOT_INTERESTED> bool operator()(NOT_INTERESTED*) { return false; }
         private:
             Unit* const i_funit;
             float i_range;

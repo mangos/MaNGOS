@@ -98,8 +98,8 @@ struct WorldLocation
     float y;
     float z;
     float o;
-    explicit WorldLocation(uint32 mapid = 0, float x = 0, float y = 0, float z = 0, float o = 0)
-        : mapid(mapid), x(x), y(y), z(z), o(o) {}
+    explicit WorldLocation(uint32 _mapid = 0, float _x = 0, float _y = 0, float _z = 0, float _o = 0)
+        : mapid(_mapid), x(_x), y(_y), z(_z), o(_o) {}
     WorldLocation(WorldLocation const &loc)
         : mapid(loc.mapid), x(loc.x), y(loc.y), z(loc.z), o(loc.o) {}
 };

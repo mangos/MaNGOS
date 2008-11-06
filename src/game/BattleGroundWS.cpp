@@ -217,7 +217,7 @@ void BattleGroundWS::EventPlayerCapturedFlag(Player *Source)
     Source->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT);
     if(Source->GetTeam() == ALLIANCE)
     {
-        if (!this->IsHordeFlagPickedup())
+        if (!IsHordeFlagPickedup())
             return;
         SetHordeFlagPicker(0);                              // must be before aura remove to prevent 2 events (drop+capture) at the same time
                                                             // horde flag in base (but not respawned yet)
@@ -234,7 +234,7 @@ void BattleGroundWS::EventPlayerCapturedFlag(Player *Source)
     }
     else
     {
-        if (!this->IsAllianceFlagPickedup())
+        if (!IsAllianceFlagPickedup())
             return;
         SetAllianceFlagPicker(0);                           // must be before aura remove to prevent 2 events (drop+capture) at the same time
                                                             // alliance flag in base (but not respawned yet)
@@ -293,7 +293,7 @@ void BattleGroundWS::EventPlayerDroppedFlag(Player *Source)
 
     if(Source->GetTeam() == ALLIANCE)
     {
-        if(!this->IsHordeFlagPickedup())
+        if(!IsHordeFlagPickedup())
             return;
         if(GetHordeFlagPickerGUID() == Source->GetGUID())
         {
@@ -308,7 +308,7 @@ void BattleGroundWS::EventPlayerDroppedFlag(Player *Source)
     }
     else
     {
-        if(!this->IsAllianceFlagPickedup())
+        if(!IsAllianceFlagPickedup())
             return;
         if(GetAllianceFlagPickerGUID() == Source->GetGUID())
         {
@@ -345,12 +345,12 @@ void BattleGroundWS::EventPlayerClickedOnFlag(Player *Source, GameObject* target
     if(GetStatus() != STATUS_IN_PROGRESS)
         return;
 
-    const char *message;
+    const char *message = NULL;
     uint8 type = 0;
 
     //alliance flag picked up from base
-    if(Source->GetTeam() == HORDE && this->GetFlagState(ALLIANCE) == BG_WS_FLAG_STATE_ON_BASE
-        && this->m_BgObjects[BG_WS_OBJECT_A_FLAG] == target_obj->GetGUID())
+    if(Source->GetTeam() == HORDE && GetFlagState(ALLIANCE) == BG_WS_FLAG_STATE_ON_BASE
+        && m_BgObjects[BG_WS_OBJECT_A_FLAG] == target_obj->GetGUID())
     {
         message = GetMangosString(LANG_BG_WS_PICKEDUP_AF);
         type = CHAT_MSG_BG_SYSTEM_HORDE;
@@ -365,8 +365,8 @@ void BattleGroundWS::EventPlayerClickedOnFlag(Player *Source, GameObject* target
     }
 
     //horde flag picked up from base
-    if (Source->GetTeam() == ALLIANCE && this->GetFlagState(HORDE) == BG_WS_FLAG_STATE_ON_BASE
-        && this->m_BgObjects[BG_WS_OBJECT_H_FLAG] == target_obj->GetGUID())
+    if (Source->GetTeam() == ALLIANCE && GetFlagState(HORDE) == BG_WS_FLAG_STATE_ON_BASE
+        && m_BgObjects[BG_WS_OBJECT_H_FLAG] == target_obj->GetGUID())
     {
         message = GetMangosString(LANG_BG_WS_PICKEDUP_HF);
         type = CHAT_MSG_BG_SYSTEM_ALLIANCE;
@@ -381,7 +381,7 @@ void BattleGroundWS::EventPlayerClickedOnFlag(Player *Source, GameObject* target
     }
 
     //Alliance flag on ground(not in base) (returned or picked up again from ground!)
-    if(this->GetFlagState(ALLIANCE) == BG_WS_FLAG_STATE_ON_GROUND && Source->IsWithinDistInMap(target_obj, 10))
+    if(GetFlagState(ALLIANCE) == BG_WS_FLAG_STATE_ON_GROUND && Source->IsWithinDistInMap(target_obj, 10))
     {
         if(Source->GetTeam() == ALLIANCE)
         {
@@ -410,7 +410,7 @@ void BattleGroundWS::EventPlayerClickedOnFlag(Player *Source, GameObject* target
     }
 
     //Horde flag on ground(not in base) (returned or picked up again)
-    if(this->GetFlagState(HORDE) == BG_WS_FLAG_STATE_ON_GROUND && Source->IsWithinDistInMap(target_obj, 10))
+    if(GetFlagState(HORDE) == BG_WS_FLAG_STATE_ON_GROUND && Source->IsWithinDistInMap(target_obj, 10))
     {
         if(Source->GetTeam() == HORDE)
         {
@@ -455,22 +455,22 @@ void BattleGroundWS::RemovePlayer(Player *plr, uint64 guid)
         if(!plr)
         {
             sLog.outError("BattleGroundWS: Removing offline player who has the FLAG!!");
-            this->SetAllianceFlagPicker(0);
-            this->RespawnFlag(ALLIANCE, false);
+            SetAllianceFlagPicker(0);
+            RespawnFlag(ALLIANCE, false);
         }
         else
-            this->EventPlayerDroppedFlag(plr);
+            EventPlayerDroppedFlag(plr);
     }
     if(IsHordeFlagPickedup() && m_FlagKeepers[BG_TEAM_HORDE] == guid)
     {
         if(!plr)
         {
             sLog.outError("BattleGroundWS: Removing offline player who has the FLAG!!");
-            this->SetHordeFlagPicker(0);
-            this->RespawnFlag(HORDE, false);
+            SetHordeFlagPicker(0);
+            RespawnFlag(HORDE, false);
         }
         else
-            this->EventPlayerDroppedFlag(plr);
+            EventPlayerDroppedFlag(plr);
     }
 }
 

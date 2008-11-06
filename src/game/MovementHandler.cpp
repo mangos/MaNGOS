@@ -110,7 +110,7 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     {
         if( mEntry->IsDungeon() )
         {
-            GetPlayer()->ResurrectPlayer(0.5f,false);
+            GetPlayer()->ResurrectPlayer(0.5f);
             GetPlayer()->SpawnCorpseBones();
             GetPlayer()->SaveToDB();
         }

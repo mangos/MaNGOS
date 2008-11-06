@@ -37,7 +37,7 @@ struct MANGOS_DLL_DECL Traveller
     Traveller(const Traveller &obj) : i_traveller(obj) {}
     Traveller& operator=(const Traveller &obj)
     {
-        this->~Traveller();
+        ~Traveller();
         new (this) Traveller(obj);
         return *this;
     }

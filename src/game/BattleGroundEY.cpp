@@ -133,10 +133,10 @@ void BattleGroundEY::Update(time_t diff)
             /*I used this order of calls, because although we will check if one player is in gameobject's distance 2 times
               but we can count of players on current point in CheckSomeoneLeftPoint
             */
-            this->CheckSomeoneJoinedPoint();
+            CheckSomeoneJoinedPoint();
             //check if player left point
-            this->CheckSomeoneLeftPoint();
-            this->UpdatePointStatuses();
+            CheckSomeoneLeftPoint();
+            UpdatePointStatuses();
             m_TowerCapCheckTimer = BG_EY_FPOINTS_TICK_TIME;
         }
     }
@@ -221,7 +221,7 @@ void BattleGroundEY::CheckSomeoneLeftPoint()
                 {
                     m_PlayersNearPoint[EY_POINTS_MAX].push_back(m_PlayersNearPoint[i][j]);
                     m_PlayersNearPoint[i].erase(m_PlayersNearPoint[i].begin() + j);
-                    this->UpdateWorldStateForPlayer(PROGRESS_BAR_SHOW, BG_EY_PROGRESS_BAR_DONT_SHOW, plr);
+                    UpdateWorldStateForPlayer(PROGRESS_BAR_SHOW, BG_EY_PROGRESS_BAR_DONT_SHOW, plr);
                 }
                 else
                 {
@@ -264,17 +264,17 @@ void BattleGroundEY::UpdatePointStatuses()
             Player *plr = objmgr.GetPlayer(m_PlayersNearPoint[point][i]);
             if (plr)
             {
-                this->UpdateWorldStateForPlayer(PROGRESS_BAR_STATUS, m_PointBarStatus[point], plr);
+                UpdateWorldStateForPlayer(PROGRESS_BAR_STATUS, m_PointBarStatus[point], plr);
                                                             //if point owner changed we must evoke event!
                 if (pointOwnerTeamId != m_PointOwnedByTeam[point])
                 {
                     //point was uncontrolled and player is from team which captured point
                     if (m_PointState[point] == EY_POINT_STATE_UNCONTROLLED && plr->GetTeam() == pointOwnerTeamId)
-                        this->EventTeamCapturedPoint(plr, point);
+                        EventTeamCapturedPoint(plr, point);
 
                     //point was under control and player isn't from team which controlled it
                     if (m_PointState[point] == EY_POINT_UNDER_CONTROL && plr->GetTeam() != m_PointOwnedByTeam[point])
-                        this->EventTeamLostPoint(plr, point);
+                        EventTeamLostPoint(plr, point);
                 }
             }
         }
@@ -350,7 +350,7 @@ void BattleGroundEY::RemovePlayer(Player *plr, uint64 guid)
         if(m_FlagKeeper == guid)
         {
             if(plr)
-                this->EventPlayerDroppedFlag(plr);
+                EventPlayerDroppedFlag(plr);
             else
             {
                 SetFlagPicker(0);
@@ -610,7 +610,7 @@ void BattleGroundEY::EventPlayerDroppedFlag(Player *Source)
 
 void BattleGroundEY::EventPlayerClickedOnFlag(Player *Source, GameObject* target_obj)
 {
-    if(GetStatus() != STATUS_IN_PROGRESS || this->IsFlagPickedup() || !Source->IsWithinDistInMap(target_obj, 10))
+    if(GetStatus() != STATUS_IN_PROGRESS || IsFlagPickedup() || !Source->IsWithinDistInMap(target_obj, 10))
         return;
 
     const char *message;
@@ -750,7 +750,7 @@ void BattleGroundEY::EventTeamCapturedPoint(Player *Source, uint32 Point)
 
 void BattleGroundEY::EventPlayerCapturedFlag(Player *Source, uint32 BgObjectType)
 {
-    if(GetStatus() != STATUS_IN_PROGRESS || this->GetFlagPickerGUID() != Source->GetGUID())
+    if(GetStatus() != STATUS_IN_PROGRESS || GetFlagPickerGUID() != Source->GetGUID())
         return;
 
     uint8 type = 0;

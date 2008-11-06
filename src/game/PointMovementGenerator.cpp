@@ -59,7 +59,7 @@ bool PointMovementGenerator<T>::Update(T &unit, const uint32 &diff)
 }
 
 template<class T>
-void PointMovementGenerator<T>::MovementInform(T &unit)
+void PointMovementGenerator<T>::MovementInform(T& /*unit*/)
 {
 }
 

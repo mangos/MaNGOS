@@ -438,8 +438,6 @@ bool ChatHandler::HandleGonameCommand(const char* args)
         Map* cMap = MapManager::Instance().GetMap(chr->GetMapId(),chr);
         if(cMap->Instanceable())
         {
-            Map* pMap = MapManager::Instance().GetMap(_player->GetMapId(),_player);
-
             // we have to go to instance, and can go to player only if:
             //   1) we are in his group (either as leader or as member)
             //   2) we are not bound to any group and have GM mode on
@@ -1932,7 +1930,6 @@ bool ChatHandler::HandleSendMailCommand(const char* args)
         return false;
     }
 
-    uint32 mailId = objmgr.GenerateMailID();
     uint32 sender_guidlo = m_session->GetPlayer()->GetGUIDLow();
     uint32 messagetype = MAIL_NORMAL;
     uint32 stationery = MAIL_STATIONERY_GM;
