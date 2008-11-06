@@ -375,7 +375,18 @@ Player::Player (WorldSession *session): Unit()
     m_rest_bonus=0;
     rest_type=REST_TYPE_NO;
     ////////////////////Rest System/////////////////////
+    //movement anticheat
+    m_anti_lastmovetime = 0;     //last movement time
+    m_anti_transportGUID = 0;    //current transport GUID
+    m_anti_last_hspeed = 7.0f;   //horizontal speed, default RUN speed
+    m_anti_lastspeed_changetime = 0; //last speed change time
+    m_anti_last_vspeed = -2.0f;  //vertical speed, default max jump height
+    m_anti_beginfalltime = 0;    //alternative falling begin time
+    m_anti_justteleported = 0;   //seted when player was teleported
+    m_anti_teletoplane_count = 0;//Teleport To Plane alarm counter
 
+    m_anti_alarmcount = 0;       //alarm counter
+    /////////////////////////////////
     m_mailsLoaded = false;
     m_mailsUpdated = false;
     unReadMails = 0;
@@ -1432,7 +1443,8 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
         sLog.outError("TeleportTo: invalid map %d or absent instance template.", mapid);
         return false;
     }
-
+    //reset falltimer at teleport
+    m_anti_justteleported = 1;
     // preparing unsummon pet if lost (we must get pet before teleportation or will not find it later)
     Pet* pet = GetPet();
 

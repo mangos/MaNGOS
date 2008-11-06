@@ -70,7 +70,9 @@ float World::m_MaxVisibleDistanceForObject    = DEFAULT_VISIBILITY_DISTANCE;
 float World::m_MaxVisibleDistanceInFlight     = DEFAULT_VISIBILITY_DISTANCE;
 float World::m_VisibleUnitGreyDistance        = 0;
 float World::m_VisibleObjectGreyDistance      = 0;
-
+//movement anticheat
+bool World::m_EnableMvAnticheat = true;
+uint32  World::m_TeleportToPlaneAlarms = 50;
 // ServerMessages.dbc
 enum ServerMessageType
 {
@@ -509,7 +511,17 @@ void World::LoadConfigSettings(bool reload)
         sLog.outError("DurabilityLossChance.Block (%f) must be >=0. Using 0.0 instead.",rate_values[RATE_DURABILITY_LOSS_BLOCK]);
         rate_values[RATE_DURABILITY_LOSS_BLOCK] = 0.0f;
     }
-
+    // movement anticheat
+    m_EnableMvAnticheat = sConfig.GetBoolDefault("Anticheat.Movement.Enable",true);
+    m_TeleportToPlaneAlarms = sConfig.GetIntDefault("Anticheat.Movement.TeleportToPlaneAlarms", 50);
+    if (m_TeleportToPlaneAlarms<20){
+        sLog.outError("Anticheat.Movement.TeleportToPlaneAlarms (%d) must be >=20. Using 20 instead.",m_TeleportToPlaneAlarms);
+        m_TeleportToPlaneAlarms = 20;
+    }
+    if (m_TeleportToPlaneAlarms>100){
+        sLog.outError("Anticheat.Movement.TeleportToPlaneAlarms (%d) must be <=100. Using 100 instead.",m_TeleportToPlaneAlarms);
+        m_TeleportToPlaneAlarms = 100;
+    }
     ///- Read other configuration items from the config file
 
     m_configs[CONFIG_COMPRESSION] = sConfig.GetIntDefault("Compression", 1);
