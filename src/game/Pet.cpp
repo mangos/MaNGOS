@@ -1282,7 +1282,6 @@ bool Pet::addSpell(uint16 spell_id, uint16 active, PetSpellState state, uint16 s
                 ToggleAutocast(itr->first, false);
 
             oldspell_id = itr->first;
-            //removeSpell(itr->first);
             unlearnSpell(itr->first);
             break;
         }
@@ -1340,16 +1339,18 @@ bool Pet::learnSpell(uint16 spell_id)
 
 void Pet::learnLevelupSpells()
 {
-    PetLevelupSpellList const *levelupSpells = spellmgr.GetPetLevelupSpellList(GetCreatureInfo()->family);
+    PetLevelupSpellSet const *levelupSpells = spellmgr.GetPetLevelupSpellList(GetCreatureInfo()->family);
     if(!levelupSpells)
         return;
 
-    for(PetLevelupSpellList::const_iterator itr = levelupSpells->begin(); itr != levelupSpells->end(); ++itr)
+    uint32 level = getLevel();
+
+    for(PetLevelupSpellSet::const_iterator itr = levelupSpells->begin(); itr != levelupSpells->end(); ++itr)
     {
-        if(itr->ReqLevel <= getLevel())
-            learnSpell(itr->SpellId);
+        if(itr->first <= level)
+            learnSpell(itr->second);
         else
-            unlearnSpell(itr->SpellId);
+            unlearnSpell(itr->second);
     }
 }
 

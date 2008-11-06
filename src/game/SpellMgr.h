@@ -626,14 +626,8 @@ typedef std::multimap<uint32, SpellLearnSpellNode> SpellLearnSpellMap;
 
 typedef std::multimap<uint32, SkillLineAbilityEntry const*> SkillLineAbilityMap;
 
-struct PetLevelupSpell
-{
-    uint32 SpellId;
-    uint32 ReqLevel;
-};
-
-typedef std::vector<PetLevelupSpell> PetLevelupSpellList;
-typedef std::map<uint32, PetLevelupSpellList> PetLevelupSpellMap;
+typedef std::map<uint32, uint32> PetLevelupSpellSet;
+typedef std::map<uint32, PetLevelupSpellSet> PetLevelupSpellMap;
 
 inline bool IsPrimaryProfessionSkill(uint32 skill)
 {
@@ -850,7 +844,7 @@ class SpellMgr
                 return NULL;
         }
 
-        PetLevelupSpellList const* GetPetLevelupSpellList(uint32 petFamily) const
+        PetLevelupSpellSet const* GetPetLevelupSpellList(uint32 petFamily) const
         {
             PetLevelupSpellMap::const_iterator itr = mPetLevelupSpellMap.find(petFamily);
             if(itr != mPetLevelupSpellMap.end())

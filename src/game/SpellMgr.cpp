@@ -1970,7 +1970,6 @@ void SpellMgr::LoadSpellPetAuras()
 
 void SpellMgr::LoadPetLevelupSpellMap()
 {
-    PetLevelupSpell petSpell;
     CreatureFamilyEntry const *creatureFamily;
     SpellEntry const *spell;
     uint32 count = 0;
@@ -2140,10 +2139,7 @@ void SpellMgr::LoadPetLevelupSpellMap()
                     }
             }
 
-            petSpell.SpellId = spell->Id;
-            petSpell.ReqLevel = spell->spellLevel;
-
-            mPetLevelupSpellMap[creatureFamily->ID].push_back(petSpell);
+            mPetLevelupSpellMap[creatureFamily->ID][spell->spellLevel] = spell->Id;
             count++;
         }
     }
