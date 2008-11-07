@@ -321,6 +321,20 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                     continue;
                 SetCriteriaProgress(achievementCriteria, 1, true);
                 break;
+            case ACHIEVEMENT_CRITERIA_TYPE_OWN_ITEM:
+                // speedup for non-login case
+                if(miscvalue1 && achievementCriteria->own_item.itemID!=miscvalue1)
+                    continue;
+                SetCriteriaProgress(achievementCriteria, GetPlayer()->GetItemCount(achievementCriteria->own_item.itemID, true));
+                break;
+            case ACHIEVEMENT_CRITERIA_TYPE_LOOT_ITEM:
+                // You _have_ to loot that item, just owning it when logging in does _not_ count!
+                if(!miscvalue1)
+                    continue;
+                if(miscvalue1 != achievementCriteria->own_item.itemID)
+                    continue;
+                SetCriteriaProgress(achievementCriteria, miscvalue2, true);
+                break;
         }
         if(IsCompletedCriteria(achievementCriteria))
             CompletedCriteria(achievementCriteria);
@@ -395,6 +409,10 @@ bool AchievementMgr::IsCompletedCriteria(AchievementCriteriaEntry const* achieve
             return progress->counter >= 1;
         case ACHIEVEMENT_CRITERIA_TYPE_USE_ITEM:
             return progress->counter >= achievementCriteria->use_item.itemCount;
+        case ACHIEVEMENT_CRITERIA_TYPE_OWN_ITEM:
+            return progress->counter >= achievementCriteria->own_item.itemCount;
+        case ACHIEVEMENT_CRITERIA_TYPE_LOOT_ITEM:
+            return progress->counter >= achievementCriteria->loot_item.itemCount;
 
         // handle all statistic-only criteria here
         case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_BATTLEGROUND:

@@ -332,9 +332,12 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
 
 void WorldSession::HandleCancelCastOpcode(WorldPacket& recvPacket)
 {
-    CHECK_PACKET_SIZE(recvPacket,4);
+    CHECK_PACKET_SIZE(recvPacket,5);
 
+    // increments with every CANCEL packet, don't use for now
+    uint8 counter;
     uint32 spellId;
+    recvPacket >> counter;
     recvPacket >> spellId;
 
     //FIXME: hack, ignore unexpected client cancel Deadly Throw cast

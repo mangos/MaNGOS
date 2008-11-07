@@ -13054,6 +13054,7 @@ void Player::ItemAddedQuestCheck( uint32 entry, uint32 count )
         }
     }
     UpdateForQuestsGO();
+    GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_OWN_ITEM, entry);
 }
 
 void Player::ItemRemovedQuestCheck( uint32 entry, uint32 count )

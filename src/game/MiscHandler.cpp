@@ -1672,7 +1672,7 @@ void WorldSession::HandleSpellClick( WorldPacket & recv_data )
 
 void WorldSession::HandleInspectAchievements( WorldPacket & recv_data )
 {
-    sLog.outString("WorldSession::HandleInspectAchievements");
+    CHECK_PACKET_SIZE(recv_data, 1);
     uint64 guid;
     if(!readGUID(recv_data, guid))
         return;
