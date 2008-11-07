@@ -30,6 +30,7 @@
 #include "AccountMgr.h"
 #include "SystemConfig.h"
 #include "revision.h"
+#include "revision_nr.h"
 #include "Util.h"
 
 bool ChatHandler::HandleHelpCommand(const char* args)
@@ -95,9 +96,9 @@ bool ChatHandler::HandleServerInfoCommand(const char* /*args*/)
 
     char const* full;
     if(m_session)
-        full = _FULLVERSION(REVISION_DATE,REVISION_TIME,"|cffffffff|Hurl:" REVISION_ID "|h" REVISION_ID "|h|r");
+        full = _FULLVERSION(REVISION_DATE,REVISION_TIME,REVISION_NR,"|cffffffff|Hurl:" REVISION_ID "|h" REVISION_ID "|h|r");
     else
-        full = _FULLVERSION(REVISION_DATE,REVISION_TIME,REVISION_ID);
+        full = _FULLVERSION(REVISION_DATE,REVISION_TIME,REVISION_NR,REVISION_ID);
 
     SendSysMessage(full);
     PSendSysMessage(LANG_USING_SCRIPT_LIB,sWorld.GetScriptsVersion());

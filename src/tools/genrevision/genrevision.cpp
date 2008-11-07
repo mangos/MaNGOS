@@ -75,9 +75,9 @@ void extractDataFromGit(FILE* EntriesFile, std::string path, bool url, RawData& 
 
     if(!found)
     {
-        strcpy(data.rev_str,"Unknown");
-        strcpy(data.date_str,"Unknown");
-        strcpy(data.time_str,"Unknown");
+        strcpy(data.rev_str,"*");
+        strcpy(data.date_str,"*");
+        strcpy(data.time_str,"*");
         return;
     }
 
@@ -154,14 +154,14 @@ void extractDataFromGit(FILE* EntriesFile, std::string path, bool url, RawData& 
         }
         else
         {
-            strcpy(data.date_str,"Unknown");
-            strcpy(data.time_str,"Unknown");
+            strcpy(data.date_str,"*");
+            strcpy(data.time_str,"*");
         }
     }
     else
     {
-        strcpy(data.date_str,"Unknown");
-        strcpy(data.time_str,"Unknown");
+        strcpy(data.date_str,"*");
+        strcpy(data.time_str,"*");
     }
 }
 
@@ -275,7 +275,7 @@ int main(int argc, char **argv)
         if(res)
             newData = generateHeader(data.rev_str,data.date_str,data.time_str);
         else
-            newData = generateHeader("Unknown", "Unknown", "Unknown");
+            newData = generateHeader("*", "*", "*");
     }
 
     /// get existed header data for compare
