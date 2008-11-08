@@ -384,10 +384,15 @@ void Unit::SendMonsterMoveByPath(Path const& path, uint32 start, uint32 end, uin
 
     WorldPacket data( SMSG_MONSTER_MOVE, (GetPackGUID().size()+4+4+4+4+1+4+4+4+pathSize*4*3) );
     data.append(GetPackGUID());
-    data << GetPositionX( )
-        << GetPositionY( )
-        << GetPositionZ( );
-    data << GetOrientation( );
+    data << GetPositionX();
+    data << GetPositionY();
+    data << GetPositionZ();
+
+    // unknown field - unrelated to orientation
+    // seems to increment about 1000 for every 1.7 seconds
+    // for now, we'll just use mstime
+    data << getMSTime();
+
     data << uint8( 0 );
     data << uint32( MovementFlags );
     data << uint32( traveltime );

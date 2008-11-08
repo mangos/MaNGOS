@@ -15,6 +15,7 @@
 #include <dbghelp.h>
 #include "WheatyExceptionReport.h"
 #include "revision.h"
+#include "revision_nr.h"
 #define CrashFolder _T("Crashs")
 //#pragma comment(linker, "/defaultlib:dbghelp.lib")
 
@@ -385,7 +386,7 @@ PEXCEPTION_POINTERS pExceptionInfo )
     GetLocalTime(&systime);
 
     // Start out with a banner
-    _tprintf(_T("Revision: %s %s %s\r\n"), REVISION_DATE, REVISION_TIME, REVISION_ID);
+    _tprintf(_T("Revision: %s %s %s %s\r\n"), REVISION_DATE, REVISION_TIME, REVISION_NR, REVISION_ID);
     _tprintf(_T("Date %u:%u:%u. Time %u:%u \r\n"), systime.wDay, systime.wMonth, systime.wYear, systime.wHour, systime.wMinute);
     PEXCEPTION_RECORD pExceptionRecord = pExceptionInfo->ExceptionRecord;
 
