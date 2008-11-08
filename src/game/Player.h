@@ -862,7 +862,7 @@ class MANGOS_DLL_SPEC PlayerTaxi
         PlayerTaxi();
         ~PlayerTaxi() {}
         // Nodes
-        void InitTaxiNodesForLevel(uint32 race, uint32 level);
+        void InitTaxiNodesForLevel(uint32 race, uint32 chrClass, uint32 level);
         void LoadTaxiMask(const char* data);
         void SaveTaxiMask(const char* data);
 
@@ -972,7 +972,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         PlayerSocial *GetSocial() { return m_social; }
 
         PlayerTaxi m_taxi;
-        void InitTaxiNodesForLevel() { m_taxi.InitTaxiNodesForLevel(getRace(),getLevel()); }
+        void InitTaxiNodesForLevel() { m_taxi.InitTaxiNodesForLevel(getRace(), getClass(), getLevel()); }
         bool ActivateTaxiPathTo(std::vector<uint32> const& nodes, uint32 mount_id = 0 , Creature* npc = NULL);
                                                             // mount_id can be used in scripting calls
         bool isAcceptTickets() const { return GetSession()->GetSecurity() >= SEC_GAMEMASTER && (m_ExtraFlags & PLAYER_EXTRA_GM_ACCEPT_TICKETS); }

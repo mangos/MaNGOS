@@ -127,7 +127,7 @@ PlayerTaxi::PlayerTaxi()
     memset(m_taximask, 0, sizeof(m_taximask));
 }
 
-void PlayerTaxi::InitTaxiNodesForLevel(uint32 race, uint32 level)
+void PlayerTaxi::InitTaxiNodesForLevel(uint32 race, uint32 chrClass, uint32 level)
 {
     // capital and taxi hub masks
     switch(race)
@@ -144,6 +144,13 @@ void PlayerTaxi::InitTaxiNodesForLevel(uint32 race, uint32 level)
         case RACE_BLOODELF: SetTaximaskNode(82); break;     // Blood Elf
         case RACE_DRAENEI:  SetTaximaskNode(94); break;     // Draenei
     }
+
+    switch(chrClass)
+    {
+        case CLASS_DEATH_KNIGHT:                            // TODO: figure out initial known nodes
+            break;
+    }
+
     // new continent starting masks (It will be accessible only at new map)
     switch(Player::TeamForRace(race))
     {
@@ -796,7 +803,7 @@ void Player::HandleDrowning()
             m_isunderwater|= 0x04;
             StartMirrorTimer(BREATH_TIMER, UnderWaterTime);
         }
-        //continius trigger drowning "Damage"
+        //continuous trigger drowning "Damage"
         if ((m_breathTimer == 0) && (m_isunderwater & 0x01))
         {
             //TODO: Check this formula
@@ -918,7 +925,7 @@ void Player::SetDrunkValue(uint16 newDrunkenValue, uint32 itemId)
         return;
 
     WorldPacket data(SMSG_CROSSED_INEBRIATION_THRESHOLD, (8+4+4));
-    data << GetGUID();
+    data << uint64(GetGUID());
     data << uint32(newDrunkenState);
     data << uint32(itemId);
 
@@ -2736,8 +2743,6 @@ bool Player::addSpell(uint32 spell_id, bool active, bool learning, bool loading,
                 continue;
 
             if(_spell_idx->second->learnOnGetSkill == ABILITY_LEARNED_ON_GET_RACE_OR_CLASS_SKILL ||
-                // poison special case, not have ABILITY_LEARNED_ON_GET_RACE_OR_CLASS_SKILL
-                pSkill->id==SKILL_POISONS && _spell_idx->second->max_value==0 ||
                 // lockpicking special case, not have ABILITY_LEARNED_ON_GET_RACE_OR_CLASS_SKILL
                 pSkill->id==SKILL_LOCKPICKING && _spell_idx->second->max_value==0 )
             {
@@ -2919,8 +2924,6 @@ void Player::removeSpell(uint32 spell_id, bool disabled)
                 continue;
 
             if(_spell_idx->second->learnOnGetSkill == ABILITY_LEARNED_ON_GET_RACE_OR_CLASS_SKILL ||
-                // poison special case, not have ABILITY_LEARNED_ON_GET_RACE_OR_CLASS_SKILL
-                pSkill->id==SKILL_POISONS && _spell_idx->second->max_value==0 ||
                 // lockpicking special case, not have ABILITY_LEARNED_ON_GET_RACE_OR_CLASS_SKILL
                 pSkill->id==SKILL_LOCKPICKING && _spell_idx->second->max_value==0 )
             {
@@ -4646,6 +4649,7 @@ bool Player::UpdateGatherSkill(uint32 SkillId, uint32 SkillValue, uint32 RedLeve
         case SKILL_HERBALISM:
         case SKILL_LOCKPICKING:
         case SKILL_JEWELCRAFTING:
+        case SKILL_INSCRIPTION:
             return UpdateSkillPro(SkillId, SkillGainChance(SkillValue, RedLevel+100, RedLevel+50, RedLevel+25)*Multiplicator,gathering_skill_gain);
         case SKILL_SKINNING:
             if( sWorld.getConfig(CONFIG_SKILL_CHANCE_SKINNING_STEPS)==0)

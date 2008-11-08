@@ -313,27 +313,27 @@ pAuraHandler AuraHandler[TOTAL_AURAS]=
     &Aura::HandleNULL,                                      //260
     &Aura::HandleNULL,                                      //261 out of phase?
     &Aura::HandleNULL,                                      //262
-    &Aura::HandleNULL,                                      //263
-    &Aura::HandleNULL,                                      //264
-    &Aura::HandleNULL,                                      //265
-    &Aura::HandleNULL,                                      //266
-    &Aura::HandleNULL,                                      //267
-    &Aura::HandleNULL,                                      //268
-    &Aura::HandleNULL,                                      //269
+    &Aura::HandleNULL,                                      //263 melee AOE
+    &Aura::HandleNULL,                                      //264 unused
+    &Aura::HandleNULL,                                      //265 unused
+    &Aura::HandleNULL,                                      //266 unused
+    &Aura::HandleNULL,                                      //267 some immunity?
+    &Aura::HandleNULL,                                      //268 attack power from stat X
+    &Aura::HandleNULL,                                      //269 ignore DR effects?
     &Aura::HandleNULL,                                      //270
-    &Aura::HandleNULL,                                      //271
-    &Aura::HandleNULL,                                      //272
+    &Aura::HandleNULL,                                      //271 increase damage done?
+    &Aura::HandleNULL,                                      //272 reduce spell cast time?
     &Aura::HandleNULL,                                      //273
-    &Aura::HandleNULL,                                      //274
-    &Aura::HandleNULL,                                      //275
-    &Aura::HandleNULL,                                      //276
-    &Aura::HandleNULL,                                      //277
-    &Aura::HandleNULL,                                      //278
+    &Aura::HandleNULL,                                      //274 proc free shot?
+    &Aura::HandleNULL,                                      //275 ignore shapeshift?
+    &Aura::HandleNULL,                                      //276 mod damage % mechanic?
+    &Aura::HandleNULL,                                      //277 increase max targets?
+    &Aura::HandleNULL,                                      //278 disarm/silence
     &Aura::HandleNULL,                                      //279
-    &Aura::HandleNULL,                                      //280
-    &Aura::HandleNULL,                                      //281
+    &Aura::HandleNULL,                                      //280 ignore armor?
+    &Aura::HandleNULL,                                      //281 increase honor gain?
     &Aura::HandleNULL,                                      //282
-    &Aura::HandleNULL                                       //283
+    &Aura::HandleNULL                                       //283 SPD/heal from AP?
 };
 
 Aura::Aura(SpellEntry const* spellproto, uint32 eff, int32 *currentBasePoints, Unit *target, Unit *caster, Item* castItem) :

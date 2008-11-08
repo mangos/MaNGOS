@@ -702,11 +702,11 @@ enum Mechanics
 {
     MECHANIC_NONE             = 0,
     MECHANIC_CHARM            = 1,
-    MECHANIC_CONFUSED         = 2,
+    MECHANIC_DISORIENTED      = 2,
     MECHANIC_DISARM           = 3,
     MECHANIC_DISTRACT         = 4,
     MECHANIC_FEAR             = 5,
-    MECHANIC_FUMBLE           = 6,
+    MECHANIC_GRIP             = 6,
     MECHANIC_ROOT             = 7,
     MECHANIC_PACIFY           = 8,                          //0 spells use this mechanic
     MECHANIC_SILENCE          = 9,
@@ -722,7 +722,7 @@ enum Mechanics
     MECHANIC_SHIELD           = 19,
     MECHANIC_SHACKLE          = 20,
     MECHANIC_MOUNT            = 21,
-    MECHANIC_PERSUADE         = 22,                         //0 spells use this mechanic
+    MECHANIC_INFECTED         = 22,                         //0 spells use this mechanic
     MECHANIC_TURN             = 23,
     MECHANIC_HORROR           = 24,
     MECHANIC_INVULNERABILITY  = 25,
@@ -730,12 +730,13 @@ enum Mechanics
     MECHANIC_DAZE             = 27,
     MECHANIC_DISCOVERY        = 28,
     MECHANIC_IMMUNE_SHIELD    = 29,                         // Divine (Blessing) Shield/Protection and Ice Block
-    MECHANIC_SAPPED           = 30
+    MECHANIC_SAPPED           = 30,
+    MECHANIC_ENRAGED          = 31
 };
 
 // Used for spell 42292 Immune Movement Impairment and Loss of Control (0x49967da6)
 #define IMMUNE_TO_MOVEMENT_IMPAIRMENT_AND_LOSS_CONTROL_MASK ( \
-    (1<<MECHANIC_CHARM   )|(1<<MECHANIC_CONFUSED )|(1<<MECHANIC_FEAR  )| \
+    (1<<MECHANIC_CHARM   )|(1<<MECHANIC_DISORIENTED )|(1<<MECHANIC_FEAR  )| \
     (1<<MECHANIC_ROOT    )|(1<<MECHANIC_PACIFY   )|(1<<MECHANIC_SLEEP )| \
     (1<<MECHANIC_SNARE   )|(1<<MECHANIC_STUN     )|(1<<MECHANIC_FREEZE)| \
     (1<<MECHANIC_KNOCKOUT)|(1<<MECHANIC_POLYMORPH)|(1<<MECHANIC_BANISH)| \
@@ -755,7 +756,8 @@ enum DispelType
     DISPEL_ALL          = 7,
     DISPEL_SPE_NPC_ONLY = 8,
     DISPEL_ENRAGE       = 9,
-    DISPEL_ZG_TICKET    = 10
+    DISPEL_ZG_TICKET    = 10,
+    DESPEL_OLD_UNUSED   = 11
 };
 
 #define DISPEL_ALL_MASK ( (1<<DISPEL_MAGIC) | (1<<DISPEL_CURSE) | (1<<DISPEL_DISEASE) | (1<<DISPEL_POISON) )
@@ -839,7 +841,7 @@ enum SpellMissInfo
     SPELL_MISS_IMMUNE2                 = 8,
     SPELL_MISS_DEFLECT                 = 9,
     SPELL_MISS_ABSORB                  = 10,
-    SPELL_MISS_REFLECT                 = 11,
+    SPELL_MISS_REFLECT                 = 11
 };
 
 enum SpellHitType
@@ -1539,7 +1541,6 @@ enum CreatureFamily
     CREATURE_FAMILY_SPOREBAT       = 33,
     CREATURE_FAMILY_NETHER_RAY     = 34,
     CREATURE_FAMILY_SERPENT        = 35,
-    //CREATURE_FAMILY_SEA_LION       = 36
     CREATURE_FAMILY_MOTH           = 37,
     CREATURE_FAMILY_CHIMAERA       = 38,
     CREATURE_FAMILY_DEVILSAUR      = 39,
@@ -1556,7 +1557,7 @@ enum CreatureTypeFlags
 {
     CREATURE_TYPEFLAGS_TAMEBLE    = 0x0001,
     CREATURE_TYPEFLAGS_HERBLOOT   = 0x0100,
-    CREATURE_TYPEFLAGS_MININGLOOT = 0x0200,
+    CREATURE_TYPEFLAGS_MININGLOOT = 0x0200
 };
 
 enum CreatureEliteType
@@ -1632,15 +1633,16 @@ inline uint8 ClassByQuestSort(int32 QuestSort)
 {
     switch(QuestSort)
     {
-        case QUEST_SORT_WARLOCK: return CLASS_WARLOCK;
-        case QUEST_SORT_WARRIOR: return CLASS_WARRIOR;
-        case QUEST_SORT_SHAMAN:  return CLASS_SHAMAN;
-        case QUEST_SORT_PALADIN: return CLASS_PALADIN;
-        case QUEST_SORT_MAGE:    return CLASS_MAGE;
-        case QUEST_SORT_ROGUE:   return CLASS_ROGUE;
-        case QUEST_SORT_HUNTER:  return CLASS_HUNTER;
-        case QUEST_SORT_PRIEST:  return CLASS_PRIEST;
-        case QUEST_SORT_DRUID:   return CLASS_DRUID;
+        case QUEST_SORT_WARLOCK:        return CLASS_WARLOCK;
+        case QUEST_SORT_WARRIOR:        return CLASS_WARRIOR;
+        case QUEST_SORT_SHAMAN:         return CLASS_SHAMAN;
+        case QUEST_SORT_PALADIN:        return CLASS_PALADIN;
+        case QUEST_SORT_MAGE:           return CLASS_MAGE;
+        case QUEST_SORT_ROGUE:          return CLASS_ROGUE;
+        case QUEST_SORT_HUNTER:         return CLASS_HUNTER;
+        case QUEST_SORT_PRIEST:         return CLASS_PRIEST;
+        case QUEST_SORT_DRUID:          return CLASS_DRUID;
+        case QUEST_SORT_DEATH_KNIGHT:   return CLASS_DEATH_KNIGHT;
     }
     return 0;
 }
@@ -1652,7 +1654,6 @@ enum SkillType
     SKILL_ARMS                     = 26,
     SKILL_COMBAT                   = 38,
     SKILL_SUBTLETY                 = 39,
-    SKILL_POISONS                  = 40,
     SKILL_SWORDS                   = 43,
     SKILL_AXES                     = 44,
     SKILL_BOWS                     = 45,
@@ -1660,8 +1661,8 @@ enum SkillType
     SKILL_BEAST_MASTERY            = 50,
     SKILL_SURVIVAL                 = 51,
     SKILL_MACES                    = 54,
-    SKILL_HOLY                     = 56,
     SKILL_2H_SWORDS                = 55,
+    SKILL_HOLY                     = 56,
     SKILL_SHADOW                   = 78,
     SKILL_DEFENSE                  = 95,
     SKILL_LANG_COMMON              = 98,
@@ -1717,24 +1718,20 @@ enum SkillType
     SKILL_PET_BOAR                 = 211,
     SKILL_PET_CROCILISK            = 212,
     SKILL_PET_CARRION_BIRD         = 213,
-    SKILL_PET_GORILLA              = 215,
     SKILL_PET_CRAB                 = 214,
+    SKILL_PET_GORILLA              = 215,
     SKILL_PET_RAPTOR               = 217,
     SKILL_PET_TALLSTRIDER          = 218,
     SKILL_RACIAL_UNDED             = 220,
-    SKILL_WEAPON_TALENTS           = 222,
     SKILL_CROSSBOWS                = 226,
-    SKILL_SPEARS                   = 227,
     SKILL_WANDS                    = 228,
     SKILL_POLEARMS                 = 229,
     SKILL_PET_SCORPID              = 236,
     SKILL_ARCANE                   = 237,
-    SKILL_OPEN_LOCK                = 242,
     SKILL_PET_TURTLE               = 251,
     SKILL_ASSASSINATION            = 253,
     SKILL_FURY                     = 256,
     SKILL_PROTECTION               = 257,
-    SKILL_BEAST_TRAINING           = 261,
     SKILL_PROTECTION2              = 267,
     SKILL_PET_TALENTS              = 270,
     SKILL_PLATE_MAIL               = 293,
@@ -1764,7 +1761,7 @@ enum SkillType
     SKILL_LOCKPICKING              = 633,
     SKILL_PET_BAT                  = 653,
     SKILL_PET_HYENA                = 654,
-    SKILL_PET_OWL                  = 655,
+    SKILL_PET_BIRD_OF_PREY         = 655,
     SKILL_PET_WIND_SERPENT         = 656,
     SKILL_LANG_GUTTERSPEAK         = 673,
     SKILL_RIDING_KODO              = 713,
@@ -1784,10 +1781,27 @@ enum SkillType
     SKILL_PET_WARP_STALKER         = 766,
     SKILL_PET_RAVAGER              = 767,
     SKILL_PET_SERPENT              = 768,
-    SKILL_INTERNAL                 = 769
+    SKILL_INTERNAL                 = 769,
+    SKILL_DK_BLOOD                 = 770,
+    SKILL_DK_FROST                 = 771,
+    SKILL_DK_UNHOLY                = 772,
+    SKILL_INSCRIPTION              = 773,
+    SKILL_PET_MOTH                 = 775,
+    SKILL_RUNEFORGING              = 776,
+    SKILL_MOUNTS                   = 777,
+    SKILL_COMPANIONS               = 778,
+    SKILL_PET_EXOTIC_CHIMAERA      = 780,
+    SKILL_PET_EXOTIC_DEVILSAUR     = 781,
+    SKILL_PET_GHOUL                = 782,
+    SKILL_PET_EXOTIC_SILITHID      = 783,
+    SKILL_PET_EXOTIC_WORM          = 784,
+    SKILL_PET_WASP                 = 785,
+    SKILL_PET_EXOTIC_RHINO         = 786,
+    SKILL_PET_EXOTIC_CORE_HOUND    = 787,
+    SKILL_PET_EXOTIC_SPIRIT_BEAST  = 788
 };
 
-#define MAX_SKILL_TYPE               770
+#define MAX_SKILL_TYPE               789
 
 inline uint32 SkillByQuestSort(int32 QuestSort)
 {
@@ -1802,25 +1816,26 @@ inline uint32 SkillByQuestSort(int32 QuestSort)
         case QUEST_SORT_TAILORING:      return SKILL_TAILORING;
         case QUEST_SORT_COOKING:        return SKILL_COOKING;
         case QUEST_SORT_FIRST_AID:      return SKILL_FIRST_AID;
+        case QUEST_SORT_JEWELCRAFTING:  return SKILL_JEWELCRAFTING;
     }
     return 0;
 }
 
 enum SkillCategory
 {
-    SKILL_CATEGORY_ATTRIBUTES    =  5,
-    SKILL_CATEGORY_WEAPON        =  6,
-    SKILL_CATEGORY_CLASS         =  7,
-    SKILL_CATEGORY_ARMOR         =  8,
-    SKILL_CATEGORY_SECONDARY     =  9,                      // secondary professions
+    SKILL_CATEGORY_ATTRIBUTES    = 5,
+    SKILL_CATEGORY_WEAPON        = 6,
+    SKILL_CATEGORY_CLASS         = 7,
+    SKILL_CATEGORY_ARMOR         = 8,
+    SKILL_CATEGORY_SECONDARY     = 9,                       // secondary professions
     SKILL_CATEGORY_LANGUAGES     = 10,
     SKILL_CATEGORY_PROFESSION    = 11,                      // primary professions
-    SKILL_CATEGORY_NOT_DISPLAYED = 12
+    SKILL_CATEGORY_GENERIC       = 12
 };
 
 enum TotemCategory
 {
-    TC_SKINNING_SKIFE              = 1,
+    TC_SKINNING_SKIFE_OLD          = 1,
     TC_EARTH_TOTEM                 = 2,
     TC_AIR_TOTEM                   = 3,
     TC_FIRE_TOTEM                  = 4,
@@ -1830,16 +1845,28 @@ enum TotemCategory
     TC_GOLDEN_ROD                  = 8,
     TC_TRUESILVER_ROD              = 9,
     TC_ARCANITE_ROD                = 10,
-    TC_MINING_PICK                 = 11,
+    TC_MINING_PICK_OLD             = 11,
     TC_PHILOSOPHERS_STONE          = 12,
-    TC_BLACKSMITH_HAMMER           = 13,
+    TC_BLACKSMITH_HAMMER_OLD       = 13,
     TC_ARCLIGHT_SPANNER            = 14,
     TC_GYROMATIC_MA                = 15,
     TC_MASTER_TOTEM                = 21,
     TC_FEL_IRON_ROD                = 41,
     TC_ADAMANTITE_ROD              = 62,
-    TC_ETERNIUM_ROD                = 63
-    // TODO: Add new wotlk
+    TC_ETERNIUM_ROD                = 63,
+    TC_HOLLOW_QUILL                = 81,
+    TC_RUNED_AZURITE_ROD           = 101,
+    TC_VIRTUOSO_INKING_SET         = 121,
+    TC_DRUMS                       = 141,
+    TC_GNOMISH_ARMY_KNIFE          = 161,
+    TC_BLACKSMITH_HAMMER           = 162,
+    TC_MINING_PICK                 = 165,
+    TC_SKINNING_KNIFE              = 166,
+    TC_HAMMER_PICK                 = 167,
+    TC_BLADED_PICKAXE              = 168,
+    TC_FLINT_AND_TINDER            = 169,
+    TC_RUNED_COBALT_ROD            = 189,
+    TC_RUNED_TITANIUM_ROD          = 190
 };
 
 enum UnitDynFlags
@@ -1849,7 +1876,8 @@ enum UnitDynFlags
     UNIT_DYNFLAG_OTHER_TAGGER      = 0x0004,
     UNIT_DYNFLAG_ROOTED            = 0x0008,
     UNIT_DYNFLAG_SPECIALINFO       = 0x0010,
-    UNIT_DYNFLAG_DEAD              = 0x0020
+    UNIT_DYNFLAG_DEAD              = 0x0020,
+    UNIT_DYNFLAG_REFER_A_FRIEND    = 0x0040
 };
 
 enum CorpseDynFlags

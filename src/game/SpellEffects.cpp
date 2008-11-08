@@ -210,12 +210,12 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS]=
     &Spell::EffectTriggerRitualOfSummoning,                 //151 SPELL_EFFECT_TRIGGER_SPELL_2
     &Spell::EffectNULL,                                     //152 SPELL_EFFECT_152                      summon Refer-a-Friend
     &Spell::EffectNULL,                                     //153 SPELL_EFFECT_CREATE_PET               misc value is creature entry
-    &Spell::EffectNULL,                                     //154
+    &Spell::EffectNULL,                                     //154 unused
     &Spell::EffectNULL,                                     //155 Allows you to equip two-handed axes, maces and swords in one hand, but you attack $49152s1% slower than normal.
-    &Spell::EffectNULL,                                     //156 Test Add Sockets Enchant
-    &Spell::EffectNULL,                                     //157
-    &Spell::EffectNULL,                                     //158
-    &Spell::EffectNULL                                      //159
+    &Spell::EffectNULL,                                     //156 Add Socket
+    &Spell::EffectNULL,                                     //157 create/learn random item/spell for profession
+    &Spell::EffectNULL,                                     //158 milling
+    &Spell::EffectNULL                                      //159 allow rename pet once again
 };
 
 void Spell::EffectNULL(uint32 /*i*/)
