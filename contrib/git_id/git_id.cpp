@@ -4,14 +4,16 @@
 #include <string>
 #include <sstream>
 #include <assert.h>
-#include <direct.h>
 #include "../../src/framework/Platform/CompilerDefs.h"
 
 #if PLATFORM == PLATFORM_WINDOWS
+#include <direct.h>
 #define popen _popen
 #define pclose _pclose
 #define snprintf _snprintf
 #pragma warning (disable:4996)
+#else
+#include <unistd.h>
 #endif
 
 #define NUM_REMOTES 2
