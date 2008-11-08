@@ -36,8 +36,8 @@ struct CriteriaProgress
     time_t date;
 };
 
-typedef HM_NAMESPACE::hash_map<uint32, CriteriaProgress*> CriteriaProgressMap;
-typedef HM_NAMESPACE::hash_map<uint32, time_t> CompletedAchievementMap;
+typedef UNORDERED_MAP<uint32, CriteriaProgress*> CriteriaProgressMap;
+typedef UNORDERED_MAP<uint32, time_t> CompletedAchievementMap;
 
 class Player;
 class WorldPacket;
