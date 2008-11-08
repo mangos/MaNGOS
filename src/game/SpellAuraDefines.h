@@ -336,6 +336,7 @@ enum AuraType
 enum AreaAuraType
 {
     AREA_AURA_PARTY,
+    AREA_AURA_RAID,
     AREA_AURA_FRIEND,
     AREA_AURA_ENEMY,
     AREA_AURA_PET,

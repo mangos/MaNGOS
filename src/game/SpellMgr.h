@@ -377,6 +377,7 @@ inline bool IsAreaOfEffectSpell(SpellEntry const *spellInfo)
 inline bool IsAreaAuraEffect(uint32 effect)
 {
     if( effect == SPELL_EFFECT_APPLY_AREA_AURA_PARTY    ||
+        effect == SPELL_EFFECT_APPLY_AREA_AURA_RAID     ||
         effect == SPELL_EFFECT_APPLY_AREA_AURA_FRIEND   ||
         effect == SPELL_EFFECT_APPLY_AREA_AURA_ENEMY    ||
         effect == SPELL_EFFECT_APPLY_AREA_AURA_PET      ||

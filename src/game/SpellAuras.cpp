@@ -452,6 +452,11 @@ Unit *caster, Item* castItem) : Aura(spellproto, eff, currentBasePoints, target,
             if(target->GetTypeId() == TYPEID_UNIT && ((Creature*)target)->isTotem())
                 m_modifier.m_auraname = SPELL_AURA_NONE;
             break;
+        case SPELL_EFFECT_APPLY_AREA_AURA_RAID:
+            m_areaAuraType = AREA_AURA_RAID;
+            if(target->GetTypeId() == TYPEID_UNIT && ((Creature*)target)->isTotem())
+                m_modifier.m_auraname = SPELL_AURA_NONE;
+            break;
         case SPELL_EFFECT_APPLY_AREA_AURA_FRIEND:
             m_areaAuraType = AREA_AURA_FRIEND;
             break;
@@ -682,6 +687,41 @@ void AreaAura::Update(uint32 diff)
                     }
                     break;
                 }
+                case AREA_AURA_RAID:
+                {
+                    Group *pGroup = NULL;
+
+                    if (owner->GetTypeId() == TYPEID_PLAYER)
+                        pGroup = ((Player*)owner)->GetGroup();
+
+                    if( pGroup)
+                    {
+                        uint8 subgroup = ((Player*)owner)->GetSubGroup();
+                        for(GroupReference *itr = pGroup->GetFirstMember(); itr != NULL; itr = itr->next())
+                        {
+                            Player* Target = itr->getSource();
+                            if(Target && Target->isAlive() && caster->IsFriendlyTo(Target))
+                            {
+                                if(caster->IsWithinDistInMap(Target, m_radius))
+                                    targets.push_back(Target);
+                                Pet *pet = Target->GetPet();
+                                if(pet && pet->isAlive() && caster->IsWithinDistInMap(pet, m_radius))
+                                    targets.push_back(pet);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // add owner
+                        if( owner != caster && caster->IsWithinDistInMap(owner, m_radius) )
+                            targets.push_back(owner);
+                        // add caster's pet
+                        Unit* pet = caster->GetPet();
+                        if( pet && caster->IsWithinDistInMap(pet, m_radius))
+                            targets.push_back(pet);
+                    }
+                    break;
+                }
                 case AREA_AURA_FRIEND:
                 {
                     CellPair p(MaNGOS::ComputeCellPair(caster->GetPositionX(), caster->GetPositionY()));
@@ -775,6 +815,24 @@ void AreaAura::Update(uint32 diff)
                 {
                     Player* checkTarget = tmp_target->GetCharmerOrOwnerPlayerOrPlayerItself();
                     if(!checkTarget || !pGroup->SameSubGroup(check, checkTarget))
+                        tmp_target->RemoveAura(tmp_spellId, tmp_effIndex);
+                }
+                else
+                    tmp_target->RemoveAura(tmp_spellId, tmp_effIndex);
+            }
+        }
+        else if( m_areaAuraType == AREA_AURA_RAID)          // TODO: fix me!
+        {
+            // not check group if target == owner or target == pet
+            if (caster->GetCharmerOrOwnerGUID() != tmp_target->GetGUID() && caster->GetGUID() != tmp_target->GetCharmerOrOwnerGUID())
+            {
+                Player* check = caster->GetCharmerOrOwnerPlayerOrPlayerItself();
+
+                Group *pGroup = check ? check->GetGroup() : NULL;
+                if( pGroup )
+                {
+                    Player* checkTarget = tmp_target->GetCharmerOrOwnerPlayerOrPlayerItself();
+                    if(!checkTarget)
                         tmp_target->RemoveAura(tmp_spellId, tmp_effIndex);
                 }
                 else

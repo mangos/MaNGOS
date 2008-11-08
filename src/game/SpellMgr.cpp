@@ -182,10 +182,10 @@ SpellSpecific GetSpellSpecific(uint32 spellId)
             if ((spellInfo->SpellFamilyFlags & 0x00000820180400LL) && (spellInfo->AttributesEx3 & 0x200))
                 return SPELL_JUDGEMENT;
 
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 3; i++)                     // TODO: fix it for WotLK!!!
             {
                 // only paladin auras have this
-                if (spellInfo->Effect[i] == SPELL_EFFECT_APPLY_AREA_AURA_PARTY)
+                if (spellInfo->Effect[i] == SPELL_EFFECT_APPLY_AREA_AURA_RAID)
                     return SPELL_AURA;
             }
             break;
@@ -1007,7 +1007,7 @@ bool SpellMgr::canStackSpellRanks(SpellEntry const *spellInfo)
     {
         // Paladin aura Spell
         if(spellInfo->SpellFamilyName == SPELLFAMILY_PALADIN
-            && spellInfo->Effect[i]==SPELL_EFFECT_APPLY_AREA_AURA_PARTY)
+            && spellInfo->Effect[i]==SPELL_EFFECT_APPLY_AREA_AURA_RAID)
             return false;
         // Druid form Spell
         if(spellInfo->SpellFamilyName == SPELLFAMILY_DRUID
@@ -1424,7 +1424,8 @@ SpellEntry const* SpellMgr::SelectAuraRankForPlayerLevel(SpellEntry const* spell
     {
         if( IsPositiveEffect(spellInfo->Id, i) && (
             spellInfo->Effect[i] == SPELL_EFFECT_APPLY_AURA ||
-            spellInfo->Effect[i] == SPELL_EFFECT_APPLY_AREA_AURA_PARTY
+            spellInfo->Effect[i] == SPELL_EFFECT_APPLY_AREA_AURA_PARTY ||
+            spellInfo->Effect[i] == SPELL_EFFECT_APPLY_AREA_AURA_RAID
             ) )
         {
             needRankSelection = true;
