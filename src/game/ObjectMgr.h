@@ -72,7 +72,7 @@ struct GameTele
     std::wstring wnameLow;
 };
 
-typedef HM_NAMESPACE::hash_map<uint32, GameTele > GameTeleMap;
+typedef UNORDERED_MAP<uint32, GameTele > GameTeleMap;
 
 struct ScriptInfo
 {
@@ -120,26 +120,26 @@ struct CellObjectGuids
     CellGuidSet gameobjects;
     CellCorpseSet corpses;
 };
-typedef HM_NAMESPACE::hash_map<uint32/*cell_id*/,CellObjectGuids> CellObjectGuidsMap;
-typedef HM_NAMESPACE::hash_map<uint32/*(mapid,spawnMode) pair*/,CellObjectGuidsMap> MapObjectGuids;
+typedef UNORDERED_MAP<uint32/*cell_id*/,CellObjectGuids> CellObjectGuidsMap;
+typedef UNORDERED_MAP<uint32/*(mapid,spawnMode) pair*/,CellObjectGuidsMap> MapObjectGuids;
 
-typedef HM_NAMESPACE::hash_map<uint64/*(instance,guid) pair*/,time_t> RespawnTimes;
+typedef UNORDERED_MAP<uint64/*(instance,guid) pair*/,time_t> RespawnTimes;
 
 struct MangosStringLocale
 {
     std::vector<std::string> Content;                       // 0 -> default, i -> i-1 locale index
 };
 
-typedef HM_NAMESPACE::hash_map<uint32,CreatureData> CreatureDataMap;
-typedef HM_NAMESPACE::hash_map<uint32,GameObjectData> GameObjectDataMap;
-typedef HM_NAMESPACE::hash_map<uint32,CreatureLocale> CreatureLocaleMap;
-typedef HM_NAMESPACE::hash_map<uint32,GameObjectLocale> GameObjectLocaleMap;
-typedef HM_NAMESPACE::hash_map<uint32,ItemLocale> ItemLocaleMap;
-typedef HM_NAMESPACE::hash_map<uint32,QuestLocale> QuestLocaleMap;
-typedef HM_NAMESPACE::hash_map<uint32,NpcTextLocale> NpcTextLocaleMap;
-typedef HM_NAMESPACE::hash_map<uint32,PageTextLocale> PageTextLocaleMap;
-typedef HM_NAMESPACE::hash_map<uint32,MangosStringLocale> MangosStringLocaleMap;
-typedef HM_NAMESPACE::hash_map<uint32,NpcOptionLocale> NpcOptionLocaleMap;
+typedef UNORDERED_MAP<uint32,CreatureData> CreatureDataMap;
+typedef UNORDERED_MAP<uint32,GameObjectData> GameObjectDataMap;
+typedef UNORDERED_MAP<uint32,CreatureLocale> CreatureLocaleMap;
+typedef UNORDERED_MAP<uint32,GameObjectLocale> GameObjectLocaleMap;
+typedef UNORDERED_MAP<uint32,ItemLocale> ItemLocaleMap;
+typedef UNORDERED_MAP<uint32,QuestLocale> QuestLocaleMap;
+typedef UNORDERED_MAP<uint32,NpcTextLocale> NpcTextLocaleMap;
+typedef UNORDERED_MAP<uint32,PageTextLocale> PageTextLocaleMap;
+typedef UNORDERED_MAP<uint32,MangosStringLocale> MangosStringLocaleMap;
+typedef UNORDERED_MAP<uint32,NpcOptionLocale> NpcOptionLocaleMap;
 
 typedef std::multimap<uint32,uint32> QuestRelations;
 
@@ -229,11 +229,11 @@ struct PlayerCondition
 };
 
 // NPC gossip text id
-typedef HM_NAMESPACE::hash_map<uint32, uint32> CacheNpcTextIdMap;
+typedef UNORDERED_MAP<uint32, uint32> CacheNpcTextIdMap;
 typedef std::list<GossipOption> CacheNpcOptionList;
 
-typedef HM_NAMESPACE::hash_map<uint32, VendorItemData> CacheVendorItemMap;
-typedef HM_NAMESPACE::hash_map<uint32, TrainerSpellData> CacheTrainerSpellMap;
+typedef UNORDERED_MAP<uint32, VendorItemData> CacheVendorItemMap;
+typedef UNORDERED_MAP<uint32, TrainerSpellData> CacheTrainerSpellMap;
 
 typedef std::list<const AchievementCriteriaEntry*> AchievementCriteriaEntryList;
 
@@ -273,23 +273,23 @@ class ObjectMgr
         ObjectMgr();
         ~ObjectMgr();
 
-        typedef HM_NAMESPACE::hash_map<uint32, Item*> ItemMap;
+        typedef UNORDERED_MAP<uint32, Item*> ItemMap;
 
         typedef std::set< Group * > GroupSet;
         typedef std::set< Guild * > GuildSet;
         typedef std::set< ArenaTeam * > ArenaTeamSet;
 
-        typedef HM_NAMESPACE::hash_map<uint32, Quest*> QuestMap;
+        typedef UNORDERED_MAP<uint32, Quest*> QuestMap;
 
-        typedef HM_NAMESPACE::hash_map<uint32, AreaTrigger> AreaTriggerMap;
+        typedef UNORDERED_MAP<uint32, AreaTrigger> AreaTriggerMap;
 
-        typedef HM_NAMESPACE::hash_map<uint32, std::string> AreaTriggerScriptMap;
+        typedef UNORDERED_MAP<uint32, std::string> AreaTriggerScriptMap;
 
-        typedef HM_NAMESPACE::hash_map<uint32, ReputationOnKillEntry> RepOnKillMap;
+        typedef UNORDERED_MAP<uint32, ReputationOnKillEntry> RepOnKillMap;
 
-        typedef HM_NAMESPACE::hash_map<uint32, WeatherZoneChances> WeatherZoneMap;
+        typedef UNORDERED_MAP<uint32, WeatherZoneChances> WeatherZoneMap;
 
-        typedef HM_NAMESPACE::hash_map<uint32, PetCreateSpellEntry> PetCreateSpellMap;
+        typedef UNORDERED_MAP<uint32, PetCreateSpellEntry> PetCreateSpellMap;
 
         Player* GetPlayer(const char* name) const { return ObjectAccessor::Instance().FindPlayerByName(name);}
         Player* GetPlayer(uint64 guid) const { return ObjectAccessor::FindPlayer(guid); }
@@ -781,10 +781,10 @@ class ObjectMgr
 
         QuestMap mQuestTemplates;
 
-        typedef HM_NAMESPACE::hash_map<uint32, GossipText*> GossipTextMap;
-        typedef HM_NAMESPACE::hash_map<uint32, uint32> QuestAreaTriggerMap;
-        typedef HM_NAMESPACE::hash_map<uint32, uint32> BattleMastersMap;
-        typedef HM_NAMESPACE::hash_map<uint32, std::string> ItemTextMap;
+        typedef UNORDERED_MAP<uint32, GossipText*> GossipTextMap;
+        typedef UNORDERED_MAP<uint32, uint32> QuestAreaTriggerMap;
+        typedef UNORDERED_MAP<uint32, uint32> BattleMastersMap;
+        typedef UNORDERED_MAP<uint32, std::string> ItemTextMap;
         typedef std::set<uint32> TavernAreaTriggerSet;
         typedef std::set<uint32> GameObjectForQuestSet;
 

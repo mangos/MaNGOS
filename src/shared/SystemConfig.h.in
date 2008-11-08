@@ -27,9 +27,9 @@
 
 #ifndef _VERSION
 #if PLATFORM == PLATFORM_WINDOWS
-# define _VERSION(REVD,REVT,REV) "0.12.0-DEV" " (" REVD " " REVT " Revision " REV ")"
+# define _VERSION(REVD,REVT,REVN,REVH) "0.12.0-DEV" " (" REVD " " REVT " Revision " REVN " - " REVH ")"
 #else
-# define _VERSION(REVD,REVT,REV) "@VERSION@" " (" REVD " " REVT " Revision " REV ")"
+# define _VERSION(REVD,REVT,REVN,REVH) "@VERSION@" " (" REVD " " REVT " Revision " REVN " - " REVH ")"
 #endif
 #endif
 
@@ -67,7 +67,7 @@
 # define _REALMD_CONFIG  SYSCONFDIR"realmd.conf"
 #endif
 
-#define _FULLVERSION(REVD,REVT,REV) _PACKAGENAME "/" _VERSION(REVD,REVT,REV) " for " _ENDIAN_PLATFORM
+#define _FULLVERSION(REVD,REVT,REVN,REVH) _PACKAGENAME "/" _VERSION(REVD,REVT,REVN,REVH) " for " _ENDIAN_PLATFORM
 
 #define DEFAULT_PLAYER_LIMIT 100
 #define DEFAULT_WORLDSERVER_PORT 8085                       //8129

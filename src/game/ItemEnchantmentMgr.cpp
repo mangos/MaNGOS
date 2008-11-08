@@ -40,7 +40,7 @@ struct EnchStoreItem
 };
 
 typedef std::vector<EnchStoreItem> EnchStoreList;
-typedef HM_NAMESPACE::hash_map<uint32, EnchStoreList> EnchantmentStore;
+typedef UNORDERED_MAP<uint32, EnchStoreList> EnchantmentStore;
 
 static EnchantmentStore RandomItemEnch;
 

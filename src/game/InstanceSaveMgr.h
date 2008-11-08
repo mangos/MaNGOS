@@ -24,7 +24,7 @@
 #include "zthread/Mutex.h"
 #include <list>
 #include <map>
-#include "Utilities/HashMap.h"
+#include "Utilities/UnorderedMap.h"
 #include "Database/DatabaseEnv.h"
 
 struct InstanceTemplate;
@@ -118,7 +118,7 @@ class MANGOS_DLL_DECL InstanceSaveManager : public MaNGOS::Singleton<InstanceSav
         ~InstanceSaveManager();
 
         typedef std::map<uint32 /*InstanceId*/, InstanceSave*> InstanceSaveMap;
-        typedef HM_NAMESPACE::hash_map<uint32 /*InstanceId*/, InstanceSave*> InstanceSaveHashMap;
+        typedef UNORDERED_MAP<uint32 /*InstanceId*/, InstanceSave*> InstanceSaveHashMap;
         typedef std::map<uint32 /*mapId*/, InstanceSaveMap> InstanceSaveMapMap;
 
         /* resetTime is a global propery of each (raid/heroic) map

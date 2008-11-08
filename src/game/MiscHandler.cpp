@@ -1344,6 +1344,8 @@ void WorldSession::HandleWhoisOpcode(WorldPacket& recv_data)
         return;
     }
 
+    normalizePlayerName (charname);
+
     Player *plr = objmgr.GetPlayer(charname.c_str());
 
     if(!plr)
