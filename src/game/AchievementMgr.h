@@ -36,9 +36,25 @@ struct CriteriaProgress
     time_t date;
 };
 
+struct CriteriaCastSpellRequirement
+{
+    CriteriaCastSpellRequirement(uint32 achievementCriteriaId, uint32 creatureEntry, uint32 playerClass, uint32 playerRace)
+    {
+        this->achievementCriteriaId = achievementCriteriaId;
+        this->creatureEntry = creatureEntry;
+        this->playerClass = playerClass;
+        this->playerRace = playerRace;
+    }
+    uint32 achievementCriteriaId;
+    uint32 creatureEntry;
+    uint8 playerClass;
+    uint8 playerRace;
+};
+
 typedef UNORDERED_MAP<uint32, CriteriaProgress*> CriteriaProgressMap;
 typedef UNORDERED_MAP<uint32, time_t> CompletedAchievementMap;
 
+class Unit;
 class Player;
 class WorldPacket;
 
@@ -57,7 +73,7 @@ class AchievementMgr
 
         void LoadFromDB(QueryResult *achievementResult, QueryResult *criteriaResult);
         void SaveToDB();
-        void UpdateAchievementCriteria(AchievementCriteriaTypes type, uint32 miscvalue1=0, uint32 miscvalue2=0, uint32 time=0);
+        void UpdateAchievementCriteria(AchievementCriteriaTypes type, uint32 miscvalue1=0, uint32 miscvalue2=0, Unit *unit=NULL, uint32 time=0);
         void CheckAllAchievementCriteria();
         void SendAllAchievementData();
         void SendRespondInspectAchievements(Player* player);
@@ -76,7 +92,6 @@ class AchievementMgr
         Player* m_player;
         CriteriaProgressMap m_criteriaProgress;
         CompletedAchievementMap m_completedAchievements;
-
+        static const CriteriaCastSpellRequirement* criteriaCastSpellRequirements[];
 };
-
 #endif

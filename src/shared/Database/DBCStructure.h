@@ -182,6 +182,7 @@ struct AchievementCriteriaEntry
         } be_spell_target;
 
         // ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL= 29
+        // ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2 = 110
         struct
         {
             uint32  spellID;                                // 3
@@ -421,13 +422,6 @@ struct AchievementCriteriaEntry
             uint32  lootType;                               // 3 3=fishing, 2=pickpocket, 4=disentchant
             uint32  lootTypeCount;                          // 4
         } loot_type;
-
-        // ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2 = 110
-        struct
-        {
-            uint32  skillLine;                              // 3
-            uint32  spellCount;                             // 4
-        } cast_spell2;
 
         // ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILL_LINE= 112
         struct
