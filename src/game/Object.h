@@ -89,7 +89,7 @@ class Map;
 class UpdateMask;
 class InstanceData;
 
-typedef HM_NAMESPACE::hash_map<Player*, UpdateData> UpdateDataMapType;
+typedef UNORDERED_MAP<Player*, UpdateData> UpdateDataMapType;
 
 struct WorldLocation
 {

@@ -26,7 +26,7 @@ class MANGOS_DLL_DECL MapInstanced : public Map
 {
     friend class MapManager;
     public:
-        typedef HM_NAMESPACE::hash_map< uint32, Map* > InstancedMaps;
+        typedef UNORDERED_MAP< uint32, Map* > InstancedMaps;
 
         MapInstanced(uint32 id, time_t expiry);
         ~MapInstanced() {}
