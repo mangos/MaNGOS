@@ -25,7 +25,7 @@ char remotes[NUM_REMOTES][256] = {
 
 char origins[NUM_REMOTES][256];
 int rev;
-char head_message[256];
+char head_message[16384];
 char write_file[2048];
 
 char buffer[256];
@@ -96,7 +96,7 @@ int get_rev(const char *from_msg)
     // accept only the rev number format, not the sql update format
     char nr_str[256];
     if(sscanf(from_msg, "[%[0123456789]]", nr_str) != 1) return 0;
-    if(buffer[strlen(nr_str)+1] != ']') return 0;
+    if(from_msg[strlen(nr_str)+1] != ']') return 0;
     return atoi(nr_str);
 }
 
@@ -105,24 +105,20 @@ bool find_rev()
     // find the highest rev number on either of the remotes
     for(int i = 0; i < NUM_REMOTES; i++)
     {
-        if(!origins[i][0]) continue;
+        if(!local && !origins[i][0]) continue;
 
         char cmd[512];
-        if(local) sprintf(cmd, "git rev-list HEAD --pretty=\"format:%%s\"");
-        else sprintf(cmd, "git rev-list %s/master --pretty=\"format:%%s\"", origins[i]);
+        if(local) sprintf(cmd, "git log HEAD --pretty=\"format:%%s\"");
+        else sprintf(cmd, "git log %s/master --pretty=\"format:%%s\"", origins[i]);
         if( (cmd_pipe = popen( cmd, "rt" )) == NULL )
             continue;
 
-        int count = 0, nr;
+        int nr;
         while(fgets(buffer, 256, cmd_pipe))
         {
-            // every second line contains the commit message
-            if(count++ % 2 == 1)
-            {
-                nr = get_rev(buffer);
-                if(nr >= rev)
-                    rev = nr+1;
-            }
+            nr = get_rev(buffer);
+            if(nr >= rev)
+                rev = nr+1;
         }
         pclose(cmd_pipe);
     }
@@ -158,36 +154,40 @@ bool write_rev()
 
 bool find_head_msg()
 {
-    if( (cmd_pipe = popen( "git rev-list HEAD --pretty=\"format:%s\"", "rt" )) == NULL )
+    if( (cmd_pipe = popen( "git log -n 1 --pretty=\"format:%s%n%n%b\"", "rt" )) == NULL )
         return false;
 
-    if(!fgets(buffer, 256, cmd_pipe)) return false;
-    if(!fgets(buffer, 256, cmd_pipe)) return false;
+    int poz = 0;
+    while(poz < 16384-1 && EOF != (head_message[poz++] = fgetc(cmd_pipe)));
+    head_message[poz-1] = '\0';
 
-    int len = (int)strnlen(buffer, 256);
-    if(len <= 0 || len >= 256) return false;
-    // clear the terminating newline
-    buffer[len-1] = '\0';
+    pclose(cmd_pipe);
 
-    if(get_rev(buffer))
+    if(get_rev(head_message))
     {
         if(!allow_replace) return false;
         // skip the rev number in the commit
-        char *p = strchr(buffer, ']');
+        char *p = strchr(head_message, ']'), *q = head_message;
         assert(p && *(p+1));
-        strncpy(head_message, p+2, 256 - (p-buffer));
+        p+=2;
+        while(*p) *q = *p, p++, q++;
+        *q = 0;
         return true;
     }
-    
-    strcpy(head_message, buffer);
+
     return true;
 }
 
 bool amend_commit()
 {
     char cmd[512];
-    sprintf(cmd, "git commit -a --amend -m \"[%d] %s\"", rev, head_message);
-    system(cmd);
+    sprintf(cmd, "git commit --amend -F- %s", write_file);
+    if( (cmd_pipe = popen( cmd, "wt" )) == NULL )
+        return false;
+
+    fprintf(cmd_pipe, "[%d] %s", rev, head_message);
+    pclose(cmd_pipe);
+    
     return true;
 }
 
@@ -200,6 +200,10 @@ int main(int argc, char *argv[])
             allow_replace = true;
         if(strncmp(argv[i], "-l", 2) == 0)
             local = true;
+        if(strncmp(argv[i], "-h", 2) == 0)
+        {
+
+        }
     }
 
     if(!find_path())              { printf("ERROR: can't find path\n");         return 1; }
@@ -208,6 +212,8 @@ int main(int argc, char *argv[])
     if(!find_head_msg())          { printf("ERROR: can't find head message\n"); return 1; }
     if(!write_rev())              { printf("ERROR: can't write revision_nr.h\n");  return 1; }
     if(!amend_commit())           { printf("ERROR: can't ammend commit\n");     return 1; }
+    
+    printf("Generated rev %d\n", rev);
 
     return 0;
 }
