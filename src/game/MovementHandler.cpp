@@ -291,6 +291,10 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
     // fall damage generation (ignore in flight case that can be triggered also at lags in moment teleportation to another map).
     if (recv_data.GetOpcode() == MSG_MOVE_FALL_LAND && !GetPlayer()->isInFlight())
     {
+        // calculate total z distance of the fall
+        // it is currently only used for the achievement system. It might be used in a more correct falldamage formula later
+        float z_diff = GetPlayer()->m_fallMovementInfo.z - movementInfo.z;
+        sLog.outDebug("zDiff = %f", z_diff);
         Player *target = GetPlayer();
 
         //Players with Feather Fall or low fall time, or physical immunity (charges used) are ignored
@@ -323,8 +327,9 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 
                     target->EnvironmentalDamage(target->GetGUID(), DAMAGE_FALL, damage);
 
-                    if(target->isAlive())
-                        target->GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_FALL_WITHOUT_DYING, movementInfo.fallTime);
+                    // recheck alive, might have died of EnvironmentalDamage
+                    if (target->isAlive())
+                        target->GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_FALL_WITHOUT_DYING, uint32(z_diff*100));
                 }
 
                 //Z given by moveinfo, LastZ, FallTime, WaterZ, MapZ, Damage, Safefall reduction
@@ -363,6 +368,8 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 
     GetPlayer()->SetPosition(movementInfo.x, movementInfo.y, movementInfo.z, movementInfo.o);
     GetPlayer()->m_movementInfo = movementInfo;
+    if (GetPlayer()->m_fallMovementInfo.fallTime >= movementInfo.fallTime || GetPlayer()->m_fallMovementInfo.z <=movementInfo.z)
+        GetPlayer()->m_fallMovementInfo = movementInfo;
 
     if(GetPlayer()->isMovingOrTurning())
         GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);

@@ -304,9 +304,8 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                     if(!gameeventmgr.IsActiveEvent(26))
                         continue;
                 }
-                // miscvalue1 is falltime, calculate to fall height format given in dbc
-                uint32 fallHeight = uint32(0.06f*miscvalue1-91.5)*100;
-                SetCriteriaProgress(achievementCriteria, fallHeight);
+                // miscvalue1 is the ingame fallheight*100 as stored in dbc
+                SetCriteriaProgress(achievementCriteria, miscvalue1);
                 break;
             }
             case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST:
