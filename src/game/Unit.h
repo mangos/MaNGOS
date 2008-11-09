@@ -716,6 +716,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         typedef std::list<DiminishingReturn> Diminishing;
         typedef std::set<AuraType> AuraTypeSet;
         typedef std::set<uint32> ComboPointHolderSet;
+        typedef std::map<uint8, uint32> VisibleAuraMap;
 
         virtual ~Unit ( );
 
@@ -1155,8 +1156,29 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void removeHatedBy(HostilReference* /*pHostilReference*/ ) { /* nothing to do yet */ }
         HostilRefManager& getHostilRefManager() { return m_HostilRefManager; }
 
-        uint32 GetVisibleAura(uint32 slot) { return m_visibleAuras[slot]; }
-        void SetVisibleAura(uint32 slot, uint32 spellid) { m_visibleAuras[slot] = spellid; }
+        uint32 GetVisibleAura(uint8 slot)
+        {
+            VisibleAuraMap::iterator itr = m_visibleAuras.find(slot);
+            if(itr != m_visibleAuras.end())
+                return itr->second;
+            return 0;
+        }
+        void SetVisibleAura(uint8 slot, uint32 spellid)
+        {
+            if(spellid == 0)
+            {
+                VisibleAuraMap::iterator itr = m_visibleAuras.find(slot);
+                if(itr != m_visibleAuras.end())
+                {
+                    m_visibleAuras.erase(itr);
+                    return;
+                }
+            }
+            else
+                m_visibleAuras[slot] = spellid;
+        }
+        VisibleAuraMap const *GetVisibleAuras() { return &m_visibleAuras; }
+        uint8 GetVisibleAurasCount() { return m_visibleAuras.size(); }
 
         Aura* GetAura(uint32 spellId, uint32 effindex);
         AuraMap      & GetAuras()       { return m_Auras; }
@@ -1330,7 +1352,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         float m_weaponDamage[MAX_ATTACK][2];
         bool m_canModifyStats;
         //std::list< spellEffectPair > AuraSpells[TOTAL_AURAS];  // TODO: use this if ok for mem
-        uint32 m_visibleAuras[MAX_AURAS];
+        VisibleAuraMap m_visibleAuras;
 
         float m_speed_rate[MAX_MOVE_TYPE];
 

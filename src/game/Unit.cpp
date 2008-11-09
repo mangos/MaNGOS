@@ -184,8 +184,6 @@ Unit::Unit()
     m_ShapeShiftFormSpellId = 0;
     m_canModifyStats = false;
 
-    for (int i = 0; i < MAX_AURAS; ++i)
-        m_visibleAuras[i] = 0;
     for (int i = 0; i < MAX_SPELL_IMMUNITY; i++)
         m_spellImmune[i].clear();
     for (int i = 0; i < UNIT_MOD_END; i++)

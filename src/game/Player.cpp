@@ -17756,31 +17756,38 @@ void Player::SendAurasForTarget(Unit *target)
     WorldPacket data(SMSG_AURA_UPDATE_ALL);
     data.append(target->GetPackGUID());
 
-    for(Unit::AuraMap::const_iterator itr = target->GetAuras().begin(); itr != target->GetAuras().end(); ++itr)
+    Unit::VisibleAuraMap const *visibleAuras = target->GetVisibleAuras();
+    for(Unit::VisibleAuraMap::const_iterator itr = visibleAuras->begin(); itr != visibleAuras->end(); ++itr)
     {
-        Aura* aura = itr->second;
-        if(aura->GetAuraSlot() >= MAX_AURAS || aura->IsPassive() || aura->GetCasterGUID()!=GetGUID())
-            continue;
-
-        data << uint8(aura->GetAuraSlot());
-        data << uint32(aura->GetId());
-
-        if(aura->GetId())
+        for(uint32 j = 0; j < 3; ++j)
         {
-            uint8 auraFlags = aura->GetAuraFlags();
-            data << uint8(auraFlags);                       // flags
-            data << uint8(aura->GetAuraLevel());            // level
-            data << uint8(aura->m_procCharges);             // charges
-
-            /*if(!(auraFlags & AFLAG_NOT_GUID))
+            if(Aura *aura = target->GetAura(itr->second, j))
             {
-                data << uint8(0)                            // packed GUID of someone (caster?)
-            }*/
+                data << uint8(aura->GetAuraSlot());
+                data << uint32(aura->GetId());
 
-            if(auraFlags & AFLAG_DURATION)                  // include aura duration
-            {
-                data << uint32(aura->GetAuraMaxDuration());
-                data << uint32(aura->GetAuraDuration());
+                if(aura->GetId())
+                {
+                    uint8 auraFlags = aura->GetAuraFlags();
+                    // flags
+                    data << uint8(auraFlags);
+                    // level
+                    data << uint8(aura->GetAuraLevel());
+                    // charges
+                    data << uint8(aura->m_procCharges);
+
+                    if(!(auraFlags & AFLAG_NOT_GUID))
+                    {
+                        data << uint8(0);               // packed GUID of someone (caster?)
+                    }
+
+                    if(auraFlags & AFLAG_DURATION)      // include aura duration
+                    {
+                        data << uint32(aura->GetAuraMaxDuration());
+                        data << uint32(aura->GetAuraDuration());
+                    }
+                }
+                break;
             }
         }
     }

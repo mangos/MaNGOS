@@ -18,8 +18,7 @@
 #ifndef MANGOS_SPELLAURADEFINES_H
 #define MANGOS_SPELLAURADEFINES_H
 
-#define MAX_AURAS 56                                        // probably changes to 64 in WotLK
-#define MAX_POSITIVE_AURAS 40
+#define MAX_AURAS 64                                        // client support up to 255, but it will cause problems with group auras updating
 
 enum AURA_FLAGS
 {
@@ -27,14 +26,11 @@ enum AURA_FLAGS
     AFLAG_EFF_INDEX_0       = 0x01,
     AFLAG_EFF_INDEX_1       = 0x02,
     AFLAG_EFF_INDEX_2       = 0x04,
-    AFLAG_NOT_GUID          = 0x08,
+    AFLAG_NOT_GUID          = 0x08,                         // caster guid?
     AFLAG_UNK1              = 0x10,                         // positive?
     AFLAG_DURATION          = 0x20,
     AFLAG_UNK2              = 0x40,
-    AFLAG_UNK3              = 0x80,
-    AFLAG_NEGATIVE          = 0x09,
-    AFLAG_POSITIVE          = 0x1F,
-    AFLAG_MASK              = 0xFF
+    AFLAG_NEGATIVE          = 0x80
 };
 
 //m_schoolAbsorb

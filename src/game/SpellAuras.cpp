@@ -947,22 +947,13 @@ void Aura::_AddAura()
     {
         if(!samespell)                                      // new slot need
         {
-            if (IsPositive())                               // empty positive slot
+            if(m_target->GetVisibleAurasCount() < MAX_AURAS)
             {
-                for (uint8 i = 0; i < MAX_POSITIVE_AURAS; i++)
+                Unit::VisibleAuraMap const *visibleAuras = m_target->GetVisibleAuras();
+                for(uint8 i = 0; i < MAX_AURAS; ++i)
                 {
-                    if (m_target->GetVisibleAura(i) == 0)
-                    {
-                        slot = i;
-                        break;
-                    }
-                }
-            }
-            else                                            // empty negative slot
-            {
-                for (uint8 i = MAX_POSITIVE_AURAS; i < MAX_AURAS; i++)
-                {
-                    if (m_target->GetVisibleAura(i) == 0)
+                    Unit::VisibleAuraMap::const_iterator itr = visibleAuras->find(i);
+                    if(itr == visibleAuras->end())
                     {
                         slot = i;
                         break;
@@ -978,7 +969,7 @@ void Aura::_AddAura()
                 if(slot < MAX_AURAS)                        // slot found
                 {
                     SetAura(false);
-                    SetAuraFlags(AFLAG_EFF_INDEX_0 | AFLAG_NOT_GUID | (GetAuraMaxDuration() ? AFLAG_DURATION : AFLAG_NONE) | (IsPositive() ? AFLAG_UNK1 : AFLAG_NONE));
+                    SetAuraFlags((1 << GetEffIndex()) | AFLAG_NOT_GUID | (GetAuraMaxDuration() ? AFLAG_DURATION : AFLAG_NONE) | (IsPositive() ? AFLAG_NONE : AFLAG_NEGATIVE));
                     SetAuraLevel(caster ? caster->getLevel() : sWorld.getConfig(CONFIG_MAX_PLAYER_LEVEL));
                     UpdateAuraCharges();
                     SendAuraUpdate(false);
@@ -1135,10 +1126,10 @@ void Aura::SendAuraUpdate(bool remove)
     data << uint8(GetAuraLevel());
     data << uint8(GetAuraCharges());
 
-    /*if(!(auraFlags & AFLAG_NOT_GUID))
+    if(!(auraFlags & AFLAG_NOT_GUID))
     {
         data << uint8(0);                                   // pguid
-    }*/
+    }
 
     if(auraFlags & AFLAG_DURATION)
     {
