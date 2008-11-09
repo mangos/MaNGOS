@@ -228,17 +228,16 @@ void WorldSession::HandleCharCreateOpcode( WorldPacket & recv_data )
     if (raceEntry->addon > Expansion())
     {
         data << (uint8)CHAR_CREATE_EXPANSION;
-        sLog.outError("Not Expansion 1 account:[%d] but tried to Create character with expansion 1 race (%u)",GetAccountId(),race_);
+        sLog.outError("Expansion %u account:[%d] tried to Create character with expansion %u race (%u)",Expansion(),GetAccountId(),raceEntry->addon,race_);
         SendPacket( &data );
         return;
     }
 
     // prevent character creating Expansion class without Expansion account
-    // TODO: use possible addon field in ChrClassesEntry in next dbc version
-    if (Expansion() < 2 && class_ == CLASS_DEATH_KNIGHT)
+    if (classEntry->addon > Expansion())
     {
-        data << (uint8)CHAR_CREATE_EXPANSION;
-        sLog.outError("Not Expansion 2 account:[%d] but tried to Create character with expansion 2 class (%u)",GetAccountId(),class_);
+        data << (uint8)CHAR_CREATE_EXPANSION_CLASS;
+        sLog.outError("Expansion %u account:[%d] tried to Create character with expansion %u class (%u)",Expansion(),GetAccountId(),classEntry->addon,class_);
         SendPacket( &data );
         return;
     }
@@ -309,25 +308,37 @@ void WorldSession::HandleCharCreateOpcode( WorldPacket & recv_data )
     uint32 skipCinematics = sWorld.getConfig(CONFIG_SKIP_CINEMATICS);
 
     bool have_same_race = false;
-    if(!AllowTwoSideAccounts || skipCinematics == 1)
+    if(!AllowTwoSideAccounts || skipCinematics == 1 || class_ == CLASS_DEATH_KNIGHT)
     {
-        QueryResult *result2 = CharacterDatabase.PQuery("SELECT DISTINCT race FROM characters WHERE account = '%u' %s", GetAccountId(),skipCinematics == 1 ? "" : "LIMIT 1");
+        QueryResult *result2 = CharacterDatabase.PQuery("SELECT race,class FROM characters WHERE account = '%u' %s",
+            GetAccountId(), (skipCinematics == 1 || class_ == CLASS_DEATH_KNIGHT) ? "" : "LIMIT 1");
         if(result2)
         {
             uint32 team_= Player::TeamForRace(race_);
 
             Field* field = result2->Fetch();
-            uint8 race = field[0].GetUInt32();
+            uint8 acc_race  = field[0].GetUInt32();
+
+            if(class_ == CLASS_DEATH_KNIGHT)
+            {
+                uint8 acc_class = field[1].GetUInt32();
+                if(acc_class == CLASS_DEATH_KNIGHT)
+                {
+                    data << (uint8)CHAR_CREATE_UNIQUE_CLASS_LIMIT;
+                    SendPacket( &data );
+                    return;
+                }
+            }
 
             // need to check team only for first character
             // TODO: what to if account already has characters of both races?
             if (!AllowTwoSideAccounts)
             {
-                uint32 team=0;
-                if(race > 0)
-                    team = Player::TeamForRace(race);
+                uint32 acc_team=0;
+                if(acc_race > 0)
+                    acc_team = Player::TeamForRace(acc_race);
 
-                if(team != team_)
+                if(acc_team != team_)
                 {
                     data << (uint8)CHAR_CREATE_PVP_TEAMS_VIOLATION;
                     SendPacket( &data );
@@ -336,15 +347,29 @@ void WorldSession::HandleCharCreateOpcode( WorldPacket & recv_data )
                 }
             }
 
-            if (skipCinematics == 1)
+            // search same race for cinematic or same class if need
+            // TODO: check if cinematic already shown? (already logged in?; cinematic field)
+            while ((skipCinematics == 1 && !have_same_race) || class_ == CLASS_DEATH_KNIGHT)
             {
-                // TODO: check if cinematic already shown? (already logged in?; cinematic field)
-                while (race_ != race && result2->NextRow())
+                if(!result2->NextRow())
+                    break;
+
+                field = result2->Fetch();
+                acc_race = field[0].GetUInt32();
+
+                if(!have_same_race)
+                    have_same_race = race_ == acc_race;
+
+                if(class_ == CLASS_DEATH_KNIGHT)
                 {
-                    field = result2->Fetch();
-                    race = field[0].GetUInt32();
+                    uint8 acc_class = field[1].GetUInt32();
+                    if(acc_class == CLASS_DEATH_KNIGHT)
+                    {
+                        data << (uint8)CHAR_CREATE_UNIQUE_CLASS_LIMIT;
+                        SendPacket( &data );
+                        return;
+                    }
                 }
-                have_same_race = race_ == race;
             }
             delete result2;
         }

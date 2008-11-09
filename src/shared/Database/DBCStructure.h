@@ -543,9 +543,9 @@ struct ChatChannelsEntry
 struct ChrClassesEntry
 {
     uint32  ClassID;                                        // 0
-                                                            // 1-2, unused
-    uint32  powerType;                                      // 3
-                                                            // 4, unused
+                                                            // 1, unused
+    uint32  powerType;                                      // 2
+                                                            // 3-4, unused
     //char*       name[16];                                 // 5-20 unused
                                                             // 21 string flag, unused
     //char*       string1[16];                              // 21-36 unused
@@ -556,6 +556,7 @@ struct ChrClassesEntry
     uint32  spellfamily;                                    // 56
                                                             // 57, unused
     uint32  CinematicSequence;                              // 58 id from CinematicSequences.dbc
+    uint32  addon;                                          // 59 (0 - original race, 1 - tbc addon, ...)
 };
 
 struct ChrRacesEntry
@@ -961,7 +962,7 @@ struct ScalingStatValuesEntry
 struct SkillLineEntry
 {
     uint32    id;                                           // 0        m_ID
-    int32     categoryId;                                   // 1        m_categoryID (index from SkillLineCategory.dbc)
+    uint32    categoryId;                                   // 1        m_categoryID (index from SkillLineCategory.dbc)
     //uint32    skillCostID;                                // 2        m_skillCostsID not used
     char*     name[16];                                     // 3-18     m_displayName_lang
                                                             // 19 string flags, not used
