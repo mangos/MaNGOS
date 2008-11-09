@@ -70,7 +70,7 @@ bool find_path()
 
 bool find_origin()
 {
-    if( (cmd_pipe = popen( "git remote -v", "rt" )) == NULL )
+    if( (cmd_pipe = popen( "git remote -v", "r" )) == NULL )
         return false;
 
     bool ret = false;
@@ -110,7 +110,7 @@ bool find_rev()
         char cmd[512];
         if(local) sprintf(cmd, "git log HEAD --pretty=\"format:%%s\"");
         else sprintf(cmd, "git log %s/master --pretty=\"format:%%s\"", origins[i]);
-        if( (cmd_pipe = popen( cmd, "rt" )) == NULL )
+        if( (cmd_pipe = popen( cmd, "r" )) == NULL )
             continue;
 
         int nr;
@@ -154,7 +154,7 @@ bool write_rev()
 
 bool find_head_msg()
 {
-    if( (cmd_pipe = popen( "git log -n 1 --pretty=\"format:%s%n%n%b\"", "rt" )) == NULL )
+    if( (cmd_pipe = popen( "git log -n 1 --pretty=\"format:%s%n%n%b\"", "r" )) == NULL )
         return false;
 
     int poz = 0;
@@ -182,7 +182,7 @@ bool amend_commit()
 {
     char cmd[512];
     sprintf(cmd, "git commit --amend -F- %s", write_file);
-    if( (cmd_pipe = popen( cmd, "wt" )) == NULL )
+    if( (cmd_pipe = popen( cmd, "w" )) == NULL )
         return false;
 
     fprintf(cmd_pipe, "[%d] %s", rev, head_message);
@@ -217,3 +217,4 @@ int main(int argc, char *argv[])
 
     return 0;
 }
+
