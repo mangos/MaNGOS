@@ -16,12 +16,20 @@
 #include <unistd.h>
 #endif
 
+// config
+
 #define NUM_REMOTES 2
 
 char remotes[NUM_REMOTES][256] = {
     "git@github.com:mangos/mangos.git",
-    "git://github.com/mangos/mangos.git"
+    "git://github.com/mangos/mangos.git"        // used for fetch if present
 };
+
+bool allow_replace = false;
+bool local = false;
+bool do_fetch = false;
+
+// aux
 
 char origins[NUM_REMOTES][256];
 int rev;
@@ -31,11 +39,9 @@ char write_file[2048];
 char buffer[256];
 FILE *cmd_pipe;
 
-bool allow_replace = false;
-bool local = false;
-
 bool find_path()
 {
+    printf("+ finding path\n");
     char cur_path[2048], *ptr;
     getcwd(cur_path, 2048);
     int len = strnlen(cur_path, 2048);
@@ -70,6 +76,7 @@ bool find_path()
 
 bool find_origin()
 {
+    printf("+ finding origin\n");
     if( (cmd_pipe = popen( "git remote -v", "r" )) == NULL )
         return false;
 
@@ -91,6 +98,48 @@ bool find_origin()
     return ret;
 }
 
+bool fetch_origin()
+{
+    printf("+ fetching origin\n");
+    char cmd[256];
+    // use the public clone url if present because the private may require a password
+    sprintf(cmd, "git fetch %s master", origins[1][0] ? origins[1] : origins[0]);
+    int ret = system(cmd);
+    return true;
+}
+
+bool check_fwd()
+{
+    printf("+ checking fast forward\n");
+    char cmd[256];
+    sprintf(cmd, "git log -n 1 --pretty=\"format:%%H\" %s/master", origins[1][0] ? origins[1] : origins[0]);
+    if( (cmd_pipe = popen( cmd, "r" )) == NULL )
+        return false;
+
+    char hash[256];
+    if(!fgets(buffer, 256, cmd_pipe)) return false;
+    strncpy(hash, buffer, 256);
+    pclose(cmd_pipe);
+
+    if( (cmd_pipe = popen( "git log --pretty=\"format:%H\"", "r" )) == NULL )
+        return false;
+
+    bool found = false;
+    while(fgets(buffer, 256, cmd_pipe))
+    {
+        buffer[strnlen(buffer, 256) - 1] = '\0';
+        if(strncmp(hash, buffer, 256) == 0)
+        {
+            found = true;
+            break;
+        }
+    }
+    pclose(cmd_pipe);
+
+    if(!found) printf("WARNING: non-fastforward, use rebase!\n");
+    return true;
+}
+
 int get_rev(const char *from_msg)
 {
     // accept only the rev number format, not the sql update format
@@ -102,6 +151,7 @@ int get_rev(const char *from_msg)
 
 bool find_rev()
 {
+    printf("+ finding next revision number\n");
     // find the highest rev number on either of the remotes
     for(int i = 0; i < NUM_REMOTES; i++)
     {
@@ -123,6 +173,8 @@ bool find_rev()
         pclose(cmd_pipe);
     }
 
+    if(rev > 0) printf("Found [%d].\n", rev);
+
     return rev > 0;
 }
 
@@ -138,6 +190,7 @@ std::string generateHeader(char const* rev_str)
 
 bool write_rev()
 {
+    printf("+ writing revision_nr.h\n");
     char rev_str[256];
     sprintf(rev_str, "%d", rev);
     std::string header = generateHeader(rev_str);
@@ -154,6 +207,7 @@ bool write_rev()
 
 bool find_head_msg()
 {
+    printf("+ finding last message on HEAD\n");
     if( (cmd_pipe = popen( "git log -n 1 --pretty=\"format:%s%n%n%b\"", "r" )) == NULL )
         return false;
 
@@ -163,9 +217,14 @@ bool find_head_msg()
 
     pclose(cmd_pipe);
 
-    if(get_rev(head_message))
+    if(int head_rev = get_rev(head_message))
     {
-        if(!allow_replace) return false;
+        if(!allow_replace)
+        {
+            printf("Last commit on HEAD is [%d]. Use -r to replace it with [%d].\n", head_rev, rev);
+            return false;
+        }
+
         // skip the rev number in the commit
         char *p = strchr(head_message, ']'), *q = head_message;
         assert(p && *(p+1));
@@ -180,6 +239,7 @@ bool find_head_msg()
 
 bool amend_commit()
 {
+    printf("+ amending last commit\n");
     char cmd[512];
     sprintf(cmd, "git commit --amend -F- %s", write_file);
     if( (cmd_pipe = popen( cmd, "w" )) == NULL )
@@ -191,30 +251,47 @@ bool amend_commit()
     return true;
 }
 
+#define DO(cmd) if(!cmd) { printf("FAILED\n"); return 1; }
+
 int main(int argc, char *argv[])
 {
     for(int i = 1; i < argc; i++)
     {
         if(argv[i] == NULL) continue;
-        if(strncmp(argv[i], "-r", 2) == 0)
+        if(strncmp(argv[i], "-r", 2) == 0 || strncmp(argv[i], "--replace", 2) == 0)
             allow_replace = true;
-        if(strncmp(argv[i], "-l", 2) == 0)
+        if(strncmp(argv[i], "-l", 2) == 0 || strncmp(argv[i], "--local", 2) == 0)
             local = true;
-        if(strncmp(argv[i], "-h", 2) == 0)
+        if(strncmp(argv[i], "-f", 2) == 0 || strncmp(argv[i], "--fetch", 2) == 0)
+            do_fetch = true;
+        if(strncmp(argv[i], "-h", 2) == 0 || strncmp(argv[i], "--help", 2) == 0)
         {
-
+            printf("Usage: git_id [OPTION]\n");
+            printf("Generates a new rev number and updates revision_nr.h and the commit message.\n");
+            printf("Should be used just before push.\n");
+            printf("   -h, --help     show the usage\n");
+            printf("   -r, --replace  replace the rev number if it was already applied to the last\n");
+            printf("                  commit\n");
+            printf("   -l, --local    search for the highest rev number on HEAD\n");
+            printf("   -f, --fetch    fetch from origin before searching for the new rev\n");
+            return 0;
         }
     }
 
-    if(!find_path())              { printf("ERROR: can't find path\n");         return 1; }
-    if(!local && !find_origin())  { printf("ERROR: can't find origin\n");       return 1; }
-    if(!find_rev())               { printf("ERROR: can't find rev\n");          return 1; }
-    if(!find_head_msg())          { printf("ERROR: can't find head message\n"); return 1; }
-    if(!write_rev())              { printf("ERROR: can't write revision_nr.h\n");  return 1; }
-    if(!amend_commit())           { printf("ERROR: can't ammend commit\n");     return 1; }
-    
-    printf("Generated rev %d\n", rev);
+    DO( find_path()     );
+    if(!local)
+    {
+        DO( find_origin()   );
+        if(do_fetch)
+        {
+            DO( fetch_origin()  );
+            DO( check_fwd()     );
+        }
+    }
+    DO( find_rev()      );
+    DO( find_head_msg() );
+    DO( write_rev()     );
+    DO( amend_commit()  );
 
     return 0;
 }
-
