@@ -298,7 +298,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
         Player *target = GetPlayer();
 
         //Players with Feather Fall or low fall time, or physical immunity (charges used) are ignored
-        if (movementInfo.fallTime > 1100 && !target->isDead() && !target->isGameMaster() &&
+        if (movementInfo.fallTime > 1500 && !target->isDead() && !target->isGameMaster() &&
             !target->HasAuraType(SPELL_AURA_HOVER) && !target->HasAuraType(SPELL_AURA_FEATHER_FALL) &&
             !target->HasAuraType(SPELL_AURA_FLY) && !target->IsImmunedToDamage(SPELL_SCHOOL_MASK_NORMAL,true) )
         {
@@ -306,10 +306,10 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
             int32 safe_fall = target->GetTotalAuraModifier(SPELL_AURA_SAFE_FALL);
             uint32 fall_time = (movementInfo.fallTime > (safe_fall*10)) ? movementInfo.fallTime - (safe_fall*10) : 0;
 
-            if(fall_time > 1100)                            //Prevent damage if fall time < 1100
+            if(fall_time > 1500)                            //Prevent damage if fall time < 1500
             {
                 //Fall Damage calculation
-                float fallperc = float(fall_time)/1100;
+                float fallperc = float(fall_time)/1500;
                 uint32 damage = (uint32)(((fallperc*fallperc -1) / 9 * target->GetMaxHealth())*sWorld.getRate(RATE_DAMAGE_FALL));
 
                 float height = movementInfo.z;

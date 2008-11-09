@@ -2061,6 +2061,22 @@ enum SummonType
     SUMMON_TYPE_POSESSED2   = 428
 };
 
+enum SummonType2
+{
+    SUMMON_TYPE2_UNKNOWN    = 0,
+    SUMMON_TYPE2_SUMMON     = 1,
+    SUMMON_TYPE2_GUARDIAN   = 2,
+    SUMMON_TYPE2_DEMON      = 3,
+    SUMMON_TYPE2_TOTEM      = 4,
+    SUMMON_TYPE2_CRITTER    = 5,
+    SUMMON_TYPE2_GHOUL      = 6,
+    SUMMON_TYPE2_BOMB       = 7,
+    SUMMON_TYPE2_PHASING    = 8,
+    SUMMON_TYPE2_SIEGE_VEH  = 9,
+    SUMMON_TYPE2_DRAKE_VEH  = 10,
+    SUMMON_TYPE2_LIGHTWELL  = 11
+};
+
 enum ResponseCodes
 {
     RESPONSE_SUCCESS                                       = 0x00,
