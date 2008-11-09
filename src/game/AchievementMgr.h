@@ -23,6 +23,8 @@
 #include "Database/DBCStores.h"
 #include "Database/DatabaseEnv.h"
 
+#define CRITERIA_CAST_SPELL_REQ_COUNT 46
+
 struct CriteriaProgress
 {
     CriteriaProgress(uint32 id, uint32 counter, time_t date = time(NULL))
@@ -38,13 +40,6 @@ struct CriteriaProgress
 
 struct CriteriaCastSpellRequirement
 {
-    CriteriaCastSpellRequirement(uint32 achievementCriteriaId, uint32 creatureEntry, uint32 playerClass, uint32 playerRace)
-    {
-        this->achievementCriteriaId = achievementCriteriaId;
-        this->creatureEntry = creatureEntry;
-        this->playerClass = playerClass;
-        this->playerRace = playerRace;
-    }
     uint32 achievementCriteriaId;
     uint32 creatureEntry;
     uint8 playerClass;
@@ -92,6 +87,6 @@ class AchievementMgr
         Player* m_player;
         CriteriaProgressMap m_criteriaProgress;
         CompletedAchievementMap m_completedAchievements;
-        static const CriteriaCastSpellRequirement* criteriaCastSpellRequirements[];
+        static const CriteriaCastSpellRequirement criteriaCastSpellRequirements[];
 };
 #endif

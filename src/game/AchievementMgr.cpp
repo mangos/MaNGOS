@@ -27,60 +27,55 @@
 #include "GameEvent.h"
 #include "World.h"
 
-const CriteriaCastSpellRequirement* AchievementMgr::criteriaCastSpellRequirements[] =
+const CriteriaCastSpellRequirement AchievementMgr::criteriaCastSpellRequirements[CRITERIA_CAST_SPELL_REQ_COUNT] =
     {
-        new CriteriaCastSpellRequirement(5272, 3057, 0, 0),
-        new CriteriaCastSpellRequirement(5273, 2784, 0, 0),
-        new CriteriaCastSpellRequirement(5752, 9099, 0, 0),
-        new CriteriaCastSpellRequirement(5753, 8403, 0, 0),
-
-        new CriteriaCastSpellRequirement(5772, 0, 0, RACE_GNOME),
-        new CriteriaCastSpellRequirement(5774, 0, 0, RACE_BLOODELF),
-        new CriteriaCastSpellRequirement(5775, 0, 0, RACE_DRAENEI),
-        new CriteriaCastSpellRequirement(5776, 0, 0, RACE_DWARF),
-        new CriteriaCastSpellRequirement(5777, 0, 0, RACE_HUMAN),
-        new CriteriaCastSpellRequirement(5778, 0, 0, RACE_NIGHTELF),
-        new CriteriaCastSpellRequirement(5779, 0, 0, RACE_ORC),
-        new CriteriaCastSpellRequirement(5780, 0, 0, RACE_TAUREN),
-        new CriteriaCastSpellRequirement(5781, 0, 0, RACE_TROLL),
-        new CriteriaCastSpellRequirement(5782, 0, 0, RACE_UNDEAD_PLAYER),
-
-        new CriteriaCastSpellRequirement(6225, 5661, 0, 0),
-        new CriteriaCastSpellRequirement(6226, 26044, 0, 0),
-        new CriteriaCastSpellRequirement(6228, 739, 0, 0),
-        new CriteriaCastSpellRequirement(6229, 927, 0, 0),
-        new CriteriaCastSpellRequirement(6230, 1444, 0, 0),
-        new CriteriaCastSpellRequirement(6231, 8140, 0, 0),
-        new CriteriaCastSpellRequirement(6232, 5489, 0, 0),
-        new CriteriaCastSpellRequirement(6233,12336, 0, 0),
-        new CriteriaCastSpellRequirement(6234, 1351, 0, 0),
-        new CriteriaCastSpellRequirement(6235, 5484, 0, 0),
-        new CriteriaCastSpellRequirement(6236, 1182, 0, 0),
-
-        new CriteriaCastSpellRequirement(6237, 0, CLASS_DEATH_KNIGHT, RACE_ORC),
-        new CriteriaCastSpellRequirement(6238, 0, CLASS_WARRIOR, RACE_HUMAN),
-        new CriteriaCastSpellRequirement(6239, 0, CLASS_SHAMAN, RACE_TAUREN),
-        new CriteriaCastSpellRequirement(6240, 0, CLASS_DRUID, RACE_NIGHTELF),
-        new CriteriaCastSpellRequirement(6241, 0, CLASS_ROGUE, RACE_UNDEAD_PLAYER),
-        new CriteriaCastSpellRequirement(6242, 0, CLASS_HUNTER, RACE_TROLL),
-        new CriteriaCastSpellRequirement(6243, 0, CLASS_MAGE, RACE_GNOME),
-        new CriteriaCastSpellRequirement(6244, 0, CLASS_PALADIN, RACE_DWARF),
-        new CriteriaCastSpellRequirement(6245, 0, CLASS_WARLOCK, RACE_BLOODELF),
-        new CriteriaCastSpellRequirement(6246, 0, CLASS_PRIEST, RACE_DRAENEI),
-
-        new CriteriaCastSpellRequirement(6312, 0, CLASS_WARLOCK, RACE_GNOME),
-        new CriteriaCastSpellRequirement(6313, 0, CLASS_DEATH_KNIGHT, RACE_HUMAN),
-        new CriteriaCastSpellRequirement(6314, 0, CLASS_PRIEST, RACE_NIGHTELF),
-        new CriteriaCastSpellRequirement(6315, 0, CLASS_SHAMAN, RACE_ORC),
-        new CriteriaCastSpellRequirement(6316, 0, CLASS_DRUID, RACE_TAUREN),
-        new CriteriaCastSpellRequirement(6317, 0, CLASS_ROGUE, RACE_TROLL),
-        new CriteriaCastSpellRequirement(6318, 0, CLASS_WARRIOR, RACE_UNDEAD_PLAYER),
-        new CriteriaCastSpellRequirement(6319, 0, CLASS_MAGE, RACE_BLOODELF),
-        new CriteriaCastSpellRequirement(6320, 0, CLASS_PALADIN, RACE_DRAENEI),
-        new CriteriaCastSpellRequirement(6321, 0, CLASS_HUNTER, RACE_DWARF),
-
-        new CriteriaCastSpellRequirement(6662, 31261, 0, 0),
-        NULL};
+        {5272, 3057, 0, 0},
+        {5273, 2784, 0, 0},
+        {5752, 9099, 0, 0},
+        {5753, 8403, 0, 0},
+        {5772, 0, 0, RACE_GNOME},
+        {5774, 0, 0, RACE_BLOODELF},
+        {5775, 0, 0, RACE_DRAENEI},
+        {5776, 0, 0, RACE_DWARF},
+        {5777, 0, 0, RACE_HUMAN},
+        {5778, 0, 0, RACE_NIGHTELF},
+        {5779, 0, 0, RACE_ORC},
+        {5780, 0, 0, RACE_TAUREN},
+        {5781, 0, 0, RACE_TROLL},
+        {5782, 0, 0, RACE_UNDEAD_PLAYER},
+        {6225, 5661, 0, 0},
+        {6226, 26044, 0, 0},
+        {6228, 739, 0, 0},
+        {6229, 927, 0, 0},
+        {6230, 1444, 0, 0},
+        {6231, 8140, 0, 0},
+        {6232, 5489, 0, 0},
+        {6233,12336, 0, 0},
+        {6234, 1351, 0, 0},
+        {6235, 5484, 0, 0},
+        {6236, 1182, 0, 0},
+        {6237, 0, CLASS_DEATH_KNIGHT, RACE_ORC},
+        {6238, 0, CLASS_WARRIOR, RACE_HUMAN},
+        {6239, 0, CLASS_SHAMAN, RACE_TAUREN},
+        {6240, 0, CLASS_DRUID, RACE_NIGHTELF},
+        {6241, 0, CLASS_ROGUE, RACE_UNDEAD_PLAYER},
+        {6242, 0, CLASS_HUNTER, RACE_TROLL},
+        {6243, 0, CLASS_MAGE, RACE_GNOME},
+        {6244, 0, CLASS_PALADIN, RACE_DWARF},
+        {6245, 0, CLASS_WARLOCK, RACE_BLOODELF},
+        {6246, 0, CLASS_PRIEST, RACE_DRAENEI},
+        {6312, 0, CLASS_WARLOCK, RACE_GNOME},
+        {6313, 0, CLASS_DEATH_KNIGHT, RACE_HUMAN},
+        {6314, 0, CLASS_PRIEST, RACE_NIGHTELF},
+        {6315, 0, CLASS_SHAMAN, RACE_ORC},
+        {6316, 0, CLASS_DRUID, RACE_TAUREN},
+        {6317, 0, CLASS_ROGUE, RACE_TROLL},
+        {6318, 0, CLASS_WARRIOR, RACE_UNDEAD_PLAYER},
+        {6319, 0, CLASS_MAGE, RACE_BLOODELF},
+        {6320, 0, CLASS_PALADIN, RACE_DRAENEI},
+        {6321, 0, CLASS_HUNTER, RACE_DWARF},
+        {6662, 31261, 0, 0}
+        };
 
 AchievementMgr::AchievementMgr(Player *player)
 {
@@ -404,13 +399,13 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                 if (!miscvalue1 || miscvalue1 != achievementCriteria->cast_spell.spellID)
                     continue;
                 // those requirements couldn't be found in the dbc
-                const CriteriaCastSpellRequirement *requirement = NULL;
 
-                for (uint32 i=0; criteriaCastSpellRequirements[i]; i++)
+                const CriteriaCastSpellRequirement *requirement = NULL;
+                for (uint32 i=0; i<CRITERIA_CAST_SPELL_REQ_COUNT; i++)
                 {
-                    if (criteriaCastSpellRequirements[i]->achievementCriteriaId == achievementCriteria->ID)
+                    if (criteriaCastSpellRequirements[i].achievementCriteriaId == achievementCriteria->ID)
                     {
-                        requirement = criteriaCastSpellRequirements[i];
+                        requirement = &criteriaCastSpellRequirements[i];
                         break;
                     }
                 }
