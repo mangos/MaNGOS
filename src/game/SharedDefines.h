@@ -1890,6 +1890,8 @@ enum CorpseDynFlags
 #define SPELL_ID_GENERIC_LEARN_PET               55884      // used for learning mounts and companions
 #define SPELL_ID_PASSIVE_BATTLE_STANCE           2457
 #define SPELL_ID_PASSIVE_RESURRECTION_SICKNESS   15007
+#define SPELL_ID_WEAPON_SWITCH_COOLDOWN_1_5s     6119
+#define SPELL_ID_WEAPON_SWITCH_COOLDOWN_1_0s     6123
 
 enum WeatherType
 {
