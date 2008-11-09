@@ -16,6 +16,26 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Table structure for table `character_db_version`
+--
+
+DROP TABLE IF EXISTS `character_db_version`;
+CREATE TABLE `character_db_version` (
+  `required_2008_11_07_03_characters_guild_bank_tab` bit(1) default NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Last applied sql update to DB';
+
+--
+-- Dumping data for table `character_db_version`
+--
+
+LOCK TABLES `character_db_version` WRITE;
+/*!40000 ALTER TABLE `character_db_version` DISABLE KEYS */;
+INSERT INTO `character_db_version` VALUES
+(NULL);
+/*!40000 ALTER TABLE `character_db_version` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `arena_team`
 --
 
@@ -853,7 +873,7 @@ CREATE TABLE `guild_bank_tab` (
   `TabId` tinyint(1) unsigned NOT NULL default '0',
   `TabName` varchar(100) NOT NULL default '',
   `TabIcon` varchar(100) NOT NULL default '',
-  `TabText` varchar(500) NOT NULL default '',
+  `TabText` text,
   PRIMARY KEY  (`guildid`,`TabId`),
   KEY `guildid_key` (`guildid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

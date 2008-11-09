@@ -16,6 +16,26 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Table structure for table `realmd_db_version`
+--
+
+DROP TABLE IF EXISTS `realmd_db_version`;
+CREATE TABLE `realmd_db_version` (
+  `required_2008_11_07_04_realmd_account` bit(1) default NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Last applied sql update to DB';
+
+--
+-- Dumping data for table `realmd_db_version`
+--
+
+LOCK TABLES `realmd_db_version` WRITE;
+/*!40000 ALTER TABLE `realmd_db_version` DISABLE KEYS */;
+INSERT INTO `realmd_db_version` VALUES
+(NULL);
+/*!40000 ALTER TABLE `realmd_db_version` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `account`
 --
 
@@ -28,7 +48,7 @@ CREATE TABLE `account` (
   `sessionkey` longtext,
   `v` longtext,
   `s` longtext,
-  `email` varchar(320) NOT NULL default '',
+  `email` text,
   `joindate` timestamp NOT NULL default CURRENT_TIMESTAMP,
   `last_ip` varchar(30) NOT NULL default '127.0.0.1',
   `failed_logins` int(11) unsigned NOT NULL default '0',
