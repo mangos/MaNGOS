@@ -962,7 +962,7 @@ struct ScalingStatValuesEntry
 struct SkillLineEntry
 {
     uint32    id;                                           // 0        m_ID
-    uint32    categoryId;                                   // 1        m_categoryID (index from SkillLineCategory.dbc)
+    int32     categoryId;                                   // 1        m_categoryID (index from SkillLineCategory.dbc)
     //uint32    skillCostID;                                // 2        m_skillCostsID not used
     char*     name[16];                                     // 3-18     m_displayName_lang
                                                             // 19 string flags, not used
