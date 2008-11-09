@@ -17753,6 +17753,9 @@ void Player::learnSkillRewardedSpells()
 
 void Player::SendAurasForTarget(Unit *target)
 {
+    if(target->GetVisibleAuras()->empty())                  // speedup things
+        return;
+
     WorldPacket data(SMSG_AURA_UPDATE_ALL);
     data.append(target->GetPackGUID());
 
@@ -17776,12 +17779,12 @@ void Player::SendAurasForTarget(Unit *target)
                     // charges
                     data << uint8(aura->m_procCharges);
 
-                    if(!(auraFlags & AFLAG_NOT_GUID))
+                    if(!(auraFlags & AFLAG_NOT_CASTER))
                     {
-                        data << uint8(0);               // packed GUID of someone (caster?)
+                        data << uint8(0);                   // packed GUID of someone (caster?)
                     }
 
-                    if(auraFlags & AFLAG_DURATION)      // include aura duration
+                    if(auraFlags & AFLAG_DURATION)          // include aura duration
                     {
                         data << uint32(aura->GetAuraMaxDuration());
                         data << uint32(aura->GetAuraDuration());

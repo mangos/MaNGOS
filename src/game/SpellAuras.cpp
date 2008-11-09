@@ -969,7 +969,7 @@ void Aura::_AddAura()
                 if(slot < MAX_AURAS)                        // slot found
                 {
                     SetAura(false);
-                    SetAuraFlags((1 << GetEffIndex()) | AFLAG_NOT_GUID | (GetAuraMaxDuration() ? AFLAG_DURATION : AFLAG_NONE) | (IsPositive() ? AFLAG_NONE : AFLAG_NEGATIVE));
+                    SetAuraFlags((1 << GetEffIndex()) | AFLAG_NOT_CASTER | ((GetAuraMaxDuration() > 0) ? AFLAG_DURATION : AFLAG_NONE) | (IsPositive() ? AFLAG_POSITIVE : AFLAG_NEGATIVE));
                     SetAuraLevel(caster ? caster->getLevel() : sWorld.getConfig(CONFIG_MAX_PLAYER_LEVEL));
                     UpdateAuraCharges();
                     SendAuraUpdate(false);
@@ -1126,7 +1126,7 @@ void Aura::SendAuraUpdate(bool remove)
     data << uint8(GetAuraLevel());
     data << uint8(GetAuraCharges());
 
-    if(!(auraFlags & AFLAG_NOT_GUID))
+    if(!(auraFlags & AFLAG_NOT_CASTER))
     {
         data << uint8(0);                                   // pguid
     }
