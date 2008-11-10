@@ -110,6 +110,7 @@ ObjectMgr::ObjectMgr()
     m_hiCharGuid        = 1;
     m_hiCreatureGuid    = 1;
     m_hiPetGuid         = 1;
+    m_hiVehicleGuid     = 1;
     m_hiItemGuid        = 1;
     m_hiGoGuid          = 1;
     m_hiDoGuid          = 1;
@@ -5102,6 +5103,8 @@ void ObjectMgr::SetHighestGuids()
 
     // pet guids are not saved to DB, set to 0 (pet guid != pet id)
     m_hiPetGuid = 0;
+    // same for vehicles
+    m_hiVehicleGuid = 0;
 
     result = CharacterDatabase.Query( "SELECT MAX(guid) FROM item_instance" );
     if( result )
@@ -5279,6 +5282,14 @@ uint32 ObjectMgr::GenerateLowGuid(HighGuid guidhigh)
                 sWorld.m_stopEvent = true;
             }
             return m_hiPetGuid;
+        case HIGHGUID_VEHICLE:
+            ++m_hiVehicleGuid;
+            if(m_hiVehicleGuid>=0x00FFFFFF)
+            {
+                sLog.outError("Vehicle guid overflow!! Can't continue, shutting down server. ");
+                sWorld.m_stopEvent = true;
+            }
+            return m_hiVehicleGuid;
         case HIGHGUID_PLAYER:
             ++m_hiCharGuid;
             if(m_hiCharGuid>=0xFFFFFFFF)

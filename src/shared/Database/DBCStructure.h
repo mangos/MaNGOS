@@ -1100,7 +1100,7 @@ struct SpellEntry
     uint32    StartRecoveryTime;                            // 209      m_startRecoveryTime
     uint32    MaxTargetLevel;                               // 210      m_maxTargetLevel
     uint32    SpellFamilyName;                              // 211      m_spellClassSet
-    uint64    SpellFamilyFlags;                             // 212-213  m_spellClassMask
+    uint64    SpellFamilyFlags;                             // 212-213  m_spellClassMask NOTE: size is 12 bytes!!!
     uint32    SpellFamilyFlags2;                            // 214      addition to m_spellClassMask
     uint32    MaxAffectedTargets;                           // 215      m_maxTargets
     uint32    DmgClass;                                     // 216      m_defenseType
@@ -1234,15 +1234,15 @@ struct StableSlotPricesEntry
     uint32 Price;
 };
 
-struct SummonPropertiesEntry
+/*struct SummonPropertiesEntry
 {
-    uint32  Id;
-    uint32  Unk1;
-    uint32  Unk2;
-    uint32  Type;
-    uint32  Slot;
-    uint32  Flags;
-};
+    uint32  Id;                                             // 0
+    uint32  Group;                                          // 1, 0 - can't be controlled?, 1 - something guardian?, 2 - pet?, 3 - something controllable?, 4 - taxi/mount?
+    uint32  Unk2;                                           // 2, 14 rows > 0
+    uint32  Type;                                           // 3, see enum
+    uint32  Slot;                                           // 4, 0-6
+    uint32  Flags;                                          // 5
+};*/
 
 struct TalentEntry
 {
@@ -1318,6 +1318,90 @@ struct TotemCategoryEntry
                                                             // 17 string flags, unused
     uint32    categoryType;                                 // 18 (one for specialization)
     uint32    categoryMask;                                 // 19 (compatibility mask for same type: different for totems, compatible from high to low for rods)
+};
+
+struct VehicleEntry
+{
+    uint32  m_ID;                                           // 0
+    uint32  m_flags;                                        // 1
+    float   m_turnSpeed;                                    // 2
+    float   m_pitchSpeed;                                   // 3
+    float   m_pitchMin;                                     // 4
+    float   m_pitchMax;                                     // 5
+    uint32  m_seatID[8];                                    // 6-13
+    float   m_mouseLookOffsetPitch;                         // 14
+    float   m_cameraFadeDistScalarMin;                      // 15
+    float   m_cameraFadeDistScalarMax;                      // 16
+    float   m_cameraPitchOffset;                            // 17
+    int     m_powerType[3];                                 // 18-20
+    int     m_powerToken[3];                                // 21-23
+    float   m_facingLimitRight;                             // 24
+    float   m_facingLimitLeft;                              // 25
+    float   m_msslTrgtTurnLingering;                        // 26
+    float   m_msslTrgtPitchLingering;                       // 27
+    float   m_msslTrgtMouseLingering;                       // 28
+    float   m_msslTrgtEndOpacity;                           // 29
+    float   m_msslTrgtArcSpeed;                             // 30
+    float   m_msslTrgtArcRepeat;                            // 31
+    float   m_msslTrgtArcWidth;                             // 32
+    float   m_msslTrgtImpactRadius[2];                      // 33-34
+    char*   m_msslTrgtArcTexture;                           // 35
+    char*   m_msslTrgtImpactTexture;                        // 36
+    char*   m_msslTrgtImpactModel[2];                       // 37-38
+    float   m_cameraYawOffset;                              // 39
+    uint32  m_uiLocomotionType;                             // 40
+    float   m_msslTrgtImpactTexRadius;                      // 41
+    uint32  m_uiSeatIndicatorType;                          // 42
+};
+
+struct VehicleSeatEntry 
+{
+    uint32  m_ID;                                           // 0
+    uint32  m_flags;                                        // 1
+    int32   m_attachmentID;                                 // 2
+    float   m_attachmentOffsetX;                            // 3
+    float   m_attachmentOffsetY;                            // 4
+    float   m_attachmentOffsetZ;                            // 5
+    float   m_enterPreDelay;                                // 6
+    float   m_enterSpeed;                                   // 7
+    float   m_enterGravity;                                 // 8
+    float   m_enterMinDuration;                             // 9
+    float   m_enterMaxDuration;                             // 10
+    float   m_enterMinArcHeight;                            // 11
+    float   m_enterMaxArcHeight;                            // 12
+    int32   m_enterAnimStart;                               // 13
+    int32   m_enterAnimLoop;                                // 14
+    int32   m_rideAnimStart;                                // 15
+    int32   m_rideAnimLoop;                                 // 16
+    int32   m_rideUpperAnimStart;                           // 17
+    int32   m_rideUpperAnimLoop;                            // 18
+    float   m_exitPreDelay;                                 // 19
+    float   m_exitSpeed;                                    // 20
+    float   m_exitGravity;                                  // 21
+    float   m_exitMinDuration;                              // 22
+    float   m_exitMaxDuration;                              // 23
+    float   m_exitMinArcHeight;                             // 24
+    float   m_exitMaxArcHeight;                             // 25
+    int32   m_exitAnimStart;                                // 26
+    int32   m_exitAnimLoop;                                 // 27
+    int32   m_exitAnimEnd;                                  // 28
+    float   m_passengerYaw;                                 // 29
+    float   m_passengerPitch;                               // 30
+    float   m_passengerRoll;                                // 31
+    int32   m_passengerAttachmentID;                        // 32
+    int32   m_vehicleEnterAnim;                             // 33
+    int32   m_vehicleExitAnim;                              // 34
+    int32   m_vehicleRideAnimLoop;                          // 35
+    int32   m_vehicleEnterAnimBone;                         // 36
+    int32   m_vehicleExitAnimBone;                          // 37
+    int32   m_vehicleRideAnimLoopBone;                      // 38
+    float   m_vehicleEnterAnimDelay;                        // 39
+    float   m_vehicleExitAnimDelay;                         // 40
+    uint32  m_vehicleAbilityDisplay;                        // 41
+    uint32  m_enterUISoundID;                               // 42
+    uint32  m_exitUISoundID;                                // 43
+    int32   m_uiSkin;                                       // 44
+    uint32  m_flagsB;                                       // 45
 };
 
 struct WorldMapAreaEntry
