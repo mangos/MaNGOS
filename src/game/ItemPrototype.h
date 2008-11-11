@@ -552,6 +552,7 @@ struct ItemPrototype
         {
             case INVTYPE_RELIC:
             case INVTYPE_SHIELD:
+            case INVTYPE_HOLDABLE:
                 return true;
         }
 
