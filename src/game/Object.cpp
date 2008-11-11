@@ -258,6 +258,10 @@ void Object::DestroyForPlayer(Player *target) const
 void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2) const
 {
     uint16 unk_flags = ((GetTypeId() == TYPEID_PLAYER) ? ((Player*)this)->m_movementInfo.unk1 : 0);
+    
+    if(GetTypeId() == TYPEID_UNIT)
+        if(((Creature*)this)->isVehicle())
+            unk_flags |= 0x20;                              // always allow pitch
 
     *data << (uint8)flags;                                  // update flags
 
@@ -331,7 +335,7 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2)
                 *data << (float)((Player*)this)->GetTransOffsetZ();
                 *data << (float)((Player*)this)->GetTransOffsetO();
                 *data << (uint32)((Player*)this)->GetTransTime();
-                *data << (uint8)((Player*)this)->GetTransUnk();
+                *data << (int8)((Player*)this)->GetTransSeat();
             }
             //MaNGOS currently not have support for other than player on transport
         }
@@ -544,7 +548,7 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2)
     // 0x80
     if(flags & UPDATEFLAG_VEHICLE)                          // unused for now
     {
-        *data << uint32(0);                                 // vehicle id
+        *data << uint32(((Vehicle*)this)->GetVehicleId());  // vehicle id
         *data << float(0);                                  // facing adjustment
     }
 }

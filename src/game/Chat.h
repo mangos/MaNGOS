@@ -427,6 +427,7 @@ class ChatHandler
         bool HandleSaveAllCommand(const char* args);
         bool HandleGetItemState(const char * args);
         bool HandleGetLootRecipient(const char * args);
+        bool HandleSpawnVehicle(const char * args);
 
         Player*   getSelectedPlayer();
         Creature* getSelectedCreature();

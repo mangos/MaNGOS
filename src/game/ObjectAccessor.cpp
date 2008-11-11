@@ -132,6 +132,9 @@ ObjectAccessor::GetCreatureOrPet(WorldObject const &u, uint64 guid)
     if(Creature *unit = GetPet(guid))
         return unit;
 
+    if(Creature *unit = GetVehicle(guid))
+        return unit;
+
     return GetCreature(u, guid);
 }
 
@@ -365,6 +368,12 @@ Pet*
 ObjectAccessor::GetPet(uint64 guid)
 {
     return GetObjectInWorld(guid, (Pet*)NULL);
+}
+
+Vehicle*
+ObjectAccessor::GetVehicle(uint64 guid)
+{
+    return GetObjectInWorld(guid, (Vehicle*)NULL);
 }
 
 Corpse*

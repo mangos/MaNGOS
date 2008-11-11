@@ -9061,7 +9061,7 @@ bool Unit::CanHaveThreatList() const
         return false;
 
     // pets and totems can not have threat list
-    if( ((Creature*)this)->isPet() || ((Creature*)this)->isTotem() )
+    if( ((Creature*)this)->isPet() || ((Creature*)this)->isTotem() || ((Creature*)this)->isVehicle() )
         return false;
 
     return true;

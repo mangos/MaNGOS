@@ -201,7 +201,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
         recv_data >> movementInfo.t_z;
         recv_data >> movementInfo.t_o;
         recv_data >> movementInfo.t_time;
-        recv_data >> movementInfo.t_unk;
+        recv_data >> movementInfo.t_seat;
     }
 
     if((MovementFlags & (MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_FLYING2)) || (movementInfo.unk1 & 0x20))

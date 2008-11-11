@@ -1661,15 +1661,16 @@ void WorldSession::HandleSpellClick( WorldPacket & recv_data )
     uint64 guid;
     recv_data >> guid;
 
-    Unit *vehicle = ObjectAccessor::GetUnit(*_player, guid);
+    Vehicle *vehicle = ObjectAccessor::GetVehicle(guid);
 
     if(!vehicle)
         return;
 
-    _player->SetClientControl(vehicle, 1);
-    _player->CastSpell(_player, 43768, true);
-    _player->SetUInt64Value(UNIT_FIELD_CHARM, guid);
-    _player->SetUInt64Value(PLAYER_FARSIGHT, guid);
+    //_player->SetClientControl(vehicle, 1);
+    //_player->CastSpell(_player, 43768, true);
+    //_player->SetUInt64Value(UNIT_FIELD_CHARM, guid);
+    //_player->SetUInt64Value(PLAYER_FARSIGHT, guid);
+    _player->EnterVehicle(vehicle);
 }
 
 void WorldSession::HandleInspectAchievements( WorldPacket & recv_data )

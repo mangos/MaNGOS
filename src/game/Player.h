@@ -47,6 +47,7 @@ class Transport;
 class UpdateMask;
 class PlayerSocial;
 class AchievementMgr;
+class Vehicle;
 
 typedef std::deque<Mail*> PlayerMails;
 
@@ -736,7 +737,7 @@ struct MovementInfo
     uint64  t_guid;
     float   t_x, t_y, t_z, t_o;
     uint32  t_time;
-    uint8   t_unk;
+    int8    t_seat;
     // swimming and unknown
     float   s_pitch;
     // last fall time
@@ -1950,6 +1951,9 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         void SetClientControl(Unit* target, uint8 allowMove);
 
+        void EnterVehicle(Vehicle *vehicle);
+        void ExitVehicle(Vehicle *vehicle);
+
         // Transports
         Transport * GetTransport() const { return m_transport; }
         void SetTransport(Transport * t) { m_transport = t; }
@@ -1959,7 +1963,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         float GetTransOffsetZ() const { return m_movementInfo.t_z; }
         float GetTransOffsetO() const { return m_movementInfo.t_o; }
         uint32 GetTransTime() const { return m_movementInfo.t_time; }
-        uint8 GetTransUnk() const { return m_movementInfo.t_unk; }
+        int8 GetTransSeat() const { return m_movementInfo.t_seat; }
 
         uint32 GetSaveTimer() const { return m_nextSave; }
         void   SetSaveTimer(uint32 timer) { m_nextSave = timer; }

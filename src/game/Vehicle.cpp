@@ -28,8 +28,9 @@
 #include "Unit.h"
 #include "Util.h"
 
-Vehicle::Vehicle() : Creature()
+Vehicle::Vehicle() : Creature(), m_vehicleId(0)
 {
+    m_isVehicle = true;
     m_updateFlag = (UPDATEFLAG_LOWGUID | UPDATEFLAG_HIGHGUID | UPDATEFLAG_LIVING | UPDATEFLAG_HAS_POSITION | UPDATEFLAG_VEHICLE);
 }
 
@@ -64,15 +65,29 @@ void Vehicle::Update(uint32 diff)
     Creature::Update(diff);
 }
 
-bool Vehicle::Create(uint32 guidlow, Map *map, uint32 Entry)
+bool Vehicle::Create(uint32 guidlow, Map *map, uint32 Entry, uint32 vehicleId, uint32 team)
 {
     SetMapId(map->GetId());
     SetInstanceId(map->GetInstanceId());
 
     Object::_Create(guidlow, Entry, HIGHGUID_VEHICLE);
 
-    if(!InitEntry(Entry))
+    if(!InitEntry(Entry, team))
         return false;
+
+    m_defaultMovementType = IDLE_MOTION_TYPE;
+
+    AIM_Initialize();
+
+    SetVehicleId(vehicleId);
+
+    SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
+
+    CreatureInfo const *ci = GetCreatureInfo();
+    setFaction(team == ALLIANCE ? ci->faction_A : ci->faction_H);
+    SetMaxHealth(ci->maxhealth);
+    SelectLevel(ci);
+    SetHealth(GetMaxHealth());
 
     return true;
 }

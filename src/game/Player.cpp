@@ -18596,3 +18596,72 @@ void Player::InitGlyphsForLevel()
 
     SetUInt32Value(PLAYER_GLYPHS_ENABLED, value);
 }
+
+void Player::EnterVehicle(Vehicle *vehicle)
+{
+    vehicle->SetCharmerGUID(GetGUID());
+    vehicle->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
+    vehicle->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
+    vehicle->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNKNOWN5);
+    vehicle->setFaction(getFaction());
+
+    SetCharm(vehicle);
+    SetUInt64Value(PLAYER_FARSIGHT, vehicle->GetGUID());
+
+    SetClientControl(vehicle, 1);
+
+    WorldPacket data(SMSG_UNKNOWN_1181, 0);
+    GetSession()->SendPacket(&data);
+
+    data.Initialize(MSG_MOVE_TELEPORT_ACK, 30);
+    data.append(GetPackGUID());
+    data << uint32(0);                                      // counter?
+    data << uint32(MOVEMENTFLAG_ONTRANSPORT);               // transport
+    data << uint16(0);                                      // special flags
+    data << uint32(getMSTime());                            // time
+    data << vehicle->GetPositionX();                        // x
+    data << vehicle->GetPositionY();                        // y
+    data << vehicle->GetPositionZ();                        // z
+    data << vehicle->GetOrientation();                      // o
+    // transport part
+    data << vehicle->GetGUID();                             // transport guid
+    data << float(0);                                       // transport offsetX
+    data << float(0);                                       // transport offsetY
+    data << float(1);                                       // transport offsetZ
+    data << float(0);                                       // transport orientation
+    data << uint32(getMSTime());                            // transport time
+    data << uint8(0);                                       // seat
+    // end of transport part
+    data << uint32(0);                                      // fall time
+    GetSession()->SendPacket(&data);
+}
+
+void Player::ExitVehicle(Vehicle *vehicle)
+{
+    vehicle->SetCharmerGUID(0);
+    vehicle->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
+    vehicle->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
+    vehicle->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNKNOWN5);
+    vehicle->setFaction((GetTeam() == ALLIANCE) ? vehicle->GetCreatureInfo()->faction_A : vehicle->GetCreatureInfo()->faction_H);
+
+    SetCharm(NULL);
+    SetUInt64Value(PLAYER_FARSIGHT, 0);
+
+    SetClientControl(vehicle, 0);
+
+    WorldPacket data(MSG_MOVE_TELEPORT_ACK, 30);
+    data.append(GetPackGUID());
+    data << uint32(0);                                      // counter?
+    data << uint32(MOVEMENTFLAG_FLY_UNK1);                  // fly unk
+    data << uint16(0x40);                                   // special flags
+    data << uint32(getMSTime());                            // time
+    data << vehicle->GetPositionX();                        // x
+    data << vehicle->GetPositionY();                        // y
+    data << vehicle->GetPositionZ();                        // z
+    data << vehicle->GetOrientation();                      // o
+    data << uint32(0);                                      // fall time
+    GetSession()->SendPacket(&data);
+
+    // only for flyable vehicles?
+    CastSpell(this, 45472, true);                           // Parachute
+}

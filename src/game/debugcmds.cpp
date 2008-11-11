@@ -31,6 +31,7 @@
 #include "Language.h"
 #include "MapManager.h"
 #include <fstream>
+#include "ObjectMgr.h"
 
 bool ChatHandler::HandleDebugInArcCommand(const char* /*args*/)
 {
@@ -515,6 +516,48 @@ bool ChatHandler::HandleGetItemState(const char* args)
         if (!error)
             SendSysMessage("All OK!");
     }
+
+    return true;
+}
+
+bool ChatHandler::HandleSpawnVehicle(const char* args)
+{
+    if(!args)
+        return false;
+
+    char* e = strtok((char*)args, " ");
+    char* i = strtok(NULL, " ");
+
+    if (!e || !i)
+        return false;
+
+    uint32 entry = (uint32)atoi(e);
+    uint32 id = (uint32)atoi(i);
+
+    // TODO: check entry, id...
+
+    Vehicle *v = new Vehicle;
+    Map *map = m_session->GetPlayer()->GetMap();
+    if(!v->Create(objmgr.GenerateLowGuid(HIGHGUID_VEHICLE), map, entry, id, m_session->GetPlayer()->GetTeam()))
+    {
+        delete v;
+        return false;
+    }
+
+    float px, py, pz;
+    m_session->GetPlayer()->GetClosePoint(px, py, pz, m_session->GetPlayer()->GetObjectSize());
+
+    v->Relocate(px, py, pz, m_session->GetPlayer()->GetOrientation());
+
+    if(!v->IsPositionValid())
+    {
+        sLog.outError("ERROR: Vehicle (guidlow %d, entry %d) not created. Suggested coordinates isn't valid (X: %f Y: %f)",
+            v->GetGUIDLow(), v->GetEntry(), v->GetPositionX(), v->GetPositionY());
+        delete v;
+        return false;
+    }
+
+    map->Add((Creature*)v);
 
     return true;
 }

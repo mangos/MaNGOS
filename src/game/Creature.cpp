@@ -1696,7 +1696,7 @@ void Creature::CallAssistence()
 
 void Creature::SaveRespawnTime()
 {
-    if(isPet() || !m_DBTableGuid)
+    if(isPet() || isVehicle() || !m_DBTableGuid)
         return;
 
     if(m_respawnTime > time(NULL))                          // dead (no corpse)
