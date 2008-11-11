@@ -221,6 +221,7 @@ void WorldSession::HandleTaxiNextDestinationOpcode(WorldPacket& recv_data)
         GetPlayer()->SetPosition(movementInfo.x, movementInfo.y, movementInfo.z, movementInfo.o);
         GetPlayer()->m_movementInfo = movementInfo;
         GetPlayer()->m_anti_lastmovetime = movementInfo.time;
+        GetPlayer()->m_anti_justteleported = 1;
         //<<< end movement anticheat
         return;
     }
