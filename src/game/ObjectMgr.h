@@ -81,7 +81,7 @@ struct ScriptInfo
     uint32 command;
     uint32 datalong;
     uint32 datalong2;
-    std::string datatext;
+    int32  dataint;
     float x;
     float y;
     float z;
@@ -124,6 +124,13 @@ typedef UNORDERED_MAP<uint32/*cell_id*/,CellObjectGuids> CellObjectGuidsMap;
 typedef UNORDERED_MAP<uint32/*(mapid,spawnMode) pair*/,CellObjectGuidsMap> MapObjectGuids;
 
 typedef UNORDERED_MAP<uint64/*(instance,guid) pair*/,time_t> RespawnTimes;
+
+
+// mangos string ranges
+#define MIN_MANGOS_STRING_ID    1
+#define MAX_MANGOS_STRING_ID    2000000000
+#define MIN_DB_SCRIPT_STRING_ID MAX_MANGOS_STRING_ID
+#define MAX_DB_SCRIPT_STRING_ID 2000010000
 
 struct MangosStringLocale
 {
@@ -499,7 +506,8 @@ class ObjectMgr
         void LoadSpellScripts();
 
         bool LoadMangosStrings(DatabaseType& db, char const* table, int32 min_value, int32 max_value);
-        bool LoadMangosStrings() { return LoadMangosStrings(WorldDatabase,"mangos_string",1,std::numeric_limits<int32>::max()); }
+        bool LoadMangosStrings() { return LoadMangosStrings(WorldDatabase,"mangos_string",MIN_MANGOS_STRING_ID,MAX_MANGOS_STRING_ID); }
+        void LoadDbScriptStrings();
         void LoadPetCreateSpells();
         void LoadCreatureLocales();
         void LoadCreatureTemplates();
@@ -824,6 +832,7 @@ class ObjectMgr
         int DBCLocaleIndex;
     private:
         void LoadScripts(ScriptMapMap& scripts, char const* tablename);
+        void CheckScripts(ScriptMapMap const& scripts,std::set<int32>& ids);
         void ConvertCreatureAddonAuras(CreatureDataAddon* addon, char const* table, char const* guidEntryStr);
         void LoadQuestRelationsHelper(QuestRelations& map,char const* table);
 
