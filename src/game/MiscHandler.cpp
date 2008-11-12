@@ -1666,11 +1666,21 @@ void WorldSession::HandleSpellClick( WorldPacket & recv_data )
     if(!vehicle)
         return;
 
-    //_player->SetClientControl(vehicle, 1);
-    //_player->CastSpell(_player, 43768, true);
-    //_player->SetUInt64Value(UNIT_FIELD_CHARM, guid);
-    //_player->SetUInt64Value(PLAYER_FARSIGHT, guid);
     _player->EnterVehicle(vehicle);
+}
+
+void WorldSession::HandleDismissControlledVehicle( WorldPacket & recv_data )
+{
+    //CHECK_PACKET_SIZE(recv_data, 8);
+    recv_data.hexlike();                                    // standard movement packet
+
+    // using charm guid, because we don't have vehicle guid...
+    Vehicle *vehicle = ObjectAccessor::GetVehicle(_player->GetCharmGUID());
+
+    if(!vehicle)
+        return;
+
+    _player->ExitVehicle(vehicle);
 }
 
 void WorldSession::HandleInspectAchievements( WorldPacket & recv_data )
@@ -1686,4 +1696,3 @@ void WorldSession::HandleInspectAchievements( WorldPacket & recv_data )
 
     player->GetAchievementMgr().SendRespondInspectAchievements(_player);
 }
-

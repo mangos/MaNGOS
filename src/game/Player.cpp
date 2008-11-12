@@ -18601,9 +18601,13 @@ void Player::EnterVehicle(Vehicle *vehicle)
 {
     vehicle->SetCharmerGUID(GetGUID());
     vehicle->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
-    vehicle->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
+    //vehicle->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
     vehicle->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNKNOWN5);
     vehicle->setFaction(getFaction());
+    //vehicle->SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
+    //vehicle->SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, 2147483647);
+    //vehicle->SetUInt32Value(UNIT_DYNAMIC_FLAGS, 0);
+    //vehicle->SetUInt32Value(UNIT_FIELD_BYTES_1, 0x02000000);
 
     SetCharm(vehicle);
     SetUInt64Value(PLAYER_FARSIGHT, vehicle->GetGUID());
@@ -18634,15 +18638,29 @@ void Player::EnterVehicle(Vehicle *vehicle)
     // end of transport part
     data << uint32(0);                                      // fall time
     GetSession()->SendPacket(&data);
+
+    data.Initialize(SMSG_PET_SPELLS, 8+4+4+4+4*10+1+1);
+    data << uint64(vehicle->GetGUID());
+    data << uint32(0x00000000);
+    data << uint32(0x00000000);
+    data << uint32(0x00000101);
+
+    for(uint32 i = 0; i < 10; ++i)
+        data << uint16(0) << uint8(0) << uint8(i+8);
+
+    data << uint8(0);
+    data << uint8(0);
+    GetSession()->SendPacket(&data);
 }
 
 void Player::ExitVehicle(Vehicle *vehicle)
 {
     vehicle->SetCharmerGUID(0);
     vehicle->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
-    vehicle->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
+    //vehicle->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
     vehicle->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNKNOWN5);
     vehicle->setFaction((GetTeam() == ALLIANCE) ? vehicle->GetCreatureInfo()->faction_A : vehicle->GetCreatureInfo()->faction_H);
+    //vehicle->SetUInt32Value(UNIT_DYNAMIC_FLAGS, 0);
 
     SetCharm(NULL);
     SetUInt64Value(PLAYER_FARSIGHT, 0);
@@ -18660,6 +18678,11 @@ void Player::ExitVehicle(Vehicle *vehicle)
     data << vehicle->GetPositionZ();                        // z
     data << vehicle->GetOrientation();                      // o
     data << uint32(0);                                      // fall time
+    GetSession()->SendPacket(&data);
+
+    data.Initialize(SMSG_PET_SPELLS, 8+4);
+    data << uint64(0);
+    data << uint32(0);
     GetSession()->SendPacket(&data);
 
     // only for flyable vehicles?

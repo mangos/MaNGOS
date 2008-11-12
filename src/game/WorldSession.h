@@ -551,7 +551,8 @@ class MANGOS_DLL_SPEC WorldSession
         void HandlePetUnlearnOpcode( WorldPacket& recvPacket );
         void HandlePetSpellAutocastOpcode( WorldPacket& recvPacket );
         void HandlePetCastSpellOpcode( WorldPacket& recvPacket );
-        void HandlePetLearnTalent( WorldPacket& recvPacket );;
+        void HandlePetLearnTalent( WorldPacket& recvPacket );
+        void HandleDismissControlledVehicle( WorldPacket& recvPacket );
 
         void HandleSetActionBar(WorldPacket& recv_data);
 
