@@ -10041,19 +10041,24 @@ void Unit::ProcDamageAndSpellFor( bool isVictim, Unit * pTarget, uint32 procFlag
                 }
             }
 
-            // this is aura triggering code call
+            /// this is aura triggering code call
             Aura* triggeredByAura = i->triggeredByAura;
 
-            // save charges existence before processing to prevent crash at access to deleted triggered aura after
+            /// save charges existence before processing to prevent crash at access to deleted triggered aura after
+            /// used in speedup code check before check aura existance.
             bool triggeredByAuraWithCharges =  triggeredByAura->m_procCharges > 0;
 
+            /// success in event proccesing
+            /// used in speedup code check before check aura existance.
             bool casted = false;
+
+            /// process triggered code
             switch(*aur)
             {
                 case SPELL_AURA_PROC_TRIGGER_SPELL:
                 {
                     sLog.outDebug("ProcDamageAndSpell: casting spell (triggered by %s proc aura of spell %u)",
-                        (isVictim?"a victim's":"an attacker's"),i->triggeredByAura->GetId());
+                        (isVictim?"a victim's":"an attacker's"),triggeredByAura->GetId());
                     casted = HandleProcTriggerSpell(pTarget, damage, triggeredByAura, procSpell, procFlag, attType, i->cooldown);
                     break;
                 }
@@ -10086,7 +10091,7 @@ void Unit::ProcDamageAndSpellFor( bool isVictim, Unit * pTarget, uint32 procFlag
                 {
                     sLog.outDebug("ProcDamageAndSpell: casting spell (triggered by %s haste aura of spell %u)",
                         (isVictim?"a victim's":"an attacker's"),triggeredByAura->GetId());
-                    casted = HandleHasteAuraProc(pTarget, damage, i->triggeredByAura, procSpell, procFlag,i->cooldown);
+                    casted = HandleHasteAuraProc(pTarget, damage, triggeredByAura, procSpell, procFlag,i->cooldown);
                     break;
                 }
                 case SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN:
@@ -10100,7 +10105,7 @@ void Unit::ProcDamageAndSpellFor( bool isVictim, Unit * pTarget, uint32 procFlag
                 {
                     sLog.outDebug("ProcDamageAndSpell: casting spell id %u (triggered by %s class script aura of spell %u)",
                         (isVictim?"a victim's":"an attacker's"),triggeredByAura->GetId());
-                    casted = HandleOverrideClassScriptAuraProc(pTarget, i->triggeredByAura, procSpell,i->cooldown);
+                    casted = HandleOverrideClassScriptAuraProc(pTarget, triggeredByAura, procSpell,i->cooldown);
                     break;
                 }
                 default:
@@ -10111,27 +10116,27 @@ void Unit::ProcDamageAndSpellFor( bool isVictim, Unit * pTarget, uint32 procFlag
                 }
             }
 
-            // Update charge (aura can be removed by triggers)
+            /// Update charge (aura can be removed by triggers)
             if(casted && triggeredByAuraWithCharges)
             {
-                // need found aura (can be dropped by triggers)
+                /// need re-found aura (can be dropped by triggers)
                 AuraMap::const_iterator lower = GetAuras().lower_bound(i->triggeredByAura_SpellPair);
                 AuraMap::const_iterator upper = GetAuras().upper_bound(i->triggeredByAura_SpellPair);
                 for(AuraMap::const_iterator itr = lower; itr!= upper; ++itr)
                 {
-                    if(itr->second == i->triggeredByAura)
+                    if(itr->second == triggeredByAura)      // pointer still valid
                     {
-                        if(i->triggeredByAura->m_procCharges > 0)
-                            i->triggeredByAura->m_procCharges -= 1;
+                        if(triggeredByAura->m_procCharges > 0)
+                            triggeredByAura->m_procCharges -= 1;
 
-                        i->triggeredByAura->UpdateAuraCharges();
+                        triggeredByAura->UpdateAuraCharges();
                         break;
                     }
                 }
             }
         }
 
-        // Safely remove auras with zero charges
+        /// Safely remove auras with zero charges
         for(AuraList::const_iterator i = auras.begin(), next; i != auras.end(); i = next)
         {
             next = i; ++next;
