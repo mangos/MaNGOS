@@ -75,7 +75,7 @@ public:
         w_loops = 0;
         m_lastchange = 0;
         w_lastchange = 0;
-        while(!World::m_stopEvent)
+        while(!World::IsStopped())
         {
             ZThread::Thread::sleep(1000);
             uint32 curtime = getMSTime();
@@ -170,13 +170,13 @@ public:
 
     // if use ra spend time waiting for io, if not use ra ,just sleep
     if (usera)
-      while (!World::m_stopEvent)
+      while (!World::IsStopped())
         {
           h.Select (0, socketSelecttime);
           checkping ();
         }
     else
-      while (!World::m_stopEvent)
+      while (!World::IsStopped())
         {
           ZThread::Thread::sleep (static_cast<unsigned long> (socketSelecttime / 1000));
           checkping ();
@@ -308,7 +308,7 @@ int Master::Run()
   if (sWorldSocketMgr->StartNetwork (wsport, bind_ip.c_str ()) == -1)
     {
       sLog.outError ("Failed to start network");
-      World::m_stopEvent = true;
+      World::StopNow(ERROR_EXIT_CODE);
       // go down and shutdown the server
     }
 
@@ -379,7 +379,8 @@ int Master::Run()
     // fixes a memory leak related to detaching threads from the module
     UnloadScriptingModule();
 
-    return sWorld.GetShutdownMask() & SHUTDOWN_MASK_RESTART ? 2 : 0;
+    // Exit the process with specified return value
+    return World::GetExitCode();
 }
 
 /// Initialize connection to the databases
@@ -462,17 +463,18 @@ void Master::clearOnlineAccounts()
 }
 
 /// Handle termination signals
-/** Put the World::m_stopEvent to 'true' if a termination signal is caught **/
 void Master::_OnSignal(int s)
 {
     switch (s)
     {
         case SIGINT:
+            World::StopNow(RESTART_EXIT_CODE);
+            break;
         case SIGTERM:
         #ifdef _WIN32
         case SIGBREAK:
         #endif
-            World::m_stopEvent = true;
+            World::StopNow(SHUTDOWN_EXIT_CODE);
             break;
     }
 

@@ -5179,7 +5179,7 @@ uint32 ObjectMgr::GenerateArenaTeamId()
     if(m_arenaTeamId>=0xFFFFFFFF)
     {
         sLog.outError("Arena team ids overflow!! Can't continue, shutting down server. ");
-        sWorld.m_stopEvent = true;
+        World::StopNow(ERROR_EXIT_CODE);
     }
     return m_arenaTeamId;
 }
@@ -5190,7 +5190,7 @@ uint32 ObjectMgr::GenerateGuildId()
     if(m_guildId>=0xFFFFFFFF)
     {
         sLog.outError("Guild ids overflow!! Can't continue, shutting down server. ");
-        sWorld.m_stopEvent = true;
+        World::StopNow(ERROR_EXIT_CODE);
     }
     return m_guildId;
 }
@@ -5201,7 +5201,7 @@ uint32 ObjectMgr::GenerateAuctionID()
     if(m_auctionid>=0xFFFFFFFF)
     {
         sLog.outError("Auctions ids overflow!! Can't continue, shutting down server. ");
-        sWorld.m_stopEvent = true;
+        World::StopNow(ERROR_EXIT_CODE);
     }
     return m_auctionid;
 }
@@ -5212,7 +5212,7 @@ uint32 ObjectMgr::GenerateMailID()
     if(m_mailid>=0xFFFFFFFF)
     {
         sLog.outError("Mail ids overflow!! Can't continue, shutting down server. ");
-        sWorld.m_stopEvent = true;
+        World::StopNow(ERROR_EXIT_CODE);
     }
     return m_mailid;
 }
@@ -5223,7 +5223,7 @@ uint32 ObjectMgr::GenerateItemTextID()
     if(m_ItemTextId>=0xFFFFFFFF)
     {
         sLog.outError("Item text ids overflow!! Can't continue, shutting down server. ");
-        sWorld.m_stopEvent = true;
+        World::StopNow(ERROR_EXIT_CODE);
     }
     return m_ItemTextId;
 }
@@ -5251,7 +5251,7 @@ uint32 ObjectMgr::GenerateLowGuid(HighGuid guidhigh)
             if(m_hiItemGuid>=0xFFFFFFFF)
             {
                 sLog.outError("Item guid overflow!! Can't continue, shutting down server. ");
-                sWorld.m_stopEvent = true;
+                World::StopNow(ERROR_EXIT_CODE);
             }
             return m_hiItemGuid;
         case HIGHGUID_UNIT:
@@ -5259,7 +5259,7 @@ uint32 ObjectMgr::GenerateLowGuid(HighGuid guidhigh)
             if(m_hiCreatureGuid>=0x00FFFFFF)
             {
                 sLog.outError("Creature guid overflow!! Can't continue, shutting down server. ");
-                sWorld.m_stopEvent = true;
+                World::StopNow(ERROR_EXIT_CODE);
             }
             return m_hiCreatureGuid;
         case HIGHGUID_PET:
@@ -5267,7 +5267,7 @@ uint32 ObjectMgr::GenerateLowGuid(HighGuid guidhigh)
             if(m_hiPetGuid>=0x00FFFFFF)
             {
                 sLog.outError("Pet guid overflow!! Can't continue, shutting down server. ");
-                sWorld.m_stopEvent = true;
+                World::StopNow(ERROR_EXIT_CODE);
             }
             return m_hiPetGuid;
         case HIGHGUID_PLAYER:
@@ -5275,7 +5275,7 @@ uint32 ObjectMgr::GenerateLowGuid(HighGuid guidhigh)
             if(m_hiCharGuid>=0xFFFFFFFF)
             {
                 sLog.outError("Players guid overflow!! Can't continue, shutting down server. ");
-                sWorld.m_stopEvent = true;
+                World::StopNow(ERROR_EXIT_CODE);
             }
             return m_hiCharGuid;
         case HIGHGUID_GAMEOBJECT:
@@ -5283,7 +5283,7 @@ uint32 ObjectMgr::GenerateLowGuid(HighGuid guidhigh)
             if(m_hiGoGuid>=0x00FFFFFF)
             {
                 sLog.outError("Gameobject guid overflow!! Can't continue, shutting down server. ");
-                sWorld.m_stopEvent = true;
+                World::StopNow(ERROR_EXIT_CODE);
             }
             return m_hiGoGuid;
         case HIGHGUID_CORPSE:
@@ -5291,7 +5291,7 @@ uint32 ObjectMgr::GenerateLowGuid(HighGuid guidhigh)
             if(m_hiCorpseGuid>=0xFFFFFFFF)
             {
                 sLog.outError("Corpse guid overflow!! Can't continue, shutting down server. ");
-                sWorld.m_stopEvent = true;
+                World::StopNow(ERROR_EXIT_CODE);
             }
             return m_hiCorpseGuid;
         case HIGHGUID_DYNAMICOBJECT:
@@ -5299,7 +5299,7 @@ uint32 ObjectMgr::GenerateLowGuid(HighGuid guidhigh)
             if(m_hiDoGuid>=0xFFFFFFFF)
             {
                 sLog.outError("DynamicObject guid overflow!! Can't continue, shutting down server. ");
-                sWorld.m_stopEvent = true;
+                World::StopNow(ERROR_EXIT_CODE);
             }
             return m_hiDoGuid;
         default:
