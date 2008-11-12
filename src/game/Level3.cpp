@@ -6324,7 +6324,8 @@ bool ChatHandler::HandleSendMoneyCommand(const char* args)
     if (!msgText)
         return false;
 
-    int32 money = atoi(strtok(NULL, ""));
+    char* money_str = strtok(NULL, "");
+    int32 money = money_str ? atoi(money_str) : 0;
     if (money <= 0)
         return false;
 
