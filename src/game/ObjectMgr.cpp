@@ -3704,7 +3704,7 @@ void ObjectMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
 
     scripts.clear();                                        // need for reload support
 
-    QueryResult *result = WorldDatabase.PQuery( "SELECT id,delay,command,datalong,datalong2,datatext, x, y, z, o FROM %s", tablename );
+    QueryResult *result = WorldDatabase.PQuery( "SELECT id,delay,command,datalong,datalong2,dataint, x, y, z, o FROM %s", tablename );
 
     uint32 count = 0;
 
@@ -3726,16 +3726,16 @@ void ObjectMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
 
         Field *fields = result->Fetch();
         ScriptInfo tmp;
-        tmp.id = fields[0].GetUInt32();
-        tmp.delay = fields[1].GetUInt32();
-        tmp.command = fields[2].GetUInt32();
-        tmp.datalong = fields[3].GetUInt32();
+        tmp.id        = fields[0].GetUInt32();
+        tmp.delay     = fields[1].GetUInt32();
+        tmp.command   = fields[2].GetUInt32();
+        tmp.datalong  = fields[3].GetUInt32();
         tmp.datalong2 = fields[4].GetUInt32();
-        tmp.datatext = fields[5].GetCppString();
-        tmp.x = fields[6].GetFloat();
-        tmp.y = fields[7].GetFloat();
-        tmp.z = fields[8].GetFloat();
-        tmp.o = fields[9].GetFloat();
+        tmp.dataint   = fields[5].GetInt32();
+        tmp.x         = fields[6].GetFloat();
+        tmp.y         = fields[7].GetFloat();
+        tmp.z         = fields[8].GetFloat();
+        tmp.o         = fields[9].GetFloat();
 
         // generic command args check
         switch(tmp.command)
@@ -3745,6 +3745,21 @@ void ObjectMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
                 if(tmp.datalong > 3)
                 {
                     sLog.outErrorDb("Table `%s` has invalid talk type (datalong = %u) in SCRIPT_COMMAND_TALK for script id %u",tablename,tmp.datalong,tmp.id);
+                    continue;
+                }
+                if(tmp.dataint==0)
+                {
+                    sLog.outErrorDb("Table `%s` has invalid talk text id (dataint = %i) in SCRIPT_COMMAND_TALK for script id %u",tablename,tmp.dataint,tmp.id);
+                    continue;
+                }
+                if(tmp.dataint < MIN_DB_SCRIPT_STRING_ID || tmp.dataint >= MAX_DB_SCRIPT_STRING_ID)
+                {
+                    sLog.outErrorDb("Table `%s` has out of range text id (dataint = %i expected %u-%u) in SCRIPT_COMMAND_TALK for script id %u",tablename,tmp.dataint,MIN_DB_SCRIPT_STRING_ID,MAX_DB_SCRIPT_STRING_ID,tmp.id);
+                    continue;
+                }
+                if(!objmgr.GetMangosStringLocale(tmp.dataint))
+                {
+                    sLog.outErrorDb("Table `%s` has not existed text id (dataint = %i) in SCRIPT_COMMAND_TALK for script id %u",tablename,tmp.dataint,tmp.id);
                     continue;
                 }
                 break;
@@ -7263,6 +7278,44 @@ bool ObjectMgr::IsVendorItemValid( uint32 vendor_entry, uint32 item_id, uint32 m
 
     return true;
 }
+
+void ObjectMgr::CheckScripts(ScriptMapMap const& scripts,std::set<int32>& ids)
+{
+    for(ScriptMapMap::const_iterator itrMM = scripts.begin(); itrMM != scripts.end(); ++itrMM)
+    {
+        for(ScriptMap::const_iterator itrM = itrMM->second.begin(); itrM != itrMM->second.end(); ++itrM)
+        {
+            if(itrM->second.dataint)
+            {
+                if(ids.count(itrM->second.dataint))
+                    ids.erase(itrM->second.dataint);
+                else
+                    sLog.outErrorDb( "Table `db_script_string` has not existed string id  %u", *itrM);
+            }
+        }
+    }
+}
+
+void ObjectMgr::LoadDbScriptStrings()
+{
+    LoadMangosStrings(WorldDatabase,"db_script_string",MIN_DB_SCRIPT_STRING_ID,MAX_DB_SCRIPT_STRING_ID);
+
+    std::set<int32> ids;
+
+    for(int32 i = MIN_DB_SCRIPT_STRING_ID; i < MAX_DB_SCRIPT_STRING_ID; ++i)
+        if(GetMangosStringLocale(i))
+            ids.insert(i);
+
+    CheckScripts(sQuestEndScripts,ids);
+    CheckScripts(sQuestStartScripts,ids);
+    CheckScripts(sSpellScripts,ids);
+    CheckScripts(sGameObjectScripts,ids);
+    CheckScripts(sEventScripts,ids);
+
+    for(std::set<int32>::const_iterator itr = ids.begin(); itr != ids.end(); ++itr)
+        sLog.outErrorDb( "Table `db_script_string` has unused string id  %u", *itr);
+}
+
 
 // Functions for scripting access
 const char* GetAreaTriggerScriptNameById(uint32 id)

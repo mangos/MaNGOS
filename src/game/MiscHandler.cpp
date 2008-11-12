@@ -493,7 +493,7 @@ void WorldSession::HandleAddFriendOpcodeCallBack(QueryResult *result, uint32 acc
     delete result;
 
     WorldSession * session = sWorld.FindSession(accountId);
-    if(!session)
+    if(!session || !session->GetPlayer())
         return;
 
     FriendsResult friendResult = FRIEND_NOT_FOUND;
@@ -576,7 +576,7 @@ void WorldSession::HandleAddIgnoreOpcodeCallBack(QueryResult *result, uint32 acc
     delete result;
 
     WorldSession * session = sWorld.FindSession(accountId);
-    if(!session)
+    if(!session || !session->GetPlayer())
         return;
 
     FriendsResult ignoreResult = FRIEND_IGNORE_NOT_FOUND;
