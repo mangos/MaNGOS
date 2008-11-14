@@ -60,6 +60,7 @@ DatabaseType dbRealmServer;                                 ///< Accessor to the
 void usage(const char *prog)
 {
     sLog.outString("Usage: \n %s [<options>]\n"
+        "    --version                print version and exist\n\r"
         "    -c config_file           use config_file as configuration file\n\r"
         #ifdef WIN32
         "    Running as service functions:\n\r"
@@ -88,6 +89,12 @@ extern int main(int argc, char **argv)
             }
             else
                 cfg_file = argv[c];
+        }
+
+        if( strcmp(argv[c],"--version") == 0)
+        {
+            printf("%s\n", _FULLVERSION(REVISION_DATE,REVISION_TIME,REVISION_NR,REVISION_ID));
+            return 0;
         }
 
         #ifdef WIN32
@@ -130,6 +137,9 @@ extern int main(int argc, char **argv)
         ++c;
     }
 
+    sLog.outString( "%s [realm-daemon]", _FULLVERSION(REVISION_DATE,REVISION_TIME,REVISION_NR,REVISION_ID) );
+    sLog.outString( "<Ctrl-C> to stop.\n" );
+
     if (!sConfig.SetSource(cfg_file))
     {
         sLog.outError("Could not find configuration file %s.", cfg_file);
@@ -150,9 +160,6 @@ extern int main(int argc, char **argv)
 
         while (pause > clock()) {}
     }
-
-    sLog.outString( "%s [realm-daemon]", _FULLVERSION(REVISION_DATE,REVISION_TIME,REVISION_NR,REVISION_ID) );
-    sLog.outString( "<Ctrl-C> to stop.\n" );
 
     /// realmd PID file creation
     std::string pidfile = sConfig.GetStringDefault("PidFile", "");
