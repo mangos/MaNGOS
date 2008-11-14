@@ -246,32 +246,6 @@ ObjectAccessor::SaveAllPlayers()
 }
 
 void
-ObjectAccessor::_update()
-{
-    UpdateDataMapType update_players;
-    {
-        Guard guard(i_updateGuard);
-        while(!i_objects.empty())
-        {
-            Object* obj = *i_objects.begin();
-            i_objects.erase(i_objects.begin());
-            if (!obj)
-                continue;
-            _buildUpdateObject(obj, update_players);
-            obj->ClearUpdateMask(false);
-        }
-    }
-
-    WorldPacket packet;                                     // here we allocate a std::vector with a size of 0x10000
-    for(UpdateDataMapType::iterator iter = update_players.begin(); iter != update_players.end(); ++iter)
-    {
-        iter->second.BuildPacket(&packet);
-        iter->first->GetSession()->SendPacket(&packet);
-        packet.clear();                                     // clean the string
-    }
-}
-
-void
 ObjectAccessor::UpdateObject(Object* obj, Player* exceptPlayer)
 {
     UpdateDataMapType update_players;
@@ -505,72 +479,36 @@ ObjectAccessor::ConvertCorpseForPlayer(uint64 player_guid)
 void
 ObjectAccessor::Update(uint32 diff)
 {
+    UpdateDataMapType update_players;
     {
-        typedef std::multimap<uint32, Player *> CreatureLocationHolderType;
-        CreatureLocationHolderType creature_locations;
-        //TODO: Player guard
-        HashMapHolder<Player>::MapType& playerMap = HashMapHolder<Player>::GetContainer();
-        for(HashMapHolder<Player>::MapType::iterator iter = playerMap.begin(); iter != playerMap.end(); ++iter)
+        Guard guard(i_updateGuard);
+        while(!i_objects.empty())
         {
-            if(iter->second->IsInWorld())
-            {
-                iter->second->Update(diff);
-                creature_locations.insert( CreatureLocationHolderType::value_type(iter->second->GetMapId(), iter->second) );
-            }
-        }
-
-        Map *map;
-
-        MaNGOS::ObjectUpdater updater(diff);
-        // for creature
-        TypeContainerVisitor<MaNGOS::ObjectUpdater, GridTypeMapContainer  > grid_object_update(updater);
-        // for pets
-        TypeContainerVisitor<MaNGOS::ObjectUpdater, WorldTypeMapContainer > world_object_update(updater);
-
-        for(CreatureLocationHolderType::iterator iter=creature_locations.begin(); iter != creature_locations.end(); ++iter)
-        {
-            MapManager::Instance().GetMap((*iter).first, (*iter).second)->resetMarkedCells();
-        }
-
-        for(CreatureLocationHolderType::iterator iter=creature_locations.begin(); iter != creature_locations.end(); ++iter)
-        {
-            Player *player = (*iter).second;
-            map = MapManager::Instance().GetMap((*iter).first, player);
-
-            CellPair standing_cell(MaNGOS::ComputeCellPair(player->GetPositionX(), player->GetPositionY()));
-
-            // Check for correctness of standing_cell, it also avoids problems with update_cell
-            if (standing_cell.x_coord >= TOTAL_NUMBER_OF_CELLS_PER_MAP || standing_cell.y_coord >= TOTAL_NUMBER_OF_CELLS_PER_MAP)
+            Object* obj = *i_objects.begin();
+            i_objects.erase(i_objects.begin());
+            if (!obj)
                 continue;
-
-            // the overloaded operators handle range checking
-            // so ther's no need for range checking inside the loop
-            CellPair begin_cell(standing_cell), end_cell(standing_cell);
-            begin_cell << 1; begin_cell -= 1;               // upper left
-            end_cell >> 1; end_cell += 1;                   // lower right
-
-            for(uint32 x = begin_cell.x_coord; x <= end_cell.x_coord; x++)
-            {
-                for(uint32 y = begin_cell.y_coord; y <= end_cell.y_coord; y++)
-                {
-                    uint32 cell_id = (y * TOTAL_NUMBER_OF_CELLS_PER_MAP) + x;
-                    if( !map->isCellMarked(cell_id) )
-                    {
-                        CellPair cell_pair(x,y);
-                        map->markCell(cell_id);
-                        Cell cell(cell_pair);
-                        cell.data.Part.reserved = CENTER_DISTRICT;
-                        cell.SetNoCreate();
-                        CellLock<NullGuard> cell_lock(cell, cell_pair);
-                        cell_lock->Visit(cell_lock, grid_object_update,  *map);
-                        cell_lock->Visit(cell_lock, world_object_update, *map);
-                    }
-                }
-            }
+            _buildUpdateObject(obj, update_players);
+            obj->ClearUpdateMask(false);
         }
     }
 
-    _update();
+    WorldPacket packet;                                     // here we allocate a std::vector with a size of 0x10000
+    for(UpdateDataMapType::iterator iter = update_players.begin(); iter != update_players.end(); ++iter)
+    {
+        iter->second.BuildPacket(&packet);
+        iter->first->GetSession()->SendPacket(&packet);
+        packet.clear();                                     // clean the string
+    }
+}
+
+void
+ObjectAccessor::UpdatePlayers(uint32 diff)
+{
+    HashMapHolder<Player>::MapType& playerMap = HashMapHolder<Player>::GetContainer();
+    for(HashMapHolder<Player>::MapType::iterator iter = playerMap.begin(); iter != playerMap.end(); ++iter)
+        if(iter->second->IsInWorld())
+            iter->second->Update(diff);
 }
 
 bool
