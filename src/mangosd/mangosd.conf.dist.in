@@ -1047,6 +1047,22 @@ Network.OutUBuff = 65536
 Network.TcpNodelay = 1
 
 ###################################################################################################################
+# MOVEMENT ANTICHEAT
+#
+#    Anticheat.Movement.Enable
+#        Enable Movement Anticheat
+#        Default: 1 - on
+#                 0 - off
+#
+#    Anticheat.Movement.TeleportToPlaneAlarms
+#        maximum alarms before player will be kicked (default 50, allowed 20 - 100)
+#
+###################################################################################################################
+
+Anticheat.Movement.Enable = 1
+Anticheat.Movement.TeleportToPlaneAlarms = 50
+
+###################################################################################################################
 # CONSOLE AND REMOTE ACCESS
 #
 #    Console.Enable
@@ -1078,20 +1094,4 @@ Ra.Enable = 0
 Ra.IP = 0.0.0.0
 Ra.Port = 3443
 Ra.MinLevel = 3
-Ra.Secure = 1
-
-###################################################################################################################
-# MOVEMENT ANTICHEAT
-#
-#    Anticheat.Movement.Enable
-#        Enable Movement Anticheat
-#        Default: 1 - on
-#                 0 - off
-#
-#    Anticheat.Movement.TeleportToPlaneAlarms
-#        maximum alarms before player will be kicked (default 50, allowed 20 - 100)
-#
-###################################################################################################################
-
-Anticheat.Movement.Enable = 1
-Anticheat.Movement.TeleportToPlaneAlarms = 50
+Ra.Secure = 1
