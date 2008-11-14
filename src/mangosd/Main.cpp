@@ -135,6 +135,12 @@ extern int main(int argc, char **argv)
         ++c;
     }
 
+    if (!sConfig.SetSource(cfg_file))
+    {
+        sLog.outError("Could not find configuration file %s.", cfg_file);
+        return 1;
+    }
+
     sLog.outString( "%s [world-daemon]", _FULLVERSION(REVISION_DATE,REVISION_TIME,REVISION_NR,REVISION_ID) );
     sLog.outString( "<Ctrl-C> to stop.\n\n" );
 
@@ -149,12 +155,6 @@ extern int main(int argc, char **argv)
     sLog.outTitle( "MM   MM MM  MMM MM   MM  MMMMMM  MMMM   MMMMM");
     sLog.outTitle( "        MM  MMM http://getmangos.com");
     sLog.outTitle( "        MMMMMM\n\n");
-
-    if (!sConfig.SetSource(cfg_file))
-    {
-        sLog.outError("Could not find configuration file %s.", cfg_file);
-        return 1;
-    }
 
     sLog.outString("Using configuration file %s.", cfg_file);
 
