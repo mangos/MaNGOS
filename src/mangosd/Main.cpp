@@ -26,6 +26,8 @@
 #include "Log.h"
 #include "Master.h"
 #include "SystemConfig.h"
+#include "revision.h"
+#include "revision_nr.h"
 
 #ifdef WIN32
 #include "ServiceWin32.h"
@@ -51,6 +53,7 @@ uint32 realmID;                                             ///< Id of the realm
 void usage(const char *prog)
 {
     sLog.outString("Usage: \n %s [<options>]\n"
+        "    --version                print version and exist\n\r"
         "    -c config_file           use config_file as configuration file\n\r"
         #ifdef WIN32
         "    Running as service functions:\n\r"
@@ -84,6 +87,12 @@ extern int main(int argc, char **argv)
             }
             else
                 cfg_file = argv[c];
+        }
+
+        if( strcmp(argv[c],"--version") == 0)
+        {
+            printf("%s\n", _FULLVERSION(REVISION_DATE,REVISION_TIME,REVISION_NR,REVISION_ID));
+            return 0;
         }
 
         #ifdef WIN32
@@ -131,6 +140,22 @@ extern int main(int argc, char **argv)
         sLog.outError("Could not find configuration file %s.", cfg_file);
         return 1;
     }
+
+    sLog.outString( "%s [world-daemon]", _FULLVERSION(REVISION_DATE,REVISION_TIME,REVISION_NR,REVISION_ID) );
+    sLog.outString( "<Ctrl-C> to stop.\n\n" );
+
+    sLog.outTitle( "MM   MM         MM   MM  MMMMM   MMMM   MMMMM");
+    sLog.outTitle( "MM   MM         MM   MM MMM MMM MM  MM MMM MMM");
+    sLog.outTitle( "MMM MMM         MMM  MM MMM MMM MM  MM MMM");
+    sLog.outTitle( "MM M MM         MMMM MM MMM     MM  MM  MMM");
+    sLog.outTitle( "MM M MM  MMMMM  MM MMMM MMM     MM  MM   MMM");
+    sLog.outTitle( "MM M MM M   MMM MM  MMM MMMMMMM MM  MM    MMM");
+    sLog.outTitle( "MM   MM     MMM MM   MM MM  MMM MM  MM     MMM");
+    sLog.outTitle( "MM   MM MMMMMMM MM   MM MMM MMM MM  MM MMM MMM");
+    sLog.outTitle( "MM   MM MM  MMM MM   MM  MMMMMM  MMMM   MMMMM");
+    sLog.outTitle( "        MM  MMM http://getmangos.com");
+    sLog.outTitle( "        MMMMMM\n\n");
+
     sLog.outString("Using configuration file %s.", cfg_file);
 
     ///- and run the 'Master'
