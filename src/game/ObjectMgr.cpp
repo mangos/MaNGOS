@@ -3704,11 +3704,8 @@ void ObjectMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
                     sLog.outErrorDb("Table `%s` has out of range text id (dataint = %i expected %u-%u) in SCRIPT_COMMAND_TALK for script id %u",tablename,tmp.dataint,MIN_DB_SCRIPT_STRING_ID,MAX_DB_SCRIPT_STRING_ID,tmp.id);
                     continue;
                 }
-                if(!objmgr.GetMangosStringLocale(tmp.dataint))
-                {
-                    sLog.outErrorDb("Table `%s` has not existed text id (dataint = %i) in SCRIPT_COMMAND_TALK for script id %u",tablename,tmp.dataint,tmp.id);
-                    continue;
-                }
+
+                // if(!objmgr.GetMangosStringLocale(tmp.dataint)) will checked after db_script_string loading
                 break;
             }
 
@@ -7207,10 +7204,11 @@ void ObjectMgr::CheckScripts(ScriptMapMap const& scripts,std::set<int32>& ids)
         {
             if(itrM->second.dataint)
             {
+                if(!GetMangosStringLocale (itrM->second.dataint))
+                    sLog.outErrorDb( "Table `db_script_string` has not existed string id  %u", *itrM);
+
                 if(ids.count(itrM->second.dataint))
                     ids.erase(itrM->second.dataint);
-                else
-                    sLog.outErrorDb( "Table `db_script_string` has not existed string id  %u", *itrM);
             }
         }
     }

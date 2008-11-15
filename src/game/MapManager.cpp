@@ -244,6 +244,8 @@ MapManager::Update(time_t diff)
     if( !i_timer.Passed() )
         return;
 
+    ObjectAccessor::Instance().UpdatePlayers(i_timer.GetCurrent());
+
     for(MapMapType::iterator iter=i_maps.begin(); iter != i_maps.end(); ++iter)
     {
         checkAndCorrectGridStatesArray();                   // debugging code, should be deleted some day
