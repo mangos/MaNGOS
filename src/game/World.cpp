@@ -2451,6 +2451,7 @@ void World::UpdateSessions( time_t diff )
         ///- and remove not active sessions from the list
         if(!itr->second->Update(diff))                      // As interval = 0
         {
+            RemoveQueuedPlayer (itr->second);
             delete itr->second;
             m_sessions.erase(itr);
         }
