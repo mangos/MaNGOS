@@ -186,6 +186,7 @@ class MANGOS_DLL_DECL ObjectAccessor : public MaNGOS::Singleton<ObjectAccessor, 
         void RemoveUpdateObject(Object *obj);
 
         void Update(uint32 diff);
+        void UpdatePlayers(uint32 diff);
 
         Corpse* GetCorpseForPlayerGUID(uint64 guid);
         void RemoveCorpse(Corpse *corpse);
@@ -218,7 +219,6 @@ class MANGOS_DLL_DECL ObjectAccessor : public MaNGOS::Singleton<ObjectAccessor, 
 
         static void _buildChangeObjectForPlayer(WorldObject *, UpdateDataMapType &);
         static void _buildPacket(Player *, Object *, UpdateDataMapType &);
-        void _update(void);
         std::set<Object *> i_objects;
         LockType i_playerGuard;
         LockType i_updateGuard;

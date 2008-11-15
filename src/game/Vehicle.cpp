@@ -83,9 +83,9 @@ bool Vehicle::Create(uint32 guidlow, Map *map, uint32 Entry, uint32 vehicleId, u
 
     SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
     SetUInt32Value(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_UNKNOWN1);
-    SetUInt32Value(UNIT_FIELD_BYTES_1, 0x02000001);
-    SetUInt32Value(UNIT_FIELD_BYTES_2, 0x00000001);
-    SetFloatValue(UNIT_FIELD_HOVERHEIGHT, 3.0f);
+    //SetUInt32Value(UNIT_FIELD_BYTES_1, 0x02000001);
+    //SetUInt32Value(UNIT_FIELD_BYTES_2, 0x00000001);
+    SetFloatValue(UNIT_FIELD_HOVERHEIGHT, 1.0f);
 
     CreatureInfo const *ci = GetCreatureInfo();
     setFaction(team == ALLIANCE ? ci->faction_A : ci->faction_H);
