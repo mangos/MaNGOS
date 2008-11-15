@@ -192,6 +192,9 @@
 			<File
 				RelativePath="..\..\src\shared\Database\SQLStorage.h">
 			</File>
+			<File
+				RelativePath="..\..\src\shared\Database\SQLStorageImpl.h">
+			</File>
 			<Filter
 				Name="DataStores">
 				<File
