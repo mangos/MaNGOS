@@ -1941,6 +1941,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         /*********************************************************/
         MovementInfo m_movementInfo;
         MovementInfo m_fallMovementInfo;
+        Unit *m_mover;
         bool isMoving() const { return HasUnitMovementFlag(movementFlagsMask); }
         bool isMovingOrTurning() const { return HasUnitMovementFlag(movementOrTurningFlagsMask); }
 
@@ -1953,6 +1954,9 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         void EnterVehicle(Vehicle *vehicle);
         void ExitVehicle(Vehicle *vehicle);
+
+        uint64 GetFarSight() const { return GetUInt64Value(PLAYER_FARSIGHT); }
+        void SetFarSight(uint64 guid) { SetUInt64Value(PLAYER_FARSIGHT, guid); }
 
         // Transports
         Transport * GetTransport() const { return m_transport; }

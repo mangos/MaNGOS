@@ -7151,12 +7151,15 @@ void Unit::SetPet(Pet* pet)
     // FIXME: hack, speed must be set only at follow
     if(pet)
         for(int i = 0; i < MAX_MOVE_TYPE; ++i)
-            pet->SetSpeed(UnitMoveType(i),m_speed_rate[i],true);
+            pet->SetSpeed(UnitMoveType(i), m_speed_rate[i], true);
 }
 
-void Unit::SetCharm(Unit* charmed)
+void Unit::SetCharm(Unit* pet)
 {
-    SetUInt64Value(UNIT_FIELD_CHARM,charmed ? charmed->GetGUID() : 0);
+    SetUInt64Value(UNIT_FIELD_CHARM, pet ? pet->GetGUID() : 0);
+
+    if(GetTypeId() == TYPEID_PLAYER)
+        ((Player*)this)->m_mover = pet ? pet : this;
 }
 
 void Unit::UnsummonAllTotems()
@@ -10784,9 +10787,9 @@ Pet* Unit::CreateTamedPetFrom(Creature* creatureTarget,uint32 spell_id)
         return NULL;
     }
 
-    pet->SetUInt64Value(UNIT_FIELD_SUMMONEDBY, GetGUID());
-    pet->SetUInt64Value(UNIT_FIELD_CREATEDBY, GetGUID());
-    pet->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE,getFaction());
+    pet->SetOwnerGUID(GetGUID());
+    pet->SetCreatorGUID(GetGUID());
+    pet->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, getFaction());
     pet->SetUInt32Value(UNIT_CREATED_BY_SPELL, spell_id);
 
     uint32 level = (creatureTarget->getLevel() < (getLevel() - 5)) ? (getLevel() - 5) : creatureTarget->getLevel();

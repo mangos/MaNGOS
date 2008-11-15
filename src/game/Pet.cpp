@@ -189,7 +189,7 @@ bool Pet::LoadPetFromDB( Unit* owner, uint32 petentry, uint32 petnumber, bool cu
     else
         m_charmInfo->SetPetNumber(pet_number, false);
 
-    SetUInt64Value(UNIT_FIELD_SUMMONEDBY, owner->GetGUID());
+    SetOwnerGUID(owner->GetGUID());
     SetDisplayId(fields[3].GetUInt32());
     SetNativeDisplayId(fields[3].GetUInt32());
     uint32 petlevel = fields[4].GetUInt32();
@@ -224,7 +224,7 @@ bool Pet::LoadPetFromDB( Unit* owner, uint32 petentry, uint32 petnumber, bool cu
     InitStatsForLevel(petlevel);
     SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, time(NULL));
     SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, fields[5].GetUInt32());
-    SetUInt64Value(UNIT_FIELD_CREATEDBY, owner->GetGUID());
+    SetCreatorGUID(owner->GetGUID());
 
     m_charmInfo->SetReactState(ReactStates(fields[6].GetUInt8()));
 

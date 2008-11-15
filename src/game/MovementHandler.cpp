@@ -187,9 +187,6 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
     recv_data >> movementInfo.z;
     recv_data >> movementInfo.o;
 
-    //Save movement flags
-    _player->SetUnitMovementFlags(MovementFlags);
-
     if(MovementFlags & MOVEMENTFLAG_ONTRANSPORT)
     {
         // recheck
@@ -360,14 +357,34 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
     /*----------------------*/
 
     /* process position-change */
+    Unit *mover = _player->m_mover;
     recv_data.put<uint32>(6, getMSTime());                  // offset flags(4) + unk(2)
-    WorldPacket data(recv_data.GetOpcode(), (GetPlayer()->GetPackGUID().size()+recv_data.size()));
-    data.append(GetPlayer()->GetPackGUID());
+    WorldPacket data(recv_data.GetOpcode(), (mover->GetPackGUID().size()+recv_data.size()));
+    data.append(_player->m_mover->GetPackGUID());           // use mover guid
     data.append(recv_data.contents(), recv_data.size());
     GetPlayer()->SendMessageToSet(&data, false);
 
-    GetPlayer()->SetPosition(movementInfo.x, movementInfo.y, movementInfo.z, movementInfo.o);
-    GetPlayer()->m_movementInfo = movementInfo;
+    if(!_player->GetCharmGUID())
+    {
+        _player->SetPosition(movementInfo.x, movementInfo.y, movementInfo.z, movementInfo.o);
+        _player->m_movementInfo = movementInfo;
+        _player->SetUnitMovementFlags(MovementFlags);
+    }
+    else
+    {
+        if(mover->GetTypeId() != TYPEID_PLAYER)
+        {
+            mover->Relocate(movementInfo.x, movementInfo.y, movementInfo.z, movementInfo.o);
+            mover->SetUnitMovementFlags(MovementFlags);
+        }
+        else
+        {
+            ((Player*)mover)->SetPosition(movementInfo.x, movementInfo.y, movementInfo.z, movementInfo.o);
+            ((Player*)mover)->m_movementInfo = movementInfo;
+            ((Player*)mover)->SetUnitMovementFlags(MovementFlags);
+        }
+    }
+
     if (GetPlayer()->m_fallMovementInfo.fallTime >= movementInfo.fallTime || GetPlayer()->m_fallMovementInfo.z <=movementInfo.z)
         GetPlayer()->m_fallMovementInfo = movementInfo;
 
@@ -520,15 +537,53 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket &recv_data)
 void WorldSession::HandleSetActiveMoverOpcode(WorldPacket &recv_data)
 {
     sLog.outDebug("WORLD: Recvd CMSG_SET_ACTIVE_MOVER");
+    recv_data.hexlike();
 
-    CHECK_PACKET_SIZE(recv_data,8);
+    CHECK_PACKET_SIZE(recv_data, 8);
 
     uint64 guid;
     recv_data >> guid;
 
+    if(_player->GetGUID() == guid)
+    {
+        if(_player->GetCharmGUID() == 0)
+            _player->m_mover = _player;
+    }
+    else
+    {
+        if(_player->GetCharmGUID() == guid)
+        {
+            if(IS_PLAYER_GUID(guid))
+            {
+                if(Player *plr = objmgr.GetPlayer(guid))
+                    _player->m_mover = plr;
+            }
+            else if(IS_CREATURE_OR_PET_GUID(guid))
+            {
+                if(Creature *creature = ObjectAccessor::GetCreatureOrPet(*_player, guid))
+                    _player->m_mover = creature;
+            }
+            else if(IS_VEHICLE_GUID(guid))
+            {
+                if(Vehicle *vehicle = ObjectAccessor::GetVehicle(guid))
+                    _player->m_mover = vehicle;
+            }
+            else
+            {
+                sLog.outError("Unknown guid " I64FMT "in HandleSetActiveMoverOpcode", guid);
+            }
+        }
+    }
+
     WorldPacket data(SMSG_TIME_SYNC_REQ, 4);                // new 2.0.x, enable movement
     data << uint32(0x00000000);                             // on blizz it increments periodically
     SendPacket(&data);
+}
+
+void WorldSession::HandleMoveNotActiveMoverOpcode(WorldPacket &recv_data)
+{
+    sLog.outDebug("WORLD: Recvd CMSG_MOVE_NOT_ACTIVE_MOVER");
+    recv_data.hexlike();                                    // normal movement packet
 }
 
 void WorldSession::HandleMountSpecialAnimOpcode(WorldPacket& /*recvdata*/)

@@ -423,6 +423,8 @@ Player::Player (WorldSession *session): Unit(), m_achievementMgr(this)
     //Default movement to run mode
     m_unit_movement_flags = 0;
 
+    m_mover = NULL;
+
     m_miniPet = 0;
     m_bgAfkReportedTimer = 0;
     m_contestedPvPTimer = 0;
@@ -13902,14 +13904,14 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
     SetUInt32Value(UNIT_CHANNEL_SPELL,0);
 
     // clear charm/summon related fields
-    SetUInt64Value(UNIT_FIELD_CHARM,0);
-    SetUInt64Value(UNIT_FIELD_SUMMON,0);
-    SetUInt64Value(UNIT_FIELD_CHARMEDBY,0);
-    SetUInt64Value(UNIT_FIELD_SUMMONEDBY,0);
-    SetUInt64Value(UNIT_FIELD_CREATEDBY,0);
+    SetCharm(NULL);
+    SetPet(NULL);
+    SetCharmerGUID(NULL);
+    SetOwnerGUID(NULL);
+    SetCreatorGUID(NULL);
 
     // reset some aura modifiers before aura apply
-    SetUInt64Value(PLAYER_FARSIGHT, 0);
+    SetFarSight(NULL);
     SetUInt32Value(PLAYER_TRACK_CREATURES, 0 );
     SetUInt32Value(PLAYER_TRACK_RESOURCES, 0 );
 
@@ -17522,6 +17524,8 @@ void Player::SendInitialPacketsBeforeAddToMap()
     // set fly flag if in fly form or taxi flight to prevent visually drop at ground in showup moment
     if(HasAuraType(SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED) || isInFlight())
         AddUnitMovementFlag(MOVEMENTFLAG_FLYING2);
+
+    m_mover = this;
 }
 
 void Player::SendInitialPacketsAfterAddToMap()
@@ -18638,7 +18642,7 @@ void Player::EnterVehicle(Vehicle *vehicle)
     //vehicle->SetUInt32Value(UNIT_FIELD_BYTES_1, 0x02000000);
 
     SetCharm(vehicle);
-    SetUInt64Value(PLAYER_FARSIGHT, vehicle->GetGUID());
+    SetFarSight(vehicle->GetGUID());
 
     SetClientControl(vehicle, 1);
 
@@ -18691,7 +18695,7 @@ void Player::ExitVehicle(Vehicle *vehicle)
     //vehicle->SetUInt32Value(UNIT_DYNAMIC_FLAGS, 0);
 
     SetCharm(NULL);
-    SetUInt64Value(PLAYER_FARSIGHT, 0);
+    SetFarSight(NULL);
 
     SetClientControl(vehicle, 0);
 

@@ -270,6 +270,7 @@ Spell::Spell( Unit* Caster, SpellEntry const *info, bool triggered, uint64 origi
     m_triggeringContainer = triggeringContainer;
     m_referencedFromCurrentSpell = false;
     m_executedCurrently = false;
+    m_delayStart = 0;
     m_delayAtDamageCount = 0;
 
     m_applyMultiplierMask = 0;
@@ -336,6 +337,7 @@ Spell::Spell( Unit* Caster, SpellEntry const *info, bool triggered, uint64 origi
     gameObjTarget = NULL;
     focusObject = NULL;
     m_cast_count = 0;
+    m_glyphIndex = 0;
     m_triggeredByAuraSpell  = NULL;
 
     //Auto Shot & Shoot
