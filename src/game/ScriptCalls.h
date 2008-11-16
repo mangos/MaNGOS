@@ -35,7 +35,7 @@ class InstanceData;
 bool LoadScriptingModule(char const* libName = "");
 void UnloadScriptingModule();
 
-typedef void(MANGOS_IMPORT * scriptCallScriptsInit) ();
+typedef void(MANGOS_IMPORT * scriptCallScriptsInit) (const ObjectMgr::ScriptNameMap &scriptNames);
 typedef void(MANGOS_IMPORT * scriptCallScriptsFree) ();
 typedef char const* (MANGOS_IMPORT * scriptCallScriptsVersion) ();
 

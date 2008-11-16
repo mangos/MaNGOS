@@ -201,7 +201,7 @@ struct CreatureInfo
     uint32  equipmentId;
     uint32  MechanicImmuneMask;
     uint32  flags_extra;
-    char const* ScriptName;
+    uint32  ScriptID;
 
     // helpers
     SkillType GetRequiredLootSkill() const
@@ -490,7 +490,9 @@ class MANGOS_DLL_SPEC Creature : public Unit
 
         CreatureInfo const *GetCreatureInfo() const { return m_creatureInfo; }
         CreatureDataAddon const* GetCreatureAddon() const;
-        char const* GetScriptName() const;
+
+        std::string GetScriptName();
+        uint32 GetScriptId();
 
         void prepareGossipMenu( Player *pPlayer, uint32 gossipid = 0 );
         void sendPreparedGossip( Player* player );

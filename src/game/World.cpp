@@ -927,6 +927,9 @@ void World::SetInitialWorldSettings()
     LoadDBCStores(m_dataPath);
     DetectDBCLang();
 
+    sLog.outString( "Loading Script Names...");
+    objmgr.LoadScriptNames();
+
     sLog.outString( "Loading InstanceTemplate" );
     objmgr.LoadInstanceTemplate();
 
