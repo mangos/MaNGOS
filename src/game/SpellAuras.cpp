@@ -2035,6 +2035,17 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                 caster->CastSpell(m_target,finalSpelId,true,NULL,this);
             return;
         }
+
+        // Waiting to Resurrect
+        if(GetId()==2584)
+        {
+            // Waiting to resurrect spell cancel, we must remove player from resurrect queue
+            if(m_target->GetTypeId() == TYPEID_PLAYER)
+                if(BattleGround *bg = ((Player*)m_target)->GetBattleGround())
+                    bg->RemovePlayerFromResurrectQueue(m_target->GetGUID());
+            return;
+        }
+
         // Dark Fiend
         if(GetId()==45934)
         {

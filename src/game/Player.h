@@ -31,6 +31,7 @@
 #include "Bag.h"
 #include "WorldSession.h"
 #include "Pet.h"
+#include "MapReference.h"
 #include "Util.h"                                           // for Tokens typedef
 #include "AchievementMgr.h"
 
@@ -2057,6 +2058,8 @@ class MANGOS_DLL_SPEC Player : public Unit
         Player* GetNextRandomRaidMember(float radius);
 
         GridReference<Player> &GetGridRef() { return m_gridRef; }
+        MapReference &GetMapRef() { return m_mapRef; }
+
         bool isAllowedToLoot(Creature* creature);
 
         WorldLocation& GetTeleportDest() { return m_teleport_dest; }
@@ -2303,6 +2306,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         Item* _StoreItem( uint16 pos, Item *pItem, uint32 count, bool clone, bool update );
 
         GridReference<Player> m_gridRef;
+        MapReference m_mapRef;
 };
 
 void AddItemsSetItem(Player*player,Item *item);
