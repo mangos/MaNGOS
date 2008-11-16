@@ -3006,16 +3006,19 @@ void Spell::SendChannelStart(uint32 duration)
 
 void Spell::SendResurrectRequest(Player* target)
 {
-    WorldPacket data(SMSG_RESURRECT_REQUEST, (8+4+2+4));
+    // Both players and NPCs can resurrect using spells - have a look at creature 28487 for example
+    // However, the packet structure differs slightly
+
+    const char* sentName = m_caster->GetTypeId()==TYPEID_PLAYER ?"":m_caster->GetName();
+
+    WorldPacket data(SMSG_RESURRECT_REQUEST, (8+4+strlen(sentName)+1+1+4));
     data << uint64(m_caster->GetGUID());
-    uint32 count = 1;
-    data << uint32(count);                                  // amount of bytes to read
+    data << uint32(strlen(sentName)+1);
 
-    for(uint32 i = 0; i < count; ++i)
-        data << uint8(0);
+    data << sentName;
+    data << uint8(0);
 
-    data << uint8(0);
-    data << uint8(0);
+    data << uint32(m_caster->GetTypeId()==TYPEID_PLAYER ?0:1);
     target->GetSession()->SendPacket(&data);
 }
 
