@@ -1222,7 +1222,7 @@ void Player::Update( uint32 p_time )
     SendUpdateToOutOfRangeGroupMembers();
 
     Pet* pet = GetPet();
-    if(pet && !IsWithinDistInMap(pet, OWNER_MAX_DISTANCE))
+    if(pet && !IsWithinDistInMap(pet, OWNER_MAX_DISTANCE) && (GetCharmGUID() && (pet->GetGUID() != GetCharmGUID())))
     {
         RemovePet(pet, PET_SAVE_NOT_IN_SLOT, true);
         return;
@@ -15889,8 +15889,8 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
             m_guardianPets.erase(pet->GetGUID());
             break;
         default:
-            if(GetPetGUID()==pet->GetGUID())
-                SetPet(0);
+            if(GetPetGUID() == pet->GetGUID())
+                SetPet(NULL);
             break;
     }
 

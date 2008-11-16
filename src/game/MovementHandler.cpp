@@ -364,7 +364,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
     data.append(recv_data.contents(), recv_data.size());
     GetPlayer()->SendMessageToSet(&data, false);
 
-    if(!_player->GetCharmGUID())
+    if(!_player->GetCharmGUID())                            // nothing is charmed
     {
         _player->SetPosition(movementInfo.x, movementInfo.y, movementInfo.z, movementInfo.o);
         _player->m_movementInfo = movementInfo;
@@ -372,12 +372,13 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
     }
     else
     {
-        if(mover->GetTypeId() != TYPEID_PLAYER)
+        if(mover->GetTypeId() != TYPEID_PLAYER)             // unit, creature, pet, vehicle...
         {
-            mover->Relocate(movementInfo.x, movementInfo.y, movementInfo.z, movementInfo.o);
+            if(Map *map = mover->GetMap())
+                map->CreatureRelocation((Creature*)mover, movementInfo.x, movementInfo.y, movementInfo.z, movementInfo.o);
             mover->SetUnitMovementFlags(MovementFlags);
         }
-        else
+        else                                                // player
         {
             ((Player*)mover)->SetPosition(movementInfo.x, movementInfo.y, movementInfo.z, movementInfo.o);
             ((Player*)mover)->m_movementInfo = movementInfo;

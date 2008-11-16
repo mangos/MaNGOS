@@ -4133,7 +4133,7 @@ void Unit::RemoveAura(AuraMap::iterator &i, AuraRemoveMode mode)
     m_Auras.erase(i);
     ++m_removedAuras;                                       // internal count used by unit update
 
-    // Status unsummoned at aura remove
+    // Statue unsummoned at aura remove
     Totem* statue = NULL;
     if(IsChanneledSpell(Aur->GetSpellProto()))
         if(Unit* caster = Aur->GetCaster())

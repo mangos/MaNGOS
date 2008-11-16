@@ -2983,19 +2983,30 @@ void Aura::HandleModPossessPet(bool apply, bool Real)
         return;
 
     Unit* caster = GetCaster();
-    if(!caster || caster->GetTypeId() != TYPEID_PLAYER)
-        return;
-    if(caster->GetPet() != m_target)
+    Pet *pet = caster->GetPet();
+    if(!pet || (pet != m_target) || !caster || (caster->GetTypeId() != TYPEID_PLAYER))
         return;
 
     if(apply)
-        m_target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNKNOWN5);
+        pet->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNKNOWN5);
     else
-        m_target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNKNOWN5);
+        pet->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNKNOWN5);
 
-    ((Player*)caster)->SetFarSight(apply ? m_target->GetGUID() : NULL);
-    ((Player*)caster)->SetCharm(apply ? m_target : NULL);
-    ((Player*)caster)->SetClientControl(m_target, apply ? 1 : 0);
+    ((Player*)caster)->SetFarSight(apply ? pet->GetGUID() : NULL);
+    ((Player*)caster)->SetCharm(apply ? pet : NULL);
+    ((Player*)caster)->SetClientControl(pet, apply ? 1 : 0);
+
+    if(apply)
+    {
+        pet->StopMoving();
+        pet->GetMotionMaster()->Clear();
+        pet->GetMotionMaster()->MoveIdle();
+    }
+    else
+    {
+        pet->AttackStop();
+        pet->GetMotionMaster()->MoveFollow(caster, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
+    }
 }
 
 void Aura::HandleModCharm(bool apply, bool Real)
