@@ -192,8 +192,6 @@ class MANGOS_DLL_DECL ObjectAccessor : public MaNGOS::Singleton<ObjectAccessor, 
         void AddCorpsesToGrid(GridPair const& gridpair,GridType& grid,Map* map);
         Corpse* ConvertCorpseForPlayer(uint64 player_guid);
 
-        bool PlayersNearGrid(uint32 x,uint32 y,uint32 m_id,uint32 i_id) const;
-
         static void UpdateObject(Object* obj, Player* exceptPlayer);
         static void _buildUpdateObject(Object* obj, UpdateDataMapType &);
 

@@ -511,32 +511,6 @@ ObjectAccessor::UpdatePlayers(uint32 diff)
             iter->second->Update(diff);
 }
 
-bool
-ObjectAccessor::PlayersNearGrid(uint32 x, uint32 y, uint32 m_id, uint32 i_id) const
-{
-    CellPair cell_min(x*MAX_NUMBER_OF_CELLS, y*MAX_NUMBER_OF_CELLS);
-    CellPair cell_max(cell_min.x_coord + MAX_NUMBER_OF_CELLS, cell_min.y_coord+MAX_NUMBER_OF_CELLS);
-    cell_min << 2;
-    cell_min -= 2;
-    cell_max >> 2;
-    cell_max += 2;
-
-    //TODO: Guard player
-    HashMapHolder<Player>::MapType& playerMap = HashMapHolder<Player>::GetContainer();
-    for(HashMapHolder<Player>::MapType::const_iterator iter=playerMap.begin(); iter != playerMap.end(); ++iter)
-    {
-        if( m_id != iter->second->GetMapId() || i_id != iter->second->GetInstanceId() )
-            continue;
-
-        CellPair p = MaNGOS::ComputeCellPair(iter->second->GetPositionX(), iter->second->GetPositionY());
-        if( (cell_min.x_coord <= p.x_coord && p.x_coord <= cell_max.x_coord) &&
-            (cell_min.y_coord <= p.y_coord && p.y_coord <= cell_max.y_coord) )
-            return true;
-    }
-
-    return false;
-}
-
 void
 ObjectAccessor::WorldObjectChangeAccumulator::Visit(PlayerMapType &m)
 {
