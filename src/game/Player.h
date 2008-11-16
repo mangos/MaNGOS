@@ -729,7 +729,7 @@ enum InstanceResetWarningType
 struct MovementInfo
 {
     // common
-    //uint32  flags;
+    uint32  flags;
     uint16  unk1;
     uint32  time;
     float   x, y, z, o;
@@ -749,17 +749,17 @@ struct MovementInfo
 
     MovementInfo()
     {
-        //flags =
+        flags = 0;
         time = t_time = fallTime = 0;
         unk1 = 0;
         x = y = z = o = t_x = t_y = t_z = t_o = s_pitch = j_unk = j_sinAngle = j_cosAngle = j_xyspeed = u_unk1 = 0.0f;
         t_guid = 0;
     }
 
-    /*void SetMovementFlags(uint32 _flags)
+    void SetMovementFlags(uint32 _flags)
     {
         flags = _flags;
-    }*/
+    }
 };
 
 // flags that use in movement check for example at spell casting

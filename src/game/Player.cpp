@@ -17537,6 +17537,10 @@ void Player::SendInitialPacketsBeforeAddToMap()
 
 void Player::SendInitialPacketsAfterAddToMap()
 {
+    WorldPacket data(SMSG_TIME_SYNC_REQ, 4);                // new 2.0.x, enable movement
+    data << uint32(0x00000000);                             // on blizz it increments periodically
+    GetSession()->SendPacket(&data);
+
     CastSpell(this, 836, true);                             // LOGINEFFECT
 
     // set some aura effects that send packet to player client after add player to map

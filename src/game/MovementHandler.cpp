@@ -170,70 +170,22 @@ void WorldSession::HandleMoveWorldportAckOpcode()
 
 void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 {
-    sLog.outDebug("WORLD: Recvd %s (%u,0x%X) opcode", LookupOpcodeName(recv_data.GetOpcode()), recv_data.GetOpcode(), recv_data.GetOpcode());
-
-    CHECK_PACKET_SIZE(recv_data, 4+2+4+4+4+4+4);
+    uint32 opcode = recv_data.GetOpcode();
+    sLog.outDebug("WORLD: Recvd %s (%u,0x%X) opcode", LookupOpcodeName(opcode), opcode, opcode);
 
     if(GetPlayer()->GetDontMove())
         return;
 
     /* extract packet */
+    if(opcode == CMSG_MOVE_NOT_ACTIVE_MOVER)
+    {
+        CHECK_PACKET_SIZE(recv_data, recv_data.rpos()+8);
+        uint64 old_mover_guid;
+        recv_data >> old_mover_guid;
+    }
+
     MovementInfo movementInfo;
-    uint32 MovementFlags;
-
-    recv_data >> MovementFlags;
-    recv_data >> movementInfo.unk1;
-    recv_data >> movementInfo.time;
-    recv_data >> movementInfo.x;
-    recv_data >> movementInfo.y;
-    recv_data >> movementInfo.z;
-    recv_data >> movementInfo.o;
-
-    if(MovementFlags & MOVEMENTFLAG_ONTRANSPORT)
-    {
-        // recheck
-        CHECK_PACKET_SIZE(recv_data, recv_data.rpos()+8+4+4+4+4+4+1);
-
-        recv_data >> movementInfo.t_guid;
-        recv_data >> movementInfo.t_x;
-        recv_data >> movementInfo.t_y;
-        recv_data >> movementInfo.t_z;
-        recv_data >> movementInfo.t_o;
-        recv_data >> movementInfo.t_time;
-        recv_data >> movementInfo.t_seat;
-    }
-
-    if((MovementFlags & (MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_FLYING2)) || (movementInfo.unk1 & 0x20))
-    {
-        // recheck
-        CHECK_PACKET_SIZE(recv_data, recv_data.rpos()+4);
-
-        recv_data >> movementInfo.s_pitch;                  // pitch, -1.55=looking down, 0=looking straight forward, +1.55=looking up
-    }
-
-    // recheck
-    CHECK_PACKET_SIZE(recv_data, recv_data.rpos()+4);
-
-    recv_data >> movementInfo.fallTime;                     // duration of last jump (when in jump duration from jump begin to now)
-
-    if(MovementFlags & MOVEMENTFLAG_JUMPING)
-    {
-        // recheck
-        CHECK_PACKET_SIZE(recv_data, recv_data.rpos()+4+4+4+4);
-
-        recv_data >> movementInfo.j_unk;                    // constant, but different when jumping in water and on land?
-        recv_data >> movementInfo.j_sinAngle;               // sin of angle between orientation0 and players orientation
-        recv_data >> movementInfo.j_cosAngle;               // cos of angle between orientation0 and players orientation
-        recv_data >> movementInfo.j_xyspeed;                // speed of xy movement
-    }
-
-    if(MovementFlags & MOVEMENTFLAG_SPLINE)
-    {
-        // recheck
-        CHECK_PACKET_SIZE(recv_data, recv_data.rpos()+4);
-
-        recv_data >> movementInfo.u_unk1;                   // unknown
-    }
+    ReadMovementInfo(recv_data, &movementInfo);
     /*----------------*/
 
     if(recv_data.size() != recv_data.rpos())
@@ -247,7 +199,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
         return;
 
     /* handle special cases */
-    if (MovementFlags & MOVEMENTFLAG_ONTRANSPORT)
+    if (movementInfo.flags & MOVEMENTFLAG_ONTRANSPORT)
     {
         // transports size limited
         // (also received at zeppelin leave by some reason with t_* as absolute in continent coordinates, can be safely skipped)
@@ -288,7 +240,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
     }
 
     // fall damage generation (ignore in flight case that can be triggered also at lags in moment teleportation to another map).
-    if (recv_data.GetOpcode() == MSG_MOVE_FALL_LAND && !GetPlayer()->isInFlight())
+    if (opcode == MSG_MOVE_FALL_LAND && !GetPlayer()->isInFlight())
     {
         // calculate total z distance of the fall
         // it is currently only used for the achievement system. It might be used in a more correct falldamage formula later
@@ -337,14 +289,14 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
         }
     }
 
-    if(recv_data.GetOpcode() == CMSG_DISMISS_CONTROLLED_VEHICLE)
+    if(opcode == CMSG_DISMISS_CONTROLLED_VEHICLE)
     {
         // using charm guid, because we don't have vehicle guid...
         if(Vehicle *vehicle = ObjectAccessor::GetVehicle(_player->GetCharmGUID()))
             _player->ExitVehicle(vehicle);
     }
 
-    if(((MovementFlags & MOVEMENTFLAG_SWIMMING) != 0) != GetPlayer()->IsInWater())
+    if(((movementInfo.flags & MOVEMENTFLAG_SWIMMING) != 0) != GetPlayer()->IsInWater())
     {
         // now client not include swimming flag in case jumping under water
         GetPlayer()->SetInWater( !GetPlayer()->IsInWater() || GetPlayer()->GetBaseMap()->IsUnderWater(movementInfo.x, movementInfo.y, movementInfo.z) );
@@ -364,7 +316,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
     {
         _player->SetPosition(movementInfo.x, movementInfo.y, movementInfo.z, movementInfo.o);
         _player->m_movementInfo = movementInfo;
-        _player->SetUnitMovementFlags(MovementFlags);
+        _player->SetUnitMovementFlags(movementInfo.flags);
     }
     else
     {
@@ -372,13 +324,13 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
         {
             if(Map *map = mover->GetMap())
                 map->CreatureRelocation((Creature*)mover, movementInfo.x, movementInfo.y, movementInfo.z, movementInfo.o);
-            mover->SetUnitMovementFlags(MovementFlags);
+            mover->SetUnitMovementFlags(movementInfo.flags);
         }
         else                                                // player
         {
             ((Player*)mover)->SetPosition(movementInfo.x, movementInfo.y, movementInfo.z, movementInfo.o);
             ((Player*)mover)->m_movementInfo = movementInfo;
-            ((Player*)mover)->SetUnitMovementFlags(MovementFlags);
+            ((Player*)mover)->SetUnitMovementFlags(movementInfo.flags);
         }
     }
 
@@ -411,21 +363,11 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket &recv_data)
 {
     sLog.outDebug("WORLD: Recvd %s (%u,0x%X) opcode", LookupOpcodeName(recv_data.GetOpcode()), recv_data.GetOpcode(), recv_data.GetOpcode());
 
-    CHECK_PACKET_SIZE(recv_data, 8+4+4+2+4+4+4+4+4);
+    CHECK_PACKET_SIZE(recv_data, recv_data.rpos()+8+4);
 
     /* extract packet */
     uint64 guid;
-    uint16 unkB;
-    uint32 unk1, flags, time, fallTime;
-    float x, y, z, orientation;
-
-    uint64 t_GUID;
-    float  t_x, t_y, t_z, t_o;
-    uint32 t_time;
-    uint8  t_unk;
-    float  s_pitch;
-    float  j_unk1, j_sinAngle, j_cosAngle, j_xyspeed;
-    float  u_unk1;
+    uint32 unk1;
     float  newspeed;
 
     recv_data >> guid;
@@ -436,47 +378,10 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket &recv_data)
 
     // continue parse packet
 
-    recv_data >> unk1;
-    recv_data >> flags >> unkB >> time;
-    recv_data >> x >> y >> z >> orientation;
-    if (flags & MOVEMENTFLAG_ONTRANSPORT)
-    {
-        // recheck
-        CHECK_PACKET_SIZE(recv_data, recv_data.rpos()+8+4+4+4+4+4+1);
+    recv_data >> unk1;                                      // counter
 
-        recv_data >> t_GUID;
-        recv_data >> t_x >> t_y >> t_z >> t_o >> t_time >> t_unk;
-    }
-    if ((flags & (MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_FLYING2)) || (unkB & 0x20))
-    {
-        // recheck
-        CHECK_PACKET_SIZE(recv_data, recv_data.rpos()+4);
-
-        recv_data >> s_pitch;                               // pitch, -1.55=looking down, 0=looking straight forward, +1.55=looking up
-    }
-
-    // recheck
-    CHECK_PACKET_SIZE(recv_data, recv_data.rpos()+4);
-
-    recv_data >> fallTime;                                  // duration of last jump (when in jump duration from jump begin to now)
-
-    if ((flags & MOVEMENTFLAG_JUMPING) || (flags & MOVEMENTFLAG_FALLING))
-    {
-        // recheck
-        CHECK_PACKET_SIZE(recv_data, recv_data.rpos()+4+4+4+4);
-
-        recv_data >> j_unk1;                                // ?constant, but different when jumping in water and on land?
-        recv_data >> j_sinAngle >> j_cosAngle;              // sin + cos of angle between orientation0 and players orientation
-        recv_data >> j_xyspeed;                             // speed of xy movement
-    }
-
-    if(flags & MOVEMENTFLAG_SPLINE)
-    {
-        // recheck
-        CHECK_PACKET_SIZE(recv_data, recv_data.rpos()+4);
-
-        recv_data >> u_unk1;                                // unknown
-    }
+    MovementInfo movementInfo;
+    ReadMovementInfo(recv_data, &movementInfo);
 
     // recheck
     CHECK_PACKET_SIZE(recv_data, recv_data.rpos()+4);

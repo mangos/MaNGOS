@@ -547,3 +547,51 @@ void WorldSession::SetAccountData(uint32 type, time_t time_, std::string data)
     CharacterDatabase.escape_string(data);
     CharacterDatabase.PExecute("INSERT INTO account_data VALUES ('%u','%u','%u','%s')", acc, type, (uint32)time_, data.c_str());
 }
+
+void WorldSession::ReadMovementInfo(WorldPacket &data, MovementInfo *mi)
+{
+    CHECK_PACKET_SIZE(data, data.rpos()+4+2+4+4+4+4+4);
+    data >> mi->flags;
+    data >> mi->unk1;
+    data >> mi->time;
+    data >> mi->x;
+    data >> mi->y;
+    data >> mi->z;
+    data >> mi->o;
+
+    if(mi->flags & MOVEMENTFLAG_ONTRANSPORT)
+    {
+        CHECK_PACKET_SIZE(data, data.rpos()+8+4+4+4+4+4+1);
+        data >> mi->t_guid;
+        data >> mi->t_x;
+        data >> mi->t_y;
+        data >> mi->t_z;
+        data >> mi->t_o;
+        data >> mi->t_time;
+        data >> mi->t_seat;
+    }
+
+    if((mi->flags & (MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_FLYING2)) || (mi->unk1 & 0x20))
+    {
+        CHECK_PACKET_SIZE(data, data.rpos()+4);
+        data >> mi->s_pitch;
+    }
+
+    CHECK_PACKET_SIZE(data, data.rpos()+4);
+    data >> mi->fallTime;
+
+    if(mi->flags & MOVEMENTFLAG_JUMPING)
+    {
+        CHECK_PACKET_SIZE(data, data.rpos()+4+4+4+4);
+        data >> mi->j_unk;
+        data >> mi->j_sinAngle;
+        data >> mi->j_cosAngle;
+        data >> mi->j_xyspeed;
+    }
+
+    if(mi->flags & MOVEMENTFLAG_SPLINE)
+    {
+        CHECK_PACKET_SIZE(data, data.rpos()+4);
+        data >> mi->u_unk1;
+    }
+}

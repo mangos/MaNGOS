@@ -3006,6 +3006,7 @@ void Aura::HandleModPossessPet(bool apply, bool Real)
     {
         pet->AttackStop();
         pet->GetMotionMaster()->MoveFollow(caster, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
+        pet->SetUnitMovementFlags(MOVEMENTFLAG_WALK_MODE);
     }
 }
 

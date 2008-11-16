@@ -1207,7 +1207,7 @@ enum Opcodes
     SMSG_SERVER_FIRST_ACHIEVEMENT                   = 0x498,
     SMSG_PET_LEARNED_SPELL                          = 0x499,    // uint16 spellid, Your pet learned spell: %s
     SMSG_PET_UNLEARNED_SPELL                        = 0x49A,    // uint16 spellid, Your pet unlearned %s
-    UMSG_UNKNOWN_1179                               = 0x49B,    // not found in client
+    CMSG_UNKNOWN_1179                               = 0x49B,    // movement opcode
     CMSG_UNKNOWN_1180                               = 0x49C,    // LUA: HearthAndResurrectFromArea
     SMSG_UNKNOWN_1181                               = 0x49D,    // empty
     SMSG_CRITERIA_REMOVE                            = 0x49E,    // uint32, broadcasts EVENT_CRITERIA_UPDATE
