@@ -5330,7 +5330,7 @@ uint32 ObjectMgr::GenerateLowGuid(HighGuid guidhigh)
             if(m_hiVehicleGuid>=0x00FFFFFF)
             {
                 sLog.outError("Vehicle guid overflow!! Can't continue, shutting down server. ");
-                sWorld.m_stopEvent = true;
+                World::StopNow(ERROR_EXIT_CODE);
             }
             return m_hiVehicleGuid;
         case HIGHGUID_PLAYER:

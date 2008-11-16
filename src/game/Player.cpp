@@ -17521,6 +17521,10 @@ void Player::SendInitialPacketsBeforeAddToMap()
     data << (float)0.01666667f;                             // game speed
     GetSession()->SendPacket( &data );
 
+    data.Initialize(SMSG_TIME_SYNC_REQ, 4);                 // new 2.0.x, enable movement
+    data << uint32(0x00000000);                             // on blizz it increments periodically
+    GetSession()->SendPacket(&data);
+
     // set fly flag if in fly form or taxi flight to prevent visually drop at ground in showup moment
     if(HasAuraType(SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED) || isInFlight())
         AddUnitMovementFlag(MOVEMENTFLAG_FLYING2);
@@ -18641,12 +18645,12 @@ void Player::EnterVehicle(Vehicle *vehicle)
     //vehicle->SetUInt32Value(UNIT_DYNAMIC_FLAGS, 0);
     //vehicle->SetUInt32Value(UNIT_FIELD_BYTES_1, 0x02000000);
 
-    SetCharm(vehicle);
-    SetFarSight(vehicle->GetGUID());
+    SetCharm(vehicle);                                      // charm
+    SetFarSight(vehicle->GetGUID());                        // set view
 
-    SetClientControl(vehicle, 1);
+    SetClientControl(vehicle, 1);                           // redirect controls to vehicle
 
-    WorldPacket data(SMSG_UNKNOWN_1181, 0);
+    WorldPacket data(SMSG_UNKNOWN_1181, 0);                 // shows vehicle UI?
     GetSession()->SendPacket(&data);
 
     data.Initialize(MSG_MOVE_TELEPORT_ACK, 30);
@@ -18660,10 +18664,10 @@ void Player::EnterVehicle(Vehicle *vehicle)
     data << vehicle->GetPositionZ();                        // z
     data << vehicle->GetOrientation();                      // o
     // transport part
-    data << vehicle->GetGUID();                             // transport guid
+    data << uint64(vehicle->GetGUID());                     // transport guid
     data << float(0);                                       // transport offsetX
     data << float(0);                                       // transport offsetY
-    data << float(1);                                       // transport offsetZ
+    data << float(2);                                       // transport offsetZ
     data << float(0);                                       // transport orientation
     data << uint32(getMSTime());                            // transport time
     data << uint8(0);                                       // seat

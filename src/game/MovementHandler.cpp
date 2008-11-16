@@ -170,6 +170,8 @@ void WorldSession::HandleMoveWorldportAckOpcode()
 
 void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 {
+    sLog.outDebug("WORLD: Recvd %s (%u,0x%X) opcode", LookupOpcodeName(recv_data.GetOpcode()), recv_data.GetOpcode(), recv_data.GetOpcode());
+
     CHECK_PACKET_SIZE(recv_data, 4+2+4+4+4+4+4);
 
     if(GetPlayer()->GetDontMove())
@@ -333,19 +335,13 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
                 DEBUG_LOG("FALLDAMAGE z=%f sz=%f pZ=%f FallTime=%d mZ=%f damage=%d SF=%d" , movementInfo.z, height, target->GetPositionZ(), movementInfo.fallTime, height, damage, safe_fall);
             }
         }
+    }
 
-        //handle fall and logout at the same time (logout started before fall finished)
-        /* outdated and create problems with sit at stun sometime
-        if (target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_ROTATE))
-        {
-            target->SetStandState(PLAYER_STATE_SIT);
-            // Can't move
-            WorldPacket data( SMSG_FORCE_MOVE_ROOT, 12 );
-            data.append(target->GetPackGUID());
-            data << (uint32)2;
-            SendPacket( &data );
-        }
-        */
+    if(recv_data.GetOpcode() == CMSG_DISMISS_CONTROLLED_VEHICLE)
+    {
+        // using charm guid, because we don't have vehicle guid...
+        if(Vehicle *vehicle = ObjectAccessor::GetVehicle(_player->GetCharmGUID()))
+            _player->ExitVehicle(vehicle);
     }
 
     if(((MovementFlags & MOVEMENTFLAG_SWIMMING) != 0) != GetPlayer()->IsInWater())
@@ -413,6 +409,8 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 
 void WorldSession::HandleForceSpeedChangeAck(WorldPacket &recv_data)
 {
+    sLog.outDebug("WORLD: Recvd %s (%u,0x%X) opcode", LookupOpcodeName(recv_data.GetOpcode()), recv_data.GetOpcode(), recv_data.GetOpcode());
+
     CHECK_PACKET_SIZE(recv_data, 8+4+4+2+4+4+4+4+4);
 
     /* extract packet */
@@ -545,46 +543,10 @@ void WorldSession::HandleSetActiveMoverOpcode(WorldPacket &recv_data)
     uint64 guid;
     recv_data >> guid;
 
-    if(_player->GetGUID() == guid)
+    if(_player->m_mover->GetGUID() != guid)
     {
-        if(_player->GetCharmGUID() == 0)
-            _player->m_mover = _player;
+        sLog.outError("HandleSetActiveMoverOpcode: incorrect mover guid: mover is " I64FMT " and should be " I64FMT, _player->m_mover->GetGUID(), guid);
     }
-    else
-    {
-        if(_player->GetCharmGUID() == guid)
-        {
-            if(IS_PLAYER_GUID(guid))
-            {
-                if(Player *plr = objmgr.GetPlayer(guid))
-                    _player->m_mover = plr;
-            }
-            else if(IS_CREATURE_OR_PET_GUID(guid))
-            {
-                if(Creature *creature = ObjectAccessor::GetCreatureOrPet(*_player, guid))
-                    _player->m_mover = creature;
-            }
-            else if(IS_VEHICLE_GUID(guid))
-            {
-                if(Vehicle *vehicle = ObjectAccessor::GetVehicle(guid))
-                    _player->m_mover = vehicle;
-            }
-            else
-            {
-                sLog.outError("Unknown guid " I64FMT "in HandleSetActiveMoverOpcode", guid);
-            }
-        }
-    }
-
-    WorldPacket data(SMSG_TIME_SYNC_REQ, 4);                // new 2.0.x, enable movement
-    data << uint32(0x00000000);                             // on blizz it increments periodically
-    SendPacket(&data);
-}
-
-void WorldSession::HandleMoveNotActiveMoverOpcode(WorldPacket &recv_data)
-{
-    sLog.outDebug("WORLD: Recvd CMSG_MOVE_NOT_ACTIVE_MOVER");
-    recv_data.hexlike();                                    // normal movement packet
 }
 
 void WorldSession::HandleMountSpecialAnimOpcode(WorldPacket& /*recvdata*/)

@@ -331,7 +331,6 @@ class MANGOS_DLL_SPEC WorldSession
 
         void HandleMovementOpcodes(WorldPacket& recvPacket);
         void HandleSetActiveMoverOpcode(WorldPacket &recv_data);
-        void HandleMoveNotActiveMoverOpcode(WorldPacket &recv_data);
         void HandleMoveTimeSkippedOpcode(WorldPacket &recv_data);
 
         void HandleRequestRaidInfoOpcode( WorldPacket & recv_data );
@@ -553,7 +552,6 @@ class MANGOS_DLL_SPEC WorldSession
         void HandlePetSpellAutocastOpcode( WorldPacket& recvPacket );
         void HandlePetCastSpellOpcode( WorldPacket& recvPacket );
         void HandlePetLearnTalent( WorldPacket& recvPacket );
-        void HandleDismissControlledVehicle( WorldPacket& recvPacket );
 
         void HandleSetActionBar(WorldPacket& recv_data);
 

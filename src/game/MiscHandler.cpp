@@ -1669,20 +1669,6 @@ void WorldSession::HandleSpellClick( WorldPacket & recv_data )
     _player->EnterVehicle(vehicle);
 }
 
-void WorldSession::HandleDismissControlledVehicle( WorldPacket & recv_data )
-{
-    //CHECK_PACKET_SIZE(recv_data, 8);
-    recv_data.hexlike();                                    // standard movement packet
-
-    // using charm guid, because we don't have vehicle guid...
-    Vehicle *vehicle = ObjectAccessor::GetVehicle(_player->GetCharmGUID());
-
-    if(!vehicle)
-        return;
-
-    _player->ExitVehicle(vehicle);
-}
-
 void WorldSession::HandleInspectAchievements( WorldPacket & recv_data )
 {
     CHECK_PACKET_SIZE(recv_data, 1);
