@@ -22,7 +22,7 @@
 DROP TABLE IF EXISTS `db_version`;
 CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
-  `required_2008_11_14_01_mangos_scripts` bit(1) default NULL
+  `required_2008_11_16_01_mangos_command` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -408,15 +408,19 @@ INSERT INTO `command` VALUES
 ('sendmoney','3','Syntax: .sendmoney #playername "#subject" "#text" #money\r\n\r\nSend mail with money to a player. Subject and mail text must be in "".'),
 ('sendmessage',3,'Syntax: .sendmessage $playername $message\r\n\r\nSend screen message to player from ADMINISTRATOR.'),
 ('server corpses',2,'Syntax: .server corpses\r\n\r\nTriggering corpses expire check in world.'),
-('server exit',4,'Syntax: .server exit\r\n\r\nTerminate mangosd NOW.'),
+('server exit',4,'Syntax: .server exit\r\n\r\nTerminate mangosd NOW. Exit code 0.'),
 ('server info',0,'Syntax: .server info\r\n\r\nDisplay server version and the number of connected players.'),
-('server idleshutdown',3,'Syntax: .server idleshutdown #delay|cancel\r\n\r\nShut the server down after #delay seconds if no active connections are present (no players) or cancel the restart/shutdown if cancel value is used.'),
-('server idlerestart',3,'Syntax: .server idlerestart #delay|cancel\r\n\r\nRestart the server after #delay seconds if no active connections are present (no players) or cancel the restart/shutdown if cancel value is used.'),
+('server idleshutdown',3,'Syntax: .server idleshutdown #delay [#exist_code]\r\n\r\nShut the server down after #delay seconds if no active connections are present (no players). Use #exist_code or 0 as program exist code.'),
+('server idleshutdown cancel',3,'Syntax: .server idleshutdown cancel\r\n\r\nCancel the restart/shutdown timer if any.'),
+('server idlerestart',3,'Syntax: .server idlerestart #delay\r\n\r\nRestart the server after #delay seconds if no active connections are present (no players). Use #exist_code or 2 as program exist code.'),
+('server idlerestart cancel',3,'Syntax: .server idlerestart cancel\r\n\r\nCancel the restart/shutdown timer if any.'),
 ('server motd',0,'Syntax: .server motd\r\n\r\nShow server Message of the day.'),
-('server restart',3,'Syntax: .server restart seconds\r\n\r\nRestart the server after given seconds and show "Restart server in X" or cancel the restart/shutdown if cancel value is used.'),
+('server restart',3,'Syntax: .server restart #delay\r\n\r\nRestart the server after #delay seconds. Use #exist_code or 2 as program exist code.'),
+('server restart cancel',3,'Syntax: .server restart cancel\r\n\r\nCancel the restart/shutdown timer if any.'),
 ('server set loglevel',4,'Syntax: .server set loglevel #level\r\n\r\nSet server log level (0 - errors only, 1 - basic, 2 - detail, 3 - debug).'),
 ('server set motd',3,'Syntax: .server set motd $MOTD\r\n\r\nSet server Message of the day.'),
-('server shutdown',3,'Syntax: .server shutdown seconds\r\n\r\nShut the server down after given seconds and show "Off server in X" or cancel the restart/shutdown if cancel value is used.'),
+('server shutdown',3,'Syntax: .server shutdown #delay [#exist_code]\r\n\r\nShut the server down after #delay seconds. Use #exist_code or 0 as program exist code.'),
+('server shutdown cancel',3,'Syntax: .server shutdown cancel\r\n\r\nCancel the restart/shutdown timer if any.'),
 ('setskill',3,'Syntax: .setskill #skill #level [#max]\r\n\r\nSet a skill of id #skill with a current skill value of #level and a maximum value of #max (or equal current maximum if not provide) for the selected character. If no character is selected, you learn the skill.'),
 ('showarea',3,'Syntax: .showarea #areaid\r\n\r\nReveal the area of #areaid to the selected character. If no character is selected, reveal this area to you.'),
 ('start',0,'Syntax: .start\r\n\r\nTeleport you to the starting area of your character.'),
