@@ -976,7 +976,7 @@ uint32 WorldObject::GetAreaId() const
 
 InstanceData* WorldObject::GetInstanceData()
 {
-    Map *map = MapManager::Instance().GetMap(m_mapId, this);
+    Map *map = GetMap();
     return map->IsDungeon() ? ((InstanceMap*)map)->GetInstanceData() : NULL;
 }
 
@@ -1347,12 +1347,12 @@ void WorldObject::BuildTeleportAckMsg(WorldPacket *data, float x, float y, float
 
 void WorldObject::SendMessageToSet(WorldPacket *data, bool /*bToSelf*/)
 {
-    MapManager::Instance().GetMap(m_mapId, this)->MessageBroadcast(this, data);
+    GetMap()->MessageBroadcast(this, data);
 }
 
 void WorldObject::SendMessageToSetInRange(WorldPacket *data, float dist, bool /*bToSelf*/)
 {
-    MapManager::Instance().GetMap(m_mapId, this)->MessageDistBroadcast(this, data, dist);
+    GetMap()->MessageDistBroadcast(this, data, dist);
 }
 
 void WorldObject::SendObjectDeSpawnAnim(uint64 guid)
@@ -1541,8 +1541,8 @@ void WorldObject::GetNearPoint(WorldObject const* searcher, float &x, float &y, 
         TypeContainerVisitor<MaNGOS::WorldObjectWorker<MaNGOS::NearUsedPosDo>, WorldTypeMapContainer > world_obj_worker(worker);
 
         CellLock<GridReadGuard> cell_lock(cell, p);
-        cell_lock->Visit(cell_lock, grid_obj_worker,  *MapManager::Instance().GetMap(GetMapId(), this));
-        cell_lock->Visit(cell_lock, world_obj_worker, *MapManager::Instance().GetMap(GetMapId(), this));
+        cell_lock->Visit(cell_lock, grid_obj_worker,  *GetMap());
+        cell_lock->Visit(cell_lock, world_obj_worker, *GetMap());
     }
 
     // maybe can just place in primary position

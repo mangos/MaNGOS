@@ -1644,7 +1644,7 @@ void World::ScriptsProcess()
                     break;
                 }
                 ((Unit *)source)->SendMonsterMoveWithSpeed(step.script->x, step.script->y, step.script->z, ((Unit *)source)->GetUnitMovementFlags(), step.script->datalong2 );
-                MapManager::Instance().GetMap(((Unit *)source)->GetMapId(), ((Unit *)source))->CreatureRelocation(((Creature *)source), step.script->x, step.script->y, step.script->z, 0);
+                ((Unit *)source)->GetMap()->CreatureRelocation(((Creature *)source), step.script->x, step.script->y, step.script->z, 0);
                 break;
             case SCRIPT_COMMAND_FLAG_SET:
                 if(!source)
@@ -1770,7 +1770,7 @@ void World::ScriptsProcess()
 
                 TypeContainerVisitor<MaNGOS::GameObjectSearcher<MaNGOS::GameObjectWithDbGUIDCheck>, GridTypeMapContainer > object_checker(checker);
                 CellLock<GridReadGuard> cell_lock(cell, p);
-                cell_lock->Visit(cell_lock, object_checker, *MapManager::Instance().GetMap(summoner->GetMapId(), summoner));
+                cell_lock->Visit(cell_lock, object_checker, *summoner->GetMap());
 
                 if ( !go )
                 {
@@ -1794,7 +1794,7 @@ void World::ScriptsProcess()
                 go->SetLootState(GO_READY);
                 go->SetRespawnTime(time_to_despawn);        //despawn object in ? seconds
 
-                MapManager::Instance().GetMap(go->GetMapId(), go)->Add(go);
+                go->GetMap()->Add(go);
                 break;
             }
             case SCRIPT_COMMAND_OPEN_DOOR:
@@ -1831,7 +1831,7 @@ void World::ScriptsProcess()
 
                 TypeContainerVisitor<MaNGOS::GameObjectSearcher<MaNGOS::GameObjectWithDbGUIDCheck>, GridTypeMapContainer > object_checker(checker);
                 CellLock<GridReadGuard> cell_lock(cell, p);
-                cell_lock->Visit(cell_lock, object_checker, *MapManager::Instance().GetMap(caster->GetMapId(), (Unit*)source));
+                cell_lock->Visit(cell_lock, object_checker, *caster->GetMap());
 
                 if ( !door )
                 {
@@ -1887,7 +1887,7 @@ void World::ScriptsProcess()
 
                 TypeContainerVisitor<MaNGOS::GameObjectSearcher<MaNGOS::GameObjectWithDbGUIDCheck>, GridTypeMapContainer > object_checker(checker);
                 CellLock<GridReadGuard> cell_lock(cell, p);
-                cell_lock->Visit(cell_lock, object_checker, *MapManager::Instance().GetMap(caster->GetMapId(), (Unit*)source));
+                cell_lock->Visit(cell_lock, object_checker, *caster->GetMap());
 
                 if ( !door )
                 {

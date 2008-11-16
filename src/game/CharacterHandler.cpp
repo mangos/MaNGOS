@@ -607,7 +607,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder * holder)
         pCurrChar->SetRank(0);
     }
 
-    if (!MapManager::Instance().GetMap(pCurrChar->GetMapId(), pCurrChar)->Add(pCurrChar))
+    if (!pCurrChar->GetMap()->Add(pCurrChar))
     {
         AreaTrigger const* at = objmgr.GetGoBackTrigger(pCurrChar->GetMapId());
         if(at)
