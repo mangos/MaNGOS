@@ -72,6 +72,7 @@ template <class TO, class FROM> class Reference : public LinkedListElement
         }
 
         Reference<TO,FROM>* next() { return((Reference<TO,FROM>*)LinkedListElement::next()); }
+        Reference<TO,FROM>const* next() const { return((Reference<TO,FROM> const*)LinkedListElement::next()); }
         Reference<TO,FROM>* prev() { return((Reference<TO,FROM>*)LinkedListElement::prev()); }
 
         inline TO* operator ->() const { return iRefTo; }
