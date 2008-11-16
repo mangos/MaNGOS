@@ -19,6 +19,7 @@
 #include "Common.h"
 #include "Database/DatabaseEnv.h"
 #include "Database/SQLStorage.h"
+#include "Database/SQLStorageImpl.h"
 
 #include "Log.h"
 #include "MapManager.h"
@@ -563,7 +564,7 @@ void ObjectMgr::LoadCreatureLocales()
     sLog.outString();
     sLog.outString( ">> Loaded %u creature locale strings", mCreatureLocaleMap.size() );
 }
-
+   
 void ObjectMgr::LoadCompletedAchievements()
 {
     QueryResult *result = CharacterDatabase.Query("SELECT achievement FROM character_achievement GROUP BY achievement");
@@ -648,9 +649,19 @@ void ObjectMgr::LoadNpcOptionLocales()
     sLog.outString( ">> Loaded %u npc_option locale strings", mNpcOptionLocaleMap.size() );
 }
 
+struct SQLCreatureLoader : public SQLStorageLoaderBase<SQLCreatureLoader>
+{
+    template<class D>
+    void convert_from_str(uint32 field_pos, char *src, D &dst)
+    {
+        dst = D(objmgr.GetScriptId(src));
+    }
+};
+
 void ObjectMgr::LoadCreatureTemplates()
 {
-    sCreatureStorage.Load();
+    SQLCreatureLoader loader;
+    loader.Load(sCreatureStorage);
 
     sLog.outString( ">> Loaded %u creature definitions", sCreatureStorage.RecordCount );
     sLog.outString();
@@ -1553,9 +1564,19 @@ void ObjectMgr::LoadItemLocales()
     sLog.outString( ">> Loaded %u Item locale strings", mItemLocaleMap.size() );
 }
 
+struct SQLItemLoader : public SQLStorageLoaderBase<SQLItemLoader>
+{
+    template<class D>
+    void convert_from_str(uint32 field_pos, char *src, D &dst)
+    {
+        dst = D(objmgr.GetScriptId(src));
+    }
+};
+
 void ObjectMgr::LoadItemPrototypes()
 {
-    sItemStorage.Load ();
+    SQLItemLoader loader;
+    loader.Load(sItemStorage);
     sLog.outString( ">> Loaded %u item prototypes", sItemStorage.RecordCount );
     sLog.outString();
 
@@ -4173,9 +4194,19 @@ void ObjectMgr::LoadPageTextLocales()
     sLog.outString( ">> Loaded %u PageText locale strings", mPageTextLocaleMap.size() );
 }
 
+struct SQLInstanceLoader : public SQLStorageLoaderBase<SQLInstanceLoader>
+{
+    template<class D>
+    void convert_from_str(uint32 field_pos, char *src, D &dst)
+    {
+        dst = D(objmgr.GetScriptId(src));
+    }
+};
+
 void ObjectMgr::LoadInstanceTemplate()
 {
-    sInstanceTemplate.Load();
+    SQLInstanceLoader loader;
+    loader.Load(sInstanceTemplate);
 
     for(uint32 i = 0; i < sInstanceTemplate.MaxEntry; i++)
     {
@@ -4589,7 +4620,7 @@ void ObjectMgr::LoadAreaTriggerScripts()
         Field *fields = result->Fetch();
 
         uint32 Trigger_ID      = fields[0].GetUInt32();
-        std::string scriptName = fields[1].GetCppString();
+        const char *scriptName = fields[1].GetString();
 
         AreaTriggerEntry const* atEntry = sAreaTriggerStore.LookupEntry(Trigger_ID);
         if(!atEntry)
@@ -4597,7 +4628,7 @@ void ObjectMgr::LoadAreaTriggerScripts()
             sLog.outErrorDb("Area trigger (ID:%u) does not exist in `AreaTrigger.dbc`.",Trigger_ID);
             continue;
         }
-        mAreaTriggerScripts[Trigger_ID] = scriptName;
+        mAreaTriggerScripts[Trigger_ID] = GetScriptId(scriptName);
     } while( result->NextRow() );
 
     delete result;
@@ -5203,7 +5234,7 @@ uint32 ObjectMgr::GenerateArenaTeamId()
     if(m_arenaTeamId>=0xFFFFFFFF)
     {
         sLog.outError("Arena team ids overflow!! Can't continue, shutting down server. ");
-        sWorld.m_stopEvent = true;
+        World::StopNow(ERROR_EXIT_CODE);
     }
     return m_arenaTeamId;
 }
@@ -5214,7 +5245,7 @@ uint32 ObjectMgr::GenerateGuildId()
     if(m_guildId>=0xFFFFFFFF)
     {
         sLog.outError("Guild ids overflow!! Can't continue, shutting down server. ");
-        sWorld.m_stopEvent = true;
+        World::StopNow(ERROR_EXIT_CODE);
     }
     return m_guildId;
 }
@@ -5225,7 +5256,7 @@ uint32 ObjectMgr::GenerateAuctionID()
     if(m_auctionid>=0xFFFFFFFF)
     {
         sLog.outError("Auctions ids overflow!! Can't continue, shutting down server. ");
-        sWorld.m_stopEvent = true;
+        World::StopNow(ERROR_EXIT_CODE);
     }
     return m_auctionid;
 }
@@ -5236,7 +5267,7 @@ uint32 ObjectMgr::GenerateMailID()
     if(m_mailid>=0xFFFFFFFF)
     {
         sLog.outError("Mail ids overflow!! Can't continue, shutting down server. ");
-        sWorld.m_stopEvent = true;
+        World::StopNow(ERROR_EXIT_CODE);
     }
     return m_mailid;
 }
@@ -5247,7 +5278,7 @@ uint32 ObjectMgr::GenerateItemTextID()
     if(m_ItemTextId>=0xFFFFFFFF)
     {
         sLog.outError("Item text ids overflow!! Can't continue, shutting down server. ");
-        sWorld.m_stopEvent = true;
+        World::StopNow(ERROR_EXIT_CODE);
     }
     return m_ItemTextId;
 }
@@ -5275,7 +5306,7 @@ uint32 ObjectMgr::GenerateLowGuid(HighGuid guidhigh)
             if(m_hiItemGuid>=0xFFFFFFFF)
             {
                 sLog.outError("Item guid overflow!! Can't continue, shutting down server. ");
-                sWorld.m_stopEvent = true;
+                World::StopNow(ERROR_EXIT_CODE);
             }
             return m_hiItemGuid;
         case HIGHGUID_UNIT:
@@ -5283,7 +5314,7 @@ uint32 ObjectMgr::GenerateLowGuid(HighGuid guidhigh)
             if(m_hiCreatureGuid>=0x00FFFFFF)
             {
                 sLog.outError("Creature guid overflow!! Can't continue, shutting down server. ");
-                sWorld.m_stopEvent = true;
+                World::StopNow(ERROR_EXIT_CODE);
             }
             return m_hiCreatureGuid;
         case HIGHGUID_PET:
@@ -5291,7 +5322,7 @@ uint32 ObjectMgr::GenerateLowGuid(HighGuid guidhigh)
             if(m_hiPetGuid>=0x00FFFFFF)
             {
                 sLog.outError("Pet guid overflow!! Can't continue, shutting down server. ");
-                sWorld.m_stopEvent = true;
+                World::StopNow(ERROR_EXIT_CODE);
             }
             return m_hiPetGuid;
         case HIGHGUID_VEHICLE:
@@ -5307,7 +5338,7 @@ uint32 ObjectMgr::GenerateLowGuid(HighGuid guidhigh)
             if(m_hiCharGuid>=0xFFFFFFFF)
             {
                 sLog.outError("Players guid overflow!! Can't continue, shutting down server. ");
-                sWorld.m_stopEvent = true;
+                World::StopNow(ERROR_EXIT_CODE);
             }
             return m_hiCharGuid;
         case HIGHGUID_GAMEOBJECT:
@@ -5315,7 +5346,7 @@ uint32 ObjectMgr::GenerateLowGuid(HighGuid guidhigh)
             if(m_hiGoGuid>=0x00FFFFFF)
             {
                 sLog.outError("Gameobject guid overflow!! Can't continue, shutting down server. ");
-                sWorld.m_stopEvent = true;
+                World::StopNow(ERROR_EXIT_CODE);
             }
             return m_hiGoGuid;
         case HIGHGUID_CORPSE:
@@ -5323,7 +5354,7 @@ uint32 ObjectMgr::GenerateLowGuid(HighGuid guidhigh)
             if(m_hiCorpseGuid>=0xFFFFFFFF)
             {
                 sLog.outError("Corpse guid overflow!! Can't continue, shutting down server. ");
-                sWorld.m_stopEvent = true;
+                World::StopNow(ERROR_EXIT_CODE);
             }
             return m_hiCorpseGuid;
         case HIGHGUID_DYNAMICOBJECT:
@@ -5331,7 +5362,7 @@ uint32 ObjectMgr::GenerateLowGuid(HighGuid guidhigh)
             if(m_hiDoGuid>=0xFFFFFFFF)
             {
                 sLog.outError("DynamicObject guid overflow!! Can't continue, shutting down server. ");
-                sWorld.m_stopEvent = true;
+                World::StopNow(ERROR_EXIT_CODE);
             }
             return m_hiDoGuid;
         default:
@@ -5413,9 +5444,19 @@ void ObjectMgr::LoadGameObjectLocales()
     sLog.outString( ">> Loaded %u gameobject locale strings", mGameObjectLocaleMap.size() );
 }
 
+struct SQLGameObjectLoader : public SQLStorageLoaderBase<SQLGameObjectLoader>
+{
+    template<class D>
+    void convert_from_str(uint32 field_pos, char *src, D &dst)
+    {
+        dst = D(objmgr.GetScriptId(src));
+    }
+};
+
 void ObjectMgr::LoadGameobjectInfo()
 {
-    sGOStorage.Load();
+    SQLGameObjectLoader loader;
+    loader.Load(sGOStorage);
 
     // some checks
     for(uint32 id = 1; id < sGOStorage.MaxEntry; id++)
@@ -6560,12 +6601,12 @@ bool ObjectMgr::CheckDeclinedNames( std::wstring mainpart, DeclinedName const& n
     return true;
 }
 
-const char* ObjectMgr::GetAreaTriggerScriptName(uint32 id)
+uint32 ObjectMgr::GetAreaTriggerScriptId(uint32 trigger_id)
 {
-    AreaTriggerScriptMap::const_iterator i = mAreaTriggerScripts.find(id);
+    AreaTriggerScriptMap::const_iterator i = mAreaTriggerScripts.find(trigger_id);
     if(i!= mAreaTriggerScripts.end())
-        return i->second.c_str();
-    return "";
+        return i->second;
+    return 0;
 }
 
 // Checks if player meets the condition
@@ -7276,6 +7317,42 @@ bool ObjectMgr::IsVendorItemValid( uint32 vendor_entry, uint32 item_id, uint32 m
     return true;
 }
 
+void ObjectMgr::LoadScriptNames()
+{
+    m_scriptNames.push_back("");
+    QueryResult *result = WorldDatabase.Query(
+      "SELECT DISTINCT(ScriptName) FROM creature_template WHERE ScriptName <> '' "
+      "UNION "
+      "SELECT DISTINCT(ScriptName) FROM gameobject_template WHERE ScriptName <> '' "
+      "UNION "
+      "SELECT DISTINCT(ScriptName) FROM item_template WHERE ScriptName <> '' "
+      "UNION "
+      "SELECT DISTINCT(ScriptName) FROM areatrigger_scripts WHERE ScriptName <> '' "
+      "UNION "
+      "SELECT DISTINCT(script) FROM instance_template WHERE script <> ''");
+    if(result)
+    {
+        do
+        {
+            m_scriptNames.push_back((*result)[0].GetString());
+        } while (result->NextRow());
+        delete result;
+    }
+
+    std::sort(m_scriptNames.begin(), m_scriptNames.end());
+}
+
+uint32 ObjectMgr::GetScriptId(const char *name)
+{
+    // use binary search to find the script name in the sorted vector
+    // assume "" is the first element
+    if(!name) return 0;
+    ScriptNameMap::const_iterator itr =
+        std::lower_bound(m_scriptNames.begin(), m_scriptNames.end(), name);
+    if(itr == m_scriptNames.end()) return 0;
+    return itr - m_scriptNames.begin();
+}
+
 void ObjectMgr::CheckScripts(ScriptMapMap const& scripts,std::set<int32>& ids)
 {
     for(ScriptMapMap::const_iterator itrMM = scripts.begin(); itrMM != scripts.end(); ++itrMM)
@@ -7314,11 +7391,10 @@ void ObjectMgr::LoadDbScriptStrings()
         sLog.outErrorDb( "Table `db_script_string` has unused string id  %u", *itr);
 }
 
-
 // Functions for scripting access
-const char* GetAreaTriggerScriptNameById(uint32 id)
+uint32 GetAreaTriggerScriptId(uint32 trigger_id)
 {
-    return objmgr.GetAreaTriggerScriptName(id);
+    return objmgr.GetAreaTriggerScriptId(trigger_id);
 }
 
 bool LoadMangosStrings(DatabaseType& db, char const* table,int32 start_value, int32 end_value)
@@ -7332,4 +7408,14 @@ bool LoadMangosStrings(DatabaseType& db, char const* table,int32 start_value, in
 
     // for scripting localized strings allowed use _only_ negative entries
     return objmgr.LoadMangosStrings(db,table,end_value,start_value);
+}
+
+uint32 MANGOS_DLL_SPEC GetScriptId(const char *name)
+{
+    return objmgr.GetScriptId(name);
+}
+
+ObjectMgr::ScriptNameMap & GetScriptNames()
+{
+    return objmgr.GetScriptNames();
 }

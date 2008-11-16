@@ -362,7 +362,7 @@ struct GameObjectInfo
             uint32 data[24];
         } raw;
     };
-    char   *ScriptName;
+    uint32 ScriptId;
 };
 
 struct GameObjectLocale

@@ -553,7 +553,7 @@ struct ItemPrototype
     float  ArmorDamageModifier;
     int32  Duration;                                        // negative = realtime, positive = ingame time
     uint32 ItemLimitCategory;                               // id from ItemLimitCategory.dbc
-    char*  ScriptName;
+    uint32 ScriptId;
     uint32 DisenchantID;
     uint32 FoodType;
     uint32 MinMoneyLoot;

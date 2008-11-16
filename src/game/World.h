@@ -49,6 +49,13 @@ enum ShutdownMask
     SHUTDOWN_MASK_IDLE    = 2,
 };
 
+enum ShutdownExitCode
+{
+    SHUTDOWN_EXIT_CODE = 0,
+    ERROR_EXIT_CODE    = 1,
+    RESTART_EXIT_CODE  = 2,
+};
+
 /// Timers for different object refresh rates
 enum WorldTimers
 {
@@ -310,7 +317,6 @@ struct CliCommandHolder
 class World
 {
     public:
-        static volatile bool m_stopEvent;
         static volatile uint32 m_worldLoopCounter;
 
         World();
@@ -387,11 +393,13 @@ class World
         void SendServerMessage(uint32 type, const char *text = "", Player* player = NULL);
 
         /// Are we in the middle of a shutdown?
-        uint32 GetShutdownMask() const { return m_ShutdownMask; }
         bool IsShutdowning() const { return m_ShutdownTimer > 0; }
-        void ShutdownServ(uint32 time, uint32 options = 0);
+        void ShutdownServ(uint32 time, uint32 options, uint8 exitcode);
         void ShutdownCancel();
         void ShutdownMsg(bool show = false, Player* player = NULL);
+        static uint8 GetExitCode() { return m_ExitCode; }
+        static void StopNow(uint8 exitcode) { m_stopEvent = true; m_ExitCode = exitcode; }
+        static bool IsStopped() { return m_stopEvent; }
 
         void Update(time_t diff);
 
@@ -467,6 +475,11 @@ class World
         void InitDailyQuestResetTime();
         void ResetDailyQuests();
     private:
+        static volatile bool m_stopEvent;
+        static uint8 m_ExitCode;
+        uint32 m_ShutdownTimer;
+        uint32 m_ShutdownMask;
+
         time_t m_startTime;
         time_t m_gameTime;
         IntervalTimer m_timers[WUPDATE_COUNT];
@@ -492,9 +505,6 @@ class World
         bool m_allowMovement;
         std::string m_motd;
         std::string m_dataPath;
-
-        uint32 m_ShutdownTimer;
-        uint32 m_ShutdownMask;
 
         // for max speed access
         static float m_MaxVisibleDistanceForCreature;

@@ -288,15 +288,18 @@ class ObjectMgr
 
         typedef UNORDERED_MAP<uint32, Quest*> QuestMap;
 
+
         typedef UNORDERED_MAP<uint32, AreaTrigger> AreaTriggerMap;
 
-        typedef UNORDERED_MAP<uint32, std::string> AreaTriggerScriptMap;
+        typedef UNORDERED_MAP<uint32, uint32> AreaTriggerScriptMap;
 
         typedef UNORDERED_MAP<uint32, ReputationOnKillEntry> RepOnKillMap;
 
         typedef UNORDERED_MAP<uint32, WeatherZoneChances> WeatherZoneMap;
 
         typedef UNORDERED_MAP<uint32, PetCreateSpellEntry> PetCreateSpellMap;
+
+        typedef std::vector<std::string> ScriptNameMap;
 
         Player* GetPlayer(const char* name) const { return ObjectAccessor::Instance().FindPlayerByName(name);}
         Player* GetPlayer(uint64 guid) const { return ObjectAccessor::FindPlayer(guid); }
@@ -462,7 +465,7 @@ class ObjectMgr
 
         AreaTrigger const* GetGoBackTrigger(uint32 Map) const;
 
-        const char* GetAreaTriggerScriptName(uint32 id);
+        uint32 GetAreaTriggerScriptId(uint32 trigger_id);
 
         ReputationOnKillEntry const* GetReputationOnKilEntry(uint32 id) const
         {
@@ -770,6 +773,10 @@ class ObjectMgr
         AchievementCriteriaEntryList const& GetAchievementCriteriaByType(AchievementCriteriaTypes type);
         std::set<uint32> allCompletedAchievements;
 
+        void LoadScriptNames();
+        ScriptNameMap &GetScriptNames() { return m_scriptNames; }
+        const char * GetScriptName(uint32 id) { return id < m_scriptNames.size() ? m_scriptNames[id].c_str() : ""; }
+        uint32 GetScriptId(const char *name);
     protected:
         uint32 m_auctionid;
         uint32 m_mailid;
@@ -788,7 +795,7 @@ class ObjectMgr
 
         uint32 m_hiPetNumber;
 
-        QuestMap mQuestTemplates;
+        QuestMap            mQuestTemplates;
 
         typedef UNORDERED_MAP<uint32, GossipText*> GossipTextMap;
         typedef UNORDERED_MAP<uint32, uint32> QuestAreaTriggerMap;
@@ -831,6 +838,8 @@ class ObjectMgr
         GraveYardMap        mGraveYardMap;
 
         GameTeleMap         m_GameTeleMap;
+
+        ScriptNameMap       m_scriptNames;
 
         typedef             std::vector<LocaleConstant> LocalForIndex;
         LocalForIndex        m_LocalForIndex;
@@ -896,7 +905,9 @@ class ObjectMgr
 #define objmgr MaNGOS::Singleton<ObjectMgr>::Instance()
 
 // scripting access functions
-bool MANGOS_DLL_SPEC LoadMangosStrings(DatabaseType& db, char const* table,int32 start_value = -1, int32 end_value = std::numeric_limits<int32>::min());
-MANGOS_DLL_SPEC const char* GetAreaTriggerScriptNameById(uint32 id);
+MANGOS_DLL_SPEC bool LoadMangosStrings(DatabaseType& db, char const* table,int32 start_value = -1, int32 end_value = std::numeric_limits<int32>::min());
+MANGOS_DLL_SPEC uint32 GetAreaTriggerScriptId(uint32 trigger_id);
+MANGOS_DLL_SPEC uint32 GetScriptId(const char *name);
+MANGOS_DLL_SPEC ObjectMgr::ScriptNameMap& GetScriptNames();
 
 #endif
