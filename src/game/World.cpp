@@ -1525,6 +1525,8 @@ void World::ScriptsProcess()
             }
         }
 
+        if(source && !source->IsInWorld()) source = NULL;
+
         Object* target = NULL;
 
         if(step.targetGUID)
@@ -1551,6 +1553,8 @@ void World::ScriptsProcess()
                     break;
             }
         }
+
+        if(target && !target->IsInWorld()) target = NULL;
 
         switch (step.script->command)
         {
