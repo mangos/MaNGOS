@@ -26,6 +26,7 @@
 #include "Database/DatabaseEnv.h"
 #include "GameEvent.h"
 #include "World.h"
+#include "SpellMgr.h"
 
 const CriteriaCastSpellRequirement AchievementMgr::criteriaCastSpellRequirements[CRITERIA_CAST_SPELL_REQ_COUNT] =
     {
@@ -396,6 +397,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                 SetCriteriaProgress(achievementCriteria, 1, true);
                 break;
             case ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2:
+            {
                 if (!miscvalue1 || miscvalue1 != achievementCriteria->cast_spell.spellID)
                     continue;
                 // those requirements couldn't be found in the dbc
@@ -426,6 +428,26 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                 }
                 SetCriteriaProgress(achievementCriteria, 1, true);
                 break;
+            }
+            case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILLLINE_SPELLS:
+            {
+                uint32 spellCount = 0;
+                for (PlayerSpellMap::const_iterator spellIter = GetPlayer()->GetSpellMap().begin();
+                        spellIter != GetPlayer()->GetSpellMap().end();
+                        spellIter++)
+                {
+                    for(SkillLineAbilityMap::const_iterator skillIter = spellmgr.GetBeginSkillLineAbilityMap(spellIter->first);
+                            skillIter != spellmgr.GetEndSkillLineAbilityMap(spellIter->first);
+                            skillIter++)
+                    {
+                        if(skillIter->second->skillId == achievementCriteria->learn_skilline_spell.skillLine)
+                            spellCount++;
+                    }
+                }
+                SetCriteriaProgress(achievementCriteria, spellCount);
+                break;
+            }
+
         }
         if(IsCompletedCriteria(achievementCriteria))
             CompletedCriteria(achievementCriteria);
@@ -511,6 +533,8 @@ bool AchievementMgr::IsCompletedCriteria(AchievementCriteriaEntry const* achieve
         case ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL:
         case ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2:
             return progress->counter >= achievementCriteria->cast_spell.castCount;
+        case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILLLINE_SPELLS:
+            return progress->counter >= achievementCriteria->learn_skilline_spell.spellCount;
 
         // handle all statistic-only criteria here
         case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_BATTLEGROUND:
