@@ -4105,7 +4105,7 @@ void Unit::RemoveAura(AuraMap::iterator &i, AuraRemoveMode mode)
     if (IsSingleTargetSpell(AurSpellInfo))
     {
         caster = Aur->GetCaster();
-        if(!caster)
+        if(caster)
         {
             AuraList& scAuras = caster->GetSingleCastAuras();
             scAuras.remove(Aur);
