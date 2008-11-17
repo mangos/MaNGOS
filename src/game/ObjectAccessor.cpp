@@ -140,7 +140,15 @@ Creature*
 ObjectAccessor::GetCreature(WorldObject const &u, uint64 guid)
 {
     Creature * ret = GetObjectInWorld(guid, (Creature*)NULL);
-    if(ret && ret->GetMapId() != u.GetMapId()) ret = NULL;
+    if(!ret)
+        return NULL;
+
+    if(ret->GetMapId() != u.GetMapId())
+        return NULL;
+
+    if(ret->GetInstanceId() != u.GetInstanceId())
+        return NULL;
+
     return ret;
 }
 
