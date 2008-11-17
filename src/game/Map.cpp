@@ -1783,9 +1783,9 @@ void InstanceMap::UnloadAll(bool pForce)
     Map::UnloadAll(pForce);
 }
 
-void InstanceMap::SendResetWarnings(uint32 timeLeft)
+void InstanceMap::SendResetWarnings(uint32 timeLeft) const
 {
-    for(MapRefManager::iterator itr = m_mapRefManager.begin(); itr != m_mapRefManager.end(); ++itr)
+    for(MapRefManager::const_iterator itr = m_mapRefManager.begin(); itr != m_mapRefManager.end(); ++itr)
         itr->getSource()->SendInstanceResetWarning(GetId(), timeLeft);
 }
 
