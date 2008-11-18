@@ -733,8 +733,8 @@ void AreaAura::Update(uint32 diff)
                     TypeContainerVisitor<MaNGOS::UnitListSearcher<MaNGOS::AnyFriendlyUnitInObjectRangeCheck>, WorldTypeMapContainer > world_unit_searcher(searcher);
                     TypeContainerVisitor<MaNGOS::UnitListSearcher<MaNGOS::AnyFriendlyUnitInObjectRangeCheck>, GridTypeMapContainer >  grid_unit_searcher(searcher);
                     CellLock<GridReadGuard> cell_lock(cell, p);
-                    cell_lock->Visit(cell_lock, world_unit_searcher, *MapManager::Instance().GetMap(caster->GetMapId(), caster));
-                    cell_lock->Visit(cell_lock, grid_unit_searcher, *MapManager::Instance().GetMap(caster->GetMapId(), caster));
+                    cell_lock->Visit(cell_lock, world_unit_searcher, *caster->GetMap());
+                    cell_lock->Visit(cell_lock, grid_unit_searcher, *caster->GetMap());
                     break;
                 }
                 case AREA_AURA_ENEMY:
@@ -749,8 +749,8 @@ void AreaAura::Update(uint32 diff)
                     TypeContainerVisitor<MaNGOS::UnitListSearcher<MaNGOS::AnyAoETargetUnitInObjectRangeCheck>, WorldTypeMapContainer > world_unit_searcher(searcher);
                     TypeContainerVisitor<MaNGOS::UnitListSearcher<MaNGOS::AnyAoETargetUnitInObjectRangeCheck>, GridTypeMapContainer >  grid_unit_searcher(searcher);
                     CellLock<GridReadGuard> cell_lock(cell, p);
-                    cell_lock->Visit(cell_lock, world_unit_searcher, *MapManager::Instance().GetMap(caster->GetMapId(), caster));
-                    cell_lock->Visit(cell_lock, grid_unit_searcher, *MapManager::Instance().GetMap(caster->GetMapId(), caster));
+                    cell_lock->Visit(cell_lock, world_unit_searcher, *caster->GetMap());
+                    cell_lock->Visit(cell_lock, grid_unit_searcher, *caster->GetMap());
                     break;
                 }
                 case AREA_AURA_OWNER:

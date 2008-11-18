@@ -125,6 +125,7 @@ typedef UNORDERED_MAP<Creature*, CreatureMover> CreatureMoveList;
 
 class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::ObjectLevelLockable<Map, ZThread::Mutex>
 {
+    friend class MapReference;
     public:
         Map(uint32 id, time_t, uint32 InstanceId, uint8 SpawnMode);
         virtual ~Map();
@@ -251,8 +252,8 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
 
         void SendToPlayers(WorldPacket const* data) const;
 
-        MapRefManager m_mapRefManager;
-
+        typedef MapRefManager PlayerList;
+        PlayerList const& GetPlayers() const { return m_mapRefManager; }
     private:
         void LoadVMap(int pX, int pY);
         void LoadMap(uint32 mapid, uint32 instanceid, int x,int y);
@@ -301,6 +302,7 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         uint32 i_InstanceId;
         uint32 m_unloadTimer;
 
+        MapRefManager m_mapRefManager;
     private:
         typedef GridReadGuard ReadGuard;
         typedef GridWriteGuard WriteGuard;
@@ -340,8 +342,6 @@ enum InstanceResetMethod
 class MANGOS_DLL_SPEC InstanceMap : public Map
 {
     public:
-        typedef std::list<Player *> PlayerList;                 // online players only
-
         InstanceMap(uint32 id, time_t, uint32 InstanceId, uint8 SpawnMode);
         ~InstanceMap();
         bool Add(Player *);
@@ -355,7 +355,7 @@ class MANGOS_DLL_SPEC InstanceMap : public Map
         time_t GetResetTime();
         void UnloadAll(bool pForce);
         bool CanEnter(Player* player);
-        void SendResetWarnings(uint32 timeLeft);
+        void SendResetWarnings(uint32 timeLeft) const;
         void SetResetSchedule(bool on);
     private:
         bool m_resetAfterUnload;

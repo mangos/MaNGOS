@@ -142,7 +142,15 @@ Creature*
 ObjectAccessor::GetCreature(WorldObject const &u, uint64 guid)
 {
     Creature * ret = GetObjectInWorld(guid, (Creature*)NULL);
-    if(ret && ret->GetMapId() != u.GetMapId()) ret = NULL;
+    if(!ret)
+        return NULL;
+
+    if(ret->GetMapId() != u.GetMapId())
+        return NULL;
+
+    if(ret->GetInstanceId() != u.GetInstanceId())
+        return NULL;
+
     return ret;
 }
 
@@ -335,7 +343,7 @@ ObjectAccessor::_buildChangeObjectForPlayer(WorldObject *obj, UpdateDataMapType 
     WorldObjectChangeAccumulator notifier(*obj, update_players);
     TypeContainerVisitor<WorldObjectChangeAccumulator, WorldTypeMapContainer > player_notifier(notifier);
     CellLock<GridReadGuard> cell_lock(cell, p);
-    cell_lock->Visit(cell_lock, player_notifier, *MapManager::Instance().GetMap(obj->GetMapId(), obj));
+    cell_lock->Visit(cell_lock, player_notifier, *obj->GetMap());
 }
 
 Pet*
@@ -533,14 +541,14 @@ ObjectAccessor::UpdateObjectVisibility(WorldObject *obj)
     CellPair p = MaNGOS::ComputeCellPair(obj->GetPositionX(), obj->GetPositionY());
     Cell cell(p);
 
-    MapManager::Instance().GetMap(obj->GetMapId(), obj)->UpdateObjectVisibility(obj,cell,p);
+    obj->GetMap()->UpdateObjectVisibility(obj,cell,p);
 }
 
 void ObjectAccessor::UpdateVisibilityForPlayer( Player* player )
 {
     CellPair p = MaNGOS::ComputeCellPair(player->GetPositionX(), player->GetPositionY());
     Cell cell(p);
-    Map* m = MapManager::Instance().GetMap(player->GetMapId(),player);
+    Map* m = player->GetMap();
 
     m->UpdatePlayerVisibility(player,cell,p);
     m->UpdateObjectsVisibilityFor(player,cell,p);

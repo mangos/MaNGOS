@@ -68,7 +68,7 @@ ObjectGridRespawnMover::Visit(CreatureMapType &m)
 
         if(cur_cell.DiffGrid(resp_cell))
         {
-            MapManager::Instance().GetMap(c->GetMapId(), c)->CreatureRespawnRelocation(c);
+            c->GetMap()->CreatureRespawnRelocation(c);
             // false result ignored: will be unload with other creatures at grid
         }
     }

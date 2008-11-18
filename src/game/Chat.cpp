@@ -1174,7 +1174,7 @@ GameObject* ChatHandler::GetObjectGlobalyWithGuidOrNearWithDbGuid(uint32 lowguid
 
         TypeContainerVisitor<MaNGOS::GameObjectSearcher<MaNGOS::GameObjectWithDbGUIDCheck>, GridTypeMapContainer > object_checker(checker);
         CellLock<GridReadGuard> cell_lock(cell, p);
-        cell_lock->Visit(cell_lock, object_checker, *MapManager::Instance().GetMap(pl->GetMapId(), pl));
+        cell_lock->Visit(cell_lock, object_checker, *pl->GetMap());
     }
 
     return obj;

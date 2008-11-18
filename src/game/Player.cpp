@@ -1578,7 +1578,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
     else
     {
         // far teleport to another map
-        Map* oldmap = IsInWorld() ? MapManager::Instance().GetMap(GetMapId(), this) : NULL;
+        Map* oldmap = IsInWorld() ? GetMap() : NULL;
         // check if we can enter before stopping combat / removing pet / totems / interrupting spells
 
         // Check enter rights before map getting to avoid creating instance copy for player
@@ -5172,7 +5172,7 @@ bool Player::SetPosition(float x, float y, float z, float orientation, bool tele
         return false;
     }
 
-    Map *m = MapManager::Instance().GetMap(GetMapId(), this);
+    Map *m = GetMap();
 
     const float old_x = GetPositionX();
     const float old_y = GetPositionY();
@@ -5190,7 +5190,7 @@ bool Player::SetPosition(float x, float y, float z, float orientation, bool tele
         m->PlayerRelocation(this, x, y, z, orientation);
 
         // reread after Map::Relocation
-        m = MapManager::Instance().GetMap(GetMapId(), this);
+        m = GetMap();
         x = GetPositionX();
         y = GetPositionY();
         z = GetPositionZ();
@@ -5219,17 +5219,17 @@ void Player::SaveRecallPosition()
 
 void Player::SendMessageToSet(WorldPacket *data, bool self)
 {
-    MapManager::Instance().GetMap(GetMapId(), this)->MessageBroadcast(this, data, self);
+    GetMap()->MessageBroadcast(this, data, self);
 }
 
 void Player::SendMessageToSetInRange(WorldPacket *data, float dist, bool self)
 {
-    MapManager::Instance().GetMap(GetMapId(), this)->MessageDistBroadcast(this, data, dist, self);
+    GetMap()->MessageDistBroadcast(this, data, dist, self);
 }
 
 void Player::SendMessageToSetInRange(WorldPacket *data, float dist, bool self, bool own_team_only)
 {
-    MapManager::Instance().GetMap(GetMapId(), this)->MessageDistBroadcast(this, data, dist, self,own_team_only);
+    GetMap()->MessageDistBroadcast(this, data, dist, self,own_team_only);
 }
 
 void Player::SendDirectMessage(WorldPacket *data)
@@ -16444,8 +16444,8 @@ void Player::HandleStealthedUnitsDetection()
     TypeContainerVisitor<MaNGOS::UnitListSearcher<MaNGOS::AnyStealthedCheck >, GridTypeMapContainer >  grid_unit_searcher(searcher);
 
     CellLock<GridReadGuard> cell_lock(cell, p);
-    cell_lock->Visit(cell_lock, world_unit_searcher, *MapManager::Instance().GetMap(GetMapId(), this));
-    cell_lock->Visit(cell_lock, grid_unit_searcher, *MapManager::Instance().GetMap(GetMapId(), this));
+    cell_lock->Visit(cell_lock, world_unit_searcher, *GetMap());
+    cell_lock->Visit(cell_lock, grid_unit_searcher, *GetMap());
 
     for (std::list<Unit*>::iterator i = stealthedUnits.begin(); i != stealthedUnits.end();)
     {
