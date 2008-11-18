@@ -655,6 +655,10 @@ void WorldSession::HandleCorpseReclaimOpcode(WorldPacket &recv_data)
     if (GetPlayer()->isAlive())
         return;
 
+    // do not allow corpse reclaim in arena
+    if (GetPlayer()->InArena())
+        return;
+
     // body not released yet
     if(!GetPlayer()->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))
         return;
