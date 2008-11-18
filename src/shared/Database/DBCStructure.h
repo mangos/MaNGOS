@@ -298,6 +298,13 @@ struct AchievementCriteriaEntry
             uint32  numberOfExaltedFactions;                // 4
         } gain_exalted_reputation;
 
+        // ACHIEVEMENT_CRITERIA_TYPE_VISIT_BARBER_SHOP = 48
+        struct
+        {
+            uint32 unused;                                  // 3
+            uint32 numberOfVisits;                          // 4
+        } visit_barber;
+
         // ACHIEVEMENT_CRITERIA_TYPE_EQUIP_EPIC_ITEM = 49
         // TODO: where is the required itemlevel stored?
         struct

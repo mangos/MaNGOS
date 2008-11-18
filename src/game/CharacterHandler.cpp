@@ -1159,6 +1159,8 @@ void WorldSession::HandleAlterAppearance( WorldPacket & recv_data )
     _player->SetByteValue(PLAYER_BYTES, 3, uint8(Color));
     _player->SetByteValue(PLAYER_BYTES_2, 0, uint8(bs_facialHair->hair_id));
 
+    _player->GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_VISIT_BARBER_SHOP, 1);
+
     _player->SetStandState(0);                              // stand up
 }
 

@@ -447,7 +447,14 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                 SetCriteriaProgress(achievementCriteria, spellCount);
                 break;
             }
-
+            case ACHIEVEMENT_CRITERIA_TYPE_VISIT_BARBER_SHOP:
+            {
+                // skip for login case
+                if(!miscvalue1)
+                    continue;
+                SetCriteriaProgress(achievementCriteria, 1);
+                break;
+            }
         }
         if(IsCompletedCriteria(achievementCriteria))
             CompletedCriteria(achievementCriteria);
@@ -535,6 +542,8 @@ bool AchievementMgr::IsCompletedCriteria(AchievementCriteriaEntry const* achieve
             return progress->counter >= achievementCriteria->cast_spell.castCount;
         case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILLLINE_SPELLS:
             return progress->counter >= achievementCriteria->learn_skilline_spell.spellCount;
+        case ACHIEVEMENT_CRITERIA_TYPE_VISIT_BARBER_SHOP:
+            return progress->counter >= achievementCriteria->visit_barber.numberOfVisits;
 
         // handle all statistic-only criteria here
         case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_BATTLEGROUND:
