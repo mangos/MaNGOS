@@ -22,7 +22,7 @@
 DROP TABLE IF EXISTS `db_version`;
 CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
-  `required_2008_11_16_01_mangos_command` bit(1) default NULL
+  `required_2008_11_18_02_mangos_mangos_string` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -622,11 +622,11 @@ CREATE TABLE `creature_movement` (
   `position_y` float NOT NULL default '0',
   `position_z` float NOT NULL default '0',
   `waittime` int(10) unsigned NOT NULL default '0',
-  `text1` text,
-  `text2` text,
-  `text3` text,
-  `text4` text,
-  `text5` text,
+  `textid1` int(11) NOT NULL default '0',
+  `textid2` int(11) NOT NULL default '0',
+  `textid3` int(11) NOT NULL default '0',
+  `textid4` int(11) NOT NULL default '0',
+  `textid5` int(11) NOT NULL default '0',
   `emote` mediumint(8) unsigned NOT NULL default '0',
   `spell` mediumint(8) unsigned NOT NULL default '0',
   `wpguid` int(11) NOT NULL default '0',
@@ -2368,7 +2368,7 @@ INSERT INTO `mangos_string` VALUES
 (248,'Model %d: %d',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (249,'Emote: %d',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (250,'Spell: %d',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
-(251,'Text %d: %s',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(251,'Text%d (ID: %i): %s',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (252,'AIScript: %s',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (253,'Forced rename for player %s will be requested at next login.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (254,'Forced rename for player %s (GUID #%u) will be requested at next login.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
