@@ -4018,7 +4018,9 @@ uint8 Spell::CanCast(bool strict)
 
                 if(int32(m_targets.getUnitTarget()->getLevel()) > CalculateDamage(i,m_targets.getUnitTarget()))
                     return SPELL_FAILED_HIGHLEVEL;
-            };break;
+
+                break;
+            }
             case SPELL_AURA_MOUNTED:
             {
                 if (m_caster->IsInWater())
@@ -4051,7 +4053,9 @@ uint8 Spell::CanCast(bool strict)
                 // can be casted at non-friendly unit or own pet/charm
                 if(m_caster->IsFriendlyTo(m_targets.getUnitTarget()))
                     return SPELL_FAILED_TARGET_FRIENDLY;
-            };break;
+
+                break;
+            }
             case SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED:
             case SPELL_AURA_FLY:
             {
@@ -4059,10 +4063,13 @@ uint8 Spell::CanCast(bool strict)
                 if(m_caster->GetTypeId()==TYPEID_PLAYER)
                 {
                     if( !((Player*)m_caster)->isGameMaster() &&
-                        GetVirtualMapForMapAndZone(m_caster->GetMapId(),m_caster->GetZoneId()) != 530)
+                        GetVirtualMapForMapAndZone(m_caster->GetMapId(),m_caster->GetZoneId()) != 530 &&
+                        !(GetVirtualMapForMapAndZone(m_caster->GetMapId(),m_caster->GetZoneId()) == 571 && ((Player*)m_caster)->HasSpell(54197)))
                         return SPELL_FAILED_NOT_HERE;
                 }
-            };break;
+
+                break;
+            }
             case SPELL_AURA_PERIODIC_MANA_LEECH:
             {
                 if (!m_targets.getUnitTarget())
@@ -4073,9 +4080,11 @@ uint8 Spell::CanCast(bool strict)
 
                 if(m_targets.getUnitTarget()->getPowerType()!=POWER_MANA)
                     return SPELL_FAILED_BAD_TARGETS;
+
                 break;
             }
-            default:break;
+            default:
+                break;
         }
     }
 

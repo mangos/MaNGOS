@@ -203,7 +203,7 @@ void LoadDBCStores(std::string dataPath)
             sAreaFlagByAreaID.insert(AreaFlagByAreaID::value_type(uint16(area->ID),area->exploreFlag));
 
             // fill MapId->DBC records ( skip sub zones and continents )
-            if(area->zone==0 && area->mapid != 0 && area->mapid != 1 && area->mapid != 530 )
+            if(area->zone==0 && area->mapid != 0 && area->mapid != 1 && area->mapid != 530 && area->mapid != 571 )
                 sAreaFlagByMapID.insert(AreaFlagByMapID::value_type(area->mapid,area->exploreFlag));
         }
     }
@@ -546,7 +546,7 @@ uint32 GetAreaFlagByMapId(uint32 mapid)
 
 uint32 GetVirtualMapForMapAndZone(uint32 mapid, uint32 zoneId)
 {
-    if(mapid != 530)                                        // speed for most cases
+    if(mapid != 530 || mapid != 571)                        // speed for most cases
         return mapid;
 
     if(WorldMapAreaEntry const* wma = sWorldMapAreaStore.LookupEntry(zoneId))
