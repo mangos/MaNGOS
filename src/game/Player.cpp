@@ -18378,9 +18378,8 @@ void Player::SetClientControl(Unit* target, uint8 allowMove)
 void Player::UpdateZoneDependentAuras( uint32 newZone )
 {
     // remove new continent flight forms
-    if( !isGameMaster() &&
-        GetVirtualMapForMapAndZone(GetMapId(),newZone) != 530 &&
-        GetVirtualMapForMapAndZone(GetMapId(),newZone) != 571)
+    uint32 v_map = GetVirtualMapForMapAndZone(GetMapId(), newZone);
+    if( !isGameMaster() && v_map != 530 && v_map != 571)
     {
         RemoveSpellsCausingAura(SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED);
         RemoveSpellsCausingAura(SPELL_AURA_FLY);
