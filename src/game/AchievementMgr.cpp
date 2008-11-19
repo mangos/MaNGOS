@@ -455,6 +455,13 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                 SetCriteriaProgress(achievementCriteria, 1);
                 break;
             }
+            case ACHIEVEMENT_CRITERIA_TYPE_GAIN_REPUTATION:
+            {
+                int32 reputation = GetPlayer()->GetReputation(achievementCriteria->gain_reputation.factionID);
+                if (reputation > 0)
+                    SetCriteriaProgress(achievementCriteria, reputation);
+                break;
+            }
         }
         if(IsCompletedCriteria(achievementCriteria))
             CompletedCriteria(achievementCriteria);
@@ -544,6 +551,8 @@ bool AchievementMgr::IsCompletedCriteria(AchievementCriteriaEntry const* achieve
             return progress->counter >= achievementCriteria->learn_skilline_spell.spellCount;
         case ACHIEVEMENT_CRITERIA_TYPE_VISIT_BARBER_SHOP:
             return progress->counter >= achievementCriteria->visit_barber.numberOfVisits;
+        case ACHIEVEMENT_CRITERIA_TYPE_GAIN_REPUTATION:
+            return progress->counter >= achievementCriteria->gain_reputation.reputationAmount;
 
         // handle all statistic-only criteria here
         case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_BATTLEGROUND:
