@@ -772,12 +772,16 @@ class ObjectMgr
         const char * GetScriptName(uint32 id) { return id < m_scriptNames.size() ? m_scriptNames[id].c_str() : ""; }
         uint32 GetScriptId(const char *name);
     protected:
+
+        // first free id for selected id type
         uint32 m_auctionid;
         uint32 m_mailid;
         uint32 m_ItemTextId;
         uint32 m_arenaTeamId;
         uint32 m_guildId;
+        uint32 m_hiPetNumber;
 
+        // first free low guid for seelcted guid type
         uint32 m_hiCharGuid;
         uint32 m_hiCreatureGuid;
         uint32 m_hiPetGuid;
@@ -785,8 +789,6 @@ class ObjectMgr
         uint32 m_hiGoGuid;
         uint32 m_hiDoGuid;
         uint32 m_hiCorpseGuid;
-
-        uint32 m_hiPetNumber;
 
         QuestMap            mQuestTemplates;
 

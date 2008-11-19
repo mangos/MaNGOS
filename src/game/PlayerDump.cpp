@@ -389,7 +389,8 @@ DumpReturn PlayerDumpReader::LoadDump(std::string file, uint32 account, std::str
         }
         else incHighest = false;
     }
-    else guid = objmgr.m_hiCharGuid;
+    else
+        guid = objmgr.m_hiCharGuid;
 
     // normalize the name if specified and check if it exists
     if(!normalizePlayerName(name))
