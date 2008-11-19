@@ -1715,6 +1715,7 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         FactionStateList m_factions;
         ForcedReactions m_forcedReactions;
+        FactionStateList const& GetFactionStateList() { return m_factions; }
         uint32 GetDefaultReputationFlags(const FactionEntry *factionEntry) const;
         int32 GetBaseReputation(const FactionEntry *factionEntry) const;
         int32 GetReputation(uint32 faction_id) const;

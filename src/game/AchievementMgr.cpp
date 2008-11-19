@@ -462,6 +462,18 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                     SetCriteriaProgress(achievementCriteria, reputation);
                 break;
             }
+            case ACHIEVEMENT_CRITERIA_TYPE_GAIN_EXALTED_REPUTATION:
+            {
+                uint32 counter = 0;
+                const FactionStateList factionStateList = GetPlayer()->GetFactionStateList();
+                for (FactionStateList::const_iterator iter = factionStateList.begin(); iter!= factionStateList.end(); iter++)
+                {
+                    if(GetPlayer()->ReputationToRank(iter->second.Standing) >= REP_EXALTED)
+                        ++counter;
+                }
+                SetCriteriaProgress(achievementCriteria, counter);
+            }
+
         }
         if(IsCompletedCriteria(achievementCriteria))
             CompletedCriteria(achievementCriteria);
@@ -553,6 +565,8 @@ bool AchievementMgr::IsCompletedCriteria(AchievementCriteriaEntry const* achieve
             return progress->counter >= achievementCriteria->visit_barber.numberOfVisits;
         case ACHIEVEMENT_CRITERIA_TYPE_GAIN_REPUTATION:
             return progress->counter >= achievementCriteria->gain_reputation.reputationAmount;
+        case ACHIEVEMENT_CRITERIA_TYPE_GAIN_EXALTED_REPUTATION:
+            return progress->counter >= achievementCriteria->gain_exalted_reputation.numberOfExaltedFactions;
 
         // handle all statistic-only criteria here
         case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_BATTLEGROUND:
