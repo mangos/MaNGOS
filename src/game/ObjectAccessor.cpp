@@ -140,7 +140,15 @@ Creature*
 ObjectAccessor::GetCreature(WorldObject const &u, uint64 guid)
 {
     Creature * ret = GetObjectInWorld(guid, (Creature*)NULL);
-    if(ret && ret->GetMapId() != u.GetMapId()) ret = NULL;
+    if(!ret)
+        return NULL;
+
+    if(ret->GetMapId() != u.GetMapId())
+        return NULL;
+
+    if(ret->GetInstanceId() != u.GetInstanceId())
+        return NULL;
+
     return ret;
 }
 
@@ -333,7 +341,7 @@ ObjectAccessor::_buildChangeObjectForPlayer(WorldObject *obj, UpdateDataMapType 
     WorldObjectChangeAccumulator notifier(*obj, update_players);
     TypeContainerVisitor<WorldObjectChangeAccumulator, WorldTypeMapContainer > player_notifier(notifier);
     CellLock<GridReadGuard> cell_lock(cell, p);
-    cell_lock->Visit(cell_lock, player_notifier, *MapManager::Instance().GetMap(obj->GetMapId(), obj));
+    cell_lock->Visit(cell_lock, player_notifier, *obj->GetMap());
 }
 
 Pet*
@@ -511,32 +519,6 @@ ObjectAccessor::UpdatePlayers(uint32 diff)
             iter->second->Update(diff);
 }
 
-bool
-ObjectAccessor::PlayersNearGrid(uint32 x, uint32 y, uint32 m_id, uint32 i_id) const
-{
-    CellPair cell_min(x*MAX_NUMBER_OF_CELLS, y*MAX_NUMBER_OF_CELLS);
-    CellPair cell_max(cell_min.x_coord + MAX_NUMBER_OF_CELLS, cell_min.y_coord+MAX_NUMBER_OF_CELLS);
-    cell_min << 2;
-    cell_min -= 2;
-    cell_max >> 2;
-    cell_max += 2;
-
-    //TODO: Guard player
-    HashMapHolder<Player>::MapType& playerMap = HashMapHolder<Player>::GetContainer();
-    for(HashMapHolder<Player>::MapType::const_iterator iter=playerMap.begin(); iter != playerMap.end(); ++iter)
-    {
-        if( m_id != iter->second->GetMapId() || i_id != iter->second->GetInstanceId() )
-            continue;
-
-        CellPair p = MaNGOS::ComputeCellPair(iter->second->GetPositionX(), iter->second->GetPositionY());
-        if( (cell_min.x_coord <= p.x_coord && p.x_coord <= cell_max.x_coord) &&
-            (cell_min.y_coord <= p.y_coord && p.y_coord <= cell_max.y_coord) )
-            return true;
-    }
-
-    return false;
-}
-
 void
 ObjectAccessor::WorldObjectChangeAccumulator::Visit(PlayerMapType &m)
 {
@@ -551,14 +533,14 @@ ObjectAccessor::UpdateObjectVisibility(WorldObject *obj)
     CellPair p = MaNGOS::ComputeCellPair(obj->GetPositionX(), obj->GetPositionY());
     Cell cell(p);
 
-    MapManager::Instance().GetMap(obj->GetMapId(), obj)->UpdateObjectVisibility(obj,cell,p);
+    obj->GetMap()->UpdateObjectVisibility(obj,cell,p);
 }
 
 void ObjectAccessor::UpdateVisibilityForPlayer( Player* player )
 {
     CellPair p = MaNGOS::ComputeCellPair(player->GetPositionX(), player->GetPositionY());
     Cell cell(p);
-    Map* m = MapManager::Instance().GetMap(player->GetMapId(),player);
+    Map* m = player->GetMap();
 
     m->UpdatePlayerVisibility(player,cell,p);
     m->UpdateObjectsVisibilityFor(player,cell,p);

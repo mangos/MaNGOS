@@ -4098,12 +4098,17 @@ void Unit::RemoveNotOwnSingleTargetAuras()
 
 void Unit::RemoveAura(AuraMap::iterator &i, AuraRemoveMode mode)
 {
-    if (IsSingleTargetSpell((*i).second->GetSpellProto()))
+    Aura* Aur = i->second;
+    SpellEntry const* AurSpellInfo = Aur->GetSpellProto();
+
+    Unit* caster = NULL;
+    if (IsSingleTargetSpell(AurSpellInfo))
     {
-        if(Unit* caster = (*i).second->GetCaster())
+        caster = Aur->GetCaster();
+        if(caster)
         {
             AuraList& scAuras = caster->GetSingleCastAuras();
-            scAuras.remove((*i).second);
+            scAuras.remove(Aur);
         }
         else
         {
@@ -4112,13 +4117,12 @@ void Unit::RemoveAura(AuraMap::iterator &i, AuraRemoveMode mode)
         }
     }
 
-    if ((*i).second->GetModifier()->m_auraname < TOTAL_AURAS)
+    // remove from list before mods removing (prevent cyclic calls, mods added before including to aura list - use reverse order)
+    if (Aur->GetModifier()->m_auraname < TOTAL_AURAS)
     {
-        m_modAuras[(*i).second->GetModifier()->m_auraname].remove((*i).second);
+        m_modAuras[Aur->GetModifier()->m_auraname].remove(Aur);
     }
 
-    // remove from list before mods removing (prevent cyclic calls, mods added before including to aura list - use reverse order)
-    Aura* Aur = i->second;
     // Set remove mode
     Aur->SetRemoveMode(mode);
     // some ShapeshiftBoosts at remove trigger removing other auras including parent Shapeshift aura
@@ -4126,17 +4130,30 @@ void Unit::RemoveAura(AuraMap::iterator &i, AuraRemoveMode mode)
     m_Auras.erase(i);
     ++m_removedAuras;                                       // internal count used by unit update
 
-    // Status unsummoned at aura remove
+    // Statue unsummoned at aura remove
     Totem* statue = NULL;
-    if(IsChanneledSpell(Aur->GetSpellProto()))
-        if(Unit* caster = Aur->GetCaster())
+    bool caster_channeled = false;
+    if(IsChanneledSpell(AurSpellInfo))
+    {
+        if(!caster)                                         // can be already located for IsSingleTargetSpell case
+            caster = Aur->GetCaster();
+
+        if(caster)
+        {
             if(caster->GetTypeId()==TYPEID_UNIT && ((Creature*)caster)->isTotem() && ((Totem*)caster)->GetTotemType()==TOTEM_STATUE)
                 statue = ((Totem*)caster);
+            else
+                caster_channeled = caster==this;
+        }
+    }
 
     sLog.outDebug("Aura %u now is remove mode %d",Aur->GetModifier()->m_auraname, mode);
     Aur->ApplyModifier(false,true);
     Aur->_RemoveAura();
     delete Aur;
+
+    if(caster_channeled)
+        RemoveAurasAtChanneledTarget (AurSpellInfo);
 
     if(statue)
         statue->UnSummon();
@@ -8723,7 +8740,7 @@ void Unit::SetVisibility(UnitVisibility x)
 
     if(IsInWorld())
     {
-        Map *m = MapManager::Instance().GetMap(GetMapId(), this);
+        Map *m = GetMap();
 
         if(GetTypeId()==TYPEID_PLAYER)
             m->PlayerRelocation((Player*)this,GetPositionX(),GetPositionY(),GetPositionZ(),GetOrientation());
@@ -10103,7 +10120,7 @@ void Unit::ProcDamageAndSpellFor( bool isVictim, Unit * pTarget, uint32 procFlag
                 }
                 case SPELL_AURA_OVERRIDE_CLASS_SCRIPTS:
                 {
-                    sLog.outDebug("ProcDamageAndSpell: casting spell id %u (triggered by %s class script aura of spell %u)",
+                    sLog.outDebug("ProcDamageAndSpell: casting spell (triggered by %s class script aura of spell %u)",
                         (isVictim?"a victim's":"an attacker's"),triggeredByAura->GetId());
                     casted = HandleOverrideClassScriptAuraProc(pTarget, triggeredByAura, procSpell,i->cooldown);
                     break;
@@ -10476,8 +10493,8 @@ Unit* Unit::SelectNearbyTarget() const
         TypeContainerVisitor<MaNGOS::UnitListSearcher<MaNGOS::AnyUnfriendlyUnitInObjectRangeCheck>, GridTypeMapContainer >  grid_unit_searcher(searcher);
 
         CellLock<GridReadGuard> cell_lock(cell, p);
-        cell_lock->Visit(cell_lock, world_unit_searcher, *MapManager::Instance().GetMap(GetMapId(), this));
-        cell_lock->Visit(cell_lock, grid_unit_searcher, *MapManager::Instance().GetMap(GetMapId(), this));
+        cell_lock->Visit(cell_lock, world_unit_searcher, *GetMap());
+        cell_lock->Visit(cell_lock, grid_unit_searcher, *GetMap());
     }
 
     // remove current target
@@ -10859,4 +10876,24 @@ bool Unit::HandleMeandingAuraProc( Aura* triggeredByAura )
     // heal
     CastCustomSpell(this,33110,&heal,NULL,NULL,true,NULL,NULL,caster_guid);
     return true;
+}
+
+void Unit::RemoveAurasAtChanneledTarget(SpellEntry const* spellInfo)
+{
+    uint64 target_guid = GetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT);
+
+    if(!IS_UNIT_GUID(target_guid))
+        return;
+
+    Unit* target = ObjectAccessor::GetUnit(*this, target_guid);
+    if(!target)
+        return;
+
+    for (AuraMap::iterator iter = target->GetAuras().begin(); iter != target->GetAuras().end(); )
+    {
+        if (iter->second->GetId() == spellInfo->Id && iter->second->GetCasterGUID()==GetGUID())
+            target->RemoveAura(iter);
+        else
+            ++iter;
+    }
 }

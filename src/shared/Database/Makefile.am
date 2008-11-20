@@ -55,6 +55,7 @@ libmangosdatabase_a_SOURCES = \
     QueryResultSqlite.h \
     SQLStorage.cpp \
     SQLStorage.h \
+    SQLStorageImpl.h \
     SqlDelayThread.cpp \
     SqlDelayThread.h \
     SqlOperations.cpp \

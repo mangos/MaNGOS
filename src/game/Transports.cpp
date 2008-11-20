@@ -105,7 +105,7 @@ void MapManager::LoadTransports()
 
         //If we someday decide to use the grid to track transports, here:
         //MapManager::Instance().LoadGrid(mapid,x,y,true);
-        //MapManager::Instance().GetMap(t->GetMapId())->Add<GameObject>((GameObject *)t);
+        //t->GetMap()->Add<GameObject>((GameObject *)t);
         ++count;
     } while(result->NextRow());
     delete result;
@@ -430,11 +430,11 @@ Transport::WayPointMap::iterator Transport::GetNextWayPoint()
 
 void Transport::TeleportTransport(uint32 newMapid, float x, float y, float z)
 {
-    //MapManager::Instance().GetMap(oldMapid)->Remove((GameObject *)this, false);
+    //GetMap()->Remove((GameObject *)this, false);
     SetMapId(newMapid);
     //MapManager::Instance().LoadGrid(newMapid,x,y,true);
     Relocate(x, y, z);
-    //MapManager::Instance().GetMap(newMapid)->Add<GameObject>((GameObject *)this);
+    //GetMap()->Add<GameObject>((GameObject *)this);
 
     for(PlayerSet::iterator itr = m_passengers.begin(); itr != m_passengers.end();)
     {

@@ -1938,7 +1938,7 @@ void Spell::EffectTeleportUnits(uint32 i)
                 ((Player*)unitTarget)->TeleportTo(mapid, x, y, z, orientation, TELE_TO_NOT_LEAVE_COMBAT | TELE_TO_NOT_UNSUMMON_PET | (unitTarget==m_caster ? TELE_TO_SPELL : 0));
             else
             {
-                MapManager::Instance().GetMap(mapid, m_caster)->CreatureRelocation((Creature*)unitTarget, x, y, z, orientation);
+                m_caster->GetMap()->CreatureRelocation((Creature*)unitTarget, x, y, z, orientation);
                 WorldPacket data;
                 unitTarget->BuildTeleportAckMsg(&data, x, y, z, orientation);
                 unitTarget->SendMessageToSet(&data, false);
@@ -1964,7 +1964,7 @@ void Spell::EffectTeleportUnits(uint32 i)
                 ((Player*)unitTarget)->TeleportTo(mapid, x, y, z, orientation, TELE_TO_NOT_LEAVE_COMBAT | TELE_TO_NOT_UNSUMMON_PET | (unitTarget==m_caster ? TELE_TO_SPELL : 0));
             else
             {
-                MapManager::Instance().GetMap(mapid, m_caster)->CreatureRelocation((Creature*)unitTarget, x, y, z, orientation);
+                m_caster->GetMap()->CreatureRelocation((Creature*)unitTarget, x, y, z, orientation);
                 WorldPacket data;
                 unitTarget->BuildTeleportAckMsg(&data, x, y, z, orientation);
                 unitTarget->SendMessageToSet(&data, false);
@@ -2626,7 +2626,7 @@ void Spell::EffectPersistentAA(uint32 i)
     dynObj->SetUInt32Value(GAMEOBJECT_DISPLAYID, 368003);
     dynObj->SetUInt32Value(DYNAMICOBJECT_BYTES, 0x01eeeeee);
     m_caster->AddDynObject(dynObj);
-    MapManager::Instance().GetMap(dynObj->GetMapId(), dynObj)->Add(dynObj);
+    dynObj->GetMap()->Add(dynObj);
 }
 
 void Spell::EffectEnergize(uint32 i)
@@ -3467,7 +3467,7 @@ void Spell::EffectAddFarsight(uint32 i)
     dynObj->SetUInt32Value(OBJECT_FIELD_TYPE, 65);
     dynObj->SetUInt32Value(DYNAMICOBJECT_BYTES, 0x80000002);
     m_caster->AddDynObject(dynObj);
-    MapManager::Instance().GetMap(dynObj->GetMapId(), dynObj)->Add(dynObj);
+    dynObj->GetMap()->Add(dynObj);
     m_caster->SetUInt64Value(PLAYER_FARSIGHT, dynObj->GetGUID());
 }
 
@@ -3664,7 +3664,7 @@ void Spell::EffectTeleUnitsFaceCaster(uint32 i)
     if(unitTarget->GetTypeId() == TYPEID_PLAYER)
         ((Player*)unitTarget)->TeleportTo(mapid, fx, fy, fz, -m_caster->GetOrientation(), TELE_TO_NOT_LEAVE_COMBAT | TELE_TO_NOT_UNSUMMON_PET | (unitTarget==m_caster ? TELE_TO_SPELL : 0));
     else
-        MapManager::Instance().GetMap(mapid, m_caster)->CreatureRelocation((Creature*)m_caster, fx, fy, fz, -m_caster->GetOrientation());
+        m_caster->GetMap()->CreatureRelocation((Creature*)m_caster, fx, fy, fz, -m_caster->GetOrientation());
 }
 
 void Spell::EffectLearnSkill(uint32 i)
@@ -3905,7 +3905,7 @@ void Spell::EffectTameCreature(uint32 /*i*/)
     pet->SetUInt32Value(UNIT_FIELD_LEVEL,creatureTarget->getLevel()-1);
 
     // add to world
-    MapManager::Instance().GetMap(pet->GetMapId(), pet)->Add((Creature*)pet);
+    pet->GetMap()->Add((Creature*)pet);
 
     // visual effect for levelup
     pet->SetUInt32Value(UNIT_FIELD_LEVEL,creatureTarget->getLevel());
@@ -3935,14 +3935,14 @@ void Spell::EffectSummonPet(uint32 i)
             if( OldSummon->isDead() )
                 return;
 
-            MapManager::Instance().GetMap(OldSummon->GetMapId(), OldSummon)->Remove((Creature*)OldSummon,false);
+            OldSummon->GetMap()->Remove((Creature*)OldSummon,false);
             OldSummon->SetMapId(m_caster->GetMapId());
 
             float px, py, pz;
             m_caster->GetClosePoint(px, py, pz, OldSummon->GetObjectSize());
 
             OldSummon->Relocate(px, py, pz, OldSummon->GetOrientation());
-            MapManager::Instance().GetMap(m_caster->GetMapId(), m_caster)->Add((Creature*)OldSummon);
+            m_caster->GetMap()->Add((Creature*)OldSummon);
 
             if(m_caster->GetTypeId() == TYPEID_PLAYER && OldSummon->isControlled() )
             {
@@ -5438,7 +5438,7 @@ void Spell::EffectMomentMove(uint32 i)
         if(unitTarget->GetTypeId() == TYPEID_PLAYER)
             ((Player*)unitTarget)->TeleportTo(mapid, fx, fy, fz, unitTarget->GetOrientation(), TELE_TO_NOT_LEAVE_COMBAT | TELE_TO_NOT_UNSUMMON_PET | (unitTarget==m_caster ? TELE_TO_SPELL : 0));
         else
-            MapManager::Instance().GetMap(mapid, unitTarget)->CreatureRelocation((Creature*)unitTarget, fx, fy, fz, unitTarget->GetOrientation());
+            m_caster->GetMap()->CreatureRelocation((Creature*)unitTarget, fx, fy, fz, unitTarget->GetOrientation());
     }
 }
 
@@ -5548,7 +5548,7 @@ void Spell::EffectCharge(uint32 /*i*/)
     m_caster->SendMonsterMove(x, y, z, 0, MOVEMENTFLAG_WALK_MODE, 1);
 
     if(m_caster->GetTypeId() != TYPEID_PLAYER)
-        MapManager::Instance().GetMap(m_caster->GetMapId(), m_caster)->CreatureRelocation((Creature*)m_caster,x,y,z,m_caster->GetOrientation());
+        m_caster->GetMap()->CreatureRelocation((Creature*)m_caster,x,y,z,m_caster->GetOrientation());
 
     // not all charge effects used in negative spells
     if ( !IsPositiveSpell(m_spellInfo->Id))
@@ -5984,7 +5984,7 @@ void Spell::EffectTransmitted(uint32 effIndex)
             linkedGO->SetSpellId(m_spellInfo->Id);
             linkedGO->SetOwnerGUID(m_caster->GetGUID() );
 
-            MapManager::Instance().GetMap(linkedGO->GetMapId(), linkedGO)->Add(linkedGO);
+            linkedGO->GetMap()->Add(linkedGO);
         }
         else
         {

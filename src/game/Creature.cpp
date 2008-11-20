@@ -149,7 +149,7 @@ void Creature::RemoveCorpse()
 
     float x,y,z,o;
     GetRespawnCoord(x, y, z, &o);
-    MapManager::Instance().GetMap(GetMapId(), this)->CreatureRelocation(this,x,y,z,o);
+    GetMap()->CreatureRelocation(this,x,y,z,o);
 }
 
 /**
@@ -337,7 +337,7 @@ void Creature::Update(uint32 diff)
                 //Call AI respawn virtual function
                 i_AI->JustRespawned();
 
-                MapManager::Instance().GetMap(GetMapId(), this)->Add(this);
+                GetMap()->Add(this);
             }
             break;
         }
@@ -1686,7 +1686,7 @@ void Creature::CallAssistence()
                 TypeContainerVisitor<MaNGOS::CreatureListSearcher<MaNGOS::AnyAssistCreatureInRangeCheck>, GridTypeMapContainer >  grid_creature_searcher(searcher);
 
                 CellLock<GridReadGuard> cell_lock(cell, p);
-                cell_lock->Visit(cell_lock, grid_creature_searcher, *MapManager::Instance().GetMap(GetMapId(), this));
+                cell_lock->Visit(cell_lock, grid_creature_searcher, *GetMap());
             }
 
             for(std::list<Creature*>::iterator iter = assistList.begin(); iter != assistList.end(); ++iter)
@@ -1942,9 +1942,14 @@ uint32 Creature::getLevelForTarget( Unit const* target ) const
     return level;
 }
 
-char const* Creature::GetScriptName() const
+std::string Creature::GetScriptName()
 {
-    return ObjectMgr::GetCreatureTemplate(GetEntry())->ScriptName;
+    return objmgr.GetScriptName(GetScriptId());
+}
+
+uint32 Creature::GetScriptId()
+{
+    return ObjectMgr::GetCreatureTemplate(GetEntry())->ScriptID;
 }
 
 VendorItemData const* Creature::GetVendorItems() const

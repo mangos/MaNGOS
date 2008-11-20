@@ -115,5 +115,5 @@ void AddSC_default()
     newscript->pGOQuestAccept        = &GOQuestAccept_default;
     newscript->pGOChooseReward       = &GOChooseReward_default;
 
-    m_scripts[nrscripts++] = newscript;
+    newscript->registerSelf();
 }
