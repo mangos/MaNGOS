@@ -78,6 +78,68 @@ const CriteriaCastSpellRequirement AchievementMgr::criteriaCastSpellRequirements
         {6662, 31261, 0, 0}
         };
 
+const AchievementReward AchievementMgr::achievementRewards[ACHIEVEMENT_REWARD_COUNT] =
+    {
+        // achievementId, horde titleid, alliance titleid, itemid 
+        {45, 0, 0, 43348},
+        {46, 78, 78, 0},
+        {230, 72, 72, 0},
+        {456, 139, 139, 0},
+        {614, 0, 0, 44223},
+        {619, 0, 0, 44224},
+        {714, 47, 47, 0},
+        {762, 130, 130, 0},
+        {870, 127, 126, 0},
+        {871, 144, 144, 0},
+        {876, 0, 0, 43349},
+        {907, 48, 48, 0},
+        {913, 74, 74, 0},
+        {942, 79, 79, 0},
+        {943, 79, 79, 0},
+        {945, 131, 131, 0},
+        {948, 130, 130, 0},
+        {953, 132, 132, 0},
+        {978, 81, 81, 0},
+        {1015, 77, 77, 0},
+        {1021, 0, 0, 40643},
+        {1038, 75, 75, 0},
+        {1039, 76, 76, 0},
+        {1163, 128, 128, 0},
+        {1174, 82, 82, 0},
+        {1175, 72, 72, 0},
+        {1250, 0, 0, 40653},
+        {1400, 120, 120, 0},
+        {1402, 122, 122, 0},
+        {1516, 83, 83, 0},
+        {1563, 84, 84, 0},
+        {1656, 124, 124, 0},
+        {1657, 124, 124, 0},
+        {1658, 129, 129, 0},
+        {1681, 125, 125, 43300},
+        {1682, 125, 125, 43300},
+        {1683, 133, 133, 0},
+        {1684, 133, 133, 0},
+        {1691, 134, 134, 0},
+        {1692, 134, 134, 0},
+        {1693, 135, 135, 0},
+        {1707, 135, 135, 0},
+        {1784, 84, 84, 0},
+        {1793, 137, 137, 0},
+        {1956, 0, 0, 43824},
+        {2051, 140, 140, 0},
+        {2054, 121, 121, 0},
+        {2096, 0, 0, 44430},
+        {2136, 0, 0, 0},// <- TODO: find item for spell 59961
+        {2137, 0, 0, 0},// <- TODO: find item for spell 60021
+        {2138, 0, 0, 0},// <- TODO: find item for spell 59976
+        {2143, 0, 0, 44178},
+        {2144, 0, 0, 0},// <- TODO: find item for spell 60024
+        {2145, 0, 0, 0},// <- TODO: find item for spell 60024
+        {2186, 141, 141, 0},
+        {2187, 142, 142, 0},
+        {2188, 143, 143, 0}
+    };
+
 AchievementMgr::AchievementMgr(Player *player)
 {
     m_player = player;
@@ -666,7 +728,53 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
         objmgr.allCompletedAchievements.insert(achievement->ID);
 
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_ACHIEVEMENT);
-    // TODO: reward titles and items
+
+    // reward items and titles
+    AchievementReward const* reward = NULL;
+    for (uint32 i=0; i<ACHIEVEMENT_REWARD_COUNT; i++)
+    {
+        if (achievementRewards[i].achievementId == achievement->ID)
+        {
+            reward = &achievementRewards[i];
+            break;
+        }
+    }
+
+    if (reward)
+    {
+        sLog.outString("achiev %u, title= %u, %u", reward->achievementId, reward->titleId[0], reward->titleId[1]);
+        uint32 titleId = reward->titleId[GetPlayer()->GetTeam() == HORDE?0:1];
+        if(CharTitlesEntry const* titleEntry = sCharTitlesStore.LookupEntry(titleId))
+            GetPlayer()->SetTitle(titleEntry);
+
+        if (reward->itemId)
+        {
+            ItemPrototype const *pProto = objmgr.GetItemPrototype( reward->itemId );
+
+            if(!pProto)
+            {
+                GetPlayer()->SendEquipError( EQUIP_ERR_ITEM_NOT_FOUND, NULL, NULL );
+                return;
+            }
+
+            ItemPosCountVec dest;
+            uint32 no_space = 0;
+            uint8 msg = GetPlayer()->CanStoreNewItem( NULL_BAG, NULL_SLOT, dest, reward->itemId, 1, &no_space );
+
+            if( msg != EQUIP_ERR_OK )
+            {
+                GetPlayer()->SendEquipError( msg, NULL, NULL );
+                return;
+            }
+            Item* pItem = GetPlayer()->StoreNewItem( dest, reward->itemId, true);
+
+            if(!pItem)
+            {
+                GetPlayer()->SendEquipError( EQUIP_ERR_ITEM_NOT_FOUND, NULL, NULL );
+                return;
+            }
+        }
+    }
 }
 
 void AchievementMgr::SendAllAchievementData()

@@ -24,6 +24,7 @@
 #include "Database/DatabaseEnv.h"
 
 #define CRITERIA_CAST_SPELL_REQ_COUNT 46
+#define ACHIEVEMENT_REWARD_COUNT 57
 
 struct CriteriaProgress
 {
@@ -44,6 +45,13 @@ struct CriteriaCastSpellRequirement
     uint32 creatureEntry;
     uint8 playerClass;
     uint8 playerRace;
+};
+
+struct AchievementReward
+{
+    uint32 achievementId;
+    uint32 titleId[2];
+    uint32 itemId;
 };
 
 typedef UNORDERED_MAP<uint32, CriteriaProgress*> CriteriaProgressMap;
@@ -88,5 +96,6 @@ class AchievementMgr
         CriteriaProgressMap m_criteriaProgress;
         CompletedAchievementMap m_completedAchievements;
         static const CriteriaCastSpellRequirement criteriaCastSpellRequirements[];
+        static const AchievementReward achievementRewards[];
 };
 #endif
