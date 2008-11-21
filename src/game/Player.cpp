@@ -5150,16 +5150,16 @@ bool Player::SetPosition(float x, float y, float z, float orientation, bool tele
         x = GetPositionX();
         y = GetPositionY();
         z = GetPositionZ();
+
+        // group update
+        if(GetGroup() && (old_x != x || old_y != y))
+            SetGroupUpdateFlag(GROUP_UPDATE_FLAG_POSITION);
     }
 
     // code block for underwater state update
     UpdateUnderwaterState(m, x, y, z);
 
     CheckExploreSystem();
-
-    // group update
-    if(GetGroup())
-        SetGroupUpdateFlag(GROUP_UPDATE_FLAG_POSITION);
 
     return true;
 }
