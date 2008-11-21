@@ -12382,7 +12382,7 @@ void Player::RewardQuest( Quest const *pQuest, uint32 reward, Object* questGiver
     if(pQuest->GetCharTitleId())
     {
         if(CharTitlesEntry const* titleEntry = sCharTitlesStore.LookupEntry(pQuest->GetCharTitleId()))
-            SetFlag64(PLAYER__FIELD_KNOWN_TITLES, (uint64(1) << titleEntry->bit_index));
+            SetTitle(titleEntry);
     }
 
     // Send reward mail
@@ -14003,7 +14003,7 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
     // note: PLAYER__FIELD_KNOWN_TITLES updated at quest status loaded
     if(uint32 curTitle = GetUInt32Value(PLAYER_CHOSEN_TITLE))
     {
-        if(!HasFlag64(PLAYER__FIELD_KNOWN_TITLES,uint64(1) << curTitle))
+        if(!HasTitle(curTitle))
             SetUInt32Value(PLAYER_CHOSEN_TITLE,0);
     }
 
@@ -14615,7 +14615,7 @@ void Player::_LoadQuestStatus(QueryResult *result)
                     if(pQuest->GetCharTitleId())
                     {
                         if(CharTitlesEntry const* titleEntry = sCharTitlesStore.LookupEntry(pQuest->GetCharTitleId()))
-                            SetFlag64(PLAYER__FIELD_KNOWN_TITLES, (uint64(1) << titleEntry->bit_index));
+                            SetTitle(titleEntry);
                     }
                 }
 
@@ -18734,3 +18734,21 @@ void Player::ExitVehicle(Vehicle *vehicle)
     // only for flyable vehicles?
     CastSpell(this, 45472, true);                           // Parachute
 }
+
+bool Player::HasTitle(uint32 bitIndex)
+{
+    if (bitIndex > 128)
+        return false;
+
+    uint32 fieldIndexOffset = bitIndex/32;
+    uint32 flag = 1 << (bitIndex%32);
+    return HasFlag(PLAYER__FIELD_KNOWN_TITLES+fieldIndexOffset, flag);
+}
+
+void Player::SetTitle(CharTitlesEntry const* title)
+{
+    uint32 fieldIndexOffset = title->bit_index/32;
+    uint32 flag = 1 << (title->bit_index%32);
+    SetFlag(PLAYER__FIELD_KNOWN_TITLES+fieldIndexOffset, flag);
+}
+

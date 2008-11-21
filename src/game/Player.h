@@ -2068,6 +2068,10 @@ class MANGOS_DLL_SPEC Player : public Unit
         DeclinedName const* GetDeclinedNames() const { return m_declinedname; }
 
         AchievementMgr& GetAchievementMgr() { return m_achievementMgr; }
+        bool HasTitle(uint32 bitIndex);
+        bool HasTitle(CharTitlesEntry const* title) { return HasTitle(title->bit_index); }
+        void SetTitle(CharTitlesEntry const* title);
+
     protected:
 
         /*********************************************************/
