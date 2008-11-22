@@ -7968,6 +7968,10 @@ uint8 Player::FindEquipSlot( ItemPrototype const* proto, uint32 slot, bool swap 
                     if (pClass == CLASS_WARLOCK)
                         slots[0] = EQUIPMENT_SLOT_RANGED;
                     break;
+                case ITEM_SUBCLASS_ARMOR_SIGIL:
+                    if (pClass == CLASS_DEATH_KNIGHT)
+                        slots[0] = EQUIPMENT_SLOT_RANGED;
+                    break;
             }
             break;
         }
