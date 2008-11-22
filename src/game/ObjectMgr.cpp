@@ -42,6 +42,7 @@
 #include "InstanceSaveMgr.h"
 #include "SpellAuras.h"
 #include "Util.h"
+#include "WaypointManager.h"
 
 INSTANTIATE_SINGLETON_1(ObjectMgr);
 
@@ -116,8 +117,12 @@ ObjectMgr::ObjectMgr()
     m_hiGoGuid          = 1;
     m_hiDoGuid          = 1;
     m_hiCorpseGuid      = 1;
-
     m_hiPetNumber       = 1;
+    m_ItemTextId        = 1;
+    m_mailid            = 1;
+    m_auctionid         = 1;
+    m_guildId           = 1;
+    m_arenaTeamId       = 1;
 
     mGuildBankTabPrice.resize(GUILD_BANK_MAX_TABS);
     mGuildBankTabPrice[0] = 100;
@@ -5132,7 +5137,6 @@ void ObjectMgr::SetHighestGuids()
     if( result )
     {
         m_hiCharGuid = (*result)[0].GetUInt32()+1;
-
         delete result;
     }
 
@@ -5140,7 +5144,6 @@ void ObjectMgr::SetHighestGuids()
     if( result )
     {
         m_hiCreatureGuid = (*result)[0].GetUInt32()+1;
-
         delete result;
     }
 
@@ -5153,7 +5156,6 @@ void ObjectMgr::SetHighestGuids()
     if( result )
     {
         m_hiItemGuid = (*result)[0].GetUInt32()+1;
-
         delete result;
     }
 
@@ -5167,7 +5169,6 @@ void ObjectMgr::SetHighestGuids()
     if( result )
     {
         m_hiGoGuid = (*result)[0].GetUInt32()+1;
-
         delete result;
     }
 
@@ -5175,39 +5176,27 @@ void ObjectMgr::SetHighestGuids()
     if( result )
     {
         m_auctionid = (*result)[0].GetUInt32()+1;
-
         delete result;
     }
-    else
-    {
-        m_auctionid = 0;
-    }
+
     result = CharacterDatabase.Query( "SELECT MAX(id) FROM mail" );
     if( result )
     {
         m_mailid = (*result)[0].GetUInt32()+1;
-
         delete result;
     }
-    else
-    {
-        m_mailid = 0;
-    }
+
     result = CharacterDatabase.Query( "SELECT MAX(id) FROM item_text" );
     if( result )
     {
-        m_ItemTextId = (*result)[0].GetUInt32();
-
+        m_ItemTextId = (*result)[0].GetUInt32()+1;
         delete result;
     }
-    else
-        m_ItemTextId = 0;
 
     result = CharacterDatabase.Query( "SELECT MAX(guid) FROM corpse" );
     if( result )
     {
         m_hiCorpseGuid = (*result)[0].GetUInt32()+1;
-
         delete result;
     }
 
@@ -5215,7 +5204,6 @@ void ObjectMgr::SetHighestGuids()
     if (result)
     {
         m_arenaTeamId = (*result)[0].GetUInt32()+1;
-
         delete result;
     }
 
@@ -5223,64 +5211,58 @@ void ObjectMgr::SetHighestGuids()
     if (result)
     {
         m_guildId = (*result)[0].GetUInt32()+1;
-
         delete result;
     }
 }
 
 uint32 ObjectMgr::GenerateArenaTeamId()
 {
-   ++m_arenaTeamId;
-    if(m_arenaTeamId>=0xFFFFFFFF)
+    if(m_arenaTeamId>=0xFFFFFFFE)
     {
         sLog.outError("Arena team ids overflow!! Can't continue, shutting down server. ");
         World::StopNow(ERROR_EXIT_CODE);
     }
-    return m_arenaTeamId;
+    return m_arenaTeamId++;
 }
 
 uint32 ObjectMgr::GenerateGuildId()
 {
-   ++m_guildId;
-    if(m_guildId>=0xFFFFFFFF)
+    if(m_guildId>=0xFFFFFFFE)
     {
         sLog.outError("Guild ids overflow!! Can't continue, shutting down server. ");
         World::StopNow(ERROR_EXIT_CODE);
     }
-    return m_guildId;
+    return m_guildId++;
 }
 
 uint32 ObjectMgr::GenerateAuctionID()
 {
-    ++m_auctionid;
-    if(m_auctionid>=0xFFFFFFFF)
+    if(m_auctionid>=0xFFFFFFFE)
     {
         sLog.outError("Auctions ids overflow!! Can't continue, shutting down server. ");
         World::StopNow(ERROR_EXIT_CODE);
     }
-    return m_auctionid;
+    return m_auctionid++;
 }
 
 uint32 ObjectMgr::GenerateMailID()
 {
-    ++m_mailid;
-    if(m_mailid>=0xFFFFFFFF)
+    if(m_mailid>=0xFFFFFFFE)
     {
         sLog.outError("Mail ids overflow!! Can't continue, shutting down server. ");
         World::StopNow(ERROR_EXIT_CODE);
     }
-    return m_mailid;
+    return m_mailid++;
 }
 
 uint32 ObjectMgr::GenerateItemTextID()
 {
-    ++m_ItemTextId;
-    if(m_ItemTextId>=0xFFFFFFFF)
+    if(m_ItemTextId>=0xFFFFFFFE)
     {
         sLog.outError("Item text ids overflow!! Can't continue, shutting down server. ");
         World::StopNow(ERROR_EXIT_CODE);
     }
-    return m_ItemTextId;
+    return m_ItemTextId++;
 }
 
 uint32 ObjectMgr::CreateItemText(std::string text)
@@ -5302,29 +5284,26 @@ uint32 ObjectMgr::GenerateLowGuid(HighGuid guidhigh)
     switch(guidhigh)
     {
         case HIGHGUID_ITEM:
-            ++m_hiItemGuid;
-            if(m_hiItemGuid>=0xFFFFFFFF)
+            if(m_hiItemGuid>=0xFFFFFFFE)
             {
                 sLog.outError("Item guid overflow!! Can't continue, shutting down server. ");
                 World::StopNow(ERROR_EXIT_CODE);
             }
-            return m_hiItemGuid;
+            return m_hiItemGuid++;
         case HIGHGUID_UNIT:
-            ++m_hiCreatureGuid;
-            if(m_hiCreatureGuid>=0x00FFFFFF)
+            if(m_hiCreatureGuid>=0x00FFFFFE)
             {
                 sLog.outError("Creature guid overflow!! Can't continue, shutting down server. ");
                 World::StopNow(ERROR_EXIT_CODE);
             }
-            return m_hiCreatureGuid;
+            return m_hiCreatureGuid++;
         case HIGHGUID_PET:
-            ++m_hiPetGuid;
-            if(m_hiPetGuid>=0x00FFFFFF)
+            if(m_hiPetGuid>=0x00FFFFFE)
             {
                 sLog.outError("Pet guid overflow!! Can't continue, shutting down server. ");
                 World::StopNow(ERROR_EXIT_CODE);
             }
-            return m_hiPetGuid;
+            return m_hiPetGuid++;
         case HIGHGUID_VEHICLE:
             ++m_hiVehicleGuid;
             if(m_hiVehicleGuid>=0x00FFFFFF)
@@ -5332,39 +5311,35 @@ uint32 ObjectMgr::GenerateLowGuid(HighGuid guidhigh)
                 sLog.outError("Vehicle guid overflow!! Can't continue, shutting down server. ");
                 World::StopNow(ERROR_EXIT_CODE);
             }
-            return m_hiVehicleGuid;
+            return m_hiVehicleGuid++;
         case HIGHGUID_PLAYER:
-            ++m_hiCharGuid;
-            if(m_hiCharGuid>=0xFFFFFFFF)
+            if(m_hiCharGuid>=0xFFFFFFFE)
             {
                 sLog.outError("Players guid overflow!! Can't continue, shutting down server. ");
                 World::StopNow(ERROR_EXIT_CODE);
             }
-            return m_hiCharGuid;
+            return m_hiCharGuid++;
         case HIGHGUID_GAMEOBJECT:
-            ++m_hiGoGuid;
-            if(m_hiGoGuid>=0x00FFFFFF)
+            if(m_hiGoGuid>=0x00FFFFFE)
             {
                 sLog.outError("Gameobject guid overflow!! Can't continue, shutting down server. ");
                 World::StopNow(ERROR_EXIT_CODE);
             }
-            return m_hiGoGuid;
+            return m_hiGoGuid++;
         case HIGHGUID_CORPSE:
-            ++m_hiCorpseGuid;
-            if(m_hiCorpseGuid>=0xFFFFFFFF)
+            if(m_hiCorpseGuid>=0xFFFFFFFE)
             {
                 sLog.outError("Corpse guid overflow!! Can't continue, shutting down server. ");
                 World::StopNow(ERROR_EXIT_CODE);
             }
-            return m_hiCorpseGuid;
+            return m_hiCorpseGuid++;
         case HIGHGUID_DYNAMICOBJECT:
-            ++m_hiDoGuid;
-            if(m_hiDoGuid>=0xFFFFFFFF)
+            if(m_hiDoGuid>=0xFFFFFFFE)
             {
                 sLog.outError("DynamicObject guid overflow!! Can't continue, shutting down server. ");
                 World::StopNow(ERROR_EXIT_CODE);
             }
-            return m_hiDoGuid;
+            return m_hiDoGuid++;
         default:
             ASSERT(0);
     }
@@ -7386,6 +7361,8 @@ void ObjectMgr::LoadDbScriptStrings()
     CheckScripts(sSpellScripts,ids);
     CheckScripts(sGameObjectScripts,ids);
     CheckScripts(sEventScripts,ids);
+
+    WaypointMgr.CheckTextsExistance(ids);
 
     for(std::set<int32>::const_iterator itr = ids.begin(); itr != ids.end(); ++itr)
         sLog.outErrorDb( "Table `db_script_string` has unused string id  %u", *itr);
