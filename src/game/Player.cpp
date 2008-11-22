@@ -17923,15 +17923,15 @@ uint32 Player::GetMinLevelForBattleGroundQueueId(uint32 queue_id)
     if(queue_id < 1)
         return 0;
 
-    if(queue_id >=6)
-        queue_id = 6;
+    if(queue_id >=7)
+        queue_id = 7;
 
     return 10*(queue_id+1);
 }
 
 uint32 Player::GetMaxLevelForBattleGroundQueueId(uint32 queue_id)
 {
-    if(queue_id >=6)
+    if(queue_id >=7)
         return 255;                                         // hardcoded max level
 
     return 10*(queue_id+2)-1;
@@ -17942,8 +17942,8 @@ uint32 Player::GetBattleGroundQueueIdFromLevel() const
     uint32 level = getLevel();
     if(level <= 19)
         return 0;
-    else if (level > 69)
-        return 6;
+    else if (level > 79)
+        return 7;
     else
         return level/10 - 1;                                // 20..29 -> 1, 30-39 -> 2, ...
 }

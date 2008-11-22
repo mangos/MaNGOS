@@ -129,8 +129,6 @@ struct BattleGroundObjectInfo
     uint32      spellid;
 };
 
-#define MAX_QUEUED_PLAYERS_MAP 7
-
 enum BattleGroundTypeId
 {
     BATTLEGROUND_AV     = 1,
