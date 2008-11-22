@@ -493,7 +493,7 @@ enum UnitFlags2
     UNIT_FLAG2_FEIGN_DEATH      = 0x00000001,
     UNIT_FLAG2_COMPREHEND_LANG  = 0x00000008,
     UNIT_FLAG2_FORCE_MOVE       = 0x00000040,
-    UNIT_FLAG2_UNKNOWN1         = 0x00000800
+    UNIT_FLAG2_REGENERATE_POWER = 0x00000800
 };
 
 /// Non Player Character flags
@@ -1370,6 +1370,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         uint32 m_unit_movement_flags;
 
         uint32 m_reactiveTimer[MAX_REACTIVE];
+        uint32 m_regenTimer;
 
     private:
         void SendAttackStop(Unit* victim);                  // only from AttackStop(Unit*)

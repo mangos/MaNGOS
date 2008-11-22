@@ -221,7 +221,6 @@ class Pet : public Creature
 
         bool    m_removed;                                  // prevent overwrite pet state in DB at next Pet::Update if pet already removed(saved)
     protected:
-        uint32  m_regenTimer;
         uint32  m_happinessTimer;
         PetType m_petType;
         int32   m_duration;                                 // time until unsummon (used mostly for summoned guardians and not used for controlled pets)
