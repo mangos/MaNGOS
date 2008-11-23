@@ -892,7 +892,7 @@ void Spell::EffectDummy(uint32 i)
                     if (!m_caster->HasAuraType(SPELL_AURA_MOUNTED))
                         return;
 
-                    float flyspeed = m_caster->GetSpeedRate(MOVE_FLY);
+                    float flyspeed = m_caster->GetSpeedRate(MOVE_FLIGHT);
                     float speed = m_caster->GetSpeedRate(MOVE_RUN);
 
                     m_caster->RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);

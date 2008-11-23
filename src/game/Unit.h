@@ -376,18 +376,18 @@ enum UnitState
 
 enum UnitMoveType
 {
-    MOVE_WALK       = 0,
-    MOVE_RUN        = 1,
-    MOVE_WALKBACK   = 2,
-    MOVE_SWIM       = 3,
-    MOVE_SWIMBACK   = 4,
-    MOVE_TURN       = 5,
-    MOVE_FLY        = 6,
-    MOVE_FLYBACK    = 7,
-    MOVE_PITCH      = 8
+    MOVE_WALK           = 0,
+    MOVE_RUN            = 1,
+    MOVE_RUN_BACK       = 2,
+    MOVE_SWIM           = 3,
+    MOVE_SWIM_BACK      = 4,
+    MOVE_TURN_RATE      = 5,
+    MOVE_FLIGHT         = 6,
+    MOVE_FLIGHT_BACK    = 7,
+    MOVE_PITCH_RATE     = 8
 };
 
-#define MAX_MOVE_TYPE 9
+#define MAX_MOVE_TYPE     9
 
 extern float baseMoveSpeed[MAX_MOVE_TYPE];
 

@@ -18651,20 +18651,15 @@ void Player::EnterVehicle(Vehicle *vehicle)
 {
     vehicle->SetCharmerGUID(GetGUID());
     vehicle->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
-    //vehicle->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
     vehicle->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNKNOWN5);
     vehicle->setFaction(getFaction());
-    //vehicle->SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
-    //vehicle->SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, 2147483647);
-    //vehicle->SetUInt32Value(UNIT_DYNAMIC_FLAGS, 0);
-    //vehicle->SetUInt32Value(UNIT_FIELD_BYTES_1, 0x02000000);
 
     SetCharm(vehicle);                                      // charm
     SetFarSight(vehicle->GetGUID());                        // set view
 
     SetClientControl(vehicle, 1);                           // redirect controls to vehicle
 
-    WorldPacket data(SMSG_UNKNOWN_1181, 0);                 // shows vehicle UI?
+    WorldPacket data(SMSG_SHOW_VEHICLE_UI, 0);              // shows vehicle UI?
     GetSession()->SendPacket(&data);
 
     data.Initialize(MSG_MOVE_TELEPORT_ACK, 30);
@@ -18677,17 +18672,20 @@ void Player::EnterVehicle(Vehicle *vehicle)
     data << vehicle->GetPositionY();                        // y
     data << vehicle->GetPositionZ();                        // z
     data << vehicle->GetOrientation();                      // o
-    // transport part
+    // transport part, TODO: load/calculate seat offsets
     data << uint64(vehicle->GetGUID());                     // transport guid
     data << float(0);                                       // transport offsetX
     data << float(0);                                       // transport offsetY
-    data << float(2);                                       // transport offsetZ
+    data << float(3);                                       // transport offsetZ
     data << float(0);                                       // transport orientation
     data << uint32(getMSTime());                            // transport time
     data << uint8(0);                                       // seat
     // end of transport part
     data << uint32(0);                                      // fall time
     GetSession()->SendPacket(&data);
+
+    vehicle->SetSpeed(MOVE_RUN, vehicle->GetCreatureInfo()->speed, true);
+    vehicle->SetSpeed(MOVE_FLIGHT, vehicle->GetCreatureInfo()->speed, true);
 
     data.Initialize(SMSG_PET_SPELLS, 8+4+4+4+4*10+1+1);
     data << uint64(vehicle->GetGUID());
@@ -18707,10 +18705,8 @@ void Player::ExitVehicle(Vehicle *vehicle)
 {
     vehicle->SetCharmerGUID(0);
     vehicle->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
-    //vehicle->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
     vehicle->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNKNOWN5);
     vehicle->setFaction((GetTeam() == ALLIANCE) ? vehicle->GetCreatureInfo()->faction_A : vehicle->GetCreatureInfo()->faction_H);
-    //vehicle->SetUInt32Value(UNIT_DYNAMIC_FLAGS, 0);
 
     SetCharm(NULL);
     SetFarSight(NULL);

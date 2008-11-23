@@ -171,19 +171,12 @@ void WorldSession::HandleMoveWorldportAckOpcode()
 void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 {
     uint32 opcode = recv_data.GetOpcode();
-    sLog.outDebug("WORLD: Recvd %s (%u,0x%X) opcode", LookupOpcodeName(opcode), opcode, opcode);
+    sLog.outDebug("WORLD: Recvd %s (%u, 0x%X) opcode", LookupOpcodeName(opcode), opcode, opcode);
 
     if(GetPlayer()->GetDontMove())
         return;
 
     /* extract packet */
-    if(opcode == CMSG_MOVE_NOT_ACTIVE_MOVER)
-    {
-        CHECK_PACKET_SIZE(recv_data, recv_data.rpos()+8);
-        uint64 old_mover_guid;
-        recv_data >> old_mover_guid;
-    }
-
     MovementInfo movementInfo;
     ReadMovementInfo(recv_data, &movementInfo);
     /*----------------*/
@@ -218,9 +211,6 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
             {
                 if ((*iter)->GetGUID() == movementInfo.t_guid)
                 {
-                    // unmount before boarding
-                    _player->RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);
-
                     GetPlayer()->m_transport = (*iter);
                     (*iter)->AddPassenger(GetPlayer());
                     break;
@@ -237,6 +227,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
         movementInfo.t_z = 0.0f;
         movementInfo.t_o = 0.0f;
         movementInfo.t_time = 0;
+        movementInfo.t_seat = -1;
     }
 
     // fall damage generation (ignore in flight case that can be triggered also at lags in moment teleportation to another map).
@@ -245,11 +236,11 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
         // calculate total z distance of the fall
         // it is currently only used for the achievement system. It might be used in a more correct falldamage formula later
         float z_diff = GetPlayer()->m_fallMovementInfo.z - movementInfo.z;
-        sLog.outDebug("zDiff = %f", z_diff);
+        sLog.outDebug("zDiff = %f, falltime = %u", z_diff, movementInfo.fallTime);
         Player *target = GetPlayer();
 
         //Players with Feather Fall or low fall time, or physical immunity (charges used) are ignored
-        if (movementInfo.fallTime > 1500 && !target->isDead() && !target->isGameMaster() &&
+        if (movementInfo.fallTime > 1300 && !target->isDead() && !target->isGameMaster() &&
             !target->HasAuraType(SPELL_AURA_HOVER) && !target->HasAuraType(SPELL_AURA_FEATHER_FALL) &&
             !target->HasAuraType(SPELL_AURA_FLY) && !target->IsImmunedToDamage(SPELL_SCHOOL_MASK_NORMAL,true) )
         {
@@ -257,10 +248,10 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
             int32 safe_fall = target->GetTotalAuraModifier(SPELL_AURA_SAFE_FALL);
             uint32 fall_time = (movementInfo.fallTime > (safe_fall*10)) ? movementInfo.fallTime - (safe_fall*10) : 0;
 
-            if(fall_time > 1500)                            //Prevent damage if fall time < 1500
+            if(fall_time > 1300)                            //Prevent damage if fall time < 1300
             {
                 //Fall Damage calculation
-                float fallperc = float(fall_time)/1500;
+                float fallperc = float(fall_time)/1300;
                 uint32 damage = (uint32)(((fallperc*fallperc -1) / 9 * target->GetMaxHealth())*sWorld.getRate(RATE_DAMAGE_FALL));
 
                 float height = movementInfo.z;
@@ -289,24 +280,19 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
         }
     }
 
-    if(opcode == CMSG_DISMISS_CONTROLLED_VEHICLE)
-    {
-        // using charm guid, because we don't have vehicle guid...
-        if(Vehicle *vehicle = ObjectAccessor::GetVehicle(_player->GetCharmGUID()))
-            _player->ExitVehicle(vehicle);
-    }
-
     if(((movementInfo.flags & MOVEMENTFLAG_SWIMMING) != 0) != GetPlayer()->IsInWater())
     {
         // now client not include swimming flag in case jumping under water
         GetPlayer()->SetInWater( !GetPlayer()->IsInWater() || GetPlayer()->GetBaseMap()->IsUnderWater(movementInfo.x, movementInfo.y, movementInfo.z) );
     }
 
+    if(opcode != MSG_MOVE_FALL_LAND && !(movementInfo.flags & MOVEMENTFLAG_FALLING))
+        _player->m_fallMovementInfo = movementInfo;         // save data before any fall
     /*----------------------*/
 
     /* process position-change */
     Unit *mover = _player->m_mover;
-    recv_data.put<uint32>(6, getMSTime());                  // offset flags(4) + unk(2)
+    recv_data.put<uint32>(6, getMSTime());                  // fix time, offset flags(4) + unk(2)
     WorldPacket data(recv_data.GetOpcode(), (mover->GetPackGUID().size()+recv_data.size()));
     data.append(_player->m_mover->GetPackGUID());           // use mover guid
     data.append(recv_data.contents(), recv_data.size());
@@ -334,8 +320,8 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
         }
     }
 
-    if (GetPlayer()->m_fallMovementInfo.fallTime >= movementInfo.fallTime || GetPlayer()->m_fallMovementInfo.z <=movementInfo.z)
-        GetPlayer()->m_fallMovementInfo = movementInfo;
+    //if (GetPlayer()->m_fallMovementInfo.fallTime >= movementInfo.fallTime || GetPlayer()->m_fallMovementInfo.z <=movementInfo.z)
+    //    GetPlayer()->m_fallMovementInfo = movementInfo;
 
     if(GetPlayer()->isMovingOrTurning())
         GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
@@ -361,7 +347,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 
 void WorldSession::HandleForceSpeedChangeAck(WorldPacket &recv_data)
 {
-    sLog.outDebug("WORLD: Recvd %s (%u,0x%X) opcode", LookupOpcodeName(recv_data.GetOpcode()), recv_data.GetOpcode(), recv_data.GetOpcode());
+    sLog.outDebug("WORLD: Recvd %s (%u, 0x%X) opcode", LookupOpcodeName(recv_data.GetOpcode()), recv_data.GetOpcode(), recv_data.GetOpcode());
 
     CHECK_PACKET_SIZE(recv_data, recv_data.rpos()+8+4);
 
@@ -378,7 +364,7 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket &recv_data)
 
     // continue parse packet
 
-    recv_data >> unk1;                                      // counter
+    recv_data >> unk1;                                      // counter or moveEvent
 
     MovementInfo movementInfo;
     ReadMovementInfo(recv_data, &movementInfo);
@@ -394,19 +380,20 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket &recv_data)
     UnitMoveType move_type;
     UnitMoveType force_move_type;
 
-    static char const* move_type_name[MAX_MOVE_TYPE] = {  "Walk", "Run", "Walkback", "Swim", "Swimback", "Turn", "Fly", "Flyback", "Pitch" };
+    static char const* move_type_name[MAX_MOVE_TYPE] = {  "Walk", "Run", "RunBack", "Swim", "SwimBack", "TurnRate", "Flight", "FlightBack", "PitchRate" };
 
     uint16 opcode = recv_data.GetOpcode();
     switch(opcode)
     {
-        case CMSG_FORCE_WALK_SPEED_CHANGE_ACK:          move_type = MOVE_WALK;     force_move_type = MOVE_WALK;     break;
-        case CMSG_FORCE_RUN_SPEED_CHANGE_ACK:           move_type = MOVE_RUN;      force_move_type = MOVE_RUN;      break;
-        case CMSG_FORCE_RUN_BACK_SPEED_CHANGE_ACK:      move_type = MOVE_WALKBACK; force_move_type = MOVE_WALKBACK; break;
-        case CMSG_FORCE_SWIM_SPEED_CHANGE_ACK:          move_type = MOVE_SWIM;     force_move_type = MOVE_SWIM;     break;
-        case CMSG_FORCE_SWIM_BACK_SPEED_CHANGE_ACK:     move_type = MOVE_SWIMBACK; force_move_type = MOVE_SWIMBACK; break;
-        case CMSG_FORCE_TURN_RATE_CHANGE_ACK:           move_type = MOVE_TURN;     force_move_type = MOVE_TURN;     break;
-        case CMSG_FORCE_FLIGHT_SPEED_CHANGE_ACK:        move_type = MOVE_FLY;      force_move_type = MOVE_FLY;      break;
-        case CMSG_FORCE_FLIGHT_BACK_SPEED_CHANGE_ACK:   move_type = MOVE_FLYBACK;  force_move_type = MOVE_FLYBACK;  break;
+        case CMSG_FORCE_WALK_SPEED_CHANGE_ACK:          move_type = MOVE_WALK;          force_move_type = MOVE_WALK;        break;
+        case CMSG_FORCE_RUN_SPEED_CHANGE_ACK:           move_type = MOVE_RUN;           force_move_type = MOVE_RUN;         break;
+        case CMSG_FORCE_RUN_BACK_SPEED_CHANGE_ACK:      move_type = MOVE_RUN_BACK;      force_move_type = MOVE_RUN_BACK;    break;
+        case CMSG_FORCE_SWIM_SPEED_CHANGE_ACK:          move_type = MOVE_SWIM;          force_move_type = MOVE_SWIM;        break;
+        case CMSG_FORCE_SWIM_BACK_SPEED_CHANGE_ACK:     move_type = MOVE_SWIM_BACK;     force_move_type = MOVE_SWIM_BACK;   break;
+        case CMSG_FORCE_TURN_RATE_CHANGE_ACK:           move_type = MOVE_TURN_RATE;     force_move_type = MOVE_TURN_RATE;   break;
+        case CMSG_FORCE_FLIGHT_SPEED_CHANGE_ACK:        move_type = MOVE_FLIGHT;        force_move_type = MOVE_FLIGHT;      break;
+        case CMSG_FORCE_FLIGHT_BACK_SPEED_CHANGE_ACK:   move_type = MOVE_FLIGHT_BACK;   force_move_type = MOVE_FLIGHT_BACK; break;
+        case CMSG_FORCE_PITCH_RATE_CHANGE_ACK:          move_type = MOVE_PITCH_RATE;    force_move_type = MOVE_PITCH_RATE;  break;
         default:
             sLog.outError("WorldSession::HandleForceSpeedChangeAck: Unknown move type opcode: %u", opcode);
             return;
@@ -451,6 +438,50 @@ void WorldSession::HandleSetActiveMoverOpcode(WorldPacket &recv_data)
     if(_player->m_mover->GetGUID() != guid)
     {
         sLog.outError("HandleSetActiveMoverOpcode: incorrect mover guid: mover is " I64FMT " and should be " I64FMT, _player->m_mover->GetGUID(), guid);
+        return;
+    }
+}
+
+void WorldSession::HandleMoveNotActiveMover(WorldPacket &recv_data)
+{
+    sLog.outDebug("WORLD: Recvd CMSG_MOVE_NOT_ACTIVE_MOVER");
+    recv_data.hexlike();
+
+    CHECK_PACKET_SIZE(recv_data, recv_data.rpos()+8);
+
+    uint64 old_mover_guid;
+    recv_data >> old_mover_guid;
+
+    if(_player->m_mover->GetGUID() == old_mover_guid)
+    {
+        sLog.outError("HandleMoveNotActiveMover: incorrect mover guid: mover is " I64FMT " and should be " I64FMT " instead of " I64FMT, _player->m_mover->GetGUID(), _player->GetGUID(), old_mover_guid);
+        return;
+    }
+
+    MovementInfo mi;
+    ReadMovementInfo(recv_data, &mi);
+    _player->m_movementInfo = mi;
+}
+
+void WorldSession::HandleDismissControlledVehicle(WorldPacket &recv_data)
+{
+    sLog.outDebug("WORLD: Recvd CMSG_DISMISS_CONTROLLED_VEHICLE");
+    recv_data.hexlike();
+
+    uint64 vehicleGUID = _player->GetCharmGUID();
+
+    if(!vehicleGUID)                                        // something wrong here...
+        return;
+
+    MovementInfo mi;
+    ReadMovementInfo(recv_data, &mi);
+    _player->m_movementInfo = mi;
+
+    // using charm guid, because we don't have vehicle guid...
+    if(Vehicle *vehicle = ObjectAccessor::GetVehicle(vehicleGUID))
+    {
+        _player->ExitVehicle(vehicle);
+        vehicle->Dismiss();
     }
 }
 

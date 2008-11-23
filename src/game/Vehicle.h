@@ -40,6 +40,8 @@ class Vehicle : public Creature
         uint32 GetVehicleId() { return m_vehicleId; }
         void SetVehicleId(uint32 vehicleid) { m_vehicleId = vehicleid; }
 
+        void Dismiss();
+
     protected:
         uint32 m_vehicleId;
 

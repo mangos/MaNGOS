@@ -94,3 +94,11 @@ bool Vehicle::Create(uint32 guidlow, Map *map, uint32 Entry, uint32 vehicleId, u
 
     return true;
 }
+
+void Vehicle::Dismiss()
+{
+    SendObjectDeSpawnAnim(GetGUID());
+    CombatStop();
+    CleanupsBeforeDelete();
+    AddObjectToRemoveList();
+}

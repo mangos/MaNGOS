@@ -1493,11 +1493,11 @@ void WorldSession::HandleChooseTitleOpcode( WorldPacket & recv_data )
     GetPlayer()->SetUInt32Value(PLAYER_CHOSEN_TITLE, title);
 }
 
-void WorldSession::HandleAllowMoveAckOpcode( WorldPacket & recv_data )
+void WorldSession::HandleTimeSyncResp( WorldPacket & recv_data )
 {
     CHECK_PACKET_SIZE(recv_data, 4+4);
 
-    sLog.outDebug("CMSG_ALLOW_MOVE_ACK");
+    sLog.outDebug("CMSG_TIME_SYNC_RESP");
 
     uint32 counter, time_;
     recv_data >> counter >> time_;

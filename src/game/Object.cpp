@@ -384,13 +384,13 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2)
 
         *data << ((Unit*)this)->GetSpeed( MOVE_WALK );
         *data << ((Unit*)this)->GetSpeed( MOVE_RUN );
-        *data << ((Unit*)this)->GetSpeed( MOVE_SWIMBACK );
+        *data << ((Unit*)this)->GetSpeed( MOVE_SWIM_BACK );
         *data << ((Unit*)this)->GetSpeed( MOVE_SWIM );
-        *data << ((Unit*)this)->GetSpeed( MOVE_WALKBACK );
-        *data << ((Unit*)this)->GetSpeed( MOVE_FLY );
-        *data << ((Unit*)this)->GetSpeed( MOVE_FLYBACK );
-        *data << ((Unit*)this)->GetSpeed( MOVE_TURN );
-        *data << ((Unit*)this)->GetSpeed( MOVE_PITCH );
+        *data << ((Unit*)this)->GetSpeed( MOVE_RUN_BACK );
+        *data << ((Unit*)this)->GetSpeed( MOVE_FLIGHT );
+        *data << ((Unit*)this)->GetSpeed( MOVE_FLIGHT_BACK );
+        *data << ((Unit*)this)->GetSpeed( MOVE_TURN_RATE );
+        *data << ((Unit*)this)->GetSpeed( MOVE_PITCH_RATE );
 
         // 0x08000000
         if(flags2 & MOVEMENTFLAG_SPLINE2)

@@ -1123,8 +1123,8 @@ enum Opcodes
     SMSG_CALENDAR_EVENT_UPDATED_ALERT               = 0x444,
     SMSG_CALENDAR_EVENT_MODERATOR_STATUS_ALERT      = 0x445,
     CMSG_CALENDAR_COMPLAIN                          = 0x446,
-    CMSG_CALENDAR_GET_CALENDAR_ON_LOGIN             = 0x447,
-    SMSG_CALENDAR_EVENT_RESERVED_3                  = 0x448,
+    CMSG_CALENDAR_PENDING_INVITES                   = 0x447,
+    SMSG_CALENDAR_PENDING_INVITES                   = 0x448,
     CMSG_SAVE_DANCE                                 = 0x449,
     SMSG_NOTIFY_DANCE                               = 0x44A,
     CMSG_PLAY_DANCE                                 = 0x44B,
@@ -1207,9 +1207,9 @@ enum Opcodes
     SMSG_SERVER_FIRST_ACHIEVEMENT                   = 0x498,
     SMSG_PET_LEARNED_SPELL                          = 0x499,    // uint16 spellid, Your pet learned spell: %s
     SMSG_PET_UNLEARNED_SPELL                        = 0x49A,    // uint16 spellid, Your pet unlearned %s
-    CMSG_UNKNOWN_1179                               = 0x49B,    // movement opcode
+    CMSG_MOVE_UNKNOWN_1179                          = 0x49B,    // movement opcode
     CMSG_UNKNOWN_1180                               = 0x49C,    // LUA: HearthAndResurrectFromArea
-    SMSG_UNKNOWN_1181                               = 0x49D,    // empty
+    SMSG_SHOW_VEHICLE_UI                            = 0x49D,    // empty
     SMSG_CRITERIA_REMOVE                            = 0x49E,    // uint32, broadcasts EVENT_CRITERIA_UPDATE
     SMSG_ACHIEVEMENT_REMOVE                         = 0x49F,    // uint32, broadcasts EVENT_ACHIEVEMENT_EARNED
     UMSG_UNKNOWN_1184                               = 0x4A0,    // not found in client
