@@ -547,8 +547,9 @@ class MANGOS_DLL_SPEC Creature : public Unit
 
         float GetAttackDistance(Unit const* pl) const;
 
-        void CallAssistence();
-        void SetNoCallAssistence(bool val) { m_AlreadyCallAssistence = val; }
+        void CallAssistance();
+        void SetNoCallAssistance(bool val) { m_AlreadyCallAssistance = val; }
+        bool CanAssistTo(const Unit* u, const Unit* enemy) const;
 
         MovementGeneratorType GetDefaultMovementType() const { return m_defaultMovementType; }
         void SetDefaultMovementType(MovementGeneratorType mgt) { m_defaultMovementType = mgt; }
@@ -633,7 +634,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
         uint32 m_DBTableGuid;                               ///< For new or temporary creatures is 0 for saved it is lowguid
         uint32 m_equipmentId;
 
-        bool m_AlreadyCallAssistence;
+        bool m_AlreadyCallAssistance;
         bool m_regenHealth;
         bool m_AI_locked;
         bool m_isDeadByDefault;
