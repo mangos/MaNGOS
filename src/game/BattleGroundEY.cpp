@@ -173,7 +173,7 @@ void BattleGroundEY::CheckSomeoneJoinedPoint()
                     ++j;
                     continue;
                 }
-                if (plr->isAlive() && plr->IsWithinDistInMap(obj, BG_EY_POINT_RADIUS))
+                if (plr->isAllowUseBattleGroundObject() && plr->IsWithinDistInMap(obj, BG_EY_POINT_RADIUS))
                 {
                     //player joined point!
                     //show progress bar
@@ -216,7 +216,7 @@ void BattleGroundEY::CheckSomeoneLeftPoint()
                     ++j;
                     continue;
                 }
-                if (!plr->isAlive() || !plr->IsWithinDistInMap(obj, BG_EY_POINT_RADIUS))
+                if (!plr->isAllowUseBattleGroundObject() || !plr->IsWithinDistInMap(obj, BG_EY_POINT_RADIUS))
                     //move player out of point (add him to players that are out of points
                 {
                     m_PlayersNearPoint[EY_POINTS_MAX].push_back(m_PlayersNearPoint[i][j]);
