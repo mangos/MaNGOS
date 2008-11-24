@@ -91,6 +91,27 @@ VendorItem const* VendorItemData::FindItem(uint32 item_id) const
     return NULL;
 }
 
+bool AssistDelayEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
+{
+    Unit* victim = Unit::GetUnit(m_owner, m_victim);
+    if (victim)
+    {
+        while (!m_assistants.empty())
+        {
+            Creature* assistant = (Creature*)Unit::GetUnit(m_owner, *m_assistants.begin());
+            m_assistants.pop_front();
+
+            if (assistant)
+            {
+                assistant->SetNoCallAssistence(true);
+                if(assistant->AI())
+                    assistant->AI()->AttackStart(victim);
+            }
+        }
+    }
+    return true;
+}
+
 Creature::Creature() :
 Unit(), i_AI(NULL),
 lootForPickPocketed(false), lootForBody(false), m_groupLootTimer(0), lootingGroupLeaderGUID(0),
@@ -1669,7 +1690,7 @@ void Creature::CallAssistence()
     {
         SetNoCallAssistence(true);
 
-        float radius = sWorld.getConfig(CONFIG_CREATURE_FAMILY_ASSISTEMCE_RADIUS);
+        float radius = sWorld.getConfig(CONFIG_CREATURE_FAMILY_ASSISTANCE_RADIUS);
         if(radius > 0)
         {
             std::list<Creature*> assistList;
@@ -1689,11 +1710,16 @@ void Creature::CallAssistence()
                 cell_lock->Visit(cell_lock, grid_creature_searcher, *GetMap());
             }
 
-            for(std::list<Creature*>::iterator iter = assistList.begin(); iter != assistList.end(); ++iter)
+            if (!assistList.empty())
             {
-                (*iter)->SetNoCallAssistence(true);
-                if((*iter)->AI())
-                    (*iter)->AI()->AttackStart(getVictim());
+                AssistDelayEvent *e = new AssistDelayEvent(getVictim()->GetGUID(), *this);
+                while (!assistList.empty())
+                {
+                    // Pushing guids because in delay can happen some creature gets despawned => invalid pointer
+                    e->AddAssistant((*assistList.begin())->GetGUID());
+                    assistList.pop_front();
+                }
+                m_Events.AddEvent(e, m_Events.CalculateTime(sWorld.getConfig(CONFIG_CREATURE_FAMILY_ASSISTANCE_DELAY)));
             }
         }
     }
