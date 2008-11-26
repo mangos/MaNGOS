@@ -1338,13 +1338,11 @@ void WorldSession::HandleWhoisOpcode(WorldPacket& recv_data)
         return;
     }
 
-    if(charname.empty())
+    if(charname.empty() || !normalizePlayerName (charname))
     {
         SendNotification(LANG_NEED_CHARACTER_NAME);
         return;
     }
-
-    normalizePlayerName (charname);
 
     Player *plr = objmgr.GetPlayer(charname.c_str());
 

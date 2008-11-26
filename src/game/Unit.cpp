@@ -6951,7 +6951,7 @@ bool Unit::Attack(Unit *victim, bool meleeAttack)
         data << uint32(AI_REACTION_AGGRO);                  // Aggro sound
         ((WorldObject*)this)->SendMessageToSet(&data, true);
 
-        ((Creature*)this)->CallAssistence();
+        ((Creature*)this)->CallAssistance();
         ((Creature*)this)->SetCombatStartPosition(GetPositionX(), GetPositionY(), GetPositionZ());
     }
 
@@ -6985,7 +6985,7 @@ bool Unit::AttackStop()
     if( GetTypeId()==TYPEID_UNIT )
     {
         // reset call assistance
-        ((Creature*)this)->SetNoCallAssistence(false);
+        ((Creature*)this)->SetNoCallAssistance(false);
     }
 
     SendAttackStop(victim);
