@@ -18659,6 +18659,14 @@ void Player::InitGlyphsForLevel()
 
 void Player::EnterVehicle(Vehicle *vehicle)
 {
+    VehicleEntry const *ve = sVehicleStore.LookupEntry(vehicle->GetVehicleId());
+    if(!ve)
+        return;
+
+    VehicleSeatEntry const *veSeat = sVehicleSeatStore.LookupEntry(ve->m_seatID[0]);
+    if(!veSeat)
+        return;
+
     vehicle->SetCharmerGUID(GetGUID());
     vehicle->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
     vehicle->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNKNOWN5);
@@ -18684,18 +18692,15 @@ void Player::EnterVehicle(Vehicle *vehicle)
     data << vehicle->GetOrientation();                      // o
     // transport part, TODO: load/calculate seat offsets
     data << uint64(vehicle->GetGUID());                     // transport guid
-    data << float(0);                                       // transport offsetX
-    data << float(0);                                       // transport offsetY
-    data << float(3);                                       // transport offsetZ
+    data << float(veSeat->m_attachmentOffsetX);             // transport offsetX
+    data << float(veSeat->m_attachmentOffsetY);             // transport offsetY
+    data << float(veSeat->m_attachmentOffsetZ);             // transport offsetZ
     data << float(0);                                       // transport orientation
     data << uint32(getMSTime());                            // transport time
     data << uint8(0);                                       // seat
     // end of transport part
     data << uint32(0);                                      // fall time
     GetSession()->SendPacket(&data);
-
-    vehicle->SetSpeed(MOVE_RUN, vehicle->GetCreatureInfo()->speed, true);
-    vehicle->SetSpeed(MOVE_FLIGHT, vehicle->GetCreatureInfo()->speed, true);
 
     data.Initialize(SMSG_PET_SPELLS, 8+4+4+4+4*10+1+1);
     data << uint64(vehicle->GetGUID());

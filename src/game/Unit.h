@@ -167,7 +167,7 @@ enum UnitBytes2_Flags
     UNIT_BYTE2_FLAG_UNK1        = 0x02,
     UNIT_BYTE2_FLAG_FFA_PVP     = 0x04,
     UNIT_BYTE2_FLAG_SANCTUARY   = 0x08,
-    UNIT_BYTE2_FLAG_AURAS       = 0x10,                     // show positive auras as positive, and allow its dispel
+    UNIT_BYTE2_FLAG_UNK4        = 0x10,
     UNIT_BYTE2_FLAG_UNK5        = 0x20,
     UNIT_BYTE2_FLAG_UNK6        = 0x40,
     UNIT_BYTE2_FLAG_UNK7        = 0x80
@@ -1149,7 +1149,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         AuraList const& GetSingleCastAuras() const { return m_scAuras; }
         SpellImmuneList m_spellImmune[MAX_SPELL_IMMUNITY];
 
-        // Threat related methodes
+        // Threat related methods
         bool CanHaveThreatList() const;
         void AddThreat(Unit* pVictim, float threat, SpellSchoolMask schoolMask = SPELL_SCHOOL_MASK_NORMAL, SpellEntry const *threatSpell = NULL);
         float ApplyTotalThreatModifier(float threat, SpellSchoolMask schoolMask = SPELL_SCHOOL_MASK_NORMAL);

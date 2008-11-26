@@ -534,7 +534,15 @@ bool ChatHandler::HandleSpawnVehicle(const char* args)
     uint32 entry = (uint32)atoi(e);
     uint32 id = (uint32)atoi(i);
 
-    // TODO: check entry, id...
+    CreatureInfo const *ci = objmgr.GetCreatureTemplate(entry);
+
+    if(!ci)
+        return false;
+
+    VehicleEntry const *ve = sVehicleStore.LookupEntry(id);
+
+    if(!ve)
+        return false;
 
     Vehicle *v = new Vehicle;
     Map *map = m_session->GetPlayer()->GetMap();
