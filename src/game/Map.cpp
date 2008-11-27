@@ -573,10 +573,19 @@ void Map::Update(const uint32 &t_diff)
     // for pets
     TypeContainerVisitor<MaNGOS::ObjectUpdater, WorldTypeMapContainer > world_object_update(updater);
 
-    for(MapRefManager::iterator iter = m_mapRefManager.begin(); iter != m_mapRefManager.end(); ++iter)
+    //TODO: Player guard
+    HashMapHolder<Player>::MapType& playerMap = HashMapHolder<Player>::GetContainer();
+    for(HashMapHolder<Player>::MapType::iterator iter = playerMap.begin(); iter != playerMap.end(); ++iter)
     {
-        Player* plr = iter->getSource();
+        Player* plr = iter->second;
+
         if(!plr->IsInWorld())
+            continue;
+
+        if(plr->GetMapId() != GetId())
+             continue;
+ 
+        if(plr->GetInstanceId() != GetInstanceId())
             continue;
 
         CellPair standing_cell(MaNGOS::ComputeCellPair(plr->GetPositionX(), plr->GetPositionY()));
