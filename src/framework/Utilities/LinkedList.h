@@ -226,7 +226,7 @@ class LinkedListHead
 
                 bool operator!=(const_reference _Right) const
                 {                                           // test for reference equality
-                    return (_Ptr != &_Right));
+                    return (_Ptr != &_Right);
                 }
 
 
