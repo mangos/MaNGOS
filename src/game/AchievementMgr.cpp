@@ -534,6 +534,26 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                         ++counter;
                 }
                 SetCriteriaProgress(achievementCriteria, counter);
+                break;
+            }
+            case ACHIEVEMENT_CRITERIA_TYPE_EXPLORE_AREA:
+            {
+                WorldMapOverlayEntry const* worldOverlayEntry = sWorldMapOverlayStore.LookupEntry(achievementCriteria->explore_area.areaReference);
+                if(!worldOverlayEntry)
+                    break;
+
+                AreaTableEntry const* areaTableEntry = GetAreaEntryByAreaID(worldOverlayEntry->areatableID);
+
+                if(!areaTableEntry)
+                    break;
+
+                uint32 exploreFlag = areaTableEntry->exploreFlag;
+                uint32 playerIndexOffset = exploreFlag / 32;
+                uint32 mask = 1<< (exploreFlag % 32);
+
+                if(GetPlayer()->GetUInt32Value(PLAYER_EXPLORED_ZONES_1 + playerIndexOffset) & mask)
+                    SetCriteriaProgress(achievementCriteria, 1);
+                break;
             }
 
         }
@@ -629,6 +649,8 @@ bool AchievementMgr::IsCompletedCriteria(AchievementCriteriaEntry const* achieve
             return progress->counter >= achievementCriteria->gain_reputation.reputationAmount;
         case ACHIEVEMENT_CRITERIA_TYPE_GAIN_EXALTED_REPUTATION:
             return progress->counter >= achievementCriteria->gain_exalted_reputation.numberOfExaltedFactions;
+        case ACHIEVEMENT_CRITERIA_TYPE_EXPLORE_AREA:
+            return progress->counter >= 1;
 
         // handle all statistic-only criteria here
         case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_BATTLEGROUND:
