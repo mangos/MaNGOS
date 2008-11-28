@@ -5590,9 +5590,23 @@ bool ChatHandler::HandleWritePDumpCommand(const char *args)
     if(!file || !p2)
         return false;
 
-    uint32 guid = objmgr.GetPlayerGUIDByName(p2);
-    if(!guid)
+    uint32 guid;
+    // character name can't start from number
+    if (isNumeric(p2[0]))
         guid = atoi(p2);
+    else
+    {
+        std::string name = p2;
+
+        if (!normalizePlayerName (name))
+        {
+            SendSysMessage (LANG_PLAYER_NOT_FOUND);
+            SetSentErrorMessage (true);
+            return false;
+        }
+
+        guid = objmgr.GetPlayerGUIDByName(name);
+    }
 
     if(!objmgr.GetPlayerAccountIdByGUID(guid))
     {

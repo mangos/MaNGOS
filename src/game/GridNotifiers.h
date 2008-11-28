@@ -721,32 +721,15 @@ namespace MaNGOS
                 if(u == i_funit)
                     return false;
 
-                // we don't need help from zombies :)
-                if( !u->isAlive() )
-                    return false;
-
-                // skip fighting creature
-                if( u->isInCombat() )
-                    return false;
-
-                // only from same creature faction
-                if(u->getFaction() != i_funit->getFaction() )
-                    return false;
-
-                // only free creature
-                if( u->GetCharmerOrOwnerGUID() )
+                if ( !u->CanAssistTo(i_funit, i_enemy) )
                     return false;
 
                 // too far
                 if( !i_funit->IsWithinDistInMap(u, i_range) )
                     return false;
 
-                // skip non hostile to caster enemy creatures
-                if( !u->IsHostileTo(i_enemy) )
-                    return false;
-
                 // only if see assisted creature
-                if(!u->IsWithinLOSInMap(i_funit) )
+                if( !i_funit->IsWithinLOSInMap(u) )
                     return false;
 
                 return true;

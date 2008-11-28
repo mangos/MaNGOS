@@ -46,6 +46,7 @@
 #  define MANGOS_IMPORT __cdecl
 #  define MANGOS_SCRIPT_EXT ".dll"
 #  define MANGOS_SCRIPT_NAME "MaNGOSScript"
+#  define MANGOS_PATH_MAX MAX_PATH
 #else //PLATFORM != PLATFORM_WINDOWS
 #  define MANGOS_LIBRARY_HANDLE void*
 #  define MANGOS_EXPORT export
@@ -59,6 +60,7 @@
 #  endif //__APPLE_CC__ && BIG_ENDIAN
 #  define MANGOS_SCRIPT_EXT ".so"
 #  define MANGOS_SCRIPT_NAME "libmangosscript"
+#  define MANGOS_PATH_MAX PATH_MAX
 #endif //PLATFORM
 
 #if PLATFORM == PLATFORM_WINDOWS

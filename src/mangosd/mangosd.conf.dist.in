@@ -252,13 +252,20 @@ AddonChannel = 1
 #                 1 - include dumping chars to log
 #
 #    GmLogFile
-#        Log file of gm commands
+#        GM Log file of gm commands
 #        Default: "" (Disable)
 #
 #    GmLogTimestamp
-#        Logfile with timestamp of server start in name
+#        GM Logfile with timestamp of server start in name
 #        Default: 0 - no timestamp in name
 #                 1 - add timestamp in name in form Logname_YYYY-MM-DD_HH-MM-SS.Ext for Logname.Ext
+#
+#    GmLogPerAccount
+#        GM Logfiles with GM account id (Note: logs not created if GmLogFile not set)
+#        Default: 0 - add gm log data to single log file
+#                 1 - add gm log data to account specific log files with name
+#                     in form Logname_#ID_YYYY-MM-DD_HH-MM-SS.Ext
+#                     or form Logname_#ID.Ext
 #
 #    RaLogFile
 #        Log file of RA commands
@@ -291,6 +298,7 @@ CharLogTimestamp = 0
 CharLogDump = 0
 GmLogFile = ""
 GmLogTimestamp = 0
+GmLogPerAccount = 0
 RaLogFile = ""
 LogColors = ""
 
@@ -613,10 +621,14 @@ TalentsInspecting = 1
 #                 1.5 - 150%
 #                 0   - off (0%)
 #
-#    CreatureFamilyAssistenceRadius
-#        Creature family assistence radius
+#    CreatureFamilyAssistanceRadius
+#        Creature family assistance radius
 #        Default: 10
 #                 0   - off
+#
+#    CreatureFamilyAssistanceDelay
+#        Reaction time for creature assistance call
+#        Default: 1500 (1.5s)
 #
 #    WorldBossLevelDiff
 #        Difference for boss dynamic level with target
@@ -674,7 +686,8 @@ TalentsInspecting = 1
 
 ThreatRadius = 100
 Rate.Creature.Aggro = 1
-CreatureFamilyAssistenceRadius = 10
+CreatureFamilyAssistanceRadius = 10
+CreatureFamilyAssistanceDelay = 1500
 WorldBossLevelDiff = 3
 Corpse.Decay.NORMAL = 60
 Corpse.Decay.RARE = 300

@@ -564,7 +564,9 @@ bool Player::Create( uint32 guidlow, std::string name, uint8 race, uint8 class_,
 
     setFactionForRace(m_race);
 
-    SetUInt32Value(UNIT_FIELD_BYTES_0, ( ( race ) | ( class_ << 8 ) | ( gender << 16 ) | ( powertype << 24 ) ) );
+    uint32 RaceClassGender = ( race ) | ( class_ << 8 ) | ( gender << 16 );
+
+    SetUInt32Value(UNIT_FIELD_BYTES_0, ( RaceClassGender | ( powertype << 24 ) ) );
     SetUInt32Value(UNIT_FIELD_BYTES_1, unitfield);
     SetByteValue(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_UNK3 | UNIT_BYTE2_FLAG_UNK5 );
     SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE );
@@ -611,8 +613,10 @@ bool Player::Create( uint32 guidlow, std::string name, uint8 race, uint8 class_,
         SetPower(POWER_MANA,GetMaxPower(POWER_MANA));
     }
 
+    // original spells
     learnDefaultSpells(true);
 
+    // original action bar
     std::list<uint16>::const_iterator action_itr[4];
     for(int i=0; i<4; i++)
         action_itr[i] = info->action[i].begin();
@@ -629,36 +633,58 @@ bool Player::Create( uint32 guidlow, std::string name, uint8 race, uint8 class_,
             ++action_itr[i];
     }
 
-    for (PlayerCreateInfoItems::const_iterator item_id_itr = info->item.begin(); item_id_itr!=info->item.end(); ++item_id_itr++)
+    // original items
+    CharStartOutfitEntry const* oEntry = NULL;
+    for (uint32 i = 1; i < sCharStartOutfitStore.GetNumRows(); ++i)
     {
-        uint32 titem_id     = item_id_itr->item_id;
-        uint32 titem_amount = item_id_itr->item_amount;
-
-        sLog.outDebug("STORAGE: Creating initial item, itemId = %u, count = %u",titem_id, titem_amount);
-
-        // attempt equip
-        uint16 eDest;
-        uint8 msg = CanEquipNewItem( NULL_SLOT, eDest, titem_id, titem_amount, false );
-        if( msg == EQUIP_ERR_OK )
+        if(CharStartOutfitEntry const* entry = sCharStartOutfitStore.LookupEntry(i))
         {
-            EquipNewItem( eDest, titem_id, titem_amount, true);
-            AutoUnequipOffhandIfNeed();
-            continue;                                       // equipped, to next
+            if(entry->RaceClassGender == RaceClassGender)
+            {
+                oEntry = entry;
+                break;
+            }
         }
-
-        // attempt store
-        ItemPosCountVec sDest;
-        // store in main bag to simplify second pass (special bags can be not equipped yet at this moment)
-        msg = CanStoreNewItem( INVENTORY_SLOT_BAG_0, NULL_SLOT, sDest, titem_id, titem_amount );
-        if( msg == EQUIP_ERR_OK )
-        {
-            StoreNewItem( sDest, titem_id, true, Item::GenerateItemRandomPropertyId(titem_id) );
-            continue;                                       // stored, to next
-        }
-
-        // item can't be added
-        sLog.outError("STORAGE: Can't equip or store initial item %u for race %u class %u , error msg = %u",titem_id,race,class_,msg);
     }
+
+    if(oEntry)
+    {
+        for(int j = 0; j < MAX_OUTFIT_ITEMS; ++j)
+        {
+            if(oEntry->ItemId[j] <= 0)
+                continue;
+
+            uint32 item_id = oEntry->ItemId[j];
+
+            ItemPrototype const* iProto = objmgr.GetItemPrototype(item_id);
+            if(!iProto)
+            {
+                sLog.outErrorDb("Initial item id %u (race %u class %u) from CharStartOutfit.dbc not listed in `item_template`, ignoring.",item_id,getRace(),getClass());
+                continue;
+            }
+
+            uint32 count = iProto->Stackable;               // max stack by default (mostly 1)
+            if(iProto->Class==ITEM_CLASS_CONSUMABLE && iProto->SubClass==ITEM_SUBCLASS_FOOD)
+            {
+                switch(iProto->Spells[0].SpellCategory)
+                {
+                    case 11:                                // food
+                        if(iProto->Stackable > 4)
+                            count = 4;
+                        break;
+                    case 59:                                // drink
+                        if(iProto->Stackable > 2)
+                            count = 2;
+                        break;
+                }
+            }
+
+            StoreNewItemInBestSlot(item_id, count);
+        }
+    }
+
+    for (PlayerCreateInfoItems::const_iterator item_id_itr = info->item.begin(); item_id_itr!=info->item.end(); ++item_id_itr++)
+        StoreNewItemInBestSlot(item_id_itr->item_id, item_id_itr->item_amount);
 
     // bags and main-hand weapon must equipped at this moment
     // now second pass for not equipped (offhand weapon/shield if it attempt equipped before main-hand weapon)
@@ -696,6 +722,35 @@ bool Player::Create( uint32 guidlow, std::string name, uint8 race, uint8 class_,
     // all item positions resolved
 
     return true;
+}
+
+bool Player::StoreNewItemInBestSlot(uint32 titem_id, uint32 titem_amount)
+{
+    sLog.outDebug("STORAGE: Creating initial item, itemId = %u, count = %u",titem_id, titem_amount);
+
+    // attempt equip
+    uint16 eDest;
+    uint8 msg = CanEquipNewItem( NULL_SLOT, eDest, titem_id, titem_amount, false );
+    if( msg == EQUIP_ERR_OK )
+    {
+        EquipNewItem( eDest, titem_id, titem_amount, true);
+        AutoUnequipOffhandIfNeed();
+        return true;                                        // equipped
+    }
+
+    // attempt store
+    ItemPosCountVec sDest;
+    // store in main bag to simplify second pass (special bags can be not equipped yet at this moment)
+    msg = CanStoreNewItem( INVENTORY_SLOT_BAG_0, NULL_SLOT, sDest, titem_id, titem_amount );
+    if( msg == EQUIP_ERR_OK )
+    {
+        StoreNewItem( sDest, titem_id, true, Item::GenerateItemRandomPropertyId(titem_id) );
+        return true;                                        // stored
+    }
+
+    // item can't be added
+    sLog.outError("STORAGE: Can't equip or store initial item %u for race %u class %u , error msg = %u",titem_id,getRace(),getClass(),msg);
+    return false;
 }
 
 void Player::StartMirrorTimer(MirrorTimerType Type, uint32 MaxValue)
@@ -11589,7 +11644,7 @@ void Player::SendPreparedQuest( uint64 guid )
             else if( status == DIALOG_STATUS_INCOMPLETE )
                 PlayerTalkClass->SendQuestGiverRequestItems( pQuest, guid, false, true );
             // Send completable on repeatable quest if player don't have quest
-            else if( pQuest->IsRepeatable() )
+            else if( pQuest->IsRepeatable() && !pQuest->IsDaily() )
                 PlayerTalkClass->SendQuestGiverRequestItems( pQuest, guid, CanCompleteRepeatableQuest(pQuest), true );
             else
                 PlayerTalkClass->SendQuestGiverQuestDetails( pQuest, guid, true );
@@ -11831,7 +11886,7 @@ bool Player::CanRewardQuest( Quest const *pQuest, bool msg )
     if(!pQuest->IsAutoComplete() && GetQuestStatus(pQuest->GetQuestId()) != QUEST_STATUS_COMPLETE)
         return false;
 
-    // daily quest can't be rewarded (10 daily quest already completed)
+    // daily quest can't be rewarded (25 daily quest already completed)
     if(!SatisfyQuestDay(pQuest,true))
         return false;
 
@@ -12431,6 +12486,15 @@ bool Player::SatisfyQuestExclusiveGroup( Quest const* qInfo, bool msg )
         // skip checked quest id, only state of other quests in group is interesting
         if(exclude_Id == qInfo->GetQuestId())
             continue;
+
+        // not allow have daily quest if daily quest from exclusive group already recently completed
+        Quest const* Nquest = objmgr.GetQuestTemplate(exclude_Id);
+        if( !SatisfyQuestDay(Nquest, false) )
+        {
+            if( msg )
+                SendCanTakeQuestResponse( INVALIDREASON_DONT_HAVE_REQ );
+            return false;
+        }
 
         QuestStatusMap::iterator i_exstatus = mQuestStatus.find( exclude_Id );
 
@@ -14278,7 +14342,8 @@ void Player::_LoadQuestStatus(QueryResult *result)
                 // add to quest log
                 if( slot < MAX_QUEST_LOG_SIZE &&
                     ( questStatusData.m_status==QUEST_STATUS_INCOMPLETE ||
-                    questStatusData.m_status==QUEST_STATUS_COMPLETE && !questStatusData.m_rewarded ) )
+                    questStatusData.m_status==QUEST_STATUS_COMPLETE &&
+                    (!questStatusData.m_rewarded || pQuest->IsDaily()) ) )
                 {
                     SetQuestSlot(slot,quest_id,quest_time);
 

@@ -341,7 +341,7 @@ void ObjectMgr::SendAuctionWonMail( AuctionEntry *auction )
 
             uint32 owner_accid = GetPlayerAccountIdByGUID(auction->owner);
 
-            sLog.outCommand("GM %s (Account: %u) won item in auction: %s (Entry: %u Count: %u) and pay money: %u. Original owner %s (Account: %u)",
+            sLog.outCommand(bidder_accId,"GM %s (Account: %u) won item in auction: %s (Entry: %u Count: %u) and pay money: %u. Original owner %s (Account: %u)",
                 bidder_name.c_str(),bidder_accId,pItem->GetProto()->Name1,pItem->GetEntry(),pItem->GetCount(),auction->bid,owner_name.c_str(),owner_accid);
         }
     }
@@ -2090,8 +2090,7 @@ void ObjectMgr::LoadPlayerInfo()
             barGoLink bar( 1 );
 
             sLog.outString();
-            sLog.outString( ">> Loaded %u player create items", count );
-            sLog.outErrorDb( "Error loading `playercreateinfo_item` table or empty table.");
+            sLog.outString( ">> Loaded %u custom player create items", count );
         }
         else
         {
@@ -2143,7 +2142,7 @@ void ObjectMgr::LoadPlayerInfo()
             delete result;
 
             sLog.outString();
-            sLog.outString( ">> Loaded %u player create items", count );
+            sLog.outString( ">> Loaded %u custom player create items", count );
         }
     }
 

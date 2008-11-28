@@ -137,6 +137,7 @@ pkgdata_DATA = \
 	2008_11_16_01_mangos_command.sql \
 	2008_11_18_01_mangos_creature_movement.sql \
 	2008_11_18_02_mangos_mangos_string.sql \
+	2008_11_27_01_mangos_playercreateinfo_item.sql \
 	README
 
 ## Additional files to include when running 'make dist'
@@ -255,4 +256,5 @@ EXTRA_DIST = \
 	2008_11_16_01_mangos_command.sql \
 	2008_11_18_01_mangos_creature_movement.sql \
 	2008_11_18_02_mangos_mangos_string.sql \
+	2008_11_27_01_mangos_playercreateinfo_item.sql \
 	README
