@@ -526,8 +526,7 @@ struct BattlemasterListEntry
                                                             // 33 unused
 };
 
-#define MAX_OUTFIT_ITEMS 12
-// #define MAX_OUTFIT_ITEMS 24                              // 12->24 in 3.0.x
+#define MAX_OUTFIT_ITEMS 24
 
 struct CharStartOutfitEntry
 {
