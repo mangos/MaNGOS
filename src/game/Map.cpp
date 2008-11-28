@@ -573,19 +573,13 @@ void Map::Update(const uint32 &t_diff)
     // for pets
     TypeContainerVisitor<MaNGOS::ObjectUpdater, WorldTypeMapContainer > world_object_update(updater);
 
-    //TODO: Player guard
-    HashMapHolder<Player>::MapType& playerMap = HashMapHolder<Player>::GetContainer();
-    for(HashMapHolder<Player>::MapType::iterator iter = playerMap.begin(); iter != playerMap.end(); ++iter)
+    // the player iterator is stored in the map object
+    // to make sure calls to Map::Remove don't invalidate it
+    for(m_mapRefIter = m_mapRefManager.begin(); m_mapRefIter != m_mapRefManager.end(); ++m_mapRefIter)
     {
-        Player* plr = iter->second;
+        Player* plr = m_mapRefIter->getSource();
 
         if(!plr->IsInWorld())
-            continue;
-
-        if(plr->GetMapId() != GetId())
-             continue;
- 
-        if(plr->GetInstanceId() != GetInstanceId())
             continue;
 
         CellPair standing_cell(MaNGOS::ComputeCellPair(plr->GetPositionX(), plr->GetPositionY()));
@@ -639,6 +633,13 @@ void Map::Update(const uint32 &t_diff)
 
 void Map::Remove(Player *player, bool remove)
 {
+    // this may be called during Map::Update
+    // after decrement+unlink, ++m_mapRefIter will continue correctly
+    // when the first element of the list is being removed
+    // nocheck_prev will return the padding element of the RefManager
+    // instead of NULL in the case of prev
+    if(m_mapRefIter == player->GetMapRef())
+        m_mapRefIter = m_mapRefIter->nocheck_prev();
     player->GetMapRef().unlink();
     CellPair p = MaNGOS::ComputeCellPair(player->GetPositionX(), player->GetPositionY());
     if(p.x_coord >= TOTAL_NUMBER_OF_CELLS_PER_MAP || p.y_coord >= TOTAL_NUMBER_OF_CELLS_PER_MAP)
@@ -1623,6 +1624,8 @@ bool InstanceMap::Add(Player *player)
         }
 
         if(i_data) i_data->OnPlayerEnter(player);
+        // for normal instances cancel the reset schedule when the
+        // first player enters (no players yet)
         SetResetSchedule(false);
 
         player->SendInitWorldStates();
@@ -1649,11 +1652,12 @@ void InstanceMap::Update(const uint32& t_diff)
 void InstanceMap::Remove(Player *player, bool remove)
 {
     sLog.outDetail("MAP: Removing player '%s' from instance '%u' of map '%s' before relocating to other map", player->GetName(), GetInstanceId(), GetMapName());
-    SetResetSchedule(true);
     //if last player set unload timer
     if(!m_unloadTimer && m_mapRefManager.getSize() == 1)
         m_unloadTimer = m_unloadWhenEmpty ? MIN_UNLOAD_DELAY : std::max(sWorld.getConfig(CONFIG_INSTANCE_UNLOAD_DELAY), (uint32)MIN_UNLOAD_DELAY);
     Map::Remove(player, remove);
+    // for normal instances schedule the reset after all players have left
+    SetResetSchedule(true);
 }
 
 void InstanceMap::CreateInstanceData(bool load)
