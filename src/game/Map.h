@@ -292,6 +292,7 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         uint32 m_unloadTimer;
 
         MapRefManager m_mapRefManager;
+        MapRefManager::iterator m_mapRefIter;
     private:
         typedef GridReadGuard ReadGuard;
         typedef GridWriteGuard WriteGuard;
