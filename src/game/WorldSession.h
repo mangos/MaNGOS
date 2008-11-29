@@ -83,7 +83,7 @@ class MANGOS_DLL_SPEC WorldSession
         void SendNotification(int32 string_id,...);
         void SendPetNameInvalid(uint32 error, std::string name, DeclinedName *declinedName);
         void SendLfgResult(uint32 type, uint32 entry, uint8 lfg_type);
-        void SendPartyResult(PartyOperation operation, std::string member, PartyResult res);
+        void SendPartyResult(PartyOperation operation, const std::string& member, PartyResult res);
         void SendAreaTriggerMessage(const char* Text, ...) ATTR_PRINTF(2,3);
 
         uint32 GetSecurity() const { return _security; }
@@ -332,7 +332,6 @@ class MANGOS_DLL_SPEC WorldSession
         void HandleGroupDeclineOpcode(WorldPacket& recvPacket);
         void HandleGroupUninviteNameOpcode(WorldPacket& recvPacket);
         void HandleGroupUninviteGuidOpcode(WorldPacket& recvPacket);
-        void HandleGroupUninvite(uint64 guid, std::string name);
         void HandleGroupSetLeaderOpcode(WorldPacket& recvPacket);
         void HandleGroupLeaveOpcode(WorldPacket& recvPacket);
         void HandleGroupPassOnLootOpcode( WorldPacket &recv_data );

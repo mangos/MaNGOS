@@ -2024,23 +2024,23 @@ bool Player::IsInSameGroupWith(Player const* p) const
 /// \todo Shouldn't we also check if there is no other invitees before disbanding the group?
 void Player::UninviteFromGroup()
 {
-    if(GetGroupInvite())                                    // uninvited invitee
+    Group* group = GetGroupInvite();
+    if(!group)
+        return;
+
+    group->RemoveInvite(this);
+
+    if(group->GetMembersCount() <= 1)                   // group has just 1 member => disband
     {
-        Group* group = GetGroupInvite();
-        group->RemoveInvite(this);
-
-        if(group->GetMembersCount() <= 1)                   // group has just 1 member => disband
+        if(group->IsCreated())
         {
-            if(group->IsCreated())
-            {
-                group->Disband(true);
-                objmgr.RemoveGroup(group);
-            }
-            else
-                group->RemoveAllInvites();
-
-            delete group;
+            group->Disband(true);
+            objmgr.RemoveGroup(group);
         }
+        else
+            group->RemoveAllInvites();
+
+        delete group;
     }
 }
 
@@ -18235,6 +18235,21 @@ Player* Player::GetNextRandomRaidMember(float radius)
 
     uint32 randTarget = urand(0,nearMembers.size()-1);
     return nearMembers[randTarget];
+}
+
+PartyResult Player::CanUninviteFromGroup() const
+{
+    const Group* grp = GetGroup();
+    if(!grp)
+        return PARTY_RESULT_YOU_NOT_IN_GROUP;
+
+    if(!grp->IsLeader(GetGUID()) && !grp->IsAssistant(GetGUID()))
+        return PARTY_RESULT_YOU_NOT_LEADER;
+
+    if(InBattleGround())
+        return PARTY_RESULT_INVITE_RESTRICTED;
+
+    return PARTY_RESULT_OK;
 }
 
 void Player::UpdateUnderwaterState( Map* m, float x, float y, float z )
