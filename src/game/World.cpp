@@ -112,10 +112,12 @@ World::World()
 World::~World()
 {
     ///- Empty the kicked session set
-    for (std::set<WorldSession*>::iterator itr = m_kicked_sessions.begin(); itr != m_kicked_sessions.end(); ++itr)
-        delete *itr;
-
-    m_kicked_sessions.clear();
+    while (!m_sessions.empty())
+    {
+        // not remove from queue, prevent loading new sessions
+        delete m_sessions.begin()->second;
+        m_sessions.erase(m_sessions.begin());
+    }
 
     ///- Empty the WeatherMap
     for (WeatherMap::iterator itr = m_weathers.begin(); itr != m_weathers.end(); ++itr)
@@ -195,17 +197,26 @@ World::AddSession_ (WorldSession* s)
     if (!RemoveSession (s->GetAccountId ()))
     {
         s->KickPlayer ();
-        m_kicked_sessions.insert (s);
+        delete s;                                           // session not added yet in session list, so not listed in queue
         return;
     }
+
+    // decrease session counts only at not reconnection case
+    bool decrease_session = true;
 
     // if session already exist, prepare to it deleting at next world update
     // NOTE - KickPlayer() should be called on "old" in RemoveSession()
     {
-      SessionMap::const_iterator old = m_sessions.find(s->GetAccountId ());
+        SessionMap::const_iterator old = m_sessions.find(s->GetAccountId ());
 
-      if(old != m_sessions.end())
-        m_kicked_sessions.insert (old->second);
+        if(old != m_sessions.end())
+        {
+            // prevent decrease sessions count if session queued
+            if(RemoveQueuedPlayer(old->second))
+                decrease_session = false;
+            // not remove replaced session form queue if listed
+            delete old->second;
+        }
     }
 
     m_sessions[s->GetAccountId ()] = s;
@@ -213,9 +224,11 @@ World::AddSession_ (WorldSession* s)
     uint32 Sessions = GetActiveAndQueuedSessionCount ();
     uint32 pLimit = GetPlayerAmountLimit ();
     uint32 QueueSize = GetQueueSize (); //number of players in the queue
+
     //so we don't count the user trying to
     //login as a session and queue the socket that we are using
-    --Sessions;
+    if(decrease_session)
+        --Sessions;
 
     if (pLimit > 0 && Sessions >= pLimit && s->GetSecurity () == SEC_PLAYER )
     {
@@ -259,6 +272,7 @@ int32 World::GetQueuePos(WorldSession* sess)
 
 void World::AddQueuedPlayer(WorldSession* sess)
 {
+    sess->SetInQueue(true);
     m_QueuedPlayer.push_back (sess);
 
     // The 1st SMSG_AUTH_RESPONSE needs to contain other info too.
@@ -274,7 +288,7 @@ void World::AddQueuedPlayer(WorldSession* sess)
     //sess->SendAuthWaitQue (GetQueuePos (sess));
 }
 
-void World::RemoveQueuedPlayer(WorldSession* sess)
+bool World::RemoveQueuedPlayer(WorldSession* sess)
 {
     // sessions count including queued to remove (if removed_session set)
     uint32 sessions = GetActiveSessionCount();
@@ -282,16 +296,16 @@ void World::RemoveQueuedPlayer(WorldSession* sess)
     uint32 position = 1;
     Queue::iterator iter = m_QueuedPlayer.begin();
 
-    // if session not queued then we need decrease sessions count (Remove socked callet before session removing from session list)
-    bool decrease_session = true;
-
     // search to remove and count skipped positions
+    bool found = false;
+
     for(;iter != m_QueuedPlayer.end(); ++iter, ++position)
     {
         if(*iter==sess)
         {
+            sess->SetInQueue(false);
             iter = m_QueuedPlayer.erase(iter);
-            decrease_session = false;                       // removing queued session
+            found = true;                                   // removing queued session
             break;
         }
     }
@@ -299,15 +313,16 @@ void World::RemoveQueuedPlayer(WorldSession* sess)
     // iter point to next socked after removed or end()
     // position store position of removed socket and then new position next socket after removed
 
-    // decrease for case session queued for removing
-    if(decrease_session && sessions)
+    // if session not queued then we need decrease sessions count
+    if(!found && sessions)
         --sessions;
 
     // accept first in queue
     if( (!m_playerLimit || sessions < m_playerLimit) && !m_QueuedPlayer.empty() )
     {
-        WorldSession * socket = m_QueuedPlayer.front();
-        socket->SendAuthWaitQue(0);
+        WorldSession* pop_sess = m_QueuedPlayer.front();
+        pop_sess->SetInQueue(false);
+        pop_sess->SendAuthWaitQue(0);
         m_QueuedPlayer.pop_front();
 
         // update iter to point first queued socket or end() if queue is empty now
@@ -319,6 +334,8 @@ void World::RemoveQueuedPlayer(WorldSession* sess)
     // iter point to first not updated socket, position store new position
     for(; iter != m_QueuedPlayer.end(); ++iter, ++position)
         (*iter)->SendAuthWaitQue(position);
+
+    return found;
 }
 
 /// Find a Weather object by the given zoneid
@@ -2170,6 +2187,8 @@ void World::SendZoneText(uint32 zone, const char* text, WorldSession *self, uint
 /// Kick (and save) all players
 void World::KickAll()
 {
+    m_QueuedPlayer.clear();                                 // prevent send queue update packet and login queued sessions
+
     // session not removed at kick and will removed in next update tick
     for (SessionMap::iterator itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
         itr->second->KickPlayer();
@@ -2182,18 +2201,6 @@ void World::KickAllLess(AccountTypes sec)
     for (SessionMap::iterator itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
         if(itr->second->GetSecurity() < sec)
             itr->second->KickPlayer();
-}
-
-/// Kick all queued players
-void World::KickAllQueued()
-{
-    // session not removed at kick and will removed in next update tick
-  //TODO here
-//    for (Queue::iterator itr = m_QueuedPlayer.begin(); itr != m_QueuedPlayer.end(); ++itr)
-//        if(WorldSession* session = (*itr)->GetSession())
-//            session->KickPlayer();
-
-    m_QueuedPlayer.empty();
 }
 
 /// Kick (and save) the designated player
@@ -2426,19 +2433,12 @@ void World::SendServerMessage(uint32 type, const char *text, Player* player)
 
 void World::UpdateSessions( time_t diff )
 {
+    ///- Add new sessions
     while(!addSessQueue.empty())
     {
-      WorldSession* sess = addSessQueue.next ();
-      AddSession_ (sess);
+        WorldSession* sess = addSessQueue.next ();
+        AddSession_ (sess);
     }
-
-    ///- Delete kicked sessions at add new session
-    for (std::set<WorldSession*>::iterator itr = m_kicked_sessions.begin(); itr != m_kicked_sessions.end(); ++itr)
-    {
-        RemoveQueuedPlayer (*itr);
-        delete *itr;
-    }
-    m_kicked_sessions.clear();
 
     ///- Then send an update signal to remaining ones
     for (SessionMap::iterator itr = m_sessions.begin(), next; itr != m_sessions.end(); itr = next)

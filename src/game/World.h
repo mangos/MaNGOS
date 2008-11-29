@@ -350,7 +350,7 @@ class World
         //player Queue
         typedef std::list<WorldSession*> Queue;
         void AddQueuedPlayer(WorldSession*);
-        void RemoveQueuedPlayer(WorldSession*);
+        bool RemoveQueuedPlayer(WorldSession* session);
         int32 GetQueuePos(WorldSession*);
         uint32 GetQueueSize() const { return m_QueuedPlayer.size(); }
 
@@ -433,7 +433,6 @@ class World
         bool KickPlayer(std::string playerName);
         void KickAll();
         void KickAllLess(AccountTypes sec);
-        void KickAllQueued();
         BanReturn BanAccount(BanMode mode, std::string nameOrIP, std::string duration, std::string reason, std::string author);
         bool RemoveBanAccount(BanMode mode, std::string nameOrIP);
 
@@ -491,7 +490,6 @@ class World
         WeatherMap m_weathers;
         typedef UNORDERED_MAP<uint32, WorldSession*> SessionMap;
         SessionMap m_sessions;
-        std::set<WorldSession*> m_kicked_sessions;
         uint32 m_maxActiveSessionCount;
         uint32 m_maxQueuedSessionCount;
 
