@@ -151,8 +151,13 @@ bool Guild::AddMember(uint64 plGuid, uint32 plRank)
     }
     else
     {
-        Player::SetUInt32ValueInDB(PLAYER_GUILDID, Id, plGuid);
-        Player::SetUInt32ValueInDB(PLAYER_GUILDRANK, newmember.RankId, plGuid);
+        Tokens tokens;
+        if(Player::LoadValuesArrayFromDB(tokens,plGuid))
+        {
+            Player::SetUInt32ValueInArray(tokens, PLAYER_GUILDID, Id);
+            Player::SetUInt32ValueInArray(tokens, PLAYER_GUILDRANK, newmember.RankId);
+            Player::SaveValuesArrayInDB(tokens, plGuid);
+        }
     }
     return true;
 }
@@ -481,8 +486,13 @@ void Guild::DelMember(uint64 guid, bool isDisbanding)
     }
     else
     {
-        Player::SetUInt32ValueInDB(PLAYER_GUILDID, 0, guid);
-        Player::SetUInt32ValueInDB(PLAYER_GUILDRANK, GR_GUILDMASTER, guid);
+        Tokens tokens;
+        if(Player::LoadValuesArrayFromDB(tokens,guid))
+        {
+            Player::SetUInt32ValueInArray(tokens, PLAYER_GUILDID, 0);
+            Player::SetUInt32ValueInArray(tokens, PLAYER_GUILDRANK, GR_GUILDMASTER);
+            Player::SaveValuesArrayInDB(tokens, guid);
+        }
     }
 
     CharacterDatabase.PExecute("DELETE FROM guild_member WHERE guid = '%u'", GUID_LOPART(guid));
