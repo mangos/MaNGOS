@@ -138,19 +138,23 @@ bool ArenaTeam::AddMember(uint64 PlayerGuid)
     {
         pl->SetInArenaTeam(Id, GetSlot());
         pl->SetArenaTeamIdInvited(0);
+
+        // hide promote/remove buttons
+        if(CaptainGuid != PlayerGuid)
+            pl->SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + 1 + (GetSlot() * 6), 1);
     }
     else
     {
-        Player::SetUInt32ValueInDB(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (GetSlot() * 6), Id, PlayerGuid);
-    }
+        Tokens tokens;
+        if(Player::LoadValuesArrayFromDB(tokens,PlayerGuid))
+        {
+            Player::SetUInt32ValueInArray(tokens,PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (GetSlot() * 6), Id);
+            // hide promote/remove buttons
+            if(CaptainGuid != PlayerGuid)
+                Player::SetUInt32ValueInArray(tokens,PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + 1 + (GetSlot() * 6), 1);
 
-    // hide promote/remove buttons
-    if(CaptainGuid != PlayerGuid)
-    {
-        if(pl)
-            pl->SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + 1 + (GetSlot() * 6), 1);
-        else
-            Player::SetUInt32ValueInDB(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + 1 + (GetSlot() * 6), 1, PlayerGuid);
+            Player::SaveValuesArrayInDB(tokens,PlayerGuid);
+        }
     }
     return true;
 }
