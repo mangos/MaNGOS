@@ -6297,7 +6297,7 @@ void Spell::EffectActivateRune(uint32 i)
     {
         if(plr->GetRuneCooldown(j) && plr->GetCurrentRune(j) == m_spellInfo->EffectMiscValue[i])
         {
-            plr->SetRuneCooldown(j, 0));
+            plr->SetRuneCooldown(j, 0);
         }
     }
 }
