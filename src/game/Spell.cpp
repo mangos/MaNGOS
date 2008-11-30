@@ -3157,7 +3157,7 @@ uint8 Spell::CheckRuneCost(uint32 runeCostID)
     if(src->NoRuneCost())
         return 0;
 
-    int32 runeCost[NUM_RUNES];                              // blood, frost, unholy, death
+    int32 runeCost[NUM_RUNE_TYPES];                         // blood, frost, unholy, death
 
     for(uint32 i = 0; i < RUNE_DEATH; ++i)
         runeCost[i] = src->RuneCost[i];
@@ -3193,7 +3193,7 @@ void Spell::TakeRunePower()
     if(!src || (src->NoRuneCost() && src->NoRunicPowerGain()))
         return;
 
-    int32 runeCost[NUM_RUNES];                              // blood, frost, unholy, death
+    int32 runeCost[NUM_RUNE_TYPES];                         // blood, frost, unholy, death
 
     for(uint32 i = 0; i < RUNE_DEATH; ++i)
         runeCost[i] = src->RuneCost[i];
@@ -3207,7 +3207,7 @@ void Spell::TakeRunePower()
             uint8 rune = plr->GetCurrentRune(i);
             if(runeCost[rune] > 0)
             {
-                plr->SetRuneCooldown(i, 5);                 // 5*2=10 sec
+                plr->SetRuneCooldown(i, RUNE_COOLDOWN);     // 5*2=10 sec
                 runeCost[rune]--;
             }
         }
@@ -3221,7 +3221,7 @@ void Spell::TakeRunePower()
         {
             if(!plr->GetRuneCooldown(i) && plr->GetCurrentRune(i) == RUNE_DEATH)
             {
-                plr->SetRuneCooldown(i, 5);                 // 5*2=10 sec
+                plr->SetRuneCooldown(i, RUNE_COOLDOWN);     // 5*2=10 sec
                 runeCost[plr->GetCurrentRune(i)]--;
                 uint8 base = plr->GetBaseRune(i);
                 plr->SetCurrentRune(i, base);
@@ -3232,10 +3232,10 @@ void Spell::TakeRunePower()
         }
     }
 
+    // you can gain some runic power when use runes
     float rp = src->runePowerGain;;
     rp *= sWorld.getRate(RATE_POWER_RUNICPOWER_INCOME);
-    rp += plr->GetPower(POWER_RUNIC_POWER);
-    plr->SetPower(POWER_RUNIC_POWER, (uint32)rp);
+    plr->ModifyPower(POWER_RUNIC_POWER, (int32)rp)
 }
 
 void Spell::TakeReagents()

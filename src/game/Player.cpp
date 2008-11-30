@@ -18896,11 +18896,11 @@ void Player::InitRunes()
 
     for(uint32 i = 0; i < MAX_RUNES; ++i)
     {
-        SetBaseRune(i, i / 2);
-        SetCurrentRune(i, i / 2);
-        SetRuneCooldown(i, 0);
+        SetBaseRune(i, i / 2);                              // init base types
+        SetCurrentRune(i, i / 2);                           // init current types
+        SetRuneCooldown(i, 0);                              // reset cooldowns
     }
 
-    for(uint32 i = 0; i < NUM_RUNES; ++i)
+    for(uint32 i = 0; i < NUM_RUNE_TYPES; ++i)
         SetFloatValue(PLAYER_RUNE_REGEN_1 + i, 0.1f);
 }

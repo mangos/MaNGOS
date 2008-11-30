@@ -224,15 +224,16 @@ struct Areas
     float y2;
 };
 
-#define MAX_RUNES 6
+#define MAX_RUNES       6
+#define RUNE_COOLDOWN   5                                   // 5*2=10 sec
 
 enum RuneType
 {
-    RUNE_BLOOD  = 0,
-    RUNE_FROST  = 1,
-    RUNE_UNHOLY = 2,
-    RUNE_DEATH  = 3,
-    NUM_RUNES   = 4
+    RUNE_BLOOD      = 0,
+    RUNE_FROST      = 1,
+    RUNE_UNHOLY     = 2,
+    RUNE_DEATH      = 3,
+    NUM_RUNE_TYPES  = 4
 };
 
 struct RuneInfo
