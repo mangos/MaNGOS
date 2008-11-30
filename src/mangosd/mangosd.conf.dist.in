@@ -415,7 +415,7 @@ LogColors = ""
 #                 2 - disable intro show in all cases
 #
 #    MaxPlayerLevel
-#        Max level that can be reached by player for experience (in range from 1 to 255).
+#        Max level that can be reached by player for experience (in range from 1 to 100).
 #        Change not recommended
 #        Default: 70
 #
@@ -843,7 +843,7 @@ Channel.SilentlyGMJoin = 0
 #                 0 (not include)
 #
 #    GM.StartLevel
-#        GM starting level (1-255)
+#        GM starting level (1-100)
 #        Default: 1
 #
 ###################################################################################################################
