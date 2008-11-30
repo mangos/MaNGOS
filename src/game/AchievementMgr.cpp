@@ -542,14 +542,12 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                 if(!worldOverlayEntry)
                     break;
 
-                AreaTableEntry const* areaTableEntry = GetAreaEntryByAreaID(worldOverlayEntry->areatableID);
-
-                if(!areaTableEntry)
+                int32 exploreFlag = GetAreaFlagByAreaID(worldOverlayEntry->areatableID);
+                if(exploreFlag < 0)
                     break;
 
-                uint32 exploreFlag = areaTableEntry->exploreFlag;
-                uint32 playerIndexOffset = exploreFlag / 32;
-                uint32 mask = 1<< (exploreFlag % 32);
+                uint32 playerIndexOffset = uint32(exploreFlag) / 32;
+                uint32 mask = 1<< (uint32(exploreFlag) % 32);
 
                 if(GetPlayer()->GetUInt32Value(PLAYER_EXPLORED_ZONES_1 + playerIndexOffset) & mask)
                     SetCriteriaProgress(achievementCriteria, 1);
