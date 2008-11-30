@@ -299,7 +299,7 @@ pAuraHandler AuraHandler[TOTAL_AURAS]=
     &Aura::HandleUnused,                                    //246 unused
     &Aura::HandleUnused,                                    //247 unused
     &Aura::HandleNoImmediateEffect,                         //248 SPELL_AURA_MOD_COMBAT_RESULT_CHANCE         implemented in Unit::RollMeleeOutcomeAgainst
-    &Aura::HandleNULL,                                      //249
+    &Aura::HandleAuraConvertRune,                           //249 SPELL_AURA_CONVERT_RUNE
     &Aura::HandleAuraModIncreaseHealth,                     //250 SPELL_AURA_MOD_INCREASE_HEALTH_2
     &Aura::HandleNULL,                                      //251 SPELL_AURA_MOD_ENEMY_DODGE
     &Aura::HandleNULL,                                      //252
@@ -6364,4 +6364,39 @@ void Aura::HandleAuraControlVehicle(bool apply, bool Real)
 
     WorldPacket data(SMSG_SHOW_VEHICLE_UI, 0);
     ((Player*)m_target)->GetSession()->SendPacket(&data);
+}
+
+void Aura::HandleAuraConvertRune(bool apply, bool Real)
+{
+    if(!Real)
+        return;
+
+    if(m_target->GetTypeId() != TYPEID_PLAYER)
+        return;
+
+    Player *plr = (Player*)m_target;
+
+    if(plr->getClass() != CLASS_DEATH_KNIGHT)
+        return;
+
+    // how to determine what rune need to be converted?
+    for(uint32 i = 0; i < MAX_RUNES; ++i)
+    {
+        if(apply)
+        {
+            if(!plr->GetRuneCooldown(i))
+            {
+                plr->ConvertRune(i, GetSpellProto()->EffectMiscValueB[m_effIndex]);
+                break;
+            }
+        }
+        else
+        {
+            if(plr->GetCurrentRune(i) == GetSpellProto()->EffectMiscValueB[m_effIndex])
+            {
+                plr->ConvertRune(i, plr->GetBaseRune(i));
+                break;
+            }
+        }
+    }
 }

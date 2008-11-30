@@ -18884,6 +18884,7 @@ void Player::SetTitle(CharTitlesEntry const* title)
 
 void Player::ConvertRune(uint8 index, uint8 newType)
 {
+    SetCurrentRune(index, newType);
     // SMSG_CONVERT_RUNE
 }
 

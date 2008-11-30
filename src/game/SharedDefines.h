@@ -652,7 +652,7 @@ enum SpellEffects
     SPELL_EFFECT_APPLY_AREA_AURA_OWNER     = 143,
     SPELL_EFFECT_144                       = 144,
     SPELL_EFFECT_145                       = 145,
-    SPELL_EFFECT_146                       = 146,
+    SPELL_EFFECT_ACTIVATE_RUNE             = 146,
     SPELL_EFFECT_QUEST_FAIL                = 147,
     SPELL_EFFECT_148                       = 148,
     SPELL_EFFECT_149                       = 149,
