@@ -1347,7 +1347,7 @@ void Player::BuildEnumData( QueryResult * result, WorldPacket * p_data )
     *p_data << GetPositionY();
     *p_data << GetPositionZ();
 
-    *p_data << GetUInt32Value(PLAYER_GUILDID);              // guild id
+    *p_data << (result ? result->Fetch()[13].GetUInt32() : 0);
 
     uint32 char_flags = 0;
     if(HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_HIDE_HELM))
@@ -1360,7 +1360,7 @@ void Player::BuildEnumData( QueryResult * result, WorldPacket * p_data )
         char_flags |= CHARACTER_FLAG_RENAME;
     // always send the flag if declined names aren't used
     // to let the client select a default method of declining the name
-    if(!sWorld.getConfig(CONFIG_DECLINED_NAMES_USED) || (result && result->Fetch()[13].GetCppString() != ""))
+    if(!sWorld.getConfig(CONFIG_DECLINED_NAMES_USED) || (result && result->Fetch()[14].GetCppString() != ""))
         char_flags |= CHARACTER_FLAG_DECLINED;
 
     *p_data << (uint32)char_flags;                          // character flags
