@@ -2103,8 +2103,8 @@ class MANGOS_DLL_SPEC Player : public Unit
             m_runes->runes[index].Cooldown = cooldown;
         }
         void SetBaseRune(uint8 index, uint8 baseRune) { m_runes->runes[index].BaseRune = baseRune; }
-        void SetCurrentRune(uint8 index, uint8 currentRune) { m_runes->runes[index].BaseRune = currentRune; }
-        void SetRuneCooldown(uint8 index, uint8 cooldown) { m_runes->runes[index].BaseRune = cooldown; }
+        void SetCurrentRune(uint8 index, uint8 currentRune) { m_runes->runes[index].currentRune = currentRune; }
+        void SetRuneCooldown(uint8 index, uint8 cooldown) { m_runes->runes[index].cooldown = cooldown; }
         void ConvertRune(uint8 index, uint8 newType);
         void InitRunes();
         AchievementMgr& GetAchievementMgr() { return m_achievementMgr; }
