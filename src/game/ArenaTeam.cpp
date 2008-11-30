@@ -207,7 +207,7 @@ void ArenaTeam::LoadMembersFromDB(uint32 ArenaTeamId)
 {
     Field *fields;
 
-    QueryResult *result = CharacterDatabase.PQuery("SELECT guid,games_week,wins_week,games_season,wins_season FROM arena_team_member WHERE arenateamid = '%u'", ArenaTeamId);
+    QueryResult *result = CharacterDatabase.PQuery("SELECT guid,played_week,wons_week,played_season,wons_season FROM arena_team_member WHERE arenateamid = '%u'", ArenaTeamId);
     if(!result)
         return;
 

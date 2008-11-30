@@ -716,9 +716,9 @@ void BattleGround::AddPlayer(Player *plr)
             else
                 plr->CastSpell(plr, SPELL_ALLIANCE_GOLD_FLAG,true);
         }
-        else
+        else                                                // green
         {
-            if(plr->GetTeam() == HORDE)                    // green
+            if(plr->GetTeam() == HORDE)
                 plr->CastSpell(plr, SPELL_HORDE_GREEN_FLAG,true);
             else
                 plr->CastSpell(plr, SPELL_ALLIANCE_GREEN_FLAG,true);
