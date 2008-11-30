@@ -710,14 +710,21 @@ void BattleGround::AddPlayer(Player *plr)
         plr->RemoveArenaSpellCooldowns();
         //plr->RemoveArenaAuras();
         plr->RemoveAllEnchantments(TEMP_ENCHANTMENT_SLOT);
-        if(team == ALLIANCE && plr->GetTeam() == ALLIANCE)
-            plr->CastSpell(plr,SPELL_ALLIANCE_GOLD_FLAG,true);
-        else if(team == HORDE && plr->GetTeam() == ALLIANCE)
-            plr->CastSpell(plr,SPELL_ALLIANCE_GREEN_FLAG,true);
-        else if(team == ALLIANCE && plr->GetTeam() == HORDE)
-            plr->CastSpell(plr,SPELL_HORDE_GOLD_FLAG,true);
+        if(team == ALLIANCE)                                // gold
+        {
+            if(plr->GetTeam() == HORDE)
+                plr->CastSpell(plr, SPELL_HORDE_GOLD_FLAG,true);
+            else
+                plr->CastSpell(plr, SPELL_ALLIANCE_GOLD_FLAG,true);
+        }
         else
-            plr->CastSpell(plr,SPELL_HORDE_GREEN_FLAG,true);
+        {
+            if(plr->GetTeam() == HORDE)                    // green
+                plr->CastSpell(plr, SPELL_HORDE_GREEN_FLAG,true);
+            else
+                plr->CastSpell(plr, SPELL_ALLIANCE_GREEN_FLAG,true);
+        }
+
         plr->DestroyConjuredItems(true);
 
         if(GetStatus() == STATUS_WAIT_JOIN)                 // not started yet

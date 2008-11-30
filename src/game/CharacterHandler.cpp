@@ -765,6 +765,9 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder * holder)
     if(sWorld.IsShutdowning())
         sWorld.ShutdownMsg(true,pCurrChar);
 
+    if(sWorld.getConfig(CONFIG_ALL_TAXI_PATHS))
+        pCurrChar->SetTaxiCheater(true);
+
     if(pCurrChar->isGameMaster())
         SendNotification(LANG_GM_ON);
 

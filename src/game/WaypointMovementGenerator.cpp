@@ -49,7 +49,8 @@ void WaypointMovementGenerator<Creature>::LoadPath(Creature &c)
     i_path = WaypointMgr.GetPath(c.GetDBTableGUIDLow());
     if(!i_path)
     {
-        sLog.outErrorDb("WaypointMovementGenerator::LoadPath: creature %s(%d) doesn't have waypoint path", c.GetName(), c.GetDBTableGUIDLow());
+        sLog.outErrorDb("WaypointMovementGenerator::LoadPath: creature %s (Entry: %u GUID: %d) doesn't have waypoint path",
+            c.GetName(), c.GetEntry(), c.GetDBTableGUIDLow());
         return;
     }
 

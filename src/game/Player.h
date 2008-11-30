@@ -1771,7 +1771,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void SetFactionVisible(FactionState* faction);
         void SetFactionVisibleForFactionTemplateId(uint32 FactionTemplateId);
         void SetFactionVisibleForFactionId(uint32 FactionId);
-        void UpdateMaxSkills();
+        void UpdateSkillsForLevel();
         void UpdateSkillsToMaxSkillsForLevel();             // for .levelup
         void ModifySkillBonus(uint32 skillid,int32 val, bool talent);
 
