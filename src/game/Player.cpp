@@ -430,6 +430,7 @@ Player::Player (WorldSession *session): Unit(), m_achievementMgr(this)
     m_contestedPvPTimer = 0;
 
     m_declinedname = NULL;
+    m_runes = NULL;
 }
 
 Player::~Player ()
@@ -474,6 +475,7 @@ Player::~Player ()
             itr->second.save->RemovePlayer(this);
 
     delete m_declinedname;
+    delete m_runes;
 }
 
 void Player::CleanupsBeforeDelete()
@@ -504,13 +506,6 @@ bool Player::Create( uint32 guidlow, std::string name, uint8 race, uint8 class_,
     for (int i = 0; i < PLAYER_SLOTS_COUNT; i++)
         m_items[i] = NULL;
 
-    //for(int j = BUYBACK_SLOT_START; j < BUYBACK_SLOT_END; j++)
-    //{
-    //    SetUInt64Value(PLAYER_FIELD_VENDORBUYBACK_SLOT_1+j*2,0);
-    //    SetUInt32Value(PLAYER_FIELD_BUYBACK_PRICE_1+j,0);
-    //    SetUInt32Value(PLAYER_FIELD_BUYBACK_TIMESTAMP_1+j,0);
-    //}
-
     m_race = race;
     m_class = class_;
 
@@ -526,9 +521,9 @@ bool Player::Create( uint32 guidlow, std::string name, uint8 race, uint8 class_,
 
     uint8 powertype = cEntry->powerType;
 
-    uint32 unitfield;
+    //uint32 unitfield;
 
-    switch(powertype)
+    /*switch(powertype)
     {
         case POWER_ENERGY:
         case POWER_MANA:
@@ -543,10 +538,10 @@ bool Player::Create( uint32 guidlow, std::string name, uint8 race, uint8 class_,
         default:
             sLog.outError("Invalid default powertype %u for player (class %u)",powertype,class_);
             return false;
-    }
+    }*/
 
-    SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, DEFAULT_WORLD_OBJECT_SIZE );
-    SetFloatValue(UNIT_FIELD_COMBATREACH, 1.5f   );
+    SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, DEFAULT_WORLD_OBJECT_SIZE);
+    SetFloatValue(UNIT_FIELD_COMBATREACH, 1.5f);
 
     switch(gender)
     {
@@ -569,12 +564,12 @@ bool Player::Create( uint32 guidlow, std::string name, uint8 race, uint8 class_,
     uint32 RaceClassGender = ( race ) | ( class_ << 8 ) | ( gender << 16 );
 
     SetUInt32Value(UNIT_FIELD_BYTES_0, ( RaceClassGender | ( powertype << 24 ) ) );
-    SetUInt32Value(UNIT_FIELD_BYTES_1, unitfield);
+    //SetUInt32Value(UNIT_FIELD_BYTES_1, unitfield);
     SetByteValue(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_PVP );
     SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE );
     SetFloatValue(UNIT_MOD_CAST_SPEED, 1.0f);               // fix cast time showed in spell tooltip on client
 
-                                                            //-1 is default value
+                                                            // -1 is default value
     SetUInt32Value(PLAYER_FIELD_WATCHED_FACTION_INDEX, uint32(-1));
 
     SetUInt32Value(PLAYER_BYTES, (skin | (face << 8) | (hairStyle << 16) | (hairColor << 24)));
@@ -586,6 +581,7 @@ bool Player::Create( uint32 guidlow, std::string name, uint8 race, uint8 class_,
     SetUInt32Value( PLAYER_GUILD_TIMESTAMP, 0 );
 
     SetUInt64Value( PLAYER__FIELD_KNOWN_TITLES, 0 );        // 0=disabled
+    SetUInt64Value( PLAYER__FIELD_KNOWN_TITLES1, 0 );       // 0=disabled
     SetUInt32Value( PLAYER_CHOSEN_TITLE, 0 );
     SetUInt32Value( PLAYER_FIELD_KILLS, 0 );
     SetUInt32Value( PLAYER_FIELD_LIFETIME_HONORBALE_KILLS, 0 );
@@ -604,6 +600,8 @@ bool Player::Create( uint32 guidlow, std::string name, uint8 race, uint8 class_,
         SetUInt32Value(UNIT_FIELD_LEVEL, 55);
     else
         SetUInt32Value( UNIT_FIELD_LEVEL, sWorld.getConfig(CONFIG_START_PLAYER_LEVEL) );
+
+    InitRunes();
 
     // Played time
     m_Last_tick = time(NULL);
@@ -624,6 +622,14 @@ bool Player::Create( uint32 guidlow, std::string name, uint8 race, uint8 class_,
     {
         UpdateMaxPower(POWER_MANA);                         // Update max Mana (for add bonus from intellect)
         SetPower(POWER_MANA,GetMaxPower(POWER_MANA));
+    }
+
+    if(getPowerType() == POWER_RUNIC_POWER)
+    {
+        SetPower(POWER_RUNE, 8);
+        SetMaxPower(POWER_RUNE, 8);
+        SetPower(POWER_RUNIC_POWER, 0);
+        SetMaxPower(POWER_RUNIC_POWER, 1000);
     }
 
     // original spells
@@ -1822,14 +1828,17 @@ void Player::RegenerateAll()
     {
         RegenerateHealth();
         if (!isInCombat() && !HasAuraType(SPELL_AURA_INTERRUPT_REGEN))
+        {
             Regenerate(POWER_RAGE);
+            Regenerate(POWER_RUNIC_POWER);
+        }
     }
 
     Regenerate( POWER_ENERGY );
 
     Regenerate( POWER_MANA );
 
-    Regenerate( POWER_RUNIC_POWER );
+    Regenerate( POWER_RUNE );
 
     m_regenTimer = regenDelay;
 }
@@ -1866,8 +1875,16 @@ void Player::Regenerate(Powers power)
             addvalue = 20;
             break;
         case POWER_RUNIC_POWER:
-            addvalue = 100;                                 // TODO: find correct regen rate
-            break;
+        {
+            float RunicPowerDecreaseRate = sWorld.getRate(RATE_POWER_RUNICPOWER_LOSS);
+            addvalue = 30 * RunicPowerDecreaseRate;         // 3 RunicPower by tick
+        }   break;
+        case POWER_RUNE:
+        {
+            for(uint32 i = 0; i < 6; ++i)
+                if(uint8 cd = GetRuneCooldown(i))           // if we have cooldown, reduce it...
+                    SetRuneCooldown(i, cd - 1);             // by 2 sec (because update is every 2 sec)
+        }   break;
         case POWER_FOCUS:
         case POWER_HAPPINESS:
             break;
@@ -1883,7 +1900,7 @@ void Player::Regenerate(Powers power)
                 addvalue *= ((*i)->GetModifier()->m_amount + 100) / 100.0f;
     }
 
-    if (power != POWER_RAGE)
+    if (power != POWER_RAGE && power != POWER_RUNIC_POWER)
     {
         curValue += uint32(addvalue);
         if (curValue > maxValue)
@@ -7217,6 +7234,17 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
                 loot->FillLoot(item->GetEntry(), LootTemplates_Prospecting, this);
             }
         }
+        else if(loot_type == LOOT_MILLING)
+        {
+            loot = &item->loot;
+
+            if(!item->m_lootGenerated)
+            {
+                item->m_lootGenerated = true;
+                loot->clear();
+                loot->FillLoot(item->GetEntry(), LootTemplates_Milling, this);
+            }
+        }
         else
         {
             loot = &item->loot;
@@ -7410,8 +7438,8 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
             conditional_list = itr->second;
     }
 
-    // LOOT_PICKPOCKETING, LOOT_PROSPECTING, LOOT_DISENCHANTING and LOOT_INSIGNIA unsupported by client, sending LOOT_SKINNING instead
-    if(loot_type == LOOT_PICKPOCKETING || loot_type == LOOT_DISENCHANTING || loot_type == LOOT_PROSPECTING || loot_type == LOOT_INSIGNIA)
+    // LOOT_PICKPOCKETING, LOOT_PROSPECTING, LOOT_DISENCHANTING, LOOT_INSIGNIA and LOOT_MILLING unsupported by client, sending LOOT_SKINNING instead
+    if(loot_type == LOOT_PICKPOCKETING || loot_type == LOOT_DISENCHANTING || loot_type == LOOT_PROSPECTING || loot_type == LOOT_INSIGNIA || loot_type == LOOT_MILLING)
         loot_type = LOOT_SKINNING;
 
     if(loot_type == LOOT_FISHINGHOLE)
@@ -14183,6 +14211,8 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
 
     _LoadDeclinedNames(holder->GetResult(PLAYER_LOGIN_QUERY_LOADDECLINEDNAMES));
 
+    InitRunes();
+
     m_achievementMgr.LoadFromDB(holder->GetResult(PLAYER_LOGIN_QUERY_LOADACHIEVEMENTS), holder->GetResult(PLAYER_LOGIN_QUERY_LOADCRITERIAPROGRESS));
     m_achievementMgr.CheckAllAchievementCriteria();
     return true;
@@ -18824,3 +18854,25 @@ void Player::SetTitle(CharTitlesEntry const* title)
     SetFlag(PLAYER__FIELD_KNOWN_TITLES+fieldIndexOffset, flag);
 }
 
+void Player::ConvertRune(uint8 index, uint8 newType)
+{
+    // SMSG_CONVERT_RUNE
+}
+
+void Player::InitRunes()
+{
+    if(getClass() != CLASS_DEATH_KNIGHT)
+        return;
+
+    m_runes = new Runes;
+
+    for(uint32 i = 0; i < MAX_RUNES; ++i)
+    {
+        SetBaseRune(i, i / 2);
+        SetCurrentRune(i, i / 2);
+        SetRuneCooldown(i, 0);
+    }
+
+    for(uint32 i = 0; i < NUM_RUNES; ++i)
+        SetFloatValue(PLAYER_RUNE_REGEN_1 + i, 0.1f);
+}

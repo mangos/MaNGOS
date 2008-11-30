@@ -613,15 +613,18 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder * holder)
 
         if(ChrClassesEntry const* cEntry = sChrClassesStore.LookupEntry(pCurrChar->getClass()))
         {
-            data.Initialize(SMSG_TRIGGER_CINEMATIC, 4);
-            data << uint32(cEntry->CinematicSequence);
-            SendPacket( &data );
-        }
-        else if(ChrRacesEntry const* rEntry = sChrRacesStore.LookupEntry(pCurrChar->getRace()))
-        {
-            data.Initialize(SMSG_TRIGGER_CINEMATIC, 4);
-            data << uint32(rEntry->CinematicSequence);
-            SendPacket( &data );
+            if(cEntry->CinematicSequence)
+            {
+                data.Initialize(SMSG_TRIGGER_CINEMATIC, 4);
+                data << uint32(cEntry->CinematicSequence);
+                SendPacket( &data );
+            }
+            else if(ChrRacesEntry const* rEntry = sChrRacesStore.LookupEntry(pCurrChar->getRace()))
+            {
+                data.Initialize(SMSG_TRIGGER_CINEMATIC, 4);
+                data << uint32(rEntry->CinematicSequence);
+                SendPacket( &data );
+            }
         }
     }
 
@@ -674,7 +677,6 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder * holder)
     pCurrChar->LoadCorpse();
 
     // setting Ghost+speed if dead
-    //if ( pCurrChar->m_deathState == DEAD )
     if (pCurrChar->m_deathState != ALIVE)
     {
         // not blizz like, we must correctly save and load player instead...
@@ -682,22 +684,6 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder * holder)
             pCurrChar->CastSpell(pCurrChar, 20584, true, 0);// auras SPELL_AURA_INCREASE_SPEED(+speed in wisp form), SPELL_AURA_INCREASE_SWIM_SPEED(+swim speed in wisp form), SPELL_AURA_TRANSFORM (to wisp form)
         pCurrChar->CastSpell(pCurrChar, 8326, true, 0);     // auras SPELL_AURA_GHOST, SPELL_AURA_INCREASE_SPEED(why?), SPELL_AURA_INCREASE_SWIM_SPEED(why?)
 
-        //pCurrChar->SetUInt32Value(UNIT_FIELD_AURA+41, 8326);
-        //pCurrChar->SetUInt32Value(UNIT_FIELD_AURA+42, 20584);
-        //pCurrChar->SetUInt32Value(UNIT_FIELD_AURAFLAGS+6, 238);
-        //pCurrChar->SetUInt32Value(UNIT_FIELD_AURALEVELS+11, 514);
-        //pCurrChar->SetUInt32Value(UNIT_FIELD_AURAAPPLICATIONS+11, 65535);
-        //pCurrChar->SetUInt32Value(UNIT_FIELD_DISPLAYID, 1825);
-        //if (pCurrChar->getRace() == RACE_NIGHTELF)
-        //{
-        //    pCurrChar->SetSpeed(MOVE_RUN,  1.5f*1.2f, true);
-        //    pCurrChar->SetSpeed(MOVE_SWIM, 1.5f*1.2f, true);
-        //}
-        //else
-        //{
-        //    pCurrChar->SetSpeed(MOVE_RUN,  1.5f, true);
-        //    pCurrChar->SetSpeed(MOVE_SWIM, 1.5f, true);
-        //}
         pCurrChar->SetMovement(MOVE_WATER_WALK);
     }
 
@@ -1171,13 +1157,13 @@ void WorldSession::HandleRemoveGlyph( WorldPacket & recv_data )
     uint32 slot;
     recv_data >> slot;
 
-	if(slot > 5)
-	{
-		sLog.outDebug("Client sent wrong glyph slot number in opcode CMSG_REMOVE_GLYPH %u", slot);
-		return;
-	}
+    if(slot > 5)
+    {
+        sLog.outDebug("Client sent wrong glyph slot number in opcode CMSG_REMOVE_GLYPH %u", slot);
+        return;
+    }
 
-	if(uint32 glyph = _player->GetGlyph(slot))
+    if(uint32 glyph = _player->GetGlyph(slot))
     {
         if(GlyphPropertiesEntry const *gp = sGlyphPropertiesStore.LookupEntry(glyph))
         {

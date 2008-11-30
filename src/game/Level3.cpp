@@ -294,6 +294,15 @@ bool ChatHandler::HandleReloadLootTemplatesItemCommand(const char*)
     return true;
 }
 
+bool ChatHandler::HandleReloadLootTemplatesMillingCommand(const char*)
+{
+    sLog.outString( "Re-Loading Loot Tables... (`milling_loot_template`)" );
+    LoadLootTemplates_Milling();
+    LootTemplates_Milling.CheckLootRefs();
+    SendGlobalSysMessage("DB table `milling_loot_template` reloaded.");
+    return true;
+}
+
 bool ChatHandler::HandleReloadLootTemplatesPickpocketingCommand(const char*)
 {
     sLog.outString( "Re-Loading Loot Tables... (`pickpocketing_loot_template`)" );

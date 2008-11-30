@@ -214,7 +214,7 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS]=
     &Spell::EffectNULL,                                     //155 Allows you to equip two-handed axes, maces and swords in one hand, but you attack $49152s1% slower than normal.
     &Spell::EffectNULL,                                     //156 Add Socket
     &Spell::EffectNULL,                                     //157 create/learn random item/spell for profession
-    &Spell::EffectNULL,                                     //158 milling
+    &Spell::EffectMilling,                                  //158 milling
     &Spell::EffectNULL                                      //159 allow rename pet once again
 };
 
@@ -6112,6 +6112,28 @@ void Spell::EffectProspecting(uint32 /*i*/)
     }
 
     ((Player*)m_caster)->SendLoot(itemTarget->GetGUID(), LOOT_PROSPECTING);
+}
+
+void Spell::EffectMilling(uint32 /*i*/)
+{
+    if(m_caster->GetTypeId() != TYPEID_PLAYER)
+        return;
+
+    Player* p_caster = (Player*)m_caster;
+    if(!itemTarget || !(itemTarget->GetProto()->BagFamily & BAG_FAMILY_MASK_HERBS))
+        return;
+
+    if(itemTarget->GetCount() < 5)
+        return;
+
+    if( sWorld.getConfig(CONFIG_SKILL_MILLING))
+    {
+        uint32 SkillValue = p_caster->GetPureSkillValue(SKILL_INSCRIPTION);
+        uint32 reqSkillValue = itemTarget->GetProto()->RequiredSkillRank;
+        p_caster->UpdateGatherSkill(SKILL_INSCRIPTION, SkillValue, reqSkillValue);
+    }
+
+    ((Player*)m_caster)->SendLoot(itemTarget->GetGUID(), LOOT_MILLING);
 }
 
 void Spell::EffectSkill(uint32 /*i*/)

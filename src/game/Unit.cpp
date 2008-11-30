@@ -2066,6 +2066,7 @@ void Unit::DoAttackDamage (Unit *pVictim, uint32 *damage, CleanDamage *cleanDama
             {
                 case CLASS_WARRIOR:
                 case CLASS_ROGUE:
+                case CLASS_DEATH_KNIGHT:
                     maxLowEnd = 0.91;                       //If the attacker is a melee class then instead the lower value of 0.91
             }
 

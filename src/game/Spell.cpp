@@ -593,6 +593,7 @@ void Spell::FillTargetMap()
                 case SPELL_EFFECT_DISENCHANT:
                 case SPELL_EFFECT_FEED_PET:
                 case SPELL_EFFECT_PROSPECTING:
+                case SPELL_EFFECT_MILLING:
                     if(m_targets.getItemTarget())
                         AddItemTarget(m_targets.getItemTarget(), i);
                     break;
@@ -3115,11 +3116,116 @@ void Spell::TakePower()
 
     Powers powerType = Powers(m_spellInfo->powerType);
 
+    if(powerType == POWER_RUNE)
+    {
+        TakeRunePower();
+        return;
+    }
+
     m_caster->ModifyPower(powerType, -(int32)m_powerCost);
 
     // Set the five second timer
     if (powerType == POWER_MANA && m_powerCost > 0)
         m_caster->SetLastManaUse(getMSTime());
+}
+
+uint8 Spell::CheckRuneCost(uint32 runeCostID)
+{
+    if(m_caster->GetTypeId() != TYPEID_PLAYER)
+        return 0;
+
+    Player *plr = (Player*)m_caster;
+
+    if(plr->getClass() != CLASS_DEATH_KNIGHT)
+        return 0;
+
+    SpellRuneCostEntry const *src = sSpellRuneCostStore.LookupEntry(runeCostID);
+
+    if(!src)
+        return 0;
+
+    if(src->NoRuneCost())
+        return 0;
+
+    int32 runeCost[NUM_RUNES];                              // blood, frost, unholy, death
+
+    for(uint32 i = 0; i < RUNE_DEATH; ++i)
+        runeCost[i] = src->RuneCost[i];
+
+    runeCost[RUNE_DEATH] = 0;                               // calculated later
+
+    for(uint32 i = 0; i < MAX_RUNES; ++i)
+        if(!plr->GetRuneCooldown(i))
+            runeCost[plr->GetCurrentRune(i)]--;
+
+    for(uint32 i = 0; i < RUNE_DEATH; ++i)
+        if(runeCost[i] > 0)
+            runeCost[RUNE_DEATH] += runeCost[i];
+
+    if(runeCost[RUNE_DEATH] > 0)
+        return SPELL_FAILED_REAGENTS;                       // not sure if result code is correct
+
+    return 0;
+}
+
+void Spell::TakeRunePower()
+{
+    if(m_caster->GetTypeId() != TYPEID_PLAYER)
+        return;
+
+    Player *plr = (Player*)m_caster;
+
+    if(plr->getClass() != CLASS_DEATH_KNIGHT)
+        return;
+
+    SpellRuneCostEntry const *src = sSpellRuneCostStore.LookupEntry(m_spellInfo->runeCostID);
+
+    if(!src || (src->NoRuneCost() && src->NoRunicPowerGain()))
+        return;
+
+    int32 runeCost[NUM_RUNES];                              // blood, frost, unholy, death
+
+    for(uint32 i = 0; i < RUNE_DEATH; ++i)
+        runeCost[i] = src->RuneCost[i];
+
+    runeCost[RUNE_DEATH] = 0;                               // calculated later
+
+    for(uint32 i = 0; i < MAX_RUNES; ++i)
+    {
+        if(!plr->GetRuneCooldown(i))
+        {
+            uint8 rune = plr->GetCurrentRune(i);
+            if(runeCost[rune] > 0)
+            {
+                plr->SetRuneCooldown(i, 5);                 // 5*2=10 sec
+                runeCost[rune]--;
+            }
+        }
+    }
+
+    runeCost[RUNE_DEATH] = runeCost[RUNE_BLOOD] + runeCost[RUNE_FROST] + runeCost[RUNE_UNHOLY];
+
+    if(runeCost[RUNE_DEATH] > 0)
+    {
+        for(uint32 i = 0; i < MAX_RUNES; ++i)
+        {
+            if(!plr->GetRuneCooldown(i) && plr->GetCurrentRune(i) == RUNE_DEATH)
+            {
+                plr->SetRuneCooldown(i, 5);                 // 5*2=10 sec
+                runeCost[plr->GetCurrentRune(i)]--;
+                uint8 base = plr->GetBaseRune(i);
+                plr->SetCurrentRune(i, base);
+                plr->ConvertRune(i, base);
+                if(runeCost[RUNE_DEATH] == 0)
+                    break;
+            }
+        }
+    }
+
+    float rp = src->runePowerGain;;
+    rp *= sWorld.getRate(RATE_POWER_RUNICPOWER_INCOME);
+    rp += plr->GetPower(POWER_RUNIC_POWER);
+    plr->SetPower(POWER_RUNIC_POWER, (uint32)rp);
 }
 
 void Spell::TakeReagents()
@@ -4040,7 +4146,7 @@ uint8 Spell::CanCast(bool strict)
                 if( form == FORM_CAT          || form == FORM_TREE      || form == FORM_TRAVEL   ||
                     form == FORM_AQUA         || form == FORM_BEAR      || form == FORM_DIREBEAR ||
                     form == FORM_CREATUREBEAR || form == FORM_GHOSTWOLF || form == FORM_FLIGHT   ||
-                    form == FORM_FLIGHT_EPIC  || form == FORM_MOONKIN )
+                    form == FORM_FLIGHT_EPIC  || form == FORM_MOONKIN   || form == FORM_METAMORPHOSIS )
                     return SPELL_FAILED_NOT_SHAPESHIFT;
 
                 break;
@@ -4431,6 +4537,11 @@ uint8 Spell::CheckPower()
         sLog.outError("Spell::CheckMana: Unknown power type '%d'", m_spellInfo->powerType);
         return SPELL_FAILED_UNKNOWN;
     }
+
+    uint8 failReason = CheckRuneCost(m_spellInfo->runeCostID);
+    if(failReason)
+        return failReason;
+
     // Check power amount
     Powers powerType = Powers(m_spellInfo->powerType);
     if(m_caster->GetPower(powerType) < m_powerCost)
@@ -4707,6 +4818,29 @@ uint8 Spell::CheckItems()
 
                 if(!LootTemplates_Prospecting.HaveLootFor(m_targets.getItemTargetEntry()))
                     return SPELL_FAILED_CANT_BE_PROSPECTED;
+
+                break;
+            }
+            case SPELL_EFFECT_MILLING:
+            {
+                if(!m_targets.getItemTarget())
+                    return SPELL_FAILED_CANT_BE_MILLED;
+                //ensure item is a millable herb
+                if(!(m_targets.getItemTarget()->GetProto()->BagFamily & BAG_FAMILY_MASK_HERBS) || m_targets.getItemTarget()->GetProto()->Class != ITEM_CLASS_TRADE_GOODS)
+                    return SPELL_FAILED_CANT_BE_MILLED;
+                //prevent milling in trade slot
+                if( m_targets.getItemTarget()->GetOwnerGUID() != m_caster->GetGUID() )
+                    return SPELL_FAILED_CANT_BE_MILLED;
+                //Check for enough skill in inscription
+                uint32 item_millingskilllevel = m_targets.getItemTarget()->GetProto()->RequiredSkillRank;
+                if(item_millingskilllevel >p_caster->GetSkillValue(SKILL_INSCRIPTION))
+                    return SPELL_FAILED_LOW_CASTLEVEL;
+                //make sure the player has the required herbs in inventory
+                if(m_targets.getItemTarget()->GetCount() < 5)
+                    return SPELL_FAILED_NEED_MORE_ITEMS;
+
+                if(!LootTemplates_Milling.HaveLootFor(m_targets.getItemTargetEntry()))
+                    return SPELL_FAILED_CANT_BE_MILLED;
 
                 break;
             }

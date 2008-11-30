@@ -210,6 +210,7 @@ class MANGOS_DLL_SPEC Item : public Object
 
         void SetBinding(bool val) { ApplyModFlag(ITEM_FIELD_FLAGS,ITEM_FLAGS_BINDED,val); }
         bool IsSoulBound() const { return HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAGS_BINDED); }
+        bool IsAccountBound() const { return HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAGS_BOA); }
         bool IsBindedNotWith(uint64 guid) const { return IsSoulBound() && GetOwnerGUID()!= guid; }
         bool IsBoundByEnchant() const;
         virtual void SaveToDB();

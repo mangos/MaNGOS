@@ -276,6 +276,7 @@ class Spell
         void EffectSkinning(uint32 i);
         void EffectCharge(uint32 i);
         void EffectProspecting(uint32 i);
+        void EffectMilling(uint32 i);
         void EffectSendTaxi(uint32 i);
         void EffectSummonCritter(uint32 i);
         void EffectKnockBack(uint32 i);
@@ -311,6 +312,8 @@ class Spell
         void cast(bool skipCheck = false);
         void finish(bool ok = true);
         void TakePower();
+        uint8 CheckRuneCost(uint32 runeCostID);
+        void TakeRunePower();
         void TakeReagents();
         void TakeCastItem();
         void TriggerSpell();

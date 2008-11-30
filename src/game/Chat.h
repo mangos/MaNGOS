@@ -225,6 +225,7 @@ class ChatHandler
         bool HandleReloadLootTemplatesFishingCommand(const char* args);
         bool HandleReloadLootTemplatesGameobjectCommand(const char* args);
         bool HandleReloadLootTemplatesItemCommand(const char* args);
+        bool HandleReloadLootTemplatesMillingCommand(const char* args);
         bool HandleReloadLootTemplatesPickpocketingCommand(const char* args);
         bool HandleReloadLootTemplatesProspectingCommand(const char* args);
         bool HandleReloadLootTemplatesReferenceCommand(const char* args);

@@ -144,6 +144,7 @@ enum ShapeshiftForm
     FORM_BERSERKERSTANCE    = 0x13,
     FORM_TEST               = 0x14,
     FORM_ZOMBIE             = 0x15,
+    FORM_METAMORPHOSIS      = 0x16,
     FORM_FLIGHT_EPIC        = 0x1B,
     FORM_SHADOW             = 0x1C,
     FORM_FLIGHT             = 0x1D,

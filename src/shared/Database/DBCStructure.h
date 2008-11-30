@@ -1194,11 +1194,12 @@ struct SpellRangeEntry
 
 struct SpellRuneCostEntry
 {
-    uint32  ID;
-    uint32  bloodRuneCost;
-    uint32  frostRuneCost;
-    uint32  unholyRuneCost;
-    uint32  runePowerGain;
+    uint32  ID;                                             // 0
+    uint32  RuneCost[3];                                    // 1-3 (0=blood, 1=frost, 2=unholy)
+    uint32  runePowerGain;                                  // 4
+
+    bool NoRuneCost() const { return RuneCost[0] == 0 && RuneCost[1] == 0 && RuneCost[2] == 0; }
+    bool NoRunicPowerGain() const { return runePowerGain == 0; }
 };
 
 struct SpellShapeshiftEntry
