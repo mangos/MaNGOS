@@ -238,9 +238,9 @@ enum RuneType
 
 struct RuneInfo
 {
-    uint8 BaseRune:1;
-    uint8 CurrentRune:1;
-    uint8 Cooldown:1;
+    uint8 BaseRune;
+    uint8 CurrentRune;
+    uint8 Cooldown;
 };
 
 struct Runes
@@ -2092,16 +2092,9 @@ class MANGOS_DLL_SPEC Player : public Unit
         WorldLocation& GetTeleportDest() { return m_teleport_dest; }
 
         DeclinedName const* GetDeclinedNames() const { return m_declinedname; }
-        RuneInfo const* GetRuneInfo(uint8 index) { return &m_runes->runes[index]; }
-        uint8 GetBaseRune(uint8 index) { return m_runes->runes[index].BaseRune; }
-        uint8 GetCurrentRune(uint8 index) { return m_runes->runes[index].CurrentRune; }
-        uint8 GetRuneCooldown(uint8 index) { return m_runes->runes[index].Cooldown; }
-        void SetRuneInfo(uint8 index, uint8 baseRune, uint8 currentRune, uint8 cooldown)
-        {
-            m_runes->runes[index].BaseRune = baseRune;
-            m_runes->runes[index].CurrentRune = currentRune;
-            m_runes->runes[index].Cooldown = cooldown;
-        }
+        uint8 GetBaseRune(uint8 index) const { return m_runes->runes[index].BaseRune; }
+        uint8 GetCurrentRune(uint8 index) const { return m_runes->runes[index].CurrentRune; }
+        uint8 GetRuneCooldown(uint8 index) const { return m_runes->runes[index].Cooldown; }
         void SetBaseRune(uint8 index, uint8 baseRune) { m_runes->runes[index].BaseRune = baseRune; }
         void SetCurrentRune(uint8 index, uint8 currentRune) { m_runes->runes[index].CurrentRune = currentRune; }
         void SetRuneCooldown(uint8 index, uint8 cooldown) { m_runes->runes[index].Cooldown = cooldown; }

@@ -1890,9 +1890,9 @@ void Player::Regenerate(Powers power)
         }   break;
         case POWER_RUNE:
         {
-            for(uint32 i = 0; i < 6; ++i)
+            for(uint32 i = 0; i < MAX_RUNES; ++i)
                 if(uint8 cd = GetRuneCooldown(i))           // if we have cooldown, reduce it...
-                    SetRuneCooldown(i, cd - 1);             // by 2 sec (because update is every 2 sec)
+                    SetRuneCooldown(i, cd - 1);             // ... by 2 sec (because update is every 2 sec)
         }   break;
         case POWER_FOCUS:
         case POWER_HAPPINESS:
@@ -14083,6 +14083,7 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
     InitStatsForLevel();
     InitTaxiNodesForLevel();
     InitGlyphsForLevel();
+    InitRunes();
 
     // apply original stats mods before spell loading or item equipment that call before equip _RemoveStatsMods()
 
@@ -14238,8 +14239,6 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
     }
 
     _LoadDeclinedNames(holder->GetResult(PLAYER_LOGIN_QUERY_LOADDECLINEDNAMES));
-
-    InitRunes();
 
     m_achievementMgr.LoadFromDB(holder->GetResult(PLAYER_LOGIN_QUERY_LOADACHIEVEMENTS), holder->GetResult(PLAYER_LOGIN_QUERY_LOADCRITERIAPROGRESS));
     m_achievementMgr.CheckAllAchievementCriteria();

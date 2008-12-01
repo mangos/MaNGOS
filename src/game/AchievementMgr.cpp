@@ -839,4 +839,3 @@ void AchievementMgr::BuildAllDataPacket(WorldPacket *data)
 
     *data << int32(-1);
 }
-

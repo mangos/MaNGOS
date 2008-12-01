@@ -3160,20 +3160,31 @@ uint8 Spell::CheckRuneCost(uint32 runeCostID)
     int32 runeCost[NUM_RUNE_TYPES];                         // blood, frost, unholy, death
 
     for(uint32 i = 0; i < RUNE_DEATH; ++i)
+    {
         runeCost[i] = src->RuneCost[i];
+    }
 
     runeCost[RUNE_DEATH] = 0;                               // calculated later
 
     for(uint32 i = 0; i < MAX_RUNES; ++i)
-        if(!plr->GetRuneCooldown(i))
-            runeCost[plr->GetCurrentRune(i)]--;
+    {
+        uint8 rune = plr->GetCurrentRune(i);
+        if((plr->GetRuneCooldown(i) == 0) && (runeCost[rune] > 0))
+        {
+            runeCost[rune]--;
+        }
+    }
 
     for(uint32 i = 0; i < RUNE_DEATH; ++i)
+    {
         if(runeCost[i] > 0)
+        {
             runeCost[RUNE_DEATH] += runeCost[i];
+        }
+    }
 
     if(runeCost[RUNE_DEATH] > 0)
-        return SPELL_FAILED_REAGENTS;                       // not sure if result code is correct
+        return SPELL_FAILED_NO_POWER;                       // not sure if result code is correct
 
     return 0;
 }
@@ -3196,20 +3207,19 @@ void Spell::TakeRunePower()
     int32 runeCost[NUM_RUNE_TYPES];                         // blood, frost, unholy, death
 
     for(uint32 i = 0; i < RUNE_DEATH; ++i)
+    {
         runeCost[i] = src->RuneCost[i];
+    }
 
     runeCost[RUNE_DEATH] = 0;                               // calculated later
 
     for(uint32 i = 0; i < MAX_RUNES; ++i)
     {
-        if(!plr->GetRuneCooldown(i))
+        uint8 rune = plr->GetCurrentRune(i);
+        if((plr->GetRuneCooldown(i) == 0) && (runeCost[rune] > 0))
         {
-            uint8 rune = plr->GetCurrentRune(i);
-            if(runeCost[rune] > 0)
-            {
-                plr->SetRuneCooldown(i, RUNE_COOLDOWN);     // 5*2=10 sec
-                runeCost[rune]--;
-            }
+            plr->SetRuneCooldown(i, RUNE_COOLDOWN);         // 5*2=10 sec
+            runeCost[rune]--;
         }
     }
 
@@ -3219,13 +3229,12 @@ void Spell::TakeRunePower()
     {
         for(uint32 i = 0; i < MAX_RUNES; ++i)
         {
-            if(!plr->GetRuneCooldown(i) && plr->GetCurrentRune(i) == RUNE_DEATH)
+            uint8 rune = plr->GetCurrentRune(i);
+            if((plr->GetRuneCooldown(i) == 0) && (rune == RUNE_DEATH))
             {
                 plr->SetRuneCooldown(i, RUNE_COOLDOWN);     // 5*2=10 sec
-                runeCost[plr->GetCurrentRune(i)]--;
-                uint8 base = plr->GetBaseRune(i);
-                plr->SetCurrentRune(i, base);
-                plr->ConvertRune(i, base);
+                runeCost[rune]--;
+                plr->ConvertRune(i, plr->GetBaseRune(i));
                 if(runeCost[RUNE_DEATH] == 0)
                     break;
             }
