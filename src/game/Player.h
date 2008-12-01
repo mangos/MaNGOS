@@ -230,8 +230,8 @@ struct Areas
 enum RuneType
 {
     RUNE_BLOOD      = 0,
-    RUNE_FROST      = 1,
-    RUNE_UNHOLY     = 2,
+    RUNE_UNHOLY     = 1,
+    RUNE_FROST      = 2,
     RUNE_DEATH      = 3,
     NUM_RUNE_TYPES  = 4
 };
@@ -246,6 +246,15 @@ struct RuneInfo
 struct Runes
 {
     RuneInfo runes[6];
+    uint8 runeState;                                        // mask of available runes
+
+    void SetRuneState(uint8 index, bool set = true)
+    {
+        if(set)
+            runeState |= (1 << index);                      // usable
+        else
+            runeState &= ~(1 << index);                     // on cooldown
+    }
 };
 
 enum FactionFlags
@@ -2092,13 +2101,16 @@ class MANGOS_DLL_SPEC Player : public Unit
         WorldLocation& GetTeleportDest() { return m_teleport_dest; }
 
         DeclinedName const* GetDeclinedNames() const { return m_declinedname; }
+        uint8 GetRunesState() const { return m_runes->runeState; }
         uint8 GetBaseRune(uint8 index) const { return m_runes->runes[index].BaseRune; }
         uint8 GetCurrentRune(uint8 index) const { return m_runes->runes[index].CurrentRune; }
         uint8 GetRuneCooldown(uint8 index) const { return m_runes->runes[index].Cooldown; }
         void SetBaseRune(uint8 index, uint8 baseRune) { m_runes->runes[index].BaseRune = baseRune; }
         void SetCurrentRune(uint8 index, uint8 currentRune) { m_runes->runes[index].CurrentRune = currentRune; }
-        void SetRuneCooldown(uint8 index, uint8 cooldown) { m_runes->runes[index].Cooldown = cooldown; }
+        void SetRuneCooldown(uint8 index, uint8 cooldown) { m_runes->runes[index].Cooldown = cooldown; m_runes->SetRuneState(index, (cooldown == 0) ? true : false); }
         void ConvertRune(uint8 index, uint8 newType);
+        void ResyncRunes(uint8 count);
+        void AddRunePower(uint8 index);
         void InitRunes();
         AchievementMgr& GetAchievementMgr() { return m_achievementMgr; }
         bool HasTitle(uint32 bitIndex);

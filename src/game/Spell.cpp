@@ -346,6 +346,7 @@ Spell::Spell( Unit* Caster, SpellEntry const *info, bool triggered, uint64 origi
     else
         m_autoRepeat = false;
 
+    m_runesState = 0;
     m_powerCost = 0;                                        // setup to correct value in Spell::prepare, don't must be used before.
     m_casttime = 0;                                         // setup to correct value in Spell::prepare, don't must be used before.
     m_timer = 0;                                            // will set to castime in prepare
@@ -2652,6 +2653,9 @@ void Spell::SendSpellStart()
     if(IsRangedSpell())
         castFlags |= CAST_FLAG_AMMO;
 
+    if(m_runesState)
+        castFlags |= CAST_FLAG_UNKNOWN10;
+
     Unit *target;
     if(!m_targets.getUnitTarget())
         target = m_caster;
@@ -2672,19 +2676,26 @@ void Spell::SendSpellStart()
 
     m_targets.write(&data);
 
-    if ( castFlags & CAST_FLAG_UNKNOWN6 )
+    if ( castFlags & CAST_FLAG_UNKNOWN6 )                   // predicted power?
         data << uint32(0);
 
-    if ( castFlags & CAST_FLAG_UNKNOWN7 )
+    if ( castFlags & CAST_FLAG_UNKNOWN7 )                   // rune cooldowns
     {
-        uint8 v1 = 0;
-        uint8 v2 = 0;
-        data << v1; // v1
-        data << v2; // v2
-        for(uint8 i = 0; i < 6; ++i)
-            if((1 << i) & v1)
-                if(!(1 << i) & v2)
-                    data << uint8(0);
+        uint8 v1 = 0;//m_runesState;
+        uint8 v2 = 0;//((Player*)m_caster)->GetRunesState();
+        data << uint8(v1);                                  // runes state before
+        data << uint8(v2);                                  // runes state after
+        for(uint8 i = 0; i < MAX_RUNES; ++i)
+        {
+            uint8 m = (1 << i);
+            if(m & v1)                                      // usable before...
+            {
+                if(!(m & v2))                               // ...but on cooldown now...
+                {
+                    data << uint8(0);                       // some unknown byte (time?)
+                }
+            }
+        }
     }
 
     if ( castFlags & CAST_FLAG_AMMO )
@@ -2709,7 +2720,14 @@ void Spell::SendSpellGo()
 
     uint32 castFlags = CAST_FLAG_UNKNOWN3;
     if(IsRangedSpell())
-        castFlags |= CAST_FLAG_AMMO;
+        castFlags |= CAST_FLAG_AMMO;                        // arrows/bullets visual
+
+    if(m_runesState)
+    {
+        castFlags |= CAST_FLAG_UNKNOWN10;                   // same as in SMSG_SPELL_START
+        castFlags |= CAST_FLAG_UNKNOWN6;                    // makes cooldowns visible
+        castFlags |= CAST_FLAG_UNKNOWN7;                    // rune cooldowns
+    }
 
     WorldPacket data(SMSG_SPELL_GO, 50);                    // guess size
     if(m_CastItem)
@@ -2727,19 +2745,26 @@ void Spell::SendSpellGo()
 
     m_targets.write(&data);
 
-    if ( castFlags & CAST_FLAG_UNKNOWN6 )                   // unknown wotlk
+    if ( castFlags & CAST_FLAG_UNKNOWN6 )                   // unknown wotlk, predicted power?
         data << uint32(0);
 
-    if ( castFlags & CAST_FLAG_UNKNOWN7 )
+    if ( castFlags & CAST_FLAG_UNKNOWN7 )                   // rune cooldowns?
     {
-        uint8 v1 = 0;
-        uint8 v2 = 0;
-        data << v1; // v1
-        data << v2; // v2
-        for(uint8 i = 0; i < 6; ++i)
-            if((1 << i) & v1)
-                if(!(1 << i) & v2)
-                    data << uint8(0);
+        uint8 v1 = m_runesState;
+        uint8 v2 = ((Player*)m_caster)->GetRunesState();
+        data << uint8(v1);                                  // runes state before
+        data << uint8(v2);                                  // runes state after
+        for(uint8 i = 0; i < MAX_RUNES; ++i)
+        {
+            uint8 m = (1 << i);
+            if(m & v1)                                      // usable before...
+            {
+                if(!(m & v2))                               // ...but on cooldown now...
+                {
+                    data << uint8(0);                       // some unknown byte (time?)
+                }
+            }
+        }
     }
 
     if ( castFlags & CAST_FLAG_UNKNOWN4 )                   // unknown wotlk
@@ -3204,6 +3229,8 @@ void Spell::TakeRunePower()
     if(!src || (src->NoRuneCost() && src->NoRunicPowerGain()))
         return;
 
+    m_runesState = plr->GetRunesState();                    // store previous state
+
     int32 runeCost[NUM_RUNE_TYPES];                         // blood, frost, unholy, death
 
     for(uint32 i = 0; i < RUNE_DEATH; ++i)
@@ -3223,7 +3250,7 @@ void Spell::TakeRunePower()
         }
     }
 
-    runeCost[RUNE_DEATH] = runeCost[RUNE_BLOOD] + runeCost[RUNE_FROST] + runeCost[RUNE_UNHOLY];
+    runeCost[RUNE_DEATH] = runeCost[RUNE_BLOOD] + runeCost[RUNE_UNHOLY] + runeCost[RUNE_FROST];
 
     if(runeCost[RUNE_DEATH] > 0)
     {

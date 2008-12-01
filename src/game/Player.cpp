@@ -18899,7 +18899,29 @@ void Player::SetTitle(CharTitlesEntry const* title)
 void Player::ConvertRune(uint8 index, uint8 newType)
 {
     SetCurrentRune(index, newType);
-    // SMSG_CONVERT_RUNE
+    
+    WorldPacket data(SMSG_CONVERT_RUNE, 2);
+    data << uint8(index);
+    data << uint8(newType);
+    GetSession()->SendPacket(&data);
+}
+
+void Player::ResyncRunes(uint8 count)
+{
+    WorldPacket data(SMSG_RESYNC_RUNES, count * 2);
+    for(uint32 i = 0; i < count; ++i)
+    {
+        data << uint8(GetCurrentRune(i));                   // rune type
+        data << uint8(255 - (GetRuneCooldown(i) * 51));     // passed cooldown time (0-255)
+    }
+    GetSession()->SendPacket(&data);
+}
+
+void Player::AddRunePower(uint8 index)
+{
+    WorldPacket data(SMSG_ADD_RUNE_POWER, 4);
+    data << uint32(1 << index);                             // mask (0x00-0x3F probably)
+    GetSession()->SendPacket(&data);
 }
 
 void Player::InitRunes()
@@ -18909,11 +18931,14 @@ void Player::InitRunes()
 
     m_runes = new Runes;
 
+    m_runes->runeState = 0;
+
     for(uint32 i = 0; i < MAX_RUNES; ++i)
     {
         SetBaseRune(i, i / 2);                              // init base types
         SetCurrentRune(i, i / 2);                           // init current types
         SetRuneCooldown(i, 0);                              // reset cooldowns
+        m_runes->SetRuneState(i);
     }
 
     for(uint32 i = 0; i < NUM_RUNE_TYPES; ++i)
