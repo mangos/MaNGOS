@@ -158,18 +158,20 @@ void WorldSession::HandleCharEnumOpcode( WorldPacket & /*recv_data*/ )
     //   ------- Query Without Declined Names --------
     //          0                1                2                3                      4                      5               6                     7                     8
         "SELECT characters.guid, characters.data, characters.name, characters.position_x, characters.position_y, characters.position_z, characters.map, characters.totaltime, characters.leveltime, "
-    //   9                    10                   11                     12
-        "characters.at_login, character_pet.entry, character_pet.modelid, character_pet.level "
+    //   9                    10                   11                     12                   13
+        "characters.at_login, character_pet.entry, character_pet.modelid, character_pet.level, guild_member.guildid "
         "FROM characters LEFT JOIN character_pet ON characters.guid=character_pet.owner AND character_pet.slot='0' "
+        "LEFT JOIN guild_member ON characters.guid = guild_member.guid "
         "WHERE characters.account = '%u' ORDER BY characters.guid"
         :
     //   --------- Query With Declined Names ---------
     //          0                1                2                3                      4                      5               6                     7                     8
         "SELECT characters.guid, characters.data, characters.name, characters.position_x, characters.position_y, characters.position_z, characters.map, characters.totaltime, characters.leveltime, "
-    //   9                    10                   11                     12                   13
-        "characters.at_login, character_pet.entry, character_pet.modelid, character_pet.level, genitive "
+    //   9                    10                   11                     12                   13                    14
+        "characters.at_login, character_pet.entry, character_pet.modelid, character_pet.level, guild_member.guildid, genitive "
         "FROM characters LEFT JOIN character_pet ON characters.guid = character_pet.owner AND character_pet.slot='0' "
         "LEFT JOIN character_declinedname ON characters.guid = character_declinedname.guid "
+        "LEFT JOIN guild_member ON characters.guid = guild_member.guid "
         "WHERE characters.account = '%u' ORDER BY characters.guid",
         GetAccountId());
 }
@@ -569,6 +571,22 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder * holder)
         DEBUG_LOG( "WORLD: Sent motd (SMSG_MOTD)" );
     }
 
+    //QueryResult *result = CharacterDatabase.PQuery("SELECT guildid,rank FROM guild_member WHERE guid = '%u'",pCurrChar->GetGUIDLow());
+    QueryResult *resultGuild = holder->GetResult(PLAYER_LOGIN_QUERY_LOADGUILD);
+
+    if(resultGuild)
+    {
+        Field *fields = resultGuild->Fetch();
+        pCurrChar->SetInGuild(fields[0].GetUInt32());
+        pCurrChar->SetRank(fields[1].GetUInt32());
+        delete resultGuild;
+    }
+    else if(pCurrChar->GetGuildId())                        // clear guild related fields in case wrong data about non existed membership
+    {
+        pCurrChar->SetInGuild(0);
+        pCurrChar->SetRank(0);
+    }
+
     if(pCurrChar->GetGuildId() != 0)
     {
         Guild* guild = objmgr.GetGuildById(pCurrChar->GetGuildId());
@@ -625,22 +643,6 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder * holder)
                 SendPacket( &data );
             }
         }
-    }
-
-    //QueryResult *result = CharacterDatabase.PQuery("SELECT guildid,rank FROM guild_member WHERE guid = '%u'",pCurrChar->GetGUIDLow());
-    QueryResult *resultGuild = holder->GetResult(PLAYER_LOGIN_QUERY_LOADGUILD);
-
-    if(resultGuild)
-    {
-        Field *fields = resultGuild->Fetch();
-        pCurrChar->SetInGuild(fields[0].GetUInt32());
-        pCurrChar->SetRank(fields[1].GetUInt32());
-        delete resultGuild;
-    }
-    else if(pCurrChar->GetGuildId())                        // clear guild related fields in case wrong data about non existed membership
-    {
-        pCurrChar->SetInGuild(0);
-        pCurrChar->SetRank(0);
     }
 
     if (!pCurrChar->GetMap()->Add(pCurrChar))

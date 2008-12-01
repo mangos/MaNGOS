@@ -1379,7 +1379,7 @@ void Player::BuildEnumData( QueryResult * result, WorldPacket * p_data )
     *p_data << GetPositionY();
     *p_data << GetPositionZ();
 
-    *p_data << GetUInt32Value(PLAYER_GUILDID);              // guild id
+    *p_data << (result ? result->Fetch()[13].GetUInt32() : 0);
 
     uint32 char_flags = 0;
     if(HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_HIDE_HELM))
@@ -1392,7 +1392,7 @@ void Player::BuildEnumData( QueryResult * result, WorldPacket * p_data )
         char_flags |= CHARACTER_FLAG_RENAME;
     // always send the flag if declined names aren't used
     // to let the client select a default method of declining the name
-    if(!sWorld.getConfig(CONFIG_DECLINED_NAMES_USED) || (result && result->Fetch()[13].GetCppString() != ""))
+    if(!sWorld.getConfig(CONFIG_DECLINED_NAMES_USED) || (result && result->Fetch()[14].GetCppString() != ""))
         char_flags |= CHARACTER_FLAG_DECLINED;
 
     *p_data << (uint32)char_flags;                          // character flags
@@ -15357,7 +15357,8 @@ void Player::SaveToDB()
 void Player::SaveInventoryAndGoldToDB()
 {
     _SaveInventory();
-    SetUInt32ValueInDB(PLAYER_FIELD_COINAGE,GetMoney(),GetGUID());
+    //money is in data field
+    SaveDataFieldToDB();
 }
 
 void Player::_SaveActions()
@@ -15745,6 +15746,20 @@ void Player::SavePositionInDB(uint32 mapid, float x,float y,float z,float o,uint
         << "',zone='"<<zone<<"',trans_x='0',trans_y='0',trans_z='0',"
         << "transguid='0',taxi_path='' WHERE guid='"<< GUID_LOPART(guid) <<"'";
     sLog.outDebug(ss.str().c_str());
+    CharacterDatabase.Execute(ss.str().c_str());
+}
+
+void Player::SaveDataFieldToDB()
+{
+    std::ostringstream ss;
+    ss<<"UPDATE characters SET data='";
+
+    for(uint16 i = 0; i < m_valuesCount; i++ )
+    {
+        ss << GetUInt32Value(i) << " ";
+    }
+    ss<<"' WHERE guid='"<< GUID_LOPART(GetGUIDLow()) <<"'";
+
     CharacterDatabase.Execute(ss.str().c_str());
 }
 
