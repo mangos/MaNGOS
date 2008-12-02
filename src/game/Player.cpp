@@ -1839,7 +1839,8 @@ void Player::RegenerateAll()
         if (!isInCombat() && !HasAuraType(SPELL_AURA_INTERRUPT_REGEN))
         {
             Regenerate(POWER_RAGE);
-            Regenerate(POWER_RUNIC_POWER);
+            if(getClass() == CLASS_DEATH_KNIGHT)
+                Regenerate(POWER_RUNIC_POWER);
         }
     }
 
@@ -1847,7 +1848,8 @@ void Player::RegenerateAll()
 
     Regenerate( POWER_MANA );
 
-    Regenerate( POWER_RUNE );
+    if(getClass() == CLASS_DEATH_KNIGHT)
+        Regenerate( POWER_RUNE );
 
     m_regenTimer = regenDelay;
 }
