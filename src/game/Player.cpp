@@ -17987,7 +17987,7 @@ void Player::SendAurasForTarget(Unit *target)
                     // level
                     data << uint8(aura->GetAuraLevel());
                     // charges
-                    data << uint8(aura->m_procCharges);
+                    data << uint8(aura->m_procCharges >= 0 ? aura->m_procCharges : 0 );
 
                     if(!(auraFlags & AFLAG_NOT_CASTER))
                     {

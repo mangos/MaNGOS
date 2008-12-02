@@ -423,7 +423,7 @@ m_periodicTimer(0), m_PeriodicEventId(0), m_AuraDRGroup(DIMINISHING_NONE)
             modOwner->ApplySpellMod(GetId(), SPELLMOD_CHARGES, m_procCharges);
     }
     else
-        m_procCharges = 0;
+        m_procCharges = -1;
 
     m_isRemovedOnShapeLost = (m_caster_guid==m_target->GetGUID() && m_spellProto->Stances &&
                             !(m_spellProto->AttributesEx2 & 0x80000) && !(m_spellProto->Attributes & 0x10000));
@@ -1124,7 +1124,7 @@ void Aura::SendAuraUpdate(bool remove)
     uint8 auraFlags = GetAuraFlags();
     data << uint8(auraFlags);
     data << uint8(GetAuraLevel());
-    data << uint8(GetAuraCharges());
+    data << uint8(m_procCharges >= 0 ? m_procCharges : 0);
 
     if(!(auraFlags & AFLAG_NOT_CASTER))
     {
