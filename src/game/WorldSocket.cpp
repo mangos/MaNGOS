@@ -52,8 +52,48 @@
 
 struct ServerPktHeader
 {
-    uint16 size;
-    uint16 cmd;
+    /**
+     * size is the length of the payload _plus_ the length of the opcode
+     */
+    ServerPktHeader(uint32 size, uint16 cmd) : size(size)
+    {
+        uint8 headerIndex=0;
+        if(isLargePacket())
+        {
+            sLog.outDebug("initializing large server to client packet. Size: %u, cmd: %u", size, cmd);
+            header= new uint8[5];
+            header[headerIndex++] = 0x80|(0xFF &(size>>16));
+        }
+        else
+        {
+            header= new uint8[4];
+        }
+
+        header[headerIndex++] = 0xFF &(size>>8);
+        header[headerIndex++] = 0xFF &size;
+
+        header[headerIndex++] = 0xFF & cmd;
+        header[headerIndex++] = 0xFF & (cmd>>8);
+    }
+
+    ~ServerPktHeader()
+    {
+        delete[] header;
+    }
+
+    uint8 getHeaderLength()
+    {
+        // cmd = 2 bytes, size= 2||3bytes
+        return 2+(isLargePacket()?3:2);
+    }
+
+    bool isLargePacket()
+    {
+        return size > 0x7FFF;
+    }
+
+    const uint32 size;
+    uint8 *header;
 };
 
 struct ClientPktHeader
@@ -961,23 +1001,17 @@ int WorldSocket::HandlePing (WorldPacket& recvPacket)
 
 int WorldSocket::iSendPacket (const WorldPacket& pct)
 {
-    if (m_OutBuffer->space () < pct.size () + sizeof (ServerPktHeader))
+    ServerPktHeader header(pct.size()+2, pct.GetOpcode());
+    if (m_OutBuffer->space () < pct.size () + header.getHeaderLength())
     {
         errno = ENOBUFS;
         return -1;
     }
 
-    ServerPktHeader header;
 
-    header.cmd = pct.GetOpcode ();
-    EndianConvert(header.cmd);
+    m_Crypt.EncryptSend ( header.header, header.getHeaderLength());
 
-    header.size = (uint16) pct.size () + 2;
-    EndianConvertReverse(header.size);
-
-    m_Crypt.EncryptSend ((uint8*) & header, sizeof (header));
-
-    if (m_OutBuffer->copy ((char*) & header, sizeof (header)) == -1)
+    if (m_OutBuffer->copy ((char*) header.header, header.getHeaderLength()) == -1)
         ACE_ASSERT (false);
 
     if (!pct.empty ())
