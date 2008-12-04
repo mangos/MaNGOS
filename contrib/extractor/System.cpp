@@ -31,6 +31,7 @@ map_id * map_ids;
 uint16 * areas;
 char output_path[128]=".";
 char input_path[128]=".";
+uint32 maxAreaId = 0;
 
 enum Extract
 {
@@ -145,6 +146,8 @@ void ReadAreaTableDBC()
     memset(areas, 0xff, sizeof(areas));
     for(unsigned int x=0; x<area_count;++x)
         areas[dbc.getRecord(x).getUInt(0)] = dbc.getRecord(x).getUInt(3);
+
+    maxAreaId = dbc.getMaxId();
 
     printf("Done! (%u areas loaded)\n", area_count);
 }

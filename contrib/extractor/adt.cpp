@@ -17,7 +17,9 @@
 
 //#include <windows.h>
 unsigned int iRes=256;
-extern uint16*areas;
+extern uint16 *areas;
+
+extern uint32 maxAreaId;
 
 vec wmoc;
 
@@ -409,7 +411,7 @@ bool ConvertADT(char * filename,char * filename2)
     {
         for(unsigned int y=0;y<16;y++)
         {
-            if(mcells->ch[y][x].area_id && mcells->ch[y][x].area_id < 0x102D)
+            if(mcells->ch[y][x].area_id && mcells->ch[y][x].area_id <= maxAreaId)
             {
                 if(areas[mcells->ch[y][x].area_id]==0xffff)
                     printf("\nCan't find area flag for areaid %u.\n",mcells->ch[y][x].area_id);
