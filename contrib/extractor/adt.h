@@ -105,7 +105,7 @@ class MPQFile;
 bool MH2O_presence;
 MH2O_offsData *LiqOffsData;
 MH2O_Data1 *LiqChunkData1;
-float *ChunkLiqHeght, *MapLiqHeight;
+float *ChunkLiqHeight, *MapLiqHeight;
 char* MapLiqFlag;
 uint32 k, m, chunk_num;
 void LoadMapChunk(MPQFile &, chunk*);

@@ -15,7 +15,6 @@
 #include "adt.h"
 #include "mpq_libmpq.h"
 
-//#include <windows.h>
 unsigned int iRes=256;
 extern uint16 *areas;
 
@@ -64,7 +63,7 @@ bool LoadADT(char* filename)
         //if(fourcc==0x4d564552)                            // MVER
         if(fourcc==0x4d43494e)                              // MCIN
         {
-            for (int i=0; i<256; i++)
+            for (int i=0; i<256; ++i)
             {
                 mf.read(&mcnk_offsets[i],4);
                 mf.read(&mcnk_sizes[i],4);
@@ -86,40 +85,41 @@ bool LoadADT(char* filename)
             uint32 header_pos = 0;
             LiqOffsData = new MH2O_offsData;
             LiqChunkData1 = new MH2O_Data1;
-            ChunkLiqHeght = new float[81];
-            for(;chunk_num < 256; chunk_num++)
+            ChunkLiqHeight = new float[81];
+            for(;chunk_num < 256; ++chunk_num)
             {
                 mf.read(LiqOffsData,12);
                 header_pos = mf.getPos();
                 if(LiqOffsData->offsData1 !=0)              // если данные в Data1 о воде есть, то их надо конвертировать
                 {
-                    mf.seek(base_pos + LiqOffsData->offsData1);// переходим по смещению из offsData1 ОТ НАЧАЛА куска
+                    // переходим по смещению из offsData1 ОТ НАЧАЛА куска
+                    mf.seek(base_pos + LiqOffsData->offsData1);
                     mf.read(LiqChunkData1,24);              // считываем сами данные в структуру типа MH2O_Data1
                     // заносим данные флага для куска
                     if(LiqChunkData1->flags & 4 || LiqChunkData1->flags & 8)
-                        MapLiqFlag[chunk_num] |=1;
+                        MapLiqFlag[chunk_num] |= 1;
                     if(LiqChunkData1->flags & 16)
-                        MapLiqFlag[chunk_num] |=2;
+                        MapLiqFlag[chunk_num] |= 2;
                     // предварительно заполняем весь кусок данными - нет воды
-                    for(int j=0;j<81;j++)
+                    for(int j=0;j<81;++j)
                     {
-                        ChunkLiqHeght[j] = -999999;         // no liquid/water
+                        ChunkLiqHeight[j] = -999999;        // no liquid/water
                     }
                     // теперь вычисляем те что с водой и перезаписываем их в куске 
-                    for(int b=0; b <= LiqChunkData1->height; b++)
+                    for(int b=0; b <= LiqChunkData1->height; ++b)
                     {
-                        for(int c=LiqChunkData1->xOffset; c <= (LiqChunkData1->xOffset+LiqChunkData1->width); c++)
+                        for(int c=LiqChunkData1->xOffset; c <= (LiqChunkData1->xOffset+LiqChunkData1->width); ++c)
                         {
                             int n = (9*(LiqChunkData1->yOffset + b))+c;
-                            ChunkLiqHeght[n] = LiqChunkData1->heightLevel1;
+                            ChunkLiqHeight[n] = LiqChunkData1->heightLevel1;
                         }
                     }
                     mf.seek(header_pos);                    // и не забыть вернуться на исходную позицию именно В ХИДЕРЕ
                 }
                 else                                        // если данных в Data1 нет, то надо заполнить весь кусок, но данными - нет воды
                 {
-                    for(int j=0; j<81; j++)
-                        ChunkLiqHeght[j] = -999999;         // no liquid/water
+                    for(int j=0; j<81; ++j)
+                        ChunkLiqHeight[j] = -999999;        // no liquid/water
                 }
                 if(!(chunk_num%16))
                     m = 1024*(chunk_num/16);                // смещение по рядам кусков с перекрытием = 1024
@@ -128,17 +128,17 @@ bool LoadADT(char* filename)
                 // это аналог старого обрезания граничных правых-боковых и нижних данных
                 for(int p=0;p<72;p+=9)                      // нижние 8 не заносим тк они дублируется след куском
                 {
-                    for(int s=0; s<8; s++)                  // 9 значение в строке не заносим тк оно дублируется след куском, а в правых-боковых обрезается для 128х128
+                    for(int s=0; s<8; ++s)                  // 9 значение в строке не заносим тк оно дублируется след куском, а в правых-боковых обрезается для 128х128
                     {
-                        MapLiqHeight[k] = ChunkLiqHeght[p+s];// :)
-                        k++;
+                        MapLiqHeight[k] = ChunkLiqHeight[p+s];
+                        ++k;
                     }
                     k=k+120;
                 }
             }
             delete LiqOffsData;
             delete LiqChunkData1;
-            delete []ChunkLiqHeght;
+            delete []ChunkLiqHeight;
 
         }
         //case 0x4d434e4b:                                  // MCNK
@@ -149,13 +149,13 @@ bool LoadADT(char* filename)
 
     //printf("Loading chunks info\n");
     // read individual map chunks
-    for (int j=0; j<16; j++)
+    for (int j=0; j<16; ++j)
     {
-        for (int i=0; i<16; i++)
+        for (int i=0; i<16; ++i)
         {
             mf.seek((int)mcnk_offsets[j*16+i]);
             LoadMapChunk(mf,&(mcells->ch[i][j]));
-            chunk_num++;
+            ++chunk_num;
         }
     }
     mf.close();
@@ -171,8 +171,7 @@ bool isHole(int holes, int i, int j)
     return (holes & holetab_h[testi] & holetab_v[testj])!=0;
 }
 
-inline
-void LoadMapChunk(MPQFile & mf, chunk*_chunk)
+inline void LoadMapChunk(MPQFile & mf, chunk*_chunk)
 {
     float h;
     uint32 fourcc;
@@ -196,8 +195,7 @@ void LoadMapChunk(MPQFile & mf, chunk*_chunk)
     int chunkflags = header.flags;
     float zmin=999999999.0f;
     float zmax=-999999999.0f;
-    //must be there, bl!zz uses some crazy format
-    //int nTextures;
+    // must be there, bl!zz uses some crazy format
     while (mf.getPos() < lastpos)
     {
         mf.read(&fourcc,4);
@@ -205,8 +203,8 @@ void LoadMapChunk(MPQFile & mf, chunk*_chunk)
         size_t nextpos = mf.getPos()  + size;
         if(fourcc==0x4d435654)                              // MCVT
         {
-            for (int j=0; j<17; j++)
-                for (int i=0; i<((j%2)?8:9); i++)
+            for (int j=0; j<17; ++j)
+                for (int i=0; i<((j%2)?8:9); ++i)
                 {
                     mf.read(&h,4);
                     float z=h+ybase;
@@ -236,32 +234,31 @@ void LoadMapChunk(MPQFile & mf, chunk*_chunk)
         else if(fourcc==0x4d434c51 && !MH2O_presence)       // не будем учитывать если уже были данные в MH2O, перестраховка :)                      // MCLQ
         {
             // liquid / water level
-            //bool haswater;
             char fcc1[5];
             mf.read(fcc1,4);
             flipcc(fcc1);
             fcc1[4]=0;
-            ChunkLiqHeght = new float[81];
+            ChunkLiqHeight = new float[81];
 
             if (!strcmp(fcc1,"MCSE"))
             {
-                for(int j=0;j<81;j++)
+                for(int j=0;j<81;++j)
                 {
-                    ChunkLiqHeght[j] = -999999;             // no liquid/water
+                    ChunkLiqHeight[j] = -999999;            // no liquid/water
                 }
             }
             else
             {
                 float maxheight;
                 mf.read(&maxheight, 4);
-                for(int j=0;j<81;j++)
+                for(int j=0;j<81;++j)
                 {
                     mf.read(&h, 4);
                     mf.read(&h, 4);
                     if(h > maxheight)
-                        ChunkLiqHeght[j] = -999999;
+                        ChunkLiqHeight[j] = -999999;
                     else
-                        ChunkLiqHeght[j] = h;
+                        ChunkLiqHeight[j] = h;
                 }
 
                 if(chunkflags & 4 || chunkflags & 8)
@@ -276,14 +273,14 @@ void LoadMapChunk(MPQFile & mf, chunk*_chunk)
             
             for(int p=0;p<72;p+=9)
             {
-                for(int s=0; s<8; s++)
+                for(int s=0; s<8; ++s)
                 {
-                    MapLiqHeight[k] = ChunkLiqHeght[p+s];   // :)
-                    k++;    
+                    MapLiqHeight[k] = ChunkLiqHeight[p+s];
+                    ++k;    
                 }
                 k=k+120;
             }
-            delete []ChunkLiqHeght;
+            delete []ChunkLiqHeight;
             break;
         }
         mf.seek(nextpos);
@@ -296,19 +293,18 @@ double solve (vec *v,vec *p)
     double b = v[0].z *(v[1].x - v[2].x) + v[1].z *(v[2].x - v[0].x) + v[2].z *(v[0].x - v[1].x);
     double c = v[0].x *(v[1].y - v[2].y) + v[1].x *(v[2].y - v[0].y) + v[2].x *(v[0].y - v[1].y);
     double d = v[0].x *(v[1].y*v[2].z - v[2].y*v[1].z) + v[1].x* (v[2].y*v[0].z - v[0].y*v[2].z) + v[2].x* (v[0].y*v[1].z - v[1].y*v[0].z);
-    //-d
+    // -d
 
-    //plane equation ax+by+cz+d=0
+    // plane equation ax+by+cz+d=0
     return ((a*p->x+c*p->z-d)/b);
 }
 
-inline
-double GetZ(double x,double z)
+inline double GetZ(double x, double z)
 {
     vec v[3];
     vec p;
     {
-        //find out quadrant
+        // find out quadrant
         int xc=(int)(x/UNITSIZE);
         int zc=(int)(z/UNITSIZE);
         if(xc>127)xc=127;
@@ -353,27 +349,26 @@ double GetZ(double x,double z)
     }
 }
 
-inline
-void TransformData()
+inline void TransformData()
 {
     cell= new Cell;
 
-    for(int x=0;x<128;x++)
+    for(int x=0;x<128;++x)
     {
-        for(int y=0;y<128;y++)
+        for(int y=0;y<128;++y)
         {
             cell->v8[x][y] = (float)mcells->ch[x/8][y/8].v8[x%8][y%8];
             cell->v9[x][y] = (float)mcells->ch[x/8][y/8].v9[x%8][y%8];
         }
 
-        //extra 1 point on bounds
+        // extra 1 point on bounds
         cell->v9[x][128] = (float)mcells->ch[x/8][15].v9[x%8][8];
-        //x==y
+        // x==y
         cell->v9[128][x] = (float)mcells->ch[15][x/8].v9[8][x%8];
 
     }
 
-    //and the last 1
+    // and the last 1
     cell->v9[128][128] = (float)mcells->ch[15][15].v9[8][8];
 
     delete mcells;
@@ -385,8 +380,10 @@ bool ConvertADT(char * filename,char * filename2)
 {
     MapLiqHeight = new float[16384];
     MapLiqFlag = new char[256];
-    for(int j=0; j<256; j++)
+    for(int j = 0; j < 256; ++j)
         MapLiqFlag[j] = 0;
+    for(int j = 0; j < 16384; ++j)
+        MapLiqHeight[j] = -999999;
 
     if(!LoadADT(filename))
     {
@@ -407,9 +404,9 @@ bool ConvertADT(char * filename,char * filename2)
     // write magic header
     fwrite(MAP_MAGIC,1,8,output);
 
-    for(unsigned int x=0;x<16;x++)
+    for(unsigned int x=0;x<16;++x)
     {
-        for(unsigned int y=0;y<16;y++)
+        for(unsigned int y=0;y<16;++y)
         {
             if(mcells->ch[y][x].area_id && mcells->ch[y][x].area_id <= maxAreaId)
             {
@@ -426,22 +423,24 @@ bool ConvertADT(char * filename,char * filename2)
         }
     }
 
-    fwrite(MapLiqFlag,1,256,output);                        //!!!!!!!!
+    fwrite(MapLiqFlag,1,256,output);
     delete [] MapLiqFlag;
     
-    fwrite(MapLiqHeight,sizeof(float),16384,output);        //!!!!!!!!
+    fwrite(MapLiqHeight,sizeof(float),16384,output);
     delete [] MapLiqHeight;
     
     TransformData();
 
-    for(unsigned int x=0;x<iRes;x++)
-    for(unsigned int y=0;y<iRes;y++)
+    for(unsigned int x=0;x<iRes;++x)
     {
-        float z=(float)GetZ(
-                    (((double)(y))*TILESIZE)/((double)(iRes-1)),
-                    (((double)(x))*TILESIZE)/((double)(iRes-1)));
+        for(unsigned int y=0;y<iRes;++y)
+        {
+            float z=(float)GetZ(
+                (((double)(y))*TILESIZE)/((double)(iRes-1)),
+                (((double)(x))*TILESIZE)/((double)(iRes-1)));
 
-        fwrite(&z,1,sizeof(z),output);
+            fwrite(&z,1,sizeof(z),output);
+        }
     }
 
     fclose(output);
