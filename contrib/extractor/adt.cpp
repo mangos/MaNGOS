@@ -204,6 +204,7 @@ inline void LoadMapChunk(MPQFile & mf, chunk*_chunk)
         if(fourcc==0x4d435654)                              // MCVT
         {
             for (int j=0; j<17; ++j)
+            {
                 for (int i=0; i<((j%2)?8:9); ++i)
                 {
                     mf.read(&h,4);
@@ -226,6 +227,7 @@ inline void LoadMapChunk(MPQFile & mf, chunk*_chunk)
                     if(z>zmax)zmax=z;
                     //if(z<zmin)zmin=z;
                 }
+            }
         }
         else if(fourcc==0x4d434e52)                         // MCNR
         {

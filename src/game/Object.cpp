@@ -1119,6 +1119,19 @@ bool WorldObject::IsWithinDistInMap(const WorldObject* obj, const float dist2com
     return distsq < maxdist * maxdist;
 }
 
+bool WorldObject::IsWithinDistInMap2d(const WorldObject* obj, const float dist2compare) const
+{
+    if (!obj || !IsInMap(obj)) return false;
+
+    float dx = GetPositionX() - obj->GetPositionX();
+    float dy = GetPositionY() - obj->GetPositionY();
+    float distsq = dx*dx + dy*dy;
+    float sizefactor = GetObjectSize() + obj->GetObjectSize();
+    float maxdist = dist2compare + sizefactor;
+
+    return distsq < maxdist * maxdist;
+}
+
 bool WorldObject::IsWithinLOSInMap(const WorldObject* obj) const
 {
     if (!IsInMap(obj)) return false;

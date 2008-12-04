@@ -1139,7 +1139,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void SetVisibility(UnitVisibility x);
 
         // common function for visibility checks for player/creatures with detection code
-        bool isVisibleForOrDetect(Unit const* u, bool detect, bool inVisibleList = false) const;
+        bool isVisibleForOrDetect(Unit const* u, bool detect, bool inVisibleList = false, bool is2dDistance = false) const;
         bool canDetectInvisibilityOf(Unit const* u) const;
 
         // virtual functions for all world objects types
