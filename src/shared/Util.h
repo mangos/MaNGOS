@@ -287,7 +287,7 @@ bool Utf8FitTo(std::string str, std::wstring search);
 #if PLATFORM == PLATFORM_WINDOWS
 #define UTF8PRINTF(OUT,FRM,RESERR)                      \
 {                                                       \
-    char temp_buf[6000];                                \
+    char temp_buf[32*1024];                             \
     va_list ap;                                         \
     va_start(ap, FRM);                                  \
     size_t temp_len = vsnprintf(temp_buf,6000,FRM,ap);  \

@@ -28,15 +28,9 @@
 
 struct CriteriaProgress
 {
-    CriteriaProgress(uint32 id, uint32 counter, time_t date = time(NULL))
-    {
-        this->id = id;
-        this->counter = counter;
-        this->date = date;
-    }
-    uint32 id;
     uint32 counter;
     time_t date;
+    bool changed;
 };
 
 struct CriteriaCastSpellRequirement
@@ -54,8 +48,14 @@ struct AchievementReward
     uint32 itemId;
 };
 
-typedef UNORDERED_MAP<uint32, CriteriaProgress*> CriteriaProgressMap;
-typedef UNORDERED_MAP<uint32, time_t> CompletedAchievementMap;
+struct CompletedAchievementData
+{
+    time_t date;
+    bool changed;
+};
+
+typedef UNORDERED_MAP<uint32, CriteriaProgress> CriteriaProgressMap;
+typedef UNORDERED_MAP<uint32, CompletedAchievementData> CompletedAchievementMap;
 
 class Unit;
 class Player;
@@ -84,7 +84,7 @@ class AchievementMgr
 
     private:
         void SendAchievementEarned(AchievementEntry const* achievement);
-        void SendCriteriaUpdate(CriteriaProgress *progress);
+        void SendCriteriaUpdate(uint32 id, CriteriaProgress const* progress);
         void SetCriteriaProgress(AchievementCriteriaEntry const* entry, uint32 newValue, bool relative=false);
         void CompletedCriteria(AchievementCriteriaEntry const* entry);
         void CompletedAchievement(AchievementEntry const* entry);

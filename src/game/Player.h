@@ -245,7 +245,7 @@ struct RuneInfo
 
 struct Runes
 {
-    RuneInfo runes[6];
+    RuneInfo runes[MAX_RUNES];
     uint8 runeState;                                        // mask of available runes
 
     void SetRuneState(uint8 index, bool set = true)
