@@ -1775,7 +1775,7 @@ bool Creature::IsOutOfThreatArea(Unit* pVictim) const
     if(!pVictim->isInAccessablePlaceFor(this))
         return true;
 
-    if(sMapStore.LookupEntry(GetMapId())->Instanceable())
+    if(sMapStore.LookupEntry(GetMapId())->IsDungeon())
         return false;
 
     float length = pVictim->GetDistance(CombatStartX,CombatStartY,CombatStartZ);

@@ -6320,7 +6320,7 @@ bool ObjectMgr::LoadMangosStrings(DatabaseType& db, char const* table, int32 min
         bar.step();
 
         sLog.outString("");
-        if(min_value > 0)                                   // error only in case internal strings
+        if(min_value == MIN_MANGOS_STRING_ID)               // error only in case internal strings
             sLog.outErrorDb(">> Loaded 0 mangos strings. DB table `%s` is empty. Cannot continue.",table);
         else
             sLog.outString(">> Loaded 0 string templates. DB table `%s` is empty.",table);
@@ -6386,7 +6386,7 @@ bool ObjectMgr::LoadMangosStrings(DatabaseType& db, char const* table, int32 min
     delete result;
 
     sLog.outString();
-    if(min_value > 0)                                       // internal mangos strings
+    if(min_value == MIN_MANGOS_STRING_ID)               // error only in case internal strings
         sLog.outString( ">> Loaded %u MaNGOS strings from table %s", count,table);
     else
         sLog.outString( ">> Loaded %u string templates from %s", count,table);
@@ -7256,7 +7256,7 @@ void ObjectMgr::CheckScripts(ScriptMapMap const& scripts,std::set<int32>& ids)
             if(itrM->second.dataint)
             {
                 if(!GetMangosStringLocale (itrM->second.dataint))
-                    sLog.outErrorDb( "Table `db_script_string` has not existed string id  %u", *itrM);
+                    sLog.outErrorDb( "Table `db_script_string` has not existed string id  %u", itrM->first);
 
                 if(ids.count(itrM->second.dataint))
                     ids.erase(itrM->second.dataint);

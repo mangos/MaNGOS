@@ -103,13 +103,13 @@ void BattleGroundQueue::AddPlayer(Player *plr, uint32 bgTypeId)
         if(sWorld.getConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_PLAYERONLY))
         {
             ChatHandler(plr).PSendSysMessage(LANG_BG_QUEUE_ANNOUNCE_SELF,
-                bgName, q_min_level, q_max_level, qAlliance, MinPlayers - qAlliance, qHorde, MinPlayers - qHorde);
+                bgName, q_min_level, q_max_level, qAlliance, (MinPlayers > qAlliance) ? (MinPlayers - qAlliance) : 0, qHorde, (MinPlayers > qHorde) ? (MinPlayers - qHorde) : 0);
         }
         // System message
         else
         {
             sWorld.SendWorldText(LANG_BG_QUEUE_ANNOUNCE_WORLD,
-                bgName, q_min_level, q_max_level, qAlliance, MinPlayers - qAlliance, qHorde, MinPlayers - qHorde);
+                bgName, q_min_level, q_max_level, qAlliance, (MinPlayers > qAlliance) ? (MinPlayers - qAlliance) : 0, qHorde, (MinPlayers > qHorde) ? (MinPlayers - qHorde) : 0);
         }
     }
 }

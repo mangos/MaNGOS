@@ -21,7 +21,7 @@
 
 DROP TABLE IF EXISTS `character_db_version`;
 CREATE TABLE `character_db_version` (
-  `required_2008_11_12_01_character_character_aura` bit(1) default NULL
+  `required_2008_12_03_01_character_guild_member` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Last applied sql update to DB';
 
 --
@@ -938,7 +938,7 @@ CREATE TABLE `guild_member` (
   `BankRemSlotsTab5` int(11) unsigned NOT NULL default '0',
   KEY `guildid_key` (`guildid`),
   KEY `guildid_rank_key` (`guildid`,`rank`),
-  KEY `guid_key` (`guid`)
+  UNIQUE KEY `guid_key` (`guid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Guild System';
 
 --

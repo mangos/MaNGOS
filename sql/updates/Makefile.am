@@ -138,6 +138,9 @@ pkgdata_DATA = \
 	2008_11_18_01_mangos_creature_movement.sql \
 	2008_11_18_02_mangos_mangos_string.sql \
 	2008_11_27_01_mangos_playercreateinfo_item.sql \
+	2008_11_29_01_mangos_spell_proc_event.sql \
+	2008_11_29_02_mangos_spell_elixir.sql \
+	2008_12_03_01_character_guild_member.sql \
 	README
 
 ## Additional files to include when running 'make dist'
@@ -257,4 +260,7 @@ EXTRA_DIST = \
 	2008_11_18_01_mangos_creature_movement.sql \
 	2008_11_18_02_mangos_mangos_string.sql \
 	2008_11_27_01_mangos_playercreateinfo_item.sql \
+	2008_11_29_01_mangos_spell_proc_event.sql \
+	2008_11_29_02_mangos_spell_elixir.sql \
+	2008_12_03_01_character_guild_member.sql \
 	README

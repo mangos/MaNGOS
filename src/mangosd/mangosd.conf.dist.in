@@ -419,17 +419,48 @@ LogColors = ""
 #        Change not recommended
 #        Default: 70
 #
+#    StartPlayerLevel
+#        Staring level that have character at creating (in range 1 to MaxPlayerLevel)
+#        Default: 1
+#
+#    StartPlayerMoney
+#        Amount of money that new players will start with.
+#        If you want to start with silver, use for example 100 (100 copper = 1 silver)
+#        Default: 0
+#
 #    MaxHonorPoints
 #        Max honor points that player can have.
 #        Default: 75000
+#
+#    StartHonorPoints
+#        Amount of honor that new players will start with
+#        Default: 0
 #
 #    MaxArenaPoints
 #        Max arena points that player can have.
 #        Default: 5000
 #
-#    StartPlayerLevel
-#        Staring level that have character at creating (in range 1 to MaxPlayerLevel)
-#        Default: 1
+#    StartArenaPoints
+#        Amount of arena points that new players will start with
+#        Default: 0
+#
+#    InstantLogout
+#        Enable or disable instant logout for security level (0..4) or high (NOT in combat/while dueling/while falling)
+#        Default: 1 (Mods/GMs/Admins)
+#
+#    DisableWaterBreath
+#        Disable/enable waterbreathing for security level (0..4) or high
+#        Default: 4 (None)
+#
+#    AllFlightPaths
+#        Players will start with all flight paths (Note: ALL flight paths, not only player's team)
+#        Default: 0 (true)
+#                 1 (false)
+#
+#    AlwaysMaxSkillForLevel
+#        Players will automatically gain max level dependent (weapon/defense) skill when logging in, leveling up etc.
+#        Default: 0 (true)
+#                 1 (false)
 #
 #    ActivateWeather
 #        Activate weather system
@@ -536,9 +567,16 @@ CharactersPerAccount = 50
 CharactersPerRealm = 10
 SkipCinematics = 0
 MaxPlayerLevel = 70
-MaxHonorPoints = 75000
-MaxArenaPoints = 5000
 StartPlayerLevel = 1
+StartPlayerMoney = 0
+MaxHonorPoints = 75000
+StartHonorPoints = 0
+MaxArenaPoints = 5000
+StartArenaPoints = 0
+InstantLogout = 1
+DisableWaterBreath = 4
+AllFlightPaths = 0
+AlwaysMaxSkillForLevel = 0
 ActivateWeather = 1
 Battleground.CastDeserter = 1
 Battleground.QueueAnnouncer.Enable = 1
@@ -798,15 +836,20 @@ Channel.SilentlyGMJoin = 0
 #        Default: 1 (include)
 #                 0 (not include)
 #
+#    GM.StartLevel
+#        GM starting level (1-255)
+#        Default: 1
+#
 ###################################################################################################################
 
 GM.LoginState     = 2
 GM.AcceptTickets  = 2
 GM.Chat           = 2
 GM.WhisperingTo   = 2
-GM.InGMList = 0
-GM.InWhoList = 0
-GM.LogTrade = 1
+GM.InGMList       = 0
+GM.InWhoList      = 0
+GM.LogTrade       = 1
+GM.StartLevel     = 1
 
 ###################################################################################################################
 # VISIBILITY AND RADIUSES
@@ -820,9 +863,9 @@ GM.LogTrade = 1
 #    Visibility.Distance.Creature
 #    Visibility.Distance.Player
 #        Visibility distance for different in game object
-#        Max limited by active player zone: ~ 166
+#        Max limited by active player zone: ~ 333
 #        Min limit dependent from objects
-#        Default: 66 (cell size)
+#        Default: 132 (cell size)
 #        Min limit is max aggro radius (45) * Rate.Creature.Aggro
 #
 #    Visibility.Distance.Object
@@ -848,10 +891,10 @@ GM.LogTrade = 1
 ###################################################################################################################
 
 Visibility.GroupMode = 0
-Visibility.Distance.Creature      = 66
-Visibility.Distance.Player        = 66
-Visibility.Distance.Object        = 66
-Visibility.Distance.InFlight      = 66
+Visibility.Distance.Creature      = 132
+Visibility.Distance.Player        = 132
+Visibility.Distance.Object        = 132
+Visibility.Distance.InFlight      = 132
 Visibility.Distance.Grey.Unit   = 1
 Visibility.Distance.Grey.Object = 10
 
