@@ -2507,13 +2507,13 @@ void Spell::finish(bool ok)
 
     m_spellState = SPELL_STATE_FINISHED;
 
-    //remove spell mods
-    if (m_caster->GetTypeId() == TYPEID_PLAYER)
-        ((Player*)m_caster)->RemoveSpellMods(this);
-
     // other code related only to successfully finished spells
     if(!ok)
         return;
+
+    //remove spell mods
+    if (m_caster->GetTypeId() == TYPEID_PLAYER)
+        ((Player*)m_caster)->RemoveSpellMods(this);
 
     //handle SPELL_AURA_ADD_TARGET_TRIGGER auras
     Unit::AuraList const& targetTriggers = m_caster->GetAurasByType(SPELL_AURA_ADD_TARGET_TRIGGER);
@@ -2553,10 +2553,11 @@ void Spell::finish(bool ok)
     // Clear combo at finish state
     if(m_caster->GetTypeId() == TYPEID_PLAYER && NeedsComboPoints(m_spellInfo))
     {
-        // Not drop combopoints if any miss exist
+        // Not drop combopoints if negative spell and if any miss on enemy exist
         bool needDrop = true;
+        if (!IsPositiveSpell(m_spellInfo->Id))
         for(std::list<TargetInfo>::iterator ihit= m_UniqueTargetInfo.begin();ihit != m_UniqueTargetInfo.end();++ihit)
-            if (ihit->missCondition != SPELL_MISS_NONE)
+            if (ihit->missCondition != SPELL_MISS_NONE && ihit->targetGUID!=m_caster->GetGUID())
             {
                 needDrop = false;
                 break;
