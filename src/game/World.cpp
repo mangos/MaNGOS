@@ -53,6 +53,7 @@
 #include "VMapFactory.h"
 #include "GlobalEvents.h"
 #include "GameEvent.h"
+#include "PoolHandler.h"
 #include "Database/DatabaseImpl.h"
 #include "GridNotifiersImpl.h"
 #include "CellImpl.h"
@@ -1177,6 +1178,9 @@ void World::SetInitialWorldSettings()
     sLog.outString( "Loading Gameobject Respawn Data..." ); // must be after PackInstances()
     objmgr.LoadGameobjectRespawnTimes();
 
+    sLog.outString( "Loading Objects Pooling Data...");
+    poolhandler.LoadFromDB();
+
     sLog.outString( "Loading Game Event Data...");
     sLog.outString();
     gameeventmgr.LoadFromDB();
@@ -1392,6 +1396,9 @@ void World::SetInitialWorldSettings()
 
     sLog.outString("Calculate next daily quest reset time..." );
     InitDailyQuestResetTime();
+
+    sLog.outString("Starting objects Pooling system..." );
+    poolhandler.Initialize();
 
     sLog.outString("Starting Game Event system..." );
     uint32 nextGameEvent = gameeventmgr.Initialize();
