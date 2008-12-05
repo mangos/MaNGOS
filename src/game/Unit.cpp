@@ -8599,26 +8599,12 @@ bool Unit::isVisibleForOrDetect(Unit const* u, bool detect, bool inVisibleList, 
     {
         // use object grey distance for all (only see objects any way)
         if (!IsWithinDistInMap(u,World::GetMaxVisibleDistanceInFlight()+(inVisibleList ? World::GetVisibleObjectGreyDistance() : 0.0f), is3dDistance))
-        {
-            if (!IsWithinDistInMap2d(u,World::GetMaxVisibleDistanceInFlight()+(inVisibleList ? World::GetVisibleObjectGreyDistance() : 0.0f)))
-                return false;
-        }
-        else
-        {
-                return false;
-        }
+            return false;
     }
     else if(!isAlive())                                     // distance for show body
     {
         if (!IsWithinDistInMap(u,World::GetMaxVisibleDistanceForObject()+(inVisibleList ? World::GetVisibleObjectGreyDistance() : 0.0f), is3dDistance))
-        {
-            if (!IsWithinDistInMap2d(u,World::GetMaxVisibleDistanceForObject()+(inVisibleList ? World::GetVisibleObjectGreyDistance() : 0.0f)))
-                return false;
-        }
-        else
-        {
-                return false;
-        }
+            return false;
     }
     else if(GetTypeId()==TYPEID_PLAYER)                     // distance for show player
     {
@@ -8626,54 +8612,26 @@ bool Unit::isVisibleForOrDetect(Unit const* u, bool detect, bool inVisibleList, 
         {
             // Players far than max visible distance for player or not in our map are not visible too
             if (!at_same_transport && !IsWithinDistInMap(u,World::GetMaxVisibleDistanceForPlayer()+(inVisibleList ? World::GetVisibleUnitGreyDistance() : 0.0f), is3dDistance))
-            {
-                if (!at_same_transport && !IsWithinDistInMap2d(u,World::GetMaxVisibleDistanceForPlayer()+(inVisibleList ? World::GetVisibleUnitGreyDistance() : 0.0f)))
-                    return false;
-            }
-            else
-            {
-                    return false;
-            }
+                return false;
         }
         else
         {
             // Units far than max visible distance for creature or not in our map are not visible too
             if (!IsWithinDistInMap(u,World::GetMaxVisibleDistanceForCreature()+(inVisibleList ? World::GetVisibleUnitGreyDistance() : 0.0f), is3dDistance))
-            {
-                if (!IsWithinDistInMap2d(u,World::GetMaxVisibleDistanceForCreature()+(inVisibleList ? World::GetVisibleUnitGreyDistance() : 0.0f)))
-                    return false;
-            }
-            else
-            {
-                    return false;
-            }
+                return false;
         }
     }
     else if(GetCharmerOrOwnerGUID())                        // distance for show pet/charmed
     {
         // Pet/charmed far than max visible distance for player or not in our map are not visible too
         if (!IsWithinDistInMap(u,World::GetMaxVisibleDistanceForPlayer()+(inVisibleList ? World::GetVisibleUnitGreyDistance() : 0.0f), is3dDistance))
-        {
-            if (!IsWithinDistInMap2d(u,World::GetMaxVisibleDistanceForPlayer()+(inVisibleList ? World::GetVisibleUnitGreyDistance() : 0.0f)))
-                return false;
-        }
-        else
-        {
-                return false;
-        }
+            return false;
     }
     else                                                    // distance for show creature
     {
         // Units far than max visible distance for creature or not in our map are not visible too
         if (!IsWithinDistInMap(u,World::GetMaxVisibleDistanceForCreature()+(inVisibleList ? World::GetVisibleUnitGreyDistance() : 0.0f), is3dDistance))
-        {
-            if (!IsWithinDistInMap2d(u,World::GetMaxVisibleDistanceForCreature()+(inVisibleList ? World::GetVisibleUnitGreyDistance() : 0.0f)))
-                return false;
-        }
-        else
-        {
-                return false;
-        }
+            return false;
     }
 
     // Visible units, always are visible for all units, except for units under invisibility
