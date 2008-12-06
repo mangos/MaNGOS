@@ -477,6 +477,9 @@ class BattleGround
         virtual void RemovePlayerAtLeave(uint64 guid, bool Transport, bool SendPacket);
                                                             // can be extended in in BG subclass
 
+        virtual void OnObjectDBLoad(Creature* /*creature*/);
+        virtual void OnObjectDBLoad(GameObject* /*obj*/);
+
         void HandleTriggerBuff(uint64 const& go_guid);
 
         // TODO: make this protected:

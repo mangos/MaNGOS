@@ -43,6 +43,7 @@ class Group;
 class InstanceSave;
 struct ScriptInfo;
 struct ScriptAction;
+class BattleGround;
 
 
 typedef ACE_RW_Thread_Mutex GridRWLock;
@@ -585,6 +586,10 @@ class MANGOS_DLL_SPEC BattleGroundMap : public Map
         void UnloadAll(bool pForce);
 
         virtual void InitVisibilityDistance();
+        BattleGround* GetBG() { return m_bg; }
+        void SetBG(BattleGround* bg) { m_bg = bg; }
+    private:
+        BattleGround* m_bg;
 };
 
 /*inline
