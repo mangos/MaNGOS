@@ -92,10 +92,10 @@ typedef struct {
     uint16 type;
     float heightLevel1;
     float heightLevel2;
-    byte xOffset;
-    byte yOffset;
-    byte width;
-    byte height;
+    uint8 xOffset;
+    uint8 yOffset;
+    uint8 width;
+    uint8 height;
     uint32 ofsData2a;
     uint32 ofsData2b;
 } MH2O_Data1;
