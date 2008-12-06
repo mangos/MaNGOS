@@ -31,8 +31,8 @@ typedef struct{
 } Cell;
 
 typedef struct{
-double v9[9][9];
-double v8[8][8];
+    double v9[9][9];
+    double v8[8][8];
     uint16 area_id;
 } chunk;
 
@@ -88,7 +88,7 @@ typedef struct {
 } MH2O_offsData;
 
 typedef struct {
-    uint16 flags;
+    uint16 LiquidTypeId;
     uint16 type;
     float heightLevel1;
     float heightLevel2;
@@ -100,13 +100,21 @@ typedef struct {
     uint32 ofsData2b;
 } MH2O_Data1;
 
+enum LiquidType
+{
+    LIQUID_TYPE_WATER = 0,
+    LIQUID_TYPE_OCEAN = 1,
+    LIQUID_TYPE_MAGMA = 2,
+    LIQUID_TYPE_SLIME = 3
+};
+
 class MPQFile;
 
 bool MH2O_presence;
 MH2O_offsData *LiqOffsData;
 MH2O_Data1 *LiqChunkData1;
 float *ChunkLiqHeight, *MapLiqHeight;
-char* MapLiqFlag;
+uint8* MapLiqFlag;
 uint32 k, m, chunk_num;
 void LoadMapChunk(MPQFile &, chunk*);
 bool LoadWMO(char* filename);

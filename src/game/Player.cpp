@@ -907,53 +907,29 @@ void Player::HandleDrowning()
 
 void Player::HandleLava()
 {
-    bool ValidArea = false;
-
     if ((m_isunderwater & 0x80) && isAlive())
     {
-        //Single trigger Set BreathTimer
+        // Single trigger Set BreathTimer
         if (!(m_isunderwater & 0x80))
         {
             m_isunderwater|= 0x04;
             m_breathTimer = 1000;
         }
-        //Reset BreathTimer and still in the lava
+
+        // Reset BreathTimer and still in the lava
         if (!m_breathTimer)
         {
             uint64 guid = GetGUID();
             uint32 damage = urand(600, 700);                // TODO: Get more detailed information about lava damage
-            uint32 dmgZone = GetZoneId();                   // TODO: Find correct "lava dealing zone" flag in Area Table
 
-            // Deal lava damage only in lava zones.
-            switch(dmgZone)
-            {
-                case 0x8D:
-                    ValidArea = false;
-                    break;
-                case 0x94:
-                    ValidArea = false;
-                    break;
-                case 0x2CE:
-                    ValidArea = false;
-                    break;
-                case 0x2CF:
-                    ValidArea = false;
-                    break;
-                default:
-                    if (dmgZone / 5 & 0x408)
-                        ValidArea = true;
-            }
-
-            // if is valid area and is not gamemaster then deal damage
-            if ( ValidArea && !isGameMaster() )
+            // if not gamemaster then deal damage
+            if ( !isGameMaster() )
                 EnvironmentalDamage(guid, DAMAGE_LAVA, damage);
 
             m_breathTimer = 1000;
         }
-
     }
-    //Death timer disabled and WaterFlags reset
-    else if (m_deathState == DEAD)
+    else if (m_deathState == DEAD)                          // Disable breath timer and reset underwater flags
     {
         m_breathTimer = 0;
         m_isunderwater = 0;
