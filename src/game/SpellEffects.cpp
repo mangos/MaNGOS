@@ -4587,6 +4587,38 @@ void Spell::EffectScriptEffect(uint32 effIndex)
     // by spell id
     switch(m_spellInfo->Id)
     {
+        // PX-238 Winter Wondervolt TRAP
+        case 26275:
+        {
+            if( unitTarget->HasAura(26272,0)
+             || unitTarget->HasAura(26157,0)
+             || unitTarget->HasAura(26273,0)
+             || unitTarget->HasAura(26274,0))
+                return;
+
+            uint32 iTmpSpellId;
+
+            switch(urand(0,3))
+            {
+                case 0:
+                    iTmpSpellId = 26272;
+                    break;
+                case 1:
+                    iTmpSpellId = 26157;
+                    break;
+                case 2:
+                    iTmpSpellId = 26273;
+                    break;
+                case 3:
+                    iTmpSpellId = 26274;
+                    break;
+            }
+
+            unitTarget->CastSpell(unitTarget, iTmpSpellId, true);
+
+            return;
+        }
+
         // Bending Shinbone
         case 8856:
         {
