@@ -996,9 +996,14 @@ void Spell::EffectDummy(uint32 i)
                     return;
                 }
                 case 37674:                                 // Chaos Blast
-                    if(unitTarget)
-                        m_caster->CastSpell(unitTarget,37675,true);
+                {
+                    if(!unitTarget)
+                        return;
+
+                    int32 basepoints0 = 100;
+                    m_caster->CastCustomSpell(unitTarget,37675,&basepoints0,NULL,NULL,true);
                     return;
+                }
                 case 40802:                                 // Mingo's Fortune Generator (Mingo's Fortune Giblets)
                 {
                     // selecting one from Bloodstained Fortune item
