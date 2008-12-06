@@ -446,6 +446,11 @@ void Creature::Update(uint32 diff)
             m_regenTimer = 2000;
             break;
         }
+        case DEAD_FALLING:
+        {
+            if (!FallGround())
+                setDeathState(JUST_DIED);
+        }
         default:
             break;
     }
@@ -1487,6 +1492,9 @@ void Creature::setDeathState(DeathState s)
         if(sWorld.getConfig(CONFIG_SAVE_RESPAWN_TIME_IMMEDIATLY) || isWorldBoss())
             SaveRespawnTime();
 
+        if (canFly() && FallGround())
+            return;
+
         if(!IsStopped())
             StopMoving();
     }
@@ -1500,6 +1508,9 @@ void Creature::setDeathState(DeathState s)
         if(!isPet() && GetCreatureInfo()->SkinLootId)
             if ( LootTemplates_Skinning.HaveLootFor(GetCreatureInfo()->SkinLootId) )
                 SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
+
+        if (canFly() && FallGround())
+            return;
 
         Unit::setDeathState(CORPSE);
     }
@@ -1518,6 +1529,25 @@ void Creature::setDeathState(DeathState s)
         SetMeleeDamageSchool(SpellSchools(cinfo->dmgschool));
         LoadCreaturesAddon(true);
     }
+}
+
+bool Creature::FallGround()
+{
+    // Let's abort after we called this function one time
+    if (getDeathState() == DEAD_FALLING)
+        return false;
+
+    // Let's do with no vmap because no way to get far distance with vmap high call
+    float tz = GetMap()->GetHeight(GetPositionX(), GetPositionY(), GetPositionZ(), false);
+
+    // Abort too if the ground is very near
+    if (fabs(GetPositionZ() - tz) < 0.1f)
+        return false;
+
+    Unit::setDeathState(DEAD_FALLING);
+    GetMotionMaster()->MovePoint(0, GetPositionX(), GetPositionY(), tz);
+    Relocate(GetPositionX(), GetPositionY(), tz);
+    return true;
 }
 
 void Creature::Respawn()
