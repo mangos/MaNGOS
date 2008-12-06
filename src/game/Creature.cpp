@@ -689,7 +689,7 @@ void Creature::prepareGossipMenu( Player *pPlayer,uint32 gossipid )
     // lazy loading single time at use
     LoadGossipOptions();
 
-    for( GossipOptionList::iterator i = m_goptions.begin( ); i != m_goptions.end( ); i++ )
+    for( GossipOptionList::iterator i = m_goptions.begin( ); i != m_goptions.end( ); ++i )
     {
         GossipOption* gso=&*i;
         if(gso->GossipId == gossipid)
@@ -1009,7 +1009,7 @@ uint32 Creature::GetNpcTextId()
 
 GossipOption const* Creature::GetGossipOption( uint32 id ) const
 {
-    for( GossipOptionList::const_iterator i = m_goptions.begin( ); i != m_goptions.end( ); i++ )
+    for( GossipOptionList::const_iterator i = m_goptions.begin( ); i != m_goptions.end( ); ++i )
     {
         if(i->Action==id )
             return &*i;
