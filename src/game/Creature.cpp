@@ -1345,7 +1345,15 @@ bool Creature::LoadFromDB(uint32 guid, Map *map)
 
     m_respawnTime  = objmgr.GetCreatureRespawnTime(m_DBTableGuid,GetInstanceId());
     if(m_respawnTime > time(NULL))                          // not ready to respawn
+    {
         m_deathState = DEAD;
+        if(canFly())
+        {
+            float tz = GetMap()->GetHeight(data->posX,data->posY,data->posZ,false);
+            if(data->posZ - tz > 0.1)
+                Relocate(data->posX,data->posY,tz);
+        }
+    }
     else if(m_respawnTime)                                  // respawn time set but expired
     {
         m_respawnTime = 0;
