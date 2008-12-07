@@ -22,6 +22,7 @@
 
 #include "Log.h"
 #include "Database/DatabaseEnv.h"
+#include "Database/DatabaseImpl.h"
 #include "Platform/Define.h"
 #include "MapManager.h"
 #include "ObjectAccessor.h"
