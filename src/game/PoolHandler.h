@@ -68,8 +68,10 @@ class PoolHandler
         PoolTemplateDataMap mPoolTemplate;
         PoolGroupCreatureMap mPoolCreatureGroups;
         PoolGroupGameObjectMap mPoolGameobjectGroups;
+        PoolGroupPoolMap mPoolPoolGroups;
         SearchMap mCreatureSearchMap;
         SearchMap mGameobjectSearchMap;
+        SearchMap mPoolSearchMap;
 
 };
 
