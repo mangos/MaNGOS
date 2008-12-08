@@ -310,7 +310,7 @@ enum AuraType
     SPELL_AURA_265 = 265,
     SPELL_AURA_266 = 266,
     SPELL_AURA_267 = 267,
-    SPELL_AURA_268 = 268,
+    SPELL_AURA_MOD_ATTACK_POWER_OF_STAT_PERCENT = 268,
     SPELL_AURA_269 = 269,
     SPELL_AURA_270 = 270,
     SPELL_AURA_271 = 271,
@@ -318,14 +318,14 @@ enum AuraType
     SPELL_AURA_273 = 273,
     SPELL_AURA_274 = 274,
     SPELL_AURA_275 = 275,
-    SPELL_AURA_276 = 276,
+    SPELL_AURA_276 = 276,                    // Only "Test Mod Damage % Mechanic" spell
     SPELL_AURA_277 = 277,
     SPELL_AURA_278 = 278,
     SPELL_AURA_279 = 279,
     SPELL_AURA_280 = 280,
-    SPELL_AURA_281 = 281,
-    SPELL_AURA_282 = 282,
-    SPELL_AURA_283 = 283,
+    SPELL_AURA_MOD_HONOR_GAIN = 281,
+    SPELL_AURA_MOD_BASE_HEALTH_PCT = 282,
+    SPELL_AURA_MOD_HEALING_RECEIVED = 283,   // Possibly only for some spell family class spells
     TOTAL_AURAS = 284
 };
 
