@@ -5763,10 +5763,8 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                 mod->value = -100;
                 mod->type = SPELLMOD_PCT;
                 mod->spellId = dummySpell->Id;
-                mod->effectId = 0;
-                mod->lastAffected = NULL;
                 mod->mask = 0x0000000000000003LL;
-                mod->charges = 0;
+                mod->mask2= 0LL;
                 ((Player*)this)->AddSpellMod(mod, true);
 
                 // Remove cooldown (Chain Lightning - have Category Recovery time)
@@ -10929,10 +10927,8 @@ bool Unit::HandleMeandingAuraProc( Aura* triggeredByAura )
                 mod->value = jumps-5;               // negative
                 mod->type = SPELLMOD_FLAT;
                 mod->spellId = spellProto->Id;
-                mod->effectId = effIdx;
-                mod->lastAffected = NULL;
-                mod->mask = spellProto->SpellFamilyFlags;
-                mod->charges = 0;
+                mod->mask  = spellProto->SpellFamilyFlags;
+                mod->mask2 = spellProto->SpellFamilyFlags2;
 
                 caster->AddSpellMod(mod, true);
                 CastCustomSpell(target,spellProto->Id,&heal,NULL,NULL,true,NULL,triggeredByAura,caster->GetGUID());

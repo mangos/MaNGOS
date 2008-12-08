@@ -1524,10 +1524,8 @@ void Spell::EffectDummy(uint32 i)
                         mod->value = -50;
                         mod->type = SPELLMOD_PCT;
                         mod->spellId = m_spellInfo->Id;
-                        mod->effectId = i;
-                        mod->lastAffected = NULL;
                         mod->mask = 0x0000020000000000LL;
-                        mod->charges = 0;
+                        mod->mask2= 0LL;
 
                         ((Player*)m_caster)->AddSpellMod(mod, true);
                         m_caster->CastSpell(unitTarget,spell_proto,true,NULL);

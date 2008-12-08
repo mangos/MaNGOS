@@ -666,8 +666,8 @@ void SpellMgr::LoadSpellAffects()
 
     uint32 count = 0;
 
-    //                                                0      1         2
-    QueryResult *result = WorldDatabase.Query("SELECT entry, effectId, SpellFamilyMask FROM spell_affect");
+    //                                                0      1         2                3                4
+    QueryResult *result = WorldDatabase.Query("SELECT entry, effectId, SpellClassMask0, SpellClassMask1, SpellClassMask2 FROM spell_affect");
     if( !result )
     {
 
@@ -714,26 +714,29 @@ void SpellMgr::LoadSpellAffects()
             continue;
         }
 
-        uint64 spellAffectMask = fields[2].GetUInt64();
+        SpellAffectEntry affect;
+        affect.SpellClassMask[0] = fields[2].GetUInt32();
+        affect.SpellClassMask[1] = fields[3].GetUInt32();
+        affect.SpellClassMask[2] = fields[4].GetUInt32();
 
-        // Spell.dbc have own data for low part of SpellFamilyMask
-        if( spellInfo->EffectItemType[effectId])
+        // Spell.dbc have own data
+        uint32 const *ptr = 0;
+        switch (effectId)
         {
-            if(spellInfo->EffectItemType[effectId] == spellAffectMask)
-            {
-                sLog.outErrorDb("Spell %u listed in `spell_affect` have redundant (same with EffectItemType%d) data for effect index (%u) and not needed, skipped.", entry,effectId+1,effectId);
+            case 0: ptr = spellInfo->EffectSpellClassMaskA; break;
+            case 1: ptr = spellInfo->EffectSpellClassMaskB; break;
+            case 2: ptr = spellInfo->EffectSpellClassMaskC; break;
+            default: 
                 continue;
-            }
-
-            // 24429 have wrong data in EffectItemType and overwrites by DB, possible bug in client
-            if(spellInfo->Id!=24429 && spellInfo->EffectItemType[effectId] != spellAffectMask)
-            {
-                sLog.outErrorDb("Spell %u listed in `spell_affect` have different low part from EffectItemType%d for effect index (%u) and not needed, skipped.", entry,effectId+1,effectId);
-                continue;
-            }
+        }
+        if(ptr[0] == affect.SpellClassMask[0] || ptr[1] == affect.SpellClassMask[1] || ptr[2] == affect.SpellClassMask[2])
+        {
+            char text[]="ABC";
+            sLog.outErrorDb("Spell %u listed in `spell_affect` have redundant (same with EffectSpellClassMask%c) data for effect index (%u) and not needed, skipped.", entry, text[effectId], effectId);
+            continue;
         }
 
-        mSpellAffectMap.insert(SpellAffectMap::value_type((entry<<8) + effectId,spellAffectMask));
+        mSpellAffectMap[(entry<<8) + effectId] = affect;
 
         ++count;
     } while( result->NextRow() );
@@ -741,7 +744,7 @@ void SpellMgr::LoadSpellAffects()
     delete result;
 
     sLog.outString();
-    sLog.outString( ">> Loaded %u spell affect definitions", count );
+    sLog.outString( ">> Loaded %u custom spell affect definitions", count );
 
     for (uint32 id = 0; id < sSpellStore.GetNumRows(); ++id)
     {
@@ -757,7 +760,16 @@ void SpellMgr::LoadSpellAffects()
                 spellInfo->EffectApplyAuraName[effectId] != SPELL_AURA_ADD_TARGET_TRIGGER) )
                 continue;
 
-            if(spellInfo->EffectItemType[effectId] != 0)
+            uint32 const *ptr = 0;
+            switch (effectId)
+            {
+                case 0: ptr = spellInfo->EffectSpellClassMaskA; break;
+                case 1: ptr = spellInfo->EffectSpellClassMaskB; break;
+                case 2: ptr = spellInfo->EffectSpellClassMaskC; break;
+                default: 
+                    continue;
+            }
+            if(ptr[0] || ptr[1] || ptr[2])
                 continue;
 
             if(mSpellAffectMap.find((id<<8) + effectId) !=  mSpellAffectMap.end())
@@ -768,33 +780,20 @@ void SpellMgr::LoadSpellAffects()
     }
 }
 
-bool SpellMgr::IsAffectedBySpell(SpellEntry const *spellInfo, uint32 spellId, uint8 effectId, uint64 familyFlags) const
+bool SpellMgr::IsAffectedByMod(SpellEntry const *spellInfo, SpellModifier *mod) const
 {
     // false for spellInfo == NULL
-    if (!spellInfo)
+    if (!spellInfo || !mod)
         return false;
 
-    SpellEntry const *affect_spell = sSpellStore.LookupEntry(spellId);
-    // false for affect_spell == NULL
-    if (!affect_spell)
+    SpellEntry const *affect_spell = sSpellStore.LookupEntry(mod->spellId);
+    // False if affect_spell == NULL or spellFamily not equal
+    if (!affect_spell || affect_spell->SpellFamilyName != spellInfo->SpellFamilyName)
         return false;
-
-    // False if spellFamily not equal
-    if (affect_spell->SpellFamilyName != spellInfo->SpellFamilyName)
-        return false;
-
-    // If familyFlags == 0
-    if (!familyFlags)
-    {
-        // Get it from spellAffect table
-        familyFlags = GetSpellAffectMask(spellId,effectId);
-        // false if familyFlags == 0
-        if (!familyFlags)
-            return false;
-    }
 
     // true
-    if (familyFlags & spellInfo->SpellFamilyFlags)
+    if (mod->mask  & spellInfo->SpellFamilyFlags ||
+        mod->mask2 & spellInfo->SpellFamilyFlags2)
         return true;
 
     return false;

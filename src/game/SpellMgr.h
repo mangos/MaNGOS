@@ -27,6 +27,9 @@
 #include "Database/SQLStorage.h"
 
 #include "Utilities/UnorderedMap.h"
+
+#include "Player.h"
+
 #include <map>
 
 class Player;
@@ -450,7 +453,11 @@ bool IsDiminishingReturnsGroupDurationLimited(DiminishingGroup group);
 DiminishingReturnsType GetDiminishingReturnsGroupType(DiminishingGroup group);
 
 // Spell affects related declarations (accessed using SpellMgr functions)
-typedef std::map<uint32, uint64> SpellAffectMap;
+struct SpellAffectEntry
+{
+    uint32 SpellClassMask[3];
+};
+typedef UNORDERED_MAP<uint32, SpellAffectEntry> SpellAffectMap;
 
 // Spell proc event related declarations (accessed using SpellMgr functions)
 enum ProcFlags
@@ -657,15 +664,15 @@ class SpellMgr
         // Accessors (const or static functions)
     public:
         // Spell affects
-        uint64 GetSpellAffectMask(uint16 spellId, uint8 effectId) const
+        SpellAffectEntry const*GetSpellAffect(uint16 spellId, uint8 effectId) const
         {
             SpellAffectMap::const_iterator itr = mSpellAffectMap.find((spellId<<8) + effectId);
             if( itr != mSpellAffectMap.end( ) )
-                return itr->second;
+                return &itr->second;
             return 0;
         }
 
-        bool IsAffectedBySpell(SpellEntry const *spellInfo, uint32 spellId, uint8 effectId, uint64 familyFlags) const;
+        bool IsAffectedByMod(SpellEntry const *spellInfo, SpellModifier *mod) const;
 
         SpellElixirMap const& GetSpellElixirMap() const { return mSpellElixirs; }
 

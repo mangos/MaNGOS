@@ -1110,9 +1110,9 @@ struct SpellEntry
     int32     EffectMiscValueB[3];                          // 116-118  m_effectMiscValueB
     uint32    EffectTriggerSpell[3];                        // 119-121  m_effectTriggerSpell
     float     EffectPointsPerComboPoint[3];                 // 122-124  m_effectPointsPerCombo
-    //uint32    EffectSpellClassMaskA[3];                   // 125-127  m_effectSpellClassMaskA not used
-    //uint32    EffectSpellClassMaskB[3];                   // 128-130  m_effectSpellClassMaskB not used
-    //uint32    EffectSpellClassMaskC[3];                   // 131-133  m_effectSpellClassMaskC not used
+    uint32    EffectSpellClassMaskA[3];                     // 125-127  m_effectSpellClassMaskA
+    uint32    EffectSpellClassMaskB[3];                     // 128-130  m_effectSpellClassMaskB
+    uint32    EffectSpellClassMaskC[3];                     // 131-133  m_effectSpellClassMaskC
     uint32    SpellVisual[2];                               // 134-135  m_spellVisualID
     uint32    SpellIconID;                                  // 136      m_spellIconID
     uint32    activeIconID;                                 // 137      m_activeIconID

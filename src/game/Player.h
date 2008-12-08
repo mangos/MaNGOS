@@ -80,15 +80,17 @@ struct PlayerSpell
 
 #define SPELL_WITHOUT_SLOT_ID uint16(-1)
 
+// Spell modifier (used for modify other spells)
 struct SpellModifier
 {
+    SpellModifier() : charges(0), lastAffected(NULL) {}
     SpellModOp   op   : 8;
     SpellModType type : 8;
     int16 charges     : 16;
     int32 value;
     uint64 mask;
+    uint64 mask2;
     uint32 spellId;
-    uint32 effectId;
     Spell const* lastAffected;
 };
 
@@ -1483,8 +1485,6 @@ class MANGOS_DLL_SPEC Player : public Unit
         PlayerSpellMap      & GetSpellMap()       { return m_spells; }
 
         void AddSpellMod(SpellModifier* mod, bool apply);
-        int32 GetTotalFlatMods(uint32 spellId, SpellModOp op);
-        int32 GetTotalPctMods(uint32 spellId, SpellModOp op);
         bool IsAffectedBySpellmod(SpellEntry const *spellInfo, SpellModifier *mod, Spell const* spell = NULL);
         template <class T> T ApplySpellMod(uint32 spellId, SpellModOp op, T &basevalue, Spell const* spell = NULL);
         void RemoveSpellMods(Spell const* spell);
