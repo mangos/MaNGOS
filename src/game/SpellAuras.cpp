@@ -2207,7 +2207,7 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
 
                     // have a look if there is still some other Lifebloom dummy aura
                     Unit::AuraList auras = m_target->GetAurasByType(SPELL_AURA_DUMMY);
-                    for(Unit::AuraList::iterator itr = auras.begin(); itr!=auras.end(); itr++)
+                    for(Unit::AuraList::iterator itr = auras.begin(); itr!=auras.end(); ++itr)
                         if((*itr)->GetSpellProto()->SpellFamilyName == SPELLFAMILY_DRUID &&
                             (*itr)->GetSpellProto()->SpellFamilyFlags & 0x1000000000LL)
                             return;
