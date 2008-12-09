@@ -668,6 +668,10 @@ bool ChatHandler::HandleModifyRepCommand(const char * args)
         return false;
     }
 
+    // check online security
+    if (HasLowerSecurity(target, 0))
+        return false;
+
     char* factionTxt = extractKeyFromLink((char*)args,"Hfaction");
     if(!factionTxt)
         return false;
@@ -1239,6 +1243,11 @@ bool ChatHandler::HandleDeMorphCommand(const char* /*args*/)
     if(!target)
         target = m_session->GetPlayer();
 
+
+    // check online security
+    else if (target->GetTypeId() == TYPEID_PLAYER && HasLowerSecurity((Player*)target, 0))
+        return false;
+
     target->DeMorph();
 
     return true;
@@ -1632,6 +1641,10 @@ bool ChatHandler::HandleMorphCommand(const char* args)
     if(!target)
         target = m_session->GetPlayer();
 
+    // check online security
+    else if (target->GetTypeId() == TYPEID_PLAYER && HasLowerSecurity((Player*)target, 0))
+        return false;
+
     target->SetDisplayId(display_id);
 
     return true;
@@ -1700,6 +1713,10 @@ bool ChatHandler::HandleKickPlayerCommand(const char *args)
             return false;
         }
 
+        // check online security
+        if (HasLowerSecurity(player, 0))
+            return false;
+
         player->GetSession()->KickPlayer();
     }
     else
@@ -1718,6 +1735,11 @@ bool ChatHandler::HandleKickPlayerCommand(const char *args)
             SetSentErrorMessage(true);
             return false;
         }
+
+        // check online security
+	Player* player = ObjectAccessor::Instance().FindPlayerByName(name.c_str());
+        if (player && HasLowerSecurity(player, 0))
+            return false;
 
         if(sWorld.KickPlayer(name))
         {
@@ -1789,6 +1811,10 @@ bool ChatHandler::HandlePInfoCommand(const char* args)
     // get additional information from Player object
     if(target)
     {
+        // check online security
+        if (HasLowerSecurity(target, 0))
+            return false;
+
         targetGUID = target->GetGUID();
         name = target->GetName();                           // re-read for case getSelectedPlayer() target
         accId = target->GetSession()->GetAccountId();
@@ -1800,6 +1826,10 @@ bool ChatHandler::HandlePInfoCommand(const char* args)
     // get additional information from DB
     else
     {
+        // check offline security
+        if (HasLowerSecurity(NULL, targetGUID))
+            return false;
+
         //                                                     0
         QueryResult *result = CharacterDatabase.PQuery("SELECT totaltime FROM characters WHERE guid = '%u'", GUID_LOPART(targetGUID));
         if (!result)
@@ -3343,12 +3373,20 @@ bool ChatHandler::HandleRenameCommand(const char* args)
 
     if(target)
     {
+        // check online security
+        if (HasLowerSecurity(target, 0))
+            return false;
+
         PSendSysMessage(LANG_RENAME_PLAYER, target->GetName());
         target->SetAtLoginFlag(AT_LOGIN_RENAME);
         CharacterDatabase.PExecute("UPDATE characters SET at_login = at_login | '1' WHERE guid = '%u'", target->GetGUIDLow());
     }
     else
     {
+        // check offline security
+        if (HasLowerSecurity(NULL, targetGUID))
+            return false;
+
         PSendSysMessage(LANG_RENAME_PLAYER_GUID, oldname.c_str(), GUID_LOPART(targetGUID));
         CharacterDatabase.PExecute("UPDATE characters SET at_login = at_login | '1' WHERE guid = '%u'", GUID_LOPART(targetGUID));
     }
@@ -3517,6 +3555,10 @@ bool ChatHandler::HandleAddHonorCommand(const char* args)
         return false;
     }
 
+    // check online security
+    if (HasLowerSecurity(target, 0))
+        return false;
+
     uint32 amount = (uint32)atoi(args);
     target->RewardHonor(NULL, 1, amount);
     return true;
@@ -3532,6 +3574,10 @@ bool ChatHandler::HandleHonorAddKillCommand(const char* /*args*/)
         return false;
     }
 
+    // check online security
+    if (target->GetTypeId() == TYPEID_PLAYER && HasLowerSecurity((Player*)target, 0))
+        return false;
+
     m_session->GetPlayer()->RewardHonor(target, 1);
     return true;
 }
@@ -3545,6 +3591,10 @@ bool ChatHandler::HandleUpdateHonorFieldsCommand(const char* /*args*/)
         SetSentErrorMessage(true);
         return false;
     }
+
+    // check online security
+    if (HasLowerSecurity(target, 0))
+        return false;
 
     target->UpdateHonorFields();
     return true;
@@ -3788,6 +3838,10 @@ bool ChatHandler::HandleCombatStopCommand(const char* args)
             player = m_session->GetPlayer();
     }
 
+    // check online security
+    if (HasLowerSecurity(player, 0))
+        return false;
+
     player->CombatStop();
     player->getHostilRefManager().deleteReferences();
     return true;
@@ -4025,6 +4079,10 @@ bool ChatHandler::HandleRepairitemsCommand(const char* /*args*/)
         return false;
     }
 
+    // check online security
+    if (HasLowerSecurity(target, 0))
+        return false;
+
     // Repair items
     target->DurabilityRepairAll(false, 0, false);
 
@@ -4047,6 +4105,10 @@ bool ChatHandler::HandleWaterwalkCommand(const char* args)
         SetSentErrorMessage(true);
         return false;
     }
+
+    // check online security
+    if (HasLowerSecurity(player, 0))
+        return false;
 
     if (strncmp(args, "on", 3) == 0)
         player->SetMovement(MOVE_WATER_WALK);               // ON
