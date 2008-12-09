@@ -1524,24 +1524,28 @@ void Pet::ToggleAutocast(uint32 spellid, bool apply)
 
     if(apply)
     {
-        for (i = 0; i < m_autospells.size() && m_autospells[i] != spellid; i++);
-            if (i == m_autospells.size())
-            {
-                m_autospells.push_back(spellid);
-                itr->second->active = ACT_ENABLED;
-                itr->second->state = PETSPELL_CHANGED;
-            }
+        for (i = 0; i < m_autospells.size() && m_autospells[i] != spellid; i++)
+            ;                                               // just search
+
+        if (i == m_autospells.size())
+        {
+            m_autospells.push_back(spellid);
+            itr->second->active = ACT_ENABLED;
+            itr->second->state = PETSPELL_CHANGED;
+        }
     }
     else
     {
         AutoSpellList::iterator itr2 = m_autospells.begin();
-        for (i = 0; i < m_autospells.size() && m_autospells[i] != spellid; i++, itr2++);
-            if (i < m_autospells.size())
-            {
-                m_autospells.erase(itr2);
-                itr->second->active = ACT_DISABLED;
-                itr->second->state = PETSPELL_CHANGED;
-            }
+        for (i = 0; i < m_autospells.size() && m_autospells[i] != spellid; i++, itr2++)
+            ;                                               // just search
+
+        if (i < m_autospells.size())
+        {
+            m_autospells.erase(itr2);
+            itr->second->active = ACT_DISABLED;
+            itr->second->state = PETSPELL_CHANGED;
+        }
     }
 }
 
