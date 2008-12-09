@@ -42,8 +42,7 @@ alter table creature_movement add `wpguid` int(11) default '0';
 #include <cassert>
 
 //-----------------------------------------------//
-void
-WaypointMovementGenerator<Creature>::LoadPath(Creature &c)
+void WaypointMovementGenerator<Creature>::LoadPath(Creature &c)
 {
     sLog.outDetail("LoadPath: loading waypoint path for creature %d,%d", c.GetGUIDLow(), c.GetDBTableGUIDLow());
 
@@ -60,26 +59,23 @@ WaypointMovementGenerator<Creature>::LoadPath(Creature &c)
     for(uint32 i = 0; i < node_count-1; i++)
         i_hasDone[i] = false;
 
-    // to prevent a misbehaviour inside "update"
+    // to prevent a misbehavior inside "update"
     // update is always called with the next wp - but the wpSys needs the current
     // so when the routine is called the first time, wpSys gets the last waypoint
     // and this prevents the system from performing text/emote, etc
     i_hasDone[node_count - 1] = true;
 }
 
-void
-WaypointMovementGenerator<Creature>::ClearWaypoints()
+void WaypointMovementGenerator<Creature>::ClearWaypoints()
 {
     i_path = NULL;
 }
 
-void
-WaypointMovementGenerator<Creature>::Initialize()
+void WaypointMovementGenerator<Creature>::Initialize()
 {
 }
 
-bool
-WaypointMovementGenerator<Creature>::Update(Creature &creature, const uint32 &diff)
+bool WaypointMovementGenerator<Creature>::Update(Creature &creature, const uint32 &diff)
 {
     if(!&creature)
         return true;
@@ -104,7 +100,7 @@ WaypointMovementGenerator<Creature>::Update(Creature &creature, const uint32 &di
     i_nextMoveTime.Update(diff);
     i_destinationHolder.UpdateTraveller(traveller, diff, false, true);
 
-    // creature has been stoped in middle of the waypoint segment
+    // creature has been stopped in middle of the waypoint segment
     if (!i_destinationHolder.HasArrived() && creature.IsStopped())
     {
         if( i_nextMoveTime.Passed()) // Timer has elapsed, meaning this part controlled it
@@ -214,14 +210,12 @@ void WaypointMovementGenerator<Creature>::MovementInform(Creature &unit)
 }
 
 //----------------------------------------------------//
-void
-FlightPathMovementGenerator::LoadPath(Player &)
+void FlightPathMovementGenerator::LoadPath(Player &)
 {
     objmgr.GetTaxiPathNodes(i_pathId, i_path,i_mapIds);
 }
 
-uint32
-FlightPathMovementGenerator::GetPathAtMapEnd() const
+uint32 FlightPathMovementGenerator::GetPathAtMapEnd() const
 {
     if(i_currentNode >= i_mapIds.size())
         return i_mapIds.size();
@@ -236,8 +230,7 @@ FlightPathMovementGenerator::GetPathAtMapEnd() const
     return i_mapIds.size();
 }
 
-void
-FlightPathMovementGenerator::Initialize(Player &player)
+void FlightPathMovementGenerator::Initialize(Player &player)
 {
     player.getHostilRefManager().setOnlineOfflineState(false);
     player.addUnitState(UNIT_STAT_IN_FLIGHT);
@@ -252,7 +245,6 @@ FlightPathMovementGenerator::Initialize(Player &player)
 
 void FlightPathMovementGenerator::Finalize(Player & player)
 {
-
     float x, y, z;
     i_destinationHolder.GetLocationNow(player.GetMapId(), x, y, z);
     player.SetPosition(x, y, z, player.GetOrientation());
@@ -272,8 +264,7 @@ void FlightPathMovementGenerator::Finalize(Player & player)
     }
 }
 
-bool
-FlightPathMovementGenerator::Update(Player &player, const uint32 &diff)
+bool FlightPathMovementGenerator::Update(Player &player, const uint32 &diff)
 {
     if( MovementInProgress() )
     {
@@ -308,8 +299,7 @@ FlightPathMovementGenerator::Update(Player &player, const uint32 &diff)
     return false;
 }
 
-void
-FlightPathMovementGenerator::SetCurrentNodeAfterTeleport()
+void FlightPathMovementGenerator::SetCurrentNodeAfterTeleport()
 {
     if(i_mapIds.empty())
         return;

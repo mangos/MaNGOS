@@ -641,7 +641,6 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder * holder)
     pCurrChar->LoadCorpse();
 
     // setting Ghost+speed if dead
-    //if ( pCurrChar->m_deathState == DEAD )
     if (pCurrChar->m_deathState != ALIVE)
     {
         // not blizz like, we must correctly save and load player instead...

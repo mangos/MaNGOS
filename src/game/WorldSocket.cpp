@@ -712,7 +712,7 @@ int WorldSocket::HandleAuthSession (WorldPacket& recvPacket)
 
     Field* fields = result->Fetch ();
 
-    expansion = fields[8].GetUInt8 () && sWorld.getConfig (CONFIG_EXPANSION) > 0;
+    expansion = ((sWorld.getConfig(CONFIG_EXPANSION) > fields[8].GetUInt8()) ? fields[8].GetUInt8() : sWorld.getConfig(CONFIG_EXPANSION));
 
     N.SetHexStr ("894B645E89E1535BBDAD5B8B290650530801B18EBFBF5E8FAB3C82872A3E9BB7");
     g.SetDword (7);
@@ -734,8 +734,8 @@ int WorldSocket::HandleAuthSession (WorldPacket& recvPacket)
     x.SetBinary (sha1.GetDigest (), sha1.GetLength ());
     v = g.ModExp (x, N);
 
-    const char* sStr = s.AsHexStr (); //Must be freed by OPENSSL_free()
-    const char* vStr = v.AsHexStr (); //Must be freed by OPENSSL_free()
+    const char* sStr = s.AsHexStr ();                       //Must be freed by OPENSSL_free()
+    const char* vStr = v.AsHexStr ();                       //Must be freed by OPENSSL_free()
     const char* vold = fields[6].GetString ();
 
     DEBUG_LOG ("WorldSocket::HandleAuthSession: (s,v) check s: %s v_old: %s v_new: %s",
@@ -825,7 +825,7 @@ int WorldSocket::HandleAuthSession (WorldPacket& recvPacket)
 
         SendPacket (packet);
 
-        sLog.outBasic ("WorldSocket::HandleAuthSession: User tryes to login but his security level is not enough");
+        sLog.outBasic ("WorldSocket::HandleAuthSession: User tries to login but his security level is not enough");
         return -1;
     }
 
@@ -940,7 +940,7 @@ int WorldSocket::HandlePing (WorldPacket& recvPacket)
         ACE_GUARD_RETURN (LockType, Guard, m_SessionLock, -1);
 
         if (m_Session)
-        m_Session->SetLatency (latency);
+            m_Session->SetLatency (latency);
         else
         {
             sLog.outError ("WorldSocket::HandlePing: peer sent CMSG_PING, "

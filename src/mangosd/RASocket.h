@@ -50,7 +50,7 @@ class RASocket: public TcpSocket
         bool bLog;
         bool bSecure;                                       //kick on wrong pass, non exist. user, user with no priv
         //will protect from DOS, bruteforce attacks
-        //some 'smart' protection must be added for more scurity
+        //some 'smart' protection must be added for more security
         uint8 iMinLevel;
         enum
         {

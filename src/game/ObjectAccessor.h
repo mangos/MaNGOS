@@ -72,7 +72,7 @@ class HashMapHolder
         static LockType* GetLock() { return &i_lock; }
     private:
 
-        //Non instanciable only static
+        //Non instanceable only static
         HashMapHolder() {}
 
         static LockType i_lock;

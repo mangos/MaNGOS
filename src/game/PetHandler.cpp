@@ -34,7 +34,7 @@
 
 void WorldSession::HandlePetAction( WorldPacket & recv_data )
 {
-    CHECK_PACKET_SIZE(recv_data,8+2+2+8);
+    CHECK_PACKET_SIZE(recv_data, 8+2+2+8);
 
     uint64 guid1;
     uint16 spellid;
@@ -46,8 +46,8 @@ void WorldSession::HandlePetAction( WorldPacket & recv_data )
     recv_data >> guid2;                                     //tag guid
 
     // used also for charmed creature
-    Unit* pet= ObjectAccessor::GetUnit(*_player,guid1);
-    sLog.outDetail( "HandlePetAction.Pet %u flag is %u, spellid is %u, target %u.\n", uint32(GUID_LOPART(guid1)), flag, spellid, uint32(GUID_LOPART(guid2)) );
+    Unit* pet= ObjectAccessor::GetUnit(*_player, guid1);
+    sLog.outDetail("HandlePetAction.Pet %u flag is %u, spellid is %u, target %u.\n", uint32(GUID_LOPART(guid1)), flag, spellid, uint32(GUID_LOPART(guid2)) );
     if(!pet)
     {
         sLog.outError( "Pet %u not exist.\n", uint32(GUID_LOPART(guid1)) );
@@ -56,7 +56,7 @@ void WorldSession::HandlePetAction( WorldPacket & recv_data )
 
     if(pet != GetPlayer()->GetPet() && pet != GetPlayer()->GetCharm())
     {
-        sLog.outError( "HandlePetAction.Pet %u isn't pet of player %s .\n", uint32(GUID_LOPART(guid1)),GetPlayer()->GetName() );
+        sLog.outError("HandlePetAction.Pet %u isn't pet of player %s.\n", uint32(GUID_LOPART(guid1)), GetPlayer()->GetName() );
         return;
     }
 
@@ -310,7 +310,7 @@ void WorldSession::SendPetNameQuery( uint64 petguid, uint32 petnumber)
 
 void WorldSession::HandlePetSetAction( WorldPacket & recv_data )
 {
-    CHECK_PACKET_SIZE(recv_data,8+4+2+2);
+    CHECK_PACKET_SIZE(recv_data, 8+4+2+2);
 
     sLog.outDetail( "HandlePetSetAction. CMSG_PET_SET_ACTION\n" );
 

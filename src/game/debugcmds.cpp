@@ -31,6 +31,7 @@
 #include "Language.h"
 #include "MapManager.h"
 #include <fstream>
+#include "ObjectMgr.h"
 
 bool ChatHandler::HandleDebugInArcCommand(const char* /*args*/)
 {
@@ -59,8 +60,8 @@ bool ChatHandler::HandleDebugSpellFailCommand(const char* args)
     uint8 failnum = (uint8)atoi(px);
 
     WorldPacket data(SMSG_CAST_FAILED, 5);
-    data << (uint32)133;
-    data << failnum;
+    data << uint32(133);
+    data << uint8(failnum);
     m_session->SendPacket(&data);
 
     return true;
@@ -145,11 +146,14 @@ bool ChatHandler::HandleSendOpcodeCommand(const char* /*args*/)
         std::string type;
         ifs >> type;
 
+        if(type == "")
+            break;
+
         if(type == "uint8")
         {
-            uint8 val1;
+            uint16 val1;
             ifs >> val1;
-            data << val1;
+            data << uint8(val1);
         }
         else if(type == "uint16")
         {
@@ -187,7 +191,8 @@ bool ChatHandler::HandleSendOpcodeCommand(const char* /*args*/)
         }
         else
         {
-            sLog.outDebug("Sending opcode: unknown type %s", type.c_str());
+            sLog.outDebug("Sending opcode: unknown type '%s'", type.c_str());
+            break;
         }
     }
     ifs.close();
