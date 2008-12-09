@@ -723,9 +723,9 @@ void SpellMgr::LoadSpellAffects()
         uint32 const *ptr = 0;
         switch (effectId)
         {
-            case 0: ptr = spellInfo->EffectSpellClassMaskA; break;
-            case 1: ptr = spellInfo->EffectSpellClassMaskB; break;
-            case 2: ptr = spellInfo->EffectSpellClassMaskC; break;
+            case 0: ptr = &spellInfo->EffectSpellClassMaskA[0]; break;
+            case 1: ptr = &spellInfo->EffectSpellClassMaskB[0]; break;
+            case 2: ptr = &spellInfo->EffectSpellClassMaskC[0]; break;
             default: 
                 continue;
         }
@@ -763,9 +763,9 @@ void SpellMgr::LoadSpellAffects()
             uint32 const *ptr = 0;
             switch (effectId)
             {
-                case 0: ptr = spellInfo->EffectSpellClassMaskA; break;
-                case 1: ptr = spellInfo->EffectSpellClassMaskB; break;
-                case 2: ptr = spellInfo->EffectSpellClassMaskC; break;
+                case 0: ptr = &spellInfo->EffectSpellClassMaskA[0]; break;
+                case 1: ptr = &spellInfo->EffectSpellClassMaskB[0]; break;
+                case 2: ptr = &spellInfo->EffectSpellClassMaskC[0]; break;
                 default: 
                     continue;
             }

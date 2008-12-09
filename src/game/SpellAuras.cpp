@@ -1204,14 +1204,14 @@ void Aura::HandleAddModifier(bool apply, bool Real)
         uint32 const *ptr;
         SpellAffectEntry const *spellAffect = spellmgr.GetSpellAffect(GetId(), m_effIndex);
         if (spellAffect)
-            ptr = spellAffect->SpellClassMask;
+            ptr = &spellAffect->SpellClassMask[0];
         else
         {
             switch (m_effIndex)
             {
-                case 0: ptr = m_spellProto->EffectSpellClassMaskA; break;
-                case 1: ptr = m_spellProto->EffectSpellClassMaskB; break;
-                case 2: ptr = m_spellProto->EffectSpellClassMaskC; break;
+                case 0: ptr = &m_spellProto->EffectSpellClassMaskA[0]; break;
+                case 1: ptr = &m_spellProto->EffectSpellClassMaskB[0]; break;
+                case 2: ptr = &m_spellProto->EffectSpellClassMaskC[0]; break;
                 default:
                     return;
             }
@@ -1254,14 +1254,14 @@ void Aura::HandleAddTargetTrigger(bool apply, bool Real)
         uint32 const *ptr;
         SpellAffectEntry const *spellAffect = spellmgr.GetSpellAffect(GetId(), m_effIndex);
         if (spellAffect)
-            ptr = spellAffect->SpellClassMask;
+            ptr = &spellAffect->SpellClassMask[0];
         else
         {
             switch (m_effIndex)
             {
-                case 0: ptr = m_spellProto->EffectSpellClassMaskA; break;
-                case 1: ptr = m_spellProto->EffectSpellClassMaskB; break;
-                case 2: ptr = m_spellProto->EffectSpellClassMaskC; break;
+                case 0: ptr = &m_spellProto->EffectSpellClassMaskA[0]; break;
+                case 1: ptr = &m_spellProto->EffectSpellClassMaskB[0]; break;
+                case 2: ptr = &m_spellProto->EffectSpellClassMaskC[0]; break;
                 default:
                     return;
             }
