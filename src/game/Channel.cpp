@@ -209,7 +209,7 @@ void Channel::KickOrBan(uint64 good, const char *badname, bool ban)
 
             if(ban && !IsBanned(bad->GetGUID()))
             {
-                banned.push_back(bad->GetGUID());
+                banned.insert(bad->GetGUID());
                 MakePlayerBanned(&data, bad->GetGUID(), good);
             }
             else
@@ -258,7 +258,7 @@ void Channel::UnBan(uint64 good, const char *badname)
         }
         else
         {
-            banned.remove(bad->GetGUID());
+            banned.erase(bad->GetGUID());
 
             WorldPacket data;
             MakePlayerUnbanned(&data, bad->GetGUID(), good);

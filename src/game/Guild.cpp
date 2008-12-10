@@ -417,53 +417,53 @@ void Guild::DelMember(uint64 guid, bool isDisbanding)
 {
     if(leaderGuid == guid && !isDisbanding)
     {
-        QueryResult *result = CharacterDatabase.PQuery("SELECT guid FROM guild_member WHERE guildid='%u' AND guid != '%u' ORDER BY rank ASC LIMIT 1", Id, GUID_LOPART(leaderGuid));
-        if( result )
+        MemberSlot* oldLeader = NULL;
+        MemberSlot* best = NULL;
+        uint64 newLeaderGUID = 0;
+        for(Guild::MemberList::iterator i = members.begin(); i != members.end(); ++i)
         {
-            uint64 newLeaderGUID;
-            Player *newLeader;
-            std::string newLeaderName, oldLeaderName;
-
-            newLeaderGUID = (*result)[0].GetUInt64();
-            delete result;
-
-            SetLeader(newLeaderGUID);
-
-            newLeader = objmgr.GetPlayer(newLeaderGUID);
-
-            // If player not online data in data field will be loaded from guild tabs no need to update it !!
-            if(newLeader)
+            if(i->first == GUID_LOPART(guid))
             {
-                newLeader->SetRank(GR_GUILDMASTER);
-                newLeaderName = newLeader->GetName();
-            }
-            else
-                objmgr.GetPlayerNameByGUID(newLeaderGUID, newLeaderName);
-
-            // when leader non-exist (at guild load with deleted leader only) not send broadcasts
-            if(objmgr.GetPlayerNameByGUID(guid, oldLeaderName))
-            {
-                WorldPacket data(SMSG_GUILD_EVENT, (1+1+oldLeaderName.size()+1+newLeaderName.size()+1));
-                data << (uint8)GE_LEADER_CHANGED;
-                data << (uint8)2;
-                data << oldLeaderName;
-                data << newLeaderName;
-                BroadcastPacket(&data);
-
-                data.Initialize(SMSG_GUILD_EVENT, (1+1+oldLeaderName.size()+1));
-                data << (uint8)GE_LEFT;
-                data << (uint8)1;
-                data << oldLeaderName;
-                BroadcastPacket(&data);
+                oldLeader = &(i->second);
+                continue;
             }
 
-            sLog.outDebug( "WORLD: Sent (SMSG_GUILD_EVENT)" );
+            if(!best || best->RankId > i->second.RankId)
+            {
+                best = &(i->second);
+                newLeaderGUID = i->first;
+            }
         }
-        else
+        if(!best)
         {
             Disband();
             return;
         }
+
+        SetLeader(newLeaderGUID);
+
+        // If player not online data in data field will be loaded from guild tabs no need to update it !!
+        if(Player *newLeader = objmgr.GetPlayer(newLeaderGUID))
+            newLeader->SetRank(GR_GUILDMASTER);
+
+        // when leader non-exist (at guild load with deleted leader only) not send broadcasts
+        if(oldLeader)
+        {
+            WorldPacket data(SMSG_GUILD_EVENT, (1+1+(oldLeader->name).size()+1+(best->name).size()+1));
+            data << (uint8)GE_LEADER_CHANGED;
+            data << (uint8)2;
+            data << oldLeader->name;
+            data << best->name;
+            BroadcastPacket(&data);
+
+            data.Initialize(SMSG_GUILD_EVENT, (1+1+(oldLeader->name).size()+1));
+            data << (uint8)GE_LEFT;
+            data << (uint8)1;
+            data << oldLeader->name;
+            BroadcastPacket(&data);
+        }
+
+        sLog.outDebug( "WORLD: Sent (SMSG_GUILD_EVENT)" );
     }
 
     members.erase(GUID_LOPART(guid));

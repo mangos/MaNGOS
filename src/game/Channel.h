@@ -147,7 +147,7 @@ class Channel
 
     typedef     std::map<uint64, PlayerInfo> PlayerList;
     PlayerList  players;
-    typedef     std::list<uint64> BannedList;
+    typedef     std::set<uint64> BannedList;
     BannedList  banned;
     bool        m_announce;
     bool        m_moderate;
@@ -202,15 +202,9 @@ class Channel
         void SendToAllButOne(WorldPacket *data, uint64 who);
         void SendToOne(WorldPacket *data, uint64 who);
 
-        bool IsOn(uint64 who) const { return players.count(who) > 0; }
+        bool IsOn(uint64 who) const { return players.count(who) != 0; }
 
-        bool IsBanned(const uint64 guid) const
-        {
-            for(BannedList::const_iterator i = banned.begin(); i != banned.end(); ++i)
-                if(*i == guid)
-                    return true;
-            return false;
-        }
+        bool IsBanned(const uint64 guid) const {return banned.count(guid) != 0; }
 
         bool IsFirst() const { return !(players.size() > 1); }
 

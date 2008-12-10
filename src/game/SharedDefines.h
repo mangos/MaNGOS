@@ -553,7 +553,6 @@ enum SpellEffects
     SPELL_EFFECT_TRADE_SKILL               = 47,
     SPELL_EFFECT_STEALTH                   = 48,
     SPELL_EFFECT_DETECT                    = 49,
-    //    SPELL_EFFECT_SUMMON_OBJECT             = 50,
     SPELL_EFFECT_TRANS_DOOR                = 50,
     SPELL_EFFECT_FORCE_CRITICAL_HIT        = 51,
     SPELL_EFFECT_GUARANTEE_HIT             = 52,
@@ -766,7 +765,7 @@ enum SpellImmunity
     IMMUNITY_MECHANIC              = 5                      // enum Mechanics
 };
 
-#define MAX_SPELL_IMMUNITY         6
+#define MAX_SPELL_IMMUNITY           6
 
 enum Targets
 {
@@ -831,7 +830,7 @@ enum SpellMissInfo
     SPELL_MISS_IMMUNE2                 = 8,
     SPELL_MISS_DEFLECT                 = 9,
     SPELL_MISS_ABSORB                  = 10,
-    SPELL_MISS_REFLECT                 = 11,
+    SPELL_MISS_REFLECT                 = 11
 };
 
 enum SpellHitType
@@ -903,13 +902,13 @@ enum GameobjectTypes
 
 enum GameObjectFlags
 {
-    GO_FLAG_IN_USE          = 0x01,                         //disables interaction while animated
-    GO_FLAG_LOCKED          = 0x02,                         //require key, spell, event, etc to be opened. Makes "Locked" appear in tooltip
-    GO_FLAG_INTERACT_COND   = 0x04,                         //cannot interact (condition to interact)
-    GO_FLAG_TRANSPORT       = 0x08,                         //any kind of transport? Object can transport (elevator, boat, car)
-    GO_FLAG_UNK1            = 0x10,                         //
-    GO_FLAG_NODESPAWN       = 0x20,                         //never despawn, typically for doors, they just change state
-    GO_FLAG_TRIGGERED       = 0x40,                         //typically, summoned objects. Triggered by spell or other events
+    GO_FLAG_IN_USE          = 0x00000001,                   //disables interaction while animated
+    GO_FLAG_LOCKED          = 0x00000002,                   //require key, spell, event, etc to be opened. Makes "Locked" appear in tooltip
+    GO_FLAG_INTERACT_COND   = 0x00000004,                   //cannot interact (condition to interact)
+    GO_FLAG_TRANSPORT       = 0x00000008,                   //any kind of transport? Object can transport (elevator, boat, car)
+    GO_FLAG_UNK1            = 0x00000010,                   //
+    GO_FLAG_NODESPAWN       = 0x00000020,                   //never despawn, typically for doors, they just change state
+    GO_FLAG_TRIGGERED       = 0x00000040                    //typically, summoned objects. Triggered by spell or other events
 };
 
 enum TextEmotes
@@ -1503,7 +1502,7 @@ enum CreatureFamily
     CREATURE_FAMILY_SPIDER         = 3,
     CREATURE_FAMILY_BEAR           = 4,
     CREATURE_FAMILY_BOAR           = 5,
-    CREATURE_FAMILY_CROCILISK      = 6,
+    CREATURE_FAMILY_CROCOLISK      = 6,
     CREATURE_FAMILY_CARRION_BIRD   = 7,
     CREATURE_FAMILY_CRAB           = 8,
     CREATURE_FAMILY_GORILLA        = 9,
@@ -1533,9 +1532,9 @@ enum CreatureFamily
 
 enum CreatureTypeFlags
 {
-    CREATURE_TYPEFLAGS_TAMEBLE    = 0x0001,
+    CREATURE_TYPEFLAGS_TAMEABLE   = 0x0001,
     CREATURE_TYPEFLAGS_HERBLOOT   = 0x0100,
-    CREATURE_TYPEFLAGS_MININGLOOT = 0x0200,
+    CREATURE_TYPEFLAGS_MININGLOOT = 0x0200
 };
 
 enum CreatureEliteType

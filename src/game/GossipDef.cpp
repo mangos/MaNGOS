@@ -128,26 +128,20 @@ void PlayerMenu::SendGossipMenu( uint32 TitleTextId, uint64 npcGUID )
     data << npcGUID;
     data << uint32(0);                                      // new 2.4.0
     data << uint32( TitleTextId );
-    data << uint32( mGossipMenu.MenuItemCount() );         // max count 0x0F
+    data << uint32( mGossipMenu.MenuItemCount() );          // max count 0x0F
 
     for ( unsigned int iI = 0; iI < mGossipMenu.MenuItemCount(); iI++ )
     {
         GossipMenuItem const& gItem = mGossipMenu.GetItem(iI);
         data << uint32( iI );
         data << uint8( gItem.m_gIcon );
-        // icons:
-        // 0 unlearn talents/misc
-        // 1 trader
-        // 2 taxi
-        // 3 trainer
-        // 9 BG/arena
         data << uint8( gItem.m_gCoded );                    // makes pop up box password
         data << uint32(gItem.m_gBoxMoney);                  // money required to open menu, 2.0.3
         data << gItem.m_gMessage;                           // text for gossip item
         data << gItem.m_gBoxMessage;                        // accept text (related to money) pop up box, 2.0.3
     }
 
-    data << uint32( mQuestMenu.MenuItemCount() );          // max count 0x20
+    data << uint32( mQuestMenu.MenuItemCount() );           // max count 0x20
 
     for ( uint16 iI = 0; iI < mQuestMenu.MenuItemCount(); iI++ )
     {
@@ -155,7 +149,7 @@ void PlayerMenu::SendGossipMenu( uint32 TitleTextId, uint64 npcGUID )
         uint32 questID = qItem.m_qId;
         Quest const* pQuest = objmgr.GetQuestTemplate(questID);
 
-        data << questID;
+        data << uint32(questID);
         data << uint32( qItem.m_qIcon );
         data << uint32( pQuest ? pQuest->GetQuestLevel() : 0 );
         std::string Title = pQuest->GetTitle();
@@ -332,7 +326,7 @@ void QuestMenu::AddMenuItem( uint32 QuestId, uint8 Icon)
 
 bool QuestMenu::HasItem( uint32 questid )
 {
-    for (QuestMenuItemList::iterator i = m_qItems.begin(); i != m_qItems.end(); i++)
+    for (QuestMenuItemList::iterator i = m_qItems.begin(); i != m_qItems.end(); ++i)
     {
         if(i->m_qId==questid)
         {
@@ -381,8 +375,7 @@ void PlayerMenu::SendQuestGiverQuestList( QEmote eEmote, std::string Title, uint
         data << title;
     }
     pSession->SendPacket( &data );
-    //uint32 fqid=pQuestMenu->GetItem(0).m_qId;
-    //sLog.outDebug( "WORLD: Sent SMSG_QUESTGIVER_QUEST_LIST NPC Guid=%u, questid-0=%u",npcGUID,fqid);
+    sLog.outDebug("WORLD: Sent SMSG_QUESTGIVER_QUEST_LIST NPC Guid=%u", GUID_LOPART(npcGUID));
 }
 
 void PlayerMenu::SendQuestGiverStatus( uint8 questStatus, uint64 npcGUID )
@@ -392,7 +385,7 @@ void PlayerMenu::SendQuestGiverStatus( uint8 questStatus, uint64 npcGUID )
     data << uint8(questStatus);
 
     pSession->SendPacket( &data );
-    sLog.outDebug( "WORLD: Sent SMSG_QUESTGIVER_STATUS NPC Guid=%u, status=%u",GUID_LOPART(npcGUID),questStatus);
+    sLog.outDebug( "WORLD: Sent SMSG_QUESTGIVER_STATUS NPC Guid=%u, status=%u", GUID_LOPART(npcGUID), questStatus);
 }
 
 void PlayerMenu::SendQuestGiverQuestDetails( Quest const *pQuest, uint64 npcGUID, bool ActivateAccept )
@@ -462,6 +455,7 @@ void PlayerMenu::SendQuestGiverQuestDetails( Quest const *pQuest, uint64 npcGUID
             else
                 data << uint32(0);
         }
+
         data << uint32(pQuest->GetRewOrReqMoney());
     }
 
@@ -479,7 +473,7 @@ void PlayerMenu::SendQuestGiverQuestDetails( Quest const *pQuest, uint64 npcGUID
     }
     pSession->SendPacket( &data );
 
-    sLog.outDebug("WORLD: Sent SMSG_QUESTGIVER_QUEST_DETAILS NPCGuid=%u, questid=%u",GUID_LOPART(npcGUID),pQuest->GetQuestId());
+    sLog.outDebug("WORLD: Sent SMSG_QUESTGIVER_QUEST_DETAILS NPCGuid=%u, questid=%u", GUID_LOPART(npcGUID), pQuest->GetQuestId());
 }
 
 void PlayerMenu::SendQuestQueryResponse( Quest const *pQuest )
@@ -760,8 +754,10 @@ void PlayerMenu::SendQuestGiverRequestItems( Quest const *pQuest, uint64 npcGUID
     else
         data << uint32(0x03);
 
-    data << uint32(0x04) << uint32(0x08) << uint32(0x10);
+    data << uint32(0x04);
+    data << uint32(0x08);
+    data << uint32(0x10);
 
     pSession->SendPacket( &data );
-    sLog.outDebug( "WORLD: Sent SMSG_QUESTGIVER_REQUEST_ITEMS NPCGuid=%u, questid=%u",GUID_LOPART(npcGUID),pQuest->GetQuestId() );
+    sLog.outDebug( "WORLD: Sent SMSG_QUESTGIVER_REQUEST_ITEMS NPCGuid=%u, questid=%u", GUID_LOPART(npcGUID), pQuest->GetQuestId() );
 }

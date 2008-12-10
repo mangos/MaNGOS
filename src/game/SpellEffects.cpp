@@ -887,7 +887,7 @@ void Spell::EffectDummy(uint32 i)
                     if (!m_caster->HasAuraType(SPELL_AURA_MOUNTED))
                         return;
 
-                    float flyspeed = m_caster->GetSpeedRate(MOVE_FLY);
+                    float flyspeed = m_caster->GetSpeedRate(MOVE_FLIGHT);
                     float speed = m_caster->GetSpeedRate(MOVE_RUN);
 
                     m_caster->RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);
@@ -990,9 +990,14 @@ void Spell::EffectDummy(uint32 i)
                     return;
                 }
                 case 37674:                                 // Chaos Blast
-                    if(unitTarget)
-                        m_caster->CastSpell(unitTarget,37675,true);
+                {
+                    if(!unitTarget)
+                        return;
+
+                    int32 basepoints0 = 100;
+                    m_caster->CastCustomSpell(unitTarget,37675,&basepoints0,NULL,NULL,true);
                     return;
+                }
                 case 40802:                                 // Mingo's Fortune Generator (Mingo's Fortune Giblets)
                 {
                     // selecting one from Bloodstained Fortune item
@@ -2195,7 +2200,7 @@ void Spell::EffectApplyAura(uint32 i)
 
     // Prayer of Mending (jump animation), we need formal caster instead original for correct animation
     if( m_spellInfo->SpellFamilyName == SPELLFAMILY_PRIEST && (m_spellInfo->SpellFamilyFlags & 0x00002000000000LL))
-        m_caster->CastSpell(unitTarget,41637,true,NULL,Aur);
+        m_caster->CastSpell(unitTarget, 41637, true, NULL, Aur, m_originalCasterGUID);
 }
 
 void Spell::EffectUnlearnSpecialization( uint32 i )
@@ -3245,17 +3250,17 @@ void Spell::EffectSummon(uint32 i)
     if(duration > 0)
         spawnCreature->SetDuration(duration);
 
-    spawnCreature->SetUInt64Value(UNIT_FIELD_SUMMONEDBY,m_caster->GetGUID());
-    spawnCreature->SetUInt32Value(UNIT_NPC_FLAGS , 0);
+    spawnCreature->SetOwnerGUID(m_caster->GetGUID());
+    spawnCreature->SetUInt32Value(UNIT_NPC_FLAGS, 0);
     spawnCreature->setPowerType(POWER_MANA);
-    spawnCreature->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE,m_caster->getFaction());
-    spawnCreature->SetUInt32Value(UNIT_FIELD_FLAGS,0);
-    spawnCreature->SetUInt32Value(UNIT_FIELD_BYTES_0,2048);
-    spawnCreature->SetUInt32Value(UNIT_FIELD_BYTES_1,0);
-    spawnCreature->SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP,0);
-    spawnCreature->SetUInt32Value(UNIT_FIELD_PETEXPERIENCE,0);
-    spawnCreature->SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP,1000);
-    spawnCreature->SetUInt64Value(UNIT_FIELD_CREATEDBY, m_caster->GetGUID());
+    spawnCreature->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, m_caster->getFaction());
+    spawnCreature->SetUInt32Value(UNIT_FIELD_FLAGS, 0);
+    spawnCreature->SetUInt32Value(UNIT_FIELD_BYTES_0, 2048);
+    spawnCreature->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
+    spawnCreature->SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, 0);
+    spawnCreature->SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
+    spawnCreature->SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, 1000);
+    spawnCreature->SetCreatorGUID(m_caster->GetGUID());
     spawnCreature->SetUInt32Value(UNIT_CREATED_BY_SPELL, m_spellInfo->Id);
 
     spawnCreature->InitStatsForLevel(level);
@@ -3517,7 +3522,8 @@ void Spell::EffectAddFarsight(uint32 i)
     dynObj->SetUInt32Value(DYNAMICOBJECT_BYTES, 0x80000002);
     m_caster->AddDynObject(dynObj);
     dynObj->GetMap()->Add(dynObj);
-    m_caster->SetUInt64Value(PLAYER_FARSIGHT, dynObj->GetGUID());
+    if(m_caster->GetTypeId() == TYPEID_PLAYER)
+        ((Player*)m_caster)->SetFarSight(dynObj->GetGUID());
 }
 
 void Spell::EffectSummonWild(uint32 i)
@@ -3674,14 +3680,14 @@ void Spell::EffectSummonGuardian(uint32 i)
         if(duration > 0)
             spawnCreature->SetDuration(duration);
 
-        spawnCreature->SetUInt64Value(UNIT_FIELD_SUMMONEDBY,m_caster->GetGUID());
+        spawnCreature->SetOwnerGUID(m_caster->GetGUID());
         spawnCreature->setPowerType(POWER_MANA);
         spawnCreature->SetUInt32Value(UNIT_NPC_FLAGS , 0);
         spawnCreature->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE,m_caster->getFaction());
         spawnCreature->SetUInt32Value(UNIT_FIELD_FLAGS,0);
         spawnCreature->SetUInt32Value(UNIT_FIELD_BYTES_1,0);
         spawnCreature->SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP,0);
-        spawnCreature->SetUInt64Value(UNIT_FIELD_CREATEDBY, m_caster->GetGUID());
+        spawnCreature->SetCreatorGUID(m_caster->GetGUID());
         spawnCreature->SetUInt32Value(UNIT_CREATED_BY_SPELL, m_spellInfo->Id);
 
         spawnCreature->InitStatsForLevel(level);
@@ -4083,15 +4089,15 @@ void Spell::EffectSummonPet(uint32 i)
             NewSummon->GetCharmInfo()->SetReactState(REACT_DEFENSIVE);
     }
 
-    NewSummon->SetUInt64Value(UNIT_FIELD_SUMMONEDBY, m_caster->GetGUID());
-    NewSummon->SetUInt64Value(UNIT_FIELD_CREATEDBY, m_caster->GetGUID());
-    NewSummon->SetUInt32Value(UNIT_NPC_FLAGS , 0);
+    NewSummon->SetOwnerGUID(m_caster->GetGUID());
+    NewSummon->SetCreatorGUID(m_caster->GetGUID());
+    NewSummon->SetUInt32Value(UNIT_NPC_FLAGS, 0);
     NewSummon->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, faction);
-    NewSummon->SetUInt32Value(UNIT_FIELD_BYTES_0,2048);
-    NewSummon->SetUInt32Value(UNIT_FIELD_BYTES_1,0);
-    NewSummon->SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP,time(NULL));
-    NewSummon->SetUInt32Value(UNIT_FIELD_PETEXPERIENCE,0);
-    NewSummon->SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP,1000);
+    NewSummon->SetUInt32Value(UNIT_FIELD_BYTES_0, 2048);
+    NewSummon->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
+    NewSummon->SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, time(NULL));
+    NewSummon->SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
+    NewSummon->SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, 1000);
     NewSummon->SetUInt32Value(UNIT_CREATED_BY_SPELL, m_spellInfo->Id);
 
     NewSummon->GetCharmInfo()->SetPetNumber(pet_number, true);
@@ -4100,7 +4106,7 @@ void Spell::EffectSummonPet(uint32 i)
     // this enables popup window (pet dismiss, cancel), hunter pet additional flags set later
     NewSummon->SetUInt32Value(UNIT_FIELD_FLAGS,UNIT_FLAG_PVP_ATTACKABLE);
 
-    NewSummon->InitStatsForLevel( petlevel);
+    NewSummon->InitStatsForLevel(petlevel);
     NewSummon->InitPetCreateSpells();
 
     if(NewSummon->getPetType()==SUMMON_PET)
@@ -4582,6 +4588,38 @@ void Spell::EffectScriptEffect(uint32 effIndex)
     // by spell id
     switch(m_spellInfo->Id)
     {
+        // PX-238 Winter Wondervolt TRAP
+        case 26275:
+        {
+            if( unitTarget->HasAura(26272,0)
+             || unitTarget->HasAura(26157,0)
+             || unitTarget->HasAura(26273,0)
+             || unitTarget->HasAura(26274,0))
+                return;
+
+            uint32 iTmpSpellId;
+
+            switch(urand(0,3))
+            {
+                case 0:
+                    iTmpSpellId = 26272;
+                    break;
+                case 1:
+                    iTmpSpellId = 26157;
+                    break;
+                case 2:
+                    iTmpSpellId = 26273;
+                    break;
+                case 3:
+                    iTmpSpellId = 26274;
+                    break;
+            }
+
+            unitTarget->CastSpell(unitTarget, iTmpSpellId, true);
+
+            return;
+        }
+
         // Bending Shinbone
         case 8856:
         {
@@ -5666,8 +5704,8 @@ void Spell::EffectSummonCritter(uint32 i)
         return;
     }
 
-    critter->SetUInt64Value(UNIT_FIELD_SUMMONEDBY,m_caster->GetGUID());
-    critter->SetUInt64Value(UNIT_FIELD_CREATEDBY,m_caster->GetGUID());
+    critter->SetOwnerGUID(m_caster->GetGUID());
+    critter->SetCreatorGUID(m_caster->GetGUID());
     critter->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE,m_caster->getFaction());
     critter->SetUInt32Value(UNIT_CREATED_BY_SPELL, m_spellInfo->Id);
 

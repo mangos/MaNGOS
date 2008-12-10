@@ -59,7 +59,12 @@ struct MANGOS_DLL_DECL Traveller
 template<>
 inline float Traveller<Creature>::Speed()
 {
-    return i_traveller.GetSpeed( i_traveller.HasUnitMovementFlag(MOVEMENTFLAG_WALK_MODE) ? MOVE_WALK : MOVE_RUN);
+    if(i_traveller.HasUnitMovementFlag(MOVEMENTFLAG_WALK_MODE))
+        return i_traveller.GetSpeed(MOVE_WALK);
+    else if(i_traveller.HasUnitMovementFlag(MOVEMENTFLAG_FLYING2))
+        return i_traveller.GetSpeed(MOVE_FLIGHT);
+    else
+        return i_traveller.GetSpeed(MOVE_RUN);
 }
 
 template<>

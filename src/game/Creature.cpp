@@ -446,6 +446,11 @@ void Creature::Update(uint32 diff)
             m_regenTimer = 2000;
             break;
         }
+        case DEAD_FALLING:
+        {
+            if (!FallGround())
+                setDeathState(JUST_DIED);
+        }
         default:
             break;
     }
@@ -689,7 +694,7 @@ void Creature::prepareGossipMenu( Player *pPlayer,uint32 gossipid )
     // lazy loading single time at use
     LoadGossipOptions();
 
-    for( GossipOptionList::iterator i = m_goptions.begin( ); i != m_goptions.end( ); i++ )
+    for( GossipOptionList::iterator i = m_goptions.begin( ); i != m_goptions.end( ); ++i )
     {
         GossipOption* gso=&*i;
         if(gso->GossipId == gossipid)
@@ -921,44 +926,7 @@ void Creature::OnPoiSelect(Player* player, GossipOption const *gossip)
 {
     if(gossip->GossipId==GOSSIP_GUARD_SPELLTRAINER || gossip->GossipId==GOSSIP_GUARD_SKILLTRAINER)
     {
-        //float x,y;
-        //bool findnpc=false;
         Poi_Icon icon = ICON_POI_0;
-        //QueryResult *result;
-        //Field *fields;
-        uint32 mapid=GetMapId();
-        Map const* map=MapManager::Instance().GetBaseMap( mapid );
-        uint16 areaflag=map->GetAreaFlag(GetPositionX(),GetPositionY());
-        uint32 zoneid=Map::GetZoneId(areaflag,mapid);
-        std::string areaname= gossip->OptionText;
-        /*
-        uint16 pflag;
-
-        // use the action relate to creaturetemplate.trainer_type ?
-        result= WorldDatabase.PQuery("SELECT creature.position_x,creature.position_y FROM creature,creature_template WHERE creature.map = '%u' AND creature.id = creature_template.entry AND creature_template.trainer_type = '%u'", mapid, gossip->Action );
-        if(!result)
-            return;
-        do
-        {
-            fields = result->Fetch();
-            x=fields[0].GetFloat();
-            y=fields[1].GetFloat();
-            pflag=map->GetAreaFlag(GetPositionX(),GetPositionY());
-            if(pflag==areaflag)
-            {
-                findnpc=true;
-                break;
-            }
-        }while(result->NextRow());
-
-        delete result;
-
-        if(!findnpc)
-        {
-            player->PlayerTalkClass->SendTalking( "$NSorry", "Here no this person.");
-            return;
-        }*/
-
         //need add more case.
         switch(gossip->Action)
         {
@@ -975,8 +943,9 @@ void Creature::OnPoiSelect(Player* player, GossipOption const *gossip)
                 icon=ICON_POI_TOWER;
                 break;
         }
-        uint32 textid=GetGossipTextId( gossip->Action, zoneid );
-        player->PlayerTalkClass->SendTalking( textid );
+        uint32 textid = GetGossipTextId( gossip->Action, GetZoneId() );
+        player->PlayerTalkClass->SendTalking(textid);
+        // std::string areaname= gossip->OptionText;
         // how this could worked player->PlayerTalkClass->SendPointOfInterest( x, y, icon, 2, 15, areaname.c_str() );
     }
 }
@@ -1009,7 +978,7 @@ uint32 Creature::GetNpcTextId()
 
 GossipOption const* Creature::GetGossipOption( uint32 id ) const
 {
-    for( GossipOptionList::const_iterator i = m_goptions.begin( ); i != m_goptions.end( ); i++ )
+    for( GossipOptionList::const_iterator i = m_goptions.begin( ); i != m_goptions.end( ); ++i )
     {
         if(i->Action==id )
             return &*i;
@@ -1340,7 +1309,15 @@ bool Creature::LoadFromDB(uint32 guid, Map *map)
 
     m_respawnTime  = objmgr.GetCreatureRespawnTime(m_DBTableGuid,GetInstanceId());
     if(m_respawnTime > time(NULL))                          // not ready to respawn
+    {
         m_deathState = DEAD;
+        if(canFly())
+        {
+            float tz = GetMap()->GetHeight(data->posX,data->posY,data->posZ,false);
+            if(data->posZ - tz > 0.1)
+                Relocate(data->posX,data->posY,tz);
+        }
+    }
     else if(m_respawnTime)                                  // respawn time set but expired
     {
         m_respawnTime = 0;
@@ -1487,6 +1464,9 @@ void Creature::setDeathState(DeathState s)
         if(sWorld.getConfig(CONFIG_SAVE_RESPAWN_TIME_IMMEDIATLY) || isWorldBoss())
             SaveRespawnTime();
 
+        if (canFly() && FallGround())
+            return;
+
         if(!IsStopped())
             StopMoving();
     }
@@ -1500,6 +1480,9 @@ void Creature::setDeathState(DeathState s)
         if(!isPet() && GetCreatureInfo()->SkinLootId)
             if ( LootTemplates_Skinning.HaveLootFor(GetCreatureInfo()->SkinLootId) )
                 SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
+
+        if (canFly() && FallGround())
+            return;
 
         Unit::setDeathState(CORPSE);
     }
@@ -1518,6 +1501,25 @@ void Creature::setDeathState(DeathState s)
         SetMeleeDamageSchool(SpellSchools(cinfo->dmgschool));
         LoadCreaturesAddon(true);
     }
+}
+
+bool Creature::FallGround()
+{
+    // Let's abort after we called this function one time
+    if (getDeathState() == DEAD_FALLING)
+        return false;
+
+    // Let's do with no vmap because no way to get far distance with vmap high call
+    float tz = GetMap()->GetHeight(GetPositionX(), GetPositionY(), GetPositionZ(), false);
+
+    // Abort too if the ground is very near
+    if (fabs(GetPositionZ() - tz) < 0.1f)
+        return false;
+
+    Unit::setDeathState(DEAD_FALLING);
+    GetMotionMaster()->MovePoint(0, GetPositionX(), GetPositionY(), tz);
+    Relocate(GetPositionX(), GetPositionY(), tz);
+    return true;
 }
 
 void Creature::Respawn()

@@ -516,10 +516,10 @@ typedef std::map<uint32, QuestStatusData> QuestStatusMap;
 
 enum QuestSlotOffsets
 {
-    QUEST_ID_OFFSET = 0,
-    QUEST_STATE_OFFSET = 1,
+    QUEST_ID_OFFSET     = 0,
+    QUEST_STATE_OFFSET  = 1,
     QUEST_COUNTS_OFFSET = 2,
-    QUEST_TIME_OFFSET = 3
+    QUEST_TIME_OFFSET   = 3
 };
 
 #define MAX_QUEST_OFFSET 4
@@ -1683,6 +1683,7 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         FactionStateList m_factions;
         ForcedReactions m_forcedReactions;
+        FactionStateList const& GetFactionStateList() { return m_factions; }
         uint32 GetDefaultReputationFlags(const FactionEntry *factionEntry) const;
         int32 GetBaseReputation(const FactionEntry *factionEntry) const;
         int32 GetReputation(uint32 faction_id) const;
@@ -1909,6 +1910,8 @@ class MANGOS_DLL_SPEC Player : public Unit
         /***                 VARIOUS SYSTEMS                   ***/
         /*********************************************************/
         MovementInfo m_movementInfo;
+        uint32 m_lastFallTime;
+        float  m_lastFallZ;
         bool isMoving() const { return HasUnitMovementFlag(movementFlagsMask); }
         bool isMovingOrTurning() const { return HasUnitMovementFlag(movementOrTurningFlagsMask); }
 
@@ -1918,6 +1921,9 @@ class MANGOS_DLL_SPEC Player : public Unit
         void HandleDrowning();
 
         void SetClientControl(Unit* target, uint8 allowMove);
+
+        uint64 GetFarSight() const { return GetUInt64Value(PLAYER_FARSIGHT); }
+        void SetFarSight(uint64 guid) { SetUInt64Value(PLAYER_FARSIGHT, guid); }
 
         // Transports
         Transport * GetTransport() const { return m_transport; }
@@ -2024,6 +2030,9 @@ class MANGOS_DLL_SPEC Player : public Unit
         WorldLocation& GetTeleportDest() { return m_teleport_dest; }
 
         DeclinedName const* GetDeclinedNames() const { return m_declinedname; }
+        bool HasTitle(uint32 bitIndex);
+        bool HasTitle(CharTitlesEntry const* title) { return HasTitle(title->bit_index); }
+        void SetTitle(CharTitlesEntry const* title);
 
     protected:
 
