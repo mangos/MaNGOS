@@ -291,12 +291,13 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
     if (recv_data.GetOpcode() == MSG_MOVE_FALL_LAND && !GetPlayer()->isInFlight())
     {
         // calculate total z distance of the fall
-        float z_diff = GetPlayer()->m_fallMovementInfo.z - movementInfo.z;
+        float z_diff = GetPlayer()->m_lastFallZ - movementInfo.z;
         sLog.outDebug("zDiff = %f", z_diff);
         Player *target = GetPlayer();
 
-        //Players with Feather Fall or physical immunity (charges used) are ignored
-        if (!target->isDead() && !target->isGameMaster() &&
+        //Players with low fall distance, Feather Fall or physical immunity (charges used) are ignored
+        // 14.57 can be calculated by resolving damageperc formular below to 0
+        if (z_diff >= 14.57f && !target->isDead() && !target->isGameMaster() &&
             !target->HasAuraType(SPELL_AURA_HOVER) && !target->HasAuraType(SPELL_AURA_FEATHER_FALL) &&
             !target->HasAuraType(SPELL_AURA_FLY) && !target->IsImmunedToDamage(SPELL_SCHOOL_MASK_NORMAL,true) )
         {
@@ -361,8 +362,11 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 
     GetPlayer()->SetPosition(movementInfo.x, movementInfo.y, movementInfo.z, movementInfo.o);
     GetPlayer()->m_movementInfo = movementInfo;
-    if (GetPlayer()->m_fallMovementInfo.fallTime >= movementInfo.fallTime || GetPlayer()->m_fallMovementInfo.z <=movementInfo.z)
-        GetPlayer()->m_fallMovementInfo = movementInfo;
+    if (GetPlayer()->m_lastFallTime >= movementInfo.fallTime || GetPlayer()->m_lastFallZ <=movementInfo.z)
+    {
+        GetPlayer()->m_lastFallTime = movementInfo.fallTime;
+        GetPlayer()->m_lastFallZ= movementInfo.z;
+    }
 
     if(GetPlayer()->isMovingOrTurning())
         GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
