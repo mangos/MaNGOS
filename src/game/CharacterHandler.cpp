@@ -904,23 +904,8 @@ void WorldSession::HandleChangePlayerNameOpcode(WorldPacket& recv_data)
     recv_data >> guid;
     recv_data >> newname;
 
-    QueryResult *result = CharacterDatabase.PQuery("SELECT at_login FROM characters WHERE guid ='%u'", GUID_LOPART(guid));
-    if (result)
-    {
-        uint32 at_loginFlags;
-        Field *fields = result->Fetch();
-        at_loginFlags = fields[0].GetUInt32();
-        delete result;
-
-        if (!(at_loginFlags & AT_LOGIN_RENAME))
-        {
-            WorldPacket data(SMSG_CHAR_RENAME, 1);
-            data << (uint8)CHAR_CREATE_ERROR;
-            SendPacket( &data );
-            return;
-        }
-    }
-    else
+    QueryResult *result = CharacterDatabase.PQuery("SELECT at_login, name FROM characters WHERE guid ='%u'", GUID_LOPART(guid));
+    if (!result)
     {
         WorldPacket data(SMSG_CHAR_RENAME, 1);
         data << (uint8)CHAR_CREATE_ERROR;
@@ -928,10 +913,16 @@ void WorldSession::HandleChangePlayerNameOpcode(WorldPacket& recv_data)
         return;
     }
 
-    if(!objmgr.GetPlayerNameByGUID(guid, oldname))          // character not exist, because we have no name for this guid
+    uint32 at_loginFlags;
+    Field *fields = result->Fetch();
+    at_loginFlags = fields[0].GetUInt32();
+    oldname = fields[1].GetCppString();
+    delete result;
+
+    if (!(at_loginFlags & AT_LOGIN_RENAME))
     {
         WorldPacket data(SMSG_CHAR_RENAME, 1);
-        data << (uint8)CHAR_LOGIN_NO_CHARACTER;
+        data << (uint8)CHAR_CREATE_ERROR;
         SendPacket( &data );
         return;
     }
