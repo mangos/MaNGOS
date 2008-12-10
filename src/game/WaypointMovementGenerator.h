@@ -73,10 +73,8 @@ class MANGOS_DLL_SPEC WaypointMovementGenerator<Creature>
 : public MovementGeneratorMedium< Creature, WaypointMovementGenerator<Creature> >,
 public PathMovementBase<Creature, WaypointPath*>
 {
-    TimeTrackerSmall i_nextMoveTime;
-    std::vector<bool> i_hasDone;
     public:
-        WaypointMovementGenerator(Creature &) : i_nextMoveTime(0) {}
+        WaypointMovementGenerator(Creature &) : i_nextMoveTime(0), b_StopedByPlayer(false) {}
         ~WaypointMovementGenerator() { ClearWaypoints(); }
         void Initialize(Creature &u)
         {
@@ -85,7 +83,12 @@ public PathMovementBase<Creature, WaypointPath*>
             LoadPath(u);
         }
         void Finalize(Creature &) {}
-        void Reset(Creature &u) { ReloadPath(u); }
+        void Reset(Creature &u)
+        {
+            ReloadPath(u);
+            b_StopedByPlayer = false;
+            i_nextMoveTime.Reset(0);
+        }
         bool Update(Creature &u, const uint32 &diff);
 
         void MovementInform(Creature &);
@@ -104,6 +107,9 @@ public PathMovementBase<Creature, WaypointPath*>
         static void Initialize(void);
     private:
         void ClearWaypoints();
+
+        TimeTrackerSmall i_nextMoveTime;
+        std::vector<bool> i_hasDone;
         bool b_StopedByPlayer;
 };
 
