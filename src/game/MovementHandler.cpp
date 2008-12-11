@@ -404,11 +404,11 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
     {
         UnitMoveType move_type;
 
-        if (MovementFlags & MOVEMENTFLAG_FLYING) move_type = MovementFlags & MOVEMENTFLAG_BACKWARD ? MOVE_FLYBACK : MOVE_FLY;
-        else if (MovementFlags & MOVEMENTFLAG_SWIMMING) move_type = MovementFlags & MOVEMENTFLAG_BACKWARD ? MOVE_SWIMBACK : MOVE_SWIM;
+        if (MovementFlags & MOVEMENTFLAG_FLYING) move_type = MovementFlags & MOVEMENTFLAG_BACKWARD ? MOVE_FLIGHT_BACK : MOVE_FLIGHT;
+        else if (MovementFlags & MOVEMENTFLAG_SWIMMING) move_type = MovementFlags & MOVEMENTFLAG_BACKWARD ? MOVE_SWIM_BACK : MOVE_SWIM;
         else if (MovementFlags & MOVEMENTFLAG_WALK_MODE) move_type = MOVE_WALK;
         //hmm... in first time after login player has MOVE_SWIMBACK instead MOVE_WALKBACK
-        else move_type = MovementFlags & MOVEMENTFLAG_BACKWARD ? MOVE_SWIMBACK : MOVE_RUN;
+        else move_type = MovementFlags & MOVEMENTFLAG_BACKWARD ? MOVE_SWIM_BACK : MOVE_RUN;
 
         float allowed_delta= 0;
         float current_speed = GetPlayer()->GetSpeed(move_type);
