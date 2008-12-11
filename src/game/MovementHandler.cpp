@@ -234,25 +234,24 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
     if (opcode == MSG_MOVE_FALL_LAND && !GetPlayer()->isInFlight())
     {
         // calculate total z distance of the fall
-        // it is currently only used for the achievement system. It might be used in a more correct falldamage formula later
-        float z_diff = GetPlayer()->m_fallMovementInfo.z - movementInfo.z;
-        sLog.outDebug("zDiff = %f, falltime = %u", z_diff, movementInfo.fallTime);
+        float z_diff = GetPlayer()->m_lastFallZ - movementInfo.z;
+        sLog.outDebug("zDiff = %f", z_diff);
         Player *target = GetPlayer();
 
-        //Players with Feather Fall or low fall time, or physical immunity (charges used) are ignored
-        if (movementInfo.fallTime > 1300 && !target->isDead() && !target->isGameMaster() &&
+        //Players with low fall distance, Feather Fall or physical immunity (charges used) are ignored
+        // 14.57 can be calculated by resolving damageperc formular below to 0
+        if (z_diff >= 14.57f && !target->isDead() && !target->isGameMaster() &&
             !target->HasAuraType(SPELL_AURA_HOVER) && !target->HasAuraType(SPELL_AURA_FEATHER_FALL) &&
             !target->HasAuraType(SPELL_AURA_FLY) && !target->IsImmunedToDamage(SPELL_SCHOOL_MASK_NORMAL,true) )
         {
-            //Safe fall, fall time reduction
+            //Safe fall, fall height reduction
             int32 safe_fall = target->GetTotalAuraModifier(SPELL_AURA_SAFE_FALL);
-            uint32 fall_time = (movementInfo.fallTime > (safe_fall*10)) ? movementInfo.fallTime - (safe_fall*10) : 0;
 
-            if(fall_time > 1300)                            //Prevent damage if fall time < 1300
+            float damageperc = 0.018f*(z_diff-safe_fall)-0.2426f;
+
+            if(damageperc >0 )
             {
-                //Fall Damage calculation
-                float fallperc = float(fall_time)/1300;
-                uint32 damage = (uint32)(((fallperc*fallperc -1) / 9 * target->GetMaxHealth())*sWorld.getRate(RATE_DAMAGE_FALL));
+                uint32 damage = (uint32)(damageperc * target->GetMaxHealth()*sWorld.getRate(RATE_DAMAGE_FALL));
 
                 float height = movementInfo.z;
                 target->UpdateGroundPositionZ(movementInfo.x,movementInfo.y,height);
@@ -286,8 +285,6 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
         GetPlayer()->SetInWater( !GetPlayer()->IsInWater() || GetPlayer()->GetBaseMap()->IsUnderWater(movementInfo.x, movementInfo.y, movementInfo.z) );
     }
 
-    if(opcode != MSG_MOVE_FALL_LAND && !(movementInfo.flags & MOVEMENTFLAG_FALLING))
-        _player->m_fallMovementInfo = movementInfo;         // save data before any fall
     /*----------------------*/
 
     /* process position-change */
@@ -320,8 +317,11 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
         }
     }
 
-    //if (GetPlayer()->m_fallMovementInfo.fallTime >= movementInfo.fallTime || GetPlayer()->m_fallMovementInfo.z <=movementInfo.z)
-    //    GetPlayer()->m_fallMovementInfo = movementInfo;
+    if (GetPlayer()->m_lastFallTime >= movementInfo.fallTime || GetPlayer()->m_lastFallZ <=movementInfo.z)
+    {
+        GetPlayer()->m_lastFallTime = movementInfo.fallTime;
+        GetPlayer()->m_lastFallZ= movementInfo.z;
+    }
 
     if(GetPlayer()->isMovingOrTurning())
         GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);

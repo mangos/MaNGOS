@@ -722,7 +722,7 @@ struct GlyphPropertiesEntry
     uint32  Id;
     uint32  SpellId;
     uint32  TypeFlags;
-    uint32  Unk1;
+    uint32  Unk1;                                           // GlyphIconId (SpellIcon.dbc)
 };
 
 struct GlyphSlotEntry
