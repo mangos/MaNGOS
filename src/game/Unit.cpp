@@ -7257,12 +7257,14 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
                  if ((*i)->GetModifier()->m_miscvalue == SPELLMOD_CHANCE_OF_SUCCESS && (*i)->GetSpellProto()->SpellIconID == 113)
                  {
                      int32 value2 = CalculateSpellDamage((*i)->GetSpellProto(),2,(*i)->GetSpellProto()->EffectBasePoints[2],this);
-                     basepoints0 = value2 * GetMaxPower(POWER_MANA) / 100;
+                     // Drain Soul
+                     CastCustomSpell(this, 18371, &basepoints0, NULL, NULL, true, castItem, triggeredByAura);
+                     break;
                  }
              }
-             if ( basepoints0 == 0 )
-                 return false;
-             trigger_spell_id = 18371;
+             // Not remove charge (aura removed on death in any cases)
+             // Need for correct work Drain Soul SPELL_AURA_CHANNEL_DEATH_ITEM aura
+             return false;
          }
          break;
      }
