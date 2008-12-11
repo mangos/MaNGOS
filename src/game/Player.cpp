@@ -1329,13 +1329,15 @@ void Player::setDeathState(DeathState s)
 
 void Player::BuildEnumData( QueryResult * result, WorldPacket * p_data )
 {
-    *p_data << GetGUID();
+    Field *fields = result->Fetch();
+
+    *p_data << uint64(GetGUID());
     *p_data << m_name;
 
-    *p_data << getRace();
+    *p_data << uint8(getRace());
     uint8 pClass = getClass();
-    *p_data << pClass;
-    *p_data << getGender();
+    *p_data << uint8(pClass);
+    *p_data << uint8(getGender());
 
     uint32 bytes = GetUInt32Value(PLAYER_BYTES);
     *p_data << uint8(bytes);
@@ -1350,14 +1352,15 @@ void Player::BuildEnumData( QueryResult * result, WorldPacket * p_data )
     // do not use GetMap! it will spawn a new instance since the bound instances are not loaded
     uint32 zoneId = MapManager::Instance().GetZoneId(GetMapId(), GetPositionX(),GetPositionY());
     sLog.outDebug("Player::BuildEnumData: m:%u, x:%f, y:%f, z:%f zone:%u", GetMapId(), GetPositionX(), GetPositionY(), GetPositionZ(), zoneId);
-    *p_data << zoneId;
-    *p_data << GetMapId();
+    *p_data << uint32(zoneId);
+    *p_data << uint32(GetMapId());
 
     *p_data << GetPositionX();
     *p_data << GetPositionY();
     *p_data << GetPositionZ();
 
-    *p_data << (result ? result->Fetch()[13].GetUInt32() : 0);
+    // guild id
+    *p_data << (result ? fields[13].GetUInt32() : 0);
 
     uint32 char_flags = 0;
     if(HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_HIDE_HELM))
@@ -1368,14 +1371,13 @@ void Player::BuildEnumData( QueryResult * result, WorldPacket * p_data )
         char_flags |= CHARACTER_FLAG_GHOST;
     if(HasAtLoginFlag(AT_LOGIN_RENAME))
         char_flags |= CHARACTER_FLAG_RENAME;
-    // always send the flag if declined names aren't used
-    // to let the client select a default method of declining the name
-    if(!sWorld.getConfig(CONFIG_DECLINED_NAMES_USED) || (result && result->Fetch()[14].GetCppString() != ""))
+    if(sWorld.getConfig(CONFIG_DECLINED_NAMES_USED) && (fields[14].GetCppString() != ""))
         char_flags |= CHARACTER_FLAG_DECLINED;
 
-    *p_data << (uint32)char_flags;                          // character flags
-    *p_data << (uint32)0;                                   // new wotlk
-    *p_data << (uint8)1;                                    // unknown
+    *p_data << uint32(char_flags);                          // character flags
+    // character customize (flags?)
+    *p_data << uint32(HasAtLoginFlag(AT_LOGIN_CUSTOMIZE) ? 1 : 0);
+    *p_data << uint8(1);                                    // unknown
 
     // Pets info
     {
@@ -1386,8 +1388,6 @@ void Player::BuildEnumData( QueryResult * result, WorldPacket * p_data )
         // show pet at selection character in character list  only for non-ghost character
         if(result && isAlive() && (pClass == CLASS_WARLOCK || pClass == CLASS_HUNTER))
         {
-            Field* fields = result->Fetch();
-
             uint32 entry = fields[10].GetUInt32();
             CreatureInfo const* cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(entry);
             if(cInfo)
@@ -1398,35 +1398,10 @@ void Player::BuildEnumData( QueryResult * result, WorldPacket * p_data )
             }
         }
 
-        *p_data << (uint32)petDisplayId;
-        *p_data << (uint32)petLevel;
-        *p_data << (uint32)petFamily;
+        *p_data << uint32(petDisplayId);
+        *p_data << uint32(petLevel);
+        *p_data << uint32(petFamily);
     }
-
-    /*ItemPrototype const *items[EQUIPMENT_SLOT_END];
-    for (int i = 0; i < EQUIPMENT_SLOT_END; i++)
-        items[i] = NULL;
-
-    QueryResult *result = CharacterDatabase.PQuery("SELECT slot,item_template FROM character_inventory WHERE guid = '%u' AND bag = 0",GetGUIDLow());
-    if (result)
-    {
-        do
-        {
-            Field *fields  = result->Fetch();
-            uint8  slot    = fields[0].GetUInt8() & 255;
-            uint32 item_id = fields[1].GetUInt32();
-            if( slot >= EQUIPMENT_SLOT_END )
-                continue;
-
-            items[slot] = objmgr.GetItemPrototype(item_id);
-            if(!items[slot])
-            {
-                sLog.outError( "Player::BuildEnumData: Player %s have unknown item (id: #%u) in inventory, skipped.", GetName(),item_id );
-                continue;
-            }
-        } while (result->NextRow());
-        delete result;
-    }*/
 
     for (uint8 slot = 0; slot < EQUIPMENT_SLOT_END; slot++)
     {
@@ -1444,20 +1419,20 @@ void Player::BuildEnumData( QueryResult * result, WorldPacket * p_data )
 
         if (proto != NULL)
         {
-            *p_data << (uint32)proto->DisplayInfoID;
-            *p_data << (uint8)proto->InventoryType;
-            *p_data << (uint32)(enchant?enchant->aura_id:0);
+            *p_data << uint32(proto->DisplayInfoID);
+            *p_data << uint8(proto->InventoryType);
+            *p_data << uint32(enchant ? enchant->aura_id : 0);
         }
         else
         {
-            *p_data << (uint32)0;
-            *p_data << (uint8)0;
-            *p_data << (uint32)0;                           // enchant?
+            *p_data << uint32(0);
+            *p_data << uint8(0);
+            *p_data << uint32(0);                           // enchant?
         }
     }
-    *p_data << (uint32)0;                                   // first bag display id
-    *p_data << (uint8)0;                                    // first bag inventory type
-    *p_data << (uint32)0;                                   // enchant?
+    *p_data << uint32(0);                                   // first bag display id
+    *p_data << uint8(0);                                    // first bag inventory type
+    *p_data << uint32(0);                                   // enchant?
 }
 
 bool Player::ToggleAFK()
@@ -15789,6 +15764,36 @@ void Player::SetFloatValueInDB(uint16 index, float value, uint64 guid)
     uint32 temp;
     memcpy(&temp, &value, sizeof(value));
     Player::SetUInt32ValueInDB(index, temp, guid);
+}
+
+void Player::Customize(uint64 guid, uint8 gender, uint8 skin, uint8 face, uint8 hairStyle, uint8 hairColor, uint8 facialHair)
+{
+    Tokens tokens;
+    if(!LoadValuesArrayFromDB(tokens,guid))
+        return;
+
+    uint32 player_bytes = atol(tokens[PLAYER_BYTES].c_str());
+    ((uint8*)player_bytes)[0] = skin;
+    ((uint8*)player_bytes)[1] = face;
+    ((uint8*)player_bytes)[2] = hairStyle;
+    ((uint8*)player_bytes)[3] = hairColor;
+    char buf[11];
+    snprintf(buf,11,"%u",player_bytes);
+    tokens[PLAYER_BYTES] = buf;
+
+    uint32 player_bytes2 = atol(tokens[PLAYER_BYTES_2].c_str());
+    ((uint8*)player_bytes2)[0] = facialHair;
+    char buf2[11];
+    snprintf(buf2,11,"%u",player_bytes2);
+    tokens[PLAYER_BYTES_2] = buf;
+
+    uint32 player_bytes3 = atol(tokens[PLAYER_BYTES_3].c_str());
+    ((uint8*)player_bytes3)[0] = gender;
+    char buf3[11];
+    snprintf(buf3,11,"%u",player_bytes3);
+    tokens[PLAYER_BYTES_3] = buf;
+
+    SaveValuesArrayInDB(tokens,guid);
 }
 
 void Player::SendAttackSwingNotStanding()

@@ -3356,6 +3356,59 @@ bool ChatHandler::HandleRenameCommand(const char* args)
     return true;
 }
 
+// customize characters
+bool ChatHandler::HandleCustomizeCommand(const char* args)
+{
+    Player* target = NULL;
+    uint64 targetGUID = 0;
+    std::string oldname;
+
+    char* px = strtok((char*)args, " ");
+
+    if(px)
+    {
+        oldname = px;
+
+        if(!normalizePlayerName(oldname))
+        {
+            SendSysMessage(LANG_PLAYER_NOT_FOUND);
+            SetSentErrorMessage(true);
+            return false;
+        }
+
+        target = objmgr.GetPlayer(oldname.c_str());
+
+        if (!target)
+            targetGUID = objmgr.GetPlayerGUIDByName(oldname);
+    }
+
+    if(!target && !targetGUID)
+    {
+        target = getSelectedPlayer();
+    }
+
+    if(!target && !targetGUID)
+    {
+        SendSysMessage(LANG_PLAYER_NOT_FOUND);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    if(target)
+    {
+        PSendSysMessage(LANG_CUSTOMIZE_PLAYER, target->GetName());
+        target->SetAtLoginFlag(AT_LOGIN_CUSTOMIZE);
+        CharacterDatabase.PExecute("UPDATE characters SET at_login = at_login | '8' WHERE guid = '%u'", target->GetGUIDLow());
+    }
+    else
+    {
+        PSendSysMessage(LANG_CUSTOMIZE_PLAYER_GUID, oldname.c_str(), GUID_LOPART(targetGUID));
+        CharacterDatabase.PExecute("UPDATE characters SET at_login = at_login | '8' WHERE guid = '%u'", GUID_LOPART(targetGUID));
+    }
+
+    return true;
+}
+
 //spawn go
 bool ChatHandler::HandleGameObjectCommand(const char* args)
 {

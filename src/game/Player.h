@@ -548,7 +548,8 @@ enum AtLoginFlags
     AT_LOGIN_NONE          = 0,
     AT_LOGIN_RENAME        = 1,
     AT_LOGIN_RESET_SPELLS  = 2,
-    AT_LOGIN_RESET_TALENTS = 4
+    AT_LOGIN_RESET_TALENTS = 4,
+    AT_LOGIN_CUSTOMIZE     = 8
 };
 
 typedef std::map<uint32, QuestStatusData> QuestStatusMap;
@@ -1333,6 +1334,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         static void SetFloatValueInArray(Tokens& data,uint16 index, float value);
         static void SetUInt32ValueInDB(uint16 index, uint32 value, uint64 guid);
         static void SetFloatValueInDB(uint16 index, float value, uint64 guid);
+        static void Customize(uint64 guid, uint8 gender, uint8 skin, uint8 face, uint8 hairStyle, uint8 hairColor, uint8 facialHair);
         static void SavePositionInDB(uint32 mapid, float x,float y,float z,float o,uint32 zone,uint64 guid);
 
         bool m_mailsLoaded;

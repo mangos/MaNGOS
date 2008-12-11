@@ -40,7 +40,8 @@ struct AchievementEntry
     uint32    ID;                                           // 0
     uint32    factionFlag;                                  // 1 -1=all, 0=horde, 1=alliance
     uint32    mapID;                                        // 2 -1=none
-    //char *name[16];                                       // 3-19
+    //uint32 unk;                                           // 3
+    //char *name[16];                                       // 4-19
     //uint32 name_flags;                                    // 20
     //char *description[16];                                // 21-36
     //uint32 desc_flags;                                    // 37
@@ -48,7 +49,7 @@ struct AchievementEntry
     uint32    points;                                       // 39 reward points
     //uint32 OrderInCategory;                               // 40
     uint32    flags;                                        // 41
-    //uint32    flags;                                      // 42 not flags, some unknown value...
+    //uint32    icon;                                       // 42 icon
     //char *unk1[16];                                       // 43-58
     //uint32 unk_flags;                                     // 59
     //uint32 count;                                         // 60

@@ -1165,7 +1165,7 @@ OpcodeHandler opcodeTable[NUM_MSG_TYPES] =
     /*0x470*/ { "CMSG_SET_CRITERIA_CHEAT",          STATUS_NEVER,    &WorldSession::Handle_NULL                     },
     /*0x471*/ { "SMSG_GROUP_SWAP_FAILED",           STATUS_NEVER,    &WorldSession::Handle_ServerSide               },
     /*0x472*/ { "CMSG_UNITANIMTIER_CHEAT",          STATUS_NEVER,    &WorldSession::Handle_NULL                     },
-    /*0x473*/ { "CMSG_CHAR_CUSTOMIZE",              STATUS_NEVER,    &WorldSession::Handle_NULL                     },
+    /*0x473*/ { "CMSG_CHAR_CUSTOMIZE",              STATUS_AUTHED,   &WorldSession::HandleCharCustomize             },
     /*0x474*/ { "SMSG_CHAR_CUSTOMIZE",              STATUS_NEVER,    &WorldSession::Handle_ServerSide               },
     /*0x475*/ { "SMSG_PET_RENAMEABLE",              STATUS_NEVER,    &WorldSession::Handle_ServerSide               },
     /*0x476*/ { "CMSG_REQUEST_VEHICLE_EXIT",        STATUS_NEVER,    &WorldSession::Handle_NULL                     },
