@@ -1912,6 +1912,11 @@ class MANGOS_DLL_SPEC Player : public Unit
         MovementInfo m_movementInfo;
         uint32 m_lastFallTime;
         float  m_lastFallZ;
+        void SetFallInformation(uint32 time, float z)
+        {
+            m_lastFallTime = time;
+            m_lastFallZ = z;
+        }
         bool isMoving() const { return HasUnitMovementFlag(movementFlagsMask); }
         bool isMovingOrTurning() const { return HasUnitMovementFlag(movementOrTurningFlagsMask); }
 
