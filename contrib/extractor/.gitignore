@@ -17,3 +17,4 @@
 debug
 release
 *.user
+*.ilk

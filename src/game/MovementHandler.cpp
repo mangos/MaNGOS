@@ -290,22 +290,25 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
     // fall damage generation (ignore in flight case that can be triggered also at lags in moment teleportation to another map).
     if (recv_data.GetOpcode() == MSG_MOVE_FALL_LAND && !GetPlayer()->isInFlight())
     {
+        // calculate total z distance of the fall
+        float z_diff = GetPlayer()->m_lastFallZ - movementInfo.z;
+        sLog.outDebug("zDiff = %f", z_diff);
         Player *target = GetPlayer();
 
-        //Players with Feather Fall or low fall time, or physical immunity (charges used) are ignored
-        if (movementInfo.fallTime > 1100 && !target->isDead() && !target->isGameMaster() &&
+        //Players with low fall distance, Feather Fall or physical immunity (charges used) are ignored
+        // 14.57 can be calculated by resolving damageperc formular below to 0
+        if (z_diff >= 14.57f && !target->isDead() && !target->isGameMaster() &&
             !target->HasAuraType(SPELL_AURA_HOVER) && !target->HasAuraType(SPELL_AURA_FEATHER_FALL) &&
             !target->HasAuraType(SPELL_AURA_FLY) && !target->IsImmunedToDamage(SPELL_SCHOOL_MASK_NORMAL,true) )
         {
-            //Safe fall, fall time reduction
+            //Safe fall, fall height reduction
             int32 safe_fall = target->GetTotalAuraModifier(SPELL_AURA_SAFE_FALL);
-            uint32 fall_time = (movementInfo.fallTime > (safe_fall*10)) ? movementInfo.fallTime - (safe_fall*10) : 0;
 
-            if(fall_time > 1100)                            //Prevent damage if fall time < 1100
+            float damageperc = 0.018f*(z_diff-safe_fall)-0.2426f;
+
+            if(damageperc >0 )
             {
-                //Fall Damage calculation
-                float fallperc = float(fall_time)/1100;
-                uint32 damage = (uint32)(((fallperc*fallperc -1) / 9 * target->GetMaxHealth())*sWorld.getRate(RATE_DAMAGE_FALL));
+                uint32 damage = (uint32)(damageperc * target->GetMaxHealth()*sWorld.getRate(RATE_DAMAGE_FALL));
 
                 float height = movementInfo.z;
                 target->UpdateGroundPositionZ(movementInfo.x,movementInfo.y,height);
@@ -359,6 +362,8 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 
     GetPlayer()->SetPosition(movementInfo.x, movementInfo.y, movementInfo.z, movementInfo.o);
     GetPlayer()->m_movementInfo = movementInfo;
+    if (GetPlayer()->m_lastFallTime >= movementInfo.fallTime || GetPlayer()->m_lastFallZ <=movementInfo.z)
+        GetPlayer()->SetFallInformation(movementInfo.fallTime, movementInfo.z);
 
     if(GetPlayer()->isMovingOrTurning())
         GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
@@ -461,19 +466,19 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket &recv_data)
     UnitMoveType move_type;
     UnitMoveType force_move_type;
 
-    static char const* move_type_name[MAX_MOVE_TYPE] = {  "Walk", "Run", "Walkback", "Swim", "Swimback", "Turn", "Fly", "Flyback" };
+    static char const* move_type_name[MAX_MOVE_TYPE] = {  "Walk", "Run", "RunBack", "Swim", "SwimBack", "TurnRate", "Flight", "FlightBack" };
 
     uint16 opcode = recv_data.GetOpcode();
     switch(opcode)
     {
-        case CMSG_FORCE_WALK_SPEED_CHANGE_ACK:          move_type = MOVE_WALK;     force_move_type = MOVE_WALK;     break;
-        case CMSG_FORCE_RUN_SPEED_CHANGE_ACK:           move_type = MOVE_RUN;      force_move_type = MOVE_RUN;      break;
-        case CMSG_FORCE_RUN_BACK_SPEED_CHANGE_ACK:      move_type = MOVE_WALKBACK; force_move_type = MOVE_WALKBACK; break;
-        case CMSG_FORCE_SWIM_SPEED_CHANGE_ACK:          move_type = MOVE_SWIM;     force_move_type = MOVE_SWIM;     break;
-        case CMSG_FORCE_SWIM_BACK_SPEED_CHANGE_ACK:     move_type = MOVE_SWIMBACK; force_move_type = MOVE_SWIMBACK; break;
-        case CMSG_FORCE_TURN_RATE_CHANGE_ACK:           move_type = MOVE_TURN;     force_move_type = MOVE_TURN;     break;
-        case CMSG_FORCE_FLIGHT_SPEED_CHANGE_ACK:        move_type = MOVE_FLY;      force_move_type = MOVE_FLY;      break;
-        case CMSG_FORCE_FLIGHT_BACK_SPEED_CHANGE_ACK:   move_type = MOVE_FLYBACK;  force_move_type = MOVE_FLYBACK;  break;
+        case CMSG_FORCE_WALK_SPEED_CHANGE_ACK:          move_type = MOVE_WALK;          force_move_type = MOVE_WALK;        break;
+        case CMSG_FORCE_RUN_SPEED_CHANGE_ACK:           move_type = MOVE_RUN;           force_move_type = MOVE_RUN;         break;
+        case CMSG_FORCE_RUN_BACK_SPEED_CHANGE_ACK:      move_type = MOVE_RUN_BACK;      force_move_type = MOVE_RUN_BACK;    break;
+        case CMSG_FORCE_SWIM_SPEED_CHANGE_ACK:          move_type = MOVE_SWIM;          force_move_type = MOVE_SWIM;        break;
+        case CMSG_FORCE_SWIM_BACK_SPEED_CHANGE_ACK:     move_type = MOVE_SWIM_BACK;     force_move_type = MOVE_SWIM_BACK;   break;
+        case CMSG_FORCE_TURN_RATE_CHANGE_ACK:           move_type = MOVE_TURN_RATE;     force_move_type = MOVE_TURN_RATE;   break;
+        case CMSG_FORCE_FLIGHT_SPEED_CHANGE_ACK:        move_type = MOVE_FLIGHT;        force_move_type = MOVE_FLIGHT;      break;
+        case CMSG_FORCE_FLIGHT_BACK_SPEED_CHANGE_ACK:   move_type = MOVE_FLIGHT_BACK;   force_move_type = MOVE_FLIGHT_BACK; break;
         default:
             sLog.outError("WorldSession::HandleForceSpeedChangeAck: Unknown move type opcode: %u", opcode);
             return;

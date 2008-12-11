@@ -45,7 +45,7 @@ WorldSession::WorldSession(uint32 id, WorldSocket *sock, uint32 sec, uint8 expan
 LookingForGroup_auto_join(false), LookingForGroup_auto_add(false), m_muteTime(mute_time),
 _player(NULL), m_Socket(sock),_security(sec), _accountId(id), m_expansion(expansion),
 m_sessionDbcLocale(sWorld.GetAvailableDbcLocale(locale)), m_sessionDbLocaleIndex(objmgr.GetIndexForLocale(locale)),
-_logoutTime(0), m_playerLoading(false), m_playerLogout(false), m_playerRecentlyLogout(false), m_latency(0)
+_logoutTime(0), m_inQueue(false), m_playerLoading(false), m_playerLogout(false), m_playerRecentlyLogout(false), m_latency(0)
 {
     if (sock)
     {
@@ -205,6 +205,13 @@ bool WorldSession::Update(uint32 /*diff*/)
                         (this->*opHandle.handler)(*packet);
                     break;
                 case STATUS_AUTHED:
+                    // prevent cheating with skip queue wait
+                    if(m_inQueue)
+                    {
+                        logUnexpectedOpcode(packet, "the player not pass queue yet");
+                        break;
+                    }
+
                     m_playerRecentlyLogout = false;
                     (this->*opHandle.handler)(*packet);
                     break;
@@ -473,38 +480,38 @@ void WorldSession::Handle_NULL( WorldPacket& recvPacket )
 
 void WorldSession::Handle_EarlyProccess( WorldPacket& recvPacket )
 {
-    sLog.outError( "SESSION: received opcode %s (0x%.4X) that must be proccessed in WorldSocket::OnRead",
+    sLog.outError( "SESSION: received opcode %s (0x%.4X) that must be processed in WorldSocket::OnRead",
         LookupOpcodeName(recvPacket.GetOpcode()),
         recvPacket.GetOpcode());
 }
 
 void WorldSession::Handle_ServerSide( WorldPacket& recvPacket )
 {
-    sLog.outError( "SESSION: received sever-side opcode %s (0x%.4X)",
+    sLog.outError( "SESSION: received server-side opcode %s (0x%.4X)",
         LookupOpcodeName(recvPacket.GetOpcode()),
         recvPacket.GetOpcode());
 }
 
-void WorldSession::Handle_Depricated( WorldPacket& recvPacket )
+void WorldSession::Handle_Deprecated( WorldPacket& recvPacket )
 {
-    sLog.outError( "SESSION: received depricated opcode %s (0x%.4X)",
+    sLog.outError( "SESSION: received deprecated opcode %s (0x%.4X)",
         LookupOpcodeName(recvPacket.GetOpcode()),
         recvPacket.GetOpcode());
 }
 
 void WorldSession::SendAuthWaitQue(uint32 position)
- {
-     if(position == 0)
-     {
-         WorldPacket packet( SMSG_AUTH_RESPONSE, 1 );
-         packet << uint8( AUTH_OK );
-         SendPacket(&packet);
-     }
-     else
-     {
-         WorldPacket packet( SMSG_AUTH_RESPONSE, 5 );
-         packet << uint8( AUTH_WAIT_QUEUE );
-         packet << uint32 (position);
-         SendPacket(&packet);
-     }
- }
+{
+    if(position == 0)
+    {
+        WorldPacket packet( SMSG_AUTH_RESPONSE, 1 );
+        packet << uint8( AUTH_OK );
+        SendPacket(&packet);
+    }
+    else
+    {
+        WorldPacket packet( SMSG_AUTH_RESPONSE, 5 );
+        packet << uint8( AUTH_WAIT_QUEUE );
+        packet << uint32 (position);
+        SendPacket(&packet);
+    }
+}

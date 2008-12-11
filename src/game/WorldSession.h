@@ -83,7 +83,7 @@ class MANGOS_DLL_SPEC WorldSession
         void SendNotification(int32 string_id,...);
         void SendPetNameInvalid(uint32 error, std::string name, DeclinedName *declinedName);
         void SendLfgResult(uint32 type, uint32 entry, uint8 lfg_type);
-        void SendPartyResult(PartyOperation operation, std::string member, PartyResult res);
+        void SendPartyResult(PartyOperation operation, const std::string& member, PartyResult res);
         void SendAreaTriggerMessage(const char* Text, ...) ATTR_PRINTF(2,3);
 
         uint32 GetSecurity() const { return _security; }
@@ -94,6 +94,9 @@ class MANGOS_DLL_SPEC WorldSession
         std::string& GetRemoteAddress() { return m_Address; }
         void SetPlayer(Player *plr) { _player = plr; }
         uint8 Expansion() const { return m_expansion; }
+
+        /// Session in auth.queue currently
+        void SetInQueue(bool state) { m_inQueue = state; }
 
         /// Is the user engaged in a log out process?
         bool isLogingOut() const { return _logoutTime || m_playerLogout; }
@@ -206,7 +209,7 @@ class MANGOS_DLL_SPEC WorldSession
         void Handle_NULL(WorldPacket& recvPacket);          // not used
         void Handle_EarlyProccess( WorldPacket& recvPacket);// just mark packets processed in WorldSocket::OnRead
         void Handle_ServerSide(WorldPacket& recvPacket);    // sever side only, can't be accepted from client
-        void Handle_Depricated(WorldPacket& recvPacket);    // never used anymore by client
+        void Handle_Deprecated(WorldPacket& recvPacket);    // never used anymore by client
 
         void HandleCharEnumOpcode(WorldPacket& recvPacket);
         void HandleCharDeleteOpcode(WorldPacket& recvPacket);
@@ -329,7 +332,6 @@ class MANGOS_DLL_SPEC WorldSession
         void HandleGroupDeclineOpcode(WorldPacket& recvPacket);
         void HandleGroupUninviteNameOpcode(WorldPacket& recvPacket);
         void HandleGroupUninviteGuidOpcode(WorldPacket& recvPacket);
-        void HandleGroupUninvite(uint64 guid, std::string name);
         void HandleGroupSetLeaderOpcode(WorldPacket& recvPacket);
         void HandleGroupLeaveOpcode(WorldPacket& recvPacket);
         void HandleGroupPassOnLootOpcode( WorldPacket &recv_data );
@@ -635,6 +637,7 @@ class MANGOS_DLL_SPEC WorldSession
         uint8 m_expansion;
 
         time_t _logoutTime;
+        bool m_inQueue;                                     // session wait in auth.queue
         bool m_playerLoading;                               // code processed in LoginPlayer
         bool m_playerLogout;                                // code processed in LogoutPlayer
         bool m_playerRecentlyLogout;

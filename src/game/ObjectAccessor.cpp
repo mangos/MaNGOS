@@ -45,7 +45,6 @@ INSTANTIATE_CLASS_MUTEX(ObjectAccessor, ZThread::FastMutex);
 
 namespace MaNGOS
 {
-
     struct MANGOS_DLL_DECL BuildUpdateForPlayer
     {
         Player &i_player;
@@ -551,7 +550,7 @@ void ObjectAccessor::UpdateVisibilityForPlayer( Player* player )
 template <class T> UNORDERED_MAP< uint64, T* > HashMapHolder<T>::m_objectMap;
 template <class T> ZThread::FastMutex HashMapHolder<T>::i_lock;
 
-/// Global defintions for the hashmap storage
+/// Global definitions for the hashmap storage
 
 template class HashMapHolder<Player>;
 template class HashMapHolder<Pet>;

@@ -516,10 +516,10 @@ typedef std::map<uint32, QuestStatusData> QuestStatusMap;
 
 enum QuestSlotOffsets
 {
-    QUEST_ID_OFFSET = 0,
-    QUEST_STATE_OFFSET = 1,
+    QUEST_ID_OFFSET     = 0,
+    QUEST_STATE_OFFSET  = 1,
     QUEST_COUNTS_OFFSET = 2,
-    QUEST_TIME_OFFSET = 3
+    QUEST_TIME_OFFSET   = 3
 };
 
 #define MAX_QUEST_OFFSET 4
@@ -1067,6 +1067,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         Item* EquipNewItem( uint16 pos, uint32 item, uint32 count, bool update );
         Item* EquipItem( uint16 pos, Item *pItem, bool update );
         void AutoUnequipOffhandIfNeed();
+        bool StoreNewItemInBestSlot(uint32 item_id, uint32 item_count);
 
         uint8 _CanTakeMoreSimilarItems(uint32 entry, uint32 count, Item* pItem, uint32* no_space_count = NULL) const;
         uint8 _CanStoreItem( uint8 bag, uint8 slot, ItemPosCountVec& dest, uint32 entry, uint32 count, Item *pItem = NULL, bool swap = false, uint32* no_space_count = NULL ) const;
@@ -1263,7 +1264,7 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         void SaveToDB();
         void SaveInventoryAndGoldToDB();                    // fast save function for item/money cheating preventing
-        void SaveGoldToDB() { SetUInt32ValueInDB(PLAYER_FIELD_COINAGE,GetMoney(),GetGUID()); }
+        void SaveDataFieldToDB();
         static bool SaveValuesArrayInDB(Tokens const& data,uint64 guid);
         static void SetUInt32ValueInArray(Tokens& data,uint16 index, uint32 value);
         static void SetFloatValueInArray(Tokens& data,uint16 index, float value);
@@ -1502,8 +1503,8 @@ class MANGOS_DLL_SPEC Player : public Unit
         void RemoveFromGroup() { RemoveFromGroup(GetGroup(),GetGUID()); }
         void SendUpdateToOutOfRangeGroupMembers();
 
-        void SetInGuild(uint32 GuildId) { SetUInt32Value(PLAYER_GUILDID, GuildId); Player::SetUInt32ValueInDB(PLAYER_GUILDID, GuildId, GetGUID()); }
-        void SetRank(uint32 rankId){ SetUInt32Value(PLAYER_GUILDRANK, rankId); Player::SetUInt32ValueInDB(PLAYER_GUILDRANK, rankId, GetGUID()); }
+        void SetInGuild(uint32 GuildId) { SetUInt32Value(PLAYER_GUILDID, GuildId); }
+        void SetRank(uint32 rankId){ SetUInt32Value(PLAYER_GUILDRANK, rankId); }
         void SetGuildIdInvited(uint32 GuildId) { m_GuildIdInvited = GuildId; }
         uint32 GetGuildId() { return GetUInt32Value(PLAYER_GUILDID);  }
         static uint32 GetGuildIdFromDB(uint64 guid);
@@ -1516,7 +1517,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void SetInArenaTeam(uint32 ArenaTeamId, uint8 slot)
         {
             SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (slot * 6), ArenaTeamId);
-            SetUInt32ValueInDB(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (slot * 6), ArenaTeamId, GetGUID());
+            SaveDataFieldToDB();                            // needed?
         }
         uint32 GetArenaTeamId(uint8 slot) { return GetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (slot * 6)); }
         static uint32 GetArenaTeamIdFromDB(uint64 guid, uint8 slot);
@@ -1682,6 +1683,7 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         FactionStateList m_factions;
         ForcedReactions m_forcedReactions;
+        FactionStateList const& GetFactionStateList() { return m_factions; }
         uint32 GetDefaultReputationFlags(const FactionEntry *factionEntry) const;
         int32 GetBaseReputation(const FactionEntry *factionEntry) const;
         int32 GetReputation(uint32 faction_id) const;
@@ -1712,7 +1714,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void SetFactionVisible(FactionState* faction);
         void SetFactionVisibleForFactionTemplateId(uint32 FactionTemplateId);
         void SetFactionVisibleForFactionId(uint32 FactionId);
-        void UpdateMaxSkills();
+        void UpdateSkillsForLevel();
         void UpdateSkillsToMaxSkillsForLevel();             // for .levelup
         void ModifySkillBonus(uint32 skillid,int32 val, bool talent);
 
@@ -1908,6 +1910,13 @@ class MANGOS_DLL_SPEC Player : public Unit
         /***                 VARIOUS SYSTEMS                   ***/
         /*********************************************************/
         MovementInfo m_movementInfo;
+        uint32 m_lastFallTime;
+        float  m_lastFallZ;
+        void SetFallInformation(uint32 time, float z)
+        {
+            m_lastFallTime = time;
+            m_lastFallZ = z;
+        }
         bool isMoving() const { return HasUnitMovementFlag(movementFlagsMask); }
         bool isMovingOrTurning() const { return HasUnitMovementFlag(movementOrTurningFlagsMask); }
 
@@ -1917,6 +1926,9 @@ class MANGOS_DLL_SPEC Player : public Unit
         void HandleDrowning();
 
         void SetClientControl(Unit* target, uint8 allowMove);
+
+        uint64 GetFarSight() const { return GetUInt64Value(PLAYER_FARSIGHT); }
+        void SetFarSight(uint64 guid) { SetUInt64Value(PLAYER_FARSIGHT, guid); }
 
         // Transports
         Transport * GetTransport() const { return m_transport; }
@@ -2014,6 +2026,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         uint64 GetAuraUpdateMask() { return m_auraUpdateMask; }
         void SetAuraUpdateMask(uint8 slot) { m_auraUpdateMask |= (uint64(1) << slot); }
         Player* GetNextRandomRaidMember(float radius);
+        PartyResult CanUninviteFromGroup() const;
 
         GridReference<Player> &GetGridRef() { return m_gridRef; }
         MapReference &GetMapRef() { return m_mapRef; }
@@ -2023,6 +2036,9 @@ class MANGOS_DLL_SPEC Player : public Unit
         WorldLocation& GetTeleportDest() { return m_teleport_dest; }
 
         DeclinedName const* GetDeclinedNames() const { return m_declinedname; }
+        bool HasTitle(uint32 bitIndex);
+        bool HasTitle(CharTitlesEntry const* title) { return HasTitle(title->bit_index); }
+        void SetTitle(CharTitlesEntry const* title);
 
     protected:
 

@@ -190,7 +190,7 @@ void GameObject::Update(uint32 /*p_time*/)
                         if(caster && caster->GetTypeId()==TYPEID_PLAYER)
                         {
                             SetGoState(0);
-                            SetUInt32Value(GAMEOBJECT_FLAGS, 32);
+                            SetUInt32Value(GAMEOBJECT_FLAGS, GO_FLAG_NODESPAWN);
 
                             UpdateData udata;
                             WorldPacket packet;
@@ -723,7 +723,7 @@ bool GameObject::isVisibleForInState(Player const* u, bool inVisibleList) const
 
     // check distance
     return IsWithinDistInMap(u,World::GetMaxVisibleDistanceForObject() +
-        (inVisibleList ? World::GetVisibleObjectGreyDistance() : 0.0f) );
+        (inVisibleList ? World::GetVisibleObjectGreyDistance() : 0.0f), false);
 }
 
 void GameObject::Respawn()

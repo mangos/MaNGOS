@@ -329,7 +329,7 @@ class Guild
         {
             return (members.find(LowGuid) != members.end());
         }
-        MemberSlot* GetMemberSlot(std::string const& name, uint64& guid)
+        MemberSlot* GetMemberSlot(const std::string& name, uint64& guid)
         {
             for(MemberList::iterator itr = members.begin(); itr != members.end(); ++itr)
             {

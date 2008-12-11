@@ -103,8 +103,11 @@ enum WorldConfigs
     CONFIG_SKIP_CINEMATICS,
     CONFIG_MAX_PLAYER_LEVEL,
     CONFIG_START_PLAYER_LEVEL,
+    CONFIG_START_PLAYER_MONEY,
     CONFIG_MAX_HONOR_POINTS,
+    CONFIG_START_HONOR_POINTS,
     CONFIG_MAX_ARENA_POINTS,
+    CONFIG_START_ARENA_POINTS,
     CONFIG_INSTANCE_IGNORE_LEVEL,
     CONFIG_INSTANCE_IGNORE_RAID,
     CONFIG_BATTLEGROUND_CAST_DESERTER,
@@ -122,6 +125,7 @@ enum WorldConfigs
     CONFIG_GM_IN_GM_LIST,
     CONFIG_GM_IN_WHO_LIST,
     CONFIG_GM_LOG_TRADE,
+    CONFIG_START_GM_LEVEL,
     CONFIG_GROUP_VISIBILITY,
     CONFIG_MAIL_DELIVERY_DELAY,
     CONFIG_UPTIME_UPDATE,
@@ -138,6 +142,7 @@ enum WorldConfigs
     CONFIG_SKILL_GAIN_WEAPON,
     CONFIG_MAX_OVERSPEED_PINGS,
     CONFIG_SAVE_RESPAWN_TIME_IMMEDIATLY,
+    CONFIG_ALWAYS_MAX_SKILL_FOR_LEVEL,
     CONFIG_WEATHER,
     CONFIG_EXPANSION,
     CONFIG_CHATFLOOD_MESSAGE_COUNT,
@@ -164,6 +169,9 @@ enum WorldConfigs
     CONFIG_DEATH_CORPSE_RECLAIM_DELAY_PVP,
     CONFIG_DEATH_CORPSE_RECLAIM_DELAY_PVE,
     CONFIG_THREAT_RADIUS,
+    CONFIG_INSTANT_LOGOUT,
+    CONFIG_DISABLE_BREATHING,
+    CONFIG_ALL_TAXI_PATHS,
     CONFIG_DECLINED_NAMES_USED,
     CONFIG_LISTEN_RANGE_SAY,
     CONFIG_LISTEN_RANGE_TEXTEMOTE,
@@ -350,7 +358,7 @@ class World
         //player Queue
         typedef std::list<WorldSession*> Queue;
         void AddQueuedPlayer(WorldSession*);
-        void RemoveQueuedPlayer(WorldSession*);
+        bool RemoveQueuedPlayer(WorldSession* session);
         int32 GetQueuePos(WorldSession*);
         uint32 GetQueueSize() const { return m_QueuedPlayer.size(); }
 
@@ -433,7 +441,6 @@ class World
         bool KickPlayer(std::string playerName);
         void KickAll();
         void KickAllLess(AccountTypes sec);
-        void KickAllQueued();
         BanReturn BanAccount(BanMode mode, std::string nameOrIP, std::string duration, std::string reason, std::string author);
         bool RemoveBanAccount(BanMode mode, std::string nameOrIP);
 
@@ -491,7 +498,6 @@ class World
         WeatherMap m_weathers;
         typedef UNORDERED_MAP<uint32, WorldSession*> SessionMap;
         SessionMap m_sessions;
-        std::set<WorldSession*> m_kicked_sessions;
         uint32 m_maxActiveSessionCount;
         uint32 m_maxQueuedSessionCount;
 

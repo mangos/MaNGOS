@@ -192,7 +192,7 @@ Group * ObjectMgr::GetGroupByLeader(const uint64 &guid) const
 
 Guild * ObjectMgr::GetGuildById(const uint32 GuildId) const
 {
-    for(GuildSet::const_iterator itr = mGuildSet.begin(); itr != mGuildSet.end(); itr++)
+    for(GuildSet::const_iterator itr = mGuildSet.begin(); itr != mGuildSet.end(); ++itr)
         if ((*itr)->GetId() == GuildId)
             return *itr;
 
@@ -201,7 +201,7 @@ Guild * ObjectMgr::GetGuildById(const uint32 GuildId) const
 
 Guild * ObjectMgr::GetGuildByName(std::string guildname) const
 {
-    for(GuildSet::const_iterator itr = mGuildSet.begin(); itr != mGuildSet.end(); itr++)
+    for(GuildSet::const_iterator itr = mGuildSet.begin(); itr != mGuildSet.end(); ++itr)
         if ((*itr)->GetName() == guildname)
             return *itr;
 
@@ -210,7 +210,7 @@ Guild * ObjectMgr::GetGuildByName(std::string guildname) const
 
 std::string ObjectMgr::GetGuildNameById(const uint32 GuildId) const
 {
-    for(GuildSet::const_iterator itr = mGuildSet.begin(); itr != mGuildSet.end(); itr++)
+    for(GuildSet::const_iterator itr = mGuildSet.begin(); itr != mGuildSet.end(); ++itr)
         if ((*itr)->GetId() == GuildId)
             return (*itr)->GetName();
 
@@ -228,7 +228,7 @@ Guild* ObjectMgr::GetGuildByLeader(const uint64 &guid) const
 
 ArenaTeam* ObjectMgr::GetArenaTeamById(const uint32 ArenaTeamId) const
 {
-    for(ArenaTeamSet::const_iterator itr = mArenaTeamSet.begin(); itr != mArenaTeamSet.end(); itr++)
+    for(ArenaTeamSet::const_iterator itr = mArenaTeamSet.begin(); itr != mArenaTeamSet.end(); ++itr)
         if ((*itr)->GetId() == ArenaTeamId)
             return *itr;
 
@@ -237,7 +237,7 @@ ArenaTeam* ObjectMgr::GetArenaTeamById(const uint32 ArenaTeamId) const
 
 ArenaTeam* ObjectMgr::GetArenaTeamByName(std::string arenateamname) const
 {
-    for(ArenaTeamSet::const_iterator itr = mArenaTeamSet.begin(); itr != mArenaTeamSet.end(); itr++)
+    for(ArenaTeamSet::const_iterator itr = mArenaTeamSet.begin(); itr != mArenaTeamSet.end(); ++itr)
         if ((*itr)->GetName() == arenateamname)
             return *itr;
 
@@ -246,7 +246,7 @@ ArenaTeam* ObjectMgr::GetArenaTeamByName(std::string arenateamname) const
 
 ArenaTeam* ObjectMgr::GetArenaTeamByCapitan(uint64 const& guid) const
 {
-    for(ArenaTeamSet::const_iterator itr = mArenaTeamSet.begin(); itr != mArenaTeamSet.end(); itr++)
+    for(ArenaTeamSet::const_iterator itr = mArenaTeamSet.begin(); itr != mArenaTeamSet.end(); ++itr)
         if ((*itr)->GetCaptain() == guid)
             return *itr;
 
@@ -2090,8 +2090,7 @@ void ObjectMgr::LoadPlayerInfo()
             barGoLink bar( 1 );
 
             sLog.outString();
-            sLog.outString( ">> Loaded %u player create items", count );
-            sLog.outErrorDb( "Error loading `playercreateinfo_item` table or empty table.");
+            sLog.outString( ">> Loaded %u custom player create items", count );
         }
         else
         {
@@ -2143,7 +2142,7 @@ void ObjectMgr::LoadPlayerInfo()
             delete result;
 
             sLog.outString();
-            sLog.outString( ">> Loaded %u player create items", count );
+            sLog.outString( ">> Loaded %u custom player create items", count );
         }
     }
 
@@ -2863,7 +2862,7 @@ void ObjectMgr::LoadQuests()
     delete result;
 
     // Post processing
-    for (QuestMap::iterator iter = mQuestTemplates.begin(); iter != mQuestTemplates.end(); iter++)
+    for (QuestMap::iterator iter = mQuestTemplates.begin(); iter != mQuestTemplates.end(); ++iter)
     {
         Quest * qinfo = iter->second;
 
@@ -4082,7 +4081,7 @@ void ObjectMgr::LoadPageTexts()
             {
                 std::ostringstream ss;
                 ss<< "The text page(s) ";
-                for (std::set<uint32>::iterator itr= checkedPages.begin();itr!=checkedPages.end(); itr++)
+                for (std::set<uint32>::iterator itr= checkedPages.begin();itr!=checkedPages.end(); ++itr)
                     ss << *itr << " ";
                 ss << "create(s) a circular reference, which can cause the server to freeze. Changing Next_Page of page "
                     << pageItr->Page_ID <<" to 0";
@@ -5066,7 +5065,7 @@ AreaTrigger const* ObjectMgr::GetGoBackTrigger(uint32 Map) const
 {
     const MapEntry *mapEntry = sMapStore.LookupEntry(Map);
     if(!mapEntry) return NULL;
-    for (AreaTriggerMap::const_iterator itr = mAreaTriggers.begin(); itr != mAreaTriggers.end(); itr++)
+    for (AreaTriggerMap::const_iterator itr = mAreaTriggers.begin(); itr != mAreaTriggers.end(); ++itr)
     {
         if(itr->second.target_mapId == mapEntry->entrance_map)
         {
@@ -6321,7 +6320,7 @@ bool ObjectMgr::LoadMangosStrings(DatabaseType& db, char const* table, int32 min
         bar.step();
 
         sLog.outString("");
-        if(min_value > 0)                                   // error only in case internal strings
+        if(min_value == MIN_MANGOS_STRING_ID)               // error only in case internal strings
             sLog.outErrorDb(">> Loaded 0 mangos strings. DB table `%s` is empty. Cannot continue.",table);
         else
             sLog.outString(">> Loaded 0 string templates. DB table `%s` is empty.",table);
@@ -6387,7 +6386,7 @@ bool ObjectMgr::LoadMangosStrings(DatabaseType& db, char const* table, int32 min
     delete result;
 
     sLog.outString();
-    if(min_value > 0)                                       // internal mangos strings
+    if(min_value == MIN_MANGOS_STRING_ID)               // error only in case internal strings
         sLog.outString( ">> Loaded %u MaNGOS strings from table %s", count,table);
     else
         sLog.outString( ">> Loaded %u string templates from %s", count,table);
@@ -7257,7 +7256,7 @@ void ObjectMgr::CheckScripts(ScriptMapMap const& scripts,std::set<int32>& ids)
             if(itrM->second.dataint)
             {
                 if(!GetMangosStringLocale (itrM->second.dataint))
-                    sLog.outErrorDb( "Table `db_script_string` has not existed string id  %u", *itrM);
+                    sLog.outErrorDb( "Table `db_script_string` has not existed string id  %u", itrM->first);
 
                 if(ids.count(itrM->second.dataint))
                     ids.erase(itrM->second.dataint);

@@ -274,13 +274,6 @@ void WorldSession::HandleLogoutRequestOpcode( WorldPacket & /*recv_data*/ )
     if (uint64 lguid = GetPlayer()->GetLootGUID())
         DoLootRelease(lguid);
 
-    //instant logout for admins, gm's, mod's
-    if( GetSecurity() > SEC_PLAYER )
-    {
-        LogoutPlayer(true);
-        return;
-    }
-
     //Can not logout if...
     if( GetPlayer()->isInCombat() ||                        //...is in combat
         GetPlayer()->duel         ||                        //...is in Duel
@@ -296,8 +289,9 @@ void WorldSession::HandleLogoutRequestOpcode( WorldPacket & /*recv_data*/ )
         return;
     }
 
-    //instant logout in taverns/cities or on taxi
-    if(GetPlayer()->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING) || GetPlayer()->isInFlight())
+    //instant logout in taverns/cities or on taxi or for admins, gm's, mod's if its enabled in mangosd.conf
+    if (GetPlayer()->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING) || GetPlayer()->isInFlight() ||
+        GetSecurity() >= sWorld.getConfig(CONFIG_INSTANT_LOGOUT))
     {
         LogoutPlayer(true);
         return;
@@ -659,6 +653,10 @@ void WorldSession::HandleCorpseReclaimOpcode(WorldPacket &recv_data)
 
     sLog.outDetail("WORLD: Received CMSG_RECLAIM_CORPSE");
     if (GetPlayer()->isAlive())
+        return;
+
+    // do not allow corpse reclaim in arena
+    if (GetPlayer()->InArena())
         return;
 
     // body not released yet
@@ -1382,7 +1380,7 @@ void WorldSession::HandleFarSightOpcode( WorldPacket & recv_data )
             sLog.outDebug("Removed FarSight from player %u", _player->GetGUIDLow());
             break;
         case 1:
-            sLog.outDebug("Added FarSight " I64FMTD " to player %u", _player->GetUInt64Value(PLAYER_FARSIGHT), _player->GetGUIDLow());
+            sLog.outDebug("Added FarSight " I64FMT " to player %u", _player->GetFarSight(), _player->GetGUIDLow());
             break;
     }
 }
@@ -1397,9 +1395,9 @@ void WorldSession::HandleChooseTitleOpcode( WorldPacket & recv_data )
     recv_data >> title;
 
     // -1 at none
-    if(title > 0 && title < 64)
+    if(title > 0 && title < 128)
     {
-       if(!GetPlayer()->HasFlag64(PLAYER__FIELD_KNOWN_TITLES,uint64(1) << title))
+       if(!GetPlayer()->HasTitle(title))
             return;
     }
     else

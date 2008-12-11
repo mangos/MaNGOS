@@ -21,7 +21,7 @@
 
 DROP TABLE IF EXISTS `character_db_version`;
 CREATE TABLE `character_db_version` (
-  `required_2008_11_12_01_character_character_aura` bit(1) default NULL
+  `required_2008_12_03_01_character_guild_member` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Last applied sql update to DB';
 
 --
@@ -249,6 +249,7 @@ CREATE TABLE `character_aura` (
   `caster_guid` bigint(20) unsigned NOT NULL default '0' COMMENT 'Full Global Unique Identifier',
   `spell` int(11) unsigned NOT NULL default '0',
   `effect_index` int(11) unsigned NOT NULL default '0',
+  `stackcount` int(11) NOT NULL default '1',
   `amount` int(11) NOT NULL default '0',
   `maxduration` int(11) NOT NULL default '0',
   `remaintime` int(11) NOT NULL default '0',
@@ -938,7 +939,7 @@ CREATE TABLE `guild_member` (
   `BankRemSlotsTab5` int(11) unsigned NOT NULL default '0',
   KEY `guildid_key` (`guildid`),
   KEY `guildid_rank_key` (`guildid`,`rank`),
-  KEY `guid_key` (`guid`)
+  UNIQUE KEY `guid_key` (`guid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Guild System';
 
 --
@@ -1125,6 +1126,7 @@ CREATE TABLE `pet_aura` (
   `caster_guid` bigint(20) unsigned NOT NULL default '0' COMMENT 'Full Global Unique Identifier',
   `spell` int(11) unsigned NOT NULL default '0',
   `effect_index` int(11) unsigned NOT NULL default '0',
+  `stackcount` int(11) NOT NULL default '1',
   `amount` int(11) NOT NULL default '0',
   `maxduration` int(11) NOT NULL default '0',
   `remaintime` int(11) NOT NULL default '0',

@@ -47,15 +47,23 @@ AggressorAI::MoveInLineOfSight(Unit *u)
     if( !i_creature.canFly() && i_creature.GetDistanceZ(u) > CREATURE_Z_ATTACK_RANGE )
         return;
 
-    if( !i_creature.getVictim() && !i_creature.hasUnitState(UNIT_STAT_STUNNED) && u->isTargetableForAttack() &&
+    if( !i_creature.hasUnitState(UNIT_STAT_STUNNED) && u->isTargetableForAttack() &&
         ( i_creature.IsHostileTo( u ) /*|| u->getVictim() && i_creature.IsFriendlyTo( u->getVictim() )*/ ) &&
         u->isInAccessablePlaceFor(&i_creature) )
     {
         float attackRadius = i_creature.GetAttackDistance(u);
         if(i_creature.IsWithinDistInMap(u, attackRadius) && i_creature.IsWithinLOSInMap(u) )
         {
-            AttackStart(u);
-            u->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
+            if(!i_creature.getVictim())
+            {
+                AttackStart(u);
+                u->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
+            }
+            else if(sMapStore.LookupEntry(i_creature.GetMapId())->IsDungeon())
+            {
+                u->SetInCombatWith(&i_creature);
+                i_creature.AddThreat(u, 0.0f);
+            }
         }
     }
 }

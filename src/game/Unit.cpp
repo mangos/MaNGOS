@@ -50,12 +50,12 @@ float baseMoveSpeed[MAX_MOVE_TYPE] =
 {
     2.5f,                                                   // MOVE_WALK
     7.0f,                                                   // MOVE_RUN
-    1.25f,                                                  // MOVE_WALKBACK
+    1.25f,                                                  // MOVE_RUN_BACK
     4.722222f,                                              // MOVE_SWIM
-    4.5f,                                                   // MOVE_SWIMBACK
-    3.141594f,                                              // MOVE_TURN
-    7.0f,                                                   // MOVE_FLY
-    4.5f,                                                   // MOVE_FLYBACK
+    4.5f,                                                   // MOVE_SWIM_BACK
+    3.141594f,                                              // MOVE_TURN_RATE
+    7.0f,                                                   // MOVE_FLIGHT
+    4.5f,                                                   // MOVE_FLIGHT_BACK
 };
 
 void InitTriggerAuraData();
@@ -2034,9 +2034,8 @@ void Unit::DealMeleeDamage(CalcDamageInfo *damageInfo, bool durabilityLoss)
 void Unit::HandleEmoteCommand(uint32 anim_id)
 {
     WorldPacket data( SMSG_EMOTE, 12 );
-    data << anim_id << GetGUID();
-    WPAssert(data.size() == 12);
-
+    data << uint32(anim_id);
+    data << uint64(GetGUID());
     SendMessageToSet(&data, true);
 }
 
@@ -3107,8 +3106,8 @@ float Unit::CalculateLevelPenalty(SpellEntry const* spellProto) const
 void Unit::SendAttackStart(Unit* pVictim)
 {
     WorldPacket data( SMSG_ATTACKSTART, 16 );
-    data << GetGUID();
-    data << pVictim->GetGUID();
+    data << uint64(GetGUID());
+    data << uint64(pVictim->GetGUID());
 
     SendMessageToSet(&data, true);
     DEBUG_LOG( "WORLD: Sent SMSG_ATTACKSTART" );
@@ -6557,17 +6556,14 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
                     {
                         int32 value2 = CalculateSpellDamage((*i)->GetSpellProto(),2,(*i)->GetSpellProto()->EffectBasePoints[2],this);
                         basepoints0 = value2 * GetMaxPower(POWER_MANA) / 100;
-
                         // Drain Soul
-                        triggered_spell_id = 18371;
-                        target = this;
-                        found = true;
+                        CastCustomSpell(this, 18371, &basepoints0, NULL, NULL, true, castItem, triggeredByAura);
                         break;
                     }
                 }
-                if(!found)
-                    return false;
-                break;                                      // fall through to normal cast
+                // Not remove charge (aura removed on death in any cases)
+                // Need for correct work Drain Soul SPELL_AURA_CHANNEL_DEATH_ITEM aura
+                return false;
             }
             break;
         }
@@ -8133,7 +8129,7 @@ bool Unit::Attack(Unit *victim, bool meleeAttack)
     if(GetTypeId()==TYPEID_UNIT)
     {
         WorldPacket data(SMSG_AI_REACTION, 12);
-        data << GetGUID();
+        data << uint64(GetGUID());
         data << uint32(AI_REACTION_AGGRO);                  // Aggro sound
         ((WorldObject*)this)->SendMessageToSet(&data, true);
 
@@ -8349,17 +8345,17 @@ Unit* Unit::GetCharm() const
 
 void Unit::SetPet(Pet* pet)
 {
-    SetUInt64Value(UNIT_FIELD_SUMMON,pet ? pet->GetGUID() : 0);
+    SetUInt64Value(UNIT_FIELD_SUMMON, pet ? pet->GetGUID() : 0);
 
     // FIXME: hack, speed must be set only at follow
     if(pet)
         for(int i = 0; i < MAX_MOVE_TYPE; ++i)
-            pet->SetSpeed(UnitMoveType(i),m_speed_rate[i],true);
+            pet->SetSpeed(UnitMoveType(i), m_speed_rate[i], true);
 }
 
-void Unit::SetCharm(Unit* charmed)
+void Unit::SetCharm(Unit* pet)
 {
-    SetUInt64Value(UNIT_FIELD_CHARM,charmed ? charmed->GetGUID() : 0);
+    SetUInt64Value(UNIT_FIELD_CHARM, pet ? pet->GetGUID() : 0);
 }
 
 void Unit::UnsummonAllTotems()
@@ -8396,7 +8392,6 @@ void Unit::SendEnergizeSpellLog(Unit *pVictim, uint32 SpellID, uint32 Damage, Po
     data << uint32(SpellID);
     data << uint32(powertype);
     data << uint32(Damage);
-    //data << uint8(critical ? 1 : 0);                      // removed in 2.4.0
     SendMessageToSet(&data, true);
 }
 
@@ -8853,7 +8848,7 @@ int32 Unit::SpellBaseDamageBonusForVictim(SpellSchoolMask schoolMask, Unit *pVic
 
 bool Unit::isSpellCrit(Unit *pVictim, SpellEntry const *spellProto, SpellSchoolMask schoolMask, WeaponAttackType attackType)
 {
-    // not criting spell
+    // not critting spell
     if((spellProto->AttributesEx2 & SPELL_ATTR_EX2_CANT_CRIT))
         return false;
 
@@ -9222,7 +9217,8 @@ bool Unit::IsImmunedToSpell(SpellEntry const* spellInfo, bool useCharges)
         if(itr->type == spellInfo->Dispel)
             return true;
 
-    if( !(spellInfo->AttributesEx & SPELL_ATTR_EX_UNAFFECTED_BY_SCHOOL_IMMUNE))               // unaffected by school immunity
+    if( !(spellInfo->AttributesEx & SPELL_ATTR_EX_UNAFFECTED_BY_SCHOOL_IMMUNE) &&         // unaffected by school immunity
+        !(spellInfo->AttributesEx & SPELL_ATTR_EX_DISPEL_AURAS_ON_IMMUNITY))              // can remove immune (by dispell or immune it)
     {
         SpellImmuneList const& schoolList = m_spellImmune[IMMUNITY_SCHOOL];
         for(SpellImmuneList::const_iterator itr = schoolList.begin(); itr != schoolList.end(); ++itr)
@@ -9685,7 +9681,7 @@ int32 Unit::ModifyPower(Powers power, int32 dVal)
     return gain;
 }
 
-bool Unit::isVisibleForOrDetect(Unit const* u, bool detect, bool inVisibleList) const
+bool Unit::isVisibleForOrDetect(Unit const* u, bool detect, bool inVisibleList, bool is3dDistance) const
 {
     if(!u)
         return false;
@@ -9736,12 +9732,12 @@ bool Unit::isVisibleForOrDetect(Unit const* u, bool detect, bool inVisibleList) 
     if(u->isInFlight())                                     // what see player in flight
     {
         // use object grey distance for all (only see objects any way)
-        if (!IsWithinDistInMap(u,World::GetMaxVisibleDistanceInFlight()+(inVisibleList ? World::GetVisibleObjectGreyDistance() : 0.0f)))
+        if (!IsWithinDistInMap(u,World::GetMaxVisibleDistanceInFlight()+(inVisibleList ? World::GetVisibleObjectGreyDistance() : 0.0f), is3dDistance))
             return false;
     }
     else if(!isAlive())                                     // distance for show body
     {
-        if (!IsWithinDistInMap(u,World::GetMaxVisibleDistanceForObject()+(inVisibleList ? World::GetVisibleObjectGreyDistance() : 0.0f)))
+        if (!IsWithinDistInMap(u,World::GetMaxVisibleDistanceForObject()+(inVisibleList ? World::GetVisibleObjectGreyDistance() : 0.0f), is3dDistance))
             return false;
     }
     else if(GetTypeId()==TYPEID_PLAYER)                     // distance for show player
@@ -9749,26 +9745,26 @@ bool Unit::isVisibleForOrDetect(Unit const* u, bool detect, bool inVisibleList) 
         if(u->GetTypeId()==TYPEID_PLAYER)
         {
             // Players far than max visible distance for player or not in our map are not visible too
-            if (!at_same_transport && !IsWithinDistInMap(u,World::GetMaxVisibleDistanceForPlayer()+(inVisibleList ? World::GetVisibleUnitGreyDistance() : 0.0f)))
+            if (!at_same_transport && !IsWithinDistInMap(u,World::GetMaxVisibleDistanceForPlayer()+(inVisibleList ? World::GetVisibleUnitGreyDistance() : 0.0f), is3dDistance))
                 return false;
         }
         else
         {
             // Units far than max visible distance for creature or not in our map are not visible too
-            if (!IsWithinDistInMap(u,World::GetMaxVisibleDistanceForCreature()+(inVisibleList ? World::GetVisibleUnitGreyDistance() : 0.0f)))
+            if (!IsWithinDistInMap(u,World::GetMaxVisibleDistanceForCreature()+(inVisibleList ? World::GetVisibleUnitGreyDistance() : 0.0f), is3dDistance))
                 return false;
         }
     }
     else if(GetCharmerOrOwnerGUID())                        // distance for show pet/charmed
     {
         // Pet/charmed far than max visible distance for player or not in our map are not visible too
-        if (!IsWithinDistInMap(u,World::GetMaxVisibleDistanceForPlayer()+(inVisibleList ? World::GetVisibleUnitGreyDistance() : 0.0f)))
+        if (!IsWithinDistInMap(u,World::GetMaxVisibleDistanceForPlayer()+(inVisibleList ? World::GetVisibleUnitGreyDistance() : 0.0f), is3dDistance))
             return false;
     }
     else                                                    // distance for show creature
     {
         // Units far than max visible distance for creature or not in our map are not visible too
-        if (!IsWithinDistInMap(u,World::GetMaxVisibleDistanceForCreature()+(inVisibleList ? World::GetVisibleUnitGreyDistance() : 0.0f)))
+        if (!IsWithinDistInMap(u,World::GetMaxVisibleDistanceForCreature()+(inVisibleList ? World::GetVisibleUnitGreyDistance() : 0.0f), is3dDistance))
             return false;
     }
 
@@ -9996,16 +9992,16 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced)
             }
             break;
         }
-        case MOVE_WALKBACK:
+        case MOVE_RUN_BACK:
             return;
         case MOVE_SWIM:
         {
             main_speed_mod  = GetMaxPositiveAuraModifier(SPELL_AURA_MOD_INCREASE_SWIM_SPEED);
             break;
         }
-        case MOVE_SWIMBACK:
+        case MOVE_SWIM_BACK:
             return;
-        case MOVE_FLY:
+        case MOVE_FLIGHT:
         {
             if (IsMounted()) // Use on mount auras
                 main_speed_mod  = GetMaxPositiveAuraModifier(SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED);
@@ -10015,7 +10011,7 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced)
             non_stack_bonus = (100.0 + GetMaxPositiveAuraModifier(SPELL_AURA_MOD_FLIGHT_SPEED_NOT_STACK))/100.0f;
             break;
         }
-        case MOVE_FLYBACK:
+        case MOVE_FLIGHT_BACK:
             return;
         default:
             sLog.outError("Unit::UpdateSpeed: Unsupported move type (%d)", mtype);
@@ -10030,7 +10026,7 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced)
     {
         case MOVE_RUN:
         case MOVE_SWIM:
-        case MOVE_FLY:
+        case MOVE_FLIGHT:
         {
             // Normalize speed by 191 aura SPELL_AURA_USE_NORMAL_MOVEMENT_SPEED if need
             // TODO: possible affect only on MOVE_RUN
@@ -10087,22 +10083,22 @@ void Unit::SetSpeed(UnitMoveType mtype, float rate, bool forced)
             case MOVE_RUN:
                 data.Initialize(MSG_MOVE_SET_RUN_SPEED, 8+4+1+4+4+4+4+4+4+4);
                 break;
-            case MOVE_WALKBACK:
+            case MOVE_RUN_BACK:
                 data.Initialize(MSG_MOVE_SET_RUN_BACK_SPEED, 8+4+1+4+4+4+4+4+4+4);
                 break;
             case MOVE_SWIM:
                 data.Initialize(MSG_MOVE_SET_SWIM_SPEED, 8+4+1+4+4+4+4+4+4+4);
                 break;
-            case MOVE_SWIMBACK:
+            case MOVE_SWIM_BACK:
                 data.Initialize(MSG_MOVE_SET_SWIM_BACK_SPEED, 8+4+1+4+4+4+4+4+4+4);
                 break;
-            case MOVE_TURN:
+            case MOVE_TURN_RATE:
                 data.Initialize(MSG_MOVE_SET_TURN_RATE, 8+4+1+4+4+4+4+4+4+4);
                 break;
-            case MOVE_FLY:
+            case MOVE_FLIGHT:
                 data.Initialize(MSG_MOVE_SET_FLIGHT_SPEED, 8+4+1+4+4+4+4+4+4+4);
                 break;
-            case MOVE_FLYBACK:
+            case MOVE_FLIGHT_BACK:
                 data.Initialize(MSG_MOVE_SET_FLIGHT_BACK_SPEED, 8+4+1+4+4+4+4+4+4+4);
                 break;
             default:
@@ -10135,22 +10131,22 @@ void Unit::SetSpeed(UnitMoveType mtype, float rate, bool forced)
             case MOVE_RUN:
                 data.Initialize(SMSG_FORCE_RUN_SPEED_CHANGE, 17);
                 break;
-            case MOVE_WALKBACK:
+            case MOVE_RUN_BACK:
                 data.Initialize(SMSG_FORCE_RUN_BACK_SPEED_CHANGE, 16);
                 break;
             case MOVE_SWIM:
                 data.Initialize(SMSG_FORCE_SWIM_SPEED_CHANGE, 16);
                 break;
-            case MOVE_SWIMBACK:
+            case MOVE_SWIM_BACK:
                 data.Initialize(SMSG_FORCE_SWIM_BACK_SPEED_CHANGE, 16);
                 break;
-            case MOVE_TURN:
+            case MOVE_TURN_RATE:
                 data.Initialize(SMSG_FORCE_TURN_RATE_CHANGE, 16);
                 break;
-            case MOVE_FLY:
+            case MOVE_FLIGHT:
                 data.Initialize(SMSG_FORCE_FLIGHT_SPEED_CHANGE, 16);
                 break;
-            case MOVE_FLYBACK:
+            case MOVE_FLIGHT_BACK:
                 data.Initialize(SMSG_FORCE_FLIGHT_BACK_SPEED_CHANGE, 16);
                 break;
             default:
@@ -10158,7 +10154,7 @@ void Unit::SetSpeed(UnitMoveType mtype, float rate, bool forced)
                 return;
         }
         data.append(GetPackGUID());
-        data << (uint32)0;
+        data << (uint32)0;                                  // moveEvent, NUM_PMOVE_EVTS = 0x39
         if (mtype == MOVE_RUN)
             data << uint8(0);                               // new 2.1.0
         data << float(GetSpeed(mtype));
@@ -10576,7 +10572,7 @@ Unit* Unit::GetUnit(WorldObject& object, uint64 guid)
 
 bool Unit::isVisibleForInState( Player const* u, bool inVisibleList ) const
 {
-    return isVisibleForOrDetect(u,false,inVisibleList);
+    return isVisibleForOrDetect(u, false, inVisibleList, false);
 }
 
 uint32 Unit::GetCreatureType() const
@@ -12105,6 +12101,10 @@ void Unit::ApplyCastTimePercentMod(float val, bool apply )
 
 uint32 Unit::GetCastingTimeForBonus( SpellEntry const *spellProto, DamageEffectType damagetype, uint32 CastingTime )
 {
+    // Not apply this to creature casted spells with casttime==0
+    if(CastingTime==0 && GetTypeId()==TYPEID_UNIT && !((Creature*)this)->isPet())
+        return 3500;
+
     if (CastingTime > 7000) CastingTime = 7000;
     if (CastingTime < 1500) CastingTime = 1500;
 
@@ -12302,9 +12302,9 @@ Pet* Unit::CreateTamedPetFrom(Creature* creatureTarget,uint32 spell_id)
         return NULL;
     }
 
-    pet->SetUInt64Value(UNIT_FIELD_SUMMONEDBY, GetGUID());
-    pet->SetUInt64Value(UNIT_FIELD_CREATEDBY, GetGUID());
-    pet->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE,getFaction());
+    pet->SetOwnerGUID(GetGUID());
+    pet->SetCreatorGUID(GetGUID());
+    pet->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, getFaction());
     pet->SetUInt32Value(UNIT_CREATED_BY_SPELL, spell_id);
 
     if(!pet->InitStatsForLevel(creatureTarget->getLevel()))

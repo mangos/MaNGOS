@@ -1028,7 +1028,7 @@ bool ChatHandler::HandleModifyASpeedCommand(const char* args)
     chr->SetSpeed(MOVE_RUN,     ASpeed,true);
     chr->SetSpeed(MOVE_SWIM,    ASpeed,true);
     //chr->SetSpeed(MOVE_TURN,    ASpeed,true);
-    chr->SetSpeed(MOVE_FLY,     ASpeed,true);
+    chr->SetSpeed(MOVE_FLIGHT,     ASpeed,true);
     return true;
 }
 
@@ -1144,7 +1144,7 @@ bool ChatHandler::HandleModifyBWalkCommand(const char* args)
     if (needReportToTarget(chr))
         ChatHandler(chr).PSendSysMessage(LANG_YOURS_BACK_SPEED_CHANGED, GetName(), BSpeed);
 
-    chr->SetSpeed(MOVE_WALKBACK,BSpeed,true);
+    chr->SetSpeed(MOVE_RUN_BACK,BSpeed,true);
 
     return true;
 }
@@ -1176,7 +1176,7 @@ bool ChatHandler::HandleModifyFlyCommand(const char* args)
     if (needReportToTarget(chr))
         ChatHandler(chr).PSendSysMessage(LANG_YOURS_FLY_SPEED_CHANGED, GetName(), FSpeed);
 
-    chr->SetSpeed(MOVE_FLY,FSpeed,true);
+    chr->SetSpeed(MOVE_FLIGHT,FSpeed,true);
 
     return true;
 }
