@@ -13484,6 +13484,7 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
 
     uint32 transGUID = fields[24].GetUInt32();
     Relocate(fields[6].GetFloat(),fields[7].GetFloat(),fields[8].GetFloat(),fields[10].GetFloat());
+    SetFallInformation(0, fields[8].GetFloat());
     SetMapId(fields[9].GetUInt32());
     SetDifficulty(fields[32].GetUInt32());                  // may be changed in _LoadGroup
 
