@@ -18758,7 +18758,7 @@ void Player::EnterVehicle(Vehicle *vehicle)
 
     SetClientControl(vehicle, 1);                           // redirect controls to vehicle
 
-    WorldPacket data(SMSG_SHOW_VEHICLE_UI, 0);              // shows vehicle UI?
+    WorldPacket data(SMSG_ON_CANCEL_EXPECTED_RIDE_VEHICLE_AURA, 0);
     GetSession()->SendPacket(&data);
 
     data.Initialize(MSG_MOVE_TELEPORT_ACK, 30);

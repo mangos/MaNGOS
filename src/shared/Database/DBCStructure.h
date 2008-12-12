@@ -40,7 +40,7 @@ struct AchievementEntry
     uint32    ID;                                           // 0
     uint32    factionFlag;                                  // 1 -1=all, 0=horde, 1=alliance
     uint32    mapID;                                        // 2 -1=none
-    //uint32 unk;                                           // 3
+    //uint32 unk;                                           // 3 parent achievement (previous, required)
     //char *name[16];                                       // 4-19
     //uint32 name_flags;                                    // 20
     //char *description[16];                                // 21-36
@@ -53,7 +53,7 @@ struct AchievementEntry
     //char *unk1[16];                                       // 43-58
     //uint32 unk_flags;                                     // 59
     //uint32 count;                                         // 60
-    uint32 refAchievement;                                  // 61
+    uint32 refAchievement;                                  // 61 related achievement?
 };
 
 struct AchievementCategoryEntry
@@ -459,8 +459,9 @@ struct AchievementCriteriaEntry
     //uint32 name_flags;                                    // 25
     uint32  completionFlag;                                 // 26
     uint32  groupFlag;                                      // 27
+    //uint32 unk1;                                          // 28
     uint32  timeLimit;                                      // 29 time limit in seconds
-    //uint32 unk1;                                          // 30
+    //uint32 order;                                          // 30 order
 };
 
 struct AreaTableEntry

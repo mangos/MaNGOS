@@ -1387,7 +1387,7 @@ bool Pet::unlearnSpell(uint16 spell_id)
         {
             if(!m_loading)
             {
-                WorldPacket data(SMSG_PET_UNLEARNED_SPELL, 2);
+                WorldPacket data(SMSG_PET_REMOVED_SPELL, 2);
                 data << uint16(spell_id);
                 ((Player*)GetOwner())->GetSession()->SendPacket(&data);
             }

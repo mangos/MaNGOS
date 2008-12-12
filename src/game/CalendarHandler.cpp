@@ -107,12 +107,12 @@ void WorldSession::HandleCalendarComplain(WorldPacket &recv_data)
     recv_data.hexlike();
 }
 
-void WorldSession::HandleCalendarPendingInvites(WorldPacket &recv_data)
+void WorldSession::HandleCalendarGetNumPending(WorldPacket &recv_data)
 {
-    sLog.outDebug("WORLD: CMSG_CALENDAR_PENDING_INVITES");
+    sLog.outDebug("WORLD: CMSG_CALENDAR_GET_NUM_PENDING");
     recv_data.hexlike();
 
-    WorldPacket data(SMSG_CALENDAR_PENDING_INVITES, 4);
+    WorldPacket data(SMSG_CALENDAR_SEND_NUM_PENDING, 4);
     data << uint32(0);                                      // 0 - no pending invites, 1 - some pending invites
     SendPacket(&data);
 }

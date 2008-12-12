@@ -366,7 +366,7 @@ enum Opcodes
     SMSG_SPELLBREAKLOG                              = 0x14F,
     SMSG_SPELLHEALLOG                               = 0x150,
     SMSG_SPELLENERGIZELOG                           = 0x151,
-    CMSG_SHEATHE_OBSOLETE                           = 0x152,
+    SMSG_BREAK_TARGET                               = 0x152,
     CMSG_SAVE_PLAYER                                = 0x153,
     CMSG_SETDEATHBINDPOINT                          = 0x154,
     SMSG_BINDPOINTUPDATE                            = 0x155,
@@ -725,8 +725,8 @@ enum Opcodes
     SMSG_SCRIPT_MESSAGE                             = 0x2B6,
     SMSG_DUEL_COUNTDOWN                             = 0x2B7,
     SMSG_AREA_TRIGGER_MESSAGE                       = 0x2B8,
-    CMSG_TOGGLE_HELM                                = 0x2B9,
-    CMSG_TOGGLE_CLOAK                               = 0x2BA,
+    CMSG_SHOWING_HELM                               = 0x2B9,
+    CMSG_SHOWING_CLOAK                              = 0x2BA,
     SMSG_MEETINGSTONE_JOINFAILED                    = 0x2BB,
     SMSG_PLAYER_SKINNED                             = 0x2BC,
     SMSG_DURABILITY_DAMAGE_DEATH                    = 0x2BD,
@@ -1123,8 +1123,8 @@ enum Opcodes
     SMSG_CALENDAR_EVENT_UPDATED_ALERT               = 0x444,
     SMSG_CALENDAR_EVENT_MODERATOR_STATUS_ALERT      = 0x445,
     CMSG_CALENDAR_COMPLAIN                          = 0x446,
-    CMSG_CALENDAR_PENDING_INVITES                   = 0x447,
-    SMSG_CALENDAR_PENDING_INVITES                   = 0x448,
+    CMSG_CALENDAR_GET_NUM_PENDING                   = 0x447,
+    SMSG_CALENDAR_SEND_NUM_PENDING                  = 0x448,
     CMSG_SAVE_DANCE                                 = 0x449,
     SMSG_NOTIFY_DANCE                               = 0x44A,
     CMSG_PLAY_DANCE                                 = 0x44B,
@@ -1205,19 +1205,20 @@ enum Opcodes
     SMSG_AURA_UPDATE                                = 0x496,
     CMSG_FLOOD_GRACE_CHEAT                          = 0x497,
     SMSG_SERVER_FIRST_ACHIEVEMENT                   = 0x498,
-    SMSG_PET_LEARNED_SPELL                          = 0x499,    // uint16 spellid, Your pet learned spell: %s
-    SMSG_PET_UNLEARNED_SPELL                        = 0x49A,    // uint16 spellid, Your pet unlearned %s
-    CMSG_MOVE_UNKNOWN_1179                          = 0x49B,    // movement opcode
-    CMSG_UNKNOWN_1180                               = 0x49C,    // LUA: HearthAndResurrectFromArea
-    SMSG_SHOW_VEHICLE_UI                            = 0x49D,    // empty
-    SMSG_CRITERIA_REMOVE                            = 0x49E,    // uint32, broadcasts EVENT_CRITERIA_UPDATE
-    SMSG_ACHIEVEMENT_REMOVE                         = 0x49F,    // uint32, broadcasts EVENT_ACHIEVEMENT_EARNED
-    UMSG_UNKNOWN_1184                               = 0x4A0,    // not found in client
-    UMSG_UNKNOWN_1185                               = 0x4A1,    // not found in client
-    UMSG_UNKNOWN_1186                               = 0x4A2,    // not found in client
-    UMSG_UNKNOWN_1187                               = 0x4A3,    // not found in client
-    UMSG_UNKNOWN_1188                               = 0x4A4,    // not found in client
-    NUM_MSG_TYPES                                   = 0x4A5
+    SMSG_PET_LEARNED_SPELL                          = 0x499,
+    SMSG_PET_REMOVED_SPELL                          = 0x49A,
+    CMSG_CHANGE_SEATS_ON_CONTROLLED_VEHICLE         = 0x49B,
+    CMSG_HEARTH_AND_RESURRECT                       = 0x49C,
+    SMSG_ON_CANCEL_EXPECTED_RIDE_VEHICLE_AURA       = 0x49D,
+    SMSG_CRITERIA_DELETED                           = 0x49E,
+    SMSG_ACHIEVEMENT_DELETED                        = 0x49F,
+    CMSG_SERVER_INFO_QUERY                          = 0x4A0,
+    SMSG_SERVER_INFO_RESPONSE                       = 0x4A1,
+    CMSG_CHECK_LOGIN_CRITERIA                       = 0x4A2,
+    SMSG_SERVER_BUCK_DATA_START                     = 0x4A3,
+    CMSG_QUERY_VEHICLE_STATUS                       = 0x4A4,
+    SMSG_PET_GUIDS                                  = 0x4A5,
+    NUM_MSG_TYPES                                   = 0x4A6
 };
 
 /// Player state
