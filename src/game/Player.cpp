@@ -182,7 +182,7 @@ void PlayerTaxi::AppendTaximaskTo( ByteBuffer& data, bool all )
     }
 }
 
-bool PlayerTaxi::LoadTaxiDestinationsFromString( std::string values )
+bool PlayerTaxi::LoadTaxiDestinationsFromString( const std::string& values )
 {
     ClearTaxiDestinations();
 
@@ -476,7 +476,7 @@ void Player::CleanupsBeforeDelete()
     Unit::CleanupsBeforeDelete();
 }
 
-bool Player::Create( uint32 guidlow, std::string name, uint8 race, uint8 class_, uint8 gender, uint8 skin, uint8 face, uint8 hairStyle, uint8 hairColor, uint8 facialHair, uint8 outfitId )
+bool Player::Create( uint32 guidlow, const std::string& name, uint8 race, uint8 class_, uint8 gender, uint8 skin, uint8 face, uint8 hairStyle, uint8 hairColor, uint8 facialHair, uint8 outfitId )
 {
     //FIXME: outfitId not used in player creating
 
@@ -15751,7 +15751,7 @@ void Player::Uncharm()
     charm->RemoveSpellsCausingAura(SPELL_AURA_MOD_POSSESS);
 }
 
-void Player::BuildPlayerChat(WorldPacket *data, uint8 msgtype, std::string text, uint32 language) const
+void Player::BuildPlayerChat(WorldPacket *data, uint8 msgtype, const std::string& text, uint32 language) const
 {
     *data << (uint8)msgtype;
     *data << (uint32)language;
@@ -15763,28 +15763,28 @@ void Player::BuildPlayerChat(WorldPacket *data, uint8 msgtype, std::string text,
     *data << (uint8)chatTag();
 }
 
-void Player::Say(const std::string text, const uint32 language)
+void Player::Say(const std::string& text, const uint32 language)
 {
     WorldPacket data(SMSG_MESSAGECHAT, 200);
     BuildPlayerChat(&data, CHAT_MSG_SAY, text, language);
     SendMessageToSetInRange(&data,sWorld.getConfig(CONFIG_LISTEN_RANGE_SAY),true);
 }
 
-void Player::Yell(const std::string text, const uint32 language)
+void Player::Yell(const std::string& text, const uint32 language)
 {
     WorldPacket data(SMSG_MESSAGECHAT, 200);
     BuildPlayerChat(&data, CHAT_MSG_YELL, text, language);
     SendMessageToSetInRange(&data,sWorld.getConfig(CONFIG_LISTEN_RANGE_YELL),true);
 }
 
-void Player::TextEmote(const std::string text)
+void Player::TextEmote(const std::string& text)
 {
     WorldPacket data(SMSG_MESSAGECHAT, 200);
     BuildPlayerChat(&data, CHAT_MSG_EMOTE, text, LANG_UNIVERSAL);
     SendMessageToSetInRange(&data,sWorld.getConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE),true, !sWorld.getConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHAT) );
 }
 
-void Player::Whisper(std::string text, uint32 language,uint64 receiver)
+void Player::Whisper(const std::string& text, uint32 language,uint64 receiver)
 {
     if (language != LANG_ADDON)                             // if not addon data
         language = LANG_UNIVERSAL;                          // whispers should always be readable

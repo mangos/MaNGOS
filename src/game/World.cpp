@@ -2281,7 +2281,7 @@ void World::KickAllLess(AccountTypes sec)
 }
 
 /// Kick (and save) the designated player
-bool World::KickPlayer(std::string playerName)
+bool World::KickPlayer(const std::string& playerName)
 {
     SessionMap::iterator itr;
 

@@ -36,7 +36,7 @@ class ChannelMgr
                 delete itr->second;
             channels.clear();
         }
-        Channel *GetJoinChannel(std::string name, uint32 channel_id)
+        Channel *GetJoinChannel(const std::string& name, uint32 channel_id)
         {
             if(channels.count(name) == 0)
             {
@@ -45,7 +45,7 @@ class ChannelMgr
             }
             return channels[name];
         }
-        Channel *GetChannel(std::string name, Player *p)
+        Channel *GetChannel(const std::string& name, Player *p)
         {
             ChannelMap::const_iterator i = channels.find(name);
 
@@ -59,7 +59,7 @@ class ChannelMgr
             else
                 return i->second;
         }
-        void LeftChannel(std::string name)
+        void LeftChannel(const std::string& name)
         {
             ChannelMap::const_iterator i = channels.find(name);
 
@@ -76,7 +76,7 @@ class ChannelMgr
         }
     private:
         ChannelMap channels;
-        void MakeNotOnPacket(WorldPacket *data, std::string name)
+        void MakeNotOnPacket(WorldPacket *data, const std::string& name)
         {
             data->Initialize(SMSG_CHANNEL_NOTIFY, (1+10));  // we guess size
             (*data) << (uint8)0x05 << name;

@@ -34,7 +34,7 @@ GossipMenu::~GossipMenu()
     ClearMenu();
 }
 
-void GossipMenu::AddMenuItem(uint8 Icon, std::string Message, uint32 dtSender, uint32 dtAction, std::string BoxMessage, uint32 BoxMoney, bool Coded)
+void GossipMenu::AddMenuItem(uint8 Icon, const std::string& Message, uint32 dtSender, uint32 dtAction, const std::string& BoxMessage, uint32 BoxMoney, bool Coded)
 {
     ASSERT( m_gItems.size() <= GOSSIP_MAX_MENU_ITEMS  );
 
@@ -51,7 +51,7 @@ void GossipMenu::AddMenuItem(uint8 Icon, std::string Message, uint32 dtSender, u
     m_gItems.push_back(gItem);
 }
 
-void GossipMenu::AddMenuItem(uint8 Icon, std::string Message, bool Coded)
+void GossipMenu::AddMenuItem(uint8 Icon, const std::string& Message, bool Coded)
 {
     AddMenuItem( Icon, Message, 0, 0, "", 0, Coded);
 }
@@ -341,7 +341,7 @@ void QuestMenu::ClearMenu()
     m_qItems.clear();
 }
 
-void PlayerMenu::SendQuestGiverQuestList( QEmote eEmote, std::string Title, uint64 npcGUID )
+void PlayerMenu::SendQuestGiverQuestList( QEmote eEmote, const std::string& Title, uint64 npcGUID )
 {
     WorldPacket data( SMSG_QUESTGIVER_QUEST_LIST, 100 );    // guess size
     data << uint64(npcGUID);
