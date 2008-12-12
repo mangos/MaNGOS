@@ -152,10 +152,9 @@ void WorldSocket::CloseSocket (void)
         ACE_GUARD (LockType, Guard, m_OutBufferLock);
 
         if (closing_)
-        return;
+            return;
 
         closing_ = true;
-
         peer ().close_writer ();
     }
 
@@ -301,7 +300,7 @@ int WorldSocket::handle_input (ACE_HANDLE)
             if ((errno == EWOULDBLOCK) ||
                 (errno == EAGAIN))
             {
-                return Update (); // interesting line ,isn't it ?
+                return Update ();                           // interesting line ,isn't it ?
             }
 
             DEBUG_LOG ("WorldSocket::handle_input: Peer error closing connection errno = %s", ACE_OS::strerror (errno));
@@ -319,7 +318,7 @@ int WorldSocket::handle_input (ACE_HANDLE)
         case 1:
             return 1;
         default:
-            return Update (); // another interesting line ;)
+            return Update ();                               // another interesting line ;)
     }
 
     ACE_NOTREACHED(return -1);
@@ -513,7 +512,7 @@ int WorldSocket::handle_input_missing_data (void)
                 return -1;
             }
 
-          // We just received nice new header
+            // We just received nice new header
             if (handle_input_header () == -1)
             {
                 ACE_ASSERT ((errno != EWOULDBLOCK) && (errno != EAGAIN));

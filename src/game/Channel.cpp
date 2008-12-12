@@ -21,7 +21,7 @@
 #include "World.h"
 #include "SocialMgr.h"
 
-Channel::Channel(std::string name, uint32 channel_id)
+Channel::Channel(const std::string& name, uint32 channel_id)
 : m_name(name), m_announce(true), m_moderate(false), m_channelId(channel_id), m_ownerGUID(0), m_password(""), m_flags(0)
 {
     // set special flags if built-in channel
@@ -773,7 +773,7 @@ void Channel::MakeOwnerChanged(WorldPacket *data, uint64 guid)
 }
 
 // done 0x09
-void Channel::MakePlayerNotFound(WorldPacket *data, std::string name)
+void Channel::MakePlayerNotFound(WorldPacket *data, const std::string& name)
 {
     MakeNotifyPacket(data, CHAT_PLAYER_NOT_FOUND_NOTICE);
     *data << name;

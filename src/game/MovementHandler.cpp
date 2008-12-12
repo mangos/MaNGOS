@@ -318,10 +318,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
     }
 
     if (GetPlayer()->m_lastFallTime >= movementInfo.fallTime || GetPlayer()->m_lastFallZ <=movementInfo.z)
-    {
-        GetPlayer()->m_lastFallTime = movementInfo.fallTime;
-        GetPlayer()->m_lastFallZ= movementInfo.z;
-    }
+        GetPlayer()->SetFallInformation(movementInfo.fallTime, movementInfo.z);
 
     if(GetPlayer()->isMovingOrTurning())
         GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);

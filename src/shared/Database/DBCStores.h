@@ -208,7 +208,7 @@ extern DBCStorage <VehicleSeatEntry>             sVehicleSeatStore;
 extern DBCStorage <WorldSafeLocsEntry>           sWorldSafeLocsStore;
 extern DBCStorage <WorldMapOverlayEntry>         sWorldMapOverlayStore;
 
-void LoadDBCStores(std::string dataPath);
+void LoadDBCStores(const std::string& dataPath);
 
 // script support functions
 MANGOS_DLL_SPEC DBCStorage <SoundEntriesEntry>  const* GetSoundEntriesStore();

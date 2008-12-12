@@ -921,7 +921,7 @@ class MANGOS_DLL_SPEC PlayerTaxi
         void AppendTaximaskTo(ByteBuffer& data,bool all);
 
         // Destinations
-        bool LoadTaxiDestinationsFromString(std::string values);
+        bool LoadTaxiDestinationsFromString(const std::string& values);
         std::string SaveTaxiDestinationsToString();
 
         void ClearTaxiDestinations() { m_TaxiDestinations.clear(); }
@@ -974,7 +974,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         }
         void SummonIfPossible(bool agree);
 
-        bool Create( uint32 guidlow, std::string name, uint8 race, uint8 class_, uint8 gender, uint8 skin, uint8 face, uint8 hairStyle, uint8 hairColor, uint8 facialHair, uint8 outfitId );
+        bool Create( uint32 guidlow, const std::string& name, uint8 race, uint8 class_, uint8 gender, uint8 skin, uint8 face, uint8 hairStyle, uint8 hairColor, uint8 facialHair, uint8 outfitId );
 
         void Update( uint32 time );
 
@@ -1068,11 +1068,11 @@ class MANGOS_DLL_SPEC Player : public Unit
         GuardianPetList const& GetGuardians() const { return m_guardianPets; }
         void Uncharm();
 
-        void Say(std::string text, const uint32 language);
-        void Yell(std::string text, const uint32 language);
-        void TextEmote(std::string text);
-        void Whisper(std::string text, const uint32 language,uint64 receiver);
-        void BuildPlayerChat(WorldPacket *data, uint8 msgtype, std::string text, uint32 language) const;
+        void Say(const std::string& text, const uint32 language);
+        void Yell(const std::string& text, const uint32 language);
+        void TextEmote(const std::string& text);
+        void Whisper(const std::string& text, const uint32 language,uint64 receiver);
+        void BuildPlayerChat(WorldPacket *data, uint8 msgtype, const std::string& text, uint32 language) const;
 
         /*********************************************************/
         /***                    STORAGE SYSTEM                 ***/
@@ -1982,6 +1982,11 @@ class MANGOS_DLL_SPEC Player : public Unit
         uint32 m_lastFallTime;
         float  m_lastFallZ;
         Unit *m_mover;
+        void SetFallInformation(uint32 time, float z)
+        {
+            m_lastFallTime = time;
+            m_lastFallZ = z;
+        }
         bool isMoving() const { return HasUnitMovementFlag(movementFlagsMask); }
         bool isMovingOrTurning() const { return HasUnitMovementFlag(movementOrTurningFlagsMask); }
 
@@ -2095,6 +2100,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         uint64 GetAuraUpdateMask() { return m_auraUpdateMask; }
         void SetAuraUpdateMask(uint8 slot) { m_auraUpdateMask |= (uint64(1) << slot); }
         Player* GetNextRandomRaidMember(float radius);
+        PartyResult CanUninviteFromGroup() const;
 
         GridReference<Player> &GetGridRef() { return m_gridRef; }
         MapReference &GetMapRef() { return m_mapRef; }
