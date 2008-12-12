@@ -15772,31 +15772,37 @@ void Player::SetFloatValueInDB(uint16 index, float value, uint64 guid)
 void Player::Customize(uint64 guid, uint8 gender, uint8 skin, uint8 face, uint8 hairStyle, uint8 hairColor, uint8 facialHair)
 {
     Tokens tokens;
-    if(!LoadValuesArrayFromDB(tokens,guid))
+    if(!LoadValuesArrayFromDB(tokens, guid))
         return;
 
-    uint32 player_bytes = atol(tokens[PLAYER_BYTES].c_str());
-    ((uint8*)player_bytes)[0] = skin;
-    ((uint8*)player_bytes)[1] = face;
-    ((uint8*)player_bytes)[2] = hairStyle;
-    ((uint8*)player_bytes)[3] = hairColor;
-    char buf[11];
-    snprintf(buf,11,"%u",player_bytes);
-    tokens[PLAYER_BYTES] = buf;
+    uint32 unit_bytes0 = GetUInt32ValueFromArray(tokens, UNIT_FIELD_BYTES_0);
+    uint8 race = unit_bytes0 & 0xFF;
+    uint8 class_ = (unit_bytes0 >> 8) & 0xFF;
 
-    uint32 player_bytes2 = atol(tokens[PLAYER_BYTES_2].c_str());
-    ((uint8*)player_bytes2)[0] = facialHair;
-    char buf2[11];
-    snprintf(buf2,11,"%u",player_bytes2);
-    tokens[PLAYER_BYTES_2] = buf;
+    PlayerInfo const* info = objmgr.GetPlayerInfo(race, class_);
+    if(!info)
+        return;
 
-    uint32 player_bytes3 = atol(tokens[PLAYER_BYTES_3].c_str());
-    ((uint8*)player_bytes3)[0] = gender;
-    char buf3[11];
-    snprintf(buf3,11,"%u",player_bytes3);
-    tokens[PLAYER_BYTES_3] = buf;
+    unit_bytes0 &= ~(0xFF << 16);
+    unit_bytes0 |= (gender << 16);
+    SetUInt32ValueInArray(tokens, UNIT_FIELD_BYTES_0, unit_bytes0);
 
-    SaveValuesArrayInDB(tokens,guid);
+    SetUInt32ValueInArray(tokens, UNIT_FIELD_DISPLAYID, gender ? info->displayId_f : info->displayId_m);
+    SetUInt32ValueInArray(tokens, UNIT_FIELD_NATIVEDISPLAYID, gender ? info->displayId_f : info->displayId_m);
+
+    SetUInt32ValueInArray(tokens, PLAYER_BYTES, (skin | (face << 8) | (hairStyle << 16) | (hairColor << 24)));
+
+    uint32 player_bytes2 = GetUInt32ValueFromArray(tokens, PLAYER_BYTES_2);
+    player_bytes2 &= ~0xFF;
+    player_bytes2 |= facialHair;
+    SetUInt32ValueInArray(tokens, PLAYER_BYTES_2, player_bytes2);
+
+    uint32 player_bytes3 = GetUInt32ValueFromArray(tokens, PLAYER_BYTES_3);
+    player_bytes3 &= ~0xFF;
+    player_bytes3 |= gender;
+    SetUInt32ValueInArray(tokens, PLAYER_BYTES_3, player_bytes3);
+
+    SaveValuesArrayInDB(tokens, guid);
 }
 
 void Player::SendAttackSwingNotStanding()
