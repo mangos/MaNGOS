@@ -480,6 +480,12 @@ void WorldSession::HandlePlayerLoginOpcode( WorldPacket & recv_data )
 {
     CHECK_PACKET_SIZE(recv_data,8);
 
+    if(PlayerLoading() || GetPlayer() != NULL)
+    {
+        sLog.outError("Player tryes to login again, AccountId = %d",GetAccountId());
+        return;
+    }
+
     m_playerLoading = true;
     uint64 playerGuid = 0;
 
