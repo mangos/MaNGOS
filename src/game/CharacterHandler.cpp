@@ -899,39 +899,13 @@ void WorldSession::HandleToggleCloakOpcode( WorldPacket & /*recv_data*/ )
 
 void WorldSession::HandleChangePlayerNameOpcode(WorldPacket& recv_data)
 {
-    CHECK_PACKET_SIZE(recv_data,8+1);
-
     uint64 guid;
     std::string newname;
-    std::string oldname;
 
     CHECK_PACKET_SIZE(recv_data, 8+1);
 
     recv_data >> guid;
     recv_data >> newname;
-
-    QueryResult *result = CharacterDatabase.PQuery("SELECT at_login, name FROM characters WHERE guid ='%u'", GUID_LOPART(guid));
-    if (!result)
-    {
-        WorldPacket data(SMSG_CHAR_RENAME, 1);
-        data << (uint8)CHAR_CREATE_ERROR;
-        SendPacket( &data );
-        return;
-    }
-
-    uint32 at_loginFlags;
-    Field *fields = result->Fetch();
-    at_loginFlags = fields[0].GetUInt32();
-    oldname = fields[1].GetCppString();
-    delete result;
-
-    if (!(at_loginFlags & AT_LOGIN_RENAME))
-    {
-        WorldPacket data(SMSG_CHAR_RENAME, 1);
-        data << (uint8)CHAR_CREATE_ERROR;
-        SendPacket( &data );
-        return;
-    }
 
     // prevent character rename to invalid name
     if(!normalizePlayerName(newname))
@@ -959,36 +933,58 @@ void WorldSession::HandleChangePlayerNameOpcode(WorldPacket& recv_data)
         return;
     }
 
-    if(objmgr.GetPlayerGUIDByName(newname))                 // character with this name already exist
+    CharacterDatabase.escape_string(newname);
+
+    CharacterDatabase.AsyncPQuery(&WorldSession::HandleChangePlayerNameOpcodeCallBack, GUID_LOPART(guid), newname, "SELECT guid, at_login, name FROM characters WHERE guid = '%u' XOR name = '%s'", GUID_LOPART(guid), newname.c_str());
+}
+
+void WorldSession::HandleChangePlayerNameOpcodeCallBack(QueryResult *result, uint32 accountId, std::string newname)
+{
+    WorldSession * session = sWorld.FindSession(accountId);
+    if(!session)
+        return;
+
+    if (!result || result->GetRowCount() != 1)
     {
         WorldPacket data(SMSG_CHAR_RENAME, 1);
         data << (uint8)CHAR_CREATE_ERROR;
-        SendPacket( &data );
+        session->SendPacket( &data );
         return;
     }
 
-    if(newname == oldname)                                  // checked by client
+    Field *fields = result->Fetch();
+    uint32 guidLow = fields[0].GetUInt32();
+    uint64 guid = MAKE_NEW_GUID(guidLow, 0, HIGHGUID_PLAYER);
+    uint32 at_loginFlags = fields[1].GetUInt32();
+    std::string oldname = fields[2].GetCppString();
+    delete result;
+    if(oldname == newname)
     {
         WorldPacket data(SMSG_CHAR_RENAME, 1);
-        data << (uint8)CHAR_NAME_FAILURE;
-        SendPacket( &data );
+        data << (uint8)CHAR_CREATE_ERROR;
+        session->SendPacket( &data );
         return;
     }
 
     // we have to check character at_login_flag & AT_LOGIN_RENAME also (fake packets hehe)
+    if (!(at_loginFlags & AT_LOGIN_RENAME))
+    {
+        WorldPacket data(SMSG_CHAR_RENAME, 1);
+        data << (uint8)CHAR_CREATE_ERROR;
+        session->SendPacket( &data );
+        return;
+    }
 
-    CharacterDatabase.escape_string(newname);
-    CharacterDatabase.PExecute("UPDATE characters set name = '%s', at_login = at_login & ~ %u WHERE guid ='%u'", newname.c_str(), uint32(AT_LOGIN_RENAME),GUID_LOPART(guid));
-    CharacterDatabase.PExecute("DELETE FROM character_declinedname WHERE guid ='%u'", GUID_LOPART(guid));
+    CharacterDatabase.PExecute("UPDATE characters set name = '%s', at_login = at_login & ~ %u WHERE guid ='%u'", newname.c_str(), uint32(AT_LOGIN_RENAME),guidLow);
+    CharacterDatabase.PExecute("DELETE FROM character_declinedname WHERE guid ='%u'", guidLow);
 
-    std::string IP_str = GetRemoteAddress();
-    sLog.outChar("Account: %d (IP: %s) Character:[%s] (guid:%u) Changed name to: %s",GetAccountId(),IP_str.c_str(),oldname.c_str(),GUID_LOPART(guid),newname.c_str());
+    sLog.outChar("Account: %d (IP: %s) Character:[%s] (guid:%u) Changed name to: %s",session->GetAccountId(),session->GetRemoteAddress(),oldname.c_str(),guidLow,newname.c_str());
 
     WorldPacket data(SMSG_CHAR_RENAME,1+8+(newname.size()+1));
     data << (uint8)RESPONSE_SUCCESS;
     data << guid;
     data << newname;
-    SendPacket(&data);
+    session->SendPacket(&data);
 }
 
 void WorldSession::HandleDeclinedPlayerNameOpcode(WorldPacket& recv_data)
