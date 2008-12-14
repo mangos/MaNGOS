@@ -3805,8 +3805,8 @@ bool ChatHandler::HandleLevelUpCommand(const char* args)
     int32 newlevel = oldlevel + addlevel;
     if(newlevel < 1)
         newlevel = 1;
-    if(newlevel > 255)                                      // hardcoded maximum level
-        newlevel = 255;
+    if(newlevel > STRONG_MAX_LEVEL)                         // hardcoded maximum level
+        newlevel = STRONG_MAX_LEVEL;
 
     if(chr)
     {

@@ -650,10 +650,11 @@ void World::LoadConfigSettings(bool reload)
     }
     else
         m_configs[CONFIG_MAX_PLAYER_LEVEL] = sConfig.GetIntDefault("MaxPlayerLevel", 60);
-    if(m_configs[CONFIG_MAX_PLAYER_LEVEL] > 255)
+
+    if(m_configs[CONFIG_MAX_PLAYER_LEVEL] > MAX_LEVEL)
     {
-        sLog.outError("MaxPlayerLevel (%i) must be in range 1..255. Set to 255.",m_configs[CONFIG_MAX_PLAYER_LEVEL]);
-        m_configs[CONFIG_MAX_PLAYER_LEVEL] = 255;
+        sLog.outError("MaxPlayerLevel (%i) must be in range 1..%u. Set to %u.",m_configs[CONFIG_MAX_PLAYER_LEVEL],MAX_LEVEL,MAX_LEVEL);
+        m_configs[CONFIG_MAX_PLAYER_LEVEL] = MAX_LEVEL;
     }
 
     m_configs[CONFIG_START_PLAYER_LEVEL] = sConfig.GetIntDefault("StartPlayerLevel", 1);
@@ -756,14 +757,14 @@ void World::LoadConfigSettings(bool reload)
     m_configs[CONFIG_START_GM_LEVEL] = sConfig.GetIntDefault("GM.StartLevel", 1);
     if(m_configs[CONFIG_START_GM_LEVEL] < m_configs[CONFIG_START_PLAYER_LEVEL])
     {
-        sLog.outError("GM.StartLevel (%i) must be in range StartPlayerLevel(%u)..255. Set to %u.",
-            m_configs[CONFIG_START_GM_LEVEL],m_configs[CONFIG_START_PLAYER_LEVEL],m_configs[CONFIG_START_PLAYER_LEVEL]);
+        sLog.outError("GM.StartLevel (%i) must be in range StartPlayerLevel(%u)..%u. Set to %u.",
+            m_configs[CONFIG_START_GM_LEVEL],m_configs[CONFIG_START_PLAYER_LEVEL], MAX_LEVEL, m_configs[CONFIG_START_PLAYER_LEVEL]);
         m_configs[CONFIG_START_GM_LEVEL] = m_configs[CONFIG_START_PLAYER_LEVEL];
     }
-    else if(m_configs[CONFIG_START_GM_LEVEL] > 255)
+    else if(m_configs[CONFIG_START_GM_LEVEL] > MAX_LEVEL)
     {
-        sLog.outError("GM.StartLevel (%i) must be in range 1..255. Set to %u.",m_configs[CONFIG_START_GM_LEVEL],255);
-        m_configs[CONFIG_START_GM_LEVEL] = 255;
+        sLog.outError("GM.StartLevel (%i) must be in range 1..%u. Set to %u.", m_configs[CONFIG_START_GM_LEVEL], MAX_LEVEL, MAX_LEVEL);
+        m_configs[CONFIG_START_GM_LEVEL] = MAX_LEVEL;
     }
 
     m_configs[CONFIG_GROUP_VISIBILITY] = sConfig.GetIntDefault("Visibility.GroupMode",0);
@@ -854,13 +855,13 @@ void World::LoadConfigSettings(bool reload)
 
     m_configs[CONFIG_WORLD_BOSS_LEVEL_DIFF] = sConfig.GetIntDefault("WorldBossLevelDiff",3);
 
-    // note: disable value (-1) will assigned as 0xFFFFFFF, to prevent overflow at calculations limit it to max possible player level (255)
-    m_configs[CONFIG_QUEST_LOW_LEVEL_HIDE_DIFF] = sConfig.GetIntDefault("Quests.LowLevelHideDiff",4);
-    if(m_configs[CONFIG_QUEST_LOW_LEVEL_HIDE_DIFF] > 255)
-        m_configs[CONFIG_QUEST_LOW_LEVEL_HIDE_DIFF] = 255;
-    m_configs[CONFIG_QUEST_HIGH_LEVEL_HIDE_DIFF] = sConfig.GetIntDefault("Quests.HighLevelHideDiff",7);
-    if(m_configs[CONFIG_QUEST_HIGH_LEVEL_HIDE_DIFF] > 255)
-        m_configs[CONFIG_QUEST_HIGH_LEVEL_HIDE_DIFF] = 255;
+    // note: disable value (-1) will assigned as 0xFFFFFFF, to prevent overflow at calculations limit it to max possible player level MAX_LEVEL(100)
+    m_configs[CONFIG_QUEST_LOW_LEVEL_HIDE_DIFF] = sConfig.GetIntDefault("Quests.LowLevelHideDiff", 4);
+    if(m_configs[CONFIG_QUEST_LOW_LEVEL_HIDE_DIFF] > MAX_LEVEL)
+        m_configs[CONFIG_QUEST_LOW_LEVEL_HIDE_DIFF] = MAX_LEVEL;
+    m_configs[CONFIG_QUEST_HIGH_LEVEL_HIDE_DIFF] = sConfig.GetIntDefault("Quests.HighLevelHideDiff", 7);
+    if(m_configs[CONFIG_QUEST_HIGH_LEVEL_HIDE_DIFF] > MAX_LEVEL)
+        m_configs[CONFIG_QUEST_HIGH_LEVEL_HIDE_DIFF] = MAX_LEVEL;
 
     m_configs[CONFIG_DETECT_POS_COLLISION] = sConfig.GetBoolDefault("DetectPosCollision", true);
 
