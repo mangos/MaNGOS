@@ -602,7 +602,7 @@ bool Player::Create( uint32 guidlow, const std::string& name, uint8 race, uint8 
     if (GetSession()->GetSecurity() >= SEC_MODERATOR)
         SetUInt32Value(UNIT_FIELD_LEVEL, sWorld.getConfig(CONFIG_START_GM_LEVEL));
     else
-    {        
+    {
         if(getClass() == CLASS_DEATH_KNIGHT)
             SetUInt32Value(UNIT_FIELD_LEVEL, 55);
         else
@@ -18719,7 +18719,7 @@ uint32 Player::GetBarberShopCost(uint8 newhairstyle, uint8 newhaircolor, uint8 n
 {
     uint32 level = getLevel();
 
-    if(level > sGtBarberShopCostBaseStore.GetNumRows())
+    if(level > GT_MAX_LEVEL)
         level = GT_MAX_LEVEL;                               // max level in this dbc
 
     uint8 hairstyle = GetByteValue(PLAYER_BYTES, 2);
