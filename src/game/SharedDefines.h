@@ -671,7 +671,7 @@ enum SpellEffects
     SPELL_EFFECT_152                       = 152,
     SPELL_EFFECT_153                       = 153,
     SPELL_EFFECT_154                       = 154,
-    SPELL_EFFECT_155                       = 155,
+    SPELL_EFFECT_TITAN_GRIP                = 155,
     SPELL_EFFECT_ADD_SOCKET                = 156,
     SPELL_EFFECT_157                       = 157,
     SPELL_EFFECT_MILLING                   = 158,
