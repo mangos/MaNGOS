@@ -675,6 +675,20 @@ void World::LoadConfigSettings(bool reload)
         m_configs[CONFIG_START_PLAYER_LEVEL] = m_configs[CONFIG_MAX_PLAYER_LEVEL];
     }
 
+    m_configs[CONFIG_START_HEROIC_PLAYER_LEVEL] = sConfig.GetIntDefault("StartHeroicPlayerLevel", 55);
+    if(m_configs[CONFIG_START_HEROIC_PLAYER_LEVEL] < 1)
+    {
+        sLog.outError("StartHeroicPlayerLevel (%i) must be in range 1..MaxPlayerLevel(%u). Set to 55.",
+            m_configs[CONFIG_START_HEROIC_PLAYER_LEVEL],m_configs[CONFIG_MAX_PLAYER_LEVEL]);
+        m_configs[CONFIG_START_HEROIC_PLAYER_LEVEL] = 55;
+    }
+    else if(m_configs[CONFIG_START_HEROIC_PLAYER_LEVEL] > m_configs[CONFIG_MAX_PLAYER_LEVEL])
+    {
+        sLog.outError("StartHeroicPlayerLevel (%i) must be in range 1..MaxPlayerLevel(%u). Set to %u.",
+            m_configs[CONFIG_START_HEROIC_PLAYER_LEVEL],m_configs[CONFIG_MAX_PLAYER_LEVEL],m_configs[CONFIG_MAX_PLAYER_LEVEL]);
+        m_configs[CONFIG_START_HEROIC_PLAYER_LEVEL] = m_configs[CONFIG_MAX_PLAYER_LEVEL];
+    }
+
     m_configs[CONFIG_START_PLAYER_MONEY] = sConfig.GetIntDefault("StartPlayerMoney", 0);
     if(m_configs[CONFIG_START_PLAYER_MONEY] < 0)
     {

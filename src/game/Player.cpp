@@ -599,15 +599,18 @@ bool Player::Create( uint32 guidlow, const std::string& name, uint8 race, uint8 
     }
 
     // set starting level
+    uint32 start_level = getClass() != CLASS_DEATH_KNIGHT
+        ? sWorld.getConfig(CONFIG_START_PLAYER_LEVEL)
+        : sWorld.getConfig(CONFIG_START_HEROIC_PLAYER_LEVEL);
+
     if (GetSession()->GetSecurity() >= SEC_MODERATOR)
-        SetUInt32Value(UNIT_FIELD_LEVEL, sWorld.getConfig(CONFIG_START_GM_LEVEL));
-    else
     {
-        if(getClass() == CLASS_DEATH_KNIGHT)
-            SetUInt32Value(UNIT_FIELD_LEVEL, 55);
-        else
-            SetUInt32Value(UNIT_FIELD_LEVEL, sWorld.getConfig(CONFIG_START_PLAYER_LEVEL));
+        uint32 gm_level = sWorld.getConfig(CONFIG_START_GM_LEVEL);
+        if(gm_level > start_level)
+            start_level = gm_level;
     }
+
+    SetUInt32Value(UNIT_FIELD_LEVEL, start_level);
 
     InitRunes();
 
