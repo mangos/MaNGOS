@@ -2320,6 +2320,8 @@ void Aura::HandleAuraPeriodicDummy(bool apply, bool Real)
     if(!Real)
         return;
 
+    Unit* caster = GetCaster();
+
     SpellEntry const*spell = GetSpellProto();
     switch( spell->SpellFamilyName)
     {
@@ -2341,6 +2343,16 @@ void Aura::HandleAuraPeriodicDummy(bool apply, bool Real)
                 // Update regen on remove
                 if (!apply && m_target->GetTypeId() == TYPEID_PLAYER)
                     ((Player*)m_target)->UpdateManaRegen();
+                break;
+            }
+            // Explosive Shot
+            if (spell->SpellFamilyFlags & 0x8000000000000000LL)
+            {
+                if (apply && caster)
+                {
+                    int32 damage = m_modifier.m_amount + caster->GetTotalAttackPowerValue(RANGED_ATTACK) * 8 / 100;
+                    caster->CastCustomSpell(m_target, 53352, &damage, 0, 0, true, 0, this);
+                }
                 break;
             }
             break;
@@ -6092,114 +6104,136 @@ void Aura::PeriodicTick()
 
 void Aura::PeriodicDummyTick()
 {
+    Unit *caster = GetCaster();
     SpellEntry const* spell = GetSpellProto();
-    switch (spell->Id)
+    switch (spell->SpellFamilyName)
     {
-        // Drink
-        case 430:
-        case 431:
-        case 432:
-        case 1133:
-        case 1135:
-        case 1137:
-        case 10250:
-        case 22734:
-        case 27089:
-        case 34291:
-        case 43706:
-        case 46755:
+        case SPELLFAMILY_GENERIC:
+        switch (spell->Id)
         {
-            if (m_target->GetTypeId() != TYPEID_PLAYER)
-                return;
-            // Search SPELL_AURA_MOD_POWER_REGEN aura for this spell and add bonus
-            Unit::AuraList const& aura = m_target->GetAurasByType(SPELL_AURA_MOD_POWER_REGEN);
-            for(Unit::AuraList::const_iterator i = aura.begin(); i != aura.end(); ++i)
+            // Drink
+            case 430:
+            case 431:
+            case 432:
+            case 1133:
+            case 1135:
+            case 1137:
+            case 10250:
+            case 22734:
+            case 27089:
+            case 34291:
+            case 43706:
+            case 46755:
+            case 49472: // Drink Coffee
+            case 61830:
             {
-                if ((*i)->GetId() == GetId())
-                {
-                    // Get tick number
-                    int32 tick = (m_maxduration - m_duration) / m_modifier.periodictime;
-                    // Default case (not on arenas)
-                    if (tick == 0)
-                    {
-                        (*i)->GetModifier()->m_amount = m_modifier.m_amount;
-                        ((Player*)m_target)->UpdateManaRegen();
-                        // Disable continue
-                        m_isPeriodic = false;
-                    }
+                if (m_target->GetTypeId() != TYPEID_PLAYER)
                     return;
-                    //**********************************************
-                    // Code commended since arena patch not added
-                    // This feature uses only in arenas
-                    //**********************************************
-                    // Here need increase mana regen per tick (6 second rule)
-                    // on 0 tick -   0  (handled in 2 second)
-                    // on 1 tick - 166% (handled in 4 second)
-                    // on 2 tick - 133% (handled in 6 second)
-                    // Not need update after 3 tick
-                    /*
-                    if (tick > 3)
-                        return;
-                    // Apply bonus for 0 - 3 tick
-                    switch (tick)
+                // Search SPELL_AURA_MOD_POWER_REGEN aura for this spell and add bonus
+                Unit::AuraList const& aura = m_target->GetAurasByType(SPELL_AURA_MOD_POWER_REGEN);
+                for(Unit::AuraList::const_iterator i = aura.begin(); i != aura.end(); ++i)
+                {
+                    if ((*i)->GetId() == GetId())
                     {
-                        case 0:   // 0%
-                            (*i)->GetModifier()->m_amount = m_modifier.m_amount = 0;
-                            break;
-                        case 1:   // 166%
-                            (*i)->GetModifier()->m_amount = m_modifier.m_amount * 5 / 3;
-                            break;
-                        case 2:   // 133%
-                            (*i)->GetModifier()->m_amount = m_modifier.m_amount * 4 / 3;
-                            break;
-                        default:  // 100% - normal regen
+                        // Get tick number
+                        int32 tick = (m_maxduration - m_duration) / m_modifier.periodictime;
+                        // Default case (not on arenas)
+                        if (tick == 0)
+                        {
                             (*i)->GetModifier()->m_amount = m_modifier.m_amount;
-                            break;
+                            ((Player*)m_target)->UpdateManaRegen();
+                            // Disable continue
+                            m_isPeriodic = false;
+                        }
+                        return;
+                        //**********************************************
+                        // Code commended since arena patch not added
+                        // This feature uses only in arenas
+                        //**********************************************
+                        // Here need increase mana regen per tick (6 second rule)
+                        // on 0 tick -   0  (handled in 2 second)
+                        // on 1 tick - 166% (handled in 4 second)
+                        // on 2 tick - 133% (handled in 6 second)
+                        // Not need update after 3 tick
+                        /*
+                        if (tick > 3)
+                            return;
+                        // Apply bonus for 0 - 3 tick
+                        switch (tick)
+                        {
+                            case 0:   // 0%
+                                (*i)->GetModifier()->m_amount = m_modifier.m_amount = 0;
+                                break;
+                            case 1:   // 166%
+                                (*i)->GetModifier()->m_amount = m_modifier.m_amount * 5 / 3;
+                                break;
+                            case 2:   // 133%
+                                (*i)->GetModifier()->m_amount = m_modifier.m_amount * 4 / 3;
+                                break;
+                            default:  // 100% - normal regen
+                                (*i)->GetModifier()->m_amount = m_modifier.m_amount;
+                                break;
+                        }
+                        ((Player*)m_target)->UpdateManaRegen();
+                        return;*/
                     }
-                    ((Player*)m_target)->UpdateManaRegen();
-                    return;*/
                 }
+                return;
             }
-            return;
-        }
+            // Forsaken Skills
+            case 7054:
+            {
+                // Possibly need cast one of them (but
+                // 7038 Forsaken Skill: Swords
+                // 7039 Forsaken Skill: Axes
+                // 7040 Forsaken Skill: Daggers
+                // 7041 Forsaken Skill: Maces
+                // 7042 Forsaken Skill: Staves
+                // 7043 Forsaken Skill: Bows
+                // 7044 Forsaken Skill: Guns
+                // 7045 Forsaken Skill: 2H Axes
+                // 7046 Forsaken Skill: 2H Maces
+                // 7047 Forsaken Skill: 2H Swords
+                // 7048 Forsaken Skill: Defense
+                // 7049 Forsaken Skill: Fire
+                // 7050 Forsaken Skill: Frost
+                // 7051 Forsaken Skill: Holy
+                // 7053 Forsaken Skill: Shadow
+                return;
+            }
 //        // Panda
 //        case 19230: break;
-//        // Master of Subtlety
-//        case 31666: break;
 //        // Gossip NPC Periodic - Talk
 //        case 33208: break;
 //        // Gossip NPC Periodic - Despawn
 //        case 33209: break;
-//        // Force of Nature
-//        case 33831: break;
-        // Aspect of the Viper
-        case 34074:
-        {
-            if (m_target->GetTypeId() != TYPEID_PLAYER)
+ 
+            // TODO: now its not periodic dummy - need move out from here
+            // Aspect of the Viper
+            case 34074:
+            {
+                if (m_target->GetTypeId() != TYPEID_PLAYER)
+                    return;
+                // Should be manauser
+                if (m_target->getPowerType()!=POWER_MANA)
+                    return;
+                if (!caster)
+                    return;
+                // Regen amount is max (100% from spell) on 21% or less mana and min on 92.5% or greater mana (20% from spell)
+                int mana = m_target->GetPower(POWER_MANA);
+                int max_mana = m_target->GetMaxPower(POWER_MANA);
+                int32 base_regen = caster->CalculateSpellDamage(m_spellProto, m_effIndex, m_currentBasePoints, m_target);
+                float regen_pct = 1.20f - 1.1f * mana / max_mana;
+                if      (regen_pct > 1.0f) regen_pct = 1.0f;
+                else if (regen_pct < 0.2f) regen_pct = 0.2f;
+                m_modifier.m_amount = int32 (base_regen * regen_pct);
+                ((Player*)m_target)->UpdateManaRegen();
                 return;
-            // Should be manauser
-            if (m_target->getPowerType()!=POWER_MANA)
-                return;
-            Unit *caster = GetCaster();
-            if (!caster)
-                return;
-            // Regen amount is max (100% from spell) on 21% or less mana and min on 92.5% or greater mana (20% from spell)
-            int mana = m_target->GetPower(POWER_MANA);
-            int max_mana = m_target->GetMaxPower(POWER_MANA);
-            int32 base_regen = caster->CalculateSpellDamage(m_spellProto, m_effIndex, m_currentBasePoints, m_target);
-            float regen_pct = 1.20f - 1.1f * mana / max_mana;
-            if      (regen_pct > 1.0f) regen_pct = 1.0f;
-            else if (regen_pct < 0.2f) regen_pct = 0.2f;
-            m_modifier.m_amount = int32 (base_regen * regen_pct);
-            ((Player*)m_target)->UpdateManaRegen();
-            return;
-        }
+            }
 //        // Steal Weapon
 //        case 36207: break;
 //        // Simon Game START timer, (DND)
 //        case 39993: break;
-//        // Harpooner's Mark
-//        case 40084: break;
 //        // Knockdown Fel Cannon: break; The Aggro Burst
 //        case 40119: break;
 //        // Old Mount Spell
@@ -6212,6 +6246,8 @@ void Aura::PeriodicDummyTick()
 //        case 40846: break;
 //        // Copy Weapon
 //        case 41054: break;
+//        // Dementia
+//        case 41404: break;
 //        // Ethereal Ring Visual, Lightning Aura
 //        case 41477: break;
 //        // Ethereal Ring Visual, Lightning Aura (Fork)
@@ -6260,6 +6296,8 @@ void Aura::PeriodicDummyTick()
 //        case 43310: break;
 //        // Headless Horseman - Maniacal Laugh, Maniacal, Delayed 17
 //        case 43884: break;
+//        // Wretched!
+//        case 43963: break;
 //        // Headless Horseman - Maniacal Laugh, Maniacal, other, Delayed 17
 //        case 44000: break;
 //        // Energy Feedback
@@ -6326,14 +6364,179 @@ void Aura::PeriodicDummyTick()
 //        case 47407: break;
 //        // Mole Machine Port Schedule
 //        case 47489: break;
+//        case 47941: break; // Crystal Spike
+//        case 48200: break; // Healer Aura
+//        case 48630: break; // Summon Gauntlet Mobs Periodic
+//        case 49313: break; // Proximity Mine Area Aura
 //        // Mole Machine Portal Schedule
 //        case 49466: break;
-//        // Drink Coffee
-//        case 49472: break;
+//        case 49555: break; // Corpse Explode
+//        case 49592: break; // Temporal Rift
+//        case 49957: break; // Cutting Laser
+//        case 50085: break; // Slow Fall
 //        // Listening to Music
 //        case 50493: break;
 //        // Love Rocket Barrage
 //        case 50530: break;
+// Exist more after, need add later
+            default:
+                break;
+        }
+        break;
+        case SPELLFAMILY_MAGE:
+        {
+            // Mirror Image
+//            if (spell->Id == 55342)
+//                return;
+            break;
+        }
+        case SPELLFAMILY_WARRIOR:
+        {
+            // Armored to the Teeth
+            if (spell->SpellIconID == 3516)
+            {
+                // Increases your attack power by $s1 for every $s2 armor value you have.
+                // Calculate AP bonus (from 1 efect of this spell)
+                int32 apBonus = m_modifier.m_amount * m_target->GetArmor() / m_target->CalculateSpellDamage(spell, 1, spell->EffectBasePoints[1], m_target);
+                m_target->CastCustomSpell(m_target, 61217, &apBonus, &apBonus, 0, true, 0, this);
+                return;
+            }
+            break;
+        }
+        case SPELLFAMILY_DRUID:
+        {
+            switch (spell->Id)
+            {
+                // Frenzied Regeneration
+                case 22842:
+                {
+                    // Converts up to 10 rage per second into health for $d.  Each point of rage is converted into ${$m2/10}.1% of max health.
+                    // Should be manauser
+                    if (m_target->getPowerType()!=POWER_RAGE)
+                        return;
+                    uint32 rage = m_target->GetPower(POWER_RAGE);
+                    // Nothing todo
+                    if (rage == 0)
+                        return;
+                    int32 mod = (rage < 100) ? rage : 100;
+                    int32 points = m_target->CalculateSpellDamage(spell, 1, spell->EffectBasePoints[1], m_target);
+                    int32 regen = m_target->GetMaxHealth() * (mod * points / 10) / 1000;
+                    m_target->CastCustomSpell(m_target, 22845, &regen, 0, 0, true, 0, this);
+                    m_target->SetPower(POWER_RAGE, rage-mod);
+                    return;
+                }
+                // Force of Nature
+                case 33831:
+                    return;
+                default:
+                    break;
+            }
+            break;
+        }
+        case SPELLFAMILY_ROGUE:
+        {
+//            switch (spell->Id)
+//            {
+                // Master of Subtlety
+//                case 31666: break;
+                // Killing Spree
+//                case 51690: break;
+                // Overkill
+//                case 58428: break;
+//                default:
+//                    break;
+//            }
+            break;
+        }
+        case SPELLFAMILY_HUNTER:
+        {
+            // Explosive Shot
+            if (spell->SpellFamilyFlags & 0x8000000000000000LL)
+            {
+                if (!caster)
+                    return;
+                // Skip 0 tick
+                if (m_duration < m_modifier.periodictime)
+                    return;
+                int32 damage = caster->CalculateSpellDamage(spell, GetEffIndex(), GetBasePoints(), m_target);
+                damage+=caster->GetTotalAttackPowerValue(RANGED_ATTACK) * 8 / 100;
+                damage/=4;
+                caster->CastCustomSpell(m_target, 56298, &damage, 0, 0, true, 0, this);
+                return;
+            }
+            switch (spell->Id)
+            {
+                // Harpooner's Mark
+                // case 40084:
+                //    return;
+                // Feeding Frenzy Rank 1
+                case 53511:
+                    if ( m_target->GetHealth() * 100 < m_target->GetMaxHealth() * 35 )
+                        m_target->CastSpell(m_target, 60096, true, 0, this);
+                    return;
+                // Feeding Frenzy Rank 2
+                case 53512:
+                    if ( m_target->GetHealth() * 100 < m_target->GetMaxHealth() * 35 )
+                        m_target->CastSpell(m_target, 60097, true, 0, this);
+                    return;
+                default:
+                    break;
+            }
+            break;
+        }
+        case SPELLFAMILY_SHAMAN:
+        {
+            // Astral Shift
+//            if (spell->Id == 52179)
+//                return;
+            break;
+        }
+        case SPELLFAMILY_DEATHKNIGHT:
+        {
+            // Death and Decay
+//            if (spell->SpellFamilyFlags & 0x0000000000000020LL)
+//                return;
+            // Raise Dead
+//            if (spell->SpellFamilyFlags & 0x0000000000001000LL)
+//                return;
+            // Chains of Ice
+            if (spell->SpellFamilyFlags & 0x0000400000000000LL)
+            {
+                // Get 0 effect aura
+                Aura *slow = m_target->GetAura(GetId(), 0);
+                if (slow)
+                {
+                    slow->ApplyModifier(false, true);
+                    Modifier *mod = slow->GetModifier();
+                    mod->m_amount+= m_modifier.m_amount;
+                    if (mod->m_amount > 0) mod->m_amount = 0;
+                    slow->ApplyModifier(true, true);
+                }
+                return;
+            }
+            // Summon Gargoyle
+//            if (spell->SpellFamilyFlags & 0x0000008000000000LL)
+//                return;
+            // Death Rune Mastery
+//            if (spell->SpellFamilyFlags & 0x0000000000004000LL)
+//                return;
+            // Bladed Armor
+            if (spell->SpellIconID == 2653)
+            {
+                // Increases your attack power by $s1 for every $s2 armor value you have.
+                // Calculate AP bonus (from 1 efect of this spell)
+                int32 apBonus = m_modifier.m_amount * m_target->GetArmor() / m_target->CalculateSpellDamage(spell, 1, spell->EffectBasePoints[1], m_target);
+                m_target->CastCustomSpell(m_target, 61217, &apBonus, &apBonus, 0, true, 0, this);
+                return;
+            }
+            // Reaping
+//            if (spell->SpellIconID == 22)
+//                return;
+            // Blood of the North
+//            if (spell->SpellIconID == 30412)
+//                return;
+            break;
+        }
         default:
             break;
     }
