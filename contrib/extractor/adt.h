@@ -104,7 +104,7 @@ typedef struct
     uint32 ofsData2b;
 } MH2O_Data1;
 
-typedef struct 
+typedef struct
 {
     uint16 unk1;
     uint16 unk2;
