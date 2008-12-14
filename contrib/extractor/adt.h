@@ -9,43 +9,45 @@ typedef unsigned char uint8;
 typedef unsigned short uint16;
 typedef unsigned int uint32;
 class Liquid;
-typedef struct {
+typedef struct
+{
     float x;
     float y;
     float z;
 } svec;
 
-typedef struct {
+typedef struct
+{
     double x;
     double y;
     double z;
 } vec;
 
-typedef struct{
+typedef struct
+{
     vec v[3];
 } triangle;
 
-typedef struct{
-    float v9[16*8+1][16*8+1];
-    float v8[16*8][16*8];
+typedef struct
+{
+    float v9[16 * 8 + 1][16 * 8 + 1];
+    float v8[16 * 8][16 * 8];
 } Cell;
 
-typedef struct{
+typedef struct
+{
     double v9[9][9];
     double v8[8][8];
     uint16 area_id;
 } chunk;
-
-class WMO;
-class WMOManager;
-void fixname(std::string &name);
 
 typedef struct
 {
     chunk ch[16][16];
 } mcell;
 
-struct MapChunkHeader {
+struct MapChunkHeader
+{
     uint32 flags;
     uint32 ix;
     uint32 iy;
@@ -81,13 +83,15 @@ struct MapChunkHeader {
     uint32 effectId;
 };
 
-typedef struct {
+typedef struct
+{
     uint32 offsData1;
     uint32 used;
     uint32 offsData2;
 } MH2O_offsData;
 
-typedef struct {
+typedef struct
+{
     uint16 LiquidTypeId;
     uint16 type;
     float heightLevel1;
@@ -100,6 +104,13 @@ typedef struct {
     uint32 ofsData2b;
 } MH2O_Data1;
 
+typedef struct
+{
+    uint16 unk1;
+    uint16 unk2;
+    float height;
+} LiqData;
+
 enum LiquidType
 {
     LIQUID_TYPE_WATER = 0,
@@ -110,12 +121,8 @@ enum LiquidType
 
 class MPQFile;
 
-bool MH2O_presence;
-MH2O_offsData *LiqOffsData;
-MH2O_Data1 *LiqChunkData1;
-float *ChunkLiqHeight, *MapLiqHeight;
-uint8* MapLiqFlag;
+float *MapLiqHeight;
+uint8 *MapLiqFlag;
 uint32 k, m, chunk_num;
 void LoadMapChunk(MPQFile &, chunk*);
-bool LoadWMO(char* filename);
 #endif

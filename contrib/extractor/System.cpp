@@ -18,9 +18,10 @@ extern ArchiveSet gOpenArchives;
 
 bool ConvertADT(char*, char*);
 
-typedef struct{
+typedef struct
+{
     char name[64];
-    unsigned int id;
+    uint32 id;
 } map_id;
 
 typedef unsigned char uint8;
@@ -143,7 +144,7 @@ void ReadAreaTableDBC()
     size_t area_count = dbc.getRecordCount();
     size_t maxid = dbc.getMaxId();
     areas = new uint16[maxid + 1];
-    memset(areas, 0xff, sizeof(areas));
+    memset(areas, 0xff, (maxid + 1) * sizeof(uint16));
 
     for(uint32 x = 0; x < area_count; ++x)
         areas[dbc.getRecord(x).getUInt(0)] = dbc.getRecord(x).getUInt(3);
@@ -199,7 +200,7 @@ void ExtractMapsFromMpq()
                 ConvertADT(mpq_filename, output_filename);
                 done++;
             }
-            // draw progess bar
+            // draw progress bar
             printf("Processing........................%d%%\r", (100 * done) / total);
         }
     }
@@ -243,7 +244,7 @@ void ExtractDBCFiles(int locale, bool basicLocale)
         string filename = path;
         filename += (iter->c_str() + strlen("DBFilesClient\\"));
 
-        FILE *output=fopen(filename.c_str(), "wb");
+        FILE *output = fopen(filename.c_str(), "wb");
         if(!output)
         {
             printf("Can't create the output file '%s'\n", filename.c_str());
@@ -295,7 +296,7 @@ void LoadCommonMPQFiles()
         if(i > 1)
             sprintf(ext, "-%i", i);
 
-        sprintf(filename,"%s/Data/patch%s.MPQ", input_path, ext);
+        sprintf(filename, "%s/Data/patch%s.MPQ", input_path, ext);
         if(FileExists(filename))
             new MPQArchive(filename);
     }

@@ -15,7 +15,7 @@
 #include "adt.h"
 #include "mpq_libmpq.h"
 
-unsigned int iRes = 256;
+uint32 iRes = 256;
 extern uint16 *areas;
 extern uint16 *LiqType;
 extern uint32 maxAreaId;
@@ -23,7 +23,6 @@ extern uint32 maxAreaId;
 vec wmoc;
 
 Cell *cell;
-//uint32 wmo_count;
 mcell *mcells;
 int holetab_h[4] = {0x1111, 0x2222, 0x4444, 0x8888};
 int holetab_v[4] = {0x000F, 0x00F0, 0x0F00, 0xF000};
@@ -40,26 +39,23 @@ bool LoadADT(char* filename)
     }
 
     MapLiqFlag = new uint8[256];
-    for(int j = 0; j < 256; ++j)
+    for(uint32 j = 0; j < 256; ++j)
         MapLiqFlag[j] = 0;                                  // no water
 
     MapLiqHeight = new float[16384];
-    for(int j = 0; j < 16384; ++j)
+    for(uint32 j = 0; j < 16384; ++j)
         MapLiqHeight[j] = -999999;                          // no water
 
-    mcells=new mcell;
+    mcells = new mcell;
 
-    wmoc.x =65 * TILESIZE;
-    wmoc.z =65 * TILESIZE;
+    wmoc.x = 65 * TILESIZE;
+    wmoc.z = 65 * TILESIZE;
 
     size_t mcnk_offsets[256], mcnk_sizes[256];
 
-    //wmo_count = 0;
-    //bool found = false;
-
-    MH2O_presence = false;
     chunk_num = 0;
     k = 0;
+    m = 0;
     while (!mf.isEof())
     {
         uint32 fourcc;
@@ -72,7 +68,7 @@ bool LoadADT(char* filename)
         //if(fourcc==0x4d564552)                            // MVER
         if(fourcc == 0x4d43494e)                            // MCIN
         {
-            for (int i = 0; i < 256; ++i)
+            for (uint32 i = 0; i < 256; ++i)
             {
                 mf.read(&mcnk_offsets[i], 4);
                 mf.read(&mcnk_sizes[i], 4);
@@ -86,24 +82,23 @@ bool LoadADT(char* filename)
         //if(fourcc == 0x4d574944)                          // MWID offsets for strings in MWMO
         //if(fourcc == 0x4d444446)                          // MDDF
         //if(fourcc == 0x4d4f4446)                          // MODF
-        if(fourcc == 0x4d48324f && size)                    // MH2O new in WotLK
+        if(fourcc == 0x4d48324f)                            // MH2O new in WotLK
         {
-            MH2O_presence = true;
             // здесь надо запомнить базовую позицию в файле тк все смещени€ будут от него
             uint32 base_pos = mf.getPos();
             uint32 header_pos = 0;
-            LiqOffsData = new MH2O_offsData;
-            LiqChunkData1 = new MH2O_Data1;
-            ChunkLiqHeight = new float[81];
-            for(;chunk_num < 256; ++chunk_num)
+            MH2O_offsData *LiqOffsData = new MH2O_offsData;
+            MH2O_Data1 *LiqChunkData1 = new MH2O_Data1;
+            float *ChunkLiqHeight = new float[81];
+            for(chunk_num = 0; chunk_num < 256; ++chunk_num)
             {
-                mf.read(LiqOffsData, 12);
+                mf.read(LiqOffsData, 0x0C);
                 header_pos = mf.getPos();
                 if(LiqOffsData->offsData1 != 0)             // если данные в Data1 о воде есть, то их надо конвертировать
                 {
                     // переходим по смещению из offsData1 ќ“ Ќј„јЋј куска
                     mf.seek(base_pos + LiqOffsData->offsData1);
-                    mf.read(LiqChunkData1, 24);             // считываем сами данные в структуру типа MH2O_Data1
+                    mf.read(LiqChunkData1, 0x18);           // считываем сами данные в структуру типа MH2O_Data1
                     // заносим данные флага дл€ куска
                     if(LiqType[LiqChunkData1->LiquidTypeId] == 0xffff)
                         printf("\nCan't find Liquid type for map %s\nchunk %d\n", filename, chunk_num);
@@ -132,6 +127,7 @@ bool LoadADT(char* filename)
                     for(int j = 0; j < 81; ++j)
                         ChunkLiqHeight[j] = -999999;        // no liquid/water
                 }
+
                 if(!(chunk_num % 16))
                     m = 1024 * (chunk_num / 16);            // смещение по р€дам кусков с перекрытием = 1024
                 k = m + (chunk_num % 16) * 8;               // устанавливаемс€ на начальный индекс дл€ заполнени€ р€да
@@ -160,6 +156,9 @@ bool LoadADT(char* filename)
 
     //printf("Loading chunks info\n");
     // read individual map chunks
+    chunk_num = 0;
+    k = 0;
+    m = 0;
     for (int j = 0; j < 16; ++j)
     {
         for (int i = 0; i < 16; ++i)
@@ -245,14 +244,14 @@ inline void LoadMapChunk(MPQFile &mf, chunk *_chunk)
         {
             nextpos = mf.getPos() + 0x1C0;                  // size fix
         }
-        else if(fourcc == 0x4d434c51 && !MH2O_presence)     // не будем учитывать если уже были данные в MH2O, перестраховка :)                      // MCLQ
+        else if(fourcc == 0x4d434c51)                       // не будем учитывать если уже были данные в MH2O, перестраховка :)                      // MCLQ
         {
             // liquid / water level
             char fcc1[5];
             mf.read(fcc1, 4);
             flipcc(fcc1);
             fcc1[4] = 0;
-            ChunkLiqHeight = new float[81];
+            float *ChunkLiqHeight = new float[81];
 
             if (!strcmp(fcc1, "MCSE"))
             {
@@ -267,9 +266,10 @@ inline void LoadMapChunk(MPQFile &mf, chunk *_chunk)
                 mf.read(&maxheight, 4);
                 for(int j = 0; j < 81; ++j)
                 {
-                    mf.read(&h, 4);
-                    mf.read(&h, 4);
-                    if(h > maxheight)
+                    LiqData liq;
+                    mf.read(&liq, 8);
+
+                    if(liq.height > maxheight)
                         ChunkLiqHeight[j] = -999999;
                     else
                         ChunkLiqHeight[j] = h;
@@ -283,7 +283,7 @@ inline void LoadMapChunk(MPQFile &mf, chunk *_chunk)
             // заполнем так же как в MH2O
             if(!(chunk_num % 16))
                 m = 1024 * (chunk_num / 16);
-            k = m +(chunk_num % 16) * 8;
+            k = m + (chunk_num % 16) * 8;
             
             for(int p = 0; p < 72; p += 9)
             {
