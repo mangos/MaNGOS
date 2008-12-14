@@ -1179,6 +1179,11 @@ class MANGOS_DLL_SPEC Player : public Unit
             // disarm applied only to mainhand weapon
             return !IsInFeralForm() && (!mainhand || !HasFlag(UNIT_FIELD_FLAGS,UNIT_FLAG_DISARMED) );
         }
+        bool IsTwoHandUsed() const
+        {
+            Item* mainItem = GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
+            return mainItem && mainItem->GetProto()->InventoryType == INVTYPE_2HWEAPON && !CanTitanGrip();
+        }
         void SendNewItem( Item *item, uint32 count, bool received, bool created, bool broadcast = false );
         bool BuyItemFromVendor(uint64 vendorguid, uint32 item, uint8 count, uint64 bagguid, uint8 slot);
 
@@ -1817,6 +1822,8 @@ class MANGOS_DLL_SPEC Player : public Unit
         void SetCanBlock(bool value);
         bool CanDualWield() const { return m_canDualWield; }
         void SetCanDualWield(bool value) { m_canDualWield = value; }
+        bool CanTitanGrip() const { return m_canTitanGrip ; }
+        void SetCanTitanGrip(bool value) { m_canTitanGrip = value; }
 
         void SetRegularAttackTime();
         void SetBaseModValue(BaseModGroup modGroup, BaseModType modType, float value) { m_auraBaseMod[modGroup][modType] = value; }
@@ -2309,8 +2316,10 @@ class MANGOS_DLL_SPEC Player : public Unit
         bool m_canParry;
         bool m_canBlock;
         bool m_canDualWield;
+        bool m_canTitanGrip;
         uint8 m_swingErrorMsg;
         float m_ammoDPS;
+
         ////////////////////Rest System/////////////////////
         int time_inn_enter;
         uint32 inn_pos_mapid;

@@ -316,6 +316,7 @@ class Spell
         void EffectKillCredit(uint32 i);
         void EffectQuestFail(uint32 i);
         void EffectActivateRune(uint32 i);
+        void EffectTitanGrip(uint32 i);
 
         Spell( Unit* Caster, SpellEntry const *info, bool triggered, uint64 originalCasterGUID = 0, Spell** triggeringContainer = NULL );
         ~Spell();
