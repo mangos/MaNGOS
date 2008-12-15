@@ -180,7 +180,6 @@ bool ArenaTeam::LoadArenaTeamFromDB(uint32 ArenaTeamId)
         CharacterDatabase.PExecute("DELETE FROM arena_team_member WHERE arenateamid = '%u'", ArenaTeamId);
         CharacterDatabase.PExecute("DELETE FROM arena_team_stats WHERE arenateamid = '%u'", ArenaTeamId);
         CharacterDatabase.CommitTransaction();
-        // return false
         return false;
     }
 
