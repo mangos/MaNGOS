@@ -18,7 +18,6 @@
 
 #ifndef __BATTLEGROUND_H
 #define __BATTLEGROUND_H
-#define ARENA_PATCH
 
 #include "Common.h"
 #include "WorldPacket.h"
