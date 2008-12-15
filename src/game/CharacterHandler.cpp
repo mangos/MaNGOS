@@ -978,7 +978,7 @@ void WorldSession::HandleChangePlayerNameOpcodeCallBack(QueryResult *result, uin
     CharacterDatabase.PExecute("UPDATE characters set name = '%s', at_login = at_login & ~ %u WHERE guid ='%u'", newname.c_str(), uint32(AT_LOGIN_RENAME),guidLow);
     CharacterDatabase.PExecute("DELETE FROM character_declinedname WHERE guid ='%u'", guidLow);
 
-    sLog.outChar("Account: %d (IP: %s) Character:[%s] (guid:%u) Changed name to: %s",session->GetAccountId(),session->GetRemoteAddress(),oldname.c_str(),guidLow,newname.c_str());
+    sLog.outChar("Account: %d (IP: %s) Character:[%s] (guid:%u) Changed name to: %s",session->GetAccountId(),session->GetRemoteAddress().c_str(),oldname.c_str(),guidLow,newname.c_str());
 
     WorldPacket data(SMSG_CHAR_RENAME,1+8+(newname.size()+1));
     data << (uint8)RESPONSE_SUCCESS;
