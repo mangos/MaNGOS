@@ -1053,7 +1053,7 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         }
         uint8 CanStoreItems( Item **pItem,int count) const;
-        uint8 CanEquipNewItem( uint8 slot, uint16 &dest, uint32 item, uint32 count, bool swap ) const;
+        uint8 CanEquipNewItem( uint8 slot, uint16 &dest, uint32 item, bool swap ) const;
         uint8 CanEquipItem( uint8 slot, uint16 &dest, Item *pItem, bool swap, bool not_loading = true ) const;
         uint8 CanUnequipItems( uint32 item, uint32 count ) const;
         uint8 CanUnequipItem( uint16 src, bool swap ) const;
@@ -1064,10 +1064,10 @@ class MANGOS_DLL_SPEC Player : public Unit
         uint8 CanUseAmmo( uint32 item ) const;
         Item* StoreNewItem( ItemPosCountVec const& pos, uint32 item, bool update,int32 randomPropertyId = 0 );
         Item* StoreItem( ItemPosCountVec const& pos, Item *pItem, bool update );
-        Item* EquipNewItem( uint16 pos, uint32 item, uint32 count, bool update );
+        Item* EquipNewItem( uint16 pos, uint32 item, bool update );
         Item* EquipItem( uint16 pos, Item *pItem, bool update );
         void AutoUnequipOffhandIfNeed();
-        bool StoreNewItemInBestSlot(uint32 item_id, uint32 item_count);
+        bool StoreNewItemInBestSlots(uint32 item_id, uint32 item_count);
 
         uint8 _CanTakeMoreSimilarItems(uint32 entry, uint32 count, Item* pItem, uint32* no_space_count = NULL) const;
         uint8 _CanStoreItem( uint8 bag, uint8 slot, ItemPosCountVec& dest, uint32 entry, uint32 count, Item *pItem = NULL, bool swap = false, uint32* no_space_count = NULL ) const;

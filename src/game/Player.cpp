@@ -668,12 +668,12 @@ bool Player::Create( uint32 guidlow, const std::string& name, uint8 race, uint8 
                 }
             }
 
-            StoreNewItemInBestSlot(item_id, count);
+            StoreNewItemInBestSlots(item_id, count);
         }
     }
 
     for (PlayerCreateInfoItems::const_iterator item_id_itr = info->item.begin(); item_id_itr!=info->item.end(); ++item_id_itr++)
-        StoreNewItemInBestSlot(item_id_itr->item_id, item_id_itr->item_amount);
+        StoreNewItemInBestSlots(item_id_itr->item_id, item_id_itr->item_amount);
 
     // bags and main-hand weapon must equipped at this moment
     // now second pass for not equipped (offhand weapon/shield if it attempt equipped before main-hand weapon)
@@ -713,24 +713,30 @@ bool Player::Create( uint32 guidlow, const std::string& name, uint8 race, uint8 
     return true;
 }
 
-bool Player::StoreNewItemInBestSlot(uint32 titem_id, uint32 titem_amount)
+bool Player::StoreNewItemInBestSlots(uint32 titem_id, uint32 titem_amount)
 {
     sLog.outDebug("STORAGE: Creating initial item, itemId = %u, count = %u",titem_id, titem_amount);
 
-    // attempt equip
-    uint16 eDest;
-    uint8 msg = CanEquipNewItem( NULL_SLOT, eDest, titem_id, titem_amount, false );
-    if( msg == EQUIP_ERR_OK )
+    // attempt equip by one
+    while(titem_amount > 0)
     {
-        EquipNewItem( eDest, titem_id, titem_amount, true);
+        uint16 eDest;
+        uint8 msg = CanEquipNewItem( NULL_SLOT, eDest, titem_id, false );
+        if( msg != EQUIP_ERR_OK )
+            break;
+
+        EquipNewItem( eDest, titem_id, true);
         AutoUnequipOffhandIfNeed();
-        return true;                                        // equipped
+        --titem_amount;
     }
+
+    if(titem_amount == 0)
+        return true;                                        // equipped
 
     // attempt store
     ItemPosCountVec sDest;
     // store in main bag to simplify second pass (special bags can be not equipped yet at this moment)
-    msg = CanStoreNewItem( INVENTORY_SLOT_BAG_0, NULL_SLOT, sDest, titem_id, titem_amount );
+    uint8 msg = CanStoreNewItem( INVENTORY_SLOT_BAG_0, NULL_SLOT, sDest, titem_id, titem_amount );
     if( msg == EQUIP_ERR_OK )
     {
         StoreNewItem( sDest, titem_id, true, Item::GenerateItemRandomPropertyId(titem_id) );
@@ -9307,10 +9313,10 @@ uint8 Player::CanStoreItems( Item **pItems,int count) const
 }
 
 //////////////////////////////////////////////////////////////////////////
-uint8 Player::CanEquipNewItem( uint8 slot, uint16 &dest, uint32 item, uint32 count, bool swap ) const
+uint8 Player::CanEquipNewItem( uint8 slot, uint16 &dest, uint32 item, bool swap ) const
 {
     dest = 0;
-    Item *pItem = Item::CreateItem( item, count, this );
+    Item *pItem = Item::CreateItem( item, 1, this );
     if( pItem )
     {
         uint8 result = CanEquipItem(slot, dest, pItem, swap );
@@ -9974,12 +9980,12 @@ Item* Player::_StoreItem( uint16 pos, Item *pItem, uint32 count, bool clone, boo
     }
 }
 
-Item* Player::EquipNewItem( uint16 pos, uint32 item, uint32 count, bool update )
+Item* Player::EquipNewItem( uint16 pos, uint32 item, bool update )
 {
-    Item *pItem = Item::CreateItem( item, count, this );
+    Item *pItem = Item::CreateItem( item, 1, this );
     if( pItem )
     {
-        ItemAddedQuestCheck( item, count );
+        ItemAddedQuestCheck( item, 1 );
         Item * retItem = EquipItem( pos, pItem, update );
 
         return retItem;
@@ -16636,8 +16642,14 @@ bool Player::BuyItemFromVendor(uint64 vendorguid, uint32 item, uint8 count, uint
     }
     else if( IsEquipmentPos( bag, slot ) )
     {
+        if(pProto->BuyCount * count != 1)
+        {
+            SendEquipError( EQUIP_ERR_ITEM_CANT_BE_EQUIPPED, NULL, NULL );
+            return false;
+        }
+
         uint16 dest;
-        uint8 msg = CanEquipNewItem( slot, dest, item, pProto->BuyCount * count, false );
+        uint8 msg = CanEquipNewItem( slot, dest, item, false );
         if( msg != EQUIP_ERR_OK )
         {
             SendEquipError( msg, NULL, NULL );
@@ -16659,7 +16671,7 @@ bool Player::BuyItemFromVendor(uint64 vendorguid, uint32 item, uint8 count, uint
             }
         }
 
-        if(Item *it = EquipNewItem( dest, item, pProto->BuyCount * count, true ))
+        if(Item *it = EquipNewItem( dest, item, true ))
         {
             uint32 new_count = pCreature->UpdateVendorItemCurrentCount(crItem,pProto->BuyCount * count);
 
