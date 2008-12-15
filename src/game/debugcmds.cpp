@@ -30,6 +30,7 @@
 #include "GossipDef.h"
 #include "Language.h"
 #include "MapManager.h"
+#include "BattleGroundMgr.h"
 #include <fstream>
 #include "ObjectMgr.h"
 
@@ -516,5 +517,11 @@ bool ChatHandler::HandleGetItemState(const char* args)
             SendSysMessage("All OK!");
     }
 
+    return true;
+}
+
+bool ChatHandler::HandleDebugArenaCommand(const char * /*args*/)
+{
+    sBattleGroundMgr.ToggleArenaTesting();
     return true;
 }

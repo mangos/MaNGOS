@@ -47,6 +47,7 @@
 #include "Config/ConfigEnv.h"
 #include "Util.h"
 #include "ItemEnchantmentMgr.h"
+#include "BattleGroundMgr.h"
 #include "InstanceSaveMgr.h"
 #include "InstanceData.h"
 
@@ -6476,6 +6477,12 @@ bool ChatHandler::HandleSendMessageCommand(const char* args)
 
     //Confirmation message
     PSendSysMessage(LANG_SENDMESSAGE,name.c_str(),msg_str);
+    return true;
+}
+
+bool ChatHandler::HandleFlushArenaPointsCommand(const char * /*args*/)
+{
+    sBattleGroundMgr.DistributeArenaPoints();
     return true;
 }
 

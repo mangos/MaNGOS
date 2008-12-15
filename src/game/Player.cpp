@@ -346,8 +346,8 @@ Player::Player (WorldSession *session): Unit()
     m_bgBattleGroundID = 0;
     for (int j=0; j < PLAYER_MAX_BATTLEGROUND_QUEUES; j++)
     {
-        m_bgBattleGroundQueueID[j].bgType  = 0;
-        m_bgBattleGroundQueueID[j].invited = false;
+        m_bgBattleGroundQueueID[j].bgQueueType  = 0;
+        m_bgBattleGroundQueueID[j].invitedToInstance = 0;
     }
     m_bgTeam = 0;
 
@@ -1499,7 +1499,8 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
     MapEntry const* mEntry = sMapStore.LookupEntry(mapid);
 
     // don't let enter battlegrounds without assigned battleground id (for example through areatrigger)...
-    if(!InBattleGround() && mEntry->IsBattleGround() && !GetSession()->GetSecurity())
+    // don't let gm level > 1 either
+    if(!InBattleGround() && mEntry->IsBattleGroundOrArena())
         return false;
 
     // client without expansion support
@@ -3487,6 +3488,29 @@ void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmC
         Guild* guild = objmgr.GetGuildById(guildId);
         if(guild)
             guild->DelMember(guid);
+    }
+
+    // remove from arena teams
+    uint32 at_id = GetArenaTeamIdFromDB(playerguid,ARENA_TEAM_2v2);
+    if(at_id != 0)
+    {
+        ArenaTeam * at = objmgr.GetArenaTeamById(at_id);
+        if(at)
+            at->DelMember(playerguid);
+    }
+    at_id = GetArenaTeamIdFromDB(playerguid,ARENA_TEAM_3v3);
+    if(at_id != 0)
+    {
+        ArenaTeam * at = objmgr.GetArenaTeamById(at_id);
+        if(at)
+            at->DelMember(playerguid);
+    }
+    at_id = GetArenaTeamIdFromDB(playerguid,ARENA_TEAM_5v5);
+    if(at_id != 0)
+    {
+        ArenaTeam * at = objmgr.GetArenaTeamById(at_id);
+        if(at)
+            at->DelMember(playerguid);
     }
 
     // the player was uninvited already on logout so just remove from group
@@ -7737,19 +7761,34 @@ void Player::SendInitWorldStates()
             data << uint32(0xa5f) << uint32(0x0);           // 35
             break;
         case 3698:                                          // Nagrand Arena
-            data << uint32(0xa0f) << uint32(0x0);           // 7
-            data << uint32(0xa10) << uint32(0x0);           // 8
-            data << uint32(0xa11) << uint32(0x0);           // 9
+            if (bg && bg->GetTypeID() == BATTLEGROUND_NA)
+                bg->FillInitialWorldStates(data);
+            else
+            {
+                data << uint32(0xa0f) << uint32(0x0);           // 7
+                data << uint32(0xa10) << uint32(0x0);           // 8
+                data << uint32(0xa11) << uint32(0x0);           // 9 show
+            }
             break;
         case 3702:                                          // Blade's Edge Arena
-            data << uint32(0x9f0) << uint32(0x0);           // 7
-            data << uint32(0x9f1) << uint32(0x0);           // 8
-            data << uint32(0x9f3) << uint32(0x0);           // 9
+            if (bg && bg->GetTypeID() == BATTLEGROUND_BE)
+                bg->FillInitialWorldStates(data);
+            else
+            {
+                data << uint32(0x9f0) << uint32(0x0);           // 7 gold
+                data << uint32(0x9f1) << uint32(0x0);           // 8 green
+                data << uint32(0x9f3) << uint32(0x0);           // 9 show
+            }
             break;
         case 3968:                                          // Ruins of Lordaeron
-            data << uint32(0xbb8) << uint32(0x0);           // 7
-            data << uint32(0xbb9) << uint32(0x0);           // 8
-            data << uint32(0xbba) << uint32(0x0);           // 9
+            if (bg && bg->GetTypeID() == BATTLEGROUND_RL)
+                bg->FillInitialWorldStates(data);
+            else
+            {
+                data << uint32(0xbb8) << uint32(0x0);           // 7 gold
+                data << uint32(0xbb9) << uint32(0x0);           // 8 green
+                data << uint32(0xbba) << uint32(0x0);           // 9 show
+            }
             break;
         case 3703:                                          // Shattrath City
             break;
@@ -13334,6 +13373,36 @@ void Player::_LoadDeclinedNames(QueryResult* result)
     delete result;
 }
 
+void Player::_LoadArenaTeamInfo(QueryResult *result)
+{
+    // arenateamid, played_week, played_season, personal_rating
+    memset((void*)&m_uint32Values[PLAYER_FIELD_ARENA_TEAM_INFO_1_1], 0, sizeof(uint32)*18);
+    if (!result)
+        return;
+
+    do
+    {
+        Field *fields = result->Fetch();
+
+        uint32 arenateamid     = fields[0].GetUInt32();
+        uint32 played_week     = fields[1].GetUInt32();
+        uint32 played_season   = fields[2].GetUInt32();
+        uint32 personal_rating = fields[3].GetUInt32();
+
+        ArenaTeam* aTeam = objmgr.GetArenaTeamById(arenateamid);
+        uint8  arenaSlot = aTeam->GetSlot();
+
+        m_uint32Values[PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + arenaSlot * 3]     = arenateamid;      // TeamID
+        m_uint32Values[PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + arenaSlot * 3 + 1] = ((aTeam->GetCaptain() == GetGUID()) ? (uint32)0 : (uint32)1); // Captain 0, member 1
+        m_uint32Values[PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + arenaSlot * 3 + 2] = played_week;      // Played Week
+        m_uint32Values[PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + arenaSlot * 3 + 3] = played_season;    // Played Season
+        m_uint32Values[PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + arenaSlot * 3 + 4] = 0;                // Unk
+        m_uint32Values[PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + arenaSlot * 3 + 5] = personal_rating;  // Personal Rating
+
+    }while (result->NextRow());
+    delete result;
+}
+
 bool Player::LoadPositionFromDB(uint32& mapid, float& x,float& y,float& z,float& o, bool& in_flight, uint64 guid)
 {
     QueryResult *result = CharacterDatabase.PQuery("SELECT position_x,position_y,position_z,orientation,map,taxi_path FROM characters WHERE guid = '%u'",GUID_LOPART(guid));
@@ -13405,8 +13474,8 @@ float Player::GetFloatValueFromDB(uint16 index, uint64 guid)
 
 bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
 {
-    ////                                                     0     1        2     3     4     5      6           7           8           9    10           11        12         13         14         15          16           17                 18                 19                 20       21       22       23       24         25           26            27        [28]  [29]    30                 31         32
-    //QueryResult *result = CharacterDatabase.PQuery("SELECT guid, account, data, name, race, class, position_x, position_y, position_z, map, orientation, taximask, cinematic, totaltime, leveltime, rest_bonus, logout_time, is_logout_resting, resettalents_cost, resettalents_time, trans_x, trans_y, trans_z, trans_o, transguid, extra_flags, stable_slots, at_login, zone, online, death_expire_time, taxi_path, dungeon_difficulty FROM characters WHERE guid = '%u'", guid);
+    ////                                                     0     1        2     3     4     5      6           7           8           9    10           11        12         13         14         15          16           17                 18                 19                 20       21       22       23       24         25           26            27        [28]  [29]    30                 31         32                         33
+    //QueryResult *result = CharacterDatabase.PQuery("SELECT guid, account, data, name, race, class, position_x, position_y, position_z, map, orientation, taximask, cinematic, totaltime, leveltime, rest_bonus, logout_time, is_logout_resting, resettalents_cost, resettalents_time, trans_x, trans_y, trans_z, trans_o, transguid, extra_flags, stable_slots, at_login, zone, online, death_expire_time, taxi_path, dungeon_difficulty, arena_pending_points FROM characters WHERE guid = '%u'", guid);
     QueryResult *result = holder->GetResult(PLAYER_LOGIN_QUERY_LOADFROM);
 
     if(!result)
@@ -13495,6 +13564,14 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
     SetDifficulty(fields[32].GetUInt32());                  // may be changed in _LoadGroup
 
     _LoadGroup(holder->GetResult(PLAYER_LOGIN_QUERY_LOADGROUP));
+
+    _LoadArenaTeamInfo(holder->GetResult(PLAYER_LOGIN_QUERY_LOADARENAINFO));
+
+    uint32 arena_currency = GetUInt32Value(PLAYER_FIELD_ARENA_CURRENCY) + fields[33].GetUInt32();
+    if (arena_currency > sWorld.getConfig(CONFIG_MAX_ARENA_POINTS))
+        arena_currency = sWorld.getConfig(CONFIG_MAX_ARENA_POINTS);
+
+    SetUInt32Value(PLAYER_FIELD_ARENA_CURRENCY, arena_currency);
 
     // check arena teams integrity
     for(uint32 arena_slot = 0; arena_slot < MAX_ARENA_SLOT; ++arena_slot)
@@ -14818,8 +14895,10 @@ void Player::SaveToDB()
     // first save/honor gain after midnight will also update the player's honor fields
     UpdateHonorFields();
 
-    // Must saved before enter into BattleGround
-    if(InBattleGround())
+    // players aren't saved on battleground maps
+    uint32 mapid = IsBeingTeleported() ? GetTeleportDest().mapid : GetMapId();
+    const MapEntry * me = sMapStore.LookupEntry(mapid);
+    if(!me || me->IsBattleGroundOrArena())
         return;
 
     int is_save_resting = HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING) ? 1 : 0;
@@ -14857,7 +14936,7 @@ void Player::SaveToDB()
         "taximask, online, cinematic, "
         "totaltime, leveltime, rest_bonus, logout_time, is_logout_resting, resettalents_cost, resettalents_time, "
         "trans_x, trans_y, trans_z, trans_o, transguid, extra_flags, stable_slots, at_login, zone, "
-        "death_expire_time, taxi_path) VALUES ("
+        "death_expire_time, taxi_path, arena_pending_points) VALUES ("
         << GetGUIDLow() << ", "
         << GetSession()->GetAccountId() << ", '"
         << sql_name << "', "
@@ -14956,7 +15035,7 @@ void Player::SaveToDB()
 
     ss << ", '";
     ss << m_taxi.SaveTaxiDestinationsToString();
-    ss << "' )";
+    ss << "', '0' )";
 
     CharacterDatabase.Execute( ss.str().c_str() );
 
@@ -17619,7 +17698,8 @@ bool Player::InArena() const
 
 bool Player::GetBGAccessByLevel(uint32 bgTypeId) const
 {
-    BattleGround *bg = sBattleGroundMgr.GetBattleGround(bgTypeId);
+    // get a template bg instead of running one
+    BattleGround *bg = sBattleGroundMgr.GetBattleGroundTemplate(bgTypeId);
     if(!bg)
         return false;
 
@@ -17657,6 +17737,11 @@ uint32 Player::GetBattleGroundQueueIdFromLevel() const
         return 6;
     else
         return level/10 - 1;                                // 20..29 -> 1, 30-39 -> 2, ...
+    /*
+    assert(bgTypeId < MAX_BATTLEGROUND_TYPES);
+    BattleGround *bg = sBattleGroundMgr.GetBattleGroundTemplate(bgTypeId);
+    assert(bg);
+    return (getLevel() - bg->GetMinLevel()) / 10;*/
 }
 
 float Player::GetReputationPriceDiscount( Creature const* pCreature ) const

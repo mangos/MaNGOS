@@ -50,6 +50,13 @@ void BattleGroundAB::Update(time_t diff)
         {
             m_Events |= 0x01;
 
+            // setup here, only when at least one player has ported to the map
+            if(!SetupBattleGround())
+            {
+                EndNow();
+                return;
+            }
+
             sLog.outDebug("Arathi Basin: entering state STATUS_WAIT_JOIN ...");
 
             // despawn banners, auras and buffs
@@ -377,6 +384,7 @@ void BattleGroundAB::_NodeOccupied(uint8 node,Team team)
 {
    if( !AddSpiritGuide(node, BG_AB_SpiritGuidePos[node][0], BG_AB_SpiritGuidePos[node][1], BG_AB_SpiritGuidePos[node][2], BG_AB_SpiritGuidePos[node][3], team) )
         sLog.outError("Failed to spawn spirit guide! point: %u, team: %u,", node, team);
+//   SpawnBGCreature(node,RESPAWN_IMMEDIATELY);
 
     uint8 capturedNodes = 0;
     for (uint8 i = 0; i < BG_AB_DYNAMIC_NODES_COUNT; ++i)
