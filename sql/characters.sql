@@ -36,6 +36,28 @@ INSERT INTO `character_db_version` VALUES
 UNLOCK TABLES;
 
 --
+-- Table structure for table `account_data`
+--
+
+DROP TABLE IF EXISTS `account_data`;
+CREATE TABLE `account_data` (
+  `account` int(11) unsigned NOT NULL default '0',
+  `type` int(11) unsigned NOT NULL default '0',
+  `time` bigint(11) unsigned NOT NULL default '0',
+  `data` longtext NOT NULL,
+  PRIMARY KEY  (`account`,`type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `account_data`
+--
+
+LOCK TABLES `account_data` WRITE;
+/*!40000 ALTER TABLE `account_data` DISABLE KEYS */;
+/*!40000 ALTER TABLE `account_data` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `arena_team`
 --
 
@@ -214,6 +236,47 @@ CREATE TABLE `characters` (
 LOCK TABLES `characters` WRITE;
 /*!40000 ALTER TABLE `characters` DISABLE KEYS */;
 /*!40000 ALTER TABLE `characters` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `character_achievement`
+--
+
+CREATE TABLE IF NOT EXISTS `character_achievement` (
+  `guid` int(11) NOT NULL,
+  `achievement` int(11) NOT NULL,
+  `date` int(11) NOT NULL,
+  PRIMARY KEY  (`guid`,`achievement`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `character_achievement`
+--
+
+LOCK TABLES `character_achievement` WRITE;
+/*!40000 ALTER TABLE `character_achievement` DISABLE KEYS */;
+/*!40000 ALTER TABLE `character_achievement` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `character_achievement_progress`
+--
+
+CREATE TABLE IF NOT EXISTS `character_achievement_progress` (
+  `guid` int(11) NOT NULL,
+  `criteria` int(11) NOT NULL,
+  `counter` int(11) NOT NULL,
+  `date` int(11) NOT NULL,
+  PRIMARY KEY  (`guid`,`criteria`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `character_achievement_progress`
+--
+
+LOCK TABLES `character_achievement_progress` WRITE;
+/*!40000 ALTER TABLE `character_achievement_progress` DISABLE KEYS */;
+/*!40000 ALTER TABLE `character_achievement_progress` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -398,9 +461,7 @@ CREATE TABLE `character_pet` (
   `level` int(11) unsigned NOT NULL default '1',
   `exp` int(11) unsigned NOT NULL default '0',
   `Reactstate` tinyint(1) unsigned NOT NULL default '0',
-  `loyaltypoints` int(11) NOT NULL default '0',
-  `loyalty` int(11) unsigned NOT NULL default '0',
-  `trainpoint` int(11) NOT NULL default '0',
+  `talentpoints` int(11) unsigned NOT NULL default '0',
   `name` varchar(100) default 'Pet',
   `renamed` tinyint(1) unsigned NOT NULL default '0',
   `slot` int(11) unsigned NOT NULL default '0',
