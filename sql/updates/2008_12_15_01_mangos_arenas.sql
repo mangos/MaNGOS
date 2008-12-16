@@ -1,3 +1,5 @@
+ALTER TABLE db_version CHANGE COLUMN required_2008_11_29_02_mangos_spell_elixir required_2008_12_15_01_mangos_arenas bit;
+
 DELETE FROM `command` WHERE `name` = "flusharenapoints";
 INSERT INTO `command` (`name`, `security`, `help`) VALUES
 ('flusharenapoints','3','Syntax: .flusharenapoints\r\n\r\nUse it to distribute arena points based on arena team ratings, and start a new week.');
