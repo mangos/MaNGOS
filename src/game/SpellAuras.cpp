@@ -1171,7 +1171,8 @@ void Aura::UpdateSlotCounterAndDuration(bool add)
     SetAuraCharges(count);
     SendAuraUpdate(false);
 }
-bool Aura::isAffectedOnSpell(SpellEntry const *spell)
+
+bool Aura::isAffectedOnSpell(SpellEntry const *spell) const
 {
     // Check family name
     if (spell->SpellFamilyName != m_spellProto->SpellFamilyName)
@@ -1184,6 +1185,7 @@ bool Aura::isAffectedOnSpell(SpellEntry const *spell)
         return true;
     return false;
 }
+
 /*********************************************************/
 /***               BASIC AURA FUNCTION                 ***/
 /*********************************************************/

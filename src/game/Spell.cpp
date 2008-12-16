@@ -4691,11 +4691,7 @@ uint8 Spell::CheckItems()
         focusObject = ok;                                   // game object found in range
     }
 
-    bool needReagentCheck = true;
-    if (m_caster->GetTypeId() == TYPEID_PLAYER && ((Player*)m_caster)->CanNoReagentCast(m_spellInfo))
-        needReagentCheck = false;
-
-    if (needReagentCheck)
+    if (!p_caster->CanNoReagentCast(m_spellInfo))
     {
         for(uint32 i=0;i<8;i++)
         {
