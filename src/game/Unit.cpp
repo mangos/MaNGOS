@@ -2307,21 +2307,21 @@ MeleeHitOutcome Unit::RollPhysicalOutcomeAgainst (Unit const *pVictim, WeaponAtt
     {
         // Increase from SPELL_AURA_MOD_SPELL_CRIT_CHANCE_SCHOOL aura
         crit_chance += GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_SPELL_CRIT_CHANCE_SCHOOL, spellInfo->SchoolMask);
-
-        if( dodge_chance != 0.0f )                          // if dodge chance is already 0, ignore talents for speed
+        // Ignore combat result aura
+        AuraList const& mCanNotBeDodge = GetAurasByType(SPELL_AURA_IGNORE_COMBAT_RESULT);
+        for(AuraList::const_iterator i = mCanNotBeDodge.begin(); i != mCanNotBeDodge.end(); ++i)
         {
-            AuraList const& mCanNotBeDodge = GetAurasByType(SPELL_AURA_IGNORE_COMBAT_RESULT);
-            for(AuraList::const_iterator i = mCanNotBeDodge.begin(); i != mCanNotBeDodge.end(); ++i)
+            if (!(*i)->isAffectedOnSpell(spellInfo))
+                continue;
+            // can't be dodged
+            switch((*i)->GetModifier()->m_miscvalue)
             {
-                // can't be dodged rogue finishing move
-                if((*i)->GetModifier()->m_miscvalue == VICTIMSTATE_DODGE)
-                {
-                    if(spellInfo->SpellFamilyName==SPELLFAMILY_ROGUE && (spellInfo->SpellFamilyFlags & SPELLFAMILYFLAG_ROGUE__FINISHING_MOVE))
-                    {
-                        dodge_chance = 0.0f;
-                        break;
-                    }
-                }
+                case MELEE_HIT_DODGE: dodge_chance = 0.0f; break;
+                case MELEE_HIT_BLOCK: block_chance = 0.0f; break;
+                case MELEE_HIT_PARRY: parry_chance = 0.0f; break;
+                default:
+                    DEBUG_LOG("Spell %u SPELL_AURA_IGNORE_COMBAT_RESULT have unhandled state %d", (*i)->GetId(), (*i)->GetModifier()->m_miscvalue);
+                    break;
             }
         }
     }
