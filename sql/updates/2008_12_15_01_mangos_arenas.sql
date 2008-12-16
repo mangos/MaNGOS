@@ -20,7 +20,7 @@ INSERT INTO mangos_string (entry, content_default) VALUES
     (1134, 'Someone in your party is already in three battleground queues. You cannot join as group.'),
     (1135, 'You cannot teleport to a battleground or arena map.'),
     (1136, 'You cannot summon players to a battleground or arena map.'),
-    (1127, 'You must be in GM mode to teleport to a player in a battleground.'),
+    (1137, 'You must be in GM mode to teleport to a player in a battleground.'),
     (1138, 'You cannot teleport to a battleground from another battleground. Please leave the current battleground first.');
 
 DELETE FROM mangos_string WHERE entry = 714 OR entry = 716;
