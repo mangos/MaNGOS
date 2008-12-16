@@ -317,7 +317,7 @@ enum AuraType
     SPELL_AURA_272 = 272,
     SPELL_AURA_273 = 273,
     SPELL_AURA_274 = 274,
-    SPELL_AURA_275 = 275,
+    SPELL_AURA_MOD_IGNORE_SHAPESHIFT = 275,
     SPELL_AURA_276 = 276,                    // Only "Test Mod Damage % Mechanic" spell, possible mod damage done
     SPELL_AURA_277 = 277,
     SPELL_AURA_MOD_DISARM_RANGED = 278,

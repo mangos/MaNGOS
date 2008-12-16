@@ -3385,12 +3385,25 @@ uint8 Spell::CanCast(bool strict)
     // for now, ignore triggered spells
     if( strict && !m_IsTriggeredSpell)
     {
-        // Cannot be used in this stance/form
-        if(uint8 shapeError = GetErrorAtShapeshiftedCast(m_spellInfo, m_caster->m_form))
-            return shapeError;
+        bool checkForm = true;
+        // Ignore form req aura
+        Unit::AuraList const& ignore = m_caster->GetAurasByType(SPELL_AURA_MOD_IGNORE_SHAPESHIFT);
+        for(Unit::AuraList::const_iterator i = ignore.begin(); i != ignore.end(); ++i)
+        {
+            if (!(*i)->isAffectedOnSpell(m_spellInfo))
+                continue;
+            checkForm = false;
+            break;
+        }
+        if (checkForm)
+        {
+            // Cannot be used in this stance/form
+            if(uint8 shapeError = GetErrorAtShapeshiftedCast(m_spellInfo, m_caster->m_form))
+                return shapeError;
 
-        if ((m_spellInfo->Attributes & SPELL_ATTR_ONLY_STEALTHED) && !(m_caster->HasStealthAura()))
-            return SPELL_FAILED_ONLY_STEALTHED;
+            if ((m_spellInfo->Attributes & SPELL_ATTR_ONLY_STEALTHED) && !(m_caster->HasStealthAura()))
+                return SPELL_FAILED_ONLY_STEALTHED;
+        }
     }
 
     // caster state requirements
