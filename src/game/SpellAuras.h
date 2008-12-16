@@ -211,6 +211,7 @@ class MANGOS_DLL_SPEC Aura
         void HandleArenaPreparation(bool apply, bool Real);
         void HandleAuraConvertRune(bool apply, bool Real);
         void HandleAuraIncreaseBaseHealthPercent(bool Apply, bool Real);
+        void HandleNoReagentUseAura(bool Apply, bool Real);
 
         virtual ~Aura();
 
@@ -302,6 +303,9 @@ class MANGOS_DLL_SPEC Aura
 
         void PeriodicTick();
         void PeriodicDummyTick();
+
+        inline uint32 const *getAuraSpellClassMask() {return  m_spellProto->EffectSpellClassMaskA + m_effIndex * 3; }
+        bool isAffectedOnSpell(SpellEntry const *spell);
     protected:
         Aura(SpellEntry const* spellproto, uint32 eff, int32 *currentBasePoints, Unit *target, Unit *caster = NULL, Item* castItem = NULL);
 

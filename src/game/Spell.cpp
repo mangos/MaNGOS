@@ -3260,11 +3260,9 @@ void Spell::TakeReagents()
     if (m_caster->GetTypeId() != TYPEID_PLAYER)
         return;
 
-    if (m_spellInfo->AttributesEx5 & SPELL_ATTR_EX5_NO_REAGENT_WHILE_PREP &&
-        m_caster->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREPARATION))
-        return;
-
     Player* p_caster = (Player*)m_caster;
+    if (p_caster->CanNoReagentCast(m_spellInfo))
+        return;
 
     for(uint32 x=0;x<8;x++)
     {
@@ -4693,8 +4691,11 @@ uint8 Spell::CheckItems()
         focusObject = ok;                                   // game object found in range
     }
 
-    if (!(m_spellInfo->AttributesEx5 & SPELL_ATTR_EX5_NO_REAGENT_WHILE_PREP &&
-        m_caster->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREPARATION)))
+    bool needReagentCheck = true;
+    if (m_caster->GetTypeId() == TYPEID_PLAYER && ((Player*)m_caster)->CanNoReagentCast(m_spellInfo))
+        needReagentCheck = false;
+
+    if (needReagentCheck)
     {
         for(uint32 i=0;i<8;i++)
         {

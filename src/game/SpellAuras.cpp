@@ -296,42 +296,42 @@ pAuraHandler AuraHandler[TOTAL_AURAS]=
     &Aura::HandleUnused,                                    //243 used by two test spells
     &Aura::HandleComprehendLanguage,                        //244 Comprehend language
     &Aura::HandleUnused,                                    //245 SPELL_AURA_MOD_DURATION_OF_MAGIC_EFFECTS
-    &Aura::HandleUnused,                                    //246 unused
+    &Aura::HandleUnused,                                    //246 SPELL_AURA_MOD_DURATION_OF_EFFECTS_BY_DISPEL
     &Aura::HandleUnused,                                    //247 unused
     &Aura::HandleNoImmediateEffect,                         //248 SPELL_AURA_MOD_COMBAT_RESULT_CHANCE         implemented in Unit::RollMeleeOutcomeAgainst
     &Aura::HandleAuraConvertRune,                           //249 SPELL_AURA_CONVERT_RUNE
     &Aura::HandleAuraModIncreaseHealth,                     //250 SPELL_AURA_MOD_INCREASE_HEALTH_2
     &Aura::HandleNULL,                                      //251 SPELL_AURA_MOD_ENEMY_DODGE
-    &Aura::HandleNULL,                                      //252
-    &Aura::HandleNULL,                                      //253
-    &Aura::HandleNULL,                                      //254
-    &Aura::HandleNULL,                                      //255 SPELL_AURA_MOD_DAMAGE_PERCENT_MECHANIC
-    &Aura::HandleNULL,                                      //256
-    &Aura::HandleNULL,                                      //257 SPELL_AURA_MOD_TARGET_RESIST_BY_SPELL_CLASS
+    &Aura::HandleNULL,                                      //252 haste all?
+    &Aura::HandleNULL,                                      //253 SPELL_AURA_MOD_BLOCK_CRIT_CHANCE
+    &Aura::HandleNULL,                                      //254 SPELL_AURA_MOD_DISARM_SHIELD disarm Shield
+    &Aura::HandleNULL,                                      //255 SPELL_AURA_MOD_MECHANIC_DAMAGE_TAKEN_PERCENT
+    &Aura::HandleNoReagentUseAura,                          //256 SPELL_AURA_NO_REAGENT_USE Use SpellClassMask for spell select
+    &Aura::HandleNULL,                                      //257 SPELL_AURA_MOD_TARGET_RESIST_BY_SPELL_CLASS Use SpellClassMask for spell select
     &Aura::HandleNULL,                                      //258 SPELL_AURA_MOD_SPELL_VISUAL
     &Aura::HandleNULL,                                      //259 corrupt healing over time spell
     &Aura::HandleNULL,                                      //260
     &Aura::HandleNULL,                                      //261 out of phase?
     &Aura::HandleNULL,                                      //262
-    &Aura::HandleNULL,                                      //263 melee AOE
+    &Aura::HandleNULL,                                      //263 SPELL_AURA_ALLOW_ONLY_ABILITY player can use only abilites set in SpellClassMask
     &Aura::HandleNULL,                                      //264 unused
     &Aura::HandleNULL,                                      //265 unused
     &Aura::HandleNULL,                                      //266 unused
     &Aura::HandleNULL,                                      //267 some immunity?
-    &Aura::HandleNULL,                                      //268 attack power from stat X
+    &Aura::HandleNULL,                                      //268 SPELL_AURA_MOD_ATTACK_POWER_OF_STAT_PERCENT
     &Aura::HandleNULL,                                      //269 ignore DR effects?
     &Aura::HandleNULL,                                      //270
     &Aura::HandleNULL,                                      //271 increase damage done?
     &Aura::HandleNULL,                                      //272 reduce spell cast time?
     &Aura::HandleNULL,                                      //273
     &Aura::HandleNULL,                                      //274 proc free shot?
-    &Aura::HandleNULL,                                      //275 ignore shapeshift?
+    &Aura::HandleNULL,                                      //275 ignore shapeshift Use SpellClassMask for spell select
     &Aura::HandleNULL,                                      //276 mod damage % mechanic?
-    &Aura::HandleNULL,                                      //277 increase max targets?
-    &Aura::HandleNULL,                                      //278 disarm/silence
+    &Aura::HandleNULL,                                      //277 increase max targets? Use SpellClassMask for spell select
+    &Aura::HandleNULL,                                      //278 SPELL_AURA_MOD_DISARM_RANGED disarm ranged weapon
     &Aura::HandleNULL,                                      //279
-    &Aura::HandleNULL,                                      //280 ignore armor?
-    &Aura::HandleNULL,                                      //281 increase honor gain?
+    &Aura::HandleNULL,                                      //280 SPELL_AURA_MOD_TARGET_ARMOR_PCT
+    &Aura::HandleNULL,                                      //281 SPELL_AURA_MOD_HONOR_GAIN
     &Aura::HandleAuraIncreaseBaseHealthPercent,             //282 SPELL_AURA_INCREASE_BASE_HEALTH_PERCENT
     &Aura::HandleNULL                                       //283 SPD/heal from AP?
 };
@@ -1171,7 +1171,19 @@ void Aura::UpdateSlotCounterAndDuration(bool add)
     SetAuraCharges(count);
     SendAuraUpdate(false);
 }
-
+bool Aura::isAffectedOnSpell(SpellEntry const *spell)
+{
+    // Check family name
+    if (spell->SpellFamilyName != m_spellProto->SpellFamilyName)
+        return false;
+    // Check EffectClassMask
+    uint32 const *ptr = getAuraSpellClassMask();
+    if (((uint64*)ptr)[0] & spell->SpellFamilyFlags)
+        return true;
+    if (ptr[2] & spell->SpellFamilyFlags2)
+        return true;
+    return false;
+}
 /*********************************************************/
 /***               BASIC AURA FUNCTION                 ***/
 /*********************************************************/
@@ -5190,6 +5202,28 @@ void Aura::HandleModPowerCost(bool apply, bool Real)
     for(int i = 0; i < MAX_SPELL_SCHOOL; ++i)
         if(m_modifier.m_miscvalue & (1<<i))
             m_target->ApplyModInt32Value(UNIT_FIELD_POWER_COST_MODIFIER+i,m_modifier.m_amount,apply);
+}
+
+void Aura::HandleNoReagentUseAura(bool Apply, bool Real)
+{
+    // spells required only Real aura add/remove
+    if(!Real)
+        return;
+    if(m_target->GetTypeId() != TYPEID_PLAYER)
+        return;
+    uint32 mask[3] = {0, 0, 0};
+    Unit::AuraList const& noReagent = m_target->GetAurasByType(SPELL_AURA_NO_REAGENT_USE);
+        for(Unit::AuraList::const_iterator i = noReagent.begin(); i !=  noReagent.end(); ++i)
+        {
+            uint32 const *ptr = (*i)->getAuraSpellClassMask();
+            mask[0]|=ptr[0];
+            mask[1]|=ptr[1];
+            mask[2]|=ptr[2];
+        }
+
+    m_target->SetUInt32Value(PLAYER_NO_REAGENT_COST_1  , mask[0]);
+    m_target->SetUInt32Value(PLAYER_NO_REAGENT_COST_1+1, mask[1]);
+    m_target->SetUInt32Value(PLAYER_NO_REAGENT_COST_1+2, mask[2]);
 }
 
 /*********************************************************/
