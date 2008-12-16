@@ -141,6 +141,8 @@ pkgdata_DATA = \
 	2008_11_29_01_mangos_spell_proc_event.sql \
 	2008_11_29_02_mangos_spell_elixir.sql \
 	2008_12_03_01_character_guild_member.sql \
+	2008_12_15_01_character_arenas.sql \
+	2008_12_15_01_mangos_arenas.sql \
 	README
 
 ## Additional files to include when running 'make dist'
@@ -263,4 +265,6 @@ EXTRA_DIST = \
 	2008_11_29_01_mangos_spell_proc_event.sql \
 	2008_11_29_02_mangos_spell_elixir.sql \
 	2008_12_03_01_character_guild_member.sql \
+	2008_12_15_01_character_arenas.sql \
+	2008_12_15_01_mangos_arenas.sql \
 	README

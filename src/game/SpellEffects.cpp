@@ -2653,7 +2653,7 @@ void Spell::DoCreateItem(uint32 i, uint32 itemtype)
                 return;
         }
 
-        if(BattleGround* bg = sBattleGroundMgr.GetBattleGround(bgType))
+        if(BattleGround* bg = sBattleGroundMgr.GetBattleGroundTemplate(bgType))
             bg->SendRewardMarkByMail(player,newitemid,no_space);
     }
 }

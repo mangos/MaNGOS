@@ -1045,6 +1045,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void RemoveAurasWithDispelType( DispelType type );
 
         void RemoveAllAuras();
+        void RemoveArenaAuras(bool onleave = false);
         void RemoveAllAurasOnDeath();
         void DelayAura(uint32 spellId, uint32 effindex, int32 delaytime);
 

@@ -363,7 +363,7 @@ uint32 GameEvent::Update()                                  // return the next e
 {
     uint32 nextEventDelay = max_ge_check_delay;             // 1 day
     uint32 calcDelay;
-    for (uint16 itr = 1; itr < mGameEvent.size(); itr++)
+    for (uint16 itr = 1; itr < mGameEvent.size(); ++itr)
     {
         //sLog.outErrorDb("Checking event %u",itr);
         if (CheckOneGameEvent(itr))
