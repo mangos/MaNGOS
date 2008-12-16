@@ -2308,12 +2308,11 @@ MeleeHitOutcome Unit::RollPhysicalOutcomeAgainst (Unit const *pVictim, WeaponAtt
         // Increase from SPELL_AURA_MOD_SPELL_CRIT_CHANCE_SCHOOL aura
         crit_chance += GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_SPELL_CRIT_CHANCE_SCHOOL, spellInfo->SchoolMask);
         // Ignore combat result aura
-        AuraList const& mCanNotBeDodge = GetAurasByType(SPELL_AURA_IGNORE_COMBAT_RESULT);
-        for(AuraList::const_iterator i = mCanNotBeDodge.begin(); i != mCanNotBeDodge.end(); ++i)
+        AuraList const& ignore = GetAurasByType(SPELL_AURA_IGNORE_COMBAT_RESULT);
+        for(AuraList::const_iterator i = ignore.begin(); i != ignore.end(); ++i)
         {
             if (!(*i)->isAffectedOnSpell(spellInfo))
                 continue;
-            // can't be dodged
             switch((*i)->GetModifier()->m_miscvalue)
             {
                 case MELEE_HIT_DODGE: dodge_chance = 0.0f; break;
