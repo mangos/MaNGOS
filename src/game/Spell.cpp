@@ -1186,7 +1186,15 @@ void Spell::SetTargetMap(uint32 i,uint32 cur,std::list<Unit*> &TagUnitMap)
         if(Player* modOwner = m_originalCaster->GetSpellModOwner())
             modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_JUMP_TARGETS, EffectChainTarget, this);
 
+    // Get spell max affected targets
     uint32 unMaxTargets = m_spellInfo->MaxAffectedTargets;
+    Unit::AuraList const& mod = m_caster->GetAurasByType(SPELL_AURA_MOD_MAX_AFFECTED_TARGETS);
+    for(Unit::AuraList::const_iterator m = mod.begin(); m != mod.end(); ++m)
+    {
+        if (!(*m)->isAffectedOnSpell(m_spellInfo))
+            continue;
+        unMaxTargets+=(*m)->GetModifier()->m_amount;
+    }
     switch(cur)
     {
         case TARGET_TOTEM_EARTH:
