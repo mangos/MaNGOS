@@ -1169,6 +1169,12 @@ void Spell::EffectDummy(uint32 i)
                     m_caster->CastSpell(m_caster, 30452, true, NULL);
                     return;
                 }
+                case 53341:
+                case 53343:
+                {
+                    m_caster->CastSpell(m_caster,54586,true);
+                    return;
+                 }
             }
 
             //All IconID Check in there
@@ -4917,6 +4923,14 @@ void Spell::EffectScriptEffect(uint32 effIndex)
 
             ((Player*)unitTarget)->ModifyMoney(50000000);
 
+            break;
+        }
+        case 51770:
+        {
+            if(!unitTarget)
+                return;
+
+            unitTarget->CastSpell(unitTarget,51771,false);
             break;
         }
     }
