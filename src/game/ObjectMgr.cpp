@@ -579,7 +579,7 @@ void ObjectMgr::LoadCreatureLocales()
     sLog.outString();
     sLog.outString( ">> Loaded %u creature locale strings", mCreatureLocaleMap.size() );
 }
-   
+
 void ObjectMgr::LoadCompletedAchievements()
 {
     QueryResult *result = CharacterDatabase.Query("SELECT achievement FROM character_achievement GROUP BY achievement");
