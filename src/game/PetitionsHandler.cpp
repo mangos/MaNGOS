@@ -317,8 +317,8 @@ void WorldSession::SendPetitionQueryOpcode(uint64 petitionguid)
 
     QueryResult *result = CharacterDatabase.PQuery(
         "SELECT ownerguid, name, "
-        "  (SELECT COUNT(playerguid) FROM petition_sign WHERE petition_sign.petitionguid = '%u') AS signs "
-        "type "
+        "  (SELECT COUNT(playerguid) FROM petition_sign WHERE petition_sign.petitionguid = '%u') AS signs, "
+        "  type "
         "FROM petition WHERE petitionguid = '%u'", GUID_LOPART(petitionguid), GUID_LOPART(petitionguid));
 
     if(result)
@@ -449,17 +449,14 @@ void WorldSession::HandlePetitionSignOpcode(WorldPacket & recv_data)
 
     Field *fields;
     uint64 petitionguid;
-    uint32 type;
     uint8 unk;
-    uint64 ownerguid;
     recv_data >> petitionguid;                              // petition guid
     recv_data >> unk;
 
-    uint8 signs = 0;
-
     QueryResult *result = CharacterDatabase.PQuery(
         "SELECT ownerguid, "
-        "  (SELECT COUNT(playerguid) FROM petition_sign WHERE petition_sign.petitionguid = '%u') AS signs "
+        "  (SELECT COUNT(playerguid) FROM petition_sign WHERE petition_sign.petitionguid = '%u') AS signs, "
+        "  type "
         "FROM petition WHERE petitionguid = '%u'", GUID_LOPART(petitionguid), GUID_LOPART(petitionguid));
 
     if(!result)
@@ -469,8 +466,9 @@ void WorldSession::HandlePetitionSignOpcode(WorldPacket & recv_data)
     }
 
     fields = result->Fetch();
-    ownerguid = MAKE_NEW_GUID(fields[0].GetUInt32(), 0, HIGHGUID_PLAYER);
-    signs = fields[1].GetUInt8();
+    uint64 ownerguid = MAKE_NEW_GUID(fields[0].GetUInt32(), 0, HIGHGUID_PLAYER);
+    uint8 signs = fields[1].GetUInt8();
+    uint32 type = fields[2].GetUInt32();
 
     delete result;
 
@@ -485,20 +483,6 @@ void WorldSession::HandlePetitionSignOpcode(WorldPacket & recv_data)
             SendArenaTeamCommandResult(ERR_ARENA_TEAM_INVITE_SS, "", "", ERR_ARENA_TEAM_NOT_ALLIED);
         else
             SendGuildCommandResult(GUILD_CREATE_S, "", GUILD_NOT_ALLIED);
-        return;
-    }
-
-    QueryResult *result2 = CharacterDatabase.PQuery("SELECT type FROM petition WHERE petitionguid = '%u'", GUID_LOPART(petitionguid));
-
-    if(result2)
-    {
-        Field* fields = result2->Fetch();
-        type = fields[0].GetUInt32();
-        delete result2;
-    }
-    else
-    {
-        sLog.outDebug("CMSG_PETITION_QUERY failed for petition (GUID: %u)", GUID_LOPART(petitionguid));
         return;
     }
 
