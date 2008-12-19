@@ -578,7 +578,7 @@ void ObjectMgr::LoadCreatureLocales()
     sLog.outString();
     sLog.outString( ">> Loaded %u creature locale strings", mCreatureLocaleMap.size() );
 }
-   
+
 void ObjectMgr::LoadNpcOptionLocales()
 {
     mNpcOptionLocaleMap.clear();                              // need for reload case

@@ -96,7 +96,7 @@ Database::AsyncQuery(Class *object, void (Class::*method)(QueryResult*, ParamTyp
     return m_threadBody->Delay(new SqlQuery(sql, new MaNGOS::QueryCallback<Class, ParamType1, ParamType2, ParamType3>(object, method, (QueryResult*)NULL, param1, param2, param3), itr->second));
 }
 
-// -- Query / static -- 
+// -- Query / static --
 
 template<typename ParamType1>
 bool
