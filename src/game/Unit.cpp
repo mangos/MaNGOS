@@ -7633,14 +7633,8 @@ int32 Unit::SpellBaseDamageBonus(SpellSchoolMask schoolMask)
         {
             if((*i)->GetModifier()->m_miscvalue & schoolMask)
             {
-                SpellEntry const* iSpellProto = (*i)->GetSpellProto();
-                uint8 eff = (*i)->GetEffIndex();
-
-                // stat used dependent from next effect aura SPELL_AURA_MOD_SPELL_HEALING presence and misc value (stat index)
-                Stats usedStat = STAT_INTELLECT;
-                if(eff < 2 && iSpellProto->EffectApplyAuraName[eff+1]==SPELL_AURA_MOD_SPELL_HEALING_OF_STAT_PERCENT)
-                    usedStat = Stats(iSpellProto->EffectMiscValue[eff+1]);
-
+                // stat used stored in miscValueB for this aura
+                Stats usedStat = Stats((*i)->GetMiscBValue());
                 DoneAdvertisedBenefit += int32(GetStat(usedStat) * (*i)->GetModifier()->m_amount / 100.0f);
             }
         }
