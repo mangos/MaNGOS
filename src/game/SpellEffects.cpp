@@ -5002,8 +5002,60 @@ void Spell::EffectScriptEffect(uint32 effIndex)
             break;
         }
     }
+    if( m_spellInfo->SpellFamilyName == SPELLFAMILY_HUNTER )
+    {
+        switch(m_spellInfo->Id)
+        {
+            // Chimera Shot
+            case 53209:
+            {
+                uint32 spellId = 0;
+                int32 basePoint = 0;
+                Unit::AuraMap& Auras = unitTarget->GetAuras();
+                for(Unit::AuraMap::iterator i = Auras.begin(); i != Auras.end(); ++i)
+                {
+                    Aura *aura = (*i).second;
+                    if (aura->GetCasterGUID() != m_caster->GetGUID())
+                        continue;
+                    // Search only Serpent Sting, Viper Sting, Scorpid Sting auras
+                    uint64 familyFlag = aura->GetSpellProto()->SpellFamilyFlags;
+                    if (!(familyFlag & 0x000000800000C000LL))
+                        continue;
+                    // Refresh aura duration
+                    aura->SetAuraDuration(aura->GetAuraMaxDuration());
+                    aura->SendAuraUpdate(false);
 
-    if( m_spellInfo->SpellFamilyName == SPELLFAMILY_PALADIN )
+                    // Serpent Sting - Instantly deals 40% of the damage done by your Serpent Sting.
+                    if (familyFlag & 0x0000000000004000LL && aura->GetEffIndex() == 0)
+                    {
+                        spellId = 53353; // 53353 Chimera Shot - Serpent
+                        basePoint = aura->GetModifier()->m_amount * 5 * 40 / 100;
+                    }
+                    // Viper Sting - Instantly restores mana to you equal to 60% of the total amount drained by your Viper Sting.
+                    if (familyFlag & 0x0000008000000000LL && aura->GetEffIndex() == 0)
+                    {
+                        spellId = 53358; // 53358 Chimera Shot - Viper
+                        basePoint = aura->GetModifier()->m_amount * 4 * 60 / 100;
+                    }
+                    // Scorpid Sting - Attempts to Disarm the target for 10 sec. This effect cannot occur more than once per 1 minute.
+                    if (familyFlag & 0x0000000000008000LL)
+                        spellId = 53359; // 53359 Chimera Shot - Scorpid
+                    // ?? nothing say in spell desc (possibly need addition check)
+                    //if (familyFlag & 0x0000010000000000LL || // dot
+                    //    familyFlag & 0x0000100000000000LL)   // stun
+                    //{
+                    //    spellId = 53366; // 53366 Chimera Shot - Wyvern
+                    //}
+                }
+                if (spellId)
+                    m_caster->CastCustomSpell(unitTarget, spellId, &basePoint, 0, 0, false);
+                return;
+            }
+            default:
+                break;
+        }
+    }
+    else if( m_spellInfo->SpellFamilyName == SPELLFAMILY_PALADIN )
     {
         switch(m_spellInfo->SpellFamilyFlags)
         {
