@@ -382,7 +382,7 @@ void Spell::EffectSchoolDMG(uint32 effect_idx)
                 else if(m_spellInfo->SpellFamilyFlags & 0x0000000000000400LL)
                     damage+= uint32(m_caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.207f);
                 // Heroic Throw ${$m1+$AP*.50}
-                else if(m_spellInfo->SpellFamilyFlags & 0x0000000000000400LL)
+                else if(m_spellInfo->SpellFamilyFlags & 0x0000000100000000LL)
                     damage+= uint32(m_caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.5f);
                 break;
             }
