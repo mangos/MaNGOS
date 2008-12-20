@@ -9250,9 +9250,12 @@ int32 Unit::CalculateSpellDamage(SpellEntry const* spellProto, uint8 effect_inde
 
     uint8 comboPoints = unitPlayer ? unitPlayer->GetComboPoints() : 0;
 
-    int32 level = int32(getLevel()) - int32(spellProto->spellLevel);
-    if (level > spellProto->maxLevel && spellProto->maxLevel > 0)
-        level = spellProto->maxLevel;
+    int32 level = int32(getLevel());
+    if (level > (int32)spellProto->maxLevel && spellProto->maxLevel > 0)
+        level = (int32)spellProto->maxLevel;
+    else if (level < (int32)spellProto->baseLevel)
+        level = (int32)spellProto->baseLevel;
+    level-= (int32)spellProto->spellLevel;
 
     float basePointsPerLevel = spellProto->EffectRealPointsPerLevel[effect_index];
     float randomPointsPerLevel = spellProto->EffectDicePerLevel[effect_index];
