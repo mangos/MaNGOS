@@ -2147,7 +2147,8 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                             return;
 
                     // final heal
-                    m_target->CastCustomSpell(m_target,33778,&m_modifier.m_amount,NULL,NULL,true,NULL,this,GetCasterGUID());
+                    if(m_target->IsInWorld())
+                        m_target->CastCustomSpell(m_target,33778,&m_modifier.m_amount,NULL,NULL,true,NULL,this,GetCasterGUID());
                 }
                 return;
             }

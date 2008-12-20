@@ -153,20 +153,11 @@ void WorldSession::logUnexpectedOpcode(WorldPacket* packet, const char *reason)
 /// Update the WorldSession (triggered by World update)
 bool WorldSession::Update(uint32 /*diff*/)
 {
-    if (m_Socket && m_Socket->IsClosed ())
-    {
-        m_Socket->RemoveReference ();
-        m_Socket = NULL;
-    }
-
-    WorldPacket *packet;
-
     ///- Retrieve packets from the receive queue and call the appropriate handlers
-    /// \todo Is there a way to consolidate the OpcondeHandlerTable and the g_worldOpcodeNames to only maintain 1 list?
-    /// answer : there is a way, but this is better, because it would use redundant RAM
-    while (!_recvQueue.empty())
+    /// not proccess packets if socket already closed
+    while (!_recvQueue.empty() && m_Socket && !m_Socket->IsClosed ())
     {
-        packet = _recvQueue.next();
+        WorldPacket *packet = _recvQueue.next();
 
         /*#if 1
         sLog.outError( "MOEP: %s (0x%.4X)",
@@ -224,6 +215,13 @@ bool WorldSession::Update(uint32 /*diff*/)
         }
 
         delete packet;
+    }
+
+    ///- Cleanup socket pointer if need
+    if (m_Socket && m_Socket->IsClosed ())
+    {
+        m_Socket->RemoveReference ();
+        m_Socket = NULL;
     }
 
     ///- If necessary, log the player out

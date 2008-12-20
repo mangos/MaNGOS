@@ -43,7 +43,7 @@ Log::Log() :
     Initialize();
 }
 
-void Log::InitColors(std::string str)
+void Log::InitColors(const std::string& str)
 {
     if(str.empty())
     {

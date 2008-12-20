@@ -863,9 +863,9 @@ GM.StartLevel     = 1
 #    Visibility.Distance.Creature
 #    Visibility.Distance.Player
 #        Visibility distance for different in game object
-#        Max limited by active player zone: ~ 333
+#        Max limited by active player zone: ~ 166
 #        Min limit dependent from objects
-#        Default: 132 (cell size)
+#        Default: 66 (cell size)
 #        Min limit is max aggro radius (45) * Rate.Creature.Aggro
 #
 #    Visibility.Distance.Object
@@ -891,10 +891,10 @@ GM.StartLevel     = 1
 ###################################################################################################################
 
 Visibility.GroupMode = 0
-Visibility.Distance.Creature      = 132
-Visibility.Distance.Player        = 132
-Visibility.Distance.Object        = 132
-Visibility.Distance.InFlight      = 132
+Visibility.Distance.Creature      = 66
+Visibility.Distance.Player        = 66
+Visibility.Distance.Object        = 66
+Visibility.Distance.InFlight      = 66
 Visibility.Distance.Grey.Unit   = 1
 Visibility.Distance.Grey.Object = 10
 
@@ -1073,6 +1073,48 @@ DurabilityLossChance.Block  = 0.05
 Death.SicknessLevel = 11
 Death.CorpseReclaimDelay.PvP = 1
 Death.CorpseReclaimDelay.PvE = 1
+
+###################################################################################################################
+#
+# Rated arena matches config
+#
+# MaxRatingDifference: the maximum rating difference between two groups in rated matches
+#             Default: 0 (disable, rating difference is discarded)
+#
+# RatingDiscardTimer: after the specified milliseconds has passed,
+#                     rating information will be discarded when selecting teams for matches
+#                     also initiates an update by this timer
+#             Default: 60000
+#
+# AutoDistributePoints: set if arena points should be distributed automatically, or by GM command
+#             Default: 0 (disable) (recommended): use gm command or sql query to distribute the points
+#                      1 (enable): arena points are distributed automatically
+#
+# AutoDistributeInterval: how often should the distribution take place
+#                         if automatic distribution is enabled
+#                         in days
+#             Default: 7 (weekly)
+#
+###################################################################################################################
+
+Arena.MaxRatingDifference = 0
+Arena.RatingDiscardTimer = 60000
+Arena.AutoDistributePoints = 0
+Arena.AutoDistributeInterval = 7
+
+###################################################################################################################
+#
+# Battleground config
+#
+# PrematureFinishTimer: the time to end the bg if there are less than minplayersperteam on one side
+#                       in milliseconds
+#              Default: 300000
+#                       0 - disable
+#
+###################################################################################################################
+
+BattleGround.PrematureFinishTimer = 300000
+
 
 ###################################################################################################################
 #

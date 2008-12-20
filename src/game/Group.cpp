@@ -212,7 +212,7 @@ bool Group::AddInvite(Player *player)
 
     RemoveInvite(player);
 
-    m_invitees.insert(player->GetGUID());
+    m_invitees.insert(player);
 
     player->SetGroupInvite(this);
 
@@ -231,14 +231,7 @@ bool Group::AddLeaderInvite(Player *player)
 
 uint32 Group::RemoveInvite(Player *player)
 {
-    for(InvitesList::iterator itr=m_invitees.begin(); itr!=m_invitees.end(); ++itr)
-    {
-        if((*itr) == player->GetGUID())
-        {
-            m_invitees.erase(itr);
-            break;
-        }
-    }
+    m_invitees.erase(player);
 
     player->SetGroupInvite(NULL);
     return GetMembersCount();
@@ -247,12 +240,29 @@ uint32 Group::RemoveInvite(Player *player)
 void Group::RemoveAllInvites()
 {
     for(InvitesList::iterator itr=m_invitees.begin(); itr!=m_invitees.end(); ++itr)
-    {
-        Player *invitee = objmgr.GetPlayer(*itr);
-        if(invitee)
-            invitee->SetGroupInvite(NULL);
-    }
+        (*itr)->SetGroupInvite(NULL);
+
     m_invitees.clear();
+}
+
+Player* Group::GetInvited(const uint64& guid) const
+{
+    for(InvitesList::const_iterator itr = m_invitees.begin(); itr != m_invitees.end(); ++itr)
+    {
+        if((*itr)->GetGUID() == guid)
+            return (*itr);
+    }
+    return NULL;
+}
+
+Player* Group::GetInvited(const std::string& name) const
+{
+    for(InvitesList::const_iterator itr = m_invitees.begin(); itr != m_invitees.end(); ++itr)
+    {
+        if((*itr)->GetName() == name)
+            return (*itr);
+    }
+    return NULL;
 }
 
 bool Group::AddMember(const uint64 &guid, const char* name)
@@ -1296,6 +1306,54 @@ void Group::UpdateLooterGuid( Creature* creature, bool ifneed )
 
     SetLooterGuid(0);
     SendUpdate();
+}
+
+uint32 Group::CanJoinBattleGroundQueue(uint32 bgTypeId, uint32 bgQueueType, uint32 MinPlayerCount, uint32 MaxPlayerCount, bool isRated, uint32 arenaSlot)
+{
+    // check for min / max count
+    uint32 memberscount = GetMembersCount();
+    if(memberscount < MinPlayerCount)
+        return BG_JOIN_ERR_GROUP_NOT_ENOUGH;
+    if(memberscount > MaxPlayerCount)
+        return BG_JOIN_ERR_GROUP_TOO_MANY;
+
+    // get a player as reference, to compare other players' stats to (arena team id, queue id based on level, etc.)
+    Player * reference = GetFirstMember()->getSource();
+    // no reference found, can't join this way
+    if(!reference)
+        return BG_JOIN_ERR_OFFLINE_MEMBER;
+
+    uint32 bgQueueId = reference->GetBattleGroundQueueIdFromLevel();
+    uint32 arenaTeamId = reference->GetArenaTeamId(arenaSlot);
+    uint32 team = reference->GetTeam();
+
+    // check every member of the group to be able to join
+    for(GroupReference *itr = GetFirstMember(); itr != NULL; itr = itr->next())
+    {
+        Player *member = itr->getSource();
+        // offline member? don't let join
+        if(!member)
+            return BG_JOIN_ERR_OFFLINE_MEMBER;
+        // don't allow cross-faction join as group
+        if(member->GetTeam() != team)
+            return BG_JOIN_ERR_MIXED_FACTION;
+        // not in the same battleground level braket, don't let join
+        if(member->GetBattleGroundQueueIdFromLevel() != bgQueueId)
+            return BG_JOIN_ERR_MIXED_LEVELS;
+        // don't let join rated matches if the arena team id doesn't match
+        if(isRated && member->GetArenaTeamId(arenaSlot) != arenaTeamId)
+            return BG_JOIN_ERR_MIXED_ARENATEAM;
+        // don't let join if someone from the group is already in that bg queue
+        if(member->InBattleGroundQueueForBattleGroundQueueType(bgQueueType))
+            return BG_JOIN_ERR_GROUP_MEMBER_ALREADY_IN_QUEUE;
+        // check for deserter debuff in case not arena queue
+        if(bgTypeId != BATTLEGROUND_AA && !member->CanJoinToBattleground())
+            return BG_JOIN_ERR_GROUP_DESERTER;
+        // check if member can join any more battleground queues
+        if(!member->HasFreeBattleGroundQueueId())
+            return BG_JOIN_ERR_ALL_QUEUES_USED;
+    }
+    return BG_JOIN_ERR_OK;
 }
 
 //===================================================

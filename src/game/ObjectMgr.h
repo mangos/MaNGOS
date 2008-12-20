@@ -282,10 +282,10 @@ class ObjectMgr
 
         typedef std::set< Group * > GroupSet;
         typedef std::set< Guild * > GuildSet;
-        typedef std::set< ArenaTeam * > ArenaTeamSet;
+
+        typedef UNORDERED_MAP<uint32, ArenaTeam* > ArenaTeamMap;
 
         typedef UNORDERED_MAP<uint32, Quest*> QuestMap;
-
 
         typedef UNORDERED_MAP<uint32, AreaTrigger> AreaTriggerMap;
 
@@ -313,16 +313,18 @@ class ObjectMgr
 
         Guild* GetGuildByLeader(uint64 const&guid) const;
         Guild* GetGuildById(const uint32 GuildId) const;
-        Guild* GetGuildByName(std::string guildname) const;
+        Guild* GetGuildByName(const std::string& guildname) const;
         std::string GetGuildNameById(const uint32 GuildId) const;
         void AddGuild(Guild* guild) { mGuildSet.insert( guild ); }
         void RemoveGuild(Guild* guild) { mGuildSet.erase( guild ); }
 
-        ArenaTeam* GetArenaTeamById(const uint32 ArenaTeamId) const;
-        ArenaTeam* GetArenaTeamByName(std::string ArenaTeamName) const;
-        ArenaTeam* GetArenaTeamByCapitan(uint64 const& guid) const;
-        void AddArenaTeam(ArenaTeam* arenateam) { mArenaTeamSet.insert( arenateam ); }
-        void RemoveArenaTeam(ArenaTeam* arenateam) { mArenaTeamSet.erase( arenateam ); }
+        ArenaTeam* GetArenaTeamById(const uint32 arenateamid) const;
+        ArenaTeam* GetArenaTeamByName(const std::string& arenateamname) const;
+        ArenaTeam* GetArenaTeamByCaptain(uint64 const& guid) const;
+        void AddArenaTeam(ArenaTeam* arenaTeam);
+        void RemoveArenaTeam(ArenaTeam* arenaTeam);
+        ArenaTeamMap::iterator GetArenaTeamMapBegin() { return mArenaTeamMap.begin(); }
+        ArenaTeamMap::iterator GetArenaTeamMapEnd()   { return mArenaTeamMap.end(); }
 
         static CreatureInfo const *GetCreatureTemplate( uint32 id );
         CreatureModelInfo const *GetCreatureModelInfo( uint32 modelid );
@@ -405,7 +407,7 @@ class ObjectMgr
         bool GetPlayerNameByGUID(const uint64 &guid, std::string &name) const;
         uint32 GetPlayerTeamByGUID(const uint64 &guid) const;
         uint32 GetPlayerAccountIdByGUID(const uint64 &guid) const;
-        uint32 GetPlayerAccountIdByPlayerName(std::string name) const;
+        uint32 GetPlayerAccountIdByPlayerName(const std::string& name) const;
 
         uint32 GetNearestTaxiNode( float x, float y, float z, uint32 mapid );
         void GetTaxiPath( uint32 source, uint32 destination, uint32 &path, uint32 &cost);
@@ -698,15 +700,15 @@ class ObjectMgr
 
         // reserved names
         void LoadReservedPlayersNames();
-        bool IsReservedName(std::string name) const
+        bool IsReservedName(const std::string& name) const
         {
             return m_ReservedNames.find(name) != m_ReservedNames.end();
         }
 
         // name with valid structure and symbols
-        static bool IsValidName( std::string name, bool create = false );
-        static bool IsValidCharterName( std::string name );
-        static bool IsValidPetName( std::string name );
+        static bool IsValidName( const std::string& name, bool create = false );
+        static bool IsValidCharterName( const std::string& name );
+        static bool IsValidPetName( const std::string& name );
 
         static bool CheckDeclinedNames(std::wstring mainpart, DeclinedName const& names);
 
@@ -730,10 +732,10 @@ class ObjectMgr
             if(itr==m_GameTeleMap.end()) return NULL;
             return &itr->second;
         }
-        GameTele const* GetGameTele(std::string name) const;
+        GameTele const* GetGameTele(const std::string& name) const;
         GameTeleMap const& GetGameTeleMap() const { return m_GameTeleMap; }
         bool AddGameTele(GameTele& data);
-        bool DeleteGameTele(std::string name);
+        bool DeleteGameTele(const std::string& name);
 
         CacheNpcOptionList const& GetNpcOptions() const { return m_mCacheNpcOptionList; }
 
@@ -801,7 +803,7 @@ class ObjectMgr
 
         GroupSet            mGroupSet;
         GuildSet            mGuildSet;
-        ArenaTeamSet        mArenaTeamSet;
+        ArenaTeamMap        mArenaTeamMap;
 
         ItemMap             mItems;
         ItemMap             mAitems;

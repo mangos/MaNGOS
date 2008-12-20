@@ -170,7 +170,7 @@ class Channel
         void MakeNotModerator(WorldPacket *data);                               //? 0x06
         void MakePasswordChanged(WorldPacket *data, uint64 guid);               //+ 0x07
         void MakeOwnerChanged(WorldPacket *data, uint64 guid);                  //? 0x08
-        void MakePlayerNotFound(WorldPacket *data, std::string name);           //+ 0x09
+        void MakePlayerNotFound(WorldPacket *data, const std::string& name);    //+ 0x09
         void MakeNotOwner(WorldPacket *data);                                   //? 0x0A
         void MakeChannelOwner(WorldPacket *data);                               //? 0x0B
         void MakeModeChange(WorldPacket *data, uint64 guid, uint8 oldflags);    //+ 0x0C
@@ -190,7 +190,7 @@ class Channel
         void MakeWrongFaction(WorldPacket *data);                               //? 0x1A
         void MakeInvalidName(WorldPacket *data);                                //? 0x1B
         void MakeNotModerated(WorldPacket *data);                               //? 0x1C
-        void MakePlayerInvited(WorldPacket *data, uint64 guid);                 //+ 0x1D
+        void MakePlayerInvited(WorldPacket *data, const std::string& name);     //+ 0x1D
         void MakePlayerInviteBanned(WorldPacket *data, uint64 guid);            //? 0x1E
         void MakeThrottled(WorldPacket *data);                                  //? 0x1F
         void MakeNotInArea(WorldPacket *data);                                  //? 0x20
@@ -244,14 +244,14 @@ class Channel
         }
 
     public:
-        Channel(std::string name, uint32 channel_id);
+        Channel(const std::string& name, uint32 channel_id);
         std::string GetName() const { return m_name; }
         uint32 GetChannelId() const { return m_channelId; }
         bool IsConstant() const { return m_channelId != 0; }
         bool IsAnnounce() const { return m_announce; }
         bool IsLFG() const { return GetFlags() & CHANNEL_FLAG_LFG; }
         std::string GetPassword() const { return m_password; }
-        void SetPassword(std::string npassword) { m_password = npassword; }
+        void SetPassword(const std::string& npassword) { m_password = npassword; }
         void SetAnnounce(bool nannounce) { m_announce = nannounce; }
         uint32 GetNumPlayers() const { return players.size(); }
         uint8 GetFlags() const { return m_flags; }

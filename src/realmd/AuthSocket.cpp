@@ -298,7 +298,7 @@ void AuthSocket::OnRead()
 }
 
 /// Make the SRP6 calculation from hash in dB
-void AuthSocket::_SetVSFields(std::string rI)
+void AuthSocket::_SetVSFields(const std::string& rI)
 {
     BigNumber I;
     I.SetHexStr(rI.c_str());

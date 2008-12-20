@@ -128,9 +128,9 @@ struct ChrClassesEntry
                                                             // 4, unused
     //char*       name[16];                                 // 5-20 unused
                                                             // 21 string flag, unused
-    //char*       string1[16];                              // 21-36 unused
+    //char*       nameFemale[16];                           // 21-36 unused, if different from base (male) case
                                                             // 37 string flag, unused
-    //char*       string2[16];                              // 38-53 unused
+    //char*       nameNeutralGender[16];                    // 38-53 unused, if different from base (male) case
                                                             // 54 string flag, unused
                                                             // 55, unused
     uint32      spellfamily;                                // 56
@@ -151,9 +151,9 @@ struct ChrRacesEntry
     uint32      startmovie;                                 // 13 id from CinematicCamera.dbc
     char*       name[16];                                   // 14-29 used for DBC language detection/selection
                                                             // 30 string flags, unused
-    //char*       string1[16];                              // 31-46 used for DBC language detection/selection
+    //char*       nameFemale[16];                           // 31-46, if different from base (male) case
                                                             // 47 string flags, unused
-    //char*       string2[16];                              // 48-63 used for DBC language detection/selection
+    //char*       nameNeutralGender[16];                    // 48-63, if different from base (male) case
                                                             // 64 string flags, unused
                                                             // 65-67 unused
     uint32      addon;                                      // 68 (0 - original race, 1 - tbc addon, ...)
@@ -267,6 +267,7 @@ struct GemPropertiesEntry
     uint32      color;
 };
 
+// All Gt* DBC store data for 100 levels, some by 100 per class/race
 #define GT_MAX_LEVEL    100
 
 struct GtCombatRatingsEntry
@@ -433,9 +434,10 @@ struct MapEntry
 
     // Helpers
     uint32 Expansion() const { return addon; }
-    bool Instanceable() const { return map_type == MAP_INSTANCE || map_type == MAP_RAID; }
-    // NOTE: this duplicate of Instanceable(), but Instanceable() can be changed when BG also will be instanceable
+
+
     bool IsDungeon() const { return map_type == MAP_INSTANCE || map_type == MAP_RAID; }
+    bool Instanceable() const { return map_type == MAP_INSTANCE || map_type == MAP_RAID || map_type == MAP_BATTLEGROUND || map_type == MAP_ARENA; }
     bool IsRaid() const { return map_type == MAP_RAID; }
     bool IsBattleGround() const { return map_type == MAP_BATTLEGROUND; }
     bool IsBattleArena() const { return map_type == MAP_ARENA; }

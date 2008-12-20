@@ -47,6 +47,7 @@
 #include "Config/ConfigEnv.h"
 #include "Util.h"
 #include "ItemEnchantmentMgr.h"
+#include "BattleGroundMgr.h"
 #include "InstanceSaveMgr.h"
 #include "InstanceData.h"
 
@@ -3805,8 +3806,8 @@ bool ChatHandler::HandleLevelUpCommand(const char* args)
     int32 newlevel = oldlevel + addlevel;
     if(newlevel < 1)
         newlevel = 1;
-    if(newlevel > 255)                                      // hardcoded maximum level
-        newlevel = 255;
+    if(newlevel > STRONG_MAX_LEVEL)                         // hardcoded maximum level
+        newlevel = STRONG_MAX_LEVEL;
 
     if(chr)
     {
@@ -4564,7 +4565,7 @@ bool ChatHandler::HandleResetAllCommand(const char * args)
         return false;
     }
 
-    CharacterDatabase.PExecute("UPDATE characters SET at_login = at_login | '%u'",atLogin);
+    CharacterDatabase.PExecute("UPDATE characters SET at_login = at_login | '%u' WHERE (at_login & '%u') = '0'",atLogin,atLogin);
     HashMapHolder<Player>::MapType const& plist = ObjectAccessor::Instance().GetPlayers();
     for(HashMapHolder<Player>::MapType::const_iterator itr = plist.begin(); itr != plist.end(); ++itr)
         itr->second->SetAtLoginFlag(atLogin);
@@ -6476,6 +6477,12 @@ bool ChatHandler::HandleSendMessageCommand(const char* args)
 
     //Confirmation message
     PSendSysMessage(LANG_SENDMESSAGE,name.c_str(),msg_str);
+    return true;
+}
+
+bool ChatHandler::HandleFlushArenaPointsCommand(const char * /*args*/)
+{
+    sBattleGroundMgr.DistributeArenaPoints();
     return true;
 }
 

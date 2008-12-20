@@ -21,7 +21,7 @@
 #include "World.h"
 #include "SocialMgr.h"
 
-Channel::Channel(std::string name, uint32 channel_id)
+Channel::Channel(const std::string& name, uint32 channel_id)
 : m_name(name), m_announce(true), m_moderate(false), m_channelId(channel_id), m_ownerGUID(0), m_password(""), m_flags(0)
 {
     // set special flags if built-in channel
@@ -626,7 +626,7 @@ void Channel::Invite(uint64 p, const char *newname)
         SendToOne(&data, newp->GetGUID());
         data.clear();
     }
-    MakePlayerInvited(&data, newp->GetGUID());
+    MakePlayerInvited(&data, newp->GetName());
     SendToOne(&data, p);
 }
 
@@ -773,7 +773,7 @@ void Channel::MakeOwnerChanged(WorldPacket *data, uint64 guid)
 }
 
 // done 0x09
-void Channel::MakePlayerNotFound(WorldPacket *data, std::string name)
+void Channel::MakePlayerNotFound(WorldPacket *data, const std::string& name)
 {
     MakeNotifyPacket(data, CHAT_PLAYER_NOT_FOUND_NOTICE);
     *data << name;
@@ -916,13 +916,8 @@ void Channel::MakeNotModerated(WorldPacket *data)
 }
 
 // done 0x1D
-void Channel::MakePlayerInvited(WorldPacket *data, uint64 guid)
+void Channel::MakePlayerInvited(WorldPacket *data, const std::string& name)
 {
-    std::string name;
-
-    if(!objmgr.GetPlayerNameByGUID(guid, name) || name.empty())
-        return;                                             // player name not found
-
     MakeNotifyPacket(data, CHAT_PLAYER_INVITED_NOTICE);
     *data << name;
 }
