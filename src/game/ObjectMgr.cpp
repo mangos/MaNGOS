@@ -2099,6 +2099,8 @@ void ObjectMgr::LoadPlayerInfo()
         {
             barGoLink bar( 1 );
 
+            bar.step();
+
             sLog.outString();
             sLog.outString( ">> Loaded %u custom player create items", count );
         }
