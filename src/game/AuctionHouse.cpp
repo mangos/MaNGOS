@@ -365,10 +365,15 @@ void WorldSession::HandleAuctionPlaceBid( WorldPacket & recv_data )
         return;
     }
 
-    if (price < (auction->bid + objmgr.GetAuctionOutBid(auction->bid)))
+    // cheating
+    if(price <= auction->bid)
+        return;
+
+    // price too low for next bid if not buyout
+    if ((price < auction->buyout || auction->buyout == 0) &&
+        price < auction->bid + objmgr.GetAuctionOutBid(auction->bid))
     {
         //auction has already higher bid, client tests it!
-        //SendAuctionCommandResult(auction->auctionId, AUCTION_PLACE_BID, ???);
         return;
     }
 
