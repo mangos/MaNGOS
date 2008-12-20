@@ -342,6 +342,13 @@ void Spell::EffectSchoolDMG(uint32 effect_idx)
                             damage = 200;
                         break;
                     }
+                    // Intercept (warrior spell trigger)
+                    case 20253:
+                    case 61491:
+                    {
+                        damage+= uint32(m_caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.12f);
+                        break;
+                    }
                 }
                 break;
             }
@@ -371,6 +378,12 @@ void Spell::EffectSchoolDMG(uint32 effect_idx)
                     damage = uint32(damage * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) / 100);
                     m_caster->ModifyAuraState(AURA_STATE_WARRIOR_VICTORY_RUSH, false);
                 }
+                // Revenge ${$m1+$AP*0.207} to ${$M1+$AP*0.207}
+                else if(m_spellInfo->SpellFamilyFlags & 0x0000000000000400LL)
+                    damage+= uint32(m_caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.207f);
+                // Heroic Throw ${$m1+$AP*.50}
+                else if(m_spellInfo->SpellFamilyFlags & 0x0000000000000400LL)
+                    damage+= uint32(m_caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.5f);
                 break;
             }
             case SPELLFAMILY_WARLOCK:
@@ -380,18 +393,20 @@ void Spell::EffectSchoolDMG(uint32 effect_idx)
                 {
                     // Incinerate does more dmg (dmg*0.25) if the target is Immolated.
                     if(unitTarget->HasAuraState(AURA_STATE_IMMOLATE))
-                        damage += int32(damage*0.25);
+                        damage += int32(damage*0.25f);
                 }
                 break;
             }
             case SPELLFAMILY_DRUID:
             {
                 // Ferocious Bite
-                if((m_spellInfo->SpellFamilyFlags & 0x000800000) && m_spellInfo->SpellVisual[0]==6587)
+                if(m_caster->GetTypeId()==TYPEID_PLAYER && (m_spellInfo->SpellFamilyFlags & 0x000800000) && m_spellInfo->SpellVisual[0]==6587)
                 {
-                    // converts each extra point of energy into ($f1+$AP/630) additional damage
-                    float multiple = m_caster->GetTotalAttackPowerValue(BASE_ATTACK) / 630 + m_spellInfo->DmgMultiplier[effect_idx];
+                    // converts each extra point of energy into ($f1+$AP/410) additional damage
+                    float ap = m_caster->GetTotalAttackPowerValue(BASE_ATTACK);
+                    float multiple = ap / 410 + m_spellInfo->DmgMultiplier[effect_idx];
                     damage += int32(m_caster->GetPower(POWER_ENERGY) * multiple);
+                    damage += int32(((Player*)m_caster)->GetComboPoints() * ap * 7 / 100);
                     m_caster->SetPower(POWER_ENERGY,0);
                 }
                 // Rake
@@ -493,12 +508,28 @@ void Spell::EffectSchoolDMG(uint32 effect_idx)
                 {
                     if(uint32 combo = ((Player*)m_caster)->GetComboPoints())
                     {
-                        damage += int32(m_caster->GetTotalAttackPowerValue(BASE_ATTACK) * combo * 0.03f);
+                        float ap = m_caster->GetTotalAttackPowerValue(BASE_ATTACK);
+                        damage += irand(int32(ap * combo * 0.03f), int32(ap * combo * 0.07f));
 
                         // Eviscerate and Envenom Bonus Damage (item set effect)
                         if(m_caster->GetDummyAura(37169))
                             damage += combo*40;
                     }
+                }
+                // Gouge
+                else if(m_spellInfo->SpellFamilyFlags & 0x0000000000000008LL)
+                {
+                    damage += int32(m_caster->GetTotalAttackPowerValue(BASE_ATTACK)*0.02f);
+                }
+                // Instant Poison
+                else if(m_spellInfo->SpellFamilyFlags & 0x0000000000002000LL)
+                {
+                    damage += int32(m_caster->GetTotalAttackPowerValue(BASE_ATTACK)*0.10f);
+                }
+                // Wound Poison
+                else if(m_spellInfo->SpellFamilyFlags & 0x0000000010000000LL)
+                {
+                    damage += int32(m_caster->GetTotalAttackPowerValue(BASE_ATTACK)*0.04f);
                 }
                 break;
             }
@@ -507,12 +538,17 @@ void Spell::EffectSchoolDMG(uint32 effect_idx)
                 // Mongoose Bite
                 if((m_spellInfo->SpellFamilyFlags & 0x000000002) && m_spellInfo->SpellVisual[0]==342)
                 {
-                    damage += int32(m_caster->GetTotalAttackPowerValue(BASE_ATTACK)*0.2);
+                    damage += int32(m_caster->GetTotalAttackPowerValue(BASE_ATTACK)*0.2f);
+                }
+                // Counterattack
+                else if(m_spellInfo->SpellFamilyFlags & 0x0008000000000000LL)
+                {
+                    damage += int32(m_caster->GetTotalAttackPowerValue(BASE_ATTACK)*0.2f);
                 }
                 // Arcane Shot
                 else if((m_spellInfo->SpellFamilyFlags & 0x00000800) && m_spellInfo->maxLevel > 0)
                 {
-                    damage += int32(m_caster->GetTotalAttackPowerValue(RANGED_ATTACK)*0.15);
+                    damage += int32(m_caster->GetTotalAttackPowerValue(RANGED_ATTACK)*0.15f);
                 }
                 // Steady Shot
                 else if(m_spellInfo->SpellFamilyFlags & 0x100000000LL)
@@ -520,16 +556,16 @@ void Spell::EffectSchoolDMG(uint32 effect_idx)
                     int32 base = irand((int32)m_caster->GetWeaponDamageRange(RANGED_ATTACK, MINDAMAGE),(int32)m_caster->GetWeaponDamageRange(RANGED_ATTACK, MAXDAMAGE));
                     damage += int32(float(base)/m_caster->GetAttackTime(RANGED_ATTACK)*2800 + m_caster->GetTotalAttackPowerValue(RANGED_ATTACK)*0.2f);
                 }
-                //Explosive Trap Effect
+                // Explosive Trap Effect
                 else if(m_spellInfo->SpellFamilyFlags & 0x00000004)
                 {
-                    damage += int32(m_caster->GetTotalAttackPowerValue(RANGED_ATTACK)*0.1);
+                    damage += int32(m_caster->GetTotalAttackPowerValue(RANGED_ATTACK)*0.1f);
                 }
                 break;
             }
             case SPELLFAMILY_PALADIN:
             {
-                //Judgement of Vengeance
+                // Judgement of Vengeance
                 if((m_spellInfo->SpellFamilyFlags & 0x800000000LL) && m_spellInfo->SpellIconID==2292)
                 {
                     uint32 stacks = 0;
@@ -542,6 +578,38 @@ void Spell::EffectSchoolDMG(uint32 effect_idx)
                         damage = -1;
                     else
                         damage *= stacks;
+                }
+                // Avenger's Shield ($m1+0.07*$SPH+0.07*$AP)
+                else if(m_spellInfo->SpellFamilyFlags & 0x0000000000004000LL)
+                {
+                    float ap = m_caster->GetTotalAttackPowerValue(BASE_ATTACK);
+                    int32 holy = m_caster->SpellBaseDamageBonus(GetSpellSchoolMask(m_spellInfo)) +
+                                 m_caster->SpellBaseDamageBonusForVictim(GetSpellSchoolMask(m_spellInfo), unitTarget);
+                    damage += int32(ap * 0.07f) + int32(holy * 7 / 100);
+                }
+                // Exorcism ($m1+0.15*$SPH+0.15*$AP)
+                else if(m_spellInfo->SpellFamilyFlags & 0x0000000200000000LL)
+                {
+                    float ap = m_caster->GetTotalAttackPowerValue(BASE_ATTACK);
+                    int32 holy = m_caster->SpellBaseDamageBonus(GetSpellSchoolMask(m_spellInfo)) +
+                                 m_caster->SpellBaseDamageBonusForVictim(GetSpellSchoolMask(m_spellInfo), unitTarget);
+                    damage += int32(ap * 0.15f) + int32(holy * 15 / 100);
+                }
+                // Hammer of Wrath ($m1+0.15*$SPH+0.15*$AP)
+                else if(m_spellInfo->SpellFamilyFlags & 0x0000008000000000LL)
+                {
+                    float ap = m_caster->GetTotalAttackPowerValue(BASE_ATTACK);
+                    int32 holy = m_caster->SpellBaseDamageBonus(GetSpellSchoolMask(m_spellInfo)) +
+                                 m_caster->SpellBaseDamageBonusForVictim(GetSpellSchoolMask(m_spellInfo), unitTarget);
+                    damage += int32(ap * 0.15f) + int32(holy * 15 / 100);
+                }
+                // Holy Wrath ($m1+0.07*$SPH+0.07*$AP)
+                else if(m_spellInfo->SpellFamilyFlags & 0x0020000000000000LL)
+                {
+                    float ap = m_caster->GetTotalAttackPowerValue(BASE_ATTACK);
+                    int32 holy = m_caster->SpellBaseDamageBonus(GetSpellSchoolMask(m_spellInfo)) +
+                                 m_caster->SpellBaseDamageBonusForVictim(GetSpellSchoolMask(m_spellInfo), unitTarget);
+                    damage += int32(ap * 0.15f) + int32(holy * 15 / 100);
                 }
                 break;
             }
