@@ -270,7 +270,7 @@ pAuraHandler AuraHandler[TOTAL_AURAS]=
     &Aura::HandleUnused,                                    //217                                   unused
     &Aura::HandleAuraModRangedHaste,                        //218 SPELL_AURA_HASTE_RANGED
     &Aura::HandleModManaRegen,                              //219 SPELL_AURA_MOD_MANA_REGEN_FROM_STAT
-    &Aura::HandleNULL,                                      //220 SPELL_AURA_MOD_RATING_FROM_STAT
+    &Aura::HandleModRatingFromStat,                         //220 SPELL_AURA_MOD_RATING_FROM_STAT
     &Aura::HandleNULL,                                      //221 ignored
     &Aura::HandleUnused,                                    //222 unused
     &Aura::HandleNULL,                                      //223 Cold Stare
@@ -4883,13 +4883,28 @@ void Aura::HandleAuraModCritPercent(bool apply, bool Real)
 
 void Aura::HandleModHitChance(bool apply, bool Real)
 {
-    m_target->m_modMeleeHitChance += apply ? m_modifier.m_amount : (-m_modifier.m_amount);
-    m_target->m_modRangedHitChance += apply ? m_modifier.m_amount : (-m_modifier.m_amount);
+    if(m_target->GetTypeId() == TYPEID_PLAYER)
+    {
+        ((Player*)m_target)->UpdateMeleeHitChances();
+        ((Player*)m_target)->UpdateRangedHitChances();
+    }
+    else
+    {
+        m_target->m_modMeleeHitChance += apply ? m_modifier.m_amount : (-m_modifier.m_amount);
+        m_target->m_modRangedHitChance += apply ? m_modifier.m_amount : (-m_modifier.m_amount);
+    }
 }
 
 void Aura::HandleModSpellHitChance(bool apply, bool Real)
 {
-    m_target->m_modSpellHitChance += apply ? m_modifier.m_amount: (-m_modifier.m_amount);
+    if(m_target->GetTypeId() == TYPEID_PLAYER)
+    {
+        ((Player*)m_target)->UpdateSpellHitChances();
+    }
+    else
+    {
+        m_target->m_modSpellHitChance += apply ? m_modifier.m_amount: (-m_modifier.m_amount);
+    }
 }
 
 void Aura::HandleModSpellCritChance(bool apply, bool Real)
@@ -5453,6 +5468,20 @@ void Aura::HandleModRating(bool apply, bool Real)
     for (uint32 rating = 0; rating < MAX_COMBAT_RATING; ++rating)
         if (m_modifier.m_miscvalue & (1 << rating))
             ((Player*)m_target)->ApplyRatingMod(CombatRating(rating), m_modifier.m_amount, apply);
+}
+
+void Aura::HandleModRatingFromStat(bool apply, bool Real)
+{
+    // spells required only Real aura add/remove
+    if(!Real)
+        return;
+
+    if(m_target->GetTypeId() != TYPEID_PLAYER)
+        return;
+    // Just recalculate ratings
+    for (uint32 rating = 0; rating < MAX_COMBAT_RATING; ++rating)
+        if (m_modifier.m_miscvalue & (1 << rating))
+            ((Player*)m_target)->ApplyRatingMod(CombatRating(rating), 0, apply);
 }
 
 void Aura::HandleForceMoveForward(bool apply, bool Real)

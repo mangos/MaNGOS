@@ -49,24 +49,17 @@ bool Player::UpdateStats(Stats stat)
     switch(stat)
     {
         case STAT_STRENGTH:
-            UpdateAttackPowerAndDamage();
             UpdateShieldBlockValue();
             break;
         case STAT_AGILITY:
             UpdateArmor();
-            UpdateAttackPowerAndDamage(true);
-            if(getClass() == CLASS_ROGUE || getClass() == CLASS_HUNTER || getClass() == CLASS_DRUID && m_form==FORM_CAT)
-                UpdateAttackPowerAndDamage();
-
             UpdateAllCritPercentages();
             UpdateDodgePercentage();
             break;
-
         case STAT_STAMINA:   UpdateMaxHealth(); break;
         case STAT_INTELLECT:
             UpdateMaxPower(POWER_MANA);
             UpdateAllSpellCritChances();
-            UpdateAttackPowerAndDamage(true);               //SPELL_AURA_MOD_RANGED_ATTACK_POWER_OF_STAT_PERCENT, only intelect currently
             UpdateArmor();                                  //SPELL_AURA_MOD_RESISTANCE_OF_INTELLECT_PERCENT, only armor currently
             break;
 
@@ -76,8 +69,25 @@ bool Player::UpdateStats(Stats stat)
         default:
             break;
     }
+    // Need update (exist AP from stat auras)
+    UpdateAttackPowerAndDamage();
+    UpdateAttackPowerAndDamage(true);
+
     UpdateSpellDamageAndHealingBonus();
     UpdateManaRegen();
+
+    // Update ratings in exist SPELL_AURA_MOD_RATING_FROM_STAT and only depends from stat
+    uint32 mask = 0;
+    AuraList const& modRatingFromStat = GetAurasByType(SPELL_AURA_MOD_RATING_FROM_STAT);
+    for(AuraList::const_iterator i = modRatingFromStat.begin();i != modRatingFromStat.end(); ++i)
+        if (Stats((*i)->GetMiscBValue()) == stat)
+            mask |= (*i)->GetMiscValue();
+    if (mask)
+    {
+        for (uint32 rating = 0; rating < MAX_COMBAT_RATING; ++rating)
+            if (mask & (1 << rating))
+                ApplyRatingMod(CombatRating(rating), 0, true);
+    }
     return true;
 }
 
@@ -558,6 +568,24 @@ void Player::UpdateSpellCritChance(uint32 school)
 
     // Store crit value
     SetFloatValue(PLAYER_SPELL_CRIT_PERCENTAGE1 + school, crit);
+}
+
+void Player::UpdateMeleeHitChances()
+{
+    m_modMeleeHitChance = GetTotalAuraModifier(SPELL_AURA_MOD_HIT_CHANCE);
+    m_modMeleeHitChance+=  GetRatingBonusValue(CR_HIT_MELEE);
+}
+
+void Player::UpdateRangedHitChances()
+{
+    m_modRangedHitChance = GetTotalAuraModifier(SPELL_AURA_MOD_HIT_CHANCE);
+    m_modRangedHitChance+= GetRatingBonusValue(CR_HIT_RANGED);
+}
+
+void Player::UpdateSpellHitChances()
+{
+    m_modSpellHitChance = GetTotalAuraModifier(SPELL_AURA_MOD_SPELL_HIT_CHANCE);
+    m_modSpellHitChance+= GetRatingBonusValue(CR_HIT_SPELL);
 }
 
 void Player::UpdateAllSpellCritChances()
