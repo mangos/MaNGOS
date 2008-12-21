@@ -582,14 +582,14 @@ enum SpellEffects
     SPELL_EFFECT_THREAT                    = 63,
     SPELL_EFFECT_TRIGGER_SPELL             = 64,
     SPELL_EFFECT_APPLY_AREA_AURA_RAID      = 65,
-    SPELL_EFFECT_POWER_FUNNEL              = 66,
+    SPELL_EFFECT_CREATE_MANA_GEM           = 66,
     SPELL_EFFECT_HEAL_MAX_HEALTH           = 67,
     SPELL_EFFECT_INTERRUPT_CAST            = 68,
     SPELL_EFFECT_DISTRACT                  = 69,
     SPELL_EFFECT_PULL                      = 70,
     SPELL_EFFECT_PICKPOCKET                = 71,
     SPELL_EFFECT_ADD_FARSIGHT              = 72,
-    SPELL_EFFECT_SUMMON_POSSESSED          = 73,
+    SPELL_EFFECT_UNTRAIN_TALENTS           = 73,
     SPELL_EFFECT_APPLY_GLYPH               = 74,
     SPELL_EFFECT_HEAL_MECHANICAL           = 75,
     SPELL_EFFECT_SUMMON_OBJECT_WILD        = 76,
@@ -655,7 +655,7 @@ enum SpellEffects
     SPELL_EFFECT_HEAL_PCT                  = 136,
     SPELL_EFFECT_ENERGIZE_PCT              = 137,
     SPELL_EFFECT_138                       = 138,
-    SPELL_EFFECT_139                       = 139,
+    SPELL_EFFECT_CLEAR_QUEST               = 139,
     SPELL_EFFECT_FORCE_CAST                = 140,
     SPELL_EFFECT_141                       = 141,
     SPELL_EFFECT_TRIGGER_SPELL_WITH_VALUE  = 142,
@@ -704,7 +704,8 @@ enum AuraState
     AURA_STATE_DEADLY_POISON                = 16,           //   T |
     AURA_STATE_FORBEARANCE                  = 17,           //  c t|
     AURA_STATE_WEAKENED_SOUL                = 18,           //    t|
-    AURA_STATE_HYPOTHERMIA                  = 19            //  c  |
+    AURA_STATE_HYPOTHERMIA                  = 19,           //  c  |
+    AURA_STATE_HEALTH_ABOVE_75_PERCENT      = 23,           // C   | not implemented yet
 };
 
 // Spell mechanics
@@ -732,7 +733,7 @@ enum Mechanics
     MECHANIC_SHIELD           = 19,
     MECHANIC_SHACKLE          = 20,
     MECHANIC_MOUNT            = 21,
-    MECHANIC_INFECTED         = 22,                         //0 spells use this mechanic
+    MECHANIC_INFECTED         = 22,
     MECHANIC_TURN             = 23,
     MECHANIC_HORROR           = 24,
     MECHANIC_INVULNERABILITY  = 25,
