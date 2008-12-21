@@ -633,6 +633,13 @@ void World::LoadConfigSettings(bool reload)
         m_configs[CONFIG_CHARACTERS_PER_REALM] = 10;
     }
 
+    m_configs[CONFIG_HEROIC_CHARACTERS_PER_REALM] = sConfig.GetIntDefault("HeroicCharactersPerRealm", 1);
+    if(m_configs[CONFIG_HEROIC_CHARACTERS_PER_REALM] < 0 || m_configs[CONFIG_HEROIC_CHARACTERS_PER_REALM] > 10)
+    {
+        sLog.outError("HeroicCharactersPerRealm (%i) must be in range 0..10. Set to 1.",m_configs[CONFIG_HEROIC_CHARACTERS_PER_REALM]);
+        m_configs[CONFIG_HEROIC_CHARACTERS_PER_REALM] = 1;
+    }
+
     // must be after CONFIG_CHARACTERS_PER_REALM
     m_configs[CONFIG_CHARACTERS_PER_ACCOUNT] = sConfig.GetIntDefault("CharactersPerAccount", 50);
     if(m_configs[CONFIG_CHARACTERS_PER_ACCOUNT] < m_configs[CONFIG_CHARACTERS_PER_REALM])

@@ -408,6 +408,11 @@ LogColors = ""
 #        Default: 10 (client limitation)
 #                The number must be between 1 and 10
 #
+#    HeroicCharactersPerRealm
+#        Limit numbers of heroic class characters for account at realm
+#        Default: 1
+#                The number must be between 0 (not allowed) and 10
+#
 #    SkipCinematics
 #        Disable in-game script movie at first character's login(allows to prevent buggy intro in case of custom start location coordinates)
 #        Default: 0 - show intro for each new characrer
@@ -574,6 +579,7 @@ StrictPetNames = 0
 CharactersCreatingDisabled = 0
 CharactersPerAccount = 50
 CharactersPerRealm = 10
+HeroicCharactersPerRealm = 1
 SkipCinematics = 0
 MaxPlayerLevel = 80
 StartPlayerLevel = 1

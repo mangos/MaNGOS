@@ -690,6 +690,11 @@ bool Player::Create( uint32 guidlow, const std::string& name, uint8 race, uint8 
 
             uint32 item_id = oEntry->ItemId[j];
 
+
+            // Hack for not existed item id in dbc 3.0.3
+            if(item_id==40582)
+                continue;
+
             ItemPrototype const* iProto = objmgr.GetItemPrototype(item_id);
             if(!iProto)
             {
