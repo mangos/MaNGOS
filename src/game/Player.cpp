@@ -13748,8 +13748,9 @@ void Player::_LoadArenaTeamInfo(QueryResult *result)
         uint32 personal_rating = fields[3].GetUInt32();
 
         ArenaTeam* aTeam = objmgr.GetArenaTeamById(arenateamid);
-        if(!aTeam) {
-            sLog.outError("FATAL: couldn't load arenateam %u", arenateamid);
+        if(!aTeam)
+        {
+            sLog.outError("Player::_LoadArenaTeamInfo: couldn't load arenateam %u, week %u, season %u, rating %u", arenateamid, played_week, played_season, personal_rating);
             continue;
         }
         uint8  arenaSlot = aTeam->GetSlot();
