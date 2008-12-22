@@ -535,7 +535,6 @@ void Spell::FillTargetMap()
                 case SPELL_EFFECT_LEARN_SPELL:
                 case SPELL_EFFECT_SKILL_STEP:
                 case SPELL_EFFECT_PROFICIENCY:
-                case SPELL_EFFECT_SUMMON_POSSESSED:
                 case SPELL_EFFECT_SUMMON_OBJECT_WILD:
                 case SPELL_EFFECT_SELF_RESURRECT:
                 case SPELL_EFFECT_REPUTATION:
@@ -4053,7 +4052,6 @@ uint8 Spell::CanCast(bool strict)
             }
             // Don't make this check for SPELL_EFFECT_SUMMON_CRITTER, SPELL_EFFECT_SUMMON_WILD or SPELL_EFFECT_SUMMON_GUARDIAN.
             // These won't show up in m_caster->GetPetGUID()
-            case SPELL_EFFECT_SUMMON_POSSESSED:
             case SPELL_EFFECT_SUMMON_PHANTASM:
             case SPELL_EFFECT_SUMMON_DEMON:
             {
