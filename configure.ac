@@ -14,9 +14,9 @@
 
 ## Prelude, basic settings for Autoconf
 #  PACKAGE:            mangos
-#  VERSION:            0.12.0 (trunk)
+#  VERSION:            0.13.0 (trunk)
 #  BUG-REPORT-ADDRESS: mangos-devs@lists.sourceforge.net
-AC_INIT( [mangos], [0.12.0], [mangos-devs@lists.sourceforge.net])
+AC_INIT( [mangos], [0.13.0], [mangos-devs@lists.sourceforge.net])
 AC_CONFIG_SRCDIR([src/shared/Base.cpp])
 
 ## Prelude, basic settings for Automake
