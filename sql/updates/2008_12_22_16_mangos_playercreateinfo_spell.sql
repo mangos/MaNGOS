@@ -1,3 +1,5 @@
+ALTER TABLE db_version CHANGE COLUMN required_2008_12_22_15_mangos_playercreateinfo_action required_2008_12_22_16_mangos_playercreateinfo_spell bit;
+
 DELETE FROM `playercreateinfo_spell` WHERE `class` = 6;
 INSERT INTO `playercreateinfo_spell` VALUES
 (1,6,81,'Dodge',1),

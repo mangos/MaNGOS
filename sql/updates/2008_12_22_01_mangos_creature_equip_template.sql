@@ -1,3 +1,5 @@
+ALTER TABLE db_version CHANGE COLUMN required_2008_12_15_01_mangos_arenas required_2008_12_22_01_mangos_creature_equip_template bit;
+
 TRUNCATE creature_equip_template;
 
 alter table `creature_equip_template`

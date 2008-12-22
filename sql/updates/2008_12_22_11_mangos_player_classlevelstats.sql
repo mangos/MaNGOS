@@ -1,3 +1,5 @@
+ALTER TABLE db_version CHANGE COLUMN required_2008_12_22_10_mangos_string required_2008_12_22_11_mangos_player_classlevelstats bit;
+
 DELETE FROM `player_classlevelstats` WHERE  class = 6 OR level > 70;
 INSERT INTO `player_classlevelstats` VALUES
 (1,71,4720,0),

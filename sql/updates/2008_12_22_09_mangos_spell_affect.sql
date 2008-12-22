@@ -1,3 +1,5 @@
+ALTER TABLE db_version CHANGE COLUMN required_2008_12_22_08_mangos_milling_loot_template required_2008_12_22_09_mangos_spell_affect bit;
+
 --
 -- Table structure for table `spell_affect`
 --

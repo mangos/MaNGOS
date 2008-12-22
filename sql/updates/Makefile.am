@@ -143,6 +143,25 @@ pkgdata_DATA = \
 	2008_12_03_01_character_guild_member.sql \
 	2008_12_15_01_character_arenas.sql \
 	2008_12_15_01_mangos_arenas.sql \
+	2008_12_22_01_mangos_creature_equip_template.sql \
+	2008_12_22_02_characters_character_pet.sql \
+	2008_12_22_03_mangos_item_template.sql \
+	2008_12_22_04_mangos_item_template.sql \
+	2008_12_22_05_characters_account_data.sql \
+	2008_12_22_06_characters_character_achievement.sql \
+	2008_12_22_07_mangos_quest_template.sql \
+	2008_12_22_08_mangos_milling_loot_template.sql \
+	2008_12_22_09_mangos_spell_affect.sql \
+	2008_12_22_10_mangos_string.sql \
+	2008_12_22_11_mangos_player_classlevelstats.sql \
+	2008_12_22_12_mangos_player_levelstats.sql \
+	2008_12_22_13_mangos_item_template.sql \
+	2008_12_22_14_mangos_playercreateinfo.sql \
+	2008_12_22_15_mangos_playercreateinfo_action.sql \
+	2008_12_22_16_mangos_playercreateinfo_spell.sql \
+	2008_12_22_17_mangos_item_template.sql \
+	2008_12_22_18_characters_characters.sql \
+	2008_12_22_19_characters_item_instance.sql \
 	README
 
 ## Additional files to include when running 'make dist'
@@ -267,4 +286,23 @@ EXTRA_DIST = \
 	2008_12_03_01_character_guild_member.sql \
 	2008_12_15_01_character_arenas.sql \
 	2008_12_15_01_mangos_arenas.sql \
+	2008_12_22_01_mangos_creature_equip_template.sql \
+	2008_12_22_02_characters_character_pet.sql \
+	2008_12_22_03_mangos_item_template.sql \
+	2008_12_22_04_mangos_item_template.sql \
+	2008_12_22_05_characters_account_data.sql \
+	2008_12_22_06_characters_character_achievement.sql \
+	2008_12_22_07_mangos_quest_template.sql \
+	2008_12_22_08_mangos_milling_loot_template.sql \
+	2008_12_22_09_mangos_spell_affect.sql \
+	2008_12_22_10_mangos_string.sql \
+	2008_12_22_11_mangos_player_classlevelstats.sql \
+	2008_12_22_12_mangos_player_levelstats.sql \
+	2008_12_22_13_mangos_item_template.sql \
+	2008_12_22_14_mangos_playercreateinfo.sql \
+	2008_12_22_15_mangos_playercreateinfo_action.sql \
+	2008_12_22_16_mangos_playercreateinfo_spell.sql \
+	2008_12_22_17_mangos_item_template.sql \
+	2008_12_22_18_characters_characters.sql \
+	2008_12_22_19_characters_item_instance.sql \
 	README

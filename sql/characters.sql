@@ -15,22 +15,13 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
-
---
--- Table structure for table `saved_variables`
---
-
-CREATE TABLE `saved_variables` (
-    `NextArenaPointDistributionTime` bigint(40) UNSIGNED NOT NULL DEFAULT '0'
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Variable Saves';
-
 --
 -- Table structure for table `character_db_version`
 --
 
 DROP TABLE IF EXISTS `character_db_version`;
 CREATE TABLE `character_db_version` (
-  `required_2008_12_15_01_character_arenas` bit(1) default NULL
+  `required_2008_12_22_19_characters_item_instance` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Last applied sql update to DB';
 
 --
@@ -253,7 +244,8 @@ UNLOCK TABLES;
 -- Table structure for table `character_achievement`
 --
 
-CREATE TABLE IF NOT EXISTS `character_achievement` (
+DROP TABLE IF EXISTS `character_achievement`;
+CREATE TABLE `character_achievement` (
   `guid` int(11) NOT NULL,
   `achievement` int(11) NOT NULL,
   `date` int(11) NOT NULL,
@@ -273,7 +265,8 @@ UNLOCK TABLES;
 -- Table structure for table `character_achievement_progress`
 --
 
-CREATE TABLE IF NOT EXISTS `character_achievement_progress` (
+DROP TABLE IF EXISTS `character_achievement_progress`;
+CREATE TABLE `character_achievement_progress` (
   `guid` int(11) NOT NULL,
   `criteria` int(11) NOT NULL,
   `counter` int(11) NOT NULL,
@@ -1294,6 +1287,7 @@ CREATE TABLE `petition_sign` (
   `type` int(10) unsigned NOT NULL default '0',
   PRIMARY KEY  (`petitionguid`,`playerguid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Guild System';
+
 --
 -- Dumping data for table `petition_sign`
 --
@@ -1303,6 +1297,26 @@ LOCK TABLES `petition_sign` WRITE;
 /*!40000 ALTER TABLE `petition_sign` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+--
+-- Table structure for table `saved_variables`
+--
+
+DROP TABLE IF EXISTS `saved_variables`;
+CREATE TABLE `saved_variables` (
+    `NextArenaPointDistributionTime` bigint(40) UNSIGNED NOT NULL DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Variable Saves';
+
+--
+-- Dumping data for table `saved_variables`
+--
+
+LOCK TABLES `saved_variables` WRITE;
+/*!40000 ALTER TABLE `saved_variables` DISABLE KEYS */;
+/*!40000 ALTER TABLE `saved_variables` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;

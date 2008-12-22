@@ -1,3 +1,5 @@
+ALTER TABLE db_version CHANGE COLUMN required_2008_12_22_13_mangos_item_template required_2008_12_22_14_mangos_playercreateinfo bit;
+
 DELETE FROM `playercreateinfo` WHERE class = 6;
 INSERT INTO `playercreateinfo` VALUES
 (1 ,6,609,4298,2355.84,-5664.77,426.028),

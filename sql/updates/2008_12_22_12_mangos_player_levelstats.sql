@@ -1,3 +1,5 @@
+ALTER TABLE db_version CHANGE COLUMN required_2008_12_22_11_mangos_player_classlevelstats required_2008_12_22_12_mangos_player_levelstats bit;
+
 DELETE FROM `player_levelstats`;
 INSERT INTO `player_levelstats` VALUES
 (1,1,1,23,20,22,20,20),
