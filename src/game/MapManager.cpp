@@ -107,7 +107,7 @@ MapManager::_GetBaseMap(uint32 id)
         Guard guard(*this);
 
         const MapEntry* entry = sMapStore.LookupEntry(id);
-        if (entry && entry->IsDungeon())
+        if (entry && entry->Instanceable())
         {
             m = new MapInstanced(id, i_gridCleanUpDelay);
         }
@@ -173,7 +173,8 @@ bool MapManager::CanPlayerEnter(uint32 mapid, Player* player)
         //The player has a heroic mode and tries to enter into instance which has no a heroic mode
         if (!entry->SupportsHeroicMode() && player->GetDifficulty() == DIFFICULTY_HEROIC)
         {
-            player->SendTransferAborted(mapid, TRANSFER_ABORT_DIFFICULTY2);      //Send aborted message
+            //Send aborted message
+            player->SendTransferAborted(mapid, TRANSFER_ABORT_DIFFICULTY, DIFFICULTY_HEROIC);
             return false;
         }
 
@@ -278,7 +279,8 @@ bool MapManager::ExistMapAndVMap(uint32 mapid, float x,float y)
 bool MapManager::IsValidMAP(uint32 mapid)
 {
     MapEntry const* mEntry = sMapStore.LookupEntry(mapid);
-    return mEntry && (!mEntry->Instanceable() || objmgr.GetInstanceTemplate(mapid));
+    return mEntry && (!mEntry->IsDungeon() || objmgr.GetInstanceTemplate(mapid));
+    // TODO: add check for battleground template
 }
 
 void MapManager::LoadGrid(int mapid, float x, float y, const WorldObject* obj, bool no_unload)

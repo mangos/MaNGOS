@@ -100,9 +100,11 @@ enum WorldConfigs
     CONFIG_CHARACTERS_CREATING_DISABLED,
     CONFIG_CHARACTERS_PER_ACCOUNT,
     CONFIG_CHARACTERS_PER_REALM,
+    CONFIG_HEROIC_CHARACTERS_PER_REALM,
     CONFIG_SKIP_CINEMATICS,
     CONFIG_MAX_PLAYER_LEVEL,
     CONFIG_START_PLAYER_LEVEL,
+    CONFIG_START_HEROIC_PLAYER_LEVEL,
     CONFIG_START_PLAYER_MONEY,
     CONFIG_MAX_HONOR_POINTS,
     CONFIG_START_HONOR_POINTS,
@@ -176,6 +178,12 @@ enum WorldConfigs
     CONFIG_LISTEN_RANGE_SAY,
     CONFIG_LISTEN_RANGE_TEXTEMOTE,
     CONFIG_LISTEN_RANGE_YELL,
+    CONFIG_ARENA_MAX_RATING_DIFFERENCE,
+    CONFIG_ARENA_RATING_DISCARD_TIMER,
+    CONFIG_ARENA_AUTO_DISTRIBUTE_POINTS,
+    CONFIG_ARENA_AUTO_DISTRIBUTE_INTERVAL_DAYS,
+    CONFIG_BATTLEGROUND_PREMATURE_FINISH_TIMER,
+    CONFIG_SKILL_MILLING,
     CONFIG_VALUE_COUNT
 };
 
@@ -186,6 +194,8 @@ enum Rates
     RATE_POWER_MANA,
     RATE_POWER_RAGE_INCOME,
     RATE_POWER_RAGE_LOSS,
+    RATE_POWER_RUNICPOWER_INCOME,
+    RATE_POWER_RUNICPOWER_LOSS,
     RATE_POWER_FOCUS,
     RATE_SKILL_DISCOVERY,
     RATE_DROP_ITEM_POOR,
@@ -229,7 +239,6 @@ enum Rates
     RATE_MINING_AMOUNT,
     RATE_MINING_NEXT,
     RATE_TALENT,
-    RATE_LOYALTY,
     RATE_CORPSE_DECAY_LOOTED,
     RATE_INSTANCE_RESET_TIME,
     RATE_TARGET_POS_RECALCULATION_RANGE,
@@ -396,6 +405,7 @@ class World
         void LoadConfigSettings(bool reload = false);
 
         void SendWorldText(int32 string_id, ...);
+        void SendGlobalText(const char* text, WorldSession *self);
         void SendGlobalMessage(WorldPacket *packet, WorldSession *self = 0, uint32 team = 0);
         void SendZoneMessage(uint32 zone, WorldPacket *packet, WorldSession *self = 0, uint32 team = 0);
         void SendZoneText(uint32 zone, const char *text, WorldSession *self = 0, uint32 team = 0);
@@ -438,7 +448,7 @@ class World
         bool IsPvPRealm() { return (getConfig(CONFIG_GAME_TYPE) == REALM_TYPE_PVP || getConfig(CONFIG_GAME_TYPE) == REALM_TYPE_RPPVP || getConfig(CONFIG_GAME_TYPE) == REALM_TYPE_FFA_PVP); }
         bool IsFFAPvPRealm() { return getConfig(CONFIG_GAME_TYPE) == REALM_TYPE_FFA_PVP; }
 
-        bool KickPlayer(std::string playerName);
+        bool KickPlayer(const std::string& playerName);
         void KickAll();
         void KickAllLess(AccountTypes sec);
         BanReturn BanAccount(BanMode mode, std::string nameOrIP, std::string duration, std::string reason, std::string author);

@@ -54,7 +54,8 @@ enum GuildRankRights
     GR_RIGHT_REPAIR_FROM_GUILD  = 0x00020000,               // unused in 2.4.x?, Remove money withdraw capacity
     GR_RIGHT_WITHDRAW_REPAIR    = 0x00040000,               // withdraw for repair
     GR_RIGHT_WITHDRAW_GOLD      = 0x00080000,               // withdraw gold
-    GR_RIGHT_ALL                = 0x000FF1FF
+    GR_RIGHT_CREATE_GUILD_EVENT = 0x00100000,               // wotlk
+    GR_RIGHT_ALL                = 0x001FF1FF
 };
 
 enum Typecommand
@@ -154,6 +155,8 @@ enum GuildBankLogEntries
     GUILD_BANK_LOG_WITHDRAW_MONEY   = 5,
     GUILD_BANK_LOG_REPAIR_MONEY     = 6,
     GUILD_BANK_LOG_MOVE_ITEM2       = 7,
+    GUILD_BANK_LOG_UNK1             = 8,
+    GUILD_BANK_LOG_UNK2             = 9,
 };
 
 enum GuildEventLogEntryTypes
@@ -242,7 +245,7 @@ struct MemberSlot
 
 struct RankInfo
 {
-    RankInfo(std::string _name, uint32 _rights, uint32 _money) : name(_name), rights(_rights), BankMoneyPerDay(_money)
+    RankInfo(const std::string& _name, uint32 _rights, uint32 _money) : name(_name), rights(_rights), BankMoneyPerDay(_money)
     {
         for(uint8 i = 0; i < GUILD_BANK_MAX_TABS; ++i)
         {
@@ -307,8 +310,8 @@ class Guild
         bool FillPlayerData(uint64 guid, MemberSlot* memslot);
         void LoadPlayerStatsByGuid(uint64 guid);
 
-        void BroadcastToGuild(WorldSession *session, std::string msg, uint32 language = LANG_UNIVERSAL);
-        void BroadcastToOfficers(WorldSession *session, std::string msg, uint32 language = LANG_UNIVERSAL);
+        void BroadcastToGuild(WorldSession *session, const std::string& msg, uint32 language = LANG_UNIVERSAL);
+        void BroadcastToOfficers(WorldSession *session, const std::string& msg, uint32 language = LANG_UNIVERSAL);
         void BroadcastPacketToRank(WorldPacket *packet, uint32 rankId);
         void BroadcastPacket(WorldPacket *packet);
 
@@ -405,7 +408,7 @@ class Guild
         bool   AddGBankItemToDB(uint32 GuildId, uint32 BankTab , uint32 BankTabSlot , uint32 GUIDLow, uint32 Entry );
 
     protected:
-        void AddRank(std::string name,uint32 rights,uint32 money);
+        void AddRank(const std::string& name,uint32 rights,uint32 money);
 
         uint32 Id;
         std::string name;

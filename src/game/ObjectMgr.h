@@ -242,6 +242,8 @@ typedef std::list<GossipOption> CacheNpcOptionList;
 typedef UNORDERED_MAP<uint32, VendorItemData> CacheVendorItemMap;
 typedef UNORDERED_MAP<uint32, TrainerSpellData> CacheTrainerSpellMap;
 
+typedef std::list<const AchievementCriteriaEntry*> AchievementCriteriaEntryList;
+
 enum SkillRangeType
 {
     SKILL_RANGE_LANGUAGE,                                   // 300..300
@@ -282,10 +284,10 @@ class ObjectMgr
 
         typedef std::set< Group * > GroupSet;
         typedef std::set< Guild * > GuildSet;
-        typedef std::set< ArenaTeam * > ArenaTeamSet;
+
+        typedef UNORDERED_MAP<uint32, ArenaTeam* > ArenaTeamMap;
 
         typedef UNORDERED_MAP<uint32, Quest*> QuestMap;
-
 
         typedef UNORDERED_MAP<uint32, AreaTrigger> AreaTriggerMap;
 
@@ -313,16 +315,18 @@ class ObjectMgr
 
         Guild* GetGuildByLeader(uint64 const&guid) const;
         Guild* GetGuildById(const uint32 GuildId) const;
-        Guild* GetGuildByName(std::string guildname) const;
+        Guild* GetGuildByName(const std::string& guildname) const;
         std::string GetGuildNameById(const uint32 GuildId) const;
         void AddGuild(Guild* guild) { mGuildSet.insert( guild ); }
         void RemoveGuild(Guild* guild) { mGuildSet.erase( guild ); }
 
-        ArenaTeam* GetArenaTeamById(const uint32 ArenaTeamId) const;
-        ArenaTeam* GetArenaTeamByName(std::string ArenaTeamName) const;
-        ArenaTeam* GetArenaTeamByCapitan(uint64 const& guid) const;
-        void AddArenaTeam(ArenaTeam* arenateam) { mArenaTeamSet.insert( arenateam ); }
-        void RemoveArenaTeam(ArenaTeam* arenateam) { mArenaTeamSet.erase( arenateam ); }
+        ArenaTeam* GetArenaTeamById(const uint32 arenateamid) const;
+        ArenaTeam* GetArenaTeamByName(const std::string& arenateamname) const;
+        ArenaTeam* GetArenaTeamByCaptain(uint64 const& guid) const;
+        void AddArenaTeam(ArenaTeam* arenaTeam);
+        void RemoveArenaTeam(ArenaTeam* arenaTeam);
+        ArenaTeamMap::iterator GetArenaTeamMapBegin() { return mArenaTeamMap.begin(); }
+        ArenaTeamMap::iterator GetArenaTeamMapEnd()   { return mArenaTeamMap.end(); }
 
         static CreatureInfo const *GetCreatureTemplate( uint32 id );
         CreatureModelInfo const *GetCreatureModelInfo( uint32 modelid );
@@ -405,7 +409,7 @@ class ObjectMgr
         bool GetPlayerNameByGUID(const uint64 &guid, std::string &name) const;
         uint32 GetPlayerTeamByGUID(const uint64 &guid) const;
         uint32 GetPlayerAccountIdByGUID(const uint64 &guid) const;
-        uint32 GetPlayerAccountIdByPlayerName(std::string name) const;
+        uint32 GetPlayerAccountIdByPlayerName(const std::string& name) const;
 
         uint32 GetNearestTaxiNode( float x, float y, float z, uint32 mapid );
         void GetTaxiPath( uint32 source, uint32 destination, uint32 &path, uint32 &cost);
@@ -562,6 +566,7 @@ class ObjectMgr
         void LoadNpcTextId();
         void LoadVendors();
         void LoadTrainerSpell();
+        void LoadCompletedAchievements();
 
         std::string GeneratePetName(uint32 entry);
         uint32 GetBaseXP(uint32 level);
@@ -698,15 +703,15 @@ class ObjectMgr
 
         // reserved names
         void LoadReservedPlayersNames();
-        bool IsReservedName(std::string name) const
+        bool IsReservedName(const std::string& name) const
         {
             return m_ReservedNames.find(name) != m_ReservedNames.end();
         }
 
         // name with valid structure and symbols
-        static bool IsValidName( std::string name, bool create = false );
-        static bool IsValidCharterName( std::string name );
-        static bool IsValidPetName( std::string name );
+        static bool IsValidName( const std::string& name, bool create = false );
+        static bool IsValidCharterName( const std::string& name );
+        static bool IsValidPetName( const std::string& name );
 
         static bool CheckDeclinedNames(std::wstring mainpart, DeclinedName const& names);
 
@@ -730,10 +735,10 @@ class ObjectMgr
             if(itr==m_GameTeleMap.end()) return NULL;
             return &itr->second;
         }
-        GameTele const* GetGameTele(std::string name) const;
+        GameTele const* GetGameTele(const std::string& name) const;
         GameTeleMap const& GetGameTeleMap() const { return m_GameTeleMap; }
         bool AddGameTele(GameTele& data);
-        bool DeleteGameTele(std::string name);
+        bool DeleteGameTele(const std::string& name);
 
         CacheNpcOptionList const& GetNpcOptions() const { return m_mCacheNpcOptionList; }
 
@@ -766,6 +771,9 @@ class ObjectMgr
         void AddVendorItem(uint32 entry,uint32 item, uint32 maxcount, uint32 incrtime, uint32 ExtendedCost);
         bool RemoveVendorItem(uint32 entry,uint32 item);
         bool IsVendorItemValid( uint32 vendor_entry, uint32 item, uint32 maxcount, uint32 ptime, uint32 ExtendedCost, Player* pl = NULL, std::set<uint32>* skip_vendors = NULL ) const;
+        void LoadAchievementCriteriaList();
+        AchievementCriteriaEntryList const& GetAchievementCriteriaByType(AchievementCriteriaTypes type);
+        std::set<uint32> allCompletedAchievements;
 
         void LoadScriptNames();
         ScriptNameMap &GetScriptNames() { return m_scriptNames; }
@@ -785,6 +793,7 @@ class ObjectMgr
         uint32 m_hiCharGuid;
         uint32 m_hiCreatureGuid;
         uint32 m_hiPetGuid;
+        uint32 m_hiVehicleGuid;
         uint32 m_hiItemGuid;
         uint32 m_hiGoGuid;
         uint32 m_hiDoGuid;
@@ -801,7 +810,7 @@ class ObjectMgr
 
         GroupSet            mGroupSet;
         GuildSet            mGuildSet;
-        ArenaTeamSet        mArenaTeamSet;
+        ArenaTeamMap        mArenaTeamMap;
 
         ItemMap             mItems;
         ItemMap             mAitems;
@@ -892,6 +901,9 @@ class ObjectMgr
         CacheNpcTextIdMap m_mCacheNpcTextIdMap;
         CacheVendorItemMap m_mCacheVendorItemMap;
         CacheTrainerSpellMap m_mCacheTrainerSpellMap;
+
+        // store achievement criterias by type to speed up lookup
+        AchievementCriteriaEntryList m_AchievementCriteriasByType[ACHIEVEMENT_CRITERIA_TYPE_TOTAL];
 };
 
 #define objmgr MaNGOS::Singleton<ObjectMgr>::Instance()

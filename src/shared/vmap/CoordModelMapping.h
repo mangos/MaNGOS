@@ -43,8 +43,8 @@ namespace VMAP
             G3D::Array<std::string> iMainFiles;
             G3D::Array<std::string> iSingeFiles;
 
-            void appendToMain(std::string pStr) { iMainFiles.append(pStr); }
-            void appendToSingle(std::string pStr) { iSingeFiles.append(pStr); }
+            void appendToMain(const std::string& pStr) { iMainFiles.append(pStr); }
+            void appendToSingle(const std::string& pStr) { iSingeFiles.append(pStr); }
 
             size_t size() { return (iMainFiles.size() + iSingeFiles.size()); }
     };
@@ -113,7 +113,7 @@ namespace VMAP
 
             const NameCollection getFilenamesForCoordinate(unsigned int pMapId, int xPos, int yPos);
 
-            static unsigned int getMapIdFromFilename(std::string pName)
+            static unsigned int getMapIdFromFilename(const std::string& pName)
             {
                 size_t spos;
 
@@ -126,8 +126,8 @@ namespace VMAP
             }
 
             const G3D::Array<unsigned int>& getMaps() const { return iMapIds; }
-            bool isAlreadyProcessedSingleFile(std::string pName) const { return iProcesseSingleFiles.containsKey(pName); }
-            void addAlreadyProcessedSingleFile(std::string pName) { iProcesseSingleFiles.set(pName,pName); }
+            bool isAlreadyProcessedSingleFile(const std::string& pName) const { return iProcesseSingleFiles.containsKey(pName); }
+            void addAlreadyProcessedSingleFile(const std::string& pName) { iProcesseSingleFiles.set(pName,pName); }
 
             inline void addWorldAreaMap(unsigned int pMapId)
             {

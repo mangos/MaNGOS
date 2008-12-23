@@ -68,7 +68,7 @@ struct Script
     CreatureAI* (*GetAI)(Creature *_Creature);
     InstanceData* (*GetInstanceData)(Map*);
     // -----------------------------------------
-    
+
     void registerSelf();
 };
 

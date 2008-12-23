@@ -112,6 +112,7 @@ ObjectMgr::ObjectMgr()
     m_hiCharGuid        = 1;
     m_hiCreatureGuid    = 1;
     m_hiPetGuid         = 1;
+    m_hiVehicleGuid     = 1;
     m_hiItemGuid        = 1;
     m_hiGoGuid          = 1;
     m_hiDoGuid          = 1;
@@ -137,13 +138,13 @@ ObjectMgr::ObjectMgr()
 
 ObjectMgr::~ObjectMgr()
 {
-    for( QuestMap::iterator i = mQuestTemplates.begin( ); i != mQuestTemplates.end( ); ++ i )
+    for( QuestMap::iterator i = mQuestTemplates.begin( ); i != mQuestTemplates.end( ); ++i )
     {
         delete i->second;
     }
     mQuestTemplates.clear( );
 
-    for( GossipTextMap::iterator i = mGossipText.begin( ); i != mGossipText.end( ); ++ i )
+    for( GossipTextMap::iterator i = mGossipText.begin( ); i != mGossipText.end( ); ++i )
     {
         delete i->second;
     }
@@ -151,7 +152,7 @@ ObjectMgr::~ObjectMgr()
 
     mAreaTriggers.clear();
 
-    for(PetLevelInfoMap::iterator i = petInfo.begin( ); i != petInfo.end( ); ++ i )
+    for(PetLevelInfoMap::iterator i = petInfo.begin( ); i != petInfo.end( ); ++i )
     {
         delete[] i->second;
     }
@@ -199,7 +200,7 @@ Guild * ObjectMgr::GetGuildById(const uint32 GuildId) const
     return NULL;
 }
 
-Guild * ObjectMgr::GetGuildByName(std::string guildname) const
+Guild * ObjectMgr::GetGuildByName(const std::string& guildname) const
 {
     for(GuildSet::const_iterator itr = mGuildSet.begin(); itr != mGuildSet.end(); ++itr)
         if ((*itr)->GetName() == guildname)
@@ -226,31 +227,41 @@ Guild* ObjectMgr::GetGuildByLeader(const uint64 &guid) const
     return NULL;
 }
 
-ArenaTeam* ObjectMgr::GetArenaTeamById(const uint32 ArenaTeamId) const
+ArenaTeam* ObjectMgr::GetArenaTeamById(const uint32 arenateamid) const
 {
-    for(ArenaTeamSet::const_iterator itr = mArenaTeamSet.begin(); itr != mArenaTeamSet.end(); ++itr)
-        if ((*itr)->GetId() == ArenaTeamId)
-            return *itr;
+    ArenaTeamMap::const_iterator itr = mArenaTeamMap.find(arenateamid);
+    if (itr != mArenaTeamMap.end())
+        return itr->second;
 
     return NULL;
 }
 
-ArenaTeam* ObjectMgr::GetArenaTeamByName(std::string arenateamname) const
+ArenaTeam* ObjectMgr::GetArenaTeamByName(const std::string& arenateamname) const
 {
-    for(ArenaTeamSet::const_iterator itr = mArenaTeamSet.begin(); itr != mArenaTeamSet.end(); ++itr)
-        if ((*itr)->GetName() == arenateamname)
-            return *itr;
+    for(ArenaTeamMap::const_iterator itr = mArenaTeamMap.begin(); itr != mArenaTeamMap.end(); ++itr)
+        if (itr->second->GetName() == arenateamname)
+            return itr->second;
 
     return NULL;
 }
 
-ArenaTeam* ObjectMgr::GetArenaTeamByCapitan(uint64 const& guid) const
+ArenaTeam* ObjectMgr::GetArenaTeamByCaptain(uint64 const& guid) const
 {
-    for(ArenaTeamSet::const_iterator itr = mArenaTeamSet.begin(); itr != mArenaTeamSet.end(); ++itr)
-        if ((*itr)->GetCaptain() == guid)
-            return *itr;
+    for(ArenaTeamMap::const_iterator itr = mArenaTeamMap.begin(); itr != mArenaTeamMap.end(); ++itr)
+        if (itr->second->GetCaptain() == guid)
+            return itr->second;
 
     return NULL;
+}
+
+void ObjectMgr::AddArenaTeam(ArenaTeam* arenaTeam)
+{
+    mArenaTeamMap[arenaTeam->GetId()] = arenaTeam;
+}
+
+void ObjectMgr::RemoveArenaTeam(ArenaTeam* arenaTeam)
+{
+    mArenaTeamMap.erase( arenaTeam->GetId() );
 }
 
 AuctionHouseObject * ObjectMgr::GetAuctionsMap( uint32 location )
@@ -568,7 +579,23 @@ void ObjectMgr::LoadCreatureLocales()
     sLog.outString();
     sLog.outString( ">> Loaded %u creature locale strings", mCreatureLocaleMap.size() );
 }
-   
+
+void ObjectMgr::LoadCompletedAchievements()
+{
+    QueryResult *result = CharacterDatabase.Query("SELECT achievement FROM character_achievement GROUP BY achievement");
+
+    if(!result)
+        return;
+
+    do
+    {
+        Field *fields = result->Fetch();
+        allCompletedAchievements.insert(fields[0].GetUInt32());
+    } while(result->NextRow());
+
+    delete result;
+}
+
 void ObjectMgr::LoadNpcOptionLocales()
 {
     mNpcOptionLocaleMap.clear();                              // need for reload case
@@ -915,8 +942,47 @@ void ObjectMgr::LoadEquipmentTemplates()
 {
     sEquipmentStorage.Load();
 
+    for(uint32 i=0; i< sEquipmentStorage.MaxEntry; ++i)
+    {
+        EquipmentInfo const* eqInfo = sEquipmentStorage.LookupEntry<EquipmentInfo>(i);
+
+        if(!eqInfo)
+            continue;
+
+        for(uint8 j=0; j<3; j++)
+        {
+            if(!eqInfo->equipentry[j])
+               continue;
+
+            ItemEntry const *dbcitem = sItemStore.LookupEntry(eqInfo->equipentry[j]);
+
+            if(!dbcitem)
+            {
+                sLog.outErrorDb("Unknown item (entry=%u) in creature_equip_template.equipentry%u for entry = %u, forced to 0.", eqInfo->equipentry[j], j+1, i);
+                const_cast<EquipmentInfo*>(eqInfo)->equipentry[j] = 0;
+                continue;
+            }
+
+            if(dbcitem->InventoryType != INVTYPE_WEAPON &&
+                    dbcitem->InventoryType != INVTYPE_SHIELD &&
+                    dbcitem->InventoryType != INVTYPE_RANGED &&
+                    dbcitem->InventoryType != INVTYPE_2HWEAPON &&
+                    dbcitem->InventoryType != INVTYPE_WEAPONMAINHAND &&
+                    dbcitem->InventoryType != INVTYPE_WEAPONOFFHAND &&
+                    dbcitem->InventoryType != INVTYPE_HOLDABLE &&
+                    dbcitem->InventoryType != INVTYPE_THROWN &&
+                    dbcitem->InventoryType != INVTYPE_RANGEDRIGHT)
+            {
+                sLog.outErrorDb("Item (entry=%u) in creature_equip_template.equipentry%u for entry = %u is not equipable in a hand, forced to 0.", eqInfo->equipentry[j], j+1, i);
+                const_cast<EquipmentInfo*>(eqInfo)->equipentry[j] = 0;
+            }
+        }
+    }
     sLog.outString( ">> Loaded %u equipment template", sEquipmentStorage.RecordCount );
     sLog.outString();
+
+    // This DBC is currently only used for item templates and creature equipments checks.
+    sItemStore.Clear();
 }
 
 CreatureModelInfo const* ObjectMgr::GetCreatureModelInfo(uint32 modelid)
@@ -1380,7 +1446,7 @@ uint32 ObjectMgr::GetPlayerAccountIdByGUID(const uint64 &guid) const
     return 0;
 }
 
-uint32 ObjectMgr::GetPlayerAccountIdByPlayerName(std::string name) const
+uint32 ObjectMgr::GetPlayerAccountIdByPlayerName(const std::string& name) const
 {
     QueryResult *result = CharacterDatabase.PQuery("SELECT account FROM characters WHERE name = '%s'", name.c_str());
     if(result)
@@ -1573,7 +1639,7 @@ void ObjectMgr::LoadItemPrototypes()
         if(proto->Class >= MAX_ITEM_CLASS)
         {
             sLog.outErrorDb("Item (Entry: %u) has wrong Class value (%u)",i,proto->Class);
-            const_cast<ItemPrototype*>(proto)->Class = ITEM_CLASS_JUNK;
+            const_cast<ItemPrototype*>(proto)->Class = ITEM_CLASS_MISC;
         }
 
         if(proto->SubClass >= MaxItemSubclassValues[proto->Class])
@@ -1670,7 +1736,7 @@ void ObjectMgr::LoadItemPrototypes()
         }
 
         // special format
-        if(proto->Spells[0].SpellId == SPELL_ID_GENERIC_LEARN)
+        if((proto->Spells[0].SpellId == SPELL_ID_GENERIC_LEARN) || (proto->Spells[0].SpellId == SPELL_ID_GENERIC_LEARN_PET))
         {
             // spell_1
             if(proto->Spells[0].SpellTrigger != ITEM_SPELLTRIGGER_ON_USE)
@@ -1707,7 +1773,7 @@ void ObjectMgr::LoadItemPrototypes()
                     const_cast<ItemPrototype*>(proto)->Spells[1].SpellTrigger = ITEM_SPELLTRIGGER_ON_USE;
                 }
                 // allowed only in special format
-                else if(proto->Spells[1].SpellId==SPELL_ID_GENERIC_LEARN)
+                else if((proto->Spells[1].SpellId==SPELL_ID_GENERIC_LEARN) || (proto->Spells[1].SpellId==SPELL_ID_GENERIC_LEARN_PET))
                 {
                     sLog.outErrorDb("Item (Entry: %u) has broken spell in spellid_%d (%u)",i,1+1,proto->Spells[1].SpellId);
                     const_cast<ItemPrototype*>(proto)->Spells[0].SpellId = 0;
@@ -1753,7 +1819,7 @@ void ObjectMgr::LoadItemPrototypes()
                         const_cast<ItemPrototype*>(proto)->Spells[j].SpellId = 0;
                     }
                     // allowed only in special format
-                    else if(proto->Spells[j].SpellId==SPELL_ID_GENERIC_LEARN)
+                    else if((proto->Spells[j].SpellId==SPELL_ID_GENERIC_LEARN) || (proto->Spells[j].SpellId==SPELL_ID_GENERIC_LEARN_PET))
                     {
                         sLog.outErrorDb("Item (Entry: %u) has broken spell in spellid_%d (%u)",i,j+1,proto->Spells[j].SpellId);
                         const_cast<ItemPrototype*>(proto)->Spells[j].SpellId = 0;
@@ -1822,9 +1888,6 @@ void ObjectMgr::LoadItemPrototypes()
             const_cast<ItemPrototype*>(proto)->FoodType = 0;
         }
     }
-
-    // this DBC used currently only for check item templates in DB.
-    sItemStore.Clear();
 }
 
 void ObjectMgr::LoadAuctionItems()
@@ -1909,8 +1972,8 @@ void ObjectMgr::LoadPetLevelInfo()
             uint32 current_level = fields[1].GetUInt32();
             if(current_level > sWorld.getConfig(CONFIG_MAX_PLAYER_LEVEL))
             {
-                if(current_level > 255)                     // hardcoded level maximum
-                    sLog.outErrorDb("Wrong (> 255) level %u in `pet_levelstats` table, ignoring.",current_level);
+                if(current_level > STRONG_MAX_LEVEL)        // hardcoded level maximum
+                    sLog.outErrorDb("Wrong (> %u) level %u in `pet_levelstats` table, ignoring.",STRONG_MAX_LEVEL,current_level);
                 else
                     sLog.outDetail("Unused (> MaxPlayerLevel in mangosd.conf) level %u in `pet_levelstats` table, ignoring.",current_level);
                 continue;
@@ -2088,6 +2151,8 @@ void ObjectMgr::LoadPlayerInfo()
         if (!result)
         {
             barGoLink bar( 1 );
+
+            bar.step();
 
             sLog.outString();
             sLog.outString( ">> Loaded %u custom player create items", count );
@@ -2286,8 +2351,8 @@ void ObjectMgr::LoadPlayerInfo()
             uint32 current_level = fields[1].GetUInt32();
             if(current_level > sWorld.getConfig(CONFIG_MAX_PLAYER_LEVEL))
             {
-                if(current_level > 255)                     // hardcoded level maximum
-                    sLog.outErrorDb("Wrong (> 255) level %u in `player_classlevelstats` table, ignoring.",current_level);
+                if(current_level > STRONG_MAX_LEVEL)        // hardcoded level maximum
+                    sLog.outErrorDb("Wrong (> %u) level %u in `player_classlevelstats` table, ignoring.",STRONG_MAX_LEVEL,current_level);
                 else
                     sLog.outDetail("Unused (> MaxPlayerLevel in mangosd.conf) level %u in `player_classlevelstats` table, ignoring.",current_level);
                 continue;
@@ -2381,8 +2446,8 @@ void ObjectMgr::LoadPlayerInfo()
             uint32 current_level = fields[2].GetUInt32();
             if(current_level > sWorld.getConfig(CONFIG_MAX_PLAYER_LEVEL))
             {
-                if(current_level > 255)                     // hardcoded level maximum
-                    sLog.outErrorDb("Wrong (> 255) level %u in `player_levelstats` table, ignoring.",current_level);
+                if(current_level > STRONG_MAX_LEVEL)        // hardcoded level maximum
+                    sLog.outErrorDb("Wrong (> %u) level %u in `player_levelstats` table, ignoring.",STRONG_MAX_LEVEL,current_level);
                 else
                     sLog.outDetail("Unused (> MaxPlayerLevel in mangosd.conf) level %u in `player_levelstats` table, ignoring.",current_level);
                 continue;
@@ -2808,31 +2873,31 @@ void ObjectMgr::LoadQuests()
     QueryResult *result = WorldDatabase.Query("SELECT entry, Method, ZoneOrSort, SkillOrClass, MinLevel, QuestLevel, Type, RequiredRaces, RequiredSkillValue,"
     //   9                    10                 11                     12                   13                     14                   15                16
         "RepObjectiveFaction, RepObjectiveValue, RequiredMinRepFaction, RequiredMinRepValue, RequiredMaxRepFaction, RequiredMaxRepValue, SuggestedPlayers, LimitTime,"
-    //   17          18            19           20           21           22              23                24         25            26
-        "QuestFlags, SpecialFlags, CharTitleId, PrevQuestId, NextQuestId, ExclusiveGroup, NextQuestInChain, SrcItemId, SrcItemCount, SrcSpell,"
-    //   27     28       29          30               31                32       33              34              35              36
+    //   17          18            19           20            21            22           23           24              25                26         27            28
+        "QuestFlags, SpecialFlags, CharTitleId, PlayersSlain, BonusTalents, PrevQuestId, NextQuestId, ExclusiveGroup, NextQuestInChain, SrcItemId, SrcItemCount, SrcSpell,"
+    //   29     30       31          32               33                34       35              36              37              38
         "Title, Details, Objectives, OfferRewardText, RequestItemsText, EndText, ObjectiveText1, ObjectiveText2, ObjectiveText3, ObjectiveText4,"
-    //   37          38          39          40          41             42             43             44
+    //   39          40          41          42          43             44             45             46
         "ReqItemId1, ReqItemId2, ReqItemId3, ReqItemId4, ReqItemCount1, ReqItemCount2, ReqItemCount3, ReqItemCount4,"
-    //   45            46            47            48            49               50               51               52               53             54             54             55
+    //   47            48            49            50            51               52               53               54               55             56             57             58
         "ReqSourceId1, ReqSourceId2, ReqSourceId3, ReqSourceId4, ReqSourceCount1, ReqSourceCount2, ReqSourceCount3, ReqSourceCount4, ReqSourceRef1, ReqSourceRef2, ReqSourceRef3, ReqSourceRef4,"
-    //   57                  58                  59                  60                  61                     62                     63                     64
+    //   59                  60                  61                  62                  63                     64                     65                     66
         "ReqCreatureOrGOId1, ReqCreatureOrGOId2, ReqCreatureOrGOId3, ReqCreatureOrGOId4, ReqCreatureOrGOCount1, ReqCreatureOrGOCount2, ReqCreatureOrGOCount3, ReqCreatureOrGOCount4,"
-    //   65             66             67             68
+    //   67             68             69             70
         "ReqSpellCast1, ReqSpellCast2, ReqSpellCast3, ReqSpellCast4,"
-    //   69                70                71                72                73                74
+    //   71                72                73                74                75                76
         "RewChoiceItemId1, RewChoiceItemId2, RewChoiceItemId3, RewChoiceItemId4, RewChoiceItemId5, RewChoiceItemId6,"
-    //   75                   76                   77                   78                   79                   80
+    //   77                   78                   79                   80                   81                   82
         "RewChoiceItemCount1, RewChoiceItemCount2, RewChoiceItemCount3, RewChoiceItemCount4, RewChoiceItemCount5, RewChoiceItemCount6,"
-    //   81          82          83          84          85             86             87             88
+    //   83          84          85          86          87             88             89             90
         "RewItemId1, RewItemId2, RewItemId3, RewItemId4, RewItemCount1, RewItemCount2, RewItemCount3, RewItemCount4,"
-    //   89              90              91              92              93              94            95            96            97            98
+    //   91              92              93              94              95              96            97            98            99            100
         "RewRepFaction1, RewRepFaction2, RewRepFaction3, RewRepFaction4, RewRepFaction5, RewRepValue1, RewRepValue2, RewRepValue3, RewRepValue4, RewRepValue5,"
-    //   99                 100            101               102       103           104                105               106         107     108    109
+    //   101                102            103               104       105           106                107               108         109     110     111
         "RewHonorableKills, RewOrReqMoney, RewMoneyMaxLevel, RewSpell, RewSpellCast, RewMailTemplateId, RewMailDelaySecs, PointMapId, PointX, PointY, PointOpt,"
-    //   110            111            112           113              114            115                116                117                118             119
+    //   112            113            114            115           116              117            118                119                120                121
         "DetailsEmote1, DetailsEmote2, DetailsEmote3, DetailsEmote4,IncompleteEmote, CompleteEmote, OfferRewardEmote1, OfferRewardEmote2, OfferRewardEmote3, OfferRewardEmote4,"
-    //   120          121
+    //   122          123
         "StartScript, CompleteScript"
         " FROM quest_template");
     if(result == NULL)
@@ -4203,7 +4268,7 @@ void ObjectMgr::AddGossipText(GossipText *pGText)
 GossipText *ObjectMgr::GetGossipText(uint32 Text_ID)
 {
     GossipTextMap::const_iterator itr;
-    for (itr = mGossipText.begin(); itr != mGossipText.end(); itr++)
+    for (itr = mGossipText.begin(); itr != mGossipText.end(); ++itr)
     {
         if(itr->second->Text_ID == Text_ID)
             return itr->second;
@@ -4654,14 +4719,14 @@ uint16 ObjectMgr::GetTaxiMount( uint32 id, uint32 team )
     {
         if (team == ALLIANCE)
         {
-            mount_entry = node->alliance_mount_type;
+            mount_entry = node->MountCreatureID[1];
             CreatureInfo const *ci = GetCreatureTemplate(mount_entry);
             if(ci)
                 mount_id = ci->DisplayID_A;
         }
         if (team == HORDE)
         {
-            mount_entry = node->horde_mount_type;
+            mount_entry = node->MountCreatureID[0];
             CreatureInfo const *ci = GetCreatureTemplate(mount_entry);
             if(ci)
                 mount_id = ci->DisplayID_H;
@@ -5095,6 +5160,8 @@ void ObjectMgr::SetHighestGuids()
 
     // pet guids are not saved to DB, set to 0 (pet guid != pet id)
     m_hiPetGuid = 0;
+    // same for vehicles
+    m_hiVehicleGuid = 0;
 
     result = CharacterDatabase.Query( "SELECT MAX(guid) FROM item_instance" );
     if( result )
@@ -5248,6 +5315,14 @@ uint32 ObjectMgr::GenerateLowGuid(HighGuid guidhigh)
                 World::StopNow(ERROR_EXIT_CODE);
             }
             return m_hiPetGuid++;
+        case HIGHGUID_VEHICLE:
+            ++m_hiVehicleGuid;
+            if(m_hiVehicleGuid>=0x00FFFFFF)
+            {
+                sLog.outError("Vehicle guid overflow!! Can't continue, shutting down server. ");
+                World::StopNow(ERROR_EXIT_CODE);
+            }
+            return m_hiVehicleGuid++;
         case HIGHGUID_PLAYER:
             if(m_hiCharGuid>=0xFFFFFFFE)
             {
@@ -6135,7 +6210,7 @@ bool isValidString(std::wstring wstr, uint32 strictMask, bool numericOrSpace, bo
     return false;
 }
 
-bool ObjectMgr::IsValidName( std::string name, bool create )
+bool ObjectMgr::IsValidName( const std::string& name, bool create )
 {
     std::wstring wname;
     if(!Utf8toWStr(name,wname))
@@ -6149,7 +6224,7 @@ bool ObjectMgr::IsValidName( std::string name, bool create )
     return isValidString(wname,strictMask,false,create);
 }
 
-bool ObjectMgr::IsValidCharterName( std::string name )
+bool ObjectMgr::IsValidCharterName( const std::string& name )
 {
     std::wstring wname;
     if(!Utf8toWStr(name,wname))
@@ -6163,7 +6238,7 @@ bool ObjectMgr::IsValidCharterName( std::string name )
     return isValidString(wname,strictMask,true);
 }
 
-bool ObjectMgr::IsValidPetName( std::string name )
+bool ObjectMgr::IsValidPetName( const std::string& name )
 {
     std::wstring wname;
     if(!Utf8toWStr(name,wname))
@@ -6208,6 +6283,23 @@ int ObjectMgr::GetOrNewIndexForLocale( LocaleConstant loc )
 
     m_LocalForIndex.push_back(loc);
     return m_LocalForIndex.size()-1;
+}
+
+AchievementCriteriaEntryList const& ObjectMgr::GetAchievementCriteriaByType(AchievementCriteriaTypes type)
+{
+    return m_AchievementCriteriasByType[type];
+}
+
+void ObjectMgr::LoadAchievementCriteriaList()
+{
+    for (uint32 entryId = 0; entryId<sAchievementCriteriaStore.GetNumRows(); entryId++)
+    {
+        AchievementCriteriaEntry const* criteria = sAchievementCriteriaStore.LookupEntry(entryId);
+        if(!criteria)
+            continue;
+
+        m_AchievementCriteriasByType[criteria->requiredType].push_back(criteria);
+    }
 }
 
 void ObjectMgr::LoadBattleMastersEntry()
@@ -6541,7 +6633,7 @@ bool PlayerCondition::Meets(Player const * player) const
         {
             Unit::AuraMap const& auras = player->GetAuras();
             for(Unit::AuraMap::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
-                if((itr->second->GetSpellProto()->Attributes & 0x1000010) && itr->second->GetSpellProto()->SpellVisual==3580)
+                if((itr->second->GetSpellProto()->Attributes & 0x1000010) && itr->second->GetSpellProto()->SpellVisual[0]==3580)
                     return true;
             return false;
         }
@@ -6709,7 +6801,7 @@ SkillRangeType GetSkillRangeType(SkillLineEntry const *pSkill, bool racial)
                 return SKILL_RANGE_MONO;
         case SKILL_CATEGORY_ARMOR:
         case SKILL_CATEGORY_CLASS:
-            if(pSkill->id != SKILL_POISONS && pSkill->id != SKILL_LOCKPICKING)
+            if(pSkill->id != SKILL_LOCKPICKING)
                 return SKILL_RANGE_MONO;
             else
                 return SKILL_RANGE_LEVEL;
@@ -6724,7 +6816,7 @@ SkillRangeType GetSkillRangeType(SkillLineEntry const *pSkill, bool racial)
                 return SKILL_RANGE_MONO;
         default:
         case SKILL_CATEGORY_ATTRIBUTES:                     //not found in dbc
-        case SKILL_CATEGORY_NOT_DISPLAYED:                  //only GENEREC(DND)
+        case SKILL_CATEGORY_GENERIC:                        //only GENERIC(DND)
             return SKILL_RANGE_NONE;
     }
 }
@@ -6792,7 +6884,7 @@ void ObjectMgr::LoadGameTele()
     sLog.outString( ">> Loaded %u game tele's", count );
 }
 
-GameTele const* ObjectMgr::GetGameTele(std::string name) const
+GameTele const* ObjectMgr::GetGameTele(const std::string& name) const
 {
     // explicit name case
     std::wstring wname;
@@ -6835,7 +6927,7 @@ bool ObjectMgr::AddGameTele(GameTele& tele)
         new_id,tele.position_x,tele.position_y,tele.position_z,tele.orientation,tele.mapId,tele.name.c_str());
 }
 
-bool ObjectMgr::DeleteGameTele(std::string name)
+bool ObjectMgr::DeleteGameTele(const std::string& name)
 {
     // explicit name case
     std::wstring wname;
@@ -7243,7 +7335,7 @@ uint32 ObjectMgr::GetScriptId(const char *name)
     if(!name) return 0;
     ScriptNameMap::const_iterator itr =
         std::lower_bound(m_scriptNames.begin(), m_scriptNames.end(), name);
-    if(itr == m_scriptNames.end()) return 0;
+    if(itr == m_scriptNames.end() || *itr != name) return 0;
     return itr - m_scriptNames.begin();
 }
 

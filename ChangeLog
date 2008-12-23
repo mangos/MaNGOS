@@ -1,6 +1,6 @@
-MaNGOS 0.12   (??? ??? 2008)
+MaNGOS 0.13   (??? ??? 2009)
 
- MaNGOS 0.12 - Codename "???" - adds further improvements to the
+ MaNGOS 0.13 - adds further improvements to the
  server core as well as to the majority of game classes and the game content
  database.
 
@@ -11,6 +11,79 @@ MaNGOS 0.12   (??? ??? 2008)
  ==== Statistics ====
  * Fixed Bugs: ???
  * Total number of changes: ???
+
+MaNGOS 0.12   (Dec 22 2008)
+
+ MaNGOS 0.12 - adds further improvements to the
+ server core as well as to the majority of game classes and the game content
+ database.
+
+ ==== Game Features ====
+
+ * Added: Support for different difficult instances, proper instances reset and proper group/player binding to instances.
+ * Added: Support for arena system.
+ * Added: Support for declined names (with Cyrillic client).
+ * Added: Support for auction pending mail and 1 hour delay in money delivery to owner.
+ * Added: Support for possibility reject warlock's player summon by targeted player.
+ * Added: Support for talent based pet auras.
+ * Added: Support for auto-reward quests.
+ * Added: Support for trap arming delay in combat state.
+ * Added: Support for show enchantment item effect on login screen.
+ * Added: Support for restoration buff in battlegrounds.
+ * Added: Support for dependent spell disabling (instead removing) at talent reset until talent re-learning.
+ * Added: Support for guild/arena team leaders delete protection.
+ * Added: Support for areatrigger scripting.
+ * Added: Support for honor rewards from quests.
+ * Added: Support for realmd reconnect from login character list.
+ * Added: Support for configurable assistance aggro delaying.
+ * Improved: Better duels work.
+ * Improved: Improvements in battleground system work including really instancing battlegrounds.
+ * Improved: Better support game localization for players and GMs.
+ * Improved: More server-side re-checks for client side primary checked data for prevent cheating.
+ * Improved: Player can't dodge attack from behind.
+ * Improved: Correctly animate eating/drinking in cases sitting at chairs/etc.
+ * Improved: Better guardians related functionality work.
+ * Improved: Expected instant logout in taxi flight at logout request.
+ * Improved: Re-implement raid ready check code.
+ * Improved: Select fishing bobber activating time in more standard way.
+ * Improved: Better random/waypoint creature movement work including fly case.
+ * Improved: Evade distance is now based on the distance from the position that the creature was at when it entered combat.
+ * Improved: Implemented further support for contested guards.
+ * Improved: Show available daily quests at map as blue marks.
+ * Improved: Limit distance for listen say/yell text.
+ * Improved: Removed dismount at login hack that now unneeded.
+ * Improved: Better support for low character experience gain in group with high character.
+ * Improved: Default behavior of pets for creatures changed to REACT_DEFENSIVE.
+ * Improved: Better work with combo points on miss/parry/immune.
+ * Improved: Allow have team dependent graveyards at entrance map for instances.
+ * Improved: Allowed switching INVTYPE_HOLDABLE items during combat.
+ * Improved: Make flying creatures fall on ground when killed.
+ * Improved: More correct way of calculating fall damage by using fall distance and not fall time.
+ * plus lots of fixes for auras, effects, spells, talents, and more.
+
+ ==== Server Features ====
+
+ * Added: Support for load and use multiply DBC locales data at server.
+ * Added: Store in `spell_chain` additional spell dependences from another spell chain for learning possibility checks.
+ * Added: New chat command for reload settings from mangosd.conf file without server restart need.
+ * Added: Set icon for realmd/mangosd binaries at Windows build.
+ * Added: Start use Adaptive Communication Environment (ACE) framework v.5.6.6 in server network code.
+ * Added: Migrate from SVN sourceforge.net to GIT github.com repository for project sources store.
+ * Added: Script name indexing for creature, gameobject, item, areatrigger and instance script.
+ * Added: The possibility to use custom process return values.
+ * Improved: More DB tables loading at server startup and less unneeded DB access in server work time.
+ * Improved: Console support for chat like commands features. Merge chat/console command list to single.
+ * Improved: Implement possibility output detailed and DB error log messages from scripting code.
+ * Improved: Better localization support for DB scripts and scripting library.
+ * Improved: Referenced loot data moved to new table for better sharing like data from other loot tables.
+ * Improved: Prevent overwriting realmd.conf and mangosd.conf on make install at Unix/Linux.
+ * Improved: Update Visual Leak Detector lib to Version 1.9g (beta).
+ * Improved: New revisions numbering and sql updates names scheme  with tools support used after switch to GIT.
+ * Improved: Use DBC data for creating initial character items.
+
+ ==== Statistics ====
+ * Fixed Bugs: many :)
+ * Total number of changes: 731 (323 in git)
 
 MaNGOS 0.11   (Jul 22 2008)
 

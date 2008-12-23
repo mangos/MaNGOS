@@ -47,6 +47,7 @@
 #include "Config/ConfigEnv.h"
 #include "Util.h"
 #include "ItemEnchantmentMgr.h"
+#include "BattleGroundMgr.h"
 #include "InstanceSaveMgr.h"
 #include "InstanceData.h"
 
@@ -291,6 +292,15 @@ bool ChatHandler::HandleReloadLootTemplatesItemCommand(const char*)
     LoadLootTemplates_Item();
     LootTemplates_Item.CheckLootRefs();
     SendGlobalSysMessage("DB table `item_loot_template` reloaded.");
+    return true;
+}
+
+bool ChatHandler::HandleReloadLootTemplatesMillingCommand(const char*)
+{
+    sLog.outString( "Re-Loading Loot Tables... (`milling_loot_template`)" );
+    LoadLootTemplates_Milling();
+    LootTemplates_Milling.CheckLootRefs();
+    SendGlobalSysMessage("DB table `milling_loot_template` reloaded.");
     return true;
 }
 
@@ -3805,8 +3815,8 @@ bool ChatHandler::HandleLevelUpCommand(const char* args)
     int32 newlevel = oldlevel + addlevel;
     if(newlevel < 1)
         newlevel = 1;
-    if(newlevel > 255)                                      // hardcoded maximum level
-        newlevel = 255;
+    if(newlevel > STRONG_MAX_LEVEL)                         // hardcoded maximum level
+        newlevel = STRONG_MAX_LEVEL;
 
     if(chr)
     {
@@ -4349,7 +4359,7 @@ static bool HandleResetStatsOrLevelHelper(Player* player)
 
     // set UNIT_FIELD_BYTES_1 to init state but preserve m_form value
     player->SetUInt32Value(UNIT_FIELD_BYTES_1, unitfield);
-    player->SetByteValue(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_UNK3 | UNIT_BYTE2_FLAG_UNK5 );
+    player->SetByteValue(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_PVP );
     player->SetByteValue(UNIT_FIELD_BYTES_2, 3, player->m_form);
 
     player->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
@@ -4394,6 +4404,7 @@ bool ChatHandler::HandleResetLevelCommand(const char * args)
     player->SetLevel(1);
     player->InitStatsForLevel(true);
     player->InitTaxiNodesForLevel();
+    player->InitGlyphsForLevel();
     player->InitTalentForLevel();
     player->SetUInt32Value(PLAYER_XP,0);
 
@@ -4437,6 +4448,7 @@ bool ChatHandler::HandleResetStatsCommand(const char * args)
 
     player->InitStatsForLevel(true);
     player->InitTaxiNodesForLevel();
+    player->InitGlyphsForLevel();
     player->InitTalentForLevel();
 
     return true;
@@ -4564,7 +4576,7 @@ bool ChatHandler::HandleResetAllCommand(const char * args)
         return false;
     }
 
-    CharacterDatabase.PExecute("UPDATE characters SET at_login = at_login | '%u'",atLogin);
+    CharacterDatabase.PExecute("UPDATE characters SET at_login = at_login | '%u' WHERE (at_login & '%u') = '0'",atLogin,atLogin);
     HashMapHolder<Player>::MapType const& plist = ObjectAccessor::Instance().GetPlayers();
     for(HashMapHolder<Player>::MapType::const_iterator itr = plist.begin(); itr != plist.end(); ++itr)
         itr->second->SetAtLoginFlag(atLogin);
@@ -6479,6 +6491,12 @@ bool ChatHandler::HandleSendMessageCommand(const char* args)
     return true;
 }
 
+bool ChatHandler::HandleFlushArenaPointsCommand(const char * /*args*/)
+{
+    sBattleGroundMgr.DistributeArenaPoints();
+    return true;
+}
+
 bool ChatHandler::HandleModifyGenderCommand(const char *args)
 {
     if(!*args)
@@ -6493,30 +6511,27 @@ bool ChatHandler::HandleModifyGenderCommand(const char *args)
         return false;
     }
 
+    PlayerInfo const* info = objmgr.GetPlayerInfo(player->getRace(), player->getClass());
+    if(!info)
+        return false;
+
     char const* gender_str = (char*)args;
     int gender_len = strlen(gender_str);
 
-    uint32 displayId = player->GetNativeDisplayId();
-    char const* gender_full = NULL;
-    uint32 new_displayId = displayId;
     Gender gender;
 
-    if(!strncmp(gender_str,"male",gender_len))              // MALE
+    if(!strncmp(gender_str, "male", gender_len))            // MALE
     {
         if(player->getGender() == GENDER_MALE)
             return true;
 
-        gender_full = "male";
-        new_displayId = player->getRace() == RACE_BLOODELF ? displayId+1 : displayId-1;
         gender = GENDER_MALE;
     }
-    else if (!strncmp(gender_str,"female",gender_len))      // FEMALE
+    else if (!strncmp(gender_str, "female", gender_len))    // FEMALE
     {
         if(player->getGender() == GENDER_FEMALE)
             return true;
 
-        gender_full = "female";
-        new_displayId = player->getRace() == RACE_BLOODELF ? displayId-1 : displayId+1;
         gender = GENDER_FEMALE;
     }
     else
@@ -6528,13 +6543,18 @@ bool ChatHandler::HandleModifyGenderCommand(const char *args)
 
     // Set gender
     player->SetByteValue(UNIT_FIELD_BYTES_0, 2, gender);
+    player->SetByteValue(PLAYER_BYTES_3, 0, gender);
 
     // Change display ID
-    player->SetDisplayId(new_displayId);
-    player->SetNativeDisplayId(new_displayId);
+    player->SetDisplayId(gender ? info->displayId_f : info->displayId_m);
+    player->SetNativeDisplayId(gender ? info->displayId_f : info->displayId_m);
 
-    PSendSysMessage(LANG_YOU_CHANGE_GENDER, player->GetName(),gender_full);
+    char const* gender_full = gender ? "female" : "male";
+
+    PSendSysMessage(LANG_YOU_CHANGE_GENDER, player->GetName(), gender_full);
+
     if (needReportToTarget(player))
-        ChatHandler(player).PSendSysMessage(LANG_YOUR_GENDER_CHANGED, gender_full,GetName());
+        ChatHandler(player).PSendSysMessage(LANG_YOUR_GENDER_CHANGED, gender_full, GetName());
+
     return true;
 }
