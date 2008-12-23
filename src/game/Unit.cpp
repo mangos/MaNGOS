@@ -1623,7 +1623,7 @@ void Unit::DealSpellDamage(SpellNonMeleeDamage *damageInfo, bool durabilityLoss)
             if( spellInfo->AttributesEx3 & 0x40000 && spellInfo->SpellFamilyName == SPELLFAMILY_PALADIN && ((*itr).second->GetCasterGUID() == GetGUID()))
             {
                 (*itr).second->SetAuraDuration((*itr).second->GetAuraMaxDuration());
-                (*itr).second->UpdateAuraDuration();
+                (*itr).second->SendAuraUpdate(false);
             }
         }
     }
@@ -1782,6 +1782,7 @@ void Unit::CalculateMeleeDamage(Unit *pVictim, uint32 damage, CalcDamageInfo *da
         case MELEE_HIT_BLOCK:
         {
             damageInfo->TargetState = VICTIMSTATE_NORMAL;
+            damageInfo->HitInfo |= HITINFO_BLOCK;
             damageInfo->procEx|=PROC_EX_BLOCK;
             damageInfo->blocked_amount = damageInfo->target->GetShieldBlockValue();
             if (damageInfo->blocked_amount >= damageInfo->damage)
@@ -1981,7 +1982,7 @@ void Unit::DealMeleeDamage(CalcDamageInfo *damageInfo, bool durabilityLoss)
             if( spellInfo->AttributesEx3 & 0x40000 && spellInfo->SpellFamilyName == SPELLFAMILY_PALADIN && ((*itr).second->GetCasterGUID() == GetGUID()))
             {
                 (*itr).second->SetAuraDuration((*itr).second->GetAuraMaxDuration());
-                (*itr).second->UpdateAuraDuration();
+                (*itr).second->SendAuraUpdate(false);
             }
         }
     }
@@ -4895,6 +4896,7 @@ void Unit::SendSpellNonMeleeDamageLog(SpellNonMeleeDamage *log)
     data.append(log->attacker->GetPackGUID());
     data << uint32(log->SpellID);
     data << uint32(log->damage);                             //damage amount
+    data << uint32(0);
     data << uint8 (log->schoolMask);                         //damage school
     data << uint32(log->absorb);                             //AbsorbedDamage
     data << uint32(log->resist);                             //resist
@@ -4953,25 +4955,65 @@ void Unit::SendSpellMiss(Unit *target, uint32 spellID, SpellMissInfo missInfo)
 
 void Unit::SendAttackStateUpdate(CalcDamageInfo *damageInfo)
 {
+    uint32 count = 1;
     WorldPacket data(SMSG_ATTACKERSTATEUPDATE, (16+84));    // we guess size
     data << (uint32)damageInfo->HitInfo;
     data.append(GetPackGUID());
     data.append(damageInfo->target->GetPackGUID());
     data << (uint32)(damageInfo->damage);     // Full damage
+    data << uint32(0);                        // overkill value
 
-    data << (uint8)1;                         // Sub damage count
-    //===  Sub damage description
-    data << (uint32)(damageInfo->damageSchoolMask); // School of sub damage
-    data << (float)damageInfo->damage;        // sub damage
-    data << (uint32)damageInfo->damage;       // Sub Damage
-    data << (uint32)damageInfo->absorb;       // Absorb
-    data << (uint32)damageInfo->resist;       // Resist
-    //=================================================
+    data << (uint8)count;                     // Sub damage count
+
+    for(int i = 0; i < count; ++i)
+    {
+        data << (uint32)(damageInfo->damageSchoolMask); // School of sub damage
+        data << (float)damageInfo->damage;        // sub damage
+        data << (uint32)damageInfo->damage;       // Sub Damage
+    }
+
+    if(damageInfo->HitInfo & (HITINFO_ABSORB | HITINFO_ABSORB2))
+    {
+        for(int i = 0; i < count; ++i)
+            data << (uint32)damageInfo->absorb;       // Absorb
+    }
+
+    if(damageInfo->HitInfo & (HITINFO_RESIST | HITINFO_RESIST2))
+    {
+        for(int i = 0; i < count; ++i)
+            data << (uint32)damageInfo->resist;       // Resist
+    }
+
     data << (uint32)damageInfo->TargetState;
     data << (uint32)0;
     data << (uint32)0;
-    data << (uint32)damageInfo->blocked_amount;
-    SendMessageToSet( &data, true );/**/
+
+    if(damageInfo->HitInfo & HITINFO_BLOCK)
+        data << (uint32)damageInfo->blocked_amount;
+
+    if(damageInfo->HitInfo & HITINFO_UNK3)
+        data << uint32(0);
+
+    if(damageInfo->HitInfo & HITINFO_UNK1)
+    {
+        data << uint32(0);
+        data << float(0);
+        data << float(0);
+        data << float(0);
+        data << float(0);
+        data << float(0);
+        data << float(0);
+        data << float(0);
+        data << float(0);
+        for(uint8 i = 0; i < 5; ++i)
+        {
+            data << float(0);
+            data << float(0);
+        }
+        data << uint32(0);
+    }
+
+    SendMessageToSet( &data, true );
 }
 
 void Unit::SendAttackStateUpdate(uint32 HitInfo, Unit *target, uint8 SwingType, SpellSchoolMask damageSchoolMask, uint32 Damage, uint32 AbsorbDamage, uint32 Resist, VictimState TargetState, uint32 BlockedAmount)
@@ -7333,23 +7375,6 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
          // Greater Heal Refund
          if (auraSpellInfo->Id==37594)
              trigger_spell_id = 37595;
-         // Shadowguard
-         else if(auraSpellInfo->SpellFamilyFlags==0x100080000000LL && auraSpellInfo->SpellVisual==7958)
-         {
-             switch(auraSpellInfo->Id)
-             {
-                 case 18137: trigger_spell_id = 28377; break;   // Rank 1
-                 case 19308: trigger_spell_id = 28378; break;   // Rank 2
-                 case 19309: trigger_spell_id = 28379; break;   // Rank 3
-                 case 19310: trigger_spell_id = 28380; break;   // Rank 4
-                 case 19311: trigger_spell_id = 28381; break;   // Rank 5
-                 case 19312: trigger_spell_id = 28382; break;   // Rank 6
-                 case 25477: trigger_spell_id = 28385; break;   // Rank 7
-                 default:
-                     sLog.outError("Unit::HandleProcTriggerSpell: Spell %u not handled in SG", auraSpellInfo->Id);
-                 return false;
-             }
-         }
          // Blessed Recovery
          else if (auraSpellInfo->SpellIconID == 1875)
          {
@@ -7530,8 +7555,8 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
      //=====================================================================
      case SPELLFAMILY_SHAMAN:
      {
-         //Lightning Shield (overwrite non existing triggered spell call in spell.dbc
-         if(auraSpellInfo->SpellFamilyFlags==0x00000400 && auraSpellInfo->SpellVisual==37)
+         // Lightning Shield (overwrite non existing triggered spell call in spell.dbc
+         if(auraSpellInfo->SpellFamilyFlags & 0x0000000000000400)
          {
              switch(auraSpellInfo->Id)
              {
@@ -7544,6 +7569,8 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
                  case 10432: trigger_spell_id = 26363; break;  // Rank 7
                  case 25469: trigger_spell_id = 26371; break;  // Rank 8
                  case 25472: trigger_spell_id = 26372; break;  // Rank 9
+                 case 49280: trigger_spell_id = 49278; break;  // Rank 10
+                 case 49281: trigger_spell_id = 49279; break;  // Rank 11
                  default:
                      sLog.outError("Unit::HandleProcTriggerSpell: Spell %u not handled in LShield", auraSpellInfo->Id);
                  return false;
