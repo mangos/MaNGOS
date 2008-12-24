@@ -633,13 +633,6 @@ void World::LoadConfigSettings(bool reload)
         m_configs[CONFIG_CHARACTERS_PER_REALM] = 10;
     }
 
-    m_configs[CONFIG_HEROIC_CHARACTERS_PER_REALM] = sConfig.GetIntDefault("HeroicCharactersPerRealm", 1);
-    if(m_configs[CONFIG_HEROIC_CHARACTERS_PER_REALM] < 0 || m_configs[CONFIG_HEROIC_CHARACTERS_PER_REALM] > 10)
-    {
-        sLog.outError("HeroicCharactersPerRealm (%i) must be in range 0..10. Set to 1.",m_configs[CONFIG_HEROIC_CHARACTERS_PER_REALM]);
-        m_configs[CONFIG_HEROIC_CHARACTERS_PER_REALM] = 1;
-    }
-
     // must be after CONFIG_CHARACTERS_PER_REALM
     m_configs[CONFIG_CHARACTERS_PER_ACCOUNT] = sConfig.GetIntDefault("CharactersPerAccount", 50);
     if(m_configs[CONFIG_CHARACTERS_PER_ACCOUNT] < m_configs[CONFIG_CHARACTERS_PER_REALM])
@@ -647,6 +640,15 @@ void World::LoadConfigSettings(bool reload)
         sLog.outError("CharactersPerAccount (%i) can't be less than CharactersPerRealm (%i).",m_configs[CONFIG_CHARACTERS_PER_ACCOUNT],m_configs[CONFIG_CHARACTERS_PER_REALM]);
         m_configs[CONFIG_CHARACTERS_PER_ACCOUNT] = m_configs[CONFIG_CHARACTERS_PER_REALM];
     }
+
+    m_configs[CONFIG_HEROIC_CHARACTERS_PER_REALM] = sConfig.GetIntDefault("HeroicCharactersPerRealm", 1);
+    if(m_configs[CONFIG_HEROIC_CHARACTERS_PER_REALM] < 0 || m_configs[CONFIG_HEROIC_CHARACTERS_PER_REALM] > 10)
+    {
+        sLog.outError("HeroicCharactersPerRealm (%i) must be in range 0..10. Set to 1.",m_configs[CONFIG_HEROIC_CHARACTERS_PER_REALM]);
+        m_configs[CONFIG_HEROIC_CHARACTERS_PER_REALM] = 1;
+    }
+
+    m_configs[CONFIG_MIN_LEVEL_FOR_HEROIC_CHARACTER_CREATING] = sConfig.GetIntDefault("MinLevelForHeroicCharacterCreating", 55);
 
     m_configs[CONFIG_SKIP_CINEMATICS] = sConfig.GetIntDefault("SkipCinematics", 0);
     if(m_configs[CONFIG_SKIP_CINEMATICS] < 0 || m_configs[CONFIG_SKIP_CINEMATICS] > 2)
