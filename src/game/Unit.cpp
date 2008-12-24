@@ -7288,27 +7288,20 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
      //=====================================================================
      // Warrior
      //=====================================================================
-     // Rampage (Rank 1-3) trigger = 18350
+     // Scent of Blood
      //=====================================================================
      case SPELLFAMILY_WARRIOR:
-     // Rampage
-     if (auraSpellInfo->SpellIconID == 2006 && auraSpellInfo->SpellFamilyFlags==0x100000)
      {
-         switch(auraSpellInfo->Id)
-         {
-             case 29801: trigger_spell_id = 30029; break;       // Rank 1
-             case 30030: trigger_spell_id = 30031; break;       // Rank 2
-             case 30033: trigger_spell_id = 30032; break;       // Rank 3
-             default:
-                 sLog.outError("Unit::HandleProcTriggerSpell: Spell %u not handled in Rampage",auraSpellInfo->Id);
-             return false;
-         }
+         // Scent of Blood
+         if (auraSpellInfo->Id == 50421)
+             trigger_spell_id = 50422;
      }
      break;
      //=====================================================================
      // Warlock
      //=====================================================================
      // Pyroclasm             trigger = 18350
+     // Nether Protection     trigger = 1206
      // Drain Soul (Rank 1-5) trigger = 0
      //=====================================================================
      case SPELLFAMILY_WARLOCK:
@@ -7361,6 +7354,25 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
              // Need for correct work Drain Soul SPELL_AURA_CHANNEL_DEATH_ITEM aura
              return false;
          }
+         // Nether Protection
+         else if (auraSpellInfo->SpellIconID == 1985)
+         {
+             if (!procSpell)
+                 return false;
+             switch(GetFirstSchoolInMask(GetSpellSchoolMask(procSpell)))
+             {
+                 case SPELL_SCHOOL_NORMAL:
+                 case SPELL_SCHOOL_HOLY:
+                     return false;                   // ignore
+                 case SPELL_SCHOOL_FIRE:   trigger_spell_id = 54371; break;
+                 case SPELL_SCHOOL_NATURE: trigger_spell_id = 54375; break;
+                 case SPELL_SCHOOL_FROST:  trigger_spell_id = 54372; break;
+                 case SPELL_SCHOOL_SHADOW: trigger_spell_id = 54374; break;
+                 case SPELL_SCHOOL_ARCANE: trigger_spell_id = 54373; break;
+                 default:
+                     return false;
+             }
+         }
          break;
      }
      //=====================================================================
@@ -7368,7 +7380,6 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
      //=====================================================================
      // Greater Heal Refund         trigger = 18350
      // Blessed Recovery (Rank 1-3) trigger = 18350
-     // Shadowguard (1-7)           trigger = 28376
      //=====================================================================
      case SPELLFAMILY_PRIEST:
      {
@@ -7441,9 +7452,9 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
      // Blessed Life                   trigger = 31934
      // Healing Discount               trigger = 18350
      // Illumination (Rank 1-5)        trigger = 18350
-     // Judgement of Light (Rank 1-5)  trigger = 5373
-     // Judgement of Wisdom (Rank 1-4) trigger = 1826
      // Lightning Capacitor            trigger = 18350
+     // Thunder Capacitor              trigger = 18350
+     // Soul Preserver                 trigger = 18350
      //=====================================================================
      case SPELLFAMILY_PALADIN:
      {
@@ -7467,28 +7478,11 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
              trigger_spell_id = 37706;
              target = this;
          }
-         // Judgement of Light and Judgement of Wisdom
-         else if (auraSpellInfo->SpellFamilyFlags & 0x0000000000080000LL)
+         // Soul Preserver
+         if (auraSpellInfo->Id==60510)
          {
-             switch (auraSpellInfo->Id)
-             {
-                 // Judgement of Light
-                 case 20185: trigger_spell_id = 20267;break; // Rank 1
-                 case 20344: trigger_spell_id = 20341;break; // Rank 2
-                 case 20345: trigger_spell_id = 20342;break; // Rank 3
-                 case 20346: trigger_spell_id = 20343;break; // Rank 4
-                 case 27162: trigger_spell_id = 27163;break; // Rank 5
-                 // Judgement of Wisdom
-                 case 20186: trigger_spell_id = 20268;break; // Rank 1
-                 case 20354: trigger_spell_id = 20352;break; // Rank 2
-                 case 20355: trigger_spell_id = 20353;break; // Rank 3
-                 case 27164: trigger_spell_id = 27165;break; // Rank 4
-                 default:
-                     sLog.outError("Unit::HandleProcTriggerSpell: Spell %u miss posibly Judgement of Light/Wisdom", auraSpellInfo->Id);
-                 return false;
-             }
-             pVictim->CastSpell(pVictim, trigger_spell_id, true, castItem, triggeredByAura);
-             return true;                        // no hidden cooldown
+             trigger_spell_id = 60515;
+             target = this;
          }
          // Illumination
          else if (auraSpellInfo->SpellIconID==241)
@@ -7544,6 +7538,27 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
              trigger_spell_id = 37661;
              target = pVictim;
          }
+         // Thunder Capacitor
+         else if (auraSpellInfo->Id == 54841)
+         {
+             if(!pVictim || !pVictim->isAlive())
+                 return false;
+             // stacking
+             CastSpell(this, 54842, true, NULL, triggeredByAura);
+             // counting
+             uint32 count = 0;
+             AuraList const& dummyAura = GetAurasByType(SPELL_AURA_DUMMY);
+             for(AuraList::const_iterator itr = dummyAura.begin(); itr != dummyAura.end(); ++itr)
+                 if((*itr)->GetId()==54842)
+                     ++count;
+             // release at 3 aura in stack (cont contain in basepoint of trigger aura)
+             if(count < triggerAmount)
+                 return false;
+
+             RemoveAurasDueToSpell(54842);
+             trigger_spell_id = 54843;
+             target = pVictim;
+         }
          break;
      }
      //=====================================================================
@@ -7594,7 +7609,8 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
              trigger_spell_id = 23571;
              target = this;
          }
-         else if (auraSpellInfo->SpellIconID == 2013) //Nature's Guardian
+         // Nature's Guardian
+         else if (auraSpellInfo->SpellIconID == 2013)
          {
              // Check health condition - should drop to less 30% (damage deal after this!)
              if (!(10*(int32(GetHealth() - damage)) < 3 * GetMaxHealth()))
@@ -7606,6 +7622,45 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
              basepoints0 = triggerAmount * GetMaxHealth() / 100;
              trigger_spell_id = 31616;
              target = this;
+         }
+         break;
+     }
+     //=====================================================================
+     // Death Knight
+     //====================================================================
+     // Acclimation       trigger = 1206
+     // Blood Presence    trigger = 1206
+     //=====================================================================
+     case SPELLFAMILY_DEATHKNIGHT:
+     {
+         // Acclimation
+         if (auraSpellInfo->SpellIconID == 1930)
+         {
+             if (!procSpell)
+                 return false;
+             switch(GetFirstSchoolInMask(GetSpellSchoolMask(procSpell)))
+             {
+                 case SPELL_SCHOOL_NORMAL:
+                     return false;                   // ignore
+                 case SPELL_SCHOOL_HOLY:   trigger_spell_id = 50490; break;
+                 case SPELL_SCHOOL_FIRE:   trigger_spell_id = 50362; break;
+                 case SPELL_SCHOOL_NATURE: trigger_spell_id = 50488; break;
+                 case SPELL_SCHOOL_FROST:  trigger_spell_id = 50485; break;
+                 case SPELL_SCHOOL_SHADOW: trigger_spell_id = 50489; break;
+                 case SPELL_SCHOOL_ARCANE: trigger_spell_id = 54373; break;
+                 default:
+                     return false;
+             }
+         }
+         // Blood Presence
+         else if (auraSpellInfo->Id == 48266)
+         {
+             if (GetTypeId() != TYPEID_PLAYER)
+                 return false;
+             if (!((Player*)this)->RewardPlayerAndGroupAtKill(pVictim))
+                 return false;
+             trigger_spell_id = 50475;
+             basepoints0 = damage * triggerAmount / 100;
          }
          break;
      }
