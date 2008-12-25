@@ -202,16 +202,9 @@ void WorldSession::HandleTaxiNextDestinationOpcode(WorldPacket& recv_data)
     // we need proccess only (1)
 
     //movement anticheat code
+    /* extract packet */
     MovementInfo movementInfo;
-    uint32 MovementFlags;
-
-    recv_data >> MovementFlags;
-    recv_data >> movementInfo.unk1;
-    recv_data >> movementInfo.time;
-    recv_data >> movementInfo.x;
-    recv_data >> movementInfo.y;
-    recv_data >> movementInfo.z;
-    recv_data >> movementInfo.o;
+    ReadMovementInfo(recv_data, &movementInfo);
     //<<< end movement anticheat
 
     uint32 curDest = GetPlayer()->m_taxi.GetTaxiDestination();
@@ -220,6 +213,7 @@ void WorldSession::HandleTaxiNextDestinationOpcode(WorldPacket& recv_data)
         //movement anticheat code
         GetPlayer()->SetPosition(movementInfo.x, movementInfo.y, movementInfo.z, movementInfo.o);
         GetPlayer()->m_movementInfo = movementInfo;
+        GetPlayer()->SetUnitMovementFlags(movementInfo.flags);
         GetPlayer()->m_anti_lastmovetime = movementInfo.time;
         GetPlayer()->m_anti_justteleported = 1;
         //<<< end movement anticheat
@@ -237,6 +231,7 @@ void WorldSession::HandleTaxiNextDestinationOpcode(WorldPacket& recv_data)
     //movement anticheat code
     GetPlayer()->SetPosition(movementInfo.x, movementInfo.y, movementInfo.z, movementInfo.o);
     GetPlayer()->m_movementInfo = movementInfo;
+    GetPlayer()->SetUnitMovementFlags(movementInfo.flags);
     GetPlayer()->m_anti_lastmovetime = movementInfo.time;
     //<<< end movement anticheat
 
