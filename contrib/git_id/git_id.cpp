@@ -270,7 +270,7 @@ bool amend_commit()
 
 bool find_sql_updates()
 {
-    printf("+ finding sql updates on HEAD\n");
+    printf("+ finding new sql updates on HEAD\n");
     // add all updates from HEAD
     snprintf(cmd, MAX_CMD, "git show HEAD:%s", sql_update_dir);
     if( (cmd_pipe = popen( cmd, "r" )) == NULL )
@@ -309,11 +309,52 @@ bool find_sql_updates()
     }
 
     pclose(cmd_pipe);
+
+    if(!sql_updates.empty())
+    {
+        for(std::set<std::string>::iterator itr = sql_updates.begin(); itr != sql_updates.end(); ++itr)
+            printf("%s\n", itr->c_str());
+    }
+    else
+        printf("WARNING: no new sql updates found.\n");
+
+    return true;
+}
+
+bool copy_file(const char *src, const char *dst)
+{
+    FILE * fin = fopen( src, "r" );
+    if(!fin) return false;
+    FILE * fout = fopen( dst, "w" );
+    if(!fout) { fclose(fin); return false; }
+
+    char c;
+    while( (c = getc(fin)) != EOF )
+        putc(c, fout);
+
+    fclose(fin);
+    fclose(fout);
+
     return true;
 }
 
 bool rename_sql_updates()
 {
+    if(!sql_updates.empty())
+    {
+        printf("+ renaming sql updates\n");
+        for(std::set<std::string>::iterator itr = sql_updates.begin(); itr != sql_updates.end(); ++itr)
+        {
+            char src_file[MAX_PATH], dst_file[MAX_PATH];
+            snprintf(src_file, MAX_PATH, "%ssql/updates/%s", path_prefix, itr->c_str());
+            snprintf(dst_file, MAX_PATH, "%ssql/updates/%d_%s", path_prefix, rev, itr->c_str());
+            if(!copy_file(src_file, dst_file)) return false;
+            snprintf(cmd, MAX_CMD, "git add %s", dst_file);
+            system(cmd);
+            snprintf(cmd, MAX_CMD, "git rm %s", src_file);
+            system(cmd);
+        }
+    }
     return true;
 }
 
