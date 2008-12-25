@@ -4,6 +4,7 @@
 #include <string>
 #include <sstream>
 #include <assert.h>
+#include <set>
 #include "../../src/framework/Platform/CompilerDefs.h"
 
 #if PLATFORM == PLATFORM_WINDOWS
@@ -23,6 +24,7 @@
 #define MAX_PATH 2048
 #define MAX_BUF 2048
 #define MAX_CMD 2048
+#define MAX_HASH 256
 
 // config
 
@@ -50,6 +52,9 @@ char head_message[MAX_MSG];
 char path_prefix[MAX_PATH] = "";
 char buffer[MAX_BUF];
 char cmd[MAX_CMD];
+char origin_hash[MAX_HASH];
+
+std::set<std::string> sql_updates;
 
 FILE *cmd_pipe;
 
@@ -127,9 +132,8 @@ bool check_fwd()
     if( (cmd_pipe = popen( cmd, "r" )) == NULL )
         return false;
 
-    char hash[256];
     if(!fgets(buffer, MAX_BUF, cmd_pipe)) return false;
-    strncpy(hash, buffer, MAX_BUF);
+    strncpy(origin_hash, buffer, MAX_HASH);
     pclose(cmd_pipe);
 
     if( (cmd_pipe = popen( "git log --pretty=\"format:%H\"", "r" )) == NULL )
@@ -139,7 +143,7 @@ bool check_fwd()
     while(fgets(buffer, MAX_BUF, cmd_pipe))
     {
         buffer[strnlen(buffer, MAX_BUF) - 1] = '\0';
-        if(strncmp(hash, buffer, MAX_BUF) == 0)
+        if(strncmp(origin_hash, buffer, MAX_BUF) == 0)
         {
             found = true;
             break;
@@ -266,16 +270,41 @@ bool amend_commit()
 bool find_sql_updates()
 {
     printf("+ finding sql updates on HEAD\n");
-    snprintf(cmd, MAX_CMD, "git ls-tree HEAD %s%s/", path_prefix, sql_update_dir);
+    // add all updates from HEAD
+    snprintf(cmd, MAX_CMD, "git show HEAD:%s", sql_update_dir);
     if( (cmd_pipe = popen( cmd, "r" )) == NULL )
         return false;
 
-    int dummy;
-    char hash[256], filename[MAX_PATH];
+    // skip first two lines
+    if(!fgets(buffer, MAX_BUF, cmd_pipe)) { pclose(cmd_pipe); return false; }
+    if(!fgets(buffer, MAX_BUF, cmd_pipe)) { pclose(cmd_pipe); return false; }
+
+    int nr;
+    char db_table[MAX_BUF];
 
     while(fgets(buffer, MAX_BUF, cmd_pipe))
     {
-        sscanf(buffer, "%d tree %s %s", &dummy, hash, filename);
+        buffer[strnlen(buffer, MAX_BUF) - 1] = '\0';
+        if(sscanf(buffer, "%d_%s.sql", &nr, db_table) == 2)
+            sql_updates.insert(buffer);
+    }
+
+    pclose(cmd_pipe);
+
+    // remove updates from the last commit also found on origin
+    snprintf(cmd, MAX_CMD, "git show %s:%s", origin_hash, sql_update_dir);
+    if( (cmd_pipe = popen( cmd, "r" )) == NULL )
+        return false;
+
+    // skip first two lines
+    if(!fgets(buffer, MAX_BUF, cmd_pipe)) { pclose(cmd_pipe); return false; }
+    if(!fgets(buffer, MAX_BUF, cmd_pipe)) { pclose(cmd_pipe); return false; }
+
+    while(fgets(buffer, MAX_BUF, cmd_pipe))
+    {
+        buffer[strnlen(buffer, MAX_BUF) - 1] = '\0';
+        if(sscanf(buffer, "%d_%s.sql", &nr, db_table) == 2)
+            sql_updates.erase(buffer);
     }
 
     pclose(cmd_pipe);
@@ -322,10 +351,8 @@ int main(int argc, char *argv[])
     {
         DO( find_origin()   );
         if(do_fetch)
-        {
             DO( fetch_origin()  );
-            DO( check_fwd()     );
-        }
+        DO( check_fwd()     );
     }
     DO( find_rev()      );
     DO( find_head_msg() );
