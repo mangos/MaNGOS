@@ -228,7 +228,7 @@ World::AddSession_ (WorldSession* s)
 
     uint32 Sessions = GetActiveAndQueuedSessionCount ();
     uint32 pLimit = GetPlayerAmountLimit ();
-    uint32 QueueSize = GetQueueSize (); //number of players in the queue
+    uint32 QueueSize = GetQueueSize ();                     //number of players in the queue
 
     //so we don't count the user trying to
     //login as a session and queue the socket that we are using
@@ -245,10 +245,10 @@ World::AddSession_ (WorldSession* s)
 
     WorldPacket packet(SMSG_AUTH_RESPONSE, 1 + 4 + 1 + 4 + 1);
     packet << uint8 (AUTH_OK);
-    packet << uint32 (0); // unknown random value...
-    packet << uint8 (0);
-    packet << uint32 (0);
-    packet << uint8 (s->Expansion()); // 0 - normal, 1 - TBC, must be set in database manually for each account
+    packet << uint32 (0);                                   // BillingTimeRemaining
+    packet << uint8 (0);                                    // BillingPlanFlags
+    packet << uint32 (0);                                   // BillingTimeRested
+    packet << uint8 (s->Expansion());                       // 0 - normal, 1 - TBC, must be set in database manually for each account
     s->SendPacket (&packet);
 
     UpdateMaxSessionCounters ();
@@ -256,7 +256,7 @@ World::AddSession_ (WorldSession* s)
     // Updates the population
     if (pLimit > 0)
     {
-        float popu = GetActiveSessionCount (); //updated number of users on the server
+        float popu = GetActiveSessionCount ();              //updated number of users on the server
         popu /= pLimit;
         popu *= 2;
         loginDatabase.PExecute ("UPDATE realmlist SET population = '%f' WHERE id = '%d'", popu, realmID);
@@ -283,10 +283,10 @@ void World::AddQueuedPlayer(WorldSession* sess)
     // The 1st SMSG_AUTH_RESPONSE needs to contain other info too.
     WorldPacket packet (SMSG_AUTH_RESPONSE, 1 + 4 + 1 + 4 + 1);
     packet << uint8 (AUTH_WAIT_QUEUE);
-    packet << uint32 (0); // unknown random value...
-    packet << uint8 (0);
-    packet << uint32 (0);
-    packet << uint8 (sess->Expansion()); // 0 - normal, 1 - TBC, must be set in database manually for each account
+    packet << uint32 (0);                                   // BillingTimeRemaining
+    packet << uint8 (0);                                    // BillingPlanFlags
+    packet << uint32 (0);                                   // BillingTimeRested
+    packet << uint8 (sess->Expansion());                    // 0 - normal, 1 - TBC, must be set in database manually for each account
     packet << uint32(GetQueuePos (sess));
     sess->SendPacket (&packet);
 
@@ -428,24 +428,30 @@ void World::LoadConfigSettings(bool reload)
     rate_values[RATE_HEALTH]      = sConfig.GetFloatDefault("Rate.Health", 1);
     if(rate_values[RATE_HEALTH] < 0)
     {
-        sLog.outError("Rate.Health (%f) mustbe > 0. Using 1 instead.",rate_values[RATE_HEALTH]);
+        sLog.outError("Rate.Health (%f) must be > 0. Using 1 instead.",rate_values[RATE_HEALTH]);
         rate_values[RATE_HEALTH] = 1;
     }
     rate_values[RATE_POWER_MANA]  = sConfig.GetFloatDefault("Rate.Mana", 1);
     if(rate_values[RATE_POWER_MANA] < 0)
     {
-        sLog.outError("Rate.Mana (%f) mustbe > 0. Using 1 instead.",rate_values[RATE_POWER_MANA]);
+        sLog.outError("Rate.Mana (%f) must be > 0. Using 1 instead.",rate_values[RATE_POWER_MANA]);
         rate_values[RATE_POWER_MANA] = 1;
     }
     rate_values[RATE_POWER_RAGE_INCOME] = sConfig.GetFloatDefault("Rate.Rage.Income", 1);
     rate_values[RATE_POWER_RAGE_LOSS]   = sConfig.GetFloatDefault("Rate.Rage.Loss", 1);
     if(rate_values[RATE_POWER_RAGE_LOSS] < 0)
     {
-        sLog.outError("Rate.Rage.Loss (%f) mustbe > 0. Using 1 instead.",rate_values[RATE_POWER_RAGE_LOSS]);
+        sLog.outError("Rate.Rage.Loss (%f) must be > 0. Using 1 instead.",rate_values[RATE_POWER_RAGE_LOSS]);
         rate_values[RATE_POWER_RAGE_LOSS] = 1;
     }
+    rate_values[RATE_POWER_RUNICPOWER_INCOME] = sConfig.GetFloatDefault("Rate.RunicPower.Income", 1);
+    rate_values[RATE_POWER_RUNICPOWER_LOSS]   = sConfig.GetFloatDefault("Rate.RunicPower.Loss", 1);
+    if(rate_values[RATE_POWER_RUNICPOWER_LOSS] < 0)
+    {
+        sLog.outError("Rate.RunicPower.Loss (%f) must be > 0. Using 1 instead.",rate_values[RATE_POWER_RUNICPOWER_LOSS]);
+        rate_values[RATE_POWER_RUNICPOWER_LOSS] = 1;
+    }
     rate_values[RATE_POWER_FOCUS] = sConfig.GetFloatDefault("Rate.Focus", 1.0f);
-    rate_values[RATE_LOYALTY]     = sConfig.GetFloatDefault("Rate.Loyalty", 1.0f);
     rate_values[RATE_SKILL_DISCOVERY] = sConfig.GetFloatDefault("Rate.Skill.Discovery", 1.0f);
     rate_values[RATE_DROP_ITEM_POOR]       = sConfig.GetFloatDefault("Rate.Drop.Item.Poor", 1.0f);
     rate_values[RATE_DROP_ITEM_NORMAL]     = sConfig.GetFloatDefault("Rate.Drop.Item.Normal", 1.0f);
@@ -647,6 +653,15 @@ void World::LoadConfigSettings(bool reload)
         m_configs[CONFIG_CHARACTERS_PER_ACCOUNT] = m_configs[CONFIG_CHARACTERS_PER_REALM];
     }
 
+    m_configs[CONFIG_HEROIC_CHARACTERS_PER_REALM] = sConfig.GetIntDefault("HeroicCharactersPerRealm", 1);
+    if(m_configs[CONFIG_HEROIC_CHARACTERS_PER_REALM] < 0 || m_configs[CONFIG_HEROIC_CHARACTERS_PER_REALM] > 10)
+    {
+        sLog.outError("HeroicCharactersPerRealm (%i) must be in range 0..10. Set to 1.",m_configs[CONFIG_HEROIC_CHARACTERS_PER_REALM]);
+        m_configs[CONFIG_HEROIC_CHARACTERS_PER_REALM] = 1;
+    }
+
+    m_configs[CONFIG_MIN_LEVEL_FOR_HEROIC_CHARACTER_CREATING] = sConfig.GetIntDefault("MinLevelForHeroicCharacterCreating", 55);
+
     m_configs[CONFIG_SKIP_CINEMATICS] = sConfig.GetIntDefault("SkipCinematics", 0);
     if(m_configs[CONFIG_SKIP_CINEMATICS] < 0 || m_configs[CONFIG_SKIP_CINEMATICS] > 2)
     {
@@ -679,6 +694,20 @@ void World::LoadConfigSettings(bool reload)
     {
         sLog.outError("StartPlayerLevel (%i) must be in range 1..MaxPlayerLevel(%u). Set to %u.",m_configs[CONFIG_START_PLAYER_LEVEL],m_configs[CONFIG_MAX_PLAYER_LEVEL],m_configs[CONFIG_MAX_PLAYER_LEVEL]);
         m_configs[CONFIG_START_PLAYER_LEVEL] = m_configs[CONFIG_MAX_PLAYER_LEVEL];
+    }
+
+    m_configs[CONFIG_START_HEROIC_PLAYER_LEVEL] = sConfig.GetIntDefault("StartHeroicPlayerLevel", 55);
+    if(m_configs[CONFIG_START_HEROIC_PLAYER_LEVEL] < 1)
+    {
+        sLog.outError("StartHeroicPlayerLevel (%i) must be in range 1..MaxPlayerLevel(%u). Set to 55.",
+            m_configs[CONFIG_START_HEROIC_PLAYER_LEVEL],m_configs[CONFIG_MAX_PLAYER_LEVEL]);
+        m_configs[CONFIG_START_HEROIC_PLAYER_LEVEL] = 55;
+    }
+    else if(m_configs[CONFIG_START_HEROIC_PLAYER_LEVEL] > m_configs[CONFIG_MAX_PLAYER_LEVEL])
+    {
+        sLog.outError("StartHeroicPlayerLevel (%i) must be in range 1..MaxPlayerLevel(%u). Set to %u.",
+            m_configs[CONFIG_START_HEROIC_PLAYER_LEVEL],m_configs[CONFIG_MAX_PLAYER_LEVEL],m_configs[CONFIG_MAX_PLAYER_LEVEL]);
+        m_configs[CONFIG_START_HEROIC_PLAYER_LEVEL] = m_configs[CONFIG_MAX_PLAYER_LEVEL];
     }
 
     m_configs[CONFIG_START_PLAYER_MONEY] = sConfig.GetIntDefault("StartPlayerMoney", 0);
@@ -742,8 +771,9 @@ void World::LoadConfigSettings(bool reload)
     m_configs[CONFIG_INSTANCE_IGNORE_RAID]  = sConfig.GetBoolDefault("Instance.IgnoreRaid", false);
 
     m_configs[CONFIG_BATTLEGROUND_CAST_DESERTER]              = sConfig.GetBoolDefault("Battleground.CastDeserter", true);
-    m_configs[CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_ENABLE]     = sConfig.GetBoolDefault("Battleground.QueueAnnouncer.Enable", true);
+    m_configs[CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_ENABLE]     = sConfig.GetBoolDefault("Battleground.QueueAnnouncer.Enable", false);
     m_configs[CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_PLAYERONLY] = sConfig.GetBoolDefault("Battleground.QueueAnnouncer.PlayerOnly", false);
+    m_configs[CONFIG_ARENA_QUEUE_ANNOUNCER_ENABLE]            = sConfig.GetBoolDefault("Arena.QueueAnnouncer.Enable", false);
 
     m_configs[CONFIG_CAST_UNSTUCK] = sConfig.GetBoolDefault("CastUnstuck", true);
     m_configs[CONFIG_INSTANCE_RESET_TIME_HOUR]  = sConfig.GetIntDefault("Instance.ResetTimeHour", 4);
@@ -753,17 +783,17 @@ void World::LoadConfigSettings(bool reload)
     m_configs[CONFIG_MIN_PETITION_SIGNS] = sConfig.GetIntDefault("MinPetitionSigns", 9);
     if(m_configs[CONFIG_MIN_PETITION_SIGNS] > 9)
     {
-        sLog.outError("MinPetitionSigns (%i) must be in range 0..9. Set to 9.",m_configs[CONFIG_MIN_PETITION_SIGNS]);
+        sLog.outError("MinPetitionSigns (%i) must be in range 0..9. Set to 9.", m_configs[CONFIG_MIN_PETITION_SIGNS]);
         m_configs[CONFIG_MIN_PETITION_SIGNS] = 9;
     }
 
-    m_configs[CONFIG_GM_LOGIN_STATE]       = sConfig.GetIntDefault("GM.LoginState",2);
-    m_configs[CONFIG_GM_ACCEPT_TICKETS]    = sConfig.GetIntDefault("GM.AcceptTickets",2);
-    m_configs[CONFIG_GM_CHAT]              = sConfig.GetIntDefault("GM.Chat",2);
-    m_configs[CONFIG_GM_WISPERING_TO]      = sConfig.GetIntDefault("GM.WhisperingTo",2);
+    m_configs[CONFIG_GM_LOGIN_STATE]       = sConfig.GetIntDefault("GM.LoginState", 2);
+    m_configs[CONFIG_GM_ACCEPT_TICKETS]    = sConfig.GetIntDefault("GM.AcceptTickets", 2);
+    m_configs[CONFIG_GM_CHAT]              = sConfig.GetIntDefault("GM.Chat", 2);
+    m_configs[CONFIG_GM_WISPERING_TO]      = sConfig.GetIntDefault("GM.WhisperingTo", 2);
 
-    m_configs[CONFIG_GM_IN_GM_LIST]        = sConfig.GetBoolDefault("GM.InGMList",false);
-    m_configs[CONFIG_GM_IN_WHO_LIST]       = sConfig.GetBoolDefault("GM.InWhoList",false);
+    m_configs[CONFIG_GM_IN_GM_LIST]        = sConfig.GetBoolDefault("GM.InGMList", false);
+    m_configs[CONFIG_GM_IN_WHO_LIST]       = sConfig.GetBoolDefault("GM.InWhoList", false);
     m_configs[CONFIG_GM_LOG_TRADE]         = sConfig.GetBoolDefault("GM.LogTrade", false);
 
     m_configs[CONFIG_START_GM_LEVEL] = sConfig.GetIntDefault("GM.StartLevel", 1);
@@ -804,6 +834,7 @@ void World::LoadConfigSettings(bool reload)
     m_configs[CONFIG_SKILL_CHANCE_SKINNING_STEPS]   = sConfig.GetIntDefault("SkillChance.SkinningSteps",75);
 
     m_configs[CONFIG_SKILL_PROSPECTING] = sConfig.GetBoolDefault("SkillChance.Prospecting",false);
+    m_configs[CONFIG_SKILL_MILLING] = sConfig.GetBoolDefault("SkillChance.Milling",false);
 
     m_configs[CONFIG_SKILL_GAIN_CRAFTING]  = sConfig.GetIntDefault("SkillGain.Crafting", 1);
     if(m_configs[CONFIG_SKILL_GAIN_CRAFTING] < 0)
@@ -1048,12 +1079,18 @@ void World::SetInitialWorldSettings()
     sLog.outString( "Loading InstanceTemplate" );
     objmgr.LoadInstanceTemplate();
 
+    sLog.outString( "Loading AchievementCriteriaList..." );
+    objmgr.LoadAchievementCriteriaList();
+
+    sLog.outString( "Loading completed achievements..." );
+    objmgr.LoadCompletedAchievements();
+
     sLog.outString( "Loading SkillLineAbilityMultiMap Data..." );
     spellmgr.LoadSkillLineAbilityMap();
 
     ///- Clean up and pack instances
     sLog.outString( "Cleaning up instances..." );
-    sInstanceSaveManager.CleanupInstances();                              // must be called before `creature_respawn`/`gameobject_respawn` tables
+    sInstanceSaveManager.CleanupInstances();                // must be called before `creature_respawn`/`gameobject_respawn` tables
 
     sLog.outString( "Packing instances..." );
     sInstanceSaveManager.PackInstances();
@@ -1172,6 +1209,9 @@ void World::SetInitialWorldSettings()
 
     sLog.outString( "Loading spell pet auras..." );
     spellmgr.LoadSpellPetAuras();
+
+    sLog.outString( "Loading pet levelup spells..." );
+    spellmgr.LoadPetLevelupSpellMap();
 
     sLog.outString( "Loading player Create Info & Level Stats..." );
     objmgr.LoadPlayerInfo();
@@ -1626,6 +1666,9 @@ void World::ScriptsProcess()
                 case HIGHGUID_PET:
                     source = HashMapHolder<Pet>::Find(step.sourceGUID);
                     break;
+                case HIGHGUID_VEHICLE:
+                    source = HashMapHolder<Vehicle>::Find(step.sourceGUID);
+                    break;
                 case HIGHGUID_PLAYER:
                     source = HashMapHolder<Player>::Find(step.sourceGUID);
                     break;
@@ -1654,6 +1697,9 @@ void World::ScriptsProcess()
                     break;
                 case HIGHGUID_PET:
                     target = HashMapHolder<Pet>::Find(step.targetGUID);
+                    break;
+                case HIGHGUID_VEHICLE:
+                    target = HashMapHolder<Vehicle>::Find(step.targetGUID);
                     break;
                 case HIGHGUID_PLAYER:                       // empty GUID case also
                     target = HashMapHolder<Player>::Find(step.targetGUID);

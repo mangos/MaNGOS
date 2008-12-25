@@ -73,12 +73,12 @@ namespace VMAP
         addWorldAreaMapId(0);                               //Azeroth
         addWorldAreaMapId(1);                               //Kalimdor
         addWorldAreaMapId(530);                             //Expansion01
+        addWorldAreaMapId(571);                             //Expansion02
     }
     //=================================================================
 
     std::string getModNameFromModPosName(const std::string& pModPosName)
     {
-
         size_t spos = pModPosName.find_first_of('#');
         std::string modelFileName = pModPosName.substr(0,spos);
         return(modelFileName);
@@ -140,7 +140,6 @@ namespace VMAP
     //=================================================================
     bool TileAssembler::convertWorld()
     {
-
         #ifdef _ASSEMBLER_DEBUG
         #   ifdef _DEBUG
         ::g_df = fopen("../TileAssembler_debug.txt", "wb");

@@ -29,6 +29,7 @@ class MailItemsInfo;
 struct ItemPrototype;
 struct AuctionEntry;
 struct DeclinedName;
+struct MovementInfo;
 
 class Creature;
 class Item;
@@ -43,6 +44,16 @@ class LoginQueryHolder;
 class CharacterHandler;
 
 #define CHECK_PACKET_SIZE(P,S) if((P).size() < (S)) return SizeError((P),(S));
+
+#define NUM_ACCOUNT_DATA_TYPES 8
+
+struct AccountData
+{
+    AccountData() : Time(NULL), Data("") {}
+
+    time_t Time;
+    std::string Data;
+};
 
 enum PartyOperation
 {
@@ -77,6 +88,8 @@ class MANGOS_DLL_SPEC WorldSession
         bool PlayerLogout() const { return m_playerLogout; }
 
         void SizeError(WorldPacket const& packet, uint32 size) const;
+
+        void ReadMovementInfo(WorldPacket &data, MovementInfo *mi);
 
         void SendPacket(WorldPacket const* packet);
         void SendNotification(const char *format,...) ATTR_PRINTF(2,3);
@@ -149,6 +162,11 @@ class MANGOS_DLL_SPEC WorldSession
 
         //pet
         void SendPetNameQuery(uint64 guid, uint32 petnumber);
+
+        // Account Data
+        AccountData *GetAccountData(uint32 type) { return &m_accountData[type]; }
+        void SetAccountData(uint32 type, time_t time_, std::string data);
+        void LoadAccountData();
 
         //mail
                                                             //used with item_page table
@@ -320,6 +338,8 @@ class MANGOS_DLL_SPEC WorldSession
 
         void HandleMovementOpcodes(WorldPacket& recvPacket);
         void HandleSetActiveMoverOpcode(WorldPacket &recv_data);
+        void HandleMoveNotActiveMover(WorldPacket &recv_data);
+        void HandleDismissControlledVehicle(WorldPacket &recv_data);
         void HandleMoveTimeSkippedOpcode(WorldPacket &recv_data);
 
         void HandleRequestRaidInfoOpcode( WorldPacket & recv_data );
@@ -380,7 +400,7 @@ class MANGOS_DLL_SPEC WorldSession
         void HandleGuildSaveEmblemOpcode(WorldPacket& recvPacket);
 
         void HandleTaxiNodeStatusQueryOpcode(WorldPacket& recvPacket);
-        void HandleTaxiQueryAvailableNodesOpcode(WorldPacket& recvPacket);
+        void HandleTaxiQueryAvailableNodes(WorldPacket& recvPacket);
         void HandleActivateTaxiOpcode(WorldPacket& recvPacket);
         void HandleActivateTaxiFarOpcode(WorldPacket& recvPacket);
         void HandleTaxiNextDestinationOpcode(WorldPacket& recvPacket);
@@ -424,6 +444,7 @@ class MANGOS_DLL_SPEC WorldSession
         void HandleAuctionRemoveItem( WorldPacket & recv_data );
         void HandleAuctionListOwnerItems( WorldPacket & recv_data );
         void HandleAuctionPlaceBid( WorldPacket & recv_data );
+        void HandleAuctionListPendingSales( WorldPacket & recv_data );
 
         void HandleGetMail( WorldPacket & recv_data );
         void HandleSendMail( WorldPacket & recv_data );
@@ -538,6 +559,7 @@ class MANGOS_DLL_SPEC WorldSession
         void HandlePetUnlearnOpcode( WorldPacket& recvPacket );
         void HandlePetSpellAutocastOpcode( WorldPacket& recvPacket );
         void HandlePetCastSpellOpcode( WorldPacket& recvPacket );
+        void HandlePetLearnTalent( WorldPacket& recvPacket );
 
         void HandleSetActionBar(WorldPacket& recv_data);
 
@@ -574,10 +596,9 @@ class MANGOS_DLL_SPEC WorldSession
         void HandleLfmSetNoneOpcode(WorldPacket& recv_data);
         void HandleLfmSetOpcode(WorldPacket& recv_data);
         void HandleLfgSetCommentOpcode(WorldPacket& recv_data);
-        void HandleNewUnknownOpcode(WorldPacket& recv_data);
         void HandleChooseTitleOpcode(WorldPacket& recv_data);
         void HandleRealmStateRequestOpcode(WorldPacket& recv_data);
-        void HandleAllowMoveAckOpcode(WorldPacket& recv_data);
+        void HandleTimeSyncResp(WorldPacket& recv_data);
         void HandleWhoisOpcode(WorldPacket& recv_data);
         void HandleResetInstancesOpcode(WorldPacket& recv_data);
 
@@ -623,6 +644,29 @@ class MANGOS_DLL_SPEC WorldSession
         void HandleGuildBankBuyTab(WorldPacket& recv_data);
         void HandleGuildBankTabText(WorldPacket& recv_data);
         void HandleGuildBankSetTabText(WorldPacket& recv_data);
+
+        // Calendar
+        void HandleCalendarGetCalendar(WorldPacket& recv_data);
+        void HandleCalendarGetEvent(WorldPacket& recv_data);
+        void HandleCalendarGuildFilter(WorldPacket& recv_data);
+        void HandleCalendarArenaTeam(WorldPacket& recv_data);
+        void HandleCalendarAddEvent(WorldPacket& recv_data);
+        void HandleCalendarUpdateEvent(WorldPacket& recv_data);
+        void HandleCalendarRemoveEvent(WorldPacket& recv_data);
+        void HandleCalendarCopyEvent(WorldPacket& recv_data);
+        void HandleCalendarEventInvite(WorldPacket& recv_data);
+        void HandleCalendarEventRsvp(WorldPacket& recv_data);
+        void HandleCalendarEventRemoveInvite(WorldPacket& recv_data);
+        void HandleCalendarEventStatus(WorldPacket& recv_data);
+        void HandleCalendarEventModeratorStatus(WorldPacket& recv_data);
+        void HandleCalendarComplain(WorldPacket& recv_data);
+        void HandleCalendarGetNumPending(WorldPacket& recv_data);
+
+        void HandleSpellClick(WorldPacket& recv_data);
+        void HandleAlterAppearance(WorldPacket& recv_data);
+        void HandleRemoveGlyph(WorldPacket& recv_data);
+        void HandleCharCustomize(WorldPacket& recv_data);
+        void HandleInspectAchievements(WorldPacket& recv_data);
     private:
         // private trade methods
         void moveItems(Item* myItems[], Item* hisItems[]);
@@ -646,6 +690,7 @@ class MANGOS_DLL_SPEC WorldSession
         LocaleConstant m_sessionDbcLocale;
         int m_sessionDbLocaleIndex;
         uint32 m_latency;
+        AccountData m_accountData[NUM_ACCOUNT_DATA_TYPES];
 
         ZThread::LockedQueue<WorldPacket*,ZThread::FastMutex> _recvQueue;
 };

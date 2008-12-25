@@ -31,7 +31,7 @@ class SqlQueryHolder;
 typedef UNORDERED_MAP<ZThread::ThreadImpl*, SqlTransaction*> TransactionQueues;
 typedef UNORDERED_MAP<ZThread::ThreadImpl*, SqlResultQueue*> QueryQueues;
 
-#define MAX_QUERY_LEN   1024
+#define MAX_QUERY_LEN   32*1024
 
 class MANGOS_DLL_SPEC Database
 {

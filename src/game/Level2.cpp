@@ -949,7 +949,7 @@ bool ChatHandler::HandleNpcDeleteCommand(const char* args)
     else
         unit = getSelectedCreature();
 
-    if(!unit || unit->isPet() || unit->isTotem())
+    if(!unit || unit->isPet() || unit->isTotem() || unit->isVehicle())
     {
         SendSysMessage(LANG_SELECT_CREATURE);
         SetSentErrorMessage(true);
@@ -1062,8 +1062,8 @@ bool ChatHandler::HandleTurnObjectCommand(const char* args)
     obj->Relocate(obj->GetPositionX(), obj->GetPositionY(), obj->GetPositionZ(), o);
 
     obj->SetFloatValue(GAMEOBJECT_FACING, o);
-    obj->SetFloatValue(GAMEOBJECT_ROTATION+2, rot2);
-    obj->SetFloatValue(GAMEOBJECT_ROTATION+3, rot3);
+    obj->SetFloatValue(GAMEOBJECT_PARENTROTATION+2, rot2);
+    obj->SetFloatValue(GAMEOBJECT_PARENTROTATION+3, rot3);
 
     map->Add(obj);
 
@@ -3356,6 +3356,59 @@ bool ChatHandler::HandleRenameCommand(const char* args)
     return true;
 }
 
+// customize characters
+bool ChatHandler::HandleCustomizeCommand(const char* args)
+{
+    Player* target = NULL;
+    uint64 targetGUID = 0;
+    std::string oldname;
+
+    char* px = strtok((char*)args, " ");
+
+    if(px)
+    {
+        oldname = px;
+
+        if(!normalizePlayerName(oldname))
+        {
+            SendSysMessage(LANG_PLAYER_NOT_FOUND);
+            SetSentErrorMessage(true);
+            return false;
+        }
+
+        target = objmgr.GetPlayer(oldname.c_str());
+
+        if (!target)
+            targetGUID = objmgr.GetPlayerGUIDByName(oldname);
+    }
+
+    if(!target && !targetGUID)
+    {
+        target = getSelectedPlayer();
+    }
+
+    if(!target && !targetGUID)
+    {
+        SendSysMessage(LANG_PLAYER_NOT_FOUND);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    if(target)
+    {
+        PSendSysMessage(LANG_CUSTOMIZE_PLAYER, target->GetName());
+        target->SetAtLoginFlag(AT_LOGIN_CUSTOMIZE);
+        CharacterDatabase.PExecute("UPDATE characters SET at_login = at_login | '8' WHERE guid = '%u'", target->GetGUIDLow());
+    }
+    else
+    {
+        PSendSysMessage(LANG_CUSTOMIZE_PLAYER_GUID, oldname.c_str(), GUID_LOPART(targetGUID));
+        CharacterDatabase.PExecute("UPDATE characters SET at_login = at_login | '8' WHERE guid = '%u'", GUID_LOPART(targetGUID));
+    }
+
+    return true;
+}
+
 //spawn go
 bool ChatHandler::HandleGameObjectCommand(const char* args)
 {
@@ -4109,17 +4162,20 @@ bool ChatHandler::HandleNpcTameCommand(const char* /*args*/)
     player->GetClosePoint (x,y,z,creatureTarget->GetObjectSize (),CONTACT_DISTANCE);
     pet->Relocate (x,y,z,M_PI-player->GetOrientation ());
 
-    // set pet to defensive mode by default (some classes can't control contolled pets in fact).
+    // set pet to defensive mode by default (some classes can't control controlled pets in fact).
     pet->GetCharmInfo()->SetReactState(REACT_DEFENSIVE);
 
+    // calculate proper level
+    uint32 level = (creatureTarget->getLevel() < (player->getLevel() - 5)) ? (player->getLevel() - 5) : creatureTarget->getLevel();
+
     // prepare visual effect for levelup
-    pet->SetUInt32Value(UNIT_FIELD_LEVEL,creatureTarget->getLevel()-1);
+    pet->SetUInt32Value(UNIT_FIELD_LEVEL, level - 1);
 
     // add to world
     pet->GetMap()->Add((Creature*)pet);
 
     // visual effect for levelup
-    pet->SetUInt32Value(UNIT_FIELD_LEVEL,creatureTarget->getLevel());
+    pet->SetUInt32Value(UNIT_FIELD_LEVEL, level);
 
     // caster have pet now
     player->SetPet(pet);
