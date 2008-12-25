@@ -25,10 +25,12 @@
 #define MAX_BUF 2048
 #define MAX_CMD 2048
 #define MAX_HASH 256
+#define MAX_DB 256
 
 // config
 
 #define NUM_REMOTES 2
+#define NUM_DATABASES 3
 
 char remotes[NUM_REMOTES][MAX_REMOTE] = {
     "git@github.com:mangos/mangos.git",
@@ -39,6 +41,18 @@ char remote_branch[MAX_REMOTE] = "master";
 char rev_file[MAX_PATH] = "src/shared/revision_nr.h";
 char sql_update_dir[MAX_PATH] = "sql/updates";
 
+char databases[NUM_DATABASES][MAX_DB] = {
+    "characters",
+    "mangos",
+    "realmd"
+};
+
+char db_version_table[NUM_DATABASES][MAX_DB] = {
+    "character_db_version",
+    "db_version",
+    "realmd_db_version",
+};
+
 bool allow_replace = false;
 bool local = false;
 bool do_fetch = false;
@@ -48,12 +62,14 @@ bool do_sql = false;
 
 char origins[NUM_REMOTES][MAX_REMOTE];
 int rev;
+int last_sql_rev[NUM_DATABASES] = {0,0,0};
 
 char head_message[MAX_MSG];
 char path_prefix[MAX_PATH] = "";
 char buffer[MAX_BUF];
 char cmd[MAX_CMD];
 char origin_hash[MAX_HASH];
+char last_sql_update[NUM_DATABASES][MAX_PATH];
 
 std::set<std::string> new_sql_updates;
 
@@ -280,14 +296,39 @@ bool find_sql_updates()
     if(!fgets(buffer, MAX_BUF, cmd_pipe)) { pclose(cmd_pipe); return false; }
     if(!fgets(buffer, MAX_BUF, cmd_pipe)) { pclose(cmd_pipe); return false; }
 
-    int nr;
-    char db_table[MAX_BUF];
+    int nr, cur_rev, i;
+    char db[MAX_BUF], table[MAX_BUF];
 
     while(fgets(buffer, MAX_BUF, cmd_pipe))
     {
         buffer[strnlen(buffer, MAX_BUF) - 1] = '\0';
-        if(sscanf(buffer, "%d_%s.sql", &nr, db_table) == 2)
-            new_sql_updates.insert(buffer);
+        if(sscanf(buffer, "%d_%d_%[^_]_%[^.].sql", &cur_rev, &nr, db, table) == 4 ||
+            sscanf(buffer, "%d_%d_%[^.].sql", &cur_rev, &nr, db) == 3)
+        {
+            // find the update with the highest rev for each database
+            // (will be the required version for the new update)
+            // new updates should not have a rev number already
+            for(i = 0; i < NUM_DATABASES; i++)
+                if(cur_rev > last_sql_rev[i] &&
+                    strncmp(db, databases[i], MAX_DB) == 0)
+                    break;
+
+            if(i < NUM_DATABASES)
+            {
+                last_sql_rev[i] = cur_rev;
+                strncpy(last_sql_update[i], buffer, MAX_PATH);
+            }
+        }
+        else if(sscanf(buffer, "%d_%[^_]_%[^.].sql", &nr, db, table) == 3 ||
+            sscanf(buffer, "%d_%[^.].sql", &nr, db) == 2)
+        {
+            for(i = 0; i < NUM_DATABASES; i++)
+                if(strncmp(db, databases[i], MAX_DB) == 0) break;
+            if(i == NUM_DATABASES)
+                printf("WARNING: incorrect database name for sql update %s\n", buffer);
+            else
+                new_sql_updates.insert(buffer);
+        } 
     }
 
     pclose(cmd_pipe);
@@ -304,7 +345,7 @@ bool find_sql_updates()
     while(fgets(buffer, MAX_BUF, cmd_pipe))
     {
         buffer[strnlen(buffer, MAX_BUF) - 1] = '\0';
-        if(sscanf(buffer, "%d_%s.sql", &nr, db_table) == 2)
+        if(sscanf(buffer, "%d_%[^.].sql", &nr, db) == 2)
             new_sql_updates.erase(buffer);
     }
 
@@ -321,12 +362,25 @@ bool find_sql_updates()
     return true;
 }
 
-bool copy_file(const char *src, const char *dst)
+bool convert_sql_update(const char *src_file, const char *dst_file, const char *dst_name)
 {
-    FILE * fin = fopen( src, "r" );
+    FILE * fin = fopen( src_file, "r" );
     if(!fin) return false;
-    FILE * fout = fopen( dst, "w" );
+    FILE * fout = fopen( dst_file, "w" );
     if(!fout) { fclose(fin); return false; }
+
+    int cur_rev, nr, i;
+    char db[MAX_PATH], table[MAX_PATH];
+    if(sscanf(dst_name, "%d_%d_%[^_]_%[^.].sql", &cur_rev, &nr, db, table) != 4 &&
+        sscanf(dst_name, "%d_%d_%[^.].sql", &cur_rev, &nr, db) != 3)
+        return false;
+
+    for(i = 0; i < NUM_DATABASES; i++)
+        if(strncmp(db, databases[i], MAX_DB) == 0) break;
+    if(i == NUM_DATABASES) return false;
+
+    fprintf(fout, "ALTER TABLE %s CHANGE COLUMN required_%s required_%s bit;\n\n",
+        db_version_table[i], last_sql_update[i], dst_name);
 
     char c;
     while( (c = getc(fin)) != EOF )
@@ -338,17 +392,19 @@ bool copy_file(const char *src, const char *dst)
     return true;
 }
 
-bool rename_sql_updates()
+bool convert_sql_updates()
 {
     if(new_sql_updates.empty()) return true;
 
-    printf("+ renaming sql updates\n");
+    printf("+ converting sql updates\n");
+
     for(std::set<std::string>::iterator itr = new_sql_updates.begin(); itr != new_sql_updates.end(); ++itr)
     {
-        char src_file[MAX_PATH], dst_file[MAX_PATH];
+        char src_file[MAX_PATH], dst_file[MAX_PATH], dst_name[MAX_PATH];
         snprintf(src_file, MAX_PATH, "%s%s/%s", path_prefix, sql_update_dir, itr->c_str());
-        snprintf(dst_file, MAX_PATH, "%s%s/%d_%s", path_prefix, sql_update_dir, rev, itr->c_str());
-        if(!copy_file(src_file, dst_file)) return false;
+        snprintf(dst_name, MAX_PATH, "%d_%s", rev, itr->c_str());
+        snprintf(dst_file, MAX_PATH, "%s%s/%s", path_prefix, sql_update_dir, dst_name);
+        if(!convert_sql_update(src_file, dst_file, dst_name)) return false;
         snprintf(cmd, MAX_CMD, "git add %s", dst_file);
         system(cmd);
         snprintf(cmd, MAX_CMD, "git rm %s", src_file);
@@ -494,7 +550,7 @@ int main(int argc, char *argv[])
     DO( write_rev()     );
     if(do_sql)
     {
-        DO( rename_sql_updates()    );
+        DO( convert_sql_updates()    );
         DO( generate_sql_makefile() );
     }
     DO( amend_commit()  );
