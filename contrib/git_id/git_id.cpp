@@ -35,8 +35,9 @@ char remotes[NUM_REMOTES][MAX_REMOTE] = {
     "git://github.com/mangos/mangos.git"        // used for fetch if present
 };
 
-char rev_file[] = "src/shared/revision_nr.h";
-char sql_update_dir[] = "sql/updates";
+char remote_branch[MAX_REMOTE] = "master";
+char rev_file[MAX_PATH] = "src/shared/revision_nr.h";
+char sql_update_dir[MAX_PATH] = "sql/updates";
 
 bool allow_replace = false;
 bool local = false;
@@ -120,7 +121,7 @@ bool fetch_origin()
 {
     printf("+ fetching origin\n");
     // use the public clone url if present because the private may require a password
-    snprintf(cmd, MAX_CMD, "git fetch %s master", origins[1][0] ? origins[1] : origins[0]);
+    snprintf(cmd, MAX_CMD, "git fetch %s %s", (origins[1][0] ? origins[1] : origins[0]), remote_branch);
     int ret = system(cmd);
     return true;
 }
@@ -128,7 +129,7 @@ bool fetch_origin()
 bool check_fwd()
 {
     printf("+ checking fast forward\n");
-    snprintf(cmd, MAX_CMD, "git log -n 1 --pretty=\"format:%%H\" %s/master", origins[1][0] ? origins[1] : origins[0]);
+    snprintf(cmd, MAX_CMD, "git log -n 1 --pretty=\"format:%%H\" %s/%s", (origins[1][0] ? origins[1] : origins[0]), remote_branch);
     if( (cmd_pipe = popen( cmd, "r" )) == NULL )
         return false;
 
@@ -173,7 +174,7 @@ bool find_rev()
         if(!local && !origins[i][0]) continue;
 
         if(local) snprintf(cmd, MAX_CMD, "git log HEAD --pretty=\"format:%%s\"");
-        else sprintf(cmd, "git log %s/master --pretty=\"format:%%s\"", origins[i]);
+        else sprintf(cmd, "git log %s/%s --pretty=\"format:%%s\"", origins[i], remote_branch);
         if( (cmd_pipe = popen( cmd, "r" )) == NULL )
             continue;
 
@@ -325,13 +326,15 @@ int main(int argc, char *argv[])
         if(argv[i] == NULL) continue;
         if(strncmp(argv[i], "-r", 2) == 0 || strncmp(argv[i], "--replace", 9) == 0)
             allow_replace = true;
-        if(strncmp(argv[i], "-l", 2) == 0 || strncmp(argv[i], "--local", 7) == 0)
+        else if(strncmp(argv[i], "-l", 2) == 0 || strncmp(argv[i], "--local", 7) == 0)
             local = true;
-        if(strncmp(argv[i], "-f", 2) == 0 || strncmp(argv[i], "--fetch", 7) == 0)
+        else if(strncmp(argv[i], "-f", 2) == 0 || strncmp(argv[i], "--fetch", 7) == 0)
             do_fetch = true;
-        if(strncmp(argv[i], "-s", 2) == 0 || strncmp(argv[i], "--sql", 5) == 0)
+        else if(strncmp(argv[i], "-s", 2) == 0 || strncmp(argv[i], "--sql", 5) == 0)
             do_sql = true;
-        if(strncmp(argv[i], "-h", 2) == 0 || strncmp(argv[i], "--help", 6) == 0)
+        else if(strncmp(argv[i], "--branch=", 9) == 0)
+            snprintf(remote_branch, MAX_REMOTE, "%s", argv[i] + 9);
+        else if(strncmp(argv[i], "-h", 2) == 0 || strncmp(argv[i], "--help", 6) == 0)
         {
             printf("Usage: git_id [OPTION]\n");
             printf("Generates a new rev number and updates revision_nr.h and the commit message.\n");
@@ -342,6 +345,7 @@ int main(int argc, char *argv[])
             printf("   -l, --local    search for the highest rev number on HEAD\n");
             printf("   -f, --fetch    fetch from origin before searching for the new rev\n");
             printf("   -s, --sql      ");
+            printf("       --branch=BRANCH");
             return 0;
         }
     }
