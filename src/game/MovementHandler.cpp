@@ -188,9 +188,6 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
         return;
     }
 
-    //get opcode
-    uint16 opcode = recv_data.GetOpcode();
-
     /* extract packet */
     MovementInfo movementInfo;
     ReadMovementInfo(recv_data, &movementInfo);
@@ -798,13 +795,9 @@ void WorldSession::HandleMoveKnockBackAck( WorldPacket & recv_data )
     sLog.outDebug("%s CMSG_MOVE_KNOCK_BACK_ACK additional: vspeed:%f, hspeed:%f, xdir:%f ydir:%f",GetPlayer()->GetName(), vspeed, hspeed, xdirection, ydirection);
     #endif
 
-    // skip not personal message;
-    if(GetPlayer()->GetGUID()!=guid)
-        return;
-
     _player->m_movementInfo = movementInfo;
-    _player->m_anti_last_hspeed = hspeed;
-    _player->m_anti_last_vspeed = vspeed < 3.2f ? vspeed - 1.0f : 3.2f;
+    _player->m_anti_last_hspeed = movementInfo.j_xyspeed;
+    _player->m_anti_last_vspeed = movementInfo.j_unk < 3.2f ? movementInfo.j_unk - 1.0f : 3.2f;
     _player->m_anti_lastspeed_changetime = movementInfo.time + 1750;
 }
 
