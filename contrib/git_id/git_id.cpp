@@ -55,7 +55,7 @@ char buffer[MAX_BUF];
 char cmd[MAX_CMD];
 char origin_hash[MAX_HASH];
 
-std::set<std::string> sql_updates;
+std::set<std::string> new_sql_updates;
 
 FILE *cmd_pipe;
 
@@ -287,7 +287,7 @@ bool find_sql_updates()
     {
         buffer[strnlen(buffer, MAX_BUF) - 1] = '\0';
         if(sscanf(buffer, "%d_%s.sql", &nr, db_table) == 2)
-            sql_updates.insert(buffer);
+            new_sql_updates.insert(buffer);
     }
 
     pclose(cmd_pipe);
@@ -305,14 +305,14 @@ bool find_sql_updates()
     {
         buffer[strnlen(buffer, MAX_BUF) - 1] = '\0';
         if(sscanf(buffer, "%d_%s.sql", &nr, db_table) == 2)
-            sql_updates.erase(buffer);
+            new_sql_updates.erase(buffer);
     }
 
     pclose(cmd_pipe);
 
-    if(!sql_updates.empty())
+    if(!new_sql_updates.empty())
     {
-        for(std::set<std::string>::iterator itr = sql_updates.begin(); itr != sql_updates.end(); ++itr)
+        for(std::set<std::string>::iterator itr = new_sql_updates.begin(); itr != new_sql_updates.end(); ++itr)
             printf("%s\n", itr->c_str());
     }
     else
@@ -340,21 +340,109 @@ bool copy_file(const char *src, const char *dst)
 
 bool rename_sql_updates()
 {
-    if(!sql_updates.empty())
+    if(new_sql_updates.empty()) return true;
+
+    printf("+ renaming sql updates\n");
+    for(std::set<std::string>::iterator itr = new_sql_updates.begin(); itr != new_sql_updates.end(); ++itr)
     {
-        printf("+ renaming sql updates\n");
-        for(std::set<std::string>::iterator itr = sql_updates.begin(); itr != sql_updates.end(); ++itr)
+        char src_file[MAX_PATH], dst_file[MAX_PATH];
+        snprintf(src_file, MAX_PATH, "%s%s/%s", path_prefix, sql_update_dir, itr->c_str());
+        snprintf(dst_file, MAX_PATH, "%s%s/%d_%s", path_prefix, sql_update_dir, rev, itr->c_str());
+        if(!copy_file(src_file, dst_file)) return false;
+        snprintf(cmd, MAX_CMD, "git add %s", dst_file);
+        system(cmd);
+        snprintf(cmd, MAX_CMD, "git rm %s", src_file);
+        system(cmd);
+    }
+
+    return true;
+}
+
+bool generate_sql_makefile()
+{
+    if(new_sql_updates.empty()) return true;
+
+    // find all files in the update dir
+    snprintf(cmd, MAX_CMD, "git show HEAD:%s", sql_update_dir);
+    if( (cmd_pipe = popen( cmd, "r" )) == NULL )
+        return false;
+
+    // skip first two lines
+    if(!fgets(buffer, MAX_BUF, cmd_pipe)) { pclose(cmd_pipe); return false; }
+    if(!fgets(buffer, MAX_BUF, cmd_pipe)) { pclose(cmd_pipe); return false; }
+
+    char newname[MAX_PATH];
+    std::set<std::string> file_list;
+
+    while(fgets(buffer, MAX_BUF, cmd_pipe))
+    {
+        buffer[strnlen(buffer, MAX_BUF) - 1] = '\0';
+        if(buffer[strnlen(buffer, MAX_BUF) - 1] != '/' &&
+            strncmp(buffer, "Makefile.am", MAX_BUF) != 0)
         {
-            char src_file[MAX_PATH], dst_file[MAX_PATH];
-            snprintf(src_file, MAX_PATH, "%ssql/updates/%s", path_prefix, itr->c_str());
-            snprintf(dst_file, MAX_PATH, "%ssql/updates/%d_%s", path_prefix, rev, itr->c_str());
-            if(!copy_file(src_file, dst_file)) return false;
-            snprintf(cmd, MAX_CMD, "git add %s", dst_file);
-            system(cmd);
-            snprintf(cmd, MAX_CMD, "git rm %s", src_file);
-            system(cmd);
+            if(new_sql_updates.find(buffer) != new_sql_updates.end())
+            {
+                snprintf(newname, MAX_PATH, "%d_%s", rev, buffer);
+                file_list.insert(newname);
+            }
+            else
+                file_list.insert(buffer);
         }
     }
+
+    pclose(cmd_pipe);
+
+    // write the makefile
+    char file_name[MAX_PATH];
+    snprintf(file_name, MAX_PATH, "%s%s/Makefile.am", path_prefix, sql_update_dir);
+    FILE *fout = fopen(file_name, "w");
+    if(!fout) { pclose(cmd_pipe); return false; }
+
+    fprintf(fout,
+        "# Copyright (C) 2005-2008 MaNGOS <http://getmangos.com/>\n"
+        "#\n"
+        "# This program is free software; you can redistribute it and/or modify\n"
+        "# it under the terms of the GNU General Public License as published by\n"
+        "# the Free Software Foundation; either version 2 of the License, or\n"
+        "# (at your option) any later version.\n"
+        "#\n"
+        "# This program is distributed in the hope that it will be useful,\n"
+        "# but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+        "# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+        "# GNU General Public License for more details.\n"
+        "#\n"
+        "# You should have received a copy of the GNU General Public License\n"
+        "# along with this program; if not, write to the Free Software\n"
+        "# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA\n"
+        "\n"
+        "## Process this file with automake to produce Makefile.in\n"
+        "\n"
+        "## Sub-directories to parse\n"
+        "\n"
+        "## Change installation location\n"
+        "#  datadir = mangos/%s\n"
+        "pkgdatadir = $(datadir)/mangos/%s\n"
+        "\n"
+        "## Files to be installed\n"
+        "#  Install basic SQL files to datadir\n"
+        "pkgdata_DATA = \\\n",
+        sql_update_dir, sql_update_dir
+    );
+
+    for(std::set<std::string>::iterator itr = file_list.begin(); itr != file_list.end(); ++itr)
+        fprintf(fout, "\t%s \\\n", itr->c_str());
+
+    fprintf(fout, 
+        "\n## Additional files to include when running 'make dist'\n"
+        "#  SQL update files, to upgrade database schema from older revisions\n"
+        "EXTRA_DIST = \\\n"
+    );
+
+    for(std::set<std::string>::iterator itr = file_list.begin(); itr != file_list.end(); ++itr)
+        fprintf(fout, "\t%s \\\n", itr->c_str());
+
+    fclose(fout);
+
     return true;
 }
 
@@ -406,7 +494,8 @@ int main(int argc, char *argv[])
     DO( write_rev()     );
     if(do_sql)
     {
-        DO( rename_sql_updates() );
+        DO( rename_sql_updates()    );
+        DO( generate_sql_makefile() );
     }
     DO( amend_commit()  );
 
