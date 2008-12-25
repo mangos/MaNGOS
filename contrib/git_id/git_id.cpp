@@ -16,35 +16,49 @@
 #include <unistd.h>
 #endif
 
+// max string sizes
+
+#define MAX_REMOTE 256
+#define MAX_MSG 16384
+#define MAX_PATH 2048
+#define MAX_BUF 2048
+#define MAX_CMD 2048
+
 // config
 
 #define NUM_REMOTES 2
 
-char remotes[NUM_REMOTES][256] = {
+char remotes[NUM_REMOTES][MAX_REMOTE] = {
     "git@github.com:mangos/mangos.git",
     "git://github.com/mangos/mangos.git"        // used for fetch if present
 };
 
+char rev_file[] = "src/shared/revision_nr.h";
+char sql_update_dir[] = "sql/updates";
+
 bool allow_replace = false;
 bool local = false;
 bool do_fetch = false;
+bool do_sql = false;
 
 // aux
 
-char origins[NUM_REMOTES][256];
+char origins[NUM_REMOTES][MAX_REMOTE];
 int rev;
-char head_message[16384];
-char write_file[2048];
 
-char buffer[256];
+char head_message[MAX_MSG];
+char path_prefix[MAX_PATH] = "";
+char buffer[MAX_BUF];
+char cmd[MAX_CMD];
+
 FILE *cmd_pipe;
 
 bool find_path()
 {
     printf("+ finding path\n");
-    char cur_path[2048], *ptr;
-    getcwd(cur_path, 2048);
-    int len = strnlen(cur_path, 2048);
+    char cur_path[MAX_PATH], *ptr;
+    getcwd(cur_path, MAX_PATH);
+    int len = strnlen(cur_path, MAX_PATH);
     
     if(cur_path[len-1] == '/' || cur_path[len-1] == '\\')
     {
@@ -58,17 +72,16 @@ bool find_path()
     for(ptr = cur_path-1; ptr = strchr(ptr+1, '\\'); count_back++);
     int count = std::max(count_fwd, count_back);
 
-    char prefix[2048] = "", path[2048];
+    char path[MAX_PATH];
     for(int i = 0; i < count; i++)
     {
-        snprintf(path, 2048, "%s.git", prefix);
+        snprintf(path, MAX_PATH, "%s.git", path_prefix);
         if(0 == chdir(path))
         {
             chdir(cur_path);
-            snprintf(write_file, 2048, "%ssrc/shared/revision_nr.h", prefix);
             return true;
         }
-        strncat(prefix, "../", 2048);
+        strncat(path_prefix, "../", MAX_PATH);
     }
 
     return false;
@@ -81,15 +94,15 @@ bool find_origin()
         return false;
 
     bool ret = false;
-    while(fgets(buffer, 256, cmd_pipe))
+    while(fgets(buffer, MAX_BUF, cmd_pipe))
     {
-        char name[256], remote[256];
+        char name[256], remote[MAX_REMOTE];
         sscanf(buffer, "%s %s", name, remote);
         for(int i = 0; i < NUM_REMOTES; i++)
         {
             if(strcmp(remote, remotes[i]) == 0)
             {
-                strncpy(origins[i], name, 256);
+                strncpy(origins[i], name, MAX_REMOTE);
                 ret = true;
             }
         }
@@ -101,9 +114,8 @@ bool find_origin()
 bool fetch_origin()
 {
     printf("+ fetching origin\n");
-    char cmd[256];
     // use the public clone url if present because the private may require a password
-    sprintf(cmd, "git fetch %s master", origins[1][0] ? origins[1] : origins[0]);
+    snprintf(cmd, MAX_CMD, "git fetch %s master", origins[1][0] ? origins[1] : origins[0]);
     int ret = system(cmd);
     return true;
 }
@@ -111,24 +123,23 @@ bool fetch_origin()
 bool check_fwd()
 {
     printf("+ checking fast forward\n");
-    char cmd[256];
-    sprintf(cmd, "git log -n 1 --pretty=\"format:%%H\" %s/master", origins[1][0] ? origins[1] : origins[0]);
+    snprintf(cmd, MAX_CMD, "git log -n 1 --pretty=\"format:%%H\" %s/master", origins[1][0] ? origins[1] : origins[0]);
     if( (cmd_pipe = popen( cmd, "r" )) == NULL )
         return false;
 
     char hash[256];
-    if(!fgets(buffer, 256, cmd_pipe)) return false;
-    strncpy(hash, buffer, 256);
+    if(!fgets(buffer, MAX_BUF, cmd_pipe)) return false;
+    strncpy(hash, buffer, MAX_BUF);
     pclose(cmd_pipe);
 
     if( (cmd_pipe = popen( "git log --pretty=\"format:%H\"", "r" )) == NULL )
         return false;
 
     bool found = false;
-    while(fgets(buffer, 256, cmd_pipe))
+    while(fgets(buffer, MAX_BUF, cmd_pipe))
     {
-        buffer[strnlen(buffer, 256) - 1] = '\0';
-        if(strncmp(hash, buffer, 256) == 0)
+        buffer[strnlen(buffer, MAX_BUF) - 1] = '\0';
+        if(strncmp(hash, buffer, MAX_BUF) == 0)
         {
             found = true;
             break;
@@ -157,14 +168,13 @@ bool find_rev()
     {
         if(!local && !origins[i][0]) continue;
 
-        char cmd[512];
-        if(local) sprintf(cmd, "git log HEAD --pretty=\"format:%%s\"");
+        if(local) snprintf(cmd, MAX_CMD, "git log HEAD --pretty=\"format:%%s\"");
         else sprintf(cmd, "git log %s/master --pretty=\"format:%%s\"", origins[i]);
         if( (cmd_pipe = popen( cmd, "r" )) == NULL )
             continue;
 
         int nr;
-        while(fgets(buffer, 256, cmd_pipe))
+        while(fgets(buffer, MAX_BUF, cmd_pipe))
         {
             nr = get_rev(buffer);
             if(nr >= rev)
@@ -195,7 +205,10 @@ bool write_rev()
     sprintf(rev_str, "%d", rev);
     std::string header = generateHeader(rev_str);
 
-    if(FILE* OutputFile = fopen(write_file,"wb"))
+    char prefixed_file[MAX_PATH];
+    snprintf(prefixed_file, MAX_PATH, "%s%s", path_prefix, rev_file);
+
+    if(FILE* OutputFile = fopen(prefixed_file, "wb"))
     {
         fprintf(OutputFile,"%s", header.c_str());
         fclose(OutputFile);
@@ -240,14 +253,37 @@ bool find_head_msg()
 bool amend_commit()
 {
     printf("+ amending last commit\n");
-    char cmd[512];
-    sprintf(cmd, "git commit --amend -F- %s", write_file);
+    snprintf(cmd, MAX_CMD, "git commit --amend -F- %s%s", path_prefix, rev_file);
     if( (cmd_pipe = popen( cmd, "w" )) == NULL )
         return false;
 
     fprintf(cmd_pipe, "[%d] %s", rev, head_message);
     pclose(cmd_pipe);
     
+    return true;
+}
+
+bool find_sql_updates()
+{
+    printf("+ finding sql updates on HEAD\n");
+    snprintf(cmd, MAX_CMD, "git ls-tree HEAD %s%s/", path_prefix, sql_update_dir);
+    if( (cmd_pipe = popen( cmd, "r" )) == NULL )
+        return false;
+
+    int dummy;
+    char hash[256], filename[MAX_PATH];
+
+    while(fgets(buffer, MAX_BUF, cmd_pipe))
+    {
+        sscanf(buffer, "%d tree %s %s", &dummy, hash, filename);
+    }
+
+    pclose(cmd_pipe);
+    return true;
+}
+
+bool rename_sql_updates()
+{
     return true;
 }
 
@@ -258,13 +294,15 @@ int main(int argc, char *argv[])
     for(int i = 1; i < argc; i++)
     {
         if(argv[i] == NULL) continue;
-        if(strncmp(argv[i], "-r", 2) == 0 || strncmp(argv[i], "--replace", 2) == 0)
+        if(strncmp(argv[i], "-r", 2) == 0 || strncmp(argv[i], "--replace", 9) == 0)
             allow_replace = true;
-        if(strncmp(argv[i], "-l", 2) == 0 || strncmp(argv[i], "--local", 2) == 0)
+        if(strncmp(argv[i], "-l", 2) == 0 || strncmp(argv[i], "--local", 7) == 0)
             local = true;
-        if(strncmp(argv[i], "-f", 2) == 0 || strncmp(argv[i], "--fetch", 2) == 0)
+        if(strncmp(argv[i], "-f", 2) == 0 || strncmp(argv[i], "--fetch", 7) == 0)
             do_fetch = true;
-        if(strncmp(argv[i], "-h", 2) == 0 || strncmp(argv[i], "--help", 2) == 0)
+        if(strncmp(argv[i], "-s", 2) == 0 || strncmp(argv[i], "--sql", 5) == 0)
+            do_sql = true;
+        if(strncmp(argv[i], "-h", 2) == 0 || strncmp(argv[i], "--help", 6) == 0)
         {
             printf("Usage: git_id [OPTION]\n");
             printf("Generates a new rev number and updates revision_nr.h and the commit message.\n");
@@ -274,6 +312,7 @@ int main(int argc, char *argv[])
             printf("                  commit\n");
             printf("   -l, --local    search for the highest rev number on HEAD\n");
             printf("   -f, --fetch    fetch from origin before searching for the new rev\n");
+            printf("   -s, --sql      ");
             return 0;
         }
     }
@@ -290,7 +329,13 @@ int main(int argc, char *argv[])
     }
     DO( find_rev()      );
     DO( find_head_msg() );
+    if(do_sql)
+        DO( find_sql_updates() );
     DO( write_rev()     );
+    if(do_sql)
+    {
+        DO( rename_sql_updates() );
+    }
     DO( amend_commit()  );
 
     return 0;
