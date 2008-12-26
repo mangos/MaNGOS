@@ -3283,7 +3283,7 @@ void Spell::EffectSummon(uint32 i)
     uint32 level = m_caster->getLevel();
     Pet* spawnCreature = new Pet(SUMMON_PET);
 
-    if(spawnCreature->LoadPetFromDB(m_caster,pet_entry))
+    if(m_caster->GetTypeId()==TYPEID_PLAYER && spawnCreature->LoadPetFromDB((Player*)m_caster,pet_entry))
     {
         // set timer for unsummon
         int32 duration = GetSpellDuration(m_spellInfo);
@@ -4099,7 +4099,7 @@ void Spell::EffectSummonPet(uint32 i)
     Pet* NewSummon = new Pet;
 
     // petentry==0 for hunter "call pet" (current pet summoned if any)
-    if(NewSummon->LoadPetFromDB(m_caster,petentry))
+    if(m_caster->GetTypeId() == TYPEID_PLAYER && NewSummon->LoadPetFromDB((Player*)m_caster,petentry))
     {
         if(NewSummon->getPetType()==SUMMON_PET)
         {
