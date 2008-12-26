@@ -413,6 +413,13 @@ LogColors = ""
 #        Default: 1
 #                The number must be between 0 (not allowed) and 10
 #
+#    MinLevelForHeroicCharacterCreating
+#        Limit creating heroic characters only for account with another character of specific level (ignored for GM accounts)
+#                 0  - not require any existed chaarcter
+#                 1  - require at least any character existed
+#        Default: 55 - default requirement
+#
+#
 #    SkipCinematics
 #        Disable in-game script movie at first character's login(allows to prevent buggy intro in case of custom start location coordinates)
 #        Default: 0 - show intro for each new characrer
@@ -468,8 +475,8 @@ LogColors = ""
 #
 #    AlwaysMaxSkillForLevel
 #        Players will automatically gain max level dependent (weapon/defense) skill when logging in, leveling up etc.
-#        Default: 0 (true)
-#                 1 (false)
+#        Default: 0 (false)
+#                 1 (true)
 #
 #    ActivateWeather
 #        Activate weather system
@@ -483,11 +490,15 @@ LogColors = ""
 #
 #    Battleground.QueueAnnouncer.Enable
 #        Enable queue announcer posting to chat
-#        Default: 1 (true)
-#                 0 (false)
+#        Default: 0 (false)
+#                 1 (true)
 #
 #    Battleground.QueueAnnouncer.PlayerOnly
 #        Enable queue announcer posting to chat
+#        Default: 0 (false)
+#                 1 (true)
+#
+#    Arena.QueueAnnouncer.Enable: Enable queue announcer posting to chat
 #        Default: 0 (false)
 #                 1 (true)
 #
@@ -580,6 +591,7 @@ CharactersCreatingDisabled = 0
 CharactersPerAccount = 50
 CharactersPerRealm = 10
 HeroicCharactersPerRealm = 1
+MinLevelForHeroicCharacterCreating = 55
 SkipCinematics = 0
 MaxPlayerLevel = 80
 StartPlayerLevel = 1
@@ -595,8 +607,9 @@ AllFlightPaths = 0
 AlwaysMaxSkillForLevel = 0
 ActivateWeather = 1
 Battleground.CastDeserter = 1
-Battleground.QueueAnnouncer.Enable = 1
+Battleground.QueueAnnouncer.Enable = 0
 Battleground.QueueAnnouncer.PlayerOnly = 0
+Arena.QueueAnnouncer.Enable = 0
 CastUnstuck = 1
 Instance.IgnoreLevel = 0
 Instance.IgnoreRaid = 0

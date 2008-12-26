@@ -317,24 +317,37 @@ void WorldSession::HandleCharCreateOpcode( WorldPacket & recv_data )
         return;
     }
 
+    // speedup check for heroic class disabled case
+    uint32 req_level_for_heroic = sWorld.getConfig(CONFIG_MIN_LEVEL_FOR_HEROIC_CHARACTER_CREATING);
+    if(GetSecurity()==SEC_PLAYER && class_ == CLASS_DEATH_KNIGHT && req_level_for_heroic > sWorld.getConfig(CONFIG_MAX_PLAYER_LEVEL))
+    {
+        data << (uint8)CHAR_CREATE_LEVEL_REQUIREMENT;
+        SendPacket( &data );
+        return;
+    }
+
     bool AllowTwoSideAccounts = !sWorld.IsPvPRealm() || sWorld.getConfig(CONFIG_ALLOW_TWO_SIDE_ACCOUNTS) || GetSecurity() > SEC_PLAYER;
     uint32 skipCinematics = sWorld.getConfig(CONFIG_SKIP_CINEMATICS);
 
     bool have_same_race = false;
+
+    // if 0 then allowed creating without any characters
+    bool have_req_level_for_heroic = (req_level_for_heroic==0);
+
     if(!AllowTwoSideAccounts || skipCinematics == 1 || class_ == CLASS_DEATH_KNIGHT)
     {
-        QueryResult *result2 = CharacterDatabase.PQuery("SELECT race,class FROM characters WHERE account = '%u' %s",
+        QueryResult *result2 = CharacterDatabase.PQuery("SELECT guid,race,class FROM characters WHERE account = '%u' %s",
             GetAccountId(), (skipCinematics == 1 || class_ == CLASS_DEATH_KNIGHT) ? "" : "LIMIT 1");
         if(result2)
         {
             uint32 team_= Player::TeamForRace(race_);
 
             Field* field = result2->Fetch();
-            uint8 acc_race  = field[0].GetUInt32();
+            uint8 acc_race  = field[1].GetUInt32();
 
             if(GetSecurity()==SEC_PLAYER && class_ == CLASS_DEATH_KNIGHT)
             {
-                uint8 acc_class = field[1].GetUInt32();
+                uint8 acc_class = field[2].GetUInt32();
                 if(acc_class == CLASS_DEATH_KNIGHT)
                 {
                     if(heroic_free_slots > 0)
@@ -346,6 +359,14 @@ void WorldSession::HandleCharCreateOpcode( WorldPacket & recv_data )
                         SendPacket( &data );
                         return;
                     }
+                }
+
+                if(!have_req_level_for_heroic)
+                {
+                    uint32 acc_guid = field[0].GetUInt32();
+                    uint32 acc_level = Player::GetUInt32ValueFromDB(UNIT_FIELD_LEVEL,acc_guid);
+                    if(acc_level >= req_level_for_heroic)
+                        have_req_level_for_heroic = true;
                 }
             }
 
@@ -374,14 +395,14 @@ void WorldSession::HandleCharCreateOpcode( WorldPacket & recv_data )
                     break;
 
                 field = result2->Fetch();
-                acc_race = field[0].GetUInt32();
+                acc_race = field[1].GetUInt32();
 
                 if(!have_same_race)
                     have_same_race = race_ == acc_race;
 
                 if(GetSecurity()==SEC_PLAYER && class_ == CLASS_DEATH_KNIGHT)
                 {
-                    uint8 acc_class = field[1].GetUInt32();
+                    uint8 acc_class = field[2].GetUInt32();
                     if(acc_class == CLASS_DEATH_KNIGHT)
                     {
                         if(heroic_free_slots > 0)
@@ -394,10 +415,25 @@ void WorldSession::HandleCharCreateOpcode( WorldPacket & recv_data )
                             return;
                         }
                     }
+
+                    if(!have_req_level_for_heroic)
+                    {
+                        uint32 acc_guid = field[0].GetUInt32();
+                        uint32 acc_level = Player::GetUInt32ValueFromDB(UNIT_FIELD_LEVEL,acc_guid);
+                        if(acc_level >= req_level_for_heroic)
+                            have_req_level_for_heroic = true;
+                    }
                 }
             }
             delete result2;
         }
+    }
+
+    if(GetSecurity()==SEC_PLAYER && class_ == CLASS_DEATH_KNIGHT && !have_req_level_for_heroic)
+    {
+        data << (uint8)CHAR_CREATE_LEVEL_REQUIREMENT;
+        SendPacket( &data );
+        return;
     }
 
     // extract other data required for player creating

@@ -263,7 +263,7 @@ class MANGOS_DLL_SPEC Aura
         {
             // only aura in slot with charges and without stack limitation
             if (m_auraSlot < MAX_AURAS && m_procCharges >= 1 && GetSpellProto()->StackAmount==0)
-                SetAuraCharges(m_procCharges - 1);
+                SendAuraUpdate(false);
         }
 
         bool IsPositive() { return m_positive; }

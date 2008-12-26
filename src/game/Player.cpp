@@ -4355,7 +4355,7 @@ uint32 Player::GetShieldBlockValue() const
 {
     BaseModGroup modGroup = SHIELD_BLOCK_VALUE;
 
-    float value = GetTotalBaseModValue(modGroup) + GetStat(STAT_STRENGTH)/20 - 1;
+    float value = GetTotalBaseModValue(modGroup) + GetStat(STAT_STRENGTH) * 0.5f - 10;
 
     value = (value < 0) ? 0 : value;
 
@@ -13748,6 +13748,11 @@ void Player::_LoadArenaTeamInfo(QueryResult *result)
         uint32 personal_rating = fields[3].GetUInt32();
 
         ArenaTeam* aTeam = objmgr.GetArenaTeamById(arenateamid);
+        if(!aTeam)
+        {
+            sLog.outError("Player::_LoadArenaTeamInfo: couldn't load arenateam %u, week %u, season %u, rating %u", arenateamid, played_week, played_season, personal_rating);
+            continue;
+        }
         uint8  arenaSlot = aTeam->GetSlot();
 
         m_uint32Values[PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + arenaSlot * 6]     = arenateamid;      // TeamID
@@ -18592,6 +18597,9 @@ uint32 Player::GetBaseWeaponSkillValue (WeaponAttackType attType) const
 
 void Player::ResurectUsingRequestData()
 {
+    /// Teleport before resurrecting, otherwise the player might get attacked from creatures near his corpse
+    TeleportTo(m_resurrectMap, m_resurrectX, m_resurrectY, m_resurrectZ, GetOrientation());
+
     ResurrectPlayer(0.0f,false);
 
     if(GetMaxHealth() > m_resurrectHealth)
@@ -18609,8 +18617,6 @@ void Player::ResurectUsingRequestData()
     SetPower(POWER_ENERGY, GetMaxPower(POWER_ENERGY) );
 
     SpawnCorpseBones();
-
-    TeleportTo(m_resurrectMap, m_resurrectX, m_resurrectY, m_resurrectZ, GetOrientation());
 }
 
 void Player::SetClientControl(Unit* target, uint8 allowMove)

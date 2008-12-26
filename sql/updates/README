@@ -12,28 +12,28 @@ To see if you need an update, the file names have been given a fixed structure
 that should enable you to see if you need an update or not.
 
 === File name descriptin ===
-File names are divided into two parts. First part is the date+counter
-that show commit apply date that will be compatible with database after apply update.
-The second part of the name, is the table that needs and update or has been added.
+File names are divided into two parts. First part is the revision+counter
+that show commit revision that will be compatible with database after apply update.
+Counter set order in sql updates apply for same revision.
+The second part of the name of the database and the table that needs and update or has been added.
 See an example below:
 
-         2008_10_17_01_characters_character_spell.sql
-         |          |  |          |
-         |          |  |          |
-         |          |  |          The table character_spell
-         |          |  |          will need an update.
-         |          |  |
-         |          |  Name of affected DB (default recommended name)
-         |          |   Can be: characters, mangos, realmd
-         |          |
-         |          Counter show number of sql update in updates list for provided date
-         |          and set proper order for sql updates for same date
+         6936_01_mangos_spell_chain.sql
+         |    |  |      |
+         |    |  |      |
+         |    |  |      The table `spell_chain`
+         |    |  |      will need an update.
+         |    |  |
+         |    |  Name of affected DB (default recommended name)
+         |    |  Can be: characters, mangos, realmd
+         |    |
+         |    Counter show number of sql update in updates list for provided revision
+         |    and set proper order for sql updates for same revision
          |
-         MaNGOS commit date related to sql update. For related commit
-         you can see http://github.com/mangos/mangos/commits/master
-         Expected commit will be in commits list for provided date and it will have
-         sql update file name (2008_10_17_01_characters_character_spell.sql in our case) in list
-         changed files, After appling this update DB compatiable with found commit.
+         MaNGOS commit revison related to sql update. 
+         It included in commit description in form [6936] as you can see at http://github.com/mangos/mangos/commits/master
 
-=== For commiters ====
-Please, include sql update name in first line of commit description for simplify it search by users in commits list.
+After appling this update DB compatiable with database that include this sql update.
+SQL update include special protection against multiply and wrong order SQL updates apply.
+So attempt apply sql update to more old DB without previous SQL update in list for targeted database 
+or to DB with already applied this or later SQL update will generate error and not applied.
