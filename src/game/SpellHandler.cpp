@@ -282,6 +282,14 @@ void WorldSession::HandleGameObjectUseOpcode( WorldPacket & recv_data )
     obj->Use(_player);
 }
 
+void WorldSession::HandleGameobjectReportUse(WorldPacket& recvPacket)
+{
+    uint64 guid;
+    recvPacket >> guid;
+
+    sLog.outDebug( "WORLD: Recvd CMSG_GAMEOBJ_REPORT_USE Message [in game guid: %u]", GUID_LOPART(guid));
+}
+
 void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
 {
     CHECK_PACKET_SIZE(recvPacket,1+4+1);
