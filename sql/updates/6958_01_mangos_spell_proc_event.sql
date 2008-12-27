@@ -1,3 +1,5 @@
+ALTER TABLE db_version CHANGE COLUMN required_6944_01_mangos_mangos_string required_6958_01_mangos_spell_proc_event bit;
+
 DROP TABLE IF EXISTS `spell_proc_event`;
 
 SET FOREIGN_KEY_CHECKS=0;
