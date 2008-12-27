@@ -284,6 +284,8 @@ void WorldSession::HandleGameObjectUseOpcode( WorldPacket & recv_data )
 
 void WorldSession::HandleGameobjectReportUse(WorldPacket& recvPacket)
 {
+    CHECK_PACKET_SIZE(recvPacket,8);
+
     uint64 guid;
     recvPacket >> guid;
 
