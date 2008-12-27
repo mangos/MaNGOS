@@ -14,6 +14,7 @@
 #define popen _popen
 #define pclose _pclose
 #define snprintf _snprintf
+#define putenv _putenv
 #pragma warning (disable:4996)
 #else
 #include <unistd.h>
@@ -42,6 +43,7 @@ char remotes[NUM_REMOTES][MAX_REMOTE] = {
 char remote_branch[MAX_REMOTE] = "master";
 char rev_file[MAX_PATH] = "src/shared/revision_nr.h";
 char sql_update_dir[MAX_PATH] = "sql/updates";
+char new_index_file[MAX_PATH] = ".git/git_id_index";
 
 char databases[NUM_DATABASES][MAX_DB] = {
     "characters",
@@ -68,22 +70,26 @@ int last_sql_rev[NUM_DATABASES] = {0,0,0};
 
 char head_message[MAX_MSG];
 char path_prefix[MAX_PATH] = "";
+char base_path[MAX_PATH];
 char buffer[MAX_BUF];
 char cmd[MAX_CMD];
 char origin_hash[MAX_HASH];
 char last_sql_update[NUM_DATABASES][MAX_PATH];
+char old_index_cmd[MAX_CMD];
+char new_index_cmd[MAX_CMD];
 
 std::set<std::string> new_sql_updates;
-std::ostringstream str_updates;
 
 FILE *cmd_pipe;
 
 bool find_path()
 {
     printf("+ finding path\n");
-    char cur_path[MAX_PATH], *ptr;
+    char *ptr;
+    char cur_path[MAX_PATH];
     getcwd(cur_path, MAX_PATH);
     int len = strnlen(cur_path, MAX_PATH);
+    strncpy(base_path, cur_path, len+1);
     
     if(cur_path[len-1] == '/' || cur_path[len-1] == '\\')
     {
@@ -107,6 +113,14 @@ bool find_path()
             return true;
         }
         strncat(path_prefix, "../", MAX_PATH);
+
+        ptr = strrchr(base_path, '\\');
+        if(ptr) *ptr = '\0';
+        else
+        {
+            ptr = strrchr(base_path, '/');
+            if(ptr) *ptr = '\0';
+        }
     }
 
     return false;
@@ -222,6 +236,18 @@ std::string generateHeader(char const* rev_str)
     return newData.str();
 }
 
+void system_switch_index(const char *cmd)
+{
+    // do the command for the original index and then for the new index
+    // both need to be updated with the changes before commit
+    // but the new index will contains only the desired changes
+    // while the old may contain others
+    system(cmd);
+    if(putenv(new_index_cmd) != 0) return;
+    system(cmd);
+    if(putenv(old_index_cmd) != 0) return;
+}
+
 bool write_rev()
 {
     printf("+ writing revision_nr.h\n");
@@ -236,8 +262,13 @@ bool write_rev()
     {
         fprintf(OutputFile,"%s", header.c_str());
         fclose(OutputFile);
+
+        // add the file to both indices, to be committed later
+        snprintf(cmd, MAX_CMD, "git add %s", prefixed_file);
+        system_switch_index(cmd);
+
         return true;
-    }
+    } 
 
     return false;
 }
@@ -277,13 +308,16 @@ bool find_head_msg()
 bool amend_commit()
 {
     printf("+ amending last commit\n");
-    snprintf(cmd, MAX_CMD, "git commit --amend -F- %s%s%s", path_prefix, rev_file, str_updates.str().c_str());
+    
+    // commit the contents of the new index
+    if(putenv(new_index_cmd) != 0) return false;
+    snprintf(cmd, MAX_CMD, "git commit --amend -F-");
     if( (cmd_pipe = popen( cmd, "w" )) == NULL )
         return false;
 
     fprintf(cmd_pipe, "[%d] %s", rev, head_message);
     pclose(cmd_pipe);
-    
+
     return true;
 }
 
@@ -379,11 +413,7 @@ bool find_sql_updates()
     if(!new_sql_updates.empty())
     {
         for(std::set<std::string>::iterator itr = new_sql_updates.begin(); itr != new_sql_updates.end(); ++itr)
-        {
             printf("%s\n", itr->c_str());
-            // store the deleted files to be amended to the commit later
-            str_updates << ' ' << path_prefix << "sql/updates/" << itr->c_str();
-        }
     }
     else
         printf("WARNING: no new sql updates found.\n");
@@ -428,15 +458,12 @@ bool convert_sql_updates()
 
         // rename the file in git
         snprintf(cmd, MAX_CMD, "git add %s", dst_file);
-        system(cmd);
+        system_switch_index(cmd);
         snprintf(cmd, MAX_CMD, "git rm %s", src_file);
-        system(cmd);
+        system_switch_index(cmd);
 
         // update the last sql update for the current database
         strncpy(last_sql_update[info.db_idx], new_name, MAX_PATH);
-
-        // store the new files to be amended to the commit later
-        str_updates << ' ' << dst_file;
     }
 
     return true;
@@ -527,6 +554,9 @@ bool generate_sql_makefile()
 
     fclose(fout);
 
+    snprintf(cmd, MAX_CMD, "git add %s%s/Makefile.am", path_prefix, sql_update_dir);
+    system_switch_index(cmd);
+
     return true;
 }
 
@@ -568,6 +598,40 @@ bool change_sql_history()
     return true;
 }
 
+bool prepare_indices()
+{
+    printf("+ preparing new index\n");
+    // copy the existing index file to a new one
+    char src_file[MAX_PATH], dst_file[MAX_PATH];
+
+    char *old_index = getenv("GIT_INDEX_FILE");
+    if(old_index) strncpy(src_file, old_index, MAX_PATH);
+    else snprintf(src_file, MAX_PATH, "%s.git/index", path_prefix);
+    snprintf(dst_file, MAX_PATH, "%s%s", path_prefix, new_index_file);
+
+    FILE * fin = fopen( src_file, "rb" );
+    if(!fin) return false;
+    FILE * fout = fopen( dst_file, "wb" );
+    if(!fout) { fclose(fin); return false; }
+
+    for(char c = getc(fin); !feof(fin); putc(c, fout), c = getc(fin));
+
+    fclose(fin);
+    fclose(fout);
+
+    // doesn't seem to work with path_prefix
+    snprintf(new_index_cmd, MAX_CMD, "GIT_INDEX_FILE=%s/%s", base_path, new_index_file);
+    if(putenv(new_index_cmd) != 0) return false;
+
+    // clear the new index
+    system("git reset --mixed HEAD");
+
+    // revert to old index
+    snprintf(old_index_cmd, MAX_CMD, "GIT_INDEX_FILE=");
+    if(putenv(old_index_cmd) != 0) return false;
+    return true;
+}
+
 #define DO(cmd) if(!cmd) { printf("FAILED\n"); return 1; }
 
 int main(int argc, char *argv[])
@@ -601,27 +665,28 @@ int main(int argc, char *argv[])
         }
     }
 
-    DO( find_path()     );
+    DO( find_path()                     );
     if(!local)
     {
-        DO( find_origin()   );
+        DO( find_origin()               );
         if(do_fetch)
-            DO( fetch_origin()  );
-        DO( check_fwd()     );
+            DO( fetch_origin()          );
+        DO( check_fwd()                 );
     }
-    DO( find_rev()      );
-    DO( find_head_msg() );
+    DO( find_rev()                      );
+    DO( find_head_msg()                 );
     if(do_sql)
-        DO( find_sql_updates() );
-    DO( write_rev()     );
+        DO( find_sql_updates()          );
+    DO( prepare_indices()               );
+    DO( write_rev()                     );
     if(do_sql)
     {
-        DO( convert_sql_updates()    );
-        DO( generate_sql_makefile()  );
+        DO( convert_sql_updates()       );
+        DO( generate_sql_makefile()     );
     }
-    DO( amend_commit()  );
-    if(do_sql)
-        DO( change_sql_history()     );
+    DO( amend_commit()                  );
+    //if(do_sql)
+    //    DO( change_sql_history()        );
 
     return 0;
 }
