@@ -178,6 +178,8 @@ void WorldSession::HandleBattleGroundJoinOpcode( WorldPacket & recv_data )
         }
         sLog.outDebug("Battleground: group end");
         sBattleGroundMgr.m_BattleGroundQueues[bgQueueTypeId].Update(bgTypeId, _player->GetBattleGroundQueueIdFromLevel());
+        if(!ginfo->IsInvitedToBGInstanceGUID)
+            sBattleGroundMgr.m_BattleGroundQueues[bgQueueTypeId].AnnounceWorld(ginfo, _player->GetGUID(), true);
     }
     else
     {
@@ -194,6 +196,8 @@ void WorldSession::HandleBattleGroundJoinOpcode( WorldPacket & recv_data )
         GroupQueueInfo * ginfo = sBattleGroundMgr.m_BattleGroundQueues[bgQueueTypeId].AddGroup(_player, bgTypeId, 0, false, 0);
         sBattleGroundMgr.m_BattleGroundQueues[bgQueueTypeId].AddPlayer(_player, ginfo);
         sBattleGroundMgr.m_BattleGroundQueues[bgQueueTypeId].Update(bgTypeId, _player->GetBattleGroundQueueIdFromLevel());
+        if(!ginfo->IsInvitedToBGInstanceGUID)
+            sBattleGroundMgr.m_BattleGroundQueues[bgQueueTypeId].AnnounceWorld(ginfo, _player->GetGUID(), true);
         sLog.outDebug("Battleground: player joined queue for bg queue type %u bg type %u: GUID %u, NAME %s",bgQueueTypeId,bgTypeId,_player->GetGUIDLow(), _player->GetName());
     }
 }
@@ -782,6 +786,8 @@ void WorldSession::HandleBattleGroundArenaJoin( WorldPacket & recv_data )
         }
         sLog.outDebug("Battleground: arena join as group end");
         sBattleGroundMgr.m_BattleGroundQueues[bgQueueTypeId].Update(bgTypeId, _player->GetBattleGroundQueueIdFromLevel(), arenatype, isRated, arenaRating);
+        if(isRated)
+            sBattleGroundMgr.m_BattleGroundQueues[bgQueueTypeId].AnnounceWorld(ginfo, _player->GetGUID(), true);
     }
     else
     {

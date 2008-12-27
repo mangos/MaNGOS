@@ -41,7 +41,6 @@
 #include "CellImpl.h"
 #include "Policies/SingletonImp.h"
 #include "SharedDefines.h"
-#include "Tools.h"
 #include "LootMgr.h"
 #include "VMapFactory.h"
 #include "BattleGround.h"
@@ -167,15 +166,15 @@ bool SpellCastTargets::read ( WorldPacket * data, Unit *caster )
 
     // TARGET_FLAG_UNK2 is used for non-combat pets, maybe other?
     if( m_targetMask & ( TARGET_FLAG_UNIT | TARGET_FLAG_UNK2 ))
-        if(!readGUID(*data, m_unitTargetGUID))
+        if(!data->readPackGUID(m_unitTargetGUID))
             return false;
 
     if( m_targetMask & ( TARGET_FLAG_OBJECT | TARGET_FLAG_OBJECT_UNK ))
-        if(!readGUID(*data, m_GOTargetGUID))
+        if(!data->readPackGUID(m_GOTargetGUID))
             return false;
 
     if(( m_targetMask & ( TARGET_FLAG_ITEM | TARGET_FLAG_TRADE_ITEM )) && caster->GetTypeId() == TYPEID_PLAYER)
-        if(!readGUID(*data, m_itemTargetGUID))
+        if(!data->readPackGUID(m_itemTargetGUID))
             return false;
 
     if( m_targetMask & TARGET_FLAG_SOURCE_LOCATION )
@@ -207,7 +206,7 @@ bool SpellCastTargets::read ( WorldPacket * data, Unit *caster )
     }
 
     if( m_targetMask & (TARGET_FLAG_CORPSE | TARGET_FLAG_PVP_CORPSE ) )
-        if(!readGUID(*data, m_CorpseTargetGUID))
+        if(!data->readPackGUID(m_CorpseTargetGUID))
             return false;
 
     // find real units/GOs
@@ -3703,8 +3702,12 @@ uint8 Spell::CanCast(bool strict)
         //Must be behind the target.
         if( m_spellInfo->AttributesEx2 == 0x100000 && (m_spellInfo->AttributesEx & 0x200) == 0x200 && target->HasInArc(M_PI, m_caster) )
         {
-            SendInterrupted(2);
-            return SPELL_FAILED_NOT_BEHIND;
+            //Exclusion for Pounce: Facing Limitation was removed in 2.0.1, but it still uses the same, old Ex-Flags
+            if( m_spellInfo->SpellFamilyName != SPELLFAMILY_DRUID || m_spellInfo->SpellFamilyFlags != 0x0000000000020000LL )
+            {
+                SendInterrupted(2);
+                return SPELL_FAILED_NOT_BEHIND;
+            }
         }
 
         //Target must be facing you.
