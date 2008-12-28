@@ -1760,6 +1760,7 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         bool IsAtGroupRewardDistance(WorldObject const* pRewardSource) const;
         bool RewardPlayerAndGroupAtKill(Unit* pVictim);
+        bool isHonorOrXPTarget(Unit* pVictim);
 
         FactionStateList m_factions;
         ForcedReactions m_forcedReactions;

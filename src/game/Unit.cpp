@@ -5874,7 +5874,7 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
                 {
                     if (GetTypeId() != TYPEID_PLAYER)
                         return false;
-                    if (!((Player*)this)->RewardPlayerAndGroupAtKill(pVictim))
+                    if (!((Player*)this)->isHonorOrXPTarget(pVictim))
                         return false;
                     trigger_spell_id = 50475;
                     basepoints0 = damage * triggerAmount / 100;
