@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2005-2008 MaNGOS <http://getmangos.com/>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -73,6 +91,7 @@ bool do_sql = false;
 char origins[NUM_REMOTES][MAX_REMOTE];
 int rev;
 int last_sql_rev[NUM_DATABASES] = {0,0,0};
+int last_sql_nr[NUM_DATABASES] = {0,0,0};
 
 char head_message[MAX_MSG];
 char path_prefix[MAX_PATH] = "";
@@ -191,7 +210,13 @@ bool check_fwd()
     }
     pclose(cmd_pipe);
 
-    if(!found) printf("WARNING: non-fastforward, use rebase!\n");
+    if(!found)
+    {
+        // with fetch you still get the latest rev, you just rebase afterwards and push
+        // without it you may not get the right rev
+        if(do_fetch) printf("WARNING: non-fastforward, use rebase!\n");
+        else { printf("ERROR: non-fastforward, use rebase!\n"); return false; }
+    }
     return true;
 }
 
@@ -372,29 +397,15 @@ bool find_sql_updates()
     while(fgets(buffer, MAX_BUF, cmd_pipe))
     {
         buffer[strnlen(buffer, MAX_BUF) - 1] = '\0';
+        if(!get_sql_update_info(buffer, info)) continue;
 
-        if(get_sql_update_info(buffer, info))
+        if(info.db_idx == NUM_DATABASES)
         {
-            if(info.rev > 0)
-            {
-                // find the update with the highest rev for each database
-                // (will be the required version for the new update)
-                // new updates should not have a rev number already
-
-                if(info.db_idx < NUM_DATABASES && info.rev > last_sql_rev[info.db_idx])
-                {
-                    last_sql_rev[info.db_idx] = info.rev;
-                    sscanf(buffer, "%[^.]", last_sql_update[info.db_idx]);
-                }
-            }
-            else
-            {
-                if(info.db_idx == NUM_DATABASES)
-                    printf("WARNING: incorrect database name for sql update %s\n", buffer);
-                else
-                    new_sql_updates.insert(buffer);
-            }
+             if(info.rev > 0) printf("WARNING: incorrect database name for sql update %s\n", buffer);
+             continue;
         }
+
+        new_sql_updates.insert(buffer);
     }
 
     pclose(cmd_pipe);
@@ -411,7 +422,22 @@ bool find_sql_updates()
     while(fgets(buffer, MAX_BUF, cmd_pipe))
     {
         buffer[strnlen(buffer, MAX_BUF) - 1] = '\0';
-        new_sql_updates.erase(buffer);
+        if(!get_sql_update_info(buffer, info)) continue;
+
+        // find the old update with the highest rev for each database
+        // (will be the required version for the new update)
+        std::set<std::string>::iterator itr = new_sql_updates.find(buffer);
+        if(itr != new_sql_updates.end() )
+        {
+            if(info.rev > 0 && (info.rev > last_sql_rev[info.db_idx] ||
+                (info.rev == last_sql_rev[info.db_idx] && info.nr > last_sql_nr[info.db_idx])))
+            {
+                last_sql_rev[info.db_idx] = info.rev;
+                last_sql_nr[info.db_idx] = info.nr;
+                sscanf(buffer, "%[^.]", last_sql_update[info.db_idx]);
+            }
+            new_sql_updates.erase(itr);
+        }
     }
 
     pclose(cmd_pipe);
@@ -667,7 +693,7 @@ bool change_sql_history()
     return true;
 }
 
-bool prepare_indices()
+bool prepare_new_index()
 {
     printf("+ preparing new index\n");
     // copy the existing index file to a new one
@@ -690,6 +716,15 @@ bool prepare_indices()
     // revert to old index
     snprintf(old_index_cmd, MAX_CMD, "GIT_INDEX_FILE=");
     if(putenv(old_index_cmd) != 0) return false;
+    return true;
+}
+
+bool cleanup_new_index()
+{
+    printf("+ cleaning up the new index\n");
+    char idx_file[MAX_PATH];
+    snprintf(idx_file, MAX_PATH, "%s%s", path_prefix, new_index_file);
+    remove(idx_file);
     return true;
 }
 
@@ -738,7 +773,7 @@ int main(int argc, char *argv[])
     DO( find_head_msg()                 );
     if(do_sql)
         DO( find_sql_updates()          );
-    DO( prepare_indices()               );
+    DO( prepare_new_index()             );
     DO( write_rev()                     );
     if(do_sql)
     {
@@ -747,6 +782,7 @@ int main(int argc, char *argv[])
         DO( change_sql_database()       );
     }
     DO( amend_commit()                  );
+    DO( cleanup_new_index()             );
     //if(do_sql)
     //    DO( change_sql_history()        );
 
