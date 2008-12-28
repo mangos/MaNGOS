@@ -57,6 +57,12 @@ char db_version_table[NUM_DATABASES][MAX_DB] = {
     "realmd_db_version",
 };
 
+char db_sql_file[NUM_DATABASES][MAX_PATH] = {
+    "sql/characters.sql",
+    "sql/mangos.sql",
+    "sql/realmd.sql"
+};
+
 bool allow_replace = false;
 bool local = false;
 bool do_fetch = false;
@@ -421,12 +427,27 @@ bool find_sql_updates()
     return true;
 }
 
+bool copy_file(const char *src_file, const char *dst_file)
+{
+    FILE * fin = fopen( src_file, "rb" );
+    if(!fin) return false;
+    FILE * fout = fopen( dst_file, "wb" );
+    if(!fout) { fclose(fin); return false; }
+
+    for(char c = getc(fin); !feof(fin); putc(c, fout), c = getc(fin));
+
+    fclose(fin);
+    fclose(fout);
+    return true;
+}
+
 bool convert_sql_updates()
 {
     if(new_sql_updates.empty()) return true;
 
     printf("+ converting sql updates\n");
 
+    // rename the sql update files and add the required update statement
     for(std::set<std::string>::iterator itr = new_sql_updates.begin(); itr != new_sql_updates.end(); ++itr)
     {
         sql_update_info info;
@@ -560,6 +581,54 @@ bool generate_sql_makefile()
     return true;
 }
 
+bool change_sql_database()
+{
+    if(new_sql_updates.empty()) return true;
+    printf("+ changing database sql files\n");
+
+    // rename the database files, copy their contents back
+    // and change the required update line
+    for(int i = 0; i < NUM_DATABASES; i++)
+    {
+        if(last_sql_update[i][0] == '\0') continue;
+
+        char old_file[MAX_PATH], tmp_file[MAX_PATH];
+
+        snprintf(old_file, MAX_PATH, "%s%s", path_prefix, db_sql_file[i]);
+        snprintf(tmp_file, MAX_PATH, "%s%stmp", path_prefix, db_sql_file[i]);
+
+        rename(old_file, tmp_file);
+
+        FILE *fin = fopen( tmp_file, "r" );
+        if(!fin) return false;
+        FILE *fout = fopen( old_file, "w" );
+        if(!fout) return false;
+
+        while(fgets(buffer, MAX_BUF, fin))
+        {
+            fputs(buffer, fout);
+            if(strncmp(buffer, "CREATE TABLE `db_version` (\n", MAX_BUF) == 0)
+                break;
+        }
+
+        if(!fgets(buffer, MAX_BUF, fin)) return false;
+        fputs(buffer, fout);
+        if(!fgets(buffer, MAX_BUF, fin)) return false;
+
+        fprintf(fout, "  `required_%s` bit(1) default NULL\n", last_sql_update[i]);
+        while(fgets(buffer, MAX_BUF, fin))
+            fputs(buffer, fout);
+
+        fclose(fin);
+        fclose(fout);
+        remove(tmp_file);
+
+        snprintf(cmd, MAX_CMD, "git add %s", old_file);
+        system_switch_index(cmd);
+    }
+    return true;
+}
+
 bool change_sql_history()
 {
     snprintf(cmd, MAX_CMD, "git log HEAD --pretty=\"format:%%H\"");
@@ -609,15 +678,7 @@ bool prepare_indices()
     else snprintf(src_file, MAX_PATH, "%s.git/index", path_prefix);
     snprintf(dst_file, MAX_PATH, "%s%s", path_prefix, new_index_file);
 
-    FILE * fin = fopen( src_file, "rb" );
-    if(!fin) return false;
-    FILE * fout = fopen( dst_file, "wb" );
-    if(!fout) { fclose(fin); return false; }
-
-    for(char c = getc(fin); !feof(fin); putc(c, fout), c = getc(fin));
-
-    fclose(fin);
-    fclose(fout);
+    copy_file(src_file, dst_file);
 
     // doesn't seem to work with path_prefix
     snprintf(new_index_cmd, MAX_CMD, "GIT_INDEX_FILE=%s/%s", base_path, new_index_file);
@@ -683,6 +744,7 @@ int main(int argc, char *argv[])
     {
         DO( convert_sql_updates()       );
         DO( generate_sql_makefile()     );
+        DO( change_sql_database()       );
     }
     DO( amend_commit()                  );
     //if(do_sql)
