@@ -348,6 +348,7 @@ bool amend_commit()
 
     fprintf(cmd_pipe, "[%d] %s", rev, head_message);
     pclose(cmd_pipe);
+    if(putenv(old_index_cmd) != 0) return false;
 
     return true;
 }
@@ -660,7 +661,7 @@ bool change_sql_history()
     snprintf(cmd, MAX_CMD, "git log HEAD --pretty=\"format:%%H\"");
     if( (cmd_pipe = popen( cmd, "r" )) == NULL )
         return false;
-    
+
     std::list<std::string> hashes;
     while(fgets(buffer, MAX_BUF, cmd_pipe))
     {
@@ -679,11 +680,30 @@ bool change_sql_history()
 
     for(std::list<std::string>::reverse_iterator next = hashes.rbegin(), itr = next++; next != hashes.rend(); ++itr, ++next)
     {
-        snprintf(cmd, MAX_CMD, "git cherry-pick %s", itr->c_str());
+        // stage the changes from the orignal commit
+        snprintf(cmd, MAX_CMD, "git cherry-pick -n %s", itr->c_str());
         system(cmd);
-        snprintf(cmd, MAX_CMD, "git checkout %s %s%s", origin_hash, path_prefix, sql_update_dir);
+
+        // remove changed and deleted files
+        snprintf(cmd, MAX_CMD, "git checkout HEAD %s%s", path_prefix, sql_update_dir);
         system(cmd);
-        snprintf(cmd, MAX_CMD, "git commit --amend -C HEAD %s%s", path_prefix, sql_update_dir);
+
+        // remove the newly added files
+        snprintf(cmd, MAX_CMD, "git diff --cached --diff-filter=A --name-only %s%s", path_prefix, sql_update_dir);
+        if( (cmd_pipe = popen( cmd, "r" )) == NULL )
+            return false;
+
+        while(fgets(buffer, MAX_BUF, cmd_pipe))
+        {
+            buffer[strnlen(buffer, MAX_BUF) - 1] = '\0';
+            snprintf(cmd, MAX_CMD, "git rm -f %s%s", path_prefix, buffer);
+            system(cmd);
+        }
+
+        pclose(cmd_pipe);
+
+        // make a commit with the same author and message as the original one
+        snprintf(cmd, MAX_CMD, "git commit -C %s", itr->c_str());
         system(cmd);
     }
 
