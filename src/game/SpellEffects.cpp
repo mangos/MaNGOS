@@ -5237,8 +5237,6 @@ void Spell::EffectApplyGlyph(uint32 i)
 
             player->CastSpell(m_caster, gp->SpellId, true);
             player->SetGlyph(m_glyphIndex, glyph);
-            if(m_CastItem)
-                player->DestroyItemCount(m_CastItem->GetEntry(), 1, true);
         }
     }
 }
