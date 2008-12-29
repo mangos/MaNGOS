@@ -22,7 +22,7 @@
 DROP TABLE IF EXISTS `db_version`;
 CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
-  `required_6961_01_mangos_command` bit(1) default NULL
+  `required_6970_01_mangos_playercreateinfo` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -9288,10 +9288,10 @@ INSERT INTO `playercreateinfo` VALUES
 (6,7,1,215,-2917,-257,53),
 (6,11,1,215,-2917,-257,53),
 (7,1,0,1,-6240,331,383),
-(7,4,0,1,-6340,331,383),
+(7,4,0,1,-6240,331,383),
 (7,6,609,4298,2355.05,-5661.7, 426.026),
-(7,8,0,1,-6340,331,383),
-(7,9,0,1,-6340,331,383),
+(7,8,0,1,-6240,331,383),
+(7,9,0,1,-6240,331,383),
 (8,1,1,14,-618,-4251,39),
 (8,3,1,14,-618,-4251,39),
 (8,4,1,14,-618,-4251,39),
