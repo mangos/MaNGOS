@@ -641,7 +641,7 @@ bool change_sql_database()
     {
         if(last_sql_update[i][0] == '\0') continue;
 
-        char old_file[MAX_PATH], tmp_file[MAX_PATH];
+        char old_file[MAX_PATH], tmp_file[MAX_PATH], dummy[MAX_BUF];
 
         snprintf(old_file, MAX_PATH, "%s%s", path_prefix, db_sql_file[i]);
         snprintf(tmp_file, MAX_PATH, "%s%stmp", path_prefix, db_sql_file[i]);
@@ -653,16 +653,20 @@ bool change_sql_database()
         FILE *fout = fopen( old_file, "w" );
         if(!fout) return false;
 
+        snprintf(dummy, MAX_CMD, "CREATE TABLE `%s` (\n", db_version_table[i]);
         while(fgets(buffer, MAX_BUF, fin))
         {
-            fputs(buffer, fout);
-            if(strncmp(buffer, "CREATE TABLE `db_version` (\n", MAX_BUF) == 0)
+            fputs(buffer, fout); 
+            if(strncmp(buffer, dummy, MAX_BUF) == 0)
                 break;
         }
 
-        if(!fgets(buffer, MAX_BUF, fin)) return false;
-        fputs(buffer, fout);
-        if(!fgets(buffer, MAX_BUF, fin)) return false;
+        while(1)
+        {
+            if(!fgets(buffer, MAX_BUF, fin)) return false;
+            if(sscanf(buffer, "  `required_%s`", dummy) == 1) break;
+            fputs(buffer, fout);
+        }
 
         fprintf(fout, "  `required_%s` bit(1) default NULL\n", last_sql_update[i]);
         while(fgets(buffer, MAX_BUF, fin))
