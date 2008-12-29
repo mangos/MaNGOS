@@ -301,7 +301,7 @@ bool write_rev()
         system_switch_index(cmd);
 
         return true;
-    } 
+    }
 
     return false;
 }
@@ -341,7 +341,7 @@ bool find_head_msg()
 bool amend_commit()
 {
     printf("+ amending last commit\n");
-    
+
     // commit the contents of the (new) index
     if(use_new_index && putenv(new_index_cmd) != 0) return false;
     snprintf(cmd, MAX_CMD, "git commit --amend -F-");
@@ -613,7 +613,7 @@ bool generate_sql_makefile()
     for(std::set<std::string>::iterator itr = file_list.begin(); itr != file_list.end(); ++itr)
         fprintf(fout, "\t%s \\\n", itr->c_str());
 
-    fprintf(fout, 
+    fprintf(fout,
         "\n## Additional files to include when running 'make dist'\n"
         "#  SQL update files, to upgrade database schema from older revisions\n"
         "EXTRA_DIST = \\\n"
@@ -656,7 +656,7 @@ bool change_sql_database()
         snprintf(dummy, MAX_CMD, "CREATE TABLE `%s` (\n", db_version_table[i]);
         while(fgets(buffer, MAX_BUF, fin))
         {
-            fputs(buffer, fout); 
+            fputs(buffer, fout);
             if(strncmp(buffer, dummy, MAX_BUF) == 0)
                 break;
         }
@@ -729,7 +729,7 @@ bool change_sql_history()
         pclose(cmd_pipe);
 
         // make a commit with the same author and message as the original one
-        
+
         snprintf(cmd, MAX_CMD, "git commit -C %s", itr->c_str());
         system(cmd);
     }
