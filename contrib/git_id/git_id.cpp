@@ -791,13 +791,14 @@ int main(int argc, char *argv[])
             printf("Usage: git_id [OPTION]\n");
             printf("Generates a new rev number and updates revision_nr.h and the commit message.\n");
             printf("Should be used just before push.\n");
-            printf("   -h, --help     show the usage\n");
-            printf("   -r, --replace  replace the rev number if it was already applied to the last\n");
-            printf("                  commit\n");
-            printf("   -l, --local    search for the highest rev number on HEAD\n");
-            printf("   -f, --fetch    fetch from origin before searching for the new rev\n");
-            printf("   -s, --sql      ");
-            printf("       --branch=BRANCH");
+            printf("   -h, --help            show the usage\n");
+            printf("   -r, --replace         replace the rev number if it was already applied\n");
+            printf("                         to the last commit\n");
+            printf("   -l, --local           search for the highest rev number on HEAD\n");
+            printf("   -f, --fetch           fetch from origin before searching for the new rev\n");
+            printf("   -s, --sql             search for new sql updates and do all of the changes\n");
+            printf("                         for the new rev\n");
+            printf("       --branch=BRANCH   specify which remote branch to use");
             return 0;
         }
     }
