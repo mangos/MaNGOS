@@ -113,7 +113,7 @@ bool find_path()
     char *ptr;
     char cur_path[MAX_PATH];
     getcwd(cur_path, MAX_PATH);
-    int len = strnlen(cur_path, MAX_PATH);
+    int len = strlen(cur_path);
     strncpy(base_path, cur_path, len+1);
     
     if(cur_path[len-1] == '/' || cur_path[len-1] == '\\')
@@ -201,7 +201,7 @@ bool check_fwd()
     bool found = false;
     while(fgets(buffer, MAX_BUF, cmd_pipe))
     {
-        buffer[strnlen(buffer, MAX_BUF) - 1] = '\0';
+        buffer[strlen(buffer) - 1] = '\0';
         if(strncmp(origin_hash, buffer, MAX_BUF) == 0)
         {
             found = true;
@@ -366,6 +366,10 @@ struct sql_update_info
 bool get_sql_update_info(const char *buffer, sql_update_info &info)
 {
     info.table[0] = '\0';
+    int dummy[3];
+    if(sscanf(buffer, "%d_%d_%d", &dummy[0], &dummy[1], &dummy[2]) == 3)
+        return false;
+
     if(sscanf(buffer, "%d_%d_%[^_]_%[^.].sql", &info.rev, &info.nr, info.db, info.table) != 4 &&
         sscanf(buffer, "%d_%d_%[^.].sql", &info.rev, &info.nr, info.db) != 3)
     {
@@ -397,7 +401,7 @@ bool find_sql_updates()
 
     while(fgets(buffer, MAX_BUF, cmd_pipe))
     {
-        buffer[strnlen(buffer, MAX_BUF) - 1] = '\0';
+        buffer[strlen(buffer) - 1] = '\0';
         if(!get_sql_update_info(buffer, info)) continue;
 
         if(info.db_idx == NUM_DATABASES)
@@ -422,7 +426,7 @@ bool find_sql_updates()
 
     while(fgets(buffer, MAX_BUF, cmd_pipe))
     {
-        buffer[strnlen(buffer, MAX_BUF) - 1] = '\0';
+        buffer[strlen(buffer) - 1] = '\0';
         if(!get_sql_update_info(buffer, info)) continue;
 
         // find the old update with the highest rev for each database
@@ -507,7 +511,7 @@ bool convert_sql_updates()
         // rename the file in git
         snprintf(cmd, MAX_CMD, "git add %s", dst_file);
         system_switch_index(cmd);
-        snprintf(cmd, MAX_CMD, "git rm %s", src_file);
+        snprintf(cmd, MAX_CMD, "git rm --quiet %s", src_file);
         system_switch_index(cmd);
 
         // update the last sql update for the current database
@@ -535,8 +539,8 @@ bool generate_sql_makefile()
 
     while(fgets(buffer, MAX_BUF, cmd_pipe))
     {
-        buffer[strnlen(buffer, MAX_BUF) - 1] = '\0';
-        if(buffer[strnlen(buffer, MAX_BUF) - 1] != '/' &&
+        buffer[strlen(buffer) - 1] = '\0';
+        if(buffer[strlen(buffer) - 1] != '/' &&
             strncmp(buffer, "Makefile.am", MAX_BUF) != 0)
         {
             if(new_sql_updates.find(buffer) != new_sql_updates.end())
@@ -665,7 +669,7 @@ bool change_sql_history()
     std::list<std::string> hashes;
     while(fgets(buffer, MAX_BUF, cmd_pipe))
     {
-        buffer[strnlen(buffer, MAX_BUF) - 1] = '\0';
+        buffer[strlen(buffer) - 1] = '\0';
         if(strncmp(origin_hash, buffer, MAX_HASH) == 0)
             break;
 
@@ -695,14 +699,15 @@ bool change_sql_history()
 
         while(fgets(buffer, MAX_BUF, cmd_pipe))
         {
-            buffer[strnlen(buffer, MAX_BUF) - 1] = '\0';
-            snprintf(cmd, MAX_CMD, "git rm -f %s%s", path_prefix, buffer);
+            buffer[strlen(buffer) - 1] = '\0';
+            snprintf(cmd, MAX_CMD, "git rm -f --quiet %s%s", path_prefix, buffer);
             system(cmd);
         }
 
         pclose(cmd_pipe);
 
         // make a commit with the same author and message as the original one
+        
         snprintf(cmd, MAX_CMD, "git commit -C %s", itr->c_str());
         system(cmd);
     }
@@ -731,7 +736,7 @@ bool prepare_new_index()
     if(putenv(new_index_cmd) != 0) return false;
 
     // clear the new index
-    system("git reset --mixed HEAD");
+    system("git reset -q --mixed HEAD");
 
     // revert to old index
     snprintf(old_index_cmd, MAX_CMD, "GIT_INDEX_FILE=");
