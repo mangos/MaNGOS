@@ -3163,6 +3163,7 @@ void Spell::EffectSummonType(uint32 i)
         case SUMMON_TYPE_GUARDIAN:
         case SUMMON_TYPE_POSESSED:
         case SUMMON_TYPE_POSESSED2:
+        case SUMMON_TYPE_GUARDIAN2:
             EffectSummonGuardian(i);
             break;
         case SUMMON_TYPE_WILD:
