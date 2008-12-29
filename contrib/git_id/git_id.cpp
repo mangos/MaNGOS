@@ -500,6 +500,20 @@ bool convert_sql_updates()
         fprintf(fout, "ALTER TABLE %s CHANGE COLUMN required_%s required_%s bit;\n\n",
             db_version_table[info.db_idx], last_sql_update[info.db_idx], new_name);
 
+        // skip the first one or two lines from the input
+        // if it already contains update requirements
+        if(fgets(buffer, MAX_BUF, fin))
+        {
+            char dummy[MAX_BUF];
+            if(sscanf(buffer, "ALTER TABLE %s CHANGE COLUMN required_%s required_%s bit", dummy, dummy, dummy) == 3)
+            {
+                if(fgets(buffer, MAX_BUF, fin) && buffer[0] != '\n')
+                    fputs(buffer, fout);
+            }
+            else
+                fputs(buffer, fout);
+        }
+
         // copy the rest of the file
         char c;
         while( (c = getc(fin)) != EOF )
@@ -536,6 +550,7 @@ bool generate_sql_makefile()
 
     char newname[MAX_PATH];
     std::set<std::string> file_list;
+    sql_update_info info;
 
     while(fgets(buffer, MAX_BUF, cmd_pipe))
     {
@@ -545,7 +560,8 @@ bool generate_sql_makefile()
         {
             if(new_sql_updates.find(buffer) != new_sql_updates.end())
             {
-                snprintf(newname, MAX_PATH, "%d_%s", rev, buffer);
+                if(!get_sql_update_info(buffer, info)) return false;
+                snprintf(newname, MAX_PATH, "%d_%0*d_%s%s%s", rev, 2, info.nr, info.db, info.has_table ? "_" : "", info.table);
                 file_list.insert(newname);
             }
             else
@@ -712,7 +728,7 @@ bool change_sql_history()
         system(cmd);
     }
 
-    snprintf(cmd, MAX_CMD, "git cherry-pick %s", hashes.begin());
+    snprintf(cmd, MAX_CMD, "git cherry-pick %s", hashes.begin()->c_str());
     system(cmd);
 
     return true;
@@ -729,7 +745,7 @@ bool prepare_new_index()
     else snprintf(src_file, MAX_PATH, "%s.git/index", path_prefix);
     snprintf(dst_file, MAX_PATH, "%s%s", path_prefix, new_index_file);
 
-    copy_file(src_file, dst_file);
+    if(!copy_file(src_file, dst_file)) return false;
 
     // doesn't seem to work with path_prefix
     snprintf(new_index_cmd, MAX_CMD, "GIT_INDEX_FILE=%s/%s", base_path, new_index_file);
