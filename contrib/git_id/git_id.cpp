@@ -85,6 +85,7 @@ bool allow_replace = false;
 bool local = false;
 bool do_fetch = false;
 bool do_sql = false;
+bool use_new_index = true;
 
 // aux
 
@@ -274,6 +275,7 @@ void system_switch_index(const char *cmd)
     // but the new index will contains only the desired changes
     // while the old may contain others
     system(cmd);
+    if(!use_new_index) return;
     if(putenv(new_index_cmd) != 0) return;
     system(cmd);
     if(putenv(old_index_cmd) != 0) return;
@@ -340,15 +342,15 @@ bool amend_commit()
 {
     printf("+ amending last commit\n");
     
-    // commit the contents of the new index
-    if(putenv(new_index_cmd) != 0) return false;
+    // commit the contents of the (new) index
+    if(use_new_index && putenv(new_index_cmd) != 0) return false;
     snprintf(cmd, MAX_CMD, "git commit --amend -F-");
     if( (cmd_pipe = popen( cmd, "w" )) == NULL )
         return false;
 
     fprintf(cmd_pipe, "[%d] %s", rev, head_message);
     pclose(cmd_pipe);
-    if(putenv(old_index_cmd) != 0) return false;
+    if(use_new_index && putenv(old_index_cmd) != 0) return false;
 
     return true;
 }
@@ -736,7 +738,23 @@ bool change_sql_history()
 
 bool prepare_new_index()
 {
+    if(!use_new_index) return true;
+
+    // only use a new index if there are staged changes that should be preserved
+    if( (cmd_pipe = popen( "git diff --cached", "r" )) == NULL )
+        return false;
+
+    if(!fgets(buffer, MAX_BUF, cmd_pipe))
+    {
+        use_new_index = false;
+        pclose(cmd_pipe);
+        return true;
+    }
+
+    pclose(cmd_pipe);
+
     printf("+ preparing new index\n");
+
     // copy the existing index file to a new one
     char src_file[MAX_PATH], dst_file[MAX_PATH];
 
@@ -762,6 +780,7 @@ bool prepare_new_index()
 
 bool cleanup_new_index()
 {
+    if(!use_new_index) return true;
     printf("+ cleaning up the new index\n");
     char idx_file[MAX_PATH];
     snprintf(idx_file, MAX_PATH, "%s%s", path_prefix, new_index_file);
