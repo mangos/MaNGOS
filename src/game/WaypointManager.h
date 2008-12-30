@@ -45,7 +45,7 @@ struct WaypointNode
     float orientation;
     uint32 delay;
     WaypointBehavior * behavior;
-    WaypointNode() {}
+    WaypointNode() : x(0.0f), y(0.0f), z(0.0f), orientation(0.0f), delay(0), behavior(NULL) {}
     WaypointNode(float _x, float _y, float _z, float _o, uint32 _delay, WaypointBehavior * _behavior)
       : x(_x), y(_y), z(_z), orientation(_o), delay(_delay), behavior(_behavior) {}
 };

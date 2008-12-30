@@ -300,7 +300,8 @@ void WaypointManager::CheckTextsExistance(std::set<int32>& ids)
     {
         for (int i = 0; i < pmItr->second.size(); ++i)
         {
-            if (!pmItr->second[i].behavior)
+            WaypointBehavior* be = pmItr->second[i].behavior;
+            if (!be)
                 continue;
 
             // Now we check text existence and put all zero texts ids to the end of array
@@ -309,29 +310,29 @@ void WaypointManager::CheckTextsExistance(std::set<int32>& ids)
             int zeroCount = 0;
             for (int j = 0; j < MAX_WAYPOINT_TEXT; ++j)
             {
-                if (!pmItr->second[i].behavior->textid[j])
+                if (!be->textid[j])
                 {
                     ++zeroCount;
                     continue;
                 }
                 else
                 {
-                    if (!objmgr.GetMangosStringLocale(pmItr->second[i].behavior->textid[j]))
+                    if (!objmgr.GetMangosStringLocale(be->textid[j]))
                     {
-                        sLog.outErrorDb("ERROR: Some waypoint has textid%u with not existing %u text.", j, pmItr->second[i].behavior->textid[j]);
-                        pmItr->second[i].behavior->textid[j] = 0;
+                        sLog.outErrorDb("ERROR: Some waypoint has textid%u with not existing %u text.", j, be->textid[j]);
+                        be->textid[j] = 0;
                         ++zeroCount;
                         continue;
                     }
                     else
-                        ids.erase(pmItr->second[i].behavior->textid[j]);
+                        ids.erase(be->textid[j]);
 
                     // Shifting check
                     if (zeroCount)
                     {
                         // Correct textid but some zeros leading, so move it forward.
-                        pmItr->second[i].behavior->textid[j-zeroCount] = pmItr->second[i].behavior->textid[j];
-                        pmItr->second[i].behavior->textid[j] = 0;
+                        be->textid[j-zeroCount] = be->textid[j];
+                        be->textid[j] = 0;
                     }
                 }
             }
