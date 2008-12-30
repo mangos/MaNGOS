@@ -10279,6 +10279,16 @@ Unit* Unit::SelectNearbyTarget() const
     return *tcIter;
 }
 
+bool Unit::hasNegativeAuraWithInterruptFlag(uint32 flag)
+{
+    for (AuraMap::iterator iter = m_Auras.begin(); iter != m_Auras.end(); ++iter)
+    {
+        if (!iter->second->IsPositive() && iter->second->GetSpellProto()->AuraInterruptFlags & flag)
+            return true;
+    }
+    return false;
+}
+
 void Unit::ApplyAttackTimePercentMod( WeaponAttackType att,float val, bool apply )
 {
     if(val > 0)
