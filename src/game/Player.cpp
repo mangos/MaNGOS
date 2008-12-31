@@ -3008,6 +3008,8 @@ void Player::removeSpell(uint32 spell_id, bool disabled)
 
     for(SpellLearnSpellMap::const_iterator itr2 = spell_begin; itr2 != spell_end; ++itr2)
         removeSpell(itr2->second.spell, disabled);
+
+    // TODO: recast if need lesser ranks spell for passive with IsPassiveSpellStackableWithRanks
 }
 
 void Player::RemoveArenaSpellCooldowns()
