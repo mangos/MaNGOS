@@ -485,6 +485,12 @@ struct AreaTableEntry
     uint32  team;                                           // 28
 };
 
+struct AreaGroupEntry
+{
+    uint32  AreaGroupId;                                    // 0
+    uint32  AreaId[7];                                      // 1-7
+};
+
 struct AreaTriggerEntry
 {
     uint32  id;                                             // 0        m_ID
@@ -1152,7 +1158,7 @@ struct SpellEntry
     //uint32    MinReputation;                              // 223      m_minReputation not used
     //uint32    RequiredAuraVision;                         // 224      m_requiredAuraVision not used
     uint32    TotemCategory[2];                             // 225-226  m_requiredTotemCategoryID
-    int32     AreaId;                                       // 227      m_requiredAreasID
+    int32     AreaGroupId;                                  // 227      m_requiredAreaGroupId
     uint32    SchoolMask;                                   // 228      m_schoolMask
     uint32    runeCostID;                                   // 229      m_runeCostID
     //uint32    spellMissileID;                             // 230      m_spellMissileID not used
