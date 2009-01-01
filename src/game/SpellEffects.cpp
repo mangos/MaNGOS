@@ -1312,7 +1312,7 @@ void Spell::EffectDummy(uint32 i)
                     case 27222:
                     case 57946: damage+=spirit*3; break;
                     default:
-                        sLog.outError("Spell::EffectDummy: Life Tap need set spirit multipler",m_triggeredByAuraSpell->Id);
+                        sLog.outError("Spell::EffectDummy: %u Life Tap need set spirit multipler", m_spellInfo->Id);
                         return;
                 }
 //              Think its not need (also need remove Life Tap from SpellDamageBonus or add new value)
