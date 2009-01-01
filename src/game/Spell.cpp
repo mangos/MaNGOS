@@ -411,7 +411,7 @@ void Spell::FillTargetMap()
             case TARGET_ALL_AROUND_CASTER:
                 if( m_spellInfo->EffectImplicitTargetB[i]==TARGET_ALL_PARTY ||
                     m_spellInfo->EffectImplicitTargetB[i]==TARGET_ALL_FRIENDLY_UNITS_AROUND_CASTER ||
-                    m_spellInfo->EffectImplicitTargetB[i]==TARGET_RANDOM_RAID_MEMBER )
+                    m_spellInfo->EffectImplicitTargetB[i]==TARGET_ALL_RAID_AROUND_CASTER )
                 {
                     SetTargetMap(i,m_spellInfo->EffectImplicitTargetB[i],tmpUnitMap);
                 }
@@ -1505,6 +1505,7 @@ void Spell::SetTargetMap(uint32 i,uint32 cur,std::list<Unit*> &TagUnitMap)
         case TARGET_ALL_PARTY_AROUND_CASTER:
         case TARGET_ALL_PARTY_AROUND_CASTER_2:
         case TARGET_ALL_PARTY:
+        case TARGET_ALL_RAID_AROUND_CASTER:
         {
             Player *pTarget = m_caster->GetCharmerOrOwnerPlayerOrPlayerItself();
             Group *pGroup = pTarget ? pTarget->GetGroup() : NULL;
@@ -1518,7 +1519,9 @@ void Spell::SetTargetMap(uint32 i,uint32 cur,std::list<Unit*> &TagUnitMap)
                     Player* Target = itr->getSource();
 
                     // IsHostileTo check duel and controlled by enemy
-                    if( Target && Target->GetSubGroup()==subgroup && !m_caster->IsHostileTo(Target) )
+                    if( Target &&
+                        (cur==TARGET_ALL_RAID_AROUND_CASTER || Target->GetSubGroup()==subgroup) &&
+                        !m_caster->IsHostileTo(Target) )
                     {
                         if( m_caster->IsWithinDistInMap(Target, radius) )
                             TagUnitMap.push_back(Target);
@@ -1538,12 +1541,6 @@ void Spell::SetTargetMap(uint32 i,uint32 cur,std::list<Unit*> &TagUnitMap)
                     if( m_caster->IsWithinDistInMap(pet, radius) )
                         TagUnitMap.push_back(pet);
             }
-        }break;
-        case TARGET_RANDOM_RAID_MEMBER:
-        {
-            if (m_caster->GetTypeId() == TYPEID_PLAYER)
-                if(Player* target = ((Player*)m_caster)->GetNextRandomRaidMember(radius))
-                    TagUnitMap.push_back(target);
         }break;
         case TARGET_SINGLE_FRIEND:
         case TARGET_SINGLE_FRIEND_2:
