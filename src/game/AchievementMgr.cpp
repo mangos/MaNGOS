@@ -614,7 +614,26 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                     SetCriteriaProgress(achievementCriteria, 1);
                 break;
             }
+           case ACHIEVEMENT_CRITERIA_TYPE_ROLL_GREED_ON_LOOT:
+           case ACHIEVEMENT_CRITERIA_TYPE_ROLL_NEED_ON_LOOT:
+           {
+               // miscvalue1 = itemid
+               // miscvalue2 = diced value
+               if(!miscvalue1)
+                   continue;
+               if(miscvalue2 != achievementCriteria->roll_greed_on_loot.rollValue)
+                   continue;
+               ItemPrototype const *pProto = objmgr.GetItemPrototype( miscvalue1 );
 
+               uint32 requiredItemLevel = 0;
+               if (achievementCriteria->ID == 2412 || achievementCriteria->ID == 2358)
+                   requiredItemLevel = 185;
+
+               if(!pProto || pProto->ItemLevel <requiredItemLevel)
+                   continue;
+               SetCriteriaProgress(achievementCriteria, 1, true);
+               break;
+           }
         }
         if(IsCompletedCriteria(achievementCriteria))
             CompletedCriteria(achievementCriteria);
@@ -710,6 +729,9 @@ bool AchievementMgr::IsCompletedCriteria(AchievementCriteriaEntry const* achieve
             return progress->counter >= achievementCriteria->gain_exalted_reputation.numberOfExaltedFactions;
         case ACHIEVEMENT_CRITERIA_TYPE_EXPLORE_AREA:
             return progress->counter >= 1;
+       case ACHIEVEMENT_CRITERIA_TYPE_ROLL_GREED_ON_LOOT:
+       case ACHIEVEMENT_CRITERIA_TYPE_ROLL_NEED_ON_LOOT:
+           return progress->counter >= achievementCriteria->roll_greed_on_loot.count;
 
         // handle all statistic-only criteria here
         case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_BATTLEGROUND:

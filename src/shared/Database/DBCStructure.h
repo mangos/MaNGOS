@@ -325,6 +325,12 @@ struct AchievementCriteriaEntry
             uint32  rollValue;                              // 3
             uint32  count;                                  // 4
         } roll_need_on_loot;
+       // ACHIEVEMENT_CRITERIA_TYPE_ROLL_GREEDON_LOOT= 51
+        struct
+        {
+            uint32  rollValue;                              // 3
+            uint32  count;                                  // 4
+        } roll_greed_on_loot;
 
         // ACHIEVEMENT_CRITERIA_TYPE_HK_CLASS = 52
         struct
