@@ -563,7 +563,7 @@ bool generate_sql_makefile()
             if(new_sql_updates.find(buffer) != new_sql_updates.end())
             {
                 if(!get_sql_update_info(buffer, info)) return false;
-                snprintf(newname, MAX_PATH, "%d_%0*d_%s%s%s", rev, 2, info.nr, info.db, info.has_table ? "_" : "", info.table);
+                snprintf(newname, MAX_PATH, "%d_%0*d_%s%s%s.sql", rev, 2, info.nr, info.db, info.has_table ? "_" : "", info.table);
                 file_list.insert(newname);
             }
             else
