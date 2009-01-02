@@ -2196,12 +2196,6 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
         }
         case SPELLFAMILY_MAGE:
         {
-            // Hypothermia
-            if( GetId()==41425 )
-            {
-                m_target->ModifyAuraState(AURA_STATE_HYPOTHERMIA,apply);
-                return;
-            }
             break;
         }
         case SPELLFAMILY_DRUID:
@@ -3842,17 +3836,6 @@ void Aura::HandleModMechanicImmunity(bool apply, bool Real)
     }
 
     m_target->ApplySpellImmune(GetId(),IMMUNITY_MECHANIC,m_modifier.m_miscvalue,apply);
-
-    // special cases
-    switch(m_modifier.m_miscvalue)
-    {
-        case MECHANIC_INVULNERABILITY:
-            m_target->ModifyAuraState(AURA_STATE_FORBEARANCE,apply);
-            break;
-        case MECHANIC_SHIELD:
-            m_target->ModifyAuraState(AURA_STATE_WEAKENED_SOUL,apply);
-            break;
-    }
 
     // Bestial Wrath
     if ( GetSpellProto()->SpellFamilyName == SPELLFAMILY_HUNTER && GetSpellProto()->SpellIconID == 1680)
