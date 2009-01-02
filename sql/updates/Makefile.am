@@ -107,7 +107,8 @@ pkgdata_DATA = \
 	6970_01_mangos_playercreateinfo.sql \
 	6976_01_realmd_realmd_db_version.sql \
 	6976_02_characters_character_db_version.sql \
-	README
+	7002_01_mangos_spell_chain \
+	README \
 
 ## Additional files to include when running 'make dist'
 #  SQL update files, to upgrade database schema from older revisions
@@ -194,4 +195,5 @@ EXTRA_DIST = \
 	6970_01_mangos_playercreateinfo.sql \
 	6976_01_realmd_realmd_db_version.sql \
 	6976_02_characters_character_db_version.sql \
-	README
+	7002_01_mangos_spell_chain \
+	README \

@@ -22,7 +22,7 @@
 DROP TABLE IF EXISTS `db_version`;
 CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
-  `required_6970_01_mangos_playercreateinfo` bit(1) default NULL
+  `required_7002_01_mangos_spell_chain` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -14842,6 +14842,11 @@ INSERT INTO spell_chain VALUES
 (57720,30706,30706,2,0),
 (57721,57720,30706,3,0),
 (57722,57721,30706,4,0),
+/*Thunderstorm*/
+(51490,0,51490,1,0),
+(59156,51490,51490,2,0),
+(59158,59156,51490,3,0),
+(59159,59158,51490,4,0),
 /*------------------
 --(573)Restoration
 ------------------*/
