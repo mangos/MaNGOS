@@ -827,7 +827,7 @@ int main(int argc, char *argv[])
             printf("   -f, --fetch           fetch from origin before searching for the new rev\n");
             printf("   -s, --sql             search for new sql updates and do all of the changes\n");
             printf("                         for the new rev\n");
-            printf("       --branch=BRANCH   specify which remote branch to use");
+            printf("       --branch=BRANCH   specify which remote branch to use\n");
             return 0;
         }
     }
