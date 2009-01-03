@@ -613,7 +613,7 @@ bool generate_sql_makefile()
     for(std::set<std::string>::iterator itr = file_list.begin(), next; itr != file_list.end(); ++itr)
     {
         next = itr; ++next;
-        fprintf(fout, "\t%s %s\n", itr->c_str(), next == file_list.end() ? "" : "\\");
+        fprintf(fout, "\t%s%s\n", itr->c_str(), next == file_list.end() ? "" : " \\");
     }
 
     fprintf(fout,
@@ -625,7 +625,7 @@ bool generate_sql_makefile()
     for(std::set<std::string>::iterator itr = file_list.begin(), next; itr != file_list.end(); ++itr)
     {
         next = itr; ++next;
-        fprintf(fout, "\t%s %s\n", itr->c_str(), next == file_list.end() ? "" : "\\");
+        fprintf(fout, "\t%s%s\n", itr->c_str(), next == file_list.end() ? "" : " \\");
     }
 
     fclose(fout);
