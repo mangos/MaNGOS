@@ -1137,7 +1137,7 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
                 case SPELLFAMILY_ROGUE:
                 {
                     // Garrote-Silence -> Garrote (multi-family check)
-                    if( spellInfo_1->SpellIconID == 498 && spellInfo_1->SpellVisual == 0 && spellInfo_2->SpellIconID == 498  )
+                    if( spellInfo_1->SpellIconID == 498 && spellInfo_1->SpellVisual[0] == 0 && spellInfo_2->SpellIconID == 498  )
                         return false;
 
                     break;
@@ -1200,7 +1200,7 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
                 //Corruption & Seed of corruption
                 if( spellInfo_1->SpellIconID == 313 && spellInfo_2->SpellIconID == 1932 ||
                     spellInfo_2->SpellIconID == 313 && spellInfo_1->SpellIconID == 1932 )
-                    if(spellInfo_1->SpellVisual != 0 && spellInfo_2->SpellVisual != 0)
+                    if(spellInfo_1->SpellVisual[0] != 0 && spellInfo_2->SpellVisual[0] != 0)
                         return true;                        // can't be stacked
 
                 // Corruption and Unstable Affliction
