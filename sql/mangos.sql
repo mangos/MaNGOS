@@ -22,7 +22,7 @@
 DROP TABLE IF EXISTS `db_version`;
 CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
-  `required_7002_01_mangos_spell_chain` bit(1) default NULL
+  `required_7015_01_mangos_item_template` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -1539,8 +1539,8 @@ CREATE TABLE `item_template` (
   `RequiredCityRank` mediumint(8) unsigned NOT NULL default '0',
   `RequiredReputationFaction` smallint(5) unsigned NOT NULL default '0',
   `RequiredReputationRank` smallint(5) unsigned NOT NULL default '0',
-  `maxcount` smallint(5) unsigned NOT NULL default '0',
-  `stackable` smallint(5) unsigned NOT NULL default '1',
+  `maxcount` smallint(5) NOT NULL default '-1',
+  `stackable` smallint(5) NOT NULL default '1',
   `ContainerSlots` tinyint(3) unsigned NOT NULL default '0',
   `StatsCount` tinyint(3) unsigned NOT NULL default '0',
   `stat_type1` tinyint(3) unsigned NOT NULL default '0',
