@@ -27,6 +27,9 @@
 #include "BattleGroundBE.h"
 #include "BattleGroundAA.h"
 #include "BattleGroundRL.h"
+#include "BattleGroundSA.h"
+#include "BattleGroundDS.h"
+#include "BattleGroundRV.h"
 #include "SharedDefines.h"
 #include "Policies/SingletonImp.h"
 #include "MapManager.h"
@@ -1193,6 +1196,15 @@ void BattleGroundMgr::BuildBattleGroundStatusPacket(WorldPacket *data, BattleGro
         case BATTLEGROUND_RL:
             *data << uint8(8);
             break;
+        case BATTLEGROUND_SA:
+            *data << uint8(9);
+            break;
+        case BATTLEGROUND_DS:
+            *data << uint8(10);
+            break;
+        case BATTLEGROUND_RV:
+            *data << uint8(11);
+            break;
         default:                                            // unknown
             *data << uint8(0);
             break;
@@ -1469,6 +1481,15 @@ BattleGround * BattleGroundMgr::CreateNewBattleGround(uint32 bgTypeId)
         case BATTLEGROUND_RL:
             bg = new BattleGroundRL(*(BattleGroundRL*)bg_template);
             break;
+        case BATTLEGROUND_SA:
+            bg = new BattleGroundSA(*(BattleGroundSA*)bg_template);
+            break;
+        case BATTLEGROUND_DS:
+            bg = new BattleGroundDS(*(BattleGroundDS*)bg_template);
+            break;
+        case BATTLEGROUND_RV:
+            bg = new BattleGroundRV(*(BattleGroundRV*)bg_template);
+            break;
         default:
             //bg = new BattleGround;
             return 0;
@@ -1515,6 +1536,9 @@ uint32 BattleGroundMgr::CreateBattleGround(uint32 bgTypeId, uint32 MinPlayersPer
         case BATTLEGROUND_AA: bg = new BattleGroundAA; break;
         case BATTLEGROUND_EY: bg = new BattleGroundEY; break;
         case BATTLEGROUND_RL: bg = new BattleGroundRL; break;
+        case BATTLEGROUND_SA: bg = new BattleGroundSA; break;
+        case BATTLEGROUND_DS: bg = new BattleGroundDS; break;
+        case BATTLEGROUND_RV: bg = new BattleGroundRV; break;
         default:bg = new BattleGround;   break;             // placeholder for non implemented BG
     }
 
@@ -1835,10 +1859,14 @@ uint32 BattleGroundMgr::BGQueueTypeId(uint32 bgTypeId, uint8 arenaType) const
         return BATTLEGROUND_QUEUE_AV;
     case BATTLEGROUND_EY:
         return BATTLEGROUND_QUEUE_EY;
+    case BATTLEGROUND_SA:
+        return BATTLEGROUND_QUEUE_SA;
     case BATTLEGROUND_AA:
     case BATTLEGROUND_NA:
     case BATTLEGROUND_RL:
     case BATTLEGROUND_BE:
+    case BATTLEGROUND_DS:
+    case BATTLEGROUND_RV:
         switch(arenaType)
         {
         case ARENA_TYPE_2v2:
@@ -1867,6 +1895,8 @@ uint32 BattleGroundMgr::BGTemplateId(uint32 bgQueueTypeId) const
         return BATTLEGROUND_AV;
     case BATTLEGROUND_QUEUE_EY:
         return BATTLEGROUND_EY;
+    case BATTLEGROUND_QUEUE_SA:
+        return BATTLEGROUND_SA;
     case BATTLEGROUND_QUEUE_2v2:
     case BATTLEGROUND_QUEUE_3v3:
     case BATTLEGROUND_QUEUE_5v5:

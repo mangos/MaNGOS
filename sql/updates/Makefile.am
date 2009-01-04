@@ -110,6 +110,7 @@ pkgdata_DATA = \
 	7002_01_mangos_spell_chain.sql \
 	7015_01_mangos_item_template.sql \
 	7024_01_mangos_spell_chain.sql \
+	7026_01_mangos_battleground_template.sql \
 	README
 
 ## Additional files to include when running 'make dist'
@@ -200,4 +201,5 @@ EXTRA_DIST = \
 	7002_01_mangos_spell_chain.sql \
 	7015_01_mangos_item_template.sql \
 	7024_01_mangos_spell_chain.sql \
+	7026_01_mangos_battleground_template.sql \
 	README
