@@ -248,7 +248,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
         // 14.57 can be calculated by resolving damageperc formular below to 0
         if (z_diff >= 14.57f && !target->isDead() && !target->isGameMaster() &&
             !target->HasAuraType(SPELL_AURA_HOVER) && !target->HasAuraType(SPELL_AURA_FEATHER_FALL) &&
-            !target->HasAuraType(SPELL_AURA_FLY) && !target->IsImmunedToDamage(SPELL_SCHOOL_MASK_NORMAL,true) )
+            !target->HasAuraType(SPELL_AURA_FLY) && !target->IsImmunedToDamage(SPELL_SCHOOL_MASK_NORMAL) )
         {
             //Safe fall, fall height reduction
             int32 safe_fall = target->GetTotalAuraModifier(SPELL_AURA_SAFE_FALL);
