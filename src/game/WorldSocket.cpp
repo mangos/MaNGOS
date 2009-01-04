@@ -61,24 +61,13 @@ struct ServerPktHeader
         if(isLargePacket())
         {
             sLog.outDebug("initializing large server to client packet. Size: %u, cmd: %u", size, cmd);
-            header= new uint8[5];
             header[headerIndex++] = 0x80|(0xFF &(size>>16));
         }
-        else
-        {
-            header= new uint8[4];
-        }
-
         header[headerIndex++] = 0xFF &(size>>8);
         header[headerIndex++] = 0xFF &size;
 
         header[headerIndex++] = 0xFF & cmd;
         header[headerIndex++] = 0xFF & (cmd>>8);
-    }
-
-    ~ServerPktHeader()
-    {
-        delete[] header;
     }
 
     uint8 getHeaderLength()
@@ -93,7 +82,7 @@ struct ServerPktHeader
     }
 
     const uint32 size;
-    uint8 *header;
+    uint8 header[5];
 };
 
 struct ClientPktHeader
