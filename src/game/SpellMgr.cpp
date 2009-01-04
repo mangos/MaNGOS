@@ -1597,6 +1597,8 @@ void SpellMgr::LoadSpellChains()
         ++count;
     } while( result->NextRow() );
 
+    delete result;
+
     // additional integrity checks
     for(SpellChainMap::iterator i = mSpellChains.begin(); i != mSpellChains.end(); ++i)
     {
@@ -1644,8 +1646,6 @@ void SpellMgr::LoadSpellChains()
             }
         }
     }
-
-    delete result;
 
     sLog.outString();
     sLog.outString( ">> Loaded %u spell chain records", count );
