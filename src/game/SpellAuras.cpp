@@ -5016,7 +5016,7 @@ void Aura::HandleAuraModRangedAttackPowerOfStatPercent(bool apply, bool Real)
         return;
 
     // Recalculate bonus
-    if(m_target->GetTypeId() == TYPEID_PLAYER && (m_target->getClassMask() & CLASSMASK_WAND_USERS))
+    if(m_target->GetTypeId() == TYPEID_PLAYER && !(m_target->getClassMask() & CLASSMASK_WAND_USERS))
         ((Player*)m_target)->UpdateAttackPowerAndDamage(true);
 }
 
