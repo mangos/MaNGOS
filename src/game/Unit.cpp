@@ -4586,6 +4586,29 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                 triggered_spell_id = 29077;
                 break;
             }
+            // Hot Streak
+            if (dummySpell->SpellIconID == 2999)
+            {
+                if (triggeredByAura->GetEffIndex()!=0)
+                    return true;
+                Aura *counter = GetAura(triggeredByAura->GetId(), 1);
+                if (!counter)
+                    return true;
+
+                // Count spell criticals in a row in second aura
+                Modifier *mod = counter->GetModifier();
+                if (procEx & PROC_EX_CRITICAL_HIT)
+                {
+                    mod->m_amount *=2;
+                    if (mod->m_amount < 100) // not enough
+                        return true;
+                    // Crititcal counted -> roll chance
+                    if (roll_chance_i(triggeredByAura->GetModifier()->m_amount))
+                       CastSpell(this, 48108, true, castItem, triggeredByAura);
+                }
+                mod->m_amount = 25;
+                return true;
+            }
             // Incanter's Regalia set (add trigger chance to Mana Shield)
             if (dummySpell->SpellFamilyFlags & 0x0000000000008000LL)
             {
@@ -4941,11 +4964,6 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                 if(!procSpell)
                     return false;
 
-                // only rogue's finishing moves (maybe need additional checks)
-                if( procSpell->SpellFamilyName!=SPELLFAMILY_ROGUE ||
-                    (procSpell->SpellFamilyFlags & SPELLFAMILYFLAG_ROGUE__FINISHING_MOVE) == 0)
-                    return false;
-
                 // energy cost save
                 basepoints0 = procSpell->manaCost * triggeredByAura->GetModifier()->m_amount/100;
                 if(basepoints0 <= 0)
@@ -5125,6 +5143,33 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     if (!roll_chance_f(chance))
                         return false;
 
+                    break;
+                }
+                // Glyph of Divinity
+                case 54939:
+                {
+                    // Lookup base amount mana restore
+                    for (int i=0; i<3;i++)
+                        if (procSpell->Effect[i] == SPELL_EFFECT_ENERGIZE)
+                        {
+                            int32 mana = procSpell->EffectBasePoints[i];
+                            CastCustomSpell(this, 54986, 0, &mana, 0, true, castItem, triggeredByAura);
+                            break;
+                        }
+                    return true;
+                }
+                // Glyph of Flash of Light
+                case 54936:
+                {
+                    triggered_spell_id = 54957;
+                    basepoints0 = triggeredByAura->GetModifier()->m_amount*damage/100;
+                    break;
+                }
+                // Glyph of Holy Light
+                case 54937:
+                {
+                    triggered_spell_id = 54968;
+                    basepoints0 = triggeredByAura->GetModifier()->m_amount*damage/100;
                     break;
                 }
             }
