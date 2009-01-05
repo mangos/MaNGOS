@@ -215,6 +215,28 @@ void WorldSession::HandleTaxiNextDestinationOpcode(WorldPacket& recv_data)
         GetPlayer()->m_movementInfo = movementInfo;
         GetPlayer()->SetUnitMovementFlags(movementInfo.flags);
         GetPlayer()->m_anti_lastmovetime = movementInfo.time;
+
+        int32 timedelta = 0;
+        if (GetPlayer()->m_anti_lastmovetime !=0){
+            timedelta = movementInfo.time - GetPlayer()->m_anti_lastmovetime;
+            GetPlayer()->m_anti_deltamovetime += timedelta;
+            GetPlayer()->m_anti_lastmovetime = movementInfo.time;
+        } else {
+            GetPlayer()->m_anti_lastmovetime = movementInfo.time;
+        }
+
+        uint32 CurTime=getMSTime();
+        uint32 CurTimeDelta = 0;
+        if (GetPlayer()->m_anti_lastMStime != 0){
+            CurTimeDelta = CurTime - GetPlayer()->m_anti_lastMStime;
+            GetPlayer()->m_anti_deltaMStime += CurTimeDelta;
+            GetPlayer()->m_anti_lastMStime = CurTime;
+        } else {
+            GetPlayer()->m_anti_lastMStime = CurTime;
+        }
+
+        //sLog.outBasic("dtime: %d, stime: %d || dMS: %d - dMV: %d || dt: %d", timedelta, CurTime, GetPlayer()->m_anti_deltaMStime,  GetPlayer()->m_anti_deltamovetime);
+ 
         GetPlayer()->m_anti_justteleported = 1;
         //<<< end movement anticheat
         return;
@@ -232,7 +254,24 @@ void WorldSession::HandleTaxiNextDestinationOpcode(WorldPacket& recv_data)
     GetPlayer()->SetPosition(movementInfo.x, movementInfo.y, movementInfo.z, movementInfo.o);
     GetPlayer()->m_movementInfo = movementInfo;
     GetPlayer()->SetUnitMovementFlags(movementInfo.flags);
-    GetPlayer()->m_anti_lastmovetime = movementInfo.time;
+    int32 timedelta = 0;
+    if (GetPlayer()->m_anti_lastmovetime !=0){
+        timedelta = movementInfo.time - GetPlayer()->m_anti_lastmovetime;
+        GetPlayer()->m_anti_deltamovetime += timedelta;
+        GetPlayer()->m_anti_lastmovetime = movementInfo.time;
+    } else {
+        GetPlayer()->m_anti_lastmovetime = movementInfo.time;
+    }
+
+    uint32 CurTime=getMSTime();
+    uint32 CurTimeDelta = 0;
+    if (GetPlayer()->m_anti_lastMStime != 0){
+        CurTimeDelta = CurTime - GetPlayer()->m_anti_lastMStime;
+        GetPlayer()->m_anti_deltaMStime += CurTimeDelta;
+        GetPlayer()->m_anti_lastMStime = CurTime;
+    } else {
+        GetPlayer()->m_anti_lastMStime = CurTime;
+    } 
     //<<< end movement anticheat
 
     // far teleport case

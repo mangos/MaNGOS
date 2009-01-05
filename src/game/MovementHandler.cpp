@@ -258,6 +258,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
     // fall damage generation (ignore in flight case that can be triggered also at lags in moment teleportation to another map).
     if (opcode == MSG_MOVE_FALL_LAND && !GetPlayer()->isInFlight())
     {
+        GetPlayer()->m_anti_justjumped = 0;
         // calculate total z distance of the fall
         float z_diff = GetPlayer()->m_lastFallZ - movementInfo.z;
         sLog.outDebug("zDiff = %f", z_diff);
@@ -330,12 +331,39 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
     }
 
     #ifdef MOVEMENT_ANTICHEAT_DEBUG
-    sLog.outBasic("%s newcoord: tm:%d ftm:%d | %f,%f,%fo(%f) [%X][%s]| transport: %f,%f,%fo(%f)",GetPlayer()->GetName(),movementInfo.time,movementInfo.fallTime,movementInfo.x,movementInfo.y,movementInfo.z,movementInfo.o,MovementFlags, LookupOpcodeName(opcode),movementInfo.t_x,movementInfo.t_y,movementInfo.t_z,movementInfo.t_o);
+    sLog.outBasic("%s newcoord: tm:%d ftm:%d | %f,%f,%fo(%f) [%X][%s]| transport: %f,%f,%fo(%f)",GetPlayer()->GetName(),movementInfo.time,movementInfo.fallTime,movementInfo.x,movementInfo.y,movementInfo.z,movementInfo.o,movementInfo.flags, LookupOpcodeName(opcode),movementInfo.t_x,movementInfo.t_y,movementInfo.t_z,movementInfo.t_o);
     sLog.outBasic("Transport: %d |  tguid: %d - %d", GetPlayer()->m_anti_transportGUID, GUID_LOPART(movementInfo.t_guid), GUID_HIPART(movementInfo.t_guid));
     #endif
     /*----------------------*/
     //---- anti-cheat features -->>>
     bool check_passed = true;
+
+    //calc time deltas
+    int32 timedelta = 1500;
+    if (GetPlayer()->m_anti_lastmovetime !=0){
+        timedelta = movementInfo.time - GetPlayer()->m_anti_lastmovetime;
+        GetPlayer()->m_anti_deltamovetime += timedelta;
+        GetPlayer()->m_anti_lastmovetime = movementInfo.time;
+    } else {
+        GetPlayer()->m_anti_lastmovetime = movementInfo.time;
+    }
+
+    uint32 CurrentMStime=getMSTime();
+    uint32 CurrentMStimeDelta = 1500;
+    if (GetPlayer()->m_anti_lastMStime != 0){
+        CurrentMStimeDelta = CurrentMStime - GetPlayer()->m_anti_lastMStime;
+        GetPlayer()->m_anti_deltaMStime += CurrentMStimeDelta;
+        GetPlayer()->m_anti_lastMStime = CurrentMStime;
+    } else {
+        GetPlayer()->m_anti_lastMStime = CurrentMStime;
+    }
+
+    int32 sync_time = GetPlayer()->m_anti_deltamovetime - GetPlayer()->m_anti_deltaMStime;
+
+    #ifdef MOVEMENT_ANTICHEAT_DEBUG
+    sLog.outBasic("dtime: %d, stime: %d || dMS: %d - dMV: %d || dt: %d", timedelta, CurrentMStime, GetPlayer()->m_anti_deltaMStime,  GetPlayer()->m_anti_deltamovetime, sync_time);
+    #endif
+
     uint32 curDest = GetPlayer()->m_taxi.GetTaxiDestination(); //check taxi flight
     if ((GetPlayer()->m_anti_transportGUID == 0) && World::GetEnableMvAnticheat() && !curDest)
     {
@@ -354,11 +382,23 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
         float delta_z = GetPlayer()->GetPositionZ() - movementInfo.z;
         float real_delta = delta_x * delta_x + delta_y * delta_y;
         float tg_z = -99999; //tangens
-        float time_delta = movementInfo.time - GetPlayer()->m_anti_lastmovetime;
-        if (time_delta > 0) {
-            GetPlayer()->m_anti_lastmovetime = movementInfo.time;
-        } else {time_delta = 0;}
-        time_delta = (time_delta < 1500) ? time_delta/1000 : 1.5f; //normalize time - 1.5 second allowed for heavy loaded server
+
+        int32 gmd = World::GetMistimingDelta();
+        if (sync_time > gmd || sync_time < -gmd){
+            timedelta = CurrentMStimeDelta;
+            GetPlayer()->m_anti_mistiming_count++;
+            
+            sLog.outError("Movement anticheat: %s is mistaming exception. Exception count: %d, mistiming: %d ms ", GetPlayer()->GetName(), GetPlayer()->m_anti_mistiming_count, sync_time);
+            if (GetPlayer()->m_anti_mistiming_count > World::GetMistimingAlarms())
+            {
+                GetPlayer()->GetSession()->KickPlayer();
+                ///sLog.outError("Movement anticheat: %s is mistaming exception. Exception count: %d, mistiming: %d ms ", GetPlayer()->GetName(), GetPlayer()->m_anti_mistiming_count, sync_time);
+            }
+            check_passed = false;
+        }
+
+        if (timedelta < 0) {timedelta = 0;}
+        float time_delta = (timedelta < 1500) ? (float)timedelta/1000 : 1.5f; //normalize time - 1.5 second allowed for heavy loaded server
 
         if (!(movementInfo.flags & (MOVEMENTFLAG_FLYING | MOVEMENTFLAG_SWIMMING)))
           tg_z = (real_delta !=0) ? (delta_z*delta_z / real_delta) : -99999;
@@ -397,17 +437,25 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
        // sLog.outBasic("%s newcoord: tm:%d ftm:%d | %f,%f,%fo(%f) [%X][%s]$%s",GetPlayer()->GetName(),movementInfo.time,movementInfo.fallTime,movementInfo.x,movementInfo.y,movementInfo.z,movementInfo.o,MovementFlags, LookupOpcodeName(opcode),move_type_name[move_type]);
        // sLog.outBasic("%f",tg_z);
 
+        if (opcode == MSG_MOVE_JUMP){
+            if (GetPlayer()->m_anti_justjumped == 1){
+                ///GetPlayer()->m_anti_justjumped = 0;
+                check_passed = false; //don't process new jump packet
+            } else {
+                GetPlayer()->m_anti_justjumped = 1;
+            }
+        }
         if ((real_delta > allowed_delta)) //&& (delta_z < 1)
         {
             #ifdef MOVEMENT_ANTICHEAT_DEBUG
-            sLog.outDebug("Movement anticheat: %s is speed exception. {real_delta=%f allowed_delta=%f | current_speed=%f preview_speed=%f time=%f}(%f %f %f %d)[%s]",GetPlayer()->GetName(),real_delta, allowed_delta, current_speed, GetPlayer()->m_anti_last_hspeed,time_delta,GetPlayer()->GetPositionX(),GetPlayer()->GetPositionY(),GetPlayer()->GetPositionZ(), GetPlayer()->GetMapId(),LookupOpcodeName(opcode));
+            sLog.outError("Movement anticheat: %s is speed exception. {real_delta=%f allowed_delta=%f | current_speed=%f preview_speed=%f time=%f}(%f %f %f %d)[%s]",GetPlayer()->GetName(),real_delta, allowed_delta, current_speed, GetPlayer()->m_anti_last_hspeed,time_delta,GetPlayer()->GetPositionX(),GetPlayer()->GetPositionY(),GetPlayer()->GetPositionZ(), GetPlayer()->GetMapId(),LookupOpcodeName(opcode));
             #endif
             check_passed = false;
         }
         if ((real_delta>4900.0f) && !(real_delta < allowed_delta))
         {
             #ifdef MOVEMENT_ANTICHEAT_DEBUG
-            sLog.outDebug("Movement anticheat: %s is teleport exception. {real_delta=%f allowed_delta=%f | current_speed=%f preview_speed=%f time=%f}(%f %f %f %d)",GetPlayer()->GetName(),real_delta, allowed_delta, current_speed, GetPlayer()->m_anti_last_hspeed,time_delta,GetPlayer()->GetPositionX(),GetPlayer()->GetPositionY(),GetPlayer()->GetPositionZ(), GetPlayer()->GetMapId());
+            sLog.outError("Movement anticheat: %s is teleport exception. {real_delta=%f allowed_delta=%f | current_speed=%f preview_speed=%f time=%f}(%f %f %f %d)",GetPlayer()->GetName(),real_delta, allowed_delta, current_speed, GetPlayer()->m_anti_last_hspeed,time_delta,GetPlayer()->GetPositionX(),GetPlayer()->GetPositionY(),GetPlayer()->GetPositionZ(), GetPlayer()->GetMapId());
             #endif
             check_passed = false;
         }
@@ -421,14 +469,14 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
         if ((tg_z > 1.56f) && (delta_z < GetPlayer()->m_anti_last_vspeed))
         {
             #ifdef MOVEMENT_ANTICHEAT_DEBUG
-            sLog.outDebug("Movement anticheat: %s is mountain exception. {tg_z=%f} (%f %f %f %d)",GetPlayer()->GetName(),tg_z, GetPlayer()->GetPositionX(),GetPlayer()->GetPositionY(),GetPlayer()->GetPositionZ(), GetPlayer()->GetMapId());
+            sLog.outError("Movement anticheat: %s is mountain exception. {tg_z=%f} (%f %f %f %d)",GetPlayer()->GetName(),tg_z, GetPlayer()->GetPositionX(),GetPlayer()->GetPositionY(),GetPlayer()->GetPositionZ(), GetPlayer()->GetMapId());
             #endif
             check_passed = false;
         }
         if (((movementInfo.flags & (MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_FLYING | MOVEMENTFLAG_FLYING2)) != 0) && !GetPlayer()->isGameMaster() && !(GetPlayer()->HasAuraType(SPELL_AURA_FLY) || GetPlayer()->HasAuraType(SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED)))
         {
             #ifdef MOVEMENT_ANTICHEAT_DEBUG
-            sLog.outDebug("Movement anticheat: %s is fly cheater. {SPELL_AURA_FLY=[%X]} {SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED=[%X]} {SPELL_AURA_MOD_SPEED_FLIGHT=[%X]} {SPELL_AURA_MOD_FLIGHT_SPEED_ALWAYS=[%X]} {SPELL_AURA_MOD_FLIGHT_SPEED_NOT_STACK=[%X]}",
+            sLog.outError("Movement anticheat: %s is fly cheater. {SPELL_AURA_FLY=[%X]} {SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED=[%X]} {SPELL_AURA_MOD_SPEED_FLIGHT=[%X]} {SPELL_AURA_MOD_FLIGHT_SPEED_ALWAYS=[%X]} {SPELL_AURA_MOD_FLIGHT_SPEED_NOT_STACK=[%X]}",
                GetPlayer()->GetName(),
                GetPlayer()->HasAuraType(SPELL_AURA_FLY), GetPlayer()->HasAuraType(SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED),
                GetPlayer()->HasAuraType(SPELL_AURA_MOD_SPEED_FLIGHT), GetPlayer()->HasAuraType(SPELL_AURA_MOD_FLIGHT_SPEED_ALWAYS),
@@ -439,7 +487,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
         if (((movementInfo.flags & MOVEMENTFLAG_WATERWALKING) != 0) && !GetPlayer()->isGameMaster() && !(GetPlayer()->HasAuraType(SPELL_AURA_WATER_WALK) | GetPlayer()->HasAuraType(SPELL_AURA_GHOST)))
         {
             #ifdef MOVEMENT_ANTICHEAT_DEBUG
-            sLog.outDebug("Movement anticheat: %s is water-walk exception. [%X]{SPELL_AURA_WATER_WALK=[%X]}", GetPlayer()->GetName(), movementInfo.flags, GetPlayer()->HasAuraType(SPELL_AURA_WATER_WALK));
+            sLog.outError("Movement anticheat: %s is water-walk exception. [%X]{SPELL_AURA_WATER_WALK=[%X]}", GetPlayer()->GetName(), movementInfo.flags, GetPlayer()->HasAuraType(SPELL_AURA_WATER_WALK));
             #endif
             check_passed = false;
         }
@@ -755,44 +803,13 @@ void WorldSession::HandleMoveKnockBackAck( WorldPacket & recv_data )
     /* extract packet */
     MovementInfo movementInfo;
     ReadMovementInfo(recv_data, &movementInfo);
-/*
-    CHECK_PACKET_SIZE(recv_data, 8+4+4+1+4+4+4+4+4);
-    MovementInfo movementInfo;
 
-    uint64 guid;
-    uint32 sequence;
-    uint32 MovementFlags;
-    uint32 ukn1;
-    float xdirection,ydirection,hspeed,vspeed;
-
-    recv_data >> guid;          //8
-    recv_data >> sequence;      //4
-    recv_data >> MovementFlags >> movementInfo.unk1 >> movementInfo.time; //4+1+4
-    recv_data >> movementInfo.x >> movementInfo.y >> movementInfo.z >> movementInfo.o; //4+4+4+4
-*/
     //Save movement flags
     _player->SetUnitMovementFlags(movementInfo.flags);
-/*
-    if(movementInfo.flags & MOVEMENTFLAG_ONTRANSPORT)
-    {
-        // recheck
-        CHECK_PACKET_SIZE(recv_data, recv_data.rpos()+8+4+4+4+4+4);
 
-        recv_data >> movementInfo.t_guid;
-        recv_data >> movementInfo.t_x;
-        recv_data >> movementInfo.t_y;
-        recv_data >> movementInfo.t_z;
-        recv_data >> movementInfo.t_o;
-        recv_data >> movementInfo.t_time;
-    }
-
-    CHECK_PACKET_SIZE(recv_data, recv_data.rpos()+4+4+4+4+4);
-    recv_data >> ukn1; //unknown //4
-    recv_data >> vspeed >> xdirection >> ydirection >> hspeed; //4+4+4+4
-*/
     #ifdef MOVEMENT_ANTICHEAT_DEBUG
-    sLog.outDebug("%s CMSG_MOVE_KNOCK_BACK_ACK: tm:%d ftm:%d | %f,%f,%fo(%f) [%X]",GetPlayer()->GetName(),movementInfo.time,movementInfo.fallTime,movementInfo.x,movementInfo.y,movementInfo.z,movementInfo.o,movementInfo.flags);
-    sLog.outDebug("%s CMSG_MOVE_KNOCK_BACK_ACK additional: vspeed:%f, hspeed:%f, xdir:%f ydir:%f",GetPlayer()->GetName(), vspeed, hspeed, xdirection, ydirection);
+    sLog.outBasic("%s CMSG_MOVE_KNOCK_BACK_ACK: tm:%d ftm:%d | %f,%f,%fo(%f) [%X]",GetPlayer()->GetName(),movementInfo.time,movementInfo.fallTime,movementInfo.x,movementInfo.y,movementInfo.z,movementInfo.o,movementInfo.flags);
+    sLog.outBasic("%s CMSG_MOVE_KNOCK_BACK_ACK additional: vspeed:%f, hspeed:%f",GetPlayer()->GetName(), movementInfo.j_unk, movementInfo.j_xyspeed);
     #endif
 
     _player->m_movementInfo = movementInfo;

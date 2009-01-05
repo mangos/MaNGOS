@@ -394,6 +394,12 @@ Player::Player (WorldSession *session): Unit(), m_achievementMgr(this)
     m_anti_justteleported = 0;   //seted when player was teleported
     m_anti_teletoplane_count = 0;//Teleport To Plane alarm counter
 
+    m_anti_lastMStime = 0;       //last movement server time
+    m_anti_deltamovetime = 0;
+    m_anti_deltaMStime = 0;
+    m_anti_mistiming_count = 0;
+    
+    m_anti_justjumped = 0;       //jump already began  
     m_anti_alarmcount = 0;       //alarm counter
     /////////////////////////////////
     m_mailsLoaded = false;

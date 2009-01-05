@@ -74,6 +74,8 @@ float World::m_VisibleObjectGreyDistance      = 0;
 //movement anticheat
 bool World::m_EnableMvAnticheat = true;
 uint32  World::m_TeleportToPlaneAlarms = 50;
+uint32 World::m_MistimingAlarms = 20;
+uint32 World::m_MistimingDelta = 2000;
 // ServerMessages.dbc
 enum ServerMessageType
 {
@@ -549,6 +551,24 @@ void World::LoadConfigSettings(bool reload)
     if (m_TeleportToPlaneAlarms>100){
         sLog.outError("Anticheat.Movement.TeleportToPlaneAlarms (%d) must be <=100. Using 100 instead.",m_TeleportToPlaneAlarms);
         m_TeleportToPlaneAlarms = 100;
+    }
+    m_MistimingDelta = sConfig.GetIntDefault("Anticheat.Movement.MistimingDelta",2000);
+    if (m_MistimingDelta<1000){
+        sLog.outError("Anticheat.Movement.m_MistimingDelta (%d) must be >=1000ms. Using 1000 instead.",m_TeleportToPlaneAlarms);
+        m_MistimingDelta = 1000;
+    }
+    if (m_MistimingDelta>10000){
+        sLog.outError("Anticheat.Movement.m_MistimingDelta (%d) must be <=10000ms. Using 10000 instead.",m_TeleportToPlaneAlarms);
+        m_MistimingDelta = 10000;
+    }
+    m_MistimingAlarms = sConfig.GetIntDefault("Anticheat.Movement.MistimingAlarms",20);
+    if (m_MistimingAlarms<10) {
+        sLog.outError("Anticheat.Movement.MistimingAlarms (%d) must be >=20. Using 10 instead.",m_TeleportToPlaneAlarms);
+        m_MistimingAlarms = 10;
+    }
+    if (m_MistimingAlarms>50){
+        sLog.outError("Anticheat.Movement.m_MistimingAlarms (%d) must be <=50. Using 50 instead.",m_TeleportToPlaneAlarms);
+        m_MistimingAlarms = 50;
     }
     ///- Read other configuration items from the config file
 

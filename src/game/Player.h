@@ -2371,6 +2371,12 @@ class MANGOS_DLL_SPEC Player : public Unit
         uint32 m_anti_justteleported;   //seted when player was teleported
         uint32 m_anti_teletoplane_count;//Teleport To Plane alarm counter
 
+        uint32 m_anti_lastMStime;       //last movement server time
+        uint32 m_anti_deltamovetime;    //client side session time
+        uint32 m_anti_deltaMStime;      //server side session time
+        uint32 m_anti_mistiming_count;  //mistiming counts before kick
+
+        uint32 m_anti_justjumped;       //Jump already began, anti air jump check  
         uint64 m_anti_alarmcount;       //alarm counter
         // Transports
         Transport * m_transport;
