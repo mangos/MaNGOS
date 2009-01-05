@@ -7390,6 +7390,16 @@ bool Unit::isSpellCrit(Unit *pVictim, SpellEntry const *spellProto, SpellSchoolM
                         }
                     }
                 }
+                // Glyph of Shadowburn
+                if (spellProto->SpellFamilyName == SPELLFAMILY_WARLOCK &&
+                    spellProto->SpellFamilyFlags & 0x0000000000000080 && 
+                    pVictim->HasAuraState(AURA_STATE_HEALTHLESS_35_PERCENT))
+                {
+                    AuraList const& mOverrideClassScript = GetAurasByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
+                    for(AuraList::const_iterator i = mOverrideClassScript.begin(); i != mOverrideClassScript.end(); ++i)
+                        if((*i)->GetModifier()->m_miscvalue == 7917)
+                            crit_chance+=(*i)->GetModifier()->m_amount;
+                }
             }
             break;
         }
