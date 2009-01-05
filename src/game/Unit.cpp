@@ -4562,6 +4562,15 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     target = this;
                     break;
                 }
+                // Vampiric Touch (generic, used by some boss)
+                case 52723:
+                case 60501:
+                {
+                    triggered_spell_id = 52724;
+                    basepoints0 = damage / 2;
+                    target = this;
+                    break;
+                }
             }
             break;
         }
