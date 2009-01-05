@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -416,7 +416,7 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         float GetDistance2d(const WorldObject* obj) const;
         float GetDistance2d(const float x, const float y) const;
         float GetDistanceZ(const WorldObject* obj) const;
-        bool IsInMap(const WorldObject* obj) const { return GetMapId()==obj->GetMapId() && GetInstanceId()==obj->GetInstanceId(); }
+        bool IsInMap(const WorldObject* obj) const { return IsInWorld() && obj->IsInWorld() && GetMapId()==obj->GetMapId() && GetInstanceId()==obj->GetInstanceId(); }
         bool IsWithinDistInMap(const WorldObject* obj, const float dist2compare, const bool is3D = true) const;
         bool IsWithinLOS(const float x, const float y, const float z ) const;
         bool IsWithinLOSInMap(const WorldObject* obj) const;

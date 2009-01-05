@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -280,6 +280,16 @@ void WorldSession::HandleGameObjectUseOpcode( WorldPacket & recv_data )
         return;
 
     obj->Use(_player);
+}
+
+void WorldSession::HandleGameobjectReportUse(WorldPacket& recvPacket)
+{
+    CHECK_PACKET_SIZE(recvPacket,8);
+
+    uint64 guid;
+    recvPacket >> guid;
+
+    sLog.outDebug( "WORLD: Recvd CMSG_GAMEOBJ_REPORT_USE Message [in game guid: %u]", GUID_LOPART(guid));
 }
 
 void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)

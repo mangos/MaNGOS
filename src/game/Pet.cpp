@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -101,7 +101,7 @@ void Pet::RemoveFromWorld()
     Unit::RemoveFromWorld();
 }
 
-bool Pet::LoadPetFromDB( Unit* owner, uint32 petentry, uint32 petnumber, bool current )
+bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool current )
 {
     m_loading = true;
 
@@ -764,7 +764,6 @@ bool Pet::CreateBaseAtCreature(Creature* creature)
     SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, 0);
     SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
     SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, uint32((MaNGOS::XP::xp_to_level(creature->getLevel()))/4));
-    SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
     SetUInt32Value(UNIT_NPC_FLAGS, 0);
 
     CreatureFamilyEntry const* cFamily = sCreatureFamilyStore.LookupEntry(creature->GetCreatureInfo()->family);
@@ -1222,7 +1221,7 @@ void Pet::_SaveAuras()
                     {
                         CharacterDatabase.PExecute("INSERT INTO pet_aura (guid,caster_guid,spell,effect_index,stackcount,amount,maxduration,remaintime,remaincharges) "
                             "VALUES ('%u', '" I64FMTD "', '%u', '%u', '%u', '%d', '%d', '%d', '%d')",
-                            m_charmInfo->GetPetNumber(), itr2->second->GetCasterGUID(),(uint32)itr2->second->GetId(), (uint32)itr2->second->GetEffIndex(), stackCounter, itr2->second->GetModifier()->m_amount,int(itr2->second->GetAuraMaxDuration()),int(itr2->second->GetAuraDuration()),int(itr2->second->m_procCharges));
+                            m_charmInfo->GetPetNumber(), itr2->second->GetCasterGUID(),(uint32)itr2->second->GetId(), (uint32)itr2->second->GetEffIndex(), stackCounter, itr2->second->GetModifier()->m_amount,int(itr2->second->GetAuraMaxDuration()),int(itr2->second->GetAuraDuration()),int(itr2->second->GetAuraCharges()));
                     }
                 }
             }

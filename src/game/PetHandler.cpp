@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -245,9 +245,6 @@ void WorldSession::HandlePetAction( WorldPacket & recv_data )
                     {
                         case SPELL_FAILED_REQUIRES_SPELL_FOCUS:
                             data << uint32(spellInfo->RequiresSpellFocus);
-                            break;
-                        case SPELL_FAILED_REQUIRES_AREA:
-                            data << uint32(spellInfo->AreaId);
                             break;
                     }
                     SendPacket(&data);

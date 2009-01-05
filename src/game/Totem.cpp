@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -159,7 +159,7 @@ void Totem::SetTypeBySummonSpell(SpellEntry const * spellProto)
         m_type = TOTEM_STATUE;                              //Jewelery statue
 }
 
-bool Totem::IsImmunedToSpell(SpellEntry const* spellInfo, bool useCharges)
+bool Totem::IsImmunedToSpell(SpellEntry const* spellInfo)
 {
     for (int i=0;i<3;i++)
     {
@@ -172,5 +172,5 @@ bool Totem::IsImmunedToSpell(SpellEntry const* spellInfo, bool useCharges)
                 continue;
         }
     }
-    return Creature::IsImmunedToSpell(spellInfo, useCharges);
+    return Creature::IsImmunedToSpell(spellInfo);
 }

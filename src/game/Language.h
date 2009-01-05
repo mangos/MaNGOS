@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -168,7 +168,9 @@ enum MangosStrings
     LANG_SOUND_NOT_EXIST                = 170,
     //                                    171,              // not used
     LANG_CONSOLE_COMMAND                = 172,
-    // Room for more level 1              173-199 not used
+    LANG_YOU_CHANGE_RUNIC_POWER         = 173,
+    LANG_YOURS_RUNIC_POWER_CHANGED      = 174,
+    // Room for more level 1              175-199 not used
 
     // level 2 chat
     LANG_NO_SELECTION                   = 200,

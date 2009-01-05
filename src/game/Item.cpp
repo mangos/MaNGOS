@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -888,8 +888,8 @@ Item* Item::CreateItem( uint32 item, uint32 count, Player const* player )
     ItemPrototype const *pProto = objmgr.GetItemPrototype( item );
     if( pProto )
     {
-        if ( count > pProto->Stackable )
-            count = pProto->Stackable;
+        if ( count > pProto->GetMaxStackSize())
+            count = pProto->GetMaxStackSize();
 
         assert(count !=0 && "pProto->Stackable==0 but checked at loading already");
 

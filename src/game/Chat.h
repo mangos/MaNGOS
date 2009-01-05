@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -77,6 +77,7 @@ class ChatHandler
 
         virtual bool isAvailable(ChatCommand const& cmd) const;
         virtual bool needReportToTarget(Player* chr) const;
+        bool HasLowerSecurity(Player* target, uint64 guid);
 
         void SendGlobalSysMessage(const char *str);
 
@@ -156,6 +157,7 @@ class ChatHandler
         bool HandleModifyHPCommand(const char* args);
         bool HandleModifyManaCommand(const char* args);
         bool HandleModifyRageCommand(const char* args);
+        bool HandleModifyRunicPowerCommand(const char* args);
         bool HandleModifyEnergyCommand(const char* args);
         bool HandleModifyMoneyCommand(const char* args);
         bool HandleModifyASpeedCommand(const char* args);
@@ -195,7 +197,6 @@ class ChatHandler
         bool HandleNpcWhisperCommand(const char* args);
         bool HandleNpcYellCommand(const char* args);
 
-        bool HandleReloadCommand(const char* args);
         bool HandleReloadAllCommand(const char* args);
         bool HandleReloadAllAreaCommand(const char* args);
         bool HandleReloadAllItemCommand(const char* args);
@@ -434,6 +435,7 @@ class ChatHandler
         bool HandleGetLootRecipient(const char * args);
         bool HandleDebugArenaCommand(const char * args);
         bool HandleSpawnVehicle(const char * args);
+        bool HandleSendLargePacketCommand(const char * args);
 
         Player*   getSelectedPlayer();
         Creature* getSelectedCreature();

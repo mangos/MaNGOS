@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -289,7 +289,7 @@ void WorldSession::HandleCorpseQueryOpcode(WorldPacket & /*recv_data*/)
     float z = corpse->GetPositionZ();
     int32 corpsemapid = _player->GetMapId();
 
-    if(Map *map = corpse->GetMap())
+    if(Map *map = MapManager::Instance().FindMap(corpse->GetMapId(), corpse->GetInstanceId()))
     {
         if(map->IsDungeon())
         {

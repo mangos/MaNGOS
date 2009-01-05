@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -344,8 +344,8 @@ void WorldSession::HandleItemQuerySingleOpcode( WorldPacket & recv_data )
         data << pProto->RequiredCityRank;
         data << pProto->RequiredReputationFaction;
         data << pProto->RequiredReputationRank;
-        data << pProto->MaxCount;
-        data << pProto->Stackable;
+        data << int32(pProto->MaxCount);
+        data << int32(pProto->Stackable);
         data << pProto->ContainerSlots;
         data << pProto->StatsCount;                         // item stats count
         for(int i = 0; i < pProto->StatsCount; i++)

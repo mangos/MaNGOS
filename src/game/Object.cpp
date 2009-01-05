@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -1044,12 +1044,12 @@ void WorldObject::_Create( uint32 guidlow, HighGuid guidhigh, uint32 mapid )
 
 uint32 WorldObject::GetZoneId() const
 {
-    return MapManager::Instance().GetBaseMap(m_mapId)->GetZoneId(m_positionX,m_positionY);
+    return MapManager::Instance().GetBaseMap(m_mapId)->GetZoneId(m_positionX,m_positionY,m_positionZ);
 }
 
 uint32 WorldObject::GetAreaId() const
 {
-    return MapManager::Instance().GetBaseMap(m_mapId)->GetAreaId(m_positionX,m_positionY);
+    return MapManager::Instance().GetBaseMap(m_mapId)->GetAreaId(m_positionX,m_positionY,m_positionZ);
 }
 
 InstanceData* WorldObject::GetInstanceData()

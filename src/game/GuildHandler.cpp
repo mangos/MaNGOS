@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -373,14 +373,14 @@ void WorldSession::HandleGuildDemoteOpcode(WorldPacket& recvPacket)
 
     guild->ChangeRank(plGuid, (slot->RankId+1));
     // Put record into guildlog
-    guild->LogGuildEvent(GUILD_EVENT_LOG_DEMOTE_PLAYER, GetPlayer()->GetGUIDLow(), GUID_LOPART(plGuid), (slot->RankId+1));
+    guild->LogGuildEvent(GUILD_EVENT_LOG_DEMOTE_PLAYER, GetPlayer()->GetGUIDLow(), GUID_LOPART(plGuid), slot->RankId);
 
     WorldPacket data(SMSG_GUILD_EVENT, (2+30));             // guess size
     data << (uint8)GE_DEMOTION;
     data << (uint8)3;
     data << GetPlayer()->GetName();
     data << plName;
-    data << guild->GetRankName(slot->RankId+1);
+    data << guild->GetRankName(slot->RankId);
     guild->BroadcastPacket(&data);
 }
 

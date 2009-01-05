@@ -870,6 +870,11 @@ Channel.SilentlyGMJoin = 0
 #        GM starting level (1-100)
 #        Default: 1
 #
+#    GM.LowerSecurity
+#        Disallow a lower security member to interact with a higher one using commands
+#        Default: 0 (disable)
+#                 1 (enable)
+#
 ###################################################################################################################
 
 GM.LoginState     = 2
@@ -880,6 +885,7 @@ GM.InGMList       = 0
 GM.InWhoList      = 0
 GM.LogTrade       = 1
 GM.StartLevel     = 1
+GM.LowerSecurity  = 0
 
 ###################################################################################################################
 # VISIBILITY AND RADIUSES
@@ -1127,12 +1133,21 @@ Death.CorpseReclaimDelay.PvE = 1
 #                         in days
 #             Default: 7 (weekly)
 #
+# ArenaSeason.ID: current area season id show in client
+#             Default: 1
+#
+# ArenaSeason.InProgress: current area season state
+#             Default: 1 (active)
+#                      0 (finished)
+#
 ###################################################################################################################
 
 Arena.MaxRatingDifference = 0
 Arena.RatingDiscardTimer = 60000
 Arena.AutoDistributePoints = 0
 Arena.AutoDistributeInterval = 7
+Arena.ArenaSeason.ID = 1
+Arena.ArenaSeason.InProgress = 1
 
 ###################################################################################################################
 #

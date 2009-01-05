@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -307,6 +307,10 @@ void WorldSession::LogoutPlayer(bool Save)
         if(_player->InBattleGround())
             _player->LeaveBattleground();
 
+        ///- Teleport to home if the player is in an invalid instance
+        if(!_player->m_InstanceValid && !_player->isGameMaster())
+            _player->TeleportTo(_player->m_homebindMapId, _player->m_homebindX, _player->m_homebindY, _player->m_homebindZ, _player->GetOrientation());
+
         for (int i=0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; i++)
         {
             if(int32 bgTypeId = _player->GetBattleGroundQueueId(i))
@@ -548,9 +552,12 @@ void WorldSession::SetAccountData(uint32 type, time_t time_, std::string data)
     m_accountData[type].Data = data;
 
     uint32 acc = GetAccountId();
+
+    CharacterDatabase.BeginTransaction ();
     CharacterDatabase.PExecute("DELETE FROM account_data WHERE account='%u' AND type='%u'", acc, type);
     CharacterDatabase.escape_string(data);
     CharacterDatabase.PExecute("INSERT INTO account_data VALUES ('%u','%u','%u','%s')", acc, type, (uint32)time_, data.c_str());
+    CharacterDatabase.CommitTransaction ();
 }
 
 void WorldSession::ReadMovementInfo(WorldPacket &data, MovementInfo *mi)

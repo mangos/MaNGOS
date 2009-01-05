@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -397,6 +397,13 @@ void Spell::EffectSchoolDMG(uint32 effect_idx)
                 }
                 break;
             }
+            case SPELLFAMILY_PRIEST:
+            {
+                // Shadow Word: Death - deals damage equal to damage done to caster
+                if (m_spellInfo->SpellFamilyFlags & 0x0000000200000000LL)
+                    m_caster->CastCustomSpell(m_caster, 32409, &damage, 0, 0, true);
+                break;
+            }
             case SPELLFAMILY_DRUID:
             {
                 // Ferocious Bite
@@ -616,61 +623,7 @@ void Spell::EffectSchoolDMG(uint32 effect_idx)
         }
 
         if(damage >= 0)
-        {
-            uint32 finalDamage;
-            if(m_originalCaster)                            // m_caster only passive source of cast
-                finalDamage = m_originalCaster->SpellNonMeleeDamageLog(unitTarget, m_spellInfo->Id, damage, m_IsTriggeredSpell, true);
-            else
-                finalDamage = m_caster->SpellNonMeleeDamageLog(unitTarget, m_spellInfo->Id, damage, m_IsTriggeredSpell, true);
-
-            // post effects
-            switch(m_spellInfo->SpellFamilyName)
-            {
-                case SPELLFAMILY_WARRIOR:
-                {
-                    // Bloodthirst
-                    if(m_spellInfo->SpellFamilyFlags & 0x40000000000LL)
-                    {
-                        uint32 BTAura = 0;
-                        switch(m_spellInfo->Id)
-                        {
-                            case 23881: BTAura = 23885; break;
-                            case 23892: BTAura = 23886; break;
-                            case 23893: BTAura = 23887; break;
-                            case 23894: BTAura = 23888; break;
-                            case 25251: BTAura = 25252; break;
-                            case 30335: BTAura = 30339; break;
-                            default:
-                                sLog.outError("Spell::EffectSchoolDMG: Spell %u not handled in BTAura",m_spellInfo->Id);
-                                break;
-                        }
-
-                        if (BTAura)
-                            m_caster->CastSpell(m_caster,BTAura,true);
-                    }
-                    break;
-                }
-                case SPELLFAMILY_PRIEST:
-                {
-                    // Shadow Word: Death
-                    if(finalDamage > 0 && (m_spellInfo->SpellFamilyFlags & 0x0000000200000000LL) && unitTarget->isAlive())
-                        // deals damage equal to damage done to caster if victim is not killed
-                        m_caster->SpellNonMeleeDamageLog( m_caster, m_spellInfo->Id, finalDamage, m_IsTriggeredSpell, false);
-
-                    break;
-                }
-                case SPELLFAMILY_PALADIN:
-                {
-                    // Judgement of Blood
-                    if(finalDamage > 0 && (m_spellInfo->SpellFamilyFlags & 0x0000000800000000LL) && m_spellInfo->SpellIconID==153)
-                    {
-                        int32 damagePoint  = finalDamage * 33 / 100;
-                        m_caster->CastCustomSpell(m_caster, 32220, &damagePoint, NULL, NULL, true);
-                    }
-                    break;
-                }
-            }
-        }
+            m_damage+= damage;
     }
 }
 
@@ -1343,38 +1296,55 @@ void Spell::EffectDummy(uint32 i)
             }
             break;
         case SPELLFAMILY_WARLOCK:
-            //Life Tap (only it have this with dummy effect)
-            if (m_spellInfo->SpellFamilyFlags == 0x40000)
+            // Life Tap
+            if (m_spellInfo->SpellFamilyFlags & 0x0000000000040000LL)
             {
-                float cost = m_currentBasePoints[0]+1;
-
-                if(Player* modOwner = m_caster->GetSpellModOwner())
-                    modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_COST, cost,this);
-
-                int32 dmg = m_caster->SpellDamageBonus(m_caster, m_spellInfo,uint32(cost > 0 ? cost : 0), SPELL_DIRECT_DAMAGE);
-
-                if(int32(m_caster->GetHealth()) > dmg)
+                // In 303 exist spirit depend
+                uint32 spirit = m_caster->GetStat(STAT_SPIRIT);
+                switch (m_spellInfo->Id)
+                {
+                    case  1454: damage+=spirit; break;
+                    case  1455: damage+=spirit*15/10; break;
+                    case  1456: damage+=spirit*2; break;
+                    case 11687: damage+=spirit*25/10; break;
+                    case 11688:
+                    case 11689:
+                    case 27222:
+                    case 57946: damage+=spirit*3; break;
+                    default:
+                        sLog.outError("Spell::EffectDummy: %u Life Tap need set spirit multipler", m_spellInfo->Id);
+                        return;
+                }
+//              Think its not need (also need remove Life Tap from SpellDamageBonus or add new value)
+//              damage = m_caster->SpellDamageBonus(m_caster, m_spellInfo,uint32(damage > 0 ? damage : 0), SPELL_DIRECT_DAMAGE);
+                if(int32(unitTarget->GetHealth()) > damage)
                 {
                     // Shouldn't Appear in Combat Log
-                    m_caster->ModifyHealth(-dmg);
+                    unitTarget->ModifyHealth(-damage);
 
-                    int32 mana = dmg;
-
+                    int32 mana = damage;
+                    // Improved Life Tap mod
                     Unit::AuraList const& auraDummy = m_caster->GetAurasByType(SPELL_AURA_DUMMY);
                     for(Unit::AuraList::const_iterator itr = auraDummy.begin(); itr != auraDummy.end(); ++itr)
                     {
-                        // only Imp. Life Tap have this in combination with dummy aura
                         if((*itr)->GetSpellProto()->SpellFamilyName==SPELLFAMILY_WARLOCK && (*itr)->GetSpellProto()->SpellIconID == 208)
                             mana = ((*itr)->GetModifier()->m_amount + 100)* mana / 100;
                     }
-
-                    m_caster->CastCustomSpell(m_caster,31818,&mana,NULL,NULL,true,NULL);
+                    m_caster->CastCustomSpell(unitTarget, 31818, &mana, NULL, NULL, true);
 
                     // Mana Feed
-                    int32 manaFeedVal = m_caster->CalculateSpellDamage(m_spellInfo,1, m_spellInfo->EffectBasePoints[1],m_caster);
-                    manaFeedVal = manaFeedVal * mana / 100;
+                    int32 manaFeedVal = 0;
+                    Unit::AuraList const& mod = m_caster->GetAurasByType(SPELL_AURA_ADD_FLAT_MODIFIER);
+                    for(Unit::AuraList::const_iterator itr = mod.begin(); itr != mod.end(); ++itr)
+                    {
+                        if((*itr)->GetSpellProto()->SpellFamilyName==SPELLFAMILY_WARLOCK && (*itr)->GetSpellProto()->SpellIconID == 1982)
+                            manaFeedVal+= (*itr)->GetModifier()->m_amount;
+                    }
                     if(manaFeedVal > 0)
-                        m_caster->CastCustomSpell(m_caster,32553,&manaFeedVal,NULL,NULL,true,NULL);
+                    {
+                        manaFeedVal = manaFeedVal * mana / 100;
+                        m_caster->CastCustomSpell(m_caster, 32553, &manaFeedVal, NULL, NULL, true, NULL);
+                    }
                 }
                 else
                     SendCastResult(SPELL_FAILED_FIZZLE);
@@ -1486,33 +1456,7 @@ void Spell::EffectDummy(uint32 i)
                 }
 
                 if(found)
-                    m_caster->SpellNonMeleeDamageLog(unitTarget, m_spellInfo->Id, damage, m_IsTriggeredSpell, true);
-                return;
-            }
-            // Kill command
-            if(m_spellInfo->SpellFamilyFlags & 0x00080000000000LL)
-            {
-                if(m_caster->getClass()!=CLASS_HUNTER)
-                    return;
-
-                // clear hunter crit aura state
-                m_caster->ModifyAuraState(AURA_STATE_HUNTER_CRIT_STRIKE,false);
-
-                // additional damage from pet to pet target
-                Pet* pet = m_caster->GetPet();
-                if(!pet || !pet->getVictim())
-                    return;
-
-                uint32 spell_id = 0;
-                switch (m_spellInfo->Id)
-                {
-                case 34026: spell_id = 34027; break;        // rank 1
-                default:
-                    sLog.outError("Spell::EffectDummy: Spell %u not handled in KC",m_spellInfo->Id);
-                    return;
-                }
-
-                pet->CastSpell(pet->getVictim(), spell_id, true);
+                    m_damage+= damage;
                 return;
             }
 
@@ -2251,31 +2195,6 @@ void Spell::EffectApplyAura(uint32 i)
     if(!Aur)
         return;
 
-    // TODO Make a way so it works for every related spell!
-    if(unitTarget->GetTypeId()==TYPEID_PLAYER)              // Negative buff should only be applied on players
-    {
-        uint32 spellId = 0;
-        if(m_spellInfo->CasterAuraStateNot==AURA_STATE_WEAKENED_SOUL || m_spellInfo->TargetAuraStateNot==AURA_STATE_WEAKENED_SOUL)
-            spellId = 6788;                                 // Weakened Soul
-        else if(m_spellInfo->CasterAuraStateNot==AURA_STATE_FORBEARANCE || m_spellInfo->TargetAuraStateNot==AURA_STATE_FORBEARANCE)
-            spellId = 25771;                                // Forbearance
-        else if(m_spellInfo->CasterAuraStateNot==AURA_STATE_HYPOTHERMIA)
-            spellId = 41425;                                // Hypothermia
-        else if (m_spellInfo->Mechanic == MECHANIC_BANDAGE) // Bandages
-            spellId = 11196;                                // Recently Bandaged
-        else if( (m_spellInfo->AttributesEx & 0x20) && (m_spellInfo->AttributesEx2 & 0x20000) )
-            spellId = 23230;                                // Blood Fury - Healing Reduction
-
-        SpellEntry const *AdditionalSpellInfo = sSpellStore.LookupEntry(spellId);
-        if (AdditionalSpellInfo)
-        {
-            // applied at target by target
-            Aura* AdditionalAura = CreateAura(AdditionalSpellInfo, 0, &m_currentBasePoints[0], unitTarget,unitTarget, 0);
-            unitTarget->AddAura(AdditionalAura);
-            sLog.outDebug("Spell: Additional Aura is: %u", AdditionalSpellInfo->EffectApplyAuraName[0]);
-        }
-    }
-
     // Prayer of Mending (jump animation), we need formal caster instead original for correct animation
     if( m_spellInfo->SpellFamilyName == SPELLFAMILY_PRIEST && (m_spellInfo->SpellFamilyFlags & 0x00002000000000LL))
         m_caster->CastSpell(unitTarget, 41637, true, NULL, Aur, m_originalCasterGUID);
@@ -2437,7 +2356,7 @@ void Spell::EffectPowerBurn(uint32 i)
         modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_MULTIPLE_VALUE, multiplier);
 
     new_damage = int32(new_damage*multiplier);
-    m_caster->SpellNonMeleeDamageLog(unitTarget, m_spellInfo->Id, new_damage, m_IsTriggeredSpell, true);
+    m_damage+=new_damage;
 }
 
 void Spell::EffectHeal( uint32 /*i*/ )
@@ -2505,27 +2424,7 @@ void Spell::EffectHeal( uint32 /*i*/ )
         else
             addhealth = caster->SpellHealingBonus(m_spellInfo, addhealth,HEAL, unitTarget);
 
-        bool crit = caster->isSpellCrit(unitTarget, m_spellInfo, m_spellSchoolMask, m_attackType);
-        if (crit)
-            addhealth = caster->SpellCriticalBonus(m_spellInfo, addhealth, unitTarget);
-        caster->SendHealSpellLog(unitTarget, m_spellInfo->Id, addhealth, crit);
-
-        int32 gain = unitTarget->ModifyHealth( int32(addhealth) );
-        unitTarget->getHostilRefManager().threatAssist(m_caster, float(gain) * 0.5f, m_spellInfo);
-
-        if(caster->GetTypeId()==TYPEID_PLAYER)
-            if(BattleGround *bg = ((Player*)caster)->GetBattleGround())
-                bg->UpdatePlayerScore(((Player*)caster), SCORE_HEALING_DONE, gain);
-
-        // ignore item heals
-        if(m_CastItem)
-            return;
-
-        uint32 procHealer = PROC_FLAG_HEAL;
-        if (crit)
-            procHealer |= PROC_FLAG_CRIT_HEAL;
-
-        m_caster->ProcDamageAndSpell(unitTarget,procHealer,PROC_FLAG_HEALED,addhealth,SPELL_SCHOOL_MASK_NONE,m_spellInfo,m_IsTriggeredSpell);
+        m_healing+=addhealth;
     }
 }
 
@@ -2602,6 +2501,8 @@ void Spell::EffectHealthLeech(uint32 i)
         if(m_caster->GetTypeId() == TYPEID_PLAYER)
             m_caster->SendHealSpellLog(m_caster, m_spellInfo->Id, uint32(new_damage));
     }
+//    m_healthLeech+=tmpvalue;
+//    m_damage+=new_damage;
 }
 
 void Spell::DoCreateItem(uint32 i, uint32 itemtype)
@@ -2644,8 +2545,8 @@ void Spell::DoCreateItem(uint32 i, uint32 itemtype)
 
     if (num_to_add < 1)
         num_to_add = 1;
-    if (num_to_add > pProto->Stackable)
-        num_to_add = pProto->Stackable;
+    if (num_to_add > pProto->GetMaxStackSize())
+        num_to_add = pProto->GetMaxStackSize();
 
     // init items_count to 1, since 1 item will be created regardless of specialization
     int items_count=1;
@@ -2768,6 +2669,8 @@ void Spell::EffectEnergize(uint32 i)
     if(m_spellInfo->EffectMiscValue[i] < 0 || m_spellInfo->EffectMiscValue[i] >= MAX_POWERS)
         return;
 
+    Powers power = Powers(m_spellInfo->EffectMiscValue[i]);
+
     // Some level depends spells
     int multiplier = 0;
     int level_diff = 0;
@@ -2797,8 +2700,6 @@ void Spell::EffectEnergize(uint32 i)
 
     if(damage < 0)
         return;
-
-    Powers power = Powers(m_spellInfo->EffectMiscValue[i]);
 
     if(unitTarget->GetMaxPower(power) == 0)
         return;
@@ -3235,6 +3136,7 @@ void Spell::EffectSummonType(uint32 i)
         case SUMMON_TYPE_GUARDIAN:
         case SUMMON_TYPE_POSESSED:
         case SUMMON_TYPE_POSESSED2:
+        case SUMMON_TYPE_GUARDIAN2:
             EffectSummonGuardian(i);
             break;
         case SUMMON_TYPE_WILD:
@@ -3283,7 +3185,7 @@ void Spell::EffectSummon(uint32 i)
     uint32 level = m_caster->getLevel();
     Pet* spawnCreature = new Pet(SUMMON_PET);
 
-    if(spawnCreature->LoadPetFromDB(m_caster,pet_entry))
+    if(m_caster->GetTypeId()==TYPEID_PLAYER && spawnCreature->LoadPetFromDB((Player*)m_caster,pet_entry))
     {
         // set timer for unsummon
         int32 duration = GetSpellDuration(m_spellInfo);
@@ -4099,7 +4001,7 @@ void Spell::EffectSummonPet(uint32 i)
     Pet* NewSummon = new Pet;
 
     // petentry==0 for hunter "call pet" (current pet summoned if any)
-    if(NewSummon->LoadPetFromDB(m_caster,petentry))
+    if(m_caster->GetTypeId() == TYPEID_PLAYER && NewSummon->LoadPetFromDB((Player*)m_caster,petentry))
     {
         if(NewSummon->getPetType()==SUMMON_PET)
         {
@@ -4184,7 +4086,8 @@ void Spell::EffectSummonPet(uint32 i)
     // this enables pet details window (Shift+P)
 
     // this enables popup window (pet dismiss, cancel), hunter pet additional flags set later
-    NewSummon->SetUInt32Value(UNIT_FIELD_FLAGS,UNIT_FLAG_PVP_ATTACKABLE);
+    if(m_caster->GetTypeId() == TYPEID_PLAYER)
+        NewSummon->SetUInt32Value(UNIT_FIELD_FLAGS,UNIT_FLAG_PVP_ATTACKABLE);
 
     NewSummon->InitStatsForLevel(petlevel);
     NewSummon->InitPetCreateSpells();
@@ -4451,35 +4354,9 @@ void Spell::EffectWeaponDmg(uint32 i)
     // prevent negative damage
     uint32 eff_damage = uint32(bonus > 0 ? bonus : 0);
 
-    const uint32 nohitMask = HITINFO_ABSORB | HITINFO_RESIST | HITINFO_MISS;
-
-    uint32 hitInfo = 0;
-    VictimState victimState = VICTIMSTATE_NORMAL;
-    uint32 blocked_dmg = 0;
-    uint32 absorbed_dmg = 0;
-    uint32 resisted_dmg = 0;
-    CleanDamage cleanDamage =  CleanDamage(0, BASE_ATTACK, MELEE_HIT_NORMAL );
-
-    m_caster->DoAttackDamage(unitTarget, &eff_damage, &cleanDamage, &blocked_dmg, m_spellSchoolMask, &hitInfo, &victimState, &absorbed_dmg, &resisted_dmg, m_attackType, m_spellInfo, m_IsTriggeredSpell);
-
-    if ((hitInfo & nohitMask) && m_attackType != RANGED_ATTACK)  // not send ranged miss/etc
-        m_caster->SendAttackStateUpdate(hitInfo & nohitMask, unitTarget, 1, m_spellSchoolMask, eff_damage, absorbed_dmg, resisted_dmg, VICTIMSTATE_NORMAL, blocked_dmg);
-
-    bool criticalhit = (hitInfo & HITINFO_CRITICALHIT);
-    m_caster->SendSpellNonMeleeDamageLog(unitTarget, m_spellInfo->Id, eff_damage, m_spellSchoolMask, absorbed_dmg, resisted_dmg, false, blocked_dmg, criticalhit);
-
-    if (eff_damage > (absorbed_dmg + resisted_dmg + blocked_dmg))
-    {
-        eff_damage -= (absorbed_dmg + resisted_dmg + blocked_dmg);
-    }
-    else
-    {
-        cleanDamage.damage += eff_damage;
-        eff_damage = 0;
-    }
-
-    // SPELL_SCHOOL_NORMAL use for weapon-like threat and rage calculation
-    m_caster->DealDamage(unitTarget, eff_damage, &cleanDamage, SPELL_DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, true);
+    // Add melee damage bonuses (also check for negative)
+    m_caster->MeleeDamageBonus(unitTarget, &eff_damage, m_attackType, m_spellInfo);
+    m_damage+= eff_damage;
 
     // Hemorrhage
     if(m_spellInfo->SpellFamilyName==SPELLFAMILY_ROGUE && (m_spellInfo->SpellFamilyFlags & 0x2000000))
@@ -4543,10 +4420,7 @@ void Spell::EffectHealMaxHealth(uint32 /*i*/)
 
     uint32 heal = m_caster->GetMaxHealth();
 
-    int32 gain = unitTarget->ModifyHealth(heal);
-    unitTarget->getHostilRefManager().threatAssist(m_caster, float(gain) * 0.5f, m_spellInfo);
-
-    m_caster->SendHealSpellLog(unitTarget, m_spellInfo->Id, heal);
+    m_healing+=heal;
 }
 
 void Spell::EffectInterruptCast(uint32 /*i*/)
@@ -5337,8 +5211,6 @@ void Spell::EffectApplyGlyph(uint32 i)
 
             player->CastSpell(m_caster, gp->SpellId, true);
             player->SetGlyph(m_glyphIndex, glyph);
-            if(m_CastItem)
-                player->DestroyItemCount(m_CastItem->GetEntry(), 1, true);
         }
     }
 }
@@ -5411,7 +5283,9 @@ void Spell::EffectSummonTotem(uint32 i)
     }
 
     pTotem->SetUInt32Value(UNIT_CREATED_BY_SPELL,m_spellInfo->Id);
-    pTotem->SetFlag(UNIT_FIELD_FLAGS,UNIT_FLAG_PVP_ATTACKABLE);
+
+    if(m_caster->GetTypeId() == TYPEID_PLAYER)
+        pTotem->SetFlag(UNIT_FIELD_FLAGS,UNIT_FLAG_PVP_ATTACKABLE);
 
     pTotem->ApplySpellImmune(m_spellInfo->Id,IMMUNITY_STATE,SPELL_AURA_MOD_FEAR,true);
     pTotem->ApplySpellImmune(m_spellInfo->Id,IMMUNITY_STATE,SPELL_AURA_TRANSFORM,true);
@@ -5509,7 +5383,8 @@ void Spell::EffectFeedPet(uint32 i)
 
     Player *_player = (Player*)m_caster;
 
-    if(!itemTarget)
+    Item* foodItem = m_targets.getItemTarget();
+    if(!foodItem)
         return;
 
     Pet *pet = _player->GetPet();
@@ -5519,15 +5394,15 @@ void Spell::EffectFeedPet(uint32 i)
     if(!pet->isAlive())
         return;
 
-    int32 benefit = pet->GetCurrentFoodBenefitLevel(itemTarget->GetProto()->ItemLevel);
+    int32 benefit = pet->GetCurrentFoodBenefitLevel(foodItem->GetProto()->ItemLevel);
     if(benefit <= 0)
         return;
 
     uint32 count = 1;
-    _player->DestroyItemCount(itemTarget,count,true);
+    _player->DestroyItemCount(foodItem,count,true);
     // TODO: fix crash when a spell has two effects, both pointed at the same item target
 
-    m_caster->CastCustomSpell(m_caster,m_spellInfo->EffectTriggerSpell[i],&benefit,NULL,NULL,true);
+    m_caster->CastCustomSpell(pet,m_spellInfo->EffectTriggerSpell[i],&benefit,NULL,NULL,true);
 }
 
 void Spell::EffectDismissPet(uint32 /*i*/)

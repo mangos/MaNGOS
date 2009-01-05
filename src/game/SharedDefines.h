@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -691,20 +691,22 @@ enum AuraState
     //AURA_STATE_UNKNOWN6                   = 6,            //     | not used
     AURA_STATE_HUNTER_PARRY                 = 7,            // C   |
     AURA_STATE_ROGUE_ATTACK_FROM_STEALTH    = 7,            // C   | FIX ME: not implemented yet!
-    //AURA_STATE_UNKNOWN7c                  = 7,            //  c  | random/focused bursts spells (?)
+    //AURA_STATE_UNKNOWN7                   = 7,            //  c  | random/focused bursts spells (?)
     //AURA_STATE_UNKNOWN8                   = 8,            //     | not used
     //AURA_STATE_UNKNOWN9                   = 9,            //     | not used
     AURA_STATE_WARRIOR_VICTORY_RUSH         = 10,           // C   | warrior victory rush
-    AURA_STATE_HUNTER_CRIT_STRIKE           = 10,           // C   | hunter crit strike
-    AURA_STATE_CRIT                         = 11,           // C   |
+    //AURA_STATE_UNKNOWN11                  = 11,           //    t|
     AURA_STATE_FAERIE_FIRE                  = 12,           //  c t|
     AURA_STATE_HEALTHLESS_35_PERCENT        = 13,           // C T |
     AURA_STATE_IMMOLATE                     = 14,           //   T |
     AURA_STATE_SWIFTMEND                    = 15,           //   T |
     AURA_STATE_DEADLY_POISON                = 16,           //   T |
-    AURA_STATE_FORBEARANCE                  = 17,           //  c t|
-    AURA_STATE_WEAKENED_SOUL                = 18,           //    t|
-    AURA_STATE_HYPOTHERMIA                  = 19,           //  c  |
+    //AURA_STATE_UNKNOWN17                  = 17,           // C   |
+    //AURA_STATE_UNKNOWN18                  = 18,           // C  t|
+    //AURA_STATE_UNKNOWN19                  = 19,           //     | not used
+    //AURA_STATE_UNKNOWN20                  = 20,           //  c  | only (45317 Suicide)
+    //AURA_STATE_UNKNOWN21                  = 21,           //     | not used
+    //AURA_STATE_UNKNOWN22                  = 22,           // C   | not implemented yet (Requires Evasive Charges to use)
     AURA_STATE_HEALTH_ABOVE_75_PERCENT      = 23,           // C   | not implemented yet
 };
 
@@ -829,7 +831,7 @@ enum Targets
     TARGET_SUMMON                      = 48,
     TARGET_AREAEFFECT_CUSTOM_2         = 52,
     TARGET_CURRENT_ENEMY_COORDINATES   = 53,                // set unit coordinates as dest, only 16 target B imlemented
-    TARGET_RANDOM_RAID_MEMBER          = 56,
+    TARGET_ALL_RAID_AROUND_CASTER      = 56,
     TARGET_SINGLE_FRIEND_2             = 57,
     TARGET_AREAEFFECT_PARTY_AND_CLASS  = 61,
     TARGET_DUELVSPLAYER_COORDINATES    = 63,
@@ -1904,6 +1906,7 @@ enum CorpseDynFlags
 #define SPELL_ID_PASSIVE_RESURRECTION_SICKNESS   15007
 #define SPELL_ID_WEAPON_SWITCH_COOLDOWN_1_5s     6119
 #define SPELL_ID_WEAPON_SWITCH_COOLDOWN_1_0s     6123
+#define SPELL_ID_AUTOSHOT                        75         // used for checks in other spells interruption
 
 enum WeatherType
 {
@@ -2072,7 +2075,8 @@ enum SummonType
     SUMMON_TYPE_CRITTER3    = 307,
     SUMMON_TYPE_UNKNOWN5    = 409,
     SUMMON_TYPE_UNKNOWN2    = 427,
-    SUMMON_TYPE_POSESSED2   = 428
+    SUMMON_TYPE_POSESSED2   = 428,
+    SUMMON_TYPE_GUARDIAN2   = 1161
 };
 
 enum ResponseCodes

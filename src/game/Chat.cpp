@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@
 #include "MapManager.h"
 #include "GridNotifiersImpl.h"
 #include "CellImpl.h"
+#include "AccountMgr.h"
 
 bool ChatHandler::load_command_table = true;
 
@@ -108,6 +109,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { "hp",             SEC_MODERATOR,      false, &ChatHandler::HandleModifyHPCommand,            "", NULL },
         { "mana",           SEC_MODERATOR,      false, &ChatHandler::HandleModifyManaCommand,          "", NULL },
         { "rage",           SEC_MODERATOR,      false, &ChatHandler::HandleModifyRageCommand,          "", NULL },
+        { "runicpower",     SEC_MODERATOR,      false, &ChatHandler::HandleModifyRunicPowerCommand,    "", NULL },
         { "energy",         SEC_MODERATOR,      false, &ChatHandler::HandleModifyEnergyCommand,        "", NULL },
         { "money",          SEC_MODERATOR,      false, &ChatHandler::HandleModifyMoneyCommand,         "", NULL },
         { "speed",          SEC_MODERATOR,      false, &ChatHandler::HandleModifySpeedCommand,         "", NULL },
@@ -199,6 +201,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { "anim",           SEC_GAMEMASTER,     false, &ChatHandler::HandleAnimCommand,                "", NULL },
         { "lootrecipient",  SEC_GAMEMASTER,     false, &ChatHandler::HandleGetLootRecipient,           "", NULL },
         { "arena",          SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDebugArenaCommand,          "", NULL },
+        { "sendlargepacket",SEC_ADMINISTRATOR,  false, &ChatHandler::HandleSendLargePacketCommand,     "", NULL },
         { NULL,             0,                  false, NULL,                                           "", NULL }
     };
 
@@ -294,7 +297,6 @@ ChatCommand * ChatHandler::getCommandTable()
         { "locales_page_text",           SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadLocalesPageTextCommand,         "", NULL },
         { "locales_quest",               SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadLocalesQuestCommand,            "", NULL },
 
-        { "",                            SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadCommand,                        "", NULL },
         { NULL,                          0,                 false, NULL,                                                     "", NULL }
     };
 
@@ -625,6 +627,38 @@ bool ChatHandler::isAvailable(ChatCommand const& cmd) const
     return m_session->GetSecurity() >= cmd.SecurityLevel;
 }
 
+bool ChatHandler::HasLowerSecurity(Player* target, uint64 guid)
+{
+    uint32 target_sec;
+
+    if (!sWorld.getConfig(CONFIG_GM_LOWER_SECURITY))
+        return false;
+
+    // allow everything from RA console
+    if (!m_session)
+        return false;
+
+    if (target)
+        target_sec = target->GetSession()->GetSecurity();
+    else if (guid)
+        target_sec = accmgr.GetSecurity(objmgr.GetPlayerAccountIdByGUID(guid));
+    else
+    {
+        SendSysMessage(LANG_PLAYER_NOT_FOUND);
+        SetSentErrorMessage(true);
+        return true;
+    }
+
+    if (m_session->GetSecurity() < target_sec)
+    {
+        SendSysMessage(LANG_YOURS_SECURITY_IS_LOW);
+        SetSentErrorMessage(true);
+        return true;
+    }
+
+    return false;
+}
+
 bool ChatHandler::hasStringAbbr(const char* name, const char* part)
 {
     // non "" command
@@ -694,9 +728,9 @@ void ChatHandler::PSendSysMessage(int32 entry, ...)
 {
     const char *format = GetMangosString(entry);
     va_list ap;
-    char str [1024];
+    char str [2048];
     va_start(ap, entry);
-    vsnprintf(str,1024,format, ap );
+    vsnprintf(str,2048,format, ap );
     va_end(ap);
     SendSysMessage(str);
 }
@@ -704,9 +738,9 @@ void ChatHandler::PSendSysMessage(int32 entry, ...)
 void ChatHandler::PSendSysMessage(const char *format, ...)
 {
     va_list ap;
-    char str [1024];
+    char str [2048];
     va_start(ap, format);
-    vsnprintf(str,1024,format, ap );
+    vsnprintf(str,2048,format, ap );
     va_end(ap);
     SendSysMessage(str);
 }

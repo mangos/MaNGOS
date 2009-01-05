@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -363,7 +363,7 @@ void AchievementMgr::CheckAllAchievementCriteria()
  */
 void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, uint32 miscvalue1, uint32 miscvalue2, Unit *unit, uint32 time)
 {
-    sLog.outString("AchievementMgr::UpdateAchievementCriteria(%u, %u, %u, %u)", type, miscvalue1, miscvalue2, time);
+    sLog.outDetail("AchievementMgr::UpdateAchievementCriteria(%u, %u, %u, %u)", type, miscvalue1, miscvalue2, time);
     AchievementCriteriaEntryList const& achievementCriteriaList = objmgr.GetAchievementCriteriaByType(type);
     for(AchievementCriteriaEntryList::const_iterator i = achievementCriteriaList.begin(); i!=achievementCriteriaList.end(); ++i)
     {
@@ -614,7 +614,26 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                     SetCriteriaProgress(achievementCriteria, 1);
                 break;
             }
+           case ACHIEVEMENT_CRITERIA_TYPE_ROLL_GREED_ON_LOOT:
+           case ACHIEVEMENT_CRITERIA_TYPE_ROLL_NEED_ON_LOOT:
+           {
+               // miscvalue1 = itemid
+               // miscvalue2 = diced value
+               if(!miscvalue1)
+                   continue;
+               if(miscvalue2 != achievementCriteria->roll_greed_on_loot.rollValue)
+                   continue;
+               ItemPrototype const *pProto = objmgr.GetItemPrototype( miscvalue1 );
 
+               uint32 requiredItemLevel = 0;
+               if (achievementCriteria->ID == 2412 || achievementCriteria->ID == 2358)
+                   requiredItemLevel = 185;
+
+               if(!pProto || pProto->ItemLevel <requiredItemLevel)
+                   continue;
+               SetCriteriaProgress(achievementCriteria, 1, true);
+               break;
+           }
         }
         if(IsCompletedCriteria(achievementCriteria))
             CompletedCriteria(achievementCriteria);
@@ -678,6 +697,8 @@ bool AchievementMgr::IsCompletedCriteria(AchievementCriteriaEntry const* achieve
             return m_completedAchievements.find(achievementCriteria->complete_achievement.linkedAchievement) != m_completedAchievements.end();
         case ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL:
             return progress->counter >= achievementCriteria->reach_skill_level.skillLevel;
+        case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST_COUNT:
+            return progress->counter >= achievementCriteria->complete_quest_count.totalQuestCount;
         case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUESTS_IN_ZONE:
             return progress->counter >= achievementCriteria->complete_quests_in_zone.questCount;
         case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_DAILY_QUEST:
@@ -710,6 +731,9 @@ bool AchievementMgr::IsCompletedCriteria(AchievementCriteriaEntry const* achieve
             return progress->counter >= achievementCriteria->gain_exalted_reputation.numberOfExaltedFactions;
         case ACHIEVEMENT_CRITERIA_TYPE_EXPLORE_AREA:
             return progress->counter >= 1;
+       case ACHIEVEMENT_CRITERIA_TYPE_ROLL_GREED_ON_LOOT:
+       case ACHIEVEMENT_CRITERIA_TYPE_ROLL_NEED_ON_LOOT:
+           return progress->counter >= achievementCriteria->roll_greed_on_loot.count;
 
         // handle all statistic-only criteria here
         case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_BATTLEGROUND:
@@ -764,7 +788,7 @@ AchievementCompletionState AchievementMgr::GetAchievementCompletionState(Achieve
 
 void AchievementMgr::SetCriteriaProgress(AchievementCriteriaEntry const* entry, uint32 newValue, bool relative)
 {
-    sLog.outString("AchievementMgr::SetCriteriaProgress(%u, %u)", entry->ID, newValue);
+    sLog.outDetail("AchievementMgr::SetCriteriaProgress(%u, %u)", entry->ID, newValue);
     CriteriaProgress *progress = NULL;
 
     CriteriaProgressMap::iterator iter = m_criteriaProgress.find(entry->ID);
@@ -772,7 +796,7 @@ void AchievementMgr::SetCriteriaProgress(AchievementCriteriaEntry const* entry, 
     if(iter == m_criteriaProgress.end())
     {
         progress = &m_criteriaProgress[entry->ID];
-        progress->counter = 0;
+        progress->counter = newValue;
         progress->date = time(NULL);
     }
     else
@@ -802,7 +826,7 @@ void AchievementMgr::SetCriteriaProgress(AchievementCriteriaEntry const* entry, 
 
 void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
 {
-    sLog.outString("AchievementMgr::CompletedAchievement(%u)", achievement->ID);
+    sLog.outDetail("AchievementMgr::CompletedAchievement(%u)", achievement->ID);
     if(achievement->flags & ACHIEVEMENT_FLAG_COUNTER || m_completedAchievements.find(achievement->ID)!=m_completedAchievements.end())
         return;
 
@@ -819,6 +843,7 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_ACHIEVEMENT);
 
     // reward items and titles
+    // TODO: rewards should be send by mail
     AchievementReward const* reward = NULL;
     for (uint32 i=0; i<ACHIEVEMENT_REWARD_COUNT; i++)
     {
@@ -831,7 +856,6 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
 
     if (reward)
     {
-        sLog.outString("achiev %u, title= %u, %u", reward->achievementId, reward->titleId[0], reward->titleId[1]);
         uint32 titleId = reward->titleId[GetPlayer()->GetTeam() == HORDE?0:1];
         if(CharTitlesEntry const* titleEntry = sCharTitlesStore.LookupEntry(titleId))
             GetPlayer()->SetTitle(titleEntry);

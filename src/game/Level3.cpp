@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -52,17 +52,8 @@
 #include "InstanceData.h"
 
 //reload commands
-bool ChatHandler::HandleReloadCommand(const char* arg)
-{
-    // this is error catcher for wrong table name in .reload commands
-    PSendSysMessage("Db table with name starting from '%s' not found and can't be reloaded.",arg);
-    SetSentErrorMessage(true);
-    return false;
-}
-
 bool ChatHandler::HandleReloadAllCommand(const char*)
 {
-    HandleReloadAreaTriggerTeleportCommand("");
     HandleReloadSkillFishingBaseLevelCommand("");
 
     HandleReloadAllAreaCommand("");
@@ -2726,7 +2717,7 @@ bool ChatHandler::HandleLookupSpellCommand(const char* args)
 
                 bool talent = (talentCost > 0);
                 bool passive = IsPassiveSpell(id);
-                bool active = target && (target->HasAura(id,0) || target->HasAura(id,1) || target->HasAura(id,2));
+                bool active = target && target->HasAura(id);
 
                 // unit32 used to prevent interpreting uint8 as char at output
                 // find rank of learned spell for learning spell, or talent rank
@@ -6297,17 +6288,17 @@ bool ChatHandler::HandleSendItemsCommand(const char* args)
         }
 
         uint32 item_count = itemCountStr ? atoi(itemCountStr) : 1;
-        if(item_count < 1 || item_proto->MaxCount && item_count > item_proto->MaxCount)
+        if(item_count < 1 || item_proto->MaxCount > 0 && item_count > uint32(item_proto->MaxCount))
         {
             PSendSysMessage(LANG_COMMAND_INVALID_ITEM_COUNT, item_count,item_id);
             SetSentErrorMessage(true);
             return false;
         }
 
-        while(item_count > item_proto->Stackable)
+        while(item_count > item_proto->GetMaxStackSize())
         {
-            items.push_back(ItemPair(item_id,item_proto->Stackable));
-            item_count -= item_proto->Stackable;
+            items.push_back(ItemPair(item_id,item_proto->GetMaxStackSize()));
+            item_count -= item_proto->GetMaxStackSize();
         }
 
         items.push_back(ItemPair(item_id,item_count));

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -425,7 +425,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
         bool isCanIneractWithBattleMaster(Player* player, bool msg) const;
         bool isCanTrainingAndResetTalentsOf(Player* pPlayer) const;
         bool IsOutOfThreatArea(Unit* pVictim) const;
-        bool IsImmunedToSpell(SpellEntry const* spellInfo, bool useCharges = false);
+        bool IsImmunedToSpell(SpellEntry const* spellInfo);
                                                             // redefine Unit::IsImmunedToSpell
         bool IsImmunedToSpellEffect(uint32 effect, uint32 mechanic) const;
                                                             // redefine Unit::IsImmunedToSpellEffect

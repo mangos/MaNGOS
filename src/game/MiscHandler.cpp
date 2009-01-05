@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,7 +41,6 @@
 #include "SpellAuras.h"
 #include "Pet.h"
 #include "SocialMgr.h"
-#include "Tools.h"
 
 void WorldSession::HandleRepopRequestOpcode( WorldPacket & /*recv_data*/ )
 {
@@ -809,7 +808,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
         GetPlayer()->SetRestType(REST_TYPE_IN_TAVERN);
 
         if(sWorld.IsFFAPvPRealm())
-            GetPlayer()->RemoveFlag(PLAYER_FLAGS,PLAYER_FLAGS_FFA_PVP);
+            GetPlayer()->RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
 
         return;
     }
@@ -1649,7 +1648,7 @@ void WorldSession::HandleInspectAchievements( WorldPacket & recv_data )
 {
     CHECK_PACKET_SIZE(recv_data, 1);
     uint64 guid;
-    if(!readGUID(recv_data, guid))
+    if(!recv_data.readPackGUID(guid))
         return;
 
     Player *player = objmgr.GetPlayer(guid);

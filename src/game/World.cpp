@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -774,6 +774,8 @@ void World::LoadConfigSettings(bool reload)
     m_configs[CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_ENABLE]     = sConfig.GetBoolDefault("Battleground.QueueAnnouncer.Enable", false);
     m_configs[CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_PLAYERONLY] = sConfig.GetBoolDefault("Battleground.QueueAnnouncer.PlayerOnly", false);
     m_configs[CONFIG_ARENA_QUEUE_ANNOUNCER_ENABLE]            = sConfig.GetBoolDefault("Arena.QueueAnnouncer.Enable", false);
+    m_configs[CONFIG_ARENA_SEASON_ID]                         = sConfig.GetIntDefault ("Arena.ArenaSeason.ID", 1);
+    m_configs[CONFIG_ARENA_SEASON_IN_PROGRESS]                = sConfig.GetBoolDefault("Arena.ArenaSeason.InProgress", true);
 
     m_configs[CONFIG_CAST_UNSTUCK] = sConfig.GetBoolDefault("CastUnstuck", true);
     m_configs[CONFIG_INSTANCE_RESET_TIME_HOUR]  = sConfig.GetIntDefault("Instance.ResetTimeHour", 4);
@@ -808,6 +810,7 @@ void World::LoadConfigSettings(bool reload)
         sLog.outError("GM.StartLevel (%i) must be in range 1..%u. Set to %u.", m_configs[CONFIG_START_GM_LEVEL], MAX_LEVEL, MAX_LEVEL);
         m_configs[CONFIG_START_GM_LEVEL] = MAX_LEVEL;
     }
+    m_configs[CONFIG_GM_LOWER_SECURITY] = sConfig.GetBoolDefault("GM.LowerSecurity", false);
 
     m_configs[CONFIG_GROUP_VISIBILITY] = sConfig.GetIntDefault("Visibility.GroupMode",0);
 
