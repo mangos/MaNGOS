@@ -28,7 +28,6 @@
 /// Storage object for a realm
 struct Realm
 {
-    std::string name;
     std::string address;
     uint8 icon;
     uint8 color;
