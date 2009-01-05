@@ -4354,7 +4354,7 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                 case 33493:
                 {
                     // Cast finish spell at last charge
-                    if (triggeredByAura->m_procCharges > 1)
+                    if (triggeredByAura->GetAuraCharges() > 1)
                         return false;
 
                     target = this;
@@ -4624,7 +4624,7 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                 case 11129:
                 {
                     //last charge and crit
-                    if (triggeredByAura->m_procCharges <= 1 && (procEx & PROC_EX_CRITICAL_HIT) )
+                    if (triggeredByAura->GetAuraCharges() <= 1 && (procEx & PROC_EX_CRITICAL_HIT) )
                     {
                         RemoveAurasDueToSpell(28682);       //-> remove Combustion auras
                         return true;                        // charge counting (will removed)
@@ -9743,6 +9743,11 @@ void Unit::ProcDamageAndSpellFor( bool isVictim, Unit * pTarget, uint32 procFlag
 
         procTriggered.push_back( ProcTriggeredData(spellProcEvent, itr->second) );
     }
+
+    // Nothing found
+    if (procTriggered.empty())
+        return;
+
     // Handle effects proceed this time
     for(ProcTriggeredList::iterator i = procTriggered.begin(); i != procTriggered.end(); ++i)
     {
@@ -9777,7 +9782,7 @@ void Unit::ProcDamageAndSpellFor( bool isVictim, Unit * pTarget, uint32 procFlag
         Modifier *auraModifier = triggeredByAura->GetModifier();
         SpellEntry const *spellInfo = triggeredByAura->GetSpellProto();
         uint32 effIndex = triggeredByAura->GetEffIndex();
-        bool useCharges = triggeredByAura->m_procCharges > 0;
+        bool useCharges = triggeredByAura->GetAuraCharges() > 0;
         // For players set spell cooldown if need
         uint32 cooldown = 0;
         if (GetTypeId() == TYPEID_PLAYER && spellProcEvent && spellProcEvent->cooldown)
@@ -9840,11 +9845,6 @@ void Unit::ProcDamageAndSpellFor( bool isVictim, Unit * pTarget, uint32 procFlag
                     continue;
                 break;
             }
-            case SPELL_AURA_MOD_STUN:
-                // Remove by default, but if charge exist drop it
-                if (triggeredByAura->m_procCharges == 0)
-                   removedSpells.push_back(triggeredByAura->GetId());
-                break;
             case SPELL_AURA_MOD_CASTING_SPEED:
                 // Skip melee hits or instant cast spells
                 if (procSpell == NULL || GetSpellCastTime(procSpell) == 0)
@@ -9885,18 +9885,16 @@ void Unit::ProcDamageAndSpellFor( bool isVictim, Unit * pTarget, uint32 procFlag
             AuraMap::const_iterator upper = GetAuras().upper_bound(i->triggeredByAura_SpellPair);
             for(AuraMap::const_iterator itr = lower; itr!= upper; ++itr)
             {
-                if(itr->second == i->triggeredByAura)
+                // If last charge dropped add spell to remove list
+                if(itr->second == i->triggeredByAura && triggeredByAura->DropAuraCharge())
                 {
-                     triggeredByAura->m_procCharges -=1;
-                     triggeredByAura->UpdateAuraCharges();
-                     if (triggeredByAura->m_procCharges <= 0)
-                          removedSpells.push_back(triggeredByAura->GetId());
+                    removedSpells.push_back(triggeredByAura->GetId());
                     break;
                 }
             }
         }
     }
-    if (removedSpells.size())
+    if (!removedSpells.empty())
     {
         // Sort spells and remove dublicates
         removedSpells.sort();
@@ -10618,10 +10616,10 @@ bool Unit::HandleMeandingAuraProc( Aura* triggeredByAura )
     uint64 caster_guid = triggeredByAura->GetCasterGUID();
 
     // jumps
-    int32 jumps = triggeredByAura->m_procCharges-1;
+    int32 jumps = triggeredByAura->GetAuraCharges()-1;
 
     // current aura expire
-    triggeredByAura->m_procCharges = 1;             // will removed at next charges decrease
+    triggeredByAura->SetAuraCharges(1);             // will removed at next charges decrease
 
     // next target selection
     if(jumps > 0 && GetTypeId()==TYPEID_PLAYER && IS_PLAYER_GUID(caster_guid))
