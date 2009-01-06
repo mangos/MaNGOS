@@ -23,11 +23,7 @@
 #include "Policies/SingletonImp.h"
 #include "Util.h"
 
-#ifdef DO_POSTGRESQL
-extern DatabasePostgre loginDatabase;
-#else
-extern DatabaseMysql loginDatabase;
-#endif
+extern DatabaseType loginDatabase;
 
 INSTANTIATE_SINGLETON_1(AccountMgr);
 
