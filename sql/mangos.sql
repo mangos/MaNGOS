@@ -22,7 +22,7 @@
 DROP TABLE IF EXISTS `db_version`;
 CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
-  `required_7034_01_mangos_spell_proc_event` bit(1) default NULL
+  `required_7040_01_mangos_achievement_reward` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -34,6 +34,31 @@ LOCK TABLES `db_version` WRITE;
 INSERT INTO `db_version` VALUES
 ('Mangos default database.',NULL);
 /*!40000 ALTER TABLE `db_version` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `achievement_reward`
+--
+
+DROP TABLE IF EXISTS `achievement_reward`;
+CREATE TABLE `achievement_reward` (
+  `entry` mediumint(8) unsigned NOT NULL default '0',
+  `title_A` mediumint(8) unsigned NOT NULL default '0',
+  `title_H` mediumint(8) unsigned NOT NULL default '0',
+  `item` mediumint(8) unsigned NOT NULL default '0',
+  `sender` mediumint(8) unsigned NOT NULL default '0',
+  `subject` varchar(255) default NULL,
+  `text` text,
+  PRIMARY KEY  (`entry`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Loot System';
+
+--
+-- Dumping data for table `achievement_reward`
+--
+
+LOCK TABLES `achievement_reward` WRITE;
+/*!40000 ALTER TABLE `achievement_reward` DISABLE KEYS */;
+/*!40000 ALTER TABLE `achievement_reward` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -1762,6 +1787,41 @@ INSERT INTO `item_template` VALUES
 (38147,4,0,-1,'Corrupted Band',963,2,32768,1,534,133,11,-1,-1,60,55,0,0,0,0,0,0,0,0,1,0,3,4,11,3,6,32,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,-1,0,0,0,0,-1,0,-1,0,0,0,0,-1,0,-1,0,0,0,0,-1,0,-1,0,0,0,0,-1,0,-1,1,'',0,0,0,0,0,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,'',0,0,0,0),
 (41751,0,5,-1,'Black Mushroom',36728,1,0,1,100,5,0,-1,-1,65,55,0,0,0,0,0,0,0,0,20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,27094,0,-1,0,0,11,1000,0,0,0,0,-1,0,-1,0,0,0,0,-1,0,-1,0,0,0,0,-1,0,-1,0,0,0,0,-1,0,-1,0,'',0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,'',0,0,0,0);
 /*!40000 ALTER TABLE `item_template` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `locales_achievement_reward`
+--
+
+DROP TABLE IF EXISTS `locales_achievement_reward`;
+CREATE TABLE `locales_achievement_reward` (
+  `entry` mediumint(8) unsigned NOT NULL default '0',
+  `subject_loc1` varchar(100) NOT NULL default '',
+  `subject_loc2` varchar(100) NOT NULL default '',
+  `subject_loc3` varchar(100) NOT NULL default '',
+  `subject_loc4` varchar(100) NOT NULL default '',
+  `subject_loc5` varchar(100) NOT NULL default '',
+  `subject_loc6` varchar(100) NOT NULL default '',
+  `subject_loc7` varchar(100) NOT NULL default '',
+  `subject_loc8` varchar(100) NOT NULL default '',
+  `text_loc1` text default NULL,
+  `text_loc2` text default NULL,
+  `text_loc3` text default NULL,
+  `text_loc4` text default NULL,
+  `text_loc5` text default NULL,
+  `text_loc6` text default NULL,
+  `text_loc7` text default NULL,
+  `text_loc8` text default NULL,
+  PRIMARY KEY  (`entry`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `locales_achievement_reward`
+--
+
+LOCK TABLES `locales_achievement_reward` WRITE;
+/*!40000 ALTER TABLE `locales_achievement_reward` DISABLE KEYS */;
+/*!40000 ALTER TABLE `locales_achievement_reward` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --

@@ -35,6 +35,7 @@
 #include "SkillDiscovery.h"
 #include "World.h"
 #include "AccountMgr.h"
+#include "AchievementMgr.h"
 #include "ObjectMgr.h"
 #include "SpellMgr.h"
 #include "Chat.h"
@@ -1072,12 +1073,6 @@ void World::SetInitialWorldSettings()
     sLog.outString( "Loading InstanceTemplate" );
     objmgr.LoadInstanceTemplate();
 
-    sLog.outString( "Loading AchievementCriteriaList..." );
-    objmgr.LoadAchievementCriteriaList();
-
-    sLog.outString( "Loading completed achievements..." );
-    objmgr.LoadCompletedAchievements();
-
     sLog.outString( "Loading SkillLineAbilityMultiMap Data..." );
     spellmgr.LoadSkillLineAbilityMap();
 
@@ -1235,6 +1230,18 @@ void World::SetInitialWorldSettings()
 
     sLog.outString( "Loading Skill Fishing base level requirements..." );
     objmgr.LoadFishingBaseSkillLevel();
+
+    sLog.outString( "Loading AchievementCriteriaList..." );
+    achievementmgr.LoadAchievementCriteriaList();
+
+    sLog.outString( "Loading achievement rewards..." );
+    achievementmgr.LoadRewards();
+
+    sLog.outString( "Loading achievement reward locale strings..." );
+    achievementmgr.LoadRewardLocales();
+
+    sLog.outString( "Loading completed achievements..." );
+    achievementmgr.LoadCompletedAchievements();
 
     ///- Load dynamic data tables from the database
     sLog.outString( "Loading Auctions..." );
