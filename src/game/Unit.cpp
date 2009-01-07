@@ -5362,6 +5362,17 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     target = this;
                     break;
                 }
+                // Glyph of Healing Wave
+                case 55440:
+                {
+                    // Not proc from self heals
+                    if (this==pVictim)
+                        return false;
+                    basepoints0 = triggeredByAura->GetModifier()->m_amount * damage / 100;
+                    target = this;
+                    triggered_spell_id = 55533;
+                    break;
+                }
             }
 
             // Earth Shield
@@ -5440,17 +5451,6 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     ((Player*)this)->AddSpellCooldown(dummySpell->Id,0,time(NULL) + cooldown);
 
                 return true;
-            }
-            // Glyph of Healing Wave
-            case 55440:
-            {
-                // Not proc from self heals
-                if (this==pVictim)
-                    return false;
-                basepoints0 = triggeredByAura->GetModifier()->m_amount * damage / 100;
-                target = this;
-                triggered_spell_id = 55533;
-                break;
             }
             break;
         }
