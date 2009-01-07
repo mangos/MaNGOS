@@ -480,31 +480,29 @@ void Spell::EffectSchoolDMG(uint32 effect_idx)
                     // consume from stack dozes not more that have combo-points
                     if(uint32 combo = ((Player*)m_caster)->GetComboPoints())
                     {
-                        // count consumed deadly poison doses at target
-                        uint32 doses = 0;
-
-                        // remove consumed poison doses
+                        Aura *poison = 0;
+                        // Lookup for Deadly poison (only attacker applied)
                         Unit::AuraList const& auras = unitTarget->GetAurasByType(SPELL_AURA_PERIODIC_DAMAGE);
                         for(Unit::AuraList::const_iterator itr = auras.begin(); itr!=auras.end() && combo;)
-                        {
-                            // Deadly poison (only attacker applied)
-                            if( (*itr)->GetSpellProto()->SpellFamilyName==SPELLFAMILY_ROGUE && ((*itr)->GetSpellProto()->SpellFamilyFlags & 0x10000) &&
-                                (*itr)->GetSpellProto()->SpellVisual[0]==5100 && (*itr)->GetCasterGUID()==m_caster->GetGUID() )
+                            if( (*itr)->GetSpellProto()->SpellFamilyName==SPELLFAMILY_ROGUE && 
+                                (*itr)->GetSpellProto()->SpellFamilyFlags & 0x10000 &&
+                                (*itr)->GetCasterGUID()==m_caster->GetGUID() )
                             {
-                                --combo;
-                                ++doses;
-
-                                unitTarget->RemoveSingleAuraFromStack((*itr)->GetId(), (*itr)->GetEffIndex());
-
-                                itr = auras.begin();
+                                poison = *itr;
+                                break;
                             }
-                            else
-                                ++itr;
+                        // count consumed deadly poison doses at target
+                        if (poison)
+                        {
+                            uint32 spellId = poison->GetId();
+                            uint32 doses = poison->GetStackAmount();
+                            if (doses > combo)
+                                doses = combo;
+                            for (int i=0; i< doses; i++)
+                                unitTarget->RemoveSingleSpellAurasFromStack(spellId);
+                            damage *= doses;
+                            damage += int32(((Player*)m_caster)->GetTotalAttackPowerValue(BASE_ATTACK) * 0.03f * doses);
                         }
-
-                        damage *= doses;
-                        damage += int32(((Player*)m_caster)->GetTotalAttackPowerValue(BASE_ATTACK) * 0.03f * doses);
-
                         // Eviscerate and Envenom Bonus Damage (item set effect)
                         if(m_caster->GetDummyAura(37169))
                             damage += ((Player*)m_caster)->GetComboPoints()*40;
@@ -572,19 +570,25 @@ void Spell::EffectSchoolDMG(uint32 effect_idx)
             }
             case SPELLFAMILY_PALADIN:
             {
-                // Judgement of Vengeance
+                // Judgement of Vengeance ${1+0.22*$SPH+0.14*$AP} + 10% for each application of Holy Vengeance on the target
                 if((m_spellInfo->SpellFamilyFlags & 0x800000000LL) && m_spellInfo->SpellIconID==2292)
                 {
+                    float ap = m_caster->GetTotalAttackPowerValue(BASE_ATTACK);
+                    int32 holy = m_caster->SpellBaseDamageBonus(GetSpellSchoolMask(m_spellInfo)) +
+                                 m_caster->SpellBaseDamageBonusForVictim(GetSpellSchoolMask(m_spellInfo), unitTarget);
+                    damage+=int32(ap * 0.14f) + int32(holy * 22 / 100);
+                    // Get stack of Holy Vengeance on the target added by caster
                     uint32 stacks = 0;
                     Unit::AuraList const& auras = unitTarget->GetAurasByType(SPELL_AURA_PERIODIC_DAMAGE);
                     for(Unit::AuraList::const_iterator itr = auras.begin(); itr!=auras.end(); ++itr)
                         if((*itr)->GetId() == 31803 && (*itr)->GetCasterGUID()==m_caster->GetGUID())
-                            ++stacks;
-                    if(!stacks)
-                        //No damage if the target isn't affected by this
-                        damage = -1;
-                    else
-                        damage *= stacks;
+                        {
+                            stacks = (*itr)->GetStackAmount();
+                            break;
+                        }
+                    // + 10% for each application of Holy Vengeance on the target
+                    if(stacks)
+                        damage += damage * stacks * 10 /100;
                 }
                 // Avenger's Shield ($m1+0.07*$SPH+0.07*$AP)
                 else if(m_spellInfo->SpellFamilyFlags & 0x0000000000004000LL)
@@ -943,16 +947,12 @@ void Spell::EffectDummy(uint32 i)
                 }
                 case 28730:                                 // Arcane Torrent (Mana)
                 {
-                    int32 count = 0;
-                    Unit::AuraList const& m_dummyAuras = m_caster->GetAurasByType(SPELL_AURA_DUMMY);
-                    for(Unit::AuraList::const_iterator i = m_dummyAuras.begin(); i != m_dummyAuras.end(); ++i)
-                        if ((*i)->GetId() == 28734)
-                            ++count;
-                    if (count)
-                    {
-                        m_caster->RemoveAurasDueToSpell(28734);
-                        int32 bp = damage * count;
+                    Aura * dummy = m_caster->GetDummyAura(28734);
+                    if (dummy)
+                    {                        
+                        int32 bp = damage * dummy->GetStackAmount();
                         m_caster->CastCustomSpell(m_caster, 28733, &bp, NULL, NULL, true);
+                        m_caster->RemoveAurasDueToSpell(28734);
                     }
                     return;
                 }
@@ -4217,21 +4217,22 @@ void Spell::EffectWeaponDmg(uint32 i)
             // Devastate bonus and sunder armor refresh
             else if(m_spellInfo->SpellVisual[0] == 671 && m_spellInfo->SpellIconID == 1508)
             {
-                customBonusDamagePercentMod = true;
-                bonusDamagePercentMod = 0.0f;               // only applied if auras found
-
-                Unit::AuraList const& list = unitTarget->GetAurasByType(SPELL_AURA_MOD_RESISTANCE);
-                for(Unit::AuraList::const_iterator itr=list.begin();itr!=list.end();++itr)
+                uint32 stack = 0;
+                // Need refresh all Sunder Armor auras from this caster
+                Unit::AuraMap& suAuras = unitTarget->GetAuras();
+                for(Unit::AuraMap::iterator itr = suAuras.begin(); itr != suAuras.end(); ++itr)
                 {
-                    SpellEntry const *proto = (*itr)->GetSpellProto();
-                    if(proto->SpellVisual[0] == 406 && proto->SpellIconID == 565)
+                    SpellEntry const *spellInfo = (*itr).second->GetSpellProto();
+                    if( spellInfo->SpellFamilyName == SPELLFAMILY_WARRIOR && 
+                        spellInfo->SpellFamilyFlags & 0x0000000000004000LL && 
+                        (*itr).second->GetCasterGUID() == m_caster->GetGUID())
                     {
-                        int32 duration = GetSpellDuration(proto);
-                        (*itr)->SetAuraDuration(duration);
-                        (*itr)->SendAuraUpdate(false);
-                        bonusDamagePercentMod += 1.0f;      // +100%
+                        (*itr).second->RefreshAura();
+                        stack = (*itr).second->GetStackAmount();
                     }
                 }
+                if (stack)
+                    spell_bonus += stack * CalculateDamage(2, unitTarget);
             }
             break;
         }
@@ -4644,12 +4645,11 @@ void Spell::EffectScriptEffect(uint32 effIndex)
         }
         // Brittle Armor - need remove one 24575 Brittle Armor aura
         case 24590:
-            unitTarget->RemoveSingleAuraFromStack(24575, 0);
-            unitTarget->RemoveSingleAuraFromStack(24575, 1);
+            unitTarget->RemoveSingleSpellAurasFromStack(24575);
             return;
         // Mercurial Shield - need remove one 26464 Mercurial Shield aura
         case 26465:
-            unitTarget->RemoveSingleAuraFromStack(26464, 0);
+            unitTarget->RemoveSingleSpellAurasFromStack(26464);
             return;
         // Orb teleport spells
         case 25140:
@@ -4900,8 +4900,7 @@ void Spell::EffectScriptEffect(uint32 effIndex)
                     if (!(familyFlag & 0x000000800000C000LL))
                         continue;
                     // Refresh aura duration
-                    aura->SetAuraDuration(aura->GetAuraMaxDuration());
-                    aura->SendAuraUpdate(false);
+                    aura->RefreshAura();
 
                     // Serpent Sting - Instantly deals 40% of the damage done by your Serpent Sting.
                     if (familyFlag & 0x0000000000004000LL && aura->GetEffIndex() == 0)

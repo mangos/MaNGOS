@@ -1131,10 +1131,7 @@ void Unit::DealSpellDamage(SpellNonMeleeDamage *damageInfo, bool durabilityLoss)
         {
             SpellEntry const *spellInfo = (*itr).second->GetSpellProto();
             if( spellInfo->AttributesEx3 & 0x40000 && spellInfo->SpellFamilyName == SPELLFAMILY_PALADIN && ((*itr).second->GetCasterGUID() == GetGUID()))
-            {
-                (*itr).second->SetAuraDuration((*itr).second->GetAuraMaxDuration());
-                (*itr).second->SendAuraUpdate(false);
-            }
+                (*itr).second->RefreshAura();
         }
     }
     // Call default DealDamage
@@ -1490,10 +1487,7 @@ void Unit::DealMeleeDamage(CalcDamageInfo *damageInfo, bool durabilityLoss)
         {
             SpellEntry const *spellInfo = (*itr).second->GetSpellProto();
             if( spellInfo->AttributesEx3 & 0x40000 && spellInfo->SpellFamilyName == SPELLFAMILY_PALADIN && ((*itr).second->GetCasterGUID() == GetGUID()))
-            {
-                (*itr).second->SetAuraDuration((*itr).second->GetAuraMaxDuration());
-                (*itr).second->SendAuraUpdate(false);
-            }
+                (*itr).second->RefreshAura();
         }
     }
 
@@ -3195,48 +3189,45 @@ bool Unit::AddAura(Aura *Aur)
         // passive and persistent auras can stack with themselves any number of times
         if (!Aur->IsPassive() && !Aur->IsPersistent())
         {
-            // replace aura if next will > spell StackAmount
-            if(aurSpellInfo->StackAmount)
+            for(AuraMap::iterator i2 = m_Auras.lower_bound(spair); i2 != m_Auras.upper_bound(spair); ++i2)
             {
-                if(m_Auras.count(spair) >= aurSpellInfo->StackAmount)
-                    RemoveAura(i,AURA_REMOVE_BY_STACK);
-            }
-            // if StackAmount==0 not allow auras from same caster
-            else
-            {
-                for(AuraMap::iterator i2 = m_Auras.lower_bound(spair); i2 != m_Auras.upper_bound(spair); ++i2)
+                if(i2->second->GetCasterGUID()==Aur->GetCasterGUID())
                 {
-                    if(i2->second->GetCasterGUID()==Aur->GetCasterGUID())
+                    // Aura can stack on self -> Stack it;
+                    if(aurSpellInfo->StackAmount)
                     {
+                        i2->second->modStackAmount(1);
+                        delete Aur;
+                        return false;
+                    }
+                    // can be only single (this check done at _each_ aura add
+                    RemoveAura(i2,AURA_REMOVE_BY_STACK);
+                    break;
+                }
+
+                bool stop = false;
+                switch(aurSpellInfo->EffectApplyAuraName[Aur->GetEffIndex()])
+                {
+                    // DoT/HoT/etc
+                    case SPELL_AURA_PERIODIC_DAMAGE:    // allow stack
+                    case SPELL_AURA_PERIODIC_DAMAGE_PERCENT:
+                    case SPELL_AURA_PERIODIC_LEECH:
+                    case SPELL_AURA_PERIODIC_HEAL:
+                    case SPELL_AURA_OBS_MOD_HEALTH:
+                    case SPELL_AURA_PERIODIC_MANA_LEECH:
+                    case SPELL_AURA_PERIODIC_ENERGIZE:
+                    case SPELL_AURA_OBS_MOD_MANA:
+                    case SPELL_AURA_POWER_BURN_MANA:
+                        break;
+                    default:                            // not allow
                         // can be only single (this check done at _each_ aura add
                         RemoveAura(i2,AURA_REMOVE_BY_STACK);
-                        break;
-                    }
-
-                    bool stop = false;
-                    switch(aurSpellInfo->EffectApplyAuraName[Aur->GetEffIndex()])
-                    {
-                        // DoT/HoT/etc
-                        case SPELL_AURA_PERIODIC_DAMAGE:    // allow stack
-                        case SPELL_AURA_PERIODIC_DAMAGE_PERCENT:
-                        case SPELL_AURA_PERIODIC_LEECH:
-                        case SPELL_AURA_PERIODIC_HEAL:
-                        case SPELL_AURA_OBS_MOD_HEALTH:
-                        case SPELL_AURA_PERIODIC_MANA_LEECH:
-                        case SPELL_AURA_PERIODIC_ENERGIZE:
-                        case SPELL_AURA_OBS_MOD_MANA:
-                        case SPELL_AURA_POWER_BURN_MANA:
-                            break;
-                        default:                            // not allow
-                            // can be only single (this check done at _each_ aura add
-                            RemoveAura(i2,AURA_REMOVE_BY_STACK);
-                            stop = true;
-                            break;
-                    }
-
-                    if(stop)
+                        stop = true;
                         break;
                 }
+
+                if(stop)
+                    break;
             }
         }
     }
@@ -3591,7 +3582,16 @@ void Unit::RemoveSingleAuraFromStack(uint32 spellId, uint32 effindex)
 {
     AuraMap::iterator iter = m_Auras.find(spellEffectPair(spellId, effindex));
     if(iter != m_Auras.end())
-        RemoveAura(iter);
+    {
+        if (iter->second->modStackAmount(-1))
+            RemoveAura(iter);
+    }
+}
+
+void Unit::RemoveSingleSpellAurasFromStack(uint32 spellId)
+{
+    for (int i=0; i<3; ++i)
+        RemoveSingleAuraFromStack(spellId, i);
 }
 
 void Unit::RemoveAurasDueToSpell(uint32 spellId, Aura* except)
@@ -4265,15 +4265,14 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     if (!procSpell || procSpell->Id == 24659)
                         return false;
                     // Need remove one 24659 aura
-                    RemoveSingleAuraFromStack(24659, 0);
-                    RemoveSingleAuraFromStack(24659, 1);
+                    RemoveSingleSpellAurasFromStack(24659);
                     return true;
                 }
                 // Restless Strength
                 case 24661:
                 {
                     // Need remove one 24662 aura
-                    RemoveSingleAuraFromStack(24662, 0);
+                    RemoveSingleSpellAurasFromStack(24662);
                     return true;
                 }
                 // Adaptive Warding (Frostfire Regalia set)
@@ -5851,14 +5850,10 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
                         return false;
                     // stacking
                     CastSpell(this, 37658, true, NULL, triggeredByAura);
-                    // counting
-                    uint32 count = 0;
-                    AuraList const& dummyAura = GetAurasByType(SPELL_AURA_DUMMY);
-                    for(AuraList::const_iterator itr = dummyAura.begin(); itr != dummyAura.end(); ++itr)
-                        if((*itr)->GetId()==37658)
-                            ++count;
+
+                    Aura * dummy = GetDummyAura(37658);
                     // release at 3 aura in stack (cont contain in basepoint of trigger aura)
-                    if(count < triggerAmount)
+                    if(!dummy || dummy->GetStackAmount() < triggerAmount)
                         return false;
 
                     RemoveAurasDueToSpell(37658);
@@ -5872,17 +5867,14 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
                         return false;
                     // stacking
                     CastSpell(this, 54842, true, NULL, triggeredByAura);
+
                     // counting
-                    uint32 count = 0;
-                    AuraList const& dummyAura = GetAurasByType(SPELL_AURA_DUMMY);
-                    for(AuraList::const_iterator itr = dummyAura.begin(); itr != dummyAura.end(); ++itr)
-                        if((*itr)->GetId()==54842)
-                            ++count;
+                    Aura * dummy = GetDummyAura(54842);
                     // release at 3 aura in stack (cont contain in basepoint of trigger aura)
-                    if(count < triggerAmount)
+                    if(!dummy || dummy->GetStackAmount() < triggerAmount)
                         return false;
 
-                     RemoveAurasDueToSpell(54842);
+                    RemoveAurasDueToSpell(54842);
                     trigger_spell_id = 54843;
                     target = pVictim;
                 }
