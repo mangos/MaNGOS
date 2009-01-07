@@ -4240,24 +4240,33 @@ void Aura::HandlePeriodicDamage(bool apply, bool Real)
             // Consecration
             if (m_spellProto->SpellFamilyFlags & 0x0000000000000020LL)
             {
-                if (apply && !loading)
+                if (apply && !loading && caster)
                 {
-                    if(Unit* caster = GetCaster())
+                    Unit::AuraList const& classScripts = caster->GetAurasByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
+                    for(Unit::AuraList::const_iterator k = classScripts.begin(); k != classScripts.end(); ++k)
                     {
-                        Unit::AuraList const& classScripts = caster->GetAurasByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
-                        for(Unit::AuraList::const_iterator k = classScripts.begin(); k != classScripts.end(); ++k)
+                        int32 tickcount = GetSpellDuration(m_spellProto) / m_spellProto->EffectAmplitude[m_effIndex];
+                        switch((*k)->GetModifier()->m_miscvalue)
                         {
-                            int32 tickcount = GetSpellDuration(m_spellProto) / m_spellProto->EffectAmplitude[m_effIndex];
-                            switch((*k)->GetModifier()->m_miscvalue)
+                            case 5147:                  // Improved Consecration - Libram of the Eternal Rest
                             {
-                                case 5147:                  // Improved Consecration - Libram of the Eternal Rest
-                                {
-                                    m_modifier.m_amount += (*k)->GetModifier()->m_amount / tickcount;
-                                    break;
-                                }
+                                m_modifier.m_amount += (*k)->GetModifier()->m_amount / tickcount;
+                                break;
                             }
                         }
                     }
+                }
+                return;
+            }
+            // Seal of Vengeance 0.013*$SPH+0.025*$AP per tick
+            if(m_spellProto->SpellFamilyFlags & 0x0000080000000000LL)
+            {
+                if (apply && !loading && caster)
+                {
+                    float ap = caster->GetTotalAttackPowerValue(BASE_ATTACK);
+                    int32 holy = caster->SpellBaseDamageBonus(GetSpellSchoolMask(m_spellProto)) +
+                                 caster->SpellBaseDamageBonusForVictim(GetSpellSchoolMask(m_spellProto), m_target);
+                    m_modifier.m_amount += int32(ap * 0.025f) + int32(holy * 13 / 1000);
                 }
                 return;
             }

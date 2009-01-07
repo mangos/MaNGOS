@@ -5047,48 +5047,15 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
         }
         case SPELLFAMILY_PALADIN:
         {
-            // TODO: spell list, formula change in 3.0.3
-            // Seal of Righteousness - melee proc dummy
+            // Seal of Righteousness - melee proc dummy (addition ${$MWS*(0.022*$AP+0.044*$SPH)} damage)
             if (dummySpell->SpellFamilyFlags&0x000000008000000LL && triggeredByAura->GetEffIndex()==0)
             {
-                if(GetTypeId() != TYPEID_PLAYER)
-                    return false;
-
-                uint32 spellId;
-                switch (triggeredByAura->GetId())
-                {
-                    case 21084: spellId = 25742; break;     // Rank 1
-                    case 20287: spellId = 25740; break;     // Rank 2
-                    case 20288: spellId = 25739; break;     // Rank 3
-                    case 20289: spellId = 25738; break;     // Rank 4
-                    case 20290: spellId = 25737; break;     // Rank 5
-                    case 20291: spellId = 25736; break;     // Rank 6
-                    case 20292: spellId = 25735; break;     // Rank 7
-                    case 20293: spellId = 25713; break;     // Rank 8
-                    case 27155: spellId = 27156; break;     // Rank 9
-                    default:
-                        sLog.outError("Unit::HandleDummyAuraProc: non handled possibly SoR (Id = %u)", triggeredByAura->GetId());
-                        return false;
-                }
-                Item *item = ((Player*)this)->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
-                float speed = (item ? item->GetProto()->Delay : BASE_ATTACK_TIME)/1000.0f;
-
-                float damageBasePoints;
-                if(item && item->GetProto()->InventoryType == INVTYPE_2HWEAPON)
-                    // two hand weapon
-                    damageBasePoints=1.20f*triggeredByAura->GetModifier()->m_amount * 1.2f * 1.03f * speed/100.0f + 1;
-                else
-                    // one hand weapon/no weapon
-                    damageBasePoints=0.85f*ceil(triggeredByAura->GetModifier()->m_amount * 1.2f * 1.03f * speed/100.0f) - 1;
-
-                int32 damagePoint = int32(damageBasePoints + 0.03f * (GetWeaponDamageRange(BASE_ATTACK,MINDAMAGE)+GetWeaponDamageRange(BASE_ATTACK,MAXDAMAGE))/2.0f) + 1;
-
-                // apply damage bonuses manually
-                if(damagePoint >= 0)
-                    damagePoint = SpellDamageBonus(pVictim, dummySpell, damagePoint, SPELL_DIRECT_DAMAGE);
-
-                CastCustomSpell(pVictim,spellId,&damagePoint,NULL,NULL,true,NULL, triggeredByAura);
-                return true;                                // no hidden cooldown
+                triggered_spell_id = 25742;
+                float ap = GetTotalAttackPowerValue(BASE_ATTACK);
+                int32 holy = SpellBaseDamageBonus(SPELL_SCHOOL_MASK_HOLY) +
+                             SpellBaseDamageBonusForVictim(SPELL_SCHOOL_MASK_HOLY, pVictim);
+                basepoints0 = GetAttackTime(BASE_ATTACK) * int32(ap*0.022f + 0.044f * holy) / 1000;
+                break;
             }
             // Seal of Blood do damage trigger
             if(dummySpell->SpellFamilyFlags & 0x0000040000000000LL)
@@ -5144,8 +5111,7 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     }
                     break;
                 }
-                // TODO: fix basepoint calculation (changed in 3.0.3)
-                // Seal of Vengeance
+                // Seal of Vengeance (damage calc on apply aura)
                 case 31801:
                 {
                     if(effIndex != 0)                       // effect 1,2 used by seal unleashing code
@@ -5378,10 +5344,6 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
             // Earth Shield
             if(dummySpell->SpellFamilyFlags & 0x0000040000000000LL)
             {
-                if(GetTypeId() != TYPEID_PLAYER)
-                    return false;
-
-                // heal
                 basepoints0 = triggeredByAura->GetModifier()->m_amount;
                 target = this;
                 triggered_spell_id = 379;
