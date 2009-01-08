@@ -1,3 +1,5 @@
+ALTER TABLE db_version CHANGE COLUMN required_7052_01_mangos_spell_proc_event required_7053_01_mangos_spell_proc_event bit;
+
 -- (60493) Dying Curse ()
 DELETE FROM `spell_proc_event` WHERE `entry` IN (60493);
 INSERT INTO `spell_proc_event` VALUES (60493, 0x00, 0, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0.000000, 0.000000, 45);
