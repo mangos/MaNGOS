@@ -121,6 +121,7 @@ pkgdata_DATA = \
 	7047_03_mangos_playercreateinfo_spell.sql \
 	7050_01_mangos_spell_proc_event.sql \
 	7051_01_mangos_spell_proc_event.sql \
+	7052_01_mangos_spell_proc_event.sql \
 	README
 
 ## Additional files to include when running 'make dist'
@@ -222,4 +223,5 @@ EXTRA_DIST = \
 	7047_03_mangos_playercreateinfo_spell.sql \
 	7050_01_mangos_spell_proc_event.sql \
 	7051_01_mangos_spell_proc_event.sql \
+	7052_01_mangos_spell_proc_event.sql \
 	README
