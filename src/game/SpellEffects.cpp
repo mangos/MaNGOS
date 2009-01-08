@@ -4599,6 +4599,8 @@ void Spell::EffectScriptEffect(uint32 effIndex)
         case 11729:
         case 11730:
         case 27230:
+        case 47871:
+        case 47878:
         {
             uint32 itemtype;
             uint32 rank = 0;
