@@ -1239,6 +1239,7 @@ void Aura::HandleAddModifier(bool apply, bool Real)
             case 34754:    // Clearcasting
             case 34936:    // Backlash
             case 48108:    // Hot Streak
+            case 57761:    // Fireball!
                 SetAuraCharges(1);
                 break;
         }
@@ -4224,10 +4225,11 @@ void Aura::HandlePeriodicDamage(bool apply, bool Real)
                 m_modifier.m_amount += int32(caster->GetTotalAttackPowerValue(BASE_ATTACK) * 7 / 100);
                 return;
             }
+            // Deadly Poison
             if (m_spellProto->SpellFamilyFlags & 0x0000000000010000)
             {
                 // 0.08*$AP / 4 * amount of stack
-                m_modifier.m_amount += int32(caster->GetTotalAttackPowerValue(BASE_ATTACK) * 2 * GetStackAmount() * / 100);
+                m_modifier.m_amount += int32(caster->GetTotalAttackPowerValue(BASE_ATTACK) * 2 * GetStackAmount() / 100);
                 return;
             }
             break;
