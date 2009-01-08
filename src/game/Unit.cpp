@@ -5825,8 +5825,8 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
                         return false;
                     // procspell is triggered spell but we need mana cost of original casted spell
                     uint32 originalSpellId = procSpell->Id;
-                    // Holy Shock
-                    if(procSpell->SpellFamilyFlags & 0x00200000)
+                    // Holy Shock heal
+                    if(procSpell->SpellFamilyFlags & 0x0001000000000000LL)
                     {
                         switch(procSpell->Id)
                         {
@@ -5835,6 +5835,8 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
                             case 25903: originalSpellId = 20930; break;
                             case 27175: originalSpellId = 27174; break;
                             case 33074: originalSpellId = 33072; break;
+                            case 48820: originalSpellId = 48824; break;
+                            case 48821: originalSpellId = 48825; break;
                             default:
                                 sLog.outError("Unit::HandleProcTriggerSpell: Spell %u not handled in HShock",procSpell->Id);
                                return false;
@@ -5847,7 +5849,8 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
                         return false;
                     }
                     // percent stored in effect 1 (class scripts) base points
-                    basepoints0 = originalSpell->manaCost*(auraSpellInfo->EffectBasePoints[1]+1)/100;
+                    int32 cost = originalSpell->manaCost + originalSpell->ManaCostPercentage * GetCreateMana() / 100;
+                    basepoints0 = cost*(auraSpellInfo->EffectBasePoints[1]+1)/100;
                     trigger_spell_id = 20272;
                     target = this;
                 }
@@ -9816,7 +9819,7 @@ void Unit::ProcDamageAndSpellFor( bool isVictim, Unit * pTarget, uint32 procFlag
             if (procExtra&(PROC_EX_NORMAL_HIT|PROC_EX_MISS|PROC_EX_RESIST))
             {
                 if (pTarget->GetTypeId() != TYPEID_PLAYER && pTarget->GetCreatureType() != CREATURE_TYPE_CRITTER)
-                    ((Player*)this)->UpdateCombatSkills(pTarget, attType, MELEE_HIT_MISS, isVictim);
+                    ((Player*)this)->UpdateCombatSkills(pTarget, attType, isVictim);
             }
             // Update defence if player is victim and parry/dodge/block
             if (isVictim && procExtra&(PROC_EX_DODGE|PROC_EX_PARRY|PROC_EX_BLOCK))

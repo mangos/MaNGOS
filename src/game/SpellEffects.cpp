@@ -1517,6 +1517,8 @@ void Spell::EffectDummy(uint32 i)
                         case 20930: hurt = 25902; heal = 25903; break;
                         case 27174: hurt = 27176; heal = 27175; break;
                         case 33072: hurt = 33073; heal = 33074; break;
+                        case 48824: hurt = 48822; heal = 48820; break;
+                        case 48825: hurt = 48823; heal = 48821; break;
                         default:
                             sLog.outError("Spell::EffectDummy: Spell %u not handled in HS",m_spellInfo->Id);
                             return;
