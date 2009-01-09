@@ -345,8 +345,6 @@ m_updated(false), m_isRemovedOnShapeLost(true), m_in_use(false)
 {
     assert(target);
 
-    int32 size = sizeof(Aura);
-
     assert(spellproto && spellproto == sSpellStore.LookupEntry( spellproto->Id ) && "`info` must be pointer to sSpellStore element");
 
     m_spellProto = spellproto;
