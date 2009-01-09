@@ -4836,6 +4836,13 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                 pVictim->CastCustomSpell(pVictim,34919,&basepoints0,NULL,NULL,true,castItem,triggeredByAura);
                 return true;                                // no hidden cooldown
             }
+            // Divine Aegis
+            if (dummySpell->SpellIconID == 2820)
+            {
+                basepoints0 = damage * triggeredByAura->GetModifier()->m_amount/100;
+                triggered_spell_id = 47753;
+                break;
+            }
             switch(dummySpell->Id)
             {
                 // Vampiric Embrace
