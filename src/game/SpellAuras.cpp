@@ -2145,6 +2145,25 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
             m_target->CastSpell(m_target,47287,true,NULL,this);
             return;
         }
+
+        if (caster && m_removeMode == AURA_REMOVE_BY_DEATH)
+        {
+            // Stop caster Arcane Missle chanelling on death
+            if (m_spellProto->SpellFamilyName == SPELLFAMILY_MAGE && 
+                m_spellProto->SpellFamilyFlags&0x0000000000000800LL)
+            {
+                caster->InterruptSpell(CURRENT_CHANNELED_SPELL);
+                return;
+            }
+            // Stop caster Penance chanelling on death
+            if (m_spellProto->SpellFamilyName == SPELLFAMILY_PRIEST && 
+                m_spellProto->SpellFamilyFlags2 & 0x00000080)
+            {
+                caster->InterruptSpell(CURRENT_CHANNELED_SPELL);
+                return;
+            }
+
+        }
     }
 
     // AT APPLY & REMOVE
@@ -6573,7 +6592,7 @@ void Aura::PeriodicDummyTick()
             if (spell->SpellFamilyFlags & 0x0000000000000020LL)
             {
                 if (caster)
-                    caster->CastCustomSpell(m_target, 52212, &m_modifier.m_amount, NULL, NULL, true);
+                    caster->CastCustomSpell(m_target, 52212, &m_modifier.m_amount, NULL, NULL, true, 0, this);
                 return;
             }
             // Raise Dead
