@@ -5254,14 +5254,19 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     if( cooldown && ((Player*)this)->HasSpellCooldown(dummySpell->Id))
                         return false;
 
+                    // Now amount of extra power stored in 1 effect of Enchant spell
+                    // Get it by item enchant id
                     uint32 spellId;
                     switch (castItem->GetEnchantmentId(EnchantmentSlot(TEMP_ENCHANTMENT_SLOT)))
                     {
-                        case 283: spellId = 33757; break;   //1 Rank
-                        case 284: spellId = 33756; break;   //2 Rank
-                        case 525: spellId = 33755; break;   //3 Rank
-                        case 1669:spellId = 33754; break;   //4 Rank
-                        case 2636:spellId = 33727; break;   //5 Rank
+                        case 283: spellId =  8232; break;   // 1 Rank
+                        case 284: spellId =  8235; break;   // 2 Rank
+                        case 525: spellId = 10486; break;   // 3 Rank
+                        case 1669:spellId = 16362; break;   // 4 Rank
+                        case 2636:spellId = 25505; break;   // 5 Rank
+                        case 3785:spellId = 58801; break;   // 6 Rank
+                        case 3786:spellId = 58803; break;   // 7 Rank
+                        case 3787:spellId = 58804; break;   // 8 Rank
                         default:
                         {
                             sLog.outError("Unit::HandleDummyAuraProc: non handled item enchantment (rank?) %u for spell id: %u (Windfury)",
@@ -5277,7 +5282,7 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                         return false;
                     }
 
-                    int32 extra_attack_power = CalculateSpellDamage(windfurySpellEntry,0,windfurySpellEntry->EffectBasePoints[0],pVictim);
+                    int32 extra_attack_power = CalculateSpellDamage(windfurySpellEntry, 1, windfurySpellEntry->EffectBasePoints[1], pVictim);
 
                     // Off-Hand case
                     if ( castItem->GetSlot() == EQUIPMENT_SLOT_OFFHAND )
