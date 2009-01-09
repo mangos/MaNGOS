@@ -6181,7 +6181,7 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
     return true;
 }
 
-bool Unit::HandleOverrideClassScriptAuraProc(Unit *pVictim, Aura *triggeredByAura, SpellEntry const *procSpell, uint32 cooldown)
+bool Unit::HandleOverrideClassScriptAuraProc(Unit *pVictim, uint32 damage, Aura *triggeredByAura, SpellEntry const *procSpell, uint32 cooldown)
 {
     int32 scriptId = triggeredByAura->GetModifier()->m_miscvalue;
 
@@ -6248,6 +6248,16 @@ bool Unit::HandleOverrideClassScriptAuraProc(Unit *pVictim, Aura *triggeredByAur
         case 5497:                                          // Improved Mana Gems (Serpent-Coil Braid)
             triggered_spell_id = 37445;                     // Mana Surge
             break;
+        case 8152:                                          // Serendipity
+        {
+            // if heal your target over maximum health
+            if (pVictim->GetHealth() + damage < pVictim->GetMaxHealth())
+                return false;
+            int32 cost = procSpell->manaCost + procSpell->ManaCostPercentage * GetCreateMana() / 100;
+            int32 basepoints0 = cost * triggeredByAura->GetModifier()->m_amount/100;
+            CastCustomSpell(this, 47762, &basepoints0, 0, 0, true, 0, triggeredByAura);
+            return true;
+        }
     }
 
     // not processed
@@ -9745,7 +9755,6 @@ bool InitTriggerAuraData()
       isTriggerAura[i]=false;
       isNonTriggerAura[i] = false;
     }
-    isTriggerAura[SPELL_AURA_PERIODIC_DAMAGE] = true;
     isTriggerAura[SPELL_AURA_DUMMY] = true;
     isTriggerAura[SPELL_AURA_MOD_CONFUSE] = true;
     isTriggerAura[SPELL_AURA_MOD_THREAT] = true;
@@ -9980,7 +9989,7 @@ void Unit::ProcDamageAndSpellFor( bool isVictim, Unit * pTarget, uint32 procFlag
             case SPELL_AURA_OVERRIDE_CLASS_SCRIPTS:
             {
                 sLog.outDebug("ProcDamageAndSpell: casting spell id %u (triggered by %s aura of spell %u)", spellInfo->Id,(isVictim?"a victim's":"an attacker's"), triggeredByAura->GetId());
-                if (!HandleOverrideClassScriptAuraProc(pTarget, triggeredByAura, procSpell, cooldown))
+                if (!HandleOverrideClassScriptAuraProc(pTarget, damage, triggeredByAura, procSpell, cooldown))
                     continue;
                 break;
             }
