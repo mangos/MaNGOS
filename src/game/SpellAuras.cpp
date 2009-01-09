@@ -6572,8 +6572,12 @@ void Aura::PeriodicDummyTick()
         case SPELLFAMILY_DEATHKNIGHT:
         {
             // Death and Decay
-//            if (spell->SpellFamilyFlags & 0x0000000000000020LL)
-//                return;
+            if (spell->SpellFamilyFlags & 0x0000000000000020LL)
+            {
+                if (caster)
+                    caster->CastCustomSpell(m_target, 52212, &m_modifier.m_amount, NULL, NULL, true);
+                return;
+            }
             // Raise Dead
 //            if (spell->SpellFamilyFlags & 0x0000000000001000LL)
 //                return;
