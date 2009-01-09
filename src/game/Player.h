@@ -72,13 +72,10 @@ enum PlayerSpellState
 
 struct PlayerSpell
 {
-    uint16 slotId          : 16;
     PlayerSpellState state : 8;
     bool active            : 1;
     bool disabled          : 1;
 };
-
-#define SPELL_WITHOUT_SLOT_ID uint16(-1)
 
 // Spell modifier (used for modify other spells)
 struct SpellModifier
@@ -1470,7 +1467,7 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         void SendProficiency(uint8 pr1, uint32 pr2);
         void SendInitialSpells();
-        bool addSpell(uint32 spell_id, bool active, bool learning = true, bool loading = false, uint16 slot_id=SPELL_WITHOUT_SLOT_ID, bool disabled = false);
+        bool addSpell(uint32 spell_id, bool active, bool learning = true, bool loading = false, bool disabled = false);
         void learnSpell(uint32 spell_id);
         void removeSpell(uint32 spell_id, bool disabled = false);
         void resetSpells();

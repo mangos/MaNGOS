@@ -66,7 +66,6 @@ enum PetSpellType
 
 struct PetSpell
 {
-    uint16 slotId;
     uint16 active;
 
     PetSpellState state : 16;
@@ -189,7 +188,7 @@ class Pet : public Creature
         void _LoadSpells();
         void _SaveSpells();
 
-        bool addSpell(uint16 spell_id,uint16 active = ACT_DECIDE, PetSpellState state = PETSPELL_NEW, uint16 slot_id=0xffff, PetSpellType type = PETSPELL_NORMAL);
+        bool addSpell(uint16 spell_id,uint16 active = ACT_DECIDE, PetSpellState state = PETSPELL_NEW, PetSpellType type = PETSPELL_NORMAL);
         bool learnSpell(uint16 spell_id);
         void learnLevelupSpells();
         bool unlearnSpell(uint16 spell_id);
