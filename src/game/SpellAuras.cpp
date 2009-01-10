@@ -6582,8 +6582,13 @@ void Aura::PeriodicDummyTick()
         case SPELLFAMILY_SHAMAN:
         {
             // Astral Shift
-//            if (spell->Id == 52179)
-//                return;
+            if (spell->Id == 52179)
+            {
+                // Periodic need for remove visual on stun/fear/silence lost
+                if (!(m_target->GetUInt32Value(UNIT_FIELD_FLAGS)&(UNIT_FLAG_STUNNED|UNIT_FLAG_FLEEING|UNIT_FLAG_SILENCED)))
+                    m_target->RemoveAurasDueToSpell(52179);
+                return;
+            }
             break;
         }
         case SPELLFAMILY_DEATHKNIGHT:
