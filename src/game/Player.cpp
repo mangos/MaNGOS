@@ -2723,23 +2723,27 @@ bool Player::addSpell(uint32 spell_id, bool active, bool learning, bool disabled
     // also cast passive spells (including all talents without SPELL_EFFECT_LEARN_SPELL) with additional checks
     else if (IsPassiveSpell(spell_id))
     {
-        // if spell doesn't require a stance or the player is in the required stance
-        if( ( !spellInfo->Stances &&
-            spell_id != 5420 && spell_id != 5419 && spell_id != 7376 &&
-            spell_id != 7381 && spell_id != 21156 && spell_id != 21009 &&
-            spell_id != 21178 && spell_id != 33948 && spell_id != 40121 ) ||
-            m_form != 0 && (spellInfo->Stances & (1<<(m_form-1))) ||
-            (spell_id ==  5420 && m_form == FORM_TREE) ||
-            (spell_id ==  5419 && m_form == FORM_TRAVEL) ||
-            (spell_id ==  7376 && m_form == FORM_DEFENSIVESTANCE) ||
-            (spell_id ==  7381 && m_form == FORM_BERSERKERSTANCE) ||
-            (spell_id == 21156 && m_form == FORM_BATTLESTANCE)||
-            (spell_id == 21178 && (m_form == FORM_BEAR || m_form == FORM_DIREBEAR) ) ||
-            (spell_id == 33948 && m_form == FORM_FLIGHT) ||
-            (spell_id == 40121 && m_form == FORM_FLIGHT_EPIC) )
+        bool need_cast =  false;
+
+        switch(spell_id)
+        {
+            // some spells not have stance data expacted cast at form change or present
+            case  5420: need_cast = (m_form == FORM_TREE);            break;
+            case  5419: need_cast = (m_form == FORM_TRAVEL);          break;
+            case  7376: need_cast = (m_form == FORM_DEFENSIVESTANCE); break;
+            case  7381: need_cast = (m_form == FORM_BERSERKERSTANCE); break;
+            case 21156: need_cast = (m_form == FORM_BATTLESTANCE);    break;
+            case 21178: need_cast = (m_form == FORM_BEAR || m_form == FORM_DIREBEAR); break;
+            case 33948: need_cast = (m_form == FORM_FLIGHT);          break;
+            case 34764: need_cast = (m_form == FORM_FLIGHT);          break;
+            case 40121: need_cast = (m_form == FORM_FLIGHT_EPIC);     break;
+            case 40122: need_cast = (m_form == FORM_FLIGHT_EPIC);     break;
+            // another spells have proper stance data
+            default: need_cast = !spellInfo->Stances && m_form != 0 && (spellInfo->Stances & (1<<(m_form-1))); break;
+        }
                                                             //Check CasterAuraStates
-            if (!spellInfo->CasterAuraState || HasAuraState(AuraState(spellInfo->CasterAuraState)))
-                CastSpell(this, spell_id, true);
+        if (need_cast && (!spellInfo->CasterAuraState || HasAuraState(AuraState(spellInfo->CasterAuraState))))
+            CastSpell(this, spell_id, true);
     }
     else if( IsSpellHaveEffect(spellInfo,SPELL_EFFECT_SKILL_STEP) )
     {
