@@ -2739,7 +2739,7 @@ bool Player::addSpell(uint32 spell_id, bool active, bool learning, bool disabled
             case 40121: need_cast = (m_form == FORM_FLIGHT_EPIC);     break;
             case 40122: need_cast = (m_form == FORM_FLIGHT_EPIC);     break;
             // another spells have proper stance data
-            default: need_cast = !spellInfo->Stances && m_form != 0 && (spellInfo->Stances & (1<<(m_form-1))); break;
+            default: need_cast = !spellInfo->Stances || m_form != 0 && (spellInfo->Stances & (1<<(m_form-1))); break;
         }
                                                             //Check CasterAuraStates
         if (need_cast && (!spellInfo->CasterAuraState || HasAuraState(AuraState(spellInfo->CasterAuraState))))
