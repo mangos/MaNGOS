@@ -1886,11 +1886,9 @@ void Spell::EffectTriggerSpell(uint32 i)
             {
                 // remove all harmful spells on you...
                 if( // ignore positive and passive auras
-                    !iter->second->IsPositive() && !iter->second->IsPassive()    &&
+                    !iter->second->IsPositive() && !iter->second->IsPassive() &&
                     // ignore physical auras
-                    (GetSpellSchoolMask(iter->second->GetSpellProto()) & SPELL_SCHOOL_MASK_NORMAL)==0 &&
-                    // ignore immunity persistent spells
-                    !( iter->second->GetSpellProto()->AttributesEx & 0x10000 ) )
+                    (GetSpellSchoolMask(iter->second->GetSpellProto()) & SPELL_SCHOOL_MASK_NORMAL)==0 )
                 {
                     m_caster->RemoveAurasDueToSpell(iter->second->GetSpellProto()->Id);
                     iter = Auras.begin();
