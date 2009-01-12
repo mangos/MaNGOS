@@ -22,7 +22,7 @@
 DROP TABLE IF EXISTS `db_version`;
 CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
-  `required_7074_01_mangos_playercreateinfo_spell` bit(1) default NULL
+  `required_7075_02_mangos_spell_learn_spell` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -16117,7 +16117,8 @@ INSERT INTO `spell_learn_spell` VALUES
 (40123,40121,0),
 (40123,40122,0),
 (53428,53341,1),
-(53428,53343,1);
+(53428,53343,1),
+(58984,21009,1);
 
 
 /*!40000 ALTER TABLE `spell_learn_spell` ENABLE KEYS */;
