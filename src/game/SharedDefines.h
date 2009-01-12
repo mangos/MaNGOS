@@ -280,7 +280,7 @@ enum ItemQualities
 #define SPELL_ATTR_EX2_UNK2                       0x00000004            // 2
 #define SPELL_ATTR_EX2_UNK3                       0x00000008            // 3
 #define SPELL_ATTR_EX2_UNK4                       0x00000010            // 4
-#define SPELL_ATTR_EX2_UNK5                       0x00000020            // 5
+#define SPELL_ATTR_EX2_AUTOREPEAT_FLAG            0x00000020            // 5
 #define SPELL_ATTR_EX2_UNK6                       0x00000040            // 6
 #define SPELL_ATTR_EX2_UNK7                       0x00000080            // 7
 #define SPELL_ATTR_EX2_UNK8                       0x00000100            // 8 not set in 3.0.3
@@ -557,8 +557,8 @@ enum SpellEffects
     SPELL_EFFECT_DISPEL                    = 38,
     SPELL_EFFECT_LANGUAGE                  = 39,
     SPELL_EFFECT_DUAL_WIELD                = 40,
-    SPELL_EFFECT_SUMMON_WILD               = 41,
-    SPELL_EFFECT_SUMMON_GUARDIAN           = 42,
+    SPELL_EFFECT_JUMP                      = 41,
+    SPELL_EFFECT_JUMP2                     = 42,
     SPELL_EFFECT_TELEPORT_UNITS_FACE_CASTER= 43,
     SPELL_EFFECT_SKILL_STEP                = 44,
     SPELL_EFFECT_ADD_HONOR                 = 45,
@@ -613,7 +613,7 @@ enum SpellEffects
     SPELL_EFFECT_SELF_RESURRECT            = 94,
     SPELL_EFFECT_SKINNING                  = 95,
     SPELL_EFFECT_CHARGE                    = 96,
-    SPELL_EFFECT_SUMMON_CRITTER            = 97,
+    SPELL_EFFECT_97                        = 97,
     SPELL_EFFECT_KNOCK_BACK                = 98,
     SPELL_EFFECT_DISENCHANT                = 99,
     SPELL_EFFECT_INEBRIATE                 = 100,
@@ -628,7 +628,7 @@ enum SpellEffects
     SPELL_EFFECT_SUMMON_DEAD_PET           = 109,
     SPELL_EFFECT_DESTROY_ALL_TOTEMS        = 110,
     SPELL_EFFECT_DURABILITY_DAMAGE         = 111,
-    SPELL_EFFECT_SUMMON_DEMON              = 112,
+    SPELL_EFFECT_112                       = 112,
     SPELL_EFFECT_RESURRECT_NEW             = 113,
     SPELL_EFFECT_ATTACK_ME                 = 114,
     SPELL_EFFECT_DURABILITY_DAMAGE_PCT     = 115,
@@ -707,7 +707,7 @@ enum AuraState
     //AURA_STATE_UNKNOWN20                  = 20,           //  c  | only (45317 Suicide)
     //AURA_STATE_UNKNOWN21                  = 21,           //     | not used
     //AURA_STATE_UNKNOWN22                  = 22,           // C   | not implemented yet (Requires Evasive Charges to use)
-    AURA_STATE_HEALTH_ABOVE_75_PERCENT      = 23,           // C   | not implemented yet
+    AURA_STATE_HEALTH_ABOVE_75_PERCENT      = 23,           // C   |
 };
 
 // Spell mechanics
@@ -1568,9 +1568,10 @@ enum CreatureFamily
 
 enum CreatureTypeFlags
 {
-    CREATURE_TYPEFLAGS_TAMEABLE   = 0x0001,
-    CREATURE_TYPEFLAGS_HERBLOOT   = 0x0100,
-    CREATURE_TYPEFLAGS_MININGLOOT = 0x0200
+    CREATURE_TYPEFLAGS_TAMEABLE        = 0x0001,
+    CREATURE_TYPEFLAGS_HERBLOOT        = 0x0100,
+    CREATURE_TYPEFLAGS_MININGLOOT      = 0x0200,
+    CREATURE_TYPEFLAGS_ENGINEERLOOT    = 0x8000
 };
 
 enum CreatureEliteType
@@ -2076,6 +2077,7 @@ enum SummonType
     SUMMON_TYPE_UNKNOWN5    = 409,
     SUMMON_TYPE_UNKNOWN2    = 427,
     SUMMON_TYPE_POSESSED2   = 428,
+    SUMMON_TYPE_FORCE_OF_NATURE = 669,
     SUMMON_TYPE_GUARDIAN2   = 1161
 };
 
