@@ -4719,6 +4719,30 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     target = this;
                     break;
                 }
+                // Divine purpose
+                case 31871:
+                case 31872:
+                {
+                    // Roll chane
+                    if (!roll_chance_i(triggeredByAura->GetModifier()->m_amount))
+                        return false;
+
+                    // Remove any stun effect on target
+                    AuraMap& Auras = pVictim->GetAuras();
+                    for(AuraMap::iterator iter = Auras.begin(), next; iter != Auras.end();)
+                    {
+                        SpellEntry const *spell = sSpellStore.LookupEntry(iter->second->GetSpellProto()->Id);
+                        if( spell->Mechanic == MECHANIC_STUN || 
+                            spell->EffectMechanic[iter->second->GetEffIndex()] == MECHANIC_STUN)
+                        {
+                            pVictim->RemoveAurasDueToSpell(spell->Id);
+                            iter = Auras.begin();
+                        }
+                        else
+                            ++iter;
+                    }
+                    return true;
+                }
             }
             break;
         }
