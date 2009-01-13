@@ -7065,7 +7065,7 @@ void ObjectMgr::LoadTrainerSpell()
             if(spellinfo->Effect[i]!=SPELL_EFFECT_LEARN_SPELL)
                 continue;
 
-            if(SpellMgr::IsProfessionSpell(spellinfo->EffectTriggerSpell[i]))
+            if(SpellMgr::IsProfessionOrRidingSpell(spellinfo->EffectTriggerSpell[i]))
             {
                 pTrainerSpell->learned_spell = spellinfo->EffectTriggerSpell[i];
                 break;
