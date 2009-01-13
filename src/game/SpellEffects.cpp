@@ -4990,59 +4990,46 @@ void Spell::EffectScriptEffect(uint32 effIndex)
     }
     else if( m_spellInfo->SpellFamilyName == SPELLFAMILY_PALADIN )
     {
-        switch(m_spellInfo->SpellFamilyFlags)
+        // Judgement
+        if (m_spellInfo->SpellFamilyFlags & 0x0000000000800000LL)
         {
-            // Judgement
-            case 0x800000:
-            {
-                if(!unitTarget || !unitTarget->isAlive())
-                    return;
-                uint32 spellId2 = 0;
-
-                // all seals have aura dummy
-                Unit::AuraList const& m_dummyAuras = m_caster->GetAurasByType(SPELL_AURA_DUMMY);
-                for(Unit::AuraList::const_iterator itr = m_dummyAuras.begin(); itr != m_dummyAuras.end(); ++itr)
-                {
-                    SpellEntry const *spellInfo = (*itr)->GetSpellProto();
-
-                    // search seal (all seals have judgement's aura dummy spell id in 2 effect
-                    if ( !spellInfo || !IsSealSpell((*itr)->GetSpellProto()) || (*itr)->GetEffIndex() != 2 )
-                        continue;
-
-                    // must be calculated base at raw base points in spell proto, GetModifier()->m_value for S.Righteousness modified by SPELLMOD_DAMAGE
-                    spellId2 = (*itr)->GetSpellProto()->EffectBasePoints[2]+1;
-
-                    if(spellId2 <= 1)
-                        continue;
-
-                    // found, remove seal
-                    m_caster->RemoveAurasDueToSpell((*itr)->GetId());
-
-                    // Sanctified Judgement
-                    Unit::AuraList const& m_auras = m_caster->GetAurasByType(SPELL_AURA_DUMMY);
-                    for(Unit::AuraList::const_iterator i = m_auras.begin(); i != m_auras.end(); ++i)
-                    {
-                        if ((*i)->GetSpellProto()->SpellIconID == 205 && (*i)->GetSpellProto()->Attributes == 0x01D0LL)
-                        {
-                            int32 chance = (*i)->GetModifier()->m_amount;
-                            if ( roll_chance_i(chance) )
-                            {
-                                int32 mana = spellInfo->manaCost;
-                                if ( Player* modOwner = m_caster->GetSpellModOwner() )
-                                    modOwner->ApplySpellMod(spellInfo->Id, SPELLMOD_COST, mana);
-                                mana = int32(mana* 0.8f);
-                                m_caster->CastCustomSpell(m_caster,31930,&mana,NULL,NULL,true,NULL,*i);
-                            }
-                            break;
-                        }
-                    }
-
-                    break;
-                }
-
-                m_caster->CastSpell(unitTarget,spellId2,true);
+            if(!unitTarget || !unitTarget->isAlive())
                 return;
+            uint32 spellId1 = 0;
+            uint32 spellId2 = 0;
+
+            // Judgement self add switch
+            switch (m_spellInfo->Id)
+            {
+                case 41467: break;                           // Judgement
+                case 53407: spellId1 = 20184; break;         // Judgement of Justice
+                case 20271:                                  // Judgement of Light
+                case 57774: spellId1 = 20185; break;         // Judgement of Light
+                case 53408: spellId1 = 20186; break;         // Judgement of Wisdom
+                default:
+                    return;
             }
+            // all seals have aura dummy in 2 effect
+            Unit::AuraList const& m_dummyAuras = m_caster->GetAurasByType(SPELL_AURA_DUMMY);
+            for(Unit::AuraList::const_iterator itr = m_dummyAuras.begin(); itr != m_dummyAuras.end(); ++itr)
+            {
+                SpellEntry const *spellInfo = (*itr)->GetSpellProto();
+                // search seal (all seals have judgement's aura dummy spell id in 2 effect
+                if ((*itr)->GetEffIndex() != 2 || !spellInfo || !IsSealSpell(spellInfo))
+                    continue;
+                spellId2 = (*itr)->GetModifier()->m_amount;
+                SpellEntry const *judge = sSpellStore.LookupEntry(spellId2);
+                if (!judge)
+                    continue;
+                 // found, remove seal
+                m_caster->RemoveAurasDueToSpell(spellInfo->Id);
+                break;
+            }
+            if (spellId1)
+                m_caster->CastSpell(unitTarget, spellId1, true);
+            if (spellId2)
+                m_caster->CastSpell(unitTarget, spellId2, true);
+            return;
         }
     }
 
