@@ -1601,19 +1601,19 @@ void ObjectMgr::LoadItemPrototypes()
             if(proto->Class != dbcitem->Class || proto->SubClass != dbcitem->SubClass)
             {
                 sLog.outErrorDb("Item (Entry: %u) not correct (Class: %u, Sub: %u) pair, must be (Class: %u, Sub: %u) (still using DB value).",i,proto->Class,proto->SubClass,dbcitem->Class,dbcitem->SubClass);
-                // It safe let use InventoryType from DB
+                // It safe let use Class/Subclass from DB
             }
 
             if(proto->Unk0 != dbcitem->Unk0)
             {
                 sLog.outErrorDb("Item (Entry: %u) not correct %u Unk0, must be %u (still using DB value).",i,proto->Unk0,dbcitem->Unk0);
-                // It safe let use InventoryType from DB
+                // It safe let use Unk0 from DB
             }
 
             if(proto->Material != dbcitem->Material)
             {
                 sLog.outErrorDb("Item (Entry: %u) not correct %u material, must be %u (still using DB value).",i,proto->Material,dbcitem->Material);
-                // It safe let use InventoryType from DB
+                // It safe let use Material from DB
             }
 
             if(proto->InventoryType != dbcitem->InventoryType)
