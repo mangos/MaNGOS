@@ -763,30 +763,6 @@ void Spell::EffectDummy(uint32 i)
                     }
                     return;
                 }
-                case 14185:                                 // Preparation Rogue
-                {
-                    if(m_caster->GetTypeId()!=TYPEID_PLAYER)
-                        return;
-
-                    //immediately finishes the cooldown on certain Rogue abilities
-                    const PlayerSpellMap& sp_list = ((Player *)m_caster)->GetSpellMap();
-                    for (PlayerSpellMap::const_iterator itr = sp_list.begin(); itr != sp_list.end(); ++itr)
-                    {
-                        uint32 classspell = itr->first;
-                        SpellEntry const *spellInfo = sSpellStore.LookupEntry(classspell);
-
-                        if (spellInfo->SpellFamilyName == SPELLFAMILY_ROGUE && (spellInfo->SpellFamilyFlags & 0x26000000860LL))
-                        {
-                            ((Player*)m_caster)->RemoveSpellCooldown(classspell);
-
-                            WorldPacket data(SMSG_CLEAR_COOLDOWN, (4+8));
-                            data << uint32(classspell);
-                            data << uint64(m_caster->GetGUID());
-                            ((Player*)m_caster)->GetSession()->SendPacket(&data);
-                        }
-                    }
-                    return;
-                }
                 case 15998:                                 // Capture Worg Pup
                 case 29435:                                 // Capture Female Kaliri Hatchling
                 {
@@ -881,7 +857,7 @@ void Spell::EffectDummy(uint32 i)
 
                     return;
                 }
-                case 23074:                                 // Arc. Dragonling
+                case 23074:                                 // Arcanite Dragonling
                     if (!m_CastItem) return;
                     m_caster->CastSpell(m_caster,19804,true,m_CastItem);
                     return;
@@ -1425,11 +1401,6 @@ void Spell::EffectDummy(uint32 i)
         case SPELLFAMILY_ROGUE:
             switch(m_spellInfo->Id )
             {
-                case 31231:                                 // Cheat Death
-                {
-                    m_caster->CastSpell(m_caster,45182,true);
-                    return;
-                }
                 case 5938:                                  // Shiv
                 {
                     if(m_caster->GetTypeId() != TYPEID_PLAYER)
@@ -1463,6 +1434,35 @@ void Spell::EffectDummy(uint32 i)
                     }
 
                     m_caster->CastSpell(unitTarget, 5940, true);
+                    return;
+                }
+                case 14185:                                 // Preparation Rogue
+                {
+                    if(m_caster->GetTypeId()!=TYPEID_PLAYER)
+                        return;
+
+                    //immediately finishes the cooldown on certain Rogue abilities
+                    const PlayerSpellMap& sp_list = ((Player *)m_caster)->GetSpellMap();
+                    for (PlayerSpellMap::const_iterator itr = sp_list.begin(); itr != sp_list.end(); ++itr)
+                    {
+                        uint32 classspell = itr->first;
+                        SpellEntry const *spellInfo = sSpellStore.LookupEntry(classspell);
+
+                        if (spellInfo->SpellFamilyName == SPELLFAMILY_ROGUE && (spellInfo->SpellFamilyFlags & 0x0000024000000860LL))
+                        {
+                            ((Player*)m_caster)->RemoveSpellCooldown(classspell);
+
+                            WorldPacket data(SMSG_CLEAR_COOLDOWN, (4+8));
+                            data << uint32(classspell);
+                            data << uint64(m_caster->GetGUID());
+                            ((Player*)m_caster)->GetSession()->SendPacket(&data);
+                        }
+                    }
+                    return;
+                }
+                case 31231:                                 // Cheat Death
+                {
+                    m_caster->CastSpell(m_caster,45182,true);
                     return;
                 }
             }
