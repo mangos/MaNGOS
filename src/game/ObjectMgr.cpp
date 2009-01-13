@@ -7040,6 +7040,19 @@ void ObjectMgr::LoadTrainerSpell()
         if(!pTrainerSpell->reqlevel)
             pTrainerSpell->reqlevel = spellinfo->spellLevel;
 
+        // calculate learned spell for profession case when stored cast-spell
+        pTrainerSpell->learned_spell = spell;
+        for(int i = 0; i <3; ++i)
+        {
+            if(spellinfo->Effect[i]!=SPELL_EFFECT_LEARN_SPELL)
+                continue;
+
+            if(SpellMgr::IsProfessionSpell(spellinfo->EffectTriggerSpell[i]))
+            {
+                pTrainerSpell->learned_spell = spellinfo->EffectTriggerSpell[i];
+                break;
+            }
+        }
 
         TrainerSpellData& data = m_mCacheTrainerSpellMap[entry];
 
