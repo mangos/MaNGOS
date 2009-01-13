@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -54,7 +54,6 @@
 //reload commands
 bool ChatHandler::HandleReloadAllCommand(const char*)
 {
-    HandleReloadAreaTriggerTeleportCommand("");
     HandleReloadSkillFishingBaseLevelCommand("");
 
     HandleReloadAllAreaCommand("");
@@ -697,7 +696,6 @@ bool ChatHandler::HandleAccountSetGmLevelCommand(const char* args)
 
     std::string targetAccountName;
     uint32 targetAccountId = 0;
-    uint32 targetSecurity = 0;
 
     /// only target player different from self allowed (if targetPlayer!=NULL then not console)
     Player* targetPlayer = getSelectedPlayer();
@@ -711,13 +709,6 @@ bool ChatHandler::HandleAccountSetGmLevelCommand(const char* args)
         arg2 = arg1;
 
         targetAccountId = targetPlayer->GetSession()->GetAccountId();
-        targetSecurity = targetPlayer->GetSession()->GetSecurity();
-        if(!accmgr.GetName(targetAccountId,targetAccountName))
-        {
-            PSendSysMessage(LANG_ACCOUNT_NOT_EXIST,targetAccountName.c_str());
-            SetSentErrorMessage(true);
-            return false;
-        }
     }
     else
     {
@@ -734,7 +725,12 @@ bool ChatHandler::HandleAccountSetGmLevelCommand(const char* args)
         }
 
         targetAccountId = accmgr.GetId(targetAccountName);
-        targetSecurity = accmgr.GetSecurity(targetAccountId);
+        if(!targetAccountId)
+        {
+            PSendSysMessage(LANG_ACCOUNT_NOT_EXIST,targetAccountName.c_str());
+            SetSentErrorMessage(true);
+            return false;
+        }
     }
 
     int32 gm = (int32)atoi(arg2);
@@ -745,12 +741,14 @@ bool ChatHandler::HandleAccountSetGmLevelCommand(const char* args)
         return false;
     }
 
-    /// m_session==NULL only for console
-    uint32 plSecurity = m_session ? m_session->GetSecurity() : SEC_CONSOLE;
-
     /// can set security level only for target with less security and to less security that we have
     /// This is also reject self apply in fact
-    if(targetSecurity >= plSecurity || uint32(gm) >= plSecurity )
+    if(HasLowerSecurityAccount(NULL,targetAccountId,true))
+        return false;
+
+    /// account can't set security to same or grater level, need more power GM or console
+    uint32 plSecurity = m_session ? m_session->GetSecurity() : SEC_CONSOLE;
+    if (uint32(gm) >= plSecurity )
     {
         SendSysMessage(LANG_YOURS_SECURITY_IS_LOW);
         SetSentErrorMessage(true);
@@ -799,19 +797,10 @@ bool ChatHandler::HandleAccountSetPasswordCommand(const char* args)
         return false;
     }
 
-    uint32 targetSecurity = accmgr.GetSecurity(targetAccountId);
-
-    /// m_session==NULL only for console
-    uint32 plSecurity = m_session ? m_session->GetSecurity() : SEC_CONSOLE;
-
     /// can set password only for target with less security
     /// This is also reject self apply in fact
-    if (targetSecurity >= plSecurity)
-    {
-        SendSysMessage (LANG_YOURS_SECURITY_IS_LOW);
-        SetSentErrorMessage (true);
+    if(HasLowerSecurityAccount (NULL,targetAccountId,true))
         return false;
-    }
 
     if (strcmp(szPassword1,szPassword2))
     {
@@ -2718,7 +2707,7 @@ bool ChatHandler::HandleLookupSpellCommand(const char* args)
 
                 bool talent = (talentCost > 0);
                 bool passive = IsPassiveSpell(id);
-                bool active = target && (target->HasAura(id,0) || target->HasAura(id,1) || target->HasAura(id,2));
+                bool active = target && target->HasAura(id);
 
                 // unit32 used to prevent interpreting uint8 as char at output
                 // find rank of learned spell for learning spell, or talent rank
@@ -6193,7 +6182,14 @@ bool ChatHandler::HandleAccountSetAddonCommand(const char* args)
             SetSentErrorMessage(true);
             return false;
         }
+
     }
+
+    // Let set addon state only for lesser (strong) security level
+    // or to self account
+    if (m_session && m_session->GetAccountId () != account_id &&
+        HasLowerSecurityAccount (NULL,account_id,true))
+        return false;
 
     int lev=atoi(szExp);                                    //get int anyway (0 if error)
     if(lev < 0)
@@ -6289,17 +6285,17 @@ bool ChatHandler::HandleSendItemsCommand(const char* args)
         }
 
         uint32 item_count = itemCountStr ? atoi(itemCountStr) : 1;
-        if(item_count < 1 || item_proto->MaxCount && item_count > item_proto->MaxCount)
+        if(item_count < 1 || item_proto->MaxCount > 0 && item_count > uint32(item_proto->MaxCount))
         {
             PSendSysMessage(LANG_COMMAND_INVALID_ITEM_COUNT, item_count,item_id);
             SetSentErrorMessage(true);
             return false;
         }
 
-        while(item_count > item_proto->Stackable)
+        while(item_count > item_proto->GetMaxStackSize())
         {
-            items.push_back(ItemPair(item_id,item_proto->Stackable));
-            item_count -= item_proto->Stackable;
+            items.push_back(ItemPair(item_id,item_proto->GetMaxStackSize()));
+            item_count -= item_proto->GetMaxStackSize();
         }
 
         items.push_back(ItemPair(item_id,item_count));

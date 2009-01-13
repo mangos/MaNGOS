@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -80,19 +80,10 @@ bool ChatHandler::HandleAccountDeleteCommand(const char* args)
     }
 
     /// Commands not recommended call from chat, but support anyway
-    if(m_session)
-    {
-        uint32 targetSecurity = accmgr.GetSecurity(account_id);
-
-        /// can delete only for account with less security
-        /// This is also reject self apply in fact
-        if (targetSecurity >= m_session->GetSecurity())
-        {
-            SendSysMessage (LANG_YOURS_SECURITY_IS_LOW);
-            SetSentErrorMessage (true);
-            return false;
-        }
-    }
+    /// can delete only for account with less security
+    /// This is also reject self apply in fact
+    if(HasLowerSecurityAccount (NULL,account_id,true))
+        return false;
 
     AccountOpResult result = accmgr.DeleteAccount(account_id);
     switch(result)

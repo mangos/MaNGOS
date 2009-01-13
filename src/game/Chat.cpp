@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@
 #include "MapManager.h"
 #include "GridNotifiersImpl.h"
 #include "CellImpl.h"
+#include "AccountMgr.h"
 
 bool ChatHandler::load_command_table = true;
 
@@ -200,6 +201,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { "anim",           SEC_GAMEMASTER,     false, &ChatHandler::HandleAnimCommand,                "", NULL },
         { "lootrecipient",  SEC_GAMEMASTER,     false, &ChatHandler::HandleGetLootRecipient,           "", NULL },
         { "arena",          SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDebugArenaCommand,          "", NULL },
+        { "sendlargepacket",SEC_ADMINISTRATOR,  false, &ChatHandler::HandleSendLargePacketCommand,     "", NULL },
         { NULL,             0,                  false, NULL,                                           "", NULL }
     };
 
@@ -623,6 +625,55 @@ bool ChatHandler::isAvailable(ChatCommand const& cmd) const
 {
     // check security level only for simple  command (without child commands)
     return m_session->GetSecurity() >= cmd.SecurityLevel;
+}
+
+bool ChatHandler::HasLowerSecurity(Player* target, uint64 guid, bool strong)
+{
+    WorldSession* target_session = NULL;
+    uint32 target_account = 0;
+
+    if (target)
+        target_session = target->GetSession();
+    else if (guid)
+        target_account = objmgr.GetPlayerAccountIdByGUID(guid);
+
+    if(!target_session && !target_account)
+    {
+        SendSysMessage(LANG_PLAYER_NOT_FOUND);
+        SetSentErrorMessage(true);
+        return true;
+    }
+
+    return HasLowerSecurityAccount(target_session,target_account,strong);
+}
+
+bool ChatHandler::HasLowerSecurityAccount(WorldSession* target, uint32 target_account, bool strong)
+{
+    uint32 target_sec;
+
+    // allow everything from console and RA console
+    if (!m_session)
+        return false;
+
+    // ignore only for non-players for non strong checks (when allow apply command at least to same sec level)
+    if (m_session->GetSecurity() > SEC_PLAYER && !strong && !sWorld.getConfig(CONFIG_GM_LOWER_SECURITY))
+        return false;
+
+    if (target)
+        target_sec = target->GetSecurity();
+    else if (target_account)
+        target_sec = accmgr.GetSecurity(target_account);
+    else
+        return true;                                        // caller must report error for (target==NULL && target_account==0)
+
+    if (m_session->GetSecurity() < target_sec || strong && m_session->GetSecurity() <= target_sec)
+    {
+        SendSysMessage(LANG_YOURS_SECURITY_IS_LOW);
+        SetSentErrorMessage(true);
+        return true;
+    }
+
+    return false;
 }
 
 bool ChatHandler::hasStringAbbr(const char* name, const char* part)

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -72,13 +72,10 @@ enum PlayerSpellState
 
 struct PlayerSpell
 {
-    uint16 slotId          : 16;
     PlayerSpellState state : 8;
     bool active            : 1;
     bool disabled          : 1;
 };
-
-#define SPELL_WITHOUT_SLOT_ID uint16(-1)
 
 // Spell modifier (used for modify other spells)
 struct SpellModifier
@@ -143,8 +140,6 @@ enum ActionButtonType
 
 typedef std::map<uint8,ActionButton> ActionButtonList;
 
-typedef std::pair<uint16, uint8> CreateSpellPair;
-
 struct PlayerCreateInfoItem
 {
     PlayerCreateInfoItem(uint32 id, uint32 amount) : item_id(id), item_amount(amount) {}
@@ -176,6 +171,8 @@ struct PlayerLevelInfo
     uint8 stats[MAX_STATS];
 };
 
+typedef std::list<uint32> PlayerCreateInfoSpells;
+
 struct PlayerInfo
 {
                                                             // existence checked by displayId != 0             // existence checked by displayId != 0
@@ -191,7 +188,7 @@ struct PlayerInfo
     uint16 displayId_m;
     uint16 displayId_f;
     PlayerCreateInfoItems item;
-    std::list<CreateSpellPair> spell;
+    PlayerCreateInfoSpells spell;
     std::list<uint16> action[4];
 
     PlayerLevelInfo* levelInfo;                             //[level-1] 0..MaxPlayerLevel-1
@@ -417,16 +414,18 @@ enum PlayerFlags
     PLAYER_FLAGS_GM             = 0x00000008,
     PLAYER_FLAGS_GHOST          = 0x00000010,
     PLAYER_FLAGS_RESTING        = 0x00000020,
-    PLAYER_FLAGS_FFA_PVP        = 0x00000080,
+    PLAYER_FLAGS_UNK7           = 0x00000040,
+    PLAYER_FLAGS_UNK8           = 0x00000080,               // pre-3.0.3 PLAYER_FLAGS_FFA_PVP flag for FFA PVP state
     PLAYER_FLAGS_CONTESTED_PVP  = 0x00000100,               // Player has been involved in a PvP combat and will be attacked by contested guards
     PLAYER_FLAGS_IN_PVP         = 0x00000200,
     PLAYER_FLAGS_HIDE_HELM      = 0x00000400,
     PLAYER_FLAGS_HIDE_CLOAK     = 0x00000800,
-    PLAYER_FLAGS_UNK1           = 0x00001000,               // played long time
-    PLAYER_FLAGS_UNK2           = 0x00002000,               // played too long time
-    PLAYER_FLAGS_UNK3           = 0x00008000,               // strange visual effect (2.0.1), looks like PLAYER_FLAGS_GHOST flag
-    PLAYER_FLAGS_UNK4           = 0x00010000,               // pre-3.0.3 PLAYER_FLAGS_SANCTUARY flag for player entered sanctuary
-    PLAYER_FLAGS_UNK5           = 0x00020000,               // taxi benchmark mode (on/off) (2.0.1)
+    PLAYER_FLAGS_UNK13          = 0x00001000,               // played long time
+    PLAYER_FLAGS_UNK14          = 0x00002000,               // played too long time
+    PLAYER_FLAGS_UNK15          = 0x00004000,
+    PLAYER_FLAGS_UNK16          = 0x00008000,               // strange visual effect (2.0.1), looks like PLAYER_FLAGS_GHOST flag
+    PLAYER_FLAGS_UNK17          = 0x00010000,               // pre-3.0.3 PLAYER_FLAGS_SANCTUARY flag for player entered sanctuary
+    PLAYER_FLAGS_UNK18          = 0x00020000,               // taxi benchmark mode (on/off) (2.0.1)
     PLAYER_FLAGS_PVP_TIMER      = 0x00040000,               // 3.0.2, pvp timer active (after you disable pvp manually)
 };
 
@@ -729,10 +728,10 @@ enum QuestBagSlots
 
 struct ItemPosCount
 {
-    ItemPosCount(uint16 _pos, uint8 _count) : pos(_pos), count(_count) {}
+    ItemPosCount(uint16 _pos, uint32 _count) : pos(_pos), count(_count) {}
     bool isContainedIn(std::vector<ItemPosCount> const& vec) const;
     uint16 pos;
-    uint8 count;
+    uint32 count;
 };
 typedef std::vector<ItemPosCount> ItemPosCountVec;
 
@@ -898,9 +897,7 @@ class MANGOS_DLL_SPEC PlayerTaxi
         // Nodes
         void InitTaxiNodesForLevel(uint32 race, uint32 chrClass, uint32 level);
         void LoadTaxiMask(const char* data);
-        void SaveTaxiMask(const char* data);
 
-        uint32 GetTaximask( uint8 index ) const { return m_taximask[index]; }
         bool IsTaximaskNodeKnown(uint32 nodeidx) const
         {
             uint8  field   = uint8((nodeidx - 1) / 32);
@@ -936,10 +933,14 @@ class MANGOS_DLL_SPEC PlayerTaxi
             return GetTaxiDestination();
         }
         bool empty() const { return m_TaxiDestinations.empty(); }
+
+        friend std::ostringstream& operator<< (std::ostringstream& ss, PlayerTaxi const& taxi);
     private:
         TaxiMask m_taximask;
         std::deque<uint32> m_TaxiDestinations;
 };
+
+std::ostringstream& operator<< (std::ostringstream& ss, PlayerTaxi const& taxi);
 
 class MANGOS_DLL_SPEC Player : public Unit
 {
@@ -1466,11 +1467,11 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         void SendProficiency(uint8 pr1, uint32 pr2);
         void SendInitialSpells();
-        bool addSpell(uint32 spell_id, bool active, bool learning = true, bool loading = false, uint16 slot_id=SPELL_WITHOUT_SLOT_ID, bool disabled = false);
+        bool addSpell(uint32 spell_id, bool active, bool learning, bool disabled);
         void learnSpell(uint32 spell_id);
         void removeSpell(uint32 spell_id, bool disabled = false);
         void resetSpells();
-        void learnDefaultSpells(bool loading = false);
+        void learnDefaultSpells();
         void learnQuestRewardedSpells();
         void learnQuestRewardedSpells(Quest const* quest);
 
@@ -1735,7 +1736,7 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         void UpdateDefense();
         void UpdateWeaponSkill (WeaponAttackType attType);
-        void UpdateCombatSkills(Unit *pVictim, WeaponAttackType attType, MeleeHitOutcome outcome, bool defence);
+        void UpdateCombatSkills(Unit *pVictim, WeaponAttackType attType, bool defence);
 
         void SetSkill(uint32 id, uint16 currVal, uint16 maxVal);
         uint16 GetMaxSkillValue(uint32 skill) const;        // max + perm. bonus

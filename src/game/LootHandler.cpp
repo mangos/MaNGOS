@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -372,14 +372,22 @@ void WorldSession::DoLootRelease( uint64 lguid )
         Item *pItem = player->GetItemByGuid(lguid );
         if(!pItem)
             return;
-        if( (pItem->GetProto()->BagFamily & BAG_FAMILY_MASK_MINING_SUPP) &&
-            pItem->GetProto()->Class == ITEM_CLASS_TRADE_GOODS &&
-            pItem->GetCount() >= 5)
+
+        ItemPrototype const* proto = pItem->GetProto();
+
+        // destroy only 5 items from stack in case prospecting and milling
+        if( (proto->BagFamily & (BAG_FAMILY_MASK_MINING_SUPP|BAG_FAMILY_MASK_HERBS)) &&
+            proto->Class == ITEM_CLASS_TRADE_GOODS)
         {
             pItem->m_lootGenerated = false;
             pItem->loot.clear();
 
-            uint32 count = 5;
+            uint32 count = pItem->GetCount();
+
+            // >=5 checked in spell code, but will work for cheating cases also with removing from another stacks.
+            if(count > 5)
+                count = 5;
+
             player->DestroyItemCount(pItem, count, true);
         }
         else

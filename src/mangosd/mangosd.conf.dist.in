@@ -346,9 +346,9 @@ LogColors = ""
 #
 #    Expansion
 #        Allow server use content from expansion
-#                 2 - check expansion 2 maps existence, and if client support expansion 2 and account have
+#        Default: 2 - check expansion 2 maps existence, and if client support expansion 2 and account have
 #                     expansion 2 setting then allow visit expansion 2 maps, allow create new class character)
-#        Default: 1 - check expansion 1 maps existence, and if client support expansion 1 and account have
+#                 1 - check expansion 1 maps existence, and if client support expansion 1 and account have
 #                     expansion 1 setting then allow visit expansion 1 maps, allow create new races character)
 #                 0 - not check expansion maps existence, not allow wisit its, not allow create new race or new class
 #                     characters, ignore account expansion setting)
@@ -870,6 +870,11 @@ Channel.SilentlyGMJoin = 0
 #        GM starting level (1-100)
 #        Default: 1
 #
+#    GM.LowerSecurity
+#        Disallow a lower security member to interact with a higher one using commands
+#        Default: 0 (disable)
+#                 1 (enable)
+#
 ###################################################################################################################
 
 GM.LoginState     = 2
@@ -880,6 +885,7 @@ GM.InGMList       = 0
 GM.InWhoList      = 0
 GM.LogTrade       = 1
 GM.StartLevel     = 1
+GM.LowerSecurity  = 0
 
 ###################################################################################################################
 # VISIBILITY AND RADIUSES
@@ -1052,6 +1058,12 @@ Visibility.Distance.Grey.Object = 10
 #         Default: 1 (enabled)
 #                  0 (disabled)
 #
+#    Death.Bones.World
+#    Death.Bones.BattlegroundOrArena
+#         Enabled/disabled creating bones instead corpse at resurrection (in normal zones/instacnes, or battleground/arenas)
+#         Default: 1 (enabled)
+#                  0 (disabled)
+#
 ###################################################################################################################
 
 Rate.Health = 1
@@ -1105,6 +1117,8 @@ DurabilityLossChance.Block  = 0.05
 Death.SicknessLevel = 11
 Death.CorpseReclaimDelay.PvP = 1
 Death.CorpseReclaimDelay.PvE = 1
+Death.Bones.World = 1
+Death.Bones.BattlegroundOrArena = 1
 
 ###################################################################################################################
 #
@@ -1127,12 +1141,21 @@ Death.CorpseReclaimDelay.PvE = 1
 #                         in days
 #             Default: 7 (weekly)
 #
+# ArenaSeason.ID: current area season id show in client
+#             Default: 1
+#
+# ArenaSeason.InProgress: current area season state
+#             Default: 1 (active)
+#                      0 (finished)
+#
 ###################################################################################################################
 
 Arena.MaxRatingDifference = 0
 Arena.RatingDiscardTimer = 60000
 Arena.AutoDistributePoints = 0
 Arena.AutoDistributeInterval = 7
+Arena.ArenaSeason.ID = 1
+Arena.ArenaSeason.InProgress = 1
 
 ###################################################################################################################
 #

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,11 +23,7 @@
 #include "Policies/SingletonImp.h"
 #include "Util.h"
 
-#ifdef DO_POSTGRESQL
-extern DatabasePostgre loginDatabase;
-#else
-extern DatabaseMysql loginDatabase;
-#endif
+extern DatabaseType loginDatabase;
 
 INSTANTIATE_SINGLETON_1(AccountMgr);
 

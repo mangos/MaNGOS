@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -256,15 +256,29 @@ class MANGOS_DLL_SPEC Aura
         uint8 GetAuraLevel() const { return m_auraLevel; }
         void SetAuraLevel(uint8 level) { m_auraLevel = level; }
         uint8 GetAuraCharges() const { return m_procCharges; }
-        void SetAuraCharges(uint8 charges) { m_procCharges = charges; }
+        void SetAuraCharges(uint8 charges) 
+        {
+            if (m_procCharges == charges)
+                return;
+            m_procCharges = charges;
+            SendAuraUpdate(false);
+        }
+        bool DropAuraCharge() // return true if last charge dropped
+        { 
+            if (m_procCharges == 0)
+                return false;
+            m_procCharges--;
+            SendAuraUpdate(false);
+            return m_procCharges == 0;
+        }
+
         void SetAura(bool remove) { m_target->SetVisibleAura(m_auraSlot, remove ? 0 : GetId()); }
         void SendAuraUpdate(bool remove);
-        void UpdateAuraCharges()
-        {
-            // only aura in slot with charges and without stack limitation
-            if (m_auraSlot < MAX_AURAS && m_procCharges >= 1 && GetSpellProto()->StackAmount==0)
-                SendAuraUpdate(false);
-        }
+
+        int8 GetStackAmount() {return m_stackAmount;}
+        void SetStackAmount(uint8 num);
+        bool modStackAmount(int32 num); // return true if last charge dropped
+        void RefreshAura();
 
         bool IsPositive() { return m_positive; }
         void SetNegative() { m_positive = false; }
@@ -286,13 +300,9 @@ class MANGOS_DLL_SPEC Aura
         void _AddAura();
         void _RemoveAura();
 
-        void TriggerSpell();
-
         bool IsUpdated() { return m_updated; }
         void SetUpdated(bool val) { m_updated = val; }
         void SetRemoveMode(AuraRemoveMode mode) { m_removeMode = mode; }
-
-        int32 m_procCharges;
 
         virtual Unit* GetTriggerTarget() const { return m_target; }
 
@@ -303,6 +313,7 @@ class MANGOS_DLL_SPEC Aura
         void setDiminishGroup(DiminishingGroup group) { m_AuraDRGroup = group; }
         DiminishingGroup getDiminishGroup() const { return m_AuraDRGroup; }
 
+        void TriggerSpell();
         void PeriodicTick();
         void PeriodicDummyTick();
 
@@ -313,22 +324,28 @@ class MANGOS_DLL_SPEC Aura
 
         Modifier m_modifier;
         SpellModifier *m_spellmod;
-        uint32 m_effIndex;
+
         SpellEntry const *m_spellProto;
-        int32 m_currentBasePoints;                          // cache SpellEntry::EffectBasePoints and use for set custom base points
-        uint64 m_caster_guid;
         Unit* m_target;
-        int32 m_maxduration;
-        int32 m_duration;
-        int32 m_timeCla;
+        uint64 m_caster_guid;
         uint64 m_castItemGuid;                              // it is NOT safe to keep a pointer to the item because it may get deleted
         time_t m_applyTime;
 
-        AuraRemoveMode m_removeMode;
+        int32 m_currentBasePoints;                          // cache SpellEntry::EffectBasePoints and use for set custom base points
+        int32 m_maxduration;                                // Max aura duration
+        int32 m_duration;                                   // Current time
+        int32 m_timeCla;                                    // Timer for power per sec calcultion
+        int32 m_periodicTimer;                              // Timer for periodic auras
 
-        uint8 m_auraSlot;
-        uint8 m_auraFlags;
-        uint8 m_auraLevel;
+        AuraRemoveMode m_removeMode:8;                      // Store info for know remove aura reason
+        DiminishingGroup m_AuraDRGroup:8;                   // Diminishing
+
+        uint8 m_effIndex;                                   // Aura effect index in spell
+        uint8 m_auraSlot;                                   // Aura slot on unit (for show in client)
+        uint8 m_auraFlags;                                  // Aura info flag (for send data to client)
+        uint8 m_auraLevel;                                  // Aura level (store caster level for correct show level dep amount)
+        uint8 m_procCharges;                                // Aura charges (0 for infinite)
+        uint8 m_stackAmount;                                // Aura stack amount
 
         bool m_positive:1;
         bool m_permanent:1;
@@ -339,14 +356,10 @@ class MANGOS_DLL_SPEC Aura
         bool m_isPersistent:1;
         bool m_isDeathPersist:1;
         bool m_isRemovedOnShapeLost:1;
-        bool m_updated:1;
+        bool m_updated:1;                                   // Prevent remove aura by stack if set
         bool m_in_use:1;                                    // true while in Aura::ApplyModifier call
 
-        int32 m_periodicTimer;
-        uint32 m_PeriodicEventId;
-        DiminishingGroup m_AuraDRGroup;
     private:
-        void UpdateSlotCounterAndDuration(bool add);
         void CleanupTriggeredSpells();
 };
 

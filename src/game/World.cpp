@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,6 +35,7 @@
 #include "SkillDiscovery.h"
 #include "World.h"
 #include "AccountMgr.h"
+#include "AchievementMgr.h"
 #include "ObjectMgr.h"
 #include "SpellMgr.h"
 #include "Chat.h"
@@ -762,6 +763,8 @@ void World::LoadConfigSettings(bool reload)
     m_configs[CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_ENABLE]     = sConfig.GetBoolDefault("Battleground.QueueAnnouncer.Enable", false);
     m_configs[CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_PLAYERONLY] = sConfig.GetBoolDefault("Battleground.QueueAnnouncer.PlayerOnly", false);
     m_configs[CONFIG_ARENA_QUEUE_ANNOUNCER_ENABLE]            = sConfig.GetBoolDefault("Arena.QueueAnnouncer.Enable", false);
+    m_configs[CONFIG_ARENA_SEASON_ID]                         = sConfig.GetIntDefault ("Arena.ArenaSeason.ID", 1);
+    m_configs[CONFIG_ARENA_SEASON_IN_PROGRESS]                = sConfig.GetBoolDefault("Arena.ArenaSeason.InProgress", true);
 
     m_configs[CONFIG_CAST_UNSTUCK] = sConfig.GetBoolDefault("CastUnstuck", true);
     m_configs[CONFIG_INSTANCE_RESET_TIME_HOUR]  = sConfig.GetIntDefault("Instance.ResetTimeHour", 4);
@@ -796,6 +799,7 @@ void World::LoadConfigSettings(bool reload)
         sLog.outError("GM.StartLevel (%i) must be in range 1..%u. Set to %u.", m_configs[CONFIG_START_GM_LEVEL], MAX_LEVEL, MAX_LEVEL);
         m_configs[CONFIG_START_GM_LEVEL] = MAX_LEVEL;
     }
+    m_configs[CONFIG_GM_LOWER_SECURITY] = sConfig.GetBoolDefault("GM.LowerSecurity", false);
 
     m_configs[CONFIG_GROUP_VISIBILITY] = sConfig.GetIntDefault("Visibility.GroupMode",0);
 
@@ -911,6 +915,8 @@ void World::LoadConfigSettings(bool reload)
     m_configs[CONFIG_DEATH_SICKNESS_LEVEL] = sConfig.GetIntDefault("Death.SicknessLevel", 11);
     m_configs[CONFIG_DEATH_CORPSE_RECLAIM_DELAY_PVP] = sConfig.GetBoolDefault("Death.CorpseReclaimDelay.PvP", true);
     m_configs[CONFIG_DEATH_CORPSE_RECLAIM_DELAY_PVE] = sConfig.GetBoolDefault("Death.CorpseReclaimDelay.PvE", true);
+    m_configs[CONFIG_DEATH_BONES_WORLD]       = sConfig.GetBoolDefault("Death.Bones.World", true);
+    m_configs[CONFIG_DEATH_BONES_BG_OR_ARENA] = sConfig.GetBoolDefault("Death.Bones.BattlegroundOrArena", true);
 
     m_configs[CONFIG_THREAT_RADIUS] = sConfig.GetIntDefault("ThreatRadius", 100);
 
@@ -1066,12 +1072,6 @@ void World::SetInitialWorldSettings()
 
     sLog.outString( "Loading InstanceTemplate" );
     objmgr.LoadInstanceTemplate();
-
-    sLog.outString( "Loading AchievementCriteriaList..." );
-    objmgr.LoadAchievementCriteriaList();
-
-    sLog.outString( "Loading completed achievements..." );
-    objmgr.LoadCompletedAchievements();
 
     sLog.outString( "Loading SkillLineAbilityMultiMap Data..." );
     spellmgr.LoadSkillLineAbilityMap();
@@ -1230,6 +1230,18 @@ void World::SetInitialWorldSettings()
 
     sLog.outString( "Loading Skill Fishing base level requirements..." );
     objmgr.LoadFishingBaseSkillLevel();
+
+    sLog.outString( "Loading AchievementCriteriaList..." );
+    achievementmgr.LoadAchievementCriteriaList();
+
+    sLog.outString( "Loading achievement rewards..." );
+    achievementmgr.LoadRewards();
+
+    sLog.outString( "Loading achievement reward locale strings..." );
+    achievementmgr.LoadRewardLocales();
+
+    sLog.outString( "Loading completed achievements..." );
+    achievementmgr.LoadCompletedAchievements();
 
     ///- Load dynamic data tables from the database
     sLog.outString( "Loading Auctions..." );

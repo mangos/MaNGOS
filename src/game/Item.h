@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -230,7 +230,7 @@ class MANGOS_DLL_SPEC Item : public Object
 
         uint32 GetCount() const { return GetUInt32Value (ITEM_FIELD_STACK_COUNT); }
         void SetCount(uint32 value) { SetUInt32Value (ITEM_FIELD_STACK_COUNT, value); }
-        uint32 GetMaxStackCount() const { return GetProto()->Stackable; }
+        uint32 GetMaxStackCount() const { return GetProto()->GetMaxStackSize(); }
         uint8 GetGemCountWithID(uint32 GemID) const;
 
         uint8 GetSlot() const {return m_slot;}

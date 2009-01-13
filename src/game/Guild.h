@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -218,12 +218,12 @@ struct GuildBankTab
 
 struct GuildItemPosCount
 {
-    GuildItemPosCount(uint8 _slot, uint8 _count) : slot(_slot), count(_count) {}
+    GuildItemPosCount(uint8 _slot, uint32 _count) : slot(_slot), count(_count) {}
 
     bool isContainedIn(std::vector<GuildItemPosCount> const& vec) const;
 
     uint8 slot;
-    uint8 count;
+    uint32 count;
 };
 typedef std::vector<GuildItemPosCount> GuildItemPosCountVec;
 

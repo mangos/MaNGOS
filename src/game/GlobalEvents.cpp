@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -53,7 +53,7 @@ static void CorpsesEraseCallBack(QueryResult *result, bool bones)
         {
             if(!ObjectAccessor::Instance().ConvertCorpseForPlayer(player_guid))
             {
-                sLog.outDebug("Corpse %u not found in world. Delete from DB.",guidlow);
+                sLog.outDebug("Corpse %u not found in world or bones creating forbidden. Delete from DB.",guidlow);
                 CharacterDatabase.PExecute("DELETE FROM corpse WHERE guid = '%u'",guidlow);
             }
         }
