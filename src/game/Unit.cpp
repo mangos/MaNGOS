@@ -4729,9 +4729,9 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
 
                     // Remove any stun effect on target
                     AuraMap& Auras = pVictim->GetAuras();
-                    for(AuraMap::iterator iter = Auras.begin(), next; iter != Auras.end();)
+                    for(AuraMap::iterator iter = Auras.begin(); iter != Auras.end();)
                     {
-                        SpellEntry const *spell = sSpellStore.LookupEntry(iter->second->GetSpellProto()->Id);
+                        SpellEntry const *spell = iter->second->GetSpellProto();
                         if( spell->Mechanic == MECHANIC_STUN || 
                             spell->EffectMechanic[iter->second->GetEffIndex()] == MECHANIC_STUN)
                         {
