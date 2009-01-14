@@ -721,12 +721,6 @@ void Spell::EffectDummy(uint32 i)
                     m_caster->CastCustomSpell(unitTarget, 12721, &deepWoundsDotBasePoints0, NULL, NULL, true, NULL);
                     return;
                 }
-                case 12975:                                 //Last Stand
-                {
-                    int32 healthModSpellBasePoints0 = int32(m_caster->GetMaxHealth()*0.3);
-                    m_caster->CastCustomSpell(m_caster, 12976, &healthModSpellBasePoints0, NULL, NULL, true, NULL);
-                    return;
-                }
                 case 13120:                                 // net-o-matic
                 {
                     if(!unitTarget)
@@ -1276,13 +1270,23 @@ void Spell::EffectDummy(uint32 i)
                 m_caster->SetPower(POWER_RAGE,0);
                 return;
             }
-            if(m_spellInfo->Id==21977)                      //Warrior's Wrath
+            switch(m_spellInfo->Id)
             {
-                if(!unitTarget)
+                // Warrior's Wrath
+                case 21977:
+                {
+                    if(!unitTarget)
+                        return;
+                    m_caster->CastSpell(unitTarget,21887,true); // spell mod
                     return;
-
-                m_caster->CastSpell(unitTarget,21887,true); // spell mod
-                return;
+                }
+                // Last Stand
+                case 12975:
+                {
+                    int32 healthModSpellBasePoints0 = int32(m_caster->GetMaxHealth()*0.3);
+                    m_caster->CastCustomSpell(m_caster, 12976, &healthModSpellBasePoints0, NULL, NULL, true, NULL);
+                    return;
+                }
             }
             break;
         case SPELLFAMILY_WARLOCK:
