@@ -1598,11 +1598,14 @@ void ObjectMgr::LoadItemPrototypes()
 
         if(dbcitem)
         {
+            /* disabled: have some strange wrong cases for Class/Subclass values.
+               for enable also uncomment Class/Sublcas fields in ItemEntry structure and in Itemfmt[]
             if(proto->Class != dbcitem->Class || proto->SubClass != dbcitem->SubClass)
             {
                 sLog.outErrorDb("Item (Entry: %u) not correct (Class: %u, Sub: %u) pair, must be (Class: %u, Sub: %u) (still using DB value).",i,proto->Class,proto->SubClass,dbcitem->Class,dbcitem->SubClass);
                 // It safe let use Class/Subclass from DB
             }
+            */
 
             if(proto->Unk0 != dbcitem->Unk0)
             {
@@ -1612,7 +1615,7 @@ void ObjectMgr::LoadItemPrototypes()
 
             if(proto->Material != dbcitem->Material)
             {
-                sLog.outErrorDb("Item (Entry: %u) not correct %u material, must be %u (still using DB value).",i,proto->Material,dbcitem->Material);
+                sLog.outErrorDb("Item (Entry: %u) not correct %i material, must be %i (still using DB value).",i,proto->Material,dbcitem->Material);
                 // It safe let use Material from DB
             }
 
