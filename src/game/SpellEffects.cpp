@@ -5021,8 +5021,6 @@ void Spell::EffectScriptEffect(uint32 effIndex)
                 SpellEntry const *judge = sSpellStore.LookupEntry(spellId2);
                 if (!judge)
                     continue;
-                 // found, remove seal
-                m_caster->RemoveAurasDueToSpell(spellInfo->Id);
                 break;
             }
             if (spellId1)
