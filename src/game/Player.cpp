@@ -6947,6 +6947,92 @@ void Player::CastItemCombatSpell(Item *item,Unit* Target, WeaponAttackType attTy
     }
 }
 
+void Player::CastItemUseSpell(Item *item,SpellCastTargets const& targets,uint8 cast_count, uint32 glyphIndex)
+{
+    ItemPrototype const* proto = item->GetProto();
+    // special learning case
+    if(proto->Spells[0].SpellId==SPELL_ID_GENERIC_LEARN || proto->Spells[0].SpellId==SPELL_ID_GENERIC_LEARN_PET)
+    {
+        uint32 learn_spell_id = proto->Spells[0].SpellId;
+        uint32 learning_spell_id = proto->Spells[1].SpellId;
+
+        SpellEntry const *spellInfo = sSpellStore.LookupEntry(learn_spell_id);
+        if(!spellInfo)
+        {
+            sLog.outError("Player::CastItemUseSpell: Item (Entry: %u) in have wrong spell id %u, ignoring ",proto->ItemId, learn_spell_id);
+            SendEquipError(EQUIP_ERR_NONE,item,NULL);
+            return;
+        }
+
+        Spell *spell = new Spell(this, spellInfo, false);
+        spell->m_CastItem = item;
+        spell->m_cast_count = cast_count;                   //set count of casts
+        spell->m_currentBasePoints[0] = learning_spell_id;
+        spell->prepare(&targets);
+        return;
+    }
+
+    // use triggered flag only for items with many spell casts and for not first cast
+    int count = 0;
+
+    // item spells casted at use
+    for(int i = 0; i < 5; ++i)
+    {
+        _Spell const& spellData = proto->Spells[i];
+
+        // no spell
+        if(!spellData.SpellId)
+            continue;
+
+        // wrong triggering type
+        if( spellData.SpellTrigger != ITEM_SPELLTRIGGER_ON_USE && spellData.SpellTrigger != ITEM_SPELLTRIGGER_ON_NO_DELAY_USE)
+            continue;
+
+        SpellEntry const *spellInfo = sSpellStore.LookupEntry(spellData.SpellId);
+        if(!spellInfo)
+        {
+            sLog.outError("Player::CastItemUseSpell: Item (Entry: %u) in have wrong spell id %u, ignoring",proto->ItemId, spellData.SpellId);
+            continue;
+        }
+
+        Spell *spell = new Spell(this, spellInfo, (count > 0));
+        spell->m_CastItem = item;
+        spell->m_cast_count = cast_count;                   // set count of casts
+        spell->m_glyphIndex = glyphIndex;                   // glyph index
+        spell->prepare(&targets);
+
+        ++count;
+    }
+
+    // Item enchantments spells casted at use
+    for(int e_slot = 0; e_slot < MAX_ENCHANTMENT_SLOT; ++e_slot)
+    {
+        uint32 enchant_id = item->GetEnchantmentId(EnchantmentSlot(e_slot));
+        SpellItemEnchantmentEntry const *pEnchant = sSpellItemEnchantmentStore.LookupEntry(enchant_id);
+        if(!pEnchant) continue;
+        for (int s=0;s<3;s++)
+        {
+            if(pEnchant->type[s]!=ITEM_ENCHANTMENT_TYPE_USE_SPELL)
+                continue;
+
+            SpellEntry const *spellInfo = sSpellStore.LookupEntry(pEnchant->spellid[s]);
+            if (!spellInfo)
+            {
+                sLog.outError("Player::CastItemUseSpell Enchant %i, cast unknown spell %i", pEnchant->ID, pEnchant->spellid[s]);
+                continue;
+            }
+
+            Spell *spell = new Spell(this, spellInfo, (count > 0));
+            spell->m_CastItem = item;
+            spell->m_cast_count = cast_count;               // set count of casts
+            spell->m_glyphIndex = glyphIndex;               // glyph index
+            spell->prepare(&targets);
+
+            ++count;
+        }
+    }
+}
+
 void Player::_RemoveAllItemMods()
 {
     sLog.outDebug("_RemoveAllItemMods start.");
@@ -11876,6 +11962,9 @@ void Player::ApplyEnchantment(Item *item,EnchantmentSlot slot,bool apply, bool a
                 }
                 break;
             }
+            case ITEM_ENCHANTMENT_TYPE_USE_SPELL:
+                // processed in Player::CastItemUseSpell
+                break;
             default:
                 sLog.outError("Unknown item enchantment display type: %d",enchant_display_type);
                 break;

@@ -46,6 +46,7 @@ class Pet;
 class PlayerMenu;
 class Transport;
 class UpdateMask;
+class SpellCastTargets;
 class PlayerSocial;
 class AchievementMgr;
 class Vehicle;
@@ -1871,6 +1872,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void ApplyEquipSpell(SpellEntry const* spellInfo, Item* item, bool apply, bool form_change = false);
         void UpdateEquipSpellsAtFormChange();
         void CastItemCombatSpell(Item *item,Unit* Target, WeaponAttackType attType);
+        void CastItemUseSpell(Item *item,SpellCastTargets const& targets,uint8 cast_count, uint32 glyphIndex);
 
         void SendInitWorldStates();
         void SendUpdateWorldState(uint32 Field, uint32 Value);
