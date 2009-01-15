@@ -568,6 +568,7 @@ class ObjectMgr
 
         std::string GeneratePetName(uint32 entry);
         uint32 GetBaseXP(uint32 level);
+        uint32 GetXPForLevel(uint32 level);
 
         int32 GetFishingBaseSkillLevel(uint32 entry) const
         {
@@ -861,6 +862,9 @@ class ObjectMgr
 
         void BuildPlayerLevelInfo(uint8 race, uint8 class_, uint8 level, PlayerLevelInfo* plinfo) const;
         PlayerInfo playerInfo[MAX_RACES][MAX_CLASSES];
+
+        typedef std::vector<uint32> PlayerXPperLevel;       // [level]
+        PlayerXPperLevel mPlayerXPperLevel;
 
         typedef std::map<uint32,uint32> BaseXPMap;          // [area level][base xp]
         BaseXPMap mBaseXPTable;
