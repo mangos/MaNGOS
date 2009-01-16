@@ -1600,7 +1600,7 @@ void ObjectMgr::LoadItemPrototypes()
         {
             if(proto->Class != dbcitem->Class)
             {
-                sLog.outErrorDb("Item (Entry: %u) not correct ñlass %u, must be %u (still using DB value).",i,proto->Class,dbcitem->Class);
+                sLog.outErrorDb("Item (Entry: %u) not correct class %u, must be %u (still using DB value).",i,proto->Class,dbcitem->Class);
                 // It safe let use Class from DB
             }
             /* disabled: have some strange wrong cases for Subclass values.
