@@ -3639,6 +3639,20 @@ uint8 Spell::CanCast(bool strict)
                 }
             }
         }
+        else if (m_caster->GetTypeId()==TYPEID_PLAYER) // Target - is player caster
+        {
+            // Additional check for some spells
+            // If 0 spell effect empty - client not send target data (need use selection)
+            // TODO: check it on next client version
+            if (m_targets.m_targetMask == TARGET_FLAG_SELF &&
+                m_spellInfo->Effect[0] == 0 && m_spellInfo->EffectImplicitTargetA[1] != TARGET_SELF)
+            {
+                if (target = m_caster->GetUnit(*m_caster, ((Player *)m_caster)->GetSelection()))
+                    m_targets.setUnitTarget(target);
+                else
+                    return SPELL_FAILED_BAD_TARGETS;
+            }
+        }
 
         // check pet presents
         for(int j=0;j<3;j++)
