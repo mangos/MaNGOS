@@ -7375,21 +7375,10 @@ uint32 Unit::SpellDamageBonus(Unit *pVictim, SpellEntry const *spellProto, uint3
                 DotFactor = 0.95f;
                 CastingTime = 3500;
             }
-            // Seal of Righteousness - 10.2%/9.8% ( based on weapon type ) of Holy Damage, multiplied by weapon speed
-            else if((spellProto->SpellFamilyFlags & 0x8000000LL) && spellProto->SpellIconID == 25)
+            // Judgement of Righteousness - 32%
+            else if (spellProto->SpellFamilyFlags & 0x0000000000000400LL)
             {
-                Item *item = ((Player*)this)->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
-                float wspeed = GetAttackTime(BASE_ATTACK)/1000.0f;
-
-                if( item && item->GetProto()->InventoryType == INVTYPE_2HWEAPON)
-                   CastingTime = uint32(wspeed*3500*0.102f);
-                else
-                   CastingTime = uint32(wspeed*3500*0.098f);
-            }
-            // Judgement of Righteousness - 73%
-            else if ((spellProto->SpellFamilyFlags & 1024) && spellProto->SpellIconID == 25)
-            {
-                CastingTime = 2555;
+                CastingTime = 1120;
             }
             // Seal of Vengeance - 17% per Fully Stacked Tick - 5 Applications
             else if ((spellProto->SpellFamilyFlags & 0x80000000000LL) && spellProto->SpellIconID == 2292)
@@ -7406,11 +7395,6 @@ uint32 Unit::SpellDamageBonus(Unit *pVictim, SpellEntry const *spellProto, uint3
             else if ((spellProto->SpellFamilyFlags & 0x10000000LL) && spellProto->SpellIconID == 29)
             {
                 CastingTime = 0;
-            }
-            // Seal of Righteousness trigger - already computed for parent spell
-            else if ( spellProto->SpellFamilyName==SPELLFAMILY_PALADIN && spellProto->SpellIconID==25 && spellProto->AttributesEx4 & 0x00800000LL )
-            {
-                return pdamage;
             }
             break;
         case  SPELLFAMILY_SHAMAN:
