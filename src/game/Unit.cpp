@@ -4856,7 +4856,8 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                 triggered_spell_id = 22858;
                 break;
             }
-            else if (dummySpell->SpellIconID == 1697)  // Second Wind
+            // Second Wind
+            if (dummySpell->SpellIconID == 1697)
             {
                 // only for spells and hit/crit (trigger start always) and not start from self casted spells (5530 Mace Stun Effect for example)
                 if (procSpell == 0 || !(procEx & (PROC_EX_NORMAL_HIT|PROC_EX_CRITICAL_HIT)) || this == pVictim)
@@ -4869,12 +4870,20 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                 {
                     case 29838: triggered_spell_id=29842; break;
                     case 29834: triggered_spell_id=29841; break;
+                    case 42770: triggered_spell_id=42771; break;
                     default:
                         sLog.outError("Unit::HandleDummyAuraProc: non handled spell id: %u (SW)",dummySpell->Id);
                     return false;
                 }
 
                 target = this;
+                break;
+            }
+            // Damage Shield
+            if (dummySpell->SpellIconID == 3214)
+            {
+                triggered_spell_id = 59653;
+                basepoints0 = GetShieldBlockValue() * triggeredByAura->GetModifier()->m_amount / 100;
                 break;
             }
             break;
@@ -4923,6 +4932,16 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                 // Damage counting
                 mod->m_amount-=damage;
                 return true;
+            }
+            // Fel Synergy
+            if (dummySpell->SpellIconID == 3222)
+            {
+                target = GetPet();
+                if (!target)
+                    return false;
+                triggered_spell_id = 54181;
+                basepoints0 = damage * triggeredByAura->GetModifier()->m_amount / 100;
+                break;
             }
             switch(dummySpell->Id)
             {
@@ -5044,7 +5063,7 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                         return false;
 
                     // heal amount
-                    basepoints0 = int32(damage * 2 / 100);
+                    basepoints0 = damage * triggeredByAura->GetModifier()->m_amount/100;
                     target = this;
                     triggered_spell_id = 39373;
                     break;
@@ -5176,6 +5195,31 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     break;
                 }
             }
+            // Cut to the Chase
+            if( dummySpell->SpellIconID == 2909 )
+            {
+                // "refresh your Slice and Dice duration to its 5 combo point maximum"
+                // lookup Slice and Dice
+                AuraList const& sd = GetAurasByType(SPELL_AURA_MOD_HASTE);
+                for(AuraList::const_iterator itr = sd.begin(); itr != sd.end(); ++itr)
+                {
+                    SpellEntry const *spellProto = (*itr)->GetSpellProto();
+                    if( spellProto->SpellFamilyName == SPELLFAMILY_ROGUE &&
+                        spellProto->SpellFamilyFlags & 0x0000000000040000LL)
+                    {
+                        (*itr)->SetAuraMaxDuration(GetSpellMaxDuration(spellProto));
+                        (*itr)->RefreshAura();
+                        return true;
+                    }
+                }
+                return false;
+            }
+            // Deadly Brew
+            if( dummySpell->SpellIconID == 2963 )
+            {
+                triggered_spell_id = 25809;
+                break;
+            }
             // Quick Recovery
             if( dummySpell->SpellIconID == 2116 )
             {
@@ -5208,6 +5252,33 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
 
                 target = this;
                 triggered_spell_id = 34720;
+                break;
+            }
+            // Hunting Party
+            if ( dummySpell->SpellIconID == 3406 )
+            {
+                triggered_spell_id = 57669;
+                target = this;
+                return true;
+            }
+            // Lock and Load
+            if ( dummySpell->SpellIconID == 3579 )
+            {
+                // Proc only from periodic (from trap activation proc another aura of this spell)
+                if (!(procFlag & PROC_FLAG_ON_DO_PERIODIC))
+                    return false;
+                if (!roll_chance_i(triggeredByAura->GetModifier()->m_amount))
+                    return false;
+                triggered_spell_id = 56453;
+                target = this;
+                break;
+            }
+            // Rapid Recuperation
+            if ( dummySpell->SpellIconID == 3560 )
+            {
+                // mane regen from Rapid Killing
+                triggered_spell_id = 56654;
+                target = this;
                 break;
             }
             break;
@@ -5552,14 +5623,53 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     triggered_spell_id = 55533;
                     break;
                 }
+                // Spirit Hunt
+                case 58877:
+                {
+                    // Cast on owner
+                    target = GetOwner();
+                    if(!target)
+                        return false;
+                    basepoints0 = triggeredByAura->GetModifier()->m_amount * damage / 100;
+                    triggered_spell_id = 58879;
+                    break;
+                }
             }
-
+            // Ancestral Awakening
+            if (dummySpell->SpellIconID == 2018)
+            {
+                // TODO: frite dummy fot triggered spell
+                triggered_spell_id = 52759;
+                basepoints0 = triggeredByAura->GetModifier()->m_amount * damage / 100;
+                target = this;
+                break;
+            }
             // Earth Shield
             if(dummySpell->SpellFamilyFlags & 0x0000040000000000LL)
             {
                 basepoints0 = triggeredByAura->GetModifier()->m_amount;
                 target = this;
                 triggered_spell_id = 379;
+                break;
+            }
+            // Improved Water Shield
+            if (dummySpell->SpellIconID == 2287)
+            {
+                // lookup water shield
+                AuraList const& vs = GetAurasByType(SPELL_AURA_PROC_TRIGGER_SPELL);
+                for(AuraList::const_iterator itr = vs.begin(); itr != vs.end(); ++itr)
+                {
+                    if( (*itr)->GetSpellProto()->SpellFamilyName == SPELLFAMILY_SHAMAN &&
+                        (*itr)->GetSpellProto()->SpellFamilyFlags & 0x0000002000000000LL)
+                    {
+                        uint32 spell = (*itr)->GetSpellProto()->EffectTriggerSpell[(*itr)->GetEffIndex()];
+                        CastSpell(this, spell, true, castItem, triggeredByAura);
+                        if ((*itr)->DropAuraCharge())
+                            RemoveAurasDueToSpell((*itr)->GetId());
+                        return true;
+                    }
+                }
+                return false;
                 break;
             }
             // Lightning Overload
@@ -5605,6 +5715,7 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                         return false;
                 }
                 // No thread generated mod
+                // TODO: exist special flag in spell attributes for this, need found and use!
                 SpellModifier *mod = new SpellModifier;
                 mod->op = SPELLMOD_THREAT;
                 mod->value = -100;
@@ -5627,10 +5738,78 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
 
                 return true;
             }
+            // Static Shock
+            if(dummySpell->SpellIconID == 3059)
+            {
+                // lookup Lightning Shield
+                AuraList const& vs = GetAurasByType(SPELL_AURA_PROC_TRIGGER_SPELL);
+                for(AuraList::const_iterator itr = vs.begin(); itr != vs.end(); ++itr)
+                {
+                    if( (*itr)->GetSpellProto()->SpellFamilyName == SPELLFAMILY_SHAMAN &&
+                        (*itr)->GetSpellProto()->SpellFamilyFlags & 0x0000000000000400LL)
+                    {
+                        uint32 spell = 0;
+                        switch ((*itr)->GetId())
+                        {
+                            case   324: spell = 26364; break;
+                            case   325: spell = 26365; break;
+                            case   905: spell = 26366; break;
+                            case   945: spell = 26367; break;
+                            case  8134: spell = 26369; break;
+                            case 10431: spell = 26370; break;
+                            case 10432: spell = 26363; break;
+                            case 25469: spell = 26371; break;
+                            case 25472: spell = 26372; break;
+                            default:
+                                return false;
+                        }
+                        CastSpell(this, spell, true, castItem, triggeredByAura);
+                        if ((*itr)->DropAuraCharge())
+                            RemoveAurasDueToSpell((*itr)->GetId());
+                        return true;
+                    }
+                }
+                return false;
+                break;
+            }
             break;
         }
         case SPELLFAMILY_DEATHKNIGHT:
         {
+            // Blood Aura
+            if (dummySpell->SpellIconID == 2636)
+            {
+                if (GetTypeId() != TYPEID_PLAYER || !((Player*)this)->isHonorOrXPTarget(pVictim))
+                    return false;
+                basepoints0 = triggeredByAura->GetModifier()->m_amount * damage / 100;
+                triggered_spell_id = 53168;
+                break;
+            }
+            // Butchery
+            if (dummySpell->SpellIconID == 2664)
+            {
+                basepoints0 = triggeredByAura->GetModifier()->m_amount;
+                triggered_spell_id = 50163;
+                target = this;
+                break;
+            }
+            // Dancing Rune Weapon
+            if (dummySpell->Id == 49028)
+            {
+                // 1 dummy aura for dismiss rune blade
+                if (triggeredByAura->GetEffIndex()!=2)
+                    return false;
+                // TODO: wite script for this "fights on its own, doing the same attacks"
+                // NOTE: Trigger here on every attack and spell cast
+                return false;
+            }
+            // Mark of Blood
+            if (dummySpell->Id == 49005)
+            {
+                // TODO: need more info (cooldowns/PPM) 
+                triggered_spell_id = 50424;
+                break;
+            }
             // Vendetta
             if (dummySpell->SpellFamilyFlags & 0x0000000000010000LL)
             {
@@ -5640,18 +5819,32 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                 break;
             }
             // Necrosis
-            else if (dummySpell->SpellIconID == 2709)
+            if (dummySpell->SpellIconID == 2709)
             {
                 basepoints0 = triggeredByAura->GetModifier()->m_amount * damage / 100;
                 triggered_spell_id = 51460;
                 break;
             }
-            // Butchery
-            else if (dummySpell->SpellIconID == 2664)
+            // Runic Power Back on Snare/Root
+            if (dummySpell->Id == 61257)
             {
-                basepoints0 = triggeredByAura->GetModifier()->m_amount;
-                triggered_spell_id = 50163;
+                // only for spells and hit/crit (trigger start always) and not start from self casted spells
+                if (procSpell == 0 || !(procEx & (PROC_EX_NORMAL_HIT|PROC_EX_CRITICAL_HIT)) || this == pVictim)
+                    return false;
+                // Need snare or root mechanic
+                if (!(GetAllSpellMechanicMask(procSpell) & ((1<<MECHANIC_ROOT)|(1<<MECHANIC_SNARE))))
+                    return false;
+                triggered_spell_id = 61258;
                 target = this;
+                break;
+            }
+            // Wandering Plague
+            if (dummySpell->SpellIconID == 1614)
+            {
+                if (!roll_chance_f(GetUnitCriticalChance(BASE_ATTACK, pVictim)))
+                    return false;
+                basepoints0 = triggeredByAura->GetModifier()->m_amount * damage / 100;
+                triggered_spell_id = 50526;
                 break;
             }
             break;
@@ -6122,10 +6315,6 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
                             trigger_spell_id = 26371; break;
                         case 25472:                         // Rank 9
                             trigger_spell_id = 26372; break;
-                        case 49280:                         // Rank 10
-                            trigger_spell_id = 49278; break;
-                        case 49281:                         // Rank 11
-                            trigger_spell_id = 49279; break;
                         default:
                             sLog.outError("Unit::HandleProcTriggerSpell: Spell %u not handled in LShield", auraSpellInfo->Id);
                         return false;
@@ -6344,8 +6533,9 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
         // Astral Shift
         case 52179:
         {
-            if(!procSpell)
+            if (procSpell == 0 || !(procEx & (PROC_EX_NORMAL_HIT|PROC_EX_CRITICAL_HIT)) || this == pVictim)
                 return false;
+
             // Need stun, fear or silence mechanic
             if (!(GetAllSpellMechanicMask(procSpell) & ((1<<MECHANIC_SILENCE)|(1<<MECHANIC_STUN)|(1<<MECHANIC_FEAR))))
                 return false;
