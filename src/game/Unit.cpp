@@ -799,7 +799,12 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
 
                     if(Spell* spell = pVictim->m_currentSpells[i])
                         if(spell->getState() == SPELL_STATE_PREPARING)
-                            spell->Delayed();
+                        {
+                            if(spell->m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_ABORT_ON_DMG)
+                                pVictim->InterruptSpell(i);
+                            else
+                                spell->Delayed();
+                        }
                 }
             }
 
