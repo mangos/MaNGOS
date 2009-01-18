@@ -5134,6 +5134,22 @@ uint16 Player::GetPureSkillValue(uint32 skill) const
     return 0;
 }
 
+int16 Player::GetSkillPermBonusValue(uint32 skill) const
+{
+    if(!skill)
+        return 0;
+
+    for (int i = 0; i < PLAYER_MAX_SKILLS; i++)
+    {
+        if ((GetUInt32Value(PLAYER_SKILL_INDEX(i)) & 0x0000FFFF) == skill)
+        {
+            return SKILL_PERM_BONUS(GetUInt32Value(PLAYER_SKILL_BONUS_INDEX(i)));
+        }
+    }
+
+    return 0;
+}
+
 int16 Player::GetSkillTempBonusValue(uint32 skill) const
 {
     if(!skill)

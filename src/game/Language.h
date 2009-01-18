@@ -723,7 +723,8 @@ enum MangosStrings
     LANG_MUST_MALE_OR_FEMALE            = 1119,
     LANG_YOU_CHANGE_GENDER              = 1120,
     LANG_YOUR_GENDER_CHANGED            = 1121,
-    // Room for more level 3              1122-1199 not used
+    LANG_SKILL_VALUES                   = 1122,
+    // Room for more level 3              1123-1199 not used
 
     // FREE IDS                           1200-9999
 
