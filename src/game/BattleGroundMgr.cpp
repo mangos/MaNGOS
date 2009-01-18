@@ -1754,7 +1754,7 @@ void BattleGroundMgr::DistributeArenaPoints()
     sWorld.SendGlobalText("Done flushing Arena points.", NULL);
 }
 
-void BattleGroundMgr::BuildBattleGroundListPacket(WorldPacket *data, uint64 guid, Player* plr, uint32 bgTypeId)
+void BattleGroundMgr::BuildBattleGroundListPacket(WorldPacket *data, const uint64& guid, Player* plr, uint32 bgTypeId)
 {
     uint32 PlayerLevel = 10;
 
@@ -1810,7 +1810,7 @@ void BattleGroundMgr::SendToBattleGround(Player *pl, uint32 instanceId)
     }
 }
 
-void BattleGroundMgr::SendAreaSpiritHealerQueryOpcode(Player *pl, BattleGround *bg, uint64 guid)
+void BattleGroundMgr::SendAreaSpiritHealerQueryOpcode(Player *pl, BattleGround *bg, const uint64& guid)
 {
     WorldPacket data(SMSG_AREA_SPIRIT_HEALER_TIME, 12);
     uint32 time_ = 30000 - bg->GetLastResurrectTime();      // resurrect every 30 seconds
