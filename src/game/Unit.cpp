@@ -9282,7 +9282,7 @@ bool Unit::SelectHostilTarget()
             {
                 --aura;
                 if ( (caster = (*aura)->GetCaster()) &&
-                     caster->IsInMap(this) && caster->isTargetableForAttack() && caster->isInAccessablePlaceFor(this) )
+                     caster->IsInMap(this) && caster->isTargetableForAttack() && caster->isInAccessablePlaceFor((Creature*)this) )
                 {
                     target = caster;
                     break;
