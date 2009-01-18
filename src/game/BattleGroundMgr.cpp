@@ -348,7 +348,7 @@ void BattleGroundQueue::RemovePlayer(const uint64& guid, bool decreaseInvitedCou
             if(Player *plr2 = objmgr.GetPlayer(group->Players.begin()->first))
             {
                 BattleGround * bg = sBattleGroundMgr.GetBattleGroundTemplate(group->BgTypeId);
-                uint32 bgQueueTypeId = sBattleGroundMgr.BGQueueTypeId(group->BgTypeId,group->ArenaType);
+                uint32 bgQueueTypeId = BattleGroundMgr::BGQueueTypeId(group->BgTypeId,group->ArenaType);
                 uint32 queueSlot = plr2->GetBattleGroundQueueIndex(bgQueueTypeId);
                 plr2->RemoveBattleGroundQueueId(bgQueueTypeId); // must be called this way, because if you move this call to queue->removeplayer, it causes bugs
                 WorldPacket data;
@@ -451,7 +451,7 @@ bool BattleGroundQueue::InviteGroupToBG(GroupQueueInfo * ginfo, BattleGround * b
         // not yet invited
         // set invitation
         ginfo->IsInvitedToBGInstanceGUID = bg->GetInstanceID();
-        uint32 bgQueueTypeId = sBattleGroundMgr.BGQueueTypeId(bg->GetTypeID(), bg->GetArenaType());
+        uint32 bgQueueTypeId = BattleGroundMgr::BGQueueTypeId(bg->GetTypeID(), bg->GetArenaType());
         // loop through the players
         for(std::map<uint64,PlayerQueueInfo*>::iterator itr = ginfo->Players.begin(); itr != ginfo->Players.end(); ++itr)
         {
@@ -546,7 +546,7 @@ void BattleGroundQueue::BGEndedRemoveInvites(BattleGround *bg)
 {
     uint32 queue_id = bg->GetQueueType();
     uint32 bgInstanceId = bg->GetInstanceID();
-    uint32 bgQueueTypeId = sBattleGroundMgr.BGQueueTypeId(bg->GetTypeID(), bg->GetArenaType());
+    uint32 bgQueueTypeId = BattleGroundMgr::BGQueueTypeId(bg->GetTypeID(), bg->GetArenaType());
     QueuedGroupsList::iterator itr, next;
     for(itr = m_QueuedGroups[queue_id].begin(); itr != m_QueuedGroups[queue_id].end(); itr = next)
     {
@@ -616,7 +616,7 @@ void BattleGroundQueue::Update(uint32 bgTypeId, uint32 queue_id, uint8 arenatype
     if (m_QueuedGroups[queue_id].empty())
         return;
 
-    uint32 bgQueueTypeId = sBattleGroundMgr.BGQueueTypeId(bgTypeId, arenatype);
+    uint32 bgQueueTypeId = BattleGroundMgr::BGQueueTypeId(bgTypeId, arenatype);
 
     //battleground with free slot for player should be always the last in this queue
     BGFreeSlotQueueType::iterator itr, next;
@@ -994,7 +994,7 @@ bool BGQueueInviteEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
     uint32 queueSlot = plr->GetBattleGroundQueueIndex(bg->GetTypeID());
     if (queueSlot < PLAYER_MAX_BATTLEGROUND_QUEUES)         // player is in queue
     {
-        uint32 bgQueueTypeId = sBattleGroundMgr.BGQueueTypeId(bg->GetTypeID(), bg->GetArenaType());
+        uint32 bgQueueTypeId = BattleGroundMgr::BGQueueTypeId(bg->GetTypeID(), bg->GetArenaType());
         uint32 queueSlot = plr->GetBattleGroundQueueIndex(bgQueueTypeId);
         if (queueSlot < PLAYER_MAX_BATTLEGROUND_QUEUES) // player is in queue
         {
@@ -1031,7 +1031,7 @@ bool BGQueueRemoveEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
 
     sLog.outDebug("Battleground: removing player %u from bg queue for instance %u because of not pressing enter battle in time.",plr->GetGUIDLow(),m_BgInstanceGUID);
 
-    uint32 bgQueueTypeId = sBattleGroundMgr.BGQueueTypeId(bg->GetTypeID(), bg->GetArenaType());
+    uint32 bgQueueTypeId = BattleGroundMgr::BGQueueTypeId(bg->GetTypeID(), bg->GetArenaType());
     uint32 queueSlot = plr->GetBattleGroundQueueIndex(bgQueueTypeId);
     if (queueSlot < PLAYER_MAX_BATTLEGROUND_QUEUES) // player is in queue
     {
@@ -1820,7 +1820,7 @@ void BattleGroundMgr::SendAreaSpiritHealerQueryOpcode(Player *pl, BattleGround *
     pl->GetSession()->SendPacket(&data);
 }
 
-bool BattleGroundMgr::IsArenaType(uint32 bgTypeId) const
+bool BattleGroundMgr::IsArenaType(uint32 bgTypeId)
 {
     return ( bgTypeId == BATTLEGROUND_AA ||
         bgTypeId == BATTLEGROUND_BE ||
@@ -1828,82 +1828,77 @@ bool BattleGroundMgr::IsArenaType(uint32 bgTypeId) const
         bgTypeId == BATTLEGROUND_RL );
 }
 
-bool BattleGroundMgr::IsBattleGroundType(uint32 bgTypeId) const
-{
-    return !IsArenaType(bgTypeId);
-}
-
-uint32 BattleGroundMgr::BGQueueTypeId(uint32 bgTypeId, uint8 arenaType) const
+uint32 BattleGroundMgr::BGQueueTypeId(uint32 bgTypeId, uint8 arenaType)
 {
     switch(bgTypeId)
     {
-    case BATTLEGROUND_WS:
-        return BATTLEGROUND_QUEUE_WS;
-    case BATTLEGROUND_AB:
-        return BATTLEGROUND_QUEUE_AB;
-    case BATTLEGROUND_AV:
-        return BATTLEGROUND_QUEUE_AV;
-    case BATTLEGROUND_EY:
-        return BATTLEGROUND_QUEUE_EY;
-    case BATTLEGROUND_SA:
-        return BATTLEGROUND_QUEUE_SA;
-    case BATTLEGROUND_AA:
-    case BATTLEGROUND_NA:
-    case BATTLEGROUND_RL:
-    case BATTLEGROUND_BE:
-    case BATTLEGROUND_DS:
-    case BATTLEGROUND_RV:
-        switch(arenaType)
-        {
-        case ARENA_TYPE_2v2:
-            return BATTLEGROUND_QUEUE_2v2;
-        case ARENA_TYPE_3v3:
-            return BATTLEGROUND_QUEUE_3v3;
-        case ARENA_TYPE_5v5:
-            return BATTLEGROUND_QUEUE_5v5;
+        case BATTLEGROUND_WS:
+            return BATTLEGROUND_QUEUE_WS;
+        case BATTLEGROUND_AB:
+            return BATTLEGROUND_QUEUE_AB;
+        case BATTLEGROUND_AV:
+            return BATTLEGROUND_QUEUE_AV;
+        case BATTLEGROUND_EY:
+            return BATTLEGROUND_QUEUE_EY;
+        case BATTLEGROUND_SA:
+            return BATTLEGROUND_QUEUE_SA;
+        case BATTLEGROUND_AA:
+        case BATTLEGROUND_NA:
+        case BATTLEGROUND_RL:
+        case BATTLEGROUND_BE:
+        case BATTLEGROUND_DS:
+        case BATTLEGROUND_RV:
+            switch(arenaType)
+            {
+                case ARENA_TYPE_2v2:
+                    return BATTLEGROUND_QUEUE_2v2;
+                case ARENA_TYPE_3v3:
+                    return BATTLEGROUND_QUEUE_3v3;
+                case ARENA_TYPE_5v5:
+                    return BATTLEGROUND_QUEUE_5v5;
+                default:
+                    return 0;
+            }
         default:
             return 0;
-        }
-    default:
-        return 0;
     }
 }
 
-uint32 BattleGroundMgr::BGTemplateId(uint32 bgQueueTypeId) const
+uint32 BattleGroundMgr::BGTemplateId(uint32 bgQueueTypeId)
 {
     switch(bgQueueTypeId)
     {
-    case BATTLEGROUND_QUEUE_WS:
-        return BATTLEGROUND_WS;
-    case BATTLEGROUND_QUEUE_AB:
-        return BATTLEGROUND_AB;
-    case BATTLEGROUND_QUEUE_AV:
-        return BATTLEGROUND_AV;
-    case BATTLEGROUND_QUEUE_EY:
-        return BATTLEGROUND_EY;
-    case BATTLEGROUND_QUEUE_SA:
-        return BATTLEGROUND_SA;
-    case BATTLEGROUND_QUEUE_2v2:
-    case BATTLEGROUND_QUEUE_3v3:
-    case BATTLEGROUND_QUEUE_5v5:
-        return BATTLEGROUND_AA;
-    default:
-        return 0;
+        case BATTLEGROUND_QUEUE_WS:
+            return BATTLEGROUND_WS;
+        case BATTLEGROUND_QUEUE_AB:
+            return BATTLEGROUND_AB;
+        case BATTLEGROUND_QUEUE_AV:
+            return BATTLEGROUND_AV;
+        case BATTLEGROUND_QUEUE_EY:
+            return BATTLEGROUND_EY;
+        case BATTLEGROUND_QUEUE_SA:
+            return BATTLEGROUND_SA;
+        case BATTLEGROUND_QUEUE_2v2:
+        case BATTLEGROUND_QUEUE_3v3:
+        case BATTLEGROUND_QUEUE_5v5:
+            return BATTLEGROUND_AA;
+        default:
+            return 0;
     }
 }
 
-uint8 BattleGroundMgr::BGArenaType(uint32 bgQueueTypeId) const
+uint8 BattleGroundMgr::BGArenaType(uint32 bgQueueTypeId)
 {
     switch(bgQueueTypeId)
     {
-    case BATTLEGROUND_QUEUE_2v2:
-        return ARENA_TYPE_2v2;
-    case BATTLEGROUND_QUEUE_3v3:
-        return ARENA_TYPE_3v3;
-    case BATTLEGROUND_QUEUE_5v5:
-        return ARENA_TYPE_5v5;
-    default:
-        return 0;
+        case BATTLEGROUND_QUEUE_2v2:
+            return ARENA_TYPE_2v2;
+        case BATTLEGROUND_QUEUE_3v3:
+            return ARENA_TYPE_3v3;
+        case BATTLEGROUND_QUEUE_5v5:
+            return ARENA_TYPE_5v5;
+        default:
+            return 0;
     }
 }
 

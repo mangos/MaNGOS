@@ -218,12 +218,6 @@ class BattleGroundMgr
 
         BGFreeSlotQueueType BGFreeSlotQueue[MAX_BATTLEGROUND_TYPES];
 
-        bool IsArenaType(uint32 bgTypeId) const;
-        bool IsBattleGroundType(uint32 bgTypeId) const;
-        uint32 BGQueueTypeId(uint32 bgTypeId, uint8 arenaType) const;
-        uint32 BGTemplateId(uint32 bgQueueTypeId) const;
-        uint8 BGArenaType(uint32 bgQueueTypeId) const;
-
         uint32 GetMaxRatingDifference() const { return sWorld.getConfig(CONFIG_ARENA_MAX_RATING_DIFFERENCE); }
         uint32 GetRatingDiscardTimer()  const { return sWorld.getConfig(CONFIG_ARENA_RATING_DISCARD_TIMER); }
         uint32 GetPrematureFinishTime() const { return sWorld.getConfig(CONFIG_BATTLEGROUND_PREMATURE_FINISH_TIMER); }
@@ -234,6 +228,11 @@ class BattleGroundMgr
 
         bool isArenaTesting() const { return m_ArenaTesting; }
 
+        static bool IsArenaType(uint32 bgTypeId);
+        static bool IsBattleGroundType(uint32 bgTypeId) { return !BattleGroundMgr::IsArenaType(bgTypeId); }
+        static uint32 BGQueueTypeId(uint32 bgTypeId, uint8 arenaType);
+        static uint32 BGTemplateId(uint32 bgQueueTypeId);
+        static uint8 BGArenaType(uint32 bgQueueTypeId);
     private:
 
         /* Battlegrounds */
