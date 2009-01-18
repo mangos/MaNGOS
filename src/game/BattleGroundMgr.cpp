@@ -37,7 +37,6 @@
 #include "MapInstanced.h"
 #include "ObjectMgr.h"
 #include "ProgressBar.h"
-#include "World.h"
 #include "Chat.h"
 #include "ArenaTeam.h"
 
@@ -1075,16 +1074,10 @@ void BGQueueRemoveEvent::Abort(uint64 /*e_time*/)
 /***            BATTLEGROUND MANAGER                   ***/
 /*********************************************************/
 
-BattleGroundMgr::BattleGroundMgr()
+BattleGroundMgr::BattleGroundMgr() : m_AutoDistributionTimeChecker(0), m_ArenaTesting(false)
 {
     m_BattleGrounds.clear();
-    m_AutoDistributePoints = (bool)sWorld.getConfig(CONFIG_ARENA_AUTO_DISTRIBUTE_POINTS);
-    m_MaxRatingDifference = sWorld.getConfig(CONFIG_ARENA_MAX_RATING_DIFFERENCE);
-    m_RatingDiscardTimer = sWorld.getConfig(CONFIG_ARENA_RATING_DISCARD_TIMER);
-    m_PrematureFinishTimer = sWorld.getConfig(CONFIG_BATTLEGROUND_PREMATURE_FINISH_TIMER);
-    m_NextRatingDiscardUpdate = m_RatingDiscardTimer;
-    m_AutoDistributionTimeChecker = 0;
-    m_ArenaTesting = false;
+    m_NextRatingDiscardUpdate = sWorld.getConfig(CONFIG_ARENA_RATING_DISCARD_TIMER);
 }
 
 BattleGroundMgr::~BattleGroundMgr()
@@ -1120,7 +1113,7 @@ void BattleGroundMgr::Update(time_t diff)
         }
     }
     // if rating difference counts, maybe force-update queues
-    if(m_MaxRatingDifference)
+    if(sWorld.getConfig(CONFIG_ARENA_MAX_RATING_DIFFERENCE))
     {
         // it's time to force update
         if(m_NextRatingDiscardUpdate < diff)
@@ -1129,12 +1122,12 @@ void BattleGroundMgr::Update(time_t diff)
             m_BattleGroundQueues[BATTLEGROUND_QUEUE_2v2].Update(BATTLEGROUND_AA,6,ARENA_TYPE_2v2,true,0);
             m_BattleGroundQueues[BATTLEGROUND_QUEUE_3v3].Update(BATTLEGROUND_AA,6,ARENA_TYPE_3v3,true,0);
             m_BattleGroundQueues[BATTLEGROUND_QUEUE_5v5].Update(BATTLEGROUND_AA,6,ARENA_TYPE_5v5,true,0);
-            m_NextRatingDiscardUpdate = m_RatingDiscardTimer;
+            m_NextRatingDiscardUpdate = sWorld.getConfig(CONFIG_ARENA_RATING_DISCARD_TIMER);
         }
         else
             m_NextRatingDiscardUpdate -= diff;
     }
-    if(m_AutoDistributePoints)
+    if(sWorld.getConfig(CONFIG_ARENA_AUTO_DISTRIBUTE_POINTS))
     {
         if(m_AutoDistributionTimeChecker < diff)
         {
@@ -1692,7 +1685,7 @@ void BattleGroundMgr::CreateInitialBattleGrounds()
 
 void BattleGroundMgr::InitAutomaticArenaPointDistribution()
 {
-    if(m_AutoDistributePoints)
+    if(sWorld.getConfig(CONFIG_ARENA_AUTO_DISTRIBUTE_POINTS))
     {
         sLog.outDebug("Initializing Automatic Arena Point Distribution");
         QueryResult * result = CharacterDatabase.Query("SELECT NextArenaPointDistributionTime FROM saved_variables");

@@ -20,7 +20,7 @@
 #define __BATTLEGROUNDMGR_H
 
 #include "BattleGround.h"
-#include "Policies/Singleton.h"
+#include "World.h"
 
 class BattleGround;
 
@@ -225,12 +225,12 @@ class BattleGroundMgr
         uint32 BGTemplateId(uint32 bgQueueTypeId) const;
         uint8 BGArenaType(uint32 bgQueueTypeId) const;
 
-        uint32 GetMaxRatingDifference() const {return m_MaxRatingDifference;}
-        uint32 GetRatingDiscardTimer() const {return m_RatingDiscardTimer;}
+        uint32 GetMaxRatingDifference() const {return sWorld.getConfig(CONFIG_ARENA_MAX_RATING_DIFFERENCE);}
+        uint32 GetRatingDiscardTimer() const {return sWorld.getConfig(CONFIG_ARENA_RATING_DISCARD_TIMER);}
 
         void InitAutomaticArenaPointDistribution();
         void DistributeArenaPoints();
-        uint32 GetPrematureFinishTime() const {return m_PrematureFinishTimer;}
+        uint32 GetPrematureFinishTime() const {return sWorld.getConfig(CONFIG_BATTLEGROUND_PREMATURE_FINISH_TIMER);}
         void ToggleArenaTesting();
         const bool isArenaTesting() const { return m_ArenaTesting; }
 
@@ -238,13 +238,9 @@ class BattleGroundMgr
 
         /* Battlegrounds */
         BattleGroundSet m_BattleGrounds;
-        uint32 m_MaxRatingDifference;
-        uint32 m_RatingDiscardTimer;
         uint32 m_NextRatingDiscardUpdate;
-        bool   m_AutoDistributePoints;
         uint64 m_NextAutoDistributionTime;
         uint32 m_AutoDistributionTimeChecker;
-        uint32 m_PrematureFinishTimer;
         bool   m_ArenaTesting;
 };
 
