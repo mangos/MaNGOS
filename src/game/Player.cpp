@@ -5322,7 +5322,7 @@ void Player::CheckExploreSystem()
 
     if(offset >= 128)
     {
-        sLog.outError("ERROR: Wrong area flag %u in map data for (X: %f Y: %f) point to field PLAYER_EXPLORED_ZONES_1 + %u ( %u must be < 64 ).",areaFlag,GetPositionX(),GetPositionY(),offset,offset);
+        sLog.outError("ERROR: Wrong area flag %u in map data for (X: %f Y: %f) point to field PLAYER_EXPLORED_ZONES_1 + %u ( %u must be < 128 ).",areaFlag,GetPositionX(),GetPositionY(),offset,offset);
         return;
     }
 
