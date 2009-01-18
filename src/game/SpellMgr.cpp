@@ -2392,7 +2392,7 @@ DiminishingGroup GetDiminishingReturnsGroupForSpell(SpellEntry const* spellproto
         case SPELLFAMILY_WARLOCK:
         {
             // Fear
-            else if (spellproto->SpellFamilyFlags & 0x40840000000LL)
+            if (spellproto->SpellFamilyFlags & 0x40840000000LL)
                 return DIMINISHING_WARLOCK_FEAR;
             // Curses/etc
             else if (spellproto->SpellFamilyFlags & 0x00080000000LL)
