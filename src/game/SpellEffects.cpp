@@ -492,7 +492,7 @@ void Spell::EffectSchoolDMG(uint32 effect_idx)
                         Aura *poison = 0;
                         // Lookup for Deadly poison (only attacker applied)
                         Unit::AuraList const& auras = unitTarget->GetAurasByType(SPELL_AURA_PERIODIC_DAMAGE);
-                        for(Unit::AuraList::const_iterator itr = auras.begin(); itr!=auras.end() && combo;)
+                        for(Unit::AuraList::const_iterator itr = auras.begin(); itr!=auras.end(); ++itr)
                             if( (*itr)->GetSpellProto()->SpellFamilyName==SPELLFAMILY_ROGUE && 
                                 (*itr)->GetSpellProto()->SpellFamilyFlags & 0x10000 &&
                                 (*itr)->GetCasterGUID()==m_caster->GetGUID() )
