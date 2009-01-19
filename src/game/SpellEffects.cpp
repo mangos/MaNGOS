@@ -54,6 +54,7 @@
 #include "Util.h"
 #include "TemporarySummon.h"
 #include "ScriptCalls.h"
+#include "SkillDiscovery.h"
 
 pEffect SpellEffects[TOTAL_SPELL_EFFECTS]=
 {
@@ -214,7 +215,7 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS]=
     &Spell::EffectNULL,                                     //154 unused
     &Spell::EffectTitanGrip,                                //155 SPELL_EFFECT_TITAN_GRIP Allows you to equip two-handed axes, maces and swords in one hand, but you attack $49152s1% slower than normal.
     &Spell::EffectNULL,                                     //156 Add Socket
-    &Spell::EffectNULL,                                     //157 create/learn random item/spell for profession
+    &Spell::EffectCreateItem,                               //157 SPELL_EFFECT_CREATE_ITEM_2 create/learn item/spell for profession
     &Spell::EffectMilling,                                  //158 milling
     &Spell::EffectNULL                                      //159 allow rename pet once again
 };
@@ -4599,12 +4600,6 @@ void Spell::EffectScriptEffect(uint32 effIndex)
 {
     // TODO: we must implement hunter pet summon at login there (spell 6962)
 
-    // by spell id
-    switch(m_spellInfo->Id)
-    {
-
-    }
-
     switch(m_spellInfo->SpellFamilyName)
     {
         case SPELLFAMILY_GENERIC:
@@ -4833,6 +4828,7 @@ void Spell::EffectScriptEffect(uint32 effIndex)
 
                     break;
                 }
+                // Emblazon Runeblade
                 case 51770:
                 {
                     if(!unitTarget)
@@ -4850,7 +4846,35 @@ void Spell::EffectScriptEffect(uint32 effIndex)
                     unitTarget->CastSpell(unitTarget, damage, false);
                     break;
                 }
+                // random spell learn instead placeholder
+                case 60893:                                 // Northrend Alchemy Research
+                case 61177:                                 // Northrend Inscription Research
+                case 61288:                                 // Minor Inscription Research
+                case 61756:                                 // Northrend Inscription Research (FAST QA VERSION)
+                {
+                    if(!IsExplicitDiscoverySpell(m_spellInfo))
+                    {
+                        sLog.outError("Wrong explicit discowry spell %u structure, or outdated...",m_spellInfo->Id);
+                        return;
+                    }
 
+                    if(m_caster->GetTypeId()!=TYPEID_PLAYER)
+                        return;
+                    Player* player = (Player*)m_caster;
+
+                    // need replace effect 0 item by loot
+                    uint32 reagent_id = m_spellInfo->EffectItemType[0];
+                    if(!player->HasItemCount(reagent_id,1))
+                        return;
+
+                    // remove reagent
+                    uint32 count = 1;
+                    player->DestroyItemCount (reagent_id,count,true);
+
+                    if(uint32 discoveredSpell = GetSkillDiscoverySpell(0, m_spellInfo->Id, player))
+                        player->learnSpell(discoveredSpell);
+                    return;
+                }
             }
             break;
         }
