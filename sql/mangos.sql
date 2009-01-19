@@ -22,7 +22,7 @@
 DROP TABLE IF EXISTS `db_version`;
 CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
-  `required_7117_01_mangos_skill_discovery_template` bit(1) default NULL
+  `required_7118_01_mangos_skill_discovery_template` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -13001,7 +13001,7 @@ CREATE TABLE `skill_discovery_template` (
   `reqSpell` mediumint(8) unsigned NOT NULL default '0' COMMENT 'spell requirement',
   `reqClass` tinyint(2) unsigned NOT NULL default '0' COMMENT 'class requirement',
   `chance` float NOT NULL default '0' COMMENT 'chance to discover',
-  PRIMARY KEY (`spellId`,`reqSpell`),
+  PRIMARY KEY (`spellId`,`reqSpell`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Skill Discovery System';
 
 --

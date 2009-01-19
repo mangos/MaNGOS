@@ -93,7 +93,7 @@ void LoadSkillDiscoveryTable()
                 }
 
                 // mechanic discovery
-                if (spellEntry->Mechanic != MECHANIC_DISCOVERY && 
+                if (spellEntry->Mechanic != MECHANIC_DISCOVERY &&
                     // explicit discovery ability
                     !IsExplicitDiscoverySpell(spellEntry))
                 {
