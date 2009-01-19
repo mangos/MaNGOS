@@ -2081,7 +2081,7 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
             ( GetSpellProto()->EffectApplyAuraName[0]==1 || GetSpellProto()->EffectApplyAuraName[0]==128 ) ) )
         {
             // spells with SpellEffect=72 and aura=4: 6196, 6197, 21171, 21425
-            ((Player*)m_target)->SetFarSight(NULL);
+            ((Player*)m_target)->SetFarSightGUID(0);
             WorldPacket data(SMSG_CLEAR_FAR_SIGHT_IMMEDIATE, 0);
             ((Player*)m_target)->GetSession()->SendPacket(&data);
             return;
@@ -2967,7 +2967,7 @@ void Aura::HandleBindSight(bool apply, bool Real)
     if(!caster || caster->GetTypeId() != TYPEID_PLAYER)
         return;
 
-    ((Player*)caster)->SetFarSight(apply ? m_target->GetGUID() : NULL);
+    ((Player*)caster)->SetFarSightGUID(apply ? m_target->GetGUID() : 0);
 }
 
 void Aura::HandleFarSight(bool apply, bool Real)
@@ -2976,7 +2976,7 @@ void Aura::HandleFarSight(bool apply, bool Real)
     if(!caster || caster->GetTypeId() != TYPEID_PLAYER)
         return;
 
-    ((Player*)caster)->SetFarSight(apply ? m_target->GetGUID() : NULL);
+    ((Player*)caster)->SetFarSightGUID(apply ? m_target->GetGUID() : 0);
 }
 
 void Aura::HandleAuraTrackCreatures(bool apply, bool Real)
@@ -3083,7 +3083,7 @@ void Aura::HandleModPossess(bool apply, bool Real)
         }
     }
     if(caster->GetTypeId() == TYPEID_PLAYER)
-        ((Player*)caster)->SetFarSight(apply ? m_target->GetGUID() : NULL);
+        ((Player*)caster)->SetFarSightGUID(apply ? m_target->GetGUID() : 0);
 }
 
 void Aura::HandleModPossessPet(bool apply, bool Real)
@@ -3104,7 +3104,7 @@ void Aura::HandleModPossessPet(bool apply, bool Real)
     else
         pet->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_24);
 
-    ((Player*)caster)->SetFarSight(apply ? pet->GetGUID() : NULL);
+    ((Player*)caster)->SetFarSightGUID(apply ? pet->GetGUID() : NULL);
     ((Player*)caster)->SetCharm(apply ? pet : NULL);
     ((Player*)caster)->SetClientControl(pet, apply ? 1 : 0);
 

@@ -2064,7 +2064,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void ExitVehicle(Vehicle *vehicle);
 
         uint64 GetFarSight() const { return GetUInt64Value(PLAYER_FARSIGHT); }
-        void SetFarSight(uint64 guid) { SetUInt64Value(PLAYER_FARSIGHT, guid); }
+        void SetFarSightGUID(uint64 guid) { SetUInt64Value(PLAYER_FARSIGHT, guid); }
 
         // Transports
         Transport * GetTransport() const { return m_transport; }

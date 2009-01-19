@@ -3564,7 +3564,7 @@ void Spell::EffectAddFarsight(uint32 i)
     m_caster->AddDynObject(dynObj);
     dynObj->GetMap()->Add(dynObj);
     if(m_caster->GetTypeId() == TYPEID_PLAYER)
-        ((Player*)m_caster)->SetFarSight(dynObj->GetGUID());
+        ((Player*)m_caster)->SetFarSightGUID(dynObj->GetGUID());
 }
 
 void Spell::EffectSummonWild(uint32 i)

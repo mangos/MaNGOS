@@ -4537,7 +4537,7 @@ void Player::ApplyRatingMod(CombatRating cr, int32 value, bool apply)
     AuraList const& modRatingFromStat = GetAurasByType(SPELL_AURA_MOD_RATING_FROM_STAT);
     for(AuraList::const_iterator i = modRatingFromStat.begin();i != modRatingFromStat.end(); ++i)
         if ((*i)->GetMiscValue() & (1<<cr))
-            amount += GetStat(Stats((*i)->GetMiscBValue())) * (*i)->GetModifier()->m_amount / 100.0f;
+            amount += int32(GetStat(Stats((*i)->GetMiscBValue())) * (*i)->GetModifier()->m_amount / 100.0f);
     if (amount < 0)
         amount = 0;
     SetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + cr, uint32(amount));
@@ -6503,7 +6503,7 @@ void Player::_ApplyItemBonuses(ItemPrototype const *proto, uint8 slot, bool appl
                     uint32 level = ((getLevel() > ssd->MaxLevel) ? ssd->MaxLevel : getLevel());
                     if(ScalingStatValuesEntry const *ssv = sScalingStatValuesStore.LookupEntry(level))
                     {
-                        int multiplier = ssv->Multiplier[proto->GetScalingStatValuesColumn()];
+                        uint32 multiplier = ssv->Multiplier[proto->GetScalingStatValuesColumn()];
                         val = (multiplier * modifier) / 10000;
                     }
                 }
@@ -6512,7 +6512,7 @@ void Player::_ApplyItemBonuses(ItemPrototype const *proto, uint8 slot, bool appl
         else
         {
             statType = proto->ItemStat[i].ItemStatType;
-            val = float(proto->ItemStat[i].ItemStatValue);
+            val = proto->ItemStat[i].ItemStatValue;
         }
 
         if(val == 0)
@@ -14264,12 +14264,12 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
     // clear charm/summon related fields
     SetCharm(NULL);
     SetPet(NULL);
-    SetCharmerGUID(NULL);
-    SetOwnerGUID(NULL);
-    SetCreatorGUID(NULL);
+    SetCharmerGUID(0);
+    SetOwnerGUID(0);
+    SetCreatorGUID(0);
 
     // reset some aura modifiers before aura apply
-    SetFarSight(NULL);
+    SetFarSightGUID(0);
     SetUInt32Value(PLAYER_TRACK_CREATURES, 0 );
     SetUInt32Value(PLAYER_TRACK_RESOURCES, 0 );
 
@@ -19171,7 +19171,7 @@ void Player::EnterVehicle(Vehicle *vehicle)
     vehicle->setFaction(getFaction());
 
     SetCharm(vehicle);                                      // charm
-    SetFarSight(vehicle->GetGUID());                        // set view
+    SetFarSightGUID(vehicle->GetGUID());                        // set view
 
     SetClientControl(vehicle, 1);                           // redirect controls to vehicle
 
@@ -19222,7 +19222,7 @@ void Player::ExitVehicle(Vehicle *vehicle)
     vehicle->setFaction((GetTeam() == ALLIANCE) ? vehicle->GetCreatureInfo()->faction_A : vehicle->GetCreatureInfo()->faction_H);
 
     SetCharm(NULL);
-    SetFarSight(NULL);
+    SetFarSightGUID(0);
 
     SetClientControl(vehicle, 0);
 
