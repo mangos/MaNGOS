@@ -4841,6 +4841,16 @@ void Spell::EffectScriptEffect(uint32 effIndex)
                     unitTarget->CastSpell(unitTarget,51771,false);
                     break;
                 }
+                // Death Gate
+                case 52751:
+                {
+                    if(!unitTarget || unitTarget->getClass() != CLASS_DEATH_KNIGHT)
+                        return;
+                    // triggered spell is stored in m_spellInfo->EffectBasePoints[0]
+                    unitTarget->CastSpell(unitTarget, damage, false);
+                    break;
+                }
+
             }
             break;
         }
