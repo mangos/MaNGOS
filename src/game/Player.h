@@ -46,6 +46,7 @@ class Pet;
 class PlayerMenu;
 class Transport;
 class UpdateMask;
+class SpellCastTargets;
 class PlayerSocial;
 class AchievementMgr;
 class Vehicle;
@@ -60,6 +61,17 @@ enum SpellModType
 {
     SPELLMOD_FLAT         = 107,                            // SPELL_AURA_ADD_FLAT_MODIFIER
     SPELLMOD_PCT          = 108                             // SPELL_AURA_ADD_PCT_MODIFIER
+};
+
+// 2^n values, Player::m_isunderwater is a bitmask. These are mangos internal values, they are never send to any client
+enum PlayerUnderwaterState
+{
+    UNDERWATER_NONE                     = 0x00,
+    UNDERWATER_INWATER                  = 0x01,             // terrain type is water and player is afflicted by it
+    UNDERWATER_WATER_TRIGGER            = 0x02,             // m_breathTimer has been initialized
+    UNDERWATER_WATER_BREATHB            = 0x04,             // breathbar has been send to client
+    UNDERWATER_WATER_BREATHB_RETRACTING = 0x10,             // breathbar is currently refilling - the player is above water level
+    UNDERWATER_INLAVA                   = 0x80              // terrain type is lava and player is afflicted by it
 };
 
 enum PlayerSpellState
@@ -427,6 +439,13 @@ enum PlayerFlags
     PLAYER_FLAGS_UNK17          = 0x00010000,               // pre-3.0.3 PLAYER_FLAGS_SANCTUARY flag for player entered sanctuary
     PLAYER_FLAGS_UNK18          = 0x00020000,               // taxi benchmark mode (on/off) (2.0.1)
     PLAYER_FLAGS_PVP_TIMER      = 0x00040000,               // 3.0.2, pvp timer active (after you disable pvp manually)
+    PLAYER_FLAGS_UNK20          = 0x00080000,
+    PLAYER_FLAGS_UNK21          = 0x00100000, 
+    PLAYER_FLAGS_UNK22          = 0x00200000,
+    PLAYER_FLAGS_UNK23          = 0x00400000,
+    PLAYER_FLAGS_UNK24          = 0x00800000,               // disabled all abilitys on tab except autoattack
+    PLAYER_FLAGS_UNK25          = 0x01000000,               // disabled all melee ability on tab include autoattack
+
 };
 
 // used for PLAYER__FIELD_KNOWN_TITLES field (uint64), (1<<bit_index) without (-1)
@@ -1625,9 +1644,12 @@ class MANGOS_DLL_SPEC Player : public Unit
         void UpdateArmor();
         void UpdateMaxHealth();
         void UpdateMaxPower(Powers power);
+        void ApplyFeralAPBonus(int32 amount, bool apply);
         void UpdateAttackPowerAndDamage(bool ranged = false);
         void UpdateShieldBlockValue();
         void UpdateDamagePhysical(WeaponAttackType attType);
+        void ApplySpellDamageBonus(int32 amount, bool apply);
+        void ApplySpellHealingBonus(int32 amount, bool apply);
         void UpdateSpellDamageAndHealingBonus();
 
         void CalculateMinMaxDamage(WeaponAttackType attType, bool normalized, float& min_damage, float& max_damage);
@@ -1645,6 +1667,8 @@ class MANGOS_DLL_SPEC Player : public Unit
         uint32 GetRangedCritDamageReduction(uint32 damage) const;
         uint32 GetSpellCritDamageReduction(uint32 damage) const;
         uint32 GetDotDamageReduction(uint32 damage) const;
+        uint32 GetBaseSpellDamageBonus() { return m_baseSpellDamage;}
+        uint32 GetBaseSpellHealingBonus() { return m_baseSpellHealing;}
 
         float GetExpertiseDodgeOrParryReduction(WeaponAttackType attType) const;
         void UpdateBlockPercentage();
@@ -1659,6 +1683,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void UpdateAllSpellCritChances();
         void UpdateSpellCritChance(uint32 school);
         void UpdateExpertise(WeaponAttackType attType);
+        void ApplyManaRegenBonus(int32 amount, bool apply);
         void UpdateManaRegen();
 
         const uint64& GetLootGUID() const { return m_lootGuid; }
@@ -1739,11 +1764,12 @@ class MANGOS_DLL_SPEC Player : public Unit
         void UpdateCombatSkills(Unit *pVictim, WeaponAttackType attType, bool defence);
 
         void SetSkill(uint32 id, uint16 currVal, uint16 maxVal);
-        uint16 GetMaxSkillValue(uint32 skill) const;        // max + perm. bonus
+        uint16 GetMaxSkillValue(uint32 skill) const;        // max + perm. bonus + temp bonus
         uint16 GetPureMaxSkillValue(uint32 skill) const;    // max
         uint16 GetSkillValue(uint32 skill) const;           // skill value + perm. bonus + temp bonus
         uint16 GetBaseSkillValue(uint32 skill) const;       // skill value + perm. bonus
         uint16 GetPureSkillValue(uint32 skill) const;       // skill value
+        int16 GetSkillPermBonusValue(uint32 skill) const;
         int16 GetSkillTempBonusValue(uint32 skill) const;
         bool HasSkill(uint32 skill) const;
         void learnSkillRewardedSpells( uint32 id );
@@ -1860,6 +1886,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void ApplyEquipSpell(SpellEntry const* spellInfo, Item* item, bool apply, bool form_change = false);
         void UpdateEquipSpellsAtFormChange();
         void CastItemCombatSpell(Item *item,Unit* Target, WeaponAttackType attType);
+        void CastItemUseSpell(Item *item,SpellCastTargets const& targets,uint8 cast_count, uint32 glyphIndex);
 
         void SendInitWorldStates();
         void SendUpdateWorldState(uint32 Field, uint32 Value);
@@ -2037,7 +2064,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void ExitVehicle(Vehicle *vehicle);
 
         uint64 GetFarSight() const { return GetUInt64Value(PLAYER_FARSIGHT); }
-        void SetFarSight(uint64 guid) { SetUInt64Value(PLAYER_FARSIGHT, guid); }
+        void SetFarSightGUID(uint64 guid) { SetUInt64Value(PLAYER_FARSIGHT, guid); }
 
         // Transports
         Transport * GetTransport() const { return m_transport; }
@@ -2207,6 +2234,7 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         void _LoadActions(QueryResult *result);
         void _LoadAuras(QueryResult *result, uint32 timediff);
+        void _LoadGlyphAuras();
         void _LoadBoundInstances(QueryResult *result);
         void _LoadInventory(QueryResult *result, uint32 timediff);
         void _LoadMailInit(QueryResult *resultUnread, QueryResult *resultDelivery);
@@ -2295,6 +2323,10 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         float m_auraBaseMod[BASEMOD_END][MOD_END];
         int16 m_baseRatingValue[MAX_COMBAT_RATING];
+        uint16 m_baseSpellDamage;
+        uint16 m_baseSpellHealing;
+        uint16 m_baseFeralAP;
+        uint16 m_baseManaRegen;
 
         SpellModList m_spellMods[MAX_SPELLMOD];
         int32 m_SpellModRemoveCount;

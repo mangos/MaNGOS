@@ -190,7 +190,7 @@ void LoadDBCStores(const std::string& dataPath)
 {
     std::string dbcPath = dataPath+"dbc/";
 
-    const uint32 DBCFilesCount = 66;
+    const uint32 DBCFilesCount = 69;
 
     barGoLink bar( DBCFilesCount );
 
@@ -566,7 +566,7 @@ uint32 GetAreaFlagByMapId(uint32 mapid)
 
 uint32 GetVirtualMapForMapAndZone(uint32 mapid, uint32 zoneId)
 {
-    if(mapid != 530 || mapid != 571)                        // speed for most cases
+    if(mapid != 530 && mapid != 571)                        // speed for most cases
         return mapid;
 
     if(WorldMapAreaEntry const* wma = sWorldMapAreaStore.LookupEntry(zoneId))

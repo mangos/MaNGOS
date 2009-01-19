@@ -1677,14 +1677,14 @@ bool ChatHandler::HandleModifyMoneyCommand(const char* args)
     return true;
 }
 
-//Edit Player field
+//Edit Unit field
 bool ChatHandler::HandleModifyBitCommand(const char* args)
 {
     if( !*args )
         return false;
 
-    Player *chr = getSelectedPlayer();
-    if (chr == NULL)
+    Unit *unit = getSelectedUnit();
+    if (!unit)
     {
         SendSysMessage(LANG_NO_CHAR_SELECTED);
         SetSentErrorMessage(true);
@@ -1692,7 +1692,7 @@ bool ChatHandler::HandleModifyBitCommand(const char* args)
     }
 
     // check online security
-    if (HasLowerSecurity(chr, 0))
+    if (unit->GetTypeId() == TYPEID_PLAYER && HasLowerSecurity((Player *)unit, 0))
         return false;
 
     char* pField = strtok((char*)args, " ");
@@ -1706,13 +1706,12 @@ bool ChatHandler::HandleModifyBitCommand(const char* args)
     uint16 field = atoi(pField);
     uint32 bit   = atoi(pBit);
 
-    if (field < 1 || field >= PLAYER_END)
+    if (field < OBJECT_END || field >= unit->GetValuesCount())
     {
         SendSysMessage(LANG_BAD_VALUE);
         SetSentErrorMessage(true);
         return false;
     }
-
     if (bit < 1 || bit > 32)
     {
         SendSysMessage(LANG_BAD_VALUE);
@@ -1720,17 +1719,16 @@ bool ChatHandler::HandleModifyBitCommand(const char* args)
         return false;
     }
 
-    if ( chr->HasFlag( field, (1<<(bit-1)) ) )
+    if ( unit->HasFlag( field, (1<<(bit-1)) ) )
     {
-        chr->RemoveFlag( field, (1<<(bit-1)) );
+        unit->RemoveFlag( field, (1<<(bit-1)) );
         PSendSysMessage(LANG_REMOVE_BIT, bit, field);
     }
     else
     {
-        chr->SetFlag( field, (1<<(bit-1)) );
+        unit->SetFlag( field, (1<<(bit-1)) );
         PSendSysMessage(LANG_SET_BIT, bit, field);
     }
-
     return true;
 }
 
