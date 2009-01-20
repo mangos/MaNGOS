@@ -5277,7 +5277,7 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
             {
                 triggered_spell_id = 57669;
                 target = this;
-                return true;
+                break;
             }
             // Lock and Load
             if ( dummySpell->SpellIconID == 3579 )

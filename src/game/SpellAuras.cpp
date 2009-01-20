@@ -6553,7 +6553,7 @@ void Aura::PeriodicDummyTick()
                 if (!caster)
                     return;
                 // Skip 0 tick
-                if (m_duration < m_modifier.periodictime)
+                if (m_duration > m_modifier.periodictime)
                     return;
                 int32 damage = caster->CalculateSpellDamage(spell, GetEffIndex(), GetBasePoints(), m_target);
                 damage+=caster->GetTotalAttackPowerValue(RANGED_ATTACK) * 8 / 100;
