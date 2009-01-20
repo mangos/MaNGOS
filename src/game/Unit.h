@@ -646,6 +646,8 @@ uint32 createProcExtendMask(SpellNonMeleeDamage *damageInfo, SpellMissInfo missC
 
 struct UnitActionBarEntry
 {
+    UnitActionBarEntry() : Raw(0) {}
+
     union
     {
         struct 
