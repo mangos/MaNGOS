@@ -35,7 +35,7 @@ BattleGroundNA::~BattleGroundNA()
 
 }
 
-void BattleGroundNA::Update(time_t diff)
+void BattleGroundNA::Update(uint32 diff)
 {
     BattleGround::Update(diff);
 

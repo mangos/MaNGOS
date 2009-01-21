@@ -899,9 +899,9 @@ GM.LowerSecurity  = 0
 #    Visibility.Distance.Creature
 #    Visibility.Distance.Player
 #        Visibility distance for different in game object
-#        Max limited by active player zone: ~ 333
+#        Max limited by active player zone: ~ 166
 #        Min limit dependent from objects
-#        Default: 132 (cell size)
+#        Default: 66 (cell size)
 #        Min limit is max aggro radius (45) * Rate.Creature.Aggro
 #
 #    Visibility.Distance.Object
@@ -927,10 +927,10 @@ GM.LowerSecurity  = 0
 ###################################################################################################################
 
 Visibility.GroupMode = 0
-Visibility.Distance.Creature      = 132
-Visibility.Distance.Player        = 132
-Visibility.Distance.Object        = 132
-Visibility.Distance.InFlight      = 132
+Visibility.Distance.Creature      = 66
+Visibility.Distance.Player        = 66
+Visibility.Distance.Object        = 66
+Visibility.Distance.InFlight      = 66
 Visibility.Distance.Grey.Unit   = 1
 Visibility.Distance.Grey.Object = 10
 
@@ -971,10 +971,6 @@ Visibility.Distance.Grey.Object = 10
 #    Rate.XP.Quest
 #    Rate.XP.Explore
 #        XP rates
-#        Default: 1
-#
-#    Rate.XP.PastLevel70
-#        XP needed per level past 70 (Rates below 1 not recommended)
 #        Default: 1
 #
 #    Rate.Rest.InGame
@@ -1086,7 +1082,6 @@ Rate.Drop.Money = 1
 Rate.XP.Kill    = 1
 Rate.XP.Quest   = 1
 Rate.XP.Explore = 1
-Rate.XP.PastLevel70 = 1
 Rate.Rest.InGame = 1
 Rate.Rest.Offline.InTavernOrCity = 1
 Rate.Rest.Offline.InWilderness = 1

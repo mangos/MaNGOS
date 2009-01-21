@@ -322,7 +322,7 @@ void WorldSession::HandleItemQuerySingleOpcode( WorldPacket & recv_data )
         data << pProto->ItemId;
         data << pProto->Class;
         data << pProto->SubClass;
-        data << pProto->Unk0;                               // new 2.0.3, not exist in wdb cache?
+        data << int32(pProto->Unk0);                        // new 2.0.3, not exist in wdb cache?
         data << Name;
         data << uint8(0x00);                                //pProto->Name2; // blizz not send name there, just uint8(0x00); <-- \0 = empty string = empty name...
         data << uint8(0x00);                                //pProto->Name3; // blizz not send name there, just uint8(0x00);
@@ -418,7 +418,7 @@ void WorldSession::HandleItemQuerySingleOpcode( WorldPacket & recv_data )
         data << pProto->PageMaterial;
         data << pProto->StartQuest;
         data << pProto->LockID;
-        data << pProto->Material;
+        data << int32(pProto->Material);
         data << pProto->Sheath;
         data << pProto->RandomProperty;
         data << pProto->RandomSuffix;
@@ -1112,10 +1112,6 @@ void WorldSession::HandleSocketOpcode(WorldPacket& recv_data)
     CHECK_PACKET_SIZE(recv_data,8*4);
 
     uint64 guids[4];
-    uint32 GemEnchants[3], OldEnchants[3];
-    Item *Gems[3];
-    bool SocketBonusActivated, SocketBonusToBeActivated;
-
     for(int i = 0; i < 4; i++)
         recv_data >> guids[i];
 
@@ -1133,6 +1129,7 @@ void WorldSession::HandleSocketOpcode(WorldPacket& recv_data)
     //this slot is excepted when applying / removing meta gem bonus
     uint8 slot = itemTarget->IsEquipped() ? itemTarget->GetSlot() : NULL_SLOT;
 
+    Item *Gems[3];
     for(int i = 0; i < 3; i++)
         Gems[i] = guids[i + 1] ? _player->GetItemByGuid(guids[i + 1]) : NULL;
 
@@ -1152,6 +1149,7 @@ void WorldSession::HandleSocketOpcode(WorldPacket& recv_data)
             return;
     }
 
+    uint32 GemEnchants[3], OldEnchants[3];
     for(int i = 0; i < 3; ++i)                              //get new and old enchantments
     {
         GemEnchants[i] = (GemProps[i]) ? GemProps[i]->spellitemenchantement : 0;
@@ -1200,7 +1198,7 @@ void WorldSession::HandleSocketOpcode(WorldPacket& recv_data)
         }
     }
 
-    SocketBonusActivated = itemTarget->GemsFitSockets();    //save state of socketbonus
+    bool SocketBonusActivated = itemTarget->GemsFitSockets();    //save state of socketbonus
     _player->ToggleMetaGemsActive(slot, false);             //turn off all metagems (except for the target item)
 
     //if a meta gem is being equipped, all information has to be written to the item before testing if the conditions for the gem are met
@@ -1222,7 +1220,7 @@ void WorldSession::HandleSocketOpcode(WorldPacket& recv_data)
     for(uint32 enchant_slot = SOCK_ENCHANTMENT_SLOT; enchant_slot < SOCK_ENCHANTMENT_SLOT+3; ++enchant_slot)
         _player->ApplyEnchantment(itemTarget,EnchantmentSlot(enchant_slot),true);
 
-    SocketBonusToBeActivated = itemTarget->GemsFitSockets();//current socketbonus state
+    bool SocketBonusToBeActivated = itemTarget->GemsFitSockets();//current socketbonus state
     if(SocketBonusActivated ^ SocketBonusToBeActivated)     //if there was a change...
     {
         _player->ApplyEnchantment(itemTarget,BONUS_ENCHANTMENT_SLOT,false);
