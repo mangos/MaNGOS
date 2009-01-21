@@ -1090,8 +1090,21 @@ void Unit::CalculateSpellDamage(SpellNonMeleeDamage *damageInfo, int32 damage, S
     // Calculate absorb resist
     if(damage > 0)
     {
-        CalcAbsorbResist(pVictim, damageSchoolMask, SPELL_DIRECT_DAMAGE, damage, &damageInfo->absorb, &damageInfo->resist);
-        damage-= damageInfo->absorb + damageInfo->resist;
+        // lookup absorb/resist ignore auras on caster for spell
+        bool ignore = false;
+        Unit::AuraList const& ignoreAbsorb = GetAurasByType(SPELL_AURA_MOD_IGNORE_ABSORB_FOR_SPELL);
+        for(Unit::AuraList::const_iterator i = ignoreAbsorb.begin(); i != ignoreAbsorb.end(); ++i)
+            if ((*i)->isAffectedOnSpell(spellInfo))
+            {
+                ignore = true;
+                break;
+            }
+        
+        if (!ignore)
+        {
+            CalcAbsorbResist(pVictim, damageSchoolMask, SPELL_DIRECT_DAMAGE, damage, &damageInfo->absorb, &damageInfo->resist);
+            damage-= damageInfo->absorb + damageInfo->resist;
+        }
     }
     else
         damage = 0;
@@ -1820,7 +1833,7 @@ void Unit::CalcAbsorbResist(Unit *pVictim,SpellSchoolMask schoolMask, DamageEffe
     // Remove all expired absorb auras
     if (existExpired)
     {
-        for(AuraList::const_iterator i = vSchoolAbsorb.begin(), next; i != vSchoolAbsorb.end();)
+        for(AuraList::const_iterator i = vSchoolAbsorb.begin(); i != vSchoolAbsorb.end();)
         {
             if ((*i)->GetModifier()->m_amount<=0)
             {
