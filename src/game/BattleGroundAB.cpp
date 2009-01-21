@@ -38,7 +38,7 @@ BattleGroundAB::~BattleGroundAB()
 {
 }
 
-void BattleGroundAB::Update(time_t diff)
+void BattleGroundAB::Update(uint32 diff)
 {
     BattleGround::Update(diff);
 

@@ -34,7 +34,7 @@ BattleGroundAV::~BattleGroundAV()
 
 }
 
-void BattleGroundAV::Update(time_t diff)
+void BattleGroundAV::Update(uint32 diff)
 {
     BattleGround::Update(diff);
 }

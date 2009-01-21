@@ -116,7 +116,7 @@ BattleGround::~BattleGround()
     this->RemoveFromBGFreeSlotQueue();
 }
 
-void BattleGround::Update(time_t diff)
+void BattleGround::Update(uint32 diff)
 {
     if(!GetPlayersSize() && !GetRemovedPlayersSize() && !GetReviveQueueSize())
         //BG is empty
