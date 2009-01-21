@@ -304,6 +304,7 @@ extern LootStore LootTemplates_Skinning;
 extern LootStore LootTemplates_Disenchant;
 extern LootStore LootTemplates_Prospecting;
 extern LootStore LootTemplates_QuestMail;
+extern LootStore LootTemplates_Spell;
 
 void LoadLootTemplates_Creature();
 void LoadLootTemplates_Fishing();
@@ -316,6 +317,7 @@ void LoadLootTemplates_Disenchant();
 void LoadLootTemplates_Prospecting();
 void LoadLootTemplates_QuestMail();
 
+void LoadLootTemplates_Spell();
 void LoadLootTemplates_Reference();
 
 inline void LoadLootTables()
@@ -330,6 +332,7 @@ inline void LoadLootTables()
     LoadLootTemplates_Disenchant();
     LoadLootTemplates_Prospecting();
     LoadLootTemplates_QuestMail();
+    LoadLootTemplates_Spell();
 
     LoadLootTemplates_Reference();
 }

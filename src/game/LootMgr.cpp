@@ -23,6 +23,7 @@
 #include "World.h"
 #include "Util.h"
 #include "SharedDefines.h"
+#include "SpellMgr.h"
 
 static Rates const qualityToRate[MAX_ITEM_QUALITY] = {
     RATE_DROP_ITEM_POOR,                                    // ITEM_QUALITY_POOR
@@ -45,6 +46,7 @@ LootStore LootTemplates_Prospecting(  "prospecting_loot_template",  "item entry 
 LootStore LootTemplates_QuestMail(    "quest_mail_loot_template",   "quest id (with mail template)",false);
 LootStore LootTemplates_Reference(    "reference_loot_template",    "reference id",                 false);
 LootStore LootTemplates_Skinning(     "skinning_loot_template",     "creature skinning id",         true);
+LootStore LootTemplates_Spell(        "spell_loot_template",        "spell id (explicitly discovering ability)",false);
 
 class LootTemplate::LootGroup                               // A set of loot definitions for items (refs are not allowed)
 {
@@ -1256,6 +1258,32 @@ void LoadLootTemplates_Skinning()
 
     // output error for any still listed (not referenced from appropriate table) ids
     LootTemplates_Skinning.ReportUnusedIds(ids_set);
+}
+
+void LoadLootTemplates_Spell()
+{
+    LootIdSet ids_set;
+    LootTemplates_Spell.LoadAndCollectLootIds(ids_set);
+
+    // remove real entries and check existence loot
+    for(uint32 spell_id = 1; spell_id < sSpellStore.GetNumRows(); ++spell_id)
+    {
+        SpellEntry const* spellInfo = sSpellStore.LookupEntry (spell_id);
+        if(!spellInfo)
+            continue;
+
+        // possible cases
+        if(!IsExplicitDiscoverySpell (spellInfo))
+            continue;
+
+        if(!ids_set.count(spell_id))
+            LootTemplates_Spell.ReportNotExistedId(spell_id);
+        else
+            ids_set.erase(spell_id);
+    }
+
+    // output error for any still listed (not referenced from appropriate table) ids
+    LootTemplates_QuestMail.ReportUnusedIds(ids_set);
 }
 
 void LoadLootTemplates_Reference()

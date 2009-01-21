@@ -4610,21 +4610,17 @@ void Spell::EffectScriptEffect(uint32 effIndex)
                 // PX-238 Winter Wondervolt TRAP
                 case 26275:
                 {
-                    if (unitTarget->HasAura(26272,0) ||
-                        unitTarget->HasAura(26157,0) ||
-                        unitTarget->HasAura(26273,0) ||
-                        unitTarget->HasAura(26274,0))
-                        return;
+                    uint32 spells[4] = { 26272, 26157, 26273, 26274 };
 
-                    uint32 iTmpSpellId;
-                    switch(urand(0,3))
-                    {
-                        case 0: iTmpSpellId = 26272; break;
-                        case 1: iTmpSpellId = 26157; break;
-                        case 2: iTmpSpellId = 26273; break;
-                        case 3: iTmpSpellId = 26274; break;
-                    }
+                    // check presence
+                    for(int j = 0; j < 4; ++j)
+                        if(unitTarget->HasAura(spells[j],0))
+                            return;
 
+                    // select spell
+                    uint32 iTmpSpellId = spells[urand(0,3)];
+
+                    // cast
                     unitTarget->CastSpell(unitTarget, iTmpSpellId, true);
                     return;
                 }
@@ -4668,16 +4664,16 @@ void Spell::EffectScriptEffect(uint32 effIndex)
                     uint32 spellid;
                     switch(m_spellInfo->Id)
                     {
-                    case 25140: spellid =  32571; break;
-                    case 25143: spellid =  32572; break;
-                    case 25650: spellid =  30140; break;
-                    case 25652: spellid =  30141; break;
-                    case 29128: spellid =  32568; break;
-                    case 29129: spellid =  32569; break;
-                    case 35376: spellid =  25649; break;
-                    case 35727: spellid =  35730; break;
-                    default:
-                        return;
+                        case 25140: spellid =  32571; break;
+                        case 25143: spellid =  32572; break;
+                        case 25650: spellid =  30140; break;
+                        case 25652: spellid =  30141; break;
+                        case 29128: spellid =  32568; break;
+                        case 29129: spellid =  32569; break;
+                        case 35376: spellid =  25649; break;
+                        case 35727: spellid =  35730; break;
+                        default:
+                            return;
                     }
 
                     unitTarget->CastSpell(unitTarget,spellid,false);
@@ -4803,18 +4799,10 @@ void Spell::EffectScriptEffect(uint32 effIndex)
                     uint32 spellId;
                     switch(rand()%4)
                     {
-                    case 0:
-                        spellId=46740;
-                        break;
-                    case 1:
-                        spellId=46739;
-                        break;
-                    case 2:
-                        spellId=46738;
-                        break;
-                    case 3:
-                        spellId=46736;
-                        break;
+                        case 0: spellId = 46740; break;
+                        case 1: spellId = 46739; break;
+                        case 2: spellId = 46738; break;
+                        case 3: spellId = 46736; break;
                     }
                     unitTarget->CastSpell(unitTarget, spellId, true);
                     break;
@@ -4865,6 +4853,7 @@ void Spell::EffectScriptEffect(uint32 effIndex)
 
                     // need replace effect 0 item by loot
                     uint32 reagent_id = m_spellInfo->EffectItemType[0];
+
                     if(!player->HasItemCount(reagent_id,1))
                         return;
 
@@ -4872,7 +4861,11 @@ void Spell::EffectScriptEffect(uint32 effIndex)
                     uint32 count = 1;
                     player->DestroyItemCount (reagent_id,count,true);
 
-                    if(uint32 discoveredSpell = GetSkillDiscoverySpell(0, m_spellInfo->Id, player))
+                    // create some random items
+                    player->AutoStoreLootItem(m_spellInfo->Id,LootTemplates_Spell);
+
+                    // learn random explicit discovery recipe (if any)
+                    if(uint32 discoveredSpell = GetExplicitDiscoverySpell(m_spellInfo->Id, player))
                         player->learnSpell(discoveredSpell);
                     return;
                 }
