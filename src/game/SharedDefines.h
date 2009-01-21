@@ -838,6 +838,7 @@ enum Targets
     TARGET_AREAEFFECT_PARTY_AND_CLASS  = 61,
     TARGET_DUELVSPLAYER_COORDINATES    = 63,
     TARGET_BEHIND_VICTIM               = 65,                // uses in teleport behind spells
+    TARGET_DYNAMIC_OBJECT_COORDINATES  = 76,
     TARGET_SINGLE_ENEMY                = 77,
     TARGET_SELF2                       = 87,
     TARGET_NONCOMBAT_PET               = 90,

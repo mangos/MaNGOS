@@ -1325,8 +1325,6 @@ void Aura::TriggerSpell()
     // generic casting code with custom spells and target/caster customs
     uint32 trigger_spell_id = GetSpellProto()->EffectTriggerSpell[m_effIndex];
 
-    uint64 originalCasterGUID = GetCasterGUID();
-
     SpellEntry const *triggeredSpellInfo = sSpellStore.LookupEntry(trigger_spell_id);
     SpellEntry const *auraSpellInfo = GetSpellProto();
     uint32 auraId = auraSpellInfo->Id;
@@ -1980,28 +1978,18 @@ void Aura::TriggerSpell()
                     return;
 
                 caster = target;
-                originalCasterGUID = 0;
                 break;
             }
             // Mana Tide
             case 16191:
             {
-                caster->CastCustomSpell(target, trigger_spell_id, &m_modifier.m_amount, NULL, NULL, true, NULL, this, originalCasterGUID);
+                caster->CastCustomSpell(target, trigger_spell_id, &m_modifier.m_amount, NULL, NULL, true, NULL, this);
                 return;
             }
         }
     }
     // All ok cast by default case
-    Spell *spell = new Spell(caster, triggeredSpellInfo, true, originalCasterGUID );
-
-    SpellCastTargets targets;
-    targets.setUnitTarget( target );
-
-    // if spell create dynamic object extract area from it
-    if(DynamicObject* dynObj = caster->GetDynObject(GetId()))
-        targets.setDestination(dynObj->GetPositionX(),dynObj->GetPositionY(),dynObj->GetPositionZ());
-
-    spell->prepare(&targets, this);
+    caster->CastSpell(target, triggeredSpellInfo, true, 0, this);
 }
 
 void Aura::TriggerSpellWithValue()
@@ -2015,7 +2003,6 @@ void Aura::TriggerSpellWithValue()
     // generic casting code with custom spells and target/caster customs
     uint32 trigger_spell_id = GetSpellProto()->EffectTriggerSpell[m_effIndex];
     int32  basepoints0 = this->GetModifier()->m_amount;
-    uint64 originalCasterGUID = GetCasterGUID();
 
     caster->CastCustomSpell(target, trigger_spell_id, &basepoints0, 0, 0, true, 0, this);
 }
