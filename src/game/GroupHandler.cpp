@@ -707,7 +707,7 @@ void WorldSession::BuildPartyMemberStatsChangedPacket(Player *player, WorldPacke
 
     if (mask & GROUP_UPDATE_FLAG_AURAS)
     {
-        uint64 auramask = player->GetAuraUpdateMask();
+        const uint64& auramask = player->GetAuraUpdateMask();
         *data << uint64(auramask);
         for(uint32 i = 0; i < MAX_AURAS; ++i)
         {
@@ -788,7 +788,7 @@ void WorldSession::BuildPartyMemberStatsChangedPacket(Player *player, WorldPacke
     {
         if(pet)
         {
-            uint64 auramask = pet->GetAuraUpdateMask();
+            const uint64& auramask = pet->GetAuraUpdateMask();
             *data << uint64(auramask);
             for(uint32 i = 0; i < MAX_AURAS; ++i)
             {
