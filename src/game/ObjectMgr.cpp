@@ -4336,14 +4336,20 @@ void ObjectMgr::LoadInstanceTemplate()
         else if(!entry->HasResetTime())
             continue;
 
+        //FIXME: now exist heroic instance, normal/heroic raid instances
+        // entry->resetTimeHeroic store reset time for both heroic mode instance (raid and non-raid)
+        // entry->resetTimeRaid   store reset time for normal raid only
+        // for current state  entry->resetTimeRaid == entry->resetTimeHeroic in case raid instances with heroic mode.
+        // but at some point wee need implement reset time dependen from raid insatance mode
         if(temp->reset_delay == 0)
         {
             // use defaults from the DBC
-            if(entry->SupportsHeroicMode())
+            if(entry->resetTimeHeroic)                      // for both raid and non raids, read above
             {
                 temp->reset_delay = entry->resetTimeHeroic / DAY;
             }
             else if (entry->resetTimeRaid && entry->map_type == MAP_RAID)
+                                                            // for normal raid only
             {
                 temp->reset_delay = entry->resetTimeRaid / DAY;
             }

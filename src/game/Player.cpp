@@ -15288,29 +15288,29 @@ InstancePlayerBind* Player::BindToInstance(InstanceSave *save, bool permanent, b
 
 void Player::SendRaidInfo()
 {
+    uint32 counter = 0;
+
     WorldPacket data(SMSG_RAID_INSTANCE_INFO, 4);
 
-    uint32 counter = 0, i;
-    for(i = 0; i < TOTAL_DIFFICULTIES; i++)
-        for (BoundInstancesMap::iterator itr = m_boundInstances[i].begin(); itr != m_boundInstances[i].end(); ++itr)
-            if(itr->second.perm) counter++;
+    size_t p_counter = data.wpos();
+    data << uint32(counter);                                // placeholder
 
-    data << counter;
-    for(i = 0; i < TOTAL_DIFFICULTIES; i++)
+    for(int i = 0; i < TOTAL_DIFFICULTIES; ++i)
     {
         for (BoundInstancesMap::iterator itr = m_boundInstances[i].begin(); itr != m_boundInstances[i].end(); ++itr)
         {
             if(itr->second.perm)
             {
                 InstanceSave *save = itr->second.save;
-                data << (save->GetMapId());
-                data << (uint32)(save->GetResetTime() - time(NULL));
-                data << save->GetInstanceId();
-                data << uint32(counter);
-                counter--;
+                data << uint32(save->GetMapId());
+                data << uint32(save->GetResetTime() - time(NULL));
+                data << uint32(save->GetInstanceId());
+                data << uint32(save->GetDifficulty());
+                ++counter;
             }
         }
     }
+    data.put<uint32>(p_counter,counter);
     GetSession()->SendPacket(&data);
 }
 
