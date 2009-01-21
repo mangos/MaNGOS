@@ -7487,6 +7487,16 @@ uint32 Unit::SpellDamageBonus(Unit *pVictim, SpellEntry const *spellProto, uint3
         if( (*i)->GetCasterGUID() == GetGUID() && (*i)->isAffectedOnSpell(spellProto))
             TakenTotalMod *= ((*i)->GetModifier()->m_amount+100.0f)/100.0f;
 
+    // Mod damage from spell mechanic
+    uint32 mechanicMask = GetAllSpellMechanicMask(spellProto);
+    if (mechanicMask)
+    {
+        AuraList const& mDamageDoneMechanic = pVictim->GetAurasByType(SPELL_AURA_MOD_MECHANIC_DAMAGE_TAKEN_PERCENT);
+        for(AuraList::const_iterator i = mDamageDoneMechanic.begin();i != mDamageDoneMechanic.end(); ++i)
+            if(mechanicMask & uint32(1<<((*i)->GetModifier()->m_miscvalue)))
+                TakenTotalMod *= ((*i)->GetModifier()->m_amount+100.0f)/100.0f;
+    }
+
     // Distribute Damage over multiple effects, reduce by AoE
     CastingTime = GetCastingTimeForBonus( spellProto, damagetype, CastingTime );
 
