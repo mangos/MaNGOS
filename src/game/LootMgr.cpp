@@ -1220,10 +1220,12 @@ void LoadLootTemplates_QuestMail()
         if(!itr->second->GetRewMailTemplateId())
             continue;
 
-        if(!ids_set.count(itr->first))
-            LootTemplates_QuestMail.ReportNotExistedId(itr->first);
-        else
+        if(ids_set.count(itr->first))
             ids_set.erase(itr->first);
+        /* disabled reporting: some quest mails not include items
+        else
+            LootTemplates_QuestMail.ReportNotExistedId(itr->first);
+        */
     }
 
     // output error for any still listed (not referenced from appropriate table) ids
