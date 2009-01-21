@@ -215,9 +215,9 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS]=
     &Spell::EffectNULL,                                     //154 unused
     &Spell::EffectTitanGrip,                                //155 SPELL_EFFECT_TITAN_GRIP Allows you to equip two-handed axes, maces and swords in one hand, but you attack $49152s1% slower than normal.
     &Spell::EffectNULL,                                     //156 Add Socket
-    &Spell::EffectCreateItem,                               //157 SPELL_EFFECT_CREATE_ITEM_2 create/learn item/spell for profession
-    &Spell::EffectMilling,                                  //158 milling
-    &Spell::EffectNULL                                      //159 allow rename pet once again
+    &Spell::EffectCreateItem,                               //157 SPELL_EFFECT_CREATE_ITEM_2            create/learn item/spell for profession
+    &Spell::EffectMilling,                                  //158 SPELL_EFFECT_MILLING                  milling
+    &Spell::EffectRenamePet                                 //159 SPELL_EFFECT_ALLOW_RENAME_PET         allow rename pet once again
 };
 
 void Spell::EffectNULL(uint32 /*i*/)
@@ -6426,7 +6426,7 @@ void Spell::EffectQuestFail(uint32 i)
     ((Player*)unitTarget)->FailQuest(m_spellInfo->EffectMiscValue[i]);
 }
 
-void Spell::EffectActivateRune(uint32 i)
+void Spell::EffectActivateRune(uint32  eff_idx)
 {
     if(m_caster->GetTypeId() != TYPEID_PLAYER)
         return;
@@ -6438,15 +6438,24 @@ void Spell::EffectActivateRune(uint32 i)
 
     for(uint32 j = 0; j < MAX_RUNES; ++j)
     {
-        if(plr->GetRuneCooldown(j) && plr->GetCurrentRune(j) == m_spellInfo->EffectMiscValue[i])
+        if(plr->GetRuneCooldown(j) && plr->GetCurrentRune(j) == m_spellInfo->EffectMiscValue[eff_idx])
         {
             plr->SetRuneCooldown(j, 0);
         }
     }
 }
 
-void Spell::EffectTitanGrip(uint32 i)
+void Spell::EffectTitanGrip(uint32 /*eff_idx*/)
 {
     if (unitTarget && unitTarget->GetTypeId() == TYPEID_PLAYER)
         ((Player*)unitTarget)->SetCanTitanGrip(true);
+}
+
+void Spell::EffectRenamePet(uint32 /*eff_idx*/)
+{
+    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_UNIT ||
+        !((Creature*)unitTarget)->isPet() || ((Pet*)unitTarget)->getPetType() != HUNTER_PET)
+        return;
+
+    unitTarget->SetByteValue(UNIT_FIELD_BYTES_2, 2, UNIT_RENAME_ALLOWED);
 }
