@@ -1277,7 +1277,12 @@ void LoadLootTemplates_Spell()
             continue;
 
         if(!ids_set.count(spell_id))
-            LootTemplates_Spell.ReportNotExistedId(spell_id);
+        {
+            // not report about not trainable spells (optionally supported by DB)
+            // 61756 (Northrend Inscription Research (FAST QA VERSION) for example
+            if(spellInfo->Attributes & SPELL_ATTR_UNK5)
+                LootTemplates_Spell.ReportNotExistedId(spell_id);
+        }
         else
             ids_set.erase(spell_id);
     }

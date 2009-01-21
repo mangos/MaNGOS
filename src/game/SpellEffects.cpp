@@ -4839,11 +4839,11 @@ void Spell::EffectScriptEffect(uint32 effIndex)
                 case 60893:                                 // Northrend Alchemy Research
                 case 61177:                                 // Northrend Inscription Research
                 case 61288:                                 // Minor Inscription Research
-                case 61756:                                 // Northrend Inscription Research (FAST QA VERSION)
+                case 61756:                                 // Northrend Inscription Research (FAST QA VERSION) 
                 {
                     if(!IsExplicitDiscoverySpell(m_spellInfo))
                     {
-                        sLog.outError("Wrong explicit discowry spell %u structure, or outdated...",m_spellInfo->Id);
+                        sLog.outError("Wrong explicit discovery spell %u structure, or outdated...",m_spellInfo->Id);
                         return;
                     }
 
