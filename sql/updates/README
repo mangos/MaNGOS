@@ -30,10 +30,10 @@ See an example below:
          |    Counter show number of sql update in updates list for provided revision
          |    and set proper order for sql updates for same revision
          |
-         MaNGOS commit revison related to sql update. 
+         MaNGOS commit revison related to sql update.
          It included in commit description in form [6936] as you can see at http://github.com/mangos/mangos/commits/master
 
 After appling this update DB compatiable with database that include this sql update.
 SQL update include special protection against multiply and wrong order SQL updates apply.
-So attempt apply sql update to more old DB without previous SQL update in list for targeted database 
+So attempt apply sql update to more old DB without previous SQL update in list for targeted database
 or to DB with already applied this or later SQL update will generate error and not applied.

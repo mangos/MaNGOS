@@ -22,7 +22,7 @@
 DROP TABLE IF EXISTS `db_version`;
 CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
-  `required_7107_01_mangos_string` bit(1) default NULL
+  `required_7141_01_mangos_instance_template` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -1445,6 +1445,7 @@ CREATE TABLE `instance_template` (
   `levelMin` tinyint(3) unsigned NOT NULL default '0',
   `levelMax` tinyint(3) unsigned NOT NULL default '0',
   `maxPlayers` tinyint(3) unsigned NOT NULL default '0',
+  `maxPlayersHeroic` tinyint(3) unsigned NOT NULL default '0',
   `reset_delay` int(10) unsigned NOT NULL default '0',
   `startLocX` float default NULL,
   `startLocY` float default NULL,
@@ -1461,32 +1462,35 @@ CREATE TABLE `instance_template` (
 LOCK TABLES `instance_template` WRITE;
 /*!40000 ALTER TABLE `instance_template` DISABLE KEYS */;
 INSERT INTO `instance_template` VALUES
-(33,0,22,30,10,7200,NULL,NULL,NULL,NULL,''),
-(34,0,24,32,10,7200,NULL,NULL,NULL,NULL,''),
-(36,0,15,20,10,7200,NULL,NULL,NULL,NULL,''),
-(43,0,15,21,10,7200,NULL,NULL,NULL,NULL,''),
-(47,0,29,38,10,7200,NULL,NULL,NULL,NULL,''),
-(48,0,24,32,10,7200,NULL,NULL,NULL,NULL,''),
-(70,0,35,47,10,7200,NULL,NULL,NULL,NULL,''),
-(90,0,29,38,10,7200,NULL,NULL,NULL,NULL,''),
-(109,0,45,55,10,7200,NULL,NULL,NULL,NULL,''),
-(129,0,37,46,10,7200,NULL,NULL,NULL,NULL,''),
-(189,0,34,45,10,7200,NULL,NULL,NULL,NULL,''),
-(209,0,44,54,10,7200,NULL,NULL,NULL,NULL,''),
-(229,0,58,0,10,120000,78.5083,-225.044,49.839,5.1,''),
-(230,0,52,0,5,7200,NULL,NULL,NULL,NULL,''),
-(249,0,60,0,40,432000,NULL,NULL,NULL,NULL,''),
-(289,0,57,0,5,7200,NULL,NULL,NULL,NULL,''),
-(309,0,60,0,20,259200,NULL,NULL,NULL,NULL,''),
-(329,0,58,60,5,7200,NULL,NULL,NULL,NULL,''),
-(349,0,46,55,10,7200,NULL,NULL,NULL,NULL,''),
-(389,0,13,18,10,7200,NULL,NULL,NULL,NULL,''),
-(409,0,60,0,40,604800,NULL,NULL,NULL,NULL,''),
-(429,0,55,60,5,7200,NULL,NULL,NULL,NULL,''),
-(469,0,60,0,40,604800,NULL,NULL,NULL,NULL,''),
-(509,0,60,0,20,259200,NULL,NULL,NULL,NULL,''),
-(531,0,60,0,40,604800,NULL,NULL,NULL,NULL,''),
-(533,0,60,0,40,604800,NULL,NULL,NULL,NULL,'');
+(33,0,22,30,10,10,7200,NULL,NULL,NULL,NULL,''),
+(34,0,24,32,10,10,7200,NULL,NULL,NULL,NULL,''),
+(36,0,15,20,10,10,7200,NULL,NULL,NULL,NULL,''),
+(43,0,15,21,10,10,7200,NULL,NULL,NULL,NULL,''),
+(47,0,29,38,10,10,7200,NULL,NULL,NULL,NULL,''),
+(48,0,24,32,10,10,7200,NULL,NULL,NULL,NULL,''),
+(70,0,35,47,10,10,7200,NULL,NULL,NULL,NULL,''),
+(90,0,29,38,10,10,7200,NULL,NULL,NULL,NULL,''),
+(109,0,45,55,10,10,7200,NULL,NULL,NULL,NULL,''),
+(129,0,37,46,10,10,7200,NULL,NULL,NULL,NULL,''),
+(189,0,34,45,10,10,7200,NULL,NULL,NULL,NULL,''),
+(209,0,44,54,10,10,7200,NULL,NULL,NULL,NULL,''),
+(229,0,58,0,10,10,120000,78.5083,-225.044,49.839,5.1,''),
+(230,0,52,0,5,5,7200,NULL,NULL,NULL,NULL,''),
+(249,0,60,0,40,40,432000,NULL,NULL,NULL,NULL,''),
+(289,0,57,0,5,5,7200,NULL,NULL,NULL,NULL,''),
+(309,0,60,0,20,20,259200,NULL,NULL,NULL,NULL,''),
+(329,0,58,60,5,5,7200,NULL,NULL,NULL,NULL,''),
+(349,0,46,55,10,10,7200,NULL,NULL,NULL,NULL,''),
+(389,0,13,18,10,10,7200,NULL,NULL,NULL,NULL,''),
+(409,0,60,0,40,40,604800,NULL,NULL,NULL,NULL,''),
+(429,0,55,60,5,5,7200,NULL,NULL,NULL,NULL,''),
+(469,0,60,0,40,40,604800,NULL,NULL,NULL,NULL,''),
+(509,0,60,0,20,20,259200,NULL,NULL,NULL,NULL,''),
+(531,0,60,0,40,40,604800,NULL,NULL,NULL,NULL,''),
+(533,0,80,0,10,25,0,NULL,NULL,NULL,NULL,''),
+(615,0,80,0,10,25,0,NULL,NULL,NULL,NULL,''),
+(616,0,80,0,10,25,0,NULL,NULL,NULL,NULL,''),
+(624,0,80,0,10,25,0,NULL,NULL,NULL,NULL,'');
 /*!40000 ALTER TABLE `instance_template` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -12999,8 +13003,9 @@ DROP TABLE IF EXISTS `skill_discovery_template`;
 CREATE TABLE `skill_discovery_template` (
   `spellId` mediumint(8) unsigned NOT NULL default '0' COMMENT 'SpellId of the discoverable spell',
   `reqSpell` mediumint(8) unsigned NOT NULL default '0' COMMENT 'spell requirement',
+  `reqSkillValue` smallint(5) unsigned NOT NULL default '0' COMMENT 'skill points requirement',
   `chance` float NOT NULL default '0' COMMENT 'chance to discover',
-  PRIMARY KEY  (`spellId`)
+  PRIMARY KEY (`spellId`,`reqSpell`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Skill Discovery System';
 
 --
@@ -16222,6 +16227,33 @@ INSERT INTO `spell_learn_spell` VALUES
 
 
 /*!40000 ALTER TABLE `spell_learn_spell` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `spell_loot_template`
+--
+
+DROP TABLE IF EXISTS `spell_loot_template`;
+CREATE TABLE `spell_loot_template` (
+  `entry` mediumint(8) unsigned NOT NULL default '0',
+  `item` mediumint(8) unsigned NOT NULL default '0',
+  `ChanceOrQuestChance` float NOT NULL default '100',
+  `groupid` tinyint(3) unsigned NOT NULL default '0',
+  `mincountOrRef` mediumint(9) NOT NULL default '1',
+  `maxcount` tinyint(3) unsigned NOT NULL default '1',
+  `lootcondition` tinyint(3) unsigned NOT NULL default '0',
+  `condition_value1` mediumint(8) unsigned NOT NULL default '0',
+  `condition_value2` mediumint(8) unsigned NOT NULL default '0',
+  PRIMARY KEY  (`entry`,`item`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Loot System';
+
+--
+-- Dumping data for table `spell_loot_template`
+--
+
+LOCK TABLES `spell_loot_template` WRITE;
+/*!40000 ALTER TABLE `spell_loot_template` DISABLE KEYS */;
+/*!40000 ALTER TABLE `spell_loot_template` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --

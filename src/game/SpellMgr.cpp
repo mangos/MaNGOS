@@ -172,7 +172,7 @@ SpellSpecific GetSpellSpecific(uint32 spellId)
             // only hunter aspects have this (but not all aspects in hunter family)
             if( spellInfo->SpellFamilyFlags & 0x0044000000380000LL || spellInfo->SpellFamilyFlags2 & 0x00003010)
                 return SPELL_ASPECT;
-            
+
             if( spellInfo->SpellFamilyFlags2 & 0x00000002 )
                 return SPELL_TRACKER;
 
@@ -736,7 +736,7 @@ void SpellMgr::LoadSpellAffects()
             case 0: ptr = &spellInfo->EffectSpellClassMaskA[0]; break;
             case 1: ptr = &spellInfo->EffectSpellClassMaskB[0]; break;
             case 2: ptr = &spellInfo->EffectSpellClassMaskC[0]; break;
-            default: 
+            default:
                 continue;
         }
         if(ptr[0] == affect.SpellClassMask[0] || ptr[1] == affect.SpellClassMask[1] || ptr[2] == affect.SpellClassMask[2])
@@ -776,7 +776,7 @@ void SpellMgr::LoadSpellAffects()
                 case 0: ptr = &spellInfo->EffectSpellClassMaskA[0]; break;
                 case 1: ptr = &spellInfo->EffectSpellClassMaskB[0]; break;
                 case 2: ptr = &spellInfo->EffectSpellClassMaskC[0]; break;
-                default: 
+                default:
                     continue;
             }
             if(ptr[0] || ptr[1] || ptr[2])

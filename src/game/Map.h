@@ -98,7 +98,8 @@ struct InstanceTemplate
     uint32 levelMin;
     uint32 levelMax;
     uint32 maxPlayers;
-    uint32 reset_delay;
+    uint32 maxPlayersHeroic;
+    uint32 reset_delay;                                 // FIX ME: now exist normal/heroic raids with possible different time of reset.
     float startLocX;
     float startLocY;
     float startLocZ;
@@ -131,7 +132,13 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         virtual ~Map();
 
         // currently unused for normal maps
-        virtual bool CanUnload(const uint32& diff);
+        bool CanUnload(uint32 diff)
+        {
+            if(!m_unloadTimer) return false;
+            if(m_unloadTimer <= diff) return true;
+            m_unloadTimer -= diff;
+            return false;
+        }
 
         virtual bool Add(Player *);
         virtual void Remove(Player *, bool);
@@ -358,6 +365,7 @@ class MANGOS_DLL_SPEC InstanceMap : public Map
         bool CanEnter(Player* player);
         void SendResetWarnings(uint32 timeLeft) const;
         void SetResetSchedule(bool on);
+        uint32 GetMaxPlayers() const;
     private:
         bool m_resetAfterUnload;
         bool m_unloadWhenEmpty;

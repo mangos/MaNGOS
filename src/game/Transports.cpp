@@ -473,11 +473,8 @@ bool Transport::AddPassenger(Player* passenger)
 
 bool Transport::RemovePassenger(Player* passenger)
 {
-    if (m_passengers.find(passenger) != m_passengers.end())
-    {
+    if (m_passengers.erase(passenger))
         sLog.outDetail("Player %s removed from transport %s.", passenger->GetName(), m_name.c_str());
-        m_passengers.erase(passenger);
-    }
     return true;
 }
 

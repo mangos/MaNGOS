@@ -646,9 +646,11 @@ uint32 createProcExtendMask(SpellNonMeleeDamage *damageInfo, SpellMissInfo missC
 
 struct UnitActionBarEntry
 {
+    UnitActionBarEntry() : Raw(0) {}
+
     union
     {
-        struct 
+        struct
         {
             uint16 SpellOrAction;
             uint16 Type;
@@ -801,9 +803,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         }
         void _removeAttacker(Unit *pAttacker)               // must be called only from Unit::AttackStop()
         {
-            AttackerSet::iterator itr = m_attackers.find(pAttacker);
-            if(itr != m_attackers.end())
-                m_attackers.erase(itr);
+            m_attackers.erase(pAttacker);
         }
         Unit * getAttackerForHelper()                       // If someone wants to help, who to give them
         {
@@ -1238,14 +1238,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void SetVisibleAura(uint8 slot, uint32 spellid)
         {
             if(spellid == 0)
-            {
-                VisibleAuraMap::iterator itr = m_visibleAuras.find(slot);
-                if(itr != m_visibleAuras.end())
-                {
-                    m_visibleAuras.erase(itr);
-                    return;
-                }
-            }
+                m_visibleAuras.erase(slot);
             else
                 m_visibleAuras[slot] = spellid;
         }

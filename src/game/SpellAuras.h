@@ -110,8 +110,10 @@ class MANGOS_DLL_SPEC Aura
         void HandleAuraModRegenInterrupt(bool Apply, bool Real);
         void HandleHaste(bool Apply, bool Real);
         void HandlePeriodicTriggerSpell(bool Apply, bool Real);
+        void HandlePeriodicTriggerSpellWithValue(bool apply, bool Real);
         void HandlePeriodicEnergize(bool Apply, bool Real);
         void HandleAuraModResistanceExclusive(bool Apply, bool Real);
+        void HandleAuraModPetTalentsPoints(bool Apply, bool Real);
         void HandleModStealth(bool Apply, bool Real);
         void HandleInvisibility(bool Apply, bool Real);
         void HandleInvisibilityDetect(bool Apply, bool Real);
@@ -256,7 +258,7 @@ class MANGOS_DLL_SPEC Aura
         uint8 GetAuraLevel() const { return m_auraLevel; }
         void SetAuraLevel(uint8 level) { m_auraLevel = level; }
         uint8 GetAuraCharges() const { return m_procCharges; }
-        void SetAuraCharges(uint8 charges) 
+        void SetAuraCharges(uint8 charges)
         {
             if (m_procCharges == charges)
                 return;
@@ -264,7 +266,7 @@ class MANGOS_DLL_SPEC Aura
             SendAuraUpdate(false);
         }
         bool DropAuraCharge() // return true if last charge dropped
-        { 
+        {
             if (m_procCharges == 0)
                 return false;
             m_procCharges--;
@@ -287,7 +289,6 @@ class MANGOS_DLL_SPEC Aura
         bool IsPermanent() const { return m_permanent; }
         bool IsAreaAura() const { return m_isAreaAura; }
         bool IsPeriodic() const { return m_isPeriodic; }
-        bool IsTrigger() const { return m_isTrigger; }
         bool IsPassive() const { return m_isPassive; }
         bool IsPersistent() const { return m_isPersistent; }
         bool IsDeathPersistent() const { return m_isDeathPersist; }
@@ -314,6 +315,7 @@ class MANGOS_DLL_SPEC Aura
         DiminishingGroup getDiminishGroup() const { return m_AuraDRGroup; }
 
         void TriggerSpell();
+        void TriggerSpellWithValue();
         void PeriodicTick();
         void PeriodicDummyTick();
 
@@ -350,7 +352,6 @@ class MANGOS_DLL_SPEC Aura
         bool m_positive:1;
         bool m_permanent:1;
         bool m_isPeriodic:1;
-        bool m_isTrigger:1;
         bool m_isAreaAura:1;
         bool m_isPassive:1;
         bool m_isPersistent:1;

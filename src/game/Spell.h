@@ -290,6 +290,7 @@ class Spell
         void EffectCharge(uint32 i);
         void EffectProspecting(uint32 i);
         void EffectMilling(uint32 i);
+        void EffectRenamePet(uint32 i);
         void EffectSendTaxi(uint32 i);
         void EffectSummonCritter(uint32 i);
         void EffectKnockBack(uint32 i);
@@ -358,7 +359,6 @@ class Spell
         void setState(uint32 state) { m_spellState = state; }
 
         void DoCreateItem(uint32 i, uint32 itemtype);
-
         void WriteSpellGoTargets( WorldPacket * data );
         void WriteAmmoToPacket( WorldPacket * data );
         void FillTargetMap();

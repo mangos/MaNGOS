@@ -687,8 +687,8 @@ void Spell::prepareDataForTriggerSystem()
     {
         switch (m_spellInfo->SpellFamilyName)
         {
-            case SPELLFAMILY_MAGE:    // Arcane Missles triggers need do it
-                if (m_spellInfo->SpellFamilyFlags & 0x0000000000200000LL) m_canTrigger = true;
+            case SPELLFAMILY_MAGE:    // Arcane Missles / Blizzard triggers need do it
+                if (m_spellInfo->SpellFamilyFlags & 0x0000000000200080LL) m_canTrigger = true;
             break;
             case SPELLFAMILY_WARLOCK: // For Hellfire Effect / Rain of Fire / Seed of Corruption triggers need do it
                 if (m_spellInfo->SpellFamilyFlags & 0x0000800000000060LL) m_canTrigger = true;
@@ -1988,6 +1988,12 @@ void Spell::SetTargetMap(uint32 i,uint32 cur,std::list<Unit*> &TagUnitMap)
                     m_targets.setDestination(_target_x, _target_y, _target_z);
             }
         }break;
+        case TARGET_DYNAMIC_OBJECT_COORDINATES:
+        {
+            // if parent spell create dynamic object extract area from it
+            if(DynamicObject* dynObj = m_caster->GetDynObject(m_triggeredByAuraSpell ? m_triggeredByAuraSpell->Id : m_spellInfo->Id))
+                m_targets.setDestination(dynObj->GetPositionX(), dynObj->GetPositionY(), dynObj->GetPositionZ());
+        }break;
         default:
             break;
     }
@@ -3078,7 +3084,7 @@ void Spell::SendLogExecute()
                         data << uint8(0);
                     break;
                 case SPELL_EFFECT_CREATE_ITEM:
-                case SPELL_EFFECT_157:
+                case SPELL_EFFECT_CREATE_ITEM_2:
                     data << uint32(m_spellInfo->EffectItemType[0]);
                     break;
                 case SPELL_EFFECT_SUMMON:
@@ -4237,7 +4243,7 @@ uint8 Spell::CanCast(bool strict)
 
                 break;
             }
-            // This is generic summon effect 
+            // This is generic summon effect
             case SPELL_EFFECT_SUMMON:
             {
                 switch(m_spellInfo->EffectMiscValueB[i])
