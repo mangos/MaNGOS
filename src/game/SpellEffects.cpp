@@ -5926,6 +5926,12 @@ void Spell::EffectSendTaxi(uint32 i)
         case 34905:                                         //Stealth Flight
             mountid = 6851;
             break;
+        case 45883:                                         //Amber Ledge to Beryl Point
+            mountid = 23524;
+            break;
+        case 46064:                                         //Amber Ledge to Coldarra
+            mountid = 6371;
+            break;
         case 53335:                                         //Stormwind Harbor Flight - Peaceful
             mountid = 6852;
             break;
