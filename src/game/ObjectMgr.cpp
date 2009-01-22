@@ -766,6 +766,19 @@ void ObjectMgr::LoadCreatureTemplates()
         if((cInfo->npcflag & UNIT_NPC_FLAG_TRAINER) && cInfo->trainer_type >= MAX_TRAINER_TYPE)
             sLog.outErrorDb("Creature (Entry: %u) has wrong trainer type %u",cInfo->Entry,cInfo->trainer_type);
 
+        if(cInfo->type && !sCreatureTypeStore.LookupEntry(cInfo->type))
+        {
+            sLog.outErrorDb("Creature (Entry: %u) has invalid creature type (%u) in `type`",cInfo->Entry,cInfo->type);
+            const_cast<CreatureInfo*>(cInfo)->type = CREATURE_TYPE_HUMANOID;
+        }
+
+        // must exist or used hidden but used in data horse case
+        if(cInfo->family && !sCreatureFamilyStore.LookupEntry(cInfo->family) && cInfo->family != CREATURE_FAMILY_HORSE_CUSTOM )
+        {
+            sLog.outErrorDb("Creature (Entry: %u) has invalid creature family (%u) in `family`",cInfo->Entry,cInfo->family);
+            const_cast<CreatureInfo*>(cInfo)->family = 0;
+        }
+
         if(cInfo->InhabitType <= 0 || cInfo->InhabitType > INHABIT_ANYWHERE)
         {
             sLog.outErrorDb("Creature (Entry: %u) has wrong value (%u) in `InhabitType`, creature will not correctly walk/swim/fly",cInfo->Entry,cInfo->InhabitType);

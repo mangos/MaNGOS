@@ -664,6 +664,14 @@ struct CreatureSpellDataEntry
     //uint32    availability[4];                            // 4-7      m_availability[4]
 };
 
+struct CreatureTypeEntry
+{
+    uint32    ID;                                           // 0        m_ID
+    //char*   Name[16];                                     // 1-16     name
+                                                            // 17       string flags
+    //uint32    no_expirience;                              // 18 no exp? critters, non-combat pets, gas cloud.
+};
+
 struct DurabilityCostsEntry
 {
     uint32    Itemlvl;                                      // 0
