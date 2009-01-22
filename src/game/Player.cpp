@@ -427,7 +427,7 @@ Player::Player (WorldSession *session): Unit(), m_achievementMgr(this)
 
     for (int i = 0; i < MAX_COMBAT_RATING; i++)
         m_baseRatingValue[i] = 0;
-    
+
     m_baseSpellDamage = 0;
     m_baseSpellHealing = 0;
     m_baseFeralAP = 0;
@@ -4535,7 +4535,7 @@ float Player::OCTRegenMPPerSpirit()
 void Player::ApplyRatingMod(CombatRating cr, int32 value, bool apply)
 {
     m_baseRatingValue[cr]+=(apply ? value : -value);
-    
+
     int32 amount = uint32(m_baseRatingValue[cr]);
     // Apply bonus from SPELL_AURA_MOD_RATING_FROM_STAT
     // stat used stored in miscValueB for this aura
@@ -9936,7 +9936,7 @@ uint8 Player::CanEquipItem( uint8 slot, uint16 &dest, Item *pItem, bool swap, bo
                     if(!CanDualWield())
                         return EQUIP_ERR_CANT_DUAL_WIELD;
                 }
-                else if (type == INVTYPE_2HWEAPON) 
+                else if (type == INVTYPE_2HWEAPON)
                 {
                     if(!CanDualWield() || !CanTitanGrip())
                         return EQUIP_ERR_CANT_DUAL_WIELD;
@@ -18705,7 +18705,7 @@ bool Player::isHonorOrXPTarget(Unit* pVictim)
 
     if(pVictim->GetTypeId() == TYPEID_UNIT)
     {
-        if (((Creature*)pVictim)->isTotem() || 
+        if (((Creature*)pVictim)->isTotem() ||
             ((Creature*)pVictim)->isPet() ||
             ((Creature*)pVictim)->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_NO_XP_AT_KILL)
                 return false;
@@ -19281,7 +19281,7 @@ void Player::SetTitle(CharTitlesEntry const* title)
 void Player::ConvertRune(uint8 index, uint8 newType)
 {
     SetCurrentRune(index, newType);
-    
+
     WorldPacket data(SMSG_CONVERT_RUNE, 2);
     data << uint8(index);
     data << uint8(newType);

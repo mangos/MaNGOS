@@ -4243,7 +4243,7 @@ uint8 Spell::CanCast(bool strict)
 
                 break;
             }
-            // This is generic summon effect 
+            // This is generic summon effect
             case SPELL_EFFECT_SUMMON:
             {
                 switch(m_spellInfo->EffectMiscValueB[i])

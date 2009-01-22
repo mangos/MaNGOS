@@ -221,7 +221,7 @@ void LoadDBCStores(const std::string& dataPath)
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sBattlemasterListStore,    dbcPath,"BattlemasterList.dbc");
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sBarberShopStyleStore,     dbcPath,"BarberShopStyle.dbc");
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sCharStartOutfitStore,     dbcPath,"CharStartOutfit.dbc");
-    
+
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sCharTitlesStore,          dbcPath,"CharTitles.dbc");
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sChatChannelsStore,        dbcPath,"ChatChannels.dbc");
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sChrClassesStore,          dbcPath,"ChrClasses.dbc");
@@ -503,11 +503,11 @@ void LoadDBCStores(const std::string& dataPath)
     // check at up-to-date DBC files (2425 is last item extended cost added in 3.0.1)
     // check at up-to-date DBC files (76 is last char title added in 3.0.1)
     // check at up-to-date DBC files (2311 is last area added in 3.0.1)
-    if( !sSpellStore.LookupEntry(54909)            || 
-        !sSkillLineAbilityStore.LookupEntry(19162) || 
+    if( !sSpellStore.LookupEntry(54909)            ||
+        !sSkillLineAbilityStore.LookupEntry(19162) ||
         !sMapStore.LookupEntry(619)                ||
-        !sGemPropertiesStore.LookupEntry(1361)     || 
-        !sItemExtendedCostStore.LookupEntry(2425)  || 
+        !sGemPropertiesStore.LookupEntry(1361)     ||
+        !sItemExtendedCostStore.LookupEntry(2425)  ||
         !sCharTitlesStore.LookupEntry(76)          ||
         !sAreaStore.LookupEntry(2311)              )
     {

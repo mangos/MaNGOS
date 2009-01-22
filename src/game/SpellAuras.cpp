@@ -340,7 +340,7 @@ Aura::Aura(SpellEntry const* spellproto, uint32 eff, int32 *currentBasePoints, U
 m_spellmod(NULL), m_caster_guid(0), m_castItemGuid(castItem?castItem->GetGUID():0), m_target(target),
 m_timeCla(1000), m_periodicTimer(0), m_removeMode(AURA_REMOVE_BY_DEFAULT), m_AuraDRGroup(DIMINISHING_NONE),
 m_effIndex(eff), m_auraSlot(MAX_AURAS), m_auraFlags(AFLAG_NONE), m_auraLevel(1), m_procCharges(0), m_stackAmount(1),
-m_positive(false), m_permanent(false), m_isPeriodic(false), m_isAreaAura(false), m_isPersistent(false), 
+m_positive(false), m_permanent(false), m_isPeriodic(false), m_isAreaAura(false), m_isPersistent(false),
 m_updated(false), m_isRemovedOnShapeLost(true), m_in_use(false)
 {
     assert(target);
@@ -970,7 +970,7 @@ void Aura::_AddAura()
             // Conflagrate aura state on Immolate
             if (m_spellProto->SpellFamilyName == SPELLFAMILY_WARLOCK && m_spellProto->SpellFamilyFlags & 4)
                 m_target->ModifyAuraState(AURA_STATE_IMMOLATE, true);
-            
+
             // Faerie Fire (druid versions)
             if (m_spellProto->SpellFamilyName == SPELLFAMILY_DRUID && m_spellProto->SpellFamilyFlags & 0x0000000000000400LL)
                 m_target->ModifyAuraState(AURA_STATE_FAERIE_FIRE, true);
@@ -1093,7 +1093,7 @@ void Aura::_RemoveAura()
             for(Unit::AuraMap::iterator i = Auras.begin(); i != Auras.end(); ++i)
             {
                 SpellEntry const *auraSpellInfo = (*i).second->GetSpellProto();
-                if(auraSpellInfo->SpellFamilyName  == m_spellProto->SpellFamilyName && 
+                if(auraSpellInfo->SpellFamilyName  == m_spellProto->SpellFamilyName &&
                    auraSpellInfo->SpellFamilyFlags == m_spellProto->SpellFamilyFlags )
                 {
                     found = true;
@@ -2146,14 +2146,14 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
         if (caster && m_removeMode == AURA_REMOVE_BY_DEATH)
         {
             // Stop caster Arcane Missle chanelling on death
-            if (m_spellProto->SpellFamilyName == SPELLFAMILY_MAGE && 
+            if (m_spellProto->SpellFamilyName == SPELLFAMILY_MAGE &&
                 m_spellProto->SpellFamilyFlags&0x0000000000000800LL)
             {
                 caster->InterruptSpell(CURRENT_CHANNELED_SPELL);
                 return;
             }
             // Stop caster Penance chanelling on death
-            if (m_spellProto->SpellFamilyName == SPELLFAMILY_PRIEST && 
+            if (m_spellProto->SpellFamilyName == SPELLFAMILY_PRIEST &&
                 m_spellProto->SpellFamilyFlags2 & 0x00000080)
             {
                 caster->InterruptSpell(CURRENT_CHANNELED_SPELL);
@@ -6321,7 +6321,7 @@ void Aura::PeriodicDummyTick()
 //        case 33208: break;
 //        // Gossip NPC Periodic - Despawn
 //        case 33209: break;
- 
+
             // TODO: now its not periodic dummy - need move out from here
             // Aspect of the Viper
             case 34074:

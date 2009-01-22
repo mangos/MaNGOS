@@ -258,7 +258,7 @@ class MANGOS_DLL_SPEC Aura
         uint8 GetAuraLevel() const { return m_auraLevel; }
         void SetAuraLevel(uint8 level) { m_auraLevel = level; }
         uint8 GetAuraCharges() const { return m_procCharges; }
-        void SetAuraCharges(uint8 charges) 
+        void SetAuraCharges(uint8 charges)
         {
             if (m_procCharges == charges)
                 return;
@@ -266,7 +266,7 @@ class MANGOS_DLL_SPEC Aura
             SendAuraUpdate(false);
         }
         bool DropAuraCharge() // return true if last charge dropped
-        { 
+        {
             if (m_procCharges == 0)
                 return false;
             m_procCharges--;

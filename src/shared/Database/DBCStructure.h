@@ -1410,7 +1410,7 @@ struct VehicleEntry
     uint32  m_uiSeatIndicatorType;                          // 42
 };
 
-struct VehicleSeatEntry 
+struct VehicleSeatEntry
 {
     uint32  m_ID;                                           // 0
     uint32  m_flags;                                        // 1

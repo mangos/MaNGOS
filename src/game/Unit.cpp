@@ -1099,7 +1099,7 @@ void Unit::CalculateSpellDamage(SpellNonMeleeDamage *damageInfo, int32 damage, S
                 ignore = true;
                 break;
             }
-        
+
         if (!ignore)
         {
             CalcAbsorbResist(pVictim, damageSchoolMask, SPELL_DIRECT_DAMAGE, damage, &damageInfo->absorb, &damageInfo->resist);
@@ -2399,7 +2399,7 @@ SpellMissInfo Unit::MeleeSpellHitResult(Unit *pVictim, SpellEntry const *spell)
         // Can`t dodge from behind in PvP (but its possible in PvE)
         if (GetTypeId() == TYPEID_PLAYER && pVictim->GetTypeId() == TYPEID_PLAYER)
             canDodge = false;
-        // Can`t parry 
+        // Can`t parry
         canParry = false;
     }
     // Check creatures flags_extra for disable parry
@@ -4744,7 +4744,7 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     for(AuraMap::iterator iter = Auras.begin(); iter != Auras.end();)
                     {
                         SpellEntry const *spell = iter->second->GetSpellProto();
-                        if( spell->Mechanic == MECHANIC_STUN || 
+                        if( spell->Mechanic == MECHANIC_STUN ||
                             spell->EffectMechanic[iter->second->GetEffIndex()] == MECHANIC_STUN)
                         {
                             pVictim->RemoveAurasDueToSpell(spell->Id);
@@ -5837,7 +5837,7 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
             // Mark of Blood
             if (dummySpell->Id == 49005)
             {
-                // TODO: need more info (cooldowns/PPM) 
+                // TODO: need more info (cooldowns/PPM)
                 triggered_spell_id = 50424;
                 break;
             }
@@ -7842,7 +7842,7 @@ bool Unit::isSpellCrit(Unit *pVictim, SpellEntry const *spellProto, SpellSchoolM
                 }
                 // Glyph of Shadowburn
                 if (spellProto->SpellFamilyName == SPELLFAMILY_WARLOCK &&
-                    spellProto->SpellFamilyFlags & 0x0000000000000080LL && 
+                    spellProto->SpellFamilyFlags & 0x0000000000000080LL &&
                     pVictim->HasAuraState(AURA_STATE_HEALTHLESS_35_PERCENT))
                 {
                     AuraList const& mOverrideClassScript = GetAurasByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
