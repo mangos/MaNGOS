@@ -22,7 +22,7 @@
 DROP TABLE IF EXISTS `db_version`;
 CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
-  `required_7149_01_mangos_spell_proc_event` bit(1) default NULL
+  `required_7150_01_mangos_playercreateinfo_spell` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -11769,6 +11769,7 @@ INSERT INTO `playercreateinfo_spell` VALUES
 (7,9,22027,'Remove Insignia'),
 (7,9,22810,'Opening - No Text'),
 (7,9,45927,'Summon Friend'),
+(7,9,58284,'Chaos Bolt Passive'),
 (7,9,61437,'Opening'),
 (8,1,78,'Heroic Strike'),
 (8,1,81,'Dodge'),
@@ -12383,6 +12384,7 @@ INSERT INTO `playercreateinfo_spell` VALUES
 (10,9,28730,'Arcane Torrent'),
 (10,9,28734,'Mana Tap'),
 (10,9,28877,'Arcane Affinity'),
+(10,9,58284,'Chaos Bolt Passive'),
 (11,1,78,'Heroic Strike'),
 (11,1,81,'Dodge'),
 (11,1,107,'Block'),
