@@ -1494,6 +1494,8 @@ class MANGOS_DLL_SPEC Player : public Unit
         uint32 resetTalentsCost() const;
         void InitTalentForLevel();
 
+        uint32 CalculateTalentsPoints() const;
+
         void InitGlyphsForLevel();
         void SetGlyphSlot(uint8 slot, uint32 slottype) { SetUInt32Value(PLAYER_FIELD_GLYPH_SLOTS_1 + slot, slottype); }
         uint32 GetGlyphSlot(uint8 slot) { return GetUInt32Value(PLAYER_FIELD_GLYPH_SLOTS_1 + slot); }
@@ -2393,6 +2395,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         uint32 m_resetTalentsCost;
         time_t m_resetTalentsTime;
         uint32 m_usedTalentCount;
+        uint32 m_questRewardTalentCount;
 
         // Social
         PlayerSocial *m_social;
