@@ -214,7 +214,6 @@ void WorldSession::HandleTaxiNextDestinationOpcode(WorldPacket& recv_data)
         GetPlayer()->SetPosition(movementInfo.x, movementInfo.y, movementInfo.z, movementInfo.o);
         GetPlayer()->m_movementInfo = movementInfo;
         GetPlayer()->SetUnitMovementFlags(movementInfo.flags);
-        GetPlayer()->m_anti_lastmovetime = movementInfo.time;
 
         int32 timedelta = 0;
         if (GetPlayer()->m_anti_lastmovetime !=0){

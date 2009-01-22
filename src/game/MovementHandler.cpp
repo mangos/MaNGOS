@@ -208,7 +208,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
     {
         // transports size limited
         // (also received at zeppelin leave by some reason with t_* as absolute in continent coordinates, can be safely skipped)
-        if( movementInfo.t_x > 60 || movementInfo.t_y > 60 || movementInfo.t_z > 60 )
+        if( movementInfo.t_x > 60 || movementInfo.t_y > 60 || movementInfo.t_x < -60 ||  movementInfo.t_y < -60 )
             return;
 
         if( !MaNGOS::IsValidMapCoord(movementInfo.x+movementInfo.t_x, movementInfo.y+movementInfo.t_y,
@@ -804,6 +804,8 @@ void WorldSession::HandleMoveKnockBackAck( WorldPacket & recv_data )
 
     /* extract packet */
     MovementInfo movementInfo;
+    uint32 unk1,unk2,unk3;
+    recv_data >> unk1 >> unk2 >> unk3;
     ReadMovementInfo(recv_data, &movementInfo);
 
     //Save movement flags
