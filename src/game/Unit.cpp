@@ -9349,6 +9349,8 @@ bool Unit::SelectHostilTarget()
 
     assert(GetTypeId()== TYPEID_UNIT);
 
+    if (!this->isAlive())
+        return false;
     //This function only useful once AI has been initialized
     if (!((Creature*)this)->AI())
         return false;
