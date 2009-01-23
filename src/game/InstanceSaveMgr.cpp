@@ -356,8 +356,8 @@ void InstanceSaveManager::PackInstances()
         bar.step();
     }
 
-    sLog.outString();
     sLog.outString( ">> Instance numbers remapped, next instance id is %u", InstanceNumber );
+    sLog.outString();
 }
 
 void InstanceSaveManager::LoadResetTimes()
