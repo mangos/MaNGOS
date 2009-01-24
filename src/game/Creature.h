@@ -427,7 +427,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
         bool canFly()  const { return GetCreatureInfo()->InhabitType & INHABIT_AIR; }
         ///// TODO RENAME THIS!!!!!
         bool isCanTrainingOf(Player* player, bool msg) const;
-        bool isCanIneractWithBattleMaster(Player* player, bool msg) const;
+        bool isCanInteractWithBattleMaster(Player* player, bool msg) const;
         bool isCanTrainingAndResetTalentsOf(Player* pPlayer) const;
         bool IsOutOfThreatArea(Unit* pVictim) const;
         bool IsImmunedToSpell(SpellEntry const* spellInfo);
