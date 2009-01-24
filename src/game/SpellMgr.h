@@ -897,6 +897,9 @@ class SpellMgr
         static bool IsPrimaryProfessionSpell(uint32 spellId);
         bool IsPrimaryProfessionFirstRankSpell(uint32 spellId) const;
 
+        bool IsSkillBonusSpell(uint32 spellId) const;
+
+
         // Spell script targets
         SpellScriptTarget::const_iterator GetBeginSpellScriptTarget(uint32 spell_id) const
         {

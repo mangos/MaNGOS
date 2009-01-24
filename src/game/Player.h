@@ -85,8 +85,9 @@ enum PlayerSpellState
 struct PlayerSpell
 {
     PlayerSpellState state : 8;
-    bool active            : 1;
-    bool disabled          : 1;
+    bool active            : 1;                             // show in spellbook
+    bool dependent         : 1;                             // learned as result another spell learn, skill grow, quest reward, etc
+    bool disabled          : 1;                             // first rank has been learned in result talent learn but currently talent unlearned, save max learned ranks
 };
 
 // Spell modifier (used for modify other spells)
@@ -1477,11 +1478,12 @@ class MANGOS_DLL_SPEC Player : public Unit
         bool HasSpell(uint32 spell) const;
         TrainerSpellState GetTrainerSpellState(TrainerSpell const* trainer_spell) const;
         bool IsSpellFitByClassAndRace( uint32 spell_id ) const;
+        bool IsNeedCastPassiveSpellAtLearn(SpellEntry const* spellInfo) const;
 
         void SendProficiency(uint8 pr1, uint32 pr2);
         void SendInitialSpells();
-        bool addSpell(uint32 spell_id, bool active, bool learning, bool disabled);
-        void learnSpell(uint32 spell_id);
+        bool addSpell(uint32 spell_id, bool active, bool learning, bool dependent, bool disabled);
+        void learnSpell(uint32 spell_id, bool dependent);
         void removeSpell(uint32 spell_id, bool disabled = false);
         void resetSpells();
         void learnDefaultSpells();
@@ -1768,7 +1770,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         int16 GetSkillPermBonusValue(uint32 skill) const;
         int16 GetSkillTempBonusValue(uint32 skill) const;
         bool HasSkill(uint32 skill) const;
-        void learnSkillRewardedSpells( uint32 id );
+        void learnSkillRewardedSpells(uint32 id);
         void learnSkillRewardedSpells();
 
         void SetDontMove(bool dontMove);
