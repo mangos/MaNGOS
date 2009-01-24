@@ -1087,7 +1087,7 @@ void Pet::_LoadSpells()
         {
             Field *fields = result->Fetch();
 
-            addSpell(fields[0].GetUInt16(), fields[1].GetUInt16(), PETSPELL_UNCHANGED);
+            addSpell(fields[0].GetUInt32(), fields[1].GetUInt16(), PETSPELL_UNCHANGED);
         }
         while( result->NextRow() );
 
@@ -1240,7 +1240,7 @@ void Pet::_SaveAuras()
     }
 }
 
-bool Pet::addSpell(uint16 spell_id, uint16 active, PetSpellState state, PetSpellType type)
+bool Pet::addSpell(uint32 spell_id, uint16 active, PetSpellState state, PetSpellType type)
 {
     SpellEntry const *spellInfo = sSpellStore.LookupEntry(spell_id);
     if (!spellInfo)
@@ -1353,7 +1353,7 @@ bool Pet::addSpell(uint16 spell_id, uint16 active, PetSpellState state, PetSpell
     return true;
 }
 
-bool Pet::learnSpell(uint16 spell_id)
+bool Pet::learnSpell(uint32 spell_id)
 {
     // prevent duplicated entires in spell book
     if (!addSpell(spell_id))
@@ -1390,7 +1390,7 @@ void Pet::learnLevelupSpells()
     }
 }
 
-bool Pet::unlearnSpell(uint16 spell_id)
+bool Pet::unlearnSpell(uint32 spell_id)
 {
     if(removeSpell(spell_id))
     {
@@ -1408,7 +1408,7 @@ bool Pet::unlearnSpell(uint16 spell_id)
     return false;
 }
 
-bool Pet::removeSpell(uint16 spell_id)
+bool Pet::removeSpell(uint32 spell_id)
 {
     PetSpellMap::iterator itr = m_spells.find(spell_id);
     if (itr == m_spells.end())
@@ -1442,7 +1442,7 @@ bool Pet::removeSpell(uint16 spell_id)
     return true;
 }
 
-bool Pet::_removeSpell(uint16 spell_id)
+bool Pet::_removeSpell(uint32 spell_id)
 {
     PetSpellMap::iterator itr = m_spells.find(spell_id);
     if (itr != m_spells.end())
@@ -1459,7 +1459,7 @@ void Pet::InitPetCreateSpells()
     m_charmInfo->InitPetActionBar();
 
     m_spells.clear();
-    int32 petspellid;
+    uint32 petspellid;
     PetCreateSpellEntry const* CreateSpells = objmgr.GetPetCreateSpellEntry(GetEntry());
     if(CreateSpells)
     {
@@ -1654,7 +1654,7 @@ void Pet::ToggleAutocast(uint32 spellid, bool apply)
     if(IsPassiveSpell(spellid))
         return;
 
-    PetSpellMap::const_iterator itr = m_spells.find((uint16)spellid);
+    PetSpellMap::const_iterator itr = m_spells.find(spellid);
 
     int i;
 
@@ -1708,7 +1708,7 @@ bool Pet::Create(uint32 guidlow, Map *map, uint32 Entry, uint32 pet_number)
 
 bool Pet::HasSpell(uint32 spell) const
 {
-    PetSpellMap::const_iterator itr = m_spells.find((uint16)spell);
+    PetSpellMap::const_iterator itr = m_spells.find(spell);
     return (itr != m_spells.end() && itr->second->state != PETSPELL_REMOVED );
 }
 
