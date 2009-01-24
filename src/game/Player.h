@@ -1770,7 +1770,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         int16 GetSkillPermBonusValue(uint32 skill) const;
         int16 GetSkillTempBonusValue(uint32 skill) const;
         bool HasSkill(uint32 skill) const;
-        void learnSkillRewardedSpells(uint32 id);
+        void learnSkillRewardedSpells(uint32 id, uint32 value);
         void learnSkillRewardedSpells();
 
         void SetDontMove(bool dontMove);
