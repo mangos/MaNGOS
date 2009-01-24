@@ -39,25 +39,14 @@ char const* petTypeSuffix[MAX_PET_TYPE] =
     "'s Companion"                                          // MINI_PET
 };
 
-Pet::Pet(PetType type) : Creature()
+Pet::Pet(PetType type) :
+Creature(), m_petType(type), m_removed(false), m_happinessTimer(7500), m_duration(0), m_bonusdamage(0),
+m_resetTalentsCost(0), m_resetTalentsTime(0), m_usedTalentCount(0), m_auraUpdateMask(0), m_loading(false),
+m_declinedname(NULL)
 {
     m_isPet = true;
     m_name = "Pet";
-    m_petType = type;
-
-    m_removed = false;
     m_regenTimer = 4000;
-    m_happinessTimer = 7500;
-    m_duration = 0;
-    m_bonusdamage = 0;
-
-    m_resetTalentsCost = 0;
-    m_resetTalentsTime = 0;
-    m_usedTalentCount = 0;
-
-    m_auraUpdateMask = 0;
-
-    m_loading = false;
 
     // pets always have a charminfo, even if they are not actually charmed
     CharmInfo* charmInfo = InitCharmInfo(this);
@@ -66,13 +55,6 @@ Pet::Pet(PetType type) : Creature()
         charmInfo->SetReactState(REACT_PASSIVE);
     else if(type == GUARDIAN_PET)                           // always aggressive
         charmInfo->SetReactState(REACT_AGGRESSIVE);
-
-    m_spells.clear();
-    m_Auras.clear();
-    m_CreatureSpellCooldowns.clear();
-    m_CreatureCategoryCooldowns.clear();
-    m_autospells.clear();
-    m_declinedname = NULL;
 }
 
 Pet::~Pet()
