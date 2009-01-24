@@ -1398,16 +1398,6 @@ void Spell::EffectDummy(uint32 i)
             }
             break;
         case SPELLFAMILY_DRUID:
-            switch(m_spellInfo->Id )
-            {
-                case 5420:                                  // Tree of Life passive
-                {
-                    // Tree of Life area effect
-                    int32 health_mod = int32(m_caster->GetStat(STAT_SPIRIT)/4);
-                    m_caster->CastCustomSpell(m_caster,34123,&health_mod,NULL,NULL,true,NULL);
-                    return;
-                }
-            }
             break;
         case SPELLFAMILY_ROGUE:
             switch(m_spellInfo->Id )
