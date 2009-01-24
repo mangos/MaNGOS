@@ -2218,7 +2218,7 @@ void Spell::EffectApplyAura(uint32 i)
         (unitTarget->GetTypeId()!=TYPEID_PLAYER || !((Player*)unitTarget)->GetSession()->PlayerLoading()) )
         return;
 
-    Unit* caster = m_originalCasterGUID ? m_originalCaster : m_caster;
+    Unit* caster = m_originalCaster ? m_originalCaster : m_caster;
     if(!caster)
         return;
 

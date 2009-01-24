@@ -807,7 +807,7 @@ enum Targets
     TARGET_EFFECT_SELECT               = 18,                // highly depends on the spell effect
     TARGET_ALL_PARTY_AROUND_CASTER     = 20,
     TARGET_SINGLE_FRIEND               = 21,
-    TARGET_ALL_AROUND_CASTER           = 22,                // used only in TargetA, target selection dependent from TargetB
+    TARGET_CASTER_COORDINATES          = 22,                // used only in TargetA, target selection dependent from TargetB
     TARGET_GAMEOBJECT                  = 23,
     TARGET_IN_FRONT_OF_CASTER          = 24,
     TARGET_DUELVSPLAYER                = 25,
