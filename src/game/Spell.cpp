@@ -2044,15 +2044,17 @@ void Spell::prepare(SpellCastTargets const* targets, Aura* triggeredByAura)
 
     m_spellState = SPELL_STATE_PREPARING;
 
-    // Check original caster is GO - set its coordinates as src cast
-    WorldObject *caster = NULL;
-    if (m_originalCasterGUID)
-        caster = (WorldObject *)ObjectAccessor::GetObjectByTypeMask(*m_caster, m_originalCasterGUID, TYPEMASK_GAMEOBJECT);
-    if (!caster)
-        caster = m_caster;
-
-    // Set cast source for targets
-    m_targets.setSource(caster->GetPositionX(), caster->GetPositionY(), caster->GetPositionZ());
+    if (!(m_targets.m_targetMask & TARGET_FLAG_SOURCE_LOCATION))
+    {
+        // Check original caster is GO - set its coordinates as src cast
+        WorldObject *caster = NULL;
+        if (m_originalCasterGUID)
+            caster = ObjectAccessor::GetGameObject(*m_caster, m_originalCasterGUID);
+        if (!caster)
+            caster = m_caster;
+        // Set cast source for targets
+        m_targets.setSource(caster->GetPositionX(), caster->GetPositionY(), caster->GetPositionZ());
+    }
 
     m_castPositionX = m_caster->GetPositionX();
     m_castPositionY = m_caster->GetPositionY();
@@ -5420,7 +5422,13 @@ bool Spell::CheckTarget( Unit* target, uint32 eff )
             // all ok by some way or another, skip normal check
             break;
         default:                                            // normal case
-            if(target!=m_caster && !target->IsWithinLOSInMap(m_caster))
+            // Get GO cast coordinates if original caster -> GO
+            WorldObject *caster = NULL;
+            if (m_originalCasterGUID)
+                caster = ObjectAccessor::GetGameObject(*m_caster, m_originalCasterGUID);
+            if (!caster)
+                caster = m_caster;
+            if(target!=m_caster && !target->IsWithinLOSInMap(caster))
                 return false;
             break;
     }
