@@ -632,8 +632,6 @@ void Spell::FillTargetMap()
                     break;
             }
         }
-        if(IsChanneledSpell(m_spellInfo) && !tmpUnitMap.empty())
-            m_needAliveTargetMask  |= (1<<i);
 
         if(m_caster->GetTypeId() == TYPEID_PLAYER)
         {
@@ -3005,6 +3003,8 @@ void Spell::WriteAmmoToPacket( WorldPacket * data )
 
 void Spell::WriteSpellGoTargets( WorldPacket * data )
 {
+    // This function also fill data for channeled spells:
+    // m_needAliveTargetMask req for stop channelig if one target die
     uint32 hit  = m_UniqueGOTargetInfo.size(); // Always hits on GO
     uint32 miss = 0;
     for(std::list<TargetInfo>::iterator ihit= m_UniqueTargetInfo.begin();ihit != m_UniqueTargetInfo.end();++ihit)
@@ -3024,7 +3024,10 @@ void Spell::WriteSpellGoTargets( WorldPacket * data )
     *data << (uint8)hit;
     for(std::list<TargetInfo>::iterator ihit= m_UniqueTargetInfo.begin();ihit != m_UniqueTargetInfo.end();++ihit)
         if ((*ihit).missCondition == SPELL_MISS_NONE)       // Add only hits
+        {
             *data << uint64(ihit->targetGUID);
+            m_needAliveTargetMask |=ihit->effectMask;
+        }
 
     for(std::list<GOTargetInfo>::iterator ighit= m_UniqueGOTargetInfo.begin();ighit != m_UniqueGOTargetInfo.end();++ighit)
         *data << uint64(ighit->targetGUID);                 // Always hits
@@ -3040,6 +3043,9 @@ void Spell::WriteSpellGoTargets( WorldPacket * data )
                 *data << uint8(ihit->reflectResult);
         }
     }
+    // Reset m_needAliveTargetMask for non channeled spell
+    if(!IsChanneledSpell(m_spellInfo))
+        m_needAliveTargetMask = 0;
 }
 
 void Spell::SendLogExecute()
