@@ -19012,6 +19012,13 @@ void Player::UpdateAreaDependentAuras( uint32 newArea )
                 if( !HasAura(51721,0) )
                     CastSpell(this,51721,true);
             break;
+        // Mist of the Kvaldir
+        case 4028:                                          //Riplash Strand
+        case 4029:                                          //Riplash Ruins
+        case 4106:                                          //Garrosh's Landing
+        case 4031:                                          //Pal'ea
+            CastSpell(this,54119,true);
+            break;
     }
 }
 
