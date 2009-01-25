@@ -7477,8 +7477,10 @@ uint32 Unit::SpellDamageBonus(Unit *pVictim, SpellEntry const *spellProto, uint3
         if( (*i)->GetModifier()->m_miscvalue & GetSpellSchoolMask(spellProto) )
             TakenTotalMod *= ((*i)->GetModifier()->m_amount+100.0f)/100.0f;
 
-    // done scripted mod
-    AuraList const& mOverrideClassScript = GetAurasByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
+    // done scripted mod (take it from owner)
+    Unit *owner = GetOwner();
+    if (!owner) owner = this;
+    AuraList const& mOverrideClassScript= owner->GetAurasByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
     for(AuraList::const_iterator i = mOverrideClassScript.begin(); i != mOverrideClassScript.end(); ++i)
     {
         if (!(*i)->isAffectedOnSpell(spellProto))
@@ -7535,10 +7537,13 @@ uint32 Unit::SpellDamageBonus(Unit *pVictim, SpellEntry const *spellProto, uint3
                 }
                 break;
             }
-            // Increased Lightning Damage
-            case 4554:
-            case 5142:
-            case 6008:
+            case 4418: // Increased Shock Damage
+            case 4554: // Increased Lightning Damage
+            case 4555: // Improved Moonfire
+            case 5142: // Increased Lightning Damage
+            case 5147: // Improved Consecration
+            case 5148: // Idol of the Shooting Star
+            case 6008: // Increased Lightning Damage / Totem of Hex
             {
                 pdamage+=(*i)->GetModifier()->m_amount;
                 break;
@@ -7569,6 +7574,21 @@ uint32 Unit::SpellDamageBonus(Unit *pVictim, SpellEntry const *spellProto, uint3
                 }
                 break;
             }
+            case 7293:
+            {
+                AuraList const& auras = pVictim->GetAurasByType(SPELL_AURA_PERIODIC_DAMAGE);
+                for(AuraList::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
+                {
+                    SpellEntry const* m_spell = (*itr)->GetSpellProto();
+                    if (m_spell->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT &&
+                        m_spell->SpellFamilyFlags & 0x0200000000000000LL)
+                    {
+                        DoneTotalMod *= ((*i)->GetModifier()->m_amount+100.0f)/100.0f;
+                        break;
+                    }
+                }
+                break;
+            }
             // Twisted Faith
             case 7377:
             {
@@ -7586,16 +7606,6 @@ uint32 Unit::SpellDamageBonus(Unit *pVictim, SpellEntry const *spellProto, uint3
                 }
                 break;
             }
-        }
-    }
-    // taken scripted mod
-    AuraList const& mOverrideClassScriptTaken = GetAurasByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
-    for(AuraList::const_iterator i = mOverrideClassScriptTaken.begin(); i != mOverrideClassScriptTaken.end(); ++i)
-    {
-        if (!(*i)->isAffectedOnSpell(spellProto))
-            continue;
-        switch((*i)->GetModifier()->m_miscvalue)
-        {
             // Marked for Death
             case 7598:
             case 7599:
@@ -7603,9 +7613,17 @@ uint32 Unit::SpellDamageBonus(Unit *pVictim, SpellEntry const *spellProto, uint3
             case 7601:
             case 7602:
             {
-                if ((*i)->GetCasterGUID()==GetGUID() ||     // Self
-                    (*i)->GetCasterGUID()==GetOwnerGUID())  // Owner
-                    DoneTotalMod *= ((*i)->GetModifier()->m_amount+100.0f)/100.0f;
+                AuraList const& auras = pVictim->GetAurasByType(SPELL_AURA_MOD_STALKED);
+                for(AuraList::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
+                {
+                    SpellEntry const* m_spell = (*itr)->GetSpellProto();
+                    if (m_spell->SpellFamilyName == SPELLFAMILY_HUNTER &&
+                        m_spell->SpellFamilyFlags & 0x0000000000000400LL)
+                    {
+                        DoneTotalMod *= ((*i)->GetModifier()->m_amount+100.0f)/100.0f;
+                        break;
+                    }
+                }
                 break;
             }
         }
