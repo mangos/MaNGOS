@@ -2287,7 +2287,6 @@ class MANGOS_DLL_SPEC Player : public Unit
         time_t m_lastHonorUpdateTime;
 
         void outDebugValues() const;
-        bool _removeSpell(uint16 spell_id);
         uint64 m_lootGuid;
 
         uint32 m_race;
