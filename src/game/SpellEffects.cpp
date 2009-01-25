@@ -1288,6 +1288,12 @@ void Spell::EffectDummy(uint32 i)
                     m_caster->CastCustomSpell(m_caster, 12976, &healthModSpellBasePoints0, NULL, NULL, true, NULL);
                     return;
                 }
+                // Bloodthirst
+                case 23881:
+                {
+                    m_caster->CastCustomSpell(unitTarget, 23885, &damage, NULL, NULL, true, NULL);
+                    return;
+                }
             }
             break;
         case SPELLFAMILY_WARLOCK:

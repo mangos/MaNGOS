@@ -6550,11 +6550,16 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
             // Need add combopoint AFTER finish movie (or they dropped in finish phase)
             break;
         }
+        // Bloodthirst (($m/100)% of max health)
+        case 23880:
+        {
+            basepoints0 = int32(GetMaxHealth() * triggerAmount / 10000);
+            break;
+        }
         // Shamanistic Rage triggered spell
         case 30824:
         {
             basepoints0 = int32(GetTotalAttackPowerValue(BASE_ATTACK) * triggerAmount / 100);
-            trigger_spell_id = 30824;
             break;
         }
         // Enlightenment (trigger only from mana cost spells)
