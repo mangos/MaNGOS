@@ -74,17 +74,45 @@ MotionMaster::~MotionMaster()
 }
 
 void
-MotionMaster::UpdateMotion(const uint32 &diff)
+MotionMaster::UpdateMotion(uint32 diff)
 {
     if( i_owner->hasUnitState(UNIT_STAT_ROOT | UNIT_STAT_STUNNED) )
         return;
     assert( !empty() );
+    m_cleanFlag |= MMCF_UPDATE;
     if (!top()->Update(*i_owner, diff))
+    {
+        m_cleanFlag &= ~MMCF_UPDATE;
         MovementExpired();
+    }
+    else
+        m_cleanFlag &= ~MMCF_UPDATE;
+
+    if (m_expList)
+    {
+        for (int i = 0; i < m_expList.size(); ++i)
+        {
+            MovementGenerator* mg = m_expList[i];
+            if (!isStatic(mg))
+                delete mg;
+        }
+
+        delete m_expList;
+        m_expList = NULL;
+
+        if (empty())
+            Initialize();
+
+        if (m_cleanFlag & MMCF_RESET)
+        {
+            top()->Reset(*i_owner);
+            m_cleanFlag &= ~MMCF_RESET;
+        }
+    }
 }
 
 void
-MotionMaster::Clear(bool reset)
+MotionMaster::DirectClean(bool reset)
 {
     while( !empty() && size() > 1 )
     {
@@ -103,7 +131,24 @@ MotionMaster::Clear(bool reset)
 }
 
 void
-MotionMaster::MovementExpired(bool reset)
+MotionMaster::DelayedClean()
+{
+    if (empty() || size() == 1)
+        return;
+
+    m_expList = new ExpireList();
+    while( !empty() && size() > 1 )
+    {
+        MovementGenerator *curr = top();
+        curr->Finalize(*i_owner);
+        pop();
+        if( !isStatic( curr ) )
+            m_expList->push_back(curr);
+    }
+}
+
+void
+MotionMaster::DirectExpire(bool reset)
 {
     if( empty() || size() == 1 )
         return;
@@ -127,6 +172,30 @@ MotionMaster::MovementExpired(bool reset)
     if( empty() )
         Initialize();
     if (reset) top()->Reset(*i_owner);
+}
+
+void
+MotionMaster::DelayedExpire()
+{
+    if( empty() || size() == 1 )
+        return;
+
+    MovementGenerator *curr = top();
+    curr->Finalize(*i_owner);
+    pop();
+
+    if( !isStatic(curr) )
+        m_expList->push_back(curr);
+
+    m_expList = new ExpireList();
+    while( !empty() && top()->GetMovementGeneratorType() == TARGETED_MOTION_TYPE )
+    {
+        // Should check if target is still valid? If not valid it will crash.
+        curr = top();
+        curr->Finalize(*i_owner);
+        pop();
+        m_expList->push_back(curr);
+    }
 }
 
 void MotionMaster::MoveIdle()
