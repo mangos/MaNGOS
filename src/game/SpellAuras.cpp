@@ -2220,6 +2220,28 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
         {
             break;
         }
+        case SPELLFAMILY_PRIEST:
+        {
+            // Pain and Suffering
+            if( m_spellProto->SpellIconID == 2874 && m_target->GetTypeId()==TYPEID_PLAYER )
+            {
+                if(apply)
+                {
+                    // Reduce backfire damage (dot damage) from Shadow Word: Death
+                    SpellModifier *mod = new SpellModifier;
+                    mod->op = SPELLMOD_DOT;
+                    mod->value = m_modifier.m_amount;
+                    mod->type = SPELLMOD_PCT;
+                    mod->spellId = GetId();
+                    mod->mask = 0x0000000200000000LL;
+                    mod->mask2= 0LL;
+                    m_spellmod = mod;
+                }
+                ((Player*)m_target)->AddSpellMod(m_spellmod, apply);
+                return;
+            }
+            break;
+        }
         case SPELLFAMILY_DRUID:
         {
             // Lifebloom

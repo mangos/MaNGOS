@@ -4937,6 +4937,34 @@ void Spell::EffectScriptEffect(uint32 effIndex)
             }
             break;
         }
+        case SPELLFAMILY_PRIEST:
+        {
+            switch(m_spellInfo->Id)
+            {
+                // Pain and Suffering
+                case 47948:
+                {
+                    if (!unitTarget)
+                        return;
+                    // Refresh Shadow Word: Pain on target
+                    Unit::AuraList const &mPeriodic = unitTarget->GetAurasByType(SPELL_AURA_PERIODIC_DAMAGE);
+                    for(Unit::AuraList::const_iterator i = mPeriodic.begin(); i != mPeriodic.end(); ++i)
+                    {
+                        if( (*i)->GetSpellProto()->SpellFamilyName == SPELLFAMILY_PRIEST &&
+                            (*i)->GetSpellProto()->SpellFamilyFlags & 0x0000000000008000LL &&
+                            (*i)->GetCasterGUID()==m_caster->GetGUID() )
+                        {
+                            (*i)->RefreshAura();
+                            return;
+                        }
+                    }
+                    return;
+                }
+                default:
+                    break;
+            }
+            break;
+        }
         case SPELLFAMILY_HUNTER:
         {
             switch(m_spellInfo->Id)
