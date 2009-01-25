@@ -1566,7 +1566,14 @@ void Spell::SetTargetMap(uint32 i,uint32 cur,std::list<Unit*> &TagUnitMap)
         }break;
         case TARGET_CASTER_COORDINATES:
         {
-            m_targets.setDestination(m_targets.m_srcX, m_targets.m_srcY, m_targets.m_srcZ);
+            // Check original caster is GO - set its coordinates as dst cast
+            WorldObject *caster = NULL;
+            if (m_originalCasterGUID)
+                caster = ObjectAccessor::GetGameObject(*m_caster, m_originalCasterGUID);
+            if (!caster)
+                caster = m_caster;
+            // Set dest for targets
+            m_targets.setDestination(caster->GetPositionX(), caster->GetPositionY(), caster->GetPositionZ());
         }break;
         case TARGET_ALL_FRIENDLY_UNITS_AROUND_CASTER:
         {
@@ -2037,18 +2044,6 @@ void Spell::prepare(SpellCastTargets const* targets, Aura* triggeredByAura)
     m_targets = *targets;
 
     m_spellState = SPELL_STATE_PREPARING;
-
-    if (!(m_targets.m_targetMask & TARGET_FLAG_SOURCE_LOCATION))
-    {
-        // Check original caster is GO - set its coordinates as src cast
-        WorldObject *caster = NULL;
-        if (m_originalCasterGUID)
-            caster = ObjectAccessor::GetGameObject(*m_caster, m_originalCasterGUID);
-        if (!caster)
-            caster = m_caster;
-        // Set cast source for targets
-        m_targets.setSource(caster->GetPositionX(), caster->GetPositionY(), caster->GetPositionZ());
-    }
 
     m_castPositionX = m_caster->GetPositionX();
     m_castPositionY = m_caster->GetPositionY();
