@@ -19485,3 +19485,13 @@ bool Player::IsAllowUseFlyMountsHere() const
     uint32 v_map = GetVirtualMapForMapAndZone(GetMapId(), GetZoneId());
     return v_map == 530 || v_map == 571 && HasSpell(54197);
 }
+
+void Player::learnSpellHighRank(uint32 spellid)
+{
+    learnSpell(spellid,false);
+
+    SpellChainMapNext const& nextMap = spellmgr.GetSpellChainNext();
+    for(SpellChainMapNext::const_iterator itr = nextMap.lower_bound(spellid); itr != nextMap.upper_bound(spellid); ++itr)
+        learnSpellHighRank(itr->second);
+}
+
