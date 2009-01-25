@@ -955,7 +955,7 @@ bool ChatHandler::HandleUnLearnCommand(const char* args)
         spell_id = spellmgr.GetFirstSpellInChain (spell_id);
 
     if (target->HasSpell(spell_id))
-        target->removeSpell(spell_id);
+        target->removeSpell(spell_id,false,!allRanks);
     else
         SendSysMessage(LANG_FORGET_SPELL);
 

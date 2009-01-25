@@ -2696,10 +2696,6 @@ bool Player::addSpell(uint32 spell_id, bool active, bool learning, bool dependen
                     if(!rankSpellId || rankSpellId==spell_id)
                         continue;
 
-                    // skip unknown ranks
-                    if(!HasSpell(rankSpellId))
-                        continue;
-
                     removeSpell(rankSpellId);
                 }
             }
@@ -2943,7 +2939,7 @@ void Player::learnSpell(uint32 spell_id, bool dependent)
     GetSession()->SendPacket(&data);
 }
 
-void Player::removeSpell(uint32 spell_id, bool disabled)
+void Player::removeSpell(uint32 spell_id, bool disabled, bool update_action_bar_for_low_rank)
 {
     PlayerSpellMap::iterator itr = m_spells.find(spell_id);
     if (itr == m_spells.end())
@@ -3079,13 +3075,13 @@ void Player::removeSpell(uint32 spell_id, bool disabled)
     {
         SpellEntry const *spellInfo = sSpellStore.LookupEntry(spell_id);
 
-        // if talent then lesser rank also talen and need learn
+            // if talent then lesser rank also talent and need learn
         if(talentCosts)
             learnSpell (prev_id,false);
-        // if ranked non-stackable spell: need activate lesser rank and update dendence state
+            // if ranked non-stackable spell: need activate lesser rank and update dendence state
         else if(cur_active && !SpellMgr::canStackSpellRanks(spellInfo) && spellmgr.GetSpellRank(spellInfo->Id) != 0)
         {
-            // need manually update dependence state (learn spell ignore like attempts)
+                // need manually update dependence state (learn spell ignore like attempts)
             PlayerSpellMap::iterator prev_itr = m_spells.find(prev_id);
             if (prev_itr != m_spells.end())
             {
@@ -3101,12 +3097,15 @@ void Player::removeSpell(uint32 spell_id, bool disabled)
                 {
                     if(addSpell(prev_id,true,false,prev_itr->second->dependent,prev_itr->second->disabled))
                     {
-                        // downgrade spell ranks in spellbook and action bar
-                        WorldPacket data(SMSG_SUPERCEDED_SPELL, (4));
-                        data << uint16(spell_id);
-                        data << uint16(prev_id);
-                        GetSession()->SendPacket( &data );
-                        prev_activate = true;
+                        if(update_action_bar_for_low_rank)
+                        {
+                            // downgrade spell ranks in spellbook and action bar
+                            WorldPacket data(SMSG_SUPERCEDED_SPELL, (4));
+                            data << uint16(spell_id);
+                            data << uint16(prev_id);
+                            GetSession()->SendPacket( &data );
+                            prev_activate = true;
+                        }
                     }
                 }
             }
@@ -5107,8 +5106,11 @@ void Player::SetSkill(uint32 id, uint16 currVal, uint16 maxVal)
             SetUInt32Value(PLAYER_SKILL_VALUE_INDEX(i),0);
             SetUInt32Value(PLAYER_SKILL_BONUS_INDEX(i),0);
 
-            // remove spells that depend on this skill when removing the skill
-            learnSkillRewardedSpells(id, 0);
+            // remove all spells that related to this skill
+            for (uint32 j=0; j<sSkillLineAbilityStore.GetNumRows(); ++j)
+                if(SkillLineAbilityEntry const *pAbility = sSkillLineAbilityStore.LookupEntry(j))
+                    if (pAbility->skillId==id)
+                        removeSpell(spellmgr.GetFirstSpellInChain(pAbility->spellId));
         }
     }
     else if(currVal)                                        //add
