@@ -2214,6 +2214,8 @@ void Spell::cast(bool skipCheck)
             if (m_spellInfo->Mechanic == MECHANIC_SHIELD &&
                 m_spellInfo->SpellIconID == 566)                       // Power Word: Shield
                 m_preCastSpell = 6788;                                 // Weakened Soul
+            if (m_spellInfo->Id == 47585)                              // Dispersion (transform)
+                m_preCastSpell = 60069;                                // Dispersion (mana regen)
             break;
         }
         case SPELLFAMILY_PALADIN:
