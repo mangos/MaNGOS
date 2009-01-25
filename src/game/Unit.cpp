@@ -5278,7 +5278,8 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     return false;
 
                 // mana cost save
-                basepoints0 = procSpell->manaCost * 40/100;
+                int32 mana = procSpell->manaCost + procSpell->ManaCostPercentage * GetCreateMana() / 100;
+                basepoints0 = mana * 40/100;
                 if(basepoints0 <= 0)
                     return false;
 
@@ -5297,9 +5298,7 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
             if ( dummySpell->SpellIconID == 3579 )
             {
                 // Proc only from periodic (from trap activation proc another aura of this spell)
-                if (!(procFlag & PROC_FLAG_ON_DO_PERIODIC))
-                    return false;
-                if (!roll_chance_i(triggeredByAura->GetModifier()->m_amount))
+                if (!(procFlag & PROC_FLAG_ON_DO_PERIODIC) || !roll_chance_i(triggerAmount))
                     return false;
                 triggered_spell_id = 56453;
                 target = this;
@@ -6612,6 +6611,14 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
                 return false;
             // Need Interrupt or Silenced mechanic
             if (!(GetAllSpellMechanicMask(procSpell) & ((1<<MECHANIC_INTERRUPT)|(1<<MECHANIC_SILENCE))))
+                return false;
+            break;
+        }
+        // Lock and Load
+        case 56453:
+        {
+            // Proc only from trap activation (from periodic proc another aura of this spell)
+            if (!(procFlags & PROC_FLAG_ON_TRAP_ACTIVATION) || !roll_chance_i(triggerAmount))
                 return false;
             break;
         }
