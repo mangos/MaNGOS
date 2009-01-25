@@ -934,7 +934,7 @@ void AchievementGlobalMgr::LoadAchievementCriteriaList()
     }
 
     sLog.outString();
-    sLog.outErrorDb(">> Loaded %u achievement criteria.",m_AchievementCriteriasByType->size());
+    sLog.outString(">> Loaded %u achievement criteria.",m_AchievementCriteriasByType->size());
 }
 
 
