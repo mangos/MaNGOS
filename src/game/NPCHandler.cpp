@@ -254,7 +254,7 @@ void WorldSession::HandleTrainerBuySpellOpcode( WorldPacket & recv_data )
         data << uint64(_player->GetGUID()) << uint32(0x016A);
         SendPacket(&data);
 
-        _player->learnSpell(spellId);
+        _player->learnSpell(spellId,false);
     }
 
     WorldPacket data(SMSG_TRAINER_BUY_SUCCEEDED, 12);

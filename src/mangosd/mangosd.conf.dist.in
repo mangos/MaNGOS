@@ -875,17 +875,23 @@ Channel.SilentlyGMJoin = 0
 #        Default: 0 (disable)
 #                 1 (enable)
 #
+#    GM.AllowAchievementGain
+#        If enabled it allows gaining achievements for GM characters
+#        Default: 0 (disable)
+#                 1 (enable) (default)
+#
 ###################################################################################################################
 
-GM.LoginState     = 2
-GM.AcceptTickets  = 2
-GM.Chat           = 2
-GM.WhisperingTo   = 2
-GM.InGMList       = 0
-GM.InWhoList      = 0
-GM.LogTrade       = 1
-GM.StartLevel     = 1
-GM.LowerSecurity  = 0
+GM.LoginState            = 2
+GM.AcceptTickets         = 2
+GM.Chat                  = 2
+GM.WhisperingTo          = 2
+GM.InGMList              = 0
+GM.InWhoList             = 0
+GM.LogTrade              = 1
+GM.StartLevel            = 1
+GM.LowerSecurity         = 0
+GM.AllowAchievementGain  = 1
 
 ###################################################################################################################
 # VISIBILITY AND RADIUSES

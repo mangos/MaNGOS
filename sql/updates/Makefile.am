@@ -145,6 +145,11 @@ pkgdata_DATA = \
 	7118_01_mangos_skill_discovery_template.sql \
 	7133_01_mangos_skill_discovery_template.sql \
 	7133_02_mangos_spell_loot_template.sql \
+	7141_01_mangos_instance_template.sql \
+	7147_01_mangos_creature_template.sql \
+	7149_01_mangos_spell_proc_event.sql \
+	7150_01_mangos_playercreateinfo_spell.sql \
+	7156_01_mangos_spell_proc_event.sql \
 	README
 
 ## Additional files to include when running 'make dist'
@@ -270,4 +275,9 @@ EXTRA_DIST = \
 	7118_01_mangos_skill_discovery_template.sql \
 	7133_01_mangos_skill_discovery_template.sql \
 	7133_02_mangos_spell_loot_template.sql \
+	7141_01_mangos_instance_template.sql \
+	7147_01_mangos_creature_template.sql \
+	7149_01_mangos_spell_proc_event.sql \
+	7150_01_mangos_playercreateinfo_spell.sql \
+	7156_01_mangos_spell_proc_event.sql \
 	README

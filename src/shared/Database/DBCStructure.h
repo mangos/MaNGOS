@@ -664,6 +664,14 @@ struct CreatureSpellDataEntry
     //uint32    availability[4];                            // 4-7      m_availability[4]
 };
 
+struct CreatureTypeEntry
+{
+    uint32    ID;                                           // 0        m_ID
+    //char*   Name[16];                                     // 1-16     name
+                                                            // 17       string flags
+    //uint32    no_expirience;                              // 18 no exp? critters, non-combat pets, gas cloud.
+};
+
 struct DurabilityCostsEntry
 {
     uint32    Itemlvl;                                      // 0
@@ -941,14 +949,16 @@ struct MapEntry
     bool IsBattleGround() const { return map_type == MAP_BATTLEGROUND; }
     bool IsBattleArena() const { return map_type == MAP_ARENA; }
     bool IsBattleGroundOrArena() const { return map_type == MAP_BATTLEGROUND || map_type == MAP_ARENA; }
-    bool SupportsHeroicMode() const { return resetTimeHeroic && !resetTimeRaid; }
+    bool SupportsHeroicMode() const { return resetTimeHeroic != 0; }
     bool HasResetTime() const { return resetTimeHeroic || resetTimeRaid; }
 
     bool IsMountAllowed() const
     {
         return !IsDungeon() ||
-            MapID==568 || MapID==309 || MapID==209 || MapID==534 ||
-            MapID==560 || MapID==509 || MapID==269;
+            MapID==209 || MapID==269 || MapID==309 ||       // TanarisInstance, CavernsOfTime, Zul'gurub
+            MapID==509 || MapID==534 || MapID==560 ||       // AhnQiraj, HyjalPast, HillsbradPast
+            MapID==568 || MapID==580 || MapID==615 ||       // ZulAman, Sunwell Plateau, Obsidian Sanctrum
+            MapID==616;                                     // Eye Of Eternity
     }
 
     bool IsContinent() const
@@ -1409,7 +1419,7 @@ struct VehicleEntry
     uint32  m_uiSeatIndicatorType;                          // 42
 };
 
-struct VehicleSeatEntry 
+struct VehicleSeatEntry
 {
     uint32  m_ID;                                           // 0
     uint32  m_flags;                                        // 1

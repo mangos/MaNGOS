@@ -325,6 +325,10 @@ void AchievementMgr::CheckAllAchievementCriteria()
 void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, uint32 miscvalue1, uint32 miscvalue2, Unit *unit, uint32 time)
 {
     sLog.outDetail("AchievementMgr::UpdateAchievementCriteria(%u, %u, %u, %u)", type, miscvalue1, miscvalue2, time);
+
+    if (!sWorld.getConfig(CONFIG_GM_ALLOW_ACHIEVEMENT_GAINS) && m_player->GetSession()->GetSecurity() > SEC_PLAYER)
+        return;
+
     AchievementCriteriaEntryList const& achievementCriteriaList = achievementmgr.GetAchievementCriteriaByType(type);
     for(AchievementCriteriaEntryList::const_iterator i = achievementCriteriaList.begin(); i!=achievementCriteriaList.end(); ++i)
     {
@@ -907,14 +911,30 @@ AchievementCriteriaEntryList const& AchievementGlobalMgr::GetAchievementCriteria
 
 void AchievementGlobalMgr::LoadAchievementCriteriaList()
 {
+    if(sAchievementCriteriaStore.GetNumRows()==0)
+    {
+        barGoLink bar(1);
+        bar.step();
+
+        sLog.outString("");
+        sLog.outErrorDb(">> Loaded 0 achievement criteria.");
+        return;
+    }
+
+    barGoLink bar( sAchievementCriteriaStore.GetNumRows() );
     for (uint32 entryId = 0; entryId<sAchievementCriteriaStore.GetNumRows(); entryId++)
     {
+        bar.step();
+
         AchievementCriteriaEntry const* criteria = sAchievementCriteriaStore.LookupEntry(entryId);
         if(!criteria)
             continue;
 
         m_AchievementCriteriasByType[criteria->requiredType].push_back(criteria);
     }
+
+    sLog.outString();
+    sLog.outErrorDb(">> Loaded %u achievement criteria.",m_AchievementCriteriasByType->size());
 }
 
 
@@ -923,15 +943,27 @@ void AchievementGlobalMgr::LoadCompletedAchievements()
     QueryResult *result = CharacterDatabase.Query("SELECT achievement FROM character_achievement GROUP BY achievement");
 
     if(!result)
-        return;
+    {
+        barGoLink bar(1);
+        bar.step();
 
+        sLog.outString("");
+        sLog.outString(">> Loaded 0 realm completed achievements . DB table `character_achievement` is empty.");
+        return;
+    }
+
+    barGoLink bar(result->GetRowCount());
     do
     {
+        bar.step();
         Field *fields = result->Fetch();
         m_allCompletedAchievements.insert(fields[0].GetUInt32());
     } while(result->NextRow());
 
     delete result;
+
+    sLog.outString("");
+    sLog.outString(">> Loaded %u realm completed achievements.",m_allCompletedAchievements.size());
 }
 
 void AchievementGlobalMgr::LoadRewards()
@@ -948,7 +980,7 @@ void AchievementGlobalMgr::LoadRewards()
         bar.step();
 
         sLog.outString("");
-        sLog.outString(">> Loaded 0 achievement rewards. DB table `achievement_reward` is empty.");
+        sLog.outErrorDb(">> Loaded 0 achievement rewards. DB table `achievement_reward` is empty.");
         return;
     }
 
@@ -956,9 +988,9 @@ void AchievementGlobalMgr::LoadRewards()
 
     do
     {
-        Field *fields = result->Fetch();
         bar.step();
 
+        Field *fields = result->Fetch();
         uint32 entry = fields[0].GetUInt32();
         if (!sAchievementStore.LookupEntry(entry))
         {

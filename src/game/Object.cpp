@@ -58,8 +58,9 @@ uint32 GuidHigh2TypeId(uint32 guid_hi)
         case HIGHGUID_DYNAMICOBJECT:return TYPEID_DYNAMICOBJECT;
         case HIGHGUID_CORPSE:       return TYPEID_CORPSE;
         case HIGHGUID_MO_TRANSPORT: return TYPEID_GAMEOBJECT;
+        case HIGHGUID_VEHICLE:      return TYPEID_UNIT;
     }
-    return 10;                                              // unknown
+    return MAX_TYPEID;                                      // unknown
 }
 
 Object::Object( )
@@ -258,7 +259,7 @@ void Object::DestroyForPlayer(Player *target) const
 void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2) const
 {
     uint16 unk_flags = ((GetTypeId() == TYPEID_PLAYER) ? ((Player*)this)->m_movementInfo.unk1 : 0);
-    
+
     if(GetTypeId() == TYPEID_UNIT)
         if(((Creature*)this)->isVehicle())
             unk_flags |= 0x20;                              // always allow pitch
