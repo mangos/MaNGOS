@@ -455,7 +455,14 @@ class Spell
         uint8 m_runesState;
 
         uint8 m_delayAtDamageCount;
-        int32 GetNextDelayAtDamageMsTime() { return m_delayAtDamageCount < 5 ? 1000 - (m_delayAtDamageCount++)* 200 : 200; }
+        bool isDelayableNoMore()
+        {
+            if(m_delayAtDamageCount >= 2)
+                return true;
+
+            m_delayAtDamageCount++;
+            return false;
+        }
 
         // Delayed spells system
         uint64 m_delayStart;                                // time of spell delay start, filled by event handler, zero = just started
