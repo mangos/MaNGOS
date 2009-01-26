@@ -6545,7 +6545,7 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
             if(!procSpell)
                 return false;
             // For trigger from Blizzard need exist Improved Blizzard
-            if (procSpell->SpellFamilyName==SPELLFAMILY_MAGE && procSpell->SpellFamilyFlags & 0x0000000000000080)
+            if (procSpell->SpellFamilyName==SPELLFAMILY_MAGE && procSpell->SpellFamilyFlags & 0x0000000000000080LL)
             {
                 bool found = false;
                 AuraList const& mOverrideClassScript = GetAurasByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
@@ -7613,17 +7613,6 @@ uint32 Unit::SpellDamageBonus(Unit *pVictim, SpellEntry const *spellProto, uint3
                     if (mod < (*i)->GetModifier()->m_amount)
                         mod = (*i)->GetModifier()->m_amount;
                     TakenTotalMod *= (mod+100.0f)/100.0f;
-                }
-                break;
-            // Mangle
-            case 2312:
-                for(int j=0;j<3;j++)
-                {
-                    if(GetEffectMechanic(spellProto, j)==MECHANIC_BLEED)
-                    {
-                        TakenTotalMod *= (100.0f+(*i)->GetModifier()->m_amount)/100.0f;
-                        break;
-                    }
                 }
                 break;
         }
