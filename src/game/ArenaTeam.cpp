@@ -306,6 +306,7 @@ void ArenaTeam::Roster(WorldSession *session)
 
     WorldPacket data(SMSG_ARENA_TEAM_ROSTER, 100);
     data << uint32(GetId());                                // arena team id
+    data << uint8(0);                                       // unknow 3.0.8
     data << uint32(GetMembersSize());                       // members count
     data << uint32(GetType());                              // arena team type?
 
@@ -325,6 +326,7 @@ void ArenaTeam::Roster(WorldSession *session)
         data << uint32(itr->wins_season);               // wins this season
         data << uint32(itr->personal_rating);           // personal rating
     }
+
     session->SendPacket(&data);
     sLog.outDebug("WORLD: Sent SMSG_ARENA_TEAM_ROSTER");
 }
