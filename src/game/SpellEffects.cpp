@@ -1271,6 +1271,15 @@ void Spell::EffectDummy(uint32 i)
                 m_caster->SetPower(POWER_RAGE,0);
                 return;
             }
+            // Slam
+            if(m_spellInfo->SpellFamilyFlags & 0x0000000000200000LL)
+            {
+                if(!unitTarget)
+                    return;
+                m_damage+=m_caster->CalculateDamage(m_attackType, false);
+                m_damage+=damage;
+                return;
+            }
             switch(m_spellInfo->Id)
             {
                 // Warrior's Wrath
