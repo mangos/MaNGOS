@@ -1727,12 +1727,29 @@ void Spell::EffectDummy(uint32 i)
                 }
                 return;
             }
-
-            if(m_spellInfo->Id == 39610)                    // Mana-Tide Totem effect
+            // Healing Stream Totem
+            if(m_spellInfo->SpellFamilyFlags & 0x0000000000002000LL)
+            {
+                m_caster->CastCustomSpell(unitTarget, 52042, &damage, 0, 0, true, 0, 0, m_originalCasterGUID);
+                return;
+            }
+            // Mana Spring Totem
+            if(m_spellInfo->SpellFamilyFlags & 0x0000000000004000LL)
+            {
+                if(unitTarget->getPowerType()!=POWER_MANA)
+                    return;
+                m_caster->CastCustomSpell(unitTarget, 52032, &damage, 0, 0, true, 0, 0, m_originalCasterGUID);
+                return;
+            }
+            if(m_spellInfo->Id == 39610)                    // Mana Tide Totem effect
             {
                 if(!unitTarget || unitTarget->getPowerType() != POWER_MANA)
                     return;
-
+                // Glyph of Mana Tide
+                Unit *owner = m_caster->GetOwner();
+                if (owner)
+                    if (Aura *dummy = owner->GetDummyAura(55441))
+                        damage+=dummy->GetModifier()->m_amount;
                 // Regenerate 6% of Total Mana Every 3 secs
                 int32 EffectBasePoints0 = unitTarget->GetMaxPower(POWER_MANA)  * damage / 100;
                 m_caster->CastCustomSpell(unitTarget,39609,&EffectBasePoints0,NULL,NULL,true,NULL,NULL,m_originalCasterGUID);
