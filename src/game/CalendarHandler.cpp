@@ -30,7 +30,7 @@ void WorldSession::HandleCalendarGetCalendar(WorldPacket &recv_data)
 {
     sLog.outDebug("WORLD: CMSG_CALENDAR_GET_CALENDAR");
     recv_data.hexlike();
-
+/* not compatible with 3.0.8? client crash at receive... :(
     time_t cur_time = time(NULL);
 
     WorldPacket data(SMSG_CALENDAR_SEND_CALENDAR,4+4*0+4+4*0+4+4);
@@ -68,6 +68,7 @@ void WorldSession::HandleCalendarGetCalendar(WorldPacket &recv_data)
     sLog.outDebug("Sending calendar");
     //data.hexlike();
     SendPacket(&data);
+*/
 }
 
 void WorldSession::HandleCalendarGetEvent(WorldPacket &recv_data)
