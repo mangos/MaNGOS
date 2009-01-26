@@ -797,6 +797,7 @@ enum Targets
 {
     TARGET_SELF                        = 1,
     TARGET_RANDOM_ENEMY_CHAIN_IN_AREA  = 2,                 // only one spell has that, but regardless, it's a target type after all
+    TARGET_RANDOM_FRIEND_CHAIN_IN_AREA = 3,
     TARGET_PET                         = 5,
     TARGET_CHAIN_DAMAGE                = 6,
     TARGET_AREAEFFECT_CUSTOM           = 8,
