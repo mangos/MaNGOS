@@ -8172,7 +8172,7 @@ uint32 Unit::SpellHealingBonus(SpellEntry const *spellProto, uint32 healamount, 
                     if (itr->second->GetCasterGUID()!=GetGUID())
                         continue;
                     SpellEntry const* m_spell = itr->second->GetSpellProto();
-                    if ( m_spell->SpellFamilyName != SPELLFAMILY_DRUID || 
+                    if ( m_spell->SpellFamilyName != SPELLFAMILY_DRUID ||
                         !(m_spell->SpellFamilyFlags & 0x0000001000000050LL))
                         continue;
                     modPercent += stepPercent * itr->second->GetStackAmount();
@@ -8258,7 +8258,7 @@ uint32 Unit::SpellHealingBonus(SpellEntry const *spellProto, uint32 healamount, 
         {
             case SPELLFAMILY_GENERIC:
                 // Healing stream from totem (add 6% per tick from hill bonus owner)
-                // Possibly need do it on apply dummy aura 
+                // Possibly need do it on apply dummy aura
                 if (spellProto->Id == 52042)
                     CastingTime = 210;
                 break;
@@ -8347,7 +8347,7 @@ uint32 Unit::SpellHealingBonus(SpellEntry const *spellProto, uint32 healamount, 
     AuraList const& mHealingGet= pVictim->GetAurasByType(SPELL_AURA_MOD_HEALING_RECEIVED);
     for(AuraList::const_iterator i = mHealingGet.begin(); i != mHealingGet.end(); ++i)
         if ((*i)->isAffectedOnSpell(spellProto))
-            TakenTotalMod *= ((*i)->GetModifier()->m_amount + 100.0f) / 100.0f;        
+            TakenTotalMod *= ((*i)->GetModifier()->m_amount + 100.0f) / 100.0f;
 
     heal = (heal + TakenTotal) * TakenTotalMod;
 
