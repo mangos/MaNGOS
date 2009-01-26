@@ -33,15 +33,15 @@ void WorldSession::HandleCalendarGetCalendar(WorldPacket &recv_data)
 
     time_t cur_time = time(NULL);
 
-	WorldPacket data(SMSG_CALENDAR_SEND_CALENDAR,4+4*0+4+4*0+4+4);
+    WorldPacket data(SMSG_CALENDAR_SEND_CALENDAR,4+4*0+4+4*0+4+4);
 
     // TODO: calendar invite event output
-	data << (uint32) 0;                                     //invite node count
+    data << (uint32) 0;                                     //invite node count
     // TODO: calendar event output
-	data << (uint32) 0;                                     //event count
+    data << (uint32) 0;                                     //event count
 
-	data << (uint32) 0;                                     //wtf??
-	data << (uint32) secsToTimeBitFields(cur_time);         // current time
+    data << (uint32) 0;                                     //wtf??
+    data << (uint32) secsToTimeBitFields(cur_time);         // current time
 
     uint32 counter = 0;
     size_t p_counter = data.wpos();
@@ -64,10 +64,10 @@ void WorldSession::HandleCalendarGetCalendar(WorldPacket &recv_data)
     }
     data.put<uint32>(p_counter,counter);
 
-	data << (uint32) 1135753200;                            //wtf?? (28.12.2005 12:00)
-	sLog.outDebug("Sending calendar");
-	//data.hexlike();
-	SendPacket(&data);
+    data << (uint32) 1135753200;                            //wtf?? (28.12.2005 12:00)
+    sLog.outDebug("Sending calendar");
+    //data.hexlike();
+    SendPacket(&data);
 }
 
 void WorldSession::HandleCalendarGetEvent(WorldPacket &recv_data)
