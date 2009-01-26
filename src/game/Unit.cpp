@@ -7963,30 +7963,38 @@ bool Unit::isSpellCrit(Unit *pVictim, SpellEntry const *spellProto, SpellSchoolM
                 // Modify by player victim resilience
                 if (pVictim->GetTypeId() == TYPEID_PLAYER)
                     crit_chance -= ((Player*)pVictim)->GetRatingBonusValue(CR_CRIT_TAKEN_SPELL);
+
                 // scripted (increase crit chance ... against ... target by x%
-                if(pVictim->isFrozen()) // Shatter
+                AuraList const& mOverrideClassScript = GetAurasByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
+                for(AuraList::const_iterator i = mOverrideClassScript.begin(); i != mOverrideClassScript.end(); ++i)
                 {
-                    AuraList const& mOverrideClassScript = GetAurasByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
-                    for(AuraList::const_iterator i = mOverrideClassScript.begin(); i != mOverrideClassScript.end(); ++i)
+                    if (!((*i)->isAffectedOnSpell(spellProto)))
+                        continue;
+                    switch((*i)->GetModifier()->m_miscvalue)
                     {
-                        switch((*i)->GetModifier()->m_miscvalue)
-                        {
-                            case 849: crit_chance+= 17.0f; break; //Shatter Rank 1
-                            case 910: crit_chance+= 34.0f; break; //Shatter Rank 2
-                            case 911: crit_chance+= 50.0f; break; //Shatter Rank 3
-                        }
+                        case  849: if (pVictim->isFrozen()) crit_chance+= 17.0f; break; //Shatter Rank 1
+                        case  910: if (pVictim->isFrozen()) crit_chance+= 34.0f; break; //Shatter Rank 2
+                        case  911: if (pVictim->isFrozen()) crit_chance+= 50.0f; break; //Shatter Rank 3
+                        case 7917: // Glyph of Shadowburn
+                            if (pVictim->HasAuraState(AURA_STATE_HEALTHLESS_35_PERCENT))
+                                crit_chance+=(*i)->GetModifier()->m_amount;
+                            break;
+                        case 7997: // Renewed Hope
+                        case 7998:
+                            if (pVictim->HasAura(6788))
+                                crit_chance+=(*i)->GetModifier()->m_amount;
+                            break;
+                        case   21: // Test of Faith
+                        case 6935:
+                        case 6918:
+                            if (pVictim->GetHealth() < pVictim->GetMaxHealth()/2)
+                                crit_chance+=(*i)->GetModifier()->m_amount;
+                            break;
+                        default:
+                            break;
                     }
                 }
-                // Glyph of Shadowburn
-                if (spellProto->SpellFamilyName == SPELLFAMILY_WARLOCK &&
-                    spellProto->SpellFamilyFlags & 0x0000000000000080LL &&
-                    pVictim->HasAuraState(AURA_STATE_HEALTHLESS_35_PERCENT))
-                {
-                    AuraList const& mOverrideClassScript = GetAurasByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
-                    for(AuraList::const_iterator i = mOverrideClassScript.begin(); i != mOverrideClassScript.end(); ++i)
-                        if((*i)->GetModifier()->m_miscvalue == 7917)
-                            crit_chance+=(*i)->GetModifier()->m_amount;
-                }
+                
                 // Sacred Shield
                 if (spellProto->SpellFamilyName == SPELLFAMILY_PALADIN &&
                     spellProto->SpellFamilyFlags & 0x0000000040000000LL)
