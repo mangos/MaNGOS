@@ -5779,6 +5779,8 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                             case 10432: spell = 26363; break;
                             case 25469: spell = 26371; break;
                             case 25472: spell = 26372; break;
+                            case 49280: spell = 49278; break;
+                            case 49281: spell = 49279; break;
                             default:
                                 return false;
                         }
@@ -6334,6 +6336,10 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
                             trigger_spell_id = 26371; break;
                         case 25472:                         // Rank 9
                             trigger_spell_id = 26372; break;
+                        case 49280:                         // Rank 10
+                            trigger_spell_id = 49278; break;
+                        case 49281:                         // Rank 11
+                            trigger_spell_id = 49279; break;
                         default:
                             sLog.outError("Unit::HandleProcTriggerSpell: Spell %u not handled in LShield", auraSpellInfo->Id);
                         return false;
