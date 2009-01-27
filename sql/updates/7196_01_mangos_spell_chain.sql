@@ -1,3 +1,5 @@
+ALTER TABLE db_version CHANGE COLUMN required_7193_01_mangos_mangos_string required_7196_01_mangos_spell_chain bit;
+
 INSERT INTO spell_chain VALUES
 /*Tranquility*/
 (44203,    0,44203,1,0),

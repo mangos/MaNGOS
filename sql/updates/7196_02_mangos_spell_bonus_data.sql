@@ -1,3 +1,5 @@
+ALTER TABLE db_version CHANGE COLUMN required_7196_01_mangos_spell_chain required_7196_02_mangos_spell_bonus_data bit;
+
 -- ----------------------------
 -- Table structure for spell_bonus_data
 -- ----------------------------

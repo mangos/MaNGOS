@@ -4476,7 +4476,6 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     if(!target)
                         return false;
 
-                    basepoints0 = int32(damage * 2.5f);     // manaregen
                     triggered_spell_id = 34650;
                     break;
                 }
