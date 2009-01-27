@@ -3419,10 +3419,6 @@ bool ChatHandler::HandleReviveCommand(const char* args)
 
 bool ChatHandler::HandleAuraCommand(const char* args)
 {
-    char* px = strtok((char*)args, " ");
-    if (!px)
-        return false;
-
     Unit *target = getSelectedUnit();
     if(!target)
     {
@@ -3431,7 +3427,9 @@ bool ChatHandler::HandleAuraCommand(const char* args)
         return false;
     }
 
-    uint32 spellID = (uint32)atoi(px);
+    // number or [name] Shift-click form |color|Hspell:spell_id|h[name]|h|r or Htalent form
+    uint32 spellID = extractSpellIdFromLink((char*)args);
+
     SpellEntry const *spellInfo = sSpellStore.LookupEntry( spellID );
     if(spellInfo)
     {
@@ -3455,10 +3453,6 @@ bool ChatHandler::HandleAuraCommand(const char* args)
 
 bool ChatHandler::HandleUnAuraCommand(const char* args)
 {
-    char* px = strtok((char*)args, " ");
-    if (!px)
-        return false;
-
     Unit *target = getSelectedUnit();
     if(!target)
     {
@@ -3474,7 +3468,11 @@ bool ChatHandler::HandleUnAuraCommand(const char* args)
         return true;
     }
 
-    uint32 spellID = (uint32)atoi(px);
+    // number or [name] Shift-click form |color|Hspell:spell_id|h[name]|h|r or Htalent form
+    uint32 spellID = extractSpellIdFromLink((char*)args);
+    if(!spellID)
+        return false;
+
     target->RemoveAurasDueToSpell(spellID);
 
     return true;
@@ -4324,19 +4322,6 @@ static bool HandleResetStatsOrLevelHelper(Player* player)
 
     uint8 powertype = cEntry->powerType;
 
-    uint32 unitfield;
-    if(powertype == POWER_RAGE)
-        unitfield = 0x1100EE00;
-    else if(powertype == POWER_ENERGY)
-        unitfield = 0x00000000;
-    else if(powertype == POWER_MANA)
-        unitfield = 0x0000EE00;
-    else
-    {
-        sLog.outError("Invalid default powertype %u for player (class %u)",powertype,player->getClass());
-        return false;
-    }
-
     // reset m_form if no aura
     if(!player->HasAuraType(SPELL_AURA_MOD_SHAPESHIFT))
         player->m_form = FORM_NONE;
@@ -4366,8 +4351,6 @@ static bool HandleResetStatsOrLevelHelper(Player* player)
         }
     }
 
-    // set UNIT_FIELD_BYTES_1 to init state but preserve m_form value
-    player->SetUInt32Value(UNIT_FIELD_BYTES_1, unitfield);
     player->SetByteValue(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_PVP );
     player->SetByteValue(UNIT_FIELD_BYTES_2, 3, player->m_form);
 
@@ -4410,7 +4393,13 @@ bool ChatHandler::HandleResetLevelCommand(const char * args)
     if(!HandleResetStatsOrLevelHelper(player))
         return false;
 
-    player->SetLevel(1);
+    // set starting level
+    uint32 start_level = player->getClass() != CLASS_DEATH_KNIGHT
+        ? sWorld.getConfig(CONFIG_START_PLAYER_LEVEL)
+        : sWorld.getConfig(CONFIG_START_HEROIC_PLAYER_LEVEL);
+
+    player->SetLevel(start_level);
+    player->InitRunes();
     player->InitStatsForLevel(true);
     player->InitTaxiNodesForLevel();
     player->InitGlyphsForLevel();
@@ -4457,6 +4446,7 @@ bool ChatHandler::HandleResetStatsCommand(const char * args)
     if(!HandleResetStatsOrLevelHelper(player))
         return false;
 
+    player->InitRunes();
     player->InitStatsForLevel(true);
     player->InitTaxiNodesForLevel();
     player->InitGlyphsForLevel();
