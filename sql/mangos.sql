@@ -17196,9 +17196,9 @@ INSERT INTO `spell_proc_event` VALUES
 /*!40000 ALTER TABLE `spell_proc_event` ENABLE KEYS */;
 UNLOCK TABLES;
 
--- ----------------------------
+--
 -- Table structure for spell_bonus_data
--- ----------------------------
+--
 DROP TABLE IF EXISTS `spell_bonus_data`;
 CREATE TABLE `spell_bonus_data` (
   `entry` smallint(5) unsigned NOT NULL,
@@ -17209,6 +17209,8 @@ CREATE TABLE `spell_bonus_data` (
   PRIMARY KEY  (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+LOCK TABLES `spell_bonus_data` WRITE;
+/*!40000 ALTER TABLE `spell_bonus_data` DISABLE KEYS */;
 INSERT INTO `spell_bonus_data` VALUES
 ('5185', '1.6104', '0', '0', 'Druid - Healing Touch'),
 ('33763', '0', '0.09518', '0', 'Druid - Lifebloom'),
@@ -17427,6 +17429,8 @@ INSERT INTO `spell_bonus_data` VALUES
 ('47818', '0.952', '0', '0', 'Warlock - Rain of Fire Triggered Rank 7'),
 ('18220', '0.96', '0', '0', 'Warlock - Dark Pact'),
 ('6229', '0.3', '0', '0', 'Warlock - Shadow Ward');
+/*!40000 ALTER TABLE `spell_bonus_data` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `spell_script_target`
