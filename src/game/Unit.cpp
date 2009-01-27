@@ -9001,8 +9001,11 @@ bool Unit::isVisibleForOrDetect(Unit const* u, bool detect, bool inVisibleList, 
             return false;
     }
 
-    // Visible units, always are visible for all units, except for units under invisibility
-    if (m_Visibility == VISIBILITY_ON && u->m_invisibilityMask==0)
+    AuraList const& thisPhaseList = GetAurasByType (SPELL_AURA_PHASE);
+    AuraList const& uPhaseList = u->GetAurasByType (SPELL_AURA_PHASE);
+
+    // Visible units, always are visible for all units, except for units under invisibility and phases
+    if (m_Visibility == VISIBILITY_ON && u->m_invisibilityMask==0 && thisPhaseList.empty() && uPhaseList.empty())
         return true;
 
     // GMs see any players, not higher GMs and all units
@@ -9018,6 +9021,29 @@ bool Unit::isVisibleForOrDetect(Unit const* u, bool detect, bool inVisibleList, 
     if (m_Visibility == VISIBILITY_OFF)
         return false;
 
+    // phased visibility (both must phased or not phased)
+    if(thisPhaseList.empty() !=  uPhaseList.empty())
+        return false;
+
+    // phased visibility (in phased state work normal rules but both must have same phase)
+    if(!thisPhaseList.empty())
+    {
+        bool samePhase = false;
+        for(AuraList::const_iterator thisItr = thisPhaseList.begin(); thisItr != thisPhaseList.end(); ++thisItr)
+        {
+            uint32 thisPhase = (*thisItr)->GetMiscValue();
+            for(AuraList::const_iterator uItr = uPhaseList.begin(); uItr != uPhaseList.end(); ++uItr)
+            {
+                if((*uItr)->GetMiscValue()==thisPhase)
+                {
+                    samePhase = true;
+                    break;
+                }
+            }
+        }
+        if(!samePhase)
+            return false;
+    }
     // raw invisibility
     bool invisible = (m_invisibilityMask != 0 || u->m_invisibilityMask !=0);
 
