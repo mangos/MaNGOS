@@ -567,7 +567,7 @@ void Spell::EffectSchoolDMG(uint32 effect_idx)
                     if(stacks)
                         damage += damage * stacks * 10 /100;
                 }
-                // Avenger's Shield ($m1+0.07*$SPH+0.07*$AP)
+                // Avenger's Shield ($m1+0.07*$SPH+0.07*$AP) - ranged sdb for future
                 else if(m_spellInfo->SpellFamilyFlags & 0x0000000000004000LL)
                 {
                     float ap = m_caster->GetTotalAttackPowerValue(BASE_ATTACK);
@@ -575,24 +575,8 @@ void Spell::EffectSchoolDMG(uint32 effect_idx)
                                  m_caster->SpellBaseDamageBonusForVictim(GetSpellSchoolMask(m_spellInfo), unitTarget);
                     damage += int32(ap * 0.07f) + int32(holy * 7 / 100);
                 }
-                // Exorcism ($m1+0.15*$SPH+0.15*$AP)
-                else if(m_spellInfo->SpellFamilyFlags & 0x0000000200000000LL)
-                {
-                    float ap = m_caster->GetTotalAttackPowerValue(BASE_ATTACK);
-                    int32 holy = m_caster->SpellBaseDamageBonus(GetSpellSchoolMask(m_spellInfo)) +
-                                 m_caster->SpellBaseDamageBonusForVictim(GetSpellSchoolMask(m_spellInfo), unitTarget);
-                    damage += int32(ap * 0.15f) + int32(holy * 15 / 100);
-                }
-                // Hammer of Wrath ($m1+0.15*$SPH+0.15*$AP)
+                // Hammer of Wrath ($m1+0.15*$SPH+0.15*$AP) - ranged type sdb future fix
                 else if(m_spellInfo->SpellFamilyFlags & 0x0000008000000000LL)
-                {
-                    float ap = m_caster->GetTotalAttackPowerValue(BASE_ATTACK);
-                    int32 holy = m_caster->SpellBaseDamageBonus(GetSpellSchoolMask(m_spellInfo)) +
-                                 m_caster->SpellBaseDamageBonusForVictim(GetSpellSchoolMask(m_spellInfo), unitTarget);
-                    damage += int32(ap * 0.15f) + int32(holy * 15 / 100);
-                }
-                // Holy Wrath ($m1+0.07*$SPH+0.07*$AP)
-                else if(m_spellInfo->SpellFamilyFlags & 0x0020000000000000LL)
                 {
                     float ap = m_caster->GetTotalAttackPowerValue(BASE_ATTACK);
                     int32 holy = m_caster->SpellBaseDamageBonus(GetSpellSchoolMask(m_spellInfo)) +
@@ -2466,14 +2450,14 @@ void Spell::EffectHeal( uint32 /*i*/ )
                 idx++;
             }
 
-            int32 tickheal = caster->SpellHealingBonus(targetAura->GetSpellProto(), targetAura->GetModifier()->m_amount, DOT, unitTarget);
+            int32 tickheal = caster->SpellHealingBonus(unitTarget, targetAura->GetSpellProto(), targetAura->GetModifier()->m_amount, DOT);
             int32 tickcount = GetSpellDuration(targetAura->GetSpellProto()) / targetAura->GetSpellProto()->EffectAmplitude[idx];
             unitTarget->RemoveAurasDueToSpell(targetAura->GetId());
 
             addhealth += tickheal * tickcount;
         }
         else
-            addhealth = caster->SpellHealingBonus(m_spellInfo, addhealth,HEAL, unitTarget);
+            addhealth = caster->SpellHealingBonus(unitTarget, m_spellInfo, addhealth, HEAL);
 
         m_healing+=addhealth;
     }
@@ -2514,7 +2498,7 @@ void Spell::EffectHealMechanical( uint32 /*i*/ )
         if (!caster)
             return;
 
-        uint32 addhealth = caster->SpellHealingBonus(m_spellInfo, uint32(damage), HEAL, unitTarget);
+        uint32 addhealth = caster->SpellHealingBonus(unitTarget, m_spellInfo, uint32(damage), HEAL);
         caster->SendHealSpellLog(unitTarget, m_spellInfo->Id, addhealth, false);
         unitTarget->ModifyHealth( int32(damage) );
     }
@@ -2545,7 +2529,7 @@ void Spell::EffectHealthLeech(uint32 i)
 
     if(m_caster->isAlive())
     {
-        new_damage = m_caster->SpellHealingBonus(m_spellInfo, new_damage, HEAL, m_caster);
+        new_damage = m_caster->SpellHealingBonus(m_caster, m_spellInfo, new_damage, HEAL);
 
         m_caster->ModifyHealth(new_damage);
 

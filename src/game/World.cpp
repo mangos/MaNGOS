@@ -1118,6 +1118,9 @@ void World::SetInitialWorldSettings()
     sLog.outString( "Loading Spell Proc Event conditions..." );
     spellmgr.LoadSpellProcEvents();
 
+    sLog.outString( "Loading Spell Bonus Data..." );
+    spellmgr.LoadSpellBonusess();
+
     sLog.outString( "Loading Aggro Spells Definitions...");
     spellmgr.LoadSpellThreats();
 
