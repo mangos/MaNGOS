@@ -1617,6 +1617,9 @@ void Unit::CalcAbsorbResist(Unit *pVictim,SpellSchoolMask schoolMask, DamageEffe
 
     // Get unit state (need for some absorb check)
     uint32 unitflag = pVictim->GetUInt32Value(UNIT_FIELD_FLAGS);
+    // Reflect damage spells (not cast any damage spell in aura lookup)
+    uint32 reflectSpell = 0;
+    int32  reflectDamage = 0;
     // Need remove expired auras after
     bool existExpired = false;
     // absorb without mana cost
@@ -1672,12 +1675,11 @@ void Unit::CalcAbsorbResist(Unit *pVictim,SpellSchoolMask schoolMask, DamageEffe
                 // Reflective Shield (Lady Malande boss)
                 if (spellProto->Id == 41475)
                 {
-                    int32 reflectDamage = 0;
                     if(RemainingDamage < currentAbsorb)
                         reflectDamage = RemainingDamage / 2;
                     else
                         reflectDamage = currentAbsorb / 2;
-                    pVictim->CastCustomSpell(this, 33619, &reflectDamage, NULL, NULL, true, NULL, *i);
+                    reflectSpell = 33619;
                     break;
                 }
                 if (spellProto->Id == 39228 || // Argussian Compass
@@ -1746,13 +1748,9 @@ void Unit::CalcAbsorbResist(Unit *pVictim,SpellSchoolMask schoolMask, DamageEffe
                                     reflectDamage = (*k)->GetModifier()->m_amount * currentAbsorb/100;
                                 else
                                     reflectDamage = (*k)->GetModifier()->m_amount * RemainingDamage/100;
+                                reflectSpell = 33619;
                             } break;
                             default: break;
-                        }
-                        if (reflectDamage)
-                        {
-                            pVictim->CastCustomSpell(this, 33619, &reflectDamage, NULL, NULL, true, NULL, *i);
-                            break;
                         }
                     }
                     break;
@@ -1844,6 +1842,9 @@ void Unit::CalcAbsorbResist(Unit *pVictim,SpellSchoolMask schoolMask, DamageEffe
                 ++i;
         }
     }
+    // Cast back reflect damage spell
+    if (reflectSpell)
+        pVictim->CastCustomSpell(this,  reflectSpell, &reflectDamage, NULL, NULL, true);
 
     // absorb by mana cost
     AuraList const& vManaShield = pVictim->GetAurasByType(SPELL_AURA_MANA_SHIELD);
