@@ -87,7 +87,7 @@ TotemAI::UpdateAI(const uint32 /*diff*/)
         victim = NULL;
 
         MaNGOS::NearestAttackableUnitInObjectRangeCheck u_check(&i_totem, &i_totem, max_range);
-        MaNGOS::UnitLastSearcher<MaNGOS::NearestAttackableUnitInObjectRangeCheck> checker(victim, u_check);
+        MaNGOS::UnitLastSearcher<MaNGOS::NearestAttackableUnitInObjectRangeCheck> checker(&i_totem,victim, u_check);
 
         TypeContainerVisitor<MaNGOS::UnitLastSearcher<MaNGOS::NearestAttackableUnitInObjectRangeCheck>, GridTypeMapContainer > grid_object_checker(checker);
         TypeContainerVisitor<MaNGOS::UnitLastSearcher<MaNGOS::NearestAttackableUnitInObjectRangeCheck>, WorldTypeMapContainer > world_object_checker(checker);

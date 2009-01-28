@@ -80,6 +80,12 @@ enum TempSummonType
     TEMPSUMMON_MANUAL_DESPAWN              = 8              // despawns when UnSummon() is called
 };
 
+enum PhaseMasks
+{
+    PHASEMASK_NORMAL   = 0x00000001,
+    PHASEMASK_ANYWHERE = 0xFFFFFFFF
+};
+
 class WorldPacket;
 class UpdateData;
 class ByteBuffer;
@@ -399,8 +405,12 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         void GetRandomPoint( float x, float y, float z, float distance, float &rand_x, float &rand_y, float &rand_z ) const;
 
         void SetMapId(uint32 newMap) { m_mapId = newMap; }
-
         uint32 GetMapId() const { return m_mapId; }
+
+        void SetPhaseMask(uint32 newPhaseMask) { m_phaseMask = newPhaseMask; }
+        uint32 GetPhaseMask() const { return m_phaseMask; }
+        bool InSamePhase(WorldObject const* obj) const { return InSamePhase(obj->GetPhaseMask()); }
+        bool InSamePhase(uint32 phasemask) const { return GetPhaseMask()==0 && phasemask==0 || (GetPhaseMask() & phasemask); }
 
         uint32 GetZoneId() const;
         uint32 GetAreaId() const;
@@ -417,7 +427,11 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         float GetDistance2d(const WorldObject* obj) const;
         float GetDistance2d(const float x, const float y) const;
         float GetDistanceZ(const WorldObject* obj) const;
-        bool IsInMap(const WorldObject* obj) const { return IsInWorld() && obj->IsInWorld() && GetMapId()==obj->GetMapId() && GetInstanceId()==obj->GetInstanceId(); }
+        bool IsInMap(const WorldObject* obj) const
+        {
+            return IsInWorld() && obj->IsInWorld() && GetMapId()==obj->GetMapId() &&
+                GetInstanceId()==obj->GetInstanceId() && InSamePhase(obj);
+        }
         bool IsWithinDistInMap(const WorldObject* obj, const float dist2compare, const bool is3D = true) const;
         bool IsWithinLOS(const float x, const float y, const float z ) const;
         bool IsWithinLOSInMap(const WorldObject* obj) const;
@@ -467,7 +481,9 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         std::string m_name;
 
     private:
-        uint32 m_mapId;
+        uint32 m_mapId;                                     // object at map with map_id
+        uint32 m_InstanceId;                                // in map copy with instance id
+        uint32 m_phaseMask;                                 // in area phase state
 
         float m_positionX;
         float m_positionY;
@@ -475,7 +491,5 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         float m_orientation;
 
         bool mSemaphoreTeleport;
-
-        uint32 m_InstanceId;
 };
 #endif

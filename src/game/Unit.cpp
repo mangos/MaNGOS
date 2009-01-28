@@ -3489,6 +3489,7 @@ bool Unit::RemoveNoStackAurasDueToAura(Aura *Aur)
         return false;
 
     uint32 spellId = Aur->GetId();
+    uint32 effIndex = Aur->GetEffIndex();
 
     // passive spell special case (only non stackable with ranks)
     if(IsPassiveSpell(spellId))
@@ -3496,8 +3497,6 @@ bool Unit::RemoveNoStackAurasDueToAura(Aura *Aur)
         if(IsPassiveSpellStackableWithRanks(spellProto))
             return true;
     }
-
-    uint32 effIndex = Aur->GetEffIndex();
 
     SpellSpecific spellId_spec = GetSpellSpecific(spellId);
 
@@ -8741,14 +8740,11 @@ bool Unit::isVisibleForOrDetect(Unit const* u, bool detect, bool inVisibleList, 
             return false;
     }
 
-    AuraList const& thisPhaseList = GetAurasByType (SPELL_AURA_PHASE);
-    AuraList const& uPhaseList = u->GetAurasByType (SPELL_AURA_PHASE);
-
     // Visible units, always are visible for all units, except for units under invisibility and phases
-    if (m_Visibility == VISIBILITY_ON && u->m_invisibilityMask==0 && thisPhaseList.empty() && uPhaseList.empty())
+    if (m_Visibility == VISIBILITY_ON && u->m_invisibilityMask==0 && InSamePhase(u))
         return true;
 
-    // GMs see any players, not higher GMs and all units
+    // GMs see any players, not higher GMs and all units in any phase
     if (u->GetTypeId() == TYPEID_PLAYER && ((Player *)u)->isGameMaster())
     {
         if(GetTypeId() == TYPEID_PLAYER)
@@ -8761,29 +8757,10 @@ bool Unit::isVisibleForOrDetect(Unit const* u, bool detect, bool inVisibleList, 
     if (m_Visibility == VISIBILITY_OFF)
         return false;
 
-    // phased visibility (both must phased or not phased)
-    if(thisPhaseList.empty() !=  uPhaseList.empty())
+    // phased visibility (both must phased in same way)
+    if(!InSamePhase(u))
         return false;
 
-    // phased visibility (in phased state work normal rules but both must have same phase)
-    if(!thisPhaseList.empty())
-    {
-        bool samePhase = false;
-        for(AuraList::const_iterator thisItr = thisPhaseList.begin(); thisItr != thisPhaseList.end(); ++thisItr)
-        {
-            uint32 thisPhase = (*thisItr)->GetMiscValue();
-            for(AuraList::const_iterator uItr = uPhaseList.begin(); uItr != uPhaseList.end(); ++uItr)
-            {
-                if((*uItr)->GetMiscValue()==thisPhase)
-                {
-                    samePhase = true;
-                    break;
-                }
-            }
-        }
-        if(!samePhase)
-            return false;
-    }
     // raw invisibility
     bool invisible = (m_invisibilityMask != 0 || u->m_invisibilityMask !=0);
 
@@ -10879,7 +10856,7 @@ Unit* Unit::SelectNearbyTarget() const
 
     {
         MaNGOS::AnyUnfriendlyUnitInObjectRangeCheck u_check(this, this, ATTACK_DISTANCE);
-        MaNGOS::UnitListSearcher<MaNGOS::AnyUnfriendlyUnitInObjectRangeCheck> searcher(targets, u_check);
+        MaNGOS::UnitListSearcher<MaNGOS::AnyUnfriendlyUnitInObjectRangeCheck> searcher(this, targets, u_check);
 
         TypeContainerVisitor<MaNGOS::UnitListSearcher<MaNGOS::AnyUnfriendlyUnitInObjectRangeCheck>, WorldTypeMapContainer > world_unit_searcher(searcher);
         TypeContainerVisitor<MaNGOS::UnitListSearcher<MaNGOS::AnyUnfriendlyUnitInObjectRangeCheck>, GridTypeMapContainer >  grid_unit_searcher(searcher);

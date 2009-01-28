@@ -716,7 +716,7 @@ void AreaAura::Update(uint32 diff)
                     cell.SetNoCreate();
 
                     MaNGOS::AnyFriendlyUnitInObjectRangeCheck u_check(caster, owner, m_radius);
-                    MaNGOS::UnitListSearcher<MaNGOS::AnyFriendlyUnitInObjectRangeCheck> searcher(targets, u_check);
+                    MaNGOS::UnitListSearcher<MaNGOS::AnyFriendlyUnitInObjectRangeCheck> searcher(caster,targets, u_check);
                     TypeContainerVisitor<MaNGOS::UnitListSearcher<MaNGOS::AnyFriendlyUnitInObjectRangeCheck>, WorldTypeMapContainer > world_unit_searcher(searcher);
                     TypeContainerVisitor<MaNGOS::UnitListSearcher<MaNGOS::AnyFriendlyUnitInObjectRangeCheck>, GridTypeMapContainer >  grid_unit_searcher(searcher);
                     CellLock<GridReadGuard> cell_lock(cell, p);
@@ -732,7 +732,7 @@ void AreaAura::Update(uint32 diff)
                     cell.SetNoCreate();
 
                     MaNGOS::AnyAoETargetUnitInObjectRangeCheck u_check(caster, owner, m_radius); // No GetCharmer in searcher
-                    MaNGOS::UnitListSearcher<MaNGOS::AnyAoETargetUnitInObjectRangeCheck> searcher(targets, u_check);
+                    MaNGOS::UnitListSearcher<MaNGOS::AnyAoETargetUnitInObjectRangeCheck> searcher(caster, targets, u_check);
                     TypeContainerVisitor<MaNGOS::UnitListSearcher<MaNGOS::AnyAoETargetUnitInObjectRangeCheck>, WorldTypeMapContainer > world_unit_searcher(searcher);
                     TypeContainerVisitor<MaNGOS::UnitListSearcher<MaNGOS::AnyAoETargetUnitInObjectRangeCheck>, GridTypeMapContainer >  grid_unit_searcher(searcher);
                     CellLock<GridReadGuard> cell_lock(cell, p);
@@ -6570,22 +6570,36 @@ void Aura::HandleAuraConvertRune(bool apply, bool Real)
 
 void Aura::HandlePhase(bool apply, bool Real)
 {
+    if(!Real)
+        return;
+
+    // always non stackable
+    if(apply)
+    {
+        Unit::AuraList const& phases = m_target->GetAurasByType(SPELL_AURA_PHASE);
+        if(!phases.empty())
+            m_target->RemoveAurasDueToSpell(phases.front()->GetId(),this);
+    }
+
     // no-phase is also phase state so same code for apply and remove
 
-    // phase auras normaly not expected at BG but anyway better check
-    if(Real && m_target->GetTypeId()==TYPEID_PLAYER)
+    // phase auras normally not expected at BG but anyway better check
+    if(m_target->GetTypeId()==TYPEID_PLAYER)
     {
         // drop flag at invisible in bg
         if(((Player*)m_target)->InBattleGround())
             if(BattleGround *bg = ((Player*)m_target)->GetBattleGround())
                 bg->EventPlayerDroppedFlag((Player*)m_target);
-    }
 
-    // apply/remove only if not in GM invisibility
-    if(m_target->GetVisibility()!=VISIBILITY_OFF)
-    {
-        // just need triggering visibility update base at aura presence
-        m_target->SetVisibility(m_target->GetVisibility());
+        // GM-mode have mask 0xFFFFFFFF
+        if(!((Player*)m_target)->isGameMaster())
+            m_target->SetPhaseMask(apply ? GetMiscValue() : PHASEMASK_NORMAL);
     }
+    else
+        m_target->SetPhaseMask(apply ? GetMiscValue() : PHASEMASK_NORMAL);
+
+    // need triggering visibility update base at phase update of not GM invisible (other GMs anyway see in any phases)
+    if(m_target->GetVisibility()!=VISIBILITY_OFF)
+        m_target->SetVisibility(m_target->GetVisibility());
 }
 

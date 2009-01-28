@@ -320,7 +320,7 @@ void GameObject::Update(uint32 /*p_time*/)
                 if(owner && NeedDespawn)                    // hunter trap
                 {
                     MaNGOS::AnyUnfriendlyUnitInObjectRangeCheck u_check(this, owner, radius);
-                    MaNGOS::UnitSearcher<MaNGOS::AnyUnfriendlyUnitInObjectRangeCheck> checker(ok, u_check);
+                    MaNGOS::UnitSearcher<MaNGOS::AnyUnfriendlyUnitInObjectRangeCheck> checker(this,ok, u_check);
 
                     CellLock<GridReadGuard> cell_lock(cell, p);
 
@@ -341,7 +341,7 @@ void GameObject::Update(uint32 /*p_time*/)
                     // affect only players
                     Player* p_ok = NULL;
                     MaNGOS::AnyPlayerInObjectRangeCheck p_check(this, radius);
-                    MaNGOS::PlayerSearcher<MaNGOS::AnyPlayerInObjectRangeCheck>  checker(p_ok, p_check);
+                    MaNGOS::PlayerSearcher<MaNGOS::AnyPlayerInObjectRangeCheck>  checker(this,p_ok, p_check);
 
                     CellLock<GridReadGuard> cell_lock(cell, p);
 
@@ -799,7 +799,7 @@ void GameObject::TriggeringLinkedGameObject( uint32 trapEntry, Unit* target)
         cell.data.Part.reserved = ALL_DISTRICT;
 
         MaNGOS::NearestGameObjectEntryInObjectRangeCheck go_check(*target,trapEntry,range);
-        MaNGOS::GameObjectLastSearcher<MaNGOS::NearestGameObjectEntryInObjectRangeCheck> checker(trapGO,go_check);
+        MaNGOS::GameObjectLastSearcher<MaNGOS::NearestGameObjectEntryInObjectRangeCheck> checker(this, trapGO,go_check);
 
         TypeContainerVisitor<MaNGOS::GameObjectLastSearcher<MaNGOS::NearestGameObjectEntryInObjectRangeCheck>, GridTypeMapContainer > object_checker(checker);
         CellLock<GridReadGuard> cell_lock(cell, p);
@@ -820,7 +820,7 @@ GameObject* GameObject::LookupFishingHoleAround(float range)
     Cell cell(p);
     cell.data.Part.reserved = ALL_DISTRICT;
     MaNGOS::NearestGameObjectFishingHole u_check(*this, range);
-    MaNGOS::GameObjectSearcher<MaNGOS::NearestGameObjectFishingHole> checker(ok, u_check);
+    MaNGOS::GameObjectSearcher<MaNGOS::NearestGameObjectFishingHole> checker(this, ok, u_check);
 
     CellLock<GridReadGuard> cell_lock(cell, p);
 
