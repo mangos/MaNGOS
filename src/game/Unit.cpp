@@ -7624,7 +7624,7 @@ uint32 Unit::SpellDamageBonus(Unit *pVictim, SpellEntry const *spellProto, uint3
         else
             coeff = bonus->direct_damage * LvlPenalty * stack;
         if (bonus->ap_bonus)
-            coeff*=bonus->ap_bonus * GetTotalAttackPowerValue(BASE_ATTACK);
+            DoneTotal+=bonus->ap_bonus * GetTotalAttackPowerValue(BASE_ATTACK) * stack;
         DoneTotal += DoneAdvertisedBenefit * coeff * SpellModSpellDamage;
         TakenTotal+= TakenAdvertisedBenefit * coeff;
     }
@@ -8037,7 +8037,7 @@ uint32 Unit::SpellHealingBonus(Unit *pVictim, SpellEntry const *spellProto, uint
         else
             coeff = bonus->direct_damage * LvlPenalty * stack;
         if (bonus->ap_bonus)
-            coeff*=bonus->ap_bonus * GetTotalAttackPowerValue(BASE_ATTACK);
+            DoneTotal+=bonus->ap_bonus * GetTotalAttackPowerValue(BASE_ATTACK) * stack;
         DoneTotal += DoneAdvertisedBenefit * coeff * SpellModSpellDamage;
         TakenTotal+= TakenAdvertisedBenefit * coeff;
     }
@@ -8107,7 +8107,7 @@ uint32 Unit::SpellHealingBonus(Unit *pVictim, SpellEntry const *spellProto, uint
         Unit::AuraList const& auraDummy = pVictim->GetAurasByType(SPELL_AURA_DUMMY);
         for(Unit::AuraList::const_iterator itr = auraDummy.begin(); itr!=auraDummy.end(); ++itr)
             if((*itr)->GetId() == 29203)
-                TakenTotalMod *= (*itr)->GetModifier()->m_amount;
+                TakenTotalMod *= ((*itr)->GetModifier()->m_amount+100.0f) / 100.0f;
     }
 
     // Healing taken percent
@@ -8355,8 +8355,8 @@ void Unit::MeleeDamageBonus(Unit *pVictim, uint32 *pdamage,WeaponAttackType attT
         TakenFlatBenefit += pVictim->GetTotalAuraModifier(SPELL_AURA_MOD_RANGED_DAMAGE_TAKEN);
 
     // Done/Taken total percent damage auras
-    float DoneTotalMod = 1;
-    float TakenTotalMod = 1;
+    float DoneTotalMod = 1.0f;
+    float TakenTotalMod = 1.0f;
 
     // ..done
     // SPELL_AURA_MOD_DAMAGE_PERCENT_DONE included in weapon damage
