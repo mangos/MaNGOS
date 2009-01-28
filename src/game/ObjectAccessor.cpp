@@ -174,7 +174,7 @@ ObjectAccessor::GetCorpse(WorldObject const &u, uint64 guid)
     if(!ret)
         return NULL;
     if(ret->GetMapId() != u.GetMapId())
-        ret = NULL;
+        return NULL;
     if(ret->GetInstanceId() != u.GetInstanceId())
         return NULL;
     return ret;
@@ -224,7 +224,7 @@ ObjectAccessor::GetGameObject(WorldObject const &u, uint64 guid)
     if(!ret)
         return NULL;
     if(ret->GetMapId() != u.GetMapId())
-        ret = NULL;
+        return NULL;
     if(ret->GetInstanceId() != u.GetInstanceId())
         return NULL;
     return ret;
@@ -237,7 +237,7 @@ ObjectAccessor::GetDynamicObject(WorldObject const &u, uint64 guid)
     if(!ret)
         return NULL;
     if(ret->GetMapId() != u.GetMapId())
-        ret = NULL;
+        return NULL;
     if(ret->GetInstanceId() != u.GetInstanceId())
         return NULL;
     return ret;
