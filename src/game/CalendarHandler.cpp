@@ -24,13 +24,10 @@
 #include "Opcodes.h"
 #include "InstanceSaveMgr.h"
 
-
-
 void WorldSession::HandleCalendarGetCalendar(WorldPacket &recv_data)
 {
     sLog.outDebug("WORLD: CMSG_CALENDAR_GET_CALENDAR");
     recv_data.hexlike();
-/* not compatible with 3.0.8? client crash at receive... :(
     time_t cur_time = time(NULL);
 
     WorldPacket data(SMSG_CALENDAR_SEND_CALENDAR,4+4*0+4+4*0+4+4);
@@ -65,10 +62,11 @@ void WorldSession::HandleCalendarGetCalendar(WorldPacket &recv_data)
     data.put<uint32>(p_counter,counter);
 
     data << (uint32) 1135753200;                            //wtf?? (28.12.2005 12:00)
-    sLog.outDebug("Sending calendar");
+    data << (uint32) 0;                                     //  unk counter 4
+    data << (uint32) 0;                                     // unk counter 5
+    //sLog.outDebug("Sending calendar");
     //data.hexlike();
     SendPacket(&data);
-*/
 }
 
 void WorldSession::HandleCalendarGetEvent(WorldPacket &recv_data)
