@@ -703,7 +703,7 @@ enum AuraState
     AURA_STATE_IMMOLATE                     = 14,           //   T |
     AURA_STATE_SWIFTMEND                    = 15,           //   T |
     AURA_STATE_DEADLY_POISON                = 16,           //   T |
-    //AURA_STATE_UNKNOWN17                  = 17,           // C   |
+    AURA_STATE_ENRAGE                       = 17,           // C   |
     //AURA_STATE_UNKNOWN18                  = 18,           // C  t|
     //AURA_STATE_UNKNOWN19                  = 19,           //     | not used
     //AURA_STATE_UNKNOWN20                  = 20,           //  c  | only (45317 Suicide)

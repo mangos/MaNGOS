@@ -972,6 +972,10 @@ void Aura::_AddAura()
             // Deadly poison aura state
             if(m_spellProto->SpellFamilyName == SPELLFAMILY_ROGUE && m_spellProto->SpellFamilyFlags & 0x10000)
                 m_target->ModifyAuraState(AURA_STATE_DEADLY_POISON, true);
+
+            // Enrage aura state
+            if(m_spellProto->Dispel == DISPEL_ENRAGE)
+                m_target->ModifyAuraState(AURA_STATE_ENRAGE, true);
         }
     }
 }
@@ -1041,6 +1045,10 @@ void Aura::_RemoveAura()
         //*****************************************************
         // Update target aura state flag (at last aura remove)
         //*****************************************************
+        // Enrage aura state
+        if(m_spellProto->Dispel == DISPEL_ENRAGE)
+            m_target->ModifyAuraState(AURA_STATE_ENRAGE, false);
+
         uint32 removeState = 0;
         switch(m_spellProto->SpellFamilyName)
         {
