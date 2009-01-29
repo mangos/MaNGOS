@@ -3367,6 +3367,8 @@ void Aura::HandleAuraModStun(bool apply, bool Real)
                 case 24132: spell_id = 24134; break;
                 case 24133: spell_id = 24135; break;
                 case 27068: spell_id = 27069; break;
+                case 49011: spell_id = 49009; break;
+                case 49012: spell_id = 49010; break;
                 default:
                     sLog.outError("Spell selection called for unexpected original spell %u, new spell for this spell family?",GetId());
                     return;
