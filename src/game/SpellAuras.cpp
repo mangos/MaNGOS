@@ -2908,6 +2908,9 @@ void Aura::HandleChannelDeathItem(bool apply, bool Real)
         Unit* victim = GetTarget();
         if(!caster || caster->GetTypeId() != TYPEID_PLAYER || !victim || m_removeMode!=AURA_REMOVE_BY_DEATH)
             return;
+        // Item amount
+        if (m_modifier.m_amount <= 0)
+            return;
 
         SpellEntry const *spellInfo = GetSpellProto();
         if(spellInfo->EffectItemType[m_effIndex] == 0)
@@ -2918,16 +2921,22 @@ void Aura::HandleChannelDeathItem(bool apply, bool Real)
             (victim->getLevel() <= MaNGOS::XP::GetGrayLevel(caster->getLevel()) ||
              victim->GetTypeId()==TYPEID_UNIT && !((Player*)caster)->isAllowedToLoot((Creature*)victim)) )
             return;
+        //Adding items
+        uint32 noSpaceForCount = 0;
+        uint32 count = m_modifier.m_amount;
+
         ItemPosCountVec dest;
-        uint8 msg = ((Player*)caster)->CanStoreNewItem( NULL_BAG, NULL_SLOT, dest, spellInfo->EffectItemType[m_effIndex], 1 );
+        uint8 msg = ((Player*)caster)->CanStoreNewItem( NULL_BAG, NULL_SLOT, dest, spellInfo->EffectItemType[m_effIndex], count, &noSpaceForCount);
         if( msg != EQUIP_ERR_OK )
         {
+            count-=noSpaceForCount;
             ((Player*)caster)->SendEquipError( msg, NULL, NULL );
-            return;
+            if (count==0)
+                return;
         }
 
         Item* newitem = ((Player*)caster)->StoreNewItem(dest, spellInfo->EffectItemType[m_effIndex], true);
-        ((Player*)caster)->SendNewItem(newitem, 1, true, false);
+        ((Player*)caster)->SendNewItem(newitem, count, true, false);
     }
 }
 
