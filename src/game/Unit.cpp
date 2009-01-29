@@ -7332,8 +7332,8 @@ uint32 Unit::SpellDamageBonus(Unit *pVictim, SpellEntry const *spellProto, uint3
     // Taken/Done total percent damage auras
     float DoneTotalMod = 1.0f;
     float TakenTotalMod = 1.0f;
-    uint32 DoneTotal = 0;
-    uint32 TakenTotal = 0;
+    int32 DoneTotal = 0;
+    int32 TakenTotal = 0;
 
     // ..done
     // Pet damage
@@ -7518,6 +7518,14 @@ uint32 Unit::SpellDamageBonus(Unit *pVictim, SpellEntry const *spellProto, uint3
                 break;
             }
         }
+    }
+
+    // Custom scripted damage
+    // Ice Lance
+    if (spellProto->SpellFamilyName == SPELLFAMILY_MAGE && spellProto->SpellIconID == 186)
+    {
+        if (pVictim->isFrozen())
+            DoneTotalMod *= 3.0f;
     }
 
     // ..taken
@@ -7883,8 +7891,8 @@ uint32 Unit::SpellHealingBonus(Unit *pVictim, SpellEntry const *spellProto, uint
     // Taken/Done total percent damage auras
     float  DoneTotalMod = 1.0f;
     float  TakenTotalMod = 1.0f;
-    uint32 DoneTotal = 0;
-    uint32 TakenTotal = 0;
+    int32  DoneTotal = 0;
+    int32  TakenTotal = 0;
 
     // Healing done percent
     AuraList const& mHealingDonePct = GetAurasByType(SPELL_AURA_MOD_HEALING_DONE_PERCENT);
