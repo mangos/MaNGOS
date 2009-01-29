@@ -7566,6 +7566,7 @@ uint32 Unit::SpellDamageBonus(Unit *pVictim, SpellEntry const *spellProto, uint3
     // Taken/Done fixed damage bonus auras
     int32 DoneAdvertisedBenefit  = SpellBaseDamageBonus(GetSpellSchoolMask(spellProto));
     int32 TakenAdvertisedBenefit = SpellBaseDamageBonusForVictim(GetSpellSchoolMask(spellProto), pVictim);
+
     // Pets just add their bonus damage to their spell damage
     // note that their spell damage is just gain of their own auras
     if (GetTypeId() == TYPEID_UNIT && ((Creature*)this)->isPet())
