@@ -7619,13 +7619,13 @@ uint32 Unit::SpellDamageBonus(Unit *pVictim, SpellEntry const *spellProto, uint3
                         break;
                     }
                 }
-                int DotTicks = 6;
+                int32 DotTicks = 6;
                 if(spellProto->EffectAmplitude[x] != 0)
                     DotTicks = DotDuration / spellProto->EffectAmplitude[x];
                 if(DotTicks)
                 {
-                    DoneAdvertisedBenefit /= DotTicks*stack;
-                    TakenAdvertisedBenefit /= DotTicks*stack;
+                    DoneAdvertisedBenefit /= DotTicks*int32(stack);
+                    TakenAdvertisedBenefit /= DotTicks*int32(stack);
                 }
             }
         }
@@ -8032,13 +8032,13 @@ uint32 Unit::SpellHealingBonus(Unit *pVictim, SpellEntry const *spellProto, uint
                         break;
                     }
                 }
-                int DotTicks = 6;
+                int32 DotTicks = 6;
                 if(spellProto->EffectAmplitude[x] != 0)
                     DotTicks = DotDuration / spellProto->EffectAmplitude[x];
                 if(DotTicks)
                 {
-                    DoneAdvertisedBenefit /= DotTicks;
-                    TakenAdvertisedBenefit /= DotTicks;
+                    DoneAdvertisedBenefit /= DotTicks*int32(stack);
+                    TakenAdvertisedBenefit /= DotTicks*int32(stack);
                 }
             }
         }
