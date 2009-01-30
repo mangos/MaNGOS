@@ -6593,10 +6593,10 @@ void Aura::HandlePhase(bool apply, bool Real)
 
         // GM-mode have mask 0xFFFFFFFF
         if(!((Player*)m_target)->isGameMaster())
-            m_target->SetPhaseMask(apply ? GetMiscValue() : PHASEMASK_NORMAL);
+            m_target->SetPhaseMask(apply ? GetMiscValue() : PHASEMASK_NORMAL,false);
     }
     else
-        m_target->SetPhaseMask(apply ? GetMiscValue() : PHASEMASK_NORMAL);
+        m_target->SetPhaseMask(apply ? GetMiscValue() : PHASEMASK_NORMAL,false);
 
     // need triggering visibility update base at phase update of not GM invisible (other GMs anyway see in any phases)
     if(m_target->GetVisibility()!=VISIBILITY_OFF)

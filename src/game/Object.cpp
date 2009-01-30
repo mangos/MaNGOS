@@ -1028,11 +1028,12 @@ WorldObject::WorldObject()
 {
 }
 
-void WorldObject::_Create( uint32 guidlow, HighGuid guidhigh, uint32 mapid )
+void WorldObject::_Create( uint32 guidlow, HighGuid guidhigh, uint32 mapid, uint32 phaseMask )
 {
     Object::_Create(guidlow, 0, guidhigh);
 
     m_mapId = mapid;
+    m_phaseMask = phaseMask;
 }
 
 uint32 WorldObject::GetZoneId() const
@@ -1468,7 +1469,7 @@ Creature* WorldObject::SummonCreature(uint32 id, float x, float y, float z, floa
     if (GetTypeId()==TYPEID_PLAYER)
         team = ((Player*)this)->GetTeam();
 
-    if (!pCreature->Create(objmgr.GenerateLowGuid(HIGHGUID_UNIT), GetMap(), id, team))
+    if (!pCreature->Create(objmgr.GenerateLowGuid(HIGHGUID_UNIT), GetMap(), GetPhaseMask(), id, team))
     {
         delete pCreature;
         return NULL;
@@ -1703,4 +1704,12 @@ void WorldObject::GetNearPoint(WorldObject const* searcher, float &x, float &y, 
     y = first_y;
 
     UpdateGroundPositionZ(x,y,z);                           // update to LOS height if available
+}
+
+void WorldObject::SetPhaseMask(uint32 newPhaseMask, bool update)
+{
+    m_phaseMask = newPhaseMask;
+
+    if(update && IsInWorld())
+        ObjectAccessor::UpdateObjectVisibility(this);
 }

@@ -349,7 +349,7 @@ class MANGOS_DLL_SPEC WorldObject : public Object
 
         virtual void Update ( uint32 /*time_diff*/ ) { }
 
-        void _Create( uint32 guidlow, HighGuid guidhigh, uint32 mapid );
+        void _Create( uint32 guidlow, HighGuid guidhigh, uint32 mapid, uint32 phaseMask);
 
         void Relocate(float x, float y, float z, float orientation)
         {
@@ -407,7 +407,7 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         void SetMapId(uint32 newMap) { m_mapId = newMap; }
         uint32 GetMapId() const { return m_mapId; }
 
-        void SetPhaseMask(uint32 newPhaseMask) { m_phaseMask = newPhaseMask; }
+        virtual void SetPhaseMask(uint32 newPhaseMask, bool update);
         uint32 GetPhaseMask() const { return m_phaseMask; }
         bool InSamePhase(WorldObject const* obj) const { return InSamePhase(obj->GetPhaseMask()); }
         bool InSamePhase(uint32 phasemask) const { return GetPhaseMask()==0 && phasemask==0 || (GetPhaseMask() & phasemask); }

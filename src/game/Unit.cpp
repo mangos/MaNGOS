@@ -11317,3 +11317,11 @@ void Unit::RemoveAurasAtChanneledTarget(SpellEntry const* spellInfo)
             ++iter;
     }
 }
+
+void Unit::SetPhaseMask(uint32 newPhaseMask, bool update)
+{
+    WorldObject::SetPhaseMask(newPhaseMask,update);
+
+    if(Pet* pet = GetPet())
+        pet->SetPhaseMask(newPhaseMask,true);
+}
