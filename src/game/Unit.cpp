@@ -11322,6 +11322,7 @@ void Unit::SetPhaseMask(uint32 newPhaseMask, bool update)
 {
     WorldObject::SetPhaseMask(newPhaseMask,update);
 
-    if(Pet* pet = GetPet())
-        pet->SetPhaseMask(newPhaseMask,true);
+    if(IsInWorld())
+        if(Pet* pet = GetPet())
+            pet->SetPhaseMask(newPhaseMask,true);
 }
