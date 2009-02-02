@@ -1419,11 +1419,6 @@ std::string ChatHandler::extractPlayerNameFromLink(char* text)
     return name;
 }
 
-const char *ChatHandler::GetName() const
-{
-    return m_session->GetPlayer()->GetName();
-}
-
 bool ChatHandler::needReportToTarget(Player* chr) const
 {
     Player* pl = m_session->GetPlayer();
@@ -1447,7 +1442,7 @@ void CliHandler::SendSysMessage(const char *str)
     m_print("\r\n");
 }
 
-const char *CliHandler::GetName() const
+std::string CliHandler::GetNameLink() const
 {
     return GetMangosString(LANG_CONSOLE_COMMAND);
 }
