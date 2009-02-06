@@ -365,6 +365,7 @@ ChatCommand * ChatHandler::getCommandTable()
 
     static ChatCommand resetCommandTable[] =
     {
+        { "achievements",   SEC_ADMINISTRATOR,  false, &ChatHandler::HandleResetAchievementsCommand,   "", NULL },
         { "honor",          SEC_ADMINISTRATOR,  false, &ChatHandler::HandleResetHonorCommand,          "", NULL },
         { "level",          SEC_ADMINISTRATOR,  false, &ChatHandler::HandleResetLevelCommand,          "", NULL },
         { "spells",         SEC_ADMINISTRATOR,  false, &ChatHandler::HandleResetSpellsCommand,         "", NULL },
