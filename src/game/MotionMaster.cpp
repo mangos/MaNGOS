@@ -136,7 +136,9 @@ MotionMaster::DelayedClean()
     if (empty() || size() == 1)
         return;
 
-    m_expList = new ExpireList();
+    if(!m_expList)
+        m_expList = new ExpireList();
+
     while( !empty() && size() > 1 )
     {
         MovementGenerator *curr = top();
@@ -184,10 +186,12 @@ MotionMaster::DelayedExpire()
     curr->Finalize(*i_owner);
     pop();
 
+    if(!m_expList)
+        m_expList = new ExpireList();
+
     if( !isStatic(curr) )
         m_expList->push_back(curr);
 
-    m_expList = new ExpireList();
     while( !empty() && top()->GetMovementGeneratorType() == TARGETED_MOTION_TYPE )
     {
         // Should check if target is still valid? If not valid it will crash.
