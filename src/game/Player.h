@@ -1966,7 +1966,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void ReportedAfkBy(Player* reporter);
         void ClearAfkReports() { m_bgAfkReporter.clear(); }
 
-        bool GetBGAccessByLevel(uint32 bgTypeId) const;
+        bool GetBGAccessByLevel(BattleGroundTypeId bgTypeId) const;
         bool isAllowUseBattleGroundObject();
 
         /*********************************************************/
