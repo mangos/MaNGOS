@@ -2328,7 +2328,7 @@ void World::SendWorldText(int32 string_id, ...)
             delete data_cache[i][j];
 }
 
-/// Send a System Message to all players (except self if mentioned)
+/// DEPRICATED, only for debug purpose. Send a System Message to all players (except self if mentioned)
 void World::SendGlobalText(const char* text, WorldSession *self)
 {
     WorldPacket data;

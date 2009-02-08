@@ -670,7 +670,17 @@ enum MangosStrings
     LANG_CANNOT_SUMMON_TO_BG            = 734,              // "You cannot summon players to a battleground or arena map."
     LANG_CANNOT_GO_TO_BG_GM             = 735,              // "You must be in GM mode to teleport to a player in a battleground."
     LANG_CANNOT_GO_TO_BG_FROM_BG        = 736,              // "You cannot teleport to a battleground from another battleground. Please leave the current battleground first."
-    // Room for batleground/arena strings 737-799 not used
+    LANG_DEBUG_ARENA_ON                 = 737,
+    LANG_DEBUG_ARENA_OFF                = 738,
+    LANG_DEBUG_BG_ON                    = 739,
+    LANG_DEBUG_BG_OFF                   = 740,
+    LANG_DIST_ARENA_POINTS_START        = 741,
+    LANG_DIST_ARENA_POINTS_ONLINE_START = 742,
+    LANG_DIST_ARENA_POINTS_ONLINE_END   = 743,
+    LANG_DIST_ARENA_POINTS_TEAM_START   = 744,
+    LANG_DIST_ARENA_POINTS_TEAM_END     = 745,
+    LANG_DIST_ARENA_POINTS_END          = 746,
+    // Room for batleground/arena strings 747-799 not used
 
     // in game strings
     //                                  = 800, not used
