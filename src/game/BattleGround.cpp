@@ -1322,6 +1322,9 @@ void BattleGround::SpawnBGCreature(uint32 type, uint32 respawntime)
 */
 bool BattleGround::DelCreature(uint32 type)
 {
+    if(!m_BgCreatures[type])
+        return true;
+
     Creature *cr = HashMapHolder<Creature>::Find(m_BgCreatures[type]);
     if(!cr)
     {
@@ -1336,6 +1339,9 @@ bool BattleGround::DelCreature(uint32 type)
 
 bool BattleGround::DelObject(uint32 type)
 {
+    if(!m_BgObjects[type])
+        return true;
+
     GameObject *obj = HashMapHolder<GameObject>::Find(m_BgObjects[type]);
     if(!obj)
     {
