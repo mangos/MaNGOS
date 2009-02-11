@@ -283,15 +283,22 @@ FleeingMovementGenerator<T>::Initialize(T &owner)
     if(!&owner)
         return;
 
-    Unit * fright = ObjectAccessor::GetUnit(owner, i_frightGUID);
-    if(!fright)
-        return;
-
     _Init(owner);
     owner.RemoveUnitMovementFlag(MOVEMENTFLAG_WALK_MODE);
-    i_caster_x = fright->GetPositionX();
-    i_caster_y = fright->GetPositionY();
-    i_caster_z = fright->GetPositionZ();
+
+    if(Unit * fright = ObjectAccessor::GetUnit(owner, i_frightGUID))
+    {
+        i_caster_x = fright->GetPositionX();
+        i_caster_y = fright->GetPositionY();
+        i_caster_z = fright->GetPositionZ();
+    }
+    else
+    {
+        i_caster_x = owner.GetPositionX();
+        i_caster_y = owner.GetPositionY();
+        i_caster_z = owner.GetPositionZ();
+    }
+
     i_only_forward = true;
     i_cur_angle = 0.0f;
     i_last_distance_from_caster = 0.0f;

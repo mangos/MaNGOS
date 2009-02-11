@@ -1110,8 +1110,8 @@ class MANGOS_DLL_SPEC Player : public Unit
         Item* EquipItem( uint16 pos, Item *pItem, bool update );
         void AutoUnequipOffhandIfNeed();
         bool StoreNewItemInBestSlots(uint32 item_id, uint32 item_count);
-        void AutoStoreLootItem(uint8 bag, uint8 slot, uint32 loot_id, LootStore const& store);
-        void AutoStoreLootItem(uint32 loot_id, LootStore const& store) { AutoStoreLootItem(NULL_BAG,NULL_SLOT,loot_id,store); }
+        void AutoStoreLoot(uint8 bag, uint8 slot, uint32 loot_id, LootStore const& store, bool broadcast = false);
+        void AutoStoreLoot(uint32 loot_id, LootStore const& store, bool broadcast = false) { AutoStoreLoot(NULL_BAG,NULL_SLOT,loot_id,store,broadcast); }
 
         uint8 _CanTakeMoreSimilarItems(uint32 entry, uint32 count, Item* pItem, uint32* no_space_count = NULL) const;
         uint8 _CanStoreItem( uint8 bag, uint8 slot, ItemPosCountVec& dest, uint32 entry, uint32 count, Item *pItem = NULL, bool swap = false, uint32* no_space_count = NULL ) const;
@@ -1261,7 +1261,6 @@ class MANGOS_DLL_SPEC Player : public Unit
             }
         }
         uint32 GetReqKillOrCastCurrentCount(uint32 quest_id, int32 entry);
-        void AdjustQuestReqItemCount( Quest const* pQuest );
         void AreaExploredOrEventHappens( uint32 questId );
         void GroupEventHappens( uint32 questId, WorldObject const* pEventObject );
         void ItemAddedQuestCheck( uint32 entry, uint32 count );
@@ -1944,18 +1943,10 @@ class MANGOS_DLL_SPEC Player : public Unit
                     return true;
             return false;
         }
-        uint32 GetBattleGroundEntryPointMap() const { return m_bgEntryPointMap; }
-        float GetBattleGroundEntryPointX() const { return m_bgEntryPointX; }
-        float GetBattleGroundEntryPointY() const { return m_bgEntryPointY; }
-        float GetBattleGroundEntryPointZ() const { return m_bgEntryPointZ; }
-        float GetBattleGroundEntryPointO() const { return m_bgEntryPointO; }
+        WorldLocation const& GetBattleGroundEntryPoint() const { return m_bgEntryPoint; }
         void SetBattleGroundEntryPoint(uint32 Map, float PosX, float PosY, float PosZ, float PosO )
         {
-            m_bgEntryPointMap = Map;
-            m_bgEntryPointX = PosX;
-            m_bgEntryPointY = PosY;
-            m_bgEntryPointZ = PosZ;
-            m_bgEntryPointO = PosO;
+            m_bgEntryPoint = WorldLocation(Map,PosX,PosY,PosZ,PosO);
         }
 
         void SetBGTeam(uint32 team) { m_bgTeam = team; }
@@ -1967,7 +1958,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void ReportedAfkBy(Player* reporter);
         void ClearAfkReports() { m_bgAfkReporter.clear(); }
 
-        bool GetBGAccessByLevel(uint32 bgTypeId) const;
+        bool GetBGAccessByLevel(BattleGroundTypeId bgTypeId) const;
         bool isAllowUseBattleGroundObject();
 
         /*********************************************************/
@@ -2050,6 +2041,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         float m_homebindX;
         float m_homebindY;
         float m_homebindZ;
+        void RelocateToHomebind() { SetMapId(m_homebindMapId); Relocate(m_homebindX,m_homebindY,m_homebindZ); }
 
         // currently visible objects at player client
         typedef std::set<uint64> ClientGUIDs;
@@ -2162,11 +2154,7 @@ class MANGOS_DLL_SPEC Player : public Unit
             uint32 invitedToInstance;
         };
         BgBattleGroundQueueID_Rec m_bgBattleGroundQueueID[PLAYER_MAX_BATTLEGROUND_QUEUES];
-        uint32 m_bgEntryPointMap;
-        float m_bgEntryPointX;
-        float m_bgEntryPointY;
-        float m_bgEntryPointZ;
-        float m_bgEntryPointO;
+        WorldLocation m_bgEntryPoint;
 
         std::set<uint32> m_bgAfkReporter;
         uint8 m_bgAfkReportedCount;
@@ -2408,6 +2396,8 @@ class MANGOS_DLL_SPEC Player : public Unit
         uint8 _CanStoreItem_InBag( uint8 bag, ItemPosCountVec& dest, ItemPrototype const *pProto, uint32& count, bool merge, bool non_specialized, Item *pSrcItem, uint8 skip_bag, uint8 skip_slot ) const;
         uint8 _CanStoreItem_InInventorySlots( uint8 slot_begin, uint8 slot_end, ItemPosCountVec& dest, ItemPrototype const *pProto, uint32& count, bool merge, Item *pSrcItem, uint8 skip_bag, uint8 skip_slot ) const;
         Item* _StoreItem( uint16 pos, Item *pItem, uint32 count, bool clone, bool update );
+
+        void AdjustQuestReqItemCount( Quest const* pQuest, QuestStatusData& questStatusData );
 
         GridReference<Player> m_gridRef;
         MapReference m_mapRef;

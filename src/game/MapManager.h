@@ -94,6 +94,11 @@ class MANGOS_DLL_DECL MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::
             return IsValidMAP(mapid) && MaNGOS::IsValidMapCoord(x,y,z,o);
         }
 
+        static bool IsValidMapCoord(WorldLocation const& loc)
+        {
+            return IsValidMapCoord(loc.mapid,loc.x,loc.y,loc.z,loc.o);
+        }
+
         void DoDelayedMovesAndRemoves();
 
         void LoadTransports();

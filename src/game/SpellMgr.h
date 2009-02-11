@@ -317,6 +317,12 @@ inline bool IsExplicitDiscoverySpell(SpellEntry const *spellInfo)
     return spellInfo->Effect[0]==SPELL_EFFECT_CREATE_ITEM_2 && spellInfo->Effect[1]==SPELL_EFFECT_SCRIPT_EFFECT;
 }
 
+inline bool IsLootCraftingSpell(SpellEntry const *spellInfo)
+{
+    return spellInfo->Effect[0]==SPELL_EFFECT_CREATE_ITEM_2 &&
+        (spellInfo->Effect[1]==SPELL_EFFECT_SCRIPT_EFFECT || !spellInfo->EffectItemType[0]);
+}
+
 int32 CompareAuraRanks(uint32 spellId_1, uint32 effIndex_1, uint32 spellId_2, uint32 effIndex_2);
 bool IsSingleFromSpellSpecificPerCaster(uint32 spellSpec1,uint32 spellSpec2);
 bool IsPassiveSpell(uint32 spellId);
@@ -357,7 +363,7 @@ bool IsSingleTargetSpells(SpellEntry const *spellInfo1, SpellEntry const *spellI
 
 bool IsAuraAddedBySpell(uint32 auraType, uint32 spellId);
 
-uint8 GetSpellAllowedInLocationError(SpellEntry const *spellInfo,uint32 map_id,uint32 zone_id,uint32 area_id);
+uint8 GetSpellAllowedInLocationError(SpellEntry const *spellInfo,uint32 map_id,uint32 zone_id,uint32 area_id,uint32 bgInstanceId);
 
 inline bool IsAreaEffectTarget( Targets target )
 {

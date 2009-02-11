@@ -43,6 +43,7 @@
 #include "SpellAuras.h"
 #include "Util.h"
 #include "WaypointManager.h"
+#include "BattleGround.h"
 
 INSTANTIATE_SINGLETON_1(ObjectMgr);
 
@@ -264,14 +265,14 @@ void ObjectMgr::RemoveArenaTeam(ArenaTeam* arenaTeam)
     mArenaTeamMap.erase( arenaTeam->GetId() );
 }
 
-AuctionHouseObject * ObjectMgr::GetAuctionsMap( uint32 location )
+AuctionHouseObject * ObjectMgr::GetAuctionsMap( AuctionLocation location )
 {
     switch ( location )
     {
-        case 6:                                             //horde
+        case AUCTION_HORDE:
             return & mHordeAuctions;
             break;
-        case 2:                                             //alliance
+        case AUCTION_ALLIANCE:
             return & mAllianceAuctions;
             break;
         default:                                            //neutral
@@ -279,18 +280,18 @@ AuctionHouseObject * ObjectMgr::GetAuctionsMap( uint32 location )
     }
 }
 
-uint32 ObjectMgr::GetAuctionCut(uint32 location, uint32 highBid)
+uint32 ObjectMgr::GetAuctionCut(AuctionLocation location, uint32 highBid)
 {
-    if (location == 7 && !sWorld.getConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_AUCTION))
+    if (location == AUCTION_NEUTRAL && !sWorld.getConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_AUCTION))
         return (uint32) (0.15f * highBid * sWorld.getRate(RATE_AUCTION_CUT));
     else
         return (uint32) (0.05f * highBid * sWorld.getRate(RATE_AUCTION_CUT));
 }
 
-uint32 ObjectMgr::GetAuctionDeposit(uint32 location, uint32 time, Item *pItem)
+uint32 ObjectMgr::GetAuctionDeposit(AuctionLocation location, uint32 time, Item *pItem)
 {
     float percentance;                                      // in 0..1
-    if ( location == 7 && !sWorld.getConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_AUCTION))
+    if (location == AUCTION_NEUTRAL && !sWorld.getConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_AUCTION))
         percentance = 0.75f;
     else
         percentance = 0.15f;
@@ -1564,18 +1565,31 @@ void ObjectMgr::LoadAuctions()
         aItem->bid = fields[8].GetUInt32();
         aItem->startbid = fields[9].GetUInt32();
         aItem->deposit = fields[10].GetUInt32();
-        aItem->location = fields[11].GetUInt8();
-        //check if sold item exists
-        if ( GetAItem( aItem->item_guidlow ) )
+
+        uint32 loc = fields[11].GetUInt8();
+        if(!IsValidAuctionLocation(loc))
         {
-            GetAuctionsMap( aItem->location )->AddAuction(aItem);
+            CharacterDatabase.PExecute("DELETE FROM auctionhouse WHERE id = '%u'",aItem->Id);
+            sLog.outError("Auction %u has wrong auction location (%u)", aItem->Id, loc);
+            delete aItem;
+            continue;
         }
-        else
+        aItem->location = AuctionLocation(loc);
+
+        // check if sold item exists for guid
+        // and item_template in fact (GetAItem will fail if problematic in result check in ObjectMgr::LoadAuctionItems)
+        if ( !GetAItem( aItem->item_guidlow ) )
         {
             CharacterDatabase.PExecute("DELETE FROM auctionhouse WHERE id = '%u'",aItem->Id);
             sLog.outError("Auction %u has not a existing item : %u", aItem->Id, aItem->item_guidlow);
             delete aItem;
+            continue;
         }
+
+        if(aItem->location)
+
+        GetAuctionsMap( aItem->location )->AddAuction(aItem);
+
     } while (result->NextRow());
     delete result;
 
@@ -6549,46 +6563,6 @@ int ObjectMgr::GetOrNewIndexForLocale( LocaleConstant loc )
     return m_LocalForIndex.size()-1;
 }
 
-void ObjectMgr::LoadBattleMastersEntry()
-{
-    mBattleMastersMap.clear();                              // need for reload case
-
-    QueryResult *result = WorldDatabase.Query( "SELECT entry,bg_template FROM battlemaster_entry" );
-
-    uint32 count = 0;
-
-    if( !result )
-    {
-        barGoLink bar( 1 );
-        bar.step();
-
-        sLog.outString();
-        sLog.outString( ">> Loaded 0 battlemaster entries - table is empty!" );
-        return;
-    }
-
-    barGoLink bar( result->GetRowCount() );
-
-    do
-    {
-        ++count;
-        bar.step();
-
-        Field *fields = result->Fetch();
-
-        uint32 entry = fields[0].GetUInt32();
-        uint32 bgTypeId  = fields[1].GetUInt32();
-
-        mBattleMastersMap[entry] = bgTypeId;
-
-    } while( result->NextRow() );
-
-    delete result;
-
-    sLog.outString();
-    sLog.outString( ">> Loaded %u battlemaster entries", count );
-}
-
 void ObjectMgr::LoadGameObjectForQuests()
 {
     mGameObjectForQuestSet.clear();                         // need for reload case
@@ -7274,16 +7248,16 @@ void ObjectMgr::LoadTrainerSpell()
 
         TrainerSpell* pTrainerSpell = new TrainerSpell();
         pTrainerSpell->spell         = spell;
-        pTrainerSpell->spellcost     = fields[2].GetUInt32();
-        pTrainerSpell->reqskill      = fields[3].GetUInt32();
-        pTrainerSpell->reqskillvalue = fields[4].GetUInt32();
-        pTrainerSpell->reqlevel      = fields[5].GetUInt32();
+        pTrainerSpell->spellCost     = fields[2].GetUInt32();
+        pTrainerSpell->reqSkill      = fields[3].GetUInt32();
+        pTrainerSpell->reqSkillValue = fields[4].GetUInt32();
+        pTrainerSpell->reqLevel      = fields[5].GetUInt32();
 
-        if(!pTrainerSpell->reqlevel)
-            pTrainerSpell->reqlevel = spellinfo->spellLevel;
+        if(!pTrainerSpell->reqLevel)
+            pTrainerSpell->reqLevel = spellinfo->spellLevel;
 
         // calculate learned spell for profession case when stored cast-spell
-        pTrainerSpell->learned_spell = spell;
+        pTrainerSpell->learnedSpell = spell;
         for(int i = 0; i <3; ++i)
         {
             if(spellinfo->Effect[i]!=SPELL_EFFECT_LEARN_SPELL)
@@ -7291,7 +7265,7 @@ void ObjectMgr::LoadTrainerSpell()
 
             if(SpellMgr::IsProfessionOrRidingSpell(spellinfo->EffectTriggerSpell[i]))
             {
-                pTrainerSpell->learned_spell = spellinfo->EffectTriggerSpell[i];
+                pTrainerSpell->learnedSpell = spellinfo->EffectTriggerSpell[i];
                 break;
             }
         }

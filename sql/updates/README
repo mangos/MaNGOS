@@ -37,3 +37,16 @@ After appling this update DB compatiable with database that include this sql upd
 SQL update include special protection against multiply and wrong order SQL updates apply.
 So attempt apply sql update to more old DB without previous SQL update in list for targeted database
 or to DB with already applied this or later SQL update will generate error and not applied.
+
+=== For commiters ====
+
+MaNGOS sources include special tool ( contrib/git_id ) for generation revision info
+in commit notes and in src/shared/revision_nr.h file. It have option '-s' that let set
+correct sql update names with revision number, generate sql update order guard queries,
+and update version fields in mangos.sql/etc. For it use name sql updates in form
+01_mangos_spell_chain.sql or 9999_01_mangos_spell_chain.sql (counter can be _01_, _02_, and etc,
+dependent from sql updates amount in commit) and _not_ add to sql updates
+guard queries. Include sql updates in commit. After commit adding to local repo call git_id
+with -s option (and another, note: -s option not work propertly with -l option). Other steps
+tool will do by self and apply changes to commit. After tool use commit with sql updates ready
+to push.

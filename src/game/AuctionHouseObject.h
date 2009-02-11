@@ -39,6 +39,15 @@ enum AuctionAction
     AUCTION_PLACE_BID = 2
 };
 
+enum AuctionLocation
+{
+    AUCTION_ALLIANCE = 2,
+    AUCTION_HORDE    = 6,
+    AUCTION_NEUTRAL  = 7
+};
+
+inline bool IsValidAuctionLocation(uint32 loc) { return loc == AUCTION_ALLIANCE || loc == AUCTION_HORDE || loc == AUCTION_NEUTRAL; }
+
 struct AuctionEntry
 {
     uint32 Id;
@@ -52,7 +61,7 @@ struct AuctionEntry
     time_t time;
     uint32 bidder;
     uint32 deposit;                                         //deposit can be calculated only when creating auction
-    uint32 location;
+    AuctionLocation location;
 };
 
 //this class is used as auctionhouse instance

@@ -231,6 +231,7 @@ class Spell
         void EffectHealthLeech(uint32 i);
         void EffectQuestComplete(uint32 i);
         void EffectCreateItem(uint32 i);
+        void EffectCreateItem2(uint32 i);
         void EffectPersistentAA(uint32 i);
         void EffectEnergize(uint32 i);
         void EffectOpenLock(uint32 i);
@@ -319,6 +320,7 @@ class Spell
         void EffectQuestFail(uint32 i);
         void EffectActivateRune(uint32 i);
         void EffectTitanGrip(uint32 i);
+        void EffectEnchantItemPrismatic(uint32 i);
 
         Spell( Unit* Caster, SpellEntry const *info, bool triggered, uint64 originalCasterGUID = 0, Spell** triggeringContainer = NULL );
         ~Spell();

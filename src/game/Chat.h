@@ -68,8 +68,6 @@ class ChatHandler
         void PSendSysMessage(         int32     entry, ...  );
 
         int ParseCommands(const char* text);
-
-        virtual char const* GetName() const;
     protected:
         explicit ChatHandler() : m_session(NULL) {}      // for CLI subclass
 
@@ -380,6 +378,7 @@ class ChatHandler
         bool HandleDelTeleCommand(const char * args);
         bool HandleListAurasCommand(const char * args);
 
+        bool HandleResetAchievementsCommand(const char * args);
         bool HandleResetHonorCommand(const char * args);
         bool HandleResetLevelCommand(const char * args);
         bool HandleResetSpellsCommand(const char * args);
@@ -440,6 +439,7 @@ class ChatHandler
         bool HandleGetItemState(const char * args);
         bool HandleGetLootRecipient(const char * args);
         bool HandleDebugArenaCommand(const char * args);
+        bool HandleDebugBattlegroundCommand(const char * args);
         bool HandleSpawnVehicle(const char * args);
         bool HandleSendLargePacketCommand(const char * args);
 
@@ -456,6 +456,8 @@ class ChatHandler
         std::string extractPlayerNameFromLink(char* text);
 
         std::string playerLink(std::string const& name) const { return m_session ? "|cffffffff|Hplayer:"+name+"|h["+name+"]|h|r" : name; }
+        virtual std::string GetNameLink() const { return GetNameLink(m_session->GetPlayer()); }
+        std::string GetNameLink(Player* chr) const { return playerLink(chr->GetName()); }
 
         GameObject* GetObjectGlobalyWithGuidOrNearWithDbGuid(uint32 lowguid,uint32 entry);
 
@@ -486,7 +488,7 @@ class CliHandler : public ChatHandler
         const char *GetMangosString(int32 entry) const;
         bool isAvailable(ChatCommand const& cmd) const;
         void SendSysMessage(const char *str);
-        char const* GetName() const;
+        std::string GetNameLink() const;
         bool needReportToTarget(Player* chr) const;
 
     private:

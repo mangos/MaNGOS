@@ -108,6 +108,7 @@ enum ITEM_FLAGS
     ITEM_FLAGS_WRAPPER                        = 0x00000200, // used or not used wrapper
     ITEM_FLAGS_PARTY_LOOT                     = 0x00000800, // determines if item is party loot or not
     ITEM_FLAGS_CHARTER                        = 0x00002000, // arena/guild charter
+    ITEM_FLAGS_PROSPECTABLE                   = 0x00040000,
     ITEM_FLAGS_UNIQUE_EQUIPPED                = 0x00080000,
     ITEM_FLAGS_USEABLE_IN_ARENA               = 0x00200000,
     ITEM_FLAGS_THROWABLE                      = 0x00400000, // not used in game for check trow possibility, only for item in game tooltip
@@ -627,6 +628,29 @@ struct ItemPrototype
     }
 
     uint32 GetMaxStackSize() const { return Stackable > 0 ? uint32(Stackable) : uint32(0x7FFFFFFF-1); }
+
+    float getDPS() const
+    {
+        if (Delay == 0)
+            return 0;
+        float temp = 0;
+        for (int i=0;i<5;++i)
+            temp+=Damage[i].DamageMin + Damage[i].DamageMax;
+        return temp*500/Delay;
+    }
+
+    int32 getFeralBonus() const
+    {
+        // 0x02A5F3 - is mask for Melee weapon from ItemSubClassMask.dbc
+        if (Class == ITEM_CLASS_WEAPON && (1<<SubClass)&0x02A5F3)
+        {
+            int32 bonus = int32(getDPS()*14.0f) - 767;
+            if (bonus < 0)
+                return 0;
+            return bonus;
+        }
+        return 0;
+    }
 };
 
 struct ItemLocale
