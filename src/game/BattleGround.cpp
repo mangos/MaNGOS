@@ -39,7 +39,7 @@ BattleGround::BattleGround()
     m_Status            = 0;
     m_EndTime           = 0;
     m_LastResurrectTime = 0;
-    m_Queue_type        = MAX_BATTLEGROUND_QUEUES;
+    m_QueueId           = MAX_BATTLEGROUND_QUEUES;
     m_InvitedAlliance   = 0;
     m_InvitedHorde      = 0;
     m_ArenaType         = 0;
@@ -554,7 +554,7 @@ void BattleGround::EndBattleGround(uint32 winner)
         sBattleGroundMgr.BuildPvpLogDataPacket(&data, this);
         plr->GetSession()->SendPacket(&data);
 
-        uint32 bgQueueTypeId = BattleGroundMgr::BGQueueTypeId(GetTypeID(), GetArenaType());
+        BattleGroundQueueTypeId bgQueueTypeId = BattleGroundMgr::BGQueueTypeId(GetTypeID(), GetArenaType());
         sBattleGroundMgr.BuildBattleGroundStatusPacket(&data, this, plr->GetTeam(), plr->GetBattleGroundQueueIndex(bgQueueTypeId), STATUS_IN_PROGRESS, TIME_TO_AUTOREMOVE, GetStartTime());
         plr->GetSession()->SendPacket(&data);
         plr->GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_BATTLEGROUND, 1);
@@ -771,7 +771,7 @@ void BattleGround::RemovePlayerAtLeave(uint64 guid, bool Transport, bool SendPac
             if(!team) team = plr->GetTeam();
 
             BattleGroundTypeId bgTypeId = GetTypeID();
-            uint32 bgQueueTypeId = BattleGroundMgr::BGQueueTypeId(GetTypeID(), GetArenaType());
+            BattleGroundQueueTypeId bgQueueTypeId = BattleGroundMgr::BGQueueTypeId(GetTypeID(), GetArenaType());
             // if arena, remove the specific arena auras
             if(isArena())
             {
@@ -822,8 +822,8 @@ void BattleGround::RemovePlayerAtLeave(uint64 guid, bool Transport, bool SendPac
 
             DecreaseInvitedCount(team);
             //we should update battleground queue, but only if bg isn't ending
-            if (GetQueueType() < MAX_BATTLEGROUND_QUEUES)
-                sBattleGroundMgr.m_BattleGroundQueues[bgQueueTypeId].Update(bgTypeId, GetQueueType());
+            if (GetQueueId() < MAX_BATTLEGROUND_QUEUES)
+                sBattleGroundMgr.m_BattleGroundQueues[bgQueueTypeId].Update(bgTypeId, GetQueueId());
 
             Group * group = plr->GetGroup();
             // remove from raid group if exist
@@ -869,7 +869,7 @@ void BattleGround::RemovePlayerAtLeave(uint64 guid, bool Transport, bool SendPac
 // this method is called when no players remains in battleground
 void BattleGround::Reset()
 {
-    SetQueueType(MAX_BATTLEGROUND_QUEUES);
+    SetQueueId(MAX_BATTLEGROUND_QUEUES);
     SetWinner(WINNER_NONE);
     SetStatus(STATUS_WAIT_QUEUE);
     SetStartTime(0);
@@ -1513,7 +1513,7 @@ void BattleGround::PlayerRelogin(Player* plr)
         return;
 
     WorldPacket data;
-    uint32 bgQueueTypeId = BattleGroundMgr::BGQueueTypeId(GetTypeID(), GetArenaType());
+    BattleGroundQueueTypeId bgQueueTypeId = BattleGroundMgr::BGQueueTypeId(GetTypeID(), GetArenaType());
 
     BlockMovement(plr);
 
