@@ -24,7 +24,7 @@
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "UpdateMask.h"
-#include "AuctionHouseObject.h"
+#include "AuctionHouseMgr.h"
 #include "Util.h"
 
 //please DO NOT use iterator++, because it is slower than ++iterator!!!
