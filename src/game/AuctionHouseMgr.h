@@ -23,6 +23,8 @@
 #include "Policies/Singleton.h"
 
 class Item;
+class Player;
+class WorldPacket;
 
 #define MIN_AUCTION_TIME (12*HOUR)
 
@@ -61,10 +63,15 @@ struct AuctionEntry
     uint32 startbid;                                        //maybe useless
     uint32 bid;
     uint32 buyout;
-    time_t time;
+    time_t expire_time;
     uint32 bidder;
     uint32 deposit;                                         //deposit can be calculated only when creating auction
     AuctionLocation location;
+
+    // helpers
+    uint32 GetAuctionCut() const;
+    uint32 GetAuctionOutBid() const;
+    bool BuildAuctionInfo(WorldPacket & data) const;
 };
 
 //this class is used as auctionhouse instance
@@ -82,9 +89,6 @@ class AuctionHouseObject
 
         uint32 Getcount() { return AuctionsMap.size(); }
 
-        AuctionEntryMap::iterator GetAuctionsBegin() {return AuctionsMap.begin();}
-        AuctionEntryMap::iterator GetAuctionsEnd() {return AuctionsMap.end();}
-
         void AddAuction(AuctionEntry *ah)
         {
             ASSERT( ah );
@@ -101,6 +105,15 @@ class AuctionHouseObject
         {
             return AuctionsMap.erase(id) ? true : false;
         }
+
+        void Update();
+
+        void BuildListBidderItems(WorldPacket& data, Player* player, uint32& count, uint32& totalcount);
+        void BuildListOwnerItems(WorldPacket& data, Player* player, uint32& count, uint32& totalcount);
+        void BuildListAuctionItems(WorldPacket& data, Player* player, 
+            std::wstring const& searchedname, uint32 listfrom, uint32 levelmin, uint32 levelmax, uint32 usable,
+            uint32 inventoryType, uint32 itemClass, uint32 itemSubClass, uint32 quality,
+            uint32& count, uint32& totalcount);
 
     private:
         AuctionEntryMap AuctionsMap;
@@ -126,22 +139,23 @@ class AuctionHouseMgr
             return NULL;
         }
 
-        void AddAItem(Item* it);
-
-        bool RemoveAItem(uint32 id);
-
         //auction messages
         void SendAuctionWonMail( AuctionEntry * auction );
         void SendAuctionSalePendingMail( AuctionEntry * auction );
         void SendAuctionSuccessfulMail( AuctionEntry * auction );
         void SendAuctionExpiredMail( AuctionEntry * auction );
-        static uint32 GetAuctionCut( AuctionLocation location, uint32 highBid );
         static uint32 GetAuctionDeposit(AuctionLocation location, uint32 time, Item *pItem);
-        static uint32 GetAuctionOutBid(uint32 currentBid);
+
     public:
         //load first auction items, because of check if item exists, when loading
         void LoadAuctionItems();
         void LoadAuctions();
+
+        void AddAItem(Item* it);
+        bool RemoveAItem(uint32 id);
+
+        void Update();
+
     private:
         AuctionHouseObject  mHordeAuctions;
         AuctionHouseObject  mAllianceAuctions;

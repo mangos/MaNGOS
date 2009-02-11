@@ -29,12 +29,12 @@
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "World.h"
+#include "WorldPacket.h"
 #include "WorldSession.h"
 
 #include "Policies/SingletonImp.h"
 
 INSTANTIATE_SINGLETON_1( AuctionHouseMgr );
-
 
 AuctionHouseMgr::AuctionHouseMgr()
 {
@@ -61,14 +61,6 @@ AuctionHouseObject * AuctionHouseMgr::GetAuctionsMap( AuctionLocation location )
     }
 }
 
-uint32 AuctionHouseMgr::GetAuctionCut(AuctionLocation location, uint32 highBid)
-{
-    if (location == AUCTION_NEUTRAL && !sWorld.getConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_AUCTION))
-        return (uint32) (0.15f * highBid * sWorld.getRate(RATE_AUCTION_CUT));
-    else
-        return (uint32) (0.05f * highBid * sWorld.getRate(RATE_AUCTION_CUT));
-}
-
 uint32 AuctionHouseMgr::GetAuctionDeposit(AuctionLocation location, uint32 time, Item *pItem)
 {
     float percentance;                                      // in 0..1
@@ -80,15 +72,6 @@ uint32 AuctionHouseMgr::GetAuctionDeposit(AuctionLocation location, uint32 time,
     percentance *= sWorld.getRate(RATE_AUCTION_DEPOSIT);
 
     return uint32( percentance * pItem->GetProto()->SellPrice * pItem->GetCount() * (time / MIN_AUCTION_TIME ) );
-}
-
-/// the sum of outbid is (1% from current bid)*5, if bid is very small, it is 1c
-uint32 AuctionHouseMgr::GetAuctionOutBid(uint32 currentBid)
-{
-    uint32 outbid = (currentBid / 100) * 5;
-    if (!outbid)
-        outbid = 1;
-    return outbid;
 }
 
 //does not clear ram
@@ -193,7 +176,7 @@ void AuctionHouseMgr::SendAuctionSalePendingMail( AuctionEntry * auction )
         msgAuctionSalePendingSubject << auction->item_template << ":0:" << AUCTION_SALE_PENDING;
 
         std::ostringstream msgAuctionSalePendingBody;
-        uint32 auctionCut = GetAuctionCut(auction->location, auction->bid);
+        uint32 auctionCut = auction->GetAuctionCut();
 
         time_t distrTime = time(NULL) + HOUR;
 
@@ -228,7 +211,7 @@ void AuctionHouseMgr::SendAuctionSuccessfulMail( AuctionEntry * auction )
         msgAuctionSuccessfulSubject << auction->item_template << ":0:" << AUCTION_SUCCESSFUL;
 
         std::ostringstream auctionSuccessfulBody;
-        uint32 auctionCut = GetAuctionCut(auction->location, auction->bid);
+        uint32 auctionCut = auction->GetAuctionCut();
 
         auctionSuccessfulBody.width(16);
         auctionSuccessfulBody << std::right << std::hex << auction->bidder;
@@ -399,7 +382,7 @@ void AuctionHouseMgr::LoadAuctions()
         aItem->item_template = fields[3].GetUInt32();
         aItem->owner = fields[4].GetUInt32();
         aItem->buyout = fields[5].GetUInt32();
-        aItem->time = fields[6].GetUInt32();
+        aItem->expire_time = fields[6].GetUInt32();
         aItem->bidder = fields[7].GetUInt32();
         aItem->bid = fields[8].GetUInt32();
         aItem->startbid = fields[9].GetUInt32();
@@ -452,4 +435,188 @@ bool AuctionHouseMgr::RemoveAItem( uint32 id )
     }
     mAitems.erase(i);
     return true;
+}
+
+void AuctionHouseMgr::Update()
+{
+    mHordeAuctions.Update();
+    mAllianceAuctions.Update();
+    mNeutralAuctions.Update();
+}
+
+void AuctionHouseObject::Update()
+{
+    time_t curTime = sWorld.GetGameTime();
+    ///- Handle expired auctions
+    AuctionEntryMap::iterator next;
+    for (AuctionEntryMap::iterator itr = AuctionsMap.begin(); itr != AuctionsMap.end();itr = next)
+    {
+        next = itr;
+        ++next;
+        if (curTime > (itr->second->expire_time))
+        {
+            ///- Either cancel the auction if there was no bidder
+            if (itr->second->bidder == 0)
+            {
+                auctionmgr.SendAuctionExpiredMail( itr->second );
+            }
+            ///- Or perform the transaction
+            else
+            {
+                //we should send an "item sold" message if the seller is online
+                //we send the item to the winner
+                //we send the money to the seller
+                auctionmgr.SendAuctionSuccessfulMail( itr->second );
+                auctionmgr.SendAuctionWonMail( itr->second );
+            }
+
+            ///- In any case clear the auction
+            //No SQL injection (Id is integer)
+            CharacterDatabase.PExecute("DELETE FROM auctionhouse WHERE id = '%u'",itr->second->Id);
+            auctionmgr.RemoveAItem(itr->second->item_guidlow);
+            delete itr->second;
+            RemoveAuction(itr->first);
+        }
+    }
+}
+
+void AuctionHouseObject::BuildListBidderItems(WorldPacket& data, Player* player, uint32& count, uint32& totalcount)
+{
+    for (AuctionEntryMap::const_iterator itr = AuctionsMap.begin();itr != AuctionsMap.end();++itr)
+    {
+        AuctionEntry *Aentry = itr->second;
+        if( Aentry && Aentry->bidder == player->GetGUIDLow() )
+        {
+            if (itr->second->BuildAuctionInfo(data))
+                ++count;
+            ++totalcount;
+        }
+    }
+}
+
+void AuctionHouseObject::BuildListOwnerItems(WorldPacket& data, Player* player, uint32& count, uint32& totalcount)
+{
+    for (AuctionEntryMap::const_iterator itr = AuctionsMap.begin();itr != AuctionsMap.end();++itr)
+    {
+        AuctionEntry *Aentry = itr->second;
+        if( Aentry && Aentry->owner == player->GetGUIDLow() )
+        {
+            if(Aentry->BuildAuctionInfo(data))
+                ++count;
+            ++totalcount;
+        }
+    }
+}
+
+void AuctionHouseObject::BuildListAuctionItems(WorldPacket& data, Player* player,
+    std::wstring const& wsearchedname, uint32 listfrom, uint32 levelmin, uint32 levelmax, uint32 usable,
+    uint32 inventoryType, uint32 itemClass, uint32 itemSubClass, uint32 quality,
+    uint32& count, uint32& totalcount)
+{
+    int loc_idx = player->GetSession()->GetSessionDbLocaleIndex();
+
+    for (AuctionEntryMap::const_iterator itr = AuctionsMap.begin();itr != AuctionsMap.end();++itr)
+    {
+        AuctionEntry *Aentry = itr->second;
+        Item *item = auctionmgr.GetAItem(Aentry->item_guidlow);
+        if (!item)
+            continue;
+
+        ItemPrototype const *proto = item->GetProto();
+
+        if (itemClass != (0xffffffff) && proto->Class != itemClass)
+            continue;
+
+        if (itemSubClass != (0xffffffff) && proto->SubClass != itemSubClass)
+            continue;
+
+        if (inventoryType != (0xffffffff) && proto->InventoryType != inventoryType)
+            continue;
+
+        if (quality != (0xffffffff) && proto->Quality != quality)
+            continue;
+
+        if( levelmin != (0x00) && (proto->RequiredLevel < levelmin || levelmax != (0x00) && proto->RequiredLevel > levelmax ) )
+            continue;
+
+        if( usable != (0x00) && player->CanUseItem( item ) != EQUIP_ERR_OK )
+            continue;
+
+        std::string name = proto->Name1;
+        if(name.empty())
+            continue;
+
+        // local name
+        if ( loc_idx >= 0 )
+        {
+            ItemLocale const *il = objmgr.GetItemLocale(proto->ItemId);
+            if (il)
+            {
+                if (il->Name.size() > size_t(loc_idx) && !il->Name[loc_idx].empty())
+                    name = il->Name[loc_idx];
+            }
+        }
+
+        if( !wsearchedname.empty() && !Utf8FitTo(name, wsearchedname) )
+            continue;
+
+        if ((count < 50) && (totalcount >= listfrom))
+        {
+            ++count;
+            Aentry->BuildAuctionInfo(data);
+        }
+        ++totalcount;
+    }
+}
+
+//this function inserts to WorldPacket auction's data
+bool AuctionEntry::BuildAuctionInfo(WorldPacket & data) const
+{
+    Item *pItem = auctionmgr.GetAItem(item_guidlow);
+    if (!pItem)
+    {
+        sLog.outError("auction to item, that doesn't exist !!!!");
+        return false;
+    }
+    data << (uint32) Id;
+    data << (uint32) pItem->GetEntry();
+
+    for (uint8 i = 0; i < MAX_INSPECTED_ENCHANTMENT_SLOT; i++)
+    {
+        data << (uint32) pItem->GetEnchantmentId(EnchantmentSlot(i));
+        data << (uint32) pItem->GetEnchantmentDuration(EnchantmentSlot(i));
+        data << (uint32) pItem->GetEnchantmentCharges(EnchantmentSlot(i));
+    }
+
+    data << (uint32) pItem->GetItemRandomPropertyId();      //random item property id
+    data << (uint32) pItem->GetItemSuffixFactor();          //SuffixFactor
+    data << (uint32) pItem->GetCount();                     //item->count
+    data << (uint32) pItem->GetSpellCharges();              //item->charge FFFFFFF
+    data << (uint32) 0;                                     //Unknown
+    data << (uint64) owner;                                 //Auction->owner
+    data << (uint32) startbid;                              //Auction->startbid (not sure if useful)
+    data << (uint32) (bid ? GetAuctionOutBid() : 0);
+    //minimal outbid
+    data << (uint32) buyout;                                //auction->buyout
+    data << (uint32) (expire_time - time(NULL))* 1000;      //time left
+    data << (uint64) bidder;                                //auction->bidder current
+    data << (uint32) bid;                                   //current bid
+    return true;
+}
+
+uint32 AuctionEntry::GetAuctionCut() const
+{
+    if (location == AUCTION_NEUTRAL && !sWorld.getConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_AUCTION))
+        return (uint32) (0.15f * bid * sWorld.getRate(RATE_AUCTION_CUT));
+    else
+        return (uint32) (0.05f * bid * sWorld.getRate(RATE_AUCTION_CUT));
+}
+
+/// the sum of outbid is (1% from current bid)*5, if bid is very small, it is 1c
+uint32 AuctionEntry::GetAuctionOutBid() const
+{
+    uint32 outbid = (bid / 100) * 5;
+    if (!outbid)
+        outbid = 1;
+    return outbid;
 }

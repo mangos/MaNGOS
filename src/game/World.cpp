@@ -1472,54 +1472,8 @@ void World::Update(uint32 diff)
             objmgr.ReturnOrDeleteOldMails(true);
         }
 
-        AuctionHouseObject* AuctionMap;
-        for (int i = 0; i < 3; i++)
-        {
-            switch (i)
-            {
-                case 0:
-                    AuctionMap = auctionmgr.GetAuctionsMap(AUCTION_HORDE);
-                    break;
-                case 1:
-                    AuctionMap = auctionmgr.GetAuctionsMap(AUCTION_ALLIANCE);
-                    break;
-                case 2:
-                    AuctionMap = auctionmgr.GetAuctionsMap(AUCTION_NEUTRAL);
-                    break;
-            }
-
-            ///- Handle expired auctions
-            AuctionHouseObject::AuctionEntryMap::iterator itr,next;
-            for (itr = AuctionMap->GetAuctionsBegin(); itr != AuctionMap->GetAuctionsEnd();itr = next)
-            {
-                next = itr;
-                ++next;
-                if (m_gameTime > (itr->second->time))
-                {
-                    ///- Either cancel the auction if there was no bidder
-                    if (itr->second->bidder == 0)
-                    {
-                        auctionmgr.SendAuctionExpiredMail( itr->second );
-                    }
-                    ///- Or perform the transaction
-                    else
-                    {
-                        //we should send an "item sold" message if the seller is online
-                        //we send the item to the winner
-                        //we send the money to the seller
-                        auctionmgr.SendAuctionSuccessfulMail( itr->second );
-                        auctionmgr.SendAuctionWonMail( itr->second );
-                    }
-
-                    ///- In any case clear the auction
-                    //No SQL injection (Id is integer)
-                    CharacterDatabase.PExecute("DELETE FROM auctionhouse WHERE id = '%u'",itr->second->Id);
-                    auctionmgr.RemoveAItem(itr->second->item_guidlow);
-                    delete itr->second;
-                    AuctionMap->RemoveAuction(itr->first);
-                }
-            }
-        }
+        ///- Handle expired auctions
+        auctionmgr.Update();
     }
 
     /// <li> Handle session updates when the timer has passed
