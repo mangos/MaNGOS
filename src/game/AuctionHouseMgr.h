@@ -16,10 +16,13 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef _AUCTION_HOUSE_H
-#define _AUCTION_HOUSE_H
+#ifndef _AUCTION_HOUSE_MGR_H
+#define _AUCTION_HOUSE_MGR_H
 
 #include "SharedDefines.h"
+#include "Policies/Singleton.h"
+
+class Item;
 
 #define MIN_AUCTION_TIME (12*HOUR)
 
@@ -102,4 +105,51 @@ class AuctionHouseObject
     private:
         AuctionEntryMap AuctionsMap;
 };
+
+class AuctionHouseMgr
+{
+    public:
+        AuctionHouseMgr();
+        ~AuctionHouseMgr();
+
+        typedef UNORDERED_MAP<uint32, Item*> ItemMap;
+
+        AuctionHouseObject * GetAuctionsMap( AuctionLocation location );
+
+        Item* GetAItem(uint32 id)
+        {
+            ItemMap::const_iterator itr = mAitems.find(id);
+            if (itr != mAitems.end())
+            {
+                return itr->second;
+            }
+            return NULL;
+        }
+
+        void AddAItem(Item* it);
+
+        bool RemoveAItem(uint32 id);
+
+        //auction messages
+        void SendAuctionWonMail( AuctionEntry * auction );
+        void SendAuctionSalePendingMail( AuctionEntry * auction );
+        void SendAuctionSuccessfulMail( AuctionEntry * auction );
+        void SendAuctionExpiredMail( AuctionEntry * auction );
+        static uint32 GetAuctionCut( AuctionLocation location, uint32 highBid );
+        static uint32 GetAuctionDeposit(AuctionLocation location, uint32 time, Item *pItem);
+        static uint32 GetAuctionOutBid(uint32 currentBid);
+    public:
+        //load first auction items, because of check if item exists, when loading
+        void LoadAuctionItems();
+        void LoadAuctions();
+    private:
+        AuctionHouseObject  mHordeAuctions;
+        AuctionHouseObject  mAllianceAuctions;
+        AuctionHouseObject  mNeutralAuctions;
+
+        ItemMap             mAitems;
+};
+
+#define auctionmgr MaNGOS::Singleton<AuctionHouseMgr>::Instance()
+
 #endif
