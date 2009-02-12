@@ -52,29 +52,16 @@ void WorldSession::HandleAuctionHelloOpcode( WorldPacket & recv_data )
     SendAuctionHello(guid, unit);
 }
 
-static AuctionLocation AuctioneerFactionToLocation(uint32 faction)
-{
-    if(sWorld.getConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_AUCTION))
-        return AUCTION_NEUTRAL;
-
-    FactionTemplateEntry const* u_entry = sFactionTemplateStore.LookupEntry(faction);
-    if(!u_entry)
-        return AUCTION_NEUTRAL;
-
-    if(u_entry->ourMask & FACTION_MASK_ALLIANCE)
-        return AUCTION_ALLIANCE;
-    else if(u_entry->ourMask & FACTION_MASK_HORDE)
-        return AUCTION_HORDE;
-    else
-        return AUCTION_NEUTRAL;
-}
-
 //this void causes that auction window is opened
 void WorldSession::SendAuctionHello( uint64 guid, Creature* unit )
 {
+    AuctionHouseEntry const* ahEntry = AuctionHouseMgr::GetAuctionHouseEntry(unit->getFaction());
+    if(!ahEntry)
+        return;
+
     WorldPacket data( MSG_AUCTION_HELLO, 12 );
     data << (uint64) guid;
-    data << (uint32) AuctioneerFactionToLocation(unit->getFaction());
+    data << (uint32) ahEntry->houseId;
     SendPacket( &data );
 }
 
@@ -135,9 +122,9 @@ void WorldSession::SendAuctionOutbiddedMail(AuctionEntry *auction, uint32 newPri
         msgAuctionOutbiddedSubject << auction->item_template << ":0:" << AUCTION_OUTBIDDED;
 
         if (oldBidder)
-            oldBidder->GetSession()->SendAuctionBidderNotification( auction->location, auction->Id, _player->GetGUID(), newPrice, auction->GetAuctionOutBid(), auction->item_template);
+            oldBidder->GetSession()->SendAuctionBidderNotification( auction->GetHouseId(), auction->Id, _player->GetGUID(), newPrice, auction->GetAuctionOutBid(), auction->item_template);
 
-        WorldSession::SendMailTo(oldBidder, MAIL_AUCTION, MAIL_STATIONERY_AUCTION, auction->location, auction->bidder, msgAuctionOutbiddedSubject.str(), 0, NULL, auction->bid, 0, MAIL_CHECK_MASK_NONE);
+        WorldSession::SendMailTo(oldBidder, MAIL_AUCTION, MAIL_STATIONERY_AUCTION, auction->GetHouseId(), auction->bidder, msgAuctionOutbiddedSubject.str(), 0, NULL, auction->bid, 0, MAIL_CHECK_MASK_NONE);
     }
 }
 
@@ -157,7 +144,7 @@ void WorldSession::SendAuctionCancelledToBidderMail( AuctionEntry* auction )
         std::ostringstream msgAuctionCancelledSubject;
         msgAuctionCancelledSubject << auction->item_template << ":0:" << AUCTION_CANCELLED_TO_BIDDER;
 
-        WorldSession::SendMailTo(bidder, MAIL_AUCTION, MAIL_STATIONERY_AUCTION, auction->location, auction->bidder, msgAuctionCancelledSubject.str(), 0, NULL, auction->bid, 0, MAIL_CHECK_MASK_NONE);
+        WorldSession::SendMailTo(bidder, MAIL_AUCTION, MAIL_STATIONERY_AUCTION, auction->GetHouseId(), auction->bidder, msgAuctionCancelledSubject.str(), 0, NULL, auction->bid, 0, MAIL_CHECK_MASK_NONE);
     }
 }
 
@@ -181,6 +168,14 @@ void WorldSession::HandleAuctionSellItem( WorldPacket & recv_data )
         sLog.outDebug( "WORLD: HandleAuctionSellItem - Unit (GUID: %u) not found or you can't interact with him.", uint32(GUID_LOPART(auctioneer)) );
         return;
     }
+
+    AuctionHouseEntry const* auctionHouseEntry = AuctionHouseMgr::GetAuctionHouseEntry(pCreature->getFaction());
+    if(!auctionHouseEntry)
+    {
+        sLog.outDebug( "WORLD: HandleAuctionSellItem - Unit (GUID: %u) has wrong faction.", uint32(GUID_LOPART(auctioneer)) );
+        return;
+    }
+
 
     // client send time in minutes, convert to common used sec time
     etime *= MINUTE;
@@ -227,12 +222,10 @@ void WorldSession::HandleAuctionSellItem( WorldPacket & recv_data )
         return;
     }
 
-    AuctionLocation location = AuctioneerFactionToLocation(pCreature->getFaction());
-    AuctionHouseObject * mAuctions;
-    mAuctions = auctionmgr.GetAuctionsMap( location );
+    AuctionHouseObject* auctionHouse = auctionmgr.GetAuctionsMap( pCreature->getFaction() );
 
     //we have to take deposit :
-    uint32 deposit = auctionmgr.GetAuctionDeposit( location, etime, it );
+    uint32 deposit = auctionmgr.GetAuctionDeposit( auctionHouseEntry, etime, it );
     if ( pl->GetMoney() < deposit )
     {
         SendAuctionCommandResult(0, AUCTION_SELL_ITEM, AUCTION_NOT_ENOUGHT_MONEY);
@@ -261,10 +254,10 @@ void WorldSession::HandleAuctionSellItem( WorldPacket & recv_data )
     AH->buyout = buyout;
     AH->expire_time = time(NULL) + auction_time;
     AH->deposit = deposit;
-    AH->location = location;
+    AH->auctionHouseEntry = auctionHouseEntry;
 
-    sLog.outDetail("selling item %u to auctioneer %u with initial bid %u with buyout %u and with time %u (in sec) in location: %u", GUID_LOPART(item), GUID_LOPART(auctioneer), bid, buyout, auction_time, location);
-    mAuctions->AddAuction(AH);
+    sLog.outDetail("selling item %u to auctioneer %u with initial bid %u with buyout %u and with time %u (in sec) in auctionhouse %u", GUID_LOPART(item), GUID_LOPART(auctioneer), bid, buyout, auction_time, AH->GetHouseId());
+    auctionHouse->AddAuction(AH);
 
     auctionmgr.AddAItem(it);
     pl->MoveItemFromInventory( it->GetBagSlot(), it->GetSlot(), true);
@@ -272,9 +265,7 @@ void WorldSession::HandleAuctionSellItem( WorldPacket & recv_data )
     CharacterDatabase.BeginTransaction();
     it->DeleteFromInventoryDB();
     it->SaveToDB();                                         // recursive and not have transaction guard into self, not in inventiory and can be save standalone
-    CharacterDatabase.PExecute("INSERT INTO auctionhouse (id,auctioneerguid,itemguid,item_template,itemowner,buyoutprice,time,buyguid,lastbid,startbid,deposit,location) "
-        "VALUES ('%u', '%u', '%u', '%u', '%u', '%u', '" I64FMTD "', '%u', '%u', '%u', '%u', '%u')",
-        AH->Id, AH->auctioneer, AH->item_guidlow, AH->item_template, AH->owner, AH->buyout, (uint64)AH->expire_time, AH->bidder, AH->bid, AH->startbid, AH->deposit, AH->location);
+    AH->SaveToDB();
     pl->SaveInventoryAndGoldToDB();
     CharacterDatabase.CommitTransaction();
 
@@ -306,12 +297,9 @@ void WorldSession::HandleAuctionPlaceBid( WorldPacket & recv_data )
     if(GetPlayer()->hasUnitState(UNIT_STAT_DIED))
         GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 
-    AuctionLocation location = AuctioneerFactionToLocation(pCreature->getFaction());
+    AuctionHouseObject* auctionHouse = auctionmgr.GetAuctionsMap( pCreature->getFaction() );
 
-    AuctionHouseObject * mAuctions;
-    mAuctions = auctionmgr.GetAuctionsMap( location );
-
-    AuctionEntry *auction = mAuctions->GetAuction(auctionId);
+    AuctionEntry *auction = auctionHouse->GetAuction(auctionId);
     Player *pl = GetPlayer();
 
     if( !auction || auction->owner == pl->GetGUIDLow() )
@@ -401,8 +389,8 @@ void WorldSession::HandleAuctionPlaceBid( WorldPacket & recv_data )
         SendAuctionCommandResult(auction->Id, AUCTION_PLACE_BID, AUCTION_OK);
 
         auctionmgr.RemoveAItem(auction->item_guidlow);
-        mAuctions->RemoveAuction(auction->Id);
-        CharacterDatabase.PExecute("DELETE FROM auctionhouse WHERE id = '%u'",auction->Id);
+        auctionHouse->RemoveAuction(auction->Id);
+        auction->DeleteFromDB();
 
         delete auction;
     }
@@ -433,12 +421,9 @@ void WorldSession::HandleAuctionRemoveItem( WorldPacket & recv_data )
     if(GetPlayer()->hasUnitState(UNIT_STAT_DIED))
         GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 
-    AuctionLocation location = AuctioneerFactionToLocation(pCreature->getFaction());
+    AuctionHouseObject* auctionHouse = auctionmgr.GetAuctionsMap( pCreature->getFaction() );
 
-    AuctionHouseObject * mAuctions;
-    mAuctions = auctionmgr.GetAuctionsMap( location );
-
-    AuctionEntry *auction = mAuctions->GetAuction(auctionId);
+    AuctionEntry *auction = auctionHouse->GetAuction(auctionId);
     Player *pl = GetPlayer();
 
     if (auction && auction->owner == pl->GetGUIDLow())
@@ -463,7 +448,7 @@ void WorldSession::HandleAuctionRemoveItem( WorldPacket & recv_data )
             mi.AddItem(auction->item_guidlow, auction->item_template, pItem);
 
             // item will deleted or added to received mail list
-            WorldSession::SendMailTo(pl, MAIL_AUCTION, MAIL_STATIONERY_AUCTION, auction->location, pl->GetGUIDLow(), msgAuctionCanceledOwner.str(), 0, &mi, 0, 0, MAIL_CHECK_MASK_NONE);
+            WorldSession::SendMailTo(pl, MAIL_AUCTION, MAIL_STATIONERY_AUCTION, auction->GetHouseId(), pl->GetGUIDLow(), msgAuctionCanceledOwner.str(), 0, &mi, 0, 0, MAIL_CHECK_MASK_NONE);
         }
         else
         {
@@ -484,11 +469,11 @@ void WorldSession::HandleAuctionRemoveItem( WorldPacket & recv_data )
     SendAuctionCommandResult( auction->Id, AUCTION_CANCEL, AUCTION_OK );
     // Now remove the auction
     CharacterDatabase.BeginTransaction();
-    CharacterDatabase.PExecute("DELETE FROM auctionhouse WHERE id = '%u'",auction->Id);
+    auction->DeleteFromDB();
     pl->SaveInventoryAndGoldToDB();
     CharacterDatabase.CommitTransaction();
     auctionmgr.RemoveAItem( auction->item_guidlow );
-    mAuctions->RemoveAuction( auction->Id );
+    auctionHouse->RemoveAuction( auction->Id );
     delete auction;
 }
 
@@ -521,8 +506,7 @@ void WorldSession::HandleAuctionListBidderItems( WorldPacket & recv_data )
     if(GetPlayer()->hasUnitState(UNIT_STAT_DIED))
         GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 
-    AuctionLocation location = AuctioneerFactionToLocation(pCreature->getFaction());
-    AuctionHouseObject* auctionHouse = auctionmgr.GetAuctionsMap( location );
+    AuctionHouseObject* auctionHouse = auctionmgr.GetAuctionsMap( pCreature->getFaction() );
 
     WorldPacket data( SMSG_AUCTION_BIDDER_LIST_RESULT, (4+4+4) );
     Player *pl = GetPlayer();
@@ -571,9 +555,7 @@ void WorldSession::HandleAuctionListOwnerItems( WorldPacket & recv_data )
     if(GetPlayer()->hasUnitState(UNIT_STAT_DIED))
         GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 
-    AuctionLocation location = AuctioneerFactionToLocation(pCreature->getFaction());
-
-    AuctionHouseObject* auctionHouse = auctionmgr.GetAuctionsMap( location );
+    AuctionHouseObject* auctionHouse = auctionmgr.GetAuctionsMap( pCreature->getFaction() );
 
     WorldPacket data( SMSG_AUCTION_OWNER_LIST_RESULT, (4+4+4) );
     data << (uint32) 0;                                     // amount place holder
@@ -620,8 +602,7 @@ void WorldSession::HandleAuctionListItems( WorldPacket & recv_data )
     if(GetPlayer()->hasUnitState(UNIT_STAT_DIED))
         GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 
-    AuctionLocation location = AuctioneerFactionToLocation(pCreature->getFaction());
-    AuctionHouseObject * auctionHouse = auctionmgr.GetAuctionsMap( location );
+    AuctionHouseObject* auctionHouse = auctionmgr.GetAuctionsMap( pCreature->getFaction() );
 
     //sLog.outDebug("Auctionhouse search guid: " I64FMTD ", list from: %u, searchedname: %s, levelmin: %u, levelmax: %u, auctionSlotID: %u, auctionMainCategory: %u, auctionSubCategory: %u, quality: %u, usable: %u", guid, listfrom, searchedname.c_str(), levelmin, levelmax, auctionSlotID, auctionMainCategory, auctionSubCategory, quality, usable);
 

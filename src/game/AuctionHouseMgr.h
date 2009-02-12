@@ -44,19 +44,10 @@ enum AuctionAction
     AUCTION_PLACE_BID = 2
 };
 
-enum AuctionLocation
-{
-    AUCTION_ALLIANCE = 2,
-    AUCTION_HORDE    = 6,
-    AUCTION_NEUTRAL  = 7
-};
-
-inline bool IsValidAuctionLocation(uint32 loc) { return loc == AUCTION_ALLIANCE || loc == AUCTION_HORDE || loc == AUCTION_NEUTRAL; }
-
 struct AuctionEntry
 {
     uint32 Id;
-    uint32 auctioneer;
+    uint32 auctioneer;                                      // creature low guid
     uint32 item_guidlow;
     uint32 item_template;
     uint32 owner;
@@ -66,12 +57,16 @@ struct AuctionEntry
     time_t expire_time;
     uint32 bidder;
     uint32 deposit;                                         //deposit can be calculated only when creating auction
-    AuctionLocation location;
+    AuctionHouseEntry const* auctionHouseEntry;             // in AuctionHouse.dbc
 
     // helpers
+    uint32 GetHouseId() const { return auctionHouseEntry->houseId; }
+    uint32 GetHouseFaction() const { return auctionHouseEntry->faction; }
     uint32 GetAuctionCut() const;
     uint32 GetAuctionOutBid() const;
     bool BuildAuctionInfo(WorldPacket & data) const;
+    void DeleteFromDB() const;
+    void SaveToDB() const;
 };
 
 //this class is used as auctionhouse instance
@@ -110,7 +105,7 @@ class AuctionHouseObject
 
         void BuildListBidderItems(WorldPacket& data, Player* player, uint32& count, uint32& totalcount);
         void BuildListOwnerItems(WorldPacket& data, Player* player, uint32& count, uint32& totalcount);
-        void BuildListAuctionItems(WorldPacket& data, Player* player, 
+        void BuildListAuctionItems(WorldPacket& data, Player* player,
             std::wstring const& searchedname, uint32 listfrom, uint32 levelmin, uint32 levelmax, uint32 usable,
             uint32 inventoryType, uint32 itemClass, uint32 itemSubClass, uint32 quality,
             uint32& count, uint32& totalcount);
@@ -127,7 +122,7 @@ class AuctionHouseMgr
 
         typedef UNORDERED_MAP<uint32, Item*> ItemMap;
 
-        AuctionHouseObject * GetAuctionsMap( AuctionLocation location );
+        AuctionHouseObject* GetAuctionsMap( uint32 factionTemplateId );
 
         Item* GetAItem(uint32 id)
         {
@@ -144,7 +139,8 @@ class AuctionHouseMgr
         void SendAuctionSalePendingMail( AuctionEntry * auction );
         void SendAuctionSuccessfulMail( AuctionEntry * auction );
         void SendAuctionExpiredMail( AuctionEntry * auction );
-        static uint32 GetAuctionDeposit(AuctionLocation location, uint32 time, Item *pItem);
+        static uint32 GetAuctionDeposit(AuctionHouseEntry const* entry, uint32 time, Item *pItem);
+        static AuctionHouseEntry const* GetAuctionHouseEntry(uint32 factionTemplateId);
 
     public:
         //load first auction items, because of check if item exists, when loading
