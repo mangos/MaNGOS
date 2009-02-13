@@ -201,7 +201,7 @@ class BattleGroundMgr
         BattleGround * GetBattleGroundTemplate(BattleGroundTypeId bgTypeId);
         BattleGround * CreateNewBattleGround(BattleGroundTypeId bgTypeId);
 
-        uint32 CreateBattleGround(BattleGroundTypeId bgTypeId, uint32 MinPlayersPerTeam, uint32 MaxPlayersPerTeam, uint32 LevelMin, uint32 LevelMax, char* BattleGroundName, uint32 MapID, float Team1StartLocX, float Team1StartLocY, float Team1StartLocZ, float Team1StartLocO, float Team2StartLocX, float Team2StartLocY, float Team2StartLocZ, float Team2StartLocO);
+        uint32 CreateBattleGround(BattleGroundTypeId bgTypeId, bool IsArena, uint32 MinPlayersPerTeam, uint32 MaxPlayersPerTeam, uint32 LevelMin, uint32 LevelMax, char* BattleGroundName, uint32 MapID, float Team1StartLocX, float Team1StartLocY, float Team1StartLocZ, float Team1StartLocO, float Team2StartLocX, float Team2StartLocY, float Team2StartLocZ, float Team2StartLocO);
 
         void AddBattleGround(uint32 InstanceID, BattleGround* BG) { m_BattleGrounds[InstanceID] = BG; };
         void RemoveBattleGround(uint32 instanceID) { m_BattleGrounds.erase(instanceID); }
@@ -240,9 +240,9 @@ class BattleGroundMgr
 
         static bool IsArenaType(BattleGroundTypeId bgTypeId);
         static bool IsBattleGroundType(BattleGroundTypeId bgTypeId) { return !BattleGroundMgr::IsArenaType(bgTypeId); }
-        static uint32 BGQueueTypeId(BattleGroundTypeId bgTypeId, uint8 arenaType);
-        static BattleGroundTypeId BGTemplateId(uint32 bgQueueTypeId);
-        static uint8 BGArenaType(uint32 bgQueueTypeId);
+        static BattleGroundQueueTypeId BGQueueTypeId(BattleGroundTypeId bgTypeId, uint8 arenaType);
+        static BattleGroundTypeId BGTemplateId(BattleGroundQueueTypeId bgQueueTypeId);
+        static uint8 BGArenaType(BattleGroundQueueTypeId bgQueueTypeId);
     private:
         BattleMastersMap    mBattleMastersMap;
 

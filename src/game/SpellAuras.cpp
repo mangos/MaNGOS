@@ -424,9 +424,9 @@ m_updated(false), m_isRemovedOnShapeLost(true), m_in_use(false)
     if(modOwner)
         modOwner->ApplySpellMod(GetId(), SPELLMOD_CHARGES, m_procCharges);
 
-    m_isRemovedOnShapeLost = (m_caster_guid==m_target->GetGUID() && 
+    m_isRemovedOnShapeLost = (m_caster_guid==m_target->GetGUID() &&
                               m_spellProto->Stances &&
-                            !(m_spellProto->AttributesEx2 & SPELL_ATTR_EX2_NOT_NEED_SHAPESHIFT) && 
+                            !(m_spellProto->AttributesEx2 & SPELL_ATTR_EX2_NOT_NEED_SHAPESHIFT) &&
                             !(m_spellProto->Attributes & SPELL_ATTR_NOT_SHAPESHIFT));
 }
 
@@ -4540,8 +4540,9 @@ void Aura::HandleModPowerRegen(bool apply, bool Real)       // drinking
     Powers pt = m_target->getPowerType();
     if(m_modifier.periodictime == 0)
     {
+        // Anger Management (only spell use this aura for rage)
         if (pt == POWER_RAGE)
-            m_modifier.periodictime = 1000;
+            m_modifier.periodictime = 3000;
         else
             m_modifier.periodictime = 2000;
     }
@@ -6013,7 +6014,7 @@ void Aura::PeriodicTick()
             Powers pt = m_target->getPowerType();
             if(int32(pt) != m_modifier.m_miscvalue)
                 return;
-            
+
             if ( GetSpellProto()->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_SEATED )
             {
                 // eating anim
@@ -6024,10 +6025,12 @@ void Aura::PeriodicTick()
                 // cannibalize anim
                 m_target->HandleEmoteCommand(EMOTE_STATE_CANNIBALIZE);
             }
-            
-            // Warrior talent, gain 1 rage every 3 seconds while in combat
-            if(pt == POWER_RAGE && m_target->isInCombat())
-                m_target->ModifyPower(pt, m_modifier.m_amount*10/17);
+
+            // Anger Management
+            // amount = 1+ 16 = 17 = 3,4*5 = 10,2*5/3 
+            // so 17 is rounded amount for 5 sec tick grow ~ 1 range grow in 3 sec
+            if(pt == POWER_RAGE)
+                m_target->ModifyPower(pt, m_modifier.m_amount*3/5);
             break;
         }
         // Here tick dummy auras

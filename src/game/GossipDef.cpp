@@ -151,7 +151,7 @@ void PlayerMenu::SendGossipMenu( uint32 TitleTextId, uint64 npcGUID )
 
         data << uint32(questID);
         data << uint32( qItem.m_qIcon );
-        data << uint32( pQuest ? pQuest->GetQuestLevel() : 0 );
+        data << uint32(pQuest && pQuest->GetQuestLevel() ? pQuest->GetQuestLevel() : pSession->GetPlayer()->getLevel());
         std::string Title = pQuest->GetTitle();
 
         int loc_idx = pSession->GetSessionDbLocaleIndex();
@@ -371,7 +371,7 @@ void PlayerMenu::SendQuestGiverQuestList( QEmote eEmote, const std::string& Titl
 
         data << uint32(questID);
         data << uint32(qmi.m_qIcon);
-        data << uint32(pQuest ? pQuest->GetQuestLevel() : 0);
+        data << uint32(pQuest && pQuest->GetQuestLevel() ? pQuest->GetQuestLevel() : pSession->GetPlayer()->getLevel());
         data << title;
     }
     pSession->SendPacket( &data );
