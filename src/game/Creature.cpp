@@ -812,8 +812,8 @@ void Creature::sendPreparedGossip(Player* player)
     if(!player)
         return;
 
-    // in case empty gossip menu open quest menu if any
-    if (player->PlayerTalkClass->GetGossipMenu().Empty() && !player->PlayerTalkClass->GetQuestMenu().Empty())
+    // in case no gossip flag and quest menu not empty, open quest menu (client expect gossip menu with this flag)
+    if (!HasFlag(UNIT_NPC_FLAGS,UNIT_NPC_FLAG_GOSSIP) && !player->PlayerTalkClass->GetQuestMenu().Empty())
     {
         player->SendPreparedQuest(GetGUID());
         return;
