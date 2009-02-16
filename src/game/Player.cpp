@@ -12299,7 +12299,7 @@ void Player::SendPreparedQuest( uint64 guid )
         if( pCreature )
         {
             uint32 textid = pCreature->GetNpcTextId();
-            GossipText * gossiptext = objmgr.GetGossipText(textid);
+            GossipText const* gossiptext = objmgr.GetGossipText(textid);
             if( !gossiptext )
             {
                 qe._Delay = 0;                              //TEXTEMOTE_MESSAGE;              //zyg: player emote
