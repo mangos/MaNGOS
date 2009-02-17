@@ -94,6 +94,7 @@ bool ChatHandler::HandleReloadAllNpcCommand(const char* /*args*/)
     HandleReloadNpcOptionCommand("a");
     HandleReloadNpcTrainerCommand("a");
     HandleReloadNpcVendorCommand("a");
+    HandleReloadPointsOfInterestCommand("a");
     return true;
 }
 
@@ -159,6 +160,7 @@ bool ChatHandler::HandleReloadAllLocalesCommand(const char* /*args*/)
     HandleReloadLocalesItemCommand("a");
     HandleReloadLocalesNpcTextCommand("a");
     HandleReloadLocalesPageTextCommand("a");
+    HandleReloadLocalesPointsOfInterestCommand("a");
     HandleReloadLocalesQuestCommand("a");
     return true;
 }
@@ -391,6 +393,14 @@ bool ChatHandler::HandleReloadNpcVendorCommand(const char*)
     sLog.outString( "Re-Loading `npc_vendor` Table!" );
     objmgr.LoadVendors();
     SendGlobalSysMessage("DB table `npc_vendor` reloaded.");
+    return true;
+}
+
+bool ChatHandler::HandleReloadPointsOfInterestCommand(const char*)
+{
+    sLog.outString( "Re-Loading `points_of_interest` Table!" );
+    objmgr.LoadPointsOfInterest();
+    SendGlobalSysMessage("DB table `points_of_interest` reloaded.");
     return true;
 }
 
@@ -689,6 +699,14 @@ bool ChatHandler::HandleReloadLocalesPageTextCommand(const char* /*arg*/)
     sLog.outString( "Re-Loading Locales Page Text ... ");
     objmgr.LoadPageTextLocales();
     SendGlobalSysMessage("DB table `locales_page_text` reloaded.");
+    return true;
+}
+
+bool ChatHandler::HandleReloadLocalesPointsOfInterestCommand(const char* /*arg*/)
+{
+    sLog.outString( "Re-Loading Locales Points Of Interest ... ");
+    objmgr.LoadPointOfInterestLocales();
+    SendGlobalSysMessage("DB table `locales_points_of_interest` reloaded.");
     return true;
 }
 
