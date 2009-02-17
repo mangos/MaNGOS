@@ -608,6 +608,8 @@ class MANGOS_DLL_SPEC Creature : public Unit
 
         uint32 GetGlobalCooldown() const { return m_GlobalCooldown; }
 
+        void SetDeadByDefault (bool death_state) {m_isDeadByDefault = death_state;}
+
     protected:
         bool CreateFromProto(uint32 guidlow,uint32 Entry,uint32 team, const CreatureData *data = NULL);
         bool InitEntry(uint32 entry, uint32 team=ALLIANCE, const CreatureData* data=NULL);
