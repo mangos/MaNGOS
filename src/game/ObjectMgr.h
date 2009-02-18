@@ -881,5 +881,7 @@ MANGOS_DLL_SPEC bool LoadMangosStrings(DatabaseType& db, char const* table,int32
 MANGOS_DLL_SPEC uint32 GetAreaTriggerScriptId(uint32 trigger_id);
 MANGOS_DLL_SPEC uint32 GetScriptId(const char *name);
 MANGOS_DLL_SPEC ObjectMgr::ScriptNameMap& GetScriptNames();
+MANGOS_DLL_SPEC CreatureInfo const* GetCreatureTemplateStore(uint32 entry);
+MANGOS_DLL_SPEC Quest const* GetQuestTemplateStore(uint32 entry);
 
 #endif

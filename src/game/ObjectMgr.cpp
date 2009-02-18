@@ -7364,3 +7364,13 @@ ObjectMgr::ScriptNameMap & GetScriptNames()
 {
     return objmgr.GetScriptNames();
 }
+
+CreatureInfo const* GetCreatureTemplateStore(uint32 entry)
+{
+    return sCreatureStorage.LookupEntry<CreatureInfo>(entry);
+}
+
+Quest const* GetQuestTemplateStore(uint32 entry)
+{
+    return objmgr.GetQuestTemplate(entry);
+}

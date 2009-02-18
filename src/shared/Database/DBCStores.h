@@ -215,7 +215,10 @@ extern DBCStorage <WorldMapOverlayEntry>         sWorldMapOverlayStore;
 void LoadDBCStores(const std::string& dataPath);
 
 // script support functions
-MANGOS_DLL_SPEC DBCStorage <SoundEntriesEntry>  const* GetSoundEntriesStore();
-MANGOS_DLL_SPEC DBCStorage <SpellEntry>         const* GetSpellStore();
-MANGOS_DLL_SPEC DBCStorage <SpellRangeEntry>    const* GetSpellRangeStore();
+MANGOS_DLL_SPEC DBCStorage <SoundEntriesEntry>          const* GetSoundEntriesStore();
+MANGOS_DLL_SPEC DBCStorage <SpellEntry>                 const* GetSpellStore();
+MANGOS_DLL_SPEC DBCStorage <SpellRangeEntry>            const* GetSpellRangeStore();
+MANGOS_DLL_SPEC DBCStorage <FactionEntry>               const* GetFactionStore();
+MANGOS_DLL_SPEC DBCStorage <ItemEntry>                  const* GetItemDisplayStore();
+MANGOS_DLL_SPEC DBCStorage <CreatureDisplayInfoEntry>   const* GetCreatureDisplayStore();
 #endif
