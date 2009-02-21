@@ -3313,6 +3313,10 @@ void Aura::HandleAuraModStun(bool apply, bool Real)
     if(!Real)
         return;
 
+    // Frost stun aura -> freeze/unfreeze target
+    if (GetSpellSchoolMask(m_spellProto) & SPELL_SCHOOL_MASK_FROST)
+        m_target->ModifyAuraState(AURA_STATE_FROZEN, apply);
+
     if (apply)
     {
         m_target->addUnitState(UNIT_STAT_STUNNED);
