@@ -341,6 +341,8 @@ pAuraHandler AuraHandler[TOTAL_AURAS]=
     &Aura::HandleUnused,                                    //288 not used by any spells (3.09) except 1 test spell.
 };
 
+static AuraType const frozenAuraTypes[] = { SPELL_AURA_MOD_ROOT, SPELL_AURA_MOD_STUN, SPELL_AURA_NONE };
+
 Aura::Aura(SpellEntry const* spellproto, uint32 eff, int32 *currentBasePoints, Unit *target, Unit *caster, Item* castItem) :
 m_spellmod(NULL), m_caster_guid(0), m_castItemGuid(castItem?castItem->GetGUID():0), m_target(target),
 m_timeCla(1000), m_periodicTimer(0), m_removeMode(AURA_REMOVE_BY_DEFAULT), m_AuraDRGroup(DIMINISHING_NONE),
@@ -3313,12 +3315,12 @@ void Aura::HandleAuraModStun(bool apply, bool Real)
     if(!Real)
         return;
 
-    // Frost stun aura -> freeze/unfreeze target
-    if (GetSpellSchoolMask(m_spellProto) & SPELL_SCHOOL_MASK_FROST)
-        m_target->ModifyAuraState(AURA_STATE_FROZEN, apply);
-
     if (apply)
     {
+        // Frost stun aura -> freeze/unfreeze target
+        if (GetSpellSchoolMask(m_spellProto) & SPELL_SCHOOL_MASK_FROST)
+            m_target->ModifyAuraState(AURA_STATE_FROZEN, apply);
+
         m_target->addUnitState(UNIT_STAT_STUNNED);
         m_target->SetUInt64Value(UNIT_FIELD_TARGET, 0);
 
@@ -3339,6 +3341,29 @@ void Aura::HandleAuraModStun(bool apply, bool Real)
     }
     else
     {
+        // Frost stun aura -> freeze/unfreeze target
+        if (GetSpellSchoolMask(m_spellProto) & SPELL_SCHOOL_MASK_FROST)
+        {
+            bool found_another = false;
+            for(AuraType const* itr = &frozenAuraTypes[0]; *itr != SPELL_AURA_NONE; ++itr)
+            {
+                Unit::AuraList const& auras = m_target->GetAurasByType(*itr);
+                for(Unit::AuraList::const_iterator i = auras.begin(); i != auras.end(); ++i)
+                {
+                    if( GetSpellSchoolMask((*i)->GetSpellProto()) & SPELL_SCHOOL_MASK_FROST)
+                    {
+                        found_another = true;
+                        break;
+                    }
+                }
+                if(found_another)
+                    break;
+            }
+
+            if(!found_another)
+                m_target->ModifyAuraState(AURA_STATE_FROZEN, apply);
+        }
+
         // Real remove called after current aura remove from lists, check if other similar auras active
         if(m_target->HasAuraType(SPELL_AURA_MOD_STUN))
             return;
@@ -3531,13 +3556,13 @@ void Aura::HandleAuraModRoot(bool apply, bool Real)
     if(!Real)
         return;
 
-    // Frost root aura -> freeze/unfreeze target
-    if (GetSpellSchoolMask(m_spellProto) & SPELL_SCHOOL_MASK_FROST)
-        m_target->ModifyAuraState(AURA_STATE_FROZEN, apply);
-
     uint32 apply_stat = UNIT_STAT_ROOT;
     if (apply)
     {
+        // Frost root aura -> freeze/unfreeze target
+        if (GetSpellSchoolMask(m_spellProto) & SPELL_SCHOOL_MASK_FROST)
+            m_target->ModifyAuraState(AURA_STATE_FROZEN, apply);
+
         m_target->addUnitState(UNIT_STAT_ROOT);
         m_target->SetUInt64Value (UNIT_FIELD_TARGET, 0);
 // probably wrong (this add skinable flag)
@@ -3563,6 +3588,29 @@ void Aura::HandleAuraModRoot(bool apply, bool Real)
     }
     else
     {
+        // Frost root aura -> freeze/unfreeze target
+        if (GetSpellSchoolMask(m_spellProto) & SPELL_SCHOOL_MASK_FROST)
+        {
+            bool found_another = false;
+            for(AuraType const* itr = &frozenAuraTypes[0]; *itr != SPELL_AURA_NONE; ++itr)
+            {
+                Unit::AuraList const& auras = m_target->GetAurasByType(*itr);
+                for(Unit::AuraList::const_iterator i = auras.begin(); i != auras.end(); ++i)
+                {
+                    if( GetSpellSchoolMask((*i)->GetSpellProto()) & SPELL_SCHOOL_MASK_FROST)
+                    {
+                        found_another = true;
+                        break;
+                    }
+                }
+                if(found_another)
+                    break;
+            }
+
+            if(!found_another)
+                m_target->ModifyAuraState(AURA_STATE_FROZEN, apply);
+        }
+
         // Real remove called after current aura remove from lists, check if other similar auras active
         if(m_target->HasAuraType(SPELL_AURA_MOD_ROOT))
             return;
