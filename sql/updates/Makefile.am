@@ -182,6 +182,7 @@ pkgdata_DATA = \
 	7303_01_mangos_pools.sql \
 	7307_01_characters_arena_team_member.sql \
 	7312_01_mangos_mangos_string.sql \
+	7314_01_characters_guild_rank.sql \
 	README
 
 ## Additional files to include when running 'make dist'
@@ -344,4 +345,5 @@ EXTRA_DIST = \
 	7303_01_mangos_pools.sql \
 	7307_01_characters_arena_team_member.sql \
 	7312_01_mangos_mangos_string.sql \
+	7314_01_characters_guild_rank.sql \
 	README
