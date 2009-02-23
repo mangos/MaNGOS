@@ -114,7 +114,9 @@ namespace MaNGOS
         bool i_toSelf;
         bool i_ownTeamOnly;
         float i_dist;
-        MessageDistDeliverer(Player &pl, WorldPacket *msg, float dist, bool to_self, bool ownTeamOnly) : i_player(pl), i_message(msg), i_dist(dist), i_toSelf(to_self), i_ownTeamOnly(ownTeamOnly) {}
+
+        MessageDistDeliverer(Player &pl, WorldPacket *msg, float dist, bool to_self, bool ownTeamOnly)
+            : i_player(pl), i_message(msg), i_toSelf(to_self), i_ownTeamOnly(ownTeamOnly), i_dist(dist) {}
         void Visit(PlayerMapType &m);
         template<class SKIP> void Visit(GridRefManager<SKIP> &) {}
     };
@@ -850,7 +852,7 @@ namespace MaNGOS
 
             ~LocalizedPacketDo()
             {
-                for(int i = 0; i < i_data_cache.size(); ++i)
+                for(size_t i = 0; i < i_data_cache.size(); ++i)
                     delete i_data_cache[i];
             }
             void operator()( Player* p );

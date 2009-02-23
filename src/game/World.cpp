@@ -405,7 +405,8 @@ void World::LoadConfigSettings(bool reload)
         sLog.outError("          Your configuration file may be out of date!");
         sLog.outError("*****************************************************************************");
         clock_t pause = 3000 + clock();
-        while (pause > clock());
+        while (pause > clock())
+            ;                                               // empty body
     }
     else
     {
@@ -417,7 +418,8 @@ void World::LoadConfigSettings(bool reload)
             sLog.outError("          unexpected behavior.");
             sLog.outError("*****************************************************************************");
             clock_t pause = 3000 + clock();
-            while (pause > clock());
+            while (pause > clock())
+                ;                                           // empty body
         }
     }
 
@@ -585,7 +587,7 @@ void World::LoadConfigSettings(bool reload)
     {
         uint32 val = sConfig.GetIntDefault("SocketSelectTime", DEFAULT_SOCKET_SELECT_TIME);
         if(val!=m_configs[CONFIG_SOCKET_SELECTTIME])
-            sLog.outError("SocketSelectTime option can't be changed at mangosd.conf reload, using current value (%u).",m_configs[DEFAULT_SOCKET_SELECT_TIME]);
+            sLog.outError("SocketSelectTime option can't be changed at mangosd.conf reload, using current value (%u).",m_configs[CONFIG_SOCKET_SELECTTIME]);
     }
     else
         m_configs[CONFIG_SOCKET_SELECTTIME] = sConfig.GetIntDefault("SocketSelectTime", DEFAULT_SOCKET_SELECT_TIME);
@@ -644,7 +646,7 @@ void World::LoadConfigSettings(bool reload)
     }
 
     m_configs[CONFIG_HEROIC_CHARACTERS_PER_REALM] = sConfig.GetIntDefault("HeroicCharactersPerRealm", 1);
-    if(m_configs[CONFIG_HEROIC_CHARACTERS_PER_REALM] < 0 || m_configs[CONFIG_HEROIC_CHARACTERS_PER_REALM] > 10)
+    if(int32(m_configs[CONFIG_HEROIC_CHARACTERS_PER_REALM]) < 0 || m_configs[CONFIG_HEROIC_CHARACTERS_PER_REALM] > 10)
     {
         sLog.outError("HeroicCharactersPerRealm (%i) must be in range 0..10. Set to 1.",m_configs[CONFIG_HEROIC_CHARACTERS_PER_REALM]);
         m_configs[CONFIG_HEROIC_CHARACTERS_PER_REALM] = 1;
@@ -653,7 +655,7 @@ void World::LoadConfigSettings(bool reload)
     m_configs[CONFIG_MIN_LEVEL_FOR_HEROIC_CHARACTER_CREATING] = sConfig.GetIntDefault("MinLevelForHeroicCharacterCreating", 55);
 
     m_configs[CONFIG_SKIP_CINEMATICS] = sConfig.GetIntDefault("SkipCinematics", 0);
-    if(m_configs[CONFIG_SKIP_CINEMATICS] < 0 || m_configs[CONFIG_SKIP_CINEMATICS] > 2)
+    if(int32(m_configs[CONFIG_SKIP_CINEMATICS]) < 0 || m_configs[CONFIG_SKIP_CINEMATICS] > 2)
     {
         sLog.outError("SkipCinematics (%i) must be in range 0..2. Set to 0.",m_configs[CONFIG_SKIP_CINEMATICS]);
         m_configs[CONFIG_SKIP_CINEMATICS] = 0;
@@ -701,7 +703,7 @@ void World::LoadConfigSettings(bool reload)
     }
 
     m_configs[CONFIG_START_PLAYER_MONEY] = sConfig.GetIntDefault("StartPlayerMoney", 0);
-    if(m_configs[CONFIG_START_PLAYER_MONEY] < 0)
+    if(int32(m_configs[CONFIG_START_PLAYER_MONEY]) < 0)
     {
         sLog.outError("StartPlayerMoney (%i) must be in range 0..%u. Set to %u.",m_configs[CONFIG_START_PLAYER_MONEY],MAX_MONEY_AMOUNT,0);
         m_configs[CONFIG_START_PLAYER_MONEY] = 0;
@@ -714,14 +716,14 @@ void World::LoadConfigSettings(bool reload)
     }
 
     m_configs[CONFIG_MAX_HONOR_POINTS] = sConfig.GetIntDefault("MaxHonorPoints", 75000);
-    if(m_configs[CONFIG_MAX_HONOR_POINTS] < 0)
+    if(int32(m_configs[CONFIG_MAX_HONOR_POINTS]) < 0)
     {
         sLog.outError("MaxHonorPoints (%i) can't be negative. Set to 0.",m_configs[CONFIG_MAX_HONOR_POINTS]);
         m_configs[CONFIG_MAX_HONOR_POINTS] = 0;
     }
 
     m_configs[CONFIG_START_HONOR_POINTS] = sConfig.GetIntDefault("StartHonorPoints", 0);
-    if(m_configs[CONFIG_START_HONOR_POINTS] < 0)
+    if(int32(m_configs[CONFIG_START_HONOR_POINTS]) < 0)
     {
         sLog.outError("StartHonorPoints (%i) must be in range 0..MaxHonorPoints(%u). Set to %u.",
             m_configs[CONFIG_START_HONOR_POINTS],m_configs[CONFIG_MAX_HONOR_POINTS],0);
@@ -735,14 +737,14 @@ void World::LoadConfigSettings(bool reload)
     }
 
     m_configs[CONFIG_MAX_ARENA_POINTS] = sConfig.GetIntDefault("MaxArenaPoints", 5000);
-    if(m_configs[CONFIG_MAX_ARENA_POINTS] < 0)
+    if(int32(m_configs[CONFIG_MAX_ARENA_POINTS]) < 0)
     {
         sLog.outError("MaxArenaPoints (%i) can't be negative. Set to 0.",m_configs[CONFIG_MAX_ARENA_POINTS]);
         m_configs[CONFIG_MAX_ARENA_POINTS] = 0;
     }
 
     m_configs[CONFIG_START_ARENA_POINTS] = sConfig.GetIntDefault("StartArenaPoints", 0);
-    if(m_configs[CONFIG_START_ARENA_POINTS] < 0)
+    if(int32(m_configs[CONFIG_START_ARENA_POINTS]) < 0)
     {
         sLog.outError("StartArenaPoints (%i) must be in range 0..MaxArenaPoints(%u). Set to %u.",
             m_configs[CONFIG_START_ARENA_POINTS],m_configs[CONFIG_MAX_ARENA_POINTS],0);
@@ -809,7 +811,7 @@ void World::LoadConfigSettings(bool reload)
     m_configs[CONFIG_MAIL_DELIVERY_DELAY] = sConfig.GetIntDefault("MailDeliveryDelay",HOUR);
 
     m_configs[CONFIG_UPTIME_UPDATE] = sConfig.GetIntDefault("UpdateUptimeInterval", 10);
-    if(m_configs[CONFIG_UPTIME_UPDATE]<=0)
+    if(int32(m_configs[CONFIG_UPTIME_UPDATE])<=0)
     {
         sLog.outError("UpdateUptimeInterval (%i) must be > 0, set to default 10.",m_configs[CONFIG_UPTIME_UPDATE]);
         m_configs[CONFIG_UPTIME_UPDATE] = 10;
@@ -1049,8 +1051,8 @@ void World::SetInitialWorldSettings()
     }
 
     ///- Loading strings. Getting no records means core load has to be canceled because no error message can be output.
-    sLog.outString( "" );
-    sLog.outString( "Loading MaNGOS strings..." );
+    sLog.outString();
+    sLog.outString("Loading MaNGOS strings...");
     if (!objmgr.LoadMangosStrings())
         exit(1);                                            // Error message displayed in function already
 
