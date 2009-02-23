@@ -1228,7 +1228,7 @@ Network.TcpNodelay = 1
 
 Anticheat.Movement.Enable = 1
 Anticheat.Movement.TeleportToPlaneAlarms = 50
-Anticheat.Movement.MistimingDelta = 2000
+Anticheat.Movement.MistimingDelta = 10000
 Anticheat.Movement.MistimingAlarms = 20
 
 ###################################################################################################################
