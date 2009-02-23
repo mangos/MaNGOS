@@ -79,6 +79,7 @@ DBCStorage <ItemEntry>                    sItemStore(Itemfmt);
 //DBCStorage <ItemCondExtCostsEntry> sItemCondExtCostsStore(ItemCondExtCostsEntryfmt);
 //DBCStorage <ItemDisplayInfoEntry> sItemDisplayInfoStore(ItemDisplayTemplateEntryfmt); -- not used currently
 DBCStorage <ItemExtendedCostEntry> sItemExtendedCostStore(ItemExtendedCostEntryfmt);
+DBCStorage <ItemLimitCategoryEntry> sItemLimitCategoryStore(ItemLimitCategoryEntryfmt);
 DBCStorage <ItemRandomPropertiesEntry> sItemRandomPropertiesStore(ItemRandomPropertiesfmt);
 DBCStorage <ItemRandomSuffixEntry> sItemRandomSuffixStore(ItemRandomSuffixfmt);
 DBCStorage <ItemSetEntry> sItemSetStore(ItemSetEntryfmt);
@@ -192,7 +193,7 @@ void LoadDBCStores(const std::string& dataPath)
 {
     std::string dbcPath = dataPath+"dbc/";
 
-    const uint32 DBCFilesCount = 71;
+    const uint32 DBCFilesCount = 72;
 
     barGoLink bar( DBCFilesCount );
 
@@ -269,6 +270,7 @@ void LoadDBCStores(const std::string& dataPath)
     //LoadDBC(availableDbcLocales,bar,bad_dbc_files,sItemDisplayInfoStore,     dbcPath,"ItemDisplayInfo.dbc");     -- not used currently
     //LoadDBC(availableDbcLocales,bar,bad_dbc_files,sItemCondExtCostsStore,    dbcPath,"ItemCondExtCosts.dbc");
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sItemExtendedCostStore,    dbcPath,"ItemExtendedCost.dbc");
+    LoadDBC(availableDbcLocales,bar,bad_dbc_files,sItemLimitCategoryStore,   dbcPath,"ItemLimitCategory.dbc");
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sItemRandomPropertiesStore,dbcPath,"ItemRandomProperties.dbc");
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sItemRandomSuffixStore,    dbcPath,"ItemRandomSuffix.dbc");
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sItemSetStore,             dbcPath,"ItemSet.dbc");
@@ -501,14 +503,13 @@ void LoadDBCStores(const std::string& dataPath)
     }
 
     // Check loaded DBC files proper version
-    if( !sSpellStore.LookupEntry(54909)            ||       // last added spell in 3.0.8a
-        !sSpellStore.LookupEntry(49184)            ||       // last added spell in 3.0.8a
-        sSpellStore.LookupEntry(49184)->RecoveryTime!=5000||// last changed spell in 3.0.8a
-        !sMapStore.LookupEntry(624)                ||       // last map added in 3.0.8a
-        !sGemPropertiesStore.LookupEntry(1557)     ||       // last gem property added in 3.0.8a
-        !sItemExtendedCostStore.LookupEntry(2589)  ||       // last item extended cost added in 3.0.8a
-        !sCharTitlesStore.LookupEntry(144)         ||       // last char title added in 3.0.8a
-        !sAreaStore.LookupEntry(2769)              )        // last area (areaflag) added in 3.0.8a
+    if( !sSpellStore.LookupEntry(62735)            ||       // last added spell in 3.0.9
+        !sMapStore.LookupEntry(624)                ||       // last map added in 3.0.8a/3.0.9
+        !sGemPropertiesStore.LookupEntry(1557)     ||       // last gem property added in 3.0.8a/3.0.9
+        !sItemExtendedCostStore.LookupEntry(2589)  ||       // last item extended cost added in 3.0.8a/3.0.9
+        !sCharTitlesStore.LookupEntry(144)         ||       // last char title added in 3.0.8a/3.0.9
+        !sAreaStore.LookupEntry(2769)              ||       // last area (areaflag) added in 3.0.8a/3.0.9
+        !sItemStore.LookupEntry(45037)             )        // last client known item added in 3.0.9
     {
         sLog.outError("\nYou have _outdated_ DBC files. Please extract correct versions from current using client.");
         exit(1);
@@ -705,3 +706,6 @@ uint32 const* GetTalentTabPages(uint32 cls)
 MANGOS_DLL_SPEC DBCStorage <SoundEntriesEntry>  const* GetSoundEntriesStore()   { return &sSoundEntriesStore;   }
 MANGOS_DLL_SPEC DBCStorage <SpellEntry>         const* GetSpellStore()          { return &sSpellStore;          }
 MANGOS_DLL_SPEC DBCStorage <SpellRangeEntry>    const* GetSpellRangeStore()     { return &sSpellRangeStore;     }
+MANGOS_DLL_SPEC DBCStorage <FactionEntry>       const* GetFactionStore()        { return &sFactionStore;        }
+MANGOS_DLL_SPEC DBCStorage <ItemEntry>          const* GetItemDisplayStore()    { return &sItemStore;           }
+MANGOS_DLL_SPEC DBCStorage <CreatureDisplayInfoEntry> const* GetCreatureDisplayStore() { return &sCreatureDisplayInfoStore; }

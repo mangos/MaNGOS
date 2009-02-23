@@ -197,6 +197,7 @@ class ChatHandler
         bool HandleNpcUnFollowCommand(const char* args);
         bool HandleNpcWhisperCommand(const char* args);
         bool HandleNpcYellCommand(const char* args);
+        bool HandleNpcSetDeathStateCommand(const char* args);
 
         bool HandleReloadAllCommand(const char* args);
         bool HandleReloadAllAreaCommand(const char* args);
@@ -222,6 +223,14 @@ class ChatHandler
         bool HandleReloadGameTeleCommand(const char* args);
         bool HandleReloadGOQuestRelationsCommand(const char* args);
         bool HandleReloadGOQuestInvRelationsCommand(const char* args);
+        bool HandleReloadItemEnchantementsCommand(const char* args);
+        bool HandleReloadLocalesCreatureCommand(const char* args);
+        bool HandleReloadLocalesGameobjectCommand(const char* args);
+        bool HandleReloadLocalesItemCommand(const char* args);
+        bool HandleReloadLocalesNpcTextCommand(const char* args);
+        bool HandleReloadLocalesPageTextCommand(const char* args);
+        bool HandleReloadLocalesPointsOfInterestCommand(const char* args);
+        bool HandleReloadLocalesQuestCommand(const char* args);
         bool HandleReloadLootTemplatesCreatureCommand(const char* args);
         bool HandleReloadLootTemplatesDisenchantCommand(const char* args);
         bool HandleReloadLootTemplatesFishingCommand(const char* args);
@@ -239,6 +248,8 @@ class ChatHandler
         bool HandleReloadNpcOptionCommand(const char* args);
         bool HandleReloadNpcTrainerCommand(const char* args);
         bool HandleReloadNpcVendorCommand(const char* args);
+        bool HandleReloadPageTextsCommand(const char* args);
+        bool HandleReloadPointsOfInterestCommand(const char* args);
         bool HandleReloadQuestAreaTriggersCommand(const char* args);
         bool HandleReloadQuestEndScriptsCommand(const char* args);
         bool HandleReloadQuestStartScriptsCommand(const char* args);
@@ -258,14 +269,6 @@ class ChatHandler
         bool HandleReloadSpellTargetPositionCommand(const char* args);
         bool HandleReloadSpellThreatsCommand(const char* args);
         bool HandleReloadSpellPetAurasCommand(const char* args);
-        bool HandleReloadPageTextsCommand(const char* args);
-        bool HandleReloadItemEnchantementsCommand(const char* args);
-        bool HandleReloadLocalesCreatureCommand(const char* args);
-        bool HandleReloadLocalesGameobjectCommand(const char* args);
-        bool HandleReloadLocalesItemCommand(const char* args);
-        bool HandleReloadLocalesNpcTextCommand(const char* args);
-        bool HandleReloadLocalesPageTextCommand(const char* args);
-        bool HandleReloadLocalesQuestCommand(const char* args);
 
         bool HandleInstanceListBindsCommand(const char* args);
         bool HandleInstanceUnbindCommand(const char* args);
@@ -442,6 +445,7 @@ class ChatHandler
         bool HandleDebugBattlegroundCommand(const char * args);
         bool HandleSpawnVehicle(const char * args);
         bool HandleSendLargePacketCommand(const char * args);
+        bool HandleSendSetPhaseShiftCommand(const char * args);
 
         Player*   getSelectedPlayer();
         Creature* getSelectedCreature();

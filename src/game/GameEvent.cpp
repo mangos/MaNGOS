@@ -19,6 +19,7 @@
 #include "GameEvent.h"
 #include "World.h"
 #include "ObjectMgr.h"
+#include "PoolHandler.h"
 #include "ProgressBar.h"
 #include "Language.h"
 #include "Log.h"
@@ -351,6 +352,57 @@ void GameEvent::LoadFromDB()
         sLog.outString();
         sLog.outString( ">> Loaded %u quests additions in game events", count );
     }
+
+    mGameEventPoolIds.resize(mGameEvent.size()*2-1);
+    //                                   1                    2
+    result = WorldDatabase.Query("SELECT pool_template.entry, game_event_pool.event "
+        "FROM pool_template JOIN game_event_pool ON pool_template.entry = game_event_pool.pool_entry");
+
+    count = 0;
+    if( !result )
+    {
+        barGoLink bar2(1);
+        bar2.step();
+
+        sLog.outString();
+        sLog.outString(">> Loaded %u pools in game events", count );
+    }
+    else
+    {
+
+        barGoLink bar2( result->GetRowCount() );
+        do
+        {
+            Field *fields = result->Fetch();
+
+            bar2.step();
+
+            uint32 entry   = fields[0].GetUInt16();
+            int16 event_id = fields[1].GetInt16();
+
+            int32 internal_event_id = mGameEvent.size() + event_id - 1;
+
+            if(internal_event_id < 0 || internal_event_id >= mGameEventPoolIds.size())
+            {
+                sLog.outErrorDb("`game_event_pool` game event id (%i) is out of range compared to max event id in `game_event`",event_id);
+                continue;
+            }
+
+            if (!poolhandler.CheckPool(entry))
+            {
+                sLog.outErrorDb("Pool Id (%u) has all creatures or gameobjects with explicit chance sum <>100 and no equal chance defined. The pool system cannot pick one to spawn.", entry);
+                continue;
+            }
+
+            ++count;
+            IdList& poollist = mGameEventPoolIds[internal_event_id];
+            poollist.push_back(entry);
+
+        } while( result->NextRow() );
+        sLog.outString();
+        sLog.outString( ">> Loaded %u pools in game events", count );
+        delete result;
+    }
 }
 
 uint32 GameEvent::Initialize()                              // return the next event delay in ms
@@ -505,6 +557,17 @@ void GameEvent::GameEventSpawn(int16 event_id)
             }
         }
     }
+
+    if(internal_event_id < 0 || internal_event_id >= mGameEventPoolIds.size())
+    {
+        sLog.outError("GameEvent::GameEventSpawn attempt access to out of range mGameEventPoolIds element %i (size: %u)",internal_event_id,mGameEventPoolIds.size());
+        return;
+    }
+
+    for (IdList::iterator itr = mGameEventPoolIds[internal_event_id].begin();itr != mGameEventPoolIds[internal_event_id].end();++itr)
+    {
+        poolhandler.SpawnPool(*itr);
+    }
 }
 
 void GameEvent::GameEventUnspawn(int16 event_id)
@@ -548,6 +611,16 @@ void GameEvent::GameEventUnspawn(int16 event_id)
             if( GameObject* pGameobject = ObjectAccessor::Instance().GetObjectInWorld(MAKE_NEW_GUID(*itr, data->id, HIGHGUID_GAMEOBJECT), (GameObject*)NULL) )
                 pGameobject->AddObjectToRemoveList();
         }
+    }
+    if(internal_event_id < 0 || internal_event_id >= mGameEventPoolIds.size())
+    {
+        sLog.outError("GameEvent::GameEventUnspawn attempt access to out of range mGameEventPoolIds element %i (size: %u)",internal_event_id,mGameEventPoolIds.size());
+        return;
+    }
+
+    for (IdList::iterator itr = mGameEventPoolIds[internal_event_id].begin();itr != mGameEventPoolIds[internal_event_id].end();++itr)
+    {
+        poolhandler.DespawnPool(*itr);
     }
 }
 

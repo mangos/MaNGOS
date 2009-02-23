@@ -22,7 +22,7 @@
 DROP TABLE IF EXISTS `db_version`;
 CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
-  `required_7252_02_mangos_mangos_string` bit(1) default NULL
+  `required_7312_01_mangos_mangos_string` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -401,6 +401,7 @@ INSERT INTO `command` VALUES
 ('npc name',2,'Syntax: .npc name $name\r\n\r\nChange the name of the selected creature or character to $name.\r\n\r\nCommand disabled.'),
 ('npc phase',3,'Syntax: .npc phase #phasemask\r\n\r\nSelected unit or pet phasemask changed to #phasemask with related world vision update for players. In creature case state saved to DB and persistent. In pet case change active until in game phase changed for owner, owner re-login, or GM-mode enable/disable..'),
 ('npc playemote',3,'Syntax: .npc playemote #emoteid\r\n\r\nMake the selected creature emote with an emote of id #emoteid.'),
+('npc setdeathstate',2,'Syntax: .npc setdeathstate on/off\r\n\r\nSet default death state (dead/alive) for npc at spawn.'),
 ('npc setmodel',2,'Syntax: .npc setmodel #displayid\r\n\r\nChange the model id of the selected creature to #displayid.'),
 ('npc setmovetype',2,'Syntax: .npc setmovetype [#creature_guid] stay/random/way [NODEL]\r\n\r\nSet for creature pointed by #creature_guid (or selected if #creature_guid not provided) movement type and move it to respawn position (if creature alive). Any existing waypoints for creature will be removed from the database if you do not use NODEL. If the creature is dead then movement type will applied at creature respawn.\r\nMake sure you use NODEL, if you want to keep the waypoints.'),
 ('npc spawndist',2,'Syntax: .npc spawndist #dist\r\n\r\nAdjust spawndistance of selected creature to dist.'),
@@ -2152,6 +2153,33 @@ LOCK TABLES `locales_page_text` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `locales_points_of_interest`
+--
+
+DROP TABLE IF EXISTS `locales_points_of_interest`; 
+CREATE TABLE `locales_points_of_interest` (
+  `entry` mediumint(8) unsigned NOT NULL default '0',
+  `icon_name_loc1` text,
+  `icon_name_loc2` text,
+  `icon_name_loc3` text,
+  `icon_name_loc4` text,
+  `icon_name_loc5` text,
+  `icon_name_loc6` text,
+  `icon_name_loc7` text,
+  `icon_name_loc8` text,
+  PRIMARY KEY  (`entry`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `locales_points_of_interest`
+--
+
+LOCK TABLES `locales_points_of_interest` WRITE;
+/*!40000 ALTER TABLE `locales_points_of_interest` DISABLE KEYS */;
+/*!40000 ALTER TABLE `locales_points_of_interest` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `locales_quest`
 --
 
@@ -2842,6 +2870,7 @@ INSERT INTO `mangos_string` VALUES
 (807,'Please provide character name',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (808,'Player %s not found or offline',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (809,'Account for character %s not found',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(810,'|Hplayer:$N|h[$N]|h has earned the achievement $a!',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (1000,'Exiting daemon...',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (1001,'Account deleted: %s',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (1002,'Account %s NOT deleted (probably sql file format was updated)',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
@@ -12717,6 +12746,136 @@ INSERT INTO `playercreateinfo_spell` VALUES
 (11,8,59548,'Gift of the Naaru'),
 (11,8,61437,'Opening');
 /*!40000 ALTER TABLE `playercreateinfo_spell` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `points_of_interest`
+--
+
+DROP TABLE IF EXISTS `points_of_interest`; 
+CREATE TABLE `points_of_interest` (
+  `entry` mediumint(8) unsigned NOT NULL default '0',
+  `x` float NOT NULL default '0',
+  `y` float NOT NULL default '0',
+  `icon` mediumint(8) unsigned NOT NULL default '0',
+  `flags` mediumint(8) unsigned NOT NULL default '0',
+  `data` mediumint(8) unsigned NOT NULL default '0',
+  `icon_name` text NOT NULL,
+  PRIMARY KEY  (`entry`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `points_of_interest`
+--
+
+LOCK TABLES `points_of_interest` WRITE;
+/*!40000 ALTER TABLE `points_of_interest` DISABLE KEYS */;
+/*!40000 ALTER TABLE `points_of_interest` ENABLE KEYS */;
+UNLOCK TABLES;
+
+
+--
+-- Table structure for table `pool_creature`
+--
+
+DROP TABLE IF EXISTS `pool_creature`;
+CREATE TABLE `pool_creature` (
+  `guid` int(10) unsigned NOT NULL default '0',
+  `pool_entry` mediumint(8) unsigned NOT NULL default '0',
+  `chance` float unsigned NOT NULL default '0',
+  PRIMARY KEY  (`pool_entry`,`guid`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+
+--
+-- Dumping data for table `pool_creature`
+--
+
+LOCK TABLES `pool_creature` WRITE;
+/*!40000 ALTER TABLE `pool_creature` DISABLE KEYS */;
+/*!40000 ALTER TABLE `pool_creature` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `pool_gameobject`
+--
+
+DROP TABLE IF EXISTS `pool_gameobject`;
+CREATE TABLE `pool_gameobject` (
+  `guid` int(10) unsigned NOT NULL default '0',
+  `pool_entry` mediumint(8) unsigned NOT NULL default '0',
+  `chance` float unsigned NOT NULL default '0',
+  PRIMARY KEY  (`guid`,`pool_entry`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `pool_gameobject`
+--
+
+LOCK TABLES `pool_gameobject` WRITE;
+/*!40000 ALTER TABLE `pool_gameobject` DISABLE KEYS */;
+/*!40000 ALTER TABLE `pool_gameobject` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `pool_pool`
+--
+
+DROP TABLE IF EXISTS `pool_pool`;
+CREATE TABLE `pool_pool` (
+  `pool_id` mediumint(8) unsigned NOT NULL default '0',
+  `mother_pool` mediumint(8) unsigned NOT NULL default '0',
+  `chance` float NOT NULL default '0',
+  PRIMARY KEY  (`pool_id`,`mother_pool`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `pool_pool`
+--
+
+LOCK TABLES `pool_pool` WRITE;
+/*!40000 ALTER TABLE `pool_pool` DISABLE KEYS */;
+/*!40000 ALTER TABLE `pool_pool` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `pool_template`
+--
+
+DROP TABLE IF EXISTS `pool_template`;
+CREATE TABLE `pool_template` (
+  `entry` mediumint(8) unsigned NOT NULL default '0' COMMENT 'Pool entry',
+  `max_limit` int(10) unsigned NOT NULL default '0' COMMENT 'Max number of objects (0) is no limit',
+  PRIMARY KEY  (`entry`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `pool_template`
+--
+
+LOCK TABLES `pool_template` WRITE;
+/*!40000 ALTER TABLE `pool_template` DISABLE KEYS */;
+/*!40000 ALTER TABLE `pool_template` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `game_event_pool`
+--
+
+DROP TABLE IF EXISTS `game_event_pool`;
+CREATE TABLE `game_event_pool` (
+  `pool_entry` mediumint(8) unsigned NOT NULL default '0' COMMENT 'Id of the pool',
+  `event` smallint(6) NOT NULL default '0' COMMENT 'Put negatives values to remove during event',
+  PRIMARY KEY  (`pool_entry`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `game_event_pool`
+--
+
+LOCK TABLES `game_event_pool` WRITE;
+/*!40000 ALTER TABLE `game_event_pool` DISABLE KEYS */;
+/*!40000 ALTER TABLE `game_event_pool` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --

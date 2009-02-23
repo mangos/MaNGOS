@@ -247,10 +247,8 @@ void BattleGroundQueue::RemovePlayer(const uint64& guid, bool decreaseInvitedCou
 {
     Player *plr = objmgr.GetPlayer(guid);
 
-    uint32 queue_id = 0;
+    int32 queue_id = 0;                                     // signed for proper for-loop finish
     QueuedPlayersMap::iterator itr;
-    GroupQueueInfo * group;
-    QueuedGroupsList::iterator group_itr;
 
     // mostly people with the highest levels are in battlegrounds, thats why
     // we count from MAX_BATTLEGROUND_QUEUES to 0
@@ -262,17 +260,18 @@ void BattleGroundQueue::RemovePlayer(const uint64& guid, bool decreaseInvitedCou
     }
 
     // couldn't find the player in bg queue, return
-    if(itr == m_QueuedPlayers[queue_id].end())
+    if(queue_id == -1)
     {
         sLog.outError("Battleground: couldn't find player to remove.");
         return;
     }
 
-    group = itr->second.GroupInfo;
+    GroupQueueInfo* group = itr->second.GroupInfo;
 
-    for(group_itr=m_QueuedGroups[queue_id].begin(); group_itr != m_QueuedGroups[queue_id].end(); ++group_itr)
+    QueuedGroupsList::iterator group_itr = m_QueuedGroups[queue_id].begin();
+    for(; group_itr != m_QueuedGroups[queue_id].end(); ++group_itr)
     {
-        if(group == (GroupQueueInfo*)(*group_itr))
+        if(group == *group_itr)
             break;
     }
 

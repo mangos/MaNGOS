@@ -1025,36 +1025,6 @@ void Spell::EffectDummy(uint32 i)
                     m_caster->CastSpell(m_caster,42337,true,NULL);
                     return;
                 }
-                case 37573:                                 //Temporal Phase Modulator
-                {
-                    if(!unitTarget)
-                        return;
-
-                    TemporarySummon* tempSummon = dynamic_cast<TemporarySummon*>(unitTarget);
-                    if(!tempSummon)
-                        return;
-
-                    uint32 health = tempSummon->GetHealth();
-                    const uint32 entry_list[6] = {21821, 21820, 21817};
-
-                    float x = tempSummon->GetPositionX();
-                    float y = tempSummon->GetPositionY();
-                    float z = tempSummon->GetPositionZ();
-                    float o = tempSummon->GetOrientation();
-
-                    tempSummon->UnSummon();
-
-                    Creature* pCreature = m_caster->SummonCreature(entry_list[urand(0, 2)], x, y, z, o,TEMPSUMMON_TIMED_OR_DEAD_DESPAWN,180000);
-                    if (!pCreature)
-                        return;
-
-                    pCreature->SetHealth(health);
-
-                    if(pCreature->AI())
-                        pCreature->AI()->AttackStart(m_caster);
-
-                    return;
-                }
                 case 34665:                                 //Administer Antidote
                 {
                     if(!unitTarget || m_caster->GetTypeId() != TYPEID_PLAYER )
@@ -3035,8 +3005,7 @@ void Spell::EffectOpenLock(uint32 /*i*/)
         }
 
         // update skill if really known
-        uint32 SkillValue = player->GetPureSkillValue(SkillId);
-        if(SkillValue)                                      // non only item base skill
+        if(uint32 SkillValue = player->GetPureSkillValue(SkillId))
         {
             if(gameObjTarget)
             {
@@ -3048,7 +3017,6 @@ void Spell::EffectOpenLock(uint32 /*i*/)
             else if(itemTarget)
             {
                 // Do one skill-up
-                uint32 SkillValue = player->GetPureSkillValue(SkillId);
                 player->UpdateGatherSkill(SkillId, SkillValue, reqSkillValue);
             }
         }
@@ -4321,6 +4289,8 @@ void Spell::EffectWeaponDmg(uint32 i)
 
     // some spell specific modifiers
     bool customBonusDamagePercentMod = false;
+    bool spellBonusNeedWeaponDamagePercentMod = false;      // if set applied weapon damage percent mode to spell bonus
+
     float bonusDamagePercentMod  = 1.0f;                    // applied to fixed effect damage bonus if set customBonusDamagePercentMod
     float weaponDamagePercentMod = 1.0f;                    // applied to weapon damage (and to fixed effect damage bonus if customBonusDamagePercentMod not set
     float totalDamagePercentMod  = 1.0f;                    // applied to final bonus+weapon damage
@@ -4389,7 +4359,7 @@ void Spell::EffectWeaponDmg(uint32 i)
                 }
 
                 if(found)
-                    totalDamagePercentMod *= 1.5f;          // 150% if poisoned
+                    totalDamagePercentMod *= 1.2f;          // 120% if poisoned
             }
             break;
         }
@@ -4398,7 +4368,8 @@ void Spell::EffectWeaponDmg(uint32 i)
             // Seal of Command - receive benefit from Spell Damage and Healing
             if(m_spellInfo->SpellFamilyFlags & 0x00000002000000LL)
             {
-                spell_bonus += int32(0.20f*m_caster->SpellBaseDamageBonus(GetSpellSchoolMask(m_spellInfo)));
+                spellBonusNeedWeaponDamagePercentMod = true;// apply weaponDamagePercentMod to spell_bonus (and then to all bonus, fixes and weapon already have applied)
+                spell_bonus += int32(0.23f*m_caster->SpellBaseDamageBonus(GetSpellSchoolMask(m_spellInfo)));
                 spell_bonus += int32(0.29f*m_caster->SpellBaseDamageBonusForVictim(GetSpellSchoolMask(m_spellInfo), unitTarget));
             }
             break;
@@ -4449,6 +4420,10 @@ void Spell::EffectWeaponDmg(uint32 i)
                 break;                                      // not weapon damage effect, just skip
         }
     }
+
+    // apply weaponDamagePercentMod to spell bonus also
+    if(spellBonusNeedWeaponDamagePercentMod)
+        spell_bonus = int32(spell_bonus*weaponDamagePercentMod);
 
     // non-weapon damage
     int32 bonus = spell_bonus + fixed_bonus;
