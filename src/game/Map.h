@@ -358,26 +358,22 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         template<class T>
         void AddToActiveHelper(T* obj)
         {
-            if(obj->isActiveObject())
-                m_activeNonPlayers.insert(obj);
+            m_activeNonPlayers.insert(obj);
         }
 
         template<class T>
         void RemoveFromActiveHelper(T* obj)
         {
-            if(obj->isActiveObject())
+            // Map::Update for active object in proccess
+            if(m_activeNonPlayersIter != m_activeNonPlayers.end())
             {
-                // Map::Update for active object in proccess
-                if(m_activeNonPlayersIter != m_activeNonPlayers.end())
-                {
-                    ActiveNonPlayers::iterator itr = m_activeNonPlayers.find(obj);
-                    if(itr==m_activeNonPlayersIter)
-                        ++m_activeNonPlayersIter;
-                    m_activeNonPlayers.erase(itr);
-                }
-                else
-                    m_activeNonPlayers.erase(obj);
+                ActiveNonPlayers::iterator itr = m_activeNonPlayers.find(obj);
+                if(itr==m_activeNonPlayersIter)
+                    ++m_activeNonPlayersIter;
+                m_activeNonPlayers.erase(itr);
             }
+            else
+                m_activeNonPlayers.erase(obj);
         }
 };
 

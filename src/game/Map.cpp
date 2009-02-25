@@ -463,7 +463,8 @@ Map::Add(T *obj)
     AddToGrid(obj,grid,cell);
     obj->AddToWorld();
 
-    AddToActive(obj);
+    if(obj->isActiveObject())
+        AddToActive(obj);
 
     DEBUG_LOG("Object %u enters grid[%u,%u]", GUID_LOPART(obj->GetGUID()), cell.GridX(), cell.GridY());
 
@@ -762,7 +763,8 @@ Map::Remove(T *obj, bool remove)
     NGridType *grid = getNGrid(cell.GridX(), cell.GridY());
     assert( grid != NULL );
 
-    RemoveFromActive(obj);
+    if(obj->isActiveObject())
+        RemoveFromActive(obj);
 
     obj->RemoveFromWorld();
     RemoveFromGrid(obj,grid,cell);
@@ -1623,7 +1625,7 @@ void Map::AddToActive( Creature* c )
     AddToActiveHelper(c);
 
     // also not allow unloading spawn grid to prevent creating creature clone at load
-    if(c->GetDBTableGUIDLow())
+    if(!c->isPet() && c->GetDBTableGUIDLow())
     {
         float x,y,z;
         c->GetRespawnCoord(x,y,z);
@@ -1644,7 +1646,7 @@ void Map::RemoveFromActive( Creature* c )
     RemoveFromActiveHelper(c);
 
     // also allow unloading spawn grid
-    if(c->GetDBTableGUIDLow())
+    if(!c->isPet() && c->GetDBTableGUIDLow())
     {
         float x,y,z;
         c->GetRespawnCoord(x,y,z);
