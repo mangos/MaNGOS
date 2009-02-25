@@ -203,19 +203,21 @@ void BattleGroundQueue::RemovePlayer(const uint64& guid, bool decreaseInvitedCou
     // we count from MAX_BATTLEGROUND_QUEUES - 1 to 0
     // variable index removes useless searching in other team's queue
     uint32 index = (group->Team == HORDE) ? BG_TEAM_HORDE : BG_TEAM_ALLIANCE;
-    for (int32 queue_id_tmp = MAX_BATTLEGROUND_QUEUES - 1; queue_id_tmp >= 0 && queue_id == -1; queue_id_tmp--)
+
+    for (int32 queue_id_tmp = MAX_BATTLEGROUND_QUEUES - 1; queue_id_tmp >= 0 && queue_id == -1; --queue_id_tmp)
     {
-        //we must check premade and normal team's queue - because when players from premade are joining bg, they leave groupinfo so we can't use its players size to find out index
-        for (uint32 j = 0; j < 3; j += BG_QUEUE_NORMAL_ALLIANCE)
+        //we must check premade and normal team's queue - because when players from premade are joining bg,
+        //they leave groupinfo so we can't use its players size to find out index
+        for (uint32 j = index; j < BG_QUEUE_GROUP_TYPES_COUNT - 1; j += BG_QUEUE_NORMAL_ALLIANCE)
         {
-            for(group_itr_tmp = m_QueuedGroups[queue_id_tmp][index + j].begin(); group_itr_tmp != m_QueuedGroups[queue_id_tmp][index + j].end(); ++group_itr_tmp)
+            for(group_itr_tmp = m_QueuedGroups[queue_id_tmp][j].begin(); group_itr_tmp != m_QueuedGroups[queue_id_tmp][j].end(); ++group_itr_tmp)
             {
                 if( (*group_itr_tmp) == group )
                 {
                     queue_id = queue_id_tmp;
                     group_itr = group_itr_tmp;
                     //we must store index to be able to erase iterator
-                    index += j;
+                    index = j;
                     break;
                 }
             }
@@ -260,7 +262,8 @@ void BattleGroundQueue::RemovePlayer(const uint64& guid, bool decreaseInvitedCou
         m_QueuedGroups[queue_id][index].erase(group_itr);
         delete group;
     }
-    // if group wasn't empty, so it wasn't deleted, and player have left a rated queue -> everyone from the group should leave too
+    // if group wasn't empty, so it wasn't deleted, and player have left a rated
+    // queue -> everyone from the group should leave too
     // don't remove recursively if already invited to bg!
     else if( !group->IsInvitedToBGInstanceGUID && group->IsRated )
     {
@@ -271,7 +274,8 @@ void BattleGroundQueue::RemovePlayer(const uint64& guid, bool decreaseInvitedCou
             BattleGround * bg = sBattleGroundMgr.GetBattleGroundTemplate(group->BgTypeId);
             BattleGroundQueueTypeId bgQueueTypeId = BattleGroundMgr::BGQueueTypeId(group->BgTypeId, group->ArenaType);
             uint32 queueSlot = plr2->GetBattleGroundQueueIndex(bgQueueTypeId);
-            plr2->RemoveBattleGroundQueueId(bgQueueTypeId); // must be called this way, because if you move this call to queue->removeplayer, it causes bugs
+            plr2->RemoveBattleGroundQueueId(bgQueueTypeId); // must be called this way, because if you move this call to
+                                                            // queue->removeplayer, it causes bugs
             WorldPacket data;
             sBattleGroundMgr.BuildBattleGroundStatusPacket(&data, bg, plr2->GetTeam(), queueSlot, STATUS_NONE, 0, 0);
             plr2->GetSession()->SendPacket(&data);
@@ -629,7 +633,10 @@ void BattleGroundQueue::Update(BattleGroundTypeId bgTypeId, BGQueueIdBasedOnLeve
         return;
 
     //if no players in queue ... do nothing
-    if( m_QueuedGroups[queue_id][BG_QUEUE_PREMADE_ALLIANCE].empty() && m_QueuedGroups[queue_id][BG_QUEUE_PREMADE_HORDE].empty() && m_QueuedGroups[queue_id][BG_QUEUE_NORMAL_ALLIANCE].empty() && m_QueuedGroups[queue_id][BG_QUEUE_NORMAL_HORDE].empty() )
+    if( m_QueuedGroups[queue_id][BG_QUEUE_PREMADE_ALLIANCE].empty() &&
+        m_QueuedGroups[queue_id][BG_QUEUE_PREMADE_HORDE].empty() &&
+        m_QueuedGroups[queue_id][BG_QUEUE_NORMAL_ALLIANCE].empty() &&
+        m_QueuedGroups[queue_id][BG_QUEUE_NORMAL_HORDE].empty() )
         return;
 
     BattleGroundQueueTypeId bgQueueTypeId = BattleGroundMgr::BGQueueTypeId(bgTypeId, arenaType);
@@ -642,7 +649,8 @@ void BattleGroundQueue::Update(BattleGroundTypeId bgTypeId, BGQueueIdBasedOnLeve
         next = itr;
         ++next;
         // DO NOT allow queue manager to invite new player to arena
-        if( (*itr)->isBattleGround() && (*itr)->GetTypeID() == bgTypeId && (*itr)->GetQueueId() == queue_id && (*itr)->GetStatus() > STATUS_WAIT_QUEUE && (*itr)->GetStatus() < STATUS_WAIT_LEAVE )
+        if( (*itr)->isBattleGround() && (*itr)->GetTypeID() == bgTypeId && (*itr)->GetQueueId() == queue_id &&
+            (*itr)->GetStatus() > STATUS_WAIT_QUEUE && (*itr)->GetStatus() < STATUS_WAIT_LEAVE )
         {
             BattleGround* bg = *itr; //we have to store battleground pointer here, because when battleground is full, it is removed from free queue (not yet implemented!!)
             // and iterator is invalid
