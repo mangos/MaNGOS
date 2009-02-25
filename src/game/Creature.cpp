@@ -114,7 +114,7 @@ m_deathTimer(0), m_respawnTime(0), m_respawnDelay(25), m_corpseDelay(60), m_resp
 m_gossipOptionLoaded(false), m_emoteState(0), m_isPet(false), m_isVehicle(false), m_isTotem(false),
 m_defaultMovementType(IDLE_MOTION_TYPE), m_DBTableGuid(0), m_equipmentId(0), m_AlreadyCallAssistance(false),
 m_regenHealth(true), m_AI_locked(false), m_isDeadByDefault(false), m_meleeDamageSchoolMask(SPELL_SCHOOL_MASK_NORMAL),
-m_creatureInfo(NULL)
+m_creatureInfo(NULL), m_isActiveObject(false)
 {
     m_regenTimer = 200;
     m_valuesCount = UNIT_END;
@@ -2097,4 +2097,24 @@ const char* Creature::GetNameForLocaleIdx(int32 loc_idx) const
     }
 
     return GetName();
+}
+
+void Creature::SetActiveObjectState( bool on )
+{
+    if(m_isActiveObject==on)
+        return;
+
+    bool world = IsInWorld();
+
+    Map* map;
+    if(world)
+    {
+        map = GetMap();
+        map->Remove(this,false);
+    }
+
+    m_isActiveObject = on;
+
+    if(world)
+        map->Add(this);
 }
