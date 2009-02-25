@@ -1046,7 +1046,6 @@ bool ChatHandler::HandleTurnObjectCommand(const char* args)
 
     obj->Relocate(obj->GetPositionX(), obj->GetPositionY(), obj->GetPositionZ(), o);
 
-    obj->SetFloatValue(GAMEOBJECT_FACING, o);
     obj->SetFloatValue(GAMEOBJECT_PARENTROTATION+2, rot2);
     obj->SetFloatValue(GAMEOBJECT_PARENTROTATION+3, rot3);
 
@@ -1176,9 +1175,6 @@ bool ChatHandler::HandleMoveObjectCommand(const char* args)
         map->Remove(obj,false);
 
         obj->Relocate(chr->GetPositionX(), chr->GetPositionY(), chr->GetPositionZ(), obj->GetOrientation());
-        obj->SetFloatValue(GAMEOBJECT_POS_X, chr->GetPositionX());
-        obj->SetFloatValue(GAMEOBJECT_POS_Y, chr->GetPositionY());
-        obj->SetFloatValue(GAMEOBJECT_POS_Z, chr->GetPositionZ());
 
         map->Add(obj);
     }
@@ -1202,9 +1198,6 @@ bool ChatHandler::HandleMoveObjectCommand(const char* args)
         map->Remove(obj,false);
 
         obj->Relocate(x, y, z, obj->GetOrientation());
-        obj->SetFloatValue(GAMEOBJECT_POS_X, x);
-        obj->SetFloatValue(GAMEOBJECT_POS_Y, y);
-        obj->SetFloatValue(GAMEOBJECT_POS_Z, z);
 
         map->Add(obj);
     }

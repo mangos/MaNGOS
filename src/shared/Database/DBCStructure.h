@@ -555,6 +555,7 @@ struct BattlemasterListEntry
     char*   name[16];                                       // 16-31
                                                             // 32 string flag, unused
                                                             // 33 unused
+    //uint32 unk;                                           // 34 new 3.1
 };
 
 #define MAX_OUTFIT_ITEMS 24
@@ -1086,6 +1087,7 @@ struct SoundEntriesEntry
                                                             // 26       m_minDistance
                                                             // 27       m_distanceCutoff
                                                             // 28       m_EAXDef
+                                                            // 29       new in 3.1
 };
 
 struct SpellEntry
@@ -1197,6 +1199,7 @@ struct SpellEntry
     uint32    SchoolMask;                                   // 228      m_schoolMask
     uint32    runeCostID;                                   // 229      m_runeCostID
     //uint32    spellMissileID;                             // 230      m_spellMissileID not used
+    //uint32  PowerDisplayId;                               // 231 PowerDisplay.dbc, new in 3.1
 
     private:
         // prevent creating custom entries (copy data from original in fact)
@@ -1300,6 +1303,7 @@ struct SpellItemEnchantmentEntry
     uint32      EnchantmentCondition;                       // 34       m_condition_id
     //uint32      requiredSkill;                            // 35       m_requiredSkillID
     //uint32      requiredSkillValue;                       // 36       m_requiredSkillRank
+                                                            // 37       new in 3.1
 };
 
 struct SpellItemEnchantmentConditionEntry
@@ -1417,8 +1421,8 @@ struct VehicleEntry
     float   m_cameraFadeDistScalarMin;                      // 15
     float   m_cameraFadeDistScalarMax;                      // 16
     float   m_cameraPitchOffset;                            // 17
-    int     m_powerType[3];                                 // 18-20
-    int     m_powerToken[3];                                // 21-23
+    //int     m_powerType[3];                                 // 18-20 removed in 3.1
+    //int     m_powerToken[3];                                // 21-23 removed in 3.1
     float   m_facingLimitRight;                             // 24
     float   m_facingLimitLeft;                              // 25
     float   m_msslTrgtTurnLingering;                        // 26
@@ -1436,6 +1440,9 @@ struct VehicleEntry
     uint32  m_uiLocomotionType;                             // 40
     float   m_msslTrgtImpactTexRadius;                      // 41
     uint32  m_uiSeatIndicatorType;                          // 42
+    // 37, new in 3.1
+    // 38, new in 3.1
+    // 39, new in 3.1
 };
 
 struct VehicleSeatEntry
@@ -1486,6 +1493,7 @@ struct VehicleSeatEntry
     uint32  m_exitUISoundID;                                // 43
     int32   m_uiSkin;                                       // 44
     uint32  m_flagsB;                                       // 45
+    // 46-57 added in 3.1, floats mostly
 };
 
 struct WorldMapAreaEntry

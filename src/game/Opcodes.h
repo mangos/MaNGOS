@@ -1238,7 +1238,7 @@ enum Opcodes
     UMSG_UNKNOWN_1201                               = 0x4B1, // not found
     CMSG_UNKNOWN_1202                               = 0x4B2, // CMSG, uint32
     SMSG_UNKNOWN_1203                               = 0x4B3, // SMSG, string+float
-    CMSG_UNKNOWN_1204                               = 0x4B4, // CMSG, empty, lua: SetLFGRoles
+    CMSG_LFG_SET_ROLES                              = 0x4B4, // CMSG, empty, lua: SetLFGRoles
     UMSG_UNKNOWN_1205                               = 0x4B5, // not found
     CMSG_UNKNOWN_1206                               = 0x4B6, // CMSG, uint64, lua: CalendarContextEventSignUp
     SMSG_UNKNOWN_1207                               = 0x4B7, // SMSG, calendar related

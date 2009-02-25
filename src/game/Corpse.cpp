@@ -85,10 +85,6 @@ bool Corpse::Create( uint32 guidlow, Player *owner)
     }
 
     SetFloatValue( OBJECT_FIELD_SCALE_X, 1 );
-    SetFloatValue( CORPSE_FIELD_POS_X, GetPositionX() );
-    SetFloatValue( CORPSE_FIELD_POS_Y, GetPositionY() );
-    SetFloatValue( CORPSE_FIELD_POS_Z, GetPositionZ() );
-    SetFloatValue( CORPSE_FIELD_FACING, GetOrientation() );
     SetUInt64Value( CORPSE_FIELD_OWNER, owner->GetGUID() );
 
     m_grid = MaNGOS::ComputeGridPair(GetPositionX(), GetPositionY());

@@ -1419,7 +1419,7 @@ void Player::BuildEnumData( QueryResult * result, WorldPacket * p_data )
 
     for (uint8 slot = 0; slot < EQUIPMENT_SLOT_END; slot++)
     {
-        uint32 visualbase = PLAYER_VISIBLE_ITEM_1_0 + (slot * MAX_VISIBLE_ITEM_OFFSET);
+        uint32 visualbase = PLAYER_VISIBLE_ITEM_1_ENTRYID + (slot * 2);
         uint32 item_id = GetUInt32Value(visualbase);
         const ItemPrototype * proto = objmgr.GetItemPrototype(item_id);
         SpellItemEnchantmentEntry const *enchant = NULL;
@@ -3452,23 +3452,12 @@ void Player::InitVisibleBits()
     // Players visible items are not inventory stuff
     for(uint16 i = 0; i < EQUIPMENT_SLOT_END; ++i)
     {
-        uint32 offset = i * MAX_VISIBLE_ITEM_OFFSET;
-
-        // item creator
-        updateVisualBits.SetBit(PLAYER_VISIBLE_ITEM_1_CREATOR + 0 + offset);
-        updateVisualBits.SetBit(PLAYER_VISIBLE_ITEM_1_CREATOR + 1 + offset);
+        uint32 offset = i * 2;
 
         // item entry
-        updateVisualBits.SetBit(PLAYER_VISIBLE_ITEM_1_0 + 0 + offset);
-
-        // item enchantments
-        for(uint8 j = 0; j < MAX_ENCHANTMENT_SLOT; ++j)
-            updateVisualBits.SetBit(PLAYER_VISIBLE_ITEM_1_0 + 1 + j + offset);
-
-        // random properties
-        updateVisualBits.SetBit(PLAYER_VISIBLE_ITEM_1_PROPERTIES + offset);
-        updateVisualBits.SetBit(PLAYER_VISIBLE_ITEM_1_SEED + offset);
-        updateVisualBits.SetBit(PLAYER_VISIBLE_ITEM_1_PAD + offset);
+        updateVisualBits.SetBit(PLAYER_VISIBLE_ITEM_1_ENTRYID + offset);
+        // enchant
+        updateVisualBits.SetBit(PLAYER_VISIBLE_ITEM_1_PERMANENTENCHANTMENT + offset);
     }
 
     updateVisualBits.SetBit(PLAYER_CHOSEN_TITLE);
@@ -10626,30 +10615,13 @@ void Player::SetVisibleItemSlot(uint8 slot, Item *pItem)
 
     if(pItem)
     {
-        SetUInt64Value(PLAYER_VISIBLE_ITEM_1_CREATOR + (slot * MAX_VISIBLE_ITEM_OFFSET), pItem->GetUInt64Value(ITEM_FIELD_CREATOR));
-
-        int VisibleBase = PLAYER_VISIBLE_ITEM_1_0 + (slot * MAX_VISIBLE_ITEM_OFFSET);
-        SetUInt32Value(VisibleBase + 0, pItem->GetEntry());
-
-        for(int i = 0; i < MAX_INSPECTED_ENCHANTMENT_SLOT; ++i)
-            SetUInt32Value(VisibleBase + 1 + i, pItem->GetEnchantmentId(EnchantmentSlot(i)));
-
-        // Use SetInt16Value to prevent set high part to FFFF for negative value
-        SetInt16Value( PLAYER_VISIBLE_ITEM_1_PROPERTIES + (slot * MAX_VISIBLE_ITEM_OFFSET), 0, pItem->GetItemRandomPropertyId());
-        SetUInt32Value(PLAYER_VISIBLE_ITEM_1_PROPERTIES + 1 + (slot * MAX_VISIBLE_ITEM_OFFSET), pItem->GetItemSuffixFactor());
+        SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (slot * 2), pItem->GetEntry());
+        SetUInt32Value(PLAYER_VISIBLE_ITEM_1_PERMANENTENCHANTMENT + (slot * 2), pItem->GetEnchantmentId(EnchantmentSlot(0)));
     }
     else
     {
-        SetUInt64Value(PLAYER_VISIBLE_ITEM_1_CREATOR + (slot * MAX_VISIBLE_ITEM_OFFSET), 0);
-
-        int VisibleBase = PLAYER_VISIBLE_ITEM_1_0 + (slot * MAX_VISIBLE_ITEM_OFFSET);
-        SetUInt32Value(VisibleBase + 0, 0);
-
-        for(int i = 0; i < MAX_INSPECTED_ENCHANTMENT_SLOT; ++i)
-            SetUInt32Value(VisibleBase + 1 + i, 0);
-
-        SetUInt32Value(PLAYER_VISIBLE_ITEM_1_PROPERTIES + 0 + (slot * MAX_VISIBLE_ITEM_OFFSET), 0);
-        SetUInt32Value(PLAYER_VISIBLE_ITEM_1_PROPERTIES + 1 + (slot * MAX_VISIBLE_ITEM_OFFSET), 0);
+        SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (slot * 2), 0);
+        SetUInt32Value(PLAYER_VISIBLE_ITEM_1_PERMANENTENCHANTMENT + (slot * 2), 0);
     }
 }
 
@@ -12133,10 +12105,9 @@ void Player::ApplyEnchantment(Item *item,EnchantmentSlot slot,bool apply, bool a
     }                                                       /*for*/
 
     // visualize enchantment at player and equipped items
-    if(slot < MAX_INSPECTED_ENCHANTMENT_SLOT)
+    if(slot == PERM_ENCHANTMENT_SLOT)
     {
-        int VisibleBase = PLAYER_VISIBLE_ITEM_1_0 + (item->GetSlot() * MAX_VISIBLE_ITEM_OFFSET);
-        SetUInt32Value(VisibleBase + 1 + slot, apply? item->GetEnchantmentId(slot) : 0);
+        SetUInt32Value(PLAYER_VISIBLE_ITEM_1_PERMANENTENCHANTMENT + (item->GetSlot() * 2), apply ? item->GetEnchantmentId(slot) : 0);
     }
 
     if(apply_dur)
