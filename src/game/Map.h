@@ -216,8 +216,8 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         // assert print helper
         bool CheckGridIntegrity(Creature* c, bool moved) const;
 
-        uint32 GetInstanceId() { return i_InstanceId; }
-        uint8 GetSpawnMode() { return (i_spawnMode); }
+        uint32 GetInstanceId() const { return i_InstanceId; }
+        uint8 GetSpawnMode() const { return (i_spawnMode); }
         virtual bool CanEnter(Player* /*player*/) { return true; }
         const char* GetMapName() const;
 
