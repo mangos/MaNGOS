@@ -263,12 +263,8 @@ void Unit::SendMonsterMove(float NewPosX, float NewPosY, float NewPosZ, uint8 ty
 {
     WorldPacket data( SMSG_MONSTER_MOVE, (41 + GetPackGUID().size()) );
     data.append(GetPackGUID());
-
-    // Point A, starting location
+    data << uint8(0);                                       // new in 3.1
     data << GetPositionX() << GetPositionY() << GetPositionZ();
-    // unknown field - unrelated to orientation
-    // seems to increment about 1000 for every 1.7 seconds
-    // for now, we'll just use mstime
     data << getMSTime();
 
     data << uint8(type);                                    // unknown
@@ -279,7 +275,7 @@ void Unit::SendMonsterMove(float NewPosX, float NewPosY, float NewPosZ, uint8 ty
         case 1:                                             // stop packet
             SendMessageToSet( &data, true );
             return;
-        case 2:                                             // not used currently
+        case 2:                                             // facing spot, not used currently
             data << float(0);
             data << float(0);
             data << float(0);
@@ -288,13 +284,12 @@ void Unit::SendMonsterMove(float NewPosX, float NewPosY, float NewPosZ, uint8 ty
             data << uint64(0);                              // probably target guid
             break;
         case 4:                                             // not used currently
-            data << float(0);                               // probably orientation
+            data << float(0);                               // facing angle
             break;
     }
 
     //Movement Flags (0x0 = walk, 0x100 = run, 0x200 = fly/swim)
     data << uint32(MovementFlags);
-
     data << Time;                                           // Time in between points
     data << uint32(1);                                      // 1 single waypoint
     data << NewPosX << NewPosY << NewPosZ;                  // the single waypoint Point B
@@ -313,22 +308,16 @@ void Unit::SendMonsterMoveByPath(Path const& path, uint32 start, uint32 end, uin
 
     WorldPacket data( SMSG_MONSTER_MOVE, (GetPackGUID().size()+4+4+4+4+1+4+4+4+pathSize*4*3) );
     data.append(GetPackGUID());
+    data << uint8(0);
     data << GetPositionX();
     data << GetPositionY();
     data << GetPositionZ();
-
-    // unknown field - unrelated to orientation
-    // seems to increment about 1000 for every 1.7 seconds
-    // for now, we'll just use mstime
     data << getMSTime();
-
     data << uint8( 0 );
     data << uint32( MovementFlags );
     data << uint32( traveltime );
     data << uint32( pathSize );
     data.append( (char*)path.GetNodes(start), pathSize * 4 * 3 );
-
-    //WPAssert( data.size() == 37 + pathnodes.Size( ) * 4 * 3 );
     SendMessageToSet(&data, true);
 }
 

@@ -240,7 +240,7 @@ void FlightPathMovementGenerator::Initialize(Player &player)
     // do not send movement, it was sent already
     i_destinationHolder.SetDestination(traveller, i_path[i_currentNode].x, i_path[i_currentNode].y, i_path[i_currentNode].z, false);
 
-    player.SendMonsterMoveByPath(GetPath(),GetCurrentNode(),GetPathAtMapEnd(),MOVEMENTFLAG_WALK_MODE|MOVEMENTFLAG_ONTRANSPORT);
+    player.SendMonsterMoveByPath(GetPath(),GetCurrentNode(),GetPathAtMapEnd(),0x420);
 }
 
 void FlightPathMovementGenerator::Finalize(Player & player)
