@@ -33,8 +33,8 @@ Corpse::Corpse(CorpseType type) : WorldObject()
 {
     m_objectType |= TYPEMASK_CORPSE;
     m_objectTypeId = TYPEID_CORPSE;
-                                                            // 2.3.2 - 0x58
-    m_updateFlag = (UPDATEFLAG_LOWGUID | UPDATEFLAG_HIGHGUID | UPDATEFLAG_HAS_POSITION);
+                                                            // 3.1.0 - 0x148
+    m_updateFlag = (UPDATEFLAG_LOWGUID | UPDATEFLAG_HAS_POSITION | UPDATEFLAG_UNK1);
 
     m_valuesCount = CORPSE_END;
 

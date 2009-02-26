@@ -1236,24 +1236,28 @@ enum Opcodes
     UMSG_UNKNOWN_1199                               = 0x4AF, // not found
     UMSG_UNKNOWN_1200                               = 0x4B0, // not found
     UMSG_UNKNOWN_1201                               = 0x4B1, // not found
-    CMSG_UNKNOWN_1202                               = 0x4B2, // CMSG, uint32
-    SMSG_UNKNOWN_1203                               = 0x4B3, // SMSG, string+float
-    CMSG_LFG_SET_ROLES                              = 0x4B4, // CMSG, empty, lua: SetLFGRoles
-    UMSG_UNKNOWN_1205                               = 0x4B5, // not found
-    CMSG_UNKNOWN_1206                               = 0x4B6, // CMSG, uint64, lua: CalendarContextEventSignUp
-    SMSG_UNKNOWN_1207                               = 0x4B7, // SMSG, calendar related
-    SMSG_UNKNOWN_1208                               = 0x4B8, // SMSG, equipment manager list?
-    CMSG_UNKNOWN_1209                               = 0x4B9, // CMSG, lua: SaveEquipmentSet
-    CMSG_UNKNOWN_1210                               = 0x4BA, // CMSG
-    SMSG_UNKNOWN_1211                               = 0x4BB, // SMSG, uint64, uint8, 3 x float
-    SMSG_UNKNOWN_1212                               = 0x4BC, // SMSG, talents related
-    CMSG_UNKNOWN_1213                               = 0x4BD, // CMSG, lua: LearnPreviewTalents
-    CMSG_UNKNOWN_1214                               = 0x4BE, // CMSG, lua: LearnPreviewTalents
-    UMSG_UNKNOWN_1215                               = 0x4BF, // not found
-    UMSG_UNKNOWN_1216                               = 0x4C0, // not found
-    UMSG_UNKNOWN_1217                               = 0x4C1, // not found
-    UMSG_UNKNOWN_1218                               = 0x4C2, // not found
-    NUM_MSG_TYPES                                   = 0x4C3
+    SMSG_UNKNOWN_1202                               = 0x4B2, // refund something
+    CMSG_UNKNOWN_1203                               = 0x4B3, // refund request?
+    CMSG_UNKNOWN_1204                               = 0x4B4, // lua: ContainerRefundItemPurchase
+    SMSG_UNKNOWN_1205                               = 0x4B5, // refund something
+    CMSG_UNKNOWN_1206                               = 0x4B6, // CMSG, uint32
+    SMSG_UNKNOWN_1207                               = 0x4B7, // SMSG, string+float
+    CMSG_LFG_SET_ROLES                              = 0x4B8, // CMSG, empty, lua: SetLFGRoles
+    UMSG_UNKNOWN_1209                               = 0x4B9, // not found
+    CMSG_UNKNOWN_1210                               = 0x4BA, // CMSG, uint64, lua: CalendarContextEventSignUp
+    SMSG_UNKNOWN_1211                               = 0x4BB, // SMSG, calendar related
+    SMSG_UNKNOWN_1212                               = 0x4BC, // SMSG, equipment manager list?
+    CMSG_UNKNOWN_1213                               = 0x4BD, // CMSG, lua: SaveEquipmentSet
+    CMSG_UNKNOWN_1214                               = 0x4BE, // CMSG
+    SMSG_UNKNOWN_1215                               = 0x4BF, // SMSG, uint64, uint8, 3 x float
+    SMSG_UNKNOWN_1216                               = 0x4C0, // SMSG, talents related
+    CMSG_UNKNOWN_1217                               = 0x4C1, // CMSG, lua: LearnPreviewTalents
+    CMSG_UNKNOWN_1218                               = 0x4C2, // CMSG, lua: LearnPreviewTalents
+    UMSG_UNKNOWN_1219                               = 0x4C3, // not found
+    UMSG_UNKNOWN_1220                               = 0x4C4, // not found
+    UMSG_UNKNOWN_1221                               = 0x4C5, // not found
+    UMSG_UNKNOWN_1222                               = 0x4C6, // not found
+    NUM_MSG_TYPES                                   = 0x4C7
 };
 
 /// Player state

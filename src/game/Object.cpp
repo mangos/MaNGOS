@@ -302,17 +302,17 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint16 flags, uint32 flags2
         *data << uint32(getMSTime());                       // time (in milliseconds)
 
         // position
-        *data << ((WorldObject *)this)->GetPositionX();
-        *data << ((WorldObject *)this)->GetPositionY();
-        *data << ((WorldObject *)this)->GetPositionZ();
-        *data << ((WorldObject *)this)->GetOrientation();
+        *data << ((WorldObject*)this)->GetPositionX();
+        *data << ((WorldObject*)this)->GetPositionY();
+        *data << ((WorldObject*)this)->GetPositionZ();
+        *data << ((WorldObject*)this)->GetOrientation();
 
         // 0x00000200
         if(flags2 & MOVEMENTFLAG_ONTRANSPORT)
         {
             if(GetTypeId() == TYPEID_PLAYER)
             {
-                *data << (uint64)((Player*)this)->GetTransport()->GetGUID();
+                data->append(((Player*)this)->GetTransport()->GetPackGUID());
                 *data << (float)((Player*)this)->GetTransOffsetX();
                 *data << (float)((Player*)this)->GetTransOffsetY();
                 *data << (float)((Player*)this)->GetTransOffsetZ();
@@ -470,14 +470,14 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint16 flags, uint32 flags2
     {
         if(flags & UPDATEFLAG_UNK1)
         {
-            *data << uint8(0);                              // PGUID
-            *data << float(0);
-            *data << float(0);
-            *data << float(0);
-            *data << float(0);
-            *data << float(0);
-            *data << float(0);
-            *data << float(0);
+            *data << uint8(0);                              // unk PGUID!
+            *data << ((WorldObject*)this)->GetPositionX();
+            *data << ((WorldObject*)this)->GetPositionY();
+            *data << ((WorldObject*)this)->GetPositionZ();
+            *data << ((WorldObject*)this)->GetPositionX();
+            *data << ((WorldObject*)this)->GetPositionY();
+            *data << ((WorldObject*)this)->GetPositionZ();
+            *data << ((WorldObject*)this)->GetOrientation();
             *data << float(0);
         }
         else
@@ -585,7 +585,22 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint16 flags, uint32 flags2
     // 0x200
     if(flags & UPDATEFLAG_UNK2)
     {
-        *data << uint64(0);
+        // may be precalculate it?
+        int64 rotation = 0;
+        float ang = ((WorldObject *)this)->GetOrientation();
+
+        float f_rot1 = sin(ang / 2.0f);
+        int64 i_rot1 = f_rot1 / atan(pow(2.0f, -20.0f));
+        rotation |= (i_rot1 << 43 >> 43) & 0x00000000001FFFFF;
+
+        //float f_rot2 = sin(0.0f / 2.0f);
+        //int64 i_rot2 = f_rot2 / atan(pow(2.0f, -20.0f));
+        //rotation |= (((i_rot2 << 22) >> 32) >> 11) & 0x000003FFFFE00000;
+
+        //float f_rot3 = sin(0.0f / 2.0f);
+        //int64 i_rot3 = f_rot3 / atan(pow(2.0f, -21.0f));
+        //rotation |= (i_rot3 >> 42) & 0x7FFFFC0000000000;
+        *data << uint64(rotation);
     }
 }
 

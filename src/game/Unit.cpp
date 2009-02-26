@@ -73,8 +73,8 @@ Unit::Unit()
 {
     m_objectType |= TYPEMASK_UNIT;
     m_objectTypeId = TYPEID_UNIT;
-                                                            // 2.3.2 - 0x70
-    m_updateFlag = (UPDATEFLAG_LOWGUID | UPDATEFLAG_HIGHGUID | UPDATEFLAG_LIVING | UPDATEFLAG_HAS_POSITION);
+                                                            // 3.1.0 - 0x60
+    m_updateFlag = (UPDATEFLAG_LIVING | UPDATEFLAG_HAS_POSITION);
 
     m_attackTimer[BASE_ATTACK]   = 0;
     m_attackTimer[OFF_ATTACK]    = 0;
@@ -265,14 +265,14 @@ void Unit::SendMonsterMove(float NewPosX, float NewPosY, float NewPosZ, uint8 ty
     data.append(GetPackGUID());
     data << uint8(0);                                       // new in 3.1
     data << GetPositionX() << GetPositionY() << GetPositionZ();
-    data << getMSTime();
+    data << uint32(getMSTime());
 
     data << uint8(type);                                    // unknown
     switch(type)
     {
         case 0:                                             // normal packet
             break;
-        case 1:                                             // stop packet
+        case 1:                                             // stop packet (raw pos?)
             SendMessageToSet( &data, true );
             return;
         case 2:                                             // facing spot, not used currently
@@ -281,16 +281,15 @@ void Unit::SendMonsterMove(float NewPosX, float NewPosY, float NewPosZ, uint8 ty
             data << float(0);
             break;
         case 3:                                             // not used currently
-            data << uint64(0);                              // probably target guid
+            data << uint64(0);                              // probably target guid (facing target?)
             break;
         case 4:                                             // not used currently
             data << float(0);                               // facing angle
             break;
     }
 
-    //Movement Flags (0x0 = walk, 0x100 = run, 0x200 = fly/swim)
     data << uint32(MovementFlags);
-    data << Time;                                           // Time in between points
+    data << uint32(Time);                                   // Time in between points
     data << uint32(1);                                      // 1 single waypoint
     data << NewPosX << NewPosY << NewPosZ;                  // the single waypoint Point B
 
