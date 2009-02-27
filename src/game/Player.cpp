@@ -3868,11 +3868,11 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
         SetPower(POWER_ENERGY, uint32(GetMaxPower(POWER_ENERGY)*restore_percent));
     }
 
+    // trigger update zone for alive state zone updates
+    UpdateZone(GetZoneId());
+
     // update visibility
     ObjectAccessor::UpdateVisibilityForPlayer(this);
-
-    // some items limited to specific map
-    DestroyZoneLimitedItem( true, GetZoneId());
 
     if(!applySickness)
         return;
