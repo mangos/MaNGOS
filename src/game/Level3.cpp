@@ -134,6 +134,7 @@ bool ChatHandler::HandleReloadAllSpellCommand(const char*)
     HandleReloadSkillDiscoveryTemplateCommand("a");
     HandleReloadSkillExtraItemTemplateCommand("a");
     HandleReloadSpellAffectCommand("a");
+    HandleReloadSpellAreaCommand("a");
     HandleReloadSpellChainCommand("a");
     HandleReloadSpellElixirCommand("a");
     HandleReloadSpellLearnSpellCommand("a");
@@ -441,6 +442,14 @@ bool ChatHandler::HandleReloadSpellAffectCommand(const char*)
     sLog.outString( "Re-Loading SpellAffect definitions..." );
     spellmgr.LoadSpellAffects();
     SendGlobalSysMessage("DB table `spell_affect` (spell mods apply requirements) reloaded.");
+    return true;
+}
+
+bool ChatHandler::HandleReloadSpellAreaCommand(const char*)
+{
+    sLog.outString( "Re-Loading SpellArea Data..." );
+    spellmgr.LoadSpellAreas();
+    SendGlobalSysMessage("DB table `spell_area` (spell dependences from area/quest/auras state) reloaded.");
     return true;
 }
 
