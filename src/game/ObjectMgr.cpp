@@ -1545,7 +1545,7 @@ void ObjectMgr::LoadItemPrototypes()
             }
         }
 
-        for (int j = 0; j < 5; j++)
+        for (int j = 0; j < 2; j++)
         {
             if(proto->Damage[j].DamageType >= MAX_SPELL_SCHOOL)
             {

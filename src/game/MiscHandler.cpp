@@ -1163,9 +1163,10 @@ void WorldSession::HandlePlayedTime(WorldPacket& /*recv_data*/)
     uint32 TotalTimePlayed = GetPlayer()->GetTotalPlayedTime();
     uint32 LevelPlayedTime = GetPlayer()->GetLevelPlayedTime();
 
-    WorldPacket data(SMSG_PLAYED_TIME, 8);
+    WorldPacket data(SMSG_PLAYED_TIME, 9);
     data << TotalTimePlayed;
     data << LevelPlayedTime;
+    data << uint8(0);
     SendPacket(&data);
 }
 

@@ -523,7 +523,7 @@ struct ItemPrototype
     _ItemStat ItemStat[10];
     uint32 ScalingStatDistribution;                         // id from ScalingStatDistribution.dbc
     uint32 ScalingStatValue;                                // mask for selecting column in ScalingStatValues.dbc
-    _Damage Damage[5];
+    _Damage Damage[2];
     uint32 Armor;
     uint32 HolyRes;
     uint32 FireRes;
@@ -634,8 +634,8 @@ struct ItemPrototype
         if (Delay == 0)
             return 0;
         float temp = 0;
-        for (int i=0;i<5;++i)
-            temp+=Damage[i].DamageMin + Damage[i].DamageMax;
+        for (int i = 0; i < 2; ++i)
+            temp += Damage[i].DamageMin + Damage[i].DamageMax;
         return temp*500/Delay;
     }
 

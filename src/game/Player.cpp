@@ -2417,7 +2417,7 @@ void Player::SendInitialSpells()
         if(!itr->second->active || itr->second->disabled)
             continue;
 
-        data << uint16(itr->first);
+        data << uint32(itr->first);
         data << uint16(0);                                  // it's not slot id
 
         spellCount +=1;
@@ -2433,7 +2433,7 @@ void Player::SendInitialSpells()
         if(!sEntry)
             continue;
 
-        data << uint16(itr->first);
+        data << uint32(itr->first);
 
         time_t cooldown = 0;
         time_t curTime = time(NULL);
@@ -2626,14 +2626,14 @@ bool Player::addSpell(uint32 spell_id, bool active, bool learning, bool dependen
                 {
                     // update spell ranks in spellbook and action bar
                     WorldPacket data(SMSG_SUPERCEDED_SPELL, (4));
-                    data << uint16(spell_id);
-                    data << uint16(next_active_spell_id);
+                    data << uint32(spell_id);
+                    data << uint32(next_active_spell_id);
                     GetSession()->SendPacket( &data );
                 }
                 else
                 {
                     WorldPacket data(SMSG_REMOVED_SPELL, 4);
-                    data << uint16(spell_id);
+                    data << uint32(spell_id);
                     GetSession()->SendPacket(&data);
                 }
             }
@@ -2725,8 +2725,8 @@ bool Player::addSpell(uint32 spell_id, bool active, bool learning, bool dependen
                             if(IsInWorld())                 // not send spell (re-/over-)learn packets at loading
                             {
                                 WorldPacket data(SMSG_SUPERCEDED_SPELL, (4));
-                                data << uint16(itr->first);
-                                data << uint16(spell_id);
+                                data << uint32(itr->first);
+                                data << uint32(spell_id);
                                 GetSession()->SendPacket( &data );
                             }
 
@@ -2741,8 +2741,8 @@ bool Player::addSpell(uint32 spell_id, bool active, bool learning, bool dependen
                             if(IsInWorld())                 // not send spell (re-/over-)learn packets at loading
                             {
                                 WorldPacket data(SMSG_SUPERCEDED_SPELL, (4));
-                                data << uint16(spell_id);
-                                data << uint16(itr->first);
+                                data << uint32(spell_id);
+                                data << uint32(itr->first);
                                 GetSession()->SendPacket( &data );
                             }
 
@@ -3093,8 +3093,8 @@ void Player::removeSpell(uint32 spell_id, bool disabled, bool update_action_bar_
                         {
                             // downgrade spell ranks in spellbook and action bar
                             WorldPacket data(SMSG_SUPERCEDED_SPELL, (4));
-                            data << uint16(spell_id);
-                            data << uint16(prev_id);
+                            data << uint32(spell_id);
+                            data << uint32(prev_id);
                             GetSession()->SendPacket( &data );
                             prev_activate = true;
                         }
@@ -3108,7 +3108,7 @@ void Player::removeSpell(uint32 spell_id, bool disabled, bool update_action_bar_
     if(!prev_activate)
     {
         WorldPacket data(SMSG_REMOVED_SPELL, 4);
-        data << uint16(spell_id);
+        data << uint32(spell_id);
         GetSession()->SendPacket(&data);
     }
 }
@@ -3131,7 +3131,7 @@ void Player::RemoveArenaSpellCooldowns()
             // notify player
             WorldPacket data(SMSG_CLEAR_COOLDOWN, (4+8));
             data << uint32(itr->first);
-            data << GetGUID();
+            data << uint64(GetGUID());
             GetSession()->SendPacket(&data);
             // remove cooldown
             m_spellCooldowns.erase(itr);
@@ -5251,7 +5251,8 @@ void Player::SendInitialActionButtons()
 {
     sLog.outDetail( "Initializing Action Buttons for '%u'", GetGUIDLow() );
 
-    WorldPacket data(SMSG_ACTION_BUTTONS, (MAX_ACTION_BUTTONS*4));
+    WorldPacket data(SMSG_ACTION_BUTTONS, 1+(MAX_ACTION_BUTTONS*4));
+    data << uint8(0);                                       // can be 0, 1, 2
     for(int button = 0; button < MAX_ACTION_BUTTONS; ++button)
     {
         ActionButtonList::const_iterator itr = m_actionButtons.find(button);
@@ -16469,7 +16470,7 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
 
     if(pet->isControlled())
     {
-        WorldPacket data(SMSG_PET_SPELLS, 8);
+        WorldPacket data(SMSG_PET_SPELLS, 8+4);
         data << uint64(0);
         data << uint32(0);
         GetSession()->SendPacket(&data);
@@ -16657,7 +16658,7 @@ void Player::PetSpellInitialize()
         if(itr->second > curTime)
             cooldown = (itr->second - curTime) * 1000;
 
-        data << uint16(itr->first);                         // spellid
+        data << uint32(itr->first);                         // spellid
         data << uint16(0);                                  // spell category?
         data << uint32(itr->second);                        // cooldown
         data << uint32(0);                                  // category cooldown
@@ -16670,7 +16671,7 @@ void Player::PetSpellInitialize()
         if(itr->second > curTime)
             cooldown = (itr->second - curTime) * 1000;
 
-        data << uint16(itr->first);                         // spellid
+        data << uint32(itr->first);                         // spellid
         data << uint16(0);                                  // spell category?
         data << uint32(0);                                  // cooldown
         data << uint32(itr->second);                        // category cooldown
@@ -16701,7 +16702,7 @@ void Player::PossessSpellInitialize()
     data << uint64(charm->GetGUID());
     data << uint32(0x00000000);
     data << uint32(0);
-    data << uint8(0) << uint8(0) << uint16(0);
+    data << uint32(0);
 
     for(uint32 i = 0; i < 10; i++)                          //40
     {

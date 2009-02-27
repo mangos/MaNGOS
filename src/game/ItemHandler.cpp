@@ -355,7 +355,7 @@ void WorldSession::HandleItemQuerySingleOpcode( WorldPacket & recv_data )
         }
         data << pProto->ScalingStatDistribution;            // scaling stats distribution
         data << pProto->ScalingStatValue;                   // some kind of flags used to determine stat values column
-        for(int i = 0; i < 5; ++i)
+        for(int i = 0; i < 2; ++i)
         {
             data << pProto->Damage[i].DamageMin;
             data << pProto->Damage[i].DamageMax;
@@ -440,6 +440,7 @@ void WorldSession::HandleItemQuerySingleOpcode( WorldPacket & recv_data )
         data << pProto->ArmorDamageModifier;
         data << pProto->Duration;                           // added in 2.4.2.8209, duration (seconds)
         data << pProto->ItemLimitCategory;                  // WotLK, ItemLimitCategory
+        data << uint32(0);                                  // Holiday.dbc?
         SendPacket( &data );
     }
     else
