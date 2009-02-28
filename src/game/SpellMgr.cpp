@@ -2390,6 +2390,7 @@ void SpellMgr::LoadSpellAreas()
         spellArea.auraSpell           = fields[5].GetUInt32();
         spellArea.raceMask            = fields[6].GetUInt32();
         spellArea.gender              = Gender(fields[7].GetUInt8());
+        spellArea.autocast            = fields[8].GetBool();
 
         if(!sSpellStore.LookupEntry(spell))
         {
