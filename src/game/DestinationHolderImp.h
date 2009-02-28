@@ -83,20 +83,7 @@ DestinationHolder<TRAVELLER>::StartTravel(TRAVELLER &traveller, bool sendMove)
     i_fromY = traveller.GetPositionY();
     i_fromZ = traveller.GetPositionZ();
 
-    float dx = i_destX - i_fromX;
-    float dy = i_destY - i_fromY;
-    float dz = i_destZ - i_fromZ;
-
-    float dist;
-    //Should be for Creature Flying and Swimming.
-    if(traveller.GetTraveller().hasUnitState(UNIT_STAT_IN_FLIGHT))
-        dist = sqrt((dx*dx) + (dy*dy) + (dz*dz));
-    else                                                    //Walking on the ground
-        dist = sqrt((dx*dx) + (dy*dy));
-    float speed = traveller.Speed();
-
-    speed *=  0.001f;                                       // speed is in seconds so convert from second to millisecond
-    i_totalTravelTime = static_cast<uint32>(dist/speed);
+    i_totalTravelTime = traveller.GetTotalTrevelTimeTo(i_destX,i_destY,i_destZ);
     i_timeElapsed = 0;
     if(sendMove)
         traveller.MoveTo(i_destX, i_destY, i_destZ, i_totalTravelTime);

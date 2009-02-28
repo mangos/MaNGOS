@@ -134,6 +134,7 @@ bool ChatHandler::HandleReloadAllSpellCommand(const char*)
     HandleReloadSkillDiscoveryTemplateCommand("a");
     HandleReloadSkillExtraItemTemplateCommand("a");
     HandleReloadSpellAffectCommand("a");
+    HandleReloadSpellAreaCommand("a");
     HandleReloadSpellChainCommand("a");
     HandleReloadSpellElixirCommand("a");
     HandleReloadSpellLearnSpellCommand("a");
@@ -441,6 +442,14 @@ bool ChatHandler::HandleReloadSpellAffectCommand(const char*)
     sLog.outString( "Re-Loading SpellAffect definitions..." );
     spellmgr.LoadSpellAffects();
     SendGlobalSysMessage("DB table `spell_affect` (spell mods apply requirements) reloaded.");
+    return true;
+}
+
+bool ChatHandler::HandleReloadSpellAreaCommand(const char*)
+{
+    sLog.outString( "Re-Loading SpellArea Data..." );
+    spellmgr.LoadSpellAreas();
+    SendGlobalSysMessage("DB table `spell_area` (spell dependences from area/quest/auras state) reloaded.");
     return true;
 }
 
@@ -3099,7 +3108,7 @@ bool ChatHandler::HandleGuildInviteCommand(const char *args)
         plGuid = objmgr.GetPlayerGUIDByName (plName);
 
     if (!plGuid)
-        false;
+        return false;
 
     // player's guild membership checked in AddMember before add
     if (!targetGuild->AddMember (plGuid,targetGuild->GetLowestRank ()))
@@ -3218,18 +3227,36 @@ bool ChatHandler::HandleGuildDeleteCommand(const char* args)
     return true;
 }
 
-bool ChatHandler::HandleGetDistanceCommand(const char* /*args*/)
+bool ChatHandler::HandleGetDistanceCommand(const char* args)
 {
-    Unit* pUnit = getSelectedUnit();
+    WorldObject* obj;
 
-    if(!pUnit)
+    if (*args)
     {
-        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
-        SetSentErrorMessage(true);
-        return false;
+        uint64 guid = extractGuidFromLink((char*)args);
+        if(guid)
+            obj = (WorldObject*)ObjectAccessor::GetObjectByTypeMask(*m_session->GetPlayer(),guid,TYPEMASK_UNIT|TYPEMASK_GAMEOBJECT);
+
+        if(!obj)
+        {
+            SendSysMessage(LANG_PLAYER_NOT_FOUND);
+            SetSentErrorMessage(true);
+            return false;
+        }
+    }
+    else
+    {
+        obj = getSelectedUnit();
+
+        if(!obj)
+        {
+            SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+            SetSentErrorMessage(true);
+            return false;
+        }
     }
 
-    PSendSysMessage(LANG_DISTANCE, m_session->GetPlayer()->GetDistance(pUnit),m_session->GetPlayer()->GetDistance2d(pUnit));
+    PSendSysMessage(LANG_DISTANCE, m_session->GetPlayer()->GetDistance(obj),m_session->GetPlayer()->GetDistance2d(obj));
 
     return true;
 }
@@ -3825,7 +3852,7 @@ bool ChatHandler::HandleLevelUpCommand(const char* args)
             return false;
         }
 
-        name = GetNameLink(chr);
+        name = chr->GetName();
     }
 
     assert(chr || chr_guid);
@@ -6523,8 +6550,6 @@ bool ChatHandler::HandleSendMoneyCommand(const char* args)
         SetSentErrorMessage(true);
         return false;
     }
-
-    uint32 mailId = objmgr.GenerateMailID();
 
     // from console show not existed sender
     uint32 sender_guidlo = m_session ? m_session->GetPlayer()->GetGUIDLow() : 0;

@@ -25,13 +25,13 @@ AM_CPPFLAGS = $(MANGOS_INCLUDES) -I$(srcdir) -I$(srcdir)/../../../dep/include -I
 #  libmangosscript shared library will later be reused by world server daemon.
 lib_LTLIBRARIES = libmangosscript.la
 libmangosscript_la_SOURCES = \
-    ScriptMgr.cpp \
-    ScriptMgr.h \
-    config.h \
-    system.cpp \
-    Scripts/sc_default.cpp \
-    Scripts/sc_defines.cpp \
-    Scripts/sc_defines.h
+	ScriptMgr.cpp \
+	ScriptMgr.h \
+	config.h \
+	system.cpp \
+	Scripts/sc_default.cpp \
+	Scripts/sc_defines.cpp \
+	Scripts/sc_defines.h
 
 ## libtool settings
 #  API versioning
@@ -51,6 +51,6 @@ libmangosscript_la_LIBFLAGS = -version-info $(LTMANGOS_CURRENT):$(LTMANGOS_REVIS
 ## Additional files to include when running 'make dist'
 #  Scripts defaults.
 EXTRA_DIST = \
-    Scripts/sc_default.cpp \
-    Scripts/sc_defines.cpp \
-    Scripts/sc_defines.h
+	Scripts/sc_default.cpp \
+	Scripts/sc_defines.cpp \
+	Scripts/sc_defines.h

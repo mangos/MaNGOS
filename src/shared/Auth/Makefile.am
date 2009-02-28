@@ -27,13 +27,13 @@ AM_CPPFLAGS = $(MANGOS_INCLUDES) -I$(top_builddir)/src/shared -I$(srcdir) -I$(sr
 noinst_LIBRARIES = libmangosauth.a
 
 libmangosauth_a_SOURCES = \
-    AuthCrypt.cpp \
-    AuthCrypt.h \
-    BigNumber.cpp \
-    BigNumber.h \
-    Hmac.cpp \
-    Hmac.h \
-    Sha1.cpp \
-    Sha1.h \
-    md5.c \
-    md5.h
+	AuthCrypt.cpp \
+	AuthCrypt.h \
+	BigNumber.cpp \
+	BigNumber.h \
+	Hmac.cpp \
+	Hmac.h \
+	Sha1.cpp \
+	Sha1.h \
+	md5.c \
+	md5.h

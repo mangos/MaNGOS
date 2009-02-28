@@ -105,6 +105,10 @@ public PathMovementBase<Creature, WaypointPath*>
 
         // statics
         static void Initialize(void);
+
+        // allow use for overwrite empty implementation
+        bool GetDestination(float& x, float& y, float& z) const { return PathMovementBase<Creature, WaypointPath*>::GetDestination(x,y,z); }
+
     private:
         void ClearWaypoints();
 
@@ -138,5 +142,8 @@ public PathMovementBase<Player>
         bool HasArrived() const { return (i_currentNode >= i_path.Size()); }
         void SetCurrentNodeAfterTeleport();
         void SkipCurrentNode() { ++i_currentNode; }
+
+        // allow use for overwrite empty implementation
+        bool GetDestination(float& x, float& y, float& z) const { return PathMovementBase<Player>::GetDestination(x,y,z); }
 };
 #endif

@@ -86,6 +86,8 @@ class Corpse : public WorldObject
         void Whisper(int32 textId,uint64 receiver) { MonsterWhisper(textId,receiver); }
 
         GridReference<Corpse> &GetGridRef() { return m_gridRef; }
+
+        bool isActiveObject() const { return false; }
     private:
         GridReference<Corpse> m_gridRef;
 
