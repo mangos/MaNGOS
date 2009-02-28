@@ -678,7 +678,10 @@ enum SpellEffects
     SPELL_EFFECT_CREATE_ITEM_2             = 157,
     SPELL_EFFECT_MILLING                   = 158,
     SPELL_EFFECT_ALLOW_RENAME_PET          = 159,
-    TOTAL_SPELL_EFFECTS                    = 160
+    SPELL_EFFECT_160                       = 160,
+    SPELL_EFFECT_161                       = 161,
+    SPELL_EFFECT_162                       = 162,
+    TOTAL_SPELL_EFFECTS                    = 163
 };
 
 // Spell aura states

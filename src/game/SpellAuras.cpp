@@ -339,6 +339,11 @@ pAuraHandler AuraHandler[TOTAL_AURAS]=
     &Aura::HandleUnused,                                    //286 not used by any spells (3.08a)
     &Aura::HandleNoImmediateEffect,                         //287 SPELL_AURA_DEFLECT_SPELLS             implemented in Unit::MagicSpellHitResult and Unit::MeleeSpellHitResult
     &Aura::HandleUnused,                                    //288 not used by any spells (3.09) except 1 test spell.
+    &Aura::HandleUnused,                                    //289 unused
+    &Aura::HandleUnused,                                    //290 unused
+    &Aura::HandleUnused,                                    //291 unused
+    &Aura::HandleNULL,                                      //292 call stabled pet
+    &Aura::HandleNULL                                       //293 2 test spells
 };
 
 static AuraType const frozenAuraTypes[] = { SPELL_AURA_MOD_ROOT, SPELL_AURA_MOD_STUN, SPELL_AURA_NONE };
