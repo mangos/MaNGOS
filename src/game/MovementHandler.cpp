@@ -87,7 +87,6 @@ void WorldSession::HandleMoveWorldportAckOpcode()
         return;
     }
 
-    //this will set player's team ... so IT MUST BE CALLED BEFORE SendInitialPacketsAfterAddToMap()
     // battleground state prepare (in case join to BG), at relogin/tele player not invited
     // only add to bg group and object, if the player was invited (else he entered through command)
     if(_player->InBattleGround())
@@ -95,7 +94,7 @@ void WorldSession::HandleMoveWorldportAckOpcode()
         // cleanup seting if outdated
         if(!mEntry->IsBattleGroundOrArena())
         {
-            _player->SetBattleGroundId(0);                          // We're not in BG.
+            _player->SetBattleGroundId(0, BATTLEGROUND_TYPE_NONE); // We're not in BG.
             // reset destination bg team
             _player->SetBGTeam(0);
         }

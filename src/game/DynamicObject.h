@@ -54,6 +54,8 @@ class DynamicObject : public WorldObject
         void Whisper(int32 textId,uint64 receiver) { MonsterWhisper(textId,receiver); }
 
         GridReference<DynamicObject> &GetGridRef() { return m_gridRef; }
+
+        bool isActiveObject() const { return false; }
     protected:
         uint64 m_casterGuid;
         uint32 m_spellId;

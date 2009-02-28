@@ -609,7 +609,10 @@ class MANGOS_DLL_SPEC Creature : public Unit
 
         uint32 GetGlobalCooldown() const { return m_GlobalCooldown; }
 
-        void SetDeadByDefault (bool death_state) {m_isDeadByDefault = death_state;}
+        void SetDeadByDefault (bool death_state) { m_isDeadByDefault = death_state; }
+
+        bool isActiveObject() const { return m_isActiveObject; }
+        void SetActiveObjectState(bool on);
 
     protected:
         bool CreateFromProto(uint32 guidlow,uint32 Entry,uint32 team, const CreatureData *data = NULL);
@@ -661,6 +664,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
     private:
         GridReference<Creature> m_gridRef;
         CreatureInfo const* m_creatureInfo;                 // in heroic mode can different from ObjMgr::GetCreatureTemplate(GetEntry())
+        bool m_isActiveObject;
 };
 
 class AssistDelayEvent : public BasicEvent

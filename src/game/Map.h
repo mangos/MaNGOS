@@ -164,8 +164,8 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
             return( !getNGrid(p.x_coord, p.y_coord) || getNGrid(p.x_coord, p.y_coord)->GetGridState() == GRID_STATE_REMOVAL );
         }
 
-        bool GetUnloadFlag(const GridPair &p) const { return getNGrid(p.x_coord, p.y_coord)->getUnloadFlag(); }
-        void SetUnloadFlag(const GridPair &p, bool unload) { getNGrid(p.x_coord, p.y_coord)->setUnloadFlag(unload); }
+        bool GetUnloadLock(const GridPair &p) const { return getNGrid(p.x_coord, p.y_coord)->getUnloadLock(); }
+        void SetUnloadLock(const GridPair &p, bool on) { getNGrid(p.x_coord, p.y_coord)->setUnloadExplicitLock(on); }
         void LoadGrid(const Cell& cell, bool no_unload = false);
         bool UnloadGrid(const uint32 &x, const uint32 &y, bool pForce);
         virtual void UnloadAll(bool pForce);
@@ -216,8 +216,8 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         // assert print helper
         bool CheckGridIntegrity(Creature* c, bool moved) const;
 
-        uint32 GetInstanceId() { return i_InstanceId; }
-        uint8 GetSpawnMode() { return (i_spawnMode); }
+        uint32 GetInstanceId() const { return i_InstanceId; }
+        uint8 GetSpawnMode() const { return (i_spawnMode); }
         virtual bool CanEnter(Player* /*player*/) { return true; }
         const char* GetMapName() const;
 
@@ -256,12 +256,24 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
 
         bool HavePlayers() const { return !m_mapRefManager.isEmpty(); }
         uint32 GetPlayersCountExceptGMs() const;
-        bool PlayersNearGrid(uint32 x,uint32 y) const;
+        bool ActiveObjectsNearGrid(uint32 x,uint32 y) const;
 
         void SendToPlayers(WorldPacket const* data) const;
 
         typedef MapRefManager PlayerList;
         PlayerList const& GetPlayers() const { return m_mapRefManager; }
+
+        // must called with AddToWorld
+        template<class T>
+        void AddToActive(T* obj) { AddToActiveHelper(obj); }
+
+        void AddToActive(Creature* obj);
+
+        // must called with RemoveFromWorld
+        template<class T>
+        void RemoveFromActive(T* obj) { RemoveFromActiveHelper(obj); }
+
+        void RemoveFromActive(Creature* obj);
     private:
         void LoadVMap(int pX, int pY);
         void LoadMap(uint32 mapid, uint32 instanceid, int x,int y);
@@ -283,7 +295,7 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         CreatureMoveList i_creaturesToMove;
 
         bool loaded(const GridPair &) const;
-        void EnsureGridLoadedForPlayer(const Cell&, Player*, bool add_player);
+        void EnsureGridLoaded(const Cell&, Player* player = NULL);
         void  EnsureGridCreated(const GridPair &);
 
         void buildNGridLinkage(NGridType* pNGridType) { pNGridType->link(this); }
@@ -302,6 +314,8 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         void setNGrid(NGridType* grid, uint32 x, uint32 y);
 
     protected:
+        void SetUnloadReferenceLock(const GridPair &p, bool on) { getNGrid(p.x_coord, p.y_coord)->setUnloadReferenceLock(on); }
+
         typedef MaNGOS::ObjectLevelLockable<Map, ZThread::Mutex>::Lock Guard;
 
         MapEntry const* i_mapEntry;
@@ -312,6 +326,10 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
 
         MapRefManager m_mapRefManager;
         MapRefManager::iterator m_mapRefIter;
+
+        typedef std::set<WorldObject*> ActiveNonPlayers;
+        ActiveNonPlayers m_activeNonPlayers;
+        ActiveNonPlayers::iterator m_activeNonPlayersIter;
     private:
         typedef GridReadGuard ReadGuard;
         typedef GridWriteGuard WriteGuard;
@@ -336,6 +354,27 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
 
         template<class T>
             void DeleteFromWorld(T*);
+
+        template<class T>
+        void AddToActiveHelper(T* obj)
+        {
+            m_activeNonPlayers.insert(obj);
+        }
+
+        template<class T>
+        void RemoveFromActiveHelper(T* obj)
+        {
+            // Map::Update for active object in proccess
+            if(m_activeNonPlayersIter != m_activeNonPlayers.end())
+            {
+                ActiveNonPlayers::iterator itr = m_activeNonPlayers.find(obj);
+                if(itr==m_activeNonPlayersIter)
+                    ++m_activeNonPlayersIter;
+                m_activeNonPlayers.erase(itr);
+            }
+            else
+                m_activeNonPlayers.erase(obj);
+        }
 };
 
 enum InstanceResetMethod
@@ -408,7 +447,7 @@ Map::Visit(const CellLock<LOCK_TYPE> &cell, TypeContainerVisitor<T, CONTAINER> &
 
     if( !cell->NoCreate() || loaded(GridPair(x,y)) )
     {
-        EnsureGridLoadedForPlayer(cell, NULL, false);
+        EnsureGridLoaded(cell);
         //LOCK_TYPE guard(i_info[x][y]->i_lock);
         getNGrid(x, y)->Visit(cell_x, cell_y, visitor);
     }
