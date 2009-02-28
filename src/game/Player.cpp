@@ -19348,8 +19348,10 @@ void Player::EnterVehicle(Vehicle *vehicle)
     // end of transport part
     data << uint32(0);                                      // fall time
     GetSession()->SendPacket(&data);
-
-    data.Initialize(SMSG_PET_SPELLS, 8+4+4+4+4*10+1+1);
+	
+	SetPosition(vehicle->GetPositionX(), vehicle->GetPositionY(), vehicle->GetPositionZ(),vehicle->GetOrientation());
+    
+	data.Initialize(SMSG_PET_SPELLS, 8+4+4+4+4*10+1+1);
     data << uint64(vehicle->GetGUID());
     data << uint32(0x00000000);
     data << uint32(0x00000000);
