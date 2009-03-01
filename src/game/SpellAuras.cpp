@@ -576,7 +576,7 @@ void Aura::Update(uint32 diff)
             {
                 Powers powertype = Powers(m_spellProto->powerType);
                 int32 manaPerSecond = m_spellProto->manaPerSecond + m_spellProto->manaPerSecondPerLevel * caster->getLevel();
-                m_timeCla = 1000;
+                m_timeCla = 1*IN_MILISECONDS;
                 if (manaPerSecond)
                 {
                     if(powertype==POWER_HEALTH)
@@ -2123,30 +2123,29 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
             return;
         }
 
-        // Waiting to Resurrect
-        if(GetId()==2584)
+        switch(GetId())
         {
-            // Waiting to resurrect spell cancel, we must remove player from resurrect queue
-            if(m_target->GetTypeId() == TYPEID_PLAYER)
-                if(BattleGround *bg = ((Player*)m_target)->GetBattleGround())
-                    bg->RemovePlayerFromResurrectQueue(m_target->GetGUID());
-            return;
-        }
-
-        // Dark Fiend
-        if(GetId()==45934)
-        {
-            // Kill target if dispelled
-            if (m_removeMode==AURA_REMOVE_BY_DISPEL)
-                m_target->DealDamage(m_target, m_target->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
-            return;
-        }
-
-        // Burning Winds
-        if(GetId()==46308)                                  // casted only at creatures at spawn
-        {
-            m_target->CastSpell(m_target,47287,true,NULL,this);
-            return;
+            case 2584:                                      // Waiting to Resurrect
+            {
+                // Waiting to resurrect spell cancel, we must remove player from resurrect queue
+                if(m_target->GetTypeId() == TYPEID_PLAYER)
+                    if(BattleGround *bg = ((Player*)m_target)->GetBattleGround())
+                        bg->RemovePlayerFromResurrectQueue(m_target->GetGUID());
+                return;
+            }
+            case 45934:                                     // Dark Fiend
+            {
+                // Kill target if dispelled
+                if (m_removeMode==AURA_REMOVE_BY_DISPEL)
+                    m_target->DealDamage(m_target, m_target->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+                return;
+            }
+            case 46308:                                     // Burning Winds
+            {
+                // casted only at creatures at spawn
+                m_target->CastSpell(m_target,47287,true,NULL,this);
+                return;
+            }
         }
 
         if (caster && m_removeMode == AURA_REMOVE_BY_DEATH)
@@ -2828,7 +2827,7 @@ void Aura::HandleAuraTransform(bool apply, bool Real)
             // for players, start regeneration after 1s (in polymorph fast regeneration case)
             // only if caster is Player (after patch 2.4.2)
             if(IS_PLAYER_GUID(GetCasterGUID()) )
-                ((Player*)m_target)->setRegenTimer(1000);
+                ((Player*)m_target)->setRegenTimer(1*IN_MILISECONDS);
 
             //dismount polymorphed target (after patch 2.4.2)
             if (m_target->IsMounted())
