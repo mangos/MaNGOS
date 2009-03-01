@@ -8597,6 +8597,8 @@ void Unit::ClearInCombat()
     // Player's state will be cleared in Player::UpdateContestedPvP
     if(GetTypeId()!=TYPEID_PLAYER)
         clearUnitState(UNIT_STAT_ATTACK_PLAYER);
+    else
+        ((Player*)this)->UpdatePotionCooldown();
 }
 
 bool Unit::isTargetableForAttack() const
