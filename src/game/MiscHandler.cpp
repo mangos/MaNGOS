@@ -1184,76 +1184,20 @@ void WorldSession::HandleInspectOpcode(WorldPacket& recv_data)
     if(!plr)                                                // wrong player
         return;
 
-    uint32 talent_points = 0x3D;
-    uint32 guid_size = plr->GetPackGUID().size();
-    WorldPacket data(SMSG_INSPECT_TALENT, 4+talent_points);
+    WorldPacket data(SMSG_INSPECT_TALENT, 50);
     data.append(plr->GetPackGUID());
-    data << uint32(talent_points);
-
-    // fill by 0 talents array
-    for(uint32 i = 0; i < talent_points; ++i)
-        data << uint8(0);
 
     if(sWorld.getConfig(CONFIG_TALENTS_INSPECTING) || _player->isGameMaster())
     {
-        // find class talent tabs (all players have 3 talent tabs)
-        uint32 const* talentTabIds = GetTalentTabPages(plr->getClass());
-
-        uint32 talentTabPos = 0;                            // pos of first talent rank in tab including all prev tabs
-        for(uint32 i = 0; i < 3; ++i)
-        {
-            uint32 talentTabId = talentTabIds[i];
-
-            // fill by real data
-            for(uint32 talentId = 0; talentId < sTalentStore.GetNumRows(); ++talentId)
-            {
-                TalentEntry const* talentInfo = sTalentStore.LookupEntry(talentId);
-                if(!talentInfo)
-                    continue;
-
-                // skip another tab talents
-                if(talentInfo->TalentTab != talentTabId)
-                    continue;
-
-                // find talent rank
-                uint32 curtalent_maxrank = 0;
-                for(uint32 k = 5; k > 0; --k)
-                {
-                    if(talentInfo->RankID[k-1] && plr->HasSpell(talentInfo->RankID[k-1]))
-                    {
-                        curtalent_maxrank = k;
-                        break;
-                    }
-                }
-
-                // not learned talent
-                if(!curtalent_maxrank)
-                    continue;
-
-                // 1 rank talent bit index
-                uint32 curtalent_index = talentTabPos + GetTalentInspectBitPosInTab(talentId);
-
-                uint32 curtalent_rank_index = curtalent_index+curtalent_maxrank-1;
-
-                // slot/offset in 7-bit bytes
-                uint32 curtalent_rank_slot7   = curtalent_rank_index / 7;
-                uint32 curtalent_rank_offset7 = curtalent_rank_index % 7;
-
-                // rank pos with skipped 8 bit
-                uint32 curtalent_rank_index2 = curtalent_rank_slot7 * 8 + curtalent_rank_offset7;
-
-                // slot/offset in 8-bit bytes with skipped high bit
-                uint32 curtalent_rank_slot = curtalent_rank_index2 / 8;
-                uint32 curtalent_rank_offset =  curtalent_rank_index2 % 8;
-
-                // apply mask
-                uint32 val = data.read<uint8>(guid_size + 4 + curtalent_rank_slot);
-                val |= (1 << curtalent_rank_offset);
-                data.put<uint8>(guid_size + 4 + curtalent_rank_slot, val & 0xFF);
-            }
-
-            talentTabPos += GetTalentTabInspectBitSize(talentTabId);
-        }
+        plr->BuildPlayerTalentsInfoData(&data);
+        plr->BuildEnchantmentsInfoData(&data);
+    }
+    else
+    {
+        data << uint32(0);                                  // unspentTalentPoints
+        data << uint8(0);                                   // talentGroupCount
+        data << uint8(0);                                   // talentGroupIndex
+        data << uint32(0);                                  // slotUsedMask
     }
 
     SendPacket(&data);

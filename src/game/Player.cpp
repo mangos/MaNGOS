@@ -18089,6 +18089,7 @@ void Player::SendInitialPacketsBeforeAddToMap()
         data << uint32( GetTutorialInt(i) );
     GetSession()->SendPacket(&data);
 
+    SendTalentInfoData(false);
     SendInitialSpells();
 
     data.Initialize(SMSG_SEND_UNLEARN_SPELLS, 4);
@@ -19610,4 +19611,120 @@ uint8 Player::CanEquipUniqueItem( ItemPrototype const* itemProto, uint8 except_s
     }
 
     return EQUIP_ERR_OK;
+}
+
+void Player::BuildPlayerTalentsInfoData(WorldPacket *data)
+{
+    *data << uint32(GetFreeTalentPoints());                 // unspentTalentPoints
+    uint8 talentGroupCount = 1;
+    *data << uint8(talentGroupCount);                       // talent group count (1 or 2)
+    *data << uint8(0);                                      // talent group index (0 or 1)
+
+    if(talentGroupCount)
+    {
+        uint8 talentIdCount = 0;
+        size_t pos = data->wpos();
+        *data << uint8(talentIdCount);                      // [PH], talentIdCount
+
+        // find class talent tabs (all players have 3 talent tabs)
+        uint32 const* talentTabIds = GetTalentTabPages(getClass());
+
+        for(uint32 i = 0; i < 3; ++i)
+        {
+            uint32 talentTabId = talentTabIds[i];
+
+            for(uint32 talentId = 0; talentId < sTalentStore.GetNumRows(); ++talentId)
+            {
+                TalentEntry const* talentInfo = sTalentStore.LookupEntry(talentId);
+                if(!talentInfo)
+                    continue;
+
+                // skip another tab talents
+                if(talentInfo->TalentTab != talentTabId)
+                    continue;
+
+                // find max talent rank
+                int32 curtalent_maxrank = -1;
+                for(int32 k = 4; k > -1; --k)
+                {
+                    if(talentInfo->RankID[k] && HasSpell(talentInfo->RankID[k]))
+                    {
+                        curtalent_maxrank = k;
+                        break;
+                    }
+                }
+
+                // not learned talent
+                if(curtalent_maxrank < 0)
+                    continue;
+
+                *data << uint32(talentInfo->TalentID);      // Talent.dbc
+                *data << uint8(curtalent_maxrank);          // talentMaxRank (0-4)
+
+                ++talentIdCount;
+            }
+        }
+
+        data->put<uint8>(pos, talentIdCount);               // put real count
+
+        uint8 glyphsCount = 6;
+        *data << uint8(glyphsCount);                        // glyphs count
+
+        for(uint8 i = 0; i < glyphsCount; ++i)
+            *data << uint16(GetGlyph(i));                   // GlyphProperties.dbc
+    }
+}
+
+void Player::BuildPetTalentsInfoData(WorldPacket *data)
+{
+    *data << uint32(0);                                     // unspentTalentPoints
+    *data << uint8(0);                                      // talentCount
+    /*for(talentCount)
+    {
+        *data << uint32(0);                                 // Talent.dbc
+        *data << uint8(0);                                  // maxRank
+    }*/
+}
+
+void Player::SendTalentInfoData(bool pet)
+{
+    WorldPacket data(SMSG_UNKNOWN_1216, 50);
+    data << uint8(pet);
+    if(pet)
+        BuildPetTalentsInfoData(&data);
+    else
+        BuildPlayerTalentsInfoData(&data);
+    GetSession()->SendPacket(&data);
+}
+
+void Player::BuildEnchantmentsInfoData(WorldPacket *data)
+{
+    uint32 slotUsedMask = 0;
+    *data << uint32(slotUsedMask);  // > 0x80000
+
+    for(uint32 i = 0; i < EQUIPMENT_SLOT_END; ++i)
+    {
+        if(slotUsedMask & 1)
+        {
+            *data << uint32(0);                             // item entry
+            uint16 enchantmentMask = 0;
+            *data << uint16(enchantmentMask);               // > 0x1000
+
+            for(uint32 j = 0; j < MAX_ENCHANTMENT_SLOT; ++j)
+            {
+                if(enchantmentMask & 1)
+                {
+                    *data << uint16(0);                     // enchantmentId?
+                }
+
+                enchantmentMask >>= 1;
+            }
+
+            *data << uint16(0);
+            *data << uint8(0);                              // PGUID!
+            *data << uint32(0);
+        }
+
+        slotUsedMask >>= 1;
+    }
 }

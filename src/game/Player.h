@@ -1187,6 +1187,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void ApplyEnchantment(Item *item,EnchantmentSlot slot,bool apply, bool apply_dur = true, bool ignore_condition = false);
         void ApplyEnchantment(Item *item,bool apply);
         void SendEnchantmentDurations();
+        void BuildEnchantmentsInfoData(WorldPacket *data);
         void AddItemDurations(Item *item);
         void RemoveItemDurations(Item *item);
         void SendItemDurations();
@@ -1459,6 +1460,9 @@ class MANGOS_DLL_SPEC Player : public Unit
         bool resetTalents(bool no_cost = false);
         uint32 resetTalentsCost() const;
         void InitTalentForLevel();
+        void BuildPlayerTalentsInfoData(WorldPacket *data);
+        void BuildPetTalentsInfoData(WorldPacket *data);
+        void SendTalentInfoData(bool pet);
 
         uint32 CalculateTalentsPoints() const;
 
