@@ -335,3 +335,15 @@ void WorldSession::HandleSetLfgOpcode( WorldPacket & recv_data )
 
     SendLfgResult(type, entry, 0);
 }
+
+void WorldSession::HandleLfgSetRoles(WorldPacket &recv_data)
+{
+    CHECK_PACKET_SIZE(recv_data, 1);
+
+    sLog.outDebug("CMSG_LFG_SET_ROLES");
+
+    uint8 roles;
+    recv_data >> roles;
+
+    _player->m_lookingForGroup.roles = roles;
+}

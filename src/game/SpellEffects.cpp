@@ -5373,12 +5373,13 @@ void Spell::EffectApplyGlyph(uint32 i)
                 if(gp->TypeFlags != gs->TypeFlags)
                 {
                     SendCastResult(SPELL_FAILED_INVALID_GLYPH);
-                    return;                                 // glyph slot missmatch
+                    return;                                 // glyph slot mismatch
                 }
             }
 
             player->CastSpell(m_caster, gp->SpellId, true);
             player->SetGlyph(m_glyphIndex, glyph);
+            player->SendTalentInfoData(false);
         }
     }
 }

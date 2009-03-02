@@ -356,6 +356,7 @@ struct LookingForGroup
     LookingForGroupSlot slots[MAX_LOOKING_FOR_GROUP_SLOT];
     LookingForGroupSlot more;
     std::string comment;
+    uint8 roles;
 };
 
 enum PlayerMovementType

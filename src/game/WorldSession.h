@@ -492,6 +492,7 @@ class MANGOS_DLL_SPEC WorldSession
         void HandleCancelAutoRepeatSpellOpcode(WorldPacket& recvPacket);
 
         void HandleLearnTalentOpcode(WorldPacket& recvPacket);
+        void HandleLearnPreviewTalents(WorldPacket& recvPacket);
         void HandleTalentWipeOpcode(WorldPacket& recvPacket);
         void HandleUnlearnSkillOpcode(WorldPacket& recvPacket);
 
@@ -598,6 +599,7 @@ class MANGOS_DLL_SPEC WorldSession
         void HandleLfmSetNoneOpcode(WorldPacket& recv_data);
         void HandleLfmSetOpcode(WorldPacket& recv_data);
         void HandleLfgSetCommentOpcode(WorldPacket& recv_data);
+        void HandleLfgSetRoles(WorldPacket& recv_data);
         void HandleChooseTitleOpcode(WorldPacket& recv_data);
         void HandleRealmStateRequestOpcode(WorldPacket& recv_data);
         void HandleTimeSyncResp(WorldPacket& recv_data);
