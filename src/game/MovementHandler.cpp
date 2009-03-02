@@ -231,52 +231,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 
     // fall damage generation (ignore in flight case that can be triggered also at lags in moment teleportation to another map).
     if (opcode == MSG_MOVE_FALL_LAND && !GetPlayer()->isInFlight())
-    {
-        // calculate total z distance of the fall
-        float z_diff = GetPlayer()->m_lastFallZ - movementInfo.z;
-        sLog.outDebug("zDiff = %f", z_diff);
-        Player *target = GetPlayer();
-
-        //Players with low fall distance, Feather Fall or physical immunity (charges used) are ignored
-        // 14.57 can be calculated by resolving damageperc formular below to 0
-        if (z_diff >= 14.57f && !target->isDead() && !target->isGameMaster() &&
-            !target->HasAuraType(SPELL_AURA_HOVER) && !target->HasAuraType(SPELL_AURA_FEATHER_FALL) &&
-            !target->HasAuraType(SPELL_AURA_FLY) && !target->IsImmunedToDamage(SPELL_SCHOOL_MASK_NORMAL) )
-        {
-            //Safe fall, fall height reduction
-            int32 safe_fall = target->GetTotalAuraModifier(SPELL_AURA_SAFE_FALL);
-
-            float damageperc = 0.018f*(z_diff-safe_fall)-0.2426f;
-
-            if(damageperc >0 )
-            {
-                uint32 damage = (uint32)(damageperc * target->GetMaxHealth()*sWorld.getRate(RATE_DAMAGE_FALL));
-
-                float height = movementInfo.z;
-                target->UpdateGroundPositionZ(movementInfo.x,movementInfo.y,height);
-
-                if (damage > 0)
-                {
-                    //Prevent fall damage from being more than the player maximum health
-                    if (damage > target->GetMaxHealth())
-                        damage = target->GetMaxHealth();
-
-                    // Gust of Wind
-                    if (target->GetDummyAura(43621))
-                        damage = target->GetMaxHealth()/2;
-
-                    target->EnvironmentalDamage(target->GetGUID(), DAMAGE_FALL, damage);
-
-                    // recheck alive, might have died of EnvironmentalDamage
-                    if (target->isAlive())
-                        target->GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_FALL_WITHOUT_DYING, uint32(z_diff*100));
-                }
-
-                //Z given by moveinfo, LastZ, FallTime, WaterZ, MapZ, Damage, Safefall reduction
-                DEBUG_LOG("FALLDAMAGE z=%f sz=%f pZ=%f FallTime=%d mZ=%f damage=%d SF=%d" , movementInfo.z, height, target->GetPositionZ(), movementInfo.fallTime, height, damage, safe_fall);
-            }
-        }
-    }
+        GetPlayer()->HandleFall(movementInfo);
 
     if(((movementInfo.flags & MOVEMENTFLAG_SWIMMING) != 0) != GetPlayer()->IsInWater())
     {

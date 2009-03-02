@@ -2010,6 +2010,8 @@ class MANGOS_DLL_SPEC Player : public Unit
             m_lastFallTime = time;
             m_lastFallZ = z;
         }
+        void HandleFall(MovementInfo const& movementInfo);
+
         bool isMoving() const { return HasUnitMovementFlag(movementFlagsMask); }
         bool isMovingOrTurning() const { return HasUnitMovementFlag(movementOrTurningFlagsMask); }
 
