@@ -252,69 +252,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
     if (opcode == MSG_MOVE_FALL_LAND && !GetPlayer()->isInFlight())
     {
         GetPlayer()->m_anti_justjumped = 0;
-        // calculate total z distance of the fall
-        float z_diff = GetPlayer()->m_lastFallZ - movementInfo.z;
-        sLog.outDebug("zDiff = %f", z_diff);
-        Player *target = GetPlayer();
-
-        /* //movement anticheat "No Fall Damage"
-        if (target->m_anti_beginfalltime != 0)
-        {
-            #ifdef MOVEMENT_ANTICHEAT_DEBUG
-            sLog.outDebug("Movement anticheat: alternate FallTime %d | client falltime %d | m_anti_justteleported = %d",movementInfo.time - GetPlayer()->m_anti_beginfalltime, movementInfo.fallTime, GetPlayer()->m_anti_justteleported );
-            #endif
-            if (target->m_anti_justteleported != 1){
-                uint32 alt_falltime = movementInfo.time - target->m_anti_beginfalltime;
-                movementInfo.fallTime = (alt_falltime < movementInfo.fallTime) ? movementInfo.fallTime : alt_falltime;
-            } else {
-                target->m_anti_justteleported = 0;
-            }
-            target->m_anti_beginfalltime = 0;
-        }
-        #ifdef MOVEMENT_ANTICHEAT_DEBUG
-        sLog.outError("Movement anticheat: FallTime %d", movementInfo.fallTime);
-        #endif
-        //end movement anticheate */
-
-        //Players with low fall distance, Feather Fall or physical immunity (charges used) are ignored
-        // 14.57 can be calculated by resolving damageperc formular below to 0
-        if (z_diff >= 14.57f && !target->isDead() && !target->isGameMaster() &&
-            !target->HasAuraType(SPELL_AURA_HOVER) && !target->HasAuraType(SPELL_AURA_FEATHER_FALL) &&
-            !target->HasAuraType(SPELL_AURA_FLY) && !target->IsImmunedToDamage(SPELL_SCHOOL_MASK_NORMAL) )
-        {
-            //Safe fall, fall height reduction
-            int32 safe_fall = target->GetTotalAuraModifier(SPELL_AURA_SAFE_FALL);
-
-            float damageperc = 0.018f*(z_diff-safe_fall)-0.2426f;
-
-            if(damageperc >0 )
-            {
-                uint32 damage = (uint32)(damageperc * target->GetMaxHealth()*sWorld.getRate(RATE_DAMAGE_FALL));
-
-                float height = movementInfo.z;
-                target->UpdateGroundPositionZ(movementInfo.x,movementInfo.y,height);
-
-                if (damage > 0)
-                {
-                    //Prevent fall damage from being more than the player maximum health
-                    if (damage > target->GetMaxHealth())
-                        damage = target->GetMaxHealth();
-
-                    // Gust of Wind
-                    if (target->GetDummyAura(43621))
-                        damage = target->GetMaxHealth()/2;
-
-                    target->EnvironmentalDamage(target->GetGUID(), DAMAGE_FALL, damage);
-
-                    // recheck alive, might have died of EnvironmentalDamage
-                    if (target->isAlive())
-                        target->GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_FALL_WITHOUT_DYING, uint32(z_diff*100));
-                }
-
-                //Z given by moveinfo, LastZ, FallTime, WaterZ, MapZ, Damage, Safefall reduction
-                DEBUG_LOG("FALLDAMAGE z=%f sz=%f pZ=%f FallTime=%d mZ=%f damage=%d SF=%d" , movementInfo.z, height, target->GetPositionZ(), movementInfo.fallTime, height, damage, safe_fall);
-            }
-        }
+        GetPlayer()->HandleFall(movementInfo);
     }
 
     if(((movementInfo.flags & MOVEMENTFLAG_SWIMMING) != 0) != GetPlayer()->IsInWater())
@@ -395,27 +333,6 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 
         if (!(movementInfo.flags & (MOVEMENTFLAG_FLYING | MOVEMENTFLAG_SWIMMING)))
           tg_z = (real_delta !=0) ? (delta_z*delta_z / real_delta) : -99999;
-
-        /* //antiOFF fall-damage, MOVEMENTFLAG_UNK4 seted by client if player try movement when falling and unset in this case the MOVEMENTFLAG_FALLING flag.
-        if (movementInfo.flags & (MOVEMENTFLAG_FALLING | MOVEMENTFLAG_UNK4 | MOVEMENTFLAG_JUMPING))
-        {
-            if (GetPlayer()->m_anti_beginfalltime == 0)
-            {
-                GetPlayer()->m_anti_beginfalltime = movementInfo.time;
-                #ifdef MOVEMENT_ANTICHEAT_DEBUG
-                sLog.outDebug("Movement anticheat: begin fall-time %d",GetPlayer()->m_anti_beginfalltime);
-                #endif
-            }
-        } else {
-            if (GetPlayer()->m_anti_beginfalltime != 0)
-            {
-                GetPlayer()->m_anti_beginfalltime = 0; // reset timer if we landed without MSG_MOVE_FALL_LAND opcode
-                #ifdef MOVEMENT_ANTICHEAT_DEBUG
-                sLog.outDebug("Movement anticheat: end fall-time %d",GetPlayer()->m_anti_beginfalltime);
-                #endif
-            }
-        }
-        */
 
         if (current_speed < GetPlayer()->m_anti_last_hspeed)
         {

@@ -46,7 +46,7 @@
 #include "BattleGround.h"
 #include "Util.h"
 
-#define SPELL_CHANNEL_UPDATE_INTERVAL 1000
+#define SPELL_CHANNEL_UPDATE_INTERVAL (1*IN_MILISECONDS)
 
 extern pEffect SpellEffects[TOTAL_SPELL_EFFECTS];
 
@@ -321,7 +321,7 @@ Spell::Spell( Unit* Caster, SpellEntry const *info, bool triggered, uint64 origi
         if((m_caster->getClassMask() & CLASSMASK_WAND_USERS) != 0 && m_caster->GetTypeId()==TYPEID_PLAYER)
         {
             if(Item* pItem = ((Player*)m_caster)->GetWeaponForAttack(RANGED_ATTACK))
-                m_spellSchoolMask = SpellSchoolMask(1 << pItem->GetProto()->Damage->DamageType);
+                m_spellSchoolMask = SpellSchoolMask(1 << pItem->GetProto()->Damage[0].DamageType);
         }
     }
     // Set health leech amount to zero
@@ -2520,93 +2520,21 @@ void Spell::SendSpellCooldown()
         return;
 
     Player* _player = (Player*)m_caster;
-    // Add cooldown for max (disable spell)
-    // Cooldown started on SendCooldownEvent call
-    if (m_spellInfo->Attributes & SPELL_ATTR_DISABLED_WHILE_ACTIVE)
+
+    // mana/health potions, disabled by client
+    if (m_spellInfo->Category==SPELLCATEGORY_HEALTH_MANA_POTIONS)
     {
-        _player->AddSpellCooldown(m_spellInfo->Id, 0, time(NULL) - 1);
+        // need in some way provided data for Spell::finish SendCooldownEvent
+        if(m_CastItem)
+            _player->SetLastPotionId(m_CastItem->GetEntry());
         return;
     }
 
-    // init cooldown values
-    uint32 cat   = 0;
-    int32 rec    = -1;
-    int32 catrec = -1;
-
-    // some special item spells without correct cooldown in SpellInfo
-    // cooldown information stored in item prototype
-    // This used in same way in WorldSession::HandleItemQuerySingleOpcode data sending to client.
-
-    if(m_CastItem)
-    {
-        ItemPrototype const* proto = m_CastItem->GetProto();
-        if(proto)
-        {
-            for(int idx = 0; idx < 5; ++idx)
-            {
-                if(proto->Spells[idx].SpellId == m_spellInfo->Id)
-                {
-                    cat    = proto->Spells[idx].SpellCategory;
-                    rec    = proto->Spells[idx].SpellCooldown;
-                    catrec = proto->Spells[idx].SpellCategoryCooldown;
-                    break;
-                }
-            }
-        }
-    }
-
-    // if no cooldown found above then base at DBC data
-    if(rec < 0 && catrec < 0)
-    {
-        cat = m_spellInfo->Category;
-        rec = m_spellInfo->RecoveryTime;
-        catrec = m_spellInfo->CategoryRecoveryTime;
-    }
-
-    // shoot spells used equipped item cooldown values already assigned in GetAttackTime(RANGED_ATTACK)
-    // prevent 0 cooldowns set by another way
-    if (rec <= 0 && catrec <= 0 && (cat == 76 || IsAutoRepeatRangedSpell(m_spellInfo) && m_spellInfo->Id != SPELL_ID_AUTOSHOT))
-        rec = _player->GetAttackTime(RANGED_ATTACK);
-
-    // Now we have cooldown data (if found any), time to apply mods
-    if(rec > 0)
-        _player->ApplySpellMod(m_spellInfo->Id, SPELLMOD_COOLDOWN, rec, this);
-
-    if(catrec > 0)
-        _player->ApplySpellMod(m_spellInfo->Id, SPELLMOD_COOLDOWN, catrec, this);
-
-    // replace negative cooldowns by 0
-    if (rec < 0) rec = 0;
-    if (catrec < 0) catrec = 0;
-
-    // no cooldown after applying spell mods
-    if( rec == 0 && catrec == 0)
+    // have infinity cooldown but set at aura apply
+    if(m_spellInfo->Attributes & SPELL_ATTR_DISABLED_WHILE_ACTIVE)
         return;
 
-    time_t curTime = time(NULL);
-
-    time_t catrecTime = catrec ? curTime+catrec/1000 : 0;   // in secs
-    time_t recTime    = rec ? curTime+rec/1000 : catrecTime;// in secs
-
-    // self spell cooldown
-    if(recTime > 0)
-        _player->AddSpellCooldown(m_spellInfo->Id, m_CastItem ? m_CastItem->GetEntry() : 0, recTime);
-
-    // category spells
-    if (catrec > 0)
-    {
-        SpellCategoryStore::const_iterator i_scstore = sSpellCategoryStore.find(cat);
-        if(i_scstore != sSpellCategoryStore.end())
-        {
-            for(SpellCategorySet::const_iterator i_scset = i_scstore->second.begin(); i_scset != i_scstore->second.end(); ++i_scset)
-            {
-                if(*i_scset == m_spellInfo->Id)             // skip main spell, already handled above
-                    continue;
-
-                _player->AddSpellCooldown(*i_scset, m_CastItem ? m_CastItem->GetEntry() : 0, catrecTime);
-            }
-        }
-    }
+    _player->AddSpellAndCategoryCooldowns(m_spellInfo,m_CastItem ? m_CastItem->GetEntry() : 0, this);
 }
 
 void Spell::update(uint32 difftime)
@@ -2796,6 +2724,10 @@ void Spell::finish(bool ok)
         if (needDrop)
             ((Player*)m_caster)->ClearComboPoints();
     }
+
+    // mana/health potions, disabled by client, send event "not in combat"
+    if (m_caster->GetTypeId() == TYPEID_PLAYER && m_spellInfo->Category == SPELLCATEGORY_HEALTH_MANA_POTIONS)
+        ((Player*)m_caster)->UpdatePotionCooldown(this);
 
     // call triggered spell only at successful cast (after clear combo points -> for add some if need)
     if(!m_TriggerSpells.empty())
@@ -3325,7 +3257,7 @@ void Spell::TakeCastItem()
     bool expendable = false;
     bool withoutCharges = false;
 
-    for (int i = 0; i<5; i++)
+    for (int i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
     {
         if (proto->Spells[i].SpellId)
         {
@@ -3534,7 +3466,7 @@ void Spell::TakeReagents()
             ItemPrototype const *proto = m_CastItem->GetProto();
             if( proto && proto->ItemId == itemid )
             {
-                for(int s=0;s<5;s++)
+                for(int s=0;s < MAX_ITEM_PROTO_SPELLS; ++s)
                 {
                     // CastItem will be used up and does not count as reagent
                     int32 charges = m_CastItem->GetSpellCharges(s);
@@ -3819,7 +3751,7 @@ uint8 Spell::CanCast(bool strict)
     // - with greater than 15 min CD without SPELL_ATTR_EX4_USABLE_IN_ARENA flag
     // - with SPELL_ATTR_EX4_NOT_USABLE_IN_ARENA flag
     if( (m_spellInfo->AttributesEx4 & SPELL_ATTR_EX4_NOT_USABLE_IN_ARENA) ||
-        GetSpellRecoveryTime(m_spellInfo) > 15 * MINUTE * 1000 && !(m_spellInfo->AttributesEx4 & SPELL_ATTR_EX4_USABLE_IN_ARENA) )
+        GetSpellRecoveryTime(m_spellInfo) > 15 * MINUTE * IN_MILISECONDS && !(m_spellInfo->AttributesEx4 & SPELL_ATTR_EX4_USABLE_IN_ARENA) )
         if(MapEntry const* mapEntry = sMapStore.LookupEntry(m_caster->GetMapId()))
             if(mapEntry->IsBattleArena())
                 return SPELL_FAILED_NOT_IN_ARENA;
@@ -4999,7 +4931,7 @@ uint8 Spell::CheckItems()
                 ItemPrototype const *proto = m_CastItem->GetProto();
                 if(!proto)
                     return SPELL_FAILED_ITEM_NOT_READY;
-                for(int s=0;s<5;s++)
+                for(int s=0;s < MAX_ITEM_PROTO_SPELLS; ++s)
                 {
                     // CastItem will be used up and does not count as reagent
                     int32 charges = m_CastItem->GetSpellCharges(s);

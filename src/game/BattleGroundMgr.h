@@ -24,7 +24,8 @@
 
 typedef std::map<uint32, BattleGround*> BattleGroundSet;
 
-typedef std::deque<BattleGround*> BGFreeSlotQueueType;
+//this container can't be deque, because deque doesn't like removing the last element - if you remove it, it invalidates next iterator and crash appears
+typedef std::list<BattleGround*> BGFreeSlotQueueType;
 
 typedef UNORDERED_MAP<uint32, BattleGroundTypeId> BattleMastersMap;
 
@@ -74,6 +75,7 @@ class BattleGroundQueue
         void FillPlayersToBG(BattleGround* bg, BGQueueIdBasedOnLevel queue_id);
         bool CheckPremadeMatch(BGQueueIdBasedOnLevel queue_id, uint32 MinPlayersPerTeam, uint32 MaxPlayersPerTeam);
         bool CheckNormalMatch(BattleGround* bg_template, BGQueueIdBasedOnLevel queue_id, uint32 minPlayers, uint32 maxPlayers);
+        bool CheckSkirmishForSameFaction(BGQueueIdBasedOnLevel queue_id, uint32 minPlayersPerTeam);
         GroupQueueInfo * AddGroup(Player * leader, BattleGroundTypeId bgTypeId, uint8 ArenaType, bool isRated, bool isPremade, uint32 ArenaRating, uint32 ArenaTeamId = 0);
         void AddPlayer(Player *plr, GroupQueueInfo *ginfo);
         void RemovePlayer(const uint64& guid, bool decreaseInvitedCount);
