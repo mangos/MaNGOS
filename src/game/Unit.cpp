@@ -3999,7 +3999,7 @@ void Unit::RemoveDynObject(uint32 spellid)
         return;
     for (DynObjectGUIDs::iterator i = m_dynObjGUIDs.begin(); i != m_dynObjGUIDs.end();)
     {
-        DynamicObject* dynObj = ObjectAccessor::GetDynamicObject(*this,*m_dynObjGUIDs.begin());
+        DynamicObject* dynObj = ObjectAccessor::GetDynamicObject(*this,*i);
         if(!dynObj)
         {
             i = m_dynObjGUIDs.erase(i);
@@ -4029,7 +4029,7 @@ DynamicObject * Unit::GetDynObject(uint32 spellId, uint32 effIndex)
 {
     for (DynObjectGUIDs::iterator i = m_dynObjGUIDs.begin(); i != m_dynObjGUIDs.end();)
     {
-        DynamicObject* dynObj = ObjectAccessor::GetDynamicObject(*this,*m_dynObjGUIDs.begin());
+        DynamicObject* dynObj = ObjectAccessor::GetDynamicObject(*this,*i);
         if(!dynObj)
         {
             i = m_dynObjGUIDs.erase(i);
@@ -4047,7 +4047,7 @@ DynamicObject * Unit::GetDynObject(uint32 spellId)
 {
     for (DynObjectGUIDs::iterator i = m_dynObjGUIDs.begin(); i != m_dynObjGUIDs.end();)
     {
-        DynamicObject* dynObj = ObjectAccessor::GetDynamicObject(*this,*m_dynObjGUIDs.begin());
+        DynamicObject* dynObj = ObjectAccessor::GetDynamicObject(*this,*i);
         if(!dynObj)
         {
             i = m_dynObjGUIDs.erase(i);
