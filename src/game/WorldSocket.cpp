@@ -996,6 +996,12 @@ int WorldSocket::HandleAuthSession (WorldPacket& recvPacket)
     if (sAddOnHandler.BuildAddonPacket (&recvPacket, &SendAddonPacked))
         SendPacket (SendAddonPacked);
 
+    // TODO: fix it!
+    WorldPacket data(SMSG_TUTORIAL_FLAGS, 4*8);
+    for(uint32 i = 0; i < 8; ++i)
+        data << uint32(-1);
+    SendPacket(data);
+
     return 0;
 }
 

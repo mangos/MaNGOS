@@ -14738,7 +14738,7 @@ void Player::_LoadAuras(QueryResult *result, uint32 timediff)
 
 void Player::_LoadGlyphAuras()
 {
-    for (uint8 i = 0; i <= MAX_GLYPH_SLOT_INDEX; ++i)
+    for (uint8 i = 0; i < MAX_GLYPH_SLOT_INDEX; ++i)
     {
         if (uint32 glyph = GetGlyph(i))
         {
@@ -18073,6 +18073,8 @@ void Player::SendInitialPacketsBeforeAddToMap()
     data << uint32(0);                                      // unknown, may be rest state time or experience
     GetSession()->SendPacket(&data);
 
+    GetSocial()->SendSocialList();
+
     // Homebind
     data.Initialize(SMSG_BINDPOINTUPDATE, 5*4);
     data << m_homebindX << m_homebindY << m_homebindZ;
@@ -18084,12 +18086,12 @@ void Player::SendInitialPacketsBeforeAddToMap()
     // SMSG_UPDATE_AURA_DURATION
 
     // tutorial stuff
-    data.Initialize(SMSG_TUTORIAL_FLAGS, 8*4);
+    /*data.Initialize(SMSG_TUTORIAL_FLAGS, 8*4);
     for (int i = 0; i < 8; ++i)
         data << uint32( GetTutorialInt(i) );
-    GetSession()->SendPacket(&data);
+    GetSession()->SendPacket(&data);*/
 
-    SendTalentInfoData(false);
+    SendTalentsInfoData(false);
     SendInitialSpells();
 
     data.Initialize(SMSG_SEND_UNLEARN_SPELLS, 4);
@@ -18098,11 +18100,23 @@ void Player::SendInitialPacketsBeforeAddToMap()
 
     SendInitialActionButtons();
     SendInitialReputations();
+    SendInitWorldStates();
     m_achievementMgr.SendAllAchievementData();
     UpdateZone(GetZoneId());
-    SendInitWorldStates();
 
-    // SMSG_SET_AURA_SINGLE
+    // equipment manager!
+    data.Initialize(SMSG_EQUIPMENT_SET_LIST);
+    data << uint32(0);                                      // count
+    /*for(count)
+    {
+        data << uint8(0);                                   // PGUID, equipment set guid?
+        data << uint32(0);                                  // counter(0,1,...)?
+        data << uint8(0);                                   // string set name
+        data << uint8(0);                                   // string icon name
+        for(uint32 i = 0; i < EQUIPMENT_SLOT_END; ++i)
+            data << uint8(0);                               // item GUID?
+    }*/
+    GetSession()->SendPacket(&data);
 
     data.Initialize(SMSG_LOGIN_SETTIMESPEED, 8);
     data << uint32(secsToTimeBitFields(sWorld.GetGameTime()));
@@ -19686,9 +19700,9 @@ void Player::BuildPetTalentsInfoData(WorldPacket *data)
     }*/
 }
 
-void Player::SendTalentInfoData(bool pet)
+void Player::SendTalentsInfoData(bool pet)
 {
-    WorldPacket data(SMSG_UNKNOWN_1216, 50);
+    WorldPacket data(SMSG_TALENTS_INFO, 50);
     data << uint8(pet);
     if(pet)
         BuildPetTalentsInfoData(&data);

@@ -36,7 +36,7 @@ void WorldSession::HandleLearnTalentOpcode( WorldPacket & recv_data )
     recv_data >> talent_id >> requested_rank;
 
     _player->LearnTalent(talent_id, requested_rank);
-    _player->SendTalentInfoData(false);
+    _player->SendTalentsInfoData(false);
 }
 
 void WorldSession::HandleLearnPreviewTalents(WorldPacket& recvPacket)
@@ -59,7 +59,7 @@ void WorldSession::HandleLearnPreviewTalents(WorldPacket& recvPacket)
         _player->LearnTalent(talentId, talentRank);
     }
 
-    _player->SendTalentInfoData(false);
+    _player->SendTalentsInfoData(false);
 }
 
 void WorldSession::HandleTalentWipeOpcode( WorldPacket & recv_data )
@@ -90,6 +90,7 @@ void WorldSession::HandleTalentWipeOpcode( WorldPacket & recv_data )
         return;
     }
 
+    _player->SendTalentsInfoData(false);
     unit->CastSpell(_player, 14867, true);                  //spell: "Untalent Visual Effect"
 }
 

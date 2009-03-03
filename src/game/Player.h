@@ -1463,7 +1463,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void InitTalentForLevel();
         void BuildPlayerTalentsInfoData(WorldPacket *data);
         void BuildPetTalentsInfoData(WorldPacket *data);
-        void SendTalentInfoData(bool pet);
+        void SendTalentsInfoData(bool pet);
         void LearnTalent(uint32 talentId, uint32 talentRank);
         void LearnPetTalent(uint64 petGuid, uint32 talentId, uint32 talentRank);
 
