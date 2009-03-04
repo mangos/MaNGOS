@@ -45,7 +45,8 @@ WorldSession::WorldSession(uint32 id, WorldSocket *sock, uint32 sec, uint8 expan
 LookingForGroup_auto_join(false), LookingForGroup_auto_add(false), m_muteTime(mute_time),
 _player(NULL), m_Socket(sock),_security(sec), _accountId(id), m_expansion(expansion),
 m_sessionDbcLocale(sWorld.GetAvailableDbcLocale(locale)), m_sessionDbLocaleIndex(objmgr.GetIndexForLocale(locale)),
-_logoutTime(0), m_inQueue(false), m_playerLoading(false), m_playerLogout(false), m_playerRecentlyLogout(false), m_latency(0)
+_logoutTime(0), m_inQueue(false), m_playerLoading(false), m_playerLogout(false), m_playerRecentlyLogout(false),
+m_latency(0), m_TutorialsChanged(false)
 {
     if (sock)
     {
@@ -586,6 +587,8 @@ void WorldSession::LoadTutorialsData()
 
         delete result;
     }
+
+    m_TutorialsChanged = false;
 }
 
 void WorldSession::SendTutorialsData()
@@ -598,6 +601,9 @@ void WorldSession::SendTutorialsData()
 
 void WorldSession::SaveTutorialsData()
 {
+    if(!m_TutorialsChanged)
+        return;
+
     uint32 Rows=0;
     // it's better than rebuilding indexes multiple times
     QueryResult *result = CharacterDatabase.PQuery("SELECT count(*) AS r FROM character_tutorial WHERE account = '%u'", GetAccountId());
@@ -616,6 +622,8 @@ void WorldSession::SaveTutorialsData()
     {
         CharacterDatabase.PExecute("INSERT INTO character_tutorial (account,tut0,tut1,tut2,tut3,tut4,tut5,tut6,tut7) VALUES ('%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u')", GetAccountId(), m_Tutorials[0], m_Tutorials[1], m_Tutorials[2], m_Tutorials[3], m_Tutorials[4], m_Tutorials[5], m_Tutorials[6], m_Tutorials[7]);
     }
+
+    m_TutorialsChanged = false;
 }
 
 void WorldSession::ReadMovementInfo(WorldPacket &data, MovementInfo *mi)

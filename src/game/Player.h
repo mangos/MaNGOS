@@ -703,14 +703,30 @@ enum QuestBagSlots
     QUESTBAG_SLOT_END           = 200
 };
 
+enum EquipmentSetUpdateState
+{
+    EQUIPMENT_SET_UNCHANGED = 0,
+    EQUIPMENT_SET_CHANGED   = 1,
+    EQUIPMENT_SET_NEW       = 2,
+    EQUIPMENT_SET_DELETED   = 3
+};
+
 struct EquipmentSet
 {
+    EquipmentSet() : Guid(0), state(EQUIPMENT_SET_NEW)
+    {
+        for(int i = 0; i < EQUIPMENT_SLOT_END; ++i)
+            Items[i] = 0;
+    }
+
     uint64 Guid;
-    uint32 Index;
     std::string Name;
     std::string IconName;
     uint32 Items[EQUIPMENT_SLOT_END];
+    EquipmentSetUpdateState state;
 };
+
+#define MAX_EQUIPMENT_SET_INDEX 10                          // client limit
 
 typedef std::map<uint32, EquipmentSet> EquipmentSets;
 
@@ -1851,7 +1867,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void CastItemCombatSpell(Item *item,Unit* Target, WeaponAttackType attType);
         void CastItemUseSpell(Item *item,SpellCastTargets const& targets,uint8 cast_count, uint32 glyphIndex);
 
-        void SaveEquipmentSet(EquipmentSet eqset);
+        void SetEquipmentSet(uint32 index, EquipmentSet eqset);
         void DeleteEquipmentSet(uint64 setGuid);
 
         void SendInitWorldStates();
@@ -2226,6 +2242,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void _SaveDailyQuestStatus();
         void _SaveReputation();
         void _SaveSpells();
+        void _SaveEquipmentSets();
 
         void _SetCreateBits(UpdateMask *updateMask, Player *target) const;
         void _SetUpdateBits(UpdateMask *updateMask, Player *target) const;

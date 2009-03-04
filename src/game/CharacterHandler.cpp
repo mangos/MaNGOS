@@ -926,7 +926,6 @@ void WorldSession::HandleTutorialFlag( WorldPacket & recv_data )
     uint32 tutflag = GetTutorialInt( wInt );
     tutflag |= (1 << rInt);
     SetTutorialInt( wInt, tutflag );
-    SaveTutorialsData();
 
     //sLog.outDebug("Received Tutorial Flag Set {%u}.", iFlag);
 }
@@ -935,14 +934,12 @@ void WorldSession::HandleTutorialClear( WorldPacket & /*recv_data*/ )
 {
     for ( uint32 iI = 0; iI < 8; iI++)
         SetTutorialInt( iI, 0xFFFFFFFF );
-    SaveTutorialsData();
 }
 
 void WorldSession::HandleTutorialReset( WorldPacket & /*recv_data*/ )
 {
     for ( uint32 iI = 0; iI < 8; iI++)
         SetTutorialInt( iI, 0x00000000 );
-    SaveTutorialsData();
 }
 
 void WorldSession::HandleSetWatchedFactionIndexOpcode(WorldPacket & recv_data)
@@ -1335,30 +1332,36 @@ void WorldSession::HandleEquipmentSetSave(WorldPacket &recv_data)
     
     CHECK_PACKET_SIZE(recv_data, recv_data.rpos()+4);
 
-    uint32 Index;
-    recv_data >> Index;
+    uint32 index;
+    recv_data >> index;
+    if(index >= MAX_EQUIPMENT_SET_INDEX)                    // client set slots amount
+        return;
 
-    std::string name, iconName;
-    recv_data >> name >> iconName;
+    CHECK_PACKET_SIZE(recv_data, recv_data.rpos()+1);
+    std::string name;
+    recv_data >> name;
+
+    CHECK_PACKET_SIZE(recv_data, recv_data.rpos()+1);
+    std::string iconName;
+    recv_data >> iconName;
 
     EquipmentSet eqSet;
 
     eqSet.Guid      = setGuid;
-    eqSet.Index     = Index;
     eqSet.Name      = name;
     eqSet.IconName  = iconName;
-
-    uint64 itemGuid;
+    eqSet.state     = EQUIPMENT_SET_NEW;
 
     for(uint32 i = 0; i < EQUIPMENT_SLOT_END; ++i)
     {
+        uint64 itemGuid;
         if(!recv_data.readPackGUID(itemGuid))
             return;
 
         eqSet.Items[i] = GUID_LOPART(itemGuid);
     }
 
-    _player->SaveEquipmentSet(eqSet);
+    _player->SetEquipmentSet(index,eqSet);
 }
 
 void WorldSession::HandleEquipmentSetDelete(WorldPacket &recv_data)

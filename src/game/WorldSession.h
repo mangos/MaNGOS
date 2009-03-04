@@ -180,7 +180,10 @@ class MANGOS_DLL_SPEC WorldSession
         void SetTutorialInt(uint32 intId, uint32 value)
         {
             if(m_Tutorials[intId] != value)
+            {
                 m_Tutorials[intId] = value;
+                m_TutorialsChanged = true;
+            }
         }
 
         //mail
@@ -711,6 +714,7 @@ class MANGOS_DLL_SPEC WorldSession
         uint32 m_latency;
         AccountData m_accountData[NUM_ACCOUNT_DATA_TYPES];
         uint32 m_Tutorials[8];
+        bool   m_TutorialsChanged;
 
         ZThread::LockedQueue<WorldPacket*,ZThread::FastMutex> _recvQueue;
 };

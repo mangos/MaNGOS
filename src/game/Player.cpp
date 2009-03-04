@@ -14010,6 +14010,7 @@ void Player::_LoadArenaTeamInfo(QueryResult *result)
 
 void Player::_LoadEquipmentSets(QueryResult *result)
 {
+    // SetPQuery(PLAYER_LOGIN_QUERY_LOADEQUIPMENTSETS,   "SELECT setguid, setindex, name, iconname, item0, item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12, item13, item14, item15, item16, item17, item18 FROM character_equipmentsets WHERE guid = '%u' ORDER BY setindex", GUID_LOPART(m_guid));
     if (!result)
         return;
 
@@ -14021,18 +14022,19 @@ void Player::_LoadEquipmentSets(QueryResult *result)
         EquipmentSet eqSet;
 
         eqSet.Guid      = fields[0].GetUInt64();
-        eqSet.Index     = fields[1].GetUInt32();
+        uint32 index    = fields[1].GetUInt32();
         eqSet.Name      = fields[2].GetCppString();
         eqSet.IconName  = fields[3].GetCppString();
+        eqSet.state     = EQUIPMENT_SET_UNCHANGED;
 
         for(uint32 i = 0; i < EQUIPMENT_SLOT_END; ++i)
             eqSet.Items[i] = fields[4+i].GetUInt32();
 
-        m_EquipmentSets[eqSet.Index] = eqSet;
+        m_EquipmentSets[index] = eqSet;
 
         ++count;
 
-        if(count >= 10)
+        if(count >= MAX_EQUIPMENT_SET_INDEX)                // client limit
             break;
     } while (result->NextRow());
     delete result;
@@ -15742,6 +15744,8 @@ void Player::SaveToDB()
     _SaveActions();
     _SaveAuras();
     _SaveReputation();
+    _SaveEquipmentSets();
+    GetSession()->SaveTutorialsData();                      // changed only while character in game
 
     CharacterDatabase.CommitTransaction();
 
@@ -18076,17 +18080,24 @@ void Player::SendInitialPacketsBeforeAddToMap()
     m_achievementMgr.SendAllAchievementData();
     UpdateZone(GetZoneId());
 
+    uint32 count = 0;
     data.Initialize(SMSG_EQUIPMENT_SET_LIST, 4);
-    data << uint32(m_EquipmentSets.size());                 // count
+    size_t count_pos = data.wpos();
+    data << uint32(count);                                  // count placeholder
     for(EquipmentSets::iterator itr = m_EquipmentSets.begin(); itr != m_EquipmentSets.end(); ++itr)
     {
+        if(itr->second.state==EQUIPMENT_SET_DELETED)
+            continue;
         data.appendPackGUID(itr->second.Guid);
-        data << uint32(itr->second.Index);
+        data << uint32(itr->first);
         data << itr->second.Name;
         data << itr->second.IconName;
         for(uint32 i = 0; i < EQUIPMENT_SLOT_END; ++i)
             data.appendPackGUID(MAKE_NEW_GUID(itr->second.Items[i], 0, HIGHGUID_ITEM));
+
+        ++count;                                            // client have limit but it checked at loading and set
     }
+    data.put<uint32>(count_pos,count);
     GetSession()->SendPacket(&data);
 
     data.Initialize(SMSG_LOGIN_SETTIMESPEED, 8);
@@ -19926,51 +19937,62 @@ void Player::LearnPetTalent(uint64 petGuid, uint32 talentId, uint32 talentRank)
     sLog.outDetail("TalentID: %u Rank: %u Spell: %u\n", talentId, talentRank, spellid);
 }
 
-void Player::SaveEquipmentSet(EquipmentSet eqset)
+void Player::SetEquipmentSet(uint32 index, EquipmentSet eqset)
 {
-    if(m_EquipmentSets.size() >= 10)                        // client limit
-        return;
+    EquipmentSet& eqslot = m_EquipmentSets[index];
 
-    EquipmentSets::iterator itr = m_EquipmentSets.find(eqset.Index);
-    if(itr != m_EquipmentSets.end())
+    EquipmentSetUpdateState old_state = eqslot.state;
+
+    eqslot = eqset;
+    eqslot.Guid = objmgr.GenerateEquipmentSetGuid();
+    eqslot.state = old_state == EQUIPMENT_SET_NEW ? EQUIPMENT_SET_NEW : EQUIPMENT_SET_CHANGED;
+
+    WorldPacket data(SMSG_EQUIPMENT_SET_SAVED, 4+1);
+    data << uint32(index);
+    data.appendPackGUID(eqset.Guid);
+    GetSession()->SendPacket(&data);
+}
+
+void Player::_SaveEquipmentSets()
+{
+    for(EquipmentSets::iterator itr = m_EquipmentSets.begin(); itr != m_EquipmentSets.end();)
     {
-        CharacterDatabase.PExecute("UPDATE character_equipmentsets SET name='%s', iconname='%s', item0='%u', item1='%u', item2='%u', item3='%u', item4='%u', item5='%u', item6='%u', item7='%u', item8='%u', item9='%u', item10='%u', item11='%u', item12='%u', item13='%u', item14='%u', item15='%u', item16='%u', item17='%u', item18='%u' WHERE guid='%u' AND setguid='"I64FMTD"' AND setindex='%u'",
-            eqset.Name.c_str(), eqset.IconName.c_str(), eqset.Items[0], eqset.Items[1], eqset.Items[2], eqset.Items[3], eqset.Items[4], eqset.Items[5], eqset.Items[6], eqset.Items[7],
-            eqset.Items[8], eqset.Items[9], eqset.Items[10], eqset.Items[11], eqset.Items[12], eqset.Items[13], eqset.Items[14], eqset.Items[15], eqset.Items[16], eqset.Items[17], eqset.Items[18], GetGUIDLow(), eqset.Guid, eqset.Index);
-    }
-    else
-    {
-        QueryResult *result = CharacterDatabase.PQuery("SELECT MAX(setguid) FROM character_equipmentsets");
-        if(!result)
-            eqset.Guid++;
-        else
+        uint32 index = itr->first;
+        EquipmentSet& eqset = itr->second;
+        switch(eqset.state)
         {
-            eqset.Guid = result->Fetch()[0].GetUInt64() + 1;
-            delete result;
+            case EQUIPMENT_SET_UNCHANGED:
+                ++itr;
+                break;                                      // nothing do
+            case EQUIPMENT_SET_CHANGED:
+                CharacterDatabase.PExecute("UPDATE character_equipmentsets SET name='%s', iconname='%s', item0='%u', item1='%u', item2='%u', item3='%u', item4='%u', item5='%u', item6='%u', item7='%u', item8='%u', item9='%u', item10='%u', item11='%u', item12='%u', item13='%u', item14='%u', item15='%u', item16='%u', item17='%u', item18='%u' WHERE guid='%u' AND setguid='"I64FMTD"' AND setindex='%u'",
+                    eqset.Name.c_str(), eqset.IconName.c_str(), eqset.Items[0], eqset.Items[1], eqset.Items[2], eqset.Items[3], eqset.Items[4], eqset.Items[5], eqset.Items[6], eqset.Items[7],
+                    eqset.Items[8], eqset.Items[9], eqset.Items[10], eqset.Items[11], eqset.Items[12], eqset.Items[13], eqset.Items[14], eqset.Items[15], eqset.Items[16], eqset.Items[17], eqset.Items[18], GetGUIDLow(), eqset.Guid, index);
+                eqset.state = EQUIPMENT_SET_UNCHANGED;
+                ++itr;
+                break;
+            case EQUIPMENT_SET_NEW:
+                CharacterDatabase.PExecute("INSERT INTO character_equipmentsets VALUES ('%u', '"I64FMTD"', '%u', '%s', '%s', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u')", 
+                    GetGUIDLow(), eqset.Guid, index, eqset.Name.c_str(), eqset.IconName.c_str(), eqset.Items[0], eqset.Items[1], eqset.Items[2], eqset.Items[3], eqset.Items[4], eqset.Items[5], eqset.Items[6], eqset.Items[7],
+                    eqset.Items[8], eqset.Items[9], eqset.Items[10], eqset.Items[11], eqset.Items[12], eqset.Items[13], eqset.Items[14], eqset.Items[15], eqset.Items[16], eqset.Items[17], eqset.Items[18]);
+                eqset.state = EQUIPMENT_SET_UNCHANGED;
+                ++itr;
+                break;
+            case EQUIPMENT_SET_DELETED:
+                CharacterDatabase.PExecute("DELETE FROM character_equipmentsets WHERE setguid="I64FMTD, eqset.Guid);
+                m_EquipmentSets.erase(itr++);
+                break;
         }
-
-        CharacterDatabase.PExecute("INSERT INTO character_equipmentsets VALUES ('%u', '"I64FMTD"', '%u', '%s', '%s', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u')", 
-            GetGUIDLow(), eqset.Guid, eqset.Index, eqset.Name.c_str(), eqset.IconName.c_str(), eqset.Items[0], eqset.Items[1], eqset.Items[2], eqset.Items[3], eqset.Items[4], eqset.Items[5], eqset.Items[6], eqset.Items[7],
-            eqset.Items[8], eqset.Items[9], eqset.Items[10], eqset.Items[11], eqset.Items[12], eqset.Items[13], eqset.Items[14], eqset.Items[15], eqset.Items[16], eqset.Items[17], eqset.Items[18]);
-
-        WorldPacket data(SMSG_EQUIPMENT_SET_SAVED, 4+1);
-        data << uint32(eqset.Index);
-        data.appendPackGUID(eqset.Guid);
-        GetSession()->SendPacket(&data);
     }
-
-    m_EquipmentSets[eqset.Index] = eqset;
 }
 
 void Player::DeleteEquipmentSet(uint64 setGuid)
 {
-    CharacterDatabase.PExecute("DELETE FROM character_equipmentsets WHERE setguid="I64FMTD, setGuid);
-
     for(EquipmentSets::iterator itr = m_EquipmentSets.begin(); itr != m_EquipmentSets.end(); ++itr)
     {
         if(itr->second.Guid == setGuid)
         {
-            m_EquipmentSets.erase(itr);
+            itr->second.state = EQUIPMENT_SET_DELETED;
             break;
         }
     }
