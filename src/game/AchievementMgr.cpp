@@ -756,10 +756,18 @@ bool AchievementMgr::IsCompletedCriteria(AchievementCriteriaEntry const* achieve
     {
         case ACHIEVEMENT_CRITERIA_TYPE_REACH_LEVEL:
         {
-            if (achievIdByClass[GetPlayer()->getClass()] == achievement->ID ||
-                achievIdByRace[GetPlayer()->getRace()]   == achievement->ID)
-                return progress->counter >= achievementCriteria->reach_level.level;
-            return false;
+            // skip wrong class achievements
+            for(int i = 1; i < MAX_CLASSES; ++i)
+                if(achievIdByClass[i] == achievement->ID && i != GetPlayer()->getClass())
+                    return false;
+
+            // skip wrong race achievements
+            for(int i = 1; i < MAX_RACES; ++i)
+                if(achievIdByRace[i] == achievement->ID && i != GetPlayer()->getRace())
+                    return false;
+
+            // appropriate class/race or not class/race specific
+            return progress->counter >= achievementCriteria->reach_level.level;
         }
         case ACHIEVEMENT_CRITERIA_TYPE_BUY_BANK_SLOT:
             return progress->counter >= achievementCriteria->buy_bank_slot.numberOfSlots;
