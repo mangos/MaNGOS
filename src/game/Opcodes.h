@@ -345,7 +345,7 @@ enum Opcodes
     SMSG_SPELL_COOLDOWN                             = 0x134,
     SMSG_COOLDOWN_EVENT                             = 0x135,
     CMSG_CANCEL_AURA                                = 0x136,
-    SMSG_UPDATE_AURA_DURATION_OBSOLETE              = 0x137, // 3.1 - equipment manager? uint32+PGUID
+    SMSG_EQUIPMENT_SET_SAVED                        = 0x137,
     SMSG_PET_CAST_FAILED                            = 0x138,
     MSG_CHANNEL_START                               = 0x139,
     MSG_CHANNEL_UPDATE                              = 0x13A,

@@ -337,7 +337,7 @@ OpcodeHandler opcodeTable[NUM_MSG_TYPES] =
     /*0x134*/ { "SMSG_SPELL_COOLDOWN",                          STATUS_NEVER,    &WorldSession::Handle_ServerSide               },
     /*0x135*/ { "SMSG_COOLDOWN_EVENT",                          STATUS_NEVER,    &WorldSession::Handle_ServerSide               },
     /*0x136*/ { "CMSG_CANCEL_AURA",                             STATUS_LOGGEDIN, &WorldSession::HandleCancelAuraOpcode          },
-    /*0x137*/ { "SMSG_UPDATE_AURA_DURATION_OBSOLETE",           STATUS_NEVER,    &WorldSession::Handle_ServerSide               },
+    /*0x137*/ { "SMSG_EQUIPMENT_SET_SAVED",                     STATUS_NEVER,    &WorldSession::Handle_ServerSide               },
     /*0x138*/ { "SMSG_PET_CAST_FAILED",                         STATUS_NEVER,    &WorldSession::Handle_ServerSide               },
     /*0x139*/ { "MSG_CHANNEL_START",                            STATUS_NEVER,    &WorldSession::Handle_NULL                     },
     /*0x13A*/ { "MSG_CHANNEL_UPDATE",                           STATUS_NEVER,    &WorldSession::Handle_NULL                     },

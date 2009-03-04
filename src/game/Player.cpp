@@ -18076,7 +18076,7 @@ void Player::SendInitialPacketsBeforeAddToMap()
     m_achievementMgr.SendAllAchievementData();
     UpdateZone(GetZoneId());
 
-    data.Initialize(SMSG_EQUIPMENT_SET_LIST);
+    data.Initialize(SMSG_EQUIPMENT_SET_LIST, 4);
     data << uint32(m_EquipmentSets.size());                 // count
     for(EquipmentSets::iterator itr = m_EquipmentSets.begin(); itr != m_EquipmentSets.end(); ++itr)
     {
@@ -19940,9 +19940,23 @@ void Player::SaveEquipmentSet(EquipmentSet eqset)
     }
     else
     {
+        QueryResult *result = CharacterDatabase.PQuery("SELECT MAX(setguid) FROM character_equipmentsets");
+        if(!result)
+            eqset.Guid++;
+        else
+        {
+            eqset.Guid = result->Fetch()[0].GetUInt64() + 1;
+            delete result;
+        }
+
         CharacterDatabase.PExecute("INSERT INTO character_equipmentsets VALUES ('%u', '"I64FMTD"', '%u', '%s', '%s', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u')", 
             GetGUIDLow(), eqset.Guid, eqset.Index, eqset.Name.c_str(), eqset.IconName.c_str(), eqset.Items[0], eqset.Items[1], eqset.Items[2], eqset.Items[3], eqset.Items[4], eqset.Items[5], eqset.Items[6], eqset.Items[7],
             eqset.Items[8], eqset.Items[9], eqset.Items[10], eqset.Items[11], eqset.Items[12], eqset.Items[13], eqset.Items[14], eqset.Items[15], eqset.Items[16], eqset.Items[17], eqset.Items[18]);
+
+        WorldPacket data(SMSG_EQUIPMENT_SET_SAVED, 4+1);
+        data << uint32(eqset.Index);
+        data.appendPackGUID(eqset.Guid);
+        GetSession()->SendPacket(&data);
     }
 
     m_EquipmentSets[eqset.Index] = eqset;
