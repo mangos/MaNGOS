@@ -187,7 +187,7 @@ int WorldSocket::SendPacket (const WorldPacket& pct)
     }
 
     ServerPktHeader header(pct.size()+2, pct.GetOpcode());
-    m_Crypt.EncryptSend ( header.header, header.getHeaderLength());
+    //m_Crypt.EncryptSend ( header.header, header.getHeaderLength());
 
     if (m_OutBuffer->space () >= pct.size () + header.getHeaderLength() && msg_queue()->is_empty())
     {
@@ -480,7 +480,7 @@ int WorldSocket::handle_input_header (void)
 
     ACE_ASSERT (m_Header.length () == sizeof (ClientPktHeader));
 
-    m_Crypt.DecryptRecv ((ACE_UINT8*) m_Header.rd_ptr (), sizeof (ClientPktHeader));
+    //m_Crypt.DecryptRecv ((ACE_UINT8*) m_Header.rd_ptr (), sizeof (ClientPktHeader));
 
     ClientPktHeader& header = *((ClientPktHeader*) m_Header.rd_ptr ());
 
@@ -982,10 +982,10 @@ int WorldSocket::HandleAuthSession (WorldPacket& recvPacket)
     // NOTE ATM the socket is singlethreaded, have this in mind ...
     ACE_NEW_RETURN (m_Session, WorldSession (id, this, security, expansion, mutetime, locale), -1);
 
-    m_Crypt.SetKey (&K);
-    m_Crypt.Init ();
+    m_Crypt.Init(&K);
 
     m_Session->LoadAccountData();
+    m_Session->LoadTutorialsData();
 
     // In case needed sometime the second arg is in microseconds 1 000 000 = 1 sec
     ACE_OS::sleep (ACE_Time_Value (0, 10000));
@@ -996,11 +996,7 @@ int WorldSocket::HandleAuthSession (WorldPacket& recvPacket)
     if (sAddOnHandler.BuildAddonPacket (&recvPacket, &SendAddonPacked))
         SendPacket (SendAddonPacked);
 
-    // TODO: fix it!
-    WorldPacket data(SMSG_TUTORIAL_FLAGS, 4*8);
-    for(uint32 i = 0; i < 8; ++i)
-        data << uint32(-1);
-    SendPacket(data);
+    m_Session->SendTutorialsData();
 
     return 0;
 }

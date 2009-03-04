@@ -345,14 +345,14 @@ enum Opcodes
     SMSG_SPELL_COOLDOWN                             = 0x134,
     SMSG_COOLDOWN_EVENT                             = 0x135,
     CMSG_CANCEL_AURA                                = 0x136,
-    SMSG_UPDATE_AURA_DURATION_OBSOLETE              = 0x137, // 3.1 - equipment manager? uint32+guid
+    SMSG_UPDATE_AURA_DURATION_OBSOLETE              = 0x137, // 3.1 - equipment manager? uint32+PGUID
     SMSG_PET_CAST_FAILED                            = 0x138,
     MSG_CHANNEL_START                               = 0x139,
     MSG_CHANNEL_UPDATE                              = 0x13A,
     CMSG_CANCEL_CHANNELLING                         = 0x13B,
     SMSG_AI_REACTION                                = 0x13C,
     CMSG_SET_SELECTION                              = 0x13D,
-    CMSG_SET_TARGET_OBSOLETE                        = 0x13E,
+    CMSG_EQUIPMENT_SET_DELETE                       = 0x13E,
     CMSG_UNUSED                                     = 0x13F,
     CMSG_UNUSED2                                    = 0x140,
     CMSG_ATTACKSWING                                = 0x141,
@@ -1257,7 +1257,8 @@ enum Opcodes
     UMSG_UNKNOWN_1220                               = 0x4C4, // not found
     UMSG_UNKNOWN_1221                               = 0x4C5, // not found
     UMSG_UNKNOWN_1222                               = 0x4C6, // not found
-    NUM_MSG_TYPES                                   = 0x4C7
+    SMSG_UNKNOWN_1223                               = 0x4C7, // arena pet?
+    NUM_MSG_TYPES                                   = 0x4C8
 };
 
 /// Player state

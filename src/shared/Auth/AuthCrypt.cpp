@@ -24,57 +24,46 @@ AuthCrypt::AuthCrypt()
     _initialized = false;
 }
 
-void AuthCrypt::Init()
+AuthCrypt::~AuthCrypt()
 {
-    _send_i = _send_j = _recv_i = _recv_j = 0;
+
+}
+
+void AuthCrypt::Init(BigNumber *K)
+{
+    uint8 recvSeed[SEED_KEY_SIZE] = { 0x22, 0xBE, 0xE5, 0xCF, 0xBB, 0x07, 0x64, 0xD9, 0x00, 0x45, 0x1B, 0xD0, 0x24, 0xB8, 0xD5, 0x45 };
+    HmacHash recvHash(SEED_KEY_SIZE, (uint8*)recvSeed);
+    recvHash.UpdateBigNumber(K);
+    recvHash.Finalize();
+    _recvCrypt.Init(SHA_DIGEST_LENGTH, recvHash.GetDigest());
+
+    uint8 sendSeed[SEED_KEY_SIZE] = { 0xF4, 0x66, 0x31, 0x59, 0xFC, 0x83, 0x6E, 0x31, 0x31, 0x02, 0x51, 0xD5, 0x44, 0x31, 0x67, 0x98 };
+    HmacHash sendHash(SEED_KEY_SIZE, (uint8*)sendSeed);
+    sendHash.UpdateBigNumber(K);
+    sendHash.Finalize();
+    _sendCrypt.Init(SHA_DIGEST_LENGTH, sendHash.GetDigest());
+
+    uint8 emptyBuf[1000];
+    memset(emptyBuf, 0, 1000);
+
+    _sendCrypt.Process(1000, (uint8*)emptyBuf, (uint8*)emptyBuf);
+    _recvCrypt.Process(1000, (uint8*)emptyBuf, (uint8*)emptyBuf);
+
     _initialized = true;
 }
 
 void AuthCrypt::DecryptRecv(uint8 *data, size_t len)
 {
-    if (!_initialized) return;
-    if (len < CRYPTED_RECV_LEN) return;
+    if (!_initialized)
+        return;
 
-    for (size_t t = 0; t < CRYPTED_RECV_LEN; t++)
-    {
-        _recv_i %= _key.size();
-        uint8 x = (data[t] - _recv_j) ^ _key[_recv_i];
-        ++_recv_i;
-        _recv_j = data[t];
-        data[t] = x;
-    }
+    _recvCrypt.Process(len, data, data);
 }
 
 void AuthCrypt::EncryptSend(uint8 *data, size_t len)
 {
-    if (!_initialized) return;
+    if (!_initialized)
+        return;
 
-    for (size_t t = 0; t < len; t++)
-    {
-        _send_i %= _key.size();
-        uint8 x = (data[t] ^ _key[_send_i]) + _send_j;
-        ++_send_i;
-        data[t] = _send_j = x;
-    }
-}
-
-void AuthCrypt::SetKey(BigNumber *bn)
-{
-    uint8 *key = new uint8[SHA_DIGEST_LENGTH];
-    GenerateKey(key, bn);
-    _key.resize(SHA_DIGEST_LENGTH);
-    std::copy(key, key + SHA_DIGEST_LENGTH, _key.begin());
-    delete[] key;
-}
-
-AuthCrypt::~AuthCrypt()
-{
-}
-
-void AuthCrypt::GenerateKey(uint8 *key, BigNumber *bn)
-{
-    HmacHash hash;
-    hash.UpdateBigNumber(bn);
-    hash.Finalize();
-    memcpy(key, hash.GetDigest(), SHA_DIGEST_LENGTH);
+    _sendCrypt.Process(len, data, data);
 }

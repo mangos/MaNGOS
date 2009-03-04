@@ -343,10 +343,6 @@ Player::Player (WorldSession *session): Unit(), m_achievementMgr(this)
     PlayerTalkClass = new PlayerMenu( GetSession() );
     m_currentBuybackSlot = BUYBACK_SLOT_START;
 
-    for ( int aX = 0 ; aX < 8 ; aX++ )
-        m_Tutorials[ aX ] = 0x00;
-    m_TutorialsChanged = false;
-
     m_DailyQuestChanged = false;
     m_lastDailyQuestTime = 0;
 
@@ -14012,6 +14008,36 @@ void Player::_LoadArenaTeamInfo(QueryResult *result)
     delete result;
 }
 
+void Player::_LoadEquipmentSets(QueryResult *result)
+{
+    if (!result)
+        return;
+
+    uint32 count = 0;
+    do
+    {
+        Field *fields = result->Fetch();
+
+        EquipmentSet eqSet;
+
+        eqSet.Guid      = fields[0].GetUInt64();
+        eqSet.Index     = fields[1].GetUInt32();
+        eqSet.Name      = fields[2].GetCppString();
+        eqSet.IconName  = fields[3].GetCppString();
+
+        for(uint32 i = 0; i < EQUIPMENT_SLOT_END; ++i)
+            eqSet.Items[i] = fields[4+i].GetUInt32();
+
+        m_EquipmentSets[eqSet.Index] = eqSet;
+
+        ++count;
+
+        if(count >= 10)
+            break;
+    } while (result->NextRow());
+    delete result;
+}
+
 bool Player::LoadPositionFromDB(uint32& mapid, float& x,float& y,float& z,float& o, bool& in_flight, uint64 guid)
 {
     QueryResult *result = CharacterDatabase.PQuery("SELECT position_x,position_y,position_z,orientation,map,taxi_path FROM characters WHERE guid = '%u'",GUID_LOPART(guid));
@@ -14467,8 +14493,6 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
     InitTalentForLevel();
     learnDefaultSpells();
 
-    _LoadTutorials(holder->GetResult(PLAYER_LOGIN_QUERY_LOADTUTORIALS));
-
     // must be before inventory (some items required reputation check)
     _LoadReputation(holder->GetResult(PLAYER_LOGIN_QUERY_LOADREPUTATION));
 
@@ -14613,6 +14637,9 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
 
     m_achievementMgr.LoadFromDB(holder->GetResult(PLAYER_LOGIN_QUERY_LOADACHIEVEMENTS), holder->GetResult(PLAYER_LOGIN_QUERY_LOADCRITERIAPROGRESS));
     m_achievementMgr.CheckAllAchievementCriteria();
+
+    _LoadEquipmentSets(holder->GetResult(PLAYER_LOGIN_QUERY_LOADEQUIPMENTSETS));
+
     return true;
 }
 
@@ -15281,27 +15308,6 @@ void Player::_LoadSpells(QueryResult *result)
     }
 }
 
-void Player::_LoadTutorials(QueryResult *result)
-{
-    //QueryResult *result = CharacterDatabase.PQuery("SELECT tut0,tut1,tut2,tut3,tut4,tut5,tut6,tut7 FROM character_tutorial WHERE account = '%u' AND realmid = '%u'", GetAccountId(), realmid);
-
-    if(result)
-    {
-        do
-        {
-            Field *fields = result->Fetch();
-
-            for (int iI=0; iI<8; iI++)
-                m_Tutorials[iI] = fields[iI].GetUInt32();
-        }
-        while( result->NextRow() );
-
-        delete result;
-    }
-
-    m_TutorialsChanged = false;
-}
-
 void Player::_LoadGroup(QueryResult *result)
 {
     //QueryResult *result = CharacterDatabase.PQuery("SELECT leaderGuid FROM group_member WHERE memberGuid='%u'", GetGUIDLow());
@@ -15731,7 +15737,6 @@ void Player::SaveToDB()
     _SaveInventory();
     _SaveQuestStatus();
     _SaveDailyQuestStatus();
-    _SaveTutorials();
     _SaveSpells();
     _SaveSpellCooldowns();
     _SaveActions();
@@ -16049,33 +16054,6 @@ void Player::_SaveSpells()
         }
 
     }
-}
-
-void Player::_SaveTutorials()
-{
-    if(!m_TutorialsChanged)
-        return;
-
-    uint32 Rows=0;
-    // it's better than rebuilding indexes multiple times
-    QueryResult *result = CharacterDatabase.PQuery("SELECT count(*) AS r FROM character_tutorial WHERE account = '%u' AND realmid = '%u'", GetSession()->GetAccountId(), realmID );
-    if(result)
-    {
-        Rows = result->Fetch()[0].GetUInt32();
-        delete result;
-    }
-
-    if (Rows)
-    {
-        CharacterDatabase.PExecute("UPDATE character_tutorial SET tut0='%u', tut1='%u', tut2='%u', tut3='%u', tut4='%u', tut5='%u', tut6='%u', tut7='%u' WHERE account = '%u' AND realmid = '%u'",
-            m_Tutorials[0], m_Tutorials[1], m_Tutorials[2], m_Tutorials[3], m_Tutorials[4], m_Tutorials[5], m_Tutorials[6], m_Tutorials[7], GetSession()->GetAccountId(), realmID );
-    }
-    else
-    {
-        CharacterDatabase.PExecute("INSERT INTO character_tutorial (account,realmid,tut0,tut1,tut2,tut3,tut4,tut5,tut6,tut7) VALUES ('%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u')", GetSession()->GetAccountId(), realmID, m_Tutorials[0], m_Tutorials[1], m_Tutorials[2], m_Tutorials[3], m_Tutorials[4], m_Tutorials[5], m_Tutorials[6], m_Tutorials[7]);
-    };
-
-    m_TutorialsChanged = false;
 }
 
 void Player::outDebugValues() const
@@ -18085,12 +18063,6 @@ void Player::SendInitialPacketsBeforeAddToMap()
     // SMSG_SET_PROFICIENCY
     // SMSG_UPDATE_AURA_DURATION
 
-    // tutorial stuff
-    /*data.Initialize(SMSG_TUTORIAL_FLAGS, 8*4);
-    for (int i = 0; i < 8; ++i)
-        data << uint32( GetTutorialInt(i) );
-    GetSession()->SendPacket(&data);*/
-
     SendTalentsInfoData(false);
     SendInitialSpells();
 
@@ -18104,28 +18076,23 @@ void Player::SendInitialPacketsBeforeAddToMap()
     m_achievementMgr.SendAllAchievementData();
     UpdateZone(GetZoneId());
 
-    // equipment manager!
     data.Initialize(SMSG_EQUIPMENT_SET_LIST);
-    data << uint32(0);                                      // count
-    /*for(count)
+    data << uint32(m_EquipmentSets.size());                 // count
+    for(EquipmentSets::iterator itr = m_EquipmentSets.begin(); itr != m_EquipmentSets.end(); ++itr)
     {
-        data << uint8(0);                                   // PGUID, equipment set guid?
-        data << uint32(0);                                  // counter(0,1,...)?
-        data << uint8(0);                                   // string set name
-        data << uint8(0);                                   // string icon name
+        data.appendPackGUID(itr->second.Guid);
+        data << uint32(itr->second.Index);
+        data << itr->second.Name;
+        data << itr->second.IconName;
         for(uint32 i = 0; i < EQUIPMENT_SLOT_END; ++i)
-            data << uint8(0);                               // item GUID?
-    }*/
+            data.appendPackGUID(MAKE_NEW_GUID(itr->second.Items[i], 0, HIGHGUID_ITEM));
+    }
     GetSession()->SendPacket(&data);
 
     data.Initialize(SMSG_LOGIN_SETTIMESPEED, 8);
     data << uint32(secsToTimeBitFields(sWorld.GetGameTime()));
     data << (float)0.01666667f;                             // game speed
     GetSession()->SendPacket( &data );
-
-    data.Initialize(SMSG_TIME_SYNC_REQ, 4);                 // new 2.0.x, enable movement
-    data << uint32(0x00000000);                             // on blizz it increments periodically
-    GetSession()->SendPacket(&data);
 
     // set fly flag if in fly form or taxi flight to prevent visually drop at ground in showup moment
     if(HasAuraType(SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED) || isInFlight())
@@ -19957,4 +19924,40 @@ void Player::LearnPetTalent(uint64 petGuid, uint32 talentId, uint32 talentRank)
     // learn! (other talent ranks will unlearned at learning)
     pet->learnSpell(spellid);
     sLog.outDetail("TalentID: %u Rank: %u Spell: %u\n", talentId, talentRank, spellid);
+}
+
+void Player::SaveEquipmentSet(EquipmentSet eqset)
+{
+    if(m_EquipmentSets.size() >= 10)                        // client limit
+        return;
+
+    EquipmentSets::iterator itr = m_EquipmentSets.find(eqset.Index);
+    if(itr != m_EquipmentSets.end())
+    {
+        CharacterDatabase.PExecute("UPDATE character_equipmentsets SET name='%s', iconname='%s', item0='%u', item1='%u', item2='%u', item3='%u', item4='%u', item5='%u', item6='%u', item7='%u', item8='%u', item9='%u', item10='%u', item11='%u', item12='%u', item13='%u', item14='%u', item15='%u', item16='%u', item17='%u', item18='%u' WHERE guid='%u' AND setguid='"I64FMTD"' AND setindex='%u'",
+            eqset.Name.c_str(), eqset.IconName.c_str(), eqset.Items[0], eqset.Items[1], eqset.Items[2], eqset.Items[3], eqset.Items[4], eqset.Items[5], eqset.Items[6], eqset.Items[7],
+            eqset.Items[8], eqset.Items[9], eqset.Items[10], eqset.Items[11], eqset.Items[12], eqset.Items[13], eqset.Items[14], eqset.Items[15], eqset.Items[16], eqset.Items[17], eqset.Items[18], GetGUIDLow(), eqset.Guid, eqset.Index);
+    }
+    else
+    {
+        CharacterDatabase.PExecute("INSERT INTO character_equipmentsets VALUES ('%u', '"I64FMTD"', '%u', '%s', '%s', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u')", 
+            GetGUIDLow(), eqset.Guid, eqset.Index, eqset.Name.c_str(), eqset.IconName.c_str(), eqset.Items[0], eqset.Items[1], eqset.Items[2], eqset.Items[3], eqset.Items[4], eqset.Items[5], eqset.Items[6], eqset.Items[7],
+            eqset.Items[8], eqset.Items[9], eqset.Items[10], eqset.Items[11], eqset.Items[12], eqset.Items[13], eqset.Items[14], eqset.Items[15], eqset.Items[16], eqset.Items[17], eqset.Items[18]);
+    }
+
+    m_EquipmentSets[eqset.Index] = eqset;
+}
+
+void Player::DeleteEquipmentSet(uint64 setGuid)
+{
+    CharacterDatabase.PExecute("DELETE FROM character_equipmentsets WHERE setguid="I64FMTD, setGuid);
+
+    for(EquipmentSets::iterator itr = m_EquipmentSets.begin(); itr != m_EquipmentSets.end(); ++itr)
+    {
+        if(itr->second.Guid == setGuid)
+        {
+            m_EquipmentSets.erase(itr);
+            break;
+        }
+    }
 }

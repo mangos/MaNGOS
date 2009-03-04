@@ -145,6 +145,7 @@ struct ActionButton
 enum ActionButtonType
 {
     ACTION_BUTTON_SPELL = 0,
+    ACTION_BUTTON_EQSET = 32,
     ACTION_BUTTON_MACRO = 64,
     ACTION_BUTTON_CMACRO= 65,
     ACTION_BUTTON_ITEM  = 128
@@ -702,6 +703,17 @@ enum QuestBagSlots
     QUESTBAG_SLOT_END           = 200
 };
 
+struct EquipmentSet
+{
+    uint64 Guid;
+    uint32 Index;
+    std::string Name;
+    std::string IconName;
+    uint32 Items[EQUIPMENT_SLOT_END];
+};
+
+typedef std::map<uint32, EquipmentSet> EquipmentSets;
+
 struct ItemPosCount
 {
     ItemPosCount(uint16 _pos, uint32 _count) : pos(_pos), count(_count) {}
@@ -833,23 +845,22 @@ enum PlayerLoginQueryIndex
     PLAYER_LOGIN_QUERY_LOADSPELLS               = 4,
     PLAYER_LOGIN_QUERY_LOADQUESTSTATUS          = 5,
     PLAYER_LOGIN_QUERY_LOADDAILYQUESTSTATUS     = 6,
-    PLAYER_LOGIN_QUERY_LOADTUTORIALS            = 7,        // common for all characters for some account at specific realm
-    PLAYER_LOGIN_QUERY_LOADREPUTATION           = 8,
-    PLAYER_LOGIN_QUERY_LOADINVENTORY            = 9,
-    PLAYER_LOGIN_QUERY_LOADACTIONS              = 10,
-    PLAYER_LOGIN_QUERY_LOADMAILCOUNT            = 11,
-    PLAYER_LOGIN_QUERY_LOADMAILDATE             = 12,
-    PLAYER_LOGIN_QUERY_LOADSOCIALLIST           = 13,
-    PLAYER_LOGIN_QUERY_LOADHOMEBIND             = 14,
-    PLAYER_LOGIN_QUERY_LOADSPELLCOOLDOWNS       = 15,
-    PLAYER_LOGIN_QUERY_LOADDECLINEDNAMES        = 16,
-    PLAYER_LOGIN_QUERY_LOADGUILD                = 17,
-    PLAYER_LOGIN_QUERY_LOADARENAINFO            = 18,
-    PLAYER_LOGIN_QUERY_LOADACHIEVEMENTS         = 19,
-    PLAYER_LOGIN_QUERY_LOADCRITERIAPROGRESS     = 20,
+    PLAYER_LOGIN_QUERY_LOADREPUTATION           = 7,
+    PLAYER_LOGIN_QUERY_LOADINVENTORY            = 8,
+    PLAYER_LOGIN_QUERY_LOADACTIONS              = 9,
+    PLAYER_LOGIN_QUERY_LOADMAILCOUNT            = 10,
+    PLAYER_LOGIN_QUERY_LOADMAILDATE             = 11,
+    PLAYER_LOGIN_QUERY_LOADSOCIALLIST           = 12,
+    PLAYER_LOGIN_QUERY_LOADHOMEBIND             = 13,
+    PLAYER_LOGIN_QUERY_LOADSPELLCOOLDOWNS       = 14,
+    PLAYER_LOGIN_QUERY_LOADDECLINEDNAMES        = 15,
+    PLAYER_LOGIN_QUERY_LOADGUILD                = 16,
+    PLAYER_LOGIN_QUERY_LOADARENAINFO            = 17,
+    PLAYER_LOGIN_QUERY_LOADACHIEVEMENTS         = 18,
+    PLAYER_LOGIN_QUERY_LOADCRITERIAPROGRESS     = 19,
+    PLAYER_LOGIN_QUERY_LOADEQUIPMENTSETS        = 20,
     MAX_PLAYER_LOGIN_QUERY                      = 21
 };
-
 
 // Player summoning auto-decline time (in secs)
 #define MAX_PLAYER_SUMMON_DELAY                   (2*MINUTE)
@@ -1363,22 +1374,6 @@ class MANGOS_DLL_SPEC Player : public Unit
             MoneyChanged( value );
         }
 
-        uint32 GetTutorialInt(uint32 intId )
-        {
-            ASSERT( (intId < 8) );
-            return m_Tutorials[intId];
-        }
-
-        void SetTutorialInt(uint32 intId, uint32 value)
-        {
-            ASSERT( (intId < 8) );
-            if(m_Tutorials[intId]!=value)
-            {
-                m_Tutorials[intId] = value;
-                m_TutorialsChanged = true;
-            }
-        }
-
         QuestStatusMap& getQuestStatusMap() { return mQuestStatus; };
 
         const uint64& GetSelection( ) const { return m_curSelection; }
@@ -1856,6 +1851,9 @@ class MANGOS_DLL_SPEC Player : public Unit
         void CastItemCombatSpell(Item *item,Unit* Target, WeaponAttackType attType);
         void CastItemUseSpell(Item *item,SpellCastTargets const& targets,uint8 cast_count, uint32 glyphIndex);
 
+        void SaveEquipmentSet(EquipmentSet eqset);
+        void DeleteEquipmentSet(uint64 setGuid);
+
         void SendInitWorldStates();
         void SendUpdateWorldState(uint32 Field, uint32 Value);
         void SendDirectMessage(WorldPacket *data);
@@ -2210,11 +2208,11 @@ class MANGOS_DLL_SPEC Player : public Unit
         void _LoadReputation(QueryResult *result);
         void _LoadSkills();
         void _LoadSpells(QueryResult *result);
-        void _LoadTutorials(QueryResult *result);
         void _LoadFriendList(QueryResult *result);
         bool _LoadHomeBind(QueryResult *result);
         void _LoadDeclinedNames(QueryResult *result);
         void _LoadArenaTeamInfo(QueryResult *result);
+        void _LoadEquipmentSets(QueryResult *result);
 
         /*********************************************************/
         /***                   SAVE SYSTEM                     ***/
@@ -2228,7 +2226,6 @@ class MANGOS_DLL_SPEC Player : public Unit
         void _SaveDailyQuestStatus();
         void _SaveReputation();
         void _SaveSpells();
-        void _SaveTutorials();
 
         void _SetCreateBits(UpdateMask *updateMask, Player *target) const;
         void _SetUpdateBits(UpdateMask *updateMask, Player *target) const;
@@ -2318,9 +2315,6 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         time_t m_nextThinkTime;
 
-        uint32 m_Tutorials[8];
-        bool   m_TutorialsChanged;
-
         bool   m_DailyQuestChanged;
         time_t m_lastDailyQuestTime;
 
@@ -2394,6 +2388,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         DeclinedName *m_declinedname;
         Runes *m_runes;
         AchievementMgr m_achievementMgr;
+        EquipmentSets m_EquipmentSets;
     private:
         // internal common parts for CanStore/StoreItem functions
         uint8 _CanStoreItem_InSpecificSlot( uint8 bag, uint8 slot, ItemPosCountVec& dest, ItemPrototype const *pProto, uint32& count, bool swap, Item *pSrcItem ) const;

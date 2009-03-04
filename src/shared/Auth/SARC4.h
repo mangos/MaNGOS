@@ -16,31 +16,23 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef _AUTH_HMAC_H
-#define _AUTH_HMAC_H
+#ifndef _AUTH_SARC4_H
+#define _AUTH_SARC4_H
 
 #include "Common.h"
-#include <openssl/hmac.h>
+#include <openssl/rc4.h>
 #include <openssl/sha.h>
 
 class BigNumber;
 
 #define SEED_KEY_SIZE 16
 
-class HmacHash
+class SARC4
 {
     public:
-        HmacHash(uint32 len, uint8 *seed);
-        ~HmacHash();
-        void UpdateBigNumber(BigNumber *bn);
-        void UpdateData(const uint8 *data, int length);
-        void Initialize();
-        void Finalize();
-        uint8 *GetDigest() { return m_digest; };
-        int GetLength() { return SHA_DIGEST_LENGTH; };
+        void Init(uint32 len, uint8 *seed);
+        void Process(uint32 len, uint8 *indata, uint8 *outdata);
     private:
-        HMAC_CTX m_ctx;
-        uint8 m_key[SEED_KEY_SIZE];
-        uint8 m_digest[SHA_DIGEST_LENGTH];
+        RC4_KEY m_rc4_key;
 };
 #endif

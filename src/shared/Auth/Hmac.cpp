@@ -19,10 +19,11 @@
 #include "Auth/Hmac.h"
 #include "BigNumber.h"
 
-HmacHash::HmacHash()
+HmacHash::HmacHash(uint32 len, uint8 *seed)
 {
-    uint8 temp[SEED_KEY_SIZE] = { 0x38, 0xA7, 0x83, 0x15, 0xF8, 0x92, 0x25, 0x30, 0x71, 0x98, 0x67, 0xB1, 0x8C, 0x4, 0xE2, 0xAA };
-    memcpy(&m_key, &temp, SEED_KEY_SIZE);
+    ASSERT(len == SEED_KEY_SIZE);
+
+    memcpy(&m_key, seed, len);
     HMAC_CTX_init(&m_ctx);
     HMAC_Init_ex(&m_ctx, &m_key, SEED_KEY_SIZE, EVP_sha1(), NULL);
 }
