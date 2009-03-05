@@ -19864,7 +19864,10 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank, bool skipPrevRanks)
     sLog.outDetail("TalentID: %u Rank: %u Spell: %u\n", talentId, talentRank, spellid);
 
     // update free talent points
-    SetFreeTalentPoints(CurTalentPoints - 1);
+    if(skipPrevRanks)
+        SetFreeTalentPoints(CurTalentPoints - (talentRank + 1));
+    else
+        SetFreeTalentPoints(CurTalentPoints - 1);
 }
 
 void Player::LearnPetTalent(uint64 petGuid, uint32 talentId, uint32 talentRank, bool skipPrevRanks)
@@ -19986,6 +19989,12 @@ void Player::LearnPetTalent(uint64 petGuid, uint32 talentId, uint32 talentRank, 
     // learn! (other talent ranks will unlearned at learning)
     pet->learnSpell(spellid);
     sLog.outDetail("TalentID: %u Rank: %u Spell: %u\n", talentId, talentRank, spellid);
+
+    // update free talent points
+    if(skipPrevRanks)
+        pet->SetFreeTalentPoints(CurTalentPoints - (talentRank + 1));
+    else
+        pet->SetFreeTalentPoints(CurTalentPoints - 1);
 }
 
 void Player::SendEquipmentSetList()
