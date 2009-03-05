@@ -1244,7 +1244,7 @@ OpcodeHandler opcodeTable[NUM_MSG_TYPES] =
     /*0x4BF*/ { "SMSG_UNKNOWN_1215",                            STATUS_NEVER,    &WorldSession::Handle_ServerSide               },
     /*0x4C0*/ { "SMSG_TALENTS_INFO",                            STATUS_NEVER,    &WorldSession::Handle_ServerSide               },
     /*0x4C1*/ { "CMSG_LEARN_PREVIEW_TALENTS",                   STATUS_LOGGEDIN, &WorldSession::HandleLearnPreviewTalents       },
-    /*0x4C2*/ { "CMSG_LEARN_PREVIEW_TALENTS_PET",               STATUS_NEVER,    &WorldSession::Handle_NULL                     },
+    /*0x4C2*/ { "CMSG_LEARN_PREVIEW_TALENTS_PET",               STATUS_LOGGEDIN, &WorldSession::HandleLearnPreviewTalentsPet    },
     /*0x4C3*/ { "UMSG_UNKNOWN_1219",                            STATUS_NEVER,    &WorldSession::Handle_NULL                     },
     /*0x4C4*/ { "UMSG_UNKNOWN_1220",                            STATUS_NEVER,    &WorldSession::Handle_NULL                     },
     /*0x4C5*/ { "UMSG_UNKNOWN_1221",                            STATUS_NEVER,    &WorldSession::Handle_NULL                     },

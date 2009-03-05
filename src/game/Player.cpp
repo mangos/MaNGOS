@@ -18080,25 +18080,7 @@ void Player::SendInitialPacketsBeforeAddToMap()
     m_achievementMgr.SendAllAchievementData();
     UpdateZone(GetZoneId());
 
-    uint32 count = 0;
-    data.Initialize(SMSG_EQUIPMENT_SET_LIST, 4);
-    size_t count_pos = data.wpos();
-    data << uint32(count);                                  // count placeholder
-    for(EquipmentSets::iterator itr = m_EquipmentSets.begin(); itr != m_EquipmentSets.end(); ++itr)
-    {
-        if(itr->second.state==EQUIPMENT_SET_DELETED)
-            continue;
-        data.appendPackGUID(itr->second.Guid);
-        data << uint32(itr->first);
-        data << itr->second.Name;
-        data << itr->second.IconName;
-        for(uint32 i = 0; i < EQUIPMENT_SLOT_END; ++i)
-            data.appendPackGUID(MAKE_NEW_GUID(itr->second.Items[i], 0, HIGHGUID_ITEM));
-
-        ++count;                                            // client have limit but it checked at loading and set
-    }
-    data.put<uint32>(count_pos,count);
-    GetSession()->SendPacket(&data);
+    SendEquipmentSetList();
 
     data.Initialize(SMSG_LOGIN_SETTIMESPEED, 8);
     data << uint32(secsToTimeBitFields(sWorld.GetGameTime()));
@@ -19669,19 +19651,80 @@ void Player::BuildPlayerTalentsInfoData(WorldPacket *data)
 
 void Player::BuildPetTalentsInfoData(WorldPacket *data)
 {
-    *data << uint32(0);                                     // unspentTalentPoints
-    *data << uint8(0);                                      // talentCount
-    /*for(talentCount)
+    uint32 unspentTalentPoints = 0;
+    size_t pointsPos = data->wpos();
+    *data << uint32(unspentTalentPoints);                   // [PH], unspentTalentPoints
+
+    uint8 talentIdCount = 0;
+    size_t countPos = data->wpos();
+    *data << uint8(talentIdCount);                          // [PH], talentIdCount
+
+    Pet *pet = GetPet();
+    if(!pet)
+        return;
+
+    unspentTalentPoints = pet->GetFreeTalentPoints();
+
+    data->put<uint32>(pointsPos, unspentTalentPoints);      // put real points
+
+    CreatureInfo const *ci = pet->GetCreatureInfo();
+    if(!ci)
+        return;
+
+    CreatureFamilyEntry const *pet_family = sCreatureFamilyStore.LookupEntry(ci->family);
+    if(!pet_family || pet_family->petTalentType < 0)
+        return;
+
+    for(uint32 talentTabId = 1; talentTabId < sTalentTabStore.GetNumRows(); ++talentTabId)
     {
-        *data << uint32(0);                                 // Talent.dbc
-        *data << uint8(0);                                  // maxRank
-    }*/
+        TalentTabEntry const *talentTabInfo = sTalentTabStore.LookupEntry( talentTabId );
+        if(!talentTabInfo)
+            continue;
+
+        if(!((1 << pet_family->petTalentType) & talentTabInfo->petTalentMask))
+            continue;
+
+        for(uint32 talentId = 0; talentId < sTalentStore.GetNumRows(); ++talentId)
+        {
+            TalentEntry const* talentInfo = sTalentStore.LookupEntry(talentId);
+            if(!talentInfo)
+                continue;
+
+            // skip another tab talents
+            if(talentInfo->TalentTab != talentTabId)
+                continue;
+
+            // find max talent rank
+            int32 curtalent_maxrank = -1;
+            for(int32 k = 4; k > -1; --k)
+            {
+                if(talentInfo->RankID[k] && pet->HasSpell(talentInfo->RankID[k]))
+                {
+                    curtalent_maxrank = k;
+                    break;
+                }
+            }
+
+            // not learned talent
+            if(curtalent_maxrank < 0)
+                continue;
+
+            *data << uint32(talentInfo->TalentID);          // Talent.dbc
+            *data << uint8(curtalent_maxrank);              // talentMaxRank (0-4)
+
+            ++talentIdCount;
+        }
+
+        data->put<uint8>(countPos, talentIdCount);          // put real count
+
+        break;
+    }
 }
 
 void Player::SendTalentsInfoData(bool pet)
 {
     WorldPacket data(SMSG_TALENTS_INFO, 50);
-    data << uint8(pet);
+    data << uint8(pet ? 1 : 0);
     if(pet)
         BuildPetTalentsInfoData(&data);
     else
@@ -19721,7 +19764,7 @@ void Player::BuildEnchantmentsInfoData(WorldPacket *data)
     }
 }
 
-void Player::LearnTalent(uint32 talentId, uint32 talentRank)
+void Player::LearnTalent(uint32 talentId, uint32 talentRank, bool skipPrevRanks)
 {
     uint32 CurTalentPoints = GetFreeTalentPoints();
 
@@ -19745,8 +19788,12 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank)
     if( (getClassMask() & talentTabInfo->ClassMask) == 0 )
         return;
 
+    // check for LearnPreviewTalents case
+    if(skipPrevRanks && (CurTalentPoints < (talentRank + 1)))
+        return;
+
     // prevent skip talent ranks (cheating)
-    if(talentRank > 0 && !HasSpell(talentInfo->RankID[talentRank-1]))
+    if(talentRank > 0 && !HasSpell(talentInfo->RankID[talentRank-1]) && !skipPrevRanks)
         return;
 
     // Check if it requires another talent
@@ -19820,7 +19867,7 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank)
     SetFreeTalentPoints(CurTalentPoints - 1);
 }
 
-void Player::LearnPetTalent(uint64 petGuid, uint32 talentId, uint32 talentRank)
+void Player::LearnPetTalent(uint64 petGuid, uint32 talentId, uint32 talentRank, bool skipPrevRanks)
 {
     Pet *pet = GetPet();
 
@@ -19865,8 +19912,12 @@ void Player::LearnPetTalent(uint64 petGuid, uint32 talentId, uint32 talentRank)
     if(!((1 << pet_family->petTalentType) & talentTabInfo->petTalentMask))
         return;
 
+    // check for LearnPreviewTalents case
+    if(skipPrevRanks && (CurTalentPoints < (talentRank + 1)))
+        return;
+
     // prevent skip talent ranks (cheating)
-    if(talentRank > 0 && !pet->HasSpell(talentInfo->RankID[talentRank-1]))
+    if(talentRank > 0 && !pet->HasSpell(talentInfo->RankID[talentRank-1]) && !skipPrevRanks)
         return;
 
     // Check if it requires another talent
@@ -19935,6 +19986,29 @@ void Player::LearnPetTalent(uint64 petGuid, uint32 talentId, uint32 talentRank)
     // learn! (other talent ranks will unlearned at learning)
     pet->learnSpell(spellid);
     sLog.outDetail("TalentID: %u Rank: %u Spell: %u\n", talentId, talentRank, spellid);
+}
+
+void Player::SendEquipmentSetList()
+{
+    uint32 count = 0;
+    WorldPacket data(SMSG_EQUIPMENT_SET_LIST, 4);
+    size_t count_pos = data.wpos();
+    data << uint32(count);                                  // count placeholder
+    for(EquipmentSets::iterator itr = m_EquipmentSets.begin(); itr != m_EquipmentSets.end(); ++itr)
+    {
+        if(itr->second.state==EQUIPMENT_SET_DELETED)
+            continue;
+        data.appendPackGUID(itr->second.Guid);
+        data << uint32(itr->first);
+        data << itr->second.Name;
+        data << itr->second.IconName;
+        for(uint32 i = 0; i < EQUIPMENT_SLOT_END; ++i)
+            data.appendPackGUID(MAKE_NEW_GUID(itr->second.Items[i], 0, HIGHGUID_ITEM));
+
+        ++count;                                            // client have limit but it checked at loading and set
+    }
+    data.put<uint32>(count_pos,count);
+    GetSession()->SendPacket(&data);
 }
 
 void Player::SetEquipmentSet(uint32 index, EquipmentSet eqset)

@@ -41,7 +41,7 @@ void WorldSession::HandleLearnTalentOpcode( WorldPacket & recv_data )
 
 void WorldSession::HandleLearnPreviewTalents(WorldPacket& recvPacket)
 {
-    sLog.outDebug("CMSG_UNKNOWN_1217");
+    sLog.outDebug("CMSG_LEARN_PREVIEW_TALENTS");
 
     CHECK_PACKET_SIZE(recvPacket, 4);
 
@@ -56,7 +56,7 @@ void WorldSession::HandleLearnPreviewTalents(WorldPacket& recvPacket)
         
         recvPacket >> talentId >> talentRank;
 
-        _player->LearnTalent(talentId, talentRank);
+        _player->LearnTalent(talentId, talentRank, true);
     }
 
     _player->SendTalentsInfoData(false);
