@@ -189,8 +189,8 @@ void WorldSession::HandleCreatureQueryOpcode( WorldPacket & recv_data )
         data << (uint32)ci->DisplayID_H;                    // modelid_female1 ?
         data << (uint32)ci->DisplayID_A2;                   // modelid_male2 ?
         data << (uint32)ci->DisplayID_H2;                   // modelid_femmale2 ?
-        data << (float)1.0f;                                // unk
-        data << (float)1.0f;                                // unk
+        data << (float)ci->unk16;                           // unk
+        data << (float)ci->unk17;                           // unk
         data << (uint8)ci->RacialLeader;
         SendPacket( &data );
         sLog.outDebug(  "WORLD: Sent SMSG_CREATURE_QUERY_RESPONSE " );
