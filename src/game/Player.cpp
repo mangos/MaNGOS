@@ -19764,7 +19764,7 @@ void Player::BuildEnchantmentsInfoData(WorldPacket *data)
     }
 }
 
-void Player::LearnTalent(uint32 talentId, uint32 talentRank, bool skipPrevRanks)
+void Player::LearnTalent(uint32 talentId, uint32 talentRank)
 {
     uint32 CurTalentPoints = GetFreeTalentPoints();
 
@@ -19788,12 +19788,23 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank, bool skipPrevRanks)
     if( (getClassMask() & talentTabInfo->ClassMask) == 0 )
         return;
 
-    // check for LearnPreviewTalents case
-    if(skipPrevRanks && (CurTalentPoints < (talentRank + 1)))
+    // find current max talent rank
+    int32 curtalent_maxrank = 0;
+    for(int32 k = 4; k > -1; --k)
+    {
+        if(talentInfo->RankID[k] && HasSpell(talentInfo->RankID[k]))
+        {
+            curtalent_maxrank = k + 1;
+            break;
+        }
+    }
+
+    // we already have same or higher talent rank learned
+    if(curtalent_maxrank >= (talentRank + 1))
         return;
 
-    // prevent skip talent ranks (cheating)
-    if(talentRank > 0 && !HasSpell(talentInfo->RankID[talentRank-1]) && !skipPrevRanks)
+    // check if we have enough talent points
+    if(CurTalentPoints < (talentRank - curtalent_maxrank + 1))
         return;
 
     // Check if it requires another talent
@@ -19864,13 +19875,10 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank, bool skipPrevRanks)
     sLog.outDetail("TalentID: %u Rank: %u Spell: %u\n", talentId, talentRank, spellid);
 
     // update free talent points
-    if(skipPrevRanks)
-        SetFreeTalentPoints(CurTalentPoints - (talentRank + 1));
-    else
-        SetFreeTalentPoints(CurTalentPoints - 1);
+    SetFreeTalentPoints(CurTalentPoints - (talentRank - curtalent_maxrank + 1));
 }
 
-void Player::LearnPetTalent(uint64 petGuid, uint32 talentId, uint32 talentRank, bool skipPrevRanks)
+void Player::LearnPetTalent(uint64 petGuid, uint32 talentId, uint32 talentRank)
 {
     Pet *pet = GetPet();
 
@@ -19880,7 +19888,7 @@ void Player::LearnPetTalent(uint64 petGuid, uint32 talentId, uint32 talentRank, 
     if(petGuid != pet->GetGUID())
         return;
 
-    uint32 CurTalentPoints =  pet->GetFreeTalentPoints();
+    uint32 CurTalentPoints = pet->GetFreeTalentPoints();
 
     if(CurTalentPoints == 0)
         return;
@@ -19915,12 +19923,23 @@ void Player::LearnPetTalent(uint64 petGuid, uint32 talentId, uint32 talentRank, 
     if(!((1 << pet_family->petTalentType) & talentTabInfo->petTalentMask))
         return;
 
-    // check for LearnPreviewTalents case
-    if(skipPrevRanks && (CurTalentPoints < (talentRank + 1)))
+    // find current max talent rank
+    int32 curtalent_maxrank = 0;
+    for(int32 k = 4; k > -1; --k)
+    {
+        if(talentInfo->RankID[k] && pet->HasSpell(talentInfo->RankID[k]))
+        {
+            curtalent_maxrank = k + 1;
+            break;
+        }
+    }
+
+    // we already have same or higher talent rank learned
+    if(curtalent_maxrank >= (talentRank + 1))
         return;
 
-    // prevent skip talent ranks (cheating)
-    if(talentRank > 0 && !pet->HasSpell(talentInfo->RankID[talentRank-1]) && !skipPrevRanks)
+    // check if we have enough talent points
+    if(CurTalentPoints < (talentRank - curtalent_maxrank + 1))
         return;
 
     // Check if it requires another talent
@@ -19991,10 +20010,7 @@ void Player::LearnPetTalent(uint64 petGuid, uint32 talentId, uint32 talentRank, 
     sLog.outDetail("TalentID: %u Rank: %u Spell: %u\n", talentId, talentRank, spellid);
 
     // update free talent points
-    if(skipPrevRanks)
-        pet->SetFreeTalentPoints(CurTalentPoints - (talentRank + 1));
-    else
-        pet->SetFreeTalentPoints(CurTalentPoints - 1);
+    pet->SetFreeTalentPoints(CurTalentPoints - (talentRank - curtalent_maxrank + 1));
 }
 
 void Player::SendEquipmentSetList()

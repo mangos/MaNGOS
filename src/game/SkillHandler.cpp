@@ -56,7 +56,7 @@ void WorldSession::HandleLearnPreviewTalents(WorldPacket& recvPacket)
         
         recvPacket >> talentId >> talentRank;
 
-        _player->LearnTalent(talentId, talentRank, true);
+        _player->LearnTalent(talentId, talentRank);
     }
 
     _player->SendTalentsInfoData(false);

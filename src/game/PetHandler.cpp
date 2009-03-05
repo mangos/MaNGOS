@@ -693,7 +693,7 @@ void WorldSession::HandleLearnPreviewTalentsPet( WorldPacket & recv_data )
 
         recv_data >> talentId >> talentRank;
 
-        _player->LearnPetTalent(guid, talentId, talentRank, true);
+        _player->LearnPetTalent(guid, talentId, talentRank);
     }
 
     _player->SendTalentsInfoData(true);
