@@ -19,7 +19,6 @@
 #ifndef MANGOS_DESTINATIONHOLDERIMP_H
 #define MANGOS_DESTINATIONHOLDERIMP_H
 
-#include "Creature.h"
 #include "MapManager.h"
 #include "DestinationHolder.h"
 

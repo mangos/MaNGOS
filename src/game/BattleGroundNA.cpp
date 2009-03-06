@@ -20,7 +20,6 @@
 #include "Player.h"
 #include "BattleGround.h"
 #include "BattleGroundNA.h"
-#include "Creature.h"
 #include "ObjectMgr.h"
 #include "MapManager.h"
 #include "WorldPacket.h"
