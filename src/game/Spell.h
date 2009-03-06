@@ -204,7 +204,7 @@ enum SpellState
     SPELL_STATE_DELAYED   = 5
 };
 
-#define SPELL_SPELL_CHANNEL_UPDATE_INTERVAL 1000
+#define SPELL_SPELL_CHANNEL_UPDATE_INTERVAL (1*IN_MILISECONDS)
 
 typedef std::multimap<uint64, uint64> SpellTargetTimeMap;
 

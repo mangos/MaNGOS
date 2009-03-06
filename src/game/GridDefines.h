@@ -38,7 +38,7 @@ class Player;
 
 #define CENTER_GRID_OFFSET      (SIZE_OF_GRIDS/2)
 
-#define MIN_GRID_DELAY          MINUTE*1000
+#define MIN_GRID_DELAY          (MINUTE*IN_MILISECONDS)
 #define MIN_MAP_UPDATE_DELAY    50
 
 #define MAX_NUMBER_OF_CELLS     8

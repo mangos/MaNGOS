@@ -192,8 +192,8 @@ void WorldSession::HandleCreatureQueryOpcode( WorldPacket & recv_data )
         data << uint32(ci->DisplayID_A2);                   // modelid_male2 ?
         data << uint32(ci->DisplayID_H2);                   // modelid_femmale2 ?
         data << uint32(0);                                  // new in 3.1
-        data << float(1.0f);                                // unk
-        data << float(1.0f);                                // unk
+        data << float(ci->unk16);                           // unk
+        data << float(ci->unk17);                           // unk
         data << uint8(ci->RacialLeader);
         for(uint32 i = 0; i < 4; ++i)
             data << uint32(0);                              // added in 3.1

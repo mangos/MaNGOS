@@ -22,7 +22,7 @@
 DROP TABLE IF EXISTS `db_version`;
 CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
-  `required_7349_01_mangos_spell_area` bit(1) default NULL
+  `required_7382_01_mangos_creature_template` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -811,6 +811,8 @@ CREATE TABLE `creature_template` (
   `AIName` char(64) NOT NULL default '',
   `MovementType` tinyint(3) unsigned NOT NULL default '0',
   `InhabitType` tinyint(3) unsigned NOT NULL default '3',
+  `unk16` float NOT NULL default '1',
+  `unk17` float NOT NULL default '1',
   `RacialLeader` tinyint(3) unsigned NOT NULL default '0',
   `RegenHealth` tinyint(3) unsigned NOT NULL default '1',
   `equipment_id` mediumint(8) unsigned NOT NULL default '0',
@@ -827,7 +829,7 @@ CREATE TABLE `creature_template` (
 LOCK TABLES `creature_template` WRITE;
 /*!40000 ALTER TABLE `creature_template` DISABLE KEYS */;
 INSERT INTO `creature_template` VALUES
-(1,1,10045,0,10045,0,'Waypoint(Only GM can see it)','Visual',NULL,1,1,64,64,0,0,0,35,35,0,0.91,1,0,14,15,0,100,2000,2200,4096,0,0,0,0,0,0,1.76,2.42,100,8,5242886,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,'',0,3,0,1,0,0,0x82,'');
+(1,1,10045,0,10045,0,'Waypoint(Only GM can see it)','Visual',NULL,1,1,64,64,0,0,0,35,35,0,0.91,1,0,14,15,0,100,2000,2200,4096,0,0,0,0,0,0,1.76,2.42,100,8,5242886,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,'',0,3,1.0,1.0,0,1,0,0,0x82,'');
 /*!40000 ALTER TABLE `creature_template` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1470,36 +1472,6 @@ CREATE TABLE `instance_template` (
 
 LOCK TABLES `instance_template` WRITE;
 /*!40000 ALTER TABLE `instance_template` DISABLE KEYS */;
-INSERT INTO `instance_template` VALUES
-(33,0,22,30,10,10,7200,NULL,NULL,NULL,NULL,''),
-(34,0,24,32,10,10,7200,NULL,NULL,NULL,NULL,''),
-(36,0,15,20,10,10,7200,NULL,NULL,NULL,NULL,''),
-(43,0,15,21,10,10,7200,NULL,NULL,NULL,NULL,''),
-(47,0,29,38,10,10,7200,NULL,NULL,NULL,NULL,''),
-(48,0,24,32,10,10,7200,NULL,NULL,NULL,NULL,''),
-(70,0,35,47,10,10,7200,NULL,NULL,NULL,NULL,''),
-(90,0,29,38,10,10,7200,NULL,NULL,NULL,NULL,''),
-(109,0,45,55,10,10,7200,NULL,NULL,NULL,NULL,''),
-(129,0,37,46,10,10,7200,NULL,NULL,NULL,NULL,''),
-(189,0,34,45,10,10,7200,NULL,NULL,NULL,NULL,''),
-(209,0,44,54,10,10,7200,NULL,NULL,NULL,NULL,''),
-(229,0,58,0,10,10,120000,78.5083,-225.044,49.839,5.1,''),
-(230,0,52,0,5,5,7200,NULL,NULL,NULL,NULL,''),
-(249,0,60,0,40,40,432000,NULL,NULL,NULL,NULL,''),
-(289,0,57,0,5,5,7200,NULL,NULL,NULL,NULL,''),
-(309,0,60,0,20,20,259200,NULL,NULL,NULL,NULL,''),
-(329,0,58,60,5,5,7200,NULL,NULL,NULL,NULL,''),
-(349,0,46,55,10,10,7200,NULL,NULL,NULL,NULL,''),
-(389,0,13,18,10,10,7200,NULL,NULL,NULL,NULL,''),
-(409,0,60,0,40,40,604800,NULL,NULL,NULL,NULL,''),
-(429,0,55,60,5,5,7200,NULL,NULL,NULL,NULL,''),
-(469,0,60,0,40,40,604800,NULL,NULL,NULL,NULL,''),
-(509,0,60,0,20,20,259200,NULL,NULL,NULL,NULL,''),
-(531,0,60,0,40,40,604800,NULL,NULL,NULL,NULL,''),
-(533,0,80,0,10,25,0,NULL,NULL,NULL,NULL,''),
-(615,0,80,0,10,25,0,NULL,NULL,NULL,NULL,''),
-(616,0,80,0,10,25,0,NULL,NULL,NULL,NULL,''),
-(624,0,80,0,10,25,0,NULL,NULL,NULL,NULL,'');
 /*!40000 ALTER TABLE `instance_template` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -13047,10 +13019,6 @@ CREATE TABLE `quest_template` (
   `ReqSourceCount2` smallint(5) unsigned NOT NULL default '0',
   `ReqSourceCount3` smallint(5) unsigned NOT NULL default '0',
   `ReqSourceCount4` smallint(5) unsigned NOT NULL default '0',
-  `ReqSourceRef1` tinyint(3) unsigned NOT NULL default '0',
-  `ReqSourceRef2` tinyint(3) unsigned NOT NULL default '0',
-  `ReqSourceRef3` tinyint(3) unsigned NOT NULL default '0',
-  `ReqSourceRef4` tinyint(3) unsigned NOT NULL default '0',
   `ReqCreatureOrGOId1` mediumint(9) NOT NULL default '0',
   `ReqCreatureOrGOId2` mediumint(9) NOT NULL default '0',
   `ReqCreatureOrGOId3` mediumint(9) NOT NULL default '0',
@@ -13299,7 +13267,7 @@ CREATE TABLE `spell_area` (
   `quest_start`        mediumint(8) unsigned NOT NULL default '0',
   `quest_start_active` tinyint(1) unsigned NOT NULL default '0',
   `quest_end`          mediumint(8) unsigned NOT NULL default '0',
-  `aura_spell`         mediumint(8) unsigned NOT NULL default '0',
+  `aura_spell`         mediumint(8) NOT NULL default '0',
   `racemask`           mediumint(8) unsigned NOT NULL default '0',
   `gender`             tinyint(1) unsigned NOT NULL default '2',
   `autocast`           tinyint(1) unsigned NOT NULL default '0',

@@ -24,8 +24,8 @@
 class BattleGround;
 
 #define EY_MAX_TEAM_SCORE         2000
-#define BG_EY_FLAG_RESPAWN_TIME   10000                     //10 seconds
-#define BG_EY_FPOINTS_TICK_TIME   2000                      //2 seconds
+#define BG_EY_FLAG_RESPAWN_TIME   (10*IN_MILISECONDS)       //10 seconds
+#define BG_EY_FPOINTS_TICK_TIME   (2*IN_MILISECONDS)        //2 seconds
 
 enum BG_EY_WorldStates
 {
@@ -315,7 +315,7 @@ class BattleGroundEY : public BattleGround
         void HandleBuffUse(uint64 const& buff_guid);
         void HandleAreaTrigger(Player *Source, uint32 Trigger);
         void HandleKillPlayer(Player *player, Player *killer);
-        virtual WorldSafeLocsEntry const* GetClosestGraveYard(float x, float y, float z, uint32 team);
+        virtual WorldSafeLocsEntry const* GetClosestGraveYard(Player* player);
         virtual bool SetupBattleGround();
         virtual void Reset();
         void UpdateTeamScore(uint32 Team);

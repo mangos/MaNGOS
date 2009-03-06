@@ -36,7 +36,7 @@ BattleGround::BattleGround()
 {
     m_TypeID            = BattleGroundTypeId(0);
     m_InstanceID        = 0;
-    m_Status            = 0;
+    m_Status            = STATUS_NONE;
     m_EndTime           = 0;
     m_LastResurrectTime = 0;
     m_QueueId           = QUEUE_ID_MAX_LEVEL_19;
@@ -1513,4 +1513,9 @@ void BattleGround::SetBgRaid( uint32 TeamID, Group *bg_raid )
     if(old_raid) old_raid->SetBattlegroundGroup(NULL);
     if(bg_raid) bg_raid->SetBattlegroundGroup(this);
     old_raid = bg_raid;
+}
+
+WorldSafeLocsEntry const* BattleGround::GetClosestGraveYard( Player* player )
+{
+    return objmgr.GetClosestGraveYard( player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetMapId(), player->GetTeam() );
 }

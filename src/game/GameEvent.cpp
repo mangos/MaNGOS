@@ -447,7 +447,7 @@ uint32 GameEvent::Update()                                  // return the next e
             nextEventDelay = calcDelay;
     }
     sLog.outBasic("Next game event check in %u seconds.", nextEventDelay + 1);
-    return (nextEventDelay + 1) * 1000;                     // Add 1 second to be sure event has started/stopped at next call
+    return (nextEventDelay + 1) * IN_MILISECONDS;           // Add 1 second to be sure event has started/stopped at next call
 }
 
 void GameEvent::UnApplyEvent(uint16 event_id)
