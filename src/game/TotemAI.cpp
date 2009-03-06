@@ -19,7 +19,6 @@
 #include "TotemAI.h"
 #include "Totem.h"
 #include "Creature.h"
-#include "Player.h"
 #include "Database/DBCStores.h"
 #include "MapManager.h"
 #include "ObjectAccessor.h"
