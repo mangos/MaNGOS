@@ -26,7 +26,6 @@
 #include "Chat.h"
 #include "SpellAuras.h"
 #include "ArenaTeam.h"
-#include "World.h"
 #include "Group.h"
 #include "ObjectMgr.h"
 #include "WorldPacket.h"

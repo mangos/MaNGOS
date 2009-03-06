@@ -21,7 +21,6 @@
 #include "WorldSession.h"
 #include "Opcodes.h"
 #include "Log.h"
-#include "World.h"
 #include "Corpse.h"
 #include "Player.h"
 #include "MapManager.h"

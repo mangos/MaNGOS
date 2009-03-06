@@ -17,7 +17,6 @@
  */
 
 #include "PoolHandler.h"
-#include "World.h"
 #include "ObjectMgr.h"
 #include "ProgressBar.h"
 #include "Language.h"
