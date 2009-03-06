@@ -20038,18 +20038,43 @@ void Player::SendEquipmentSetList()
 
 void Player::SetEquipmentSet(uint32 index, EquipmentSet eqset)
 {
+    if(eqset.Guid != 0)
+    {
+        bool found = false;
+
+        for(EquipmentSets::iterator itr = m_EquipmentSets.begin(); itr != m_EquipmentSets.end(); ++itr)
+        {
+            if((itr->second.Guid == eqset.Guid) && (itr->first == index))
+            {
+                found = true;
+                break;
+            }
+        }
+
+        if(!found)                                          // something wrong...
+        {
+            sLog.outError("Player %s tried to save equipment set "I64FMTD" (index %u), but that equipment set not found!", GetName(), eqset.Guid, index);
+            return;
+        }
+    }
+
     EquipmentSet& eqslot = m_EquipmentSets[index];
 
     EquipmentSetUpdateState old_state = eqslot.state;
 
     eqslot = eqset;
-    eqslot.Guid = objmgr.GenerateEquipmentSetGuid();
-    eqslot.state = old_state == EQUIPMENT_SET_NEW ? EQUIPMENT_SET_NEW : EQUIPMENT_SET_CHANGED;
 
-    WorldPacket data(SMSG_EQUIPMENT_SET_SAVED, 4+1);
-    data << uint32(index);
-    data.appendPackGUID(eqset.Guid);
-    GetSession()->SendPacket(&data);
+    if(eqset.Guid == 0)
+    {
+        eqslot.Guid = objmgr.GenerateEquipmentSetGuid();
+
+        WorldPacket data(SMSG_EQUIPMENT_SET_SAVED, 4+1);
+        data << uint32(index);
+        data.appendPackGUID(eqslot.Guid);
+        GetSession()->SendPacket(&data);
+    }
+
+    eqslot.state = old_state == EQUIPMENT_SET_NEW ? EQUIPMENT_SET_NEW : EQUIPMENT_SET_CHANGED;
 }
 
 void Player::_SaveEquipmentSets()
