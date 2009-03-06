@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "GameEvent.h"
+#include "GameEventMgr.h"
 #include "World.h"
 #include "ObjectMgr.h"
 #include "PoolHandler.h"
@@ -26,9 +26,9 @@
 #include "MapManager.h"
 #include "Policies/SingletonImp.h"
 
-INSTANTIATE_SINGLETON_1(GameEvent);
+INSTANTIATE_SINGLETON_1(GameEventMgr);
 
-bool GameEvent::CheckOneGameEvent(uint16 entry) const
+bool GameEventMgr::CheckOneGameEvent(uint16 entry) const
 {
     // Get the event information
     time_t currenttime = time(NULL);
@@ -39,7 +39,7 @@ bool GameEvent::CheckOneGameEvent(uint16 entry) const
         return false;
 }
 
-uint32 GameEvent::NextCheck(uint16 entry) const
+uint32 GameEventMgr::NextCheck(uint16 entry) const
 {
     time_t currenttime = time(NULL);
 
@@ -65,7 +65,7 @@ uint32 GameEvent::NextCheck(uint16 entry) const
         return delay;
 }
 
-void GameEvent::StartEvent( uint16 event_id, bool overwrite )
+void GameEventMgr::StartEvent( uint16 event_id, bool overwrite )
 {
     AddActiveEvent(event_id);
     ApplyNewEvent(event_id);
@@ -77,7 +77,7 @@ void GameEvent::StartEvent( uint16 event_id, bool overwrite )
     }
 }
 
-void GameEvent::StopEvent( uint16 event_id, bool overwrite )
+void GameEventMgr::StopEvent( uint16 event_id, bool overwrite )
 {
     RemoveActiveEvent(event_id);
     UnApplyEvent(event_id);
@@ -89,7 +89,7 @@ void GameEvent::StopEvent( uint16 event_id, bool overwrite )
     }
 }
 
-void GameEvent::LoadFromDB()
+void GameEventMgr::LoadFromDB()
 {
     {
         QueryResult *result = WorldDatabase.Query("SELECT MAX(entry) FROM game_event");
@@ -108,7 +108,7 @@ void GameEvent::LoadFromDB()
         mGameEvent.resize(max_event_id+1);
     }
 
-    QueryResult *result = WorldDatabase.Query("SELECT entry,UNIX_TIMESTAMP(start_time),UNIX_TIMESTAMP(end_time),occurence,length,description FROM game_event");
+    QueryResult *result = WorldDatabase.Query("SELECT entry,UNIX_TIMESTAMP(start_time),UNIX_TIMESTAMP(end_time),occurence,length,holiday,description FROM game_event");
     if( !result )
     {
         mGameEvent.clear();
@@ -142,6 +142,8 @@ void GameEvent::LoadFromDB()
             pGameEvent.end          = time_t(endtime);
             pGameEvent.occurence    = fields[3].GetUInt32();
             pGameEvent.length       = fields[4].GetUInt32();
+            pGameEvent.holiday_id   = fields[5].GetUInt32();
+
 
             if(pGameEvent.length==0)                            // length>0 is validity check
             {
@@ -149,7 +151,16 @@ void GameEvent::LoadFromDB()
                 continue;
             }
 
-            pGameEvent.description  = fields[5].GetCppString();
+            if(pGameEvent.holiday_id)
+            {
+                if(!sHolidaysStore.LookupEntry(pGameEvent.holiday_id))
+                {
+                    sLog.outErrorDb("`game_event` game event id (%i) have not existed holiday id %u.",event_id,pGameEvent.holiday_id);
+                    pGameEvent.holiday_id = 0;
+                }
+            }
+
+            pGameEvent.description  = fields[6].GetCppString();
 
         } while( result->NextRow() );
         delete result;
@@ -405,7 +416,7 @@ void GameEvent::LoadFromDB()
     }
 }
 
-uint32 GameEvent::Initialize()                              // return the next event delay in ms
+uint32 GameEventMgr::Initialize()                           // return the next event delay in ms
 {
     m_ActiveEvents.clear();
     uint32 delay = Update();
@@ -414,7 +425,7 @@ uint32 GameEvent::Initialize()                              // return the next e
     return delay;
 }
 
-uint32 GameEvent::Update()                                  // return the next event delay in ms
+uint32 GameEventMgr::Update()                               // return the next event delay in ms
 {
     uint32 nextEventDelay = max_ge_check_delay;             // 1 day
     uint32 calcDelay;
@@ -450,7 +461,7 @@ uint32 GameEvent::Update()                                  // return the next e
     return (nextEventDelay + 1) * IN_MILISECONDS;           // Add 1 second to be sure event has started/stopped at next call
 }
 
-void GameEvent::UnApplyEvent(uint16 event_id)
+void GameEventMgr::UnApplyEvent(uint16 event_id)
 {
     sLog.outString("GameEvent %u \"%s\" removed.", event_id, mGameEvent[event_id].description.c_str());
     // un-spawn positive event tagged objects
@@ -464,7 +475,7 @@ void GameEvent::UnApplyEvent(uint16 event_id)
     UpdateEventQuests(event_id, false);
 }
 
-void GameEvent::ApplyNewEvent(uint16 event_id)
+void GameEventMgr::ApplyNewEvent(uint16 event_id)
 {
     switch(sWorld.getConfig(CONFIG_EVENT_ANNOUNCE))
     {
@@ -487,13 +498,13 @@ void GameEvent::ApplyNewEvent(uint16 event_id)
     UpdateEventQuests(event_id, true);
 }
 
-void GameEvent::GameEventSpawn(int16 event_id)
+void GameEventMgr::GameEventSpawn(int16 event_id)
 {
     int32 internal_event_id = mGameEvent.size() + event_id - 1;
 
     if(internal_event_id < 0 || internal_event_id >= mGameEventCreatureGuids.size())
     {
-        sLog.outError("GameEvent::GameEventSpawn attempt access to out of range mGameEventCreatureGuids element %i (size: %u)",internal_event_id,mGameEventCreatureGuids.size());
+        sLog.outError("GameEventMgr::GameEventSpawn attempt access to out of range mGameEventCreatureGuids element %i (size: %u)",internal_event_id,mGameEventCreatureGuids.size());
         return;
     }
 
@@ -526,7 +537,7 @@ void GameEvent::GameEventSpawn(int16 event_id)
 
     if(internal_event_id < 0 || internal_event_id >= mGameEventGameobjectGuids.size())
     {
-        sLog.outError("GameEvent::GameEventSpawn attempt access to out of range mGameEventGameobjectGuids element %i (size: %u)",internal_event_id,mGameEventGameobjectGuids.size());
+        sLog.outError("GameEventMgr::GameEventSpawn attempt access to out of range mGameEventGameobjectGuids element %i (size: %u)",internal_event_id,mGameEventGameobjectGuids.size());
         return;
     }
 
@@ -560,7 +571,7 @@ void GameEvent::GameEventSpawn(int16 event_id)
 
     if(internal_event_id < 0 || internal_event_id >= mGameEventPoolIds.size())
     {
-        sLog.outError("GameEvent::GameEventSpawn attempt access to out of range mGameEventPoolIds element %i (size: %u)",internal_event_id,mGameEventPoolIds.size());
+        sLog.outError("GameEventMgr::GameEventSpawn attempt access to out of range mGameEventPoolIds element %i (size: %u)",internal_event_id,mGameEventPoolIds.size());
         return;
     }
 
@@ -570,13 +581,13 @@ void GameEvent::GameEventSpawn(int16 event_id)
     }
 }
 
-void GameEvent::GameEventUnspawn(int16 event_id)
+void GameEventMgr::GameEventUnspawn(int16 event_id)
 {
     int32 internal_event_id = mGameEvent.size() + event_id - 1;
 
     if(internal_event_id < 0 || internal_event_id >= mGameEventCreatureGuids.size())
     {
-        sLog.outError("GameEvent::GameEventUnspawn attempt access to out of range mGameEventCreatureGuids element %i (size: %u)",internal_event_id,mGameEventCreatureGuids.size());
+        sLog.outError("GameEventMgr::GameEventUnspawn attempt access to out of range mGameEventCreatureGuids element %i (size: %u)",internal_event_id,mGameEventCreatureGuids.size());
         return;
     }
 
@@ -597,7 +608,7 @@ void GameEvent::GameEventUnspawn(int16 event_id)
 
     if(internal_event_id < 0 || internal_event_id >= mGameEventGameobjectGuids.size())
     {
-        sLog.outError("GameEvent::GameEventUnspawn attempt access to out of range mGameEventGameobjectGuids element %i (size: %u)",internal_event_id,mGameEventGameobjectGuids.size());
+        sLog.outError("GameEventMgr::GameEventUnspawn attempt access to out of range mGameEventGameobjectGuids element %i (size: %u)",internal_event_id,mGameEventGameobjectGuids.size());
         return;
     }
 
@@ -614,7 +625,7 @@ void GameEvent::GameEventUnspawn(int16 event_id)
     }
     if(internal_event_id < 0 || internal_event_id >= mGameEventPoolIds.size())
     {
-        sLog.outError("GameEvent::GameEventUnspawn attempt access to out of range mGameEventPoolIds element %i (size: %u)",internal_event_id,mGameEventPoolIds.size());
+        sLog.outError("GameEventMgr::GameEventUnspawn attempt access to out of range mGameEventPoolIds element %i (size: %u)",internal_event_id,mGameEventPoolIds.size());
         return;
     }
 
@@ -624,7 +635,7 @@ void GameEvent::GameEventUnspawn(int16 event_id)
     }
 }
 
-void GameEvent::ChangeEquipOrModel(int16 event_id, bool activate)
+void GameEventMgr::ChangeEquipOrModel(int16 event_id, bool activate)
 {
     for(ModelEquipList::iterator itr = mGameEventModelEquip[event_id].begin();itr != mGameEventModelEquip[event_id].end();++itr)
     {
@@ -703,7 +714,7 @@ void GameEvent::ChangeEquipOrModel(int16 event_id, bool activate)
     }
 }
 
-void GameEvent::UpdateEventQuests(uint16 event_id, bool Activate)
+void GameEventMgr::UpdateEventQuests(uint16 event_id, bool Activate)
 {
     QuestRelList::iterator itr;
     for (itr = mGameEventQuests[event_id].begin();itr != mGameEventQuests[event_id].end();++itr)
@@ -729,7 +740,19 @@ void GameEvent::UpdateEventQuests(uint16 event_id, bool Activate)
     }
 }
 
-GameEvent::GameEvent()
+GameEventMgr::GameEventMgr()
 {
     isSystemInit = false;
+}
+
+MANGOS_DLL_SPEC bool IsHolidayActive( HolidayIds id )
+{
+    GameEventMgr::GameEventDataMap const& events = gameeventmgr.GetEventMap();
+    GameEventMgr::ActiveEvents const& ae = gameeventmgr.GetActiveEventList();
+
+    for(GameEventMgr::ActiveEvents::const_iterator itr = ae.begin(); itr != ae.end(); ++itr)
+        if(events[id].holiday_id==id)
+            return true;
+
+    return false;
 }
