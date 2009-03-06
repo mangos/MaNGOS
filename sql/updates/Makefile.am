@@ -362,4 +362,5 @@ EXTRA_DIST = \
 	7369_01_mangos_quest_template.sql \
 	7376_01_mangos_spell_area.sql \
 	7382_01_mangos_creature_template.sql \
+	7388_01_mangos_mangos_string.sql \
 	README
