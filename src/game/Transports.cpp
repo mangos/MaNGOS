@@ -135,7 +135,7 @@ void MapManager::LoadTransports()
 Transport::Transport() : GameObject()
 {
                                                             // 3.1.0 - 0x34A
-    m_updateFlag = (UPDATEFLAG_TRANSPORT | UPDATEFLAG_LOWGUID | UPDATEFLAG_HAS_POSITION | UPDATEFLAG_UNK1 | UPDATEFLAG_UNK2);
+    m_updateFlag = (UPDATEFLAG_TRANSPORT | UPDATEFLAG_HIGHGUID | UPDATEFLAG_HAS_POSITION | UPDATEFLAG_UNK2);
 }
 
 bool Transport::Create(uint32 guidlow, uint32 mapid, float x, float y, float z, float ang, uint32 animprogress, uint32 dynflags)

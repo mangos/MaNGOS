@@ -20,19 +20,18 @@
 #define _AUTH_SARC4_H
 
 #include "Common.h"
-#include <openssl/rc4.h>
-#include <openssl/sha.h>
-
-class BigNumber;
-
-#define SEED_KEY_SIZE 16
+#include <openssl/evp.h>
 
 class SARC4
 {
     public:
-        void Init(uint32 len, uint8 *seed);
-        void Process(uint32 len, uint8 *indata, uint8 *outdata);
+        SARC4();
+        ~SARC4();
+        void Init(uint8 *seed1, uint8 *seed2);
+        void Encrypt(uint32 len, uint8 *data);
+        void Decrypt(uint32 len, uint8 *data);
     private:
-        RC4_KEY m_rc4_key;
+        EVP_CIPHER_CTX m_encryptctx;
+        EVP_CIPHER_CTX m_decryptctx;
 };
 #endif

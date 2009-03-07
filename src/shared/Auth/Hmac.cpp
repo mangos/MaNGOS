@@ -23,14 +23,12 @@ HmacHash::HmacHash(uint32 len, uint8 *seed)
 {
     ASSERT(len == SEED_KEY_SIZE);
 
-    memcpy(&m_key, seed, len);
     HMAC_CTX_init(&m_ctx);
-    HMAC_Init_ex(&m_ctx, &m_key, SEED_KEY_SIZE, EVP_sha1(), NULL);
+    HMAC_Init_ex(&m_ctx, seed, SEED_KEY_SIZE, EVP_sha1(), NULL);
 }
 
 HmacHash::~HmacHash()
 {
-    memset(&m_key, 0x00, SEED_KEY_SIZE);
     HMAC_CTX_cleanup(&m_ctx);
 }
 
@@ -42,11 +40,6 @@ void HmacHash::UpdateBigNumber(BigNumber *bn)
 void HmacHash::UpdateData(const uint8 *data, int length)
 {
     HMAC_Update(&m_ctx, data, length);
-}
-
-void HmacHash::Initialize()
-{
-    HMAC_Init_ex(&m_ctx, &m_key, SEED_KEY_SIZE, EVP_sha1(), NULL);
 }
 
 void HmacHash::Finalize()

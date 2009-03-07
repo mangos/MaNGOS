@@ -1788,6 +1788,7 @@ void BattleGroundMgr::BuildBattleGroundListPacket(WorldPacket *data, const uint6
 
     data->Initialize(SMSG_BATTLEFIELD_LIST);
     *data << uint64(guid);                                  // battlemaster guid
+    *data << uint8(0);                                      // unknown 3.1
     *data << uint32(bgTypeId);                              // battleground id
     if(bgTypeId == BATTLEGROUND_AA)                         // arena
     {

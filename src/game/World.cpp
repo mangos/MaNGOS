@@ -252,6 +252,12 @@ World::AddSession_ (WorldSession* s)
     packet << uint8 (s->Expansion());                       // 0 - normal, 1 - TBC, must be set in database manually for each account
     s->SendPacket (&packet);
 
+    // Create and send the Addon packet
+    //if (sAddOnHandler.BuildAddonPacket (&recvPacket, &SendAddonPacked))
+    //    SendPacket (SendAddonPacked);
+
+    s->SendTutorialsData();
+
     UpdateMaxSessionCounters ();
 
     // Updates the population

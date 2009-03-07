@@ -19962,33 +19962,44 @@ void Player::SendTalentsInfoData(bool pet)
 void Player::BuildEnchantmentsInfoData(WorldPacket *data)
 {
     uint32 slotUsedMask = 0;
-    *data << uint32(slotUsedMask);  // > 0x80000
+    size_t slotUsedMaskPos = data->wpos();
+    *data << uint32(slotUsedMask);                          // slotUsedMask < 0x80000
 
     for(uint32 i = 0; i < EQUIPMENT_SLOT_END; ++i)
     {
-        if(slotUsedMask & 1)
+        Item *item = GetItemByPos(INVENTORY_SLOT_BAG_0, i);
+
+        if(!item)
+            continue;
+
+        slotUsedMask |= (1 << i);
+
+        *data << uint32(item->GetEntry());                  // item entry
+
+        uint16 enchantmentMask = 0;
+        size_t enchantmentMaskPos = data->wpos();
+        *data << uint16(enchantmentMask);                   // enchantmentMask < 0x1000
+
+        for(uint32 j = 0; j < MAX_ENCHANTMENT_SLOT; ++j)
         {
-            *data << uint32(0);                             // item entry
-            uint16 enchantmentMask = 0;
-            *data << uint16(enchantmentMask);               // > 0x1000
+            uint32 enchId = item->GetEnchantmentId(EnchantmentSlot(j));
 
-            for(uint32 j = 0; j < MAX_ENCHANTMENT_SLOT; ++j)
-            {
-                if(enchantmentMask & 1)
-                {
-                    *data << uint16(0);                     // enchantmentId?
-                }
+            if(!enchId)
+                continue;
 
-                enchantmentMask >>= 1;
-            }
+            enchantmentMask |= (1 << j);
 
-            *data << uint16(0);
-            *data << uint8(0);                              // PGUID!
-            *data << uint32(0);
+            *data << uint16(enchId);                        // enchantmentId?
         }
 
-        slotUsedMask >>= 1;
+        data->put<uint16>(enchantmentMaskPos, enchantmentMask);
+
+        *data << uint16(0);                                 // ?
+        *data << uint8(0);                                  // PGUID!
+        *data << uint32(0);                                 // seed?
     }
+
+    data->put<uint32>(slotUsedMaskPos, slotUsedMask);
 }
 
 void Player::LearnTalent(uint32 talentId, uint32 talentRank)

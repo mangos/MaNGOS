@@ -35,19 +35,26 @@ void AuthCrypt::Init(BigNumber *K)
     HmacHash recvHash(SEED_KEY_SIZE, (uint8*)recvSeed);
     recvHash.UpdateBigNumber(K);
     recvHash.Finalize();
-    _recvCrypt.Init(SHA_DIGEST_LENGTH, recvHash.GetDigest());
 
     uint8 sendSeed[SEED_KEY_SIZE] = { 0xF4, 0x66, 0x31, 0x59, 0xFC, 0x83, 0x6E, 0x31, 0x31, 0x02, 0x51, 0xD5, 0x44, 0x31, 0x67, 0x98 };
     HmacHash sendHash(SEED_KEY_SIZE, (uint8*)sendSeed);
     sendHash.UpdateBigNumber(K);
     sendHash.Finalize();
-    _sendCrypt.Init(SHA_DIGEST_LENGTH, sendHash.GetDigest());
 
-    uint8 emptyBuf[1000];
-    memset(emptyBuf, 0, 1000);
+    _recvCrypt.Init(recvHash.GetDigest(), sendHash.GetDigest());
+    _sendCrypt.Init(recvHash.GetDigest(), sendHash.GetDigest());
 
-    _sendCrypt.Process(1000, (uint8*)emptyBuf, (uint8*)emptyBuf);
-    _recvCrypt.Process(1000, (uint8*)emptyBuf, (uint8*)emptyBuf);
+    uint8 emptyBuf1[1024];
+    memset(emptyBuf1, 0, 1024);
+
+    _sendCrypt.Encrypt(1024, (uint8*)emptyBuf1);
+    _sendCrypt.Decrypt(1024, (uint8*)emptyBuf1);
+
+    uint8 emptyBuf2[1024];
+    memset(emptyBuf2, 0, 1024);
+
+    _recvCrypt.Encrypt(1024, (uint8*)emptyBuf2);
+    _recvCrypt.Decrypt(1024, (uint8*)emptyBuf2);
 
     _initialized = true;
 }
@@ -57,7 +64,7 @@ void AuthCrypt::DecryptRecv(uint8 *data, size_t len)
     if (!_initialized)
         return;
 
-    _recvCrypt.Process(len, data, data);
+    _recvCrypt.Decrypt(len, data);
 }
 
 void AuthCrypt::EncryptSend(uint8 *data, size_t len)
@@ -65,5 +72,5 @@ void AuthCrypt::EncryptSend(uint8 *data, size_t len)
     if (!_initialized)
         return;
 
-    _sendCrypt.Process(len, data, data);
+    _sendCrypt.Encrypt(len, data);
 }

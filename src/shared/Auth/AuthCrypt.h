@@ -20,7 +20,6 @@
 #define _AUTHCRYPT_H
 
 #include <Common.h>
-#include <vector>
 #include "SARC4.h"
 
 class BigNumber;
@@ -38,8 +37,8 @@ class AuthCrypt
         bool IsInitialized() { return _initialized; }
 
     private:
-        SARC4 _sendCrypt;
         SARC4 _recvCrypt;
+        SARC4 _sendCrypt;
         bool _initialized;
 };
 #endif

@@ -269,12 +269,15 @@ void WorldSession::HandleBattleGroundPVPlogdataOpcode( WorldPacket & /*recv_data
 
 void WorldSession::HandleBattleGroundListOpcode( WorldPacket &recv_data )
 {
-    CHECK_PACKET_SIZE(recv_data, 4);
+    CHECK_PACKET_SIZE(recv_data, 4 + 1);
 
     sLog.outDebug( "WORLD: Recvd CMSG_BATTLEFIELD_LIST Message");
 
     uint32 bgTypeId;
     recv_data >> bgTypeId;                                  // id from DBC
+
+    //uint8 unk;
+    //recv_data >> unk;                                     // that byte is constant 0 in 3.1
 
     BattlemasterListEntry const* bl = sBattlemasterListStore.LookupEntry(bgTypeId);
     if(!bl)
