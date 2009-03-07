@@ -19,7 +19,6 @@
 #include "MapManager.h"
 #include "Player.h"
 #include "GridNotifiers.h"
-#include "WorldSession.h"
 #include "Log.h"
 #include "GridStates.h"
 #include "CellImpl.h"

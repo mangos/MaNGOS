@@ -17,8 +17,6 @@
  */
 
 #include "TemporarySummon.h"
-#include "WorldPacket.h"
-#include "MapManager.h"
 #include "Log.h"
 #include "ObjectAccessor.h"
 #include "CreatureAI.h"

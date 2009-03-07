@@ -20,7 +20,6 @@
 #include "Totem.h"
 #include "Creature.h"
 #include "Database/DBCStores.h"
-#include "MapManager.h"
 #include "ObjectAccessor.h"
 #include "SpellMgr.h"
 

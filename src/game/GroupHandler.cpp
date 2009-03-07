@@ -26,8 +26,6 @@
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "Group.h"
-#include "ObjectAccessor.h"
-#include "MapManager.h"
 #include "SocialMgr.h"
 #include "Util.h"
 

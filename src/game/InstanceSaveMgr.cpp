@@ -21,7 +21,6 @@
 
 #include "Player.h"
 #include "GridNotifiers.h"
-#include "WorldSession.h"
 #include "Log.h"
 #include "GridStates.h"
 #include "CellImpl.h"
@@ -33,7 +32,6 @@
 #include "GridNotifiersImpl.h"
 #include "Config/ConfigEnv.h"
 #include "Transports.h"
-#include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "World.h"
 #include "Group.h"

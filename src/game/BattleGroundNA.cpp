@@ -21,7 +21,6 @@
 #include "BattleGround.h"
 #include "BattleGroundNA.h"
 #include "ObjectMgr.h"
-#include "MapManager.h"
 #include "WorldPacket.h"
 #include "Language.h"
 

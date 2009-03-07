@@ -23,7 +23,6 @@
 #include "Creature.h"
 #include "Chat.h"
 #include "ObjectMgr.h"
-#include "MapManager.h"
 #include "Language.h"
 #include "Util.h"
 #include "WorldPacket.h"

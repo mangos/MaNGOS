@@ -28,7 +28,6 @@
 #include "ChannelMgr.h"
 #include "Group.h"
 #include "Guild.h"
-#include "MapManager.h"
 #include "ObjectAccessor.h"
 #include "ScriptCalls.h"
 #include "Player.h"

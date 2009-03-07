@@ -32,11 +32,8 @@
 #include "Group.h"
 #include "Guild.h"
 #include "World.h"
-#include "MapManager.h"
 #include "ObjectAccessor.h"
 #include "BattleGroundMgr.h"
-#include "Language.h"                                       // for CMSG_CANCEL_MOUNT_AURA handler
-#include "Chat.h"
 #include "SocialMgr.h"
 
 /// WorldSession constructor
