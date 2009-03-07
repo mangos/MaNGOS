@@ -81,7 +81,7 @@ void BattleGroundQueue::SelectionPool::Init()
 
 // remove group info from selection pool
 // returns true when we need to try to add new group to selection pool
-// or false when pool is ok
+// returns false when selection pool is ok or when we kicked smaller group than we need to kick
 // sometimes it can be called on empty selection pool
 bool BattleGroundQueue::SelectionPool::KickGroup(uint32 size)
 {
@@ -105,7 +105,8 @@ bool BattleGroundQueue::SelectionPool::KickGroup(uint32 size)
         GroupQueueInfo* ginfo = (*groupToKick);
         SelectedGroups.erase(groupToKick);
         PlayerCount -= ginfo->Players.size();
-        if (abs((int32)(ginfo->Players.size() - size)) <= 1)
+        //return false if we kicked smaller group or there are enough players in selection pool
+        if (ginfo->Players.size() <= size + 1)
             return false;
     }
     return true;
@@ -113,8 +114,8 @@ bool BattleGroundQueue::SelectionPool::KickGroup(uint32 size)
 
 // add group to selection pool
 // used when building selection pools
-// returns true if we can invite more players
-// returns false when selection pool is set
+// returns true if we can invite more players, or when we added group to selection pool
+// returns false when selection pool is full
 bool BattleGroundQueue::SelectionPool::AddGroup(GroupQueueInfo *ginfo, uint32 desiredCount)
 {
     //if group is larger than desired count - don't allow to add it to pool
@@ -123,6 +124,7 @@ bool BattleGroundQueue::SelectionPool::AddGroup(GroupQueueInfo *ginfo, uint32 de
         SelectedGroups.push_back(ginfo);
         // increase selected players count
         PlayerCount += ginfo->Players.size();
+        return true;
     }
     if( PlayerCount < desiredCount )
         return true;
@@ -499,7 +501,7 @@ void BattleGroundQueue::FillPlayersToBG(BattleGround* bg, BGQueueIdBasedOnLevel 
             //if ali selection is already empty, then kick horde group, but if there are less horde than ali in bg - break;
             if( !m_SelectionPools[BG_TEAM_ALLIANCE].GetPlayerCount() )
             {
-                if( aliFree <= diffHorde - 1 )
+                if( aliFree <= diffHorde + 1 )
                     break;
                 m_SelectionPools[BG_TEAM_HORDE].KickGroup(diffHorde - diffAli);
             }
@@ -514,7 +516,7 @@ void BattleGroundQueue::FillPlayersToBG(BattleGround* bg, BGQueueIdBasedOnLevel 
             }
             if( !m_SelectionPools[BG_TEAM_HORDE].GetPlayerCount() )
             {
-                if( hordeFree <= diffAli - 1 )
+                if( hordeFree <= diffAli + 1 )
                     break;
                 m_SelectionPools[BG_TEAM_ALLIANCE].KickGroup(diffAli - diffHorde);
             }
