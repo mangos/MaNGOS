@@ -27,6 +27,11 @@
 BattleGroundAV::BattleGroundAV()
 {
 
+    //TODO FIX ME!
+    m_StartMessageIds[BG_STARTING_EVENT_FIRST]  = LANG_BG_EY_START_TWO_MINUTES;
+    m_StartMessageIds[BG_STARTING_EVENT_SECOND] = LANG_BG_EY_START_ONE_MINUTE;
+    m_StartMessageIds[BG_STARTING_EVENT_THIRD]  = LANG_BG_EY_START_HALF_MINUTE;
+    m_StartMessageIds[BG_STARTING_EVENT_FOURTH] = LANG_BG_EY_HAS_BEGUN;
 }
 
 BattleGroundAV::~BattleGroundAV()
@@ -37,6 +42,14 @@ BattleGroundAV::~BattleGroundAV()
 void BattleGroundAV::Update(uint32 diff)
 {
     BattleGround::Update(diff);
+}
+
+void BattleGroundAV::StartingEventCloseDoors()
+{
+}
+
+void BattleGroundAV::StartingEventOpenDoors()
+{
 }
 
 void BattleGroundAV::AddPlayer(Player *plr)
