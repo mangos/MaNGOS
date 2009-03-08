@@ -28,7 +28,6 @@
 #include "Player.h"
 #include "UpdateMask.h"
 #include "Chat.h"
-#include "MapManager.h"
 #include "GridNotifiersImpl.h"
 #include "CellImpl.h"
 #include "AccountMgr.h"

@@ -19,7 +19,6 @@
 #include "Database/DatabaseEnv.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "MapManager.h"
 #include "Player.h"
 #include "Opcodes.h"
 #include "ObjectMgr.h"

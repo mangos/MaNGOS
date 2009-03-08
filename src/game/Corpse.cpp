@@ -20,12 +20,9 @@
 #include "Corpse.h"
 #include "Player.h"
 #include "UpdateMask.h"
-#include "MapManager.h"
 #include "ObjectAccessor.h"
 #include "Database/DatabaseEnv.h"
 #include "Opcodes.h"
-#include "WorldSession.h"
-#include "WorldPacket.h"
 #include "GossipDef.h"
 #include "World.h"
 

@@ -81,7 +81,7 @@ void BattleGroundQueue::SelectionPool::Init()
 
 // remove group info from selection pool
 // returns true when we need to try to add new group to selection pool
-// or false when pool is ok
+// returns false when selection pool is ok or when we kicked smaller group than we need to kick
 // sometimes it can be called on empty selection pool
 bool BattleGroundQueue::SelectionPool::KickGroup(uint32 size)
 {
@@ -105,7 +105,8 @@ bool BattleGroundQueue::SelectionPool::KickGroup(uint32 size)
         GroupQueueInfo* ginfo = (*groupToKick);
         SelectedGroups.erase(groupToKick);
         PlayerCount -= ginfo->Players.size();
-        if (abs((int32)(ginfo->Players.size() - size)) <= 1)
+        //return false if we kicked smaller group or there are enough players in selection pool
+        if (ginfo->Players.size() <= size + 1)
             return false;
     }
     return true;
@@ -113,17 +114,19 @@ bool BattleGroundQueue::SelectionPool::KickGroup(uint32 size)
 
 // add group to selection pool
 // used when building selection pools
-// returns true if we can invite more players, otherwise return false - (selection pool is set that time)
+// returns true if we can invite more players, or when we added group to selection pool
+// returns false when selection pool is full
 bool BattleGroundQueue::SelectionPool::AddGroup(GroupQueueInfo *ginfo, uint32 desiredCount)
 {
     //if group is larger than desired count - don't allow to add it to pool
-    if (!ginfo->IsInvitedToBGInstanceGUID && desiredCount >= PlayerCount + ginfo->Players.size())
+    if( !ginfo->IsInvitedToBGInstanceGUID && desiredCount >= PlayerCount + ginfo->Players.size() )
     {
         SelectedGroups.push_back(ginfo);
         // increase selected players count
         PlayerCount += ginfo->Players.size();
+        return true;
     }
-    if (PlayerCount == desiredCount)
+    if( PlayerCount < desiredCount )
         return true;
     return false;
 }
@@ -498,7 +501,7 @@ void BattleGroundQueue::FillPlayersToBG(BattleGround* bg, BGQueueIdBasedOnLevel 
             //if ali selection is already empty, then kick horde group, but if there are less horde than ali in bg - break;
             if( !m_SelectionPools[BG_TEAM_ALLIANCE].GetPlayerCount() )
             {
-                if( aliFree <= diffHorde - 1 )
+                if( aliFree <= diffHorde + 1 )
                     break;
                 m_SelectionPools[BG_TEAM_HORDE].KickGroup(diffHorde - diffAli);
             }
@@ -513,7 +516,7 @@ void BattleGroundQueue::FillPlayersToBG(BattleGround* bg, BGQueueIdBasedOnLevel 
             }
             if( !m_SelectionPools[BG_TEAM_HORDE].GetPlayerCount() )
             {
-                if( hordeFree <= diffAli - 1 )
+                if( hordeFree <= diffAli + 1 )
                     break;
                 m_SelectionPools[BG_TEAM_ALLIANCE].KickGroup(diffAli - diffHorde);
             }
@@ -553,7 +556,8 @@ bool BattleGroundQueue::CheckPremadeMatch(BGQueueIdBasedOnLevel queue_id, uint32
             {
                 for(itr = m_QueuedGroups[queue_id][BG_QUEUE_NORMAL_ALLIANCE + i].begin(); itr != m_QueuedGroups[queue_id][BG_QUEUE_NORMAL_ALLIANCE + i].end(); ++itr)
                 {
-                    if( !(*itr)->IsInvitedToBGInstanceGUID && m_SelectionPools[i].AddGroup((*itr), maxPlayers) )
+                    //if itr can join BG and player count is less that maxPlayers, then add group to selectionpool
+                    if( !(*itr)->IsInvitedToBGInstanceGUID && !m_SelectionPools[i].AddGroup((*itr), maxPlayers) )
                         break;
                 }
             }
@@ -575,7 +579,7 @@ bool BattleGroundQueue::CheckPremadeMatch(BGQueueIdBasedOnLevel queue_id, uint32
             {
                 //we must insert group to normal queue and erase pointer from premade queue
                 m_QueuedGroups[queue_id][BG_QUEUE_NORMAL_ALLIANCE + i].push_front((*itr));
-                m_QueuedGroups[queue_id][BG_QUEUE_PREMADE_ALLIANCE + i].erase(itr); //pop_front();
+                m_QueuedGroups[queue_id][BG_QUEUE_PREMADE_ALLIANCE + i].erase(itr);
             }
         }
     }
@@ -612,7 +616,7 @@ bool BattleGroundQueue::CheckNormalMatch(BattleGround* bg_template, BGQueueIdBas
         for(; itr_team[j] != m_QueuedGroups[queue_id][BG_QUEUE_NORMAL_ALLIANCE + j].end(); ++(itr_team[j]))
         {
             if( !(*(itr_team[j]))->IsInvitedToBGInstanceGUID )
-                if( m_SelectionPools[j].AddGroup(*(itr_team[j]), m_SelectionPools[(j + 1) % BG_TEAMS_COUNT].GetPlayerCount()) )
+                if( !m_SelectionPools[j].AddGroup(*(itr_team[j]), m_SelectionPools[(j + 1) % BG_TEAMS_COUNT].GetPlayerCount()) )
                     break;
         }
         // do not allow to start bg with more than 2 players more on 1 faction
@@ -620,7 +624,7 @@ bool BattleGroundQueue::CheckNormalMatch(BattleGround* bg_template, BGQueueIdBas
             return false;
     }
     //allow 1v0 if debug bg
-    if( sBattleGroundMgr.isTesting() && (m_SelectionPools[BG_TEAM_ALLIANCE].GetPlayerCount() || m_SelectionPools[BG_TEAM_HORDE].GetPlayerCount()) )
+    if( sBattleGroundMgr.isTesting() && bg_template->isBattleGround() && (m_SelectionPools[BG_TEAM_ALLIANCE].GetPlayerCount() || m_SelectionPools[BG_TEAM_HORDE].GetPlayerCount()) )
         return true;
     //return true if there are enough players in selection pools - enable to work .debug bg command correctly
     return m_SelectionPools[BG_TEAM_ALLIANCE].GetPlayerCount() >= minPlayers && m_SelectionPools[BG_TEAM_HORDE].GetPlayerCount() >= minPlayers;
@@ -656,12 +660,9 @@ bool BattleGroundQueue::CheckSkirmishForSameFaction(BGQueueIdBasedOnLevel queue_
     //invite players to other selection pool
     for(; itr_team2 != m_QueuedGroups[queue_id][BG_QUEUE_NORMAL_ALLIANCE + teamIndex].end(); ++itr_team2)
     {
-        if( !(*itr_team2)->IsInvitedToBGInstanceGUID )
-        {
-            m_SelectionPools[otherTeam].AddGroup(*itr_team2, minPlayersPerTeam);
-            if( m_SelectionPools[otherTeam].GetPlayerCount() == minPlayersPerTeam )
-                break;
-        }
+        //if selection pool is full then break;
+        if( !(*itr_team2)->IsInvitedToBGInstanceGUID && !m_SelectionPools[otherTeam].AddGroup(*itr_team2, minPlayersPerTeam) )
+            break;
     }
     if( m_SelectionPools[otherTeam].GetPlayerCount() != minPlayersPerTeam )
         return false;
@@ -1533,11 +1534,6 @@ BattleGround * BattleGroundMgr::CreateNewBattleGround(BattleGroundTypeId bgTypeI
     // reset the new bg (set status to status_wait_queue from status_none)
     bg->Reset();
 
-    if( bg->isBattleGround() && sWorld.getConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_ENABLE) )
-    {
-        sWorld.SendWorldText(LANG_BG_STARTED_ANNOUNCE_WORLD, bg->GetName(), bg->GetMinLevel(), bg->GetMaxLevel());
-    }
-
     // start the joining of the bg
     bg->SetStatus(STATUS_WAIT_JOIN);
     bg->SetQueueId(queue_id);
@@ -1758,7 +1754,7 @@ void BattleGroundMgr::DistributeArenaPoints()
     for (std::map<uint32, uint32>::iterator plr_itr = PlayerPoints.begin(); plr_itr != PlayerPoints.end(); ++plr_itr)
     {
         //update to database
-        CharacterDatabase.PExecute("UPDATE characters SET arena_pending_points = '%u' WHERE `guid` = '%u'", plr_itr->second, plr_itr->first);
+        CharacterDatabase.PExecute("UPDATE characters SET arena_pending_points = '%u' WHERE guid = '%u'", plr_itr->second, plr_itr->first);
         //add points if player is online
         Player* pl = objmgr.GetPlayer(plr_itr->first);
         if (pl)

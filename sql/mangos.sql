@@ -22,7 +22,7 @@
 DROP TABLE IF EXISTS `db_version`;
 CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
-  `required_7369_01_mangos_quest_template` bit(1) default NULL
+  `required_7399_01_mangos_mangos_string` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -135,6 +135,7 @@ CREATE TABLE `areatrigger_teleport` (
   `heroic_key` mediumint(8) unsigned NOT NULL default '0',
   `heroic_key2` mediumint(8) unsigned NOT NULL default '0',
   `required_quest_done` int(11) unsigned NOT NULL default '0',
+  `required_quest_done_heroic` int(11) unsigned NOT NULL default '0',
   `required_failed_text` text,
   `target_map` smallint(5) unsigned NOT NULL default '0',
   `target_position_x` float NOT NULL default '0',
@@ -811,6 +812,8 @@ CREATE TABLE `creature_template` (
   `AIName` char(64) NOT NULL default '',
   `MovementType` tinyint(3) unsigned NOT NULL default '0',
   `InhabitType` tinyint(3) unsigned NOT NULL default '3',
+  `unk16` float NOT NULL default '1',
+  `unk17` float NOT NULL default '1',
   `RacialLeader` tinyint(3) unsigned NOT NULL default '0',
   `RegenHealth` tinyint(3) unsigned NOT NULL default '1',
   `equipment_id` mediumint(8) unsigned NOT NULL default '0',
@@ -827,7 +830,7 @@ CREATE TABLE `creature_template` (
 LOCK TABLES `creature_template` WRITE;
 /*!40000 ALTER TABLE `creature_template` DISABLE KEYS */;
 INSERT INTO `creature_template` VALUES
-(1,1,10045,0,10045,0,'Waypoint(Only GM can see it)','Visual',NULL,1,1,64,64,0,0,0,35,35,0,0.91,1,0,14,15,0,100,2000,2200,4096,0,0,0,0,0,0,1.76,2.42,100,8,5242886,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,'',0,3,0,1,0,0,0x82,'');
+(1,1,10045,0,10045,0,'Waypoint(Only GM can see it)','Visual',NULL,1,1,64,64,0,0,0,35,35,0,0.91,1,0,14,15,0,100,2000,2200,4096,0,0,0,0,0,0,1.76,2.42,100,8,5242886,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,'',0,3,1.0,1.0,0,1,0,0,0x82,'');
 /*!40000 ALTER TABLE `creature_template` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1069,6 +1072,7 @@ CREATE TABLE `game_event` (
   `end_time` timestamp NOT NULL default '0000-00-00 00:00:00' COMMENT 'Absolute end date, the event will never start afler',
   `occurence` bigint(20) unsigned NOT NULL default '86400' COMMENT 'Delay in hours between occurences of the event',
   `length` bigint(20) unsigned NOT NULL default '43200' COMMENT 'Length in hours of the event',
+  `holiday` mediumint(8) unsigned NOT NULL default '0' COMMENT 'Client side holiday id',
   `description` varchar(255) default NULL COMMENT 'Description of the event displayed in console',
   PRIMARY KEY  (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
@@ -1470,36 +1474,6 @@ CREATE TABLE `instance_template` (
 
 LOCK TABLES `instance_template` WRITE;
 /*!40000 ALTER TABLE `instance_template` DISABLE KEYS */;
-INSERT INTO `instance_template` VALUES
-(33,0,22,30,10,10,7200,NULL,NULL,NULL,NULL,''),
-(34,0,24,32,10,10,7200,NULL,NULL,NULL,NULL,''),
-(36,0,15,20,10,10,7200,NULL,NULL,NULL,NULL,''),
-(43,0,15,21,10,10,7200,NULL,NULL,NULL,NULL,''),
-(47,0,29,38,10,10,7200,NULL,NULL,NULL,NULL,''),
-(48,0,24,32,10,10,7200,NULL,NULL,NULL,NULL,''),
-(70,0,35,47,10,10,7200,NULL,NULL,NULL,NULL,''),
-(90,0,29,38,10,10,7200,NULL,NULL,NULL,NULL,''),
-(109,0,45,55,10,10,7200,NULL,NULL,NULL,NULL,''),
-(129,0,37,46,10,10,7200,NULL,NULL,NULL,NULL,''),
-(189,0,34,45,10,10,7200,NULL,NULL,NULL,NULL,''),
-(209,0,44,54,10,10,7200,NULL,NULL,NULL,NULL,''),
-(229,0,58,0,10,10,120000,78.5083,-225.044,49.839,5.1,''),
-(230,0,52,0,5,5,7200,NULL,NULL,NULL,NULL,''),
-(249,0,60,0,40,40,432000,NULL,NULL,NULL,NULL,''),
-(289,0,57,0,5,5,7200,NULL,NULL,NULL,NULL,''),
-(309,0,60,0,20,20,259200,NULL,NULL,NULL,NULL,''),
-(329,0,58,60,5,5,7200,NULL,NULL,NULL,NULL,''),
-(349,0,46,55,10,10,7200,NULL,NULL,NULL,NULL,''),
-(389,0,13,18,10,10,7200,NULL,NULL,NULL,NULL,''),
-(409,0,60,0,40,40,604800,NULL,NULL,NULL,NULL,''),
-(429,0,55,60,5,5,7200,NULL,NULL,NULL,NULL,''),
-(469,0,60,0,40,40,604800,NULL,NULL,NULL,NULL,''),
-(509,0,60,0,20,20,259200,NULL,NULL,NULL,NULL,''),
-(531,0,60,0,40,40,604800,NULL,NULL,NULL,NULL,''),
-(533,0,80,0,10,25,0,NULL,NULL,NULL,NULL,''),
-(615,0,80,0,10,25,0,NULL,NULL,NULL,NULL,''),
-(616,0,80,0,10,25,0,NULL,NULL,NULL,NULL,''),
-(624,0,80,0,10,25,0,NULL,NULL,NULL,NULL,'');
 /*!40000 ALTER TABLE `instance_template` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -2840,7 +2814,6 @@ INSERT INTO `mangos_string` VALUES
 (723,'Your group does not have enough players to join this match.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (724,'The Gold Team wins!',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (725,'The Green Team wins!',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
-(726,'There aren\'t enough players in this battleground. It will end soon unless some more players join to balance the fight.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (727,'Your group has an offline member. Please remove him before joining.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (728,'Your group has players from the opposing faction. You can\'t join the battleground as a group.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (729,'Your group has players from different battleground brakets. You can\'t join as group.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
@@ -2861,6 +2834,11 @@ INSERT INTO `mangos_string` VALUES
 (744,'Modifying played count, arena points etc. for loaded arena teams, sending updated stats to online players...',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (745,'Modification done.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (746,'Done flushing Arena points.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(750,'Not enough players. This game will close in %u mins.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(751,'Not enough players. This game will close in %u seconds.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(753,'The battle for Warsong Gulch begins in 2 minutes.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(754,'The battle for Arathi Basin begins in 2 minutes.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(755,'The battle for Eye of the Storm begins in 2 minutes.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (801,'You do not have enough gold',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (802,'You do not have enough free slots',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (803,'Your partner does not have enough free bag slots',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
@@ -13295,7 +13273,7 @@ CREATE TABLE `spell_area` (
   `quest_start`        mediumint(8) unsigned NOT NULL default '0',
   `quest_start_active` tinyint(1) unsigned NOT NULL default '0',
   `quest_end`          mediumint(8) unsigned NOT NULL default '0',
-  `aura_spell`         mediumint(8) unsigned NOT NULL default '0',
+  `aura_spell`         mediumint(8) NOT NULL default '0',
   `racemask`           mediumint(8) unsigned NOT NULL default '0',
   `gender`             tinyint(1) unsigned NOT NULL default '2',
   `autocast`           tinyint(1) unsigned NOT NULL default '0',

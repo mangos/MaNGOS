@@ -20,12 +20,11 @@
     \ingroup u2w
 */
 
-#include "WorldSocket.h"
+#include "WorldSocket.h"                                    // must be first to make ACE happy with ACE includes in it
 #include "Common.h"
 #include "Database/DatabaseEnv.h"
 #include "Log.h"
 #include "Opcodes.h"
-#include "WorldSocket.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include "Player.h"
@@ -33,11 +32,8 @@
 #include "Group.h"
 #include "Guild.h"
 #include "World.h"
-#include "MapManager.h"
 #include "ObjectAccessor.h"
 #include "BattleGroundMgr.h"
-#include "Language.h"                                       // for CMSG_CANCEL_MOUNT_AURA handler
-#include "Chat.h"
 #include "SocialMgr.h"
 
 /// WorldSession constructor
@@ -304,7 +300,7 @@ void WorldSession::LogoutPlayer(bool Save)
         }
         //drop a flag if player is carrying it
         if(BattleGround *bg = _player->GetBattleGround())
-            bg->EventPlayerDroppedFlag(_player);
+            bg->EventPlayerLoggedOut(_player);
 
         ///- Teleport to home if the player is in an invalid instance
         if(!_player->m_InstanceValid && !_player->isGameMaster())

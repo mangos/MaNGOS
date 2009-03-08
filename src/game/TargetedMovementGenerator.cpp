@@ -20,7 +20,6 @@
 #include "TargetedMovementGenerator.h"
 #include "Errors.h"
 #include "Creature.h"
-#include "MapManager.h"
 #include "DestinationHolderImp.h"
 #include "World.h"
 

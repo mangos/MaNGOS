@@ -19,7 +19,6 @@
 #ifndef MANGOS_TRAVELLER_H
 #define MANGOS_TRAVELLER_H
 
-#include "MapManager.h"
 #include "Creature.h"
 #include "Player.h"
 #include <cassert>

@@ -23,7 +23,6 @@
 #include "Creature.h"
 #include "MapManager.h"
 #include "Language.h"
-#include "Chat.h"
 #include "SpellAuras.h"
 #include "ArenaTeam.h"
 #include "World.h"
@@ -31,12 +30,61 @@
 #include "ObjectMgr.h"
 #include "WorldPacket.h"
 #include "Util.h"
+#include "GridNotifiersImpl.h"
+
+namespace MaNGOS
+{
+    class BattleGroundChatBuilder
+    {
+        public:
+            BattleGroundChatBuilder(ChatMsg msgtype, int32 textId, Player const* source, va_list* args = NULL)
+                : i_msgtype(msgtype), i_textId(textId), i_source(source), i_args(args) {}
+            void operator()(WorldPacket& data, int32 loc_idx)
+            {
+                char const* text = objmgr.GetMangosString(i_textId,loc_idx);
+
+                if(i_args)
+                {
+                    // we need copy va_list before use or original va_list will corrupted
+                    va_list ap;
+                    va_copy(ap,*i_args);
+
+                    char str [2048];
+                    vsnprintf(str,2048,text, ap );
+                    va_end(ap);
+
+                    do_helper(data,&str[0]);
+                }
+                else
+                    do_helper(data,text);
+            }
+        private:
+            void do_helper(WorldPacket& data, char const* text)
+            {
+                uint64 target_guid = i_source  ? i_source ->GetGUID() : 0;
+
+                data << uint8(i_msgtype);
+                data << uint32(LANG_UNIVERSAL);
+                data << uint64(target_guid);                // there 0 for BG messages
+                data << uint32(0);                          // can be chat msg group or something
+                data << uint64(target_guid);
+                data << uint32(strlen(text)+1);
+                data << text;
+                data << uint8(i_source ? i_source->chatTag() : uint8(0));
+            }
+
+            ChatMsg i_msgtype;
+            int32 i_textId;
+            Player const* i_source;
+            va_list* i_args;
+    };
+}                                                           // namespace MaNGOS
 
 BattleGround::BattleGround()
 {
     m_TypeID            = BattleGroundTypeId(0);
     m_InstanceID        = 0;
-    m_Status            = 0;
+    m_Status            = STATUS_NONE;
     m_EndTime           = 0;
     m_LastResurrectTime = 0;
     m_QueueId           = QUEUE_ID_MAX_LEVEL_19;
@@ -88,6 +136,16 @@ BattleGround::BattleGround()
 
     m_PrematureCountDown = false;
     m_PrematureCountDown = 0;
+
+    m_StartDelayTimes[BG_STARTING_EVENT_FIRST]  = BG_START_DELAY_2M;
+    m_StartDelayTimes[BG_STARTING_EVENT_SECOND] = BG_START_DELAY_1M;
+    m_StartDelayTimes[BG_STARTING_EVENT_THIRD]  = BG_START_DELAY_30S;
+    m_StartDelayTimes[BG_STARTING_EVENT_FOURTH] = BG_START_DELAY_NONE;
+    //we must set to some default existing values
+    m_StartMessageIds[BG_STARTING_EVENT_FIRST]  = LANG_BG_WS_START_TWO_MINUTES;
+    m_StartMessageIds[BG_STARTING_EVENT_SECOND] = LANG_BG_WS_START_ONE_MINUTE;
+    m_StartMessageIds[BG_STARTING_EVENT_THIRD]  = LANG_BG_WS_START_HALF_MINUTE;
+    m_StartMessageIds[BG_STARTING_EVENT_FOURTH] = LANG_BG_WS_HAS_BEGUN;
 }
 
 BattleGround::~BattleGround()
@@ -153,7 +211,7 @@ void BattleGround::Update(uint32 diff)
         m_RemovedPlayers.clear();
     }
 
-    // remove offline players from bg after ~5 minutes
+    // remove offline players from bg after 5 minutes
     if(GetPlayersSize())
     {
         for(std::map<uint64, BattleGroundPlayer>::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
@@ -162,14 +220,18 @@ void BattleGround::Update(uint32 diff)
             itr->second.LastOnlineTime += diff;
 
             if(plr)
-                itr->second.LastOnlineTime = 0;   // update last online time
+                itr->second.LastOnlineTime = 0;                 // update last online time
             else
-                if(itr->second.LastOnlineTime >= MAX_OFFLINE_TIME)                   // 5 minutes
-                    m_RemovedPlayers[itr->first] = 1;       // add to remove list (BG)
+                if(itr->second.LastOnlineTime >= MAX_OFFLINE_TIME)
+                    m_RemovedPlayers[itr->first] = 1;           // add to remove list (BG)
         }
     }
 
-    //this should be handled by spell system:
+    /*********************************************************/
+    /***        BATTLEGROUND RESSURECTION SYSTEM           ***/
+    /*********************************************************/
+
+    //this should be handled by spell system
     m_LastResurrectTime += diff;
     if (m_LastResurrectTime >= RESURRECTION_INTERVAL)
     {
@@ -219,6 +281,10 @@ void BattleGround::Update(uint32 diff)
         m_ResurrectQueue.clear();
     }
 
+    /*********************************************************/
+    /***           BATTLEGROUND BALLANCE SYSTEM            ***/
+    /*********************************************************/
+
     // if less then minimum players are in on one side, then start premature finish timer
     if(GetStatus() == STATUS_IN_PROGRESS && !isArena() && sBattleGroundMgr.GetPrematureFinishTime() && (GetPlayersCountByTeam(ALLIANCE) < GetMinPlayersPerTeam() || GetPlayersCountByTeam(HORDE) < GetMinPlayersPerTeam()))
     {
@@ -226,7 +292,6 @@ void BattleGround::Update(uint32 diff)
         {
             m_PrematureCountDown = true;
             m_PrematureCountDownTimer = sBattleGroundMgr.GetPrematureFinishTime();
-            SendMessageToAll(LANG_BATTLEGROUND_PREMATURE_FINISH_WARNING);
         }
         else if(m_PrematureCountDownTimer < diff)
         {
@@ -238,13 +303,101 @@ void BattleGround::Update(uint32 diff)
         {
             uint32 newtime = m_PrematureCountDownTimer - diff;
             // announce every minute
-            if(m_PrematureCountDownTimer != sBattleGroundMgr.GetPrematureFinishTime() && newtime / 60000 != m_PrematureCountDownTimer / 60000)
-                SendMessageToAll(LANG_BATTLEGROUND_PREMATURE_FINISH_WARNING);
+            if( newtime > (MINUTE * IN_MILISECONDS) )
+            {
+                if( newtime / (MINUTE * IN_MILISECONDS) != m_PrematureCountDownTimer / (MINUTE * IN_MILISECONDS) )
+                    PSendMessageToAll(LANG_BATTLEGROUND_PREMATURE_FINISH_WARNING, CHAT_MSG_SYSTEM, NULL, (uint32)(m_PrematureCountDownTimer / (MINUTE * IN_MILISECONDS)));
+            }
+            else
+            {
+                //announce every 15 seconds
+                if( newtime / (15 * IN_MILISECONDS) != m_PrematureCountDownTimer / (15 * IN_MILISECONDS) )
+                    PSendMessageToAll(LANG_BATTLEGROUND_PREMATURE_FINISH_WARNING_SECS, CHAT_MSG_SYSTEM, NULL, (uint32)(m_PrematureCountDownTimer / IN_MILISECONDS));
+            }
             m_PrematureCountDownTimer = newtime;
         }
     }
     else if (m_PrematureCountDown)
         m_PrematureCountDown = false;
+
+    /*********************************************************/
+    /***           BATTLEGROUND STARTING SYSTEM            ***/
+    /*********************************************************/
+
+    if (GetStatus() == STATUS_WAIT_JOIN && GetPlayersSize())
+    {
+        ModifyStartDelayTime(diff);
+
+        if (!(m_Events & BG_STARTING_EVENT_1))
+        {
+            m_Events |= BG_STARTING_EVENT_1;
+
+            // setup here, only when at least one player has ported to the map
+            if(!SetupBattleGround())
+            {
+                EndNow();
+                return;
+            }
+
+            StartingEventCloseDoors();
+            SetStartDelayTime(m_StartDelayTimes[BG_STARTING_EVENT_FIRST]);
+            //first start warning - 2 or 1 minute
+            SendMessageToAll(m_StartMessageIds[BG_STARTING_EVENT_FIRST], CHAT_MSG_BG_SYSTEM_NEUTRAL);
+        }
+        // After 1 minute or 30 seconds, warning is signalled
+        else if (GetStartDelayTime() <= m_StartDelayTimes[BG_STARTING_EVENT_SECOND] && !(m_Events & BG_STARTING_EVENT_2))
+        {
+            m_Events |= BG_STARTING_EVENT_2;
+            SendMessageToAll(m_StartMessageIds[BG_STARTING_EVENT_SECOND], CHAT_MSG_BG_SYSTEM_NEUTRAL);
+        }
+        // After 30 or 15 seconds, warning is signalled
+        else if (GetStartDelayTime() <= m_StartDelayTimes[BG_STARTING_EVENT_THIRD] && !(m_Events & BG_STARTING_EVENT_3))
+        {
+            m_Events |= BG_STARTING_EVENT_3;
+            SendMessageToAll(m_StartMessageIds[BG_STARTING_EVENT_THIRD], CHAT_MSG_BG_SYSTEM_NEUTRAL);
+        }
+        // delay expired (atfer 2 or 1 minute)
+        else if (GetStartDelayTime() <= 0 && !(m_Events & BG_STARTING_EVENT_4))
+        {
+            m_Events |= BG_STARTING_EVENT_4;
+
+            StartingEventOpenDoors();
+
+            SendMessageToAll(m_StartMessageIds[BG_STARTING_EVENT_FOURTH], CHAT_MSG_BG_SYSTEM_NEUTRAL);
+            SetStatus(STATUS_IN_PROGRESS);
+            SetStartDelayTime(m_StartDelayTimes[BG_STARTING_EVENT_FOURTH]);
+
+            //remove preparation
+            if( isArena() )
+            {
+                //TODO : add arena sound PlaySoundToAll(SOUND_ARENA_START);
+
+                for(BattleGroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
+                    if(Player *plr = objmgr.GetPlayer(itr->first))
+                        plr->RemoveAurasDueToSpell(SPELL_ARENA_PREPARATION);
+
+                CheckArenaWinConditions();
+            }
+            else
+            {
+
+                PlaySoundToAll(SOUND_BG_START);
+
+                for(BattleGroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
+                    if(Player* plr = objmgr.GetPlayer(itr->first))
+                        plr->RemoveAurasDueToSpell(SPELL_PREPARATION);
+                //Announce BG starting
+                if( sWorld.getConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_ENABLE) )
+                {
+                    sWorld.SendWorldText(LANG_BG_STARTED_ANNOUNCE_WORLD, GetName(), GetMinLevel(), GetMaxLevel());
+                }
+            }
+        }
+    }
+
+    /*********************************************************/
+    /***           BATTLEGROUND ENDING SYSTEM              ***/
+    /*********************************************************/
 
     if(GetStatus() == STATUS_WAIT_LEAVE)
     {
@@ -259,6 +412,7 @@ void BattleGround::Update(uint32 diff)
             // do not change any battleground's private variables
         }
     }
+
 }
 
 void BattleGround::SetTeamStartLoc(uint32 TeamID, float X, float Y, float Z, float O)
@@ -425,15 +579,11 @@ void BattleGround::EndBattleGround(uint32 winner)
     uint32 loser_rating = 0;
     uint32 winner_rating = 0;
     WorldPacket data;
-    Player *Source = NULL;
-    const char *winmsg = "";
+    int32 winmsg_id = 0;
 
     if(winner == ALLIANCE)
     {
-        if(isBattleGround())
-            winmsg = GetMangosString(LANG_BG_A_WINS);
-        else
-            winmsg = GetMangosString(LANG_ARENA_GOLD_WINS);
+        winmsg_id = isBattleGround() ? LANG_BG_A_WINS : LANG_ARENA_GOLD_WINS;
 
         PlaySoundToAll(SOUND_ALLIANCE_WINS);                // alliance wins sound
 
@@ -441,10 +591,7 @@ void BattleGround::EndBattleGround(uint32 winner)
     }
     else if(winner == HORDE)
     {
-        if(isBattleGround())
-            winmsg = GetMangosString(LANG_BG_H_WINS);
-        else
-            winmsg = GetMangosString(LANG_ARENA_GREEN_WINS);
+        winmsg_id = isBattleGround() ? LANG_BG_H_WINS : LANG_ARENA_GREEN_WINS;
 
         PlaySoundToAll(SOUND_HORDE_WINS);                   // horde wins sound
 
@@ -529,8 +676,6 @@ void BattleGround::EndBattleGround(uint32 winner)
 
         if(team == winner)
         {
-            if(!Source)
-                Source = plr;
             RewardMark(plr,ITEM_WINNER_COUNT);
             UpdatePlayerScore(plr, SCORE_BONUS_HONOR, 20);
             RewardQuest(plr);
@@ -570,11 +715,8 @@ void BattleGround::EndBattleGround(uint32 winner)
     // inform invited players about the removal
     sBattleGroundMgr.m_BattleGroundQueues[BattleGroundMgr::BGQueueTypeId(GetTypeID(), GetArenaType())].BGEndedRemoveInvites(this);
 
-    if(Source)
-    {
-        ChatHandler(Source).FillMessageData(&data, CHAT_MSG_BG_SYSTEM_NEUTRAL, LANG_UNIVERSAL, Source->GetGUID(), winmsg);
-        SendPacketToAll(&data);
-    }
+    if(winmsg_id)
+        SendMessageToAll(winmsg_id,CHAT_MSG_BG_SYSTEM_NEUTRAL);
 }
 
 uint32 BattleGround::GetBattlemasterEntry() const
@@ -992,6 +1134,17 @@ void BattleGround::AddOrSetPlayerToCorrectBgGroup(Player *plr, uint64 plr_guid, 
     }
 }
 
+// This method should be called when player logs out from running battleground
+void BattleGround::EventPlayerLoggedOut(Player* player)
+{
+    if( GetStatus() == STATUS_IN_PROGRESS )
+    {
+        if( isBattleGround() )
+            EventPlayerDroppedFlag(player);
+        else
+            CheckArenaWinConditions();
+    }
+}
 
 /* This method should be called only once ... it adds pointer to queue */
 void BattleGround::AddToBGFreeSlotQueue()
@@ -1024,7 +1177,7 @@ void BattleGround::RemoveFromBGFreeSlotQueue()
 // returns the number how many players can join battleground to MaxPlayersPerTeam
 uint32 BattleGround::GetFreeSlotsForTeam(uint32 Team) const
 {
-    //if BG is starting ... invite anyone
+    //return free slot count to MaxPlayerPerTeam
     if (GetStatus() == STATUS_WAIT_JOIN || GetStatus() == STATUS_IN_PROGRESS)
         return (GetInvitedCount(Team) < GetMaxPlayersPerTeam()) ? GetMaxPlayersPerTeam() - GetInvitedCount(Team) : 0;
 
@@ -1357,19 +1510,23 @@ bool BattleGround::AddSpiritGuide(uint32 type, float x, float y, float z, float 
     return true;
 }
 
-void BattleGround::SendMessageToAll(char const* text)
+void BattleGround::SendMessageToAll(int32 entry, ChatMsg type, Player const* source)
 {
-    WorldPacket data;
-    ChatHandler::FillMessageData(&data, NULL, CHAT_MSG_BG_SYSTEM_NEUTRAL, LANG_UNIVERSAL, NULL, 0, text, NULL);
-    SendPacketToAll(&data);
+    MaNGOS::BattleGroundChatBuilder bg_builder(type, entry, source);
+    MaNGOS::LocalizedPacketDo<MaNGOS::BattleGroundChatBuilder> bg_do(bg_builder);
+    BroadcastWorker(bg_do);
 }
 
-void BattleGround::SendMessageToAll(int32 entry)
+void BattleGround::PSendMessageToAll(int32 entry, ChatMsg type, Player const* source, ...)
 {
-    char const* text = GetMangosString(entry);
-    WorldPacket data;
-    ChatHandler::FillMessageData(&data, NULL, CHAT_MSG_BG_SYSTEM_NEUTRAL, LANG_UNIVERSAL, NULL, 0, text, NULL);
-    SendPacketToAll(&data);
+    va_list ap;
+    va_start(ap, type);
+
+    MaNGOS::BattleGroundChatBuilder bg_builder(type, entry, source, &ap);
+    MaNGOS::LocalizedPacketDo<MaNGOS::BattleGroundChatBuilder> bg_do(bg_builder);
+    BroadcastWorker(bg_do);
+
+    va_end(ap);
 }
 
 void BattleGround::EndNow()
@@ -1505,6 +1662,14 @@ uint32 BattleGround::GetAlivePlayersCountByTeam(uint32 Team) const
         }
     }
     return count;
+}
+
+void BattleGround::CheckArenaWinConditions()
+{
+    if( !GetAlivePlayersCountByTeam(ALLIANCE) && GetPlayersCountByTeam(HORDE) )
+        EndBattleGround(HORDE);
+    else if( GetPlayersCountByTeam(ALLIANCE) && !GetAlivePlayersCountByTeam(HORDE) )
+        EndBattleGround(ALLIANCE);
 }
 
 void BattleGround::SetBgRaid( uint32 TeamID, Group *bg_raid )

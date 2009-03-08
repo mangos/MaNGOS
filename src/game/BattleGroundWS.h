@@ -105,8 +105,10 @@ enum BG_WS_FlagState
 
 enum BG_WS_Graveyards
 {
-    WS_GRAVEYARD_MAIN_ALLIANCE   = 771,
-    WS_GRAVEYARD_MAIN_HORDE      = 772
+    WS_GRAVEYARD_FLAGROOM_ALLIANCE = 769,
+    WS_GRAVEYARD_FLAGROOM_HORDE    = 770,
+    WS_GRAVEYARD_MAIN_ALLIANCE     = 771,
+    WS_GRAVEYARD_MAIN_HORDE        = 772
 };
 
 enum BG_WS_CreatureTypes
@@ -138,6 +140,8 @@ class BattleGroundWS : public BattleGround
 
         /* inherited from BattlegroundClass */
         virtual void AddPlayer(Player *plr);
+        virtual void StartingEventCloseDoors();
+        virtual void StartingEventOpenDoors();
 
         /* BG Flags */
         uint64 GetAllianceFlagPickerGUID() const    { return m_FlagKeepers[BG_TEAM_ALLIANCE]; }
@@ -160,6 +164,7 @@ class BattleGroundWS : public BattleGround
         void HandleKillPlayer(Player *player, Player *killer);
         bool SetupBattleGround();
         virtual void Reset();
+        virtual WorldSafeLocsEntry const* GetClosestGraveYard(Player* player);
 
         void UpdateFlagState(uint32 team, uint32 value);
         void UpdateTeamScore(uint32 team);

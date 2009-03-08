@@ -17,10 +17,8 @@
  */
 
 #include "Common.h"
-#include "SharedDefines.h"
 #include "Database/DatabaseEnv.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
 #include "Opcodes.h"
 #include "Log.h"
 #include "UpdateMask.h"
@@ -30,7 +28,6 @@
 #include "Player.h"
 #include "SkillExtraItems.h"
 #include "Unit.h"
-#include "CreatureAI.h"
 #include "Spell.h"
 #include "DynamicObject.h"
 #include "SpellAuras.h"
@@ -1106,7 +1103,23 @@ void Spell::EffectDummy(uint32 i)
                 {
                     m_caster->CastSpell(m_caster,54586,true);
                     return;
-                 }
+                }
+                case 58418:                                 // Portal to Orgrimmar
+                {
+                    if(!unitTarget)
+                        return;
+
+                    unitTarget->CastSpell(unitTarget, 58419, true);
+                    break;
+                }
+                case 58420:                                 // Portal to Stormwind
+                {
+                    if(!unitTarget)
+                        return;
+
+                    unitTarget->CastSpell(unitTarget, 58421, true);
+                    break;
+                }
             }
 
             //All IconID Check in there

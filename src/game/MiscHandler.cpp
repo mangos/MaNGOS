@@ -34,11 +34,9 @@
 #include "Chat.h"
 #include "ScriptCalls.h"
 #include <zlib/zlib.h>
-#include "MapManager.h"
 #include "ObjectAccessor.h"
 #include "Object.h"
 #include "BattleGround.h"
-#include "SpellAuras.h"
 #include "Pet.h"
 #include "SocialMgr.h"
 
@@ -859,8 +857,16 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
         }
 
         uint32 missingQuest = 0;
-        if(at->requiredQuest && !GetPlayer()->GetQuestRewardStatus(at->requiredQuest))
-            missingQuest = at->requiredQuest;
+        if(GetPlayer()->GetDifficulty() == DIFFICULTY_HEROIC)
+        {
+            if (at->requiredQuestHeroic && !GetPlayer()->GetQuestRewardStatus(at->requiredQuestHeroic))
+                missingQuest = at->requiredQuestHeroic;
+        }
+        else
+        {
+            if(at->requiredQuest && !GetPlayer()->GetQuestRewardStatus(at->requiredQuest))
+                missingQuest = at->requiredQuest;
+        }
 
         if(missingLevel || missingItem || missingKey || missingQuest)
         {

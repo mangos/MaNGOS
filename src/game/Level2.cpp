@@ -18,9 +18,6 @@
 
 #include "Common.h"
 #include "Database/DatabaseEnv.h"
-#include "WorldPacket.h"
-#include "WorldSession.h"
-#include "World.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "Item.h"
@@ -31,7 +28,7 @@
 #include "MapManager.h"
 #include "Language.h"
 #include "World.h"
-#include "GameEvent.h"
+#include "GameEventMgr.h"
 #include "SpellMgr.h"
 #include "PoolHandler.h"
 #include "AccountMgr.h"
@@ -162,7 +159,7 @@ bool ChatHandler::HandleTargetObjectCommand(const char* args)
 {
     Player* pl = m_session->GetPlayer();
     QueryResult *result;
-    GameEvent::ActiveEvents const& activeEventsList = gameeventmgr.GetActiveEventList();
+    GameEventMgr::ActiveEvents const& activeEventsList = gameeventmgr.GetActiveEventList();
     if(*args)
     {
         int32 id = atoi((char*)args);
@@ -185,7 +182,7 @@ bool ChatHandler::HandleTargetObjectCommand(const char* args)
         eventFilter << " AND (event IS NULL ";
         bool initString = true;
 
-        for (GameEvent::ActiveEvents::const_iterator itr = activeEventsList.begin(); itr != activeEventsList.end(); ++itr)
+        for (GameEventMgr::ActiveEvents::const_iterator itr = activeEventsList.begin(); itr != activeEventsList.end(); ++itr)
         {
             if (initString)
             {
@@ -3617,8 +3614,8 @@ bool ChatHandler::HandleLookupEventCommand(const char* args)
 
     uint32 counter = 0;
 
-    GameEvent::GameEventDataMap const& events = gameeventmgr.GetEventMap();
-    GameEvent::ActiveEvents const& activeEvents = gameeventmgr.GetActiveEventList();
+    GameEventMgr::GameEventDataMap const& events = gameeventmgr.GetEventMap();
+    GameEventMgr::ActiveEvents const& activeEvents = gameeventmgr.GetActiveEventList();
 
     for(uint32 id = 0; id < events.size(); ++id )
     {
@@ -3651,12 +3648,12 @@ bool ChatHandler::HandleEventActiveListCommand(const char* /*args*/)
 {
     uint32 counter = 0;
 
-    GameEvent::GameEventDataMap const& events = gameeventmgr.GetEventMap();
-    GameEvent::ActiveEvents const& activeEvents = gameeventmgr.GetActiveEventList();
+    GameEventMgr::GameEventDataMap const& events = gameeventmgr.GetEventMap();
+    GameEventMgr::ActiveEvents const& activeEvents = gameeventmgr.GetActiveEventList();
 
     char const* active = GetMangosString(LANG_ACTIVE);
 
-    for(GameEvent::ActiveEvents::const_iterator itr = activeEvents.begin(); itr != activeEvents.end(); ++itr )
+    for(GameEventMgr::ActiveEvents::const_iterator itr = activeEvents.begin(); itr != activeEvents.end(); ++itr )
     {
         uint32 event_id = *itr;
         GameEventData const& eventData = events[event_id];
@@ -3687,7 +3684,7 @@ bool ChatHandler::HandleEventInfoCommand(const char* args)
 
     uint32 event_id = atoi(cId);
 
-    GameEvent::GameEventDataMap const& events = gameeventmgr.GetEventMap();
+    GameEventMgr::GameEventDataMap const& events = gameeventmgr.GetEventMap();
 
     if(event_id >=events.size())
     {
@@ -3704,7 +3701,7 @@ bool ChatHandler::HandleEventInfoCommand(const char* args)
         return false;
     }
 
-    GameEvent::ActiveEvents const& activeEvents = gameeventmgr.GetActiveEventList();
+    GameEventMgr::ActiveEvents const& activeEvents = gameeventmgr.GetActiveEventList();
     bool active = activeEvents.find(event_id) != activeEvents.end();
     char const* activeStr = active ? GetMangosString(LANG_ACTIVE) : "";
 
@@ -3736,7 +3733,7 @@ bool ChatHandler::HandleEventStartCommand(const char* args)
 
     int32 event_id = atoi(cId);
 
-    GameEvent::GameEventDataMap const& events = gameeventmgr.GetEventMap();
+    GameEventMgr::GameEventDataMap const& events = gameeventmgr.GetEventMap();
 
     if(event_id < 1 || event_id >=events.size())
     {
@@ -3753,7 +3750,7 @@ bool ChatHandler::HandleEventStartCommand(const char* args)
         return false;
     }
 
-    GameEvent::ActiveEvents const& activeEvents = gameeventmgr.GetActiveEventList();
+    GameEventMgr::ActiveEvents const& activeEvents = gameeventmgr.GetActiveEventList();
     if(activeEvents.find(event_id) != activeEvents.end())
     {
         PSendSysMessage(LANG_EVENT_ALREADY_ACTIVE,event_id);
@@ -3777,7 +3774,7 @@ bool ChatHandler::HandleEventStopCommand(const char* args)
 
     int32 event_id = atoi(cId);
 
-    GameEvent::GameEventDataMap const& events = gameeventmgr.GetEventMap();
+    GameEventMgr::GameEventDataMap const& events = gameeventmgr.GetEventMap();
 
     if(event_id < 1 || event_id >=events.size())
     {
@@ -3794,7 +3791,7 @@ bool ChatHandler::HandleEventStopCommand(const char* args)
         return false;
     }
 
-    GameEvent::ActiveEvents const& activeEvents = gameeventmgr.GetActiveEventList();
+    GameEventMgr::ActiveEvents const& activeEvents = gameeventmgr.GetActiveEventList();
 
     if(activeEvents.find(event_id) == activeEvents.end())
     {

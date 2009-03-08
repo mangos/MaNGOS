@@ -569,9 +569,11 @@ enum MangosStrings
     // Battleground
     LANG_BG_A_WINS                      = 600,
     LANG_BG_H_WINS                      = 601,
-    LANG_BG_WS_ONE_MINUTE               = 602,
-    LANG_BG_WS_HALF_MINUTE              = 603,
-    LANG_BG_WS_BEGIN                    = 604,
+
+    LANG_BG_WS_START_TWO_MINUTES        = 753,
+    LANG_BG_WS_START_ONE_MINUTE         = 602,
+    LANG_BG_WS_START_HALF_MINUTE        = 603,
+    LANG_BG_WS_HAS_BEGUN                = 604,
 
     LANG_BG_WS_CAPTURED_HF              = 605,
     LANG_BG_WS_CAPTURED_AF              = 606,
@@ -585,9 +587,10 @@ enum MangosStrings
     LANG_BG_WS_ALLIANCE_FLAG_RESPAWNED  = 614,
     LANG_BG_WS_HORDE_FLAG_RESPAWNED     = 615,
 
-    LANG_BG_EY_ONE_MINUTE               = 636,
-    LANG_BG_EY_HALF_MINUTE              = 637,
-    LANG_BG_EY_BEGIN                    = 638,
+    LANG_BG_EY_START_TWO_MINUTES        = 755,
+    LANG_BG_EY_START_ONE_MINUTE         = 636,
+    LANG_BG_EY_START_HALF_MINUTE        = 637,
+    LANG_BG_EY_HAS_BEGUN                = 638,
 
     LANG_BG_AB_ALLY                     = 650,
     LANG_BG_AB_HORDE                    = 651,
@@ -600,9 +603,11 @@ enum MangosStrings
     LANG_BG_AB_NODE_DEFENDED            = 658,
     LANG_BG_AB_NODE_ASSAULTED           = 659,
     LANG_BG_AB_NODE_CLAIMED             = 660,
-    LANG_BG_AB_ONEMINTOSTART            = 661,
-    LANG_BG_AB_HALFMINTOSTART           = 662,
-    LANG_BG_AB_STARTED                  = 663,
+
+    LANG_BG_AB_START_TWO_MINUTES        = 754,
+    LANG_BG_AB_START_ONE_MINUTE         = 661,
+    LANG_BG_AB_START_HALF_MINUTE        = 662,
+    LANG_BG_AB_HAS_BEGUN                = 663,
     LANG_BG_AB_A_NEAR_VICTORY           = 664,
     LANG_BG_AB_H_NEAR_VICTORY           = 665,
     LANG_BG_MARK_BY_MAIL                = 666,
@@ -633,7 +638,7 @@ enum MangosStrings
     LANG_ARENA_ONE_MINUTE               = 701,
     LANG_ARENA_THIRTY_SECONDS           = 702,
     LANG_ARENA_FIFTEEN_SECONDS          = 703,
-    LANG_ARENA_BEGUN                    = 704,
+    LANG_ARENA_HAS_BEGUN                = 704,
 
     LANG_WAIT_BEFORE_SPEAKING           = 705,
     LANG_NOT_EQUIPPED_ITEM              = 706,
@@ -658,7 +663,7 @@ enum MangosStrings
     LANG_ARENA_NOT_ENOUGH_PLAYERS       = 723,              // "Your group does not have enough players to join this match."
     LANG_ARENA_GOLD_WINS                = 724,              // "The Gold Team wins!"
     LANG_ARENA_GREEN_WINS               = 725,              // "The Green Team wins!"
-    LANG_BATTLEGROUND_PREMATURE_FINISH_WARNING = 726,       // The battleground will end soon, because there aren't enough players. Get more ppl or win already!
+//                                      = 726, not used
     LANG_BG_GROUP_OFFLINE_MEMBER        = 727,              // "Your group has an offline member. Please remove him before joining."
     LANG_BG_GROUP_MIXED_FACTION         = 728,              // "Your group has players from the opposing faction. You can't join the battleground as a group."
     LANG_BG_GROUP_MIXED_LEVELS          = 729,              // "Your group has players from different battleground brakets. You can't join as group."
@@ -680,7 +685,16 @@ enum MangosStrings
     LANG_DIST_ARENA_POINTS_TEAM_START   = 744,
     LANG_DIST_ARENA_POINTS_TEAM_END     = 745,
     LANG_DIST_ARENA_POINTS_END          = 746,
-    // Room for batleground/arena strings 747-799 not used
+//                                      = 747, not used
+//                                      = 748, not used
+//                                      = 749, not used
+    LANG_BATTLEGROUND_PREMATURE_FINISH_WARNING = 750,       // "Not enough players. This game will close in %u mins."
+    LANG_BATTLEGROUND_PREMATURE_FINISH_WARNING_SECS = 751,  // "Not enough players. This game will close in %u seconds."
+//                                      = 752, not used
+//  LANG_BG_WS_START_TWO_MINUTES        = 753,
+//  LANG_BG_AB_START_TWO_MINUTES        = 754,
+//  LANG_BG_EY_START_TWO_MINUTES        = 755,
+    // Room for batleground/arena strings 756-799 not used
 
     // in game strings
     //                                  = 800, not used
