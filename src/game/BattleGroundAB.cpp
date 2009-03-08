@@ -87,15 +87,13 @@ void BattleGroundAB::Update(uint32 diff)
                     if(teamIndex == 0)
                     {
                         // FIXME: team and node names not localized
-                        PSendMessageToAll(LANG_BG_AB_NODE_TAKEN,CHAT_MSG_BG_SYSTEM_ALLIANCE,NULL,
-                            GetMangosString(LANG_BG_AB_ALLY), _GetNodeName(node));
+                        SendMessage2ToAll(LANG_BG_AB_NODE_TAKEN,CHAT_MSG_BG_SYSTEM_ALLIANCE,NULL,LANG_BG_AB_ALLY,_GetNodeNameId(node));
                         PlaySoundToAll(SOUND_NODE_CAPTURED_ALLIANCE);
                     }
                     else
                     {
                         // FIXME: team and node names not localized
-                        PSendMessageToAll(LANG_BG_AB_NODE_TAKEN,CHAT_MSG_BG_SYSTEM_HORDE,NULL,
-                            GetMangosString(LANG_BG_AB_HORDE),_GetNodeName(node));
+                        SendMessage2ToAll(LANG_BG_AB_NODE_TAKEN,CHAT_MSG_BG_SYSTEM_HORDE,NULL,LANG_BG_AB_HORDE,_GetNodeNameId(node));
                         PlaySoundToAll(SOUND_NODE_CAPTURED_HORDE);
                     }
                 }
@@ -274,24 +272,19 @@ void BattleGroundAB::_DelBanner(uint8 node, uint8 type, uint8 teamIndex)
     SpawnBGObject(obj, RESPAWN_ONE_DAY);
 }
 
-const char* BattleGroundAB::_GetNodeName(uint8 node)
+int32 BattleGroundAB::_GetNodeNameId(uint8 node)
 {
     switch (node)
     {
-        case BG_AB_NODE_STABLES:
-            return GetMangosString(LANG_BG_AB_NODE_STABLES);
-        case BG_AB_NODE_BLACKSMITH:
-            return GetMangosString(LANG_BG_AB_NODE_BLACKSMITH);
-        case BG_AB_NODE_FARM:
-            return GetMangosString(LANG_BG_AB_NODE_FARM);
-        case BG_AB_NODE_LUMBER_MILL:
-            return GetMangosString(LANG_BG_AB_NODE_LUMBER_MILL);
-        case BG_AB_NODE_GOLD_MINE:
-            return GetMangosString(LANG_BG_AB_NODE_GOLD_MINE);
+        case BG_AB_NODE_STABLES:    return LANG_BG_AB_NODE_STABLES;
+        case BG_AB_NODE_BLACKSMITH: return LANG_BG_AB_NODE_BLACKSMITH;
+        case BG_AB_NODE_FARM:       return LANG_BG_AB_NODE_FARM;
+        case BG_AB_NODE_LUMBER_MILL:return LANG_BG_AB_NODE_LUMBER_MILL;
+        case BG_AB_NODE_GOLD_MINE:  return LANG_BG_AB_NODE_GOLD_MINE;
         default:
             ASSERT(0);
     }
-    return "";
+    return 0;
 }
 
 void BattleGroundAB::FillInitialWorldStates(WorldPacket& data)
@@ -443,9 +436,9 @@ void BattleGroundAB::EventPlayerClickedOnFlag(Player *source, GameObject* /*targ
 
         // FIXME: team and node names not localized
         if(teamIndex == 0)
-            PSendMessageToAll(LANG_BG_AB_NODE_CLAIMED,CHAT_MSG_BG_SYSTEM_ALLIANCE, source, _GetNodeName(node), GetMangosString(LANG_BG_AB_ALLY));
+            SendMessage2ToAll(LANG_BG_AB_NODE_CLAIMED,CHAT_MSG_BG_SYSTEM_ALLIANCE, source, _GetNodeNameId(node), LANG_BG_AB_ALLY);
         else
-            PSendMessageToAll(LANG_BG_AB_NODE_CLAIMED,CHAT_MSG_BG_SYSTEM_HORDE, source, _GetNodeName(node), GetMangosString(LANG_BG_AB_HORDE));
+            SendMessage2ToAll(LANG_BG_AB_NODE_CLAIMED,CHAT_MSG_BG_SYSTEM_HORDE, source, _GetNodeNameId(node), LANG_BG_AB_HORDE);
 
         sound = SOUND_NODE_CLAIMED;
     }
@@ -467,9 +460,9 @@ void BattleGroundAB::EventPlayerClickedOnFlag(Player *source, GameObject* /*targ
 
             // FIXME: node names not localized
             if(teamIndex == 0)
-                PSendMessageToAll(LANG_BG_AB_NODE_ASSAULTED,CHAT_MSG_BG_SYSTEM_ALLIANCE, source, _GetNodeName(node));
+                SendMessage2ToAll(LANG_BG_AB_NODE_ASSAULTED,CHAT_MSG_BG_SYSTEM_ALLIANCE, source, _GetNodeNameId(node));
             else
-                PSendMessageToAll(LANG_BG_AB_NODE_ASSAULTED,CHAT_MSG_BG_SYSTEM_HORDE, source, _GetNodeName(node));
+                SendMessage2ToAll(LANG_BG_AB_NODE_ASSAULTED,CHAT_MSG_BG_SYSTEM_HORDE, source, _GetNodeNameId(node));
         }
         // If contested, change back to occupied
         else
@@ -487,9 +480,9 @@ void BattleGroundAB::EventPlayerClickedOnFlag(Player *source, GameObject* /*targ
 
             // FIXME: node names not localized
             if(teamIndex == 0)
-                PSendMessageToAll(LANG_BG_AB_NODE_DEFENDED,CHAT_MSG_BG_SYSTEM_ALLIANCE, source, _GetNodeName(node));
+                SendMessage2ToAll(LANG_BG_AB_NODE_DEFENDED,CHAT_MSG_BG_SYSTEM_ALLIANCE, source, _GetNodeNameId(node));
             else
-                PSendMessageToAll(LANG_BG_AB_NODE_DEFENDED,CHAT_MSG_BG_SYSTEM_HORDE, source, _GetNodeName(node));
+                SendMessage2ToAll(LANG_BG_AB_NODE_DEFENDED,CHAT_MSG_BG_SYSTEM_HORDE, source, _GetNodeNameId(node));
         }
         sound = (teamIndex == 0) ? SOUND_NODE_ASSAULTED_ALLIANCE : SOUND_NODE_ASSAULTED_HORDE;
     }
@@ -509,9 +502,9 @@ void BattleGroundAB::EventPlayerClickedOnFlag(Player *source, GameObject* /*targ
 
         // FIXME: node names not localized
         if(teamIndex == 0)
-            PSendMessageToAll(LANG_BG_AB_NODE_ASSAULTED,CHAT_MSG_BG_SYSTEM_ALLIANCE, source, _GetNodeName(node));
+            SendMessage2ToAll(LANG_BG_AB_NODE_ASSAULTED,CHAT_MSG_BG_SYSTEM_ALLIANCE, source, _GetNodeNameId(node));
         else
-            PSendMessageToAll(LANG_BG_AB_NODE_ASSAULTED,CHAT_MSG_BG_SYSTEM_HORDE, source, _GetNodeName(node));
+            SendMessage2ToAll(LANG_BG_AB_NODE_ASSAULTED,CHAT_MSG_BG_SYSTEM_HORDE, source, _GetNodeNameId(node));
 
         sound = (teamIndex == 0) ? SOUND_NODE_ASSAULTED_ALLIANCE : SOUND_NODE_ASSAULTED_HORDE;
     }
@@ -521,9 +514,9 @@ void BattleGroundAB::EventPlayerClickedOnFlag(Player *source, GameObject* /*targ
     {
         // FIXME: team and node names not localized
         if(teamIndex == 0)
-            PSendMessageToAll(LANG_BG_AB_NODE_TAKEN,CHAT_MSG_BG_SYSTEM_ALLIANCE, NULL, GetMangosString(LANG_BG_AB_ALLY), _GetNodeName(node));
+            SendMessage2ToAll(LANG_BG_AB_NODE_TAKEN,CHAT_MSG_BG_SYSTEM_ALLIANCE, NULL, LANG_BG_AB_ALLY, _GetNodeNameId(node));
         else
-            PSendMessageToAll(LANG_BG_AB_NODE_TAKEN,CHAT_MSG_BG_SYSTEM_HORDE, NULL, GetMangosString(LANG_BG_AB_HORDE), _GetNodeName(node));
+            SendMessage2ToAll(LANG_BG_AB_NODE_TAKEN,CHAT_MSG_BG_SYSTEM_HORDE, NULL, LANG_BG_AB_HORDE, _GetNodeNameId(node));
     }
     PlaySoundToAll(sound);
 }

@@ -25,6 +25,7 @@
 #include "Object.h"
 #include "Creature.h"
 #include "Player.h"
+#include "Vehicle.h"
 #include "ObjectMgr.h"
 #include "UpdateData.h"
 #include "UpdateMask.h"

@@ -23,6 +23,7 @@
 #include "Creature.h"
 #include "GameObject.h"
 #include "DynamicObject.h"
+#include "Vehicle.h"
 #include "WorldPacket.h"
 #include "Item.h"
 #include "Corpse.h"
