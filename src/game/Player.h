@@ -2373,6 +2373,7 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         uint32 m_anti_justjumped;       //Jump already began, anti air jump check  
         uint64 m_anti_alarmcount;       //alarm counter
+        float  m_anti_jumpbase;
         // Transports
         Transport * m_transport;
 
