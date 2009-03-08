@@ -399,6 +399,15 @@ class BattleGround
         virtual void FillInitialWorldStates(WorldPacket& /*data*/) {}
         void SendPacketToTeam(uint32 TeamID, WorldPacket *packet, Player *sender = NULL, bool self = true);
         void SendPacketToAll(WorldPacket *packet);
+
+        template<class Do>
+        void BroadcastWorker(Do& _do)
+        {
+            for(std::map<uint64, BattleGroundPlayer>::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+                if(Player *plr = ObjectAccessor::FindPlayer(MAKE_NEW_GUID(itr->first, 0, HIGHGUID_PLAYER)))
+                    _do(plr);
+        }
+
         void PlaySoundToTeam(uint32 SoundID, uint32 TeamID);
         void PlaySoundToAll(uint32 SoundID);
         void CastSpellOnTeam(uint32 SpellID, uint32 TeamID);
@@ -412,8 +421,8 @@ class BattleGround
         void EndBattleGround(uint32 winner);
         void BlockMovement(Player *plr);
 
-        void SendMessageToAll(int32 entry, uint8 type);
-        void PSendMessageToAll(int32 entry, uint8 type, ...  );
+        void SendMessageToAll(int32 entry, ChatMsg type);
+        void PSendMessageToAll(int32 entry, ChatMsg type, ...  );
 
         /* Raid Group */
         Group *GetBgRaid(uint32 TeamID) const { return TeamID == ALLIANCE ? m_BgRaids[BG_TEAM_ALLIANCE] : m_BgRaids[BG_TEAM_HORDE]; }

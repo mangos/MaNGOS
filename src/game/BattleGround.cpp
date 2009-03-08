@@ -31,6 +31,52 @@
 #include "ObjectMgr.h"
 #include "WorldPacket.h"
 #include "Util.h"
+#include "GridNotifiersImpl.h"
+
+namespace MaNGOS
+{
+    class BattleGroundChatBuilder
+    {
+        public:
+            BattleGroundChatBuilder(ChatMsg msgtype, int32 textId, va_list* args = NULL)
+                : i_msgtype(msgtype), i_textId(textId), i_args(args) {}
+            void operator()(WorldPacket& data, int32 loc_idx)
+            {
+                char const* text = objmgr.GetMangosString(i_textId,loc_idx);
+
+                if(i_args)
+                {
+                    // we need copy va_list before use or original va_list will corrupted
+                    va_list ap;
+                    va_copy(ap,*i_args);
+
+                    char str [2048];
+                    vsnprintf(str,2048,text, ap );
+                    va_end(ap);
+
+                    do_helper(data,&str[0]);
+                }
+                else
+                    do_helper(data,text);
+            }
+        private:
+            void do_helper(WorldPacket& data, char const* text)
+            {
+                data << uint8(i_msgtype);
+                data << uint32(LANG_UNIVERSAL);
+                data << uint64(0);                                     // there 0 for BG messages
+                data << uint32(0);                                     // can be chat msg group or something
+                data << uint64(0);
+                data << uint32(strlen(text)+1);
+                data << text;
+                data << uint8(0);
+            }
+
+            ChatMsg i_msgtype;
+            int32 i_textId;
+            va_list* i_args;
+    };
+}                                                           // namespace MaNGOS
 
 BattleGround::BattleGround()
 {
@@ -1474,27 +1520,23 @@ bool BattleGround::AddSpiritGuide(uint32 type, float x, float y, float z, float 
     return true;
 }
 
-void BattleGround::SendMessageToAll(int32 entry, uint8 type)
+void BattleGround::SendMessageToAll(int32 entry, ChatMsg type)
 {
-    char const* text = GetMangosString(entry);
-    WorldPacket data;
-    ChatHandler::FillMessageData(&data, NULL, type, LANG_UNIVERSAL, NULL, 0, text, NULL);
-    SendPacketToAll(&data);
+    MaNGOS::BattleGroundChatBuilder bg_builder(type, entry);
+    MaNGOS::LocalizedPacketDo<MaNGOS::BattleGroundChatBuilder> bg_do(bg_builder);
+    BroadcastWorker(bg_do);
 }
 
-//copied from void ChatHandler::PSendSysMessage(int32 entry, ...)
-void BattleGround::PSendMessageToAll(int32 entry, uint8 type, ...)
+void BattleGround::PSendMessageToAll(int32 entry, ChatMsg type, ...)
 {
-    const char *format = GetMangosString(entry);
     va_list ap;
-    char str [2048];
     va_start(ap, type);
-    vsnprintf(str,2048,format, ap );
-    va_end(ap);
 
-    WorldPacket data;
-    ChatHandler::FillMessageData(&data, NULL, type, LANG_UNIVERSAL, NULL, 0, str, NULL);
-    SendPacketToAll(&data);
+    MaNGOS::BattleGroundChatBuilder bg_builder(type, entry, &ap);
+    MaNGOS::LocalizedPacketDo<MaNGOS::BattleGroundChatBuilder> bg_do(bg_builder);
+    BroadcastWorker(bg_do);
+
+    va_end(ap);
 }
 
 void BattleGround::EndNow()
