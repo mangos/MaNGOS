@@ -45,6 +45,13 @@ void HmacHash::UpdateData(const uint8 *data, int length)
 void HmacHash::Finalize()
 {
     uint32 length = 0;
-    HMAC_Final(&m_ctx, m_digest, &length);
+    HMAC_Final(&m_ctx, (uint8*)m_digest, &length);
     ASSERT(length == SHA_DIGEST_LENGTH)
+}
+
+uint8 *HmacHash::ComputeHash(BigNumber *bn)
+{
+    HMAC_Update(&m_ctx, bn->AsByteArray(), bn->GetNumBytes());
+    Finalize();
+    return (uint8*)m_digest;
 }
