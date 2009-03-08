@@ -412,7 +412,6 @@ class BattleGround
         void EndBattleGround(uint32 winner);
         void BlockMovement(Player *plr);
 
-        void SendMessageToAll(char const* text, uint8 type);
         void SendMessageToAll(int32 entry, uint8 type);
         void PSendMessageToAll(int32 entry, uint8 type, ...  );
 

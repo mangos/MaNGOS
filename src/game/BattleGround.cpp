@@ -1474,13 +1474,6 @@ bool BattleGround::AddSpiritGuide(uint32 type, float x, float y, float z, float 
     return true;
 }
 
-void BattleGround::SendMessageToAll(char const* text, uint8 type)
-{
-    WorldPacket data;
-    ChatHandler::FillMessageData(&data, NULL, type, LANG_UNIVERSAL, NULL, 0, text, NULL);
-    SendPacketToAll(&data);
-}
-
 void BattleGround::SendMessageToAll(int32 entry, uint8 type)
 {
     char const* text = GetMangosString(entry);
@@ -1498,7 +1491,10 @@ void BattleGround::PSendMessageToAll(int32 entry, uint8 type, ...)
     va_start(ap, type);
     vsnprintf(str,2048,format, ap );
     va_end(ap);
-    SendMessageToAll(str, type);
+
+    WorldPacket data;
+    ChatHandler::FillMessageData(&data, NULL, type, LANG_UNIVERSAL, NULL, 0, str, NULL);
+    SendPacketToAll(&data);
 }
 
 void BattleGround::EndNow()

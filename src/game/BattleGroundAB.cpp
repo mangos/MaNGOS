@@ -125,9 +125,9 @@ void BattleGroundAB::Update(uint32 diff)
                 if( !m_IsInformedNearVictory && m_TeamScores[team] > 1800 )
                 {
                     if( team == BG_TEAM_ALLIANCE )
-                        SendMessageToAll(GetMangosString(LANG_BG_AB_A_NEAR_VICTORY), CHAT_MSG_BG_SYSTEM_NEUTRAL);
+                        SendMessageToAll(LANG_BG_AB_A_NEAR_VICTORY, CHAT_MSG_BG_SYSTEM_NEUTRAL);
                     else
-                        SendMessageToAll(GetMangosString(LANG_BG_AB_H_NEAR_VICTORY), CHAT_MSG_BG_SYSTEM_NEUTRAL);
+                        SendMessageToAll(LANG_BG_AB_H_NEAR_VICTORY, CHAT_MSG_BG_SYSTEM_NEUTRAL);
                     PlaySoundToAll(SOUND_NEAR_VICTORY);
                     m_IsInformedNearVictory = true;
                 }

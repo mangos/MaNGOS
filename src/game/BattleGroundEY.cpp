@@ -519,7 +519,7 @@ void BattleGroundEY::RespawnFlag(bool send_message)
 
     if(send_message)
     {
-        SendMessageToAll(GetMangosString(LANG_BG_EY_RESETED_FLAG), CHAT_MSG_BG_SYSTEM_NEUTRAL);
+        SendMessageToAll(LANG_BG_EY_RESETED_FLAG, CHAT_MSG_BG_SYSTEM_NEUTRAL);
         PlaySoundToAll(BG_EY_SOUND_FLAG_RESET);             // flags respawned sound...
     }
 
