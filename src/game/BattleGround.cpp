@@ -37,8 +37,8 @@ namespace MaNGOS
     class BattleGroundChatBuilder
     {
         public:
-            BattleGroundChatBuilder(ChatMsg msgtype, int32 textId, va_list* args = NULL)
-                : i_msgtype(msgtype), i_textId(textId), i_args(args) {}
+            BattleGroundChatBuilder(ChatMsg msgtype, int32 textId, Player const* source, va_list* args = NULL)
+                : i_msgtype(msgtype), i_textId(textId), i_source(source), i_args(args) {}
             void operator()(WorldPacket& data, int32 loc_idx)
             {
                 char const* text = objmgr.GetMangosString(i_textId,loc_idx);
@@ -61,18 +61,21 @@ namespace MaNGOS
         private:
             void do_helper(WorldPacket& data, char const* text)
             {
+                uint64 target_guid = i_source  ? i_source ->GetGUID() : 0;
+
                 data << uint8(i_msgtype);
                 data << uint32(LANG_UNIVERSAL);
-                data << uint64(0);                                     // there 0 for BG messages
-                data << uint32(0);                                     // can be chat msg group or something
-                data << uint64(0);
+                data << uint64(target_guid);                // there 0 for BG messages
+                data << uint32(0);                          // can be chat msg group or something
+                data << uint64(target_guid);
                 data << uint32(strlen(text)+1);
                 data << text;
-                data << uint8(0);
+                data << uint8(i_source ? i_source->chatTag() : uint8(0));
             }
 
             ChatMsg i_msgtype;
             int32 i_textId;
+            Player const* i_source;
             va_list* i_args;
     };
 }                                                           // namespace MaNGOS
@@ -303,13 +306,13 @@ void BattleGround::Update(uint32 diff)
             if( newtime > (MINUTE * IN_MILISECONDS) )
             {
                 if( newtime / (MINUTE * IN_MILISECONDS) != m_PrematureCountDownTimer / (MINUTE * IN_MILISECONDS) )
-                    PSendMessageToAll(LANG_BATTLEGROUND_PREMATURE_FINISH_WARNING, CHAT_MSG_SYSTEM, (uint32)(m_PrematureCountDownTimer / (MINUTE * IN_MILISECONDS)));
+                    PSendMessageToAll(LANG_BATTLEGROUND_PREMATURE_FINISH_WARNING, CHAT_MSG_SYSTEM, NULL, (uint32)(m_PrematureCountDownTimer / (MINUTE * IN_MILISECONDS)));
             }
             else
             {
                 //announce every 15 seconds
                 if( newtime / (15 * IN_MILISECONDS) != m_PrematureCountDownTimer / (15 * IN_MILISECONDS) )
-                    PSendMessageToAll(LANG_BATTLEGROUND_PREMATURE_FINISH_WARNING_SECS, CHAT_MSG_SYSTEM, (uint32)(m_PrematureCountDownTimer / IN_MILISECONDS));
+                    PSendMessageToAll(LANG_BATTLEGROUND_PREMATURE_FINISH_WARNING_SECS, CHAT_MSG_SYSTEM, NULL, (uint32)(m_PrematureCountDownTimer / IN_MILISECONDS));
             }
             m_PrematureCountDownTimer = newtime;
         }
@@ -1507,19 +1510,19 @@ bool BattleGround::AddSpiritGuide(uint32 type, float x, float y, float z, float 
     return true;
 }
 
-void BattleGround::SendMessageToAll(int32 entry, ChatMsg type)
+void BattleGround::SendMessageToAll(int32 entry, ChatMsg type, Player const* source)
 {
-    MaNGOS::BattleGroundChatBuilder bg_builder(type, entry);
+    MaNGOS::BattleGroundChatBuilder bg_builder(type, entry, source);
     MaNGOS::LocalizedPacketDo<MaNGOS::BattleGroundChatBuilder> bg_do(bg_builder);
     BroadcastWorker(bg_do);
 }
 
-void BattleGround::PSendMessageToAll(int32 entry, ChatMsg type, ...)
+void BattleGround::PSendMessageToAll(int32 entry, ChatMsg type, Player const* source, ...)
 {
     va_list ap;
     va_start(ap, type);
 
-    MaNGOS::BattleGroundChatBuilder bg_builder(type, entry, &ap);
+    MaNGOS::BattleGroundChatBuilder bg_builder(type, entry, source, &ap);
     MaNGOS::LocalizedPacketDo<MaNGOS::BattleGroundChatBuilder> bg_do(bg_builder);
     BroadcastWorker(bg_do);
 
