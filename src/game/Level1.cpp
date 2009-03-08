@@ -36,6 +36,7 @@
 #include "VMapFactory.h"
 #endif
 
+//-----------------------Npc Commands-----------------------
 bool ChatHandler::HandleNpcSayCommand(const char* args)
 {
     if(!*args)
@@ -119,6 +120,7 @@ bool ChatHandler::HandleNpcWhisperCommand(const char* args)
 
     return true;
 }
+//----------------------------------------------------------
 
 // global announce
 bool ChatHandler::HandleAnnounceCommand(const char* args)
