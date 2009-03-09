@@ -267,7 +267,7 @@ class Guild
         Guild();
         ~Guild();
 
-        bool create(uint64 lGuid, std::string gname);
+        bool create(Player* leader, std::string gname);
         void Disband();
 
         typedef std::map<uint32, MemberSlot> MemberList;
