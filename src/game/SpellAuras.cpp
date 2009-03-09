@@ -2490,15 +2490,9 @@ void Aura::HandleAuraHover(bool apply, bool Real)
 
 void Aura::HandleWaterBreathing(bool apply, bool Real)
 {
-    if(!apply && !m_target->HasAuraType(SPELL_AURA_WATER_BREATHING))
-    {
-        // update for enable timer in case not moving target
-        if(m_target->GetTypeId()==TYPEID_PLAYER && m_target->IsInWorld())
-        {
-            ((Player*)m_target)->UpdateUnderwaterState(m_target->GetMap(),m_target->GetPositionX(),m_target->GetPositionY(),m_target->GetPositionZ());
-            ((Player*)m_target)->HandleDrowning();
-        }
-    }
+    // update timers in client
+    if(m_target->GetTypeId()==TYPEID_PLAYER)
+        ((Player*)m_target)->UpdateMirrorTimers();
 }
 
 void Aura::HandleAuraModShapeshift(bool apply, bool Real)
@@ -3108,7 +3102,7 @@ void Aura::HandleModPossessPet(bool apply, bool Real)
     else
         pet->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_24);
 
-    ((Player*)caster)->SetFarSightGUID(apply ? pet->GetGUID() : NULL);
+    ((Player*)caster)->SetFarSightGUID(apply ? pet->GetGUID() : 0);
     ((Player*)caster)->SetCharm(apply ? pet : NULL);
     ((Player*)caster)->SetClientControl(pet, apply ? 1 : 0);
 
@@ -4181,7 +4175,7 @@ void Aura::HandleAuraPeriodicDummy(bool apply, bool Real)
         {
             // Explosive Shot
             if (apply && !loading && caster)
-                m_modifier.m_amount +=caster->GetTotalAttackPowerValue(RANGED_ATTACK) * 8 / 100;
+                m_modifier.m_amount += int32(caster->GetTotalAttackPowerValue(RANGED_ATTACK) * 8 / 100);
             break;
         }
     }

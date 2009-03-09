@@ -89,7 +89,7 @@ enum BattleGroundTimeIntervals
     INVITATION_REMIND_TIME          = 60000,                // ms
     INVITE_ACCEPT_WAIT_TIME         = 80000,                // ms
     TIME_TO_AUTOREMOVE              = 120000,               // ms
-    MAX_OFFLINE_TIME                = 300000,               // ms
+    MAX_OFFLINE_TIME                = 300,                  // secs
     RESPAWN_ONE_DAY                 = 86400,                // secs
     RESPAWN_IMMEDIATELY             = 0,                    // secs
     BUFF_RESPAWN_TIME               = 180,                  // secs
@@ -125,7 +125,7 @@ enum BattleGroundStatus
 
 struct BattleGroundPlayer
 {
-    uint32  LastOnlineTime;                                 // for tracking and removing offline players from queue after 5 minutes
+    time_t  OfflineRemoveTime;                              // for tracking and removing offline players from queue after 5 minutes
     uint32  Team;                                           // Player's team
 };
 
@@ -367,7 +367,6 @@ class BattleGround
         typedef std::map<uint64, BattleGroundPlayer> BattleGroundPlayerMap;
         BattleGroundPlayerMap const& GetPlayers() const { return m_Players; }
         uint32 GetPlayersSize() const { return m_Players.size(); }
-        uint32 GetRemovedPlayersSize() const { return m_RemovedPlayers.size(); }
 
         std::map<uint64, BattleGroundScore*>::const_iterator GetPlayerScoresBegin() const { return m_PlayerScores.begin(); }
         std::map<uint64, BattleGroundScore*>::const_iterator GetPlayerScoresEnd() const { return m_PlayerScores.end(); }
@@ -401,12 +400,7 @@ class BattleGround
         void SendPacketToAll(WorldPacket *packet);
 
         template<class Do>
-        void BroadcastWorker(Do& _do)
-        {
-            for(std::map<uint64, BattleGroundPlayer>::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
-                if(Player *plr = ObjectAccessor::FindPlayer(MAKE_NEW_GUID(itr->first, 0, HIGHGUID_PLAYER)))
-                    _do(plr);
-        }
+        void BroadcastWorker(Do& _do);
 
         void PlaySoundToTeam(uint32 SoundID, uint32 TeamID);
         void PlaySoundToAll(uint32 SoundID);
@@ -423,6 +417,9 @@ class BattleGround
 
         void SendMessageToAll(int32 entry, ChatMsg type, Player const* source = NULL);
         void PSendMessageToAll(int32 entry, ChatMsg type, Player const* source, ...  );
+
+        // specialized version with 2 string id args
+        void SendMessage2ToAll(int32 entry, ChatMsg type, Player const* source, int32 strId1 = 0, int32 strId2 = 0);
 
         /* Raid Group */
         Group *GetBgRaid(uint32 TeamID) const { return TeamID == ALLIANCE ? m_BgRaids[BG_TEAM_ALLIANCE] : m_BgRaids[BG_TEAM_HORDE]; }
@@ -458,6 +455,7 @@ class BattleGround
         virtual void EventPlayerDroppedFlag(Player* /*player*/) {}
         virtual void EventPlayerClickedOnFlag(Player* /*player*/, GameObject* /*target_obj*/) {}
         virtual void EventPlayerCapturedFlag(Player* /*player*/) {}
+        void EventPlayerLoggedIn(Player* player, uint64 plr_guid);
         void EventPlayerLoggedOut(Player* player);
 
         /* Death related */
@@ -487,20 +485,20 @@ class BattleGround
 
         void DoorOpen(uint32 type);
         void DoorClose(uint32 type);
-        const char *GetMangosString(int32 entry);
 
         virtual bool HandlePlayerUnderMap(Player * /*plr*/) { return false; }
 
         // since arenas can be AvA or Hvh, we have to get the "temporary" team of a player
         uint32 GetPlayerTeam(uint64 guid);
+        uint32 GetOtherTeam(uint32 teamId);
         bool IsPlayerInBattleGround(uint64 guid);
-        void PlayerRelogin(Player* plr);
 
         void SetDeleteThis() {m_SetDeleteThis = true;}
 
     protected:
         //this method is called, when BG cannot spawn its own spirit guide, or something is wrong, It correctly ends BattleGround
         void EndNow();
+        void PlayerAddedToBGCheckIfBGIsRunning(Player* plr);
 
         /* Scorekeeping */
                                                             // Player scores
@@ -545,7 +543,7 @@ class BattleGround
 
         /* Player lists */
         std::vector<uint64> m_ResurrectQueue;               // Player GUID
-        std::map<uint64, uint8> m_RemovedPlayers;           // uint8 is remove type (0 - bgqueue, 1 - bg, 2 - resurrect queue)
+        std::deque<uint64> m_OfflineQueue;                  // Player GUID
 
         /* Invited counters are useful for player invitation to BG - do not allow, if BG is started to one faction to have 2 more players than another faction */
         /* Invited counters will be changed only when removing already invited player from queue, removing player from battleground and inviting player to BG */
