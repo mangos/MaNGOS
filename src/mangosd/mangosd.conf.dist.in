@@ -1244,7 +1244,7 @@ Network.TcpNodelay = 1
 #        maximum alarms before player will be kicked (default 50, allowed 20 - 100)
 #
 #    Anticheat.Movement.MistimingDelta
-#        mistiming intelval between client and serverside (default 2000 ms, allowed 1000 - 10000 ms)
+#        mistiming intelval between client and serverside (default 10000 ms, allowed 1000 - 10000 ms)
 #
 #    Anticheat.Movement.MistimingAlarms
 #        mistiming alarms before player will be kicked (default 20, allowed 10 - 50)
