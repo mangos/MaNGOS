@@ -119,7 +119,7 @@ void WorldSession::HandleGMTicketCreateOpcode( WorldPacket & recv_data )
     data.Initialize( SMSG_GMTICKET_CREATE, 4 );
     data << uint32(2);
     SendPacket( &data );
-    DEBUG_LOG("update the ticket\n");
+    DEBUG_LOG("update the ticket");
 
     //TODO: Guard player map
     HashMapHolder<Player>::MapType &m = ObjectAccessor::Instance().GetPlayers();

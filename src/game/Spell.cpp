@@ -2044,7 +2044,7 @@ void Spell::SetTargetMap(uint32 i,uint32 cur,std::list<Unit*> &TagUnitMap)
                 }
             }
             else
-                sLog.outError( "SPELL: unknown target coordinates for spell ID %u\n", m_spellInfo->Id );
+                sLog.outError( "SPELL: unknown target coordinates for spell ID %u", m_spellInfo->Id );
         }break;
         case TARGET_BEHIND_VICTIM:
         {
@@ -3530,7 +3530,7 @@ void Spell::HandleEffects(Unit *pUnitTarget,Item *pItemTarget,GameObject *pGOTar
             EffectEnchantItemTmp(i);
         else
         {
-            sLog.outError("SPELL: unknown effect %u spell id %u\n",
+            sLog.outError("SPELL: unknown effect %u spell id %u",
                 eff, m_spellInfo->Id);
         }
     }
