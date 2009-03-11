@@ -23,8 +23,7 @@
 #include "Creature.h"
 #include "GameObject.h"
 #include "DynamicObject.h"
-#include "Corpse.h"
-#include "WorldSession.h"
+#include "Vehicle.h"
 #include "WorldPacket.h"
 #include "Item.h"
 #include "Corpse.h"
@@ -409,7 +408,7 @@ ObjectAccessor::ConvertCorpseForPlayer(uint64 player_guid, bool insignia)
         return NULL;
     }
 
-    DEBUG_LOG("Deleting Corpse and spawning bones.\n");
+    DEBUG_LOG("Deleting Corpse and spawning bones.");
 
     // remove corpse from player_guid -> corpse map
     RemoveCorpse(corpse);

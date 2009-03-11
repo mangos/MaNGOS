@@ -31,7 +31,6 @@
 #include "GridDefines.h"
 #include "Object.h"
 #include "Player.h"
-#include "Vehicle.h"
 
 #include <set>
 
@@ -40,6 +39,7 @@ class Corpse;
 class Unit;
 class GameObject;
 class DynamicObject;
+class Vehicle;
 class WorldObject;
 class Map;
 

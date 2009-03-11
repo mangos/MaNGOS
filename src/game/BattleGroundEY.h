@@ -210,6 +210,9 @@ enum EYBattleGroundObjectTypes
     BG_EY_OBJECT_MAX                            = 59
 };
 
+#define BG_EY_NotEYWeekendHonorTicks 330
+#define BG_EY_EYWeekendHonorTicks 200
+
 enum BG_EY_FlagState
 {
     BG_EY_FLAG_STATE_ON_BASE      = 0,
@@ -302,6 +305,8 @@ class BattleGroundEY : public BattleGround
 
         /* inherited from BattlegroundClass */
         virtual void AddPlayer(Player *plr);
+        virtual void StartingEventCloseDoors();
+        virtual void StartingEventOpenDoors();
 
         /* BG Flags */
         uint64 GetFlagPickerGUID() const    { return m_FlagKeeper; }
@@ -319,6 +324,7 @@ class BattleGroundEY : public BattleGround
         virtual bool SetupBattleGround();
         virtual void Reset();
         void UpdateTeamScore(uint32 Team);
+        void EndBattleGround(uint32 winner);
         void UpdatePlayerScore(Player *Source, uint32 type, uint32 value);
         virtual void FillInitialWorldStates(WorldPacket& data);
         void SetDroppedFlagGUID(uint64 guid)       { m_DroppedFlagGUID = guid;}
@@ -368,5 +374,6 @@ class BattleGroundEY : public BattleGround
         uint8 m_CurrentPointPlayersCount[2*EY_POINTS_MAX];
 
         int32 m_PointAddingTimer;
+        uint32 m_HonorTics;
 };
 #endif

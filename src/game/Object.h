@@ -414,6 +414,7 @@ class MANGOS_DLL_SPEC WorldObject : public Object
 
         uint32 GetZoneId() const;
         uint32 GetAreaId() const;
+        void GetZoneAndAreaId(uint32& zoneid, uint32& areaid) const;
 
         InstanceData* GetInstanceData();
 

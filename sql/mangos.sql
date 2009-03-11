@@ -22,7 +22,7 @@
 DROP TABLE IF EXISTS `db_version`;
 CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
-  `required_7382_01_mangos_creature_template` bit(1) default NULL
+  `required_7439_01_mangos_mangos_string` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -135,6 +135,7 @@ CREATE TABLE `areatrigger_teleport` (
   `heroic_key` mediumint(8) unsigned NOT NULL default '0',
   `heroic_key2` mediumint(8) unsigned NOT NULL default '0',
   `required_quest_done` int(11) unsigned NOT NULL default '0',
+  `required_quest_done_heroic` int(11) unsigned NOT NULL default '0',
   `required_failed_text` text,
   `target_map` smallint(5) unsigned NOT NULL default '0',
   `target_position_x` float NOT NULL default '0',
@@ -1071,6 +1072,7 @@ CREATE TABLE `game_event` (
   `end_time` timestamp NOT NULL default '0000-00-00 00:00:00' COMMENT 'Absolute end date, the event will never start afler',
   `occurence` bigint(20) unsigned NOT NULL default '86400' COMMENT 'Delay in hours between occurences of the event',
   `length` bigint(20) unsigned NOT NULL default '43200' COMMENT 'Length in hours of the event',
+  `holiday` mediumint(8) unsigned NOT NULL default '0' COMMENT 'Client side holiday id',
   `description` varchar(255) default NULL COMMENT 'Description of the event displayed in console',
   PRIMARY KEY  (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
@@ -2407,6 +2409,7 @@ INSERT INTO `mangos_string` VALUES
 (172,'server console command',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (173,'You changed runic power of %s to %i/%i.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (174,'%s changed your runic power to %i/%i.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(175,'Liquid level: %f, ground: %f, type: %d, status: %d',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (200,'No selection.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (201,'Object GUID is: lowpart %u highpart %X',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (202,'The name was too long by %i characters.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
@@ -2812,7 +2815,6 @@ INSERT INTO `mangos_string` VALUES
 (723,'Your group does not have enough players to join this match.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (724,'The Gold Team wins!',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (725,'The Green Team wins!',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
-(726,'There aren\'t enough players in this battleground. It will end soon unless some more players join to balance the fight.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (727,'Your group has an offline member. Please remove him before joining.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (728,'Your group has players from the opposing faction. You can\'t join the battleground as a group.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (729,'Your group has players from different battleground brakets. You can\'t join as group.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
@@ -2833,6 +2835,11 @@ INSERT INTO `mangos_string` VALUES
 (744,'Modifying played count, arena points etc. for loaded arena teams, sending updated stats to online players...',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (745,'Modification done.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (746,'Done flushing Arena points.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(750,'Not enough players. This game will close in %u mins.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(751,'Not enough players. This game will close in %u seconds.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(753,'The battle for Warsong Gulch begins in 2 minutes.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(754,'The battle for Arathi Basin begins in 2 minutes.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(755,'The battle for Eye of the Storm begins in 2 minutes.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (801,'You do not have enough gold',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (802,'You do not have enough free slots',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (803,'Your partner does not have enough free bag slots',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
@@ -2843,6 +2850,11 @@ INSERT INTO `mangos_string` VALUES
 (808,'Player %s not found or offline',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (809,'Account for character %s not found',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (810,'|Hplayer:$N|h[$N]|h has earned the achievement $a!',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(811,'Guild Master',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(812,'Officer',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(813,'Veteran',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(814,'Member',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(815,'Initiate',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (1000,'Exiting daemon...',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (1001,'Account deleted: %s',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (1002,'Account %s NOT deleted (probably sql file format was updated)',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),

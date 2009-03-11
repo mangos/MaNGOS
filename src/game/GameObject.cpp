@@ -26,10 +26,8 @@
 #include "UpdateMask.h"
 #include "Opcodes.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
 #include "World.h"
 #include "Database/DatabaseEnv.h"
-#include "MapManager.h"
 #include "LootMgr.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
@@ -472,14 +470,15 @@ void GameObject::getFishLoot(Loot *fishloot, Player* loot_owner)
 {
     fishloot->clear();
 
-    uint32 subzone = GetAreaId();
+    uint32 zone, subzone;
+    GetZoneAndAreaId(zone,subzone);
 
     // if subzone loot exist use it
     if(LootTemplates_Fishing.HaveLootFor(subzone))
         fishloot->FillLoot(subzone, LootTemplates_Fishing, loot_owner,true);
     // else use zone loot
     else
-        fishloot->FillLoot(GetZoneId(), LootTemplates_Fishing, loot_owner,true);
+        fishloot->FillLoot(zone, LootTemplates_Fishing, loot_owner,true);
 }
 
 void GameObject::SaveToDB()
@@ -1000,11 +999,12 @@ void GameObject::Use(Unit* user)
                     // 2) if skill == base_zone_skill => 5% chance
                     // 3) chance is linear dependence from (base_zone_skill-skill)
 
-                    uint32 subzone = GetAreaId();
+                    uint32 zone, subzone;
+                    GetZoneAndAreaId(zone,subzone);
 
                     int32 zone_skill = objmgr.GetFishingBaseSkillLevel( subzone );
                     if(!zone_skill)
-                        zone_skill = objmgr.GetFishingBaseSkillLevel( GetZoneId() );
+                        zone_skill = objmgr.GetFishingBaseSkillLevel( zone );
 
                     //provide error, no fishable zone or area should be 0
                     if(!zone_skill)
@@ -1174,7 +1174,7 @@ void GameObject::Use(Unit* user)
 
             Player* player = (Player*)user;
 
-            if( player->isAllowUseBattleGroundObject() )
+            if( player->CanUseBattleGroundObject() )
             {
                 // in battleground check
                 BattleGround *bg = player->GetBattleGround();
@@ -1199,7 +1199,7 @@ void GameObject::Use(Unit* user)
 
             Player* player = (Player*)user;
 
-            if( player->isAllowUseBattleGroundObject() )
+            if( player->CanUseBattleGroundObject() )
             {
                 // in battleground check
                 BattleGround *bg = player->GetBattleGround();

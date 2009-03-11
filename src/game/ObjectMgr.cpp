@@ -28,14 +28,13 @@
 #include "SpellMgr.h"
 #include "UpdateMask.h"
 #include "World.h"
-#include "WorldSession.h"
 #include "Group.h"
 #include "Guild.h"
 #include "ArenaTeam.h"
 #include "Transports.h"
 #include "ProgressBar.h"
 #include "Language.h"
-#include "GameEvent.h"
+#include "GameEventMgr.h"
 #include "Spell.h"
 #include "Chat.h"
 #include "AccountMgr.h"
@@ -43,7 +42,6 @@
 #include "SpellAuras.h"
 #include "Util.h"
 #include "WaypointManager.h"
-#include "BattleGround.h"
 
 INSTANTIATE_SINGLETON_1(ObjectMgr);
 
@@ -1767,7 +1765,10 @@ void ObjectMgr::LoadPetLevelInfo()
                 if(current_level > STRONG_MAX_LEVEL)        // hardcoded level maximum
                     sLog.outErrorDb("Wrong (> %u) level %u in `pet_levelstats` table, ignoring.",STRONG_MAX_LEVEL,current_level);
                 else
+                {
                     sLog.outDetail("Unused (> MaxPlayerLevel in mangosd.conf) level %u in `pet_levelstats` table, ignoring.",current_level);
+                    ++count;                                // make result loading percent "expected" correct in case disabled detail mode for example.
+                }
                 continue;
             }
             else if(current_level < 1)
@@ -2146,7 +2147,10 @@ void ObjectMgr::LoadPlayerInfo()
                 if(current_level > STRONG_MAX_LEVEL)        // hardcoded level maximum
                     sLog.outErrorDb("Wrong (> %u) level %u in `player_classlevelstats` table, ignoring.",STRONG_MAX_LEVEL,current_level);
                 else
+                {
                     sLog.outDetail("Unused (> MaxPlayerLevel in mangosd.conf) level %u in `player_classlevelstats` table, ignoring.",current_level);
+                    ++count;                                // make result loading percent "expected" correct in case disabled detail mode for example.
+                }
                 continue;
             }
 
@@ -2241,7 +2245,10 @@ void ObjectMgr::LoadPlayerInfo()
                 if(current_level > STRONG_MAX_LEVEL)        // hardcoded level maximum
                     sLog.outErrorDb("Wrong (> %u) level %u in `player_levelstats` table, ignoring.",STRONG_MAX_LEVEL,current_level);
                 else
+                {
                     sLog.outDetail("Unused (> MaxPlayerLevel in mangosd.conf) level %u in `player_levelstats` table, ignoring.",current_level);
+                    ++count;                                // make result loading percent "expected" correct in case disabled detail mode for example.
+                }
                 continue;
             }
 
@@ -2349,7 +2356,10 @@ void ObjectMgr::LoadPlayerInfo()
                 if(current_level > STRONG_MAX_LEVEL)        // hardcoded level maximum
                     sLog.outErrorDb("Wrong (> %u) level %u in `player_xp_for_level` table, ignoring.", STRONG_MAX_LEVEL,current_level);
                 else
+                {
                     sLog.outDetail("Unused (> MaxPlayerLevel in mangosd.conf) level %u in `player_xp_for_levels` table, ignoring.",current_level);
+                    ++count;                                // make result loading percent "expected" correct in case disabled detail mode for example.
+                }
                 continue;
             }
             //PlayerXPperLevel
@@ -3273,14 +3283,15 @@ void ObjectMgr::LoadQuests()
 
         if(qinfo->NextQuestInChain)
         {
-            if(mQuestTemplates.find(qinfo->NextQuestInChain) == mQuestTemplates.end())
+            QuestMap::iterator qNextItr = mQuestTemplates.find(qinfo->NextQuestInChain);
+            if(qNextItr == mQuestTemplates.end())
             {
                 sLog.outErrorDb("Quest %u has `NextQuestInChain` = %u but quest %u does not exist, quest chain will not work.",
                     qinfo->GetQuestId(),qinfo->NextQuestInChain ,qinfo->NextQuestInChain );
                 qinfo->NextQuestInChain = 0;
             }
             else
-                mQuestTemplates[qinfo->NextQuestInChain]->prevChainQuests.push_back(qinfo->GetQuestId());
+                qNextItr->second->prevChainQuests.push_back(qinfo->GetQuestId());
         }
 
         // fill additional data stores
@@ -3298,14 +3309,15 @@ void ObjectMgr::LoadQuests()
 
         if(qinfo->NextQuestId)
         {
-            if (mQuestTemplates.find(abs(qinfo->GetNextQuestId())) == mQuestTemplates.end())
+            QuestMap::iterator qNextItr = mQuestTemplates.find(abs(qinfo->GetNextQuestId()));
+            if (qNextItr == mQuestTemplates.end())
             {
                 sLog.outErrorDb("Quest %d has NextQuestId %i, but no such quest", qinfo->GetQuestId(), qinfo->GetNextQuestId());
             }
             else
             {
                 int32 signedQuestId = qinfo->NextQuestId < 0 ? -int32(qinfo->GetQuestId()) : int32(qinfo->GetQuestId());
-                mQuestTemplates[abs(qinfo->GetNextQuestId())]->prevQuests.push_back(signedQuestId);
+                qNextItr->second->prevQuests.push_back(signedQuestId);
             }
         }
 
@@ -4850,8 +4862,8 @@ void ObjectMgr::LoadAreaTriggerTeleports()
 
     uint32 count = 0;
 
-    //                                                0   1               2              3               4           5            6                    7                     8           9                  10                 11                 12
-    QueryResult *result = WorldDatabase.Query("SELECT id, required_level, required_item, required_item2, heroic_key, heroic_key2, required_quest_done, required_failed_text, target_map, target_position_x, target_position_y, target_position_z, target_orientation FROM areatrigger_teleport");
+    //                                                0   1               2              3               4           5            6                    7                           8                     9           10                 11                 12                 13
+    QueryResult *result = WorldDatabase.Query("SELECT id, required_level, required_item, required_item2, heroic_key, heroic_key2, required_quest_done, required_quest_done_heroic, required_failed_text, target_map, target_position_x, target_position_y, target_position_z, target_orientation FROM areatrigger_teleport");
     if( !result )
     {
 
@@ -4878,18 +4890,19 @@ void ObjectMgr::LoadAreaTriggerTeleports()
 
         AreaTrigger at;
 
-        at.requiredLevel      = fields[1].GetUInt8();
-        at.requiredItem       = fields[2].GetUInt32();
-        at.requiredItem2      = fields[3].GetUInt32();
-        at.heroicKey          = fields[4].GetUInt32();
-        at.heroicKey2         = fields[5].GetUInt32();
-        at.requiredQuest      = fields[6].GetUInt32();
-        at.requiredFailedText = fields[7].GetCppString();
-        at.target_mapId       = fields[8].GetUInt32();
-        at.target_X           = fields[9].GetFloat();
-        at.target_Y           = fields[10].GetFloat();
-        at.target_Z           = fields[11].GetFloat();
-        at.target_Orientation = fields[12].GetFloat();
+        at.requiredLevel        = fields[1].GetUInt8();
+        at.requiredItem         = fields[2].GetUInt32();
+        at.requiredItem2        = fields[3].GetUInt32();
+        at.heroicKey            = fields[4].GetUInt32();
+        at.heroicKey2           = fields[5].GetUInt32();
+        at.requiredQuest        = fields[6].GetUInt32();
+        at.requiredQuestHeroic  = fields[7].GetUInt32();
+        at.requiredFailedText   = fields[8].GetCppString();
+        at.target_mapId         = fields[9].GetUInt32();
+        at.target_X             = fields[10].GetFloat();
+        at.target_Y             = fields[11].GetFloat();
+        at.target_Z             = fields[12].GetFloat();
+        at.target_Orientation   = fields[13].GetFloat();
 
         AreaTriggerEntry const* atEntry = sAreaTriggerStore.LookupEntry(Trigger_ID);
         if(!atEntry)
@@ -4939,10 +4952,21 @@ void ObjectMgr::LoadAreaTriggerTeleports()
 
         if(at.requiredQuest)
         {
-            if(!mQuestTemplates[at.requiredQuest])
+            QuestMap::iterator qReqItr = mQuestTemplates.find(at.requiredQuest);
+            if(qReqItr == mQuestTemplates.end())
             {
                 sLog.outErrorDb("Required Quest %u not exist for trigger %u, remove quest done requirement.",at.requiredQuest,Trigger_ID);
                 at.requiredQuest = 0;
+            }
+        }
+
+        if(at.requiredQuestHeroic)
+        {
+            QuestMap::iterator qReqItr = mQuestTemplates.find(at.requiredQuestHeroic);
+            if(qReqItr == mQuestTemplates.end())
+            {
+                sLog.outErrorDb("Required Quest %u not exist for trigger %u, remove quest done requirement.",at.requiredQuestHeroic,Trigger_ID);
+                at.requiredQuestHeroic = 0;
             }
         }
 
@@ -6692,7 +6716,7 @@ bool PlayerCondition::IsValid(ConditionType condition, uint32 value1, uint32 val
         }
         case CONDITION_ACTIVE_EVENT:
         {
-            GameEvent::GameEventDataMap const& events = gameeventmgr.GetEventMap();
+            GameEventMgr::GameEventDataMap const& events = gameeventmgr.GetEventMap();
             if(value1 >=events.size() || !events[value1].isValid())
             {
                 sLog.outErrorDb("Active event condition requires existed event id (%u), skipped", value1);

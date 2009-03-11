@@ -26,7 +26,6 @@
 #include "Opcodes.h"
 #include "Guild.h"
 #include "ArenaTeam.h"
-#include "MapManager.h"
 #include "GossipDef.h"
 #include "SocialMgr.h"
 
@@ -825,7 +824,7 @@ void WorldSession::HandleTurnInPetitionOpcode(WorldPacket & recv_data)
     if(type == 9)                                           // create guild
     {
         Guild* guild = new Guild;
-        if(!guild->create(_player->GetGUID(), name))
+        if(!guild->create(_player, name))
         {
             delete guild;
             delete result;

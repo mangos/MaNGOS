@@ -69,10 +69,11 @@ enum PlayerUnderwaterState
 {
     UNDERWATER_NONE                     = 0x00,
     UNDERWATER_INWATER                  = 0x01,             // terrain type is water and player is afflicted by it
-    UNDERWATER_WATER_TRIGGER            = 0x02,             // m_breathTimer has been initialized
-    UNDERWATER_WATER_BREATHB            = 0x04,             // breathbar has been send to client
-    UNDERWATER_WATER_BREATHB_RETRACTING = 0x10,             // breathbar is currently refilling - the player is above water level
-    UNDERWATER_INLAVA                   = 0x80              // terrain type is lava and player is afflicted by it
+    UNDERWATER_INLAVA                   = 0x02,             // terrain type is lava and player is afflicted by it
+    UNDERWATER_INSLIME                  = 0x04,             // terrain type is lava and player is afflicted by it
+    UNDERWARER_INDARKWATER              = 0x08,             // terrain type is dark water and player is afflicted by it
+
+    UNDERWATER_EXIST_TIMERS             = 0x10
 };
 
 enum PlayerSpellState
@@ -502,6 +503,8 @@ enum MirrorTimerType
     BREATH_TIMER       = 1,
     FIRE_TIMER         = 2
 };
+#define MAX_TIMERS      3
+#define DISABLED_MIRROR_TIMER   -1
 
 // 2^n values
 enum PlayerExtraFlags
@@ -1551,7 +1554,7 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         PvPInfo pvpInfo;
         void UpdatePvP(bool state, bool ovrride=false);
-        void UpdateZone(uint32 newZone);
+        void UpdateZone(uint32 newZone,uint32 newArea);
         void UpdateArea(uint32 newArea);
 
         void UpdateZoneDependentAuras( uint32 zone_id );    // zones
@@ -1727,6 +1730,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         uint32 DurabilityRepairAll(bool cost, float discountMod, bool guildBank);
         uint32 DurabilityRepair(uint16 pos, bool cost, float discountMod, bool guildBank);
 
+        void UpdateMirrorTimers();
         void StopMirrorTimers()
         {
             StopMirrorTimer(FATIGUE_TIMER);
@@ -1874,7 +1878,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void SetEquipmentSet(uint32 index, EquipmentSet eqset);
         void DeleteEquipmentSet(uint64 setGuid);
 
-        void SendInitWorldStates();
+        void SendInitWorldStates(uint32 zone, uint32 area);
         void SendUpdateWorldState(uint32 Field, uint32 Value);
         void SendDirectMessage(WorldPacket *data);
 
@@ -1995,7 +1999,8 @@ class MANGOS_DLL_SPEC Player : public Unit
         void ClearAfkReports() { m_bgAfkReporter.clear(); }
 
         bool GetBGAccessByLevel(BattleGroundTypeId bgTypeId) const;
-        bool isAllowUseBattleGroundObject();
+        bool CanUseBattleGroundObject();
+        bool CanCaptureTowerPoint();
 
         /*********************************************************/
         /***                    REST SYSTEM                    ***/
@@ -2040,8 +2045,6 @@ class MANGOS_DLL_SPEC Player : public Unit
         bool CanFly() const { return HasUnitMovementFlag(MOVEMENTFLAG_CAN_FLY); }
         bool IsFlying() const { return HasUnitMovementFlag(MOVEMENTFLAG_FLYING); }
         bool IsAllowUseFlyMountsHere() const;
-
-        void HandleDrowning();
 
         void SetClientControl(Unit* target, uint8 allowMove);
 
@@ -2171,6 +2174,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void AddRunePower(uint8 index);
         void InitRunes();
         AchievementMgr& GetAchievementMgr() { return m_achievementMgr; }
+        void UpdateAchievementCriteria(AchievementCriteriaTypes type, uint32 miscvalue1=0, uint32 miscvalue2=0, Unit *unit=NULL, uint32 time=0);
         bool HasTitle(uint32 bitIndex);
         bool HasTitle(CharTitlesEntry const* title) { return HasTitle(title->bit_index); }
         void SetTitle(CharTitlesEntry const* title);
@@ -2256,12 +2260,14 @@ class MANGOS_DLL_SPEC Player : public Unit
         /*********************************************************/
         /***              ENVIRONMENTAL SYSTEM                 ***/
         /*********************************************************/
-        void HandleLava();
         void HandleSobering();
-        void StartMirrorTimer(MirrorTimerType Type, uint32 MaxValue);
-        void ModifyMirrorTimer(MirrorTimerType Type, uint32 MaxValue, uint32 CurrentValue, uint32 Regen);
+        void SendMirrorTimer(MirrorTimerType Type, uint32 MaxValue, uint32 CurrentValue, int32 Regen);
         void StopMirrorTimer(MirrorTimerType Type);
-        uint8 m_isunderwater;
+        void HandleDrowning(uint32 time_diff);
+        int32 getMaxTimer(MirrorTimerType timer);
+        int32 m_MirrorTimer[MAX_TIMERS];
+        uint8 m_MirrorTimerFlags;
+        uint8 m_MirrorTimerFlagsLast;
         bool m_isInWater;
 
         /*********************************************************/
@@ -2342,7 +2348,6 @@ class MANGOS_DLL_SPEC Player : public Unit
         bool   m_DailyQuestChanged;
         time_t m_lastDailyQuestTime;
 
-        uint32 m_breathTimer;
         uint32 m_drunkTimer;
         uint16 m_drunk;
         uint32 m_weaponChangeTimer;

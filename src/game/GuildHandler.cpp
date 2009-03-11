@@ -24,7 +24,6 @@
 #include "Log.h"
 #include "Opcodes.h"
 #include "Guild.h"
-#include "MapManager.h"
 #include "GossipDef.h"
 #include "SocialMgr.h"
 
@@ -63,7 +62,7 @@ void WorldSession::HandleGuildCreateOpcode(WorldPacket& recvPacket)
         return;
 
     Guild *guild = new Guild;
-    if(!guild->create(GetPlayer()->GetGUID(),gname))
+    if(!guild->create(GetPlayer(),gname))
     {
         delete guild;
         return;

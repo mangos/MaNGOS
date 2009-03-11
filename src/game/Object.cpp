@@ -25,8 +25,8 @@
 #include "Object.h"
 #include "Creature.h"
 #include "Player.h"
+#include "Vehicle.h"
 #include "ObjectMgr.h"
-#include "WorldSession.h"
 #include "UpdateData.h"
 #include "UpdateMask.h"
 #include "Util.h"
@@ -1094,6 +1094,11 @@ uint32 WorldObject::GetZoneId() const
 uint32 WorldObject::GetAreaId() const
 {
     return MapManager::Instance().GetBaseMap(m_mapId)->GetAreaId(m_positionX,m_positionY,m_positionZ);
+}
+
+void WorldObject::GetZoneAndAreaId(uint32& zoneid, uint32& areaid) const
+{
+    MapManager::Instance().GetBaseMap(m_mapId)->GetZoneAndAreaId(zoneid,areaid,m_positionX,m_positionY,m_positionZ);
 }
 
 InstanceData* WorldObject::GetInstanceData()

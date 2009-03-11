@@ -6,6 +6,7 @@
 	ProjectGUID="{4205C8A9-79B7-4354-8064-F05FB9CA0C96}"
 	RootNamespace="script"
 	Keyword="Win32Proj"
+	TargetFrameworkVersion="0"
 	>
 	<Platforms>
 		<Platform
@@ -68,7 +69,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="mangosd.lib zlib.lib zthread.lib libmySQL.lib libeay32.lib ws2_32.lib winmm.lib odbc32.lib odbccp32.lib"
 				OutputFile="..\..\bin\$(PlatformName)_$(ConfigurationName)\MaNGOSScript.dll"
-				LinkIncremental="2"
+				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;.\mangosd__$(PlatformName)_$(ConfigurationName)&quot;;&quot;..\..\dep\lib\$(PlatformName)_$(ConfigurationName)&quot;;&quot;.\zlib__$(PlatformName)_$(ConfigurationName)&quot;;&quot;.\zthread__$(PlatformName)_$(ConfigurationName)&quot;"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)\MaNGOSScript.pdb"
@@ -151,7 +152,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="mangosd.lib zlib.lib zthread.lib libmySQL.lib libeay32.lib ws2_32.lib winmm.lib odbc32.lib odbccp32.lib"
 				OutputFile="..\..\bin\$(PlatformName)_$(ConfigurationName)\MaNGOSScript.dll"
-				LinkIncremental="2"
+				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;.\mangosd__$(PlatformName)_$(ConfigurationName)&quot;;&quot;..\..\dep\lib\$(PlatformName)_$(ConfigurationName)&quot;;&quot;.\zlib__$(PlatformName)_$(ConfigurationName)&quot;;&quot;.\zthread__$(PlatformName)_$(ConfigurationName)&quot;"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)\MaNGOSScript.pdb"

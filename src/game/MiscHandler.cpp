@@ -34,11 +34,9 @@
 #include "Chat.h"
 #include "ScriptCalls.h"
 #include <zlib/zlib.h>
-#include "MapManager.h"
 #include "ObjectAccessor.h"
 #include "Object.h"
 #include "BattleGround.h"
-#include "SpellAuras.h"
 #include "Pet.h"
 #include "SocialMgr.h"
 
@@ -386,10 +384,10 @@ void WorldSession::HandleZoneUpdateOpcode( WorldPacket & recv_data )
 
     sLog.outDetail("WORLD: Recvd ZONE_UPDATE: %u", newZone);
 
-    if(newZone != _player->GetZoneId())
-        GetPlayer()->SendInitWorldStates();                 // only if really enters to new zone, not just area change, works strange...
-
-    GetPlayer()->UpdateZone(newZone);
+    // use server size data
+    uint32 newzone, newarea;
+    GetPlayer()->GetZoneAndAreaId(newzone,newarea);
+    GetPlayer()->UpdateZone(newzone,newarea);
 }
 
 void WorldSession::HandleSetTargetOpcode( WorldPacket & recv_data )
@@ -859,8 +857,16 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
         }
 
         uint32 missingQuest = 0;
-        if(at->requiredQuest && !GetPlayer()->GetQuestRewardStatus(at->requiredQuest))
-            missingQuest = at->requiredQuest;
+        if(GetPlayer()->GetDifficulty() == DIFFICULTY_HEROIC)
+        {
+            if (at->requiredQuestHeroic && !GetPlayer()->GetQuestRewardStatus(at->requiredQuestHeroic))
+                missingQuest = at->requiredQuestHeroic;
+        }
+        else
+        {
+            if(at->requiredQuest && !GetPlayer()->GetQuestRewardStatus(at->requiredQuest))
+                missingQuest = at->requiredQuest;
+        }
 
         if(missingLevel || missingItem || missingKey || missingQuest)
         {

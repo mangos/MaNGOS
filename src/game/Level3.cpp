@@ -33,7 +33,6 @@
 #include "Guild.h"
 #include "ObjectAccessor.h"
 #include "MapManager.h"
-#include "SpellAuras.h"
 #include "ScriptCalls.h"
 #include "Language.h"
 #include "GridNotifiersImpl.h"
@@ -3066,7 +3065,7 @@ bool ChatHandler::HandleGuildCreateCommand(const char* args)
     }
 
     Guild *guild = new Guild;
-    if (!guild->create (player->GetGUID (),guildname))
+    if (!guild->create (player,guildname))
     {
         delete guild;
         SendSysMessage (LANG_GUILD_NOT_CREATED);
@@ -3258,77 +3257,6 @@ bool ChatHandler::HandleGetDistanceCommand(const char* args)
 
     PSendSysMessage(LANG_DISTANCE, m_session->GetPlayer()->GetDistance(obj),m_session->GetPlayer()->GetDistance2d(obj));
 
-    return true;
-}
-
-// FIX-ME!!!
-
-bool ChatHandler::HandleAddWeaponCommand(const char* /*args*/)
-{
-    /*if (!*args)
-        return false;
-
-    uint64 guid = m_session->GetPlayer()->GetSelection();
-    if (guid == 0)
-    {
-        SendSysMessage(LANG_NO_SELECTION);
-        return true;
-    }
-
-    Creature *pCreature = ObjectAccessor::GetCreature(*m_session->GetPlayer(), guid);
-
-    if(!pCreature)
-    {
-        SendSysMessage(LANG_SELECT_CREATURE);
-        return true;
-    }
-
-    char* pSlotID = strtok((char*)args, " ");
-    if (!pSlotID)
-        return false;
-
-    char* pItemID = strtok(NULL, " ");
-    if (!pItemID)
-        return false;
-
-    uint32 ItemID = atoi(pItemID);
-    uint32 SlotID = atoi(pSlotID);
-
-    ItemPrototype* tmpItem = objmgr.GetItemPrototype(ItemID);
-
-    bool added = false;
-    if(tmpItem)
-    {
-        switch(SlotID)
-        {
-            case 1:
-                pCreature->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_DISPLAY, ItemID);
-                added = true;
-                break;
-            case 2:
-                pCreature->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_DISPLAY_01, ItemID);
-                added = true;
-                break;
-            case 3:
-                pCreature->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_DISPLAY_02, ItemID);
-                added = true;
-                break;
-            default:
-                PSendSysMessage(LANG_ITEM_SLOT_NOT_EXIST,SlotID);
-                added = false;
-                break;
-        }
-        if(added)
-        {
-            PSendSysMessage(LANG_ITEM_ADDED_TO_SLOT,ItemID,tmpItem->Name1,SlotID);
-        }
-    }
-    else
-    {
-        PSendSysMessage(LANG_ITEM_NOT_FOUND,ItemID);
-        return true;
-    }
-    */
     return true;
 }
 
@@ -3592,7 +3520,7 @@ bool ChatHandler::HandleLinkGraveCommand(const char* args)
         return false;
     }
 
-    if(objmgr.AddGraveYardLink(g_id,player->GetZoneId(),g_team))
+    if(objmgr.AddGraveYardLink(g_id,zoneId,g_team))
         PSendSysMessage(LANG_COMMAND_GRAVEYARDLINKED, g_id,zoneId);
     else
         PSendSysMessage(LANG_COMMAND_GRAVEYARDALRLINKED, g_id,zoneId);
@@ -3616,6 +3544,7 @@ bool ChatHandler::HandleNearGraveCommand(const char* args)
         return false;
 
     Player* player = m_session->GetPlayer();
+    uint32 zone_id = player->GetZoneId();
 
     WorldSafeLocsEntry const* graveyard = objmgr.GetClosestGraveYard(
         player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(),player->GetMapId(),g_team);
@@ -3624,7 +3553,7 @@ bool ChatHandler::HandleNearGraveCommand(const char* args)
     {
         uint32 g_id = graveyard->ID;
 
-        GraveYardData const* data = objmgr.FindGraveYardData(g_id,player->GetZoneId());
+        GraveYardData const* data = objmgr.FindGraveYardData(g_id,zone_id);
         if (!data)
         {
             PSendSysMessage(LANG_COMMAND_GRAVEYARDERROR,g_id);
@@ -3643,7 +3572,7 @@ bool ChatHandler::HandleNearGraveCommand(const char* args)
         else if(g_team == ALLIANCE)
             team_name = GetMangosString(LANG_COMMAND_GRAVEYARD_ALLIANCE);
 
-        PSendSysMessage(LANG_COMMAND_GRAVEYARDNEAREST, g_id,team_name.c_str(),player->GetZoneId());
+        PSendSysMessage(LANG_COMMAND_GRAVEYARDNEAREST, g_id,team_name.c_str(),zone_id);
     }
     else
     {
@@ -3657,29 +3586,36 @@ bool ChatHandler::HandleNearGraveCommand(const char* args)
             team_name = GetMangosString(LANG_COMMAND_GRAVEYARD_ALLIANCE);
 
         if(g_team == ~uint32(0))
-            PSendSysMessage(LANG_COMMAND_ZONENOGRAVEYARDS, player->GetZoneId());
+            PSendSysMessage(LANG_COMMAND_ZONENOGRAVEYARDS, zone_id);
         else
-            PSendSysMessage(LANG_COMMAND_ZONENOGRAFACTION, player->GetZoneId(),team_name.c_str());
+            PSendSysMessage(LANG_COMMAND_ZONENOGRAFACTION, zone_id,team_name.c_str());
     }
 
     return true;
 }
 
-//play npc emote
-bool ChatHandler::HandleNpcPlayEmoteCommand(const char* args)
+//-----------------------Npc Commands-----------------------
+bool ChatHandler::HandleNpcChangeEntryCommand(const char *args)
 {
-    uint32 emote = atoi((char*)args);
+    if(!args)
+        return false;
 
-    Creature* target = getSelectedCreature();
-    if(!target)
+    uint32 newEntryNum = atoi(args);
+    if(!newEntryNum)
+        return false;
+
+    Unit* unit = getSelectedUnit();
+    if(!unit || unit->GetTypeId() != TYPEID_UNIT)
     {
         SendSysMessage(LANG_SELECT_CREATURE);
         SetSentErrorMessage(true);
         return false;
     }
-
-    target->SetUInt32Value(UNIT_NPC_EMOTESTATE,emote);
-
+    Creature* creature = (Creature*)unit;
+    if(creature->UpdateEntry(newEntryNum))
+        SendSysMessage(LANG_DONE);
+    else
+        SendSysMessage(LANG_ERROR);
     return true;
 }
 
@@ -3727,6 +3663,95 @@ bool ChatHandler::HandleNpcInfoCommand(const char* /*args*/)
 
     return true;
 }
+
+//play npc emote
+bool ChatHandler::HandleNpcPlayEmoteCommand(const char* args)
+{
+    uint32 emote = atoi((char*)args);
+
+    Creature* target = getSelectedCreature();
+    if(!target)
+    {
+        SendSysMessage(LANG_SELECT_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    target->SetUInt32Value(UNIT_NPC_EMOTESTATE,emote);
+
+    return true;
+}
+
+//TODO: NpcCommands that needs to be fixed :
+
+bool ChatHandler::HandleNpcAddWeaponCommand(const char* /*args*/)
+{
+    /*if (!*args)
+    return false;
+
+    uint64 guid = m_session->GetPlayer()->GetSelection();
+    if (guid == 0)
+    {
+        SendSysMessage(LANG_NO_SELECTION);
+        return true;
+    }
+
+    Creature *pCreature = ObjectAccessor::GetCreature(*m_session->GetPlayer(), guid);
+
+    if(!pCreature)
+    {
+        SendSysMessage(LANG_SELECT_CREATURE);
+        return true;
+    }
+
+    char* pSlotID = strtok((char*)args, " ");
+    if (!pSlotID)
+        return false;
+
+    char* pItemID = strtok(NULL, " ");
+    if (!pItemID)
+        return false;
+
+    uint32 ItemID = atoi(pItemID);
+    uint32 SlotID = atoi(pSlotID);
+
+    ItemPrototype* tmpItem = objmgr.GetItemPrototype(ItemID);
+
+    bool added = false;
+    if(tmpItem)
+    {
+        switch(SlotID)
+        {
+            case 1:
+                pCreature->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_DISPLAY, ItemID);
+                added = true;
+                break;
+            case 2:
+                pCreature->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_DISPLAY_01, ItemID);
+                added = true;
+                break;
+            case 3:
+                pCreature->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_DISPLAY_02, ItemID);
+                added = true;
+                break;
+            default:
+                PSendSysMessage(LANG_ITEM_SLOT_NOT_EXIST,SlotID);
+                added = false;
+                break;
+        }
+
+        if(added)
+            PSendSysMessage(LANG_ITEM_ADDED_TO_SLOT,ItemID,tmpItem->Name1,SlotID);
+    }
+    else
+    {
+        PSendSysMessage(LANG_ITEM_NOT_FOUND,ItemID);
+        return true;
+    }
+    */
+    return true;
+}
+//----------------------------------------------------------
 
 bool ChatHandler::HandleExploreCheatCommand(const char* args)
 {
@@ -5683,30 +5708,6 @@ bool ChatHandler::HandleLoadPDumpCommand(const char *args)
             return false;
     }
 
-    return true;
-}
-
-bool ChatHandler::HandleNpcChangeEntryCommand(const char *args)
-{
-    if(!args)
-        return false;
-
-    uint32 newEntryNum = atoi(args);
-    if(!newEntryNum)
-        return false;
-
-    Unit* unit = getSelectedUnit();
-    if(!unit || unit->GetTypeId() != TYPEID_UNIT)
-    {
-        SendSysMessage(LANG_SELECT_CREATURE);
-        SetSentErrorMessage(true);
-        return false;
-    }
-    Creature* creature = (Creature*)unit;
-    if(creature->UpdateEntry(newEntryNum))
-        SendSysMessage(LANG_DONE);
-    else
-        SendSysMessage(LANG_ERROR);
     return true;
 }
 
