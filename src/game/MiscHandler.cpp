@@ -384,10 +384,10 @@ void WorldSession::HandleZoneUpdateOpcode( WorldPacket & recv_data )
 
     sLog.outDetail("WORLD: Recvd ZONE_UPDATE: %u", newZone);
 
-    if(newZone != _player->GetZoneId())
-        GetPlayer()->SendInitWorldStates();                 // only if really enters to new zone, not just area change, works strange...
-
-    GetPlayer()->UpdateZone(newZone);
+    // use server size data
+    uint32 newzone, newarea;
+    GetPlayer()->GetZoneAndAreaId(newzone,newarea);
+    GetPlayer()->UpdateZone(newzone,newarea);
 }
 
 void WorldSession::HandleSetTargetOpcode( WorldPacket & recv_data )
