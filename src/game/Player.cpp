@@ -20451,4 +20451,6 @@ void Player::DeleteEquipmentSet(uint64 setGuid)
         {
             itr->second.state = EQUIPMENT_SET_DELETED;
             break;
+        }
+    }
 }
