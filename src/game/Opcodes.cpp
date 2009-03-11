@@ -357,7 +357,7 @@ OpcodeHandler opcodeTable[NUM_MSG_TYPES] =
     /*0x148*/ { "SMSG_ATTACKSWING_DEADTARGET",                  STATUS_NEVER,    &WorldSession::Handle_ServerSide               },
     /*0x149*/ { "SMSG_ATTACKSWING_CANT_ATTACK",                 STATUS_NEVER,    &WorldSession::Handle_ServerSide               },
     /*0x14A*/ { "SMSG_ATTACKERSTATEUPDATE",                     STATUS_NEVER,    &WorldSession::Handle_ServerSide               },
-    /*0x14B*/ { "SMSG_VICTIMSTATEUPDATE_OBSOLETE",              STATUS_NEVER,    &WorldSession::Handle_ServerSide               },
+    /*0x14B*/ { "SMSG_BATTLEFIELD_PORT_DENIED",                 STATUS_NEVER,    &WorldSession::Handle_ServerSide               },
     /*0x14C*/ { "SMSG_DAMAGE_DONE_OBSOLETE",                    STATUS_NEVER,    &WorldSession::Handle_ServerSide               },
     /*0x14D*/ { "SMSG_DAMAGE_TAKEN_OBSOLETE",                   STATUS_NEVER,    &WorldSession::Handle_ServerSide               },
     /*0x14E*/ { "SMSG_CANCEL_COMBAT",                           STATUS_NEVER,    &WorldSession::Handle_ServerSide               },

@@ -18298,7 +18298,6 @@ void Player::SendInitialPacketsBeforeAddToMap()
 
     SendInitialActionButtons();
     SendInitialReputations();
-    SendInitWorldStates();
     m_achievementMgr.SendAllAchievementData();
 
     uint32 newzone, newarea;

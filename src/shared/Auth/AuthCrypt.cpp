@@ -33,51 +33,32 @@ AuthCrypt::~AuthCrypt()
 
 void AuthCrypt::Init(BigNumber *K)
 {
-    sLog.outDebug("SessionKey: %s", K->AsHexStr());
-
     uint8 ServerEncryptionKey[SEED_KEY_SIZE] = { 0x22, 0xBE, 0xE5, 0xCF, 0xBB, 0x07, 0x64, 0xD9, 0x00, 0x45, 0x1B, 0xD0, 0x24, 0xB8, 0xD5, 0x45 };
     HmacHash serverEncryptHmac(SEED_KEY_SIZE, (uint8*)ServerEncryptionKey);
     uint8 *encryptHash = serverEncryptHmac.ComputeHash(K);
 
-    BigNumber eh;
-    eh.SetBinary(encryptHash, SHA_DIGEST_LENGTH);
-    sLog.outDebug("EncryptHash: %s", eh.AsHexStr());
-
     uint8 ServerDecryptionKey[SEED_KEY_SIZE] = { 0xF4, 0x66, 0x31, 0x59, 0xFC, 0x83, 0x6E, 0x31, 0x31, 0x02, 0x51, 0xD5, 0x44, 0x31, 0x67, 0x98 };
     HmacHash clientDecryptHmac(SEED_KEY_SIZE, (uint8*)ServerDecryptionKey);
     uint8 *decryptHash = clientDecryptHmac.ComputeHash(K);
-
-    BigNumber dh;
-    dh.SetBinary(decryptHash, SHA_DIGEST_LENGTH);
-    sLog.outDebug("DecryptHash: %s", dh.AsHexStr());
 
     SARC4 _serverDecrypt(encryptHash);
     _clientDecrypt.Init(decryptHash);
     _serverEncrypt.Init(encryptHash);
     SARC4 _clientEncrypt(decryptHash);
 
-    uint8 *syncBuf = new uint8[1024];
+    uint8 syncBuf[1024];
+
     memset(syncBuf, 0, 1024);
 
     _serverEncrypt.UpdateData(1024, syncBuf);
     _clientEncrypt.UpdateData(1024, syncBuf);
-
-    BigNumber b1;
-    b1.SetBinary(syncBuf, 16);
-    sLog.outDebug("buf1: %s", b1.AsHexStr());
 
     memset(syncBuf, 0, 1024);
 
     _serverDecrypt.UpdateData(1024, syncBuf);
     _clientDecrypt.UpdateData(1024, syncBuf);
 
-    BigNumber b2;
-    b2.SetBinary(syncBuf, 16);
-    sLog.outDebug("buf2: %s", b2.AsHexStr());
-
     _initialized = true;
-
-    delete[] syncBuf;
 }
 
 void AuthCrypt::DecryptRecv(uint8 *data, size_t len)
