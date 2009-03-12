@@ -401,12 +401,15 @@ void WorldSession::HandleBattleGroundPlayerPortOpcode( WorldPacket &recv_data )
                 WorldPacket data2(SMSG_GROUP_JOINED_BATTLEGROUND, 4);
                 data2 << uint32(0xFFFFFFFE);
                 _player->GetSession()->SendPacket(&data2);
+                action = 0;
                 sLog.outDebug("Battleground: player %s (%u) has a deserter debuff, do not port him to battleground!", _player->GetName(), _player->GetGUIDLow());
             }
             //if player don't match battleground max level, then do not allow him to enter! (this might happen when player leveled up during his waiting in queue
             if( _player->getLevel() > bg->GetMaxLevel() )
+            {
                 sLog.outError("Battleground: Player %s (%u) has level higher than maxlevel of battleground! Do not port him to battleground!", _player->GetName(), _player->GetGUIDLow());
-            action = 0;
+                action = 0;
+            }
         }
         uint32 queueSlot = _player->GetBattleGroundQueueIndex(bgQueueTypeId);
         WorldPacket data;

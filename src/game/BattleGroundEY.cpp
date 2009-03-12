@@ -520,7 +520,7 @@ void BattleGroundEY::Reset()
     m_PointAddingTimer = 0;
     m_TowerCapCheckTimer = 0;
     bool isBGWeekend = false;           //TODO FIXME - call sBattleGroundMgr.IsBGWeekend(m_TypeID); - you must also implement that call!
-    uint32 m_HonorTics = (isBGWeekend) ? BG_EY_EYWeekendHonorTicks : BG_EY_NotEYWeekendHonorTicks;
+    m_HonorTics = (isBGWeekend) ? BG_EY_EYWeekendHonorTicks : BG_EY_NotEYWeekendHonorTicks;
 
     for(uint8 i = 0; i < EY_POINTS_MAX; ++i)
     {
