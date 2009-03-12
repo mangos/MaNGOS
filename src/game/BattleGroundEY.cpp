@@ -258,9 +258,20 @@ void BattleGroundEY::UpdatePointStatuses()
 void BattleGroundEY::UpdateTeamScore(uint32 Team)
 {
     uint32 score = GetTeamScore(Team);
-    if(score >= EY_MAX_TEAM_SCORE)
+    //TODO there should be some sound played when one team is near victory!! - and define variables
+    /*if( !m_IsInformedNearVictory && score >= BG_EY_WARNING_NEAR_VICTORY_SCORE )
     {
-        score = EY_MAX_TEAM_SCORE;
+        if( Team == ALLIANCE )
+            SendMessageToAll(LANG_BG_EY_A_NEAR_VICTORY, CHAT_MSG_BG_SYSTEM_NEUTRAL);
+        else
+            SendMessageToAll(LANG_BG_EY_H_NEAR_VICTORY, CHAT_MSG_BG_SYSTEM_NEUTRAL);
+        PlaySoundToAll(BG_EY_SOUND_NEAR_VICTORY);
+        m_IsInformedNearVictory = true;
+    }*/
+
+    if( score >= BG_EY_MAX_TEAM_SCORE )
+    {
+        score = BG_EY_MAX_TEAM_SCORE;
         EndBattleGround(Team);
     }
 
