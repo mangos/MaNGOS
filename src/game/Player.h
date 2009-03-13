@@ -1530,7 +1530,7 @@ class MANGOS_DLL_SPEC Player : public Unit
             m_cinematic = cine;
         }
 
-        void addActionButton(uint8 button, uint16 action, uint8 type, uint8 misc);
+        bool addActionButton(uint8 button, uint16 action, uint8 type, uint8 misc);
         void removeActionButton(uint8 button);
         void SendInitialActionButtons();
 
