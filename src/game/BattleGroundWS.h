@@ -164,6 +164,7 @@ class BattleGroundWS : public BattleGround
         void HandleKillPlayer(Player *player, Player *killer);
         bool SetupBattleGround();
         virtual void Reset();
+        void EndBattleGround(uint32 winner);
         virtual WorldSafeLocsEntry const* GetClosestGraveYard(Player* player);
 
         void UpdateFlagState(uint32 team, uint32 value);
@@ -186,5 +187,9 @@ class BattleGroundWS : public BattleGround
         uint32 m_TeamScores[2];
         int32 m_FlagsTimer[2];
         int32 m_FlagsDropTimer[2];
+
+        uint32 m_ReputationCapture;
+        uint32 m_HonorWinKills;
+        uint32 m_HonorEndKills;
 };
 #endif

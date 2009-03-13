@@ -30,6 +30,7 @@
 #include "ObjectMgr.h"
 #include "WorldPacket.h"
 #include "Util.h"
+#include "Formulas.h"
 #include "GridNotifiersImpl.h"
 
 namespace MaNGOS
@@ -127,6 +128,7 @@ BattleGround::BattleGround()
     m_TypeID            = BattleGroundTypeId(0);
     m_InstanceID        = 0;
     m_Status            = STATUS_NONE;
+    m_ClientInstanceID  = 0;
     m_EndTime           = 0;
     m_LastResurrectTime = 0;
     m_QueueId           = QUEUE_ID_MAX_LEVEL_19;
@@ -314,7 +316,13 @@ void BattleGround::Update(uint32 diff)
         else if(m_PrematureCountDownTimer < diff)
         {
             // time's up!
-            EndBattleGround(0); // noone wins
+            uint32 winner = 0;
+            if( GetPlayersCountByTeam(ALLIANCE) >= GetMinPlayersPerTeam() )
+                winner = ALLIANCE;
+            else if( GetPlayersCountByTeam(HORDE) >= GetMinPlayersPerTeam() )
+                winner = HORDE;
+
+            EndBattleGround(winner);
             m_PrematureCountDown = false;
         }
         else
@@ -420,9 +428,10 @@ void BattleGround::Update(uint32 diff)
     if(GetStatus() == STATUS_WAIT_LEAVE)
     {
         // remove all players from battleground after 2 minutes
-        m_EndTime += diff;
-        if(m_EndTime >= TIME_TO_AUTOREMOVE)                 // 2 minutes
+        m_EndTime -= diff;
+        if( m_EndTime <= 0)
         {
+            m_EndTime = 0;
             BattleGroundPlayerMap::iterator itr, next;
             for(itr = m_Players.begin(); itr != m_Players.end(); itr = next)
             {
@@ -435,6 +444,8 @@ void BattleGround::Update(uint32 diff)
         }
     }
 
+    //update start time
+    m_StartTime += diff;
 }
 
 void BattleGround::SetTeamStartLoc(uint32 TeamID, float X, float Y, float Z, float O)
@@ -625,7 +636,8 @@ void BattleGround::EndBattleGround(uint32 winner)
     }
 
     SetStatus(STATUS_WAIT_LEAVE);
-    m_EndTime = 0;
+    //we must set it this way, because end time is sent in packet!
+    m_EndTime = TIME_TO_AUTOREMOVE;
 
     // arena rating calculation
     if(isArena() && isRated())
@@ -693,7 +705,6 @@ void BattleGround::EndBattleGround(uint32 winner)
         if(team == winner)
         {
             RewardMark(plr,ITEM_WINNER_COUNT);
-            UpdatePlayerScore(plr, SCORE_BONUS_HONOR, 20);
             RewardQuest(plr);
         }
         else
@@ -709,7 +720,7 @@ void BattleGround::EndBattleGround(uint32 winner)
         plr->GetSession()->SendPacket(&data);
 
         BattleGroundQueueTypeId bgQueueTypeId = BattleGroundMgr::BGQueueTypeId(GetTypeID(), GetArenaType());
-        sBattleGroundMgr.BuildBattleGroundStatusPacket(&data, this, plr->GetBattleGroundQueueIndex(bgQueueTypeId), STATUS_IN_PROGRESS, TIME_TO_AUTOREMOVE, GetStartTime());
+        sBattleGroundMgr.BuildBattleGroundStatusPacket(&data, this, plr->GetBattleGroundQueueIndex(bgQueueTypeId), STATUS_IN_PROGRESS, TIME_TO_AUTOREMOVE, GetStartTime(), GetArenaType());
         plr->GetSession()->SendPacket(&data);
         plr->GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_BATTLEGROUND, 1);
     }
@@ -732,7 +743,13 @@ void BattleGround::EndBattleGround(uint32 winner)
     sBattleGroundMgr.m_BattleGroundQueues[BattleGroundMgr::BGQueueTypeId(GetTypeID(), GetArenaType())].BGEndedRemoveInvites(this);
 
     if(winmsg_id)
-        SendMessageToAll(winmsg_id,CHAT_MSG_BG_SYSTEM_NEUTRAL);
+        SendMessageToAll(winmsg_id, CHAT_MSG_BG_SYSTEM_NEUTRAL);
+}
+
+uint32 BattleGround::GetBonusHonorFromKill(uint32 kills) const
+{
+    //variable kills means how many honorable kills you scored (so we need kills * honor_for_one_kill)
+    return MaNGOS::Honor::hk_honor_at_level(GetMaxLevel(), kills);
 }
 
 uint32 BattleGround::GetBattlemasterEntry() const
@@ -884,7 +901,7 @@ void BattleGround::RemovePlayerAtLeave(uint64 guid, bool Transport, bool SendPac
     BattleGroundPlayerMap::iterator itr = m_Players.find(guid);
     if(itr != m_Players.end())
     {
-        UpdatePlayersCountByTeam(team, true);   // -1 player
+        UpdatePlayersCountByTeam(team, true);               // -1 player
         m_Players.erase(itr);
         // check if the player was a participant of the match, or only entered through gm command (goname)
         participant = true;
@@ -926,8 +943,8 @@ void BattleGround::RemovePlayerAtLeave(uint64 guid, bool Transport, bool SendPac
             // if arena, remove the specific arena auras
             if(isArena())
             {
-                plr->RemoveArenaAuras(true);    // removes debuffs / dots etc., we don't want the player to die after porting out
-                bgTypeId=BATTLEGROUND_AA;       // set the bg type to all arenas (it will be used for queue refreshing)
+                plr->RemoveArenaAuras(true);                // removes debuffs / dots etc., we don't want the player to die after porting out
+                bgTypeId=BATTLEGROUND_AA;                   // set the bg type to all arenas (it will be used for queue refreshing)
 
                 // summon old pet if there was one and there isn't a current pet
                 if(!plr->GetPet() && plr->GetTemporaryUnsummonedPetNumber())
@@ -951,7 +968,7 @@ void BattleGround::RemovePlayerAtLeave(uint64 guid, bool Transport, bool SendPac
             if(SendPacket)
             {
                 WorldPacket data;
-                sBattleGroundMgr.BuildBattleGroundStatusPacket(&data, this, plr->GetBattleGroundQueueIndex(bgQueueTypeId), STATUS_NONE, 0, 0);
+                sBattleGroundMgr.BuildBattleGroundStatusPacket(&data, this, plr->GetBattleGroundQueueIndex(bgQueueTypeId), STATUS_NONE, 0, 0, 0);
                 plr->GetSession()->SendPacket(&data);
             }
 
@@ -974,7 +991,7 @@ void BattleGround::RemovePlayerAtLeave(uint64 guid, bool Transport, bool SendPac
         // remove from raid group if player is member
         if(Group *group = GetBgRaid(team))
         {
-            if( !group->RemoveMember(guid, 0) )               // group was disbanded
+            if( !group->RemoveMember(guid, 0) )             // group was disbanded
             {
                 SetBgRaid(team, NULL);
                 delete group;
@@ -993,7 +1010,7 @@ void BattleGround::RemovePlayerAtLeave(uint64 guid, bool Transport, bool SendPac
     if( plr )
     {
         // Do next only if found in battleground
-        plr->SetBattleGroundId(0, BATTLEGROUND_TYPE_NONE);      // We're not in BG.
+        plr->SetBattleGroundId(0, BATTLEGROUND_TYPE_NONE);  // We're not in BG.
         // reset destination bg team
         plr->SetBGTeam(0);
 
@@ -1576,7 +1593,7 @@ void BattleGround::EndNow()
 {
     RemoveFromBGFreeSlotQueue();
     SetStatus(STATUS_WAIT_LEAVE);
-    SetEndTime(TIME_TO_AUTOREMOVE);
+    SetEndTime(0);
     // inform invited players about the removal
     sBattleGroundMgr.m_BattleGroundQueues[BattleGroundMgr::BGQueueTypeId(GetTypeID(), GetArenaType())].BGEndedRemoveInvites(this);
 }
@@ -1686,7 +1703,7 @@ void BattleGround::PlayerAddedToBGCheckIfBGIsRunning(Player* plr)
     sBattleGroundMgr.BuildPvpLogDataPacket(&data, this);
     plr->GetSession()->SendPacket(&data);
 
-    sBattleGroundMgr.BuildBattleGroundStatusPacket(&data, this, plr->GetBattleGroundQueueIndex(bgQueueTypeId), STATUS_IN_PROGRESS, TIME_TO_AUTOREMOVE, GetStartTime());
+    sBattleGroundMgr.BuildBattleGroundStatusPacket(&data, this, plr->GetBattleGroundQueueIndex(bgQueueTypeId), STATUS_IN_PROGRESS, GetEndTime(), GetStartTime(), GetArenaType());
     plr->GetSession()->SendPacket(&data);
 }
 

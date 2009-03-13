@@ -153,7 +153,12 @@ uint32 ReadMapDBC()
 {
     printf("Read Map.dbc file... ");
     DBCFile dbc("DBFilesClient\\Map.dbc");
-    dbc.open();
+
+    if(!dbc.open())
+    {
+        printf("Fatal error: Invalid Map.dbc file format!\n");
+        exit(1);
+    }
 
     size_t map_count = dbc.getRecordCount();
     map_ids = new map_id[map_count];
@@ -170,7 +175,12 @@ void ReadAreaTableDBC()
 {
     printf("Read AreaTable.dbc file...");
     DBCFile dbc("DBFilesClient\\AreaTable.dbc");
-    dbc.open();
+
+    if(!dbc.open())
+    {
+        printf("Fatal error: Invalid AreaTable.dbc file format!\n");
+        exit(1);
+    }
 
     size_t area_count = dbc.getRecordCount();
     size_t maxid = dbc.getMaxId();
@@ -189,7 +199,12 @@ void ReadLiquidTypeTableDBC()
 {
     printf("Read LiquidType.dbc file...");
     DBCFile dbc("DBFilesClient\\LiquidType.dbc");
-    dbc.open();
+    if(!dbc.open())
+    {
+        printf("Fatal error: Invalid LiquidType.dbc file format!\n");
+        exit(1);
+    }
+
     size_t LiqType_count = dbc.getRecordCount();
     size_t LiqType_maxid = dbc.getMaxId();
     LiqType = new uint16[LiqType_maxid + 1];
@@ -207,7 +222,7 @@ void ReadLiquidTypeTableDBC()
 
 // Map file format data
 #define MAP_MAGIC             'SPAM'
-#define MAP_VERSION_MAGIC     '0.1v'
+#define MAP_VERSION_MAGIC     '0.1w'
 #define MAP_AREA_MAGIC        'AERA'
 #define MAP_HEIGTH_MAGIC      'TGHM'
 #define MAP_LIQUID_MAGIC      'QILM'
@@ -304,7 +319,6 @@ bool ConvertADT(char *filename, char *filename2, int cell_y, int cell_x)
 
     memset(liquid_show, 0, sizeof(liquid_show));
     memset(liquid_type, 0, sizeof(liquid_type));
-    memset(liquid_height, 0, sizeof(liquid_height));
 
     // Prepare map header
     map_fileheader map;
@@ -709,6 +723,8 @@ bool ConvertADT(char *filename, char *filename2, int cell_y, int cell_x)
                     if (maxHeight < h) maxHeight = h;
                     if (minHeight > h) minHeight = h;
                 }
+                else
+                    liquid_height[y][x] = CONF_use_minHeight;
             }
         }
         map.liquidMapOffset = map.heightMapOffset + map.heightMapSize;
@@ -812,11 +828,11 @@ void ExtractMapsFromMpq()
     printf("Convert map files\n");
     for(uint32 z = 0; z < map_count; ++z)
     {
-        printf("Extract %s (%d/%d)                  \n", map_ids[z].name, z, map_count);
+        printf("Extract %s (%d/%d)                  \n", map_ids[z].name, z+1, map_count);
         // Loadup map grid data
         sprintf(mpq_map_name, "World\\Maps\\%s\\%s.wdt", map_ids[z].name, map_ids[z].name);
         WDT_file wdt;
-        if (!wdt.loadFile(mpq_map_name))
+        if (!wdt.loadFile(mpq_map_name, false))
         {
 //            printf("Error loading %s map wdt data\n", map_ids[z].name);
             continue;

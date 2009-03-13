@@ -17,13 +17,14 @@ FileLoader::~FileLoader()
     free();
 }
 
-bool FileLoader::loadFile(char *filename)
+bool FileLoader::loadFile(char *filename, bool log)
 {
     free();
     MPQFile mf(filename);
     if(mf.isEof())
     {
-        printf("No such file %s\n", filename);
+        if (log)
+            printf("No such file %s\n", filename);
         return false;
     }
 

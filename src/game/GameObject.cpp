@@ -125,8 +125,8 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map *map, uint32 phaseMa
 
     int64 rotation = 0;
 
-    float f_rot1 = sin(ang / 2.0f);
-    int64 i_rot1 = f_rot1 / atan(pow(2.0f, -20.0f));
+    double f_rot1 = sin(ang / 2.0f);
+    int64 i_rot1 = int64(f_rot1 / atan(pow(2.0f, -20.0f)));
     rotation |= (i_rot1 << 43 >> 43) & 0x00000000001FFFFF;
 
     //float f_rot2 = sin(0.0f / 2.0f);
@@ -491,14 +491,15 @@ void GameObject::getFishLoot(Loot *fishloot, Player* loot_owner)
 {
     fishloot->clear();
 
-    uint32 subzone = GetAreaId();
+    uint32 zone, subzone;
+    GetZoneAndAreaId(zone,subzone);
 
     // if subzone loot exist use it
     if(LootTemplates_Fishing.HaveLootFor(subzone))
         fishloot->FillLoot(subzone, LootTemplates_Fishing, loot_owner,true);
     // else use zone loot
     else
-        fishloot->FillLoot(GetZoneId(), LootTemplates_Fishing, loot_owner,true);
+        fishloot->FillLoot(zone, LootTemplates_Fishing, loot_owner,true);
 }
 
 void GameObject::SaveToDB()
@@ -1019,11 +1020,12 @@ void GameObject::Use(Unit* user)
                     // 2) if skill == base_zone_skill => 5% chance
                     // 3) chance is linear dependence from (base_zone_skill-skill)
 
-                    uint32 subzone = GetAreaId();
+                    uint32 zone, subzone;
+                    GetZoneAndAreaId(zone,subzone);
 
                     int32 zone_skill = objmgr.GetFishingBaseSkillLevel( subzone );
                     if(!zone_skill)
-                        zone_skill = objmgr.GetFishingBaseSkillLevel( GetZoneId() );
+                        zone_skill = objmgr.GetFishingBaseSkillLevel( zone );
 
                     //provide error, no fishable zone or area should be 0
                     if(!zone_skill)
