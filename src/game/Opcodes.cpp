@@ -345,7 +345,7 @@ OpcodeHandler opcodeTable[NUM_MSG_TYPES] =
     /*0x13C*/ { "SMSG_AI_REACTION",                             STATUS_NEVER,    &WorldSession::Handle_ServerSide               },
     /*0x13D*/ { "CMSG_SET_SELECTION",                           STATUS_LOGGEDIN, &WorldSession::HandleSetSelectionOpcode        },
     /*0x13E*/ { "CMSG_EQUIPMENT_SET_DELETE",                    STATUS_LOGGEDIN, &WorldSession::HandleEquipmentSetDelete        },
-    /*0x13F*/ { "CMSG_UNUSED",                                  STATUS_NEVER,    &WorldSession::Handle_NULL                     },
+    /*0x13F*/ { "CMSG_INSTANCE_LOCK_RESPONSE",                  STATUS_NEVER,    &WorldSession::Handle_NULL                     },
     /*0x140*/ { "CMSG_UNUSED2",                                 STATUS_NEVER,    &WorldSession::Handle_NULL                     },
     /*0x141*/ { "CMSG_ATTACKSWING",                             STATUS_LOGGEDIN, &WorldSession::HandleAttackSwingOpcode         },
     /*0x142*/ { "CMSG_ATTACKSTOP",                              STATUS_LOGGEDIN, &WorldSession::HandleAttackStopOpcode          },

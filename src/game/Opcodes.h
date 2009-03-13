@@ -353,7 +353,7 @@ enum Opcodes
     SMSG_AI_REACTION                                = 0x13C,
     CMSG_SET_SELECTION                              = 0x13D,
     CMSG_EQUIPMENT_SET_DELETE                       = 0x13E,
-    CMSG_UNUSED                                     = 0x13F,
+    CMSG_INSTANCE_LOCK_RESPONSE                     = 0x13F,
     CMSG_UNUSED2                                    = 0x140,
     CMSG_ATTACKSWING                                = 0x141,
     CMSG_ATTACKSTOP                                 = 0x142,
