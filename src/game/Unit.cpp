@@ -7132,6 +7132,7 @@ bool Unit::Attack(Unit *victim, bool meleeAttack)
     if(HasAuraType(SPELL_AURA_MOD_UNATTACKABLE))
         RemoveSpellsCausingAura(SPELL_AURA_MOD_UNATTACKABLE);
 
+    // in fighting already
     if (m_attacking)
     {
         if (m_attacking == victim)
@@ -7145,7 +7146,16 @@ bool Unit::Attack(Unit *victim, bool meleeAttack)
             }
             return false;
         }
-        AttackStop();
+
+        // remove old target data
+        AttackStop(true);
+    }
+    // new battle
+    else
+    {
+        // set position before any AI calls/assistance
+        if(GetTypeId()==TYPEID_UNIT)
+            ((Creature*)this)->SetCombatStartPosition(GetPositionX(), GetPositionY(), GetPositionZ());
     }
 
     //Set our target
@@ -7153,10 +7163,6 @@ bool Unit::Attack(Unit *victim, bool meleeAttack)
 
     if(meleeAttack)
         addUnitState(UNIT_STAT_MELEE_ATTACKING);
-
-    // set position before any AI calls/assistance
-    if(GetTypeId()==TYPEID_UNIT)
-        ((Creature*)this)->SetCombatStartPosition(GetPositionX(), GetPositionY(), GetPositionZ());
 
     m_attacking = victim;
     m_attacking->_addAttacker(this);
@@ -7184,7 +7190,7 @@ bool Unit::Attack(Unit *victim, bool meleeAttack)
     return true;
 }
 
-bool Unit::AttackStop()
+bool Unit::AttackStop(bool targetSwitch /*=false*/)
 {
     if (!m_attacking)
         return false;
@@ -7201,11 +7207,9 @@ bool Unit::AttackStop()
 
     InterruptSpell(CURRENT_MELEE_SPELL);
 
-    if( GetTypeId()==TYPEID_UNIT )
-    {
-        // reset call assistance
+    // reset only at real combat stop
+    if(!targetSwitch && GetTypeId()==TYPEID_UNIT )
         ((Creature*)this)->SetNoCallAssistance(false);
-    }
 
     SendAttackStop(victim);
 
