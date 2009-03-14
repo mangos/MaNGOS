@@ -75,7 +75,7 @@ enum SpellAuraInterruptFlags
     AURA_INTERRUPT_FLAG_MOUNTING            = 0x00020000,   // 17   removed by mounting
     AURA_INTERRUPT_FLAG_NOT_SEATED          = 0x00040000,   // 18   removed by standing up
     AURA_INTERRUPT_FLAG_CHANGE_MAP          = 0x00080000,   // 19   leaving map/getting teleported
-    AURA_INTERRUPT_FLAG_UNK20               = 0x00100000,   // 20
+    AURA_INTERRUPT_FLAG_IMMUNE_OR_STEALTH   = 0x00100000,   // 20   removed when player on himself casts immunity spell or vanish?
     AURA_INTERRUPT_FLAG_UNK21               = 0x00200000,   // 21
     AURA_INTERRUPT_FLAG_UNK22               = 0x00400000,   // 22
     AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT    = 0x00800000,   // 23   removed by entering pvp combat
