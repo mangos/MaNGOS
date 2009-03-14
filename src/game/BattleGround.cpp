@@ -1200,7 +1200,11 @@ void BattleGround::EventPlayerLoggedOut(Player* player)
         if( isBattleGround() )
             EventPlayerDroppedFlag(player);
         else
-            CheckArenaWinConditions();
+        {
+            //1 player is logging out, if it is the last, then end arena!
+            if( GetAlivePlayersCountByTeam(player->GetTeam()) <= 1 && GetPlayersCountByTeam(GetOtherTeam(player->GetTeam())) )
+                EndBattleGround(GetOtherTeam(player->GetTeam()));
+        }
     }
 }
 
@@ -1668,8 +1672,9 @@ void BattleGround::HandleKillPlayer( Player *player, Player *killer )
         }
     }
 
-    // to be able to remove insignia
-    player->SetFlag( UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE );
+    // to be able to remove insignia -- ONLY IN BattleGrounds
+    if( !isArena() )
+        player->SetFlag( UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE );
 }
 
 // return the player's team based on battlegroundplayer info
