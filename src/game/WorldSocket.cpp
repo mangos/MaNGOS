@@ -986,6 +986,7 @@ int WorldSocket::HandleAuthSession (WorldPacket& recvPacket)
 
     m_Session->LoadAccountData();
     m_Session->LoadTutorialsData();
+    m_Session->ReadAddonsInfo(recvPacket);
 
     // In case needed sometime the second arg is in microseconds 1 000 000 = 1 sec
     ACE_OS::sleep (ACE_Time_Value (0, 10000));
