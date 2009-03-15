@@ -402,23 +402,28 @@ Player::Player (WorldSession *session): Unit(), m_achievementMgr(this)
     rest_type=REST_TYPE_NO;
     ////////////////////Rest System/////////////////////
     //movement anticheat
-    m_anti_lastmovetime = 0;     //last movement time
-    m_anti_transportGUID = 0;    //current transport GUID
-    m_anti_last_hspeed = 7.0f;   //horizontal speed, default RUN speed
-    m_anti_lastspeed_changetime = 0; //last speed change time
-    m_anti_last_vspeed = -2.0f;  //vertical speed, default max jump height
-    m_anti_beginfalltime = 0;    //alternative falling begin time
-    m_anti_justteleported = 0;   //seted when player was teleported
-    m_anti_teletoplane_count = 0;//Teleport To Plane alarm counter
+    m_anti_LastClientTime  = 0;   //last movement client time
+    m_anti_LastServerTime  = 0;   //last movement server time
+    m_anti_DeltaClientTime = 0;   //client side session time
+    m_anti_DeltaServerTime = 0;   //server side session time
+    m_anti_MistimingCount  = 0;   //mistiming counts before kick
 
-    m_anti_lastMStime = 0;       //last movement server time
-    m_anti_deltamovetime = 0;
-    m_anti_deltaMStime = 0;
-    m_anti_mistiming_count = 0;
+    m_anti_LastSpeedChangeTime = 0;  //last speed change time
+    m_anti_BeginFallTime = 0;     //alternative falling begin time (obsolete)
     
-    m_anti_justjumped = 0;       //jump already began  
-    m_anti_alarmcount = 0;       //alarm counter
-    m_anti_jumpbase = 0;         //AntiGravitation
+    m_anti_Last_HSpeed =  7.0f;   //horizontal speed, default RUN speed
+    m_anti_Last_VSpeed = -2.3f;   //vertical speed, default max jump height
+
+    m_anti_TransportGUID = 0;     //current transport GUID
+
+    m_anti_JustTeleported = 0;    //seted when player was teleported
+    m_anti_TeleToPlane_Count = 0; //Teleport To Plane alarm counter
+    
+    m_anti_AlarmCount = 0;        //alarm counter
+
+    m_anti_JustJumped = 0;        //Jump already began, anti air jump check  
+    m_anti_JumpBaseZ = 0;          //Z coord before jump (AntiGrav)
+    // << movement anticheat
     /////////////////////////////////
     m_mailsLoaded = false;
     m_mailsUpdated = false;
@@ -1566,8 +1571,9 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
         sLog.outError("TeleportTo: invalid map %d or absent instance template.", mapid);
         return false;
     }
-    //reset falltimer at teleport
-    m_anti_justteleported = 1;
+    //movement anticheat
+    m_anti_JustTeleported = 1;
+    //<<< movement anticheat
     // preparing unsummon pet if lost (we must get pet before teleportation or will not find it later)
     Pet* pet = GetPet();
 
@@ -1640,7 +1646,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
             m_teleport_dest = WorldLocation(mapid, x, y, z, orientation);
 
         SetFallInformation(0, z);
-        m_anti_jumpbase = 0;
+        m_anti_JumpBaseZ = 0;
 
         //BuildHeartBeatMsg(&data);
         //SendMessageToSet(&data, true);
@@ -1792,7 +1798,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
 
             m_teleport_dest = WorldLocation(mapid, final_x, final_y, final_z, final_o);
             SetFallInformation(0, final_z);
-            m_anti_jumpbase = 0;
+            m_anti_JumpBaseZ = 0;
             // if the player is saved before worldportack (at logout for example)
             // this will be used instead of the current location in SaveToDB
 

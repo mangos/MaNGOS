@@ -2361,23 +2361,29 @@ class MANGOS_DLL_SPEC Player : public Unit
         RestType rest_type;
         ////////////////////Rest System/////////////////////
         //movement anticheat
-        uint32 m_anti_lastmovetime;     //last movement time
-        uint64 m_anti_transportGUID;    //current transport GUID
-        float  m_anti_last_hspeed;      //horizontal speed, default RUN speed
-        uint32 m_anti_lastspeed_changetime;  //last speed change time
-        float  m_anti_last_vspeed;      //vertical speed, default max jump height
-        uint32 m_anti_beginfalltime;    //alternative falling begin time
-        uint32 m_anti_justteleported;   //seted when player was teleported
-        uint32 m_anti_teletoplane_count;//Teleport To Plane alarm counter
+        uint32 m_anti_LastClientTime;     //last movement client time
+        uint32 m_anti_LastServerTime;     //last movement server time
+        uint32 m_anti_DeltaClientTime;    //client side session time
+        uint32 m_anti_DeltaServerTime;    //server side session time
+        uint32 m_anti_MistimingCount;     //mistiming counts before kick
 
-        uint32 m_anti_lastMStime;       //last movement server time
-        uint32 m_anti_deltamovetime;    //client side session time
-        uint32 m_anti_deltaMStime;      //server side session time
-        uint32 m_anti_mistiming_count;  //mistiming counts before kick
+        uint32 m_anti_LastSpeedChangeTime;//last speed change time
+        uint32 m_anti_BeginFallTime;      //alternative falling begin time (obsolete)
+        
+        float  m_anti_Last_HSpeed;        //horizontal speed, default RUN speed
+        float  m_anti_Last_VSpeed;        //vertical speed, default max jump height
 
-        uint32 m_anti_justjumped;       //Jump already began, anti air jump check  
-        uint64 m_anti_alarmcount;       //alarm counter
-        float  m_anti_jumpbase;
+        uint64 m_anti_TransportGUID;      //current transport GUID
+
+        uint32 m_anti_JustTeleported;     //seted when player was teleported
+        uint32 m_anti_TeleToPlane_Count;  //Teleport To Plane alarm counter
+        
+        uint64 m_anti_AlarmCount;         //alarm counter
+
+        uint32 m_anti_JustJumped;         //Jump already began, anti air jump check  
+        float  m_anti_JumpBaseZ;           //Z coord before jump
+        // << movement anticheat
+
         // Transports
         Transport * m_transport;
 

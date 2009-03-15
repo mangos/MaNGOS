@@ -561,9 +561,9 @@ void World::LoadConfigSettings(bool reload)
         sLog.outError("Anticheat.Movement.m_MistimingDelta (%d) must be >=1000ms. Using 1000 instead.",m_TeleportToPlaneAlarms);
         m_MistimingDelta = 1000;
     }
-    if (m_MistimingDelta>10000){
-        sLog.outError("Anticheat.Movement.m_MistimingDelta (%d) must be <=10000ms. Using 10000 instead.",m_TeleportToPlaneAlarms);
-        m_MistimingDelta = 10000;
+    if (m_MistimingDelta>15000){
+        sLog.outError("Anticheat.Movement.m_MistimingDelta (%d) must be <=15000ms. Using 15000 instead.",m_TeleportToPlaneAlarms);
+        m_MistimingDelta = 15000;
     }
     m_MistimingAlarms = sConfig.GetIntDefault("Anticheat.Movement.MistimingAlarms",20);
     if (m_MistimingAlarms<10) {
