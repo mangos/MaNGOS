@@ -410,7 +410,7 @@ Player::Player (WorldSession *session): Unit(), m_achievementMgr(this)
 
     m_anti_LastSpeedChangeTime = 0;  //last speed change time
     m_anti_BeginFallTime = 0;     //alternative falling begin time (obsolete)
-    
+
     m_anti_Last_HSpeed =  7.0f;   //horizontal speed, default RUN speed
     m_anti_Last_VSpeed = -2.3f;   //vertical speed, default max jump height
 
@@ -418,10 +418,10 @@ Player::Player (WorldSession *session): Unit(), m_achievementMgr(this)
 
     m_anti_JustTeleported = 0;    //seted when player was teleported
     m_anti_TeleToPlane_Count = 0; //Teleport To Plane alarm counter
-    
+
     m_anti_AlarmCount = 0;        //alarm counter
 
-    m_anti_JustJumped = 0;        //Jump already began, anti air jump check  
+    m_anti_JustJumped = 0;        //Jump already began, anti air jump check
     m_anti_JumpBaseZ = 0;          //Z coord before jump (AntiGrav)
     // << movement anticheat
     /////////////////////////////////
@@ -19638,7 +19638,7 @@ void Player::EnterVehicle(Vehicle *vehicle)
     GetSession()->SendPacket(&data);
 	
 	SetPosition(vehicle->GetPositionX(), vehicle->GetPositionY(), vehicle->GetPositionZ(),vehicle->GetOrientation());
-    
+
 	data.Initialize(SMSG_PET_SPELLS, 8+4+4+4+4*10+1+1);
     data << uint64(vehicle->GetGUID());
     data << uint32(0x00000000);

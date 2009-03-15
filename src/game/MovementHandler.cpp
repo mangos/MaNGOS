@@ -310,7 +310,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
         int32 sync_time = GetPlayer()->m_anti_DeltaClientTime - GetPlayer()->m_anti_DeltaServerTime;
 
         #ifdef MOVEMENT_ANTICHEAT_DEBUG
-        sLog.outBasic("MA-%s Time > cClientTimeDelta: %d, cServerTime: %d || deltaC: %d - deltaS: %d || SyncTime: %d", 
+        sLog.outBasic("MA-%s Time > cClientTimeDelta: %d, cServerTime: %d || deltaC: %d - deltaS: %d || SyncTime: %d",
                         GetPlayer()->GetName(),cClientTimeDelta, cServerTime,
                         GetPlayer()->m_anti_DeltaClientTime, GetPlayer()->m_anti_DeltaServerTime, sync_time);
         #endif
@@ -320,8 +320,8 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
         if (sync_time > gmd || sync_time < -gmd){
             cClientTimeDelta = cServerTimeDelta;
             GetPlayer()->m_anti_MistimingCount++;
-            
-            sLog.outError("MA-%s, mistaming exception. #:%d, mistiming: %dms ", 
+
+            sLog.outError("MA-%s, mistaming exception. #:%d, mistiming: %dms ",
                             GetPlayer()->GetName(), GetPlayer()->m_anti_MistimingCount, sync_time);
 
             if (GetPlayer()->m_anti_MistimingCount > World::GetMistimingAlarms())
@@ -352,7 +352,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 
             // movement distance
             float allowed_delta= 0;
-            
+
             float delta_x = GetPlayer()->GetPositionX() - movementInfo.x;
             float delta_y = GetPlayer()->GetPositionY() - movementInfo.y;
             float delta_z = GetPlayer()->GetPositionZ() - movementInfo.z;
@@ -387,7 +387,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 
             //AntiGravitation (thanks to Meekro)
             float JumpHeight = GetPlayer()->m_anti_JumpBaseZ - movementInfo.z;
-            if ((GetPlayer()->m_anti_JumpBaseZ != 0) 
+            if ((GetPlayer()->m_anti_JumpBaseZ != 0)
                     && !(movementInfo.flags & (MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_FLYING | MOVEMENTFLAG_FLYING2))
                     && (JumpHeight < GetPlayer()->m_anti_Last_VSpeed))
             {
