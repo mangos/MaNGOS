@@ -3616,7 +3616,8 @@ uint8 Spell::CanCast(bool strict)
         if (checkForm)
         {
             // Cannot be used in this stance/form
-            if(uint8 shapeError = GetErrorAtShapeshiftedCast(m_spellInfo, m_caster->m_form))
+            SpellCastResult shapeError = GetErrorAtShapeshiftedCast(m_spellInfo, m_caster->m_form);
+            if(shapeError != SPELL_CAST_OK)
                 return shapeError;
 
             if ((m_spellInfo->Attributes & SPELL_ATTR_ONLY_STEALTHED) && !(m_caster->HasStealthAura()))
@@ -3676,14 +3677,10 @@ uint8 Spell::CanCast(bool strict)
             // auto selection spell rank implemented in WorldSession::HandleCastSpellOpcode
             // this case can be triggered if rank not found (too low-level target for first rank)
             if(m_caster->GetTypeId() == TYPEID_PLAYER && !IsPassiveSpell(m_spellInfo->Id) && !m_CastItem)
-            {
                 for(int i=0;i<3;i++)
-                {
                     if(IsPositiveEffect(m_spellInfo->Id, i) && m_spellInfo->Effect[i] == SPELL_EFFECT_APPLY_AURA)
                         if(target->getLevel() + 10 < m_spellInfo->spellLevel)
                             return SPELL_FAILED_LOWLEVEL;
-                }
-            }
         }
         else if (m_caster->GetTypeId()==TYPEID_PLAYER) // Target - is player caster
         {
@@ -3748,10 +3745,8 @@ uint8 Spell::CanCast(bool strict)
         }
 
         if(IsPositiveSpell(m_spellInfo->Id))
-        {
             if(target->IsImmunedToSpell(m_spellInfo))
                 return SPELL_FAILED_TARGET_AURASTATE;
-        }
 
         //Must be behind the target.
         if( m_spellInfo->AttributesEx2 == 0x100000 && (m_spellInfo->AttributesEx & 0x200) == 0x200 && target->HasInArc(M_PI, m_caster) )
@@ -3773,10 +3768,9 @@ uint8 Spell::CanCast(bool strict)
 
         // check if target is in combat
         if (target != m_caster && (m_spellInfo->AttributesEx & SPELL_ATTR_EX_NOT_IN_COMBAT_TARGET) && target->isInCombat())
-        {
             return SPELL_FAILED_TARGET_AFFECTING_COMBAT;
-        }
     }
+
     // Spell casted only on battleground
     if((m_spellInfo->AttributesEx3 & SPELL_ATTR_EX3_BATTLEGROUND) &&  m_caster->GetTypeId()==TYPEID_PLAYER)
         if(!((Player*)m_caster)->InBattleGround())
@@ -3795,9 +3789,10 @@ uint8 Spell::CanCast(bool strict)
     uint32 zone, area;
     m_caster->GetZoneAndAreaId(zone,area);
 
-    if (uint8 res= spellmgr.GetSpellAllowedInLocationError(m_spellInfo,m_caster->GetMapId(),zone,area,
-        m_caster->GetTypeId()==TYPEID_PLAYER ? ((Player*)m_caster) : NULL))
-        return res;
+    SpellCastResult locRes= spellmgr.GetSpellAllowedInLocationError(m_spellInfo,m_caster->GetMapId(),zone,area,
+        m_caster->GetTypeId()==TYPEID_PLAYER ? ((Player*)m_caster) : NULL);
+    if(locRes != SPELL_CAST_OK)
+        return locRes;
 
     // not let players cast spells at mount (and let do it to creatures)
     if( m_caster->IsMounted() && m_caster->GetTypeId()==TYPEID_PLAYER && !m_IsTriggeredSpell &&
