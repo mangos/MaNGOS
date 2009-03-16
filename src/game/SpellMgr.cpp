@@ -1336,6 +1336,10 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
                 // Cat Energy (Feral T4 (2)) and Omen of Clarity
                 if( spellInfo_1->Id == 16864 && spellInfo_2->Id == 37311 || spellInfo_2->Id == 16864 && spellInfo_1->Id == 37311 )
                     return false;
+
+                // Survival Instincts and Survival Instincts
+                if( spellInfo_1->Id == 61336 && spellInfo_2->Id == 50322 || spellInfo_2->Id == 61336 && spellInfo_1->Id == 50322 )
+                    return false;
             }
 
             // Leader of the Pack and Scroll of Stamina (multi-family check)
