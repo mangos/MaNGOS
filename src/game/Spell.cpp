@@ -4394,7 +4394,7 @@ SpellCastResult Spell::CheckCast(bool strict)
     return SPELL_CAST_OK;
 }
 
-int16 Spell::PetCanCast(Unit* target)
+SpellCastResult Spell::CheckPetCast(Unit* target)
 {
     if(!m_caster->isAlive())
         return SPELL_FAILED_CASTER_DEAD;
@@ -4458,11 +4458,7 @@ int16 Spell::PetCanCast(Unit* target)
             return SPELL_FAILED_NOT_READY;
     }
 
-    SpellCastResult result = CheckCast(true);
-    if(result != SPELL_CAST_OK)
-        return result;
-    else
-        return -1;                                          //this allows to check spell fail 0, in combat
+    return CheckCast(true);
 }
 
 SpellCastResult Spell::CheckCasterAuras() const
@@ -4589,9 +4585,9 @@ bool Spell::CanAutoCast(Unit* target)
         }
     }
 
-    int16 result = PetCanCast(target);
+    SpellCastResult result = CheckPetCast(target);
 
-    if(result == -1 || result == SPELL_FAILED_UNIT_NOT_INFRONT)
+    if(result == SPELL_CAST_OK || result == SPELL_FAILED_UNIT_NOT_INFRONT)
     {
         FillTargetMap();
         //check if among target units, our WANTED target is as well (->only self cast spells return false)
