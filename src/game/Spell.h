@@ -337,9 +337,9 @@ class Spell
         void TakeReagents();
         void TakeCastItem();
         void TriggerSpell();
-        uint8 CanCast(bool strict);
+
+        SpellCastResult CheckCast(bool strict);
         int16 PetCanCast(Unit* target);
-        bool CanAutoCast(Unit* target);
 
         // handlers
         void handle_immediate();
@@ -372,8 +372,9 @@ class Spell
 
         Unit* SelectMagnetTarget();
         bool CheckTarget( Unit* target, uint32 eff );
+        bool CanAutoCast(Unit* target);
 
-        void SendCastResult(uint8 result);
+        void SendCastResult(SpellCastResult result);
         void SendSpellStart();
         void SendSpellGo();
         void SendSpellCooldown();
