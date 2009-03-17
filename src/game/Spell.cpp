@@ -49,6 +49,31 @@
 
 extern pEffect SpellEffects[TOTAL_SPELL_EFFECTS];
 
+class PrioritizeManaPlayerWraper
+{
+    friend struct PrioritizeMana;
+
+    public:
+        explicit PrioritizeManaPlayerWraper(Player* player) : player(player)
+        {
+            uint32 maxmana = player->GetMaxPower(POWER_MANA);
+            percentMana = maxmana ? player->GetPower(POWER_MANA) * 100 / maxmana : 101;
+        }
+        Player* getPlayer() const { return player; }
+    private:
+        Player* player;
+        uint32 percentMana;
+};
+
+struct PrioritizeMana
+{
+    int operator()( PrioritizeManaPlayerWraper const& x, PrioritizeManaPlayerWraper const& y ) const
+    {
+        return x.percentMana < y.percentMana;
+    }
+};
+
+
 bool IsQuestTameSpell(uint32 spellId)
 {
     SpellEntry const *spellproto = sSpellStore.LookupEntry(spellId);
@@ -1600,7 +1625,6 @@ void Spell::SetTargetMap(uint32 i,uint32 cur,std::list<Unit*> &TagUnitMap)
         case TARGET_ALL_PARTY_AROUND_CASTER:
         case TARGET_ALL_PARTY_AROUND_CASTER_2:
         case TARGET_ALL_PARTY:
-        case TARGET_ALL_RAID_AROUND_CASTER:
         {
             Player *pTarget = m_caster->GetCharmerOrOwnerPlayerOrPlayerItself();
             Group *pGroup = pTarget ? pTarget->GetGroup() : NULL;
@@ -1614,9 +1638,7 @@ void Spell::SetTargetMap(uint32 i,uint32 cur,std::list<Unit*> &TagUnitMap)
                     Player* Target = itr->getSource();
 
                     // IsHostileTo check duel and controlled by enemy
-                    if( Target &&
-                        (cur==TARGET_ALL_RAID_AROUND_CASTER || Target->GetSubGroup()==subgroup) &&
-                        !m_caster->IsHostileTo(Target) )
+                    if( Target && Target->GetSubGroup()==subgroup && !m_caster->IsHostileTo(Target) )
                     {
                         if( m_caster->IsWithinDistInMap(Target, radius) )
                             TagUnitMap.push_back(Target);
@@ -1636,7 +1658,81 @@ void Spell::SetTargetMap(uint32 i,uint32 cur,std::list<Unit*> &TagUnitMap)
                     if( m_caster->IsWithinDistInMap(pet, radius) )
                         TagUnitMap.push_back(pet);
             }
-        }break;
+            break;
+        }
+        case TARGET_ALL_RAID_AROUND_CASTER:
+        {
+            Player *pTarget = m_caster->GetCharmerOrOwnerPlayerOrPlayerItself();
+            Group *pGroup = pTarget ? pTarget->GetGroup() : NULL;
+
+            if(m_spellInfo->Id==57669)                  //Replenishment (special target selection)
+            {
+                if(pGroup)
+                {
+                    typedef std::priority_queue<PrioritizeManaPlayerWraper, std::vector<PrioritizeManaPlayerWraper>, PrioritizeMana> Top10;
+                    Top10 manaUsers;
+
+                    for(GroupReference *itr = pGroup->GetFirstMember(); itr != NULL && manaUsers.size() < 10; itr = itr->next())
+                    {
+                        Player* Target = itr->getSource();
+                        if (m_caster->GetGUID() != Target->GetGUID() && Target->getPowerType() == POWER_MANA &&
+                            !Target->isDead() && m_caster->IsWithinDistInMap(Target, radius))
+                        {
+                            PrioritizeManaPlayerWraper  WTarget(Target);
+                            manaUsers.push(WTarget);
+                        }
+                    }
+
+                    while(!manaUsers.empty())
+                    {
+                        TagUnitMap.push_back(manaUsers.top().getPlayer());
+                        manaUsers.pop();
+                    }
+                }
+                else
+                {
+                    Unit* ownerOrSelf = pTarget ? pTarget : m_caster->GetCharmerOrOwnerOrSelf();
+                    if ((ownerOrSelf==m_caster || m_caster->IsWithinDistInMap(ownerOrSelf, radius)) &&
+                        ownerOrSelf->getPowerType() == POWER_MANA)
+                        TagUnitMap.push_back(ownerOrSelf);
+
+                    if(Pet* pet = ownerOrSelf->GetPet())
+                        if( m_caster->IsWithinDistInMap(pet, radius) && pet->getPowerType() == POWER_MANA )
+                            TagUnitMap.push_back(pet);
+                }
+            }
+            else
+            {
+                if(pGroup)
+                {
+                    for(GroupReference *itr = pGroup->GetFirstMember(); itr != NULL; itr = itr->next())
+                    {
+                        Player* Target = itr->getSource();
+
+                        // IsHostileTo check duel and controlled by enemy
+                        if( Target && !m_caster->IsHostileTo(Target) )
+                        {
+                            if( m_caster->IsWithinDistInMap(Target, radius) )
+                                TagUnitMap.push_back(Target);
+
+                            if(Pet* pet = Target->GetPet())
+                                if( m_caster->IsWithinDistInMap(pet, radius) )
+                                    TagUnitMap.push_back(pet);
+                        }
+                    }
+                }
+                else
+                {
+                    Unit* ownerOrSelf = pTarget ? pTarget : m_caster->GetCharmerOrOwnerOrSelf();
+                    if(ownerOrSelf==m_caster || m_caster->IsWithinDistInMap(ownerOrSelf, radius))
+                        TagUnitMap.push_back(ownerOrSelf);
+                    if(Pet* pet = ownerOrSelf->GetPet())
+                        if( m_caster->IsWithinDistInMap(pet, radius) )
+                            TagUnitMap.push_back(pet);
+                }
+            }
+            break;
+        }
         case TARGET_SINGLE_FRIEND:
         case TARGET_SINGLE_FRIEND_2:
         {
