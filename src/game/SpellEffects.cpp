@@ -793,7 +793,7 @@ void Spell::EffectDummy(uint32 i)
                     // create before death for get proper coordinates
                     if(!pGameObj->Create(objmgr.GenerateLowGuid(HIGHGUID_GAMEOBJECT), 179644, map, m_caster->GetPhaseMask(),
                         creatureTarget->GetPositionX(), creatureTarget->GetPositionY(), creatureTarget->GetPositionZ(),
-                        creatureTarget->GetOrientation(), 0, 0, 0, 0, 100, 1) )
+                        creatureTarget->GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 100, 1) )
                     {
                         delete pGameObj;
                         return;
@@ -4587,7 +4587,7 @@ void Spell::EffectSummonObjectWild(uint32 i)
     Map *map = target->GetMap();
 
     if(!pGameObj->Create(objmgr.GenerateLowGuid(HIGHGUID_GAMEOBJECT), gameobject_id, map,
-        m_caster->GetPhaseMask(), x, y, z, target->GetOrientation(), 0, 0, 0, 0, 100, 1))
+        m_caster->GetPhaseMask(), x, y, z, target->GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 100, 1))
     {
         delete pGameObj;
         return;
@@ -4635,7 +4635,7 @@ void Spell::EffectSummonObjectWild(uint32 i)
     {
         GameObject* linkedGO = new GameObject;
         if(linkedGO->Create(objmgr.GenerateLowGuid(HIGHGUID_GAMEOBJECT), linkedEntry, map,
-            m_caster->GetPhaseMask(), x, y, z, target->GetOrientation(), 0, 0, 0, 0, 100, 1))
+            m_caster->GetPhaseMask(), x, y, z, target->GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 100, 1))
         {
             linkedGO->SetRespawnTime(duration > 0 ? duration/IN_MILISECONDS : 0);
             linkedGO->SetSpellId(m_spellInfo->Id);
@@ -5260,7 +5260,7 @@ void Spell::EffectDuel(uint32 i)
         m_caster->GetPositionX()+(unitTarget->GetPositionX()-m_caster->GetPositionX())/2 ,
         m_caster->GetPositionY()+(unitTarget->GetPositionY()-m_caster->GetPositionY())/2 ,
         m_caster->GetPositionZ(),
-        m_caster->GetOrientation(), 0, 0, 0, 0, 0, 1))
+        m_caster->GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 0, 1))
     {
         delete pGameObj;
         return;
@@ -5635,9 +5635,6 @@ void Spell::EffectSummonObject(uint32 i)
 
     GameObject* pGameObj = new GameObject;
 
-    float rot2 = sin(m_caster->GetOrientation()/2);
-    float rot3 = cos(m_caster->GetOrientation()/2);
-
     float x,y,z;
     // If dest location if present
     if (m_targets.m_targetMask & TARGET_FLAG_DEST_LOCATION)
@@ -5652,7 +5649,7 @@ void Spell::EffectSummonObject(uint32 i)
 
     Map *map = m_caster->GetMap();
     if(!pGameObj->Create(objmgr.GenerateLowGuid(HIGHGUID_GAMEOBJECT), go_id, map,
-        m_caster->GetPhaseMask(), x, y, z, m_caster->GetOrientation(), 0, 0, rot2, rot3, 0, 1))
+        m_caster->GetPhaseMask(), x, y, z, m_caster->GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 0, 1))
     {
         delete pGameObj;
         return;
@@ -6242,7 +6239,7 @@ void Spell::EffectTransmitted(uint32 effIndex)
     GameObject* pGameObj = new GameObject;
 
     if(!pGameObj->Create(objmgr.GenerateLowGuid(HIGHGUID_GAMEOBJECT), name_id, cMap,
-        m_caster->GetPhaseMask(), fx, fy, fz, m_caster->GetOrientation(), 0, 0, 0, 0, 100, 1))
+        m_caster->GetPhaseMask(), fx, fy, fz, m_caster->GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 100, 1))
     {
         delete pGameObj;
         return;
@@ -6255,10 +6252,6 @@ void Spell::EffectTransmitted(uint32 effIndex)
         case GAMEOBJECT_TYPE_FISHINGNODE:
         {
             m_caster->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT,pGameObj->GetGUID());
-                                                            // Orientation3
-            pGameObj->SetFloatValue(GAMEOBJECT_PARENTROTATION + 2, 0.88431775569915771 );
-                                                            // Orientation4
-            pGameObj->SetFloatValue(GAMEOBJECT_PARENTROTATION + 3, -0.4668855369091033 );
             m_caster->AddGameObject(pGameObj);              // will removed at spell cancel
 
             // end time of range when possible catch fish (FISHING_BOBBER_READY_TIME..GetDuration(m_spellInfo))
@@ -6313,7 +6306,7 @@ void Spell::EffectTransmitted(uint32 effIndex)
     {
         GameObject* linkedGO = new GameObject;
         if(linkedGO->Create(objmgr.GenerateLowGuid(HIGHGUID_GAMEOBJECT), linkedEntry, cMap,
-            m_caster->GetPhaseMask(), fx, fy, fz, m_caster->GetOrientation(), 0, 0, 0, 0, 100, 1))
+            m_caster->GetPhaseMask(), fx, fy, fz, m_caster->GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 100, 1))
         {
             linkedGO->SetRespawnTime(duration > 0 ? duration/IN_MILISECONDS : 0);
             linkedGO->SetUInt32Value(GAMEOBJECT_LEVEL, m_caster->getLevel() );
