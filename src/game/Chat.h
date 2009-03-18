@@ -451,6 +451,7 @@ class ChatHandler
         bool HandleSpawnVehicle(const char * args);
         bool HandleSendLargePacketCommand(const char * args);
         bool HandleSendSetPhaseShiftCommand(const char * args);
+        bool HandleSetItemFlagCommand(const char * args);
 
         Player*   getSelectedPlayer();
         Creature* getSelectedCreature();

@@ -1888,7 +1888,7 @@ void BattleGroundMgr::DistributeArenaPoints()
     sWorld.SendWorldText(LANG_DIST_ARENA_POINTS_END);
 }
 
-void BattleGroundMgr::BuildBattleGroundListPacket(WorldPacket *data, const uint64& guid, Player* plr, BattleGroundTypeId bgTypeId)
+void BattleGroundMgr::BuildBattleGroundListPacket(WorldPacket *data, const uint64& guid, Player* plr, BattleGroundTypeId bgTypeId, uint8 fromWhere)
 {
     uint32 PlayerLevel = 10;
 
@@ -1897,16 +1897,16 @@ void BattleGroundMgr::BuildBattleGroundListPacket(WorldPacket *data, const uint6
 
     data->Initialize(SMSG_BATTLEFIELD_LIST);
     *data << uint64(guid);                                  // battlemaster guid
-    *data << uint8(0);                                      // unknown 3.1
+    *data << uint8(fromWhere);                              // from where you joined
     *data << uint32(bgTypeId);                              // battleground id
     if(bgTypeId == BATTLEGROUND_AA)                         // arena
     {
-        *data << uint8(5);                                  // unk
-        *data << uint32(0);                                 // unk
+        *data << uint8(4);                                  // unk
+        *data << uint32(0);                                 // unk (count?)
     }
     else                                                    // battleground
     {
-        *data << uint8(0x00);                               // unk
+        *data << uint8(0x00);                               // unk, different for each bg type
 
         size_t count_pos = data->wpos();
         uint32 count = 0;
