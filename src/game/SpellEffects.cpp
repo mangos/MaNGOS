@@ -99,7 +99,7 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS]=
     &Spell::EffectUnused,                                   // 39 SPELL_EFFECT_LANGUAGE
     &Spell::EffectDualWield,                                // 40 SPELL_EFFECT_DUAL_WIELD
     &Spell::EffectUnused,                                   // 41 SPELL_EFFECT_JUMP
-    &Spell::EffectUnused,                                   // 42 SPELL_EFFECT_JUMP2
+    &Spell::EffectJump,                                     // 42 SPELL_EFFECT_JUMP2
     &Spell::EffectTeleUnitsFaceCaster,                      // 43 SPELL_EFFECT_TELEPORT_UNITS_FACE_CASTER
     &Spell::EffectLearnSkill,                               // 44 SPELL_EFFECT_SKILL_STEP
     &Spell::EffectAddHonor,                                 // 45 SPELL_EFFECT_ADD_HONOR                honor/pvp related
@@ -1119,7 +1119,7 @@ void Spell::EffectDummy(uint32 i)
                         return;
 
                     unitTarget->CastSpell(unitTarget, 58419, true);
-                    break;
+                    return;
                 }
                 case 58420:                                 // Portal to Stormwind
                 {
@@ -1127,7 +1127,7 @@ void Spell::EffectDummy(uint32 i)
                         return;
 
                     unitTarget->CastSpell(unitTarget, 58421, true);
-                    break;
+                    return;
                 }
             }
 
@@ -1750,6 +1750,15 @@ void Spell::EffectDummy(uint32 i)
         m_caster->AddPetAura(petSpell);
         return;
     }
+
+    // Script based implementation. Must be used only for not good for implementation in core spell effects
+    // So called only for not proccessed cases
+    if(gameObjTarget)
+        Script->EffectDummyGameObj(m_caster, m_spellInfo->Id, i, gameObjTarget);
+    else if(unitTarget && unitTarget->GetTypeId()==TYPEID_UNIT)
+        Script->EffectDummyCreature(m_caster, m_spellInfo->Id, i, (Creature*)unitTarget);
+    else if(itemTarget)
+        Script->EffectDummyItem(m_caster, m_spellInfo->Id, i, itemTarget);
 }
 
 void Spell::EffectTriggerSpellWithValue(uint32 i)
@@ -2000,6 +2009,55 @@ void Spell::EffectTriggerMissileSpell(uint32 effect_idx)
     m_caster->CastSpell(m_targets.m_destX, m_targets.m_destY, m_targets.m_destZ, spellInfo, true, m_CastItem, 0, m_originalCasterGUID);
 }
 
+void Spell::EffectJump(uint32 i)
+{
+    if(m_caster->isInFlight())
+        return;
+
+    // Init dest coordinates
+    float x,y,z,o;
+    if(m_targets.m_targetMask & TARGET_FLAG_DEST_LOCATION)
+    {
+        x = m_targets.m_destX;
+        y = m_targets.m_destY;
+        z = m_targets.m_destZ;
+
+        if(m_spellInfo->EffectImplicitTargetA[i] == TARGET_BEHIND_VICTIM)
+        {
+            // explicit cast data from client or server-side cast
+            // some spell at client send caster
+            Unit* pTarget = NULL;
+            if(m_targets.getUnitTarget() && m_targets.getUnitTarget()!=m_caster)
+                pTarget = m_targets.getUnitTarget();
+            else if(unitTarget->getVictim())
+                pTarget = m_caster->getVictim();
+            else if(m_caster->GetTypeId() == TYPEID_PLAYER)
+                pTarget = ObjectAccessor::GetUnit(*m_caster, ((Player*)m_caster)->GetSelection());
+
+            o = pTarget ? pTarget->GetOrientation() : m_caster->GetOrientation();
+        }
+        else
+            o = m_caster->GetOrientation();
+    }
+    else if(unitTarget)
+    {
+        unitTarget->GetContactPoint(m_caster,x,y,z,CONTACT_DISTANCE);
+        o = m_caster->GetOrientation();
+    }
+    else if(gameObjTarget)
+    {
+        gameObjTarget->GetContactPoint(m_caster,x,y,z,CONTACT_DISTANCE);
+        o = m_caster->GetOrientation();
+    }
+    else
+    {
+        sLog.outError( "Spell::EffectJump - unsupported target mode for spell ID %u", m_spellInfo->Id );
+        return;
+    }
+
+    m_caster->NearTeleportTo(x,y,z,o,true);
+}
+
 void Spell::EffectTeleportUnits(uint32 i)
 {
     if(!unitTarget || unitTarget->isInFlight())
@@ -2018,45 +2076,38 @@ void Spell::EffectTeleportUnits(uint32 i)
         }
         case TARGET_TABLE_X_Y_Z_COORDINATES:
         {
-            // TODO: Only players can teleport?
-            if (unitTarget->GetTypeId() != TYPEID_PLAYER)
-                return;
             SpellTargetPosition const* st = spellmgr.GetSpellTargetPosition(m_spellInfo->Id);
             if(!st)
             {
                 sLog.outError( "Spell::EffectTeleportUnits - unknown Teleport coordinates for spell ID %u", m_spellInfo->Id );
                 return;
             }
-            ((Player*)unitTarget)->TeleportTo(st->target_mapId,st->target_X,st->target_Y,st->target_Z,st->target_Orientation,unitTarget==m_caster ? TELE_TO_SPELL : 0);
+
+            if(st->target_mapId==unitTarget->GetMapId())
+                unitTarget->NearTeleportTo(st->target_X,st->target_Y,st->target_Z,st->target_Orientation,unitTarget==m_caster);
+            else if(unitTarget->GetTypeId()==TYPEID_PLAYER)
+                ((Player*)unitTarget)->TeleportTo(st->target_mapId,st->target_X,st->target_Y,st->target_Z,st->target_Orientation,unitTarget==m_caster ? TELE_TO_SPELL : 0);
             break;
         }
         case TARGET_BEHIND_VICTIM:
         {
-            // Get selected target for player (or victim for units)
             Unit *pTarget = NULL;
-            if(m_caster->GetTypeId() == TYPEID_PLAYER)
-                pTarget = ObjectAccessor::GetUnit(*m_caster, ((Player*)m_caster)->GetSelection());
-            else
-                pTarget = m_caster->getVictim();
-            // No target present - return
-            if (!pTarget)
-                return;
+
+            // explicit cast data from client or server-side cast
+            // some spell at client send caster
+            if(m_targets.getUnitTarget() && m_targets.getUnitTarget()!=unitTarget)
+                pTarget = m_targets.getUnitTarget();
+            else if(unitTarget->getVictim())
+                pTarget = unitTarget->getVictim();
+            else if(unitTarget->GetTypeId() == TYPEID_PLAYER)
+                pTarget = ObjectAccessor::GetUnit(*unitTarget, ((Player*)unitTarget)->GetSelection());
+
             // Init dest coordinates
-            uint32 mapid = m_caster->GetMapId();
             float x = m_targets.m_destX;
             float y = m_targets.m_destY;
             float z = m_targets.m_destZ;
-            float orientation = pTarget->GetOrientation();
-            // Teleport
-            if(unitTarget->GetTypeId() == TYPEID_PLAYER)
-                ((Player*)unitTarget)->TeleportTo(mapid, x, y, z, orientation, TELE_TO_NOT_LEAVE_COMBAT | TELE_TO_NOT_UNSUMMON_PET | (unitTarget==m_caster ? TELE_TO_SPELL : 0));
-            else
-            {
-                m_caster->GetMap()->CreatureRelocation((Creature*)unitTarget, x, y, z, orientation);
-                WorldPacket data;
-                unitTarget->BuildTeleportAckMsg(&data, x, y, z, orientation);
-                unitTarget->SendMessageToSet(&data, false);
-            }
+            float orientation = pTarget ? pTarget->GetOrientation() : unitTarget->GetOrientation();
+            unitTarget->NearTeleportTo(x,y,z,orientation,unitTarget==m_caster);
             return;
         }
         default:
@@ -2074,15 +2125,7 @@ void Spell::EffectTeleportUnits(uint32 i)
             float z = m_targets.m_destZ;
             float orientation = unitTarget->GetOrientation();
             // Teleport
-            if(unitTarget->GetTypeId() == TYPEID_PLAYER)
-                ((Player*)unitTarget)->TeleportTo(mapid, x, y, z, orientation, TELE_TO_NOT_LEAVE_COMBAT | TELE_TO_NOT_UNSUMMON_PET | (unitTarget==m_caster ? TELE_TO_SPELL : 0));
-            else
-            {
-                m_caster->GetMap()->CreatureRelocation((Creature*)unitTarget, x, y, z, orientation);
-                WorldPacket data;
-                unitTarget->BuildTeleportAckMsg(&data, x, y, z, orientation);
-                unitTarget->SendMessageToSet(&data, false);
-            }
+            unitTarget->NearTeleportTo(x,y,z,orientation,unitTarget==m_caster);
             return;
         }
     }
@@ -2903,7 +2946,7 @@ void Spell::SendLoot(uint64 guid, LootType loottype)
     player->SendLoot(guid, loottype);
 }
 
-void Spell::EffectOpenLock(uint32 /*i*/)
+void Spell::EffectOpenLock(uint32 effIndex)
 {
     if(!m_caster || m_caster->GetTypeId() != TYPEID_PLAYER)
     {
@@ -2913,7 +2956,6 @@ void Spell::EffectOpenLock(uint32 /*i*/)
 
     Player* player = (Player*)m_caster;
 
-    LootType loottype = LOOT_CORPSE;
     uint32 lockId = 0;
     uint64 guid = 0;
 
@@ -2925,7 +2967,7 @@ void Spell::EffectOpenLock(uint32 /*i*/)
         if( goInfo->type == GAMEOBJECT_TYPE_BUTTON && goInfo->button.noDamageImmune ||
             goInfo->type == GAMEOBJECT_TYPE_GOOBER && goInfo->goober.losOK )
         {
-            //CanUseBattleGroundObject() already called in CanCast()
+            //CanUseBattleGroundObject() already called in CheckCast()
             // in battleground check
             if(BattleGround *bg = player->GetBattleGround())
             {
@@ -2937,7 +2979,7 @@ void Spell::EffectOpenLock(uint32 /*i*/)
         }
         else if (goInfo->type == GAMEOBJECT_TYPE_FLAGSTAND)
         {
-            //CanUseBattleGroundObject() already called in CanCast()
+            //CanUseBattleGroundObject() already called in CheckCast()
             // in battleground check
             if(BattleGround *bg = player->GetBattleGround())
             {
@@ -2960,91 +3002,39 @@ void Spell::EffectOpenLock(uint32 /*i*/)
         return;
     }
 
-    if(!lockId)                                             // possible case for GO and maybe for items.
+    SkillType skillId = SKILL_NONE;
+    int32 reqSkillValue = 0;
+    int32 skillValue;
+
+    SpellCastResult res = CanOpenLock(effIndex,lockId,skillId,reqSkillValue,skillValue);
+    if(res != SPELL_CAST_OK)
     {
-        SendLoot(guid, loottype);
+        SendCastResult(res);
         return;
     }
 
-    // Get LockInfo
-    LockEntry const *lockInfo = sLockStore.LookupEntry(lockId);
+    SendLoot(guid, LOOT_SKINNING);
 
-    if (!lockInfo)
+    // not allow use skill grow at item base open
+    if(!m_CastItem && skillId != SKILL_NONE)
     {
-        sLog.outError( "Spell::EffectOpenLock: %s [guid = %u] has an unknown lockId: %u!",
-            (gameObjTarget ? "gameobject" : "item"), GUID_LOPART(guid), lockId);
-        SendCastResult(SPELL_FAILED_BAD_TARGETS);
-        return;
-    }
-
-    // check key
-    for(int i = 0; i < 8; ++i)
-    {
-        // Type==1 This means lockInfo->Index[i] is an item
-        if(lockInfo->Type[i]==LOCK_KEY_ITEM && lockInfo->Index[i] && m_CastItem && m_CastItem->GetEntry()==lockInfo->Index[i])
-        {
-            SendLoot(guid, loottype);
-            return;
-        }
-    }
-
-    uint32 SkillId = 0;
-    // Check and skill-up skill
-    if( m_spellInfo->Effect[1] == SPELL_EFFECT_SKILL )
-        SkillId = m_spellInfo->EffectMiscValue[1];
-                                                            // pickpocketing spells
-    else if( m_spellInfo->EffectMiscValue[0] == LOCKTYPE_PICKLOCK )
-        SkillId = SKILL_LOCKPICKING;
-
-    // skill bonus provided by casting spell (mostly item spells)
-    uint32 spellSkillBonus = uint32(m_currentBasePoints[0]+1);
-
-    uint32 reqSkillValue = lockInfo->Skill[0];
-
-    if(lockInfo->Skill[1])                                  // required pick lock skill applying
-    {
-        if(SkillId != SKILL_LOCKPICKING)                    // wrong skill (cheating?)
-        {
-            SendCastResult(SPELL_FAILED_FIZZLE);
-            return;
-        }
-
-        reqSkillValue = lockInfo->Skill[1];
-    }
-    else if(SkillId == SKILL_LOCKPICKING)                   // apply picklock skill to wrong target
-    {
-        SendCastResult(SPELL_FAILED_BAD_TARGETS);
-        return;
-    }
-
-    if ( SkillId )
-    {
-        loottype = LOOT_SKINNING;
-        if ( player->GetSkillValue(SkillId) + spellSkillBonus < reqSkillValue )
-        {
-            SendCastResult(SPELL_FAILED_LOW_CASTLEVEL);
-            return;
-        }
-
         // update skill if really known
-        if(uint32 SkillValue = player->GetPureSkillValue(SkillId))
+        if(uint32 pureSkillValue = player->GetPureSkillValue(skillId))
         {
             if(gameObjTarget)
             {
                 // Allow one skill-up until respawned
                 if ( !gameObjTarget->IsInSkillupList( player->GetGUIDLow() ) &&
-                    player->UpdateGatherSkill(SkillId, SkillValue, reqSkillValue) )
+                    player->UpdateGatherSkill(skillId, pureSkillValue, reqSkillValue) )
                     gameObjTarget->AddToSkillupList( player->GetGUIDLow() );
             }
             else if(itemTarget)
             {
                 // Do one skill-up
-                player->UpdateGatherSkill(SkillId, SkillValue, reqSkillValue);
+                player->UpdateGatherSkill(skillId, pureSkillValue, reqSkillValue);
             }
         }
     }
-
-    SendLoot(guid, loottype);
 }
 
 void Spell::EffectSummonChangeItem(uint32 i)
@@ -3743,16 +3733,12 @@ void Spell::EffectTeleUnitsFaceCaster(uint32 i)
     if(unitTarget->isInFlight())
         return;
 
-    uint32 mapid = m_caster->GetMapId();
     float dis = GetSpellRadius(sSpellRadiusStore.LookupEntry(m_spellInfo->EffectRadiusIndex[i]));
 
     float fx,fy,fz;
     m_caster->GetClosePoint(fx,fy,fz,unitTarget->GetObjectSize(),dis);
 
-    if(unitTarget->GetTypeId() == TYPEID_PLAYER)
-        ((Player*)unitTarget)->TeleportTo(mapid, fx, fy, fz, -m_caster->GetOrientation(), TELE_TO_NOT_LEAVE_COMBAT | TELE_TO_NOT_UNSUMMON_PET | (unitTarget==m_caster ? TELE_TO_SPELL : 0));
-    else
-        m_caster->GetMap()->CreatureRelocation((Creature*)m_caster, fx, fy, fz, -m_caster->GetOrientation());
+    unitTarget->NearTeleportTo(fx,fy,fz,-m_caster->GetOrientation(),unitTarget==m_caster);
 }
 
 void Spell::EffectLearnSkill(uint32 i)
@@ -3773,17 +3759,26 @@ void Spell::EffectAddHonor(uint32 /*i*/)
     if(unitTarget->GetTypeId() != TYPEID_PLAYER)
         return;
 
-    uint32 honor_reward = MaNGOS::Honor::hk_honor_at_level(unitTarget->getLevel(), damage);
-    sLog.outDebug("SpellEffect::AddHonor called for spell_id %u, that rewards %u honor points to player: %u", m_spellInfo->Id, honor_reward, ((Player*)unitTarget)->GetGUIDLow());
+    // not scale value for item based reward (/10 value expected)
+    if(m_CastItem)
+    {
+        ((Player*)unitTarget)->RewardHonor(NULL, 1, damage/10);
+        sLog.outError("SpellEffect::AddHonor (spell_id %u) rewards %d honor points (item %u) for player: %u", m_spellInfo->Id, damage/10, m_CastItem->GetEntry(),((Player*)unitTarget)->GetGUIDLow());
+        return;
+    }
 
     // do not allow to add too many honor for player (50 * 21) = 1040 at level 70, or (50 * 31) = 1550 at level 80
-    if( damage <= 50 )
+    if( damage <= 50)
+    {
+        uint32 honor_reward = MaNGOS::Honor::hk_honor_at_level(unitTarget->getLevel(), damage);
         ((Player*)unitTarget)->RewardHonor(NULL, 1, honor_reward);
+        sLog.outDebug("SpellEffect::AddHonor (spell_id %u) rewards %u honor points (scale) to player: %u", m_spellInfo->Id, honor_reward, ((Player*)unitTarget)->GetGUIDLow());
+    }
     else
     {
         //maybe we have correct honor_gain in damage already
         ((Player*)unitTarget)->RewardHonor(NULL, 1, damage);
-        sLog.outError("SpellEffect::AddHonor called for spell_id %u, that rewards %d * honor for one honorable kill and it is too much (%u of honor) for player: %u", m_spellInfo->Id, damage, honor_reward, ((Player*)unitTarget)->GetGUIDLow());
+        sLog.outError("SpellEffect::AddHonor (spell_id %u) rewards %u honor points (non scale) for player: %u", m_spellInfo->Id, damage, ((Player*)unitTarget)->GetGUIDLow());
     }
 }
 
@@ -5757,7 +5752,6 @@ void Spell::EffectMomentMove(uint32 i)
 
     if( m_spellInfo->rangeIndex== 1)                        //self range
     {
-        uint32 mapid = m_caster->GetMapId();
         float dis = GetSpellRadius(sSpellRadiusStore.LookupEntry(m_spellInfo->EffectRadiusIndex[i]));
 
         // before caster
@@ -5767,7 +5761,7 @@ void Spell::EffectMomentMove(uint32 i)
         unitTarget->GetPosition(ox,oy,oz);
 
         float fx2,fy2,fz2;                                  // getObjectHitPos overwrite last args in any result case
-        if(VMAP::VMapFactory::createOrGetVMapManager()->getObjectHitPos(mapid, ox,oy,oz+0.5, fx,fy,oz+0.5,fx2,fy2,fz2, -0.5))
+        if(VMAP::VMapFactory::createOrGetVMapManager()->getObjectHitPos(unitTarget->GetMapId(), ox,oy,oz+0.5, fx,fy,oz+0.5,fx2,fy2,fz2, -0.5))
         {
             fx = fx2;
             fy = fy2;
@@ -5775,10 +5769,7 @@ void Spell::EffectMomentMove(uint32 i)
             unitTarget->UpdateGroundPositionZ(fx,fy,fz);
         }
 
-        if(unitTarget->GetTypeId() == TYPEID_PLAYER)
-            ((Player*)unitTarget)->TeleportTo(mapid, fx, fy, fz, unitTarget->GetOrientation(), TELE_TO_NOT_LEAVE_COMBAT | TELE_TO_NOT_UNSUMMON_PET | (unitTarget==m_caster ? TELE_TO_SPELL : 0));
-        else
-            m_caster->GetMap()->CreatureRelocation((Creature*)unitTarget, fx, fy, fz, unitTarget->GetOrientation());
+        unitTarget->NearTeleportTo(fx, fy, fz, unitTarget->GetOrientation(),unitTarget==m_caster);
     }
 }
 

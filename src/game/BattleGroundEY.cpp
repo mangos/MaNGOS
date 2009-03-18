@@ -258,9 +258,20 @@ void BattleGroundEY::UpdatePointStatuses()
 void BattleGroundEY::UpdateTeamScore(uint32 Team)
 {
     uint32 score = GetTeamScore(Team);
-    if(score >= EY_MAX_TEAM_SCORE)
+    //TODO there should be some sound played when one team is near victory!! - and define variables
+    /*if( !m_IsInformedNearVictory && score >= BG_EY_WARNING_NEAR_VICTORY_SCORE )
     {
-        score = EY_MAX_TEAM_SCORE;
+        if( Team == ALLIANCE )
+            SendMessageToAll(LANG_BG_EY_A_NEAR_VICTORY, CHAT_MSG_BG_SYSTEM_NEUTRAL);
+        else
+            SendMessageToAll(LANG_BG_EY_H_NEAR_VICTORY, CHAT_MSG_BG_SYSTEM_NEUTRAL);
+        PlaySoundToAll(BG_EY_SOUND_NEAR_VICTORY);
+        m_IsInformedNearVictory = true;
+    }*/
+
+    if( score >= BG_EY_MAX_TEAM_SCORE )
+    {
+        score = BG_EY_MAX_TEAM_SCORE;
         EndBattleGround(Team);
     }
 
@@ -509,7 +520,7 @@ void BattleGroundEY::Reset()
     m_PointAddingTimer = 0;
     m_TowerCapCheckTimer = 0;
     bool isBGWeekend = false;           //TODO FIXME - call sBattleGroundMgr.IsBGWeekend(m_TypeID); - you must also implement that call!
-    uint32 m_HonorTics = (isBGWeekend) ? BG_EY_EYWeekendHonorTicks : BG_EY_NotEYWeekendHonorTicks;
+    m_HonorTics = (isBGWeekend) ? BG_EY_EYWeekendHonorTicks : BG_EY_NotEYWeekendHonorTicks;
 
     for(uint8 i = 0; i < EY_POINTS_MAX; ++i)
     {
@@ -594,9 +605,9 @@ void BattleGroundEY::EventPlayerDroppedFlag(Player *Source)
     UpdateWorldState(NETHERSTORM_FLAG_STATE_ALLIANCE, BG_EY_FLAG_STATE_WAIT_RESPAWN);
 
     if(Source->GetTeam() == ALLIANCE)
-        SendMessageToAll(LANG_BG_EY_DROPPED_FLAG,CHAT_MSG_BG_SYSTEM_ALLIANCE, Source);
+        SendMessageToAll(LANG_BG_EY_DROPPED_FLAG, CHAT_MSG_BG_SYSTEM_ALLIANCE, NULL);
     else
-        SendMessageToAll(LANG_BG_EY_DROPPED_FLAG,CHAT_MSG_BG_SYSTEM_HORDE, Source);
+        SendMessageToAll(LANG_BG_EY_DROPPED_FLAG, CHAT_MSG_BG_SYSTEM_HORDE, NULL);
 }
 
 void BattleGroundEY::EventPlayerClickedOnFlag(Player *Source, GameObject* target_obj)
@@ -626,9 +637,9 @@ void BattleGroundEY::EventPlayerClickedOnFlag(Player *Source, GameObject* target
     Source->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT);
 
     if(Source->GetTeam() == ALLIANCE)
-        SendMessageToAll(LANG_BG_EY_HAS_TAKEN_FLAG,CHAT_MSG_BG_SYSTEM_ALLIANCE, Source);
+        PSendMessageToAll(LANG_BG_EY_HAS_TAKEN_FLAG, CHAT_MSG_BG_SYSTEM_ALLIANCE, NULL, Source->GetName());
     else
-        SendMessageToAll(LANG_BG_EY_HAS_TAKEN_FLAG,CHAT_MSG_BG_SYSTEM_HORDE, Source);
+        PSendMessageToAll(LANG_BG_EY_HAS_TAKEN_FLAG, CHAT_MSG_BG_SYSTEM_HORDE, NULL, Source->GetName());
 }
 
 void BattleGroundEY::EventTeamLostPoint(Player *Source, uint32 Point)

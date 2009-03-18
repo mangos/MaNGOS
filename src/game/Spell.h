@@ -20,6 +20,7 @@
 #define __SPELL_H
 
 #include "GridDefines.h"
+#include "SharedDefines.h"
 
 class WorldSession;
 class Unit;
@@ -249,6 +250,7 @@ class Spell
         void EffectSummonWild(uint32 i);
         void EffectSummonGuardian(uint32 i);
         void EffectHealMechanical(uint32 i);
+        void EffectJump(uint32 i);
         void EffectTeleUnitsFaceCaster(uint32 i);
         void EffectLearnSkill(uint32 i);
         void EffectAddHonor(uint32 i);
@@ -331,14 +333,13 @@ class Spell
         void cast(bool skipCheck = false);
         void finish(bool ok = true);
         void TakePower();
-        uint8 CheckRuneCost(uint32 runeCostID);
         void TakeRunePower();
         void TakeReagents();
         void TakeCastItem();
         void TriggerSpell();
-        uint8 CanCast(bool strict);
-        int16 PetCanCast(Unit* target);
-        bool CanAutoCast(Unit* target);
+
+        SpellCastResult CheckCast(bool strict);
+        SpellCastResult CheckPetCast(Unit* target);
 
         // handlers
         void handle_immediate();
@@ -347,10 +348,11 @@ class Spell
         void _handle_immediate_phase();
         void _handle_finish_phase();
 
-        uint8 CheckItems();
-        uint8 CheckRange(bool strict);
-        uint8 CheckPower();
-        uint8 CheckCasterAuras() const;
+        SpellCastResult CheckItems();
+        SpellCastResult CheckRange(bool strict);
+        SpellCastResult CheckPower();
+        SpellCastResult CheckRuneCost(uint32 runeCostID);
+        SpellCastResult CheckCasterAuras() const;
 
         int32 CalculateDamage(uint8 i, Unit* target) { return m_caster->CalculateSpellDamage(m_spellInfo,i,m_currentBasePoints[i],target); }
         int32 CalculatePowerCost();
@@ -370,8 +372,9 @@ class Spell
 
         Unit* SelectMagnetTarget();
         bool CheckTarget( Unit* target, uint32 eff );
+        bool CanAutoCast(Unit* target);
 
-        void SendCastResult(uint8 result);
+        void SendCastResult(SpellCastResult result);
         void SendSpellStart();
         void SendSpellGo();
         void SendSpellCooldown();
@@ -546,6 +549,7 @@ class Spell
         void DoAllEffectOnTarget(GOTargetInfo *target);
         void DoAllEffectOnTarget(ItemTargetInfo *target);
         bool IsAliveUnitPresentInTargetList();
+        SpellCastResult CanOpenLock(uint32 effIndex, uint32 lockid, SkillType& skillid, int32& reqSkillValue, int32& skillValue);
         // -------------------------------------------
 
         //List For Triggered Spells

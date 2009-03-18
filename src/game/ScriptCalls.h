@@ -56,6 +56,9 @@ typedef bool(MANGOS_IMPORT * scriptCallGOQuestAccept)(Player *player, GameObject
 typedef bool(MANGOS_IMPORT * scriptCallGOChooseReward)(Player *player, GameObject *, Quest const*, uint32 opt );
 typedef bool(MANGOS_IMPORT * scriptCallReceiveEmote) ( Player *player, Creature *_Creature, uint32 emote );
 typedef bool(MANGOS_IMPORT * scriptCallItemUse) (Player *player, Item *_Item, SpellCastTargets const& targets);
+typedef bool(MANGOS_IMPORT * scriptCallEffectDummyGameObj) (Unit *caster, uint32 spellId, uint32 effIndex, GameObject *gameObjTarget);
+typedef bool(MANGOS_IMPORT * scriptCallEffectDummyCreature) (Unit *caster, uint32 spellId, uint32 effIndex, Creature *crTarget);
+typedef bool(MANGOS_IMPORT * scriptCallEffectDummyItem) (Unit *caster, uint32 spellId, uint32 effIndex, Item *itemTarget);
 typedef CreatureAI* (MANGOS_IMPORT * scriptCallGetAI) ( Creature *_Creature );
 typedef InstanceData* (MANGOS_IMPORT * scriptCallCreateInstanceData) (Map *map);
 
@@ -82,6 +85,9 @@ typedef struct
     scriptCallGOQuestAccept GOQuestAccept;
     scriptCallReceiveEmote ReceiveEmote;
     scriptCallItemUse ItemUse;
+    scriptCallEffectDummyGameObj  EffectDummyGameObj;
+    scriptCallEffectDummyCreature EffectDummyCreature;
+    scriptCallEffectDummyItem     EffectDummyItem;
     scriptCallGetAI GetAI;
     scriptCallCreateInstanceData CreateInstanceData;
 
