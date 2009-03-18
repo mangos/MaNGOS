@@ -32,8 +32,6 @@ libmangosgame_a_SOURCES = \
 	AccountMgr.h \
 	AchievementMgr.h \
 	AchievementMgr.cpp \
-	AddonHandler.cpp \
-	AddonHandler.h \
 	AggressorAI.cpp \
 	AggressorAI.h \
 	AnimalRandomMovementGenerator.h \
