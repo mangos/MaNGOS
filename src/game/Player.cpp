@@ -3529,7 +3529,7 @@ void Player::InitVisibleBits()
         // item entry
         updateVisualBits.SetBit(PLAYER_VISIBLE_ITEM_1_ENTRYID + offset);
         // enchant
-        updateVisualBits.SetBit(PLAYER_VISIBLE_ITEM_1_PERMANENTENCHANTMENT + offset);
+        updateVisualBits.SetBit(PLAYER_VISIBLE_ITEM_1_ENCHANTMENT + offset);
     }
 
     updateVisualBits.SetBit(PLAYER_CHOSEN_TITLE);
@@ -3554,7 +3554,7 @@ void Player::BuildCreateUpdateBlockForPlayer( UpdateData *data, Player *target )
 
             m_items[i]->BuildCreateUpdateBlockForPlayer( data, target );
         }
-        for(int i = KEYRING_SLOT_START; i < QUESTBAG_SLOT_END; i++)
+        for(int i = KEYRING_SLOT_START; i < CURRENCYTOKEN_SLOT_END; i++)
         {
             if(m_items[i] == NULL)
                 continue;
@@ -3587,7 +3587,7 @@ void Player::DestroyForPlayer( Player *target ) const
 
             m_items[i]->DestroyForPlayer( target );
         }
-        for(int i = KEYRING_SLOT_START; i < QUESTBAG_SLOT_END; i++)
+        for(int i = KEYRING_SLOT_START; i < CURRENCYTOKEN_SLOT_END; i++)
         {
             if(m_items[i] == NULL)
                 continue;
@@ -8315,10 +8315,10 @@ uint8 Player::FindEquipSlot( ItemPrototype const* proto, uint32 slot, bool swap 
             slots[0] = EQUIPMENT_SLOT_RANGED;
             break;
         case INVTYPE_BAG:
-            slots[0] = INVENTORY_SLOT_BAG_1;
-            slots[1] = INVENTORY_SLOT_BAG_2;
-            slots[2] = INVENTORY_SLOT_BAG_3;
-            slots[3] = INVENTORY_SLOT_BAG_4;
+            slots[0] = INVENTORY_SLOT_BAG_START + 0;
+            slots[1] = INVENTORY_SLOT_BAG_START + 1;
+            slots[2] = INVENTORY_SLOT_BAG_START + 2;
+            slots[3] = INVENTORY_SLOT_BAG_START + 3;
             break;
         case INVTYPE_RELIC:
         {
@@ -8420,7 +8420,7 @@ uint8 Player::CanUnequipItems( uint32 item, uint32 count ) const
                 return EQUIP_ERR_OK;
         }
     }
-    for(int i = KEYRING_SLOT_START; i < QUESTBAG_SLOT_END; i++)
+    for(int i = KEYRING_SLOT_START; i < CURRENCYTOKEN_SLOT_END; i++)
     {
         pItem = GetItemByPos( INVENTORY_SLOT_BAG_0, i );
         if( pItem && pItem->GetEntry() == item )
@@ -8462,7 +8462,7 @@ uint32 Player::GetItemCount( uint32 item, bool inBankAlso, Item* skipItem ) cons
         if( pItem && pItem != skipItem &&  pItem->GetEntry() == item )
             count += pItem->GetCount();
     }
-    for(int i = KEYRING_SLOT_START; i < QUESTBAG_SLOT_END; i++)
+    for(int i = KEYRING_SLOT_START; i < CURRENCYTOKEN_SLOT_END; i++)
     {
         Item *pItem = GetItemByPos( INVENTORY_SLOT_BAG_0, i );
         if( pItem && pItem != skipItem && pItem->GetEntry() == item )
@@ -8522,7 +8522,7 @@ Item* Player::GetItemByGuid( uint64 guid ) const
         if( pItem && pItem->GetGUID() == guid )
             return pItem;
     }
-    for(int i = KEYRING_SLOT_START; i < QUESTBAG_SLOT_END; i++)
+    for(int i = KEYRING_SLOT_START; i < CURRENCYTOKEN_SLOT_END; i++)
     {
         Item *pItem = GetItemByPos( INVENTORY_SLOT_BAG_0, i );
         if( pItem && pItem->GetGUID() == guid )
@@ -8568,7 +8568,7 @@ Item* Player::GetItemByPos( uint16 pos ) const
 
 Item* Player::GetItemByPos( uint8 bag, uint8 slot ) const
 {
-    if( bag == INVENTORY_SLOT_BAG_0 && ( slot < BANK_SLOT_BAG_END || slot >= KEYRING_SLOT_START && slot < QUESTBAG_SLOT_END ) )
+    if( bag == INVENTORY_SLOT_BAG_0 && ( slot < BANK_SLOT_BAG_END || slot >= KEYRING_SLOT_START && slot < CURRENCYTOKEN_SLOT_END ) )
         return m_items[slot];
     else if(bag >= INVENTORY_SLOT_BAG_START && bag < INVENTORY_SLOT_BAG_END
         || bag >= BANK_SLOT_BAG_START && bag < BANK_SLOT_BAG_END )
@@ -8646,7 +8646,7 @@ bool Player::IsInventoryPos( uint8 bag, uint8 slot )
         return true;
     if( bag >= INVENTORY_SLOT_BAG_START && bag < INVENTORY_SLOT_BAG_END )
         return true;
-    if( bag == INVENTORY_SLOT_BAG_0 && ( slot >= KEYRING_SLOT_START && slot < QUESTBAG_SLOT_END ) )
+    if( bag == INVENTORY_SLOT_BAG_0 && ( slot >= KEYRING_SLOT_START && slot < CURRENCYTOKEN_SLOT_END ) )
         return true;
     return false;
 }
@@ -8767,7 +8767,7 @@ bool Player::HasItemCount( uint32 item, uint32 count, bool inBankAlso ) const
                 return true;
         }
     }
-    for(int i = KEYRING_SLOT_START; i < QUESTBAG_SLOT_END; i++)
+    for(int i = KEYRING_SLOT_START; i < CURRENCYTOKEN_SLOT_END; i++)
     {
         Item *pItem = GetItemByPos( INVENTORY_SLOT_BAG_0, i );
         if( pItem && pItem->GetEntry() == item )
@@ -8934,7 +8934,7 @@ bool Player::HasItemTotemCategory( uint32 TotemCategory ) const
         if( pItem && IsTotemCategoryCompatiableWith(pItem->GetProto()->TotemCategory,TotemCategory ))
             return true;
     }
-    for(uint8 i = KEYRING_SLOT_START; i < QUESTBAG_SLOT_END; ++i)
+    for(uint8 i = KEYRING_SLOT_START; i < CURRENCYTOKEN_SLOT_END; ++i)
     {
         pItem = GetItemByPos( INVENTORY_SLOT_BAG_0, i );
         if( pItem && IsTotemCategoryCompatiableWith(pItem->GetProto()->TotemCategory,TotemCategory ))
@@ -8974,16 +8974,8 @@ uint8 Player::_CanStoreItem_InSpecificSlot( uint8 bag, uint8 slot, ItemPosCountV
             if(slot >= KEYRING_SLOT_START && slot < KEYRING_SLOT_START+GetMaxKeyringSize() && !(pProto->BagFamily & BAG_FAMILY_MASK_KEYS))
                 return EQUIP_ERR_ITEM_DOESNT_GO_INTO_BAG;
 
-            // vanitypet case (not use, vanity pets stored as spells)
-            if(slot >= VANITYPET_SLOT_START && slot < VANITYPET_SLOT_END)
-                return EQUIP_ERR_ITEM_DOESNT_GO_INTO_BAG;
-
             // currencytoken case (disabled until proper implement)
             if(slot >= CURRENCYTOKEN_SLOT_START && slot < CURRENCYTOKEN_SLOT_END && !(false /*pProto->BagFamily & BAG_FAMILY_MASK_CURRENCY_TOKENS*/))
-                return EQUIP_ERR_ITEM_DOESNT_GO_INTO_BAG;
-
-            // guestbag case (disabled until proper implement)
-            if(slot >= QUESTBAG_SLOT_START && slot < QUESTBAG_SLOT_END && !(false /*pProto->BagFamily & BAG_FAMILY_MASK_QUEST_ITEMS*/))
                 return EQUIP_ERR_ITEM_DOESNT_GO_INTO_BAG;
 
             // prevent cheating
@@ -9231,7 +9223,7 @@ uint8 Player::_CanStoreItem( uint8 bag, uint8 slot, ItemPosCountVec &dest, uint3
         {
             if( bag == INVENTORY_SLOT_BAG_0 )               // inventory
             {
-                res = _CanStoreItem_InInventorySlots(KEYRING_SLOT_START,QUESTBAG_SLOT_END,dest,pProto,count,true,pItem,bag,slot);
+                res = _CanStoreItem_InInventorySlots(KEYRING_SLOT_START,CURRENCYTOKEN_SLOT_END,dest,pProto,count,true,pItem,bag,slot);
                 if(res!=EQUIP_ERR_OK)
                 {
                     if(no_space_count)
@@ -9319,34 +9311,10 @@ uint8 Player::_CanStoreItem( uint8 bag, uint8 slot, ItemPosCountVec &dest, uint3
                 }
             }
 
-            // Vanity pet case skipped as not used
-
             /* until proper implementation
             else if(pProto->BagFamily & BAG_FAMILY_MASK_CURRENCY_TOKENS)
             {
                 res = _CanStoreItem_InInventorySlots(CURRENCYTOKEN_SLOT_START,CURRENCYTOKEN_SLOT_END,dest,pProto,count,false,pItem,bag,slot);
-                if(res!=EQUIP_ERR_OK)
-                {
-                    if(no_space_count)
-                        *no_space_count = count + no_similar_count;
-                    return res;
-                }
-
-                if(count==0)
-                {
-                    if(no_similar_count==0)
-                        return EQUIP_ERR_OK;
-
-                    if(no_space_count)
-                        *no_space_count = count + no_similar_count;
-                    return EQUIP_ERR_CANT_CARRY_MORE_OF_THIS;
-                }
-            }
-            */
-            /* until proper implementation
-            else if(pProto->BagFamily & BAG_FAMILY_MASK_QUEST_ITEMS)
-            {
-                res = _CanStoreItem_InInventorySlots(QUESTBAG_SLOT_START,QUESTBAG_SLOT_END,dest,pProto,count,false,pItem,bag,slot);
                 if(res!=EQUIP_ERR_OK)
                 {
                     if(no_space_count)
@@ -9414,7 +9382,7 @@ uint8 Player::_CanStoreItem( uint8 bag, uint8 slot, ItemPosCountVec &dest, uint3
     // search stack for merge to
     if( pProto->Stackable != 1 )
     {
-        res = _CanStoreItem_InInventorySlots(KEYRING_SLOT_START,QUESTBAG_SLOT_END,dest,pProto,count,true,pItem,bag,slot);
+        res = _CanStoreItem_InInventorySlots(KEYRING_SLOT_START,CURRENCYTOKEN_SLOT_END,dest,pProto,count,true,pItem,bag,slot);
         if(res!=EQUIP_ERR_OK)
         {
             if(no_space_count)
@@ -9513,34 +9481,10 @@ uint8 Player::_CanStoreItem( uint8 bag, uint8 slot, ItemPosCountVec &dest, uint3
             }
         }
 
-        // Vanity pet case skipped as not used
-
         /* until proper implementation
         else if(false pProto->BagFamily & BAG_FAMILY_MASK_CURRENCY_TOKENS)
         {
             res = _CanStoreItem_InInventorySlots(CURRENCYTOKEN_SLOT_START,CURRENCYTOKEN_SLOT_END,dest,pProto,count,false,pItem,bag,slot);
-            if(res!=EQUIP_ERR_OK)
-            {
-                if(no_space_count)
-                    *no_space_count = count + no_similar_count;
-                return res;
-            }
-
-            if(count==0)
-            {
-                if(no_similar_count==0)
-                    return EQUIP_ERR_OK;
-
-                if(no_space_count)
-                    *no_space_count = count + no_similar_count;
-                return EQUIP_ERR_CANT_CARRY_MORE_OF_THIS;
-            }
-        }
-        */
-        /* until proper implementation
-        else if(false pProto->BagFamily & BAG_FAMILY_MASK_QUEST_ITEMS)
-        {
-            res = _CanStoreItem_InInventorySlots(QUESTBAG_SLOT_START,QUESTBAG_SLOT_END,dest,pProto,count,false,pItem,bag,slot);
             if(res!=EQUIP_ERR_OK)
             {
                 if(no_space_count)
@@ -9630,13 +9574,11 @@ uint8 Player::CanStoreItems( Item **pItems,int count) const
     int inv_bags[INVENTORY_SLOT_BAG_END-INVENTORY_SLOT_BAG_START][MAX_BAG_SIZE];
     int inv_keys[KEYRING_SLOT_END-KEYRING_SLOT_START];
     int inv_tokens[CURRENCYTOKEN_SLOT_END-CURRENCYTOKEN_SLOT_START];
-    int inv_quests[QUESTBAG_SLOT_END-QUESTBAG_SLOT_START];
 
     memset(inv_slot_items,0,sizeof(int)*(INVENTORY_SLOT_ITEM_END-INVENTORY_SLOT_ITEM_START));
     memset(inv_bags,0,sizeof(int)*(INVENTORY_SLOT_BAG_END-INVENTORY_SLOT_BAG_START)*MAX_BAG_SIZE);
     memset(inv_keys,0,sizeof(int)*(KEYRING_SLOT_END-KEYRING_SLOT_START));
     memset(inv_tokens,0,sizeof(int)*(CURRENCYTOKEN_SLOT_END-CURRENCYTOKEN_SLOT_START));
-    memset(inv_quests,0,sizeof(int)*(QUESTBAG_SLOT_END-QUESTBAG_SLOT_START));
 
     for(int i = INVENTORY_SLOT_ITEM_START; i < INVENTORY_SLOT_ITEM_END; i++)
     {
@@ -9658,8 +9600,6 @@ uint8 Player::CanStoreItems( Item **pItems,int count) const
         }
     }
 
-    // Vanity pet case skipped as not used
-
     for(int i = CURRENCYTOKEN_SLOT_START; i < CURRENCYTOKEN_SLOT_END; i++)
     {
         pItem2 = GetItemByPos( INVENTORY_SLOT_BAG_0, i );
@@ -9667,16 +9607,6 @@ uint8 Player::CanStoreItems( Item **pItems,int count) const
         if (pItem2 && !pItem2->IsInTrade())
         {
             inv_tokens[i-CURRENCYTOKEN_SLOT_START] = pItem2->GetCount();
-        }
-    }
-
-    for(int i = QUESTBAG_SLOT_START; i < QUESTBAG_SLOT_END; i++)
-    {
-        pItem2 = GetItemByPos( INVENTORY_SLOT_BAG_0, i );
-
-        if (pItem2 && !pItem2->IsInTrade())
-        {
-            inv_quests[i-QUESTBAG_SLOT_START] = pItem2->GetCount();
         }
     }
 
@@ -9739,26 +9669,12 @@ uint8 Player::CanStoreItems( Item **pItems,int count) const
             }
             if (b_found) continue;
 
-            // Vanity pet case skipped as not used
-
             for(int t = CURRENCYTOKEN_SLOT_START; t < CURRENCYTOKEN_SLOT_END; t++)
             {
                 pItem2 = GetItemByPos( INVENTORY_SLOT_BAG_0, t );
                 if( pItem2 && pItem2->GetEntry() == pItem->GetEntry() && inv_tokens[t-CURRENCYTOKEN_SLOT_START] + pItem->GetCount() <= pProto->GetMaxStackSize())
                 {
                     inv_tokens[t-CURRENCYTOKEN_SLOT_START] += pItem->GetCount();
-                    b_found = true;
-                    break;
-                }
-            }
-            if (b_found) continue;
-
-            for(int t = QUESTBAG_SLOT_START; t < QUESTBAG_SLOT_END; t++)
-            {
-                pItem2 = GetItemByPos( INVENTORY_SLOT_BAG_0, t );
-                if( pItem2 && pItem2->GetEntry() == pItem->GetEntry() && inv_quests[t-QUESTBAG_SLOT_START] + pItem->GetCount() <= pProto->GetMaxStackSize())
-                {
-                    inv_quests[t-QUESTBAG_SLOT_START] += pItem->GetCount();
                     b_found = true;
                     break;
                 }
@@ -9817,8 +9733,6 @@ uint8 Player::CanStoreItems( Item **pItems,int count) const
 
             if (b_found) continue;
 
-            // Vanity pet case skipped as not used
-
             /* until proper implementation
             if(pProto->BagFamily & BAG_FAMILY_MASK_CURRENCY_TOKENS)
             {
@@ -9827,22 +9741,6 @@ uint8 Player::CanStoreItems( Item **pItems,int count) const
                     if( inv_tokens[t-CURRENCYTOKEN_SLOT_START] == 0 )
                     {
                         inv_tokens[t-CURRENCYTOKEN_SLOT_START] = 1;
-                        b_found = true;
-                        break;
-                    }
-                }
-            }
-
-            if (b_found) continue;
-            */
-            /* until proper implementation
-            if(pProto->BagFamily & BAG_FAMILY_MASK_QUEST_ITEMS)
-            {
-                for(uint32 t = QUESTBAG_SLOT_START; t < QUESTBAG_SLOT_END; ++t)
-                {
-                    if( inv_quests[t-QUESTBAG_SLOT_START] == 0 )
-                    {
-                        inv_quests[t-QUESTBAG_SLOT_START] = 1;
                         b_found = true;
                         break;
                     }
@@ -10708,12 +10606,12 @@ void Player::SetVisibleItemSlot(uint8 slot, Item *pItem)
     if(pItem)
     {
         SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (slot * 2), pItem->GetEntry());
-        SetUInt32Value(PLAYER_VISIBLE_ITEM_1_PERMANENTENCHANTMENT + (slot * 2), pItem->GetEnchantmentId(EnchantmentSlot(0)));
+        SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENCHANTMENT + (slot * 2), pItem->GetEnchantmentId(EnchantmentSlot(0)));
     }
     else
     {
         SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (slot * 2), 0);
-        SetUInt32Value(PLAYER_VISIBLE_ITEM_1_PERMANENTENCHANTMENT + (slot * 2), 0);
+        SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENCHANTMENT + (slot * 2), 0);
     }
 }
 
@@ -10949,7 +10847,8 @@ void Player::DestroyItemCount( uint32 item, uint32 count, bool update, bool uneq
             }
         }
     }
-    for(int i = KEYRING_SLOT_START; i < QUESTBAG_SLOT_END; i++)
+
+    for(int i = KEYRING_SLOT_START; i < CURRENCYTOKEN_SLOT_END; i++)
     {
         if (Item* pItem = GetItemByPos( INVENTORY_SLOT_BAG_0, i ))
         {
@@ -11054,7 +10953,7 @@ void Player::DestroyZoneLimitedItem( bool update, uint32 new_zone )
             if (pItem->IsLimitedToAnotherMapOrZone(GetMapId(),new_zone))
                 DestroyItem( INVENTORY_SLOT_BAG_0, i, update);
 
-    for(int i = KEYRING_SLOT_START; i < QUESTBAG_SLOT_END; i++)
+    for(int i = KEYRING_SLOT_START; i < CURRENCYTOKEN_SLOT_END; i++)
         if (Item* pItem = GetItemByPos( INVENTORY_SLOT_BAG_0, i ))
             if (pItem->IsLimitedToAnotherMapOrZone(GetMapId(),new_zone))
                 DestroyItem( INVENTORY_SLOT_BAG_0, i, update);
@@ -12172,7 +12071,7 @@ void Player::ApplyEnchantment(Item *item,EnchantmentSlot slot,bool apply, bool a
     // visualize enchantment at player and equipped items
     if(slot == PERM_ENCHANTMENT_SLOT)
     {
-        SetUInt32Value(PLAYER_VISIBLE_ITEM_1_PERMANENTENCHANTMENT + (item->GetSlot() * 2), apply ? item->GetEnchantmentId(slot) : 0);
+        SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENCHANTMENT + (item->GetSlot() * 2), apply ? item->GetEnchantmentId(slot) : 0);
     }
 
     if(apply_dur)
@@ -15445,6 +15344,14 @@ void Player::_LoadBoundInstances(QueryResult *result)
             // the resettime for normal instances is only saved when the InstanceSave is unloaded
             // so the value read from the DB may be wrong here but only if the InstanceSave is loaded
             // and in that case it is not used
+
+            MapEntry const* mapEntry = sMapStore.LookupEntry(mapId);
+            if(!mapEntry || !mapEntry->IsDungeon())
+            {
+                sLog.outError("_LoadBoundInstances: player %s(%d) has bind to not existed or not dungeon map %d", GetName(), GetGUIDLow(), mapId);
+                CharacterDatabase.PExecute("DELETE FROM character_instance WHERE guid = '%d' AND instance = '%d'", GetGUIDLow(), instanceId);
+                continue;
+            }
 
             if(!perm && group)
             {

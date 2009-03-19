@@ -560,11 +560,13 @@ enum PlayerSlots
     // first slot for item stored (in any way in player m_items data)
     PLAYER_SLOT_START           = 0,
     // last+1 slot for item stored (in any way in player m_items data)
-    PLAYER_SLOT_END             = 200,
+    PLAYER_SLOT_END             = 150,
     PLAYER_SLOTS_COUNT          = (PLAYER_SLOT_END - PLAYER_SLOT_START)
 };
 
-enum EquipmentSlots
+#define INVENTORY_SLOT_BAG_0    255
+
+enum EquipmentSlots                                         // 19 slots
 {
     EQUIPMENT_SLOT_START        = 0,
     EQUIPMENT_SLOT_HEAD         = 0,
@@ -591,119 +593,45 @@ enum EquipmentSlots
 
 enum InventorySlots
 {
-    INVENTORY_SLOT_BAG_0        = 255,
-    INVENTORY_SLOT_BAG_START    = 19,
-    INVENTORY_SLOT_BAG_1        = 19,
-    INVENTORY_SLOT_BAG_2        = 20,
-    INVENTORY_SLOT_BAG_3        = 21,
-    INVENTORY_SLOT_BAG_4        = 22,
-    INVENTORY_SLOT_BAG_END      = 23,
+    INVENTORY_SLOT_BAG_START    = 19,                       // 4 slots
+    INVENTORY_SLOT_BAG_END      = 23
+};
 
-    INVENTORY_SLOT_ITEM_START   = 23,
-    INVENTORY_SLOT_ITEM_1       = 23,
-    INVENTORY_SLOT_ITEM_2       = 24,
-    INVENTORY_SLOT_ITEM_3       = 25,
-    INVENTORY_SLOT_ITEM_4       = 26,
-    INVENTORY_SLOT_ITEM_5       = 27,
-    INVENTORY_SLOT_ITEM_6       = 28,
-    INVENTORY_SLOT_ITEM_7       = 29,
-    INVENTORY_SLOT_ITEM_8       = 30,
-    INVENTORY_SLOT_ITEM_9       = 31,
-    INVENTORY_SLOT_ITEM_10      = 32,
-    INVENTORY_SLOT_ITEM_11      = 33,
-    INVENTORY_SLOT_ITEM_12      = 34,
-    INVENTORY_SLOT_ITEM_13      = 35,
-    INVENTORY_SLOT_ITEM_14      = 36,
-    INVENTORY_SLOT_ITEM_15      = 37,
-    INVENTORY_SLOT_ITEM_16      = 38,
+enum InventoryPackSlots
+{
+    INVENTORY_SLOT_ITEM_START   = 23,                       // 16 slots
     INVENTORY_SLOT_ITEM_END     = 39
 };
 
-enum BankSlots
+enum BankItemSlots
 {
-    BANK_SLOT_ITEM_START        = 39,
-    BANK_SLOT_ITEM_1            = 39,
-    BANK_SLOT_ITEM_2            = 40,
-    BANK_SLOT_ITEM_3            = 41,
-    BANK_SLOT_ITEM_4            = 42,
-    BANK_SLOT_ITEM_5            = 43,
-    BANK_SLOT_ITEM_6            = 44,
-    BANK_SLOT_ITEM_7            = 45,
-    BANK_SLOT_ITEM_8            = 46,
-    BANK_SLOT_ITEM_9            = 47,
-    BANK_SLOT_ITEM_10           = 48,
-    BANK_SLOT_ITEM_11           = 49,
-    BANK_SLOT_ITEM_12           = 50,
-    BANK_SLOT_ITEM_13           = 51,
-    BANK_SLOT_ITEM_14           = 52,
-    BANK_SLOT_ITEM_15           = 53,
-    BANK_SLOT_ITEM_16           = 54,
-    BANK_SLOT_ITEM_17           = 55,
-    BANK_SLOT_ITEM_18           = 56,
-    BANK_SLOT_ITEM_19           = 57,
-    BANK_SLOT_ITEM_20           = 58,
-    BANK_SLOT_ITEM_21           = 59,
-    BANK_SLOT_ITEM_22           = 60,
-    BANK_SLOT_ITEM_23           = 61,
-    BANK_SLOT_ITEM_24           = 62,
-    BANK_SLOT_ITEM_25           = 63,
-    BANK_SLOT_ITEM_26           = 64,
-    BANK_SLOT_ITEM_27           = 65,
-    BANK_SLOT_ITEM_28           = 66,
-    BANK_SLOT_ITEM_END          = 67,
+    BANK_SLOT_ITEM_START        = 39,                       // 28 slots
+    BANK_SLOT_ITEM_END          = 67
+};
 
-    BANK_SLOT_BAG_START         = 67,
-    BANK_SLOT_BAG_1             = 67,
-    BANK_SLOT_BAG_2             = 68,
-    BANK_SLOT_BAG_3             = 69,
-    BANK_SLOT_BAG_4             = 70,
-    BANK_SLOT_BAG_5             = 71,
-    BANK_SLOT_BAG_6             = 72,
-    BANK_SLOT_BAG_7             = 73,
+enum BankBagSlots
+{
+    BANK_SLOT_BAG_START         = 67,                       // 7 slots
     BANK_SLOT_BAG_END           = 74
 };
 
-enum BuyBackSlots
+enum BuyBackSlots                                           // 12 slots
 {
     // stored in m_buybackitems
     BUYBACK_SLOT_START          = 74,
-    BUYBACK_SLOT_1              = 74,
-    BUYBACK_SLOT_2              = 75,
-    BUYBACK_SLOT_3              = 76,
-    BUYBACK_SLOT_4              = 77,
-    BUYBACK_SLOT_5              = 78,
-    BUYBACK_SLOT_6              = 79,
-    BUYBACK_SLOT_7              = 80,
-    BUYBACK_SLOT_8              = 81,
-    BUYBACK_SLOT_9              = 82,
-    BUYBACK_SLOT_10             = 83,
-    BUYBACK_SLOT_11             = 84,
-    BUYBACK_SLOT_12             = 85,
     BUYBACK_SLOT_END            = 86
 };
 
-enum KeyRingSlots
+enum KeyRingSlots                                           // 32 slots
 {
     KEYRING_SLOT_START          = 86,
     KEYRING_SLOT_END            = 118
 };
 
-enum VanityPetSlots
+enum CurrencyTokenSlots                                     // 32 slots
 {
-    VANITYPET_SLOT_START        = 118,                      // not use, vanity pets stored as spells
-    VANITYPET_SLOT_END          = 136                       // not alloed any content in.
-};
-
-enum CurrencyTokenSlots
-{
-    CURRENCYTOKEN_SLOT_START    = 136,
-    CURRENCYTOKEN_SLOT_END      = 168
-};
-
-enum QuestBagSlots
-{
-    QUESTBAG_SLOT_START         = 168,
-    QUESTBAG_SLOT_END           = 200
+    CURRENCYTOKEN_SLOT_START    = 118,
+    CURRENCYTOKEN_SLOT_END      = 150
 };
 
 enum EquipmentSetUpdateState
@@ -751,15 +679,19 @@ enum TradeSlots
 
 enum TransferAbortReason
 {
-    TRANSFER_ABORT_ERROR                    = 0x00,
-    TRANSFER_ABORT_MAX_PLAYERS              = 0x01,         // Transfer Aborted: instance is full
-    TRANSFER_ABORT_NOT_FOUND                = 0x02,         // Transfer Aborted: instance not found
-    TRANSFER_ABORT_TOO_MANY_INSTANCES       = 0x03,         // You have entered too many instances recently.
-    TRANSFER_ABORT_ZONE_IN_COMBAT           = 0x05,         // Unable to zone in while an encounter is in progress.
-    TRANSFER_ABORT_INSUF_EXPAN_LVL          = 0x06,         // You must have <TBC,WotLK> expansion installed to access this area.
-    TRANSFER_ABORT_DIFFICULTY               = 0x07,         // <Normal,Heroic,Epic> difficulty mode is not available for %s.
-    TRANSFER_ABORT_UNIQUE_MESSAGE           = 0x08,         // Until you've escaped TLK's grasp, you cannot leave this place!
-    TRANSFER_ABORT_TOO_MANY_REALM_INSTANCES = 0x09          // Additional instances cannot be launched, please try again later.
+    TRANSFER_ABORT_NONE                     = 0x00,
+    TRANSFER_ABORT_ERROR                    = 0x01,
+    TRANSFER_ABORT_MAX_PLAYERS              = 0x02,         // Transfer Aborted: instance is full
+    TRANSFER_ABORT_NOT_FOUND                = 0x03,         // Transfer Aborted: instance not found
+    TRANSFER_ABORT_TOO_MANY_INSTANCES       = 0x04,         // You have entered too many instances recently.
+    TRANSFER_ABORT_ZONE_IN_COMBAT           = 0x06,         // Unable to zone in while an encounter is in progress.
+    TRANSFER_ABORT_INSUF_EXPAN_LVL          = 0x07,         // You must have <TBC,WotLK> expansion installed to access this area.
+    TRANSFER_ABORT_DIFFICULTY               = 0x08,         // <Normal,Heroic,Epic> difficulty mode is not available for %s.
+    TRANSFER_ABORT_UNIQUE_MESSAGE           = 0x09,         // Until you've escaped TLK's grasp, you cannot leave this place!
+    TRANSFER_ABORT_TOO_MANY_REALM_INSTANCES = 0x0A,         // Additional instances cannot be launched, please try again later.
+    TRANSFER_ABORT_NEED_GROUP               = 0x0B,         // 3.1
+    TRANSFER_ABORT_NOT_FOUND2               = 0x0C,         // 3.1
+    TRANSFER_ABORT_NOT_FOUND3               = 0x0D,         // 3.1
 };
 
 enum InstanceResetWarningType
@@ -798,11 +730,6 @@ struct MovementInfo
         unk1 = 0;
         x = y = z = o = t_x = t_y = t_z = t_o = s_pitch = j_unk = j_sinAngle = j_cosAngle = j_xyspeed = u_unk1 = 0.0f;
         t_guid = 0;
-    }
-
-    void SetMovementFlags(uint32 _flags)
-    {
-        flags = _flags;
     }
 };
 

@@ -1257,9 +1257,11 @@ enum Opcodes
     UMSG_UNKNOWN_1220                               = 0x4C4, // not found
     UMSG_UNKNOWN_1221                               = 0x4C5, // not found
     UMSG_UNKNOWN_1222                               = 0x4C6, // not found
-    SMSG_UNKNOWN_1223                               = 0x4C7, // arena pet?
+    SMSG_UNKNOWN_1223                               = 0x4C7, // uint64, arena pet?
     SMSG_UNKNOWN_1224                               = 0x4C8, // uint32 "Can't change arena team..."
-    NUM_MSG_TYPES                                   = 0x4C9
+    UMSG_UNKNOWN_1225                               = 0x4C9, // not found
+    UMSG_UNKNOWN_1226                               = 0x4CA, // not found
+    NUM_MSG_TYPES                                   = 0x4CB
 };
 
 /// Player state

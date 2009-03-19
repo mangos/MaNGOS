@@ -55,6 +55,7 @@ GameObject::GameObject() : WorldObject()
     m_goInfo = NULL;
 
     m_DBTableGuid = 0;
+    m_rotation = 0;
 }
 
 GameObject::~GameObject()
@@ -120,8 +121,8 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map *map, uint32 phaseMa
 
     SetFloatValue(GAMEOBJECT_PARENTROTATION+0, rotation0);
     SetFloatValue(GAMEOBJECT_PARENTROTATION+1, rotation1);
-    SetFloatValue(GAMEOBJECT_PARENTROTATION+2, rotation2);
-    SetFloatValue(GAMEOBJECT_PARENTROTATION+3, rotation3);
+
+    UpdateRotationFields(rotation2,rotation3);              // GAMEOBJECT_FACING, GAMEOBJECT_ROTATION, GAMEOBJECT_PARENTROTATION+2/3
 
     SetFloatValue(OBJECT_FIELD_SCALE_X, goinfo->size);
 
@@ -1295,4 +1296,32 @@ const char* GameObject::GetNameForLocaleIdx(int32 loc_idx) const
     }
 
     return GetName();
+}
+
+void GameObject::UpdateRotationFields(float rotation2 /*=0.0f*/, float rotation3 /*=0.0f*/)
+{
+    int64 rotation = 0;
+
+    double f_rot1 = sin(GetOrientation() / 2.0f);
+    int64 i_rot1 = int64(f_rot1 / atan(pow(2.0f, -20.0f)));
+    rotation |= (i_rot1 << 43 >> 43) & 0x00000000001FFFFF;
+
+    //float f_rot2 = sin(0.0f / 2.0f);
+    //int64 i_rot2 = f_rot2 / atan(pow(2.0f, -20.0f));
+    //rotation |= (((i_rot2 << 22) >> 32) >> 11) & 0x000003FFFFE00000;
+
+    //float f_rot3 = sin(0.0f / 2.0f);
+    //int64 i_rot3 = f_rot3 / atan(pow(2.0f, -21.0f));
+    //rotation |= (i_rot3 >> 42) & 0x7FFFFC0000000000;
+
+    m_rotation = rotation;
+
+    if(rotation2==0.0f && rotation3==0.0f)
+    {
+        rotation2 = sin(GetOrientation()/2);
+        rotation3 = cos(GetOrientation()/2);
+    }
+
+    SetFloatValue(GAMEOBJECT_PARENTROTATION+2, rotation2);
+    SetFloatValue(GAMEOBJECT_PARENTROTATION+3, rotation3);
 }

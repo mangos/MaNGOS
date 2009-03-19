@@ -441,6 +441,8 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
 
         uint32 GetDBTableGUIDLow() const { return m_DBTableGuid; }
 
+        void UpdateRotationFields(float rotation2 = 0.0f, float rotation3 = 0.0f);
+
         void Say(int32 textId, uint32 language, uint64 TargetGuid) { MonsterSay(textId,language,TargetGuid); }
         void Yell(int32 textId, uint32 language, uint64 TargetGuid) { MonsterYell(textId,language,TargetGuid); }
         void TextEmote(int32 textId, uint64 TargetGuid) { MonsterTextEmote(textId,TargetGuid); }
@@ -577,6 +579,7 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
         GridReference<GameObject> &GetGridRef() { return m_gridRef; }
 
         bool isActiveObject() const { return false; }
+        uint64 GetRotation() const { return m_rotation; }
     protected:
         uint32      m_charges;                              // Spell charges for GAMEOBJECT_TYPE_SPELLCASTER (22)
         uint32      m_spellId;
@@ -593,6 +596,7 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
 
         uint32 m_DBTableGuid;                               ///< For new or temporary gameobjects is 0 for saved it is lowguid
         GameObjectInfo const* m_goInfo;
+        uint64 m_rotation;
     private:
         void SwitchDoorOrButton(bool activate);
 

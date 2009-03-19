@@ -902,7 +902,7 @@ void WorldSession::HandleUpdateAccountData(WorldPacket &recv_data)
 
     if(decompressedSize == 0)                               // erase
     {
-        SetAccountData(type, timestamp, "");
+        SetAccountData(type, 0, "");
 
         WorldPacket data(SMSG_UPDATE_ACCOUNT_DATA_COMPLETE, 4+4);
         data << uint32(type);
