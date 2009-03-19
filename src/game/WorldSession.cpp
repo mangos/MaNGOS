@@ -673,6 +673,8 @@ void WorldSession::ReadMovementInfo(WorldPacket &data, MovementInfo *mi)
 
 void WorldSession::ReadAddonsInfo(WorldPacket &data)
 {
+    if (data.rpos() + 4 > data.size())
+        return;
     uint32 size;
     data >> size;
 
