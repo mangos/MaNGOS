@@ -416,13 +416,19 @@ bool ChatHandler::HandleGameObjectTargetCommand(const char* args)
     GameEventMgr::ActiveEvents const& activeEventsList = gameeventmgr.GetActiveEventList();
     if(*args)
     {
-        int32 id = atoi((char*)args);
+        // number or [name] Shift-click form |color|Hgameobject_entry:go_id|h[name]|h|r
+        char* cId = extractKeyFromLink((char*)args,"Hgameobject_entry");
+        if(!cId)
+            return false;
+
+        uint32 id = atol(cId);
+
         if(id)
             result = WorldDatabase.PQuery("SELECT guid, id, position_x, position_y, position_z, orientation, map, (POW(position_x - '%f', 2) + POW(position_y - '%f', 2) + POW(position_z - '%f', 2)) AS order_ FROM gameobject WHERE map = '%i' AND id = '%u' ORDER BY order_ ASC LIMIT 1",
                 pl->GetPositionX(), pl->GetPositionY(), pl->GetPositionZ(), pl->GetMapId(),id);
         else
         {
-            std::string name = args;
+            std::string name = cId;
             WorldDatabase.escape_string(name);
             result = WorldDatabase.PQuery(
                 "SELECT guid, id, position_x, position_y, position_z, orientation, map, (POW(position_x - %f, 2) + POW(position_y - %f, 2) + POW(position_z - %f, 2)) AS order_ "
@@ -704,11 +710,12 @@ bool ChatHandler::HandleGameObjectAddCommand(const char* args)
     if (!*args)
         return false;
 
-    char* pParam1 = strtok((char*)args, " ");
-    if (!pParam1)
+    // number or [name] Shift-click form |color|Hgameobject_entry:go_id|h[name]|h|r
+    char* cId = extractKeyFromLink((char*)args,"Hgameobject_entry");
+    if(!cId)
         return false;
 
-    uint32 id = atoi((char*)pParam1);
+    uint32 id = atol(cId);
     if(!id)
         return false;
 
