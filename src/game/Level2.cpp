@@ -155,7 +155,7 @@ bool ChatHandler::HandleUnmuteCommand(const char* args)
     return true;
 }
 
-bool ChatHandler::HandleTargetObjectCommand(const char* args)
+bool ChatHandler::HandleGameObjectTargetCommand(const char* args)
 {
     Player* pl = m_session->GetPlayer();
     QueryResult *result;
@@ -1702,7 +1702,7 @@ bool ChatHandler::HandleItemMoveCommand(const char* args)
 }
 
 //delete object by selection or guid
-bool ChatHandler::HandleDelObjectCommand(const char* args)
+bool ChatHandler::HandleGameObjectDeleteCommand(const char* args)
 {
     // number or [name] Shift-click form |color|Hgameobject:go_guid|h[name]|h|r
     char* cId = extractKeyFromLink((char*)args,"Hgameobject");
@@ -1750,7 +1750,7 @@ bool ChatHandler::HandleDelObjectCommand(const char* args)
 }
 
 //turn selected object
-bool ChatHandler::HandleTurnObjectCommand(const char* args)
+bool ChatHandler::HandleGameObjectTurnCommand(const char* args)
 {
     // number or [name] Shift-click form |color|Hgameobject:go_id|h[name]|h|r
     char* cId = extractKeyFromLink((char*)args,"Hgameobject");
@@ -1804,7 +1804,7 @@ bool ChatHandler::HandleTurnObjectCommand(const char* args)
 }
 
 //move selected object
-bool ChatHandler::HandleMoveObjectCommand(const char* args)
+bool ChatHandler::HandleGameObjectMoveCommand(const char* args)
 {
     // number or [name] Shift-click form |color|Hgameobject:go_guid|h[name]|h|r
     char* cId = extractKeyFromLink((char*)args,"Hgameobject");
@@ -1899,7 +1899,7 @@ bool ChatHandler::HandleDeMorphCommand(const char* /*args*/)
 }
 
 //morph creature or player
-bool ChatHandler::HandleMorphCommand(const char* args)
+bool ChatHandler::HandleModifyMorphCommand(const char* args)
 {
     if (!*args)
         return false;
@@ -3623,7 +3623,7 @@ bool ChatHandler::HandleCustomizeCommand(const char* args)
 }
 
 //spawn go
-bool ChatHandler::HandleGameObjectCommand(const char* args)
+bool ChatHandler::HandleGameObjectAddCommand(const char* args)
 {
     if (!*args)
         return false;
@@ -3692,7 +3692,7 @@ bool ChatHandler::HandleGameObjectCommand(const char* args)
 }
 
 //show animation
-bool ChatHandler::HandleAnimCommand(const char* args)
+bool ChatHandler::HandleDebugAnimCommand(const char* args)
 {
     if (!*args)
         return false;
@@ -3703,7 +3703,7 @@ bool ChatHandler::HandleAnimCommand(const char* args)
 }
 
 //change standstate
-bool ChatHandler::HandleStandStateCommand(const char* args)
+bool ChatHandler::HandleModifyStandStateCommand(const char* args)
 {
     if (!*args)
         return false;
@@ -3714,7 +3714,7 @@ bool ChatHandler::HandleStandStateCommand(const char* args)
     return true;
 }
 
-bool ChatHandler::HandleAddHonorCommand(const char* args)
+bool ChatHandler::HandleHonorAddCommand(const char* args)
 {
     if (!*args)
         return false;
@@ -3754,7 +3754,7 @@ bool ChatHandler::HandleHonorAddKillCommand(const char* /*args*/)
     return true;
 }
 
-bool ChatHandler::HandleUpdateHonorFieldsCommand(const char* /*args*/)
+bool ChatHandler::HandleHonorUpdateCommand(const char* /*args*/)
 {
     Player *target = getSelectedPlayer();
     if(!target)
@@ -4298,7 +4298,7 @@ bool ChatHandler::HandleWaterwalkCommand(const char* args)
 }
 
 //set pahsemask for selected object
-bool ChatHandler::HandleGOPhaseCommand(const char* args)
+bool ChatHandler::HandleGameObjectPhaseCommand(const char* args)
 {
     // number or [name] Shift-click form |color|Hgameobject:go_id|h[name]|h|r
     char* cId = extractKeyFromLink((char*)args,"Hgameobject");
