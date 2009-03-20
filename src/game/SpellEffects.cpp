@@ -1364,6 +1364,20 @@ void Spell::EffectDummy(uint32 i)
             }
             break;
         case SPELLFAMILY_DRUID:
+            // Starfall
+            if (m_spellInfo->SpellFamilyFlags2 & 0x00000100LL)
+            {
+                switch(m_spellInfo->Id)
+                {
+                    case 50286: m_caster->CastSpell(unitTarget, 50288, true); return;
+                    case 53196: m_caster->CastSpell(unitTarget, 53191, true); return;
+                    case 53197: m_caster->CastSpell(unitTarget, 53194, true); return;
+                    case 53198: m_caster->CastSpell(unitTarget, 53195, true); return;
+                    default:
+                        sLog.outError("Spell::EffectDummy: Unhandeled Starfall spell rank %u",m_spellInfo->Id);
+                        return;
+                }
+            }
             break;
         case SPELLFAMILY_ROGUE:
             switch(m_spellInfo->Id )
