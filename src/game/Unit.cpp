@@ -5160,6 +5160,16 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     triggered_spell_id = 28810;
                     break;
                 }
+                // Glyph of Dispel Magic
+                case 55677:
+                {
+                    if(!target->IsFriendlyTo(this))
+                        return false;
+
+                    basepoints0 = int32(target->GetMaxHealth() * triggerAmount / 100);
+                    triggered_spell_id = 56131;
+                    break;
+                }
             }
             break;
         }
