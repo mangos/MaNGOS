@@ -2746,7 +2746,7 @@ bool Player::addSpell(uint32 spell_id, bool active, bool learning, bool dependen
         {
             if(TalentEntry const *talentInfo = sTalentStore.LookupEntry( talentPos->talent_id ))
             {
-                for(int i=0; i <5; ++i)
+                for(int i=0; i < MAX_TALENT_RANK; ++i)
                 {
                     // skip learning spell and no rank spell case
                     uint32 rankSpellId = talentInfo->RankID[i];
@@ -3359,7 +3359,7 @@ bool Player::resetTalents(bool no_cost)
         if( (getClassMask() & talentTabInfo->ClassMask) == 0 )
             continue;
 
-        for (int j = 0; j < 5; j++)
+        for (int j = 0; j < MAX_TALENT_RANK; j++)
         {
             for(PlayerSpellMap::iterator itr = GetSpellMap().begin(); itr != GetSpellMap().end();)
             {
@@ -19916,7 +19916,7 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank)
     if(CurTalentPoints == 0)
         return;
 
-    if (talentRank > 4)
+    if (talentRank >= MAX_TALENT_RANK)
         return;
 
     TalentEntry const *talentInfo = sTalentStore.LookupEntry( talentId );
@@ -19935,7 +19935,7 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank)
 
     // find current max talent rank
     int32 curtalent_maxrank = 0;
-    for(int32 k = 4; k > -1; --k)
+    for(int32 k = MAX_TALENT_RANK-1; k > -1; --k)
     {
         if(talentInfo->RankID[k] && HasSpell(talentInfo->RankID[k]))
         {
@@ -19958,7 +19958,7 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank)
         if(TalentEntry const *depTalentInfo = sTalentStore.LookupEntry(talentInfo->DependsOn))
         {
             bool hasEnoughRank = false;
-            for (int i = talentInfo->DependsOnRank; i <= 4; i++)
+            for (int i = talentInfo->DependsOnRank; i < MAX_TALENT_RANK; i++)
             {
                 if (depTalentInfo->RankID[i] != 0)
                     if (HasSpell(depTalentInfo->RankID[i]))
@@ -19984,7 +19984,7 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank)
             {
                 if (tmpTalent->TalentTab == tTab)
                 {
-                    for (int j = 0; j <= 4; j++)
+                    for (int j = 0; j < MAX_TALENT_RANK; j++)
                     {
                         if (tmpTalent->RankID[j] != 0)
                         {
@@ -20000,7 +20000,7 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank)
     }
 
     // not have required min points spent in talent tree
-    if(spentPoints < (talentInfo->Row * 5))
+    if(spentPoints < (talentInfo->Row * MAX_TALENT_RANK))
         return;
 
     // spell not set in talent.dbc
@@ -20038,7 +20038,7 @@ void Player::LearnPetTalent(uint64 petGuid, uint32 talentId, uint32 talentRank)
     if(CurTalentPoints == 0)
         return;
 
-    if (talentRank > 2)
+    if (talentRank >= MAX_PET_TALENT_RANK)
         return;
 
     TalentEntry const *talentInfo = sTalentStore.LookupEntry(talentId);
@@ -20070,7 +20070,7 @@ void Player::LearnPetTalent(uint64 petGuid, uint32 talentId, uint32 talentRank)
 
     // find current max talent rank
     int32 curtalent_maxrank = 0;
-    for(int32 k = 4; k > -1; --k)
+    for(int32 k = MAX_TALENT_RANK-1; k > -1; --k)
     {
         if(talentInfo->RankID[k] && pet->HasSpell(talentInfo->RankID[k]))
         {
@@ -20093,7 +20093,7 @@ void Player::LearnPetTalent(uint64 petGuid, uint32 talentId, uint32 talentRank)
         if(TalentEntry const *depTalentInfo = sTalentStore.LookupEntry(talentInfo->DependsOn))
         {
             bool hasEnoughRank = false;
-            for (int i = talentInfo->DependsOnRank; i <= 4; i++)
+            for (int i = talentInfo->DependsOnRank; i < MAX_TALENT_RANK; i++)
             {
                 if (depTalentInfo->RankID[i] != 0)
                     if (pet->HasSpell(depTalentInfo->RankID[i]))
@@ -20119,7 +20119,7 @@ void Player::LearnPetTalent(uint64 petGuid, uint32 talentId, uint32 talentRank)
             {
                 if (tmpTalent->TalentTab == tTab)
                 {
-                    for (int j = 0; j <= 4; j++)
+                    for (int j = 0; j < MAX_TALENT_RANK; j++)
                     {
                         if (tmpTalent->RankID[j] != 0)
                         {
@@ -20135,7 +20135,7 @@ void Player::LearnPetTalent(uint64 petGuid, uint32 talentId, uint32 talentRank)
     }
 
     // not have required min points spent in talent tree
-    if(spentPoints < (talentInfo->Row * 3))
+    if(spentPoints < (talentInfo->Row * MAX_PET_TALENT_RANK))
         return;
 
     // spell not set in talent.dbc
@@ -20152,7 +20152,7 @@ void Player::LearnPetTalent(uint64 petGuid, uint32 talentId, uint32 talentRank)
 
     // learn! (other talent ranks will unlearned at learning)
     pet->learnSpell(spellid);
-    sLog.outDetail("TalentID: %u Rank: %u Spell: %u\n", talentId, talentRank, spellid);
+    sLog.outDetail("PetTalentID: %u Rank: %u Spell: %u\n", talentId, talentRank, spellid);
 
     // update free talent points
     pet->SetFreeTalentPoints(CurTalentPoints - (talentRank - curtalent_maxrank + 1));
