@@ -41,21 +41,21 @@ void AuthCrypt::Init(BigNumber *K)
     HmacHash clientDecryptHmac(SEED_KEY_SIZE, (uint8*)ServerDecryptionKey);
     uint8 *decryptHash = clientDecryptHmac.ComputeHash(K);
 
-    SARC4 _serverDecrypt(encryptHash);
+    //SARC4 _serverDecrypt(encryptHash);
     _clientDecrypt.Init(decryptHash);
     _serverEncrypt.Init(encryptHash);
-    SARC4 _clientEncrypt(decryptHash);
+    //SARC4 _clientEncrypt(decryptHash);
 
     uint8 syncBuf[1024];
 
     memset(syncBuf, 0, 1024);
 
     _serverEncrypt.UpdateData(1024, syncBuf);
-    _clientEncrypt.UpdateData(1024, syncBuf);
+    //_clientEncrypt.UpdateData(1024, syncBuf);
 
     memset(syncBuf, 0, 1024);
 
-    _serverDecrypt.UpdateData(1024, syncBuf);
+    //_serverDecrypt.UpdateData(1024, syncBuf);
     _clientDecrypt.UpdateData(1024, syncBuf);
 
     _initialized = true;
