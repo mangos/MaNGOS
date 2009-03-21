@@ -448,22 +448,9 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint16 flags, uint32 flags2
 
             *data << uint8(0);                              // added in 3.0.8
 
-            /*for(uint32 i = 0; i < poscount; i++)
-            {
-            // path points
-            *data << (float)0;
-            *data << (float)0;
-            *data << (float)0;
-            }*/
-
             *data << path.GetNodes()[poscount-1].x;
             *data << path.GetNodes()[poscount-1].y;
             *data << path.GetNodes()[poscount-1].z;
-
-            // target position (path end)
-            /**data << ((Unit*)this)->GetPositionX();
-            *data << ((Unit*)this)->GetPositionY();
-            *data << ((Unit*)this)->GetPositionZ();*/
         }
     }
     else
