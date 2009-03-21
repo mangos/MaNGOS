@@ -108,10 +108,10 @@ void WaypointManager::Load()
         {
             QueryResult *result1 = WorldDatabase.PQuery("SELECT id, map FROM creature WHERE guid = '%u'", id);
             if(result1)
-                sLog.outErrorDb("ERROR: Creature (guidlow %d, entry %d) have invalid coordinates in his waypoint %d (X: %f, Y: %f).",
+                sLog.outErrorDb("Creature (guidlow %d, entry %d) have invalid coordinates in his waypoint %d (X: %f, Y: %f).",
                     id, result1->Fetch()[0].GetUInt32(), point, node.x, node.y);
             else
-                sLog.outErrorDb("ERROR: Waypoint path %d, have invalid coordinates in his waypoint %d (X: %f, Y: %f).",
+                sLog.outErrorDb("Waypoint path %d, have invalid coordinates in his waypoint %d (X: %f, Y: %f).",
                     id, point, node.x, node.y);
 
             MaNGOS::NormalizeMapCoord(node.x);
@@ -327,7 +327,7 @@ void WaypointManager::CheckTextsExistance(std::set<int32>& ids)
                 {
                     if (!objmgr.GetMangosStringLocale(be->textid[j]))
                     {
-                        sLog.outErrorDb("ERROR: Some waypoint has textid%u with not existing %u text.", j, be->textid[j]);
+                        sLog.outErrorDb("Some waypoint has textid%u with not existing %u text.", j, be->textid[j]);
                         be->textid[j] = 0;
                         ++zeroCount;
                         continue;
