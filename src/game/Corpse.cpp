@@ -76,7 +76,7 @@ bool Corpse::Create( uint32 guidlow, Player *owner)
 
     if(!IsPositionValid())
     {
-        sLog.outError("ERROR: Corpse (guidlow %d, owner %s) not created. Suggested coordinates isn't valid (X: %f Y: %f)",
+        sLog.outError("Corpse (guidlow %d, owner %s) not created. Suggested coordinates isn't valid (X: %f Y: %f)",
             guidlow,owner->GetName(),owner->GetPositionX(), owner->GetPositionY());
         return false;
     }
@@ -149,7 +149,7 @@ bool Corpse::LoadFromDB(uint32 guid, QueryResult *result)
 
     if( ! result )
     {
-        sLog.outError("ERROR: Corpse (GUID: %u) not found in table `corpse`, can't load. ",guid);
+        sLog.outError("Corpse (GUID: %u) not found in table `corpse`, can't load. ",guid);
         return false;
     }
 
@@ -177,7 +177,7 @@ bool Corpse::LoadFromDB(uint32 guid, Field *fields)
 
     if(!LoadValues( fields[5].GetString() ))
     {
-        sLog.outError("ERROR: Corpse #%d have broken data in `data` field. Can't be loaded.",guid);
+        sLog.outError("Corpse #%d have broken data in `data` field. Can't be loaded.",guid);
         return false;
     }
 
@@ -185,7 +185,7 @@ bool Corpse::LoadFromDB(uint32 guid, Field *fields)
     m_type             = CorpseType(fields[7].GetUInt32());
     if(m_type >= MAX_CORPSE_TYPE)
     {
-        sLog.outError("ERROR: Corpse (guidlow %d, owner %d) have wrong corpse type, not load.",GetGUIDLow(),GUID_LOPART(GetOwnerGUID()));
+        sLog.outError("Corpse (guidlow %d, owner %d) have wrong corpse type, not load.",GetGUIDLow(),GUID_LOPART(GetOwnerGUID()));
         return false;
     }
     uint32 instanceid  = fields[8].GetUInt32();
@@ -202,7 +202,7 @@ bool Corpse::LoadFromDB(uint32 guid, Field *fields)
 
     if(!IsPositionValid())
     {
-        sLog.outError("ERROR: Corpse (guidlow %d, owner %d) not created. Suggested coordinates isn't valid (X: %f Y: %f)",
+        sLog.outError("Corpse (guidlow %d, owner %d) not created. Suggested coordinates isn't valid (X: %f Y: %f)",
             GetGUIDLow(),GUID_LOPART(GetOwnerGUID()),GetPositionX(),GetPositionY());
         return false;
     }
