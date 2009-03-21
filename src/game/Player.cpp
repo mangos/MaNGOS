@@ -18195,6 +18195,7 @@ void Player::SendInitialPacketsBeforeAddToMap()
     SendInitialReputations();
     m_achievementMgr.SendAllAchievementData();
 
+    // update zone
     uint32 newzone, newarea;
     GetZoneAndAreaId(newzone,newarea);
     UpdateZone(newzone,newarea);                            // also call SendInitWorldStates();
@@ -19851,194 +19852,6 @@ void Player::UpdateAchievementCriteria( AchievementCriteriaTypes type, uint32 mi
     GetAchievementMgr().UpdateAchievementCriteria(type, miscvalue1,miscvalue2,unit,time);
 }
 
-void Player::BuildPlayerTalentsInfoData(WorldPacket *data)
-{
-    *data << uint32(GetFreeTalentPoints());                 // unspentTalentPoints
-    uint8 talentGroupCount = 1;
-    *data << uint8(talentGroupCount);                       // talent group count (1 or 2)
-    *data << uint8(0);                                      // talent group index (0 or 1)
-
-    if(talentGroupCount)
-    {
-        uint8 talentIdCount = 0;
-        size_t pos = data->wpos();
-        *data << uint8(talentIdCount);                      // [PH], talentIdCount
-
-        // find class talent tabs (all players have 3 talent tabs)
-        uint32 const* talentTabIds = GetTalentTabPages(getClass());
-
-        for(uint32 i = 0; i < 3; ++i)
-        {
-            uint32 talentTabId = talentTabIds[i];
-
-            for(uint32 talentId = 0; talentId < sTalentStore.GetNumRows(); ++talentId)
-            {
-                TalentEntry const* talentInfo = sTalentStore.LookupEntry(talentId);
-                if(!talentInfo)
-                    continue;
-
-                // skip another tab talents
-                if(talentInfo->TalentTab != talentTabId)
-                    continue;
-
-                // find max talent rank
-                int32 curtalent_maxrank = -1;
-                for(int32 k = 4; k > -1; --k)
-                {
-                    if(talentInfo->RankID[k] && HasSpell(talentInfo->RankID[k]))
-                    {
-                        curtalent_maxrank = k;
-                        break;
-                    }
-                }
-
-                // not learned talent
-                if(curtalent_maxrank < 0)
-                    continue;
-
-                *data << uint32(talentInfo->TalentID);      // Talent.dbc
-                *data << uint8(curtalent_maxrank);          // talentMaxRank (0-4)
-
-                ++talentIdCount;
-            }
-        }
-
-        data->put<uint8>(pos, talentIdCount);               // put real count
-
-        uint8 glyphsCount = 6;
-        *data << uint8(glyphsCount);                        // glyphs count
-
-        for(uint8 i = 0; i < glyphsCount; ++i)
-            *data << uint16(GetGlyph(i));                   // GlyphProperties.dbc
-    }
-}
-
-void Player::BuildPetTalentsInfoData(WorldPacket *data)
-{
-    uint32 unspentTalentPoints = 0;
-    size_t pointsPos = data->wpos();
-    *data << uint32(unspentTalentPoints);                   // [PH], unspentTalentPoints
-
-    uint8 talentIdCount = 0;
-    size_t countPos = data->wpos();
-    *data << uint8(talentIdCount);                          // [PH], talentIdCount
-
-    Pet *pet = GetPet();
-    if(!pet)
-        return;
-
-    unspentTalentPoints = pet->GetFreeTalentPoints();
-
-    data->put<uint32>(pointsPos, unspentTalentPoints);      // put real points
-
-    CreatureInfo const *ci = pet->GetCreatureInfo();
-    if(!ci)
-        return;
-
-    CreatureFamilyEntry const *pet_family = sCreatureFamilyStore.LookupEntry(ci->family);
-    if(!pet_family || pet_family->petTalentType < 0)
-        return;
-
-    for(uint32 talentTabId = 1; talentTabId < sTalentTabStore.GetNumRows(); ++talentTabId)
-    {
-        TalentTabEntry const *talentTabInfo = sTalentTabStore.LookupEntry( talentTabId );
-        if(!talentTabInfo)
-            continue;
-
-        if(!((1 << pet_family->petTalentType) & talentTabInfo->petTalentMask))
-            continue;
-
-        for(uint32 talentId = 0; talentId < sTalentStore.GetNumRows(); ++talentId)
-        {
-            TalentEntry const* talentInfo = sTalentStore.LookupEntry(talentId);
-            if(!talentInfo)
-                continue;
-
-            // skip another tab talents
-            if(talentInfo->TalentTab != talentTabId)
-                continue;
-
-            // find max talent rank
-            int32 curtalent_maxrank = -1;
-            for(int32 k = 4; k > -1; --k)
-            {
-                if(talentInfo->RankID[k] && pet->HasSpell(talentInfo->RankID[k]))
-                {
-                    curtalent_maxrank = k;
-                    break;
-                }
-            }
-
-            // not learned talent
-            if(curtalent_maxrank < 0)
-                continue;
-
-            *data << uint32(talentInfo->TalentID);          // Talent.dbc
-            *data << uint8(curtalent_maxrank);              // talentMaxRank (0-4)
-
-            ++talentIdCount;
-        }
-
-        data->put<uint8>(countPos, talentIdCount);          // put real count
-
-        break;
-    }
-}
-
-void Player::SendTalentsInfoData(bool pet)
-{
-    WorldPacket data(SMSG_TALENTS_INFO, 50);
-    data << uint8(pet ? 1 : 0);
-    if(pet)
-        BuildPetTalentsInfoData(&data);
-    else
-        BuildPlayerTalentsInfoData(&data);
-    GetSession()->SendPacket(&data);
-}
-
-void Player::BuildEnchantmentsInfoData(WorldPacket *data)
-{
-    uint32 slotUsedMask = 0;
-    size_t slotUsedMaskPos = data->wpos();
-    *data << uint32(slotUsedMask);                          // slotUsedMask < 0x80000
-
-    for(uint32 i = 0; i < EQUIPMENT_SLOT_END; ++i)
-    {
-        Item *item = GetItemByPos(INVENTORY_SLOT_BAG_0, i);
-
-        if(!item)
-            continue;
-
-        slotUsedMask |= (1 << i);
-
-        *data << uint32(item->GetEntry());                  // item entry
-
-        uint16 enchantmentMask = 0;
-        size_t enchantmentMaskPos = data->wpos();
-        *data << uint16(enchantmentMask);                   // enchantmentMask < 0x1000
-
-        for(uint32 j = 0; j < MAX_ENCHANTMENT_SLOT; ++j)
-        {
-            uint32 enchId = item->GetEnchantmentId(EnchantmentSlot(j));
-
-            if(!enchId)
-                continue;
-
-            enchantmentMask |= (1 << j);
-
-            *data << uint16(enchId);                        // enchantmentId?
-        }
-
-        data->put<uint16>(enchantmentMaskPos, enchantmentMask);
-
-        *data << uint16(0);                                 // ?
-        *data << uint8(0);                                  // PGUID!
-        *data << uint32(0);                                 // seed?
-    }
-
-    data->put<uint32>(slotUsedMaskPos, slotUsedMask);
-}
-
 void Player::LearnTalent(uint32 talentId, uint32 talentRank)
 {
     uint32 CurTalentPoints = GetFreeTalentPoints();
@@ -20286,6 +20099,194 @@ void Player::LearnPetTalent(uint64 petGuid, uint32 talentId, uint32 talentRank)
 
     // update free talent points
     pet->SetFreeTalentPoints(CurTalentPoints - (talentRank - curtalent_maxrank + 1));
+}
+
+void Player::BuildPlayerTalentsInfoData(WorldPacket *data)
+{
+    *data << uint32(GetFreeTalentPoints());                 // unspentTalentPoints
+    uint8 talentGroupCount = 1;
+    *data << uint8(talentGroupCount);                       // talent group count (1 or 2)
+    *data << uint8(0);                                      // talent group index (0 or 1)
+
+    if(talentGroupCount)
+    {
+        uint8 talentIdCount = 0;
+        size_t pos = data->wpos();
+        *data << uint8(talentIdCount);                      // [PH], talentIdCount
+
+        // find class talent tabs (all players have 3 talent tabs)
+        uint32 const* talentTabIds = GetTalentTabPages(getClass());
+
+        for(uint32 i = 0; i < 3; ++i)
+        {
+            uint32 talentTabId = talentTabIds[i];
+
+            for(uint32 talentId = 0; talentId < sTalentStore.GetNumRows(); ++talentId)
+            {
+                TalentEntry const* talentInfo = sTalentStore.LookupEntry(talentId);
+                if(!talentInfo)
+                    continue;
+
+                // skip another tab talents
+                if(talentInfo->TalentTab != talentTabId)
+                    continue;
+
+                // find max talent rank
+                int32 curtalent_maxrank = -1;
+                for(int32 k = 4; k > -1; --k)
+                {
+                    if(talentInfo->RankID[k] && HasSpell(talentInfo->RankID[k]))
+                    {
+                        curtalent_maxrank = k;
+                        break;
+                    }
+                }
+
+                // not learned talent
+                if(curtalent_maxrank < 0)
+                    continue;
+
+                *data << uint32(talentInfo->TalentID);      // Talent.dbc
+                *data << uint8(curtalent_maxrank);          // talentMaxRank (0-4)
+
+                ++talentIdCount;
+            }
+        }
+
+        data->put<uint8>(pos, talentIdCount);               // put real count
+
+        uint8 glyphsCount = 6;
+        *data << uint8(glyphsCount);                        // glyphs count
+
+        for(uint8 i = 0; i < glyphsCount; ++i)
+            *data << uint16(GetGlyph(i));                   // GlyphProperties.dbc
+    }
+}
+
+void Player::BuildPetTalentsInfoData(WorldPacket *data)
+{
+    uint32 unspentTalentPoints = 0;
+    size_t pointsPos = data->wpos();
+    *data << uint32(unspentTalentPoints);                   // [PH], unspentTalentPoints
+
+    uint8 talentIdCount = 0;
+    size_t countPos = data->wpos();
+    *data << uint8(talentIdCount);                          // [PH], talentIdCount
+
+    Pet *pet = GetPet();
+    if(!pet)
+        return;
+
+    unspentTalentPoints = pet->GetFreeTalentPoints();
+
+    data->put<uint32>(pointsPos, unspentTalentPoints);      // put real points
+
+    CreatureInfo const *ci = pet->GetCreatureInfo();
+    if(!ci)
+        return;
+
+    CreatureFamilyEntry const *pet_family = sCreatureFamilyStore.LookupEntry(ci->family);
+    if(!pet_family || pet_family->petTalentType < 0)
+        return;
+
+    for(uint32 talentTabId = 1; talentTabId < sTalentTabStore.GetNumRows(); ++talentTabId)
+    {
+        TalentTabEntry const *talentTabInfo = sTalentTabStore.LookupEntry( talentTabId );
+        if(!talentTabInfo)
+            continue;
+
+        if(!((1 << pet_family->petTalentType) & talentTabInfo->petTalentMask))
+            continue;
+
+        for(uint32 talentId = 0; talentId < sTalentStore.GetNumRows(); ++talentId)
+        {
+            TalentEntry const* talentInfo = sTalentStore.LookupEntry(talentId);
+            if(!talentInfo)
+                continue;
+
+            // skip another tab talents
+            if(talentInfo->TalentTab != talentTabId)
+                continue;
+
+            // find max talent rank
+            int32 curtalent_maxrank = -1;
+            for(int32 k = 4; k > -1; --k)
+            {
+                if(talentInfo->RankID[k] && pet->HasSpell(talentInfo->RankID[k]))
+                {
+                    curtalent_maxrank = k;
+                    break;
+                }
+            }
+
+            // not learned talent
+            if(curtalent_maxrank < 0)
+                continue;
+
+            *data << uint32(talentInfo->TalentID);          // Talent.dbc
+            *data << uint8(curtalent_maxrank);              // talentMaxRank (0-4)
+
+            ++talentIdCount;
+        }
+
+        data->put<uint8>(countPos, talentIdCount);          // put real count
+
+        break;
+    }
+}
+
+void Player::SendTalentsInfoData(bool pet)
+{
+    WorldPacket data(SMSG_TALENTS_INFO, 50);
+    data << uint8(pet ? 1 : 0);
+    if(pet)
+        BuildPetTalentsInfoData(&data);
+    else
+        BuildPlayerTalentsInfoData(&data);
+    GetSession()->SendPacket(&data);
+}
+
+void Player::BuildEnchantmentsInfoData(WorldPacket *data)
+{
+    uint32 slotUsedMask = 0;
+    size_t slotUsedMaskPos = data->wpos();
+    *data << uint32(slotUsedMask);                          // slotUsedMask < 0x80000
+
+    for(uint32 i = 0; i < EQUIPMENT_SLOT_END; ++i)
+    {
+        Item *item = GetItemByPos(INVENTORY_SLOT_BAG_0, i);
+
+        if(!item)
+            continue;
+
+        slotUsedMask |= (1 << i);
+
+        *data << uint32(item->GetEntry());                  // item entry
+
+        uint16 enchantmentMask = 0;
+        size_t enchantmentMaskPos = data->wpos();
+        *data << uint16(enchantmentMask);                   // enchantmentMask < 0x1000
+
+        for(uint32 j = 0; j < MAX_ENCHANTMENT_SLOT; ++j)
+        {
+            uint32 enchId = item->GetEnchantmentId(EnchantmentSlot(j));
+
+            if(!enchId)
+                continue;
+
+            enchantmentMask |= (1 << j);
+
+            *data << uint16(enchId);                        // enchantmentId?
+        }
+
+        data->put<uint16>(enchantmentMaskPos, enchantmentMask);
+
+        *data << uint16(0);                                 // ?
+        *data << uint8(0);                                  // PGUID!
+        *data << uint32(0);                                 // seed?
+    }
+
+    data->put<uint32>(slotUsedMaskPos, slotUsedMask);
 }
 
 void Player::SendEquipmentSetList()

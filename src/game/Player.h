@@ -591,27 +591,27 @@ enum EquipmentSlots                                         // 19 slots
     EQUIPMENT_SLOT_END          = 19
 };
 
-enum InventorySlots
+enum InventorySlots                                         // 4 slots
 {
-    INVENTORY_SLOT_BAG_START    = 19,                       // 4 slots
+    INVENTORY_SLOT_BAG_START    = 19,
     INVENTORY_SLOT_BAG_END      = 23
 };
 
-enum InventoryPackSlots
+enum InventoryPackSlots                                     // 16 slots
 {
-    INVENTORY_SLOT_ITEM_START   = 23,                       // 16 slots
+    INVENTORY_SLOT_ITEM_START   = 23,
     INVENTORY_SLOT_ITEM_END     = 39
 };
 
-enum BankItemSlots
+enum BankItemSlots                                          // 28 slots
 {
-    BANK_SLOT_ITEM_START        = 39,                       // 28 slots
+    BANK_SLOT_ITEM_START        = 39,
     BANK_SLOT_ITEM_END          = 67
 };
 
-enum BankBagSlots
+enum BankBagSlots                                           // 7 slots
 {
-    BANK_SLOT_BAG_START         = 67,                       // 7 slots
+    BANK_SLOT_BAG_START         = 67,
     BANK_SLOT_BAG_END           = 74
 };
 
