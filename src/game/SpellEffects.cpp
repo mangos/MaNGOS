@@ -5390,16 +5390,6 @@ void Spell::EffectApplyGlyph(uint32 i)
 
     Player *player = (Player*)m_caster;
 
-    // remove old glyph
-    if(uint32 oldglyph = player->GetGlyph(m_glyphIndex))
-    {
-        if(GlyphPropertiesEntry const *old_gp = sGlyphPropertiesStore.LookupEntry(oldglyph))
-        {
-            player->RemoveAurasDueToSpell(old_gp->SpellId);
-            player->SetGlyph(m_glyphIndex, 0);
-        }
-    }
-
     // apply new one
     if(uint32 glyph = m_spellInfo->EffectMiscValue[i])
     {
@@ -5410,7 +5400,17 @@ void Spell::EffectApplyGlyph(uint32 i)
                 if(gp->TypeFlags != gs->TypeFlags)
                 {
                     SendCastResult(SPELL_FAILED_INVALID_GLYPH);
-                    return;                                 // glyph slot missmatch
+                    return;                                 // glyph slot mismatch
+                }
+            }
+
+            // remove old glyph
+            if(uint32 oldglyph = player->GetGlyph(m_glyphIndex))
+            {
+                if(GlyphPropertiesEntry const *old_gp = sGlyphPropertiesStore.LookupEntry(oldglyph))
+                {
+                    player->RemoveAurasDueToSpell(old_gp->SpellId);
+                    player->SetGlyph(m_glyphIndex, 0);
                 }
             }
 
