@@ -1326,6 +1326,19 @@ void Spell::SetTargetMap(uint32 i,uint32 cur,std::list<Unit*> &TagUnitMap)
 
     // Get spell max affected targets
     uint32 unMaxTargets = m_spellInfo->MaxAffectedTargets;
+
+    // custom target amount cases
+    switch(m_spellInfo->SpellFamilyName)
+    {
+        case SPELLFAMILY_DRUID:
+            // Starfall
+            if (m_spellInfo->SpellFamilyFlags2 & 0x00000100LL)
+                unMaxTargets = 2;
+            break;
+        default:
+            break;
+    }
+
     Unit::AuraList const& mod = m_caster->GetAurasByType(SPELL_AURA_MOD_MAX_AFFECTED_TARGETS);
     for(Unit::AuraList::const_iterator m = mod.begin(); m != mod.end(); ++m)
     {
@@ -1333,6 +1346,7 @@ void Spell::SetTargetMap(uint32 i,uint32 cur,std::list<Unit*> &TagUnitMap)
             continue;
         unMaxTargets+=(*m)->GetModifier()->m_amount;
     }
+
     switch(cur)
     {
         case TARGET_TOTEM_EARTH:
