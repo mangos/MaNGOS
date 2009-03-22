@@ -433,7 +433,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
             }
 
             //mountian hack checks // 1.56f (delta_z < GetPlayer()->m_anti_Last_VSpeed))
-            if ((delta_z < 0) && (GetPlayer()->m_anti_JustJumped == 0) && (tg_z > 2.37f))
+            if ((delta_z < GetPlayer()->m_anti_Last_VSpeed) && (GetPlayer()->m_anti_JustJumped == 0) && (tg_z > 2.37f))
             {
                 #ifdef MOVEMENT_ANTICHEAT_DEBUG
                 sLog.outError("MA-%s, mountain exception | tg_z=%f", GetPlayer()->GetName(),tg_z);
@@ -809,7 +809,9 @@ void WorldSession::HandleMoveKnockBackAck( WorldPacket & recv_data )
     _player->m_movementInfo = movementInfo;
     _player->m_anti_Last_HSpeed = movementInfo.j_xyspeed;
     _player->m_anti_Last_VSpeed = movementInfo.j_unk < 3.2f ? movementInfo.j_unk - 1.0f : 3.2f;
-    _player->m_anti_LastSpeedChangeTime = movementInfo.time + 1750;
+
+    uint32 dt = (_player->m_anti_Last_VSpeed < 0) ? (int)(ceil(_player->m_anti_Last_VSpeed/-25)*1000) : (int)(ceil(_player->m_anti_Last_VSpeed/25)*1000);
+    _player->m_anti_LastSpeedChangeTime = movementInfo.time + dt + 1000;
 }
 
 void WorldSession::HandleMoveHoverAck( WorldPacket& /*recv_data*/ )
