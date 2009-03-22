@@ -376,6 +376,8 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
             }
             allowed_delta = allowed_delta * time_delta;
             allowed_delta = allowed_delta * allowed_delta + 2;
+            if (tg_z > 2.2)
+                allowed_delta = allowed_delta + (delta_z*delta_z)/2.37; // mountain fall allowed speed
 
             if (movementInfo.time>GetPlayer()->m_anti_LastSpeedChangeTime)
             {
@@ -431,7 +433,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
             }
 
             //mountian hack checks // 1.56f (delta_z < GetPlayer()->m_anti_Last_VSpeed))
-            if ((delta_z < 0) && (GetPlayer()->m_anti_JustJumped == 0) && (tg_z > 1.57f))
+            if ((delta_z < 0) && (GetPlayer()->m_anti_JustJumped == 0) && (tg_z > 2.37f))
             {
                 #ifdef MOVEMENT_ANTICHEAT_DEBUG
                 sLog.outError("MA-%s, mountain exception | tg_z=%f", GetPlayer()->GetName(),tg_z);
