@@ -133,6 +133,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { "arena",          SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDebugArenaCommand,               "", NULL },
         { "bg",             SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDebugBattlegroundCommand,        "", NULL },
         { "sendlargepacket",SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDebugSendLargePacketCommand,     "", NULL },
+        { "setitemflag",    SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDebugSetItemFlagCommand,         "", NULL },
         { NULL,             0,                  false, NULL,                                                "", NULL }
     };
 
@@ -1351,7 +1352,7 @@ uint32 ChatHandler::extractSpellIdFromLink(char* text)
                 return 0;
 
             int32 rank = param1_str ? (uint32)atol(param1_str) : 0;
-            if(rank >= 5)
+            if(rank >= MAX_TALENT_RANK)
                 return 0;
 
             if(rank < 0)

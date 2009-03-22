@@ -1326,6 +1326,19 @@ void Spell::SetTargetMap(uint32 i,uint32 cur,std::list<Unit*> &TagUnitMap)
 
     // Get spell max affected targets
     uint32 unMaxTargets = m_spellInfo->MaxAffectedTargets;
+
+    // custom target amount cases
+    switch(m_spellInfo->SpellFamilyName)
+    {
+        case SPELLFAMILY_DRUID:
+            // Starfall
+            if (m_spellInfo->SpellFamilyFlags2 & 0x00000100LL)
+                unMaxTargets = 2;
+            break;
+        default:
+            break;
+    }
+
     Unit::AuraList const& mod = m_caster->GetAurasByType(SPELL_AURA_MOD_MAX_AFFECTED_TARGETS);
     for(Unit::AuraList::const_iterator m = mod.begin(); m != mod.end(); ++m)
     {
@@ -1333,6 +1346,7 @@ void Spell::SetTargetMap(uint32 i,uint32 cur,std::list<Unit*> &TagUnitMap)
             continue;
         unMaxTargets+=(*m)->GetModifier()->m_amount;
     }
+
     switch(cur)
     {
         case TARGET_TOTEM_EARTH:
@@ -4987,7 +5001,7 @@ SpellCastResult Spell::CheckItems()
                 ItemPrototype const *proto = m_CastItem->GetProto();
                 if(!proto)
                     return SPELL_FAILED_ITEM_NOT_READY;
-                for(int s=0;s < MAX_ITEM_PROTO_SPELLS; ++s)
+                for(int s=0; s < MAX_ITEM_PROTO_SPELLS; ++s)
                 {
                     // CastItem will be used up and does not count as reagent
                     int32 charges = m_CastItem->GetSpellCharges(s);

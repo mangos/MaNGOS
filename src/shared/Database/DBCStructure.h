@@ -697,6 +697,23 @@ struct CreatureTypeEntry
     //uint32    no_expirience;                              // 18 no exp? critters, non-combat pets, gas cloud.
 };
 
+/* not used
+struct CurrencyCategoryEntry
+{
+    uint32    ID;                                           // 0
+    uint32    Unk1;                                         // 1        0 for known categories and 3 for unknown one (3.0.9)
+    char*   Name[16];                                       // 2-17     name
+    //                                                      // 18       string flags
+};
+*/
+
+struct CurrencyTypesEntry
+{
+    //uint32    ID;                                         // 0        not used
+    uint32    ItemId;                                       // 1        used as real index
+    uint32    BitIndex;                                     // 2        bit index in PLAYER_FIELD_KNOWN_CURRENCIES (1 << (index-1))
+};
+
 struct DurabilityCostsEntry
 {
     uint32    Itemlvl;                                      // 0
@@ -899,6 +916,13 @@ struct ItemEntry
    uint32   DisplayId;                                      // 5
    uint32   InventoryType;                                  // 6
    uint32   Sheath;                                         // 7
+};
+
+struct ItemBagFamilyEntry
+{
+    uint32   ID;                                            // 0
+    //char*     name[16]                                    // 1-16     m_name_lang
+    //                                                      // 17       name flags
 };
 
 struct ItemDisplayInfoEntry
@@ -1396,13 +1420,16 @@ struct StableSlotPricesEntry
     uint32  Flags;                                          // 5
 };*/
 
+#define MAX_TALENT_RANK 5
+#define MAX_PET_TALENT_RANK 3                               // use in calculations, expected <= MAX_TALENT_RANK
+
 struct TalentEntry
 {
     uint32    TalentID;                                     // 0
     uint32    TalentTab;                                    // 1 index in TalentTab.dbc (TalentTabEntry)
     uint32    Row;                                          // 2
     uint32    Col;                                          // 3
-    uint32    RankID[5];                                    // 4-8
+    uint32    RankID[MAX_TALENT_RANK];                      // 4-8
                                                             // 9-12 not used, always 0, maybe not used high ranks
     uint32    DependsOn;                                    // 13 index in Talent.dbc (TalentEntry)
                                                             // 14-15 not used

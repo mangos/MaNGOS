@@ -105,6 +105,7 @@ enum ITEM_FLAGS
     ITEM_FLAGS_CONJURED                       = 0x00000002,
     ITEM_FLAGS_OPENABLE                       = 0x00000004,
     ITEM_FLAGS_WRAPPED                        = 0x00000008,
+    ITEM_FLAGS_BROKEN                         = 0x00000010, // appears red icon (like when item durability==0)
     ITEM_FLAGS_WRAPPER                        = 0x00000200, // used or not used wrapper
     ITEM_FLAGS_PARTY_LOOT                     = 0x00000800, // determines if item is party loot or not
     ITEM_FLAGS_CHARTER                        = 0x00002000, // arena/guild charter
@@ -556,7 +557,7 @@ struct ItemPrototype
     uint32 MaxDurability;
     uint32 Area;                                            // id from AreaTable.dbc
     uint32 Map;                                             // id from Map.dbc
-    uint32 BagFamily;                                       // id from ItemBagFamily.dbc
+    uint32 BagFamily;                                       // bit string (1 << id from ItemBagFamily.dbc)
     uint32 TotemCategory;                                   // id from TotemCategory.dbc
     _Socket Socket[MAX_ITEM_PROTO_SOCKETS];
     uint32 socketBonus;                                     // id from SpellItemEnchantment.dbc

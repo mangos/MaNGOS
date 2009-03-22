@@ -67,11 +67,13 @@
 extern "C" {
 #endif
 
-#define DTLS1_VERSION			0x0100
-#define DTLS1_VERSION_MAJOR		0x01
-#define DTLS1_VERSION_MINOR		0x00
+#define DTLS1_VERSION			0xFEFF
+#define DTLS1_BAD_VER			0x0100
 
+#if 0
+/* this alert description is not specified anywhere... */
 #define DTLS1_AD_MISSING_HANDSHAKE_MESSAGE    110
+#endif
 
 /* lengths of messages */
 #define DTLS1_COOKIE_LENGTH                     32
@@ -83,9 +85,13 @@ extern "C" {
 #define DTLS1_HM_BAD_FRAGMENT                   -2
 #define DTLS1_HM_FRAGMENT_RETRY                 -3
 
-#define DTLS1_CCS_HEADER_LENGTH                  3
+#define DTLS1_CCS_HEADER_LENGTH                  1
 
+#ifdef DTLS1_AD_MISSING_HANDSHAKE_MESSAGE
 #define DTLS1_AL_HEADER_LENGTH                   7
+#else
+#define DTLS1_AL_HEADER_LENGTH                   2
+#endif
 
 
 typedef struct dtls1_bitmap_st

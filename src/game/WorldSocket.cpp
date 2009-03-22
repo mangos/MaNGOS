@@ -35,7 +35,6 @@
 #include "WorldPacket.h"
 #include "SharedDefines.h"
 #include "ByteBuffer.h"
-#include "AddonHandler.h"
 #include "Opcodes.h"
 #include "Database/DatabaseEnv.h"
 #include "Auth/Sha1.h"
@@ -187,7 +186,7 @@ int WorldSocket::SendPacket (const WorldPacket& pct)
     }
 
     ServerPktHeader header(pct.size()+2, pct.GetOpcode());
-    m_Crypt.EncryptSend ( header.header, header.getHeaderLength());
+    m_Crypt.EncryptSend ((uint8*)header.header, header.getHeaderLength());
 
     if (m_OutBuffer->space () >= pct.size () + header.getHeaderLength() && msg_queue()->is_empty())
     {
@@ -480,7 +479,7 @@ int WorldSocket::handle_input_header (void)
 
     ACE_ASSERT (m_Header.length () == sizeof (ClientPktHeader));
 
-    m_Crypt.DecryptRecv ((ACE_UINT8*) m_Header.rd_ptr (), sizeof (ClientPktHeader));
+    m_Crypt.DecryptRecv ((uint8*) m_Header.rd_ptr (), sizeof (ClientPktHeader));
 
     ClientPktHeader& header = *((ClientPktHeader*) m_Header.rd_ptr ());
 
@@ -986,15 +985,12 @@ int WorldSocket::HandleAuthSession (WorldPacket& recvPacket)
     m_Crypt.Init ();
 
     m_Session->LoadAccountData();
+    m_Session->ReadAddonsInfo(recvPacket);
 
     // In case needed sometime the second arg is in microseconds 1 000 000 = 1 sec
     ACE_OS::sleep (ACE_Time_Value (0, 10000));
 
     sWorld.AddSession (m_Session);
-
-    // Create and send the Addon packet
-    if (sAddOnHandler.BuildAddonPacket (&recvPacket, &SendAddonPacked))
-        SendPacket (SendAddonPacked);
 
     return 0;
 }
