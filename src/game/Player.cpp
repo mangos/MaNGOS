@@ -451,7 +451,7 @@ Player::Player (WorldSession *session): Unit(), m_achievementMgr(this)
     //Default movement to run mode
     m_unit_movement_flags = 0;
 
-    m_mover = NULL;
+    m_mover = this;
 
     m_miniPet = 0;
     m_bgAfkReportedTimer = 0;
