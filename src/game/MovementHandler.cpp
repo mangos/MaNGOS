@@ -292,7 +292,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
             // TODO: discard movement packets after the player is rooted
             if(GetPlayer()->isAlive())
             {
-                GetPlayer()->EnvironmentalDamage(GetPlayer()->GetGUID(),DAMAGE_FALL_TO_VOID, GetPlayer()->GetMaxHealth());
+                GetPlayer()->EnvironmentalDamage(DAMAGE_FALL_TO_VOID, GetPlayer()->GetMaxHealth());
                 // change the death state to CORPSE to prevent the death timer from
                 // starting in the next player update
                 GetPlayer()->KillPlayer();
