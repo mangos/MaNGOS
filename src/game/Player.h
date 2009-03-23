@@ -1942,8 +1942,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         /***                 VARIOUS SYSTEMS                   ***/
         /*********************************************************/
         MovementInfo m_movementInfo;
-        uint32 m_lastFallTime;
-        float  m_lastFallZ;
+        void UpdateFallInformationIfNeed(MovementInfo const& minfo,uint16 opcode);
         Unit *m_mover;
         void SetFallInformation(uint32 time, float z)
         {
@@ -2185,10 +2184,6 @@ class MANGOS_DLL_SPEC Player : public Unit
         void StopMirrorTimer(MirrorTimerType Type);
         void HandleDrowning(uint32 time_diff);
         int32 getMaxTimer(MirrorTimerType timer);
-        int32 m_MirrorTimer[MAX_TIMERS];
-        uint8 m_MirrorTimerFlags;
-        uint8 m_MirrorTimerFlagsLast;
-        bool m_isInWater;
 
         /*********************************************************/
         /***                  HONOR SYSTEM                     ***/
@@ -2353,6 +2348,14 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         GridReference<Player> m_gridRef;
         MapReference m_mapRef;
+
+        uint32 m_lastFallTime;
+        float  m_lastFallZ;
+
+        int32 m_MirrorTimer[MAX_TIMERS];
+        uint8 m_MirrorTimerFlags;
+        uint8 m_MirrorTimerFlagsLast;
+        bool m_isInWater;
 };
 
 void AddItemsSetItem(Player*player,Item *item);
