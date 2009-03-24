@@ -4316,6 +4316,13 @@ bool ChatHandler::LookupPlayerSearchCommand(QueryResult* result, int32 limit)
 
     delete result;
 
+    if(i==0)                                                // empty accounts only
+    {
+        PSendSysMessage(LANG_NO_PLAYERS_FOUND);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
     return true;
 }
 
