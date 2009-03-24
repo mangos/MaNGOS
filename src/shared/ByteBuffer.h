@@ -338,7 +338,7 @@ class ByteBuffer
             if(!sLog.IsOutDebug())                          // optimize disabled debug output
                 return;
 
-            sLog.outDebug("STORAGE_SIZE: %u", size() );
+            sLog.outDebug("STORAGE_SIZE: %lu", (unsigned long)size() );
             for(uint32 i = 0; i < size(); i++)
                 sLog.outDebugInLine("%u - ", read<uint8>(i) );
             sLog.outDebug(" ");
@@ -349,7 +349,7 @@ class ByteBuffer
             if(!sLog.IsOutDebug())                          // optimize disabled debug output
                 return;
 
-            sLog.outDebug("STORAGE_SIZE: %u", size() );
+            sLog.outDebug("STORAGE_SIZE: %lu", (unsigned long)size() );
             for(uint32 i = 0; i < size(); i++)
                 sLog.outDebugInLine("%c", read<uint8>(i) );
             sLog.outDebug(" ");
@@ -361,7 +361,7 @@ class ByteBuffer
                 return;
 
             uint32 j = 1, k = 1;
-            sLog.outDebug("STORAGE_SIZE: %u", size() );
+            sLog.outDebug("STORAGE_SIZE: %lu", (unsigned long)size() );
 
             if(sLog.IsIncludeTime())
                 sLog.outDebugInLine("         ");
@@ -420,7 +420,7 @@ class ByteBuffer
     protected:
         bool PrintPosError(bool add, size_t pos, size_t esize) const
         {
-            sLog.outError("ERROR: Attempt %s in ByteBuffer (pos: %u size: %u) value with size: %u",(add ? "put" : "get"),pos, size(), esize);
+            sLog.outError("ERROR: Attempt %s in ByteBuffer (pos: %lu size: %lu) value with size: %lu",(add ? "put" : "get"),(unsigned long)pos, (unsigned long)size(), (unsigned long)esize);
 
             // assert must fail after function call
             return false;
