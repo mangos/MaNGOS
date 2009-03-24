@@ -7372,7 +7372,7 @@ Unit* Unit::GetCharm() const
             return pet;
 
         sLog.outError("Unit::GetCharm: Charmed creature %u not exist.",GUID_LOPART(charm_guid));
-        const_cast<Unit*>(this)->SetCharm(0);
+        const_cast<Unit*>(this)->SetCharm(NULL);
     }
 
     return NULL;
@@ -8244,6 +8244,9 @@ bool Unit::IsImmunedToSpell(SpellEntry const* spellInfo)
         if ( hasUnitState(UNIT_STAT_STUNNED) )
             return true;
     }
+
+    //TODO add spellEffect immunity checks!, player with flag in bg is imune to imunity buffs from other friendly players!
+    //SpellImmuneList const& dispelList = m_spellImmune[IMMUNITY_EFFECT];
 
     SpellImmuneList const& dispelList = m_spellImmune[IMMUNITY_DISPEL];
     for(SpellImmuneList::const_iterator itr = dispelList.begin(); itr != dispelList.end(); ++itr)

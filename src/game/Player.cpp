@@ -474,7 +474,7 @@ Player::Player (WorldSession *session): Unit(), m_achievementMgr(this)
     //Default movement to run mode
     m_unit_movement_flags = 0;
 
-    m_mover = NULL;
+    m_mover = this;
 
     m_miniPet = 0;
     m_bgAfkReportedTimer = 0;
@@ -482,6 +482,9 @@ Player::Player (WorldSession *session): Unit(), m_achievementMgr(this)
 
     m_declinedname = NULL;
     m_runes = NULL;
+
+    m_lastFallTime = 0;
+    m_lastFallZ = 0;
 }
 
 Player::~Player ()
@@ -849,7 +852,7 @@ void Player::StopMirrorTimer(MirrorTimerType Type)
     GetSession()->SendPacket( &data );
 }
 
-void Player::EnvironmentalDamage(uint64 guid, EnviromentalDamage type, uint32 damage)
+void Player::EnvironmentalDamage(EnviromentalDamage type, uint32 damage)
 {
     if(!isAlive() || isGameMaster())
         return;
@@ -865,11 +868,11 @@ void Player::EnvironmentalDamage(uint64 guid, EnviromentalDamage type, uint32 da
     damage-=absorb+resist;
 
     WorldPacket data(SMSG_ENVIRONMENTALDAMAGELOG, (21));
-    data << (uint64)guid;
-    data << (uint8)(type!=DAMAGE_FALL_TO_VOID ? type : DAMAGE_FALL);
-    data << (uint32)damage;
-    data << (uint32)absorb; // absorb
-    data << (uint32)resist; // resist
+    data << uint64(GetGUID());
+    data << uint8(type!=DAMAGE_FALL_TO_VOID ? type : DAMAGE_FALL);
+    data << uint32(damage);
+    data << uint32(absorb);
+    data << uint32(resist);
     SendMessageToSet(&data, true);
 
     DealDamage(this, damage, NULL, SELF_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
@@ -948,7 +951,7 @@ void Player::HandleDrowning(uint32 time_diff)
                 // Calculate and deal damage
                 // TODO: Check this formula
                 uint32 damage = GetMaxHealth() / 5 + urand(0, getLevel()-1);
-                EnvironmentalDamage(GetGUID(), DAMAGE_DROWNING, damage);
+                EnvironmentalDamage(DAMAGE_DROWNING, damage);
             }
             else if (!(m_MirrorTimerFlagsLast & UNDERWATER_INWATER))      // Update time in client if need
                 SendMirrorTimer(BREATH_TIMER, getMaxTimer(BREATH_TIMER), m_MirrorTimer[BREATH_TIMER], -1);
@@ -984,7 +987,7 @@ void Player::HandleDrowning(uint32 time_diff)
                 if (isAlive())                                            // Calculate and deal damage
                 {
                     uint32 damage = GetMaxHealth() / 5 + urand(0, getLevel()-1);
-                    EnvironmentalDamage(GetGUID(), DAMAGE_EXHAUSTED, damage);
+                    EnvironmentalDamage(DAMAGE_EXHAUSTED, damage);
                 }
                 else if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))       // Teleport ghost to graveyard
                     RepopAtGraveyard();
@@ -1018,9 +1021,9 @@ void Player::HandleDrowning(uint32 time_diff)
                 // TODO: Check this formula
                 uint32 damage = urand(600, 700);
                 if (m_MirrorTimerFlags&UNDERWATER_INLAVA)
-                    EnvironmentalDamage(GetGUID(), DAMAGE_LAVA, damage);
+                    EnvironmentalDamage(DAMAGE_LAVA, damage);
                 else
-                    EnvironmentalDamage(GetGUID(), DAMAGE_SLIME, damage);
+                    EnvironmentalDamage(DAMAGE_SLIME, damage);
             }
         }
     }
@@ -6053,14 +6056,18 @@ bool Player::SetOneFactionReputation(FactionEntry const* factionEntry, int32 sta
 //Calculate total reputation percent player gain with quest/creature level
 int32 Player::CalculateReputationGain(uint32 creatureOrQuestLevel, int32 rep, bool for_quest)
 {
-    // for grey creature kill received 20%, in other case 100.
-    int32 percent = (!for_quest && (creatureOrQuestLevel <= MaNGOS::XP::GetGrayLevel(getLevel()))) ? 20 : 100;
+    float percent = 100.0f;
+
+    float rate = for_quest ? sWorld.getRate(RATE_REPUTATION_LOWLEVEL_QUEST) : sWorld.getRate(RATE_REPUTATION_LOWLEVEL_KILL);
+
+    if(rate != 1.0f && creatureOrQuestLevel <= MaNGOS::XP::GetGrayLevel(getLevel()))
+        percent *= rate;
 
     int32 repMod = GetTotalAuraModifier(SPELL_AURA_MOD_REPUTATION_GAIN);
 
     percent += rep > 0 ? repMod : -repMod;
 
-    if(percent <=0)
+    if(percent <= 0.0f)
         return 0;
 
     return int32(sWorld.getRate(RATE_REPUTATION_GAIN)*rep*percent/100);
@@ -14215,7 +14222,7 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
     //Need to call it to initialize m_team (m_team can be calculated from m_race)
     //Other way is to saves m_team into characters table.
     setFactionForRace(m_race);
-    SetCharm(0);
+    SetCharm(NULL);
 
     m_class = fields[5].GetUInt8();
 
@@ -16388,16 +16395,6 @@ void Player::SendAutoRepeatCancel()
     WorldPacket data(SMSG_CANCEL_AUTO_REPEAT, GetPackGUID().size());
     data.append(GetPackGUID());                             // may be it's target guid
     GetSession()->SendPacket( &data );
-}
-
-void Player::PlaySound(uint32 Sound, bool OnlySelf)
-{
-    WorldPacket data(SMSG_PLAY_SOUND, 4);
-    data << Sound;
-    if (OnlySelf)
-        GetSession()->SendPacket( &data );
-    else
-        SendMessageToSet( &data, true );
 }
 
 void Player::SendExplorationExperience(uint32 Area, uint32 Experience)
@@ -18827,6 +18824,7 @@ void Player::SummonIfPossible(bool agree)
     }
 
     // drop flag at summon
+    // this code can be reached only when GM is summoning player who carries flag, because player should be immune to summoning spells when he carries flag
     if(BattleGround *bg = GetBattleGround())
         bg->EventPlayerDroppedFlag(this);
 
@@ -19473,6 +19471,7 @@ bool Player::CanUseBattleGroundObject()
     return ( //InBattleGround() &&                          // in battleground - not need, check in other cases
              //!IsMounted() && - not correct, player is dismounted when he clicks on flag
              //i'm not sure if these two are correct, because invisible players should get visible when they click on flag
+             !isTotalImmune() &&                            // not totally immune
              !HasStealthAura() &&                           // not stealthed
              !HasInvisibilityAura() &&                      // not invisible
              !HasAura(SPELL_RECENTLY_DROPPED_FLAG, 0) &&    // can't pickup
@@ -19640,6 +19639,20 @@ void Player::ExitVehicle(Vehicle *vehicle)
 
     // only for flyable vehicles?
     CastSpell(this, 45472, true);                           // Parachute
+}
+
+bool Player::isTotalImmune()
+{
+    AuraList const& immune = GetAurasByType(SPELL_AURA_SCHOOL_IMMUNITY);
+
+    uint32 immuneMask = 0;
+    for(AuraList::const_iterator itr = immune.begin(); itr != immune.end(); ++itr)
+    {
+        immuneMask |= (*itr)->GetModifier()->m_miscvalue;
+        if( immuneMask & SPELL_SCHOOL_MASK_ALL )            // total immunity
+            return true;
+    }
+    return false;
 }
 
 bool Player::HasTitle(uint32 bitIndex)
@@ -19952,7 +19965,7 @@ void Player::HandleFall(MovementInfo const& movementInfo)
                 if (GetDummyAura(43621))
                     damage = GetMaxHealth()/2;
 
-                EnvironmentalDamage(GetGUID(), DAMAGE_FALL, damage);
+                EnvironmentalDamage(DAMAGE_FALL, damage);
 
                 // recheck alive, might have died of EnvironmentalDamage
                 if (isAlive())
@@ -20228,4 +20241,10 @@ void Player::UpdateKnownCurrencies(uint32 itemId, bool apply)
         else
             RemoveFlag64(PLAYER_FIELD_KNOWN_CURRENCIES,(1LL << (ctEntry->BitIndex-1)));
     }
+}
+
+void Player::UpdateFallInformationIfNeed( MovementInfo const& minfo,uint16 opcode )
+{
+    if (m_lastFallTime >= minfo.fallTime || m_lastFallZ <=minfo.z || opcode == MSG_MOVE_FALL_LAND)
+        SetFallInformation(minfo.fallTime, minfo.z);
 }
