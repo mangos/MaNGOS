@@ -712,7 +712,8 @@ struct CurrencyTypesEntry
 {
     //uint32    ID;                                         // 0        not used
     uint32    ItemId;                                       // 1        used as real index
-    uint32    BitIndex;                                     // 2        bit index in PLAYER_FIELD_KNOWN_CURRENCIES (1 << (index-1))
+    //uint32    Category;                                   // 2        may be category
+    uint32    BitIndex;                                     // 3        bit index in PLAYER_FIELD_KNOWN_CURRENCIES (1 << (index-1))
 };
 
 struct DurabilityCostsEntry
