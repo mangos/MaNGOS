@@ -4593,6 +4593,9 @@ uint32 ObjectMgr::GetNearestTaxiNode( float x, float y, float z, uint32 mapid, u
     //movement anticheat fix
     if (dist > 3600)
        id = 0;
+    //hack for fix exception data in DBC, node 193 must be 185
+    if (id == 193)
+       id = 185;
     //movement anticheat fix
 
     return id;
