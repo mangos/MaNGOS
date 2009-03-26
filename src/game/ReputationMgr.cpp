@@ -198,6 +198,10 @@ void ReputationMgr::SendVisible(FactionState const* faction) const
 void ReputationMgr::Initilize()
 {
     m_factions.clear();
+    m_visibleFactionCount = 0;
+    m_honoredFactionCount = 0;
+    m_reveredFactionCount = 0;
+    m_exaltedFactionCount = 0;
 
     for(unsigned int i = 1; i < sFactionStore.GetNumRows(); i++)
     {
@@ -211,6 +215,11 @@ void ReputationMgr::Initilize()
             newFaction.Standing = 0;
             newFaction.Flags = GetDefaultStateFlags(factionEntry);
             newFaction.Changed = true;
+
+            if( newFaction.Flags & FACTION_FLAG_VISIBLE )
+                ++m_visibleFactionCount;
+
+            UpdateRankCounters(REP_HOSTILE,GetBaseRank(factionEntry));
 
             m_factions[newFaction.ReputationListID] = newFaction;
         }
@@ -250,19 +259,27 @@ bool ReputationMgr::SetOneFactionReputation(FactionEntry const* factionEntry, in
         else if (standing < Reputation_Bottom)
             standing = Reputation_Bottom;
 
+        ReputationRank old_rank = ReputationToRank(itr->second.Standing + BaseRep);
+        ReputationRank new_rank = ReputationToRank(standing);
+
         itr->second.Standing = standing - BaseRep;
         itr->second.Changed = true;
 
         SetVisible(&itr->second);
 
-        if(ReputationToRank(standing) <= REP_HOSTILE)
+        if(new_rank <= REP_HOSTILE)
             SetAtWar(&itr->second,true);
 
         SendState(&itr->second);
 
+        UpdateRankCounters(old_rank, new_rank);
+
         m_player->ReputationChanged(factionEntry);
+        m_player->GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KNOWN_FACTIONS,         factionEntry->ID);
         m_player->GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GAIN_REPUTATION,        factionEntry->ID);
         m_player->GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GAIN_EXALTED_REPUTATION,factionEntry->ID);
+        m_player->GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GAIN_REVERED_REPUTATION,factionEntry->ID);
+        m_player->GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GAIN_HONORED_REPUTATION,factionEntry->ID);
 
         return true;
     }
@@ -302,6 +319,8 @@ void ReputationMgr::SetVisible(FactionState* faction)
 
     faction->Flags |= FACTION_FLAG_VISIBLE;
     faction->Changed = true;
+
+    ++m_visibleFactionCount;
 
     SendVisible(faction);
 }
@@ -385,6 +404,12 @@ void ReputationMgr::LoadFromDB(QueryResult *result)
                 // update standing to current
                 faction->Standing = int32(fields[1].GetUInt32());
 
+                // update counters
+                int32 BaseRep = GetBaseReputation(factionEntry);
+                ReputationRank old_rank = ReputationToRank(BaseRep);
+                ReputationRank new_rank = ReputationToRank(BaseRep + faction->Standing);
+                UpdateRankCounters(old_rank,new_rank);
+
                 uint32 dbFactionFlags = fields[2].GetUInt32();
 
                 if( dbFactionFlags & FACTION_FLAG_VISIBLE )
@@ -430,4 +455,21 @@ void ReputationMgr::SaveToDB()
         }
     }
     CharacterDatabase.CommitTransaction();
+}
+
+void ReputationMgr::UpdateRankCounters( ReputationRank old_rank, ReputationRank new_rank )
+{
+    if(old_rank >= REP_EXALTED)
+        --m_exaltedFactionCount;
+    if(old_rank >= REP_REVERED)
+        --m_reveredFactionCount;
+    if(old_rank >= REP_HONORED)
+        --m_honoredFactionCount;
+
+    if(new_rank >= REP_EXALTED)
+        ++m_exaltedFactionCount;
+    if(new_rank >= REP_REVERED)
+        ++m_reveredFactionCount;
+    if(new_rank >= REP_HONORED)
+        ++m_honoredFactionCount;
 }

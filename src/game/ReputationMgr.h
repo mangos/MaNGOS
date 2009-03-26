@@ -56,7 +56,8 @@ class QueryResult;
 class ReputationMgr
 {
     public:                                                 // constructors and global modifiers
-        explicit ReputationMgr(Player* owner) : m_player(owner) {}
+        explicit ReputationMgr(Player* owner) : m_player(owner),
+            m_visibleFactionCount(0), m_honoredFactionCount(0), m_reveredFactionCount(0), m_exaltedFactionCount(0) {}
         ~ReputationMgr() {}
 
         void SaveToDB();
@@ -68,6 +69,11 @@ class ReputationMgr
 
         static ReputationRank ReputationToRank(int32 standing);
     public:                                                 // accessors
+        uint8 GetVisibleFactionCount() const { return m_visibleFactionCount; }
+        uint8 GetHonoredFactionCount() const { return m_honoredFactionCount; }
+        uint8 GetReveredFactionCount() const { return m_reveredFactionCount; }
+        uint8 GetExaltedFactionCount() const { return m_exaltedFactionCount; }
+
         FactionStateList const& GetStateList() const { return m_factions; }
 
         FactionState const* GetState(FactionEntry const* factionEntry) const
@@ -131,6 +137,10 @@ class ReputationMgr
         Player* m_player;
         FactionStateList m_factions;
         ForcedReactions m_forcedReactions;
+        uint8 m_visibleFactionCount :8;
+        uint8 m_honoredFactionCount :8;
+        uint8 m_reveredFactionCount :8;
+        uint8 m_exaltedFactionCount :8;
 };
 
 #endif
