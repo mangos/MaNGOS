@@ -472,6 +472,8 @@ void World::LoadConfigSettings(bool reload)
     rate_values[RATE_XP_QUEST]    = sConfig.GetFloatDefault("Rate.XP.Quest", 1.0f);
     rate_values[RATE_XP_EXPLORE]  = sConfig.GetFloatDefault("Rate.XP.Explore", 1.0f);
     rate_values[RATE_REPUTATION_GAIN]  = sConfig.GetFloatDefault("Rate.Reputation.Gain", 1.0f);
+    rate_values[RATE_REPUTATION_LOWLEVEL_KILL]  = sConfig.GetFloatDefault("Rate.Reputation.LowLevel.Kill", 1.0f);
+    rate_values[RATE_REPUTATION_LOWLEVEL_QUEST]  = sConfig.GetFloatDefault("Rate.Reputation.LowLevel.Quest", 1.0f);
     rate_values[RATE_CREATURE_NORMAL_DAMAGE]          = sConfig.GetFloatDefault("Rate.Creature.Normal.Damage", 1.0f);
     rate_values[RATE_CREATURE_ELITE_ELITE_DAMAGE]     = sConfig.GetFloatDefault("Rate.Creature.Elite.Elite.Damage", 1.0f);
     rate_values[RATE_CREATURE_ELITE_RAREELITE_DAMAGE] = sConfig.GetFloatDefault("Rate.Creature.Elite.RAREELITE.Damage", 1.0f);
@@ -2239,6 +2241,47 @@ void World::ScriptsProcess()
                 break;
             }
 
+            case SCRIPT_COMMAND_PLAY_SOUND:
+            {
+                if(!source)
+                {
+                    sLog.outError("SCRIPT_COMMAND_PLAY_SOUND call for NULL creature.");
+                    break;
+                }
+
+                WorldObject* pSource = dynamic_cast<WorldObject*>(source);
+                if(!pSource)
+                {
+                    sLog.outError("SCRIPT_COMMAND_PLAY_SOUND call for non-world object (TypeId: %u), skipping.",source->GetTypeId());
+                    break;
+                }
+
+                // bitmask: 0/1=anyone/target, 0/2=with distance dependent
+                Player* pTarget = NULL;
+                if(step.script->datalong2 & 1)
+                {
+                    if(!target)
+                    {
+                        sLog.outError("SCRIPT_COMMAND_PLAY_SOUND in targeted mode call for NULL target.");
+                        break;
+                    }
+
+                    if(target->GetTypeId()!=TYPEID_PLAYER)
+                    {
+                        sLog.outError("SCRIPT_COMMAND_PLAY_SOUND in targeted mode call for non-player (TypeId: %u), skipping.",target->GetTypeId());
+                        break;
+                    }
+
+                    pTarget = (Player*)target;
+                }
+
+                // bitmask: 0/1=anyone/target, 0/2=with distance dependent
+                if(step.script->datalong2 & 2)
+                    pSource->PlayDistanceSound(step.script->datalong,pTarget);
+                else
+                    pSource->PlayDirectSound(step.script->datalong,pTarget);
+                break;
+            }
             default:
                 sLog.outError("Unknown script command %u called.",step.script->command);
                 break;

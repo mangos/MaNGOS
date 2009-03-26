@@ -300,7 +300,7 @@ void Spell::EffectEnvirinmentalDMG(uint32 i)
 
     m_caster->SendSpellNonMeleeDamageLog(m_caster, m_spellInfo->Id, damage, GetSpellSchoolMask(m_spellInfo), absorb, resist, false, 0, false);
     if(m_caster->GetTypeId() == TYPEID_PLAYER)
-        ((Player*)m_caster)->EnvironmentalDamage(m_caster->GetGUID(),DAMAGE_FIRE,damage);
+        ((Player*)m_caster)->EnvironmentalDamage(DAMAGE_FIRE,damage);
 }
 
 void Spell::EffectSchoolDMG(uint32 effect_idx)
@@ -2372,60 +2372,9 @@ void Spell::EffectPowerDrain(uint32 i)
 
 void Spell::EffectSendEvent(uint32 EffectIndex)
 {
-    if (m_caster->GetTypeId() == TYPEID_PLAYER && ((Player*)m_caster)->InBattleGround())
-    {
-        BattleGround* bg = ((Player *)m_caster)->GetBattleGround();
-        if(bg && bg->GetStatus() == STATUS_IN_PROGRESS)
-        {
-            switch(m_spellInfo->Id)
-            {
-                case 23333:                                 // Pickup Horde Flag
-                    /*do not uncomment .
-                    if(bg->GetTypeID()==BATTLEGROUND_WS)
-                        bg->EventPlayerClickedOnFlag((Player*)m_caster, gameObjTarget);
-                    sLog.outDebug("Send Event Horde Flag Picked Up");
-                    break;
-                    /* not used :
-                    case 23334:                                 // Drop Horde Flag
-                        if(bg->GetTypeID()==BATTLEGROUND_WS)
-                            bg->EventPlayerDroppedFlag((Player*)m_caster);
-                        sLog.outDebug("Drop Horde Flag");
-                        break;
-                    */
-                case 23335:                                 // Pickup Alliance Flag
-                    /*do not uncomment ... (it will cause crash, because of null targetobject!) anyway this is a bad way to call that event, because it would cause recursion
-                    if(bg->GetTypeID()==BATTLEGROUND_WS)
-                        bg->EventPlayerClickedOnFlag((Player*)m_caster, gameObjTarget);
-                    sLog.outDebug("Send Event Alliance Flag Picked Up");
-                    break;
-                    /* not used :
-                    case 23336:                                 // Drop Alliance Flag
-                        if(bg->GetTypeID()==BATTLEGROUND_WS)
-                            bg->EventPlayerDroppedFlag((Player*)m_caster);
-                        sLog.outDebug("Drop Alliance Flag");
-                        break;
-                    case 23385:                                 // Alliance Flag Returns
-                        if(bg->GetTypeID()==BATTLEGROUND_WS)
-                            bg->EventPlayerClickedOnFlag((Player*)m_caster, gameObjTarget);
-                        sLog.outDebug("Alliance Flag Returned");
-                        break;
-                    case 23386:                                   // Horde Flag Returns
-                        if(bg->GetTypeID()==BATTLEGROUND_WS)
-                            bg->EventPlayerClickedOnFlag((Player*)m_caster, gameObjTarget);
-                        sLog.outDebug("Horde Flag Returned");
-                        break;*/
-                case 34976:
-                    /*
-                    if(bg->GetTypeID()==BATTLEGROUND_EY)
-                        bg->EventPlayerClickedOnFlag((Player*)m_caster, gameObjTarget);
-                    */
-                    break;
-                default:
-                    sLog.outDebug("Unknown spellid %u in BG event", m_spellInfo->Id);
-                    break;
-            }
-        }
-    }
+    /*
+    we do not handle a flag dropping or clicking on flag in battleground by sendevent system
+    */
     sLog.outDebug("Spell ScriptStart %u for spellid %u in EffectSendEvent ", m_spellInfo->EffectMiscValue[EffectIndex], m_spellInfo->Id);
     sWorld.ScriptsStart(sEventScripts, m_spellInfo->EffectMiscValue[EffectIndex], m_caster, focusObject);
 }
@@ -5812,7 +5761,7 @@ void Spell::EffectReputation(uint32 i)
     if(!factionEntry)
         return;
 
-    _player->ModifyFactionReputation(factionEntry,rep_change);
+    _player->GetReputationMgr().ModifyReputation(factionEntry,rep_change);
 }
 
 void Spell::EffectQuestComplete(uint32 i)

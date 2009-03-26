@@ -323,7 +323,7 @@ void ObjectMgr::LoadCreatureLocales()
     delete result;
 
     sLog.outString();
-    sLog.outString( ">> Loaded %u creature locale strings", mCreatureLocaleMap.size() );
+    sLog.outString( ">> Loaded %lu creature locale strings", (unsigned long)mCreatureLocaleMap.size() );
 }
 
 void ObjectMgr::LoadNpcOptionLocales()
@@ -391,7 +391,7 @@ void ObjectMgr::LoadNpcOptionLocales()
     delete result;
 
     sLog.outString();
-    sLog.outString( ">> Loaded %u npc_option locale strings", mNpcOptionLocaleMap.size() );
+    sLog.outString( ">> Loaded %lu npc_option locale strings", (unsigned long)mNpcOptionLocaleMap.size() );
 }
 
 void ObjectMgr::LoadPointOfInterestLocales()
@@ -442,7 +442,7 @@ void ObjectMgr::LoadPointOfInterestLocales()
     delete result;
 
     sLog.outString();
-    sLog.outString( ">> Loaded %u points_of_interest locale strings", mPointOfInterestLocaleMap.size() );
+    sLog.outString( ">> Loaded %lu points_of_interest locale strings", (unsigned long)mPointOfInterestLocaleMap.size() );
 }
 
 struct SQLCreatureLoader : public SQLStorageLoaderBase<SQLCreatureLoader>
@@ -982,7 +982,7 @@ void ObjectMgr::LoadCreatures()
     delete result;
 
     sLog.outString();
-    sLog.outString( ">> Loaded %u creatures", mCreatureDataMap.size() );
+    sLog.outString( ">> Loaded %lu creatures", (unsigned long)mCreatureDataMap.size() );
 }
 
 void ObjectMgr::AddCreatureToGrid(uint32 guid, CreatureData const* data)
@@ -1109,7 +1109,7 @@ void ObjectMgr::LoadGameobjects()
     delete result;
 
     sLog.outString();
-    sLog.outString( ">> Loaded %u gameobjects", mGameObjectDataMap.size());
+    sLog.outString( ">> Loaded %lu gameobjects", (unsigned long)mGameObjectDataMap.size());
 }
 
 void ObjectMgr::AddGameobjectToGrid(uint32 guid, GameObjectData const* data)
@@ -1182,7 +1182,7 @@ void ObjectMgr::LoadCreatureRespawnTimes()
 
     delete result;
 
-    sLog.outString( ">> Loaded %u creature respawn times", mCreatureRespawnTimes.size() );
+    sLog.outString( ">> Loaded %lu creature respawn times", (unsigned long)mCreatureRespawnTimes.size() );
     sLog.outString();
 }
 
@@ -1224,7 +1224,7 @@ void ObjectMgr::LoadGameobjectRespawnTimes()
 
     delete result;
 
-    sLog.outString( ">> Loaded %u gameobject respawn times", mGORespawnTimes.size() );
+    sLog.outString( ">> Loaded %lu gameobject respawn times", (unsigned long)mGORespawnTimes.size() );
     sLog.outString();
 }
 
@@ -1369,7 +1369,7 @@ void ObjectMgr::LoadItemLocales()
     delete result;
 
     sLog.outString();
-    sLog.outString( ">> Loaded %u Item locale strings", mItemLocaleMap.size() );
+    sLog.outString( ">> Loaded %lu Item locale strings", (unsigned long)mItemLocaleMap.size() );
 }
 
 struct SQLItemLoader : public SQLStorageLoaderBase<SQLItemLoader>
@@ -1719,13 +1719,13 @@ void ObjectMgr::LoadItemPrototypes()
         if(proto->BagFamily)
         {
             // check bits
-            for(uint32 i = 0; i < sizeof(proto->BagFamily)*8; ++i)
+            for(uint32 j = 0; j < sizeof(proto->BagFamily)*8; ++j)
             {
-                uint32 mask = 1 << i;
+                uint32 mask = 1 << j;
                 if((proto->BagFamily & mask)==0)
                     continue;
 
-                ItemBagFamilyEntry const* bf = sItemBagFamilyStore.LookupEntry(i+1);
+                ItemBagFamilyEntry const* bf = sItemBagFamilyStore.LookupEntry(j+1);
                 if(!bf)
                 {
                     sLog.outErrorDb("Item (Entry: %u) has bag family bit set not listed in ItemBagFamily.dbc, remove bit",i);
@@ -2986,10 +2986,10 @@ void ObjectMgr::LoadQuests()
             // no changes, quest can't be done for this requirement
         }
 
-        if(qinfo->RequiredMinRepValue && qinfo->RequiredMinRepValue > Player::Reputation_Cap)
+        if(qinfo->RequiredMinRepValue && qinfo->RequiredMinRepValue > ReputationMgr::Reputation_Cap)
         {
             sLog.outErrorDb("Quest %u has `RequiredMinRepValue` = %d but max reputation is %u, quest can't be done.",
-                qinfo->GetQuestId(),qinfo->RequiredMinRepValue,Player::Reputation_Cap);
+                qinfo->GetQuestId(),qinfo->RequiredMinRepValue,ReputationMgr::Reputation_Cap);
             // no changes, quest can't be done for this requirement
         }
 
@@ -3412,7 +3412,7 @@ void ObjectMgr::LoadQuests()
     }
 
     sLog.outString();
-    sLog.outString( ">> Loaded %u quests definitions", mQuestTemplates.size() );
+    sLog.outString( ">> Loaded %lu quests definitions", (unsigned long)mQuestTemplates.size() );
 }
 
 void ObjectMgr::LoadQuestLocales()
@@ -3548,7 +3548,7 @@ void ObjectMgr::LoadQuestLocales()
     delete result;
 
     sLog.outString();
-    sLog.outString( ">> Loaded %u Quest locale strings", mQuestLocaleMap.size() );
+    sLog.outString( ">> Loaded %lu Quest locale strings", (unsigned long)mQuestLocaleMap.size() );
 }
 
 void ObjectMgr::LoadPetCreateSpells()
@@ -4098,7 +4098,7 @@ void ObjectMgr::LoadPageTextLocales()
     delete result;
 
     sLog.outString();
-    sLog.outString( ">> Loaded %u PageText locale strings", mPageTextLocaleMap.size() );
+    sLog.outString( ">> Loaded %lu PageText locale strings", (unsigned long)mPageTextLocaleMap.size() );
 }
 
 struct SQLInstanceLoader : public SQLStorageLoaderBase<SQLInstanceLoader>
@@ -4293,7 +4293,7 @@ void ObjectMgr::LoadNpcTextLocales()
     delete result;
 
     sLog.outString();
-    sLog.outString( ">> Loaded %u NpcText locale strings", mNpcTextLocaleMap.size() );
+    sLog.outString( ">> Loaded %lu NpcText locale strings", (unsigned long)mNpcTextLocaleMap.size() );
 }
 
 //not very fast function but it is called only once a day, or on starting-up
@@ -5379,7 +5379,7 @@ void ObjectMgr::LoadGameObjectLocales()
     delete result;
 
     sLog.outString();
-    sLog.outString( ">> Loaded %u gameobject locale strings", mGameObjectLocaleMap.size() );
+    sLog.outString( ">> Loaded %lu gameobject locale strings", (unsigned long)mGameObjectLocaleMap.size() );
 }
 
 struct SQLGameObjectLoader : public SQLStorageLoaderBase<SQLGameObjectLoader>
@@ -6609,7 +6609,7 @@ bool PlayerCondition::Meets(Player const * player) const
         case CONDITION_REPUTATION_RANK:
         {
             FactionEntry const* faction = sFactionStore.LookupEntry(value1);
-            return faction && player->GetReputationRank(faction) >= value2;
+            return faction && player->GetReputationMgr().GetRank(faction) >= value2;
         }
         case CONDITION_TEAM:
             return player->GetTeam() == value1;

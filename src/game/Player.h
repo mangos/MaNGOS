@@ -34,6 +34,7 @@
 #include "MapReference.h"
 #include "Util.h"                                           // for Tokens typedef
 #include "AchievementMgr.h"
+#include "ReputationMgr.h"
 #include "BattleGround.h"
 
 #include<string>
@@ -49,7 +50,6 @@ class Transport;
 class UpdateMask;
 class SpellCastTargets;
 class PlayerSocial;
-class AchievementMgr;
 class Vehicle;
 
 typedef std::deque<Mail*> PlayerMails;
@@ -271,31 +271,6 @@ struct Runes
             runeState &= ~(1 << index);                     // on cooldown
     }
 };
-
-enum FactionFlags
-{
-    FACTION_FLAG_VISIBLE            = 0x01,                 // makes visible in client (set or can be set at interaction with target of this faction)
-    FACTION_FLAG_AT_WAR             = 0x02,                 // enable AtWar-button in client. player controlled (except opposition team always war state), Flag only set on initial creation
-    FACTION_FLAG_HIDDEN             = 0x04,                 // hidden faction from reputation pane in client (player can gain reputation, but this update not sent to client)
-    FACTION_FLAG_INVISIBLE_FORCED   = 0x08,                 // always overwrite FACTION_FLAG_VISIBLE and hide faction in rep.list, used for hide opposite team factions
-    FACTION_FLAG_PEACE_FORCED       = 0x10,                 // always overwrite FACTION_FLAG_AT_WAR, used for prevent war with own team factions
-    FACTION_FLAG_INACTIVE           = 0x20,                 // player controlled, state stored in characters.data ( CMSG_SET_FACTION_INACTIVE )
-    FACTION_FLAG_RIVAL              = 0x40                  // flag for the two competing outland factions
-};
-
-typedef uint32 RepListID;
-struct FactionState
-{
-    uint32 ID;
-    RepListID ReputationListID;
-    uint32 Flags;
-    int32  Standing;
-    bool Changed;
-};
-
-typedef std::map<RepListID,FactionState> FactionStateList;
-
-typedef std::map<uint32,ReputationRank> ForcedReactions;
 
 typedef std::set<uint64> GuardianPetList;
 
@@ -1234,6 +1209,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void CastedCreatureOrGO( uint32 entry, uint64 guid, uint32 spell_id );
         void TalkedToCreature( uint32 entry, uint64 guid );
         void MoneyChanged( uint32 value );
+        void ReputationChanged(FactionEntry const* factionEntry );
         bool HasQuestForItem( uint32 itemid ) const;
         bool HasQuestForGO(int32 GOId) const;
         void UpdateForQuestsGO();
@@ -1611,8 +1587,6 @@ class MANGOS_DLL_SPEC Player : public Unit
         void SendDelayResponse(const uint32);
         void SendLogXPGain(uint32 GivenXP,Unit* victim,uint32 RestXP);
 
-        //Low Level Packets
-        void PlaySound(uint32 Sound, bool OnlySelf);
         //notifiers
         void SendAttackSwingCantAttack();
         void SendAttackSwingCancelAttack();
@@ -1701,39 +1675,12 @@ class MANGOS_DLL_SPEC Player : public Unit
         bool RewardPlayerAndGroupAtKill(Unit* pVictim);
         bool isHonorOrXPTarget(Unit* pVictim);
 
-        FactionStateList m_factions;
-        ForcedReactions m_forcedReactions;
-        FactionStateList const& GetFactionStateList() { return m_factions; }
-        uint32 GetDefaultReputationFlags(const FactionEntry *factionEntry) const;
-        int32 GetBaseReputation(const FactionEntry *factionEntry) const;
-        int32 GetReputation(uint32 faction_id) const;
-        int32 GetReputation(const FactionEntry *factionEntry) const;
-        ReputationRank GetReputationRank(uint32 faction) const;
-        ReputationRank GetReputationRank(const FactionEntry *factionEntry) const;
-        ReputationRank GetBaseReputationRank(const FactionEntry *factionEntry) const;
-        ReputationRank ReputationToRank(int32 standing) const;
-        const static int32 ReputationRank_Length[MAX_REPUTATION_RANK];
-        const static int32 Reputation_Cap    =  42999;
-        const static int32 Reputation_Bottom = -42000;
-        bool ModifyFactionReputation(uint32 FactionTemplateId, int32 DeltaReputation);
-        bool ModifyFactionReputation(FactionEntry const* factionEntry, int32 standing);
-        bool ModifyOneFactionReputation(FactionEntry const* factionEntry, int32 standing);
-        bool SetFactionReputation(uint32 FactionTemplateId, int32 standing);
-        bool SetFactionReputation(FactionEntry const* factionEntry, int32 standing);
-        bool SetOneFactionReputation(FactionEntry const* factionEntry, int32 standing);
-        int32 CalculateReputationGain(uint32 creatureOrQuestLevel, int32 rep, bool for_quest);
+        ReputationMgr&       GetReputationMgr()       { return m_reputationMgr; }
+        ReputationMgr const& GetReputationMgr() const { return m_reputationMgr; }
+        ReputationRank GetReputationRank(uint32 faction_id) const;
         void RewardReputation(Unit *pVictim, float rate);
         void RewardReputation(Quest const *pQuest);
-        void SetInitialFactions();
-        void UpdateReputation() const;
-        void SendFactionState(FactionState const* faction) const;
-        void SendInitialReputations();
-        FactionState const* GetFactionState( FactionEntry const* factionEntry) const;
-        void SetFactionAtWar(FactionState* faction, bool atWar);
-        void SetFactionInactive(FactionState* faction, bool inactive);
-        void SetFactionVisible(FactionState* faction);
-        void SetFactionVisibleForFactionTemplateId(uint32 FactionTemplateId);
-        void SetFactionVisibleForFactionId(uint32 FactionId);
+
         void UpdateSkillsForLevel();
         void UpdateSkillsToMaxSkillsForLevel();             // for .levelup
         void ModifySkillBonus(uint32 skillid,int32 val, bool talent);
@@ -1926,6 +1873,7 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         bool GetBGAccessByLevel(BattleGroundTypeId bgTypeId) const;
         bool CanUseBattleGroundObject();
+        bool isTotalImmune();
         bool CanCaptureTowerPoint();
 
         /*********************************************************/
@@ -1941,7 +1889,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         /***              ENVIROMENTAL SYSTEM                  ***/
         /*********************************************************/
 
-        void EnvironmentalDamage(uint64 guid, EnviromentalDamage type, uint32 damage);
+        void EnvironmentalDamage(EnviromentalDamage type, uint32 damage);
 
         /*********************************************************/
         /***               FLOOD FILTER SYSTEM                 ***/
@@ -1955,8 +1903,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         /***                 VARIOUS SYSTEMS                   ***/
         /*********************************************************/
         MovementInfo m_movementInfo;
-        uint32 m_lastFallTime;
-        float  m_lastFallZ;
+        void UpdateFallInformationIfNeed(MovementInfo const& minfo,uint16 opcode);
         Unit *m_mover;
         void SetFallInformation(uint32 time, float z)
         {
@@ -2164,7 +2111,6 @@ class MANGOS_DLL_SPEC Player : public Unit
         void _LoadQuestStatus(QueryResult *result);
         void _LoadDailyQuestStatus(QueryResult *result);
         void _LoadGroup(QueryResult *result);
-        void _LoadReputation(QueryResult *result);
         void _LoadSkills();
         void _LoadSpells(QueryResult *result);
         void _LoadFriendList(QueryResult *result);
@@ -2183,7 +2129,6 @@ class MANGOS_DLL_SPEC Player : public Unit
         void _SaveMail();
         void _SaveQuestStatus();
         void _SaveDailyQuestStatus();
-        void _SaveReputation();
         void _SaveSpells();
         void _SaveEquipmentSets();
 
@@ -2198,10 +2143,6 @@ class MANGOS_DLL_SPEC Player : public Unit
         void StopMirrorTimer(MirrorTimerType Type);
         void HandleDrowning(uint32 time_diff);
         int32 getMaxTimer(MirrorTimerType timer);
-        int32 m_MirrorTimer[MAX_TIMERS];
-        uint8 m_MirrorTimerFlags;
-        uint8 m_MirrorTimerFlagsLast;
-        bool m_isInWater;
 
         /*********************************************************/
         /***                  HONOR SYSTEM                     ***/
@@ -2350,7 +2291,6 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         DeclinedName *m_declinedname;
         Runes *m_runes;
-        AchievementMgr m_achievementMgr;
         EquipmentSets m_EquipmentSets;
     private:
         // internal common parts for CanStore/StoreItem functions
@@ -2358,12 +2298,24 @@ class MANGOS_DLL_SPEC Player : public Unit
         uint8 _CanStoreItem_InBag( uint8 bag, ItemPosCountVec& dest, ItemPrototype const *pProto, uint32& count, bool merge, bool non_specialized, Item *pSrcItem, uint8 skip_bag, uint8 skip_slot ) const;
         uint8 _CanStoreItem_InInventorySlots( uint8 slot_begin, uint8 slot_end, ItemPosCountVec& dest, ItemPrototype const *pProto, uint32& count, bool merge, Item *pSrcItem, uint8 skip_bag, uint8 skip_slot ) const;
         Item* _StoreItem( uint16 pos, Item *pItem, uint32 count, bool clone, bool update );
-        void UpdateKnownCurrencies(uint32 itemId, bool apply);
 
+        void UpdateKnownCurrencies(uint32 itemId, bool apply);
+        int32 CalculateReputationGain(uint32 creatureOrQuestLevel, int32 rep, bool for_quest);
         void AdjustQuestReqItemCount( Quest const* pQuest, QuestStatusData& questStatusData );
 
         GridReference<Player> m_gridRef;
         MapReference m_mapRef;
+
+        uint32 m_lastFallTime;
+        float  m_lastFallZ;
+
+        int32 m_MirrorTimer[MAX_TIMERS];
+        uint8 m_MirrorTimerFlags;
+        uint8 m_MirrorTimerFlagsLast;
+        bool m_isInWater;
+
+        AchievementMgr m_achievementMgr;
+        ReputationMgr  m_reputationMgr;
 };
 
 void AddItemsSetItem(Player*player,Item *item);

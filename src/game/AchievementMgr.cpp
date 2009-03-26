@@ -319,6 +319,7 @@ void AchievementMgr::SendAchievementEarned(AchievementEntry const* achievement)
         MaNGOS::LocalizedPacketDo<MaNGOS::AchievementChatBuilder> say_do(say_builder);
         guild->BroadcastWorker(say_do,GetPlayer());
     }
+
     if(achievement->flags & (ACHIEVEMENT_FLAG_REALM_FIRST_KILL|ACHIEVEMENT_FLAG_REALM_FIRST_REACH))
     {
         // broadcast realm first reached
@@ -337,19 +338,20 @@ void AchievementMgr::SendAchievementEarned(AchievementEntry const* achievement)
         cell.data.Part.reserved = ALL_DISTRICT;
         cell.SetNoCreate();
 
-        MaNGOS::AchievementChatBuilder say_builder(*GetPlayer(), CHAT_MSG_GUILD_ACHIEVEMENT, LANG_ACHIEVEMENT_EARNED,achievement->ID);
+        MaNGOS::AchievementChatBuilder say_builder(*GetPlayer(), CHAT_MSG_ACHIEVEMENT, LANG_ACHIEVEMENT_EARNED,achievement->ID);
         MaNGOS::LocalizedPacketDo<MaNGOS::AchievementChatBuilder> say_do(say_builder);
         MaNGOS::PlayerDistWorker<MaNGOS::LocalizedPacketDo<MaNGOS::AchievementChatBuilder> > say_worker(GetPlayer(),sWorld.getConfig(CONFIG_LISTEN_RANGE_SAY),say_do);
         TypeContainerVisitor<MaNGOS::PlayerDistWorker<MaNGOS::LocalizedPacketDo<MaNGOS::AchievementChatBuilder> >, WorldTypeMapContainer > message(say_worker);
         CellLock<GridReadGuard> cell_lock(cell, p);
         cell_lock->Visit(cell_lock, message, *GetPlayer()->GetMap());
     }
+
     WorldPacket data(SMSG_ACHIEVEMENT_EARNED, 8+4+8);
     data.append(GetPlayer()->GetPackGUID());
     data << uint32(achievement->ID);
     data << uint32(secsToTimeBitFields(time(NULL)));
     data << uint32(0);
-    GetPlayer()->SendMessageToSet(&data, true);
+    GetPlayer()->SendMessageToSetInRange(&data, sWorld.getConfig(CONFIG_LISTEN_RANGE_SAY), true);
 }
 
 void AchievementMgr::SendCriteriaUpdate(uint32 id, CriteriaProgress const* progress)
@@ -365,7 +367,7 @@ void AchievementMgr::SendCriteriaUpdate(uint32 id, CriteriaProgress const* progr
     data << uint32(secsToTimeBitFields(progress->date));
     data << uint32(0);  // timer 1
     data << uint32(0);  // timer 2
-    GetPlayer()->SendMessageToSet(&data, true);
+    GetPlayer()->SendDirectMessage(&data);
 }
 
 /**
@@ -743,7 +745,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                 if (miscvalue1 && miscvalue1 != achievementCriteria->gain_reputation.factionID)
                     continue;
 
-                int32 reputation = GetPlayer()->GetReputation(achievementCriteria->gain_reputation.factionID);
+                int32 reputation = GetPlayer()->GetReputationMgr().GetReputation(achievementCriteria->gain_reputation.factionID);
                 if (reputation > 0)
                     SetCriteriaProgress(achievementCriteria, reputation);
                 break;
@@ -755,12 +757,12 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                     continue;
 
                 uint32 counter = 0;
-                const FactionStateList factionStateList = GetPlayer()->GetFactionStateList();
+                FactionStateList const& factionStateList = GetPlayer()->GetReputationMgr().GetStateList();
                 for (FactionStateList::const_iterator iter = factionStateList.begin(); iter!= factionStateList.end(); ++iter)
-                {
-                    if(GetPlayer()->ReputationToRank(iter->second.Standing) >= REP_EXALTED)
-                        ++counter;
-                }
+                    if(FactionEntry const *factionEntry = sFactionStore.LookupEntry(iter->second.ID))
+                        if(ReputationMgr::ReputationToRank(iter->second.Standing + GetPlayer()->GetReputationMgr().GetBaseReputation(factionEntry)) >= REP_EXALTED)
+                            ++counter;
+
                 SetCriteriaProgress(achievementCriteria, counter);
                 break;
             }
@@ -1107,7 +1109,7 @@ AchievementCompletionState AchievementMgr::GetAchievementCompletionState(Achieve
 void AchievementMgr::SetCriteriaProgress(AchievementCriteriaEntry const* entry, uint32 changeValue, ProgressType ptype)
 {
     if((sLog.getLogFilter() & LOG_FILTER_ACHIEVEMENT_UPDATES)==0)
-        sLog.outDetail("AchievementMgr::SetCriteriaProgress(%u, %u) for (GUID:%u)", entry->ID, changeValue);
+        sLog.outDetail("AchievementMgr::SetCriteriaProgress(%u, %u) for (GUID:%u)", entry->ID, changeValue, m_player->GetGUIDLow());
 
     CriteriaProgress *progress = NULL;
 
@@ -1309,7 +1311,7 @@ void AchievementGlobalMgr::LoadAchievementCriteriaList()
     }
 
     sLog.outString();
-    sLog.outString(">> Loaded %u achievement criteria.",m_AchievementCriteriasByType->size());
+    sLog.outString(">> Loaded %lu achievement criteria.",(unsigned long)m_AchievementCriteriasByType->size());
 }
 
 
@@ -1338,7 +1340,7 @@ void AchievementGlobalMgr::LoadCompletedAchievements()
     delete result;
 
     sLog.outString();
-    sLog.outString(">> Loaded %u realm completed achievements.",m_allCompletedAchievements.size());
+    sLog.outString(">> Loaded %lu realm completed achievements.",(unsigned long)m_allCompletedAchievements.size());
 }
 
 void AchievementGlobalMgr::LoadRewards()
@@ -1448,7 +1450,7 @@ void AchievementGlobalMgr::LoadRewards()
     delete result;
 
     sLog.outString();
-    sLog.outString( ">> Loaded %u achievement reward locale strings", m_achievementRewardLocales.size() );
+    sLog.outString( ">> Loaded %lu achievement reward locale strings", (unsigned long)m_achievementRewardLocales.size() );
 }
 
 void AchievementGlobalMgr::LoadRewardLocales()
@@ -1517,5 +1519,5 @@ void AchievementGlobalMgr::LoadRewardLocales()
     delete result;
 
     sLog.outString();
-    sLog.outString( ">> Loaded %u achievement reward locale strings", m_achievementRewardLocales.size() );
+    sLog.outString( ">> Loaded %lu achievement reward locale strings", (unsigned long)m_achievementRewardLocales.size() );
 }
