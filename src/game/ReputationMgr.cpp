@@ -217,7 +217,7 @@ void ReputationMgr::Initilize()
     }
 }
 
-bool ReputationMgr::SetReputation(FactionEntry const* factionEntry, int32 standing)
+bool ReputationMgr::SetReputation(FactionEntry const* factionEntry, int32 standing, bool incremental)
 {
     SimpleFactionsList const* flist = GetFactionTeamList(factionEntry->ID);
     if (flist)
@@ -227,26 +227,29 @@ bool ReputationMgr::SetReputation(FactionEntry const* factionEntry, int32 standi
         {
             FactionEntry const *factionEntryCalc = sFactionStore.LookupEntry(*itr);
             if(factionEntryCalc)
-                res = SetOneFactionReputation(factionEntryCalc, standing);
+                res = SetOneFactionReputation(factionEntryCalc, standing, incremental);
         }
         return res;
     }
     else
-        return SetOneFactionReputation(factionEntry, standing);
+        return SetOneFactionReputation(factionEntry, standing, incremental);
 }
 
-bool ReputationMgr::SetOneFactionReputation(FactionEntry const* factionEntry, int32 standing)
+bool ReputationMgr::SetOneFactionReputation(FactionEntry const* factionEntry, int32 standing, bool incremental)
 {
     FactionStateList::iterator itr = m_factions.find(factionEntry->reputationListID);
     if (itr != m_factions.end())
     {
+        int32 BaseRep = GetBaseReputation(factionEntry);
+
+        if(incremental)
+            standing += itr->second.Standing + BaseRep;
+
         if (standing > Reputation_Cap)
             standing = Reputation_Cap;
-        else
-            if (standing < Reputation_Bottom)
-                standing = Reputation_Bottom;
+        else if (standing < Reputation_Bottom)
+            standing = Reputation_Bottom;
 
-        int32 BaseRep = GetBaseReputation(factionEntry);
         itr->second.Standing = standing - BaseRep;
         itr->second.Changed = true;
 
@@ -258,57 +261,7 @@ bool ReputationMgr::SetOneFactionReputation(FactionEntry const* factionEntry, in
         SendState(&itr->second);
 
         m_player->ReputationChanged(factionEntry);
-        m_player->GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GAIN_REPUTATION,factionEntry->ID);
-        m_player->GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GAIN_EXALTED_REPUTATION,factionEntry->ID);
-        return true;
-    }
-    return false;
-}
-
-bool ReputationMgr::ModifyReputation(FactionEntry const* factionEntry, int32 standing)
-{
-    SimpleFactionsList const* flist = GetFactionTeamList(factionEntry->ID);
-    if (flist)
-    {
-        bool res = false;
-        for (SimpleFactionsList::const_iterator itr = flist->begin();itr != flist->end();++itr)
-        {
-            FactionEntry const *factionEntryCalc = sFactionStore.LookupEntry(*itr);
-            if(factionEntryCalc)
-                res = ModifyOneFactionReputation(factionEntryCalc, standing);
-        }
-        return res;
-    }
-    else
-        return ModifyOneFactionReputation(factionEntry, standing);
-}
-
-bool ReputationMgr::ModifyOneFactionReputation(FactionEntry const* factionEntry, int32 standing)
-{
-    FactionStateList::iterator itr = m_factions.find(factionEntry->reputationListID);
-    if (itr != m_factions.end())
-    {
-        int32 BaseRep = GetBaseReputation(factionEntry);
-        int32 new_rep = BaseRep + itr->second.Standing + standing;
-
-        if (new_rep > Reputation_Cap)
-            new_rep = Reputation_Cap;
-        else
-            if (new_rep < Reputation_Bottom)
-                new_rep = Reputation_Bottom;
-
-        if(ReputationToRank(new_rep) <= REP_HOSTILE)
-            SetAtWar(&itr->second,true);
-
-        itr->second.Standing = new_rep - BaseRep;
-        itr->second.Changed = true;
-
-        SetVisible(&itr->second);
-        SendState(&itr->second);
-
-        m_player->ReputationChanged(factionEntry);
-
-        m_player->GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GAIN_REPUTATION,factionEntry->ID);
+        m_player->GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GAIN_REPUTATION,        factionEntry->ID);
         m_player->GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GAIN_EXALTED_REPUTATION,factionEntry->ID);
 
         return true;
