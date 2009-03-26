@@ -20,15 +20,15 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "dbcfile.h"
+#include "DBCFileLoader.h"
 
-DBCFile::DBCFile()
+DBCFileLoader::DBCFileLoader()
 {
     data = NULL;
     fieldsOffset = NULL;
 }
 
-bool DBCFile::Load(const char *filename, const char *fmt)
+bool DBCFileLoader::Load(const char *filename, const char *fmt)
 {
 
     uint32 header;
@@ -89,7 +89,7 @@ bool DBCFile::Load(const char *filename, const char *fmt)
     return true;
 }
 
-DBCFile::~DBCFile()
+DBCFileLoader::~DBCFileLoader()
 {
     if(data)
         delete [] data;
@@ -97,13 +97,13 @@ DBCFile::~DBCFile()
         delete [] fieldsOffset;
 }
 
-DBCFile::Record DBCFile::getRecord(size_t id)
+DBCFileLoader::Record DBCFileLoader::getRecord(size_t id)
 {
     assert(data);
     return Record(*this, data + id*recordSize);
 }
 
-uint32 DBCFile::GetFormatRecordSize(const char * format,int32* index_pos)
+uint32 DBCFileLoader::GetFormatRecordSize(const char * format,int32* index_pos)
 {
     uint32 recordsize = 0;
     int32 i = -1;
@@ -135,7 +135,7 @@ uint32 DBCFile::GetFormatRecordSize(const char * format,int32* index_pos)
     return recordsize;
 }
 
-char* DBCFile::AutoProduceData(const char* format, uint32& records, char**& indexTable)
+char* DBCFileLoader::AutoProduceData(const char* format, uint32& records, char**& indexTable)
 {
     /*
     format STRING, NA, FLOAT,NA,INT <=>
@@ -218,7 +218,7 @@ char* DBCFile::AutoProduceData(const char* format, uint32& records, char**& inde
     return dataTable;
 }
 
-char* DBCFile::AutoProduceStrings(const char* format, char* dataTable)
+char* DBCFileLoader::AutoProduceStrings(const char* format, char* dataTable)
 {
     if(strlen(format)!=fieldCount)
         return NULL;

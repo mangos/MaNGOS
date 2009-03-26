@@ -16,8 +16,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef DBCFILE_H
-#define DBCFILE_H
+#ifndef DBC_FILE_LOADER_H
+#define DBC_FILE_LOADER_H
 #include "Platform/Define.h"
 #include "Utilities/ByteConverter.h"
 #include <cassert>
@@ -35,11 +35,11 @@ enum
     FT_LOGIC='l'                                            //Logical (boolean)
 };
 
-class DBCFile
+class DBCFileLoader
 {
     public:
-        DBCFile();
-        ~DBCFile();
+        DBCFileLoader();
+        ~DBCFileLoader();
 
         bool Load(const char *filename, const char *fmt);
 
@@ -75,11 +75,11 @@ class DBCFile
                 }
 
             private:
-                Record(DBCFile &file_, unsigned char *offset_): offset(offset_), file(file_) {}
+                Record(DBCFileLoader &file_, unsigned char *offset_): offset(offset_), file(file_) {}
                 unsigned char *offset;
-                DBCFile &file;
+                DBCFileLoader &file;
 
-                friend class DBCFile;
+                friend class DBCFileLoader;
 
         };
 

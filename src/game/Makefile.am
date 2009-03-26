@@ -97,6 +97,11 @@ libmangosgame_a_SOURCES = \
 	CreatureAISelector.h \
 	Creature.cpp \
 	Creature.h \
+	DBCEnums.h \
+	DBCfmt.h \
+	DBCStores.cpp \
+	DBCStores.h \
+	DBCStructure.h	\
 	debugcmds.cpp \
 	DestinationHolder.cpp \
 	DestinationHolder.h \

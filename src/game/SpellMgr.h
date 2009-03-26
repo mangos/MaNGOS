@@ -23,7 +23,7 @@
 // For more high level function for sSpellStore data
 
 #include "SharedDefines.h"
-#include "Database/DBCStructure.h"
+#include "DBCStructure.h"
 #include "Database/SQLStorage.h"
 
 #include "Utilities/UnorderedMap.h"
