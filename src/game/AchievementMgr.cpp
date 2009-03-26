@@ -725,14 +725,24 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                 if(!worldOverlayEntry)
                     break;
 
-                int32 exploreFlag = GetAreaFlagByAreaID(worldOverlayEntry->areatableID);
-                if(exploreFlag < 0)
-                    break;
+                bool matchFound = false;
+                for (int i = 0; i < 3; ++i)
+                {
+                    int32 exploreFlag = GetAreaFlagByAreaID(worldOverlayEntry->areatableID[i]);
+                    if(exploreFlag < 0)
+                        break;
 
-                uint32 playerIndexOffset = uint32(exploreFlag) / 32;
-                uint32 mask = 1<< (uint32(exploreFlag) % 32);
+                    uint32 playerIndexOffset = uint32(exploreFlag) / 32;
+                    uint32 mask = 1<< (uint32(exploreFlag) % 32);
 
-                if(GetPlayer()->GetUInt32Value(PLAYER_EXPLORED_ZONES_1 + playerIndexOffset) & mask)
+                    if(GetPlayer()->GetUInt32Value(PLAYER_EXPLORED_ZONES_1 + playerIndexOffset) & mask)
+                    {
+                        matchFound = true;
+                        break;
+                    }
+                }
+
+                if(matchFound)
                     SetCriteriaProgress(achievementCriteria, 1);
                 break;
             }
@@ -745,7 +755,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                 if (miscvalue1 && miscvalue1 != achievementCriteria->gain_reputation.factionID)
                     continue;
 
-                int32 reputation = GetPlayer()->GetReputation(achievementCriteria->gain_reputation.factionID);
+                int32 reputation = GetPlayer()->GetReputationMgr().GetReputation(achievementCriteria->gain_reputation.factionID);
                 if (reputation > 0)
                     SetCriteriaProgress(achievementCriteria, reputation);
                 break;
@@ -757,13 +767,12 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                     continue;
 
                 uint32 counter = 0;
-                const FactionStateList factionStateList = GetPlayer()->GetFactionStateList();
+                FactionStateList const& factionStateList = GetPlayer()->GetReputationMgr().GetStateList();
                 for (FactionStateList::const_iterator iter = factionStateList.begin(); iter!= factionStateList.end(); ++iter)
-                {
-                    FactionEntry const *factionEntry = sFactionStore.LookupEntry(iter->second.ID);
-                    if(GetPlayer()->ReputationToRank(iter->second.Standing + GetPlayer()->GetBaseReputation(factionEntry)) >= REP_EXALTED)
-                        ++counter;
-                }
+                    if(FactionEntry const *factionEntry = sFactionStore.LookupEntry(iter->second.ID))
+                        if(ReputationMgr::ReputationToRank(iter->second.Standing + GetPlayer()->GetReputationMgr().GetBaseReputation(factionEntry)) >= REP_EXALTED)
+                            ++counter;
+
                 SetCriteriaProgress(achievementCriteria, counter);
                 break;
             }
@@ -1110,7 +1119,7 @@ AchievementCompletionState AchievementMgr::GetAchievementCompletionState(Achieve
 void AchievementMgr::SetCriteriaProgress(AchievementCriteriaEntry const* entry, uint32 changeValue, ProgressType ptype)
 {
     if((sLog.getLogFilter() & LOG_FILTER_ACHIEVEMENT_UPDATES)==0)
-        sLog.outDetail("AchievementMgr::SetCriteriaProgress(%u, %u) for (GUID:%u)", entry->ID, changeValue);
+        sLog.outDetail("AchievementMgr::SetCriteriaProgress(%u, %u) for (GUID:%u)", entry->ID, changeValue, m_player->GetGUIDLow());
 
     CriteriaProgress *progress = NULL;
 
