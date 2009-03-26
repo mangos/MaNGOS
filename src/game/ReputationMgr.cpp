@@ -79,46 +79,6 @@ int32 ReputationMgr::GetReputation(FactionEntry const* factionEntry) const
     return 0;
 }
 
-/*
-FactionState const* ReputationMgr::GetState( FactionTemplateEntry const* factionTemplateEntry ) const
-{
-    if(factionTemplateEntry->faction)
-        if (FactionEntry const* raw_faction = sFactionStore.LookupEntry(factionTemplateEntry->faction))
-            if (raw_faction->reputationListID >=0 )
-                return GetState(raw_faction);
-
-    return NULL;
-}
-*/
-/*
-ReputationRank ReputationMgr::GetRank(uint32 faction) const
-{
-    FactionEntry const*factionEntry = sFactionStore.LookupEntry(faction);
-    if(!factionEntry)
-        return MIN_REPUTATION_RANK;
-
-    return GetRank(factionEntry);
-}
-*/
-/*
-ReputationRank const* ReputationMgr::GetRankIfAny(FactionTemplateEntry const* factionTemplateEntry,ReputationRank& rankHolder) const
-{
-    if (!factionTemplateEntry->faction)
-        return NULL;
-
-    if (FactionEntry const* raw_faction = sFactionStore.LookupEntry(factionTemplateEntry->faction))
-    {
-        if (raw_faction->reputationListID >=0 )
-        {
-            rankHolder = GetRank(raw_faction);
-            return &rankHolder;
-        }
-    }
-
-    return NULL;
-}
-*/
-
 ReputationRank ReputationMgr::GetRank(FactionEntry const* factionEntry) const
 {
     int32 reputation = GetReputation(factionEntry);
@@ -304,37 +264,6 @@ bool ReputationMgr::SetOneFactionReputation(FactionEntry const* factionEntry, in
     }
     return false;
 }
-
-/*
-bool ReputationMgr::SetOneFactionReputation(FactionEntry const* factionEntry, int32 standing)
-{
-    FactionStateList::iterator itr = m_factions.find(factionEntry->reputationListID);
-    if (itr != m_factions.end())
-    {
-        if (standing > Reputation_Cap)
-            standing = Reputation_Cap;
-        else
-            if (standing < Reputation_Bottom)
-                standing = Reputation_Bottom;
-
-        int32 BaseRep = GetBaseReputation(factionEntry);
-        itr->second.Standing = standing - BaseRep;
-        itr->second.Changed = true;
-
-        if(itr->second.SetFactionVisible())
-            SendFactionVisible(&itr->second);
-
-        if(ReputationToRank(standing) <= REP_HOSTILE)
-            itr->second.SetAtWar(true);
-
-        SendState(&(itr->second));
-        m_player->GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GAIN_REPUTATION,factionEntry->ID);
-        m_player->GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GAIN_EXALTED_REPUTATION,factionEntry->ID);
-        return true;
-    }
-    return false;
-}
-*/
 
 bool ReputationMgr::ModifyReputation(FactionEntry const* factionEntry, int32 standing)
 {
