@@ -21,7 +21,7 @@
 
 DROP TABLE IF EXISTS `realmd_db_version`;
 CREATE TABLE `realmd_db_version` (
-  `required_6976_01_realmd_realmd_db_version` bit(1) default NULL
+  `required_7546_02_realmd_uptime` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Last applied sql update to DB';
 
 --
@@ -173,6 +173,29 @@ LOCK TABLES `realmlist` WRITE;
 INSERT INTO `realmlist` VALUES
 (1,'MaNGOS','127.0.0.1',8085,1,0,1,0,0);
 /*!40000 ALTER TABLE `realmlist` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `uptime`
+--
+
+DROP TABLE IF EXISTS `uptime`;
+CREATE TABLE `uptime` (
+  `realmid` int(11) unsigned NOT NULL,
+  `starttime` bigint(20) unsigned NOT NULL default '0',
+  `startstring` varchar(64) NOT NULL default '',
+  `uptime` bigint(20) unsigned NOT NULL default '0',
+  `maxplayers` smallint(5) unsigned NOT NULL default '0',
+  PRIMARY KEY  (`realmid`,`starttime`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Uptime system';
+
+--
+-- Dumping data for table `uptime`
+--
+
+LOCK TABLES `uptime` WRITE;
+/*!40000 ALTER TABLE `uptime` DISABLE KEYS */;
+/*!40000 ALTER TABLE `uptime` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

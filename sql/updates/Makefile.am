@@ -204,6 +204,8 @@ pkgdata_DATA = \
 	7536_01_mangos_spell_chain.sql \
 	7544_01_mangos_uptime.sql \
 	7544_02_characters_uptime.sql \
+	7546_01_characters_uptime.sql \
+	7546_02_realmd_uptime.sql \
 	README
 
 ## Additional files to include when running 'make dist'
@@ -388,4 +390,6 @@ EXTRA_DIST = \
 	7536_01_mangos_spell_chain.sql \
 	7544_01_mangos_uptime.sql \
 	7544_02_characters_uptime.sql \
+	7546_01_characters_uptime.sql \
+	7546_02_realmd_uptime.sql \
 	README

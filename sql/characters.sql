@@ -21,7 +21,7 @@
 
 DROP TABLE IF EXISTS `character_db_version`;
 CREATE TABLE `character_db_version` (
-  `required_7544_02_characters_uptime` bit(1) default NULL
+  `required_7546_01_characters_uptime` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Last applied sql update to DB';
 
 --
@@ -1320,28 +1320,6 @@ CREATE TABLE `saved_variables` (
 LOCK TABLES `saved_variables` WRITE;
 /*!40000 ALTER TABLE `saved_variables` DISABLE KEYS */;
 /*!40000 ALTER TABLE `saved_variables` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `uptime`
---
-
-DROP TABLE IF EXISTS `uptime`;
-CREATE TABLE `uptime` (
-  `starttime` bigint(20) unsigned NOT NULL default '0',
-  `startstring` varchar(64) NOT NULL default '',
-  `uptime` bigint(20) unsigned NOT NULL default '0',
-  `maxplayers` smallint(5) unsigned NOT NULL default '0',
-  PRIMARY KEY  (`starttime`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Uptime system';
-
---
--- Dumping data for table `uptime`
---
-
-LOCK TABLES `uptime` WRITE;
-/*!40000 ALTER TABLE `uptime` DISABLE KEYS */;
-/*!40000 ALTER TABLE `uptime` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
