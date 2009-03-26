@@ -235,15 +235,15 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
                         }
                     }
                 }
-                //movement anticheat;
-                //Correct finding GO guid in DB (thanks to GriffonHeart)
-                GameObject *obj = HashMapHolder<GameObject>::Find(movementInfo.t_guid);
-                if(obj)
-                    plMover->m_anti_TransportGUID = obj->GetDBTableGUIDLow();
-                else
-                    plMover->m_anti_TransportGUID = GUID_LOPART(movementInfo.t_guid);
-                // <<< movement anticheat
             }
+            //movement anticheat;
+            //Correct finding GO guid in DB (thanks to GriffonHeart)
+            GameObject *obj = HashMapHolder<GameObject>::Find(movementInfo.t_guid);
+            if(obj)
+                plMover->m_anti_TransportGUID = obj->GetDBTableGUIDLow();
+            else
+                plMover->m_anti_TransportGUID = GUID_LOPART(movementInfo.t_guid);
+            // <<< movement anticheat
         }
     } else if (plMover && plMover->m_anti_TransportGUID != 0){
         if (plMover && plMover->m_transport)               // if we were on a transport, leave
