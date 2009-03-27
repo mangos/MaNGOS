@@ -216,7 +216,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
             movementInfo.z+movementInfo.t_z, movementInfo.o+movementInfo.t_o) )
             return;
 
-        if (plMover && !plMover->m_anti_TransportGUID ==0 && (movementInfo.t_guid !=0))
+        if (plMover && plMover->m_anti_TransportGUID == 0 && (movementInfo.t_guid !=0))
         {
             // if we boarded a transport, add us to it
             if (plMover && !plMover->m_transport)
@@ -257,7 +257,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
         movementInfo.t_o = 0.0f;
         movementInfo.t_time = 0;
         movementInfo.t_seat = -1;
-        GetPlayer()->m_anti_TransportGUID = 0;
+        plMover->m_anti_TransportGUID = 0;
     }
 
     // fall damage generation (ignore in flight case that can be triggered also at lags in moment teleportation to another map).
