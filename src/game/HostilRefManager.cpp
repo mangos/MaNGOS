@@ -19,7 +19,7 @@
 #include "HostilRefManager.h"
 #include "ThreatManager.h"
 #include "Unit.h"
-#include "Database/DBCStructure.h"
+#include "DBCStructure.h"
 #include "SpellMgr.h"
 
 HostilRefManager::~HostilRefManager()

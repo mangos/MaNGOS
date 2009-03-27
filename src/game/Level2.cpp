@@ -2072,7 +2072,7 @@ bool ChatHandler::HandleModifyMorphCommand(const char* args)
 //kick player
 bool ChatHandler::HandleKickPlayerCommand(const char *args)
 {
-    if (!args)
+    if (!*args)
     {
         Player* player = getSelectedPlayer();
 
