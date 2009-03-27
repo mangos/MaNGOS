@@ -21,7 +21,7 @@
 
 #include "Common.h"
 #include "SharedDefines.h"
-#include "Database/DBCStructure.h"
+#include "DBCStructure.h"
 #include <map>
 
 enum FactionFlags
@@ -56,7 +56,8 @@ class QueryResult;
 class ReputationMgr
 {
     public:                                                 // constructors and global modifiers
-        explicit ReputationMgr(Player* owner) : m_player(owner) {}
+        explicit ReputationMgr(Player* owner) : m_player(owner),
+            m_visibleFactionCount(0), m_honoredFactionCount(0), m_reveredFactionCount(0), m_exaltedFactionCount(0) {}
         ~ReputationMgr() {}
 
         void SaveToDB();
@@ -68,6 +69,11 @@ class ReputationMgr
 
         static ReputationRank ReputationToRank(int32 standing);
     public:                                                 // accessors
+        uint8 GetVisibleFactionCount() const { return m_visibleFactionCount; }
+        uint8 GetHonoredFactionCount() const { return m_honoredFactionCount; }
+        uint8 GetReveredFactionCount() const { return m_reveredFactionCount; }
+        uint8 GetExaltedFactionCount() const { return m_exaltedFactionCount; }
+
         FactionStateList const& GetStateList() const { return m_factions; }
 
         FactionState const* GetState(FactionEntry const* factionEntry) const
@@ -95,8 +101,14 @@ class ReputationMgr
         }
 
     public:                                                 // modifiers
-        bool SetReputation(FactionEntry const* factionEntry, int32 standing);
-        bool ModifyReputation(FactionEntry const* factionEntry, int32 standing);
+        bool SetReputation(FactionEntry const* factionEntry, int32 standing)
+        {
+            return SetReputation(factionEntry, standing, false);
+        }
+        bool ModifyReputation(FactionEntry const* factionEntry, int32 standing)
+        {
+            return SetReputation(factionEntry, standing, true);
+        }
 
         void SetVisible(FactionTemplateEntry const* factionTemplateEntry);
         void SetVisible(FactionEntry const* factionEntry);
@@ -114,16 +126,21 @@ class ReputationMgr
     private:                                                // internal helper functions
         void Initilize();
         uint32 GetDefaultStateFlags(const FactionEntry *factionEntry) const;
-        bool SetOneFactionReputation(FactionEntry const* factionEntry, int32 standing);
-        bool ModifyOneFactionReputation(FactionEntry const* factionEntry, int32 standing);
+        bool SetReputation(FactionEntry const* factionEntry, int32 standing, bool incremental);
+        bool SetOneFactionReputation(FactionEntry const* factionEntry, int32 standing, bool incremental);
         void SetVisible(FactionState* faction);
         void SetAtWar(FactionState* faction, bool atWar);
         void SetInactive(FactionState* faction, bool inactive);
         void SendVisible(FactionState const* faction) const;
+        void UpdateRankCounters( ReputationRank old_rank, ReputationRank new_rank );
     private:
         Player* m_player;
         FactionStateList m_factions;
         ForcedReactions m_forcedReactions;
+        uint8 m_visibleFactionCount :8;
+        uint8 m_honoredFactionCount :8;
+        uint8 m_reveredFactionCount :8;
+        uint8 m_exaltedFactionCount :8;
 };
 
 #endif

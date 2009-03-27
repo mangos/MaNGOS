@@ -31,7 +31,7 @@
 #include "FollowerRefManager.h"
 #include "Utilities/EventProcessor.h"
 #include "MotionMaster.h"
-#include "Database/DBCStructure.h"
+#include "DBCStructure.h"
 #include <list>
 
 enum SpellInterruptFlags

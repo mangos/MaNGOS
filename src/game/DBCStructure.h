@@ -16,8 +16,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef DBCSTRUCTURE_H
-#define DBCSTRUCTURE_H
+#ifndef MANGOS_DBCSTRUCTURE_H
+#define MANGOS_DBCSTRUCTURE_H
 
 #include "DBCEnums.h"
 #include "Platform/Define.h"
@@ -1618,7 +1618,7 @@ struct WorldSafeLocsEntry
 struct WorldMapOverlayEntry
 {
     uint32    ID;                                           // 0
-    uint32    areatableID;                                  // 2
+    uint32    areatableID[4];                               // 2-5
 };
 
 // GCC have alternative #pragma pack() syntax and old gcc version not support pack(pop), also any gcc version not support it at some platform
