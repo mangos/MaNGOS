@@ -1745,6 +1745,28 @@ void Spell::EffectDummy(uint32 i)
                 return;
             }
             break;
+        case SPELLFAMILY_DEATHKNIGHT:
+            // Death Coil
+            if(m_spellInfo->SpellFamilyFlags & 0x002000LL)
+            {
+                if(m_caster->IsFriendlyTo(unitTarget))
+                {
+                    if(unitTarget->GetCreatureType() != CREATURE_TYPE_UNDEAD)
+                        return;
+
+                    // first rank have special multiplier
+                    int32 bp = damage * 1.5f;
+                    m_caster->CastCustomSpell(unitTarget,47633,&bp,NULL,NULL,true);
+                }
+                else
+                {
+                    // first rank have special multiplier
+                    int32 bp = damage;
+                    m_caster->CastCustomSpell(unitTarget,47632,&bp,NULL,NULL,true);
+                }
+                return;
+            }
+            break;
     }
 
     // pet auras
