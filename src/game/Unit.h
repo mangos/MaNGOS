@@ -1113,6 +1113,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
             return this;
         }
         Player* GetCharmerOrOwnerPlayerOrPlayerItself();
+        float GetCombatDistance( const Unit* target ) const;
 
         void SetPet(Pet* pet);
         void SetCharm(Unit* pet);

@@ -7372,6 +7372,16 @@ Unit* Unit::GetCharm() const
     return NULL;
 }
 
+float Unit::GetCombatDistance( const Unit* target ) const
+{
+    float radius = target->GetFloatValue(UNIT_FIELD_COMBATREACH) + GetFloatValue(UNIT_FIELD_COMBATREACH);
+    float dx = GetPositionX() - target->GetPositionX();
+    float dy = GetPositionY() - target->GetPositionY();
+    float dz = GetPositionZ() - target->GetPositionZ();
+    float dist = sqrt((dx*dx) + (dy*dy) + (dz*dz)) - radius;
+    return ( dist > 0 ? dist : 0);
+}
+
 void Unit::SetPet(Pet* pet)
 {
     SetUInt64Value(UNIT_FIELD_SUMMON, pet ? pet->GetGUID() : 0);

@@ -4750,9 +4750,7 @@ SpellCastResult Spell::CheckRange(bool strict)
     if(target && target != m_caster)
     {
         // distance from target in checks
-        float dist = m_caster->GetDistance(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ()) - target->GetFloatValue(UNIT_FIELD_COMBATREACH) - m_caster->GetFloatValue(UNIT_FIELD_COMBATREACH); // DasMy: respect victims dimension
-        if (dist < 0.0f)
-            dist = 0.0f;
+        float dist = m_caster->GetCombatDistance(target);
 
         if(dist > max_range)
             return SPELL_FAILED_OUT_OF_RANGE;               //0x5A;
