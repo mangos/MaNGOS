@@ -1586,7 +1586,12 @@ SpellEntry const *Creature::reachWithSpellAttack(Unit *pVictim)
         SpellRangeEntry const* srange = sSpellRangeStore.LookupEntry(spellInfo->rangeIndex);
         float range = GetSpellMaxRange(srange);
         float minrange = GetSpellMinRange(srange);
-        float dist = GetDistance(pVictim);
+
+        // DasMy: respect victims dimensions
+        float dist = GetDistance(pVictim) - pVictim->GetFloatValue(UNIT_FIELD_COMBATREACH) - GetFloatValue(UNIT_FIELD_COMBATREACH);
+        if (dist < 0.0f)
+            dist = 0.0f;
+
         //if(!isInFront( pVictim, range ) && spellInfo->AttributesEx )
         //    continue;
         if( dist > range || dist < minrange )
@@ -1632,7 +1637,12 @@ SpellEntry const *Creature::reachWithSpellCure(Unit *pVictim)
         SpellRangeEntry const* srange = sSpellRangeStore.LookupEntry(spellInfo->rangeIndex);
         float range = GetSpellMaxRange(srange);
         float minrange = GetSpellMinRange(srange);
-        float dist = GetDistance(pVictim);
+
+        // DasMy: respect victims dimensions
+        float dist = GetDistance(pVictim) - pVictim->GetFloatValue(UNIT_FIELD_COMBATREACH) - GetFloatValue(UNIT_FIELD_COMBATREACH);
+        if (dist < 0.0f)
+            dist = 0.0f;
+
         //if(!isInFront( pVictim, range ) && spellInfo->AttributesEx )
         //    continue;
         if( dist > range || dist < minrange )
