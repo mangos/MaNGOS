@@ -1159,6 +1159,10 @@ float WorldObject::GetAngle( const float x, const float y ) const
 
 bool WorldObject::HasInArc(const float arcangle, const WorldObject* obj) const
 {
+    // always have self in arc
+    if(obj == this)
+        return true;
+
     float arc = arcangle;
 
     // move arc to range 0.. 2*pi
