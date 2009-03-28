@@ -1750,3 +1750,12 @@ void Pet::CastPetAura(PetAura const* aura)
     else
         CastSpell(this, auraId, true);
 }
+
+void Pet::learnSpellHighRank(uint32 spellid)
+{
+    learnSpell(spellid);
+
+    SpellChainMapNext const& nextMap = spellmgr.GetSpellChainNext();
+    for(SpellChainMapNext::const_iterator itr = nextMap.lower_bound(spellid); itr != nextMap.upper_bound(spellid); ++itr)
+        learnSpellHighRank(itr->second);
+}
