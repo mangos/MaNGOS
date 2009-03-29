@@ -120,7 +120,7 @@ struct MANGOS_DLL_DECL ScriptedAI : public CreatureAI
     void SpellHit(Unit *, const SpellEntry*){}
 
     // Called when spell hits creature's target
-    void SpellHitTarget(WorldObject*, const SpellEntry*) {}
+    void SpellHitTarget(Unit*, const SpellEntry*) {}
 
     Creature* m_creature;
 

@@ -1223,10 +1223,6 @@ void Spell::DoAllEffectOnTarget(GOTargetInfo *target)
     // ignore autorepeat/melee casts for speed (not exist quest for spells (hm... )
     if( m_caster->GetTypeId() == TYPEID_PLAYER && !IsAutoRepeat() && !IsNextMeleeSwingSpell() && !IsChannelActive() )
         ((Player*)m_caster)->CastedCreatureOrGO(go->GetEntry(),go->GetGUID(),m_spellInfo->Id);
-
-    // Call scripted function for AI if this spell is casted by a creature
-    if(m_caster->GetTypeId()==TYPEID_UNIT && ((Creature*)m_caster)->AI())
-        ((Creature*)m_caster)->AI()->SpellHitTarget(go,m_spellInfo);
 }
 
 void Spell::DoAllEffectOnTarget(ItemTargetInfo *target)

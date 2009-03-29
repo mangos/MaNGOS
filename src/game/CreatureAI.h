@@ -81,7 +81,7 @@ class MANGOS_DLL_SPEC CreatureAI
         virtual void SpellHit(Unit*, const SpellEntry*) {}
 
         // Called when spell hits creature's target
-        virtual void SpellHitTarget(WorldObject*, const SpellEntry*) {}
+        virtual void SpellHitTarget(Unit*, const SpellEntry*) {}
 
         // Called when vitim entered water and creature can not enter water
         virtual bool canReachByRangeAttack(Unit*) { return false; }
