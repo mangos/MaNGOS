@@ -1070,12 +1070,12 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
             caster->ProcDamageAndSpell(unit, procAttacker, procVictim, procEx, 0, m_attackType, m_spellInfo);
     }
 
-    // Call scripted function for AI if this spell is casted upon a creature (except pets)
+    // Call scripted function for AI if this spell is casted upon a creature
     if(unit->GetTypeId()==TYPEID_UNIT)
     {
         // cast at creature (or GO) quest objectives update at successful cast finished (+channel finished)
-        // ignore autorepeat/melee casts for speed (not exist quest for spells (hm... )
-        if( m_caster->GetTypeId() == TYPEID_PLAYER && !IsAutoRepeat() && !IsNextMeleeSwingSpell() && !IsChannelActive() )
+        // ignore pets or autorepeat/melee casts for speed (not exist quest for spells (hm... )
+        if( !((Creature*)unit)->isPet() && m_caster->GetTypeId() == TYPEID_PLAYER && !IsAutoRepeat() && !IsNextMeleeSwingSpell() && !IsChannelActive() )
             ((Player*)m_caster)->CastedCreatureOrGO(unit->GetEntry(),unit->GetGUID(),m_spellInfo->Id);
 
         if(((Creature*)unit)->AI())
