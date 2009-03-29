@@ -27,6 +27,7 @@
 
 class Unit;
 class Creature;
+class WorldObject;
 struct SpellEntry;
 
 #define TIME_INTERVAL_LOOK   5000
@@ -78,6 +79,9 @@ class MANGOS_DLL_SPEC CreatureAI
 
         // Called when hit by a spell
         virtual void SpellHit(Unit*, const SpellEntry*) {}
+
+        // Called when spell hits creature's target
+        virtual void SpellHitTarget(WorldObject*, const SpellEntry*) {}
 
         // Called when vitim entered water and creature can not enter water
         virtual bool canReachByRangeAttack(Unit*) { return false; }
