@@ -1248,6 +1248,7 @@ void Aura::HandleAddModifier(bool apply, bool Real)
             case 34754:    // Clearcasting
             case 34936:    // Backlash
             case 48108:    // Hot Streak
+            case 51124:    // Killing Machine
             case 54741:    // Firestarter
             case 57761:    // Fireball!
                 SetAuraCharges(1);
@@ -2252,7 +2253,7 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                     mod->value = m_modifier.m_amount;
                     mod->type = SPELLMOD_PCT;
                     mod->spellId = GetId();
-                    mod->mask = 0x0000000200000000LL;
+                    mod->mask = 0x0000200000000000LL;
                     mod->mask2= 0LL;
                     m_spellmod = mod;
                 }
