@@ -166,12 +166,15 @@ bool ChatHandler::HandleAccountOnlineListCommand(const char* args)
     ///- Get the list of accounts ID logged to the realm
     QueryResult *resultDB = CharacterDatabase.Query("SELECT name,account FROM characters WHERE online > 0");
     if (!resultDB)
+    {
+        SendSysMessage(LANG_ACCOUNT_LIST_EMPTY);
         return true;
+    }
 
     ///- Display the list of account/characters online
-    SendSysMessage("=====================================================================");
+    SendSysMessage(LANG_ACCOUNT_LIST_BAR);
     SendSysMessage(LANG_ACCOUNT_LIST_HEADER);
-    SendSysMessage("=====================================================================");
+    SendSysMessage(LANG_ACCOUNT_LIST_BAR);
 
     ///- Circle through accounts
     do
@@ -188,7 +191,7 @@ bool ChatHandler::HandleAccountOnlineListCommand(const char* args)
         if(resultLogin)
         {
             Field *fieldsLogin = resultLogin->Fetch();
-            PSendSysMessage("|%15s| %20s | %15s |%4d|%5d|",
+            PSendSysMessage(LANG_ACCOUNT_LIST_LINE,
                 fieldsLogin[0].GetString(),name.c_str(),fieldsLogin[1].GetString(),fieldsLogin[2].GetUInt32(),fieldsLogin[3].GetUInt32());
 
             delete resultLogin;
@@ -200,7 +203,7 @@ bool ChatHandler::HandleAccountOnlineListCommand(const char* args)
 
     delete resultDB;
 
-    SendSysMessage("=====================================================================");
+    SendSysMessage(LANG_ACCOUNT_LIST_BAR);
     return true;
 }
 

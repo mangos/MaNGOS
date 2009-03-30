@@ -22,6 +22,7 @@
 #include <vector>
 #include <string>
 #include "Utilities/UnorderedMap.h"
+#include "Policies/Singleton.h"
 
 #define MAX_WAYPOINT_TEXT 5
 struct WaypointBehavior

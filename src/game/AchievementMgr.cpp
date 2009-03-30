@@ -197,10 +197,8 @@ void AchievementMgr::SaveToDB()
 
         if(need_execute)
         {
-            CharacterDatabase.BeginTransaction ();
             CharacterDatabase.Execute( ssdel.str().c_str() );
             CharacterDatabase.Execute( ssins.str().c_str() );
-            CharacterDatabase.CommitTransaction ();
         }
     }
 
@@ -258,12 +256,10 @@ void AchievementMgr::SaveToDB()
 
         if(need_execute_del || need_execute_ins)
         {
-            CharacterDatabase.BeginTransaction ();
             if(need_execute_del)
                 CharacterDatabase.Execute( ssdel.str().c_str() );
             if(need_execute_ins)
                 CharacterDatabase.Execute( ssins.str().c_str() );
-            CharacterDatabase.CommitTransaction ();
         }
     }
 }
@@ -308,6 +304,9 @@ void AchievementMgr::LoadFromDB(QueryResult *achievementResult, QueryResult *cri
 
 void AchievementMgr::SendAchievementEarned(AchievementEntry const* achievement)
 {
+    if(GetPlayer()->GetSession()->PlayerLoading())
+        return;
+
     #ifdef MANGOS_DEBUG
     if((sLog.getLogFilter() & LOG_FILTER_ACHIEVEMENT_UPDATES)==0)
         sLog.outDebug("AchievementMgr::SendAchievementEarned(%u)", achievement->ID);
@@ -515,8 +514,18 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                 SetCriteriaProgress(achievementCriteria, GetPlayer()->getLevel());
                 break;
             case ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL:
+                // update at loading or specific skill update
+                if(miscvalue1 && miscvalue1 != achievementCriteria->reach_skill_level.skillID)
+                    continue;
                 if(uint32 skillvalue = GetPlayer()->GetBaseSkillValue(achievementCriteria->reach_skill_level.skillID))
                     SetCriteriaProgress(achievementCriteria, skillvalue);
+                break;
+            case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILL_LEVEL:
+                // update at loading or specific skill update
+                if(miscvalue1 && miscvalue1 != achievementCriteria->learn_skill_level.skillID)
+                    continue;
+                if(uint32 maxSkillvalue = GetPlayer()->GetPureMaxSkillValue(achievementCriteria->learn_skill_level.skillID))
+                    SetCriteriaProgress(achievementCriteria, maxSkillvalue);
                 break;
             case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_ACHIEVEMENT:
                 if(m_completedAchievements.find(achievementCriteria->complete_achievement.linkedAchievement) != m_completedAchievements.end())
@@ -909,7 +918,6 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
             case ACHIEVEMENT_CRITERIA_TYPE_WIN_RATED_ARENA:
             case ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_TEAM_RATING:
             case ACHIEVEMENT_CRITERIA_TYPE_REACH_TEAM_RATING:
-            case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILL_LEVEL:
             case ACHIEVEMENT_CRITERIA_TYPE_OWN_RANK:
             case ACHIEVEMENT_CRITERIA_TYPE_EQUIP_EPIC_ITEM:
             case ACHIEVEMENT_CRITERIA_TYPE_HK_CLASS:
@@ -999,6 +1007,8 @@ bool AchievementMgr::IsCompletedCriteria(AchievementCriteriaEntry const* achieve
         }
         case ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL:
             return progress->counter >= achievementCriteria->reach_skill_level.skillLevel;
+        case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILL_LEVEL:
+            return progress->counter >= (achievementCriteria->learn_skill_level.skillLevel * 75);
         case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_ACHIEVEMENT:
             return progress->counter >= 1;
         case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST_COUNT:

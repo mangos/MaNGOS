@@ -1179,6 +1179,10 @@ float WorldObject::GetAngle( const float x, const float y ) const
 
 bool WorldObject::HasInArc(const float arcangle, const WorldObject* obj) const
 {
+    // always have self in arc
+    if(obj == this)
+        return true;
+
     float arc = arcangle;
 
     // move arc to range 0.. 2*pi
@@ -1323,6 +1327,19 @@ void WorldObject::MonsterYell(int32 textId, uint32 language, uint64 TargetGuid)
     TypeContainerVisitor<MaNGOS::PlayerDistWorker<MaNGOS::LocalizedPacketDo<MaNGOS::MonsterChatBuilder> >, WorldTypeMapContainer > message(say_worker);
     CellLock<GridReadGuard> cell_lock(cell, p);
     cell_lock->Visit(cell_lock, message, *GetMap());
+}
+
+void WorldObject::MonsterYellToZone(int32 textId, uint32 language, uint64 TargetGuid)
+{
+    MaNGOS::MonsterChatBuilder say_build(*this, CHAT_MSG_MONSTER_YELL, textId,language,TargetGuid);
+    MaNGOS::LocalizedPacketDo<MaNGOS::MonsterChatBuilder> say_do(say_build);
+
+    uint32 zoneid = GetZoneId();
+
+    Map::PlayerList const& pList = GetMap()->GetPlayers();
+    for(Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
+        if(itr->getSource()->GetZoneId()==zoneid)
+            say_do(itr->getSource());
 }
 
 void WorldObject::MonsterTextEmote(int32 textId, uint64 TargetGuid, bool IsBossEmote)

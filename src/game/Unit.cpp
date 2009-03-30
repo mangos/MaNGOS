@@ -2275,8 +2275,8 @@ bool Unit::isSpellBlocked(Unit *pVictim, SpellEntry const *spellProto, WeaponAtt
            ((Creature*)pVictim)->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_NO_BLOCK )
                 return false;
 
-        float blockChance = GetUnitBlockChance();
-        blockChance += (GetWeaponSkillValue(attackType) - pVictim->GetMaxSkillValueForLevel() )*0.04;
+        float blockChance = pVictim->GetUnitBlockChance();
+        blockChance += (int32(GetWeaponSkillValue(attackType)) - int32(pVictim->GetMaxSkillValueForLevel()))*0.04f;
         if (roll_chance_f(blockChance))
             return true;
     }
@@ -6355,7 +6355,7 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
                     }
                     // percent stored in effect 1 (class scripts) base points
                     int32 cost = originalSpell->manaCost + originalSpell->ManaCostPercentage * GetCreateMana() / 100;
-                    basepoints0 = cost*(auraSpellInfo->EffectBasePoints[1]+1)/100;
+                    basepoints0 = cost*auraSpellInfo->CalculateSimpleValue(1)/100;
                     trigger_spell_id = 20272;
                     target = this;
                 }
@@ -7360,6 +7360,16 @@ Unit* Unit::GetCharm() const
     return NULL;
 }
 
+float Unit::GetCombatDistance( const Unit* target ) const
+{
+    float radius = target->GetFloatValue(UNIT_FIELD_COMBATREACH) + GetFloatValue(UNIT_FIELD_COMBATREACH);
+    float dx = GetPositionX() - target->GetPositionX();
+    float dy = GetPositionY() - target->GetPositionY();
+    float dz = GetPositionZ() - target->GetPositionZ();
+    float dist = sqrt((dx*dx) + (dy*dy) + (dz*dz)) - radius;
+    return ( dist > 0 ? dist : 0);
+}
+
 void Unit::SetPet(Pet* pet)
 {
     SetUInt64Value(UNIT_FIELD_SUMMON, pet ? pet->GetGUID() : 0);
@@ -7680,8 +7690,8 @@ uint32 Unit::SpellDamageBonus(Unit *pVictim, SpellEntry const *spellProto, uint3
                     DotTicks = DotDuration / spellProto->EffectAmplitude[x];
                 if(DotTicks)
                 {
-                    DoneAdvertisedBenefit /= DotTicks*int32(stack);
-                    TakenAdvertisedBenefit /= DotTicks*int32(stack);
+                    DoneAdvertisedBenefit = DoneAdvertisedBenefit * int32(stack) / DotTicks;
+                    TakenAdvertisedBenefit = TakenAdvertisedBenefit * int32(stack) / DotTicks;
                 }
             }
         }
@@ -8098,8 +8108,8 @@ uint32 Unit::SpellHealingBonus(Unit *pVictim, SpellEntry const *spellProto, uint
                     DotTicks = DotDuration / spellProto->EffectAmplitude[x];
                 if(DotTicks)
                 {
-                    DoneAdvertisedBenefit /= DotTicks*int32(stack);
-                    TakenAdvertisedBenefit /= DotTicks*int32(stack);
+                    DoneAdvertisedBenefit = DoneAdvertisedBenefit * int32(stack) / DotTicks;
+                    TakenAdvertisedBenefit = TakenAdvertisedBenefit * int32(stack) / DotTicks;
                 }
             }
         }
