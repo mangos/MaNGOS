@@ -1422,7 +1422,7 @@ struct StableSlotPricesEntry
 {
     uint32  Id;                                             // 0
     uint32  Group;                                          // 1, 0 - can't be controlled?, 1 - something guardian?, 2 - pet?, 3 - something controllable?, 4 - taxi/mount?
-    uint32  Unk2;                                           // 2, 14 rows > 0
+    uint32  FactionId;                                      // 2, 14 rows > 0
     uint32  Type;                                           // 3, see enum
     uint32  Slot;                                           // 4, 0-6
     uint32  Flags;                                          // 5
