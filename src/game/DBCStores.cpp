@@ -20,6 +20,7 @@
 #include "Policies/SingletonImp.h"
 #include "Log.h"
 #include "ProgressBar.h"
+#include "SharedDefines.h"
 
 #include "DBCfmt.h"
 
@@ -391,9 +392,13 @@ void LoadDBCStores(const std::string& dataPath)
             if(!talentTabInfo)
                 continue;
 
+            // prevent memory corruption; otherwise cls will become 12 below
+            if ((talentTabInfo->ClassMask & CLASSMASK_ALL_PLAYABLE)==0)
+                continue;
+
             // store class talent tab pages
             uint32 cls = 1;
-            for(uint32 m=1;!(m & talentTabInfo->ClassMask) && cls < 12 /*MAX_CLASSES*/;m <<=1, ++cls) {}
+            for(uint32 m=1;!(m & talentTabInfo->ClassMask) && cls < MAX_CLASSES;m <<=1, ++cls) {}
 
             sTalentTabPages[cls][talentTabInfo->tabpage]=talentTabId;
 
