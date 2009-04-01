@@ -300,7 +300,7 @@ class MANGOS_DLL_SPEC Aura
         void SetUpdated(bool val) { m_updated = val; }
 
         bool IsSingleTarget() {return m_isSingleTargetAura;}
-        bool SetIsSingleTarget(bool val) { m_isSingleTargetAura = val;}
+        void SetIsSingleTarget(bool val) { m_isSingleTargetAura = val;}
 
         void SetRemoveMode(AuraRemoveMode mode) { m_removeMode = mode; }
 
