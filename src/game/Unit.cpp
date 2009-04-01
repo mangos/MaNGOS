@@ -3423,7 +3423,7 @@ bool Unit::AddAura(Aura *Aur)
     }
 
     // update single target auras list (before aura add to aura list, to prevent unexpected remove recently added aura)
-    if (IsSingleTargetSpell(aurSpellInfo) && Aur->GetTarget())
+    if (Aur->IsSingleTarget() && Aur->GetTarget())
     {
         // caster pointer can be deleted in time aura remove, find it by guid at each iteration
         for(;;)
@@ -3704,10 +3704,9 @@ void Unit::RemoveAurasDueToSpellBySteal(uint32 spellId, uint64 casterGUID, Unit 
         if (aur->GetId() == spellId && aur->GetCasterGUID() == casterGUID)
         {
             int32 basePoints = aur->GetBasePoints();
-            // construct the new aura for the attacker
-            Aura * new_aur = CreateAura(aur->GetSpellProto(), aur->GetEffIndex(), &basePoints, stealer);
-            if(!new_aur)
-                continue;
+            // construct the new aura for the attacker - will never return NULL, it's just a wrapper for
+            // some different constructors
+            Aura * new_aur = CreateAura(aur->GetSpellProto(), aur->GetEffIndex(), &basePoints, stealer, this);
 
             // set its duration and maximum duration
             // max duration 2 minutes (in msecs)
@@ -3715,6 +3714,12 @@ void Unit::RemoveAurasDueToSpellBySteal(uint32 spellId, uint64 casterGUID, Unit 
             const int32 max_dur = 2*MINUTE*IN_MILISECONDS;
             new_aur->SetAuraMaxDuration( max_dur > dur ? dur : max_dur );
             new_aur->SetAuraDuration( max_dur > dur ? dur : max_dur );
+
+            // Unregister _before_ adding to stealer
+            aur->UnregisterSingleCastAura();
+
+            // strange but intended behaviour: Stolen single target auras won't be treated as single targeted
+            new_aur->SetIsSingleTarget(false);
 
             // add the new aura to stealer
             stealer->AddAura(new_aur);
@@ -3842,21 +3847,7 @@ void Unit::RemoveAura(AuraMap::iterator &i, AuraRemoveMode mode)
     Aura* Aur = i->second;
     SpellEntry const* AurSpellInfo = Aur->GetSpellProto();
 
-    Unit* caster = NULL;
-    if (IsSingleTargetSpell(AurSpellInfo))
-    {
-        caster = Aur->GetCaster();
-        if(caster)
-        {
-            AuraList& scAuras = caster->GetSingleCastAuras();
-            scAuras.remove(Aur);
-        }
-        else
-        {
-            sLog.outError("Couldn't find the caster of the single target aura, may crash later!");
-            assert(false);
-        }
-    }
+    Aur->UnregisterSingleCastAura();
 
     // remove from list before mods removing (prevent cyclic calls, mods added before including to aura list - use reverse order)
     if (Aur->GetModifier()->m_auraname < TOTAL_AURAS)
@@ -3876,8 +3867,7 @@ void Unit::RemoveAura(AuraMap::iterator &i, AuraRemoveMode mode)
     bool caster_channeled = false;
     if(IsChanneledSpell(AurSpellInfo))
     {
-        if(!caster)                                         // can be already located for IsSingleTargetSpell case
-            caster = Aur->GetCaster();
+        Unit* caster = Aur->GetCaster();
 
         if(caster)
         {

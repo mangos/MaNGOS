@@ -360,6 +360,8 @@ m_updated(false), m_isRemovedOnShapeLost(true), m_in_use(false)
     m_isPassive = IsPassiveSpell(GetId());
     m_positive = IsPositiveEffect(GetId(), m_effIndex);
 
+    m_isSingleTargetAura = IsSingleTargetSpell(m_spellProto);
+
     m_applyTime = time(NULL);
 
     int32 damage;
@@ -6742,3 +6744,21 @@ void Aura::HandlePhase(bool apply, bool Real)
         m_target->SetVisibility(m_target->GetVisibility());
 }
 
+void Aura::UnregisterSingleCastAura()
+{
+    if (IsSingleTarget())
+    {
+        Unit* caster = NULL;
+        caster = GetCaster();
+        if(caster)
+        {
+            caster->GetSingleCastAuras().remove(this);
+        }
+        else
+        {
+            sLog.outError("Couldn't find the caster of the single target aura, may crash later!");
+            assert(false);
+        }
+        m_isSingleTargetAura = false;
+    }
+}
