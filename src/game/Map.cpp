@@ -337,10 +337,12 @@ Map::EnsureGridCreated(const GridPair &p)
 void
 Map::EnsureGridLoadedAtEnter(const Cell &cell, Player *player)
 {
-    NGridType *grid = getNGrid(cell.GridX(), cell.GridY());
+    NGridType *grid;
 
     if(EnsureGridLoaded(cell))
     {
+        grid = getNGrid(cell.GridX(), cell.GridY());
+
         if (player)
         {
             player->SendDelayResponse(MAX_GRID_LOAD_TIME);
@@ -354,6 +356,8 @@ Map::EnsureGridLoadedAtEnter(const Cell &cell, Player *player)
         ResetGridExpiry(*getNGrid(cell.GridX(), cell.GridY()), 0.1f);
         grid->SetGridState(GRID_STATE_ACTIVE);
     }
+    else
+        grid = getNGrid(cell.GridX(), cell.GridY());
 
     if (player)
         AddToGrid(player,grid,cell);

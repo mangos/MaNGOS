@@ -425,7 +425,7 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         CreatureMoveList i_creaturesToMove;
 
         bool loaded(const GridPair &) const;
-        void  EnsureGridCreated(const GridPair &);
+        void EnsureGridCreated(const GridPair &);
         bool EnsureGridLoaded(Cell const&);
         void EnsureGridLoadedAtEnter(Cell const&, Player* player = NULL);
 
