@@ -1875,7 +1875,8 @@ void Map::SendInitTransports( Player * player )
 
     for (MapManager::TransportSet::iterator i = tset.begin(); i != tset.end(); ++i)
     {
-        if((*i) != player->GetTransport())                  // send data for current transport in other place
+        // send data for current transport in other place
+        if((*i) != player->GetTransport() && (*i)->GetMapId()==i_id)
         {
             hasTransport = true;
             (*i)->BuildCreateUpdateBlockForPlayer(&transData, player);
@@ -1902,7 +1903,7 @@ void Map::SendRemoveTransports( Player * player )
 
     // except used transport
     for (MapManager::TransportSet::iterator i = tset.begin(); i != tset.end(); ++i)
-        if(player->GetTransport() != (*i))
+        if((*i) != player->GetTransport() && (*i)->GetMapId()!=i_id)
             (*i)->BuildOutOfRangeUpdateBlock(&transData);
 
     WorldPacket packet;
