@@ -10653,7 +10653,7 @@ Player* Unit::GetSpellModOwner()
 void Unit::SendPetCastFail(uint32 spellid, SpellCastResult msg)
 {
     if(msg == SPELL_CAST_OK)
-        return; 
+        return;
 
     Unit *owner = GetCharmerOrOwner();
     if(!owner || owner->GetTypeId() != TYPEID_PLAYER)
