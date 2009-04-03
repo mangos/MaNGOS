@@ -1454,6 +1454,7 @@ void Creature::DeleteFromDB()
     WorldDatabase.PExecuteLog("DELETE FROM creature_movement WHERE id = '%u'", m_DBTableGuid);
     WorldDatabase.PExecuteLog("DELETE FROM game_event_creature WHERE guid = '%u'", m_DBTableGuid);
     WorldDatabase.PExecuteLog("DELETE FROM game_event_model_equip WHERE guid = '%u'", m_DBTableGuid);
+    WorldDatabase.PExecuteLog("DELETE FROM creature_battleground WHERE guid = '%u'", m_DBTableGuid);
     WorldDatabase.CommitTransaction();
 }
 

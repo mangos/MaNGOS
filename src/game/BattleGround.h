@@ -22,6 +22,7 @@
 #include "Common.h"
 #include "SharedDefines.h"
 
+#define BG_EVENT_NONE 255
 class Creature;
 class GameObject;
 class Group;
@@ -29,6 +30,12 @@ class Player;
 class WorldPacket;
 
 struct WorldSafeLocsEntry;
+
+struct BattleGroundEventIdx
+{
+    uint8 event1;
+    uint8 event2;
+};
 
 enum BattleGroundSounds
 {

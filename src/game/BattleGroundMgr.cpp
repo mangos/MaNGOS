@@ -2098,3 +2098,67 @@ bool BattleGroundMgr::IsBGWeekend(BattleGroundTypeId bgTypeId)
             return false;
     }
 }
+
+void BattleGroundMgr::LoadCreatureBattleEventIndexes()
+{
+    mCreatureBattleEventIndexMap.clear();                   // need for reload case
+    QueryResult *result = WorldDatabase.Query( "SELECT guid, event1, event2 FROM creature_battleground" );
+    uint32 count = 0;
+    if( !result )
+    {
+        barGoLink bar( 1 );
+        bar.step();
+
+        sLog.outString();
+        sLog.outString( ">> Loaded 0 battleground eventindexes for creatures - table is empty!" );
+        return;
+    }
+    barGoLink bar( result->GetRowCount() );
+    do
+    {
+        ++count;
+        bar.step();
+        Field *fields = result->Fetch();
+        uint32 dbTableGuidLow   = fields[0].GetUInt32();
+        BattleGroundEventIdx events;
+        events.event1           = fields[1].GetUInt8();
+        events.event2           = fields[2].GetUInt8();
+        mCreatureBattleEventIndexMap[dbTableGuidLow] = events;
+
+    } while( result->NextRow() );
+    delete result;
+    sLog.outString();
+    sLog.outString( ">> Loaded %u battleground eventindexes for creatures", count );
+}
+
+void BattleGroundMgr::LoadGameObjectBattleEventIndexes()
+{
+    mGameObjectBattleEventIndexMap.clear();                   // need for reload case
+    QueryResult *result = WorldDatabase.Query( "SELECT guid, event1, event2 FROM gameobject_battleground" );
+    uint32 count = 0;
+    if( !result )
+    {
+        barGoLink bar( 1 );
+        bar.step();
+
+        sLog.outString();
+        sLog.outString( ">> Loaded 0 battleground eventindexes for gameobjects - table is empty!" );
+        return;
+    }
+    barGoLink bar( result->GetRowCount() );
+    do
+    {
+        ++count;
+        bar.step();
+        Field *fields = result->Fetch();
+        uint32 dbTableGuidLow   = fields[0].GetUInt32();
+        BattleGroundEventIdx events;
+        events.event1           = fields[1].GetUInt8();
+        events.event2           = fields[2].GetUInt8();
+        mGameObjectBattleEventIndexMap[dbTableGuidLow] = events;
+
+    } while( result->NextRow() );
+    delete result;
+    sLog.outString();
+    sLog.outString( ">> Loaded %u battleground eventindexes for gameobjects", count );
+}
