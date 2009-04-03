@@ -34,6 +34,11 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
     CHECK_PACKET_SIZE(recvPacket,1+1+1+4+8+4+1);
 
     Player* pUser = _player;
+
+    // ignore for remote control state
+    if(pUser->m_mover != pUser)
+        return;
+
     uint8 bagIndex, slot;
     uint8 unk_flags;                                        // flags (if 0x02 - some additional data are received)
     uint8 cast_count;                                       // next cast if exists (single or not)
@@ -138,6 +143,11 @@ void WorldSession::HandleOpenItemOpcode(WorldPacket& recvPacket)
     sLog.outDetail("WORLD: CMSG_OPEN_ITEM packet, data length = %i",(uint32)recvPacket.size());
 
     Player* pUser = _player;
+
+    // ignore for remote control state
+    if(pUser->m_mover != pUser)
+        return;
+
     uint8 bagIndex, slot;
 
     recvPacket >> bagIndex >> slot;
@@ -215,6 +225,11 @@ void WorldSession::HandleGameObjectUseOpcode( WorldPacket & recv_data )
     recv_data >> guid;
 
     sLog.outDebug( "WORLD: Recvd CMSG_GAMEOBJ_USE Message [guid=%u]", GUID_LOPART(guid));
+
+    // ignore for remote control state
+    if(_player->m_mover != _player)
+        return;
+
     GameObject *obj = ObjectAccessor::GetGameObject(*_player, guid);
 
     if(!obj)
@@ -234,6 +249,10 @@ void WorldSession::HandleGameobjectReportUse(WorldPacket& recvPacket)
     recvPacket >> guid;
 
     sLog.outDebug( "WORLD: Recvd CMSG_GAMEOBJ_REPORT_USE Message [in game guid: %u]", GUID_LOPART(guid));
+
+    // ignore for remote control state
+    if(_player->m_mover != _player)
+        return;
 
     GameObject* go = ObjectAccessor::GetGameObject(*_player,guid);
     if(!go)
@@ -255,6 +274,11 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
     recvPacket >> spellId;
     recvPacket >> unk_flags;                                // flags (if 0x02 - some additional data are received)
 
+    // ignore for remote control state (for player case)
+    Unit* mover = _player->m_mover;
+    if(mover != _player && mover->GetTypeId()==TYPEID_PLAYER)
+        return;
+
     sLog.outDebug("WORLD: got cast spell packet, spellId - %u, cast_count: %u, unk_flags %u, data length = %i",
         spellId, cast_count, unk_flags, (uint32)recvPacket.size());
 
@@ -266,16 +290,28 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    // not have spell in spellbook or spell passive and not casted by client
-    if ( !_player->HasActiveSpell (spellId) || IsPassiveSpell(spellId) )
+    if(mover->GetTypeId()==TYPEID_PLAYER)
     {
-        //cheater? kick? ban?
-        return;
+        // not have spell in spellbook or spell passive and not casted by client
+        if (!((Player*)mover)->HasActiveSpell (spellId) || IsPassiveSpell(spellId) )
+        {
+            //cheater? kick? ban?
+            return;
+        }
+    }
+    else
+    {
+        // not have spell in spellbook or spell passive and not casted by client
+        if (!((Creature*)mover)->HasSpell(spellId) || IsPassiveSpell(spellId) )
+        {
+            //cheater? kick? ban?
+            return;
+        }
     }
 
     // client provided targets
     SpellCastTargets targets;
-    if(!targets.read(&recvPacket,_player))
+    if(!targets.read(&recvPacket,mover))
         return;
 
     // auto-selection buff level base at target level (in spellInfo)
@@ -288,7 +324,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
             spellInfo = actualSpellInfo;
     }
 
-    Spell *spell = new Spell(_player, spellInfo, false);
+    Spell *spell = new Spell(mover, spellInfo, false);
     spell->m_cast_count = cast_count;                       // set count of casts
     spell->prepare(&targets);
 }
@@ -296,6 +332,11 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
 void WorldSession::HandleCancelCastOpcode(WorldPacket& recvPacket)
 {
     CHECK_PACKET_SIZE(recvPacket,5);
+
+    // ignore for remote control state (for player case)
+    Unit* mover = _player->m_mover;
+    if(mover != _player && mover->GetTypeId()==TYPEID_PLAYER)
+        return;
 
     // increments with every CANCEL packet, don't use for now
     uint8 counter;
@@ -307,13 +348,17 @@ void WorldSession::HandleCancelCastOpcode(WorldPacket& recvPacket)
     if(spellId==26679)
         return;
 
-    if(_player->IsNonMeleeSpellCasted(false))
-        _player->InterruptNonMeleeSpells(false,spellId);
+    if(mover->IsNonMeleeSpellCasted(false))
+        mover->InterruptNonMeleeSpells(false,spellId);
 }
 
 void WorldSession::HandleCancelAuraOpcode( WorldPacket& recvPacket)
 {
     CHECK_PACKET_SIZE(recvPacket,4);
+
+    // ignore for remote control state
+    if(_player->m_mover != _player)
+        return;
 
     uint32 spellId;
     recvPacket >> spellId;
@@ -348,6 +393,10 @@ void WorldSession::HandleCancelAuraOpcode( WorldPacket& recvPacket)
 void WorldSession::HandlePetCancelAuraOpcode( WorldPacket& recvPacket)
 {
     CHECK_PACKET_SIZE(recvPacket, 8+4);
+
+    // ignore for remote control state
+    if(_player->m_mover != _player)
+        return;
 
     uint64 guid;
     uint32 spellId;
@@ -396,7 +445,7 @@ void WorldSession::HandleCancelAutoRepeatSpellOpcode( WorldPacket& /*recvPacket*
 {
     // may be better send SMSG_CANCEL_AUTO_REPEAT?
     // cancel and prepare for deleting
-    _player->InterruptSpell(CURRENT_AUTOREPEAT_SPELL);
+    _player->m_mover->InterruptSpell(CURRENT_AUTOREPEAT_SPELL);
 }
 
 /// \todo Complete HandleCancelChanneling function
@@ -413,6 +462,10 @@ void WorldSession::HandleCancelChanneling( WorldPacket & /*recv_data */)
 void WorldSession::HandleTotemDestroy( WorldPacket& recvPacket)
 {
     CHECK_PACKET_SIZE(recvPacket, 1);
+
+    // ignore for remote control state
+    if(_player->m_mover != _player)
+        return;
 
     uint8 slotId;
 
