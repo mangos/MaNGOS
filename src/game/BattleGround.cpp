@@ -1413,9 +1413,9 @@ bool BattleGround::AddObject(uint32 type, uint32 entry, float x, float y, float 
 
 //some doors aren't despawned so we cannot handle their closing in gameobject::update()
 //it would be nice to correctly implement GO_ACTIVATED state and open/close doors in gameobject code
-void BattleGround::DoorClose(uint32 type)
+void BattleGround::DoorClose(uint64 const& guid)
 {
-    GameObject *obj = HashMapHolder<GameObject>::Find(m_BgObjects[type]);
+    GameObject *obj = HashMapHolder<GameObject>::Find(guid);
     if (obj)
     {
         //if doors are open, close it
@@ -1432,9 +1432,9 @@ void BattleGround::DoorClose(uint32 type)
     }
 }
 
-void BattleGround::DoorOpen(uint32 type)
+void BattleGround::DoorOpen(uint64 const& guid)
 {
-    GameObject *obj = HashMapHolder<GameObject>::Find(m_BgObjects[type]);
+    GameObject *obj = HashMapHolder<GameObject>::Find(guid);
     if (obj)
     {
         //change state to be sure they will be opened
@@ -1447,32 +1447,28 @@ void BattleGround::DoorOpen(uint32 type)
     }
 }
 
-void BattleGround::SpawnBGObject(uint32 type, uint32 respawntime)
+
+void BattleGround::SpawnBGObject(uint64 const& guid, uint32 respawntime)
 {
+    GameObject *obj = HashMapHolder<GameObject>::Find(guid);
+    if(!obj)
+        return;
     Map * map = MapManager::Instance().FindMap(GetMapId(),GetInstanceID());
     if (!map)
         return;
     if (respawntime == 0)
     {
-        GameObject *obj = HashMapHolder<GameObject>::Find(m_BgObjects[type]);
-        if (obj)
-        {
-            //we need to change state from GO_JUST_DEACTIVATED to GO_READY in case battleground is starting again
-            if (obj->getLootState() == GO_JUST_DEACTIVATED)
-                obj->SetLootState(GO_READY);
-            obj->SetRespawnTime(0);
-            map->Add(obj);
-        }
+        //we need to change state from GO_JUST_DEACTIVATED to GO_READY in case battleground is starting again
+        if (obj->getLootState() == GO_JUST_DEACTIVATED)
+            obj->SetLootState(GO_READY);
+        obj->SetRespawnTime(0);
+        map->Add(obj);
     }
     else
     {
-        GameObject *obj = HashMapHolder<GameObject>::Find(m_BgObjects[type]);
-        if (obj)
-        {
-            map->Add(obj);
-            obj->SetRespawnTime(respawntime);
-            obj->SetLootState(GO_JUST_DEACTIVATED);
-        }
+        map->Add(obj);
+        obj->SetRespawnTime(respawntime);
+        obj->SetLootState(GO_JUST_DEACTIVATED);
     }
 }
 
@@ -1508,36 +1504,32 @@ Creature* BattleGround::AddCreature(uint32 entry, uint32 type, uint32 teamval, f
 
     return  pCreature;
 }
-/*
-void BattleGround::SpawnBGCreature(uint32 type, uint32 respawntime)
-{
-    Map * map = MapManager::Instance().FindMap(GetMapId(),GetInstanceId());
-    if (!map)
-        return false;
 
+void BattleGround::SpawnBGCreature(uint64 const& guid, uint32 respawntime)
+{
+    Creature* obj = HashMapHolder<Creature>::Find(guid);
+    if (!obj)
+        return;
+    Map * map = MapManager::Instance().FindMap(GetMapId(),GetInstanceID());
+    if (!map)
+        return;
     if (respawntime == 0)
     {
-        Creature *obj = HashMapHolder<Creature>::Find(m_BgCreatures[type]);
-        if (obj)
-        {
-            //obj->Respawn();                               // bugged
-            obj->SetRespawnTime(0);
-            objmgr.SaveCreatureRespawnTime(obj->GetGUIDLow(), GetInstanceID(), 0);
-            map->Add(obj);
-        }
+        //obj->SetVisibility(VISIBILITY_ON);
+        obj->Respawn();
+        //obj->SetRespawnTime(0);
+        //objmgr.SaveCreatureRespawnTime(obj->GetGUIDLow(), GetInstanceID(), 0);
+        map->Add(obj);
     }
     else
     {
-        Creature *obj = HashMapHolder<Creature>::Find(m_BgCreatures[type]);
-        if (obj)
-        {
-            obj->setDeathState(DEAD);
-            obj->SetRespawnTime(respawntime);
-            map->Add(obj);
-        }
+        map->Add(obj);
+        obj->setDeathState(JUST_DIED);
+        obj->SetRespawnDelay(respawntime);
+        obj->RemoveCorpse();
     }
 }
-*/
+
 bool BattleGround::DelCreature(uint32 type)
 {
     if (!m_BgCreatures[type])
@@ -1666,17 +1658,19 @@ void BattleGround::HandleTriggerBuff(uint64 const& go_guid)
     if (m_BuffChange && entry != Buff_Entries[buff])
     {
         //despawn current buff
-        SpawnBGObject(index, RESPAWN_ONE_DAY);
+        SpawnBGObject(m_BgObjects[index], RESPAWN_ONE_DAY);
         //set index for new one
         for (uint8 currBuffTypeIndex = 0; currBuffTypeIndex < 3; ++currBuffTypeIndex)
+        {
             if (entry == Buff_Entries[currBuffTypeIndex])
             {
                 index -= currBuffTypeIndex;
                 index += buff;
             }
+        }
     }
 
-    SpawnBGObject(index, BUFF_RESPAWN_TIME);
+    SpawnBGObject(m_BgObjects[index], BUFF_RESPAWN_TIME);
 }
 
 void BattleGround::HandleKillPlayer( Player *player, Player *killer )

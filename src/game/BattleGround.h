@@ -487,16 +487,16 @@ class BattleGround
         typedef std::vector<uint64> BGCreatures;
         BGObjects m_BgObjects;
         BGCreatures m_BgCreatures;
-        void SpawnBGObject(uint32 type, uint32 respawntime);
+        void SpawnBGObject(uint64 const& guid, uint32 respawntime);
         bool AddObject(uint32 type, uint32 entry, float x, float y, float z, float o, float rotation0, float rotation1, float rotation2, float rotation3, uint32 respawnTime = 0);
-//        void SpawnBGCreature(uint32 type, uint32 respawntime);
+        void SpawnBGCreature(uint64 const& guid, uint32 respawntime);
         Creature* AddCreature(uint32 entry, uint32 type, uint32 teamval, float x, float y, float z, float o, uint32 respawntime = 0);
         bool DelCreature(uint32 type);
         bool DelObject(uint32 type);
         bool AddSpiritGuide(uint32 type, float x, float y, float z, float o, uint32 team);
 
-        void DoorOpen(uint32 type);
-        void DoorClose(uint32 type);
+        void DoorOpen(uint64 const& guid);
+        void DoorClose(uint64 const& guid);
 
         virtual bool HandlePlayerUnderMap(Player * /*plr*/) { return false; }
 

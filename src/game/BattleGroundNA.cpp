@@ -57,16 +57,16 @@ void BattleGroundNA::Update(uint32 diff)
 void BattleGroundNA::StartingEventCloseDoors()
 {
     for(uint32 i = BG_NA_OBJECT_DOOR_1; i <= BG_NA_OBJECT_DOOR_4; ++i)
-        SpawnBGObject(i, RESPAWN_IMMEDIATELY);
+        SpawnBGObject(m_BgObjects[i], RESPAWN_IMMEDIATELY);
 }
 
 void BattleGroundNA::StartingEventOpenDoors()
 {
     for(uint32 i = BG_NA_OBJECT_DOOR_1; i <= BG_NA_OBJECT_DOOR_2; ++i)
-        DoorOpen(i);
+        DoorOpen(m_BgObjects[i]);
 
     for(uint32 i = BG_NA_OBJECT_BUFF_1; i <= BG_NA_OBJECT_BUFF_2; ++i)
-        SpawnBGObject(i, 60);
+        SpawnBGObject(m_BgObjects[i], 60);
 }
 
 void BattleGroundNA::AddPlayer(Player *plr)

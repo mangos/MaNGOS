@@ -95,25 +95,25 @@ void BattleGroundEY::Update(uint32 diff)
 
 void BattleGroundEY::StartingEventCloseDoors()
 {
-    SpawnBGObject(BG_EY_OBJECT_DOOR_A, RESPAWN_IMMEDIATELY);
-    SpawnBGObject(BG_EY_OBJECT_DOOR_H, RESPAWN_IMMEDIATELY);
+    SpawnBGObject(m_BgObjects[BG_EY_OBJECT_DOOR_A], RESPAWN_IMMEDIATELY);
+    SpawnBGObject(m_BgObjects[BG_EY_OBJECT_DOOR_H], RESPAWN_IMMEDIATELY);
 
     for(uint32 i = BG_EY_OBJECT_A_BANNER_FEL_REALVER_CENTER; i < BG_EY_OBJECT_MAX; ++i)
-        SpawnBGObject(i, RESPAWN_ONE_DAY);
+        SpawnBGObject(m_BgObjects[i], RESPAWN_ONE_DAY);
 }
 
 void BattleGroundEY::StartingEventOpenDoors()
 {
-    SpawnBGObject(BG_EY_OBJECT_DOOR_A, RESPAWN_ONE_DAY);
-    SpawnBGObject(BG_EY_OBJECT_DOOR_H, RESPAWN_ONE_DAY);
+    SpawnBGObject(m_BgObjects[BG_EY_OBJECT_DOOR_A], RESPAWN_ONE_DAY);
+    SpawnBGObject(m_BgObjects[BG_EY_OBJECT_DOOR_H], RESPAWN_ONE_DAY);
 
     for(uint32 i = BG_EY_OBJECT_N_BANNER_FEL_REALVER_CENTER; i <= BG_EY_OBJECT_FLAG_NETHERSTORM; ++i)
-        SpawnBGObject(i, RESPAWN_IMMEDIATELY);
+        SpawnBGObject(m_BgObjects[i], RESPAWN_IMMEDIATELY);
     for(uint32 i = 0; i < EY_POINTS_MAX; ++i)
     {
         //randomly spawn buff
         uint8 buff = urand(0, 2);
-        SpawnBGObject(BG_EY_OBJECT_SPEEDBUFF_FEL_REALVER + buff + i * 3, RESPAWN_IMMEDIATELY);
+        SpawnBGObject(m_BgObjects[BG_EY_OBJECT_SPEEDBUFF_FEL_REALVER + buff + i * 3], RESPAWN_IMMEDIATELY);
     }
 }
 
@@ -538,11 +538,11 @@ void BattleGroundEY::Reset()
 void BattleGroundEY::RespawnFlag(bool send_message)
 {
     if (m_FlagCapturedBgObjectType > 0)
-        SpawnBGObject(m_FlagCapturedBgObjectType, RESPAWN_ONE_DAY);
+        SpawnBGObject(m_BgObjects[m_FlagCapturedBgObjectType], RESPAWN_ONE_DAY);
 
     m_FlagCapturedBgObjectType = 0;
     m_FlagState = BG_EY_FLAG_STATE_ON_BASE;
-    SpawnBGObject(BG_EY_OBJECT_FLAG_NETHERSTORM, RESPAWN_IMMEDIATELY);
+    SpawnBGObject(m_BgObjects[BG_EY_OBJECT_FLAG_NETHERSTORM], RESPAWN_IMMEDIATELY);
 
     if (send_message)
     {
@@ -631,7 +631,7 @@ void BattleGroundEY::EventPlayerClickedOnFlag(Player *Source, GameObject* target
         UpdateWorldState(NETHERSTORM_FLAG, 0);
     m_FlagState = BG_EY_FLAG_STATE_ON_PLAYER;
 
-    SpawnBGObject(BG_EY_OBJECT_FLAG_NETHERSTORM, RESPAWN_ONE_DAY);
+    SpawnBGObject(m_BgObjects[BG_EY_OBJECT_FLAG_NETHERSTORM], RESPAWN_ONE_DAY);
     SetFlagPicker(Source->GetGUID());
     //get flag aura on player
     Source->CastSpell(Source, BG_EY_NETHERSTORM_FLAG_SPELL, true);
@@ -657,21 +657,21 @@ void BattleGroundEY::EventTeamLostPoint(Player *Source, uint32 Point)
     if (Team == ALLIANCE)
     {
         m_TeamPointsCount[BG_TEAM_ALLIANCE]--;
-        SpawnBGObject(m_LoosingPointTypes[Point].DespawnObjectTypeAlliance, RESPAWN_ONE_DAY);
-        SpawnBGObject(m_LoosingPointTypes[Point].DespawnObjectTypeAlliance + 1, RESPAWN_ONE_DAY);
-        SpawnBGObject(m_LoosingPointTypes[Point].DespawnObjectTypeAlliance + 2, RESPAWN_ONE_DAY);
+        SpawnBGObject(m_BgObjects[m_LoosingPointTypes[Point].DespawnObjectTypeAlliance], RESPAWN_ONE_DAY);
+        SpawnBGObject(m_BgObjects[m_LoosingPointTypes[Point].DespawnObjectTypeAlliance + 1], RESPAWN_ONE_DAY);
+        SpawnBGObject(m_BgObjects[m_LoosingPointTypes[Point].DespawnObjectTypeAlliance + 2], RESPAWN_ONE_DAY);
     }
     else
     {
         m_TeamPointsCount[BG_TEAM_HORDE]--;
-        SpawnBGObject(m_LoosingPointTypes[Point].DespawnObjectTypeHorde, RESPAWN_ONE_DAY);
-        SpawnBGObject(m_LoosingPointTypes[Point].DespawnObjectTypeHorde + 1, RESPAWN_ONE_DAY);
-        SpawnBGObject(m_LoosingPointTypes[Point].DespawnObjectTypeHorde + 2, RESPAWN_ONE_DAY);
+        SpawnBGObject(m_BgObjects[m_LoosingPointTypes[Point].DespawnObjectTypeHorde], RESPAWN_ONE_DAY);
+        SpawnBGObject(m_BgObjects[m_LoosingPointTypes[Point].DespawnObjectTypeHorde + 1], RESPAWN_ONE_DAY);
+        SpawnBGObject(m_BgObjects[m_LoosingPointTypes[Point].DespawnObjectTypeHorde + 2], RESPAWN_ONE_DAY);
     }
 
-    SpawnBGObject(m_LoosingPointTypes[Point].SpawnNeutralObjectType, RESPAWN_IMMEDIATELY);
-    SpawnBGObject(m_LoosingPointTypes[Point].SpawnNeutralObjectType + 1, RESPAWN_IMMEDIATELY);
-    SpawnBGObject(m_LoosingPointTypes[Point].SpawnNeutralObjectType + 2, RESPAWN_IMMEDIATELY);
+    SpawnBGObject(m_BgObjects[m_LoosingPointTypes[Point].SpawnNeutralObjectType], RESPAWN_IMMEDIATELY);
+    SpawnBGObject(m_BgObjects[m_LoosingPointTypes[Point].SpawnNeutralObjectType + 1], RESPAWN_IMMEDIATELY);
+    SpawnBGObject(m_BgObjects[m_LoosingPointTypes[Point].SpawnNeutralObjectType + 2], RESPAWN_IMMEDIATELY);
 
     //buff isn't despawned
 
@@ -694,23 +694,23 @@ void BattleGroundEY::EventTeamCapturedPoint(Player *Source, uint32 Point)
 
     uint32 Team = Source->GetTeam();
 
-    SpawnBGObject(m_CapturingPointTypes[Point].DespawnNeutralObjectType, RESPAWN_ONE_DAY);
-    SpawnBGObject(m_CapturingPointTypes[Point].DespawnNeutralObjectType + 1, RESPAWN_ONE_DAY);
-    SpawnBGObject(m_CapturingPointTypes[Point].DespawnNeutralObjectType + 2, RESPAWN_ONE_DAY);
+    SpawnBGObject(m_BgObjects[m_CapturingPointTypes[Point].DespawnNeutralObjectType], RESPAWN_ONE_DAY);
+    SpawnBGObject(m_BgObjects[m_CapturingPointTypes[Point].DespawnNeutralObjectType + 1], RESPAWN_ONE_DAY);
+    SpawnBGObject(m_BgObjects[m_CapturingPointTypes[Point].DespawnNeutralObjectType + 2], RESPAWN_ONE_DAY);
 
     if (Team == ALLIANCE)
     {
         m_TeamPointsCount[BG_TEAM_ALLIANCE]++;
-        SpawnBGObject(m_CapturingPointTypes[Point].SpawnObjectTypeAlliance, RESPAWN_IMMEDIATELY);
-        SpawnBGObject(m_CapturingPointTypes[Point].SpawnObjectTypeAlliance + 1, RESPAWN_IMMEDIATELY);
-        SpawnBGObject(m_CapturingPointTypes[Point].SpawnObjectTypeAlliance + 2, RESPAWN_IMMEDIATELY);
+        SpawnBGObject(m_BgObjects[m_CapturingPointTypes[Point].SpawnObjectTypeAlliance], RESPAWN_IMMEDIATELY);
+        SpawnBGObject(m_BgObjects[m_CapturingPointTypes[Point].SpawnObjectTypeAlliance + 1], RESPAWN_IMMEDIATELY);
+        SpawnBGObject(m_BgObjects[m_CapturingPointTypes[Point].SpawnObjectTypeAlliance + 2], RESPAWN_IMMEDIATELY);
     }
     else
     {
         m_TeamPointsCount[BG_TEAM_HORDE]++;
-        SpawnBGObject(m_CapturingPointTypes[Point].SpawnObjectTypeHorde, RESPAWN_IMMEDIATELY);
-        SpawnBGObject(m_CapturingPointTypes[Point].SpawnObjectTypeHorde + 1, RESPAWN_IMMEDIATELY);
-        SpawnBGObject(m_CapturingPointTypes[Point].SpawnObjectTypeHorde + 2, RESPAWN_IMMEDIATELY);
+        SpawnBGObject(m_BgObjects[m_CapturingPointTypes[Point].SpawnObjectTypeHorde], RESPAWN_IMMEDIATELY);
+        SpawnBGObject(m_BgObjects[m_CapturingPointTypes[Point].SpawnObjectTypeHorde + 1], RESPAWN_IMMEDIATELY);
+        SpawnBGObject(m_BgObjects[m_CapturingPointTypes[Point].SpawnObjectTypeHorde + 2], RESPAWN_IMMEDIATELY);
     }
 
     //buff isn't respawned
@@ -754,7 +754,7 @@ void BattleGroundEY::EventPlayerCapturedFlag(Player *Source, uint32 BgObjectType
     else
         PlaySoundToAll(BG_EY_SOUND_FLAG_CAPTURED_HORDE);
 
-    SpawnBGObject(BgObjectType, RESPAWN_IMMEDIATELY);
+    SpawnBGObject(m_BgObjects[BgObjectType], RESPAWN_IMMEDIATELY);
 
     m_FlagsTimer = BG_EY_FLAG_RESPAWN_TIME;
     m_FlagCapturedBgObjectType = BgObjectType;
