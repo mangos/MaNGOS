@@ -54,7 +54,7 @@ class TransportPath
         std::vector<PathNode> i_nodes;
 };
 
-class Transport : private GameObject
+class Transport : protected GameObject
 {
     public:
         explicit Transport();
@@ -81,7 +81,6 @@ class Transport : private GameObject
         typedef std::set<Player*> PlayerSet;
         PlayerSet const& GetPassengers() const { return m_passengers; }
 
-        std::string m_name;
     private:
         struct WayPoint
         {
@@ -111,6 +110,7 @@ class Transport : private GameObject
 
     private:
         void TeleportTransport(uint32 newMapid, float x, float y, float z);
+        void UpdateForMap(Map const* map);
         WayPointMap::iterator GetNextWayPoint();
 };
 #endif

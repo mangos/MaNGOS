@@ -101,7 +101,7 @@ void WaypointManager::Load()
         node.y              = fields[1].GetFloat();
         node.z              = fields[2].GetFloat();
         node.orientation    = fields[3].GetFloat();
-        node.delay          = fields[6].GetUInt16();
+        node.delay          = fields[6].GetUInt32();
 
         // prevent using invalid coordinates
         if(!MaNGOS::IsValidMapCoord(node.x, node.y, node.z, node.orientation))

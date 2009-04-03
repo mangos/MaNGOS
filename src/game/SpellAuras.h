@@ -267,6 +267,8 @@ class MANGOS_DLL_SPEC Aura
             return m_procCharges == 0;
         }
 
+        void UnregisterSingleCastAura();
+
         void SetAura(bool remove) { m_target->SetVisibleAura(m_auraSlot, remove ? 0 : GetId()); }
         void SendAuraUpdate(bool remove);
 
@@ -296,6 +298,10 @@ class MANGOS_DLL_SPEC Aura
 
         bool IsUpdated() { return m_updated; }
         void SetUpdated(bool val) { m_updated = val; }
+
+        bool IsSingleTarget() {return m_isSingleTargetAura;}
+        void SetIsSingleTarget(bool val) { m_isSingleTargetAura = val;}
+
         void SetRemoveMode(AuraRemoveMode mode) { m_removeMode = mode; }
 
         virtual Unit* GetTriggerTarget() const { return m_target; }
@@ -352,6 +358,7 @@ class MANGOS_DLL_SPEC Aura
         bool m_isRemovedOnShapeLost:1;
         bool m_updated:1;                                   // Prevent remove aura by stack if set
         bool m_in_use:1;                                    // true while in Aura::ApplyModifier call
+        bool m_isSingleTargetAura:1;                        // true if it's a single target spell and registered at caster - can change at spell steal for example
 
     private:
         void CleanupTriggeredSpells();
