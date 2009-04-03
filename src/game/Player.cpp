@@ -20005,7 +20005,7 @@ void Player::_SaveEquipmentSets()
                 ++itr;
                 break;
             case EQUIPMENT_SET_NEW:
-                CharacterDatabase.PExecute("INSERT INTO character_equipmentsets VALUES ('%u', '"I64FMTD"', '%u', '%s', '%s', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u')", 
+                CharacterDatabase.PExecute("INSERT INTO character_equipmentsets VALUES ('%u', '"I64FMTD"', '%u', '%s', '%s', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u')",
                     GetGUIDLow(), eqset.Guid, index, eqset.Name.c_str(), eqset.IconName.c_str(), eqset.Items[0], eqset.Items[1], eqset.Items[2], eqset.Items[3], eqset.Items[4], eqset.Items[5], eqset.Items[6], eqset.Items[7],
                     eqset.Items[8], eqset.Items[9], eqset.Items[10], eqset.Items[11], eqset.Items[12], eqset.Items[13], eqset.Items[14], eqset.Items[15], eqset.Items[16], eqset.Items[17], eqset.Items[18]);
                 eqset.state = EQUIPMENT_SET_UNCHANGED;

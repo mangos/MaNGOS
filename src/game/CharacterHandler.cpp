@@ -1316,7 +1316,7 @@ void WorldSession::HandleEquipmentSetSave(WorldPacket &recv_data)
     uint64 setGuid;
     if(!recv_data.readPackGUID(setGuid))
         return;
-    
+
     CHECK_PACKET_SIZE(recv_data, recv_data.rpos()+4);
 
     uint32 index;

@@ -51,7 +51,7 @@ void WorldSession::HandleLearnPreviewTalents(WorldPacket& recvPacket)
     for(uint32 i = 0; i < talentsCount; ++i)
     {
         CHECK_PACKET_SIZE(recvPacket, recvPacket.rpos()+4+4);
-        
+
         recvPacket >> talentId >> talentRank;
 
         _player->LearnTalent(talentId, talentRank);
