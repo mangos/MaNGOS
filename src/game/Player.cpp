@@ -1804,7 +1804,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
             // if the player is saved before worldportack (at logout for example)
             // this will be used instead of the current location in SaveToDB
 
-            RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CHANGE_MAP);
+            RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CHANGE_MAP | AURA_INTERRUPT_FLAG_MOVE | AURA_INTERRUPT_FLAG_TURNING);
 
             // move packet sent by client always after far teleport
             // SetPosition(final_x, final_y, final_z, final_o, true);
@@ -5519,6 +5519,20 @@ void Player::SendMessageToSetInRange(WorldPacket *data, float dist, bool self, b
 void Player::SendDirectMessage(WorldPacket *data)
 {
     GetSession()->SendPacket(data);
+}
+
+void Player::SendCinematicStart(uint32 CinematicSequenceId)
+{
+    WorldPacket data(SMSG_TRIGGER_CINEMATIC, 4);
+    data << uint32(CinematicSequenceId);
+    SendDirectMessage(&data);
+}
+
+void Player::SendMovieStart(uint32 MovieId)
+{
+    WorldPacket data(SMSG_TRIGGER_MOVIE, 4);
+    data << uint32(MovieId);
+    SendDirectMessage(&data);
 }
 
 void Player::CheckExploreSystem()
@@ -14418,15 +14432,17 @@ void Player::_LoadAuras(QueryResult *result, uint32 timediff)
             else
                 remaincharges = 0;
 
-            //do not load single target auras (unless they were cast by the player)
-            if (caster_guid != GetGUID() && IsSingleTargetSpell(spellproto))
-                continue;
 
             for(uint32 i=0; i<stackcount; i++)
             {
                 Aura* aura = CreateAura(spellproto, effindex, NULL, this, NULL);
                 if(!damage)
                     damage = aura->GetModifier()->m_amount;
+
+                // reset stolen single target auras
+                if (caster_guid != GetGUID() && aura->IsSingleTarget())
+                    aura->SetIsSingleTarget(false);
+
                 aura->SetLoadedState(caster_guid,damage,maxduration,remaintime,remaincharges);
                 AddAura(aura);
                 sLog.outDetail("Added aura spellid %u, effect %u", spellproto->Id, effindex);
@@ -15476,7 +15492,7 @@ void Player::_SaveAuras()
             if (!(itr2->second->IsPassive() || itr2->second->IsRemovedOnShapeLost()))
             {
                 //do not save single target auras (unless they were cast by the player)
-                if (!(itr2->second->GetCasterGUID() != GetGUID() && IsSingleTargetSpell(spellInfo)))
+                if (!(itr2->second->GetCasterGUID() != GetGUID() && itr2->second->IsSingleTarget()))
                 {
                     uint8 i;
                     // or apply at cast SPELL_AURA_MOD_SHAPESHIFT or SPELL_AURA_MOD_STEALTH auras

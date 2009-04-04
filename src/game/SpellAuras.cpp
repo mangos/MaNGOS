@@ -230,7 +230,7 @@ pAuraHandler AuraHandler[TOTAL_AURAS]=
     &Aura::HandleNoImmediateEffect,                         //178 SPELL_AURA_MOD_DEBUFF_RESISTANCE          implemented in Unit::MagicSpellHitResult
     &Aura::HandleNoImmediateEffect,                         //179 SPELL_AURA_MOD_ATTACKER_SPELL_CRIT_CHANCE implemented in Unit::SpellCriticalBonus
     &Aura::HandleNoImmediateEffect,                         //180 SPELL_AURA_MOD_FLAT_SPELL_DAMAGE_VERSUS   implemented in Unit::SpellDamageBonus
-    &Aura::HandleUnused,                                    //181 unused (3.0.8a) old SPELL_AURA_MOD_FLAT_SPELL_CRIT_DAMAGE_VERSUS 
+    &Aura::HandleUnused,                                    //181 unused (3.0.8a) old SPELL_AURA_MOD_FLAT_SPELL_CRIT_DAMAGE_VERSUS
     &Aura::HandleAuraModResistenceOfStatPercent,            //182 SPELL_AURA_MOD_RESISTANCE_OF_STAT_PERCENT
     &Aura::HandleNULL,                                      //183 SPELL_AURA_MOD_CRITICAL_THREAT only used in 28746
     &Aura::HandleNoImmediateEffect,                         //184 SPELL_AURA_MOD_ATTACKER_MELEE_HIT_CHANCE  implemented in Unit::RollMeleeOutcomeAgainst
@@ -359,6 +359,8 @@ m_updated(false), m_isRemovedOnShapeLost(true), m_in_use(false)
 
     m_isPassive = IsPassiveSpell(GetId());
     m_positive = IsPositiveEffect(GetId(), m_effIndex);
+
+    m_isSingleTargetAura = IsSingleTargetSpell(m_spellProto);
 
     m_applyTime = time(NULL);
 
@@ -3065,21 +3067,28 @@ void Aura::HandleModPossess(bool apply, bool Real)
             m_target->StopMoving();
             m_target->GetMotionMaster()->Clear();
             m_target->GetMotionMaster()->MoveIdle();
-            CharmInfo *charmInfo = ((Creature*)m_target)->InitCharmInfo(m_target);
-            charmInfo->InitPossessCreateSpells();
+        }
+        else if(m_target->GetTypeId() == TYPEID_PLAYER)
+        {
+            ((Player*)m_target)->SetClientControl(m_target, 0);
         }
 
+        if(CharmInfo *charmInfo = m_target->InitCharmInfo(m_target))
+            charmInfo->InitPossessCreateSpells();
+
         if(caster->GetTypeId() == TYPEID_PLAYER)
-        {
             ((Player*)caster)->PossessSpellInitialize();
-        }
     }
     else
     {
         m_target->SetCharmerGUID(0);
+        caster->InterruptSpell(CURRENT_CHANNELED_SPELL);    // the spell is not automatically canceled when interrupted, do it now
 
         if(m_target->GetTypeId() == TYPEID_PLAYER)
+        {
             ((Player*)m_target)->setFactionForRace(m_target->getRace());
+            ((Player*)m_target)->SetClientControl(m_target, 1);
+        }
         else if(m_target->GetTypeId() == TYPEID_UNIT)
         {
             CreatureInfo const *cinfo = ((Creature*)m_target)->GetCreatureInfo();
@@ -3183,7 +3192,7 @@ void Aura::HandleModCharm(bool apply, bool Real)
             if(m_target->GetTypeId() == TYPEID_UNIT)
             {
                 ((Creature*)m_target)->AIM_Initialize();
-                CharmInfo *charmInfo = ((Creature*)m_target)->InitCharmInfo(m_target);
+                CharmInfo *charmInfo = m_target->InitCharmInfo(m_target);
                 charmInfo->InitCharmCreateSpells();
                 charmInfo->SetReactState( REACT_DEFENSIVE );
 
@@ -3484,52 +3493,56 @@ void Aura::HandleAuraModStun(bool apply, bool Real)
 
 void Aura::HandleModStealth(bool apply, bool Real)
 {
-    if(apply)
+    Unit* pTarget = m_target;
+
+    if (apply)
     {
         // drop flag at stealth in bg
-         m_target->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_IMMUNE_OR_LOST_SELECTION);
+         pTarget->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_IMMUNE_OR_LOST_SELECTION);
 
         // only at real aura add
-        if(Real)
+        if (Real)
         {
-            m_target->SetStandFlags(UNIT_STAND_FLAGS_CREEP);
-            if(m_target->GetTypeId()==TYPEID_PLAYER)
-                m_target->SetFlag(PLAYER_FIELD_BYTES2, 0x2000);
+            pTarget->SetStandFlags(UNIT_STAND_FLAGS_CREEP);
+
+            if (pTarget->GetTypeId()==TYPEID_PLAYER)
+                pTarget->SetFlag(PLAYER_FIELD_BYTES2, 0x2000);
 
             // apply only if not in GM invisibility (and overwrite invisibility state)
-            if(m_target->GetVisibility()!=VISIBILITY_OFF)
+            if (pTarget->GetVisibility()!=VISIBILITY_OFF)
             {
-                m_target->SetVisibility(VISIBILITY_GROUP_NO_DETECT);
-                m_target->SetVisibility(VISIBILITY_GROUP_STEALTH);
+                pTarget->SetVisibility(VISIBILITY_GROUP_NO_DETECT);
+                pTarget->SetVisibility(VISIBILITY_GROUP_STEALTH);
             }
         }
     }
     else
     {
         // only at real aura remove
-        if(Real)
+        if (Real)
         {
             // if last SPELL_AURA_MOD_STEALTH and no GM invisibility
-            if(!m_target->HasAuraType(SPELL_AURA_MOD_STEALTH) && m_target->GetVisibility()!=VISIBILITY_OFF)
+            if (!pTarget->HasAuraType(SPELL_AURA_MOD_STEALTH) && pTarget->GetVisibility()!=VISIBILITY_OFF)
             {
-                m_target->RemoveStandFlags(UNIT_STAND_FLAGS_CREEP);
-                if(m_target->GetTypeId()==TYPEID_PLAYER)
-                    m_target->RemoveFlag(PLAYER_FIELD_BYTES2, 0x2000);
+                pTarget->RemoveStandFlags(UNIT_STAND_FLAGS_CREEP);
+
+                if (pTarget->GetTypeId()==TYPEID_PLAYER)
+                    pTarget->RemoveFlag(PLAYER_FIELD_BYTES2, 0x2000);
 
                 // restore invisibility if any
-                if(m_target->HasAuraType(SPELL_AURA_MOD_INVISIBILITY))
+                if (pTarget->HasAuraType(SPELL_AURA_MOD_INVISIBILITY))
                 {
-                    m_target->SetVisibility(VISIBILITY_GROUP_NO_DETECT);
-                    m_target->SetVisibility(VISIBILITY_GROUP_INVISIBILITY);
+                    pTarget->SetVisibility(VISIBILITY_GROUP_NO_DETECT);
+                    pTarget->SetVisibility(VISIBILITY_GROUP_INVISIBILITY);
                 }
                 else
-                    m_target->SetVisibility(VISIBILITY_ON);
+                    pTarget->SetVisibility(VISIBILITY_ON);
             }
         }
     }
 
     // Master of Subtlety
-    Unit::AuraList const& mDummyAuras = m_target->GetAurasByType(SPELL_AURA_DUMMY);
+    Unit::AuraList const& mDummyAuras = pTarget->GetAurasByType(SPELL_AURA_DUMMY);
     for(Unit::AuraList::const_iterator i = mDummyAuras.begin();i != mDummyAuras.end(); ++i)
     {
         if ((*i)->GetSpellProto()->SpellIconID == 2114)
@@ -3537,10 +3550,10 @@ void Aura::HandleModStealth(bool apply, bool Real)
             if (apply)
             {
                 int32 bp = (*i)->GetModifier()->m_amount;
-                m_target->CastCustomSpell(m_target,31665,&bp,NULL,NULL,true);
+                pTarget->CastCustomSpell(pTarget,31665,&bp,NULL,NULL,true);
             }
             else
-                m_target->CastSpell(m_target,31666,true);
+                pTarget->CastSpell(pTarget,31666,true);
             break;
         }
     }
@@ -4217,7 +4230,7 @@ void Aura::HandlePeriodicDamage(bool apply, bool Real)
     if (apply)
     {
         if(loading)
-            return; 
+            return;
 
         Unit *caster = GetCaster();
         if (!caster)
@@ -6154,7 +6167,7 @@ void Aura::PeriodicTick()
             }
 
             // Anger Management
-            // amount = 1+ 16 = 17 = 3,4*5 = 10,2*5/3 
+            // amount = 1+ 16 = 17 = 3,4*5 = 10,2*5/3
             // so 17 is rounded amount for 5 sec tick grow ~ 1 range grow in 3 sec
             if(pt == POWER_RAGE)
                 m_target->ModifyPower(pt, m_modifier.m_amount*3/5);
@@ -6742,3 +6755,21 @@ void Aura::HandlePhase(bool apply, bool Real)
         m_target->SetVisibility(m_target->GetVisibility());
 }
 
+void Aura::UnregisterSingleCastAura()
+{
+    if (IsSingleTarget())
+    {
+        Unit* caster = NULL;
+        caster = GetCaster();
+        if(caster)
+        {
+            caster->GetSingleCastAuras().remove(this);
+        }
+        else
+        {
+            sLog.outError("Couldn't find the caster of the single target aura, may crash later!");
+            assert(false);
+        }
+        m_isSingleTargetAura = false;
+    }
+}

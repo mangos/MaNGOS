@@ -1768,7 +1768,7 @@ bool ChatHandler::HandleLearnAllMyTalentsCommand(const char* /*args*/)
 
         // search highest talent rank
         uint32 spellid = 0;
-        
+
         for(int rank = MAX_TALENT_RANK-1; rank >= 0; --rank)
         {
             if(talentInfo->RankID[rank]!=0)
@@ -5609,7 +5609,7 @@ bool ChatHandler::HandleRespawnCommand(const char* /*args*/)
     return true;
 }
 
-bool ChatHandler::HandleGMFlyModeCommand(const char* args)
+bool ChatHandler::HandleGMFlyCommand(const char* args)
 {
     if (!*args)
         return false;

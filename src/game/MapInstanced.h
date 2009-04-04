@@ -49,7 +49,7 @@ class MANGOS_DLL_DECL MapInstanced : public Map
             SetUnloadReferenceLock(GridPair(63-p.x_coord, 63-p.y_coord), true);
         }
 
-        void RemoveGridMapReference(const GridPair &p)
+        void RemoveGridMapReference(GridPair const& p)
         {
             --GridMapReference[p.x_coord][p.y_coord];
             if (!GridMapReference[p.x_coord][p.y_coord])

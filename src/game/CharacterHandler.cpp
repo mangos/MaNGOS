@@ -699,18 +699,10 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder * holder)
 
         if(ChrClassesEntry const* cEntry = sChrClassesStore.LookupEntry(pCurrChar->getClass()))
         {
-            if(cEntry->CinematicSequence)
-            {
-                data.Initialize(SMSG_TRIGGER_CINEMATIC, 4);
-                data << uint32(cEntry->CinematicSequence);
-                SendPacket( &data );
-            }
-            else if(ChrRacesEntry const* rEntry = sChrRacesStore.LookupEntry(pCurrChar->getRace()))
-            {
-                data.Initialize(SMSG_TRIGGER_CINEMATIC, 4);
-                data << uint32(rEntry->CinematicSequence);
-                SendPacket( &data );
-            }
+            if (cEntry->CinematicSequence)
+                pCurrChar->SendCinematicStart(cEntry->CinematicSequence);
+            else if (ChrRacesEntry const* rEntry = sChrRacesStore.LookupEntry(pCurrChar->getRace()))
+                pCurrChar->SendCinematicStart(rEntry->CinematicSequence);
         }
     }
 

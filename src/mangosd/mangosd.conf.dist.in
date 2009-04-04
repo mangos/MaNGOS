@@ -25,7 +25,7 @@ ConfVersion=2008080101
 #    WorldDatabaseInfo
 #    CharacterDatabaseInfo
 #        Database connection settings for the world server.
-#        Default: 
+#        Default:
 #                ---MYSQL---
 #                    hostname;port;username;password;database
 #                    .;somenumber;username;password;database - use named pipes at Windows
