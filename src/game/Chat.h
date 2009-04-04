@@ -100,8 +100,6 @@ class ChatHandler
         bool HandleStartCommand(const char* args);
         bool HandleDismountCommand(const char* args);
         bool HandleSaveCommand(const char* args);
-        bool HandleGMListIngameCommand(const char* args);
-        bool HandleGMListFullCommand(const char* args);
 
         bool HandleNamegoCommand(const char* args);
         bool HandleGonameCommand(const char* args);
@@ -109,9 +107,6 @@ class ChatHandler
         bool HandleRecallCommand(const char* args);
         bool HandleAnnounceCommand(const char* args);
         bool HandleNotifyCommand(const char* args);
-        bool HandleGMmodeCommand(const char* args);
-        bool HandleGMChatCommand(const char* args);
-        bool HandleGMVisibleCommand(const char* args);
         bool HandleGPSCommand(const char* args);
         bool HandleTaxiCheatCommand(const char* args);
         bool HandleWhispersCommand(const char* args);
@@ -126,6 +121,13 @@ class ChatHandler
         bool HandleEventStartCommand(const char* args);
         bool HandleEventStopCommand(const char* args);
         bool HandleEventInfoCommand(const char* args);
+
+        bool HandleGMCommand(const char* args);
+        bool HandleGMChatCommand(const char* args);
+        bool HandleGMFlyCommand(const char* args);
+        bool HandleGMListFullCommand(const char* args);
+        bool HandleGMListIngameCommand(const char* args);
+        bool HandleGMVisibleCommand(const char* args);
 
         bool HandleLearnCommand(const char* args);
         bool HandleLearnAllCommand(const char* args);
@@ -412,7 +414,6 @@ class ChatHandler
         bool HandleWpShowCommand(const char* args);
         bool HandleWpExportCommand(const char* args);
         bool HandleWpImportCommand(const char* args);
-        bool HandleGMFlyModeCommand(const char* args);
         bool HandleDebugSendOpcodeCommand(const char* args);
         bool HandleDebugSellErrorCommand(const char* args);
         bool HandleDebugBuyErrorCommand(const char* args);
