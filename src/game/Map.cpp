@@ -1616,8 +1616,6 @@ float Map::GetHeight(float x, float y, float z, bool pUseVmaps) const
     }
 }
 
-#include "World.h"
-
 uint16 Map::GetAreaFlag(float x, float y, float z) const
 {
     uint16 areaflag;
