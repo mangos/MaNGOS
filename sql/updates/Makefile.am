@@ -214,6 +214,9 @@ pkgdata_DATA = \
 	7615_01_mangos_command.sql \
 	7616_01_mangos_mangos_string.sql \
 	7616_02_mangos_command.sql \
+	7622_01_mangos_creature_ai_scripts.sql \
+	7622_02_mangos_creature_ai_summons.sql \
+	7622_03_mangos_creature_ai_texts.sql \
 	README
 
 ## Additional files to include when running 'make dist'
@@ -408,4 +411,7 @@ EXTRA_DIST = \
 	7615_01_mangos_command.sql \
 	7616_01_mangos_mangos_string.sql \
 	7616_02_mangos_command.sql \
+	7622_01_mangos_creature_ai_scripts.sql \
+	7622_02_mangos_creature_ai_summons.sql \
+	7622_03_mangos_creature_ai_texts.sql \
 	README
