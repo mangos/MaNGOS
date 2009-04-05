@@ -97,7 +97,11 @@ void HostilReference::addThreat(float pMod)
     if(!isOnline())
         updateOnlineStatus();
     if(pMod != 0.0f)
-        fireStatusChanged(ThreatRefStatusChangeEvent(UEV_THREAT_REF_THREAT_CHANGE, this, pMod));
+    {
+        ThreatRefStatusChangeEvent event(UEV_THREAT_REF_THREAT_CHANGE, this, pMod);
+        fireStatusChanged(event);
+    }
+
     if(isValid() && pMod >= 0)
     {
         Unit* victim_owner = getTarget()->GetOwner();
@@ -153,7 +157,9 @@ void HostilReference::setOnlineOfflineState(bool pIsOnline)
         iOnline = pIsOnline;
         if(!iOnline)
             setAccessibleState(false);                      // if not online that not accessable as well
-        fireStatusChanged(ThreatRefStatusChangeEvent(UEV_THREAT_REF_ONLINE_STATUS, this));
+
+        ThreatRefStatusChangeEvent event(UEV_THREAT_REF_ONLINE_STATUS, this);
+        fireStatusChanged(event);
     }
 }
 
@@ -164,7 +170,9 @@ void HostilReference::setAccessibleState(bool pIsAccessible)
     if(iAccessible != pIsAccessible)
     {
         iAccessible = pIsAccessible;
-        fireStatusChanged(ThreatRefStatusChangeEvent(UEV_THREAT_REF_ASSECCIBLE_STATUS, this));
+
+        ThreatRefStatusChangeEvent event(UEV_THREAT_REF_ASSECCIBLE_STATUS, this);
+        fireStatusChanged(event);
     }
 }
 
@@ -175,7 +183,9 @@ void HostilReference::setAccessibleState(bool pIsAccessible)
 void HostilReference::removeReference()
 {
     invalidate();
-    fireStatusChanged(ThreatRefStatusChangeEvent(UEV_THREAT_REF_REMOVE_FROM_LIST, this));
+
+    ThreatRefStatusChangeEvent event(UEV_THREAT_REF_REMOVE_FROM_LIST, this);
+    fireStatusChanged(event);
 }
 
 //============================================================

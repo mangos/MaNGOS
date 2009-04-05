@@ -43,20 +43,8 @@ class ThreatCalcHelper
 };
 
 //==============================================================
-
 class MANGOS_DLL_SPEC HostilReference : public Reference<Unit, ThreatManager>
 {
-    private:
-        float iThreat;
-        float iTempThreatModifyer;                          // used for taunt
-        uint64 iUnitGuid;
-        bool iOnline;
-        bool iAccessible;
-    private:
-        // Inform the source, that the status of that reference was changed
-        void fireStatusChanged(ThreatRefStatusChangeEvent& pThreatRefStatusChangeEvent);
-
-        Unit* getSourceUnit();
     public:
         HostilReference(Unit* pUnit, ThreatManager *pThreatManager, float pThreat);
 
@@ -123,6 +111,17 @@ class MANGOS_DLL_SPEC HostilReference : public Reference<Unit, ThreatManager>
 
         // Tell our refFrom (source) object, that the link is cut (Target destroyed)
         void sourceObjectDestroyLink();
+    private:
+        // Inform the source, that the status of that reference was changed
+        void fireStatusChanged(ThreatRefStatusChangeEvent& pThreatRefStatusChangeEvent);
+
+        Unit* getSourceUnit();
+    private:
+        float iThreat;
+        float iTempThreatModifyer;                          // used for taunt
+        uint64 iUnitGuid;
+        bool iOnline;
+        bool iAccessible;
 };
 
 //==============================================================
