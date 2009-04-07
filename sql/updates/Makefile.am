@@ -211,6 +211,13 @@ pkgdata_DATA = \
 	7560_01_mangos_gameobject_template.sql \
 	7565_01_mangos_mangos_string.sql \
 	7568_01_mangos_spell_proc_event.sql \
+	7615_01_mangos_command.sql \
+	7616_01_mangos_mangos_string.sql \
+	7616_02_mangos_command.sql \
+	7622_01_mangos_creature_ai_scripts.sql \
+	7622_02_mangos_creature_ai_summons.sql \
+	7622_03_mangos_creature_ai_texts.sql \
+	7627_01_mangos_achievement_criteria_data.sql \
 	README
 
 ## Additional files to include when running 'make dist'
@@ -402,4 +409,11 @@ EXTRA_DIST = \
 	7560_01_mangos_gameobject_template.sql \
 	7565_01_mangos_mangos_string.sql \
 	7568_01_mangos_spell_proc_event.sql \
+	7615_01_mangos_command.sql \
+	7616_01_mangos_mangos_string.sql \
+	7616_02_mangos_command.sql \
+	7622_01_mangos_creature_ai_scripts.sql \
+	7622_02_mangos_creature_ai_summons.sql \
+	7622_03_mangos_creature_ai_texts.sql \
+	7627_01_mangos_achievement_criteria_data.sql \
 	README

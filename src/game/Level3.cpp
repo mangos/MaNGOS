@@ -55,6 +55,7 @@ bool ChatHandler::HandleReloadAllCommand(const char*)
 {
     HandleReloadSkillFishingBaseLevelCommand("");
 
+    HandleReloadAllAchievementCommand("");
     HandleReloadAllAreaCommand("");
     HandleReloadAllLootCommand("");
     HandleReloadAllNpcCommand("");
@@ -67,6 +68,13 @@ bool ChatHandler::HandleReloadAllCommand(const char*)
     HandleReloadReservedNameCommand("");
     HandleReloadMangosStringCommand("");
     HandleReloadGameTeleCommand("");
+    return true;
+}
+
+bool ChatHandler::HandleReloadAllAchievementCommand(const char*)
+{
+    HandleReloadAchievementCriteriaDataCommand("");
+    HandleReloadAchievementRewardCommand("");
     return true;
 }
 
@@ -155,6 +163,7 @@ bool ChatHandler::HandleReloadAllItemCommand(const char*)
 
 bool ChatHandler::HandleReloadAllLocalesCommand(const char* /*args*/)
 {
+    HandleReloadLocalesAchievementRewardCommand("a");
     HandleReloadLocalesCreatureCommand("a");
     HandleReloadLocalesGameobjectCommand("a");
     HandleReloadLocalesItemCommand("a");
@@ -170,6 +179,22 @@ bool ChatHandler::HandleReloadConfigCommand(const char* /*args*/)
     sLog.outString( "Re-Loading config settings..." );
     sWorld.LoadConfigSettings(true);
     SendGlobalSysMessage("World config settings reloaded.");
+    return true;
+}
+
+bool ChatHandler::HandleReloadAchievementCriteriaDataCommand(const char*)
+{
+    sLog.outString( "Re-Loading Additional Achievement Criteria Data..." );
+    achievementmgr.LoadAchievementCriteriaData();
+    SendGlobalSysMessage("DB table `achievement_criteria_data` reloaded.");
+    return true;
+}
+
+bool ChatHandler::HandleReloadAchievementRewardCommand(const char*)
+{
+    sLog.outString( "Re-Loading Achievement Reward Data..." );
+    achievementmgr.LoadRewards();
+    SendGlobalSysMessage("DB table `achievement_reward` reloaded.");
     return true;
 }
 
@@ -667,6 +692,14 @@ bool ChatHandler::HandleReloadGameTeleCommand(const char* /*arg*/)
 
     SendGlobalSysMessage("DB table `game_tele` reloaded.");
 
+    return true;
+}
+
+bool ChatHandler::HandleReloadLocalesAchievementRewardCommand(const char*)
+{
+    sLog.outString( "Re-Loading Locales Achievement Reward Data..." );
+    achievementmgr.LoadRewardLocales();
+    SendGlobalSysMessage("DB table `locales_achievement_reward` reloaded.");
     return true;
 }
 
