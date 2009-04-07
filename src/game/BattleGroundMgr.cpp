@@ -169,9 +169,9 @@ GroupQueueInfo * BattleGroundQueue::AddGroup(Player *leader, BattleGroundTypeId 
 
     //compute index (if group is premade or joined a rated match) to queues
     uint32 index = 0;
-    if(!isRated && !isPremade)
+    if (!isRated && !isPremade)
         index += BG_TEAMS_COUNT;
-    if(ginfo->Team == HORDE)
+    if (ginfo->Team == HORDE)
         index++;
     sLog.outDebug("Adding Group to BattleGroundQueue bgTypeId : %u, queue_id : %u, index : %u", BgTypeId, queue_id, index);
 
@@ -235,7 +235,7 @@ uint32 BattleGroundQueue::GetAverageQueueWaitTime(GroupQueueInfo* ginfo, BGQueue
             team_index = BG_TEAM_HORDE;                     //for rated arenas use BG_TEAM_HORDE
     }
     //check if there is enought values(we always add values > 0)
-    if(m_WaitTimes[team_index][queue_id][COUNT_OF_PLAYERS_TO_AVERAGE_WAIT_TIME - 1] )
+    if (m_WaitTimes[team_index][queue_id][COUNT_OF_PLAYERS_TO_AVERAGE_WAIT_TIME - 1] )
         return (m_SumOfWaitTimes[team_index][queue_id] / COUNT_OF_PLAYERS_TO_AVERAGE_WAIT_TIME);
     else
         //if there aren't enough values return 0 - not available
@@ -346,7 +346,7 @@ void BattleGroundQueue::RemovePlayer(const uint64& guid, bool decreaseInvitedCou
     {
         // remove next player, this is recursive
         // first send removal information
-        if(Player *plr2 = objmgr.GetPlayer(group->Players.begin()->first))
+        if (Player *plr2 = objmgr.GetPlayer(group->Players.begin()->first))
         {
             BattleGround * bg = sBattleGroundMgr.GetBattleGroundTemplate(group->BgTypeId);
             BattleGroundQueueTypeId bgQueueTypeId = BattleGroundMgr::BGQueueTypeId(group->BgTypeId, group->ArenaType);
@@ -370,11 +370,11 @@ void BattleGroundQueue::AnnounceWorld(GroupQueueInfo *ginfo, const uint64& playe
         if (sWorld.getConfig(CONFIG_ARENA_QUEUE_ANNOUNCER_ENABLE) && ginfo->IsRated)
         {
             BattleGround* bg = sBattleGroundMgr.GetBattleGroundTemplate(ginfo->BgTypeId);
-            if(!bg)
+            if (!bg)
                 return;
 
             char const* bgName = bg->GetName();
-            if(isAddedToQueue)
+            if (isAddedToQueue)
                 sWorld.SendWorldText(LANG_ARENA_QUEUE_ANNOUNCE_WORLD_JOIN, bgName, ginfo->ArenaType, ginfo->ArenaType, ginfo->ArenaTeamRating);
             else
                 sWorld.SendWorldText(LANG_ARENA_QUEUE_ANNOUNCE_WORLD_EXIT, bgName, ginfo->ArenaType, ginfo->ArenaType, ginfo->ArenaTeamRating);
@@ -386,7 +386,7 @@ void BattleGroundQueue::AnnounceWorld(GroupQueueInfo *ginfo, const uint64& playe
         {
             Player *plr = objmgr.GetPlayer(playerGUID);
             BattleGround* bg = sBattleGroundMgr.GetBattleGroundTemplate(ginfo->BgTypeId);
-            if(!bg || !plr)
+            if (!bg || !plr)
                 return;
 
             BGQueueIdBasedOnLevel queue_id = plr->GetBattleGroundQueueIdFromLevel(bg->GetTypeID());
@@ -567,7 +567,7 @@ void BattleGroundQueue::FillPlayersToBG(BattleGround* bg, BGQueueIdBasedOnLevel 
 bool BattleGroundQueue::CheckPremadeMatch(BGQueueIdBasedOnLevel queue_id, uint32 MinPlayersPerTeam, uint32 MaxPlayersPerTeam)
 {
     //check match
-    if(!m_QueuedGroups[queue_id][BG_QUEUE_PREMADE_ALLIANCE].empty() && !m_QueuedGroups[queue_id][BG_QUEUE_PREMADE_HORDE].empty())
+    if (!m_QueuedGroups[queue_id][BG_QUEUE_PREMADE_ALLIANCE].empty() && !m_QueuedGroups[queue_id][BG_QUEUE_PREMADE_HORDE].empty())
     {
         //start premade match
         //if groups aren't invited
@@ -579,7 +579,7 @@ bool BattleGroundQueue::CheckPremadeMatch(BGQueueIdBasedOnLevel queue_id, uint32
             if (!(*horde_group)->IsInvitedToBGInstanceGUID)
                 break;
 
-        if( ali_group != m_QueuedGroups[queue_id][BG_QUEUE_PREMADE_ALLIANCE].end() && horde_group != m_QueuedGroups[queue_id][BG_QUEUE_PREMADE_HORDE].end())
+        if (ali_group != m_QueuedGroups[queue_id][BG_QUEUE_PREMADE_ALLIANCE].end() && horde_group != m_QueuedGroups[queue_id][BG_QUEUE_PREMADE_HORDE].end())
         {
             m_SelectionPools[BG_TEAM_ALLIANCE].AddGroup((*ali_group), MaxPlayersPerTeam);
             m_SelectionPools[BG_TEAM_HORDE].AddGroup((*horde_group), MaxPlayersPerTeam);
@@ -606,10 +606,10 @@ bool BattleGroundQueue::CheckPremadeMatch(BGQueueIdBasedOnLevel queue_id, uint32
     uint32 time_before = getMSTime() - sWorld.getConfig(CONFIG_BATTLEGROUND_PREMADE_GROUP_WAIT_FOR_MATCH);
     for(uint32 i = 0; i < BG_TEAMS_COUNT; i++)
     {
-        if(!m_QueuedGroups[queue_id][BG_QUEUE_PREMADE_ALLIANCE + i].empty())
+        if (!m_QueuedGroups[queue_id][BG_QUEUE_PREMADE_ALLIANCE + i].empty())
         {
             GroupsQueueType::iterator itr = m_QueuedGroups[queue_id][BG_QUEUE_PREMADE_ALLIANCE + i].begin();
-            if(!(*itr)->IsInvitedToBGInstanceGUID && ((*itr)->JoinTime < time_before || (*itr)->Players.size() < MinPlayersPerTeam))
+            if (!(*itr)->IsInvitedToBGInstanceGUID && ((*itr)->JoinTime < time_before || (*itr)->Players.size() < MinPlayersPerTeam))
             {
                 //we must insert group to normal queue and erase pointer from premade queue
                 m_QueuedGroups[queue_id][BG_QUEUE_NORMAL_ALLIANCE + i].push_front((*itr));
@@ -672,7 +672,7 @@ bool BattleGroundQueue::CheckSkirmishForSameFaction(BGQueueIdBasedOnLevel queue_
     uint32 teamIndex = BG_TEAM_ALLIANCE;
     uint32 otherTeam = BG_TEAM_HORDE;
     uint32 otherTeamId = HORDE;
-    if ( m_SelectionPools[BG_TEAM_HORDE].GetPlayerCount() == minPlayersPerTeam )
+    if (m_SelectionPools[BG_TEAM_HORDE].GetPlayerCount() == minPlayersPerTeam )
     {
         teamIndex = BG_TEAM_HORDE;
         otherTeam = BG_TEAM_ALLIANCE;
@@ -848,7 +848,7 @@ void BattleGroundQueue::Update(BattleGroundTypeId bgTypeId, BGQueueIdBasedOnLeve
     if (!isRated)
     {
         // if there are enough players in pools, start new battleground or non rated arena
-        if( CheckNormalMatch(bg_template, queue_id, MinPlayersPerTeam, MaxPlayersPerTeam)
+        if (CheckNormalMatch(bg_template, queue_id, MinPlayersPerTeam, MaxPlayersPerTeam)
             || (bg_template->isArena() && CheckSkirmishForSameFaction(queue_id, MinPlayersPerTeam)) )
         {
             // we successfully created a pool
@@ -872,7 +872,7 @@ void BattleGroundQueue::Update(BattleGroundTypeId bgTypeId, BGQueueIdBasedOnLeve
         // found out the minimum and maximum ratings the newly added team should battle against
         // arenaRating is the rating of the latest joined team, or 0
         // 0 is on (automatic update call) and we must set it to team's with longest wait time
-        if ( !arenaRating )
+        if (!arenaRating )
         {
             GroupQueueInfo* front1 = NULL;
             GroupQueueInfo* front2 = NULL;
@@ -1121,7 +1121,7 @@ void BattleGroundMgr::DeleteAllBattleGrounds()
         {
             BattleGround * bg = itr->second;
             m_BattleGrounds[i].erase(itr++);
-            if(!m_ClientBattleGroundIds[i][bg->GetQueueId()].empty())
+            if (!m_ClientBattleGroundIds[i][bg->GetQueueId()].empty())
                 m_ClientBattleGroundIds[i][bg->GetQueueId()].erase(bg->GetClientInstanceID());
             delete bg;
         }
@@ -1153,21 +1153,21 @@ void BattleGroundMgr::Update(uint32 diff)
             itr->second->Update(diff);
             // use the SetDeleteThis variable
             // direct deletion caused crashes
-            if(itr->second->m_SetDeleteThis)
+            if (itr->second->m_SetDeleteThis)
             {
                 BattleGround * bg = itr->second;
                 m_BattleGrounds[i].erase(itr);
-                if(!m_ClientBattleGroundIds[i][bg->GetQueueId()].empty())
+                if (!m_ClientBattleGroundIds[i][bg->GetQueueId()].empty())
                     m_ClientBattleGroundIds[i][bg->GetQueueId()].erase(bg->GetClientInstanceID());
                 delete bg;
             }
         }
     }
     // if rating difference counts, maybe force-update queues
-    if(sWorld.getConfig(CONFIG_ARENA_MAX_RATING_DIFFERENCE) && sWorld.getConfig(CONFIG_ARENA_RATING_DISCARD_TIMER))
+    if (sWorld.getConfig(CONFIG_ARENA_MAX_RATING_DIFFERENCE) && sWorld.getConfig(CONFIG_ARENA_RATING_DISCARD_TIMER))
     {
         // it's time to force update
-        if(m_NextRatingDiscardUpdate < diff)
+        if (m_NextRatingDiscardUpdate < diff)
         {
             // forced update for level 70 rated arenas
             sLog.outDebug("BattleGroundMgr: UPDATING ARENA QUEUES");
@@ -1182,11 +1182,11 @@ void BattleGroundMgr::Update(uint32 diff)
         else
             m_NextRatingDiscardUpdate -= diff;
     }
-    if(sWorld.getConfig(CONFIG_ARENA_AUTO_DISTRIBUTE_POINTS))
+    if (sWorld.getConfig(CONFIG_ARENA_AUTO_DISTRIBUTE_POINTS))
     {
-        if(m_AutoDistributionTimeChecker < diff)
+        if (m_AutoDistributionTimeChecker < diff)
         {
-            if(sWorld.GetGameTime() > m_NextAutoDistributionTime)
+            if (sWorld.GetGameTime() > m_NextAutoDistributionTime)
             {
                 DistributeArenaPoints();
                 m_NextAutoDistributionTime = sWorld.GetGameTime() + BATTLEGROUND_ARENA_POINT_DISTRIBUTION_DAY * sWorld.getConfig(CONFIG_ARENA_AUTO_DISTRIBUTE_INTERVAL_DAYS);
@@ -1260,7 +1260,7 @@ void BattleGroundMgr::BuildBattleGroundStatusPacket(WorldPacket *data, BattleGro
             break;
     }
 
-    if(bg->isArena() && (StatusID == STATUS_WAIT_QUEUE))
+    if (bg->isArena() && (StatusID == STATUS_WAIT_QUEUE))
         *data << uint32(BATTLEGROUND_AA);                   // all arenas   I don't think so.
     else
     *data << uint32(bg->GetTypeID());                   // BG id from DBC
@@ -1313,14 +1313,14 @@ void BattleGroundMgr::BuildPvpLogDataPacket(WorldPacket *data, BattleGround *bg)
         {
             uint32 at_id = bg->m_ArenaTeamIds[i];
             ArenaTeam * at = objmgr.GetArenaTeamById(at_id);
-            if(at)
+            if (at)
                 *data << at->GetName();
             else
                 *data << (uint8)0;
         }
     }
 
-    if(bg->GetStatus() != STATUS_WAIT_LEAVE)
+    if (bg->GetStatus() != STATUS_WAIT_LEAVE)
     {
         *data << uint8(0);                                  // bg not ended
     }
@@ -1336,7 +1336,7 @@ void BattleGroundMgr::BuildPvpLogDataPacket(WorldPacket *data, BattleGround *bg)
     {
         *data << (uint64)itr->first;
         *data << (int32)itr->second->KillingBlows;
-        if(type == 0)
+        if (type == 0)
         {
             *data << (int32)itr->second->HonorableKills;
             *data << (int32)itr->second->Deaths;
@@ -1346,7 +1346,7 @@ void BattleGroundMgr::BuildPvpLogDataPacket(WorldPacket *data, BattleGround *bg)
         {
             Player *plr = objmgr.GetPlayer(itr->first);
             uint32 team = bg->GetPlayerTeam(itr->first);
-            if(!team && plr)
+            if (!team && plr)
                 team = plr->GetTeam();
             if (( bg->GetWinner()==0 && team == ALLIANCE ) || ( bg->GetWinner()==1 && team==HORDE ))
                 *data << uint8(1);
@@ -1444,12 +1444,12 @@ BattleGround * BattleGroundMgr::GetBattleGroundThroughClientInstance(uint32 inst
     if (!bg)
         return NULL;
 
-    if(bg->isArena())
+    if (bg->isArena())
         return GetBattleGround(instanceId, bgTypeId);
 
     for(BattleGroundSet::iterator itr = m_BattleGrounds[bgTypeId].begin(); itr != m_BattleGrounds[bgTypeId].end(); ++itr)
     {
-        if(itr->second->GetClientInstanceID() == instanceId)
+        if (itr->second->GetClientInstanceID() == instanceId)
             return itr->second;
     }
     return NULL;
@@ -1459,7 +1459,7 @@ BattleGround * BattleGroundMgr::GetBattleGround(uint32 InstanceID, BattleGroundT
 {
     //search if needed
     BattleGroundSet::iterator itr;
-    if( bgTypeId == BATTLEGROUND_TYPE_NONE)
+    if (bgTypeId == BATTLEGROUND_TYPE_NONE)
     {
         for(uint32 i = BATTLEGROUND_AV; i < MAX_BATTLEGROUND_TYPE_ID; i++)
         {
@@ -1506,20 +1506,20 @@ BattleGround * BattleGroundMgr::CreateNewBattleGround(BattleGroundTypeId bgTypeI
 {
     // get the template BG
     BattleGround *bg_template = GetBattleGroundTemplate(bgTypeId);
-    if(!bg_template)
+    if (!bg_template)
     {
         sLog.outError("BattleGround: CreateNewBattleGround - bg template not found for %u", bgTypeId);
         return NULL;
     }
 
     //for arenas there is random map used
-    if(bg_template->isArena())
+    if (bg_template->isArena())
     {
         BattleGroundTypeId arenas[] = {BATTLEGROUND_NA, BATTLEGROUND_BE, BATTLEGROUND_RL};
         uint32 arena_num = urand(0,2);
         bgTypeId = arenas[arena_num];
         bg_template = GetBattleGroundTemplate(bgTypeId);
-        if(!bg_template)
+        if (!bg_template)
         {
             sLog.outError("BattleGround: CreateNewBattleGround - bg template not found for %u", bgTypeId);
             return NULL;
@@ -1645,7 +1645,7 @@ void BattleGroundMgr::CreateInitialBattleGrounds()
     //                                                0   1                 2                 3      4      5                6              7             8
     QueryResult *result = WorldDatabase.Query("SELECT id, MinPlayersPerTeam,MaxPlayersPerTeam,MinLvl,MaxLvl,AllianceStartLoc,AllianceStartO,HordeStartLoc,HordeStartO FROM battleground_template");
 
-    if(!result)
+    if (!result)
     {
         barGoLink bar(1);
 
@@ -1667,7 +1667,7 @@ void BattleGroundMgr::CreateInitialBattleGrounds()
 
         // can be overwrite by values from DB
         bl = sBattlemasterListStore.LookupEntry(bgTypeID_);
-        if(!bl)
+        if (!bl)
         {
             sLog.outError("Battleground ID %u not found in BattlemasterList.dbc. Battleground not created.", bgTypeID_);
             continue;
@@ -1695,14 +1695,14 @@ void BattleGroundMgr::CreateInitialBattleGrounds()
         start1 = fields[5].GetUInt32();
 
         start = sWorldSafeLocsStore.LookupEntry(start1);
-        if(start)
+        if (start)
         {
             AStartLoc[0] = start->x;
             AStartLoc[1] = start->y;
             AStartLoc[2] = start->z;
             AStartLoc[3] = fields[6].GetFloat();
         }
-        else if(bgTypeID == BATTLEGROUND_AA)
+        else if (bgTypeID == BATTLEGROUND_AA)
         {
             AStartLoc[0] = 0;
             AStartLoc[1] = 0;
@@ -1718,14 +1718,14 @@ void BattleGroundMgr::CreateInitialBattleGrounds()
         start2 = fields[7].GetUInt32();
 
         start = sWorldSafeLocsStore.LookupEntry(start2);
-        if(start)
+        if (start)
         {
             HStartLoc[0] = start->x;
             HStartLoc[1] = start->y;
             HStartLoc[2] = start->z;
             HStartLoc[3] = fields[8].GetFloat();
         }
-        else if(bgTypeID == BATTLEGROUND_AA)
+        else if (bgTypeID == BATTLEGROUND_AA)
         {
             HStartLoc[0] = 0;
             HStartLoc[1] = 0;
@@ -1739,7 +1739,7 @@ void BattleGroundMgr::CreateInitialBattleGrounds()
         }
 
         //sLog.outDetail("Creating battleground %s, %u-%u", bl->name[sWorld.GetDBClang()], MinLvl, MaxLvl);
-        if(!CreateBattleGround(bgTypeID, IsArena, MinPlayersPerTeam, MaxPlayersPerTeam, MinLvl, MaxLvl, bl->name[sWorld.GetDefaultDbcLocale()], bl->mapid[0], AStartLoc[0], AStartLoc[1], AStartLoc[2], AStartLoc[3], HStartLoc[0], HStartLoc[1], HStartLoc[2], HStartLoc[3]))
+        if (!CreateBattleGround(bgTypeID, IsArena, MinPlayersPerTeam, MaxPlayersPerTeam, MinLvl, MaxLvl, bl->name[sWorld.GetDefaultDbcLocale()], bl->mapid[0], AStartLoc[0], AStartLoc[1], AStartLoc[2], AStartLoc[3], HStartLoc[0], HStartLoc[1], HStartLoc[2], HStartLoc[3]))
             continue;
 
         ++count;
@@ -1753,11 +1753,11 @@ void BattleGroundMgr::CreateInitialBattleGrounds()
 
 void BattleGroundMgr::InitAutomaticArenaPointDistribution()
 {
-    if(sWorld.getConfig(CONFIG_ARENA_AUTO_DISTRIBUTE_POINTS))
+    if (sWorld.getConfig(CONFIG_ARENA_AUTO_DISTRIBUTE_POINTS))
     {
         sLog.outDebug("Initializing Automatic Arena Point Distribution");
         QueryResult * result = CharacterDatabase.Query("SELECT NextArenaPointDistributionTime FROM saved_variables");
-        if(!result)
+        if (!result)
         {
             sLog.outDebug("Battleground: Next arena point distribution time not found in SavedVariables, reseting it now.");
             m_NextAutoDistributionTime = sWorld.GetGameTime() + BATTLEGROUND_ARENA_POINT_DISTRIBUTION_DAY * sWorld.getConfig(CONFIG_ARENA_AUTO_DISTRIBUTE_INTERVAL_DAYS);
@@ -1785,7 +1785,7 @@ void BattleGroundMgr::DistributeArenaPoints()
     //at first update all points for all team members
     for(ObjectMgr::ArenaTeamMap::iterator team_itr = objmgr.GetArenaTeamMapBegin(); team_itr != objmgr.GetArenaTeamMapEnd(); ++team_itr)
     {
-        if(ArenaTeam * at = team_itr->second)
+        if (ArenaTeam * at = team_itr->second)
         {
             at->UpdateArenaPointsHelper(PlayerPoints);
         }
@@ -1809,7 +1809,7 @@ void BattleGroundMgr::DistributeArenaPoints()
     sWorld.SendWorldText(LANG_DIST_ARENA_POINTS_TEAM_START);
     for(ObjectMgr::ArenaTeamMap::iterator titr = objmgr.GetArenaTeamMapBegin(); titr != objmgr.GetArenaTeamMapEnd(); ++titr)
     {
-        if(ArenaTeam * at = titr->second)
+        if (ArenaTeam * at = titr->second)
         {
             at->FinishWeek();                              // set played this week etc values to 0 in memory, too
             at->SaveToDB();                                // save changes
@@ -1826,7 +1826,7 @@ void BattleGroundMgr::BuildBattleGroundListPacket(WorldPacket *data, const uint6
 {
     uint32 PlayerLevel = 10;
 
-    if(plr)
+    if (plr)
         PlayerLevel = plr->getLevel();
 
     data->Initialize(SMSG_BATTLEFIELD_LIST);
@@ -1858,12 +1858,12 @@ void BattleGroundMgr::BuildBattleGroundListPacket(WorldPacket *data, const uint6
 void BattleGroundMgr::SendToBattleGround(Player *pl, uint32 instanceId, BattleGroundTypeId bgTypeId)
 {
     BattleGround *bg = GetBattleGround(instanceId, bgTypeId);
-    if(bg)
+    if (bg)
     {
         uint32 mapid = bg->GetMapId();
         float x, y, z, O;
         uint32 team = pl->GetBGTeam();
-        if(team==0)
+        if (team==0)
             team = pl->GetTeam();
         bg->GetTeamStartLoc(team, x, y, z, O);
 
@@ -1880,7 +1880,7 @@ void BattleGroundMgr::SendAreaSpiritHealerQueryOpcode(Player *pl, BattleGround *
 {
     WorldPacket data(SMSG_AREA_SPIRIT_HEALER_TIME, 12);
     uint32 time_ = 30000 - bg->GetLastResurrectTime();      // resurrect every 30 seconds
-    if(time_ == uint32(-1))
+    if (time_ == uint32(-1))
         time_ = 0;
     data << guid << time_;
     pl->GetSession()->SendPacket(&data);
@@ -1971,7 +1971,7 @@ uint8 BattleGroundMgr::BGArenaType(BattleGroundQueueTypeId bgQueueTypeId)
 void BattleGroundMgr::ToggleTesting()
 {
     m_Testing = !m_Testing;
-    if(m_Testing)
+    if (m_Testing)
         sWorld.SendWorldText(LANG_DEBUG_BG_ON);
     else
         sWorld.SendWorldText(LANG_DEBUG_BG_OFF);
@@ -1980,7 +1980,7 @@ void BattleGroundMgr::ToggleTesting()
 void BattleGroundMgr::ToggleArenaTesting()
 {
     m_ArenaTesting = !m_ArenaTesting;
-    if(m_ArenaTesting)
+    if (m_ArenaTesting)
         sWorld.SendWorldText(LANG_DEBUG_ARENA_ON);
     else
         sWorld.SendWorldText(LANG_DEBUG_ARENA_OFF);

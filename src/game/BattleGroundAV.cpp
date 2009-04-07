@@ -67,7 +67,7 @@ void BattleGroundAV::RemovePlayer(Player* /*plr*/,uint64 /*guid*/)
 void BattleGroundAV::HandleAreaTrigger(Player *Source, uint32 Trigger)
 {
     // this is wrong way to implement these things. On official it done by gameobject spell cast.
-    if(GetStatus() != STATUS_IN_PROGRESS)
+    if (GetStatus() != STATUS_IN_PROGRESS)
         return;
 
     uint32 SpellId = 0;
@@ -89,7 +89,7 @@ void BattleGroundAV::HandleAreaTrigger(Player *Source, uint32 Trigger)
             break;
     }
 
-    if(SpellId)
+    if (SpellId)
         Source->CastSpell(Source, SpellId, true);
 }
 
