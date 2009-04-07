@@ -739,9 +739,6 @@ void BattleGround::EndBattleGround(uint32 winner)
         loser_arena_team->NotifyStatsChanged();
     }
 
-    // inform invited players about the removal
-    sBattleGroundMgr.m_BattleGroundQueues[BattleGroundMgr::BGQueueTypeId(GetTypeID(), GetArenaType())].BGEndedRemoveInvites(this);
-
     if(winmsg_id)
         SendMessageToAll(winmsg_id, CHAT_MSG_BG_SYSTEM_NEUTRAL);
 }
@@ -1603,8 +1600,6 @@ void BattleGround::EndNow()
     RemoveFromBGFreeSlotQueue();
     SetStatus(STATUS_WAIT_LEAVE);
     SetEndTime(0);
-    // inform invited players about the removal
-    sBattleGroundMgr.m_BattleGroundQueues[BattleGroundMgr::BGQueueTypeId(GetTypeID(), GetArenaType())].BGEndedRemoveInvites(this);
 }
 
 /*
