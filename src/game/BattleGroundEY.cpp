@@ -50,7 +50,7 @@ void BattleGroundEY::Update(uint32 diff)
 {
     BattleGround::Update(diff);
 
-    if( GetStatus() == STATUS_IN_PROGRESS )
+    if (GetStatus() == STATUS_IN_PROGRESS)
     {
         m_PointAddingTimer -= diff;
         if(m_PointAddingTimer <= 0)
@@ -259,9 +259,9 @@ void BattleGroundEY::UpdateTeamScore(uint32 Team)
 {
     uint32 score = GetTeamScore(Team);
     //TODO there should be some sound played when one team is near victory!! - and define variables
-    /*if( !m_IsInformedNearVictory && score >= BG_EY_WARNING_NEAR_VICTORY_SCORE )
+    /*if (!m_IsInformedNearVictory && score >= BG_EY_WARNING_NEAR_VICTORY_SCORE)
     {
-        if( Team == ALLIANCE )
+        if (Team == ALLIANCE)
             SendMessageToAll(LANG_BG_EY_A_NEAR_VICTORY, CHAT_MSG_BG_SYSTEM_NEUTRAL);
         else
             SendMessageToAll(LANG_BG_EY_H_NEAR_VICTORY, CHAT_MSG_BG_SYSTEM_NEUTRAL);
@@ -269,7 +269,7 @@ void BattleGroundEY::UpdateTeamScore(uint32 Team)
         m_IsInformedNearVictory = true;
     }*/
 
-    if( score >= BG_EY_MAX_TEAM_SCORE )
+    if (score >= BG_EY_MAX_TEAM_SCORE)
     {
         score = BG_EY_MAX_TEAM_SCORE;
         EndBattleGround(Team);
@@ -284,9 +284,9 @@ void BattleGroundEY::UpdateTeamScore(uint32 Team)
 void BattleGroundEY::EndBattleGround(uint32 winner)
 {
     //win reward
-    if( winner == ALLIANCE )
+    if (winner == ALLIANCE)
         RewardHonorToTeam(GetBonusHonorFromKill(1), ALLIANCE);
-    if( winner == HORDE )
+    if (winner == HORDE)
         RewardHonorToTeam(GetBonusHonorFromKill(1), HORDE);
     //complete map reward
     RewardHonorToTeam(GetBonusHonorFromKill(1), ALLIANCE);
@@ -472,7 +472,7 @@ bool BattleGroundEY::SetupBattleGround()
     for (int i = 0; i < EY_POINTS_MAX; ++i)
     {
         AreaTriggerEntry const* at = sAreaTriggerStore.LookupEntry(m_Points_Trigger[i]);
-        if( !at )
+        if (!at)
         {
             sLog.outError("BattleGroundEY: Unknown trigger: %u", m_Points_Trigger[i]);
             continue;
@@ -486,14 +486,14 @@ bool BattleGroundEY::SetupBattleGround()
 
     WorldSafeLocsEntry const *sg = NULL;
     sg = sWorldSafeLocsStore.LookupEntry(EY_GRAVEYARD_MAIN_ALLIANCE);
-    if( !sg || !AddSpiritGuide(EY_SPIRIT_MAIN_ALLIANCE, sg->x, sg->y, sg->z, 3.124139f, ALLIANCE) )
+    if (!sg || !AddSpiritGuide(EY_SPIRIT_MAIN_ALLIANCE, sg->x, sg->y, sg->z, 3.124139f, ALLIANCE))
     {
         sLog.outErrorDb("BatteGroundEY: Failed to spawn spirit guide! BattleGround not created!");
         return false;
     }
 
     sg = sWorldSafeLocsStore.LookupEntry(EY_GRAVEYARD_MAIN_HORDE);
-    if( !sg || !AddSpiritGuide(EY_SPIRIT_MAIN_HORDE, sg->x, sg->y, sg->z, 3.193953f, HORDE) )
+    if (!sg || !AddSpiritGuide(EY_SPIRIT_MAIN_HORDE, sg->x, sg->y, sg->z, 3.193953f, HORDE))
     {
         sLog.outErrorDb("BatteGroundEY: Failed to spawn spirit guide! BattleGround not created!");
         return false;

@@ -607,9 +607,9 @@ void BattleGroundWS::Reset()
 void BattleGroundWS::EndBattleGround(uint32 winner)
 {
     //win reward
-    if( winner == ALLIANCE )
+    if (winner == ALLIANCE)
         RewardHonorToTeam(GetBonusHonorFromKill(m_HonorWinKills), ALLIANCE);
-    if( winner == HORDE )
+    if (winner == HORDE)
         RewardHonorToTeam(GetBonusHonorFromKill(m_HonorWinKills), HORDE);
     //complete map_end rewards (even if no team wins)
     RewardHonorToTeam(GetBonusHonorFromKill(m_HonorEndKills), ALLIANCE);

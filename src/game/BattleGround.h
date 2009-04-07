@@ -354,7 +354,7 @@ class BattleGround
         void IncreaseInvitedCount(uint32 team)      { (team == ALLIANCE) ? ++m_InvitedAlliance : ++m_InvitedHorde; }
         uint32 GetInvitedCount(uint32 team) const
         {
-            if( team == ALLIANCE )
+            if (team == ALLIANCE)
                 return m_InvitedAlliance;
             else
                 return m_InvitedHorde;

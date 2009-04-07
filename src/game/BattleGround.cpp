@@ -233,12 +233,12 @@ void BattleGround::Update(uint32 diff)
         return;
 
     // remove offline players from bg after 5 minutes
-    if( !m_OfflineQueue.empty() )
+    if (!m_OfflineQueue.empty())
     {
         BattleGroundPlayerMap::iterator itr = m_Players.find(*(m_OfflineQueue.begin()));
-        if( itr != m_Players.end() )
+        if (itr != m_Players.end())
         {
-            if( itr->second.OfflineRemoveTime <= sWorld.GetGameTime() )
+            if (itr->second.OfflineRemoveTime <= sWorld.GetGameTime())
             {
                 RemovePlayerAtLeave(itr->first, true, true);// remove player from BG
                 m_OfflineQueue.pop_front();                 // remove from offline queue
@@ -317,9 +317,9 @@ void BattleGround::Update(uint32 diff)
         {
             // time's up!
             uint32 winner = 0;
-            if( GetPlayersCountByTeam(ALLIANCE) >= GetMinPlayersPerTeam() )
+            if (GetPlayersCountByTeam(ALLIANCE) >= GetMinPlayersPerTeam())
                 winner = ALLIANCE;
-            else if( GetPlayersCountByTeam(HORDE) >= GetMinPlayersPerTeam() )
+            else if (GetPlayersCountByTeam(HORDE) >= GetMinPlayersPerTeam())
                 winner = HORDE;
 
             EndBattleGround(winner);
@@ -329,15 +329,15 @@ void BattleGround::Update(uint32 diff)
         {
             uint32 newtime = m_PrematureCountDownTimer - diff;
             // announce every minute
-            if( newtime > (MINUTE * IN_MILISECONDS) )
+            if (newtime > (MINUTE * IN_MILISECONDS))
             {
-                if( newtime / (MINUTE * IN_MILISECONDS) != m_PrematureCountDownTimer / (MINUTE * IN_MILISECONDS) )
+                if (newtime / (MINUTE * IN_MILISECONDS) != m_PrematureCountDownTimer / (MINUTE * IN_MILISECONDS))
                     PSendMessageToAll(LANG_BATTLEGROUND_PREMATURE_FINISH_WARNING, CHAT_MSG_SYSTEM, NULL, (uint32)(m_PrematureCountDownTimer / (MINUTE * IN_MILISECONDS)));
             }
             else
             {
                 //announce every 15 seconds
-                if( newtime / (15 * IN_MILISECONDS) != m_PrematureCountDownTimer / (15 * IN_MILISECONDS) )
+                if (newtime / (15 * IN_MILISECONDS) != m_PrematureCountDownTimer / (15 * IN_MILISECONDS))
                     PSendMessageToAll(LANG_BATTLEGROUND_PREMATURE_FINISH_WARNING_SECS, CHAT_MSG_SYSTEM, NULL, (uint32)(m_PrematureCountDownTimer / IN_MILISECONDS));
             }
             m_PrematureCountDownTimer = newtime;
@@ -394,7 +394,7 @@ void BattleGround::Update(uint32 diff)
             SetStartDelayTime(m_StartDelayTimes[BG_STARTING_EVENT_FOURTH]);
 
             //remove preparation
-            if( isArena() )
+            if (isArena())
             {
                 //TODO : add arena sound PlaySoundToAll(SOUND_ARENA_START);
 
@@ -413,7 +413,7 @@ void BattleGround::Update(uint32 diff)
                     if(Player* plr = objmgr.GetPlayer(itr->first))
                         plr->RemoveAurasDueToSpell(SPELL_PREPARATION);
                 //Announce BG starting
-                if( sWorld.getConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_ENABLE) )
+                if (sWorld.getConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_ENABLE))
                 {
                     sWorld.SendWorldText(LANG_BG_STARTED_ANNOUNCE_WORLD, GetName(), GetMinLevel(), GetMaxLevel());
                 }
@@ -644,7 +644,7 @@ void BattleGround::EndBattleGround(uint32 winner)
     {
         winner_arena_team = objmgr.GetArenaTeamById(GetArenaTeamIdForTeam(winner));
         loser_arena_team = objmgr.GetArenaTeamById(GetArenaTeamIdForTeam(GetOtherTeam(winner)));
-        if( winner_arena_team && loser_arena_team )
+        if (winner_arena_team && loser_arena_team)
         {
             loser_rating = loser_arena_team->GetStats().rating;
             winner_rating = winner_arena_team->GetStats().rating;
@@ -980,7 +980,7 @@ void BattleGround::RemovePlayerAtLeave(uint64 guid, bool Transport, bool SendPac
                 //left a rated match while the encounter was in progress, consider as loser
                 ArenaTeam * others_arena_team = objmgr.GetArenaTeamById(GetArenaTeamIdForTeam(GetOtherTeam(team)));
                 ArenaTeam * players_arena_team = objmgr.GetArenaTeamById(GetArenaTeamIdForTeam(team));
-                if( others_arena_team && players_arena_team )
+                if (others_arena_team && players_arena_team)
                     players_arena_team->OfflineMemberLost(guid, others_arena_team->GetRating());
             }
         }
@@ -996,7 +996,7 @@ void BattleGround::RemovePlayerAtLeave(uint64 guid, bool Transport, bool SendPac
         }
         DecreaseInvitedCount(team);
         //we should update battleground queue, but only if bg isn't ending
-        if( isBattleGround() && GetStatus() < STATUS_WAIT_LEAVE )
+        if (isBattleGround() && GetStatus() < STATUS_WAIT_LEAVE)
             sBattleGroundMgr.m_BattleGroundQueues[bgQueueTypeId].Update(bgTypeId, GetQueueId());
         // Let others know
         WorldPacket data;
@@ -1004,7 +1004,7 @@ void BattleGround::RemovePlayerAtLeave(uint64 guid, bool Transport, bool SendPac
         SendPacketToTeam(team, &data, plr, false);
     }
 
-    if( plr )
+    if (plr)
     {
         // Do next only if found in battleground
         plr->SetBattleGroundId(0, BATTLEGROUND_TYPE_NONE);  // We're not in BG.
@@ -1161,8 +1161,8 @@ void BattleGround::AddOrSetPlayerToCorrectBgGroup(Player *plr, uint64 plr_guid, 
         else
         {
             group->AddMember(plr_guid, plr->GetName());
-            if( Group* originalGroup = plr->GetOriginalGroup() )
-                if( originalGroup->IsLeader(plr_guid) )
+            if (Group* originalGroup = plr->GetOriginalGroup())
+                if (originalGroup->IsLeader(plr_guid))
                     group->ChangeLeader(plr_guid);
         }
     }
@@ -1174,7 +1174,7 @@ void BattleGround::EventPlayerLoggedIn(Player* player, uint64 plr_guid)
     // player is correct pointer
     for(std::deque<uint64>::iterator itr = m_OfflineQueue.begin(); itr != m_OfflineQueue.end(); ++itr)
     {
-        if( *itr == plr_guid )
+        if (*itr == plr_guid)
         {
             m_OfflineQueue.erase(itr);
             break;
@@ -1192,14 +1192,14 @@ void BattleGround::EventPlayerLoggedOut(Player* player)
     // player is correct pointer, it is checked in WorldSession::LogoutPlayer()
     m_OfflineQueue.push_back(player->GetGUID());
     m_Players[player->GetGUID()].OfflineRemoveTime = sWorld.GetGameTime() + MAX_OFFLINE_TIME;
-    if( GetStatus() == STATUS_IN_PROGRESS )
+    if (GetStatus() == STATUS_IN_PROGRESS)
     {
-        if( isBattleGround() )
+        if (isBattleGround())
             EventPlayerDroppedFlag(player);
         else
         {
             //1 player is logging out, if it is the last, then end arena!
-            if( GetAlivePlayersCountByTeam(player->GetTeam()) <= 1 && GetPlayersCountByTeam(GetOtherTeam(player->GetTeam())) )
+            if (GetAlivePlayersCountByTeam(player->GetTeam()) <= 1 && GetPlayersCountByTeam(GetOtherTeam(player->GetTeam())))
                 EndBattleGround(GetOtherTeam(player->GetTeam()));
         }
     }
@@ -1382,7 +1382,7 @@ void BattleGround::DoorClose(uint32 type)
     if(obj)
     {
         //if doors are open, close it
-        if( obj->getLootState() == GO_ACTIVATED && !obj->GetGoState() )
+        if (obj->getLootState() == GO_ACTIVATED && !obj->GetGoState())
         {
             //change state to allow door to be closed
             obj->SetLootState(GO_READY);
@@ -1415,13 +1415,13 @@ void BattleGround::SpawnBGObject(uint32 type, uint32 respawntime)
     Map * map = MapManager::Instance().FindMap(GetMapId(),GetInstanceID());
     if(!map)
         return;
-    if( respawntime == 0 )
+    if (respawntime == 0)
     {
         GameObject *obj = HashMapHolder<GameObject>::Find(m_BgObjects[type]);
         if(obj)
         {
             //we need to change state from GO_JUST_DEACTIVATED to GO_READY in case battleground is starting again
-            if( obj->getLootState() == GO_JUST_DEACTIVATED )
+            if (obj->getLootState() == GO_JUST_DEACTIVATED)
                 obj->SetLootState(GO_READY);
             obj->SetRespawnTime(0);
             map->Add(obj);
@@ -1626,13 +1626,13 @@ void BattleGround::HandleTriggerBuff(uint64 const& go_guid)
     //randomly select new buff
     uint8 buff = urand(0, 2);
     uint32 entry = obj->GetEntry();
-    if( m_BuffChange && entry != Buff_Entries[buff] )
+    if (m_BuffChange && entry != Buff_Entries[buff])
     {
         //despawn current buff
         SpawnBGObject(index, RESPAWN_ONE_DAY);
         //set index for new one
         for (uint8 currBuffTypeIndex = 0; currBuffTypeIndex < 3; ++currBuffTypeIndex)
-            if( entry == Buff_Entries[currBuffTypeIndex] )
+            if (entry == Buff_Entries[currBuffTypeIndex])
             {
                 index -= currBuffTypeIndex;
                 index += buff;
@@ -1650,7 +1650,7 @@ void BattleGround::HandleKillPlayer( Player *player, Player *killer )
     UpdatePlayerScore(player, SCORE_DEATHS, 1);
 
     // add +1 kills to group and +1 killing_blows to killer
-    if( killer )
+    if (killer)
     {
         UpdatePlayerScore(killer, SCORE_HONORABLE_KILLS, 1);
         UpdatePlayerScore(killer, SCORE_KILLING_BLOWS, 1);
@@ -1662,13 +1662,13 @@ void BattleGround::HandleKillPlayer( Player *player, Player *killer )
             if(!plr || plr == killer)
                 continue;
 
-            if( plr->GetTeam() == killer->GetTeam() && plr->IsAtGroupRewardDistance(player) )
+            if (plr->GetTeam() == killer->GetTeam() && plr->IsAtGroupRewardDistance(player))
                 UpdatePlayerScore(plr, SCORE_HONORABLE_KILLS, 1);
         }
     }
 
     // to be able to remove insignia -- ONLY IN BattleGrounds
-    if( !isArena() )
+    if (!isArena())
         player->SetFlag( UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE );
 }
 
@@ -1729,9 +1729,9 @@ uint32 BattleGround::GetAlivePlayersCountByTeam(uint32 Team) const
 
 void BattleGround::CheckArenaWinConditions()
 {
-    if( !GetAlivePlayersCountByTeam(ALLIANCE) && GetPlayersCountByTeam(HORDE) )
+    if (!GetAlivePlayersCountByTeam(ALLIANCE) && GetPlayersCountByTeam(HORDE))
         EndBattleGround(HORDE);
-    else if( GetPlayersCountByTeam(ALLIANCE) && !GetAlivePlayersCountByTeam(HORDE) )
+    else if (GetPlayersCountByTeam(ALLIANCE) && !GetAlivePlayersCountByTeam(HORDE))
         EndBattleGround(ALLIANCE);
 }
 
