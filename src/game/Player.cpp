@@ -19805,10 +19805,9 @@ void Player::BuildPlayerTalentsInfoData(WorldPacket *data)
 
         data->put<uint8>(pos, talentIdCount);               // put real count
 
-        uint8 glyphsCount = 6;
-        *data << uint8(glyphsCount);                        // glyphs count
+        *data << uint8(MAX_GLYPH_SLOT_INDEX);               // glyphs count
 
-        for(uint8 i = 0; i < glyphsCount; ++i)
+        for(uint8 i = 0; i < MAX_GLYPH_SLOT_INDEX; ++i)
             *data << uint16(GetGlyph(i));                   // GlyphProperties.dbc
     }
 }
