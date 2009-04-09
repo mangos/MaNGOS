@@ -26,8 +26,6 @@
 
 BattleGroundRL::BattleGroundRL()
 {
-    m_BgObjects.resize(BG_RL_OBJECT_MAX);
-
     m_StartDelayTimes[BG_STARTING_EVENT_FIRST]  = BG_START_DELAY_1M;
     m_StartDelayTimes[BG_STARTING_EVENT_SECOND] = BG_START_DELAY_30S;
     m_StartDelayTimes[BG_STARTING_EVENT_THIRD]  = BG_START_DELAY_15S;
@@ -56,17 +54,11 @@ void BattleGroundRL::Update(uint32 diff)
 
 void BattleGroundRL::StartingEventCloseDoors()
 {
-    for(uint32 i = BG_RL_OBJECT_DOOR_1; i <= BG_RL_OBJECT_DOOR_2; ++i)
-        SpawnBGObject(m_BgObjects[i], RESPAWN_IMMEDIATELY);
 }
 
 void BattleGroundRL::StartingEventOpenDoors()
 {
-    for(uint32 i = BG_RL_OBJECT_DOOR_1; i <= BG_RL_OBJECT_DOOR_2; ++i)
-        DoorOpen(m_BgObjects[i]);
-
-    for(uint32 i = BG_RL_OBJECT_BUFF_1; i <= BG_RL_OBJECT_BUFF_2; ++i)
-        SpawnBGObject(m_BgObjects[i], 60);
+    OpenDoorEvent(BG_EVENT_DOOR);
 }
 
 void BattleGroundRL::AddPlayer(Player *plr)
@@ -155,17 +147,6 @@ void BattleGroundRL::Reset()
 
 bool BattleGroundRL::SetupBattleGround()
 {
-    // gates
-    if (!AddObject(BG_RL_OBJECT_DOOR_1, BG_RL_OBJECT_TYPE_DOOR_1, 1293.561, 1601.938, 31.60557, -1.457349, 0, 0, -0.6658813, 0.7460576, RESPAWN_IMMEDIATELY)
-        || !AddObject(BG_RL_OBJECT_DOOR_2, BG_RL_OBJECT_TYPE_DOOR_2, 1278.648, 1730.557, 31.60557, 1.684245, 0, 0, 0.7460582, 0.6658807, RESPAWN_IMMEDIATELY)
-    // buffs
-        || !AddObject(BG_RL_OBJECT_BUFF_1, BG_RL_OBJECT_TYPE_BUFF_1, 1328.719971, 1632.719971, 36.730400, -1.448624, 0, 0, 0.6626201, -0.7489557, 120)
-        || !AddObject(BG_RL_OBJECT_BUFF_2, BG_RL_OBJECT_TYPE_BUFF_2, 1243.300049, 1699.170044, 34.872601, -0.06981307, 0, 0, 0.03489945, -0.9993908, 120))
-    {
-        sLog.outErrorDb("BatteGroundRL: Failed to spawn some object!");
-        return false;
-    }
-
     return true;
 }
 

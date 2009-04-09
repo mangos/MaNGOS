@@ -29,9 +29,6 @@
 
 BattleGroundWS::BattleGroundWS()
 {
-    m_BgObjects.resize(BG_WS_OBJECT_MAX);
-    m_BgCreatures.resize(BG_CREATURES_MAX_WS);
-
     m_StartMessageIds[BG_STARTING_EVENT_FIRST]  = LANG_BG_WS_START_TWO_MINUTES;
     m_StartMessageIds[BG_STARTING_EVENT_SECOND] = LANG_BG_WS_START_ONE_MINUTE;
     m_StartMessageIds[BG_STARTING_EVENT_THIRD]  = LANG_BG_WS_START_HALF_MINUTE;
@@ -93,29 +90,16 @@ void BattleGroundWS::Update(uint32 diff)
 
 void BattleGroundWS::StartingEventCloseDoors()
 {
-    for(uint32 i = BG_WS_OBJECT_DOOR_A_1; i <= BG_WS_OBJECT_DOOR_H_4; ++i)
-    {
-        DoorClose(m_BgObjects[i]);
-        SpawnBGObject(m_BgObjects[i], RESPAWN_IMMEDIATELY);
-    }
-    for(uint32 i = BG_WS_OBJECT_A_FLAG; i <= BG_WS_OBJECT_BERSERKBUFF_2; ++i)
-        SpawnBGObject(m_BgObjects[i], RESPAWN_ONE_DAY);
 }
 
 void BattleGroundWS::StartingEventOpenDoors()
 {
-    for(uint32 i = BG_WS_OBJECT_DOOR_A_1; i <= BG_WS_OBJECT_DOOR_A_4; ++i)
-        DoorOpen(m_BgObjects[i]);
-    for(uint32 i = BG_WS_OBJECT_DOOR_H_1; i <= BG_WS_OBJECT_DOOR_H_2; ++i)
-        DoorOpen(m_BgObjects[i]);
+    OpenDoorEvent(BG_EVENT_DOOR);
 
-    SpawnBGObject(m_BgObjects[BG_WS_OBJECT_DOOR_A_5], RESPAWN_ONE_DAY);
-    SpawnBGObject(m_BgObjects[BG_WS_OBJECT_DOOR_A_6], RESPAWN_ONE_DAY);
-    SpawnBGObject(m_BgObjects[BG_WS_OBJECT_DOOR_H_3], RESPAWN_ONE_DAY);
-    SpawnBGObject(m_BgObjects[BG_WS_OBJECT_DOOR_H_4], RESPAWN_ONE_DAY);
+    // TODO implement timer to despawn doors after a short while
 
-    for(uint32 i = BG_WS_OBJECT_A_FLAG; i <= BG_WS_OBJECT_BERSERKBUFF_2; ++i)
-        SpawnBGObject(m_BgObjects[i], RESPAWN_IMMEDIATELY);
+    SpawnEvent(WS_EVENT_FLAG_A, 0, true);
+    SpawnEvent(WS_EVENT_FLAG_H, 0, true);
 }
 
 void BattleGroundWS::AddPlayer(Player *plr)
@@ -133,18 +117,20 @@ void BattleGroundWS::RespawnFlag(uint32 Team, bool captured)
     {
         sLog.outDebug("Respawn Alliance flag");
         m_FlagState[BG_TEAM_ALLIANCE] = BG_WS_FLAG_STATE_ON_BASE;
+        SpawnEvent(WS_EVENT_FLAG_A, 0, true);
     }
     else
     {
         sLog.outDebug("Respawn Horde flag");
         m_FlagState[BG_TEAM_HORDE] = BG_WS_FLAG_STATE_ON_BASE;
+        SpawnEvent(WS_EVENT_FLAG_H, 0, true);
     }
 
     if (captured)
     {
         //when map_update will be allowed for battlegrounds this code will be useless
-        SpawnBGObject(m_BgObjects[BG_WS_OBJECT_H_FLAG], RESPAWN_IMMEDIATELY);
-        SpawnBGObject(m_BgObjects[BG_WS_OBJECT_A_FLAG], RESPAWN_IMMEDIATELY);
+        SpawnEvent(WS_EVENT_FLAG_A, 0, true);
+        SpawnEvent(WS_EVENT_FLAG_H, 0, true);
         SendMessageToAll(LANG_BG_WS_F_PLACED, CHAT_MSG_BG_SYSTEM_NEUTRAL);
         PlaySoundToAll(BG_WS_SOUND_FLAGS_RESPAWNED);        // flag respawned sound...
     }
@@ -155,17 +141,11 @@ void BattleGroundWS::RespawnFlagAfterDrop(uint32 team)
     if (GetStatus() != STATUS_IN_PROGRESS)
         return;
 
-    RespawnFlag(team,false);
+    RespawnFlag(team, false);
     if (team == ALLIANCE)
-    {
-        SpawnBGObject(m_BgObjects[BG_WS_OBJECT_A_FLAG], RESPAWN_IMMEDIATELY);
         SendMessageToAll(LANG_BG_WS_ALLIANCE_FLAG_RESPAWNED, CHAT_MSG_BG_SYSTEM_NEUTRAL);
-    }
     else
-    {
-        SpawnBGObject(m_BgObjects[BG_WS_OBJECT_H_FLAG], RESPAWN_IMMEDIATELY);
         SendMessageToAll(LANG_BG_WS_HORDE_FLAG_RESPAWNED, CHAT_MSG_BG_SYSTEM_NEUTRAL);
-    }
 
     PlaySoundToAll(BG_WS_SOUND_FLAGS_RESPAWNED);
 
@@ -217,8 +197,9 @@ void BattleGroundWS::EventPlayerCapturedFlag(Player *Source)
     //for flag capture is reward 2 honorable kills
     RewardHonorToTeam(GetBonusHonorFromKill(2), Source->GetTeam());
 
-    SpawnBGObject(m_BgObjects[BG_WS_OBJECT_H_FLAG], BG_WS_FLAG_RESPAWN_TIME);
-    SpawnBGObject(m_BgObjects[BG_WS_OBJECT_A_FLAG], BG_WS_FLAG_RESPAWN_TIME);
+    // despawn flags
+    SpawnEvent(WS_EVENT_FLAG_A, 0, false);
+    SpawnEvent(WS_EVENT_FLAG_H, 0, false);
 
     if (Source->GetTeam() == ALLIANCE)
         SendMessageToAll(LANG_BG_WS_CAPTURED_HF, CHAT_MSG_BG_SYSTEM_ALLIANCE, Source);
@@ -337,14 +318,16 @@ void BattleGroundWS::EventPlayerClickedOnFlag(Player *Source, GameObject* target
     int32 message_id = 0;
     ChatMsg type;
 
+    uint8 event = (sBattleGroundMgr.GetGameObjectEventIndex(target_obj->GetDBTableGUIDLow())).event1;
+
     //alliance flag picked up from base
     if(Source->GetTeam() == HORDE && GetFlagState(ALLIANCE) == BG_WS_FLAG_STATE_ON_BASE
-        && m_BgObjects[BG_WS_OBJECT_A_FLAG] == target_obj->GetGUID())
+        && event == WS_EVENT_FLAG_A)
     {
         message_id = LANG_BG_WS_PICKEDUP_AF;
         type = CHAT_MSG_BG_SYSTEM_HORDE;
         PlaySoundToAll(BG_WS_SOUND_ALLIANCE_FLAG_PICKED_UP);
-        SpawnBGObject(m_BgObjects[BG_WS_OBJECT_A_FLAG], RESPAWN_ONE_DAY);
+        SpawnEvent(WS_EVENT_FLAG_A, 0, false);
         SetAllianceFlagPicker(Source->GetGUID());
         m_FlagState[BG_TEAM_ALLIANCE] = BG_WS_FLAG_STATE_ON_PLAYER;
         //update world state to show correct flag carrier
@@ -355,12 +338,12 @@ void BattleGroundWS::EventPlayerClickedOnFlag(Player *Source, GameObject* target
 
     //horde flag picked up from base
     if (Source->GetTeam() == ALLIANCE && GetFlagState(HORDE) == BG_WS_FLAG_STATE_ON_BASE
-        && m_BgObjects[BG_WS_OBJECT_H_FLAG] == target_obj->GetGUID())
+        && event == WS_EVENT_FLAG_H)
     {
         message_id = LANG_BG_WS_PICKEDUP_HF;
         type = CHAT_MSG_BG_SYSTEM_ALLIANCE;
         PlaySoundToAll(BG_WS_SOUND_HORDE_FLAG_PICKED_UP);
-        SpawnBGObject(m_BgObjects[BG_WS_OBJECT_H_FLAG], RESPAWN_ONE_DAY);
+        SpawnEvent(WS_EVENT_FLAG_H, 0, false);
         SetHordeFlagPicker(Source->GetGUID());
         m_FlagState[BG_TEAM_HORDE] = BG_WS_FLAG_STATE_ON_PLAYER;
         //update world state to show correct flag carrier
@@ -378,7 +361,6 @@ void BattleGroundWS::EventPlayerClickedOnFlag(Player *Source, GameObject* target
             type = CHAT_MSG_BG_SYSTEM_ALLIANCE;
             UpdateFlagState(HORDE, BG_WS_FLAG_STATE_WAIT_RESPAWN);
             RespawnFlag(ALLIANCE, false);
-            SpawnBGObject(m_BgObjects[BG_WS_OBJECT_A_FLAG], RESPAWN_IMMEDIATELY);
             PlaySoundToAll(BG_WS_SOUND_FLAG_RETURNED);
             UpdatePlayerScore(Source, SCORE_FLAG_RETURNS, 1);
         }
@@ -387,7 +369,7 @@ void BattleGroundWS::EventPlayerClickedOnFlag(Player *Source, GameObject* target
             message_id = LANG_BG_WS_PICKEDUP_AF;
             type = CHAT_MSG_BG_SYSTEM_HORDE;
             PlaySoundToAll(BG_WS_SOUND_ALLIANCE_FLAG_PICKED_UP);
-            SpawnBGObject(m_BgObjects[BG_WS_OBJECT_A_FLAG], RESPAWN_ONE_DAY);
+            SpawnEvent(WS_EVENT_FLAG_A, 0, false);
             SetAllianceFlagPicker(Source->GetGUID());
             Source->CastSpell(Source, BG_WS_SPELL_SILVERWING_FLAG, true);
             m_FlagState[BG_TEAM_ALLIANCE] = BG_WS_FLAG_STATE_ON_PLAYER;
@@ -407,7 +389,6 @@ void BattleGroundWS::EventPlayerClickedOnFlag(Player *Source, GameObject* target
             type = CHAT_MSG_BG_SYSTEM_HORDE;
             UpdateFlagState(ALLIANCE, BG_WS_FLAG_STATE_WAIT_RESPAWN);
             RespawnFlag(HORDE, false);
-            SpawnBGObject(m_BgObjects[BG_WS_OBJECT_H_FLAG], RESPAWN_IMMEDIATELY);
             PlaySoundToAll(BG_WS_SOUND_FLAG_RETURNED);
             UpdatePlayerScore(Source, SCORE_FLAG_RETURNS, 1);
         }
@@ -416,7 +397,7 @@ void BattleGroundWS::EventPlayerClickedOnFlag(Player *Source, GameObject* target
             message_id = LANG_BG_WS_PICKEDUP_HF;
             type = CHAT_MSG_BG_SYSTEM_ALLIANCE;
             PlaySoundToAll(BG_WS_SOUND_HORDE_FLAG_PICKED_UP);
-            SpawnBGObject(m_BgObjects[BG_WS_OBJECT_H_FLAG], RESPAWN_ONE_DAY);
+            SpawnEvent(WS_EVENT_FLAG_H, 0, false);
             SetHordeFlagPicker(Source->GetGUID());
             Source->CastSpell(Source, BG_WS_SPELL_WARSONG_FLAG, true);
             m_FlagState[BG_TEAM_HORDE] = BG_WS_FLAG_STATE_ON_PLAYER;
@@ -532,50 +513,6 @@ void BattleGroundWS::HandleAreaTrigger(Player *Source, uint32 Trigger)
 
 bool BattleGroundWS::SetupBattleGround()
 {
-    // flags
-    if (!AddObject(BG_WS_OBJECT_A_FLAG, BG_OBJECT_A_FLAG_WS_ENTRY, 1540.423f, 1481.325f, 351.8284f, 3.089233f, 0, 0, 0.9996573f, 0.02617699f, BG_WS_FLAG_RESPAWN_TIME/1000)
-        || !AddObject(BG_WS_OBJECT_H_FLAG, BG_OBJECT_H_FLAG_WS_ENTRY, 916.0226f, 1434.405f, 345.413f, 0.01745329f, 0, 0, 0.008726535f, 0.9999619f, BG_WS_FLAG_RESPAWN_TIME/1000)
-        // buffs
-        || !AddObject(BG_WS_OBJECT_SPEEDBUFF_1, BG_OBJECTID_SPEEDBUFF_ENTRY, 1449.93f, 1470.71f, 342.6346f, -1.64061f, 0, 0, 0.7313537f, -0.6819983f, BUFF_RESPAWN_TIME)
-        || !AddObject(BG_WS_OBJECT_SPEEDBUFF_2, BG_OBJECTID_SPEEDBUFF_ENTRY, 1005.171f, 1447.946f, 335.9032f, 1.64061f, 0, 0, 0.7313537f, 0.6819984f, BUFF_RESPAWN_TIME)
-        || !AddObject(BG_WS_OBJECT_REGENBUFF_1, BG_OBJECTID_REGENBUFF_ENTRY, 1317.506f, 1550.851f, 313.2344f, -0.2617996f, 0, 0, 0.1305263f, -0.9914448f, BUFF_RESPAWN_TIME)
-        || !AddObject(BG_WS_OBJECT_REGENBUFF_2, BG_OBJECTID_REGENBUFF_ENTRY, 1110.451f, 1353.656f, 316.5181f, -0.6806787f, 0, 0, 0.333807f, -0.9426414f, BUFF_RESPAWN_TIME)
-        || !AddObject(BG_WS_OBJECT_BERSERKBUFF_1, BG_OBJECTID_BERSERKERBUFF_ENTRY, 1320.09f, 1378.79f, 314.7532f, 1.186824f, 0, 0, 0.5591929f, 0.8290376f, BUFF_RESPAWN_TIME)
-        || !AddObject(BG_WS_OBJECT_BERSERKBUFF_2, BG_OBJECTID_BERSERKERBUFF_ENTRY, 1139.688f, 1560.288f, 306.8432f, -2.443461f, 0, 0, 0.9396926f, -0.3420201f, BUFF_RESPAWN_TIME)
-        // alliance gates
-        || !AddObject(BG_WS_OBJECT_DOOR_A_1, BG_OBJECT_DOOR_A_1_WS_ENTRY, 1503.335f, 1493.466f, 352.1888f, 3.115414f, 0, 0, 0.9999143f, 0.01308903f, RESPAWN_IMMEDIATELY)
-        || !AddObject(BG_WS_OBJECT_DOOR_A_2, BG_OBJECT_DOOR_A_2_WS_ENTRY, 1492.478f, 1457.912f, 342.9689f, 3.115414f, 0, 0, 0.9999143f, 0.01308903f, RESPAWN_IMMEDIATELY)
-        || !AddObject(BG_WS_OBJECT_DOOR_A_3, BG_OBJECT_DOOR_A_3_WS_ENTRY, 1468.503f, 1494.357f, 351.8618f, 3.115414f, 0, 0, 0.9999143f, 0.01308903f, RESPAWN_IMMEDIATELY)
-        || !AddObject(BG_WS_OBJECT_DOOR_A_4, BG_OBJECT_DOOR_A_4_WS_ENTRY, 1471.555f, 1458.778f, 362.6332f, 3.115414f, 0, 0, 0.9999143f, 0.01308903f, RESPAWN_IMMEDIATELY)
-        || !AddObject(BG_WS_OBJECT_DOOR_A_5, BG_OBJECT_DOOR_A_5_WS_ENTRY, 1492.347f, 1458.34f, 342.3712f, -0.03490669f, 0, 0, 0.01745246f, -0.9998477f, RESPAWN_IMMEDIATELY)
-        || !AddObject(BG_WS_OBJECT_DOOR_A_6, BG_OBJECT_DOOR_A_6_WS_ENTRY, 1503.466f, 1493.367f, 351.7352f, -0.03490669f, 0, 0, 0.01745246f, -0.9998477f, RESPAWN_IMMEDIATELY)
-        // horde gates
-        || !AddObject(BG_WS_OBJECT_DOOR_H_1, BG_OBJECT_DOOR_H_1_WS_ENTRY, 949.1663f, 1423.772f, 345.6241f, -0.5756807f, -0.01673368f, -0.004956111f, -0.2839723f, 0.9586737f, RESPAWN_IMMEDIATELY)
-        || !AddObject(BG_WS_OBJECT_DOOR_H_2, BG_OBJECT_DOOR_H_2_WS_ENTRY, 953.0507f, 1459.842f, 340.6526f, -1.99662f, -0.1971825f, 0.1575096f, -0.8239487f, 0.5073641f, RESPAWN_IMMEDIATELY)
-        || !AddObject(BG_WS_OBJECT_DOOR_H_3, BG_OBJECT_DOOR_H_3_WS_ENTRY, 949.9523f, 1422.751f, 344.9273f, 0.0f, 0, 0, 0, 1, RESPAWN_IMMEDIATELY)
-        || !AddObject(BG_WS_OBJECT_DOOR_H_4, BG_OBJECT_DOOR_H_4_WS_ENTRY, 950.7952f, 1459.583f, 342.1523f, 0.05235988f, 0, 0, 0.02617695f, 0.9996573f, RESPAWN_IMMEDIATELY)
-        )
-    {
-        sLog.outErrorDb("BatteGroundWS: Failed to spawn some object BattleGround not created!");
-        return false;
-    }
-
-    WorldSafeLocsEntry const *sg = sWorldSafeLocsStore.LookupEntry(WS_GRAVEYARD_MAIN_ALLIANCE);
-    if (!sg || !AddSpiritGuide(WS_SPIRIT_MAIN_ALLIANCE, sg->x, sg->y, sg->z, 3.124139f, ALLIANCE))
-    {
-        sLog.outErrorDb("BatteGroundWS: Failed to spawn Alliance spirit guide! BattleGround not created!");
-        return false;
-    }
-
-    sg = sWorldSafeLocsStore.LookupEntry(WS_GRAVEYARD_MAIN_HORDE);
-    if (!sg || !AddSpiritGuide(WS_SPIRIT_MAIN_HORDE, sg->x, sg->y, sg->z, 3.193953f, HORDE))
-    {
-        sLog.outErrorDb("BatteGroundWS: Failed to spawn Horde spirit guide! BattleGround not created!");
-        return false;
-    }
-
-    sLog.outDebug("BatteGroundWS: BG objects and spirit guides spawned");
-
     return true;
 }
 
@@ -584,25 +521,23 @@ void BattleGroundWS::Reset()
     //call parent's class reset
     BattleGround::Reset();
 
-    m_FlagKeepers[BG_TEAM_ALLIANCE]     = 0;
-    m_FlagKeepers[BG_TEAM_HORDE]        = 0;
-    m_DroppedFlagGUID[BG_TEAM_ALLIANCE] = 0;
-    m_DroppedFlagGUID[BG_TEAM_HORDE]    = 0;
-    m_FlagState[BG_TEAM_ALLIANCE]       = BG_WS_FLAG_STATE_ON_BASE;
-    m_FlagState[BG_TEAM_HORDE]          = BG_WS_FLAG_STATE_ON_BASE;
-    m_TeamScores[BG_TEAM_ALLIANCE]      = 0;
-    m_TeamScores[BG_TEAM_HORDE]         = 0;
+    // spiritguides and flags not spawned at beginning
+    m_ActiveEvents[WS_EVENT_SPIRITGUIDES_SPAWN] = BG_EVENT_NONE;
+    m_ActiveEvents[WS_EVENT_FLAG_A] = BG_EVENT_NONE;
+    m_ActiveEvents[WS_EVENT_FLAG_H] = BG_EVENT_NONE;
+
+    for(uint32 i = 0; i < BG_TEAMS_COUNT; ++i)
+    {
+        m_DroppedFlagGUID[i] = 0;
+        m_FlagKeepers[i]     = 0;
+        m_FlagState[i]       = BG_WS_FLAG_STATE_ON_BASE;
+        m_TeamScores[i]      = 0;
+    }
     bool isBGWeekend = sBattleGroundMgr.IsBGWeekend(GetTypeID());
     m_ReputationCapture = (isBGWeekend) ? 45 : 35;
     m_HonorWinKills = (isBGWeekend) ? 3 : 1;
     m_HonorEndKills = (isBGWeekend) ? 4 : 2;
 
-    /* Spirit nodes is static at this BG and then not required deleting at BG reset.
-    if (m_BgCreatures[WS_SPIRIT_MAIN_ALLIANCE])
-        DelCreature(WS_SPIRIT_MAIN_ALLIANCE);
-    if (m_BgCreatures[WS_SPIRIT_MAIN_HORDE])
-        DelCreature(WS_SPIRIT_MAIN_HORDE);
-    */
 }
 
 void BattleGroundWS::EndBattleGround(uint32 winner)
