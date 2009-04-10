@@ -43,20 +43,8 @@ class ThreatCalcHelper
 };
 
 //==============================================================
-
 class MANGOS_DLL_SPEC HostilReference : public Reference<Unit, ThreatManager>
 {
-    private:
-        float iThreat;
-        float iTempThreatModifyer;                          // used for taunt
-        uint64 iUnitGuid;
-        bool iOnline;
-        bool iAccessible;
-    private:
-        // Inform the source, that the status of that reference was changed
-        void fireStatusChanged(const ThreatRefStatusChangeEvent& pThreatRefStatusChangeEvent);
-
-        Unit* getSourceUnit();
     public:
         HostilReference(Unit* pUnit, ThreatManager *pThreatManager, float pThreat);
 
@@ -123,6 +111,17 @@ class MANGOS_DLL_SPEC HostilReference : public Reference<Unit, ThreatManager>
 
         // Tell our refFrom (source) object, that the link is cut (Target destroyed)
         void sourceObjectDestroyLink();
+    private:
+        // Inform the source, that the status of that reference was changed
+        void fireStatusChanged(ThreatRefStatusChangeEvent& pThreatRefStatusChangeEvent);
+
+        Unit* getSourceUnit();
+    private:
+        float iThreat;
+        float iTempThreatModifyer;                          // used for taunt
+        uint64 iUnitGuid;
+        bool iOnline;
+        bool iAccessible;
 };
 
 //==============================================================
@@ -168,12 +167,9 @@ class MANGOS_DLL_SPEC ThreatContainer
 
 class MANGOS_DLL_SPEC ThreatManager
 {
-    private:
-        HostilReference* iCurrentVictim;
-        Unit* iOwner;
-        ThreatContainer iThreatContainer;
-        ThreatContainer iThreatOfflineContainer;
     public:
+        friend class HostilReference;
+
         explicit ThreatManager(Unit *pOwner);
 
         ~ThreatManager() { clearReferences(); }
@@ -187,7 +183,7 @@ class MANGOS_DLL_SPEC ThreatManager
 
         bool isThreatListEmpty() { return iThreatContainer.empty();}
 
-        bool processThreatEvent(const UnitBaseEvent* pUnitBaseEvent);
+        void processThreatEvent(ThreatRefStatusChangeEvent* threatRefStatusChangeEvent);
 
         HostilReference* getCurrentVictim() { return iCurrentVictim; }
 
@@ -208,6 +204,11 @@ class MANGOS_DLL_SPEC ThreatManager
         std::list<HostilReference*>& getOfflieThreatList() { return iThreatOfflineContainer.getThreatList(); }
         ThreatContainer& getOnlineContainer() { return iThreatContainer; }
         ThreatContainer& getOfflineContainer() { return iThreatOfflineContainer; }
+    private:
+        HostilReference* iCurrentVictim;
+        Unit* iOwner;
+        ThreatContainer iThreatContainer;
+        ThreatContainer iThreatOfflineContainer;
 };
 
 //=================================================

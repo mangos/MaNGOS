@@ -82,7 +82,8 @@ enum MangosStrings
     LANG_MOTD_CURRENT                   = 56,
     LANG_USING_WORLD_DB                 = 57,
     LANG_USING_SCRIPT_LIB               = 58,
-    // Room for more level 0              59-99 not used
+    LANG_USING_EVENT_AI                 = 59,
+    // Room for more level 0              60-99 not used
 
     // level 1 chat
     LANG_GLOBAL_NOTIFY                  = 100,
@@ -765,7 +766,12 @@ enum MangosStrings
     LANG_RESET_PET_TALENTS_ONLINE       = 1127,
     // Room for more level 3              1128-1199 not used
 
-    // FREE IDS                           1200-9999
+    // Debug commands
+    LANG_CINEMATIC_NOT_EXIST            = 1200,
+    LANG_MOVIE_NOT_EXIST                = 1201,
+    // Room for more debug                1202-1299 not used
+
+    // FREE IDS                           1300-9999
 
     // Use for not-in-offcial-sources patches
     //                                    10000-10999
