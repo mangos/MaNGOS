@@ -208,10 +208,6 @@ void WorldSession::HandleTaxiNextDestinationOpcode(WorldPacket& recv_data)
     
     uint32 curDest = GetPlayer()->m_taxi.GetTaxiDestination();
 
-    //sLog.outBasic("MA-%s > | xyzo: %f,%f,%fo(%f) flags[%X] | curloc: %d | destloc: %d ",
-    //                GetPlayer()->GetName(),movementInfo.x,movementInfo.y,movementInfo.z,movementInfo.o,
-    //                movementInfo.flags, curloc,curDest);
-
     if(!curDest)
     {
         //movement anticheat code
@@ -247,6 +243,10 @@ void WorldSession::HandleTaxiNextDestinationOpcode(WorldPacket& recv_data)
     //movment anticheat
     uint32 curloc = objmgr.GetNearestTaxiNode(movementInfo.x,movementInfo.y,movementInfo.z,GetPlayer()->GetMapId(),GetPlayer( )->GetTeam(), curDest);
     //end movement anticheat
+
+    //sLog.outBasic("MA-%s > | xyzo: %f,%f,%fo(%f) flags[%X] | curloc: %d | destloc: %d ",
+    //                GetPlayer()->GetName(),movementInfo.x,movementInfo.y,movementInfo.z,movementInfo.o,
+    //                movementInfo.flags, curloc,curDest);
 
     TaxiNodesEntry const* curDestNode = sTaxiNodesStore.LookupEntry(curDest);
 
