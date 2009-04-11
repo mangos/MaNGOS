@@ -1653,8 +1653,12 @@ class MANGOS_DLL_SPEC Player : public Unit
         bool HasSkill(uint32 skill) const;
         void learnSkillRewardedSpells(uint32 id, uint32 value);
 
-        void SetDontMove(bool dontMove);
-        bool GetDontMove() const { return m_dontMove; }
+        WorldLocation& GetTeleportDest() { return m_teleport_dest; }
+        bool IsBeingTeleported() const { return mSemaphoreTeleport_Near || mSemaphoreTeleport_Far; }
+        bool IsBeingTeleportedNear() const { return mSemaphoreTeleport_Near; }
+        bool IsBeingTeleportedFar() const { return mSemaphoreTeleport_Far; }
+        void SetSemaphoreTeleportNear(bool semphsetting) { mSemaphoreTeleport_Near = semphsetting; }
+        void SetSemaphoreTeleportFar(bool semphsetting) { mSemaphoreTeleport_Far = semphsetting; }
 
         void CheckExploreSystem(void);
 
@@ -2032,8 +2036,6 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         bool isAllowedToLoot(Creature* creature);
 
-        WorldLocation& GetTeleportDest() { return m_teleport_dest; }
-
         DeclinedName const* GetDeclinedNames() const { return m_declinedname; }
         uint8 GetRunesState() const { return m_runes->runeState; }
         uint8 GetBaseRune(uint8 index) const { return m_runes->runes[index].BaseRune; }
@@ -2201,8 +2203,6 @@ class MANGOS_DLL_SPEC Player : public Unit
         typedef std::list<Channel*> JoinedChannelsList;
         JoinedChannelsList m_channels;
 
-        bool m_dontMove;
-
         int m_cinematic;
 
         Player *pTrader;
@@ -2268,10 +2268,6 @@ class MANGOS_DLL_SPEC Player : public Unit
         uint32 m_groupUpdateMask;
         uint64 m_auraUpdateMask;
 
-        // Temporarily removed pet cache
-        uint32 m_temporaryUnsummonedPetNumber;
-        uint32 m_oldpetspell;
-
         uint64 m_miniPet;
         GuardianPetList m_guardianPets;
 
@@ -2281,9 +2277,6 @@ class MANGOS_DLL_SPEC Player : public Unit
         float  m_summon_x;
         float  m_summon_y;
         float  m_summon_z;
-
-        // Far Teleport
-        WorldLocation m_teleport_dest;
 
         DeclinedName *m_declinedname;
         Runes *m_runes;
@@ -2308,6 +2301,15 @@ class MANGOS_DLL_SPEC Player : public Unit
         uint8 m_MirrorTimerFlags;
         uint8 m_MirrorTimerFlagsLast;
         bool m_isInWater;
+
+        // Current teleport data
+        WorldLocation m_teleport_dest;
+        bool mSemaphoreTeleport_Near;
+        bool mSemaphoreTeleport_Far;
+
+        // Temporary removed pet cache
+        uint32 m_temporaryUnsummonedPetNumber;
+        uint32 m_oldpetspell;
 
         AchievementMgr m_achievementMgr;
         ReputationMgr  m_reputationMgr;
