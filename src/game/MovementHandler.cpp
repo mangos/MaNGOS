@@ -222,7 +222,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
     Player *plMover = mover->GetTypeId()==TYPEID_PLAYER ? (Player*)mover : NULL;
 
     // ignore, waiting processing in WorldSession::HandleMoveWorldportAckOpcode and WorldSession::HandleMoveTeleportAck
-    if(plMover && plMover->IsBeingTeleported())
+    if(plMover && plMover->IsBeingTeleported()){
         // movement anticheat
         plMover->m_anti_JustTeleported = 1;
         // end movement anticheat
