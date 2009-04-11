@@ -357,7 +357,7 @@ void Pet::SavePetToDB(PetSaveMode mode)
         return;
 
     // save only fully controlled creature
-    if (!isControlled() && !isTemporarySummoned())
+    if (!isControlled())
         return;
 
     // not save not player pets
