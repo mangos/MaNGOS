@@ -202,6 +202,11 @@ void WorldSession::HandleTaxiNextDestinationOpcode(WorldPacket& recv_data)
 
     //movement anticheat code
     /* extract packet */
+    Unit *mover = _player->m_mover;
+    Player *plMover = mover->GetTypeId()==TYPEID_PLAYER ? (Player*)mover : NULL;
+    if (!plMover)
+        return;
+
     MovementInfo movementInfo;
     ReadMovementInfo(recv_data, &movementInfo);
     //<<< end movement anticheat

@@ -221,18 +221,14 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
             // if we boarded a transport, add us to it
             if (plMover && !plMover->m_transport)
             {
-                // if we boarded a transport, add us to it
-                if (!GetPlayer()->m_transport)
+                // elevators also cause the client to send MOVEMENTFLAG_ONTRANSPORT - just unmount if the guid can be found in the transport list
+                for (MapManager::TransportSet::iterator iter = MapManager::Instance().m_Transports.begin(); iter != MapManager::Instance().m_Transports.end(); ++iter)
                 {
-                    // elevators also cause the client to send MOVEMENTFLAG_ONTRANSPORT - just unmount if the guid can be found in the transport list
-                    for (MapManager::TransportSet::iterator iter = MapManager::Instance().m_Transports.begin(); iter != MapManager::Instance().m_Transports.end(); ++iter)
+                    if ((*iter)->GetGUID() == movementInfo.t_guid)
                     {
-                        if ((*iter)->GetGUID() == movementInfo.t_guid)
-                        {
-                            plMover->m_transport = (*iter);
-                            (*iter)->AddPassenger(plMover);
-                            break;
-                        }
+                        plMover->m_transport = (*iter);
+                        (*iter)->AddPassenger(plMover);
+                        break;
                     }
                 }
             }
@@ -281,11 +277,19 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
     //---- anti-cheat features -->>>
     bool check_passed = true;
     #ifdef MOVEMENT_ANTICHEAT_DEBUG
-    sLog.outBasic("MA-%s > client-time:%d fall-time:%d | xyzo: %f,%f,%fo(%f) flags[%X] opcode[%s]| transport (xyzo): %f,%f,%fo(%f)",
+    if (plMover){
+        sLog.outBasic("MA-%s > client-time:%d fall-time:%d | xyzo: %f,%f,%fo(%f) flags[%X] opcode[%s]| transport (xyzo): %f,%f,%fo(%f)",
                     plMover->GetName(),movementInfo.time,movementInfo.fallTime,movementInfo.x,movementInfo.y,movementInfo.z,movementInfo.o,
                     movementInfo.flags, LookupOpcodeName(opcode),movementInfo.t_x,movementInfo.t_y,movementInfo.t_z,movementInfo.t_o);
-    sLog.outBasic("MA-%s Transport > server GUID: %d |  client GUID: (lo)%d - (hi)%d",
+        sLog.outBasic("MA-%s Transport > server GUID: %d |  client GUID: (lo)%d - (hi)%d",
                     plMover->GetName(),plMover->m_anti_TransportGUID, GUID_LOPART(movementInfo.t_guid), GUID_HIPART(movementInfo.t_guid));
+    } else {
+        sLog.outBasic("MA > client-time:%d fall-time:%d | xyzo: %f,%f,%fo(%f) flags[%X] opcode[%s]| transport (xyzo): %f,%f,%fo(%f)",
+                    movementInfo.time,movementInfo.fallTime,movementInfo.x,movementInfo.y,movementInfo.z,movementInfo.o,
+                    movementInfo.flags, LookupOpcodeName(opcode),movementInfo.t_x,movementInfo.t_y,movementInfo.t_z,movementInfo.t_o);
+        sLog.outBasic("MA Transport > server GUID:  |  client GUID: (lo)%d - (hi)%d",
+                    GUID_LOPART(movementInfo.t_guid), GUID_HIPART(movementInfo.t_guid));
+    }
     #endif
 
     if (plMover && World::GetEnableMvAnticheat())
@@ -622,13 +626,13 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
     }
     
     } else if (plMover) {
-    plMover->m_anti_AlarmCount++;
-    WorldPacket data;
-    plMover->SetUnitMovementFlags(0);
-    plMover->BuildTeleportAckMsg(&data, plMover->GetPositionX(), plMover->GetPositionY(), plMover->GetPositionZ(), plMover->GetOrientation());
-    plMover->GetSession()->SendPacket(&data);
-    plMover->BuildHeartBeatMsg(&data);
-    plMover->SendMessageToSet(&data, true);
+        plMover->m_anti_AlarmCount++;
+        WorldPacket data;
+        plMover->SetUnitMovementFlags(0);
+        plMover->BuildTeleportAckMsg(&data, plMover->GetPositionX(), plMover->GetPositionY(), plMover->GetPositionZ(), plMover->GetOrientation());
+        plMover->GetSession()->SendPacket(&data);
+        plMover->BuildHeartBeatMsg(&data);
+        plMover->SendMessageToSet(&data, true);
     }
 }
 
