@@ -52,6 +52,9 @@ void WorldSession::HandleSendMail(WorldPacket & recv_data )
     recv_data >> mailbox;
     recv_data >> receiver;
 
+    if (!objmgr.IsGameObjectOfTypeInRange(_player, mailbox, GAMEOBJECT_TYPE_MAILBOX))
+        return;
+
     // recheck
     CHECK_PACKET_SIZE(recv_data, 8+(receiver.size()+1)+1+1+4+4+1+4+4+8+1);
 
@@ -274,6 +277,10 @@ void WorldSession::HandleMarkAsRead(WorldPacket & recv_data )
     uint64 mailbox;
     uint32 mailId;
     recv_data >> mailbox;
+
+    if (!objmgr.IsGameObjectOfTypeInRange(_player, mailbox, GAMEOBJECT_TYPE_MAILBOX))
+        return;
+
     recv_data >> mailId;
     Player *pl = _player;
     Mail *m = pl->GetMail(mailId);
@@ -297,6 +304,10 @@ void WorldSession::HandleMailDelete(WorldPacket & recv_data )
     uint32 mailId;
     recv_data >> mailbox;
     recv_data >> mailId;
+
+    if (!objmgr.IsGameObjectOfTypeInRange(_player, mailbox, GAMEOBJECT_TYPE_MAILBOX))
+        return;
+
     Player* pl = _player;
     pl->m_mailsUpdated = true;
     Mail *m = pl->GetMail(mailId);
@@ -312,6 +323,10 @@ void WorldSession::HandleReturnToSender(WorldPacket & recv_data )
     uint64 mailbox;
     uint32 mailId;
     recv_data >> mailbox;
+
+    if (!objmgr.IsGameObjectOfTypeInRange(_player, mailbox, GAMEOBJECT_TYPE_MAILBOX))
+        return;
+
     recv_data >> mailId;
     Player *pl = _player;
     Mail *m = pl->GetMail(mailId);
@@ -409,6 +424,10 @@ void WorldSession::HandleTakeItem(WorldPacket & recv_data )
     uint32 mailId;
     uint32 itemId;
     recv_data >> mailbox;
+
+    if (!objmgr.IsGameObjectOfTypeInRange(_player, mailbox, GAMEOBJECT_TYPE_MAILBOX))
+        return;
+
     recv_data >> mailId;
     recv_data >> itemId;                                    // item guid low?
     Player* pl = _player;
@@ -500,6 +519,10 @@ void WorldSession::HandleTakeMoney(WorldPacket & recv_data )
     uint32 mailId;
     recv_data >> mailbox;
     recv_data >> mailId;
+
+    if (!objmgr.IsGameObjectOfTypeInRange(_player, mailbox, GAMEOBJECT_TYPE_MAILBOX))
+        return;
+
     Player *pl = _player;
 
     Mail* m = pl->GetMail(mailId);
@@ -531,9 +554,8 @@ void WorldSession::HandleGetMail(WorldPacket & recv_data )
     uint64 mailbox;
     recv_data >> mailbox;
 
-    //GameObject* obj = ObjectAccessor::GetGameObject(_player, mailbox);
-    //if(!obj || !obj->IsMailBox())
-    //    return;
+    if (!objmgr.IsGameObjectOfTypeInRange(_player, mailbox, GAMEOBJECT_TYPE_MAILBOX))
+        return;
 
     Player* pl = _player;
 
@@ -668,6 +690,9 @@ void WorldSession::HandleMailCreateTextItem(WorldPacket & recv_data )
     uint32 mailId;
 
     recv_data >> mailbox >> mailId;
+
+    if (!objmgr.IsGameObjectOfTypeInRange(_player, mailbox, GAMEOBJECT_TYPE_MAILBOX))
+        return;
 
     Player *pl = _player;
 
