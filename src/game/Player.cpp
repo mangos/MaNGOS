@@ -1631,6 +1631,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
 
     if ((GetMapId() == mapid) && (!m_transport))
     {
+        m_anti_JumpBaseZ = 0;
         if (!(options & TELE_TO_NOT_UNSUMMON_PET))
         {
             //same map, only remove pet if out of range for new position
