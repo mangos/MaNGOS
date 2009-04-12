@@ -4583,24 +4583,24 @@ float Player::GetRatingBonusValue(CombatRating cr) const
 
 uint32 Player::GetMeleeCritDamageReduction(uint32 damage) const
 {
-    float melee  = GetRatingBonusValue(CR_CRIT_TAKEN_MELEE)*2.0f;
-    if (melee>25.0f) melee = 25.0f;
+    float melee  = GetRatingBonusValue(CR_CRIT_TAKEN_MELEE)*2.2f;
+    if (melee>33.0f) melee = 33.0f;
     return uint32 (melee * damage /100.0f);
 }
 
 uint32 Player::GetRangedCritDamageReduction(uint32 damage) const
 {
-    float ranged = GetRatingBonusValue(CR_CRIT_TAKEN_RANGED)*2.0f;
-    if (ranged>25.0f) ranged=25.0f;
+    float ranged = GetRatingBonusValue(CR_CRIT_TAKEN_RANGED)*2.2f;
+    if (ranged>33.0f) ranged=33.0f;
     return uint32 (ranged * damage /100.0f);
 }
 
 uint32 Player::GetSpellCritDamageReduction(uint32 damage) const
 {
-    float spell = GetRatingBonusValue(CR_CRIT_TAKEN_SPELL)*2.0f;
-    // In wow script resilience limited to 25%
-    if (spell>25.0f)
-        spell = 25.0f;
+    float spell = GetRatingBonusValue(CR_CRIT_TAKEN_SPELL)*2.2f;
+    // In wow script resilience limited to 33%
+    if (spell>33.0f)
+        spell = 33.0f;
     return uint32 (spell * damage / 100.0f);
 }
 
@@ -9947,7 +9947,7 @@ Item* Player::StoreItem( ItemPosCountVec const& dest, Item* pItem, bool update )
         return NULL;
 
     Item* lastItem = pItem;
-
+    uint32 entry = pItem->GetEntry();
     for(ItemPosCountVec::const_iterator itr = dest.begin(); itr != dest.end(); )
     {
         uint16 pos = itr->pos;
@@ -9963,7 +9963,7 @@ Item* Player::StoreItem( ItemPosCountVec const& dest, Item* pItem, bool update )
 
         lastItem = _StoreItem(pos,pItem,count,true,update);
     }
-
+    GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_OWN_ITEM, entry);
     return lastItem;
 }
 
@@ -12435,6 +12435,8 @@ void Player::RewardQuest( Quest const *pQuest, uint32 reward, Object* questGiver
         SendQuestReward( pQuest, XP, questGiver );
 
     if (q_status.uState != QUEST_NEW) q_status.uState = QUEST_CHANGED;
+    if (pQuest->GetZoneOrSort() > 0)
+        GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUESTS_IN_ZONE, pQuest->GetZoneOrSort());
     GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST_COUNT);
     GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST);
 
@@ -13089,7 +13091,6 @@ void Player::ItemAddedQuestCheck( uint32 entry, uint32 count )
         }
     }
     UpdateForQuestsGO();
-    GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_OWN_ITEM, entry);
 }
 
 void Player::ItemRemovedQuestCheck( uint32 entry, uint32 count )
@@ -18938,7 +18939,7 @@ void Player::UpdateUnderwaterState( Map* m, float x, float y, float z )
     }
 
     // Allow travel in dark water on taxi or transport
-    if (liquid_status.type & MAP_LIQUID_TYPE_DARK_WATER && !isInFlight() && !(GetUnitMovementFlags()&MOVEMENTFLAG_ONTRANSPORT))
+    if ((liquid_status.type & MAP_LIQUID_TYPE_DARK_WATER) && !isInFlight() && !GetTransport())
         m_MirrorTimerFlags |= UNDERWARER_INDARKWATER;
     else
         m_MirrorTimerFlags &= ~UNDERWARER_INDARKWATER;
