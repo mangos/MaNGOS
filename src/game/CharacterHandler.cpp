@@ -161,7 +161,7 @@ void WorldSession::HandleCharEnumOpcode( WorldPacket & /*recv_data*/ )
         "SELECT characters.guid, characters.data, characters.name, characters.position_x, characters.position_y, characters.position_z, characters.map, characters.totaltime, characters.leveltime, "
     //   9                    10                   11                     12                   13
         "characters.at_login, character_pet.entry, character_pet.modelid, character_pet.level, guild_member.guildid "
-        "FROM characters LEFT JOIN character_pet ON characters.guid=character_pet.owner AND character_pet.slot='0' "
+        "FROM characters LEFT JOIN character_pet ON characters.guid=character_pet.owner AND character_pet.slot='%u' "
         "LEFT JOIN guild_member ON characters.guid = guild_member.guid "
         "WHERE characters.account = '%u' ORDER BY characters.guid"
         :
@@ -170,11 +170,11 @@ void WorldSession::HandleCharEnumOpcode( WorldPacket & /*recv_data*/ )
         "SELECT characters.guid, characters.data, characters.name, characters.position_x, characters.position_y, characters.position_z, characters.map, characters.totaltime, characters.leveltime, "
     //   9                    10                   11                     12                   13                    14
         "characters.at_login, character_pet.entry, character_pet.modelid, character_pet.level, guild_member.guildid, genitive "
-        "FROM characters LEFT JOIN character_pet ON characters.guid = character_pet.owner AND character_pet.slot='0' "
+        "FROM characters LEFT JOIN character_pet ON characters.guid = character_pet.owner AND character_pet.slot='%u' "
         "LEFT JOIN character_declinedname ON characters.guid = character_declinedname.guid "
         "LEFT JOIN guild_member ON characters.guid = guild_member.guid "
         "WHERE characters.account = '%u' ORDER BY characters.guid",
-        GetAccountId());
+        PET_SAVE_AS_CURRENT,GetAccountId());
 }
 
 void WorldSession::HandleCharCreateOpcode( WorldPacket & recv_data )
@@ -797,9 +797,8 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder * holder)
         SendDoFlight( MountId, path, startNode );
     }
 
-    // Load pet if any and player is alive and not in taxi flight
-    if(pCurrChar->isAlive() && pCurrChar->m_taxi.GetTaxiSource()==0)
-        pCurrChar->LoadPet();
+    // Load pet if any (if player not alive and in taxi flight or another then pet will remember as temporary unsummoned)
+    pCurrChar->LoadPet();
 
     // Set FFA PvP for non GM in non-rest mode
     if(sWorld.IsFFAPvPRealm() && !pCurrChar->isGameMaster() && !pCurrChar->HasFlag(PLAYER_FLAGS,PLAYER_FLAGS_RESTING) )

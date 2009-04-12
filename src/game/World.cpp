@@ -723,7 +723,7 @@ void World::LoadConfigSettings(bool reload)
     {
         sLog.outError("StartHonorPoints (%i) must be in range 0..MaxHonorPoints(%u). Set to %u.",
             m_configs[CONFIG_START_HONOR_POINTS],m_configs[CONFIG_MAX_HONOR_POINTS],0);
-        m_configs[CONFIG_MAX_HONOR_POINTS] = 0;
+        m_configs[CONFIG_START_HONOR_POINTS] = 0;
     }
     else if(m_configs[CONFIG_START_HONOR_POINTS] > m_configs[CONFIG_MAX_HONOR_POINTS])
     {
@@ -2831,14 +2831,19 @@ void World::UpdateMaxSessionCounters()
 
 void World::LoadDBVersion()
 {
-    QueryResult* result = WorldDatabase.Query("SELECT version FROM db_version LIMIT 1");
+    QueryResult* result = WorldDatabase.Query("SELECT version, creature_ai_version FROM db_version LIMIT 1");
     if(result)
     {
         Field* fields = result->Fetch();
 
-        m_DBVersion = fields[0].GetString();
+        m_DBVersion              = fields[0].GetCppString();
+        m_CreatureEventAIVersion = fields[1].GetCppString();
         delete result;
     }
-    else
-        m_DBVersion = "unknown world database";
+
+    if(m_DBVersion.empty())
+        m_DBVersion = "Unknown world database.";
+
+    if(m_CreatureEventAIVersion.empty())
+        m_CreatureEventAIVersion = "Unknown creature EventAI.";
 }
