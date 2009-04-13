@@ -3517,15 +3517,37 @@ void Aura::HandleModStealth(bool apply, bool Real)
                 pTarget->SetVisibility(VISIBILITY_GROUP_NO_DETECT);
                 pTarget->SetVisibility(VISIBILITY_GROUP_STEALTH);
             }
+
+            // apply full stealth period bonuses only at first stealth aura in stack
+            if(pTarget->GetAurasByType(SPELL_AURA_MOD_STEALTH).size()<=1)
+            {
+                Unit::AuraList const& mDummyAuras = pTarget->GetAurasByType(SPELL_AURA_DUMMY);
+                for(Unit::AuraList::const_iterator i = mDummyAuras.begin();i != mDummyAuras.end(); ++i)
+                {
+                    // Master of Subtlety
+                    if ((*i)->GetSpellProto()->SpellIconID == 2114)
+                    {
+                        pTarget->RemoveAurasDueToSpell(31666);
+                        int32 bp = (*i)->GetModifier()->m_amount;
+                        pTarget->CastCustomSpell(pTarget,31665,&bp,NULL,NULL,true);
+                    }
+                    // Overkill
+                    else if ((*i)->GetId() == 58426 && GetSpellProto()->SpellFamilyFlags & 0x0000000000400000LL)
+                    {
+                        pTarget->RemoveAurasDueToSpell(58428);
+                        pTarget->CastSpell(m_target, 58427, true);
+                    }
+                }
+            }
         }
     }
     else
     {
-        // only at real aura remove
-        if (Real)
+        // only at real aura remove of _last_ SPELL_AURA_MOD_STEALTH
+        if (Real && !pTarget->HasAuraType(SPELL_AURA_MOD_STEALTH))
         {
-            // if last SPELL_AURA_MOD_STEALTH and no GM invisibility
-            if (!pTarget->HasAuraType(SPELL_AURA_MOD_STEALTH) && pTarget->GetVisibility()!=VISIBILITY_OFF)
+            // if no GM invisibility
+            if(pTarget->GetVisibility()!=VISIBILITY_OFF)
             {
                 pTarget->RemoveStandFlags(UNIT_STAND_FLAGS_CREEP);
 
@@ -3541,23 +3563,18 @@ void Aura::HandleModStealth(bool apply, bool Real)
                 else
                     pTarget->SetVisibility(VISIBILITY_ON);
             }
-        }
-    }
 
-    // Master of Subtlety
-    Unit::AuraList const& mDummyAuras = pTarget->GetAurasByType(SPELL_AURA_DUMMY);
-    for(Unit::AuraList::const_iterator i = mDummyAuras.begin();i != mDummyAuras.end(); ++i)
-    {
-        if ((*i)->GetSpellProto()->SpellIconID == 2114)
-        {
-            if (apply)
+            // apply delayed talent bonus remover at last stealth aura remove
+            Unit::AuraList const& mDummyAuras = pTarget->GetAurasByType(SPELL_AURA_DUMMY);
+            for(Unit::AuraList::const_iterator i = mDummyAuras.begin();i != mDummyAuras.end(); ++i)
             {
-                int32 bp = (*i)->GetModifier()->m_amount;
-                pTarget->CastCustomSpell(pTarget,31665,&bp,NULL,NULL,true);
+                // Master of Subtlety
+                if ((*i)->GetSpellProto()->SpellIconID == 2114)
+                    pTarget->CastSpell(pTarget,31666,true);
+                // Overkill
+                else if ((*i)->GetId() == 58426 && GetSpellProto()->SpellFamilyFlags & 0x0000000000400000LL)
+                    pTarget->CastSpell(m_target, 58428, true);
             }
-            else
-                pTarget->CastSpell(pTarget,31666,true);
-            break;
         }
     }
 }
@@ -4181,11 +4198,15 @@ void Aura::HandleAuraPeriodicDummy(bool apply, bool Real)
     {
         case SPELLFAMILY_ROGUE:
         {
-            // Master of Subtlety
-            if (spell->Id==31666 && !apply)
+            if(!apply)
             {
-                m_target->RemoveAurasDueToSpell(31665);
-                break;
+                switch(spell->Id)
+                {
+                    // Master of Subtlety
+                    case 31666: m_target->RemoveAurasDueToSpell(31665); break;
+                    // Overkill
+                    case 58428: m_target->RemoveAurasDueToSpell(58427); break;
+                }
             }
             break;
         }

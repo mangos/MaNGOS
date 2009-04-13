@@ -1374,6 +1374,10 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
                     return false;
             }
 
+            //Overkill
+            if( spellInfo_1->SpellIconID == 2285 && spellInfo_2->SpellIconID == 2285 )
+                return false;
+
             // Garrote -> Garrote-Silence (multi-family check)
             if( spellInfo_1->SpellIconID == 498 && spellInfo_2->SpellIconID == 498 && spellInfo_2->SpellVisual[0] == 0 )
                 return false;
