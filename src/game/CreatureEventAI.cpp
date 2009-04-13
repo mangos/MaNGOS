@@ -32,7 +32,7 @@
 
 int CreatureEventAI::Permissible(const Creature *creature)
 {
-    if( creature->GetCreatureInfo()->AIName == "EventAI" )
+    if( creature->GetAIName() == "EventAI" )
         return PERMIT_BASE_SPECIAL;
     return PERMIT_BASE_NO;
 }
