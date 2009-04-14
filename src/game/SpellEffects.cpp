@@ -3508,7 +3508,7 @@ void Spell::EffectPickPocket(uint32 /*i*/)
             // Reveal action + get attack
             m_caster->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
             if (((Creature*)unitTarget)->AI())
-                ((Creature*)unitTarget)->AI()->AttackStart(m_caster);
+                ((Creature*)unitTarget)->AI()->AttackedBy(m_caster);
         }
     }
 }
