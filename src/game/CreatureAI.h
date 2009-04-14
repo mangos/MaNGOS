@@ -36,6 +36,7 @@ struct SpellEntry;
 class MANGOS_DLL_SPEC CreatureAI
 {
     public:
+        explicit CreatureAI(Creature* creature) : m_creature(creature) {}
 
         virtual ~CreatureAI();
 
@@ -94,6 +95,8 @@ class MANGOS_DLL_SPEC CreatureAI
 
         // Called at waypoint reached or point movement finished
         virtual void MovementInform(uint32 /*MovementType*/, uint32 /*Data*/) {}
+
+        Creature* const m_creature;
 };
 
 struct SelectableAI : public FactoryHolder<CreatureAI>, public Permissible<Creature>

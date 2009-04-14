@@ -34,7 +34,7 @@ class MANGOS_DLL_DECL AggressorAI : public CreatureAI
 
     public:
 
-        AggressorAI(Creature &c);
+        explicit AggressorAI(Creature *c);
 
         void MoveInLineOfSight(Unit *);
         void AttackStart(Unit *);
@@ -45,7 +45,6 @@ class MANGOS_DLL_DECL AggressorAI : public CreatureAI
         static int Permissible(const Creature *);
 
     private:
-        Creature &i_creature;
         uint64 i_victimGuid;
         AggressorState i_state;
         TimeTracker i_tracker;

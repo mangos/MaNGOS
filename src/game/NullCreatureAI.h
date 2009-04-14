@@ -25,9 +25,7 @@ class MANGOS_DLL_DECL NullCreatureAI : public CreatureAI
 {
     public:
 
-        NullCreatureAI(Creature &) {}
-        NullCreatureAI() {}
-
+        explicit NullCreatureAI(Creature* c) : CreatureAI(c) {}
         ~NullCreatureAI();
 
         void MoveInLineOfSight(Unit *) {}

@@ -80,7 +80,7 @@ struct Script
 
 struct MANGOS_DLL_DECL ScriptedAI : public CreatureAI
 {
-    ScriptedAI(Creature* creature) : m_creature(creature) {}
+    explicit ScriptedAI(Creature* creature) : CreatureAI(creature) {}
     ~ScriptedAI() {}
 
     // Called if IsVisible(Unit *who) is true at each *who move
@@ -121,8 +121,6 @@ struct MANGOS_DLL_DECL ScriptedAI : public CreatureAI
 
     // Called when spell hits creature's target
     void SpellHitTarget(Unit*, const SpellEntry*) {}
-
-    Creature* m_creature;
 
     //= Some useful helpers =========================
 
