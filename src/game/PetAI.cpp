@@ -63,7 +63,7 @@ void PetAI::MoveInLineOfSight(Unit *u)
 
 void PetAI::AttackStart(Unit *u)
 {
-    if( inCombat || !u || (m_creature->isPet() && ((Pet&)m_creature).getPetType() == MINI_PET) )
+    if( inCombat || !u || (m_creature->isPet() && ((Pet*)m_creature)->getPetType() == MINI_PET) )
         return;
 
     if(m_creature->Attack(u,true))
@@ -274,7 +274,7 @@ void PetAI::UpdateAI(const uint32 diff)
 
             m_creature->AddCreatureSpellCooldown(spell->m_spellInfo->Id);
             if (m_creature->isPet())
-                ((Pet&)m_creature).CheckLearning(spell->m_spellInfo->Id);
+                ((Pet*)m_creature)->CheckLearning(spell->m_spellInfo->Id);
 
             spell->prepare(&targets);
         }
