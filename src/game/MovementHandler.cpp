@@ -337,7 +337,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
         //calc time deltas
         int32 cClientTimeDelta = 1500;
         if (plMover->m_anti_LastClientTime !=0){
-            cClientTimeDelta = movementInfo.time - GetPlayer()->m_anti_LastClientTime;
+            cClientTimeDelta = movementInfo.time - plMover->m_anti_LastClientTime;
             plMover->m_anti_DeltaClientTime += cClientTimeDelta;
             plMover->m_anti_LastClientTime = movementInfo.time;
         } else {
@@ -372,7 +372,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
             cClientTimeDelta = cServerTimeDelta;
             plMover->m_anti_MistimingCount++;
 
-            sLog.outError("MA-%s, mistaming exception. #:%d, mistiming: %dms ",
+            sLog.outError("MA-%s, mistiming exception. #:%d, mistiming: %dms ",
                             plMover->GetName(), plMover->m_anti_MistimingCount, sync_time);
 
             if (plMover->m_anti_MistimingCount > World::GetMistimingAlarms())
@@ -434,7 +434,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
             {
                 plMover->m_anti_Last_HSpeed = current_speed; // store current speed
                 plMover->m_anti_Last_VSpeed = -2.3f;
-                if (plMover->m_anti_LastSpeedChangeTime != 0) GetPlayer()->m_anti_LastSpeedChangeTime = 0;
+                if (plMover->m_anti_LastSpeedChangeTime != 0) plMover->m_anti_LastSpeedChangeTime = 0;
             }
             // end calculating section ---------------------
 
@@ -460,7 +460,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
                     plMover->m_anti_JustJumped += 1;
                     plMover->m_anti_JumpBaseZ = movementInfo.z;
                 }
-            } else if (GetPlayer()->IsInWater()) {
+            } else if (plMover->IsInWater()) {
                  plMover->m_anti_JustJumped = 0;
             }
 
@@ -532,7 +532,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
                         check_passed = false;
                         #ifdef MOVEMENT_ANTICHEAT_DEBUG
                         sLog.outDebug("MA-%s, teleport to plan exception. plane_z: %f ",
-                                        GetPlayer()->GetName(), plane_z);
+                                        plMover->GetName(), plane_z);
                         #endif
                         if (plMover->m_anti_TeleToPlane_Count > World::GetTeleportToPlaneAlarms())
                         {
@@ -592,7 +592,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
             if (!check_passed){
                 if (plMover->m_transport)
                     {
-                        plMover->m_transport->RemovePassenger(GetPlayer());
+                        plMover->m_transport->RemovePassenger(plMover);
                         plMover->m_transport = NULL;
                     }
                     movementInfo.t_x = 0.0f;
