@@ -35,7 +35,7 @@ AggressorAI::Permissible(const Creature *creature)
     return PERMIT_BASE_NO;
 }
 
-AggressorAI::AggressorAI(Creature &c) : i_creature(c), i_victimGuid(0), i_state(STATE_NORMAL), i_tracker(TIME_INTERVAL_LOOK)
+AggressorAI::AggressorAI(Creature *c) : CreatureAI(c), i_victimGuid(0), i_state(STATE_NORMAL), i_tracker(TIME_INTERVAL_LOOK)
 {
 }
 
@@ -43,25 +43,25 @@ void
 AggressorAI::MoveInLineOfSight(Unit *u)
 {
     // Ignore Z for flying creatures
-    if( !i_creature.canFly() && i_creature.GetDistanceZ(u) > CREATURE_Z_ATTACK_RANGE )
+    if( !m_creature->canFly() && m_creature->GetDistanceZ(u) > CREATURE_Z_ATTACK_RANGE )
         return;
 
-    if( !i_creature.hasUnitState(UNIT_STAT_STUNNED) && u->isTargetableForAttack() &&
-        ( i_creature.IsHostileTo( u ) /*|| u->getVictim() && i_creature.IsFriendlyTo( u->getVictim() )*/ ) &&
-        u->isInAccessablePlaceFor(&i_creature) )
+    if( !m_creature->hasUnitState(UNIT_STAT_STUNNED) && u->isTargetableForAttack() &&
+        ( m_creature->IsHostileTo( u ) /*|| u->getVictim() && m_creature->IsFriendlyTo( u->getVictim() )*/ ) &&
+        u->isInAccessablePlaceFor(m_creature) )
     {
-        float attackRadius = i_creature.GetAttackDistance(u);
-        if(i_creature.IsWithinDistInMap(u, attackRadius) && i_creature.IsWithinLOSInMap(u) )
+        float attackRadius = m_creature->GetAttackDistance(u);
+        if(m_creature->IsWithinDistInMap(u, attackRadius) && m_creature->IsWithinLOSInMap(u) )
         {
-            if(!i_creature.getVictim())
+            if(!m_creature->getVictim())
             {
                 AttackStart(u);
                 u->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
             }
-            else if(sMapStore.LookupEntry(i_creature.GetMapId())->IsDungeon())
+            else if(sMapStore.LookupEntry(m_creature->GetMapId())->IsDungeon())
             {
-                u->SetInCombatWith(&i_creature);
-                i_creature.AddThreat(u, 0.0f);
+                u->SetInCombatWith(m_creature);
+                m_creature->AddThreat(u, 0.0f);
             }
         }
     }
@@ -69,70 +69,70 @@ AggressorAI::MoveInLineOfSight(Unit *u)
 
 void AggressorAI::EnterEvadeMode()
 {
-    if( !i_creature.isAlive() )
+    if( !m_creature->isAlive() )
     {
-        DEBUG_LOG("Creature stopped attacking cuz his dead [guid=%u]", i_creature.GetGUIDLow());
+        DEBUG_LOG("Creature stopped attacking cuz his dead [guid=%u]", m_creature->GetGUIDLow());
         i_victimGuid = 0;
-        i_creature.CombatStop();
-        i_creature.DeleteThreatList();
+        m_creature->CombatStop();
+        m_creature->DeleteThreatList();
         return;
     }
 
-    Unit* victim = ObjectAccessor::GetUnit(i_creature, i_victimGuid );
+    Unit* victim = ObjectAccessor::GetUnit(*m_creature, i_victimGuid );
 
     if( !victim  )
     {
-        DEBUG_LOG("Creature stopped attacking because victim is non exist [guid=%u]", i_creature.GetGUIDLow());
+        DEBUG_LOG("Creature stopped attacking because victim is non exist [guid=%u]", m_creature->GetGUIDLow());
     }
     else if( !victim->isAlive() )
     {
-        DEBUG_LOG("Creature stopped attacking cuz his victim is dead [guid=%u]", i_creature.GetGUIDLow());
+        DEBUG_LOG("Creature stopped attacking cuz his victim is dead [guid=%u]", m_creature->GetGUIDLow());
     }
     else if( victim->HasStealthAura() )
     {
-        DEBUG_LOG("Creature stopped attacking cuz his victim is stealth [guid=%u]", i_creature.GetGUIDLow());
+        DEBUG_LOG("Creature stopped attacking cuz his victim is stealth [guid=%u]", m_creature->GetGUIDLow());
     }
     else if( victim->isInFlight() )
     {
-        DEBUG_LOG("Creature stopped attacking cuz his victim is fly away [guid=%u]", i_creature.GetGUIDLow());
+        DEBUG_LOG("Creature stopped attacking cuz his victim is fly away [guid=%u]", m_creature->GetGUIDLow());
     }
     else
     {
-        DEBUG_LOG("Creature stopped attacking due to target out run him [guid=%u]", i_creature.GetGUIDLow());
+        DEBUG_LOG("Creature stopped attacking due to target out run him [guid=%u]", m_creature->GetGUIDLow());
         //i_state = STATE_LOOK_AT_VICTIM;
         //i_tracker.Reset(TIME_INTERVAL_LOOK);
     }
 
-    if(!i_creature.isCharmed())
+    if(!m_creature->isCharmed())
     {
-        i_creature.RemoveAllAuras();
+        m_creature->RemoveAllAuras();
 
         // Remove TargetedMovementGenerator from MotionMaster stack list, and add HomeMovementGenerator instead
-        if( i_creature.GetMotionMaster()->GetCurrentMovementGeneratorType() == TARGETED_MOTION_TYPE )
-            i_creature.GetMotionMaster()->MoveTargetedHome();
+        if( m_creature->GetMotionMaster()->GetCurrentMovementGeneratorType() == TARGETED_MOTION_TYPE )
+            m_creature->GetMotionMaster()->MoveTargetedHome();
     }
 
-    i_creature.DeleteThreatList();
+    m_creature->DeleteThreatList();
     i_victimGuid = 0;
-    i_creature.CombatStop();
-    i_creature.SetLootRecipient(NULL);
+    m_creature->CombatStop();
+    m_creature->SetLootRecipient(NULL);
 }
 
 void
 AggressorAI::UpdateAI(const uint32 /*diff*/)
 {
-    // update i_victimGuid if i_creature.getVictim() !=0 and changed
-    if(!i_creature.SelectHostilTarget() || !i_creature.getVictim())
+    // update i_victimGuid if m_creature->getVictim() !=0 and changed
+    if(!m_creature->SelectHostilTarget() || !m_creature->getVictim())
         return;
 
-    i_victimGuid = i_creature.getVictim()->GetGUID();
+    i_victimGuid = m_creature->getVictim()->GetGUID();
 
-    if( i_creature.isAttackReady() )
+    if( m_creature->isAttackReady() )
     {
-        if( i_creature.IsWithinDistInMap(i_creature.getVictim(), ATTACK_DISTANCE))
+        if( m_creature->IsWithinDistInMap(m_creature->getVictim(), ATTACK_DISTANCE))
         {
-            i_creature.AttackerStateUpdate(i_creature.getVictim());
-            i_creature.resetAttackTimer();
+            m_creature->AttackerStateUpdate(m_creature->getVictim());
+            m_creature->resetAttackTimer();
         }
     }
 }
@@ -140,8 +140,8 @@ AggressorAI::UpdateAI(const uint32 /*diff*/)
 bool
 AggressorAI::IsVisible(Unit *pl) const
 {
-    return i_creature.GetDistance(pl) < sWorld.getConfig(CONFIG_SIGHT_MONSTER)
-        && pl->isVisibleForOrDetect(&i_creature,true);
+    return m_creature->GetDistance(pl) < sWorld.getConfig(CONFIG_SIGHT_MONSTER)
+        && pl->isVisibleForOrDetect(m_creature,true);
 }
 
 void
@@ -150,15 +150,15 @@ AggressorAI::AttackStart(Unit *u)
     if( !u )
         return;
 
-    if(i_creature.Attack(u,true))
+    if(m_creature->Attack(u,true))
     {
-        i_creature.SetInCombatWith(u);
-        u->SetInCombatWith(&i_creature);
+        m_creature->SetInCombatWith(u);
+        u->SetInCombatWith(m_creature);
 
-        i_creature.AddThreat(u, 0.0f);
-        //    DEBUG_LOG("Creature %s tagged a victim to kill [guid=%u]", i_creature.GetName(), u->GetGUIDLow());
+        m_creature->AddThreat(u, 0.0f);
+        //    DEBUG_LOG("Creature %s tagged a victim to kill [guid=%u]", m_creature->GetName(), u->GetGUIDLow());
         i_victimGuid = u->GetGUID();
 
-        i_creature.GetMotionMaster()->MoveChase(u);
+        m_creature->GetMotionMaster()->MoveChase(u);
     }
 }

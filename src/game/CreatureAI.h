@@ -36,17 +36,17 @@ struct SpellEntry;
 class MANGOS_DLL_SPEC CreatureAI
 {
     public:
+        explicit CreatureAI(Creature* creature) : m_creature(creature) {}
 
         virtual ~CreatureAI();
 
-        // Called if IsVisible(Unit *who) is true at each *who move
-        virtual void MoveInLineOfSight(Unit *) = 0;
+        ///== Reactions At =================================
 
-        // Called at each attack of m_creature by any victim
-        virtual void AttackStart(Unit *) = 0;
+        // Called if IsVisible(Unit *who) is true at each *who move, reaction at visibility zone enter
+        virtual void MoveInLineOfSight(Unit *) {}
 
-        // Called at stopping attack by any attacker
-        virtual void EnterEvadeMode() = 0;
+        // Called for reaction at stopping attack at no attackers or targets
+        virtual void EnterEvadeMode() {}
 
         // Called at reaching home after evade
         virtual void JustReachedHome() {}
@@ -58,13 +58,9 @@ class MANGOS_DLL_SPEC CreatureAI
         virtual void DamageDeal(Unit * /*done_to*/, uint32 & /*damage*/) {}
 
         // Called at any Damage from any attacker (before damage apply)
-        virtual void DamageTaken(Unit *done_by, uint32 & /*damage*/) { AttackedBy(done_by); }
-
-        // Is unit visible for MoveInLineOfSight
-        virtual bool IsVisible(Unit *) const = 0;
-
-        // Called at World update tick
-        virtual void UpdateAI(const uint32 diff ) = 0;
+        // Note: it for recalculation damage or special reaction at damage
+        // for attack reaction use AttackedBy called for not DOT damage in Unit::DealDamage also
+        virtual void DamageTaken(Unit *done_by, uint32 & /*damage*/) {}
 
         // Called when the creature is killed
         virtual void JustDied(Unit *) {}
@@ -83,17 +79,36 @@ class MANGOS_DLL_SPEC CreatureAI
         // Called when spell hits creature's target
         virtual void SpellHitTarget(Unit*, const SpellEntry*) {}
 
-        // Called when vitim entered water and creature can not enter water
-        virtual bool canReachByRangeAttack(Unit*) { return false; }
-
-        // Called when the creature is attacked
-        virtual void AttackedBy(Unit * /*attacker*/) {}
+        // Called when the creature is target of hostile action: swing, hostile spell landed, fear/etc)
+        virtual void AttackedBy(Unit* attacker);
 
         // Called when creature is spawned or respawned (for reseting variables)
         virtual void JustRespawned() {}
 
         // Called at waypoint reached or point movement finished
         virtual void MovementInform(uint32 /*MovementType*/, uint32 /*Data*/) {}
+
+        ///== Triggered Actions Requested ==================
+
+        // Called when creature attack expected (if creature can and no have current victim)
+        // Note: for reaction at hostile action must be called AttackedBy function.
+        virtual void AttackStart(Unit *) {}
+
+        // Called at World update tick
+        virtual void UpdateAI(const uint32 diff ) {}
+
+        ///== State checks =================================
+
+        // Is unit visible for MoveInLineOfSight
+        virtual bool IsVisible(Unit *) const { return false; }
+
+        // Called when victim entered water and creature can not enter water
+        virtual bool canReachByRangeAttack(Unit*) { return false; }
+
+        ///== Fields =======================================
+
+        // Pointer to controlled by AI creature
+        Creature* const m_creature;
 };
 
 struct SelectableAI : public FactoryHolder<CreatureAI>, public Permissible<Creature>

@@ -419,28 +419,22 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
     if (!spellProto || !(spellProto->Mechanic == MECHANIC_ROOT || IsAuraAddedBySpell(SPELL_AURA_MOD_ROOT, spellProto->Id)))
         pVictim->RemoveSpellbyDamageTaken(SPELL_AURA_MOD_ROOT, damage);
 
-    if(pVictim->GetTypeId() != TYPEID_PLAYER)
+    // no xp,health if type 8 /critters/
+    if(pVictim->GetTypeId() != TYPEID_PLAYER && pVictim->GetCreatureType() == CREATURE_TYPE_CRITTER)
     {
-        // no xp,health if type 8 /critters/
-        if ( pVictim->GetCreatureType() == CREATURE_TYPE_CRITTER)
-        {
-            pVictim->setDeathState(JUST_DIED);
-            pVictim->SetHealth(0);
+        pVictim->setDeathState(JUST_DIED);
+        pVictim->SetHealth(0);
 
-            // allow loot only if has loot_id in creature_template
-            CreatureInfo const* cInfo = ((Creature*)pVictim)->GetCreatureInfo();
-            if(cInfo && cInfo->lootid)
-                pVictim->SetUInt32Value(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
+        // allow loot only if has loot_id in creature_template
+        CreatureInfo const* cInfo = ((Creature*)pVictim)->GetCreatureInfo();
+        if(cInfo && cInfo->lootid)
+            pVictim->SetUInt32Value(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
 
-            // some critters required for quests
-            if(GetTypeId() == TYPEID_PLAYER)
-                ((Player*)this)->KilledMonster(pVictim->GetEntry(),pVictim->GetGUID());
+        // some critters required for quests
+        if(GetTypeId() == TYPEID_PLAYER)
+            ((Player*)this)->KilledMonster(pVictim->GetEntry(),pVictim->GetGUID());
 
-            return damage;
-        }
-
-        if(!pVictim->isInCombat() && ((Creature*)pVictim)->AI())
-            ((Creature*)pVictim)->AI()->AttackStart(this);
+        return damage;
     }
 
     DEBUG_LOG("DealDamageStart");
@@ -689,18 +683,16 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
 
         if(damagetype != DOT)
         {
-            if(getVictim())
-            {
-                // if have target and damage pVictim just call AI reaction
-                if(pVictim != getVictim() && pVictim->GetTypeId()==TYPEID_UNIT && ((Creature*)pVictim)->AI())
-                    ((Creature*)pVictim)->AI()->AttackedBy(this);
-            }
-            else
+            if(!getVictim())
             {
                 // if not have main target then attack state with target (including AI call)
                 //start melee attacks only after melee hit
                 Attack(pVictim,(damagetype == DIRECT_DAMAGE));
             }
+
+            // if damage pVictim call AI reaction
+            if(pVictim->GetTypeId()==TYPEID_UNIT && ((Creature*)pVictim)->AI())
+                ((Creature*)pVictim)->AI()->AttackedBy(this);
         }
 
         // polymorphed and other negative transformed cases
@@ -1962,6 +1954,10 @@ void Unit::AttackerStateUpdate (Unit *pVictim, WeaponAttackType attType, bool ex
             }
         }
 
+        // if damage pVictim call AI reaction
+        if(pVictim->GetTypeId()==TYPEID_UNIT && ((Creature*)pVictim)->AI())
+            ((Creature*)pVictim)->AI()->AttackedBy(this);
+
         return;
     }
 
@@ -1989,6 +1985,10 @@ void Unit::AttackerStateUpdate (Unit *pVictim, WeaponAttackType attType, bool ex
                 --m_extraAttacks;
         }
     }
+
+    // if damage pVictim call AI reaction
+    if(pVictim->GetTypeId()==TYPEID_UNIT && ((Creature*)pVictim)->AI())
+        ((Creature*)pVictim)->AI()->AttackedBy(this);
 }
 
 MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(const Unit *pVictim, WeaponAttackType attType) const
@@ -7165,9 +7165,6 @@ bool Unit::Attack(Unit *victim, bool meleeAttack)
     m_attacking = victim;
     m_attacking->_addAttacker(this);
 
-    if(m_attacking->GetTypeId()==TYPEID_UNIT && ((Creature*)m_attacking)->AI())
-        ((Creature*)m_attacking)->AI()->AttackedBy(this);
-
     if(GetTypeId()==TYPEID_UNIT)
     {
         WorldPacket data(SMSG_AI_REACTION, 12);
@@ -7283,7 +7280,51 @@ void Unit::RemoveAllAttackers()
 
 void Unit::ModifyAuraState(AuraState flag, bool apply)
 {
-    ApplyModFlag(UNIT_FIELD_AURASTATE, 1<<(flag-1), apply);
+    if (apply)
+    {
+        if (!HasFlag(UNIT_FIELD_AURASTATE, 1<<(flag-1)))
+        {
+            SetFlag(UNIT_FIELD_AURASTATE, 1<<(flag-1));
+            if(GetTypeId() == TYPEID_PLAYER)
+            {
+                const PlayerSpellMap& sp_list = ((Player*)this)->GetSpellMap();
+                for (PlayerSpellMap::const_iterator itr = sp_list.begin(); itr != sp_list.end(); ++itr)
+                {
+                    if(itr->second->state == PLAYERSPELL_REMOVED) continue;
+                    SpellEntry const *spellInfo = sSpellStore.LookupEntry(itr->first);
+                    if (!spellInfo || !IsPassiveSpell(itr->first)) continue;
+                    if (spellInfo->CasterAuraState == flag)
+                        CastSpell(this, itr->first, true, NULL);
+                }
+            }
+        }
+    }
+    else
+    {
+        if (HasFlag(UNIT_FIELD_AURASTATE,1<<(flag-1)))
+        {
+            RemoveFlag(UNIT_FIELD_AURASTATE, 1<<(flag-1));
+            Unit::AuraMap& tAuras = GetAuras();
+            for (Unit::AuraMap::iterator itr = tAuras.begin(); itr != tAuras.end();)
+            {
+                SpellEntry const* spellProto = (*itr).second->GetSpellProto();
+                if (spellProto->CasterAuraState == flag)
+                {
+                    // exceptions (applied at state but not removed at state change)
+                    // Rampage
+                    if(spellProto->SpellIconID==2006 && spellProto->SpellFamilyName==SPELLFAMILY_WARRIOR && spellProto->SpellFamilyFlags==0x100000)
+                    {
+                        ++itr;
+                        continue;
+                    }
+
+                    RemoveAura(itr);
+                }
+                else
+                    ++itr;
+            }
+        }
+    }
 }
 
 Unit *Unit::GetOwner() const
@@ -10738,8 +10779,8 @@ void Unit::SetFeared(bool apply, uint64 casterGUID, uint32 spellID)
 
             // attack caster if can
             Unit* caster = ObjectAccessor::GetObjectInWorld(casterGUID, (Unit*)NULL);
-            if(caster && caster != getVictim() && ((Creature*)this)->AI())
-                ((Creature*)this)->AI()->AttackStart(caster);
+            if(caster && ((Creature*)this)->AI())
+                ((Creature*)this)->AI()->AttackedBy(caster);
         }
     }
 

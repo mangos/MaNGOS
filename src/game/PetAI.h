@@ -29,12 +29,11 @@ class MANGOS_DLL_DECL PetAI : public CreatureAI
 {
     public:
 
-        PetAI(Creature &c);
+        explicit PetAI(Creature *c);
 
         void MoveInLineOfSight(Unit *);
         void AttackStart(Unit *);
         void EnterEvadeMode();
-        void DamageTaken(Unit *done_by, uint32& /*damage*/) { AttackedBy(done_by); }
         void AttackedBy(Unit*);
         bool IsVisible(Unit *) const;
         void JustDied(Unit* /*who*/) { _stopAttack(); }
@@ -49,7 +48,6 @@ class MANGOS_DLL_DECL PetAI : public CreatureAI
 
         void UpdateAllies();
 
-        Creature &i_pet;
         bool inCombat;
         TimeTracker i_tracker;
         std::set<uint64> m_AllySet;

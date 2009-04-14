@@ -3116,7 +3116,7 @@ void Aura::HandleModPossess(bool apply, bool Real)
             ((Creature*)m_target)->AIM_Initialize();
 
             if (((Creature*)m_target)->AI())
-                ((Creature*)m_target)->AI()->AttackStart(caster);
+                ((Creature*)m_target)->AI()->AttackedBy(caster);
         }
     }
 }
@@ -3269,7 +3269,7 @@ void Aura::HandleModCharm(bool apply, bool Real)
             {
                 ((Creature*)m_target)->AIM_Initialize();
                 if (((Creature*)m_target)->AI())
-                    ((Creature*)m_target)->AI()->AttackStart(caster);
+                    ((Creature*)m_target)->AI()->AttackedBy(caster);
             }
         }
     }
