@@ -38,12 +38,10 @@ namespace FactorySelector
                 return scriptedAI;
 
         CreatureAIRegistry &ai_registry(CreatureAIRepository::Instance());
-        assert( creature->GetCreatureInfo() != NULL );
-        CreatureInfo const *cinfo=creature->GetCreatureInfo();
 
         const CreatureAICreator *ai_factory = NULL;
 
-        std::string ainame=cinfo->AIName;
+        std::string ainame=creature->GetAIName();
 
         // select by NPC flags _first_ - otherwise EventAI might be choosen for pets/totems
         // excplicit check for isControlled() and owner type to allow guardian, mini-pets and pets controlled by NPCs to be scripted by EventAI
@@ -84,7 +82,7 @@ namespace FactorySelector
         ainame = (ai_factory == NULL) ? "NullCreatureAI" : ai_factory->key();
 
         DEBUG_LOG("Creature %u used AI is %s.", creature->GetGUIDLow(), ainame.c_str() );
-        return ( ai_factory == NULL ? new NullCreatureAI : ai_factory->Create(creature) );
+        return ( ai_factory == NULL ? new NullCreatureAI(creature) : ai_factory->Create(creature) );
     }
 
     MovementGenerator* selectMovementGenerator(Creature *creature)

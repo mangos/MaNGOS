@@ -24,7 +24,7 @@
 #include "ObjectMgr.h"
 
 // Character Dump tables
-#define DUMP_TABLE_COUNT 19
+#define DUMP_TABLE_COUNT 21
 
 struct DumpTable
 {
@@ -34,25 +34,27 @@ struct DumpTable
 
 static DumpTable dumpTables[DUMP_TABLE_COUNT] =
 {
-    { "characters",               DTT_CHARACTER  },
-    { "character_queststatus",    DTT_CHAR_TABLE },
-    { "character_reputation",     DTT_CHAR_TABLE },
-    { "character_spell",          DTT_CHAR_TABLE },
-    { "character_spell_cooldown", DTT_CHAR_TABLE },
-    { "character_action",         DTT_CHAR_TABLE },
-    { "character_aura",           DTT_CHAR_TABLE },
-    { "character_homebind",       DTT_CHAR_TABLE },
-    { "character_ticket",         DTT_CHAR_TABLE },
-    { "character_inventory",      DTT_INVENTORY  },
-    { "mail",                     DTT_MAIL       },
-    { "mail_items",               DTT_MAIL_ITEM  },
-    { "item_instance",            DTT_ITEM       },
-    { "character_gifts",          DTT_ITEM_GIFT  },
-    { "item_text",                DTT_ITEM_TEXT  },
-    { "character_pet",            DTT_PET        },
-    { "pet_aura",                 DTT_PET_TABLE  },
-    { "pet_spell",                DTT_PET_TABLE  },
-    { "pet_spell_cooldown",       DTT_PET_TABLE  },
+    { "characters",                       DTT_CHARACTER  },
+    { "character_achievement",            DTT_CHAR_TABLE },
+    { "character_achievement_progress",   DTT_CHAR_TABLE },
+    { "character_queststatus",            DTT_CHAR_TABLE },
+    { "character_reputation",             DTT_CHAR_TABLE },
+    { "character_spell",                  DTT_CHAR_TABLE },
+    { "character_spell_cooldown",         DTT_CHAR_TABLE },
+    { "character_action",                 DTT_CHAR_TABLE },
+    { "character_aura",                   DTT_CHAR_TABLE },
+    { "character_homebind",               DTT_CHAR_TABLE },
+    { "character_ticket",                 DTT_CHAR_TABLE },
+    { "character_inventory",              DTT_INVENTORY  },
+    { "mail",                             DTT_MAIL       },
+    { "mail_items",                       DTT_MAIL_ITEM  },
+    { "item_instance",                    DTT_ITEM       },
+    { "character_gifts",                  DTT_ITEM_GIFT  },
+    { "item_text",                        DTT_ITEM_TEXT  },
+    { "character_pet",                    DTT_PET        },
+    { "pet_aura",                         DTT_PET_TABLE  },
+    { "pet_spell",                        DTT_PET_TABLE  },
+    { "pet_spell_cooldown",               DTT_PET_TABLE  },
 };
 
 // Low level functions

@@ -2767,13 +2767,13 @@ void Aura::HandleAuraTransform(bool apply, bool Real)
     if (apply)
     {
         // special case (spell specific functionality)
-        if(m_modifier.m_miscvalue==0)
+        if (m_modifier.m_miscvalue==0)
         {
             // player applied only
-            if(m_target->GetTypeId()!=TYPEID_PLAYER)
+            if (m_target->GetTypeId()!=TYPEID_PLAYER)
                 return;
 
-            switch(GetId())
+            switch (GetId())
             {
                 // Orb of Deception
                 case 16739:
@@ -2833,7 +2833,7 @@ void Aura::HandleAuraTransform(bool apply, bool Real)
         else
         {
             CreatureInfo const * ci = objmgr.GetCreatureTemplate(m_modifier.m_miscvalue);
-            if(!ci)
+            if (!ci)
             {
                                                             //pig pink ^_^
                 m_target->SetDisplayId(16358);
@@ -2848,15 +2848,18 @@ void Aura::HandleAuraTransform(bool apply, bool Real)
                 if(GetId()==42016 && m_target->GetMountID() && !m_target->GetAurasByType(SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED).empty())
                     m_target->SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID,16314);
             }
-            m_target->setTransForm(GetId());
         }
 
+        // update active transform spell only not set or not overwriting negative by positive case
+        if (!m_target->getTransForm() || !IsPositiveSpell(GetId()) || IsPositiveSpell(m_target->getTransForm()))
+            m_target->setTransForm(GetId());
+
         // polymorph case
-        if( Real && m_target->GetTypeId() == TYPEID_PLAYER && m_target->IsPolymorphed())
+        if (Real && m_target->GetTypeId() == TYPEID_PLAYER && m_target->IsPolymorphed())
         {
             // for players, start regeneration after 1s (in polymorph fast regeneration case)
             // only if caster is Player (after patch 2.4.2)
-            if(IS_PLAYER_GUID(GetCasterGUID()) )
+            if (IS_PLAYER_GUID(GetCasterGUID()) )
                 ((Player*)m_target)->setRegenTimer(1*IN_MILISECONDS);
 
             //dismount polymorphed target (after patch 2.4.2)
@@ -2866,20 +2869,20 @@ void Aura::HandleAuraTransform(bool apply, bool Real)
     }
     else
     {
+        // ApplyModifier(true) will reapply it if need
+        m_target->setTransForm(0);
+        m_target->SetDisplayId(m_target->GetNativeDisplayId());
+
+        // re-aplly some from still active with preference negative cases
         Unit::AuraList const& otherTransforms = m_target->GetAurasByType(SPELL_AURA_TRANSFORM);
-        if(otherTransforms.empty())
-        {
-            m_target->SetDisplayId(m_target->GetNativeDisplayId());
-            m_target->setTransForm(0);
-        }
-        else
+        if (!otherTransforms.empty())
         {
             // look for other transform auras
             Aura* handledAura = *otherTransforms.begin();
             for(Unit::AuraList::const_iterator i = otherTransforms.begin();i != otherTransforms.end(); ++i)
             {
                 // negative auras are preferred
-                if(!IsPositiveSpell((*i)->GetSpellProto()->Id))
+                if (!IsPositiveSpell((*i)->GetSpellProto()->Id))
                 {
                     handledAura = *i;
                     break;
@@ -2889,12 +2892,12 @@ void Aura::HandleAuraTransform(bool apply, bool Real)
         }
 
         // Dragonmaw Illusion (restore mount model)
-        if(GetId()==42016 && m_target->GetMountID()==16314)
+        if (GetId()==42016 && m_target->GetMountID()==16314)
         {
-            if(!m_target->GetAurasByType(SPELL_AURA_MOUNTED).empty())
+            if (!m_target->GetAurasByType(SPELL_AURA_MOUNTED).empty())
             {
                 uint32 cr_id = m_target->GetAurasByType(SPELL_AURA_MOUNTED).front()->GetModifier()->m_miscvalue;
-                if(CreatureInfo const* ci = objmgr.GetCreatureTemplate(cr_id))
+                if (CreatureInfo const* ci = objmgr.GetCreatureTemplate(cr_id))
                 {
                     uint32 team = 0;
                     if (m_target->GetTypeId()==TYPEID_PLAYER)
@@ -3118,7 +3121,7 @@ void Aura::HandleModPossess(bool apply, bool Real)
             ((Creature*)m_target)->AIM_Initialize();
 
             if (((Creature*)m_target)->AI())
-                ((Creature*)m_target)->AI()->AttackStart(caster);
+                ((Creature*)m_target)->AI()->AttackedBy(caster);
         }
     }
 }
@@ -3271,7 +3274,7 @@ void Aura::HandleModCharm(bool apply, bool Real)
             {
                 ((Creature*)m_target)->AIM_Initialize();
                 if (((Creature*)m_target)->AI())
-                    ((Creature*)m_target)->AI()->AttackStart(caster);
+                    ((Creature*)m_target)->AI()->AttackedBy(caster);
             }
         }
     }
@@ -3519,15 +3522,37 @@ void Aura::HandleModStealth(bool apply, bool Real)
                 pTarget->SetVisibility(VISIBILITY_GROUP_NO_DETECT);
                 pTarget->SetVisibility(VISIBILITY_GROUP_STEALTH);
             }
+
+            // apply full stealth period bonuses only at first stealth aura in stack
+            if(pTarget->GetAurasByType(SPELL_AURA_MOD_STEALTH).size()<=1)
+            {
+                Unit::AuraList const& mDummyAuras = pTarget->GetAurasByType(SPELL_AURA_DUMMY);
+                for(Unit::AuraList::const_iterator i = mDummyAuras.begin();i != mDummyAuras.end(); ++i)
+                {
+                    // Master of Subtlety
+                    if ((*i)->GetSpellProto()->SpellIconID == 2114)
+                    {
+                        pTarget->RemoveAurasDueToSpell(31666);
+                        int32 bp = (*i)->GetModifier()->m_amount;
+                        pTarget->CastCustomSpell(pTarget,31665,&bp,NULL,NULL,true);
+                    }
+                    // Overkill
+                    else if ((*i)->GetId() == 58426 && GetSpellProto()->SpellFamilyFlags & 0x0000000000400000LL)
+                    {
+                        pTarget->RemoveAurasDueToSpell(58428);
+                        pTarget->CastSpell(m_target, 58427, true);
+                    }
+                }
+            }
         }
     }
     else
     {
-        // only at real aura remove
-        if (Real)
+        // only at real aura remove of _last_ SPELL_AURA_MOD_STEALTH
+        if (Real && !pTarget->HasAuraType(SPELL_AURA_MOD_STEALTH))
         {
-            // if last SPELL_AURA_MOD_STEALTH and no GM invisibility
-            if (!pTarget->HasAuraType(SPELL_AURA_MOD_STEALTH) && pTarget->GetVisibility()!=VISIBILITY_OFF)
+            // if no GM invisibility
+            if(pTarget->GetVisibility()!=VISIBILITY_OFF)
             {
                 pTarget->RemoveStandFlags(UNIT_STAND_FLAGS_CREEP);
 
@@ -3543,23 +3568,18 @@ void Aura::HandleModStealth(bool apply, bool Real)
                 else
                     pTarget->SetVisibility(VISIBILITY_ON);
             }
-        }
-    }
 
-    // Master of Subtlety
-    Unit::AuraList const& mDummyAuras = pTarget->GetAurasByType(SPELL_AURA_DUMMY);
-    for(Unit::AuraList::const_iterator i = mDummyAuras.begin();i != mDummyAuras.end(); ++i)
-    {
-        if ((*i)->GetSpellProto()->SpellIconID == 2114)
-        {
-            if (apply)
+            // apply delayed talent bonus remover at last stealth aura remove
+            Unit::AuraList const& mDummyAuras = pTarget->GetAurasByType(SPELL_AURA_DUMMY);
+            for(Unit::AuraList::const_iterator i = mDummyAuras.begin();i != mDummyAuras.end(); ++i)
             {
-                int32 bp = (*i)->GetModifier()->m_amount;
-                pTarget->CastCustomSpell(pTarget,31665,&bp,NULL,NULL,true);
+                // Master of Subtlety
+                if ((*i)->GetSpellProto()->SpellIconID == 2114)
+                    pTarget->CastSpell(pTarget,31666,true);
+                // Overkill
+                else if ((*i)->GetId() == 58426 && GetSpellProto()->SpellFamilyFlags & 0x0000000000400000LL)
+                    pTarget->CastSpell(m_target, 58428, true);
             }
-            else
-                pTarget->CastSpell(pTarget,31666,true);
-            break;
         }
     }
 }
@@ -3728,20 +3748,8 @@ void Aura::HandleAuraModSilence(bool apply, bool Real)
         m_target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED);
         // Stop cast only spells vs PreventionType == SPELL_PREVENTION_TYPE_SILENCE
         for (uint32 i = CURRENT_MELEE_SPELL; i < CURRENT_MAX_SPELL;i++)
-        {
-            Spell* currentSpell = m_target->m_currentSpells[i];
-            if (currentSpell && currentSpell->m_spellInfo->PreventionType == SPELL_PREVENTION_TYPE_SILENCE)
-            {
-                uint32 state = currentSpell->getState();
-                // Stop spells on prepare or casting state
-                if ( state == SPELL_STATE_PREPARING || state == SPELL_STATE_CASTING )
-                {
-                    currentSpell->cancel();
-                    currentSpell->SetReferencedFromCurrent(false);
-                    m_target->m_currentSpells[i] = NULL;
-                }
-            }
-        }
+            if (m_target->m_currentSpells[i] && m_target->m_currentSpells[i]->m_spellInfo->PreventionType == SPELL_PREVENTION_TYPE_SILENCE)
+                m_target->InterruptSpell(i,false);          // Stop spells on prepare or casting state
 
         switch (GetId())
         {
@@ -4195,11 +4203,15 @@ void Aura::HandleAuraPeriodicDummy(bool apply, bool Real)
     {
         case SPELLFAMILY_ROGUE:
         {
-            // Master of Subtlety
-            if (spell->Id==31666 && !apply)
+            if(!apply)
             {
-                m_target->RemoveAurasDueToSpell(31665);
-                break;
+                switch(spell->Id)
+                {
+                    // Master of Subtlety
+                    case 31666: m_target->RemoveAurasDueToSpell(31665); break;
+                    // Overkill
+                    case 58428: m_target->RemoveAurasDueToSpell(58427); break;
+                }
             }
             break;
         }

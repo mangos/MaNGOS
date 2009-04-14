@@ -34,7 +34,7 @@ class MANGOS_DLL_DECL GuardAI : public CreatureAI
 
     public:
 
-        GuardAI(Creature &c);
+        explicit GuardAI(Creature *c);
 
         void MoveInLineOfSight(Unit *);
         void AttackStart(Unit *);
@@ -46,7 +46,6 @@ class MANGOS_DLL_DECL GuardAI : public CreatureAI
         static int Permissible(const Creature *);
 
     private:
-        Creature &i_creature;
         uint64 i_victimGuid;
         GuardState i_state;
         TimeTracker i_tracker;
