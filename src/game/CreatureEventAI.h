@@ -265,6 +265,7 @@ class MANGOS_DLL_SPEC CreatureEventAI : public CreatureAI
         void SpellHit(Unit* pUnit, const SpellEntry* pSpell);
         void UpdateAI(const uint32 diff);
         bool IsVisible(Unit *) const;
+        void ReceiveEmote(Player* pPlayer, uint32 text_emote);
         static int Permissible(const Creature *);
 
         bool ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pActionInvoker = NULL);
@@ -277,7 +278,6 @@ class MANGOS_DLL_SPEC CreatureEventAI : public CreatureAI
         void DoZoneInCombat(Unit* pUnit);
         void DoMeleeAttackIfReady();
         bool CanCast(Unit* Target, SpellEntry const *Spell, bool Triggered);
-        bool ReceiveEmote(Player* pPlayer, Creature* pCreature, uint32 uiEmote);
 
         Unit* DoSelectLowestHpFriendly(float range, uint32 MinHPDiff);
         void DoFindFriendlyMissingBuff(std::list<Creature*>& _list, float range, uint32 spellid);

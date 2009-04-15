@@ -41,7 +41,7 @@ struct Script
         pGossipHello(NULL), pQuestAccept(NULL), pGossipSelect(NULL), pGossipSelectWithCode(NULL),
         pQuestSelect(NULL), pQuestComplete(NULL), pNPCDialogStatus(NULL), pGODialogStatus(NULL), pChooseReward(NULL),
         pItemHello(NULL), pGOHello(NULL), pAreaTrigger(NULL), pItemQuestAccept(NULL), pGOQuestAccept(NULL),
-        pGOChooseReward(NULL), pReceiveEmote(NULL), pItemUse(NULL), pEffectDummyGameObj(NULL), pEffectDummyCreature(NULL),
+        pGOChooseReward(NULL), pItemUse(NULL), pEffectDummyGameObj(NULL), pEffectDummyCreature(NULL),
         pEffectDummyItem(NULL), GetAI(NULL)
     {}
 
@@ -63,7 +63,6 @@ struct Script
     bool (*pItemQuestAccept     )(Player *player, Item *_Item, Quest const*_Quest );
     bool (*pGOQuestAccept       )(Player *player, GameObject *_GO, Quest const*_Quest );
     bool (*pGOChooseReward      )(Player *player, GameObject *_GO, Quest const*_Quest, uint32 opt );
-    bool (*pReceiveEmote        )(Player *player, Creature *_Creature, uint32 emote );
     bool (*pItemUse             )(Player *player, Item* _Item, SpellCastTargets const& targets);
     bool (*pEffectDummyGameObj  )(Unit*, uint32, uint32, GameObject* );
     bool (*pEffectDummyCreature )(Unit*, uint32, uint32, Creature* );

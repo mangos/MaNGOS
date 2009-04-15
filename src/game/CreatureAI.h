@@ -25,9 +25,10 @@
 #include "Dynamic/ObjectRegistry.h"
 #include "Dynamic/FactoryHolder.h"
 
+class WorldObject;
 class Unit;
 class Creature;
-class WorldObject;
+class Player;
 struct SpellEntry;
 
 #define TIME_INTERVAL_LOOK   5000
@@ -87,6 +88,9 @@ class MANGOS_DLL_SPEC CreatureAI
 
         // Called at waypoint reached or point movement finished
         virtual void MovementInform(uint32 /*MovementType*/, uint32 /*Data*/) {}
+
+        // Called at text emote receive from player 
+        virtual void ReceiveEmote(Player* pPlayer, uint32 text_emote) {}
 
         ///== Triggered Actions Requested ==================
 
