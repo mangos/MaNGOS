@@ -205,6 +205,15 @@ enum SpellState
     SPELL_STATE_DELAYED   = 5
 };
 
+enum SpellTargets
+{
+    SPELL_TARGETS_HOSTILE,
+    SPELL_TARGETS_NOT_FRIENDLY,
+    SPELL_TARGETS_NOT_HOSTILE,
+    SPELL_TARGETS_FRIENDLY,
+    SPELL_TARGETS_AOE_DAMAGE
+};
+
 #define SPELL_SPELL_CHANNEL_UPDATE_INTERVAL (1*IN_MILISECONDS)
 
 typedef std::multimap<uint64, uint64> SpellTargetTimeMap;
@@ -366,9 +375,11 @@ class Spell
         void DoCreateItem(uint32 i, uint32 itemtype);
         void WriteSpellGoTargets( WorldPacket * data );
         void WriteAmmoToPacket( WorldPacket * data );
-        void FillTargetMap();
 
-        void SetTargetMap(uint32 i,uint32 cur,std::list<Unit*> &TagUnitMap);
+        typedef std::list<Unit*> UnitList;
+        void FillTargetMap();
+        void SetTargetMap(uint32 i,uint32 cur,UnitList& TagUnitMap);
+        void FillAreaTargets( UnitList& TagUnitMap, float x, float y, float radius, SpellNotifyPushType pushType, SpellTargets spellTargets );
 
         Unit* SelectMagnetTarget();
         bool CheckTarget( Unit* target, uint32 eff );
@@ -577,15 +588,6 @@ enum ReplenishType
     REPLENISH_HEALTH    = 20,
     REPLENISH_MANA      = 21,
     REPLENISH_RAGE      = 22
-};
-
-enum SpellTargets
-{
-    SPELL_TARGETS_HOSTILE,
-    SPELL_TARGETS_NOT_FRIENDLY,
-    SPELL_TARGETS_NOT_HOSTILE,
-    SPELL_TARGETS_FRIENDLY,
-    SPELL_TARGETS_AOE_DAMAGE
 };
 
 namespace MaNGOS
