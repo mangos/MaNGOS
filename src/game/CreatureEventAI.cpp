@@ -47,7 +47,7 @@ CreatureEventAI::CreatureEventAI(Creature *c ) : CreatureAI(c), InCombat(false)
         {
 
             //Debug check
-            #ifndef _DEBUG
+            #ifndef MANGOS_DEBUG
             if ((*i).event_flags & EFLAG_DEBUG_ONLY)
                 continue;
             #endif
