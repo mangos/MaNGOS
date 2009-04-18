@@ -1961,6 +1961,9 @@ void Unit::AttackerStateUpdate (Unit *pVictim, WeaponAttackType attType, bool ex
         return;
     }
 
+    // attack can be redirected to another target
+    pVictim = SelectMagnetTarget(pVictim);
+
     CalcDamageInfo damageInfo;
     CalculateMeleeDamage(pVictim, 0, &damageInfo, attType);
     // Send log damage message to client
@@ -7418,6 +7421,34 @@ void Unit::UnsummonAllTotems()
         if (OldTotem && OldTotem->isTotem())
             ((Totem*)OldTotem)->UnSummon();
     }
+}
+
+Unit* Unit::SelectMagnetTarget(Unit *victim, SpellEntry const *spellInfo)
+{
+    if(!victim)
+        return NULL;
+
+    // Magic case
+    if(spellInfo && (spellInfo->DmgClass == SPELL_DAMAGE_CLASS_NONE || spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MAGIC))
+    {
+        Unit::AuraList const& magnetAuras = victim->GetAurasByType(SPELL_AURA_SPELL_MAGNET);
+        for(Unit::AuraList::const_iterator itr = magnetAuras.begin(); itr != magnetAuras.end(); ++itr)
+            if(Unit* magnet = (*itr)->GetCaster())
+                if(magnet->IsWithinLOSInMap(this) && magnet->isAlive())
+                    return magnet;
+    }
+    // Melee && ranged case
+    else
+    {
+        AuraList const& hitTriggerAuras = victim->GetAurasByType(SPELL_AURA_ADD_CASTER_HIT_TRIGGER);
+        for(AuraList::const_iterator i = hitTriggerAuras.begin(); i != hitTriggerAuras.end(); ++i)
+            if(Unit* magnet = (*i)->GetCaster())
+                if(magnet->isAlive() && magnet->IsWithinLOSInMap(this))
+                    if(roll_chance_i((*i)->GetModifier()->m_amount))
+                        return magnet;
+    }
+
+    return victim;
 }
 
 void Unit::SendHealSpellLog(Unit *pVictim, uint32 SpellID, uint32 Damage, bool critical)

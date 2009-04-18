@@ -381,7 +381,6 @@ class Spell
         void SetTargetMap(uint32 i,uint32 cur,UnitList& TagUnitMap);
         void FillAreaTargets( UnitList& TagUnitMap, float x, float y, float radius, SpellNotifyPushType pushType, SpellTargets spellTargets );
 
-        Unit* SelectMagnetTarget();
         bool CheckTarget( Unit* target, uint32 eff );
         bool CanAutoCast(Unit* target);
 

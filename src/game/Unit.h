@@ -1339,6 +1339,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void ModifyAuraState(AuraState flag, bool apply);
         bool HasAuraState(AuraState flag) const { return HasFlag(UNIT_FIELD_AURASTATE, 1<<(flag-1)); }
         void UnsummonAllTotems();
+        Unit* SelectMagnetTarget(Unit *victim, SpellEntry const *spellInfo = NULL);
         int32 SpellBaseDamageBonus(SpellSchoolMask schoolMask);
         int32 SpellBaseHealingBonus(SpellSchoolMask schoolMask);
         int32 SpellBaseDamageBonusForVictim(SpellSchoolMask schoolMask, Unit *pVictim);
