@@ -17059,8 +17059,8 @@ void Player::UpdateHomebindTime(uint32 time)
     {
         if (time >= m_HomebindTimer)
         {
-            // teleport to homebind location
-            TeleportTo(m_homebindMapId, m_homebindX, m_homebindY, m_homebindZ, GetOrientation());
+            // teleport to nearest graveyard
+            RepopAtGraveyard();
         }
         else
             m_HomebindTimer -= time;

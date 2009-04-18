@@ -1306,7 +1306,8 @@ void BattleGroundMgr::BuildPvpLogDataPacket(WorldPacket *data, BattleGround *bg)
         for(int i = 1; i >= 0; --i)
         {
             *data << uint32(bg->m_ArenaTeamRatingChanges[i]);
-            *data << uint32(3999);  // huge thanks for TOM_RUS for this!
+            *data << uint32(3999);                          // huge thanks for TOM_RUS for this!
+            *data << uint32(0);                             // added again in 3.1
             sLog.outDebug("rating change: %d", bg->m_ArenaTeamRatingChanges[i]);
         }
         for(int i = 1; i >= 0; --i)
