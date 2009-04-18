@@ -1024,6 +1024,7 @@ void GameObject::Use(Unit* user)
                         if (ok)
                         {
                             player->SendLoot(ok->GetGUID(),LOOT_FISHINGHOLE);
+                            player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_FISH_IN_GAMEOBJECT, ok->GetGOInfo()->id);
                             SetLootState(GO_JUST_DEACTIVATED);
                         }
                         else
