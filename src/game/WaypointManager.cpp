@@ -141,6 +141,12 @@ void WaypointManager::Load()
             }
         }
 
+        if (be.emote)
+        {
+            if (!sEmotesStore.LookupEntry(be.emote))
+                sLog.outErrorDb("Waypoint path %u (Point %u) are using emote %u, but emote does not exist.",id, point, be.emote);
+        }
+
         // save memory by not storing empty behaviors
         if(!be.isEmpty())
         {
