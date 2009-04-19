@@ -78,7 +78,7 @@ void WorldSession::HandleTaxiQueryAvailableNodes( WorldPacket & recv_data )
     recv_data >> guid;
 
     // cheating checks
-    Creature *unit = ObjectAccessor::GetNPCIfCanInteractWith(*_player, guid, UNIT_NPC_FLAG_FLIGHTMASTER);
+    Creature *unit = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_FLIGHTMASTER);
     if (!unit)
     {
         sLog.outDebug( "WORLD: HandleTaxiQueryAvailableNodes - Unit (GUID: %u) not found or you can't interact with him.", uint32(GUID_LOPART(guid)) );
@@ -165,7 +165,7 @@ void WorldSession::HandleActivateTaxiFarOpcode ( WorldPacket & recv_data )
 
     recv_data >> guid >> _totalcost >> node_count;
 
-    Creature *npc = ObjectAccessor::GetNPCIfCanInteractWith(*_player, guid, UNIT_NPC_FLAG_FLIGHTMASTER);
+    Creature *npc = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_FLIGHTMASTER);
     if (!npc)
     {
         sLog.outDebug( "WORLD: HandleActivateTaxiFarOpcode - Unit (GUID: %u) not found or you can't interact with it.", uint32(GUID_LOPART(guid)) );
@@ -266,7 +266,7 @@ void WorldSession::HandleActivateTaxiOpcode( WorldPacket & recv_data )
 
     recv_data >> guid >> nodes[0] >> nodes[1];
     sLog.outDebug( "WORLD: Received CMSG_ACTIVATETAXI from %d to %d" ,nodes[0],nodes[1]);
-    Creature *npc = ObjectAccessor::GetNPCIfCanInteractWith(*_player, guid, UNIT_NPC_FLAG_FLIGHTMASTER);
+    Creature *npc = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_FLIGHTMASTER);
     if (!npc)
     {
         sLog.outDebug( "WORLD: HandleActivateTaxiOpcode - Unit (GUID: %u) not found or you can't interact with it.", uint32(GUID_LOPART(guid)) );
