@@ -636,8 +636,10 @@ void WorldSession::ReadMovementInfo(WorldPacket &data, MovementInfo *mi)
 
     if(mi->flags & MOVEMENTFLAG_ONTRANSPORT)
     {
-        CHECK_PACKET_SIZE(data, data.rpos()+8+4+4+4+4+4+1);
-        data >> mi->t_guid;
+        if(!data.readPackGUID(mi->t_guid))
+            return;
+
+        CHECK_PACKET_SIZE(data, data.rpos()+4+4+4+4+4+1);
         data >> mi->t_x;
         data >> mi->t_y;
         data >> mi->t_z;
