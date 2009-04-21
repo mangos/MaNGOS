@@ -87,7 +87,7 @@ void WorldSession::HandleQuestgiverHelloOpcode( WorldPacket & recv_data )
 
     sLog.outDebug ("WORLD: Received CMSG_QUESTGIVER_HELLO npc = %u", GUID_LOPART(guid));
 
-    Creature *pCreature = ObjectAccessor::GetNPCIfCanInteractWith(*_player, guid,UNIT_NPC_FLAG_NONE);
+    Creature *pCreature = GetPlayer()->GetNPCIfCanInteractWith(guid,UNIT_NPC_FLAG_NONE);
     if (!pCreature)
     {
         sLog.outDebug ("WORLD: HandleQuestgiverHelloOpcode - Unit (GUID: %u) not found or you can't interact with him.",
@@ -611,7 +611,7 @@ void WorldSession::HandleQuestgiverStatusQueryMultipleOpcode(WorldPacket& /*recv
 
         if(IS_CREATURE_GUID(*itr))
         {
-            Creature *questgiver = ObjectAccessor::GetCreature(*_player, *itr);
+            Creature *questgiver = GetPlayer()->GetMap()->GetCreature(*itr);
             if(!questgiver || questgiver->IsHostileTo(_player))
                 continue;
             if(!questgiver->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER))
@@ -626,7 +626,7 @@ void WorldSession::HandleQuestgiverStatusQueryMultipleOpcode(WorldPacket& /*recv
         }
         else if(IS_GAMEOBJECT_GUID(*itr))
         {
-            GameObject *questgiver = ObjectAccessor::GetGameObject(*_player, *itr);
+            GameObject *questgiver = GetPlayer()->GetMap()->GetGameObject(*itr);
             if(!questgiver)
                 continue;
             if(questgiver->GetGoType() != GAMEOBJECT_TYPE_QUESTGIVER)

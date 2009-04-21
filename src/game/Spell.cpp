@@ -158,7 +158,7 @@ void SpellCastTargets::setCorpseTarget(Corpse* corpse)
 
 void SpellCastTargets::Update(Unit* caster)
 {
-    m_GOTarget   = m_GOTargetGUID ? ObjectAccessor::GetGameObject(*caster,m_GOTargetGUID) : NULL;
+    m_GOTarget   = m_GOTargetGUID ? caster->GetMap()->GetGameObject(m_GOTargetGUID) : NULL;
     m_unitTarget = m_unitTargetGUID ?
         ( m_unitTargetGUID==caster->GetGUID() ? caster : ObjectAccessor::GetUnit(*caster, m_unitTargetGUID) ) :
     NULL;
@@ -956,7 +956,7 @@ void Spell::AddGOTarget(GameObject* pVictim, uint32 effIndex)
 
 void Spell::AddGOTarget(uint64 goGUID, uint32 effIndex)
 {
-    GameObject* go = ObjectAccessor::GetGameObject(*m_caster, goGUID);
+    GameObject* go = m_caster->GetMap()->GetGameObject(goGUID);
     if (go)
         AddGOTarget(go, effIndex);
 }
@@ -1233,7 +1233,7 @@ void Spell::DoAllEffectOnTarget(GOTargetInfo *target)
     if(!effectMask)
         return;
 
-    GameObject* go = ObjectAccessor::GetGameObject(*m_caster, target->targetGUID);
+    GameObject* go = m_caster->GetMap()->GetGameObject(target->targetGUID);
     if(!go)
         return;
 
@@ -1542,9 +1542,11 @@ void Spell::SetTargetMap(uint32 i,uint32 cur,UnitList& TagUnitMap)
         {
             if (EffectChainTarget <= 1)
             {
-                Unit* pUnitTarget = SelectMagnetTarget();
-                if(pUnitTarget)
+                if(Unit* pUnitTarget = m_caster->SelectMagnetTarget(m_targets.getUnitTarget(), m_spellInfo))
+                {
+                    m_targets.setUnitTarget(pUnitTarget);
                     TagUnitMap.push_back(pUnitTarget);
+                }
             }
             else
             {
@@ -1782,7 +1784,7 @@ void Spell::SetTargetMap(uint32 i,uint32 cur,UnitList& TagUnitMap)
             // Check original caster is GO - set its coordinates as dst cast
             WorldObject *caster = NULL;
             if (IS_GAMEOBJECT_GUID(m_originalCasterGUID))
-                caster = ObjectAccessor::GetGameObject(*m_caster, m_originalCasterGUID);
+                caster = m_caster->GetMap()->GetGameObject(m_originalCasterGUID);
             if (!caster)
                 caster = m_caster;
             // Set dest for targets
@@ -1871,9 +1873,11 @@ void Spell::SetTargetMap(uint32 i,uint32 cur,UnitList& TagUnitMap)
                 }
                 else
                 {
-                    Unit* pUnitTarget = SelectMagnetTarget();
-                    if(pUnitTarget)
+                    if(Unit* pUnitTarget = m_caster->SelectMagnetTarget(m_targets.getUnitTarget(), m_spellInfo))
+                    {
+                        m_targets.setUnitTarget(pUnitTarget);
                         TagUnitMap.push_back(pUnitTarget);
+                    }
                 }
             }
         }break;
@@ -1905,9 +1909,11 @@ void Spell::SetTargetMap(uint32 i,uint32 cur,UnitList& TagUnitMap)
         }break;
         case TARGET_SINGLE_ENEMY:
         {
-            Unit* pUnitTarget = SelectMagnetTarget();
-            if(pUnitTarget)
+            if(Unit* pUnitTarget = m_caster->SelectMagnetTarget(m_targets.getUnitTarget(), m_spellInfo))
+            {
+                m_targets.setUnitTarget(pUnitTarget);
                 TagUnitMap.push_back(pUnitTarget);
+            }
         }break;
         case TARGET_AREAEFFECT_PARTY:
         {
@@ -2710,7 +2716,7 @@ void Spell::update(uint32 difftime)
                     {
                         GOTargetInfo* target = &*ihit;
 
-                        GameObject* go = ObjectAccessor::GetGameObject(*m_caster, target->targetGUID);
+                        GameObject* go = m_caster->GetMap()->GetGameObject(target->targetGUID);
                         if(!go)
                             continue;
 
@@ -3259,7 +3265,7 @@ void Spell::SendChannelStart(uint32 duration)
         {
             if(itr->effectMask & (1<<0) )
             {
-                target = ObjectAccessor::GetGameObject(*m_caster, itr->targetGUID);
+                target = m_caster->GetMap()->GetGameObject(itr->targetGUID);
                 break;
             }
         }
@@ -5407,7 +5413,7 @@ bool Spell::CheckTarget( Unit* target, uint32 eff )
             // Get GO cast coordinates if original caster -> GO
             WorldObject *caster = NULL;
             if (IS_GAMEOBJECT_GUID(m_originalCasterGUID))
-                caster = ObjectAccessor::GetGameObject(*m_caster, m_originalCasterGUID);
+                caster = m_caster->GetMap()->GetGameObject(m_originalCasterGUID);
             if (!caster)
                 caster = m_caster;
             if(target!=m_caster && !target->IsWithinLOSInMap(caster))
@@ -5416,30 +5422,6 @@ bool Spell::CheckTarget( Unit* target, uint32 eff )
     }
 
     return true;
-}
-
-Unit* Spell::SelectMagnetTarget()
-{
-    Unit* target = m_targets.getUnitTarget();
-
-    if(target && target->HasAuraType(SPELL_AURA_SPELL_MAGNET) && !(m_spellInfo->Attributes & 0x10))
-    {
-        Unit::AuraList const& magnetAuras = target->GetAurasByType(SPELL_AURA_SPELL_MAGNET);
-        for(Unit::AuraList::const_iterator itr = magnetAuras.begin(); itr != magnetAuras.end(); ++itr)
-        {
-            if(Unit* magnet = (*itr)->GetCaster())
-            {
-                if(magnet->IsWithinLOSInMap(m_caster))
-                {
-                    target = magnet;
-                    m_targets.setUnitTarget(target);
-                    break;
-                }
-            }
-        }
-    }
-
-    return target;
 }
 
 bool Spell::IsNeedSendToClient() const

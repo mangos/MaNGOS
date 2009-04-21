@@ -1962,6 +1962,9 @@ void Unit::AttackerStateUpdate (Unit *pVictim, WeaponAttackType attType, bool ex
         return;
     }
 
+    // attack can be redirected to another target
+    pVictim = SelectMagnetTarget(pVictim);
+
     CalcDamageInfo damageInfo;
     CalculateMeleeDamage(pVictim, 0, &damageInfo, attType);
     // Send log damage message to client
@@ -3982,7 +3985,7 @@ void Unit::RemoveDynObject(uint32 spellid)
         return;
     for (DynObjectGUIDs::iterator i = m_dynObjGUIDs.begin(); i != m_dynObjGUIDs.end();)
     {
-        DynamicObject* dynObj = ObjectAccessor::GetDynamicObject(*this,*i);
+        DynamicObject* dynObj = GetMap()->GetDynamicObject(*i);
         if(!dynObj)
         {
             i = m_dynObjGUIDs.erase(i);
@@ -4001,7 +4004,7 @@ void Unit::RemoveAllDynObjects()
 {
     while(!m_dynObjGUIDs.empty())
     {
-        DynamicObject* dynObj = ObjectAccessor::GetDynamicObject(*this,*m_dynObjGUIDs.begin());
+        DynamicObject* dynObj = GetMap()->GetDynamicObject(*m_dynObjGUIDs.begin());
         if(dynObj)
             dynObj->Delete();
         m_dynObjGUIDs.erase(m_dynObjGUIDs.begin());
@@ -4012,7 +4015,7 @@ DynamicObject * Unit::GetDynObject(uint32 spellId, uint32 effIndex)
 {
     for (DynObjectGUIDs::iterator i = m_dynObjGUIDs.begin(); i != m_dynObjGUIDs.end();)
     {
-        DynamicObject* dynObj = ObjectAccessor::GetDynamicObject(*this,*i);
+        DynamicObject* dynObj = GetMap()->GetDynamicObject(*i);
         if(!dynObj)
         {
             i = m_dynObjGUIDs.erase(i);
@@ -4030,7 +4033,7 @@ DynamicObject * Unit::GetDynObject(uint32 spellId)
 {
     for (DynObjectGUIDs::iterator i = m_dynObjGUIDs.begin(); i != m_dynObjGUIDs.end();)
     {
-        DynamicObject* dynObj = ObjectAccessor::GetDynamicObject(*this,*i);
+        DynamicObject* dynObj = GetMap()->GetDynamicObject(*i);
         if(!dynObj)
         {
             i = m_dynObjGUIDs.erase(i);
@@ -7257,7 +7260,7 @@ bool Unit::isAttackingPlayer() const
     {
         if(m_TotemSlot[i])
         {
-            Creature *totem = ObjectAccessor::GetCreature(*this, m_TotemSlot[i]);
+            Creature *totem = GetMap()->GetCreature(m_TotemSlot[i]);
             if(totem && totem->isAttackingPlayer())
                 return true;
         }
@@ -7415,10 +7418,38 @@ void Unit::UnsummonAllTotems()
         if(!m_TotemSlot[i])
             continue;
 
-        Creature *OldTotem = ObjectAccessor::GetCreature(*this, m_TotemSlot[i]);
+        Creature *OldTotem = GetMap()->GetCreature(m_TotemSlot[i]);
         if (OldTotem && OldTotem->isTotem())
             ((Totem*)OldTotem)->UnSummon();
     }
+}
+
+Unit* Unit::SelectMagnetTarget(Unit *victim, SpellEntry const *spellInfo)
+{
+    if(!victim)
+        return NULL;
+
+    // Magic case
+    if(spellInfo && (spellInfo->DmgClass == SPELL_DAMAGE_CLASS_NONE || spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MAGIC))
+    {
+        Unit::AuraList const& magnetAuras = victim->GetAurasByType(SPELL_AURA_SPELL_MAGNET);
+        for(Unit::AuraList::const_iterator itr = magnetAuras.begin(); itr != magnetAuras.end(); ++itr)
+            if(Unit* magnet = (*itr)->GetCaster())
+                if(magnet->IsWithinLOSInMap(this) && magnet->isAlive())
+                    return magnet;
+    }
+    // Melee && ranged case
+    else
+    {
+        AuraList const& hitTriggerAuras = victim->GetAurasByType(SPELL_AURA_ADD_CASTER_HIT_TRIGGER);
+        for(AuraList::const_iterator i = hitTriggerAuras.begin(); i != hitTriggerAuras.end(); ++i)
+            if(Unit* magnet = (*i)->GetCaster())
+                if(magnet->isAlive() && magnet->IsWithinLOSInMap(this))
+                    if(roll_chance_i((*i)->GetModifier()->m_amount))
+                        return magnet;
+    }
+
+    return victim;
 }
 
 void Unit::SendHealSpellLog(Unit *pVictim, uint32 SpellID, uint32 Damage, bool critical)
