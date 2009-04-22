@@ -1290,8 +1290,8 @@ void Unit::CalculateMeleeDamage(Unit *pVictim, uint32 damage, CalcDamageInfo *da
             damageInfo->procEx|=PROC_EX_NORMAL_HIT;
             float reducePercent = 1.0f;                     //damage factor
             // calculate base values and mods
-            float baseLowEnd = 1.3;
-            float baseHighEnd = 1.2;
+            float baseLowEnd = 1.3f;
+            float baseHighEnd = 1.2f;
             switch(getClass())                              // lowering base values for casters
             {
                 case CLASS_SHAMAN:
@@ -1299,17 +1299,17 @@ void Unit::CalculateMeleeDamage(Unit *pVictim, uint32 damage, CalcDamageInfo *da
                 case CLASS_MAGE:
                 case CLASS_WARLOCK:
                 case CLASS_DRUID:
-                    baseLowEnd  -= 0.7;
-                    baseHighEnd -= 0.3;
+                    baseLowEnd  -= 0.7f;
+                    baseHighEnd -= 0.3f;
                     break;
             }
 
-            float maxLowEnd = 0.6;
+            float maxLowEnd = 0.6f;
             switch(getClass())                              // upper for melee classes
             {
                 case CLASS_WARRIOR:
                 case CLASS_ROGUE:
-                    maxLowEnd = 0.91;                       //If the attacker is a melee class then instead the lower value of 0.91
+                    maxLowEnd = 0.91f;                      //If the attacker is a melee class then instead the lower value of 0.91
             }
 
             // calculate values
@@ -1405,29 +1405,29 @@ void Unit::DealMeleeDamage(CalcDamageInfo *damageInfo, bool durabilityLoss)
         // Reduce attack time
         if (pVictim->haveOffhandWeapon() && offtime < basetime)
         {
-            float percent20 = pVictim->GetAttackTime(OFF_ATTACK) * 0.20;
-            float percent60 = 3 * percent20;
+            float percent20 = pVictim->GetAttackTime(OFF_ATTACK) * 0.20f;
+            float percent60 = 3.0f * percent20;
             if(offtime > percent20 && offtime <= percent60)
             {
                 pVictim->setAttackTimer(OFF_ATTACK, uint32(percent20));
             }
             else if(offtime > percent60)
             {
-                offtime -= 2 * percent20;
+                offtime -= 2.0f * percent20;
                 pVictim->setAttackTimer(OFF_ATTACK, uint32(offtime));
             }
         }
         else
         {
             float percent20 = pVictim->GetAttackTime(BASE_ATTACK) * 0.20;
-            float percent60 = 3 * percent20;
+            float percent60 = 3.0f * percent20;
             if(basetime > percent20 && basetime <= percent60)
             {
                 pVictim->setAttackTimer(BASE_ATTACK, uint32(percent20));
             }
             else if(basetime > percent60)
             {
-                basetime -= 2 * percent20;
+                basetime -= 2.0f * percent20;
                 pVictim->setAttackTimer(BASE_ATTACK, uint32(basetime));
             }
         }
@@ -1443,19 +1443,19 @@ void Unit::DealMeleeDamage(CalcDamageInfo *damageInfo, bool durabilityLoss)
     {
         // -probability is between 0% and 40%
         // 20% base chance
-        float Probability = 20;
+        float Probability = 20.0f;
 
         //there is a newbie protection, at level 10 just 7% base chance; assuming linear function
         if( pVictim->getLevel() < 30 )
-            Probability = 0.65f*pVictim->getLevel()+0.5;
+            Probability = 0.65f*pVictim->getLevel()+0.5f;
 
         uint32 VictimDefense=pVictim->GetDefenseSkillValue();
         uint32 AttackerMeleeSkill=GetUnitMeleeSkill();
 
         Probability *= AttackerMeleeSkill/(float)VictimDefense;
 
-        if(Probability > 40)
-            Probability = 40;
+        if(Probability > 40.0f)
+            Probability = 40.0f;
 
         if(roll_chance_f(Probability))
             CastSpell(pVictim, 1604, true);

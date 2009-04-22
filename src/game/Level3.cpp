@@ -3440,7 +3440,7 @@ bool ChatHandler::HandleModifyArenaCommand(const char * args)
 bool ChatHandler::HandleReviveCommand(const char* args)
 {
     Player* player = NULL;
-    uint32 player_guid = 0;
+    uint64 player_guid = 0;
 
     if (*args)
     {
