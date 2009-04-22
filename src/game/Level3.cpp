@@ -4522,6 +4522,8 @@ bool ChatHandler::HandleResetHonorCommand (const char * args)
     player->SetUInt32Value(PLAYER_FIELD_TODAY_CONTRIBUTION, 0);
     player->SetUInt32Value(PLAYER_FIELD_YESTERDAY_CONTRIBUTION, 0);
 
+    player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EARN_HONORABLE_KILL);
+
     return true;
 }
 
