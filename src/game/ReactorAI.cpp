@@ -91,7 +91,7 @@ ReactorAI::EnterEvadeMode()
         m_creature->GetMotionMaster()->MovementExpired();
         m_creature->GetMotionMaster()->MoveIdle();
         i_victimGuid = 0;
-        m_creature->CombatStop();
+        m_creature->CombatStop(true);
         m_creature->DeleteThreatList();
         return;
     }
@@ -118,7 +118,7 @@ ReactorAI::EnterEvadeMode()
     m_creature->RemoveAllAuras();
     m_creature->DeleteThreatList();
     i_victimGuid = 0;
-    m_creature->CombatStop();
+    m_creature->CombatStop(true);
     m_creature->SetLootRecipient(NULL);
 
     // Remove TargetedMovementGenerator from MotionMaster stack list, and add HomeMovementGenerator instead

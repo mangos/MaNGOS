@@ -7214,9 +7214,9 @@ bool Unit::AttackStop(bool targetSwitch /*=false*/)
     return true;
 }
 
-void Unit::CombatStop(bool cast)
+void Unit::CombatStop(bool includingCast)
 {
-    if (cast && IsNonMeleeSpellCasted(false))
+    if (includingCast && IsNonMeleeSpellCasted(false))
         InterruptNonMeleeSpells(false);
 
     AttackStop();
@@ -7226,19 +7226,19 @@ void Unit::CombatStop(bool cast)
     ClearInCombat();
 }
 
-void Unit::CombatStopWithPets(bool cast)
+void Unit::CombatStopWithPets(bool includingCast)
 {
-    CombatStop(cast);
+    CombatStop(includingCast);
     if(Pet* pet = GetPet())
-        pet->CombatStop(cast);
+        pet->CombatStop(includingCast);
     if(Unit* charm = GetCharm())
-        charm->CombatStop(cast);
+        charm->CombatStop(includingCast);
     if(GetTypeId()==TYPEID_PLAYER)
     {
         GuardianPetList const& guardians = ((Player*)this)->GetGuardians();
         for(GuardianPetList::const_iterator itr = guardians.begin(); itr != guardians.end(); ++itr)
             if(Unit* guardian = Unit::GetUnit(*this,*itr))
-                guardian->CombatStop(cast);
+                guardian->CombatStop(includingCast);
     }
 }
 
