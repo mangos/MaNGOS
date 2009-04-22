@@ -7216,7 +7216,7 @@ bool Unit::AttackStop(bool targetSwitch /*=false*/)
 
 void Unit::CombatStop(bool cast)
 {
-    if(cast& IsNonMeleeSpellCasted(false))
+    if (cast && IsNonMeleeSpellCasted(false))
         InterruptNonMeleeSpells(false);
 
     AttackStop();
