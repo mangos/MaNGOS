@@ -90,7 +90,9 @@ class ChatHandler
         bool HandleAccountCommand(const char* args);
         bool HandleAccountCreateCommand(const char* args);
         bool HandleAccountDeleteCommand(const char* args);
+        bool HandleAccountLockCommand(const char* args);
         bool HandleAccountOnlineListCommand(const char* args);
+        bool HandleAccountPasswordCommand(const char* args);
         bool HandleAccountSetAddonCommand(const char* args);
         bool HandleAccountSetGmLevelCommand(const char* args);
         bool HandleAccountSetPasswordCommand(const char* args);
@@ -454,11 +456,9 @@ class ChatHandler
         bool HandleDelTicketCommand(const char* args);
         bool HandleMaxSkillCommand(const char* args);
         bool HandleSetSkillCommand(const char* args);
-        bool HandlePasswordCommand(const char* args);
-        bool HandleLockAccountCommand(const char* args);
         bool HandleRespawnCommand(const char* args);
-        bool HandleRenameCommand(const char * args);
-        bool HandleCustomizeCommand(const char * args);
+        bool HandleCharacterRenameCommand(const char * args);
+        bool HandleCharacterCustomizeCommand(const char * args);
         bool HandlePDumpLoadCommand(const char *args);
         bool HandlePDumpWriteCommand(const char *args);
         bool HandleComeToMeCommand(const char *args);
