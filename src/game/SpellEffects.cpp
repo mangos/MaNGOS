@@ -378,6 +378,12 @@ void Spell::EffectSchoolDMG(uint32 effect_idx)
                     damage = uint32(damage * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) / 100);
                     m_caster->ModifyAuraState(AURA_STATE_WARRIOR_VICTORY_RUSH, false);
                 }
+                // Concussion Blow
+                else if(m_spellInfo->SpellFamilyFlags & 0x0000000004000000LL)
+                {
+                    if(effect_idx < 2 && m_spellInfo->Effect[effect_idx+1]==SPELL_EFFECT_DUMMY)
+                        damage += uint32(m_spellInfo->CalculateSimpleValue(effect_idx+1) * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) / 100);
+                }
                 // Revenge ${$m1+$AP*0.207} to ${$M1+$AP*0.207}
                 else if(m_spellInfo->SpellFamilyFlags & 0x0000000000000400LL)
                     damage+= uint32(m_caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.207f);
