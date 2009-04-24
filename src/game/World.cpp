@@ -1947,7 +1947,6 @@ void World::ScriptsProcess()
                 }
 
                 if( go->GetGoType()==GAMEOBJECT_TYPE_FISHINGNODE ||
-                    go->GetGoType()==GAMEOBJECT_TYPE_FISHINGNODE ||
                     go->GetGoType()==GAMEOBJECT_TYPE_DOOR        ||
                     go->GetGoType()==GAMEOBJECT_TYPE_BUTTON      ||
                     go->GetGoType()==GAMEOBJECT_TYPE_TRAP )
