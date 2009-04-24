@@ -1214,7 +1214,7 @@ void CreatureEventAI::MoveInLineOfSight(Unit *who)
         }
     }
 
-    if (m_creature->isCivilian() && m_creature->IsNeutralToAll())
+    if (m_creature->isCivilian() || m_creature->IsNeutralToAll())
         return;
 
     if (!m_creature->hasUnitState(UNIT_STAT_STUNNED) && who->isTargetableForAttack() &&
