@@ -3535,7 +3535,7 @@ void Aura::HandleModStealth(bool apply, bool Real)
                     else if ((*i)->GetId() == 58426 && GetSpellProto()->SpellFamilyFlags & 0x0000000000400000LL)
                     {
                         pTarget->RemoveAurasDueToSpell(58428);
-                        pTarget->CastSpell(m_target, 58427, true);
+                        pTarget->CastSpell(pTarget, 58427, true);
                     }
                 }
             }
@@ -3573,7 +3573,7 @@ void Aura::HandleModStealth(bool apply, bool Real)
                     pTarget->CastSpell(pTarget,31666,true);
                 // Overkill
                 else if ((*i)->GetId() == 58426 && GetSpellProto()->SpellFamilyFlags & 0x0000000000400000LL)
-                    pTarget->CastSpell(m_target, 58428, true);
+                    pTarget->CastSpell(pTarget, 58428, true);
             }
         }
     }
