@@ -38,8 +38,6 @@ libmangosdatabase_a_SOURCES = \
 	DatabasePostgre.cpp \
 	DatabaseMysql.h \
 	DatabasePostgre.h \
-	DatabaseSqlite.cpp \
-	DatabaseSqlite.h \
 	DBCEnums.h \
 	Field.cpp \
 	Field.h \
@@ -50,8 +48,6 @@ libmangosdatabase_a_SOURCES = \
 	QueryResultMysql.h \
 	QueryResultPostgre.cpp \
 	QueryResultPostgre.h \
-	QueryResultSqlite.cpp \
-	QueryResultSqlite.h \
 	SQLStorage.cpp \
 	SQLStorage.h \
 	SQLStorageImpl.h \

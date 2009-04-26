@@ -236,15 +236,6 @@ bool AreaTrigger      ( Player *player, AreaTriggerEntry* atEntry )
 }
 
 MANGOS_DLL_EXPORT
-bool ReceiveEmote ( Player *player, Creature *_Creature, uint32 emote )
-{
-    Script *tmpscript = m_scripts[_Creature->GetScriptId()];
-    if(!tmpscript || !tmpscript->pReceiveEmote) return false;
-
-    return tmpscript->pReceiveEmote(player,_Creature, emote);
-}
-
-MANGOS_DLL_EXPORT
 bool ItemUse( Player *player, Item* _Item, SpellCastTargets const& targets)
 {
     Script *tmpscript = NULL;
@@ -323,6 +314,7 @@ void ScriptedAI::UpdateAI(const uint32)
 
 void ScriptedAI::EnterEvadeMode()
 {
+    m_creature->CombatStop(true);
     if( m_creature->isAlive() )
         DoGoHome();
 }

@@ -181,6 +181,7 @@ inline bool IsAreaEffectTarget( Targets target )
 {
     switch (target )
     {
+        case TARGET_AREAEFFECT_INSTANT:
         case TARGET_AREAEFFECT_CUSTOM:
         case TARGET_ALL_ENEMY_IN_AREA:
         case TARGET_ALL_ENEMY_IN_AREA_INSTANT:
