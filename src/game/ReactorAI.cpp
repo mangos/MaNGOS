@@ -48,11 +48,12 @@ ReactorAI::AttackStart(Unit *p)
     if(m_creature->Attack(p,true))
     {
         DEBUG_LOG("Tag unit GUID: %u (TypeId: %u) as a victim", p->GetGUIDLow(), p->GetTypeId());
+        i_victimGuid = p->GetGUID();
+        m_creature->AddThreat(p, 0.0f);
+
         m_creature->SetInCombatWith(p);
         p->SetInCombatWith(m_creature);
 
-        m_creature->AddThreat(p, 0.0f);
-        i_victimGuid = p->GetGUID();
         m_creature->GetMotionMaster()->MoveChase(p);
     }
 }

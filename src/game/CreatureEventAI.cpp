@@ -1118,7 +1118,7 @@ void CreatureEventAI::JustSummoned(Creature* pUnit)
     }
 }
 
-void CreatureEventAI::Aggro(Unit *who)
+void CreatureEventAI::EnterCombat(Unit *enemy)
 {
     //Check for on combat start events
     if (!bEmptyList)
@@ -1129,7 +1129,7 @@ void CreatureEventAI::Aggro(Unit *who)
             {
                 case EVENT_T_AGGRO:
                     (*i).Enabled = true;
-                    ProcessEvent(*i, who);
+                    ProcessEvent(*i, enemy);
                     break;
                     //Reset all in combat timers
                 case EVENT_T_TIMER:
@@ -1164,16 +1164,11 @@ void CreatureEventAI::AttackStart(Unit *who)
     if (!who)
         return;
 
-    bool inCombat = m_creature->isInCombat();
-
     if (m_creature->Attack(who, MeleeEnabled))
     {
         m_creature->AddThreat(who, 0.0f);
         m_creature->SetInCombatWith(who);
         who->SetInCombatWith(m_creature);
-
-        if (!inCombat)
-            Aggro(who);
 
         if (CombatMovementEnabled)
         {
@@ -1233,8 +1228,8 @@ void CreatureEventAI::MoveInLineOfSight(Unit *who)
             }
             else if (m_creature->GetMap()->IsDungeon())
             {
-                who->SetInCombatWith(m_creature);
                 m_creature->AddThreat(who, 0.0f);
+                who->SetInCombatWith(m_creature);
             }
         }
     }

@@ -46,6 +46,9 @@ class MANGOS_DLL_SPEC CreatureAI
         // Called if IsVisible(Unit *who) is true at each *who move, reaction at visibility zone enter
         virtual void MoveInLineOfSight(Unit *) {}
 
+        // Called for reaction at enter to combat if not in combat yet (enemy can be NULL)
+        virtual void EnterCombat(Unit* /*enemy*/) {}
+
         // Called for reaction at stopping attack at no attackers or targets
         virtual void EnterEvadeMode() {}
 
