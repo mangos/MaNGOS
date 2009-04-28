@@ -2185,11 +2185,12 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
             if( GetId()==24658 )
             {
                 uint32 spellId = 24659;
-                if (apply)
+                if (apply && caster)
                 {
                     const SpellEntry *spell = sSpellStore.LookupEntry(spellId);
                     if (!spell)
                         return;
+
                     for (int i=0; i < spell->StackAmount; ++i)
                         caster->CastSpell(m_target, spell->Id, true, NULL, NULL, GetCasterGUID());
                     return;
@@ -2201,7 +2202,7 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
             if( GetId()==24661 )
             {
                 uint32 spellId = 24662;
-                if (apply)
+                if (apply && caster)
                 {
                     const SpellEntry *spell = sSpellStore.LookupEntry(spellId);
                     if (!spell)
@@ -3411,7 +3412,7 @@ void Aura::HandleAuraModStun(bool apply, bool Real)
         {
             GameObject* pObj = new GameObject;
             if(pObj->Create(objmgr.GenerateLowGuid(HIGHGUID_GAMEOBJECT), 185584, m_target->GetMap(), m_target->GetPhaseMask(),
-                m_target->GetPositionX(), m_target->GetPositionY(), m_target->GetPositionZ(), m_target->GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 100, 1))
+                m_target->GetPositionX(), m_target->GetPositionY(), m_target->GetPositionZ(), m_target->GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 100, GO_STATE_READY))
             {
                 pObj->SetRespawnTime(GetAuraDuration()/IN_MILISECONDS);
                 pObj->SetSpellId(GetId());
@@ -3539,7 +3540,7 @@ void Aura::HandleModStealth(bool apply, bool Real)
                     else if ((*i)->GetId() == 58426 && GetSpellProto()->SpellFamilyFlags & 0x0000000000400000LL)
                     {
                         pTarget->RemoveAurasDueToSpell(58428);
-                        pTarget->CastSpell(m_target, 58427, true);
+                        pTarget->CastSpell(pTarget, 58427, true);
                     }
                 }
             }
@@ -3577,7 +3578,7 @@ void Aura::HandleModStealth(bool apply, bool Real)
                     pTarget->CastSpell(pTarget,31666,true);
                 // Overkill
                 else if ((*i)->GetId() == 58426 && GetSpellProto()->SpellFamilyFlags & 0x0000000000400000LL)
-                    pTarget->CastSpell(m_target, 58428, true);
+                    pTarget->CastSpell(pTarget, 58428, true);
             }
         }
     }

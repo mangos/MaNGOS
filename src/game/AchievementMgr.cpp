@@ -720,12 +720,12 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                     continue;
                 // skip wrong arena achievements, if not achievIdByArenaSlot then normal total death counter
                 bool notfit = false;
-                for(int i = 0; i < MAX_ARENA_SLOT; ++i)
+                for(int j = 0; j < MAX_ARENA_SLOT; ++j)
                 {
-                    if(achievIdByArenaSlot[i] == achievement->ID)
+                    if(achievIdByArenaSlot[j] == achievement->ID)
                     {
                         BattleGround* bg = GetPlayer()->GetBattleGround();
-                        if(!bg || !bg->isArena() || ArenaTeam::GetSlotByType(bg->GetArenaType()) != i)
+                        if(!bg || !bg->isArena() || ArenaTeam::GetSlotByType(bg->GetArenaType()) != j)
                             notfit = true;
 
                         break;
@@ -749,26 +749,26 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
 
                 // search case
                 bool found = false;
-                for(int i = 0; achievIdForDangeon[i][0]; ++i)
+                for(int j = 0; achievIdForDangeon[j][0]; ++j)
                 {
-                    if(achievIdForDangeon[i][0] == achievement->ID)
+                    if(achievIdForDangeon[j][0] == achievement->ID)
                     {
                         if(map->IsRaid())
                         {
                             // if raid accepted (ignore difficulty)
-                            if(!achievIdForDangeon[i][2])
+                            if(!achievIdForDangeon[j][2])
                                 break;                      // for
                         }
                         else if(GetPlayer()->GetDifficulty()==DIFFICULTY_NORMAL)
                         {
                             // dungeon in normal mode accepted
-                            if(!achievIdForDangeon[i][1])
+                            if(!achievIdForDangeon[j][1])
                                 break;                      // for
                         }
                         else
                         {
                             // dungeon in heroic mode accepted
-                            if(!achievIdForDangeon[i][3])
+                            if(!achievIdForDangeon[j][3])
                                 break;                      // for
                         }
 
@@ -890,11 +890,15 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                     break;
 
                 bool matchFound = false;
-                for (int i = 0; i < 3; ++i)
+                for (int j = 0; j < MAX_WORLD_MAP_OVERLAY_AREA_IDX; ++j)
                 {
-                    int32 exploreFlag = GetAreaFlagByAreaID(worldOverlayEntry->areatableID[i]);
-                    if(exploreFlag < 0)
+                    uint32 area_id = worldOverlayEntry->areatableID[j];
+                    if(!area_id)                            // array have 0 only in empty tail
                         break;
+
+                    int32 exploreFlag = GetAreaFlagByAreaID(area_id);
+                    if(exploreFlag < 0)
+                        continue;
 
                     uint32 playerIndexOffset = uint32(exploreFlag) / 32;
                     uint32 mask = 1<< (uint32(exploreFlag) % 32);
@@ -1392,7 +1396,7 @@ void AchievementMgr::SetCriteriaProgress(AchievementCriteriaEntry const* entry, 
     {
         progress = &iter->second;
 
-        uint32 newValue;
+        uint32 newValue = 0;
         switch(ptype)
         {
             case PROGRESS_SET:

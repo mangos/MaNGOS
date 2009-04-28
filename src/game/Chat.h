@@ -116,6 +116,7 @@ class ChatHandler
         bool HandleCharacterCustomizeCommand(const char * args);
         bool HandleCharacterDeleteCommand(const char* args);
         bool HandleCharacterRenameCommand(const char * args);
+        bool HandleCharacterLevelCommand(const char* args);
 
         bool HandleDebugAnimCommand(const char* args);
         bool HandleDebugArenaCommand(const char * args);
@@ -498,6 +499,7 @@ class ChatHandler
         bool HandleBanHelper(BanMode mode,char const* args);
         bool HandleBanInfoHelper(uint32 accountid, char const* accountname);
         bool HandleUnBanHelper(BanMode mode,char const* args);
+        void HandleCharacterLevel(Player* player, uint64 player_guid, uint32 oldlevel, uint32 newlevel);
 
         void SetSentErrorMessage(bool val){ sentErrorMessage = val;};
     private:

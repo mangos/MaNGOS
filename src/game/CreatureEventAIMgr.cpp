@@ -457,22 +457,16 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Scripts()
                             sLog.outErrorDb("CreatureEventAI:  Event %u Action %u param3 uses non-existant SoundID %u.", i, j+1, temp.action[j].param3);
                         break;
                     case ACTION_T_EMOTE:
-                        //TODO: load emotes and check it's store for existing
-                        /*
                         if (!sEmotesStore.LookupEntry(temp.action[j].param1))
                             sLog.outErrorDb("CreatureEventAI: Event %u Action %u param1 (EmoteId: %u) are not valid.", i, j+1, temp.action[j].param1);
-                        */
                         break;
                     case ACTION_T_RANDOM_EMOTE:
-                        //TODO: load emotes and check it's store for existing
-                        /*
                         if (!sEmotesStore.LookupEntry(temp.action[j].param1))
                             sLog.outErrorDb("CreatureEventAI:  Event %u Action %u param1 (EmoteId: %u) are not valid.", i, j+1, temp.action[j].param1);
                         if (temp.action[j].param2_s >= 0 && !sEmotesStore.LookupEntry(temp.action[j].param2))
                             sLog.outErrorDb("CreatureEventAI:  Event %u Action %u param2 (EmoteId: %u) are not valid.", i, j+1, temp.action[j].param2);
                         if (temp.action[j].param3_s >= 0 && !sEmotesStore.LookupEntry(temp.action[j].param3))
                             sLog.outErrorDb("CreatureEventAI:  Event %u Action %u param3 (EmoteId: %u) are not valid.", i, j+1, temp.action[j].param3);
-                        */
                         break;
                     case ACTION_T_CAST:
                     {

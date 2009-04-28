@@ -101,7 +101,7 @@ const char TotemCategoryEntryfmt[]="nxxxxxxxxxxxxxxxxxii";
 const char VehicleEntryfmt[]="niffffiiiiiiiifffffffffffffffssssfifixxx";
 const char VehicleSeatEntryfmt[]="niiffffffffffiiiiiifffffffiiifffiiiiiiiffiiiiixxxxxxxxxxxx";
 const char WorldMapAreaEntryfmt[]="xinxffffix";
-const char WorldSafeLocsEntryfmt[]="nifffxxxxxxxxxxxxxxxxx";
 const char WorldMapOverlayEntryfmt[]="nxiiiixxxxxxxxxxx";
+const char WorldSafeLocsEntryfmt[]="nifffxxxxxxxxxxxxxxxxx";
 
 #endif

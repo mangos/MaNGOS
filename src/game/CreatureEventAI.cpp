@@ -39,10 +39,10 @@ int CreatureEventAI::Permissible(const Creature *creature)
 
 CreatureEventAI::CreatureEventAI(Creature *c ) : CreatureAI(c)
 {
-    CreatureEventAI_Event_Map::iterator CreatureEvents = CreatureEAI_Mgr.GetCreatureEventAIMap().find(m_creature->GetEntry());
+    CreatureEventAI_Event_Map::const_iterator CreatureEvents = CreatureEAI_Mgr.GetCreatureEventAIMap().find(m_creature->GetEntry());
     if (CreatureEvents != CreatureEAI_Mgr.GetCreatureEventAIMap().end())
     {
-        std::vector<CreatureEventAI_Event>::iterator i;
+        std::vector<CreatureEventAI_Event>::const_iterator i;
         for (i = (*CreatureEvents).second.begin(); i != (*CreatureEvents).second.end(); ++i)
         {
 
@@ -622,7 +622,7 @@ void CreatureEventAI::ProcessAction(uint16 type, uint32 param1, uint32 param2, u
             }
 
             //Allowed to cast only if not casting (unless we interrupt ourself) or if spell is triggered
-            bool canCast = !(caster->IsNonMeleeSpellCasted(false) && (param3 & CAST_TRIGGERED | CAST_INTURRUPT_PREVIOUS));
+            bool canCast = !caster->IsNonMeleeSpellCasted(false) || (param3 & (CAST_TRIGGERED | CAST_INTURRUPT_PREVIOUS));
 
             // If cast flag CAST_AURA_NOT_PRESENT is active, check if target already has aura on them
             if(param3 & CAST_AURA_NOT_PRESENT)
@@ -678,9 +678,9 @@ void CreatureEventAI::ProcessAction(uint16 type, uint32 param1, uint32 param2, u
             Creature* pCreature = NULL;
 
             if (param3)
-                pCreature = m_creature->SummonCreature(param1, 0, 0, 0, 0, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, param3);
+                pCreature = m_creature->SummonCreature(param1, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, param3);
             else
-                pCreature = m_creature->SummonCreature(param1, 0, 0, 0, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 0);
+                pCreature = m_creature->SummonCreature(param1, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 0);
 
             if (!pCreature)
             {
@@ -912,8 +912,8 @@ void CreatureEventAI::ProcessAction(uint16 type, uint32 param1, uint32 param2, u
                 //if not available, use pActionInvoker
                 if (Unit* pTarget = GetTargetByType(param2, pActionInvoker))
                 {
-                    if (Player* pPlayer = pTarget->GetCharmerOrOwnerPlayerOrPlayerItself())
-                        pPlayer->RewardPlayerAndGroupAtEvent(param1, m_creature);
+                    if (Player* pPlayer2 = pTarget->GetCharmerOrOwnerPlayerOrPlayerItself())
+                        pPlayer2->RewardPlayerAndGroupAtEvent(param1, m_creature);
                 }
             }
         }
@@ -1118,7 +1118,7 @@ void CreatureEventAI::JustSummoned(Creature* pUnit)
     }
 }
 
-void CreatureEventAI::Aggro(Unit *who)
+void CreatureEventAI::EnterCombat(Unit *enemy)
 {
     //Check for on combat start events
     if (!bEmptyList)
@@ -1129,7 +1129,7 @@ void CreatureEventAI::Aggro(Unit *who)
             {
                 case EVENT_T_AGGRO:
                     (*i).Enabled = true;
-                    ProcessEvent(*i, who);
+                    ProcessEvent(*i, enemy);
                     break;
                     //Reset all in combat timers
                 case EVENT_T_TIMER:
@@ -1164,16 +1164,11 @@ void CreatureEventAI::AttackStart(Unit *who)
     if (!who)
         return;
 
-    bool inCombat = m_creature->isInCombat();
-
     if (m_creature->Attack(who, MeleeEnabled))
     {
         m_creature->AddThreat(who, 0.0f);
         m_creature->SetInCombatWith(who);
         who->SetInCombatWith(m_creature);
-
-        if (!inCombat)
-            Aggro(who);
 
         if (CombatMovementEnabled)
         {
@@ -1233,8 +1228,8 @@ void CreatureEventAI::MoveInLineOfSight(Unit *who)
             }
             else if (m_creature->GetMap()->IsDungeon())
             {
-                who->SetInCombatWith(m_creature);
                 m_creature->AddThreat(who, 0.0f);
+                who->SetInCombatWith(m_creature);
             }
         }
     }

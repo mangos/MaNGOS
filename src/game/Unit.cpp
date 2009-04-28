@@ -2104,12 +2104,12 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst (const Unit *pVictim, WeaponAttack
 
         if(pVictim->GetTypeId()==TYPEID_PLAYER || !(((Creature*)pVictim)->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_NO_PARRY) )
         {
-            int32 tmp = int32(parry_chance);
-            if (   (tmp > 0)                                    // check if unit _can_ parry
-                && ((tmp -= skillBonus) > 0)
-                && (roll < (sum += tmp)))
+            int32 tmp2 = int32(parry_chance);
+            if (   (tmp2 > 0)                                   // check if unit _can_ parry
+                && ((tmp2 -= skillBonus) > 0)
+                && (roll < (sum += tmp2)))
             {
-                DEBUG_LOG ("RollMeleeOutcomeAgainst: PARRY <%d, %d)", sum-tmp, sum);
+                DEBUG_LOG ("RollMeleeOutcomeAgainst: PARRY <%d, %d)", sum-tmp2, sum);
                 return MELEE_HIT_PARRY;
             }
         }
@@ -2990,7 +2990,7 @@ void Unit::SetCurrentCastedSpell( Spell * pSpell )
 {
     assert(pSpell);                                         // NULL may be never passed here, use InterruptSpell or InterruptNonMeleeSpells
 
-    uint32 CSpellType = pSpell->GetCurrentContainer();
+    CurrentSpellTypes CSpellType = pSpell->GetCurrentContainer();
 
     if (pSpell == m_currentSpells[CSpellType]) return;      // avoid breaking self
 
@@ -8679,7 +8679,7 @@ void Unit::SetInCombatWith(Unit* enemy)
     Unit* eOwner = enemy->GetCharmerOrOwnerOrSelf();
     if(eOwner->IsPvP())
     {
-        SetInCombatState(true);
+        SetInCombatState(true,enemy);
         return;
     }
 
@@ -8689,14 +8689,14 @@ void Unit::SetInCombatWith(Unit* enemy)
         Unit const* myOwner = GetCharmerOrOwnerOrSelf();
         if(((Player const*)eOwner)->duel->opponent == myOwner)
         {
-            SetInCombatState(true);
+            SetInCombatState(true,enemy);
             return;
         }
     }
-    SetInCombatState(false);
+    SetInCombatState(false,enemy);
 }
 
-void Unit::SetInCombatState(bool PvP)
+void Unit::SetInCombatState(bool PvP, Unit* enemy)
 {
     // only alive units can be in combat
     if(!isAlive())
@@ -8704,10 +8704,16 @@ void Unit::SetInCombatState(bool PvP)
 
     if(PvP)
         m_CombatTimer = 5000;
+
+    bool creatureNotInCombat = GetTypeId()==TYPEID_UNIT && !HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT);
+
     SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT);
 
     if(isCharmed() || (GetTypeId()!=TYPEID_PLAYER && ((Creature*)this)->isPet()))
         SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_IN_COMBAT);
+
+    if(creatureNotInCombat && ((Creature*)this)->AI())
+        ((Creature*)this)->AI()->EnterCombat(enemy);
 }
 
 void Unit::ClearInCombat()

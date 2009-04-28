@@ -553,7 +553,7 @@ bool ChatHandler::HandleGameObjectDeleteCommand(const char* args)
     if(owner_guid)
     {
         Unit* owner = ObjectAccessor::GetUnit(*m_session->GetPlayer(),owner_guid);
-        if(!owner && !IS_PLAYER_GUID(owner_guid))
+        if(!owner || !IS_PLAYER_GUID(owner_guid))
         {
             PSendSysMessage(LANG_COMMAND_DELOBJREFERCREATURE, GUID_LOPART(owner_guid), obj->GetGUIDLow());
             SetSentErrorMessage(true);
@@ -734,7 +734,7 @@ bool ChatHandler::HandleGameObjectAddCommand(const char* args)
     GameObject* pGameObj = new GameObject;
     uint32 db_lowGUID = objmgr.GenerateLowGuid(HIGHGUID_GAMEOBJECT);
 
-    if(!pGameObj->Create(db_lowGUID, goI->id, map, chr->GetPhaseMaskForSpawn(), x, y, z, o, 0.0f, 0.0f, 0.0f, 0.0f, 0, 1))
+    if(!pGameObj->Create(db_lowGUID, goI->id, map, chr->GetPhaseMaskForSpawn(), x, y, z, o, 0.0f, 0.0f, 0.0f, 0.0f, 0, GO_STATE_READY))
     {
         delete pGameObj;
         return false;
@@ -1369,7 +1369,7 @@ bool ChatHandler::HandleNpcMoveCommand(const char* args)
         if(!cId)
             return false;
 
-        uint32 lowguid = atoi(cId);
+        lowguid = atoi(cId);
 
         /* FIXME: impossibel without entry
         if(lowguid)
