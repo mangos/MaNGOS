@@ -95,8 +95,8 @@ class Transport : protected GameObject
 
         typedef std::map<uint32, WayPoint> WayPointMap;
 
-        WayPointMap::iterator m_curr;
-        WayPointMap::iterator m_next;
+        WayPointMap::const_iterator m_curr;
+        WayPointMap::const_iterator m_next;
         uint32 m_pathTime;
         uint32 m_timer;
 
@@ -110,6 +110,6 @@ class Transport : protected GameObject
     private:
         void TeleportTransport(uint32 newMapid, float x, float y, float z);
         void UpdateForMap(Map const* map);
-        WayPointMap::iterator GetNextWayPoint();
+        WayPointMap::const_iterator GetNextWayPoint();
 };
 #endif

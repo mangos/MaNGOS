@@ -830,7 +830,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         void _addAttacker(Unit *pAttacker)                  // must be called only from Unit::Attack(Unit*)
         {
-            AttackerSet::iterator itr = m_attackers.find(pAttacker);
+            AttackerSet::const_iterator itr = m_attackers.find(pAttacker);
             if(itr == m_attackers.end())
                 m_attackers.insert(pAttacker);
         }
@@ -1275,7 +1275,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         uint32 GetVisibleAura(uint8 slot)
         {
-            VisibleAuraMap::iterator itr = m_visibleAuras.find(slot);
+            VisibleAuraMap::const_iterator itr = m_visibleAuras.find(slot);
             if(itr != m_visibleAuras.end())
                 return itr->second;
             return 0;
