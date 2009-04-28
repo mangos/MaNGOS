@@ -830,8 +830,8 @@ bool ChatHandler::HandleAccountSetGmLevelCommand(const char* args)
         return false;
 
     /// account can't set security to same or grater level, need more power GM or console
-    uint32 plSecurity = m_session ? m_session->GetSecurity() : SEC_CONSOLE;
-    if (uint32(gm) >= plSecurity )
+    AccountTypes plSecurity = m_session ? m_session->GetSecurity() : SEC_CONSOLE;
+    if (AccountTypes(gm) >= plSecurity )
     {
         SendSysMessage(LANG_YOURS_SECURITY_IS_LOW);
         SetSentErrorMessage(true);
@@ -842,7 +842,7 @@ bool ChatHandler::HandleAccountSetGmLevelCommand(const char* args)
     if(targetPlayer && m_session->GetPlayer()!=targetPlayer)
     {
         ChatHandler(targetPlayer).PSendSysMessage(LANG_YOURS_SECURITY_CHANGED,GetNameLink().c_str(), gm);
-        targetPlayer->GetSession()->SetSecurity(gm);
+        targetPlayer->GetSession()->SetSecurity(AccountTypes(gm));
     }
 
     PSendSysMessage(LANG_YOU_CHANGE_SECURITY, targetAccountName.c_str(), gm);

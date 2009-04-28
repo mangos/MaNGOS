@@ -10013,22 +10013,22 @@ Item* Player::_StoreItem( uint16 pos, Item *pItem, uint32 count, bool clone, boo
 
     Item *pItem2 = GetItemByPos( bag, slot );
 
-    if( !pItem2 )
+    if (!pItem2)
     {
-        if(clone)
+        if (clone)
             pItem = pItem->CloneItem(count,this);
         else
             pItem->SetCount(count);
 
-        if(!pItem)
+        if (!pItem)
             return NULL;
 
-        if( pItem->GetProto()->Bonding == BIND_WHEN_PICKED_UP ||
+        if (pItem->GetProto()->Bonding == BIND_WHEN_PICKED_UP ||
             pItem->GetProto()->Bonding == BIND_QUEST_ITEM ||
-            pItem->GetProto()->Bonding == BIND_WHEN_EQUIPED && IsBagPos(pos) )
+            (pItem->GetProto()->Bonding == BIND_WHEN_EQUIPED && IsBagPos(pos)))
             pItem->SetBinding( true );
 
-        if( bag == INVENTORY_SLOT_BAG_0 )
+        if (bag == INVENTORY_SLOT_BAG_0)
         {
             m_items[slot] = pItem;
             SetUInt64Value( (uint16)(PLAYER_FIELD_INV_SLOT_HEAD + (slot * 2) ), pItem->GetGUID() );
@@ -10042,7 +10042,7 @@ Item* Player::_StoreItem( uint16 pos, Item *pItem, uint32 count, bool clone, boo
             if (slot >= CURRENCYTOKEN_SLOT_START && slot < CURRENCYTOKEN_SLOT_END)
                 UpdateKnownCurrencies(pItem->GetEntry(),true);
 
-            if( IsInWorld() && update )
+            if (IsInWorld() && update)
             {
                 pItem->AddToWorld();
                 pItem->SendUpdateToPlayer( this );
@@ -10050,20 +10050,16 @@ Item* Player::_StoreItem( uint16 pos, Item *pItem, uint32 count, bool clone, boo
 
             pItem->SetState(ITEM_CHANGED, this);
         }
-        else
+        else if (Bag *pBag = (Bag*)GetItemByPos( INVENTORY_SLOT_BAG_0, bag ))
         {
-            Bag *pBag = (Bag*)GetItemByPos( INVENTORY_SLOT_BAG_0, bag );
-            if( pBag )
+            pBag->StoreItem( slot, pItem, update );
+            if( IsInWorld() && update )
             {
-                pBag->StoreItem( slot, pItem, update );
-                if( IsInWorld() && update )
-                {
-                    pItem->AddToWorld();
-                    pItem->SendUpdateToPlayer( this );
-                }
-                pItem->SetState(ITEM_CHANGED, this);
-                pBag->SetState(ITEM_CHANGED, this);
+                pItem->AddToWorld();
+                pItem->SendUpdateToPlayer( this );
             }
+            pItem->SetState(ITEM_CHANGED, this);
+            pBag->SetState(ITEM_CHANGED, this);
         }
 
         AddEnchantmentDurations(pItem);
@@ -10073,19 +10069,19 @@ Item* Player::_StoreItem( uint16 pos, Item *pItem, uint32 count, bool clone, boo
     }
     else
     {
-        if( pItem2->GetProto()->Bonding == BIND_WHEN_PICKED_UP ||
+        if (pItem2->GetProto()->Bonding == BIND_WHEN_PICKED_UP ||
             pItem2->GetProto()->Bonding == BIND_QUEST_ITEM ||
-            pItem2->GetProto()->Bonding == BIND_WHEN_EQUIPED && IsBagPos(pos) )
+            (pItem2->GetProto()->Bonding == BIND_WHEN_EQUIPED && IsBagPos(pos)))
             pItem2->SetBinding( true );
 
         pItem2->SetCount( pItem2->GetCount() + count );
-        if( IsInWorld() && update )
+        if (IsInWorld() && update)
             pItem2->SendUpdateToPlayer( this );
 
-        if(!clone)
+        if (!clone)
         {
             // delete item (it not in any slot currently)
-            if( IsInWorld() && update )
+            if (IsInWorld() && update)
             {
                 pItem->RemoveFromWorld();
                 pItem->DestroyForPlayer( this );
@@ -10097,6 +10093,7 @@ Item* Player::_StoreItem( uint16 pos, Item *pItem, uint32 count, bool clone, boo
             pItem->SetOwnerGUID(GetGUID());                 // prevent error at next SetState in case trade/mail/buy from vendor
             pItem->SetState(ITEM_REMOVED, this);
         }
+
         // AddItemDurations(pItem2); - pItem2 already have duration listed for player
         AddEnchantmentDurations(pItem2);
 
@@ -10108,14 +10105,12 @@ Item* Player::_StoreItem( uint16 pos, Item *pItem, uint32 count, bool clone, boo
 
 Item* Player::EquipNewItem( uint16 pos, uint32 item, bool update )
 {
-    Item *pItem = Item::CreateItem( item, 1, this );
-    if( pItem )
+    if (Item *pItem = Item::CreateItem( item, 1, this ))
     {
         ItemAddedQuestCheck( item, 1 );
-        Item * retItem = EquipItem( pos, pItem, update );
-
-        return retItem;
+        return EquipItem( pos, pItem, update );
     }
+
     return NULL;
 }
 
@@ -13776,7 +13771,7 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
     m_name = fields[3].GetCppString();
 
     // check name limitations
-    if(!ObjectMgr::IsValidName(m_name) || GetSession()->GetSecurity() == SEC_PLAYER && objmgr.IsReservedName(m_name))
+    if(!ObjectMgr::IsValidName(m_name) || (GetSession()->GetSecurity() == SEC_PLAYER && objmgr.IsReservedName(m_name)))
     {
         delete result;
         CharacterDatabase.PExecute("UPDATE characters SET at_login = at_login | '%u' WHERE guid ='%u'", uint32(AT_LOGIN_RENAME),guid);
@@ -13891,7 +13886,7 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
         if(currentBg && currentBg->IsPlayerInBattleGround(GetGUID()))
         {
             BattleGroundQueueTypeId bgQueueTypeId = sBattleGroundMgr.BGQueueTypeId(currentBg->GetTypeID(), currentBg->GetArenaType());
-            uint32 queueSlot = AddBattleGroundQueueId(bgQueueTypeId);
+            AddBattleGroundQueueId(bgQueueTypeId);
 
             SetBattleGroundId(currentBg->GetInstanceID(), currentBg->GetTypeID());
             SetBGTeam(bgteam);
@@ -18715,7 +18710,7 @@ uint32 Player::GetBaseWeaponSkillValue (WeaponAttackType attType) const
         return 0;
 
     // weapon skill or (unarmed for base attack)
-    uint32  skill = item ? item->GetSkill() : SKILL_UNARMED;
+    uint32  skill = item ? item->GetSkill() : uint32(SKILL_UNARMED);
     return GetBaseSkillValue(skill);
 }
 

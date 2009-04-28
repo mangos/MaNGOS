@@ -33,7 +33,7 @@ namespace FactorySelector
     CreatureAI* selectAI(Creature *creature)
     {
         // Allow scripting AI for normal creatures and not controlled pets (guardians and mini-pets)
-        if((!creature->isPet() || !((Pet*)creature)->isControlled()) && !creature->isCharmed())
+        if ((!creature->isPet() || !((Pet*)creature)->isControlled()) && !creature->isCharmed())
             if(CreatureAI* scriptedAI = Script->GetAI(creature))
                 return scriptedAI;
 
@@ -46,20 +46,21 @@ namespace FactorySelector
         // select by NPC flags _first_ - otherwise EventAI might be choosen for pets/totems
         // excplicit check for isControlled() and owner type to allow guardian, mini-pets and pets controlled by NPCs to be scripted by EventAI
         Unit *owner=NULL;
-        if(creature->isPet() && ((Pet*)creature)->isControlled() && (owner=creature->GetOwner()) && owner->GetTypeId()==TYPEID_PLAYER || creature->isCharmed())
+        if (creature->isPet() && ((Pet*)creature)->isControlled() &&
+            ((owner=creature->GetOwner()) && owner->GetTypeId()==TYPEID_PLAYER) || creature->isCharmed())
             ai_factory = ai_registry.GetRegistryItem("PetAI");
-        else if(creature->isTotem())
+        else if (creature->isTotem())
             ai_factory = ai_registry.GetRegistryItem("TotemAI");
 
         // select by script name
-        if( !ai_factory && !ainame.empty())
+        if (!ai_factory && !ainame.empty())
             ai_factory = ai_registry.GetRegistryItem( ainame.c_str() );
 
-        if(!ai_factory && creature->isGuard() )
+        if (!ai_factory && creature->isGuard() )
             ai_factory = ai_registry.GetRegistryItem("GuardAI");
 
         // select by permit check
-        if(!ai_factory)
+        if (!ai_factory)
         {
             int best_val = PERMIT_BASE_NO;
             typedef CreatureAIRegistry::RegistryMapType RMT;

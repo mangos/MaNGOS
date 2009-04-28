@@ -255,6 +255,8 @@ void WorldSession::HandlePetAction( WorldPacket & recv_data )
                         case SPELL_FAILED_REQUIRES_SPELL_FOCUS:
                             data << uint32(spellInfo->RequiresSpellFocus);
                             break;
+                        default:
+                            break;
                     }
                     SendPacket(&data);
                 }
