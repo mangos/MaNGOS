@@ -189,7 +189,7 @@ void WaypointManager::Unload()
 
 void WaypointManager::_clearPath(WaypointPath &path)
 {
-    for(WaypointPath::iterator itr = path.begin(); itr != path.end(); ++itr)
+    for(WaypointPath::const_iterator itr = path.begin(); itr != path.end(); ++itr)
         if(itr->behavior)
             delete itr->behavior;
     path.clear();
@@ -230,7 +230,7 @@ uint32 WaypointManager::GetLastPoint(uint32 id, uint32 default_notfound)
         point = (*result)[0].GetUInt32()+1;
         delete result;
     }*/
-    WaypointPathMap::iterator itr = m_pathMap.find(id);
+    WaypointPathMap::const_iterator itr = m_pathMap.find(id);
     if(itr != m_pathMap.end() && itr->second.size() != 0)
         point = itr->second.size();
     return point;
@@ -309,7 +309,7 @@ void WaypointManager::SetNodeText(uint32 id, uint32 point, const char *text_fiel
 
 void WaypointManager::CheckTextsExistance(std::set<int32>& ids)
 {
-    WaypointPathMap::iterator pmItr = m_pathMap.begin();
+    WaypointPathMap::const_iterator pmItr = m_pathMap.begin();
     for ( ; pmItr != m_pathMap.end(); ++pmItr)
     {
         for (int i = 0; i < pmItr->second.size(); ++i)

@@ -707,7 +707,7 @@ bool ChatHandler::HasLowerSecurityAccount(WorldSession* target, uint32 target_ac
     else
         return true;                                        // caller must report error for (target==NULL && target_account==0)
 
-    if (m_session->GetSecurity() < target_sec || strong && m_session->GetSecurity() <= target_sec)
+    if (m_session->GetSecurity() < target_sec || (strong && m_session->GetSecurity() <= target_sec))
     {
         SendSysMessage(LANG_YOURS_SECURITY_IS_LOW);
         SetSentErrorMessage(true);
@@ -816,7 +816,7 @@ bool ChatHandler::ExecuteCommandInTable(ChatCommand *table, const char* text, co
 
     while (*text == ' ') ++text;
 
-    for(uint32 i = 0; table[i].Name != NULL; i++)
+    for(uint32 i = 0; table[i].Name != NULL; ++i)
     {
         if( !hasStringAbbr(table[i].Name, cmd.c_str()) )
             continue;
@@ -937,27 +937,27 @@ int ChatHandler::ParseCommands(const char* text)
     //    return 0;
 
     /// chat case (.command or !command format)
-    if(m_session)
+    if (m_session)
     {
         if(text[0] != '!' && text[0] != '.')
             return 0;
     }
 
     /// ignore single . and ! in line
-    if(strlen(text) < 2)
+    if (strlen(text) < 2)
         return 0;
 
     /// ignore messages staring from many dots.
-    if(text[0] == '.' && text[1] == '.' || text[0] == '!' && text[1] == '!')
+    if ((text[0] == '.' && text[1] == '.') || (text[0] == '!' && text[1] == '!'))
         return 0;
 
     /// skip first . or ! (in console allowed use command with . and ! and without its)
-    if(text[0] == '!' || text[0] == '.')
+    if (text[0] == '!' || text[0] == '.')
         ++text;
 
     std::string fullcmd = text;                             // original `text` can't be used. It content destroyed in command code processing.
 
-    if(!ExecuteCommandInTable(getCommandTable(), text, fullcmd))
+    if (!ExecuteCommandInTable(getCommandTable(), text, fullcmd))
         SendSysMessage(LANG_NO_CMD);
 
     return 1;

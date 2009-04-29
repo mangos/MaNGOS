@@ -1909,7 +1909,7 @@ bool ChatHandler::HandleNpcNameCommand(const char* /*args*/)
         return true;
     }
 
-    for (uint8 i = 0; i < strlen(args); i++)
+    for (uint8 i = 0; i < strlen(args); ++i)
     {
         if(!isalpha(args[i]) && args[i]!=' ')
         {

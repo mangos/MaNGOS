@@ -197,7 +197,7 @@ void PetAI::UpdateAI(const uint32 diff)
     if (m_creature->GetGlobalCooldown() == 0 && !m_creature->IsNonMeleeSpellCasted(false))
     {
         //Autocast
-        for (uint8 i = 0; i < m_creature->GetPetAutoSpellSize(); i++)
+        for (uint8 i = 0; i < m_creature->GetPetAutoSpellSize(); ++i)
         {
             uint32 spellID = m_creature->GetPetAutoSpellOnPos(i);
             if (!spellID)
@@ -229,7 +229,7 @@ void PetAI::UpdateAI(const uint32 diff)
             else
             {
                 bool spellUsed = false;
-                for(std::set<uint64>::iterator tar = m_AllySet.begin(); tar != m_AllySet.end(); ++tar)
+                for(std::set<uint64>::const_iterator tar = m_AllySet.begin(); tar != m_AllySet.end(); ++tar)
                 {
                     Unit* Target = ObjectAccessor::GetUnit(*m_creature,*tar);
 

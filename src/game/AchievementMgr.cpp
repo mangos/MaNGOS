@@ -228,14 +228,14 @@ AchievementMgr::~AchievementMgr()
 
 void AchievementMgr::Reset()
 {
-    for(CompletedAchievementMap::iterator iter = m_completedAchievements.begin(); iter!=m_completedAchievements.end(); ++iter)
+    for(CompletedAchievementMap::const_iterator iter = m_completedAchievements.begin(); iter!=m_completedAchievements.end(); ++iter)
     {
         WorldPacket data(SMSG_ACHIEVEMENT_DELETED,4);
         data << uint32(iter->first);
         m_player->SendDirectMessage(&data);
     }
 
-    for(CriteriaProgressMap::iterator iter = m_criteriaProgress.begin(); iter!=m_criteriaProgress.end(); ++iter)
+    for(CriteriaProgressMap::const_iterator iter = m_criteriaProgress.begin(); iter!=m_criteriaProgress.end(); ++iter)
     {
         WorldPacket data(SMSG_CRITERIA_DELETED,4);
         data << uint32(iter->first);
@@ -675,7 +675,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
             case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST_COUNT:
             {
                 uint32 counter =0;
-                for(QuestStatusMap::iterator itr = GetPlayer()->getQuestStatusMap().begin(); itr!=GetPlayer()->getQuestStatusMap().end(); itr++)
+                for(QuestStatusMap::const_iterator itr = GetPlayer()->getQuestStatusMap().begin(); itr!=GetPlayer()->getQuestStatusMap().end(); itr++)
                     if(itr->second.m_rewarded)
                         counter++;
                 SetCriteriaProgress(achievementCriteria, counter);
@@ -688,7 +688,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                     continue;
 
                 uint32 counter =0;
-                for(QuestStatusMap::iterator itr = GetPlayer()->getQuestStatusMap().begin(); itr!=GetPlayer()->getQuestStatusMap().end(); itr++)
+                for(QuestStatusMap::const_iterator itr = GetPlayer()->getQuestStatusMap().begin(); itr!=GetPlayer()->getQuestStatusMap().end(); itr++)
                 {
                     Quest const* quest = objmgr.GetQuestTemplate(itr->first);
                     if(itr->second.m_rewarded && quest->GetZoneOrSort() >= 0 && uint32(quest->GetZoneOrSort()) == achievementCriteria->complete_quests_in_zone.zoneID)
@@ -1129,6 +1129,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
             case ACHIEVEMENT_CRITERIA_TYPE_NUMBER_OF_TALENT_RESETS:
             case ACHIEVEMENT_CRITERIA_TYPE_SPECIAL_PVP_KILL:
             case ACHIEVEMENT_CRITERIA_TYPE_EARNED_PVP_TITLE:
+            case ACHIEVEMENT_CRITERIA_TYPE_WIN_DUEL:
             case ACHIEVEMENT_CRITERIA_TYPE_LOSE_DUEL:
             case ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE_TYPE:
             case ACHIEVEMENT_CRITERIA_TYPE_GOLD_EARNED_BY_AUCTIONS:
@@ -1147,7 +1148,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                 break;                                   // Not implemented yet :(
         }
         if(IsCompletedCriteria(achievementCriteria,achievement))
-            CompletedCriteria(achievementCriteria,achievement);
+            CompletedCriteriaFor(achievement);
 
         // check again the completeness for SUMM and REQ COUNT achievements, 
         // as they don't depend on the completed criteria but on the sum of the progress of each individual criteria
@@ -1296,7 +1297,7 @@ bool AchievementMgr::IsCompletedCriteria(AchievementCriteriaEntry const* achieve
     return false;
 }
 
-void AchievementMgr::CompletedCriteria(AchievementCriteriaEntry const* criteria, AchievementEntry const* achievement)
+void AchievementMgr::CompletedCriteriaFor(AchievementEntry const* achievement)
 {
     // counter can never complete
     if(achievement->flags & ACHIEVEMENT_FLAG_COUNTER)

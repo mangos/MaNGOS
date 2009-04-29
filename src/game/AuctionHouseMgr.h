@@ -76,7 +76,7 @@ class AuctionHouseObject
         AuctionHouseObject() {}
         ~AuctionHouseObject()
         {
-            for (AuctionEntryMap::iterator itr = AuctionsMap.begin(); itr != AuctionsMap.end(); ++itr)
+            for (AuctionEntryMap::const_iterator itr = AuctionsMap.begin(); itr != AuctionsMap.end(); ++itr)
                 delete itr->second;
         }
 

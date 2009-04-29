@@ -830,8 +830,8 @@ bool ChatHandler::HandleAccountSetGmLevelCommand(const char* args)
         return false;
 
     /// account can't set security to same or grater level, need more power GM or console
-    uint32 plSecurity = m_session ? m_session->GetSecurity() : SEC_CONSOLE;
-    if (uint32(gm) >= plSecurity )
+    AccountTypes plSecurity = m_session ? m_session->GetSecurity() : SEC_CONSOLE;
+    if (AccountTypes(gm) >= plSecurity )
     {
         SendSysMessage(LANG_YOURS_SECURITY_IS_LOW);
         SetSentErrorMessage(true);
@@ -842,7 +842,7 @@ bool ChatHandler::HandleAccountSetGmLevelCommand(const char* args)
     if(targetPlayer && m_session->GetPlayer()!=targetPlayer)
     {
         ChatHandler(targetPlayer).PSendSysMessage(LANG_YOURS_SECURITY_CHANGED,GetNameLink().c_str(), gm);
-        targetPlayer->GetSession()->SetSecurity(gm);
+        targetPlayer->GetSession()->SetSecurity(AccountTypes(gm));
     }
 
     PSendSysMessage(LANG_YOU_CHANGE_SECURITY, targetAccountName.c_str(), gm);
@@ -1747,7 +1747,7 @@ bool ChatHandler::HandleLearnAllMySpellsCommand(const char* /*args*/)
         return true;
     uint32 family = clsEntry->spellfamily;
 
-    for (uint32 i = 0; i < sSpellStore.GetNumRows(); i++)
+    for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)
     {
         SpellEntry const *spellInfo = sSpellStore.LookupEntry(i);
         if(!spellInfo)
@@ -1786,7 +1786,7 @@ bool ChatHandler::HandleLearnAllMyTalentsCommand(const char* /*args*/)
     Player* player = m_session->GetPlayer();
     uint32 classMask = player->getClassMask();
 
-    for (uint32 i = 0; i < sTalentStore.GetNumRows(); i++)
+    for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
     {
         TalentEntry const *talentInfo = sTalentStore.LookupEntry(i);
         if(!talentInfo)
@@ -1861,7 +1861,7 @@ bool ChatHandler::HandleLearnAllMyPetTalentsCommand(const char* /*args*/)
         return false;
     }
 
-    for (uint32 i = 0; i < sTalentStore.GetNumRows(); i++)
+    for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
     {
         TalentEntry const *talentInfo = sTalentStore.LookupEntry(i);
         if(!talentInfo)
@@ -3496,7 +3496,7 @@ bool ChatHandler::HandleAuraCommand(const char* args)
     SpellEntry const *spellInfo = sSpellStore.LookupEntry( spellID );
     if(spellInfo)
     {
-        for(uint32 i = 0;i<3;i++)
+        for(uint32 i = 0;i<3;++i)
         {
             uint8 eff = spellInfo->Effect[i];
             if (eff>=TOTAL_SPELL_EFFECTS)
@@ -3862,7 +3862,7 @@ bool ChatHandler::HandleExploreCheatCommand(const char* args)
             ChatHandler(chr).PSendSysMessage(LANG_YOURS_EXPLORE_SET_NOTHING,GetNameLink().c_str());
     }
 
-    for (uint8 i=0; i<128; i++)
+    for (uint8 i=0; i<128; ++i)
     {
         if (flag != 0)
         {
@@ -4516,7 +4516,7 @@ bool ChatHandler::HandleListAurasCommand (const char * /*args*/)
                 IS_PLAYER_GUID(itr->second->GetCasterGUID()) ? "player" : "creature",GUID_LOPART(itr->second->GetCasterGUID()));
         }
     }
-    for (int i = 0; i < TOTAL_AURAS; i++)
+    for (int i = 0; i < TOTAL_AURAS; ++i)
     {
         Unit::AuraList const& uAuraList = unit->GetAurasByType(AuraType(i));
         if (uAuraList.empty()) continue;
@@ -5209,7 +5209,7 @@ bool ChatHandler::HandleQuestComplete(const char* args)
     }
 
     // All creature/GO slain/casted (not required, but otherwise it will display "Creature slain 0/10")
-    for(uint8 i = 0; i < QUEST_OBJECTIVES_COUNT; i++)
+    for(uint8 i = 0; i < QUEST_OBJECTIVES_COUNT; ++i)
     {
         uint32 creature = pQuest->ReqCreatureOrGOId[i];
         uint32 creaturecount = pQuest->ReqCreatureOrGOCount[i];
@@ -6320,10 +6320,10 @@ bool ChatHandler::HandleInstanceListBindsCommand(const char* /*args*/)
     Player* player = getSelectedPlayer();
     if (!player) player = m_session->GetPlayer();
     uint32 counter = 0;
-    for(uint8 i = 0; i < TOTAL_DIFFICULTIES; i++)
+    for(uint8 i = 0; i < TOTAL_DIFFICULTIES; ++i)
     {
         Player::BoundInstancesMap &binds = player->GetBoundInstances(i);
-        for(Player::BoundInstancesMap::iterator itr = binds.begin(); itr != binds.end(); ++itr)
+        for(Player::BoundInstancesMap::const_iterator itr = binds.begin(); itr != binds.end(); ++itr)
         {
             InstanceSave *save = itr->second.save;
             std::string timeleft = GetTimeString(save->GetResetTime() - time(NULL));
@@ -6336,10 +6336,10 @@ bool ChatHandler::HandleInstanceListBindsCommand(const char* /*args*/)
     Group *group = player->GetGroup();
     if(group)
     {
-        for(uint8 i = 0; i < TOTAL_DIFFICULTIES; i++)
+        for(uint8 i = 0; i < TOTAL_DIFFICULTIES; ++i)
         {
             Group::BoundInstancesMap &binds = group->GetBoundInstances(i);
-            for(Group::BoundInstancesMap::iterator itr = binds.begin(); itr != binds.end(); ++itr)
+            for(Group::BoundInstancesMap::const_iterator itr = binds.begin(); itr != binds.end(); ++itr)
             {
                 InstanceSave *save = itr->second.save;
                 std::string timeleft = GetTimeString(save->GetResetTime() - time(NULL));
@@ -6364,7 +6364,7 @@ bool ChatHandler::HandleInstanceUnbindCommand(const char* args)
         Player* player = getSelectedPlayer();
         if (!player) player = m_session->GetPlayer();
         uint32 counter = 0;
-        for(uint8 i = 0; i < TOTAL_DIFFICULTIES; i++)
+        for(uint8 i = 0; i < TOTAL_DIFFICULTIES; ++i)
         {
             Player::BoundInstancesMap &binds = player->GetBoundInstances(i);
             for(Player::BoundInstancesMap::iterator itr = binds.begin(); itr != binds.end();)

@@ -488,8 +488,8 @@ large groups are disadvantageous, because they will be kicked first if invitatio
 */
 void BattleGroundQueue::FillPlayersToBG(BattleGround* bg, BGQueueIdBasedOnLevel queue_id)
 {
-    uint32 hordeFree = bg->GetFreeSlotsForTeam(HORDE);
-    uint32 aliFree   = bg->GetFreeSlotsForTeam(ALLIANCE);
+    int32 hordeFree = bg->GetFreeSlotsForTeam(HORDE);
+    int32 aliFree   = bg->GetFreeSlotsForTeam(ALLIANCE);
 
     //iterator for iterating through bg queue
     GroupsQueueType::const_iterator Ali_itr = m_QueuedGroups[queue_id][BG_QUEUE_NORMAL_ALLIANCE].begin();
@@ -519,8 +519,8 @@ void BattleGroundQueue::FillPlayersToBG(BattleGround* bg, BGQueueIdBasedOnLevel 
     */
 
     // At first we need to compare free space in bg and our selection pool
-    int32 diffAli = aliFree - m_SelectionPools[BG_TEAM_ALLIANCE].GetPlayerCount();
-    int32 diffHorde = hordeFree - m_SelectionPools[BG_TEAM_HORDE].GetPlayerCount();
+    int32 diffAli   = aliFree   - int32(m_SelectionPools[BG_TEAM_ALLIANCE].GetPlayerCount());
+    int32 diffHorde = hordeFree - int32(m_SelectionPools[BG_TEAM_HORDE].GetPlayerCount());
     while( abs(diffAli - diffHorde) > 1 && (m_SelectionPools[BG_TEAM_HORDE].GetPlayerCount() > 0 || m_SelectionPools[BG_TEAM_ALLIANCE].GetPlayerCount() > 0) )
     {
         //each cycle execution we need to kick at least 1 group
@@ -556,8 +556,8 @@ void BattleGroundQueue::FillPlayersToBG(BattleGround* bg, BGQueueIdBasedOnLevel 
             }
         }
         //count diffs after small update
-        diffAli = aliFree - m_SelectionPools[BG_TEAM_ALLIANCE].GetPlayerCount();
-        diffHorde = hordeFree - m_SelectionPools[BG_TEAM_HORDE].GetPlayerCount();
+        diffAli   = aliFree   - int32(m_SelectionPools[BG_TEAM_ALLIANCE].GetPlayerCount());
+        diffHorde = hordeFree - int32(m_SelectionPools[BG_TEAM_HORDE].GetPlayerCount());
     }
 }
 
@@ -736,8 +736,6 @@ void BattleGroundQueue::Update(BattleGroundTypeId bgTypeId, BGQueueIdBasedOnLeve
         m_QueuedGroups[queue_id][BG_QUEUE_NORMAL_ALLIANCE].empty() &&
         m_QueuedGroups[queue_id][BG_QUEUE_NORMAL_HORDE].empty() )
         return;
-
-    BattleGroundQueueTypeId bgQueueTypeId = BattleGroundMgr::BGQueueTypeId(bgTypeId, arenaType);
 
     //battleground with free slot for player should be always in the beggining of the queue
     // maybe it would be better to create bgfreeslotqueue for each queue_id_based_on_level
@@ -1189,8 +1187,8 @@ void BattleGroundMgr::Update(uint32 diff)
             if (sWorld.GetGameTime() > m_NextAutoDistributionTime)
             {
                 DistributeArenaPoints();
-                m_NextAutoDistributionTime = sWorld.GetGameTime() + BATTLEGROUND_ARENA_POINT_DISTRIBUTION_DAY * sWorld.getConfig(CONFIG_ARENA_AUTO_DISTRIBUTE_INTERVAL_DAYS);
-                CharacterDatabase.PExecute("UPDATE saved_variables SET NextArenaPointDistributionTime = '"I64FMTD"'", m_NextAutoDistributionTime);
+                m_NextAutoDistributionTime = time_t(sWorld.GetGameTime() + BATTLEGROUND_ARENA_POINT_DISTRIBUTION_DAY * sWorld.getConfig(CONFIG_ARENA_AUTO_DISTRIBUTE_INTERVAL_DAYS));
+                CharacterDatabase.PExecute("UPDATE saved_variables SET NextArenaPointDistributionTime = '"I64FMTD"'", uint64(m_NextAutoDistributionTime));
             }
             m_AutoDistributionTimeChecker = 600000; // check 10 minutes
         }
@@ -1437,7 +1435,7 @@ void BattleGroundMgr::BuildPlayerJoinedBattleGroundPacket(WorldPacket *data, Pla
     *data << uint64(plr->GetGUID());
 }
 
-BattleGround * BattleGroundMgr::GetBattleGroundThroughClientInstance(uint32 instanceId, BattleGroundTypeId bgTypeId, BGQueueIdBasedOnLevel queue_id)
+BattleGround * BattleGroundMgr::GetBattleGroundThroughClientInstance(uint32 instanceId, BattleGroundTypeId bgTypeId)
 {
     //cause at HandleBattleGroundJoinOpcode the clients sends the instanceid he gets from
     //SMSG_BATTLEFIELD_LIST we need to find the battleground with this clientinstance-id
@@ -1761,12 +1759,12 @@ void BattleGroundMgr::InitAutomaticArenaPointDistribution()
         if (!result)
         {
             sLog.outDebug("Battleground: Next arena point distribution time not found in SavedVariables, reseting it now.");
-            m_NextAutoDistributionTime = sWorld.GetGameTime() + BATTLEGROUND_ARENA_POINT_DISTRIBUTION_DAY * sWorld.getConfig(CONFIG_ARENA_AUTO_DISTRIBUTE_INTERVAL_DAYS);
-            CharacterDatabase.PExecute("INSERT INTO saved_variables (NextArenaPointDistributionTime) VALUES ('"I64FMTD"')", m_NextAutoDistributionTime);
+            m_NextAutoDistributionTime = time_t(sWorld.GetGameTime() + BATTLEGROUND_ARENA_POINT_DISTRIBUTION_DAY * sWorld.getConfig(CONFIG_ARENA_AUTO_DISTRIBUTE_INTERVAL_DAYS));
+            CharacterDatabase.PExecute("INSERT INTO saved_variables (NextArenaPointDistributionTime) VALUES ('"I64FMTD"')", uint64(m_NextAutoDistributionTime));
         }
         else
         {
-            m_NextAutoDistributionTime = (*result)[0].GetUInt64();
+            m_NextAutoDistributionTime = time_t((*result)[0].GetUInt64());
             delete result;
         }
         sLog.outDebug("Automatic Arena Point Distribution initialized.");

@@ -56,7 +56,7 @@ void WaypointMovementGenerator<Creature>::LoadPath(Creature &c)
 
     uint32 node_count = i_path->size();
     i_hasDone.resize(node_count);
-    for(uint32 i = 0; i < node_count-1; i++)
+    for(uint32 i = 0; i < node_count-1; ++i)
         i_hasDone[i] = false;
 
     // to prevent a misbehavior inside "update"
@@ -470,7 +470,7 @@ int CreatePathAStar(gentity_t *bot, int from, int to, short int *pathlist)
                     break;
             }
 
-            for (i = 0; i < nodes[atNode].enodenum; i++)    //loop through all the links for this node
+            for (i = 0; i < nodes[atNode].enodenum; ++i)    //loop through all the links for this node
             {
                 newnode = nodes[atNode].links[i].targetNode;
 
@@ -528,7 +528,7 @@ int CreatePathAStar(gentity_t *bot, int from, int to, short int *pathlist)
                         parent[newnode] = atNode;           //set the new parent for this node
                         gcost[newnode] = gc;                //and the new g cost
 
-                        for (i = 1; i < numOpen; i++)       //loop through all the items on the open list
+                        for (i = 1; i < numOpen; ++i)       //loop through all the items on the open list
                         {
                             if (openlist[i] == newnode)     //find this node in the list
                             {
