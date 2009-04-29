@@ -7284,7 +7284,7 @@ void Unit::RemoveAllAttackers()
 {
     while (!m_attackers.empty())
     {
-        AttackerSet::const_iterator iter = m_attackers.begin();
+        AttackerSet::iterator iter = m_attackers.begin();
         if(!(*iter)->AttackStop())
         {
             sLog.outError("WORLD: Unit has an attacker that isn't attacking it!");

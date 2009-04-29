@@ -436,9 +436,9 @@ void Transport::TeleportTransport(uint32 newMapid, float x, float y, float z)
     SetMapId(newMapid);
     Relocate(x, y, z);
 
-    for(PlayerSet::const_iterator itr = m_passengers.begin(); itr != m_passengers.end();)
+    for(PlayerSet::iterator itr = m_passengers.begin(); itr != m_passengers.end();)
     {
-        PlayerSet::const_iterator it2 = itr;
+        PlayerSet::iterator it2 = itr;
         ++itr;
 
         Player *plr = *it2;
