@@ -336,7 +336,8 @@ enum AuraType
     SPELL_AURA_291,
     SPELL_AURA_292,
     SPELL_AURA_293,
-    TOTAL_AURAS = 294
+    SPELL_AURA_294,
+    TOTAL_AURAS = 295
 };
 
 enum AreaAuraType
