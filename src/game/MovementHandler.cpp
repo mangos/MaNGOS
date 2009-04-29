@@ -24,6 +24,7 @@
 #include "Corpse.h"
 #include "Player.h"
 #include "Vehicle.h"
+#include "SpellAuras.h"
 #include "MapManager.h"
 #include "Transports.h"
 #include "BattleGround.h"
@@ -475,8 +476,8 @@ void WorldSession::HandleDismissControlledVehicle(WorldPacket &recv_data)
     // using charm guid, because we don't have vehicle guid...
     if(Vehicle *vehicle = ObjectAccessor::GetVehicle(vehicleGUID))
     {
-        _player->ExitVehicle(vehicle);
-        vehicle->Dismiss();
+        // Aura::HandleAuraControlVehicle will call Player::ExitVehicle
+        vehicle->RemoveSpellsCausingAura(SPELL_AURA_CONTROL_VEHICLE);
     }
 }
 
