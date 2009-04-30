@@ -349,6 +349,10 @@ void Spell::EffectSchoolDMG(uint32 effect_idx)
                         damage+= uint32(m_caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.12f);
                         break;
                     }
+                    // Cataclysmic Bolt
+                    case 38441:
+                        damage = unitTarget->GetMaxHealth() / 2;
+                        break;
                 }
                 break;
             }
