@@ -434,6 +434,17 @@ class Spell
 
         CurrentSpellTypes GetCurrentContainer();
 
+        Player* GetPlayerForCastQuestCond()
+        {
+            if ( m_caster->GetTypeId() == TYPEID_PLAYER )
+                return (Player*)m_caster;
+
+            if ( Unit* u = m_caster->GetCharmerOrOwner() )
+                if ( u->GetTypeId() == TYPEID_PLAYER )
+                    return (Player*)u;
+
+            return NULL;
+        }
         Unit* GetCaster() const { return m_caster; }
         Unit* GetOriginalCaster() const { return m_originalCaster; }
         int32 GetPowerCost() const { return m_powerCost; }
