@@ -1093,7 +1093,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
         // ignore pets or autorepeat/melee casts for speed (not exist quest for spells (hm... )
         if( !((Creature*)unit)->isPet() && !IsAutoRepeat() && !IsNextMeleeSwingSpell() && !IsChannelActive() )
         {
-            if ( Player* p = GetPlayerForCastQuestCond() )
+            if ( Player* p = m_caster->GetCharmerOrOwnerPlayerOrPlayerItself() )
                 p->CastedCreatureOrGO(unit->GetEntry(),unit->GetGUID(),m_spellInfo->Id);
         }
 
@@ -1242,7 +1242,7 @@ void Spell::DoAllEffectOnTarget(GOTargetInfo *target)
     // ignore autorepeat/melee casts for speed (not exist quest for spells (hm... )
     if( !IsAutoRepeat() && !IsNextMeleeSwingSpell() && !IsChannelActive() )
     {
-        if ( Player* p = GetPlayerForCastQuestCond() )
+        if ( Player* p = m_caster->GetCharmerOrOwnerPlayerOrPlayerItself() )
             p->CastedCreatureOrGO(go->GetEntry(),go->GetGUID(),m_spellInfo->Id);
     }
 }
@@ -2699,7 +2699,7 @@ void Spell::update(uint32 difftime)
                 // ignore autorepeat/melee casts for speed (not exist quest for spells (hm... )
                 if( !IsAutoRepeat() && !IsNextMeleeSwingSpell() )
                 {
-                    if ( Player* p = GetPlayerForCastQuestCond() )
+                    if ( Player* p = m_caster->GetCharmerOrOwnerPlayerOrPlayerItself() )
                     {
                         for(std::list<TargetInfo>::iterator ihit= m_UniqueTargetInfo.begin();ihit != m_UniqueTargetInfo.end();++ihit)
                         {
