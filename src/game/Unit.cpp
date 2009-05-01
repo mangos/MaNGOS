@@ -7344,10 +7344,9 @@ void Unit::ModifyAuraState(AuraState flag, bool apply)
 
 Unit *Unit::GetOwner() const
 {
-    uint64 ownerid = GetOwnerGUID();
-    if(!ownerid)
-        return NULL;
-    return ObjectAccessor::GetUnit(*this, ownerid);
+    if(uint64 ownerid = GetOwnerGUID())
+        return ObjectAccessor::GetUnit(*this, ownerid);
+    return NULL;
 }
 
 Unit *Unit::GetCharmer() const
