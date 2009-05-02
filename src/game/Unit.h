@@ -595,6 +595,22 @@ enum MovementFlags
     MOVEMENTFLAG_UNK3           = 0x40000000
 };
 
+enum MonsterMovementFlags
+{
+    MONSTER_MOVE_FLAG_WALK      = 0x00000000,
+    MONSTER_MOVE_FLAG_UNK1      = 0x00000800,               // float+uint32
+    MONSTER_MOVE_FLAG_RUN       = 0x00001000,
+    MONSTER_MOVE_FLAG_SPLINE    = 0x00002000,               // spline n*(float x,y,z)
+    MONSTER_MOVE_FLAG_SPLINE2   = 0x00040000,               // spline n*(float x,y,z)
+    MONSTER_MOVE_FLAG_UNK2      = 0x00080000,
+    MONSTER_MOVE_FLAG_UNK3      = 0x00100000,
+    MONSTER_MOVE_FLAG_UNK4      = 0x00200000,               // uint8+uint32
+
+    // masks
+    MONSTER_MOVE_FLAG_SPLINE_FLY= 0x00003000,               // fly by points
+    MONSTER_MOVE_FLAG_TEST_FLY  = 0x00180000                // found these flags on flying mob with MONSTER_MOVE_FLAG_SPLINE in same time
+};
+
 enum DiminishingLevels
 {
     DIMINISHING_LEVEL_1             = 0,

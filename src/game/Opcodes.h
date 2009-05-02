@@ -1261,7 +1261,9 @@ enum Opcodes
     SMSG_UNKNOWN_1224                               = 0x4C8, // uint32 "Can't change arena team..."
     UMSG_UNKNOWN_1225                               = 0x4C9, // not found
     UMSG_UNKNOWN_1226                               = 0x4CA, // not found
-    NUM_MSG_TYPES                                   = 0x4CB
+    UMSG_UNKNOWN_1227                               = 0x4CB, // CMSG, lua: UseEquipmentSet
+    UMSG_UNKNOWN_1228                               = 0x4CC, // SMSG, UseEquipmentSetResult?
+    NUM_MSG_TYPES                                   = 0x4CD
 };
 
 /// Player state

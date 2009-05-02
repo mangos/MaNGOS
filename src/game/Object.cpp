@@ -273,12 +273,12 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint16 flags, uint32 flags2
         {
             case TYPEID_UNIT:
             {
-                flags2 = ((Unit*)this)->GetUnitMovementFlags();
+                flags2 = ((Unit*)this)->isInFlight() ? (MOVEMENTFLAG_FORWARD | MOVEMENTFLAG_LEVITATING) : MOVEMENTFLAG_NONE;
             }
             break;
             case TYPEID_PLAYER:
             {
-                flags2 = ((Player*)this)->GetUnitMovementFlags();
+                flags2 = ((Player*)this)->m_movementInfo.GetMovementFlags();
 
                 if(((Player*)this)->GetTransport())
                     flags2 |= MOVEMENTFLAG_ONTRANSPORT;
@@ -394,25 +394,27 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint16 flags, uint32 flags2
 
             FlightPathMovementGenerator *fmg = (FlightPathMovementGenerator*)(((Player*)this)->GetMotionMaster()->top());
 
-            uint16 flags3 = 0x0000;
+            uint32 flags3 = MONSTER_MOVE_FLAG_SPLINE_FLY;
 
-            *data << uint16(flags3);                        // splines flag?
+            *data << uint32(flags3);                        // splines flag?
 
-            if(flags3 & 0x80)                               // probably x,y,z coords there
+            if(flags3 & 0x20000)                            // may be orientation
             {
-                *data << (float)0;
-                *data << (float)0;
                 *data << (float)0;
             }
-
-            if(flags3 & 0x100)                              // probably guid there
+            else
             {
-                *data << uint64(0);
-            }
+                if(flags3 & 0x8000)                         // probably x,y,z coords there
+                {
+                    *data << (float)0;
+                    *data << (float)0;
+                    *data << (float)0;
+                }
 
-            if(flags3 & 0x200)                              // may be orientation
-            {
-                *data << (float)0;
+                if(flags3 & 0x10000)                        // probably guid there
+                {
+                    *data << uint64(0);
+                }
             }
 
             Path &path = fmg->GetPath();
@@ -422,9 +424,6 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint16 flags, uint32 flags2
 
             uint32 inflighttime = uint32(path.GetPassedLength(fmg->GetCurrentNode(), x, y, z) * 32);
             uint32 traveltime = uint32(path.GetTotalLength() * 32);
-
-            *data << uint8(0);                              // added in 3.1
-            *data << uint8(0);                              // added in 3.1
 
             *data << uint32(inflighttime);                  // passed move time?
             *data << uint32(traveltime);                    // full move time?

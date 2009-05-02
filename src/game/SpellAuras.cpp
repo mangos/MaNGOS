@@ -3189,7 +3189,7 @@ void Aura::HandleModPossessPet(bool apply, bool Real)
     {
         pet->AttackStop();
         pet->GetMotionMaster()->MoveFollow(caster, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
-        pet->SetUnitMovementFlags(MOVEMENTFLAG_NONE);
+        pet->SetUnitMovementFlags(MONSTER_MOVE_FLAG_WALK);
     }
 }
 
@@ -3198,7 +3198,7 @@ void Aura::HandleAuraModPetTalentsPoints(bool Apply, bool Real)
     if(!Real)
         return;
 
-    // Recalculate pet tlaent points
+    // Recalculate pet talent points
     if (Pet *pet=m_target->GetPet())
         pet->InitTalentForLevel();
 }
@@ -3430,7 +3430,7 @@ void Aura::HandleAuraModStun(bool apply, bool Real)
         if(m_target->GetTypeId() != TYPEID_PLAYER)
             ((Creature*)m_target)->StopMoving();
         else
-            m_target->SetUnitMovementFlags(0);    //Clear movement flags
+            ((Player*)m_target)->m_movementInfo.flags = 0;    //Clear movement flags
 
         WorldPacket data(SMSG_FORCE_MOVE_ROOT, 8);
 
@@ -3697,9 +3697,9 @@ void Aura::HandleAuraModRoot(bool apply, bool Real)
 
         m_target->addUnitState(UNIT_STAT_ROOT);
         m_target->SetUInt64Value (UNIT_FIELD_TARGET, 0);
-// probably wrong (this add skinable flag)
-// TODO: find correct flag
-//        m_target->SetFlag(UNIT_FIELD_FLAGS,(apply_stat<<16));
+        // probably wrong (this add skinable flag)
+        // TODO: find correct flag
+        //m_target->SetFlag(UNIT_FIELD_FLAGS,(apply_stat<<16));
 
         //Save last orientation
         if( m_target->getVictim() )
@@ -3713,7 +3713,7 @@ void Aura::HandleAuraModRoot(bool apply, bool Real)
             m_target->SendMessageToSet(&data,true);
 
             //Clear unit movement flags
-            m_target->SetUnitMovementFlags(0);
+            ((Player*)m_target)->m_movementInfo.flags = 0;
         }
         else
             ((Creature *)m_target)->StopMoving();
@@ -3748,9 +3748,9 @@ void Aura::HandleAuraModRoot(bool apply, bool Real)
             return;
 
         m_target->clearUnitState(UNIT_STAT_ROOT);
-// probably wrong (this add skinable flag)
-// TODO: find correct flag
-//        m_target->RemoveFlag(UNIT_FIELD_FLAGS,(apply_stat<<16));
+        // probably wrong (this add skinable flag)
+        // TODO: find correct flag
+        //m_target->RemoveFlag(UNIT_FIELD_FLAGS,(apply_stat<<16));
 
         if(!m_target->hasUnitState(UNIT_STAT_STUNNED))      // prevent allow move if have also stun effect
         {

@@ -695,6 +695,10 @@ struct MovementInfo
         x = y = z = o = t_x = t_y = t_z = t_o = s_pitch = j_unk = j_sinAngle = j_cosAngle = j_xyspeed = u_unk1 = 0.0f;
         t_guid = 0;
     }
+
+    uint32 GetMovementFlags() { return flags; }
+    void AddMovementFlag(uint32 flag) { flags |= flag; }
+    bool HasMovementFlag(uint32 flag) const { return flags & flag; }
 };
 
 // flags that use in movement check for example at spell casting
@@ -1908,11 +1912,11 @@ class MANGOS_DLL_SPEC Player : public Unit
         }
         void HandleFall(MovementInfo const& movementInfo);
 
-        bool isMoving() const { return HasUnitMovementFlag(movementFlagsMask); }
-        bool isMovingOrTurning() const { return HasUnitMovementFlag(movementOrTurningFlagsMask); }
+        bool isMoving() const { return m_movementInfo.HasMovementFlag(movementFlagsMask); }
+        bool isMovingOrTurning() const { return m_movementInfo.HasMovementFlag(movementOrTurningFlagsMask); }
 
-        bool CanFly() const { return HasUnitMovementFlag(MOVEMENTFLAG_CAN_FLY); }
-        bool IsFlying() const { return HasUnitMovementFlag(MOVEMENTFLAG_FLYING); }
+        bool CanFly() const { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_CAN_FLY); }
+        bool IsFlying() const { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FLYING); }
         bool IsAllowUseFlyMountsHere() const;
 
         void SetClientControl(Unit* target, uint8 allowMove);
