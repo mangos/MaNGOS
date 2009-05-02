@@ -183,8 +183,9 @@ void Map::DeleteStateMachine()
 
 Map::Map(uint32 id, time_t expiry, uint32 InstanceId, uint8 SpawnMode)
   : i_mapEntry (sMapStore.LookupEntry(id)), i_spawnMode(SpawnMode),
-  i_id(id), i_InstanceId(InstanceId), m_unloadTimer(0), i_gridExpiry(expiry),
-  m_activeNonPlayersIter(m_activeNonPlayers.end())
+  i_id(id), i_InstanceId(InstanceId), m_unloadTimer(0),
+  m_activeNonPlayersIter(m_activeNonPlayers.end()),
+  i_gridExpiry(expiry)
 {
     for(unsigned int idx=0; idx < MAX_NUMBER_OF_GRIDS; ++idx)
     {
@@ -1226,7 +1227,7 @@ uint16 GridMap::getArea(float x, float y)
     return m_area_map[lx*16 + ly];
 }
 
-float  GridMap::getHeightFromFlat(float x, float y) const
+float  GridMap::getHeightFromFlat(float /*x*/, float /*y*/) const
 {
     return m_gridHeight;
 }

@@ -153,7 +153,7 @@ bool ChatHandler::HandleCharacterDeleteCommand(const char* args)
 }
 
 /// Exit the realm
-bool ChatHandler::HandleServerExitCommand(const char* args)
+bool ChatHandler::HandleServerExitCommand(const char* /*args*/)
 {
     SendSysMessage(LANG_COMMAND_EXIT);
     World::StopNow(SHUTDOWN_EXIT_CODE);
@@ -161,7 +161,7 @@ bool ChatHandler::HandleServerExitCommand(const char* args)
 }
 
 /// Display info on users currently in the realm
-bool ChatHandler::HandleAccountOnlineListCommand(const char* args)
+bool ChatHandler::HandleAccountOnlineListCommand(const char* /*args*/)
 {
     ///- Get the list of accounts ID logged to the realm
     QueryResult *resultDB = CharacterDatabase.Query("SELECT name,account FROM characters WHERE online > 0");

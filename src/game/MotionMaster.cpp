@@ -397,6 +397,8 @@ void MotionMaster::Mutate(MovementGenerator *m)
             // DistractMovement interrupted by any other movement
             case DISTRACT_MOTION_TYPE:
                 MovementExpired(false);
+            default:
+                break;
         }
     }
     m->Initialize(*i_owner);
