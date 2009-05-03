@@ -6803,7 +6803,7 @@ bool ChatHandler::HandleModifyGenderCommand(const char *args)
 
     if(!player)
     {
-        PSendSysMessage(LANG_NO_PLAYER);
+        PSendSysMessage(LANG_NO_PLAYER, args);
         SetSentErrorMessage(true);
         return false;
     }
