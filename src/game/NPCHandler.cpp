@@ -155,6 +155,7 @@ void WorldSession::SendTrainerList( uint64 guid, const std::string& strTitle )
 
     // reputation discount
     float fDiscountMod = _player->GetReputationPriceDiscount(unit);
+    bool can_learn_primary_prof = GetPlayer()->GetFreePrimaryProffesionPoints() > 0;
 
     uint32 count = 0;
     for(TrainerSpellMap::const_iterator itr = trainer_spells->spellList.begin(); itr != trainer_spells->spellList.end(); ++itr)
@@ -164,24 +165,25 @@ void WorldSession::SendTrainerList( uint64 guid, const std::string& strTitle )
         if(!_player->IsSpellFitByClassAndRace(tSpell->learnedSpell))
             continue;
 
-        ++count;
-
         bool primary_prof_first_rank = spellmgr.IsPrimaryProfessionFirstRankSpell(tSpell->learnedSpell);
-
         SpellChainNode const* chain_node = spellmgr.GetSpellChainNode(tSpell->learnedSpell);
+        TrainerSpellState state = _player->GetTrainerSpellState(tSpell);
 
         data << uint32(tSpell->spell);                      // learned spell (or cast-spell in profession case)
-        data << uint8(_player->GetTrainerSpellState(tSpell));
+        data << uint8(state==TRAINER_SPELL_GREEN_DISABLED ? TRAINER_SPELL_GREEN : state);
         data << uint32(floor(tSpell->spellCost * fDiscountMod));
 
-        data << uint32(primary_prof_first_rank ? 1 : 0);    // primary prof. learn confirmation dialog
+        data << uint32(primary_prof_first_rank && can_learn_primary_prof ? 1 : 0);
+                                                            // primary prof. learn confirmation dialog
         data << uint32(primary_prof_first_rank ? 1 : 0);    // must be equal prev. field to have learn button in enabled state
         data << uint8(tSpell->reqLevel);
         data << uint32(tSpell->reqSkill);
         data << uint32(tSpell->reqSkillValue);
-        data << uint32(chain_node ? (chain_node->prev ? chain_node->prev : chain_node->req) : 0);
-        data << uint32(chain_node && chain_node->prev ? chain_node->req : 0);
+        data << uint32(!tSpell->IsCastable() && chain_node ? (chain_node->prev ? chain_node->prev : chain_node->req) : 0);
+        data << uint32(!tSpell->IsCastable() && chain_node && chain_node->prev ? chain_node->req : 0);
         data << uint32(0);
+
+        ++count;
     }
 
     data << strTitle;

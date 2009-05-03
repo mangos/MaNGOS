@@ -683,17 +683,17 @@ void GameEventMgr::ChangeEquipOrModel(int16 event_id, bool activate)
         }
         else                                                // If not spawned
         {
-            CreatureData const* data = objmgr.GetCreatureData(itr->first);
-            if (data && activate)
+            CreatureData const* data2 = objmgr.GetCreatureData(itr->first);
+            if (data2 && activate)
             {
-                CreatureInfo const *cinfo = objmgr.GetCreatureTemplate(data->id);
-                uint32 display_id = objmgr.ChooseDisplayId(0,cinfo,data);
+                CreatureInfo const *cinfo = objmgr.GetCreatureTemplate(data2->id);
+                uint32 display_id = objmgr.ChooseDisplayId(0,cinfo,data2);
                 CreatureModelInfo const *minfo = objmgr.GetCreatureModelRandomGender(display_id);
                 if (minfo)
                     display_id = minfo->modelid;
-                if (data->equipmentId == 0)
+                if (data2->equipmentId == 0)
                     itr->second.equipement_id_prev = cinfo->equipmentId;
-                else if (data->equipmentId != -1)
+                else if (data2->equipmentId != -1)
                     itr->second.equipement_id_prev = data->equipmentId;
                 itr->second.modelid_prev = display_id;
             }
@@ -751,7 +751,7 @@ MANGOS_DLL_SPEC bool IsHolidayActive( HolidayIds id )
     GameEventMgr::ActiveEvents const& ae = gameeventmgr.GetActiveEventList();
 
     for(GameEventMgr::ActiveEvents::const_iterator itr = ae.begin(); itr != ae.end(); ++itr)
-        if(events[id].holiday_id==id)
+        if(events[*itr].holiday_id==id)
             return true;
 
     return false;

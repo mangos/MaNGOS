@@ -169,7 +169,7 @@ void Channel::Leave(uint64 p, bool send)
 
 void Channel::KickOrBan(uint64 good, const char *badname, bool ban)
 {
-    uint32 sec = 0;
+    AccountTypes sec = SEC_PLAYER;
     Player *gplr = objmgr.GetPlayer(good);
     if(gplr)
         sec = gplr->GetSession()->GetSecurity();
@@ -298,10 +298,11 @@ void Channel::Password(uint64 p, const char *pass)
 
 void Channel::SetMode(uint64 p, const char *p2n, bool mod, bool set)
 {
-    uint32 sec = 0;
     Player *plr = objmgr.GetPlayer(p);
-    if(plr)
-        sec = plr->GetSession()->GetSecurity();
+    if (!plr)
+        return;
+
+    uint32 sec = plr->GetSession()->GetSecurity();
 
     if(!IsOn(p))
     {
@@ -366,10 +367,11 @@ void Channel::SetMode(uint64 p, const char *p2n, bool mod, bool set)
 
 void Channel::SetOwner(uint64 p, const char *newname)
 {
-    uint32 sec = 0;
     Player *plr = objmgr.GetPlayer(p);
-    if(plr)
-        sec = plr->GetSession()->GetSecurity();
+    if (!plr)
+        return;
+
+    uint32 sec = plr->GetSession()->GetSecurity();
 
     if(!IsOn(p))
     {
@@ -447,7 +449,7 @@ void Channel::List(Player* player)
         bool gmInWhoList = sWorld.getConfig(CONFIG_GM_IN_WHO_LIST) || player->GetSession()->GetSecurity() > SEC_PLAYER;
 
         uint32 count  = 0;
-        for(PlayerList::iterator i = players.begin(); i != players.end(); ++i)
+        for(PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
         {
             Player *plr = objmgr.GetPlayer(i->first);
 
@@ -660,7 +662,7 @@ void Channel::SetOwner(uint64 guid, bool exclaim)
 
 void Channel::SendToAll(WorldPacket *data, uint64 p)
 {
-    for(PlayerList::iterator i = players.begin(); i != players.end(); ++i)
+    for(PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
     {
         Player *plr = objmgr.GetPlayer(i->first);
         if(plr)
@@ -673,7 +675,7 @@ void Channel::SendToAll(WorldPacket *data, uint64 p)
 
 void Channel::SendToAllButOne(WorldPacket *data, uint64 who)
 {
-    for(PlayerList::iterator i = players.begin(); i != players.end(); ++i)
+    for(PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
     {
         if(i->first != who)
         {

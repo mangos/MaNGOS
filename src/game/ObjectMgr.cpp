@@ -447,7 +447,7 @@ void ObjectMgr::LoadPointOfInterestLocales()
 struct SQLCreatureLoader : public SQLStorageLoaderBase<SQLCreatureLoader>
 {
     template<class D>
-    void convert_from_str(uint32 field_pos, char *src, D &dst)
+    void convert_from_str(uint32 /*field_pos*/, char *src, D &dst)
     {
         dst = D(objmgr.GetScriptId(src));
     }
@@ -600,12 +600,12 @@ void ObjectMgr::LoadCreatureTemplates()
                 sLog.outErrorDb("Creature (Entry: %u) has non-existing PetSpellDataId (%u)", cInfo->Entry, cInfo->PetSpellDataId);
         }
 
-        for(int i = 0; i < CREATURE_MAX_SPELLS; ++i)
+        for(int j = 0; j < CREATURE_MAX_SPELLS; ++j)
         {
-            if(cInfo->spells[i] && !sSpellStore.LookupEntry(cInfo->spells[i]))
+            if(cInfo->spells[j] && !sSpellStore.LookupEntry(cInfo->spells[j]))
             {
-                sLog.outErrorDb("Creature (Entry: %u) has non-existing Spell%d (%u), set to 0", cInfo->Entry, i+1,cInfo->spells[i]);
-                const_cast<CreatureInfo*>(cInfo)->spells[i] = 0;
+                sLog.outErrorDb("Creature (Entry: %u) has non-existing Spell%d (%u), set to 0", cInfo->Entry, j+1,cInfo->spells[j]);
+                const_cast<CreatureInfo*>(cInfo)->spells[j] = 0;
             }
         }
 
@@ -1394,7 +1394,7 @@ void ObjectMgr::LoadItemLocales()
 struct SQLItemLoader : public SQLStorageLoaderBase<SQLItemLoader>
 {
     template<class D>
-    void convert_from_str(uint32 field_pos, char *src, D &dst)
+    void convert_from_str(uint32 /*field_pos*/, char *src, D &dst)
     {
         dst = D(objmgr.GetScriptId(src));
     }
@@ -2694,15 +2694,15 @@ void ObjectMgr::LoadGroups()
     result = CharacterDatabase.Query("SELECT memberGuid, assistant, subgroup, leaderGuid FROM group_member ORDER BY leaderGuid");
     if(!result)
     {
-        barGoLink bar( 1 );
-        bar.step();
+        barGoLink bar2( 1 );
+        bar2.step();
     }
     else
     {
-        barGoLink bar( result->GetRowCount() );
+        barGoLink bar2( result->GetRowCount() );
         do
         {
-            bar.step();
+            bar2.step();
             Field *fields = result->Fetch();
             count++;
             leaderGuid = MAKE_NEW_GUID(fields[3].GetUInt32(), 0, HIGHGUID_PLAYER);
@@ -2754,15 +2754,15 @@ void ObjectMgr::LoadGroups()
 
     if(!result)
     {
-        barGoLink bar( 1 );
-        bar.step();
+        barGoLink bar2( 1 );
+        bar2.step();
     }
     else
     {
-        barGoLink bar( result->GetRowCount() );
+        barGoLink bar2( result->GetRowCount() );
         do
         {
-            bar.step();
+            bar2.step();
             Field *fields = result->Fetch();
             count++;
             leaderGuid = MAKE_NEW_GUID(fields[0].GetUInt32(), 0, HIGHGUID_PLAYER);
@@ -3149,7 +3149,7 @@ void ObjectMgr::LoadQuests()
                 {
                     sLog.outErrorDb("Quest %u has `ReqSpellCast%d` = %u but spell %u does not exist, quest can't be done.",
                         qinfo->GetQuestId(),j+1,id,id);
-                    // no changes, quest can't be done for this requirement
+                    continue;
                 }
 
                 if(!qinfo->ReqCreatureOrGOId[j])
@@ -4133,7 +4133,7 @@ void ObjectMgr::LoadPageTextLocales()
 struct SQLInstanceLoader : public SQLStorageLoaderBase<SQLInstanceLoader>
 {
     template<class D>
-    void convert_from_str(uint32 field_pos, char *src, D &dst)
+    void convert_from_str(uint32 /*field_pos*/, char *src, D &dst)
     {
         dst = D(objmgr.GetScriptId(src));
     }
@@ -5415,7 +5415,7 @@ void ObjectMgr::LoadGameObjectLocales()
 struct SQLGameObjectLoader : public SQLStorageLoaderBase<SQLGameObjectLoader>
 {
     template<class D>
-    void convert_from_str(uint32 field_pos, char *src, D &dst)
+    void convert_from_str(uint32 /*field_pos*/, char *src, D &dst)
     {
         dst = D(objmgr.GetScriptId(src));
     }

@@ -322,9 +322,11 @@ enum AttackingTarget
     ATTACKING_TARGET_RANDOM = 0,                            //Just selects a random target
     ATTACKING_TARGET_TOPAGGRO,                              //Selects targes from top aggro to bottom
     ATTACKING_TARGET_BOTTOMAGGRO,                           //Selects targets from bottom aggro to top
+    /* not implemented
     ATTACKING_TARGET_RANDOM_PLAYER,                         //Just selects a random target (player only)
     ATTACKING_TARGET_TOPAGGRO_PLAYER,                       //Selects targes from top aggro to bottom (player only)
     ATTACKING_TARGET_BOTTOMAGGRO_PLAYER,                    //Selects targets from bottom aggro to top (player only)
+    */
 };
 
 // GCC have alternative #pragma pack() syntax and old gcc version not support pack(pop), also any gcc version not support it at some platform
@@ -368,7 +370,7 @@ struct VendorItemData
 
     void Clear()
     {
-        for (VendorItemList::iterator itr = m_items.begin(); itr != m_items.end(); ++itr)
+        for (VendorItemList::const_iterator itr = m_items.begin(); itr != m_items.end(); ++itr)
             delete (*itr);
         m_items.clear();
     }

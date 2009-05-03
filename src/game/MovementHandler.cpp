@@ -262,7 +262,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
             if (plMover && !plMover->m_transport)
             {
                 // elevators also cause the client to send MOVEMENTFLAG_ONTRANSPORT - just unmount if the guid can be found in the transport list
-                for (MapManager::TransportSet::iterator iter = MapManager::Instance().m_Transports.begin(); iter != MapManager::Instance().m_Transports.end(); ++iter)
+                for (MapManager::TransportSet::const_iterator iter = MapManager::Instance().m_Transports.begin(); iter != MapManager::Instance().m_Transports.end(); ++iter)
                 {
                     if ((*iter)->GetGUID() == movementInfo.t_guid)
                     {
@@ -615,7 +615,6 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 
     if(plMover)                                             // nothing is charmed, or player charmed
     {
-
         plMover->SetPosition(movementInfo.x, movementInfo.y, movementInfo.z, movementInfo.o);
         plMover->m_movementInfo = movementInfo;
         plMover->SetUnitMovementFlags(movementInfo.flags);

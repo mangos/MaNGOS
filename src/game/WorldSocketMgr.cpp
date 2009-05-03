@@ -132,7 +132,7 @@ class ReactorRunnable : protected ACE_Task_Base
             if (m_NewSockets.empty ())
                 return;
 
-            for (SocketSet::iterator i = m_NewSockets.begin (); i != m_NewSockets.end (); ++i)
+            for (SocketSet::const_iterator i = m_NewSockets.begin (); i != m_NewSockets.end (); ++i)
             {
                 WorldSocket* sock = (*i);
 
@@ -174,14 +174,14 @@ class ReactorRunnable : protected ACE_Task_Base
                     if ((*i)->Update () == -1)
                     {
                         t = i;
-                        i++;
+                        ++i;
                         (*t)->CloseSocket ();
                         (*t)->RemoveReference ();
                         --m_Connections;
                         m_Sockets.erase (t);
                     }
                     else
-                        i++;
+                        ++i;
                 }
             }
 

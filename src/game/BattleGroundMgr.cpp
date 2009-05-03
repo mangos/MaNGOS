@@ -488,8 +488,8 @@ large groups are disadvantageous, because they will be kicked first if invitatio
 */
 void BattleGroundQueue::FillPlayersToBG(BattleGround* bg, BGQueueIdBasedOnLevel queue_id)
 {
-    uint32 hordeFree = bg->GetFreeSlotsForTeam(HORDE);
-    uint32 aliFree   = bg->GetFreeSlotsForTeam(ALLIANCE);
+    int32 hordeFree = bg->GetFreeSlotsForTeam(HORDE);
+    int32 aliFree   = bg->GetFreeSlotsForTeam(ALLIANCE);
 
     //iterator for iterating through bg queue
     GroupsQueueType::const_iterator Ali_itr = m_QueuedGroups[queue_id][BG_QUEUE_NORMAL_ALLIANCE].begin();
@@ -519,8 +519,8 @@ void BattleGroundQueue::FillPlayersToBG(BattleGround* bg, BGQueueIdBasedOnLevel 
     */
 
     // At first we need to compare free space in bg and our selection pool
-    int32 diffAli = aliFree - m_SelectionPools[BG_TEAM_ALLIANCE].GetPlayerCount();
-    int32 diffHorde = hordeFree - m_SelectionPools[BG_TEAM_HORDE].GetPlayerCount();
+    int32 diffAli   = aliFree   - int32(m_SelectionPools[BG_TEAM_ALLIANCE].GetPlayerCount());
+    int32 diffHorde = hordeFree - int32(m_SelectionPools[BG_TEAM_HORDE].GetPlayerCount());
     while( abs(diffAli - diffHorde) > 1 && (m_SelectionPools[BG_TEAM_HORDE].GetPlayerCount() > 0 || m_SelectionPools[BG_TEAM_ALLIANCE].GetPlayerCount() > 0) )
     {
         //each cycle execution we need to kick at least 1 group
@@ -556,8 +556,8 @@ void BattleGroundQueue::FillPlayersToBG(BattleGround* bg, BGQueueIdBasedOnLevel 
             }
         }
         //count diffs after small update
-        diffAli = aliFree - m_SelectionPools[BG_TEAM_ALLIANCE].GetPlayerCount();
-        diffHorde = hordeFree - m_SelectionPools[BG_TEAM_HORDE].GetPlayerCount();
+        diffAli   = aliFree   - int32(m_SelectionPools[BG_TEAM_ALLIANCE].GetPlayerCount());
+        diffHorde = hordeFree - int32(m_SelectionPools[BG_TEAM_HORDE].GetPlayerCount());
     }
 }
 
@@ -737,8 +737,6 @@ void BattleGroundQueue::Update(BattleGroundTypeId bgTypeId, BGQueueIdBasedOnLeve
         m_QueuedGroups[queue_id][BG_QUEUE_NORMAL_HORDE].empty() )
         return;
 
-    BattleGroundQueueTypeId bgQueueTypeId = BattleGroundMgr::BGQueueTypeId(bgTypeId, arenaType);
-
     //battleground with free slot for player should be always in the beggining of the queue
     // maybe it would be better to create bgfreeslotqueue for each queue_id_based_on_level
     BGFreeSlotQueueType::iterator itr, next;
@@ -761,10 +759,10 @@ void BattleGroundQueue::Update(BattleGroundTypeId bgTypeId, BGQueueIdBasedOnLeve
             FillPlayersToBG(bg, queue_id);
 
             // now everything is set, invite players
-            for(GroupsQueueType::const_iterator itr = m_SelectionPools[BG_TEAM_ALLIANCE].SelectedGroups.begin(); itr != m_SelectionPools[BG_TEAM_ALLIANCE].SelectedGroups.end(); ++itr)
-                InviteGroupToBG((*itr), bg, (*itr)->Team);
-            for(GroupsQueueType::const_iterator itr = m_SelectionPools[BG_TEAM_HORDE].SelectedGroups.begin(); itr != m_SelectionPools[BG_TEAM_HORDE].SelectedGroups.end(); ++itr)
-                InviteGroupToBG((*itr), bg, (*itr)->Team);
+            for(GroupsQueueType::const_iterator citr = m_SelectionPools[BG_TEAM_ALLIANCE].SelectedGroups.begin(); citr != m_SelectionPools[BG_TEAM_ALLIANCE].SelectedGroups.end(); ++citr)
+                InviteGroupToBG((*citr), bg, (*citr)->Team);
+            for(GroupsQueueType::const_iterator citr = m_SelectionPools[BG_TEAM_HORDE].SelectedGroups.begin(); citr != m_SelectionPools[BG_TEAM_HORDE].SelectedGroups.end(); ++citr)
+                InviteGroupToBG((*citr), bg, (*citr)->Team);
 
             if (!bg->HasFreeSlots())
             {
@@ -834,8 +832,8 @@ void BattleGroundQueue::Update(BattleGroundTypeId bgTypeId, BGQueueIdBasedOnLeve
             }
             //invite those selection pools
             for(uint32 i = 0; i < BG_TEAMS_COUNT; i++)
-                for(GroupsQueueType::const_iterator itr = m_SelectionPools[BG_TEAM_ALLIANCE + i].SelectedGroups.begin(); itr != m_SelectionPools[BG_TEAM_ALLIANCE + i].SelectedGroups.end(); ++itr)
-                    InviteGroupToBG((*itr), bg2, (*itr)->Team);
+                for(GroupsQueueType::const_iterator citr = m_SelectionPools[BG_TEAM_ALLIANCE + i].SelectedGroups.begin(); citr != m_SelectionPools[BG_TEAM_ALLIANCE + i].SelectedGroups.end(); ++citr)
+                    InviteGroupToBG((*citr), bg2, (*citr)->Team);
             //start bg
             bg2->StartBattleGround();
             //clear structures
@@ -861,8 +859,8 @@ void BattleGroundQueue::Update(BattleGroundTypeId bgTypeId, BGQueueIdBasedOnLeve
 
             // invite those selection pools
             for(uint32 i = 0; i < BG_TEAMS_COUNT; i++)
-                for(GroupsQueueType::const_iterator itr = m_SelectionPools[BG_TEAM_ALLIANCE + i].SelectedGroups.begin(); itr != m_SelectionPools[BG_TEAM_ALLIANCE + i].SelectedGroups.end(); ++itr)
-                    InviteGroupToBG((*itr), bg2, (*itr)->Team);
+                for(GroupsQueueType::const_iterator citr = m_SelectionPools[BG_TEAM_ALLIANCE + i].SelectedGroups.begin(); citr != m_SelectionPools[BG_TEAM_ALLIANCE + i].SelectedGroups.end(); ++citr)
+                    InviteGroupToBG((*citr), bg2, (*citr)->Team);
             // start bg
             bg2->StartBattleGround();
         }
@@ -1189,8 +1187,8 @@ void BattleGroundMgr::Update(uint32 diff)
             if (sWorld.GetGameTime() > m_NextAutoDistributionTime)
             {
                 DistributeArenaPoints();
-                m_NextAutoDistributionTime = sWorld.GetGameTime() + BATTLEGROUND_ARENA_POINT_DISTRIBUTION_DAY * sWorld.getConfig(CONFIG_ARENA_AUTO_DISTRIBUTE_INTERVAL_DAYS);
-                CharacterDatabase.PExecute("UPDATE saved_variables SET NextArenaPointDistributionTime = '"I64FMTD"'", m_NextAutoDistributionTime);
+                m_NextAutoDistributionTime = time_t(sWorld.GetGameTime() + BATTLEGROUND_ARENA_POINT_DISTRIBUTION_DAY * sWorld.getConfig(CONFIG_ARENA_AUTO_DISTRIBUTE_INTERVAL_DAYS));
+                CharacterDatabase.PExecute("UPDATE saved_variables SET NextArenaPointDistributionTime = '"I64FMTD"'", uint64(m_NextAutoDistributionTime));
             }
             m_AutoDistributionTimeChecker = 600000; // check 10 minutes
         }
@@ -1436,7 +1434,7 @@ void BattleGroundMgr::BuildPlayerJoinedBattleGroundPacket(WorldPacket *data, Pla
     *data << uint64(plr->GetGUID());
 }
 
-BattleGround * BattleGroundMgr::GetBattleGroundThroughClientInstance(uint32 instanceId, BattleGroundTypeId bgTypeId, BGQueueIdBasedOnLevel queue_id)
+BattleGround * BattleGroundMgr::GetBattleGroundThroughClientInstance(uint32 instanceId, BattleGroundTypeId bgTypeId)
 {
     //cause at HandleBattleGroundJoinOpcode the clients sends the instanceid he gets from
     //SMSG_BATTLEFIELD_LIST we need to find the battleground with this clientinstance-id
@@ -1760,12 +1758,12 @@ void BattleGroundMgr::InitAutomaticArenaPointDistribution()
         if (!result)
         {
             sLog.outDebug("Battleground: Next arena point distribution time not found in SavedVariables, reseting it now.");
-            m_NextAutoDistributionTime = sWorld.GetGameTime() + BATTLEGROUND_ARENA_POINT_DISTRIBUTION_DAY * sWorld.getConfig(CONFIG_ARENA_AUTO_DISTRIBUTE_INTERVAL_DAYS);
-            CharacterDatabase.PExecute("INSERT INTO saved_variables (NextArenaPointDistributionTime) VALUES ('"I64FMTD"')", m_NextAutoDistributionTime);
+            m_NextAutoDistributionTime = time_t(sWorld.GetGameTime() + BATTLEGROUND_ARENA_POINT_DISTRIBUTION_DAY * sWorld.getConfig(CONFIG_ARENA_AUTO_DISTRIBUTE_INTERVAL_DAYS));
+            CharacterDatabase.PExecute("INSERT INTO saved_variables (NextArenaPointDistributionTime) VALUES ('"I64FMTD"')", uint64(m_NextAutoDistributionTime));
         }
         else
         {
-            m_NextAutoDistributionTime = (*result)[0].GetUInt64();
+            m_NextAutoDistributionTime = time_t((*result)[0].GetUInt64());
             delete result;
         }
         sLog.outDebug("Automatic Arena Point Distribution initialized.");
@@ -1824,10 +1822,11 @@ void BattleGroundMgr::DistributeArenaPoints()
 
 void BattleGroundMgr::BuildBattleGroundListPacket(WorldPacket *data, const uint64& guid, Player* plr, BattleGroundTypeId bgTypeId)
 {
-    uint32 PlayerLevel = 10;
+    if (!plr)
+        return;
 
-    if (plr)
-        PlayerLevel = plr->getLevel();
+    uint32 PlayerLevel = 10;
+    PlayerLevel = plr->getLevel();
 
     data->Initialize(SMSG_BATTLEFIELD_LIST);
     *data << uint64(guid);                                  // battlemaster guid

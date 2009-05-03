@@ -78,8 +78,9 @@ bool AchievementCriteriaData::IsValid(AchievementCriteriaEntry const* criteria)
 
     switch(criteria->requiredType)
     {
-        case ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2:
         case ACHIEVEMENT_CRITERIA_TYPE_DO_EMOTE:
+        case ACHIEVEMENT_CRITERIA_TYPE_LOOT_TYPE:
+        case ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2:
             break;
         default:
             sLog.outErrorDb( "Table `achievement_criteria_data` have data for not supported criteria type (Entry: %u Type: %u), ignore.", criteria->ID, criteria->requiredType);
@@ -228,14 +229,14 @@ AchievementMgr::~AchievementMgr()
 
 void AchievementMgr::Reset()
 {
-    for(CompletedAchievementMap::iterator iter = m_completedAchievements.begin(); iter!=m_completedAchievements.end(); ++iter)
+    for(CompletedAchievementMap::const_iterator iter = m_completedAchievements.begin(); iter!=m_completedAchievements.end(); ++iter)
     {
         WorldPacket data(SMSG_ACHIEVEMENT_DELETED,4);
         data << uint32(iter->first);
         m_player->SendDirectMessage(&data);
     }
 
-    for(CriteriaProgressMap::iterator iter = m_criteriaProgress.begin(); iter!=m_criteriaProgress.end(); ++iter)
+    for(CriteriaProgressMap::const_iterator iter = m_criteriaProgress.begin(); iter!=m_criteriaProgress.end(); ++iter)
     {
         WorldPacket data(SMSG_CRITERIA_DELETED,4);
         data << uint32(iter->first);
@@ -675,7 +676,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
             case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST_COUNT:
             {
                 uint32 counter =0;
-                for(QuestStatusMap::iterator itr = GetPlayer()->getQuestStatusMap().begin(); itr!=GetPlayer()->getQuestStatusMap().end(); itr++)
+                for(QuestStatusMap::const_iterator itr = GetPlayer()->getQuestStatusMap().begin(); itr!=GetPlayer()->getQuestStatusMap().end(); itr++)
                     if(itr->second.m_rewarded)
                         counter++;
                 SetCriteriaProgress(achievementCriteria, counter);
@@ -688,7 +689,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                     continue;
 
                 uint32 counter =0;
-                for(QuestStatusMap::iterator itr = GetPlayer()->getQuestStatusMap().begin(); itr!=GetPlayer()->getQuestStatusMap().end(); itr++)
+                for(QuestStatusMap::const_iterator itr = GetPlayer()->getQuestStatusMap().begin(); itr!=GetPlayer()->getQuestStatusMap().end(); itr++)
                 {
                     Quest const* quest = objmgr.GetQuestTemplate(itr->first);
                     if(itr->second.m_rewarded && quest->GetZoneOrSort() >= 0 && uint32(quest->GetZoneOrSort()) == achievementCriteria->complete_quests_in_zone.zoneID)
@@ -720,12 +721,12 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                     continue;
                 // skip wrong arena achievements, if not achievIdByArenaSlot then normal total death counter
                 bool notfit = false;
-                for(int i = 0; i < MAX_ARENA_SLOT; ++i)
+                for(int j = 0; j < MAX_ARENA_SLOT; ++j)
                 {
-                    if(achievIdByArenaSlot[i] == achievement->ID)
+                    if(achievIdByArenaSlot[j] == achievement->ID)
                     {
                         BattleGround* bg = GetPlayer()->GetBattleGround();
-                        if(!bg || !bg->isArena() || ArenaTeam::GetSlotByType(bg->GetArenaType()) != i)
+                        if(!bg || !bg->isArena() || ArenaTeam::GetSlotByType(bg->GetArenaType()) != j)
                             notfit = true;
 
                         break;
@@ -749,26 +750,26 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
 
                 // search case
                 bool found = false;
-                for(int i = 0; achievIdForDangeon[i][0]; ++i)
+                for(int j = 0; achievIdForDangeon[j][0]; ++j)
                 {
-                    if(achievIdForDangeon[i][0] == achievement->ID)
+                    if(achievIdForDangeon[j][0] == achievement->ID)
                     {
                         if(map->IsRaid())
                         {
                             // if raid accepted (ignore difficulty)
-                            if(!achievIdForDangeon[i][2])
+                            if(!achievIdForDangeon[j][2])
                                 break;                      // for
                         }
                         else if(GetPlayer()->GetDifficulty()==DIFFICULTY_NORMAL)
                         {
                             // dungeon in normal mode accepted
-                            if(!achievIdForDangeon[i][1])
+                            if(!achievIdForDangeon[j][1])
                                 break;                      // for
                         }
                         else
                         {
                             // dungeon in heroic mode accepted
-                            if(!achievIdForDangeon[i][3])
+                            if(!achievIdForDangeon[j][3])
                                 break;                      // for
                         }
 
@@ -861,6 +862,30 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                 if(GetPlayer()->HasSpell(achievementCriteria->learn_spell.spellID))
                     SetCriteriaProgress(achievementCriteria, 1);
                 break;
+            case ACHIEVEMENT_CRITERIA_TYPE_LOOT_TYPE:
+            {
+                // miscvalue1=loot_type (note: 0 = LOOT_CORSPE and then it ignored)
+                // miscvalue2=count of item loot
+                if (!miscvalue1 || !miscvalue2)
+                    continue;
+                if (miscvalue1 != achievementCriteria->loot_type.lootType)
+                    continue;
+
+                // zone specific
+                if(achievementCriteria->loot_type.lootTypeCount==1)
+                {
+                    // those requirements couldn't be found in the dbc
+                    AchievementCriteriaDataSet const* data = achievementmgr.GetCriteriaDataSet(achievementCriteria);
+                    if(!data)
+                        continue;
+
+                    if(!data->Meets(GetPlayer(),unit))
+                        continue;
+                }
+
+                SetCriteriaProgress(achievementCriteria, miscvalue2, PROGRESS_ACCUMULATE);
+                break;
+            }
             case ACHIEVEMENT_CRITERIA_TYPE_OWN_ITEM:
                 // speedup for non-login case
                 if(miscvalue1 && achievementCriteria->own_item.itemID != miscvalue1)
@@ -890,11 +915,15 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                     break;
 
                 bool matchFound = false;
-                for (int i = 0; i < 3; ++i)
+                for (int j = 0; j < MAX_WORLD_MAP_OVERLAY_AREA_IDX; ++j)
                 {
-                    int32 exploreFlag = GetAreaFlagByAreaID(worldOverlayEntry->areatableID[i]);
-                    if(exploreFlag < 0)
+                    uint32 area_id = worldOverlayEntry->areatableID[j];
+                    if(!area_id)                            // array have 0 only in empty tail
                         break;
+
+                    int32 exploreFlag = GetAreaFlagByAreaID(area_id);
+                    if(exploreFlag < 0)
+                        continue;
 
                     uint32 playerIndexOffset = uint32(exploreFlag) / 32;
                     uint32 mask = 1<< (uint32(exploreFlag) % 32);
@@ -1125,6 +1154,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
             case ACHIEVEMENT_CRITERIA_TYPE_NUMBER_OF_TALENT_RESETS:
             case ACHIEVEMENT_CRITERIA_TYPE_SPECIAL_PVP_KILL:
             case ACHIEVEMENT_CRITERIA_TYPE_EARNED_PVP_TITLE:
+            case ACHIEVEMENT_CRITERIA_TYPE_WIN_DUEL:
             case ACHIEVEMENT_CRITERIA_TYPE_LOSE_DUEL:
             case ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE_TYPE:
             case ACHIEVEMENT_CRITERIA_TYPE_GOLD_EARNED_BY_AUCTIONS:
@@ -1137,13 +1167,12 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
             case ACHIEVEMENT_CRITERIA_TYPE_ROLL_GREED:
             case ACHIEVEMENT_CRITERIA_TYPE_QUEST_ABANDONED:
             case ACHIEVEMENT_CRITERIA_TYPE_FLIGHT_PATHS_TAKEN:
-            case ACHIEVEMENT_CRITERIA_TYPE_LOOT_TYPE:
             case ACHIEVEMENT_CRITERIA_TYPE_ACCEPTED_SUMMONINGS:
             case ACHIEVEMENT_CRITERIA_TYPE_TOTAL:
                 break;                                   // Not implemented yet :(
         }
         if(IsCompletedCriteria(achievementCriteria,achievement))
-            CompletedCriteria(achievementCriteria,achievement);
+            CompletedCriteriaFor(achievement);
 
         // check again the completeness for SUMM and REQ COUNT achievements, 
         // as they don't depend on the completed criteria but on the sum of the progress of each individual criteria
@@ -1227,6 +1256,8 @@ bool AchievementMgr::IsCompletedCriteria(AchievementCriteriaEntry const* achieve
             return progress->counter >= achievementCriteria->cast_spell.castCount;
         case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SPELL:
             return progress->counter >= 1;
+        case ACHIEVEMENT_CRITERIA_TYPE_LOOT_TYPE:
+            return progress->counter >= achievementCriteria->loot_type.lootTypeCount;
         case ACHIEVEMENT_CRITERIA_TYPE_OWN_ITEM:
             return progress->counter >= achievementCriteria->own_item.itemCount;
         case ACHIEVEMENT_CRITERIA_TYPE_USE_ITEM:
@@ -1292,7 +1323,7 @@ bool AchievementMgr::IsCompletedCriteria(AchievementCriteriaEntry const* achieve
     return false;
 }
 
-void AchievementMgr::CompletedCriteria(AchievementCriteriaEntry const* criteria, AchievementEntry const* achievement)
+void AchievementMgr::CompletedCriteriaFor(AchievementEntry const* achievement)
 {
     // counter can never complete
     if(achievement->flags & ACHIEVEMENT_FLAG_COUNTER)
@@ -1392,7 +1423,7 @@ void AchievementMgr::SetCriteriaProgress(AchievementCriteriaEntry const* entry, 
     {
         progress = &iter->second;
 
-        uint32 newValue;
+        uint32 newValue = 0;
         switch(ptype)
         {
             case PROGRESS_SET:
@@ -1667,18 +1698,22 @@ void AchievementGlobalMgr::LoadAchievementCriteriaData()
 
         switch(criteria->requiredType)
         {
-            case ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2:
-                if(!GetCriteriaDataSet(criteria))
-                    sLog.outErrorDb( "Table `achievement_criteria_data` not have expected data for for criteria (Entry: %u Type: %u).", criteria->ID, criteria->requiredType);
-                break;
             case ACHIEVEMENT_CRITERIA_TYPE_DO_EMOTE:        // need skip generic cases
-                if(criteria->do_emote.count && !GetCriteriaDataSet(criteria))
-                    sLog.outErrorDb( "Table `achievement_criteria_data` not have expected data for for criteria (Entry: %u Type: %u).", criteria->ID, criteria->requiredType);
+                if(criteria->do_emote.count==0)
+                    continue;
                 break;
-            default:                                        // unexpected case processed in IsValid check
+            case ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2:     // any cases
                 break;
+            case ACHIEVEMENT_CRITERIA_TYPE_LOOT_TYPE:       // need skip generic cases
+                if(criteria->loot_type.lootTypeCount!=1)
+                    continue;
+                break;
+            default:                                        // type not use DB data, ignore
+                continue;
         }
 
+        if(!GetCriteriaDataSet(criteria))
+            sLog.outErrorDb( "Table `achievement_criteria_data` not have expected data for for criteria (Entry: %u Type: %u).", criteria->ID, criteria->requiredType);
     }
 
     sLog.outString();

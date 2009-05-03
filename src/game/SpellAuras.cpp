@@ -2176,64 +2176,97 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
     {
         case SPELLFAMILY_GENERIC:
         {
-            // Unstable Power
-            if( GetId()==24658 )
+            switch(GetId())
             {
-                uint32 spellId = 24659;
-                if (apply)
+                // Unstable Power
+                case 24658:
                 {
-                    const SpellEntry *spell = sSpellStore.LookupEntry(spellId);
-                    if (!spell)
-                        return;
-                    for (int i=0; i < spell->StackAmount; ++i)
-                        caster->CastSpell(m_target, spell->Id, true, NULL, NULL, GetCasterGUID());
-                    return;
-                }
-                m_target->RemoveAurasDueToSpell(spellId);
-                return;
-            }
-            // Restless Strength
-            if( GetId()==24661 )
-            {
-                uint32 spellId = 24662;
-                if (apply)
-                {
-                    const SpellEntry *spell = sSpellStore.LookupEntry(spellId);
-                    if (!spell)
-                        return;
-                    for (int i=0; i < spell->StackAmount; ++i)
-                        caster->CastSpell(m_target, spell->Id, true, NULL, NULL, GetCasterGUID());
-                    return;
-                }
-                m_target->RemoveAurasDueToSpell(spellId);
-                return;
-            }
-            //Summon Fire Elemental
-            if (GetId() == 40133 && caster)
-            {
-                Unit *owner = caster->GetOwner();
-                if (owner && owner->GetTypeId() == TYPEID_PLAYER)
-                {
-                    if(apply)
-                        owner->CastSpell(owner,8985,true);
-                    else
-                        ((Player*)owner)->RemovePet(NULL, PET_SAVE_NOT_IN_SLOT, true);
-                }
-                return;
-            }
+                    uint32 spellId = 24659;
+                    if (apply && caster)
+                    {
+                        const SpellEntry *spell = sSpellStore.LookupEntry(spellId);
+                        if (!spell)
+                            return;
 
-            //Summon Earth Elemental
-            if (GetId() == 40132 && caster)
-            {
-                Unit *owner = caster->GetOwner();
-                if (owner && owner->GetTypeId() == TYPEID_PLAYER)
-                {
-                    if(apply)
-                        owner->CastSpell(owner,19704,true);
-                    else
-                        ((Player*)owner)->RemovePet(NULL, PET_SAVE_NOT_IN_SLOT, true);
+                        for (int i=0; i < spell->StackAmount; ++i)
+                            caster->CastSpell(m_target, spell->Id, true, NULL, NULL, GetCasterGUID());
+                        return;
+                    }
+                    m_target->RemoveAurasDueToSpell(spellId);
+                    return;
                 }
-                return;
+                // Restless Strength
+                case 24661:
+                {
+                    uint32 spellId = 24662;
+                    if (apply && caster)
+                    {
+                        const SpellEntry *spell = sSpellStore.LookupEntry(spellId);
+                        if (!spell)
+                            return;
+                        for (int i=0; i < spell->StackAmount; ++i)
+                            caster->CastSpell(m_target, spell->Id, true, NULL, NULL, GetCasterGUID());
+                        return;
+                    }
+                    m_target->RemoveAurasDueToSpell(spellId);
+                    return;
+                }
+                //Summon Fire Elemental
+                case 40133:
+                {
+                    if (!caster)
+                        return;
+
+                    Unit *owner = caster->GetOwner();
+                    if (owner && owner->GetTypeId() == TYPEID_PLAYER)
+                    {
+                        if(apply)
+                            owner->CastSpell(owner,8985,true);
+                        else
+                            ((Player*)owner)->RemovePet(NULL, PET_SAVE_NOT_IN_SLOT, true);
+                    }
+                    return;
+                }
+                //Summon Earth Elemental
+                case 40132 :
+                {
+                    if (!caster)
+                        return;
+
+                    Unit *owner = caster->GetOwner();
+                    if (owner && owner->GetTypeId() == TYPEID_PLAYER)
+                    {
+                        if(apply)
+                            owner->CastSpell(owner,19704,true);
+                        else
+                            ((Player*)owner)->RemovePet(NULL, PET_SAVE_NOT_IN_SLOT, true);
+                    }
+                    return;
+                }
+                // LK Intro VO (1)
+                case 58204:
+                    if(m_target->GetTypeId() == TYPEID_PLAYER)
+                    {
+                        // Play part 1
+                        if(apply)
+                            m_target->PlayDirectSound(14970, (Player *)m_target);
+                        // continue in 58205
+                        else
+                            m_target->CastSpell(m_target, 58205, true);
+                    }
+                    return;
+                // LK Intro VO (2)
+                case 58205:
+                    if(m_target->GetTypeId() == TYPEID_PLAYER)
+                    {
+                        // Play part 2
+                        if(apply)
+                            m_target->PlayDirectSound(14971, (Player *)m_target);
+                        // Play part 3
+                        else
+                            m_target->PlayDirectSound(14972, (Player *)m_target);
+                    }
+                    return;
             }
             break;
         }
@@ -2733,18 +2766,16 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
             case FORM_BEAR:
             case FORM_DIREBEAR:
             case FORM_CAT:
-            {
                 if(Aura* dummy = m_target->GetDummyAura(37315) )
                     m_target->CastSpell(m_target,37316,true,NULL,dummy);
                 break;
-            }
             // Nordrassil Regalia - bonus
             case FORM_MOONKIN:
-            {
                 if(Aura* dummy = m_target->GetDummyAura(37324) )
                     m_target->CastSpell(m_target,37325,true,NULL,dummy);
                 break;
-            }
+            default:
+                break;
         }
     }
 
@@ -3534,7 +3565,7 @@ void Aura::HandleModStealth(bool apply, bool Real)
                     else if ((*i)->GetId() == 58426 && GetSpellProto()->SpellFamilyFlags & 0x0000000000400000LL)
                     {
                         pTarget->RemoveAurasDueToSpell(58428);
-                        pTarget->CastSpell(m_target, 58427, true);
+                        pTarget->CastSpell(pTarget, 58427, true);
                     }
                 }
             }
@@ -3572,7 +3603,7 @@ void Aura::HandleModStealth(bool apply, bool Real)
                     pTarget->CastSpell(pTarget,31666,true);
                 // Overkill
                 else if ((*i)->GetId() == 58426 && GetSpellProto()->SpellFamilyFlags & 0x0000000000400000LL)
-                    pTarget->CastSpell(m_target, 58428, true);
+                    pTarget->CastSpell(pTarget, 58428, true);
             }
         }
     }

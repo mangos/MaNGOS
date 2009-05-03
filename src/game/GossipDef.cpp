@@ -130,7 +130,7 @@ void PlayerMenu::SendGossipMenu( uint32 TitleTextId, uint64 npcGUID )
     data << uint32( TitleTextId );
     data << uint32( mGossipMenu.MenuItemCount() );          // max count 0x0F
 
-    for ( unsigned int iI = 0; iI < mGossipMenu.MenuItemCount(); iI++ )
+    for (uint32 iI = 0; iI < mGossipMenu.MenuItemCount(); ++iI )
     {
         GossipMenuItem const& gItem = mGossipMenu.GetItem(iI);
         data << uint32( iI );
@@ -143,7 +143,7 @@ void PlayerMenu::SendGossipMenu( uint32 TitleTextId, uint64 npcGUID )
 
     data << uint32( mQuestMenu.MenuItemCount() );           // max count 0x20
 
-    for ( uint16 iI = 0; iI < mQuestMenu.MenuItemCount(); iI++ )
+    for (uint32 iI = 0; iI < mQuestMenu.MenuItemCount(); ++iI )
     {
         QuestMenuItem const& qItem = mQuestMenu.GetItem(iI);
         uint32 questID = qItem.m_qId;
@@ -253,7 +253,7 @@ void PlayerMenu::SendTalking( uint32 textID )
     else
     {
         std::string Text_0[8],Text_1[8];
-        for (int i=0;i<8;i++)
+        for (int i=0;i<8;++i)
         {
             Text_0[i]=pGossip->Options[i].Text_0;
             Text_1[i]=pGossip->Options[i].Text_1;
@@ -264,7 +264,7 @@ void PlayerMenu::SendTalking( uint32 textID )
             NpcTextLocale const *nl = objmgr.GetNpcTextLocale(textID);
             if (nl)
             {
-                for (int i=0;i<8;i++)
+                for (int i=0;i<8;++i)
                 {
                     if (nl->Text_0[i].size() > loc_idx && !nl->Text_0[i][loc_idx].empty())
                         Text_0[i]=nl->Text_0[i][loc_idx];
@@ -273,7 +273,7 @@ void PlayerMenu::SendTalking( uint32 textID )
                 }
             }
         }
-        for (int i=0; i<8; i++)
+        for (int i=0; i<8; ++i)
         {
             data << pGossip->Options[i].Probability;
 
@@ -355,7 +355,7 @@ void QuestMenu::AddMenuItem( uint32 QuestId, uint8 Icon)
 
 bool QuestMenu::HasItem( uint32 questid )
 {
-    for (QuestMenuItemList::iterator i = m_qItems.begin(); i != m_qItems.end(); ++i)
+    for (QuestMenuItemList::const_iterator i = m_qItems.begin(); i != m_qItems.end(); ++i)
     {
         if(i->m_qId==questid)
         {
@@ -379,7 +379,7 @@ void PlayerMenu::SendQuestGiverQuestList( QEmote eEmote, const std::string& Titl
     data << uint32(eEmote._Emote );                         // NPC emote
     data << uint8 ( mQuestMenu.MenuItemCount() );
 
-    for ( uint16 iI = 0; iI < mQuestMenu.MenuItemCount(); iI++ )
+    for (uint32 iI = 0; iI < mQuestMenu.MenuItemCount(); ++iI )
     {
         QuestMenuItem const& qmi = mQuestMenu.GetItem(iI);
 
@@ -464,7 +464,7 @@ void PlayerMenu::SendQuestGiverQuestDetails( Quest const *pQuest, uint64 npcGUID
         ItemPrototype const* IProto;
 
         data << uint32(pQuest->GetRewChoiceItemsCount());
-        for (uint32 i=0; i < QUEST_REWARD_CHOICES_COUNT; i++)
+        for (uint32 i=0; i < QUEST_REWARD_CHOICES_COUNT; ++i)
         {
             if ( !pQuest->RewChoiceItemId[i] ) continue;
             data << uint32(pQuest->RewChoiceItemId[i]);
@@ -477,7 +477,7 @@ void PlayerMenu::SendQuestGiverQuestDetails( Quest const *pQuest, uint64 npcGUID
         }
 
         data << uint32(pQuest->GetRewItemsCount());
-        for (uint32 i=0; i < QUEST_REWARDS_COUNT; i++)
+        for (uint32 i=0; i < QUEST_REWARDS_COUNT; ++i)
         {
             if ( !pQuest->RewItemId[i] ) continue;
             data << uint32(pQuest->RewItemId[i]);
@@ -500,7 +500,7 @@ void PlayerMenu::SendQuestGiverQuestDetails( Quest const *pQuest, uint64 npcGUID
     data << uint32(pQuest->GetBonusTalents());              // bonus talents
 
     data << uint32(QUEST_EMOTE_COUNT);
-    for (uint32 i=0; i < QUEST_EMOTE_COUNT; i++)
+    for (uint32 i=0; i < QUEST_EMOTE_COUNT; ++i)
     {
         data << uint32(pQuest->DetailsEmote[i]);
         data << uint32(0);                                  // DetailsEmoteDelay
@@ -518,7 +518,7 @@ void PlayerMenu::SendQuestQueryResponse( Quest const *pQuest )
     Details = pQuest->GetDetails();
     Objectives = pQuest->GetObjectives();
     EndText = pQuest->GetEndText();
-    for (int i=0;i<QUEST_OBJECTIVES_COUNT;i++)
+    for (int i=0;i<QUEST_OBJECTIVES_COUNT;++i)
         ObjectiveText[i]=pQuest->ObjectiveText[i];
 
     int loc_idx = pSession->GetSessionDbLocaleIndex();
@@ -536,7 +536,7 @@ void PlayerMenu::SendQuestQueryResponse( Quest const *pQuest )
             if (ql->EndText.size() > loc_idx && !ql->EndText[loc_idx].empty())
                 EndText=ql->EndText[loc_idx];
 
-            for (int i=0;i<QUEST_OBJECTIVES_COUNT;i++)
+            for (int i=0;i<QUEST_OBJECTIVES_COUNT;++i)
                 if (ql->ObjectiveText[i].size() > loc_idx && !ql->ObjectiveText[i][loc_idx].empty())
                     ObjectiveText[i]=ql->ObjectiveText[i][loc_idx];
         }
@@ -581,19 +581,19 @@ void PlayerMenu::SendQuestQueryResponse( Quest const *pQuest )
 
     if (pQuest->HasFlag(QUEST_FLAGS_HIDDEN_REWARDS))
     {
-        for (iI = 0; iI < QUEST_REWARDS_COUNT; iI++)
+        for (iI = 0; iI < QUEST_REWARDS_COUNT; ++iI)
             data << uint32(0) << uint32(0);
-        for (iI = 0; iI < QUEST_REWARD_CHOICES_COUNT; iI++)
+        for (iI = 0; iI < QUEST_REWARD_CHOICES_COUNT; ++iI)
             data << uint32(0) << uint32(0);
     }
     else
     {
-        for (iI = 0; iI < QUEST_REWARDS_COUNT; iI++)
+        for (iI = 0; iI < QUEST_REWARDS_COUNT; ++iI)
         {
             data << uint32(pQuest->RewItemId[iI]);
             data << uint32(pQuest->RewItemCount[iI]);
         }
-        for (iI = 0; iI < QUEST_REWARD_CHOICES_COUNT; iI++)
+        for (iI = 0; iI < QUEST_REWARD_CHOICES_COUNT; ++iI)
         {
             data << uint32(pQuest->RewChoiceItemId[iI]);
             data << uint32(pQuest->RewChoiceItemCount[iI]);
@@ -610,7 +610,7 @@ void PlayerMenu::SendQuestQueryResponse( Quest const *pQuest )
     data << Details;
     data << EndText;
 
-    for (iI = 0; iI < QUEST_OBJECTIVES_COUNT; iI++)
+    for (iI = 0; iI < QUEST_OBJECTIVES_COUNT; ++iI)
     {
         if (pQuest->ReqCreatureOrGOId[iI] < 0)
         {
@@ -634,7 +634,7 @@ void PlayerMenu::SendQuestQueryResponse( Quest const *pQuest )
     data << uint32(0);                                      // TODO: 5 item objective
     data << uint32(0);
 
-    for (iI = 0; iI < QUEST_OBJECTIVES_COUNT; iI++)
+    for (iI = 0; iI < QUEST_OBJECTIVES_COUNT; ++iI)
         data << ObjectiveText[iI];
 
     pSession->SendPacket( &data );
@@ -670,7 +670,7 @@ void PlayerMenu::SendQuestGiverOfferReward( Quest const* pQuest, uint64 npcGUID,
     data << uint32(0);                                      // unk
 
     uint32 EmoteCount = 0;
-    for (uint32 i = 0; i < QUEST_EMOTE_COUNT; i++)
+    for (uint32 i = 0; i < QUEST_EMOTE_COUNT; ++i)
     {
         if(pQuest->OfferRewardEmote[i] <= 0)
             break;
@@ -678,7 +678,7 @@ void PlayerMenu::SendQuestGiverOfferReward( Quest const* pQuest, uint64 npcGUID,
     }
 
     data << EmoteCount;                                     // Emote Count
-    for (uint32 i = 0; i < EmoteCount; i++)
+    for (uint32 i = 0; i < EmoteCount; ++i)
     {
         data << uint32(0);                                  // Delay Emote
         data << pQuest->OfferRewardEmote[i];
@@ -687,7 +687,7 @@ void PlayerMenu::SendQuestGiverOfferReward( Quest const* pQuest, uint64 npcGUID,
     ItemPrototype const *pItem;
 
     data << uint32(pQuest->GetRewChoiceItemsCount());
-    for (uint32 i=0; i < pQuest->GetRewChoiceItemsCount(); i++)
+    for (uint32 i=0; i < pQuest->GetRewChoiceItemsCount(); ++i)
     {
         pItem = objmgr.GetItemPrototype( pQuest->RewChoiceItemId[i] );
 
@@ -701,7 +701,7 @@ void PlayerMenu::SendQuestGiverOfferReward( Quest const* pQuest, uint64 npcGUID,
     }
 
     data << uint32(pQuest->GetRewItemsCount());
-    for (uint16 i=0; i < pQuest->GetRewItemsCount(); i++)
+    for (uint16 i=0; i < pQuest->GetRewItemsCount(); ++i)
     {
         pItem = objmgr.GetItemPrototype(pQuest->RewItemId[i]);
         data << uint32(pQuest->RewItemId[i]);
@@ -780,7 +780,7 @@ void PlayerMenu::SendQuestGiverRequestItems( Quest const *pQuest, uint64 npcGUID
 
     data << uint32( pQuest->GetReqItemsCount() );
     ItemPrototype const *pItem;
-    for (int i = 0; i < QUEST_OBJECTIVES_COUNT; i++)
+    for (int i = 0; i < QUEST_OBJECTIVES_COUNT; ++i)
     {
         if ( !pQuest->ReqItemId[i] ) continue;
         pItem = objmgr.GetItemPrototype(pQuest->ReqItemId[i]);

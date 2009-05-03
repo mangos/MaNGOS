@@ -46,6 +46,9 @@ class MANGOS_DLL_SPEC CreatureAI
         // Called if IsVisible(Unit *who) is true at each *who move, reaction at visibility zone enter
         virtual void MoveInLineOfSight(Unit *) {}
 
+        // Called for reaction at enter to combat if not in combat yet (enemy can be NULL)
+        virtual void EnterCombat(Unit* /*enemy*/) {}
+
         // Called for reaction at stopping attack at no attackers or targets
         virtual void EnterEvadeMode() {}
 
@@ -61,7 +64,7 @@ class MANGOS_DLL_SPEC CreatureAI
         // Called at any Damage from any attacker (before damage apply)
         // Note: it for recalculation damage or special reaction at damage
         // for attack reaction use AttackedBy called for not DOT damage in Unit::DealDamage also
-        virtual void DamageTaken(Unit *done_by, uint32 & /*damage*/) {}
+        virtual void DamageTaken(Unit * /*done_by*/, uint32 & /*damage*/) {}
 
         // Called when the creature is killed
         virtual void JustDied(Unit *) {}
@@ -90,7 +93,7 @@ class MANGOS_DLL_SPEC CreatureAI
         virtual void MovementInform(uint32 /*MovementType*/, uint32 /*Data*/) {}
 
         // Called at text emote receive from player 
-        virtual void ReceiveEmote(Player* pPlayer, uint32 text_emote) {}
+        virtual void ReceiveEmote(Player* /*pPlayer*/, uint32 /*text_emote*/) {}
 
         ///== Triggered Actions Requested ==================
 
@@ -99,7 +102,7 @@ class MANGOS_DLL_SPEC CreatureAI
         virtual void AttackStart(Unit *) {}
 
         // Called at World update tick
-        virtual void UpdateAI(const uint32 diff ) {}
+        virtual void UpdateAI(const uint32 /*diff*/) {}
 
         ///== State checks =================================
 

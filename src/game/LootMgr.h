@@ -55,6 +55,21 @@ enum PermissionTypes
     NONE_PERMISSION   = 3
 };
 
+enum LootType
+{
+    LOOT_CORPSE                 = 1,
+    LOOT_PICKPOCKETING          = 2,
+    LOOT_FISHING                = 3,
+    LOOT_DISENCHANTING          = 4,
+                                                            // ignored always by client
+    LOOT_SKINNING               = 6,
+    LOOT_PROSPECTING            = 7,
+    LOOT_MILLING                = 8,
+
+    LOOT_FISHINGHOLE            = 20,                       // unsupported by client, sending LOOT_FISHING instead
+    LOOT_INSIGNIA               = 21                        // unsupported by client, sending LOOT_CORPSE instead
+};
+
 class Player;
 class LootStore;
 
@@ -224,8 +239,9 @@ struct Loot
     std::vector<LootItem> items;
     uint32 gold;
     uint8 unlootedCount;
+    LootType loot_type;                                     // required for achievement system
 
-    Loot(uint32 _gold = 0) : gold(_gold), unlootedCount(0) {}
+    Loot(uint32 _gold = 0) : gold(_gold), unlootedCount(0), loot_type(LOOT_CORPSE) {}
     ~Loot() { clear(); }
 
     // if loot becomes invalid this reference is used to inform the listener
@@ -237,15 +253,15 @@ struct Loot
     // void clear();
     void clear()
     {
-        for (QuestItemMap::iterator itr = PlayerQuestItems.begin(); itr != PlayerQuestItems.end(); ++itr)
+        for (QuestItemMap::const_iterator itr = PlayerQuestItems.begin(); itr != PlayerQuestItems.end(); ++itr)
             delete itr->second;
         PlayerQuestItems.clear();
 
-        for (QuestItemMap::iterator itr = PlayerFFAItems.begin(); itr != PlayerFFAItems.end(); ++itr)
+        for (QuestItemMap::const_iterator itr = PlayerFFAItems.begin(); itr != PlayerFFAItems.end(); ++itr)
             delete itr->second;
         PlayerFFAItems.clear();
 
-        for (QuestItemMap::iterator itr = PlayerNonQuestNonFFAConditionalItems.begin(); itr != PlayerNonQuestNonFFAConditionalItems.end(); ++itr)
+        for (QuestItemMap::const_iterator itr = PlayerNonQuestNonFFAConditionalItems.begin(); itr != PlayerNonQuestNonFFAConditionalItems.end(); ++itr)
             delete itr->second;
         PlayerNonQuestNonFFAConditionalItems.clear();
 

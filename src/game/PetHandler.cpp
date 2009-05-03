@@ -175,7 +175,7 @@ void WorldSession::HandlePetAction( WorldPacket & recv_data )
                 return;
             }
 
-            for(uint32 i = 0; i < 3;i++)
+            for(uint32 i = 0; i < 3;++i)
             {
                 if(spellInfo->EffectImplicitTargetA[i] == TARGET_ALL_ENEMY_IN_AREA || spellInfo->EffectImplicitTargetA[i] == TARGET_ALL_ENEMY_IN_AREA_INSTANT || spellInfo->EffectImplicitTargetA[i] == TARGET_ALL_ENEMY_IN_AREA_CHANNELED)
                     return;
@@ -194,10 +194,19 @@ void WorldSession::HandlePetAction( WorldPacket & recv_data )
             //auto turn to target unless possessed
             if(result == SPELL_FAILED_UNIT_NOT_INFRONT && !pet->HasAuraType(SPELL_AURA_MOD_POSSESS))
             {
-                pet->SetInFront(unit_target);
-                if( unit_target->GetTypeId() == TYPEID_PLAYER )
-                    pet->SendUpdateToPlayer( (Player*)unit_target );
-                if(Unit* powner = pet->GetCharmerOrOwner())
+                if(unit_target)
+                {
+                    pet->SetInFront(unit_target);
+                    if (unit_target->GetTypeId() == TYPEID_PLAYER)
+                        pet->SendUpdateToPlayer( (Player*)unit_target );
+                }
+                else if(Unit *unit_target2 = spell->m_targets.getUnitTarget())
+                {
+                    pet->SetInFront(unit_target2);
+                    if (unit_target2->GetTypeId() == TYPEID_PLAYER)
+                        pet->SendUpdateToPlayer( (Player*)unit_target2 );
+                }
+                if (Unit* powner = pet->GetCharmerOrOwner())
                     if(powner->GetTypeId() == TYPEID_PLAYER)
                         pet->SendUpdateToPlayer((Player*)powner);
                 result = SPELL_CAST_OK;
@@ -245,6 +254,8 @@ void WorldSession::HandlePetAction( WorldPacket & recv_data )
                     {
                         case SPELL_FAILED_REQUIRES_SPELL_FOCUS:
                             data << uint32(spellInfo->RequiresSpellFocus);
+                            break;
+                        default:
                             break;
                     }
                     SendPacket(&data);
@@ -340,7 +351,7 @@ void WorldSession::HandlePetSetAction( WorldPacket & recv_data )
     }
 
     count = (recv_data.size() == 24) ? 2 : 1;
-    for(uint8 i = 0; i < count; i++)
+    for(uint8 i = 0; i < count; ++i)
     {
         recv_data >> position;
         recv_data >> spell_id;

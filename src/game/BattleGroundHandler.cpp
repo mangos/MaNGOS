@@ -110,9 +110,9 @@ void WorldSession::HandleBattleGroundJoinOpcode( WorldPacket & recv_data )
         return;
 
     // get bg instance or bg template if instance not found
-    BattleGround * bg = NULL;
+    BattleGround *bg = NULL;
     if (instanceId)
-        BattleGround *bg = sBattleGroundMgr.GetBattleGroundThroughClientInstance(instanceId, bgTypeId, _player->GetBattleGroundQueueIdFromLevel(bgTypeId));
+        bg = sBattleGroundMgr.GetBattleGroundThroughClientInstance(instanceId, bgTypeId);
 
     if (!bg && !(bg = sBattleGroundMgr.GetBattleGroundTemplate(bgTypeId)))
     {
@@ -228,7 +228,7 @@ void WorldSession::HandleBattleGroundPlayerPositionsOpcode( WorldPacket & /*recv
 
                 WorldPacket data(MSG_BATTLEGROUND_PLAYER_POSITIONS, (4+4+16*count1+16*count2));
                 data << count1;                                     // alliance flag holders count - obsolete, now always 0
-                /*for(uint8 i = 0; i < count1; i++)
+                /*for(uint8 i = 0; i < count1; ++i)
                 {
                     data << uint64(0);                              // guid
                     data << (float)0;                               // x
@@ -330,7 +330,7 @@ void WorldSession::HandleBattleGroundPlayerPortOpcode( WorldPacket &recv_data )
         if (_player->InBattleGroundQueue())
         {
             // update all queues, send invitation info if player is invited, queue info if queued
-            for (uint32 i = 0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; i++)
+            for (uint32 i = 0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
             {
                 BattleGroundQueueTypeId bgQueueTypeId = _player->GetBattleGroundQueueTypeId(i);
                 if (!bgQueueTypeId)
@@ -345,7 +345,6 @@ void WorldSession::HandleBattleGroundPlayerPortOpcode( WorldPacket &recv_data )
                 BattleGround * bg = NULL;
                 // get possibly needed data from groupinfo
                 uint8 arenatype = itrPlayerStatus->second.GroupInfo->ArenaType;
-                uint8 israted = itrPlayerStatus->second.GroupInfo->IsRated;
                 uint8 status = 0;
 
                 if (!itrPlayerStatus->second.GroupInfo->IsInvitedToBGInstanceGUID)
@@ -357,7 +356,7 @@ void WorldSession::HandleBattleGroundPlayerPortOpcode( WorldPacket &recv_data )
                 else
                 {
                     // get the bg we're invited to
-                    BattleGround * bg = sBattleGroundMgr.GetBattleGround(itrPlayerStatus->second.GroupInfo->IsInvitedToBGInstanceGUID, bgTypeId);
+                    bg = sBattleGroundMgr.GetBattleGround(itrPlayerStatus->second.GroupInfo->IsInvitedToBGInstanceGUID, bgTypeId);
                     status = STATUS_WAIT_JOIN;
                 }
 
@@ -532,7 +531,7 @@ void WorldSession::HandleBattlefieldStatusOpcode( WorldPacket & /*recv_data*/ )
     WorldPacket data;
     // we must update all queues here
     BattleGround *bg = NULL;
-    for (uint8 i = 0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; i++)
+    for (uint8 i = 0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
     {
         BattleGroundQueueTypeId bgQueueTypeId = _player->GetBattleGroundQueueTypeId(i);
         if (!bgQueueTypeId)
@@ -571,7 +570,7 @@ void WorldSession::HandleBattlefieldStatusOpcode( WorldPacket & /*recv_data*/ )
         }
         else
         {
-            BattleGround *bg = sBattleGroundMgr.GetBattleGroundTemplate(bgTypeId);
+            bg = sBattleGroundMgr.GetBattleGroundTemplate(bgTypeId);
             if (!bg)
                 continue;
             uint32 avgTime = sBattleGroundMgr.m_BattleGroundQueues[bgQueueTypeId].GetAverageQueueWaitTime(itrPlayerStatus->second.GroupInfo, _player->GetBattleGroundQueueIdFromLevel(bgTypeId));
