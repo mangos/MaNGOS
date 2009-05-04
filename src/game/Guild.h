@@ -26,6 +26,14 @@
 
 class Item;
 
+uint32 GuildBankTabPrice[GUILD_BANK_MAX_TABS] =
+{ 100,250,500,1000,2500,5000 };
+
+inline uint32 GetGuildBankTabPrice(uint8 Index)
+{
+    return Index < GUILD_BANK_MAX_TABS ? GuildBankTabPrice[Index] : 0;
+}
+
 enum GuildDefaultRanks
 {
     GR_GUILDMASTER  = 0,
