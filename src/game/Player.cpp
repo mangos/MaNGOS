@@ -18700,14 +18700,17 @@ void Player::RewardPlayerAndGroupAtEvent(uint32 creature_id, WorldObject* pRewar
 
 bool Player::IsAtGroupRewardDistance(WorldObject const* pRewardSource) const
 {
-    if(pRewardSource->GetDistance(this) <= sWorld.getConfig(CONFIG_GROUP_XP_DISTANCE))
+    if (GetInstanceId() != pRewardSource->GetInstanceId())
+        return false;
+
+    if (pRewardSource->GetDistance(this) <= sWorld.getConfig(CONFIG_GROUP_XP_DISTANCE))
         return true;
 
-    if(isAlive())
+    if (isAlive())
         return false;
 
     Corpse* corpse = GetCorpse();
-    if(!corpse)
+    if (!corpse)
         return false;
 
     return pRewardSource->GetDistance(corpse) <= sWorld.getConfig(CONFIG_GROUP_XP_DISTANCE);
