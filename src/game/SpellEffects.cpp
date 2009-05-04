@@ -5971,9 +5971,7 @@ void Spell::EffectSummonCritter(uint32 i)
 
     critter->AIM_Initialize();
     critter->InitPetCreateSpells();                         // e.g. disgusting oozeling has a create spell as critter...
-    critter->SetMaxHealth(1);
-    critter->SetHealth(1);
-    critter->SetLevel(1);
+    critter->SelectLevel(critter->GetCreatureInfo());       // some summoned creaters have different from 1 DB data for level/hp
 
     // set timer for unsummon
     int32 duration = GetSpellDuration(m_spellInfo);
