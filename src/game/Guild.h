@@ -26,14 +26,6 @@
 
 class Item;
 
-uint32 GuildBankTabPrice[GUILD_BANK_MAX_TABS] =
-{ 100,250,500,1000,2500,5000 };
-
-inline uint32 GetGuildBankTabPrice(uint8 Index)
-{
-    return Index < GUILD_BANK_MAX_TABS ? GuildBankTabPrice[Index] : 0;
-}
-
 enum GuildDefaultRanks
 {
     GR_GUILDMASTER  = 0,
@@ -196,6 +188,22 @@ enum GuildEmblem
     ERR_GUILDEMBLEM_NOTENOUGHMONEY        = 4,
     ERR_GUILDEMBLEM_INVALIDVENDOR         = 5
 };
+
+inline uint32 GetGuildBankTabPrice(uint8 Index)
+{
+    switch(Index)
+    {
+        case 0: return 100;
+        case 1: return 250;
+        case 2: return 500;
+        case 3: return 1000;
+        case 4: return 2500;
+        case 5: return 5000;
+        default:
+            return 0;
+    }
+    return 0;
+}
 
 struct GuildBankEvent
 {
