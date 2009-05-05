@@ -257,6 +257,8 @@ void Unit::SendMonsterMoveWithSpeed(float x, float y, float z, uint32 transitTim
 
 void Unit::SendMonsterMove(float NewPosX, float NewPosY, float NewPosZ, uint8 type, uint32 MovementFlags, uint32 Time, Player* player)
 {
+    float moveTime = Time;
+
     WorldPacket data( SMSG_MONSTER_MOVE, (41 + GetPackGUID().size()) );
     data.append(GetPackGUID());
     data << uint8(0);                                       // new in 3.1
@@ -284,11 +286,12 @@ void Unit::SendMonsterMove(float NewPosX, float NewPosY, float NewPosZ, uint8 ty
             break;
     }
 
-    if(MovementFlags & MONSTER_MOVE_FLAG_SPLINE)            // we shouldn't get here with this flag
-        sLog.outError("SHIT HAPPENED!");
-
     data << uint32(MovementFlags);
-    data << uint32(Time);                                   // Time in between points
+
+    if(MovementFlags & MONSTER_MOVE_WALK)
+        moveTime *= 1.5f;
+
+    data << uint32(moveTime);                               // Time in between points
     data << uint32(1);                                      // 1 single waypoint
     data << NewPosX << NewPosY << NewPosZ;                  // the single waypoint Point B
 

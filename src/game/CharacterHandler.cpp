@@ -1352,3 +1352,14 @@ void WorldSession::HandleEquipmentSetDelete(WorldPacket &recv_data)
 
     _player->DeleteEquipmentSet(setGuid);
 }
+
+void WorldSession::HandleEquipmentSetUse(WorldPacket &recv_data)
+{
+    sLog.outDebug("CMSG_EQUIPMENT_SET_USE");
+    recv_data.hexlike();
+    // for(x) { pguid, uint8, uint8 }
+
+    WorldPacket data(SMSG_EQUIPMENT_SET_USE_RESULT, 1);
+    data << uint8(0);
+    SendPacket(&data);
+}

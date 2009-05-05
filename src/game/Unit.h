@@ -597,18 +597,38 @@ enum MovementFlags
 
 enum MonsterMovementFlags
 {
-    MONSTER_MOVE_FLAG_WALK      = 0x00000000,
-    MONSTER_MOVE_FLAG_UNK1      = 0x00000800,               // float+uint32
-    MONSTER_MOVE_FLAG_RUN       = 0x00001000,
-    MONSTER_MOVE_FLAG_SPLINE    = 0x00002000,               // spline n*(float x,y,z)
-    MONSTER_MOVE_FLAG_SPLINE2   = 0x00040000,               // spline n*(float x,y,z)
-    MONSTER_MOVE_FLAG_UNK2      = 0x00080000,
-    MONSTER_MOVE_FLAG_UNK3      = 0x00100000,
-    MONSTER_MOVE_FLAG_UNK4      = 0x00200000,               // uint8+uint32
+    MONSTER_MOVE_NONE           = 0x00000000,
+    MONSTER_MOVE_FORWARD        = 0x00000001,
+    MONSTER_MOVE_BACKWARD       = 0x00000002,
+    MONSTER_MOVE_STRAFE_LEFT    = 0x00000004,
+    MONSTER_MOVE_STRAFE_RIGHT   = 0x00000008,
+    MONSTER_MOVE_LEFT           = 0x00000010,               // turn
+    MONSTER_MOVE_RIGHT          = 0x00000020,               // turn
+    MONSTER_MOVE_PITCH_UP       = 0x00000040,
+    MONSTER_MOVE_PITCH_DOWN     = 0x00000080,
+    MONSTER_MOVE_TELEPORT       = 0x00000100,
+    MONSTER_MOVE_TELEPORT2      = 0x00000200,
+    MONSTER_MOVE_LEVITATING     = 0x00000400,
+    MONSTER_MOVE_UNK1           = 0x00000800,               // float+uint32
+    MONSTER_MOVE_WALK           = 0x00001000,               // run2?
+    MONSTER_MOVE_SPLINE         = 0x00002000,               // spline n*(float x,y,z)
+    // 0x4000, 0x8000, 0x10000, 0x20000 run
+    MONSTER_MOVE_SPLINE2        = 0x00040000,               // spline n*(float x,y,z)
+    MONSTER_MOVE_UNK2           = 0x00080000,               // used for flying mobs
+    MONSTER_MOVE_UNK3           = 0x00100000,               // used for flying mobs
+    MONSTER_MOVE_UNK4           = 0x00200000,               // uint8+uint32
+    MONSTER_MOVE_UNK5           = 0x00400000,               // run in place, then teleport to final point
+    MONSTER_MOVE_UNK6           = 0x00800000,               // teleport
+    MONSTER_MOVE_UNK7           = 0x01000000,               // run
+    MONSTER_MOVE_FLY            = 0x02000000,               // swimming/flying (depends on mob?)
+    MONSTER_MOVE_UNK9           = 0x04000000,               // run
+    MONSTER_MOVE_UNK10          = 0x08000000,               // run
+    MONSTER_MOVE_UNK11          = 0x10000000,               // run
+    MONSTER_MOVE_UNK12          = 0x20000000,               // run
+    MONSTER_MOVE_UNK13          = 0x40000000,               // levitating
 
     // masks
-    MONSTER_MOVE_FLAG_SPLINE_FLY= 0x00003000,               // fly by points
-    MONSTER_MOVE_FLAG_TEST_FLY  = 0x00180000                // found these flags on flying mob with MONSTER_MOVE_FLAG_SPLINE in same time
+    MONSTER_MOVE_SPLINE_FLY     = 0x00003000,               // fly by points
 };
 
 enum DiminishingLevels

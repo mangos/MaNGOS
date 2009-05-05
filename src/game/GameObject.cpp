@@ -637,8 +637,6 @@ uint32 GameObject::GetLootId(GameObjectInfo const* ginfo)
             return ginfo->chest.lootId;
         case GAMEOBJECT_TYPE_FISHINGHOLE:
             return ginfo->fishinghole.lootId;
-        case GAMEOBJECT_TYPE_FISHINGNODE:
-            return ginfo->fishnode.lootId;
         default:
             return 0;
     }

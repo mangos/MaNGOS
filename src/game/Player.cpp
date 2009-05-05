@@ -17787,6 +17787,7 @@ void Player::SendInitialPacketsBeforeAddToMap()
     data.Initialize(SMSG_LOGIN_SETTIMESPEED, 8);
     data << uint32(secsToTimeBitFields(sWorld.GetGameTime()));
     data << (float)0.01666667f;                             // game speed
+    data << uint32(0);                                      // added in 3.1.2
     GetSession()->SendPacket( &data );
 
     // set fly flag if in fly form or taxi flight to prevent visually drop at ground in showup moment

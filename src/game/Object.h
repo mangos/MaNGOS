@@ -46,9 +46,7 @@ enum TypeMask
     TYPEMASK_PLAYER         = 0x0010,
     TYPEMASK_GAMEOBJECT     = 0x0020,
     TYPEMASK_DYNAMICOBJECT  = 0x0040,
-    TYPEMASK_CORPSE         = 0x0080,
-    TYPEMASK_AIGROUP        = 0x0100,
-    TYPEMASK_AREATRIGGER    = 0x0200
+    TYPEMASK_CORPSE         = 0x0080
 };
 
 enum TypeID
@@ -60,11 +58,10 @@ enum TypeID
     TYPEID_PLAYER        = 4,
     TYPEID_GAMEOBJECT    = 5,
     TYPEID_DYNAMICOBJECT = 6,
-    TYPEID_CORPSE        = 7,
-    TYPEID_AIGROUP       = 8,
-    TYPEID_AREATRIGGER   = 9
+    TYPEID_CORPSE        = 7
 };
-#define MAX_TYPEID         10
+
+#define NUM_CLIENT_OBJECT_TYPES             8
 
 uint32 GuidHigh2TypeId(uint32 guid_hi);
 

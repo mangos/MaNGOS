@@ -109,7 +109,7 @@ bool WaypointMovementGenerator<Creature>::Update(Creature &creature, const uint3
             // Now we re-set destination to same node and start travel
             creature.addUnitState(UNIT_STAT_ROAMING);
             if (creature.canFly())
-                creature.AddUnitMovementFlag(MONSTER_MOVE_FLAG_TEST_FLY);
+                creature.AddUnitMovementFlag(MONSTER_MOVE_FLY);
             const WaypointNode &node = i_path->at(i_currentNode);
             i_destinationHolder.SetDestination(traveller, node.x, node.y, node.z);
             i_nextMoveTime.Reset(i_destinationHolder.GetTotalTravelTime());
@@ -172,7 +172,7 @@ bool WaypointMovementGenerator<Creature>::Update(Creature &creature, const uint3
         {
             creature.addUnitState(UNIT_STAT_ROAMING);
             if (creature.canFly())
-                creature.AddUnitMovementFlag(MONSTER_MOVE_FLAG_TEST_FLY);
+                creature.AddUnitMovementFlag(MONSTER_MOVE_FLY);
             const WaypointNode &node = i_path->at(i_currentNode);
             i_destinationHolder.SetDestination(traveller, node.x, node.y, node.z);
             i_nextMoveTime.Reset(i_destinationHolder.GetTotalTravelTime());
@@ -240,7 +240,7 @@ void FlightPathMovementGenerator::Initialize(Player &player)
     // do not send movement, it was sent already
     i_destinationHolder.SetDestination(traveller, i_path[i_currentNode].x, i_path[i_currentNode].y, i_path[i_currentNode].z, false);
 
-    player.SendMonsterMoveByPath(GetPath(),GetCurrentNode(),GetPathAtMapEnd(),MONSTER_MOVE_FLAG_SPLINE_FLY);
+    player.SendMonsterMoveByPath(GetPath(),GetCurrentNode(),GetPathAtMapEnd(),MONSTER_MOVE_SPLINE_FLY);
 }
 
 void FlightPathMovementGenerator::Finalize(Player & player)
@@ -261,7 +261,7 @@ void FlightPathMovementGenerator::Finalize(Player & player)
         if(player.pvpInfo.inHostileArea)
             player.CastSpell(&player, 2479, true);
 
-        player.SetUnitMovementFlags(MONSTER_MOVE_FLAG_WALK);
+        player.SetUnitMovementFlags(MONSTER_MOVE_WALK);
         player.StopMoving();
     }
 }

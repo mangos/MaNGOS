@@ -65,7 +65,7 @@ ConfusedMovementGenerator<T>::Initialize(T &unit)
     }
 
     unit.StopMoving();
-    unit.RemoveUnitMovementFlag(MOVEMENTFLAG_WALK_MODE);
+    unit.RemoveUnitMovementFlag(MONSTER_MOVE_WALK);
     unit.addUnitState(UNIT_STAT_CONFUSED);
 }
 

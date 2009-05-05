@@ -71,9 +71,9 @@ inline uint32 Traveller<T>::GetTotalTrevelTimeTo(float x, float y, float z)
 template<>
 inline float Traveller<Creature>::Speed()
 {
-    if(i_traveller.HasUnitMovementFlag(MONSTER_MOVE_FLAG_WALK))
+    if(i_traveller.HasUnitMovementFlag(MONSTER_MOVE_WALK))
         return i_traveller.GetSpeed(MOVE_WALK);
-    else if(i_traveller.HasUnitMovementFlag(MONSTER_MOVE_FLAG_TEST_FLY))
+    else if(i_traveller.HasUnitMovementFlag(MONSTER_MOVE_FLY))
         return i_traveller.GetSpeed(MOVE_FLIGHT);
     else
         return i_traveller.GetSpeed(MOVE_RUN);
@@ -138,7 +138,7 @@ template<>
 inline void Traveller<Player>::MoveTo(float x, float y, float z, uint32 t)
 {
     //Only send MOVEMENTFLAG_WALK_MODE, client has strange issues with other move flags
-    i_traveller.SendMonsterMove(x, y, z, 0, MONSTER_MOVE_FLAG_WALK, t);
+    i_traveller.SendMonsterMove(x, y, z, 0, MONSTER_MOVE_WALK, t);
 }
 
 typedef Traveller<Creature> CreatureTraveller;
