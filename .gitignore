@@ -9,56 +9,66 @@
 #
 # Normal rules
 #
-
-compile
-FILES
-INSTALL
-
-*.pyc
-*.[oa]
-*.lo
-*.loT
-*.la
-*.laT
+.*
+*.o
+*.o.*
+*.a
 *.so
-*.bak
-*.dist
-.deps
-.libs
-*~
-.*.swp
-Makefile.in
-Makefile
+*.so.dbg
+*.bin
+*.gz
 
-core
-core.*
-!core.h
-vgcore*
+#
+# Top-level generic files
+#
+tags
+TAGS
+INSTALL
+!.gitignore
 
-doc/html
-doc/Doxyfile
-doc/doxygen.log
-
+#
+# Build generated files
+#
 aclocal.m4
 autom4te.cache
+compile
 config.guess
 config.h.in
+config.log
+config.status
 config.sub
 configure
 depcomp
+libtool
 install-sh
 ltmain.sh
 missing
-config.log
-config.status
-libtool
 stamp-h1
 
+Makefile.in
+Makefile
+
+#
+# Editors / debuggers / other output files
+#
+*~
+*.bak
+*.orig
+*.patch
 callgrind.out.*
 
 #
+# Git stuff
 #
-# MaNGOS generated files
-#
+# stgit directories
+patches-*
 
+#
+# VS binaries output
+#
 bin/*
+
+#
+# Special exceptions
+#
+!dep/ACE_wrappers/ace/ace_message_table.bin

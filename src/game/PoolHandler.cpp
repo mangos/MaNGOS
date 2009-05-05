@@ -322,7 +322,7 @@ bool PoolGroup<GameObject>::ReSpawn1Object(uint32 guid)
 
 // Nothing to do for a child Pool
 template <>
-bool PoolGroup<Pool>::ReSpawn1Object(uint32 guid)
+bool PoolGroup<Pool>::ReSpawn1Object(uint32 /*guid*/)
 {
     return true;
 }
@@ -623,6 +623,7 @@ void PoolHandler::Initialize()
             SpawnPool(pool_entry);
             count++;
         } while (result->NextRow());
+        delete result;
     }
 
     sLog.outBasic("Pool handling system initialized, %u pools spawned.", count);

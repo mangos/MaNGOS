@@ -1263,6 +1263,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         {
             SetUInt32Value (PLAYER_FIELD_COINAGE, value);
             MoneyChanged( value );
+            UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_GOLD_VALUE_OWNED);
         }
 
         uint32 GetTutorialInt(uint32 intId )
@@ -1436,7 +1437,7 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         bool addActionButton(uint8 button, uint16 action, uint8 type, uint8 misc);
         void removeActionButton(uint8 button);
-        void SendInitialActionButtons();
+        void SendInitialActionButtons() const;
 
         PvPInfo pvpInfo;
         void UpdatePvP(bool state, bool ovrride=false);

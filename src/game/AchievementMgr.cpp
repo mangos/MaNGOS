@@ -562,6 +562,12 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
         {
             // std. case: increment at 1
             case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_DAILY_QUEST:
+            case ACHIEVEMENT_CRITERIA_TYPE_NUMBER_OF_TALENT_RESETS:
+            case ACHIEVEMENT_CRITERIA_TYPE_WIN_DUEL:
+            case ACHIEVEMENT_CRITERIA_TYPE_LOSE_DUEL:
+            case ACHIEVEMENT_CRITERIA_TYPE_QUEST_ABANDONED:
+            case ACHIEVEMENT_CRITERIA_TYPE_FLIGHT_PATHS_TAKEN:
+            case ACHIEVEMENT_CRITERIA_TYPE_ACCEPTED_SUMMONINGS:
                 // AchievementMgr::UpdateAchievementCriteria might also be called on login - skip in this case
                 if(!miscvalue1)
                     continue;
@@ -1125,6 +1131,9 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
             case ACHIEVEMENT_CRITERIA_TYPE_EARN_HONORABLE_KILL:
                 SetCriteriaProgress(achievementCriteria, GetPlayer()->GetUInt32Value(PLAYER_FIELD_LIFETIME_HONORBALE_KILLS));
                 break;
+            case ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_GOLD_VALUE_OWNED:
+                SetCriteriaProgress(achievementCriteria, GetPlayer()->GetMoney(), PROGRESS_HIGHEST);
+                break;
             // std case: not exist in DBC, not triggered in code as result
             case ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_HEALTH:
             case ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_SPELLPOWER:
@@ -1151,23 +1160,16 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
             case ACHIEVEMENT_CRITERIA_TYPE_HK_RACE:
             case ACHIEVEMENT_CRITERIA_TYPE_GET_KILLING_BLOWS:
             case ACHIEVEMENT_CRITERIA_TYPE_MONEY_FROM_VENDORS:
-            case ACHIEVEMENT_CRITERIA_TYPE_NUMBER_OF_TALENT_RESETS:
             case ACHIEVEMENT_CRITERIA_TYPE_SPECIAL_PVP_KILL:
             case ACHIEVEMENT_CRITERIA_TYPE_EARNED_PVP_TITLE:
-            case ACHIEVEMENT_CRITERIA_TYPE_WIN_DUEL:
-            case ACHIEVEMENT_CRITERIA_TYPE_LOSE_DUEL:
             case ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE_TYPE:
             case ACHIEVEMENT_CRITERIA_TYPE_GOLD_EARNED_BY_AUCTIONS:
             case ACHIEVEMENT_CRITERIA_TYPE_CREATE_AUCTION:
             case ACHIEVEMENT_CRITERIA_TYPE_WON_AUCTIONS:
-            case ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_GOLD_VALUE_OWNED:
             case ACHIEVEMENT_CRITERIA_TYPE_LOOT_EPIC_ITEM:
             case ACHIEVEMENT_CRITERIA_TYPE_RECEIVE_EPIC_ITEM:
             case ACHIEVEMENT_CRITERIA_TYPE_ROLL_NEED:
             case ACHIEVEMENT_CRITERIA_TYPE_ROLL_GREED:
-            case ACHIEVEMENT_CRITERIA_TYPE_QUEST_ABANDONED:
-            case ACHIEVEMENT_CRITERIA_TYPE_FLIGHT_PATHS_TAKEN:
-            case ACHIEVEMENT_CRITERIA_TYPE_ACCEPTED_SUMMONINGS:
             case ACHIEVEMENT_CRITERIA_TYPE_TOTAL:
                 break;                                   // Not implemented yet :(
         }
@@ -1294,6 +1296,8 @@ bool AchievementMgr::IsCompletedCriteria(AchievementCriteriaEntry const* achieve
             return progress->counter >= achievementCriteria->fish_in_gameobject.lootCount;
         case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILLLINE_SPELLS:
             return progress->counter >= achievementCriteria->learn_skillline_spell.spellCount;
+        case ACHIEVEMENT_CRITERIA_TYPE_WIN_DUEL:
+            return progress->counter >= achievementCriteria->win_duel.duelCount;
         case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILL_LINE:
             return progress->counter >= achievementCriteria->learn_skill_line.spellCount;
         case ACHIEVEMENT_CRITERIA_TYPE_EARN_HONORABLE_KILL:
@@ -1308,16 +1312,22 @@ bool AchievementMgr::IsCompletedCriteria(AchievementCriteriaEntry const* achieve
         case ACHIEVEMENT_CRITERIA_TYPE_KILLED_BY_PLAYER:
         case ACHIEVEMENT_CRITERIA_TYPE_DEATHS_FROM:
         case ACHIEVEMENT_CRITERIA_TYPE_GOLD_SPENT_FOR_TALENTS:
+        case ACHIEVEMENT_CRITERIA_TYPE_NUMBER_OF_TALENT_RESETS:
         case ACHIEVEMENT_CRITERIA_TYPE_GOLD_SPENT_AT_BARBER:
         case ACHIEVEMENT_CRITERIA_TYPE_GOLD_SPENT_FOR_MAIL:
+        case ACHIEVEMENT_CRITERIA_TYPE_LOSE_DUEL:
         case ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_AUCTION_BID:
         case ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_AUCTION_SOLD:
+        case ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_GOLD_VALUE_OWNED:
         case ACHIEVEMENT_CRITERIA_TYPE_GAIN_REVERED_REPUTATION:
         case ACHIEVEMENT_CRITERIA_TYPE_GAIN_HONORED_REPUTATION:
         case ACHIEVEMENT_CRITERIA_TYPE_KNOWN_FACTIONS:
         case ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_HEALTH:
         case ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_SPELLPOWER:
         case ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_ARMOR:
+        case ACHIEVEMENT_CRITERIA_TYPE_QUEST_ABANDONED:
+        case ACHIEVEMENT_CRITERIA_TYPE_FLIGHT_PATHS_TAKEN:
+        case ACHIEVEMENT_CRITERIA_TYPE_ACCEPTED_SUMMONINGS:
             return false;
     }
     return false;

@@ -43,9 +43,9 @@ class MANGOS_DLL_SPEC PointMovementGenerator
 
         bool GetDestination(float& x, float& y, float& z) const { x=i_x; y=i_y; z=i_z; return true; }
     private:
-        TimeTracker i_nextMoveTime;
-        float i_x,i_y,i_z;
         uint32 id;
+        float i_x,i_y,i_z;
+        TimeTracker i_nextMoveTime;
         DestinationHolder< Traveller<T> > i_destinationHolder;
 };
 #endif
