@@ -1263,6 +1263,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         {
             SetUInt32Value (PLAYER_FIELD_COINAGE, value);
             MoneyChanged( value );
+            UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_GOLD_VALUE_OWNED);
         }
 
         uint32 GetTutorialInt(uint32 intId )
