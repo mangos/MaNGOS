@@ -38,8 +38,8 @@ char const* petTypeSuffix[MAX_PET_TYPE] =
 };
 
 Pet::Pet(PetType type) :
-Creature(), m_petType(type), m_removed(false), m_happinessTimer(7500), m_duration(0), m_bonusdamage(0),
-m_resetTalentsCost(0), m_resetTalentsTime(0), m_usedTalentCount(0), m_auraUpdateMask(0), m_loading(false),
+Creature(), m_removed(false), m_petType(type), m_happinessTimer(7500), m_duration(0), m_resetTalentsCost(0),
+m_bonusdamage(0), m_resetTalentsTime(0), m_usedTalentCount(0), m_auraUpdateMask(0), m_loading(false),
 m_declinedname(NULL)
 {
     m_isPet = true;
@@ -1278,6 +1278,12 @@ bool Pet::addSpell(uint32 spell_id, uint16 active, PetSpellState state, PetSpell
         {
             // can be in case spell loading but learned at some previous spell loading
             itr->second->state = PETSPELL_UNCHANGED;
+
+            if(active == ACT_ENABLED)
+                ToggleAutocast(spell_id, true);
+            else if(active == ACT_DISABLED)
+                ToggleAutocast(spell_id, false);
+
             return false;
         }
         else
@@ -1677,8 +1683,13 @@ void Pet::ToggleAutocast(uint32 spellid, bool apply)
         if (i == m_autospells.size())
         {
             m_autospells.push_back(spellid);
-            itr->second->active = ACT_ENABLED;
-            itr->second->state = PETSPELL_CHANGED;
+
+            if(itr->second->active != ACT_ENABLED)
+            {
+                itr->second->active = ACT_ENABLED;
+                if(itr->second->state != PETSPELL_NEW)
+                    itr->second->state = PETSPELL_CHANGED;
+            }
         }
     }
     else
@@ -1690,8 +1701,12 @@ void Pet::ToggleAutocast(uint32 spellid, bool apply)
         if (i < m_autospells.size())
         {
             m_autospells.erase(itr2);
-            itr->second->active = ACT_DISABLED;
-            itr->second->state = PETSPELL_CHANGED;
+            if(itr->second->active != ACT_DISABLED)
+            {
+                itr->second->active = ACT_DISABLED;
+                if(itr->second->state != PETSPELL_NEW)
+                    itr->second->state = PETSPELL_CHANGED;
+            }
         }
     }
 }

@@ -1573,7 +1573,7 @@ void WorldSession::HandleGuildBankBuyTab( WorldPacket & recv_data )
     if(!pGuild)
         return;
 
-    uint32 TabCost = objmgr.GetGuildBankTabPrice(TabId) * GOLD;
+    uint32 TabCost = GetGuildBankTabPrice(TabId) * GOLD;
     if (!TabCost)
         return;
 

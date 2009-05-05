@@ -48,8 +48,8 @@ class MANGOS_DLL_DECL PetAI : public CreatureAI
 
         void UpdateAllies();
 
-        bool inCombat;
         TimeTracker i_tracker;
+        bool inCombat;
         std::set<uint64> m_AllySet;
         uint32 m_updateAlliesTimer;
 

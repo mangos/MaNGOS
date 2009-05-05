@@ -1868,6 +1868,7 @@ void Player::Regenerate(Powers power)
         }   break;
         case POWER_FOCUS:
         case POWER_HAPPINESS:
+        case POWER_HEALTH:
             break;
     }
 
@@ -1957,8 +1958,8 @@ Player::GetNPCIfCanInteractWith(uint64 guid, uint32 npcflagmask)
     if(!IsInWorld())
         return NULL;
 
-    // exist
-    Creature *unit = GetMap()->GetCreature(guid);
+    // exist (we need look pets also for some interaction (quest/etc)
+    Creature *unit = ObjectAccessor::GetCreatureOrPetOrVehicle(*this,guid);
     if (!unit)
         return NULL;
 
@@ -1974,8 +1975,8 @@ Player::GetNPCIfCanInteractWith(uint64 guid, uint32 npcflagmask)
     if(!unit->isAlive() && (!unit->isSpiritService() || isAlive() ))
         return NULL;
 
-    // not allow interaction under control
-    if(unit->GetCharmerOrOwnerGUID())
+    // not allow interaction under control, but allow with own pets
+    if(unit->GetCharmerGUID())
         return NULL;
 
     // not enemy
@@ -3420,6 +3421,7 @@ bool Player::resetTalents(bool no_cost)
     {
         ModifyMoney(-(int32)cost);
         GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GOLD_SPENT_FOR_TALENTS, cost);
+        GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_NUMBER_OF_TALENT_RESETS, 1);
 
         m_resetTalentsCost = cost;
         m_resetTalentsTime = time(NULL);
@@ -4807,6 +4809,8 @@ void Player::ApplyRatingMod(CombatRating cr, int32 value, bool apply)
                 UpdateExpertise(OFF_ATTACK);
             }
             break;
+        case CR_ARMOR_PENETRATION:
+            break;
     }
 }
 
@@ -5353,7 +5357,7 @@ int16 Player::GetSkillTempBonusValue(uint32 skill) const
     return 0;
 }
 
-void Player::SendInitialActionButtons()
+void Player::SendInitialActionButtons() const
 {
     sLog.outDetail( "Initializing Action Buttons for '%u'", GetGUIDLow() );
 
@@ -5607,7 +5611,7 @@ uint32 Player::TeamForRace(uint8 race)
         case 1: return HORDE;
     }
 
-    sLog.outError("Race %u have wrong team id in DBC: wrong DBC files?",uint32(race),rEntry->TeamID);
+    sLog.outError("Race %u have wrong teamid %u in DBC: wrong DBC files?",uint32(race),rEntry->TeamID);
     return ALLIANCE;
 }
 
@@ -9651,7 +9655,6 @@ uint8 Player::CanBankItem( uint8 bag, uint8 slot, ItemPosCountVec &dest, Item *p
             if (!pItem->IsBag())
                 return EQUIP_ERR_ITEM_DOESNT_GO_TO_SLOT;
 
-            Bag *pBag = (Bag*)pItem;
             if( !HasBankBagSlot( slot ) )
                 return EQUIP_ERR_MUST_PURCHASE_THAT_BAG_SLOT;
 
@@ -11775,7 +11778,9 @@ void Player::PrepareQuestMenu( uint64 guid )
     Object *pObject;
     QuestRelations* pObjectQR;
     QuestRelations* pObjectQIR;
-    Creature *pCreature = GetMap()->GetCreature(guid);
+
+    // pets also can have quests
+    Creature *pCreature = ObjectAccessor::GetCreatureOrPetOrVehicle(*this,guid);
     if( pCreature )
     {
         pObject = (Object*)pCreature;
@@ -11861,7 +11866,9 @@ void Player::SendPreparedQuest( uint64 guid )
         qe._Delay = 0;
         qe._Emote = 0;
         std::string title = "";
-        Creature *pCreature = GetMap()->GetCreature(guid);
+
+        // need pet case for some quests
+        Creature *pCreature = ObjectAccessor::GetCreatureOrPetOrVehicle(*this,guid);
         if( pCreature )
         {
             uint32 textid = pCreature->GetNpcTextId();
@@ -11925,7 +11932,7 @@ Quest const * Player::GetNextQuest( uint64 guid, Quest const *pQuest )
     QuestRelations* pObjectQR;
     QuestRelations* pObjectQIR;
 
-    Creature *pCreature = GetMap()->GetCreature(guid);
+    Creature *pCreature = ObjectAccessor::GetCreatureOrPetOrVehicle(*this,guid);
     if( pCreature )
     {
         pObject = (Object*)pCreature;
@@ -12988,7 +12995,6 @@ void Player::AdjustQuestReqItemCount( Quest const* pQuest, QuestStatusData& ques
             uint32 reqitemcount = pQuest->ReqItemCount[i];
             if( reqitemcount != 0 )
             {
-                uint32 quest_id = pQuest->GetQuestId();
                 uint32 curitemcount = GetItemCount(pQuest->ReqItemId[i],true);
 
                 questStatusData.m_itemcount[i] = std::min(curitemcount, reqitemcount);
@@ -18475,7 +18481,7 @@ uint32 Player::GetResurrectionSpellId()
                 case 27239: spell_id = 27240; break;        // rank 6
                 case 47883: spell_id = 47882; break;        // rank 7
                 default:
-                    sLog.outError("Unhandled spell %%u: S.Resurrection",(*itr)->GetId());
+                    sLog.outError("Unhandled spell %u: S.Resurrection",(*itr)->GetId());
                     continue;
             }
 
@@ -18639,17 +18645,17 @@ void Player::RewardPlayerAndGroupAtEvent(uint32 creature_id, WorldObject* pRewar
 
 bool Player::IsAtGroupRewardDistance(WorldObject const* pRewardSource) const
 {
-    if(pRewardSource->GetDistance(this) <= sWorld.getConfig(CONFIG_GROUP_XP_DISTANCE))
+    if (pRewardSource->IsWithinDistInMap(this,sWorld.getConfig(CONFIG_GROUP_XP_DISTANCE)))
         return true;
 
-    if(isAlive())
+    if (isAlive())
         return false;
 
     Corpse* corpse = GetCorpse();
-    if(!corpse)
+    if (!corpse)
         return false;
 
-    return pRewardSource->GetDistance(corpse) <= sWorld.getConfig(CONFIG_GROUP_XP_DISTANCE);
+    return pRewardSource->IsWithinDistInMap(corpse,sWorld.getConfig(CONFIG_GROUP_XP_DISTANCE));
 }
 
 uint32 Player::GetBaseWeaponSkillValue (WeaponAttackType attType) const

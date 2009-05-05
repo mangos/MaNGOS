@@ -124,14 +124,6 @@ ObjectMgr::ObjectMgr()
     m_arenaTeamId       = 1;
     m_auctionid         = 1;
 
-    mGuildBankTabPrice.resize(GUILD_BANK_MAX_TABS);
-    mGuildBankTabPrice[0] = 100;
-    mGuildBankTabPrice[1] = 250;
-    mGuildBankTabPrice[2] = 500;
-    mGuildBankTabPrice[3] = 1000;
-    mGuildBankTabPrice[4] = 2500;
-    mGuildBankTabPrice[5] = 5000;
-
     // Only zero condition left, others will be added while loading DB tables
     mConditions.resize(1);
 }
@@ -4848,8 +4840,10 @@ WorldSafeLocsEntry const *ObjectMgr::GetClosestGraveYard(float x, float y, float
         if(MapId != entry->map_id)
         {
             // if find graveyard at different map from where entrance placed (or no entrance data), use any first
-            if (!mapEntry || mapEntry->entrance_map < 0 || mapEntry->entrance_map != entry->map_id ||
-                mapEntry->entrance_x == 0 && mapEntry->entrance_y == 0)
+            if (!mapEntry ||
+                 mapEntry->entrance_map < 0 ||
+                 mapEntry->entrance_map != entry->map_id ||
+                (mapEntry->entrance_x == 0 && mapEntry->entrance_y == 0))
             {
                 // not have any corrdinates for check distance anyway
                 entryFar = entry;
@@ -6833,6 +6827,8 @@ bool PlayerCondition::IsValid(ConditionType condition, uint32 value1, uint32 val
             }
             break;
         }
+        case CONDITION_NONE:
+            break;
     }
     return true;
 }
