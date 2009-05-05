@@ -289,7 +289,7 @@ void Unit::SendMonsterMove(float NewPosX, float NewPosY, float NewPosZ, uint8 ty
     data << uint32(MovementFlags);
 
     if(MovementFlags & MONSTER_MOVE_WALK)
-        moveTime *= 1.5f;
+        moveTime *= 1.4f;
 
     data << uint32(moveTime);                               // Time in between points
     data << uint32(1);                                      // 1 single waypoint

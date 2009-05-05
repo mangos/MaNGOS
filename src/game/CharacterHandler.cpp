@@ -1357,9 +1357,23 @@ void WorldSession::HandleEquipmentSetUse(WorldPacket &recv_data)
 {
     sLog.outDebug("CMSG_EQUIPMENT_SET_USE");
     recv_data.hexlike();
-    // for(x) { pguid, uint8, uint8 }
+
+    for(uint32 i = 0; i < EQUIPMENT_SLOT_END; ++i)
+    {
+        uint64 itemGuid;
+        if(!recv_data.readPackGUID(itemGuid))
+            return;
+
+        CHECK_PACKET_SIZE(recv_data, recv_data.rpos()+1+1);
+
+        uint8 dstbag, dstslot;
+        recv_data >> dstbag >> dstslot;
+
+        // so we have itemGuid, bag and slot here...
+        // if guid == 1, unequip item?
+    }
 
     WorldPacket data(SMSG_EQUIPMENT_SET_USE_RESULT, 1);
-    data << uint8(0);
+    data << uint8(0);                                       // 4 - equipment swap failed - inventory is full
     SendPacket(&data);
 }
