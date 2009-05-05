@@ -16196,7 +16196,7 @@ bool Player::HasGuardianWithEntry(uint32 entry)
     for(GuardianPetList::const_iterator itr = m_guardianPets.begin(); itr != m_guardianPets.end(); ++itr)
     {
         if(Pet* pet = ObjectAccessor::GetPet(*itr))
-            if (Pet->GetEntry() == entry)
+            if (pet->GetEntry() == entry)
                 return true;
     }
 
