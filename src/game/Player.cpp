@@ -16194,8 +16194,11 @@ bool Player::HasGuardianWithEntry(uint32 entry)
     // pet guid middle part is entry (and creature also)
     // and in guardian list must be guardians with same entry _always_
     for(GuardianPetList::const_iterator itr = m_guardianPets.begin(); itr != m_guardianPets.end(); ++itr)
-        if(GUID_ENPART(*itr)==entry)
-            return true;
+    {
+        if(Pet* pet = ObjectAccessor::GetPet(*itr))
+            if (Pet->GetEntry() == entry)
+                return true;
+    }
 
     return false;
 }
