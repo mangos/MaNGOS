@@ -3526,6 +3526,7 @@ void Aura::HandleAuraModStun(bool apply, bool Real)
 void Aura::HandleModStealth(bool apply, bool Real)
 {
     Unit* pTarget = m_target;
+    SpellEntry const* pSpellInfo = GetSpellProto();
 
     if (apply)
     {
@@ -3561,7 +3562,7 @@ void Aura::HandleModStealth(bool apply, bool Real)
                         pTarget->CastCustomSpell(pTarget,31665,&bp,NULL,NULL,true);
                     }
                     // Overkill
-                    else if ((*i)->GetId() == 58426 && GetSpellProto()->SpellFamilyFlags & 0x0000000000400000LL)
+                    else if ((*i)->GetId() == 58426 && pSpellInfo->SpellFamilyFlags & 0x0000000000400000LL)
                     {
                         pTarget->RemoveAurasDueToSpell(58428);
                         pTarget->CastSpell(pTarget, 58427, true);
@@ -3601,7 +3602,7 @@ void Aura::HandleModStealth(bool apply, bool Real)
                 if ((*i)->GetSpellProto()->SpellIconID == 2114)
                     pTarget->CastSpell(pTarget,31666,true);
                 // Overkill
-                else if ((*i)->GetId() == 58426 && GetSpellProto()->SpellFamilyFlags & 0x0000000000400000LL)
+                else if ((*i)->GetId() == 58426 && pSpellInfo->SpellFamilyFlags & 0x0000000000400000LL)
                     pTarget->CastSpell(pTarget, 58428, true);
             }
         }
