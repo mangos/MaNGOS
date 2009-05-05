@@ -3986,21 +3986,26 @@ void Aura::HandleModMechanicImmunity(bool apply, bool /*Real*/)
     if(GetId()==42292 || GetId()==59752)
         mechanic=IMMUNE_TO_MOVEMENT_IMPAIRMENT_AND_LOSS_CONTROL_MASK;
 
-    if(apply && GetSpellProto()->AttributesEx & SPELL_ATTR_EX_DISPEL_AURAS_ON_IMMUNITY)
+    // cache values in local vars for prevent access to possible deleted aura data
+    SpellEntry const* spellInfo = GetSpellProto();
+    uint32 misc     = m_modifier.m_miscvalue;
+    Unit*  target   = m_target;
+
+    if(apply && spellInfo->AttributesEx & SPELL_ATTR_EX_DISPEL_AURAS_ON_IMMUNITY)
     {
-        Unit::AuraMap& Auras = m_target->GetAuras();
+        Unit::AuraMap& Auras = target->GetAuras();
         for(Unit::AuraMap::iterator iter = Auras.begin(), next; iter != Auras.end(); iter = next)
         {
             next = iter;
             ++next;
             SpellEntry const *spell = iter->second->GetSpellProto();
             if (!( spell->Attributes & SPELL_ATTR_UNAFFECTED_BY_INVULNERABILITY) && // spells unaffected by invulnerability
-                   spell->Id != GetId())
+                   spell->Id != spellInfo->Id)
             {
                 //check for mechanic mask
                 if(GetSpellMechanicMask(spell, iter->second->GetEffIndex()) & mechanic)
                 {
-                    m_target->RemoveAurasDueToSpell(spell->Id);
+                    target->RemoveAurasDueToSpell(spell->Id);
                     if(Auras.empty())
                         break;
                     else
@@ -4010,19 +4015,19 @@ void Aura::HandleModMechanicImmunity(bool apply, bool /*Real*/)
         }
     }
 
-    m_target->ApplySpellImmune(GetId(),IMMUNITY_MECHANIC,m_modifier.m_miscvalue,apply);
+    target->ApplySpellImmune(spellInfo->Id,IMMUNITY_MECHANIC,misc,apply);
 
     // Bestial Wrath
-    if ( GetSpellProto()->SpellFamilyName == SPELLFAMILY_HUNTER && GetSpellProto()->SpellIconID == 1680)
+    if (spellInfo->SpellFamilyName == SPELLFAMILY_HUNTER && spellInfo->SpellIconID == 1680)
     {
         // The Beast Within cast on owner if talent present
-        if ( Unit* owner = m_target->GetOwner() )
+        if (Unit* owner = target->GetOwner())
         {
             // Search talent
-            Unit::AuraList const& m_dummyAuras = owner->GetAurasByType(SPELL_AURA_DUMMY);
-            for(Unit::AuraList::const_iterator i = m_dummyAuras.begin(); i != m_dummyAuras.end(); ++i)
+            Unit::AuraList const& dummyAuras = owner->GetAurasByType(SPELL_AURA_DUMMY);
+            for(Unit::AuraList::const_iterator i = dummyAuras.begin(); i != dummyAuras.end(); ++i)
             {
-                if ( (*i)->GetSpellProto()->SpellIconID == 2229 )
+                if ((*i)->GetSpellProto()->SpellIconID == 2229)
                 {
                     if (apply)
                         owner->CastSpell(owner, 34471, true, 0, this);
@@ -4035,21 +4040,21 @@ void Aura::HandleModMechanicImmunity(bool apply, bool /*Real*/)
     }
 
     // The Beast Within and Bestial Wrath - immunity
-    if(GetId() == 19574 || GetId() == 34471)
+    if (spellInfo->Id == 19574 || spellInfo->Id == 34471)
     {
-        if(apply)
+        if (apply)
         {
-            m_target->CastSpell(m_target,24395,true);
-            m_target->CastSpell(m_target,24396,true);
-            m_target->CastSpell(m_target,24397,true);
-            m_target->CastSpell(m_target,26592,true);
+            target->CastSpell(target,24395,true);
+            target->CastSpell(target,24396,true);
+            target->CastSpell(target,24397,true);
+            target->CastSpell(target,26592,true);
         }
         else
         {
-            m_target->RemoveAurasDueToSpell(24395);
-            m_target->RemoveAurasDueToSpell(24396);
-            m_target->RemoveAurasDueToSpell(24397);
-            m_target->RemoveAurasDueToSpell(26592);
+            target->RemoveAurasDueToSpell(24395);
+            target->RemoveAurasDueToSpell(24396);
+            target->RemoveAurasDueToSpell(24397);
+            target->RemoveAurasDueToSpell(26592);
         }
     }
 }
