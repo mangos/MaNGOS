@@ -5317,6 +5317,16 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
         }
         case SPELLFAMILY_HUNTER:
         {
+            // Aspect of the Viper
+            if ( dummySpell->SpellFamilyFlags & 0x4000000000000LL )
+            {
+                uint32 maxmana = GetMaxPower(POWER_MANA);
+                basepoints0 = maxmana* GetAttackTime(RANGED_ATTACK)/1000.0f/100.0f;
+
+                target = this;
+                triggered_spell_id = 34075;
+                break;
+            }
             // Thrill of the Hunt
             if ( dummySpell->SpellIconID == 2236 )
             {
@@ -10608,6 +10618,7 @@ void Unit::ProcDamageAndSpellFor( bool isVictim, Unit * pTarget, uint32 procFlag
                 break;
             }
             case SPELL_AURA_MANA_SHIELD:
+            case SPELL_AURA_OBS_MOD_MANA:
             case SPELL_AURA_DUMMY:
             {
                 sLog.outDebug("ProcDamageAndSpell: casting spell id %u (triggered by %s dummy aura of spell %u)", spellInfo->Id,(isVictim?"a victim's":"an attacker's"), triggeredByAura->GetId());
