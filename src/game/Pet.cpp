@@ -1637,6 +1637,12 @@ void Pet::InitTalentForLevel()
         resetTalents(true);
     }
     SetFreeTalentPoints(talentPointsForLevel - m_usedTalentCount);
+
+    Unit *owner = GetOwner();
+    if (!owner || owner->GetTypeId() != TYPEID_PLAYER)
+        return;
+
+    ((Player*)owner)->SendTalentsInfoData(true);
 }
 
 uint32 Pet::resetTalentsCost() const

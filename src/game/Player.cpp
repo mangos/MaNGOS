@@ -2327,6 +2327,8 @@ void Player::InitTalentForLevel()
         else
             SetFreeTalentPoints(talentPointsForLevel-m_usedTalentCount);
     }
+
+    SendTalentsInfoData(false);                             // update at client
 }
 
 void Player::InitStatsForLevel(bool reapplyMods)
@@ -19920,6 +19922,9 @@ void Player::BuildPetTalentsInfoData(WorldPacket *data)
 
 void Player::SendTalentsInfoData(bool pet)
 {
+    if(GetSession()->PlayerLoading())
+        return;
+
     WorldPacket data(SMSG_TALENTS_INFO, 50);
     data << uint8(pet ? 1 : 0);
     if(pet)
