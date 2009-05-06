@@ -208,7 +208,7 @@ void Group::ConvertToRaid()
     // update quest related GO states (quest activity dependent from raid membership)
     for(member_citerator citr = m_memberSlots.begin(); citr != m_memberSlots.end(); ++citr)
         if(Player* player = objmgr.GetPlayer(citr->guid))
-            player->UpdateForQuestsGO();
+            player->UpdateForQuestWorldObjects();
 }
 
 bool Group::AddInvite(Player *player)
@@ -302,7 +302,7 @@ bool Group::AddMember(const uint64 &guid, const char* name)
 
         // quest related GO state dependent from raid memebership
         if(isRaidGroup())
-            player->UpdateForQuestsGO();
+            player->UpdateForQuestWorldObjects();
     }
 
     return true;
@@ -319,7 +319,7 @@ uint32 Group::RemoveMember(const uint64 &guid, const uint8 &method)
         {
             // quest related GO state dependent from raid membership
             if(isRaidGroup())
-                player->UpdateForQuestsGO();
+                player->UpdateForQuestWorldObjects();
 
             WorldPacket data;
 
@@ -400,7 +400,7 @@ void Group::Disband(bool hideDestroy)
 
         // quest related GO state dependent from raid membership
         if(isRaidGroup())
-            player->UpdateForQuestsGO();
+            player->UpdateForQuestWorldObjects();
 
         if(!player->GetSession())
             continue;
