@@ -1620,6 +1620,9 @@ void Unit::CalcAbsorbResist(Unit *pVictim,SpellSchoolMask schoolMask, DamageEffe
     // Reflect damage spells (not cast any damage spell in aura lookup)
     uint32 reflectSpell = 0;
     int32  reflectDamage = 0;
+    // Death Prevention Aura
+    SpellEntry const*  preventDeathSpell = NULL;
+    int32  preventDeathAmount = 0;
     // Need remove expired auras after
     bool existExpired = false;
     // absorb without mana cost
@@ -1635,7 +1638,7 @@ void Unit::CalcAbsorbResist(Unit *pVictim,SpellSchoolMask schoolMask, DamageEffe
         // Max Amount can be absorbed by this aura
         int32  currentAbsorb = mod->m_amount;
 
-        // Found empty aura (umpossible but..)
+        // Found empty aura (impossible but..)
         if (currentAbsorb <=0)
         {
             existExpired = true;
@@ -1706,26 +1709,29 @@ void Unit::CalcAbsorbResist(Unit *pVictim,SpellSchoolMask schoolMask, DamageEffe
             }
             case SPELLFAMILY_ROGUE:
             {
-                // Cheat Death
-                if(spellProto->SpellIconID == 2109)
+                // Cheat Death (make less prio with Guardian Spirit case)
+                if (!preventDeathSpell && spellProto->SpellIconID == 2109 &&
+                    pVictim->GetTypeId()==TYPEID_PLAYER &&  // Only players
+                    !((Player*)pVictim)->HasSpellCooldown(31231) &&
+                                                            // Only if no cooldown
+                    roll_chance_i((*i)->GetModifier()->m_amount))
+                                                            // Only if roll
                 {
-                    if (pVictim->GetTypeId()==TYPEID_PLAYER &&            // Only players
-                        pVictim->GetHealth() <= RemainingDamage &&        // Only if damage kill
-                        !((Player*)pVictim)->HasSpellCooldown(31231) &&   // Only if no cooldown
-                        roll_chance_i(currentAbsorb))                     // Only if roll
-                    {
-                        pVictim->CastSpell(pVictim,31231,true);
-                        ((Player*)pVictim)->AddSpellCooldown(31231,0,time(NULL)+60);
-                        // with health > 10% lost health until health==10%, in other case no losses
-                        uint32 health10 = pVictim->GetMaxHealth()/10;
-                        RemainingDamage = pVictim->GetHealth() > health10 ? pVictim->GetHealth() - health10 : 0;
-                    }
+                    preventDeathSpell = (*i)->GetSpellProto();
                     continue;
                 }
                 break;
             }
             case SPELLFAMILY_PRIEST:
             {
+                // Guardian Spirit
+                if (spellProto->SpellIconID == 2873)
+                {
+                    preventDeathSpell = (*i)->GetSpellProto();
+                    preventDeathAmount = (*i)->GetModifier()->m_amount;
+                    continue;
+                }
+
                 // Reflective Shield
                 if (spellProto->SpellFamilyFlags == 0x1)
                 {
@@ -1841,6 +1847,7 @@ void Unit::CalcAbsorbResist(Unit *pVictim,SpellSchoolMask schoolMask, DamageEffe
                 ++i;
         }
     }
+
     // Cast back reflect damage spell
     if (reflectSpell)
         pVictim->CastCustomSpell(this,  reflectSpell, &reflectDamage, NULL, NULL, true);
@@ -1935,6 +1942,41 @@ void Unit::CalcAbsorbResist(Unit *pVictim,SpellSchoolMask schoolMask, DamageEffe
 
             CleanDamage cleanDamage = CleanDamage(splitted, BASE_ATTACK, MELEE_HIT_NORMAL);
             DealDamage(caster, splitted, &cleanDamage, DIRECT_DAMAGE, schoolMask, (*i)->GetSpellProto(), false);
+        }
+    }
+
+    // Apply death prevention spells effects
+    if (preventDeathSpell && RemainingDamage >= pVictim->GetHealth())
+    {
+        switch(preventDeathSpell->SpellFamilyName)
+        {
+            // Cheat Death
+            case SPELLFAMILY_ROGUE:
+            {
+                // Cheat Death
+                if (preventDeathSpell->SpellIconID == 2109)
+                {
+                    pVictim->CastSpell(pVictim,31231,true);
+                    ((Player*)pVictim)->AddSpellCooldown(31231,0,time(NULL)+60);
+                    // with health > 10% lost health until health==10%, in other case no losses
+                    uint32 health10 = pVictim->GetMaxHealth()/10;
+                    RemainingDamage = pVictim->GetHealth() > health10 ? pVictim->GetHealth() - health10 : 0;
+                }
+                break;
+            }
+            // Guardian Spirit
+            case SPELLFAMILY_PRIEST:
+            {
+                // Guardian Spirit
+                if (preventDeathSpell->SpellIconID == 2873)
+                {
+                    int32 healAmount = pVictim->GetMaxHealth() * preventDeathAmount / 100;
+                    pVictim->CastCustomSpell(pVictim, 48153, &healAmount, NULL, NULL, true);
+                    pVictim->RemoveAurasDueToSpell(preventDeathSpell->Id);
+                    RemainingDamage = 0;
+                }
+                break;
+            }
         }
     }
 
@@ -5924,7 +5966,7 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
             if (dummySpell->Id == 49005)
             {
                 // TODO: need more info (cooldowns/PPM)
-                triggered_spell_id = 50424;
+                triggered_spell_id = 61607;
                 break;
             }
             // Vendetta

@@ -2307,6 +2307,7 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
             switch(GetId())
             {
                 case 34246:                                 // Idol of the Emerald Queen
+                case 60779:                                 // Idol of Lush Moss
                 {
                     if (m_target->GetTypeId() != TYPEID_PLAYER)
                         return;
