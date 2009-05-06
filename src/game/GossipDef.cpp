@@ -748,8 +748,7 @@ void PlayerMenu::SendQuestGiverRequestItems( Quest const *pQuest, uint64 npcGUID
         }
     }
 
-    // We may wish a better check, perhaps checking the real quest requirements
-    if (RequestItemsText.empty())
+    if (!pQuest->GetReqItemsCount() && Completable)
     {
         SendQuestGiverOfferReward(pQuest, npcGUID, true);
         return;

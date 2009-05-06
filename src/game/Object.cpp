@@ -453,7 +453,7 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint16 flags, uint32 flags2
     }
     else
     {
-        if(flags & UPDATEFLAG_UNK1)
+        if(flags & UPDATEFLAG_POSITION)
         {
             *data << uint8(0);                              // unk PGUID!
             *data << ((WorldObject*)this)->GetPositionX();
@@ -572,7 +572,7 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint16 flags, uint32 flags2
     }
 
     // 0x200
-    if(flags & UPDATEFLAG_UNK2)
+    if(flags & UPDATEFLAG_ROTATION)
     {
         *data << uint64(((GameObject*)this)->GetRotation());
     }

@@ -1366,11 +1366,38 @@ void WorldSession::HandleEquipmentSetUse(WorldPacket &recv_data)
 
         CHECK_PACKET_SIZE(recv_data, recv_data.rpos()+1+1);
 
-        uint8 dstbag, dstslot;
-        recv_data >> dstbag >> dstslot;
+        uint8 srcbag, srcslot;
+        recv_data >> srcbag >> srcslot;
 
-        // so we have itemGuid, bag and slot here...
-        // if guid == 1, unequip item?
+        sLog.outDebug("Item " I64FMT ": srcbag %u, srcslot %u", itemGuid, srcbag, srcslot);
+
+        Item *item = _player->GetItemByGuid(itemGuid);
+
+        uint16 dstpos = i | (INVENTORY_SLOT_BAG_0 << 8);
+
+        if(!item)
+        {
+            Item *uItem = _player->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
+            if(!uItem)
+                continue;
+
+            ItemPosCountVec sDest;
+            uint8 msg = _player->CanStoreItem( NULL_BAG, NULL_SLOT, sDest, uItem, false );
+            if(msg == EQUIP_ERR_OK)
+            {
+                _player->RemoveItem(INVENTORY_SLOT_BAG_0, i, true);
+                _player->StoreItem( sDest, uItem, true );
+            }
+            else
+                _player->SendEquipError(msg, uItem, NULL);
+
+            continue;
+        }
+
+        if(item->GetPos() == dstpos)
+            continue;
+
+        _player->SwapItem(item->GetPos(), dstpos);
     }
 
     WorldPacket data(SMSG_EQUIPMENT_SET_USE_RESULT, 1);
