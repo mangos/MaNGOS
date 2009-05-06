@@ -5959,7 +5959,7 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
             if (dummySpell->Id == 49005)
             {
                 // TODO: need more info (cooldowns/PPM)
-                triggered_spell_id = 50424;
+                triggered_spell_id = 61607;
                 break;
             }
             // Vendetta
