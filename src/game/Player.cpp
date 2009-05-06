@@ -20134,7 +20134,6 @@ void Player::_SaveEquipmentSets()
                 break;
         }
     }
-    return false;
 }
 
 void Player::DeleteEquipmentSet(uint64 setGuid)
@@ -20147,3 +20146,4 @@ void Player::DeleteEquipmentSet(uint64 setGuid)
             break;
         }
     }
+}
