@@ -6155,7 +6155,7 @@ void Spell::EffectSummonDeadPet(uint32 /*i*/)
 
 void Spell::EffectDestroyAllTotems(uint32 /*i*/)
 {
-    uint32 mana = 0;
+    int32 mana = 0;
     for(int slot = 0;  slot < MAX_TOTEM; ++slot)
     {
         if(!m_caster->m_TotemSlot[slot])
