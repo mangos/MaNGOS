@@ -181,10 +181,7 @@ bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool 
         return true;
     }
 
-    if (getPetType() == HUNTER_PET || (getPetType() == SUMMON_PET && cinfo->type == CREATURE_TYPE_DEMON && owner->getClass() == CLASS_WARLOCK))
-        m_charmInfo->SetPetNumber(pet_number, true);
-    else
-        m_charmInfo->SetPetNumber(pet_number, false);
+    m_charmInfo->SetPetNumber(pet_number, IsPermanentPetFor(owner));
 
     SetOwnerGUID(owner->GetGUID());
     SetDisplayId(fields[3].GetUInt32());
@@ -552,17 +549,25 @@ void Pet::Update(uint32 diff)
                 }
             }
 
-            if(getPetType() != HUNTER_PET)
-                break;
-
-            //regenerate Focus
+            //regenerate focus for hunter pets or energy for deathknight's ghoul
             if(m_regenTimer <= diff)
             {
-                RegenerateFocus();
+                switch (getPowerType())
+                {
+                    case POWER_FOCUS:
+                    case POWER_ENERGY:
+                        Regenerate(getPowerType());
+                        break;
+                    default:
+                        break;
+                }
                 m_regenTimer = 4000;
             }
             else
                 m_regenTimer -= diff;
+
+            if(getPetType() != HUNTER_PET)
+                break;
 
             if(m_happinessTimer <= diff)
             {
@@ -580,22 +585,41 @@ void Pet::Update(uint32 diff)
     Creature::Update(diff);
 }
 
-void Pet::RegenerateFocus()
+void Pet::Regenerate(Powers power)
 {
-    uint32 curValue = GetPower(POWER_FOCUS);
-    uint32 maxValue = GetMaxPower(POWER_FOCUS);
+    uint32 curValue = GetPower(power);
+    uint32 maxValue = GetMaxPower(power);
 
     if (curValue >= maxValue)
         return;
 
-    float addvalue = 24 * sWorld.getRate(RATE_POWER_FOCUS);
+    float addvalue = 0.0f;
 
+    switch (power)
+    {
+        case POWER_FOCUS:
+        {
+            // For hunter pets.
+            addvalue = 24 * sWorld.getRate(RATE_POWER_FOCUS);
+            break;
+        }
+        case POWER_ENERGY:
+        {
+            // For deathknight's ghoul.
+            addvalue = 20;
+            break;
+        }
+        default:
+            return;
+    }
+
+    // Apply modifiers (if any).
     AuraList const& ModPowerRegenPCTAuras = GetAurasByType(SPELL_AURA_MOD_POWER_REGEN_PERCENT);
     for(AuraList::const_iterator i = ModPowerRegenPCTAuras.begin(); i != ModPowerRegenPCTAuras.end(); ++i)
-        if ((*i)->GetModifier()->m_miscvalue == POWER_FOCUS)
+        if ((*i)->GetModifier()->m_miscvalue == power)
             addvalue *= ((*i)->GetModifier()->m_amount + 100) / 100.0f;
 
-    ModifyPower(POWER_FOCUS, (int32)addvalue);
+    ModifyPower(power, (int32)addvalue);
 }
 
 void Pet::LooseHappiness()
@@ -1711,6 +1735,27 @@ void Pet::ToggleAutocast(uint32 spellid, bool apply)
     }
 }
 
+bool Pet::IsPermanentPetFor(Player* owner)
+{
+    switch(getPetType())
+    {
+        case SUMMON_PET:
+            switch(owner->getClass())
+            {
+                case CLASS_WARLOCK:
+                    return GetCreatureInfo()->type == CREATURE_TYPE_DEMON;
+                case CLASS_DEATH_KNIGHT:
+                    return GetCreatureInfo()->type == CREATURE_TYPE_UNDEAD;
+                default:
+                    return false;
+            }
+        case HUNTER_PET:
+            return true;
+        default:
+            return false;
+    }
+}
+
 bool Pet::Create(uint32 guidlow, Map *map, uint32 phaseMask, uint32 Entry, uint32 pet_number)
 {
     SetMapId(map->GetId());
@@ -1761,10 +1806,10 @@ void Pet::LearnPetPassives()
 void Pet::CastPetAuras(bool current)
 {
     Unit* owner = GetOwner();
-    if(!owner)
+    if(!owner || owner->GetTypeId()!=TYPEID_PLAYER)
         return;
 
-    if(getPetType() != HUNTER_PET && (getPetType() != SUMMON_PET || owner->getClass() != CLASS_WARLOCK))
+    if(!IsPermanentPetFor((Player*)owner))
         return;
 
     for(PetAuraSet::const_iterator itr = owner->m_petAuras.begin(); itr != owner->m_petAuras.end();)
