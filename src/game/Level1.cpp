@@ -1681,12 +1681,12 @@ bool ChatHandler::HandleModifyMoneyCommand(const char* args)
 
     uint32 moneyuser = chr->GetMoney();
 
-    if(addmoney < 0)
+    if (addmoney < 0)
     {
-        int32 newmoney = moneyuser + addmoney;
+        int32 newmoney = int32(moneyuser) + addmoney;
 
         sLog.outDetail(GetMangosString(LANG_CURRENT_MONEY), moneyuser, addmoney, newmoney);
-        if(newmoney <= 0 )
+        if (newmoney <= 0 )
         {
             PSendSysMessage(LANG_YOU_TAKE_ALL_MONEY, GetNameLink(chr).c_str());
             if (needReportToTarget(chr))
@@ -1696,6 +1696,9 @@ bool ChatHandler::HandleModifyMoneyCommand(const char* args)
         }
         else
         {
+            if (newmoney > MAX_MONEY_AMOUNT)
+                newmoney = MAX_MONEY_AMOUNT;
+
             PSendSysMessage(LANG_YOU_TAKE_MONEY, abs(addmoney), GetNameLink(chr).c_str());
             if (needReportToTarget(chr))
                 ChatHandler(chr).PSendSysMessage(LANG_YOURS_MONEY_TAKEN, GetNameLink().c_str(), abs(addmoney));
@@ -1707,7 +1710,11 @@ bool ChatHandler::HandleModifyMoneyCommand(const char* args)
         PSendSysMessage(LANG_YOU_GIVE_MONEY, addmoney, GetNameLink(chr).c_str());
         if (needReportToTarget(chr))
             ChatHandler(chr).PSendSysMessage(LANG_YOURS_MONEY_GIVEN, GetNameLink().c_str(), addmoney);
-        chr->ModifyMoney( addmoney );
+
+        if (addmoney >=MAX_MONEY_AMOUNT)
+            chr->SetMoney(MAX_MONEY_AMOUNT);
+        else
+            chr->ModifyMoney( addmoney );
     }
 
     sLog.outDetail(GetMangosString(LANG_NEW_MONEY), moneyuser, addmoney, chr->GetMoney() );
