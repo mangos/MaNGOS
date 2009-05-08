@@ -1308,18 +1308,18 @@ void WorldSession::HandleEquipmentSetSave(WorldPacket &recv_data)
     if(!recv_data.readPackGUID(setGuid))
         return;
 
-    CHECK_PACKET_SIZE(recv_data, recv_data.rpos()+4);
+    CHECK_PACKET_SIZE(recv_data, recv_data.rpos() + 4);
 
     uint32 index;
     recv_data >> index;
     if(index >= MAX_EQUIPMENT_SET_INDEX)                    // client set slots amount
         return;
 
-    CHECK_PACKET_SIZE(recv_data, recv_data.rpos()+1);
+    CHECK_PACKET_SIZE(recv_data, recv_data.rpos() + 1);
     std::string name;
     recv_data >> name;
 
-    CHECK_PACKET_SIZE(recv_data, recv_data.rpos()+1);
+    CHECK_PACKET_SIZE(recv_data, recv_data.rpos() + 1);
     std::string iconName;
     recv_data >> iconName;
 
@@ -1336,10 +1336,18 @@ void WorldSession::HandleEquipmentSetSave(WorldPacket &recv_data)
         if(!recv_data.readPackGUID(itemGuid))
             return;
 
+        Item *item = _player->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
+
+        if(!item && itemGuid)                               // cheating check 1
+            return;
+
+        if(item && item->GetGUID() != itemGuid)             // cheating check 2
+            return;
+
         eqSet.Items[i] = GUID_LOPART(itemGuid);
     }
 
-    _player->SetEquipmentSet(index,eqSet);
+    _player->SetEquipmentSet(index, eqSet);
 }
 
 void WorldSession::HandleEquipmentSetDelete(WorldPacket &recv_data)

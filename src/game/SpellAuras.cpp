@@ -3142,9 +3142,8 @@ void Aura::HandleModPossess(bool apply, bool Real)
             ((Player*)caster)->SetFarSightGUID(0);
             ((Player*)caster)->SetClientControl(m_target,0);
 
-            WorldPacket data(SMSG_PET_SPELLS, 8+4);
+            WorldPacket data(SMSG_PET_SPELLS, 8);
             data << uint64(0);
-            data << uint32(0);
             ((Player*)caster)->GetSession()->SendPacket(&data);
         }
 
@@ -3297,9 +3296,8 @@ void Aura::HandleModCharm(bool apply, bool Real)
 
             if(caster->GetTypeId() == TYPEID_PLAYER)
             {
-                WorldPacket data(SMSG_PET_SPELLS, 8+4);
+                WorldPacket data(SMSG_PET_SPELLS, 8);
                 data << uint64(0);
-                data << uint32(0);
                 ((Player*)caster)->GetSession()->SendPacket(&data);
             }
             if(m_target->GetTypeId() == TYPEID_UNIT)

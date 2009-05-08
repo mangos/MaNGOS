@@ -16108,9 +16108,8 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
 
     if(pet->isControlled())
     {
-        WorldPacket data(SMSG_PET_SPELLS, 8+4);
+        WorldPacket data(SMSG_PET_SPELLS, 8);
         data << uint64(0);
-        data << uint32(0);
         GetSession()->SendPacket(&data);
 
         if(GetGroup())
@@ -16253,9 +16252,9 @@ void Player::PetSpellInitialize()
 
     CharmInfo *charmInfo = pet->GetCharmInfo();
 
-    WorldPacket data(SMSG_PET_SPELLS, 8+4+4+4+10*4);
+    WorldPacket data(SMSG_PET_SPELLS, 8+2+4+4+4*10+1+1);
     data << uint64(pet->GetGUID());
-    data << uint32(pet->GetCreatureInfo()->family);         // creature family (required for pet talents)
+    data << uint16(pet->GetCreatureInfo()->family);         // creature family (required for pet talents)
     data << uint32(0);
     data << uint8(charmInfo->GetReactState()) << uint8(charmInfo->GetCommandState()) << uint16(0);
 
@@ -16330,24 +16329,19 @@ void Player::PossessSpellInitialize()
         return;
     }
 
-    uint8 addlist = 0;
-    WorldPacket data(SMSG_PET_SPELLS, 16+40+1+4*addlist+25);// first line + actionbar + spellcount + spells + last adds
-
-                                                            //16
+    WorldPacket data(SMSG_PET_SPELLS, 8+2+4+4+4*10+1+1);
     data << uint64(charm->GetGUID());
-    data << uint32(0x00000000);
+    data << uint16(0);
     data << uint32(0);
     data << uint32(0);
 
-    for(uint32 i = 0; i < 10; ++i)                          //40
+    for(uint32 i = 0; i < 10; ++i)
     {
         data << uint16(charmInfo->GetActionBarEntry(i)->SpellOrAction) << uint16(charmInfo->GetActionBarEntry(i)->Type);
     }
 
-    data << uint8(addlist);                                 //1
-
-    uint8 count = 0;
-    data << uint8(count);                                   // cooldowns count
+    data << uint8(0);                                       // spells count
+    data << uint8(0);                                       // cooldowns count
 
     GetSession()->SendPacket(&data);
 }
@@ -16382,23 +16376,22 @@ void Player::CharmSpellInitialize()
         }
     }
 
-    WorldPacket data(SMSG_PET_SPELLS, 16+40+1+4*addlist+25);// first line + actionbar + spellcount + spells + last adds
-
+    WorldPacket data(SMSG_PET_SPELLS, 8+2+4+4+4*10+1+4*addlist+1);
     data << uint64(charm->GetGUID());
-    data << uint32(0x00000000);
-    data << uint32(0);
-    if(charm->GetTypeId() != TYPEID_PLAYER)
-        data << uint8(charmInfo->GetReactState()) << uint8(charmInfo->GetCommandState());
-    else
-        data << uint8(0) << uint8(0);
     data << uint16(0);
+    data << uint32(0);
 
-    for(uint32 i = 0; i < 10; ++i)                          //40
+    if(charm->GetTypeId() != TYPEID_PLAYER)
+        data << uint8(charmInfo->GetReactState()) << uint8(charmInfo->GetCommandState()) << uint16(0);
+    else
+        data << uint8(0) << uint8(0) << uint16(0);
+
+    for(uint32 i = 0; i < 10; ++i)
     {
         data << uint16(charmInfo->GetActionBarEntry(i)->SpellOrAction) << uint16(charmInfo->GetActionBarEntry(i)->Type);
     }
 
-    data << uint8(addlist);                                 //1
+    data << uint8(addlist);
 
     if(addlist)
     {
@@ -16413,8 +16406,7 @@ void Player::CharmSpellInitialize()
         }
     }
 
-    uint8 count = 0;
-    data << uint8(count);                                   // cooldowns count
+    data << uint8(0);                                       // cooldowns count
 
     GetSession()->SendPacket(&data);
 }
@@ -19156,10 +19148,10 @@ void Player::EnterVehicle(Vehicle *vehicle)
     data << uint32(0);                                      // fall time
     GetSession()->SendPacket(&data);
 
-    data.Initialize(SMSG_PET_SPELLS, 8+4+4+4+4*10+1+1);
+    data.Initialize(SMSG_PET_SPELLS, 8+2+4+4+4*10+1+1);
     data << uint64(vehicle->GetGUID());
-    data << uint32(0x00000000);
-    data << uint32(0x00000000);
+    data << uint16(0);
+    data << uint32(0);
     data << uint32(0x00000101);
 
     for(uint32 i = 0; i < 10; ++i)
@@ -19195,9 +19187,8 @@ void Player::ExitVehicle(Vehicle *vehicle)
     data << uint32(0);                                      // fall time
     GetSession()->SendPacket(&data);
 
-    data.Initialize(SMSG_PET_SPELLS, 8+4);
+    data.Initialize(SMSG_PET_SPELLS, 8);
     data << uint64(0);
-    data << uint32(0);
     GetSession()->SendPacket(&data);
 
     // maybe called at dummy aura remove?
@@ -20066,7 +20057,7 @@ void Player::SendEquipmentSetList()
 
         ++count;                                            // client have limit but it checked at loading and set
     }
-    data.put<uint32>(count_pos,count);
+    data.put<uint32>(count_pos, count);
     GetSession()->SendPacket(&data);
 }
 
@@ -20102,7 +20093,7 @@ void Player::SetEquipmentSet(uint32 index, EquipmentSet eqset)
     {
         eqslot.Guid = objmgr.GenerateEquipmentSetGuid();
 
-        WorldPacket data(SMSG_EQUIPMENT_SET_SAVED, 4+1);
+        WorldPacket data(SMSG_EQUIPMENT_SET_SAVED, 4 + 1);
         data << uint32(index);
         data.appendPackGUID(eqslot.Guid);
         GetSession()->SendPacket(&data);
