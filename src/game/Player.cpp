@@ -593,6 +593,7 @@ bool Player::Create( uint32 guidlow, const std::string& name, uint8 race, uint8 
 
     SetUInt64Value( PLAYER__FIELD_KNOWN_TITLES, 0 );        // 0=disabled
     SetUInt64Value( PLAYER__FIELD_KNOWN_TITLES1, 0 );       // 0=disabled
+    SetUInt64Value( PLAYER__FIELD_KNOWN_TITLES2, 0 );       // 0=disabled
     SetUInt32Value( PLAYER_CHOSEN_TITLE, 0 );
     SetUInt32Value( PLAYER_FIELD_KILLS, 0 );
     SetUInt32Value( PLAYER_FIELD_LIFETIME_HONORBALE_KILLS, 0 );
@@ -14189,7 +14190,7 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
     if(uint32 curTitle = GetUInt32Value(PLAYER_CHOSEN_TITLE))
     {
         if(!HasTitle(curTitle))
-            SetUInt32Value(PLAYER_CHOSEN_TITLE,0);
+            SetUInt32Value(PLAYER_CHOSEN_TITLE, 0);
     }
 
     // Not finish taxi flight path
@@ -19160,7 +19161,7 @@ void Player::EnterVehicle(Vehicle *vehicle)
     vehicle->setFaction(getFaction());
 
     SetCharm(vehicle);                                      // charm
-    SetFarSightGUID(vehicle->GetGUID());                        // set view
+    SetFarSightGUID(vehicle->GetGUID());                    // set view
 
     SetClientControl(vehicle, 1);                           // redirect controls to vehicle
 
@@ -19252,19 +19253,19 @@ bool Player::isTotalImmune()
 
 bool Player::HasTitle(uint32 bitIndex)
 {
-    if (bitIndex > 128)
+    if (bitIndex > 192)
         return false;
 
-    uint32 fieldIndexOffset = bitIndex/32;
-    uint32 flag = 1 << (bitIndex%32);
-    return HasFlag(PLAYER__FIELD_KNOWN_TITLES+fieldIndexOffset, flag);
+    uint32 fieldIndexOffset = bitIndex / 32;
+    uint32 flag = 1 << (bitIndex % 32);
+    return HasFlag(PLAYER__FIELD_KNOWN_TITLES + fieldIndexOffset, flag);
 }
 
 void Player::SetTitle(CharTitlesEntry const* title)
 {
-    uint32 fieldIndexOffset = title->bit_index/32;
-    uint32 flag = 1 << (title->bit_index%32);
-    SetFlag(PLAYER__FIELD_KNOWN_TITLES+fieldIndexOffset, flag);
+    uint32 fieldIndexOffset = title->bit_index / 32;
+    uint32 flag = 1 << (title->bit_index % 32);
+    SetFlag(PLAYER__FIELD_KNOWN_TITLES + fieldIndexOffset, flag);
 }
 
 void Player::ConvertRune(uint8 index, uint8 newType)
@@ -19893,60 +19894,64 @@ void Player::BuildPlayerTalentsInfoData(WorldPacket *data)
 {
     *data << uint32(GetFreeTalentPoints());                 // unspentTalentPoints
     uint8 talentGroupCount = 1;
-    *data << uint8(talentGroupCount);                       // talent group count (1 or 2)
+    *data << uint8(talentGroupCount);                       // talent group count (0, 1 or 2)
     *data << uint8(0);                                      // talent group index (0 or 1)
 
     if(talentGroupCount)
     {
-        uint8 talentIdCount = 0;
-        size_t pos = data->wpos();
-        *data << uint8(talentIdCount);                      // [PH], talentIdCount
-
-        // find class talent tabs (all players have 3 talent tabs)
-        uint32 const* talentTabIds = GetTalentTabPages(getClass());
-
-        for(uint32 i = 0; i < 3; ++i)
+        // loop through all specs (only 1 for now)
+        for(uint32 groups = 0; groups < talentGroupCount; ++groups)
         {
-            uint32 talentTabId = talentTabIds[i];
+            uint8 talentIdCount = 0;
+            size_t pos = data->wpos();
+            *data << uint8(talentIdCount);                  // [PH], talentIdCount
 
-            for(uint32 talentId = 0; talentId < sTalentStore.GetNumRows(); ++talentId)
+            // find class talent tabs (all players have 3 talent tabs)
+            uint32 const* talentTabIds = GetTalentTabPages(getClass());
+
+            for(uint32 i = 0; i < 3; ++i)
             {
-                TalentEntry const* talentInfo = sTalentStore.LookupEntry(talentId);
-                if(!talentInfo)
-                    continue;
+                uint32 talentTabId = talentTabIds[i];
 
-                // skip another tab talents
-                if(talentInfo->TalentTab != talentTabId)
-                    continue;
-
-                // find max talent rank
-                int32 curtalent_maxrank = -1;
-                for(int32 k = 4; k > -1; --k)
+                for(uint32 talentId = 0; talentId < sTalentStore.GetNumRows(); ++talentId)
                 {
-                    if(talentInfo->RankID[k] && HasSpell(talentInfo->RankID[k]))
+                    TalentEntry const* talentInfo = sTalentStore.LookupEntry(talentId);
+                    if(!talentInfo)
+                        continue;
+
+                    // skip another tab talents
+                    if(talentInfo->TalentTab != talentTabId)
+                        continue;
+
+                    // find max talent rank
+                    int32 curtalent_maxrank = -1;
+                    for(int32 k = 4; k > -1; --k)
                     {
-                        curtalent_maxrank = k;
-                        break;
+                        if(talentInfo->RankID[k] && HasSpell(talentInfo->RankID[k]))
+                        {
+                            curtalent_maxrank = k;
+                            break;
+                        }
                     }
+
+                    // not learned talent
+                    if(curtalent_maxrank < 0)
+                        continue;
+
+                    *data << uint32(talentInfo->TalentID);  // Talent.dbc
+                    *data << uint8(curtalent_maxrank);      // talentMaxRank (0-4)
+
+                    ++talentIdCount;
                 }
-
-                // not learned talent
-                if(curtalent_maxrank < 0)
-                    continue;
-
-                *data << uint32(talentInfo->TalentID);      // Talent.dbc
-                *data << uint8(curtalent_maxrank);          // talentMaxRank (0-4)
-
-                ++talentIdCount;
             }
+
+            data->put<uint8>(pos, talentIdCount);           // put real count
+
+            *data << uint8(MAX_GLYPH_SLOT_INDEX);           // glyphs count
+
+            for(uint8 i = 0; i < MAX_GLYPH_SLOT_INDEX; ++i)
+                *data << uint16(GetGlyph(i));               // GlyphProperties.dbc
         }
-
-        data->put<uint8>(pos, talentIdCount);               // put real count
-
-        *data << uint8(MAX_GLYPH_SLOT_INDEX);               // glyphs count
-
-        for(uint8 i = 0; i < MAX_GLYPH_SLOT_INDEX; ++i)
-            *data << uint16(GetGlyph(i));                   // GlyphProperties.dbc
     }
 }
 

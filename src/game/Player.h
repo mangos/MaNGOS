@@ -1390,7 +1390,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         uint32 GetGlyph(uint8 slot) { return GetUInt32Value(PLAYER_FIELD_GLYPHS_1 + slot); }
 
         uint32 GetFreePrimaryProffesionPoints() const { return GetUInt32Value(PLAYER_CHARACTER_POINTS2); }
-        void SetFreePrimaryProffesions(uint16 profs) { SetUInt32Value(PLAYER_CHARACTER_POINTS2,profs); }
+        void SetFreePrimaryProffesions(uint16 profs) { SetUInt32Value(PLAYER_CHARACTER_POINTS2, profs); }
         void InitPrimaryProffesions();
 
         PlayerSpellMap const& GetSpellMap() const { return m_spells; }

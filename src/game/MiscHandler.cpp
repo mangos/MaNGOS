@@ -1422,7 +1422,7 @@ void WorldSession::HandleChooseTitleOpcode( WorldPacket & recv_data )
     recv_data >> title;
 
     // -1 at none
-    if(title > 0 && title < 128)
+    if(title > 0 && title < 192)
     {
        if(!GetPlayer()->HasTitle(title))
             return;
