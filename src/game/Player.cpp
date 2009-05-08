@@ -20182,7 +20182,10 @@ void Player::DeleteEquipmentSet(uint64 setGuid)
     {
         if(itr->second.Guid == setGuid)
         {
-            itr->second.state = EQUIPMENT_SET_DELETED;
+            if(itr->second.state == EQUIPMENT_SET_NEW)
+                m_EquipmentSets.erase(itr);
+            else
+                itr->second.state = EQUIPMENT_SET_DELETED;
             break;
         }
     }
