@@ -412,7 +412,7 @@ void WorldSession::HandleNpcTextQueryOpcode( WorldPacket & recv_data )
     sLog.outDebug(  "WORLD: Sent SMSG_NPC_TEXT_UPDATE " );
 }
 
-void WorldSession::HandlePageQueryOpcode( WorldPacket & recv_data )
+void WorldSession::HandlePageTextQueryOpcode( WorldPacket & recv_data )
 {
     CHECK_PACKET_SIZE(recv_data,4);
 

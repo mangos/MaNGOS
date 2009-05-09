@@ -1271,7 +1271,7 @@ enum SessionStatus
 {
     STATUS_AUTHED = 0,                                      ///< Player authenticated
     STATUS_LOGGEDIN,                                        ///< Player in game
-    STATUS_TRANSFER_PENDING,                                ///< Player transferring to another map
+    STATUS_TRANSFER,                                        ///< Player transferring to another map
     STATUS_NEVER                                            ///< Opcode not accepted from client (deprecated or server side only)
 };
 

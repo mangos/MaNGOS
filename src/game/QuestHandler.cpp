@@ -205,7 +205,7 @@ void WorldSession::HandleQuestgiverAcceptQuestOpcode( WorldPacket & recv_data )
     _player->PlayerTalkClass->CloseGossip();
 }
 
-void WorldSession::HandleQuestgiverQuestQueryOpcode( WorldPacket & recv_data )
+void WorldSession::HandleQuestgiverQueryQuestOpcode( WorldPacket & recv_data )
 {
     CHECK_PACKET_SIZE(recv_data,8+4+1);
 
@@ -387,7 +387,7 @@ void WorldSession::HandleQuestConfirmAccept(WorldPacket& recv_data)
     sLog.outDebug( "WORLD: Received CMSG_QUEST_CONFIRM_ACCEPT quest = %u",quest );
 }
 
-void WorldSession::HandleQuestComplete(WorldPacket& recv_data)
+void WorldSession::HandleQuestgiverCompleteQuest(WorldPacket& recv_data)
 {
     CHECK_PACKET_SIZE(recv_data,8+4);
 
@@ -420,12 +420,12 @@ void WorldSession::HandleQuestComplete(WorldPacket& recv_data)
     }
 }
 
-void WorldSession::HandleQuestAutoLaunch(WorldPacket& /*recvPacket*/)
+void WorldSession::HandleQuestgiverQuestAutoLaunch(WorldPacket& /*recvPacket*/)
 {
-    sLog.outDebug( "WORLD: Received CMSG_QUESTGIVER_QUEST_AUTOLAUNCH (Send your log to anakin if you see this message)" );
+    sLog.outDebug( "WORLD: Received CMSG_QUESTGIVER_QUEST_AUTOLAUNCH" );
 }
 
-void WorldSession::HandleQuestPushToParty(WorldPacket& recvPacket)
+void WorldSession::HandlePushQuestToParty(WorldPacket& recvPacket)
 {
     CHECK_PACKET_SIZE(recvPacket,4);
 
@@ -604,7 +604,7 @@ uint32 WorldSession::getDialogStatus(Player *pPlayer, Object* questgiver, uint32
     return result;
 }
 
-void WorldSession::HandleQuestgiverStatusQueryMultipleOpcode(WorldPacket& /*recvPacket*/)
+void WorldSession::HandleQuestgiverStatusMultipleQuery(WorldPacket& /*recvPacket*/)
 {
     sLog.outDebug("WORLD: Received CMSG_QUESTGIVER_STATUS_MULTIPLE_QUERY");
 
