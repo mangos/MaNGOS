@@ -613,6 +613,7 @@ void Spell::FillTargetMap()
                 case SPELL_EFFECT_SUMMON_OBJECT_WILD:
                 case SPELL_EFFECT_SELF_RESURRECT:
                 case SPELL_EFFECT_REPUTATION:
+                case SPELL_EFFECT_SEND_TAXI:
                     if(m_targets.getUnitTarget())
                         tmpUnitMap.push_back(m_targets.getUnitTarget());
                     // Triggered spells have additional spell targets - cast them even if no explicit unit target is given (required for spell 50516 for example)
@@ -1055,6 +1056,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
 
         // Add bonuses and fill damageInfo struct
         caster->CalculateSpellDamage(&damageInfo, m_damage, m_spellInfo);
+        caster->DealDamageMods(damageInfo.target,damageInfo.damage,&damageInfo.absorb);
 
         // Send log damage message to client
         caster->SendSpellNonMeleeDamageLog(&damageInfo);
