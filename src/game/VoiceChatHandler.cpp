@@ -36,7 +36,7 @@ void WorldSession::HandleChannelVoiceOnOpcode( WorldPacket & recv_data )
     recv_data.hexlike();
 }
 
-void WorldSession::HandleSetActivelVoiceChanne( WorldPacket & recv_data )
+void WorldSession::HandleSetActiveVoiceChannel( WorldPacket & recv_data )
 {
     sLog.outDebug("WORLD: CMSG_SET_ACTIVE_VOICE_CHANNEL");
     // uint32, string
