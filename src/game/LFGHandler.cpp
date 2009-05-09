@@ -184,6 +184,8 @@ void WorldSession::HandleLfgClearOpcode( WorldPacket & /*recv_data */ )
 
     if( sWorld.getConfig(CONFIG_RESTRICTED_LFG_CHANNEL) && _player->GetSession()->GetSecurity() == SEC_PLAYER )
         _player->LeaveLFGChannel();
+
+    SendLfgUpdate(0, 0, 0);
 }
 
 void WorldSession::HandleLfmClearOpcode( WorldPacket & /*recv_data */)
@@ -220,7 +222,7 @@ void WorldSession::HandleSetLfmOpcode( WorldPacket & recv_data )
 
 void WorldSession::HandleSetLfgCommentOpcode( WorldPacket & recv_data )
 {
-    CHECK_PACKET_SIZE(recv_data,1);
+    CHECK_PACKET_SIZE(recv_data, 1);
 
     sLog.outDebug("CMSG_SET_LFG_COMMENT");
     //recv_data.hexlike();
@@ -250,18 +252,53 @@ void WorldSession::HandleLookingForGroup(WorldPacket& recv_data)
         AttemptJoin(_player);
 
     SendLfgResult(type, entry, 0);
+    SendLfgUpdate(0, 1, 0);
 }
 
 void WorldSession::SendLfgResult(uint32 type, uint32 entry, uint8 lfg_type)
 {
     uint32 number = 0;
 
-    // start prepare packet;
     WorldPacket data(MSG_LOOKING_FOR_GROUP);
     data << uint32(type);                                   // type
     data << uint32(entry);                                  // entry from LFGDungeons.dbc
-    data << uint32(0);                                      // count, placeholder
-    data << uint32(0);                                      // count again, strange, placeholder
+
+    data << uint8(0);
+    /*if(uint8)
+    {
+        uint32 count1;
+        for(count1)
+        {
+            uint64; // player guid
+        }
+    }*/
+
+    data << uint32(0);                                      // count2
+    data << uint32(0);
+    /*for(count2)
+    {
+        uint64 // not player guid
+        uint32 flags;
+        if(flags & 0x2)
+        {
+            string
+        }
+        if(flags & 0x10)
+        {
+            uint8
+        }
+        if(flags & 0x20)
+        {
+            for(3)
+            {
+                uint8
+            }
+        }
+    }*/
+
+    size_t count3_pos = data.wpos();
+    data << uint32(0);                                      // count3
+    data << uint32(0);                                      // unk
 
     //TODO: Guard Player map
     HashMapHolder<Player>::MapType const& players = ObjectAccessor::Instance().GetPlayers();
@@ -272,45 +309,78 @@ void WorldSession::SendLfgResult(uint32 type, uint32 entry, uint8 lfg_type)
         if(!plr || plr->GetTeam() != _player->GetTeam())
             continue;
 
-        if(!plr->m_lookingForGroup.HaveInSlot(entry,type))
+        if(!plr->m_lookingForGroup.HaveInSlot(entry, type))
             continue;
 
         ++number;
 
-        data.append(plr->GetPackGUID());                    // packed guid
-        data << plr->getLevel();                            // level
-        data << plr->GetZoneId();                           // current zone
-        data << lfg_type;                                   // 0x00 - LFG, 0x01 - LFM
+        data << uint64(plr->GetGUID());                     // guid
 
-        for(uint8 j = 0; j < MAX_LOOKING_FOR_GROUP_SLOT; ++j)
+        uint32 flags = 0x1FF;
+        data << uint32(flags);                              // flags
+
+        if(flags & 0x1)
         {
-            data << uint32( plr->m_lookingForGroup.slots[j].entry | (plr->m_lookingForGroup.slots[j].type << 24) );
+            data << uint8(plr->getLevel());
+            data << uint8(plr->getClass());
+            data << uint8(plr->getRace());
+
+            for(int i = 0; i < 3; ++i)
+                data << uint8(0);                           // spent talents count in specific tab
+
+            data << uint32(0);                              // resistances1
+            data << uint32(0);                              // spd/heal
+            data << uint32(0);                              // spd/heal
+            data << uint32(0);                              // combat_rating9
+            data << uint32(0);                              // combat_rating10
+            data << uint32(0);                              // combat_rating11
+            data << float(0);                               // mp5
+            data << float(0);                               // unk
+            data << uint32(0);                              // attack power
+            data << uint32(0);                              // stat1
+            data << uint32(0);                              // maxhealth
+            data << uint32(0);                              // maxpower1
+            data << uint32(0);                              // unk
+            data << float(0);                               // unk
+            data << uint32(0);                              // unk
+            data << uint32(0);                              // unk
+            data << uint32(0);                              // unk
+            data << uint32(0);                              // unk
+            data << uint32(0);                              // combat_rating20
+            data << uint32(0);                              // unk
         }
-        data << plr->m_lookingForGroup.comment;
 
-        Group *group = plr->GetGroup();
-        if(group)
+        if(flags & 0x2)
+            data << plr->m_lookingForGroup.comment;         // comment
+
+        if(flags & 0x4)
+            data << uint8(0);                               // unk
+
+        if(flags & 0x8)
+            data << uint64(0);                              // guid from count2 block, not player guid
+
+        if(flags & 0x10)
+            data << uint8(0);                               // unk
+
+        if(flags & 0x20)
+            data << uint8(plr->m_lookingForGroup.roles);    // roles
+
+        if(flags & 0x40)
+            data << uint32(plr->GetZoneId());               // areaid
+
+        if(flags & 0x100)
+            data << uint8(0);                               // unk
+
+        if(flags & 0x80)
         {
-            data << group->GetMembersCount()-1;             // count of group members without group leader
-            for(GroupReference *itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
+            for(uint8 j = 0; j < MAX_LOOKING_FOR_GROUP_SLOT; ++j)
             {
-                Player *member = itr->getSource();
-                if(member && member->GetGUID() != plr->GetGUID())
-                {
-                    data.append(member->GetPackGUID());     // packed guid
-                    data << member->getLevel();             // player level
-                }
+                data << uint32(plr->m_lookingForGroup.slots[j].entry | (plr->m_lookingForGroup.slots[j].type << 24));
             }
-        }
-        else
-        {
-            data << uint32(0x00);
         }
     }
 
-    // fill count placeholders
-    data.put<uint32>(4+4,  number);
-    data.put<uint32>(4+4+4,number);
+    data.put<uint32>(count3_pos, number);                   // fill count placeholder
 
     SendPacket(&data);
 }
@@ -339,7 +409,8 @@ void WorldSession::HandleSetLfgOpcode( WorldPacket & recv_data )
     if(LookingForGroup_auto_join)
         AttemptJoin(_player);
 
-    SendLfgResult(type, entry, 0);
+    //SendLfgResult(type, entry, 0);
+    SendLfgUpdate(0, 1, 0);
 }
 
 void WorldSession::HandleLfgSetRoles(WorldPacket &recv_data)
@@ -352,4 +423,13 @@ void WorldSession::HandleLfgSetRoles(WorldPacket &recv_data)
     recv_data >> roles;
 
     _player->m_lookingForGroup.roles = roles;
+}
+
+void WorldSession::SendLfgUpdate(uint8 unk1, uint8 unk2, uint8 unk3)
+{
+    WorldPacket data(SMSG_LFG_UPDATE, 3);
+    data << uint8(unk1);
+    data << uint8(unk2);
+    data << uint8(unk3);
+    SendPacket(&data);
 }

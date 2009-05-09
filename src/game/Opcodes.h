@@ -693,7 +693,7 @@ enum Opcodes
     CMSG_BUYBACK_ITEM                               = 0x290,
     SMSG_SERVER_MESSAGE                             = 0x291,
     CMSG_MEETINGSTONE_JOIN                          = 0x292,
-    CMSG_MEETINGSTONE_LEAVE                         = 0x293,
+    CMSG_MEETINGSTONE_LEAVE                         = 0x293, // SMSG?
     CMSG_MEETINGSTONE_CHEAT                         = 0x294,
     SMSG_MEETINGSTONE_SETQUEUE                      = 0x295,
     CMSG_MEETINGSTONE_INFO                          = 0x296,
