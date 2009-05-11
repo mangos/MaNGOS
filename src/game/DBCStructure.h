@@ -939,6 +939,7 @@ struct HolidaysEntry
     //uint32 unk51;                                         // 51
     //uint32 unk52;                                         // 52
     //uint32 unk53;                                         // 53
+    //uint32 unk54;                                         // 54
 };
 
 struct ItemEntry
