@@ -19,8 +19,7 @@
 #ifndef DATABASE_H
 #define DATABASE_H
 
-#include "zthread/Thread.h"
-#include "../src/zthread/ThreadImpl.h"
+#include "Threading.h"
 #include "Utilities/UnorderedMap.h"
 #include "Database/SqlDelayThread.h"
 
@@ -28,8 +27,8 @@ class SqlTransaction;
 class SqlResultQueue;
 class SqlQueryHolder;
 
-typedef UNORDERED_MAP<ZThread::ThreadImpl*, SqlTransaction*> TransactionQueues;
-typedef UNORDERED_MAP<ZThread::ThreadImpl*, SqlResultQueue*> QueryQueues;
+typedef UNORDERED_MAP<ACE_Based::Thread* , SqlTransaction*> TransactionQueues;
+typedef UNORDERED_MAP<ACE_Based::Thread* , SqlResultQueue*> QueryQueues;
 
 #define MAX_QUERY_LEN   32*1024
 
@@ -41,7 +40,7 @@ class MANGOS_DLL_SPEC Database
         TransactionQueues m_tranQueues;                     ///< Transaction queues from diff. threads
         QueryQueues m_queryQueues;                          ///< Query queues from diff threads
         SqlDelayThread* m_threadBody;                       ///< Pointer to delay sql executer
-        ZThread::Thread* m_delayThread;                     ///< Pointer to executer thread
+        ACE_Based::Thread* m_delayThread;                   ///< Pointer to executer thread
 
     public:
 

@@ -27,7 +27,7 @@
     QueryQueues::iterator queue_itr; \
     \
     { \
-        ZThread::ThreadImpl * queryThread = ZThread::ThreadImpl::current(); \
+        ACE_Based::Thread * queryThread = ACE_Based::Thread::current(); \
         queue_itr = m_queryQueues.find(queryThread); \
         if (queue_itr == m_queryQueues.end()) return false; \
     }
@@ -57,7 +57,7 @@
     QueryQueues::iterator queue_itr; \
     \
     { \
-        ZThread::ThreadImpl * queryThread = ZThread::ThreadImpl::current(); \
+        ACE_Based::Thread * queryThread = ACE_Based::Thread::current(); \
         queue_itr = m_queryQueues.find(queryThread); \
         if (queue_itr == m_queryQueues.end()) return false; \
     }

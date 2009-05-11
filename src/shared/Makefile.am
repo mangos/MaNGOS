@@ -36,6 +36,7 @@ libmangosshared_a_SOURCES = \
 	Common.cpp \
 	Common.h \
 	Errors.h \
+	LockedQueue.h \
 	Log.cpp \
 	Log.h \
 	MemoryLeaks.cpp \
@@ -43,6 +44,8 @@ libmangosshared_a_SOURCES = \
 	ProgressBar.cpp \
 	ProgressBar.h \
 	Timer.h \
+	Threading.cpp \
+	Threading.h \
 	Util.cpp \
 	Util.h \
 	WorldPacket.h \
