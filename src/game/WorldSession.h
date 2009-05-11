@@ -738,8 +738,7 @@ class MANGOS_DLL_SPEC WorldSession
         uint32 m_Tutorials[8];
         bool   m_TutorialsChanged;
         AddonsList m_addonsList;
-
-        ZThread::LockedQueue<WorldPacket*,ZThread::FastMutex> _recvQueue;
+        ACE_Based::LockedQueue<WorldPacket*, ACE_Thread_Mutex> _recvQueue;
 };
 #endif
 /// @}

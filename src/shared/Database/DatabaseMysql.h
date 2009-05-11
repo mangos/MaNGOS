@@ -23,7 +23,8 @@
 
 #include "Database.h"
 #include "Policies/Singleton.h"
-#include "zthread/FastMutex.h"
+#include "ace/Thread_Mutex.h"
+#include "ace/Guard_T.h"
 
 #ifdef WIN32
 #define FD_SETSIZE 1024
@@ -63,9 +64,9 @@ class MANGOS_DLL_SPEC DatabaseMysql : public Database
         // must be call before finish thread run
         void ThreadEnd();
     private:
-        ZThread::FastMutex mMutex;
+        ACE_Thread_Mutex mMutex;
 
-        ZThread::ThreadImpl* tranThread;
+        ACE_Based::Thread * tranThread;
 
         MYSQL *mMysql;
 

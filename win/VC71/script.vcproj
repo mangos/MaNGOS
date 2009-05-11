@@ -33,10 +33,10 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="mangosd.lib zlib.lib zthread.lib libmySQL.lib libeay32.lib ws2_32.lib winmm.lib odbc32.lib odbccp32.lib"
+				AdditionalDependencies="mangosd.lib zlib.lib libmySQL.lib libeay32.lib ws2_32.lib winmm.lib odbc32.lib odbccp32.lib aced.lib"
 				OutputFile="..\..\bin\$(PlatformName)_$(ConfigurationName)\MaNGOSScript.dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;.\mangosd__$(PlatformName)_$(ConfigurationName)&quot;;&quot;..\..\dep\lib\$(PlatformName)_$(ConfigurationName)&quot;;&quot;.\zlib__$(PlatformName)_$(ConfigurationName)&quot;;&quot;.\zthread__$(PlatformName)_$(ConfigurationName)&quot;"
+				AdditionalLibraryDirectories=";.\mangosd__$(PlatformName)_$(ConfigurationName);.\zlib__$(PlatformName)_$(ConfigurationName);..\..\dep\lib\$(PlatformName)_$(ConfigurationName)"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/MaNGOSScript.pdb"
 				SubSystem="2"
@@ -83,10 +83,10 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="mangosd.lib zlib.lib zthread.lib libmySQL.lib libeay32.lib ws2_32.lib winmm.lib odbc32.lib odbccp32.lib"
+				AdditionalDependencies="mangosd.lib zlib.lib libmySQL.lib libeay32.lib ws2_32.lib winmm.lib odbc32.lib odbccp32.lib ace.lib"
 				OutputFile="..\..\bin\$(PlatformName)_$(ConfigurationName)\MaNGOSScript.dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;.\mangosd__$(PlatformName)_$(ConfigurationName)&quot;;&quot;..\..\dep\lib\$(PlatformName)_$(ConfigurationName)&quot;;&quot;.\zlib__$(PlatformName)_$(ConfigurationName)&quot;;&quot;.\zthread__$(PlatformName)_$(ConfigurationName)&quot;"
+				AdditionalLibraryDirectories=";.\mangosd__$(PlatformName)_$(ConfigurationName);.\zlib__$(PlatformName)_$(ConfigurationName);..\..\dep\lib\$(PlatformName)_$(ConfigurationName)"
 				GenerateDebugInformation="FALSE"
 				SubSystem="2"
 				OptimizeReferences="2"
