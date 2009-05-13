@@ -120,6 +120,7 @@ enum ITEM_FLAGS
 
 enum BAG_FAMILY_MASK
 {
+    BAG_FAMILY_MASK_NONE                      = 0x00000000,
     BAG_FAMILY_MASK_ARROWS                    = 0x00000001,
     BAG_FAMILY_MASK_BULLETS                   = 0x00000002,
     BAG_FAMILY_MASK_SOUL_SHARDS               = 0x00000004,

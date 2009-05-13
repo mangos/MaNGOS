@@ -369,7 +369,7 @@ void WorldSession::SendLfgResult(uint32 type, uint32 entry, uint8 lfg_type)
             data << uint32(plr->GetZoneId());               // areaid
 
         if(flags & 0x100)
-            data << uint8(0);                               // unk
+            data << uint8(0);                               // LFG/LFM flag?
 
         if(flags & 0x80)
         {
