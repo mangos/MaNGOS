@@ -1114,16 +1114,25 @@ float WorldObject::GetDistanceZ(const WorldObject* obj) const
     return ( dist > 0 ? dist : 0);
 }
 
-bool WorldObject::IsWithinDist(float x, float y, float z, float dist2compare, bool is3D) const
+bool WorldObject::IsWithinDist(float x, float y, float z, float dist2compare) const
+{
+    float dx = GetPositionX() - x;
+    float dy = GetPositionY() - y;
+    float dz = GetPositionZ() - z;
+    float distsq = dx*dx + dy*dy + dz*dz;
+
+    float sizefactor = GetObjectSize();
+    float maxdist = dist2compare + sizefactor;
+
+    return distsq < maxdist * maxdist;
+}
+
+bool WorldObject::IsWithinDist2d(float x, float y, float dist2compare) const
 {
     float dx = GetPositionX() - x;
     float dy = GetPositionY() - y;
     float distsq = dx*dx + dy*dy;
-    if(is3D)
-    {
-        float dz = GetPositionZ() - z;
-        distsq += dz*dz;
-    }
+
     float sizefactor = GetObjectSize();
     float maxdist = dist2compare + sizefactor;
 
@@ -1185,12 +1194,16 @@ bool WorldObject::GetDistanceOrder(WorldObject const* obj1, WorldObject const* o
     return distsq1 < distsq2;
 }
 
-bool WorldObject::IsInRange(WorldObject const* obj, float minRange, float maxRange) const
+bool WorldObject::IsInRange(WorldObject const* obj, float minRange, float maxRange, bool is3D /* = true */) const
 {
     float dx = GetPositionX() - obj->GetPositionX();
     float dy = GetPositionY() - obj->GetPositionY();
-    float dz = GetPositionZ() - obj->GetPositionZ();
-    float distsq = dx*dx + dy*dy + dz*dz;
+    float distsq = dx*dx + dy*dy;
+    if(is3D)
+    {
+        float dz = GetPositionZ() - obj->GetPositionZ();
+        distsq += dz*dz;
+    }
 
     float sizefactor = GetObjectSize() + obj->GetObjectSize();
 
@@ -1207,6 +1220,23 @@ bool WorldObject::IsInRange2d(float x, float y, float minRange, float maxRange) 
     float dx = GetPositionX() - x;
     float dy = GetPositionY() - y;
     float distsq = dx*dx + dy*dy;
+
+    float sizefactor = GetObjectSize();
+
+    float mindist = minRange + sizefactor;
+    if(distsq < mindist * mindist)
+        return false;
+
+    float maxdist = maxRange + sizefactor;
+    return distsq < maxdist * maxdist;
+}
+
+bool WorldObject::IsInRange(float x, float y, float z, float minRange, float maxRange) const
+{
+    float dx = GetPositionX() - x;
+    float dy = GetPositionY() - y;
+    float dz = GetPositionZ() - z;
+    float distsq = dx*dx + dy*dy + dz*dz;
 
     float sizefactor = GetObjectSize();
 
