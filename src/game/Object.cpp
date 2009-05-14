@@ -1114,7 +1114,7 @@ float WorldObject::GetDistanceZ(const WorldObject* obj) const
     return ( dist > 0 ? dist : 0);
 }
 
-bool WorldObject::IsWithinDist(float x, float y, float z, float dist2compare) const
+bool WorldObject::IsWithinDist3d(float x, float y, float z, float dist2compare) const
 {
     float dx = GetPositionX() - x;
     float dy = GetPositionY() - y;
@@ -1231,7 +1231,7 @@ bool WorldObject::IsInRange2d(float x, float y, float minRange, float maxRange) 
     return distsq < maxdist * maxdist;
 }
 
-bool WorldObject::IsInRange(float x, float y, float z, float minRange, float maxRange) const
+bool WorldObject::IsInRange3d(float x, float y, float z, float minRange, float maxRange) const
 {
     float dx = GetPositionX() - x;
     float dy = GetPositionY() - y;

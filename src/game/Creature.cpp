@@ -1782,7 +1782,7 @@ bool Creature::IsOutOfThreatArea(Unit* pVictim) const
     uint32 ThreatRadius = sWorld.getConfig(CONFIG_THREAT_RADIUS);
 
     //Use AttackDistance in distance check if threat radius is lower. This prevents creature bounce in and out of combat every update tick.
-    return !pVictim->IsWithinDist(CombatStartX,CombatStartY,CombatStartZ,
+    return !pVictim->IsWithinDist3d(CombatStartX,CombatStartY,CombatStartZ,
         ThreatRadius > AttackDist ? ThreatRadius : AttackDist);
 }
 

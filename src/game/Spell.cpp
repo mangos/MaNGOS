@@ -4689,9 +4689,9 @@ SpellCastResult Spell::CheckRange(bool strict)
 
     if(m_targets.m_targetMask == TARGET_FLAG_DEST_LOCATION && m_targets.m_destX != 0 && m_targets.m_destY != 0 && m_targets.m_destZ != 0)
     {
-        if(!m_caster->IsWithinDist(m_targets.m_destX, m_targets.m_destY, m_targets.m_destZ,max_range))
+        if(!m_caster->IsWithinDist3d(m_targets.m_destX, m_targets.m_destY, m_targets.m_destZ,max_range))
             return SPELL_FAILED_OUT_OF_RANGE;
-        if(m_caster->IsWithinDist(m_targets.m_destX, m_targets.m_destY, m_targets.m_destZ,min_range))
+        if(m_caster->IsWithinDist3d(m_targets.m_destX, m_targets.m_destY, m_targets.m_destZ,min_range))
             return SPELL_FAILED_TOO_CLOSE;
     }
 

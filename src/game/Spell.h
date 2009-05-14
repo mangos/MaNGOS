@@ -621,7 +621,7 @@ namespace MaNGOS
                 if( i_originalCaster->IsFriendlyTo(pPlayer) )
                     continue;
 
-                if( pPlayer->IsWithinDist(i_spell.m_targets.m_destX, i_spell.m_targets.m_destY, i_spell.m_targets.m_destZ,i_radius))
+                if( pPlayer->IsWithinDist3d(i_spell.m_targets.m_destX, i_spell.m_targets.m_destY, i_spell.m_targets.m_destZ,i_radius))
                     i_data.push_back(pPlayer);
             }
         }
@@ -717,7 +717,7 @@ namespace MaNGOS
                             i_data->push_back(itr->getSource());
                         break;
                     case PUSH_DEST_CENTER:
-                        if(itr->getSource()->IsWithinDist(i_spell.m_targets.m_destX, i_spell.m_targets.m_destY, i_spell.m_targets.m_destZ,i_radius))
+                        if(itr->getSource()->IsWithinDist3d(i_spell.m_targets.m_destX, i_spell.m_targets.m_destY, i_spell.m_targets.m_destZ,i_radius))
                             i_data->push_back(itr->getSource());
                         break;
                     case PUSH_TARGET_CENTER:
