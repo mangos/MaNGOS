@@ -288,8 +288,7 @@ void PetAI::UpdateAI(const uint32 diff)
 
 bool PetAI::_isVisible(Unit *u) const
 {
-    //return false;                                           //( ((Creature*)&i_pet)->GetDistanceSq(u) * 1.0<= sWorld.getConfig(CONFIG_SIGHT_GUARDER) && !u->m_stealth && u->isAlive());
-    return m_creature->GetDistance(u) < sWorld.getConfig(CONFIG_SIGHT_GUARDER)
+    return m_creature->IsWithinDist(u,sWorld.getConfig(CONFIG_SIGHT_GUARDER))
         && u->isVisibleForOrDetect(m_creature,true);
 }
 

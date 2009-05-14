@@ -1087,7 +1087,7 @@ float WorldObject::GetDistance2d(float x, float y) const
     return ( dist > 0 ? dist : 0);
 }
 
-float WorldObject::GetDistance(const float x, const float y, const float z) const
+float WorldObject::GetDistance(float x, float y, float z) const
 {
     float dx = GetPositionX() - x;
     float dy = GetPositionY() - y;
@@ -1114,10 +1114,24 @@ float WorldObject::GetDistanceZ(const WorldObject* obj) const
     return ( dist > 0 ? dist : 0);
 }
 
-bool WorldObject::IsWithinDistInMap(const WorldObject* obj, const float dist2compare, const bool is3D) const
+bool WorldObject::IsWithinDist(float x, float y, float z, float dist2compare, bool is3D) const
 {
-    if (!obj || !IsInMap(obj)) return false;
+    float dx = GetPositionX() - x;
+    float dy = GetPositionY() - y;
+    float distsq = dx*dx + dy*dy;
+    if(is3D)
+    {
+        float dz = GetPositionZ() - z;
+        distsq += dz*dz;
+    }
+    float sizefactor = GetObjectSize();
+    float maxdist = dist2compare + sizefactor;
 
+    return distsq < maxdist * maxdist;
+}
+
+bool WorldObject::_IsWithinDist(WorldObject const* obj, float dist2compare, bool is3D) const
+{
     float dx = GetPositionX() - obj->GetPositionX();
     float dy = GetPositionY() - obj->GetPositionY();
     float distsq = dx*dx + dy*dy;
@@ -1140,12 +1154,60 @@ bool WorldObject::IsWithinLOSInMap(const WorldObject* obj) const
     return(IsWithinLOS(ox, oy, oz ));
 }
 
-bool WorldObject::IsWithinLOS(const float ox, const float oy, const float oz ) const
+bool WorldObject::IsWithinLOS(float ox, float oy, float oz) const
 {
     float x,y,z;
     GetPosition(x,y,z);
     VMAP::IVMapManager *vMapManager = VMAP::VMapFactory::createOrGetVMapManager();
     return vMapManager->isInLineOfSight(GetMapId(), x, y, z+2.0f, ox, oy, oz+2.0f);
+}
+
+bool WorldObject::GetDistanceOrder(WorldObject const* obj1, WorldObject const* obj2) const
+{
+    float dx1 = GetPositionX() - obj1->GetPositionX();
+    float dy1 = GetPositionY() - obj1->GetPositionY();
+    float dz1 = GetPositionZ() - obj1->GetPositionZ();
+    float distsq1 = dx1*dx1 + dy1*dy1 + dz1*dz1;
+
+    float dx2 = GetPositionX() - obj2->GetPositionX();
+    float dy2 = GetPositionY() - obj2->GetPositionY();
+    float dz2 = GetPositionZ() - obj2->GetPositionZ();
+    float distsq2 = dx2*dx2 + dy2*dy2 + dz2*dz2;
+
+    return distsq1 < distsq2;
+}
+
+bool WorldObject::IsInRange(WorldObject const* obj, float minRange, float maxRange) const
+{
+    float dx = GetPositionX() - obj->GetPositionX();
+    float dy = GetPositionY() - obj->GetPositionY();
+    float dz = GetPositionZ() - obj->GetPositionZ();
+    float distsq = dx*dx + dy*dy + dz*dz;
+
+    float sizefactor = GetObjectSize() + obj->GetObjectSize();
+
+    float mindist = minRange + sizefactor;
+    if(distsq < mindist * mindist)
+        return false;
+
+    float maxdist = maxRange + sizefactor;
+    return distsq < maxdist * maxdist;
+}
+
+bool WorldObject::IsInRange2d(float x, float y, float minRange, float maxRange) const
+{
+    float dx = GetPositionX() - x;
+    float dy = GetPositionY() - y;
+    float distsq = dx*dx + dy*dy;
+
+    float sizefactor = GetObjectSize();
+
+    float mindist = minRange + sizefactor;
+    if(distsq < mindist * mindist)
+        return false;
+
+    float maxdist = maxRange + sizefactor;
+    return distsq < maxdist * maxdist;
 }
 
 float WorldObject::GetAngle(const WorldObject* obj) const
@@ -1543,15 +1605,8 @@ namespace MaNGOS
             // we must add used pos that can fill places around center
             void add(WorldObject* u, float x, float y) const
             {
-                // dist include size of u
-                float dist2d = i_object.GetDistance2d(x,y);
-
-                // u is too nearest to i_object
-                if(dist2d + i_object.GetObjectSize() + u->GetObjectSize() < i_selector.m_dist - i_selector.m_size)
-                    return;
-
-                // u is too far away from i_object
-                if(dist2d + i_object.GetObjectSize() - u->GetObjectSize() > i_selector.m_dist + i_selector.m_size)
+                // u is too nearest/far away to i_object
+                if(!i_object.IsInRange2d(x,y,i_selector.m_dist - i_selector.m_size,i_selector.m_dist + i_selector.m_size))
                     return;
 
                 float angle = i_object.GetAngle(u)-i_angle;
@@ -1562,6 +1617,8 @@ namespace MaNGOS
                 while(angle < -M_PI)
                     angle += 2.0f * M_PI;
 
+                // dist include size of u
+                float dist2d = i_object.GetDistance2d(x,y);
                 i_selector.AddUsedPos(u->GetObjectSize(),angle,dist2d + i_object.GetObjectSize());
             }
         private:
