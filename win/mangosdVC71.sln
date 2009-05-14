@@ -23,10 +23,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mangosd", "VC71\mangosd.vcp
 		{262199E8-EEDF-4700-A1D1-E9CC901CF480} = {262199E8-EEDF-4700-A1D1-E9CC901CF480}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zthread", "VC71\zthread.vcproj", "{262199E8-EEDF-4700-A1D1-E9CC901CF480}"
-	ProjectSection(ProjectDependencies) = postProject
-	EndProjectSection
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zlib", "VC71\zlib.vcproj", "{8F1DEA42-6A5B-4B62-839D-C141A7BFACF2}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection

@@ -24,7 +24,7 @@
 #define __CLIRUNNABLE_H
 
 /// Command Line Interface handling thread
-class CliRunnable : public ZThread::Runnable
+class CliRunnable : public ACE_Based::Runnable
 {
     public:
         void run();

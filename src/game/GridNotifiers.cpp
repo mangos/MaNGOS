@@ -176,14 +176,14 @@ MessageDistDeliverer::Visit(PlayerMapType &m)
 {
     for(PlayerMapType::iterator iter=m.begin(); iter != m.end(); ++iter)
     {
-        if( (i_toSelf || iter->getSource() != &i_player ) &&
+        if ((i_toSelf || iter->getSource() != &i_player ) &&
             (!i_ownTeamOnly || iter->getSource()->GetTeam() == i_player.GetTeam() ) &&
-            (!i_dist || iter->getSource()->GetDistance(&i_player) <= i_dist) )
+            (!i_dist || iter->getSource()->IsWithinDist(&i_player,i_dist)))
         {
             if (!i_player.InSamePhase(iter->getSource()))
                 continue;
 
-            if(WorldSession* session = iter->getSource()->GetSession())
+            if (WorldSession* session = iter->getSource()->GetSession())
                 session->SendPacket(i_message);
         }
     }
@@ -194,12 +194,12 @@ ObjectMessageDistDeliverer::Visit(PlayerMapType &m)
 {
     for(PlayerMapType::iterator iter=m.begin(); iter != m.end(); ++iter)
     {
-        if( !i_dist || iter->getSource()->GetDistance(&i_object) <= i_dist )
+        if (!i_dist || iter->getSource()->IsWithinDist(&i_object,i_dist))
         {
-            if( !i_object.InSamePhase(iter->getSource()))
+            if (!i_object.InSamePhase(iter->getSource()))
                 continue;
 
-            if(WorldSession* session = iter->getSource()->GetSession())
+            if (WorldSession* session = iter->getSource()->GetSession())
                 session->SendPacket(i_message);
         }
     }
