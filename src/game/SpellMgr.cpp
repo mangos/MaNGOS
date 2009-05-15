@@ -2126,184 +2126,101 @@ void SpellMgr::LoadSpellPetAuras()
     sLog.outString( ">> Loaded %u spell pet auras", count );
 }
 
+static uint32 family2skillline[MAX_CREATURE_FAMILY][2] = {
+    /* ----------------------------- = 0 */ {0,   0  },
+    /*CREATURE_FAMILY_WOLF           = 1 */ {208, 270},
+    /*CREATURE_FAMILY_CAT            = 2 */ {209, 270},
+    /*CREATURE_FAMILY_SPIDER         = 3 */ {203, 270},
+    /*CREATURE_FAMILY_BEAR           = 4 */ {210, 270},
+    /*CREATURE_FAMILY_BOAR           = 5 */ {211, 270},
+    /*CREATURE_FAMILY_CROCOLISK      = 6 */ {212, 270},
+    /*CREATURE_FAMILY_CARRION_BIRD   = 7 */ {213, 270},
+    /*CREATURE_FAMILY_CRAB           = 8 */ {214, 270},
+    /*CREATURE_FAMILY_GORILLA        = 9 */ {215, 270},
+    /*CREATURE_FAMILY_HORSE_CUSTOM   = 10*/ {0,   0  },
+    /*CREATURE_FAMILY_RAPTOR         = 11*/ {217, 270},
+    /*CREATURE_FAMILY_TALLSTRIDER    = 12*/ {218, 270},
+    /* ----------------------------- = 13*/ {0,   0  },
+    /* ----------------------------- = 14*/ {0,   0  },
+    /*CREATURE_FAMILY_FELHUNTER      = 15*/ {189, 0  },
+    /*CREATURE_FAMILY_VOIDWALKER     = 16*/ {204, 0  },
+    /*CREATURE_FAMILY_SUCCUBUS       = 17*/ {205, 0  },
+    /* ----------------------------- = 18*/ {0,   0  },
+    /*CREATURE_FAMILY_DOOMGUARD      = 19*/ {207, 0  },
+    /*CREATURE_FAMILY_SCORPID        = 20*/ {236, 270},
+    /*CREATURE_FAMILY_TURTLE         = 21*/ {251, 270},
+    /* ----------------------------- = 22*/ {0,   0  },
+    /*CREATURE_FAMILY_IMP            = 23*/ {188, 0  },
+    /*CREATURE_FAMILY_BAT            = 24*/ {653, 270},
+    /*CREATURE_FAMILY_HYENA          = 25*/ {654, 270},
+    /*CREATURE_FAMILY_BIRD_OF_PREY   = 26*/ {655, 270},
+    /*CREATURE_FAMILY_WIND_SERPENT   = 27*/ {656, 270},
+    /*CREATURE_FAMILY_REMOTE_CONTROL = 28*/ {758, 0  },
+    /*CREATURE_FAMILY_FELGUARD       = 29*/ {761, 0  },
+    /*CREATURE_FAMILY_DRAGONHAWK     = 30*/ {763, 270},
+    /*CREATURE_FAMILY_RAVAGER        = 31*/ {767, 270},
+    /*CREATURE_FAMILY_WARP_STALKER   = 32*/ {766, 270},
+    /*CREATURE_FAMILY_SPOREBAT       = 33*/ {765, 270},
+    /*CREATURE_FAMILY_NETHER_RAY     = 34*/ {764, 270},
+    /*CREATURE_FAMILY_SERPENT        = 35*/ {768, 270},
+    /* ----------------------------- = 36*/ {0,   0  },
+    /*CREATURE_FAMILY_MOTH           = 37*/ {775, 270},
+    /*CREATURE_FAMILY_CHIMAERA       = 38*/ {780, 270},
+    /*CREATURE_FAMILY_DEVILSAUR      = 39*/ {781, 270},
+    /*CREATURE_FAMILY_GHOUL          = 40*/ {782, 0  },
+    /*CREATURE_FAMILY_SILITHID       = 41*/ {783, 270},
+    /*CREATURE_FAMILY_WORM           = 42*/ {784, 270},
+    /*CREATURE_FAMILY_RHINO          = 43*/ {786, 270},
+    /*CREATURE_FAMILY_WASP           = 44*/ {785, 270},
+    /*CREATURE_FAMILY_CORE_HOUND     = 45*/ {787, 270},
+    /*CREATURE_FAMILY_SPIRIT_BEAST   = 46*/ {788, 270}
+};
+
 void SpellMgr::LoadPetLevelupSpellMap()
 {
-    CreatureFamilyEntry const *creatureFamily;
-    SpellEntry const *spell;
     uint32 count = 0;
+    uint32 family_count = 0;
 
     for (uint32 i = 0; i < sCreatureFamilyStore.GetNumRows(); ++i)
     {
-        creatureFamily = sCreatureFamilyStore.LookupEntry(i);
-
+        CreatureFamilyEntry const *creatureFamily = sCreatureFamilyStore.LookupEntry(i);
         if(!creatureFamily)                                 // not exist
             continue;
 
-        if(creatureFamily->petTalentType < 0)               // not hunter pet family
+        if(i >= MAX_CREATURE_FAMILY)
             continue;
 
-        for(uint32 j = 0; j < sSpellStore.GetNumRows(); ++j)
+        if(!family2skillline[i][0])
+            continue;
+
+        for (uint32 j = 0; j < sSkillLineAbilityStore.GetNumRows(); ++j)
         {
-            spell = sSpellStore.LookupEntry(j);
-
-            // not exist
-            if(!spell)
+            SkillLineAbilityEntry const *skillLine = sSkillLineAbilityStore.LookupEntry(j);
+            if( !skillLine )
                 continue;
 
-            // not hunter spell
-            if(spell->SpellFamilyName != SPELLFAMILY_HUNTER)
+            if (skillLine->skillId!=family2skillline[i][0] &&
+                (!family2skillline[i][1] || skillLine->skillId!=family2skillline[i][1]))
                 continue;
 
-            // not pet spell
-            if(!(spell->SpellFamilyFlags & 0x1000000000000000LL))
+            if(skillLine->learnOnGetSkill != ABILITY_LEARNED_ON_GET_RACE_OR_CLASS_SKILL)
                 continue;
 
-            // not Growl or Cower (generics)
-            if(spell->SpellIconID != 201 && spell->SpellIconID != 958)
-            {
-                switch(creatureFamily->ID)
-                {
-                    case CREATURE_FAMILY_BAT:               // Bite and Sonic Blast
-                        if(spell->SpellIconID != 1680 && spell->SpellIconID != 1577)
-                            continue;
-                        break;
-                    case CREATURE_FAMILY_BEAR:              // Claw and Swipe
-                        if(spell->SpellIconID != 262 && spell->SpellIconID != 1562)
-                            continue;
-                        break;
-                    case CREATURE_FAMILY_BIRD_OF_PREY:      // Claw and Snatch
-                        if(spell->SpellIconID != 262 && spell->SpellIconID != 168)
-                            continue;
-                        break;
-                    case CREATURE_FAMILY_BOAR:              // Bite and Gore
-                        if(spell->SpellIconID != 1680 && spell->SpellIconID != 1578)
-                            continue;
-                        break;
-                    case CREATURE_FAMILY_CARRION_BIRD:      // Bite and Demoralizing Screech
-                        if(spell->SpellIconID != 1680 && spell->SpellIconID != 1579)
-                            continue;
-                        break;
-                    case CREATURE_FAMILY_CAT:               // Claw and Prowl and Rake
-                        if(spell->SpellIconID != 262 && spell->SpellIconID != 495 && spell->SpellIconID != 494)
-                            continue;
-                        break;
-                    case CREATURE_FAMILY_CHIMAERA:          // Bite and Froststorm Breath
-                        if(spell->SpellIconID != 1680 && spell->SpellIconID != 62)
-                            continue;
-                        break;
-                    case CREATURE_FAMILY_CORE_HOUND:        // Bite and Lava Breath
-                        if(spell->SpellIconID != 1680 && spell->SpellIconID != 1197)
-                            continue;
-                        break;
-                    case CREATURE_FAMILY_CRAB:              // Claw and Pin
-                        if(spell->SpellIconID != 262 && spell->SpellIconID != 2679)
-                            continue;
-                        break;
-                    case CREATURE_FAMILY_CROCOLISK:         // Bite and Bad Attitude
-                        if(spell->SpellIconID != 1680 && spell->SpellIconID != 1581)
-                            continue;
-                        break;
-                    case CREATURE_FAMILY_DEVILSAUR:         // Bite and Monstrous Bite
-                        if(spell->SpellIconID != 1680 && spell->SpellIconID != 599)
-                            continue;
-                        break;
-                    case CREATURE_FAMILY_DRAGONHAWK:        // Bite and Fire Breath
-                        if(spell->SpellIconID != 1680 && spell->SpellIconID != 2128)
-                            continue;
-                        break;
-                    case CREATURE_FAMILY_GORILLA:           // Smack and Thunderstomp
-                        if(spell->SpellIconID != 473 && spell->SpellIconID != 148)
-                            continue;
-                        break;
-                    case CREATURE_FAMILY_HYENA:             // Bite and Tendon Rip
-                        if(spell->SpellIconID != 1680 && spell->SpellIconID != 138)
-                            continue;
-                        break;
-                    case CREATURE_FAMILY_MOTH:              // Serenity Dust and Smack
-                        if(spell->SpellIconID != 1714 && spell->SpellIconID != 473)
-                            continue;
-                        break;
-                    case CREATURE_FAMILY_NETHER_RAY:        // Bite and Nether Shock
-                        if(spell->SpellIconID != 1680 && spell->SpellIconID != 2027)
-                            continue;
-                        break;
-                    case CREATURE_FAMILY_RAPTOR:            // Claw and Savage Rend
-                        if(spell->SpellIconID != 262 && spell->SpellIconID != 245)
-                            continue;
-                        break;
-                    case CREATURE_FAMILY_RAVAGER:           // Bite and Ravage
-                        if(spell->SpellIconID != 1680 && spell->SpellIconID != 2253)
-                            continue;
-                        break;
-                    case CREATURE_FAMILY_RHINO:             // Smack and Stampede
-                        if(spell->SpellIconID != 473 && spell->SpellIconID != 3066)
-                            continue;
-                        break;
-                    case CREATURE_FAMILY_SCORPID:           // Claw and Scorpid Poison
-                        if(spell->SpellIconID != 262 && spell->SpellIconID != 163)
-                            continue;
-                        break;
-                    case CREATURE_FAMILY_SERPENT:           // Bite and Poison Spit
-                        if(spell->SpellIconID != 1680 && spell->SpellIconID != 68)
-                            continue;
-                        break;
-                    case CREATURE_FAMILY_SILITHID:          // Claw and Venom Web Spray
-                        if(spell->SpellIconID != 262 && (spell->SpellIconID != 272 && spell->SpellVisual[0] != 12013))
-                            continue;
-                        break;
-                    case CREATURE_FAMILY_SPIDER:            // Bite and Web
-                        if(spell->SpellIconID != 1680 && (spell->SpellIconID != 272 && spell->SpellVisual[0] != 684))
-                            continue;
-                        break;
-                    case CREATURE_FAMILY_SPIRIT_BEAST:      // Claw and Prowl and Spirit Strike
-                        if(spell->SpellIconID != 262 && spell->SpellIconID != 495 && spell->SpellIconID != 255)
-                            continue;
-                        break;
-                    case CREATURE_FAMILY_SPOREBAT:          // Smack and Spore Cloud
-                        if(spell->SpellIconID != 473 && spell->SpellIconID != 2681)
-                            continue;
-                        break;
-                    case CREATURE_FAMILY_TALLSTRIDER:       // Claw and Dust Cloud
-                        if(spell->SpellIconID != 262 && (spell->SpellIconID != 157 && !(spell->Attributes & 0x4000000)))
-                            continue;
-                        break;
-                    case CREATURE_FAMILY_TURTLE:            // Bite and Shell Shield
-                        if(spell->SpellIconID != 1680 && spell->SpellIconID != 1588)
-                            continue;
-                        break;
-                    case CREATURE_FAMILY_WARP_STALKER:      // Bite and Warp
-                        if(spell->SpellIconID != 1680 && spell->SpellIconID != 1952)
-                            continue;
-                         break;
-                    case CREATURE_FAMILY_WASP:              // Smack and Sting
-                        if(spell->SpellIconID != 473 && spell->SpellIconID != 110)
-                            continue;
-                        break;
-                    case CREATURE_FAMILY_WIND_SERPENT:      // Bite and Lightning Breath
-                        if(spell->SpellIconID != 1680 && spell->SpellIconID != 62)
-                            continue;
-                        break;
-                    case CREATURE_FAMILY_WOLF:              // Bite and Furious Howl
-                        if(spell->SpellIconID != 1680 && spell->SpellIconID != 1573)
-                            continue;
-                        break;
-                    case CREATURE_FAMILY_WORM:              // Acid Spit and Bite
-                        if(spell->SpellIconID != 636 && spell->SpellIconID != 1680)
-                            continue;
-                        break;
-                    default:
-                        sLog.outError("LoadPetLevelupSpellMap: Unhandled creature family %u", creatureFamily->ID);
-                        continue;
-                    }
-            }
+            SpellEntry const *spell = sSpellStore.LookupEntry(skillLine->spellId);
+            if(!spell)                                      // not exist
+                continue;
 
-            mPetLevelupSpellMap[creatureFamily->ID][spell->spellLevel] = spell->Id;
+            PetLevelupSpellSet& spellSet = mPetLevelupSpellMap[creatureFamily->ID];
+            if(spellSet.empty())
+                ++family_count;
+
+            spellSet.insert(PetLevelupSpellSet::value_type(spell->spellLevel,spell->Id));
             count++;
         }
     }
 
     sLog.outString();
-    sLog.outString( ">> Loaded %u pet levelup spells", count );
+    sLog.outString( ">> Loaded %u pet levelup and default spells for %u families", count, family_count );
 }
 
 /// Some checks for spells, to prevent adding deprecated/broken spells for trainers, spell book, etc
