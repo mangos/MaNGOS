@@ -1283,6 +1283,11 @@ bool ChatHandler::HandleNpcChangeLevelCommand(const char* args)
 
     if(pCreature->isPet())
     {
+        if(((Pet*)pCreature)->getPetType()==HUNTER_PET)
+        {
+            pCreature->SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, objmgr.GetXPForLevel(lvl)/4);
+            pCreature->SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
+        }
         ((Pet*)pCreature)->GivePetLevel(lvl);
     }
     else

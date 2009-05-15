@@ -161,6 +161,7 @@ class Pet : public Creature
         HappinessState GetHappinessState();
         void GivePetXP(uint32 xp);
         void GivePetLevel(uint32 level);
+        void SynchronizeLevelWithOwner();
         bool InitStatsForLevel(uint32 level);
         bool HaveInDiet(ItemPrototype const* item) const;
         uint32 GetCurrentFoodBenefitLevel(uint32 itemlevel);

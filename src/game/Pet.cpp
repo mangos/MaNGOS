@@ -345,6 +345,8 @@ bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool 
     }
 
     m_loading = false;
+
+    SynchronizeLevelWithOwner();
     return true;
 }
 
@@ -732,12 +734,11 @@ void Pet::GivePetXP(uint32 xp)
     {
         newXP -= nextLvlXP;
 
-        SetLevel( level + 1 );
+        GivePetLevel(level+1);
         SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, objmgr.GetXPForLevel(level+1)/4);
 
         level = getLevel();
         nextLvlXP = GetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP);
-        GivePetLevel(level);
     }
 
     SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, newXP);
@@ -1846,4 +1847,30 @@ void Pet::learnSpellHighRank(uint32 spellid)
     SpellChainMapNext const& nextMap = spellmgr.GetSpellChainNext();
     for(SpellChainMapNext::const_iterator itr = nextMap.lower_bound(spellid); itr != nextMap.upper_bound(spellid); ++itr)
         learnSpellHighRank(itr->second);
+}
+
+void Pet::SynchronizeLevelWithOwner()
+{
+    Unit* owner = GetOwner();
+    if (!owner || owner->GetTypeId() != TYPEID_PLAYER)
+        return;
+
+    switch(getPetType())
+    {
+        // always same level
+        case SUMMON_PET:
+            GivePetLevel(owner->getLevel());
+            break;
+        // can't be greater owner level
+        case HUNTER_PET:
+            if(getLevel() > owner->getLevel())
+            {
+                GivePetLevel(owner->getLevel());
+                SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, objmgr.GetXPForLevel(owner->getLevel())/4);
+                SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, GetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP)-1);
+            }
+            break;
+        default:
+            break;
+    }
 }
