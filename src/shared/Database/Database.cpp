@@ -108,7 +108,7 @@ bool Database::PExecuteLog(const char * format,...)
 
 void Database::SetResultQueue(SqlResultQueue * queue)
 {
-	m_queryQueues[ACE_Based::Thread::current()] = queue;
+    m_queryQueues[ACE_Based::Thread::current()] = queue;
 
 }
 

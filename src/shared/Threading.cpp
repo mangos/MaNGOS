@@ -44,40 +44,43 @@ ThreadPriority::ThreadPriority()
 
     ASSERT (!_tmp.empty());
 
-    const size_t max_pos = _tmp.size();
-    size_t min_pos = 1;
-    size_t norm_pos = 0;
-    for (size_t i = 0; i < max_pos; ++i)
+    if(_tmp.size() >= MAXPRIORITYNUM)
     {
-        if(_tmp[i] == ACE_THR_PRI_OTHER_DEF)
+        const size_t max_pos = _tmp.size();
+        size_t min_pos = 1;
+        size_t norm_pos = 0;
+        for (size_t i = 0; i < max_pos; ++i)
         {
-            norm_pos = i + 1;
-            break;
+            if(_tmp[i] == ACE_THR_PRI_OTHER_DEF)
+            {
+                norm_pos = i + 1;
+                break;
+            }
         }
+
+        //since we have only 7(seven) values in enum Priority
+        //and 3 we know already (Idle, Normal, Realtime) so
+        //we need to split each list [Idle...Normal] and [Normal...Realtime]
+        //into ¹ piesces
+        const size_t _divider = 4;
+        size_t _div = (norm_pos - min_pos) / _divider;
+        if(_div == 0)
+            _div = 1;
+
+        min_pos = (norm_pos - 1);
+
+        m_priority[Low] = _tmp[min_pos -= _div];
+        m_priority[Lowest] = _tmp[min_pos -= _div ];
+
+        _div = (max_pos - norm_pos) / _divider;
+        if(_div == 0)
+            _div = 1;
+
+        min_pos = norm_pos - 1;
+
+        m_priority[High] = _tmp[min_pos += _div];
+        m_priority[Highest] = _tmp[min_pos += _div];
     }
-
-    //since we have only 7(seven) values in enum Priority
-    //and 3 we know already (Idle, Normal, Realtime) so
-    //we need to split each list [Idle...Normal] and [Normal...Realtime]
-    //into ¹ piesces
-    const size_t _divider = 4;
-    size_t _div = (norm_pos - min_pos) / _divider;
-    if(_div == 0)
-        _div = 1;
-
-    min_pos = (norm_pos - 1);
-
-    m_priority[Low] = _tmp[min_pos -= _div];
-    m_priority[Lowest] = _tmp[min_pos -= _div ];
-
-    _div = (max_pos - norm_pos) / _divider;
-    if(_div == 0)
-        _div = 1;
-
-    min_pos = norm_pos - 1;
-
-    m_priority[High] = _tmp[min_pos += _div];
-    m_priority[Highest] = _tmp[min_pos += _div];
 }
 
 int ThreadPriority::getPriority(Priority p) const

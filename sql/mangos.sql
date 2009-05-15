@@ -23,7 +23,7 @@ DROP TABLE IF EXISTS `db_version`;
 CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
-  `required_7796_02_mangos_mangos_string` bit(1) default NULL
+  `required_7830_01_mangos_spell_chain` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -1712,7 +1712,7 @@ CREATE TABLE `item_template` (
   `stat_type10` tinyint(3) unsigned NOT NULL default '0',
   `stat_value10` smallint(6) NOT NULL default '0',
   `ScalingStatDistribution` smallint(6) NOT NULL default '0',
-  `ScalingStatValue` smallint(6) NOT NULL default '0',
+  `ScalingStatValue` int(6) unsigned NOT NULL default '0',
   `dmg_min1` float NOT NULL default '0',
   `dmg_max1` float NOT NULL default '0',
   `dmg_type1` tinyint(3) unsigned NOT NULL default '0',
@@ -3157,6 +3157,27 @@ CREATE TABLE `npc_option` (
 LOCK TABLES `npc_option` WRITE;
 /*!40000 ALTER TABLE `npc_option` DISABLE KEYS */;
 /*!40000 ALTER TABLE `npc_option` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `npc_spellclick_spells`
+--
+
+DROP TABLE IF EXISTS `npc_spellclick_spells`;
+CREATE TABLE `npc_spellclick_spells` (
+    `npc_entry` INT UNSIGNED NOT NULL COMMENT 'reference to creature_template',
+    `spell_id` INT UNSIGNED NOT NULL COMMENT 'spell which should be casted ',
+    `quest_id` INT UNSIGNED NOT NULL COMMENT 'reference to quest_template',
+    `cast_flags` TINYINT UNSIGNED NOT NULL COMMENT 'first bit defines caster: 1=player, 0=creature; second bit defines target, same mapping as caster bit'
+) ENGINE = MYISAM DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `npc_spellclick_spells`
+--
+
+LOCK TABLES `npc_spellclick_spells` WRITE;
+/*!40000 ALTER TABLE `npc_spellclick_spells` DISABLE KEYS */;
+/*!40000 ALTER TABLE `npc_spellclick_spells` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -14476,7 +14497,7 @@ INSERT INTO spell_chain VALUES
 /*------------------
 --(189)Pet-Felhunter
 ------------------*/
-/*DevourMagic*/
+/*Devour Magic*/
 (19505,0,19505,1,0),
 (19731,19505,19505,2,0),
 (19734,19731,19505,3,0),
@@ -14484,13 +14505,19 @@ INSERT INTO spell_chain VALUES
 (27276,19736,19505,5,0),
 (27277,27276,19505,6,0),
 (48011,27277,19505,7,0),
-/*ShadowBite*/
+/*Fel Intelligence*/
+(54424,0,54424,1,0),
+(57564,54424,54424,2,0),
+(57565,57564,54424,3,0),
+(57566,57565,54424,4,0),
+(57567,57566,54424,5,0),
+/*Shadow Bite*/
 (54049,0,54049,1,0),
 (54050,54049,54049,2,0),
 (54051,54050,54049,3,0),
 (54052,54051,54049,4,0),
 (54053,54052,54049,5,0),
-/*SpellLock*/
+/*Spell Lock*/
 (19244,0,19244,1,0),
 (19647,19244,19244,2,0),
 /*------------------
@@ -17013,9 +17040,9 @@ INSERT INTO `spell_proc_event` VALUES
 (30293, 0x00000000,  5, 0x00000381, 0x000000C0, 0x00000000, 0x00000000, 0x00000000, 0.000000, 0.000000,  0),
 (30295, 0x00000000,  5, 0x00000381, 0x000000C0, 0x00000000, 0x00000000, 0x00000000, 0.000000, 0.000000,  0),
 (30296, 0x00000000,  5, 0x00000381, 0x000000C0, 0x00000000, 0x00000000, 0x00000000, 0.000000, 0.000000,  0),
-(30299, 0x00000024,  0, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0.000000, 0.000000,  0),
-(30301, 0x00000024,  0, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0.000000, 0.000000,  0),
-(30302, 0x00000024,  0, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0.000000, 0.000000,  0),
+(30299, 0x0000007E,  0, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0.000000, 0.000000,  0),
+(30301, 0x0000007E,  0, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0.000000, 0.000000,  0),
+(30302, 0x0000007E,  0, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0.000000, 0.000000,  0),
 (30675, 0x00000000, 11, 0x00000003, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0.000000, 0.000000,  0),
 (30678, 0x00000000, 11, 0x00000003, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0.000000, 0.000000,  0),
 (30679, 0x00000000, 11, 0x00000003, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0.000000, 0.000000,  0),
@@ -17101,6 +17128,7 @@ INSERT INTO `spell_proc_event` VALUES
 (33882, 0x00000000,  0, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000002, 0.000000, 0.000000,  0),
 (33883, 0x00000000,  0, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000002, 0.000000, 0.000000,  0),
 (33953, 0x00000000,  0, 0x00000000, 0x00000000, 0x00000000, 0x00004000, 0x00000000, 0.000000, 0.000000, 45),
+(34074, 0x00000000,  9, 0x0007FA43, 0x00881081, 0x00000201, 0x00000000, 0x00000000, 0.000000, 0.000000,  0),
 (34080, 0x00000000,  0, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000008, 0.000000, 0.000000,  0),
 (34138, 0x00000000, 11, 0x00000080, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0.000000, 0.000000,  0),
 (34139, 0x00000000, 10, 0x40000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0.000000, 0.000000,  0),

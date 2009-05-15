@@ -136,10 +136,12 @@ typedef UNORDERED_MAP<uint64/*(instance,guid) pair*/,time_t> RespawnTimes;
 
 
 // mangos string ranges
-#define MIN_MANGOS_STRING_ID    1
-#define MAX_MANGOS_STRING_ID    2000000000
-#define MIN_DB_SCRIPT_STRING_ID MAX_MANGOS_STRING_ID
-#define MAX_DB_SCRIPT_STRING_ID 2000010000
+#define MIN_MANGOS_STRING_ID           1                    // 'mangos_string'
+#define MAX_MANGOS_STRING_ID           2000000000
+#define MIN_DB_SCRIPT_STRING_ID        MAX_MANGOS_STRING_ID // 'db_script_string'
+#define MAX_DB_SCRIPT_STRING_ID        2000010000
+#define MIN_CREATURE_AI_TEXT_STRING_ID (-1)                 // 'creature_ai_texts'
+#define MAX_CREATURE_AI_TEXT_STRING_ID (-1000000)
 
 struct MangosStringLocale
 {
@@ -887,7 +889,7 @@ class ObjectMgr
 #define objmgr MaNGOS::Singleton<ObjectMgr>::Instance()
 
 // scripting access functions
-MANGOS_DLL_SPEC bool LoadMangosStrings(DatabaseType& db, char const* table,int32 start_value = -1, int32 end_value = std::numeric_limits<int32>::min());
+MANGOS_DLL_SPEC bool LoadMangosStrings(DatabaseType& db, char const* table,int32 start_value = MAX_CREATURE_AI_TEXT_STRING_ID, int32 end_value = std::numeric_limits<int32>::min());
 MANGOS_DLL_SPEC uint32 GetAreaTriggerScriptId(uint32 trigger_id);
 MANGOS_DLL_SPEC uint32 GetScriptId(const char *name);
 MANGOS_DLL_SPEC ObjectMgr::ScriptNameMap& GetScriptNames();
