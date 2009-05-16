@@ -1581,7 +1581,7 @@ bool CreatureEventAI::CanCast(Unit* Target, SpellEntry const *Spell, bool Trigge
         return false;
 
     //Unit is out of range of this spell
-    if (!m_creature->IsInRange(Target,TempRange->minRange,TempRange->minRange))
+    if (!m_creature->IsInRange(Target,TempRange->minRange,TempRange->maxRange))
         return false;
 
     return true;
