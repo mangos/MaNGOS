@@ -4792,13 +4792,10 @@ bool ChatHandler::HandleResetLevelCommand(const char * args)
     player->InitTalentForLevel();
     player->SetUInt32Value(PLAYER_XP,0);
 
-    // reset level to summoned pet
-    Pet* pet = player->GetPet();
-    if(pet && pet->getPetType()==SUMMON_PET)
-    {
-        pet->InitStatsForLevel(1);
-        pet->InitTalentForLevel();
-    }
+    // reset level for pet
+    if(Pet* pet = player->GetPet())
+        pet->SynchronizeLevelWithOwner();
+
     return true;
 }
 
