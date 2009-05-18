@@ -300,6 +300,7 @@ class ChatHandler
         bool HandleReloadAllNpcCommand(const char* args);
         bool HandleReloadAllQuestCommand(const char* args);
         bool HandleReloadAllScriptsCommand(const char* args);
+        bool HandleReloadAllEventAICommand(const char* args);
         bool HandleReloadAllSpellCommand(const char* args);
         bool HandleReloadAllLocalesCommand(const char* args);
 
@@ -310,6 +311,9 @@ class ChatHandler
         bool HandleReloadAreaTriggerTavernCommand(const char* args);
         bool HandleReloadAreaTriggerTeleportCommand(const char* args);
         bool HandleReloadEventScriptsCommand(const char* args);
+        bool HandleReloadEventAITextsCommand(const char* args);
+        bool HandleReloadEventAISummonsCommand(const char* args);
+        bool HandleReloadEventAIScriptsCommand(const char* args);
         bool HandleReloadCommandCommand(const char* args);
         bool HandleReloadCreatureQuestRelationsCommand(const char* args);
         bool HandleReloadCreatureQuestInvRelationsCommand(const char* args);
