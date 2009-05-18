@@ -123,6 +123,7 @@ class ChatHandler
         bool HandleCharacterDeleteCommand(const char* args);
         bool HandleCharacterLevelCommand(const char* args);
         bool HandleCharacterRenameCommand(const char * args);
+        bool HandleCharacterReputationCommand(const char* args);
 
         bool HandleDebugAnimCommand(const char* args);
         bool HandleDebugArenaCommand(const char * args);
