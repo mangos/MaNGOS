@@ -2024,7 +2024,7 @@ bool ChatHandler::HandleTeleNameCommand(const char * args)
     Player* target;
     uint64 target_guid;
     std::string target_name;
-    if(!extractPlayerTarget(teleStr,&target,&target_guid,&target_name))
+    if(!extractPlayerTarget(nameStr,&target,&target_guid,&target_name))
         return false;
 
     // id, or string, or [name] Shift-click form |color|Htele:id|h[name]|h|r
