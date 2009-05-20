@@ -85,8 +85,7 @@ VendorItem const* VendorItemData::FindItem(uint32 item_id) const
 
 bool AssistDelayEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
 {
-    Unit* victim = Unit::GetUnit(m_owner, m_victim);
-    if (victim)
+    if(Unit* victim = Unit::GetUnit(m_owner, m_victim))
     {
         while (!m_assistants.empty())
         {
@@ -1725,26 +1724,34 @@ void Creature::CallAssistance()
     }
 }
 
-bool Creature::CanAssistTo(const Unit* u, const Unit* enemy) const
+bool Creature::CanAssistTo(const Unit* u, const Unit* enemy, bool checkfaction /*= true*/) const
 {
     // we don't need help from zombies :)
-    if( !isAlive() )
+    if (!isAlive())
         return false;
 
     // skip fighting creature
-    if( isInCombat() )
-        return false;
-
-    // only from same creature faction
-    if(getFaction() != u->getFaction() )
+    if (isInCombat())
         return false;
 
     // only free creature
-    if( GetCharmerOrOwnerGUID() )
+    if (GetCharmerOrOwnerGUID())
         return false;
 
+    // only from same creature faction
+    if (checkfaction)
+    {
+        if (getFaction() != u->getFaction())
+            return false;
+    }
+    else
+    {
+        if (!IsFriendlyTo(u))
+            return false;
+    }
+
     // skip non hostile to caster enemy creatures
-    if( !IsHostileTo(enemy) )
+    if (!IsHostileTo(enemy))
         return false;
 
     return true;
