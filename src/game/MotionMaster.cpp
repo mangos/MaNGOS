@@ -331,7 +331,37 @@ MotionMaster::MovePoint(uint32 id, float x, float y, float z)
 }
 
 void
-MotionMaster::MoveFleeing(Unit* enemy)
+MotionMaster::MoveSeekAssistance(float x, float y, float z)
+{
+    if(i_owner->GetTypeId()==TYPEID_PLAYER)
+    {
+        sLog.outError("Player (GUID: %u) attempt to seek assistance",i_owner->GetGUIDLow());
+    }
+    else
+    {
+        DEBUG_LOG("Creature (Entry: %u GUID: %u) seek assistance (X: %f Y: %f Z: %f)",
+            i_owner->GetEntry(), i_owner->GetGUIDLow(), x, y, z );
+        Mutate(new AssistanceMovementGenerator(x,y,z));
+    }
+}
+
+void
+MotionMaster::MoveSeekAssistanceDistract(uint32 time)
+{
+    if(i_owner->GetTypeId()==TYPEID_PLAYER)
+    {
+        sLog.outError("Player (GUID: %u) attempt to call distract after assistance",i_owner->GetGUIDLow());
+    }
+    else
+    {
+        DEBUG_LOG("Creature (Entry: %u GUID: %u) is distracted after assistance call (Time: %u)",
+            i_owner->GetEntry(), i_owner->GetGUIDLow(), time );
+        Mutate(new AssistanceDistractMovementGenerator(time));
+    }
+}
+
+void
+MotionMaster::MoveFleeing(Unit* enemy, uint32 time)
 {
     if(!enemy)
         return;
@@ -345,11 +375,15 @@ MotionMaster::MoveFleeing(Unit* enemy)
     }
     else
     {
-        DEBUG_LOG("Creature (Entry: %u GUID: %u) flee from %s (GUID: %u)",
+        DEBUG_LOG("Creature (Entry: %u GUID: %u) flee from %s (GUID: %u)%s",
             i_owner->GetEntry(), i_owner->GetGUIDLow(),
             enemy->GetTypeId()==TYPEID_PLAYER ? "player" : "creature",
-            enemy->GetTypeId()==TYPEID_PLAYER ? enemy->GetGUIDLow() : ((Creature*)enemy)->GetDBTableGUIDLow() );
-        Mutate(new FleeingMovementGenerator<Creature>(enemy->GetGUID()));
+            enemy->GetTypeId()==TYPEID_PLAYER ? enemy->GetGUIDLow() : ((Creature*)enemy)->GetDBTableGUIDLow(),
+            time ? " for a limited time" : "");
+        if (time)
+            Mutate(new TimedFleeingMovementGenerator(enemy->GetGUID(), time));
+        else
+            Mutate(new FleeingMovementGenerator<Creature>(enemy->GetGUID()));
     }
 }
 

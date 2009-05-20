@@ -623,9 +623,8 @@ void CreatureEventAI::ProcessAction(CreatureEventAI_Action const& action, uint32
         case ACTION_T_EVADE:
             EnterEvadeMode();
             break;
-        case ACTION_T_FLEE:
-            //TODO: Replace with Flee movement generator
-            m_creature->CastSpell(m_creature, SPELL_RUN_AWAY, true);
+        case ACTION_T_FLEE_FOR_ASSIST:
+            m_creature->DoFleeToGetAssistance();
             break;
         case ACTION_T_QUEST_EVENT_ALL:
             if (pActionInvoker && pActionInvoker->GetTypeId() == TYPEID_PLAYER)
