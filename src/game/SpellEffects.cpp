@@ -3262,6 +3262,7 @@ void Spell::EffectSummon(uint32 i)
 
     spawnCreature->AIM_Initialize();
     spawnCreature->InitPetCreateSpells();
+    spawnCreature->InitLevelupSpellsForLevel();
     spawnCreature->SetHealth(spawnCreature->GetMaxHealth());
     spawnCreature->SetPower(POWER_MANA, spawnCreature->GetMaxPower(POWER_MANA));
 
@@ -4174,6 +4175,7 @@ void Spell::EffectSummonPet(uint32 i)
 
     NewSummon->InitStatsForLevel(petlevel);
     NewSummon->InitPetCreateSpells();
+    NewSummon->InitLevelupSpellsForLevel();
     NewSummon->InitTalentForLevel();
 
     if(NewSummon->getPetType()==SUMMON_PET)
@@ -5971,6 +5973,7 @@ void Spell::EffectSummonCritter(uint32 i)
 
     critter->AIM_Initialize();
     critter->InitPetCreateSpells();                         // e.g. disgusting oozeling has a create spell as critter...
+    //critter->InitLevelupSpellsForLevel();                 // none?
     critter->SelectLevel(critter->GetCreatureInfo());       // some summoned creaters have different from 1 DB data for level/hp
     critter->SetUInt32Value(UNIT_NPC_FLAGS, critter->GetCreatureInfo()->npcflag);
                                                             // some mini-pets have quests

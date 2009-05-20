@@ -1227,9 +1227,13 @@ bool WorldObject::IsInRange(WorldObject const* obj, float minRange, float maxRan
 
     float sizefactor = GetObjectSize() + obj->GetObjectSize();
 
-    float mindist = minRange + sizefactor;
-    if(distsq < mindist * mindist)
-        return false;
+    // check only for real range
+    if(minRange > 0.0f)
+    {
+        float mindist = minRange + sizefactor;
+        if(distsq < mindist * mindist)
+            return false;
+    }
 
     float maxdist = maxRange + sizefactor;
     return distsq < maxdist * maxdist;
@@ -1243,9 +1247,13 @@ bool WorldObject::IsInRange2d(float x, float y, float minRange, float maxRange) 
 
     float sizefactor = GetObjectSize();
 
-    float mindist = minRange + sizefactor;
-    if(distsq < mindist * mindist)
-        return false;
+    // check only for real range
+    if(minRange > 0.0f)
+    {
+        float mindist = minRange + sizefactor;
+        if(distsq < mindist * mindist)
+            return false;
+    }
 
     float maxdist = maxRange + sizefactor;
     return distsq < maxdist * maxdist;
@@ -1260,9 +1268,13 @@ bool WorldObject::IsInRange3d(float x, float y, float z, float minRange, float m
 
     float sizefactor = GetObjectSize();
 
-    float mindist = minRange + sizefactor;
-    if(distsq < mindist * mindist)
-        return false;
+    // check only for real range
+    if(minRange > 0.0f)
+    {
+        float mindist = minRange + sizefactor;
+        if(distsq < mindist * mindist)
+            return false;
+    }
 
     float maxdist = maxRange + sizefactor;
     return distsq < maxdist * maxdist;
