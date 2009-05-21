@@ -1402,6 +1402,13 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         uint32 CalculateTalentsPoints() const;
 
+        // Dual Spec
+        uint32 GetActiveSpec() { return m_activeSpec; }
+        void SetActiveSpec(uint32 spec) { m_activeSpec = spec; }
+        uint32 GetSpecsCount() { return m_specsCount; }
+        void SetSpecsCount(uint32 count) { m_specsCount = count; }
+        void ActivateSpec(uint32 specNum);
+
         void InitGlyphsForLevel();
         void SetGlyphSlot(uint8 slot, uint32 slottype) { SetUInt32Value(PLAYER_FIELD_GLYPH_SLOTS_1 + slot, slottype); }
         uint32 GetGlyphSlot(uint8 slot) { return GetUInt32Value(PLAYER_FIELD_GLYPH_SLOTS_1 + slot); }
@@ -2208,6 +2215,9 @@ class MANGOS_DLL_SPEC Player : public Unit
         PlayerSpellMap m_spells;
         SpellCooldowns m_spellCooldowns;
         uint32 m_lastPotionId;                              // last used health/mana potion in combat, that block next potion use
+
+        uint32 m_activeSpec;
+        uint32 m_specsCount;
 
         ActionButtonList m_actionButtons;
 
