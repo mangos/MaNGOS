@@ -283,6 +283,23 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Scripts()
                     if (temp.ooc_los.repeatMax < temp.ooc_los.repeatMin)
                         sLog.outErrorDb("CreatureEventAI:  Creature %u are using repeatable event(%u) with param4 < param3 (RepeatMax < RepeatMin). Event will never repeat.", temp.creature_id, i);
                     break;
+                case EVENT_T_SPAWNED:
+                    switch(temp.spawned.condition)
+                    {
+                        case SPAWNED_EVENT_ALWAY:
+                            break;
+                        case SPAWNED_EVENT_MAP:
+                            if(!sMapStore.LookupEntry(temp.spawned.conditionValue1))
+                                sLog.outErrorDb("CreatureEventAI:  Creature %u are using spawned event(%u) with param1 = %u 'map specific' but with not existed map (%u) in param2. Event will never repeat.", temp.creature_id, i, temp.spawned.condition, temp.spawned.conditionValue1);
+                            break;
+                        case SPAWNED_EVENT_ZONE:
+                            if(!GetAreaEntryByAreaID(temp.spawned.conditionValue1))
+                                sLog.outErrorDb("CreatureEventAI:  Creature %u are using spawned event(%u) with param1 = %u 'area specific' but with not existed area (%u) in param2. Event will never repeat.", temp.creature_id, i, temp.spawned.condition, temp.spawned.conditionValue1);
+                        default:
+                            sLog.outErrorDb("CreatureEventAI:  Creature %u are using invalid spawned event %u mode (%u) in param1", temp.creature_id, i, temp.spawned.condition);
+                            break;
+                    }
+                    break;
                 case EVENT_T_FRIENDLY_HP:
                     if (temp.friendly_hp.repeatMax < temp.friendly_hp.repeatMin)
                         sLog.outErrorDb("CreatureEventAI:  Creature %u are using repeatable event(%u) with param4 < param3 (RepeatMax < RepeatMin). Event will never repeat.", temp.creature_id, i);
@@ -327,7 +344,6 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Scripts()
                 case EVENT_T_AGGRO:
                 case EVENT_T_DEATH:
                 case EVENT_T_EVADE:
-                case EVENT_T_SPAWNED:
                 case EVENT_T_REACHED_HOME:
                 {
                     if (temp.event_flags & EFLAG_REPEATABLE)
@@ -626,12 +642,13 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Scripts()
                             sLog.outErrorDb("CreatureEventAI:  Event %u Action %u uses non-existant creature entry %u.", i, j+1, action.update_template.creatureId);
                         break;
                     case ACTION_T_EVADE:                    //No Params
-                    case ACTION_T_FLEE:                     //No Params
+                    case ACTION_T_FLEE_FOR_ASSIST:          //No Params
                     case ACTION_T_DIE:                      //No Params
                     case ACTION_T_ZONE_COMBAT_PULSE:        //No Params
                     case ACTION_T_AUTO_ATTACK:              //AllowAttackState (0 = stop attack, anything else means continue attacking)
                     case ACTION_T_COMBAT_MOVEMENT:          //AllowCombatMovement (0 = stop combat based movement, anything else continue attacking)
                     case ACTION_T_RANGED_MOVEMENT:          //Distance, Angle
+                    case ACTION_T_CALL_FOR_HELP:            //Distance
                         break;
 
                     case ACTION_T_RANDOM_SAY:

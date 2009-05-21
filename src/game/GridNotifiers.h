@@ -445,6 +445,25 @@ namespace MaNGOS
         template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED> &) {}
     };
 
+    template<class Do>
+    struct MANGOS_DLL_DECL CreatureWorker
+    {
+        uint32 i_phaseMask;
+        Do& i_do;
+
+        CreatureWorker(WorldObject const* searcher, Do& _do)
+            : i_phaseMask(searcher->GetPhaseMask()), i_do(_do) {}
+
+        void Visit(CreatureMapType &m)
+        {
+            for(CreatureMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
+                if(itr->getSource()->InSamePhase(i_phaseMask))
+                    i_do(itr->getSource());
+        }
+
+        template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED> &) {}
+    };
+
     // Player searchers
 
     template<class Check>
@@ -893,6 +912,38 @@ namespace MaNGOS
             Unit* const i_funit;
             Unit* const i_enemy;
             float i_range;
+    };
+
+    class NearestAssistCreatureInCreatureRangeCheck
+    {
+        public:
+            NearestAssistCreatureInCreatureRangeCheck(Creature* obj, Unit* enemy, float range)
+                : i_obj(obj), i_enemy(enemy), i_range(range) {}
+
+            bool operator()(Creature* u)
+            {
+                if(u == i_obj)
+                    return false;
+                if(!u->CanAssistTo(i_obj,i_enemy))
+                    return false;
+                    
+                if(!i_obj->IsWithinDistInMap(u, i_range))
+                    return false;
+                
+                if(!i_obj->IsWithinLOSInMap(u))
+                    return false;
+
+                i_range = i_obj->GetDistance(u);            // use found unit range as new range limit for next check
+                return true;
+            }
+            float GetLastRange() const { return i_range; }
+        private:
+            Creature* const i_obj;
+            Unit* const i_enemy;
+            float  i_range;
+
+            // prevent clone this object
+            NearestAssistCreatureInCreatureRangeCheck(NearestAssistCreatureInCreatureRangeCheck const&);
     };
 
     // Success at unit in range, range update for next check (this can be use with CreatureLastSearcher to find nearest creature)

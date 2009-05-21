@@ -92,7 +92,10 @@ template<class T>
 void
 TargetedMovementGenerator<T>::Initialize(T &owner)
 {
-    owner.RemoveUnitMovementFlag(MONSTER_MOVE_WALK);
+    if (owner.GetTypeId() == TYPEID_UNIT && ((Creature*)&owner)->HasSearchedAssistance())
+        owner.AddUnitMovementFlag(MONSTER_MOVE_WALK);
+    else
+        owner.RemoveUnitMovementFlag(MONSTER_MOVE_WALK);
 
     if (owner.GetTypeId() == TYPEID_UNIT && ((Creature*)&owner)->canFly())
         owner.AddUnitMovementFlag(MONSTER_MOVE_FLY);
