@@ -21,7 +21,7 @@
 
 DROP TABLE IF EXISTS `realmd_db_version`;
 CREATE TABLE `realmd_db_version` (
-  `required_7546_02_realmd_uptime` bit(1) default NULL
+  `required_7867_01_realmd_account` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Last applied sql update to DB';
 
 --
