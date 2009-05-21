@@ -17,6 +17,7 @@ Version 0.13
  * Under discussion.
  * OpenSSL lib upgrade to OpenSSL 0.9.8k
  * ZThread replaced by similar ACE framework functionality. ZThread use dropped.
+ * Visual Studio 2003 (VC71) support dropped
  * Upgrade to client version 3.0.9 (build 9551).
 
 Version 0.12
