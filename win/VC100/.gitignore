@@ -10,7 +10,10 @@
 # MaNGOS generated files at Windows build
 #
 
-*.ncb
-*.suo
-*.sdf
-ipch
+*__Win32_Debug*
+*__x64_Debug*
+*__Win32_Release*
+*__x64_Release*
+*.user
+*.filters
+*.log
