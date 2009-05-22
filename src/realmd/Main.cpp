@@ -54,7 +54,7 @@ void HookSignals();
 bool stopEvent = false;                                     ///< Setting it to true stops the server
 RealmList m_realmList;                                      ///< Holds the list of realms for this server
 
-DatabaseType dbRealmServer;                                 ///< Accessor to the realm server database
+DatabaseType loginDatabase;                                 ///< Accessor to the realm server database
 
 /// Print out the usage string for this program on the console.
 void usage(const char *prog)
@@ -262,7 +262,7 @@ extern int main(int argc, char **argv)
         {
             loopCounter = 0;
             sLog.outDetail("Ping MySQL to keep connection alive");
-            delete dbRealmServer.Query("SELECT 1 FROM realmlist LIMIT 1");
+            delete loginDatabase.Query("SELECT 1 FROM realmlist LIMIT 1");
         }
 #ifdef WIN32
         if (m_ServiceStatus == 0) stopEvent = true;
@@ -271,7 +271,7 @@ extern int main(int argc, char **argv)
     }
 
     ///- Wait for the delay thread to exit
-    dbRealmServer.HaltDelayThread();
+    loginDatabase.HaltDelayThread();
 
     ///- Remove signal handling before leaving
     UnhookSignals();
@@ -310,7 +310,7 @@ bool StartDB(std::string &dbstring)
     }
 
     sLog.outString("Database: %s", dbstring.c_str() );
-    if(!dbRealmServer.Initialize(dbstring.c_str()))
+    if(!loginDatabase.Initialize(dbstring.c_str()))
     {
         sLog.outError("Cannot connect to database");
         return false;
