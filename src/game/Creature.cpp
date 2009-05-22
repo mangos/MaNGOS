@@ -1297,7 +1297,7 @@ bool Creature::CreateFromProto(uint32 guidlow, uint32 Entry, uint32 team, const 
     Map *map = MapManager::Instance().FindMap(GetMapId(), GetInstanceId());
     if(map && map->IsDungeon() && ((InstanceMap*)map)->GetInstanceData())
     {
-        ((InstanceMap*)map)->GetInstanceData()->OnCreatureCreate(this, Entry);
+        ((InstanceMap*)map)->GetInstanceData()->OnCreatureCreate(this);
     }
 
     return true;
