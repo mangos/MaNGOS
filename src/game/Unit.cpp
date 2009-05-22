@@ -5765,7 +5765,6 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
             // Ancestral Awakening
             if (dummySpell->SpellIconID == 3065)
             {
-                // TODO: frite dummy fot triggered spell
                 triggered_spell_id = 52759;
                 basepoints0 = triggerAmount * damage / 100;
                 target = this;
@@ -11353,6 +11352,9 @@ Pet* Unit::CreateTamedPetFrom(Creature* creatureTarget,uint32 spell_id)
     if(GetTypeId()==TYPEID_PLAYER)
         pet->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
 
+    if(IsPvP())
+        pet->SetPvP(true);
+
     uint32 level = (creatureTarget->getLevel() < (getLevel() - 5)) ? (getLevel() - 5) : creatureTarget->getLevel();
 
     if(!pet->InitStatsForLevel(level))
@@ -11556,4 +11558,22 @@ void Unit::NearTeleportTo( float x, float y, float z, float orientation, bool ca
         BuildHeartBeatMsg(&data);
         SendMessageToSet(&data, false);
     }
+}
+
+void Unit::SetPvP( bool state )
+{
+    if(state)
+        SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_PVP);
+    else
+        RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_PVP);
+
+    if(Pet* pet = GetPet())
+        pet->SetPvP(state);
+    if(Unit* charmed = GetCharm())
+        charmed->SetPvP(state);
+
+    for (int8 i = 0; i < MAX_TOTEM; ++i)
+        if(m_TotemSlot[i])
+            if(Creature *totem = GetMap()->GetCreature(m_TotemSlot[i]))
+                totem->SetPvP(state);
 }

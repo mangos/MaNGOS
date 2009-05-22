@@ -61,7 +61,7 @@ class MANGOS_DLL_SPEC InstanceData
         virtual void OnObjectCreate(GameObject *) {}
 
         //called on creature creation
-        virtual void OnCreatureCreate(Creature * /*creature*/, uint32 /*creature_entry*/) {}
+        virtual void OnCreatureCreate(Creature * /*creature*/) {}
 
         //All-purpose data storage 64 bit
         virtual uint64 GetData64(uint32 /*Data*/) { return 0; }
