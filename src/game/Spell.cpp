@@ -1737,6 +1737,33 @@ void Spell::SetTargetMap(uint32 i,uint32 cur,UnitList& TagUnitMap)
                             TagUnitMap.push_back(pet);
                 }
             }
+            if (m_spellInfo->Id==52759)                     //Ancestral Awakening (special target selection)
+            {
+                float lowestPerc   = (float)m_caster->GetHealth() / (float)m_caster->GetMaxHealth();
+                Unit* lowestTarget = m_caster;
+
+                if (pGroup)
+                {
+                    Group::MemberSlotList const& members = pGroup->GetMemberSlots();
+                    Group::MemberSlotList::const_iterator itr = members.begin();
+                    for(; itr != members.end(); ++itr)
+                    {
+                        if (Unit* member = ObjectAccessor::GetPlayer(*m_caster, (*itr).guid))
+                        {
+                            if (member == m_caster || member->isDead() || m_caster->IsHostileTo(member) || !m_caster->IsWithinDistInMap(member, radius))
+                                continue;
+
+                            float perc = (float)member->GetHealth() / (float)member->GetMaxHealth();
+                            if (perc <= lowestPerc)
+                            {
+                                lowestPerc = perc;
+                                lowestTarget = member;
+                            }
+                        }
+                    }
+                }
+                TagUnitMap.push_back(lowestTarget);
+            }
             else
             {
                 if(pGroup)
