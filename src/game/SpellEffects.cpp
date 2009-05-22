@@ -1687,6 +1687,12 @@ void Spell::EffectDummy(uint32 i)
                 }
                 return;
             }
+            // Cleansing Totem
+            if(m_spellInfo->SpellFamilyFlags & 0x0000000004000000LL && m_spellInfo->SpellIconID==1673)
+            {
+                m_caster->CastSpell(unitTarget, 52025, true);
+                return;
+            }
             // Healing Stream Totem
             if(m_spellInfo->SpellFamilyFlags & 0x0000000000002000LL)
             {
