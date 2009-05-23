@@ -1577,6 +1577,20 @@ bool Creature::IsImmunedToSpellEffect(SpellEntry const* spellInfo, uint32 index)
     if (GetCreatureInfo()->MechanicImmuneMask & (1 << (spellInfo->EffectMechanic[index] - 1)))
         return true;
 
+    // Taunt immunity special flag check
+    if (GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_NOT_TAUNTABLE)
+    {
+        // Taunt aura apply check
+        if (spellInfo->Effect[index] == SPELL_EFFECT_APPLY_AURA)
+        {
+            if (spellInfo->EffectApplyAuraName[index] == SPELL_AURA_MOD_TAUNT)
+                return true;
+        }
+        // Spell effect taunt check
+        else if (spellInfo->Effect[index] == SPELL_EFFECT_ATTACK_ME)
+            return true;
+    }
+
     return Unit::IsImmunedToSpellEffect(spellInfo, index);
 }
 
