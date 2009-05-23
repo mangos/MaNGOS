@@ -906,6 +906,7 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         void GiveXP(uint32 xp, Unit* victim);
         void GiveLevel(uint32 level);
+
         void InitStatsForLevel(bool reapplyMods = false);
 
         // Played Time Stuff

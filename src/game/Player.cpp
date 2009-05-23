@@ -1447,8 +1447,8 @@ void Player::BuildEnumData( QueryResult * result, WorldPacket * p_data )
 
     *p_data << uint8(getLevel());                           // player level
     // do not use GetMap! it will spawn a new instance since the bound instances are not loaded
-    uint32 zoneId = MapManager::Instance().GetZoneId(GetMapId(), GetPositionX(),GetPositionY(),GetPositionZ());
-    sLog.outDebug("Player::BuildEnumData: m:%u, x:%f, y:%f, z:%f zone:%u", GetMapId(), GetPositionX(), GetPositionY(), GetPositionZ(), zoneId);
+    uint32 zoneId = fields[10].GetUInt32();
+    sLog.outDebug("Player::BuildEnumData: map:%u, x:%f, y:%f, z:%f zone:%u", GetMapId(), GetPositionX(), GetPositionY(), GetPositionZ(), zoneId);
     *p_data << uint32(zoneId);
     *p_data << uint32(GetMapId());
 
@@ -1457,7 +1457,7 @@ void Player::BuildEnumData( QueryResult * result, WorldPacket * p_data )
     *p_data << GetPositionZ();
 
     // guild id
-    *p_data << (result ? fields[13].GetUInt32() : 0);
+    *p_data << uint32(fields[14].GetUInt32());
 
     uint32 char_flags = 0;
     if(HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_HIDE_HELM))
@@ -1470,7 +1470,7 @@ void Player::BuildEnumData( QueryResult * result, WorldPacket * p_data )
         char_flags |= CHARACTER_FLAG_RENAME;
     if(sWorld.getConfig(CONFIG_DECLINED_NAMES_USED))
     {
-        if(!fields[14].GetCppString().empty())
+        if(!fields[15].GetCppString().empty())
             char_flags |= CHARACTER_FLAG_DECLINED;
     }
     else
@@ -1490,12 +1490,12 @@ void Player::BuildEnumData( QueryResult * result, WorldPacket * p_data )
         // show pet at selection character in character list  only for non-ghost character
         if (result && isAlive() && (pClass == CLASS_WARLOCK || pClass == CLASS_HUNTER || pClass == CLASS_DEATH_KNIGHT))
         {
-            uint32 entry = fields[10].GetUInt32();
+            uint32 entry = fields[11].GetUInt32();
             CreatureInfo const* cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(entry);
             if(cInfo)
             {
-                petDisplayId = fields[11].GetUInt32();
-                petLevel     = fields[12].GetUInt32();
+                petDisplayId = fields[12].GetUInt32();
+                petLevel     = fields[13].GetUInt32();
                 petFamily    = cInfo->family;
             }
         }
@@ -2100,11 +2100,22 @@ void Player::SetGameMaster(bool on)
         setFaction(35);
         SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_GM);
 
+        if (Pet* pet = GetPet())
+        {
+            pet->setFaction(35);
+            pet->getHostilRefManager().setOnlineOfflineState(false);
+        }
+
+        for (int8 i = 0; i < MAX_TOTEM; ++i)
+            if(m_TotemSlot[i])
+                if(Creature *totem = GetMap()->GetCreature(m_TotemSlot[i]))
+                    totem->setFaction(35);
+
         RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
         ResetContestedPvP();
 
         getHostilRefManager().setOnlineOfflineState(false);
-        CombatStop();
+        CombatStopWithPets();
 
         SetPhaseMask(PHASEMASK_ANYWHERE,false);             // see and visible in all phases
     }
@@ -2117,6 +2128,17 @@ void Player::SetGameMaster(bool on)
         m_ExtraFlags &= ~ PLAYER_EXTRA_GM_ON;
         setFactionForRace(getRace());
         RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_GM);
+
+        if (Pet* pet = GetPet())
+        {
+            pet->setFaction(getFaction());
+            pet->getHostilRefManager().setOnlineOfflineState(true);
+        }
+
+        for (int8 i = 0; i < MAX_TOTEM; ++i)
+            if(m_TotemSlot[i])
+                if(Creature *totem = GetMap()->GetCreature(m_TotemSlot[i]))
+                    totem->setFaction(getFaction());
 
         // restore FFA PvP Server state
         if(sWorld.IsFFAPvPRealm())
@@ -2329,10 +2351,10 @@ void Player::GiveLevel(uint32 level)
     SetPower(POWER_FOCUS, 0);
     SetPower(POWER_HAPPINESS, 0);
 
-    // give level to summoned pet
-    Pet* pet = GetPet();
-    if(pet && pet->getPetType()==SUMMON_PET)
-        pet->GivePetLevel(level);
+    // update level to hunter/summon pet
+    if (Pet* pet = GetPet())
+        pet->SynchronizeLevelWithOwner();
+
     GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_LEVEL);
 }
 
@@ -2518,6 +2540,10 @@ void Player::InitStatsForLevel(bool reapplyMods)
     SetPower(POWER_FOCUS, 0);
     SetPower(POWER_HAPPINESS, 0);
     SetPower(POWER_RUNIC_POWER, 0);
+
+    // update level to hunter/summon pet
+    if (Pet* pet = GetPet())
+        pet->SynchronizeLevelWithOwner();
 }
 
 void Player::SendInitialSpells()
@@ -11649,6 +11675,14 @@ void Player::ApplyEnchantment(Item *item,EnchantmentSlot slot,bool apply, bool a
                     sLog.outDebug("Adding %u to stat nb %u",enchant_amount,enchant_spell_id);
                     switch (enchant_spell_id)
                     {
+                        case ITEM_MOD_MANA:
+                            sLog.outDebug("+ %u MANA",enchant_amount);
+                            HandleStatModifier(UNIT_MOD_MANA, BASE_VALUE, float(enchant_amount), apply);
+                            break;
+                        case ITEM_MOD_HEALTH:
+                            sLog.outDebug("+ %u HEALTH",enchant_amount);
+                            HandleStatModifier(UNIT_MOD_HEALTH, BASE_VALUE, float(enchant_amount), apply);
+                            break;
                         case ITEM_MOD_AGILITY:
                             sLog.outDebug("+ %u AGILITY",enchant_amount);
                             HandleStatModifier(UNIT_MOD_STAT_AGILITY, TOTAL_VALUE, float(enchant_amount), apply);
@@ -13696,20 +13730,23 @@ void Player::SendQuestUpdateAddCreatureOrGo( Quest const* pQuest, uint64 guid, u
 bool Player::MinimalLoadFromDB( QueryResult *result, uint32 guid )
 {
     bool delete_result = true;
-    if(!result)
+    if (!result)
     {
-        //                                        0     1     2     3           4           5           6    7          8          9
-        result = CharacterDatabase.PQuery("SELECT guid, data, name, position_x, position_y, position_z, map, totaltime, leveltime, at_login FROM characters WHERE guid = '%u'",guid);
-        if(!result) return false;
+        //                                          0     1     2     3           4           5           6    7          8          9         10
+        result = CharacterDatabase.PQuery("SELECT guid, data, name, position_x, position_y, position_z, map, totaltime, leveltime, at_login, zone FROM characters WHERE guid = '%u'",guid);
+        if (!result)
+            return false;
     }
-    else delete_result = false;
+    else
+        delete_result = false;
 
     Field *fields = result->Fetch();
 
-    if(!LoadValues( fields[1].GetString()))
+    if (!LoadValues( fields[1].GetString()))
     {
         sLog.outError("Player #%d have broken data in `data` field. Can't be loaded for character list.",GUID_LOPART(guid));
-        if(delete_result) delete result;
+        if (delete_result)
+            delete result;
         return false;
     }
 
@@ -13732,12 +13769,13 @@ bool Player::MinimalLoadFromDB( QueryResult *result, uint32 guid )
 
     _LoadBoundInstances();*/
 
-    if (delete_result) delete result;
+    if (delete_result)
+        delete result;
 
     for (int i = 0; i < PLAYER_SLOTS_COUNT; ++i)
         m_items[i] = NULL;
 
-    if( HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST) )
+    if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))
         m_deathState = DEAD;
 
     return true;
@@ -16420,11 +16458,11 @@ void Player::PetSpellInitialize()
         // spells loop
         for (PetSpellMap::const_iterator itr = pet->m_spells.begin(); itr != pet->m_spells.end(); ++itr)
         {
-            if(itr->second->state == PETSPELL_REMOVED)
+            if(itr->second.state == PETSPELL_REMOVED)
                 continue;
 
             data << uint16(itr->first);
-            data << uint16(itr->second->active);            // pet spell active state isn't boolean
+            data << uint16(itr->second.active);             // pet spell active state isn't boolean
             ++addlist;
         }
     }
@@ -17370,11 +17408,6 @@ void Player::UpdatePvP(bool state, bool ovrride)
     if(!state || ovrride)
     {
         SetPvP(state);
-        if(Pet* pet = GetPet())
-            pet->SetPvP(state);
-        if(Unit* charmed = GetCharm())
-            charmed->SetPvP(state);
-
         pvpInfo.endTimer = 0;
     }
     else
@@ -17382,14 +17415,7 @@ void Player::UpdatePvP(bool state, bool ovrride)
         if(pvpInfo.endTimer != 0)
             pvpInfo.endTimer = time(NULL);
         else
-        {
             SetPvP(state);
-
-            if(Pet* pet = GetPet())
-                pet->SetPvP(state);
-            if(Unit* charmed = GetCharm())
-                charmed->SetPvP(state);
-        }
     }
 }
 
@@ -20045,4 +20071,3 @@ bool Player::canSeeSpellClickOn(Creature const *c) const
     }
     return false;
 }
-

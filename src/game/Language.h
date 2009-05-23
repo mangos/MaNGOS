@@ -94,7 +94,6 @@ enum MangosStrings
     LANG_CANNOT_GO_TO_INST_GM           = 105,
     LANG_CANNOT_GO_INST_INST            = 106,
     LANG_CANNOT_SUMMON_INST_INST        = 107,
-
     LANG_SUMMONING                      = 108,
     LANG_SUMMONED_BY                    = 109,
     LANG_TELEPORTING_TO                 = 110,
@@ -102,7 +101,6 @@ enum MangosStrings
     LANG_NO_PLAYER                      = 112,
     LANG_APPEARING_AT                   = 113,
     LANG_APPEARING_TO                   = 114,
-
     LANG_BAD_VALUE                      = 115,
     LANG_NO_CHAR_SELECTED               = 116,
     LANG_NOT_IN_GROUP                   = 117,
@@ -167,7 +165,7 @@ enum MangosStrings
 
     LANG_MAIL_SENT                      = 169,
     LANG_SOUND_NOT_EXIST                = 170,
-    //                                    171,              // not used
+    LANG_CANT_TELEPORT_SELF             = 171,
     LANG_CONSOLE_COMMAND                = 172,
     LANG_YOU_CHANGE_RUNIC_POWER         = 173,
     LANG_YOURS_RUNIC_POWER_CHANGED      = 174,
@@ -266,7 +264,7 @@ enum MangosStrings
     LANG_COMMAND_ADDVENDORITEMITEMS     = 280,
     LANG_COMMAND_KICKSELF               = 281,
     LANG_COMMAND_KICKMESSAGE            = 282,
-    LANG_COMMAND_KICKNOTFOUNDPLAYER     = 283,
+    //                                    283, not used
     LANG_COMMAND_WHISPERACCEPTING       = 284,
     LANG_COMMAND_WHISPERON              = 285,
     LANG_COMMAND_WHISPEROFF             = 286,

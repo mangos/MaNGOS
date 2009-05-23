@@ -21,7 +21,7 @@
 
 DROP TABLE IF EXISTS `realmd_db_version`;
 CREATE TABLE `realmd_db_version` (
-  `required_7546_02_realmd_uptime` bit(1) default NULL
+  `required_7867_01_realmd_account` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Last applied sql update to DB';
 
 --
@@ -50,7 +50,7 @@ CREATE TABLE `account` (
   `s` longtext,
   `email` text,
   `joindate` timestamp NOT NULL default CURRENT_TIMESTAMP,
-  `last_ip` varchar(30) NOT NULL default '127.0.0.1',
+  `last_ip` varchar(30) NOT NULL default '0.0.0.0',
   `failed_logins` int(11) unsigned NOT NULL default '0',
   `locked` tinyint(3) unsigned NOT NULL default '0',
   `last_login` timestamp NOT NULL default '0000-00-00 00:00:00',
@@ -107,7 +107,7 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `ip_banned`;
 CREATE TABLE `ip_banned` (
-  `ip` varchar(32) NOT NULL default '127.0.0.1',
+  `ip` varchar(32) NOT NULL default '0.0.0.0',
   `bandate` bigint(40) NOT NULL,
   `unbandate` bigint(40) NOT NULL,
   `bannedby` varchar(50) NOT NULL default '[Console]',

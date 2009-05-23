@@ -12,3 +12,5 @@
 
 *.ncb
 *.suo
+*.sdf
+ipch
