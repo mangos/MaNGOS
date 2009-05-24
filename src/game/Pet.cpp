@@ -1437,25 +1437,40 @@ bool Pet::learnSpell(uint32 spell_id)
 
 void Pet::InitLevelupSpellsForLevel()
 {
-    uint32 family = GetCreatureInfo()->family;
-    if(!family)
-        return;
-
-    PetLevelupSpellSet const *levelupSpells = spellmgr.GetPetLevelupSpellList(family);
-    if(!levelupSpells)
-        return;
-
     uint32 level = getLevel();
 
-    // PetLevelupSpellSet ordered by levels, process in reversed order
-    for(PetLevelupSpellSet::const_reverse_iterator itr = levelupSpells->rbegin(); itr != levelupSpells->rend(); ++itr)
+    if(PetLevelupSpellSet const *levelupSpells = GetCreatureInfo()->family ? spellmgr.GetPetLevelupSpellList(GetCreatureInfo()->family) : NULL)
     {
-        // will called first if level down
-        if(itr->first > level)
-            unlearnSpell(itr->second,true);                 // will learn prev rank if any
-        // will called if level up
-        else
-            learnSpell(itr->second);                        // will unlearn prev rank if any
+        // PetLevelupSpellSet ordered by levels, process in reversed order
+        for(PetLevelupSpellSet::const_reverse_iterator itr = levelupSpells->rbegin(); itr != levelupSpells->rend(); ++itr)
+        {
+            // will called first if level down
+            if(itr->first > level)
+                unlearnSpell(itr->second,true);                 // will learn prev rank if any
+            // will called if level up
+            else
+                learnSpell(itr->second);                        // will unlearn prev rank if any
+        }
+    }
+
+    int32 petSpellsId = GetCreatureInfo()->PetSpellDataId ? -(int32)GetCreatureInfo()->PetSpellDataId : GetEntry();
+
+    // default spells (can be not learned if pet level (as owner level decrease result for example) less first possible in normal game)
+    if(PetDefaultSpellsEntry const *defSpells = spellmgr.GetPetDefaultSpellsEntry(petSpellsId))
+    {
+        for(int i = 0; i < MAX_CREATURE_SPELL_DATA_SLOT; ++i)
+        {
+            SpellEntry const* spellEntry = sSpellStore.LookupEntry(defSpells->spellid[i]);
+            if(!spellEntry)
+                continue;
+
+            // will called first if level down
+            if(spellEntry->spellLevel > level)
+                unlearnSpell(spellEntry->Id,false);
+            // will called if level up
+            else
+                learnSpell(spellEntry->Id);
+        }
     }
 }
 
@@ -1516,14 +1531,16 @@ bool Pet::removeSpell(uint32 spell_id, bool learn_prev)
             learnSpell(prev_id);
         }
         else
-        {
-            m_charmInfo->AddSpellToAB(spell_id, 0);
+            learn_prev = false;
+    }
 
-            // need update action bar for last removed rank
-            if (Unit* owner = GetOwner())
-                if (owner->GetTypeId() == TYPEID_PLAYER)
-                    ((Player*)owner)->PetSpellInitialize();
-        }
+    // if remove last rank or non-ranked then update action bar at server and client if need
+    if(!learn_prev && m_charmInfo->AddSpellToAB(spell_id, 0))
+    {
+        // need update action bar for last removed rank
+        if (Unit* owner = GetOwner())
+            if (owner->GetTypeId() == TYPEID_PLAYER)
+                ((Player*)owner)->PetSpellInitialize();
     }
 
     return true;

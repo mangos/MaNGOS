@@ -3572,7 +3572,7 @@ void ObjectMgr::LoadPetCreateSpells()
 
         sLog.outString();
         sLog.outString( ">> Loaded 0 pet create spells" );
-        sLog.outErrorDb("`petcreateinfo_spell` table is empty!");
+        //sLog.outErrorDb("`petcreateinfo_spell` table is empty!");
         return;
     }
 
@@ -3644,6 +3644,7 @@ void ObjectMgr::LoadPetCreateSpells()
 
     sLog.outString();
     sLog.outString( ">> Loaded %u pet create spells", count );
+    sLog.outErrorDb("`petcreateinfo_spell` table use deprecated! Must be empty!");
 }
 
 void ObjectMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
