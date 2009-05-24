@@ -1814,8 +1814,6 @@ enum CreatureFamily
     CREATURE_FAMILY_SPIRIT_BEAST   = 46
 };
 
-#define MAX_CREATURE_FAMILY          47
-
 enum CreatureTypeFlags
 {
     CREATURE_TYPEFLAGS_TAMEABLE        = 0x0001,
