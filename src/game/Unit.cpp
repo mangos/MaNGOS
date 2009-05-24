@@ -4846,6 +4846,25 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                 triggered_spell_id = 29077;
                 break;
             }
+
+            //Arcane Potency
+            if (dummySpell->SpellIconID == 2120)
+            {
+                if(!procSpell)
+                    return false;
+
+                target = this;
+                switch (dummySpell->Id)
+                {
+                    case 31571: triggered_spell_id = 57529; break;
+                    case 31572: triggered_spell_id = 57531; break;
+                    default:
+                        sLog.outError("Unit::HandleDummyAuraProc: non handled spell id: %u",dummySpell->Id);
+                        return false;
+                }
+                break;
+            }
+
             // Hot Streak
             if (dummySpell->SpellIconID == 2999)
             {
@@ -5092,9 +5111,8 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                 if(triggeredByAura->GetCasterGUID() != pVictim->GetGUID())
                     return false;
 
-                // energize amount
-                basepoints0 = triggerAmount*damage/100;
-                pVictim->CastCustomSpell(pVictim,34919,&basepoints0,NULL,NULL,true,castItem,triggeredByAura);
+                // Energize 0.25% of max. mana
+                pVictim->CastSpell(pVictim,57669,true,castItem,triggeredByAura);
                 return true;                                // no hidden cooldown
             }
             // Divine Aegis
@@ -10462,6 +10480,7 @@ bool InitTriggerAuraData()
     isTriggerAura[SPELL_AURA_PRAYER_OF_MENDING] = true;
     isTriggerAura[SPELL_AURA_PROC_TRIGGER_SPELL_WITH_VALUE] = true;
     isTriggerAura[SPELL_AURA_MOD_DAMAGE_FROM_CASTER] = true;
+    isTriggerAura[SPELL_AURA_MOD_SPELL_CRIT_CHANCE] = true;
 
     isNonTriggerAura[SPELL_AURA_MOD_POWER_REGEN]=true;
     isNonTriggerAura[SPELL_AURA_REDUCE_PUSHBACK]=true;

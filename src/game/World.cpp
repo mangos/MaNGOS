@@ -1160,11 +1160,14 @@ void World::SetInitialWorldSettings()
     sLog.outString( "Loading Points Of Interest Data..." );
     objmgr.LoadPointsOfInterest();
 
-    sLog.outString( "Loading Pet Create Spells..." );
-    objmgr.LoadPetCreateSpells();
-
     sLog.outString( "Loading Creature Data..." );
     objmgr.LoadCreatures();
+
+    sLog.outString( "Loading pet levelup spells..." );
+    spellmgr.LoadPetLevelupSpellMap();
+
+    sLog.outString( "Loading pet default spell additional to levelup spells..." );
+    spellmgr.LoadPetDefaultSpells();
 
     sLog.outString( "Loading Creature Addon Data..." );
     sLog.outString();
@@ -1231,9 +1234,6 @@ void World::SetInitialWorldSettings()
 
     sLog.outString( "Loading spell pet auras..." );
     spellmgr.LoadSpellPetAuras();
-
-    sLog.outString( "Loading pet levelup spells..." );
-    spellmgr.LoadPetLevelupSpellMap();
 
     sLog.outString( "Loading Player Create Info & Level Stats..." );
     sLog.outString();
