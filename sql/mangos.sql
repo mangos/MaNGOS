@@ -23,7 +23,7 @@ DROP TABLE IF EXISTS `db_version`;
 CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
-  `required_8060_01_mangos_spell_pet_auras` bit(1) default NULL
+  `required_8064_01_mangos_spell_chain` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -16152,6 +16152,10 @@ INSERT INTO spell_chain VALUES
 (27681,0,27681,1,14752),
 (32999,27681,27681,2,0),
 (48074,32999,27681,3,0),
+/*Rapture*/
+(47535,0,47535,1,0),
+(47536,47535,47535,2,0),
+(47537,47536,47535,3,0),
 /*ShackleUndead*/
 (9484,0,9484,1,0),
 (9485,9484,9484,2,0),
