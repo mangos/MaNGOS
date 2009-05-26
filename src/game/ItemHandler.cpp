@@ -1008,7 +1008,7 @@ void WorldSession::HandleItemNameQueryOpcode(WorldPacket & recv_data)
         return;
     }
     else
-        sLog.outDebug("WORLD: CMSG_ITEM_NAME_QUERY for item %u failed (unknown item)", itemid);
+        sLog.outErrorDb("WORLD: CMSG_ITEM_NAME_QUERY for item %u failed (unknown item)", itemid);
 }
 
 void WorldSession::HandleWrapItemOpcode(WorldPacket& recv_data)

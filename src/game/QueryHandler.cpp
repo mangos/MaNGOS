@@ -181,24 +181,24 @@ void WorldSession::HandleCreatureQueryOpcode( WorldPacket & recv_data )
         data << uint8(0) << uint8(0) << uint8(0);           // name2, name3, name4, always empty
         data << SubName;
         data << ci->IconName;                               // "Directions" for guard, string for Icons 2.3.0
-        data << uint32(ci->type_flags);                     // flags          wdbFeild7=wad flags1
-        data << uint32(ci->type);
-        data << uint32(ci->family);                         // family         wdbFeild9
-        data << uint32(ci->rank);                           // rank           wdbFeild10
-        data << uint32(ci->PetSpellDataId);                 // Id from CreatureSpellData.dbc    wdbField12
+        data << uint32(ci->type_flags);                     // flags
+        data << uint32(ci->type);                           // CreatureType.dbc
+        data << uint32(ci->family);                         // CreatureFamily.dbc
+        data << uint32(ci->rank);                           // Creature Rank (elite, boss, etc)
+        data << uint32(0);                                  // new in 3.1, creature entry?
+        data << uint32(0);                                  // new in 3.1, creature entry?
         data << uint32(ci->DisplayID_A);                    // modelid_male1
         data << uint32(ci->DisplayID_H);                    // modelid_female1 ?
         data << uint32(ci->DisplayID_A2);                   // modelid_male2 ?
         data << uint32(ci->DisplayID_H2);                   // modelid_femmale2 ?
-        data << uint32(0);                                  // new in 3.1
         data << float(ci->unk16);                           // unk
         data << float(ci->unk17);                           // unk
         data << uint8(ci->RacialLeader);
         for(uint32 i = 0; i < 4; ++i)
-            data << uint32(0);                              // added in 3.1
-        data << uint32(0);                                  // added in 3.1
+            data << uint32(0);                              // itemId[4], quest drop
+        data << uint32(0);                                  // CreatureMovementInfo.dbc
         SendPacket( &data );
-        sLog.outDebug(  "WORLD: Sent SMSG_CREATURE_QUERY_RESPONSE " );
+        sLog.outDebug( "WORLD: Sent SMSG_CREATURE_QUERY_RESPONSE" );
     }
     else
     {
@@ -210,7 +210,7 @@ void WorldSession::HandleCreatureQueryOpcode( WorldPacket & recv_data )
         WorldPacket data( SMSG_CREATURE_QUERY_RESPONSE, 4 );
         data << uint32(entry | 0x80000000);
         SendPacket( &data );
-        sLog.outDebug( "WORLD: Sent SMSG_CREATURE_QUERY_RESPONSE " );
+        sLog.outDebug( "WORLD: Sent SMSG_CREATURE_QUERY_RESPONSE" );
     }
 }
 
@@ -259,9 +259,9 @@ void WorldSession::HandleGameObjectQueryOpcode( WorldPacket & recv_data )
         data.append(info->raw.data, 24);
         data << float(info->size);                          // go size
         for(uint32 i = 0; i < 4; ++i)
-            data << uint32(0);                              // added in 3.1
+            data << uint32(0);                              // itemId[4], quest drop
         SendPacket( &data );
-        sLog.outDebug(  "WORLD: Sent CMSG_GAMEOBJECT_QUERY " );
+        sLog.outDebug( "WORLD: Sent SMSG_GAMEOBJECT_QUERY_RESPONSE" );
     }
     else
     {
@@ -274,7 +274,7 @@ void WorldSession::HandleGameObjectQueryOpcode( WorldPacket & recv_data )
         WorldPacket data ( SMSG_GAMEOBJECT_QUERY_RESPONSE, 4 );
         data << uint32(entryID | 0x80000000);
         SendPacket( &data );
-        sLog.outDebug(  "WORLD: Sent CMSG_GAMEOBJECT_QUERY " );
+        sLog.outDebug( "WORLD: Sent SMSG_GAMEOBJECT_QUERY_RESPONSE" );
     }
 }
 
@@ -326,7 +326,7 @@ void WorldSession::HandleCorpseQueryOpcode(WorldPacket & /*recv_data*/)
 
 void WorldSession::HandleNpcTextQueryOpcode( WorldPacket & recv_data )
 {
-    CHECK_PACKET_SIZE(recv_data,4+8);
+    CHECK_PACKET_SIZE(recv_data, 4 + 8);
 
     uint32 textID;
     uint64 guid;
@@ -361,7 +361,7 @@ void WorldSession::HandleNpcTextQueryOpcode( WorldPacket & recv_data )
     else
     {
         std::string Text_0[8], Text_1[8];
-        for (int i=0;i<8;++i)
+        for (int i = 0; i < 8; ++i)
         {
             Text_0[i]=pGossip->Options[i].Text_0;
             Text_1[i]=pGossip->Options[i].Text_1;
@@ -373,7 +373,7 @@ void WorldSession::HandleNpcTextQueryOpcode( WorldPacket & recv_data )
             NpcTextLocale const *nl = objmgr.GetNpcTextLocale(textID);
             if (nl)
             {
-                for (int i=0;i<8;++i)
+                for (int i = 0; i < 8; ++i)
                 {
                     if (nl->Text_0[i].size() > size_t(loc_idx) && !nl->Text_0[i][loc_idx].empty())
                         Text_0[i]=nl->Text_0[i][loc_idx];
@@ -383,7 +383,7 @@ void WorldSession::HandleNpcTextQueryOpcode( WorldPacket & recv_data )
             }
         }
 
-        for (int i=0; i<8; ++i)
+        for (int i = 0; i < 8; ++i)
         {
             data << pGossip->Options[i].Probability;
 
@@ -409,12 +409,12 @@ void WorldSession::HandleNpcTextQueryOpcode( WorldPacket & recv_data )
 
     SendPacket( &data );
 
-    sLog.outDebug(  "WORLD: Sent SMSG_NPC_TEXT_UPDATE " );
+    sLog.outDebug( "WORLD: Sent SMSG_NPC_TEXT_UPDATE " );
 }
 
 void WorldSession::HandlePageTextQueryOpcode( WorldPacket & recv_data )
 {
-    CHECK_PACKET_SIZE(recv_data,4);
+    CHECK_PACKET_SIZE(recv_data, 4);
 
     uint32 pageID;
 
@@ -455,6 +455,6 @@ void WorldSession::HandlePageTextQueryOpcode( WorldPacket & recv_data )
         }
         SendPacket( &data );
 
-        sLog.outDebug(  "WORLD: Sent SMSG_PAGE_TEXT_QUERY_RESPONSE " );
+        sLog.outDebug( "WORLD: Sent SMSG_PAGE_TEXT_QUERY_RESPONSE" );
     }
 }
