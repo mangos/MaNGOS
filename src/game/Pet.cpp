@@ -240,22 +240,10 @@ bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool 
 
     if (!is_temporary_summoned)
     {
-        // permanent controlled pets store state in DB
-        Tokens tokens = StrSplit(fields[14].GetString(), " ");
-
-        if (tokens.size() != 20)
+        if(!m_charmInfo->LoadActionBar(fields[14].GetCppString()))
         {
             delete result;
             return false;
-        }
-
-        int index;
-        Tokens::iterator iter;
-        for(iter = tokens.begin(), index = 0; index < 10; ++iter, ++index )
-        {
-            m_charmInfo->GetActionBarEntry(index)->Type = atol((*iter).c_str());
-            ++iter;
-            m_charmInfo->GetActionBarEntry(index)->SpellOrAction = atol((*iter).c_str());
         }
     }
 
@@ -299,6 +287,10 @@ bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool 
 
     // Spells should be loaded after pet is added to map, because in CheckCast is check on it
     _LoadSpells();
+    InitLevelupSpellsForLevel();
+
+    CleanupActionBar();                                     // remove unknown spells from action bar after load
+
     _LoadSpellCooldowns();
 
     owner->SetPet(this);                                    // in DB stored only full controlled creature
@@ -328,8 +320,6 @@ bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool 
             }
         }
     }
-
-    InitLevelupSpellsForLevel();
 
     m_loading = false;
 
@@ -421,8 +411,12 @@ void Pet::SavePetToDB(PetSaveMode mode)
             << curmana << ", "
             << GetPower(POWER_HAPPINESS) << ", '";
 
-        for(uint32 i = 0; i < 10; ++i)
-            ss << uint32(m_charmInfo->GetActionBarEntry(i)->Type) << " " << uint32(m_charmInfo->GetActionBarEntry(i)->SpellOrAction) << " ";
+        for(uint32 i = 0; i < MAX_UNIT_ACTION_BAR_INDEX; ++i)
+        {
+            ss << uint32(m_charmInfo->GetActionBarEntry(i)->Type) << " "
+               << uint32(m_charmInfo->GetActionBarEntry(i)->SpellOrAction) << " ";
+        };
+
         ss  << "', "
             << time(NULL) << ", "
             << uint32(m_resetTalentsCost) << ", "
@@ -1337,7 +1331,7 @@ bool Pet::addSpell(uint32 spell_id,ActiveStates active /*= ACT_DECIDE*/, PetSpel
                 // skip unknown ranks
                 if(!HasSpell(rankSpellId))
                     continue;
-                removeSpell(rankSpellId,false);
+                removeSpell(rankSpellId,false,false);
             }
         }
     }
@@ -1358,7 +1352,7 @@ bool Pet::addSpell(uint32 spell_id,ActiveStates active /*= ACT_DECIDE*/, PetSpel
                         ToggleAutocast(itr2->first, false);
 
                     oldspell_id = itr2->first;
-                    unlearnSpell(itr2->first,false);
+                    unlearnSpell(itr2->first,false,false);
                     break;
                 }
                 // ignore new lesser rank
@@ -1373,7 +1367,7 @@ bool Pet::addSpell(uint32 spell_id,ActiveStates active /*= ACT_DECIDE*/, PetSpel
     if (IsPassiveSpell(spell_id))
         CastSpell(this, spell_id, true);
     else
-        m_charmInfo->AddSpellToAB(oldspell_id, spell_id);
+        m_charmInfo->AddSpellToActionBar(spell_id);
 
     if(newspell.active == ACT_ENABLED)
         ToggleAutocast(spell_id, true);
@@ -1396,16 +1390,17 @@ bool Pet::learnSpell(uint32 spell_id)
     if (!addSpell(spell_id))
         return false;
 
-    Unit* owner = GetOwner();
-    if(owner && owner->GetTypeId() == TYPEID_PLAYER)
+    if(!m_loading)
     {
-        if(!m_loading)
+        Unit* owner = GetOwner();
+        if(owner && owner->GetTypeId() == TYPEID_PLAYER)
         {
             WorldPacket data(SMSG_PET_LEARNED_SPELL, 2);
             data << uint16(spell_id);
             ((Player*)owner)->GetSession()->SendPacket(&data);
+
+            ((Player*)owner)->PetSpellInitialize();
         }
-        ((Player*)owner)->PetSpellInitialize();
     }
     return true;
 }
@@ -1441,7 +1436,7 @@ void Pet::InitLevelupSpellsForLevel()
 
             // will called first if level down
             if(spellEntry->spellLevel > level)
-                unlearnSpell(spellEntry->Id,false);
+                unlearnSpell(spellEntry->Id,true);
             // will called if level up
             else
                 learnSpell(spellEntry->Id);
@@ -1449,9 +1444,9 @@ void Pet::InitLevelupSpellsForLevel()
     }
 }
 
-bool Pet::unlearnSpell(uint32 spell_id, bool learn_prev)
+bool Pet::unlearnSpell(uint32 spell_id, bool learn_prev, bool clear_ab)
 {
-    if(removeSpell(spell_id,learn_prev))
+    if(removeSpell(spell_id,learn_prev,clear_ab))
     {
         if(GetOwner()->GetTypeId() == TYPEID_PLAYER)
         {
@@ -1467,7 +1462,7 @@ bool Pet::unlearnSpell(uint32 spell_id, bool learn_prev)
     return false;
 }
 
-bool Pet::removeSpell(uint32 spell_id, bool learn_prev)
+bool Pet::removeSpell(uint32 spell_id, bool learn_prev, bool clear_ab)
 {
     PetSpellMap::iterator itr = m_spells.find(spell_id);
     if (itr == m_spells.end())
@@ -1498,27 +1493,33 @@ bool Pet::removeSpell(uint32 spell_id, bool learn_prev)
     if (learn_prev)
     {
         if (uint32 prev_id = spellmgr.GetPrevSpellInChain (spell_id))
-        {
-            // replace to next spell
-            if(!talentCost && !IsPassiveSpell(prev_id))
-                m_charmInfo->AddSpellToAB(spell_id, prev_id);
-
             learnSpell(prev_id);
-        }
         else
             learn_prev = false;
     }
 
     // if remove last rank or non-ranked then update action bar at server and client if need
-    if(!learn_prev && m_charmInfo->AddSpellToAB(spell_id, 0))
+    if (clear_ab && !learn_prev && m_charmInfo->RemoveSpellFromActionBar(spell_id))
     {
-        // need update action bar for last removed rank
-        if (Unit* owner = GetOwner())
-            if (owner->GetTypeId() == TYPEID_PLAYER)
-                ((Player*)owner)->PetSpellInitialize();
+        if(!m_loading)
+        {
+            // need update action bar for last removed rank
+            if (Unit* owner = GetOwner())
+                if (owner->GetTypeId() == TYPEID_PLAYER)
+                    ((Player*)owner)->PetSpellInitialize();
+        }
     }
 
     return true;
+}
+
+
+void Pet::CleanupActionBar()
+{
+    for(int i = 0; i < MAX_UNIT_ACTION_BAR_INDEX; ++i)
+        if(UnitActionBarEntry const* ab = m_charmInfo->GetActionBarEntry(i))
+            if(ab->SpellOrAction && ab->IsActionBarForSpell() && !HasSpell(ab->SpellOrAction))
+                m_charmInfo->SetActionBar(i,0,ACT_DISABLED);
 }
 
 void Pet::InitPetCreateSpells()
