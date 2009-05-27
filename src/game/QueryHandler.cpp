@@ -185,8 +185,8 @@ void WorldSession::HandleCreatureQueryOpcode( WorldPacket & recv_data )
         data << uint32(ci->type);                           // CreatureType.dbc
         data << uint32(ci->family);                         // CreatureFamily.dbc
         data << uint32(ci->rank);                           // Creature Rank (elite, boss, etc)
-        data << uint32(0);                                  // new in 3.1, creature entry?
-        data << uint32(0);                                  // new in 3.1, creature entry?
+        data << uint32(ci->unk1);                           // new in 3.1, creature entry?
+        data << uint32(ci->unk2);                           // new in 3.1, creature entry?
         data << uint32(ci->DisplayID_A);                    // modelid_male1
         data << uint32(ci->DisplayID_H);                    // modelid_female1 ?
         data << uint32(ci->DisplayID_A2);                   // modelid_male2 ?
@@ -195,7 +195,7 @@ void WorldSession::HandleCreatureQueryOpcode( WorldPacket & recv_data )
         data << float(ci->unk17);                           // unk
         data << uint8(ci->RacialLeader);
         for(uint32 i = 0; i < 4; ++i)
-            data << uint32(0);                              // itemId[4], quest drop
+            data << uint32(ci->questItems[i]);              // itemId[4], quest drop
         data << uint32(0);                                  // CreatureMovementInfo.dbc
         SendPacket( &data );
         sLog.outDebug( "WORLD: Sent SMSG_CREATURE_QUERY_RESPONSE" );
@@ -225,7 +225,6 @@ void WorldSession::HandleGameObjectQueryOpcode( WorldPacket & recv_data )
     const GameObjectInfo *info = objmgr.GetGameObjectInfo(entryID);
     if(info)
     {
-
         std::string Name;
         std::string IconName;
         std::string CastBarCaption;
@@ -255,11 +254,11 @@ void WorldSession::HandleGameObjectQueryOpcode( WorldPacket & recv_data )
         data << uint8(0) << uint8(0) << uint8(0);           // name2, name3, name4
         data << IconName;                                   // 2.0.3, string. Icon name to use instead of default icon for go's (ex: "Attack" makes sword)
         data << CastBarCaption;                             // 2.0.3, string. Text will appear in Cast Bar when using GO (ex: "Collecting")
-        data << uint8(0);                                   // 2.0.3, string
+        data << info->unk1;                                 // 2.0.3, string
         data.append(info->raw.data, 24);
         data << float(info->size);                          // go size
         for(uint32 i = 0; i < 4; ++i)
-            data << uint32(0);                              // itemId[4], quest drop
+            data << uint32(info->questItems[i]);            // itemId[4], quest drop
         SendPacket( &data );
         sLog.outDebug( "WORLD: Sent SMSG_GAMEOBJECT_QUERY_RESPONSE" );
     }

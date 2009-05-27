@@ -41,9 +41,11 @@ struct GameObjectInfo
     char   *name;
     char   *IconName;
     char   *castBarCaption;
+    char   *unk1;
     uint32  faction;
     uint32  flags;
     float   size;
+    uint32  questItems[4];
     union                                                   // different GO types have different data field
     {
         //0 GAMEOBJECT_TYPE_DOOR
