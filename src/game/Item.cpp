@@ -942,3 +942,29 @@ Item* Item::CloneItem( uint32 count, Player const* player ) const
     newItem->SetItemRandomProperties(GetItemRandomPropertyId());
     return newItem;
 }
+
+bool Item::IsBindedNotWith( Player const* player ) const
+{
+    // not binded item
+    if(!IsSoulBound())
+        return false;
+
+    // own item
+    if(GetOwnerGUID()== player->GetGUID())
+        return false;
+
+    // not BOA item case
+    if(!IsBoundAccountWide())
+        return true;
+
+    // online
+    if(Player* owner = objmgr.GetPlayer(GetOwnerGUID()))
+    {
+        return owner->GetSession()->GetAccountId() != player->GetSession()->GetAccountId();
+    }
+    // offline slow case
+    else
+    {
+        return objmgr.GetPlayerAccountIdByGUID(GetOwnerGUID()) != player->GetSession()->GetAccountId();
+    }
+}
