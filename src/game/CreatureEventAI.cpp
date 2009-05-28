@@ -783,6 +783,11 @@ void CreatureEventAI::ProcessAction(CreatureEventAI_Action const& action, uint32
             cell_lock->Visit(cell_lock, grid_creature_searcher, *m_creature->GetMap());
             break;
         }
+        case ACTION_T_SET_SHEATH:
+        {
+            m_creature->SetSheath(SheathState(action.set_sheath.sheath));
+            break;
+        }
     }
 }
 
