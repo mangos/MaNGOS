@@ -65,6 +65,7 @@ enum PetSpellType
 {
     PETSPELL_NORMAL = 0,
     PETSPELL_FAMILY = 1,
+    PETSPELL_TALENT = 2,
 };
 
 struct PetSpell
@@ -198,8 +199,9 @@ class Pet : public Creature
         bool learnSpell(uint32 spell_id);
         void learnSpellHighRank(uint32 spellid);
         void InitLevelupSpellsForLevel();
-        bool unlearnSpell(uint32 spell_id, bool learn_prev);
-        bool removeSpell(uint32 spell_id, bool learn_prev);
+        bool unlearnSpell(uint32 spell_id, bool learn_prev, bool clear_ab = true);
+        bool removeSpell(uint32 spell_id, bool learn_prev, bool clear_ab = true);
+        void CleanupActionBar();
 
         PetSpellMap     m_spells;
         AutoSpellList   m_autospells;

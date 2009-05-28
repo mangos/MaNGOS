@@ -497,15 +497,15 @@ void ObjectMgr::LoadCreatureTemplates()
                 continue;
             }
 
-            if(cInfo->classNum != heroicInfo->classNum)
+            if(cInfo->trainer_class != heroicInfo->trainer_class)
             {
-                sLog.outErrorDb("Creature (Entry: %u) has different `classNum` in heroic mode (Entry: %u).",i,cInfo->HeroicEntry);
+                sLog.outErrorDb("Creature (Entry: %u) has different `trainer_class` in heroic mode (Entry: %u).",i,cInfo->HeroicEntry);
                 continue;
             }
 
-            if(cInfo->race != heroicInfo->race)
+            if(cInfo->trainer_race != heroicInfo->trainer_race)
             {
-                sLog.outErrorDb("Creature (Entry: %u) has different `race` in heroic mode (Entry: %u).",i,cInfo->HeroicEntry);
+                sLog.outErrorDb("Creature (Entry: %u) has different `trainer_race` in heroic mode (Entry: %u).",i,cInfo->HeroicEntry);
                 continue;
             }
 

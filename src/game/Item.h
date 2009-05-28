@@ -116,8 +116,11 @@ enum InventoryChangeFailure
     EQUIP_ERR_TOO_MUCH_GOLD                      = 77,
     EQUIP_ERR_NOT_DURING_ARENA_MATCH             = 78,
     EQUIP_ERR_CANNOT_TRADE_THAT                  = 79,
-    EQUIP_ERR_PERSONAL_ARENA_RATING_TOO_LOW      = 80
-    // probably exist more
+    EQUIP_ERR_PERSONAL_ARENA_RATING_TOO_LOW      = 80,
+    // no output                                 = 81,
+    EQUIP_ERR_ARTEFACTS_ONLY_FOR_OWN_CHARACTERS  = 82,
+    // no output                                 = 83,
+    // crash client                              = 84,
 };
 
 enum BuyFailure
@@ -212,8 +215,8 @@ class MANGOS_DLL_SPEC Item : public Object
 
         void SetBinding(bool val) { ApplyModFlag(ITEM_FIELD_FLAGS,ITEM_FLAGS_BINDED,val); }
         bool IsSoulBound() const { return HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAGS_BINDED); }
-        bool IsAccountBound() const { return HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAGS_BOA); }
-        bool IsBindedNotWith(uint64 guid) const { return IsSoulBound() && GetOwnerGUID()!= guid; }
+        bool IsBoundAccountWide() const { return HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAGS_BOA); }
+        bool IsBindedNotWith(Player const* player) const;
         bool IsBoundByEnchant() const;
         virtual void SaveToDB();
         virtual bool LoadFromDB(uint32 guid, uint64 owner_guid, QueryResult *result = NULL);
@@ -222,7 +225,7 @@ class MANGOS_DLL_SPEC Item : public Object
 
         bool IsBag() const { return GetProto()->InventoryType == INVTYPE_BAG; }
         bool IsBroken() const { return GetUInt32Value(ITEM_FIELD_MAXDURABILITY) > 0 && GetUInt32Value(ITEM_FIELD_DURABILITY) == 0; }
-        bool CanBeTraded() const;
+        bool CanBeTraded(bool mail = false) const;
         void SetInTrade(bool b = true) { mb_in_trade = b; }
         bool IsInTrade() const { return mb_in_trade; }
 
