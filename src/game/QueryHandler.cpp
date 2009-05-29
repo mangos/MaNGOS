@@ -408,7 +408,7 @@ void WorldSession::HandleNpcTextQueryOpcode( WorldPacket & recv_data )
 
     SendPacket( &data );
 
-    sLog.outDebug( "WORLD: Sent SMSG_NPC_TEXT_UPDATE " );
+    sLog.outDebug( "WORLD: Sent SMSG_NPC_TEXT_UPDATE" );
 }
 
 void WorldSession::HandlePageTextQueryOpcode( WorldPacket & recv_data )

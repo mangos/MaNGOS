@@ -279,7 +279,7 @@ void Spell::EffectInstaKill(uint32 /*i*/)
         m_caster->CastSpell(m_caster, spellID, true);
     }
 
-    if(m_caster == unitTarget)                                // prevent interrupt message
+    if(m_caster == unitTarget)                              // prevent interrupt message
         finish();
 
     m_caster->DealDamage(unitTarget, unitTarget->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
@@ -2718,7 +2718,7 @@ void Spell::EffectCreateItem2(uint32 i)
 
             // remove reagent
             uint32 count = 1;
-            player->DestroyItemCount (item_id, count, true);
+            player->DestroyItemCount(item_id, count, true);
         }
 
         // create some random items

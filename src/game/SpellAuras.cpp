@@ -2584,7 +2584,7 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
                 modelid = 10045;
             break;
         case FORM_DIREBEAR:
-            if(Player::TeamForRace(m_target->getRace())==ALLIANCE)
+            if(Player::TeamForRace(m_target->getRace()) == ALLIANCE)
                 modelid = 2281;
             else
                 modelid = 2289;
@@ -3414,7 +3414,7 @@ void Aura::HandleAuraModStun(bool apply, bool Real)
         if(m_target->GetTypeId() != TYPEID_PLAYER)
             ((Creature*)m_target)->StopMoving();
         else
-            ((Player*)m_target)->m_movementInfo.flags = 0;    //Clear movement flags
+            ((Player*)m_target)->m_movementInfo.flags = 0;    // Clear movement flags
 
         WorldPacket data(SMSG_FORCE_MOVE_ROOT, 8);
         data.append(m_target->GetPackGUID());
@@ -4066,7 +4066,7 @@ void Aura::HandleAuraModStateImmunity(bool apply, bool Real)
 
 void Aura::HandleAuraModSchoolImmunity(bool apply, bool Real)
 {
-    m_target->ApplySpellImmune(GetId(),IMMUNITY_SCHOOL,m_modifier.m_miscvalue,apply);
+    m_target->ApplySpellImmune(GetId(), IMMUNITY_SCHOOL, m_modifier.m_miscvalue, apply);
 
     // remove all flag auras (they are positive, but they must be removed when you are immune)
     if( this->GetSpellProto()->AttributesEx & SPELL_ATTR_EX_DISPEL_AURAS_ON_IMMUNITY

@@ -110,7 +110,7 @@ void WorldSession::HandleQuestgiverHelloOpcode( WorldPacket & recv_data )
 
 void WorldSession::HandleQuestgiverAcceptQuestOpcode( WorldPacket & recv_data )
 {
-    CHECK_PACKET_SIZE(recv_data,8+4+4);
+    CHECK_PACKET_SIZE(recv_data, 8+4+4);
 
     uint64 guid;
     uint32 quest;
@@ -207,7 +207,7 @@ void WorldSession::HandleQuestgiverAcceptQuestOpcode( WorldPacket & recv_data )
 
 void WorldSession::HandleQuestgiverQueryQuestOpcode( WorldPacket & recv_data )
 {
-    CHECK_PACKET_SIZE(recv_data,8+4+1);
+    CHECK_PACKET_SIZE(recv_data, 8+4+1);
 
     uint64 guid;
     uint32 quest;
