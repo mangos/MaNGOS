@@ -438,7 +438,7 @@ void WorldSession::HandleStandStateChangeOpcode( WorldPacket & recv_data )
     _player->SetStandState(animstate);
 }
 
-void WorldSession::HandleFriendListOpcode( WorldPacket & recv_data )
+void WorldSession::HandleContactListOpcode( WorldPacket & recv_data )
 {
     CHECK_PACKET_SIZE(recv_data, 4);
     sLog.outDebug( "WORLD: Received CMSG_CONTACT_LIST" );
@@ -611,9 +611,10 @@ void WorldSession::HandleDelIgnoreOpcode( WorldPacket & recv_data )
     sLog.outDebug( "WORLD: Sent motd (SMSG_FRIEND_STATUS)" );
 }
 
-void WorldSession::HandleSetFriendNoteOpcode( WorldPacket & recv_data )
+void WorldSession::HandleSetContactNotesOpcode( WorldPacket & recv_data )
 {
     CHECK_PACKET_SIZE(recv_data, 8+1);
+    sLog.outDebug("CMSG_SET_CONTACT_NOTES");
     uint64 guid;
     std::string note;
     recv_data >> guid >> note;
@@ -649,7 +650,7 @@ void WorldSession::HandleBugOpcode( WorldPacket & recv_data )
     CharacterDatabase.PExecute ("INSERT INTO bugreport (type,content) VALUES('%s', '%s')", type.c_str( ), content.c_str( ));
 }
 
-void WorldSession::HandleCorpseReclaimOpcode(WorldPacket &recv_data)
+void WorldSession::HandleReclaimCorpseOpcode(WorldPacket &recv_data)
 {
     CHECK_PACKET_SIZE(recv_data,8);
 
@@ -1015,7 +1016,7 @@ void WorldSession::HandleSetActionButtonOpcode(WorldPacket& recv_data)
     }
 }
 
-void WorldSession::HandleCompleteCinema( WorldPacket & /*recv_data*/ )
+void WorldSession::HandleCompleteCinematic( WorldPacket & /*recv_data*/ )
 {
     DEBUG_LOG( "WORLD: Player is watching cinema" );
 }
@@ -1119,7 +1120,7 @@ void WorldSession::HandleMoveRootAck(WorldPacket&/* recv_data*/)
     */
 }
 
-void WorldSession::HandleSetActionBar(WorldPacket& recv_data)
+void WorldSession::HandleSetActionBarToggles(WorldPacket& recv_data)
 {
     CHECK_PACKET_SIZE(recv_data,1);
 
@@ -1130,7 +1131,7 @@ void WorldSession::HandleSetActionBar(WorldPacket& recv_data)
     if(!GetPlayer())                                        // ignore until not logged (check needed because STATUS_AUTHED)
     {
         if(ActionBar!=0)
-            sLog.outError("WorldSession::HandleSetActionBar in not logged state with value: %u, ignored",uint32(ActionBar));
+            sLog.outError("WorldSession::HandleSetActionBarToggles in not logged state with value: %u, ignored",uint32(ActionBar));
         return;
     }
 
@@ -1370,10 +1371,10 @@ void WorldSession::HandleWhoisOpcode(WorldPacket& recv_data)
     sLog.outDebug("Received whois command from player %s for character %s", GetPlayer()->GetName(), charname.c_str());
 }
 
-void WorldSession::HandleReportSpamOpcode( WorldPacket & recv_data )
+void WorldSession::HandleComplainOpcode( WorldPacket & recv_data )
 {
     CHECK_PACKET_SIZE(recv_data, 1+8);
-    sLog.outDebug("WORLD: CMSG_REPORT_SPAM");
+    sLog.outDebug("WORLD: CMSG_COMPLAIN");
     recv_data.hexlike();
 
     uint8 spam_type;                                        // 0 - mail, 1 - chat
@@ -1414,7 +1415,7 @@ void WorldSession::HandleReportSpamOpcode( WorldPacket & recv_data )
     sLog.outDebug("REPORT SPAM: type %u, guid %u, unk1 %u, unk2 %u, unk3 %u, unk4 %u, message %s", spam_type, GUID_LOPART(spammer_guid), unk1, unk2, unk3, unk4, description.c_str());
 }
 
-void WorldSession::HandleRealmStateRequestOpcode( WorldPacket & recv_data )
+void WorldSession::HandleRealmSplitOpcode( WorldPacket & recv_data )
 {
     CHECK_PACKET_SIZE(recv_data, 4);
 
@@ -1460,7 +1461,7 @@ void WorldSession::HandleFarSightOpcode( WorldPacket & recv_data )
     }
 }
 
-void WorldSession::HandleChooseTitleOpcode( WorldPacket & recv_data )
+void WorldSession::HandleSetTitleOpcode( WorldPacket & recv_data )
 {
     CHECK_PACKET_SIZE(recv_data, 4);
 
@@ -1509,7 +1510,7 @@ void WorldSession::HandleResetInstancesOpcode( WorldPacket & /*recv_data*/ )
         _player->ResetInstances(INSTANCE_RESET_ALL);
 }
 
-void WorldSession::HandleDungeonDifficultyOpcode( WorldPacket & recv_data )
+void WorldSession::HandleSetDungeonDifficultyOpcode( WorldPacket & recv_data )
 {
     CHECK_PACKET_SIZE(recv_data, 4);
 
@@ -1523,7 +1524,7 @@ void WorldSession::HandleDungeonDifficultyOpcode( WorldPacket & recv_data )
 
     if(mode > DIFFICULTY_HEROIC)
     {
-        sLog.outError("WorldSession::HandleDungeonDifficultyOpcode: player %d sent an invalid instance mode %d!", _player->GetGUIDLow(), mode);
+        sLog.outError("WorldSession::HandleSetDungeonDifficultyOpcode: player %d sent an invalid instance mode %d!", _player->GetGUIDLow(), mode);
         return;
     }
 
@@ -1531,7 +1532,7 @@ void WorldSession::HandleDungeonDifficultyOpcode( WorldPacket & recv_data )
     Map *map = _player->GetMap();
     if(map && map->IsDungeon())
     {
-        sLog.outError("WorldSession::HandleDungeonDifficultyOpcode: player %d tried to reset the instance while inside!", _player->GetGUIDLow());
+        sLog.outError("WorldSession::HandleSetDungeonDifficultyOpcode: player %d tried to reset the instance while inside!", _player->GetGUIDLow());
         return;
     }
 
@@ -1555,7 +1556,7 @@ void WorldSession::HandleDungeonDifficultyOpcode( WorldPacket & recv_data )
     }
 }
 
-void WorldSession::HandleDismountOpcode( WorldPacket & /*recv_data*/ )
+void WorldSession::HandleCancelMountAuraOpcode( WorldPacket & /*recv_data*/ )
 {
     sLog.outDebug("WORLD: CMSG_CANCEL_MOUNT_AURA");
     //recv_data.hexlike();
@@ -1577,7 +1578,7 @@ void WorldSession::HandleDismountOpcode( WorldPacket & /*recv_data*/ )
     _player->RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);
 }
 
-void WorldSession::HandleMoveFlyModeChangeAckOpcode( WorldPacket & recv_data )
+void WorldSession::HandleMoveSetCanFlyAckOpcode( WorldPacket & recv_data )
 {
     CHECK_PACKET_SIZE(recv_data, 8+4+4);
 
@@ -1592,16 +1593,6 @@ void WorldSession::HandleMoveFlyModeChangeAckOpcode( WorldPacket & recv_data )
     recv_data >> guid >> unk >> flags;
 
     _player->SetUnitMovementFlags(flags);
-    /*
-    on:
-    25 00 00 00 00 00 00 00 | 00 00 00 00 00 00 80 00
-    85 4E A9 01 19 BA 7A C3 | 42 0D 70 44 44 B0 A8 42
-    78 15 94 40 39 03 00 00 | 00 00 80 3F
-    off:
-    25 00 00 00 00 00 00 00 | 00 00 00 00 00 00 00 00
-    10 FD A9 01 19 BA 7A C3 | 42 0D 70 44 44 B0 A8 42
-    78 15 94 40 39 03 00 00 | 00 00 00 00
-    */
 }
 
 void WorldSession::HandleRequestPetInfoOpcode( WorldPacket & /*recv_data */)
@@ -1622,7 +1613,7 @@ void WorldSession::HandleSetTaxiBenchmarkOpcode( WorldPacket & recv_data )
     sLog.outDebug("Client used \"/timetest %d\" command", mode);
 }
 
-void WorldSession::HandleInspectAchievements( WorldPacket & recv_data )
+void WorldSession::HandleQueryInspectAchievements( WorldPacket & recv_data )
 {
     CHECK_PACKET_SIZE(recv_data, 1);
     uint64 guid;

@@ -38,7 +38,7 @@ class MPQArchiveSet
 };
 
 extern MPQArchiveSet gOpenArchives;
- 
+
 class MPQFile
 {
     HANDLE hFile;

@@ -39,7 +39,6 @@ MPQArchiveSet::~MPQArchiveSet()
         ar_itr->close();
 }
 
-//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 MPQFile::MPQFile(const char* filename):
     eof(false),
     buffer(0),
@@ -72,7 +71,6 @@ MPQFile::MPQFile(const char* filename):
 
     eof = true;
     buffer = 0;
-
 }
 
 MPQFile::~MPQFile()

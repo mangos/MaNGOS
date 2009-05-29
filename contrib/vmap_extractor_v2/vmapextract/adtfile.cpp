@@ -24,6 +24,7 @@ void fixnamen(char *name, size_t len)
         }
     }
 }
+
 void fixname2(char *name, size_t len)
 {
     for (size_t i=0; i<len-3; i++)
@@ -44,10 +45,10 @@ bool ADTFile::init(char *map_id)
         return false;
 
     size_t size;
-    
+
     string xMap;
     string yMap;
-    
+
     Adtfilename.erase(Adtfilename.find(".adt"),4);
     string TempMapNumber;
     TempMapNumber = Adtfilename.substr(Adtfilename.length()-6,6);
@@ -69,7 +70,6 @@ bool ADTFile::init(char *map_id)
         return false;
     }
 
-
     while (!ADT.isEof())
     {
         char fourcc[5];
@@ -82,7 +82,6 @@ bool ADTFile::init(char *map_id)
 
         if (!strcmp(fourcc,"MCIN"))
         {
-
         }
         else if (!strcmp(fourcc,"MTEX"))
         {
@@ -96,7 +95,7 @@ bool ADTFile::init(char *map_id)
                 char *p=buf;
                 int t=0;
                 ModelInstansName = new string[size];
-                while (p<buf+size) 
+                while (p<buf+size)
                 {
                     fixnamen(p,strlen(p));
                     string path(p);
@@ -130,10 +129,8 @@ bool ADTFile::init(char *map_id)
                     else
                         fclose(output);
                 }
-
                 delete[] buf;
             }
-
         }
         else if (!strcmp(fourcc,"MWMO"))
         {
@@ -144,7 +141,7 @@ bool ADTFile::init(char *map_id)
                 char *p=buf;
                 int q = 0;
                 WmoInstansName = new string[size];
-                while (p<buf+size) 
+                while (p<buf+size)
                 {
                     string path(p);
                     char* s=GetPlainName(p);
@@ -186,7 +183,7 @@ bool ADTFile::init(char *map_id)
             }
         }
         //======================
-#if 0 
+#if 0
         else if (!strcmp(fourcc,"MDDF"))
         {
             if (size)

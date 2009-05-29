@@ -1944,12 +1944,9 @@ void Map::SendInitSelf( Player * player )
 
     UpdateData data;
 
-    bool hasTransport = false;
-
     // attach to player data current transport data
     if(Transport* transport = player->GetTransport())
     {
-        hasTransport = true;
         transport->BuildCreateUpdateBlockForPlayer(&data, player);
     }
 
@@ -1963,14 +1960,13 @@ void Map::SendInitSelf( Player * player )
         {
             if(player!=(*itr) && player->HaveAtClient(*itr))
             {
-                hasTransport = true;
                 (*itr)->BuildCreateUpdateBlockForPlayer(&data, player);
             }
         }
     }
 
     WorldPacket packet;
-    data.BuildPacket(&packet, hasTransport);
+    data.BuildPacket(&packet);
     player->GetSession()->SendPacket(&packet);
 }
 
@@ -1987,20 +1983,17 @@ void Map::SendInitTransports( Player * player )
 
     MapManager::TransportSet& tset = tmap[player->GetMapId()];
 
-    bool hasTransport = false;
-
     for (MapManager::TransportSet::const_iterator i = tset.begin(); i != tset.end(); ++i)
     {
         // send data for current transport in other place
         if((*i) != player->GetTransport() && (*i)->GetMapId()==i_id)
         {
-            hasTransport = true;
             (*i)->BuildCreateUpdateBlockForPlayer(&transData, player);
         }
     }
 
     WorldPacket packet;
-    transData.BuildPacket(&packet, hasTransport);
+    transData.BuildPacket(&packet);
     player->GetSession()->SendPacket(&packet);
 }
 
