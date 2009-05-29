@@ -15,7 +15,7 @@
 *
 ********************************************************************/
 
-#ifndef _WIN32 || _WIN64
+#ifndef _WIN32
 #include "StormPort.h"
 #include "StormLib.h"
 

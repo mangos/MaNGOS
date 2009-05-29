@@ -1,5 +1,6 @@
 #include "adtfile.h"
 
+#include <algorithm>
 char * GetPlainName(char * FileName)
 {
     char * szTemp;
@@ -22,6 +23,7 @@ void fixnamen(char *name, size_t len)
         }
     }
 }
+
 void fixname2(char *name, size_t len)
 {
     for (size_t i=0; i<len-3; i++)
@@ -42,10 +44,10 @@ bool ADTFile::init(char *map_id)
         return false;
 
     size_t size;
-    
+
     string xMap;
     string yMap;
-    
+
     Adtfilename.erase(Adtfilename.find(".adt"),4);
     string TempMapNumber;
     TempMapNumber = Adtfilename.substr(Adtfilename.length()-6,6);
@@ -100,18 +102,27 @@ bool ADTFile::init(char *map_id)
                     fixname2(s,strlen(s));
                     p=p+strlen(p)+1;
                     ModelInstansName[t++] = s;
-                    path.erase(path.length()-2,2);
-                    path.append("2");
-                    char* szLocalFile[512];
-                    sprintf((char*)szLocalFile, ".\\buildings\\%s", s);
-                    FILE * output = fopen((char*)szLocalFile,"rb");
+
+                    // < 3.1.0 ADT MMDX section store filename.mdx filenames for corresponded .m2 file
+                    std::string ext3 = path.size() >= 4 ? path.substr(path.size()-4,4) : "";
+                    std::transform( ext3.begin(), ext3.end(), ext3.begin(), ::tolower );
+                    if(ext3 == ".mdx")
+                    {
+                        // replace .mdx -> .m2
+                        path.erase(path.length()-2,2);
+                        path.append("2");
+                    }
+                    // >= 3.1.0 ADT MMDX section store filename.m2 filenames for corresponded .m2 file
+                    // nothing do
+
+                    char szLocalFile[MAX_PATH];
+                    sprintf(szLocalFile, ".\\buildings\\%s", s);
+                    FILE * output = fopen(szLocalFile,"rb");
                     if(!output)
                     {
                         Model * m2 = new Model(path);
                         if(m2->open())
-                        {
-                            m2->ConvertToVMAPModel((char*)szLocalFile);
-                        }
+                            m2->ConvertToVMAPModel(szLocalFile);
                         delete m2;
                     }
                     else
@@ -129,7 +140,7 @@ bool ADTFile::init(char *map_id)
                 char *p=buf;
                 int q = 0;
                 WmoInstansName = new string[size];
-                while (p<buf+size) 
+                while (p<buf+size)
                 {
                     string path(p);
                     char* s=GetPlainName(p);
@@ -171,7 +182,7 @@ bool ADTFile::init(char *map_id)
             }
         }
         //======================
-#if 0 
+#if 0
         else if (!strcmp(fourcc,"MDDF"))
         {
             if (size)

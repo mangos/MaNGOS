@@ -3222,8 +3222,9 @@ void Aura::HandleModCharm(bool apply, bool Real)
                     CreatureInfo const *cinfo = ((Creature*)m_target)->GetCreatureInfo();
                     if(cinfo && cinfo->type == CREATURE_TYPE_DEMON)
                     {
+                        //does not appear to have relevance. Why code added initially? See note below at !apply
                         //to prevent client crash
-                        m_target->SetFlag(UNIT_FIELD_BYTES_0, 2048);
+                        //m_target->SetFlag(UNIT_FIELD_BYTES_0, 2048);
                         //just to enable stat window
                         charmInfo->SetPetNumber(objmgr.GeneratePetNumber(), true);
                         //if charmed two demons the same session, the 2nd gets the 1st one's name
@@ -3261,11 +3262,13 @@ void Aura::HandleModCharm(bool apply, bool Real)
                 // restore UNIT_FIELD_BYTES_0
                 if(cinfo && caster->GetTypeId() == TYPEID_PLAYER && caster->getClass() == CLASS_WARLOCK && cinfo->type == CREATURE_TYPE_DEMON)
                 {
-                    CreatureDataAddon const *cainfo = ((Creature*)m_target)->GetCreatureAddon();
+                    //does not appear to have relevance. Why code added initially? Class, gender, powertype should be same.
+                    //db field removed and replaced with better way to set class, restore using this if problems
+                    /*CreatureDataAddon const *cainfo = ((Creature*)m_target)->GetCreatureAddon();
                     if(cainfo && cainfo->bytes0 != 0)
                         m_target->SetUInt32Value(UNIT_FIELD_BYTES_0, cainfo->bytes0);
                     else
-                        m_target->RemoveFlag(UNIT_FIELD_BYTES_0, 2048);
+                        m_target->RemoveFlag(UNIT_FIELD_BYTES_0, 2048);*/
 
                     if(m_target->GetCharmInfo())
                         m_target->GetCharmInfo()->SetPetNumber(0, true);

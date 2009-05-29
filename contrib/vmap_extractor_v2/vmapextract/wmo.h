@@ -37,7 +37,7 @@ public:
 
     WMORoot(std::string &filename);
     ~WMORoot();
-    
+
     bool open();
     bool ConvertToVMAPRootWmo(FILE *output);
 private:

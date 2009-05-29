@@ -10420,7 +10420,7 @@ bool CharmInfo::AddSpellToActionBar(uint32 spell_id, ActiveStates newstate)
         }
     }
 
-    // or use empty slot in other case 
+    // or use empty slot in other case
     for(uint8 i = 0; i < MAX_UNIT_ACTION_BAR_INDEX; ++i)
     {
         if (!PetActionBar[i].SpellOrAction && PetActionBar[i].IsActionBarForSpell())

@@ -295,7 +295,7 @@ int WMOGroup::ConvertToVMAPGroupWmo(FILE *output, bool pPreciseVectorData)
         {
             int LIQU_h[] = {0x5551494C,LiquEx_size+8,hlq_xverts,hlq_yverts};// "LIQU"
             fwrite(LIQU_h,4,4,output);
-            fwrite(LiquEx,4,LiquEx_size/4,output);    
+            fwrite(LiquEx,4,LiquEx_size/4,output);
             delete [] LiquEx;
         }
 
@@ -305,7 +305,7 @@ int WMOGroup::ConvertToVMAPGroupWmo(FILE *output, bool pPreciseVectorData)
     {
         //printf("Convert GroupWmo...\n");
         //-------GRP -------------------------------------
-        fwrite(&liquflags,sizeof(uint32),1,output); 
+        fwrite(&liquflags,sizeof(uint32),1,output);
         char GRP[] = "GRP ";
         fwrite(GRP,1,4,output);
         int k = 0;
@@ -317,7 +317,7 @@ int WMOGroup::ConvertToVMAPGroupWmo(FILE *output, bool pPreciseVectorData)
         }
         delete [] MOBA;
         int moba_size_grp = moba_batch*4+4;
-        fwrite(&moba_size_grp,4,1,output); 
+        fwrite(&moba_size_grp,4,1,output);
         fwrite(&moba_batch,4,1,output);
         fwrite(MobaEx,4,k,output);
         delete [] MobaEx;
@@ -335,7 +335,7 @@ int WMOGroup::ConvertToVMAPGroupWmo(FILE *output, bool pPreciseVectorData)
                 continue;
             // Use only this triangles
             if ((int)MOPY[i]&(WMO_MATERIAL_HINT|WMO_MATERIAL_COLLIDE_HIT))
-            {    
+            {
                 MopyEx[n] = MOPY[i];
                 MopyEx[(n+1)] = MOPY[(i+1)];
                 IndexExTr[j] = i/2;
@@ -454,7 +454,7 @@ int WMOGroup::ConvertToVMAPGroupWmo(FILE *output, bool pPreciseVectorData)
         delete [] MovtEx;
         delete [] MovtExSort;
 
-        //---------------------------------------------    
+        //---------------------------------------------
         return IndexExTr_size;
     }
 }

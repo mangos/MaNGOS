@@ -36,7 +36,7 @@ bool DBCFile::open()
     f.read(&nb,4); // Number of fields
     f.read(&es,4); // Size of a record
     f.read(&ss,4); // String size
-    
+
     recordSize = es;
     recordCount = na;
     fieldCount = nb;

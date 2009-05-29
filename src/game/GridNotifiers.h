@@ -926,10 +926,10 @@ namespace MaNGOS
                     return false;
                 if(!u->CanAssistTo(i_obj,i_enemy))
                     return false;
-                    
+
                 if(!i_obj->IsWithinDistInMap(u, i_range))
                     return false;
-                
+
                 if(!i_obj->IsWithinLOSInMap(u))
                     return false;
 

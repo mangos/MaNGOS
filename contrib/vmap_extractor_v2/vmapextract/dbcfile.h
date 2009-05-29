@@ -91,7 +91,7 @@ public:
     class Iterator
     {
     public:
-        Iterator(DBCFile &file, unsigned char *offset): 
+        Iterator(DBCFile &file, unsigned char *offset):
             record(file, offset) {}
         /// Advance (prefix only)
         Iterator & operator++() {

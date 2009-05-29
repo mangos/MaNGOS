@@ -2000,7 +2000,7 @@ bool ChatHandler::HandleTeleNameCommand(const char * args)
     extractOptFirstArg((char*)args,&nameStr,&teleStr);
     if(!teleStr)
         return false;
-    
+
     Player* target;
     uint64 target_guid;
     std::string target_name;

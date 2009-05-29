@@ -118,7 +118,7 @@ class Vec2D
 {
 public:
     float x,y;
-    
+
     Vec2D(float x0 = 0.0f, float y0 = 0.0f) : x(x0), y(y0) {}
 
     Vec2D(const Vec2D& v) : x(v.x), y(v.y) {}

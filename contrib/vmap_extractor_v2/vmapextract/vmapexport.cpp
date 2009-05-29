@@ -90,6 +90,7 @@ static const char * GetPlainName(const char * szFileName)
 
 static void ShowProcessedFile(const char * szFileName)
 {
+/* not truncate file names in output
     char szLine[80];
     size_t nLength = strlen(szFileName);
 
@@ -100,13 +101,14 @@ static void ShowProcessedFile(const char * szFileName)
         nLength = sizeof(szLine)-1;
     memcpy(szLine, szFileName, nLength);
     printf("\r%s\n", szLine);
+*/
+    printf("\r%s\n", szFileName);
 }
 
-int ExtractWmo(const std::vector<std::string>& pArchiveNames)
+int ExtractWmo()
 {
     char* szListFile = "";
     char   szLocalFile[MAX_PATH] = "";
-    HANDLE hMpq = "";
     BOOL bResult = FALSE;
 
     //const char* ParsArchiveNames[] = {"patch-2.MPQ", "patch.MPQ", "common.MPQ", "expansion.MPQ"};
@@ -114,20 +116,14 @@ int ExtractWmo(const std::vector<std::string>& pArchiveNames)
     int nError = ERROR_SUCCESS;
     if(szListFile == NULL || *szListFile == 0)
         szListFile = NULL;
-    //char tmp[1024];
-    //for (size_t i=0; i<4; i++)
-    for (size_t i=0; i<pArchiveNames.size(); ++i)
-    {
-        //sprintf(tmp,"%s\\%s", input_path, ParsArchiveNames[i]);
-        //if(!SFileOpenArchive(tmp, 0, 0, &hMpq))
-        if(!SFileOpenArchive(pArchiveNames[i].c_str(), 0, 0, &hMpq))
-            printf("NOT open!!! %s\n",pArchiveNames[i].c_str());
 
+    for (ArchiveSet::const_iterator ar_itr = gOpenArchives.archives.begin(); ar_itr != gOpenArchives.archives.end(); ++ar_itr)
+    {
         // Copy files from archive
         if(nError == ERROR_SUCCESS)
         {
             SFILE_FIND_DATA wf;
-            HANDLE hFind = SFileFindFirstFile(hMpq,"*.wmo*", &wf, szListFile);
+            HANDLE hFind = SFileFindFirstFile(ar_itr->hMPQ,"*.wmo*", &wf, szListFile);
             bResult = TRUE;
 
             while(hFind != NULL && bResult == TRUE)
@@ -171,10 +167,10 @@ int ExtractWmo(const std::vector<std::string>& pArchiveNames)
                         {
                             for (int i=0; i<froot->nGroups; ++i)
                             {
-                                char temp[512];
+                                char temp[MAX_PATH];
                                 strcpy(temp, wf.cFileName);
                                 temp[strlen(wf.cFileName)-4] = 0;
-                                char groupFileName[512];
+                                char groupFileName[MAX_PATH];
                                 sprintf(groupFileName,"%s_%03d.wmo",temp, i);
                                 printf("%s\n",groupFileName);
                                 //printf("GroupWmo!\n");
@@ -210,12 +206,6 @@ int ExtractWmo(const std::vector<std::string>& pArchiveNames)
             if(hFind != NULL)
                 SFileFindClose(hFind);
         }
-    }
-
-    // Close both archives
-    if(hMpq != NULL)
-    {
-        //SFileCloseArchive(hMpq);
     }
 
     if(nError == ERROR_SUCCESS)
@@ -533,26 +523,30 @@ int main(int argc, char ** argv)
         if(nError == ERROR_ALREADY_EXISTS)
             nError = ERROR_SUCCESS;
     }
-    //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-    // patch goes first -> fake priority handling
-    std::vector<MPQArchive*> archives;
 
-    //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    // prepare archive name list
     std::vector<std::string> archiveNames;
-
     fillArchiveNameVector(archiveNames);
-    for (size_t i=0; i<archiveNames.size(); ++i)
+    if(!gOpenArchives.Open(archiveNames))
     {
-        archives.push_back(new MPQArchive(archiveNames[i].c_str()));
+        printf("FATAL ERROR: None MPQ archive found by path '%s'. Use -d option with proper path.\n",input_path);
+        return 1;
     }
-    ExtractWmo(archiveNames);
 
-     //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    // extract data
+    ExtractWmo();
+
+    //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
     //map.dbc
     if(nError == ERROR_SUCCESS)
     {
         DBCFile * dbc = new DBCFile("DBFilesClient\\Map.dbc");
-        dbc->open();
+        if(!dbc->open())
+        {
+            delete dbc;
+            printf("FATAL ERROR: Map.dbc not found in data file.\n");
+            return 1;
+        }
         map_count=dbc->getRecordCount ();
         map_ids=new map_id[map_count];
         for(unsigned int x=0;x<map_count;++x)
@@ -574,5 +568,6 @@ int main(int argc, char ** argv)
         printf("ERROR: Extract %s. Work NOT complete.\n   Precise vector data=%d.\nPress any key.\n",versionString, preciseVectorData);
         _getch();
     }
+
     printf("Extract %s. Work complete. No errors.",versionString);
 }
