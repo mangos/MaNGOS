@@ -3414,7 +3414,7 @@ void Aura::HandleAuraModStun(bool apply, bool Real)
         if(m_target->GetTypeId() != TYPEID_PLAYER)
             ((Creature*)m_target)->StopMoving();
         else
-            ((Player*)m_target)->m_movementInfo.flags = 0;    // Clear movement flags
+            ((Player*)m_target)->m_movementInfo.flags = 0;  // Clear movement flags
 
         WorldPacket data(SMSG_FORCE_MOVE_ROOT, 8);
         data.append(m_target->GetPackGUID());

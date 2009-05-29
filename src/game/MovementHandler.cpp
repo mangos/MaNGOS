@@ -336,7 +336,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
     {
         if(Map *map = mover->GetMap())
             map->CreatureRelocation((Creature*)mover, movementInfo.x, movementInfo.y, movementInfo.z, movementInfo.o);
-        //mover->SetUnitMovementFlags(movementInfo.flags);
+        mover->SetUnitMovementFlags(movementInfo.flags);
     }
 }
 

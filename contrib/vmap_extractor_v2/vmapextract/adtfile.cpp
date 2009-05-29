@@ -1,6 +1,7 @@
 #include "adtfile.h"
 
 #include <algorithm>
+
 char * GetPlainName(char * FileName)
 {
     char * szTemp;
