@@ -24,17 +24,17 @@ typedef struct
     float z;
 }svec;
 
-typedef struct
+struct vec
 {
     double x;
     double y;
     double z;
-}vec;
+};
 
-typedef struc
+struct triangle
 {
     vec v[3];
-}triangle;
+};
 
 typedef struct
 {

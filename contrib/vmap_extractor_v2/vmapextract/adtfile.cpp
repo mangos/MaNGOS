@@ -1,5 +1,7 @@
 #include "adtfile.h"
 
+#include <algorithm>
+
 char * GetPlainName(char * FileName)
 {
     char * szTemp;
@@ -67,6 +69,7 @@ bool ADTFile::init(char *map_id)
         return false;
     }
 
+
     while (!ADT.isEof())
     {
         char fourcc[5];
@@ -79,6 +82,7 @@ bool ADTFile::init(char *map_id)
 
         if (!strcmp(fourcc,"MCIN"))
         {
+
         }
         else if (!strcmp(fourcc,"MTEX"))
         {
@@ -92,7 +96,7 @@ bool ADTFile::init(char *map_id)
                 char *p=buf;
                 int t=0;
                 ModelInstansName = new string[size];
-                while (p<buf+size)
+                while (p<buf+size) 
                 {
                     fixnamen(p,strlen(p));
                     string path(p);
@@ -100,25 +104,36 @@ bool ADTFile::init(char *map_id)
                     fixname2(s,strlen(s));
                     p=p+strlen(p)+1;
                     ModelInstansName[t++] = s;
-                    path.erase(path.length()-2,2);
-                    path.append("2");
-                    char* szLocalFile[512];
-                    sprintf((char*)szLocalFile, ".\\buildings\\%s", s);
-                    FILE * output = fopen((char*)szLocalFile,"rb");
+
+                    // < 3.1.0 ADT MMDX section store filename.mdx filenames for corresponded .m2 file
+                    std::string ext3 = path.size() >= 4 ? path.substr(path.size()-4,4) : "";
+                    std::transform( ext3.begin(), ext3.end(), ext3.begin(), ::tolower );
+                    if(ext3 == ".mdx")
+                    {
+                        // replace .mdx -> .m2
+                        path.erase(path.length()-2,2);
+                        path.append("2");
+                    }
+                    // >= 3.1.0 ADT MMDX section store filename.m2 filenames for corresponded .m2 file
+                    // nothing do
+
+                    char szLocalFile[MAX_PATH];
+                    sprintf(szLocalFile, ".\\buildings\\%s", s);
+                    FILE * output = fopen(szLocalFile,"rb");
                     if(!output)
                     {
                         Model * m2 = new Model(path);
                         if(m2->open())
-                        {
-                            m2->ConvertToVMAPModel((char*)szLocalFile);
-                        }
+                            m2->ConvertToVMAPModel(szLocalFile);
                         delete m2;
                     }
                     else
                         fclose(output);
                 }
+
                 delete[] buf;
             }
+
         }
         else if (!strcmp(fourcc,"MWMO"))
         {
