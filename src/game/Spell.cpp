@@ -4740,13 +4740,13 @@ SpellCastResult Spell::CheckRange(bool strict)
         range_mod = 6.25;
 
     SpellRangeEntry const* srange = sSpellRangeStore.LookupEntry(m_spellInfo->rangeIndex);
-    float max_range = GetSpellMaxRange(srange) + range_mod;
-    float min_range = GetSpellMinRange(srange);
+    Unit *target = m_targets.getUnitTarget();
+    bool friendly = target ? target->IsFriendlyTo(m_caster) : false;
+    float max_range = GetSpellMaxRange(srange, friendly) + range_mod;
+    float min_range = GetSpellMinRange(srange, friendly);
 
     if(Player* modOwner = m_caster->GetSpellModOwner())
         modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_RANGE, max_range, this);
-
-    Unit *target = m_targets.getUnitTarget();
 
     if(target && target != m_caster)
     {
