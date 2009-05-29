@@ -24,7 +24,7 @@
 #define __STORMLIB_SELF__               // Don't use StormLib.lib
 #include "StormLib.h"
 
-#pragma warning(disable : 4505) 
+#pragma warning(disable : 4505)
 #pragma comment(lib, "Winmm.lib")
 
 //From Extractor
@@ -44,7 +44,8 @@
 typedef unsigned char uint8;
 typedef unsigned short uint16;
 typedef unsigned int uint32;
-typedef struct{
+typedef struct
+{
     char name[64];
     unsigned int id;
 }map_id;
@@ -208,14 +209,17 @@ int ExtractWmo(const std::vector<std::string>& pArchiveNames)
             // Close the search handle
             if(hFind != NULL)
                 SFileFindClose(hFind);
-
         }
     }
+
     // Close both archives
     if(hMpq != NULL)
+    {
         //SFileCloseArchive(hMpq);
-        if(nError == ERROR_SUCCESS)
-            printf("\nExtract wmo complete (No errors)\n");
+    }
+
+    if(nError == ERROR_SUCCESS)
+        printf("\nExtract wmo complete (No errors)\n");
 
     return nError;
 }
