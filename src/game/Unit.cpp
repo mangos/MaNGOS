@@ -10319,13 +10319,15 @@ CharmInfo::CharmInfo(Unit* unit)
 void CharmInfo::InitPetActionBar()
 {
     // the first 3 SpellOrActions are attack, follow and stay
+    // last 3 SpellOrActions are reactions
     for(uint32 i = 0; i < 3; ++i)
     {
         SetActionBar(i,COMMAND_ATTACK - i,ACT_COMMAND);
         SetActionBar(i + 7,COMMAND_ATTACK - i,ACT_REACTION);
     }
+    // middle 4 SpellOrActions are spells/special attacks/abilities
     for(uint32 i = 0; i < 4; ++i)
-        SetActionBar(i,0,ACT_DISABLED);
+        SetActionBar(i + 3,0,ACT_DISABLED);
 }
 
 void CharmInfo::InitEmptyActionBar()
