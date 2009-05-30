@@ -339,11 +339,13 @@ bool IsPositiveEffect(uint32 spellId, uint32 effIndex)
                 case SPELL_AURA_MOD_STAT:
                 case SPELL_AURA_MOD_DAMAGE_DONE:            // dependent from bas point sign (negative -> negative)
                 case SPELL_AURA_MOD_HEALING_DONE:
-                {
                     if(spellproto->CalculateSimpleValue(effIndex) < 0)
                         return false;
                     break;
-                }
+                case SPELL_AURA_MOD_SPELL_CRIT_CHANCE:
+                    if(spellproto->CalculateSimpleValue(effIndex) > 0)
+                        return true;                        // some expected possitive spells have SPELL_ATTR_EX_NEGATIVE
+                    break;
                 case SPELL_AURA_ADD_TARGET_TRIGGER:
                     return true;
                 case SPELL_AURA_PERIODIC_TRIGGER_SPELL:
