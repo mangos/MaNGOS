@@ -1076,8 +1076,8 @@ void WorldSession::HandleMoveUnRootAck(WorldPacket&/* recv_data*/)
         recv_data >> Orientation;
 
         // TODO for later may be we can use for anticheat
-        DEBUG_LOG("Guid " I64FMTD,guid);
-        DEBUG_LOG("unknown1 " I64FMTD,unknown1);
+        DEBUG_LOG("Guid " UI64FMTD,guid);
+        DEBUG_LOG("unknown1 " UI64FMTD,unknown1);
         DEBUG_LOG("unknown2 %u",unknown2);
         DEBUG_LOG("X %f",PositionX);
         DEBUG_LOG("Y %f",PositionY);
@@ -1110,8 +1110,8 @@ void WorldSession::HandleMoveRootAck(WorldPacket&/* recv_data*/)
         recv_data >> Orientation;
 
         // for later may be we can use for anticheat
-        DEBUG_LOG("Guid " I64FMTD,guid);
-        DEBUG_LOG("unknown1 " I64FMTD,unknown1);
+        DEBUG_LOG("Guid " UI64FMTD,guid);
+        DEBUG_LOG("unknown1 " UI64FMTD,unknown1);
         DEBUG_LOG("unknown1 %u",unknown2);
         DEBUG_LOG("X %f",PositionX);
         DEBUG_LOG("Y %f",PositionY);
@@ -1166,7 +1166,7 @@ void WorldSession::HandleInspectOpcode(WorldPacket& recv_data)
 
     uint64 guid;
     recv_data >> guid;
-    DEBUG_LOG("Inspected guid is " I64FMTD, guid);
+    DEBUG_LOG("Inspected guid is (GUID: %u TypeId: %u)", GUID_LOPART(guid), GuidHigh2TypeId(GUID_HIPART(guid)));
 
     _player->SetSelection(guid);
 
@@ -1456,7 +1456,7 @@ void WorldSession::HandleFarSightOpcode( WorldPacket & recv_data )
             sLog.outDebug("Removed FarSight from player %u", _player->GetGUIDLow());
             break;
         case 1:
-            sLog.outDebug("Added FarSight " I64FMT " to player %u", _player->GetFarSight(), _player->GetGUIDLow());
+            sLog.outDebug("Added FarSight (GUID:%u TypeId:%u) to player %u", GUID_LOPART(_player->GetFarSight()), GuidHigh2TypeId(GUID_HIPART(_player->GetFarSight())), _player->GetGUIDLow());
             break;
     }
 }

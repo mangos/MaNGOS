@@ -57,7 +57,7 @@ class Field
             if(mValue)
             {
                 uint64 value;
-                sscanf(mValue,I64FMTD,&value);
+                sscanf(mValue,UI64FMTD,&value);
                 return value;
             }
             else

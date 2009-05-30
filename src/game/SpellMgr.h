@@ -67,15 +67,15 @@ enum SpellFamilyNames
 };
 
 //Some SpellFamilyFlags
-#define SPELLFAMILYFLAG_ROGUE_VANISH            0x000000800LL
-#define SPELLFAMILYFLAG_ROGUE_STEALTH           0x000400000LL
-#define SPELLFAMILYFLAG_ROGUE_BACKSTAB          0x000800004LL
-#define SPELLFAMILYFLAG_ROGUE_SAP               0x000000080LL
-#define SPELLFAMILYFLAG_ROGUE_FEINT             0x008000000LL
-#define SPELLFAMILYFLAG_ROGUE_KIDNEYSHOT        0x000200000LL
-#define SPELLFAMILYFLAG_ROGUE__FINISHING_MOVE   0x9003E0000LL
+#define SPELLFAMILYFLAG_ROGUE_VANISH            UI64LIT(0x000000800)
+#define SPELLFAMILYFLAG_ROGUE_STEALTH           UI64LIT(0x000400000)
+#define SPELLFAMILYFLAG_ROGUE_BACKSTAB          UI64LIT(0x000800004)
+#define SPELLFAMILYFLAG_ROGUE_SAP               UI64LIT(0x000000080)
+#define SPELLFAMILYFLAG_ROGUE_FEINT             UI64LIT(0x008000000)
+#define SPELLFAMILYFLAG_ROGUE_KIDNEYSHOT        UI64LIT(0x000200000)
+#define SPELLFAMILYFLAG_ROGUE__FINISHING_MOVE   UI64LIT(0x9003E0000)
 
-#define SPELLFAMILYFLAG_PALADIN_SEALS           0x26000C000A000000LL
+#define SPELLFAMILYFLAG_PALADIN_SEALS           UI64LIT(0x26000C000A000000)
 // Spell clasification
 enum SpellSpecific
 {
@@ -130,7 +130,7 @@ inline bool IsSealSpell(SpellEntry const *spellInfo)
 inline bool IsElementalShield(SpellEntry const *spellInfo)
 {
     // family flags 10 (Lightning), 42 (Earth), 37 (Water), proc shield from T2 8 pieces bonus
-    return (spellInfo->SpellFamilyFlags & 0x42000000400LL) || spellInfo->Id == 23552;
+    return (spellInfo->SpellFamilyFlags & UI64LIT(0x42000000400)) || spellInfo->Id == 23552;
 }
 
 inline bool IsExplicitDiscoverySpell(SpellEntry const *spellInfo)

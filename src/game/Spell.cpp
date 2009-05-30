@@ -768,28 +768,28 @@ void Spell::prepareDataForTriggerSystem()
         switch (m_spellInfo->SpellFamilyName)
         {
             case SPELLFAMILY_MAGE:    // Arcane Missles / Blizzard triggers need do it
-                if (m_spellInfo->SpellFamilyFlags & 0x0000000000200080LL)
+                if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0000000000200080))
                     m_canTrigger = true;
                 break;
             case SPELLFAMILY_WARLOCK: // For Hellfire Effect / Rain of Fire / Seed of Corruption triggers need do it
-                if (m_spellInfo->SpellFamilyFlags & 0x0000800000000060LL)
+                if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0000800000000060))
                     m_canTrigger = true;
                 break;
             case SPELLFAMILY_PRIEST:  // For Penance heal/damage triggers need do it
-                if (m_spellInfo->SpellFamilyFlags & 0x0001800000000000LL)
+                if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0001800000000000))
                     m_canTrigger = true;
                 break;
             case SPELLFAMILY_ROGUE:   // For poisons need do it
-                if (m_spellInfo->SpellFamilyFlags & 0x000000101001E000LL)
+                if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x000000101001E000))
                     m_canTrigger = true;
                 break;
             case SPELLFAMILY_HUNTER:  // Hunter Rapid Killing/Explosive Trap Effect/Immolation Trap Effect/Frost Trap Aura/Snake Trap Effect/Explosive Shot
-                if (m_spellInfo->SpellFamilyFlags & 0x0100200000000214LL ||
+                if ((m_spellInfo->SpellFamilyFlags & UI64LIT(0x0100200000000214)) ||
                     m_spellInfo->SpellFamilyFlags2 & 0x200)
                     m_canTrigger = true;
                 break;
             case SPELLFAMILY_PALADIN: // For Judgements (all) / Holy Shock triggers need do it
-                if (m_spellInfo->SpellFamilyFlags & 0x0001000900B80400LL)
+                if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0001000900B80400))
                     m_canTrigger = true;
                 break;
             default:
@@ -837,7 +837,7 @@ void Spell::prepareDataForTriggerSystem()
     }
     // Hunter traps spells (for Entrapment trigger)
     // Gives your Immolation Trap, Frost Trap, Explosive Trap, and Snake Trap ....
-    if (m_spellInfo->SpellFamilyName == SPELLFAMILY_HUNTER && m_spellInfo->SpellFamilyFlags & 0x000020000000001CLL)
+    if (m_spellInfo->SpellFamilyName == SPELLFAMILY_HUNTER && (m_spellInfo->SpellFamilyFlags & UI64LIT(0x000020000000001C)))
         m_procAttacker |= PROC_FLAG_ON_TRAP_ACTIVATION;
 }
 
@@ -894,7 +894,7 @@ void Spell::AddUnitTarget(Unit* pVictim, uint32 effIndex)
             m_delayMoment = target.timeDelay;
     }
     else
-        target.timeDelay = 0LL;
+        target.timeDelay = UI64LIT(0);
 
     // If target reflect spell back to caster
     if (target.missCondition == SPELL_MISS_REFLECT)
@@ -957,7 +957,7 @@ void Spell::AddGOTarget(GameObject* pVictim, uint32 effIndex)
             m_delayMoment = target.timeDelay;
     }
     else
-        target.timeDelay = 0LL;
+        target.timeDelay = UI64LIT(0);
 
     // Add target to list
     m_UniqueGOTargetInfo.push_back(target);
@@ -1079,7 +1079,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
         caster->DealSpellDamage(&damageInfo, true);
 
         // Judgement of Blood
-        if (m_spellInfo->SpellFamilyName == SPELLFAMILY_PALADIN && m_spellInfo->SpellFamilyFlags & 0x0000000800000000LL && m_spellInfo->SpellIconID==153)
+        if (m_spellInfo->SpellFamilyName == SPELLFAMILY_PALADIN && (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0000000800000000)) && m_spellInfo->SpellIconID==153)
         {
             int32 damagePoint  = damageInfo.damage * 33 / 100;
             m_caster->CastCustomSpell(m_caster, 32220, &damagePoint, NULL, NULL, true);
@@ -1371,7 +1371,7 @@ void Spell::SetTargetMap(uint32 i,uint32 cur,UnitList& TagUnitMap)
     {
         case SPELLFAMILY_DRUID:
             // Starfall
-            if (m_spellInfo->SpellFamilyFlags2 & 0x00000100LL)
+            if (m_spellInfo->SpellFamilyFlags2 & UI64LIT(0x00000100))
                 unMaxTargets = 2;
             break;
         default:
@@ -2393,7 +2393,8 @@ void Spell::cast(bool skipCheck)
         }
         case SPELLFAMILY_MAGE:
         {
-            if (m_spellInfo->SpellFamilyFlags&0x0000008000000000LL)    // Ice Block
+            // Ice Block
+            if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0000008000000000))
                 m_preCastSpell = 41425;                                // Hypothermia
             break;
         }
@@ -2408,7 +2409,8 @@ void Spell::cast(bool skipCheck)
         }
         case SPELLFAMILY_PALADIN:
         {
-            if (m_spellInfo->SpellFamilyFlags&0x0000000000400080LL)    // Divine Shield, Divine Protection or Hand of Protection
+            // Divine Shield, Divine Protection or Hand of Protection
+            if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0000000000400080))
                 m_preCastSpell = 25771;                                // Forbearance
             break;
         }
@@ -3861,9 +3863,8 @@ SpellCastResult Spell::CheckCast(bool strict)
         {
             //Exclusion for Pounce:  Facing Limitation was removed in 2.0.1, but it still uses the same, old Ex-Flags
             //Exclusion for Mutilate:Facing Limitation was removed in 2.0.1 and 3.0.3, but they still use the same, old Ex-Flags
-            if( (m_spellInfo->SpellFamilyName != SPELLFAMILY_DRUID || m_spellInfo->SpellFamilyFlags != 0x0000000000020000LL) &&
-                (m_spellInfo->SpellFamilyName != SPELLFAMILY_ROGUE || m_spellInfo->SpellFamilyFlags != 0x0020000000000000LL)
-              )
+            if ((m_spellInfo->SpellFamilyName != SPELLFAMILY_DRUID || (m_spellInfo->SpellFamilyFlags != UI64LIT(0x0000000000020000))) &&
+                (m_spellInfo->SpellFamilyName != SPELLFAMILY_ROGUE || (m_spellInfo->SpellFamilyFlags != UI64LIT(0x0020000000000000))))
             {
                 SendInterrupted(2);
                 return SPELL_FAILED_NOT_BEHIND;
@@ -5380,7 +5381,7 @@ bool Spell::CheckTargetCreatureType(Unit* target) const
     uint32 spellCreatureTargetMask = m_spellInfo->TargetCreatureType;
 
     // Curse of Doom : not find another way to fix spell target check :/
-    if(m_spellInfo->SpellFamilyName==SPELLFAMILY_WARLOCK && m_spellInfo->SpellFamilyFlags == 0x0200000000LL)
+    if(m_spellInfo->SpellFamilyName==SPELLFAMILY_WARLOCK && m_spellInfo->SpellFamilyFlags == UI64LIT(0x0200000000))
     {
         // not allow cast at player
         if(target->GetTypeId()==TYPEID_PLAYER)
