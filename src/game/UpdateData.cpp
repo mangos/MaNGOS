@@ -127,11 +127,12 @@ bool UpdateData::BuildPacket(WorldPacket *packet)
 
     if (pSize > 100 )                                       // compress large packets
     {
-        packet->SetOpcode( SMSG_COMPRESSED_UPDATE_OBJECT );
-        *packet << uint32(pSize);                           // original size
+        packet->resize(pSize + sizeof(uint32));
+        packet->SetOpcode(SMSG_COMPRESSED_UPDATE_OBJECT);
+        packet->put<uint32>(0, pSize);                      // original size
         uint32 destsize = pSize;
-        Compress((uint8*)buf.contents(), &destsize, (uint8*)buf.contents(), pSize);
-        packet->append(buf.contents(), destsize);
+        Compress((uint8*)packet->contents() + sizeof(uint32), &destsize, (uint8*)buf.contents(), pSize);
+        packet->resize(destsize + sizeof(uint32));
     }
     else                                                    // send small packets without compression
     {
