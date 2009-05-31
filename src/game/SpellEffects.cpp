@@ -3293,9 +3293,10 @@ void Spell::EffectSummon(uint32 i)
 
     map->Add((Creature*)spawnCreature);
 
+    m_caster->SetPet(spawnCreature);
+
     if(m_caster->GetTypeId() == TYPEID_PLAYER)
     {
-        m_caster->SetPet(spawnCreature);
         spawnCreature->GetCharmInfo()->SetReactState( REACT_DEFENSIVE );
         spawnCreature->SavePetToDB(PET_SAVE_AS_CURRENT);
         ((Player*)m_caster)->PetSpellInitialize();
