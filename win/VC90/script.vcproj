@@ -69,7 +69,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="mangosd.lib zlib.lib libmySQL.lib libeay32.lib ws2_32.lib winmm.lib odbc32.lib odbccp32.lib aced.lib"
 				OutputFile="..\..\bin\$(PlatformName)_$(ConfigurationName)\MaNGOSScript.dll"
-				LinkIncremental="1"
+				LinkIncremental="2"
 				AdditionalLibraryDirectories=";.\mangosd__$(PlatformName)_$(ConfigurationName);.\zlib__$(PlatformName)_$(ConfigurationName);..\..\dep\lib\$(PlatformName)_$(ConfigurationName)"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)\MaNGOSScript.pdb"

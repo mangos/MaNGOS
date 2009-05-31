@@ -126,14 +126,21 @@ bool UpdateData::BuildPacket(WorldPacket *packet)
 
     if (pSize > 100 )                                       // compress large packets
     {
-        packet->resize(pSize);
-
-        packet->put<uint32>(0, pSize);
+        *packet << uint32(pSize);
+        packet->append(buf);
 
         uint32 destsize = pSize;
-        Compress(const_cast<uint8*>(packet->contents()) + sizeof(uint32), &destsize, (void*)buf.contents(), pSize);
+
+        Compress(const_cast<uint8*>(packet->contents()) + sizeof(uint32),
+            &destsize,
+            const_cast<uint8*>(packet->contents()) + sizeof(uint32),
+            pSize);
+
         if (destsize == 0)
+        {
+            sLog.outError("Error while compressing update packet!");
             return false;
+        }
 
         packet->resize( destsize + sizeof(uint32) );
         packet->SetOpcode( SMSG_COMPRESSED_UPDATE_OBJECT );
