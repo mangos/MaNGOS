@@ -2719,6 +2719,13 @@ DiminishingGroup GetDiminishingReturnsGroupForSpell(SpellEntry const* spellproto
                 return DIMINISHING_BLIND_CYCLONE;
             break;
         }
+        case SPELLFAMILY_HUNTER:
+        {
+            // Freezing trap
+            if (spellproto->SpellFamilyFlags & UI64LIT(0x00000000008))
+                return DIMINISHING_FREEZE;
+            break;
+        }
         case SPELLFAMILY_WARLOCK:
         {
             // Fear
