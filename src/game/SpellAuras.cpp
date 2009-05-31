@@ -3414,7 +3414,7 @@ void Aura::HandleAuraModStun(bool apply, bool Real)
         else
         {
             m_target->SetUnitMovementFlags(0);              // Clear movement flags
-            m_target->SetStandState(UNIT_STAND_STATE_STAND);
+            m_target->SetStandState(UNIT_STAND_STATE_STAND);// in 1.5 client
         }
 
         WorldPacket data(SMSG_FORCE_MOVE_ROOT, 8);
