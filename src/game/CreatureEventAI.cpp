@@ -578,11 +578,19 @@ void CreatureEventAI::ProcessAction(CreatureEventAI_Action const& action, uint32
             MeleeEnabled = action.auto_attack.state != 0;
             break;
         case ACTION_T_COMBAT_MOVEMENT:
+            // ignore no affect case
+            if(CombatMovementEnabled==(action.combat_movement.state!=0))
+                return;
+
             CombatMovementEnabled = action.combat_movement.state != 0;
 
             //Allow movement (create new targeted movement gen only if idle)
             if (CombatMovementEnabled)
             {
+                if(action.combat_movement.melee && m_creature->isInCombat())
+                    if(Unit* victim = m_creature->getVictim())
+                        m_creature->SendMeleeAttackStart(victim);
+
                 if (m_creature->GetMotionMaster()->GetCurrentMovementGeneratorType() == IDLE_MOTION_TYPE)
                 {
                     m_creature->GetMotionMaster()->Clear(false);
@@ -590,11 +598,17 @@ void CreatureEventAI::ProcessAction(CreatureEventAI_Action const& action, uint32
                 }
             }
             else
-            if (m_creature->GetMotionMaster()->GetCurrentMovementGeneratorType() == TARGETED_MOTION_TYPE)
             {
-                m_creature->GetMotionMaster()->Clear(false);
-                m_creature->GetMotionMaster()->MoveIdle();
-                m_creature->StopMoving();
+                if(action.combat_movement.melee && m_creature->isInCombat())
+                    if(Unit* victim = m_creature->getVictim())
+                        m_creature->SendMeleeAttackStop(victim);
+
+                if (m_creature->GetMotionMaster()->GetCurrentMovementGeneratorType() == TARGETED_MOTION_TYPE)
+                {
+                    m_creature->GetMotionMaster()->Clear(false);
+                    m_creature->GetMotionMaster()->MoveIdle();
+                    m_creature->StopMoving();
+                }
             }
             break;
         case ACTION_T_SET_PHASE:

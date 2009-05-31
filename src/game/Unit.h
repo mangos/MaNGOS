@@ -921,6 +921,8 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void CombatStopWithPets(bool includingCast = false);
         Unit* SelectNearbyTarget() const;
         bool hasNegativeAuraWithInterruptFlag(uint32 flag);
+        void SendMeleeAttackStop(Unit* victim);
+        void SendMeleeAttackStart(Unit* pVictim);
 
         void addUnitState(uint32 f) { m_state |= f; }
         bool hasUnitState(const uint32 f) const { return (m_state & f); }
@@ -1548,9 +1550,6 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         uint32 m_regenTimer;
 
     private:
-        void SendAttackStop(Unit* victim);                  // only from AttackStop(Unit*)
-        void SendAttackStart(Unit* pVictim);                // only from Unit::AttackStart(Unit*)
-
         bool IsTriggeredAtSpellProcEvent(Unit *pVictim, Aura* aura, SpellEntry const* procSpell, uint32 procFlag, uint32 procExtra, WeaponAttackType attType, bool isVictim, bool active, SpellProcEventEntry const*& spellProcEvent );
         bool HandleDummyAuraProc(   Unit *pVictim, uint32 damage, Aura* triggredByAura, SpellEntry const *procSpell, uint32 procFlag, uint32 procEx, uint32 cooldown);
         bool HandleHasteAuraProc(   Unit *pVictim, uint32 damage, Aura* triggredByAura, SpellEntry const *procSpell, uint32 procFlag, uint32 procEx, uint32 cooldown);
