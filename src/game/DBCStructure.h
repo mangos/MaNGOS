@@ -1238,7 +1238,7 @@ struct SkillLineEntry
     uint32    spellIcon;                                    // 37       m_spellIconID
     //char*     alternateVerb[16];                          // 38-53    m_alternateVerb_lang
                                                             // 54 string flags
-                                                            // 55       m_canLink
+    uint32    canLink;                                      // 55       m_canLink (prof. with recipes
 };
 
 struct SkillLineAbilityEntry
