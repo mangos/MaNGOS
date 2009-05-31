@@ -10331,6 +10331,8 @@ void Player::QuickEquipItem( uint16 pos, Item *pItem)
             pItem->AddToWorld();
             pItem->SendUpdateToPlayer( this );
         }
+
+        GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM, pItem->GetEntry());
     }
 }
 
