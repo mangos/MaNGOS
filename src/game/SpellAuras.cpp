@@ -3412,7 +3412,10 @@ void Aura::HandleAuraModStun(bool apply, bool Real)
         if(m_target->GetTypeId() != TYPEID_PLAYER)
             ((Creature*)m_target)->StopMoving();
         else
+        {
             m_target->SetUnitMovementFlags(0);              // Clear movement flags
+            m_target->SetStandState(UNIT_STAND_STATE_STAND);
+        }
 
         WorldPacket data(SMSG_FORCE_MOVE_ROOT, 8);
         data.append(m_target->GetPackGUID());
