@@ -16397,7 +16397,7 @@ void Player::PetSpellInitialize()
 
     CharmInfo *charmInfo = pet->GetCharmInfo();
 
-    WorldPacket data(SMSG_PET_SPELLS, 8+4+4+4+4*10+1+1);
+    WorldPacket data(SMSG_PET_SPELLS, 8+4+4+4+4*MAX_UNIT_ACTION_BAR_INDEX+1+1);
     data << uint64(pet->GetGUID());
     data << uint32(pet->GetCreatureInfo()->family);         // creature family (required for pet talents)
     data << uint32(0);
@@ -16471,7 +16471,7 @@ void Player::PossessSpellInitialize()
         return;
     }
 
-    WorldPacket data(SMSG_PET_SPELLS, 8+4+4+4+4*10+1+1);
+    WorldPacket data(SMSG_PET_SPELLS, 8+4+4+4+4*MAX_UNIT_ACTION_BAR_INDEX+1+1);
     data << uint64(charm->GetGUID());
     data << uint32(0);
     data << uint32(0);
@@ -16515,7 +16515,7 @@ void Player::CharmSpellInitialize()
         }
     }
 
-    WorldPacket data(SMSG_PET_SPELLS, 8+4+4+4+4*10+1+4*addlist+1);
+    WorldPacket data(SMSG_PET_SPELLS, 8+4+4+4+4*MAX_UNIT_ACTION_BAR_INDEX+1+4*addlist+1);
     data << uint64(charm->GetGUID());
     data << uint32(0);
     data << uint32(0);
@@ -19316,7 +19316,7 @@ void Player::EnterVehicle(Vehicle *vehicle)
     data << uint32(0);                                      // fall time
     GetSession()->SendPacket(&data);
 
-    data.Initialize(SMSG_PET_SPELLS, 8+4+4+4+4*10+1+1);
+    data.Initialize(SMSG_PET_SPELLS, 8+4+4+4+4*MAX_UNIT_ACTION_BAR_INDEX+1+1);
     data << uint64(vehicle->GetGUID());
     data << uint32(0);
     data << uint32(0);
