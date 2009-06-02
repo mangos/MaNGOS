@@ -407,7 +407,7 @@ bool AuthSocket::_HandleLogonChallenge()
         {
             ///- If the IP is 'locked', check that the player comes indeed from the correct IP address
             bool locked = false;
-            if((*result)[2].GetUInt8() == 1)            // if ip is locked
+            if((*result)[2].GetUInt8() == 1)                // if ip is locked
             {
                 DEBUG_LOG("[AuthChallenge] Account '%s' is locked to IP - '%s'", _login.c_str(), (*result)[3].GetString());
                 DEBUG_LOG("[AuthChallenge] Player address is '%s'", GetRemoteAddress().c_str());
@@ -466,15 +466,15 @@ bool AuthSocket::_HandleLogonChallenge()
                     ///- Fill the response packet with the result
                     pkt << (uint8)REALM_AUTH_SUCCESS;
 
-                    // B may be calculated < 32B so we force minnimal length to 32B
-                    pkt.append(B.AsByteArray(32), 32);   // 32 bytes
+                    // B may be calculated < 32B so we force minimal length to 32B
+                    pkt.append(B.AsByteArray(32), 32);      // 32 bytes
                     pkt << (uint8)1;
                     pkt.append(g.AsByteArray(), 1);
                     pkt << (uint8)32;
                     pkt.append(N.AsByteArray(), 32);
-                    pkt.append(s.AsByteArray(), s.GetNumBytes());   // 32 bytes
+                    pkt.append(s.AsByteArray(), s.GetNumBytes());// 32 bytes
                     pkt.append(unk3.AsByteArray(), 16);
-                    pkt << (uint8)0;                    // Added in 1.12.x client branch
+                    pkt << (uint8)0;                        // security flags (0x0...0x04)
 
                     uint8 secLevel = (*result)[4].GetUInt8();
                     _accountSecurityLevel = secLevel <= SEC_ADMINISTRATOR ? AccountTypes(secLevel) : SEC_ADMINISTRATOR;
@@ -488,7 +488,7 @@ bool AuthSocket::_HandleLogonChallenge()
             }
             delete result;
         }
-        else                                            //no account
+        else                                                // no account
         {
             pkt<< (uint8) REALM_AUTH_NO_MATCH;
         }
@@ -553,7 +553,7 @@ bool AuthSocket::_HandleLogonProof()
                 DEBUG_LOG("\n[AuthChallenge] Found precached patch info for patch %s",tmp);
             }
             else
-            {                                               //calculate patch md5
+            {                                               // calculate patch md5
                 printf("\n[AuthChallenge] Patch info for %s was not cached.",tmp);
                 PatchesCache.LoadPatchMD5(tmp);
                 PatchesCache.GetHash(tmp,(uint8*)&xferh.md5);
@@ -869,9 +869,9 @@ bool AuthSocket::_HandleRealmList()
 
         uint8 lock = (i->second.allowedSecurityLevel > _accountSecurityLevel) ? 1 : 0;
 
-        pkt << i->second.icon;                             // realm type
-        pkt << lock;                                       // if 1, then realm locked
-        pkt << i->second.color;                            // if 2, then realm is offline
+        pkt << i->second.icon;                              // realm type
+        pkt << lock;                                        // if 1, then realm locked
+        pkt << i->second.color;                             // if 2, then realm is offline
         pkt << i->first;
         pkt << i->second.address;
         pkt << i->second.populationLevel;
@@ -921,7 +921,7 @@ bool AuthSocket::_HandleXferCancel()
     DEBUG_LOG("Entering _HandleXferCancel");
 
     ///- Close and delete the socket
-    ibuf.Remove(1);                                         //clear input buffer
+    ibuf.Remove(1);                                         // clear input buffer
 
     SetCloseAndDelete();
 
@@ -941,7 +941,7 @@ bool AuthSocket::_HandleXferAccept()
     }
 
     ///- Launch a PatcherRunnable thread, starting at the begining of the patch file
-    ibuf.Remove(1);                                         //clear input buffer
+    ibuf.Remove(1);                                         // clear input buffer
     fseek(pPatch,0,0);
 
 	ACE_Based::Thread u(*new PatcherRunnable(this));
@@ -1023,7 +1023,7 @@ void Patcher::LoadPatchesInfo()
     WIN32_FIND_DATA fil;
     HANDLE hFil=FindFirstFile("./patches/*.mpq",&fil);
     if(hFil==INVALID_HANDLE_VALUE)
-        return;                                             //no patches were found
+        return;                                             // no patches were found
 
     do
     {

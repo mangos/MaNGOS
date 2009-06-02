@@ -78,6 +78,7 @@ bool AchievementCriteriaData::IsValid(AchievementCriteriaEntry const* criteria)
 
     switch(criteria->requiredType)
     {
+        case ACHIEVEMENT_CRITERIA_TYPE_WIN_RATED_ARENA:
         case ACHIEVEMENT_CRITERIA_TYPE_DO_EMOTE:
         case ACHIEVEMENT_CRITERIA_TYPE_LOOT_TYPE:
         case ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2:
@@ -90,6 +91,7 @@ bool AchievementCriteriaData::IsValid(AchievementCriteriaEntry const* criteria)
     switch(dataType)
     {
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_NONE:
+        case ACHIEVEMENT_CRITERIA_DATA_TYPE_VALUE:
             return true;
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_T_CREATURE:
             if(!creature.id || !objmgr.GetCreatureTemplate(creature.id))
@@ -174,7 +176,7 @@ bool AchievementCriteriaData::IsValid(AchievementCriteriaEntry const* criteria)
     return false;
 }
 
-bool AchievementCriteriaData::Meets(Player const* source, Unit const* target) const
+bool AchievementCriteriaData::Meets(Player const* source, Unit const* target, uint32 miscvalue1 /*= 0*/) const
 {
     switch(dataType)
     {
@@ -213,15 +215,17 @@ bool AchievementCriteriaData::Meets(Player const* source, Unit const* target) co
         }
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_T_AURA:
             return target && target->HasAura(aura.spell_id,aura.effect_idx);
+        case ACHIEVEMENT_CRITERIA_DATA_TYPE_VALUE:
+            return miscvalue1 >= value.minvalue;
     }
 
     return false;
 }
 
-bool AchievementCriteriaDataSet::Meets(Player const* source, Unit const* target) const
+bool AchievementCriteriaDataSet::Meets(Player const* source, Unit const* target, uint32 miscvalue /*= 0*/) const
 {
     for(Storage::const_iterator itr = storage.begin(); itr != storage.end(); ++itr)
-        if(!itr->Meets(source,target))
+        if(!itr->Meets(source,target,miscvalue))
             return false;
 
     return true;
@@ -287,6 +291,11 @@ void AchievementMgr::ResetAchievementCriteria(AchievementCriteriaTypes type, uin
             case ACHIEVEMENT_CRITERIA_TYPE_HEALING_DONE:    // have total statistic also not expected to be reset
                 if (achievementCriteria->healing_done.flag == miscvalue1 &&
                     achievementCriteria->healing_done.mapid == miscvalue2)
+                    SetCriteriaProgress(achievementCriteria, 0, PROGRESS_SET);
+                break;
+            case ACHIEVEMENT_CRITERIA_TYPE_WIN_RATED_ARENA: // have total statistic also not expected to be reset
+                // reset only the criteria having the miscvalue1 condition
+                if (achievementCriteria->win_rated_arena.flag == miscvalue1)
                     SetCriteriaProgress(achievementCriteria, 0, PROGRESS_SET);
                 break;
             default:                                        // reset all cases
@@ -589,6 +598,8 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
             case ACHIEVEMENT_CRITERIA_TYPE_NUMBER_OF_TALENT_RESETS:
             case ACHIEVEMENT_CRITERIA_TYPE_WIN_DUEL:
             case ACHIEVEMENT_CRITERIA_TYPE_LOSE_DUEL:
+            case ACHIEVEMENT_CRITERIA_TYPE_ROLL_NEED:
+            case ACHIEVEMENT_CRITERIA_TYPE_ROLL_GREED:
             case ACHIEVEMENT_CRITERIA_TYPE_QUEST_ABANDONED:
             case ACHIEVEMENT_CRITERIA_TYPE_FLIGHT_PATHS_TAKEN:
             case ACHIEVEMENT_CRITERIA_TYPE_ACCEPTED_SUMMONINGS:
@@ -922,6 +933,26 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                     continue;
                 SetCriteriaProgress(achievementCriteria, GetPlayer()->GetItemCount(achievementCriteria->own_item.itemID, true));
                 break;
+            case ACHIEVEMENT_CRITERIA_TYPE_WIN_RATED_ARENA:
+                // miscvalue1 contains the personal rating
+                if (!miscvalue1)                            // no update at login
+                    continue;
+
+                // additional requirements
+                if(achievementCriteria->win_rated_arena.flag==ACHIEVEMENT_CRITERIA_CONDITION_NO_LOOSE)
+                {
+                    // those requirements couldn't be found in the dbc
+                    AchievementCriteriaDataSet const* data = achievementmgr.GetCriteriaDataSet(achievementCriteria);
+                    if(!data || !data->Meets(GetPlayer(),unit,miscvalue1))
+                    {
+                        // reset the progress as we have a win without the requirement.
+                        SetCriteriaProgress(achievementCriteria, 0);
+                        continue;
+                    }
+                }
+
+                SetCriteriaProgress(achievementCriteria, 1, PROGRESS_ACCUMULATE);
+                break;
             case ACHIEVEMENT_CRITERIA_TYPE_USE_ITEM:
                 // AchievementMgr::UpdateAchievementCriteria might also be called on login - skip in this case
                 if(!miscvalue1)
@@ -1063,7 +1094,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                 if(miscvalue1 != achievementCriteria->equip_item.itemID)
                     continue;
 
-                SetCriteriaProgress(achievementCriteria, 1, PROGRESS_ACCUMULATE);
+                SetCriteriaProgress(achievementCriteria, 1);
                 break;
             case ACHIEVEMENT_CRITERIA_TYPE_USE_GAMEOBJECT:
                 // miscvalue1 = go entry
@@ -1187,7 +1218,6 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
             case ACHIEVEMENT_CRITERIA_TYPE_WIN_ARENA:
             case ACHIEVEMENT_CRITERIA_TYPE_PLAY_ARENA:
             case ACHIEVEMENT_CRITERIA_TYPE_HONORABLE_KILL:
-            case ACHIEVEMENT_CRITERIA_TYPE_WIN_RATED_ARENA:
             case ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_TEAM_RATING:
             case ACHIEVEMENT_CRITERIA_TYPE_REACH_TEAM_RATING:
             case ACHIEVEMENT_CRITERIA_TYPE_OWN_RANK:
@@ -1202,8 +1232,6 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
             case ACHIEVEMENT_CRITERIA_TYPE_WON_AUCTIONS:
             case ACHIEVEMENT_CRITERIA_TYPE_LOOT_EPIC_ITEM:
             case ACHIEVEMENT_CRITERIA_TYPE_RECEIVE_EPIC_ITEM:
-            case ACHIEVEMENT_CRITERIA_TYPE_ROLL_NEED:
-            case ACHIEVEMENT_CRITERIA_TYPE_ROLL_GREED:
             case ACHIEVEMENT_CRITERIA_TYPE_TOTAL:
                 break;                                   // Not implemented yet :(
         }
@@ -1295,6 +1323,8 @@ bool AchievementMgr::IsCompletedCriteria(AchievementCriteriaEntry const* achieve
             return progress->counter >= 1;
         case ACHIEVEMENT_CRITERIA_TYPE_OWN_ITEM:
             return progress->counter >= achievementCriteria->own_item.itemCount;
+        case ACHIEVEMENT_CRITERIA_TYPE_WIN_RATED_ARENA:
+            return progress->counter >= achievementCriteria->win_rated_arena.count;
         case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILL_LEVEL:
             return progress->counter >= (achievementCriteria->learn_skill_level.skillLevel * 75);
         case ACHIEVEMENT_CRITERIA_TYPE_USE_ITEM:
@@ -1360,6 +1390,8 @@ bool AchievementMgr::IsCompletedCriteria(AchievementCriteriaEntry const* achieve
         case ACHIEVEMENT_CRITERIA_TYPE_GAIN_REVERED_REPUTATION:
         case ACHIEVEMENT_CRITERIA_TYPE_GAIN_HONORED_REPUTATION:
         case ACHIEVEMENT_CRITERIA_TYPE_KNOWN_FACTIONS:
+        case ACHIEVEMENT_CRITERIA_TYPE_ROLL_NEED:
+        case ACHIEVEMENT_CRITERIA_TYPE_ROLL_GREED:
         case ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_HEALTH:
         case ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_SPELLPOWER:
         case ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_ARMOR:
@@ -1536,7 +1568,7 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
         return;
 
     // titles
-    if(uint32 titleId = reward->titleId[GetPlayer()->GetTeam() == HORDE?0:1])
+    if(uint32 titleId = reward->titleId[GetPlayer()->GetTeam() == HORDE ? 0 : 1])
     {
         if(CharTitlesEntry const* titleEntry = sCharTitlesStore.LookupEntry(titleId))
             GetPlayer()->SetTitle(titleEntry);
@@ -1746,6 +1778,10 @@ void AchievementGlobalMgr::LoadAchievementCriteriaData()
 
         switch(criteria->requiredType)
         {
+            case ACHIEVEMENT_CRITERIA_TYPE_WIN_RATED_ARENA: // need skip generic cases
+                if(criteria->win_rated_arena.flag!=ACHIEVEMENT_CRITERIA_CONDITION_NO_LOOSE)
+                    continue;
+                break;
             case ACHIEVEMENT_CRITERIA_TYPE_DO_EMOTE:        // need skip generic cases
                 if(criteria->do_emote.count==0)
                     continue;

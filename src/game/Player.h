@@ -147,6 +147,7 @@ struct ActionButton
 enum ActionButtonType
 {
     ACTION_BUTTON_SPELL = 0,
+    ACTION_BUTTON_EQSET = 32,
     ACTION_BUTTON_MACRO = 64,
     ACTION_BUTTON_CMACRO= 65,
     ACTION_BUTTON_ITEM  = 128
@@ -287,14 +288,32 @@ struct EnchantDuration
 typedef std::list<EnchantDuration> EnchantDurationList;
 typedef std::list<Item*> ItemDurationList;
 
+enum LfgType
+{
+    LFG_TYPE_NONE           = 0,
+    LFG_TYPE_DUNGEON        = 1,
+    LFG_TYPE_RAID           = 2,
+    LFG_TYPE_QUEST          = 3,
+    LFG_TYPE_ZONE           = 4,
+    LFG_TYPE_HEROIC_DUNGEON = 5
+};
+
+enum LfgRoles
+{
+    LEADER  = 1,
+    TANK    = 2,
+    HEALER  = 4,
+    DAMAGE  = 8
+};
+
 struct LookingForGroupSlot
 {
     LookingForGroupSlot() : entry(0), type(0) {}
     bool Empty() const { return !entry && !type; }
     void Clear() { entry = 0; type = 0; }
     void Set(uint32 _entry, uint32 _type ) { entry = _entry; type = _type; }
-    bool Is(uint32 _entry, uint32 _type) const { return entry==_entry && type==_type; }
-    bool canAutoJoin() const { return entry && (type == 1 || type == 5); }
+    bool Is(uint32 _entry, uint32 _type) const { return entry == _entry && type == _type; }
+    bool canAutoJoin() const { return entry && (type == LFG_TYPE_DUNGEON || type == LFG_TYPE_HEROIC_DUNGEON); }
 
     uint32 entry;
     uint32 type;
@@ -305,11 +324,11 @@ struct LookingForGroupSlot
 struct LookingForGroup
 {
     LookingForGroup() {}
-    bool HaveInSlot(LookingForGroupSlot const& slot) const { return HaveInSlot(slot.entry,slot.type); }
+    bool HaveInSlot(LookingForGroupSlot const& slot) const { return HaveInSlot(slot.entry, slot.type); }
     bool HaveInSlot(uint32 _entry, uint32 _type) const
     {
         for(int i = 0; i < MAX_LOOKING_FOR_GROUP_SLOT; ++i)
-            if(slots[i].Is(_entry,_type))
+            if(slots[i].Is(_entry, _type))
                 return true;
         return false;
     }
@@ -383,48 +402,48 @@ enum PlayerFlags
 
 // used for PLAYER__FIELD_KNOWN_TITLES field (uint64), (1<<bit_index) without (-1)
 // can't use enum for uint64 values
-#define PLAYER_TITLE_DISABLED              0x0000000000000000LL
-#define PLAYER_TITLE_NONE                  0x0000000000000001LL
-#define PLAYER_TITLE_PRIVATE               0x0000000000000002LL // 1
-#define PLAYER_TITLE_CORPORAL              0x0000000000000004LL // 2
-#define PLAYER_TITLE_SERGEANT_A            0x0000000000000008LL // 3
-#define PLAYER_TITLE_MASTER_SERGEANT       0x0000000000000010LL // 4
-#define PLAYER_TITLE_SERGEANT_MAJOR        0x0000000000000020LL // 5
-#define PLAYER_TITLE_KNIGHT                0x0000000000000040LL // 6
-#define PLAYER_TITLE_KNIGHT_LIEUTENANT     0x0000000000000080LL // 7
-#define PLAYER_TITLE_KNIGHT_CAPTAIN        0x0000000000000100LL // 8
-#define PLAYER_TITLE_KNIGHT_CHAMPION       0x0000000000000200LL // 9
-#define PLAYER_TITLE_LIEUTENANT_COMMANDER  0x0000000000000400LL // 10
-#define PLAYER_TITLE_COMMANDER             0x0000000000000800LL // 11
-#define PLAYER_TITLE_MARSHAL               0x0000000000001000LL // 12
-#define PLAYER_TITLE_FIELD_MARSHAL         0x0000000000002000LL // 13
-#define PLAYER_TITLE_GRAND_MARSHAL         0x0000000000004000LL // 14
-#define PLAYER_TITLE_SCOUT                 0x0000000000008000LL // 15
-#define PLAYER_TITLE_GRUNT                 0x0000000000010000LL // 16
-#define PLAYER_TITLE_SERGEANT_H            0x0000000000020000LL // 17
-#define PLAYER_TITLE_SENIOR_SERGEANT       0x0000000000040000LL // 18
-#define PLAYER_TITLE_FIRST_SERGEANT        0x0000000000080000LL // 19
-#define PLAYER_TITLE_STONE_GUARD           0x0000000000100000LL // 20
-#define PLAYER_TITLE_BLOOD_GUARD           0x0000000000200000LL // 21
-#define PLAYER_TITLE_LEGIONNAIRE           0x0000000000400000LL // 22
-#define PLAYER_TITLE_CENTURION             0x0000000000800000LL // 23
-#define PLAYER_TITLE_CHAMPION              0x0000000001000000LL // 24
-#define PLAYER_TITLE_LIEUTENANT_GENERAL    0x0000000002000000LL // 25
-#define PLAYER_TITLE_GENERAL               0x0000000004000000LL // 26
-#define PLAYER_TITLE_WARLORD               0x0000000008000000LL // 27
-#define PLAYER_TITLE_HIGH_WARLORD          0x0000000010000000LL // 28
-#define PLAYER_TITLE_GLADIATOR             0x0000000020000000LL // 29
-#define PLAYER_TITLE_DUELIST               0x0000000040000000LL // 30
-#define PLAYER_TITLE_RIVAL                 0x0000000080000000LL // 31
-#define PLAYER_TITLE_CHALLENGER            0x0000000100000000LL // 32
-#define PLAYER_TITLE_SCARAB_LORD           0x0000000200000000LL // 33
-#define PLAYER_TITLE_CONQUEROR             0x0000000400000000LL // 34
-#define PLAYER_TITLE_JUSTICAR              0x0000000800000000LL // 35
-#define PLAYER_TITLE_CHAMPION_OF_THE_NAARU 0x0000001000000000LL // 36
-#define PLAYER_TITLE_MERCILESS_GLADIATOR   0x0000002000000000LL // 37
-#define PLAYER_TITLE_OF_THE_SHATTERED_SUN  0x0000004000000000LL // 38
-#define PLAYER_TITLE_HAND_OF_ADAL          0x0000008000000000LL // 39
-#define PLAYER_TITLE_VENGEFUL_GLADIATOR    0x0000010000000000LL // 40
+#define PLAYER_TITLE_DISABLED              UI64LIT(0x0000000000000000)
+#define PLAYER_TITLE_NONE                  UI64LIT(0x0000000000000001)
+#define PLAYER_TITLE_PRIVATE               UI64LIT(0x0000000000000002) // 1
+#define PLAYER_TITLE_CORPORAL              UI64LIT(0x0000000000000004) // 2
+#define PLAYER_TITLE_SERGEANT_A            UI64LIT(0x0000000000000008) // 3
+#define PLAYER_TITLE_MASTER_SERGEANT       UI64LIT(0x0000000000000010) // 4
+#define PLAYER_TITLE_SERGEANT_MAJOR        UI64LIT(0x0000000000000020) // 5
+#define PLAYER_TITLE_KNIGHT                UI64LIT(0x0000000000000040) // 6
+#define PLAYER_TITLE_KNIGHT_LIEUTENANT     UI64LIT(0x0000000000000080) // 7
+#define PLAYER_TITLE_KNIGHT_CAPTAIN        UI64LIT(0x0000000000000100) // 8
+#define PLAYER_TITLE_KNIGHT_CHAMPION       UI64LIT(0x0000000000000200) // 9
+#define PLAYER_TITLE_LIEUTENANT_COMMANDER  UI64LIT(0x0000000000000400) // 10
+#define PLAYER_TITLE_COMMANDER             UI64LIT(0x0000000000000800) // 11
+#define PLAYER_TITLE_MARSHAL               UI64LIT(0x0000000000001000) // 12
+#define PLAYER_TITLE_FIELD_MARSHAL         UI64LIT(0x0000000000002000) // 13
+#define PLAYER_TITLE_GRAND_MARSHAL         UI64LIT(0x0000000000004000) // 14
+#define PLAYER_TITLE_SCOUT                 UI64LIT(0x0000000000008000) // 15
+#define PLAYER_TITLE_GRUNT                 UI64LIT(0x0000000000010000) // 16
+#define PLAYER_TITLE_SERGEANT_H            UI64LIT(0x0000000000020000) // 17
+#define PLAYER_TITLE_SENIOR_SERGEANT       UI64LIT(0x0000000000040000) // 18
+#define PLAYER_TITLE_FIRST_SERGEANT        UI64LIT(0x0000000000080000) // 19
+#define PLAYER_TITLE_STONE_GUARD           UI64LIT(0x0000000000100000) // 20
+#define PLAYER_TITLE_BLOOD_GUARD           UI64LIT(0x0000000000200000) // 21
+#define PLAYER_TITLE_LEGIONNAIRE           UI64LIT(0x0000000000400000) // 22
+#define PLAYER_TITLE_CENTURION             UI64LIT(0x0000000000800000) // 23
+#define PLAYER_TITLE_CHAMPION              UI64LIT(0x0000000001000000) // 24
+#define PLAYER_TITLE_LIEUTENANT_GENERAL    UI64LIT(0x0000000002000000) // 25
+#define PLAYER_TITLE_GENERAL               UI64LIT(0x0000000004000000) // 26
+#define PLAYER_TITLE_WARLORD               UI64LIT(0x0000000008000000) // 27
+#define PLAYER_TITLE_HIGH_WARLORD          UI64LIT(0x0000000010000000) // 28
+#define PLAYER_TITLE_GLADIATOR             UI64LIT(0x0000000020000000) // 29
+#define PLAYER_TITLE_DUELIST               UI64LIT(0x0000000040000000) // 30
+#define PLAYER_TITLE_RIVAL                 UI64LIT(0x0000000080000000) // 31
+#define PLAYER_TITLE_CHALLENGER            UI64LIT(0x0000000100000000) // 32
+#define PLAYER_TITLE_SCARAB_LORD           UI64LIT(0x0000000200000000) // 33
+#define PLAYER_TITLE_CONQUEROR             UI64LIT(0x0000000400000000) // 34
+#define PLAYER_TITLE_JUSTICAR              UI64LIT(0x0000000800000000) // 35
+#define PLAYER_TITLE_CHAMPION_OF_THE_NAARU UI64LIT(0x0000001000000000) // 36
+#define PLAYER_TITLE_MERCILESS_GLADIATOR   UI64LIT(0x0000002000000000) // 37
+#define PLAYER_TITLE_OF_THE_SHATTERED_SUN  UI64LIT(0x0000004000000000) // 38
+#define PLAYER_TITLE_HAND_OF_ADAL          UI64LIT(0x0000008000000000) // 39
+#define PLAYER_TITLE_VENGEFUL_GLADIATOR    UI64LIT(0x0000010000000000) // 40
 
 // used in PLAYER_FIELD_BYTES values
 enum PlayerFieldByteFlags
@@ -963,7 +982,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         /*********************************************************/
 
         void SetVirtualItemSlot( uint8 i, Item* item);
-        void SetSheath( uint32 sheathed );
+        void SetSheath( SheathState sheathed );             // overwrite Unit version
         uint8 FindEquipSlot( ItemPrototype const* proto, uint32 slot, bool swap ) const;
         uint32 GetItemCount( uint32 item, bool inBankAlso = false, Item* skipItem = NULL ) const;
         Item* GetItemByGuid( uint64 guid ) const;
@@ -1297,7 +1316,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void ClearComboPoints();
         void SendComboPoints();
 
-        void SendMailResult(uint32 mailId, uint32 mailAction, uint32 mailError, uint32 equipError = 0, uint32 item_guid = 0, uint32 item_count = 0);
+        void SendMailResult(uint32 mailId, MailResponseType mailAction, MailResponseResult mailError, uint32 equipError = 0, uint32 item_guid = 0, uint32 item_count = 0);
         void SendNewMail();
         void UpdateNextMailTimeAndUnreads();
         void AddNewMailDeliverTime(time_t deliver_time);
@@ -1379,9 +1398,9 @@ class MANGOS_DLL_SPEC Player : public Unit
         void SetGlyph(uint8 slot, uint32 glyph) { SetUInt32Value(PLAYER_FIELD_GLYPHS_1 + slot, glyph); }
         uint32 GetGlyph(uint8 slot) { return GetUInt32Value(PLAYER_FIELD_GLYPHS_1 + slot); }
 
-        uint32 GetFreePrimaryProffesionPoints() const { return GetUInt32Value(PLAYER_CHARACTER_POINTS2); }
-        void SetFreePrimaryProffesions(uint16 profs) { SetUInt32Value(PLAYER_CHARACTER_POINTS2,profs); }
-        void InitPrimaryProffesions();
+        uint32 GetFreePrimaryProfessionPoints() const { return GetUInt32Value(PLAYER_CHARACTER_POINTS2); }
+        void SetFreePrimaryProfessions(uint16 profs) { SetUInt32Value(PLAYER_CHARACTER_POINTS2, profs); }
+        void InitPrimaryProfessions();
 
         PlayerSpellMap const& GetSpellMap() const { return m_spells; }
         PlayerSpellMap      & GetSpellMap()       { return m_spells; }

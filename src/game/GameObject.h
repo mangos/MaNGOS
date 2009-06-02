@@ -103,6 +103,7 @@ struct GameObjectInfo
             uint32 openTextID;                              //14 can be used to replace castBarCaption?
             uint32 groupLootRules;                          //15
         } chest;
+        //4 GAMEOBJECT_TYPE_BINDER - empty
         //5 GAMEOBJECT_TYPE_GENERIC
         struct
         {
@@ -205,6 +206,7 @@ struct GameObjectInfo
             uint32 eventID;                                 //2
             uint32 openTextID;                              //3 can be used to replace castBarCaption?
         } camera;
+        //14 GAMEOBJECT_TYPE_MAPOBJECT - empty
         //15 GAMEOBJECT_TYPE_MO_TRANSPORT
         struct
         {
@@ -216,6 +218,7 @@ struct GameObjectInfo
             uint32 transportPhysics;                        //5
             uint32 mapID;                                   //6
         } moTransport;
+        //16 GAMEOBJECT_TYPE_DUELFLAG - empty
         //17 GAMEOBJECT_TYPE_FISHINGNODE
         struct
         {
@@ -234,6 +237,7 @@ struct GameObjectInfo
             uint32 castersGrouped;                          //6
             uint32 ritualNoTargetCheck;                     //7
         } summoningRitual;
+        //19 GAMEOBJECT_TYPE_MAILBOX - empty
         //20 GAMEOBJECT_TYPE_AUCTIONHOUSE
         struct
         {
@@ -349,7 +353,8 @@ struct GameObjectInfo
             uint32 state1Name;                              //2
             uint32 state2Name;                              //3
         } destructibleBuilding;
-        //34 GAMEOBJECT_TYPE_TRAPDOOR
+        //34 GAMEOBJECT_TYPE_GUILDBANK - empty
+        //35 GAMEOBJECT_TYPE_TRAPDOOR
         struct
         {
             uint32 whenToPause;                             // 0
@@ -358,7 +363,7 @@ struct GameObjectInfo
         } trapDoor;
 
         // not use for specific field access (only for output with loop by all filed), also this determinate max union size
-        struct                                              // GAMEOBJECT_TYPE_SPELLCASTER
+        struct
         {
             uint32 data[24];
         } raw;

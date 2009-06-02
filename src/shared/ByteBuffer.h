@@ -309,11 +309,14 @@ class ByteBuffer
         }
         void append(const ByteBuffer& buffer)
         {
-            if(buffer.size()) append(buffer.contents(),buffer.size());
+            if(buffer.size()) append(buffer.contents(),buffer.wpos());
         }
 
         void appendPackGUID(uint64 guid)
         {
+            if (_storage.size() < _wpos + sizeof(guid) + 1)
+                _storage.resize(_wpos + sizeof(guid) + 1);
+
             size_t mask_position = wpos();
             *this << uint8(0);
             for(uint8 i = 0; i < 8; i++)
@@ -370,7 +373,7 @@ class ByteBuffer
             {
                 if ((i == (j*8)) && ((i != (k*16))))
                 {
-                    if (read<uint8>(i) < 0x0F)
+                    if (read<uint8>(i) < 0x10)
                     {
                         sLog.outDebugInLine("| 0%X ", read<uint8>(i) );
                     }
@@ -382,7 +385,7 @@ class ByteBuffer
                 }
                 else if (i == (k*16))
                 {
-                    if (read<uint8>(i) < 0x0F)
+                    if (read<uint8>(i) < 0x10)
                     {
                         sLog.outDebugInLine("\n");
                         if(sLog.IsIncludeTime())
@@ -404,7 +407,7 @@ class ByteBuffer
                 }
                 else
                 {
-                    if (read<uint8>(i) < 0x0F)
+                    if (read<uint8>(i) < 0x10)
                     {
                         sLog.outDebugInLine("0%X ", read<uint8>(i) );
                     }

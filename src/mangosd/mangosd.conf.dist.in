@@ -976,10 +976,6 @@ Visibility.Distance.Grey.Object = 10
 #         Drop rates (items by quality and money)
 #         Default: 1
 #
-#    Rate.Drop.Money
-#         Drop rates
-#         Default: 1
-#
 #    Rate.XP.Kill
 #    Rate.XP.Quest
 #    Rate.XP.Explore
@@ -1117,7 +1113,6 @@ Rate.Talent = 1
 Rate.Reputation.Gain = 1
 Rate.Reputation.LowLevel.Kill    = 1
 Rate.Reputation.LowLevel.Quest   = 1
-
 Rate.InstanceResetTime = 1
 SkillGain.Crafting = 1
 SkillGain.Defense = 1
@@ -1138,7 +1133,6 @@ Death.CorpseReclaimDelay.PvP = 1
 Death.CorpseReclaimDelay.PvE = 1
 Death.Bones.World = 1
 Death.Bones.BattlegroundOrArena = 1
-
 
 ###################################################################################################################
 # BATTLEGROUND CONFIG
@@ -1181,7 +1175,6 @@ Battleground.QueueAnnouncer.PlayerOnly = 0
 Battleground.InvitationType = 0
 BattleGround.PrematureFinishTimer = 300000
 BattleGround.PremadeGroupWaitForMatch = 1800000
-
 
 ###################################################################################################################
 # ARENA CONFIG
@@ -1231,7 +1224,6 @@ Arena.AutoDistributeInterval = 7
 Arena.QueueAnnouncer.Enable = 0
 Arena.ArenaSeason.ID = 1
 Arena.ArenaSeason.InProgress = 1
-
 
 ###################################################################################################################
 # NETWORK CONFIG

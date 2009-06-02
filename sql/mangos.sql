@@ -23,7 +23,7 @@ DROP TABLE IF EXISTS `db_version`;
 CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
-  `required_7896_01_mangos_creature_template` bit(1) default NULL
+  `required_7945_01_mangos_quest_template` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -564,7 +564,6 @@ DROP TABLE IF EXISTS `creature_addon`;
 CREATE TABLE `creature_addon` (
   `guid` int(11) NOT NULL default '0',
   `mount` mediumint(8) unsigned NOT NULL default '0',
-  `bytes0` int(10) unsigned NOT NULL default '0',
   `bytes1` int(10) unsigned NOT NULL default '0',
   `bytes2` int(10) unsigned NOT NULL default '0',
   `emote` int(10) unsigned NOT NULL default '0',
@@ -813,8 +812,10 @@ CREATE TABLE `creature_template` (
   `maxdmg` float NOT NULL default '0',
   `dmgschool` tinyint(4) NOT NULL default '0',
   `attackpower` int(10) unsigned NOT NULL default '0',
+  `dmg_multiplier` float NOT NULL default '1',
   `baseattacktime` int(10) unsigned NOT NULL default '0',
   `rangeattacktime` int(10) unsigned NOT NULL default '0',
+  `unit_class` tinyint(3) unsigned NOT NULL default '0',
   `unit_flags` int(10) unsigned NOT NULL default '0',
   `dynamicflags` int(10) unsigned NOT NULL default '0',
   `family` tinyint(4) NOT NULL default '0',
@@ -864,7 +865,7 @@ CREATE TABLE `creature_template` (
 LOCK TABLES `creature_template` WRITE;
 /*!40000 ALTER TABLE `creature_template` DISABLE KEYS */;
 INSERT INTO `creature_template` VALUES
-(1,0,10045,0,10045,0,'Waypoint(Only GM can see it)','Visual',NULL,1,1,64,64,0,0,0,35,35,0,0.91,1,0,14,15,0,100,2000,2200,4096,0,0,0,0,0,0,1.76,2.42,100,8,5242886,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,'',0,3,1.0,1.0,0,1,0,0,0x82,'');
+(1,0,10045,0,10045,0,'Waypoint(Only GM can see it)','Visual',NULL,1,1,64,64,0,0,0,35,35,0,0.91,1,0,14,15,0,100,1,2000,2200,8,4096,0,0,0,0,0,0,1.76,2.42,100,8,5242886,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,'',0,3,1.0,1.0,0,1,0,0,0x82,'');
 /*!40000 ALTER TABLE `creature_template` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -876,7 +877,6 @@ DROP TABLE IF EXISTS `creature_template_addon`;
 CREATE TABLE `creature_template_addon` (
   `entry` mediumint(8) unsigned NOT NULL default '0',
   `mount` mediumint(8) unsigned NOT NULL default '0',
-  `bytes0` int(10) unsigned NOT NULL default '0',
   `bytes1` int(10) unsigned NOT NULL default '0',
   `bytes2` int(10) unsigned NOT NULL default '0',
   `emote` mediumint(8) unsigned NOT NULL default '0',
@@ -12938,7 +12938,8 @@ CREATE TABLE `pool_creature` (
   `pool_entry` mediumint(8) unsigned NOT NULL default '0',
   `chance` float unsigned NOT NULL default '0',
   `description` varchar(255) NOT NULL,
-  PRIMARY KEY  (`pool_entry`,`guid`)
+  PRIMARY KEY  (`pool_entry`,`guid`),
+  INDEX `idx_guid`(`guid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 
@@ -12961,7 +12962,8 @@ CREATE TABLE `pool_gameobject` (
   `pool_entry` mediumint(8) unsigned NOT NULL default '0',
   `chance` float unsigned NOT NULL default '0',
   `description` varchar(255) NOT NULL,
-  PRIMARY KEY  (`guid`,`pool_entry`)
+  PRIMARY KEY  (`guid`,`pool_entry`),
+  INDEX `idx_guid`(`guid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 --
@@ -13262,12 +13264,20 @@ CREATE TABLE `quest_template` (
   `DetailsEmote2` smallint(5) unsigned NOT NULL default '0',
   `DetailsEmote3` smallint(5) unsigned NOT NULL default '0',
   `DetailsEmote4` smallint(5) unsigned NOT NULL default '0',
+  `DetailsEmoteDelay1` int(11) unsigned NOT NULL default '0',
+  `DetailsEmoteDelay2` int(11) unsigned NOT NULL default '0',
+  `DetailsEmoteDelay3` int(11) unsigned NOT NULL default '0',
+  `DetailsEmoteDelay4` int(11) unsigned NOT NULL default '0',
   `IncompleteEmote` smallint(5) unsigned NOT NULL default '0',
   `CompleteEmote` smallint(5) unsigned NOT NULL default '0',
   `OfferRewardEmote1` smallint(5) unsigned NOT NULL default '0',
   `OfferRewardEmote2` smallint(5) unsigned NOT NULL default '0',
   `OfferRewardEmote3` smallint(5) unsigned NOT NULL default '0',
   `OfferRewardEmote4` smallint(5) unsigned NOT NULL default '0',
+  `OfferRewardEmoteDelay1` int(11) unsigned NOT NULL default '0',
+  `OfferRewardEmoteDelay2` int(11) unsigned NOT NULL default '0',
+  `OfferRewardEmoteDelay3` int(11) unsigned NOT NULL default '0',
+  `OfferRewardEmoteDelay4` int(11) unsigned NOT NULL default '0',
   `StartScript` mediumint(8) unsigned NOT NULL default '0',
   `CompleteScript` mediumint(8) unsigned NOT NULL default '0',
   PRIMARY KEY  (`entry`)
