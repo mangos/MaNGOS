@@ -2203,12 +2203,6 @@ void World::ScriptsProcess()
                     break;
                 }
 
-                if(!source->isType(TYPEMASK_UNIT))
-                {
-                    sLog.outError("SCRIPT_COMMAND_CAST_SPELL source caster isn't unit (TypeId: %u), skipping.",source->GetTypeId());
-                    break;
-                }
-
                 Object* cmdTarget = step.script->datalong2 & 0x01 ? source : target;
 
                 if(!cmdTarget)

@@ -65,12 +65,11 @@ enum PetSpellType
 {
     PETSPELL_NORMAL = 0,
     PETSPELL_FAMILY = 1,
-    PETSPELL_TALENT = 2,
 };
 
 struct PetSpell
 {
-    ActiveStates active : 16;
+    uint16 active;                                          // use instead enum (not good use *uint16* limited enum in case when value in enum not possitive in *int16*)
 
     PetSpellState state : 8;
     PetSpellType type   : 8;

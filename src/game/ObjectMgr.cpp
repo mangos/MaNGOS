@@ -2851,9 +2851,13 @@ void ObjectMgr::LoadQuests()
         "RewRepFaction1, RewRepFaction2, RewRepFaction3, RewRepFaction4, RewRepFaction5, RewRepValue1, RewRepValue2, RewRepValue3, RewRepValue4, RewRepValue5,"
     //   97                 98             99                100       101           102                103               104         105     106     107
         "RewHonorableKills, RewOrReqMoney, RewMoneyMaxLevel, RewSpell, RewSpellCast, RewMailTemplateId, RewMailDelaySecs, PointMapId, PointX, PointY, PointOpt,"
-    //   108            109            110            111            112              113            114                115                116                117
-        "DetailsEmote1, DetailsEmote2, DetailsEmote3, DetailsEmote4, IncompleteEmote, CompleteEmote, OfferRewardEmote1, OfferRewardEmote2, OfferRewardEmote3, OfferRewardEmote4,"
-    //   118          119
+    //   108            109            110            111            112                 113                 114                 115
+        "DetailsEmote1, DetailsEmote2, DetailsEmote3, DetailsEmote4, DetailsEmoteDelay1, DetailsEmoteDelay2, DetailsEmoteDelay3, DetailsEmoteDelay4,"
+    //   116              117            118                119                120                121
+        "IncompleteEmote, CompleteEmote, OfferRewardEmote1, OfferRewardEmote2, OfferRewardEmote3, OfferRewardEmote4,"
+    //   122                     123                     124                     125
+        "OfferRewardEmoteDelay1, OfferRewardEmoteDelay2, OfferRewardEmoteDelay3, OfferRewardEmoteDelay4,"
+    //   126          127
         "StartScript, CompleteScript"
         " FROM quest_template");
     if(result == NULL)
@@ -3929,13 +3933,16 @@ void ObjectMgr::LoadEventScripts()
             switch(goInfo->type)
             {
                 case GAMEOBJECT_TYPE_GOOBER:
-                    if(goInfo->goober.eventId)
+                    if (goInfo->goober.eventId)
                         evt_scripts.insert(goInfo->goober.eventId);
                     break;
                 case GAMEOBJECT_TYPE_CHEST:
-                    if(goInfo->chest.eventId)
+                    if (goInfo->chest.eventId)
                         evt_scripts.insert(goInfo->chest.eventId);
                     break;
+                case GAMEOBJECT_TYPE_CAMERA:
+                    if (goInfo->camera.eventID)
+                        evt_scripts.insert(goInfo->camera.eventID);
                 default:
                     break;
             }
@@ -3962,7 +3969,8 @@ void ObjectMgr::LoadEventScripts()
     {
         std::set<uint32>::const_iterator itr2 = evt_scripts.find(itr->first);
         if (itr2 == evt_scripts.end())
-            sLog.outErrorDb("Table `event_scripts` has script (Id: %u) not referring to any gameobject_template type 10 data2 field or type 3 data6 field or any spell effect %u", itr->first, SPELL_EFFECT_SEND_EVENT);
+            sLog.outErrorDb("Table `event_scripts` has script (Id: %u) not referring to any gameobject_template type 10 data2 field, type 3 data6 field, type 13 data 2 field or any spell effect %u",
+                itr->first, SPELL_EFFECT_SEND_EVENT);
     }
 }
 
