@@ -976,10 +976,6 @@ Visibility.Distance.Grey.Object = 10
 #         Drop rates (items by quality and money)
 #         Default: 1
 #
-#    Rate.Drop.Money
-#         Drop rates
-#         Default: 1
-#
 #    Rate.XP.Kill
 #    Rate.XP.Quest
 #    Rate.XP.Explore
