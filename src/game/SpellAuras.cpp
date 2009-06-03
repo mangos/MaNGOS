@@ -3074,7 +3074,7 @@ void Aura::HandleModPossess(bool apply, bool Real)
     if( apply )
     {
         m_target->SetCharmerGUID(GetCasterGUID());
-        m_target->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, caster->getFaction());
+        m_target->setFaction(caster->getFaction());
 
         caster->SetCharm(m_target);
 
@@ -3116,7 +3116,7 @@ void Aura::HandleModPossess(bool apply, bool Real)
         else if(m_target->GetTypeId() == TYPEID_UNIT)
         {
             CreatureInfo const *cinfo = ((Creature*)m_target)->GetCreatureInfo();
-            m_target->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, cinfo->faction_A);
+            m_target->setFaction(cinfo->faction_A);
         }
 
         caster->SetCharm(NULL);
@@ -3205,7 +3205,7 @@ void Aura::HandleModCharm(bool apply, bool Real)
         if( apply )
         {
             m_target->SetCharmerGUID(GetCasterGUID());
-            m_target->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, caster->getFaction());
+            m_target->setFaction(caster->getFaction());
             m_target->CastStop(m_target == caster ? GetId() : 0);
             caster->SetCharm(m_target);
 
@@ -3254,12 +3254,12 @@ void Aura::HandleModCharm(bool apply, bool Real)
                 if(((Creature*)m_target)->isPet())
                 {
                     if(Unit* owner = m_target->GetOwner())
-                        m_target->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, owner->getFaction());
+                        m_target->setFaction(owner->getFaction());
                     else if(cinfo)
-                        m_target->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, cinfo->faction_A);
+                        m_target->setFaction(cinfo->faction_A);
                 }
                 else if(cinfo)                              // normal creature
-                    m_target->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, cinfo->faction_A);
+                    m_target->setFaction(cinfo->faction_A);
 
                 // restore UNIT_FIELD_BYTES_0
                 if(cinfo && caster->GetTypeId() == TYPEID_PLAYER && caster->getClass() == CLASS_WARLOCK && cinfo->type == CREATURE_TYPE_DEMON)

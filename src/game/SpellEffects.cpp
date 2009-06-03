@@ -3268,9 +3268,9 @@ void Spell::EffectSummon(uint32 i)
         spawnCreature->SetDuration(duration);
 
     spawnCreature->SetOwnerGUID(m_caster->GetGUID());
-    spawnCreature->SetUInt32Value(UNIT_NPC_FLAGS, 0);
+    spawnCreature->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
     spawnCreature->setPowerType(POWER_MANA);
-    spawnCreature->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, m_caster->getFaction());
+    spawnCreature->setFaction(m_caster->getFaction());
     spawnCreature->SetUInt32Value(UNIT_FIELD_FLAGS, 0);
     spawnCreature->SetUInt32Value(UNIT_FIELD_BYTES_0, 2048);
     spawnCreature->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
@@ -3702,8 +3702,8 @@ void Spell::EffectSummonGuardian(uint32 i)
 
         spawnCreature->SetOwnerGUID(m_caster->GetGUID());
         spawnCreature->setPowerType(POWER_MANA);
-        spawnCreature->SetUInt32Value(UNIT_NPC_FLAGS, 0);
-        spawnCreature->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, m_caster->getFaction());
+        spawnCreature->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+        spawnCreature->setFaction(m_caster->getFaction());
         spawnCreature->SetUInt32Value(UNIT_FIELD_FLAGS, 0);
         spawnCreature->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
         spawnCreature->SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, 0);
@@ -4184,8 +4184,8 @@ void Spell::EffectSummonPet(uint32 i)
 
     NewSummon->SetOwnerGUID(m_caster->GetGUID());
     NewSummon->SetCreatorGUID(m_caster->GetGUID());
-    NewSummon->SetUInt32Value(UNIT_NPC_FLAGS, 0);
-    NewSummon->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, faction);
+    NewSummon->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+    NewSummon->setFaction(faction);
     NewSummon->SetUInt32Value(UNIT_FIELD_BYTES_0, 2048);
     NewSummon->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
     NewSummon->SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, time(NULL));
@@ -5984,7 +5984,7 @@ void Spell::EffectSummonCritter(uint32 i)
 
     critter->SetOwnerGUID(m_caster->GetGUID());
     critter->SetCreatorGUID(m_caster->GetGUID());
-    critter->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE,m_caster->getFaction());
+    critter->setFaction(m_caster->getFaction());
     critter->SetUInt32Value(UNIT_CREATED_BY_SPELL, m_spellInfo->Id);
 
     critter->AIM_Initialize();
