@@ -604,6 +604,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
         float GetAttackDistance(Unit const* pl) const;
 
         void DoFleeToGetAssistance();
+        void CallForHelp(float fRadius);
         void CallAssistance();
         void SetNoCallAssistance(bool val) { m_AlreadyCallAssistance = val; }
         void SetNoSearchAssistance(bool val) { m_AlreadySearchedAssistance = val; }
