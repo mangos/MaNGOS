@@ -5507,7 +5507,11 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                 case 20186:
                 {
                     if (pVictim->getPowerType() == POWER_MANA)
-                        pVictim->CastSpell(pVictim, 20268, true, 0, triggeredByAura);
+                    {
+                        // 2% of maximum mana
+                        basepoints0 = int32(pVictim->GetMaxPower(POWER_MANA) * 2 / 100);
+                        pVictim->CastCustomSpell(pVictim, 20268, &basepoints0, NULL, NULL, true, 0, triggeredByAura);
+                    }
                     return true;
                 }
                 // Holy Power (Redemption Armor set)
