@@ -163,39 +163,6 @@ Debugging options:
 ])
 AC_MSG_RESULT($MANGOSD_DEBUG_INFO)
 
-
-# Enable CLI console?
-AC_MSG_CHECKING(whether cli console is enabled)
-MANGOSD_ENABLE_CLI=no
-AC_ARG_ENABLE(cli,
-[  --enable-cli Turn on command console system],
-[
-    if test "$enableval" = "yes" ; then
-	CFLAGS="-DENABLE_CLI $CFLAGS"
-	CXXFLAGS="-DENABLE_CLI $CXXFLAGS"
-	MANGOSD_ENABLE_CLI=yes
-    elif test "$withval" != "no" ; then
-	AC_MSG_ERROR(Please choose yes or no)
-    fi
-])
-AC_MSG_RESULT($MANGOSD_ENABLE_CLI)
-
-# Enable remote console?
-AC_MSG_CHECKING(whether remote console is enabled)
-MANGOSD_ENABLE_RA=no
-AC_ARG_ENABLE(ra,
-[  --enable-ra Turn on remote console system],
-[
-    if test "$enableval" = "yes" ; then
-	CFLAGS="-DENABLE_RA $CFLAGS"
-	CXXFLAGS="-DENABLE_RA $CXXFLAGS"
-	MANGOSD_ENABLE_RA=yes
-    elif test "$withval" != "no" ; then
-	AC_MSG_ERROR(Please choose yes or no)
-    fi
-])
-AC_MSG_RESULT($MANGOSD_ENABLE_RA)
-
 ## Check for required header files.
 AC_HEADER_STDC
 AC_HEADER_DIRENT
@@ -211,10 +178,8 @@ AC_CHECK_HEADERS([zlib.h])
 AC_HEADER_STDBOOL
 AC_C_CONST
 AC_C_INLINE
-AC_TYPE_SIZE_T
 AC_HEADER_TIME
 AC_STRUCT_TM
-AC_TYPE_UINT64_T
 AC_C_VOLATILE
 AC_CHECK_TYPES([ptrdiff_t])
 
@@ -272,8 +237,6 @@ MANGOS_LIBS="$POSTGRE_LIBS $MYSQL_LIBS $ZLIB $COMPATLIB $SSLLIB $MANGOS_LIBS"
 ## Export defined variables
 AC_SUBST(DOXYGEN)
 AC_SUBST(MANGOSD_DEBUG_INFO)
-AC_SUBST(MANGOSD_ENABLE_CLI)
-AC_SUBST(MANGOSD_ENABLE_RA)
 
 ## Additional CPPFLAGS and LDFLAGS.
 AC_SUBST(MANGOS_INCLUDES)
