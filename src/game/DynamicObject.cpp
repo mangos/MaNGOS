@@ -39,14 +39,18 @@ DynamicObject::DynamicObject() : WorldObject()
 void DynamicObject::AddToWorld()
 {
     ///- Register the dynamicObject for guid lookup
-    if(!IsInWorld()) ObjectAccessor::Instance().AddObject(this);
+    if(!IsInWorld())
+        ObjectAccessor::Instance().AddObject(this);
+
     Object::AddToWorld();
 }
 
 void DynamicObject::RemoveFromWorld()
 {
     ///- Remove the dynamicObject from the accessor
-    if(IsInWorld()) ObjectAccessor::Instance().RemoveObject(this);
+    if(IsInWorld())
+        ObjectAccessor::Instance().RemoveObject(this);
+
     Object::RemoveFromWorld();
 }
 
@@ -55,7 +59,7 @@ bool DynamicObject::Create( uint32 guidlow, Unit *caster, uint32 spellId, uint32
     SetInstanceId(caster->GetInstanceId());
 
     WorldObject::_Create(guidlow, HIGHGUID_DYNAMICOBJECT, caster->GetMapId(), caster->GetPhaseMask());
-    Relocate(x,y,z,0);
+    Relocate(x, y, z, 0);
 
     if(!IsPositionValid())
     {
@@ -78,14 +82,13 @@ bool DynamicObject::Create( uint32 guidlow, Unit *caster, uint32 spellId, uint32
     m_radius = radius;
     m_effIndex = effIndex;
     m_spellId = spellId;
-    m_casterGuid = caster->GetGUID();
     return true;
 }
 
 Unit* DynamicObject::GetCaster() const
 {
     // can be not found in some cases
-    return ObjectAccessor::GetUnit(*this,m_casterGuid);
+    return ObjectAccessor::GetUnit(*this, GetCasterGUID());
 }
 
 void DynamicObject::Update(uint32 p_time)
@@ -111,7 +114,7 @@ void DynamicObject::Update(uint32 p_time)
     cell.data.Part.reserved = ALL_DISTRICT;
     cell.SetNoCreate();
 
-    MaNGOS::DynamicObjectUpdater notifier(*this,caster);
+    MaNGOS::DynamicObjectUpdater notifier(*this, caster);
 
     TypeContainerVisitor<MaNGOS::DynamicObjectUpdater, WorldTypeMapContainer > world_object_notifier(notifier);
     TypeContainerVisitor<MaNGOS::DynamicObjectUpdater, GridTypeMapContainer > grid_object_notifier(notifier);
@@ -136,12 +139,12 @@ void DynamicObject::Delete()
 void DynamicObject::Delay(int32 delaytime)
 {
     m_aliveDuration -= delaytime;
-    for(AffectedSet::iterator iunit= m_affected.begin();iunit != m_affected.end();++iunit)
+    for(AffectedSet::iterator iunit= m_affected.begin(); iunit != m_affected.end(); ++iunit)
         if (*iunit)
             (*iunit)->DelayAura(m_spellId, m_effIndex, delaytime);
 }
 
 bool DynamicObject::isVisibleForInState(Player const* u, bool inVisibleList) const
 {
-    return IsInWorld() && u->IsInWorld() && IsWithinDistInMap(u,World::GetMaxVisibleDistanceForObject()+(inVisibleList ? World::GetVisibleObjectGreyDistance() : 0.0f), false);
+    return IsInWorld() && u->IsInWorld() && IsWithinDistInMap(u, World::GetMaxVisibleDistanceForObject() + (inVisibleList ? World::GetVisibleObjectGreyDistance() : 0.0f), false);
 }
