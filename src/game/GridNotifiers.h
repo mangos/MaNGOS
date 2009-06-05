@@ -847,8 +847,8 @@ namespace MaNGOS
     class AnyAoETargetUnitInObjectRangeCheck
     {
         public:
-            AnyAoETargetUnitInObjectRangeCheck(WorldObject const* obj, Unit const* funit, float range)
-                : i_obj(obj), i_funit(funit), i_range(range)
+            AnyAoETargetUnitInObjectRangeCheck(WorldObject const* obj, Unit const* funit, float range, bool hitHidden = true)
+                : i_obj(obj), i_funit(funit), i_range(range), i_hitHidden(hitHidden)
             {
                 Unit const* check = i_funit;
                 Unit const* owner = i_funit->GetOwner();
@@ -863,6 +863,8 @@ namespace MaNGOS
                     return false;
                 if(u->GetTypeId()==TYPEID_UNIT && ((Creature*)u)->isTotem())
                     return false;
+                if (!i_hitHidden && !u->isVisibleForOrDetect(i_funit, false))
+                    return false;
 
                 if(( i_targetForPlayer ? !i_funit->IsFriendlyTo(u) : i_funit->IsHostileTo(u) )&& i_obj->IsWithinDistInMap(u, i_range))
                     return true;
@@ -870,6 +872,7 @@ namespace MaNGOS
                 return false;
             }
         private:
+            bool i_hitHidden;
             bool i_targetForPlayer;
             WorldObject const* i_obj;
             Unit const* i_funit;
