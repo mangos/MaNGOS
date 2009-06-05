@@ -104,8 +104,18 @@ SpellSpecific GetSpellSpecific(uint32 spellId);
 // Different spell properties
 inline float GetSpellRadius(SpellRadiusEntry const *radius) { return (radius ? radius->Radius : 0); }
 uint32 GetSpellCastTime(SpellEntry const* spellInfo, Spell const* spell = NULL);
-inline float GetSpellMinRange(SpellRangeEntry const *range) { return (range ? range->minRange : 0); }
-inline float GetSpellMaxRange(SpellRangeEntry const *range) { return (range ? range->maxRange : 0); }
+inline float GetSpellMinRange(SpellRangeEntry const *range, bool friendly = false)
+{
+    if(!range)
+        return 0;
+    return (friendly ? range->minRangeFriendly : range->minRange);
+}
+inline float GetSpellMaxRange(SpellRangeEntry const *range, bool friendly = false)
+{
+    if(!range)
+        return 0;
+    return (friendly ? range->maxRangeFriendly : range->maxRange);
+}
 inline uint32 GetSpellRecoveryTime(SpellEntry const *spellInfo) { return spellInfo->RecoveryTime > spellInfo->CategoryRecoveryTime ? spellInfo->RecoveryTime : spellInfo->CategoryRecoveryTime; }
 int32 GetSpellDuration(SpellEntry const *spellInfo);
 int32 GetSpellMaxDuration(SpellEntry const *spellInfo);
