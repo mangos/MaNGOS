@@ -1561,7 +1561,8 @@ void Spell::SetTargetMap(uint32 i,uint32 cur,UnitList& TagUnitMap)
             else
             {
                 Unit* pUnitTarget = m_targets.getUnitTarget();
-                if(!pUnitTarget)
+                Unit* originalCaster = GetOriginalCaster();
+                if(!pUnitTarget || !originalCaster)
                     break;
 
                 unMaxTargets = EffectChainTarget;
@@ -1578,55 +1579,45 @@ void Spell::SetTargetMap(uint32 i,uint32 cur,UnitList& TagUnitMap)
                 cell.data.Part.reserved = ALL_DISTRICT;
                 cell.SetNoCreate();
 
-                Unit* originalCaster = GetOriginalCaster();
-                if(originalCaster)
+                std::list<Unit *> tempUnitMap;
                 {
-                    std::list<Unit *> tempUnitMap;
+                    MaNGOS::AnyAoETargetUnitInObjectRangeCheck u_check(pUnitTarget, originalCaster, max_range, false);
+                    MaNGOS::UnitListSearcher<MaNGOS::AnyAoETargetUnitInObjectRangeCheck> searcher(m_caster, tempUnitMap, u_check);
+                    TypeContainerVisitor<MaNGOS::UnitListSearcher<MaNGOS::AnyAoETargetUnitInObjectRangeCheck>, WorldTypeMapContainer> world_unit_searcher(searcher);
+                    TypeContainerVisitor<MaNGOS::UnitListSearcher<MaNGOS::AnyAoETargetUnitInObjectRangeCheck>, GridTypeMapContainer>  grid_unit_searcher(searcher);
+                    CellLock<GridReadGuard> cell_lock(cell, p);
 
-                    {
-                        MaNGOS::AnyAoETargetUnitInObjectRangeCheck u_check(pUnitTarget, originalCaster, max_range, false);
-                        MaNGOS::UnitListSearcher<MaNGOS::AnyAoETargetUnitInObjectRangeCheck> searcher(m_caster, tempUnitMap, u_check);
+                    cell_lock->Visit(cell_lock, world_unit_searcher, *m_caster->GetMap());
+                    cell_lock->Visit(cell_lock, grid_unit_searcher, *m_caster->GetMap());
+                }
+                if (tempUnitMap.empty())
+                    break;
 
-                        TypeContainerVisitor<MaNGOS::UnitListSearcher<MaNGOS::AnyAoETargetUnitInObjectRangeCheck>, WorldTypeMapContainer > world_unit_searcher(searcher);
-                        TypeContainerVisitor<MaNGOS::UnitListSearcher<MaNGOS::AnyAoETargetUnitInObjectRangeCheck>, GridTypeMapContainer >  grid_unit_searcher(searcher);
+                tempUnitMap.sort(TargetDistanceOrder(pUnitTarget));
 
-                        CellLock<GridReadGuard> cell_lock(cell, p);
-                        cell_lock->Visit(cell_lock, world_unit_searcher, *m_caster->GetMap());
-                        cell_lock->Visit(cell_lock, grid_unit_searcher, *m_caster->GetMap());
-                    }
+                if (*tempUnitMap.begin() == pUnitTarget)
+                    tempUnitMap.erase (tempUnitMap.begin());
 
-                    tempUnitMap.sort(TargetDistanceOrder(pUnitTarget));
+                TagUnitMap.push_back(pUnitTarget);
+                uint32 t = unMaxTargets - 1;
+                Unit *prev = pUnitTarget;
+                std::list<Unit*>::iterator next = tempUnitMap.begin();
 
-                    if(tempUnitMap.empty())
+                while (t && next != tempUnitMap.end())
+                {
+                    if (!prev->IsWithinDist (*next,CHAIN_SPELL_JUMP_RADIUS))
                         break;
-
-                    if(*tempUnitMap.begin() == pUnitTarget)
-                        tempUnitMap.erase(tempUnitMap.begin());
-
-                    TagUnitMap.push_back(pUnitTarget);
-                    uint32 t = unMaxTargets - 1;
-                    Unit *prev = pUnitTarget;
-                    std::list<Unit*>::iterator next = tempUnitMap.begin();
-
-                    while(t && next != tempUnitMap.end() )
+                    if (!prev->IsWithinLOSInMap (*next))
                     {
-                        if(!prev->IsWithinDist(*next,CHAIN_SPELL_JUMP_RADIUS))
-                            break;
-
-                        if(!prev->IsWithinLOSInMap(*next))
-                        {
-                            ++next;
-                            continue;
-                        }
-
-                        prev = *next;
-                        TagUnitMap.push_back(prev);
-                        tempUnitMap.erase(next);
-                        tempUnitMap.sort(TargetDistanceOrder(prev));
-                        next = tempUnitMap.begin();
-
-                        --t;
+                        ++next;
+                        continue;
                     }
+                    prev = *next;
+                    TagUnitMap.push_back(prev);
+                    tempUnitMap.erase(next);
+                    tempUnitMap.sort (TargetDistanceOrder(prev));
+                    next = tempUnitMap.begin();
+                    --t;
                 }
             }
         }break;
@@ -4119,14 +4110,19 @@ SpellCastResult Spell::CheckCast(bool strict)
             }
             case SPELL_EFFECT_TAMECREATURE:
             {
+                if (m_caster->GetTypeId() != TYPEID_PLAYER)
+                    return SPELL_FAILED_BAD_TARGETS;
+
                 if (!m_targets.getUnitTarget() || m_targets.getUnitTarget()->GetTypeId() == TYPEID_PLAYER)
                     return SPELL_FAILED_BAD_IMPLICIT_TARGETS;
 
-                if (m_targets.getUnitTarget()->getLevel() > m_caster->getLevel())
+                Creature* target = (Creature*)m_targets.getUnitTarget();
+
+                if (target->getLevel() > m_caster->getLevel())
                     return SPELL_FAILED_HIGHLEVEL;
 
                 // use SMSG_PET_TAME_FAILURE?
-                if (!((Creature*)m_targets.getUnitTarget())->GetCreatureInfo()->isTameable ())
+                if (!target->GetCreatureInfo()->isTameable (((Player*)m_caster)->CanTameExoticPets()))
                     return SPELL_FAILED_BAD_TARGETS;
 
                 if(m_caster->GetPetGUID())
