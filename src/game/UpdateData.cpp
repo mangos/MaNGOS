@@ -45,7 +45,7 @@ void UpdateData::AddUpdateBlock(const ByteBuffer &block)
     ++m_blockCount;
 }
 
-void UpdateData::Compress( uint8* dst, uint32 *dst_size, uint8* src, int src_size )
+void UpdateData::Compress(void* dst, uint32 *dst_size, void* src, int src_size)
 {
     z_stream c_stream;
 
@@ -105,44 +105,42 @@ bool UpdateData::BuildPacket(WorldPacket *packet)
 {
     ASSERT(packet->empty());                                // shouldn't happen
 
-    ByteBuffer buf(m_outOfRangeGUIDs.empty() ? m_data.size() : 1 + 4 + m_outOfRangeGUIDs.size() * 9 + m_data.size());
+    ByteBuffer buf(4 + (m_outOfRangeGUIDs.empty() ? 0 : 1 + 4 + 9 * m_outOfRangeGUIDs.size()) + m_data.wpos());
 
-    // put update blocks count
-    buf << uint32(m_outOfRangeGUIDs.empty() ? m_blockCount : m_blockCount + 1);
+    buf << (uint32) (!m_outOfRangeGUIDs.empty() ? m_blockCount + 1 : m_blockCount);
 
-    if(m_outOfRangeGUIDs.empty())
+    if(!m_outOfRangeGUIDs.empty())
     {
-        // put update data
-        buf.append(m_data);
-    }
-    else
-    {
-        // put out of range GUID's
-        buf << uint8(UPDATETYPE_OUT_OF_RANGE_OBJECTS);
-        buf << uint32(m_outOfRangeGUIDs.size());
+        buf << (uint8) UPDATETYPE_OUT_OF_RANGE_OBJECTS;
+        buf << (uint32) m_outOfRangeGUIDs.size();
 
         for(std::set<uint64>::const_iterator i = m_outOfRangeGUIDs.begin(); i != m_outOfRangeGUIDs.end(); ++i)
+        {
             buf.appendPackGUID(*i);
-
-        // put update data
-        buf.append(m_data);
+        }
     }
 
-    size_t pSize = buf.size();
+    buf.append(m_data);
 
-    if(pSize > 100)                                         // compress large packets
+    size_t pSize = buf.wpos();                              // use real used data size
+
+    if (pSize > 100 )                                       // compress large packets
     {
-        packet->SetOpcode(SMSG_COMPRESSED_UPDATE_OBJECT);
-        packet->resize(pSize + sizeof(uint32));
-        packet->put<uint32>(0, pSize);                      // original size
         uint32 destsize = pSize;
-        Compress((uint8*)packet->contents() + sizeof(uint32), &destsize, (uint8*)buf.contents(), pSize);
-        packet->resize(destsize + sizeof(uint32));          // resize packet to compressed size + 4
+        packet->resize( destsize + sizeof(uint32) );
+
+        packet->put<uint32>(0, pSize);
+        Compress(const_cast<uint8*>(packet->contents()) + sizeof(uint32), &destsize, (void*)buf.contents(), pSize);
+        if (destsize == 0)
+            return false;
+
+        packet->resize( destsize + sizeof(uint32) );
+        packet->SetOpcode( SMSG_COMPRESSED_UPDATE_OBJECT );
     }
     else                                                    // send small packets without compression
     {
-        packet->SetOpcode(SMSG_UPDATE_OBJECT);
-        packet->append(buf);
+        packet->append( buf );
+        packet->SetOpcode( SMSG_UPDATE_OBJECT );
     }
 
     return true;

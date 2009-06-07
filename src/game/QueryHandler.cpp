@@ -196,7 +196,7 @@ void WorldSession::HandleCreatureQueryOpcode( WorldPacket & recv_data )
         data << uint8(ci->RacialLeader);
         for(uint32 i = 0; i < 4; ++i)
             data << uint32(ci->questItems[i]);              // itemId[4], quest drop
-        data << uint32(0);                                  // CreatureMovementInfo.dbc
+        data << uint32(ci->movementId);                     // CreatureMovementInfo.dbc
         SendPacket( &data );
         sLog.outDebug( "WORLD: Sent SMSG_CREATURE_QUERY_RESPONSE" );
     }

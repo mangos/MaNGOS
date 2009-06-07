@@ -423,7 +423,7 @@ Player::Player (WorldSession *session): Unit(), m_achievementMgr(this), m_reputa
     m_lastPotionId = 0;
 
     m_activeSpec = 0;
-    m_speakCount = 0;
+    m_specsCount = 0;
 
     for (int i = 0; i < BASEMOD_END; ++i)
     {
