@@ -5545,8 +5545,8 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     }
                     break;
                 }
-                // Blessing of Sanctuary
-                case 20911:
+                case 25899:                                 // Greater Blessing of Sanctuary
+                case 20911:                                 // Blessing of Sanctuary
                 {
                     if (target->GetTypeId() != TYPEID_PLAYER)
                         return false;
