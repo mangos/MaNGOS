@@ -63,7 +63,7 @@ void PetAI::MoveInLineOfSight(Unit *u)
 
 void PetAI::AttackStart(Unit *u)
 {
-    if( inCombat || !u || (m_creature->isPet() && ((Pet*)m_creature)->getPetType() == MINI_PET) )
+    if(!u || (m_creature->isPet() && ((Pet*)m_creature)->getPetType() == MINI_PET))
         return;
 
     if(m_creature->Attack(u,true))
