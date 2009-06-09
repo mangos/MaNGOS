@@ -189,6 +189,24 @@ bool IsSingleTargetSpells(SpellEntry const *spellInfo1, SpellEntry const *spellI
 
 bool IsAuraAddedBySpell(uint32 auraType, uint32 spellId);
 
+inline bool IsPointEffectTarget( Targets target )
+{
+    switch (target )
+    {
+        case TARGET_INNKEEPER_COORDINATES:
+        case TARGET_TABLE_X_Y_Z_COORDINATES:
+        case TARGET_CASTER_COORDINATES:
+        case TARGET_SCRIPT_COORDINATES:
+        case TARGET_CURRENT_ENEMY_COORDINATES:
+        case TARGET_DUELVSPLAYER_COORDINATES:
+        case TARGET_DYNAMIC_OBJECT_COORDINATES:
+            return true;
+        default:
+            break;
+    }
+    return false;
+}
+
 inline bool IsAreaEffectTarget( Targets target )
 {
     switch (target )

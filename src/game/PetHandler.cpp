@@ -245,19 +245,7 @@ void WorldSession::HandlePetAction( WorldPacket & recv_data )
             else
             {
                 if(pet->HasAuraType(SPELL_AURA_MOD_POSSESS))
-                {
-                    WorldPacket data(SMSG_CAST_FAILED, (4+1+1));
-                    data << uint8(0) << uint32(spellid) << uint8(result);
-                    switch (result)
-                    {
-                        case SPELL_FAILED_REQUIRES_SPELL_FOCUS:
-                            data << uint32(spellInfo->RequiresSpellFocus);
-                            break;
-                        default:
-                            break;
-                    }
-                    SendPacket(&data);
-                }
+                    Spell::SendCastResult(GetPlayer(),spellInfo,0,result);
                 else
                     pet->SendPetCastFail(spellid, result);
 
