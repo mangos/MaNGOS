@@ -51,9 +51,15 @@ enum AchievementCriteriaDataType
     ACHIEVEMENT_CRITERIA_DATA_TYPE_S_AREA              = 6, // area id        0
     ACHIEVEMENT_CRITERIA_DATA_TYPE_T_AURA              = 7, // spell_id       effect_idx
     ACHIEVEMENT_CRITERIA_DATA_TYPE_VALUE               = 8, // minvalue                     value provided with achievement update must be not less that limit
+    ACHIEVEMENT_CRITERIA_DATA_TYPE_T_LEVEL             = 9, // minlevel						minlevel of target
+    ACHIEVEMENT_CRITERIA_DATA_TYPE_T_GENDER            = 10,// gender						0=male; 1=female	
+    ACHIEVEMENT_CRITERIA_DATA_TYPE_DISABLED            = 11,//                              used to prevent achievement creteria complete if not all requirement implemented and listed in table
+    ACHIEVEMENT_CRITERIA_DATA_TYPE_MAP_DIFFICULTY      = 12,// difficulty                   normal/heroic difficulty for current event map
+    ACHIEVEMENT_CRITERIA_DATA_TYPE_MAP_PLAYER_COUNT    = 13,// count                        "with less than %u people in the zone"
+    ACHIEVEMENT_CRITERIA_DATA_TYPE_T_TEAM              = 14,// team                         HORDE(67), ALLIANCE(469)
 };
 
-#define MAX_ACHIEVEMENT_CRITERIA_DATA_TYPE               9  // maximum value in AchievementCriteriaDataType enum
+#define MAX_ACHIEVEMENT_CRITERIA_DATA_TYPE               15 // maximum value in AchievementCriteriaDataType enum
 
 class Player;
 class Unit;
@@ -63,44 +69,71 @@ struct AchievementCriteriaData
     AchievementCriteriaDataType dataType;
     union
     {
-        // ACHIEVEMENT_CRITERIA_DATA_TYPE_T_CREATURE
+        // ACHIEVEMENT_CRITERIA_DATA_TYPE_NONE              = 0 (no data)
+        // ACHIEVEMENT_CRITERIA_DATA_TYPE_T_CREATURE        = 1
         struct
         {
             uint32 id;
         } creature;
-        // ACHIEVEMENT_CRITERIA_DATA_TYPE_T_PLAYER_CLASS_RACE
+        // ACHIEVEMENT_CRITERIA_DATA_TYPE_T_PLAYER_CLASS_RACE = 2
         struct
         {
             uint32 class_id;
             uint32 race_id;
         } classRace;
-        // ACHIEVEMENT_CRITERIA_DATA_TYPE_T_PLAYER_LESS_HEALTH
+        // ACHIEVEMENT_CRITERIA_DATA_TYPE_T_PLAYER_LESS_HEALTH = 3
         struct
         {
             uint32 percent;
         } health;
-        // ACHIEVEMENT_CRITERIA_DATA_TYPE_T_PLAYER_DEAD
+        // ACHIEVEMENT_CRITERIA_DATA_TYPE_T_PLAYER_DEAD     = 4
         struct
         {
             uint32 own_team_flag;
         } player_dead;
-        // ACHIEVEMENT_CRITERIA_DATA_TYPE_T_AURA
-        // ACHIEVEMENT_CRITERIA_DATA_TYPE_S_AURA
+        // ACHIEVEMENT_CRITERIA_DATA_TYPE_S_AURA            = 5
+        // ACHIEVEMENT_CRITERIA_DATA_TYPE_T_AURA            = 7
         struct
         {
             uint32 spell_id;
             uint32 effect_idx;
         } aura;
-        // ACHIEVEMENT_CRITERIA_DATA_TYPE_S_AREA
+        // ACHIEVEMENT_CRITERIA_DATA_TYPE_S_AREA            = 6
         struct
         {
             uint32 id;
         } area;
-        // ACHIEVEMENT_CRITERIA_DATA_TYPE_VALUE
+        // ACHIEVEMENT_CRITERIA_DATA_TYPE_VALUE             = 8
         struct
         {
             uint32 minvalue;
         } value;
+        // ACHIEVEMENT_CRITERIA_DATA_TYPE_T_LEVEL           = 9
+        struct
+        {
+            uint32 minlevel;
+        } level;
+        // ACHIEVEMENT_CRITERIA_DATA_TYPE_T_GENDER          = 10
+        struct
+        {
+            uint32 gender;
+        } gender;
+        // ACHIEVEMENT_CRITERIA_DATA_TYPE_DISABLED          = 11 (no data)
+        // ACHIEVEMENT_CRITERIA_DATA_TYPE_MAP_DIFFICULTY    = 12
+        struct
+        {
+            uint32 difficalty;
+        } difficalty;
+        // ACHIEVEMENT_CRITERIA_DATA_TYPE_MAP_PLAYER_COUNT  = 13
+        struct
+        {
+            uint32 maxcount;
+        } map_players;
+        // ACHIEVEMENT_CRITERIA_DATA_TYPE_T_TEAM            = 14
+        struct
+        {
+            uint32 team;
+        } team;
         // ...
         struct
         {

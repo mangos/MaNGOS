@@ -1429,7 +1429,9 @@ struct SpellRangeEntry
 {
     uint32    ID;
     float     minRange;
+    float     minRangeFriendly;
     float     maxRange;
+    float     maxRangeFriendly;
 };
 
 struct SpellRuneCostEntry
