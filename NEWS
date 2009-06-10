@@ -13,11 +13,16 @@ http://getmangos.com/community/
 Please submit bug reports at:
 http://mangos.lighthouseapp.com/
 
-Version 0.13
+Version 0.14
  * Under discussion.
- * OpenSSL lib upgrade to OpenSSL 0.9.8k
+ * Upgrade to client version 3.1.3 (build 9947).
+
+Version 0.13
+ * OpenSSL lib upgrade to OpenSSL 0.9.8k.
  * ZThread replaced by similar ACE framework functionality. ZThread use dropped.
- * Visual Studio 2003 (VC71) support dropped
+ * Visual Studio 2003 (VC71) support dropped.
+ * Experemental support for Visual Studio 2010 Beta 1 added.
+ * Sqlite sql engine support dropped.
  * Upgrade to client version 3.0.9 (build 9551).
 
 Version 0.12

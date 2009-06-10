@@ -1,6 +1,6 @@
-MaNGOS 0.13   (??? ??? 2009)
+MaNGOS 0.14   (??? ??? 2009)
 
- MaNGOS 0.13 - adds further improvements to the
+ MaNGOS 0.14 - adds further improvements to the
  server core as well as to the majority of game classes and the game content
  database.
 
@@ -11,6 +11,65 @@ MaNGOS 0.13   (??? ??? 2009)
  ==== Statistics ====
  * Fixed Bugs: ???
  * Total number of changes: ???
+
+ MaNGOS 0.13   (10 June 2009)
+
+ MaNGOS 0.13 - adds further improvements to the
+ server core as well as to the majority of game classes and the game content
+ database.
+
+ ==== Game Features ====
+
+ * Added: Support for heroic class character creating and functionality.
+ * Added: Support for area phase system.
+ * Added: Support for achievement system and most achievement types implemented.
+ * Added: Support for pet's talents learning and pet's spells auto-learning at level change.
+ * Added: Support for one potion per-combat functionality work.
+ * Added: Support for glyphs work.
+ * Added: Support for explicit recipe discovery abilities.
+ * Added: Support for heroic raid instance mode.
+ * Added: Support for currencies tab.
+ * Added: Support for prismatic sockets in items.
+ * Added: Support for feral attack power bonus from items.
+ * Added: Support for gameobjects and creatures grouping (pools of them).
+ * Added: Support for deep ocean fatigue timer.
+ * Added: Basic support for mind control like spells. Required more work for full functionality.
+ * Added: Support for spellclick units.
+ * Added: Support for mobs fleeing and run for getting assistance.
+ * Added: support for bind to account items.
+ * Improved: Implement proper hide out of range (at another map) transports.
+ * Improved: Updated spell casting pushback system.
+ * Improved: Allows saving characters in Battle Grounds.
+ * Improved: Implemented new BattleGroundQueue invitation system. Now it supports premade group versus premade group matches.
+ * Improved: Allow mini-pet has been questgivers or gossip holders, mini-pet use DB data for stats and flags.
+ * Improved: Show arrows/etc at creature use ranged weapon and more support for proper scripting creatures with ranged weapon.
+ * Improved: Support in DB set time ordering details and reward quest emotes.
+ * Improved: Support for use spell data for spellranges at friendly targets.
+
+ * plus lots of fixes for auras, effects, spells, talents, and more.
+
+ ==== Server Features ====
+
+ * Added: `spell_bonus_data` table for store damage/healing bonus coefficients.
+ * Added: `player_xp_for_level` table added for store XP requirements for player levels instead outdated formula.
+ * Added: Implement mangosd stop and pause if it work as Windows service.
+ * Added: Implement active objects support.
+ * Added: Implement precompiled headers use in build at Windows that speedup builds at Windows in big degree.
+ * Added: Implement support for PostgreSQL connection using Unix sockets.
+ * Added: EventAI (DB-based creature AI scripting engine) contributed by ScriptDev2 team
+ * Added: Tool for convert sql queries/statements from mysql to pgsql.
+ * Improved: Rewritten spell proc system added that allow resolve many limitations old spell proc system
+ * Improved: Redesigned .map files structure with result more compact files with better data quality.
+ * Improved: Better security checks in generic way for chat commands.
+ * Improved: Taxi and specially quest taxi paths work.
+ * Improved: Better support C++ scripting in script DLL including improvements in AI calls system.
+ * Improved: Better support for localization.
+ * Improved: Implement item use target requirements store in table `item_required_target`.
+
+
+ ==== Statistics ====
+ * Fixed Bugs: 41 ticket and many bugs reported at forum resolved
+ * Total number of changes: 1057 revisions (1550 commits)
 
 MaNGOS 0.12   (Dec 22 2008)
 
