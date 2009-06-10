@@ -308,6 +308,8 @@ bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool 
         ((Player*)owner)->PetSpellInitialize();
         if(((Player*)owner)->GetGroup())
             ((Player*)owner)->SetGroupUpdateFlag(GROUP_UPDATE_PET);
+
+        ((Player*)owner)->SendTalentsInfoData(true);
     }
 
     if (owner->GetTypeId() == TYPEID_PLAYER && getPetType() == HUNTER_PET)
@@ -1646,7 +1648,8 @@ void Pet::InitTalentForLevel()
     if (!owner || owner->GetTypeId() != TYPEID_PLAYER)
         return;
 
-    ((Player*)owner)->SendTalentsInfoData(true);
+    if(!m_loading)
+        ((Player*)owner)->SendTalentsInfoData(true);
 }
 
 uint32 Pet::resetTalentsCost() const
