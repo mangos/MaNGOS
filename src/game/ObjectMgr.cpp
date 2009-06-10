@@ -1863,14 +1863,19 @@ void ObjectMgr::LoadItemRequiredTarget()
                     if (lower != upper)
                         break;
 
-                    if (pSpellInfo->EffectImplicitTargetA[i] == TARGET_CHAIN_DAMAGE ||
-                        pSpellInfo->EffectImplicitTargetB[i] == TARGET_CHAIN_DAMAGE ||
-                        pSpellInfo->EffectImplicitTargetA[i] == TARGET_DUELVSPLAYER ||
-                        pSpellInfo->EffectImplicitTargetB[i] == TARGET_DUELVSPLAYER)
+                    for (int j = 0; j < 3; ++j)
                     {
-                        bIsItemSpellValid = true;
-                        break;
+                        if (pSpellInfo->EffectImplicitTargetA[j] == TARGET_CHAIN_DAMAGE ||
+                            pSpellInfo->EffectImplicitTargetB[j] == TARGET_CHAIN_DAMAGE ||
+                            pSpellInfo->EffectImplicitTargetA[j] == TARGET_DUELVSPLAYER ||
+                            pSpellInfo->EffectImplicitTargetB[j] == TARGET_DUELVSPLAYER)
+                        {
+                            bIsItemSpellValid = true;
+                            break;
+                        }
                     }
+                    if (bIsItemSpellValid)
+                        break;
                 }
             }
         }
