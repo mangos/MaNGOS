@@ -16,42 +16,37 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "Auth/Hmac.h"
-#include "BigNumber.h"
+#include "Auth/SARC4.h"
+#include <openssl/sha.h>
 
-HmacHash::HmacHash(uint32 len, uint8 *seed)
+SARC4::SARC4()
 {
-    ASSERT(len == SEED_KEY_SIZE);
-
-    HMAC_CTX_init(&m_ctx);
-    HMAC_Init_ex(&m_ctx, seed, SEED_KEY_SIZE, EVP_sha1(), NULL);
+    EVP_CIPHER_CTX_init(&m_ctx);
+    EVP_EncryptInit_ex(&m_ctx, EVP_rc4(), NULL, NULL, NULL);
+    EVP_CIPHER_CTX_set_key_length(&m_ctx, SHA_DIGEST_LENGTH);
 }
 
-HmacHash::~HmacHash()
+SARC4::SARC4(uint8 *seed)
 {
-    HMAC_CTX_cleanup(&m_ctx);
+    EVP_CIPHER_CTX_init(&m_ctx);
+    EVP_EncryptInit_ex(&m_ctx, EVP_rc4(), NULL, NULL, NULL);
+    EVP_CIPHER_CTX_set_key_length(&m_ctx, SHA_DIGEST_LENGTH);
+    EVP_EncryptInit_ex(&m_ctx, NULL, NULL, seed, NULL);
 }
 
-void HmacHash::UpdateBigNumber(BigNumber *bn)
+SARC4::~SARC4()
 {
-    UpdateData(bn->AsByteArray(), bn->GetNumBytes());
+    EVP_CIPHER_CTX_cleanup(&m_ctx);
 }
 
-void HmacHash::UpdateData(const uint8 *data, int length)
+void SARC4::Init(uint8 *seed)
 {
-    HMAC_Update(&m_ctx, data, length);
+    EVP_EncryptInit_ex(&m_ctx, NULL, NULL, seed, NULL);
 }
 
-void HmacHash::Finalize()
+void SARC4::UpdateData(int len, uint8 *data)
 {
-    uint32 length = 0;
-    HMAC_Final(&m_ctx, (uint8*)m_digest, &length);
-    ASSERT(length == SHA_DIGEST_LENGTH)
-}
-
-uint8 *HmacHash::ComputeHash(BigNumber *bn)
-{
-    HMAC_Update(&m_ctx, bn->AsByteArray(), bn->GetNumBytes());
-    Finalize();
-    return (uint8*)m_digest;
+    int outlen = 0;
+    EVP_EncryptUpdate(&m_ctx, data, &outlen, data, len);
+    EVP_EncryptFinal_ex(&m_ctx, data, &outlen);
 }

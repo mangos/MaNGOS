@@ -157,6 +157,8 @@ struct CreatureInfo
 {
     uint32  Entry;
     uint32  HeroicEntry;
+    uint32  unk1;
+    uint32  unk2;
     uint32  DisplayID_A;
     uint32  DisplayID_A2;
     uint32  DisplayID_H;
@@ -216,6 +218,8 @@ struct CreatureInfo
     float   unk16;
     float   unk17;
     bool    RacialLeader;
+    uint32  questItems[4];
+    uint32  movementId;
     bool    RegenHealth;
     uint32  equipmentId;
     uint32  MechanicImmuneMask;

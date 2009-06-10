@@ -339,6 +339,12 @@ pAuraHandler AuraHandler[TOTAL_AURAS]=
     &Aura::HandleUnused,                                    //286 not used by any spells (3.08a)
     &Aura::HandleNoImmediateEffect,                         //287 SPELL_AURA_DEFLECT_SPELLS             implemented in Unit::MagicSpellHitResult and Unit::MeleeSpellHitResult
     &Aura::HandleUnused,                                    //288 not used by any spells (3.09) except 1 test spell.
+    &Aura::HandleUnused,                                    //289 unused
+    &Aura::HandleUnused,                                    //290 unused
+    &Aura::HandleUnused,                                    //291 unused
+    &Aura::HandleNULL,                                      //292 call stabled pet
+    &Aura::HandleNULL,                                      //293 2 test spells
+    &Aura::HandleNULL                                       //294 2 spells, possible prevent mana regen
 };
 
 static AuraType const frozenAuraTypes[] = { SPELL_AURA_MOD_ROOT, SPELL_AURA_MOD_STUN, SPELL_AURA_NONE };
@@ -3120,9 +3126,8 @@ void Aura::HandleModPossess(bool apply, bool Real)
             ((Player*)caster)->SetFarSightGUID(0);
             ((Player*)caster)->SetClientControl(m_target, 0);
 
-            WorldPacket data(SMSG_PET_SPELLS, 8+4);
+            WorldPacket data(SMSG_PET_SPELLS, 8);
             data << uint64(0);
-            data << uint32(0);
             ((Player*)caster)->GetSession()->SendPacket(&data);
         }
 
@@ -3168,7 +3173,7 @@ void Aura::HandleModPossessPet(bool apply, bool Real)
     {
         pet->AttackStop();
         pet->GetMotionMaster()->MoveFollow(caster, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
-        pet->SetUnitMovementFlags(MOVEMENTFLAG_NONE);
+        pet->SetUnitMovementFlags(MONSTER_MOVE_WALK);
     }
 }
 
@@ -3278,9 +3283,8 @@ void Aura::HandleModCharm(bool apply, bool Real)
 
             if(caster->GetTypeId() == TYPEID_PLAYER)
             {
-                WorldPacket data(SMSG_PET_SPELLS, 8+4);
+                WorldPacket data(SMSG_PET_SPELLS, 8);
                 data << uint64(0);
-                data << uint32(0);
                 ((Player*)caster)->GetSession()->SendPacket(&data);
             }
             if(m_target->GetTypeId() == TYPEID_UNIT)
@@ -3413,7 +3417,7 @@ void Aura::HandleAuraModStun(bool apply, bool Real)
             ((Creature*)m_target)->StopMoving();
         else
         {
-            m_target->SetUnitMovementFlags(0);              // Clear movement flags
+            ((Player*)m_target)->m_movementInfo.flags = 0;  // Clear movement flags
             m_target->SetStandState(UNIT_STAND_STATE_STAND);// in 1.5 client
         }
 
@@ -3697,7 +3701,7 @@ void Aura::HandleAuraModRoot(bool apply, bool Real)
             m_target->SendMessageToSet(&data, true);
 
             //Clear unit movement flags
-            m_target->SetUnitMovementFlags(0);
+            ((Player*)m_target)->m_movementInfo.flags = 0;
         }
         else
             ((Creature *)m_target)->StopMoving();

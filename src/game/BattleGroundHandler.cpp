@@ -65,7 +65,7 @@ void WorldSession::HandleBattlemasterHelloOpcode( WorldPacket & recv_data )
 void WorldSession::SendBattlegGroundList( uint64 guid, BattleGroundTypeId bgTypeId )
 {
     WorldPacket data;
-    sBattleGroundMgr.BuildBattleGroundListPacket(&data, guid, _player, bgTypeId);
+    sBattleGroundMgr.BuildBattleGroundListPacket(&data, guid, _player, bgTypeId, 0);
     SendPacket( &data );
 }
 
@@ -100,13 +100,6 @@ void WorldSession::HandleBattlemasterJoinOpcode( WorldPacket & recv_data )
 
     // ignore if player is already in BG
     if (_player->InBattleGround())
-        return;
-
-    Creature *unit = GetPlayer()->GetMap()->GetCreature(guid);
-    if (!unit)
-        return;
-
-    if(!unit->isBattleMaster())                             // it's not battlemaster
         return;
 
     // get bg instance or bg template if instance not found
@@ -287,12 +280,15 @@ void WorldSession::HandlePVPLogDataOpcode( WorldPacket & /*recv_data*/ )
 
 void WorldSession::HandleBattlefieldListOpcode( WorldPacket &recv_data )
 {
-    CHECK_PACKET_SIZE(recv_data, 4);
+    CHECK_PACKET_SIZE(recv_data, 4 + 1);
 
     sLog.outDebug( "WORLD: Recvd CMSG_BATTLEFIELD_LIST Message");
 
     uint32 bgTypeId;
     recv_data >> bgTypeId;                                  // id from DBC
+
+    uint8 fromWhere;
+    recv_data >> fromWhere;                                 // 0 - battlemaster, 1 - UI
 
     BattlemasterListEntry const* bl = sBattlemasterListStore.LookupEntry(bgTypeId);
     if (!bl)
@@ -302,7 +298,7 @@ void WorldSession::HandleBattlefieldListOpcode( WorldPacket &recv_data )
     }
 
     WorldPacket data;
-    sBattleGroundMgr.BuildBattleGroundListPacket(&data, _player->GetGUID(), _player, BattleGroundTypeId(bgTypeId));
+    sBattleGroundMgr.BuildBattleGroundListPacket(&data, 0, _player, BattleGroundTypeId(bgTypeId), fromWhere);
     SendPacket( &data );
 }
 

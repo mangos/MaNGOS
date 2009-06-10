@@ -285,7 +285,7 @@ FleeingMovementGenerator<T>::Initialize(T &owner)
         return;
 
     _Init(owner);
-    owner.RemoveUnitMovementFlag(MOVEMENTFLAG_WALK_MODE);
+    owner.RemoveUnitMovementFlag(MONSTER_MOVE_WALK);
 
     if(Unit * fright = ObjectAccessor::GetUnit(owner, i_frightGUID))
     {

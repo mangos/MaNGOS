@@ -244,6 +244,8 @@ World::AddSession_ (WorldSession* s)
     s->SendPacket (&packet);
 
     s->SendAddonsInfo();
+    s->SendTutorialsData();
+
     UpdateMaxSessionCounters ();
 
     // Updates the population
