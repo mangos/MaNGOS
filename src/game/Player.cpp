@@ -6828,8 +6828,9 @@ void Player::UpdateEquipSpellsAtFormChange()
     }
 }
 
-void Player::CastItemCombatSpell(Item *item,Unit* Target, WeaponAttackType attType)
+void Player::CastItemCombatSpell(Unit* Target, WeaponAttackType attType)
 {
+    Item *item = GetWeaponForAttack(attType, true);
     if(!item || item->IsBroken())
         return;
 

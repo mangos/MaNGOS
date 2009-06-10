@@ -1505,11 +1505,9 @@ void Unit::DealMeleeDamage(CalcDamageInfo *damageInfo, bool durabilityLoss)
     // If not miss
     if (!(damageInfo->HitInfo & HITINFO_MISS))
     {
+        // on weapon hit casts
         if(GetTypeId() == TYPEID_PLAYER && pVictim->isAlive())
-        {
-            for(int i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
-                ((Player*)this)->CastItemCombatSpell(((Player*)this)->GetItemByPos(INVENTORY_SLOT_BAG_0,i), pVictim, damageInfo->attackType);
-        }
+            ((Player*)this)->CastItemCombatSpell(pVictim, damageInfo->attackType);
 
         // victim's damage shield
         std::set<Aura*> alreadyDone;
