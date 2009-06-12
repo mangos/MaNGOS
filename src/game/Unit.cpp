@@ -5091,7 +5091,7 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                 target = GetPet();
                 if (!target)
                     return false;
-                basepoints0 = damage * 15 / 100;
+                basepoints0 = damage * triggerAmount / 100;
                 triggered_spell_id = 54181;
                 break;
             }
