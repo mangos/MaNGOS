@@ -79,6 +79,9 @@ bool AchievementCriteriaData::IsValid(AchievementCriteriaEntry const* criteria)
     switch(criteria->requiredType)
     {
         case ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE:
+        case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST:      // only hardcoded list
+        case ACHIEVEMENT_CRITERIA_TYPE_FALL_WITHOUT_DYING:
+        case ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL:
         case ACHIEVEMENT_CRITERIA_TYPE_WIN_RATED_ARENA:
         case ACHIEVEMENT_CRITERIA_TYPE_DO_EMOTE:
         case ACHIEVEMENT_CRITERIA_TYPE_LOOT_TYPE:
@@ -724,10 +727,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
 
                 // those requirements couldn't be found in the dbc
                 AchievementCriteriaDataSet const* data = achievementmgr.GetCriteriaDataSet(achievementCriteria);
-                if(!data)
-                    continue;
-
-                if(!data->Meets(GetPlayer(),unit))
+                if(!data || !data->Meets(GetPlayer(),unit))
                     continue;
 
                 SetCriteriaProgress(achievementCriteria, miscvalue2, PROGRESS_ACCUMULATE);
@@ -892,13 +892,12 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                 // AchievementMgr::UpdateAchievementCriteria might also be called on login - skip in this case
                 if(!miscvalue1)
                     continue;
-                if(achievement->ID == 1260)
-                {
-                    if(Player::GetDrunkenstateByValue(GetPlayer()->GetDrunkValue()) != DRUNKEN_SMASHED)
-                        continue;
-                    if(!IsHolidayActive(HOLIDAY_BREWFEST))
-                        continue;
-                }
+
+                // those requirements couldn't be found in the dbc
+                AchievementCriteriaDataSet const* data = achievementmgr.GetCriteriaDataSet(achievementCriteria);
+                if(!data || !data->Meets(GetPlayer(),unit))
+                    continue;
+
                 // miscvalue1 is the ingame fallheight*100 as stored in dbc
                 SetCriteriaProgress(achievementCriteria, miscvalue1);
                 break;
@@ -912,19 +911,44 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                 SetCriteriaProgress(achievementCriteria, 1, PROGRESS_ACCUMULATE);
                 break;
             case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST:
+            {
                 // if miscvalues != 0, it contains the questID.
                 if (miscvalue1)
                 {
-                    if (miscvalue1 == achievementCriteria->complete_quest.questID)
-                        SetCriteriaProgress(achievementCriteria, 1);
+                    if (miscvalue1 != achievementCriteria->complete_quest.questID)
+                        continue;
                 }
                 else
                 {
                     // login case.
-                    if(GetPlayer()->GetQuestRewardStatus(achievementCriteria->complete_quest.questID))
-                        SetCriteriaProgress(achievementCriteria, 1);
+                    if(!GetPlayer()->GetQuestRewardStatus(achievementCriteria->complete_quest.questID))
+                        continue;
                 }
+
+                // exist many achievements with this criteria, use at this moment hardcoded check to skil simple case
+                switch(achievement->ID)
+                {
+                    case 31:
+                    case 1275:
+                    case 1276:
+                    case 1277:
+                    case 1282:
+                    case 1789:
+                    {
+                        // those requirements couldn't be found in the dbc
+                        AchievementCriteriaDataSet const* data = achievementmgr.GetCriteriaDataSet(achievementCriteria);
+                        if(!data || !data->Meets(GetPlayer(),unit))
+                            continue;
+                        break;
+                    }
+                    default:
+                        break;
+                }
+
+
+                SetCriteriaProgress(achievementCriteria, 1);
                 break;
+            }
             case ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET:
             case ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2:
                 if (!miscvalue1 || miscvalue1 != achievementCriteria->be_spell_target.spellID)
@@ -957,10 +981,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                 {
                     // those requirements couldn't be found in the dbc
                     AchievementCriteriaDataSet const* data = achievementmgr.GetCriteriaDataSet(achievementCriteria);
-                    if(!data)
-                        continue;
-
-                    if(!data->Meets(GetPlayer(),unit))
+                    if(!data || !data->Meets(GetPlayer(),unit))
                         continue;
                 }
 
@@ -1098,10 +1119,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                 {
                     // those requirements couldn't be found in the dbc
                     AchievementCriteriaDataSet const* data = achievementmgr.GetCriteriaDataSet(achievementCriteria);
-                    if(!data)
-                        continue;
-
-                    if(!data->Meets(GetPlayer(),unit))
+                    if(!data || !data->Meets(GetPlayer(),unit))
                         continue;
                 }
 
@@ -1826,6 +1844,30 @@ void AchievementGlobalMgr::LoadAchievementCriteriaData()
         {
             case ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE:
                 break;                                      // any cases
+            case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST:
+            {
+                AchievementEntry const* achievement = sAchievementStore.LookupEntry(criteria->referredAchievement);
+                if(!achievement)
+                    continue;
+
+                // exist many achievements with this criteria, use at this moment hardcoded check to skil simple case
+                switch(achievement->ID)
+                {
+                    case 31:
+                    case 1275:
+                    case 1276:
+                    case 1277:
+                    case 1282:
+                    case 1789:
+                        break;
+                    default:
+                        continue;
+                }
+            }
+            case ACHIEVEMENT_CRITERIA_TYPE_FALL_WITHOUT_DYING:
+                break;                                      // any cases
+            case ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL:      // any cases
+                break;
             case ACHIEVEMENT_CRITERIA_TYPE_WIN_RATED_ARENA: // need skip generic cases
                 if(criteria->win_rated_arena.flag!=ACHIEVEMENT_CRITERIA_CONDITION_NO_LOOSE)
                     continue;
