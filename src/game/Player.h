@@ -371,6 +371,8 @@ enum DrunkenState
     DRUNKEN_SMASHED = 3
 };
 
+#define MAX_DRUNKEN   4
+
 enum PlayerFlags
 {
     PLAYER_FLAGS_GROUP_LEADER   = 0x00000001,
