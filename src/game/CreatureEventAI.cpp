@@ -849,6 +849,9 @@ void CreatureEventAI::JustDied(Unit* killer)
         if ((*i).Event.event_type == EVENT_T_DEATH)
             ProcessEvent(*i, killer);
     }
+
+    // reset phase after any death state events
+    Phase = 0;
 }
 
 void CreatureEventAI::KilledUnit(Unit* victim)
