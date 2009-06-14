@@ -34,10 +34,10 @@ void WorldSession::SendGMTicketGetTicket(uint32 status, char const* text)
     {
         data << text;                                       // ticket text
         data << uint8(0x7);                                 // ticket category
-        data << float(0);                                   // time from ticket creation?
-        data << float(0);                                   // const
-        data << float(0);                                   // const
-        data << uint8(0);                                   // const
+        data << float(0);                                   // tickets in queue?
+        data << float(0);                                   // if > "tickets in queue" then "We are currently experiencing a high volume of petitions."
+        data << float(0);                                   // 0 - "Your ticket will be serviced soon", 1 - "Wait time currently unavailable"
+        data << uint8(0);                                   // if == 2 and next field == 1 then "Your ticket has been escalated"
         data << uint8(0);                                   // const
     }
     SendPacket( &data );
@@ -104,7 +104,7 @@ void WorldSession::HandleGMTicketCreateOpcode( WorldPacket & recv_data )
     if(ticketmgr.GetGMTicket(GetPlayer()->GetGUIDLow()))
     {
         WorldPacket data( SMSG_GMTICKET_CREATE, 4 );
-        data << uint32(1);
+        data << uint32(1);                                  // 1 - You already have GM ticket
         SendPacket( &data );
         return;
     }
@@ -117,7 +117,7 @@ void WorldSession::HandleGMTicketCreateOpcode( WorldPacket & recv_data )
     SendPacket( &data );
 
     data.Initialize( SMSG_GMTICKET_CREATE, 4 );
-    data << uint32(2);
+    data << uint32(2);                                      // 2 - nothing appears (3-error creating, 5-error updating)
     SendPacket( &data );
     DEBUG_LOG("update the ticket");
 
@@ -141,7 +141,7 @@ void WorldSession::HandleGMTicketSystemStatusOpcode( WorldPacket & /*recv_data*/
 void WorldSession::HandleGMSurveySubmit( WorldPacket & recv_data)
 {
     // GM survey is shown after SMSG_GM_TICKET_STATUS_UPDATE with status = 3
-    CHECK_PACKET_SIZE(recv_data,4+4);
+    CHECK_PACKET_SIZE(recv_data, 4+4);
     uint32 x;
     recv_data >> x;                                         // answer range? (6 = 0-5?)
     sLog.outDebug("SURVEY: X = %u", x);
