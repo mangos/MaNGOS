@@ -1447,8 +1447,7 @@ void Aura::TriggerSpell()
                         if (mana)
                         {
                             mana /= 10;
-                            caster->ModifyPower( POWER_MANA, mana );
-                            caster->SendEnergizeSpellLog(caster, 23493, mana, POWER_MANA);
+                            caster->EnergizeBySpell(caster, 23493, mana, POWER_MANA);
                         }
                         return;
                     }

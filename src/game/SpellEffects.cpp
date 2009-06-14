@@ -2369,9 +2369,7 @@ void Spell::EffectPowerDrain(uint32 i)
 
         int32 gain = int32(new_damage * manaMultiplier);
 
-        m_caster->ModifyPower(POWER_MANA,gain);
-        //send log
-        m_caster->SendEnergizeSpellLog(m_caster, m_spellInfo->Id, gain, POWER_MANA);
+        m_caster->EnergizeBySpell(m_caster, m_spellInfo->Id, gain, POWER_MANA);
     }
 }
 
@@ -2792,8 +2790,7 @@ void Spell::EffectEnergize(uint32 i)
     if(unitTarget->GetMaxPower(power) == 0)
         return;
 
-    unitTarget->ModifyPower(power,damage);
-    m_caster->SendEnergizeSpellLog(unitTarget, m_spellInfo->Id, damage, power);
+    m_caster->EnergizeBySpell(unitTarget, m_spellInfo->Id, damage, power);
 
     // Mad Alchemist's Potion
     if (m_spellInfo->Id == 45051)
@@ -2855,8 +2852,7 @@ void Spell::EffectEnergisePct(uint32 i)
         return;
 
     uint32 gain = damage * maxPower / 100;
-    unitTarget->ModifyPower(power, gain);
-    m_caster->SendEnergizeSpellLog(unitTarget, m_spellInfo->Id, gain, power);
+    m_caster->EnergizeBySpell(unitTarget, m_spellInfo->Id, gain, power);
 }
 
 void Spell::SendLoot(uint64 guid, LootType loottype)
