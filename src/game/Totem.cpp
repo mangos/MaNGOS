@@ -62,10 +62,11 @@ void Totem::Summon(Unit* owner)
     CreatureInfo const *cinfo = GetCreatureInfo();
     if(owner->GetTypeId()==TYPEID_PLAYER && cinfo)
     {
-        if(((Player*)owner)->GetTeam()==HORDE)
-            SetDisplayId(cinfo->DisplayID_H);
-        else
-            SetDisplayId(cinfo->DisplayID_A);
+        uint32 display_id = objmgr.ChooseDisplayId(((Player*)owner)->GetTeam(),cinfo);
+        CreatureModelInfo const *minfo = objmgr.GetCreatureModelRandomGender(display_id);
+        if (minfo)
+            display_id = minfo->modelid;
+        SetDisplayId(display_id);
     }
 
     WorldPacket data(SMSG_GAMEOBJECT_SPAWN_ANIM_OBSOLETE, 8);

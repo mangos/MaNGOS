@@ -203,21 +203,21 @@ bool Creature::InitEntry(uint32 Entry, uint32 team, const CreatureData *data )
     // known valid are: CLASS_WARRIOR,CLASS_PALADIN,CLASS_ROGUE,CLASS_MAGE
     SetByteValue(UNIT_FIELD_BYTES_0, 1, uint8(cinfo->unit_class));
 
-    if (cinfo->DisplayID_A == 0 || cinfo->DisplayID_H == 0) // Cancel load if no model defined
-    {
-        sLog.outErrorDb("Creature (Entry: %u) has no model defined for Horde or Alliance in table `creature_template`, can't load. ",Entry);
-        return false;
-    }
-
     uint32 display_id = objmgr.ChooseDisplayId(team, GetCreatureInfo(), data);
-    CreatureModelInfo const *minfo = objmgr.GetCreatureModelRandomGender(display_id);
-    if (!minfo)
+    if (!display_id)                                        // Cancel load if no display id
     {
         sLog.outErrorDb("Creature (Entry: %u) has model %u not found in table `creature_model_info`, can't load. ", Entry, display_id);
         return false;
     }
-    else
-        display_id = minfo->modelid;                        // it can be different (for another gender)
+
+    CreatureModelInfo const *minfo = objmgr.GetCreatureModelRandomGender(display_id);
+    if (!minfo)                                             // Cancel load if no model defined
+    {
+        sLog.outErrorDb("Creature (Entry: %u) has no model defined in table `creature_template`, can't load. ",Entry);
+        return false;
+    }
+
+    display_id = minfo->modelid;                            // it can be different (for another gender)
 
     SetDisplayId(display_id);
     SetNativeDisplayId(display_id);
@@ -1107,19 +1107,30 @@ void Creature::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask)
 
     // check if it's a custom model and if not, use 0 for displayId
     CreatureInfo const *cinfo = GetCreatureInfo();
-    if(cinfo)
+    if (cinfo)
     {
-        if(displayId != cinfo->DisplayID_A && displayId != cinfo->DisplayID_H)
+        if (displayId != cinfo->DisplayID_A[0] && displayId != cinfo->DisplayID_A[1] &&
+            displayId != cinfo->DisplayID_H[0] && displayId != cinfo->DisplayID_H[1])
         {
-            CreatureModelInfo const *minfo = objmgr.GetCreatureModelInfo(cinfo->DisplayID_A);
-            if(!minfo || displayId != minfo->modelid_other_gender)
-            {
-                minfo = objmgr.GetCreatureModelInfo(cinfo->DisplayID_H);
-                if(minfo && displayId == minfo->modelid_other_gender)
-                    displayId = 0;
-            }
-            else
-                displayId = 0;
+            if (cinfo->DisplayID_A[0])
+                if (CreatureModelInfo const *minfo = objmgr.GetCreatureModelInfo(cinfo->DisplayID_A[0]))
+                    if(displayId == minfo->modelid_other_gender)
+                        displayId = 0;
+
+            if (displayId && cinfo->DisplayID_A[1])
+                if (CreatureModelInfo const *minfo = objmgr.GetCreatureModelInfo(cinfo->DisplayID_A[1]))
+                    if(displayId == minfo->modelid_other_gender)
+                        displayId = 0;
+
+            if (displayId && cinfo->DisplayID_H[0])
+                if (CreatureModelInfo const *minfo = objmgr.GetCreatureModelInfo(cinfo->DisplayID_H[0]))
+                    if(displayId == minfo->modelid_other_gender)
+                        displayId = 0;
+
+            if (displayId && cinfo->DisplayID_H[1])
+                if (CreatureModelInfo const *minfo = objmgr.GetCreatureModelInfo(cinfo->DisplayID_H[1]))
+                    if(displayId == minfo->modelid_other_gender)
+                        displayId = 0;
         }
         else
             displayId = 0;

@@ -117,17 +117,18 @@ void WorldSession::SendTaxiMenu( Creature* unit )
     sLog.outDebug( "WORLD: Sent SMSG_SHOWTAXINODES" );
 }
 
-void WorldSession::SendDoFlight( uint16 MountId, uint32 path, uint32 pathNode )
+void WorldSession::SendDoFlight( uint32 mountDisplayId, uint32 path, uint32 pathNode )
 {
     // remove fake death
-    if(GetPlayer()->hasUnitState(UNIT_STAT_DIED))
+    if (GetPlayer()->hasUnitState(UNIT_STAT_DIED))
         GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 
     while(GetPlayer()->GetMotionMaster()->GetCurrentMovementGeneratorType()==FLIGHT_MOTION_TYPE)
         GetPlayer()->GetMotionMaster()->MovementExpired(false);
 
-    if (MountId)
-        GetPlayer()->Mount( MountId );
+    if (mountDisplayId)
+        GetPlayer()->Mount( mountDisplayId );
+
     GetPlayer()->GetMotionMaster()->MoveTaxiFlight(path,pathNode);
 }
 
@@ -241,13 +242,13 @@ void WorldSession::HandleMoveSplineDoneOpcode(WorldPacket& /*recv_data*/)
 
         sLog.outDebug( "WORLD: Taxi has to go from %u to %u", sourcenode, destinationnode );
 
-        uint16 MountId = objmgr.GetTaxiMount(sourcenode, GetPlayer()->GetTeam());
+        uint32 mountDisplayId = objmgr.GetTaxiMountDisplayId(sourcenode, GetPlayer()->GetTeam());
 
         uint32 path, cost;
         objmgr.GetTaxiPath( sourcenode, destinationnode, path, cost);
 
-        if(path && MountId)
-            SendDoFlight( MountId, path, 1 );               // skip start fly node
+        if(path && mountDisplayId)
+            SendDoFlight( mountDisplayId, path, 1 );        // skip start fly node
         else
             GetPlayer()->m_taxi.ClearTaxiDestinations();    // clear problematic path and next
     }
