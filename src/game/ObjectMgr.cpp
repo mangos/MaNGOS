@@ -871,7 +871,7 @@ CreatureModelInfo const* ObjectMgr::GetCreatureModelInfo(uint32 modelid)
     return sCreatureModelStorage.LookupEntry<CreatureModelInfo>(modelid);
 }
 
-uint32 ObjectMgr::ChooseDisplayId(uint32 team, const CreatureInfo *cinfo, const CreatureData *data)
+uint32 ObjectMgr::ChooseDisplayId(uint32 team, const CreatureInfo *cinfo, const CreatureData *data /*= NULL*/)
 {
     // Load creature model (display id)
     uint32 display_id;
@@ -879,9 +879,25 @@ uint32 ObjectMgr::ChooseDisplayId(uint32 team, const CreatureInfo *cinfo, const 
     {
         // DisplayID_A is used if no team is given
         if (team == HORDE)
+        {
             display_id = (cinfo->DisplayID_H2 != 0 && urand(0,1) == 0) ? cinfo->DisplayID_H2 : cinfo->DisplayID_H;
+            if(!display_id)
+            {
+                display_id = cinfo->DisplayID_A;
+                if(!display_id)
+                    display_id = cinfo->DisplayID_A2;
+            }
+        }
         else
+        {
             display_id = (cinfo->DisplayID_A2 != 0 && urand(0,1) == 0) ? cinfo->DisplayID_A2 : cinfo->DisplayID_A;
+            if(!display_id)
+            {
+                display_id = cinfo->DisplayID_H;
+                if(!display_id)
+                    display_id = cinfo->DisplayID_H2;
+            }
+        }
     }
     else                                                    // overridden in creature data
         display_id = data->displayid;
@@ -4796,8 +4812,8 @@ void ObjectMgr::GetTaxiPath( uint32 source, uint32 destination, uint32 &path, ui
 uint16 ObjectMgr::GetTaxiMount( uint32 id, uint32 team, bool allowed_alt_team /* = false */)
 {
     uint16 mount_entry = 0;
-    uint16 mount_id = 0;
 
+    // select mount creature id
     TaxiNodesEntry const* node = sTaxiNodesStore.LookupEntry(id);
     if(node)
     {
@@ -4806,33 +4822,34 @@ uint16 ObjectMgr::GetTaxiMount( uint32 id, uint32 team, bool allowed_alt_team /*
             mount_entry = node->MountCreatureID[1];
             if(!mount_entry && allowed_alt_team)
                 mount_entry = node->MountCreatureID[0];
-
-            CreatureInfo const *ci = GetCreatureTemplate(mount_entry);
-            if(ci)
-                mount_id = ci->DisplayID_A;
         }
-        if (team == HORDE)
+        else if (team == HORDE)
         {
             mount_entry = node->MountCreatureID[0];
 
             if(!mount_entry && allowed_alt_team)
                 mount_entry = node->MountCreatureID[1];
-
-            CreatureInfo const *ci = GetCreatureTemplate(mount_entry);
-            if(ci)
-                mount_id = ci->DisplayID_H;
         }
     }
 
+    CreatureInfo const *mount_info = GetCreatureTemplate(mount_entry);
+    if (!mount_info)
+        return 0;
+
+    uint16 mount_id = objmgr.ChooseDisplayId(team,mount_info);
+    if (!mount_id)
+        return 0;
+
     CreatureModelInfo const *minfo = GetCreatureModelInfo(mount_id);
-    if(!minfo)
+    if (!minfo)
     {
         sLog.outErrorDb("Taxi mount (Entry: %u) for taxi node (Id: %u) for team %u has model %u not found in table `creature_model_info`, can't load. ",
             mount_entry,id,team,mount_id);
 
         return false;
     }
-    if(minfo->modelid_other_gender!=0)
+
+    if (minfo->modelid_other_gender != 0)
         mount_id = urand(0,1) ? mount_id : minfo->modelid_other_gender;
 
     return mount_id;
