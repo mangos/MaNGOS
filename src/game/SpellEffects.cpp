@@ -3711,8 +3711,7 @@ void Spell::EffectSummonGuardian(uint32 i)
 
         spawnCreature->AIM_Initialize();
 
-        if(m_caster->GetTypeId()==TYPEID_PLAYER)
-            ((Player*)m_caster)->AddGuardian(spawnCreature);
+        m_caster->AddGuardian(spawnCreature);
 
         map->Add((Creature*)spawnCreature);
     }
