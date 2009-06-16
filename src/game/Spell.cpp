@@ -49,30 +49,54 @@
 
 extern pEffect SpellEffects[TOTAL_SPELL_EFFECTS];
 
-class PrioritizeManaPlayerWraper
+class PrioritizeManaUnitWraper
 {
-    friend struct PrioritizeMana;
-
     public:
-        explicit PrioritizeManaPlayerWraper(Player* player) : player(player)
+        explicit PrioritizeManaUnitWraper(Unit* unit) : i_unit(unit)
         {
-            uint32 maxmana = player->GetMaxPower(POWER_MANA);
-            percentMana = maxmana ? player->GetPower(POWER_MANA) * 100 / maxmana : 101;
+            uint32 maxmana = unit->GetMaxPower(POWER_MANA);
+            i_percent = maxmana ? unit->GetPower(POWER_MANA) * 100 / maxmana : 101;
         }
-        Player* getPlayer() const { return player; }
+        Unit* getUnit() const { return i_unit; }
+        uint32 getPercent() const { return i_percent; }
     private:
-        Player* player;
-        uint32 percentMana;
+        Unit* i_unit;
+        uint32 i_percent;
 };
 
 struct PrioritizeMana
 {
-    int operator()( PrioritizeManaPlayerWraper const& x, PrioritizeManaPlayerWraper const& y ) const
+    int operator()( PrioritizeManaUnitWraper const& x, PrioritizeManaUnitWraper const& y ) const
     {
-        return x.percentMana < y.percentMana;
+        return x.getPercent() < y.getPercent();
     }
 };
 
+typedef std::priority_queue<PrioritizeManaUnitWraper, std::vector<PrioritizeManaUnitWraper>, PrioritizeMana> PrioritizeManaUnitQueue;
+
+class PrioritizeHealthUnitWraper
+{
+public:
+    explicit PrioritizeHealthUnitWraper(Unit* unit) : i_unit(unit)
+    {
+        i_percent = unit->GetHealth() * 100 / unit->GetMaxHealth();
+    }
+    Unit* getUnit() const { return i_unit; }
+    uint32 getPercent() const { return i_percent; }
+private:
+    Unit* i_unit;
+    uint32 i_percent;
+};
+
+struct PrioritizeHealth
+{
+    int operator()( PrioritizeHealthUnitWraper const& x, PrioritizeHealthUnitWraper const& y ) const
+    {
+        return x.getPercent() < y.getPercent();
+    }
+};
+
+typedef std::priority_queue<PrioritizeHealthUnitWraper, std::vector<PrioritizeHealthUnitWraper>, PrioritizeHealth> PrioritizeHealthUnitQueue;
 
 bool IsQuestTameSpell(uint32 spellId)
 {
@@ -1664,139 +1688,16 @@ void Spell::SetTargetMap(uint32 i,uint32 cur,UnitList& TagUnitMap)
         case TARGET_ALL_PARTY_AROUND_CASTER:
         case TARGET_ALL_PARTY_AROUND_CASTER_2:
         case TARGET_ALL_PARTY:
-        {
-            Player *pTarget = m_caster->GetCharmerOrOwnerPlayerOrPlayerItself();
-            Group *pGroup = pTarget ? pTarget->GetGroup() : NULL;
-
-            if(pGroup)
-            {
-                uint8 subgroup = pTarget->GetSubGroup();
-
-                for(GroupReference *itr = pGroup->GetFirstMember(); itr != NULL; itr = itr->next())
-                {
-                    Player* Target = itr->getSource();
-
-                    // IsHostileTo check duel and controlled by enemy
-                    if( Target && Target->GetSubGroup()==subgroup && !m_caster->IsHostileTo(Target) )
-                    {
-                        if( m_caster->IsWithinDistInMap(Target, radius) )
-                            TagUnitMap.push_back(Target);
-
-                        if(Pet* pet = Target->GetPet())
-                            if( m_caster->IsWithinDistInMap(pet, radius) )
-                                TagUnitMap.push_back(pet);
-                    }
-                }
-            }
-            else
-            {
-                Unit* ownerOrSelf = pTarget ? pTarget : m_caster->GetCharmerOrOwnerOrSelf();
-                if(ownerOrSelf==m_caster || m_caster->IsWithinDistInMap(ownerOrSelf, radius))
-                    TagUnitMap.push_back(ownerOrSelf);
-                if(Pet* pet = ownerOrSelf->GetPet())
-                    if( m_caster->IsWithinDistInMap(pet, radius) )
-                        TagUnitMap.push_back(pet);
-            }
+            FillRaidOrPartyTargets(TagUnitMap,m_caster,radius,false,true,true);
             break;
-        }
         case TARGET_ALL_RAID_AROUND_CASTER:
         {
-            Player *pTarget = m_caster->GetCharmerOrOwnerPlayerOrPlayerItself();
-            Group *pGroup = pTarget ? pTarget->GetGroup() : NULL;
-
             if(m_spellInfo->Id == 57669)                    // Replenishment (special target selection)
-            {
-                if(pGroup)
-                {
-                    typedef std::priority_queue<PrioritizeManaPlayerWraper, std::vector<PrioritizeManaPlayerWraper>, PrioritizeMana> Top10;
-                    Top10 manaUsers;
-
-                    for(GroupReference *itr = pGroup->GetFirstMember(); itr != NULL && manaUsers.size() < 10; itr = itr->next())
-                    {
-                        Player* Target = itr->getSource();
-                        if (m_caster->GetGUID() != Target->GetGUID() && Target->getPowerType() == POWER_MANA &&
-                            !Target->isDead() && m_caster->IsWithinDistInMap(Target, radius))
-                        {
-                            PrioritizeManaPlayerWraper  WTarget(Target);
-                            manaUsers.push(WTarget);
-                        }
-                    }
-
-                    while(!manaUsers.empty())
-                    {
-                        TagUnitMap.push_back(manaUsers.top().getPlayer());
-                        manaUsers.pop();
-                    }
-                }
-                else
-                {
-                    Unit* ownerOrSelf = pTarget ? pTarget : m_caster->GetCharmerOrOwnerOrSelf();
-                    if ((ownerOrSelf==m_caster || m_caster->IsWithinDistInMap(ownerOrSelf, radius)) &&
-                        ownerOrSelf->getPowerType() == POWER_MANA)
-                        TagUnitMap.push_back(ownerOrSelf);
-
-                    if(Pet* pet = ownerOrSelf->GetPet())
-                        if( m_caster->IsWithinDistInMap(pet, radius) && pet->getPowerType() == POWER_MANA )
-                            TagUnitMap.push_back(pet);
-                }
-            }
-            if (m_spellInfo->Id==52759)                     //Ancestral Awakening (special target selection)
-            {
-                float lowestPerc   = (float)m_caster->GetHealth() / (float)m_caster->GetMaxHealth();
-                Unit* lowestTarget = m_caster;
-
-                if (pGroup)
-                {
-                    Group::MemberSlotList const& members = pGroup->GetMemberSlots();
-                    Group::MemberSlotList::const_iterator itr = members.begin();
-                    for(; itr != members.end(); ++itr)
-                    {
-                        if (Unit* member = ObjectAccessor::GetPlayer(*m_caster, (*itr).guid))
-                        {
-                            if (member == m_caster || member->isDead() || m_caster->IsHostileTo(member) || !m_caster->IsWithinDistInMap(member, radius))
-                                continue;
-
-                            float perc = (float)member->GetHealth() / (float)member->GetMaxHealth();
-                            if (perc <= lowestPerc)
-                            {
-                                lowestPerc = perc;
-                                lowestTarget = member;
-                            }
-                        }
-                    }
-                }
-                TagUnitMap.push_back(lowestTarget);
-            }
+                FillRaidOrPartyManaPriorityTargets(TagUnitMap, m_caster, radius, 10, true, false, false);
+            else if (m_spellInfo->Id==52759)                //Ancestral Awakening (special target selection)
+                FillRaidOrPartyHealthPriorityTargets(TagUnitMap, m_caster, radius, 1, true, false, false);
             else
-            {
-                if(pGroup)
-                {
-                    for(GroupReference *itr = pGroup->GetFirstMember(); itr != NULL; itr = itr->next())
-                    {
-                        Player* Target = itr->getSource();
-
-                        // IsHostileTo check duel and controlled by enemy
-                        if( Target && !m_caster->IsHostileTo(Target) )
-                        {
-                            if( m_caster->IsWithinDistInMap(Target, radius) )
-                                TagUnitMap.push_back(Target);
-
-                            if(Pet* pet = Target->GetPet())
-                                if( m_caster->IsWithinDistInMap(pet, radius) )
-                                    TagUnitMap.push_back(pet);
-                        }
-                    }
-                }
-                else
-                {
-                    Unit* ownerOrSelf = pTarget ? pTarget : m_caster->GetCharmerOrOwnerOrSelf();
-                    if(ownerOrSelf==m_caster || m_caster->IsWithinDistInMap(ownerOrSelf, radius))
-                        TagUnitMap.push_back(ownerOrSelf);
-                    if(Pet* pet = ownerOrSelf->GetPet())
-                        if( m_caster->IsWithinDistInMap(pet, radius) )
-                            TagUnitMap.push_back(pet);
-                }
-            }
+                FillRaidOrPartyTargets(TagUnitMap, m_caster, radius, true, true, true);
             break;
         }
         case TARGET_SINGLE_FRIEND:
@@ -1823,7 +1724,12 @@ void Spell::SetTargetMap(uint32 i,uint32 cur,UnitList& TagUnitMap)
             m_targets.setDestination(caster->GetPositionX(), caster->GetPositionY(), caster->GetPositionZ());
         }break;
         case TARGET_ALL_FRIENDLY_UNITS_AROUND_CASTER:
-            FillAreaTargets(TagUnitMap, m_targets.m_destX, m_targets.m_destY, radius, PUSH_SELF_CENTER, SPELL_TARGETS_FRIENDLY);
+            // special target order
+            if (m_spellInfo->Id==64904)                     // Hymn of Hope
+                // target amount stored in parent spell dummy effect but hard for access
+                FillRaidOrPartyManaPriorityTargets(TagUnitMap, m_caster, radius, 3, true, false, false);
+            else
+                FillAreaTargets(TagUnitMap, m_targets.m_destX, m_targets.m_destY, radius, PUSH_SELF_CENTER, SPELL_TARGETS_FRIENDLY);
             break;
         case TARGET_ALL_FRIENDLY_UNITS_IN_AREA:
             FillAreaTargets(TagUnitMap, m_targets.m_destX, m_targets.m_destY, radius, PUSH_DEST_CENTER, SPELL_TARGETS_FRIENDLY);
@@ -5728,4 +5634,82 @@ void Spell::FillAreaTargets( UnitList& TagUnitMap, float x, float y, float radiu
     CellLock<GridReadGuard> cell_lock(cell, p);
     cell_lock->Visit(cell_lock, world_notifier, *m_caster->GetMap());
     cell_lock->Visit(cell_lock, grid_notifier, *m_caster->GetMap());
+}
+
+void Spell::FillRaidOrPartyTargets( UnitList &TagUnitMap, Unit* target, float radius, bool raid, bool withPets, bool withcaster )
+{
+    Player *pTarget = target->GetCharmerOrOwnerPlayerOrPlayerItself();
+    Group *pGroup = pTarget ? pTarget->GetGroup() : NULL;
+
+    if (pGroup)
+    {
+        uint8 subgroup = pTarget->GetSubGroup();
+
+        for(GroupReference *itr = pGroup->GetFirstMember(); itr != NULL; itr = itr->next())
+        {
+            Player* Target = itr->getSource();
+
+            // IsHostileTo check duel and controlled by enemy
+            if (Target && (raid || subgroup==Target->GetSubGroup())
+                && !m_caster->IsHostileTo(Target))
+            {
+                if (Target==m_caster && withcaster ||
+                    Target!=m_caster && m_caster->IsWithinDistInMap(Target, radius))
+                    TagUnitMap.push_back(Target);
+
+                if (withPets)
+                    if (Pet* pet = Target->GetPet())
+                        if (pet==m_caster && withcaster ||
+                            pet!=m_caster && m_caster->IsWithinDistInMap(pet, radius))
+                            TagUnitMap.push_back(pet);
+            }
+        }
+    }
+    else
+    {
+        Unit* ownerOrSelf = pTarget ? pTarget : target->GetCharmerOrOwnerOrSelf();
+        if (ownerOrSelf==m_caster && withcaster ||
+            ownerOrSelf!=m_caster && m_caster->IsWithinDistInMap(ownerOrSelf, radius))
+            TagUnitMap.push_back(ownerOrSelf);
+
+        if (withPets)
+            if (Pet* pet = ownerOrSelf->GetPet())
+                if (pet==m_caster && withcaster ||
+                    pet!=m_caster && m_caster->IsWithinDistInMap(pet, radius))
+                    TagUnitMap.push_back(pet);
+    }
+}
+
+void Spell::FillRaidOrPartyManaPriorityTargets( UnitList &TagUnitMap, Unit* target, float radius, uint32 count, bool raid, bool withPets, bool withCaster )
+{
+    FillRaidOrPartyTargets(TagUnitMap,target,radius,raid,withPets,withCaster);
+
+    PrioritizeManaUnitQueue manaUsers;
+    for(UnitList::const_iterator itr = TagUnitMap.begin(); itr != TagUnitMap.end() && manaUsers.size() < count; ++itr)
+        if ((*itr)->getPowerType() == POWER_MANA && !(*itr)->isDead())
+            manaUsers.push(PrioritizeManaUnitWraper(*itr));
+
+    TagUnitMap.clear();
+    while(!manaUsers.empty())
+    {
+        TagUnitMap.push_back(manaUsers.top().getUnit());
+        manaUsers.pop();
+    }
+}
+
+void Spell::FillRaidOrPartyHealthPriorityTargets( UnitList &TagUnitMap, Unit* target, float radius, uint32 count, bool raid, bool withPets, bool withCaster )
+{
+    FillRaidOrPartyTargets(TagUnitMap,target,radius,raid,withPets,withCaster);
+
+    PrioritizeHealthUnitQueue healthQueue;
+    for(UnitList::const_iterator itr = TagUnitMap.begin(); itr != TagUnitMap.end() && healthQueue.size() < count; ++itr)
+        if (!(*itr)->isDead())
+            healthQueue.push(PrioritizeHealthUnitWraper(*itr));
+
+    TagUnitMap.clear();
+    while(!healthQueue.empty())
+    {
+        TagUnitMap.push_back(healthQueue.top().getUnit());
+        healthQueue.pop();
+    }
 }
