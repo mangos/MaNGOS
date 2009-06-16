@@ -48,7 +48,7 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     WorldLocation &loc = GetPlayer()->GetTeleportDest();
 
     // possible errors in the coordinate validity check
-    if(!MapManager::IsValidMapCoord(loc.mapid, loc.x, loc.y, loc.z, loc.o))
+    if(!MapManager::IsValidMapCoord(loc.mapid, loc.coord_x, loc.coord_y, loc.coord_z, loc.orientation))
     {
         LogoutPlayer(false);
         return;
@@ -66,7 +66,7 @@ void WorldSession::HandleMoveWorldportAckOpcode()
 
     // relocate the player to the teleport destination
     GetPlayer()->SetMapId(loc.mapid);
-    GetPlayer()->Relocate(loc.x, loc.y, loc.z, loc.o);
+    GetPlayer()->Relocate(loc.coord_x, loc.coord_y, loc.coord_z, loc.orientation);
 
     // since the MapId is set before the GetInstance call, the InstanceId must be set to 0
     // to let GetInstance() determine the proper InstanceId based on the player's binds
@@ -77,7 +77,7 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     // while the player is in transit, for example the map may get full
     if(!GetPlayer()->GetMap()->Add(GetPlayer()))
     {
-        sLog.outDebug("WORLD: teleport of player %s (%d) to location %d, %f, %f, %f, %f failed", GetPlayer()->GetName(), GetPlayer()->GetGUIDLow(), loc.mapid, loc.x, loc.y, loc.z, loc.o);
+        sLog.outDebug("WORLD: teleport of player %s (%d) to location %d, %f, %f, %f, %f failed", GetPlayer()->GetName(), GetPlayer()->GetGUIDLow(), loc.mapid, loc.coord_x, loc.coord_y, loc.coord_z, loc.orientation);
         // teleport the player home
         if(!GetPlayer()->TeleportTo(GetPlayer()->m_homebindMapId, GetPlayer()->m_homebindX, GetPlayer()->m_homebindY, GetPlayer()->m_homebindZ, GetPlayer()->GetOrientation()))
         {
@@ -184,7 +184,7 @@ void WorldSession::HandleMoveTeleportAck(WorldPacket& recv_data)
 
     WorldLocation const& dest = plMover->GetTeleportDest();
 
-    plMover->SetPosition(dest.x, dest.y, dest.z, dest.o, true);
+    plMover->SetPosition(dest.coord_x, dest.coord_y, dest.coord_z, dest.orientation, true);
 
     uint32 newzone, newarea;
     plMover->GetZoneAndAreaId(newzone, newarea);

@@ -884,7 +884,7 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         bool TeleportTo(WorldLocation const &loc, uint32 options = 0)
         {
-            return TeleportTo(loc.mapid, loc.x, loc.y, loc.z, options);
+            return TeleportTo(loc.mapid, loc.coord_x, loc.coord_y, loc.coord_z, options);
         }
 
         void SetSummonPoint(uint32 mapid, float x, float y, float z)

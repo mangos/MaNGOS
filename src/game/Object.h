@@ -98,14 +98,14 @@ typedef UNORDERED_MAP<Player*, UpdateData> UpdateDataMapType;
 struct WorldLocation
 {
     uint32 mapid;
-    float x;
-    float y;
-    float z;
-    float o;
+    float coord_x;
+    float coord_y;
+    float coord_z;
+    float orientation;
     explicit WorldLocation(uint32 _mapid = 0, float _x = 0, float _y = 0, float _z = 0, float _o = 0)
-        : mapid(_mapid), x(_x), y(_y), z(_z), o(_o) {}
+        : mapid(_mapid), coord_x(_x), coord_y(_y), coord_z(_z), orientation(_o) {}
     WorldLocation(WorldLocation const &loc)
-        : mapid(loc.mapid), x(loc.x), y(loc.y), z(loc.z), o(loc.o) {}
+        : mapid(loc.mapid), coord_x(loc.coord_x), coord_y(loc.coord_y), coord_z(loc.coord_z), orientation(loc.orientation) {}
 };
 
 class MANGOS_DLL_SPEC Object
@@ -363,12 +363,6 @@ class MANGOS_DLL_SPEC WorldObject : public Object
             m_positionZ = z;
         }
 
-        void Relocate(WorldLocation const & loc)
-        {
-            SetMapId(loc.mapid);
-            Relocate(loc.x, loc.y, loc.z, loc.o);
-        }
-
         void SetOrientation(float orientation) { m_orientation = orientation; }
 
         float GetPositionX( ) const { return m_positionX; }
@@ -377,7 +371,7 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         void GetPosition( float &x, float &y, float &z ) const
             { x = m_positionX; y = m_positionY; z = m_positionZ; }
         void GetPosition( WorldLocation &loc ) const
-            { loc.mapid = GetMapId(); GetPosition(loc.x, loc.y, loc.z); loc.o = GetOrientation(); }
+            { loc.mapid = m_mapId; GetPosition(loc.coord_x, loc.coord_y, loc.coord_z); loc.orientation = GetOrientation(); }
         float GetOrientation( ) const { return m_orientation; }
         void GetNearPoint2D( float &x, float &y, float distance, float absAngle) const;
         void GetNearPoint( WorldObject const* searcher, float &x, float &y, float &z, float searcher_size, float distance2d,float absAngle) const;
