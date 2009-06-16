@@ -550,6 +550,15 @@ bool Map::loaded(const GridPair &p) const
 
 void Map::Update(const uint32 &t_diff)
 {
+    /// update players at tick
+    for(m_mapRefIter = m_mapRefManager.begin(); m_mapRefIter != m_mapRefManager.end(); ++m_mapRefIter)
+    {
+        Player* plr = m_mapRefIter->getSource();
+        if(plr && plr->IsInWorld())
+            plr->Update(t_diff);
+    }
+
+    /// update active cells around players and active objects
     resetMarkedCells();
 
     MaNGOS::ObjectUpdater updater(t_diff);
