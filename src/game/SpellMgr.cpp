@@ -332,6 +332,9 @@ bool IsPositiveEffect(uint32 spellId, uint32 effIndex)
                         case 38638:                         // Nether Exhaustion (green)
                         case 38639:                         // Nether Exhaustion (blue)
                             return false;
+                        // some spells have unclear target modes for selection, so just make its positive
+                        case 27202:                         // Summon Lord Valthalak DND
+                            return true;
                         default:
                             break;
                     }
