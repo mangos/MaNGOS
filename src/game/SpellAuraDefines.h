@@ -327,11 +327,17 @@ enum AuraType
     SPELL_AURA_MOD_BASE_HEALTH_PCT = 282,
     SPELL_AURA_MOD_HEALING_RECEIVED = 283,                  // Possibly only for some spell family class spells
     SPELL_AURA_284,
-    SPELL_AURA_285,
+    SPELL_AURA_MOD_ATTACK_POWER_OF_ARMOR = 285,
     SPELL_AURA_286,
     SPELL_AURA_DEFLECT_SPELLS,
     SPELL_AURA_288,
-    TOTAL_AURAS = 289
+    SPELL_AURA_289,
+    SPELL_AURA_290,
+    SPELL_AURA_291,
+    SPELL_AURA_292,
+    SPELL_AURA_293,
+    SPELL_AURA_294,
+    TOTAL_AURAS = 295
 };
 
 enum AreaAuraType

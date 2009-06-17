@@ -274,8 +274,8 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
 
             //Repeat Timers
             pHolder.UpdateRepeatTimer(m_creature,event.summon_unit.repeatMin,event.summon_unit.repeatMax);
+            break;
         }
-        break;
         case EVENT_T_TARGET_MANA:
         {
             if (!m_creature->isInCombat() || !m_creature->getVictim() || !m_creature->getVictim()->GetMaxPower(POWER_MANA))
@@ -293,6 +293,34 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
         case EVENT_T_REACHED_HOME:
         case EVENT_T_RECEIVE_EMOTE:
             break;
+        case EVENT_T_BUFFED:
+        {
+            //Note: checked only aura for effect 0, if need check aura for effect 1/2 then
+            // possible way: pack in event.buffed.amount 2 uint16 (ammount+effectIdx)
+            Aura* aura = m_creature->GetAura(event.buffed.spellId,0);
+            if(!aura || aura->GetStackAmount() < event.buffed.amount)
+                return false;
+
+            //Repeat Timers
+            pHolder.UpdateRepeatTimer(m_creature,event.buffed.repeatMin,event.buffed.repeatMax);
+            break;
+        }
+        case EVENT_T_TARGET_BUFFED:
+        {
+            //Prevent event from occuring on no unit
+            if (!pActionInvoker)
+                return false;
+
+            //Note: checked only aura for effect 0, if need check aura for effect 1/2 then
+            // possible way: pack in event.buffed.amount 2 uint16 (ammount+effectIdx)
+            Aura* aura = pActionInvoker->GetAura(event.buffed.spellId,0);
+            if(!aura || aura->GetStackAmount() < event.buffed.amount)
+                return false;
+
+            //Repeat Timers
+            pHolder.UpdateRepeatTimer(m_creature,event.buffed.repeatMin,event.buffed.repeatMax);
+            break;
+        }
         default:
             sLog.outErrorDb("CreatureEventAI: Creature %u using Event %u has invalid Event Type(%u), missing from ProcessEvent() Switch.", m_creature->GetEntry(), pHolder.Event.event_id, pHolder.Event.event_type);
             break;
@@ -384,9 +412,8 @@ void CreatureEventAI::ProcessAction(CreatureEventAI_Action const& action, uint32
                 {
                     if (CreatureInfo const* ci = GetCreatureTemplateStore(action.morph.creatureId))
                     {
-                        //use default display
-                        if (ci->DisplayID_A)
-                            m_creature->SetDisplayId(ci->DisplayID_A);
+                        uint32 display_id = objmgr.ChooseDisplayId(0,ci);
+                        m_creature->SetDisplayId(display_id);
                     }
                 }
                 //if no param1, then use value from param2 (modelId)
@@ -850,6 +877,9 @@ void CreatureEventAI::JustDied(Unit* killer)
         if ((*i).Event.event_type == EVENT_T_DEATH)
             ProcessEvent(*i, killer);
     }
+
+    // reset phase after any death state events
+    Phase = 0;
 }
 
 void CreatureEventAI::KilledUnit(Unit* victim)

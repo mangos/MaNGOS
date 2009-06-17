@@ -25,9 +25,8 @@
 #include <set>
 #include <list>
 #include <sstream>
-#include "../../src/framework/Platform/CompilerDefs.h"
 
-#if PLATFORM == PLATFORM_WINDOWS
+#ifdef WIN32
 #include <direct.h>
 #define popen _popen
 #define pclose _pclose
@@ -114,7 +113,7 @@ bool find_path()
     char *ptr;
     char cur_path[MAX_PATH];
     getcwd(cur_path, MAX_PATH);
-    int len = strlen(cur_path);
+    size_t len = strlen(cur_path);
     strncpy(base_path, cur_path, len+1);
     
     if(cur_path[len-1] == '/' || cur_path[len-1] == '\\')

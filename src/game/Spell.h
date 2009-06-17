@@ -32,19 +32,6 @@ class Aura;
 
 enum SpellCastTargetFlags
 {
-    /*TARGET_FLAG_NONE             = 0x0000,
-    TARGET_FLAG_SWIMMER          = 0x0002,
-    TARGET_FLAG_ITEM             = 0x0010,
-    TARGET_FLAG_SOURCE_AREA      = 0x0020,
-    TARGET_FLAG_DEST_AREA        = 0x0040,
-    TARGET_FLAG_UNKNOWN          = 0x0080,
-    TARGET_FLAG_SELF             = 0x0100,
-    TARGET_FLAG_PVP_CORPSE       = 0x0200,
-    TARGET_FLAG_MASS_SPIRIT_HEAL = 0x0400,
-    TARGET_FLAG_BEAST_CORPSE     = 0x0402,
-    TARGET_FLAG_OBJECT           = 0x4000,
-    TARGET_FLAG_RESURRECTABLE    = 0x8000*/
-
     TARGET_FLAG_SELF            = 0x00000000,
     TARGET_FLAG_UNUSED1         = 0x00000001,               // not used in any spells as of 3.0.3 (can be set dynamically)
     TARGET_FLAG_UNIT            = 0x00000002,               // pguid
@@ -379,7 +366,11 @@ class Spell
         typedef std::list<Unit*> UnitList;
         void FillTargetMap();
         void SetTargetMap(uint32 i,uint32 cur,UnitList& TagUnitMap);
+
         void FillAreaTargets( UnitList& TagUnitMap, float x, float y, float radius, SpellNotifyPushType pushType, SpellTargets spellTargets );
+        void FillRaidOrPartyTargets( UnitList &TagUnitMap, Unit* target, float radius, bool raid, bool withPets, bool withcaster );
+        void FillRaidOrPartyManaPriorityTargets( UnitList &TagUnitMap, Unit* target, float radius, uint32 count, bool raid, bool withPets, bool withcaster );
+        void FillRaidOrPartyHealthPriorityTargets( UnitList &TagUnitMap, Unit* target, float radius, uint32 count, bool raid, bool withPets, bool withcaster );
 
         template<typename T> WorldObject* FindCorpseUsing();
 

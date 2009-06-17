@@ -60,7 +60,7 @@ FleeingMovementGenerator<T>::_getPoint(T &owner, float &x, float &y, float &z)
     z = owner.GetPositionZ();
 
     float temp_x, temp_y, angle;
-    const Map * _map = MapManager::Instance().GetBaseMap(owner.GetMapId());
+    const Map * _map = owner.GetBaseMap();
     //primitive path-finding
     for(uint8 i = 0; i < 18; ++i)
     {
@@ -285,7 +285,7 @@ FleeingMovementGenerator<T>::Initialize(T &owner)
         return;
 
     _Init(owner);
-    owner.RemoveUnitMovementFlag(MOVEMENTFLAG_WALK_MODE);
+    owner.RemoveUnitMovementFlag(MONSTER_MOVE_WALK);
 
     if(Unit * fright = ObjectAccessor::GetUnit(owner, i_frightGUID))
     {

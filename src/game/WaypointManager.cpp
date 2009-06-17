@@ -118,7 +118,7 @@ void WaypointManager::Load()
             MaNGOS::NormalizeMapCoord(node.y);
             if(result1)
             {
-                node.z = MapManager::Instance ().GetBaseMap(result1->Fetch()[1].GetUInt32())->GetHeight(node.x, node.y, node.z);
+                node.z = MapManager::Instance ().CreateBaseMap(result1->Fetch()[1].GetUInt32())->GetHeight(node.x, node.y, node.z);
                 delete result1;
             }
             WorldDatabase.PExecute("UPDATE creature_movement SET position_x = '%f', position_y = '%f', position_z = '%f' WHERE id = '%u' AND point = '%u'", node.x, node.y, node.z, id, point);

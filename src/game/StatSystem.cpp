@@ -125,9 +125,9 @@ bool Player::UpdateAllStats()
         SetStat(Stats(i), (int32)value);
     }
 
-    UpdateAttackPowerAndDamage();
-    UpdateAttackPowerAndDamage(true);
     UpdateArmor();
+    // calls UpdateAttackPowerAndDamage() in UpdateArmor for SPELL_AURA_MOD_ATTACK_POWER_OF_ARMOR
+    UpdateAttackPowerAndDamage(true);
     UpdateMaxHealth();
 
     for(int i = POWER_MANA; i < MAX_POWERS; ++i)
@@ -188,6 +188,8 @@ void Player::UpdateArmor()
     Pet *pet = GetPet();
     if(pet)
         pet->UpdateArmor();
+
+    UpdateAttackPowerAndDamage();                           // armor dependent auras update for SPELL_AURA_MOD_ATTACK_POWER_OF_ARMOR
 }
 
 float Player::GetHealthBonusFromStamina()
@@ -353,6 +355,11 @@ void Player::UpdateAttackPowerAndDamage(bool ranged )
         AuraList const& mAPbyStat = GetAurasByType(SPELL_AURA_MOD_ATTACK_POWER_OF_STAT_PERCENT);
         for(AuraList::const_iterator i = mAPbyStat.begin();i != mAPbyStat.end(); ++i)
             attPowerMod += int32(GetStat(Stats((*i)->GetModifier()->m_miscvalue)) * (*i)->GetModifier()->m_amount / 100.0f);
+
+        AuraList const& mAPbyArmor = GetAurasByType(SPELL_AURA_MOD_ATTACK_POWER_OF_ARMOR);
+        for(AuraList::const_iterator iter = mAPbyArmor.begin(); iter != mAPbyArmor.end(); ++iter)
+            // always: ((*i)->GetModifier()->m_miscvalue == 1 == SPELL_SCHOOL_MASK_NORMAL)
+            attPowerMod += int32(GetArmor() / (*iter)->GetModifier()->m_amount);
     }
 
     float attPowerMultiplier = GetModifierValue(unitMod, TOTAL_PCT) - 1.0f;

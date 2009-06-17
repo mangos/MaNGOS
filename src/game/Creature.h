@@ -157,10 +157,10 @@ struct CreatureInfo
 {
     uint32  Entry;
     uint32  HeroicEntry;
-    uint32  DisplayID_A;
-    uint32  DisplayID_A2;
-    uint32  DisplayID_H;
-    uint32  DisplayID_H2;
+    uint32  unk1;
+    uint32  unk2;
+    uint32  DisplayID_A[2];
+    uint32  DisplayID_H[2];
     char*   Name;
     char*   SubName;
     char*   IconName;
@@ -216,6 +216,8 @@ struct CreatureInfo
     float   unk16;
     float   unk17;
     bool    RacialLeader;
+    uint32  questItems[4];
+    uint32  movementId;
     bool    RegenHealth;
     uint32  equipmentId;
     uint32  MechanicImmuneMask;
@@ -448,7 +450,7 @@ typedef std::map<uint32,time_t> CreatureSpellCooldowns;
 // max different by z coordinate for creature aggro reaction
 #define CREATURE_Z_ATTACK_RANGE 3
 
-#define MAX_VENDOR_ITEMS 255                                // Limitation in item count field size in SMSG_LIST_INVENTORY
+#define MAX_VENDOR_ITEMS 150                                // Limitation in 3.x.x item count in SMSG_LIST_INVENTORY
 
 class MANGOS_DLL_SPEC Creature : public Unit
 {

@@ -31,9 +31,8 @@ ConfusedMovementGenerator<T>::Initialize(T &unit)
     x = unit.GetPositionX();
     y = unit.GetPositionY();
     z = unit.GetPositionZ();
-    uint32 mapid=unit.GetMapId();
 
-    Map const* map = MapManager::Instance().GetBaseMap(mapid);
+    Map const* map = unit.GetBaseMap();
 
     i_nextMove = 1;
 
@@ -65,7 +64,7 @@ ConfusedMovementGenerator<T>::Initialize(T &unit)
     }
 
     unit.StopMoving();
-    unit.RemoveUnitMovementFlag(MOVEMENTFLAG_WALK_MODE);
+    unit.RemoveUnitMovementFlag(MONSTER_MOVE_WALK);
     unit.addUnitState(UNIT_STAT_CONFUSED);
 }
 

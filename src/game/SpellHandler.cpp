@@ -518,15 +518,17 @@ void WorldSession::HandleSpellClick( WorldPacket & recv_data )
     uint64 guid;
     recv_data >> guid;
 
-    Creature *unit = ObjectAccessor::GetCreatureOrPetOrVehicle(*_player, guid);
-
-    if(!unit)
+    if (_player->isInCombat())                              // client prevent click and set different icon at combat state
         return;
 
-    SpellClickInfoMap const& map = objmgr.mSpellClickInfoMap;
-    for(SpellClickInfoMap::const_iterator itr = map.lower_bound(unit->GetEntry()); itr != map.upper_bound(unit->GetEntry()); ++itr)
+    Creature *unit = ObjectAccessor::GetCreatureOrPetOrVehicle(*_player, guid);
+    if (!unit || unit->isInCombat())                        // client prevent click and set different icon at combat state
+        return;
+
+    SpellClickInfoMapBounds clickPair = objmgr.GetSpellClickInfoMapBounds(unit->GetEntry());
+    for(SpellClickInfoMap::const_iterator itr = clickPair.first; itr != clickPair.second; ++itr)
     {
-        if(itr->second.questId == 0 || _player->GetQuestStatus(itr->second.questId) == QUEST_STATUS_INCOMPLETE)
+        if (itr->second.IsFitToRequirements(_player))
         {
             Unit *caster = (itr->second.castFlags & 0x1) ? (Unit*)_player : (Unit*)unit;
             Unit *target = (itr->second.castFlags & 0x2) ? (Unit*)_player : (Unit*)unit;
