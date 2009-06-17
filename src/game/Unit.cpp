@@ -7584,7 +7584,7 @@ void Unit::RemoveGuardians()
     }
 }
 
-bool Unit::HasGuardianWithEntry(uint32 entry)
+Pet* Unit::FindGuardianWithEntry(uint32 entry)
 {
     // pet guid middle part is entry (and creature also)
     // and in guardian list must be guardians with same entry _always_
@@ -7592,10 +7592,10 @@ bool Unit::HasGuardianWithEntry(uint32 entry)
     {
         if(Pet* pet = ObjectAccessor::GetPet(*itr))
             if (pet->GetEntry() == entry)
-                return true;
+                return pet;
     }
 
-    return false;
+    return NULL;
 }
 
 void Unit::UnsummonAllTotems()
