@@ -423,7 +423,7 @@ Player::Player (WorldSession *session): Unit(), m_achievementMgr(this), m_reputa
     m_lastPotionId = 0;
 
     m_activeSpec = 0;
-    m_specsCount = 0;
+    m_specsCount = 1;
 
     for (int i = 0; i < BASEMOD_END; ++i)
     {
@@ -2359,7 +2359,8 @@ void Player::InitTalentForLevel()
             SetFreeTalentPoints(talentPointsForLevel-m_usedTalentCount);
     }
 
-    SendTalentsInfoData(false);                             // update at client
+    if(!GetSession()->PlayerLoading())
+        SendTalentsInfoData(false);                         // update at client
 }
 
 void Player::InitStatsForLevel(bool reapplyMods)
@@ -3249,7 +3250,6 @@ void Player::removeSpell(uint32 spell_id, bool disabled, bool update_action_bar_
         GetSession()->SendPacket(&data);
     }
 }
-
 
 void Player::RemoveSpellCooldown( uint32 spell_id, bool update /* = false */ )
 {
@@ -19994,14 +19994,13 @@ bool Player::canSeeSpellClickOn(Creature const *c) const
 void Player::BuildPlayerTalentsInfoData(WorldPacket *data)
 {
     *data << uint32(GetFreeTalentPoints());                 // unspentTalentPoints
-    uint8 talentGroupCount = 1;
-    *data << uint8(talentGroupCount);                       // talent group count (0, 1 or 2)
-    *data << uint8(0);                                      // talent group index (0 or 1)
+    *data << uint8(m_specsCount);                           // talent group count (0, 1 or 2)
+    *data << uint8(m_activeSpec);                           // talent group index (0 or 1)
 
-    if(talentGroupCount)
+    if(m_specsCount)
     {
         // loop through all specs (only 1 for now)
-        for(uint32 groups = 0; groups < talentGroupCount; ++groups)
+        for(uint32 specIdx = 0; specIdx < m_specsCount; ++specIdx)
         {
             uint8 talentIdCount = 0;
             size_t pos = data->wpos();
@@ -20026,7 +20025,7 @@ void Player::BuildPlayerTalentsInfoData(WorldPacket *data)
 
                     // find max talent rank
                     int32 curtalent_maxrank = -1;
-                    for(int32 k = 4; k > -1; --k)
+                    for(int32 k = MAX_TALENT_RANK-1; k > -1; --k)
                     {
                         if(talentInfo->RankID[k] && HasSpell(talentInfo->RankID[k]))
                         {
