@@ -1580,6 +1580,13 @@ void Creature::Respawn()
     }
 }
 
+void Creature::ForcedDespawn()
+{
+    setDeathState(JUST_DIED);
+    RemoveCorpse();
+    SetHealth(0);                                           // just for nice GM-mode view
+}
+
 bool Creature::IsImmunedToSpell(SpellEntry const* spellInfo)
 {
     if (!spellInfo)

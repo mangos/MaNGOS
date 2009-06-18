@@ -105,6 +105,7 @@ enum EventAI_ActionType
     ACTION_T_ZONE_COMBAT_PULSE          = 38,               // No Params
     ACTION_T_CALL_FOR_HELP              = 39,               // Radius
     ACTION_T_SET_SHEATH                 = 40,               // Sheath (0-passive,1-melee,2-ranged)
+    ACTION_T_FORCE_DESPAWN              = 41,               // No Params
     ACTION_T_END,
 };
 
