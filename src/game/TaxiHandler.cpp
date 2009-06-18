@@ -310,7 +310,7 @@ void WorldSession::HandleMoveSplineDoneOpcode(WorldPacket& recv_data)
     if(curloc != curDest){
          // current source node for next destination
         uint32 sourcenode = GetPlayer()->m_taxi.GetTaxiSource();
-        uint16 MountId = objmgr.GetTaxiMount(sourcenode, GetPlayer()->GetTeam());
+        uint16 MountId = objmgr.GetTaxiMountDisplayId(sourcenode, GetPlayer()->GetTeam());
 
         uint32 path, cost;
         objmgr.GetTaxiPath( sourcenode, curDest, path, cost);
