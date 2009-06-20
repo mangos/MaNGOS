@@ -588,7 +588,6 @@ class MANGOS_DLL_SPEC CreatureEventAI : public CreatureAI
         inline Unit* SelectUnit(AttackingTarget target, uint32 position);
 
         void DoScriptText(int32 textEntry, WorldObject* pSource, Unit* target);
-        void DoZoneInCombat(Unit* pUnit);
         void DoMeleeAttackIfReady();
         bool CanCast(Unit* Target, SpellEntry const *Spell, bool Triggered);
 

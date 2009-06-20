@@ -648,6 +648,8 @@ class MANGOS_DLL_SPEC Creature : public Unit
 
         void SendZoneUnderAttackMessage(Player* attacker);
 
+        void SetInCombatWithZone();
+
         bool hasQuest(uint32 quest_id) const;
         bool hasInvolvedQuest(uint32 quest_id)  const;
 
