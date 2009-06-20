@@ -208,6 +208,7 @@ class Pet : public Creature
         void InitPetCreateSpells();
 
         bool resetTalents(bool no_cost = false);
+        static void resetTalentsForAllPetsOf(Player* owner, Pet* online_pet = NULL);
         uint32 resetTalentsCost() const;
         void InitTalentForLevel();
 

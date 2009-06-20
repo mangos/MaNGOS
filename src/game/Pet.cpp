@@ -1547,6 +1547,10 @@ bool Pet::resetTalents(bool no_cost)
     if (!owner || owner->GetTypeId()!=TYPEID_PLAYER)
         return false;
 
+    // not need after this call
+    if(((Player*)owner)->HasAtLoginFlag(AT_LOGIN_RESET_PET_TALENTS))
+        ((Player*)owner)->RemoveAtLoginFlag(AT_LOGIN_RESET_PET_TALENTS,true);
+
     CreatureInfo const * ci = GetCreatureInfo();
     if(!ci)
         return false;
@@ -1630,6 +1634,90 @@ bool Pet::resetTalents(bool no_cost)
     }
     player->PetSpellInitialize();
     return true;
+}
+
+void Pet::resetTalentsForAllPetsOf(Player* owner, Pet* online_pet /*= NULL*/)
+{
+    // not need after this call
+    if(((Player*)owner)->HasAtLoginFlag(AT_LOGIN_RESET_PET_TALENTS))
+        ((Player*)owner)->RemoveAtLoginFlag(AT_LOGIN_RESET_PET_TALENTS,true);
+
+    // reset for online
+    if(online_pet)
+        online_pet->resetTalents(true);
+
+    // now need only reset for offline pets (all pets except online case)
+    uint32 except_petnumber = online_pet ? online_pet->GetCharmInfo()->GetPetNumber() : 0;
+
+    QueryResult *resultPets = CharacterDatabase.PQuery(
+        "SELECT id FROM character_pet WHERE owner = '%u' AND id <> '%u'",
+        owner->GetGUIDLow(),except_petnumber);
+
+    // no offline pets
+    if(!resultPets)
+        return;
+
+    QueryResult *result = CharacterDatabase.PQuery(
+        "SELECT DISTINCT pet_spell.spell FROM pet_spell, character_pet "
+        "WHERE character_pet.owner = '%u' AND character_pet.id = pet_spell.guid AND character_pet.id <> %u",
+        owner->GetGUIDLow(),except_petnumber);
+
+    if(!result)
+    {
+        delete resultPets;
+        return;
+    }
+
+    bool need_comma = false;
+    std::ostringstream ss;
+    ss << "DELETE FROM pet_spell WHERE guid IN (";
+
+    do
+    {
+        Field *fields = resultPets->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+
+        if(need_comma)
+            ss << ",";
+
+        ss << id;
+
+        need_comma = true;
+    }
+    while( resultPets->NextRow() );
+
+    delete resultPets;
+
+    ss << ") AND spell IN (";
+
+    bool need_execute = false;
+    do
+    {
+        Field *fields = result->Fetch();
+
+        uint32 spell = fields[0].GetUInt32();
+
+        if(!GetTalentSpellCost(spell))
+            continue;
+
+        if(need_execute)
+            ss << ",";
+
+        ss << spell;
+
+        need_execute = true;
+    }
+    while( result->NextRow() );
+
+    delete result;
+
+    if(!need_execute)
+        return;
+
+    ss << ")";
+
+    CharacterDatabase.Execute(ss.str().c_str());
 }
 
 void Pet::InitTalentForLevel()
