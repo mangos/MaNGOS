@@ -5568,12 +5568,6 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                         case POWER_MANA:
                             triggered_spell_id = 57319;
                             break;
-                        case POWER_RAGE:
-                            triggered_spell_id = 57320;
-                            break;
-                        case POWER_RUNIC_POWER:
-                            triggered_spell_id = 57321;
-                            break;
                         default:
                             return false;
                     }
