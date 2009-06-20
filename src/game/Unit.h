@@ -1495,8 +1495,6 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void SendPetCastFail(uint32 spellid, SpellCastResult msg);
         void SendPetActionFeedback (uint8 msg);
         void SendPetTalk (uint32 pettalk);
-        void SendPetSpellCooldown (uint32 spellid, time_t cooltime);
-        void SendPetClearCooldown (uint32 spellid);
         void SendPetAIReaction(uint64 guid);
         ///----------End of Pet responses methods----------
 
