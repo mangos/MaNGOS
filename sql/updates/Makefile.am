@@ -226,6 +226,8 @@ pkgdata_DATA = \
 	8030_01_characters_character_spell.sql \
 	8030_02_characters_character_action.sql \
 	8030_03_mangos_npc_trainer.sql \
+	8050_01_mangos_spell_proc_event.sql \
+	8050_02_mangos_spell_bonus_data.sql \
 	README
 
 ## Additional files to include when running 'make dist'
@@ -432,4 +434,6 @@ EXTRA_DIST = \
 	8030_01_characters_character_spell.sql \
 	8030_02_characters_character_action.sql \
 	8030_03_mangos_npc_trainer.sql \
+	8050_01_mangos_spell_proc_event.sql \
+	8050_02_mangos_spell_bonus_data.sql \
 	README
