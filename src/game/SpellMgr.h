@@ -528,7 +528,7 @@ class PetAura
         bool removeOnChangePet;
         int32 damage;
 };
-typedef std::map<uint16, PetAura> SpellPetAuraMap;
+typedef std::map<uint32, PetAura> SpellPetAuraMap;
 
 struct SpellArea
 {
@@ -833,9 +833,9 @@ class SpellMgr
             return mSkillLineAbilityMap.upper_bound(spell_id);
         }
 
-        PetAura const* GetPetAura(uint16 spell_id)
+        PetAura const* GetPetAura(uint16 spell_id, uint8 eff)
         {
-            SpellPetAuraMap::const_iterator itr = mSpellPetAuraMap.find(spell_id);
+            SpellPetAuraMap::const_iterator itr = mSpellPetAuraMap.find((spell_id<<8) + eff);
             if(itr != mSpellPetAuraMap.end())
                 return &itr->second;
             else

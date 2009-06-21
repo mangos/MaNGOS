@@ -3107,8 +3107,9 @@ void Player::removeSpell(uint32 spell_id, bool disabled, bool update_action_bar_
     RemoveAurasDueToSpell(spell_id);
 
     // remove pet auras
-    if(PetAura const* petSpell = spellmgr.GetPetAura(spell_id))
-        RemovePetAura(petSpell);
+    for(int i = 0; i < 3; ++i)
+        if(PetAura const* petSpell = spellmgr.GetPetAura(spell_id, i))
+            RemovePetAura(petSpell);
 
     // free talent points
     uint32 talentCosts = GetTalentSpellCost(spell_id);
