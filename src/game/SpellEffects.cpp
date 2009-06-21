@@ -3180,6 +3180,7 @@ void Spell::EffectSummonType(uint32 i)
             EffectSummonDemon(i);
             break;
         case SUMMON_TYPE_SUMMON:
+        case SUMMON_TYPE_ELEMENTAL:
             EffectSummon(i);
             break;
         case SUMMON_TYPE_CRITTER:
