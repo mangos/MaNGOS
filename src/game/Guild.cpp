@@ -352,17 +352,14 @@ bool Guild::FillPlayerData(uint64 guid, MemberSlot* memslot)
     }
     else
     {
-        QueryResult *result = CharacterDatabase.PQuery("SELECT name,data,zone,class FROM characters WHERE guid = '%u'", GUID_LOPART(guid));
+        QueryResult *result = CharacterDatabase.PQuery("SELECT name,level,zone,class FROM characters WHERE guid = '%u'", GUID_LOPART(guid));
         if(!result)
             return false;                                   // player doesn't exist
 
         Field *fields = result->Fetch();
 
         plName = fields[0].GetCppString();
-
-        Tokens data = StrSplit(fields[1].GetCppString(), " ");
-        plLevel = Player::GetUInt32ValueFromArray(data,UNIT_FIELD_LEVEL);
-
+        plLevel = fields[1].GetUInt32();
         plZone = fields[2].GetUInt32();
         plClass = fields[3].GetUInt32();
         delete result;
