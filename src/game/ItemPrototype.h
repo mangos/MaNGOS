@@ -63,10 +63,13 @@ enum ItemModType
     ITEM_MOD_SPELL_DAMAGE_DONE        = 42,
     ITEM_MOD_MANA_REGENERATION        = 43,
     ITEM_MOD_ARMOR_PENETRATION_RATING = 44,
-    ITEM_MOD_SPELL_POWER              = 45
+    ITEM_MOD_SPELL_POWER              = 45,
+    ITEM_MOD_HEALTH_REGEN             = 46,
+    ITEM_MOD_SPELL_PENETRATION        = 47,
+    ITEM_MOD_BLOCK_VALUE              = 48
 };
 
-#define MAX_ITEM_MOD                    46
+#define MAX_ITEM_MOD                    49
 
 enum ItemSpelltriggerType
 {

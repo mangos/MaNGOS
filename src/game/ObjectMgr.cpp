@@ -4396,7 +4396,7 @@ void ObjectMgr::LoadInstanceTemplate()
         if(temp->reset_delay == 0)
         {
             // use defaults from the DBC
-            if(entry->resetTimeHeroic)                      // for both raid and non raids, read above
+            /*if(entry->resetTimeHeroic)                      // for both raid and non raids, read above
             {
                 temp->reset_delay = entry->resetTimeHeroic / DAY;
             }
@@ -4404,7 +4404,7 @@ void ObjectMgr::LoadInstanceTemplate()
                                                             // for normal raid only
             {
                 temp->reset_delay = entry->resetTimeRaid / DAY;
-            }
+            }*/
         }
 
         // the reset_delay must be at least one day

@@ -1080,21 +1080,12 @@ struct MapEntry
                                                             // 55 intro text flags
     uint32  multimap_id;                                    // 56
                                                             // 57
-    //chat*     unknownText1[16];                           // 58-73 unknown empty text fields, possible normal Intro text.
-                                                            // 74 text flags
-    //chat*     heroicIntroText[16];                        // 75-90 heroic mode requirement text
-                                                            // 91 text flags
-    //chat*     unknownText2[16];                           // 92-107 unknown empty text fields
-                                                            // 108 text flags
-    int32   entrance_map;                                   // 109 map_id of entrance map
-    float   entrance_x;                                     // 110 entrance x coordinate (if exist single entry)
-    float   entrance_y;                                     // 111 entrance y coordinate (if exist single entry)
-    uint32  resetTimeRaid;                                  // 112
-    uint32  resetTimeHeroic;                                // 113
-                                                            // 114 all 0
-                                                            // 115 -1, 0 and 720
-    uint32  addon;                                          // 116 (0-original maps,1-tbc addon)
-                                                            // 117 some kind of time?
+    int32   entrance_map;                                   // 58 map_id of entrance map
+    float   entrance_x;                                     // 59 entrance x coordinate (if exist single entry)
+    float   entrance_y;                                     // 60 entrance y coordinate (if exist single entry)
+                                                            // 61 -1, 0 and 720
+    uint32  addon;                                          // 62 (0-original maps,1-tbc addon)
+                                                            // 63 some kind of time?
 
     // Helpers
     uint32 Expansion() const { return addon; }
@@ -1106,8 +1097,8 @@ struct MapEntry
     bool IsBattleGround() const { return map_type == MAP_BATTLEGROUND; }
     bool IsBattleArena() const { return map_type == MAP_ARENA; }
     bool IsBattleGroundOrArena() const { return map_type == MAP_BATTLEGROUND || map_type == MAP_ARENA; }
-    bool SupportsHeroicMode() const { return resetTimeHeroic != 0; }
-    bool HasResetTime() const { return resetTimeHeroic || resetTimeRaid; }
+    bool SupportsHeroicMode() const { return true; }
+    bool HasResetTime() const { return true; }
 
     bool IsMountAllowed() const
     {
@@ -1159,7 +1150,7 @@ struct ScalingStatValuesEntry
 {
     uint32  Id;
     uint32  Level;
-    uint32  ssdMultiplier[5];                               // Multiplier for ScalingStatDistribution
+    uint32  ssdMultiplier[4];                               // Multiplier for ScalingStatDistribution
     uint32  armorMod[4];                                    // Armor for level
     uint32  dpsMod[6];                                      // DPS mod for level
     uint32  spellBonus;                                     // not sure.. TODO: need more info about
@@ -1172,8 +1163,8 @@ struct ScalingStatValuesEntry
             if(mask & 0x00000001) return ssdMultiplier[0];
             if(mask & 0x00000002) return ssdMultiplier[1];
             if(mask & 0x00000004) return ssdMultiplier[2];
-            if(mask & 0x00000008) return ssdMultiplier[3];
-            if(mask & 0x00000010) return ssdMultiplier[4];
+            //if(mask & 0x00000008) return ssdMultiplier[3];
+            if(mask & 0x00000010) return ssdMultiplier[3];
         }
         return 0;
     }
@@ -1298,8 +1289,11 @@ struct SpellEntry
     uint32    AttributesEx4;                                // 8        m_attributesExD
     uint32    AttributesEx5;                                // 9        m_attributesExE
     //uint32    AttributesEx6;                              // 10       m_attributesExF not used
+    // new 3.2
     uint32    Stances;                                      // 11       m_shapeshiftMask
+    // new 3.2
     uint32    StancesNot;                                   // 12       m_shapeshiftExclude
+    // new 3.2
     uint32    Targets;                                      // 13       m_targets
     uint32    TargetCreatureType;                           // 14       m_targetCreatureType
     uint32    RequiresSpellFocus;                           // 15       m_requiresSpellFocus

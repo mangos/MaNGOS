@@ -1467,6 +1467,7 @@ bool Player::BuildEnumData( QueryResult * result, WorldPacket * p_data )
     // character customize (flags?)
     *p_data << uint32(atLoginFlags & AT_LOGIN_CUSTOMIZE ? 1 : 0);
     *p_data << uint8(1);                                    // unknown
+    *p_data << uint8(0);                                    // 3.2
 
     // Pets info
     {
