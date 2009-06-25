@@ -1001,6 +1001,7 @@ struct ItemExtendedCostEntry
     uint32      ID;                                         // 0 extended-cost entry id
     uint32      reqhonorpoints;                             // 1 required honor points
     uint32      reqarenapoints;                             // 2 required arena points
+    //uint32 unk1; // 3.2
     uint32      reqitem[5];                                 // 3-7 required item id
     uint32      reqitemcount[5];                            // 8-12 required count of 1st item
     uint32      reqpersonalarenarating;                     // 13 required personal arena rating
@@ -1155,6 +1156,7 @@ struct ScalingStatValuesEntry
     uint32  dpsMod[6];                                      // DPS mod for level
     uint32  spellBonus;                                     // not sure.. TODO: need more info about
     uint32  feralBonus;                                     // Feral AP bonus
+    //uint32  unk1[6]; // 3.2
 
     uint32  getssdMultiplier(uint32 mask) const
     {
@@ -1389,6 +1391,10 @@ struct SpellEntry
     uint32    runeCostID;                                   // 229      m_runeCostID
     //uint32    spellMissileID;                             // 230      m_spellMissileID not used
     //uint32  PowerDisplayId;                               // 231 PowerDisplay.dbc, new in 3.1
+    //uint32 unk1; // 3.2
+    //uint32 unk2; // 3.2
+    //uint32 unk3; // 3.2
+    //uint32 unk4; // 3.2
 
     // helpers
     int32 CalculateSimpleValue(uint8 eff) const { return EffectBasePoints[eff]+int32(EffectBaseDice[eff]); }

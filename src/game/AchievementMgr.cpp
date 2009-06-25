@@ -191,7 +191,7 @@ bool AchievementCriteriaData::IsValid(AchievementCriteriaEntry const* criteria)
             }
             return true;
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_MAP_DIFFICULTY:
-            if (difficalty.difficalty >= TOTAL_DIFFICULTIES)
+            if (difficalty.difficalty >= TOTAL_DUNGEON_DIFFICULTIES)
             {
                 sLog.outErrorDb( "Table `achievement_criteria_data` (Entry: %u Type: %u) for data type ACHIEVEMENT_CRITERIA_DATA_TYPE_MAP_DIFFICULTY (%u) have wrong difficulty in value1 (%u), ignore.",
                     criteria->ID, criteria->requiredType,dataType,difficalty.difficalty);
@@ -841,7 +841,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                             if(!achievIdForDangeon[j][2])
                                 break;                      // for
                         }
-                        else if(GetPlayer()->GetDifficulty()==DIFFICULTY_NORMAL)
+                        else if(GetPlayer()->GetDungeonDifficulty()==DUNGEON_DIFFICULTY_NORMAL)
                         {
                             // dungeon in normal mode accepted
                             if(!achievIdForDangeon[j][1])

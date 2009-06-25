@@ -1292,7 +1292,7 @@ enum Opcodes
     CMSG_UNKNOWN_1255                               = 0x4E7, // lua: BattlefieldMgrExitRequest
     SMSG_UNKNOWN_1256                               = 0x4E8, // uint32, uint32
     UMSG_UNKNOWN_1257                               = 0x4E9, // not found 3.2
-    MSG_UNKNOWN_1258                                = 0x4EA, // lua: SetRaidDificulty
+    MSG_SET_RAID_DIFFICULTY                         = 0x4EA, // lua: SetRaidDificulty
     UMSG_UNKNOWN_1259                               = 0x4EB, // not found 3.2
     SMSG_TOGGLE_XP_GAIN                             = 0x4EC, // enable/disable XP gain console message
     UMSG_UNKNOWN_1261                               = 0x4ED, // not found 3.2

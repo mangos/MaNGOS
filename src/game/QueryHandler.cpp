@@ -198,8 +198,8 @@ void WorldSession::HandleCreatureQueryOpcode( WorldPacket & recv_data )
         data << float(ci->unk16);                           // unk
         data << float(ci->unk17);                           // unk
         data << uint8(ci->RacialLeader);
-        for(uint32 i = 0; i < 4; ++i)
-            data << uint32(ci->questItems[i]);              // itemId[4], quest drop
+        for(uint32 i = 0; i < 6; ++i)
+            data << uint32(ci->questItems[i]);              // itemId[6], quest drop
         data << uint32(ci->movementId);                     // CreatureMovementInfo.dbc
         SendPacket( &data );
         sLog.outDebug( "WORLD: Sent SMSG_CREATURE_QUERY_RESPONSE" );
@@ -261,8 +261,8 @@ void WorldSession::HandleGameObjectQueryOpcode( WorldPacket & recv_data )
         data << info->unk1;                                 // 2.0.3, string
         data.append(info->raw.data, 24);
         data << float(info->size);                          // go size
-        for(uint32 i = 0; i < 4; ++i)
-            data << uint32(info->questItems[i]);            // itemId[4], quest drop
+        for(uint32 i = 0; i < 6; ++i)
+            data << uint32(info->questItems[i]);            // itemId[6], quest drop
         SendPacket( &data );
         sLog.outDebug( "WORLD: Sent SMSG_GAMEOBJECT_QUERY_RESPONSE" );
     }

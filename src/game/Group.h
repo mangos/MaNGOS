@@ -279,8 +279,10 @@ class MANGOS_DLL_SPEC Group
         }
 
         void SetTargetIcon(uint8 id, uint64 guid);
-        void SetDifficulty(uint8 difficulty);
-        uint8 GetDifficulty() { return m_difficulty; }
+        void SetDungeonDifficulty(uint8 difficulty);
+        uint8 GetDungeonDifficulty() { return m_dungeonDifficulty; }
+        void SetRaidDifficulty(uint8 difficulty);
+        uint8 GetRaidDifficulty() { return m_raidDifficulty; }
         uint16 InInstance();
         bool InCombatToInstance(uint32 instanceId);
         void ResetInstances(uint8 method, Player* SendMsgTo);
@@ -397,14 +399,15 @@ class MANGOS_DLL_SPEC Group
         uint64              m_mainTank;
         uint64              m_mainAssistant;
         GroupType           m_groupType;
-        uint8               m_difficulty;
+        uint8               m_dungeonDifficulty;
+        uint8               m_raidDifficulty;
         BattleGround*       m_bgGroup;
         uint64              m_targetIcons[TARGETICONCOUNT];
         LootMethod          m_lootMethod;
         ItemQualities       m_lootThreshold;
         uint64              m_looterGuid;
         Rolls               RollId;
-        BoundInstancesMap   m_boundInstances[TOTAL_DIFFICULTIES];
+        BoundInstancesMap   m_boundInstances[TOTAL_DUNGEON_DIFFICULTIES];
         uint8*              m_subGroupsCounts;
 };
 #endif

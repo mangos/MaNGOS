@@ -845,7 +845,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
             missingItem = at->requiredItem2;
 
         uint32 missingKey = 0;
-        if(GetPlayer()->GetDifficulty() == DIFFICULTY_HEROIC)
+        if(GetPlayer()->GetDungeonDifficulty() == DUNGEON_DIFFICULTY_HEROIC)
         {
             if(at->heroicKey)
             {
@@ -858,7 +858,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
         }
 
         uint32 missingQuest = 0;
-        if(GetPlayer()->GetDifficulty() == DIFFICULTY_HEROIC)
+        if(GetPlayer()->GetDungeonDifficulty() == DUNGEON_DIFFICULTY_HEROIC)
         {
             if (at->requiredQuestHeroic && !GetPlayer()->GetQuestRewardStatus(at->requiredQuestHeroic))
                 missingQuest = at->requiredQuestHeroic;
@@ -875,7 +875,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
             if(missingItem)
                 SendAreaTriggerMessage(GetMangosString(LANG_LEVEL_MINREQUIRED_AND_ITEM), at->requiredLevel, objmgr.GetItemPrototype(missingItem)->Name1);
             else if(missingKey)
-                GetPlayer()->SendTransferAborted(at->target_mapId, TRANSFER_ABORT_DIFFICULTY, DIFFICULTY_HEROIC);
+                GetPlayer()->SendTransferAborted(at->target_mapId, TRANSFER_ABORT_DIFFICULTY, DUNGEON_DIFFICULTY_HEROIC);
             else if(missingQuest)
                 SendAreaTriggerMessage(at->requiredFailedText.c_str());
             else if(missingLevel)
@@ -1469,10 +1469,10 @@ void WorldSession::HandleSetDungeonDifficultyOpcode( WorldPacket & recv_data )
     uint32 mode;
     recv_data >> mode;
 
-    if(mode == _player->GetDifficulty())
+    if(mode == _player->GetDungeonDifficulty())
         return;
 
-    if(mode > DIFFICULTY_HEROIC)
+    if(mode > DUNGEON_DIFFICULTY_HEROIC)
     {
         sLog.outError("WorldSession::HandleSetDungeonDifficultyOpcode: player %d sent an invalid instance mode %d!", _player->GetGUIDLow(), mode);
         return;
@@ -1496,13 +1496,60 @@ void WorldSession::HandleSetDungeonDifficultyOpcode( WorldPacket & recv_data )
             // the difficulty is set even if the instances can't be reset
             //_player->SendDungeonDifficulty(true);
             pGroup->ResetInstances(INSTANCE_RESET_CHANGE_DIFFICULTY, _player);
-            pGroup->SetDifficulty(mode);
+            pGroup->SetDungeonDifficulty(mode);
         }
     }
     else
     {
         _player->ResetInstances(INSTANCE_RESET_CHANGE_DIFFICULTY);
-        _player->SetDifficulty(mode);
+        _player->SetDungeonDifficulty(mode);
+    }
+}
+
+void WorldSession::HandleSetRaidDifficultyOpcode( WorldPacket & recv_data )
+{
+    CHECK_PACKET_SIZE(recv_data, 4);
+
+    sLog.outDebug("MSG_SET_RAID_DIFFICULTY");
+
+    uint32 mode;
+    recv_data >> mode;
+
+    if(mode == _player->GetRaidDifficulty())
+        return;
+
+    if(mode > RAID_DIFFICULTY_25MAN_HEROIC)
+    {
+        sLog.outError("WorldSession::HandleSetRaidDifficultyOpcode: player %d sent an invalid instance mode %d!", _player->GetGUIDLow(), mode);
+        return;
+    }
+
+    // cannot reset while in an instance
+    Map *map = _player->GetMap();
+    if(map && map->IsDungeon())
+    {
+        sLog.outError("WorldSession::HandleSetRaidDifficultyOpcode: player %d tried to reset the instance while inside!", _player->GetGUIDLow());
+        return;
+    }
+
+    if(_player->getLevel() < LEVELREQUIREMENT_HEROIC)
+        return;
+
+    Group *pGroup = _player->GetGroup();
+    if(pGroup)
+    {
+        if(pGroup->IsLeader(_player->GetGUID()))
+        {
+            // the difficulty is set even if the instances can't be reset
+            //_player->SendDungeonDifficulty(true);
+            pGroup->ResetInstances(INSTANCE_RESET_CHANGE_DIFFICULTY, _player);
+            pGroup->SetRaidDifficulty(mode);
+        }
+    }
+    else
+    {
+        _player->ResetInstances(INSTANCE_RESET_CHANGE_DIFFICULTY);
+        _player->SetRaidDifficulty(mode);
     }
 }
 

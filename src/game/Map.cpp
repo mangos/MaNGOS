@@ -2507,7 +2507,7 @@ void InstanceMap::UnloadAll(bool pForce)
 void InstanceMap::SendResetWarnings(uint32 timeLeft) const
 {
     for(MapRefManager::const_iterator itr = m_mapRefManager.begin(); itr != m_mapRefManager.end(); ++itr)
-        itr->getSource()->SendInstanceResetWarning(GetId(), itr->getSource()->GetDifficulty(), timeLeft);
+        itr->getSource()->SendInstanceResetWarning(GetId(), itr->getSource()->GetDungeonDifficulty(), timeLeft);
 }
 
 void InstanceMap::SetResetSchedule(bool on)
@@ -2534,7 +2534,7 @@ uint32 InstanceMap::GetMaxPlayers() const
 /* ******* Battleground Instance Maps ******* */
 
 BattleGroundMap::BattleGroundMap(uint32 id, time_t expiry, uint32 InstanceId)
-  : Map(id, expiry, InstanceId, DIFFICULTY_NORMAL)
+  : Map(id, expiry, InstanceId, DUNGEON_DIFFICULTY_NORMAL)
 {
 }
 

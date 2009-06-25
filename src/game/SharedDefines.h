@@ -2351,9 +2351,18 @@ enum DiminishingGroup
 
 enum DungeonDifficulties
 {
-    DIFFICULTY_NORMAL = 0,
-    DIFFICULTY_HEROIC = 1,
-    TOTAL_DIFFICULTIES
+    DUNGEON_DIFFICULTY_NORMAL = 0,
+    DUNGEON_DIFFICULTY_HEROIC = 1,
+    TOTAL_DUNGEON_DIFFICULTIES
+};
+
+enum RaidDifficulties
+{
+    RAID_DIFFICULTY_10MAN_NORMAL = 0,
+    RAID_DIFFICULTY_10MAN_HEROIC = 1,
+    RAID_DIFFICULTY_25MAN_NORMAL = 2,
+    RAID_DIFFICULTY_25MAN_HEROIC = 3,
+    TOTAL_RAID_DIFFICULTIES
 };
 
 enum SummonType
@@ -2519,9 +2528,11 @@ enum BattleGroundTypeId
     BATTLEGROUND_RL            = 8,
     BATTLEGROUND_SA            = 9,
     BATTLEGROUND_DS            = 10,
-    BATTLEGROUND_RV            = 11
+    BATTLEGROUND_RV            = 11,
+    BATTLEGROUND_IC            = 30,
+    BATTLEGROUND_ABG           = 32
 };
-#define MAX_BATTLEGROUND_TYPE_ID 12
+#define MAX_BATTLEGROUND_TYPE_ID 33
 
 enum MailResponseType
 {

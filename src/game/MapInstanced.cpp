@@ -153,7 +153,7 @@ Map* MapInstanced::GetInstance(const WorldObject* obj)
                 return map;
             }
 
-            InstancePlayerBind *pBind = player->GetBoundInstance(GetId(), player->GetDifficulty());
+            InstancePlayerBind *pBind = player->GetBoundInstance(GetId(), player->GetDungeonDifficulty());
             InstanceSave *pSave = pBind ? pBind->save : NULL;
 
             // the player's permanet player bind is taken into consideration first
@@ -163,7 +163,7 @@ Map* MapInstanced::GetInstance(const WorldObject* obj)
                 InstanceGroupBind *groupBind = NULL;
                 Group *group = player->GetGroup();
                 // use the player's difficulty setting (it may not be the same as the group's)
-                if(group && (groupBind = group->GetBoundInstance(GetId(), player->GetDifficulty())))
+                if(group && (groupBind = group->GetBoundInstance(GetId(), player->GetDungeonDifficulty())))
                     pSave = groupBind->save;
             }
 
@@ -182,7 +182,7 @@ Map* MapInstanced::GetInstance(const WorldObject* obj)
                 // if no instanceId via group members or instance saves is found
                 // the instance will be created for the first time
                 NewInstanceId = MapManager::Instance().GenerateInstanceId();
-                return CreateInstance(NewInstanceId, NULL, player->GetDifficulty());
+                return CreateInstance(NewInstanceId, NULL, player->GetDungeonDifficulty());
             }
         }
     }
@@ -208,7 +208,7 @@ InstanceMap* MapInstanced::CreateInstance(uint32 InstanceId, InstanceSave *save,
     }
 
     // some instances only have one difficulty
-    if (entry && !entry->SupportsHeroicMode()) difficulty = DIFFICULTY_NORMAL;
+    if (entry && !entry->SupportsHeroicMode()) difficulty = DUNGEON_DIFFICULTY_NORMAL;
 
     sLog.outDebug("MapInstanced::CreateInstance: %smap instance %d for %d created with difficulty %s", save?"":"new ", InstanceId, GetId(), difficulty?"heroic":"normal");
 

@@ -1505,6 +1505,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void UpdateDuelFlag(time_t currTime);
         void CheckDuelDistance(time_t currTime);
         void DuelComplete(DuelCompleteType type);
+        void SendDuelCountdown(uint32 counter);
 
         bool IsGroupVisibleFor(Player* p) const;
         bool IsInSameGroupWith(Player const* p) const;
@@ -1535,9 +1536,11 @@ class MANGOS_DLL_SPEC Player : public Unit
         uint32 GetArenaTeamIdInvited() { return m_ArenaTeamIdInvited; }
         static void LeaveAllArenaTeams(uint64 guid);
 
-        void SetDifficulty(uint32 dungeon_difficulty) { m_dungeonDifficulty = dungeon_difficulty; }
-        uint8 GetDifficulty() { return m_dungeonDifficulty; }
-        bool IsHeroic() { return m_dungeonDifficulty == DIFFICULTY_HEROIC; }
+        void SetDungeonDifficulty(uint32 dungeon_difficulty) { m_dungeonDifficulty = dungeon_difficulty; }
+        uint8 GetDungeonDifficulty() { return m_dungeonDifficulty; }
+        bool IsHeroicDungeon() { return m_dungeonDifficulty == DUNGEON_DIFFICULTY_HEROIC; }
+        void SetRaidDifficulty(uint32 raid_difficulty) { m_raidDifficulty = raid_difficulty; }
+        uint8 GetRaidDifficulty() { return m_raidDifficulty; }
 
         bool UpdateSkill(uint32 skill_id, uint32 step);
         bool UpdateSkillPro(uint16 SkillId, int32 Chance, uint32 step);
@@ -1625,6 +1628,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void SendExplorationExperience(uint32 Area, uint32 Experience);
 
         void SendDungeonDifficulty(bool IsInGroup);
+        void SendRaidDifficulty(bool IsInGroup);
         void ResetInstances(uint8 method);
         void SendResetInstanceSuccess(uint32 MapId);
         void SendResetInstanceFailed(uint32 reason, uint32 MapId);
@@ -2037,7 +2041,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         uint32 m_HomebindTimer;
         bool m_InstanceValid;
         // permanent binds and solo binds by difficulty
-        BoundInstancesMap m_boundInstances[TOTAL_DIFFICULTIES];
+        BoundInstancesMap m_boundInstances[TOTAL_DUNGEON_DIFFICULTIES];
         InstancePlayerBind* GetBoundInstance(uint32 mapid, uint8 difficulty);
         BoundInstancesMap& GetBoundInstances(uint8 difficulty) { return m_boundInstances[difficulty]; }
         void UnbindInstance(uint32 mapid, uint8 difficulty, bool unload = false);
@@ -2194,6 +2198,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         time_t m_speakTime;
         uint32 m_speakCount;
         uint32 m_dungeonDifficulty;
+        uint32 m_raidDifficulty;
 
         uint32 m_atLoginFlags;
 

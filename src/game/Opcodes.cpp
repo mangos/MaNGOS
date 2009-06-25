@@ -1284,7 +1284,7 @@ OpcodeHandler opcodeTable[NUM_MSG_TYPES] =
     /*0x4E7*/ { "UMSG_UNKNOWN_1255",                            STATUS_NEVER,    &WorldSession::Handle_NULL                     },
     /*0x4E8*/ { "UMSG_UNKNOWN_1256",                            STATUS_NEVER,    &WorldSession::Handle_NULL                     },
     /*0x4E9*/ { "UMSG_UNKNOWN_1257",                            STATUS_NEVER,    &WorldSession::Handle_NULL                     },
-    /*0x4EA*/ { "UMSG_UNKNOWN_1258",                            STATUS_NEVER,    &WorldSession::Handle_NULL                     },
+    /*0x4EA*/ { "MSG_SET_RAID_DIFFICULTY",                      STATUS_LOGGEDIN, &WorldSession::HandleSetRaidDifficultyOpcode   },
     /*0x4EB*/ { "UMSG_UNKNOWN_1259",                            STATUS_NEVER,    &WorldSession::Handle_NULL                     },
     /*0x4EC*/ { "UMSG_UNKNOWN_1260",                            STATUS_NEVER,    &WorldSession::Handle_NULL                     },
     /*0x4ED*/ { "UMSG_UNKNOWN_1261",                            STATUS_NEVER,    &WorldSession::Handle_NULL                     },

@@ -146,11 +146,12 @@ enum BattleGroundQueueTypeId
     BATTLEGROUND_QUEUE_AB       = 3,
     BATTLEGROUND_QUEUE_EY       = 4,
     BATTLEGROUND_QUEUE_SA       = 5,
-    BATTLEGROUND_QUEUE_2v2      = 6,
-    BATTLEGROUND_QUEUE_3v3      = 7,
-    BATTLEGROUND_QUEUE_5v5      = 8
+    BATTLEGROUND_QUEUE_IC       = 6,
+    BATTLEGROUND_QUEUE_2v2      = 7,
+    BATTLEGROUND_QUEUE_3v3      = 8,
+    BATTLEGROUND_QUEUE_5v5      = 9
 };
-#define MAX_BATTLEGROUND_QUEUE_TYPES 9
+#define MAX_BATTLEGROUND_QUEUE_TYPES 10
 
 enum BGQueueIdBasedOnLevel                        // queue_id for level ranges
 {
