@@ -71,9 +71,9 @@ inline uint32 Traveller<T>::GetTotalTrevelTimeTo(float x, float y, float z)
 template<>
 inline float Traveller<Creature>::Speed()
 {
-    if(i_traveller.HasUnitMovementFlag(MONSTER_MOVE_WALK))
+    if(i_traveller.HasMonsterMoveFlag(MONSTER_MOVE_WALK))
         return i_traveller.GetSpeed(MOVE_WALK);
-    else if(i_traveller.HasUnitMovementFlag(MONSTER_MOVE_FLY))
+    else if(i_traveller.HasMonsterMoveFlag(MONSTER_MOVE_FLY))
         return i_traveller.GetSpeed(MOVE_FLIGHT);
     else
         return i_traveller.GetSpeed(MOVE_RUN);
@@ -102,7 +102,7 @@ inline float Traveller<Creature>::GetMoveDestinationTo(float x, float y, float z
 template<>
 inline void Traveller<Creature>::MoveTo(float x, float y, float z, uint32 t)
 {
-    i_traveller.AI_SendMoveToPacket(x, y, z, t, i_traveller.GetUnitMovementFlags(), 0);
+    i_traveller.AI_SendMoveToPacket(x, y, z, t, i_traveller.GetMonsterMoveFlags(), 0);
 }
 
 // specialization for players
