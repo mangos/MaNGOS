@@ -38,6 +38,7 @@ alter table creature_movement add `wpguid` int(11) default '0';
 #include "DestinationHolderImp.h"
 #include "CreatureAI.h"
 #include "WaypointManager.h"
+#include "WorldPacket.h"
 
 #include <cassert>
 
@@ -261,7 +262,9 @@ void FlightPathMovementGenerator::Finalize(Player & player)
         if(player.pvpInfo.inHostileArea)
             player.CastSpell(&player, 2479, true);
 
-        player.SetUnitMovementFlags(MONSTER_MOVE_WALK);
+        // update z position to ground and orientation for landing point
+        // this prevent cheating with landing  point at lags
+        // when client side flight end early in comparison server side
         player.StopMoving();
     }
 }
