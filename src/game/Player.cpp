@@ -449,9 +449,6 @@ Player::Player (WorldSession *session): Unit(), m_achievementMgr(this), m_reputa
     m_summon_y = 0.0f;
     m_summon_z = 0.0f;
 
-    //Default movement to run mode
-    m_unit_movement_flags = 0;
-
     m_mover = this;
 
     m_miniPet = 0;
@@ -1623,7 +1620,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
     }
 
     // reset movement flags at teleport, because player will continue move with these flags after teleport
-    m_movementInfo.flags = 0;
+    m_movementInfo.SetMovementFlags(MOVEMENTFLAG_NONE);
 
     if ((GetMapId() == mapid) && (!m_transport))
     {
@@ -17970,7 +17967,7 @@ void Player::SendInitialPacketsBeforeAddToMap()
 
     // set fly flag if in fly form or taxi flight to prevent visually drop at ground in showup moment
     if(HasAuraType(SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED) || isInFlight())
-        m_movementInfo.flags |= MOVEMENTFLAG_FLYING2;
+        m_movementInfo.AddMovementFlag(MOVEMENTFLAG_FLYING2);
 
     m_mover = this;
 }
@@ -20320,4 +20317,19 @@ void Player::SendClearCooldown( uint32 spell_id, Unit* target )
     data << uint32(spell_id);
     data << uint64(target->GetGUID());
     SendDirectMessage(&data);
+}
+
+void Player::BuildTeleportAckMsg( WorldPacket *data, float x, float y, float z, float ang ) const
+{
+    data->Initialize(MSG_MOVE_TELEPORT_ACK, 41);
+    data->append(GetPackGUID());
+    *data << uint32(0);                                     // this value increments every time
+    *data << uint32(m_movementInfo.GetMovementFlags());     // movement flags
+    *data << uint16(0);                                     // 2.3.0
+    *data << uint32(getMSTime());                           // time
+    *data << x;
+    *data << y;
+    *data << z;
+    *data << ang;
+    *data << uint32(0);
 }

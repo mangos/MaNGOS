@@ -64,7 +64,6 @@ ConfusedMovementGenerator<T>::Initialize(T &unit)
     }
 
     unit.StopMoving();
-    unit.RemoveUnitMovementFlag(MONSTER_MOVE_WALK);
     unit.addUnitState(UNIT_STAT_CONFUSED);
 }
 
@@ -72,6 +71,8 @@ template<>
 void
 ConfusedMovementGenerator<Creature>::_InitSpecific(Creature &creature, bool &is_water_ok, bool &is_land_ok)
 {
+    creature.RemoveMonsterMoveFlag(MONSTER_MOVE_WALK);
+
     is_water_ok = creature.canSwim();
     is_land_ok  = creature.canWalk();
 }
@@ -138,17 +139,21 @@ ConfusedMovementGenerator<T>::Update(T &unit, const uint32 &diff)
     return true;
 }
 
-template<class T>
-void
-ConfusedMovementGenerator<T>::Finalize(T &unit)
+template<>
+void ConfusedMovementGenerator<Player>::Finalize(Player &unit)
 {
     unit.clearUnitState(UNIT_STAT_CONFUSED);
 }
 
+template<>
+void ConfusedMovementGenerator<Creature>::Finalize(Creature &unit)
+{
+    unit.clearUnitState(UNIT_STAT_CONFUSED);
+    unit.AddMonsterMoveFlag(MONSTER_MOVE_WALK);
+}
+
 template void ConfusedMovementGenerator<Player>::Initialize(Player &player);
 template void ConfusedMovementGenerator<Creature>::Initialize(Creature &creature);
-template void ConfusedMovementGenerator<Player>::Finalize(Player &player);
-template void ConfusedMovementGenerator<Creature>::Finalize(Creature &creature);
 template void ConfusedMovementGenerator<Player>::Reset(Player &player);
 template void ConfusedMovementGenerator<Creature>::Reset(Creature &creature);
 template bool ConfusedMovementGenerator<Player>::Update(Player &player, const uint32 &diff);

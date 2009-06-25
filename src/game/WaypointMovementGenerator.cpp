@@ -110,7 +110,7 @@ bool WaypointMovementGenerator<Creature>::Update(Creature &creature, const uint3
             // Now we re-set destination to same node and start travel
             creature.addUnitState(UNIT_STAT_ROAMING);
             if (creature.canFly())
-                creature.AddUnitMovementFlag(MONSTER_MOVE_FLY);
+                creature.AddMonsterMoveFlag(MONSTER_MOVE_FLY);
             const WaypointNode &node = i_path->at(i_currentNode);
             i_destinationHolder.SetDestination(traveller, node.x, node.y, node.z);
             i_nextMoveTime.Reset(i_destinationHolder.GetTotalTravelTime());
@@ -173,7 +173,7 @@ bool WaypointMovementGenerator<Creature>::Update(Creature &creature, const uint3
         {
             creature.addUnitState(UNIT_STAT_ROAMING);
             if (creature.canFly())
-                creature.AddUnitMovementFlag(MONSTER_MOVE_FLY);
+                creature.AddMonsterMoveFlag(MONSTER_MOVE_FLY);
             const WaypointNode &node = i_path->at(i_currentNode);
             i_destinationHolder.SetDestination(traveller, node.x, node.y, node.z);
             i_nextMoveTime.Reset(i_destinationHolder.GetTotalTravelTime());
