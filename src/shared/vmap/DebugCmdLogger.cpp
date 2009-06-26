@@ -17,6 +17,7 @@
  */
 
 #include "DebugCmdLogger.h"
+#include <stdio.h>
 
 using namespace G3D;
 
