@@ -1042,32 +1042,25 @@ void Spell::EffectDummy(uint32 i)
                 {
                     if(!unitTarget || m_caster->GetTypeId() != TYPEID_PLAYER )
                         return;
-
-                    if(!unitTarget)
+                    // Spell has scriptable target but for sure.
+                    if (unitTarget->GetTypeId() != TYPEID_UNIT)
                         return;
 
-                    TemporarySummon* tempSummon = dynamic_cast<TemporarySummon*>(unitTarget);
-                    if(!tempSummon)
-                        return;
+                    uint32 health = unitTarget->GetHealth();
+                    float x, y, z, o;
 
-                    uint32 health = tempSummon->GetHealth();
+                    unitTarget->GetPosition(x, y, z);
+                    o = unitTarget->GetOrientation();
+                    ((Creature*)unitTarget)->ForcedDespawn();
 
-                    float x = tempSummon->GetPositionX();
-                    float y = tempSummon->GetPositionY();
-                    float z = tempSummon->GetPositionZ();
-                    float o = tempSummon->GetOrientation();
-                    tempSummon->UnSummon();
+                    if (Creature* summon = m_caster->SummonCreature(16992, x, y, z, o,TEMPSUMMON_TIMED_OR_DEAD_DESPAWN,180000))
+                    {
+                        summon->SetHealth(health);
+                        ((Player*)m_caster)->RewardPlayerAndGroupAtEvent(16992, summon);
 
-                    Creature* pCreature = m_caster->SummonCreature(16992, x, y, z, o,TEMPSUMMON_TIMED_OR_DEAD_DESPAWN,180000);
-                    if (!pCreature)
-                        return;
-
-                    pCreature->SetHealth(health);
-                    ((Player*)m_caster)->RewardPlayerAndGroupAtEvent(16992, pCreature);
-
-                    if (pCreature->AI())
-                        pCreature->AI()->AttackStart(m_caster);
-
+                        if (summon->AI())
+                            summon->AI()->AttackStart(m_caster);
+                    }
                     return;
                 }
                 case 44997:                                 // Converting Sentry
