@@ -2087,10 +2087,10 @@ void SpellMgr::LoadSpellPetAuras()
 
         bar.step();
 
-        uint16 spell = fields[0].GetUInt16();
+        uint32 spell = fields[0].GetUInt32();
         uint8 eff = fields[1].GetUInt8();
-        uint16 pet = fields[2].GetUInt16();
-        uint16 aura = fields[3].GetUInt16();
+        uint32 pet = fields[2].GetUInt32();
+        uint32 aura = fields[3].GetUInt32();
 
         SpellPetAuraMap::iterator itr = mSpellPetAuraMap.find((spell<<8) + eff);
         if(itr != mSpellPetAuraMap.end())

@@ -69,7 +69,7 @@ enum PetSpellType
 
 struct PetSpell
 {
-    uint16 active;                                          // use instead enum (not good use *uint16* limited enum in case when value in enum not possitive in *int16*)
+    uint8 active;                                           // use instead enum (not good use *uint8* limited enum in case when value in enum not possitive in *int8*)
 
     PetSpellState state : 8;
     PetSpellType type   : 8;
