@@ -720,7 +720,7 @@ void SpellMgr::LoadSpellAffects()
 
         bar.step();
 
-        uint16 entry = fields[0].GetUInt16();
+        uint32 entry = fields[0].GetUInt32();
         uint8 effectId = fields[1].GetUInt8();
 
         SpellEntry const* spellInfo = sSpellStore.LookupEntry(entry);
@@ -1039,7 +1039,7 @@ void SpellMgr::LoadSpellElixirs()
 
         bar.step();
 
-        uint16 entry = fields[0].GetUInt16();
+        uint32 entry = fields[0].GetUInt32();
         uint8 mask = fields[1].GetUInt8();
 
         SpellEntry const* spellInfo = sSpellStore.LookupEntry(entry);
