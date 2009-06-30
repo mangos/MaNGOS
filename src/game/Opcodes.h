@@ -693,7 +693,7 @@ enum Opcodes
     CMSG_BUYBACK_ITEM                               = 0x290,
     SMSG_SERVER_MESSAGE                             = 0x291,
     CMSG_MEETINGSTONE_JOIN                          = 0x292,
-    CMSG_MEETINGSTONE_LEAVE                         = 0x293, // SMSG?
+    SMSG_MEETINGSTONE_LEAVE                         = 0x293,
     CMSG_MEETINGSTONE_CHEAT                         = 0x294,
     SMSG_MEETINGSTONE_SETQUEUE                      = 0x295,
     CMSG_MEETINGSTONE_INFO                          = 0x296,
@@ -1075,7 +1075,7 @@ enum Opcodes
     CMSG_REFER_A_FRIEND                             = 0x40E,
     MSG_GM_CHANGE_ARENA_RATING                      = 0x40F,
     CMSG_DECLINE_CHANNEL_INVITE                     = 0x410,
-    CMSG_GROUPACTION_THROTTLED                      = 0x411,
+    CMSG_GROUPACTION_THROTTLED                      = 0x411, // SMSG?
     SMSG_OVERRIDE_LIGHT                             = 0x412,
     SMSG_TOTEM_CREATED                              = 0x413,
     CMSG_TOTEM_DESTROYED                            = 0x414,
@@ -1224,7 +1224,7 @@ enum Opcodes
     SMSG_SERVER_BUCK_DATA_START                     = 0x4A3, // not found
     CMSG_QUERY_VEHICLE_STATUS                       = 0x4A4, // not found
     UMSG_UNKNOWN_1189                               = 0x4A5, // not found, old SMSG_PET_GUIDS
-    SMSG_UNKNOWN_1190                               = 0x4A6, // smsg unk, old SMSG_CLIENTCACHE_VERSION
+    SMSG_UNKNOWN_1190                               = 0x4A6, // smsg unk, "You can't do that yet"
     SMSG_UNKNOWN_1191                               = 0x4A7, // smsg guid+uint32 (vehicle)
     CMSG_UNKNOWN_1192                               = 0x4A8, // cmsg uint64
     CMSG_EJECT_PASSENGER                            = 0x4A9, // cmsg uint64
@@ -1258,7 +1258,7 @@ enum Opcodes
     UMSG_UNKNOWN_1221                               = 0x4C5, // not found 3.2
     UMSG_UNKNOWN_1222                               = 0x4C6, // not found 3.2
     SMSG_UNKNOWN_1223                               = 0x4C7, // uint64, arena pet? 3.2
-    SMSG_UNKNOWN_1224                               = 0x4C8, // uint32 "Can't change arena team..." 3.2
+    SMSG_UNKNOWN_1224                               = 0x4C8, // uint32 "Can't modify arena team while queued or in a match." 3.2
     UMSG_UNKNOWN_1225                               = 0x4C9, // not found 3.2
     UMSG_UNKNOWN_1226                               = 0x4CA, // not found 3.2
     UMSG_UNKNOWN_1227                               = 0x4CB, // not found 3.2
@@ -1280,14 +1280,14 @@ enum Opcodes
     UMSG_UNKNOWN_1243                               = 0x4DB, // not found 3.2
     UMSG_UNKNOWN_1244                               = 0x4DC, // not found 3.2
     UMSG_UNKNOWN_1245                               = 0x4DD, // not found 3.2
-    SMSG_UNKNOWN_1246                               = 0x4DE, // uint32
+    SMSG_UNKNOWN_1246                               = 0x4DE, // uint32, BattlefieldMgrEntryInvite
     CMSG_UNKNOWN_1247                               = 0x4DF, // lua: BattlefieldMgrEntryInviteResponse
     SMSG_UNKNOWN_1248                               = 0x4E0, // uint32, uint8, uint8
-    SMSG_UNKNOWN_1249                               = 0x4E1, // uint32
+    SMSG_UNKNOWN_1249                               = 0x4E1, // uint32 BattlefieldMgrQueueInvite
     CMSG_UNKNOWN_1250                               = 0x4E2, // lua: BattlefieldMgrQueueInviteResponse
     CMSG_UNKNOWN_1251                               = 0x4E3, // lua: BattlefieldMgrQueueRequest
-    SMSG_UNKNOWN_1252                               = 0x4E4, // uint32, uint8
-    SMSG_UNKNOWN_1253                               = 0x4E5, // uint32
+    SMSG_UNKNOWN_1252                               = 0x4E4, // uint32, uint8 queue full/can't join
+    SMSG_UNKNOWN_1253                               = 0x4E5, // uint32 wintergrasp is full, you'll be ejected soon
     SMSG_UNKNOWN_1254                               = 0x4E6, // uint32, uint32, uint8
     CMSG_UNKNOWN_1255                               = 0x4E7, // lua: BattlefieldMgrExitRequest
     SMSG_UNKNOWN_1256                               = 0x4E8, // uint32, uint32
@@ -1295,8 +1295,13 @@ enum Opcodes
     MSG_SET_RAID_DIFFICULTY                         = 0x4EA, // lua: SetRaidDificulty
     UMSG_UNKNOWN_1259                               = 0x4EB, // not found 3.2
     SMSG_TOGGLE_XP_GAIN                             = 0x4EC, // enable/disable XP gain console message
-    UMSG_UNKNOWN_1261                               = 0x4ED, // not found 3.2
-    NUM_MSG_TYPES                                   = 0x4EE
+    SMSG_UNKNOWN_1261                               = 0x4ED,
+    SMSG_UNKNOWN_1262                               = 0x4EE,
+    CMSG_UNKNOWN_1263                               = 0x4EF, // lua: GMResponseResolve
+    SMSG_UNKNOWN_1264                               = 0x4F0,
+    UMSG_UNKNOWN_1265                               = 0x4F1, // not found 3.2
+    UMSG_UNKNOWN_1266                               = 0x4F2, // not found 3.2
+    NUM_MSG_TYPES                                   = 0x4F3
 };
 
 /// Player state
