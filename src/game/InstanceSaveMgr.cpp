@@ -128,7 +128,7 @@ void InstanceSaveManager::RemoveInstanceSave(uint32 InstanceId)
     InstanceSaveHashMap::iterator itr = m_instanceSaveById.find( InstanceId );
     if(itr != m_instanceSaveById.end())
     {
-        // save the resettime for instances only when they get unloaded
+        // save the resettime for normal instances only when they get unloaded
         if(time_t resettime = itr->second->GetResetTimeForDB())
             CharacterDatabase.PExecute("UPDATE instance SET resettime = '"UI64FMTD"' WHERE id = '%u'", (uint64)resettime, InstanceId);
         delete itr->second;
@@ -173,7 +173,12 @@ void InstanceSave::SaveToDB()
 
 time_t InstanceSave::GetResetTimeForDB()
 {
-    return GetResetTime();
+    // only save the reset time for normal instances
+    const MapEntry *entry = sMapStore.LookupEntry(GetMapId());
+    if(!entry || entry->map_type == MAP_RAID || GetDifficulty() == DIFFICULTY_HEROIC)
+        return 0;
+    else
+        return GetResetTime();
 }
 
 // to cache or not to cache, that is the question
