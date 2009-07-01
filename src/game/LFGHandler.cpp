@@ -40,6 +40,10 @@ static void AttemptJoin(Player* _player)
         if(!plr || plr==_player || plr->GetTeam() != _player->GetTeam())
             continue;
 
+        //skip players not in world
+        if(!plr->IsInWorld())
+            continue;
+
         // skip not auto add, not group leader cases
         if(!plr->GetSession()->LookingForGroup_auto_add || plr->GetGroup() && plr->GetGroup()->GetLeaderGUID()!=plr->GetGUID())
             continue;
@@ -94,6 +98,9 @@ static void AttemptAddMore(Player* _player)
 
         // skip enemies and self
         if(!plr || plr==_player || plr->GetTeam() != _player->GetTeam())
+            continue;
+
+        if(!plr->IsInWorld())
             continue;
 
         // skip not auto join or in group
@@ -307,6 +314,9 @@ void WorldSession::SendLfgResult(uint32 type, uint32 entry, uint8 lfg_type)
         Player *plr = iter->second;
 
         if(!plr || plr->GetTeam() != _player->GetTeam())
+            continue;
+
+        if(!plr->IsInWorld())
             continue;
 
         if(!plr->m_lookingForGroup.HaveInSlot(entry, type))

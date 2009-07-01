@@ -32,6 +32,7 @@
 #include "GridNotifiersImpl.h"
 #include "CellImpl.h"
 #include "Language.h"
+#include "MapManager.h"
 
 #include "Policies/SingletonImp.h"
 
@@ -825,8 +826,8 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                 if(!miscvalue1)
                     continue;
 
-                Map const* map = GetPlayer()->GetMap();
-                if(!map->IsDungeon())
+                Map const* map = GetPlayer()->IsInWorld() ? GetPlayer()->GetMap() : MapManager::Instance().FindMap(GetPlayer()->GetMapId(), GetPlayer()->GetInstanceId());
+                if(!map || !map->IsDungeon())
                     continue;
 
                 // search case
