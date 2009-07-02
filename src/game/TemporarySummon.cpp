@@ -165,7 +165,6 @@ void TemporarySummon::UnSummon()
 {
     CombatStop();
 
-    CleanupsBeforeDelete();
     AddObjectToRemoveList();
 
     Unit* sum = m_summoner ? ObjectAccessor::GetUnit(*this, m_summoner) : NULL;

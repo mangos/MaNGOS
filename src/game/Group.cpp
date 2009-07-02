@@ -963,7 +963,7 @@ void Group::SendUpdate()
 
 void Group::UpdatePlayerOutOfRange(Player* pPlayer)
 {
-    if(!pPlayer)
+    if(!pPlayer || !pPlayer->IsInWorld())
         return;
 
     Player *player;
@@ -1504,7 +1504,7 @@ void Group::ResetInstances(uint8 method, Player* SendMsgTo)
         bool isEmpty = true;
         // if the map is loaded, reset it
         Map *map = MapManager::Instance().FindMap(p->GetMapId(), p->GetInstanceId());
-        if(map && map->IsDungeon())
+        if(map && map->IsDungeon() && !(method == INSTANCE_RESET_GROUP_DISBAND && !p->CanReset()))
             isEmpty = ((InstanceMap*)map)->Reset(method);
 
         if(SendMsgTo)

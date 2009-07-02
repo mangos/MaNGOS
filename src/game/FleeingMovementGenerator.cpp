@@ -285,7 +285,6 @@ FleeingMovementGenerator<T>::Initialize(T &owner)
         return;
 
     _Init(owner);
-    owner.RemoveUnitMovementFlag(MONSTER_MOVE_WALK);
 
     if(Unit * fright = ObjectAccessor::GetUnit(owner, i_frightGUID))
     {
@@ -313,6 +312,8 @@ FleeingMovementGenerator<Creature>::_Init(Creature &owner)
 {
     if(!&owner)
         return;
+
+    owner.RemoveMonsterMoveFlag(MONSTER_MOVE_WALK);
     owner.SetUInt64Value(UNIT_FIELD_TARGET, 0);
     is_water_ok = owner.canSwim();
     is_land_ok  = owner.canWalk();
@@ -326,10 +327,16 @@ FleeingMovementGenerator<Player>::_Init(Player &)
     is_land_ok  = true;
 }
 
-template<class T>
-void
-FleeingMovementGenerator<T>::Finalize(T &owner)
+template<>
+void FleeingMovementGenerator<Player>::Finalize(Player &owner)
 {
+    owner.clearUnitState(UNIT_STAT_FLEEING);
+}
+
+template<>
+void FleeingMovementGenerator<Creature>::Finalize(Creature &owner)
+{
+    owner.AddMonsterMoveFlag(MONSTER_MOVE_WALK);
     owner.clearUnitState(UNIT_STAT_FLEEING);
 }
 
@@ -379,8 +386,6 @@ template bool FleeingMovementGenerator<Player>::_getPoint(Player &, float &, flo
 template bool FleeingMovementGenerator<Creature>::_getPoint(Creature &, float &, float &, float &);
 template void FleeingMovementGenerator<Player>::_setTargetLocation(Player &);
 template void FleeingMovementGenerator<Creature>::_setTargetLocation(Creature &);
-template void FleeingMovementGenerator<Player>::Finalize(Player &);
-template void FleeingMovementGenerator<Creature>::Finalize(Creature &);
 template void FleeingMovementGenerator<Player>::Reset(Player &);
 template void FleeingMovementGenerator<Creature>::Reset(Creature &);
 template bool FleeingMovementGenerator<Player>::Update(Player &, const uint32 &);

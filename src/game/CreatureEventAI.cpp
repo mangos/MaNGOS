@@ -90,7 +90,7 @@ CreatureEventAI::CreatureEventAI(Creature *c ) : CreatureAI(c)
     Phase = 0;
     CombatMovementEnabled = true;
     MeleeEnabled = true;
-    AttackDistance = 0;
+    AttackDistance = 0.0f;
     AttackAngle = 0.0f;
 
     //Handle Spawned Events
@@ -482,8 +482,8 @@ void CreatureEventAI::ProcessAction(CreatureEventAI_Action const& action, uint32
                         {
                             if (m_creature->GetMotionMaster()->GetCurrentMovementGeneratorType() == TARGETED_MOTION_TYPE)
                             {
-                                AttackDistance = 0;
-                                AttackAngle = 0;
+                                AttackDistance = 0.0f;
+                                AttackAngle = 0.0f;
 
                                 m_creature->GetMotionMaster()->Clear(false);
                                 m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim(), AttackDistance, AttackAngle);
@@ -652,8 +652,8 @@ void CreatureEventAI::ProcessAction(CreatureEventAI_Action const& action, uint32
                 target->RemoveAurasDueToSpell(action.remove_aura.spellId);
             break;
         case ACTION_T_RANGED_MOVEMENT:
-            AttackDistance = action.ranged_movement.distance;
-            AttackAngle = ((float)action.ranged_movement.angle/180)*M_PI;
+            AttackDistance = (float)action.ranged_movement.distance;
+            AttackAngle = action.ranged_movement.angle/180.0f*M_PI;
 
             if (CombatMovementEnabled)
             {
@@ -761,15 +761,10 @@ void CreatureEventAI::ProcessAction(CreatureEventAI_Action const& action, uint32
             m_creature->DealDamage(m_creature, m_creature->GetMaxHealth(),NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
             break;
         case ACTION_T_ZONE_COMBAT_PULSE:
-            if (!m_creature->isInCombat() || !m_creature->GetMap()->IsDungeon())
-            {
-
-                sLog.outErrorDb("CreatureEventAI: Event %d ACTION_T_ZONE_COMBAT_PULSE on creature out of combat or in non-dungeon map. Creature %d", EventId, m_creature->GetEntry());
-                return;
-            }
-
-            DoZoneInCombat(m_creature);
+        {
+            m_creature->SetInCombatWithZone();
             break;
+        }
         case ACTION_T_CALL_FOR_HELP:
         {
             m_creature->CallForHelp(action.call_for_help.radius);
@@ -1318,33 +1313,6 @@ void CreatureEventAI::DoScriptText(int32 textEntry, WorldObject* pSource, Unit* 
             pSource->MonsterYellToZone(textEntry, (*i).second.Language, target ? target->GetGUID() : 0);
             break;
     }
-}
-
-void CreatureEventAI::DoZoneInCombat(Unit* pUnit)
-{
-    if (!pUnit)
-        pUnit = m_creature;
-
-    Map *map = pUnit->GetMap();
-
-    if (!map->IsDungeon())                                  //use IsDungeon instead of Instanceable, in case battlegrounds will be instantiated
-    {
-        sLog.outErrorDb("CreatureEventAI: DoZoneInCombat call for map that isn't an instance (pUnit entry = %d)", pUnit->GetTypeId() == TYPEID_UNIT ? ((Creature*)pUnit)->GetEntry() : 0);
-        return;
-    }
-
-    if (!pUnit->CanHaveThreatList() || pUnit->getThreatManager().isThreatListEmpty())
-    {
-        sLog.outErrorDb("CreatureEventAI: DoZoneInCombat called for creature that either cannot have threat list or has empty threat list (pUnit entry = %d)", pUnit->GetTypeId() == TYPEID_UNIT ? ((Creature*)pUnit)->GetEntry() : 0);
-
-        return;
-    }
-
-    Map::PlayerList const &PlayerList = map->GetPlayers();
-    for(Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-        if (Player* i_pl = i->getSource())
-            if (!i_pl->isGameMaster())
-                pUnit->AddThreat(i_pl, 0.0f);
 }
 
 void CreatureEventAI::DoMeleeAttackIfReady()

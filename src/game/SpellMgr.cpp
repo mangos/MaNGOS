@@ -331,6 +331,7 @@ bool IsPositiveEffect(uint32 spellId, uint32 effIndex)
                         case 38637:                         // Nether Exhaustion (red)
                         case 38638:                         // Nether Exhaustion (green)
                         case 38639:                         // Nether Exhaustion (blue)
+                        case 11196:                         // Recently Bandaged
                             return false;
                         // some spells have unclear target modes for selection, so just make effect positive
                         case 27184:                         
@@ -719,7 +720,7 @@ void SpellMgr::LoadSpellAffects()
 
         bar.step();
 
-        uint16 entry = fields[0].GetUInt16();
+        uint32 entry = fields[0].GetUInt32();
         uint8 effectId = fields[1].GetUInt8();
 
         SpellEntry const* spellInfo = sSpellStore.LookupEntry(entry);
@@ -1038,7 +1039,7 @@ void SpellMgr::LoadSpellElixirs()
 
         bar.step();
 
-        uint16 entry = fields[0].GetUInt16();
+        uint32 entry = fields[0].GetUInt32();
         uint8 mask = fields[1].GetUInt8();
 
         SpellEntry const* spellInfo = sSpellStore.LookupEntry(entry);
@@ -1858,7 +1859,13 @@ void SpellMgr::LoadSpellLearnSpells()
 
         if(!sSpellStore.LookupEntry(node.spell))
         {
-            sLog.outErrorDb("Spell %u listed in `spell_learn_spell` does not exist",node.spell);
+            sLog.outErrorDb("Spell %u listed in `spell_learn_spell` learning not existed spell %u",spell_id,node.spell);
+            continue;
+        }
+
+        if(GetTalentSpellCost(node.spell))
+        {
+            sLog.outErrorDb("Spell %u listed in `spell_learn_spell` attempt learning talent spell %u, skipped",spell_id,node.spell);
             continue;
         }
 
@@ -2064,8 +2071,8 @@ void SpellMgr::LoadSpellPetAuras()
 
     uint32 count = 0;
 
-    //                                                0      1    2
-    QueryResult *result = WorldDatabase.Query("SELECT spell, pet, aura FROM spell_pet_auras");
+    //                                                0      1         2    3
+    QueryResult *result = WorldDatabase.Query("SELECT spell, effectId, pet, aura FROM spell_pet_auras");
     if( !result )
     {
 
@@ -2086,11 +2093,12 @@ void SpellMgr::LoadSpellPetAuras()
 
         bar.step();
 
-        uint16 spell = fields[0].GetUInt16();
-        uint16 pet = fields[1].GetUInt16();
-        uint16 aura = fields[2].GetUInt16();
+        uint32 spell = fields[0].GetUInt32();
+        uint8 eff = fields[1].GetUInt8();
+        uint32 pet = fields[2].GetUInt32();
+        uint32 aura = fields[3].GetUInt32();
 
-        SpellPetAuraMap::iterator itr = mSpellPetAuraMap.find(spell);
+        SpellPetAuraMap::iterator itr = mSpellPetAuraMap.find((spell<<8) + eff);
         if(itr != mSpellPetAuraMap.end())
         {
             itr->second.AddAura(pet, aura);
@@ -2103,14 +2111,10 @@ void SpellMgr::LoadSpellPetAuras()
                 sLog.outErrorDb("Spell %u listed in `spell_pet_auras` does not exist", spell);
                 continue;
             }
-            int i = 0;
-            for(; i < 3; ++i)
-                if((spellInfo->Effect[i] == SPELL_EFFECT_APPLY_AURA &&
-                    spellInfo->EffectApplyAuraName[i] == SPELL_AURA_DUMMY) ||
-                    spellInfo->Effect[i] == SPELL_EFFECT_DUMMY)
-                    break;
 
-            if(i == 3)
+            if (spellInfo->Effect[eff] != SPELL_EFFECT_DUMMY &&
+               (spellInfo->Effect[eff] != SPELL_EFFECT_APPLY_AURA ||
+                spellInfo->EffectApplyAuraName[eff] != SPELL_AURA_DUMMY))
             {
                 sLog.outError("Spell %u listed in `spell_pet_auras` does not have dummy aura or dummy effect", spell);
                 continue;
@@ -2123,8 +2127,8 @@ void SpellMgr::LoadSpellPetAuras()
                 continue;
             }
 
-            PetAura pa(pet, aura, spellInfo->EffectImplicitTargetA[i] == TARGET_PET, spellInfo->CalculateSimpleValue(i));
-            mSpellPetAuraMap[spell] = pa;
+            PetAura pa(pet, aura, spellInfo->EffectImplicitTargetA[eff] == TARGET_PET, spellInfo->CalculateSimpleValue(eff));
+            mSpellPetAuraMap[(spell<<8) + eff] = pa;
         }
 
         ++count;
@@ -2319,8 +2323,9 @@ bool SpellMgr::IsSpellValid(SpellEntry const* spellInfo, Player* pl, bool msg)
             case 0:
                 continue;
 
-                // craft spell for crafting non-existed item (break client recipes list show)
+            // craft spell for crafting non-existed item (break client recipes list show)
             case SPELL_EFFECT_CREATE_ITEM:
+            case SPELL_EFFECT_CREATE_ITEM_2:
             {
                 if(!ObjectMgr::GetItemPrototype( spellInfo->EffectItemType[i] ))
                 {
@@ -2719,36 +2724,32 @@ DiminishingGroup GetDiminishingReturnsGroupForSpell(SpellEntry const* spellproto
     {
         case SPELLFAMILY_ROGUE:
         {
-            // Kidney Shot
-            if (spellproto->SpellFamilyFlags & UI64LIT(0x00000200000))
-                return DIMINISHING_KIDNEYSHOT;
             // Blind
-            else if (spellproto->SpellFamilyFlags & UI64LIT(0x00001000000))
-                return DIMINISHING_BLIND_CYCLONE;
-            break;
-        }
-        case SPELLFAMILY_HUNTER:
-        {
-            // Freezing trap
-            if (spellproto->SpellFamilyFlags & UI64LIT(0x00000000008))
-                return DIMINISHING_FREEZE;
+            if (spellproto->SpellFamilyFlags & UI64LIT(0x00001000000))
+                return DIMINISHING_FEAR_BLIND;
+            // Cheap Shot
+            else if (spellproto->SpellFamilyFlags & UI64LIT(0x00000000400))
+                return DIMINISHING_CHEAPSHOT_POUNCE;
             break;
         }
         case SPELLFAMILY_WARLOCK:
         {
-            // Fear
-            if (spellproto->SpellFamilyFlags & UI64LIT(0x40840000000))
-                return DIMINISHING_WARLOCK_FEAR;
             // Curses/etc
-            else if (spellproto->SpellFamilyFlags & UI64LIT(0x00080000000))
+            if (spellproto->SpellFamilyFlags & UI64LIT(0x00080000000))
                 return DIMINISHING_LIMITONLY;
+            // Seduction
+            else if (spellproto->SpellFamilyFlags & UI64LIT(0x00040000000))
+                return DIMINISHING_CHARM;
             break;
         }
         case SPELLFAMILY_DRUID:
         {
             // Cyclone
             if (spellproto->SpellFamilyFlags & UI64LIT(0x02000000000))
-                return DIMINISHING_BLIND_CYCLONE;
+                return DIMINISHING_CYCLONE;
+            // Pounce
+            else if (spellproto->SpellFamilyFlags & UI64LIT(0x00000020000))
+                return DIMINISHING_CHEAPSHOT_POUNCE;
             break;
         }
         case SPELLFAMILY_WARRIOR:
@@ -2756,6 +2757,20 @@ DiminishingGroup GetDiminishingReturnsGroupForSpell(SpellEntry const* spellproto
             // Hamstring - limit duration to 10s in PvP
             if (spellproto->SpellFamilyFlags & UI64LIT(0x00000000002))
                 return DIMINISHING_LIMITONLY;
+            break;
+        }
+        case SPELLFAMILY_PALADIN:
+        {
+            // Turn Evil
+            if (spellproto->SpellFamilyFlags & UI64LIT(0x00804000000000))
+                return DIMINISHING_FEAR_BLIND;
+            break;
+        }
+        case SPELLFAMILY_DEATHKNIGHT:
+        {
+            // Hungering Cold (no flags)
+            if (spellproto->SpellIconID == 2797)
+                return DIMINISHING_POLYMORPH_GOUGE_SAP;
             break;
         }
         default:
@@ -2766,20 +2781,49 @@ DiminishingGroup GetDiminishingReturnsGroupForSpell(SpellEntry const* spellproto
     uint32 mechanic = GetAllSpellMechanicMask(spellproto);
     if (mechanic == MECHANIC_NONE)          return DIMINISHING_NONE;
     if (mechanic & (1<<MECHANIC_STUN))      return triggered ? DIMINISHING_TRIGGER_STUN : DIMINISHING_CONTROL_STUN;
-    if (mechanic & (1<<MECHANIC_SLEEP))     return DIMINISHING_SLEEP;
-    if (mechanic & (1<<MECHANIC_POLYMORPH)) return DIMINISHING_POLYMORPH;
+    if (mechanic & (1<<MECHANIC_SLEEP))     return DIMINISHING_FREEZE_SLEEP;
+    if (mechanic & (1<<MECHANIC_POLYMORPH)) return DIMINISHING_POLYMORPH_GOUGE_SAP;
     if (mechanic & (1<<MECHANIC_ROOT))      return triggered ? DIMINISHING_TRIGGER_ROOT : DIMINISHING_CONTROL_ROOT;
-    if (mechanic & (1<<MECHANIC_FEAR))      return DIMINISHING_FEAR;
+    if (mechanic & (1<<MECHANIC_FEAR))      return DIMINISHING_FEAR_BLIND;
     if (mechanic & (1<<MECHANIC_CHARM))     return DIMINISHING_CHARM;
     if (mechanic & (1<<MECHANIC_SILENCE))   return DIMINISHING_SILENCE;
     if (mechanic & (1<<DIMINISHING_DISARM)) return DIMINISHING_DISARM;
-    if (mechanic & (1<<MECHANIC_FREEZE))    return DIMINISHING_FREEZE;
-    if (mechanic & ((1<<MECHANIC_KNOCKOUT) | (1<<MECHANIC_SAPPED)))    return DIMINISHING_KNOCKOUT;
+    if (mechanic & (1<<MECHANIC_FREEZE))    return DIMINISHING_FREEZE_SLEEP;
+    if (mechanic & ((1<<MECHANIC_KNOCKOUT) | (1<<MECHANIC_SAPPED)))    return DIMINISHING_POLYMORPH_GOUGE_SAP;
     if (mechanic & (1<<MECHANIC_BANISH))    return DIMINISHING_BANISH;
     if (mechanic & (1<<MECHANIC_HORROR))    return DIMINISHING_DEATHCOIL;
 
 
     return DIMINISHING_NONE;
+}
+
+int32 GetDiminishingReturnsLimitDuration(DiminishingGroup group, SpellEntry const* spellproto)
+{
+    if(!IsDiminishingReturnsGroupDurationLimited(group))
+        return 0;
+
+    // Explicit diminishing duration
+    switch(spellproto->SpellFamilyName)
+    {
+        case SPELLFAMILY_HUNTER:
+        {
+            // Wyvern Sting
+            if (spellproto->SpellFamilyFlags & UI64LIT(0x0000100000000000))
+                return 6000;
+            break;
+        }
+        case SPELLFAMILY_PALADIN:
+        {
+            // Repentance - limit to 6 seconds in PvP
+            if (spellproto->SpellFamilyFlags & UI64LIT(0x00000000004))
+                return 6000;
+            break;
+        }
+        default:
+            break;
+    }
+
+    return 10000;
 }
 
 bool IsDiminishingReturnsGroupDurationLimited(DiminishingGroup group)
@@ -2788,17 +2832,14 @@ bool IsDiminishingReturnsGroupDurationLimited(DiminishingGroup group)
     {
         case DIMINISHING_CONTROL_STUN:
         case DIMINISHING_TRIGGER_STUN:
-        case DIMINISHING_KIDNEYSHOT:
-        case DIMINISHING_SLEEP:
         case DIMINISHING_CONTROL_ROOT:
         case DIMINISHING_TRIGGER_ROOT:
-        case DIMINISHING_FEAR:
-        case DIMINISHING_WARLOCK_FEAR:
+        case DIMINISHING_FEAR_BLIND:
         case DIMINISHING_CHARM:
-        case DIMINISHING_POLYMORPH:
-        case DIMINISHING_FREEZE:
-        case DIMINISHING_KNOCKOUT:
-        case DIMINISHING_BLIND_CYCLONE:
+        case DIMINISHING_POLYMORPH_GOUGE_SAP:
+        case DIMINISHING_CHEAPSHOT_POUNCE:
+        case DIMINISHING_FREEZE_SLEEP:
+        case DIMINISHING_CYCLONE:
         case DIMINISHING_BANISH:
         case DIMINISHING_LIMITONLY:
             return true;
@@ -2812,24 +2853,21 @@ DiminishingReturnsType GetDiminishingReturnsGroupType(DiminishingGroup group)
 {
     switch(group)
     {
-        case DIMINISHING_BLIND_CYCLONE:
-        case DIMINISHING_CONTROL_STUN:
+        case DIMINISHING_CYCLONE:
         case DIMINISHING_TRIGGER_STUN:
-        case DIMINISHING_KIDNEYSHOT:
+        case DIMINISHING_CONTROL_STUN:
+        case DIMINISHING_CHEAPSHOT_POUNCE:
             return DRTYPE_ALL;
-        case DIMINISHING_SLEEP:
         case DIMINISHING_CONTROL_ROOT:
         case DIMINISHING_TRIGGER_ROOT:
-        case DIMINISHING_FEAR:
+        case DIMINISHING_FEAR_BLIND:
         case DIMINISHING_CHARM:
-        case DIMINISHING_POLYMORPH:
+        case DIMINISHING_POLYMORPH_GOUGE_SAP:
         case DIMINISHING_SILENCE:
         case DIMINISHING_DISARM:
         case DIMINISHING_DEATHCOIL:
-        case DIMINISHING_FREEZE:
+        case DIMINISHING_FREEZE_SLEEP:
         case DIMINISHING_BANISH:
-        case DIMINISHING_WARLOCK_FEAR:
-        case DIMINISHING_KNOCKOUT:
             return DRTYPE_PLAYER;
         default:
             break;

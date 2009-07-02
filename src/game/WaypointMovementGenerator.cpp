@@ -38,6 +38,7 @@ alter table creature_movement add `wpguid` int(11) default '0';
 #include "DestinationHolderImp.h"
 #include "CreatureAI.h"
 #include "WaypointManager.h"
+#include "WorldPacket.h"
 
 #include <cassert>
 
@@ -109,7 +110,7 @@ bool WaypointMovementGenerator<Creature>::Update(Creature &creature, const uint3
             // Now we re-set destination to same node and start travel
             creature.addUnitState(UNIT_STAT_ROAMING);
             if (creature.canFly())
-                creature.AddUnitMovementFlag(MONSTER_MOVE_FLY);
+                creature.AddMonsterMoveFlag(MONSTER_MOVE_FLY);
             const WaypointNode &node = i_path->at(i_currentNode);
             i_destinationHolder.SetDestination(traveller, node.x, node.y, node.z);
             i_nextMoveTime.Reset(i_destinationHolder.GetTotalTravelTime());
@@ -172,7 +173,7 @@ bool WaypointMovementGenerator<Creature>::Update(Creature &creature, const uint3
         {
             creature.addUnitState(UNIT_STAT_ROAMING);
             if (creature.canFly())
-                creature.AddUnitMovementFlag(MONSTER_MOVE_FLY);
+                creature.AddMonsterMoveFlag(MONSTER_MOVE_FLY);
             const WaypointNode &node = i_path->at(i_currentNode);
             i_destinationHolder.SetDestination(traveller, node.x, node.y, node.z);
             i_nextMoveTime.Reset(i_destinationHolder.GetTotalTravelTime());
@@ -261,7 +262,9 @@ void FlightPathMovementGenerator::Finalize(Player & player)
         if(player.pvpInfo.inHostileArea)
             player.CastSpell(&player, 2479, true);
 
-        player.SetUnitMovementFlags(MONSTER_MOVE_WALK);
+        // update z position to ground and orientation for landing point
+        // this prevent cheating with landing  point at lags
+        // when client side flight end early in comparison server side
         player.StopMoving();
     }
 }

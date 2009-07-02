@@ -90,13 +90,13 @@ RandomMovementGenerator<Creature>::_setRandomLocation(Creature &creature)
     if (is_air_ok)
     {
         i_nextMoveTime.Reset(i_destinationHolder.GetTotalTravelTime());
-        creature.AddUnitMovementFlag(MONSTER_MOVE_FLY);
+        creature.AddMonsterMoveFlag(MONSTER_MOVE_FLY);
     }
     //else if (is_water_ok) // Swimming mode to be done with more than this check
     else
     {
         i_nextMoveTime.Reset(urand(500+i_destinationHolder.GetTotalTravelTime(),5000+i_destinationHolder.GetTotalTravelTime()));
-        creature.SetUnitMovementFlags(MONSTER_MOVE_WALK);
+        creature.AddMonsterMoveFlag(MONSTER_MOVE_WALK);
     }
 }
 
@@ -108,9 +108,13 @@ RandomMovementGenerator<Creature>::Initialize(Creature &creature)
         return;
 
     if (creature.canFly())
-        creature.AddUnitMovementFlag(MONSTER_MOVE_FLY);
+        creature.AddMonsterMoveFlag(MONSTER_MOVE_FLY);
+
+    else if(irand(0,RUNNING_CHANCE_RANDOMMV) > 0)
+        creature.AddMonsterMoveFlag(MONSTER_MOVE_WALK);
     else
-        creature.SetUnitMovementFlags(irand(0,RUNNING_CHANCE_RANDOMMV) > 0 ? MONSTER_MOVE_WALK : MONSTER_MOVE_NONE);
+        creature.RemoveMonsterMoveFlag(MONSTER_MOVE_WALK);  // run with 1/RUNNING_CHANCE_RANDOMMV chance
+
     _setRandomLocation(creature);
 }
 
@@ -147,14 +151,17 @@ RandomMovementGenerator<Creature>::Update(Creature &creature, const uint32 &diff
         if(i_nextMoveTime.Passed())
         {
             if (creature.canFly())
-                creature.AddUnitMovementFlag(MONSTER_MOVE_FLY);
-            else
-                creature.SetUnitMovementFlags(irand(0,RUNNING_CHANCE_RANDOMMV) > 0 ? MONSTER_MOVE_WALK : MONSTER_MOVE_NONE);
+                creature.AddMonsterMoveFlag(MONSTER_MOVE_FLY);
+            else if(irand(0,RUNNING_CHANCE_RANDOMMV) > 0)
+                creature.AddMonsterMoveFlag(MONSTER_MOVE_WALK);
+            else                                            // run with 1/RUNNING_CHANCE_RANDOMMV chance
+                creature.RemoveMonsterMoveFlag(MONSTER_MOVE_WALK);
+
             _setRandomLocation(creature);
         }
         else if(creature.isPet() && creature.GetOwner() && !creature.IsWithinDist(creature.GetOwner(),PET_FOLLOW_DIST+2.5f))
         {
-           creature.SetUnitMovementFlags(MONSTER_MOVE_WALK);
+           creature.AddMonsterMoveFlag(MONSTER_MOVE_WALK);
            _setRandomLocation(creature);
         }
     }

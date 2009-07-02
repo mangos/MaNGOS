@@ -1337,7 +1337,6 @@ bool ChatHandler::HandleNpcDeleteCommand(const char* args)
     // Delete the creature
     unit->CombatStop();
     unit->DeleteFromDB();
-    unit->CleanupsBeforeDelete();
     unit->AddObjectToRemoveList();
 
     SendSysMessage(LANG_COMMAND_DELCREATMESSAGE);
@@ -2133,22 +2132,17 @@ bool ChatHandler::HandlePInfoCommand(const char* args)
         if (HasLowerSecurity(NULL, target_guid))
             return false;
 
-        //                                                     0
-        QueryResult *result = CharacterDatabase.PQuery("SELECT totaltime FROM characters WHERE guid = '%u'", GUID_LOPART(target_guid));
+        //                                                     0          1      2      3
+        QueryResult *result = CharacterDatabase.PQuery("SELECT totaltime, level, money, account FROM characters WHERE guid = '%u'", GUID_LOPART(target_guid));
         if (!result)
             return false;
 
         Field *fields = result->Fetch();
         total_player_time = fields[0].GetUInt32();
+        level = fields[1].GetUInt32();
+        money = fields[2].GetUInt32();
+        accId = fields[3].GetUInt32();
         delete result;
-
-        Tokens data;
-        if (!Player::LoadValuesArrayFromDB(data,target_guid))
-            return false;
-
-        money = Player::GetUInt32ValueFromArray(data, PLAYER_FIELD_COINAGE);
-        level = Player::GetUInt32ValueFromArray(data, UNIT_FIELD_LEVEL);
-        accId = objmgr.GetPlayerAccountIdByGUID(target_guid);
     }
 
     std::string username = GetMangosString(LANG_ERROR);
@@ -2788,7 +2782,6 @@ bool ChatHandler::HandleWpModifyCommand(const char* args)
         {
             wpCreature = m_session->GetPlayer()->GetMap()->GetCreature(MAKE_NEW_GUID(wpGuid, VISUAL_WAYPOINT, HIGHGUID_UNIT));
             wpCreature->DeleteFromDB();
-            wpCreature->CleanupsBeforeDelete();
             wpCreature->AddObjectToRemoveList();
         }
 
@@ -2852,7 +2845,6 @@ bool ChatHandler::HandleWpModifyCommand(const char* args)
             {
                 wpCreature = m_session->GetPlayer()->GetMap()->GetCreature(MAKE_NEW_GUID(wpGuid, VISUAL_WAYPOINT, HIGHGUID_UNIT));
                 wpCreature->DeleteFromDB();
-                wpCreature->CleanupsBeforeDelete();
                 wpCreature->AddObjectToRemoveList();
                 // re-create
                 Creature* wpCreature2 = new Creature;
@@ -3132,7 +3124,6 @@ bool ChatHandler::HandleWpShowCommand(const char* args)
                 else
                 {
                     pCreature->DeleteFromDB();
-                    pCreature->CleanupsBeforeDelete();
                     pCreature->AddObjectToRemoveList();
                 }
 
@@ -3330,7 +3321,6 @@ bool ChatHandler::HandleWpShowCommand(const char* args)
             else
             {
                 pCreature->DeleteFromDB();
-                pCreature->CleanupsBeforeDelete();
                 pCreature->AddObjectToRemoveList();
             }
         }while(result->NextRow());

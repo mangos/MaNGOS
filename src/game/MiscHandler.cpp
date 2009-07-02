@@ -170,6 +170,10 @@ void WorldSession::HandleWhoOpcode( WorldPacket & recv_data )
                 continue;
         }
 
+        //do not process players which are not in world
+        if(!(itr->second->IsInWorld()))
+            continue;
+
         // check if target is globally visible for player
         if (!(itr->second->IsVisibleGloballyFor(_player)))
             continue;
@@ -276,7 +280,7 @@ void WorldSession::HandleLogoutRequestOpcode( WorldPacket & /*recv_data*/ )
     if( GetPlayer()->isInCombat() ||                        //...is in combat
         GetPlayer()->duel         ||                        //...is in Duel
                                                             //...is jumping ...is falling
-        GetPlayer()->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_JUMPING | MOVEMENTFLAG_FALLING))
+        GetPlayer()->m_movementInfo.HasMovementFlag(MovementFlags(MOVEMENTFLAG_JUMPING | MOVEMENTFLAG_FALLING)))
     {
         WorldPacket data( SMSG_LOGOUT_RESPONSE, (2+4) ) ;
         data << (uint8)0xC;
@@ -984,40 +988,41 @@ void WorldSession::HandleSetActionButtonOpcode(WorldPacket& recv_data)
     CHECK_PACKET_SIZE(recv_data,1+2+1+1);
 
     sLog.outDebug(  "WORLD: Received CMSG_SET_ACTION_BUTTON" );
-    uint8 button, misc, type;
-    uint16 action;
-    recv_data >> button >> action >> misc >> type;
-    sLog.outDetail( "BUTTON: %u ACTION: %u TYPE: %u MISC: %u", button, action, type, misc );
-    if(action==0)
+    uint8 button;
+    uint32 packetData;
+    recv_data >> button >> packetData;
+
+    uint32 action = ACTION_BUTTON_ACTION(packetData);
+    uint8  type   = ACTION_BUTTON_TYPE(packetData);
+
+    sLog.outDetail( "BUTTON: %u ACTION: %u TYPE: %u", button, action, type );
+    if (!packetData)
     {
         sLog.outDetail( "MISC: Remove action from button %u", button );
-
         GetPlayer()->removeActionButton(button);
     }
     else
     {
-        if(type==ACTION_BUTTON_MACRO || type==ACTION_BUTTON_CMACRO)
+        switch(type)
         {
-            sLog.outDetail( "MISC: Added Macro %u into button %u", action, button );
-            GetPlayer()->addActionButton(button,action,type,misc);
+            case ACTION_BUTTON_MACRO:
+            case ACTION_BUTTON_CMACRO:
+                sLog.outDetail( "MISC: Added Macro %u into button %u", action, button );
+                break;
+            case ACTION_BUTTON_EQSET:
+                sLog.outDetail( "MISC: Added EquipmentSet %u into button %u", action, button );
+                break;
+            case ACTION_BUTTON_SPELL:
+                sLog.outDetail( "MISC: Added Spell %u into button %u", action, button );
+                break;
+            case ACTION_BUTTON_ITEM:
+                sLog.outDetail( "MISC: Added Item %u into button %u", action, button );
+                break;
+            default:
+                sLog.outError( "MISC: Unknown action button type %u for action %u into button %u", type, action, button );
+                return;
         }
-        else if(type==ACTION_BUTTON_EQSET)
-        {
-            sLog.outDetail( "MISC: Added EquipmentSet %u into button %u", action, button );
-            GetPlayer()->addActionButton(button,action,type,misc);
-        }
-        else if(type==ACTION_BUTTON_SPELL)
-        {
-            sLog.outDetail( "MISC: Added Spell %u into button %u", action, button );
-            GetPlayer()->addActionButton(button,action,type,misc);
-        }
-        else if(type==ACTION_BUTTON_ITEM)
-        {
-            sLog.outDetail( "MISC: Added Item %u into button %u", action, button );
-            GetPlayer()->addActionButton(button,action,type,misc);
-        }
-        else
-            sLog.outError( "MISC: Unknown action button type %u for action %u into button %u", type, action, button );
+        GetPlayer()->addActionButton(button,action,type);
     }
 }
 
@@ -1542,7 +1547,7 @@ void WorldSession::HandleMoveSetCanFlyAckOpcode( WorldPacket & recv_data )
 
     recv_data >> guid >> unk >> flags;
 
-    _player->m_movementInfo.flags = flags;
+    _player->m_movementInfo.SetMovementFlags(MovementFlags(flags));
 }
 
 void WorldSession::HandleRequestPetInfoOpcode( WorldPacket & /*recv_data */)

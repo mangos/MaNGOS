@@ -145,15 +145,14 @@ inline bool IsElementalShield(SpellEntry const *spellInfo)
 
 inline bool IsExplicitDiscoverySpell(SpellEntry const *spellInfo)
 {
-    return spellInfo->Effect[0]==SPELL_EFFECT_CREATE_ITEM_2 && spellInfo->Effect[1]==SPELL_EFFECT_SCRIPT_EFFECT;
+    return spellInfo->Effect[0]==SPELL_EFFECT_CREATE_RANDOM_ITEM && spellInfo->Effect[1]==SPELL_EFFECT_SCRIPT_EFFECT;
 }
 
 inline bool IsLootCraftingSpell(SpellEntry const *spellInfo)
 {
-    return spellInfo->Effect[0]==SPELL_EFFECT_CREATE_ITEM_2 && (
-        spellInfo->Effect[1]==SPELL_EFFECT_SCRIPT_EFFECT || // see IsExplicitDiscoverySpell
-        !spellInfo->EffectItemType[0] ||                    // result item not provided
-        spellInfo->TotemCategory[0] == 121);                // different random cards from Inscription (121==Virtuoso Inking Set category)
+    return spellInfo->Effect[0]==SPELL_EFFECT_CREATE_RANDOM_ITEM ||
+        // different random cards from Inscription (121==Virtuoso Inking Set category)
+        spellInfo->Effect[0]==SPELL_EFFECT_CREATE_ITEM_2 && spellInfo->TotemCategory[0] == 121;
 }
 
 int32 CompareAuraRanks(uint32 spellId_1, uint32 effIndex_1, uint32 spellId_2, uint32 effIndex_2);
@@ -334,6 +333,7 @@ inline uint32 GetDispellMask(DispelType dispel)
 DiminishingGroup GetDiminishingReturnsGroupForSpell(SpellEntry const* spellproto, bool triggered);
 bool IsDiminishingReturnsGroupDurationLimited(DiminishingGroup group);
 DiminishingReturnsType GetDiminishingReturnsGroupType(DiminishingGroup group);
+int32 GetDiminishingReturnsLimitDuration(DiminishingGroup group, SpellEntry const* spellproto);
 
 // Spell affects related declarations (accessed using SpellMgr functions)
 struct SpellAffectEntry
@@ -487,20 +487,20 @@ class PetAura
             auras.clear();
         }
 
-        PetAura(uint16 petEntry, uint16 aura, bool _removeOnChangePet, int _damage) :
+        PetAura(uint32 petEntry, uint32 aura, bool _removeOnChangePet, int _damage) :
         removeOnChangePet(_removeOnChangePet), damage(_damage)
         {
             auras[petEntry] = aura;
         }
 
-        uint16 GetAura(uint16 petEntry) const
+        uint32 GetAura(uint32 petEntry) const
         {
-            std::map<uint16, uint16>::const_iterator itr = auras.find(petEntry);
+            std::map<uint32, uint32>::const_iterator itr = auras.find(petEntry);
             if(itr != auras.end())
                 return itr->second;
             else
             {
-                std::map<uint16, uint16>::const_iterator itr2 = auras.find(0);
+                std::map<uint32, uint32>::const_iterator itr2 = auras.find(0);
                 if(itr2 != auras.end())
                     return itr2->second;
                 else
@@ -508,7 +508,7 @@ class PetAura
             }
         }
 
-        void AddAura(uint16 petEntry, uint16 aura)
+        void AddAura(uint32 petEntry, uint32 aura)
         {
             auras[petEntry] = aura;
         }
@@ -524,11 +524,11 @@ class PetAura
         }
 
     private:
-        std::map<uint16, uint16> auras;
+        std::map<uint32, uint32> auras;
         bool removeOnChangePet;
         int32 damage;
 };
-typedef std::map<uint16, PetAura> SpellPetAuraMap;
+typedef std::map<uint32, PetAura> SpellPetAuraMap;
 
 struct SpellArea
 {
@@ -633,7 +633,7 @@ class SpellMgr
     // Accessors (const or static functions)
     public:
         // Spell affects
-        SpellAffectEntry const*GetSpellAffect(uint16 spellId, uint8 effectId) const
+        SpellAffectEntry const*GetSpellAffect(uint32 spellId, uint8 effectId) const
         {
             SpellAffectMap::const_iterator itr = mSpellAffectMap.find((spellId<<8) + effectId);
             if( itr != mSpellAffectMap.end( ) )
@@ -833,9 +833,9 @@ class SpellMgr
             return mSkillLineAbilityMap.upper_bound(spell_id);
         }
 
-        PetAura const* GetPetAura(uint16 spell_id)
+        PetAura const* GetPetAura(uint32 spell_id, uint8 eff)
         {
-            SpellPetAuraMap::const_iterator itr = mSpellPetAuraMap.find(spell_id);
+            SpellPetAuraMap::const_iterator itr = mSpellPetAuraMap.find((spell_id<<8) + eff);
             if(itr != mSpellPetAuraMap.end())
                 return &itr->second;
             else

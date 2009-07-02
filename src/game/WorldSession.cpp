@@ -307,7 +307,13 @@ void WorldSession::LogoutPlayer(bool Save)
 
         ///- Teleport to home if the player is in an invalid instance
         if(!_player->m_InstanceValid && !_player->isGameMaster())
+        {
             _player->TeleportTo(_player->m_homebindMapId, _player->m_homebindX, _player->m_homebindY, _player->m_homebindZ, _player->GetOrientation());
+            //this is a bad place to call for far teleport because we need player to be in world for successful logout
+            //maybe we should implement delayed far teleport logout?
+            while(_player->IsBeingTeleportedFar())
+                HandleMoveWorldportAckOpcode();
+        }
 
         for (int i=0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
         {
@@ -367,6 +373,14 @@ void WorldSession::LogoutPlayer(bool Save)
         if(_player->GetGroup() && !_player->GetGroup()->isRaidGroup() && m_Socket)
             _player->RemoveFromGroup();
 
+        ///- Send update to group
+        if(_player->GetGroup())
+            _player->GetGroup()->SendUpdate();
+
+        ///- Broadcast a logout message to the player's friends
+        sSocialMgr.SendFriendStatus(_player, FRIEND_OFFLINE, _player->GetGUIDLow(), true);
+        sSocialMgr.RemovePlayerSocial (_player->GetGUIDLow ());
+
         ///- Remove the player from the world
         // the player may not be in the world when logging out
         // e.g if he got disconnected during a transfer to another map
@@ -375,17 +389,9 @@ void WorldSession::LogoutPlayer(bool Save)
         // RemoveFromWorld does cleanup that requires the player to be in the accessor
         ObjectAccessor::Instance().RemoveObject(_player);
 
-        ///- Send update to group
-        if(_player->GetGroup())
-            _player->GetGroup()->SendUpdate();
-
-        ///- Broadcast a logout message to the player's friends
-        sSocialMgr.SendFriendStatus(_player, FRIEND_OFFLINE, _player->GetGUIDLow(), true);
-
         ///- Delete the player object
         _player->CleanupsBeforeDelete();                    // do some cleanup before deleting to prevent crash at crossreferences to already deleted data
 
-        sSocialMgr.RemovePlayerSocial (_player->GetGUIDLow ());
         delete _player;
         _player = NULL;
 
@@ -635,7 +641,7 @@ void WorldSession::ReadMovementInfo(WorldPacket &data, MovementInfo *mi)
     data >> mi->z;
     data >> mi->o;
 
-    if(mi->flags & MOVEMENTFLAG_ONTRANSPORT)
+    if(mi->HasMovementFlag(MOVEMENTFLAG_ONTRANSPORT))
     {
         if(!data.readPackGUID(mi->t_guid))
             return;
@@ -649,7 +655,7 @@ void WorldSession::ReadMovementInfo(WorldPacket &data, MovementInfo *mi)
         data >> mi->t_seat;
     }
 
-    if((mi->flags & (MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_FLYING2)) || (mi->unk1 & 0x20))
+    if((mi->HasMovementFlag(MovementFlags(MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_FLYING2))) || (mi->unk1 & 0x20))
     {
         CHECK_PACKET_SIZE(data, data.rpos()+4);
         data >> mi->s_pitch;
@@ -658,7 +664,7 @@ void WorldSession::ReadMovementInfo(WorldPacket &data, MovementInfo *mi)
     CHECK_PACKET_SIZE(data, data.rpos()+4);
     data >> mi->fallTime;
 
-    if(mi->flags & MOVEMENTFLAG_JUMPING)
+    if(mi->HasMovementFlag(MOVEMENTFLAG_JUMPING))
     {
         CHECK_PACKET_SIZE(data, data.rpos()+4+4+4+4);
         data >> mi->j_unk;
@@ -667,7 +673,7 @@ void WorldSession::ReadMovementInfo(WorldPacket &data, MovementInfo *mi)
         data >> mi->j_xyspeed;
     }
 
-    if(mi->flags & MOVEMENTFLAG_SPLINE)
+    if(mi->HasMovementFlag(MOVEMENTFLAG_SPLINE))
     {
         CHECK_PACKET_SIZE(data, data.rpos()+4);
         data >> mi->u_unk1;

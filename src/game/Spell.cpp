@@ -2286,41 +2286,46 @@ void Spell::cast(bool skipCheck)
     {
         case SPELLFAMILY_GENERIC:
         {
-            if (m_spellInfo->Mechanic == MECHANIC_BANDAGE)             // Bandages
-                m_preCastSpell = 11196;                                // Recently Bandaged
-            else if(m_spellInfo->SpellIconID == 1662 && m_spellInfo->AttributesEx & 0x20) // Blood Fury (Racial)
-                m_preCastSpell = 23230;                                // Blood Fury - Healing Reduction
+            if (m_spellInfo->Mechanic == MECHANIC_BANDAGE)  // Bandages
+                m_preCastSpell = 11196;                     // Recently Bandaged
+            else if(m_spellInfo->SpellIconID == 1662 && m_spellInfo->AttributesEx & 0x20)
+                                                            // Blood Fury (Racial)
+                m_preCastSpell = 23230;                     // Blood Fury - Healing Reduction
             break;
         }
         case SPELLFAMILY_MAGE:
         {
             // Ice Block
             if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0000008000000000))
-                m_preCastSpell = 41425;                                // Hypothermia
+                m_preCastSpell = 41425;                     // Hypothermia
             break;
         }
         case SPELLFAMILY_PRIEST:
         {
+            // Power Word: Shield
             if (m_spellInfo->Mechanic == MECHANIC_SHIELD &&
-                m_spellInfo->SpellIconID == 566)                       // Power Word: Shield
-                m_preCastSpell = 6788;                                 // Weakened Soul
-            if (m_spellInfo->Id == 47585)                              // Dispersion (transform)
-                m_preCastSpell = 60069;                                // Dispersion (mana regen)
+                (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0000000000000001)))
+                m_preCastSpell = 6788;                      // Weakened Soul
+            // Dispersion (transform)
+            if (m_spellInfo->Id == 47585)
+                m_preCastSpell = 60069;                     // Dispersion (mana regen)
             break;
         }
         case SPELLFAMILY_PALADIN:
         {
             // Divine Shield, Divine Protection or Hand of Protection
             if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0000000000400080))
-                m_preCastSpell = 25771;                                // Forbearance
+                m_preCastSpell = 25771;                     // Forbearance
             break;
         }
         case SPELLFAMILY_SHAMAN:
         {
-            if (m_spellInfo->Id == 2825)                               // Bloodlust
-                m_preCastSpell = 57724;                                // Sated
-            else if (m_spellInfo->Id == 32182)                         // Heroism
-                m_preCastSpell = 57723;                                // Exhaustion
+            // Bloodlust
+            if (m_spellInfo->Id == 2825)
+                m_preCastSpell = 57724;                     // Sated
+            // Heroism
+            else if (m_spellInfo->Id == 32182)
+                m_preCastSpell = 57723;                     // Exhaustion
             break;
         }
         default:
@@ -2574,7 +2579,7 @@ void Spell::update(uint32 difftime)
     // check if the player caster has moved before the spell finished
     if ((m_caster->GetTypeId() == TYPEID_PLAYER && m_timer != 0) &&
         (m_castPositionX != m_caster->GetPositionX() || m_castPositionY != m_caster->GetPositionY() || m_castPositionZ != m_caster->GetPositionZ()) &&
-        (m_spellInfo->Effect[0] != SPELL_EFFECT_STUCK || !m_caster->HasUnitMovementFlag(MOVEMENTFLAG_FALLING)))
+        (m_spellInfo->Effect[0] != SPELL_EFFECT_STUCK || !((Player*)m_caster)->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FALLING)))
     {
         // always cancel for channeled spells
         if( m_spellState == SPELL_STATE_CASTING )
@@ -2606,7 +2611,7 @@ void Spell::update(uint32 difftime)
                 if( m_caster->GetTypeId() == TYPEID_PLAYER )
                 {
                     // check if player has jumped before the channeling finished
-                    if(m_caster->HasUnitMovementFlag(MOVEMENTFLAG_JUMPING))
+                    if(((Player*)m_caster)->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_JUMPING))
                         cancel();
 
                     // check for incapacitating player states
@@ -4160,7 +4165,6 @@ SpellCastResult Spell::CheckCast(bool strict)
 
                 break;
             }
-            case SPELL_EFFECT_OPEN_LOCK_ITEM:
             case SPELL_EFFECT_OPEN_LOCK:
             {
                 if( m_spellInfo->EffectImplicitTargetA[i] != TARGET_GAMEOBJECT &&
@@ -4232,6 +4236,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                     case SUMMON_TYPE_POSESSED2:
                     case SUMMON_TYPE_DEMON:
                     case SUMMON_TYPE_SUMMON:
+                    case SUMMON_TYPE_ELEMENTAL:
                     {
                         if(m_caster->GetPetGUID())
                             return SPELL_FAILED_ALREADY_HAVE_SUMMON;
@@ -4673,7 +4678,7 @@ SpellCastResult Spell::CheckRange(bool strict)
 
         if(dist > max_range)
             return SPELL_FAILED_OUT_OF_RANGE;               //0x5A;
-        if(dist < min_range)
+        if(min_range && dist < min_range)
             return SPELL_FAILED_TOO_CLOSE;
         if( m_caster->GetTypeId() == TYPEID_PLAYER &&
             (m_spellInfo->FacingCasterFlags & SPELL_FACING_FLAG_INFRONT) && !m_caster->HasInArc( M_PI, target ) )
@@ -4684,7 +4689,7 @@ SpellCastResult Spell::CheckRange(bool strict)
     {
         if(!m_caster->IsWithinDist3d(m_targets.m_destX, m_targets.m_destY, m_targets.m_destZ, max_range))
             return SPELL_FAILED_OUT_OF_RANGE;
-        if(m_caster->IsWithinDist3d(m_targets.m_destX, m_targets.m_destY, m_targets.m_destZ, min_range))
+        if(min_range && m_caster->IsWithinDist3d(m_targets.m_destX, m_targets.m_destY, m_targets.m_destZ, min_range))
             return SPELL_FAILED_TOO_CLOSE;
     }
 

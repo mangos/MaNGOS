@@ -579,7 +579,7 @@ enum SpellEffects
     SPELL_EFFECT_SUMMON_PET                = 56,
     SPELL_EFFECT_LEARN_PET_SPELL           = 57,
     SPELL_EFFECT_WEAPON_DAMAGE             = 58,
-    SPELL_EFFECT_OPEN_LOCK_ITEM            = 59,
+    SPELL_EFFECT_CREATE_RANDOM_ITEM        = 59,
     SPELL_EFFECT_PROFICIENCY               = 60,
     SPELL_EFFECT_SEND_EVENT                = 61,
     SPELL_EFFECT_POWER_BURN                = 62,
@@ -681,8 +681,8 @@ enum SpellEffects
     SPELL_EFFECT_MILLING                   = 158,
     SPELL_EFFECT_ALLOW_RENAME_PET          = 159,
     SPELL_EFFECT_160                       = 160,
-    SPELL_EFFECT_161                       = 161,
-    SPELL_EFFECT_162                       = 162,
+    SPELL_EFFECT_TALENT_SPEC_COUNT         = 161,
+    SPELL_EFFECT_TALENT_SPEC_SELECT        = 162,
     TOTAL_SPELL_EFFECTS                    = 163
 };
 
@@ -2321,24 +2321,20 @@ enum DiminishingGroup
     DIMINISHING_NONE,
     DIMINISHING_CONTROL_STUN,                               // Player Controlled stuns
     DIMINISHING_TRIGGER_STUN,                               // By aura proced stuns, usualy chance on hit talents
-    DIMINISHING_SLEEP,
     DIMINISHING_CONTROL_ROOT,                               // Immobilizing effects from casted spells
     DIMINISHING_TRIGGER_ROOT,                               // Immobilizing effects from triggered spells like Frostbite
-    DIMINISHING_FEAR,                                       // Non-warlock fears
+    DIMINISHING_FEAR_BLIND,                                 // Fears & blind
     DIMINISHING_CHARM,
-    // Mage Specific
-    DIMINISHING_POLYMORPH,
-    // Rogue Specific
-    DIMINISHING_KIDNEYSHOT,                                 // Kidney Shot is not diminished with Cheap Shot
+    DIMINISHING_POLYMORPH_GOUGE_SAP,
     // Warlock Specific
     DIMINISHING_DEATHCOIL,                                  // Death Coil Diminish only with another Death Coil
-    DIMINISHING_WARLOCK_FEAR,                               // Also with Sedduction
+    // Druid Specific
+    DIMINISHING_CYCLONE,                                    // From 2.3.0
     // Shared Class Specific
-    DIMINISHING_BLIND_CYCLONE,                              // From 2.3.0
+    DIMINISHING_CHEAPSHOT_POUNCE,
     DIMINISHING_DISARM,                                     // From 2.3.0
     DIMINISHING_SILENCE,                                    // From 2.3.0
-    DIMINISHING_FREEZE,                                     // Hunter's Freezing Trap
-    DIMINISHING_KNOCKOUT,                                   // Also with Sap, all Knockout mechanics are here
+    DIMINISHING_FREEZE_SLEEP,                               // Hunter's Freezing Trap
     DIMINISHING_BANISH,
     // Other
     // Don't Diminish, but limit duration to 10s
@@ -2373,8 +2369,9 @@ enum SummonType
     SUMMON_TYPE_UNKNOWN5    = 409,
     SUMMON_TYPE_UNKNOWN2    = 427,
     SUMMON_TYPE_POSESSED2   = 428,
-    SUMMON_TYPE_FORCE_OF_NATURE = 669,
-    SUMMON_TYPE_GUARDIAN2   = 1161
+    SUMMON_TYPE_GUARDIAN2   = 1161,
+    SUMMON_TYPE_ELEMENTAL   = 1561,
+    SUMMON_TYPE_FORCE_OF_NATURE = 1562
 };
 
 enum ResponseCodes

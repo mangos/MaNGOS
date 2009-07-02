@@ -92,6 +92,5 @@ void Vehicle::Dismiss()
 {
     SendObjectDeSpawnAnim(GetGUID());
     CombatStop();
-    CleanupsBeforeDelete();
     AddObjectToRemoveList();
 }
