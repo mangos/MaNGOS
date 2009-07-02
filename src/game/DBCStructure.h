@@ -638,18 +638,18 @@ struct ChrRacesEntry
                                                             // 3 unused
     uint32      model_m;                                    // 4
     uint32      model_f;                                    // 5
-                                                            // 6-7 unused
-    uint32      TeamID;                                     // 8 (7-Alliance 1-Horde)
-                                                            // 9-12 unused
-    uint32      CinematicSequence;                          // 13 id from CinematicSequences.dbc
-    char*       name[16];                                   // 14-29 used for DBC language detection/selection
-                                                            // 30 string flags, unused
-    //char*       nameFemale[16];                           // 31-46, if different from base (male) case
-                                                            // 47 string flags, unused
-    //char*       nameNeutralGender[16];                    // 48-63, if different from base (male) case
-                                                            // 64 string flags, unused
-                                                            // 65-67 unused
-    uint32      addon;                                      // 68 (0 - original race, 1 - tbc addon, ...)
+                                                            // 6 unused
+    uint32      TeamID;                                     // 7 (7-Alliance 1-Horde)
+                                                            // 8-11 unused
+    uint32      CinematicSequence;                          // 12 id from CinematicSequences.dbc
+    char*       name[16];                                   // 13-28 used for DBC language detection/selection
+                                                            // 29 string flags, unused
+    //char*       nameFemale[16];                           // 30-45, if different from base (male) case
+                                                            // 46 string flags, unused
+    //char*       nameNeutralGender[16];                    // 47-62, if different from base (male) case
+                                                            // 63 string flags, unused
+                                                            // 64-66 unused
+    uint32      addon;                                      // 67 (0 - original race, 1 - tbc addon, ...)
 };
 
 /* not used
@@ -1116,6 +1116,16 @@ struct MapEntry
     {
         return MapID == 0 || MapID == 1 || MapID == 530 || MapID == 571;
     }
+};
+
+struct MapDifficultyEntry
+{
+    uint32      Id;                                         // 0
+    uint32      MapId;                                      // 1
+    uint32      Difficulty;                                 // 2
+    char*       transferFailedText[16];                     // 3-18
+    uint32      textFlags;                                  // 19
+    uint32      resetTime;                                  // 20
 };
 
 struct MovieEntry

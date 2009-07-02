@@ -240,13 +240,13 @@ void Object::BuildOutOfRangeUpdateBlock(UpdateData * data) const
     data->AddOutOfRangeGUID(GetGUID());
 }
 
-void Object::DestroyForPlayer(Player *target) const
+void Object::DestroyForPlayer( Player *target, bool anim ) const
 {
     ASSERT(target);
 
     WorldPacket data(SMSG_DESTROY_OBJECT, 8);
     data << uint64(GetGUID());
-    data << uint8(0);                                       // WotLK (bool)
+    data << uint8(anim ? 1 : 0);                            // WotLK (bool), may be despawn animation
     target->GetSession()->SendPacket( &data );
 }
 
@@ -314,7 +314,14 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint16 flags, uint32 flags2
                 *data << (uint32)((Player*)this)->GetTransTime();
                 *data << (int8)((Player*)this)->GetTransSeat();
             }
-            //MaNGOS currently not have support for other than player on transport
+            else
+            {
+                //MaNGOS currently not have support for other than player on transport
+                *data << uint8(0);
+                *data << float(0) << float(0) << float(0) << float(0);
+                *data << uint32(0);
+                *data << uint8(-1);
+            }
         }
 
         // 0x02200000
@@ -773,7 +780,7 @@ void Object::_SetCreateBits(UpdateMask *updateMask, Player* /*target*/) const
 
 void Object::SetInt32Value( uint16 index, int32 value )
 {
-    ASSERT( index < m_valuesCount || PrintIndexError( index , true ) );
+    ASSERT( index < m_valuesCount || PrintIndexError( index, true ) );
 
     if(m_int32Values[ index ] != value)
     {
@@ -792,7 +799,7 @@ void Object::SetInt32Value( uint16 index, int32 value )
 
 void Object::SetUInt32Value( uint16 index, uint32 value )
 {
-    ASSERT( index < m_valuesCount || PrintIndexError( index , true ) );
+    ASSERT( index < m_valuesCount || PrintIndexError( index, true ) );
 
     if(m_uint32Values[ index ] != value)
     {
@@ -811,7 +818,7 @@ void Object::SetUInt32Value( uint16 index, uint32 value )
 
 void Object::SetUInt64Value( uint16 index, const uint64 &value )
 {
-    ASSERT( index + 1 < m_valuesCount || PrintIndexError( index , true ) );
+    ASSERT( index + 1 < m_valuesCount || PrintIndexError( index, true ) );
     if(*((uint64*)&(m_uint32Values[ index ])) != value)
     {
         m_uint32Values[ index ] = *((uint32*)&value);
@@ -830,7 +837,7 @@ void Object::SetUInt64Value( uint16 index, const uint64 &value )
 
 void Object::SetFloatValue( uint16 index, float value )
 {
-    ASSERT( index < m_valuesCount || PrintIndexError( index , true ) );
+    ASSERT( index < m_valuesCount || PrintIndexError( index, true ) );
 
     if(m_floatValues[ index ] != value)
     {
@@ -849,7 +856,7 @@ void Object::SetFloatValue( uint16 index, float value )
 
 void Object::SetByteValue( uint16 index, uint8 offset, uint8 value )
 {
-    ASSERT( index < m_valuesCount || PrintIndexError( index , true ) );
+    ASSERT( index < m_valuesCount || PrintIndexError( index, true ) );
 
     if(offset > 4)
     {
@@ -875,7 +882,7 @@ void Object::SetByteValue( uint16 index, uint8 offset, uint8 value )
 
 void Object::SetUInt16Value( uint16 index, uint8 offset, uint16 value )
 {
-    ASSERT( index < m_valuesCount || PrintIndexError( index , true ) );
+    ASSERT( index < m_valuesCount || PrintIndexError( index, true ) );
 
     if(offset > 2)
     {
@@ -949,7 +956,7 @@ void Object::ApplyModPositiveFloatValue(uint16 index, float  val, bool apply)
 
 void Object::SetFlag( uint16 index, uint32 newFlag )
 {
-    ASSERT( index < m_valuesCount || PrintIndexError( index , true ) );
+    ASSERT( index < m_valuesCount || PrintIndexError( index, true ) );
     uint32 oldval = m_uint32Values[ index ];
     uint32 newval = oldval | newFlag;
 
@@ -970,7 +977,7 @@ void Object::SetFlag( uint16 index, uint32 newFlag )
 
 void Object::RemoveFlag( uint16 index, uint32 oldFlag )
 {
-    ASSERT( index < m_valuesCount || PrintIndexError( index , true ) );
+    ASSERT( index < m_valuesCount || PrintIndexError( index, true ) );
     uint32 oldval = m_uint32Values[ index ];
     uint32 newval = oldval & ~oldFlag;
 
@@ -991,7 +998,7 @@ void Object::RemoveFlag( uint16 index, uint32 oldFlag )
 
 void Object::SetByteFlag( uint16 index, uint8 offset, uint8 newFlag )
 {
-    ASSERT( index < m_valuesCount || PrintIndexError( index , true ) );
+    ASSERT( index < m_valuesCount || PrintIndexError( index, true ) );
 
     if(offset > 4)
     {
@@ -1016,7 +1023,7 @@ void Object::SetByteFlag( uint16 index, uint8 offset, uint8 newFlag )
 
 void Object::RemoveByteFlag( uint16 index, uint8 offset, uint8 oldFlag )
 {
-    ASSERT( index < m_valuesCount || PrintIndexError( index , true ) );
+    ASSERT( index < m_valuesCount || PrintIndexError( index, true ) );
 
     if(offset > 4)
     {
@@ -1326,7 +1333,7 @@ bool WorldObject::HasInArc(const float arcangle, const WorldObject* obj) const
 
 void WorldObject::GetRandomPoint( float x, float y, float z, float distance, float &rand_x, float &rand_y, float &rand_z) const
 {
-    if(distance==0)
+    if(distance == 0)
     {
         rand_x = x;
         rand_y = y;
@@ -1534,7 +1541,7 @@ void WorldObject::SendMessageToSetInRange(WorldPacket *data, float dist, bool /*
 void WorldObject::SendObjectDeSpawnAnim(uint64 guid)
 {
     WorldPacket data(SMSG_GAMEOBJECT_DESPAWN_ANIM, 8);
-    data << guid;
+    data << uint64(guid);
     SendMessageToSet(&data, true);
 }
 

@@ -823,10 +823,6 @@ void Spell::EffectDummy(uint32 i)
                     DEBUG_LOG("AddObject at SpellEfects.cpp EffectDummy");
                     map->Add(pGameObj);
 
-                    WorldPacket data(SMSG_GAMEOBJECT_SPAWN_ANIM_OBSOLETE, 8);
-                    data << uint64(pGameObj->GetGUID());
-                    m_caster->SendMessageToSet(&data, true);
-
                     return;
                 }
                 case 23074:                                 // Arcanite Dragonling
@@ -5699,9 +5695,6 @@ void Spell::EffectSummonObject(uint32 i)
     m_caster->AddGameObject(pGameObj);
 
     map->Add(pGameObj);
-    WorldPacket data(SMSG_GAMEOBJECT_SPAWN_ANIM_OBSOLETE, 8);
-    data << uint64(pGameObj->GetGUID());
-    m_caster->SendMessageToSet(&data, true);
 
     m_caster->m_ObjectSlot[slot] = pGameObj->GetGUID();
 }
@@ -6313,16 +6306,14 @@ void Spell::EffectTransmitted(uint32 effIndex)
         case GAMEOBJECT_TYPE_FISHINGHOLE:
         case GAMEOBJECT_TYPE_CHEST:
         default:
-        {
             break;
-        }
     }
 
     pGameObj->SetRespawnTime(duration > 0 ? duration/IN_MILISECONDS : 0);
 
-    pGameObj->SetOwnerGUID(m_caster->GetGUID() );
+    pGameObj->SetOwnerGUID(m_caster->GetGUID());
 
-    pGameObj->SetUInt32Value(GAMEOBJECT_LEVEL, m_caster->getLevel() );
+    pGameObj->SetUInt32Value(GAMEOBJECT_LEVEL, m_caster->getLevel());
     pGameObj->SetSpellId(m_spellInfo->Id);
 
     DEBUG_LOG("AddObject at SpellEfects.cpp EffectTransmitted");
@@ -6331,10 +6322,6 @@ void Spell::EffectTransmitted(uint32 effIndex)
 
     cMap->Add(pGameObj);
 
-    WorldPacket data(SMSG_GAMEOBJECT_SPAWN_ANIM_OBSOLETE, 8);
-    data << uint64(pGameObj->GetGUID());
-    m_caster->SendMessageToSet(&data,true);
-
     if(uint32 linkedEntry = pGameObj->GetLinkedGameObjectEntry())
     {
         GameObject* linkedGO = new GameObject;
@@ -6342,9 +6329,9 @@ void Spell::EffectTransmitted(uint32 effIndex)
             m_caster->GetPhaseMask(), fx, fy, fz, m_caster->GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 100, GO_STATE_READY))
         {
             linkedGO->SetRespawnTime(duration > 0 ? duration/IN_MILISECONDS : 0);
-            linkedGO->SetUInt32Value(GAMEOBJECT_LEVEL, m_caster->getLevel() );
+            linkedGO->SetUInt32Value(GAMEOBJECT_LEVEL, m_caster->getLevel());
             linkedGO->SetSpellId(m_spellInfo->Id);
-            linkedGO->SetOwnerGUID(m_caster->GetGUID() );
+            linkedGO->SetOwnerGUID(m_caster->GetGUID());
 
             linkedGO->GetMap()->Add(linkedGO);
         }
