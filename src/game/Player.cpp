@@ -5564,7 +5564,6 @@ ActionButton* Player::addActionButton(uint8 button, uint32 action, uint8 type)
 
     // set data and update to CHANGED if not NEW
     ab.SetActionAndType(action,ActionButtonType(type));
-    }
 
     sLog.outDetail( "Player '%u' Added Action '%u' (type %u) to Button '%u'", GetGUIDLow(), action, uint32(type), button );
     return &ab;
@@ -20482,4 +20481,3 @@ void Player::SendDuelCountdown(uint32 counter)
     WorldPacket data(SMSG_DUEL_COUNTDOWN, 4);
     data << uint32(counter);                                // seconds
     GetSession()->SendPacket(&data);
-}
