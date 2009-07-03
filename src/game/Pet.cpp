@@ -798,16 +798,19 @@ bool Pet::CreateBaseAtCreature(Creature* creature)
     return true;
 }
 
-bool Pet::InitStatsForLevel(uint32 petlevel)
+bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
 {
     CreatureInfo const *cinfo = GetCreatureInfo();
     assert(cinfo);
 
-    Unit* owner = GetOwner();
     if(!owner)
     {
-        sLog.outError("attempt to summon pet (Entry %u) without owner! Attempt terminated.", cinfo->Entry);
-        return false;
+        owner = GetOwner();
+        if(!owner)
+        {
+            sLog.outError("attempt to summon pet (Entry %u) without owner! Attempt terminated.", cinfo->Entry);
+            return false;
+        }
     }
 
     uint32 creature_ID = (getPetType() == HUNTER_PET) ? 1 : cinfo->Entry;
