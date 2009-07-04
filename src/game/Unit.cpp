@@ -6704,6 +6704,21 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
                 return false;
             break;
         }
+        // Decimation
+        case 63156:
+        case 63158:
+        {
+             // Looking for dummy effect
+            Aura *aur = GetAura(auraSpellInfo->Id, 1);
+            if (!aur)
+                return false;
+
+            // If target's health is not below equal certain value (35%) not proc
+            if ((pVictim->GetHealth() * 100 / pVictim->GetMaxHealth()) > aur->GetModifier()->m_amount)
+                return false;
+
+            break;
+        }
     }
 
     // Custom basepoints/target for exist spell
