@@ -19386,6 +19386,7 @@ void Player::EnterVehicle(Vehicle *vehicle)
     SetFarSightGUID(vehicle->GetGUID());                    // set view
 
     SetClientControl(vehicle, 1);                           // redirect controls to vehicle
+    SetMover(vehicle);
 
     WorldPacket data(SMSG_ON_CANCEL_EXPECTED_RIDE_VEHICLE_AURA, 0);
     GetSession()->SendPacket(&data);
@@ -19437,6 +19438,7 @@ void Player::ExitVehicle(Vehicle *vehicle)
     SetFarSightGUID(0);
 
     SetClientControl(vehicle, 0);
+    SetMover(NULL);
 
     WorldPacket data(MSG_MOVE_TELEPORT_ACK, 30);
     data.append(GetPackGUID());

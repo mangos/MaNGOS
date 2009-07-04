@@ -7564,9 +7564,6 @@ void Unit::SetPet(Pet* pet)
 void Unit::SetCharm(Unit* pet)
 {
     SetUInt64Value(UNIT_FIELD_CHARM, pet ? pet->GetGUID() : 0);
-
-    if(GetTypeId() == TYPEID_PLAYER)
-        ((Player*)this)->m_mover = pet ? pet : this;
 }
 
 

@@ -2028,6 +2028,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         bool IsAllowUseFlyMountsHere() const;
 
         void SetClientControl(Unit* target, uint8 allowMove);
+        void SetMover(Unit* target) { m_mover = target ? target : this; }
 
         void EnterVehicle(Vehicle *vehicle);
         void ExitVehicle(Vehicle *vehicle);

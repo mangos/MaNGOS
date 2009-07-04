@@ -3087,6 +3087,7 @@ void Aura::HandleModPossess(bool apply, bool Real)
         {
             ((Player*)caster)->SetFarSightGUID(m_target->GetGUID());
             ((Player*)caster)->SetClientControl(m_target, 1);
+            ((Player*)caster)->SetMover(m_target);
         }
 
         m_target->CombatStop();
@@ -3130,6 +3131,7 @@ void Aura::HandleModPossess(bool apply, bool Real)
         {
             ((Player*)caster)->SetFarSightGUID(0);
             ((Player*)caster)->SetClientControl(m_target, 0);
+            ((Player*)caster)->SetMover(NULL);
 
             WorldPacket data(SMSG_PET_SPELLS, 8);
             data << uint64(0);
@@ -3167,6 +3169,7 @@ void Aura::HandleModPossessPet(bool apply, bool Real)
     ((Player*)caster)->SetFarSightGUID(apply ? pet->GetGUID() : 0);
     ((Player*)caster)->SetCharm(apply ? pet : NULL);
     ((Player*)caster)->SetClientControl(pet, apply ? 1 : 0);
+    ((Player*)caster)->SetMover(apply ? pet : NULL);
 
     if(apply)
     {
