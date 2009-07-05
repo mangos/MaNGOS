@@ -1517,6 +1517,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void SendCooldownEvent(SpellEntry const *spellInfo, uint32 itemId = 0, Spell* spell = NULL);
         void ProhibitSpellScholl(SpellSchoolMask idSchoolMask, uint32 unTimeMs );
         void RemoveSpellCooldown(uint32 spell_id, bool update = false);
+        void RemoveSpellCategoryCooldown(uint32 cat, bool update = false);
         void SendClearCooldown( uint32 spell_id, Unit* target );
 
         void RemoveArenaSpellCooldowns();
