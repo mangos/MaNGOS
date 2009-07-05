@@ -6767,6 +6767,14 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
                 return false;
             break;
         }
+        // Sword and Board
+        case 50227:
+        {
+            // Remove cooldown on Shield Slam
+            if (GetTypeId() == TYPEID_PLAYER)
+                ((Player*)this)->RemoveSpellCategoryCooldown(1209, true);
+            break;
+        }
         // Brain Freeze
         case 57761:
         {
