@@ -1146,15 +1146,17 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
 
 void Spell::DoSpellHitOnUnit(Unit *unit, const uint32 effectMask)
 {
-    if(!unit || !effectMask)
+    if (!unit || !effectMask)
         return;
 
+    Unit* realCaster = m_originalCaster ? m_originalCaster : m_caster;
+
     // Recheck immune (only for delayed spells)
-    if( m_spellInfo->speed && (
+    if (m_spellInfo->speed && (
         unit->IsImmunedToDamage(GetSpellSchoolMask(m_spellInfo)) ||
         unit->IsImmunedToSpell(m_spellInfo)))
     {
-        m_caster->SendSpellMiss(unit, m_spellInfo->Id, SPELL_MISS_IMMUNE);
+        realCaster->SendSpellMiss(unit, m_spellInfo->Id, SPELL_MISS_IMMUNE);
         return;
     }
 
@@ -1164,67 +1166,65 @@ void Spell::DoSpellHitOnUnit(Unit *unit, const uint32 effectMask)
         ((Player*)unit)->GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2, m_spellInfo->Id);
     }
 
-    if(m_caster->GetTypeId() == TYPEID_PLAYER)
-    {
-        ((Player*)m_caster)->GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2, m_spellInfo->Id, 0, unit);
-    }
+    if (realCaster->GetTypeId() == TYPEID_PLAYER)
+        ((Player*)realCaster)->GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2, m_spellInfo->Id, 0, unit);
 
-    if( m_caster != unit )
+    if (realCaster != unit)
     {
         // Recheck  UNIT_FLAG_NON_ATTACKABLE for delayed spells
         if (m_spellInfo->speed > 0.0f &&
             unit->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE) &&
             unit->GetCharmerOrOwnerGUID() != m_caster->GetGUID())
         {
-            m_caster->SendSpellMiss(unit, m_spellInfo->Id, SPELL_MISS_EVADE);
+            realCaster->SendSpellMiss(unit, m_spellInfo->Id, SPELL_MISS_EVADE);
             return;
         }
 
-        if( !m_caster->IsFriendlyTo(unit) )
+        if (!realCaster->IsFriendlyTo(unit))
         {
             // for delayed spells ignore not visible explicit target
-            if(m_spellInfo->speed > 0.0f && unit == m_targets.getUnitTarget() && !unit->isVisibleForOrDetect(m_caster,false))
+            if (m_spellInfo->speed > 0.0f && unit == m_targets.getUnitTarget() &&
+                !unit->isVisibleForOrDetect(m_caster,false))
             {
-                m_caster->SendSpellMiss(unit, m_spellInfo->Id, SPELL_MISS_EVADE);
+                realCaster->SendSpellMiss(unit, m_spellInfo->Id, SPELL_MISS_EVADE);
                 return;
             }
 
             unit->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
 
-            if( !(m_spellInfo->AttributesEx & SPELL_ATTR_EX_NO_INITIAL_AGGRO) )
+            if (!(m_spellInfo->AttributesEx & SPELL_ATTR_EX_NO_INITIAL_AGGRO))
             {
-                if(!unit->IsStandState() && !unit->hasUnitState(UNIT_STAT_STUNNED))
+                if (!unit->IsStandState() && !unit->hasUnitState(UNIT_STAT_STUNNED))
                     unit->SetStandState(UNIT_STAND_STATE_STAND);
 
-                if(!unit->isInCombat() && unit->GetTypeId() != TYPEID_PLAYER && ((Creature*)unit)->AI())
-                    ((Creature*)unit)->AI()->AttackedBy(m_caster);
+                if (!unit->isInCombat() && unit->GetTypeId() != TYPEID_PLAYER && ((Creature*)unit)->AI())
+                    ((Creature*)unit)->AI()->AttackedBy(realCaster);
 
-                unit->AddThreat(m_caster, 0.0f);
-                unit->SetInCombatWith(m_caster);
-                m_caster->SetInCombatWith(unit);
+                unit->AddThreat(realCaster, 0.0f);
+                unit->SetInCombatWith(realCaster);
+                realCaster->SetInCombatWith(unit);
 
-                if(Player *attackedPlayer = unit->GetCharmerOrOwnerPlayerOrPlayerItself())
-                {
-                    m_caster->SetContestedPvP(attackedPlayer);
-                }
+                if (Player *attackedPlayer = unit->GetCharmerOrOwnerPlayerOrPlayerItself())
+                    realCaster->SetContestedPvP(attackedPlayer);
             }
         }
         else
         {
             // for delayed spells ignore negative spells (after duel end) for friendly targets
-            if(m_spellInfo->speed > 0.0f && !IsPositiveSpell(m_spellInfo->Id))
+            if (m_spellInfo->speed > 0.0f && !IsPositiveSpell(m_spellInfo->Id))
             {
-                m_caster->SendSpellMiss(unit, m_spellInfo->Id, SPELL_MISS_EVADE);
+                realCaster->SendSpellMiss(unit, m_spellInfo->Id, SPELL_MISS_EVADE);
                 return;
             }
 
             // assisting case, healing and resurrection
-            if(unit->hasUnitState(UNIT_STAT_ATTACK_PLAYER))
-                m_caster->SetContestedPvP();
-            if( unit->isInCombat() && !(m_spellInfo->AttributesEx & SPELL_ATTR_EX_NO_INITIAL_AGGRO) )
+            if (unit->hasUnitState(UNIT_STAT_ATTACK_PLAYER))
+                realCaster->SetContestedPvP();
+
+            if (unit->isInCombat() && !(m_spellInfo->AttributesEx & SPELL_ATTR_EX_NO_INITIAL_AGGRO))
             {
-                m_caster->SetInCombatState(unit->GetCombatTimer() > 0);
-                unit->getHostilRefManager().threatAssist(m_caster, 0.0f);
+                realCaster->SetInCombatState(unit->GetCombatTimer() > 0);
+                unit->getHostilRefManager().threatAssist(realCaster, 0.0f);
             }
         }
     }
@@ -1233,7 +1233,8 @@ void Spell::DoSpellHitOnUnit(Unit *unit, const uint32 effectMask)
     m_diminishGroup = GetDiminishingReturnsGroupForSpell(m_spellInfo,m_triggeredByAuraSpell);
     m_diminishLevel = unit->GetDiminishing(m_diminishGroup);
     // Increase Diminishing on unit, current informations for actually casts will use values above
-    if((GetDiminishingReturnsGroupType(m_diminishGroup) == DRTYPE_PLAYER && unit->GetTypeId() == TYPEID_PLAYER) || GetDiminishingReturnsGroupType(m_diminishGroup) == DRTYPE_ALL)
+    if ((GetDiminishingReturnsGroupType(m_diminishGroup) == DRTYPE_PLAYER && unit->GetTypeId() == TYPEID_PLAYER) ||
+        GetDiminishingReturnsGroupType(m_diminishGroup) == DRTYPE_ALL)
         unit->IncrDiminishing(m_diminishGroup);
 
     // Apply additional spell effects to target
@@ -1250,7 +1251,7 @@ void Spell::DoSpellHitOnUnit(Unit *unit, const uint32 effectMask)
                 // Get multiplier
                 float multiplier = m_spellInfo->DmgMultiplier[effectNumber];
                 // Apply multiplier mods
-                if(Player* modOwner = m_originalCaster->GetSpellModOwner())
+                if(Player* modOwner = realCaster->GetSpellModOwner())
                     modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_EFFECT_PAST_FIRST, multiplier, this);
                 m_damageMultipliers[effectNumber] *= multiplier;
             }
