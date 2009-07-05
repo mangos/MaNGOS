@@ -85,8 +85,8 @@ void Totem::UnSummon()
 {
     CombatStop();
     RemoveAurasDueToSpell(GetSpell());
-    Unit *owner = GetOwner();
-    if (owner)
+
+    if (Unit *owner = GetOwner())
     {
         // clear owner's totem slot
         for(int i = 0; i < MAX_TOTEM; ++i)
@@ -106,8 +106,7 @@ void Totem::UnSummon()
             ((Player*)owner)->SendAutoRepeatCancel(this);
 
             // Not only the player can summon the totem (scripted AI)
-            Group *pGroup = ((Player*)owner)->GetGroup();
-            if (pGroup)
+            if (Group *pGroup = ((Player*)owner)->GetGroup())
             {
                 for(GroupReference *itr = pGroup->GetFirstMember(); itr != NULL; itr = itr->next())
                 {
