@@ -1459,13 +1459,16 @@ bool Pet::unlearnSpell(uint32 spell_id, bool learn_prev, bool clear_ab)
 {
     if(removeSpell(spell_id,learn_prev,clear_ab))
     {
-        if(GetOwner()->GetTypeId() == TYPEID_PLAYER)
+        if(!m_loading)
         {
-            if(!m_loading)
+            if (Unit* owner = GetOwner())
             {
-                WorldPacket data(SMSG_PET_REMOVED_SPELL, 4);
-                data << uint32(spell_id);
-                ((Player*)GetOwner())->GetSession()->SendPacket(&data);
+                if(owner->GetTypeId() == TYPEID_PLAYER)
+                {
+                    WorldPacket data(SMSG_PET_REMOVED_SPELL, 4);
+                    data << uint32(spell_id);
+                    ((Player*)owner)->GetSession()->SendPacket(&data);
+                }
             }
         }
         return true;
