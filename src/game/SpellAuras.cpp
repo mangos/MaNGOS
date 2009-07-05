@@ -1178,23 +1178,32 @@ void Aura::SendAuraUpdate(bool remove)
 
 void Aura::SetStackAmount(uint8 stackAmount)
 {
-    if (stackAmount != m_stackAmount)
+    if (stackAmount == m_stackAmount)
+        // Nothing changed
+        return;
+
+    Unit *target = GetTarget();
+    Unit *caster = GetCaster();
+    if (!target || !caster)
+        return;
+
+    bool refresh = stackAmount > m_stackAmount;
+    m_stackAmount = stackAmount;
+    int32 amount = m_stackAmount * caster->CalculateSpellDamage(m_spellProto, m_effIndex, m_currentBasePoints, target);
+    // Reapply if amount change
+    if (amount!=m_modifier.m_amount)
     {
-        Unit *target = GetTarget();
-        Unit *caster = GetCaster();
-        if (!target || !caster)
-            return;
-        m_stackAmount = stackAmount;
-        int32 amount = m_stackAmount * caster->CalculateSpellDamage(m_spellProto, m_effIndex, m_currentBasePoints, target);
-        // Reapply if amount change
-        if (amount!=m_modifier.m_amount)
-        {
-            ApplyModifier(false, true);
-            m_modifier.m_amount = amount;
-            ApplyModifier(true, true);
-        }
+        ApplyModifier(false, true);
+        m_modifier.m_amount = amount;
+        ApplyModifier(true, true);
     }
-    RefreshAura();
+
+    if (refresh)
+        // Stack increased refresh duration
+        RefreshAura();
+    else
+        // Stack decreased only send update
+        SendAuraUpdate(false);
 }
 
 bool Aura::modStackAmount(int32 num)
