@@ -4336,19 +4336,25 @@ void Spell::EffectWeaponDmg(uint32 i)
                 uint32 stack = 0;
                 // Need refresh all Sunder Armor auras from this caster
                 Unit::AuraMap& suAuras = unitTarget->GetAuras();
+                SpellEntry const *spellInfo;
                 for(Unit::AuraMap::iterator itr = suAuras.begin(); itr != suAuras.end(); ++itr)
                 {
-                    SpellEntry const *spellInfo = (*itr).second->GetSpellProto();
+                    spellInfo = (*itr).second->GetSpellProto();
                     if( spellInfo->SpellFamilyName == SPELLFAMILY_WARRIOR &&
                         (spellInfo->SpellFamilyFlags & UI64LIT(0x0000000000004000)) &&
                         (*itr).second->GetCasterGUID() == m_caster->GetGUID())
                     {
                         (*itr).second->RefreshAura();
                         stack = (*itr).second->GetStackAmount();
+                        break;
                     }
                 }
                 if (stack)
                     spell_bonus += stack * CalculateDamage(2, unitTarget);
+                if (!stack || stack < spellInfo->StackAmount)
+                    // Devastate causing Sunder Armor Effect
+                    // and no need to cast over max stack amount
+                    m_caster->CastSpell(unitTarget, 58567, true);
             }
             break;
         }
