@@ -1777,6 +1777,8 @@ class MANGOS_DLL_SPEC Player : public Unit
         static uint32 getFactionForRace(uint8 race);
         void setFactionForRace(uint8 race);
 
+        void InitDisplayIds();
+
         bool IsAtGroupRewardDistance(WorldObject const* pRewardSource) const;
         bool RewardPlayerAndGroupAtKill(Unit* pVictim);
         void RewardPlayerAndGroupAtEvent(uint32 creature_id,WorldObject* pRewardSource);
