@@ -4387,6 +4387,23 @@ SpellCastResult Spell::CheckCast(bool strict)
 
                 break;
             }
+            case SPELL_AURA_MOD_POSSESS_PET:
+            {
+                if(m_caster->GetCharmGUID())
+                    return SPELL_FAILED_ALREADY_HAVE_CHARM;
+
+                if(m_caster->GetCharmerGUID())
+                    return SPELL_FAILED_CHARMED;
+
+                Pet* pet = m_caster->GetPet();
+                if(!pet)
+                    return SPELL_FAILED_NO_PET;
+
+                if(pet->GetCharmerGUID())
+                    return SPELL_FAILED_CHARMED;
+
+                break;
+            }
             case SPELL_AURA_MOUNTED:
             {
                 if (m_caster->IsInWater())
