@@ -204,6 +204,7 @@ enum SpellTargets
 #define SPELL_SPELL_CHANNEL_UPDATE_INTERVAL (1*IN_MILISECONDS)
 
 typedef std::multimap<uint64, uint64> SpellTargetTimeMap;
+typedef std::list<uint32>             SpellPrecasts;
 
 class Spell
 {
@@ -335,6 +336,13 @@ class Spell
         void TakeCastItem();
         void TriggerSpell();
 
+        void AddPrecastSpell(uint32 spellId)
+        {
+            if (!m_preCastSpells)
+                m_preCastSpells = new SpellPrecasts();
+            m_preCastSpells->push_back(spellId);
+        }
+
         SpellCastResult CheckCast(bool strict);
         SpellCastResult CheckPetCast(Unit* target);
 
@@ -399,7 +407,7 @@ class Spell
         Item* m_CastItem;
         uint8 m_cast_count;
         uint32 m_glyphIndex;
-        uint32 m_preCastSpell;
+        SpellPrecasts *m_preCastSpells;
         SpellCastTargets m_targets;
 
         int32 GetCastTime() const { return m_casttime; }
