@@ -5521,6 +5521,17 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     }
                     return true;
                 }
+                // Judgements of the Wise
+                case 31876:
+                case 31877:
+                case 31878:
+                    target = this;
+                    basepoints0 = GetCreatePowers(POWER_MANA) * 25 / 100;
+                    triggered_spell_id = 31930;
+
+                    // Replenishment
+                    CastSpell(this, 57669, true, NULL, triggeredByAura);
+                    break;
                 // Holy Power (Redemption Armor set)
                 case 28789:
                 {
