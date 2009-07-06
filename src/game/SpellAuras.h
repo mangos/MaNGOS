@@ -325,6 +325,8 @@ class MANGOS_DLL_SPEC Aura
     protected:
         Aura(SpellEntry const* spellproto, uint32 eff, int32 *currentBasePoints, Unit *target, Unit *caster = NULL, Item* castItem = NULL);
 
+        bool IsCritFromAbilityAura(Unit* caster, uint32& damage);
+
         Modifier m_modifier;
         SpellModifier *m_spellmod;
 
