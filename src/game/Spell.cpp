@@ -395,6 +395,7 @@ Spell::Spell( Unit* Caster, SpellEntry const *info, bool triggered, uint64 origi
 
     m_castPositionX = m_castPositionY = m_castPositionZ = 0;
     m_TriggerSpells.clear();
+    m_preCastSpells.clear();
     m_IsTriggeredSpell = triggered;
     //m_AreaAura = false;
     m_CastItem = NULL;
@@ -405,7 +406,6 @@ Spell::Spell( Unit* Caster, SpellEntry const *info, bool triggered, uint64 origi
     focusObject = NULL;
     m_cast_count = 0;
     m_glyphIndex = 0;
-    m_preCastSpells = NULL;
     m_triggeredByAuraSpell  = NULL;
 
     //Auto Shot & Shoot (wand)
@@ -445,7 +445,6 @@ Spell::Spell( Unit* Caster, SpellEntry const *info, bool triggered, uint64 origi
 
 Spell::~Spell()
 {
-    delete m_preCastSpells;
 }
 
 template<typename T>
@@ -1239,12 +1238,11 @@ void Spell::DoSpellHitOnUnit(Unit *unit, const uint32 effectMask)
         unit->IncrDiminishing(m_diminishGroup);
 
     // Apply additional spell effects to target
-    if (m_preCastSpells)
+    while (!m_preCastSpells.empty())
     {
-        for (SpellPrecasts::const_iterator i = m_preCastSpells->begin(); i != m_preCastSpells->end(); ++i)
-            m_caster->CastSpell(unit, *i, true, m_CastItem);
-        delete m_preCastSpells;
-        m_preCastSpells = NULL;
+        uint32 spellId = *m_preCastSpells.begin();
+        m_caster->CastSpell(unit, spellId, true, m_CastItem);
+        m_preCastSpells.erase(m_preCastSpells.begin());
     }
 
     for(uint32 effectNumber = 0; effectNumber < 3; ++effectNumber)
