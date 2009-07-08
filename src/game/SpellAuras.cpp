@@ -3074,33 +3074,33 @@ void Aura::HandleModPossess(bool apply, bool Real)
     if(!Real)
         return;
 
-    if(m_target->getLevel() > m_modifier.m_amount)
-        return;
-
     // not possess yourself
     if(GetCasterGUID() == m_target->GetGUID())
         return;
 
     Unit* caster = GetCaster();
-    if(!caster)
+    if(!caster || caster->GetTypeId() != TYPEID_PLAYER)
         return;
+
+    Player* p_caster = (Player*)caster;
+
 
     if( apply )
     {
-        m_target->SetCharmerGUID(GetCasterGUID());
-        m_target->setFaction(caster->getFaction());
+        m_target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
 
-        caster->SetCharm(m_target);
+        m_target->SetCharmerGUID(p_caster->GetGUID());
+        m_target->setFaction(p_caster->getFaction());
 
-        if(caster->GetTypeId() == TYPEID_PLAYER)
-        {
-            ((Player*)caster)->SetFarSightGUID(m_target->GetGUID());
-            ((Player*)caster)->SetClientControl(m_target, 1);
-            ((Player*)caster)->SetMover(m_target);
-        }
+        p_caster->SetCharm(m_target);
+
+        p_caster->SetFarSightGUID(m_target->GetGUID());
+        p_caster->SetClientControl(m_target, 1);
+        p_caster->SetMover(m_target);
 
         m_target->CombatStop();
         m_target->DeleteThreatList();
+
         if(m_target->GetTypeId() == TYPEID_UNIT)
         {
             m_target->StopMoving();
@@ -3115,13 +3115,14 @@ void Aura::HandleModPossess(bool apply, bool Real)
         if(CharmInfo *charmInfo = m_target->InitCharmInfo(m_target))
             charmInfo->InitPossessCreateSpells();
 
-        if(caster->GetTypeId() == TYPEID_PLAYER)
-            ((Player*)caster)->PossessSpellInitialize();
+        p_caster->PossessSpellInitialize();
     }
     else
     {
+        m_target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+
         m_target->SetCharmerGUID(0);
-        caster->InterruptSpell(CURRENT_CHANNELED_SPELL);    // the spell is not automatically canceled when interrupted, do it now
+        p_caster->InterruptSpell(CURRENT_CHANNELED_SPELL);  // the spell is not automatically canceled when interrupted, do it now
 
         if(m_target->GetTypeId() == TYPEID_PLAYER)
         {
@@ -3134,18 +3135,13 @@ void Aura::HandleModPossess(bool apply, bool Real)
             m_target->setFaction(cinfo->faction_A);
         }
 
-        caster->SetCharm(NULL);
+        p_caster->SetCharm(NULL);
 
-        if(caster->GetTypeId() == TYPEID_PLAYER)
-        {
-            ((Player*)caster)->SetFarSightGUID(0);
-            ((Player*)caster)->SetClientControl(m_target, 0);
-            ((Player*)caster)->SetMover(NULL);
+        p_caster->SetFarSightGUID(0);
+        p_caster->SetClientControl(m_target, 0);
+        p_caster->SetMover(NULL);
 
-            WorldPacket data(SMSG_PET_SPELLS, 8);
-            data << uint64(0);
-            ((Player*)caster)->GetSession()->SendPacket(&data);
-        }
+        p_caster->RemovePetActionBar();
 
         if(m_target->GetTypeId() == TYPEID_UNIT)
         {
@@ -3170,14 +3166,16 @@ void Aura::HandleModPossessPet(bool apply, bool Real)
     if(!pet || pet != m_target)
         return;
 
-    if(apply)
-        pet->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_24);
-    else
-        pet->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_24);
+    Player* p_caster = (Player*)caster;
 
-    ((Player*)caster)->SetFarSightGUID(apply ? pet->GetGUID() : 0);
-    ((Player*)caster)->SetCharm(apply ? pet : NULL);
-    ((Player*)caster)->SetClientControl(pet, apply ? 1 : 0);
+    if(apply)
+        pet->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+    else
+        pet->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+
+    p_caster->SetFarSightGUID(apply ? pet->GetGUID() : 0);
+    p_caster->SetCharm(apply ? pet : NULL);
+    p_caster->SetClientControl(pet, apply ? 1 : 0);
     ((Player*)caster)->SetMover(apply ? pet : NULL);
 
     if(apply)
@@ -3217,99 +3215,91 @@ void Aura::HandleModCharm(bool apply, bool Real)
     if(!caster)
         return;
 
-    if(int32(m_target->getLevel()) <= m_modifier.m_amount)
+    if( apply )
     {
-        if( apply )
+        m_target->SetCharmerGUID(GetCasterGUID());
+        m_target->setFaction(caster->getFaction());
+        m_target->CastStop(m_target == caster ? GetId() : 0);
+        caster->SetCharm(m_target);
+
+        m_target->CombatStop();
+        m_target->DeleteThreatList();
+
+        if(m_target->GetTypeId() == TYPEID_UNIT)
         {
-            m_target->SetCharmerGUID(GetCasterGUID());
-            m_target->setFaction(caster->getFaction());
-            m_target->CastStop(m_target == caster ? GetId() : 0);
-            caster->SetCharm(m_target);
+            ((Creature*)m_target)->AIM_Initialize();
+            CharmInfo *charmInfo = m_target->InitCharmInfo(m_target);
+            charmInfo->InitCharmCreateSpells();
+            charmInfo->SetReactState( REACT_DEFENSIVE );
 
-            m_target->CombatStop();
-            m_target->DeleteThreatList();
-
-            if(m_target->GetTypeId() == TYPEID_UNIT)
-            {
-                ((Creature*)m_target)->AIM_Initialize();
-                CharmInfo *charmInfo = m_target->InitCharmInfo(m_target);
-                charmInfo->InitCharmCreateSpells();
-                charmInfo->SetReactState( REACT_DEFENSIVE );
-
-                if(caster->GetTypeId() == TYPEID_PLAYER && caster->getClass() == CLASS_WARLOCK)
-                {
-                    CreatureInfo const *cinfo = ((Creature*)m_target)->GetCreatureInfo();
-                    if(cinfo && cinfo->type == CREATURE_TYPE_DEMON)
-                    {
-                        //does not appear to have relevance. Why code added initially? See note below at !apply
-                        //to prevent client crash
-                        //m_target->SetFlag(UNIT_FIELD_BYTES_0, 2048);
-                        //just to enable stat window
-                        charmInfo->SetPetNumber(objmgr.GeneratePetNumber(), true);
-                        //if charmed two demons the same session, the 2nd gets the 1st one's name
-                        m_target->SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, time(NULL));
-                    }
-                }
-            }
-
-            if(caster->GetTypeId() == TYPEID_PLAYER)
-            {
-                ((Player*)caster)->CharmSpellInitialize();
-            }
-        }
-        else
-        {
-            m_target->SetCharmerGUID(0);
-
-            if(m_target->GetTypeId() == TYPEID_PLAYER)
-                ((Player*)m_target)->setFactionForRace(m_target->getRace());
-            else
+            if(caster->GetTypeId() == TYPEID_PLAYER && caster->getClass() == CLASS_WARLOCK)
             {
                 CreatureInfo const *cinfo = ((Creature*)m_target)->GetCreatureInfo();
-
-                // restore faction
-                if(((Creature*)m_target)->isPet())
+                if(cinfo && cinfo->type == CREATURE_TYPE_DEMON)
                 {
-                    if(Unit* owner = m_target->GetOwner())
-                        m_target->setFaction(owner->getFaction());
-                    else if(cinfo)
-                        m_target->setFaction(cinfo->faction_A);
+                    //does not appear to have relevance. Why code added initially? See note below at !apply
+                    //to prevent client crash
+                    //m_target->SetFlag(UNIT_FIELD_BYTES_0, 2048);
+                    //just to enable stat window
+                    charmInfo->SetPetNumber(objmgr.GeneratePetNumber(), true);
+                    //if charmed two demons the same session, the 2nd gets the 1st one's name
+                    m_target->SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, time(NULL));
                 }
-                else if(cinfo)                              // normal creature
+            }
+        }
+
+        if(caster->GetTypeId() == TYPEID_PLAYER)
+            ((Player*)caster)->CharmSpellInitialize();
+    }
+    else
+    {
+        m_target->SetCharmerGUID(0);
+
+        if(m_target->GetTypeId() == TYPEID_PLAYER)
+            ((Player*)m_target)->setFactionForRace(m_target->getRace());
+        else
+        {
+            CreatureInfo const *cinfo = ((Creature*)m_target)->GetCreatureInfo();
+
+            // restore faction
+            if(((Creature*)m_target)->isPet())
+            {
+                if(Unit* owner = m_target->GetOwner())
+                    m_target->setFaction(owner->getFaction());
+                else if(cinfo)
                     m_target->setFaction(cinfo->faction_A);
-
-                // restore UNIT_FIELD_BYTES_0
-                if(cinfo && caster->GetTypeId() == TYPEID_PLAYER && caster->getClass() == CLASS_WARLOCK && cinfo->type == CREATURE_TYPE_DEMON)
-                {
-                    //does not appear to have relevance. Why code added initially? Class, gender, powertype should be same.
-                    //db field removed and replaced with better way to set class, restore using this if problems
-                    /*CreatureDataAddon const *cainfo = ((Creature*)m_target)->GetCreatureAddon();
-                    if(cainfo && cainfo->bytes0 != 0)
-                        m_target->SetUInt32Value(UNIT_FIELD_BYTES_0, cainfo->bytes0);
-                    else
-                        m_target->RemoveFlag(UNIT_FIELD_BYTES_0, 2048);*/
-
-                    if(m_target->GetCharmInfo())
-                        m_target->GetCharmInfo()->SetPetNumber(0, true);
-                    else
-                        sLog.outError("Aura::HandleModCharm: target (GUID: %u TypeId: %u) has a charm aura but no charm info!", m_target->GetGUIDLow(), m_target->GetTypeId());
-                }
             }
+            else if(cinfo)                              // normal creature
+                m_target->setFaction(cinfo->faction_A);
 
-            caster->SetCharm(NULL);
-
-            if(caster->GetTypeId() == TYPEID_PLAYER)
+            // restore UNIT_FIELD_BYTES_0
+            if(cinfo && caster->GetTypeId() == TYPEID_PLAYER && caster->getClass() == CLASS_WARLOCK && cinfo->type == CREATURE_TYPE_DEMON)
             {
-                WorldPacket data(SMSG_PET_SPELLS, 8);
-                data << uint64(0);
-                ((Player*)caster)->GetSession()->SendPacket(&data);
+                //does not appear to have relevance. Why code added initially? Class, gender, powertype should be same.
+                //db field removed and replaced with better way to set class, restore using this if problems
+                /*CreatureDataAddon const *cainfo = ((Creature*)m_target)->GetCreatureAddon();
+                if(cainfo && cainfo->bytes0 != 0)
+                m_target->SetUInt32Value(UNIT_FIELD_BYTES_0, cainfo->bytes0);
+                else
+                m_target->RemoveFlag(UNIT_FIELD_BYTES_0, 2048);*/
+
+                if(m_target->GetCharmInfo())
+                    m_target->GetCharmInfo()->SetPetNumber(0, true);
+                else
+                    sLog.outError("Aura::HandleModCharm: target (GUID: %u TypeId: %u) has a charm aura but no charm info!", m_target->GetGUIDLow(), m_target->GetTypeId());
             }
-            if(m_target->GetTypeId() == TYPEID_UNIT)
-            {
-                ((Creature*)m_target)->AIM_Initialize();
-                if (((Creature*)m_target)->AI())
-                    ((Creature*)m_target)->AI()->AttackedBy(caster);
-            }
+        }
+
+        caster->SetCharm(NULL);
+
+        if(caster->GetTypeId() == TYPEID_PLAYER)
+            ((Player*)caster)->RemovePetActionBar();
+
+        if(m_target->GetTypeId() == TYPEID_UNIT)
+        {
+            ((Creature*)m_target)->AIM_Initialize();
+            if (((Creature*)m_target)->AI())
+                ((Creature*)m_target)->AI()->AttackedBy(caster);
         }
     }
 }
