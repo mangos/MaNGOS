@@ -169,7 +169,7 @@ struct ActionButton
     }
 };
 
-#define  MAX_ACTION_BUTTONS 144                             //checked in 2.3.0
+#define  MAX_ACTION_BUTTONS 144                             //checked in 3.2.0
 
 typedef std::map<uint8,ActionButton> ActionButtonList;
 
@@ -316,20 +316,24 @@ typedef std::list<Item*> ItemDurationList;
 
 enum LfgType
 {
-    LFG_TYPE_NONE           = 0,
-    LFG_TYPE_DUNGEON        = 1,
-    LFG_TYPE_RAID           = 2,
-    LFG_TYPE_QUEST          = 3,
-    LFG_TYPE_ZONE           = 4,
-    LFG_TYPE_HEROIC_DUNGEON = 5
+    LFG_TYPE_NONE                 = 0,
+    LFG_TYPE_DUNGEON              = 1,
+    LFG_TYPE_RAID                 = 2,
+    LFG_TYPE_QUEST                = 3,
+    LFG_TYPE_ZONE                 = 4,
+    LFG_TYPE_HEROIC_DUNGEON       = 5,
+    LFG_TYPE_ANY_DUNGEON          = 6,
+    LFG_TYPE_ANY_HEROIC_DUNGEON   = 7,
+    LFG_TYPE_DAILY_DUNGEON        = 8,
+    LFG_TYPE_DAILY_HEROIC_DUNGEON = 9
 };
 
 enum LfgRoles
 {
-    LEADER  = 1,
-    TANK    = 2,
-    HEALER  = 4,
-    DAMAGE  = 8
+    LEADER  = 0x01,
+    TANK    = 0x02,
+    HEALER  = 0x04,
+    DAMAGE  = 0x08
 };
 
 struct LookingForGroupSlot
