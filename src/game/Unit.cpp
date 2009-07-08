@@ -4278,13 +4278,13 @@ void Unit::SendPeriodicAuraLog(SpellPeriodicAuraLogInfo *pInfo)
             data << uint32(GetSpellSchoolMask(aura->GetSpellProto()));
             data << uint32(pInfo->absorb);                  // absorb
             data << uint32(pInfo->resist);                  // resist
-            data << uint8(0);                               // new 3.1.2
+            data << uint8(pInfo->critical ? 1 : 0);         // new 3.1.2 critical flag
             break;
         case SPELL_AURA_PERIODIC_HEAL:
         case SPELL_AURA_OBS_MOD_HEALTH:
             data << uint32(pInfo->damage);                  // damage
             data << uint32(pInfo->overDamage);              // overheal?
-            data << uint8(0);                               // new 3.1.2
+            data << uint8(pInfo->critical ? 1 : 0);         // new 3.1.2 critical flag
             break;
         case SPELL_AURA_OBS_MOD_MANA:
         case SPELL_AURA_PERIODIC_ENERGIZE:
@@ -5521,6 +5521,17 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     }
                     return true;
                 }
+                // Judgements of the Wise
+                case 31876:
+                case 31877:
+                case 31878:
+                    target = this;
+                    basepoints0 = GetCreatePowers(POWER_MANA) * 25 / 100;
+                    triggered_spell_id = 31930;
+
+                    // Replenishment
+                    CastSpell(this, 57669, true, NULL, triggeredByAura);
+                    break;
                 // Holy Power (Redemption Armor set)
                 case 28789:
                 {
@@ -6765,6 +6776,14 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
         {
             if(!procSpell || procSpell->powerType!=POWER_MANA || procSpell->manaCost==0 && procSpell->ManaCostPercentage==0 && procSpell->manaCostPerlevel==0)
                 return false;
+            break;
+        }
+        // Sword and Board
+        case 50227:
+        {
+            // Remove cooldown on Shield Slam
+            if (GetTypeId() == TYPEID_PLAYER)
+                ((Player*)this)->RemoveSpellCategoryCooldown(1209, true);
             break;
         }
         // Brain Freeze
@@ -9788,7 +9807,8 @@ int32 Unit::CalculateSpellDamage(SpellEntry const* spellProto, uint8 effect_inde
 
     if(spellProto->Attributes & SPELL_ATTR_LEVEL_DAMAGE_CALCULATION && spellProto->spellLevel &&
             spellProto->Effect[effect_index] != SPELL_EFFECT_WEAPON_PERCENT_DAMAGE &&
-            spellProto->Effect[effect_index] != SPELL_EFFECT_KNOCK_BACK)
+            spellProto->Effect[effect_index] != SPELL_EFFECT_KNOCK_BACK &&
+            (spellProto->Effect[effect_index] != SPELL_EFFECT_APPLY_AURA || spellProto->EffectApplyAuraName[effect_index] != SPELL_AURA_MOD_DECREASE_SPEED))
         value = int32(value*0.25f*exp(getLevel()*(70-spellProto->spellLevel)/1000.0f));
 
     return value;

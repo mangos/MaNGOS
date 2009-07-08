@@ -4504,9 +4504,6 @@ bool ChatHandler::HandleResetHonorCommand (const char * args)
 
 static bool HandleResetStatsOrLevelHelper(Player* player)
 {
-    PlayerInfo const *info = objmgr.GetPlayerInfo(player->getRace(), player->getClass());
-    if(!info) return false;
-
     ChrClassesEntry const* cEntry = sChrClassesStore.LookupEntry(player->getClass());
     if(!cEntry)
     {
@@ -4529,21 +4526,7 @@ static bool HandleResetStatsOrLevelHelper(Player* player)
 
     // reset only if player not in some form;
     if(player->m_form==FORM_NONE)
-    {
-        switch(player->getGender())
-        {
-            case GENDER_FEMALE:
-                player->SetDisplayId(info->displayId_f);
-                player->SetNativeDisplayId(info->displayId_f);
-                break;
-            case GENDER_MALE:
-                player->SetDisplayId(info->displayId_m);
-                player->SetNativeDisplayId(info->displayId_m);
-                break;
-            default:
-                break;
-        }
-    }
+        player->InitDisplayIds();
 
     player->SetByteValue(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_PVP );
     player->SetByteValue(UNIT_FIELD_BYTES_2, 3, player->m_form);
@@ -5623,18 +5606,18 @@ bool ChatHandler::HandlePDumpLoadCommand(const char *args)
     char* name_str = strtok(NULL, " ");
 
     std::string name;
-    if(name_str)
+    if (name_str)
     {
         name = name_str;
         // normalize the name if specified and check if it exists
-        if(!normalizePlayerName(name))
+        if (!normalizePlayerName(name))
         {
             PSendSysMessage(LANG_INVALID_CHARACTER_NAME);
             SetSentErrorMessage(true);
             return false;
         }
 
-        if(!ObjectMgr::IsValidName(name,true))
+        if (ObjectMgr::CheckPlayerName(name,true) != CHAR_NAME_SUCCESS)
         {
             PSendSysMessage(LANG_INVALID_CHARACTER_NAME);
             SetSentErrorMessage(true);
@@ -5646,17 +5629,17 @@ bool ChatHandler::HandlePDumpLoadCommand(const char *args)
 
     uint32 guid = 0;
 
-    if(guid_str)
+    if (guid_str)
     {
         guid = atoi(guid_str);
-        if(!guid)
+        if (!guid)
         {
             PSendSysMessage(LANG_INVALID_CHARACTER_GUID);
             SetSentErrorMessage(true);
             return false;
         }
 
-        if(objmgr.GetPlayerAccountIdByGUID(guid))
+        if (objmgr.GetPlayerAccountIdByGUID(guid))
         {
             PSendSysMessage(LANG_CHARACTER_GUID_IN_USE,guid);
             SetSentErrorMessage(true);
@@ -6562,8 +6545,7 @@ bool ChatHandler::HandleModifyGenderCommand(const char *args)
     player->SetByteValue(PLAYER_BYTES_3, 0, gender);
 
     // Change display ID
-    player->SetDisplayId(gender ? info->displayId_f : info->displayId_m);
-    player->SetNativeDisplayId(gender ? info->displayId_f : info->displayId_m);
+    player->InitDisplayIds();
 
     char const* gender_full = gender ? "female" : "male";
 
