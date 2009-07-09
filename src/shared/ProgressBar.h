@@ -18,7 +18,6 @@
 #ifndef MANGOSSERVER_PROGRESSBAR_H
 #define MANGOSSERVER_PROGRESSBAR_H
 
-#include <stdio.h>
 #include "Platform/Define.h"
 
 class MANGOS_DLL_SPEC barGoLink
