@@ -22,7 +22,7 @@
 #include "Creature.h"
 #include "ObjectAccessor.h"
 
-class TemporarySummon : public Creature
+class MANGOS_DLL_SPEC TemporarySummon : public Creature
 {
     public:
         explicit TemporarySummon(uint64 summoner = 0);
