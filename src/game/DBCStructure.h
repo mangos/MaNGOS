@@ -1303,11 +1303,11 @@ struct SpellEntry
     uint32    AttributesEx4;                                // 8        m_attributesExD
     uint32    AttributesEx5;                                // 9        m_attributesExE
     //uint32    AttributesEx6;                              // 10       m_attributesExF not used
-    // new 3.2
+    // uint32 unk_320_1; // 3.2.0 (0x20 - totems, 0x4 - paladin auras, etc...)
     uint32    Stances;                                      // 11       m_shapeshiftMask
-    // new 3.2
+    // uint32 unk_320_2; // 3.2.0
     uint32    StancesNot;                                   // 12       m_shapeshiftExclude
-    // new 3.2
+    // uint32 unk_320_3; // 3.2.0
     uint32    Targets;                                      // 13       m_targets
     uint32    TargetCreatureType;                           // 14       m_targetCreatureType
     uint32    RequiresSpellFocus;                           // 15       m_requiresSpellFocus
@@ -1403,10 +1403,8 @@ struct SpellEntry
     uint32    runeCostID;                                   // 229      m_runeCostID
     //uint32    spellMissileID;                             // 230      m_spellMissileID not used
     //uint32  PowerDisplayId;                               // 231 PowerDisplay.dbc, new in 3.1
-    //uint32 unk1; // 3.2
-    //uint32 unk2; // 3.2
-    //uint32 unk3; // 3.2
-    //uint32 unk4; // 3.2
+    //float unk_320_4[3]; // 3.2.0
+    //uint32 spellDescriptionVariablesID; // 3.2.0
 
     // helpers
     int32 CalculateSimpleValue(uint8 eff) const { return EffectBasePoints[eff]+int32(EffectBaseDice[eff]); }
