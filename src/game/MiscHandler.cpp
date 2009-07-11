@@ -1161,12 +1161,9 @@ void WorldSession::HandleWardenDataOpcode(WorldPacket& /*recv_data*/)
 
 void WorldSession::HandlePlayedTime(WorldPacket& /*recv_data*/)
 {
-    uint32 TotalTimePlayed = GetPlayer()->GetTotalPlayedTime();
-    uint32 LevelPlayedTime = GetPlayer()->GetLevelPlayedTime();
-
-    WorldPacket data(SMSG_PLAYED_TIME, 9);
-    data << TotalTimePlayed;
-    data << LevelPlayedTime;
+    WorldPacket data(SMSG_PLAYED_TIME, 4 + 4 + 1);
+    data << uint32(_player->GetTotalPlayedTime());
+    data << uint32(_player->GetLevelPlayedTime());
     data << uint8(0);
     SendPacket(&data);
 }
@@ -1261,7 +1258,7 @@ void WorldSession::HandleWorldTeleportOpcode(WorldPacket& recv_data)
     DEBUG_LOG("Time %u sec, map=%u, x=%f, y=%f, z=%f, orient=%f", time/1000, mapid, PositionX, PositionY, PositionZ, Orientation);
 
     if (GetSecurity() >= SEC_ADMINISTRATOR)
-        GetPlayer()->TeleportTo(mapid,PositionX,PositionY,PositionZ,Orientation);
+        GetPlayer()->TeleportTo(mapid, PositionX, PositionY, PositionZ, Orientation);
     else
         SendNotification(LANG_YOU_NOT_HAVE_PERMISSION);
     sLog.outDebug("Received worldport command from player %s", GetPlayer()->GetName());
