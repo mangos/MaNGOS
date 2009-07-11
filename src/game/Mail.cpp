@@ -29,6 +29,15 @@
 #include "Language.h"
 #include "DBCStores.h"
 
+enum MailShowFlags
+{
+    MAIL_SHOW_UNK0    = 0x0001,
+    MAIL_SHOW_DELETE  = 0x0002,                             // forced show delete button instead return button
+    MAIL_SHOW_AUCTION = 0x0004,                             // from old comment
+    MAIL_SHOW_COD     = 0x0008,                             // show subject prefix
+    MAIL_SHOW_UNK4    = 0x0010,
+};
+
 void MailItem::deleteItem( bool inDB )
 {
     if(item)
@@ -601,6 +610,14 @@ void WorldSession::HandleGetMailList(WorldPacket & recv_data )
         if(data.wpos()+next_mail_size > maxPacketSize)
             break;
 
+        uint32 show_flags = 0;
+        if ((*itr)->messageType != MAIL_NORMAL)
+            show_flags |= MAIL_SHOW_DELETE;
+        if ((*itr)->messageType == MAIL_AUCTION)
+            show_flags |= MAIL_SHOW_AUCTION;
+        if ((*itr)->COD)
+            show_flags |= MAIL_SHOW_COD;
+
         data << (uint16) 0x0040;                            // unknown 2.3.0, different values
         data << (uint32) (*itr)->messageID;                 // Message ID
         data << (uint8) (*itr)->messageType;                // Message Type
@@ -624,7 +641,7 @@ void WorldSession::HandleGetMailList(WorldPacket & recv_data )
         data << (uint32) 0;                                 // unknown
         data << (uint32) (*itr)->stationery;                // stationery (Stationery.dbc)
         data << (uint32) (*itr)->money;                     // Gold
-        data << (uint32) 0x04;                              // unknown, 0x4 - auction, 0x10 - normal
+        data << (uint32) show_flags;                        // unknown, 0x4 - auction, 0x10 - normal
                                                             // Time
         data << (float)  ((*itr)->expire_time-time(NULL))/DAY;
         data << (uint32) (*itr)->mailTemplateId;            // mail template (MailTemplate.dbc)
