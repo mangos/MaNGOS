@@ -510,8 +510,6 @@ enum ActivateTaxiReplies
     ERR_TAXINOTSTANDING             = 12
 };
 
-
-
 enum MirrorTimerType
 {
     FATIGUE_TIMER      = 0,
@@ -717,6 +715,19 @@ enum InstanceResetWarningType
     RAID_INSTANCE_WARNING_MIN_SOON  = 3,                    // WARNING! %s is scheduled to reset in %d minute(s). Please exit the zone or you will be returned to your bind location!
     RAID_INSTANCE_WELCOME           = 4,                    // Welcome to %s. This raid instance is scheduled to reset in %s.
     RAID_INSTANCE_EXPIRED           = 5
+};
+
+// PLAYER_FIELD_ARENA_TEAM_INFO_1_1 offsets
+enum ArenaTeamInfoType
+{
+    ARENA_TEAM_ID               = 0,
+    ARENA_TEAM_MEMBER           = 1,                        // 0 - captain, 1 - member
+    ARENA_TEAM_GAMES_WEEK       = 2,
+    ARENA_TEAM_GAMES_SEASON     = 3,
+    ARENA_TEAM_WINS_SEASON      = 4,
+    ARENA_TEAM_PERSONAL_RATING  = 5,
+    ARENA_TEAM_UNK2             = 6,                        // new in 3.2
+    ARENA_TEAM_END              = 7
 };
 
 // used in most movement packets (send and received)
@@ -1609,9 +1620,9 @@ class MANGOS_DLL_SPEC Player : public Unit
         // Arena Team
         void SetInArenaTeam(uint32 ArenaTeamId, uint8 slot)
         {
-            SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (slot * 7), ArenaTeamId);
+            SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (slot * ARENA_TEAM_END), ArenaTeamId);
         }
-        uint32 GetArenaTeamId(uint8 slot) { return GetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (slot * 7)); }
+        uint32 GetArenaTeamId(uint8 slot) { return GetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (slot * ARENA_TEAM_END)); }
         static uint32 GetArenaTeamIdFromDB(uint64 guid, uint8 slot);
         void SetArenaTeamIdInvited(uint32 ArenaTeamId) { m_ArenaTeamIdInvited = ArenaTeamId; }
         uint32 GetArenaTeamIdInvited() { return m_ArenaTeamIdInvited; }

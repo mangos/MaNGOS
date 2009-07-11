@@ -138,11 +138,11 @@ bool ArenaTeam::AddMember(const uint64& PlayerGuid)
     {
         pl->SetInArenaTeam(Id, GetSlot());
         pl->SetArenaTeamIdInvited(0);
-        pl->SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (GetSlot() * 7) + 5, newmember.personal_rating );
+        pl->SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (GetSlot() * ARENA_TEAM_END) + ARENA_TEAM_PERSONAL_RATING, newmember.personal_rating );
 
         // hide promote/remove buttons
         if(CaptainGuid != PlayerGuid)
-            pl->SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (GetSlot() * 7) + 1, 1);
+            pl->SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (GetSlot() * ARENA_TEAM_END) + ARENA_TEAM_MEMBER, 1);
     }
     return true;
 }
@@ -238,7 +238,7 @@ void ArenaTeam::SetCaptain(const uint64& guid)
     // disable remove/promote buttons
     Player *oldcaptain = objmgr.GetPlayer(GetCaptain());
     if(oldcaptain)
-        oldcaptain->SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + 1 + (GetSlot() * 7), 1);
+        oldcaptain->SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (GetSlot() * ARENA_TEAM_END) + ARENA_TEAM_MEMBER, 1);
 
     // set new captain
     CaptainGuid = guid;
@@ -249,7 +249,7 @@ void ArenaTeam::SetCaptain(const uint64& guid)
     // enable remove/promote buttons
     Player *newcaptain = objmgr.GetPlayer(guid);
     if(newcaptain)
-        newcaptain->SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + 1 + (GetSlot() * 7), 0);
+        newcaptain->SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (GetSlot() * ARENA_TEAM_END) + ARENA_TEAM_MEMBER, 0);
 }
 
 void ArenaTeam::DelMember(uint64 guid)
@@ -270,9 +270,9 @@ void ArenaTeam::DelMember(uint64 guid)
         player->SetInArenaTeam(0, GetSlot());
         player->GetSession()->SendArenaTeamCommandResult(ERR_ARENA_TEAM_QUIT_S, GetName(), "", 0);
         // delete all info regarding this team
-        for(int i = 0; i < 6; ++i)
+        for(int i = 0; i < ARENA_TEAM_END; ++i)
         {
-            player->SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (GetSlot() * 7) + i, 0);
+            player->SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (GetSlot() * ARENA_TEAM_END) + i, 0);
         }
     }
 
@@ -565,11 +565,11 @@ void ArenaTeam::MemberLost(Player * plr, uint32 againstRating)
             int32 mod = (int32)ceil(32.0f * (0.0f - chance));
             itr->ModifyPersonalRating(plr, mod, GetSlot());
             // update personal played stats
-            itr->games_week +=1;
-            itr->games_season +=1;
+            itr->games_week += 1;
+            itr->games_season += 1;
             // update the unit fields
-            plr->SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + 7 * GetSlot() + 2, itr->games_week);
-            plr->SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + 7 * GetSlot() + 3, itr->games_season);
+            plr->SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (GetSlot() * ARENA_TEAM_END) + ARENA_TEAM_GAMES_WEEK, itr->games_week);
+            plr->SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (GetSlot() * ARENA_TEAM_END) + ARENA_TEAM_GAMES_SEASON, itr->games_season);
             return;
         }
     }
@@ -590,8 +590,8 @@ void ArenaTeam::OfflineMemberLost(uint64 guid, uint32 againstRating)
             else
                 itr->personal_rating += mod;
             // update personal played stats
-            itr->games_week +=1;
-            itr->games_season +=1;
+            itr->games_week += 1;
+            itr->games_season += 1;
             return;
         }
     }
@@ -609,13 +609,13 @@ void ArenaTeam::MemberWon(Player * plr, uint32 againstRating)
             int32 mod = (int32)floor(32.0f * (1.0f - chance));
             itr->ModifyPersonalRating(plr, mod, GetSlot());
             // update personal stats
-            itr->games_week +=1;
-            itr->games_season +=1;
+            itr->games_week += 1;
+            itr->games_season += 1;
             itr->wins_season += 1;
             itr->wins_week += 1;
             // update unit fields
-            plr->SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + 7 * GetSlot() + 2, itr->games_week);
-            plr->SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + 7 * GetSlot() + 3, itr->games_season);
+            plr->SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (GetSlot() * ARENA_TEAM_END) + ARENA_TEAM_GAMES_WEEK, itr->games_week);
+            plr->SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (GetSlot() * ARENA_TEAM_END) + ARENA_TEAM_GAMES_SEASON, itr->games_season);
             return;
         }
     }
