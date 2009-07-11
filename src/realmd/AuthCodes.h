@@ -66,8 +66,8 @@ enum LoginResult
 
 // we need to stick to 1 version or half of the stuff will work for someone
 // others will not and opposite
-// will only support WoW, WoW:TBC and WoW:WotLK 3.2.0 client build 10072...
+// will only support WoW, WoW:TBC and WoW:WotLK 3.2.0 client build 10083...
 
-#define EXPECTED_MANGOS_CLIENT_BUILD        {10072, 0}
+#define EXPECTED_MANGOS_CLIENT_BUILD        {10083, 0}
 
 #endif

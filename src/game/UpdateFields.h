@@ -19,7 +19,7 @@
 #ifndef _UPDATEFIELDS_AUTO_H
 #define _UPDATEFIELDS_AUTO_H
 
-// Auto generated for version 0, 2, 0, 10072
+// Auto generated for version 0, 2, 0, 10083
 
 enum EObjectFields
 {
@@ -378,17 +378,18 @@ enum EUnitFields
     PLAYER_FIELD_BYTES2                       = UNIT_END + 0x041F, // Size: 1, Type: 6, Flags: PRIVATE
     PLAYER_FIELD_WATCHED_FACTION_INDEX        = UNIT_END + 0x0420, // Size: 1, Type: INT, Flags: PRIVATE
     PLAYER_FIELD_COMBAT_RATING_1              = UNIT_END + 0x0421, // Size: 25, Type: INT, Flags: PRIVATE
-    PLAYER_FIELD_ARENA_TEAM_INFO_1_1          = UNIT_END + 0x043A, // Size: 18, Type: INT, Flags: PRIVATE
-    PLAYER_FIELD_HONOR_CURRENCY               = UNIT_END + 0x044C, // Size: 1, Type: INT, Flags: PRIVATE
-    PLAYER_FIELD_ARENA_CURRENCY               = UNIT_END + 0x044D, // Size: 1, Type: INT, Flags: PRIVATE
-    PLAYER_FIELD_MAX_LEVEL                    = UNIT_END + 0x044E, // Size: 1, Type: INT, Flags: PRIVATE
-    PLAYER_FIELD_DAILY_QUESTS_1               = UNIT_END + 0x044F, // Size: 25, Type: INT, Flags: PRIVATE
-    PLAYER_RUNE_REGEN_1                       = UNIT_END + 0x0468, // Size: 4, Type: FLOAT, Flags: PRIVATE
-    PLAYER_NO_REAGENT_COST_1                  = UNIT_END + 0x046C, // Size: 3, Type: INT, Flags: PRIVATE
-    PLAYER_FIELD_GLYPH_SLOTS_1                = UNIT_END + 0x046F, // Size: 6, Type: INT, Flags: PRIVATE
-    PLAYER_FIELD_GLYPHS_1                     = UNIT_END + 0x0475, // Size: 6, Type: INT, Flags: PRIVATE
-    PLAYER_GLYPHS_ENABLED                     = UNIT_END + 0x047B, // Size: 1, Type: INT, Flags: PRIVATE
-    PLAYER_END                                = UNIT_END + 0x047C,
+    PLAYER_FIELD_ARENA_TEAM_INFO_1_1          = UNIT_END + 0x043A, // Size: 21, Type: INT, Flags: PRIVATE
+    PLAYER_FIELD_HONOR_CURRENCY               = UNIT_END + 0x044F, // Size: 1, Type: INT, Flags: PRIVATE
+    PLAYER_FIELD_ARENA_CURRENCY               = UNIT_END + 0x0450, // Size: 1, Type: INT, Flags: PRIVATE
+    PLAYER_FIELD_MAX_LEVEL                    = UNIT_END + 0x0451, // Size: 1, Type: INT, Flags: PRIVATE
+    PLAYER_FIELD_DAILY_QUESTS_1               = UNIT_END + 0x0452, // Size: 25, Type: INT, Flags: PRIVATE
+    PLAYER_RUNE_REGEN_1                       = UNIT_END + 0x046B, // Size: 4, Type: FLOAT, Flags: PRIVATE
+    PLAYER_NO_REAGENT_COST_1                  = UNIT_END + 0x046F, // Size: 3, Type: INT, Flags: PRIVATE
+    PLAYER_FIELD_GLYPH_SLOTS_1                = UNIT_END + 0x0472, // Size: 6, Type: INT, Flags: PRIVATE
+    PLAYER_FIELD_GLYPHS_1                     = UNIT_END + 0x0478, // Size: 6, Type: INT, Flags: PRIVATE
+    PLAYER_GLYPHS_ENABLED                     = UNIT_END + 0x047E, // Size: 1, Type: INT, Flags: PRIVATE
+    PLAYER_FIELD_PADDING                      = UNIT_END + 0x047F, // Size: 1, Type: INT, Flags: NONE
+    PLAYER_END                                = UNIT_END + 0x0480,
 };
 
 enum EGameObjectFields
