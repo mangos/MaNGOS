@@ -1089,6 +1089,7 @@ struct MapEntry
                                                             // 61 -1, 0 and 720
     uint32  addon;                                          // 62 (0-original maps,1-tbc addon)
                                                             // 63 some kind of time?
+    //uint32 maxPlayers;                                    // 64 max players
 
     // Helpers
     uint32 Expansion() const { return addon; }
