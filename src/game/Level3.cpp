@@ -3171,7 +3171,7 @@ bool ChatHandler::HandleLookupTaxiNodeCommand(const char * args)
         }
     }
     if (counter == 0)                                       // if counter == 0 then we found nth
-        SendSysMessage(LANG_COMMAND_NOSPELLFOUND);
+        SendSysMessage(LANG_COMMAND_NOTAXINODEFOUND);
     return true;
 }
 
