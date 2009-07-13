@@ -5287,7 +5287,7 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                         triggered_spell_id = 40446;
                         chance = 25.0f;
                     }
-                    // Mangle (cat/bear)
+                    // Mangle (Bear) and Mangle (Cat)
                     else if (procSpell->SpellFamilyFlags & UI64LIT(0x0000044000000000))
                     {
                         triggered_spell_id = 40452;
@@ -7916,8 +7916,7 @@ uint32 Unit::SpellDamageBonus(Unit *pVictim, SpellEntry const *spellProto, uint3
             TakenTotalMod *= ((*i)->GetModifier()->m_amount+100.0f)/100.0f;
 
     // Mod damage from spell mechanic
-    uint32 mechanicMask = GetAllSpellMechanicMask(spellProto);
-    if (mechanicMask)
+    if (uint32 mechanicMask = GetAllSpellMechanicMask(spellProto))
     {
         AuraList const& mDamageDoneMechanic = pVictim->GetAurasByType(SPELL_AURA_MOD_MECHANIC_DAMAGE_TAKEN_PERCENT);
         for(AuraList::const_iterator i = mDamageDoneMechanic.begin();i != mDamageDoneMechanic.end(); ++i)
