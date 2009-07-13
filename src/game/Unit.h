@@ -514,7 +514,7 @@ enum UnitFlags
     UNIT_FLAG_DISARMED         = 0x00200000,                // 3.0.3, disable melee spells casting..., "Required melee weapon" added to melee spells tooltip.
     UNIT_FLAG_CONFUSED         = 0x00400000,
     UNIT_FLAG_FLEEING          = 0x00800000,
-    UNIT_FLAG_UNK_24           = 0x01000000,                // used in spell Eyes of the Beast for pet...
+    UNIT_FLAG_PLAYER_CONTROLLED= 0x01000000,                // used in spell Eyes of the Beast for pet... let attack by controlled creature
     UNIT_FLAG_NOT_SELECTABLE   = 0x02000000,
     UNIT_FLAG_SKINNABLE        = 0x04000000,
     UNIT_FLAG_MOUNT            = 0x08000000,
@@ -686,8 +686,8 @@ struct SpellNonMeleeDamage{
 
 struct SpellPeriodicAuraLogInfo
 {
-    SpellPeriodicAuraLogInfo(Aura *_aura, uint32 _damage, uint32 _overDamage, uint32 _absorb, uint32 _resist, float _multiplier)
-        : aura(_aura), damage(_damage), overDamage(_overDamage), absorb(_absorb), resist(_resist), multiplier(_multiplier) {}
+    SpellPeriodicAuraLogInfo(Aura *_aura, uint32 _damage, uint32 _overDamage, uint32 _absorb, uint32 _resist, float _multiplier, bool _critical = false)
+        : aura(_aura), damage(_damage), overDamage(_overDamage), absorb(_absorb), resist(_resist), multiplier(_multiplier), critical(_critical) {}
 
     Aura   *aura;
     uint32 damage;
@@ -695,6 +695,7 @@ struct SpellPeriodicAuraLogInfo
     uint32 resist;
     uint32 overDamage;                                      // overkill/overheal
     float  multiplier;
+    bool   critical;
 };
 
 uint32 createProcExtendMask(SpellNonMeleeDamage *damageInfo, SpellMissInfo missCondition);

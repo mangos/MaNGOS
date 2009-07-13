@@ -1,0 +1,6 @@
+ALTER TABLE db_version CHANGE COLUMN required_8098_02_mangos_playercreateinfo_action required_8112_01_mangos_spell_proc_event bit;
+
+DELETE FROM spell_proc_event WHERE entry IN (63156, 63158);
+INSERT INTO spell_proc_event VALUES
+(63156, 0x00000000,  0, 0x00000001, 0x00000040, 0x00000000, 0x00000000, 0x00000000, 0.000000, 0.000000,  0),
+(63158, 0x00000000,  0, 0x00000001, 0x00000040, 0x00000000, 0x00000000, 0x00000000, 0.000000, 0.000000,  0);
