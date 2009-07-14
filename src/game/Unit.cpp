@@ -9259,7 +9259,7 @@ bool Unit::isVisibleForOrDetect(Unit const* u, bool detect, bool inVisibleList, 
         //based on wowwiki every 5 mod we have 1 more level diff in calculation
         visibleDistance += (int32(u->GetTotalAuraModifier(SPELL_AURA_MOD_DETECT)) - stealthMod)/5.0f;
 
-        if(!IsWithinDist(u,visibleDistance))
+        if(visibleDistance <= 0 || !IsWithinDist(u,visibleDistance))
             return false;
     }
 
