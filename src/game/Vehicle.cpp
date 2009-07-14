@@ -62,8 +62,7 @@ void Vehicle::Update(uint32 diff)
 
 bool Vehicle::Create(uint32 guidlow, Map *map, uint32 Entry, uint32 vehicleId, uint32 team)
 {
-    SetMapId(map->GetId());
-    SetInstanceId(map->GetInstanceId());
+    SetMap(map);
 
     Object::_Create(guidlow, Entry, HIGHGUID_VEHICLE);
 

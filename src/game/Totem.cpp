@@ -54,8 +54,6 @@ void Totem::Update( uint32 time )
 void Totem::Summon(Unit* owner)
 {
     sLog.outDebug("AddObject at Totem.cpp line 49");
-
-    SetInstanceId(owner->GetInstanceId());
     owner->GetMap()->Add((Creature*)this);
 
     // select totem model in dependent from owner team
