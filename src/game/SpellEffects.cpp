@@ -903,17 +903,6 @@ void Spell::EffectDummy(uint32 i)
                         m_caster->CastSpell(unitTarget, 29294, true);
                     return;
                 }
-                case 28730:                                 // Arcane Torrent (Mana)
-                {
-                    Aura * dummy = m_caster->GetDummyAura(28734);
-                    if (dummy)
-                    {
-                        int32 bp = damage * dummy->GetStackAmount();
-                        m_caster->CastCustomSpell(m_caster, 28733, &bp, NULL, NULL, true);
-                        m_caster->RemoveAurasDueToSpell(28734);
-                    }
-                    return;
-                }
                 case 29200:                                 // Purify Helboar Meat
                 {
                     if( m_caster->GetTypeId() != TYPEID_PLAYER )
