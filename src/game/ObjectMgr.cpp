@@ -1230,6 +1230,12 @@ void ObjectMgr::LoadGameobjects()
         data.rotation2      = fields[ 9].GetFloat();
         data.rotation3      = fields[10].GetFloat();
         data.spawntimesecs  = fields[11].GetInt32();
+
+        if (data.spawntimesecs==0 && gInfo->IsDespawnAtAction())
+        {
+            sLog.outErrorDb("Table `gameobject` have gameobject (GUID: %u Entry: %u) with `spawntimesecs` (0) value, but gameobejct marked as despawnable at action.",guid,data.id);
+        }
+
         data.animprogress   = fields[12].GetUInt32();
 
         uint32 go_state     = fields[13].GetUInt32();
@@ -5717,6 +5723,16 @@ inline void CheckGONoDamageImmuneId(GameObjectInfo const* goInfo,uint32 dataN,ui
         goInfo->id,goInfo->type,N,dataN);
 }
 
+inline void CheckGOConsumable(GameObjectInfo const* goInfo,uint32 dataN,uint32 N)
+{
+    // 0/1 correct values
+    if (dataN <= 1)
+        return;
+
+    sLog.outErrorDb("Gameobject (Entry: %u GoType: %u) have data%d=%u but expected boolean (0/1) consumable field value.",
+        goInfo->id,goInfo->type,N,dataN);
+}
+
 void ObjectMgr::LoadGameobjectInfo()
 {
     SQLGameObjectLoader loader;
@@ -5759,6 +5775,8 @@ void ObjectMgr::LoadGameobjectInfo()
                 if (goInfo->chest.lockId)
                     CheckGOLockId(goInfo,goInfo->chest.lockId,0);
 
+                CheckGOConsumable(goInfo,goInfo->chest.consumable,3);
+
                 if (goInfo->chest.linkedTrapId)              // linked trap
                     CheckGOLinkedTrapId(goInfo,goInfo->chest.linkedTrapId,7);
                 break;
@@ -5793,6 +5811,8 @@ void ObjectMgr::LoadGameobjectInfo()
             {
                 if (goInfo->goober.lockId)
                     CheckGOLockId(goInfo,goInfo->goober.lockId,0);
+
+                CheckGOConsumable(goInfo,goInfo->goober.consumable,3);
 
                 if (goInfo->goober.pageId)                  // pageId
                 {
@@ -6757,7 +6777,7 @@ void ObjectMgr::LoadGameObjectForQuests()
             // scan GO chest with loot including quest items
             case GAMEOBJECT_TYPE_CHEST:
             {
-                uint32 loot_id = GameObject::GetLootId(goInfo);
+                uint32 loot_id = goInfo->GetLootId();
 
                 // find quest loot for GO
                 if(LootTemplates_Gameobject.HaveQuestLootFor(loot_id))

@@ -87,7 +87,7 @@ void GameObject::CleanupsBeforeDelete()
                     ownerType = "pet";
 
                 sLog.outError("Delete GameObject (GUID: %u Entry: %u SpellId %u LinkedGO %u) that lost references to owner (GUID %u Type '%s') GO list. Crash possible later.",
-                    GetGUIDLow(), GetGOInfo()->id, m_spellId, GetLinkedGameObjectEntry(), GUID_LOPART(owner_guid), ownerType);
+                    GetGUIDLow(), GetGOInfo()->id, m_spellId, GetGOInfo()->GetLinkedGameObjectEntry(), GUID_LOPART(owner_guid), ownerType);
             }
         }
     }
@@ -383,7 +383,7 @@ void GameObject::Update(uint32 /*p_time*/)
             {
                 case GAMEOBJECT_TYPE_DOOR:
                 case GAMEOBJECT_TYPE_BUTTON:
-                    if (GetAutoCloseTime() && (m_cooldownTime < time(NULL)))
+                    if (GetGOInfo()->GetAutoCloseTime() && (m_cooldownTime < time(NULL)))
                         ResetDoorOrButton();
                     break;
             }
@@ -423,7 +423,7 @@ void GameObject::Update(uint32 /*p_time*/)
             }
 
             //burning flags in some battlegrounds, if you find better condition, just add it
-            if (GetGoAnimProgress() > 0)
+            if (GetGOInfo()->IsDespawnAtAction() || GetGoAnimProgress() > 0)
             {
                 SendObjectDeSpawnAnim(GetGUID());
                 //reset flags
@@ -601,7 +601,7 @@ bool GameObject::LoadFromDB(uint32 guid, Map *map)
     if (!Create(guid,entry, map, phaseMask, x, y, z, ang, rotation0, rotation1, rotation2, rotation3, animprogress, go_state) )
         return false;
 
-    if(!GetDespawnPossibility())
+    if(!GetGOInfo()->GetDespawnPossibility() && !GetGOInfo()->IsDespawnAtAction())
     {
         SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NODESPAWN);
         m_spawnedByDefault = true;
@@ -645,22 +645,6 @@ void GameObject::DeleteFromDB()
 GameObjectInfo const *GameObject::GetGOInfo() const
 {
     return m_goInfo;
-}
-
-uint32 GameObject::GetLootId(GameObjectInfo const* ginfo)
-{
-    if (!ginfo)
-        return 0;
-
-    switch(ginfo->type)
-    {
-        case GAMEOBJECT_TYPE_CHEST:
-            return ginfo->chest.lootId;
-        case GAMEOBJECT_TYPE_FISHINGHOLE:
-            return ginfo->fishinghole.lootId;
-        default:
-            return 0;
-    }
 }
 
 /*********************************************************/
@@ -757,7 +741,7 @@ bool GameObject::ActivateToQuest( Player *pTarget)const
         // scan GO chest with loot including quest items
         case GAMEOBJECT_TYPE_CHEST:
         {
-            if(LootTemplates_Gameobject.HaveQuestLootForPlayer(GetLootId(), pTarget))
+            if(LootTemplates_Gameobject.HaveQuestLootForPlayer(GetGOInfo()->GetLootId(), pTarget))
                 return true;
             break;
         }
@@ -842,7 +826,7 @@ void GameObject::UseDoorOrButton(uint32 time_to_restore, bool alternative /* = f
         return;
 
     if(!time_to_restore)
-        time_to_restore = GetAutoCloseTime();
+        time_to_restore = GetGOInfo()->GetAutoCloseTime();
 
     SwitchDoorOrButton(true,alternative);
     SetLootState(GO_ACTIVATED);
@@ -1294,7 +1278,7 @@ void GameObject::Use(Unit* user)
         return;
     }
 
-    Spell *spell = new Spell(spellCaster, spellInfo, triggered);
+    Spell *spell = new Spell(spellCaster, spellInfo, triggered,GetGUID());
 
     // spell target is user of GO
     SpellCastTargets targets;
