@@ -53,7 +53,6 @@ void Totem::Update( uint32 time )
 
 void Totem::Summon(Unit* owner)
 {
-    SetInstanceId(owner->GetInstanceId());
     owner->GetMap()->Add((Creature*)this);
 
     // select totem model in dependent from owner team

@@ -310,12 +310,6 @@ void Spell::EffectSchoolDMG(uint32 effect_idx)
         {
             case SPELLFAMILY_GENERIC:
             {
-                //Gore
-                if (m_spellInfo->SpellIconID == 2269 )
-                {
-                    damage+= rand()%2 ? damage : 0;
-                }
-
                 switch(m_spellInfo->Id)                     // better way to check unknown
                 {
                     // Meteor like spells (divided damage to targets)
@@ -436,26 +430,15 @@ void Spell::EffectSchoolDMG(uint32 effect_idx)
                     m_caster->SetPower(POWER_ENERGY,0);
                 }
                 // Rake
-                else if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0000000000001000))
+                else if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0000000000001000) && m_spellInfo->Effect[2]==SPELL_EFFECT_ADD_COMBO_POINTS)
                 {
+                    // $AP*0.01 bonus
                     damage += int32(m_caster->GetTotalAttackPowerValue(BASE_ATTACK) / 100);
                 }
                 // Swipe
                 else if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0010000000000000))
                 {
                     damage += int32(m_caster->GetTotalAttackPowerValue(BASE_ATTACK)*0.08f);
-                }
-                //Mangle Bonus for the initial damage of Lacerate and Rake
-                if ((m_spellInfo->SpellFamilyFlags==UI64LIT(0x0000000000001000) && m_spellInfo->SpellIconID==494) ||
-                    (m_spellInfo->SpellFamilyFlags==UI64LIT(0x0000010000000000) && m_spellInfo->SpellIconID==2246))
-                {
-                    Unit::AuraList const& mDummyAuras = unitTarget->GetAurasByType(SPELL_AURA_DUMMY);
-                    for(Unit::AuraList::const_iterator i = mDummyAuras.begin(); i != mDummyAuras.end(); ++i)
-                        if(((*i)->GetSpellProto()->SpellFamilyFlags & UI64LIT(0x0000044000000000)) && (*i)->GetSpellProto()->SpellFamilyName==SPELLFAMILY_DRUID)
-                        {
-                            damage = int32(damage*(100.0f+(*i)->GetModifier()->m_amount)/100.0f);
-                            break;
-                        }
                 }
                 break;
             }
@@ -527,8 +510,13 @@ void Spell::EffectSchoolDMG(uint32 effect_idx)
             }
             case SPELLFAMILY_HUNTER:
             {
+                //Gore
+                if (m_spellInfo->SpellIconID == 1578)
+                {
+                    damage+= rand()%2 ? damage : 0;
+                }
                 // Mongoose Bite
-                if ((m_spellInfo->SpellFamilyFlags & UI64LIT(0x000000002)) && m_spellInfo->SpellVisual[0]==342)
+                else if ((m_spellInfo->SpellFamilyFlags & UI64LIT(0x000000002)) && m_spellInfo->SpellVisual[0]==342)
                 {
                     damage += int32(m_caster->GetTotalAttackPowerValue(BASE_ATTACK)*0.2f);
                 }
@@ -787,7 +775,9 @@ void Spell::EffectDummy(uint32 i)
                     if(!itemTarget && m_caster->GetTypeId()!=TYPEID_PLAYER)
                         return;
 
-                    uint32 spell_id = roll_chance_i(50) ? 17269 : 17270;
+                    uint32 spell_id = roll_chance_i(50)
+                        ? 17269                             // Create Resonating Skull
+                        : 17270;                            // Create Bone Dust
 
                     m_caster->CastSpell(m_caster, spell_id, true, NULL);
                     return;
@@ -846,25 +836,25 @@ void Spell::EffectDummy(uint32 i)
                     if (!m_CastItem) return;
                     m_caster->CastSpell(m_caster, 13166, true, m_CastItem);
                     return;
-                case 23448:                                 // Ultrasafe Transporter: Gadgetzan - backfires
+                case 23448:                                 // Transporter Arrival - Ultrasafe Transporter: Gadgetzan - backfires
                 {
                     int32 r = irand(0, 119);
-                    if ( r < 20 )                           // 1/6 polymorph
+                    if ( r < 20 )                           // Transporter Malfunction - 1/6 polymorph 
                         m_caster->CastSpell(m_caster, 23444, true);
-                    else if ( r < 100 )                     // 4/6 evil twin
+                    else if ( r < 100 )                     // Evil Twin               - 4/6 evil twin
                         m_caster->CastSpell(m_caster, 23445, true);
-                    else                                    // 1/6 miss the target
+                    else                                    // Transporter Malfunction - 1/6 miss the target
                         m_caster->CastSpell(m_caster, 36902, true);
                     return;
                 }
-                case 23453:                                 // Ultrasafe Transporter: Gadgetzan
-                    if ( roll_chance_i(50) )                // success
+                case 23453:                                 // Gnomish Transporter - Ultrasafe Transporter: Gadgetzan
+                    if ( roll_chance_i(50) )                // Gadgetzan Transporter         - success
                         m_caster->CastSpell(m_caster, 23441, true);
-                    else                                    // failure
+                    else                                    // Gadgetzan Transporter Failure - failure
                         m_caster->CastSpell(m_caster, 23446, true);
                     return;
                 case 23645:                                 // Hourglass Sand
-                    m_caster->RemoveAurasDueToSpell(23170);
+                    m_caster->RemoveAurasDueToSpell(23170); // Brood Affliction: Bronze
                     return;
                 case 23725:                                 // Gift of Life (warrior bwl trinket)
                     m_caster->CastSpell(m_caster, 23782, true);
@@ -882,35 +872,31 @@ void Spell::EffectDummy(uint32 i)
 
                     //5 different spells used depending on mounted speed and if mount can fly or not
                     if (flyspeed >= 4.1f)
+                        // Flying Reindeer
                         m_caster->CastSpell(m_caster, 44827, true); //310% flying Reindeer
                     else if (flyspeed >= 3.8f)
+                        // Flying Reindeer
                         m_caster->CastSpell(m_caster, 44825, true); //280% flying Reindeer
                     else if (flyspeed >= 1.6f)
+                        // Flying Reindeer
                         m_caster->CastSpell(m_caster, 44824, true); //60% flying Reindeer
                     else if (speed >= 2.0f)
+                        // Reindeer
                         m_caster->CastSpell(m_caster, 25859, true); //100% ground Reindeer
                     else
+                        // Reindeer
                         m_caster->CastSpell(m_caster, 25858, true); //60% ground Reindeer
 
                     return;
                 }
-                //case 26074:                               // Holiday Cheer
-                //    return; -- implemented at client side
+                case 26074:                                 // Holiday Cheer
+                    // implemented at client side
+                    return;
                 case 28006:                                 // Arcane Cloaking
                 {
                     if (unitTarget && unitTarget->GetTypeId() == TYPEID_PLAYER )
+                        // Naxxramas Entry Flag Effect DND
                         m_caster->CastSpell(unitTarget, 29294, true);
-                    return;
-                }
-                case 28730:                                 // Arcane Torrent (Mana)
-                {
-                    Aura * dummy = m_caster->GetDummyAura(28734);
-                    if (dummy)
-                    {
-                        int32 bp = damage * dummy->GetStackAmount();
-                        m_caster->CastCustomSpell(m_caster, 28733, &bp, NULL, NULL, true);
-                        m_caster->RemoveAurasDueToSpell(28734);
-                    }
                     return;
                 }
                 case 29200:                                 // Purify Helboar Meat
@@ -918,7 +904,9 @@ void Spell::EffectDummy(uint32 i)
                     if( m_caster->GetTypeId() != TYPEID_PLAYER )
                         return;
 
-                    uint32 spell_id = roll_chance_i(50) ? 29277 : 29278;
+                    uint32 spell_id = roll_chance_i(50)
+                        ? 29277                             // Summon Purified Helboar Meat
+                        : 29278;                            // Summon Toxic Helboar Meat
 
                     m_caster->CastSpell(m_caster,spell_id,true,NULL);
                     return;
@@ -929,19 +917,19 @@ void Spell::EffectDummy(uint32 i)
                     return;
                 case 30458:                                 // Nigh Invulnerability
                     if (!m_CastItem) return;
-                    if(roll_chance_i(86))                   // success
+                    if(roll_chance_i(86))                   // Nigh-Invulnerability   - success
                         m_caster->CastSpell(m_caster, 30456, true, m_CastItem);
-                    else                                    // backfire in 14% casts
+                    else                                    // Complete Vulnerability - backfire in 14% casts
                         m_caster->CastSpell(m_caster, 30457, true, m_CastItem);
                     return;
                 case 30507:                                 // Poultryizer
                     if (!m_CastItem) return;
-                    if(roll_chance_i(80))                   // success
+                    if(roll_chance_i(80))                   // Poultryized! - success
                         m_caster->CastSpell(unitTarget, 30501, true, m_CastItem);
-                    else                                    // backfire 20%
+                    else                                    // Poultryized! - backfire 20%
                         m_caster->CastSpell(unitTarget, 30504, true, m_CastItem);
                     return;
-                case 33060:                                         // Make a Wish
+                case 33060:                                 // Make a Wish
                 {
                     if(m_caster->GetTypeId()!=TYPEID_PLAYER)
                         return;
@@ -950,23 +938,23 @@ void Spell::EffectDummy(uint32 i)
 
                     switch(urand(1,5))
                     {
-                        case 1: spell_id = 33053; break;
-                        case 2: spell_id = 33057; break;
-                        case 3: spell_id = 33059; break;
-                        case 4: spell_id = 33062; break;
-                        case 5: spell_id = 33064; break;
+                        case 1: spell_id = 33053; break;    // Mr Pinchy's Blessing
+                        case 2: spell_id = 33057; break;    // Summon Mighty Mr. Pinchy
+                        case 3: spell_id = 33059; break;    // Summon Furious Mr. Pinchy
+                        case 4: spell_id = 33062; break;    // Tiny Magical Crawdad
+                        case 5: spell_id = 33064; break;    // Mr. Pinchy's Gift
                     }
 
                     m_caster->CastSpell(m_caster, spell_id, true, NULL);
                     return;
                 }
-                case 35745:
+                case 35745:                                 // Socrethar's Stone
                 {
                     uint32 spell_id;
                     switch(m_caster->GetAreaId())
                     {
-                        case 3900: spell_id = 35743; break;
-                        case 3742: spell_id = 35744; break;
+                        case 3900: spell_id = 35743; break; // Socrethar Portal
+                        case 3742: spell_id = 35744; break; // Socrethar Portal
                         default: return;
                     }
 
@@ -1076,6 +1064,13 @@ void Spell::EffectDummy(uint32 i)
                     m_caster->CastSpell(m_caster, 45088, true);
                     return;
                 }
+                case 55004:                                 // Nitro Boosts 
+                    if(!m_CastItem) return; 
+                    if(roll_chance_i(95))                   // Nitro Boosts - success 
+                        m_caster->CastSpell(m_caster, 54861, true, m_CastItem); 
+                    else                                    // Knocked Up   - backfire 5% 
+                        m_caster->CastSpell(m_caster, 46014, true, m_CastItem); 
+                    return; 
                 case 50243:                                 // Teach Language
                 {
                     if(m_caster->GetTypeId() != TYPEID_PLAYER)
@@ -1119,7 +1114,7 @@ void Spell::EffectDummy(uint32 i)
                     return;
 
                 }
-                case 52308:
+                case 52308:                                 // Take Sputum Sample
                 {
                     switch(i)
                     {
@@ -1142,9 +1137,10 @@ void Spell::EffectDummy(uint32 i)
                         return;
                     m_caster->CastCustomSpell(unitTarget, 52752, &damage, NULL, NULL, true);
                     return;
-                case 53341:
-                case 53343:
+                case 53341:                                 // Rune of Cinderglacier
+                case 53343:                                 // Rune of Razorice
                 {
+                    // Runeforging Credit
                     m_caster->CastSpell(m_caster, 54586, true);
                     return;
                 }
@@ -2983,7 +2979,7 @@ void Spell::EffectOpenLock(uint32 effIndex)
                 return;
             }
         }
-        lockId = gameObjTarget->GetLockId();
+        lockId = goInfo->GetLockId();
         guid = gameObjTarget->GetGUID();
     }
     else if(itemTarget)
@@ -4080,7 +4076,6 @@ void Spell::EffectSummonPet(uint32 i)
                 return;
 
             OldSummon->GetMap()->Remove((Creature*)OldSummon,false);
-            OldSummon->SetMapId(m_caster->GetMapId());
 
             float px, py, pz;
             m_caster->GetClosePoint(px, py, pz, OldSummon->GetObjectSize());
@@ -4628,7 +4623,7 @@ void Spell::EffectSummonObjectWild(uint32 i)
         }
     }
 
-    if(uint32 linkedEntry = pGameObj->GetLinkedGameObjectEntry())
+    if(uint32 linkedEntry = pGameObj->GetGOInfo()->GetLinkedGameObjectEntry())
     {
         GameObject* linkedGO = new GameObject;
         if(linkedGO->Create(objmgr.GenerateLowGuid(HIGHGUID_GAMEOBJECT), linkedEntry, map,
@@ -6333,7 +6328,7 @@ void Spell::EffectTransmitted(uint32 effIndex)
 
     cMap->Add(pGameObj);
 
-    if(uint32 linkedEntry = pGameObj->GetLinkedGameObjectEntry())
+    if(uint32 linkedEntry = pGameObj->GetGOInfo()->GetLinkedGameObjectEntry())
     {
         GameObject* linkedGO = new GameObject;
         if(linkedGO->Create(objmgr.GenerateLowGuid(HIGHGUID_GAMEOBJECT), linkedEntry, cMap,

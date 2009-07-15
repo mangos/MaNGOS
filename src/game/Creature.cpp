@@ -563,8 +563,8 @@ bool Creature::AIM_Initialize()
 
 bool Creature::Create (uint32 guidlow, Map *map, uint32 phaseMask, uint32 Entry, uint32 team, const CreatureData *data)
 {
-    SetMapId(map->GetId());
-    SetInstanceId(map->GetInstanceId());
+    ASSERT(map);
+    SetMap(map);
     SetPhaseMask(phaseMask,false);
 
     //oX = x;     oY = y;    dX = x;    dY = y;    m_moveTime = 0;    m_startMove = 0;
@@ -572,6 +572,12 @@ bool Creature::Create (uint32 guidlow, Map *map, uint32 phaseMask, uint32 Entry,
 
     if (bResult)
     {
+        //Notify the map's instance data.
+        //Only works if you create the object in it, not if it is moves to that map.
+        //Normally non-players do not teleport to other maps.
+        if(map->IsDungeon() && ((InstanceMap*)map)->GetInstanceData())
+            ((InstanceMap*)map)->GetInstanceData()->OnCreatureCreate(this);
+
         switch (GetCreatureInfo()->rank)
         {
             case CREATURE_ELITE_RARE:
@@ -1311,15 +1317,6 @@ bool Creature::CreateFromProto(uint32 guidlow, uint32 Entry, uint32 team, const 
 
     if(!UpdateEntry(Entry, team, data))
         return false;
-
-    //Notify the map's instance data.
-    //Only works if you create the object in it, not if it is moves to that map.
-    //Normally non-players do not teleport to other maps.
-    Map *map = MapManager::Instance().FindMap(GetMapId(), GetInstanceId());
-    if(map && map->IsDungeon() && ((InstanceMap*)map)->GetInstanceData())
-    {
-        ((InstanceMap*)map)->GetInstanceData()->OnCreatureCreate(this);
-    }
 
     return true;
 }

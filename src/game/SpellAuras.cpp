@@ -1190,24 +1190,23 @@ void Aura::SendAuraUpdate(bool remove)
 
 void Aura::SetStackAmount(uint8 stackAmount)
 {
-    if (stackAmount == m_stackAmount)
-        // Nothing changed
-        return;
-
     Unit *target = GetTarget();
     Unit *caster = GetCaster();
     if (!target || !caster)
         return;
 
-    bool refresh = stackAmount > m_stackAmount;
-    m_stackAmount = stackAmount;
-    int32 amount = m_stackAmount * caster->CalculateSpellDamage(m_spellProto, m_effIndex, m_currentBasePoints, target);
-    // Reapply if amount change
-    if (amount!=m_modifier.m_amount)
+    bool refresh = stackAmount >= m_stackAmount;
+    if (stackAmount != m_stackAmount)
     {
-        ApplyModifier(false, true);
-        m_modifier.m_amount = amount;
-        ApplyModifier(true, true);
+        m_stackAmount = stackAmount;
+        int32 amount = m_stackAmount * caster->CalculateSpellDamage(m_spellProto, m_effIndex, m_currentBasePoints, target);
+        // Reapply if amount change
+        if (amount!=m_modifier.m_amount)
+        {
+            ApplyModifier(false, true);
+            m_modifier.m_amount = amount;
+            ApplyModifier(true, true);
+        }
     }
 
     if (refresh)
@@ -3802,15 +3801,15 @@ void Aura::HandleAuraModSilence(bool apply, bool Real)
 void Aura::HandleModThreat(bool apply, bool Real)
 {
     // only at real add/remove aura
-    if(!Real)
+    if (!Real)
         return;
 
-    if(!m_target->isAlive())
+    if (!m_target->isAlive())
         return;
 
     Unit* caster = GetCaster();
 
-    if(!caster || !caster->isAlive())
+    if (!caster || !caster->isAlive())
         return;
 
     int level_diff = 0;
@@ -3828,38 +3827,31 @@ void Aura::HandleModThreat(bool apply, bool Real)
             multiplier = 1;
             break;
     }
+
     if (level_diff > 0)
         m_modifier.m_amount += multiplier * level_diff;
 
-    for(int8 x=0;x < MAX_SPELL_SCHOOL;x++)
-    {
-        if(m_modifier.m_miscvalue & int32(1<<x))
-        {
-            if(m_target->GetTypeId() == TYPEID_PLAYER)
-                ApplyPercentModFloatVar(m_target->m_threatModifier[x], m_positive ? m_modifier.m_amount : -m_modifier.m_amount, apply);
-        }
-    }
+    if (m_target->GetTypeId() == TYPEID_PLAYER)
+        for(int8 x=0;x < MAX_SPELL_SCHOOL;x++)
+            if (m_modifier.m_miscvalue & int32(1<<x))
+                ApplyPercentModFloatVar(m_target->m_threatModifier[x], m_modifier.m_amount, apply);
 }
 
 void Aura::HandleAuraModTotalThreat(bool apply, bool Real)
 {
     // only at real add/remove aura
-    if(!Real)
+    if (!Real)
         return;
 
-    if(!m_target->isAlive() || m_target->GetTypeId()!= TYPEID_PLAYER)
+    if (!m_target->isAlive() || m_target->GetTypeId() != TYPEID_PLAYER)
         return;
 
     Unit* caster = GetCaster();
 
-    if(!caster || !caster->isAlive())
+    if (!caster || !caster->isAlive())
         return;
 
-    float threatMod = 0.0f;
-    if(apply)
-        threatMod = float(m_modifier.m_amount);
-    else
-        threatMod =  float(-m_modifier.m_amount);
+    float threatMod = apply ? float(m_modifier.m_amount) : float(-m_modifier.m_amount);
 
     m_target->getHostilRefManager().threatAssist(caster, threatMod);
 }
@@ -3867,18 +3859,18 @@ void Aura::HandleAuraModTotalThreat(bool apply, bool Real)
 void Aura::HandleModTaunt(bool apply, bool Real)
 {
     // only at real add/remove aura
-    if(!Real)
+    if (!Real)
         return;
 
-    if(!m_target->isAlive() || !m_target->CanHaveThreatList())
+    if (!m_target->isAlive() || !m_target->CanHaveThreatList())
         return;
 
     Unit* caster = GetCaster();
 
-    if(!caster || !caster->isAlive())
+    if (!caster || !caster->isAlive())
         return;
 
-    if(apply)
+    if (apply)
         m_target->TauntApply(caster);
     else
     {
@@ -4326,10 +4318,10 @@ void Aura::HandlePeriodicDamage(bool apply, bool Real)
             case SPELLFAMILY_DRUID:
             {
                 // Rake
-                if (m_spellProto->SpellFamilyFlags & UI64LIT(0x0000000000001000))
+                if (m_spellProto->SpellFamilyFlags & UI64LIT(0x0000000000001000) && m_spellProto->Effect[2]==SPELL_EFFECT_ADD_COMBO_POINTS)
                 {
-                    // $AP*0.06 bonus per tick
-                    m_modifier.m_amount += int32(caster->GetTotalAttackPowerValue(BASE_ATTACK) * 6 / 100);
+                    // $AP*0.18 bonus per tick
+                    m_modifier.m_amount += int32(caster->GetTotalAttackPowerValue(BASE_ATTACK) * 18 / 100);
                     return;
                 }
                 // Lacerate
