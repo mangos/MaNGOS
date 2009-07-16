@@ -874,7 +874,7 @@ Channel.SilentlyGMJoin = 0
 #
 #    GM.InGMList.Level
 #        Max GM level showed in GM list (if visible) in non-GM state (.gm off)
-#                 0 (only players)
+#                 0 (none)
 #                 1 (only moderators)
 #                 2 (only gamemasters)
 #        Default: 3 (anyone)
