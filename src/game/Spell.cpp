@@ -3670,6 +3670,7 @@ SpellCastResult Spell::CheckCast(bool strict)
         // Special cases of non existing auras handling
         if(m_spellInfo->excludeCasterAuraSpell == 61988)
         {
+            // Avenging Wrath Marker
             if(m_caster->HasAura(61987))
                 return SPELL_FAILED_CASTER_AURASTATE;
         }
@@ -3696,8 +3697,19 @@ SpellCastResult Spell::CheckCast(bool strict)
         // Target aura req check if need
         if(m_spellInfo->targetAuraSpell && !target->HasAura(m_spellInfo->targetAuraSpell))
             return SPELL_FAILED_CASTER_AURASTATE;
-        if(m_spellInfo->excludeTargetAuraSpell && target->HasAura(m_spellInfo->excludeTargetAuraSpell))
-            return SPELL_FAILED_CASTER_AURASTATE;
+        if(m_spellInfo->excludeTargetAuraSpell)
+        {
+            // Special cases of non existing auras handling
+            if (m_spellInfo->excludeTargetAuraSpell == 61988)
+            {
+                // Avenging Wrath Marker
+                if (target->HasAura(61987))
+                    return SPELL_FAILED_CASTER_AURASTATE;
+
+            }
+            else if (target->HasAura(m_spellInfo->excludeTargetAuraSpell))
+                return SPELL_FAILED_CASTER_AURASTATE;
+        }
 
         if(target != m_caster)
         {
