@@ -23,7 +23,7 @@ DROP TABLE IF EXISTS `db_version`;
 CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
-  `required_8158_01_mangos_playercreateinfo_action` bit(1) default NULL
+  `required_8191_01_mangos_spell_affect` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -789,8 +789,8 @@ DROP TABLE IF EXISTS `creature_template`;
 CREATE TABLE `creature_template` (
   `entry` mediumint(8) unsigned NOT NULL default '0',
   `heroic_entry` mediumint(8) unsigned NOT NULL default '0',
-  `unk1` int(11) UNSIGNED DEFAULT '0' NOT NULL,
-  `unk2` int(11) UNSIGNED DEFAULT '0' NOT NULL,
+  `KillCredit1` int(11) unsigned NOT NULL default '0',
+  `KillCredit2` int(11) unsigned NOT NULL default '0',
   `modelid_A` mediumint(8) unsigned NOT NULL default '0',
   `modelid_A2` mediumint(8) unsigned NOT NULL default '0',
   `modelid_H` mediumint(8) unsigned NOT NULL default '0',
@@ -13540,29 +13540,6 @@ CREATE TABLE `skinning_loot_template` (
 LOCK TABLES `skinning_loot_template` WRITE;
 /*!40000 ALTER TABLE `skinning_loot_template` DISABLE KEYS */;
 /*!40000 ALTER TABLE `skinning_loot_template` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `spell_affect`
---
-
-DROP TABLE IF EXISTS `spell_affect`;
-CREATE TABLE `spell_affect` (
-  `entry` smallint(5) unsigned NOT NULL default '0',
-  `effectId` tinyint(3) unsigned NOT NULL default '0',
-  `SpellClassMask0` int(5) unsigned NOT NULL default '0',
-  `SpellClassMask1` int(5) unsigned NOT NULL default '0',
-  `SpellClassMask2` int(5) unsigned NOT NULL default '0',
-  PRIMARY KEY  (`entry`,`effectId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
---
--- Dumping data for table `spell_affect`
---
-
-LOCK TABLES `spell_affect` WRITE;
-/*!40000 ALTER TABLE `spell_affect` DISABLE KEYS */;
-/*!40000 ALTER TABLE `spell_affect` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --

@@ -681,126 +681,6 @@ void SpellMgr::LoadSpellTargetPositions()
     sLog.outString( ">> Loaded %u spell teleport coordinates", count );
 }
 
-void SpellMgr::LoadSpellAffects()
-{
-    mSpellAffectMap.clear();                                // need for reload case
-
-    uint32 count = 0;
-
-    //                                                0      1         2                3                4
-    QueryResult *result = WorldDatabase.Query("SELECT entry, effectId, SpellClassMask0, SpellClassMask1, SpellClassMask2 FROM spell_affect");
-    if( !result )
-    {
-
-        barGoLink bar( 1 );
-
-        bar.step();
-
-        sLog.outString();
-        sLog.outString( ">> Loaded %u spell affect definitions", count );
-        return;
-    }
-
-    barGoLink bar( result->GetRowCount() );
-
-    do
-    {
-        Field *fields = result->Fetch();
-
-        bar.step();
-
-        uint32 entry = fields[0].GetUInt32();
-        uint8 effectId = fields[1].GetUInt8();
-
-        SpellEntry const* spellInfo = sSpellStore.LookupEntry(entry);
-
-        if (!spellInfo)
-        {
-            sLog.outErrorDb("Spell %u listed in `spell_affect` does not exist", entry);
-            continue;
-        }
-
-        if (effectId >= 3)
-        {
-            sLog.outErrorDb("Spell %u listed in `spell_affect` have invalid effect index (%u)", entry,effectId);
-            continue;
-        }
-
-        if( spellInfo->Effect[effectId] != SPELL_EFFECT_APPLY_AURA ||
-            spellInfo->EffectApplyAuraName[effectId] != SPELL_AURA_ADD_FLAT_MODIFIER &&
-            spellInfo->EffectApplyAuraName[effectId] != SPELL_AURA_ADD_PCT_MODIFIER  &&
-            spellInfo->EffectApplyAuraName[effectId] != SPELL_AURA_ADD_TARGET_TRIGGER )
-        {
-            sLog.outErrorDb("Spell %u listed in `spell_affect` have not SPELL_AURA_ADD_FLAT_MODIFIER (%u) or SPELL_AURA_ADD_PCT_MODIFIER (%u) or SPELL_AURA_ADD_TARGET_TRIGGER (%u) for effect index (%u)", entry,SPELL_AURA_ADD_FLAT_MODIFIER,SPELL_AURA_ADD_PCT_MODIFIER,SPELL_AURA_ADD_TARGET_TRIGGER,effectId);
-            continue;
-        }
-
-        SpellAffectEntry affect;
-        affect.SpellClassMask[0] = fields[2].GetUInt32();
-        affect.SpellClassMask[1] = fields[3].GetUInt32();
-        affect.SpellClassMask[2] = fields[4].GetUInt32();
-
-        // Spell.dbc have own data
-        uint32 const *ptr = 0;
-        switch (effectId)
-        {
-            case 0: ptr = &spellInfo->EffectSpellClassMaskA[0]; break;
-            case 1: ptr = &spellInfo->EffectSpellClassMaskB[0]; break;
-            case 2: ptr = &spellInfo->EffectSpellClassMaskC[0]; break;
-            default:
-                continue;
-        }
-        if(ptr[0] == affect.SpellClassMask[0] || ptr[1] == affect.SpellClassMask[1] || ptr[2] == affect.SpellClassMask[2])
-        {
-            char text[]="ABC";
-            sLog.outErrorDb("Spell %u listed in `spell_affect` have redundant (same with EffectSpellClassMask%c) data for effect index (%u) and not needed, skipped.", entry, text[effectId], effectId);
-            continue;
-        }
-
-        mSpellAffectMap[(entry<<8) + effectId] = affect;
-
-        ++count;
-    } while( result->NextRow() );
-
-    delete result;
-
-    sLog.outString();
-    sLog.outString( ">> Loaded %u custom spell affect definitions", count );
-
-    for (uint32 id = 0; id < sSpellStore.GetNumRows(); ++id)
-    {
-        SpellEntry const* spellInfo = sSpellStore.LookupEntry(id);
-        if (!spellInfo)
-            continue;
-
-        for (int effectId = 0; effectId < 3; ++effectId)
-        {
-            if( spellInfo->Effect[effectId] != SPELL_EFFECT_APPLY_AURA ||
-                (spellInfo->EffectApplyAuraName[effectId] != SPELL_AURA_ADD_FLAT_MODIFIER &&
-                spellInfo->EffectApplyAuraName[effectId] != SPELL_AURA_ADD_PCT_MODIFIER  &&
-                spellInfo->EffectApplyAuraName[effectId] != SPELL_AURA_ADD_TARGET_TRIGGER) )
-                continue;
-
-            uint32 const *ptr = 0;
-            switch (effectId)
-            {
-                case 0: ptr = &spellInfo->EffectSpellClassMaskA[0]; break;
-                case 1: ptr = &spellInfo->EffectSpellClassMaskB[0]; break;
-                case 2: ptr = &spellInfo->EffectSpellClassMaskC[0]; break;
-                default:
-                    continue;
-            }
-            if(ptr[0] || ptr[1] || ptr[2])
-                continue;
-
-            if(mSpellAffectMap.find((id<<8) + effectId) !=  mSpellAffectMap.end())
-                continue;
-
-            sLog.outErrorDb("Spell %u (%s) misses spell_affect for effect %u",id,spellInfo->SpellName[sWorld.GetDefaultDbcLocale()], effectId);
-        }
-    }
-}
-
 bool SpellMgr::IsAffectedByMod(SpellEntry const *spellInfo, SpellModifier *mod) const
 {
     // false for spellInfo == NULL
@@ -3027,13 +2907,6 @@ DiminishingGroup GetDiminishingReturnsGroupForSpell(SpellEntry const* spellproto
                 return DIMINISHING_LIMITONLY;
             break;
         }
-        case SPELLFAMILY_PALADIN:
-        {
-            // Turn Evil
-            if (spellproto->SpellFamilyFlags & UI64LIT(0x00804000000000))
-                return DIMINISHING_FEAR_BLIND;
-            break;
-        }
         case SPELLFAMILY_DEATHKNIGHT:
         {
             // Hungering Cold (no flags)
@@ -3048,16 +2921,19 @@ DiminishingGroup GetDiminishingReturnsGroupForSpell(SpellEntry const* spellproto
     // Get by mechanic
     uint32 mechanic = GetAllSpellMechanicMask(spellproto);
     if (mechanic == MECHANIC_NONE)          return DIMINISHING_NONE;
-    if (mechanic & (1<<MECHANIC_STUN))      return triggered ? DIMINISHING_TRIGGER_STUN : DIMINISHING_CONTROL_STUN;
+    if (mechanic & ((1<<MECHANIC_STUN) |
+                    (1<<MECHANIC_SHACKLE))) return triggered ? DIMINISHING_TRIGGER_STUN : DIMINISHING_CONTROL_STUN;
     if (mechanic & (1<<MECHANIC_SLEEP))     return DIMINISHING_FREEZE_SLEEP;
     if (mechanic & (1<<MECHANIC_POLYMORPH)) return DIMINISHING_POLYMORPH_GOUGE_SAP;
     if (mechanic & (1<<MECHANIC_ROOT))      return triggered ? DIMINISHING_TRIGGER_ROOT : DIMINISHING_CONTROL_ROOT;
-    if (mechanic & (1<<MECHANIC_FEAR))      return DIMINISHING_FEAR_BLIND;
+    if (mechanic & ((1<<MECHANIC_FEAR) |
+                    (1<<MECHANIC_TURN)))    return DIMINISHING_FEAR_BLIND;
     if (mechanic & (1<<MECHANIC_CHARM))     return DIMINISHING_CHARM;
     if (mechanic & (1<<MECHANIC_SILENCE))   return DIMINISHING_SILENCE;
     if (mechanic & (1<<MECHANIC_DISARM))    return DIMINISHING_DISARM;
     if (mechanic & (1<<MECHANIC_FREEZE))    return DIMINISHING_FREEZE_SLEEP;
-    if (mechanic & ((1<<MECHANIC_KNOCKOUT) | (1<<MECHANIC_SAPPED)))    return DIMINISHING_POLYMORPH_GOUGE_SAP;
+    if (mechanic & ((1<<MECHANIC_KNOCKOUT) |
+                    (1<<MECHANIC_SAPPED)))  return DIMINISHING_POLYMORPH_GOUGE_SAP;
     if (mechanic & (1<<MECHANIC_BANISH))    return DIMINISHING_BANISH;
     if (mechanic & (1<<MECHANIC_HORROR))    return DIMINISHING_DEATHCOIL;
 

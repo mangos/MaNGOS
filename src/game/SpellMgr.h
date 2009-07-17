@@ -23,17 +23,18 @@
 // For more high level function for sSpellStore data
 
 #include "SharedDefines.h"
+#include "SpellAuraDefines.h"
 #include "DBCStructure.h"
+#include "DBCStores.h"
 #include "Database/SQLStorage.h"
 
 #include "Utilities/UnorderedMap.h"
-
-#include "Player.h"
 
 #include <map>
 
 class Player;
 class Spell;
+struct SpellModifier;
 
 extern SQLStorage sSpellThreatStore;
 
@@ -341,13 +342,6 @@ bool IsDiminishingReturnsGroupDurationLimited(DiminishingGroup group);
 DiminishingReturnsType GetDiminishingReturnsGroupType(DiminishingGroup group);
 int32 GetDiminishingReturnsLimitDuration(DiminishingGroup group, SpellEntry const* spellproto);
 
-// Spell affects related declarations (accessed using SpellMgr functions)
-struct SpellAffectEntry
-{
-    uint32 SpellClassMask[3];
-};
-typedef UNORDERED_MAP<uint32, SpellAffectEntry> SpellAffectMap;
-
 // Spell proc event related declarations (accessed using SpellMgr functions)
 enum ProcFlags
 {
@@ -638,14 +632,6 @@ class SpellMgr
 
     // Accessors (const or static functions)
     public:
-        // Spell affects
-        SpellAffectEntry const*GetSpellAffect(uint32 spellId, uint8 effectId) const
-        {
-            SpellAffectMap::const_iterator itr = mSpellAffectMap.find((spellId<<8) + effectId);
-            if( itr != mSpellAffectMap.end( ) )
-                return &itr->second;
-            return 0;
-        }
 
         bool IsAffectedByMod(SpellEntry const *spellInfo, SpellModifier *mod) const;
 
@@ -907,7 +893,6 @@ class SpellMgr
         void LoadSpellLearnSkills();
         void LoadSpellLearnSpells();
         void LoadSpellScriptTarget();
-        void LoadSpellAffects();
         void LoadSpellElixirs();
         void LoadSpellProcEvents();
         void LoadSpellBonusess();
@@ -926,7 +911,6 @@ class SpellMgr
         SpellLearnSkillMap mSpellLearnSkills;
         SpellLearnSpellMap mSpellLearnSpells;
         SpellTargetPositionMap mSpellTargetPositions;
-        SpellAffectMap     mSpellAffectMap;
         SpellElixirMap     mSpellElixirs;
         SpellProcEventMap  mSpellProcEventMap;
         SpellBonusMap      mSpellBonusMap;
