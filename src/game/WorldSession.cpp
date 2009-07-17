@@ -626,6 +626,9 @@ void WorldSession::SaveTutorialsData()
 
 void WorldSession::ReadMovementInfo(WorldPacket &data, MovementInfo *mi)
 {
+    if(!data.readPackGUID(mi->guid))
+        return;
+
     CHECK_PACKET_SIZE(data, data.rpos()+4+2+4+4+4+4+4);
     data >> mi->flags;
     data >> mi->unk1;

@@ -1275,8 +1275,8 @@ enum Opcodes
     SMSG_EQUIPMENT_SET_USE_RESULT                   = 0x4D6, // SMSG, UseEquipmentSetResult?
     UMSG_UNKNOWN_1239                               = 0x4D7, // not found 3.2
     SMSG_UNKNOWN_1240                               = 0x4D8, // SMSG, uint64, string
-    CMSG_UNKNOWN_1241                               = 0x4D9, // lua: CreateCharacter
-    SMSG_UNKNOWN_1242                               = 0x4DA, // response to 1241
+    CMSG_UNKNOWN_1241                               = 0x4D9, // lua: CreateCharacter (PFC client response)
+    SMSG_UNKNOWN_1242                               = 0x4DA, // response to 1241 (PFC server response)
     UMSG_UNKNOWN_1243                               = 0x4DB, // not found 3.2
     UMSG_UNKNOWN_1244                               = 0x4DC, // not found 3.2
     UMSG_UNKNOWN_1245                               = 0x4DD, // not found 3.2
