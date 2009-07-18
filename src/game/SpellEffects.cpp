@@ -2034,7 +2034,7 @@ void Spell::EffectTriggerSpell(uint32 i)
             m_caster->CastSpell(unitTarget,spellInfo,true,m_CastItem,NULL,m_originalCasterGUID);
     }
     else
-        m_TriggerSpells.push_back(spellInfo);
+        AddTriggeredSpell(spellInfo);
 }
 
 void Spell::EffectTriggerMissileSpell(uint32 effect_idx)
