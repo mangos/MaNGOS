@@ -4296,8 +4296,8 @@ void Aura::HandlePeriodicDamage(bool apply, bool Real)
                 // Rake
                 if (m_spellProto->SpellFamilyFlags & UI64LIT(0x0000000000001000) && m_spellProto->Effect[2]==SPELL_EFFECT_ADD_COMBO_POINTS)
                 {
-                    // $AP*0.18 bonus per tick
-                    m_modifier.m_amount += int32(caster->GetTotalAttackPowerValue(BASE_ATTACK) * 18 / 100);
+                    // $AP*0.18/3 bonus per tick
+                    m_modifier.m_amount += int32(caster->GetTotalAttackPowerValue(BASE_ATTACK) * 6 / 100);
                     return;
                 }
                 // Lacerate
