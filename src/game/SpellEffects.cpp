@@ -424,6 +424,10 @@ void Spell::EffectSchoolDMG(uint32 effect_idx)
                         {
                             int32 damagetick = m_caster->SpellDamageBonus(unitTarget, (*i)->GetSpellProto(), (*i)->GetModifier()->m_amount, DOT);
                             damage += damagetick * 4;
+
+                            // Glyph of Conflagrate
+                            if (!m_caster->HasAura(56235))
+                                unitTarget->RemoveAurasByCasterSpell((*i)->GetId(), m_caster->GetGUID());
                             break;
                         }
                     }
