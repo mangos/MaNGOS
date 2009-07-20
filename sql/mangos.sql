@@ -23,7 +23,7 @@ DROP TABLE IF EXISTS `db_version`;
 CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
-  `required_8212_01_mangos_spell_proc_event` bit(1) default NULL
+  `required_8213_01_mangos_spell_bonus_data` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -17891,7 +17891,7 @@ INSERT INTO `spell_bonus_data` VALUES
 ('27243', '0.22', '0.25', '0', 'Warlock - Seed of Corruption'),
 ('30108', '0', '0.24', '0', 'Warlock - Unstable Affliction'),
 ('31117', '1.8', '0', '0', 'Warlock - Unstable Affliction Dispell'),
-('17962', '0.4286', '0', '0', 'Warlock - Conflagrate'),
+('17962', '0', '0', '0', 'Warlock - Conflagrate'),
 ('6789', '0.22', '0', '0', 'Warlock - Death Coil'),
 ('28176', '0', '0', '0', 'Warlock - Fel Armor'),
 ('48181', '0.4729', '0', '0', 'Warlock - Haunt'),

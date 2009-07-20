@@ -408,6 +408,26 @@ void Spell::EffectSchoolDMG(uint32 effect_idx)
                     if(unitTarget->HasAuraState(AURA_STATE_IMMOLATE))
                         damage += int32(damage*0.25f);
                 }
+                // Conflagrate - consumes immolate or Shadowflame
+                if (m_spellInfo->TargetAuraState == AURA_STATE_IMMOLATE)
+                {
+                    // for caster applied auras only
+                    Unit::AuraList const &mPeriodic = unitTarget->GetAurasByType(SPELL_AURA_PERIODIC_DAMAGE);
+                    for(Unit::AuraList::const_iterator i = mPeriodic.begin(); i != mPeriodic.end(); ++i)
+                    {
+                        if ((*i)->GetSpellProto()->SpellFamilyName == SPELLFAMILY_WARLOCK &&
+                            (*i)->GetCasterGUID()==m_caster->GetGUID() &&
+                            // Immolate
+                            ((*i)->GetSpellProto()->SpellFamilyFlags & 0x0000000000000004 ||
+                            // Shadowflame
+                            (*i)->GetSpellProto()->SpellFamilyFlags2 & 0x00000002))
+                        {
+                            int32 damagetick = m_caster->SpellDamageBonus(unitTarget, (*i)->GetSpellProto(), (*i)->GetModifier()->m_amount, DOT);
+                            damage += damagetick * 4;
+                            break;
+                        }
+                    }
+                }
                 break;
             }
             case SPELLFAMILY_PRIEST:
