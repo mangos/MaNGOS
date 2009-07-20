@@ -1086,6 +1086,7 @@ void Aura::_RemoveAura()
 
         uint32 removeState = 0;
         uint64 removeFamilyFlag = m_spellProto->SpellFamilyFlags;
+        uint32 removeFamilyFlag2 = m_spellProto->SpellFamilyFlags2;
         switch(m_spellProto->SpellFamilyName)
         {
             case SPELLFAMILY_PALADIN:
@@ -1097,23 +1098,9 @@ void Aura::_RemoveAura()
                 if ((m_spellProto->SpellFamilyFlags & UI64LIT(0x0000000000000004)) ||
                     (m_spellProto->SpellFamilyFlags2 & 0x00000002))
                 {
-                    // it can have both from same caster or same effect from different casters
-                    bool removeAuraState=true;
-                    Unit::AuraList const& dotList = m_target->GetAurasByType(SPELL_AURA_PERIODIC_DAMAGE);
-                    for(Unit::AuraList::const_iterator i = dotList.begin(); i != dotList.end(); ++i)
-                    {
-                        if ((*i)->GetSpellProto()->SpellFamilyName == SPELLFAMILY_WARLOCK &&
-                            //  Immolate
-                            (((*i)->GetSpellProto()->SpellFamilyFlags & UI64LIT(0x0000000000000004)) ||
-                            // Shadowflame
-                            ((*i)->GetSpellProto()->SpellFamilyFlags2 & 0x00000002)))
-                        {
-                            removeAuraState=false;
-                            break;
-                        }
-                    }
-                    if(removeAuraState)
-                        removeState = AURA_STATE_CONFLAGRATE;
+                    removeFamilyFlag = UI64LIT(0x0000000000000004);
+                    removeFamilyFlag2 = 0x00000002;
+                    removeState = AURA_STATE_CONFLAGRATE;
                 }
                 break;
             case SPELLFAMILY_DRUID:
@@ -1147,7 +1134,7 @@ void Aura::_RemoveAura()
             {
                 SpellEntry const *auraSpellInfo = (*i).second->GetSpellProto();
                 if(auraSpellInfo->SpellFamilyName  == m_spellProto->SpellFamilyName &&
-                   auraSpellInfo->SpellFamilyFlags & removeFamilyFlag)
+                   (auraSpellInfo->SpellFamilyFlags & removeFamilyFlag || auraSpellInfo->SpellFamilyFlags2 & removeFamilyFlag2))
                 {
                     found = true;
                     break;
