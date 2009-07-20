@@ -437,25 +437,38 @@ void Spell::EffectSchoolDMG(uint32 effect_idx)
                 // Conflagrate - consumes Immolate or Shadowflame
                 else if (m_spellInfo->TargetAuraState == AURA_STATE_CONFLAGRATE)
                 {
-                    // for caster applied auras only
+                    Aura const* aura = NULL;                // found req. aura for damage calculation
+
                     Unit::AuraList const &mPeriodic = unitTarget->GetAurasByType(SPELL_AURA_PERIODIC_DAMAGE);
                     for(Unit::AuraList::const_iterator i = mPeriodic.begin(); i != mPeriodic.end(); ++i)
                     {
-                        if ((*i)->GetSpellProto()->SpellFamilyName == SPELLFAMILY_WARLOCK &&
-                            (*i)->GetCasterGUID()==m_caster->GetGUID() &&
-                            // Immolate
-                            ((*i)->GetSpellProto()->SpellFamilyFlags & UI64LIT(0x0000000000000004) ||
-                            // Shadowflame
-                            (*i)->GetSpellProto()->SpellFamilyFlags2 & 0x00000002))
-                        {
-                            int32 damagetick = m_caster->SpellDamageBonus(unitTarget, (*i)->GetSpellProto(), (*i)->GetModifier()->m_amount, DOT);
-                            damage += damagetick * 4;
+                        // for caster applied auras only
+                        if ((*i)->GetSpellProto()->SpellFamilyName != SPELLFAMILY_WARLOCK ||
+                            (*i)->GetCasterGUID()!=m_caster->GetGUID())
+                            continue;
 
-                            // Glyph of Conflagrate
-                            if (!m_caster->HasAura(56235))
-                                unitTarget->RemoveAurasByCasterSpell((*i)->GetId(), m_caster->GetGUID());
+                        // Immolate
+                        if ((*i)->GetSpellProto()->SpellFamilyFlags & UI64LIT(0x0000000000000004))
+                        {
+                            aura = *i;                      // it selected always if exist
                             break;
                         }
+
+                        // Shadowflame
+                        if ((*i)->GetSpellProto()->SpellFamilyFlags2 & 0x00000002)
+                            aura = *i;                      // remember but wait possible Immolate as primary priority
+                    }
+
+                    // found Immolate or Shadowflame
+                    if (aura)
+                    {
+                        int32 damagetick = m_caster->SpellDamageBonus(unitTarget, aura->GetSpellProto(), aura->GetModifier()->m_amount, DOT);
+                        damage += damagetick * 4;
+
+                        // Glyph of Conflagrate
+                        if (!m_caster->HasAura(56235))
+                            unitTarget->RemoveAurasByCasterSpell(aura->GetId(), m_caster->GetGUID());
+                        break;
                     }
                 }
                 break;
