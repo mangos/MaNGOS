@@ -1093,35 +1093,20 @@ void Aura::_RemoveAura()
                     removeState = AURA_STATE_JUDGEMENT;     // Update Seals information
                 break;
             case SPELLFAMILY_WARLOCK:
-                // Conflagrate aura state on Immolate and Shadowflame
-                // Check Immolate case
-                if (m_spellProto->SpellFamilyFlags & UI64LIT(0x0000000000000004))
+                // Conflagrate aura state on Immolate and Shadowflame,
+                if ((m_spellProto->SpellFamilyFlags & UI64LIT(0x0000000000000004)) ||
+                    (m_spellProto->SpellFamilyFlags2 & 0x00000002))
                 {
-                    //check if there is a Shadowflame DOT present, if not, remove AURA_STATE_CONFLAGRATE
+                    // it can have both from same caster or same effect from different casters
                     bool removeAuraState=true;
-                    Unit::AuraList const& SFDOT = m_target->GetAurasByType(SPELL_AURA_PERIODIC_DAMAGE);
-                    for(Unit::AuraList::const_iterator i = SFDOT.begin(); i != SFDOT.end(); ++i)
+                    Unit::AuraList const& dotList = m_target->GetAurasByType(SPELL_AURA_PERIODIC_DAMAGE);
+                    for(Unit::AuraList::const_iterator i = dotList.begin(); i != dotList.end(); ++i)
                     {
                         if ((*i)->GetSpellProto()->SpellFamilyName == SPELLFAMILY_WARLOCK &&
-                            ((*i)->GetSpellProto()->SpellFamilyFlags2 & 0x00000002))
-                        {
-                            removeAuraState=false;
-                            break;
-                        }
-                    }
-                    if(removeAuraState)
-                        removeState = AURA_STATE_CONFLAGRATE;
-                }
-                // Check Shadowflame case
-                else if (m_spellProto->SpellFamilyFlags2 & 0x00000002)
-                {
-                    //check if there is a Immolate DOT present, if not, remove AURA_STATE_CONFLAGRATE
-                    bool removeAuraState=true;
-                    Unit::AuraList const& IMDOT = m_target->GetAurasByType(SPELL_AURA_PERIODIC_DAMAGE);
-                    for(Unit::AuraList::const_iterator i = IMDOT.begin(); i != IMDOT.end(); ++i)
-                    {
-                        if ((*i)->GetSpellProto()->SpellFamilyName == SPELLFAMILY_WARLOCK &&
-                            ((*i)->GetSpellProto()->SpellFamilyFlags & UI64LIT(0x0000000000000004)))
+                            //  Immolate
+                            (((*i)->GetSpellProto()->SpellFamilyFlags & UI64LIT(0x0000000000000004)) ||
+                            // Shadowflame
+                            ((*i)->GetSpellProto()->SpellFamilyFlags2 & 0x00000002)))
                         {
                             removeAuraState=false;
                             break;
