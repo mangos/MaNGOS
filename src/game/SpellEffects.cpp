@@ -5749,14 +5749,10 @@ void Spell::EffectSummonObject(uint32 i)
         default: return;
     }
 
-    uint64 guid = m_caster->m_ObjectSlot[slot];
-    if(guid != 0)
+    if(uint64 guid = m_caster->m_ObjectSlot[slot])
     {
-        GameObject* obj = NULL;
-        if( m_caster )
-            obj = m_caster->GetMap()->GetGameObject(guid);
-
-        if(obj) obj->Delete();
+        if(GameObject* obj = m_caster ? m_caster->GetMap()->GetGameObject(guid) : NULL)
+            obj->SetLootState(GO_JUST_DEACTIVATED);
         m_caster->m_ObjectSlot[slot] = 0;
     }
 
