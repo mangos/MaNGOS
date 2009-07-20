@@ -984,9 +984,13 @@ void Aura::_AddAura()
             if (IsSealSpell(m_spellProto))
                 m_target->ModifyAuraState(AURA_STATE_JUDGEMENT, true);
 
-            // Conflagrate aura state on Immolate
-            if (m_spellProto->SpellFamilyName == SPELLFAMILY_WARLOCK && m_spellProto->SpellFamilyFlags & 4)
-                m_target->ModifyAuraState(AURA_STATE_IMMOLATE, true);
+            // Conflagrate aura state on Immolate and Shadowflame
+            if (m_spellProto->SpellFamilyName == SPELLFAMILY_WARLOCK &&
+                // Immolate
+                ((m_spellProto->SpellFamilyFlags & UI64LIT(0x0000000000000004)) ||
+                // Shadowflame
+                (m_spellProto->SpellFamilyFlags2 & 0x00000002)))
+                m_target->ModifyAuraState(AURA_STATE_CONFLAGRATE, true);
 
             // Faerie Fire (druid versions)
             if (m_spellProto->SpellFamilyName == SPELLFAMILY_DRUID && (m_spellProto->SpellFamilyFlags & UI64LIT(0x0000000000000400)))
@@ -1089,8 +1093,43 @@ void Aura::_RemoveAura()
                     removeState = AURA_STATE_JUDGEMENT;     // Update Seals information
                 break;
             case SPELLFAMILY_WARLOCK:
-                if(m_spellProto->SpellFamilyFlags & UI64LIT(0x4))
-                    removeState = AURA_STATE_IMMOLATE;      // Conflagrate aura state
+                // Conflagrate aura state on Immolate and Shadowflame
+                // Check Immolate case
+                if (m_spellProto->SpellFamilyFlags & UI64LIT(0x0000000000000004))
+                {
+                    //check if there is a Shadowflame DOT present, if not, remove AURA_STATE_CONFLAGRATE
+                    bool removeAuraState=true;
+                    Unit::AuraList const& SFDOT = m_target->GetAurasByType(SPELL_AURA_PERIODIC_DAMAGE);
+                    for(Unit::AuraList::const_iterator i = SFDOT.begin(); i != SFDOT.end(); ++i)
+                    {
+                        if ((*i)->GetSpellProto()->SpellFamilyName == SPELLFAMILY_WARLOCK &&
+                            ((*i)->GetSpellProto()->SpellFamilyFlags2 & 0x00000002))
+                        {
+                            removeAuraState=false;
+                            break;
+                        }
+                    }
+                    if(removeAuraState)
+                        removeState = AURA_STATE_CONFLAGRATE;
+                }
+                // Check Shadowflame case
+                else if (m_spellProto->SpellFamilyFlags2 & 0x00000002)
+                {
+                    //check if there is a Immolate DOT present, if not, remove AURA_STATE_CONFLAGRATE
+                    bool removeAuraState=true;
+                    Unit::AuraList const& IMDOT = m_target->GetAurasByType(SPELL_AURA_PERIODIC_DAMAGE);
+                    for(Unit::AuraList::const_iterator i = IMDOT.begin(); i != IMDOT.end(); ++i)
+                    {
+                        if ((*i)->GetSpellProto()->SpellFamilyName == SPELLFAMILY_WARLOCK &&
+                            ((*i)->GetSpellProto()->SpellFamilyFlags & UI64LIT(0x0000000000000004)))
+                        {
+                            removeAuraState=false;
+                            break;
+                        }
+                    }
+                    if(removeAuraState)
+                        removeState = AURA_STATE_CONFLAGRATE;
+                }
                 break;
             case SPELLFAMILY_DRUID:
                 if(m_spellProto->SpellFamilyFlags & UI64LIT(0x0000000000000400))

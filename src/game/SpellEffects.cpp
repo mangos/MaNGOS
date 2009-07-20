@@ -404,12 +404,38 @@ void Spell::EffectSchoolDMG(uint32 effect_idx)
                 // Incinerate Rank 1 & 2
                 if ((m_spellInfo->SpellFamilyFlags & UI64LIT(0x00004000000000)) && m_spellInfo->SpellIconID==2128)
                 {
-                    // Incinerate does more dmg (dmg*0.25) if the target is Immolated.
-                    if(unitTarget->HasAuraState(AURA_STATE_IMMOLATE))
-                        damage += int32(damage*0.25f);
+                    // Incinerate does more dmg (dmg*0.25) if the target have Immolate debuff.
+                    // Check aura state for speed but aura state set not only for Immolate spell
+                    if(unitTarget->HasAuraState(AURA_STATE_CONFLAGRATE))
+                    {
+                        Unit::AuraList const& RejorRegr = unitTarget->GetAurasByType(SPELL_AURA_PERIODIC_DAMAGE);
+                        for(Unit::AuraList::const_iterator i = RejorRegr.begin(); i != RejorRegr.end(); ++i)
+                        {
+                            // Immolate
+                            if((*i)->GetSpellProto()->SpellFamilyName == SPELLFAMILY_WARLOCK &&
+                                ((*i)->GetSpellProto()->SpellFamilyFlags & UI64LIT(0x00000000000004)))
+                            {
+                                damage += damage/4;
+                                break;
+                            }
+                        }
+                    }
                 }
-                // Conflagrate - consumes immolate or Shadowflame
-                if (m_spellInfo->TargetAuraState == AURA_STATE_IMMOLATE)
+                // Shadowflame
+                else if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0001000000000000))
+                {
+                    // Apply DOT part
+                    switch(m_spellInfo->Id)
+                    {
+                        case 47897: m_caster->CastSpell(unitTarget, 47960, true); break;
+                        case 61290: m_caster->CastSpell(unitTarget, 61291, true); break;
+                        default:
+                            sLog.outError("Spell::EffectDummy: Unhandeled Shadowflame spell rank %u",m_spellInfo->Id);
+                        break;
+                    }
+                }
+                // Conflagrate - consumes Immolate or Shadowflame
+                else if (m_spellInfo->TargetAuraState == AURA_STATE_CONFLAGRATE)
                 {
                     // for caster applied auras only
                     Unit::AuraList const &mPeriodic = unitTarget->GetAurasByType(SPELL_AURA_PERIODIC_DAMAGE);
@@ -418,7 +444,7 @@ void Spell::EffectSchoolDMG(uint32 effect_idx)
                         if ((*i)->GetSpellProto()->SpellFamilyName == SPELLFAMILY_WARLOCK &&
                             (*i)->GetCasterGUID()==m_caster->GetGUID() &&
                             // Immolate
-                            ((*i)->GetSpellProto()->SpellFamilyFlags & 0x0000000000000004 ||
+                            ((*i)->GetSpellProto()->SpellFamilyFlags & UI64LIT(0x0000000000000004) ||
                             // Shadowflame
                             (*i)->GetSpellProto()->SpellFamilyFlags2 & 0x00000002))
                         {
