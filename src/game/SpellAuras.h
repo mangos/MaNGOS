@@ -215,9 +215,10 @@ class MANGOS_DLL_SPEC Aura
         virtual ~Aura();
 
         void SetModifier(AuraType t, int32 a, uint32 pt, int32 miscValue);
-        Modifier* GetModifier() {return &m_modifier;}
-        int32 GetMiscValue() {return m_spellProto->EffectMiscValue[m_effIndex];}
-        int32 GetMiscBValue() {return m_spellProto->EffectMiscValueB[m_effIndex];}
+        Modifier*       GetModifier()       { return &m_modifier; }
+        Modifier const* GetModifier() const { return &m_modifier; }
+        int32 GetMiscValue() const { return m_spellProto->EffectMiscValue[m_effIndex]; }
+        int32 GetMiscBValue() const { return m_spellProto->EffectMiscValueB[m_effIndex]; }
 
         SpellEntry const* GetSpellProto() const { return m_spellProto; }
         uint32 GetId() const{ return m_spellProto->Id; }

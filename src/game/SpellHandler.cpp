@@ -133,11 +133,11 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
         // send spell error
         if (SpellEntry const* spellInfo = sSpellStore.LookupEntry(spellid))
         {
-            // for implicit area/coord target spells 
+            // for implicit area/coord target spells
             if (IsPointEffectTarget(Targets(spellInfo->EffectImplicitTargetA[0])) ||
                 IsAreaEffectTarget(Targets(spellInfo->EffectImplicitTargetA[0])))
                 Spell::SendCastResult(_player,spellInfo,cast_count,SPELL_FAILED_NO_VALID_TARGETS);
-            // for explicit target spells 
+            // for explicit target spells
             else
                 Spell::SendCastResult(_player,spellInfo,cast_count,SPELL_FAILED_BAD_TARGETS);
         }

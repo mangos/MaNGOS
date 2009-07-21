@@ -1819,6 +1819,10 @@ bool Creature::CanAssistTo(const Unit* u, const Unit* enemy, bool checkfaction /
     if (!isAlive())
         return false;
 
+    // we don't need help from non-combatant ;)
+    if (isCivilian())
+        return false;
+
     // skip fighting creature
     if (isInCombat())
         return false;
