@@ -1164,7 +1164,7 @@ void WorldSession::HandlePlayedTime(WorldPacket& /*recv_data*/)
     WorldPacket data(SMSG_PLAYED_TIME, 4 + 4 + 1);
     data << uint32(_player->GetTotalPlayedTime());
     data << uint32(_player->GetLevelPlayedTime());
-    data << uint8(0);
+    data << uint8(1);                                       // 0 - will not show in chat frame
     SendPacket(&data);
 }
 
