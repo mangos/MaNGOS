@@ -1835,7 +1835,7 @@ void Spell::EffectDummy(uint32 i)
             break;
         case SPELLFAMILY_DEATHKNIGHT:
             // Death Coil
-            if(m_spellInfo->SpellFamilyFlags & UI64LIT(0x002000))
+            if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x002000))
             {
                 if(m_caster->IsFriendlyTo(unitTarget))
                 {
@@ -1850,6 +1850,12 @@ void Spell::EffectDummy(uint32 i)
                     int32 bp = damage;
                     m_caster->CastCustomSpell(unitTarget, 47632, &bp, NULL, NULL, true);
                 }
+                return;
+            }
+            // Hungering Cold
+            else if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0000100000000000))
+            {
+                m_caster->CastSpell(m_caster, 51209, true);
                 return;
             }
             break;
