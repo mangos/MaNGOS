@@ -1690,16 +1690,16 @@ void Spell::SetTargetMap(uint32 i,uint32 cur,UnitList& TagUnitMap)
         case TARGET_ALL_PARTY_AROUND_CASTER:
         case TARGET_ALL_PARTY_AROUND_CASTER_2:
         case TARGET_ALL_PARTY:
-            FillRaidOrPartyTargets(TagUnitMap,m_caster,radius,false,true,true);
+            FillRaidOrPartyTargets(TagUnitMap, m_caster, m_caster, radius, false, true, true);
             break;
         case TARGET_ALL_RAID_AROUND_CASTER:
         {
             if(m_spellInfo->Id == 57669)                    // Replenishment (special target selection)
-                FillRaidOrPartyManaPriorityTargets(TagUnitMap, m_caster, radius, 10, true, false, false);
+                FillRaidOrPartyManaPriorityTargets(TagUnitMap, m_caster, m_caster, radius, 10, true, false, false);
             else if (m_spellInfo->Id==52759)                //Ancestral Awakening (special target selection)
-                FillRaidOrPartyHealthPriorityTargets(TagUnitMap, m_caster, radius, 1, true, false, false);
+                FillRaidOrPartyHealthPriorityTargets(TagUnitMap, m_caster, m_caster, radius, 1, true, false, false);
             else
-                FillRaidOrPartyTargets(TagUnitMap, m_caster, radius, true, true, true);
+                FillRaidOrPartyTargets(TagUnitMap, m_caster, m_caster, radius, true, true, true);
             break;
         }
         case TARGET_SINGLE_FRIEND:
@@ -1728,12 +1728,23 @@ void Spell::SetTargetMap(uint32 i,uint32 cur,UnitList& TagUnitMap)
             // special target order
             if (m_spellInfo->Id==64904)                     // Hymn of Hope
                 // target amount stored in parent spell dummy effect but hard for access
-                FillRaidOrPartyManaPriorityTargets(TagUnitMap, m_caster, radius, 3, true, false, false);
+                FillRaidOrPartyManaPriorityTargets(TagUnitMap, m_caster, m_caster, radius, 3, true, false, false);
             else
                 FillAreaTargets(TagUnitMap, m_targets.m_destX, m_targets.m_destY, radius, PUSH_SELF_CENTER, SPELL_TARGETS_FRIENDLY);
             break;
         case TARGET_ALL_FRIENDLY_UNITS_IN_AREA:
-            FillAreaTargets(TagUnitMap, m_targets.m_destX, m_targets.m_destY, radius, PUSH_DEST_CENTER, SPELL_TARGETS_FRIENDLY);
+            // Wild Growth
+            if (m_spellInfo->SpellFamilyName == SPELLFAMILY_DRUID && m_spellInfo->SpellIconID == 2864)
+            {
+                Unit* target = m_targets.getUnitTarget();
+                if(!target)
+                    target = m_caster;
+                uint32 count = CalculateDamage(2,m_caster); // stored in dummy effect, affected by mods
+
+                FillRaidOrPartyHealthPriorityTargets(TagUnitMap, m_caster, target, radius, count, true, false, true);
+            }
+            else
+                FillAreaTargets(TagUnitMap, m_targets.m_destX, m_targets.m_destY, radius, PUSH_DEST_CENTER, SPELL_TARGETS_FRIENDLY);
             break;
         // TARGET_SINGLE_PARTY means that the spells can only be casted on a party member and not on the caster (some seals, fire shield from imp, etc..)
         case TARGET_SINGLE_PARTY:
@@ -5751,14 +5762,14 @@ void Spell::FillAreaTargets( UnitList& TagUnitMap, float x, float y, float radiu
     cell_lock->Visit(cell_lock, grid_notifier, *m_caster->GetMap());
 }
 
-void Spell::FillRaidOrPartyTargets( UnitList &TagUnitMap, Unit* target, float radius, bool raid, bool withPets, bool withcaster )
+void Spell::FillRaidOrPartyTargets( UnitList &TagUnitMap, Unit* member, Unit* center, float radius, bool raid, bool withPets, bool withcaster )
 {
-    Player *pTarget = target->GetCharmerOrOwnerPlayerOrPlayerItself();
-    Group *pGroup = pTarget ? pTarget->GetGroup() : NULL;
+    Player *pMember = member->GetCharmerOrOwnerPlayerOrPlayerItself();
+    Group *pGroup = pMember ? pMember->GetGroup() : NULL;
 
     if (pGroup)
     {
-        uint8 subgroup = pTarget->GetSubGroup();
+        uint8 subgroup = pMember->GetSubGroup();
 
         for(GroupReference *itr = pGroup->GetFirstMember(); itr != NULL; itr = itr->next())
         {
@@ -5768,36 +5779,36 @@ void Spell::FillRaidOrPartyTargets( UnitList &TagUnitMap, Unit* target, float ra
             if (Target && (raid || subgroup==Target->GetSubGroup())
                 && !m_caster->IsHostileTo(Target))
             {
-                if (Target==m_caster && withcaster ||
-                    Target!=m_caster && m_caster->IsWithinDistInMap(Target, radius))
+                if ((Target==center || center->IsWithinDistInMap(Target, radius)) &&
+                    (withcaster || Target != m_caster))
                     TagUnitMap.push_back(Target);
 
                 if (withPets)
                     if (Pet* pet = Target->GetPet())
-                        if (pet==m_caster && withcaster ||
-                            pet!=m_caster && m_caster->IsWithinDistInMap(pet, radius))
+                        if ((pet==center || center->IsWithinDistInMap(pet, radius)) &&
+                            (withcaster || pet != m_caster))
                             TagUnitMap.push_back(pet);
             }
         }
     }
     else
     {
-        Unit* ownerOrSelf = pTarget ? pTarget : target->GetCharmerOrOwnerOrSelf();
-        if (ownerOrSelf==m_caster && withcaster ||
-            ownerOrSelf!=m_caster && m_caster->IsWithinDistInMap(ownerOrSelf, radius))
+        Unit* ownerOrSelf = pMember ? pMember : member->GetCharmerOrOwnerOrSelf();
+        if ((ownerOrSelf==center || center->IsWithinDistInMap(ownerOrSelf, radius)) &&
+            (withcaster || ownerOrSelf != m_caster))
             TagUnitMap.push_back(ownerOrSelf);
 
         if (withPets)
             if (Pet* pet = ownerOrSelf->GetPet())
-                if (pet==m_caster && withcaster ||
-                    pet!=m_caster && m_caster->IsWithinDistInMap(pet, radius))
+                if ((pet==center || center->IsWithinDistInMap(pet, radius)) &&
+                    (withcaster || pet != m_caster))
                     TagUnitMap.push_back(pet);
     }
 }
 
-void Spell::FillRaidOrPartyManaPriorityTargets( UnitList &TagUnitMap, Unit* target, float radius, uint32 count, bool raid, bool withPets, bool withCaster )
+void Spell::FillRaidOrPartyManaPriorityTargets( UnitList &TagUnitMap, Unit* member, Unit* center, float radius, uint32 count, bool raid, bool withPets, bool withCaster )
 {
-    FillRaidOrPartyTargets(TagUnitMap,target,radius,raid,withPets,withCaster);
+    FillRaidOrPartyTargets(TagUnitMap, member, center, radius, raid, withPets, withCaster);
 
     PrioritizeManaUnitQueue manaUsers;
     for(UnitList::const_iterator itr = TagUnitMap.begin(); itr != TagUnitMap.end() && manaUsers.size() < count; ++itr)
@@ -5812,9 +5823,9 @@ void Spell::FillRaidOrPartyManaPriorityTargets( UnitList &TagUnitMap, Unit* targ
     }
 }
 
-void Spell::FillRaidOrPartyHealthPriorityTargets( UnitList &TagUnitMap, Unit* target, float radius, uint32 count, bool raid, bool withPets, bool withCaster )
+void Spell::FillRaidOrPartyHealthPriorityTargets( UnitList &TagUnitMap, Unit* member, Unit* center, float radius, uint32 count, bool raid, bool withPets, bool withCaster )
 {
-    FillRaidOrPartyTargets(TagUnitMap,target,radius,raid,withPets,withCaster);
+    FillRaidOrPartyTargets(TagUnitMap, member, center, radius, raid, withPets, withCaster);
 
     PrioritizeHealthUnitQueue healthQueue;
     for(UnitList::const_iterator itr = TagUnitMap.begin(); itr != TagUnitMap.end() && healthQueue.size() < count; ++itr)
