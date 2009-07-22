@@ -9232,13 +9232,11 @@ bool Unit::isVisibleForOrDetect(Unit const* u, bool detect, bool inVisibleList, 
 
     // NOW ONLY STEALTH CASE
 
-    // stealth and detected and visible for some seconds
-    if (u->GetTypeId() == TYPEID_PLAYER  && ((Player*)u)->m_DetectInvTimer > 300 && ((Player*)u)->HaveAtClient(this))
-        return true;
-
     //if in non-detect mode then invisible for unit
+    //mobs always detect players (detect == true)... return 'false' for those mobs which have (detect == false)
+    //players detect players only in Player::HandleStealthedUnitsDetection()
     if (!detect)
-        return false;
+        return (u->GetTypeId() == TYPEID_PLAYER) ? ((Player*)u)->HaveAtClient(this) : false;
 
     // Special cases
 
@@ -9254,21 +9252,13 @@ bool Unit::isVisibleForOrDetect(Unit const* u, bool detect, bool inVisibleList, 
     if (u->hasUnitState(UNIT_STAT_STUNNED) && (u != this))
         return false;
 
-    // Creature can detect target only in aggro radius
-    if(u->GetTypeId() != TYPEID_PLAYER)
-    {
-        //Always invisible from back and out of aggro range
-        bool isInFront = u->isInFrontInMap(this,((Creature const*)u)->GetAttackDistance(this));
-        if(!isInFront)
-            return false;
-    }
-    else
-    {
-        //Always invisible from back
-        bool isInFront = u->isInFrontInMap(this,(GetTypeId()==TYPEID_PLAYER || GetCharmerOrOwnerGUID()) ? World::GetMaxVisibleDistanceForPlayer() : World::GetMaxVisibleDistanceForCreature());
-        if(!isInFront)
-            return false;
-    }
+    // set max ditance
+    float visibleDistance = (u->GetTypeId() == TYPEID_PLAYER) ? MAX_PLAYER_STEALTH_DETECT_RANGE : ((Creature const*)u)->GetAttackDistance(this);
+
+    //Always invisible from back (when stealth detection is on), also filter max distance cases
+    bool isInFront = u->isInFrontInMap(this, visibleDistance);
+    if(!isInFront)
+        return false;
 
     // if doesn't have stealth detection (Shadow Sight), then check how stealthy the unit is, otherwise just check los
     if(!u->HasAuraType(SPELL_AURA_DETECT_STEALTH))
@@ -9276,7 +9266,7 @@ bool Unit::isVisibleForOrDetect(Unit const* u, bool detect, bool inVisibleList, 
         //Calculation if target is in front
 
         //Visible distance based on stealth value (stealth rank 4 300MOD, 10.5 - 3 = 7.5)
-        float visibleDistance = 10.5f - (GetTotalAuraModifier(SPELL_AURA_MOD_STEALTH)/100.0f);
+        visibleDistance = 10.5f - (GetTotalAuraModifier(SPELL_AURA_MOD_STEALTH)/100.0f);
 
         //Visible distance is modified by
         //-Level Diff (every level diff = 1.0f in visible distance)
@@ -9290,7 +9280,9 @@ bool Unit::isVisibleForOrDetect(Unit const* u, bool detect, bool inVisibleList, 
         //-Stealth Mod(positive like Master of Deception) and Stealth Detection(negative like paranoia)
         //based on wowwiki every 5 mod we have 1 more level diff in calculation
         visibleDistance += (int32(u->GetTotalAuraModifier(SPELL_AURA_MOD_DETECT)) - stealthMod)/5.0f;
+        visibleDistance = visibleDistance > MAX_PLAYER_STEALTH_DETECT_RANGE ? MAX_PLAYER_STEALTH_DETECT_RANGE : visibleDistance;
 
+        // recheck new distance
         if(visibleDistance <= 0 || !IsWithinDist(u,visibleDistance))
             return false;
     }
