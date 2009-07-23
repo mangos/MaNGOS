@@ -106,7 +106,7 @@ enum EventAI_ActionType
     ACTION_T_CALL_FOR_HELP              = 39,               // Radius
     ACTION_T_SET_SHEATH                 = 40,               // Sheath (0-passive,1-melee,2-ranged)
     ACTION_T_FORCE_DESPAWN              = 41,               // No Params
-    ACTION_T_SET_INVINCEABILITY_HP_LEVEL= 42,               // MinHpValue, format(0-flat,1-percent from max health)
+    ACTION_T_SET_INVINCIBILITY_HP_LEVEL = 42,               // MinHpValue, format(0-flat,1-percent from max health)
     ACTION_T_END,
 };
 
@@ -374,11 +374,12 @@ struct CreatureEventAI_Action
         {
             uint32 sheath;
         } set_sheath;
+        // ACTION_T_SET_INVINCIBILITY_HP_LEVEL             = 42
         struct
         {
             uint32 hp_level;
             uint32 is_percent;
-        } invinceability_hp_level;
+        } invincibility_hp_level;
         // RAW
         struct
         {
