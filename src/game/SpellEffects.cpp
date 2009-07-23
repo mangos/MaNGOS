@@ -5036,6 +5036,7 @@ void Spell::EffectScriptEffect(uint32 effIndex)
                 case 61177:                                 // Northrend Inscription Research
                 case 61288:                                 // Minor Inscription Research
                 case 61756:                                 // Northrend Inscription Research (FAST QA VERSION)
+                case 64323:                                 // Book of Glyph Mastery
                 {
                     if(m_caster->GetTypeId() != TYPEID_PLAYER)
                         return;
