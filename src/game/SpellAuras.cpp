@@ -5777,19 +5777,19 @@ void Aura::HandleSchoolAbsorb(bool apply, bool Real)
     }
 
     // Ice Barrier (remove effect from Shattered Barrier)
-    if(!apply && caster && m_spellProto->SpellIconID == 32 && m_spellProto->SpellFamilyName == SPELLFAMILY_MAGE)
+    if(!apply && m_spellProto->SpellIconID == 32 && m_spellProto->SpellFamilyName == SPELLFAMILY_MAGE)
     {
         if (!((m_removeMode == AURA_REMOVE_BY_DEFAULT && !m_modifier.m_amount) || m_removeMode == AURA_REMOVE_BY_DISPEL))
             return;
 
-        if (caster->HasAura(44745,0))                       // Shattered Barrier, rank 1
+        if (m_target->HasAura(44745,0))                     // Shattered Barrier, rank 1
         {
             if(roll_chance_i(50))
-                caster->CastSpell(caster, 55080, true, NULL, this);
+                m_target->CastSpell(m_target, 55080, true, NULL, this);
         }
-        else if (caster->HasAura(54787,0))                  // Shattered Barrier, rank 2
+        else if (m_target->HasAura(54787,0))                // Shattered Barrier, rank 2
         {
-            caster->CastSpell(caster, 55080, true, NULL, this);
+            m_target->CastSpell(m_target, 55080, true, NULL, this);
         }
     }
 
