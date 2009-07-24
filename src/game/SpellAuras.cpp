@@ -5776,6 +5776,24 @@ void Aura::HandleSchoolAbsorb(bool apply, bool Real)
         m_modifier.m_amount += (int32)DoneActualBenefit;
     }
 
+    // Shattered Barrier
+    if(!apply && m_spellProto->SpellIconID == 32 && m_spellProto->SpellFamilyName == SPELLFAMILY_MAGE)
+    {
+        Unit* caster = GetCaster();
+        if (!((m_removeMode == AURA_REMOVE_BY_DEFAULT && !m_modifier.m_amount) || m_removeMode == AURA_REMOVE_BY_DISPEL))
+            return;
+
+        if (caster->HasAura(44745,0))                       // rank 1
+        {
+            if(roll_chance_i(50))
+                caster->CastSpell(caster, 55080, true, NULL, this);
+        }
+        else if (caster->HasAura(54787,0))                  // rank 2
+        {
+            caster->CastSpell(caster, 55080, true, NULL, this);
+        }
+    }
+
     if (!apply && caster &&
         // Power Word: Shield
         m_spellProto->SpellFamilyName == SPELLFAMILY_PRIEST && m_spellProto->Mechanic == MECHANIC_SHIELD &&
