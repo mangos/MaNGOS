@@ -628,6 +628,10 @@ inline bool IsProfessionOrRidingSkill(uint32 skill)
 
 class SpellMgr
 {
+    friend struct DoSpellBonusess;
+    friend struct DoSpellProcEvent;
+    friend struct DoSpellProcItemEnchant;
+
     // Constructors
     public:
         SpellMgr();
@@ -699,13 +703,7 @@ class SpellMgr
             SpellBonusMap::const_iterator itr = mSpellBonusMap.find(spellId);
             if( itr != mSpellBonusMap.end( ) )
                 return &itr->second;
-            // Not found, try lookup for 1 spell rank if exist
-            if (uint32 rank_1 = GetFirstSpellInChain(spellId))
-            {
-                SpellBonusMap::const_iterator itr2 = mSpellBonusMap.find(rank_1);
-                if( itr2 != mSpellBonusMap.end( ) )
-                    return &itr2->second;
-            }
+
             return NULL;
         }
 
@@ -745,6 +743,17 @@ class SpellMgr
         }
 
         SpellChainMapNext const& GetSpellChainNext() const { return mSpellChainsNext; }
+
+        template<typename Worker>
+        void doForHighRanks(uint32 spellid, Worker& worker)
+        {
+            SpellChainMapNext const& nextMap = GetSpellChainNext();
+            for(SpellChainMapNext::const_iterator itr = nextMap.lower_bound(spellid); itr != nextMap.upper_bound(spellid); ++itr)
+            {
+                worker(itr->second);
+                doForHighRanks(itr->second,worker);
+            }
+        }
 
         // Note: not use rank for compare to spell ranks: spell chains isn't linear order
         // Use IsHighRankOfSpell instead
