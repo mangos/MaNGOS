@@ -5788,6 +5788,23 @@ void Aura::HandleSchoolAbsorb(bool apply, bool Real)
         m_modifier.m_amount += (int32)DoneActualBenefit;
     }
 
+    // Ice Barrier (remove effect from Shattered Barrier)
+    if(!apply && m_spellProto->SpellIconID == 32 && m_spellProto->SpellFamilyName == SPELLFAMILY_MAGE)
+    {
+        if (!((m_removeMode == AURA_REMOVE_BY_DEFAULT && !m_modifier.m_amount) || m_removeMode == AURA_REMOVE_BY_DISPEL))
+            return;
+
+        if (m_target->HasAura(44745,0))                     // Shattered Barrier, rank 1
+        {
+            if(roll_chance_i(50))
+                m_target->CastSpell(m_target, 55080, true, NULL, this);
+        }
+        else if (m_target->HasAura(54787,0))                // Shattered Barrier, rank 2
+        {
+            m_target->CastSpell(m_target, 55080, true, NULL, this);
+        }
+    }
+
     if (!apply && caster &&
         // Power Word: Shield
         m_spellProto->SpellFamilyName == SPELLFAMILY_PRIEST && m_spellProto->Mechanic == MECHANIC_SHIELD &&
@@ -6079,7 +6096,17 @@ void Aura::PeriodicTick()
             if(m_modifier.m_auraname==SPELL_AURA_OBS_MOD_HEALTH)
                 pdamage = uint32(m_target->GetMaxHealth() * amount / 100);
             else
+            {
                 pdamage = amount;
+
+                // Wild Growth (1/7 - 6 + 2*ramainTicks) %
+                if (m_spellProto->SpellFamilyName == SPELLFAMILY_DRUID && m_spellProto->SpellIconID == 2864)
+                {
+                    int32 ticks = m_maxduration/m_modifier.periodictime;
+                    int32 remainingTicks = int32(float(m_duration) / m_modifier.periodictime + 0.5);
+                    pdamage = int32(pdamage) + int32(amount)*ticks*(-6+2*remainingTicks)/100;
+                }
+            }
 
             pdamage = pCaster->SpellHealingBonus(m_target, GetSpellProto(), pdamage, DOT, GetStackAmount());
 
@@ -6954,9 +6981,7 @@ void Aura::UnregisterSingleCastAura()
 {
     if (IsSingleTarget())
     {
-        Unit* caster = NULL;
-        caster = GetCaster();
-        if(caster)
+        if(Unit* caster = GetCaster())
         {
             caster->GetSingleCastAuras().remove(this);
         }

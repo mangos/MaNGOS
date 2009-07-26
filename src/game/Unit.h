@@ -102,14 +102,15 @@ enum SpellModOp
     SPELLMOD_CRIT_DAMAGE_BONUS      = 15,
     SPELLMOD_RESIST_MISS_CHANCE     = 16,
     SPELLMOD_JUMP_TARGETS           = 17,
-    SPELLMOD_CHANCE_OF_SUCCESS      = 18,
+    SPELLMOD_CHANCE_OF_SUCCESS      = 18,                   // Only used with SPELL_AURA_ADD_FLAT_MODIFIER and affects proc spells
     SPELLMOD_ACTIVATION_TIME        = 19,
     SPELLMOD_EFFECT_PAST_FIRST      = 20,
     SPELLMOD_CASTING_TIME_OLD       = 21,
     SPELLMOD_DOT                    = 22,
     SPELLMOD_EFFECT3                = 23,
     SPELLMOD_SPELL_BONUS_DAMAGE     = 24,
-    // spellmod 25, 26 unused
+    // spellmod 25 unused
+    SPELLMOD_FREQUENCY_OF_SUCCESS   = 26,                   // Only used with SPELL_AURA_ADD_PCT_MODIFIER and affects used on proc spells
     SPELLMOD_MULTIPLE_VALUE         = 27,
     SPELLMOD_RESIST_DISPEL_CHANCE   = 28
 };
@@ -851,6 +852,7 @@ typedef std::set<uint64> GuardianPetList;
 
 // delay time next attack to prevent client attack animation problems
 #define ATTACK_DISPLAY_DELAY 200
+#define MAX_PLAYER_STEALTH_DETECT_RANGE 45.0f               // max distance for detection targets by player
 
 struct SpellProcEventEntry;                                 // used only privately
 
@@ -1195,6 +1197,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         bool AddAura(Aura *aur);
 
+        void RemoveAura(Aura* aura);
         void RemoveAura(AuraMap::iterator &i, AuraRemoveMode mode = AURA_REMOVE_BY_DEFAULT);
         void RemoveAura(uint32 spellId, uint32 effindex, Aura* except = NULL);
         void RemoveSingleSpellAurasFromStack(uint32 spellId);

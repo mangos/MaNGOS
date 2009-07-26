@@ -36,8 +36,6 @@ class Player;
 class Spell;
 struct SpellModifier;
 
-extern SQLStorage sSpellThreatStore;
-
 // only used in code
 enum SpellCategories
 {
@@ -155,7 +153,9 @@ inline bool IsElementalShield(SpellEntry const *spellInfo)
 
 inline bool IsExplicitDiscoverySpell(SpellEntry const *spellInfo)
 {
-    return spellInfo->Effect[0]==SPELL_EFFECT_CREATE_RANDOM_ITEM && spellInfo->Effect[1]==SPELL_EFFECT_SCRIPT_EFFECT;
+    return spellInfo->Effect[0] == SPELL_EFFECT_CREATE_RANDOM_ITEM
+        && spellInfo->Effect[1] == SPELL_EFFECT_SCRIPT_EFFECT
+        || spellInfo->Id == 64323;                          // Book of Glyph Mastery (Effect0==SPELL_EFFECT_SCRIPT_EFFECT without any other data)
 }
 
 inline bool IsLootCraftingSpell(SpellEntry const *spellInfo)
@@ -447,6 +447,8 @@ typedef UNORDERED_MAP<uint32, SpellBonusEntry>     SpellBonusMap;
 #define ELIXIR_SHATTRATH_MASK 0x8
 
 typedef std::map<uint32, uint8> SpellElixirMap;
+typedef std::map<uint32, float> SpellProcItemEnchantMap;
+typedef std::map<uint32, uint16> SpellThreatMap;
 
 // Spell script target related declarations (accessed using SpellMgr functions)
 enum SpellTargetType
@@ -626,6 +628,10 @@ inline bool IsProfessionOrRidingSkill(uint32 skill)
 
 class SpellMgr
 {
+    friend struct DoSpellBonusess;
+    friend struct DoSpellProcEvent;
+    friend struct DoSpellProcItemEnchant;
+
     // Constructors
     public:
         SpellMgr();
@@ -660,6 +666,15 @@ class SpellMgr
                 return SPELL_NORMAL;
         }
 
+        uint16 GetSpellThreat(uint32 spellid) const
+        {
+            SpellThreatMap::const_iterator itr = mSpellThreatMap.find(spellid);
+            if(itr==mSpellThreatMap.end())
+                return 0;
+
+            return itr->second;
+        }
+
         // Spell proc events
         SpellProcEventEntry const* GetSpellProcEvent(uint32 spellId) const
         {
@@ -667,6 +682,16 @@ class SpellMgr
             if( itr != mSpellProcEventMap.end( ) )
                 return &itr->second;
             return NULL;
+        }
+
+        // Spell procs from item enchants
+        float GetItemEnchantProcChance(uint32 spellid) const
+        {
+            SpellProcItemEnchantMap::const_iterator itr = mSpellProcItemEnchantMap.find(spellid);
+            if(itr==mSpellProcItemEnchantMap.end())
+                return 0.0f;
+
+            return itr->second;
         }
 
         static bool IsSpellProcEventCanTriggeredBy( SpellProcEventEntry const * spellProcEvent, uint32 EventProcFlag, SpellEntry const * procSpell, uint32 procFlags, uint32 procExtra, bool active);
@@ -678,13 +703,7 @@ class SpellMgr
             SpellBonusMap::const_iterator itr = mSpellBonusMap.find(spellId);
             if( itr != mSpellBonusMap.end( ) )
                 return &itr->second;
-            // Not found, try lookup for 1 spell rank if exist
-            if (uint32 rank_1 = GetFirstSpellInChain(spellId))
-            {
-                SpellBonusMap::const_iterator itr2 = mSpellBonusMap.find(rank_1);
-                if( itr2 != mSpellBonusMap.end( ) )
-                    return &itr2->second;
-            }
+
             return NULL;
         }
 
@@ -724,6 +743,17 @@ class SpellMgr
         }
 
         SpellChainMapNext const& GetSpellChainNext() const { return mSpellChainsNext; }
+
+        template<typename Worker>
+        void doForHighRanks(uint32 spellid, Worker& worker)
+        {
+            SpellChainMapNext const& nextMap = GetSpellChainNext();
+            for(SpellChainMapNext::const_iterator itr = nextMap.lower_bound(spellid); itr != nextMap.upper_bound(spellid); ++itr)
+            {
+                worker(itr->second);
+                doForHighRanks(itr->second,worker);
+            }
+        }
 
         // Note: not use rank for compare to spell ranks: spell chains isn't linear order
         // Use IsHighRankOfSpell instead
@@ -896,6 +926,7 @@ class SpellMgr
         void LoadSpellScriptTarget();
         void LoadSpellElixirs();
         void LoadSpellProcEvents();
+        void LoadSpellProcItemEnchant();
         void LoadSpellBonusess();
         void LoadSpellTargetPositions();
         void LoadSpellThreats();
@@ -913,7 +944,9 @@ class SpellMgr
         SpellLearnSpellMap mSpellLearnSpells;
         SpellTargetPositionMap mSpellTargetPositions;
         SpellElixirMap     mSpellElixirs;
+        SpellThreatMap     mSpellThreatMap;
         SpellProcEventMap  mSpellProcEventMap;
+        SpellProcItemEnchantMap mSpellProcItemEnchantMap;
         SpellBonusMap      mSpellBonusMap;
         SkillLineAbilityMap mSkillLineAbilityMap;
         SpellPetAuraMap     mSpellPetAuraMap;

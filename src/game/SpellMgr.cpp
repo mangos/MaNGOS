@@ -700,6 +700,13 @@ bool SpellMgr::IsAffectedByMod(SpellEntry const *spellInfo, SpellModifier *mod) 
     return false;
 }
 
+struct DoSpellProcEvent
+{
+    DoSpellProcEvent(SpellProcEventEntry const& _spe) : spe(_spe) {}
+    void operator() (uint32 spell_id) { spellmgr.mSpellProcEventMap[spell_id] = spe; }
+    SpellProcEventEntry const& spe;
+};
+
 void SpellMgr::LoadSpellProcEvents()
 {
     mSpellProcEventMap.clear();                             // need for reload case
@@ -734,6 +741,15 @@ void SpellMgr::LoadSpellProcEvents()
             continue;
         }
 
+        uint32 first_id = GetFirstSpellInChain(entry);
+
+        if ( first_id != entry )
+        {
+            sLog.outErrorDb("Spell %u listed in `spell_proc_event` is not first rank (%u) in chain", entry, first_id);
+            // prevent loading since it won't have an effect anyway
+            continue;
+        }
+
         SpellProcEventEntry spe;
 
         spe.schoolMask      = fields[1].GetUInt32();
@@ -747,6 +763,10 @@ void SpellMgr::LoadSpellProcEvents()
         spe.cooldown        = fields[10].GetUInt32();
 
         mSpellProcEventMap[entry] = spe;
+
+        // also add to high ranks
+        DoSpellProcEvent worker(spe);
+        doForHighRanks(entry,worker);
 
         if (spell->procFlags==0)
         {
@@ -768,6 +788,83 @@ void SpellMgr::LoadSpellProcEvents()
     else
         sLog.outString( ">> Loaded %u extra spell proc event conditions", count );
 }
+
+struct DoSpellProcItemEnchant
+{
+    DoSpellProcItemEnchant(float _ppm) : ppm(_ppm) {}
+    void operator() (uint32 spell_id) { spellmgr.mSpellProcItemEnchantMap[spell_id] = ppm; }
+    float ppm;
+};
+
+void SpellMgr::LoadSpellProcItemEnchant()
+{
+    mSpellProcItemEnchantMap.clear();                       // need for reload case
+
+    uint32 count = 0;
+
+    //                                                0      1
+    QueryResult *result = WorldDatabase.Query("SELECT entry, ppmRate FROM spell_proc_item_enchant");
+    if( !result )
+    {
+
+        barGoLink bar( 1 );
+
+        bar.step();
+
+        sLog.outString();
+        sLog.outString( ">> Loaded %u proc item enchant definitions", count );
+        return;
+    }
+
+    barGoLink bar( result->GetRowCount() );
+
+    do
+    {
+        Field *fields = result->Fetch();
+
+        bar.step();
+
+        uint32 entry = fields[0].GetUInt32();
+        float ppmRate = fields[1].GetFloat();
+
+        SpellEntry const* spellInfo = sSpellStore.LookupEntry(entry);
+
+        if (!spellInfo)
+        {
+            sLog.outErrorDb("Spell %u listed in `spell_proc_item_enchant` does not exist", entry);
+            continue;
+        }
+
+        uint32 first_id = GetFirstSpellInChain(entry);
+
+        if ( first_id != entry )
+        {
+            sLog.outErrorDb("Spell %u listed in `spell_proc_item_enchant` is not first rank (%u) in chain", entry, first_id);
+            // prevent loading since it won't have an effect anyway
+            continue;
+        }
+
+        mSpellProcItemEnchantMap[entry] = ppmRate;
+
+        // also add to high ranks
+        DoSpellProcItemEnchant worker(ppmRate);
+        doForHighRanks(entry,worker);
+
+        ++count;
+    } while( result->NextRow() );
+
+    delete result;
+
+    sLog.outString();
+    sLog.outString( ">> Loaded %u proc item enchant definitions", count );
+}
+
+struct DoSpellBonusess
+{
+    DoSpellBonusess(SpellBonusEntry const& _spellBonus) : spellBonus(_spellBonus) {}
+    void operator() (uint32 spell_id) { spellmgr.mSpellBonusMap[spell_id] = spellBonus; }
+    SpellBonusEntry const& spellBonus;
+};
 
 void SpellMgr::LoadSpellBonusess()
 {
@@ -791,10 +888,19 @@ void SpellMgr::LoadSpellBonusess()
         bar.step();
         uint32 entry = fields[0].GetUInt32();
 
-        const SpellEntry *spell = sSpellStore.LookupEntry(entry);
+        SpellEntry const* spell = sSpellStore.LookupEntry(entry);
         if (!spell)
         {
             sLog.outErrorDb("Spell %u listed in `spell_bonus_data` does not exist", entry);
+            continue;
+        }
+
+        uint32 first_id = GetFirstSpellInChain(entry);
+
+        if ( first_id != entry )
+        {
+            sLog.outErrorDb("Spell %u listed in `spell_bonus_data` is not first rank (%u) in chain", entry, first_id);
+            // prevent loading since it won't have an effect anyway
             continue;
         }
 
@@ -805,6 +911,11 @@ void SpellMgr::LoadSpellBonusess()
         sbe.ap_bonus      = fields[3].GetFloat();
 
         mSpellBonusMap[entry] = sbe;
+
+        // also add to high ranks
+        DoSpellBonusess worker(sbe);
+        doForHighRanks(entry,worker);
+
     } while( result->NextRow() );
 
     delete result;
@@ -932,12 +1043,50 @@ void SpellMgr::LoadSpellElixirs()
 
 void SpellMgr::LoadSpellThreats()
 {
-    sSpellThreatStore.Free();                               // for reload
+    mSpellThreatMap.clear();                                // need for reload case
 
-    sSpellThreatStore.Load();
+    uint32 count = 0;
 
-    sLog.outString( ">> Loaded %u aggro generating spells", sSpellThreatStore.RecordCount );
+    //                                                0      1
+    QueryResult *result = WorldDatabase.Query("SELECT entry, Threat FROM spell_threat");
+    if( !result )
+    {
+
+        barGoLink bar( 1 );
+
+        bar.step();
+
+        sLog.outString();
+        sLog.outString( ">> Loaded %u aggro generating spells", count );
+        return;
+    }
+
+    barGoLink bar( result->GetRowCount() );
+
+    do
+    {
+        Field *fields = result->Fetch();
+
+        bar.step();
+
+        uint32 entry = fields[0].GetUInt32();
+        uint16 Threat = fields[1].GetUInt16();
+
+        if (!sSpellStore.LookupEntry(entry))
+        {
+            sLog.outErrorDb("Spell %u listed in `spell_threat` does not exist", entry);
+            continue;
+        }
+
+        mSpellThreatMap[entry] = Threat;
+
+        ++count;
+    } while( result->NextRow() );
+
+    delete result;
+
     sLog.outString();
+    sLog.outString( ">> Loaded %u aggro generating spells", count );
 }
 
 bool SpellMgr::IsRankSpellDueToSpell(SpellEntry const *spellInfo_1,uint32 spellId_2) const
@@ -2858,16 +3007,11 @@ DiminishingGroup GetDiminishingReturnsGroupForSpell(SpellEntry const* spellproto
     // Explicit Diminishing Groups
     switch(spellproto->SpellFamilyName)
     {
-        case SPELLFAMILY_MAGE:
-        {
-            // Shattered Barrier (triggered so doesn't share with Frost Nova)
-            if (spellproto->SpellFamilyFlags & UI64LIT(0x00000080000))
-                return DIMINISHING_TRIGGER_ROOT;
-            // Frost Nova / Freeze (Water Elemental)
-            else if (spellproto->SpellIconID == 193)
-                return DIMINISHING_CONTROL_ROOT;
+        case SPELLFAMILY_GENERIC:
+            // some generic arena related spells have by some strange reason MECHANIC_TURN
+            if  (spellproto->Mechanic == MECHANIC_TURN)
+                return DIMINISHING_NONE;
             break;
-        }
         case SPELLFAMILY_ROGUE:
         {
             // Blind

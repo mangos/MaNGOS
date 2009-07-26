@@ -106,6 +106,7 @@ enum EventAI_ActionType
     ACTION_T_CALL_FOR_HELP              = 39,               // Radius
     ACTION_T_SET_SHEATH                 = 40,               // Sheath (0-passive,1-melee,2-ranged)
     ACTION_T_FORCE_DESPAWN              = 41,               // No Params
+    ACTION_T_SET_INVINCIBILITY_HP_LEVEL = 42,               // MinHpValue, format(0-flat,1-percent from max health)
     ACTION_T_END,
 };
 
@@ -373,6 +374,12 @@ struct CreatureEventAI_Action
         {
             uint32 sheath;
         } set_sheath;
+        // ACTION_T_SET_INVINCIBILITY_HP_LEVEL             = 42
+        struct
+        {
+            uint32 hp_level;
+            uint32 is_percent;
+        } invincibility_hp_level;
         // RAW
         struct
         {
@@ -575,6 +582,7 @@ class MANGOS_DLL_SPEC CreatureEventAI : public CreatureAI
         void AttackStart(Unit *who);
         void MoveInLineOfSight(Unit *who);
         void SpellHit(Unit* pUnit, const SpellEntry* pSpell);
+        void DamageTaken(Unit* done_by, uint32& damage);
         void UpdateAI(const uint32 diff);
         bool IsVisible(Unit *) const;
         void ReceiveEmote(Player* pPlayer, uint32 text_emote);
@@ -604,10 +612,11 @@ class MANGOS_DLL_SPEC CreatureEventAI : public CreatureAI
         bool bEmptyList;
 
         //Variables used by Events themselves
-        uint8 Phase;                                        //Current phase, max 32 phases
-        bool CombatMovementEnabled;                         //If we allow targeted movment gen (movement twoards top threat)
-        bool MeleeEnabled;                                  //If we allow melee auto attack
-        float AttackDistance;                               //Distance to attack from
-        float AttackAngle;                                  //Angle of attack
+        uint8 Phase;                                        // Current phase, max 32 phases
+        bool CombatMovementEnabled;                         // If we allow targeted movment gen (movement twoards top threat)
+        bool MeleeEnabled;                                  // If we allow melee auto attack
+        float AttackDistance;                               // Distance to attack from
+        float AttackAngle;                                  // Angle of attack
+        uint32 InvinceabilityHpLevel;                       // Minimal health level allowed at damage apply
 };
 #endif
