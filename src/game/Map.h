@@ -41,6 +41,8 @@ class WorldPacket;
 class InstanceData;
 class Group;
 class InstanceSave;
+struct ScriptInfo;
+struct ScriptAction;
 
 
 typedef ACE_RW_Thread_Mutex GridRWLock;
@@ -388,6 +390,10 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         typedef MapRefManager PlayerList;
         PlayerList const& GetPlayers() const { return m_mapRefManager; }
 
+        //per-map script storage
+        void ScriptsStart(std::map<uint32, std::multimap<uint32, ScriptInfo> > const& scripts, uint32 id, Object* source, Object* target);
+        void ScriptCommandStart(ScriptInfo const& script, uint32 delay, Object* source, Object* target);
+
         // must called with AddToWorld
         template<class T>
         void AddToActive(T* obj) { AddToActiveHelper(obj); }
@@ -444,6 +450,7 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         void setGridObjectDataLoaded(bool pLoaded, uint32 x, uint32 y) { getNGrid(x,y)->setGridObjectDataLoaded(pLoaded); }
 
         void setNGrid(NGridType* grid, uint32 x, uint32 y);
+        void ScriptsProcess();
 
     protected:
         void SetUnloadReferenceLock(const GridPair &p, bool on) { getNGrid(p.x_coord, p.y_coord)->setUnloadReferenceLock(on); }
@@ -477,6 +484,7 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         time_t i_gridExpiry;
 
         std::set<WorldObject *> i_objectsToRemove;
+        std::multimap<time_t, ScriptAction> m_scriptSchedule;
 
         // Type specific code for add/remove to/from grid
         template<class T>

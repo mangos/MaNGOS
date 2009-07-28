@@ -82,6 +82,7 @@ libmangosgame_a_SOURCES = \
 	Channel.cpp \
 	Channel.h \
 	ChannelHandler.cpp \
+	ChannelMgr.cpp \
 	ChannelMgr.h \
 	CharacterHandler.cpp \
 	Chat.cpp \
@@ -298,7 +299,12 @@ libmangosgame_a_SOURCES = \
 	GroupRefManager.h
 
 ## Link against shared library
-libmangosgame_a_LIBADD = ../shared/libmangosshared.a ../shared/Auth/libmangosauth.a ../shared/Config/libmangosconfig.a ../shared/Database/libmangosdatabase.a ../shared/vmap/libmangosvmaps.a
+libmangosgame_a_LIBADD = \
+	../shared/libmangosshared.a \
+	../shared/Auth/libmangosauth.a \
+	../shared/Config/libmangosconfig.a \
+	../shared/Database/libmangosdatabase.a \
+	../shared/vmap/libmangosvmaps.a
 
 ## Additional files to include when running 'make dist'
 #  Precompiled Headers for WIN

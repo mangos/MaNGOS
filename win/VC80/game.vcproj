@@ -690,6 +690,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\game\ChannelMgr.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\game\ChannelMgr.h"
 				>
 			</File>

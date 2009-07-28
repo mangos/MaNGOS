@@ -2721,14 +2721,34 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
         case FORM_FLIGHT_EPIC:
         case FORM_FLIGHT:
         case FORM_MOONKIN:
+        {
             // remove movement affects
             m_target->RemoveSpellsCausingAura(SPELL_AURA_MOD_ROOT);
-            m_target->RemoveSpellsCausingAura(SPELL_AURA_MOD_DECREASE_SPEED);
+            Unit::AuraList const& slowingAuras = m_target->GetAurasByType(SPELL_AURA_MOD_DECREASE_SPEED);
+            for (Unit::AuraList::const_iterator iter = slowingAuras.begin(); iter != slowingAuras.end();)
+            {
+                SpellEntry const* aurSpellInfo = (*iter)->GetSpellProto();
+
+                // If spell that caused this aura has Croud Control or Daze effect
+                if((GetAllSpellMechanicMask(aurSpellInfo) & MECHANIC_NOT_REMOVED_BY_SHAPESHIFT) ||
+                    // some Daze spells have these parameters instead of MECHANIC_DAZE
+                    (aurSpellInfo->SpellIconID == 15 && aurSpellInfo->Dispel == 0))
+                {
+                    ++iter;
+                    continue;
+                }
+
+                // All OK, remove aura now
+                m_target->RemoveAurasDueToSpellByCancel(aurSpellInfo->Id);
+                iter = slowingAuras.begin();
+            }
 
             // and polymorphic affects
             if(m_target->IsPolymorphed())
                 m_target->RemoveAurasDueToSpell(m_target->getTransForm());
+
             break;
+        }
         default:
            break;
     }
@@ -5375,16 +5395,19 @@ void Aura::HandleShapeshiftBoosts(bool apply)
     uint32 spellId = 0;
     uint32 spellId2 = 0;
     uint32 HotWSpellId = 0;
+    uint32 MasterShaperSpellId = 0;
 
     switch(GetModifier()->m_miscvalue)
     {
         case FORM_CAT:
             spellId = 3025;
             HotWSpellId = 24900;
+            MasterShaperSpellId = 48420;
             break;
         case FORM_TREE:
             spellId = 5420;
             spellId2 = 34123;
+            MasterShaperSpellId = 48422;
             break;
         case FORM_TRAVEL:
             spellId = 5419;
@@ -5396,11 +5419,13 @@ void Aura::HandleShapeshiftBoosts(bool apply)
             spellId = 1178;
             spellId2 = 21178;
             HotWSpellId = 24899;
+            MasterShaperSpellId = 48418;
             break;
         case FORM_DIREBEAR:
             spellId = 9635;
             spellId2 = 21178;
             HotWSpellId = 24899;
+            MasterShaperSpellId = 48418;
             break;
         case FORM_BATTLESTANCE:
             spellId = 21156;
@@ -5415,6 +5440,7 @@ void Aura::HandleShapeshiftBoosts(bool apply)
             spellId = 24905;
             // aura from effect trigger spell
             spellId2 = 24907;
+            MasterShaperSpellId = 48421;
             break;
         case FORM_FLIGHT:
             spellId = 33948;
@@ -5463,14 +5489,31 @@ void Aura::HandleShapeshiftBoosts(bool apply)
                 if (spellInfo->Stances & (1<<form))
                     m_target->CastSpell(m_target, itr->first, true, NULL, this);
             }
-            //LotP
+
+            // Master Shapeshifter
+            if (MasterShaperSpellId)
+            {
+                Unit::AuraList const& ShapeShifterAuras = m_target->GetAurasByType(SPELL_AURA_DUMMY);
+                for(Unit::AuraList::const_iterator i = ShapeShifterAuras.begin(); i != ShapeShifterAuras.end(); i++)
+                {
+                    if ((*i)->GetSpellProto()->SpellIconID == 2851)
+                    {
+                        int32 ShiftMod = (*i)->GetModifier()->m_amount;
+                        m_target->CastCustomSpell(m_target, MasterShaperSpellId, &ShiftMod, NULL, NULL, true);
+                        break;
+                    }
+                }
+            }
+
+            // Leader of the Pack
             if (((Player*)m_target)->HasSpell(17007))
             {
                 SpellEntry const *spellInfo = sSpellStore.LookupEntry(24932);
                 if (spellInfo && spellInfo->Stances & (1<<form))
                     m_target->CastSpell(m_target, 24932, true, NULL, this);
             }
-            // HotW
+
+            // Heart of the Wild
             if (HotWSpellId)
             {
                 Unit::AuraList const& mModTotalStatPct = m_target->GetAurasByType(SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE);
@@ -5493,6 +5536,7 @@ void Aura::HandleShapeshiftBoosts(bool apply)
     {
         m_target->RemoveAurasDueToSpell(spellId);
         m_target->RemoveAurasDueToSpell(spellId2);
+        m_target->RemoveAurasDueToSpell(MasterShaperSpellId);
 
         Unit::AuraMap& tAuras = m_target->GetAuras();
         for (Unit::AuraMap::iterator itr = tAuras.begin(); itr != tAuras.end();)
@@ -5503,9 +5547,7 @@ void Aura::HandleShapeshiftBoosts(bool apply)
                 itr = tAuras.begin();
             }
             else
-            {
                 ++itr;
-            }
         }
     }
 
