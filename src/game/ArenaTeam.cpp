@@ -502,20 +502,16 @@ float ArenaTeam::GetChanceAgainst(uint32 own_rating, uint32 enemy_rating)
     return 1.0f/(1.0f+exp(log(10.0f)*(float)((float)enemy_rating - (float)own_rating)/400.0f));
 }
 
-int32 ArenaTeam::WonAgainst(uint32 againstRating)
+void ArenaTeam::FinishGame(int32 mod)
 {
-    // called when the team has won
-    //'chance' calculation - to beat the opponent
-    float chance = GetChanceAgainst(stats.rating,againstRating);
-    // calculate the rating modification (ELO system with k=32)
-    int32 mod = (int32)floor(32.0f * (1.0f - chance));
-    // modify the team stats accordingly
-    stats.rating += mod;
+    if (int32(stats.rating) + mod < 0)
+        stats.rating = 0;
+    else
+        stats.rating += mod;
+
     stats.games_week += 1;
-    stats.wins_week += 1;
     stats.games_season += 1;
-    stats.wins_season += 1;
-    //update team's rank
+    // update team's rank
     stats.rank = 1;
     ObjectMgr::ArenaTeamMap::const_iterator i = objmgr.GetArenaTeamMapBegin();
     for ( ; i != objmgr.GetArenaTeamMapEnd(); ++i)
@@ -523,6 +519,21 @@ int32 ArenaTeam::WonAgainst(uint32 againstRating)
         if (i->second->GetType() == this->Type && i->second->GetStats().rating > stats.rating)
             ++stats.rank;
     }
+
+
+}
+
+int32 ArenaTeam::WonAgainst(uint32 againstRating)
+{
+    // called when the team has won
+    //'chance' calculation - to beat the opponent
+    float chance = GetChanceAgainst(stats.rating, againstRating);
+    // calculate the rating modification (ELO system with k=32)
+    int32 mod = (int32)floor(32.0f * (1.0f - chance));
+    // modify the team stats accordingly
+    FinishGame(mod);
+    stats.wins_week += 1;
+    stats.wins_season += 1;
 
     // return the rating change, used to display it on the results screen
     return mod;
@@ -532,22 +543,11 @@ int32 ArenaTeam::LostAgainst(uint32 againstRating)
 {
     // called when the team has lost
     //'chance' calculation - to loose to the opponent
-    float chance = GetChanceAgainst(stats.rating,againstRating);
+    float chance = GetChanceAgainst(stats.rating, againstRating);
     // calculate the rating modification (ELO system with k=32)
     int32 mod = (int32)ceil(32.0f * (0.0f - chance));
     // modify the team stats accordingly
-    stats.rating += mod;
-    stats.games_week += 1;
-    stats.games_season += 1;
-    //update team's rank
-
-    stats.rank = 1;
-    ObjectMgr::ArenaTeamMap::const_iterator i = objmgr.GetArenaTeamMapBegin();
-    for ( ; i != objmgr.GetArenaTeamMapEnd(); ++i)
-    {
-        if (i->second->GetType() == this->Type && i->second->GetStats().rating > stats.rating)
-            ++stats.rank;
-    }
+    FinishGame(mod);
 
     // return the rating change, used to display it on the results screen
     return mod;
