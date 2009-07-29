@@ -260,6 +260,9 @@ class BattleGroundAB : public BattleGround
         /* Nodes occupying */
         virtual void EventPlayerClickedOnFlag(Player *source, GameObject* target_obj);
 
+        /* achievement req. */
+        bool IsAllNodesConrolledByTeam(uint32 team) const;  // overwrited
+        bool IsTeamScores500disadvantage(uint32 team) const { return m_TeamScores500disadvantage[GetTeamIndexByTeamId(team)]; }
     private:
         /* Gameobject spawning/despawning */
         void _CreateBanner(uint8 node, uint8 type, uint8 teamIndex, bool delay);
@@ -289,7 +292,7 @@ class BattleGroundAB : public BattleGround
         bool                m_IsInformedNearVictory;
         uint32              m_HonorTics;
         uint32              m_ReputationTics;
-
-
+        // need for achievements
+        bool                m_TeamScores500disadvantage[BG_TEAMS_COUNT];
 };
 #endif

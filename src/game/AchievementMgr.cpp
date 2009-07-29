@@ -33,6 +33,8 @@
 #include "CellImpl.h"
 #include "Language.h"
 #include "MapManager.h"
+#include "BattleGround.h"
+#include "BattleGroundAB.h"
 
 #include "Policies/SingletonImp.h"
 
@@ -79,6 +81,7 @@ bool AchievementCriteriaData::IsValid(AchievementCriteriaEntry const* criteria)
 
     switch(criteria->requiredType)
     {
+        case ACHIEVEMENT_CRITERIA_TYPE_WIN_BG:
         case ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE:
         case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST:      // only hardcoded list
         case ACHIEVEMENT_CRITERIA_TYPE_FALL_WITHOUT_DYING:
@@ -231,6 +234,8 @@ bool AchievementCriteriaData::IsValid(AchievementCriteriaEntry const* criteria)
                 return false;
             }
             return true;
+        case ACHIEVEMENT_CRITERIA_DATA_TYPE_BG_LOSS_TEAM_SCORE:
+            return true;                                 // not check correctness node indexes
         default:
             sLog.outErrorDb( "Table `achievement_criteria_data` (Entry: %u Type: %u) have data for not supported data type (%u), ignore.", criteria->ID, criteria->requiredType,dataType);
             return false;
@@ -299,6 +304,13 @@ bool AchievementCriteriaData::Meets(Player const* source, Unit const* target, ui
             return Player::GetDrunkenstateByValue(source->GetDrunkValue()) >= drunk.state;
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_HOLIDAY:
             return IsHolidayActive(HolidayIds(holiday.id));
+        case ACHIEVEMENT_CRITERIA_DATA_TYPE_BG_LOSS_TEAM_SCORE:
+        {
+            BattleGround* bg = source->GetBattleGround();
+            if(!bg)
+                return false;
+            return bg->IsTeamScoreInRange(source->GetTeam()==ALLIANCE ? HORDE : ALLIANCE,bg_loss_team_score.min_score,bg_loss_team_score.max_score);
+        }
     }
     return false;
 }
@@ -718,6 +730,54 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
 
             // specialized cases
 
+            case ACHIEVEMENT_CRITERIA_TYPE_WIN_BG:
+            {
+                // AchievementMgr::UpdateAchievementCriteria might also be called on login - skip in this case
+                if (!miscvalue1)
+                    continue;
+                if (achievementCriteria->win_bg.bgMapID != GetPlayer()->GetMapId())
+                    continue;
+
+                if (achievementCriteria->win_bg.additionalRequirement1_type)
+                {
+                    // those requirements couldn't be found in the dbc
+                    AchievementCriteriaDataSet const* data = achievementmgr.GetCriteriaDataSet(achievementCriteria);
+                    if (!data || !data->Meets(GetPlayer(),unit))
+                        continue;
+                }
+                // some hardcoded requirements
+                else
+                {
+                    BattleGround* bg = GetPlayer()->GetBattleGround();
+                    if (!bg)
+                        continue;
+
+                    switch(achievementCriteria->referredAchievement)
+                    {
+                        case 161:                           // AB, Overcome a 500 resource disadvantage
+                        {
+                            if (bg->GetTypeID() != BATTLEGROUND_AB)
+                                continue;
+                            if(!((BattleGroundAB*)bg)->IsTeamScores500disadvantage(GetPlayer()->GetTeam()))
+                                continue;
+                            break;
+                        }
+                        case 156:                           // AB, win while controlling all 5 flags (all nodes)
+                        case 784:                           // EY, win while holding 4 bases (all nodes)
+                        {
+                            if(!bg->IsAllNodesConrolledByTeam(GetPlayer()->GetTeam()))
+                                continue;
+                            break;
+                        }
+                        case 1762:                          // SA, win without losing any siege vehicles
+                        case 2192:                          // SA, win without losing any siege vehicles
+                            continue;                       // not implemented
+                    }
+                }
+
+                SetCriteriaProgress(achievementCriteria, miscvalue1, PROGRESS_ACCUMULATE);
+                break;
+            }
             case ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE:
             {
                 // AchievementMgr::UpdateAchievementCriteria might also be called on login - skip in this case
@@ -1269,7 +1329,6 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
             case ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_RATING:
                 break;
             // FIXME: not triggered in code as result, need to implement
-            case ACHIEVEMENT_CRITERIA_TYPE_WIN_BG:
             case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_DAILY_QUEST_DAILY:
             case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_RAID:
             case ACHIEVEMENT_CRITERIA_TYPE_BG_OBJECTIVE_CAPTURE:
@@ -1338,6 +1397,8 @@ bool AchievementMgr::IsCompletedCriteria(AchievementCriteriaEntry const* achieve
 
     switch(achievementCriteria->requiredType)
     {
+        case ACHIEVEMENT_CRITERIA_TYPE_WIN_BG:
+            return progress->counter >= achievementCriteria->win_bg.winCount;
         case ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE:
             return progress->counter >= achievementCriteria->kill_creature.creatureCount;
         case ACHIEVEMENT_CRITERIA_TYPE_REACH_LEVEL:
@@ -1843,6 +1904,10 @@ void AchievementGlobalMgr::LoadAchievementCriteriaData()
 
         switch(criteria->requiredType)
         {
+            case ACHIEVEMENT_CRITERIA_TYPE_WIN_BG:
+                if(!criteria->win_bg.additionalRequirement1_type)
+                    continue;
+                break;
             case ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE:
                 break;                                      // any cases
             case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST:
