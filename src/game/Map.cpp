@@ -483,6 +483,7 @@ void Map::MessageBroadcast(Player *player, WorldPacket *msg, bool to_self)
 
     Cell cell(p);
     cell.data.Part.reserved = ALL_DISTRICT;
+    cell.SetNoCreate();
 
     if( !loaded(GridPair(cell.data.Part.grid_x, cell.data.Part.grid_y)) )
         return;
@@ -528,6 +529,7 @@ void Map::MessageDistBroadcast(Player *player, WorldPacket *msg, float dist, boo
 
     Cell cell(p);
     cell.data.Part.reserved = ALL_DISTRICT;
+    cell.SetNoCreate();
 
     if( !loaded(GridPair(cell.data.Part.grid_x, cell.data.Part.grid_y)) )
         return;
