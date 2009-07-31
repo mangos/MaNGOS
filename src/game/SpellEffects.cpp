@@ -577,7 +577,8 @@ void Spell::EffectSchoolDMG(uint32 effect_idx)
                 //Gore
                 if (m_spellInfo->SpellIconID == 1578)
                 {
-                    damage+= rand()%2 ? damage : 0;
+                    if (m_caster->HasAura(57627))           // Charge 6 sec post-affect
+                      damage *= 2;
                 }
                 // Mongoose Bite
                 else if ((m_spellInfo->SpellFamilyFlags & UI64LIT(0x000000002)) && m_spellInfo->SpellVisual[0]==342)
