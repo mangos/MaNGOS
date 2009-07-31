@@ -7017,7 +7017,7 @@ void Aura::UnregisterSingleCastAura()
         }
         else
         {
-            sLog.outError("Couldn't find the caster of the single target aura, may crash later!");
+            sLog.outError("Couldn't find the caster of the single target aura (SpellId %u), may crash later!", GetId());
             assert(false);
         }
         m_isSingleTargetAura = false;
