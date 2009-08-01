@@ -6226,7 +6226,7 @@ void Spell::EffectSummonDeadPet(uint32 /*i*/)
 
     pet->AIM_Initialize();
 
-    _player->PetSpellInitialize();
+    // _player->PetSpellInitialize(); -- action bar not removed at death and not required send at revive
     pet->SavePetToDB(PET_SAVE_AS_CURRENT);
 }
 
