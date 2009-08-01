@@ -283,6 +283,7 @@ INSERT INTO spell_check (spellid,SpellFamilyName,SpellFamilyMaskA,SpellFamilyMas
 (55004, 0,                -1,        -1,  -1,  -1,  -1,  3, -1,-1,'Nitro Boosts',                       'Spell::EffectDummy'),
 (55441,11,                -1,        -1,  -1,  -1,  -1, -1,  4,-1,'Glyph of Mana Tide',                 'Spell::EffectDummy'),
 (56235,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Glyph of Conflagrate',               'Spell::EffectSchoolDMG'),
+(57627,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Charge',                             'Spell::EffectSchoolDMG'),
 (57946, 5,0x0000000000040000,0x00000000,  -1,  -1,  -1,  3, -1,-1,'Life Tap',                           'Spell::EffectDummy'),
 (58367,-1,                -1,        -1,  -1,  -1,  -1, -1,  4,-1,'Glyph of Execution',                 'Spell::EffectDummy'),
 (58418, 0,                -1,        -1,  -1,  -1,  -1,  3, -1,-1,'Portal to Orgrimmar',                'Spell::EffectDummy'),
