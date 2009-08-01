@@ -138,6 +138,11 @@ AC_PATH_PROGS(MYSQL_CONFIG, mysql_config, mysql_config, $PATH)
 	    MYSQL_INCLUDES="`$MYSQL_CONFIG --cflags`"
         MYSQL_LIBS="`$MYSQL_CONFIG --libs_r`"
 	CXXFLAGS="-DDO_MYSQL $CXXFLAGS"
+	# Workaround for --as-needed linker flag that comes sometimes from mysql
+	if echo $MYSQL_LIBS|grep "\-Wl,--as-needed" > /dev/null; then
+		MYSQL_LIBS=`echo $MYSQL_LIBS|sed -e "s/-Wl,--as-needed//"`;
+		AC_MSG_WARN([Your mysql libs contains -Wl,--as-needed, this is not good, problem fixed in more recent mysql versions])
+	fi
     fi
 else
 AC_MSG_RESULT($DO_MYSQL)
