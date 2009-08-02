@@ -5166,6 +5166,7 @@ void Spell::EffectScriptEffect(uint32 effIndex)
                 {
                     uint32 spellId = 0;
                     int32 basePoint = 0;
+                    Unit* target = unitTarget;
                     Unit::AuraMap& Auras = unitTarget->GetAuras();
                     for(Unit::AuraMap::iterator i = Auras.begin(); i != Auras.end(); ++i)
                     {
@@ -5190,6 +5191,7 @@ void Spell::EffectScriptEffect(uint32 effIndex)
                         {
                             spellId = 53358; // 53358 Chimera Shot - Viper
                             basePoint = aura->GetModifier()->m_amount * 4 * 60 / 100;
+                            target = m_caster;
                         }
                         // Scorpid Sting - Attempts to Disarm the target for 10 sec. This effect cannot occur more than once per 1 minute.
                         if (familyFlag & UI64LIT(0x0000000000008000))
@@ -5202,7 +5204,7 @@ void Spell::EffectScriptEffect(uint32 effIndex)
                         //}
                     }
                     if (spellId)
-                        m_caster->CastCustomSpell(unitTarget, spellId, &basePoint, 0, 0, false);
+                        m_caster->CastCustomSpell(target, spellId, &basePoint, 0, 0, false);
                     return;
                 }
                 default:
