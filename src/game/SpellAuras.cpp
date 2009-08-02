@@ -1015,7 +1015,7 @@ void Aura::_AddAura()
     }
 }
 
-void Aura::_RemoveAura()
+bool Aura::_RemoveAura()
 {
     // Remove all triggered by aura spells vs unlimited duration
     // except same aura replace case
@@ -1039,10 +1039,10 @@ void Aura::_RemoveAura()
     uint8 slot = GetAuraSlot();
 
     if(slot >= MAX_AURAS)                                   // slot not set
-        return;
+        return false;
 
     if(m_target->GetVisibleAura(slot) == 0)
-        return;
+        return false;
 
     bool lastaura = true;
 
@@ -1063,96 +1063,98 @@ void Aura::_RemoveAura()
     }
 
     // only remove icon when the last aura of the spell is removed (current aura already removed from list)
-    if (lastaura)
+    if (!lastaura)
+        return false;
+
+    // unregister aura diminishing (and store last time)
+    if (getDiminishGroup() != DIMINISHING_NONE )
+        m_target->ApplyDiminishingAura(getDiminishGroup(), false);
+
+    SetAura(true);
+    SetAuraFlags(AFLAG_NONE);
+    SetAuraLevel(0);
+    SendAuraUpdate(true);
+
+    // update for out of range group members
+    m_target->UpdateAuraForGroup(slot);
+
+    //*****************************************************
+    // Update target aura state flag (at last aura remove)
+    //*****************************************************
+    // Enrage aura state
+    if(m_spellProto->Dispel == DISPEL_ENRAGE)
+        m_target->ModifyAuraState(AURA_STATE_ENRAGE, false);
+
+    uint32 removeState = 0;
+    uint64 removeFamilyFlag = m_spellProto->SpellFamilyFlags;
+    uint32 removeFamilyFlag2 = m_spellProto->SpellFamilyFlags2;
+    switch(m_spellProto->SpellFamilyName)
     {
-        // unregister aura diminishing (and store last time)
-        if (getDiminishGroup() != DIMINISHING_NONE )
-            m_target->ApplyDiminishingAura(getDiminishGroup(), false);
-
-        SetAura(true);
-        SetAuraFlags(AFLAG_NONE);
-        SetAuraLevel(0);
-        SendAuraUpdate(true);
-
-        // update for out of range group members
-        m_target->UpdateAuraForGroup(slot);
-
-        //*****************************************************
-        // Update target aura state flag (at last aura remove)
-        //*****************************************************
-        // Enrage aura state
-        if(m_spellProto->Dispel == DISPEL_ENRAGE)
-            m_target->ModifyAuraState(AURA_STATE_ENRAGE, false);
-
-        uint32 removeState = 0;
-        uint64 removeFamilyFlag = m_spellProto->SpellFamilyFlags;
-        uint32 removeFamilyFlag2 = m_spellProto->SpellFamilyFlags2;
-        switch(m_spellProto->SpellFamilyName)
+    case SPELLFAMILY_PALADIN:
+        if (IsSealSpell(m_spellProto))
+            removeState = AURA_STATE_JUDGEMENT;     // Update Seals information
+        break;
+    case SPELLFAMILY_WARLOCK:
+        // Conflagrate aura state on Immolate and Shadowflame,
+        if ((m_spellProto->SpellFamilyFlags & UI64LIT(0x0000000000000004)) ||
+            (m_spellProto->SpellFamilyFlags2 & 0x00000002))
         {
-            case SPELLFAMILY_PALADIN:
-                if (IsSealSpell(m_spellProto))
-                    removeState = AURA_STATE_JUDGEMENT;     // Update Seals information
-                break;
-            case SPELLFAMILY_WARLOCK:
-                // Conflagrate aura state on Immolate and Shadowflame,
-                if ((m_spellProto->SpellFamilyFlags & UI64LIT(0x0000000000000004)) ||
-                    (m_spellProto->SpellFamilyFlags2 & 0x00000002))
-                {
-                    removeFamilyFlag = UI64LIT(0x0000000000000004);
-                    removeFamilyFlag2 = 0x00000002;
-                    removeState = AURA_STATE_CONFLAGRATE;
-                }
-                break;
-            case SPELLFAMILY_DRUID:
-                if(m_spellProto->SpellFamilyFlags & UI64LIT(0x0000000000000400))
-                    removeState = AURA_STATE_FAERIE_FIRE;   // Faerie Fire (druid versions)
-                else if(m_spellProto->SpellFamilyFlags & UI64LIT(0x50))
-                {
-                    removeFamilyFlag = 0x50;
-                    removeState = AURA_STATE_SWIFTMEND;     // Swiftmend aura state
-                }
-                break;
-            case SPELLFAMILY_WARRIOR:
-                if(m_spellProto->SpellFamilyFlags & UI64LIT(0x0004000000000000))
-                    removeState = AURA_STATE_WARRIOR_VICTORY_RUSH; // Victorious
-                break;
-            case SPELLFAMILY_ROGUE:
-                if(m_spellProto->SpellFamilyFlags & UI64LIT(0x10000))
-                    removeState = AURA_STATE_DEADLY_POISON; // Deadly poison aura state
-                break;
-            case SPELLFAMILY_HUNTER:
-                if(m_spellProto->SpellFamilyFlags & UI64LIT(0x1000000000000000))
-                    removeState = AURA_STATE_FAERIE_FIRE;   // Sting (hunter versions)
-
+            removeFamilyFlag = UI64LIT(0x0000000000000004);
+            removeFamilyFlag2 = 0x00000002;
+            removeState = AURA_STATE_CONFLAGRATE;
         }
-        // Remove state (but need check other auras for it)
-        if (removeState)
+        break;
+    case SPELLFAMILY_DRUID:
+        if(m_spellProto->SpellFamilyFlags & UI64LIT(0x0000000000000400))
+            removeState = AURA_STATE_FAERIE_FIRE;   // Faerie Fire (druid versions)
+        else if(m_spellProto->SpellFamilyFlags & UI64LIT(0x50))
         {
-            bool found = false;
-            Unit::AuraMap& Auras = m_target->GetAuras();
-            for(Unit::AuraMap::iterator i = Auras.begin(); i != Auras.end(); ++i)
-            {
-                SpellEntry const *auraSpellInfo = (*i).second->GetSpellProto();
-                if(auraSpellInfo->SpellFamilyName  == m_spellProto->SpellFamilyName &&
-                   (auraSpellInfo->SpellFamilyFlags & removeFamilyFlag || auraSpellInfo->SpellFamilyFlags2 & removeFamilyFlag2))
-                {
-                    found = true;
-                    break;
-                }
-            }
-            // this has been last aura
-            if(!found)
-                m_target->ModifyAuraState(AuraState(removeState), false);
+            removeFamilyFlag = 0x50;
+            removeState = AURA_STATE_SWIFTMEND;     // Swiftmend aura state
         }
+        break;
+    case SPELLFAMILY_WARRIOR:
+        if(m_spellProto->SpellFamilyFlags & UI64LIT(0x0004000000000000))
+            removeState = AURA_STATE_WARRIOR_VICTORY_RUSH; // Victorious
+        break;
+    case SPELLFAMILY_ROGUE:
+        if(m_spellProto->SpellFamilyFlags & UI64LIT(0x10000))
+            removeState = AURA_STATE_DEADLY_POISON; // Deadly poison aura state
+        break;
+    case SPELLFAMILY_HUNTER:
+        if(m_spellProto->SpellFamilyFlags & UI64LIT(0x1000000000000000))
+            removeState = AURA_STATE_FAERIE_FIRE;   // Sting (hunter versions)
 
-        // reset cooldown state for spells
-        if(caster && caster->GetTypeId() == TYPEID_PLAYER)
-        {
-            if ( GetSpellProto()->Attributes & SPELL_ATTR_DISABLED_WHILE_ACTIVE )
-                // note: item based cooldowns and cooldown spell mods with charges ignored (unknown existed cases)
-                ((Player*)caster)->SendCooldownEvent(GetSpellProto());
-        }
     }
+    // Remove state (but need check other auras for it)
+    if (removeState)
+    {
+        bool found = false;
+        Unit::AuraMap& Auras = m_target->GetAuras();
+        for(Unit::AuraMap::iterator i = Auras.begin(); i != Auras.end(); ++i)
+        {
+            SpellEntry const *auraSpellInfo = (*i).second->GetSpellProto();
+            if(auraSpellInfo->SpellFamilyName  == m_spellProto->SpellFamilyName &&
+                (auraSpellInfo->SpellFamilyFlags & removeFamilyFlag || auraSpellInfo->SpellFamilyFlags2 & removeFamilyFlag2))
+            {
+                found = true;
+                break;
+            }
+        }
+        // this has been last aura
+        if(!found)
+            m_target->ModifyAuraState(AuraState(removeState), false);
+    }
+
+    // reset cooldown state for spells
+    if(caster && caster->GetTypeId() == TYPEID_PLAYER)
+    {
+        if ( GetSpellProto()->Attributes & SPELL_ATTR_DISABLED_WHILE_ACTIVE )
+            // note: item based cooldowns and cooldown spell mods with charges ignored (unknown existed cases)
+            ((Player*)caster)->SendCooldownEvent(GetSpellProto());
+    }
+
+    return true;
 }
 
 void Aura::SendAuraUpdate(bool remove)
@@ -5543,6 +5545,107 @@ void Aura::HandleShapeshiftBoosts(bool apply)
     m_target->SetHealth(uint32(ceil((double)m_target->GetMaxHealth() * healthPercentage)));*/
 }
 
+void Aura::HandleSpellSpecificBoosts(bool apply)
+{
+    uint32 spellId1 = 0;
+    uint32 spellId2 = 0;
+    uint32 spellId3 = 0;
+
+    switch(GetSpellProto()->SpellFamilyName)
+    {
+        case SPELLFAMILY_WARRIOR:
+        {
+            if(!apply)
+            {
+                // Remove Blood Frenzy only if target no longer has any Deep Wound or Rend (applying is handled by procs)
+                if (GetSpellProto()->Mechanic != MECHANIC_BLEED)
+                    return;
+
+                // If target still has one of Warrior's bleeds, do nothing
+                Unit::AuraList const& PeriodicDamage = m_target->GetAurasByType(SPELL_AURA_PERIODIC_DAMAGE);
+                for(Unit::AuraList::const_iterator i = PeriodicDamage.begin(); i != PeriodicDamage.end(); ++i)
+                    if( (*i)->GetCasterGUID() == GetCasterGUID() &&
+                        (*i)->GetSpellProto()->SpellFamilyName == SPELLFAMILY_WARRIOR &&
+                        (*i)->GetSpellProto()->Mechanic == MECHANIC_BLEED)
+                        return;
+
+                spellId1 = 30069;
+                spellId2 = 30070;
+            }
+            break;
+        }
+        case SPELLFAMILY_HUNTER:
+        {
+            if(GetSpellSpecific(m_spellProto->Id) != SPELL_ASPECT)
+                return;
+
+            // Aspect of the Dragonhawk dodge
+            if (GetSpellProto()->SpellFamilyFlags2 & 0x00001000)
+                spellId1 = 61848;
+            else
+                return;
+
+            break;
+        }
+        case SPELLFAMILY_PALADIN:
+        {
+            // Only process on player casting paladin aura
+            // all aura bonuses applied also in aura area effect way to caster
+            if (GetCasterGUID() != m_target->GetGUID() || !IS_PLAYER_GUID(GetCasterGUID()))
+                return;
+
+            if (GetSpellSpecific(m_spellProto->Id) != SPELL_AURA)
+                return;
+
+            // Sanctified Retribution and Swift Retribution (they share one aura), but not Retribution Aura (already gets modded)
+            if ((GetSpellProto()->SpellFamilyFlags & UI64LIT(0x0000000000000008))==0)
+                spellId1 = 63531;                           // placeholder for talent spell mods
+            // Improved Concentration Aura (auras bonus)
+            spellId2 = 63510;                               // placeholder for talent spell mods
+            // Improved Devotion Aura (auras bonus)
+            spellId3 = 63514;                               // placeholder for talent spell mods
+            break;
+        }
+        case SPELLFAMILY_DEATHKNIGHT:
+        {
+            if (GetSpellSpecific(m_spellProto->Id) != SPELL_PRESENCE)
+                return;
+
+            // Frost Presence health
+            if (GetId() == 48263)
+                spellId1 = 61261;
+            // Unholy Presence move speed
+            else if (GetId() == 48265)
+                spellId1 = 49772;
+            else
+                return;
+
+            break;
+        }
+        default:
+            return;
+    }
+
+    if (apply)
+    {
+        if (spellId1)
+            m_target->CastSpell(m_target, spellId1, true, NULL, this);
+        if (spellId2)
+            m_target->CastSpell(m_target, spellId2, true, NULL, this);
+        if (spellId3)
+            m_target->CastSpell(m_target, spellId3, true, NULL, this);
+    }
+    else
+    {
+        if (spellId1)
+            m_target->RemoveAurasByCasterSpell(spellId1, GetCasterGUID());
+        if (spellId2)
+            m_target->RemoveAurasByCasterSpell(spellId2, GetCasterGUID());
+        if (spellId3)
+            m_target->RemoveAurasByCasterSpell(spellId3, GetCasterGUID());
+    }
+}
+
 void Aura::HandleAuraEmpathy(bool apply, bool /*Real*/)
 {
     if(m_target->GetTypeId() != TYPEID_UNIT)
@@ -5739,14 +5842,6 @@ void Aura::HandleSpiritOfRedemption( bool apply, bool Real )
 
 void Aura::CleanupTriggeredSpells()
 {
-    if (m_spellProto->SpellFamilyName == SPELLFAMILY_WARRIOR && (m_spellProto->SpellFamilyFlags & UI64LIT(0x0000001000000020)))
-    {
-        // Blood Frenzy remove
-        m_target->RemoveAurasDueToSpell(30069);
-        m_target->RemoveAurasDueToSpell(30070);
-        return;
-    }
-
     uint32 tSpellId = m_spellProto->EffectTriggerSpell[GetEffIndex()];
     if(!tSpellId)
         return;

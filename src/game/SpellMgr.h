@@ -122,7 +122,7 @@ int32 GetSpellMaxDuration(SpellEntry const *spellInfo);
 
 inline bool IsSpellHaveEffect(SpellEntry const *spellInfo, SpellEffects effect)
 {
-    for(int i= 0; i < 3; ++i)
+    for(int i = 0; i < 3; ++i)
         if(SpellEffects(spellInfo->Effect[i])==effect)
             return true;
     return false;
@@ -130,10 +130,18 @@ inline bool IsSpellHaveEffect(SpellEntry const *spellInfo, SpellEffects effect)
 
 inline bool IsSpellHaveAura(SpellEntry const *spellInfo, AuraType aura)
 {
-    for(int i= 0; i < 3; ++i)
+    for(int i = 0; i < 3; ++i)
         if(AuraType(spellInfo->EffectApplyAuraName[i])==aura)
             return true;
     return false;
+}
+
+inline bool IsSpellLastAuraEffect(SpellEntry const *spellInfo, int effecIdx)
+{
+    for(int i = effecIdx+1; i < 3; ++i)
+        if(spellInfo->EffectApplyAuraName[i])
+            return false;
+    return true;
 }
 
 bool IsNoStackAuraDueToAura(uint32 spellId_1, uint32 effIndex_1, uint32 spellId_2, uint32 effIndex_2);
