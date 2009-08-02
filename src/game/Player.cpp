@@ -18134,11 +18134,6 @@ void Player::SendInitialPacketsBeforeAddToMap()
     m_reputationMgr.SendInitialReputations();
     m_achievementMgr.SendAllAchievementData();
 
-    // update zone
-    uint32 newzone, newarea;
-    GetZoneAndAreaId(newzone,newarea);
-    UpdateZone(newzone,newarea);                            // also call SendInitWorldStates();
-
     SendEquipmentSetList();
 
     data.Initialize(SMSG_LOGIN_SETTIMESPEED, 4 + 4 + 4);
@@ -18156,6 +18151,11 @@ void Player::SendInitialPacketsBeforeAddToMap()
 
 void Player::SendInitialPacketsAfterAddToMap()
 {
+    // update zone
+    uint32 newzone, newarea;
+    GetZoneAndAreaId(newzone,newarea);
+    UpdateZone(newzone,newarea);                            // also call SendInitWorldStates();
+
     WorldPacket data(SMSG_TIME_SYNC_REQ, 4);                // new 2.0.x, enable movement
     data << uint32(0x00000000);                             // on blizz it increments periodically
     GetSession()->SendPacket(&data);
