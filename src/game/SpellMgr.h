@@ -40,7 +40,8 @@ struct SpellModifier;
 enum SpellCategories
 {
     SPELLCATEGORY_HEALTH_MANA_POTIONS = 4,
-    SPELLCATEGORY_DEVOUR_MAGIC        = 12
+    SPELLCATEGORY_DEVOUR_MAGIC        = 12,
+    SPELLCATEGORY_JUDGEMENT           = 1210,               // Judgement (seal trigger)
 };
 
 enum SpellFamilyNames

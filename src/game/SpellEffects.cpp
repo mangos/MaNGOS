@@ -5222,8 +5222,8 @@ void Spell::EffectScriptEffect(uint32 effIndex)
         }
         case SPELLFAMILY_PALADIN:
         {
-            // Judgement
-            if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0000000000800000))
+            // Judgement (seal trigger)
+            if (m_spellInfo->Category == SPELLCATEGORY_JUDGEMENT)
             {
                 if(!unitTarget || !unitTarget->isAlive())
                     return;
@@ -5233,12 +5233,12 @@ void Spell::EffectScriptEffect(uint32 effIndex)
                 // Judgement self add switch
                 switch (m_spellInfo->Id)
                 {
-                    case 41467: break;                      // Judgement
                     case 53407: spellId1 = 20184; break;    // Judgement of Justice
                     case 20271:                             // Judgement of Light
                     case 57774: spellId1 = 20185; break;    // Judgement of Light
                     case 53408: spellId1 = 20186; break;    // Judgement of Wisdom
                     default:
+                        sLog.outError("Unsupported Judgement (seal trigger) spell (Id: %u) in Spell::EffectScriptEffect",m_spellInfo->Id)
                         return;
                 }
                 // all seals have aura dummy in 2 effect
