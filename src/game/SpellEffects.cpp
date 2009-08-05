@@ -1860,6 +1860,28 @@ void Spell::EffectDummy(uint32 i)
                 m_caster->CastSpell(m_caster, 51209, true);
                 return;
             }
+            // Death Strike
+            else if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0000000000000010))
+            {
+                uint32 count = 0;
+                Unit::AuraMap const& auras = unitTarget->GetAuras();
+                for(Unit::AuraMap::const_iterator itr = auras.begin(); itr!=auras.end(); ++itr)
+                {
+                    if(itr->second->GetSpellProto()->Dispel == DISPEL_DISEASE &&
+                        itr->second->GetCasterGUID() == m_caster->GetGUID() &&
+                        IsSpellLastAuraEffect(itr->second->GetSpellProto(), itr->second->GetEffIndex()))
+                    {
+                        ++count;
+                        // max. 15%
+                        if(count == 3)
+                            break;
+                    }
+                }
+
+                int32 bp = count * m_caster->GetMaxHealth() * m_spellInfo->DmgMultiplier[0] / 100;
+                m_caster->CastCustomSpell(m_caster, 45470, &bp, NULL, NULL, true);
+                return;
+            }
             break;
     }
 
