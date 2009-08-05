@@ -8277,6 +8277,13 @@ bool Unit::isSpellCrit(Unit *pVictim, SpellEntry const *spellProto, SpellSchoolM
                             crit_chance+=aura->GetModifier()->m_amount;
                             break;
                         }
+                        // Exorcism
+                        else if (spellProto->Category == 19)
+                        {
+                            if (pVictim->GetCreatureTypeMask() & CREATURE_TYPEMASK_DEMON_OR_UNDEAD)
+                                return true;
+                            break;
+                        }
                     break;
                     case SPELLFAMILY_SHAMAN:
                         // Lava Burst
