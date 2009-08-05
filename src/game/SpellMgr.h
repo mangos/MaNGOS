@@ -40,7 +40,8 @@ struct SpellModifier;
 enum SpellCategories
 {
     SPELLCATEGORY_HEALTH_MANA_POTIONS = 4,
-    SPELLCATEGORY_DEVOUR_MAGIC        = 12
+    SPELLCATEGORY_DEVOUR_MAGIC        = 12,
+    SPELLCATEGORY_JUDGEMENT           = 1210,               // Judgement (seal trigger)
 };
 
 enum SpellFamilyNames
@@ -96,7 +97,8 @@ enum SpellSpecific
     SPELL_BATTLE_ELIXIR     = 14,
     SPELL_GUARDIAN_ELIXIR   = 15,
     SPELL_FLASK_ELIXIR      = 16,
-    SPELL_PRESENCE          = 17
+    SPELL_PRESENCE          = 17,
+    SPELL_HAND              = 18,
 };
 
 SpellSpecific GetSpellSpecific(uint32 spellId);
@@ -122,7 +124,7 @@ int32 GetSpellMaxDuration(SpellEntry const *spellInfo);
 
 inline bool IsSpellHaveEffect(SpellEntry const *spellInfo, SpellEffects effect)
 {
-    for(int i= 0; i < 3; ++i)
+    for(int i = 0; i < 3; ++i)
         if(SpellEffects(spellInfo->Effect[i])==effect)
             return true;
     return false;
@@ -130,10 +132,18 @@ inline bool IsSpellHaveEffect(SpellEntry const *spellInfo, SpellEffects effect)
 
 inline bool IsSpellHaveAura(SpellEntry const *spellInfo, AuraType aura)
 {
-    for(int i= 0; i < 3; ++i)
+    for(int i = 0; i < 3; ++i)
         if(AuraType(spellInfo->EffectApplyAuraName[i])==aura)
             return true;
     return false;
+}
+
+inline bool IsSpellLastAuraEffect(SpellEntry const *spellInfo, int effecIdx)
+{
+    for(int i = effecIdx+1; i < 3; ++i)
+        if(spellInfo->EffectApplyAuraName[i])
+            return false;
+    return true;
 }
 
 bool IsNoStackAuraDueToAura(uint32 spellId_1, uint32 effIndex_1, uint32 spellId_2, uint32 effIndex_2);

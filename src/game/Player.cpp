@@ -689,14 +689,14 @@ bool Player::Create( uint32 guidlow, const std::string& name, uint8 race, uint8 
                 switch(iProto->Spells[0].SpellCategory)
                 {
                     case 11:                                // food
-                        if(iProto->Stackable > 4)
-                            count = 4;
+                        count = getClass()==CLASS_DEATH_KNIGHT ? 10 : 4;
                         break;
                     case 59:                                // drink
-                        if(iProto->Stackable > 2)
-                            count = 2;
+                        count = 2;
                         break;
                 }
+                if(iProto->Stackable < count)
+                    count = iProto->Stackable;
             }
 
             StoreNewItemInBestSlots(item_id, count);
@@ -13853,61 +13853,6 @@ void Player::SendQuestUpdateAddCreatureOrGo( Quest const* pQuest, uint64 guid, u
 /***                   LOAD SYSTEM                     ***/
 /*********************************************************/
 
-bool Player::MinimalLoadFromDB( QueryResult *result, uint32 guid )
-{
-    bool delete_result = true;
-    if (!result)
-    {
-        //                                        0     1     2     3           4           5           6    7          8          9         10    11
-        result = CharacterDatabase.PQuery("SELECT guid, data, name, position_x, position_y, position_z, map, totaltime, leveltime, at_login, zone, level FROM characters WHERE guid = '%u'",guid);
-        if (!result)
-            return false;
-    }
-    else
-        delete_result = false;
-
-    Field *fields = result->Fetch();
-
-    if (!LoadValues( fields[1].GetString()))
-    {
-        sLog.outError("Player #%d have broken data in `data` field. Can't be loaded for character list.",GUID_LOPART(guid));
-        if (delete_result)
-            delete result;
-        return false;
-    }
-
-    // overwrite possible wrong/corrupted guid
-    SetUInt64Value(OBJECT_FIELD_GUID, MAKE_NEW_GUID(guid, 0, HIGHGUID_PLAYER));
-
-    m_name = fields[2].GetCppString();
-
-    Relocate(fields[3].GetFloat(),fields[4].GetFloat(),fields[5].GetFloat());
-    SetLocationMapId(fields[6].GetUInt32());
-
-    // the instance id is not needed at character enum
-
-    m_Played_time[PLAYED_TIME_TOTAL] = fields[7].GetUInt32();
-    m_Played_time[PLAYED_TIME_LEVEL] = fields[8].GetUInt32();
-
-    m_atLoginFlags = fields[9].GetUInt32();
-
-    // I don't see these used anywhere ..
-    /*_LoadGroup();
-
-    _LoadBoundInstances();*/
-
-    if (delete_result)
-        delete result;
-
-    for (int i = 0; i < PLAYER_SLOTS_COUNT; ++i)
-        m_items[i] = NULL;
-
-    if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))
-        m_deathState = DEAD;
-
-    return true;
-}
-
 void Player::_LoadDeclinedNames(QueryResult* result)
 {
     if(!result)
@@ -14762,7 +14707,7 @@ void Player::_LoadAuras(QueryResult *result, uint32 timediff)
         delete result;
     }
 
-    if(getClass() == CLASS_WARRIOR)
+    if(getClass() == CLASS_WARRIOR && !HasAuraType(SPELL_AURA_MOD_SHAPESHIFT))
         CastSpell(this,SPELL_ID_PASSIVE_BATTLE_STANCE,true);
 }
 
@@ -15564,25 +15509,8 @@ void Player::SaveToDB()
     // first save/honor gain after midnight will also update the player's honor fields
     UpdateHonorFields();
 
-    int is_save_resting = HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING) ? 1 : 0;
-                                                            //save, far from tavern/city
-                                                            //save, but in tavern/city
     sLog.outDebug("The value of player %s at save: ", m_name.c_str());
     outDebugValues();
-
-    // save state (after auras removing), if aura remove some flags then it must set it back by self)
-    uint32 tmp_bytes = GetUInt32Value(UNIT_FIELD_BYTES_1);
-    uint32 tmp_bytes2 = GetUInt32Value(UNIT_FIELD_BYTES_2);
-    uint32 tmp_flags = GetUInt32Value(UNIT_FIELD_FLAGS);
-    uint32 tmp_pflags = GetUInt32Value(PLAYER_FLAGS);
-    uint32 tmp_displayid = GetDisplayId();
-
-    // Set player sit state to standing on save, also stealth and shifted form
-    SetByteValue(UNIT_FIELD_BYTES_1, 0, UNIT_STAND_STATE_STAND);
-    SetByteValue(UNIT_FIELD_BYTES_2, 3, 0);                 // shapeshift
-    RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
-
-    bool inworld = IsInWorld();
 
     CharacterDatabase.BeginTransaction();
 
@@ -15638,66 +15566,47 @@ void Player::SaveToDB()
 
     ss << "', ";
 
-    ss << m_taxi;                                           // string with TaxiMaskSize numbers
+    ss << m_taxi << ", ";                                   // string with TaxiMaskSize numbers
 
-    ss << ", ";
-    ss << (inworld ? 1 : 0);
+    ss << (IsInWorld() ? 1 : 0) << ", ";
 
-    ss << ", ";
-    ss << m_cinematic;
+    ss << m_cinematic << ", ";
 
-    ss << ", ";
-    ss << m_Played_time[PLAYED_TIME_TOTAL];
-    ss << ", ";
-    ss << m_Played_time[PLAYED_TIME_LEVEL];
+    ss << m_Played_time[PLAYED_TIME_TOTAL] << ", ";
+    ss << m_Played_time[PLAYED_TIME_LEVEL] << ", ";
 
-    ss << ", ";
-    ss << finiteAlways(m_rest_bonus);
-    ss << ", ";
-    ss << (uint64)time(NULL);
-    ss << ", ";
-    ss << is_save_resting;
-    ss << ", ";
-    ss << m_resetTalentsCost;
-    ss << ", ";
-    ss << (uint64)m_resetTalentsTime;
+    ss << finiteAlways(m_rest_bonus) << ", ";
+    ss << (uint64)time(NULL) << ", ";
+    ss << (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING) ? 1 : 0) << ", ";
+                                                            //save, far from tavern/city
+                                                            //save, but in tavern/city
+    ss << m_resetTalentsCost << ", ";
+    ss << (uint64)m_resetTalentsTime << ", ";
 
-    ss << ", ";
-    ss << finiteAlways(m_movementInfo.t_x);
-    ss << ", ";
-    ss << finiteAlways(m_movementInfo.t_y);
-    ss << ", ";
-    ss << finiteAlways(m_movementInfo.t_z);
-    ss << ", ";
-    ss << finiteAlways(m_movementInfo.t_o);
-    ss << ", ";
+    ss << finiteAlways(m_movementInfo.t_x) << ", ";
+    ss << finiteAlways(m_movementInfo.t_y) << ", ";
+    ss << finiteAlways(m_movementInfo.t_z) << ", ";
+    ss << finiteAlways(m_movementInfo.t_o) << ", ";
     if (m_transport)
         ss << m_transport->GetGUIDLow();
     else
         ss << "0";
+    ss << ", ";
 
-    ss << ", ";
-    ss << m_ExtraFlags;
+    ss << m_ExtraFlags << ", ";
 
-    ss << ", ";
-    ss << uint32(m_stableSlots);                            // to prevent save uint8 as char
+    ss << uint32(m_stableSlots) << ", ";                    // to prevent save uint8 as char
 
-    ss << ", ";
-    ss << uint32(m_atLoginFlags);
+    ss << uint32(m_atLoginFlags) << ", ";
 
-    ss << ", ";
-    ss << GetZoneId();
+    ss << GetZoneId() << ", ";
 
-    ss << ", ";
-    ss << (uint64)m_deathExpireTime;
+    ss << (uint64)m_deathExpireTime << ", '";
 
-    ss << ", '";
-    ss << m_taxi.SaveTaxiDestinationsToString();
-    ss << "', '0', ";
-    ss << GetBattleGroundId();
-    ss << ", ";
-    ss << GetBGTeam();
-    ss << ", ";
+    ss << m_taxi.SaveTaxiDestinationsToString() << "', ";
+    ss << "'0', ";                                          // arena_pending_points
+    ss << GetBattleGroundId() << ", ";
+    ss << GetBGTeam() << ", ";
     ss << m_bgEntryPoint.mapid << ", "
        << finiteAlways(m_bgEntryPoint.coord_x) << ", "
        << finiteAlways(m_bgEntryPoint.coord_y) << ", "
@@ -15723,12 +15632,6 @@ void Player::SaveToDB()
     GetSession()->SaveTutorialsData();                      // changed only while character in game
 
     CharacterDatabase.CommitTransaction();
-
-    // restore state (before aura apply, if aura remove flag then aura must set it ack by self)
-    SetUInt32Value(UNIT_FIELD_BYTES_1, tmp_bytes);
-    SetUInt32Value(UNIT_FIELD_BYTES_2, tmp_bytes2);
-    SetUInt32Value(UNIT_FIELD_FLAGS, tmp_flags);
-    SetUInt32Value(PLAYER_FLAGS, tmp_pflags);
 
     // save pet (hunter pet level and experience and all type pets health/mana).
     if(Pet* pet = GetPet())
@@ -15798,26 +15701,13 @@ void Player::_SaveAuras()
 
             SpellEntry const *spellInfo = itr2->second->GetSpellProto();
 
-            //skip all auras from spells that are passive or need a shapeshift
-            if (!(itr2->second->IsPassive() || itr2->second->IsRemovedOnShapeLost()))
+            //skip all auras from spells that are passive
+            //do not save single target auras (unless they were cast by the player)
+            if (!itr2->second->IsPassive() && (itr2->second->GetCasterGUID() == GetGUID() || !itr2->second->IsSingleTarget()))
             {
-                //do not save single target auras (unless they were cast by the player)
-                if (!(itr2->second->GetCasterGUID() != GetGUID() && itr2->second->IsSingleTarget()))
-                {
-                    uint8 i;
-                    // or apply at cast SPELL_AURA_MOD_SHAPESHIFT or SPELL_AURA_MOD_STEALTH auras
-                    for (i = 0; i < 3; ++i)
-                        if (spellInfo->EffectApplyAuraName[i] == SPELL_AURA_MOD_SHAPESHIFT ||
-                        spellInfo->EffectApplyAuraName[i] == SPELL_AURA_MOD_STEALTH)
-                            break;
-
-                    if (i == 3)
-                    {
-                        CharacterDatabase.PExecute("INSERT INTO character_aura (guid,caster_guid,spell,effect_index,stackcount,amount,maxduration,remaintime,remaincharges) "
-                            "VALUES ('%u', '" UI64FMTD "' ,'%u', '%u', '%u', '%d', '%d', '%d', '%d')",
-                            GetGUIDLow(), itr2->second->GetCasterGUID(), (uint32)itr2->second->GetId(), (uint32)itr2->second->GetEffIndex(), stackCounter, itr2->second->GetModifier()->m_amount,int(itr2->second->GetAuraMaxDuration()),int(itr2->second->GetAuraDuration()),int(itr2->second->GetAuraCharges()));
-                    }
-                }
+                CharacterDatabase.PExecute("INSERT INTO character_aura (guid,caster_guid,spell,effect_index,stackcount,amount,maxduration,remaintime,remaincharges) "
+                    "VALUES ('%u', '" UI64FMTD "' ,'%u', '%u', '%u', '%d', '%d', '%d', '%d')",
+                    GetGUIDLow(), itr2->second->GetCasterGUID(), (uint32)itr2->second->GetId(), (uint32)itr2->second->GetEffIndex(), stackCounter, itr2->second->GetModifier()->m_amount,int(itr2->second->GetAuraMaxDuration()),int(itr2->second->GetAuraDuration()),int(itr2->second->GetAuraCharges()));
             }
 
             if(itr == auras.end())
@@ -18146,11 +18036,6 @@ void Player::SendInitialPacketsBeforeAddToMap()
     m_reputationMgr.SendInitialReputations();
     m_achievementMgr.SendAllAchievementData();
 
-    // update zone
-    uint32 newzone, newarea;
-    GetZoneAndAreaId(newzone,newarea);
-    UpdateZone(newzone,newarea);                            // also call SendInitWorldStates();
-
     SendEquipmentSetList();
 
     data.Initialize(SMSG_LOGIN_SETTIMESPEED, 4 + 4 + 4);
@@ -18160,7 +18045,7 @@ void Player::SendInitialPacketsBeforeAddToMap()
     GetSession()->SendPacket( &data );
 
     // set fly flag if in fly form or taxi flight to prevent visually drop at ground in showup moment
-    if(HasAuraType(SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED) || isInFlight())
+    if(HasAuraType(SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED) || HasAuraType(SPELL_AURA_FLY) || isInFlight())
         m_movementInfo.AddMovementFlag(MOVEMENTFLAG_FLYING2);
 
     m_mover = this;
@@ -18168,6 +18053,11 @@ void Player::SendInitialPacketsBeforeAddToMap()
 
 void Player::SendInitialPacketsAfterAddToMap()
 {
+    // update zone
+    uint32 newzone, newarea;
+    GetZoneAndAreaId(newzone,newarea);
+    UpdateZone(newzone,newarea);                            // also call SendInitWorldStates();
+
     WorldPacket data(SMSG_TIME_SYNC_REQ, 4);                // new 2.0.x, enable movement
     data << uint32(0x00000000);                             // on blizz it increments periodically
     GetSession()->SendPacket(&data);
@@ -19103,13 +18993,6 @@ void Player::SetClientControl(Unit* target, uint8 allowMove)
 
 void Player::UpdateZoneDependentAuras( uint32 newZone )
 {
-    // remove new continent flight forms
-    if( !IsAllowUseFlyMountsHere() )
-    {
-        RemoveSpellsCausingAura(SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED);
-        RemoveSpellsCausingAura(SPELL_AURA_FLY);
-    }
-
     // Some spells applied at enter into zone (with subzones), aura removed in UpdateAreaDependentAuras that called always at zone->area update
     SpellAreaForAreaMapBounds saBounds = spellmgr.GetSpellAreaForAreaMapBounds(newZone);
     for(SpellAreaForAreaMap::const_iterator itr = saBounds.first; itr != saBounds.second; ++itr)
@@ -19682,13 +19565,11 @@ uint32 Player::CalculateTalentsPoints() const
     return uint32(talentPointsForLevel * sWorld.getRate(RATE_TALENT));
 }
 
-bool Player::IsAllowUseFlyMountsHere() const
+bool Player::IsKnowHowFlyIn(uint32 mapid, uint32 zone) const
 {
-    if (isGameMaster())
-        return true;
-
-    uint32 v_map = GetVirtualMapForMapAndZone(GetMapId(), GetZoneId());
-    return v_map == 530 || v_map == 571 && HasSpell(54197);
+    // continent checked in SpellMgr::GetSpellAllowedInLocationError at cast and area update
+    uint32 v_map = GetVirtualMapForMapAndZone(mapid, zone);
+    return v_map != 571 || HasSpell(54197);                 // Cold Weather Flying
 }
 
 struct DoPlayerLearnSpell

@@ -16,7 +16,7 @@
 /* re-adding before command use. So need just adding new line to file.       */
 
 /* Current table fill progress state:                                        */
-/* SpellEffect.cpp from start until end of Spell::EffectDummy */
+/* SpellEffect.cpp from start until end of Spell::EffectPowerBurn */
 
 DROP TABLE IF EXISTS spell_check;
 CREATE TABLE `spell_check` (
@@ -58,6 +58,7 @@ INSERT INTO spell_check (spellid,SpellFamilyName,SpellFamilyMaskA,SpellFamilyMas
 (8220, -1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Flip Out',                           'Spell::EffectDummy'),
 (8221, -1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Yaaarrrr',                           'Spell::EffectDummy'),
 (8222, -1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Yaaarrrr',                           'Spell::EffectDummy'),
+(8326, -1,                -1,        -1,  -1,  -1,  -1,  6, -1,-1,'Ghost',                              'Spell::EffectApplyAura'),
 (8593,  0,                -1,        -1,  -1,  -1,  -1,  3, -1,-1,'Symbol of life',                     'Spell::EffectDummy'),
 (10399,11,0x0000000000400000,0x00000000,  -1,  -1,  -1,  3, -1,-1,'Rockbiter Weapon',                   'Spell::EffectDummy'),
 (11687, 5,0x0000000000040000,0x00000000,  -1,  -1,  -1,  3, -1,-1,'Life Tap',                           'Spell::EffectDummy'),
@@ -98,6 +99,7 @@ INSERT INTO spell_check (spellid,SpellFamilyName,SpellFamilyMaskA,SpellFamilyMas
 (20473,10,                -1,        -1, 156,  -1,  -1,  3, -1,-1,'Holy Shock',                         'Spell::EffectDummy'),
 (20577, 0,                -1,        -1,  -1,  -1,  -1,  3, -1,-1,'Cannibalize',                        'Spell::EffectDummy'),
 (20578,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Cannibalize',                        'Spell::EffectDummy'),
+(20584,-1,                -1,        -1,  -1,  -1,  -1,  6, -1,-1,'Ghost',                              'Spell::EffectApplyAura'),
 (20647,-1,                -1,        -1,  -1,  -1,  -1,  2, -1, 0,'Execute',                            'Spell::EffectDummy'),
 (20929,10,                -1,        -1, 156,  -1,  -1,  3, -1,-1,'Holy Shock',                         'Spell::EffectDummy'),
 (20930,10,                -1,        -1, 156,  -1,  -1,  3, -1,-1,'Holy Shock',                         'Spell::EffectDummy'),
@@ -110,10 +112,13 @@ INSERT INTO spell_check (spellid,SpellFamilyName,SpellFamilyMaskA,SpellFamilyMas
 (23133, 0,                -1,        -1,  -1,  -1,  -1,  3, -1,-1,'Gnomish Battle Chicken',             'Spell::EffectDummy'),
 (23170,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Brood Affliction: Bronze',           'Spell::EffectDummy'),
 (23441,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Gadgetzan Transporter',              'Spell::EffectDummy'),
+(23442,-1,                -1,        -1,  -1,  -1,  -1,  5, -1,-1,'Everlook Transporter',               'Spell::EffectTeleportUnits'),
 (23444,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Transporter Malfunction',            'Spell::EffectDummy'),
 (23445,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Evil Twin',                          'Spell::EffectDummy'),
+(23445,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Evil Twin',                          'Spell::EffectTeleportUnits'),
 (23446,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Gadgetzan Transporter Failure',      'Spell::EffectDummy'),
 (23448, 0,                -1,        -1,  -1,  -1,  -1,  3, -1,-1,'Transporter Arrival',                'Spell::EffectDummy'),
+(23449,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Transporter Malfunction',            'Spell::EffectTeleportUnits'),
 (23453, 0,                -1,        -1,  -1,  -1,  -1,  3, -1,-1,'Gnomish Transporter',                'Spell::EffectDummy'),
 (23645, 0,                -1,        -1,  -1,  -1,  -1,  3, -1,-1,'Hourglass Sand',                     'Spell::EffectDummy'),
 (23725, 0,                -1,        -1,  -1,  -1,  -1,  3, -1,-1,'Gift of Life',                       'Spell::EffectDummy'),
@@ -123,6 +128,7 @@ INSERT INTO spell_check (spellid,SpellFamilyName,SpellFamilyMaskA,SpellFamilyMas
 (23885,-1,                -1,        -1,  -1,  -1,  -1,  6, 42, 0,'Bloodthirst',                        'Spell::EffectDummy'),
 (23989, 9,                -1,        -1,  -1,  -1,  -1,  3, -1,-1,'Readiness',                          'Spell::EffectDummy'),
 (24340, 0,                -1,        -1,  -1,  -1,  -1,  2, -1,-1,'Meteor',                             'Spell::EffectSchoolDMG'),
+(24575,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Brittle Armor',                      'Spell::EffectTriggerSpell'),
 (25599, 0,                -1,        -1,  -1,  -1,  -1,  2, -1,-1,'Thundercrash',                       'Spell::EffectSchoolDMG'),
 (25858,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Reindeer',                           'Spell::EffectDummy'),
 (25859,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Reindeer',                           'Spell::EffectDummy'),
@@ -134,6 +140,7 @@ INSERT INTO spell_check (spellid,SpellFamilyName,SpellFamilyMaskA,SpellFamilyMas
 (25913,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Holy Shock',                         'Spell::EffectDummy'),
 (25914,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Holy Shock',                         'Spell::EffectDummy'),
 (26074, 0,                -1,        -1,  -1,  -1,  -1,  3, -1,-1,'Holiday Cheer',                      'Spell::EffectDummy'),
+(26464,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Mercurial Shield',                   'Spell::EffectTriggerSpell'),
 (26467,-1,                -1,        -1,  -1,  -1,  -1,  6, 42, 0,'Persistent Shield',                  'Spell::EffectDummy'),
 (26558, 0,                -1,        -1,  -1,  -1,  -1,  2, -1,-1,'Meteor',                             'Spell::EffectSchoolDMG'),
 (26635,-1,                -1,        -1,  -1,  -1,  -1,  6, -1, 0,'Berserking',                         'Spell::EffectDummy'),
@@ -145,6 +152,7 @@ INSERT INTO spell_check (spellid,SpellFamilyName,SpellFamilyMaskA,SpellFamilyMas
 (27176,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Holy Shock',                         'Spell::EffectDummy'),
 (27222, 5,0x0000000000040000,0x00000000,  -1,  -1,  -1,  3, -1,-1,'Life Tap',                           'Spell::EffectDummy'),
 (28006, 0,                -1,        -1,  -1,  -1,  -1,  3, -1,-1,'Arcane Cloaking',                    'Spell::EffectDummy'),
+(28305,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Mana Leech',                         'Spell::EffectTriggerSpell'),
 (28884, 0,                -1,        -1,  -1,  -1,  -1,  2, -1,-1,'Meteor',                             'Spell::EffectSchoolDMG'),
 (29294,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Naxxramas Entry Flag Effect DND',    'Spell::EffectDummy'),
 (29200, 0,                -1,        -1,  -1,  -1,  -1,  3, -1,-1,'Purify Helboar Meat',                'Spell::EffectDummy'),
@@ -163,6 +171,7 @@ INSERT INTO spell_check (spellid,SpellFamilyName,SpellFamilyMaskA,SpellFamilyMas
 (31231, 8,                -1,        -1,  -1,  -1,  -1,  3, -1,-1,'Cheat Death',                        'Spell::EffectDummy'),
 (31436, 0,                -1,        -1,  -1,  -1,  -1,  2, -1,-1,'Malevolent Cleave',                  'Spell::EffectSchoolDMG'),
 (31789,10,                -1,        -1,  -1,  -1,  -1,  3, -1, 0,'Righteous Defense',                  'Spell::EffectDummy'),
+(31790,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Righteous Defense',                  'Spell::EffectTriggerSpell'),
 (31803,-1,                -1,        -1,  -1,  -1,  -1,  6,  3,-1,'Holy Vengeance',                     'Spell::EffectSchoolDMG'),
 (31818,-1,                -1,        -1,  -1,  -1,  -1, 30, -1, 0,'Life Tap',                           'Spell::EffectDummy'),
 (32409,-1,                -1,        -1,  -1,  -1,  -1,  6,  3,-1,'Shadow Word: Death',                 'Spell::EffectSchoolDMG'),
@@ -197,7 +206,16 @@ INSERT INTO spell_check (spellid,SpellFamilyName,SpellFamilyMaskA,SpellFamilyMas
 (36755,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Rockbiter Weapon',                   'Spell::EffectDummy'),
 (36759,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Rockbiter Weapon',                   'Spell::EffectDummy'),
 (36837, 0,                -1,        -1,  -1,  -1,  -1,  2, -1,-1,'Meteor',                             'Spell::EffectSchoolDMG'),
+(36890,-1,                -1,        -1,  -1,  -1,  -1,  5, -1,-1,'Area52 Transporter',                 'Spell::EffectTeleportUnits'),
+(36893,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Transporter Malfunction',            'Spell::EffectTeleportUnits'),
+(36895,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Transporter Malfunction',            'Spell::EffectTeleportUnits'),
+(36897,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Transporter Malfunction',            'Spell::EffectTeleportUnits'),
+(36899,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Transporter Malfunction',            'Spell::EffectTeleportUnits'),
+(36900,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Soul Split: Evil!',                  'Spell::EffectTeleportUnits'),
+(36901,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Soul Split: Good',                   'Spell::EffectTeleportUnits'),
 (36902,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Transporter Malfunction',            'Spell::EffectDummy'),
+(36940,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Transporter Malfunction',            'Spell::EffectTeleportUnits'),
+(36941,-1,                -1,        -1,  -1,  -1,  -1,  5, -1,-1,'Toshley\'s Station Transporter',     'Spell::EffectTeleportUnits'),
 (37169,-1,                -1,        -1,  -1,  -1,  -1,  6,  4,-1,'Eviscerate and Envenom Bonus Damage','Spell::EffectSchoolDMG'),
 (37506, 9,                -1,        -1,  -1,  -1,  -1,  3, -1,-1,'Scatter Shot',                       'Spell::EffectDummy'),
 (37674, 0,                -1,        -1,  -1,  -1,  -1,  3, -1,-1,'Chaos Blast',                        'Spell::EffectDummy'),
@@ -213,6 +231,7 @@ INSERT INTO spell_check (spellid,SpellFamilyName,SpellFamilyMaskA,SpellFamilyMas
 (39610,11,                -1,        -1,  -1,  -1,  -1,  3, -1,-1,'Mana Tide Totem effect',             'Spell::EffectDummy'),
 (40810, 0,                -1,        -1,  -1,  -1,  -1,  2, -1,-1,'Saber Lash',                         'Spell::EffectSchoolDMG'),
 (41276, 0,                -1,        -1,  -1,  -1,  -1,  2, -1,-1,'Meteor',                             'Spell::EffectSchoolDMG'),
+(41637,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Prayer of Mending',                  'Spell::EffectApplyAura'),
 (42384, 0,                -1,        -1,  -1,  -1,  -1,  2, -1,-1,'Brutal Swipe',                       'Spell::EffectSchoolDMG'),
 (43267, 0,                -1,        -1,  -1,  -1,  -1,  2, -1,-1,'Saber Lash',                         'Spell::EffectSchoolDMG'),
 (43268, 0,                -1,        -1,  -1,  -1,  -1,  2, -1,-1,'Saber Lash',                         'Spell::EffectSchoolDMG'),
@@ -337,6 +356,7 @@ INSERT INTO spell_check (spellid,SpellFamilyName,SpellFamilyMaskA,SpellFamilyMas
 (    0, 7,0x0000044000000000,0x00000000,  -1,  -1,  -1, -1, -1,-1,'Mangle (Cat) and Mangle (Bear)',     'Unit::HandleDummyAuraProc'),
 (    0, 9,0x0000000000000002,0x00000000,  -1, 342,  -1,  2, -1,-1,'Mongoose Bite',                      'Spell::EffectSchoolDMG'),
 (0,     6,0x0080000000000000,0x00000000,  -1,  -1,  -1,  3, -1,-1,'Penance',                            'Spell::EffectDummy'),
+(    0, 6,0x0000002000000000,0x00000000,  -1,  -1,  -1,  6, -1,-1,'Prayer of Mending',                  'Spell::EffectApplyAura'),
 (    0, 8,0x0000024000000860,0x00000000,  -1,  -1,  -1, -1, -1,-1,'Preparation (affected spells)',      'Spell::EffectDummy'),
 (    0, 7,0x0000000000001000,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Rake',                               'Spell::EffectSchoolDMG'),     /* used in */
 (    0, 7,0x0000000000001000,0x00000000,  -1,  -1,  -1, 80, -1, 2,'Rake',                               'Spell::EffectSchoolDMG'),     /* exactly selected */
@@ -355,6 +375,7 @@ INSERT INTO spell_check (spellid,SpellFamilyName,SpellFamilyMaskA,SpellFamilyMas
 (0,     7,0x0000000000000000,0x00000100,  -1,  -1,  -1,  3, -1,-1,'Starfall',                           'Spell::EffectDummy'),
 (    0, 9,0x0000000100000000,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Steady Shot',                        'Spell::EffectSchoolDMG'),
 (    0, 9,0x0000000100000000,0x00000000,  -1,  -1,  -1,  3, -1,-1,'Steady Shot',                        'Spell::EffectDummy'),
+(    0, 8,0x0000000000400000,0x00000000,  -1,  -1,  -1, -1, -1,-1,'Stealth',                            'Spell::EffectTriggerSpell'),
 (    0, 7,0x0010000000000000,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Swipe',                              'Spell::EffectSchoolDMG'),
 (    0, 4,0x0000000000000080,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Thunder Clap',                       'Spell::EffectSchoolDMG'),
 (    0, 4,0x0000010000000000,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Victory Rush',                       'Spell::EffectSchoolDMG'),
