@@ -1303,7 +1303,9 @@ enum Opcodes
     UMSG_UNKNOWN_1266                               = 0x4F2, // not found 3.2
     UMSG_UNKNOWN_1267                               = 0x4F3, // not found 3.2
     UMSG_UNKNOWN_1268                               = 0x4F4, // not found 3.2
-    NUM_MSG_TYPES                                   = 0x4F5
+    UMSG_UNKNOWN_1269                               = 0x4F5,
+    UMSG_UNKNOWN_1270                               = 0x4F6,
+    NUM_MSG_TYPES                                   = 0x4F7
 };
 
 /// Player state
