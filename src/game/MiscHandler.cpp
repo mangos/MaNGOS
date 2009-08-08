@@ -975,7 +975,7 @@ void WorldSession::HandleRequestAccountData(WorldPacket& recv_data)
 
     dest.resize(destSize);
 
-    WorldPacket data (SMSG_UPDATE_ACCOUNT_DATA, 8+4+4+4+destSize);
+    WorldPacket data(SMSG_UPDATE_ACCOUNT_DATA, 8+4+4+4+destSize);
     data << uint64(_player->GetGUID());                     // player guid
     data << uint32(type);                                   // type (0-7)
     data << uint32(adata->Time);                            // unix time
@@ -1023,7 +1023,7 @@ void WorldSession::HandleSetActionButtonOpcode(WorldPacket& recv_data)
                 sLog.outError( "MISC: Unknown action button type %u for action %u into button %u", type, action, button );
                 return;
         }
-        GetPlayer()->addActionButton(button,action,type);
+        GetPlayer()->addActionButton(button, action, type);
     }
 }
 
@@ -1450,7 +1450,7 @@ void WorldSession::HandleTimeSyncResp( WorldPacket & recv_data )
     recv_data >> counter >> time_;
 
     // time_ seems always more than getMSTime()
-    uint32 diff = getMSTimeDiff(getMSTime(),time_);
+    uint32 diff = getMSTimeDiff(getMSTime(), time_);
 
     sLog.outDebug("response sent: counter %u, time %u (HEX: %X), ms. time %u, diff %u", counter, time_, time_, getMSTime(), diff);
 }
@@ -1626,4 +1626,14 @@ void WorldSession::HandleQueryInspectAchievements( WorldPacket & recv_data )
 
     if(Player *player = objmgr.GetPlayer(guid))
         player->GetAchievementMgr().SendRespondInspectAchievements(_player);
+}
+
+void WorldSession::HandleWorldStateUITimerUpdate(WorldPacket& recv_data)
+{
+    // empty opcode
+    sLog.outDebug("WORLD: CMSG_WORLD_STATE_UI_TIMER_UPDATE");
+
+    WorldPacket data(SMSG_WORLD_STATE_UI_TIMER_UPDATE, 4);
+    data << uint32(time(NULL));
+    SendPacket(&data);
 }

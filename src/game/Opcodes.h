@@ -1275,8 +1275,8 @@ enum Opcodes
     SMSG_EQUIPMENT_SET_USE_RESULT                   = 0x4D6, // SMSG, UseEquipmentSetResult?
     UMSG_UNKNOWN_1239                               = 0x4D7, // not found 3.2
     SMSG_UNKNOWN_1240                               = 0x4D8, // SMSG, uint64, string
-    CMSG_UNKNOWN_1241                               = 0x4D9, // lua: CreateCharacter (PFC client response)
-    SMSG_UNKNOWN_1242                               = 0x4DA, // response to 1241 (PFC server response)
+    CMSG_CHAR_FACTION_CHANGE                        = 0x4D9, // lua: CreateCharacter (PFC client response)
+    SMSG_CHAR_FACTION_CHANGE                        = 0x4DA, // response to 1241 (PFC server response)
     UMSG_UNKNOWN_1243                               = 0x4DB, // not found 3.2
     UMSG_UNKNOWN_1244                               = 0x4DC, // not found 3.2
     UMSG_UNKNOWN_1245                               = 0x4DD, // not found 3.2
@@ -1292,20 +1292,21 @@ enum Opcodes
     CMSG_UNKNOWN_1255                               = 0x4E7, // lua: BattlefieldMgrExitRequest
     SMSG_UNKNOWN_1256                               = 0x4E8, // uint32, uint32
     UMSG_UNKNOWN_1257                               = 0x4E9, // not found 3.2
-    MSG_SET_RAID_DIFFICULTY                         = 0x4EA, // lua: SetRaidDificulty
-    UMSG_UNKNOWN_1259                               = 0x4EB, // not found 3.2
-    SMSG_TOGGLE_XP_GAIN                             = 0x4EC, // enable/disable XP gain console message
-    SMSG_UNKNOWN_1261                               = 0x4ED,
+    UMSG_UNKNOWN_1258                               = 0x4EA, // not found 3.2
+    MSG_SET_RAID_DIFFICULTY                         = 0x4EB, // lua: SetRaidDifficulty
+    UMSG_UNKNOWN_1260                               = 0x4EC, // not found 3.2
+    SMSG_TOGGLE_XP_GAIN                             = 0x4ED, // enable/disable XP gain console message
     SMSG_UNKNOWN_1262                               = 0x4EE,
-    CMSG_UNKNOWN_1263                               = 0x4EF, // lua: GMResponseResolve
-    SMSG_UNKNOWN_1264                               = 0x4F0,
-    UMSG_UNKNOWN_1265                               = 0x4F1, // not found 3.2
+    SMSG_UNKNOWN_1263                               = 0x4EF,
+    CMSG_UNKNOWN_1264                               = 0x4F0, // lua: GMResponseResolve
+    SMSG_UNKNOWN_1265                               = 0x4F1,
     UMSG_UNKNOWN_1266                               = 0x4F2, // not found 3.2
     UMSG_UNKNOWN_1267                               = 0x4F3, // not found 3.2
     UMSG_UNKNOWN_1268                               = 0x4F4, // not found 3.2
-    UMSG_UNKNOWN_1269                               = 0x4F5,
-    UMSG_UNKNOWN_1270                               = 0x4F6,
-    NUM_MSG_TYPES                                   = 0x4F7
+    UMSG_UNKNOWN_1269                               = 0x4F5, // not found 3.2
+    CMSG_WORLD_STATE_UI_TIMER_UPDATE                = 0x4F6,
+    SMSG_WORLD_STATE_UI_TIMER_UPDATE                = 0x4F7,
+    NUM_MSG_TYPES                                   = 0x4F8
 };
 
 /// Player state
