@@ -263,6 +263,7 @@ pkgdata_DATA = \
 	8254_01_mangos_spell_proc_event.sql \
 	8294_01_mangos_playercreateinfo_action.sql \
 	8310_01_mangos_spell_proc_event.sql \
+	8332_01_realmd_realmcharacters.sql \
 	README
 
 ## Additional files to include when running 'make dist'
@@ -506,4 +507,5 @@ EXTRA_DIST = \
 	8254_01_mangos_spell_proc_event.sql \
 	8294_01_mangos_playercreateinfo_action.sql \
 	8310_01_mangos_spell_proc_event.sql \
+	8332_01_realmd_realmcharacters.sql \
 	README
