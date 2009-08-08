@@ -292,15 +292,23 @@ class MANGOS_DLL_SPEC Aura
         bool IsDeathPersistent() const { return m_isDeathPersist; }
         bool IsRemovedOnShapeLost() const { return m_isRemovedOnShapeLost; }
         bool IsInUse() const { return m_in_use;}
+        bool IsDeleted() const { return m_deleted;}
 
-        virtual void Update(uint32 diff);
+        void SetInUse(bool state)
+        {
+            if(state)
+                ++m_in_use;
+            else
+            {
+                if(m_in_use)
+                    --m_in_use;
+            }
+        }
         void ApplyModifier(bool apply, bool Real = false);
 
+        void UpdateAura(uint32 diff) { SetInUse(true); Update(diff); SetInUse(false); }
         void _AddAura();
         bool _RemoveAura();
-
-        bool IsUpdated() { return m_updated; }
-        void SetUpdated(bool val) { m_updated = val; }
 
         bool IsSingleTarget() {return m_isSingleTargetAura;}
         void SetIsSingleTarget(bool val) { m_isSingleTargetAura = val;}
@@ -319,13 +327,18 @@ class MANGOS_DLL_SPEC Aura
 
         void TriggerSpell();
         void TriggerSpellWithValue();
-        void PeriodicTick();
-        void PeriodicDummyTick();
 
         uint32 const *getAuraSpellClassMask() const { return  m_spellProto->EffectSpellClassMaskA + m_effIndex * 3; }
         bool isAffectedOnSpell(SpellEntry const *spell) const;
     protected:
         Aura(SpellEntry const* spellproto, uint32 eff, int32 *currentBasePoints, Unit *target, Unit *caster = NULL, Item* castItem = NULL);
+
+        // must be called only from Aura::UpdateAura
+        virtual void Update(uint32 diff);
+
+        // must be called only from Aura*::Update
+        void PeriodicTick();
+        void PeriodicDummyTick();
 
         bool IsCritFromAbilityAura(Unit* caster, uint32& damage);
 
@@ -362,10 +375,10 @@ class MANGOS_DLL_SPEC Aura
         bool m_isPersistent:1;
         bool m_isDeathPersist:1;
         bool m_isRemovedOnShapeLost:1;
-        bool m_updated:1;                                   // Prevent remove aura by stack if set
-        bool m_in_use:1;                                    // true while in Aura::ApplyModifier call
+        bool m_deleted:1;                                   // true if RemoveAura(iterator) called while in Aura::ApplyModifier call (added to Unit::m_deletedAuras)
         bool m_isSingleTargetAura:1;                        // true if it's a single target spell and registered at caster - can change at spell steal for example
 
+        uint32 m_in_use;                                    // > 0 while in Aura::ApplyModifier call/Aura::Update/etc
     private:
         void CleanupTriggeredSpells();
 };
@@ -375,6 +388,7 @@ class MANGOS_DLL_SPEC AreaAura : public Aura
     public:
         AreaAura(SpellEntry const* spellproto, uint32 eff, int32 *currentBasePoints, Unit *target, Unit *caster = NULL, Item* castItem = NULL);
         ~AreaAura();
+    protected:
         void Update(uint32 diff);
     private:
         float m_radius;
@@ -386,6 +400,7 @@ class MANGOS_DLL_SPEC PersistentAreaAura : public Aura
     public:
         PersistentAreaAura(SpellEntry const* spellproto, uint32 eff, int32 *currentBasePoints, Unit *target, Unit *caster = NULL, Item* castItem = NULL);
         ~PersistentAreaAura();
+    protected:
         void Update(uint32 diff);
 };
 
