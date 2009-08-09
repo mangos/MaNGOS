@@ -5544,23 +5544,19 @@ void Aura::HandleSpellSpecificBoosts(bool apply)
         }
         case SPELLFAMILY_HUNTER:
         {
-            if(GetSpellSpecific(m_spellProto->Id) != SPELL_ASPECT)
-                return;
-
-            // Aspect of the Dragonhawk dodge
-            if (GetSpellProto()->SpellFamilyFlags2 & 0x00001000)
-                spellId1 = 61848;
             // The Beast Within and Bestial Wrath - immunity
-            else if (GetId() == 19574 || GetId() == 34471)
+            if (GetId() == 19574 || GetId() == 34471)
             {
                 spellId1 = 24395;
                 spellId2 = 24396;
                 spellId3 = 24397;
                 spellId4 = 26592;
             }
+            // Aspect of the Dragonhawk dodge
+            else if(GetSpellProto()->SpellFamilyFlags2 & 0x00001000)
+                spellId1 = 61848;
             else
                 return;
-
             break;
         }
         case SPELLFAMILY_PALADIN:
