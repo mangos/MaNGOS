@@ -1378,3 +1378,30 @@ void WorldSession::HandleCancelTempEnchantmentOpcode(WorldPacket& recv_data)
     GetPlayer()->ApplyEnchantment(item, TEMP_ENCHANTMENT_SLOT, false);
     item->ClearEnchantment(TEMP_ENCHANTMENT_SLOT);
 }
+
+void WorldSession::HandleItemRefundInfoRequest(WorldPacket& recv_data)
+{
+    sLog.outDebug("WORLD: CMSG_ITEM_REFUND_INFO_REQUEST");
+
+    CHECK_PACKET_SIZE(recv_data, 8);
+
+    uint64 guid;
+
+    recv_data >> guid;                                      // item guid
+
+    Item *item = _player->GetItemByGuid(guid);
+
+    if(!item)
+    {
+        sLog.outDebug("Item refund: item not found!");
+        return;
+    }
+
+    if(!item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAGS_REFUNDABLE))
+    {
+        sLog.outDebug("Item refund: item not refundable!");
+        return;
+    }
+
+    // refund system not implemented yet
+}

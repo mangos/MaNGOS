@@ -216,20 +216,26 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
     recv_data.hexlike();
 
     Unit *mover = _player->m_mover;
-    Player *plMover = mover->GetTypeId()==TYPEID_PLAYER ? (Player*)mover : NULL;
+    Player *plMover = mover->GetTypeId() == TYPEID_PLAYER ? (Player*)mover : NULL;
 
     // ignore, waiting processing in WorldSession::HandleMoveWorldportAckOpcode and WorldSession::HandleMoveTeleportAck
     if(plMover && plMover->IsBeingTeleported())
         return;
 
     /* extract packet */
+    uint64 guid;
+
+    if(!recv_data.readPackGUID(guid))
+        return;
+
     MovementInfo movementInfo;
+    movementInfo.guid = guid;
     ReadMovementInfo(recv_data, &movementInfo);
     /*----------------*/
 
     if(recv_data.size() != recv_data.rpos())
     {
-        sLog.outError("MovementHandler: player %s (guid %d, account %u) sent a packet (opcode %u) that is " SIZEFMTD " bytes larger than it should be. Kicked as cheater.", _player->GetName(), _player->GetGUIDLow(), _player->GetSession()->GetAccountId(), recv_data.GetOpcode(), recv_data.size() - recv_data.rpos());
+        sLog.outError("MovementHandler: player %s (guid %d, account %u) sent a packet (opcode %u) that is " SIZEFMTD " bytes larger than it should be. Kicked as cheater.", _player->GetName(), _player->GetGUIDLow(), _player->GetSession()->GetAccountId(), opcode, recv_data.size() - recv_data.rpos());
         KickPlayer();
         return;
     }
@@ -289,17 +295,17 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
     /*----------------------*/
 
     /* process position-change */
-    recv_data.put<uint32>(6, getMSTime());                  // fix time, offset flags(4) + unk(2)
-    WorldPacket data(recv_data.GetOpcode(), (mover->GetPackGUID().size()+recv_data.size()));
-    data.append(mover->GetPackGUID());                      // use mover guid
-    data.append(recv_data.contents(), recv_data.size());
+    WorldPacket data(opcode, recv_data.size());
+    movementInfo.time = getMSTime();
+    movementInfo.guid = mover->GetGUID();
+    WriteMovementInfo(&data, &movementInfo);
     GetPlayer()->SendMessageToSet(&data, false);
 
     if(plMover)                                             // nothing is charmed, or player charmed
     {
         plMover->SetPosition(movementInfo.x, movementInfo.y, movementInfo.z, movementInfo.o);
         plMover->m_movementInfo = movementInfo;
-        plMover->UpdateFallInformationIfNeed(movementInfo, recv_data.GetOpcode());
+        plMover->UpdateFallInformationIfNeed(movementInfo, opcode);
 
         if(plMover->isMovingOrTurning())
             plMover->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
@@ -344,26 +350,28 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 
 void WorldSession::HandleForceSpeedChangeAck(WorldPacket &recv_data)
 {
-    sLog.outDebug("WORLD: Recvd %s (%u, 0x%X) opcode", LookupOpcodeName(recv_data.GetOpcode()), recv_data.GetOpcode(), recv_data.GetOpcode());
-
-    CHECK_PACKET_SIZE(recv_data, recv_data.rpos()+8+4);
+    uint32 opcode = recv_data.GetOpcode();
+    sLog.outDebug("WORLD: Recvd %s (%u, 0x%X) opcode", LookupOpcodeName(opcode), opcode, opcode);
 
     /* extract packet */
     uint64 guid;
     uint32 unk1;
     float  newspeed;
 
-    recv_data >> guid;
+    if(!recv_data.readPackGUID(guid))
+        return;
 
     // now can skip not our packet
     if(_player->GetGUID() != guid)
         return;
 
     // continue parse packet
+    CHECK_PACKET_SIZE(recv_data, recv_data.rpos()+4);
 
     recv_data >> unk1;                                      // counter or moveEvent
 
     MovementInfo movementInfo;
+    movementInfo.guid = guid;
     ReadMovementInfo(recv_data, &movementInfo);
 
     // recheck
@@ -372,6 +380,13 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket &recv_data)
     recv_data >> newspeed;
     /*----------------*/
 
+    if(recv_data.size() != recv_data.rpos())
+    {
+        sLog.outError("MovementHandler: player %s (guid %d, account %u) sent a packet (opcode %u) that is " SIZEFMTD " bytes larger than it should be. Kicked as cheater.", _player->GetName(), _player->GetGUIDLow(), _player->GetSession()->GetAccountId(), opcode, recv_data.size() - recv_data.rpos());
+        KickPlayer();
+        return;
+    }
+
     // client ACK send one packet for mounted/run case and need skip all except last from its
     // in other cases anti-cheat check can be fail in false case
     UnitMoveType move_type;
@@ -379,7 +394,6 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket &recv_data)
 
     static char const* move_type_name[MAX_MOVE_TYPE] = {  "Walk", "Run", "RunBack", "Swim", "SwimBack", "TurnRate", "Flight", "FlightBack", "PitchRate" };
 
-    uint16 opcode = recv_data.GetOpcode();
     switch(opcode)
     {
         case CMSG_FORCE_WALK_SPEED_CHANGE_ACK:          move_type = MOVE_WALK;          force_move_type = MOVE_WALK;        break;
@@ -444,10 +458,10 @@ void WorldSession::HandleMoveNotActiveMover(WorldPacket &recv_data)
     sLog.outDebug("WORLD: Recvd CMSG_MOVE_NOT_ACTIVE_MOVER");
     recv_data.hexlike();
 
-    CHECK_PACKET_SIZE(recv_data, recv_data.rpos()+8);
-
     uint64 old_mover_guid;
-    recv_data >> old_mover_guid;
+
+    if(!recv_data.readPackGUID(old_mover_guid))
+        return;
 
     if(_player->m_mover->GetGUID() == old_mover_guid)
     {
@@ -456,7 +470,16 @@ void WorldSession::HandleMoveNotActiveMover(WorldPacket &recv_data)
     }
 
     MovementInfo mi;
+    mi.guid = old_mover_guid;
     ReadMovementInfo(recv_data, &mi);
+
+    if(recv_data.size() != recv_data.rpos())
+    {
+        sLog.outError("MovementHandler: player %s (guid %d, account %u) sent a packet (opcode %u) that is " SIZEFMTD " bytes larger than it should be. Kicked as cheater.", _player->GetName(), _player->GetGUIDLow(), _player->GetSession()->GetAccountId(), recv_data.GetOpcode(), recv_data.size() - recv_data.rpos());
+        KickPlayer();
+        return;
+    }
+
     _player->m_movementInfo = mi;
 }
 
@@ -470,8 +493,22 @@ void WorldSession::HandleDismissControlledVehicle(WorldPacket &recv_data)
     if(!vehicleGUID)                                        // something wrong here...
         return;
 
+    uint64 guid;
+
+    if(!recv_data.readPackGUID(guid))
+        return;
+
     MovementInfo mi;
+    mi.guid = guid;
     ReadMovementInfo(recv_data, &mi);
+
+    if(recv_data.size() != recv_data.rpos())
+    {
+        sLog.outError("MovementHandler: player %s (guid %d, account %u) sent a packet (opcode %u) that is " SIZEFMTD " bytes larger than it should be. Kicked as cheater.", _player->GetName(), _player->GetGUIDLow(), _player->GetSession()->GetAccountId(), recv_data.GetOpcode(), recv_data.size() - recv_data.rpos());
+        KickPlayer();
+        return;
+    }
+
     _player->m_movementInfo = mi;
 
     // using charm guid, because we don't have vehicle guid...

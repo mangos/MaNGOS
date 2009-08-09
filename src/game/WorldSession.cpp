@@ -629,9 +629,6 @@ void WorldSession::SaveTutorialsData()
 
 void WorldSession::ReadMovementInfo(WorldPacket &data, MovementInfo *mi)
 {
-    if(!data.readPackGUID(mi->guid))
-        return;
-
     CHECK_PACKET_SIZE(data, data.rpos()+4+2+4+4+4+4+4);
     data >> mi->flags;
     data >> mi->unk1;
@@ -677,6 +674,51 @@ void WorldSession::ReadMovementInfo(WorldPacket &data, MovementInfo *mi)
     {
         CHECK_PACKET_SIZE(data, data.rpos()+4);
         data >> mi->u_unk1;
+    }
+}
+
+void WorldSession::WriteMovementInfo(WorldPacket *data, MovementInfo *mi)
+{
+    data->appendPackGUID(mi->guid);
+
+    *data << mi->flags;
+    *data << mi->unk1;
+    *data << mi->time;
+    *data << mi->x;
+    *data << mi->y;
+    *data << mi->z;
+    *data << mi->o;
+
+    if(mi->HasMovementFlag(MOVEMENTFLAG_ONTRANSPORT))
+    {
+        data->appendPackGUID(mi->t_guid);
+
+        *data << mi->t_x;
+        *data << mi->t_y;
+        *data << mi->t_z;
+        *data << mi->t_o;
+        *data << mi->t_time;
+        *data << mi->t_seat;
+    }
+
+    if((mi->HasMovementFlag(MovementFlags(MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_FLYING2))) || (mi->unk1 & 0x20))
+    {
+        *data << mi->s_pitch;
+    }
+
+    *data << mi->fallTime;
+
+    if(mi->HasMovementFlag(MOVEMENTFLAG_JUMPING))
+    {
+        *data << mi->j_unk;
+        *data << mi->j_sinAngle;
+        *data << mi->j_cosAngle;
+        *data << mi->j_xyspeed;
+    }
+
+    if(mi->HasMovementFlag(MOVEMENTFLAG_SPLINE))
+    {
+        *data << mi->u_unk1;
     }
 }
 

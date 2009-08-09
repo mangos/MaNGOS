@@ -110,6 +110,7 @@ class MANGOS_DLL_SPEC WorldSession
         void SendAddonsInfo();
 
         void ReadMovementInfo(WorldPacket &data, MovementInfo *mi);
+        void WriteMovementInfo(WorldPacket *data, MovementInfo *mi);
 
         void SendPacket(WorldPacket const* packet);
         void SendNotification(const char *format,...) ATTR_PRINTF(2,3);
@@ -667,6 +668,7 @@ class MANGOS_DLL_SPEC WorldSession
         void HandleSocketOpcode(WorldPacket& recv_data);
 
         void HandleCancelTempEnchantmentOpcode(WorldPacket& recv_data);
+        void HandleItemRefundInfoRequest(WorldPacket& recv_data);
 
         void HandleChannelVoiceOnOpcode(WorldPacket & recv_data);
         void HandleVoiceSessionEnableOpcode(WorldPacket& recv_data);

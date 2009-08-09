@@ -1237,7 +1237,7 @@ enum Opcodes
     UMSG_UNKNOWN_1200                               = 0x4B0, // not found
     UMSG_UNKNOWN_1201                               = 0x4B1, // not found
     SMSG_UNKNOWN_1202                               = 0x4B2, // refund something
-    CMSG_UNKNOWN_1203                               = 0x4B3, // refund request?
+    CMSG_ITEM_REFUND_INFO_REQUEST                   = 0x4B3, // refund request?
     CMSG_UNKNOWN_1204                               = 0x4B4, // lua: ContainerRefundItemPurchase
     SMSG_UNKNOWN_1205                               = 0x4B5, // refund something
     CMSG_UNKNOWN_1206                               = 0x4B6, // CMSG, uint32
@@ -1265,9 +1265,9 @@ enum Opcodes
     UMSG_UNKNOWN_1228                               = 0x4CC, // not found 3.2
     SMSG_UNKNOWN_1229                               = 0x4CD, // SMSG, any opcode?
     SMSG_UNKNOWN_1230                               = 0x4CE, // SMSG, movement related
-    UMSG_UNKNOWN_1231                               = 0x4CF, // not found 3.2
+    CMSG_UNKNOWN_1231_ACK                           = 0x4CF, // movement related
     SMSG_UNKNOWN_1232                               = 0x4D0, // SMSG, movement related
-    UMSG_UNKNOWN_1233                               = 0x4D1, // not found 3.2
+    CMSG_UNKNOWN_1233_ACK                           = 0x4D1, // movement related
     SMSG_UNKNOWN_1234                               = 0x4D2, // SMSG, movement related
     SMSG_UNKNOWN_1235                               = 0x4D3, // SMSG, movement related
     SMSG_UNKNOWN_1236                               = 0x4D4, // SMSG, movement related

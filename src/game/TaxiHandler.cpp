@@ -158,14 +158,14 @@ bool WorldSession::SendLearnNewTaxiNode( Creature* unit )
 
 void WorldSession::HandleActivateTaxiExpressOpcode ( WorldPacket & recv_data )
 {
-    CHECK_PACKET_SIZE(recv_data,8+4+4);
+    CHECK_PACKET_SIZE(recv_data,8+4);
 
     sLog.outDebug( "WORLD: Received CMSG_ACTIVATETAXIEXPRESS" );
 
     uint64 guid;
-    uint32 node_count, _totalcost;
+    uint32 node_count;
 
-    recv_data >> guid >> _totalcost >> node_count;
+    recv_data >> guid >> node_count;
 
     Creature *npc = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_FLIGHTMASTER);
     if (!npc)
@@ -174,7 +174,7 @@ void WorldSession::HandleActivateTaxiExpressOpcode ( WorldPacket & recv_data )
         return;
     }
     // recheck
-    CHECK_PACKET_SIZE(recv_data,8+4+4+node_count*4);
+    CHECK_PACKET_SIZE(recv_data,8+4+node_count*4);
 
     std::vector<uint32> nodes;
 
