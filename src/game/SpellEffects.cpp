@@ -2409,11 +2409,6 @@ void Spell::EffectApplyAura(uint32 i)
     if (!added)
         return;
 
-    // found crash at character loading, broken pointer to Aur...
-    // Aur was deleted in AddAura()...
-    if(!Aur)
-        return;
-
     // Prayer of Mending (jump animation), we need formal caster instead original for correct animation
     if( m_spellInfo->SpellFamilyName == SPELLFAMILY_PRIEST && (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0000002000000000)))
         m_caster->CastSpell(unitTarget, 41637, true, NULL, Aur, m_originalCasterGUID);
@@ -5264,6 +5259,26 @@ void Spell::EffectScriptEffect(uint32 effIndex)
                     }
                     if (spellId)
                         m_caster->CastCustomSpell(target, spellId, &basePoint, 0, 0, false);
+                    return;
+                }
+                case 53412:                                 // Invigoration (pet triggered script, master targeted)
+                {
+                    if (!unitTarget)
+                        return;
+
+                    Unit::AuraList const& auras = unitTarget->GetAurasByType(SPELL_AURA_DUMMY);
+                    for(Unit::AuraList::const_iterator i = auras.begin();i != auras.end(); ++i)
+                    {
+                        // Invigoration (master talent)
+                        if ((*i)->GetModifier()->m_miscvalue == 8 && (*i)->GetSpellProto()->SpellIconID == 3487)
+                        {
+                            if (roll_chance_i((*i)->GetModifier()->m_amount))
+                            {
+                                unitTarget->CastSpell(unitTarget, 53398, true, NULL, (*i), m_caster->GetGUID());
+                                break;
+                            }
+                        }
+                    }
                     return;
                 }
                 default:

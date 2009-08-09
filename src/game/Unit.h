@@ -829,7 +829,7 @@ struct CharmInfo
 
         Unit* m_unit;
         UnitActionBarEntry PetActionBar[MAX_UNIT_ACTION_BAR_INDEX];
-        CharmSpellEntry m_charmspells[4];
+        CharmSpellEntry m_charmspells[CREATURE_MAX_SPELLS];
         CommandStates   m_CommandState;
         ReactStates     m_reactState;
         uint32          m_petnumber;
@@ -1514,8 +1514,10 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         DeathState m_deathState;
 
         AuraMap m_Auras;
+        AuraMap::iterator m_AurasUpdateIterator;            // != end() in Unit::m_Auras update and point to next element
+        AuraList m_deletedAuras;                            // auras removed while in ApplyModifier and waiting deleted
 
-        std::list<Aura *> m_scAuras;                        // casted singlecast auras
+        AuraList m_scAuras;                                 // casted by unit single per-caster auras
 
         typedef std::list<uint64> DynObjectGUIDs;
         DynObjectGUIDs m_dynObjGUIDs;
@@ -1524,7 +1526,6 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         GameObjectList m_gameObj;
         bool m_isSorted;
         uint32 m_transform;
-        uint32 m_removedAuras;
 
         AuraList m_modAuras[TOTAL_AURAS];
         float m_auraModifiersGroup[UNIT_MOD_END][MODIFIER_TYPE_END];

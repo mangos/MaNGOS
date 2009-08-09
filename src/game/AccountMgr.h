@@ -51,7 +51,7 @@ class AccountMgr
         uint32 GetSecurity(uint32 acc_id);
         bool GetName(uint32 acc_id, std::string &name);
 
-        static bool normilizeString(std::string& utf8str);
+        static bool normalizeString(std::string& utf8str);
 };
 
 #define accmgr MaNGOS::Singleton<AccountMgr>::Instance()

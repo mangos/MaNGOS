@@ -21,7 +21,7 @@
 
 DROP TABLE IF EXISTS `realmd_db_version`;
 CREATE TABLE `realmd_db_version` (
-  `required_7938_01_realmd_account` bit(1) default NULL
+  `required_8332_01_realmd_realmcharacters` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Last applied sql update to DB';
 
 --
@@ -133,7 +133,8 @@ CREATE TABLE `realmcharacters` (
   `realmid` int(11) unsigned NOT NULL default '0',
   `acctid` bigint(20) unsigned NOT NULL,
   `numchars` tinyint(3) unsigned NOT NULL default '0',
-  PRIMARY KEY  (`realmid`,`acctid`)
+  PRIMARY KEY  (`realmid`,`acctid`),
+  KEY (acctid)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Realm Character Tracker';
 
 --

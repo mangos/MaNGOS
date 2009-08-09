@@ -692,7 +692,7 @@ void WorldSession::HandleGetMailList(WorldPacket & recv_data )
         realCount += 1;
     }
 
-    data.put<uint32>(0, realCount);                         // this will display warning about undelivered mail to player if realCount > mails_count
+    data.put<uint32>(0, realCount);                         // this will display warning about undelivered mail to player if realCount > mailsCount
     data.put<uint8>(4, mailsCount);                         // set real send mails to client
     SendPacket(&data);
 
