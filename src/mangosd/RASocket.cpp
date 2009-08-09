@@ -147,7 +147,7 @@ void RASocket::OnRead()
                     std::string login = szLogin;
 
                     ///- Convert Account name to Upper Format
-                    AccountMgr::normilizeString(login);
+                    AccountMgr::normalizeString(login);
 
                     ///- Escape the Login to allow quotes in names
                     loginDatabase.escape_string(login);
@@ -189,8 +189,8 @@ void RASocket::OnRead()
                     std::string login = szLogin;
                     std::string pw = &buff[5];
 
-                    AccountMgr::normilizeString(login);
-                    AccountMgr::normilizeString(pw);
+                    AccountMgr::normalizeString(login);
+                    AccountMgr::normalizeString(pw);
                     loginDatabase.escape_string(login);
                     loginDatabase.escape_string(pw);
 

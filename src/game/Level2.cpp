@@ -4043,7 +4043,7 @@ bool ChatHandler::HandleLookupPlayerAccountCommand(const char* args)
     char* limit_str = strtok (NULL, " ");
     int32 limit = limit_str ? atoi (limit_str) : -1;
 
-    if (!AccountMgr::normilizeString (account))
+    if (!AccountMgr::normalizeString (account))
         return false;
 
     loginDatabase.escape_string (account);

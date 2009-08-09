@@ -55,7 +55,7 @@ void utf8print(const char* str)
 /// \todo This function has to be enhanced to respect the login/realm split (delete char, delete account chars in realm, delete account chars in realm then delete account
 bool ChatHandler::HandleAccountDeleteCommand(const char* args)
 {
-    if(!*args)
+    if (!*args)
         return false;
 
     ///- Get the account name from the command line
@@ -64,7 +64,7 @@ bool ChatHandler::HandleAccountDeleteCommand(const char* args)
         return false;
 
     std::string account_name = account_name_str;
-    if(!AccountMgr::normilizeString(account_name))
+    if (!AccountMgr::normalizeString(account_name))
     {
         PSendSysMessage(LANG_ACCOUNT_NOT_EXIST,account_name.c_str());
         SetSentErrorMessage(true);
@@ -72,7 +72,7 @@ bool ChatHandler::HandleAccountDeleteCommand(const char* args)
     }
 
     uint32 account_id = accmgr.GetId(account_name);
-    if(!account_id)
+    if (!account_id)
     {
         PSendSysMessage(LANG_ACCOUNT_NOT_EXIST,account_name.c_str());
         SetSentErrorMessage(true);
@@ -219,7 +219,7 @@ bool ChatHandler::HandleAccountCreateCommand(const char* args)
     if(!szAcc || !szPassword)
         return false;
 
-    // normilized in accmgr.CreateAccount
+    // normalized in accmgr.CreateAccount
     std::string account_name = szAcc;
     std::string password = szPassword;
 
