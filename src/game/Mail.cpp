@@ -574,7 +574,7 @@ void WorldSession::HandleMailTakeMoney(WorldPacket & recv_data )
 //called when player lists his received mails
 void WorldSession::HandleGetMailList(WorldPacket & recv_data )
 {
-    CHECK_PACKET_SIZE(recv_data,8);
+    CHECK_PACKET_SIZE(recv_data, 8);
 
     uint64 mailbox;
     recv_data >> mailbox;
@@ -594,6 +594,7 @@ void WorldSession::HandleGetMailList(WorldPacket & recv_data )
     uint32 mails_count = 0;                                 // real send to client mails amount
 
     WorldPacket data(SMSG_MAIL_LIST_RESULT, (200));         // guess size
+    data << uint32(0);                                      // 3.2.0
     data << uint8(0);                                       // mail's count
     time_t cur_time = time(NULL);
 
