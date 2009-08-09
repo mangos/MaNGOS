@@ -4032,7 +4032,7 @@ void Aura::HandleModMechanicImmunity(bool apply, bool /*Real*/)
 
     if(apply && GetSpellProto()->AttributesEx & SPELL_ATTR_EX_DISPEL_AURAS_ON_IMMUNITY)
     {
-        uint32 mechanic = 1 << m_modifier.m_miscvalue;
+        uint32 mechanic = 1 << misc;
 
         //immune movement impairment and loss of control
         if(GetId()==42292 || GetId()==59752)
