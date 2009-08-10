@@ -6070,8 +6070,11 @@ void Spell::EffectCharge(uint32 /*i*/)
     if (!unitTarget)
         return;
 
+    //TODO: research more ContactPoint/attack distance.
+    //3.666666 instead of ATTACK_DISTANCE(5.0f) in below seem to give more accurate result.
     float x, y, z;
-    unitTarget->GetContactPoint(m_caster, x, y, z);
+    unitTarget->GetContactPoint(m_caster, x, y, z, 3.666666f);
+
     if (unitTarget->GetTypeId() != TYPEID_PLAYER)
         ((Creature *)unitTarget)->StopMoving();
 
@@ -6099,7 +6102,7 @@ void Spell::EffectCharge2(uint32 /*i*/)
             ((Creature *)unitTarget)->StopMoving();
     }
     else if (unitTarget && unitTarget != m_caster)
-        unitTarget->GetContactPoint(m_caster, x, y, z);
+        unitTarget->GetContactPoint(m_caster, x, y, z, 3.666666f);
     else
         return;
 
