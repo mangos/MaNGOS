@@ -72,6 +72,6 @@ enum LoginResult
 
 // At update excepted builds please update if need define DEFAULT_MAX_LEVEL
 // in DBCEnum.h to default max player level expected by build
-// and alos in mangosd.conf.in
+// and also in mangosd.conf.in
 
 #endif
