@@ -891,8 +891,8 @@ enum PlayerDelayedOperations
     DELAYED_SAVE_PLAYER         = 0x01,
     DELAYED_RESURRECT_PLAYER    = 0x02,
     DELAYED_SPELL_CAST_DESERTER = 0x04,
-    DELAYED_BG_MOUNT_RESTORE    = 0x08, ///< Flag to restore mount state after teleport from BG
-    DELAYED_BG_TAXI_RESTORE     = 0x10, ///< Flag to restore taxi state after teleport from BG
+    DELAYED_BG_MOUNT_RESTORE    = 0x08,                     ///< Flag to restore mount state after teleport from BG
+    DELAYED_BG_TAXI_RESTORE     = 0x10,                     ///< Flag to restore taxi state after teleport from BG
     DELAYED_END
 };
 
@@ -937,7 +937,7 @@ class MANGOS_DLL_SPEC PlayerTaxi
             else
                 return false;
         }
-        void AppendTaximaskTo(ByteBuffer& data,bool all);
+        void AppendTaximaskTo(ByteBuffer& data, bool all);
 
         // Destinations
         bool LoadTaxiDestinationsFromString(const std::string& values, uint32 team);
@@ -972,21 +972,21 @@ struct BGData
         bgTeam(0), mountSpell(0) { ClearTaxiPath(); }
 
 
-    uint32 bgInstanceID;                    ///< This variable is set to bg->m_InstanceID,
-                                            ///  when player is teleported to BG - (it is battleground's GUID)
+    uint32 bgInstanceID;                                    ///< This variable is set to bg->m_InstanceID,
+                                                            ///  when player is teleported to BG - (it is battleground's GUID)
     BattleGroundTypeId bgTypeID;
 
     std::set<uint32>   bgAfkReporter;
     uint8              bgAfkReportedCount;
     time_t             bgAfkReportedTimer;
 
-    uint32 bgTeam;                          ///< What side the player will be added to
+    uint32 bgTeam;                                          ///< What side the player will be added to
 
 
     uint32 mountSpell;
     uint32 taxiPath[2];
 
-    WorldLocation joinPos;                  ///< From where player entered BG
+    WorldLocation joinPos;                                  ///< From where player entered BG
 
     void ClearTaxiPath()     { taxiPath[0] = taxiPath[1] = 0; }
     bool HasTaxiPath() const { return taxiPath[0] && taxiPath[1]; }
@@ -1050,8 +1050,8 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         bool ToggleAFK();
         bool ToggleDND();
-        bool isAFK() const { return HasFlag(PLAYER_FLAGS,PLAYER_FLAGS_AFK); };
-        bool isDND() const { return HasFlag(PLAYER_FLAGS,PLAYER_FLAGS_DND); };
+        bool isAFK() const { return HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_AFK); }
+        bool isDND() const { return HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_DND); }
         uint8 chatTag() const;
         std::string afkMsg;
         std::string dndMsg;
@@ -1089,33 +1089,33 @@ class MANGOS_DLL_SPEC Player : public Unit
         time_t m_logintime;
         time_t m_Last_tick;
         uint32 m_Played_time[MAX_PLAYED_TIME_INDEX];
-        uint32 GetTotalPlayedTime() { return m_Played_time[PLAYED_TIME_TOTAL]; };
-        uint32 GetLevelPlayedTime() { return m_Played_time[PLAYED_TIME_LEVEL]; };
+        uint32 GetTotalPlayedTime() { return m_Played_time[PLAYED_TIME_TOTAL]; }
+        uint32 GetLevelPlayedTime() { return m_Played_time[PLAYED_TIME_LEVEL]; }
 
         void setDeathState(DeathState s);                   // overwrite Unit::setDeathState
 
-        void InnEnter (int time,uint32 mapid, float x,float y,float z)
+        void InnEnter (int time, uint32 mapid, float x, float y, float z)
         {
             inn_pos_mapid = mapid;
             inn_pos_x = x;
             inn_pos_y = y;
             inn_pos_z = z;
             time_inn_enter = time;
-        };
+        }
 
-        float GetRestBonus() const { return m_rest_bonus; };
+        float GetRestBonus() const { return m_rest_bonus; }
         void SetRestBonus(float rest_bonus_new);
 
-        RestType GetRestType() const { return rest_type; };
-        void SetRestType(RestType n_r_type) { rest_type = n_r_type; };
+        RestType GetRestType() const { return rest_type; }
+        void SetRestType(RestType n_r_type) { rest_type = n_r_type; }
 
-        uint32 GetInnPosMapId() const { return inn_pos_mapid; };
-        float GetInnPosX() const { return inn_pos_x; };
-        float GetInnPosY() const { return inn_pos_y; };
-        float GetInnPosZ() const { return inn_pos_z; };
+        uint32 GetInnPosMapId() const { return inn_pos_mapid; }
+        float GetInnPosX() const { return inn_pos_x; }
+        float GetInnPosY() const { return inn_pos_y; }
+        float GetInnPosZ() const { return inn_pos_z; }
 
-        int GetTimeInnEnter() const { return time_inn_enter; };
-        void UpdateInnerTime (int time) { time_inn_enter = time; };
+        int GetTimeInnEnter() const { return time_inn_enter; }
+        void UpdateInnerTime (int time) { time_inn_enter = time; }
 
         void RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent = false);
         void RemoveMiniPet();
@@ -1145,14 +1145,14 @@ class MANGOS_DLL_SPEC Player : public Unit
         Item* GetShield(bool useable = false) const;
         static uint32 GetAttackBySlot( uint8 slot );        // MAX_ATTACK if not weapon slot
         std::vector<Item *> &GetItemUpdateQueue() { return m_itemUpdateQueue; }
-        static bool IsInventoryPos( uint16 pos ) { return IsInventoryPos(pos >> 8,pos & 255); }
+        static bool IsInventoryPos( uint16 pos ) { return IsInventoryPos(pos >> 8, pos & 255); }
         static bool IsInventoryPos( uint8 bag, uint8 slot );
-        static bool IsEquipmentPos( uint16 pos ) { return IsEquipmentPos(pos >> 8,pos & 255); }
+        static bool IsEquipmentPos( uint16 pos ) { return IsEquipmentPos(pos >> 8, pos & 255); }
         static bool IsEquipmentPos( uint8 bag, uint8 slot );
         static bool IsBagPos( uint16 pos );
-        static bool IsBankPos( uint16 pos ) { return IsBankPos(pos >> 8,pos & 255); }
+        static bool IsBankPos( uint16 pos ) { return IsBankPos(pos >> 8, pos & 255); }
         static bool IsBankPos( uint8 bag, uint8 slot );
-        bool IsValidPos( uint16 pos ) { return IsBankPos(pos >> 8,pos & 255); }
+        bool IsValidPos( uint16 pos ) { return IsBankPos(pos >> 8, pos & 255); }
         bool IsValidPos( uint8 bag, uint8 slot );
         uint8 GetBankBagSlotCount() const { return GetByteValue(PLAYER_BYTES_2, 2); }
         void SetBankBagSlotCount(uint8 count) { SetByteValue(PLAYER_BYTES_2, 2, count); }
@@ -1161,8 +1161,8 @@ class MANGOS_DLL_SPEC Player : public Unit
         bool CanNoReagentCast(SpellEntry const* spellInfo) const;
         bool HasItemOrGemWithIdEquipped( uint32 item, uint32 count, uint8 except_slot = NULL_SLOT) const;
         bool HasItemOrGemWithLimitCategoryEquipped( uint32 limitCategory, uint32 count, uint8 except_slot = NULL_SLOT) const;
-        uint8 CanTakeMoreSimilarItems(Item* pItem) const { return _CanTakeMoreSimilarItems(pItem->GetEntry(),pItem->GetCount(),pItem); }
-        uint8 CanTakeMoreSimilarItems(uint32 entry, uint32 count) const { return _CanTakeMoreSimilarItems(entry,count,NULL); }
+        uint8 CanTakeMoreSimilarItems(Item* pItem) const { return _CanTakeMoreSimilarItems(pItem->GetEntry(), pItem->GetCount(), pItem); }
+        uint8 CanTakeMoreSimilarItems(uint32 entry, uint32 count) const { return _CanTakeMoreSimilarItems(entry, count, NULL); }
         uint8 CanStoreNewItem( uint8 bag, uint8 slot, ItemPosCountVec& dest, uint32 item, uint32 count, uint32* no_space_count = NULL ) const
         {
             return _CanStoreItem(bag, slot, dest, item, count, NULL, false, no_space_count );
@@ -1371,12 +1371,12 @@ class MANGOS_DLL_SPEC Player : public Unit
         void SendQuestUpdateAddItem( Quest const* pQuest, uint32 item_idx, uint32 count );
         void SendQuestUpdateAddCreatureOrGo( Quest const* pQuest, uint64 guid, uint32 creatureOrGO_idx, uint32 old_count, uint32 add_count );
 
-        uint64 GetDivider() { return m_divider; };
-        void SetDivider( uint64 guid ) { m_divider = guid; };
+        uint64 GetDivider() { return m_divider; }
+        void SetDivider( uint64 guid ) { m_divider = guid; }
 
-        uint32 GetInGameTime() { return m_ingametime; };
+        uint32 GetInGameTime() { return m_ingametime; }
 
-        void SetInGameTime( uint32 time ) { m_ingametime = time; };
+        void SetInGameTime( uint32 time ) { m_ingametime = time; }
 
         void AddTimedQuest( uint32 quest_id ) { m_timedquests.insert(quest_id); }
 
@@ -1462,15 +1462,14 @@ class MANGOS_DLL_SPEC Player : public Unit
         void AddNewMailDeliverTime(time_t deliver_time);
         bool IsMailsLoaded() const { return m_mailsLoaded; }
 
-        //void SetMail(Mail *m);
         void RemoveMail(uint32 id);
 
         void AddMail(Mail* mail) { m_mail.push_front(mail);}// for call from WorldSession::SendMailTo
-        uint32 GetMailSize() { return m_mail.size();};
+        uint32 GetMailSize() { return m_mail.size(); }
         Mail* GetMail(uint32 id);
 
-        PlayerMails::iterator GetmailBegin() { return m_mail.begin();};
-        PlayerMails::iterator GetmailEnd() { return m_mail.end();};
+        PlayerMails::iterator GetMailBegin() { return m_mail.begin();}
+        PlayerMails::iterator GetMailEnd() { return m_mail.end();}
 
         /*********************************************************/
         /*** MAILED ITEMS SYSTEM ***/
@@ -1481,7 +1480,7 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         typedef UNORDERED_MAP<uint32, Item*> ItemMap;
 
-        ItemMap mMitems;                                    //template defined in objectmgr.cpp
+        ItemMap mMitems;                                    // template defined in objectmgr.cpp
 
         Item* GetMItem(uint32 id)
         {
@@ -1600,7 +1599,7 @@ class MANGOS_DLL_SPEC Player : public Unit
             m_resurrectZ = Z;
             m_resurrectHealth = health;
             m_resurrectMana = mana;
-        };
+        }
         void clearResurrectRequestData() { setResurrectRequestData(0,0,0.0f,0.0f,0.0f,0,0); }
         bool isRessurectRequestedBy(uint64 guid) const { return m_resurrectGUID == guid; }
         bool isRessurectRequested() const { return m_resurrectGUID != 0; }
@@ -1892,7 +1891,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void SetCanBlock(bool value);
         bool CanDualWield() const { return m_canDualWield; }
         void SetCanDualWield(bool value) { m_canDualWield = value; }
-        bool CanTitanGrip() const { return m_canTitanGrip ; }
+        bool CanTitanGrip() const { return m_canTitanGrip; }
         void SetCanTitanGrip(bool value) { m_canTitanGrip = value; }
         bool CanTameExoticPets() const { return isGameMaster() || HasAuraType(SPELL_AURA_ALLOW_TAME_PET_TYPE); }
 
@@ -2058,8 +2057,8 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         bool isRested() const { return GetRestTime() >= 10*IN_MILISECONDS; }
         uint32 GetXPRestBonus(uint32 xp);
-        uint32 GetRestTime() const { return m_restTime;};
-        void SetRestTime(uint32 v) { m_restTime = v;};
+        uint32 GetRestTime() const { return m_restTime; }
+        void SetRestTime(uint32 v) { m_restTime = v; }
 
         /*********************************************************/
         /***              ENVIROMENTAL SYSTEM                  ***/
