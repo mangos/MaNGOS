@@ -257,6 +257,14 @@ inline bool IsPointEffectTarget( Targets target )
         case TARGET_CURRENT_ENEMY_COORDINATES:
         case TARGET_DUELVSPLAYER_COORDINATES:
         case TARGET_DYNAMIC_OBJECT_COORDINATES:
+        case TARGET_POINT_AT_NORTH:
+        case TARGET_POINT_AT_SOUTH:
+        case TARGET_POINT_AT_EAST:
+        case TARGET_POINT_AT_WEST:
+        case TARGET_POINT_AT_NE:
+        case TARGET_POINT_AT_NW:
+        case TARGET_POINT_AT_SE:
+        case TARGET_POINT_AT_SW:
             return true;
         default:
             break;

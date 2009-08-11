@@ -1045,6 +1045,14 @@ enum Targets
     TARGET_BEHIND_VICTIM               = 65,                // uses in teleport behind spells, caster/target dependent from spell effect
     TARGET_DYNAMIC_OBJECT_COORDINATES  = 76,
     TARGET_SINGLE_ENEMY                = 77,
+    TARGET_POINT_AT_NORTH              = 78,                // 78-85 possible _COORDINATES at radius with pi/4 step around target in unknown order, N?
+    TARGET_POINT_AT_SOUTH              = 79,                // S?
+    TARGET_POINT_AT_EAST               = 80,                // 80/81 must be symmetric from line caster->target, E (base at 82/83, 84/85 order) ?
+    TARGET_POINT_AT_WEST               = 81,                // 80/81 must be symmetric from line caster->target, W (base at 82/83, 84/85 order) ?
+    TARGET_POINT_AT_NE                 = 82,                // from spell desc: "(NE)"
+    TARGET_POINT_AT_NW                 = 83,                // from spell desc: "(NW)"
+    TARGET_POINT_AT_SE                 = 84,                // from spell desc: "(SE)"
+    TARGET_POINT_AT_SW                 = 85,                // from spell desc: "(SW)"
     TARGET_SELF2                       = 87,
     TARGET_DIRECTLY_FORWARD            = 89,
     TARGET_NONCOMBAT_PET               = 90,
