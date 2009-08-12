@@ -2407,15 +2407,7 @@ void Spell::EffectApplyAura(uint32 i)
         Aur->SetAuraDuration(duration);
     }
 
-    bool added = unitTarget->AddAura(Aur);
-
-    // Aura not added and deleted in AddAura call;
-    if (!added)
-        return;
-
-    // Prayer of Mending (jump animation), we need formal caster instead original for correct animation
-    if( m_spellInfo->SpellFamilyName == SPELLFAMILY_PRIEST && (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0000002000000000)))
-        m_caster->CastSpell(unitTarget, 41637, true, NULL, Aur, m_originalCasterGUID);
+    unitTarget->AddAura(Aur);
 }
 
 void Spell::EffectUnlearnSpecialization( uint32 i )
