@@ -23,7 +23,7 @@ DROP TABLE IF EXISTS `db_version`;
 CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
-  `required_8342_01_mangos_spell_proc_event` bit(1) default NULL
+  `required_8361_01_mangos_spell_bonus_data` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -13591,6 +13591,7 @@ CREATE TABLE `spell_bonus_data` (
 LOCK TABLES `spell_bonus_data` WRITE;
 /*!40000 ALTER TABLE `spell_bonus_data` DISABLE KEYS */;
 INSERT INTO `spell_bonus_data` VALUES
+/* Death Knight */
 ('48721', '0', '0', '0.04', 'Death Knight - Blood Boil'),
 ('55078', '0', '0', '0.055', 'Death Knight - Blood Plague Dummy Proc'),
 ('50444', '0', '0', '0.105', 'Death Knight - Corpse Explosion Triggered'),
@@ -13605,6 +13606,7 @@ INSERT INTO `spell_bonus_data` VALUES
 ('50536', '0', '0', '0.013', 'Death Knight - Unholy Blight Triggered'),
 ('50401', '0', '0', '0', 'Death Knight - Razor Frost'),
 ('56903', '0', '0', '0', 'Death Knight - Lichflame'),
+/* Druid */
 ('5185', '1.6104', '0', '0', 'Druid - Healing Touch'),
 ('33763', '0', '0.09518', '0', 'Druid - Lifebloom'),
 ('774', '0', '0.37604', '0', 'Druid - Rejuvenation'),
@@ -13621,6 +13623,7 @@ INSERT INTO `spell_bonus_data` VALUES
 ('8921', '0.1515', '0.13', '0', 'Druid - Moonfire'),
 ('2912', '1', '0', '0', 'Druid - Starfire'),
 ('5176', '0.5714', '0', '0', 'Druid - Wrath'),
+/* Mage */
 ('30451', '0.7143', '0', '0', 'Mage - Arcane Blast'),
 ('1449', '0.2128', '0', '0', 'Mage - Arcane Explosion'),
 ('7268', '0.2857', '0', '0', 'Mage - Arcane Missiles Triggered Spell'),
@@ -13642,6 +13645,7 @@ INSERT INTO `spell_bonus_data` VALUES
 ('11426', '0.8053', '0', '0', 'Mage - Ice Barrier'),
 ('30455', '0.1429', '0', '0', 'Mage - Ice Lance'),
 ('34913','0', '0', '0', 'Mage - Molten Armor Triggered'),
+/* Paladin */
 ('19750','0.4286', '0', '0', 'Paladin - Flash of Light'),
 ('635', '0.7143', '0', '0', 'Paladin - Holy Light'),
 ('25912', '0.4286', '0', '0', 'Paladin - Holy Shock Triggered Hurt'),
@@ -13662,7 +13666,7 @@ INSERT INTO `spell_bonus_data` VALUES
 ('25742', '0.07', '0', '0.039', 'Paladin - Seal of Righteousness Dummy Proc'),
 ('53595', '0', '0', '0','Paladin - Hammer of the Righteous'),
 ('31803', '0', '0.013', '0.15', 'Paladin - Holy Vengeance'),
-('52042', '0.045', '0', '0', 'Shaman - Healing Stream Totem Triggered Heal'),
+/* Priest */
 ('32546', '0.8068', '0', '0', 'Priest - Binding Heal'),
 ('34861', '0.402', '0', '0', 'Priest - Circle of Healing'),
 ('19236', '0.8068', '0', '0', 'Priest - Desperate Prayer'),
@@ -13685,9 +13689,11 @@ INSERT INTO `spell_bonus_data` VALUES
 ('589', '0', '0.1829', '0', 'Priest - Shadow Word: Pain'),
 ('585', '0.714', '0', '0', 'Priest - Smite'),
 ('34914', '0', '0.4', '0', 'Priest - Vampiric Touch'),
+/* Shaman */
 ('974', '0.4762', '0', '0', 'Shaman - Earth Shield'),
 ('1064', '1.34', '0', '0', 'Shaman - Chain Heal'),
 ('331', '1.6106', '0', '0', 'Shaman - Healing Wave'),
+('52042', '0.045', '0', '0', 'Shaman - Healing Stream Totem Triggered Heal'),
 ('8004', '0.8082', '0', '0', 'Shaman - Lesser Healing Wave'),
 ('61295', '0.4', '0.18', '0', 'Shaman - Riptide'),
 ('421', '0.57', '0', '0', 'Shaman - Chain Lightning'),
@@ -13702,6 +13708,7 @@ INSERT INTO `spell_bonus_data` VALUES
 ('26364', '0.33', '0', '0', 'Shaman - Lightning Shield Proc'),
 ('8188', '0.1', '0', '0', 'Shaman - Magma Totam Passive'),
 ('3606', '0.1667', '0', '0', 'Shaman - Searing Totem Attack'),
+/* Warlock */
 ('980', '0', '0.1', '0', 'Warlock - Curse of Agony'),
 ('603', '0', '2', '0', 'Warlock - Curse of Doom'),
 ('172', '0', '0.3', '0', 'Warlock - Corruption'),
@@ -13728,7 +13735,9 @@ INSERT INTO `spell_bonus_data` VALUES
 ('42223', '0.952', '0', '0', 'Warlock - Rain of Fire Triggered'),
 ('18220', '0.96', '0', '0', 'Warlock - Dark Pact'),
 ('6229', '0.3', '0', '0', 'Warlock - Shadow Ward'),
-('63106', '0', '0', '0', 'Warlock - Siphon Life Triggered');
+('63106', '0', '0', '0', 'Warlock - Siphon Life Triggered'),
+/* Item */
+(40293, 0, 0, 0, 'Item - Siphon Essence');
 /*!40000 ALTER TABLE `spell_bonus_data` ENABLE KEYS */;
 UNLOCK TABLES;
 
