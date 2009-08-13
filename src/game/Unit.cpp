@@ -5568,6 +5568,10 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                 case 31876:
                 case 31877:
                 case 31878:
+                    // triggered only at casted Judgement spells, not at additional Judgement effects
+                    if(!procSpell || procSpell->Category != 1210)
+                        return;
+
                     target = this;
                     triggered_spell_id = 31930;
 
