@@ -2451,6 +2451,32 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                 ((Player*)m_target)->UpdateAttackPowerAndDamage();
                 return;
             }
+
+            // Improved Moonkin Form
+            if(GetSpellProto()->SpellIconID == 2855)
+            {
+                uint32 spell_id;
+                switch(GetId())
+                {
+                    case 48384: spell_id = 50170;           //Rank 1
+                    case 48395: spell_id = 50171;           //Rank 2
+                    case 48396: spell_id = 50172;           //Rank 3
+                    default:
+                        sLog.outError("HandleAuraDummy: Not handled rank of IMF (Spell: %u)",GetId());
+                        return;
+                }
+
+                if(apply)
+                {
+                    if(m_target->m_form != FORM_MOONKIN)
+                        return;
+
+                    m_target->CastSpell(m_target, spell_id, true);
+                }
+                else
+                    m_target-> RemoveAurasDueToSpell(spell_id);
+                return;
+            }
             break;
         }
         case SPELLFAMILY_HUNTER:
@@ -5486,8 +5512,35 @@ void Aura::HandleShapeshiftBoosts(bool apply)
             }
 
             // Savage Roar
-            if (((Player*)m_target)->HasAura(52610) && form == FORM_CAT)
-                m_target->CastSpell(m_target, 62071, true);            
+            if (form == FORM_CAT && ((Player*)m_target)->HasAura(52610))
+                m_target->CastSpell(m_target, 62071, true);
+
+            // Improved Moonkin Form
+            if (form == FORM_MOONKIN)
+            {
+                Unit::AuraList const& dummyAuras = m_target->GetAurasByType(SPELL_AURA_DUMMY);
+                for(Unit::AuraList::const_iterator i = dummyAuras.begin(); i != dummyAuras.end(); i++)
+                {
+                    if ((*i)->GetSpellProto()->SpellFamilyName==SPELLFAMILY_DRUID &&
+                        (*i)->GetSpellProto()->SpellIconID == 2855)
+                    {
+                        uint32 spell_id = 0;
+                        switch((*i)->GetId())
+                        {
+                            case 48384:spell_id=50170;break;//Rank 1
+                            case 48395:spell_id=50171;break;//Rank 2
+                            case 48396:spell_id=50172;break;//Rank 3
+                            default:
+                                sLog.outError("Aura::HandleShapeshiftBoosts: Not handled rank of IMF (Spell: %u)",(*i)->GetId());
+                                break;
+                        }
+
+                        if(spell_id)
+                            m_target->CastSpell(m_target, spell_id, true, NULL, this);
+                        break;
+                    }
+                }
+            }
 
             // Heart of the Wild
             if (HotWSpellId)
