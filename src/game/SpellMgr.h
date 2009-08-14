@@ -240,9 +240,18 @@ inline bool IsCasterSourceTarget(uint32 target)
 inline bool IsSpellWithCasterSourceTargetsOnly(SpellEntry const* spellInfo)
 {
     for(int i = 0; i < 3; ++i)
-        if(uint32 target = spellInfo->EffectImplicitTargetA[i])
-            if(!IsCasterSourceTarget(target))
-                return false;
+    {
+        uint32 targetA = spellInfo->EffectImplicitTargetA[i];
+        if(targetA && !IsCasterSourceTarget(targetA))
+            return false;
+
+        uint32 targetB = spellInfo->EffectImplicitTargetB[i];
+        if(targetB && !IsCasterSourceTarget(targetB))
+            return false;
+
+        if(!targetA && !targetB)
+            return false;
+    }
     return true;
 }
 
