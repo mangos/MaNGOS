@@ -569,6 +569,10 @@ LogColors = ""
 #        Default: 0 - recheck offhand slot weapon only at zone update
 #                 1 - recheck offhand slot weapon at talent reset also
 #
+#    ClientCacheVersion
+#        Client cache version for client cache data reset. Use any different from DB value and not recently used for triggering reset.
+#        Default: 0 (use DB value from world DB db_version.cache_id field)
+#
 #    Event.Announce
 #        Default: 0 (false)
 #                 1 (true)
@@ -627,6 +631,7 @@ MailDeliveryDelay = 3600
 SkillChance.Prospecting = 0
 SkillChance.Milling = 0
 OffhandCheckAtTalentsReset = 0
+ClientCacheVersion = 0
 Event.Announce = 0
 BeepAtStart = 1
 Motd = "Welcome to the Massive Network Game Object Server."

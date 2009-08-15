@@ -1957,9 +1957,17 @@ void Spell::EffectForceCast(uint32 i)
     unitTarget->CastSpell(unitTarget, spellInfo, true, NULL, NULL, m_originalCasterGUID);
 }
 
-void Spell::EffectTriggerSpell(uint32 i)
+void Spell::EffectTriggerSpell(uint32 effIndex)
 {
-    uint32 triggered_spell_id = m_spellInfo->EffectTriggerSpell[i];
+    // only unit case known
+    if (!unitTarget)
+    {
+        if(gameObjTarget || itemTarget)
+            sLog.outError("Spell::EffectTriggerSpell (Spell: %u): Unsupported non-unit case!",m_spellInfo->Id);
+        return;
+    }
+
+    uint32 triggered_spell_id = m_spellInfo->EffectTriggerSpell[effIndex];
 
     // special cases
     switch(triggered_spell_id)
@@ -1967,21 +1975,21 @@ void Spell::EffectTriggerSpell(uint32 i)
         // Vanish (not exist)
         case 18461:
         {
-            m_caster->RemoveSpellsCausingAura(SPELL_AURA_MOD_ROOT);
-            m_caster->RemoveSpellsCausingAura(SPELL_AURA_MOD_DECREASE_SPEED);
-            m_caster->RemoveSpellsCausingAura(SPELL_AURA_MOD_STALKED);
+            unitTarget->RemoveSpellsCausingAura(SPELL_AURA_MOD_ROOT);
+            unitTarget->RemoveSpellsCausingAura(SPELL_AURA_MOD_DECREASE_SPEED);
+            unitTarget->RemoveSpellsCausingAura(SPELL_AURA_MOD_STALKED);
 
             // if this spell is given to NPC it must handle rest by it's own AI
-            if ( m_caster->GetTypeId() != TYPEID_PLAYER )
+            if (unitTarget->GetTypeId() != TYPEID_PLAYER)
                 return;
 
             // get highest rank of the Stealth spell
             uint32 spellId = 0;
-            const PlayerSpellMap& sp_list = ((Player*)m_caster)->GetSpellMap();
+            const PlayerSpellMap& sp_list = ((Player*)unitTarget)->GetSpellMap();
             for (PlayerSpellMap::const_iterator itr = sp_list.begin(); itr != sp_list.end(); ++itr)
             {
                 // only highest rank is shown in spell book, so simply check if shown in spell book
-                if(!itr->second->active || itr->second->disabled || itr->second->state == PLAYERSPELL_REMOVED)
+                if (!itr->second->active || itr->second->disabled || itr->second->state == PLAYERSPELL_REMOVED)
                     continue;
 
                 SpellEntry const *spellInfo = sSpellStore.LookupEntry(itr->first);
@@ -2000,10 +2008,10 @@ void Spell::EffectTriggerSpell(uint32 i)
                 return;
 
             // reset cooldown on it if needed
-            if(((Player*)m_caster)->HasSpellCooldown(spellId))
-                ((Player*)m_caster)->RemoveSpellCooldown(spellId);
+            if (((Player*)unitTarget)->HasSpellCooldown(spellId))
+                ((Player*)unitTarget)->RemoveSpellCooldown(spellId);
 
-            m_caster->CastSpell(m_caster, spellId, true);
+            m_caster->CastSpell(unitTarget, spellId, true);
             return;
         }
         // just skip
@@ -2043,7 +2051,7 @@ void Spell::EffectTriggerSpell(uint32 i)
         // Cloak of Shadows
         case 35729:
         {
-            Unit::AuraMap& Auras = m_caster->GetAuras();
+            Unit::AuraMap& Auras = unitTarget->GetAuras();
             for(Unit::AuraMap::iterator iter = Auras.begin(); iter != Auras.end(); ++iter)
             {
                 // remove all harmful spells on you...
@@ -2061,7 +2069,7 @@ void Spell::EffectTriggerSpell(uint32 i)
         // Priest Shadowfiend (34433) need apply mana gain trigger aura on pet
         case 41967:
         {
-            if (Unit *pet = m_caster->GetPet())
+            if (Unit *pet = unitTarget->GetPet())
                 pet->CastSpell(pet, 28305, true);
             return;
         }
@@ -2069,63 +2077,54 @@ void Spell::EffectTriggerSpell(uint32 i)
 
     // normal case
     SpellEntry const *spellInfo = sSpellStore.LookupEntry( triggered_spell_id );
-
-    if(!spellInfo)
+    if (!spellInfo)
     {
         sLog.outError("EffectTriggerSpell of spell %u: triggering unknown spell id %i", m_spellInfo->Id,triggered_spell_id);
         return;
     }
 
+    // select formal caster for triggered spell
+    Unit* caster = m_caster;
+
     // some triggered spells require specific equipment
-    if(spellInfo->EquippedItemClass >=0 && m_caster->GetTypeId()==TYPEID_PLAYER)
+    if (spellInfo->EquippedItemClass >=0 && m_caster->GetTypeId()==TYPEID_PLAYER)
     {
         // main hand weapon required
-        if(spellInfo->AttributesEx3 & SPELL_ATTR_EX3_MAIN_HAND)
+        if (spellInfo->AttributesEx3 & SPELL_ATTR_EX3_MAIN_HAND)
         {
             Item* item = ((Player*)m_caster)->GetWeaponForAttack(BASE_ATTACK);
 
             // skip spell if no weapon in slot or broken
-            if(!item || item->IsBroken() )
+            if (!item || item->IsBroken() )
                 return;
 
             // skip spell if weapon not fit to triggered spell
-            if(!item->IsFitToSpellRequirements(spellInfo))
+            if (!item->IsFitToSpellRequirements(spellInfo))
                 return;
         }
 
         // offhand hand weapon required
-        if(spellInfo->AttributesEx3 & SPELL_ATTR_EX3_REQ_OFFHAND)
+        if (spellInfo->AttributesEx3 & SPELL_ATTR_EX3_REQ_OFFHAND)
         {
             Item* item = ((Player*)m_caster)->GetWeaponForAttack(OFF_ATTACK);
 
             // skip spell if no weapon in slot or broken
-            if(!item || item->IsBroken() )
+            if (!item || item->IsBroken() )
                 return;
 
             // skip spell if weapon not fit to triggered spell
-            if(!item->IsFitToSpellRequirements(spellInfo))
+            if (!item->IsFitToSpellRequirements(spellInfo))
                 return;
         }
     }
-
-    // some triggered spells must be casted instantly (for example, if next effect case instant kill caster)
-    bool instant = false;
-    for(uint32 j = i+1; j < 3; ++j)
-    {
-        if(m_spellInfo->Effect[j]==SPELL_EFFECT_INSTAKILL && m_spellInfo->EffectImplicitTargetA[j]==TARGET_SELF)
-        {
-            instant = true;
-            break;
-        }
-    }
-
-    if(instant)
-    {
-        if (unitTarget)
-            m_caster->CastSpell(unitTarget,spellInfo,true,m_CastItem,NULL,m_originalCasterGUID);
-    }
     else
-        AddTriggeredSpell(spellInfo);
+    {
+        // Note: not exist spells with weapon req. and IsSpellHaveCasterSourceTargets == true
+        // so this just for speedup places in else
+        caster = IsSpellWithCasterSourceTargetsOnly(spellInfo) ? unitTarget : m_caster;
+    }
+
+    caster->CastSpell(unitTarget,spellInfo,true,NULL,NULL,m_originalCasterGUID);
 }
 
 void Spell::EffectTriggerMissileSpell(uint32 effect_idx)
@@ -2403,15 +2402,7 @@ void Spell::EffectApplyAura(uint32 i)
         Aur->SetAuraDuration(duration);
     }
 
-    bool added = unitTarget->AddAura(Aur);
-
-    // Aura not added and deleted in AddAura call;
-    if (!added)
-        return;
-
-    // Prayer of Mending (jump animation), we need formal caster instead original for correct animation
-    if( m_spellInfo->SpellFamilyName == SPELLFAMILY_PRIEST && (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0000002000000000)))
-        m_caster->CastSpell(unitTarget, 41637, true, NULL, Aur, m_originalCasterGUID);
+    unitTarget->AddAura(Aur);
 }
 
 void Spell::EffectUnlearnSpecialization( uint32 i )
@@ -2686,6 +2677,26 @@ void Spell::DoCreateItem(uint32 i, uint32 itemtype)
         return;
     }
 
+    // bg reward have some special in code work
+    uint32 bgType = 0;
+    switch(m_spellInfo->Id)
+    {
+        case SPELL_AV_MARK_WINNER:
+        case SPELL_AV_MARK_LOSER:
+            bgType = BATTLEGROUND_AV;
+            break;
+        case SPELL_WS_MARK_WINNER:
+        case SPELL_WS_MARK_LOSER:
+            bgType = BATTLEGROUND_WS;
+            break;
+        case SPELL_AB_MARK_WINNER:
+        case SPELL_AB_MARK_LOSER:
+            bgType = BATTLEGROUND_AB;
+            break;
+        default:
+            break;
+    }
+
     uint32 num_to_add;
 
     // TODO: maybe all this can be replaced by using correct calculated `damage` value
@@ -2766,35 +2777,17 @@ void Spell::DoCreateItem(uint32 i, uint32 itemtype)
 
         // send info to the client
         if(pItem)
-            player->SendNewItem(pItem, num_to_add, true, true);
+            player->SendNewItem(pItem, num_to_add, true, bgType == 0);
 
         // we succeeded in creating at least one item, so a levelup is possible
-        player->UpdateCraftSkill(m_spellInfo->Id);
+        if(bgType == 0)
+            player->UpdateCraftSkill(m_spellInfo->Id);
     }
 
     // for battleground marks send by mail if not add all expected
-    if(no_space > 0 )
+    if(no_space > 0 && bgType)
     {
-        BattleGroundTypeId bgType;
-        switch(m_spellInfo->Id)
-        {
-            case SPELL_AV_MARK_WINNER:
-            case SPELL_AV_MARK_LOSER:
-                bgType = BATTLEGROUND_AV;
-                break;
-            case SPELL_WS_MARK_WINNER:
-            case SPELL_WS_MARK_LOSER:
-                bgType = BATTLEGROUND_WS;
-                break;
-            case SPELL_AB_MARK_WINNER:
-            case SPELL_AB_MARK_LOSER:
-                bgType = BATTLEGROUND_AB;
-                break;
-            default:
-                return;
-        }
-
-        if(BattleGround* bg = sBattleGroundMgr.GetBattleGroundTemplate(bgType))
+        if(BattleGround* bg = sBattleGroundMgr.GetBattleGroundTemplate(BattleGroundTypeId(bgType)))
             bg->SendRewardMarkByMail(player, newitemid, no_space);
     }
 }
@@ -4485,6 +4478,13 @@ void Spell::EffectWeaponDmg(uint32 i)
                 if(found)
                     totalDamagePercentMod *= 1.2f;          // 120% if poisoned
             }
+            // Fan of Knives
+            else if (m_caster->GetTypeId()==TYPEID_PLAYER && (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0004000000000000)))
+            {
+                Item* weapon = ((Player*)m_caster)->GetWeaponForAttack(m_attackType,true);
+                if (weapon && weapon->GetProto()->SubClass == ITEM_SUBCLASS_WEAPON_DAGGER)
+                    totalDamagePercentMod *= 1.5f;          // 150% to daggers
+            }
             break;
         }
         case SPELLFAMILY_PALADIN:
@@ -5054,6 +5054,11 @@ void Spell::EffectScriptEffect(uint32 effIndex)
                     }
                     return;
                 }
+                case 55693:                                 // Remove Collapsing Cave Aura
+                    if(unitTarget)
+                        return;
+                    unitTarget->RemoveAurasDueToSpell(m_spellInfo->CalculateSimpleValue(effIndex));
+                    break;
                 case 58418:                                 // Portal to Orgrimmar
                 case 58420:                                 // Portal to Stormwind
                 {
@@ -6061,8 +6066,11 @@ void Spell::EffectCharge(uint32 /*i*/)
     if (!unitTarget)
         return;
 
+    //TODO: research more ContactPoint/attack distance.
+    //3.666666 instead of ATTACK_DISTANCE(5.0f) in below seem to give more accurate result.
     float x, y, z;
-    unitTarget->GetContactPoint(m_caster, x, y, z);
+    unitTarget->GetContactPoint(m_caster, x, y, z, 3.666666f);
+
     if (unitTarget->GetTypeId() != TYPEID_PLAYER)
         ((Creature *)unitTarget)->StopMoving();
 
@@ -6090,7 +6098,7 @@ void Spell::EffectCharge2(uint32 /*i*/)
             ((Creature *)unitTarget)->StopMoving();
     }
     else if (unitTarget && unitTarget != m_caster)
-        unitTarget->GetContactPoint(m_caster, x, y, z);
+        unitTarget->GetContactPoint(m_caster, x, y, z, 3.666666f);
     else
         return;
 

@@ -1045,6 +1045,14 @@ enum Targets
     TARGET_BEHIND_VICTIM               = 65,                // uses in teleport behind spells, caster/target dependent from spell effect
     TARGET_DYNAMIC_OBJECT_COORDINATES  = 76,
     TARGET_SINGLE_ENEMY                = 77,
+    TARGET_POINT_AT_NORTH              = 78,                // 78-85 possible _COORDINATES at radius with pi/4 step around target in unknown order, N?
+    TARGET_POINT_AT_SOUTH              = 79,                // S?
+    TARGET_POINT_AT_EAST               = 80,                // 80/81 must be symmetric from line caster->target, E (base at 82/83, 84/85 order) ?
+    TARGET_POINT_AT_WEST               = 81,                // 80/81 must be symmetric from line caster->target, W (base at 82/83, 84/85 order) ?
+    TARGET_POINT_AT_NE                 = 82,                // from spell desc: "(NE)"
+    TARGET_POINT_AT_NW                 = 83,                // from spell desc: "(NW)"
+    TARGET_POINT_AT_SE                 = 84,                // from spell desc: "(SE)"
+    TARGET_POINT_AT_SW                 = 85,                // from spell desc: "(SW)"
     TARGET_SELF2                       = 87,
     TARGET_DIRECTLY_FORWARD            = 89,
     TARGET_NONCOMBAT_PET               = 90,
@@ -1833,11 +1841,26 @@ enum CreatureFamily
 
 enum CreatureTypeFlags
 {
-    CREATURE_TYPEFLAGS_TAMEABLE        = 0x00001,
-    CREATURE_TYPEFLAGS_HERBLOOT        = 0x00100,
-    CREATURE_TYPEFLAGS_MININGLOOT      = 0x00200,
-    CREATURE_TYPEFLAGS_ENGINEERLOOT    = 0x08000,
-    CREATURE_TYPEFLAGS_EXOTIC          = 0x10000
+    CREATURE_TYPEFLAGS_TAMEABLE        = 0x00001,           //tameable by any hunter
+    CREATURE_TYPEFLAGS_UNK2            = 0x00002,           //? Related to spirits/ghosts in any form? Allow gossip interaction if player is also ghost? Visibility?
+    CREATURE_TYPEFLAGS_UNK3            = 0x00004,
+    CREATURE_TYPEFLAGS_UNK4            = 0x00008,
+    CREATURE_TYPEFLAGS_UNK5            = 0x00010,
+    CREATURE_TYPEFLAGS_UNK6            = 0x00020,
+    CREATURE_TYPEFLAGS_UNK7            = 0x00040,
+    CREATURE_TYPEFLAGS_UNK8            = 0x00080,
+    CREATURE_TYPEFLAGS_HERBLOOT        = 0x00100,           //can be looted by herbalist
+    CREATURE_TYPEFLAGS_MININGLOOT      = 0x00200,           //can be looted by miner
+    CREATURE_TYPEFLAGS_UNK11           = 0x00400,
+    CREATURE_TYPEFLAGS_UNK12           = 0x00800,           //? Related to mounts in some way. If mounted, fight mounted, mount appear as independant when rider dies?
+    CREATURE_TYPEFLAGS_UNK13           = 0x01000,           //? Can aid any player in combat if in range?
+    CREATURE_TYPEFLAGS_UNK14           = 0x02000,
+    CREATURE_TYPEFLAGS_UNK15           = 0x04000,           //? Possibly not in use
+    CREATURE_TYPEFLAGS_ENGINEERLOOT    = 0x08000,           //can be looted by engineer
+    CREATURE_TYPEFLAGS_EXOTIC          = 0x10000,           //can be tamed by hunter as exotic pet
+    CREATURE_TYPEFLAGS_UNK18           = 0x20000,           //? Related to veichles/pvp?
+    CREATURE_TYPEFLAGS_UNK19           = 0x40000,           //? Related to veichle/siege weapons?
+    CREATURE_TYPEFLAGS_UNK20           = 0x80000
 };
 
 enum CreatureEliteType

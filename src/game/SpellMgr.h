@@ -240,9 +240,18 @@ inline bool IsCasterSourceTarget(uint32 target)
 inline bool IsSpellWithCasterSourceTargetsOnly(SpellEntry const* spellInfo)
 {
     for(int i = 0; i < 3; ++i)
-        if(uint32 target = spellInfo->EffectImplicitTargetA[i])
-            if(!IsCasterSourceTarget(target))
-                return false;
+    {
+        uint32 targetA = spellInfo->EffectImplicitTargetA[i];
+        if(targetA && !IsCasterSourceTarget(targetA))
+            return false;
+
+        uint32 targetB = spellInfo->EffectImplicitTargetB[i];
+        if(targetB && !IsCasterSourceTarget(targetB))
+            return false;
+
+        if(!targetA && !targetB)
+            return false;
+    }
     return true;
 }
 
@@ -257,6 +266,14 @@ inline bool IsPointEffectTarget( Targets target )
         case TARGET_CURRENT_ENEMY_COORDINATES:
         case TARGET_DUELVSPLAYER_COORDINATES:
         case TARGET_DYNAMIC_OBJECT_COORDINATES:
+        case TARGET_POINT_AT_NORTH:
+        case TARGET_POINT_AT_SOUTH:
+        case TARGET_POINT_AT_EAST:
+        case TARGET_POINT_AT_WEST:
+        case TARGET_POINT_AT_NE:
+        case TARGET_POINT_AT_NW:
+        case TARGET_POINT_AT_SE:
+        case TARGET_POINT_AT_SW:
             return true;
         default:
             break;
