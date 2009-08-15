@@ -548,7 +548,7 @@ OpcodeHandler opcodeTable[NUM_MSG_TYPES] =
     /*0x207*/ { "CMSG_GMTICKET_UPDATETEXT",                     STATUS_LOGGEDIN, &WorldSession::HandleGMTicketUpdateTextOpcode  },
     /*0x208*/ { "SMSG_GMTICKET_UPDATETEXT",                     STATUS_NEVER,    &WorldSession::Handle_ServerSide               },
     /*0x209*/ { "SMSG_ACCOUNT_DATA_TIMES",                      STATUS_NEVER,    &WorldSession::Handle_ServerSide               },
-    /*0x20A*/ { "CMSG_REQUEST_ACCOUNT_DATA",                    STATUS_LOGGEDIN, &WorldSession::HandleRequestAccountData        },
+    /*0x20A*/ { "CMSG_REQUEST_ACCOUNT_DATA",                    STATUS_AUTHED,   &WorldSession::HandleRequestAccountData        },
     /*0x20B*/ { "CMSG_UPDATE_ACCOUNT_DATA",                     STATUS_AUTHED,   &WorldSession::HandleUpdateAccountData         },
     /*0x20C*/ { "SMSG_UPDATE_ACCOUNT_DATA",                     STATUS_NEVER,    &WorldSession::Handle_ServerSide               },
     /*0x20D*/ { "SMSG_CLEAR_FAR_SIGHT_IMMEDIATE",               STATUS_NEVER,    &WorldSession::Handle_ServerSide               },

@@ -645,14 +645,15 @@ struct ChrRacesEntry
     uint32      TeamID;                                     // 7 (7-Alliance 1-Horde)
                                                             // 8-11 unused
     uint32      CinematicSequence;                          // 12 id from CinematicSequences.dbc
-    char*       name[16];                                   // 13-28 used for DBC language detection/selection
-                                                            // 29 string flags, unused
-    //char*       nameFemale[16];                           // 30-45, if different from base (male) case
-                                                            // 46 string flags, unused
-    //char*       nameNeutralGender[16];                    // 47-62, if different from base (male) case
-                                                            // 63 string flags, unused
-                                                            // 64-66 unused
-    uint32      expansion;                                  // 67 (0 - original race, 1 - tbc addon, ...)
+    //uint32    unk_322;                                    // 13
+    char*       name[16];                                   // 14-29 used for DBC language detection/selection
+                                                            // 30 string flags, unused
+    //char*       nameFemale[16];                           // 31-46, if different from base (male) case
+                                                            // 47 string flags, unused
+    //char*       nameNeutralGender[16];                    // 48-63, if different from base (male) case
+                                                            // 64 string flags, unused
+                                                            // 65-67 unused
+    uint32      expansion;                                  // 68 (0 - original race, 1 - tbc addon, ...)
 };
 
 /* not used
