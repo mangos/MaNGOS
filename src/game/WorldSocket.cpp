@@ -263,12 +263,12 @@ int WorldSocket::open (void *a)
 
     // Send startup packet.
     WorldPacket packet (SMSG_AUTH_CHALLENGE, 24);
-    packet << uint32(1);
+    packet << uint32(1);                                    // 1...31
     packet << m_Seed;
-    packet << uint32(0xF3539DA3);
-    packet << uint32(0x6E8547B9);
-    packet << uint32(0x9A6AA2F8);
-    packet << uint32(0xA4F170F4);
+    packet << uint32(0xF3539DA3);                           // random data
+    packet << uint32(0x6E8547B9);                           // random data
+    packet << uint32(0x9A6AA2F8);                           // random data
+    packet << uint32(0xA4F170F4);                           // random data
 
     if (SendPacket (packet) == -1)
         return -1;
