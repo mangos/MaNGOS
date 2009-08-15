@@ -32,8 +32,6 @@
 void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 {
     // TODO: add targets.read() check
-    CHECK_PACKET_SIZE(recvPacket,1+1+1+4+8+4+1);
-
     Player* pUser = _player;
 
     // ignore for remote control state
@@ -160,8 +158,6 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 
 void WorldSession::HandleOpenItemOpcode(WorldPacket& recvPacket)
 {
-    CHECK_PACKET_SIZE(recvPacket,1+1);
-
     sLog.outDetail("WORLD: CMSG_OPEN_ITEM packet, data length = %i",(uint32)recvPacket.size());
 
     Player* pUser = _player;
@@ -240,8 +236,6 @@ void WorldSession::HandleOpenItemOpcode(WorldPacket& recvPacket)
 
 void WorldSession::HandleGameObjectUseOpcode( WorldPacket & recv_data )
 {
-    CHECK_PACKET_SIZE(recv_data, 8);
-
     uint64 guid;
 
     recv_data >> guid;
@@ -265,8 +259,6 @@ void WorldSession::HandleGameObjectUseOpcode( WorldPacket & recv_data )
 
 void WorldSession::HandleGameobjectReportUse(WorldPacket& recvPacket)
 {
-    CHECK_PACKET_SIZE(recvPacket,8);
-
     uint64 guid;
     recvPacket >> guid;
 
@@ -288,8 +280,6 @@ void WorldSession::HandleGameobjectReportUse(WorldPacket& recvPacket)
 
 void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
 {
-    CHECK_PACKET_SIZE(recvPacket,1+4+1);
-
     uint32 spellId;
     uint8  cast_count, unk_flags;
     recvPacket >> cast_count;
@@ -353,8 +343,6 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
 
 void WorldSession::HandleCancelCastOpcode(WorldPacket& recvPacket)
 {
-    CHECK_PACKET_SIZE(recvPacket,5);
-
     // ignore for remote control state (for player case)
     Unit* mover = _player->m_mover;
     if(mover != _player && mover->GetTypeId()==TYPEID_PLAYER)
@@ -376,8 +364,6 @@ void WorldSession::HandleCancelCastOpcode(WorldPacket& recvPacket)
 
 void WorldSession::HandleCancelAuraOpcode( WorldPacket& recvPacket)
 {
-    CHECK_PACKET_SIZE(recvPacket,4);
-
     uint32 spellId;
     recvPacket >> spellId;
 
@@ -428,8 +414,6 @@ void WorldSession::HandleCancelAuraOpcode( WorldPacket& recvPacket)
 
 void WorldSession::HandlePetCancelAuraOpcode( WorldPacket& recvPacket)
 {
-    CHECK_PACKET_SIZE(recvPacket, 8+4);
-
     // ignore for remote control state
     if(_player->m_mover != _player)
         return;
@@ -488,8 +472,6 @@ void WorldSession::HandleCancelAutoRepeatSpellOpcode( WorldPacket& /*recvPacket*
 void WorldSession::HandleCancelChanneling( WorldPacket & /*recv_data */)
 {
     /*
-        CHECK_PACKET_SIZE(recv_data, 4);
-
         uint32 spellid;
         recv_data >> spellid;
     */
@@ -497,8 +479,6 @@ void WorldSession::HandleCancelChanneling( WorldPacket & /*recv_data */)
 
 void WorldSession::HandleTotemDestroyed( WorldPacket& recvPacket)
 {
-    CHECK_PACKET_SIZE(recvPacket, 1);
-
     // ignore for remote control state
     if(_player->m_mover != _player)
         return;
@@ -534,8 +514,6 @@ void WorldSession::HandleSelfResOpcode( WorldPacket & /*recv_data*/ )
 
 void WorldSession::HandleSpellClick( WorldPacket & recv_data )
 {
-    CHECK_PACKET_SIZE(recv_data, 8);
-
     uint64 guid;
     recv_data >> guid;
 

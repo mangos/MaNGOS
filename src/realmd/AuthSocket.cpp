@@ -766,6 +766,7 @@ bool AuthSocket::_HandleReconnectChallenge()
 
     _login = (const char*)ch->I;
     _safelogin = _login;
+    loginDatabase.escape_string(_safelogin);
 
     QueryResult *result = loginDatabase.PQuery ("SELECT sessionkey FROM account WHERE username = '%s'", _safelogin.c_str ());
 
