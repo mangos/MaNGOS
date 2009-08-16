@@ -5626,6 +5626,18 @@ void Aura::HandleSpellSpecificBoosts(bool apply)
             }
             break;
         }
+        case SPELLFAMILY_ROGUE:
+            // Sprint (skip non player casted spells by category)
+            if (GetSpellProto()->SpellFamilyFlags & UI64LIT(0x0000000000000040) && GetSpellProto()->Category == 44)
+            {
+                if(!apply || m_target->HasAura(58039))      // Glyph of Blurred Speed
+                    spellId1 = 61922;                       // Sprint (waterwalk)
+                else
+                    return;
+            }
+            else
+                return;
+            break;
         case SPELLFAMILY_HUNTER:
         {
             // The Beast Within and Bestial Wrath - immunity
@@ -5637,7 +5649,7 @@ void Aura::HandleSpellSpecificBoosts(bool apply)
                 spellId4 = 26592;
             }
             // Aspect of the Dragonhawk dodge
-            else if(GetSpellProto()->SpellFamilyFlags2 & 0x00001000)
+            else if (GetSpellProto()->SpellFamilyFlags2 & 0x00001000)
                 spellId1 = 61848;
             else
                 return;
