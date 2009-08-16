@@ -2628,6 +2628,10 @@ void Aura::HandleAuraFeatherFall(bool apply, bool Real)
     data.append(m_target->GetPackGUID());
     data << uint32(0);
     m_target->SendMessageToSet(&data, true);
+
+    // start fall from current height
+    if(!apply && m_target->GetTypeId() == TYPEID_PLAYER)
+        ((Player*)m_target)->SetFallInformation(0, m_target->GetPositionZ());
 }
 
 void Aura::HandleAuraHover(bool apply, bool Real)
