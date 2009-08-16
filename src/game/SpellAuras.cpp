@@ -2313,6 +2313,21 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                     }
                     return;
                 }
+                //Dragonmaw Illusion
+                case 40214 :
+                {
+                    if(apply)
+                    {
+                        m_target->CastSpell(m_target, 40216, true);
+                        m_target->CastSpell(m_target, 42016, true);
+                    }
+                    else
+                    {
+                        m_target->RemoveAurasDueToSpell(40216);
+                        m_target->RemoveAurasDueToSpell(42016);
+                    }
+                    return;
+                }
                 // LK Intro VO (1)
                 case 58204:
                     if(m_target->GetTypeId() == TYPEID_PLAYER)
