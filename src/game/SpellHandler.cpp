@@ -348,10 +348,9 @@ void WorldSession::HandleCancelCastOpcode(WorldPacket& recvPacket)
     if(mover != _player && mover->GetTypeId()==TYPEID_PLAYER)
         return;
 
-    // increments with every CANCEL packet, don't use for now
-    uint8 counter;
     uint32 spellId;
-    recvPacket >> counter;
+
+    recvPacket.read_skip<uint8>();                          // counter, increments with every CANCEL packet, don't use for now
     recvPacket >> spellId;
 
     //FIXME: hack, ignore unexpected client cancel Deadly Throw cast
