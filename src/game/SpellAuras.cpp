@@ -2325,6 +2325,21 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                     }
                     return;
                 }
+                //Dragonmaw Illusion
+                case 40214 :
+                {
+                    if(apply)
+                    {
+                        m_target->CastSpell(m_target, 40216, true);
+                        m_target->CastSpell(m_target, 42016, true);
+                    }
+                    else
+                    {
+                        m_target->RemoveAurasDueToSpell(40216);
+                        m_target->RemoveAurasDueToSpell(42016);
+                    }
+                    return;
+                }
                 // LK Intro VO (1)
                 case 58204:
                     if(m_target->GetTypeId() == TYPEID_PLAYER)
@@ -2485,9 +2500,9 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                 uint32 spell_id;
                 switch(GetId())
                 {
-                    case 48384: spell_id = 50170;           //Rank 1
-                    case 48395: spell_id = 50171;           //Rank 2
-                    case 48396: spell_id = 50172;           //Rank 3
+                    case 48384: spell_id = 50170; break;    //Rank 1
+                    case 48395: spell_id = 50171; break;    //Rank 2
+                    case 48396: spell_id = 50172; break;    //Rank 3
                     default:
                         sLog.outError("HandleAuraDummy: Not handled rank of IMF (Spell: %u)",GetId());
                         return;
@@ -2640,6 +2655,10 @@ void Aura::HandleAuraFeatherFall(bool apply, bool Real)
     data.append(m_target->GetPackGUID());
     data << uint32(0);
     m_target->SendMessageToSet(&data, true);
+
+    // start fall from current height
+    if(!apply && m_target->GetTypeId() == TYPEID_PLAYER)
+        ((Player*)m_target)->SetFallInformation(0, m_target->GetPositionZ());
 }
 
 void Aura::HandleAuraHover(bool apply, bool Real)
@@ -5638,6 +5657,18 @@ void Aura::HandleSpellSpecificBoosts(bool apply)
             }
             break;
         }
+        case SPELLFAMILY_ROGUE:
+            // Sprint (skip non player casted spells by category)
+            if (GetSpellProto()->SpellFamilyFlags & UI64LIT(0x0000000000000040) && GetSpellProto()->Category == 44)
+            {
+                if(!apply || m_target->HasAura(58039))      // Glyph of Blurred Speed
+                    spellId1 = 61922;                       // Sprint (waterwalk)
+                else
+                    return;
+            }
+            else
+                return;
+            break;
         case SPELLFAMILY_HUNTER:
         {
             // The Beast Within and Bestial Wrath - immunity
@@ -5649,7 +5680,7 @@ void Aura::HandleSpellSpecificBoosts(bool apply)
                 spellId4 = 26592;
             }
             // Aspect of the Dragonhawk dodge
-            else if(GetSpellProto()->SpellFamilyFlags2 & 0x00001000)
+            else if (GetSpellProto()->SpellFamilyFlags2 & 0x00001000)
                 spellId1 = 61848;
             else
                 return;

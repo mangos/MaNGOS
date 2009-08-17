@@ -1435,6 +1435,12 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
                 // Master of Subtlety
                 if (spellId_1 == 31665 && spellId_2 == 31666 || spellId_1 == 31666 && spellId_2 == 31665 )
                     return false;
+
+                // Sprint & Sprint (waterwalk)
+                if( spellInfo_1->SpellIconID == 516 && spellInfo_2->SpellIconID == 516 &&
+                    (spellInfo_1->Category == 44 && spellInfo_2->Category == 0 ||
+                    spellInfo_2->Category == 44 && spellInfo_1->Category == 0))
+                    return false;
             }
 
             //Overkill
@@ -2660,10 +2666,6 @@ void SpellMgr::LoadSpellAreas()
 
 SpellCastResult SpellMgr::GetSpellAllowedInLocationError(SpellEntry const *spellInfo, uint32 map_id, uint32 zone_id, uint32 area_id, Player const* player)
 {
-    // allow in GM-mode
-    if (player && player->isGameMaster())
-        return SPELL_CAST_OK;
-
     // normal case
     if (spellInfo->AreaGroupId > 0)
     {

@@ -166,8 +166,6 @@ void WorldSession::HandleMoveTeleportAck(WorldPacket& recv_data)
     if(!recv_data.readPackGUID(guid))
         return;
 
-    CHECK_PACKET_SIZE(recv_data, recv_data.rpos()+4+4);
-
     uint32 flags, time;
     recv_data >> flags >> time;
     DEBUG_LOG("Guid " UI64FMTD, guid);
@@ -352,7 +350,6 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket &recv_data)
 {
     uint32 opcode = recv_data.GetOpcode();
     sLog.outDebug("WORLD: Recvd %s (%u, 0x%X) opcode", LookupOpcodeName(opcode), opcode, opcode);
-
     /* extract packet */
     uint64 guid;
     uint32 unk1;
@@ -366,16 +363,11 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket &recv_data)
         return;
 
     // continue parse packet
-    CHECK_PACKET_SIZE(recv_data, recv_data.rpos()+4);
-
     recv_data >> unk1;                                      // counter or moveEvent
 
     MovementInfo movementInfo;
     movementInfo.guid = guid;
     ReadMovementInfo(recv_data, &movementInfo);
-
-    // recheck
-    CHECK_PACKET_SIZE(recv_data, recv_data.rpos()+4);
 
     recv_data >> newspeed;
     /*----------------*/
@@ -440,8 +432,6 @@ void WorldSession::HandleSetActiveMoverOpcode(WorldPacket &recv_data)
 {
     sLog.outDebug("WORLD: Recvd CMSG_SET_ACTIVE_MOVER");
     recv_data.hexlike();
-
-    CHECK_PACKET_SIZE(recv_data, 8);
 
     uint64 guid;
     recv_data >> guid;
@@ -531,7 +521,6 @@ void WorldSession::HandleMountSpecialAnimOpcode(WorldPacket& /*recvdata*/)
 
 void WorldSession::HandleMoveKnockBackAck( WorldPacket & /*recv_data*/ )
 {
-    // CHECK_PACKET_SIZE(recv_data,?);
     sLog.outDebug("CMSG_MOVE_KNOCK_BACK_ACK");
     // Currently not used but maybe use later for recheck final player position
     // (must be at call same as into "recv_data >> x >> y >> z >> orientation;"
@@ -571,8 +560,6 @@ void WorldSession::HandleMoveWaterWalkAck(WorldPacket& /*recv_data*/)
 
 void WorldSession::HandleSummonResponseOpcode(WorldPacket& recv_data)
 {
-    CHECK_PACKET_SIZE(recv_data, 8+1);
-
     if(!_player->isAlive() || _player->isInCombat() )
         return;
 

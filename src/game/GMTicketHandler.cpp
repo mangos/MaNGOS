@@ -59,8 +59,6 @@ void WorldSession::HandleGMTicketGetTicketOpcode( WorldPacket & /*recv_data*/ )
 
 void WorldSession::HandleGMTicketUpdateTextOpcode( WorldPacket & recv_data )
 {
-    CHECK_PACKET_SIZE(recv_data,1);
-
     std::string ticketText;
     recv_data >> ticketText;
 
@@ -83,8 +81,6 @@ void WorldSession::HandleGMTicketDeleteTicketOpcode( WorldPacket & /*recv_data*/
 
 void WorldSession::HandleGMTicketCreateOpcode( WorldPacket & recv_data )
 {
-    CHECK_PACKET_SIZE(recv_data, 4*4+1+2*4);
-
     uint32 map;
     float x, y, z;
     std::string ticketText = "";
@@ -92,9 +88,6 @@ void WorldSession::HandleGMTicketCreateOpcode( WorldPacket & recv_data )
 
     recv_data >> map >> x >> y >> z;                        // last check 2.4.3
     recv_data >> ticketText;
-
-    // recheck
-    CHECK_PACKET_SIZE(recv_data,4*4+(ticketText.size()+1)+2*4);
 
     recv_data >> unk1 >> unk2;
     // note: the packet might contain more data, but the exact structure of that is unknown
@@ -141,7 +134,6 @@ void WorldSession::HandleGMTicketSystemStatusOpcode( WorldPacket & /*recv_data*/
 void WorldSession::HandleGMSurveySubmit( WorldPacket & recv_data)
 {
     // GM survey is shown after SMSG_GM_TICKET_STATUS_UPDATE with status = 3
-    CHECK_PACKET_SIZE(recv_data, 4+4);
     uint32 x;
     recv_data >> x;                                         // answer range? (6 = 0-5?)
     sLog.outDebug("SURVEY: X = %u", x);
@@ -150,13 +142,11 @@ void WorldSession::HandleGMSurveySubmit( WorldPacket & recv_data)
     memset(result, 0, sizeof(result));
     for( int i = 0; i < 10; ++i)
     {
-        CHECK_PACKET_SIZE(recv_data,recv_data.rpos()+4);
         uint32 questionID;
         recv_data >> questionID;                            // GMSurveyQuestions.dbc
         if (!questionID)
             break;
 
-        CHECK_PACKET_SIZE(recv_data,recv_data.rpos()+1+1);
         uint8 value;
         std::string unk_text;
         recv_data >> value;                                 // answer
@@ -166,7 +156,6 @@ void WorldSession::HandleGMSurveySubmit( WorldPacket & recv_data)
         sLog.outDebug("SURVEY: ID %u, value %u, text %s", questionID, value, unk_text.c_str());
     }
 
-    CHECK_PACKET_SIZE(recv_data,recv_data.rpos()+1);
     std::string comment;
     recv_data >> comment;                                   // addional comment
     sLog.outDebug("SURVEY: comment %s", comment.c_str());

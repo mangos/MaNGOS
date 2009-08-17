@@ -29,12 +29,8 @@
 #include "WaypointMovementGenerator.h"
 #include "DestinationHolderImp.h"
 
-#include <cassert>
-
 void WorldSession::HandleTaxiNodeStatusQueryOpcode( WorldPacket & recv_data )
 {
-    CHECK_PACKET_SIZE(recv_data,8);
-
     sLog.outDebug( "WORLD: Received CMSG_TAXINODE_STATUS_QUERY" );
 
     uint64 guid;
@@ -70,8 +66,6 @@ void WorldSession::SendTaxiStatus( uint64 guid )
 
 void WorldSession::HandleTaxiQueryAvailableNodes( WorldPacket & recv_data )
 {
-    CHECK_PACKET_SIZE(recv_data,8);
-
     sLog.outDebug( "WORLD: Received CMSG_TAXIQUERYAVAILABLENODES" );
 
     uint64 guid;
@@ -158,8 +152,6 @@ bool WorldSession::SendLearnNewTaxiNode( Creature* unit )
 
 void WorldSession::HandleActivateTaxiExpressOpcode ( WorldPacket & recv_data )
 {
-    CHECK_PACKET_SIZE(recv_data,8+4);
-
     sLog.outDebug( "WORLD: Received CMSG_ACTIVATETAXIEXPRESS" );
 
     uint64 guid;
@@ -173,9 +165,6 @@ void WorldSession::HandleActivateTaxiExpressOpcode ( WorldPacket & recv_data )
         sLog.outDebug( "WORLD: HandleActivateTaxiExpressOpcode - Unit (GUID: %u) not found or you can't interact with it.", uint32(GUID_LOPART(guid)) );
         return;
     }
-    // recheck
-    CHECK_PACKET_SIZE(recv_data,8+4+node_count*4);
-
     std::vector<uint32> nodes;
 
     for(uint32 i = 0; i < node_count; ++i)
@@ -258,8 +247,6 @@ void WorldSession::HandleMoveSplineDoneOpcode(WorldPacket& /*recv_data*/)
 
 void WorldSession::HandleActivateTaxiOpcode( WorldPacket & recv_data )
 {
-    CHECK_PACKET_SIZE(recv_data,8+4+4);
-
     sLog.outDebug( "WORLD: Received CMSG_ACTIVATETAXI" );
 
     uint64 guid;
