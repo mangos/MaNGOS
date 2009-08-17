@@ -2488,9 +2488,9 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                 uint32 spell_id;
                 switch(GetId())
                 {
-                    case 48384: spell_id = 50170;           //Rank 1
-                    case 48395: spell_id = 50171;           //Rank 2
-                    case 48396: spell_id = 50172;           //Rank 3
+                    case 48384: spell_id = 50170; break;    //Rank 1
+                    case 48395: spell_id = 50171; break;    //Rank 2
+                    case 48396: spell_id = 50172; break;    //Rank 3
                     default:
                         sLog.outError("HandleAuraDummy: Not handled rank of IMF (Spell: %u)",GetId());
                         return;
