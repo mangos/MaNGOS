@@ -369,7 +369,7 @@ void Log::outString( const char * str, ... )
     if(m_includeTime)
         outTime();
 
-    UTF8PRINTF(stdout,str,);
+    utf8printf(stdout, str);
 
     if(m_colored)
         ResetColor(true);
@@ -401,7 +401,7 @@ void Log::outError( const char * err, ... )
     if(m_includeTime)
         outTime();
 
-    UTF8PRINTF(stderr,err,);
+    utf8printf(stderr, err);
 
     if(m_colored)
         ResetColor(false);
@@ -434,7 +434,7 @@ void Log::outErrorDb( const char * err, ... )
     if(m_includeTime)
         outTime();
 
-    UTF8PRINTF(stderr,err,);
+    utf8printf(stderr, err);
 
     if(m_colored)
         ResetColor(false);
@@ -483,7 +483,7 @@ void Log::outBasic( const char * str, ... )
         if(m_includeTime)
             outTime();
 
-        UTF8PRINTF(stdout,str,);
+        utf8printf(stdout, str);
 
         if(m_colored)
             ResetColor(true);
@@ -518,7 +518,7 @@ void Log::outDetail( const char * str, ... )
         if(m_includeTime)
             outTime();
 
-        UTF8PRINTF(stdout,str,);
+        utf8printf(stdout, str);
 
         if(m_colored)
             ResetColor(true);
@@ -548,7 +548,7 @@ void Log::outDebugInLine( const char * str, ... )
         if(m_colored)
             SetColor(true,m_colors[LogDebug]);
 
-        UTF8PRINTF(stdout,str,);
+        utf8printf(stdout, str);
 
         if(m_colored)
             ResetColor(true);
@@ -574,7 +574,7 @@ void Log::outDebug( const char * str, ... )
         if(m_includeTime)
             outTime();
 
-        UTF8PRINTF(stdout,str,);
+        utf8printf(stdout, str);
 
         if(m_colored)
             ResetColor(true);
@@ -609,7 +609,7 @@ void Log::outCommand( uint32 account, const char * str, ... )
         if(m_includeTime)
             outTime();
 
-        UTF8PRINTF(stdout,str,);
+        utf8printf(stdout, str);
 
         if(m_colored)
             ResetColor(true);
@@ -691,7 +691,7 @@ void Log::outMenu( const char * str, ... )
     if(m_includeTime)
         outTime();
 
-    UTF8PRINTF(stdout,str,);
+    utf8printf(stdout, str);
 
     ResetColor(true);
 
