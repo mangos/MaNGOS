@@ -84,15 +84,15 @@ void WorldSession::HandleGMTicketCreateOpcode( WorldPacket & recv_data )
     uint32 map;
     float x, y, z;
     std::string ticketText = "";
-    uint32 unk1, unk2;
 
     recv_data >> map >> x >> y >> z;                        // last check 2.4.3
     recv_data >> ticketText;
 
-    recv_data >> unk1 >> unk2;
-    // note: the packet might contain more data, but the exact structure of that is unknown
+    recv_data.read_skip<uint32>();                          // unk1, 0
+    recv_data.read_skip<uint32>();                          // unk2, 1
+    recv_data.read_skip<uint32>();                          // unk3, 0
 
-    sLog.outDebug("TicketCreate: map %u, x %f, y %f, z %f, text %s, unk1 %u, unk2 %u", map, x, y, z, ticketText.c_str(), unk1, unk2);
+    sLog.outDebug("TicketCreate: map %u, x %f, y %f, z %f, text %s", map, x, y, z, ticketText.c_str());
 
     if(ticketmgr.GetGMTicket(GetPlayer()->GetGUIDLow()))
     {
