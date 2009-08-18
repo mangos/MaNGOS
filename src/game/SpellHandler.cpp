@@ -348,10 +348,9 @@ void WorldSession::HandleCancelCastOpcode(WorldPacket& recvPacket)
     if(mover != _player && mover->GetTypeId()==TYPEID_PLAYER)
         return;
 
-    // increments with every CANCEL packet, don't use for now
-    uint8 counter;
     uint32 spellId;
-    recvPacket >> counter;
+
+    recvPacket.read_skip<uint8>();                          // counter, increments with every CANCEL packet, don't use for now
     recvPacket >> spellId;
 
     //FIXME: hack, ignore unexpected client cancel Deadly Throw cast
@@ -402,9 +401,9 @@ void WorldSession::HandleCancelAuraOpcode( WorldPacket& recvPacket)
     // channeled spell case (it currently casted then)
     if (IsChanneledSpell(spellInfo))
     {
-        if (_player->m_currentSpells[CURRENT_CHANNELED_SPELL] &&
-            _player->m_currentSpells[CURRENT_CHANNELED_SPELL]->m_spellInfo->Id==spellId)
-            _player->InterruptSpell(CURRENT_CHANNELED_SPELL);
+        if (Spell* curSpell = _player->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
+            if (curSpell->m_spellInfo->Id==spellId)
+                _player->InterruptSpell(CURRENT_CHANNELED_SPELL);
         return;
     }
 
@@ -468,13 +467,16 @@ void WorldSession::HandleCancelAutoRepeatSpellOpcode( WorldPacket& /*recvPacket*
     _player->m_mover->InterruptSpell(CURRENT_AUTOREPEAT_SPELL);
 }
 
-/// \todo Complete HandleCancelChanneling function
-void WorldSession::HandleCancelChanneling( WorldPacket & /*recv_data */)
+void WorldSession::HandleCancelChanneling( WorldPacket & recv_data)
 {
-    /*
-        uint32 spellid;
-        recv_data >> spellid;
-    */
+    recv_data.read_skip<uint32>();                          // spellid, not used
+
+    // ignore for remote control state (for player case)
+    Unit* mover = _player->m_mover;
+    if(mover != _player && mover->GetTypeId()==TYPEID_PLAYER)
+        return;
+
+    mover->InterruptSpell(CURRENT_CHANNELED_SPELL);
 }
 
 void WorldSession::HandleTotemDestroyed( WorldPacket& recvPacket)

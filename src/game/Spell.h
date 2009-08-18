@@ -210,6 +210,7 @@ class Spell
 {
     friend struct MaNGOS::SpellNotifierPlayer;
     friend struct MaNGOS::SpellNotifierCreatureAndPlayer;
+    friend void Unit::SetCurrentCastedSpell( Spell * pSpell );
     public:
 
         void EffectNULL(uint32 );

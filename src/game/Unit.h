@@ -710,13 +710,15 @@ struct DeclinedName
 
 enum CurrentSpellTypes
 {
-    CURRENT_MELEE_SPELL = 0,
-    CURRENT_FIRST_NON_MELEE_SPELL = 1,                      // just counter
-    CURRENT_GENERIC_SPELL = 1,
-    CURRENT_AUTOREPEAT_SPELL = 2,
-    CURRENT_CHANNELED_SPELL = 3,
-    CURRENT_MAX_SPELL = 4                                   // just counter
+    CURRENT_MELEE_SPELL             = 0,
+    CURRENT_GENERIC_SPELL           = 1,
+    CURRENT_AUTOREPEAT_SPELL        = 2,
+    CURRENT_CHANNELED_SPELL         = 3
 };
+
+#define CURRENT_FIRST_NON_MELEE_SPELL 1
+#define CURRENT_MAX_SPELL             4
+
 
 enum ActiveStates
 {
@@ -1249,7 +1251,8 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         void SetCurrentCastedSpell(Spell * pSpell);
         virtual void ProhibitSpellScholl(SpellSchoolMask /*idSchoolMask*/, uint32 /*unTimeMs*/ ) { }
-        void InterruptSpell(uint32 spellType, bool withDelayed = true);
+        void InterruptSpell(CurrentSpellTypes spellType, bool withDelayed = true);
+        void FinishSpell(CurrentSpellTypes spellType, bool ok = true);
 
         // set withDelayed to true to account delayed spells as casted
         // delayed+channeled spells are always accounted as casted
@@ -1260,9 +1263,8 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         // delayed+channeled spells are always interrupted
         void InterruptNonMeleeSpells(bool withDelayed, uint32 spellid = 0);
 
+        Spell* GetCurrentSpell(CurrentSpellTypes spellType) const { return m_currentSpells[spellType]; }
         Spell* FindCurrentSpellBySpellId(uint32 spell_id) const;
-
-        Spell* m_currentSpells[CURRENT_MAX_SPELL];
 
         uint32 m_addDmgOnce;
         uint64 m_TotemSlot[MAX_TOTEM];
@@ -1556,6 +1558,8 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         uint32 m_state;                                     // Even derived shouldn't modify
         uint32 m_CombatTimer;
         uint32 m_lastManaUse;                               // msecs
+
+        Spell* m_currentSpells[CURRENT_MAX_SPELL];
 
         UnitVisibility m_Visibility;
 
