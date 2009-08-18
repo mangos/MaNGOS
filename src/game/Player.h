@@ -321,11 +321,7 @@ enum LfgType
     LFG_TYPE_RAID                 = 2,
     LFG_TYPE_QUEST                = 3,
     LFG_TYPE_ZONE                 = 4,
-    LFG_TYPE_HEROIC_DUNGEON       = 5,
-    LFG_TYPE_ANY_DUNGEON          = 6,
-    LFG_TYPE_ANY_HEROIC_DUNGEON   = 7,
-    LFG_TYPE_DAILY_DUNGEON        = 8,
-    LFG_TYPE_DAILY_HEROIC_DUNGEON = 9
+    LFG_TYPE_HEROIC_DUNGEON       = 5
 };
 
 enum LfgRoles
