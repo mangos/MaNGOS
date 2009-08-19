@@ -5223,6 +5223,7 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                 pVictim->CastSpell(pVictim,57669,true,castItem,triggeredByAura);
                 return true;                                // no hidden cooldown
             }
+
             // Divine Aegis
             if (dummySpell->SpellIconID == 2820)
             {
@@ -5230,6 +5231,17 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                 triggered_spell_id = 47753;
                 break;
             }
+            // Improved Shadowform
+            else if (dummySpell->SpellIconID == 217)
+            {
+                if(!roll_chance_i(triggerAmount))
+                    return false;
+
+                RemoveSpellsCausingAura(SPELL_AURA_MOD_ROOT);
+                RemoveSpellsCausingAura(SPELL_AURA_MOD_DECREASE_SPEED);
+                break;
+            }
+
             switch(dummySpell->Id)
             {
                 // Vampiric Embrace
