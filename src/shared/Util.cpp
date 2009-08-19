@@ -135,12 +135,8 @@ uint32 TimeStringToSecs(const std::string& timestring)
     {
         if(isdigit(*itr))
         {
-            std::string str;                                //very complicated typecast char->const char*; is there no better way?
-            str += *itr;
-            const char* tmp = str.c_str();
-
             buffer*=10;
-            buffer+=atoi(tmp);
+            buffer+= (*itr)-'0';
         }
         else
         {
