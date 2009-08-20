@@ -4524,6 +4524,68 @@ bool Unit::HandleHasteAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
     return true;
 }
 
+bool Unit::HandleSpellCritChanceAuraProc(Unit *pVictim, uint32 /*damage*/, Aura* triggeredByAura, SpellEntry const * /*procSpell*/, uint32 /*procFlag*/, uint32 /*procEx*/, uint32 cooldown)
+{
+    SpellEntry const *triggeredByAuraSpell = triggeredByAura->GetSpellProto();
+
+    Item* castItem = triggeredByAura->GetCastItemGUID() && GetTypeId()==TYPEID_PLAYER
+        ? ((Player*)this)->GetItemByGuid(triggeredByAura->GetCastItemGUID()) : NULL;
+
+    uint32 triggered_spell_id = 0;
+    Unit* target = pVictim;
+    int32 basepoints0 = 0;
+
+    switch(triggeredByAuraSpell->SpellFamilyName)
+    {
+        case SPELLFAMILY_MAGE:
+        {
+            switch(triggeredByAuraSpell->Id)
+            {
+                // Focus Magic
+                case 54646:
+                {
+                    Unit* caster = triggeredByAura->GetCaster();
+                    if(!caster)
+                        return false;
+
+                    triggered_spell_id = 54648;
+                    target = caster;
+                    break;
+                }
+            }
+        }
+    }
+
+    // processed charge only counting case
+    if(!triggered_spell_id)
+        return true;
+
+    SpellEntry const* triggerEntry = sSpellStore.LookupEntry(triggered_spell_id);
+
+    if(!triggerEntry)
+    {
+        sLog.outError("Unit::HandleHasteAuraProc: Spell %u have not existed triggered spell %u",triggeredByAuraSpell->Id,triggered_spell_id);
+        return false;
+    }
+
+    // default case
+    if(!target || target!=this && !target->isAlive())
+        return false;
+
+    if( cooldown && GetTypeId()==TYPEID_PLAYER && ((Player*)this)->HasSpellCooldown(triggered_spell_id))
+        return false;
+
+    if(basepoints0)
+        CastCustomSpell(target,triggered_spell_id,&basepoints0,NULL,NULL,true,castItem,triggeredByAura);
+    else
+        CastSpell(target,triggered_spell_id,true,castItem,triggeredByAura);
+
+    if( cooldown && GetTypeId()==TYPEID_PLAYER )
+        ((Player*)this)->AddSpellCooldown(triggered_spell_id,0,time(NULL) + cooldown);
+
+    return true;
+}
+
 bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAura, SpellEntry const * procSpell, uint32 procFlag, uint32 procEx, uint32 cooldown)
 {
     SpellEntry const *dummySpell = triggeredByAura->GetSpellProto ();
@@ -5223,6 +5285,7 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                 pVictim->CastSpell(pVictim,57669,true,castItem,triggeredByAura);
                 return true;                                // no hidden cooldown
             }
+
             // Divine Aegis
             if (dummySpell->SpellIconID == 2820)
             {
@@ -5230,6 +5293,17 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                 triggered_spell_id = 47753;
                 break;
             }
+            // Improved Shadowform
+            else if (dummySpell->SpellIconID == 217)
+            {
+                if(!roll_chance_i(triggerAmount))
+                    return false;
+
+                RemoveSpellsCausingAura(SPELL_AURA_MOD_ROOT);
+                RemoveSpellsCausingAura(SPELL_AURA_MOD_DECREASE_SPEED);
+                break;
+            }
+
             switch(dummySpell->Id)
             {
                 // Vampiric Embrace
@@ -11126,6 +11200,12 @@ void Unit::ProcDamageAndSpellFor( bool isVictim, Unit * pTarget, uint32 procFlag
                 break;
             case SPELL_AURA_MOD_SPELL_CRIT_CHANCE:
                 if (!procSpell)
+                {
+                    triggeredByAura->SetInUse(false);
+                    continue;
+                }
+                sLog.outDebug("ProcDamageAndSpell: casting spell id %u (triggered by %s spell crit chance aura of spell %u)", spellInfo->Id,(isVictim?"a victim's":"an attacker's"), triggeredByAura->GetId());
+                if (!HandleSpellCritChanceAuraProc(pTarget, damage, triggeredByAura, procSpell, procFlag, procExtra, cooldown))
                 {
                     triggeredByAura->SetInUse(false);
                     continue;

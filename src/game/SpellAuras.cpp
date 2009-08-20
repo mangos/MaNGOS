@@ -5438,7 +5438,7 @@ void Aura::HandleNoReagentUseAura(bool /*Apply*/, bool Real)
 
 void Aura::HandleShapeshiftBoosts(bool apply)
 {
-    uint32 spellId = 0;
+    uint32 spellId1 = 0;
     uint32 spellId2 = 0;
     uint32 HotWSpellId = 0;
     uint32 MasterShaperSpellId = 0;
@@ -5448,87 +5448,92 @@ void Aura::HandleShapeshiftBoosts(bool apply)
     switch(form)
     {
         case FORM_CAT:
-            spellId = 3025;
+            spellId1 = 3025;
             HotWSpellId = 24900;
             MasterShaperSpellId = 48420;
             break;
         case FORM_TREE:
-            spellId = 5420;
+            spellId1 = 5420;
             spellId2 = 34123;
             MasterShaperSpellId = 48422;
             break;
         case FORM_TRAVEL:
-            spellId = 5419;
+            spellId1 = 5419;
             break;
         case FORM_AQUA:
-            spellId = 5421;
+            spellId1 = 5421;
             break;
         case FORM_BEAR:
-            spellId = 1178;
+            spellId1 = 1178;
             spellId2 = 21178;
             HotWSpellId = 24899;
             MasterShaperSpellId = 48418;
             break;
         case FORM_DIREBEAR:
-            spellId = 9635;
+            spellId1 = 9635;
             spellId2 = 21178;
             HotWSpellId = 24899;
             MasterShaperSpellId = 48418;
             break;
         case FORM_BATTLESTANCE:
-            spellId = 21156;
+            spellId1 = 21156;
             break;
         case FORM_DEFENSIVESTANCE:
-            spellId = 7376;
+            spellId1 = 7376;
             break;
         case FORM_BERSERKERSTANCE:
-            spellId = 7381;
+            spellId1 = 7381;
             break;
         case FORM_MOONKIN:
-            spellId = 24905;
+            spellId1 = 24905;
             // aura from effect trigger spell
             spellId2 = 24907;
             MasterShaperSpellId = 48421;
             break;
         case FORM_FLIGHT:
-            spellId = 33948;
+            spellId1 = 33948;
             spellId2 = 34764;
             break;
         case FORM_FLIGHT_EPIC:
-            spellId  = 40122;
+            spellId1  = 40122;
             spellId2 = 40121;
             break;
         case FORM_METAMORPHOSIS:
-            spellId  = 54817;
+            spellId1  = 54817;
             spellId2 = 54879;
             break;
         case FORM_SPIRITOFREDEMPTION:
-            spellId  = 27792;
+            spellId1  = 27792;
             spellId2 = 27795;                               // must be second, this important at aura remove to prevent to early iterator invalidation.
+            break;
+        case FORM_SHADOW:
+            spellId1 = 49868;
+
+            if(m_target->GetTypeId() == TYPEID_PLAYER)      // Spell 49868 have same category as main form spell and share cooldown
+                ((Player*)m_target)->RemoveSpellCooldown(49868);
             break;
         case FORM_GHOSTWOLF:
         case FORM_AMBIENT:
         case FORM_GHOUL:
-        case FORM_SHADOW:
         case FORM_STEALTH:
         case FORM_CREATURECAT:
         case FORM_CREATUREBEAR:
-            spellId = 0;
+            spellId1 = 0;
             break;
     }
 
     if(apply)
     {
-        if (spellId) m_target->CastSpell(m_target, spellId, true, NULL, this );
+        if (spellId1) m_target->CastSpell(m_target, spellId1, true, NULL, this );
         if (spellId2) m_target->CastSpell(m_target, spellId2, true, NULL, this);
 
-        if(m_target->GetTypeId() == TYPEID_PLAYER)
+        if (m_target->GetTypeId() == TYPEID_PLAYER)
         {
             const PlayerSpellMap& sp_list = ((Player *)m_target)->GetSpellMap();
             for (PlayerSpellMap::const_iterator itr = sp_list.begin(); itr != sp_list.end(); ++itr)
             {
-                if(itr->second->state == PLAYERSPELL_REMOVED) continue;
-                if(itr->first==spellId || itr->first==spellId2) continue;
+                if (itr->second->state == PLAYERSPELL_REMOVED) continue;
+                if (itr->first==spellId1 || itr->first==spellId2) continue;
                 SpellEntry const *spellInfo = sSpellStore.LookupEntry(itr->first);
                 if (!spellInfo || !(spellInfo->Attributes & (SPELL_ATTR_PASSIVE | (1<<7))))
                     continue;
@@ -5611,7 +5616,7 @@ void Aura::HandleShapeshiftBoosts(bool apply)
     }
     else
     {
-        m_target->RemoveAurasDueToSpell(spellId);
+        m_target->RemoveAurasDueToSpell(spellId1);
         m_target->RemoveAurasDueToSpell(spellId2);
         m_target->RemoveAurasDueToSpell(MasterShaperSpellId);
 

@@ -218,7 +218,10 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 
     // ignore, waiting processing in WorldSession::HandleMoveWorldportAckOpcode and WorldSession::HandleMoveTeleportAck
     if(plMover && plMover->IsBeingTeleported())
+    {
+        recv_data.rpos(recv_data.wpos());                   // prevent warnings spam
         return;
+    }
 
     /* extract packet */
     uint64 guid;
@@ -231,6 +234,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
     ReadMovementInfo(recv_data, &movementInfo);
     /*----------------*/
 
+        recv_data.rpos(recv_data.wpos());                   // prevent warnings spam
     if (!MaNGOS::IsValidMapCoord(movementInfo.x, movementInfo.y, movementInfo.z, movementInfo.o))
         return;
 
@@ -353,7 +357,10 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket &recv_data)
 
     // now can skip not our packet
     if(_player->GetGUID() != guid)
+    {
+        recv_data.rpos(recv_data.wpos());                   // prevent warnings spam
         return;
+    }
 
     // continue parse packet
     recv_data >> unk1;                                      // counter or moveEvent
@@ -442,6 +449,7 @@ void WorldSession::HandleMoveNotActiveMover(WorldPacket &recv_data)
     if(_player->m_mover->GetGUID() == old_mover_guid)
     {
         sLog.outError("HandleMoveNotActiveMover: incorrect mover guid: mover is " I64FMT " and should be " I64FMT " instead of " I64FMT, _player->m_mover->GetGUID(), _player->GetGUID(), old_mover_guid);
+        recv_data.rpos(recv_data.wpos());                   // prevent warnings spam
         return;
     }
 
@@ -460,7 +468,10 @@ void WorldSession::HandleDismissControlledVehicle(WorldPacket &recv_data)
     uint64 vehicleGUID = _player->GetCharmGUID();
 
     if(!vehicleGUID)                                        // something wrong here...
+    {
+        recv_data.rpos(recv_data.wpos());                   // prevent warnings spam
         return;
+    }
 
     uint64 guid;
 

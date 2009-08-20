@@ -634,7 +634,7 @@ void WorldSession::HandleReclaimCorpseOpcode(WorldPacket &recv_data)
     if(corpse->GetGhostTime() + GetPlayer()->GetCorpseReclaimDelay(corpse->GetType()==CORPSE_RESURRECTABLE_PVP) > time(NULL))
         return;
 
-    if (!corpse->IsWithinDist(GetPlayer(),CORPSE_RECLAIM_RADIUS,false))
+    if (!corpse->IsWithinDist(GetPlayer(), CORPSE_RECLAIM_RADIUS, true))
         return;
 
     uint64 guid;
@@ -721,21 +721,31 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
     else
     {
         // we have only extent
-        float dx = pl->GetPositionX() - atEntry->x;
-        float dy = pl->GetPositionY() - atEntry->y;
-        float dz = pl->GetPositionZ() - atEntry->z;
-        double es = sin(atEntry->box_orientation);
-        double ec = cos(atEntry->box_orientation);
-        // calc rotated vector based on extent axis
-        double rotateDx = dx*ec - dy*es;
-        double rotateDy = dx*es + dy*ec;
 
-        if( (fabs(rotateDx) > atEntry->box_x/2 + delta) ||
-            (fabs(rotateDy) > atEntry->box_y/2 + delta) ||
+        // rotate the players position instead of rotating the whole cube, that way we can make a simplified
+        // is-in-cube check and we have to calculate only one point instead of 4
+
+        // 2PI = 360°, keep in mind that ingame orientation is counter-clockwise
+        double rotation = 2*M_PI-atEntry->box_orientation;
+        double sinVal = sin(rotation);
+        double cosVal = cos(rotation);
+
+        float playerBoxDistX = pl->GetPositionX() - atEntry->x;
+        float playerBoxDistY = pl->GetPositionY() - atEntry->y;
+
+        float rotPlayerX = atEntry->x + playerBoxDistX * cosVal - playerBoxDistY*sinVal;
+        float rotPlayerY = atEntry->y + playerBoxDistY * cosVal + playerBoxDistX*sinVal;
+
+        // box edges are parallel to coordiante axis, so we can treat every dimension independently :D
+        float dz = pl->GetPositionZ() - atEntry->z;
+        float dx = rotPlayerX - atEntry->x;
+        float dy = rotPlayerY - atEntry->y;
+        if( (fabs(dx) > atEntry->box_x/2 + delta) ||
+            (fabs(dy) > atEntry->box_y/2 + delta) ||
             (fabs(dz) > atEntry->box_z/2 + delta) )
         {
-            sLog.outDebug("Player '%s' (GUID: %u) too far (1/2 box X: %f 1/2 box Y: %f 1/2 box Z: %f rotate dX: %f rotate dY: %f dZ:%f), ignore Area Trigger ID: %u",
-                pl->GetName(), pl->GetGUIDLow(), atEntry->box_x/2, atEntry->box_y/2, atEntry->box_z/2, rotateDx, rotateDy, dz, Trigger_ID);
+            sLog.outDebug("Player '%s' (GUID: %u) too far (1/2 box X: %f 1/2 box Y: %f 1/2 box Z: %f rotatedPlayerX: %f rotatedPlayerY: %f dZ:%f), ignore Area Trigger ID: %u",
+                pl->GetName(), pl->GetGUIDLow(), atEntry->box_x/2, atEntry->box_y/2, atEntry->box_z/2, rotPlayerX, rotPlayerY, dz, Trigger_ID);
             return;
         }
     }
@@ -868,6 +878,7 @@ void WorldSession::HandleUpdateAccountData(WorldPacket &recv_data)
 
     if(decompressedSize > 0xFFFF)
     {
+        recv_data.rpos(recv_data.wpos());                   // unnneded warning spam in this case
         sLog.outError("UAD: Account data packet too big, size %u", decompressedSize);
         return;
     }
@@ -878,9 +889,12 @@ void WorldSession::HandleUpdateAccountData(WorldPacket &recv_data)
     uLongf realSize = decompressedSize;
     if(uncompress(const_cast<uint8*>(dest.contents()), &realSize, const_cast<uint8*>(recv_data.contents() + recv_data.rpos()), recv_data.size() - recv_data.rpos()) != Z_OK)
     {
+        recv_data.rpos(recv_data.wpos());                   // unnneded warning spam in this case
         sLog.outError("UAD: Failed to decompress account data");
         return;
     }
+
+    recv_data.rpos(recv_data.wpos());                       // uncompress read (recv_data.size() - recv_data.rpos())
 
     std::string adata;
     dest >> adata;
@@ -987,7 +1001,8 @@ void WorldSession::HandleMoveTimeSkippedOpcode( WorldPacket & recv_data )
     /*  WorldSession::Update( getMSTime() );*/
     DEBUG_LOG( "WORLD: Time Lag/Synchronization Resent/Update" );
 
-    recv_data.read_skip2<uint64,uint32>();
+    recv_data.read_skip<uint64>();
+    recv_data.read_skip<uint32>();
     /*
         uint64 guid;
         uint32 time_skipped;
@@ -1010,76 +1025,50 @@ void WorldSession::HandleFeatherFallAck(WorldPacket &/*recv_data*/)
 
 void WorldSession::HandleMoveUnRootAck(WorldPacket& recv_data)
 {
+    // no used
+    recv_data.rpos(recv_data.wpos());                       // prevent warnings spam
+/*
+    uint64 guid;
+    recv_data >> guid;
+
+    // now can skip not our packet
+    if(_player->GetGUID() != guid)
+    {
+        recv_data.rpos(recv_data.wpos());                   // prevent warnings spam
+        return;
+    }
+
     sLog.outDebug( "WORLD: CMSG_FORCE_MOVE_UNROOT_ACK" );
 
-    recv_data.read_skip<uint64>();                          // guid
-    recv_data.read_skip<uint64>();                          // unknown1
-    recv_data.read_skip<uint32>();                          // unknown2
-    recv_data.read_skip<float>();                           // PositionX
-    recv_data.read_skip<float>();                           // PositionY
-    recv_data.read_skip<float>();                           // PositionZ
-    recv_data.read_skip<float>();                           // Orientation
-    
-    /*
-        recv_data.hexlike();
+    recv_data.read_skip<uint32>();                          // unk
 
-        recv_data >> guid;
-        recv_data >> unknown1;
-        recv_data >> unknown2;
-        recv_data >> PositionX;
-        recv_data >> PositionY;
-        recv_data >> PositionZ;
-        recv_data >> Orientation;
-
-        // TODO for later may be we can use for anticheat
-        DEBUG_LOG("Guid " UI64FMTD,guid);
-        DEBUG_LOG("unknown1 " UI64FMTD,unknown1);
-        DEBUG_LOG("unknown2 %u",unknown2);
-        DEBUG_LOG("X %f",PositionX);
-        DEBUG_LOG("Y %f",PositionY);
-        DEBUG_LOG("Z %f",PositionZ);
-        DEBUG_LOG("O %f",Orientation);
-    */
+    MovementInfo movementInfo;
+    ReadMovementInfo(recv_data, &movementInfo);
+*/
 }
 
 void WorldSession::HandleMoveRootAck(WorldPacket& recv_data)
 {
-    recv_data.read_skip<uint64>();                          // guid
-    recv_data.read_skip<uint64>();                          // unknown1
-    recv_data.read_skip<uint32>();                          // unknown2
-    recv_data.read_skip<float>();                           // PositionX
-    recv_data.read_skip<float>();                           // PositionY
-    recv_data.read_skip<float>();                           // PositionZ
-    recv_data.read_skip<float>();                           // Orientation
+    // no used
+    recv_data.rpos(recv_data.wpos());                       // prevent warnings spam
+/*
+    uint64 guid;
+    recv_data >> guid;
 
-    /*
-        sLog.outDebug( "WORLD: CMSG_FORCE_MOVE_ROOT_ACK" );
-        recv_data.hexlike();
-        uint64 guid;
-        uint64 unknown1;
-        uint32 unknown2;
-        float PositionX;
-        float PositionY;
-        float PositionZ;
-        float Orientation;
+    // now can skip not our packet
+    if(_player->GetGUID() != guid)
+    {
+        recv_data.rpos(recv_data.wpos());                   // prevent warnings spam
+        return;
+    }
 
-        recv_data >> guid;
-        recv_data >> unknown1;
-        recv_data >> unknown2;
-        recv_data >> PositionX;
-        recv_data >> PositionY;
-        recv_data >> PositionZ;
-        recv_data >> Orientation;
+    sLog.outDebug( "WORLD: CMSG_FORCE_MOVE_ROOT_ACK" );
 
-        // for later may be we can use for anticheat
-        DEBUG_LOG("Guid " UI64FMTD,guid);
-        DEBUG_LOG("unknown1 " UI64FMTD,unknown1);
-        DEBUG_LOG("unknown1 %u",unknown2);
-        DEBUG_LOG("X %f",PositionX);
-        DEBUG_LOG("Y %f",PositionY);
-        DEBUG_LOG("Z %f",PositionZ);
-        DEBUG_LOG("O %f",Orientation);
-    */
+    recv_data.read_skip<uint32>();                          // unk
+
+    MovementInfo movementInfo;
+    ReadMovementInfo(recv_data, &movementInfo);
+*/
 }
 
 void WorldSession::HandleSetActionBarToggles(WorldPacket& recv_data)
