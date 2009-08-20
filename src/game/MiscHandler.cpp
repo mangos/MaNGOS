@@ -1537,7 +1537,6 @@ void WorldSession::HandleSetTaxiBenchmarkOpcode( WorldPacket & recv_data )
 
 void WorldSession::HandleQueryInspectAchievements( WorldPacket & recv_data )
 {
-
     uint64 guid;
     if(!recv_data.readPackGUID(guid))
         return;
