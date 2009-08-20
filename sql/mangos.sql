@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_8394_01_mangos_spell_proc_event` bit(1) default NULL
+  `required_8397_02_mangos_spell_threat` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -15382,14 +15382,6 @@ INSERT INTO spell_chain VALUES
 (30356,25258,23922,6,0),
 (47487,30356,23922,7,0),
 (47488,47487,23922,8,0),
-/*SunderArmor*/
-(7386,0,7386,1,0),
-(7405,7386,7386,2,0),
-(8380,7405,7386,3,0),
-(11596,8380,7386,4,0),
-(11597,11596,7386,5,0),
-(25225,11597,7386,6,0),
-(47467,25225,7386,7,0),
 /*------------------
 -- (267) Protection (Paladin)
 ------------------*/
@@ -18104,11 +18096,9 @@ INSERT INTO `spell_threat` VALUES
 (7373,141),
 (7379,235),
 (7386,100),
-(7405,140),
 (8198,40),
 (8204,64),
 (8205,96),
-(8380,180),
 (8972,118),
 (9745,148),
 (9880,178),
@@ -18120,8 +18110,6 @@ INSERT INTO `spell_threat` VALUES
 (11567,145),
 (11580,143),
 (11581,180),
-(11596,220),
-(11597,261),
 (11600,275),
 (11601,315),
 (11775,395),
@@ -18142,7 +18130,6 @@ INSERT INTO `spell_threat` VALUES
 (23925,250),
 (24394,580),
 (24583,5),
-(25225,300),
 (25231,130),
 (25258,286),
 (25264,215),
