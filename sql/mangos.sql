@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_8397_02_mangos_spell_threat` bit(1) default NULL
+  `required_8399_01_mangos_spell_elixir` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -16966,12 +16966,19 @@ INSERT INTO `spell_elixir` VALUES
 (17627,0x3),
 (17629,0x3),
 (17628,0x3),
+(18191,0x10),
+(18192,0x10),
+(18193,0x10),
+(18194,0x10),
+(18222,0x10),
 (21920,0x1),
+(22730,0x10),
 (24361,0x2),
 (24363,0x2),
 (24382,0x2),
 (24383,0x2),
 (24417,0x2),
+(25661,0x10),
 (26276,0x1),
 (27652,0x2),
 (27653,0x2),
@@ -17014,6 +17021,8 @@ INSERT INTO `spell_elixir` VALUES
 (45373,0x1),
 (46837,0xB),
 (46839,0xB);
+
+
 /*!40000 ALTER TABLE `spell_elixir` ENABLE KEYS */;
 UNLOCK TABLES;
 

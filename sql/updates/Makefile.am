@@ -89,6 +89,7 @@ pkgdata_DATA = \
 	8397_01_mangos_spell_chain.sql \
 	8397_02_mangos_spell_threat.sql \
 	8397_03_characters_character_spell.sql \
+	8399_01_mangos_spell_elixir.sql \
 	README
 
 ## Additional files to include when running 'make dist'
@@ -158,4 +159,5 @@ EXTRA_DIST = \
 	8397_01_mangos_spell_chain.sql \
 	8397_02_mangos_spell_threat.sql \
 	8397_03_characters_character_spell.sql \
+	8399_01_mangos_spell_elixir.sql \
 	README
