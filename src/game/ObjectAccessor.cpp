@@ -44,7 +44,11 @@ INSTANTIATE_SINGLETON_2(ObjectAccessor, CLASS_LOCK);
 INSTANTIATE_CLASS_MUTEX(ObjectAccessor, ACE_Thread_Mutex);
 
 ObjectAccessor::ObjectAccessor() {}
-ObjectAccessor::~ObjectAccessor() {}
+ObjectAccessor::~ObjectAccessor()
+{
+    for(Player2CorpsesMapType::const_iterator itr = i_player2corpse.begin(); itr != i_player2corpse.end(); ++itr)
+        delete itr->second;
+}
 
 Creature*
 ObjectAccessor::GetCreatureOrPetOrVehicle(WorldObject const &u, uint64 guid)
@@ -363,8 +367,6 @@ ObjectAccessor::ConvertCorpseForPlayer(uint64 player_guid, bool insignia)
         // bones->m_inWorld = m_inWorld;                        // don't overwrite world state
         // bones->m_type = m_type;                              // don't overwrite type
         bones->Relocate(corpse->GetPositionX(), corpse->GetPositionY(), corpse->GetPositionZ(), corpse->GetOrientation());
-        bones->SetMapId(corpse->GetMapId());
-        bones->SetInstanceId(corpse->GetInstanceId());
         bones->SetPhaseMask(corpse->GetPhaseMask(), false);
 
         bones->SetUInt32Value(CORPSE_FIELD_FLAGS, CORPSE_FLAG_UNK2 | CORPSE_FLAG_BONES);

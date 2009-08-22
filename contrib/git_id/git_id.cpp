@@ -750,8 +750,10 @@ bool prepare_new_index()
     if(!use_new_index) return true;
 
     // only use a new index if there are staged changes that should be preserved
-    if( (cmd_pipe = popen( "git diff --cached", "r" )) == NULL )
+    if( (cmd_pipe = popen( "git diff --cached", "r" )) == NULL ) {
+        use_new_index = false;
         return false;
+    }
 
     if(!fgets(buffer, MAX_BUF, cmd_pipe))
     {

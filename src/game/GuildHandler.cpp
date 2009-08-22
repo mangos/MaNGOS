@@ -29,8 +29,6 @@
 
 void WorldSession::HandleGuildQueryOpcode(WorldPacket& recvPacket)
 {
-    CHECK_PACKET_SIZE(recvPacket, 4);
-
     uint32 guildId;
     Guild *guild;
 
@@ -50,8 +48,6 @@ void WorldSession::HandleGuildQueryOpcode(WorldPacket& recvPacket)
 
 void WorldSession::HandleGuildCreateOpcode(WorldPacket& recvPacket)
 {
-    CHECK_PACKET_SIZE(recvPacket, 1);
-
     std::string gname;
 
     //sLog.outDebug("WORLD: Received CMSG_GUILD_CREATE");
@@ -62,7 +58,7 @@ void WorldSession::HandleGuildCreateOpcode(WorldPacket& recvPacket)
         return;
 
     Guild *guild = new Guild;
-    if(!guild->create(GetPlayer(),gname))
+    if(!guild->Create(GetPlayer(),gname))
     {
         delete guild;
         return;
@@ -73,8 +69,6 @@ void WorldSession::HandleGuildCreateOpcode(WorldPacket& recvPacket)
 
 void WorldSession::HandleGuildInviteOpcode(WorldPacket& recvPacket)
 {
-    CHECK_PACKET_SIZE(recvPacket, 1);
-
     std::string Invitedname, plname;
 
     //sLog.outDebug("WORLD: Received CMSG_GUILD_INVITE");
@@ -146,8 +140,6 @@ void WorldSession::HandleGuildInviteOpcode(WorldPacket& recvPacket)
 
 void WorldSession::HandleGuildRemoveOpcode(WorldPacket& recvPacket)
 {
-    CHECK_PACKET_SIZE(recvPacket, 1);
-
     std::string plName;
 
     //sLog.outDebug("WORLD: Received CMSG_GUILD_REMOVE");
@@ -269,8 +261,6 @@ void WorldSession::HandleGuildRosterOpcode(WorldPacket& /*recvPacket*/)
 
 void WorldSession::HandleGuildPromoteOpcode(WorldPacket& recvPacket)
 {
-    CHECK_PACKET_SIZE(recvPacket, 1);
-
     std::string plName;
 
     //sLog.outDebug("WORLD: Received CMSG_GUILD_PROMOTE");
@@ -327,8 +317,6 @@ void WorldSession::HandleGuildPromoteOpcode(WorldPacket& recvPacket)
 
 void WorldSession::HandleGuildDemoteOpcode(WorldPacket& recvPacket)
 {
-    CHECK_PACKET_SIZE(recvPacket, 1);
-
     std::string plName;
 
     //sLog.outDebug("WORLD: Received CMSG_GUILD_DEMOTE");
@@ -451,8 +439,6 @@ void WorldSession::HandleGuildDisbandOpcode(WorldPacket& /*recvPacket*/)
 
 void WorldSession::HandleGuildLeaderOpcode(WorldPacket& recvPacket)
 {
-    CHECK_PACKET_SIZE(recvPacket, 1);
-
     std::string name;
     Player *oldLeader = GetPlayer();
     Guild *guild;
@@ -537,8 +523,6 @@ void WorldSession::HandleGuildMOTDOpcode(WorldPacket& recvPacket)
 
 void WorldSession::HandleGuildSetPublicNoteOpcode(WorldPacket& recvPacket)
 {
-    CHECK_PACKET_SIZE(recvPacket, 1);
-
     std::string name,PNOTE;
 
     //sLog.outDebug("WORLD: Received CMSG_GUILD_SET_PUBLIC_NOTE");
@@ -579,8 +563,6 @@ void WorldSession::HandleGuildSetPublicNoteOpcode(WorldPacket& recvPacket)
 
 void WorldSession::HandleGuildSetOfficerNoteOpcode(WorldPacket& recvPacket)
 {
-    CHECK_PACKET_SIZE(recvPacket, 1);
-
     std::string plName, OFFNOTE;
 
     //sLog.outDebug("WORLD: Received CMSG_GUILD_SET_OFFICER_NOTE");
@@ -620,27 +602,26 @@ void WorldSession::HandleGuildSetOfficerNoteOpcode(WorldPacket& recvPacket)
 
 void WorldSession::HandleGuildRankOpcode(WorldPacket& recvPacket)
 {
-    CHECK_PACKET_SIZE(recvPacket, 4+4+1+4*13);
     //recvPacket.hexlike();
 
     Guild *guild;
     std::string rankname;
     uint32 rankId;
     uint32 rights, MoneyPerDay;
-    uint32 BankRights;
-    uint32 BankSlotPerDay;
 
     //sLog.outDebug("WORLD: Received CMSG_GUILD_RANK");
 
     guild = objmgr.GetGuildById(GetPlayer()->GetGuildId());
     if(!guild)
     {
+        recvPacket.rpos(recvPacket.wpos());                 // set to end to avoid warnings spam
         SendGuildCommandResult(GUILD_CREATE_S, "", GUILD_PLAYER_NOT_IN_GUILD);
         return;
     }
 
     else if(GetPlayer()->GetGUID() != guild->GetLeader())
     {
+        recvPacket.rpos(recvPacket.wpos());                 // set to end to avoid warnings spam
         SendGuildCommandResult(GUILD_INVITE_S, "", GUILD_PERMISSIONS);
         return;
     }
@@ -652,10 +633,14 @@ void WorldSession::HandleGuildRankOpcode(WorldPacket& recvPacket)
 
     for (int i = 0; i < GUILD_BANK_MAX_TABS; ++i)
     {
+        uint32 BankRights;
+        uint32 BankSlotPerDay;
+
         recvPacket >> BankRights;
         recvPacket >> BankSlotPerDay;
         guild->SetBankRightsAndSlots(rankId, uint8(i), uint16(BankRights & 0xFF), uint16(BankSlotPerDay), true);
     }
+
     sLog.outDebug("WORLD: Changed RankName to %s , Rights to 0x%.4X", rankname.c_str(), rights);
 
     guild->SetBankMoneyPerDay(rankId, MoneyPerDay);
@@ -672,8 +657,6 @@ void WorldSession::HandleGuildRankOpcode(WorldPacket& recvPacket)
 
 void WorldSession::HandleGuildAddRankOpcode(WorldPacket& recvPacket)
 {
-    CHECK_PACKET_SIZE(recvPacket, 1);
-
     Guild *guild;
     std::string rankname;
 
@@ -742,8 +725,6 @@ void WorldSession::SendGuildCommandResult(uint32 typecmd, const std::string& str
 
 void WorldSession::HandleGuildChangeInfoTextOpcode(WorldPacket& recvPacket)
 {
-    CHECK_PACKET_SIZE(recvPacket, 1);
-
     //sLog.outDebug("WORLD: Received CMSG_GUILD_INFO_TEXT");
 
     std::string GINFO;
@@ -768,8 +749,6 @@ void WorldSession::HandleGuildChangeInfoTextOpcode(WorldPacket& recvPacket)
 
 void WorldSession::HandleSaveGuildEmblemOpcode(WorldPacket& recvPacket)
 {
-    CHECK_PACKET_SIZE(recvPacket, 8+4+4+4+4+4);
-
     //sLog.outDebug("WORLD: Received MSG_SAVE_GUILD_EMBLEM");
 
     uint64 vendorGuid;
@@ -846,7 +825,7 @@ void WorldSession::HandleGuildEventLogQueryOpcode(WorldPacket& /* recvPacket */)
     if(!pGuild)
         return;
 
-    pGuild->DisplayGuildEventlog(this);
+    pGuild->DisplayGuildEventLog(this);
 }
 
 /******  GUILD BANK  *******/
@@ -900,7 +879,6 @@ void WorldSession::HandleGuildPermissions( WorldPacket& /* recv_data */ )
 void WorldSession::HandleGuildBankerActivate( WorldPacket & recv_data )
 {
     sLog.outDebug("WORLD: Received (CMSG_GUILD_BANKER_ACTIVATE)");
-    CHECK_PACKET_SIZE(recv_data,8+1);
     uint64 GoGuid;
     uint8  unk;
     recv_data >> GoGuid >> unk;
@@ -924,7 +902,6 @@ void WorldSession::HandleGuildBankerActivate( WorldPacket & recv_data )
 void WorldSession::HandleGuildBankQueryTab( WorldPacket & recv_data )
 {
     sLog.outDebug("WORLD: Received (CMSG_GUILD_BANK_QUERY_TAB)");
-    CHECK_PACKET_SIZE(recv_data,8+1+1);
     uint64 GoGuid;
     uint8 TabId,unk1;
     recv_data >> GoGuid >> TabId >> unk1;
@@ -950,7 +927,6 @@ void WorldSession::HandleGuildBankQueryTab( WorldPacket & recv_data )
 void WorldSession::HandleGuildBankDepositMoney( WorldPacket & recv_data )
 {
     sLog.outDebug("WORLD: Received (CMSG_GUILD_BANK_DEPOSIT_MONEY)");
-    CHECK_PACKET_SIZE(recv_data,8+4);
     uint64 GoGuid;
     uint32 money;
     recv_data >> GoGuid >> money;
@@ -998,7 +974,6 @@ void WorldSession::HandleGuildBankDepositMoney( WorldPacket & recv_data )
 void WorldSession::HandleGuildBankWithdrawMoney( WorldPacket & recv_data )
 {
     sLog.outDebug("WORLD: Received (CMSG_GUILD_BANK_WITHDRAW_MONEY)");
-    CHECK_PACKET_SIZE(recv_data,8+4);
     uint64 GoGuid;
     uint32 money;
     recv_data >> GoGuid >> money;
@@ -1053,16 +1028,18 @@ void WorldSession::HandleGuildBankSwapItems( WorldPacket & recv_data )
     uint64 GoGuid;
     uint8 BankToBank;
 
-    uint8 BankTab, BankTabSlot, AutoStore, AutoStoreCount, PlayerSlot, PlayerBag, SplitedAmount = 0;
-    uint8 BankTabDst, BankTabSlotDst, unk2, ToChar = 1;
+    uint8 BankTab, BankTabSlot, AutoStore;
+    uint8 PlayerSlot = NULL_SLOT;
+    uint8 PlayerBag = NULL_BAG;
+    uint8 BankTabDst, BankTabSlotDst, unk2;
+    uint8 ToChar = 1;
     uint32 ItemEntry, unk1;
+    uint32 AutoStoreCount = 0;
+    uint32 SplitedAmount = 0;
 
-    CHECK_PACKET_SIZE(recv_data,8+1);
     recv_data >> GoGuid >> BankToBank;
     if (BankToBank)
     {
-        // recheck
-        CHECK_PACKET_SIZE(recv_data, recv_data.rpos()+1+1+4+1+1+4+1+1);
         recv_data >> BankTabDst;
         recv_data >> BankTabSlotDst;
         recv_data >> unk1;                                  // always 0
@@ -1072,39 +1049,37 @@ void WorldSession::HandleGuildBankSwapItems( WorldPacket & recv_data )
         recv_data >> unk2;                                  // always 0
         recv_data >> SplitedAmount;
 
-        if (BankTabSlotDst >= GUILD_BANK_MAX_SLOTS)
+        if (BankTabSlotDst >= GUILD_BANK_MAX_SLOTS || BankTabDst == BankTab && BankTabSlotDst == BankTabSlot)
+        {
+            recv_data.rpos(recv_data.wpos());               // prevent additional spam at rejected packet
             return;
-        if (BankTabDst == BankTab && BankTabSlotDst == BankTabSlot)
-            return;
+        }
     }
     else
     {
-        // recheck
-        CHECK_PACKET_SIZE(recv_data, recv_data.rpos()+1+1+4+1);
         recv_data >> BankTab;
         recv_data >> BankTabSlot;
         recv_data >> ItemEntry;
         recv_data >> AutoStore;
         if (AutoStore)
         {
-            // recheck
-            CHECK_PACKET_SIZE(recv_data, recv_data.rpos()+1);
             recv_data >> AutoStoreCount;
+            recv_data.read_skip<uint8>();                   // ToChar (?), always and expected to be 1 (autostore only triggered in guild->ToChar)
+            recv_data.read_skip<uint32>();                  // unknown, always 0
         }
-        // recheck
-        CHECK_PACKET_SIZE(recv_data, recv_data.rpos()+1+1);
-        recv_data >> PlayerBag;
-        recv_data >> PlayerSlot;
-        if (!AutoStore)
+        else
         {
-            // recheck
-            CHECK_PACKET_SIZE(recv_data, recv_data.rpos()+1+1);
+            recv_data >> PlayerBag;
+            recv_data >> PlayerSlot;
             recv_data >> ToChar;
             recv_data >> SplitedAmount;
         }
 
         if (BankTabSlot >= GUILD_BANK_MAX_SLOTS && BankTabSlot != 0xFF)
+        {
+            recv_data.rpos(recv_data.wpos());               // prevent additional spam at rejected packet
             return;
+        }
     }
 
     if (!GetPlayer()->GetGameObjectIfCanInteractWith(GoGuid, GAMEOBJECT_TYPE_GUILD_BANK))
@@ -1238,14 +1213,6 @@ void WorldSession::HandleGuildBankSwapItems( WorldPacket & recv_data )
     }
 
     // Player <-> Bank
-
-    // char->bank autostore click return BankTabSlot = 255 = NULL_SLOT
-    // do similar for bank->char
-    if(AutoStore && ToChar)
-    {
-        PlayerBag = NULL_BAG;
-        PlayerSlot = NULL_SLOT;
-    }
 
     // allow work with inventory only
     if(!Player::IsInventoryPos(PlayerBag,PlayerSlot) && !(PlayerBag == NULL_BAG && PlayerSlot == NULL_SLOT) )
@@ -1554,7 +1521,6 @@ void WorldSession::HandleGuildBankSwapItems( WorldPacket & recv_data )
 void WorldSession::HandleGuildBankBuyTab( WorldPacket & recv_data )
 {
     sLog.outDebug("WORLD: Received (CMSG_GUILD_BANK_BUY_TAB)");
-    CHECK_PACKET_SIZE(recv_data, 8+1);
     //recv_data.hexlike();
     uint64 GoGuid;
     uint8 TabId;
@@ -1580,7 +1546,7 @@ void WorldSession::HandleGuildBankBuyTab( WorldPacket & recv_data )
     if (pGuild->GetPurchasedTabs() >= GUILD_BANK_MAX_TABS)
         return;
 
-    if (TabId != pGuild->GetPurchasedTabs())                // purchased_tabs = 0 when buying Tab 0, that is why this check can be made
+    if (TabId != pGuild->GetPurchasedTabs())                // m_PurchasedTabs = 0 when buying Tab 0, that is why this check can be made
     {
         sLog.outError("Error: trying to buy a tab non contigous to owned ones");
         return;
@@ -1602,7 +1568,6 @@ void WorldSession::HandleGuildBankUpdateTab( WorldPacket & recv_data )
 {
     sLog.outDebug("WORLD: Received (CMSG_GUILD_BANK_UPDATE_TAB)");
     //recv_data.hexlike();
-    CHECK_PACKET_SIZE(recv_data, 8+1+1+1);
     uint64 GoGuid;
     uint8 TabId;
     std::string Name;
@@ -1638,7 +1603,6 @@ void WorldSession::HandleGuildBankUpdateTab( WorldPacket & recv_data )
 void WorldSession::HandleGuildBankLogQuery( WorldPacket & recv_data )
 {
     sLog.outDebug("WORLD: Received (MSG_GUILD_BANK_LOG_QUERY)");
-    CHECK_PACKET_SIZE(recv_data, 1);
 
     uint32 GuildId = GetPlayer()->GetGuildId();
     if (GuildId == 0)
@@ -1657,7 +1621,6 @@ void WorldSession::HandleGuildBankLogQuery( WorldPacket & recv_data )
 void WorldSession::HandleQueryGuildBankTabText(WorldPacket &recv_data)
 {
     sLog.outDebug("WORLD: Received MSG_QUERY_GUILD_BANK_TEXT");
-    CHECK_PACKET_SIZE(recv_data, 1);
 
     uint32 GuildId = GetPlayer()->GetGuildId();
     if (GuildId == 0)
@@ -1676,8 +1639,6 @@ void WorldSession::HandleQueryGuildBankTabText(WorldPacket &recv_data)
 void WorldSession::HandleSetGuildBankTabText(WorldPacket &recv_data)
 {
     sLog.outDebug("WORLD: Received CMSG_SET_GUILD_BANK_TEXT");
-    CHECK_PACKET_SIZE(recv_data, 1+1);
-
     uint32 GuildId = GetPlayer()->GetGuildId();
     if (GuildId == 0)
         return;

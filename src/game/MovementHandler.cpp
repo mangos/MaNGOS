@@ -72,18 +72,17 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     GetPlayer()->SetSemaphoreTeleportFar(false);
 
     // relocate the player to the teleport destination
-    GetPlayer()->SetMapId(loc.mapid);
+    GetPlayer()->SetMap(MapManager::Instance().CreateMap(loc.mapid, GetPlayer()));    GetPlayer()->Relocate(loc.coord_x, loc.coord_y, loc.coord_z, loc.orientation);
     GetPlayer()->Relocate(loc.coord_x, loc.coord_y, loc.coord_z, loc.orientation);
-
-    // since the MapId is set before the GetInstance call, the InstanceId must be set to 0
-    // to let GetInstance() determine the proper InstanceId based on the player's binds
-    GetPlayer()->SetInstanceId(0);
 
     GetPlayer()->SendInitialPacketsBeforeAddToMap();
     // the CanEnter checks are done in TeleporTo but conditions may change
     // while the player is in transit, for example the map may get full
     if(!GetPlayer()->GetMap()->Add(GetPlayer()))
     {
+        //if player wasn't added to map, reset his map pointer!
+        GetPlayer()->ResetMap();
+
         sLog.outDebug("WORLD: teleport of player %s (%d) to location %d, %f, %f, %f, %f failed", GetPlayer()->GetName(), GetPlayer()->GetGUIDLow(), loc.mapid, loc.coord_x, loc.coord_y, loc.coord_z, loc.orientation);
         // teleport the player home
         if(!GetPlayer()->TeleportTo(GetPlayer()->m_homebindMapId, GetPlayer()->m_homebindX, GetPlayer()->m_homebindY, GetPlayer()->m_homebindZ, GetPlayer()->GetOrientation()))
@@ -168,8 +167,6 @@ void WorldSession::HandleMoveWorldportAckOpcode()
 
 void WorldSession::HandleMoveTeleportAck(WorldPacket& recv_data)
 {
-    CHECK_PACKET_SIZE(recv_data, 8+4);
-
     sLog.outDebug("MSG_MOVE_TELEPORT_ACK");
     uint64 guid;
     uint32 flags, time;
@@ -224,7 +221,9 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
     Player *plMover = mover->GetTypeId()==TYPEID_PLAYER ? (Player*)mover : NULL;
 
     // ignore, waiting processing in WorldSession::HandleMoveWorldportAckOpcode and WorldSession::HandleMoveTeleportAck
-    if(plMover && plMover->IsBeingTeleported()){
+    if(plMover && plMover->IsBeingTeleported())
+    {
+        recv_data.rpos(recv_data.wpos());                   // prevent warnings spam
         // movement anticheat
         plMover->m_anti_JustTeleported = 1;
         // end movement anticheat
@@ -240,23 +239,32 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
     {
         sLog.outError("MovementHandler: player %s (guid %d, account %u) sent a packet (opcode %u) that is " SIZEFMTD " bytes larger than it should be. Kicked as cheater.", _player->GetName(), _player->GetGUIDLow(), _player->GetSession()->GetAccountId(), recv_data.GetOpcode(), recv_data.size() - recv_data.rpos());
         KickPlayer();
+        recv_data.rpos(recv_data.wpos());                   // prevent warnings spam
         return;
     }
 
     if (!MaNGOS::IsValidMapCoord(movementInfo.x, movementInfo.y, movementInfo.z, movementInfo.o))
+    {
+        recv_data.rpos(recv_data.wpos());                   // prevent warnings spam
         return;
+    }
 
     /* handle special cases */
     if (movementInfo.HasMovementFlag(MOVEMENTFLAG_ONTRANSPORT))
     {
         // transports size limited
-        // (also received at zeppelin leave by some reason with t_* as absolute in continent coordinates, can be safely skipped)
-        if( movementInfo.t_x > 60 || movementInfo.t_y > 60 || movementInfo.t_x < -60 ||  movementInfo.t_y < -60 )
+        // (also received at zeppelin leave by some reason with t_* as absolute in continent coordinates, can be safely skipped)        if( movementInfo.t_x > 50 || movementInfo.t_y > 50 || movementInfo.t_z > 50 || movementInfo.t_x < -60 ||  movementInfo.t_y < -60 || movementInfo.t_z < -60)
+        {
+            recv_data.rpos(recv_data.wpos());                   // prevent warnings spam
             return;
+        }
 
         if( !MaNGOS::IsValidMapCoord(movementInfo.x+movementInfo.t_x, movementInfo.y + movementInfo.t_y,
             movementInfo.z + movementInfo.t_z, movementInfo.o + movementInfo.t_o) )
+        {
+            recv_data.rpos(recv_data.wpos());                   // prevent warnings spam
             return;
+        }
 
         if (plMover && plMover->m_anti_TransportGUID == 0 && (movementInfo.t_guid !=0))
         {
@@ -681,8 +689,6 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket &recv_data)
 {
     sLog.outDebug("WORLD: Recvd %s (%u, 0x%X) opcode", LookupOpcodeName(recv_data.GetOpcode()), recv_data.GetOpcode(), recv_data.GetOpcode());
 
-    CHECK_PACKET_SIZE(recv_data, recv_data.rpos()+8+4);
-
     /* extract packet */
     uint64 guid;
     uint32 unk1;
@@ -692,7 +698,10 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket &recv_data)
 
     // now can skip not our packet
     if(_player->GetGUID() != guid)
+    {
+        recv_data.rpos(recv_data.wpos());                   // prevent warnings spam
         return;
+    }
 
     // continue parse packet
 
@@ -700,9 +709,6 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket &recv_data)
 
     MovementInfo movementInfo;
     ReadMovementInfo(recv_data, &movementInfo);
-
-    // recheck
-    CHECK_PACKET_SIZE(recv_data, recv_data.rpos()+4);
 
     recv_data >> newspeed;
     /*----------------*/
@@ -762,8 +768,6 @@ void WorldSession::HandleSetActiveMoverOpcode(WorldPacket &recv_data)
     sLog.outDebug("WORLD: Recvd CMSG_SET_ACTIVE_MOVER");
     recv_data.hexlike();
 
-    CHECK_PACKET_SIZE(recv_data, 8);
-
     uint64 guid;
     recv_data >> guid;
 
@@ -779,14 +783,13 @@ void WorldSession::HandleMoveNotActiveMover(WorldPacket &recv_data)
     sLog.outDebug("WORLD: Recvd CMSG_MOVE_NOT_ACTIVE_MOVER");
     recv_data.hexlike();
 
-    CHECK_PACKET_SIZE(recv_data, recv_data.rpos()+8);
-
     uint64 old_mover_guid;
     recv_data >> old_mover_guid;
 
     if(_player->m_mover->GetGUID() == old_mover_guid)
     {
         sLog.outError("HandleMoveNotActiveMover: incorrect mover guid: mover is " I64FMT " and should be " I64FMT " instead of " I64FMT, _player->m_mover->GetGUID(), _player->GetGUID(), old_mover_guid);
+        recv_data.rpos(recv_data.wpos());                   // prevent warnings spam
         return;
     }
 
@@ -803,7 +806,10 @@ void WorldSession::HandleDismissControlledVehicle(WorldPacket &recv_data)
     uint64 vehicleGUID = _player->GetCharmGUID();
 
     if(!vehicleGUID)                                        // something wrong here...
+    {
+        recv_data.rpos(recv_data.wpos());                   // prevent warnings spam
         return;
+    }
 
     MovementInfo mi;
     ReadMovementInfo(recv_data, &mi);
@@ -829,7 +835,6 @@ void WorldSession::HandleMountSpecialAnimOpcode(WorldPacket& /*recvdata*/)
 
 void WorldSession::HandleMoveKnockBackAck( WorldPacket & recv_data )
 {
-    // CHECK_PACKET_SIZE(recv_data,?);
     sLog.outDebug("CMSG_MOVE_KNOCK_BACK_ACK");
     // Currently not used but maybe use later for recheck final player position
     // (must be at call same as into "recv_data >> x >> y >> z >> orientation;"
@@ -868,8 +873,6 @@ void WorldSession::HandleMoveWaterWalkAck(WorldPacket& /*recv_data*/)
 
 void WorldSession::HandleSummonResponseOpcode(WorldPacket& recv_data)
 {
-    CHECK_PACKET_SIZE(recv_data, 8+1);
-
     if(!_player->isAlive() || _player->isInCombat() )
         return;
 

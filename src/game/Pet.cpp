@@ -146,7 +146,7 @@ bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool 
     }
 
     uint32 pet_number = fields[0].GetUInt32();
-    
+
     if (current && owner->IsPetNeedBeTemporaryUnsummoned())
     {
         owner->SetTemporaryUnsummonedPetNumber(pet_number);
@@ -743,9 +743,6 @@ bool Pet::CreateBaseAtCreature(Creature* creature)
         return false;
     }
     uint32 guid=objmgr.GenerateLowGuid(HIGHGUID_PET);
-
-    sLog.outBasic("SetInstanceID()");
-    SetInstanceId(creature->GetInstanceId());
 
     sLog.outBasic("Create pet");
     uint32 pet_number = objmgr.GeneratePetNumber();
@@ -1841,8 +1838,7 @@ bool Pet::IsPermanentPetFor(Player* owner)
 
 bool Pet::Create(uint32 guidlow, Map *map, uint32 phaseMask, uint32 Entry, uint32 pet_number)
 {
-    SetMapId(map->GetId());
-    SetInstanceId(map->GetInstanceId());
+    SetMap(map);
     SetPhaseMask(phaseMask,false);
 
     Object::_Create(guidlow, pet_number, HIGHGUID_PET);
@@ -1922,13 +1918,19 @@ void Pet::CastPetAura(PetAura const* aura)
         CastSpell(this, auraId, true);
 }
 
+struct DoPetLearnSpell
+{
+    DoPetLearnSpell(Pet& _pet) : pet(_pet) {}
+    void operator() (uint32 spell_id) { pet.learnSpell(spell_id); }
+    Pet& pet;
+};
+
 void Pet::learnSpellHighRank(uint32 spellid)
 {
     learnSpell(spellid);
 
-    SpellChainMapNext const& nextMap = spellmgr.GetSpellChainNext();
-    for(SpellChainMapNext::const_iterator itr = nextMap.lower_bound(spellid); itr != nextMap.upper_bound(spellid); ++itr)
-        learnSpellHighRank(itr->second);
+    DoPetLearnSpell worker(*this);
+    spellmgr.doForHighRanks(spellid,worker);
 }
 
 void Pet::SynchronizeLevelWithOwner()

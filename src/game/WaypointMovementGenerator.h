@@ -74,7 +74,7 @@ class MANGOS_DLL_SPEC WaypointMovementGenerator<Creature>
 public PathMovementBase<Creature, WaypointPath*>
 {
     public:
-        WaypointMovementGenerator(Creature &) : i_nextMoveTime(0), b_StopedByPlayer(false) {}
+        WaypointMovementGenerator(Creature &) : i_nextMoveTime(0), b_StoppedByPlayer(false) {}
         ~WaypointMovementGenerator() { ClearWaypoints(); }
         void Initialize(Creature &u)
         {
@@ -86,7 +86,7 @@ public PathMovementBase<Creature, WaypointPath*>
         void Reset(Creature &u)
         {
             ReloadPath(u);
-            b_StopedByPlayer = false;
+            b_StoppedByPlayer = false;
             i_nextMoveTime.Reset(0);
         }
         bool Update(Creature &u, const uint32 &diff);
@@ -100,8 +100,8 @@ public PathMovementBase<Creature, WaypointPath*>
         void ReloadPath(Creature &c) { ClearWaypoints(); LoadPath(c); }
 
         // Player stoping creature
-        bool IsStopedByPlayer() { return b_StopedByPlayer; }
-        void SetStopedByPlayer(bool val) { b_StopedByPlayer = val; }
+        bool IsStoppedByPlayer() { return b_StoppedByPlayer; }
+        void SetStoppedByPlayer(bool val) { b_StoppedByPlayer = val; }
 
         // statics
         static void Initialize(void);
@@ -114,7 +114,7 @@ public PathMovementBase<Creature, WaypointPath*>
 
         TimeTrackerSmall i_nextMoveTime;
         std::vector<bool> i_hasDone;
-        bool b_StopedByPlayer;
+        bool b_StoppedByPlayer;
 };
 
 /** FlightPathMovementGenerator generates movement of the player for the paths

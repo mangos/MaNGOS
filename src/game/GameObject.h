@@ -397,6 +397,98 @@ struct GameObjectInfo
         } raw;
     };
     uint32 ScriptId;
+
+    // helpers
+    bool IsDespawnAtAction() const
+    {
+        switch(type)
+        {
+            case GAMEOBJECT_TYPE_CHEST:  return chest.consumable;
+            case GAMEOBJECT_TYPE_GOOBER: return goober.consumable;
+            default: return false;
+        }
+    }
+
+    uint32 GetLockId() const
+    {
+        switch(type)
+        {
+            case GAMEOBJECT_TYPE_DOOR:       return door.lockId;
+            case GAMEOBJECT_TYPE_BUTTON:     return button.lockId;
+            case GAMEOBJECT_TYPE_QUESTGIVER: return questgiver.lockId;
+            case GAMEOBJECT_TYPE_CHEST:      return chest.lockId;
+            case GAMEOBJECT_TYPE_TRAP:       return trap.lockId;
+            case GAMEOBJECT_TYPE_GOOBER:     return goober.lockId;
+            case GAMEOBJECT_TYPE_AREADAMAGE: return areadamage.lockId;
+            case GAMEOBJECT_TYPE_CAMERA:     return camera.lockId;
+            case GAMEOBJECT_TYPE_FLAGSTAND:  return flagstand.lockId;
+            case GAMEOBJECT_TYPE_FISHINGHOLE:return fishinghole.lockId;
+            case GAMEOBJECT_TYPE_FLAGDROP:   return flagdrop.lockId;
+            default: return 0;
+        }
+    }
+
+    bool GetDespawnPossibility() const                      // despawn at targeting of cast?
+    {
+        switch(type)
+        {
+            case GAMEOBJECT_TYPE_DOOR:       return door.noDamageImmune;
+            case GAMEOBJECT_TYPE_BUTTON:     return button.noDamageImmune;
+            case GAMEOBJECT_TYPE_QUESTGIVER: return questgiver.noDamageImmune;
+            case GAMEOBJECT_TYPE_GOOBER:     return goober.noDamageImmune;
+            case GAMEOBJECT_TYPE_FLAGSTAND:  return flagstand.noDamageImmune;
+            case GAMEOBJECT_TYPE_FLAGDROP:   return flagdrop.noDamageImmune;
+            default: return true;
+        }
+    }
+
+    uint32 GetCharges() const                               // despawn at uses amount
+    {
+        switch(type)
+        {
+            case GAMEOBJECT_TYPE_TRAP:        return trap.charges;
+            case GAMEOBJECT_TYPE_GUARDPOST:   return guardpost.charges;
+            case GAMEOBJECT_TYPE_SPELLCASTER: return spellcaster.charges;
+            default: return 0;
+        }
+    }
+
+    uint32 GetLinkedGameObjectEntry() const
+    {
+        switch(type)
+        {
+            case GAMEOBJECT_TYPE_CHEST:       return chest.linkedTrapId;
+            case GAMEOBJECT_TYPE_SPELL_FOCUS: return spellFocus.linkedTrapId;
+            case GAMEOBJECT_TYPE_GOOBER:      return goober.linkedTrapId;
+            default: return 0;
+        }
+    }
+
+    uint32 GetAutoCloseTime() const
+    {
+        uint32 autoCloseTime = 0;
+        switch(type)
+        {
+            case GAMEOBJECT_TYPE_DOOR:          autoCloseTime = door.autoCloseTime; break;
+            case GAMEOBJECT_TYPE_BUTTON:        autoCloseTime = button.autoCloseTime; break;
+            case GAMEOBJECT_TYPE_TRAP:          autoCloseTime = trap.autoCloseTime; break;
+            case GAMEOBJECT_TYPE_GOOBER:        autoCloseTime = goober.autoCloseTime; break;
+            case GAMEOBJECT_TYPE_TRANSPORT:     autoCloseTime = transport.autoCloseTime; break;
+            case GAMEOBJECT_TYPE_AREADAMAGE:    autoCloseTime = areadamage.autoCloseTime; break;
+            default: break;
+        }
+        return autoCloseTime / 0x10000;
+    }
+
+    uint32 GetLootId() const
+    {
+        switch(type)
+        {
+            case GAMEOBJECT_TYPE_CHEST:       return chest.lootId;
+            case GAMEOBJECT_TYPE_FISHINGHOLE: return fishinghole.lootId;
+            default: return 0;
+        }
+    }
 };
 
 // GCC have alternative #pragma pack() syntax and old gcc version not support pack(pop), also any gcc version not support it at some platform
@@ -475,14 +567,6 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
 
         bool IsTransport() const;
 
-        void SetOwnerGUID(uint64 owner)
-        {
-            m_spawnedByDefault = false;                     // all object with owner is despawned after delay
-            SetUInt64Value(OBJECT_FIELD_CREATED_BY, owner);
-        }
-        uint64 GetOwnerGUID() const { return GetUInt64Value(OBJECT_FIELD_CREATED_BY); }
-        Unit* GetOwner() const;
-
         uint32 GetDBTableGUIDLow() const { return m_DBTableGuid; }
 
         void UpdateRotationFields(float rotation2 = 0.0f, float rotation3 = 0.0f);
@@ -500,40 +584,21 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
         void SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask);
         bool LoadFromDB(uint32 guid, Map *map);
         void DeleteFromDB();
-        static uint32 GetLootId(GameObjectInfo const* info);
-        uint32 GetLootId() const { return GetLootId(GetGOInfo()); }
-        uint32 GetLockId() const
-        {
-            switch(GetGoType())
-            {
-                case GAMEOBJECT_TYPE_DOOR:       return GetGOInfo()->door.lockId;
-                case GAMEOBJECT_TYPE_BUTTON:     return GetGOInfo()->button.lockId;
-                case GAMEOBJECT_TYPE_QUESTGIVER: return GetGOInfo()->questgiver.lockId;
-                case GAMEOBJECT_TYPE_CHEST:      return GetGOInfo()->chest.lockId;
-                case GAMEOBJECT_TYPE_TRAP:       return GetGOInfo()->trap.lockId;
-                case GAMEOBJECT_TYPE_GOOBER:     return GetGOInfo()->goober.lockId;
-                case GAMEOBJECT_TYPE_AREADAMAGE: return GetGOInfo()->areadamage.lockId;
-                case GAMEOBJECT_TYPE_CAMERA:     return GetGOInfo()->camera.lockId;
-                case GAMEOBJECT_TYPE_FLAGSTAND:  return GetGOInfo()->flagstand.lockId;
-                case GAMEOBJECT_TYPE_FISHINGHOLE:return GetGOInfo()->fishinghole.lockId;
-                case GAMEOBJECT_TYPE_FLAGDROP:   return GetGOInfo()->flagdrop.lockId;
-                default: return 0;
-            }
-        }
 
-        bool GetDespawnPossibility() const
+        void SetOwnerGUID(uint64 owner)
         {
-            switch(GetGoType())
-            {
-                case GAMEOBJECT_TYPE_DOOR:       return GetGOInfo()->door.noDamageImmune;
-                case GAMEOBJECT_TYPE_BUTTON:     return GetGOInfo()->button.noDamageImmune;
-                case GAMEOBJECT_TYPE_QUESTGIVER: return GetGOInfo()->questgiver.noDamageImmune;
-                case GAMEOBJECT_TYPE_GOOBER:     return GetGOInfo()->goober.noDamageImmune;
-                case GAMEOBJECT_TYPE_FLAGSTAND:  return GetGOInfo()->flagstand.noDamageImmune;
-                case GAMEOBJECT_TYPE_FLAGDROP:   return GetGOInfo()->flagdrop.noDamageImmune;
-                default: return true;
-            }
+            m_spawnedByDefault = false;                     // all object with owner is despawned after delay
+            SetUInt64Value(OBJECT_FIELD_CREATED_BY, owner);
         }
+        uint64 GetOwnerGUID() const { return GetUInt64Value(OBJECT_FIELD_CREATED_BY); }
+        Unit* GetOwner() const;
+
+        void SetSpellId(uint32 id)
+        {
+            m_spawnedByDefault = false;                     // all summoned object is despawned after delay
+            m_spellId = id;
+        }
+        uint32 GetSpellId() const { return m_spellId;}
 
         time_t GetRespawnTime() const { return m_respawnTime; }
         time_t GetRespawnTimeEx() const
@@ -561,8 +626,6 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
         uint32 GetRespawnDelay() const { return m_respawnDelayTime; }
         void Refresh();
         void Delete();
-        void SetSpellId(uint32 id) { m_spellId = id;}
-        uint32 GetSpellId() const { return m_spellId;}
         void getFishLoot(Loot *loot, Player* loot_owner);
         GameobjectTypes GetGoType() const { return GameobjectTypes(GetByteValue(GAMEOBJECT_BYTES_1, 1)); }
         void SetGoType(GameobjectTypes type) { SetByteValue(GAMEOBJECT_BYTES_1, 1, type); }
@@ -603,34 +666,7 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
         void UseDoorOrButton(uint32 time_to_restore = 0, bool alternative = false);
                                                             // 0 = use `gameobject`.`spawntimesecs`
         void ResetDoorOrButton();
-        // 0 = use `gameobject`.`spawntimesecs`
 
-        uint32 GetLinkedGameObjectEntry() const
-        {
-            switch(GetGoType())
-            {
-                case GAMEOBJECT_TYPE_CHEST:       return GetGOInfo()->chest.linkedTrapId;
-                case GAMEOBJECT_TYPE_SPELL_FOCUS: return GetGOInfo()->spellFocus.linkedTrapId;
-                case GAMEOBJECT_TYPE_GOOBER:      return GetGOInfo()->goober.linkedTrapId;
-                default: return 0;
-            }
-        }
-
-        uint32 GetAutoCloseTime() const
-        {
-            uint32 autoCloseTime = 0;
-            switch(GetGoType())
-            {
-                case GAMEOBJECT_TYPE_DOOR:          autoCloseTime = GetGOInfo()->door.autoCloseTime; break;
-                case GAMEOBJECT_TYPE_BUTTON:        autoCloseTime = GetGOInfo()->button.autoCloseTime; break;
-                case GAMEOBJECT_TYPE_TRAP:          autoCloseTime = GetGOInfo()->trap.autoCloseTime; break;
-                case GAMEOBJECT_TYPE_GOOBER:        autoCloseTime = GetGOInfo()->goober.autoCloseTime; break;
-                case GAMEOBJECT_TYPE_TRANSPORT:     autoCloseTime = GetGOInfo()->transport.autoCloseTime; break;
-                case GAMEOBJECT_TYPE_AREADAMAGE:    autoCloseTime = GetGOInfo()->areadamage.autoCloseTime; break;
-                default: break;
-            }
-            return autoCloseTime / 0x10000;
-        }
 
         void TriggeringLinkedGameObject( uint32 trapEntry, Unit* target);
 
@@ -643,7 +679,6 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
         bool isActiveObject() const { return false; }
         uint64 GetRotation() const { return m_rotation; }
     protected:
-        uint32      m_charges;                              // Spell charges for GAMEOBJECT_TYPE_SPELLCASTER (22)
         uint32      m_spellId;
         time_t      m_respawnTime;                          // (secs) time of next respawn (or despawn if GO have owner()),
         uint32      m_respawnDelayTime;                     // (secs) if 0 then current GO state no dependent from timer

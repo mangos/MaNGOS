@@ -24,6 +24,27 @@
 #include "Log.h"
 #include "Utilities/ByteConverter.h"
 
+class ByteBufferException
+{
+    public:
+        ByteBufferException(bool _add, size_t _pos, size_t _esize, size_t _size)
+            : add(_add), pos(_pos), esize(_esize), size(_size)
+        {
+            PrintPosError();
+        }
+
+        void PrintPosError() const
+        {
+            sLog.outError("ERROR: Attempted to %s in ByteBuffer (pos: " SIZEFMTD " size: "SIZEFMTD") value with size: " SIZEFMTD,
+                (add ? "put" : "get"), pos, size, esize);
+        }
+    private:
+        bool add;
+        size_t pos;
+        size_t esize;
+        size_t size;
+};
+
 class ByteBuffer
 {
     public:
@@ -239,6 +260,16 @@ class ByteBuffer
             return _wpos;
         }
 
+        template<typename T>
+        void read_skip() { read_skip(sizeof(T)); }
+
+        void read_skip(size_t skip)
+        {
+            if(_rpos + skip > size())
+                throw ByteBufferException(false, _rpos, skip, size());
+            _rpos += skip;
+        }
+
         template <typename T> T read()
         {
             T r = read<T>(_rpos);
@@ -248,7 +279,8 @@ class ByteBuffer
 
         template <typename T> T read(size_t pos) const
         {
-            ASSERT(pos + sizeof(T) <= size() || PrintPosError(false, pos, sizeof(T)));
+            if(pos + sizeof(T) > size())
+                throw ByteBufferException(false, pos, sizeof(T), size());
             T val = *((T const*)&_storage[pos]);
             EndianConvert(val);
             return val;
@@ -256,7 +288,8 @@ class ByteBuffer
 
         void read(uint8 *dest, size_t len)
         {
-            ASSERT(_rpos  + len  <= size() || PrintPosError(false, _rpos, len));
+            if(_rpos  + len > size())
+               throw ByteBufferException(false, _rpos, len, size());
             memcpy(dest, &_storage[_rpos], len);
             _rpos += len;
         }
@@ -370,7 +403,8 @@ class ByteBuffer
 
         void put(size_t pos, const uint8 *src, size_t cnt)
         {
-            ASSERT(pos + cnt <= size() || PrintPosError(true, pos, cnt));
+            if(pos + cnt > size())
+               throw ByteBufferException(true, pos, cnt, size());
             memcpy(&_storage[pos], src, cnt);
         }
 
@@ -459,19 +493,12 @@ class ByteBuffer
         }
 
     protected:
-        bool PrintPosError(bool add, size_t pos, size_t esize) const
-        {
-            sLog.outError("ERROR: Attempt %s in ByteBuffer (pos: %lu size: %lu) value with size: %lu",(add ? "put" : "get"),(unsigned long)pos, (unsigned long)size(), (unsigned long)esize);
-
-            // assert must fail after function call
-            return false;
-        }
-
         size_t _rpos, _wpos;
         std::vector<uint8> _storage;
 };
 
-template <typename T> ByteBuffer &operator<<(ByteBuffer &b, std::vector<T> v)
+template <typename T>
+inline ByteBuffer &operator<<(ByteBuffer &b, std::vector<T> v)
 {
     b << (uint32)v.size();
     for (typename std::vector<T>::iterator i = v.begin(); i != v.end(); ++i)
@@ -481,7 +508,8 @@ template <typename T> ByteBuffer &operator<<(ByteBuffer &b, std::vector<T> v)
     return b;
 }
 
-template <typename T> ByteBuffer &operator>>(ByteBuffer &b, std::vector<T> &v)
+template <typename T>
+inline ByteBuffer &operator>>(ByteBuffer &b, std::vector<T> &v)
 {
     uint32 vsize;
     b >> vsize;
@@ -495,7 +523,8 @@ template <typename T> ByteBuffer &operator>>(ByteBuffer &b, std::vector<T> &v)
     return b;
 }
 
-template <typename T> ByteBuffer &operator<<(ByteBuffer &b, std::list<T> v)
+template <typename T>
+inline ByteBuffer &operator<<(ByteBuffer &b, std::list<T> v)
 {
     b << (uint32)v.size();
     for (typename std::list<T>::iterator i = v.begin(); i != v.end(); ++i)
@@ -505,7 +534,8 @@ template <typename T> ByteBuffer &operator<<(ByteBuffer &b, std::list<T> v)
     return b;
 }
 
-template <typename T> ByteBuffer &operator>>(ByteBuffer &b, std::list<T> &v)
+template <typename T>
+inline ByteBuffer &operator>>(ByteBuffer &b, std::list<T> &v)
 {
     uint32 vsize;
     b >> vsize;
@@ -519,7 +549,8 @@ template <typename T> ByteBuffer &operator>>(ByteBuffer &b, std::list<T> &v)
     return b;
 }
 
-template <typename K, typename V> ByteBuffer &operator<<(ByteBuffer &b, std::map<K, V> &m)
+template <typename K, typename V>
+inline ByteBuffer &operator<<(ByteBuffer &b, std::map<K, V> &m)
 {
     b << (uint32)m.size();
     for (typename std::map<K, V>::iterator i = m.begin(); i != m.end(); ++i)
@@ -529,7 +560,8 @@ template <typename K, typename V> ByteBuffer &operator<<(ByteBuffer &b, std::map
     return b;
 }
 
-template <typename K, typename V> ByteBuffer &operator>>(ByteBuffer &b, std::map<K, V> &m)
+template <typename K, typename V>
+inline ByteBuffer &operator>>(ByteBuffer &b, std::map<K, V> &m)
 {
     uint32 msize;
     b >> msize;
@@ -542,5 +574,24 @@ template <typename K, typename V> ByteBuffer &operator>>(ByteBuffer &b, std::map
         m.insert(make_pair(k, v));
     }
     return b;
+}
+
+template<>
+inline void ByteBuffer::read_skip<char*>()
+{
+    std::string temp;
+    *this >> temp;
+}
+
+template<>
+inline void ByteBuffer::read_skip<char const*>()
+{
+    read_skip<char*>();
+}
+
+template<>
+inline void ByteBuffer::read_skip<std::string>()
+{
+    read_skip<char*>();
 }
 #endif

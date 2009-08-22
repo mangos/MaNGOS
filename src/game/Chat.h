@@ -370,12 +370,12 @@ class ChatHandler
         bool HandleReloadSkillDiscoveryTemplateCommand(const char* args);
         bool HandleReloadSkillExtraItemTemplateCommand(const char* args);
         bool HandleReloadSkillFishingBaseLevelCommand(const char* args);
-        bool HandleReloadSpellAffectCommand(const char* args);
         bool HandleReloadSpellAreaCommand(const char* args);
         bool HandleReloadSpellChainCommand(const char* args);
         bool HandleReloadSpellElixirCommand(const char* args);
         bool HandleReloadSpellLearnSpellCommand(const char* args);
         bool HandleReloadSpellProcEventCommand(const char* args);
+        bool HandleReloadSpellProcItemEnchantCommand(const char* args);
         bool HandleReloadSpellBonusesCommand(const char* args);
         bool HandleReloadSpellScriptTargetCommand(const char* args);
         bool HandleReloadSpellScriptsCommand(const char* args);

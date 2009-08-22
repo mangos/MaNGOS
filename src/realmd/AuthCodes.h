@@ -70,4 +70,8 @@ enum LoginResult
 
 #define EXPECTED_MANGOS_CLIENT_BUILD        {9947, 0}
 
+// At update excepted builds please update if need define DEFAULT_MAX_LEVEL
+// in DBCEnum.h to default max player level expected by build
+// and also in mangosd.conf.in
+
 #endif

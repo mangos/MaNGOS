@@ -291,6 +291,10 @@ class BattleGround
         virtual void StartingEventCloseDoors() {}
         virtual void StartingEventOpenDoors() {}
 
+        /* achievement req. */
+        virtual bool IsAllNodesConrolledByTeam(uint32 /*team*/) const { return false; }
+        bool IsTeamScoreInRange(uint32 team, uint32 minScore, uint32 maxScore) const;
+
         /* Battleground */
         // Get methods:
         char const* GetName() const         { return m_Name; }
@@ -370,8 +374,9 @@ class BattleGround
         BattleGroundPlayerMap const& GetPlayers() const { return m_Players; }
         uint32 GetPlayersSize() const { return m_Players.size(); }
 
-        std::map<uint64, BattleGroundScore*>::const_iterator GetPlayerScoresBegin() const { return m_PlayerScores.begin(); }
-        std::map<uint64, BattleGroundScore*>::const_iterator GetPlayerScoresEnd() const { return m_PlayerScores.end(); }
+        typedef std::map<uint64, BattleGroundScore*> BattleGroundScoreMap;
+        BattleGroundScoreMap::const_iterator GetPlayerScoresBegin() const { return m_PlayerScores.begin(); }
+        BattleGroundScoreMap::const_iterator GetPlayerScoresEnd() const { return m_PlayerScores.end(); }
         uint32 GetPlayerScoresSize() const { return m_PlayerScores.size(); }
 
         uint32 GetReviveQueueSize() const { return m_ReviveQueue.size(); }
@@ -388,7 +393,7 @@ class BattleGround
         void SetTeamStartLoc(uint32 TeamID, float X, float Y, float Z, float O);
         void GetTeamStartLoc(uint32 TeamID, float &X, float &Y, float &Z, float &O) const
         {
-            uint8 idx = GetTeamIndexByTeamId(TeamID);
+            BattleGroundTeamId idx = GetTeamIndexByTeamId(TeamID);
             X = m_TeamStartLocX[idx];
             Y = m_TeamStartLocY[idx];
             Z = m_TeamStartLocZ[idx];
@@ -431,7 +436,7 @@ class BattleGround
 
         virtual void UpdatePlayerScore(Player *Source, uint32 type, uint32 value);
 
-        uint8 GetTeamIndexByTeamId(uint32 Team) const { return Team == ALLIANCE ? BG_TEAM_ALLIANCE : BG_TEAM_HORDE; }
+        static BattleGroundTeamId GetTeamIndexByTeamId(uint32 Team) { return Team == ALLIANCE ? BG_TEAM_ALLIANCE : BG_TEAM_HORDE; }
         uint32 GetPlayersCountByTeam(uint32 Team) const { return m_PlayersCount[GetTeamIndexByTeamId(Team)]; }
         uint32 GetAlivePlayersCountByTeam(uint32 Team) const;   // used in arenas to correctly handle death in spirit of redemption / last stand etc. (killer = killed) cases
         void UpdatePlayersCountByTeam(uint32 Team, bool remove)
@@ -499,14 +504,17 @@ class BattleGround
 
         void SetDeleteThis() {m_SetDeleteThis = true;}
 
+        /* virtual score-array - get's used in bg-subclasses */
+        int32 m_TeamScores[BG_TEAMS_COUNT];
+
     protected:
         //this method is called, when BG cannot spawn its own spirit guide, or something is wrong, It correctly ends BattleGround
         void EndNow();
         void PlayerAddedToBGCheckIfBGIsRunning(Player* plr);
 
         /* Scorekeeping */
-                                                            // Player scores
-        std::map<uint64, BattleGroundScore*>    m_PlayerScores;
+                                                            
+        BattleGroundScoreMap m_PlayerScores;                // Player scores
         // must be implemented in BG subclass
         virtual void RemovePlayer(Player * /*player*/, uint64 /*guid*/) {}
 

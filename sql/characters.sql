@@ -21,7 +21,7 @@
 
 DROP TABLE IF EXISTS `character_db_version`;
 CREATE TABLE `character_db_version` (
-  `required_8104_01_characters` bit(1) default NULL
+  `required_8402_02_characters_guild_bank_eventlog` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Last applied sql update to DB';
 
 --
@@ -232,13 +232,6 @@ CREATE TABLE `characters` (
   `death_expire_time` bigint(20) unsigned NOT NULL default '0',
   `taxi_path` text,
   `arena_pending_points` int(10) UNSIGNED NOT NULL default '0',
-  `bgid` int(10) unsigned NOT NULL default '0',
-  `bgteam` int(10) unsigned NOT NULL default '0',
-  `bgmap` int(10) unsigned NOT NULL default '0',
-  `bgx` float NOT NULL default '0',
-  `bgy` float NOT NULL default '0',
-  `bgz` float NOT NULL default '0',
-  `bgo` float NOT NULL default '0',
   PRIMARY KEY  (`guid`),
   KEY `idx_account` (`account`),
   KEY `idx_online` (`online`),
@@ -344,6 +337,35 @@ CREATE TABLE `character_aura` (
 LOCK TABLES `character_aura` WRITE;
 /*!40000 ALTER TABLE `character_aura` DISABLE KEYS */;
 /*!40000 ALTER TABLE `character_aura` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `character_battleground_data`
+--
+
+DROP TABLE IF EXISTS `character_battleground_data`;
+CREATE TABLE `character_battleground_data` (
+  `guid` int(11) unsigned NOT NULL default '0' COMMENT 'Global Unique Identifier',
+  `instance_id` int(11) unsigned NOT NULL default '0',
+  `team` int(11) unsigned NOT NULL default '0',
+  `join_x` float NOT NULL default '0',
+  `join_y` float NOT NULL default '0',
+  `join_z` float NOT NULL default '0',
+  `join_o` float NOT NULL default '0',
+  `join_map` int(11) NOT NULL default '0',
+  `taxi_start` int(11) NOT NULL default '0',
+  `taxi_end` int(11) NOT NULL default '0',
+  `mount_spell` int(11) NOT NULL default '0',
+  PRIMARY KEY  (`guid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Player System';
+
+--
+-- Dumping data for table `character_battleground_data`
+--
+
+LOCK TABLES `character_battleground_data` WRITE;
+/*!40000 ALTER TABLE `character_battleground_data` DISABLE KEYS */;
+/*!40000 ALTER TABLE `character_battleground_data` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -913,16 +935,16 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `guild_bank_eventlog`;
 CREATE TABLE `guild_bank_eventlog` (
-  `guildid` int(11) unsigned NOT NULL default '0',
-  `LogGuid` int(11) unsigned NOT NULL default '0',
-  `LogEntry` tinyint(1) unsigned NOT NULL default '0',
-  `TabId` tinyint(1) unsigned NOT NULL default '0',
+  `guildid` int(11) unsigned NOT NULL default '0' COMMENT 'Guild Identificator',
+  `LogGuid` int(11) unsigned NOT NULL default '0' COMMENT 'Log record identificator - auxiliary column',
+  `TabId` tinyint(3) unsigned NOT NULL default '0' COMMENT 'Guild bank TabId',
+  `EventType` tinyint(3) unsigned NOT NULL default '0' COMMENT 'Event type',
   `PlayerGuid` int(11) unsigned NOT NULL default '0',
   `ItemOrMoney` int(11) unsigned NOT NULL default '0',
   `ItemStackCount` tinyint(3) unsigned NOT NULL default '0',
-  `DestTabId` tinyint(1) unsigned NOT NULL default '0',
-  `TimeStamp` bigint(20) unsigned NOT NULL default '0',
-  PRIMARY KEY  (`guildid`,`LogGuid`),
+  `DestTabId` tinyint(1) unsigned NOT NULL default '0' COMMENT 'Destination Tab Id',
+  `TimeStamp` bigint(20) unsigned NOT NULL default '0' COMMENT 'Event UNIX time',
+  PRIMARY KEY  (`guildid`,`LogGuid`,`TabId`),
   KEY `guildid_key` (`guildid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -1014,12 +1036,13 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `guild_eventlog`;
 CREATE TABLE `guild_eventlog` (
   `guildid` int(11) NOT NULL COMMENT 'Guild Identificator',
-  `LogGuid` int(11) NOT NULL COMMENT 'Log entry identificator',
+  `LogGuid` int(11) NOT NULL COMMENT 'Log record identificator - auxiliary column',
   `EventType` tinyint(1) NOT NULL COMMENT 'Event type',
   `PlayerGuid1` int(11) NOT NULL COMMENT 'Player 1',
   `PlayerGuid2` int(11) NOT NULL COMMENT 'Player 2',
   `NewRank` tinyint(2) NOT NULL COMMENT 'New rank(in case promotion/demotion)',
-  `TimeStamp` bigint(20) NOT NULL COMMENT 'Event UNIX time'
+  `TimeStamp` bigint(20) NOT NULL COMMENT 'Event UNIX time',
+  PRIMARY KEY (`guildid`, `LogGuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT 'Guild Eventlog';
 
 --

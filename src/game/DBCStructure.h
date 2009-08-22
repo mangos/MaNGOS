@@ -81,11 +81,14 @@ struct AchievementCriteriaEntry
         } kill_creature;
 
         // ACHIEVEMENT_CRITERIA_TYPE_WIN_BG                 = 1
-        // TODO: there are further criterias instead just winning
         struct
         {
             uint32  bgMapID;                                // 3
             uint32  winCount;                               // 4
+            uint32  additionalRequirement1_type;            // 5 additional requirement 1 type
+            uint32  additionalRequirement1_value;           // 6 additional requirement 1 value
+            uint32  additionalRequirement2_type;            // 7 additional requirement 2 type
+            uint32  additionalRequirement2_value;           // 8 additional requirement 1 value
         } win_bg;
 
         // ACHIEVEMENT_CRITERIA_TYPE_REACH_LEVEL            = 5
@@ -661,7 +664,7 @@ struct CinematicCameraEntry
     float       start_x;                                    // 3
     float       start_y;                                    // 4
     float       start_z;                                    // 5
-    float       unk6;                                       // 6 speed?     
+    float       unk6;                                       // 6 speed?
 };
 */
 
@@ -1424,13 +1427,6 @@ struct SpellFocusObjectEntry
     uint32    ID;                                           // 0
     //char*     Name[16];                                   // 1-15 unused
                                                             // 16 string flags, unused
-};
-
-// stored in SQL table
-struct SpellThreatEntry
-{
-    uint32      spellId;
-    int32       threat;
 };
 
 struct SpellRadiusEntry

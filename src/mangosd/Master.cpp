@@ -223,11 +223,13 @@ int Master::Run()
     _HookSignals();
 
     ///- Launch WorldRunnable thread
-    ACE_Based::Thread t(*new WorldRunnable);
-    t.setPriority(ACE_Based::Highest);
+    ACE_Based::Thread world_thread(new WorldRunnable);
+    world_thread.setPriority(ACE_Based::Highest);
 
     // set server online
     loginDatabase.PExecute("UPDATE realmlist SET color = 0, population = 0 WHERE id = '%d'",realmID);
+
+    ACE_Based::Thread* cliThread = NULL;
 
 #ifdef WIN32
     if (sConfig.GetBoolDefault("Console.Enable", true) && (m_ServiceStatus == -1)/* need disable console in service mode*/)
@@ -236,10 +238,10 @@ int Master::Run()
 #endif
     {
         ///- Launch CliRunnable thread
-        ACE_Based::Thread td1(*new CliRunnable);
+        cliThread = new ACE_Based::Thread(new CliRunnable);
     }
 
-    ACE_Based::Thread td2(*new RARunnable);
+    ACE_Based::Thread rar_thread(new RARunnable);
 
     ///- Handle affinity for multiple processors and process priority on Windows
     #ifdef WIN32
@@ -295,13 +297,12 @@ int Master::Run()
     uint32 loopCounter = 0;
 
     ///- Start up freeze catcher thread
-    uint32 freeze_delay = sConfig.GetIntDefault("MaxCoreStuckTime", 0);
-    if(freeze_delay)
+    if(uint32 freeze_delay = sConfig.GetIntDefault("MaxCoreStuckTime", 0))
     {
         FreezeDetectorRunnable *fdr = new FreezeDetectorRunnable();
         fdr->SetDelayTime(freeze_delay*1000);
-        ACE_Based::Thread t(*fdr);
-        t.setPriority(ACE_Based::Highest);
+        ACE_Based::Thread freeze_thread(fdr);
+        freeze_thread.setPriority(ACE_Based::Highest);
     }
 
     ///- Launch the world listener socket
@@ -325,8 +326,8 @@ int Master::Run()
 
     // when the main thread closes the singletons get unloaded
     // since worldrunnable uses them, it will crash if unloaded after master
-    t.wait();
-    td2.wait ();
+    world_thread.wait();
+    rar_thread.wait ();
 
     ///- Clean database before leaving
     clearOnlineAccounts();
@@ -338,9 +339,10 @@ int Master::Run()
 
     sLog.outString( "Halting process..." );
 
-    #ifdef WIN32
-    if (sConfig.GetBoolDefault("Console.Enable", true))
+    if (cliThread)
     {
+        #ifdef WIN32
+
         // this only way to terminate CLI thread exist at Win32 (alt. way exist only in Windows Vista API)
         //_exit(1);
         // send keyboard input to safely unblock the CLI thread
@@ -375,8 +377,17 @@ int Master::Run()
         b[3].Event.KeyEvent.wRepeatCount = 1;
         DWORD numb;
         BOOL ret = WriteConsoleInput(hStdIn, b, 4, &numb);
+
+        cliThread->wait();
+
+        #else 
+
+        cliThread->destroy();
+
+        #endif
+
+        delete cliThread;
     }
-    #endif
 
     // for some unknown reason, unloading scripts here and not in worldrunnable
     // fixes a memory leak related to detaching threads from the module
@@ -465,7 +476,7 @@ void Master::clearOnlineAccounts()
     CharacterDatabase.Execute("UPDATE characters SET online = 0 WHERE online<>0");
 
     // Battleground instance ids reset at server restart
-    CharacterDatabase.Execute("UPDATE characters SET bgid = 0 WHERE bgid<>0");
+    CharacterDatabase.Execute("UPDATE character_battleground_data SET instance_id = 0");
 }
 
 /// Handle termination signals

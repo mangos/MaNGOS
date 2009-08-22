@@ -330,7 +330,7 @@ void PlayerDumpWriter::DumpTable(std::string& dump, uint32 guid, char const*tabl
 std::string PlayerDumpWriter::GetDump(uint32 guid)
 {
     std::string dump;
-    
+
     dump += "IMPORTANT NOTE: This sql queries not created for apply directly, use '.pdump load' command in console or client chat instead.\n";
     dump += "IMPORTANT NOTE: NOT APPLY ITS DIRECTLY to character DB or you will DAMAGE and CORRUPT character DB\n\n";
 
@@ -581,7 +581,7 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
                     ROLLBACK(DUMP_FILE_BROKEN);
                 if(!changetoknth(vals, ITEM_FIELD_OWNER+1, newguid))
                     ROLLBACK(DUMP_FILE_BROKEN);
-                if(!changetokGuid(vals, ITEM_FIELD_ITEM_TEXT_ID+1, itemTexts, objmgr.m_ItemTextId))
+                if(!changetokGuid(vals, ITEM_FIELD_ITEM_TEXT_ID+1, itemTexts, objmgr.m_ItemTextId,true))
                     ROLLBACK(DUMP_FILE_BROKEN);
                 if(!changenth(line, 3, vals.c_str()))
                     ROLLBACK(DUMP_FILE_BROKEN);

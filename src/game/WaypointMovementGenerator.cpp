@@ -106,7 +106,7 @@ bool WaypointMovementGenerator<Creature>::Update(Creature &creature, const uint3
     {
         if( i_nextMoveTime.Passed()) // Timer has elapsed, meaning this part controlled it
         {
-            SetStopedByPlayer(false);
+            SetStoppedByPlayer(false);
             // Now we re-set destination to same node and start travel
             creature.addUnitState(UNIT_STAT_ROAMING);
             if (creature.canFly())
@@ -117,11 +117,11 @@ bool WaypointMovementGenerator<Creature>::Update(Creature &creature, const uint3
         }
         else // if( !i_nextMoveTime.Passed())
         { // unexpected end of timer && creature stopped && not at end of segment
-            if (!IsStopedByPlayer())
+            if (!IsStoppedByPlayer())
             {                                                   // Put 30 seconds delay
                 i_destinationHolder.IncreaseTravelTime(STOP_TIME_FOR_PLAYER);
                 i_nextMoveTime.Reset(STOP_TIME_FOR_PLAYER);
-                SetStopedByPlayer(true);                        // Mark we did it
+                SetStoppedByPlayer(true);                        // Mark we did it
             }
         }
         return true;    // Abort here this update
@@ -160,10 +160,10 @@ bool WaypointMovementGenerator<Creature>::Update(Creature &creature, const uint3
                     else
                         creature.Say(behavior->textid[0], 0, 0);
                 }
-
-                i_hasDone[idx] = true;
-                MovementInform(creature);
             }                                               // wpBehaviour found
+
+            i_hasDone[idx] = true;
+            MovementInform(creature);
         }                                                   // HasDone == false
     }                                                       // i_creature.IsStopped()
 
@@ -194,7 +194,7 @@ bool WaypointMovementGenerator<Creature>::Update(Creature &creature, const uint3
         else // If not stopped then stop it and set the reset of TimeTracker to waittime
         {
             creature.StopMoving();
-            SetStopedByPlayer(false);
+            SetStoppedByPlayer(false);
             i_nextMoveTime.Reset(i_path->at(i_currentNode).delay);
             ++i_currentNode;
             if( i_currentNode >= i_path->size() )

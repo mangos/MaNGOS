@@ -33,8 +33,6 @@
 //void called when player click on auctioneer npc
 void WorldSession::HandleAuctionHelloOpcode( WorldPacket & recv_data )
 {
-    CHECK_PACKET_SIZE(recv_data,8);
-
     uint64 guid;                                            //NPC guid
     recv_data >> guid;
 
@@ -151,8 +149,6 @@ void WorldSession::SendAuctionCancelledToBidderMail( AuctionEntry* auction )
 //this void creates new auction and adds auction to some auctionhouse
 void WorldSession::HandleAuctionSellItem( WorldPacket & recv_data )
 {
-    CHECK_PACKET_SIZE(recv_data,8+8+4+4+4);
-
     uint64 auctioneer, item;
     uint32 etime, bid, buyout;
     recv_data >> auctioneer >> item;
@@ -275,8 +271,6 @@ void WorldSession::HandleAuctionSellItem( WorldPacket & recv_data )
 //this function is called when client bids or buys out auction
 void WorldSession::HandleAuctionPlaceBid( WorldPacket & recv_data )
 {
-    CHECK_PACKET_SIZE(recv_data,8+4+4);
-
     uint64 auctioneer;
     uint32 auctionId;
     uint32 price;
@@ -404,8 +398,6 @@ void WorldSession::HandleAuctionPlaceBid( WorldPacket & recv_data )
 //this void is called when auction_owner cancels his auction
 void WorldSession::HandleAuctionRemoveItem( WorldPacket & recv_data )
 {
-    CHECK_PACKET_SIZE(recv_data,8+4);
-
     uint64 auctioneer;
     uint32 auctionId;
     recv_data >> auctioneer;
@@ -482,8 +474,6 @@ void WorldSession::HandleAuctionRemoveItem( WorldPacket & recv_data )
 //called when player lists his bids
 void WorldSession::HandleAuctionListBidderItems( WorldPacket & recv_data )
 {
-    CHECK_PACKET_SIZE(recv_data,8+4+4);
-
     uint64 guid;                                            //NPC guid
     uint32 listfrom;                                        //page of auctions
     uint32 outbiddedCount;                                  //count of outbidded auctions
@@ -538,8 +528,6 @@ void WorldSession::HandleAuctionListBidderItems( WorldPacket & recv_data )
 //this void sends player info about his auctions
 void WorldSession::HandleAuctionListOwnerItems( WorldPacket & recv_data )
 {
-    CHECK_PACKET_SIZE(recv_data,8+4);
-
     uint32 listfrom;
     uint64 guid;
 
@@ -575,8 +563,6 @@ void WorldSession::HandleAuctionListOwnerItems( WorldPacket & recv_data )
 //this void is called when player clicks on search button
 void WorldSession::HandleAuctionListItems( WorldPacket & recv_data )
 {
-    CHECK_PACKET_SIZE(recv_data,8+4+1+1+1+4+4+4+4+1);
-
     std::string searchedname;
     uint8 levelmin, levelmax, usable;
     uint32 listfrom, auctionSlotID, auctionMainCategory, auctionSubCategory, quality;
@@ -586,12 +572,11 @@ void WorldSession::HandleAuctionListItems( WorldPacket & recv_data )
     recv_data >> listfrom;                                  // start, used for page control listing by 50 elements
     recv_data >> searchedname;
 
-    // recheck with known string size
-    CHECK_PACKET_SIZE(recv_data,8+4+(searchedname.size()+1)+1+1+4+4+4+4+1);
-
     recv_data >> levelmin >> levelmax;
     recv_data >> auctionSlotID >> auctionMainCategory >> auctionSubCategory;
     recv_data >> quality >> usable;
+
+    recv_data.read_skip(16);                                // unknown 16 bytes: 00 07 01 00 00 01 05 00 06 00 09 01 08 00 03 00
 
     Creature *pCreature = GetPlayer()->GetNPCIfCanInteractWith(guid,UNIT_NPC_FLAG_AUCTIONEER);
     if (!pCreature)
@@ -635,7 +620,8 @@ void WorldSession::HandleAuctionListItems( WorldPacket & recv_data )
 void WorldSession::HandleAuctionListPendingSales( WorldPacket & recv_data )
 {
     sLog.outDebug("CMSG_AUCTION_LIST_PENDING_SALES");
-    recv_data.hexlike();
+
+    recv_data.read_skip<uint64>();                          // auctioner guid
 
     uint32 count = 0;
 

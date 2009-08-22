@@ -26,8 +26,6 @@
 
 void WorldSession::HandleDuelAcceptedOpcode(WorldPacket& recvPacket)
 {
-    CHECK_PACKET_SIZE(recvPacket,8);
-
     uint64 guid;
     Player *pl;
     Player *plTarget;
@@ -59,8 +57,6 @@ void WorldSession::HandleDuelAcceptedOpcode(WorldPacket& recvPacket)
 
 void WorldSession::HandleDuelCancelledOpcode(WorldPacket& recvPacket)
 {
-    CHECK_PACKET_SIZE(recvPacket,8);
-
     //sLog.outDebug( "WORLD: received CMSG_DUEL_CANCELLED" );
 
     // no duel requested

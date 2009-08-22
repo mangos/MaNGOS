@@ -194,9 +194,12 @@ void PetAI::UpdateAI(const uint32 diff)
         }
     }
 
+    // Autocast (casted only in combat or persistent spells in any state)
     if (m_creature->GetGlobalCooldown() == 0 && !m_creature->IsNonMeleeSpellCasted(false))
     {
-        //Autocast
+        typedef std::vector<std::pair<Unit*, Spell*> > TargetSpellList;
+        TargetSpellList targetSpellStore;
+
         for (uint8 i = 0; i < m_creature->GetPetAutoSpellSize(); ++i)
         {
             uint32 spellID = m_creature->GetPetAutoSpellOnPos(i);
@@ -210,11 +213,29 @@ void PetAI::UpdateAI(const uint32 diff)
             // ignore some combinations of combat state and combat/noncombat spells
             if (!inCombat)
             {
+                // ignore attacking spells, and allow only self/around spells
                 if (!IsPositiveSpell(spellInfo->Id))
                     continue;
+
+                // non combat spells allowed
+                // only pet spells have IsNonCombatSpell and not fit this reqs:
+                // Consume Shadows, Lesser Invisibility, so ignore checks for its
+                if (!IsNonCombatSpell(spellInfo))
+                {
+                    // allow only spell without spell cost or with spell cost but not duration limit
+                    int32 duration = GetSpellDuration(spellInfo);
+                    if ((spellInfo->manaCost || spellInfo->ManaCostPercentage || spellInfo->manaPerSecond) && duration > 0)
+                        continue;
+
+                    // allow only spell without cooldown > duration
+                    int32 cooldown = GetSpellRecoveryTime(spellInfo);
+                    if (cooldown >= 0 && duration >= 0 && cooldown > duration)
+                        continue;
+                }
             }
             else
             {
+                // just ignore non-combat spells
                 if (IsNonCombatSpell(spellInfo))
                     continue;
             }
@@ -223,7 +244,7 @@ void PetAI::UpdateAI(const uint32 diff)
 
             if (inCombat && !m_creature->hasUnitState(UNIT_STAT_FOLLOW) && spell->CanAutoCast(m_creature->getVictim()))
             {
-                m_targetSpellStore.push_back(std::make_pair<Unit*, Spell*>(m_creature->getVictim(), spell));
+                targetSpellStore.push_back(std::make_pair<Unit*, Spell*>(m_creature->getVictim(), spell));
                 continue;
             }
             else
@@ -239,7 +260,7 @@ void PetAI::UpdateAI(const uint32 diff)
 
                     if(spell->CanAutoCast(Target))
                     {
-                        m_targetSpellStore.push_back(std::make_pair<Unit*, Spell*>(Target, spell));
+                        targetSpellStore.push_back(std::make_pair<Unit*, Spell*>(Target, spell));
                         spellUsed = true;
                         break;
                     }
@@ -250,14 +271,14 @@ void PetAI::UpdateAI(const uint32 diff)
         }
 
         //found units to cast on to
-        if (!m_targetSpellStore.empty())
+        if (!targetSpellStore.empty())
         {
-            uint32 index = urand(0, m_targetSpellStore.size() - 1);
+            uint32 index = urand(0, targetSpellStore.size() - 1);
 
-            Spell* spell  = m_targetSpellStore[index].second;
-            Unit*  target = m_targetSpellStore[index].first;
+            Spell* spell  = targetSpellStore[index].second;
+            Unit*  target = targetSpellStore[index].first;
 
-            m_targetSpellStore.erase(m_targetSpellStore.begin() + index);
+            targetSpellStore.erase(targetSpellStore.begin() + index);
 
             SpellCastTargets targets;
             targets.setUnitTarget( target );
@@ -276,11 +297,10 @@ void PetAI::UpdateAI(const uint32 diff)
 
             spell->prepare(&targets);
         }
-        while (!m_targetSpellStore.empty())
-        {
-            delete m_targetSpellStore.begin()->second;
-            m_targetSpellStore.erase(m_targetSpellStore.begin());
-        }
+
+        // deleted cached Spell objects
+        for(TargetSpellList::const_iterator itr = targetSpellStore.begin(); itr != targetSpellStore.end(); ++itr)
+            delete itr->second;
     }
 }
 

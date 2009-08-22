@@ -127,8 +127,6 @@ void WorldSession::SendNameQueryOpcodeFromDBCallBack(QueryResult *result, uint32
 
 void WorldSession::HandleNameQueryOpcode( WorldPacket & recv_data )
 {
-    CHECK_PACKET_SIZE(recv_data, 8);
-
     uint64 guid;
 
     recv_data >> guid;
@@ -152,10 +150,9 @@ void WorldSession::HandleQueryTimeOpcode( WorldPacket & /*recv_data*/ )
 /// Only _static_ data send in this packet !!!
 void WorldSession::HandleCreatureQueryOpcode( WorldPacket & recv_data )
 {
-    CHECK_PACKET_SIZE(recv_data,4+8);
-
     uint32 entry;
     recv_data >> entry;
+    recv_data.read_skip<uint64>();                          // guid
 
     CreatureInfo const *ci = objmgr.GetCreatureTemplate(entry);
     if (ci)
@@ -189,8 +186,8 @@ void WorldSession::HandleCreatureQueryOpcode( WorldPacket & recv_data )
         data << uint32(ci->type);                           // CreatureType.dbc
         data << uint32(ci->family);                         // CreatureFamily.dbc
         data << uint32(ci->rank);                           // Creature Rank (elite, boss, etc)
-        data << uint32(ci->unk1);                           // new in 3.1, creature entry?
-        data << uint32(ci->unk2);                           // new in 3.1, creature entry?
+        data << uint32(ci->KillCredit[0]);                  // new in 3.1, kill credit
+        data << uint32(ci->KillCredit[1]);                  // new in 3.1, kill credit
         data << uint32(ci->DisplayID_A[0]);                 // modelid_male1
         data << uint32(ci->DisplayID_H[0]);                 // modelid_female1 ?
         data << uint32(ci->DisplayID_A[1]);                 // modelid_male2 ?
@@ -221,10 +218,9 @@ void WorldSession::HandleCreatureQueryOpcode( WorldPacket & recv_data )
 /// Only _static_ data send in this packet !!!
 void WorldSession::HandleGameObjectQueryOpcode( WorldPacket & recv_data )
 {
-    CHECK_PACKET_SIZE(recv_data,4+8);
-
     uint32 entryID;
     recv_data >> entryID;
+    recv_data.read_skip<uint64>();                          // guid
 
     const GameObjectInfo *info = objmgr.GetGameObjectInfo(entryID);
     if(info)
@@ -333,8 +329,6 @@ void WorldSession::HandleCorpseQueryOpcode(WorldPacket & /*recv_data*/)
 
 void WorldSession::HandleNpcTextQueryOpcode( WorldPacket & recv_data )
 {
-    CHECK_PACKET_SIZE(recv_data, 4 + 8);
-
     uint32 textID;
     uint64 guid;
 
@@ -421,8 +415,6 @@ void WorldSession::HandleNpcTextQueryOpcode( WorldPacket & recv_data )
 
 void WorldSession::HandlePageTextQueryOpcode( WorldPacket & recv_data )
 {
-    CHECK_PACKET_SIZE(recv_data, 4);
-
     uint32 pageID;
 
     recv_data >> pageID;

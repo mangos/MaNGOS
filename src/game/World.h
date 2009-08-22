@@ -27,6 +27,7 @@
 #include "Timer.h"
 #include "Policies/Singleton.h"
 #include "SharedDefines.h"
+#include "ace/Atomic_Op.h"
 
 #include <map>
 #include <set>
@@ -136,8 +137,8 @@ enum WorldConfigs
     CONFIG_GM_ACCEPT_TICKETS,
     CONFIG_GM_CHAT,
     CONFIG_GM_WISPERING_TO,
-    CONFIG_GM_IN_GM_LIST,
-    CONFIG_GM_IN_WHO_LIST,
+    CONFIG_GM_LEVEL_IN_GM_LIST,
+    CONFIG_GM_LEVEL_IN_WHO_LIST,
     CONFIG_GM_LOG_TRADE,
     CONFIG_START_GM_LEVEL,
     CONFIG_GM_LOWER_SECURITY,
@@ -211,6 +212,9 @@ enum WorldConfigs
     CONFIG_ARENA_SEASON_ID,
     CONFIG_ARENA_SEASON_IN_PROGRESS,
     CONFIG_OFFHAND_CHECK_AT_TALENTS_RESET,
+    CONFIG_CLIENTCACHE_VERSION,
+    CONFIG_GUILD_EVENT_LOG_COUNT,
+    CONFIG_GUILD_BANK_EVENT_LOG_COUNT,
     CONFIG_VALUE_COUNT
 };
 
@@ -482,9 +486,10 @@ class World
         BanReturn BanAccount(BanMode mode, std::string nameOrIP, std::string duration, std::string reason, std::string author);
         bool RemoveBanAccount(BanMode mode, std::string nameOrIP);
 
-        void ScriptsStart(std::map<uint32, std::multimap<uint32, ScriptInfo> > const& scripts, uint32 id, Object* source, Object* target);
-        void ScriptCommandStart(ScriptInfo const& script, uint32 delay, Object* source, Object* target);
-        bool IsScriptScheduled() const { return !m_scriptSchedule.empty(); }
+        uint32 IncreaseScheduledScriptsCount() { return (uint32)++m_scheduledScripts; }
+        uint32 DecreaseScheduledScriptCount() { return (uint32)--m_scheduledScripts; }
+        uint32 DecreaseScheduledScriptCount(size_t count) { return (uint32)(m_scheduledScripts -= count); }
+        bool IsScriptScheduled() const { return m_scheduledScripts > 0; }
 
         // for max speed access
         static float GetMaxVisibleDistanceForCreature() { return m_MaxVisibleDistanceForCreature; }
@@ -520,7 +525,6 @@ class World
 
     protected:
         void _UpdateGameTime();
-        void ScriptsProcess();
         // callback for UpdateRealmCharacters
         void _UpdateRealmCharCount(QueryResult *resultCharCount, uint32 accountId);
 
@@ -531,6 +535,9 @@ class World
         static uint8 m_ExitCode;
         uint32 m_ShutdownTimer;
         uint32 m_ShutdownMask;
+
+        //atomic op counter for active scripts amount
+        ACE_Atomic_Op<ACE_Thread_Mutex, long> m_scheduledScripts;
 
         time_t m_startTime;
         time_t m_gameTime;
@@ -544,8 +551,6 @@ class World
         SessionMap m_sessions;
         uint32 m_maxActiveSessionCount;
         uint32 m_maxQueuedSessionCount;
-
-        std::multimap<time_t, ScriptAction> m_scriptSchedule;
 
         float rate_values[MAX_RATES];
         uint32 m_configs[CONFIG_VALUE_COUNT];

@@ -488,8 +488,8 @@ LogColors = ""
 #
 #    AllFlightPaths
 #        Players will start with all flight paths (Note: ALL flight paths, not only player's team)
-#        Default: 0 (true)
-#                 1 (false)
+#        Default: 0 (false)
+#                 1 (true)
 #
 #    AlwaysMaxSkillForLevel
 #        Players will automatically gain max level dependent (weapon/defense) skill when logging in, leveling up etc.
@@ -537,6 +537,18 @@ LogColors = ""
 #        Default: 7
 #                -1 (show all available quests marks)
 #
+#    Guild.EventLogRecordsCount
+#        Count of guild event log records stored in guild_eventlog table
+#        Increase to store more guild events in table, minimum is 100
+#        You can set it to very high value to prevent oldest guild events to be rewritten by latest guild events - but it can slow down performance
+#        Default: 100
+#
+#    Guild.BankEventLogRecordsCount
+#        Count of guild_bank event log records stored in guild_bank_eventlog table
+#        Increase to store more guild_bank events in table - minimum is 25 (GUILD_BANK_MAX_LOGS) for each guild_bank tab
+#        Useful when you don't want old log events to be overwritten by new, but increasing can slow down performance
+#        Default: 25
+#
 #    MaxPrimaryTradeSkill
 #        Max count that player can learn the primary trade skill.
 #        Default: 2
@@ -568,6 +580,10 @@ LogColors = ""
 #        Talent reset can change offhand weapon restrictions for equip slots.
 #        Default: 0 - recheck offhand slot weapon only at zone update
 #                 1 - recheck offhand slot weapon at talent reset also
+#
+#    ClientCacheVersion
+#        Client cache version for client cache data reset. Use any different from DB value and not recently used for triggering reset.
+#        Default: 0 (use DB value from world DB db_version.cache_id field)
 #
 #    Event.Announce
 #        Default: 0 (false)
@@ -620,6 +636,8 @@ Instance.ResetTimeHour = 4
 Instance.UnloadDelay = 1800000
 Quests.LowLevelHideDiff = 4
 Quests.HighLevelHideDiff = 7
+Guild.EventLogRecordsCount = 100
+Guild.BankEventLogRecordsCount = 25
 MaxPrimaryTradeSkill = 2
 MinPetitionSigns = 9
 MaxGroupXPDistance = 74
@@ -627,6 +645,7 @@ MailDeliveryDelay = 3600
 SkillChance.Prospecting = 0
 SkillChance.Milling = 0
 OffhandCheckAtTalentsReset = 0
+ClientCacheVersion = 0
 Event.Announce = 0
 BeepAtStart = 1
 Motd = "Welcome to the Massive Network Game Object Server."
@@ -872,15 +891,19 @@ Channel.SilentlyGMJoin = 0
 #                 0 (disable)
 #                 1 (enable)
 #
-#    GM.InGMList
-#        Is GM showed in GM list (if visible) in non-GM state (.gm off)
-#        Default: 0 (false)
-#                 1 (true)
+#    GM.InGMList.Level
+#        Max GM level showed in GM list (if visible) in non-GM state (.gm off)
+#                 0 (none)
+#                 1 (only moderators)
+#                 2 (only gamemasters)
+#        Default: 3 (anyone)
 #
-#    GM.InWhoList
-#        Is GM showed in who list (if visible).
-#        Default: 0 (false)
-#                 1 (true)
+#    GM.InWhoList.Level
+#        Max GM level showed in who list (if visible).
+#                 0 (only players)
+#                 1 (only moderators)
+#                 2 (only gamemasters)
+#        Default: 3 (anyone)
 #
 #    GM.LogTrade
 #        Include GM trade and trade slot enchanting operations in GM log if it enable
@@ -908,8 +931,8 @@ GM.Visible               = 2
 GM.AcceptTickets         = 2
 GM.Chat                  = 2
 GM.WhisperingTo          = 2
-GM.InGMList              = 0
-GM.InWhoList             = 0
+GM.InGMList.Level        = 3
+GM.InWhoList.Level       = 3
 GM.LogTrade              = 1
 GM.StartLevel            = 1
 GM.LowerSecurity         = 0
