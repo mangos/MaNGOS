@@ -99,7 +99,10 @@ enum SpellSpecific
     SPELL_FLASK_ELIXIR      = 16,
     SPELL_PRESENCE          = 17,
     SPELL_HAND              = 18,
-    SPELL_WELL_FED          = 19
+    SPELL_WELL_FED          = 19,
+    SPELL_FOOD              = 20,
+    SPELL_DRINK             = 21,
+    SPELL_FOOD_AND_DRINK    = 22,
 };
 
 SpellSpecific GetSpellSpecific(uint32 spellId);
