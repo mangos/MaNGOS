@@ -175,6 +175,7 @@ SpellSpecific GetSpellSpecific(uint32 spellId)
                 if ((spellInfo->AttributesEx2 & SPELL_ATTR_EX2_FOOD_BUFF) || spellInfo->SpellIconID == 2560)
                     return SPELL_WELL_FED;
             }
+            break;
         }
         case SPELLFAMILY_MAGE:
         {
@@ -295,6 +296,7 @@ bool IsSingleFromSpellSpecificPerCaster(SpellSpecific spellSpec1,SpellSpecific s
         case SPELL_PRESENCE:
         case SPELL_HAND:
         case SPELL_WELL_FED:
+            return spellSpec1==spellSpec2;
         case SPELL_FOOD:
             return spellSpec2==SPELL_FOOD
                 || spellSpec2==SPELL_FOOD_AND_DRINK;
