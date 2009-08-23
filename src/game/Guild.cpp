@@ -212,7 +212,15 @@ bool Guild::LoadGuildFromDB(uint32 GuildId)
     //set m_Id in case guild data are broken in DB and Guild will be Disbanded (deleted from DB)
     m_Id = GuildId;
 
-    //variable m_PurchasedTabs is loaded when guild bank is loaded, because we don't need it yet
+    QueryResult *result = CharacterDatabase.PQuery("SELECT COUNT(TabId) FROM guild_bank_tab WHERE guildid='%u'", GuildId);
+    if(result)
+    {
+        Field *fields = result->Fetch();
+        m_PurchasedTabs = fields[0].GetUInt32();
+        if (m_PurchasedTabs > GUILD_BANK_MAX_TABS)
+            m_PurchasedTabs = GUILD_BANK_MAX_TABS;
+        delete result;
+    }
 
     if(!LoadRanksFromDB(GuildId))
         return false;
@@ -223,7 +231,7 @@ bool Guild::LoadGuildFromDB(uint32 GuildId)
     LoadBankRightsFromDB(GuildId);                          // Must be after LoadRanksFromDB because it populates rank struct
 
     //                                                     0     1           2            3            4            5
-    QueryResult *result = CharacterDatabase.PQuery("SELECT name, leaderguid, EmblemStyle, EmblemColor, BorderStyle, BorderColor,"
+    result = CharacterDatabase.PQuery("SELECT name, leaderguid, EmblemStyle, EmblemColor, BorderStyle, BorderColor,"
     //   6                7     8     9           10
         "BackgroundColor, info, motd, createdate, BankMoney FROM guild WHERE guildid = '%u'", GuildId);
 
