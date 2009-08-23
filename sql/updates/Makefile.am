@@ -92,6 +92,7 @@ pkgdata_DATA = \
 	8399_01_mangos_spell_elixir.sql \
 	8402_01_characters_guild_eventlog.sql \
 	8402_02_characters_guild_bank_eventlog.sql \
+	8409_01_characters_guild.sql \
 	README
 
 ## Additional files to include when running 'make dist'
@@ -164,4 +165,5 @@ EXTRA_DIST = \
 	8399_01_mangos_spell_elixir.sql \
 	8402_01_characters_guild_eventlog.sql \
 	8402_02_characters_guild_bank_eventlog.sql \
+	8409_01_characters_guild.sql \
 	README
