@@ -5474,8 +5474,6 @@ void Aura::HandleShapeshiftBoosts(bool apply)
             break;
         case FORM_MOONKIN:
             spellId1 = 24905;
-            // aura from effect trigger spell
-            spellId2 = 24907;
             MasterShaperSpellId = 48421;
             break;
         case FORM_FLIGHT:
@@ -5483,15 +5481,15 @@ void Aura::HandleShapeshiftBoosts(bool apply)
             spellId2 = 34764;
             break;
         case FORM_FLIGHT_EPIC:
-            spellId1  = 40122;
+            spellId1 = 40122;
             spellId2 = 40121;
             break;
         case FORM_METAMORPHOSIS:
-            spellId1  = 54817;
+            spellId1 = 54817;
             spellId2 = 54879;
             break;
         case FORM_SPIRITOFREDEMPTION:
-            spellId1  = 27792;
+            spellId1 = 27792;
             spellId2 = 27795;                               // must be second, this important at aura remove to prevent to early iterator invalidation.
             break;
         case FORM_SHADOW:
@@ -5506,14 +5504,15 @@ void Aura::HandleShapeshiftBoosts(bool apply)
         case FORM_STEALTH:
         case FORM_CREATURECAT:
         case FORM_CREATUREBEAR:
-            spellId1 = 0;
             break;
     }
 
     if(apply)
     {
-        if (spellId1) m_target->CastSpell(m_target, spellId1, true, NULL, this );
-        if (spellId2) m_target->CastSpell(m_target, spellId2, true, NULL, this);
+        if (spellId1)
+            m_target->CastSpell(m_target, spellId1, true, NULL, this );
+        if (spellId2)
+            m_target->CastSpell(m_target, spellId2, true, NULL, this);
 
         if (m_target->GetTypeId() == TYPEID_PLAYER)
         {
@@ -5604,9 +5603,12 @@ void Aura::HandleShapeshiftBoosts(bool apply)
     }
     else
     {
-        m_target->RemoveAurasDueToSpell(spellId1);
-        m_target->RemoveAurasDueToSpell(spellId2);
-        m_target->RemoveAurasDueToSpell(MasterShaperSpellId);
+        if(spellId1)
+            m_target->RemoveAurasDueToSpell(spellId1);
+        if(spellId2)
+            m_target->RemoveAurasDueToSpell(spellId2);
+        if(MasterShaperSpellId)
+            m_target->RemoveAurasDueToSpell(MasterShaperSpellId);
 
         Unit::AuraMap& tAuras = m_target->GetAuras();
         for (Unit::AuraMap::iterator itr = tAuras.begin(); itr != tAuras.end();)

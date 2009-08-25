@@ -3116,24 +3116,9 @@ bool Player::addSpell(uint32 spell_id, bool active, bool learning, bool dependen
 
 bool Player::IsNeedCastPassiveSpellAtLearn(SpellEntry const* spellInfo) const
 {
-    bool need_cast =  false;
-
-    switch(spellInfo->Id)
-    {
-        // some spells not have stance data expected cast at form change or present
-        case  5420: need_cast = (m_form == FORM_TREE);            break;
-        case  5419: need_cast = (m_form == FORM_TRAVEL);          break;
-        case  7376: need_cast = (m_form == FORM_DEFENSIVESTANCE); break;
-        case  7381: need_cast = (m_form == FORM_BERSERKERSTANCE); break;
-        case 21156: need_cast = (m_form == FORM_BATTLESTANCE);    break;
-        case 21178: need_cast = (m_form == FORM_BEAR || m_form == FORM_DIREBEAR); break;
-        case 33948: need_cast = (m_form == FORM_FLIGHT);          break;
-        case 34764: need_cast = (m_form == FORM_FLIGHT);          break;
-        case 40121: need_cast = (m_form == FORM_FLIGHT_EPIC);     break;
-        case 40122: need_cast = (m_form == FORM_FLIGHT_EPIC);     break;
-        // another spells have proper stance data
-        default: need_cast = !spellInfo->Stances || m_form != 0 && (spellInfo->Stances & (1<<(m_form-1))); break;
-    }
+    // note: form passives activated with shapeshift spells be implemented by HandleShapeshiftBoosts instead of spell_learn_spell
+    // talent dependent passives activated at form apply have proper stance data
+    bool need_cast = !spellInfo->Stances || m_form != 0 && (spellInfo->Stances & (1<<(m_form-1)));
 
     //Check CasterAuraStates
     return need_cast && (!spellInfo->CasterAuraState || HasAuraState(AuraState(spellInfo->CasterAuraState)));
