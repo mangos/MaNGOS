@@ -4918,11 +4918,26 @@ void Spell::EffectScriptEffect(uint32 effIndex)
                     unitTarget->HandleEmoteCommand(EMOTE_STATE_DANCE);
                     return;
                 }
+                // Demonic Empowerment (succubus Vanish effect)
+                case 54436:
+                {
+                    if(!unitTarget)
+                        return;
+
+                    unitTarget->RemoveSpellsCausingAura(SPELL_AURA_MOD_ROOT);
+                    unitTarget->RemoveSpellsCausingAura(SPELL_AURA_MOD_DECREASE_SPEED);
+                    unitTarget->RemoveSpellsCausingAura(SPELL_AURA_MOD_STALKED);
+                    unitTarget->RemoveSpellsCausingAura(SPELL_AURA_MOD_STUN);
+                    return;
+                }
                 // Escape artist
                 case 20589:
                 {
-                    m_caster->RemoveSpellsCausingAura(SPELL_AURA_MOD_ROOT);
-                    m_caster->RemoveSpellsCausingAura(SPELL_AURA_MOD_DECREASE_SPEED);
+                    if(!unitTarget)
+                        return;
+
+                    unitTarget->RemoveSpellsCausingAura(SPELL_AURA_MOD_ROOT);
+                    unitTarget->RemoveSpellsCausingAura(SPELL_AURA_MOD_DECREASE_SPEED);
                     return;
                 }
                 // Mirren's Drinking Hat
@@ -4948,6 +4963,8 @@ void Spell::EffectScriptEffect(uint32 effIndex)
                 // Improved Sprint
                 case 30918:
                 {
+                    if(!unitTarget)
+                        return;
                     // Removes snares and roots.
                     uint32 mechanic_mask = (1<<MECHANIC_ROOT) | (1<<MECHANIC_SNARE);
                     Unit::AuraMap& Auras = unitTarget->GetAuras();
@@ -5116,6 +5133,8 @@ void Spell::EffectScriptEffect(uint32 effIndex)
                 case 47871:
                 case 47878:
                 {
+                    if(!unitTarget)
+                        return;
                     uint32 itemtype;
                     uint32 rank = 0;
                     Unit::AuraList const& mDummyAuras = unitTarget->GetAurasByType(SPELL_AURA_DUMMY);
@@ -5166,6 +5185,26 @@ void Spell::EffectScriptEffect(uint32 effIndex)
                             return;
                     }
                     DoCreateItem( effIndex, itemtype );
+                    return;
+                }
+                // Demonic Empowerment
+                case 47193: 
+                {
+                    if(!unitTarget)
+                        return;
+                    uint32 entry = unitTarget->GetEntry();
+                    uint32 spellID;
+                    switch(entry)
+                    {
+                        case   416: spellID = 54444; break; //imp
+                        case   417: spellID = 54509; break; //fellhunter
+                        case  1860: spellID = 54443; break; //void
+                        case  1863: spellID = 54435; break; //succubus
+                        case 17252: spellID = 54508; break; //fellguard
+                        default:
+                            return;
+                    }
+                    unitTarget->CastSpell(unitTarget,spellID,true);
                     return;
                 }
                 // Everlasting Affliction
@@ -5222,6 +5261,8 @@ void Spell::EffectScriptEffect(uint32 effIndex)
                 // Chimera Shot
                 case 53209:
                 {
+                    if(!unitTarget)
+                        return;
                     uint32 spellId = 0;
                     int32 basePoint = 0;
                     Unit* target = unitTarget;
