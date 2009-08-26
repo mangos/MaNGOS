@@ -445,6 +445,8 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         float GetAngle( const WorldObject* obj ) const;
         float GetAngle( const float x, const float y ) const;
         bool HasInArc( const float arcangle, const WorldObject* obj ) const;
+        bool isInFrontInMap(WorldObject const* target,float distance, float arc = M_PI) const;
+        bool isInBackInMap(WorldObject const* target, float distance, float arc = M_PI) const;
 
         virtual void CleanupsBeforeDelete();                // used in destructor or explicitly before mass creature delete to remove cross-references to already deleted units
 
@@ -471,10 +473,10 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         void AddObjectToRemoveList();
 
         // main visibility check function in normal case (ignore grey zone distance check)
-        bool isVisibleFor(Player const* u) const { return isVisibleForInState(u,false); }
+        bool isVisibleFor(Player const* u, WorldObject const* viewPoint) const { return isVisibleForInState(u,viewPoint,false); }
 
         // low level function for visibility change code, must be define in all main world object subclasses
-        virtual bool isVisibleForInState(Player const* u, bool inVisibleList) const = 0;
+        virtual bool isVisibleForInState(Player const* u, WorldObject const* viewPoint, bool inVisibleList) const = 0;
 
         void SetMap(Map * map);
         Map * GetMap() const { ASSERT(m_currMap); return m_currMap; }

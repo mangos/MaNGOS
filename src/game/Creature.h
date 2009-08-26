@@ -681,7 +681,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
 
         void SetDeadByDefault (bool death_state) { m_isDeadByDefault = death_state; }
 
-        bool isActiveObject() const { return m_isActiveObject; }
+        bool isActiveObject() const { return m_isActiveObject || HasAuraType(SPELL_AURA_BIND_SIGHT) || HasAuraType(SPELL_AURA_FAR_SIGHT); }
         void SetActiveObjectState(bool on);
 
     protected:

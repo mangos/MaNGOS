@@ -3118,24 +3118,9 @@ bool Player::addSpell(uint32 spell_id, bool active, bool learning, bool dependen
 
 bool Player::IsNeedCastPassiveSpellAtLearn(SpellEntry const* spellInfo) const
 {
-    bool need_cast =  false;
-
-    switch(spellInfo->Id)
-    {
-        // some spells not have stance data expected cast at form change or present
-        case  5420: need_cast = (m_form == FORM_TREE);            break;
-        case  5419: need_cast = (m_form == FORM_TRAVEL);          break;
-        case  7376: need_cast = (m_form == FORM_DEFENSIVESTANCE); break;
-        case  7381: need_cast = (m_form == FORM_BERSERKERSTANCE); break;
-        case 21156: need_cast = (m_form == FORM_BATTLESTANCE);    break;
-        case 21178: need_cast = (m_form == FORM_BEAR || m_form == FORM_DIREBEAR); break;
-        case 33948: need_cast = (m_form == FORM_FLIGHT);          break;
-        case 34764: need_cast = (m_form == FORM_FLIGHT);          break;
-        case 40121: need_cast = (m_form == FORM_FLIGHT_EPIC);     break;
-        case 40122: need_cast = (m_form == FORM_FLIGHT_EPIC);     break;
-        // another spells have proper stance data
-        default: need_cast = !spellInfo->Stances || m_form != 0 && (spellInfo->Stances & (1<<(m_form-1))); break;
-    }
+    // note: form passives activated with shapeshift spells be implemented by HandleShapeshiftBoosts instead of spell_learn_spell
+    // talent dependent passives activated at form apply have proper stance data
+    bool need_cast = !spellInfo->Stances || m_form != 0 && (spellInfo->Stances & (1<<(m_form-1)));
 
     //Check CasterAuraStates
     return need_cast && (!spellInfo->CasterAuraState || HasAuraState(AuraState(spellInfo->CasterAuraState)));
@@ -16825,13 +16810,15 @@ void Player::HandleStealthedUnitsDetection()
     cell_lock->Visit(cell_lock, world_unit_searcher, *GetMap());
     cell_lock->Visit(cell_lock, grid_unit_searcher, *GetMap());
 
+    WorldObject const* viewPoint = GetViewPoint();
+
     for (std::list<Unit*>::const_iterator i = stealthedUnits.begin(); i != stealthedUnits.end(); ++i)
     {
         if((*i)==this)
             continue;
 
         bool hasAtClient = HaveAtClient((*i));
-        bool hasDetected = (*i)->isVisibleForOrDetect(this, true);
+        bool hasDetected = (*i)->isVisibleForOrDetect(this, viewPoint, true);
 
         if (hasDetected)
         {
@@ -17915,6 +17902,17 @@ void Player::ReportedAfkBy(Player* reporter)
     }
 }
 
+WorldObject const* Player::GetViewPoint() const
+{
+    if(uint64 far_sight = GetFarSight())
+    {
+        WorldObject const* viewPoint = ObjectAccessor::GetWorldObject(*this,far_sight);
+        return viewPoint ? viewPoint : this;                // always expected not NULL
+    }
+    else
+        return this;
+}
+
 bool Player::IsVisibleInGridForPlayer( Player* pl ) const
 {
     // gamemaster in GM mode see all, including ghosts
@@ -17980,11 +17978,11 @@ bool Player::IsVisibleGloballyFor( Player* u ) const
     return true;
 }
 
-void Player::UpdateVisibilityOf(WorldObject* target)
+void Player::UpdateVisibilityOf(WorldObject const* viewPoint, WorldObject* target)
 {
     if(HaveAtClient(target))
     {
-        if(!target->isVisibleForInState(this, true))
+        if(!target->isVisibleForInState(this, viewPoint, true))
         {
             target->DestroyForPlayer(this);
             m_clientGUIDs.erase(target->GetGUID());
@@ -17997,7 +17995,7 @@ void Player::UpdateVisibilityOf(WorldObject* target)
     }
     else
     {
-        if(target->isVisibleForInState(this,false))
+        if(target->isVisibleForInState(this, viewPoint, false))
         {
             target->SendUpdateToPlayer(this);
             if(target->GetTypeId()!=TYPEID_GAMEOBJECT||!((GameObject*)target)->IsTransport())
@@ -18033,11 +18031,11 @@ inline void UpdateVisibilityOf_helper(std::set<uint64>& s64, GameObject* target)
 }
 
 template<class T>
-void Player::UpdateVisibilityOf(T* target, UpdateData& data, UpdateDataMapType& data_updates, std::set<WorldObject*>& visibleNow)
+void Player::UpdateVisibilityOf(WorldObject const* viewPoint, T* target, UpdateData& data, UpdateDataMapType& data_updates, std::set<WorldObject*>& visibleNow)
 {
     if(HaveAtClient(target))
     {
-        if(!target->isVisibleForInState(this,true))
+        if(!target->isVisibleForInState(this,viewPoint,true))
         {
             target->BuildOutOfRangeUpdateBlock(&data);
             m_clientGUIDs.erase(target->GetGUID());
@@ -18050,7 +18048,7 @@ void Player::UpdateVisibilityOf(T* target, UpdateData& data, UpdateDataMapType& 
     }
     else
     {
-        if(target->isVisibleForInState(this,false))
+        if(target->isVisibleForInState(this,viewPoint,false))
         {
             visibleNow.insert(target);
             target->BuildUpdate(data_updates);
@@ -18065,11 +18063,11 @@ void Player::UpdateVisibilityOf(T* target, UpdateData& data, UpdateDataMapType& 
     }
 }
 
-template void Player::UpdateVisibilityOf(Player*        target, UpdateData& data, UpdateDataMapType& data_updates, std::set<WorldObject*>& visibleNow);
-template void Player::UpdateVisibilityOf(Creature*      target, UpdateData& data, UpdateDataMapType& data_updates, std::set<WorldObject*>& visibleNow);
-template void Player::UpdateVisibilityOf(Corpse*        target, UpdateData& data, UpdateDataMapType& data_updates, std::set<WorldObject*>& visibleNow);
-template void Player::UpdateVisibilityOf(GameObject*    target, UpdateData& data, UpdateDataMapType& data_updates, std::set<WorldObject*>& visibleNow);
-template void Player::UpdateVisibilityOf(DynamicObject* target, UpdateData& data, UpdateDataMapType& data_updates, std::set<WorldObject*>& visibleNow);
+template void Player::UpdateVisibilityOf(WorldObject const* viewPoint, Player*        target, UpdateData& data, UpdateDataMapType& data_updates, std::set<WorldObject*>& visibleNow);
+template void Player::UpdateVisibilityOf(WorldObject const* viewPoint, Creature*      target, UpdateData& data, UpdateDataMapType& data_updates, std::set<WorldObject*>& visibleNow);
+template void Player::UpdateVisibilityOf(WorldObject const* viewPoint, Corpse*        target, UpdateData& data, UpdateDataMapType& data_updates, std::set<WorldObject*>& visibleNow);
+template void Player::UpdateVisibilityOf(WorldObject const* viewPoint, GameObject*    target, UpdateData& data, UpdateDataMapType& data_updates, std::set<WorldObject*>& visibleNow);
+template void Player::UpdateVisibilityOf(WorldObject const* viewPoint, DynamicObject* target, UpdateData& data, UpdateDataMapType& data_updates, std::set<WorldObject*>& visibleNow);
 
 void Player::InitPrimaryProfessions()
 {
@@ -20592,6 +20590,17 @@ void Player::BuildTeleportAckMsg( WorldPacket *data, float x, float y, float z, 
 bool Player::HasMovementFlag( MovementFlags f ) const
 {
     return m_movementInfo.HasMovementFlag(f);
+}
+
+void Player::SetFarSightGUID( uint64 guid )
+{
+    if(GetFarSight() == guid)
+        return;
+
+    SetUInt64Value(PLAYER_FARSIGHT, guid);
+
+    // need triggering load grids around new view point
+    ObjectAccessor::UpdateVisibilityForPlayer(this);
 }
 
 void Player::SendDuelCountdown(uint32 counter)

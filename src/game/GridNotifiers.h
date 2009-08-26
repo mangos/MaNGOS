@@ -778,7 +778,7 @@ namespace MaNGOS
                 return u->isAlive()
                     && i_obj->IsWithinDistInMap(u, i_range)
                     && !i_funit->IsFriendlyTo(u)
-                    && u->isVisibleForOrDetect(i_funit, false);
+                    && u->isVisibleForOrDetect(i_funit,i_funit,false);
             }
         private:
             WorldObject const* i_obj;
@@ -827,7 +827,7 @@ namespace MaNGOS
             bool operator()(Unit* u)
             {
                 if( u->isTargetableForAttack() && i_obj->IsWithinDistInMap(u, i_range) &&
-                    !i_funit->IsFriendlyTo(u) && u->isVisibleForOrDetect(i_funit,false)  )
+                    !i_funit->IsFriendlyTo(u) && u->isVisibleForOrDetect(i_funit,i_funit,false)  )
                 {
                     i_range = i_obj->GetDistance(u);        // use found unit range as new range limit for next check
                     return true;
@@ -863,7 +863,7 @@ namespace MaNGOS
                     return false;
                 if(u->GetTypeId()==TYPEID_UNIT && ((Creature*)u)->isTotem())
                     return false;
-                if (!i_hitHidden && !u->isVisibleForOrDetect(i_funit, false))
+                if (!i_hitHidden && !u->isVisibleForOrDetect(i_funit, i_funit, false))
                     return false;
 
                 if(( i_targetForPlayer ? !i_funit->IsFriendlyTo(u) : i_funit->IsHostileTo(u) )&& i_obj->IsWithinDistInMap(u, i_range))

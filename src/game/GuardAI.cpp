@@ -126,7 +126,7 @@ void GuardAI::UpdateAI(const uint32 /*diff*/)
 bool GuardAI::IsVisible(Unit *pl) const
 {
     return m_creature->IsWithinDist(pl,sWorld.getConfig(CONFIG_SIGHT_GUARDER))
-        && pl->isVisibleForOrDetect(m_creature,true);
+        && pl->isVisibleForOrDetect(m_creature,m_creature,true);
 }
 
 void GuardAI::AttackStart(Unit *u)

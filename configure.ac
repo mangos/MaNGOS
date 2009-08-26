@@ -201,16 +201,34 @@ AC_TYPE_SIGNAL
 AC_FUNC_VPRINTF
 AC_CHECK_FUNCS([atexit ftime gethostbyaddr gethostbyname gethostname gettimeofday memmove memset pow realpath select socket sqrt strchr strdup strerror strstr])
 
-PKG_CHECK_MODULES(ACE, [ACE >= 5.5.2], [need_to_build_ace=no], [need_to_build_ace=yes])
-if test X$need_to_build_ace = Xyes ; then
+
+# Check for use buildtin ACE sources
+AC_ARG_ENABLE(builtin_ace, AC_HELP_STRING([--enable-builtin-ace], [turn on/off using builtin ACE sources]))
+
+enable_builtin_ace_support=yes
+
+if test "x$enable_builtin_ace" = "xno"; then
+  PKG_CHECK_MODULES(ACE, [ACE >= 5.5.2], [need_builtin_ace=no], [need_builtin_ace=yes])
+  if test X$need_builtin_ace = Xyes ; then
+    AC_MSG_ERROR([You need to install ACE package or use built-in ACE sources])
+  fi
+  enable_builtin_ace_support=no
+fi
+
+if test X$enable_builtin_ace_support = Xno; then
+
+  # old ace versions might not have ace/Stack_Trace.h...
+  AC_LANG_PUSH([C++])
+  AC_CHECK_HEADERS([ace/Stack_Trace.h])
+  AC_LANG_POP
+else
+  # ...but we certainly have it in our included version
+  AC_DEFINE(HAVE_ACE_STACK_TRACE_H)
   ACE_INCLUDES="-I\$(top_srcdir)/dep/ACE_wrappers -I\$(top_builddir)/dep/ACE_wrappers"
   ACE_LIBS="\$(top_builddir)/dep/ACE_wrappers/ace/libACE.la"
 fi
 
-AM_CONDITIONAL([MANGOS_BUILD_ACE], [test X$need_to_build_ace = Xyes])
-
-# old ace versions not have ace/Stack_Trace.h
-AC_CHECK_HEADERS([ace/Stack_Trace.h])
+AM_CONDITIONAL([MANGOS_BUILD_ACE], [test X$enable_builtin_ace_support = Xyes])
 
 ## Unify all additional includes/libs in one variable.
 # TODO this looks kinda ugly, but when we add m4 folder I will make it look very pritey ( by Derex ).
@@ -261,7 +279,7 @@ AC_CONFIG_FILES([
 ])
 
 ## Configure ACE, if needed
-if test X$need_to_build_ace = Xyes; then
+if test X$enable_builtin_ace_support = Xyes; then
   AC_CONFIG_SUBDIRS([dep/ACE_wrappers])
 fi
 
