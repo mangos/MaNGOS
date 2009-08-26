@@ -3634,10 +3634,14 @@ void Spell::EffectPickPocket(uint32 /*i*/)
 
 void Spell::EffectAddFarsight(uint32 i)
 {
-    float radius = GetSpellRadius(sSpellRadiusStore.LookupEntry(m_spellInfo->EffectRadiusIndex[i]));
+    if(m_caster->GetTypeId() != TYPEID_PLAYER)
+        return;
+
     int32 duration = GetSpellDuration(m_spellInfo);
     DynamicObject* dynObj = new DynamicObject;
-    if(!dynObj->Create(objmgr.GenerateLowGuid(HIGHGUID_DYNAMICOBJECT), m_caster, m_spellInfo->Id, i, m_targets.m_destX, m_targets.m_destY, m_targets.m_destZ, duration, radius))
+
+    // set radius to 0: spell not expected to work as persistent aura
+    if(!dynObj->Create(objmgr.GenerateLowGuid(HIGHGUID_DYNAMICOBJECT), m_caster, m_spellInfo->Id, i, m_targets.m_destX, m_targets.m_destY, m_targets.m_destZ, duration, 0))
     {
         delete dynObj;
         return;
@@ -3646,8 +3650,7 @@ void Spell::EffectAddFarsight(uint32 i)
     dynObj->SetUInt32Value(DYNAMICOBJECT_BYTES, 0x80000002);
     m_caster->AddDynObject(dynObj);
     m_caster->GetMap()->Add(dynObj);
-    if(m_caster->GetTypeId() == TYPEID_PLAYER)
-        ((Player*)m_caster)->SetFarSightGUID(dynObj->GetGUID());
+    ((Player*)m_caster)->SetFarSightGUID(dynObj->GetGUID());
 }
 
 void Spell::EffectSummonWild(uint32 i)

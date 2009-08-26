@@ -1310,21 +1310,19 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         float GetWeaponDamageRange(WeaponAttackType attType ,WeaponDamageRange type) const;
         void SetBaseWeaponDamage(WeaponAttackType attType ,WeaponDamageRange damageRange, float value) { m_weaponDamage[attType][damageRange] = value; }
 
-        bool isInFrontInMap(Unit const* target,float distance, float arc = M_PI) const;
         void SetInFront(Unit const* target);
-        bool isInBackInMap(Unit const* target, float distance, float arc = M_PI) const;
 
         // Visibility system
         UnitVisibility GetVisibility() const { return m_Visibility; }
         void SetVisibility(UnitVisibility x);
 
         // common function for visibility checks for player/creatures with detection code
-        bool isVisibleForOrDetect(Unit const* u, bool detect, bool inVisibleList = false, bool is3dDistance = true) const;
+        bool isVisibleForOrDetect(Unit const* u, WorldObject const* viewPoint, bool detect, bool inVisibleList = false, bool is3dDistance = true) const;
         bool canDetectInvisibilityOf(Unit const* u) const;
         void SetPhaseMask(uint32 newPhaseMask, bool update);// overwrite WorldObject::SetPhaseMask
 
         // virtual functions for all world objects types
-        bool isVisibleForInState(Player const* u, bool inVisibleList) const;
+        bool isVisibleForInState(Player const* u, WorldObject const* viewPoint, bool inVisibleList) const;
         // function for low level grid visibility checks in player/creature cases
         virtual bool IsVisibleInGridForPlayer(Player* pl) const = 0;
 

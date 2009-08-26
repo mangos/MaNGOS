@@ -141,7 +141,7 @@ bool
 AggressorAI::IsVisible(Unit *pl) const
 {
     return m_creature->IsWithinDist(pl,sWorld.getConfig(CONFIG_SIGHT_MONSTER))
-        && pl->isVisibleForOrDetect(m_creature,true);
+        && pl->isVisibleForOrDetect(m_creature,m_creature,true);
 }
 
 void

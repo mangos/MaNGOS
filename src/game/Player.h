@@ -2084,7 +2084,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void ExitVehicle(Vehicle *vehicle);
 
         uint64 GetFarSight() const { return GetUInt64Value(PLAYER_FARSIGHT); }
-        void SetFarSightGUID(uint64 guid) { SetUInt64Value(PLAYER_FARSIGHT, guid); }
+        void SetFarSightGUID(uint64 guid);
 
         // Transports
         Transport * GetTransport() const { return m_transport; }
@@ -2122,13 +2122,14 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         bool HaveAtClient(WorldObject const* u) { return u==this || m_clientGUIDs.find(u->GetGUID())!=m_clientGUIDs.end(); }
 
+        WorldObject const* GetViewPoint() const;
         bool IsVisibleInGridForPlayer(Player* pl) const;
         bool IsVisibleGloballyFor(Player* pl) const;
 
-        void UpdateVisibilityOf(WorldObject* target);
+        void UpdateVisibilityOf(WorldObject const* viewPoint, WorldObject* target);
 
         template<class T>
-            void UpdateVisibilityOf(T* target, UpdateData& data, UpdateDataMapType& data_updates, std::set<WorldObject*>& visibleNow);
+            void UpdateVisibilityOf(WorldObject const* viewPoint,T* target, UpdateData& data, UpdateDataMapType& data_updates, std::set<WorldObject*>& visibleNow);
 
         // Stealth detection system
         void HandleStealthedUnitsDetection();

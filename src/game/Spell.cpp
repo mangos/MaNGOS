@@ -1194,7 +1194,7 @@ void Spell::DoSpellHitOnUnit(Unit *unit, const uint32 effectMask)
         {
             // for delayed spells ignore not visible explicit target
             if (m_spellInfo->speed > 0.0f && unit == m_targets.getUnitTarget() &&
-                !unit->isVisibleForOrDetect(m_caster,false))
+                !unit->isVisibleForOrDetect(m_caster,m_caster,false))
             {
                 realCaster->SendSpellMiss(unit, m_spellInfo->Id, SPELL_MISS_EVADE);
                 return;
@@ -1204,9 +1204,9 @@ void Spell::DoSpellHitOnUnit(Unit *unit, const uint32 effectMask)
             if (!(m_spellInfo->AttributesEx & SPELL_ATTR_EX_NOT_BREAK_STEALTH))
                 unit->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
 
-            // can cause back attack (if detected)
+            // can cause back attack (if detected), stealth removed at Spell::cast if spell break it
             if (!(m_spellInfo->AttributesEx & SPELL_ATTR_EX_NO_INITIAL_AGGRO) && !IsPositiveSpell(m_spellInfo->Id) &&
-                m_caster->isVisibleForOrDetect(unit,false)) // stealth removed at Spell::cast if spell break it
+                m_caster->isVisibleForOrDetect(unit,unit,false))
             {
                 // use speedup check to avoid re-remove after above lines
                 if (m_spellInfo->AttributesEx & SPELL_ATTR_EX_NOT_BREAK_STEALTH)

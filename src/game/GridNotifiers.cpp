@@ -30,13 +30,16 @@ using namespace MaNGOS;
 void
 MaNGOS::PlayerNotifier::Visit(PlayerMapType &m)
 {
+    WorldObject const* viewPoint = i_player.GetViewPoint();
+
     for(PlayerMapType::iterator iter=m.begin(); iter != m.end(); ++iter)
     {
-        if( iter->getSource() == &i_player )
+        Player* player = iter->getSource();
+        if( player == &i_player )
             continue;
 
-        iter->getSource()->UpdateVisibilityOf(&i_player);
-        i_player.UpdateVisibilityOf(iter->getSource());
+        player->UpdateVisibilityOf(player->GetViewPoint(),&i_player);
+        i_player.UpdateVisibilityOf(viewPoint,player);
     }
 }
 
@@ -45,24 +48,28 @@ VisibleChangesNotifier::Visit(PlayerMapType &m)
 {
     for(PlayerMapType::iterator iter=m.begin(); iter != m.end(); ++iter)
     {
-        if(iter->getSource() == &i_object)
+        Player* player = iter->getSource();
+        if(player == &i_object)
             continue;
 
-        iter->getSource()->UpdateVisibilityOf(&i_object);
+        player->UpdateVisibilityOf(player->GetViewPoint(),&i_object);
     }
 }
 
 void
 VisibleNotifier::Visit(PlayerMapType &m)
 {
+    WorldObject const* viewPoint = i_player.GetViewPoint();
+
     for(PlayerMapType::iterator iter=m.begin(); iter != m.end(); ++iter)
     {
-        if( iter->getSource() == &i_player )
+        Player* player = iter->getSource();
+        if( player == &i_player )
             continue;
 
-        iter->getSource()->UpdateVisibilityOf(&i_player);
-        i_player.UpdateVisibilityOf(iter->getSource(),i_data,i_data_updates,i_visibleNow);
-        i_clientGUIDs.erase(iter->getSource()->GetGUID());
+        player->UpdateVisibilityOf(player->GetViewPoint(),&i_player);
+        i_player.UpdateVisibilityOf(viewPoint,player,i_data,i_data_updates,i_visibleNow);
+        i_clientGUIDs.erase(player->GetGUID());
     }
 }
 
@@ -77,8 +84,9 @@ VisibleNotifier::Notify()
         {
             if(i_clientGUIDs.find((*itr)->GetGUID())!=i_clientGUIDs.end())
             {
-                (*itr)->UpdateVisibilityOf(&i_player);
-                i_player.UpdateVisibilityOf((*itr),i_data,i_data_updates,i_visibleNow);
+                // ignore far sight case
+                (*itr)->UpdateVisibilityOf((*itr),&i_player);
+                i_player.UpdateVisibilityOf(&i_player,(*itr),i_data,i_data_updates,i_visibleNow);
                 i_clientGUIDs.erase((*itr)->GetGUID());
             }
         }
@@ -121,9 +129,8 @@ VisibleNotifier::Notify()
             if(!IS_PLAYER_GUID(*iter))
                 continue;
 
-            Player* plr = ObjectAccessor::GetPlayer(i_player,*iter);
-            if(plr)
-                plr->UpdateVisibilityOf(&i_player);
+            if (Player* plr = ObjectAccessor::GetPlayer(i_player,*iter))
+                plr->UpdateVisibilityOf(plr->GetViewPoint(),&i_player);
         }
     }
 

@@ -1116,7 +1116,7 @@ void CreatureEventAI::UpdateAI(const uint32 diff)
 bool CreatureEventAI::IsVisible(Unit *pl) const
 {
     return m_creature->IsWithinDist(pl,sWorld.getConfig(CONFIG_SIGHT_MONSTER))
-        && pl->isVisibleForOrDetect(m_creature,true);
+        && pl->isVisibleForOrDetect(m_creature,m_creature,true);
 }
 
 inline Unit* CreatureEventAI::SelectUnit(AttackingTarget target, uint32 position)
