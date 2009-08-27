@@ -38,6 +38,7 @@ CREATE TABLE `spell_check` (
 INSERT INTO spell_check (spellid,SpellFamilyName,SpellFamilyMaskA,SpellFamilyMaskB,SpellIcon,SpellVisual,SpellCategory,EffectType,EffectAura,EffectIdx,Name,Code) VALUES
 /* sorted by spell ids */
 /*id   fm familyMaskA        fmMaskB    icon vis  cat  eff aur ef name                                  code                   */
+(781,   9,                -1,        -1,  -1,  -1,  -1,  3, -1,-1,'Disengage',                          'Spell::EffectDummy'),
 (1454,  5,0x0000000000040000,0x00000000,  -1,  -1,  -1,  3, -1,-1,'Life Tap',                           'Spell::EffectDummy'),
 (1455,  5,0x0000000000040000,0x00000000,  -1,  -1,  -1,  3, -1,-1,'Life Tap',                           'Spell::EffectDummy'),
 (1456,  5,0x0000000000040000,0x00000000,  -1,  -1,  -1,  3, -1,-1,'Life Tap',                           'Spell::EffectDummy'),
@@ -315,7 +316,10 @@ INSERT INTO spell_check (spellid,SpellFamilyName,SpellFamilyMaskA,SpellFamilyMas
 (55004, 0,                -1,        -1,  -1,  -1,  -1,  3, -1,-1,'Nitro Boosts',                       'Spell::EffectDummy'),
 (55441,11,                -1,        -1,  -1,  -1,  -1, -1,  4,-1,'Glyph of Mana Tide',                 'Spell::EffectDummy'),
 (56235,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Glyph of Conflagrate',               'Spell::EffectSchoolDMG'),
+(56446,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Disengage',                          'Spell::EffectDummy'),
 (57627,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Charge',                             'Spell::EffectSchoolDMG'),
+(57635, 9,                -1,        -1,  -1,  -1,  -1,  3, -1,-1,'Disengage',                          'Spell::EffectDummy'),
+(57636,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Disengage',                          'Spell::EffectDummy'),
 (57946, 5,0x0000000000040000,0x00000000,  -1,  -1,  -1,  3, -1,-1,'Life Tap',                           'Spell::EffectDummy'),
 (58367,-1,                -1,        -1,  -1,  -1,  -1, -1,  4,-1,'Glyph of Execution',                 'Spell::EffectDummy'),
 (58418, 0,                -1,        -1,  -1,  -1,  -1,  3, -1,-1,'Portal to Orgrimmar',                'Spell::EffectDummy'),
@@ -324,9 +328,13 @@ INSERT INTO spell_check (spellid,SpellFamilyName,SpellFamilyMaskA,SpellFamilyMas
 (59645,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Underbelly Elixir',                  'Spell::EffectDummy'),
 (59831,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Underbelly Elixir',                  'Spell::EffectDummy'),
 (59843,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Underbelly Elixir',                  'Spell::EffectDummy'),
+(60932, 0,                -1,        -1,  -1,  -1,  -1,  3, -1,-1,'Disengage',                          'Spell::EffectDummy'),
+(60934,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Disengage',                          'Spell::EffectDummy'),
 (61290, 5,0x0001000000000000,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Shadowflame',                        'Spell::EffectSchoolDMG'),
 (61291,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Shadowflame',                        'Spell::EffectSchoolDMG'),
 (61491, 0,                -1,        -1,  -1,  -1,  -1,  2, -1,-1,'Intercept',                          'Spell::EffectSchoolDMG'),
+(61507, 9,                -1,        -1,  -1,  -1,  -1,  3, -1,-1,'Disengage',                          'Spell::EffectDummy'),
+(61508,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Disengage',                          'Spell::EffectDummy'),
 (63375,-1,                -1,        -1,  -1,  -1,  -1, 30, -1,-1,'Improved Stormstrike',               'Spell::EffectEnergize'),
 
 /* sorted by spell names */
@@ -344,6 +352,7 @@ INSERT INTO spell_check (spellid,SpellFamilyName,SpellFamilyMaskA,SpellFamilyMas
 (    0,15,0x0000000000002000,0x00000000,  -1,  -1,  -1,  3, -1,-1,'Death Coil',                         'Spell::EffectDummy'),
 (    0,15,0x0000000000000010,0x00000000,  -1,  -1,  -1,  3, -1,-1,'Death Strike',                       'Spell::EffectDummy'),
 (    0, 5,                -1,        -1,  -1,  -1,  12, 38, -1,-1,'Devour Magic',                       'Spell::EffectDispel'),
+(    0, 9,0x0000400000000000,0x00000000,  -1,  -1,  -1,  3, -1,-1,'Disengage',                          'Spell::EffectDummy'),
 (    0, 8,0x0000000800000000,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Envenom',                            'Spell::EffectSchoolDMG'),
 (    0, 8,0x0000000000020000,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Eviscerate',                         'Spell::EffectSchoolDMG'),
 (0,     4,0x0000000020000000,0x00000000,  -1,  -1,  -1,  3, -1,-1,'Execute',                            'Spell::EffectDummy'),
