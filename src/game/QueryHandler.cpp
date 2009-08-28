@@ -457,3 +457,16 @@ void WorldSession::HandlePageTextQueryOpcode( WorldPacket & recv_data )
         sLog.outDebug( "WORLD: Sent SMSG_PAGE_TEXT_QUERY_RESPONSE" );
     }
 }
+
+void WorldSession::HandleCorpseMapPositionQuery( WorldPacket & recv_data )
+{
+    uint32 unk;
+    recv_data >> unk;
+
+    WorldPacket data(CMSG_CORPSE_MAP_POSITION_QUERY_RESPONSE, 4+4+4+4);
+    data << float(0);
+    data << float(0);
+    data << float(0);
+    data << float(0);
+    SendPacket(&data);
+}

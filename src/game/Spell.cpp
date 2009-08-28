@@ -239,7 +239,10 @@ bool SpellCastTargets::read ( WorldPacket * data, Unit *caster )
 
     if( m_targetMask & TARGET_FLAG_SOURCE_LOCATION )
     {
-        if(data->rpos() + 4 + 4 + 4 > data->size())
+        if(data->rpos() + 1 + 4 + 4 + 4 > data->size())
+            return false;
+
+        if(!data->readPackGUID(m_unitTargetGUID))
             return false;
 
         *data >> m_srcX >> m_srcY >> m_srcZ;
@@ -308,7 +311,14 @@ void SpellCastTargets::write ( WorldPacket * data )
     }
 
     if( m_targetMask & TARGET_FLAG_SOURCE_LOCATION )
+    {
+        if(m_unitTarget)
+            data->append(m_unitTarget->GetPackGUID());
+        else
+            *data << uint8(0);
+
         *data << m_srcX << m_srcY << m_srcZ;
+    }
 
     if( m_targetMask & TARGET_FLAG_DEST_LOCATION )
     {
@@ -2972,6 +2982,12 @@ void Spell::SendSpellStart()
 
     if ( castFlags & CAST_FLAG_AMMO )
         WriteAmmoToPacket(&data);
+
+    if ( castFlags & CAST_FLAG_UNKNOWN21 )
+    {
+        data << uint32(0);
+        data << uint32(0);
+    }
 
     m_caster->SendMessageToSet(&data, true);
 }

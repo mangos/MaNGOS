@@ -40,9 +40,11 @@
 #include "Pet.h"
 #include "SocialMgr.h"
 
-void WorldSession::HandleRepopRequestOpcode( WorldPacket & /*recv_data*/ )
+void WorldSession::HandleRepopRequestOpcode( WorldPacket & recv_data )
 {
     sLog.outDebug( "WORLD: Recvd CMSG_REPOP_REQUEST Message" );
+
+    recv_data.read_skip<uint8>();
 
     if(GetPlayer()->isAlive() || GetPlayer()->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))
         return;

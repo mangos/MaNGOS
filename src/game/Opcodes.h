@@ -1240,8 +1240,8 @@ enum Opcodes
     CMSG_ITEM_REFUND_INFO_REQUEST                   = 0x4B3, // refund request?
     CMSG_UNKNOWN_1204                               = 0x4B4, // lua: ContainerRefundItemPurchase
     SMSG_UNKNOWN_1205                               = 0x4B5, // refund something
-    CMSG_UNKNOWN_1206                               = 0x4B6, // CMSG, uint32
-    SMSG_UNKNOWN_1207                               = 0x4B7, // SMSG, string+float
+    CMSG_CORPSE_MAP_POSITION_QUERY                  = 0x4B6, // CMSG, uint32
+    CMSG_CORPSE_MAP_POSITION_QUERY_RESPONSE         = 0x4B7, // SMSG, 3*float+float
     CMSG_LFG_SET_ROLES                              = 0x4B8, // CMSG, empty, lua: SetLFGRoles
     UMSG_UNKNOWN_1209                               = 0x4B9, // not found
     CMSG_UNKNOWN_1210                               = 0x4BA, // CMSG, uint64, lua: CalendarContextEventSignUp

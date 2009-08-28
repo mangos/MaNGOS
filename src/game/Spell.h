@@ -77,7 +77,8 @@ enum SpellCastFlags
     CAST_FLAG_UNKNOWN10          = 0x00040000,
     CAST_FLAG_UNKNOWN5           = 0x00080000,              // wotlk
     CAST_FLAG_UNKNOWN20          = 0x00100000,
-    CAST_FLAG_UNKNOWN7           = 0x00200000               // wotlk, rune cooldown list
+    CAST_FLAG_UNKNOWN7           = 0x00200000,              // wotlk, rune cooldown list
+    CAST_FLAG_UNKNOWN21          = 0x04000000
 };
 
 enum SpellNotifyPushType

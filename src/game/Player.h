@@ -2390,8 +2390,6 @@ class MANGOS_DLL_SPEC Player : public Unit
         uint16 tradeItems[TRADE_SLOT_COUNT];
         uint32 tradeGold;
 
-        time_t m_nextThinkTime;
-
         bool   m_DailyQuestChanged;
         time_t m_lastDailyQuestTime;
 

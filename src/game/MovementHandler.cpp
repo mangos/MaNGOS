@@ -515,7 +515,8 @@ void WorldSession::HandleMoveKnockBackAck( WorldPacket & recv_data )
 {
     sLog.outDebug("CMSG_MOVE_KNOCK_BACK_ACK");
 
-    recv_data.read_skip<uint64>();                          // guid
+    uint64 guid;
+    recv_data.readPackGUID(guid);
     recv_data.read_skip<uint32>();                          // unk
 
     MovementInfo movementInfo;
@@ -526,7 +527,8 @@ void WorldSession::HandleMoveHoverAck( WorldPacket& recv_data )
 {
     sLog.outDebug("CMSG_MOVE_HOVER_ACK");
 
-    recv_data.read_skip<uint64>();                          // guid
+    uint64 guid;
+    recv_data.readPackGUID(guid);
     recv_data.read_skip<uint32>();                          // unk
 
     MovementInfo movementInfo;
@@ -539,7 +541,8 @@ void WorldSession::HandleMoveWaterWalkAck(WorldPacket& recv_data)
 {
     sLog.outDebug("CMSG_MOVE_WATER_WALK_ACK");
 
-    recv_data.read_skip<uint64>();                          // guid
+    uint64 guid;
+    recv_data.readPackGUID(guid);
     recv_data.read_skip<uint32>();                          // unk
 
     MovementInfo movementInfo;

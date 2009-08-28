@@ -340,10 +340,16 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
     {
         recvPacket.read_skip<float>();                      // unk1, coords?
         recvPacket.read_skip<float>();                      // unk1, coords?
-        recvPacket.read_skip<uint8>();                      // >> 1
-        recvPacket.read_skip<uint32>();                     // >> MSG_MOVE_STOP
-        MovementInfo movementInfo;
-        ReadMovementInfo(recvPacket, &movementInfo);
+        uint8 unk1;
+        recvPacket >> unk1;                                 // >> 1 or 0
+        if(unk1)
+        {
+            recvPacket.read_skip<uint32>();                 // >> MSG_MOVE_STOP
+            uint64 guid;
+            recvPacket.readPackGUID(guid);
+            MovementInfo movementInfo;
+            ReadMovementInfo(recvPacket, &movementInfo);
+        }
     }
 
     // auto-selection buff level base at target level (in spellInfo)
