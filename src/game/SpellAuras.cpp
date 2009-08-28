@@ -1305,13 +1305,18 @@ void Aura::HandleAddModifier(bool apply, bool Real)
 
     ((Player*)m_target)->AddSpellMod(m_spellmod, apply);
 
-    // reapply some passive spells after add/remove related spellmods
-    if(m_spellProto->SpellFamilyName==SPELLFAMILY_WARRIOR && (spellFamilyMask & UI64LIT(0x0000100000000000)))
-    {
-        m_target->RemoveAurasDueToSpell(45471);
+    // reaplly talents to own passive persistent auras
+    std::set<uint32> affectedPassives;
 
-        if(apply)
-            m_target->CastSpell(m_target, 45471, true);
+    for(Unit::AuraMap::const_iterator itr = m_target->GetAuras().begin(); itr != m_target->GetAuras().end(); ++itr)
+        if (itr->second->IsPassive() && itr->second->IsPermanent() &&
+            itr->second->GetCasterGUID() == m_target->GetGUID() && isAffectedOnSpell(itr->second->GetSpellProto()))
+            affectedPassives.insert(itr->second->GetId());
+
+    for(std::set<uint32>::const_iterator set_itr = affectedPassives.begin(); set_itr != affectedPassives.end(); ++set_itr)
+    {
+        m_target->RemoveAurasDueToSpell(*set_itr);
+        m_target->CastSpell(m_target, *set_itr, true);
     }
 }
 void Aura::HandleAddTargetTrigger(bool apply, bool /*Real*/)
