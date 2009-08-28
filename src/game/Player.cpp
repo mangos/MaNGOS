@@ -112,6 +112,14 @@ enum CharacterFlags
     CHARACTER_FLAG_UNK32                = 0x80000000
 };
 
+enum CharacterCustomizeFlags
+{
+    CHAR_CUSTOMIZE_FLAG_NONE            = 0x00000000,
+    CHAR_CUSTOMIZE_FLAG_CUSTOMIZE       = 0x00000001,       // name, gender, etc...
+    CHAR_CUSTOMIZE_FLAG_FACTION         = 0x00010000,       // name, gender, faction, etc...
+    CHAR_CUSTOMIZE_FLAG_RACE            = 0x00100000        // name, gender, race, etc...
+};
+
 // corpse reclaim times
 #define DEATH_EXPIRE_STEP (5*MINUTE)
 #define MAX_DEATH_COUNT 3
@@ -1445,7 +1453,7 @@ bool Player::BuildEnumData( QueryResult * result, WorldPacket * p_data )
 
     *p_data << uint32(char_flags);                          // character flags
     // character customize flags
-    *p_data << uint32(atLoginFlags & AT_LOGIN_CUSTOMIZE ? 1 : 0);// 0x00010000 - faction change
+    *p_data << uint32(atLoginFlags & AT_LOGIN_CUSTOMIZE ? CHAR_CUSTOMIZE_FLAG_CUSTOMIZE : CHAR_CUSTOMIZE_FLAG_NONE);
     *p_data << uint8(1);                                    // unknown
 
     // Pets info
@@ -15363,10 +15371,9 @@ void Player::SendRaidInfo()
                 data << uint32(save->GetMapId());           // map id
                 data << uint32(save->GetDifficulty());      // difficulty
                 data << uint64(save->GetInstanceId());      // instance id
-                data << uint8(0);
-                data << uint8(0);
+                data << uint8(1);                           // expired = 0
+                data << uint8(0);                           // extended = 1
                 data << uint32(save->GetResetTime() - now); // reset time
-                //data << uint32(0);                          // is extended
                 ++counter;
             }
         }

@@ -353,7 +353,7 @@ enum Opcodes
     SMSG_AI_REACTION                                = 0x13C,
     CMSG_SET_SELECTION                              = 0x13D,
     CMSG_EQUIPMENT_SET_DELETE                       = 0x13E,
-    CMSG_INSTANCE_LOCK_RESPONSE                     = 0x13F,
+    CMSG_INSTANCE_LOCK_WARNING_RESPONSE             = 0x13F,
     CMSG_UNUSED2                                    = 0x140,
     CMSG_ATTACKSWING                                = 0x141,
     CMSG_ATTACKSTOP                                 = 0x142,
@@ -361,7 +361,7 @@ enum Opcodes
     SMSG_ATTACKSTOP                                 = 0x144,
     SMSG_ATTACKSWING_NOTINRANGE                     = 0x145,
     SMSG_ATTACKSWING_BADFACING                      = 0x146,
-    SMSG_INSTANCE_LOCK_QUERY                        = 0x147,
+    SMSG_INSTANCE_LOCK_WARNING_QUERY                = 0x147,
     SMSG_ATTACKSWING_DEADTARGET                     = 0x148,
     SMSG_ATTACKSWING_CANT_ATTACK                    = 0x149,
     SMSG_ATTACKERSTATEUPDATE                        = 0x14A,
@@ -692,7 +692,7 @@ enum Opcodes
     CMSG_GROUP_ASSISTANT_LEADER                     = 0x28F,
     CMSG_BUYBACK_ITEM                               = 0x290,
     SMSG_SERVER_MESSAGE                             = 0x291,
-    CMSG_MEETINGSTONE_JOIN                          = 0x292, // lua: SetSavedInstanceExtend
+    CMSG_SET_SAVED_INSTANCE_EXTEND                  = 0x292, // lua: SetSavedInstanceExtend
     SMSG_MEETINGSTONE_LEAVE                         = 0x293,
     CMSG_MEETINGSTONE_CHEAT                         = 0x294,
     SMSG_MEETINGSTONE_SETQUEUE                      = 0x295,
@@ -1075,7 +1075,7 @@ enum Opcodes
     CMSG_REFER_A_FRIEND                             = 0x40E,
     MSG_GM_CHANGE_ARENA_RATING                      = 0x40F,
     CMSG_DECLINE_CHANNEL_INVITE                     = 0x410,
-    CMSG_GROUPACTION_THROTTLED                      = 0x411, // SMSG?
+    SMSG_GROUPACTION_THROTTLED                      = 0x411, // SMSG?
     SMSG_OVERRIDE_LIGHT                             = 0x412,
     SMSG_TOTEM_CREATED                              = 0x413,
     CMSG_TOTEM_DESTROYED                            = 0x414,
@@ -1306,7 +1306,7 @@ enum Opcodes
     UMSG_UNKNOWN_1269                               = 0x4F5, // not found 3.2
     CMSG_WORLD_STATE_UI_TIMER_UPDATE                = 0x4F6,
     SMSG_WORLD_STATE_UI_TIMER_UPDATE                = 0x4F7,
-    CMSG_UNKNOWN_1272                               = 0x4F8, // called from lua: CreateCharacter, may be paid race change
+    CMSG_UNKNOWN_1272                               = 0x4F8, // called from lua: CreateCharacter, paid race change
     NUM_MSG_TYPES                                   = 0x4F9
 };
 
