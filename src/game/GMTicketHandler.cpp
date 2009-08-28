@@ -89,8 +89,9 @@ void WorldSession::HandleGMTicketCreateOpcode( WorldPacket & recv_data )
     recv_data >> ticketText;
 
     recv_data.read_skip<uint32>();                          // unk1, 0
-    recv_data.read_skip<uint32>();                          // unk2, 1
+    recv_data.read_skip<uint8>();                           // unk2, 1
     recv_data.read_skip<uint32>();                          // unk3, 0
+    recv_data.read_skip<uint32>();                          // unk4, 0
 
     sLog.outDebug("TicketCreate: map %u, x %f, y %f, z %f, text %s", map, x, y, z, ticketText.c_str());
 
