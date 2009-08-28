@@ -54,12 +54,11 @@ void WorldSession::HandleArenaTeamQueryOpcode(WorldPacket & recv_data)
     uint32 ArenaTeamId;
     recv_data >> ArenaTeamId;
 
-    ArenaTeam *arenateam = objmgr.GetArenaTeamById(ArenaTeamId);
-    if(!arenateam)                                          // arena team not found
-        return;
-
-    arenateam->Query(this);
-    arenateam->Stats(this);
+    if(ArenaTeam *arenateam = objmgr.GetArenaTeamById(ArenaTeamId))
+    {
+        arenateam->Query(this);
+        arenateam->Stats(this);
+    }
 }
 
 void WorldSession::HandleArenaTeamRosterOpcode(WorldPacket & recv_data)
@@ -69,11 +68,8 @@ void WorldSession::HandleArenaTeamRosterOpcode(WorldPacket & recv_data)
     uint32 ArenaTeamId;                                     // arena team id
     recv_data >> ArenaTeamId;
 
-    ArenaTeam *arenateam = objmgr.GetArenaTeamById(ArenaTeamId);
-    if(!arenateam)
-        return;
-
-    arenateam->Roster(this);
+    if(ArenaTeam *arenateam = objmgr.GetArenaTeamById(ArenaTeamId))
+        arenateam->Roster(this);
 }
 
 void WorldSession::HandleArenaTeamInviteOpcode(WorldPacket & recv_data)
@@ -203,12 +199,14 @@ void WorldSession::HandleArenaTeamLeaveOpcode(WorldPacket & recv_data)
     ArenaTeam *at = objmgr.GetArenaTeamById(ArenaTeamId);
     if(!at)
         return;
+
     if(_player->GetGUID() == at->GetCaptain() && at->GetMembersSize() > 1)
     {
         // check for correctness
         SendArenaTeamCommandResult(ERR_ARENA_TEAM_QUIT_S, "", "", ERR_ARENA_TEAM_LEADER_LEAVE_S);
         return;
     }
+
     // arena team has only one member (=captain)
     if(_player->GetGUID() == at->GetCaptain())
     {
@@ -235,18 +233,17 @@ void WorldSession::HandleArenaTeamDisbandOpcode(WorldPacket & recv_data)
     uint32 ArenaTeamId;                                     // arena team id
     recv_data >> ArenaTeamId;
 
-    ArenaTeam *at = objmgr.GetArenaTeamById(ArenaTeamId);
-    if(!at)
-        return;
+    if(ArenaTeam *at = objmgr.GetArenaTeamById(ArenaTeamId))
+    {
+        if(at->GetCaptain() != _player->GetGUID())
+            return;
 
-    if(at->GetCaptain() != _player->GetGUID())
-        return;
+        if(at->IsFighting())
+            return;
 
-    if (at->IsFighting())
-        return;
-
-    at->Disband(this);
-    delete at;
+        at->Disband(this);
+        delete at;
+    }
 }
 
 void WorldSession::HandleArenaTeamRemoveOpcode(WorldPacket & recv_data)
