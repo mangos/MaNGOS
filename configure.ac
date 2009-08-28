@@ -48,7 +48,7 @@ if test "$srcdir" = "." && test "$enable_maintainer_mode" != "yes"; then
           ../configure
           make
 
-      This will create a build space in the directory `objdir' and
+      This will create a build space in the directory 'objdir' and
       start a build in that directory.
 
       If however you realy want to disable this error,
