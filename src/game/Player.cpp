@@ -18150,6 +18150,8 @@ void Player::SendInitialPacketsBeforeAddToMap()
 {
     GetSocial()->SendSocialList();
 
+    // guild bank list wtf?
+
     // Homebind
     WorldPacket data(SMSG_BINDPOINTUPDATE, 5*4);
     data << m_homebindX << m_homebindY << m_homebindZ;
@@ -18158,9 +18160,14 @@ void Player::SendInitialPacketsBeforeAddToMap()
     GetSession()->SendPacket(&data);
 
     // SMSG_SET_PROFICIENCY
+    // SMSG_SET_PCT_SPELL_MODIFIER
+    // SMSG_SET_FLAT_SPELL_MODIFIER
     // SMSG_UPDATE_AURA_DURATION
 
     SendTalentsInfoData(false);
+
+    // SMSG_INSTANCE_DIFFICULTY
+
     SendInitialSpells();
 
     data.Initialize(SMSG_SEND_UNLEARN_SPELLS, 4);
@@ -18169,6 +18176,7 @@ void Player::SendInitialPacketsBeforeAddToMap()
 
     SendInitialActionButtons();
     m_reputationMgr.SendInitialReputations();
+    // SMSG_INIT_WORLD_STATES
     m_achievementMgr.SendAllAchievementData();
 
     SendEquipmentSetList();
@@ -18178,6 +18186,11 @@ void Player::SendInitialPacketsBeforeAddToMap()
     data << (float)0.01666667f;                             // game speed
     data << uint32(0);                                      // added in 3.1.2
     GetSession()->SendPacket( &data );
+
+    // SMSG_TALENTS_INFO x 2 for pet (unspent points and talents in separate packets...)
+    // SMSG_PET_GUIDS
+    // SMSG_UPDATE_WORLD_STATE
+    // SMSG_POWER_UPDATE
 
     // set fly flag if in fly form or taxi flight to prevent visually drop at ground in showup moment
     if(HasAuraType(SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED) || HasAuraType(SPELL_AURA_FLY) || isInFlight())

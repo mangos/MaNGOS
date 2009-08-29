@@ -622,11 +622,6 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
         DEBUG_LOG( "WORLD: Sent motd (SMSG_MOTD)" );
     }
 
-    data.Initialize(SMSG_LEARNED_DANCE_MOVES, 4+4);
-    data << uint32(0);
-    data << uint32(0);
-    SendPacket(&data);
-
     //QueryResult *result = CharacterDatabase.PQuery("SELECT guildid,rank FROM guild_member WHERE guid = '%u'",pCurrChar->GetGUIDLow());
     QueryResult *resultGuild = holder->GetResult(PLAYER_LOGIN_QUERY_LOADGUILD);
 
@@ -673,6 +668,11 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
             pCurrChar->SetInGuild(0);
         }
     }
+
+    data.Initialize(SMSG_LEARNED_DANCE_MOVES, 4+4);
+    data << uint32(0);
+    data << uint32(0);
+    SendPacket(&data);
 
     if(!pCurrChar->isAlive())
         pCurrChar->SendCorpseReclaimDelay(true);
