@@ -582,7 +582,7 @@ void WorldSession::LoadGlobalAccountData()
 void WorldSession::LoadAccountData(QueryResult* result, uint32 mask)
 {
     for (uint32 i = 0; i < NUM_ACCOUNT_DATA_TYPES; ++i)
-        if(mask & (1 < i))
+        if (mask & (1 << i))
             m_accountData[i] = AccountData();
 
     if(!result)
