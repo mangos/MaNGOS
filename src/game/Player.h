@@ -867,7 +867,8 @@ enum PlayerLoginQueryIndex
     PLAYER_LOGIN_QUERY_LOADCRITERIAPROGRESS     = 19,
     PLAYER_LOGIN_QUERY_LOADEQUIPMENTSETS        = 20,
     PLAYER_LOGIN_QUERY_LOADBGDATA               = 21,
-    MAX_PLAYER_LOGIN_QUERY                      = 22
+    PLAYER_LOGIN_QUERY_LOADACCOUNTDATA          = 22,
+    MAX_PLAYER_LOGIN_QUERY                      = 23
 };
 
 enum PlayerDelayedOperations
