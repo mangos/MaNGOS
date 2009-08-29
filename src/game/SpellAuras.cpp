@@ -1254,13 +1254,17 @@ void Aura::ReapplyAffectedPassiveAuras( Unit* target )
     std::set<uint32> affectedPassives;
 
     for(Unit::AuraMap::const_iterator itr = target->GetAuras().begin(); itr != target->GetAuras().end(); ++itr)
+    {
         // permanent passive
         if (itr->second->IsPassive() && itr->second->IsPermanent() &&
             // non deleted and not same aura (any with same spell id)
             !itr->second->IsDeleted() && itr->second->GetId() != GetId() &&
             // only applied by self and affected by aura
             itr->second->GetCasterGUID() == target->GetGUID() && isAffectedOnSpell(itr->second->GetSpellProto()))
+        {
             affectedPassives.insert(itr->second->GetId());
+        }
+    }
 
     for(std::set<uint32>::const_iterator set_itr = affectedPassives.begin(); set_itr != affectedPassives.end(); ++set_itr)
     {
@@ -1329,16 +1333,13 @@ void Aura::HandleAddModifier(bool apply, bool Real)
     ReapplyAffectedPassiveAuras(m_target);
 
     // re-aplly talents and passives applied to pet (it affected by player spellmods)
-    if (m_target->GetTypeId() == TYPEID_PLAYER)
-    {
-        if(Pet* pet = m_target->GetPet())
-            ReapplyAffectedPassiveAuras(pet);
+    if(Pet* pet = m_target->GetPet())
+        ReapplyAffectedPassiveAuras(pet);
 
-        for(int i = 0; i < MAX_TOTEM; ++i)
-            if(m_target->m_TotemSlot[i])
-                if(Creature* totem = m_target->GetMap()->GetCreature(m_target->m_TotemSlot[i]))
-                    ReapplyAffectedPassiveAuras(totem);
-    }
+    for(int i = 0; i < MAX_TOTEM; ++i)
+        if(m_target->m_TotemSlot[i])
+            if(Creature* totem = m_target->GetMap()->GetCreature(m_target->m_TotemSlot[i]))
+                ReapplyAffectedPassiveAuras(totem);
 }
 void Aura::HandleAddTargetTrigger(bool apply, bool /*Real*/)
 {
