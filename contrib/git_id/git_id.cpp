@@ -58,7 +58,8 @@ char remotes[NUM_REMOTES][MAX_REMOTE] = {
 };
 
 char remote_branch[MAX_REMOTE] = "master";
-char rev_file[MAX_PATH] = "src/shared/revision_nr.h";
+char rev_nr_file[MAX_PATH] = "src/shared/revision_nr.h";
+char rev_sql_file[MAX_PATH] = "src/shared/revision_sql.h";
 char sql_update_dir[MAX_PATH] = "sql/updates";
 char new_index_file[MAX_PATH] = ".git/git_id_index";
 
@@ -78,6 +79,12 @@ char db_sql_file[NUM_DATABASES][MAX_PATH] = {
     "sql/characters.sql",
     "sql/mangos.sql",
     "sql/realmd.sql"
+};
+
+char db_sql_rev_field[NUM_DATABASES][MAX_PATH] = {
+    "REVISION_DB_CHARACTERS",
+    "REVISION_DB_MANGOS",
+    "REVISION_DB_REALMD"
 };
 
 bool allow_replace = false;
@@ -257,13 +264,24 @@ bool find_rev()
     return rev > 0;
 }
 
-std::string generateHeader(char const* rev_str)
+std::string generateNrHeader(char const* rev_str)
 {
     std::ostringstream newData;
     newData << "#ifndef __REVISION_NR_H__" << std::endl;
     newData << "#define __REVISION_NR_H__"  << std::endl;
     newData << " #define REVISION_NR \"" << rev_str << "\"" << std::endl;
     newData << "#endif // __REVISION_NR_H__" << std::endl;
+    return newData.str();
+}
+
+std::string generateSqlHeader()
+{
+    std::ostringstream newData;
+    newData << "#ifndef __REVISION_SQL_H__" << std::endl;
+    newData << "#define __REVISION_SQL_H__"  << std::endl;
+    for(int i = 0; i < NUM_DATABASES; ++i)
+        newData << " #define " << db_sql_rev_field[i] << " \"required_" << last_sql_update[i] << "\"" << std::endl;
+    newData << "#endif // __REVISION_SQL_H__" << std::endl;
     return newData.str();
 }
 
@@ -280,15 +298,39 @@ void system_switch_index(const char *cmd)
     if(putenv(old_index_cmd) != 0) return;
 }
 
-bool write_rev()
+bool write_rev_nr()
 {
     printf("+ writing revision_nr.h\n");
     char rev_str[256];
     sprintf(rev_str, "%d", rev);
-    std::string header = generateHeader(rev_str);
+    std::string header = generateNrHeader(rev_str);
 
     char prefixed_file[MAX_PATH];
-    snprintf(prefixed_file, MAX_PATH, "%s%s", path_prefix, rev_file);
+    snprintf(prefixed_file, MAX_PATH, "%s%s", path_prefix, rev_nr_file);
+
+    if(FILE* OutputFile = fopen(prefixed_file, "wb"))
+    {
+        fprintf(OutputFile,"%s", header.c_str());
+        fclose(OutputFile);
+
+        // add the file to both indices, to be committed later
+        snprintf(cmd, MAX_CMD, "git add %s", prefixed_file);
+        system_switch_index(cmd);
+
+        return true;
+    }
+
+    return false;
+}
+
+bool write_rev_sql()
+{
+    if(new_sql_updates.empty()) return true;
+    printf("+ writing revision_sql.h\n");
+    std::string header = generateSqlHeader();
+
+    char prefixed_file[MAX_PATH];
+    snprintf(prefixed_file, MAX_PATH, "%s%s", path_prefix, rev_sql_file);
 
     if(FILE* OutputFile = fopen(prefixed_file, "wb"))
     {
@@ -846,12 +888,13 @@ int main(int argc, char *argv[])
     if(do_sql)
         DO( find_sql_updates()          );
     DO( prepare_new_index()             );
-    DO( write_rev()                     );
+    DO( write_rev_nr()                  );
     if(do_sql)
     {
         DO( convert_sql_updates()       );
         DO( generate_sql_makefile()     );
         DO( change_sql_database()       );
+        DO( write_rev_sql()             );
     }
     DO( amend_commit()                  );
     DO( cleanup_new_index()             );
