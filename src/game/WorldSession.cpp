@@ -234,7 +234,11 @@ bool WorldSession::Update(uint32 /*diff*/)
                             break;
                         }
 
-                        m_playerRecentlyLogout = false;
+                        // single from authed time opcodes send in to after logout time
+                        // and before other STATUS_LOGGEDIN_OR_RECENTLY_LOGGOUT opcodes.
+                        if (packet->GetOpcode() != CMSG_SET_ACTIVE_VOICE_CHANNEL)
+                            m_playerRecentlyLogout = false;
+
                         (this->*opHandle.handler)(*packet);
                         if (sLog.IsOutDebug() && packet->rpos() < packet->wpos())
                             LogUnprocessedTail(packet);
@@ -582,7 +586,7 @@ void WorldSession::LoadGlobalAccountData()
 void WorldSession::LoadAccountData(QueryResult* result, uint32 mask)
 {
     for (uint32 i = 0; i < NUM_ACCOUNT_DATA_TYPES; ++i)
-        if(mask & (1 << i))
+        if (mask & (1 << i))
             m_accountData[i] = AccountData();
 
     if(!result)

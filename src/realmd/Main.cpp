@@ -31,6 +31,7 @@
 #include "SystemConfig.h"
 #include "revision.h"
 #include "revision_nr.h"
+#include "revision_sql.h"
 #include "Util.h"
 #include <openssl/opensslv.h>
 #include <openssl/crypto.h>
@@ -324,6 +325,9 @@ bool StartDB(std::string &dbstring)
         sLog.outError("Cannot connect to database");
         return false;
     }
+
+    if(!loginDatabase.CheckRequiredField("realmd_db_version",REVISION_DB_REALMD))
+        return false;
 
     return true;
 }

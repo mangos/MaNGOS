@@ -38,6 +38,7 @@
 #include "RASocket.h"
 #include "ScriptCalls.h"
 #include "Util.h"
+#include "revision_sql.h"
 
 #include "sockets/TcpSocket.h"
 #include "sockets/Utility.h"
@@ -416,6 +417,9 @@ bool Master::_StartDB()
         return false;
     }
 
+    if(!WorldDatabase.CheckRequiredField("db_version",REVISION_DB_MANGOS))
+        return false;
+
     if(!sConfig.GetString("CharacterDatabaseInfo", &dbstring))
     {
         sLog.outError("Character Database not specified in configuration file");
@@ -429,6 +433,9 @@ bool Master::_StartDB()
         sLog.outError("Cannot connect to Character database %s",dbstring.c_str());
         return false;
     }
+
+    if(!CharacterDatabase.CheckRequiredField("character_db_version",REVISION_DB_CHARACTERS))
+        return false;
 
     ///- Get login database info from configuration file
     if(!sConfig.GetString("LoginDatabaseInfo", &dbstring))
@@ -444,6 +451,9 @@ bool Master::_StartDB()
         sLog.outError("Cannot connect to login database %s",dbstring.c_str());
         return false;
     }
+
+    if(!loginDatabase.CheckRequiredField("realmd_db_version",REVISION_DB_REALMD))
+        return false;
 
     ///- Get the realm Id from the configuration file
     realmID = sConfig.GetIntDefault("RealmID", 0);
