@@ -34,8 +34,8 @@ enum MailShowFlags
     MAIL_SHOW_UNK0    = 0x0001,
     MAIL_SHOW_DELETE  = 0x0002,                             // forced show delete button instead return button
     MAIL_SHOW_AUCTION = 0x0004,                             // from old comment
-    MAIL_SHOW_COD     = 0x0008,                             // show subject prefix
-    MAIL_SHOW_UNK4    = 0x0010,
+    MAIL_SHOW_UNK2    = 0x0008,                             // unknown, COD will be shown even without that flag
+    MAIL_SHOW_RETURN  = 0x0010,
 };
 
 void MailItem::deleteItem( bool inDB )
@@ -319,7 +319,16 @@ void WorldSession::HandleMailDelete(WorldPacket & recv_data )
     pl->m_mailsUpdated = true;
     Mail *m = pl->GetMail(mailId);
     if(m)
+    {
+        // delete shouldn't show up for COD mails
+        if (m->COD)
+        {
+            pl->SendMailResult(mailId, MAIL_DELETED, MAIL_ERR_INTERNAL_ERROR);
+            return;
+        }
+
         m->state = MAIL_STATE_DELETED;
+    }
     pl->SendMailResult(mailId, MAIL_DELETED, MAIL_OK);
 }
 
@@ -589,8 +598,8 @@ void WorldSession::HandleGetMailList(WorldPacket & recv_data )
             show_flags |= MAIL_SHOW_DELETE;
         if ((*itr)->messageType == MAIL_AUCTION)
             show_flags |= MAIL_SHOW_AUCTION;
-        if ((*itr)->COD)
-            show_flags |= MAIL_SHOW_COD;
+        if ((*itr)->HasItems() && (*itr)->messageType == MAIL_NORMAL)
+            show_flags |= MAIL_SHOW_RETURN;
 
         data << (uint16) 0x0040;                            // unknown 2.3.0, different values
         data << (uint32) (*itr)->messageID;                 // Message ID
