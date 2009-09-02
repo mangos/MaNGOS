@@ -22,7 +22,12 @@
 #include "Common.h"
 #include "SharedDefines.h"
 
+// magic event-numbers
 #define BG_EVENT_NONE 255
+// those generic events should get a high event id
+#define BG_EVENT_DOOR 254
+
+
 class Creature;
 class GameObject;
 class Group;
@@ -484,14 +489,30 @@ class BattleGround
         virtual void RemovePlayerAtLeave(uint64 guid, bool Transport, bool SendPacket);
                                                             // can be extended in in BG subclass
 
+        /* event related */
+        // generic implementation in BattleGround-class
+        // called when a creature gets added to map (NOTE: only triggered if
+        // a player activates the cell of the creature)
         virtual void OnObjectDBLoad(Creature* /*creature*/);
         virtual void OnObjectDBLoad(GameObject* /*obj*/);
+        // (de-)spawns creatures and gameobjects from an event
+        void SpawnEvent(uint8 event1, uint8 event2, bool spawn);
+        bool IsActiveEvent(uint8 event1, uint8 event2)
+        {
+            if (m_ActiveEvents.find(event1) == m_ActiveEvents.end())
+                return false;
+            return m_ActiveEvents[event1] == event2;
+        }
+        void OpenDoorEvent(uint8 event1, uint8 event2 = 0);
+        bool IsDoor(uint8 event1, uint8 event2);
 
+        /* other things */
         void HandleTriggerBuff(uint64 const& go_guid);
 
         // TODO: make this protected:
         typedef std::vector<uint64> BGObjects;
         typedef std::vector<uint64> BGCreatures;
+        // TODO drop m_BGObjects
         BGObjects m_BgObjects;
         BGCreatures m_BgCreatures;
         void SpawnBGObject(uint64 const& guid, uint32 respawntime);
@@ -517,13 +538,31 @@ class BattleGround
         /* virtual score-array - get's used in bg-subclasses */
         int32 m_TeamScores[BG_TEAMS_COUNT];
 
+        struct EventObjects
+        {
+            BGObjects gameobjects;
+            BGCreatures creatures;
+        };
+
+        //typedef std::map<uint8, std::map<uint8, EventObjects>> BGObjectMap;
+        //typedef std::map<uint8, std::map<uint8, bool>> BGEventMap;
+        // cause we create it dynamicly i use a map - to avoid resizing when
+        // using vector - also it contains 2*events concatenated with PAIR32
+        // this is needed to avoid overhead of a 2dimensional std::map
+        std::map<uint32, EventObjects> m_EventObjects;
+        // this must be filled first in BattleGroundXY::Reset().. else
+        // creatures will get added wrong
+        // door-events are automaticly added - but _ALL_ other must be in this vector
+        std::map<uint8, uint8> m_ActiveEvents;
+
+
     protected:
         //this method is called, when BG cannot spawn its own spirit guide, or something is wrong, It correctly ends BattleGround
         void EndNow();
         void PlayerAddedToBGCheckIfBGIsRunning(Player* plr);
 
         /* Scorekeeping */
-                                                            
+
         BattleGroundScoreMap m_PlayerScores;                // Player scores
         // must be implemented in BG subclass
         virtual void RemovePlayer(Player * /*player*/, uint64 /*guid*/) {}

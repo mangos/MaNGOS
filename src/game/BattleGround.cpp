@@ -1083,6 +1083,9 @@ void BattleGround::Reset()
 
     m_Events = 0;
 
+    // door-event2 is always 0
+    m_ActiveEvents[BG_EVENT_DOOR] = 0;
+
     if (m_InvitedAlliance > 0 || m_InvitedHorde > 0)
         sLog.outError("BattleGround system: bad counter, m_InvitedAlliance: %d, m_InvitedHorde: %d", m_InvitedAlliance, m_InvitedHorde);
 
@@ -1447,6 +1450,90 @@ void BattleGround::DoorOpen(uint64 const& guid)
     }
 }
 
+void BattleGround::OnObjectDBLoad(Creature* creature)
+{
+    BattleGroundEventIdx eventId = sBattleGroundMgr.GetCreatureEventIndex(creature->GetDBTableGUIDLow());
+    if (eventId.event1 == BG_EVENT_NONE)
+        return;
+    m_EventObjects[MAKE_PAIR32(eventId.event1, eventId.event2)].creatures.push_back(creature->GetGUID());
+    if (!IsActiveEvent(eventId.event1, eventId.event2))
+        SpawnBGCreature(creature->GetGUID(), RESPAWN_ONE_DAY);
+}
+
+
+void BattleGround::OnObjectDBLoad(GameObject* obj)
+{
+    BattleGroundEventIdx eventId = sBattleGroundMgr.GetGameObjectEventIndex(obj->GetDBTableGUIDLow());
+    if (eventId.event1 == BG_EVENT_NONE)
+        return;
+    m_EventObjects[MAKE_PAIR32(eventId.event1, eventId.event2)].gameobjects.push_back(obj->GetGUID());
+    if (!IsActiveEvent(eventId.event1, eventId.event2))
+    {
+        SpawnBGObject(obj->GetGUID(), RESPAWN_ONE_DAY);
+    }
+    else
+    {
+        // it's possible, that doors aren't spawned anymore (wsg)
+        if (GetStatus() >= STATUS_IN_PROGRESS && IsDoor(eventId.event1, eventId.event2))
+            DoorOpen(obj->GetGUID());
+    }
+}
+
+bool BattleGround::IsDoor(uint8 event1, uint8 event2)
+{
+    if (event1 == BG_EVENT_DOOR)
+    {
+        if (event2 > 0)
+        {
+            sLog.outError("BattleGround too high event2 for event1:%i", event1);
+            return false;
+        }
+        return true;
+    }
+    return false;
+}
+
+void BattleGround::OpenDoorEvent(uint8 event1, uint8 event2 /*=0*/)
+{
+    if (!IsDoor(event1, event2))
+    {
+        sLog.outError("BattleGround:OpenDoorEvent this is no door event1:%u event2:%u", event1, event2);
+        return;
+    }
+    if (!IsActiveEvent(event1, event2))                 // maybe already despawned (eye)
+    {
+        sLog.outError("BattleGround:OpenDoorEvent this event isn't active event1:%u event2:%u", event1, event2);
+        return;
+    }
+    BGObjects::const_iterator itr = m_EventObjects[MAKE_PAIR32(event1, event2)].gameobjects.begin();
+    for(; itr != m_EventObjects[MAKE_PAIR32(event1, event2)].gameobjects.end(); ++itr)
+        DoorOpen(*itr);
+}
+
+void BattleGround::SpawnEvent(uint8 event1, uint8 event2, bool spawn)
+{
+    // stop if we want to spawn something which was already spawned
+    // or despawn something which was already despawned
+    if (event2 == BG_EVENT_NONE || (spawn && m_ActiveEvents[event1] == event2)
+        || (!spawn && m_ActiveEvents[event1] != event2))
+        return;
+
+    if (spawn)
+    {
+        // if event gets spawned, the current active event mus get despawned
+        SpawnEvent(event1, m_ActiveEvents[event1], false);
+        m_ActiveEvents[event1] = event2;                    // set this event to active
+    }
+    else
+        m_ActiveEvents[event1] = BG_EVENT_NONE;             // no event active if event2 gets despawned
+
+    BGCreatures::const_iterator itr = m_EventObjects[MAKE_PAIR32(event1, event2)].creatures.begin();
+    for(; itr != m_EventObjects[MAKE_PAIR32(event1, event2)].creatures.end(); ++itr)
+        SpawnBGCreature(*itr, (spawn) ? RESPAWN_IMMEDIATELY : RESPAWN_ONE_DAY);
+    BGObjects::const_iterator itr2 = m_EventObjects[MAKE_PAIR32(event1, event2)].gameobjects.begin();
+    for(; itr2 != m_EventObjects[MAKE_PAIR32(event1, event2)].gameobjects.end(); ++itr2)
+        SpawnBGObject(*itr2, (spawn) ? RESPAWN_IMMEDIATELY : RESPAWN_ONE_DAY);
+}
 
 void BattleGround::SpawnBGObject(uint64 const& guid, uint32 respawntime)
 {
