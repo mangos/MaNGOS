@@ -668,7 +668,10 @@ void Player::UpdateArmorPenetration()
         {
             Item *weapon = GetWeaponForAttack(WeaponAttackType(i));
             if(weapon && weapon->IsFitToSpellRequirements((*itr)->GetSpellProto()))
+            {
                 m_armorPenetrationPct += (*itr)->GetModifier()->m_amount;
+                break;
+            }
         }
     }
 }
