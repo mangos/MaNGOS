@@ -104,8 +104,7 @@ DestinationHolder<TRAVELLER>::UpdateTraveller(TRAVELLER &traveller, uint32 diff,
 
             float x,y,z;
             GetLocationNowNoMicroMovement(x, y, z);
-            if( x == -431602080 )
-                return false;
+
             if (traveller.GetTraveller().GetPositionX() != x || traveller.GetTraveller().GetPositionY() != y  || traveller.GetTraveller().GetPositionZ() != z)
             {
                 float ori = traveller.GetTraveller().GetAngle(x, y);
@@ -130,9 +129,6 @@ DestinationHolder<TRAVELLER>::UpdateTraveller(TRAVELLER &traveller, uint32 diff,
             GetLocationNow(traveller.GetTraveller().GetBaseMap() ,x, y, z, true);                  // Should reposition Object with right Coord, so I can bypass some Grid Relocation
         else
             GetLocationNow(traveller.GetTraveller().GetBaseMap(), x, y, z, false);
-
-        if( x == -431602080 )
-            return false;
 
         if (traveller.GetTraveller().GetPositionX() != x || traveller.GetTraveller().GetPositionY() != y || traveller.GetTraveller().GetPositionZ() != z)
         {
