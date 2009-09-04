@@ -238,27 +238,20 @@ class BattleGroundMgr
             return BATTLEGROUND_WS;
         }
 
-        void LoadCreatureBattleEventIndexes();
-        BattleGroundEventIdx GetCreatureEventIndex(uint32 dbTableGuidLow) const
+        void LoadBattleEventIndexes();
+        const BattleGroundEventIdx GetCreatureEventIndex(uint32 dbTableGuidLow) const
         {
-            CreatureBattleEventIndexesMap::const_iterator itr = mCreatureBattleEventIndexMap.find(dbTableGuidLow);
-            if(itr != mCreatureBattleEventIndexMap.end())
+            CreatureBattleEventIndexesMap::const_iterator itr = m_CreatureBattleEventIndexMap.find(dbTableGuidLow);
+            if(itr != m_CreatureBattleEventIndexMap.end())
                 return itr->second;
-            BattleGroundEventIdx none;
-            none.event1 = BG_EVENT_NONE;
-            none.event2 = BG_EVENT_NONE;
-            return none;                                    // needed to check for error
+            return m_CreatureBattleEventIndexMap.find(-1)->second;
         }
-        void LoadGameObjectBattleEventIndexes();
-        BattleGroundEventIdx GetGameObjectEventIndex(uint32 dbTableGuidLow) const
+        const BattleGroundEventIdx GetGameObjectEventIndex(uint32 dbTableGuidLow) const
         {
-            GameObjectBattleEventIndexesMap::const_iterator itr = mGameObjectBattleEventIndexMap.find(dbTableGuidLow);
-            if(itr != mGameObjectBattleEventIndexMap.end())
+            GameObjectBattleEventIndexesMap::const_iterator itr = m_GameObjectBattleEventIndexMap.find(dbTableGuidLow);
+            if(itr != m_GameObjectBattleEventIndexMap.end())
                 return itr->second;
-            BattleGroundEventIdx none;
-            none.event1 = BG_EVENT_NONE;
-            none.event2 = BG_EVENT_NONE;
-            return none;                                    // needed to check for error
+            return m_GameObjectBattleEventIndexMap.find(-1)->second;
         }
 
         bool isArenaTesting() const { return m_ArenaTesting; }
@@ -273,8 +266,8 @@ class BattleGroundMgr
         static bool IsBGWeekend(BattleGroundTypeId bgTypeId);
     private:
         BattleMastersMap    mBattleMastersMap;
-        CreatureBattleEventIndexesMap mCreatureBattleEventIndexMap;
-        GameObjectBattleEventIndexesMap mGameObjectBattleEventIndexMap;
+        CreatureBattleEventIndexesMap m_CreatureBattleEventIndexMap;
+        GameObjectBattleEventIndexesMap m_GameObjectBattleEventIndexMap;
 
         /* Battlegrounds */
         BattleGroundSet m_BattleGrounds[MAX_BATTLEGROUND_TYPE_ID];
