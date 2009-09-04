@@ -1422,7 +1422,7 @@ struct SpellEntry
     //uint32    spellMissileID;                             // 233      m_spellMissileID not used
     //uint32  PowerDisplayId;                               // 234 PowerDisplay.dbc, new in 3.1
     //float   unk_320_4[3];                                 // 235-237  3.2.0
-    //uint32  spellDescriptionVariablesID;                  // 238      3.2.0
+    //uint32  spellDescriptionVariableID;                   // 238      3.2.0
 
     // helpers
     int32 CalculateSimpleValue(uint8 eff) const { return EffectBasePoints[eff]+int32(EffectBaseDice[eff]); }
