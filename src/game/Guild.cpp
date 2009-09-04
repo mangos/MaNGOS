@@ -680,7 +680,7 @@ void Guild::SetRankName(uint32 rankId, std::string name_)
 
     // name now can be used for encoding to DB
     CharacterDatabase.escape_string(name_);
-    CharacterDatabase.PExecute("UPDATE guild_rank SET rname='%s' WHERE rid='%u' AND guildid='%u'", name_.c_str(), (rankId+1), m_Id);
+    CharacterDatabase.PExecute("UPDATE guild_rank SET rname='%s' WHERE rid='%u' AND guildid='%u'", name_.c_str(), rankId, m_Id);
 }
 
 void Guild::SetRankRights(uint32 rankId, uint32 rights)
@@ -690,7 +690,7 @@ void Guild::SetRankRights(uint32 rankId, uint32 rights)
 
     m_Ranks[rankId].rights = rights;
 
-    CharacterDatabase.PExecute("UPDATE guild_rank SET rights='%u' WHERE rid='%u' AND guildid='%u'", rights, (rankId+1), m_Id);
+    CharacterDatabase.PExecute("UPDATE guild_rank SET rights='%u' WHERE rid='%u' AND guildid='%u'", rights, rankId, m_Id);
 }
 
 int32 Guild::GetRank(uint32 LowGuid)
@@ -1402,7 +1402,7 @@ void Guild::SetBankMoneyPerDay(uint32 rankId, uint32 money)
         if (itr->second.RankId == rankId)
             itr->second.BankResetTimeMoney = 0;
 
-    CharacterDatabase.PExecute("UPDATE guild_rank SET BankMoneyPerDay='%u' WHERE rid='%u' AND guildid='%u'", money, (rankId+1), m_Id);
+    CharacterDatabase.PExecute("UPDATE guild_rank SET BankMoneyPerDay='%u' WHERE rid='%u' AND guildid='%u'", money, rankId, m_Id);
     CharacterDatabase.PExecute("UPDATE guild_member SET BankResetTimeMoney='0' WHERE guildid='%u' AND rank='%u'", m_Id, rankId);
 }
 
