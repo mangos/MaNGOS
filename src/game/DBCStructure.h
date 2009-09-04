@@ -1320,7 +1320,7 @@ struct SpellEntry
     uint32    AttributesEx3;                                // 7        m_attributesExC
     uint32    AttributesEx4;                                // 8        m_attributesExD
     uint32    AttributesEx5;                                // 9        m_attributesExE
-    //uint32    AttributesEx6;                              // 10       m_attributesExF not used
+    uint32    AttributesEx6;                                // 10       m_attributesExF
     // uint32 unk_320_1;                                    // 11       3.2.0 (0x20 - totems, 0x4 - paladin auras, etc...)
     uint32    Stances;                                      // 12       m_shapeshiftMask
     // uint32 unk_320_2;                                    // 13       3.2.0

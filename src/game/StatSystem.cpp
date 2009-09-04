@@ -91,17 +91,12 @@ bool Player::UpdateStats(Stats stat)
     return true;
 }
 
-void Player::ApplySpellDamageBonus(int32 amount, bool apply)
+void Player::ApplySpellPowerBonus(int32 amount, bool apply)
 {
-    m_baseSpellDamage+=apply?amount:-amount;
+    m_baseSpellPower+=apply?amount:-amount;
+
     // For speed just update for client
     ApplyModUInt32Value(PLAYER_FIELD_MOD_HEALING_DONE_POS, amount, apply);
-}
-
-void Player::ApplySpellHealingBonus(int32 amount, bool apply)
-{
-    m_baseSpellHealing+=apply?amount:-amount;
-    // For speed just update for client
     for(int i = SPELL_SCHOOL_HOLY; i < MAX_SPELL_SCHOOL; ++i)
         ApplyModUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS+i, amount, apply);;
 }
@@ -137,6 +132,7 @@ bool Player::UpdateAllStats()
     UpdateAllSpellCritChances();
     UpdateDefenseBonusesMod();
     UpdateShieldBlockValue();
+    UpdateArmorPenetration();
     UpdateSpellDamageAndHealingBonus();
     UpdateManaRegen();
     UpdateExpertise(BASE_ATTACK);
@@ -650,6 +646,33 @@ void Player::UpdateExpertise(WeaponAttackType attack)
         case BASE_ATTACK: SetUInt32Value(PLAYER_EXPERTISE, expertise);         break;
         case OFF_ATTACK:  SetUInt32Value(PLAYER_OFFHAND_EXPERTISE, expertise); break;
         default: break;
+    }
+}
+
+void Player::UpdateArmorPenetration()
+{
+    m_armorPenetrationPct = GetRatingBonusValue(CR_ARMOR_PENETRATION);
+
+    AuraList const& armorAuras = GetAurasByType(SPELL_AURA_MOD_TARGET_ARMOR_PCT);
+    for(AuraList::const_iterator itr = armorAuras.begin(); itr != armorAuras.end(); ++itr)
+    {
+        // affects all weapons
+        if((*itr)->GetSpellProto()->EquippedItemClass == -1)
+        {
+            m_armorPenetrationPct += (*itr)->GetModifier()->m_amount;
+            continue;
+        }
+
+        // dependent on weapon class
+        for(uint8 i = 0; i < MAX_ATTACK; ++i)
+        {
+            Item *weapon = GetWeaponForAttack(WeaponAttackType(i));
+            if(weapon && weapon->IsFitToSpellRequirements((*itr)->GetSpellProto()))
+            {
+                m_armorPenetrationPct += (*itr)->GetModifier()->m_amount;
+                break;
+            }
+        }
     }
 }
 

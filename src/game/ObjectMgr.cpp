@@ -1220,7 +1220,7 @@ void ObjectMgr::LoadGameobjects()
         uint32 entry        = fields[ 1].GetUInt32();
 
         GameObjectInfo const* gInfo = GetGameObjectInfo(entry);
-        if(!gInfo)
+        if (!gInfo)
         {
             sLog.outErrorDb("Table `gameobject` has gameobject (GUID: %u) with non existing gameobject entry %u, skipped.", guid, entry);
             continue;
@@ -1232,7 +1232,7 @@ void ObjectMgr::LoadGameobjects()
             continue;
         }
 
-        if(gInfo->displayId && !sGameObjectDisplayInfoStore.LookupEntry(gInfo->displayId))
+        if (gInfo->displayId && !sGameObjectDisplayInfoStore.LookupEntry(gInfo->displayId))
         {
             sLog.outErrorDb("Gameobject (GUID: %u Entry %u GoType: %u) have invalid displayId (%u), not loaded.", guid, entry, gInfo->type, gInfo->displayId);
             continue;
@@ -1272,13 +1272,13 @@ void ObjectMgr::LoadGameobjects()
         int16 gameEvent     = fields[16].GetInt16();
         int16 PoolId        = fields[17].GetInt16();
 
-        if(data.rotation2 < -1.0f || data.rotation2 > 1.0f)
+        if (data.rotation2 < -1.0f || data.rotation2 > 1.0f)
         {
             sLog.outErrorDb("Table `gameobject` have gameobject (GUID: %u Entry: %u) with invalid rotation2 (%f) value, skip", guid, data.id, data.rotation2);
             continue;
         }
 
-        if(data.rotation3 < -1.0f || data.rotation3 > 1.0f)
+        if (data.rotation3 < -1.0f || data.rotation3 > 1.0f)
         {
             sLog.outErrorDb("Table `gameobject` have gameobject (GUID: %u Entry: %u) with invalid rotation3 (%f) value, skip", guid, data.id, data.rotation3);
             continue;
@@ -1785,6 +1785,16 @@ void ObjectMgr::LoadItemPrototypes()
             {
                 sLog.outErrorDb("Item (Entry: %u) has wrong stat_type%d (%u)",i,j+1,proto->ItemStat[j].ItemStatType);
                 const_cast<ItemPrototype*>(proto)->ItemStat[j].ItemStatType = 0;
+            }
+
+            switch(proto->ItemStat[j].ItemStatType)
+            {
+                case ITEM_MOD_SPELL_HEALING_DONE:
+                case ITEM_MOD_SPELL_DAMAGE_DONE:
+                    sLog.outErrorDb("Item (Entry: %u) has deprecated stat_type%d (%u)",i,j+1,proto->ItemStat[j].ItemStatType);
+                    break;
+                default:
+                    break;
             }
         }
 

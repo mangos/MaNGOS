@@ -71,9 +71,9 @@ void SqlQuery::Execute(Database *db)
 void SqlResultQueue::Update()
 {
     /// execute the callbacks waiting in the synchronization queue
-    while(!empty())
+    MaNGOS::IQueryCallback* callback;
+    while (next(callback))
     {
-        MaNGOS::IQueryCallback * callback = next();
         callback->Execute();
         delete callback;
     }

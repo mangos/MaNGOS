@@ -150,9 +150,10 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map *map, uint32 phaseMa
 
     SetUInt32Value(GAMEOBJECT_DISPLAYID, goinfo->displayId);
 
+    // GAMEOBJECT_BYTES_1, index at 0, 1, 2 and 3
     SetGoState(go_state);
     SetGoType(GameobjectTypes(goinfo->type));
-
+    SetGoArtKit(0);                                         // unknown what this is
     SetGoAnimProgress(animprogress);
 
     //Notify the map's instance data.

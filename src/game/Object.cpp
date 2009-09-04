@@ -592,10 +592,9 @@ void Object::_BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask 
         if (isType(TYPEMASK_GAMEOBJECT) && !((GameObject*)this)->IsTransport())
         {
             if ( ((GameObject*)this)->ActivateToQuest(target) || target->isGameMaster())
-            {
                 IsActivateToQuest = true;
-                updateMask->SetBit(GAMEOBJECT_DYNAMIC);
-            }
+
+            updateMask->SetBit(GAMEOBJECT_DYNAMIC);
         }
         else if (isType(TYPEMASK_UNIT))
         {
@@ -711,18 +710,27 @@ void Object::_BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask 
                         switch(((GameObject*)this)->GetGoType())
                         {
                             case GAMEOBJECT_TYPE_CHEST:
-                                *data << uint32(9);         // enable quest object. Represent 9, but 1 for client before 2.3.0
+                                // enable quest object. Represent 9, but 1 for client before 2.3.0
+                                *data << uint16(9);
+                                *data << uint16(-1);
                                 break;
                             case GAMEOBJECT_TYPE_GOOBER:
-                                *data << uint32(1);
+                                *data << uint16(1);
+                                *data << uint16(-1);
                                 break;
                             default:
-                                *data << uint32(0);         // unknown, not happen.
+                                // unknown, not happen.
+                                *data << uint16(0);
+                                *data << uint16(-1);
                                 break;
                         }
                     }
                     else
-                        *data << uint32(0);                 // disable quest object
+                    {
+                        // disable quest object
+                        *data << uint16(0);
+                        *data << uint16(-1);
+                    }
                 }
                 else
                     *data << m_uint32Values[ index ];       // other cases
