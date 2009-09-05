@@ -140,7 +140,7 @@ Unit::Unit()
     m_baseSpellCritChance = 5;
 
     m_CombatTimer = 0;
-    m_lastManaUse = 0;
+    m_lastManaUseTimer = 0;
 
     //m_victimThreat = 0.0f;
     for (int i = 0; i < MAX_SPELL_SCHOOL; ++i)
@@ -191,6 +191,14 @@ void Unit::Update( uint32 p_time )
     // Or else we may have some SPELL_STATE_FINISHED spells stalled in pointers, that is bad.
     m_Events.Update( p_time );
     _UpdateSpells( p_time );
+
+    if (m_lastManaUseTimer)
+    {
+        if (p_time >= m_lastManaUseTimer)
+            m_lastManaUseTimer = 0;
+        else
+            m_lastManaUseTimer -= p_time;
+    }
 
     // really delete auras "deleted" while processing its ApplyModify code
     for(AuraList::const_iterator itr = m_deletedAuras.begin(); itr != m_deletedAuras.begin(); ++itr)
@@ -11801,11 +11809,6 @@ Aura* Unit::GetDummyAura( uint32 spell_id ) const
             return *itr;
 
     return NULL;
-}
-
-bool Unit::IsUnderLastManaUseEffect() const
-{
-    return  getMSTimeDiff(m_lastManaUse,getMSTime()) < 5000;
 }
 
 void Unit::SetContestedPvP(Player *attackedPlayer)

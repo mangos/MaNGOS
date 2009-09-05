@@ -3518,7 +3518,7 @@ void Spell::TakePower()
 
     // Set the five second timer
     if (powerType == POWER_MANA && m_powerCost > 0)
-        m_caster->SetLastManaUse(getMSTime());
+        m_caster->SetLastManaUse();
 }
 
 SpellCastResult Spell::CheckRuneCost(uint32 runeCostID)

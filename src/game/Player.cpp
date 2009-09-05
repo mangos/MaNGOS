@@ -1201,7 +1201,7 @@ void Player::Update( uint32 p_time )
         }
     }
 
-    if(m_regenTimer > 0)
+    if (m_regenTimer)
     {
         if(p_time >= m_regenTimer)
             m_regenTimer = 0;

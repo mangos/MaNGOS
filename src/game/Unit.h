@@ -1427,15 +1427,14 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         uint32 SpellCriticalDamageBonus(SpellEntry const *spellProto, uint32 damage, Unit *pVictim);
         uint32 SpellCriticalHealingBonus(SpellEntry const *spellProto, uint32 damage, Unit *pVictim);
 
-        void SetLastManaUse(uint32 spellCastTime)
+        void SetLastManaUse()
         {
             if (GetTypeId() == TYPEID_PLAYER && !IsUnderLastManaUseEffect())
-            {
                 RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_REGENERATE_POWER);
-            }
-            m_lastManaUse = spellCastTime;
+
+            m_lastManaUseTimer = 5000;
         }
-        bool IsUnderLastManaUseEffect() const;
+        bool IsUnderLastManaUseEffect() const { return m_lastManaUseTimer; }
 
         uint32 GetRegenTimer() const { return m_regenTimer; }
 
@@ -1559,6 +1558,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         uint32 m_reactiveTimer[MAX_REACTIVE];
         uint32 m_regenTimer;
+        uint32 m_lastManaUseTimer;
 
     private:
         bool IsTriggeredAtSpellProcEvent(Unit *pVictim, Aura* aura, SpellEntry const* procSpell, uint32 procFlag, uint32 procExtra, WeaponAttackType attType, bool isVictim, bool active, SpellProcEventEntry const*& spellProcEvent );
@@ -1571,7 +1571,6 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         uint32 m_state;                                     // Even derived shouldn't modify
         uint32 m_CombatTimer;
-        uint32 m_lastManaUse;                               // msecs
 
         Spell* m_currentSpells[CURRENT_MAX_SPELL];
 
