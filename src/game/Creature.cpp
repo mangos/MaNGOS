@@ -1462,7 +1462,7 @@ float Creature::GetAttackDistance(Unit const* pl) const
     uint32 playerlevel   = pl->getLevelForTarget(this);
     uint32 creaturelevel = getLevelForTarget(pl);
 
-    int32 leveldif       = playerlevel - creaturelevel;
+    int32 leveldif       = int32(playerlevel) - int32(creaturelevel);
 
     // "The maximum Aggro Radius has a cap of 25 levels under. Example: A level 30 char has the same Aggro Radius of a level 5 char on a level 60 mob."
     if ( leveldif < - 25)
