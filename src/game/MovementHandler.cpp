@@ -438,7 +438,7 @@ void WorldSession::HandleSetActiveMoverOpcode(WorldPacket &recv_data)
 
     if(_player->m_mover->GetGUID() != guid)
     {
-        sLog.outError("HandleSetActiveMoverOpcode: incorrect mover guid: mover is " I64FMT " and should be " I64FMT, _player->m_mover->GetGUID(), guid);
+        sLog.outError("HandleSetActiveMoverOpcode: incorrect mover guid: mover is " UI64FMTD " and should be " UI64FMTD, _player->m_mover->GetGUID(), guid);
         return;
     }
 }
@@ -453,7 +453,7 @@ void WorldSession::HandleMoveNotActiveMover(WorldPacket &recv_data)
 
     if(_player->m_mover->GetGUID() == old_mover_guid)
     {
-        sLog.outError("HandleMoveNotActiveMover: incorrect mover guid: mover is " I64FMT " and should be " I64FMT " instead of " I64FMT, _player->m_mover->GetGUID(), _player->GetGUID(), old_mover_guid);
+        sLog.outError("HandleMoveNotActiveMover: incorrect mover guid: mover is " UI64FMTD " and should be " UI64FMTD " instead of " UI64FMTD, _player->m_mover->GetGUID(), _player->GetGUID(), old_mover_guid);
         recv_data.rpos(recv_data.wpos());                   // prevent warnings spam
         return;
     }

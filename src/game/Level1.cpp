@@ -658,7 +658,7 @@ bool ChatHandler::HandleModifyKnownTitlesCommand(const char* args)
 
     uint64 titles2 = titles;
 
-    for(int i = 1; i < sCharTitlesStore.GetNumRows(); ++i)
+    for(uint32 i = 1; i < sCharTitlesStore.GetNumRows(); ++i)
         if(CharTitlesEntry const* tEntry = sCharTitlesStore.LookupEntry(i))
             titles2 &= ~(uint64(1) << tEntry->bit_index);
 
@@ -2275,7 +2275,7 @@ bool ChatHandler::HandleGoTaxinodeCommand(const char* args)
         return false;
     }
 
-    if (node->x == 0.0f && node->y == 0.0f && node->z == 0.0f ||
+    if ((node->x == 0.0f && node->y == 0.0f && node->z == 0.0f) ||
         !MapManager::IsValidMapCoord(node->map_id,node->x,node->y,node->z))
     {
         PSendSysMessage(LANG_INVALID_TARGET_COORD,node->x,node->y,node->map_id);
@@ -2412,7 +2412,7 @@ bool ChatHandler::HandleGoZoneXYCommand(const char* args)
     float y = (float)atof(py);
 
     // prevent accept wrong numeric args
-    if (x==0.0f && *px!='0' || y==0.0f && *py!='0')
+    if ((x==0.0f && *px!='0') || (y==0.0f && *py!='0'))
         return false;
 
     uint32 areaid = cAreaId ? (uint32)atoi(cAreaId) : _player->GetZoneId();

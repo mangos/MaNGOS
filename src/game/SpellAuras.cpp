@@ -1325,8 +1325,6 @@ void Aura::HandleAddModifier(bool apply, bool Real)
         m_spellmod = mod;
     }
 
-    uint64 spellFamilyMask = m_spellmod->mask;
-
     ((Player*)m_target)->AddSpellMod(m_spellmod, apply);
 
     // reapply talents to own passive persistent auras
