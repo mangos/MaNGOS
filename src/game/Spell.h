@@ -318,6 +318,7 @@ class Spell
         void EffectEnergisePct(uint32 i);
         void EffectTriggerSpellWithValue(uint32 i);
         void EffectTriggerRitualOfSummoning(uint32 i);
+        void EffectKillCreditPersonal(uint32 i);
         void EffectKillCredit(uint32 i);
         void EffectQuestFail(uint32 i);
         void EffectActivateRune(uint32 i);
