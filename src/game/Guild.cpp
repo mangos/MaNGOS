@@ -824,7 +824,7 @@ void Guild::UpdateLogoutTime(uint64 guid)
     if (itr == members.end() )
         return;
 
-    itr->second.Level = time(NULL);
+    itr->second.LogoutTime = time(NULL);
 
     if (m_OnlineMembers > 0)
         --m_OnlineMembers;
