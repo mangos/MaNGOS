@@ -28,8 +28,6 @@
 INSTANTIATE_SINGLETON_2(WorldLog, CLASS_LOCK);
 INSTANTIATE_CLASS_MUTEX(WorldLog, ACE_Thread_Mutex);
 
-#define WORLD_LOG_FILE_STRING   "world.log"
-
 /// Open the log file (if specified so in the configuration file)
 void WorldLog::Initialize()
 {
