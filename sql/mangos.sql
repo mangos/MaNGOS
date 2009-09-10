@@ -17027,7 +17027,9 @@ INSERT INTO `spell_elixir` VALUES
 (53758,0x3),
 (53760,0x3),
 (54212,0x3),
-(62380,0x3);
+(62380,0x3),
+(67019,0x3);
+
 
 
 /*!40000 ALTER TABLE `spell_elixir` ENABLE KEYS */;
