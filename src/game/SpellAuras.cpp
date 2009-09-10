@@ -3031,22 +3031,28 @@ void Aura::HandleAuraTransform(bool apply, bool Real)
         }
         else
         {
+            uint32 model_id;
+
             CreatureInfo const * ci = objmgr.GetCreatureTemplate(m_modifier.m_miscvalue);
             if (!ci)
             {
-                                                            //pig pink ^_^
-                m_target->SetDisplayId(16358);
+                model_id = 16358;                           // pig pink ^_^
                 sLog.outError("Auras: unknown creature id = %d (only need its modelid) Form Spell Aura Transform in Spell ID = %d", m_modifier.m_miscvalue, GetId());
             }
             else
-            {
-                                                            // Will use the default model here
-                m_target->SetDisplayId(ci->DisplayID_A[0]);
+                model_id = ci->DisplayID_A[0];              // Will use the default model here
 
-                // Dragonmaw Illusion (set mount model also)
-                if(GetId()==42016 && m_target->GetMountID() && !m_target->GetAurasByType(SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED).empty())
-                    m_target->SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID,16314);
-            }
+            // Polymorph (sheep/penguin case)
+            if (GetSpellProto()->SpellFamilyName == SPELLFAMILY_MAGE && GetSpellProto()->SpellIconID == 82)
+                if (Unit* caster = GetCaster())
+                    if (caster->HasAura(52648))             // Glyph of the Penguin
+                        model_id = 26452;
+
+            m_target->SetDisplayId(model_id);
+
+            // Dragonmaw Illusion (set mount model also)
+            if(GetId()==42016 && m_target->GetMountID() && !m_target->GetAurasByType(SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED).empty())
+                m_target->SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID,16314);
         }
 
         // update active transform spell only not set or not overwriting negative by positive case
@@ -5697,6 +5703,14 @@ void Aura::HandleSpellSpecificBoosts(bool apply)
             }
             break;
         }
+        case SPELLFAMILY_PRIEST:
+            // Dispersion mana reg and immunity
+            if (GetSpellProto()->Id == 47585)
+            {
+                spellId1 = 60069;
+                spellId2 = 63230;
+            }
+            break;
         case SPELLFAMILY_ROGUE:
             // Sprint (skip non player casted spells by category)
             if (GetSpellProto()->SpellFamilyFlags & UI64LIT(0x0000000000000040) && GetSpellProto()->Category == 44)

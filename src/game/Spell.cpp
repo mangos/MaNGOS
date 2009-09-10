@@ -2429,7 +2429,6 @@ void Spell::cast(bool skipCheck)
 
             switch(m_spellInfo->Id)
             {
-                case 47585: AddPrecastSpell(60069); break;  // Dispersion (transform)
                 case 15237: AddTriggeredSpell(23455); break;// Holy Nova, rank 1
                 case 15430: AddTriggeredSpell(23458); break;// Holy Nova, rank 2
                 case 15431: AddTriggeredSpell(23459); break;// Holy Nova, rank 3
