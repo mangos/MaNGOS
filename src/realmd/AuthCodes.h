@@ -66,9 +66,9 @@ enum LoginResult
 
 // we need to stick to 1 version or half of the stuff will work for someone
 // others will not and opposite
-// will only support WoW, WoW:TBC and WoW:WotLK 3.2.2 client build 10392...
+// will only support WoW, WoW:TBC and WoW:WotLK 3.2.2 client build 10433...
 
-#define EXPECTED_MANGOS_CLIENT_BUILD        {10392, 0}
+#define EXPECTED_MANGOS_CLIENT_BUILD        {10433, 0}
 
 // At update excepted builds please update if need define DEFAULT_MAX_LEVEL
 // in DBCEnum.h to default max player level expected by build
