@@ -360,9 +360,23 @@ void BattleGround::Update(uint32 diff)
             }
             m_PrematureCountDownTimer = newtime;
         }
+
     }
     else if (m_PrematureCountDown)
         m_PrematureCountDown = false;
+
+    /*********************************************************/
+    /***           ARENA BUFF OBJECT SPAWNING              ***/
+    /*********************************************************/
+    if (isArena() && !m_ArenaBuffSpawned)
+    {
+        // 60 seconds after start the buffobjects in arena should get spawned
+        if (m_StartTime > uint32(m_StartDelayTimes[BG_STARTING_EVENT_FIRST] + ARENA_SPAWN_BUFF_OBJECTS))
+        {
+            SpawnEvent(ARENA_BUFF_EVENT, 0, true);
+            m_ArenaBuffSpawned = true;
+        }
+    }
 
     /*********************************************************/
     /***           BATTLEGROUND STARTING SYSTEM            ***/
@@ -1085,6 +1099,11 @@ void BattleGround::Reset()
 
     // door-event2 is always 0
     m_ActiveEvents[BG_EVENT_DOOR] = 0;
+    if (isArena())
+    {
+        m_ActiveEvents[ARENA_BUFF_EVENT] = BG_EVENT_NONE;
+        m_ArenaBuffSpawned = false;
+    }
 
     if (m_InvitedAlliance > 0 || m_InvitedHorde > 0)
         sLog.outError("BattleGround system: bad counter, m_InvitedAlliance: %d, m_InvitedHorde: %d", m_InvitedAlliance, m_InvitedHorde);

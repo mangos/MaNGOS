@@ -26,6 +26,9 @@
 #define BG_EVENT_NONE 255
 // those generic events should get a high event id
 #define BG_EVENT_DOOR 254
+// only arena event
+// cause this buff apears 90sec after start in every bg i implement it here
+#define ARENA_BUFF_EVENT 252
 
 
 class Creature;
@@ -105,6 +108,7 @@ enum BattleGroundTimeIntervals
     RESPAWN_ONE_DAY                 = 86400,                // secs
     RESPAWN_IMMEDIATELY             = 0,                    // secs
     BUFF_RESPAWN_TIME               = 180,                  // secs
+    ARENA_SPAWN_BUFF_OBJECTS        = 90000,                // ms - 90sec after start
 };
 
 enum BattleGroundStartTimeIntervals
@@ -589,6 +593,7 @@ class BattleGround
         BattleGroundStatus m_Status;
         uint32 m_ClientInstanceID;                          //the instance-id which is sent to the client and without any other internal use
         uint32 m_StartTime;
+        bool m_ArenaBuffSpawned;                            // to cache if arenabuff event is started (cause bool is faster than checking IsActiveEvent)
         int32 m_EndTime;                                    // it is set to 120000 when bg is ending and it decreases itself
         uint32 m_LastResurrectTime;
         BGQueueIdBasedOnLevel m_QueueId;
