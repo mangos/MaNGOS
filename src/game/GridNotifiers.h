@@ -872,11 +872,11 @@ namespace MaNGOS
                 return false;
             }
         private:
-            bool i_hitHidden;
             bool i_targetForPlayer;
             WorldObject const* i_obj;
             Unit const* i_funit;
             float i_range;
+            bool i_hitHidden;
     };
 
     // do attack at call of help to friendly crearture
@@ -1076,7 +1076,7 @@ namespace MaNGOS
             ~LocalizedPacketListDo()
             {
                 for(size_t i = 0; i < i_data_cache.size(); ++i)
-                    for(int j = 0; j < i_data_cache[i].size(); ++j)
+                    for(size_t j = 0; j < i_data_cache[i].size(); ++j)
                         delete i_data_cache[i][j];
             }
             void operator()( Player* p );

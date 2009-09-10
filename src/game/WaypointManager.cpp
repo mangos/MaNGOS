@@ -312,7 +312,7 @@ void WaypointManager::CheckTextsExistance(std::set<int32>& ids)
     WaypointPathMap::const_iterator pmItr = m_pathMap.begin();
     for ( ; pmItr != m_pathMap.end(); ++pmItr)
     {
-        for (int i = 0; i < pmItr->second.size(); ++i)
+        for (size_t i = 0; i < pmItr->second.size(); ++i)
         {
             WaypointBehavior* be = pmItr->second[i].behavior;
             if (!be)
