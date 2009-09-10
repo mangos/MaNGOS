@@ -3512,6 +3512,11 @@ void Spell::EffectDispel(uint32 i)
         std::list < std::pair<uint32,uint64> > success_list;// (spell_id,casterGuid)
         std::list < uint32 > fail_list;                     // spell_id
         int32 list_size = dispel_list.size();
+
+        // some spells have effect value = 0 and all from its by meaning expect 1
+        if(!damage)
+            damage = 1;
+
         // Dispell N = damage buffs (or while exist buffs for dispel)
         for (int32 count=0; count < damage && list_size > 0; ++count)
         {
