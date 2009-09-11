@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_8487_02_mangos_spell_proc_event` bit(1) default NULL
+  `required_8488_02_mangos_spell_bonus_data` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -13612,7 +13612,7 @@ INSERT INTO `spell_bonus_data` VALUES
 (5185,  1.6104, 0,       0,     'Druid - Healing Touch'),
 (339,   0,      0.1,     0,     'Druid - Entangling Roots'),
 (42231, 0.12898,0,       0,     'Druid - Hurricane Triggered'),
-(5570,  0,      0.127,   0,     'Druid - Insect Swarm'),
+(5570,  0,      0.2,     0,     'Druid - Insect Swarm'),
 (33763, 0,      0.09518, 0,     'Druid - Lifebloom'),
 (8921,  0.1515, 0.13,    0,     'Druid - Moonfire'),
 (50464, 0.6611, 0,       0,     'Druid - Nourish'),
@@ -13623,17 +13623,15 @@ INSERT INTO `spell_bonus_data` VALUES
 (2912,  1,      0,       0,     'Druid - Starfire'),
 (18562, 0,      0,       0,     'Druid - Swiftmend'),
 (44203, 0.538,  0,       0,     'Druid - Tranquility Triggered'),
+(61391, 0.193,  0,       0,     'Druid - Typhoon'),
 (48438, 0,      0.11505, 0,     'Druid - Wild Growth'),
 (5176,  0.5714, 0,       0,     'Druid - Wrath'),
 /* Mage */
-(44425, 0.8571, 0,       0,     'Mage - Arcane Barrage'),
+(44425, 0.714286,0,      0,     'Mage - Arcane Barrage'),
 (30451, 0.7143, 0,       0,     'Mage - Arcane Blast'),
 (1449,  0.2128, 0,       0,     'Mage - Arcane Explosion'),
 (7268,  0.2857, 0,       0,     'Mage - Arcane Missiles Triggered Spell'),
-(11113, 0.1357, 0,       0,     'Mage - Blast Wave Rank'),
-(42208, 0.0952, 0,       0,     'Mage - Blizzard Triggered Spell'),
-(120,   0.1357, 0,       0,     'Mage - Cone of Cold'),
-(31661, 0.1357, 0,       0,     'Mage - Dragons Breath'),
+(42208, 0.1437, 0,       0,     'Mage - Blizzard Triggered'),
 (2136,  0.4286, 0,       0,     'Mage - Fire Blast'),
 (133,   1,      0,       0,     'Mage - Fire Ball'),
 (2120,  0.2357, 0.122,   0,     'Mage - Flamestrike'),
@@ -13652,11 +13650,11 @@ INSERT INTO `spell_bonus_data` VALUES
 (53742, 0,      0.0156,  0.03,  'Paladin - Blood Corruption'),
 (26573, 0,      0.04,    0.04,  'Paladin - Consecration'),
 (879,   0.15,   0,       0.15,  'Paladin - Exorcism'),
-(19750, 0.4286, 0,       0,     'Paladin - Flash of Light'),
+(25997, 0,      0,       0,     'Paladin - Eye for an Eye'),
+(19750, 1,      0,       0,     'Paladin - Flash of Light'),
 (53595, 0,      0,       0,     'Paladin - Hammer of the Righteous'),
 (24275, 0.15,   0,       0.15,  'Paladin - Hammer of Wrath'),
-(635,   0.7143, 0,       0,     'Paladin - Holy Light'),
-(25914, 0.4286, 0,       0,     'Paladin - Holy Shock Triggered Heal'),
+(635,   1.66,   0,       0,     'Paladin - Holy Light'),
 (25912, 0.4286, 0,       0,     'Paladin - Holy Shock Triggered Hurt'),
 (20925, 0.09,   0,       0.056, 'Paladin - Holy Shield'),
 (31803, 0,      0.0156,  0.03,  'Paladin - Holy Vengeance'),
@@ -13665,6 +13663,8 @@ INSERT INTO `spell_bonus_data` VALUES
 (32220, 0.0594, 0,       0.0363,'Paladin - Judgement of Blood Self'),
 (20467, 0.25,   0,       0.16,  'Paladin - Judgement of Command'),
 (53733, 0,      0,       0,     'Paladin - Judgement of Corruption'),
+(20267, 0.1,    0,       0.1,   'Paladin - Judgement of Light Proc'),
+(20187, 0.32,   0,       0,     'Paladin - Judgement of Righteousness'),
 (53726, 0.18,   0,       0.11,  'Paladin - Judgement of the Martyr Enemy'),
 (53725, 0.0594, 0,       0.0363,'Paladin - Judgement of the Martyr Self'),
 (31804, 0,      0,       0,     'Paladin - Judgement of Vengeance'),
@@ -13672,29 +13672,29 @@ INSERT INTO `spell_bonus_data` VALUES
 (32221, 0,      0,       0,     'Paladin - Seal of Blood Proc Self'),
 (20424, 0,      0,       0,     'Paladin - Seal of Command Proc'),
 (53739, 0,      0.00156, 0.003, 'Paladin - Seal of Corruption (full stack proc)'),
-(20167, 0.25,   0,       0.16,  'Paladin - Seal of Light Proc'),
+(20167, 0.15,   0,       0.15,  'Paladin - Seal of Light Proc'),
 (25742, 0.07,   0,       0.039, 'Paladin - Seal of Righteousness Dummy Proc'),
 (53719, 0,      0,       0,     'Paladin - Seal of the Martyr Proc Enemy'),
 (53718, 0,      0,       0,     'Paladin - Seal of the Martyr Proc Self'),
 (42463, 0,      0.00156, 0.003, 'Paladin - Seal of Vengeance (full stack proc)'),
-
+(53600, 0,      0,       0,     'Paladin - Shield of Righteousness'),
 /* Priest */
 (32546, 0.8068, 0,       0,     'Priest - Binding Heal'),
+(27813, 0,      0,       0,     'Priest - Blessed Recovery'),
 (34861, 0.402,  0,       0,     'Priest - Circle of Healing'),
 (19236, 0.8068, 0,       0,     'Priest - Desperate Prayer'),
-(2944,  0.1849, 0,       0,     'Priest - Devouring Plague'),
+(2944,  0,      0.1849,  0,     'Priest - Devouring Plague'),
 (14914, 0.5711, 0.024,   0,     'Priest - Holy Fire'),
 (15237, 0.1606, 0,       0,     'Priest - Holy Nova Damage'),
 (2061,  0.8068, 0,       0,     'Priest - Flash Heal'),
 (2060,  1.6135, 0,       0,     'Priest - Greater Heal'),
 (23455, 0.3035, 0,       0,     'Priest - Holy Nova Heal'),
 (8129,  0,      0,       0,     'Priest - Mana Burn'),
-(8092,  0.4296, 0,       0,     'Priest - Mind Blast'),
-(15407, 0.257,  0,       0,     'Priest - Mind Flay'),
+(58381, 0.257143,0,      0,     'Priest - Mind Flay Triggered'),
 (49821, 0.14286,0,       0,     'Priest - Mind Sear Trigger'),
 (17,    0.8068, 0,       0,     'Priest - Power Word: Shield'),
-(596,   0.8086, 0,       0,     'Priest - Prayer of Healing'),
 (33110, 0.8068, 0,       0,     'Priest - Prayer of Mending Heal Proc'),
+(33619, 0,      0,       0,     'Priest - Reflective Shield'),
 (139,   0,      0.376,   0,     'Priest - Renew'),
 (32379, 0.4296, 0,       0,     'Priest - Shadow Word: Death'),
 (589,   0,      0.1829,  0,     'Priest - Shadow Word: Pain'),
@@ -13727,27 +13727,23 @@ INSERT INTO `spell_bonus_data` VALUES
 (980,   0,      0.1,     0,     'Warlock - Curse of Agony'),
 (603,   0,      2,       0,     'Warlock - Curse of Doom'),
 (18220, 0.96,   0,       0,     'Warlock - Dark Pact'),
-(6789,  0.22,   0,       0,     'Warlock - Death Coil'),
-(689,   0,      0.1428,  0,     'Warlock - Drain Life'),
 (5138,  0,      0,       0,     'Warlock - Drain Mana'),
 (1120,  0,      0.4286,  0,     'Warlock - Drain Soul'),
 (28176, 0,      0,       0,     'Warlock - Fel Armor'),
+(18790, 0,      0,       0,     'Warlock - Fel Stamina'),
 (48181, 0.4729, 0,       0,     'Warlock - Haunt'),
 (755 ,  0,      0.4485,  0,     'Warlock - Health Funnel'),
 (1949,  0,      0.0946,  0,     'Warlock - Hellfire'),
 (5857,  0.1428, 0,       0,     'Warlock - Hellfire Effect on Enemy'),
 (348,   0.2,    0.2,     0,     'Warlock - Immolate'),
-(29722, 0.7143, 0,       0,     'Warlock - Incinerate'),
-(42223, 0.952,  0,       0,     'Warlock - Rain of Fire Triggered'),
-(27243, 0.22,   0.25,    0,     'Warlock - Seed of Corruption'),
-(5676,  0.4286, 0,       0,     'Warlock - Searing Pain'),
-(686,   0.8571, 0,       0,     'Warlock - Shadow Bolt'),
+(42223, 0.285714,0,      0,     'Warlock - Rain of Fire Triggered'),
+(27243, 0.2129, 0.25,    0,     'Warlock - Seed of Corruption'),
 (6229,  0.3,    0,       0,     'Warlock - Shadow Ward'),
-(17877, 0.4286, 0,       0,     'Warlock - Shadowburn'),
-(30283, 0.195,  0,       0,     'Warlock - Shadowfury'),
+(47960, 0,      0.06666, 0,     'Warlock - Shadowflame DoT'),
+(47897, 0.1064, 0,       0,     'Warlock - Shadowflame Direct'),
 (63106, 0,      0,       0,     'Warlock - Siphon Life Triggered'),
 (6353,  1.15,   0,       0,     'Warlock - Soul Fire'),
-(30108, 0,      0.24,    0,     'Warlock - Unstable Affliction'),
+(30294, 0,      0,       0,     'Warlock - Soul Leech'),
 (31117, 1.8,    0,       0,     'Warlock - Unstable Affliction Dispell'),
 /* Item */
 (40293, 0,      0,       0,     'Item - Siphon Essence');
@@ -14266,6 +14262,10 @@ INSERT INTO spell_chain VALUES
 /*Body and Soul*/
 (64127,0,64127,1,0),
 (64129,64127,64127,2,0),
+/*Blessed Recovery Proc*/
+(27813,0,27813,1,0),
+(27817,27813,27813,2,0),
+(27818,27817,27813,3,0),
 /*Circle of Healing*/
 (34861,0,34861,1,0),
 (34863,34861,34861,2,0),
@@ -16266,6 +16266,12 @@ INSERT INTO spell_chain VALUES
 (53225,53223,50516,3,0),
 (53226,53225,50516,4,0),
 (61384,53226,50516,5,0),
+/*Typhoon Triggered*/
+(61391,0,61391,1,0),
+(61390,61391,61391,2,0),
+(61388,61390,61391,3,0),
+(61387,61388,61391,4,0),
+(53227,61387,61391,5,0),
 /*Wrath*/
 (5176,0,5176,1,0),
 (5177,5176,5176,2,0),
@@ -16832,9 +16838,9 @@ INSERT INTO spell_chain VALUES
 (34769,0,34769,1,0),
 (34767,34769,34769,2,33391),
 /*------------------
---(780)Pet-ExoticChimaera
+--(780)Pet-Exotic Chimaera
 ------------------*/
-/*FroststormBreath*/
+/*Froststorm Breath*/
 (54644,0,54644,1,0),
 (55488,54644,54644,2,0),
 (55489,55488,54644,3,0),
@@ -16842,9 +16848,9 @@ INSERT INTO spell_chain VALUES
 (55491,55490,54644,5,0),
 (55492,55491,54644,6,0),
 /*------------------
---(781)Pet-ExoticDevlisaur
+--(781)Pet-Exotic Devlisaur
 ------------------*/
-/*MonstrousBite*/
+/*Monstrous Bite*/
 (54680,0,54680,1,0),
 (55495,54680,54680,2,0),
 (55496,55495,54680,3,0),
@@ -16852,7 +16858,7 @@ INSERT INTO spell_chain VALUES
 (55498,55497,54680,5,0),
 (55499,55498,54680,6,0),
 /*------------------
---(784)Pet-ExoticWorm
+--(784)Pet-Exotic Worm
 ------------------*/
 /*AcidSpit*/
 (55749,0,55749,1,0),
@@ -16872,9 +16878,9 @@ INSERT INTO spell_chain VALUES
 (56630,56629,56626,5,0),
 (56631,56630,56626,6,0),
 /*------------------
---(787)Pet-ExoticCoreHound
+--(787)Pet-Exotic Core Hound
 ------------------*/
-/*LavaBreath*/
+/*Lava Breath*/
 (58604,0,58604,1,0),
 (58607,58604,58604,2,0),
 (58608,58607,58604,3,0),
@@ -16882,16 +16888,27 @@ INSERT INTO spell_chain VALUES
 (58610,58609,58604,5,0),
 (58611,58610,58604,6,0),
 /*------------------
---(788)Pet-ExoticSpiritBeast
+--(788)Pet-Exotic Spirit Beast
 ------------------*/
-/*SpiritStrike*/
+/*Spirit Strike*/
 (61193,0,61193,1,0),
 (61194,61193,61193,2,0),
 (61195,61194,61193,3,0),
 (61196,61195,61193,4,0),
 (61197,61196,61193,5,0),
 (61198,61197,61193,6,0),
-
+/*------------------
+--(-) Not listed in skill abilities
+------------------*/
+/*Hurricane*/
+(42231,    0,42231,1,0),
+(42232,42231,42231,2,0),
+(42233,42232,42231,3,0),
+(42230,42233,42231,4,0),
+(48466,42230,42231,5,0),
+/*Shadowflame Triggered DoT*/
+(47960,0,47960,1,0),
+(61291,47960,47960,2,0),
 /*Tranquility*/
 (44203,    0,44203,1,0),
 (44205,44203,44203,2,0),
@@ -16899,13 +16916,7 @@ INSERT INTO spell_chain VALUES
 (44207,44206,44203,4,0),
 (44208,44207,44203,5,0),
 (48444,44208,44203,6,0),
-(48445,48444,44203,7,0),
-/*Hurricane*/
-(42231,    0,42231,1,0),
-(42232,42231,42231,2,0),
-(42233,42232,42231,3,0),
-(42230,42233,42231,4,0),
-(48466,42230,42231,5,0);
+(48445,48444,44203,7,0);
 /*!40000 ALTER TABLE `spell_chain` ENABLE KEYS */;
 UNLOCK TABLES;
 
