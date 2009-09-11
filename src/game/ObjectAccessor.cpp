@@ -451,12 +451,23 @@ ObjectAccessor::UpdateObjectVisibility(WorldObject *obj)
 
 void ObjectAccessor::UpdateVisibilityForPlayer( Player* player )
 {
-    CellPair p = MaNGOS::ComputeCellPair(player->GetPositionX(), player->GetPositionY());
-    Cell cell(p);
+    WorldObject const* viewPoint = player->GetViewPoint();
     Map* m = player->GetMap();
 
+    CellPair p(MaNGOS::ComputeCellPair(player->GetPositionX(), player->GetPositionY()));
+    Cell cell(p);
+
     m->UpdatePlayerVisibility(player, cell, p);
-    m->UpdateObjectsVisibilityFor(player, cell, p);
+
+    if (player!=viewPoint)
+    {
+        CellPair pView(MaNGOS::ComputeCellPair(viewPoint->GetPositionX(), viewPoint->GetPositionY()));
+        Cell cellView(pView);
+
+        m->UpdateObjectsVisibilityFor(player, cellView, pView);
+    }
+    else
+        m->UpdateObjectsVisibilityFor(player, cell, p);
 }
 
 /// Define the static member of HashMapHolder
