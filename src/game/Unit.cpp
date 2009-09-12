@@ -5800,6 +5800,30 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                         return true;
                     break;
                 }
+                // Light's Beacon (heal target area aura)
+                case 53651:
+                {
+                    // not do bonus heal for explicit beacon focus healing
+                    if (GetGUID() == triggeredByAura->GetCasterGUID())
+                        return false;
+
+                    Unit* beacon = triggeredByAura->GetCaster();
+                    if (!beacon)
+                        return false;
+
+                    Aura* dummy = beacon->GetDummyAura(53563);
+                    if (!dummy)
+                        return false;
+
+                    // original heal must be form beacon caster 
+                    if (dummy->GetCasterGUID() != pVictim->GetGUID())
+                        return false;
+
+                    triggered_spell_id = 53652; // Beacon of Light
+                    basepoints0 = triggeredByAura->GetModifier()->m_amount*damage/100;
+                    target = beacon;
+                    break;
+                }
                 // Seal of the Martyr do damage trigger
                 case 53720:
                 {
