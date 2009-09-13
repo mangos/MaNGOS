@@ -65,7 +65,7 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     GetPlayer()->SetSemaphoreTeleportFar(false);
 
     // relocate the player to the teleport destination
-    GetPlayer()->SetMap(MapManager::Instance().CreateMap(loc.mapid, GetPlayer()));    GetPlayer()->Relocate(loc.coord_x, loc.coord_y, loc.coord_z, loc.orientation);
+    GetPlayer()->SetMap(MapManager::Instance().CreateMap(loc.mapid, GetPlayer()));
     GetPlayer()->Relocate(loc.coord_x, loc.coord_y, loc.coord_z, loc.orientation);
 
     GetPlayer()->SendInitialPacketsBeforeAddToMap();
