@@ -1590,12 +1590,9 @@ bool BattleGround::AddSpiritGuide(uint32 type, float x, float y, float z, float 
 
     pCreature->setDeathState(DEAD);
 
-    pCreature->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, pCreature->GetGUID());
+    pCreature->SetChannelObjectGUID(pCreature->GetGUID());
     // aura
     pCreature->SetVisibleAura(0, SPELL_SPIRIT_HEAL_CHANNEL);
-    //pCreature->SetUInt32Value(UNIT_FIELD_AURAFLAGS, 0x00000009);
-    //pCreature->SetUInt32Value(UNIT_FIELD_AURALEVELS, 0x0000003C);
-    //pCreature->SetUInt32Value(UNIT_FIELD_AURAAPPLICATIONS, 0x000000FF);
     // casting visual effect
     pCreature->SetUInt32Value(UNIT_CHANNEL_SPELL, SPELL_SPIRIT_HEAL_CHANNEL);
     // correct cast speed

@@ -6518,7 +6518,7 @@ void Spell::EffectTransmitted(uint32 effIndex)
     {
         case GAMEOBJECT_TYPE_FISHINGNODE:
         {
-            m_caster->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT,pGameObj->GetGUID());
+            m_caster->SetChannelObjectGUID(pGameObj->GetGUID());
             m_caster->AddGameObject(pGameObj);              // will removed at spell cancel
 
             // end time of range when possible catch fish (FISHING_BOBBER_READY_TIME..GetDuration(m_spellInfo))

@@ -383,7 +383,7 @@ void WorldSession::HandleSetTargetOpcode( WorldPacket & recv_data )
     uint64 guid ;
     recv_data >> guid;
 
-    _player->SetUInt32Value(UNIT_FIELD_TARGET, guid);
+    _player->SetTargetGUID(guid);
 
     // update reputation list if need
     Unit* unit = ObjectAccessor::GetUnit(*_player, guid );

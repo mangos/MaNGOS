@@ -534,7 +534,7 @@ SingleEnemyTargetAura::SingleEnemyTargetAura(SpellEntry const* spellproto, uint3
 Unit *caster, Item* castItem) : Aura(spellproto, eff, currentBasePoints, target, caster, castItem)
 {
     if (caster)
-        m_casters_target_guid = caster->GetTypeId()==TYPEID_PLAYER ? ((Player*)caster)->GetSelection() : caster->GetUInt64Value(UNIT_FIELD_TARGET);
+        m_casters_target_guid = caster->GetTypeId()==TYPEID_PLAYER ? ((Player*)caster)->GetSelection() : caster->GetTargetGUID();
     else
         m_casters_target_guid = 0;
 }
@@ -3665,7 +3665,7 @@ void Aura::HandleAuraModStun(bool apply, bool Real)
             m_target->ModifyAuraState(AURA_STATE_FROZEN, apply);
 
         m_target->addUnitState(UNIT_STAT_STUNNED);
-        m_target->SetUInt64Value(UNIT_FIELD_TARGET, 0);
+        m_target->SetTargetGUID(0);
 
         m_target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
         m_target->CastStop(m_target->GetGUID() == GetCasterGUID() ? GetId() : 0);
@@ -3735,7 +3735,7 @@ void Aura::HandleAuraModStun(bool apply, bool Real)
         if(!m_target->hasUnitState(UNIT_STAT_ROOT))         // prevent allow move if have also root effect
         {
             if(m_target->getVictim() && m_target->isAlive())
-                m_target->SetUInt64Value(UNIT_FIELD_TARGET,m_target->getVictim()->GetGUID() );
+                m_target->SetTargetGUID(m_target->getVictim()->GetGUID());
 
             WorldPacket data(SMSG_FORCE_MOVE_UNROOT, 8+4);
             data.append(m_target->GetPackGUID());
@@ -3939,8 +3939,8 @@ void Aura::HandleAuraModRoot(bool apply, bool Real)
             m_target->ModifyAuraState(AURA_STATE_FROZEN, apply);
 
         m_target->addUnitState(UNIT_STAT_ROOT);
-        m_target->SetUInt64Value (UNIT_FIELD_TARGET, 0);
-        // probably wrong (this add skinable flag)
+        m_target->SetTargetGUID(0);
+        // probably wrong (this add skinnable flag)
         // TODO: find correct flag
         //m_target->SetFlag(UNIT_FIELD_FLAGS,(apply_stat<<16));
 
@@ -3991,14 +3991,14 @@ void Aura::HandleAuraModRoot(bool apply, bool Real)
             return;
 
         m_target->clearUnitState(UNIT_STAT_ROOT);
-        // probably wrong (this add skinable flag)
+        // probably wrong (this add skinnable flag)
         // TODO: find correct flag
         //m_target->RemoveFlag(UNIT_FIELD_FLAGS,(apply_stat<<16));
 
         if(!m_target->hasUnitState(UNIT_STAT_STUNNED))      // prevent allow move if have also stun effect
         {
             if(m_target->getVictim() && m_target->isAlive())
-                m_target->SetUInt64Value (UNIT_FIELD_TARGET, m_target->getVictim()->GetGUID() );
+                m_target->SetTargetGUID(m_target->getVictim()->GetGUID());
 
             if(m_target->GetTypeId() == TYPEID_PLAYER)
             {

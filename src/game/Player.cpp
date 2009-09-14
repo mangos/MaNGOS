@@ -1609,6 +1609,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
         m_movementInfo.t_y = 0.0f;
         m_movementInfo.t_z = 0.0f;
         m_movementInfo.t_o = 0.0f;
+        m_movementInfo.t_seat = -1;
         m_movementInfo.t_time = 0;
     }
 
@@ -13910,18 +13911,18 @@ void Player::_LoadArenaTeamInfo(QueryResult *result)
         ArenaTeam* aTeam = objmgr.GetArenaTeamById(arenateamid);
         if(!aTeam)
         {
-            sLog.outError("Player::_LoadArenaTeamInfo: couldn't load arenateam %u, week %u, season %u, rating %u", arenateamid, played_week, played_season, personal_rating);
+            sLog.outError("Player::_LoadArenaTeamInfo: couldn't load arenateam %u", arenateamid);
             continue;
         }
         uint8  arenaSlot = aTeam->GetSlot();
 
         m_uint32Values[PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (arenaSlot * ARENA_TEAM_END) + ARENA_TEAM_ID]                 = arenateamid;      // TeamID
+        m_uint32Values[PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (arenaSlot * ARENA_TEAM_END) + ARENA_TEAM_TYPE]               = aTeam->GetType(); // team type
         m_uint32Values[PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (arenaSlot * ARENA_TEAM_END) + ARENA_TEAM_MEMBER]             = ((aTeam->GetCaptain() == GetGUID()) ? (uint32)0 : (uint32)1); // Captain 0, member 1
         m_uint32Values[PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (arenaSlot * ARENA_TEAM_END) + ARENA_TEAM_GAMES_WEEK]         = played_week;      // Played Week
         m_uint32Values[PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (arenaSlot * ARENA_TEAM_END) + ARENA_TEAM_GAMES_SEASON]       = played_season;    // Played Season
         m_uint32Values[PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (arenaSlot * ARENA_TEAM_END) + ARENA_TEAM_WINS_SEASON]        = wons_season;      // wins season
         m_uint32Values[PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (arenaSlot * ARENA_TEAM_END) + ARENA_TEAM_PERSONAL_RATING]    = personal_rating;  // Personal Rating
-        m_uint32Values[PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (arenaSlot * ARENA_TEAM_END) + ARENA_TEAM_UNK2]               = 0;                // unk 3.2
 
     } while (result->NextRow());
     delete result;
@@ -14194,6 +14195,8 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
         m_movementInfo.t_y = 0.0f;
         m_movementInfo.t_z = 0.0f;
         m_movementInfo.t_o = 0.0f;
+        m_movementInfo.t_time = 0;
+        m_movementInfo.t_seat = -1;
     }
 
     _LoadBGData(holder->GetResult(PLAYER_LOGIN_QUERY_LOADBGDATA));
@@ -14261,6 +14264,8 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
             m_movementInfo.t_y = 0.0f;
             m_movementInfo.t_z = 0.0f;
             m_movementInfo.t_o = 0.0f;
+            m_movementInfo.t_time = 0;
+            m_movementInfo.t_seat = -1;
 
             transGUID = 0;
         }
@@ -14298,6 +14303,8 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
             m_movementInfo.t_y = 0.0f;
             m_movementInfo.t_z = 0.0f;
             m_movementInfo.t_o = 0.0f;
+            m_movementInfo.t_time = 0;
+            m_movementInfo.t_seat = -1;
 
             transGUID = 0;
         }
@@ -14400,7 +14407,7 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
     delete result;
 
     // clear channel spell data (if saved at channel spell casting)
-    SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, 0);
+    SetChannelObjectGUID(0);
     SetUInt32Value(UNIT_CHANNEL_SPELL,0);
 
     // clear charm/summon related fields

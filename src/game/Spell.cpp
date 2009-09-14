@@ -3347,7 +3347,7 @@ void Spell::SendChannelUpdate(uint32 time)
 {
     if(time == 0)
     {
-        m_caster->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, 0);
+        m_caster->SetChannelObjectGUID(0);
         m_caster->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
     }
 
@@ -3401,7 +3401,7 @@ void Spell::SendChannelStart(uint32 duration)
 
     m_timer = duration;
     if(target)
-        m_caster->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, target->GetGUID());
+        m_caster->SetChannelObjectGUID(target->GetGUID());
     m_caster->SetUInt32Value(UNIT_CHANNEL_SPELL, m_spellInfo->Id);
 }
 

@@ -1155,10 +1155,16 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void SetOwnerGUID(uint64 owner) { SetUInt64Value(UNIT_FIELD_SUMMONEDBY, owner); }
         uint64 GetCreatorGUID() const { return GetUInt64Value(UNIT_FIELD_CREATEDBY); }
         void SetCreatorGUID(uint64 creator) { SetUInt64Value(UNIT_FIELD_CREATEDBY, creator); }
-        uint64 GetPetGUID() const { return  GetUInt64Value(UNIT_FIELD_SUMMON); }
+        uint64 GetPetGUID() const { return GetUInt64Value(UNIT_FIELD_SUMMON); }
+        void SetPetGUID(uint64 pet) { SetUInt64Value(UNIT_FIELD_SUMMON, pet); }
         uint64 GetCharmerGUID() const { return GetUInt64Value(UNIT_FIELD_CHARMEDBY); }
         void SetCharmerGUID(uint64 owner) { SetUInt64Value(UNIT_FIELD_CHARMEDBY, owner); }
-        uint64 GetCharmGUID() const { return  GetUInt64Value(UNIT_FIELD_CHARM); }
+        uint64 GetCharmGUID() const { return GetUInt64Value(UNIT_FIELD_CHARM); }
+        void SetCharmGUID(uint64 charm) { SetUInt64Value(UNIT_FIELD_CHARM, charm); }
+        uint64 GetTargetGUID() const { return GetUInt64Value(UNIT_FIELD_TARGET); }
+        void SetTargetGUID(uint64 targetGuid) { SetUInt64Value(UNIT_FIELD_TARGET, targetGuid); }
+        uint64 GetChannelObjectGUID() const { return GetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT); }
+        void SetChannelObjectGUID(uint64 targetGuid) { SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, targetGuid); }
 
         uint64 GetCharmerOrOwnerGUID() const { return GetCharmerGUID() ? GetCharmerGUID() : GetOwnerGUID(); }
         uint64 GetCharmerOrOwnerOrOwnGUID() const

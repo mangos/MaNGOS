@@ -314,7 +314,7 @@ FleeingMovementGenerator<Creature>::_Init(Creature &owner)
         return;
 
     owner.RemoveMonsterMoveFlag(MONSTER_MOVE_WALK);
-    owner.SetUInt64Value(UNIT_FIELD_TARGET, 0);
+    owner.SetTargetGUID(0);
     is_water_ok = owner.canSwim();
     is_land_ok  = owner.canWalk();
 }

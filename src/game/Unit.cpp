@@ -7629,8 +7629,8 @@ bool Unit::Attack(Unit *victim, bool meleeAttack)
             ((Creature*)this)->SetCombatStartPosition(GetPositionX(), GetPositionY(), GetPositionZ());
     }
 
-    //Set our target
-    SetUInt64Value(UNIT_FIELD_TARGET, victim->GetGUID());
+    // Set our target
+    SetTargetGUID(victim->GetGUID());
 
     if(meleeAttack)
         addUnitState(UNIT_STAT_MELEE_ATTACKING);
@@ -7668,8 +7668,8 @@ bool Unit::AttackStop(bool targetSwitch /*=false*/)
     m_attacking->_removeAttacker(this);
     m_attacking = NULL;
 
-    //Clear our target
-    SetUInt64Value(UNIT_FIELD_TARGET, 0);
+    // Clear our target
+    SetTargetGUID(0);
 
     clearUnitState(UNIT_STAT_MELEE_ATTACKING);
 
@@ -7831,6 +7831,7 @@ void Unit::ModifyAuraState(AuraState flag, bool apply)
         }
     }
 }
+
 Unit *Unit::GetOwner() const
 {
     if(uint64 ownerid = GetOwnerGUID())
@@ -7894,7 +7895,7 @@ float Unit::GetCombatDistance( const Unit* target ) const
 
 void Unit::SetPet(Pet* pet)
 {
-    SetUInt64Value(UNIT_FIELD_SUMMON, pet ? pet->GetGUID() : 0);
+    SetPetGUID(pet ? pet->GetGUID() : 0);
 
     // FIXME: hack, speed must be set only at follow
     if(pet && GetTypeId()==TYPEID_PLAYER)
@@ -7904,15 +7905,13 @@ void Unit::SetPet(Pet* pet)
 
 void Unit::SetCharm(Unit* pet)
 {
-    SetUInt64Value(UNIT_FIELD_CHARM, pet ? pet->GetGUID() : 0);
+    SetCharmGUID(pet ? pet->GetGUID() : 0);
 }
-
 
 void Unit::AddGuardian( Pet* pet )
 {
     m_guardianPets.insert(pet->GetGUID());
 }
-
 
 void Unit::RemoveGuardian( Pet* pet )
 {
@@ -12136,7 +12135,7 @@ bool Unit::HandleMendingAuraProc( Aura* triggeredByAura )
 
 void Unit::RemoveAurasAtChanneledTarget(SpellEntry const* spellInfo)
 {
-    uint64 target_guid = GetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT);
+    uint64 target_guid = GetChannelObjectGUID();
 
     if(!IS_UNIT_GUID(target_guid))
         return;
