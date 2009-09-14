@@ -489,6 +489,9 @@ Unit *caster, Item* castItem) : Aura(spellproto, eff, currentBasePoints, target,
             m_areaAuraType = AREA_AURA_RAID;
             if (target->GetTypeId() == TYPEID_UNIT && ((Creature*)target)->isTotem())
                 m_modifier.m_auraname = SPELL_AURA_NONE;
+            // Light's Beacon not applied to caster itself (TODO: more generic check for another simialr spell if any?)
+            else if (target == caster_ptr && m_spellProto->Id == 53651)
+                m_modifier.m_auraname = SPELL_AURA_NONE;
             break;
         case SPELL_EFFECT_APPLY_AREA_AURA_FRIEND:
             m_areaAuraType = AREA_AURA_FRIEND;
@@ -782,7 +785,40 @@ void AreaAura::Update(uint32 diff)
 
             for(std::list<Unit *>::iterator tIter = targets.begin(); tIter != targets.end(); tIter++)
             {
-                if((*tIter)->HasAura(GetId(), m_effIndex))
+                // flag for seelction is need apply aura to current iteration target
+                bool apply = true;
+
+                // we need ignore present caster self applied are auras sometime
+                // in cases if this only auras applied for spell effect
+                Unit::spellEffectPair spair = Unit::spellEffectPair(GetId(), m_effIndex);
+                for(Unit::AuraMap::const_iterator i = (*tIter)->GetAuras().lower_bound(spair); i != (*tIter)->GetAuras().upper_bound(spair); ++i)
+                {
+                    if (i->second->IsDeleted())
+                        continue;
+
+                    switch(m_areaAuraType)
+                    {
+                        case AREA_AURA_ENEMY:
+                            // non caster self-casted auras (non stacked)
+                            if(i->second->GetModifier()->m_auraname != SPELL_AURA_NONE)
+                                apply = false;
+                            break;
+                        case AREA_AURA_RAID:
+                            // non caster self-casted auras (stacked from diff. casters)
+                            if(i->second->GetModifier()->m_auraname != SPELL_AURA_NONE  || i->second->GetCasterGUID() == GetCasterGUID())
+                                apply = false;
+                            break;
+                        default:
+                            // in generic case not allow stacking area auras
+                            apply = false;
+                            break;
+                    }
+
+                    if(!apply)
+                        break;
+                }
+
+                if(!apply)
                     continue;
 
                 if(SpellEntry const *actualSpellInfo = spellmgr.SelectAuraRankForPlayerLevel(GetSpellProto(), (*tIter)->getLevel()))
@@ -815,7 +851,7 @@ void AreaAura::Update(uint32 diff)
             caster->IsFriendlyTo(m_target) != needFriendly
            )
         {
-            m_target->RemoveAura(GetId(), GetEffIndex());
+            m_target->RemoveAurasByCasterSpell(GetId(), GetEffIndex(),GetCasterGUID());
         }
         else if( m_areaAuraType == AREA_AURA_PARTY)         // check if in same sub group
         {
@@ -847,16 +883,16 @@ void AreaAura::Update(uint32 diff)
                 {
                     Player* checkTarget = m_target->GetCharmerOrOwnerPlayerOrPlayerItself();
                     if(!checkTarget)
-                        m_target->RemoveAura(GetId(), GetEffIndex());
+                        m_target->RemoveAurasByCasterSpell(GetId(), GetEffIndex(), GetCasterGUID());
                 }
                 else
-                    m_target->RemoveAura(GetId(), GetEffIndex());
+                    m_target->RemoveAurasByCasterSpell(GetId(), GetEffIndex(), GetCasterGUID());
             }
         }
         else if( m_areaAuraType == AREA_AURA_PET || m_areaAuraType == AREA_AURA_OWNER )
         {
             if( m_target->GetGUID() != caster->GetCharmerOrOwnerGUID() )
-                m_target->RemoveAura(GetId(), GetEffIndex());
+                m_target->RemoveAurasByCasterSpell(GetId(), GetEffIndex(), GetCasterGUID());
         }
     }
 }
@@ -895,6 +931,32 @@ void Aura::ApplyModifier(bool apply, bool Real)
     if(aura < TOTAL_AURAS)
         (*this.*AuraHandler [aura])(apply, Real);
     SetInUse(false);
+}
+
+bool Aura::IsNeedVisibleSlot(Unit const* caster) const
+{
+    bool totemAura = caster && caster->GetTypeId() == TYPEID_UNIT && ((Creature*)caster)->isTotem();
+
+    // passive auras (except totem auras) do not get placed in the slots
+    if (m_isPassive && !totemAura)
+        return false;
+
+    // generic not caster case
+    if (m_target != caster)
+        return true;
+
+    // special area auras case at caster
+    switch(m_spellProto->Effect[GetEffIndex()])
+    {
+        case SPELL_EFFECT_APPLY_AREA_AURA_ENEMY:
+            return false;
+        case SPELL_EFFECT_APPLY_AREA_AURA_RAID:
+            // not sure is totemAura  need, just preserve old code results
+            return totemAura || m_modifier.m_auraname != SPELL_AURA_NONE;
+        default: break;
+    }
+
+    return true;
 }
 
 void Aura::_AddAura()
@@ -954,10 +1016,7 @@ void Aura::_AddAura()
         }
     }
 
-    // passive auras (except totem auras) do not get placed in the slots
-    // area auras with SPELL_AURA_NONE are not shown on target
-    if((!m_isPassive || (caster && caster->GetTypeId() == TYPEID_UNIT && ((Creature*)caster)->isTotem())) &&
-        (m_spellProto->Effect[GetEffIndex()] != SPELL_EFFECT_APPLY_AREA_AURA_ENEMY || m_target != caster))
+    if (IsNeedVisibleSlot(caster))
     {
         SetAuraSlot( slot );
         if(slot < MAX_AURAS)                        // slot found send data to client
@@ -2414,6 +2473,20 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                     m_spellmod = mod;
                 }
                 ((Player*)m_target)->AddSpellMod(m_spellmod, apply);
+                return;
+            }
+            break;
+        }
+        case SPELLFAMILY_PALADIN:
+        {
+            // Beacon of Light
+            if (GetId() == 53563)
+            {
+                if(apply)
+                    // original caster must be target (beacon)
+                    m_target->CastSpell(m_target,53651,true,NULL,this,m_target->GetGUID());
+                else
+                    m_target->RemoveAurasByCasterSpell(53651,m_target->GetGUID());
                 return;
             }
             break;

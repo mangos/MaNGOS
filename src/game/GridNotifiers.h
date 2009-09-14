@@ -20,7 +20,6 @@
 #define MANGOS_GRIDNOTIFIERS_H
 
 #include "ObjectGridLoader.h"
-#include "ByteBuffer.h"
 #include "UpdateData.h"
 #include <iostream>
 

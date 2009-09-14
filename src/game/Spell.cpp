@@ -1008,13 +1008,6 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
             caster->ProcDamageAndSpell(unitTarget, procAttacker, procVictim, procEx, damageInfo.damage, m_attackType, m_spellInfo);
 
         caster->DealSpellDamage(&damageInfo, true);
-
-        // Judgement of Blood
-        if (m_spellInfo->SpellFamilyName == SPELLFAMILY_PALADIN && (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0000000800000000)) && m_spellInfo->SpellIconID==153)
-        {
-            int32 damagePoint  = damageInfo.damage * 33 / 100;
-            m_caster->CastCustomSpell(m_caster, 32220, &damagePoint, NULL, NULL, true);
-        }
     }
     // Passive spell hits/misses or active spells only misses (only triggers)
     else

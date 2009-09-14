@@ -406,4 +406,8 @@ INSERT INTO spell_check (spellid,SpellFamilyName,SpellFamilyMaskA,SpellFamilyMas
 (    0, 7,0x0010000000000000,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Swipe',                              'Spell::EffectSchoolDMG'),
 (    0, 4,0x0000000000000080,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Thunder Clap',                       'Spell::EffectSchoolDMG'),
 (    0, 4,0x0000010000000000,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Victory Rush',                       'Spell::EffectSchoolDMG'),
-(    0, 8,0x0000000010000000,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Wound Poison',                       'Spell::EffectSchoolDMG');
+(    0, 8,0x0000000010000000,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Wound Poison',                       'Spell::EffectSchoolDMG'),
+
+/* some random spells from not proccessed files sorted by spell ids */
+/*id   fm familyMaskA        fmMaskB    icon vis  cat  eff aur ef name                                  code                   */
+(53563,-1,                -1,        -1,  -1,  -1,  -1, -1,  4,-1,'Beacon of Light',                    'Aura::HandleAuraDummy');      /* will outdated in 3.2.x */
