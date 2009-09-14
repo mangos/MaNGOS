@@ -20,7 +20,6 @@
 #define _AUTH_BIGNUMBER_H
 
 #include "Common.h"
-#include "ByteBuffer.h"
 
 struct bignum_st;
 
@@ -83,8 +82,6 @@ class BigNumber
 
         uint32 AsDword();
         uint8* AsByteArray(int minSize = 0);
-        ByteBuffer AsByteBuffer();
-        std::vector<uint8> AsByteVector();
 
         const char *AsHexStr();
         const char *AsDecStr();
