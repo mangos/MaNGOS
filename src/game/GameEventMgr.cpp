@@ -421,7 +421,7 @@ uint32 GameEventMgr::Initialize()                           // return the next e
     m_ActiveEvents.clear();
     uint32 delay = Update();
     sLog.outBasic("Game Event system initialized." );
-    isSystemInit = true;
+    m_IsGameEventsInit = true;
     return delay;
 }
 
@@ -445,11 +445,14 @@ uint32 GameEventMgr::Update()                               // return the next e
                 StopEvent(itr);
             else
             {
-                if (!isSystemInit)
+                if (!m_IsGameEventsInit)
                 {
                     int16 event_nid = (-1) * (itr);
                     // spawn all negative ones for this event
                     GameEventSpawn(event_nid);
+
+                    // disable any event specific quest (for cases where creature is spawned, but event not active).
+                    UpdateEventQuests(itr, false);
                 }
             }
         }
@@ -740,7 +743,7 @@ void GameEventMgr::UpdateEventQuests(uint16 event_id, bool Activate)
 
 GameEventMgr::GameEventMgr()
 {
-    isSystemInit = false;
+    m_IsGameEventsInit = false;
 }
 
 MANGOS_DLL_SPEC bool IsHolidayActive( HolidayIds id )

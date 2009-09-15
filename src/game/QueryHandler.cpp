@@ -40,7 +40,7 @@ void WorldSession::SendNameQueryOpcode(Player *p)
                                                             // guess size
     WorldPacket data( SMSG_NAME_QUERY_RESPONSE, (8+1+1+1+1+1+10) );
     data.append(p->GetPackGUID());                          // player guid
-    data << uint8(0);                                       // added in 3.1
+    data << uint8(0);                                       // added in 3.1; if > 1, then end of packet
     data << p->GetName();                                   // played name
     data << uint8(0);                                       // realm name for cross realm BG usage
     data << uint8(p->getRace());
@@ -104,7 +104,7 @@ void WorldSession::SendNameQueryOpcodeFromDBCallBack(QueryResult *result, uint32
                                                             // guess size
     WorldPacket data( SMSG_NAME_QUERY_RESPONSE, (8+1+1+1+1+1+1+10) );
     data.appendPackGUID(MAKE_NEW_GUID(guid, 0, HIGHGUID_PLAYER));
-    data << uint8(0);                                       // added in 3.1
+    data << uint8(0);                                       // added in 3.1; if > 1, then end of packet
     data << name;
     data << uint8(0);                                       // realm name for cross realm BG usage
     data << uint8(pRace);                                   // race

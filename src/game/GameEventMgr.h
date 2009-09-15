@@ -94,7 +94,7 @@ class GameEventMgr
         GameEventIdMap    mGameEventPoolIds;
         GameEventDataMap  mGameEvent;
         ActiveEvents m_ActiveEvents;
-        bool isSystemInit;
+        bool m_IsGameEventsInit;
 };
 
 #define gameeventmgr MaNGOS::Singleton<GameEventMgr>::Instance()
