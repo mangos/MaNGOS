@@ -12131,34 +12131,36 @@ void Player::PrepareQuestMenu( uint64 guid )
     }
 }
 
-void Player::SendPreparedQuest( uint64 guid )
+void Player::SendPreparedQuest(uint64 guid)
 {
     QuestMenu& questMenu = PlayerTalkClass->GetQuestMenu();
-    if( questMenu.Empty() )
+
+    if (questMenu.Empty())
         return;
 
-    QuestMenuItem const& qmi0 = questMenu.GetItem( 0 );
+    QuestMenuItem const& qmi0 = questMenu.GetItem(0);
 
     uint32 status = qmi0.m_qIcon;
 
     // single element case
-    if ( questMenu.MenuItemCount() == 1 )
+    if (questMenu.MenuItemCount() == 1)
     {
         // Auto open -- maybe also should verify there is no greeting
         uint32 quest_id = qmi0.m_qId;
         Quest const* pQuest = objmgr.GetQuestTemplate(quest_id);
 
-        if ( pQuest )
+        if (pQuest)
         {
-            if( status == DIALOG_STATUS_UNK2 && !GetQuestRewardStatus( quest_id ) )
-                PlayerTalkClass->SendQuestGiverRequestItems( pQuest, guid, CanRewardQuest(pQuest, false), true );
-            else if( status == DIALOG_STATUS_UNK2 )
-                PlayerTalkClass->SendQuestGiverRequestItems( pQuest, guid, CanRewardQuest(pQuest, false), true );
-            // Send completable on repeatable quest if player don't have quest
-            else if( pQuest->IsRepeatable() && !pQuest->IsDaily() )
-                PlayerTalkClass->SendQuestGiverRequestItems( pQuest, guid, CanCompleteRepeatableQuest(pQuest), true );
+            if (status == DIALOG_STATUS_UNK2 && !GetQuestRewardStatus(quest_id))
+                PlayerTalkClass->SendQuestGiverRequestItems(pQuest, guid, CanRewardQuest(pQuest, false), true);
+            else if (status == DIALOG_STATUS_UNK2)
+                PlayerTalkClass->SendQuestGiverRequestItems(pQuest, guid, CanRewardQuest(pQuest, false), true);
+            // Send completable on repeatable and autoCompletable quest if player don't have quest
+            // TODO: verify if check for !pQuest->IsDaily() is really correct (possibly not)
+            else if (pQuest->IsAutoComplete() && pQuest->IsRepeatable() && !pQuest->IsDaily())
+                PlayerTalkClass->SendQuestGiverRequestItems(pQuest, guid, CanCompleteRepeatableQuest(pQuest), true);
             else
-                PlayerTalkClass->SendQuestGiverQuestDetails( pQuest, guid, true );
+                PlayerTalkClass->SendQuestGiverQuestDetails(pQuest, guid, true);
         }
     }
     // multiply entries
@@ -12171,11 +12173,11 @@ void Player::SendPreparedQuest( uint64 guid )
 
         // need pet case for some quests
         Creature *pCreature = ObjectAccessor::GetCreatureOrPetOrVehicle(*this,guid);
-        if( pCreature )
+        if (pCreature)
         {
             uint32 textid = pCreature->GetNpcTextId();
             GossipText const* gossiptext = objmgr.GetGossipText(textid);
-            if( !gossiptext )
+            if (!gossiptext)
             {
                 qe._Delay = 0;                              //TEXTEMOTE_MESSAGE;              //zyg: player emote
                 qe._Emote = 0;                              //TEXTEMOTE_HELLO;                //zyg: NPC emote
@@ -12217,7 +12219,7 @@ void Player::SendPreparedQuest( uint64 guid )
                 }
             }
         }
-        PlayerTalkClass->SendQuestGiverQuestList( qe, title, guid );
+        PlayerTalkClass->SendQuestGiverQuestList(qe, title, guid);
     }
 }
 
