@@ -32,6 +32,7 @@ template <class T>
 PoolGroup<T>::PoolGroup()
 {
     m_SpawnedPoolAmount = 0;
+    m_LastDespawnedNode = 0;
 }
 
 // Method to add a gameobject/creature guid to the proper list depending on pool type and chance value
@@ -107,7 +108,7 @@ void PoolGroup<T>::DespawnObject(uint32 guid)
             if (!guid || EqualChanced[i].guid == guid)
             {
                 if (guid)
-                    CacheValue = EqualChanced[i].guid;
+                    m_LastDespawnedNode = EqualChanced[i].guid;
                 else
                     Despawn1Object(EqualChanced[i].guid);
 
@@ -184,9 +185,11 @@ void PoolGroup<T>::SpawnObject(uint32 limit, bool cache)
     if (limit == 1)                                         // This is the only case where explicit chance is used
     {
         uint32 roll = RollOne();
-        if (cache && CacheValue != roll)
-            Despawn1Object(CacheValue);
-        CacheValue = Spawn1Object(roll);
+        if (cache && m_LastDespawnedNode != roll)
+            Despawn1Object(m_LastDespawnedNode);
+
+        m_LastDespawnedNode = 0;
+        Spawn1Object(roll);
     }
     else if (limit < EqualChanced.size() && m_SpawnedPoolAmount < limit)
     {
@@ -199,10 +202,11 @@ void PoolGroup<T>::SpawnObject(uint32 limit, bool cache)
         {
             uint32 roll = urand(1, IndexList.size()) - 1;
             uint32 index = IndexList[roll];
-            if (!cache || (cache && EqualChanced[index].guid != CacheValue))
+            if (!cache || (cache && EqualChanced[index].guid != m_LastDespawnedNode))
             {
                 if (cache)
-                    Despawn1Object(CacheValue);
+                    Despawn1Object(m_LastDespawnedNode);
+
                 EqualChanced[index].spawned = Spawn1Object(EqualChanced[index].guid);
             }
             else
@@ -214,7 +218,7 @@ void PoolGroup<T>::SpawnObject(uint32 limit, bool cache)
             std::vector<uint32>::iterator itr = IndexList.begin()+roll;
             IndexList.erase(itr);
         }
-        CacheValue = 0;
+        m_LastDespawnedNode = 0;
     }
     else  // Not enough objects in pool, so spawn all
     {
@@ -333,7 +337,7 @@ bool PoolGroup<Pool>::ReSpawn1Object(uint32 /*guid*/)
 
 PoolHandler::PoolHandler()
 {
-    isSystemInit = false;
+    m_IsPoolSystemStarted = false;
 }
 
 void PoolHandler::LoadFromDB()
@@ -627,7 +631,7 @@ void PoolHandler::Initialize()
     }
 
     sLog.outBasic("Pool handling system initialized, %u pools spawned.", count);
-    isSystemInit = true;
+    m_IsPoolSystemStarted = true;
 }
 
 // Call to spawn a pool, if cache if true the method will spawn only if cached entry is different
