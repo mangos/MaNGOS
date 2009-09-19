@@ -262,7 +262,7 @@ class MANGOS_DLL_SPEC Aura
             m_procCharges = charges;
             SendAuraUpdate(false);
         }
-        bool DropAuraCharge() // return true if last charge dropped
+        bool DropAuraCharge()                               // return true if last charge dropped
         {
             if (m_procCharges == 0)
                 return false;

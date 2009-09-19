@@ -1862,6 +1862,8 @@ void Unit::CalcAbsorbResist(Unit *pVictim,SpellSchoolMask schoolMask, DamageEffe
 
         // Reduce shield amount
         mod->m_amount-=currentAbsorb;
+        if((*i)->DropAuraCharge())
+            mod->m_amount = 0;
         // Need remove it later
         if (mod->m_amount<=0)
             existExpired = true;

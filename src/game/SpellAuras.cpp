@@ -6129,6 +6129,15 @@ void Aura::HandleSchoolAbsorb(bool apply, bool Real)
                         //+30% from +spell bonus
                         DoneActualBenefit = caster->SpellBaseDamageBonus(GetSpellSchoolMask(m_spellProto)) * 0.30f;
                     break;
+                case SPELLFAMILY_PALADIN:
+                    // Sacred Shield
+                    // (check not strictly needed, only Sacred Shield has SPELL_AURA_SCHOOL_ABSORB in SPELLFAMILY_PALADIN at this time)
+                    if (m_spellProto->SpellFamilyFlags & UI64LIT(0x0008000000000000))
+                    {
+                        // +75% from spell power
+                        DoneActualBenefit = caster->SpellBaseHealingBonus(GetSpellSchoolMask(m_spellProto)) * 0.75f;
+                    }
+                    break;
                 case SPELLFAMILY_DRUID:
                     // Savage Defense (amount store original percent of attack power applied)
                     if (m_spellProto->SpellIconID == 50)    // only spell with this aura fit
