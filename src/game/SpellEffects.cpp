@@ -1646,6 +1646,16 @@ void Spell::EffectDummy(uint32 i)
                     ((Player*)m_caster)->SendAttackSwingCancelAttack();
                     return;
                 }
+                // Master's Call
+                case 53271:
+                {
+                    Pet* pet = m_caster->GetPet();
+                    if (!pet || !unitTarget)
+                        return;
+
+                    pet->CastSpell(unitTarget, m_spellInfo->CalculateSimpleValue(i), true);
+                    return;
+                }
             }
             break;
         case SPELLFAMILY_PALADIN:
@@ -5384,6 +5394,16 @@ void Spell::EffectScriptEffect(uint32 effIndex)
                             }
                         }
                     }
+                    return;
+                }
+                // Master's Call
+                case 53271:
+                {
+                    if (!unitTarget)
+                        return;
+
+                    // script effect have in value, but this outdated removed part
+                    unitTarget->CastSpell(unitTarget, 62305, true);
                     return;
                 }
                 default:

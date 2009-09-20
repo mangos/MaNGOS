@@ -308,8 +308,11 @@ INSERT INTO spell_check (spellid,SpellFamilyName,SpellFamilyMaskA,SpellFamilyMas
 (53196, 7,0x0000000000000000,0x00000100,  -1,  -1,  -1,  3, -1,-1,'Starfall',                           'Spell::EffectDummy'),
 (53197, 7,0x0000000000000000,0x00000100,  -1,  -1,  -1,  3, -1,-1,'Starfall',                           'Spell::EffectDummy'),
 (53198, 7,0x0000000000000000,0x00000100,  -1,  -1,  -1,  3, -1,-1,'Starfall',                           'Spell::EffectDummy'),
+(53271,-1,                -1,        -1,  -1,  -1,  -1,  3, -1,-1,'Master''s Call',                     'Spell::EffectDummy'),
+(53271,-1,                -1,        -1,  -1,  -1,  -1, 77, -1,-1,'Master''s Call',                     'Spell::EffectScriptEffect'),
 (53341, 0,                -1,        -1,  -1,  -1,  -1,  3, -1,-1,'Rune of Cinderglacier',              'Spell::EffectDummy'),
 (53343, 0,                -1,        -1,  -1,  -1,  -1,  3, -1,-1,'Rune of Razorice',                   'Spell::EffectDummy'),
+(54216,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Master''s Call',                     'Spell::EffectDummy'),
 (54586,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Runeforging Credit',                 'Spell::EffectDummy'),
 (54824,-1,                -1,        -1,  -1,  -1,  -1, -1,  4,-1,'Glyph of Swiftmend',                 'Spell::EffectHeal'),
 (54861,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Nitro Boosts',                       'Spell::EffectDummy'),
@@ -335,6 +338,7 @@ INSERT INTO spell_check (spellid,SpellFamilyName,SpellFamilyMaskA,SpellFamilyMas
 (61491, 0,                -1,        -1,  -1,  -1,  -1,  2, -1,-1,'Intercept',                          'Spell::EffectSchoolDMG'),
 (61507, 9,                -1,        -1,  -1,  -1,  -1,  3, -1,-1,'Disengage',                          'Spell::EffectDummy'),
 (61508,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Disengage',                          'Spell::EffectDummy'),
+(62305,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Master''s Call',                     'Spell::EffectScriptEffect'),
 (63375,-1,                -1,        -1,  -1,  -1,  -1, 30, -1,-1,'Improved Stormstrike',               'Spell::EffectEnergize'),
 
 /* sorted by spell names */
