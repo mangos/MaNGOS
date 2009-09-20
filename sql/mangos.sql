@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_8511_01_mangos_spell_proc_event` bit(1) default NULL
+  `required_8514_01_mangos_spell_bonus_data` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -13659,6 +13659,7 @@ INSERT INTO `spell_bonus_data` VALUES
 (20925, 0.09,   0,       0.056, 'Paladin - Holy Shield'),
 (31803, 0,      0.0156,  0.03,  'Paladin - Holy Vengeance'),
 (2812,  0.07,   0,       0.07,  'Paladin - Holy Wrath'),
+(54158, 0.25,   0,       0,     'Paladin - Judgement'),
 (31898, 0.18,   0,       0.11,  'Paladin - Judgement of Blood Enemy'), 
 (32220, 0.0594, 0,       0.0363,'Paladin - Judgement of Blood Self'),
 (20467, 0.25,   0,       0.16,  'Paladin - Judgement of Command'),

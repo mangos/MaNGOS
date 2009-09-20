@@ -669,6 +669,12 @@ void Spell::EffectSchoolDMG(uint32 effect_idx)
                 {
                     damage+=int32(m_caster->GetShieldBlockValue());
                 }
+                // Judgement
+                else if (m_spellInfo->Id == 54158)
+                {
+                    // [1 + 0.25 * SPH + 0.16 * AP]
+                    damage += int32(m_caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.16f);
+                }
                 break;
             }
         }
@@ -5405,19 +5411,30 @@ void Spell::EffectScriptEffect(uint32 effIndex)
                         sLog.outError("Unsupported Judgement (seal trigger) spell (Id: %u) in Spell::EffectScriptEffect",m_spellInfo->Id);
                         return;
                 }
-                // all seals have aura dummy in 2 effect
+                // offensive seals have aura dummy in 2 effect
                 Unit::AuraList const& m_dummyAuras = m_caster->GetAurasByType(SPELL_AURA_DUMMY);
                 for(Unit::AuraList::const_iterator itr = m_dummyAuras.begin(); itr != m_dummyAuras.end(); ++itr)
                 {
-                    SpellEntry const *spellInfo = (*itr)->GetSpellProto();
-                    // search seal (all seals have judgement's aura dummy spell id in 2 effect
-                    if ((*itr)->GetEffIndex() != 2 || !spellInfo || !IsSealSpell(spellInfo))
+                    // search seal (offensive seals have judgement's aura dummy spell id in 2 effect
+                    if ((*itr)->GetEffIndex() != 2 || !IsSealSpell((*itr)->GetSpellProto()))
                         continue;
                     spellId2 = (*itr)->GetModifier()->m_amount;
                     SpellEntry const *judge = sSpellStore.LookupEntry(spellId2);
                     if (!judge)
                         continue;
                     break;
+                }
+                // if there were no offensive seals than there is seal with proc trigger aura
+                if (!spellId2)
+                {
+                    Unit::AuraList const& procTriggerAuras = m_caster->GetAurasByType(SPELL_AURA_PROC_TRIGGER_SPELL);
+                    for(Unit::AuraList::const_iterator itr = procTriggerAuras.begin(); itr != procTriggerAuras.end(); ++itr)
+                    {
+                        if ((*itr)->GetEffIndex() != 0 || !IsSealSpell((*itr)->GetSpellProto()))
+                            continue;
+                        spellId2 = 54158;
+                        break;
+                    }
                 }
                 if (spellId1)
                     m_caster->CastSpell(unitTarget, spellId1, true);
