@@ -3321,6 +3321,7 @@ void Spell::EffectSummonType(uint32 i)
         case SUMMON_TYPE_CRITTER:
         case SUMMON_TYPE_CRITTER2:
         case SUMMON_TYPE_CRITTER3:
+        case SUMMON_TYPE_QUEST_CRITTER:
             EffectSummonCritter(i);
             break;
         case SUMMON_TYPE_TOTEM_SLOT1:
