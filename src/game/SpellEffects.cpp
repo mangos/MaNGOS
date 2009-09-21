@@ -1646,6 +1646,15 @@ void Spell::EffectDummy(uint32 i)
                     ((Player*)m_caster)->SendAttackSwingCancelAttack();
                     return;
                 }
+                // Last Stand
+                case 53478:
+                {
+                    if (!unitTarget)
+                        return;
+                    int32 healthModSpellBasePoints0 = int32(unitTarget->GetMaxHealth() * 0.3);
+                    unitTarget->CastCustomSpell(unitTarget, 53479, &healthModSpellBasePoints0, NULL, NULL, true, NULL);
+                    return;
+                }
                 // Master's Call
                 case 53271:
                 {
