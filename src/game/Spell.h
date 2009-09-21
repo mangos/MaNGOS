@@ -657,7 +657,9 @@ namespace MaNGOS
 
             for(typename GridRefManager<T>::iterator itr = m.begin(); itr != m.end(); ++itr)
             {
-                if ( !itr->getSource()->isTargetableForAttack()
+                // there are still more spells which can be casted on dead, but
+                // they are no AOE and don't have such a nice SPELL_ATTR flag
+                if ( !itr->getSource()->isTargetableForAttack(i_spell.m_spellInfo->AttributesEx3 & SPELL_ATTR_EX3_CAST_ON_DEAD)
                     // mostly phase check
                     || !itr->getSource()->IsInMap(i_originalCaster))
                     continue;
