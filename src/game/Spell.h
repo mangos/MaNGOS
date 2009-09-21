@@ -657,36 +657,32 @@ namespace MaNGOS
 
             for(typename GridRefManager<T>::iterator itr = m.begin(); itr != m.end(); ++itr)
             {
-                if( !itr->getSource()->isAlive() || (itr->getSource()->GetTypeId() == TYPEID_PLAYER && ((Player*)itr->getSource())->isInFlight()))
-                    continue;
-
-                // mostly phase check
-                if(!itr->getSource()->IsInMap(i_originalCaster))
+                if ( !itr->getSource()->isTargetableForAttack()
+                    // mostly phase check
+                    || !itr->getSource()->IsInMap(i_originalCaster))
                     continue;
 
                 switch (i_TargetType)
                 {
                     case SPELL_TARGETS_HOSTILE:
-                        if (!itr->getSource()->isTargetableForAttack() || !i_originalCaster->IsHostileTo( itr->getSource() ))
+                        if (!i_originalCaster->IsHostileTo( itr->getSource() ))
                             continue;
                         break;
                     case SPELL_TARGETS_NOT_FRIENDLY:
-                        if (!itr->getSource()->isTargetableForAttack() || i_originalCaster->IsFriendlyTo( itr->getSource() ))
+                        if (i_originalCaster->IsFriendlyTo( itr->getSource() ))
                             continue;
                         break;
                     case SPELL_TARGETS_NOT_HOSTILE:
-                        if (!itr->getSource()->isTargetableForAttack() || i_originalCaster->IsHostileTo( itr->getSource() ))
+                        if (i_originalCaster->IsHostileTo( itr->getSource() ))
                             continue;
                         break;
                     case SPELL_TARGETS_FRIENDLY:
-                        if (!itr->getSource()->isTargetableForAttack() || !i_originalCaster->IsFriendlyTo( itr->getSource() ))
+                        if (!i_originalCaster->IsFriendlyTo( itr->getSource() ))
                             continue;
                         break;
                     case SPELL_TARGETS_AOE_DAMAGE:
                     {
                         if(itr->getSource()->GetTypeId()==TYPEID_UNIT && ((Creature*)itr->getSource())->isTotem())
-                            continue;
-                        if(!itr->getSource()->isTargetableForAttack())
                             continue;
 
                         Unit* check = i_originalCaster->GetCharmerOrOwnerOrSelf();

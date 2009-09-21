@@ -1282,14 +1282,16 @@ void Spell::SetTargetMap(uint32 effIndex,uint32 targetMode,UnitList& TagUnitMap)
     else
         radius = GetSpellMaxRange(sSpellRangeStore.LookupEntry(m_spellInfo->rangeIndex));
 
-    if(m_originalCaster)
-        if(Player* modOwner = m_originalCaster->GetSpellModOwner())
-            modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_RADIUS, radius, this);
-
     uint32 EffectChainTarget = m_spellInfo->EffectChainTarget[effIndex];
+
     if(m_originalCaster)
+    {
         if(Player* modOwner = m_originalCaster->GetSpellModOwner())
+        {
+            modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_RADIUS, radius, this);
             modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_JUMP_TARGETS, EffectChainTarget, this);
+        }
+    }
 
     // Get spell max affected targets
     uint32 unMaxTargets = m_spellInfo->MaxAffectedTargets;
@@ -4098,27 +4100,12 @@ SpellCastResult Spell::CheckCast(bool strict)
         if (non_caster_target && (m_spellInfo->AttributesEx & SPELL_ATTR_EX_NOT_IN_COMBAT_TARGET) && target->isInCombat())
             return SPELL_FAILED_TARGET_AFFECTING_COMBAT;
     }
-
-    // Spell casted only on battleground
-    if ((m_spellInfo->AttributesEx3 & SPELL_ATTR_EX3_BATTLEGROUND) &&  m_caster->GetTypeId() == TYPEID_PLAYER)
-        if(!((Player*)m_caster)->InBattleGround())
-            return SPELL_FAILED_ONLY_BATTLEGROUNDS;
-
-    // do not allow spells to be cast in arenas
-    // - with greater than 15 min CD without SPELL_ATTR_EX4_USABLE_IN_ARENA flag
-    // - with SPELL_ATTR_EX4_NOT_USABLE_IN_ARENA flag
-    if ((m_spellInfo->AttributesEx4 & SPELL_ATTR_EX4_NOT_USABLE_IN_ARENA) ||
-        GetSpellRecoveryTime(m_spellInfo) > 15 * MINUTE * IN_MILISECONDS && !(m_spellInfo->AttributesEx4 & SPELL_ATTR_EX4_USABLE_IN_ARENA))
-        if(MapEntry const* mapEntry = sMapStore.LookupEntry(m_caster->GetMapId()))
-            if(mapEntry->IsBattleArena())
-                return SPELL_FAILED_NOT_IN_ARENA;
-
     // zone check
     uint32 zone, area;
     m_caster->GetZoneAndAreaId(zone, area);
 
     SpellCastResult locRes= spellmgr.GetSpellAllowedInLocationError(m_spellInfo,m_caster->GetMapId(),zone,area,
-        m_caster->GetTypeId() == TYPEID_PLAYER ? ((Player*)m_caster) : NULL);
+        m_caster->GetCharmerOrOwnerPlayerOrPlayerItself());
     if (locRes != SPELL_CAST_OK)
         return locRes;
 
