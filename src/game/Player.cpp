@@ -19657,6 +19657,16 @@ void Player::InitRunes()
         SetFloatValue(PLAYER_RUNE_REGEN_1 + i, 0.1f);
 }
 
+
+bool Player::IsBaseRuneSlotsOnCooldown( RuneType runeType ) const
+{
+    for(uint32 i = 0; i < MAX_RUNES; ++i)
+        if (GetBaseRune(i) == runeType && GetRuneCooldown(i) == 0)
+            return false;
+
+    return true;
+}
+
 void Player::AutoStoreLoot(uint8 bag, uint8 slot, uint32 loot_id, LootStore const& store, bool broadcast)
 {
     Loot loot;
