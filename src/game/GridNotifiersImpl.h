@@ -44,8 +44,7 @@ inline void
 MaNGOS::ObjectUpdater::Visit(CreatureMapType &m)
 {
     for(CreatureMapType::iterator iter=m.begin(); iter != m.end(); ++iter)
-        if(!iter->getSource()->isSpiritService())
-            iter->getSource()->Update(i_timeDiff);
+        iter->getSource()->Update(i_timeDiff);
 }
 
 inline void

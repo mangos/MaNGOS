@@ -331,6 +331,15 @@ void Creature::Update(uint32 diff)
             break;
         case DEAD:
         {
+            if (isSpiritService())
+            {
+                Unit::Update( diff );
+                // do not allow the AI to be changed during update
+                m_AI_locked = true;
+                i_AI->UpdateAI(diff);
+                m_AI_locked = false;
+                break;                                      // they don't should respawn
+            }
             if( m_respawnTime <= time(NULL) )
             {
                 DEBUG_LOG("Respawning...");
@@ -1533,12 +1542,15 @@ void Creature::setDeathState(DeathState s)
     {
         SetHealth(GetMaxHealth());
         SetLootRecipient(NULL);
-        Unit::setDeathState(ALIVE);
         CreatureInfo const *cinfo = GetCreatureInfo();
         SetUInt32Value(UNIT_DYNAMIC_FLAGS, 0);
         RemoveFlag (UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
         AddMonsterMoveFlag(MONSTER_MOVE_WALK);
         SetUInt32Value(UNIT_NPC_FLAGS, cinfo->npcflag);
+        if (!isSpiritService())
+            Unit::setDeathState(ALIVE);
+        else
+            Unit::setDeathState(DEAD);
         clearUnitState(UNIT_STAT_ALL_STATE);
         i_motionMaster.Clear();
         SetMeleeDamageSchool(SpellSchools(cinfo->dmgschool));
