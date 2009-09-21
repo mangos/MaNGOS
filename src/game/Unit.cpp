@@ -5137,6 +5137,16 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     CastSpell(this, 28682, true, castItem, triggeredByAura);
                     return (procEx & PROC_EX_CRITICAL_HIT); // charge update only at crit hits, no hidden cooldowns
                 }
+                // Glyph of Ice Block
+                case 56372:
+                {
+                    if (GetTypeId() != TYPEID_PLAYER)
+                        return false;
+
+                    // not 100% safe with client version switches but for 3.1.3 no spells with cooldown that can have mage player except Frost Nova.
+                    ((Player*)this)->RemoveSpellCategoryCooldown(35, true);
+                    return true;
+                }
             }
             break;
         }
