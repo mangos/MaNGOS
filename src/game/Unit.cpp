@@ -6134,8 +6134,16 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
             // Earth Shield
             if (dummySpell->SpellFamilyFlags & UI64LIT(0x0000040000000000))
             {
-                basepoints0 = triggerAmount;
                 target = this;
+                basepoints0 = triggerAmount;
+
+                // Glyph of Earth Shield
+                if (Aura* aur = GetDummyAura(63279))
+                {
+                    int32 aur_mod = aur->GetModifier()->m_amount;
+                    basepoints0 = int32(basepoints0 * (aur_mod + 100.0f) / 100.0f);
+                }
+
                 triggered_spell_id = 379;
                 break;
             }
