@@ -7280,13 +7280,13 @@ void Aura::HandleAuraConvertRune(bool apply, bool Real)
         {
             if(!plr->GetRuneCooldown(i))
             {
-                plr->ConvertRune(i, GetSpellProto()->EffectMiscValueB[m_effIndex]);
+                plr->ConvertRune(i, RuneType(GetSpellProto()->EffectMiscValueB[m_effIndex]));
                 break;
             }
         }
         else
         {
-            if(plr->GetCurrentRune(i) == GetSpellProto()->EffectMiscValueB[m_effIndex])
+            if(plr->GetCurrentRune(i) == RuneType(GetSpellProto()->EffectMiscValueB[m_effIndex]))
             {
                 plr->ConvertRune(i, plr->GetBaseRune(i));
                 break;
