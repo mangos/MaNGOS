@@ -199,11 +199,8 @@ BattleGround::~BattleGround()
 {
     // remove objects and creatures
     // (this is done automatically in mapmanager update, when the instance is reset after the reset time)
-    int size = m_BgCreatures.size();
-    for(int i = 0; i < size; ++i)
-        DelCreature(i);
 
-    size = m_BgObjects.size();
+    int size = m_BgObjects.size();
     for(int i = 0; i < size; ++i)
         DelObject(i);
 
@@ -1578,39 +1575,6 @@ void BattleGround::SpawnBGObject(uint64 const& guid, uint32 respawntime)
     }
 }
 
-Creature* BattleGround::AddCreature(uint32 entry, uint32 type, uint32 teamval, float x, float y, float z, float o, uint32 respawntime)
-{
-    Map * map = MapManager::Instance().FindMap(GetMapId(),GetInstanceID());
-    if (!map)
-        return NULL;
-
-    Creature* pCreature = new Creature;
-    if (!pCreature->Create(objmgr.GenerateLowGuid(HIGHGUID_UNIT), map, PHASEMASK_NORMAL, entry, teamval))
-    {
-        sLog.outError("Can't create creature entry: %u",entry);
-        delete pCreature;
-        return NULL;
-    }
-
-    pCreature->Relocate(x, y, z, o);
-
-    if (!pCreature->IsPositionValid())
-    {
-        sLog.outError("Creature (guidlow %d, entry %d) not added to battleground. Suggested coordinates isn't valid (X: %f Y: %f)",pCreature->GetGUIDLow(),pCreature->GetEntry(),pCreature->GetPositionX(),pCreature->GetPositionY());
-        delete pCreature;
-        return NULL;
-    }
-
-    pCreature->AIM_Initialize();
-
-    //pCreature->SetDungeonDifficulty(0);
-
-    map->Add(pCreature);
-    m_BgCreatures[type] = pCreature->GetGUID();
-
-    return  pCreature;
-}
-
 void BattleGround::SpawnBGCreature(uint64 const& guid, uint32 respawntime)
 {
     Creature* obj = HashMapHolder<Creature>::Find(guid);
@@ -1621,10 +1585,7 @@ void BattleGround::SpawnBGCreature(uint64 const& guid, uint32 respawntime)
         return;
     if (respawntime == 0)
     {
-        //obj->SetVisibility(VISIBILITY_ON);
         obj->Respawn();
-        //obj->SetRespawnTime(0);
-        //objmgr.SaveCreatureRespawnTime(obj->GetGUIDLow(), GetInstanceID(), 0);
         map->Add(obj);
     }
     else
@@ -1634,22 +1595,6 @@ void BattleGround::SpawnBGCreature(uint64 const& guid, uint32 respawntime)
         obj->SetRespawnDelay(respawntime);
         obj->RemoveCorpse();
     }
-}
-
-bool BattleGround::DelCreature(uint32 type)
-{
-    if (!m_BgCreatures[type])
-        return true;
-
-    Creature *cr = HashMapHolder<Creature>::Find(m_BgCreatures[type]);
-    if (!cr)
-    {
-        sLog.outError("Can't find creature guid: %u",GUID_LOPART(m_BgCreatures[type]));
-        return false;
-    }
-    cr->AddObjectToRemoveList();
-    m_BgCreatures[type] = 0;
-    return true;
 }
 
 bool BattleGround::DelObject(uint32 type)
@@ -1666,41 +1611,6 @@ bool BattleGround::DelObject(uint32 type)
     obj->SetRespawnTime(0);                                 // not save respawn time
     obj->Delete();
     m_BgObjects[type] = 0;
-    return true;
-}
-
-bool BattleGround::AddSpiritGuide(uint32 type, float x, float y, float z, float o, uint32 team)
-{
-    uint32 entry = 0;
-
-    if (team == ALLIANCE)
-        entry = 13116;
-    else
-        entry = 13117;
-
-    Creature* pCreature = AddCreature(entry,type,team,x,y,z,o);
-    if (!pCreature)
-    {
-        sLog.outError("Can't create Spirit guide. BattleGround not created!");
-        EndNow();
-        return false;
-    }
-
-    pCreature->setDeathState(DEAD);
-
-    pCreature->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, pCreature->GetGUID());
-    // aura
-    pCreature->SetVisibleAura(0, SPELL_SPIRIT_HEAL_CHANNEL);
-    //pCreature->SetUInt32Value(UNIT_FIELD_AURAFLAGS, 0x00000009);
-    //pCreature->SetUInt32Value(UNIT_FIELD_AURALEVELS, 0x0000003C);
-    //pCreature->SetUInt32Value(UNIT_FIELD_AURAAPPLICATIONS, 0x000000FF);
-    // casting visual effect
-    pCreature->SetUInt32Value(UNIT_CHANNEL_SPELL, SPELL_SPIRIT_HEAL_CHANNEL);
-    // correct cast speed
-    pCreature->SetFloatValue(UNIT_MOD_CAST_SPEED, 1.0f);
-
-    //pCreature->CastSpell(pCreature, SPELL_SPIRIT_HEAL_CHANNEL, true);
-
     return true;
 }
 
@@ -1817,11 +1727,6 @@ uint32 BattleGround::GetPlayerTeam(uint64 guid)
     if (itr!=m_Players.end())
         return itr->second.Team;
     return 0;
-}
-
-uint32 BattleGround::GetOtherTeam(uint32 teamId)
-{
-    return (teamId) ? ((teamId == ALLIANCE) ? HORDE : ALLIANCE) : 0;
 }
 
 bool BattleGround::IsPlayerInBattleGround(uint64 guid)

@@ -518,14 +518,10 @@ class BattleGround
         typedef std::vector<uint64> BGCreatures;
         // TODO drop m_BGObjects
         BGObjects m_BgObjects;
-        BGCreatures m_BgCreatures;
         void SpawnBGObject(uint64 const& guid, uint32 respawntime);
         bool AddObject(uint32 type, uint32 entry, float x, float y, float z, float o, float rotation0, float rotation1, float rotation2, float rotation3, uint32 respawnTime = 0);
         void SpawnBGCreature(uint64 const& guid, uint32 respawntime);
-        Creature* AddCreature(uint32 entry, uint32 type, uint32 teamval, float x, float y, float z, float o, uint32 respawntime = 0);
-        bool DelCreature(uint32 type);
         bool DelObject(uint32 type);
-        bool AddSpiritGuide(uint32 type, float x, float y, float z, float o, uint32 team);
 
         void DoorOpen(uint64 const& guid);
         void DoorClose(uint64 const& guid);
@@ -534,7 +530,7 @@ class BattleGround
 
         // since arenas can be AvA or Hvh, we have to get the "temporary" team of a player
         uint32 GetPlayerTeam(uint64 guid);
-        uint32 GetOtherTeam(uint32 teamId);
+        uint32 GetOtherTeam(uint32 teamId){ return (teamId) ? ((teamId == ALLIANCE) ? HORDE : ALLIANCE) : 0; }
         bool IsPlayerInBattleGround(uint64 guid);
 
         void SetDeleteThis() {m_SetDeleteThis = true;}
@@ -548,8 +544,6 @@ class BattleGround
             BGCreatures creatures;
         };
 
-        //typedef std::map<uint8, std::map<uint8, EventObjects>> BGObjectMap;
-        //typedef std::map<uint8, std::map<uint8, bool>> BGEventMap;
         // cause we create it dynamicly i use a map - to avoid resizing when
         // using vector - also it contains 2*events concatenated with PAIR32
         // this is needed to avoid overhead of a 2dimensional std::map
