@@ -669,6 +669,12 @@ void Spell::EffectSchoolDMG(uint32 effect_idx)
                 {
                     damage+=int32(m_caster->GetShieldBlockValue());
                 }
+                // Judgement
+                else if (m_spellInfo->Id == 54158)
+                {
+                    // [1 + 0.25 * SPH + 0.16 * AP]
+                    damage += int32(m_caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.16f);
+                }
                 break;
             }
         }
@@ -1634,6 +1640,25 @@ void Spell::EffectDummy(uint32 i)
                     m_caster->InterruptSpell(CURRENT_AUTOREPEAT_SPELL);
                     m_caster->AttackStop();
                     ((Player*)m_caster)->SendAttackSwingCancelAttack();
+                    return;
+                }
+                // Last Stand
+                case 53478:
+                {
+                    if (!unitTarget)
+                        return;
+                    int32 healthModSpellBasePoints0 = int32(unitTarget->GetMaxHealth() * 0.3);
+                    unitTarget->CastCustomSpell(unitTarget, 53479, &healthModSpellBasePoints0, NULL, NULL, true, NULL);
+                    return;
+                }
+                // Master's Call
+                case 53271:
+                {
+                    Pet* pet = m_caster->GetPet();
+                    if (!pet || !unitTarget)
+                        return;
+
+                    pet->CastSpell(unitTarget, m_spellInfo->CalculateSimpleValue(i), true);
                     return;
                 }
             }
@@ -3297,6 +3322,8 @@ void Spell::EffectSummonType(uint32 i)
                 EffectSummonGuardian(i);
             break;
         case SUMMON_TYPE_WILD:
+        case SUMMON_TYPE_QUEST_WILD:
+        case SUMMON_TYPE_CREATURE:
             EffectSummonWild(i);
             break;
         case SUMMON_TYPE_DEMON:
@@ -3310,6 +3337,7 @@ void Spell::EffectSummonType(uint32 i)
         case SUMMON_TYPE_CRITTER:
         case SUMMON_TYPE_CRITTER2:
         case SUMMON_TYPE_CRITTER3:
+        case SUMMON_TYPE_QUEST_CRITTER:
             EffectSummonCritter(i);
             break;
         case SUMMON_TYPE_TOTEM_SLOT1:
@@ -5374,6 +5402,16 @@ void Spell::EffectScriptEffect(uint32 effIndex)
                     }
                     return;
                 }
+                // Master's Call
+                case 53271:
+                {
+                    if (!unitTarget)
+                        return;
+
+                    // script effect have in value, but this outdated removed part
+                    unitTarget->CastSpell(unitTarget, 62305, true);
+                    return;
+                }
                 default:
                     break;
             }
@@ -5400,19 +5438,30 @@ void Spell::EffectScriptEffect(uint32 effIndex)
                         sLog.outError("Unsupported Judgement (seal trigger) spell (Id: %u) in Spell::EffectScriptEffect",m_spellInfo->Id);
                         return;
                 }
-                // all seals have aura dummy in 2 effect
+                // offensive seals have aura dummy in 2 effect
                 Unit::AuraList const& m_dummyAuras = m_caster->GetAurasByType(SPELL_AURA_DUMMY);
                 for(Unit::AuraList::const_iterator itr = m_dummyAuras.begin(); itr != m_dummyAuras.end(); ++itr)
                 {
-                    SpellEntry const *spellInfo = (*itr)->GetSpellProto();
-                    // search seal (all seals have judgement's aura dummy spell id in 2 effect
-                    if ((*itr)->GetEffIndex() != 2 || !spellInfo || !IsSealSpell(spellInfo))
+                    // search seal (offensive seals have judgement's aura dummy spell id in 2 effect
+                    if ((*itr)->GetEffIndex() != 2 || !IsSealSpell((*itr)->GetSpellProto()))
                         continue;
                     spellId2 = (*itr)->GetModifier()->m_amount;
                     SpellEntry const *judge = sSpellStore.LookupEntry(spellId2);
                     if (!judge)
                         continue;
                     break;
+                }
+                // if there were no offensive seals than there is seal with proc trigger aura
+                if (!spellId2)
+                {
+                    Unit::AuraList const& procTriggerAuras = m_caster->GetAurasByType(SPELL_AURA_PROC_TRIGGER_SPELL);
+                    for(Unit::AuraList::const_iterator itr = procTriggerAuras.begin(); itr != procTriggerAuras.end(); ++itr)
+                    {
+                        if ((*itr)->GetEffIndex() != 0 || !IsSealSpell((*itr)->GetSpellProto()))
+                            continue;
+                        spellId2 = 54158;
+                        break;
+                    }
                 }
                 if (spellId1)
                     m_caster->CastSpell(unitTarget, spellId1, true);
@@ -6830,7 +6879,7 @@ void Spell::EffectActivateRune(uint32  eff_idx)
 
     for(uint32 j = 0; j < MAX_RUNES; ++j)
     {
-        if(plr->GetRuneCooldown(j) && plr->GetCurrentRune(j) == m_spellInfo->EffectMiscValue[eff_idx])
+        if(plr->GetRuneCooldown(j) && plr->GetCurrentRune(j) == RuneType(m_spellInfo->EffectMiscValue[eff_idx]))
         {
             plr->SetRuneCooldown(j, 0);
         }

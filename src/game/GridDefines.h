@@ -41,7 +41,7 @@ class Player;
 #define MIN_GRID_DELAY          (MINUTE*IN_MILISECONDS)
 #define MIN_MAP_UPDATE_DELAY    50
 
-#define MAX_NUMBER_OF_CELLS     4
+#define MAX_NUMBER_OF_CELLS     8
 #define SIZE_OF_GRID_CELL       (SIZE_OF_GRIDS/MAX_NUMBER_OF_CELLS)
 
 #define CENTER_GRID_CELL_ID     (MAX_NUMBER_OF_CELLS*MAX_NUMBER_OF_GRIDS/2)
@@ -86,26 +86,34 @@ struct MANGOS_DLL_DECL CoordPair
 
     void operator<<(const uint32 val)
     {
-        if( x_coord >= val )
+        if( x_coord > val )
             x_coord -= val;
+        else
+            x_coord = 0;
     }
 
     void operator>>(const uint32 val)
     {
         if( x_coord+val < LIMIT )
             x_coord += val;
+        else
+            x_coord = LIMIT - 1;
     }
 
     void operator-=(const uint32 val)
     {
-        if( y_coord >= val )
+        if( y_coord > val )
             y_coord -= val;
+        else
+            y_coord = 0;
     }
 
     void operator+=(const uint32 val)
     {
         if( y_coord+val < LIMIT )
             y_coord += val;
+        else
+            y_coord = LIMIT - 1;
     }
 
     uint32 x_coord;
