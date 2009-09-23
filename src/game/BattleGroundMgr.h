@@ -244,6 +244,8 @@ class BattleGroundMgr
         static BattleGroundQueueTypeId BGQueueTypeId(BattleGroundTypeId bgTypeId, uint8 arenaType);
         static BattleGroundTypeId BGTemplateId(BattleGroundQueueTypeId bgQueueTypeId);
         static uint8 BGArenaType(BattleGroundQueueTypeId bgQueueTypeId);
+
+        static bool IsBGWeekend(BattleGroundTypeId bgTypeId);
     private:
         BattleMastersMap    mBattleMastersMap;
 

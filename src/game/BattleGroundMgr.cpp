@@ -40,7 +40,7 @@
 #include "ArenaTeam.h"
 #include "World.h"
 #include "WorldPacket.h"
-#include "ProgressBar.h"
+#include "GameEventMgr.h"
 
 #include "Policies/SingletonImp.h"
 
@@ -2082,3 +2082,19 @@ void BattleGroundMgr::LoadBattleMastersEntry()
     sLog.outString( ">> Loaded %u battlemaster entries", count );
 }
 
+bool BattleGroundMgr::IsBGWeekend(BattleGroundTypeId bgTypeId)
+{
+    switch (bgTypeId)
+    {
+        case BATTLEGROUND_AV:
+            return IsHolidayActive(HOLIDAY_CALL_TO_ARMS_AV);
+        case BATTLEGROUND_EY:
+            return IsHolidayActive(HOLIDAY_CALL_TO_ARMS_EY);
+        case BATTLEGROUND_WS:
+            return IsHolidayActive(HOLIDAY_CALL_TO_ARMS_WS);
+        case BATTLEGROUND_SA:
+            return IsHolidayActive(HOLIDAY_CALL_TO_ARMS_SA);
+        default:
+            return false;
+    }
+}
