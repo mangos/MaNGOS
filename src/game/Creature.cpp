@@ -160,7 +160,11 @@ void Creature::RemoveCorpse()
     setDeathState(DEAD);
     ObjectAccessor::UpdateObjectVisibility(this);
     loot.clear();
-    m_respawnTime = time(NULL) + m_respawnDelay;
+    uint32 respawnDelay = m_respawnDelay;
+    if (AI())
+        AI()->CorpseRemoved(respawnDelay);
+
+    m_respawnTime = time(NULL) + respawnDelay;
 
     float x,y,z,o;
     GetRespawnCoord(x, y, z, &o);
