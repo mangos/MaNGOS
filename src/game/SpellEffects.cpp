@@ -348,8 +348,16 @@ void Spell::EffectSchoolDMG(uint32 effect_idx)
                     }
                     // Cataclysmic Bolt
                     case 38441:
+                    {
                         damage = unitTarget->GetMaxHealth() / 2;
                         break;
+                    }
+                    // Tympanic Tantrum
+                    case 62775:
+                    {
+                        damage = unitTarget->GetMaxHealth() / 10;
+                        break;
+                    }
                 }
                 break;
             }
