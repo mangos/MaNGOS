@@ -2205,12 +2205,14 @@ void Spell::SetTargetMap(uint32 effIndex,uint32 targetMode,UnitList& TagUnitMap)
                                 TagUnitMap.push_back(owner);
                     }
                     break;
+
                 default:
                     break;
             }
             break;
         }
         default:
+            sLog.outError( "SPELL: Unknown implicit target (%u) for spell ID %u", targetMode, m_spellInfo->Id );
             break;
     }
 
