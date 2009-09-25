@@ -8075,7 +8075,7 @@ void Unit::EnergizeBySpell(Unit *pVictim, uint32 SpellID, uint32 Damage, Powers 
 {
     SendEnergizeSpellLog(pVictim, SpellID, Damage, powertype);
     // needs to be called after sending spell log
-    ModifyPower(powertype, Damage);
+    pVictim->ModifyPower(powertype, Damage);
 }
 
 uint32 Unit::SpellDamageBonus(Unit *pVictim, SpellEntry const *spellProto, uint32 pdamage, DamageEffectType damagetype, uint32 stack)
