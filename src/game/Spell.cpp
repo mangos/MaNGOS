@@ -1323,6 +1323,34 @@ void Spell::SetTargetMap(uint32 effIndex,uint32 targetMode,UnitList& TagUnitMap)
 
     switch(targetMode)
     {
+        case TARGET_RANDOM_NEARBY_LOC:
+        {
+            float dest_x = m_caster->GetPositionX() + irand(-radius, radius);
+            float dest_y = m_caster->GetPositionY() + irand(-radius, radius);
+            float dest_z = m_caster->GetMap()->GetHeight(dest_x, dest_y, MAX_HEIGHT);
+            m_targets.setDestination(dest_x, dest_y, dest_z);
+
+            TagUnitMap.push_back(m_caster);
+            break;
+        }
+        case TARGET_RANDOM_NEARBY_DEST:
+        {
+            float dest_x = m_targets.m_destX + irand(-radius, radius);
+            float dest_y = m_targets.m_destY + irand(-radius, radius);
+            float dest_z = m_caster->GetMap()->GetHeight(dest_x, dest_y, MAX_HEIGHT);
+            m_targets.setDestination(dest_x, dest_y, dest_z);
+
+            if (radius > 0.0f)
+            {
+                // caster included here?
+                FillAreaTargets(TagUnitMap, dest_x, dest_y, radius, PUSH_DEST_CENTER, SPELL_TARGETS_AOE_DAMAGE);
+            }
+            else
+                TagUnitMap.push_back(m_caster);
+
+            break;
+        }
+
         case TARGET_TOTEM_EARTH:
         case TARGET_TOTEM_WATER:
         case TARGET_TOTEM_AIR:
