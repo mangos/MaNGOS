@@ -317,7 +317,7 @@ void WorldSession::HandleCorpseQueryOpcode(WorldPacket & /*recv_data*/)
         }
     }
 
-    WorldPacket data(MSG_CORPSE_QUERY, 1+(5*4));
+    WorldPacket data(MSG_CORPSE_QUERY, 1+(6*4));
     data << uint8(1);                                       // corpse found
     data << int32(mapid);
     data << float(x);
@@ -416,10 +416,12 @@ void WorldSession::HandleNpcTextQueryOpcode( WorldPacket & recv_data )
 
 void WorldSession::HandlePageTextQueryOpcode( WorldPacket & recv_data )
 {
-    uint32 pageID;
+    sLog.outDetail("WORLD: Received CMSG_PAGE_TEXT_QUERY");
+    recv_data.hexlike();
 
+    uint32 pageID;
     recv_data >> pageID;
-    sLog.outDetail("WORLD: Received CMSG_PAGE_TEXT_QUERY for pageID '%u'", pageID);
+    recv_data.read_skip<uint64>();                          // guid
 
     while (pageID)
     {
@@ -461,6 +463,8 @@ void WorldSession::HandlePageTextQueryOpcode( WorldPacket & recv_data )
 
 void WorldSession::HandleCorpseMapPositionQuery( WorldPacket & recv_data )
 {
+    sLog.outDebug( "WORLD: Recv CMSG_CORPSE_MAP_POSITION_QUERY" );
+
     uint32 unk;
     recv_data >> unk;
 

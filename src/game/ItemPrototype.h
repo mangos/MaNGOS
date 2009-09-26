@@ -123,7 +123,8 @@ enum ITEM_FLAGS
     ITEM_FLAGS_SPECIALUSE                     = 0x00800000, // last used flag in 2.3.0
     ITEM_FLAGS_BOA                            = 0x08000000, // bind on account (set in template for items that can binded in like way)
     ITEM_FLAGS_ENCHANT_SCROLL                 = 0x10000000, // for enchant scrolls
-    ITEM_FLAGS_MILLABLE                       = 0x20000000
+    ITEM_FLAGS_MILLABLE                       = 0x20000000,
+    ITEM_FLAGS_BOP_TRADEABLE                  = 0x80000000
 };
 
 enum BAG_FAMILY_MASK

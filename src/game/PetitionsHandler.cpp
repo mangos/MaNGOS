@@ -48,30 +48,35 @@
 void WorldSession::HandlePetitionBuyOpcode(WorldPacket & recv_data)
 {
     sLog.outDebug("Received opcode CMSG_PETITION_BUY");
-    //recv_data.hexlike();
+    recv_data.hexlike();
 
     uint64 guidNPC;
-    uint64 unk1, unk3, unk4, unk5, unk6, unk7;
     uint32 unk2;
     std::string name;
-    uint16 unk8;
-    uint8  unk9;
-    uint32 unk10;                                           // selected index
-    uint32 unk11;
-    recv_data >> guidNPC;                                   // NPC GUID
-    recv_data >> unk1;                                      // 0
-    recv_data >> unk2;                                      // 0
-    recv_data >> name;                                      // name
 
-    recv_data >> unk3;                                      // 0
-    recv_data >> unk4;                                      // 0
-    recv_data >> unk5;                                      // 0
-    recv_data >> unk6;                                      // 0
-    recv_data >> unk7;                                      // 0
-    recv_data >> unk8;                                      // 0
-    recv_data >> unk9;                                      // 0
-    recv_data >> unk10;                                     // index
-    recv_data >> unk11;                                     // 0
+    recv_data >> guidNPC;                                   // NPC GUID
+    recv_data.read_skip<uint32>();                          // 0
+    recv_data.read_skip<uint64>();                          // 0
+    recv_data >> name;                                      // name
+    recv_data.read_skip<std::string>();                     // some string
+    recv_data.read_skip<uint32>();                          // 0
+    recv_data.read_skip<uint32>();                          // 0
+    recv_data.read_skip<uint32>();                          // 0
+    recv_data.read_skip<uint32>();                          // 0
+    recv_data.read_skip<uint32>();                          // 0
+    recv_data.read_skip<uint32>();                          // 0
+    recv_data.read_skip<uint32>();                          // 0
+    recv_data.read_skip<uint16>();                          // 0
+    recv_data.read_skip<uint32>();                          // 0
+    recv_data.read_skip<uint32>();                          // 0
+    recv_data.read_skip<uint32>();                          // 0
+
+    for (int i = 0; i < 10; ++i)
+        recv_data.read_skip<std::string>();
+
+    recv_data >> unk2;                                      // index
+    recv_data.read_skip<uint32>();                          // 0
+
     sLog.outDebug("Petitioner with GUID %u tried sell petition: name %s", GUID_LOPART(guidNPC), name.c_str());
 
     // prevent cheating
@@ -109,7 +114,7 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket & recv_data)
             return;
         }
 
-        switch(unk10)
+        switch(unk2)
         {
             case 1:
                 charterid = ARENA_TEAM_CHARTER_2v2;
@@ -127,11 +132,11 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket & recv_data)
                 type = 5;                                   // 5v5
                 break;
             default:
-                sLog.outDebug("unknown selection at buy petition: %u", unk10);
+                sLog.outDebug("unknown selection at buy petition: %u", unk2);
                 return;
         }
 
-        if(_player->GetArenaTeamId(unk10-1))
+        if(_player->GetArenaTeamId(unk2 - 1))
         {
             SendArenaTeamCommandResult(ERR_ARENA_TEAM_CREATE_S, name, "", ERR_ALREADY_IN_ARENA_TEAM);
             return;

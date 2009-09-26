@@ -13794,7 +13794,7 @@ void Player::SendQuestFailed( uint32 quest_id )
     if( quest_id )
     {
         WorldPacket data( SMSG_QUESTGIVER_QUEST_FAILED, 4+4 );
-        data << quest_id;
+        data << uint32(quest_id);
         data << uint32(0);                                  // failed reason (4 for inventory is full)
         GetSession()->SendPacket( &data );
         sLog.outDebug("WORLD: Sent SMSG_QUESTGIVER_QUEST_FAILED");
@@ -13806,7 +13806,7 @@ void Player::SendQuestTimerFailed( uint32 quest_id )
     if( quest_id )
     {
         WorldPacket data( SMSG_QUESTUPDATE_FAILEDTIMER, 4 );
-        data << quest_id;
+        data << uint32(quest_id);
         GetSession()->SendPacket( &data );
         sLog.outDebug("WORLD: Sent SMSG_QUESTUPDATE_FAILEDTIMER");
     }
@@ -14225,7 +14225,7 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
     {
         MapEntry const* mapEntry = sMapStore.LookupEntry(GetMapId());
         // if server restart after player save in BG or area
-        // player can have current coordinates in to BG/Arean map, fix this
+        // player can have current coordinates in to BG/Arena map, fix this
         if(!mapEntry || mapEntry->IsBattleGroundOrArena())
         {
             const WorldLocation& _loc = GetBattleGroundEntryPoint();

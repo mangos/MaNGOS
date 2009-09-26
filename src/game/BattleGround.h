@@ -85,9 +85,9 @@ enum BattleGroundSpells
 enum BattleGroundTimeIntervals
 {
     RESURRECTION_INTERVAL           = 30000,                // ms
-    REMIND_INTERVAL                 = 30000,                // ms
-    INVITATION_REMIND_TIME          = 60000,                // ms
-    INVITE_ACCEPT_WAIT_TIME         = 80000,                // ms
+    //REMIND_INTERVAL                 = 10000,                // ms
+    INVITATION_REMIND_TIME          = 20000,                // ms
+    INVITE_ACCEPT_WAIT_TIME         = 40000,                // ms
     TIME_TO_AUTOREMOVE              = 120000,               // ms
     MAX_OFFLINE_TIME                = 300,                  // secs
     RESPAWN_ONE_DAY                 = 86400,                // secs
