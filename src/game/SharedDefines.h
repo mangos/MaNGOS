@@ -1052,6 +1052,7 @@ enum Targets
     TARGET_AREAEFFECT_PARTY_AND_CLASS  = 61,
     TARGET_DUELVSPLAYER_COORDINATES    = 63,
     TARGET_BEHIND_VICTIM               = 65,                // uses in teleport behind spells, caster/target dependent from spell effect
+    TARGET_RANDOM_NEARBY_LOC           = 72,                // uses in teleport onto nearby locations
     TARGET_DYNAMIC_OBJECT_COORDINATES  = 76,
     TARGET_SINGLE_ENEMY                = 77,
     TARGET_POINT_AT_NORTH              = 78,                // 78-85 possible _COORDINATES at radius with pi/4 step around target in unknown order, N?
@@ -1062,6 +1063,7 @@ enum Targets
     TARGET_POINT_AT_NW                 = 83,                // from spell desc: "(NW)"
     TARGET_POINT_AT_SE                 = 84,                // from spell desc: "(SE)"
     TARGET_POINT_AT_SW                 = 85,                // from spell desc: "(SW)"
+    TARGET_RANDOM_NEARBY_DEST          = 86,                // "Test Nearby Dest Random" - random around selected destination
     TARGET_SELF2                       = 87,
     TARGET_DIRECTLY_FORWARD            = 89,
     TARGET_NONCOMBAT_PET               = 90,
