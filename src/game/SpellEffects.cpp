@@ -4591,14 +4591,36 @@ void Spell::EffectWeaponDmg(uint32 i)
                 if (count)
                 {
                     // Effect 1(for Blood-Caked Strike)/3(other) damage is bonus
-                    double bonus = count * CalculateDamage(m_spellInfo->SpellIconID == 1736 ? 0 : 2, unitTarget) / 100.0f;
+                    float bonus = count * CalculateDamage(m_spellInfo->SpellIconID == 1736 ? 0 : 2, unitTarget) / 100.0f;
                     // Blood Strike, Blood-Caked Strike and Obliterate store bonus*2
                     if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0002000000400000) ||
                         m_spellInfo->SpellIconID == 1736)
                         bonus /= 2.0f;
 
-                    totalDamagePercentMod += bonus;
+                    totalDamagePercentMod *= 1.0f + bonus;
                 }
+            }
+            // Glyph of Blood Strike
+            if( m_spellInfo->SpellFamilyFlags & UI64LIT(0x0000000000400000) &&
+                m_caster->HasAura(59332) &&
+                unitTarget->HasAuraType(SPELL_AURA_MOD_DECREASE_SPEED))
+            {
+                totalDamagePercentMod *= 1.2f;              // 120% if snared
+            }
+            // Glyph of Death Strike
+            if( m_spellInfo->SpellFamilyFlags & UI64LIT(0x0000000000000010) &&
+                m_caster->HasAura(59336))
+            {
+                int32 rp = m_caster->GetPower(POWER_RUNIC_POWER) / 10;
+                if(rp > 25)
+                    rp = 25;
+                totalDamagePercentMod *= 1.0f + rp / 100.0f;
+            }
+            // Glyph of Plague Strike
+            if( m_spellInfo->SpellFamilyFlags & UI64LIT(0x0000000000000001) &&
+                m_caster->HasAura(58657) )
+            {
+                totalDamagePercentMod *= 1.2f;
             }
             break;
         }
