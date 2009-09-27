@@ -1314,10 +1314,12 @@ void Spell::SetTargetMap(uint32 effIndex,uint32 targetMode,UnitList& TagUnitMap)
     switch(targetMode)
     {
         case TARGET_RANDOM_NEARBY_LOC:
-        case TARGET_RANDOM_NEARBY_LOC_LR:
+            radius *= sqrt(rand_norm()); // Get a random point in circle. Use sqrt(rand) to correct distribution when converting polar to Cartesian coordinates.
+        case TARGET_RANDOM_CIRCUMFERENCE_POINT:
         {
-            float dest_x = m_caster->GetPositionX() + irand(-radius, radius);
-            float dest_y = m_caster->GetPositionY() + irand(-radius, radius);
+            float angle = 2.0 * M_PI * rand_norm();
+            float dest_x = m_caster->GetPositionX() + cos(angle) * radius;
+            float dest_y = m_caster->GetPositionY() + sin(angle) * radius;
             float dest_z = m_caster->GetMap()->GetHeight(dest_x, dest_y, MAX_HEIGHT);
             m_targets.setDestination(dest_x, dest_y, dest_z);
 
@@ -1326,8 +1328,10 @@ void Spell::SetTargetMap(uint32 effIndex,uint32 targetMode,UnitList& TagUnitMap)
         }
         case TARGET_RANDOM_NEARBY_DEST:
         {
-            float dest_x = m_targets.m_destX + irand(-radius, radius);
-            float dest_y = m_targets.m_destY + irand(-radius, radius);
+            radius *= sqrt(rand_norm()); // Get a random point in circle. Use sqrt(rand) to correct distribution when converting polar to Cartesian coordinates.
+            float angle = 2.0 * M_PI * rand_norm();
+            float dest_x = m_targets.m_destX + cos(angle) * radius;
+            float dest_y = m_targets.m_destY + sin(angle) * radius;
             float dest_z = m_caster->GetMap()->GetHeight(dest_x, dest_y, MAX_HEIGHT);
             m_targets.setDestination(dest_x, dest_y, dest_z);
 
