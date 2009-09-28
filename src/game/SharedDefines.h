@@ -1032,6 +1032,7 @@ enum Targets
     TARGET_ALL_PARTY                   = 33,
     TARGET_ALL_PARTY_AROUND_CASTER_2   = 34,                // used in Tranquility
     TARGET_SINGLE_PARTY                = 35,
+    TARGET_ALL_HOSTILE_UNITS_AROUND_CASTER = 36,
     TARGET_AREAEFFECT_PARTY            = 37,
     TARGET_SCRIPT                      = 38,
     TARGET_SELF_FISHING                = 39,
