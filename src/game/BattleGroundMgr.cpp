@@ -42,7 +42,7 @@
 #include "ArenaTeam.h"
 #include "World.h"
 #include "WorldPacket.h"
-#include "ProgressBar.h"
+#include "GameEventMgr.h"
 
 #include "Policies/SingletonImp.h"
 
@@ -1902,16 +1902,6 @@ void BattleGroundMgr::SendToBattleGround(Player *pl, uint32 instanceId, BattleGr
     }
 }
 
-void BattleGroundMgr::SendAreaSpiritHealerQueryOpcode(Player *pl, BattleGround *bg, const uint64& guid)
-{
-    WorldPacket data(SMSG_AREA_SPIRIT_HEALER_TIME, 12);
-    uint32 time_ = 30000 - bg->GetLastResurrectTime();      // resurrect every 30 seconds
-    if (time_ == uint32(-1))
-        time_ = 0;
-    data << guid << time_;
-    pl->GetSession()->SendPacket(&data);
-}
-
 bool BattleGroundMgr::IsArenaType(BattleGroundTypeId bgTypeId)
 {
     return ( bgTypeId == BATTLEGROUND_AA ||
@@ -2100,3 +2090,128 @@ void BattleGroundMgr::LoadBattleMastersEntry()
     sLog.outString( ">> Loaded %u battlemaster entries", count );
 }
 
+bool BattleGroundMgr::IsBGWeekend(BattleGroundTypeId bgTypeId)
+{
+    switch (bgTypeId)
+    {
+        case BATTLEGROUND_AV:
+            return IsHolidayActive(HOLIDAY_CALL_TO_ARMS_AV);
+        case BATTLEGROUND_EY:
+            return IsHolidayActive(HOLIDAY_CALL_TO_ARMS_EY);
+        case BATTLEGROUND_WS:
+            return IsHolidayActive(HOLIDAY_CALL_TO_ARMS_WS);
+        case BATTLEGROUND_SA:
+            return IsHolidayActive(HOLIDAY_CALL_TO_ARMS_SA);
+        default:
+            return false;
+    }
+}
+
+void BattleGroundMgr::LoadBattleEventIndexes()
+{
+    BattleGroundEventIdx events;
+    events.event1 = BG_EVENT_NONE;
+    events.event2 = BG_EVENT_NONE;
+    m_GameObjectBattleEventIndexMap.clear();             // need for reload case
+    m_GameObjectBattleEventIndexMap[-1] = events;
+    m_CreatureBattleEventIndexMap.clear();               // need for reload case
+    m_CreatureBattleEventIndexMap[-1] = events;
+
+    uint32 count = 0;
+
+    QueryResult *result =
+        //                              0       1           2             3             4           5           6
+        WorldDatabase.PQuery( "SELECT data.typ, data.guid1, data.ev1 ev1, data.ev2 ev2, data.map m, data.guid2, description.map, "
+        //                              7                  8                   9
+                                      "description.event1, description.event2, description.description "
+                                 "FROM "
+                                    "(SELECT 1 typ, a.guid guid1, a.event1 ev1, a.event2 ev2, b.map map, b.guid guid2 "
+                                        "FROM gameobject_battleground a "
+                                        "LEFT OUTER JOIN gameobject b ON a.guid = b.guid "
+                                     "UNION "
+                                     "SELECT 2 typ, a.guid guid1, a.event1 ev1, a.event2 ev2, b.map map, b.guid guid2 "
+                                        "FROM creature_battleground a "
+                                        "LEFT OUTER JOIN creature b ON a.guid = b.guid "
+                                    ") data "
+                                    "RIGHT OUTER JOIN battleground_events description ON data.map = description.map "
+                                        "AND data.ev1 = description.event1 AND data.ev2 = description.event2 "
+        // full outer join doesn't work in mysql :-/ so just UNION-select the same again and add a left outer join
+                              "UNION "
+                              "SELECT data.typ, data.guid1, data.ev1, data.ev2, data.map, data.guid2, description.map, "
+                                      "description.event1, description.event2, description.description "
+                                 "FROM "
+                                    "(SELECT 1 typ, a.guid guid1, a.event1 ev1, a.event2 ev2, b.map map, b.guid guid2 "
+                                        "FROM gameobject_battleground a "
+                                        "LEFT OUTER JOIN gameobject b ON a.guid = b.guid "
+                                     "UNION "
+                                     "SELECT 2 typ, a.guid guid1, a.event1 ev1, a.event2 ev2, b.map map, b.guid guid2 "
+                                        "FROM creature_battleground a "
+                                        "LEFT OUTER JOIN creature b ON a.guid = b.guid "
+                                    ") data "
+                                    "LEFT OUTER JOIN battleground_events description ON data.map = description.map "
+                                        "AND data.ev1 = description.event1 AND data.ev2 = description.event2 "
+                              "ORDER BY m, ev1, ev2" );
+    if( !result )
+    {
+        barGoLink bar( 1 );
+        bar.step();
+    }
+    barGoLink bar( result->GetRowCount() );
+    do
+    {
+        bar.step();
+        Field *fields = result->Fetch();
+        if (fields[2].GetUInt8() == BG_EVENT_NONE || fields[3].GetUInt8() == BG_EVENT_NONE)
+            continue;                                       // we don't need to add those to the eventmap
+
+        bool gameobject         = (fields[0].GetUInt8() == 1);
+        uint32 dbTableGuidLow   = fields[1].GetUInt32();
+        events.event1           = fields[2].GetUInt8();
+        events.event2           = fields[3].GetUInt8();
+        uint32 map              = fields[4].GetUInt32();
+
+        uint32 desc_map = fields[6].GetUInt32();
+        uint8 desc_event1 = fields[7].GetUInt8();
+        uint8 desc_event2 = fields[8].GetUInt8();
+        const char *description = fields[9].GetString();
+
+        // checking for NULL - through right outer join this will mean following:
+        if (fields[5].GetUInt32() != dbTableGuidLow)
+        {
+            sLog.outErrorDb("BattleGroundEvent: %s with nonexistant guid %u for event: map:%u, event1:%u, event2:%u (\"%s\")",
+                (gameobject) ? "gameobject" : "creature", dbTableGuidLow, map, events.event1, events.event2, description);
+            continue;
+        }
+
+        // checking for NULL - through full outer join this can mean 2 things:
+        if (desc_map != map)
+        {
+            // there is an event missing
+            if (dbTableGuidLow == 0)
+            {
+                sLog.outErrorDb("BattleGroundEvent: missing db-data for map:%u, event1:%u, event2:%u (\"%s\")", desc_map, desc_event1, desc_event2, description);
+                continue;
+            }
+            // we have an event which shouldn't exist
+            else
+            {
+                sLog.outErrorDb("BattleGroundEvent: %s with guid %u is registered, for a nonexistant event: map:%u, event1:%u, event2:%u",
+                    (gameobject) ? "gameobject" : "creature", dbTableGuidLow, map, events.event1, events.event2);
+                continue;
+            }
+        }
+
+        if (gameobject)
+            m_GameObjectBattleEventIndexMap[dbTableGuidLow] = events;
+        else
+            m_CreatureBattleEventIndexMap[dbTableGuidLow] = events;
+
+        ++count;
+
+    } while( result->NextRow() );
+    sLog.outString();
+    sLog.outString( ">> Loaded %u battleground eventindexes", count);
+    if (count == 0)
+        return;
+    delete result;
+}

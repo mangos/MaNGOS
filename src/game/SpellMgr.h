@@ -198,6 +198,12 @@ inline bool IsPassiveSpellStackableWithRanks(SpellEntry const* spellProto)
     return !IsSpellHaveEffect(spellProto,SPELL_EFFECT_APPLY_AURA);
 }
 
+inline bool IsDeathOnlySpell(SpellEntry const *spellInfo)
+{
+    return spellInfo->AttributesEx & SPELL_ATTR_EX3_CAST_ON_DEAD
+        || spellInfo->Id == 2584
+        || spellInfo->Id == 22011;
+}
 
 inline bool IsDeathPersistentSpell(SpellEntry const *spellInfo)
 {

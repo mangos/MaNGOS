@@ -109,6 +109,9 @@ class MANGOS_DLL_SPEC CreatureAI
         // Is unit visible for MoveInLineOfSight
         virtual bool IsVisible(Unit *) const { return false; }
 
+        // called when the corpse of this creature gets removed
+        virtual void CorpseRemoved(uint32 & /*respawnDelay*/) {}
+
         // Called when victim entered water and creature can not enter water
         virtual bool canReachByRangeAttack(Unit*) { return false; }
 

@@ -307,7 +307,7 @@ void AuctionHouseMgr::LoadAuctionItems()
 
         if(!proto)
         {
-            sLog.outError( "ObjectMgr::LoadAuctionItems: Unknown item (GUID: %u id: #%u) in auction, skipped.", item_guid,item_template);
+            sLog.outError( "AuctionHouseMgr::LoadAuctionItems: Unknown item (GUID: %u id: #%u) in auction, skipped.", item_guid,item_template);
             continue;
         }
 
@@ -416,7 +416,7 @@ void AuctionHouseMgr::LoadAuctions()
         }
 
         // check if sold item exists for guid
-        // and item_template in fact (GetAItem will fail if problematic in result check in ObjectMgr::LoadAuctionItems)
+        // and item_template in fact (GetAItem will fail if problematic in result check in AuctionHouseMgr::LoadAuctionItems)
         if ( !GetAItem( aItem->item_guidlow ) )
         {
             aItem->DeleteFromDB();
