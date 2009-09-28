@@ -1054,7 +1054,10 @@ enum Targets
     TARGET_NARROW_FRONTAL_CONE         = 60,
     TARGET_AREAEFFECT_PARTY_AND_CLASS  = 61,
     TARGET_DUELVSPLAYER_COORDINATES    = 63,
+    TARGET_INFRONT_OF_VICTIM           = 64,
     TARGET_BEHIND_VICTIM               = 65,                // used in teleport behind spells, caster/target dependent from spell effect
+    TARGET_RIGHT_FROM_VICTIM           = 66,
+    TARGET_LEFT_FROM_VICTIM            = 67,
     TARGET_RANDOM_NEARBY_LOC           = 72,                // used in teleport onto nearby locations
     TARGET_RANDOM_CIRCUMFERENCE_POINT  = 73,
     TARGET_DYNAMIC_OBJECT_COORDINATES  = 76,

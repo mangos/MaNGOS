@@ -2022,7 +2022,10 @@ void Spell::SetTargetMap(uint32 effIndex,uint32 targetMode,UnitList& TagUnitMap)
                 sLog.outError( "SPELL: unknown target coordinates for spell ID %u", m_spellInfo->Id );
             break;
         }
+        case TARGET_INFRONT_OF_VICTIM:
         case TARGET_BEHIND_VICTIM:
+        case TARGET_RIGHT_FROM_VICTIM:
+        case TARGET_LEFT_FROM_VICTIM:
         {
             Unit *pTarget = NULL;
 
@@ -2037,8 +2040,19 @@ void Spell::SetTargetMap(uint32 effIndex,uint32 targetMode,UnitList& TagUnitMap)
 
             if(pTarget)
             {
+                float angle = 0.0f;
+                float dist = (radius && targetMode != TARGET_BEHIND_VICTIM) ? radius : CONTACT_DISTANCE;
+
+                switch(targetMode)
+                {
+                    case TARGET_INFRONT_OF_VICTIM:                   break;
+                    case TARGET_BEHIND_VICTIM:      angle = M_PI;    break;
+                    case TARGET_RIGHT_FROM_VICTIM:  angle = -M_PI/2;  break;
+                    case TARGET_LEFT_FROM_VICTIM:   angle = M_PI/2; break;
+                }
+
                 float _target_x, _target_y, _target_z;
-                pTarget->GetClosePoint(_target_x, _target_y, _target_z, m_caster->GetObjectSize(), CONTACT_DISTANCE, M_PI);
+                pTarget->GetClosePoint(_target_x, _target_y, _target_z, pTarget->GetObjectSize(), dist, angle);
                 if(pTarget->IsWithinLOS(_target_x, _target_y, _target_z))
                 {
                     TagUnitMap.push_back(m_caster);
