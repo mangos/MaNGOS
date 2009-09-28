@@ -2125,7 +2125,9 @@ void SpellMgr::LoadSpellScriptTarget()
             if( spellProto->EffectImplicitTargetA[i]==TARGET_SCRIPT ||
                 spellProto->EffectImplicitTargetB[i]==TARGET_SCRIPT ||
                 spellProto->EffectImplicitTargetA[i]==TARGET_SCRIPT_COORDINATES ||
-                spellProto->EffectImplicitTargetB[i]==TARGET_SCRIPT_COORDINATES )
+                spellProto->EffectImplicitTargetB[i]==TARGET_SCRIPT_COORDINATES ||
+                spellProto->EffectImplicitTargetA[i]==TARGET_FOCUS_OR_SCRIPTED_GAMEOBJECT ||
+                spellProto->EffectImplicitTargetB[i]==TARGET_FOCUS_OR_SCRIPTED_GAMEOBJECT )
             {
                 targetfound = true;
                 break;
@@ -2133,7 +2135,7 @@ void SpellMgr::LoadSpellScriptTarget()
         }
         if(!targetfound)
         {
-            sLog.outErrorDb("Table `spell_script_target`: spellId %u listed for TargetEntry %u does not have any implicit target TARGET_SCRIPT(38) or TARGET_SCRIPT_COORDINATES (46).",spellId,targetEntry);
+            sLog.outErrorDb("Table `spell_script_target`: spellId %u listed for TargetEntry %u does not have any implicit target TARGET_SCRIPT(38) or TARGET_SCRIPT_COORDINATES (46) or TARGET_FOCUS_OR_SCRIPTED_GAMEOBJECT (40).",spellId,targetEntry);
             continue;
         }
 

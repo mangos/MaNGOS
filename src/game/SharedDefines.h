@@ -1035,6 +1035,7 @@ enum Targets
     TARGET_AREAEFFECT_PARTY            = 37,
     TARGET_SCRIPT                      = 38,
     TARGET_SELF_FISHING                = 39,
+    TARGET_FOCUS_OR_SCRIPTED_GAMEOBJECT= 40,
     TARGET_TOTEM_EARTH                 = 41,
     TARGET_TOTEM_WATER                 = 42,
     TARGET_TOTEM_AIR                   = 43,
