@@ -98,6 +98,7 @@ void BattleGroundWS::StartingEventOpenDoors()
 
     // TODO implement timer to despawn doors after a short while
 
+    SpawnEvent(WS_EVENT_SPIRITGUIDES_SPAWN, 0, true);
     SpawnEvent(WS_EVENT_FLAG_A, 0, true);
     SpawnEvent(WS_EVENT_FLAG_H, 0, true);
 }
