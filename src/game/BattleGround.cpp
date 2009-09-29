@@ -1564,7 +1564,16 @@ void BattleGround::HandleTriggerBuff(uint64 const& go_guid)
     if (!obj || obj->GetGoType() != GAMEOBJECT_TYPE_TRAP || !obj->isSpawned())
         return;
 
-    //change buff type, when buff is used:
+    // static buffs are already handled just by database and don't need
+    // battleground code
+    if (!m_BuffChange)
+    {
+        obj->SetLootState(GO_JUST_DEACTIVATED);             // can be despawned or destroyed
+        return;
+    }
+
+    // change buff type, when buff is used:
+    // TODO this can be done when poolsystem works for instances
     int32 index = m_BgObjects.size() - 1;
     while (index >= 0 && m_BgObjects[index] != go_guid)
         index--;
