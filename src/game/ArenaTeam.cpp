@@ -198,6 +198,9 @@ bool ArenaTeam::LoadMembersFromDB(QueryResult *arenaTeamMembersResult)
     do
     {
         Field *fields = arenaTeamMembersResult->Fetch();
+        //prevent crash if db records are broken, when all members in result are already processed and current team hasn't got any members
+        if (!fields)
+            break;
         uint32 arenaTeamId        = fields[0].GetUInt32();
         if (arenaTeamId < m_TeamId)
         {

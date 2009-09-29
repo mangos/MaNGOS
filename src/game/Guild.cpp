@@ -290,6 +290,9 @@ bool Guild::LoadRanksFromDB(QueryResult *guildRanksResult)
     do
     {
         fields = guildRanksResult->Fetch();
+        //condition that would be true when all ranks in QueryResult will be processed and guild without ranks is being processed
+        if (!fields)
+            break;
 
         uint32 guildId       = fields[0].GetUInt32();
         if (guildId < m_Id)
@@ -352,6 +355,9 @@ bool Guild::LoadMembersFromDB(QueryResult *guildMembersResult)
     do
     {
         Field *fields = guildMembersResult->Fetch();
+        //this condition will be true when all rows in QueryResult are processed and new guild without members is going to be loaded - prevent crash
+        if (!fields)
+            break;
         uint32 guildId       = fields[0].GetUInt32();
         if (guildId < m_Id)
         {
@@ -1461,6 +1467,9 @@ bool Guild::LoadBankRightsFromDB(QueryResult *guildBankTabRightsResult)
     do
     {
         Field *fields      = guildBankTabRightsResult->Fetch();
+        //prevent crash when all rights in result are already processed
+        if (!fields)
+            break;
         uint32 guildId     = fields[0].GetUInt32();
         if (guildId < m_Id)
         {
