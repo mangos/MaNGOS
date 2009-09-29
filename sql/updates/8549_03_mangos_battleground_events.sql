@@ -89,4 +89,4 @@ INSERT INTO battleground_events (map, event1, event2, description) VALUES
     (@RL_MAP, 254, 0, 'doors'),
 
     (@BE_MAP, 253, 0, 'buffs'),
-    (@BE_MAP, 254, 0, 'doors')
+    (@BE_MAP, 254, 0, 'doors');
