@@ -7400,6 +7400,17 @@ void Aura::HandleModTargetArmorPct(bool apply, bool Real)
 
 void Aura::HandleAuraModAllCritChance(bool apply, bool Real)
 {
-    this->HandleAuraModCritPercent(apply, Real);
-    this->HandleModSpellCritChance(apply, Real);
+    // spells required only Real aura add/remove
+    if(!Real)
+        return;
+
+    if(m_target->GetTypeId() != TYPEID_PLAYER)
+        return;
+
+    ((Player*)m_target)->HandleBaseModValue(CRIT_PERCENTAGE,         FLAT_MOD, float (m_modifier.m_amount), apply);
+    ((Player*)m_target)->HandleBaseModValue(OFFHAND_CRIT_PERCENTAGE, FLAT_MOD, float (m_modifier.m_amount), apply);
+    ((Player*)m_target)->HandleBaseModValue(RANGED_CRIT_PERCENTAGE,  FLAT_MOD, float (m_modifier.m_amount), apply);
+
+    // included in Player::UpdateSpellCritChance calculation
+    ((Player*)m_target)->UpdateAllSpellCritChances();
 }
