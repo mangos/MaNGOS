@@ -875,6 +875,13 @@ int main(int argc, char *argv[])
         }
     }
 
+    if (local && do_sql)
+    {
+        printf("Options -l/--local and -s/--sql can't be used in same time currently.\n");
+        printf("FAILED\n");
+        return 1;
+    }
+
     DO( find_path()                     );
     if(!local)
     {
