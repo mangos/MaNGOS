@@ -491,7 +491,6 @@ class ChatHandler
         bool HandleWaterwalkCommand(const char* args);
 
         //! Development Commands
-        bool HandleSet32Bit(const char* args);
         bool HandleSaveAllCommand(const char* args);
 
         Player*   getSelectedPlayer();

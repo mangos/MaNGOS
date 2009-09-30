@@ -1299,7 +1299,7 @@ void WorldSession::HandleSocketOpcode(WorldPacket& recv_data)
         _player->ApplyEnchantment(itemTarget,EnchantmentSlot(enchant_slot),true);
 
     bool SocketBonusToBeActivated = itemTarget->GemsFitSockets();//current socketbonus state
-    if(SocketBonusActivated ^ SocketBonusToBeActivated)     //if there was a change...
+    if(SocketBonusActivated != SocketBonusToBeActivated)    //if there was a change...
     {
         _player->ApplyEnchantment(itemTarget,BONUS_ENCHANTMENT_SLOT,false);
         itemTarget->SetEnchantment(BONUS_ENCHANTMENT_SLOT, (SocketBonusToBeActivated ? itemTarget->GetProto()->socketBonus : 0), 0, 0);
