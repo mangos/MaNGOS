@@ -468,7 +468,7 @@ void BattleGroundEY::RespawnFlagAfterDrop()
 {
     RespawnFlag(true);
 
-    GameObject *obj = HashMapHolder<GameObject>::Find(GetDroppedFlagGUID());
+    GameObject *obj = GetBgMap()->GetGameObject(GetDroppedFlagGUID());
     if (obj)
         obj->Delete();
     else

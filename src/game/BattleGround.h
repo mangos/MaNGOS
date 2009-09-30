@@ -36,6 +36,7 @@ class GameObject;
 class Group;
 class Player;
 class WorldPacket;
+class BattleGroundMap;
 
 struct WorldSafeLocsEntry;
 
@@ -394,6 +395,14 @@ class BattleGround
         void SetMapId(uint32 MapID) { m_MapId = MapID; }
         uint32 GetMapId() const { return m_MapId; }
 
+        /* Map pointers */
+        void SetBgMap(BattleGroundMap* map) { m_Map = map; }
+        BattleGroundMap* GetBgMap()
+        {
+            ASSERT(m_Map);
+            return m_Map;
+        }
+
         void SetTeamStartLoc(uint32 TeamID, float X, float Y, float Z, float O);
         void GetTeamStartLoc(uint32 TeamID, float &X, float &Y, float &Z, float &O) const
         {
@@ -618,6 +627,7 @@ class BattleGround
 
         /* Start location */
         uint32 m_MapId;
+        BattleGroundMap* m_Map;
         float m_TeamStartLocX[BG_TEAMS_COUNT];
         float m_TeamStartLocY[BG_TEAMS_COUNT];
         float m_TeamStartLocZ[BG_TEAMS_COUNT];
