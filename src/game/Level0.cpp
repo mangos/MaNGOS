@@ -22,7 +22,6 @@
 #include "Player.h"
 #include "Opcodes.h"
 #include "Chat.h"
-#include "ObjectAccessor.h"
 #include "Language.h"
 #include "AccountMgr.h"
 #include "SystemConfig.h"

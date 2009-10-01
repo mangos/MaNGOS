@@ -23,7 +23,6 @@
 #include "Player.h"
 #include "ObjectMgr.h"
 #include "WorldSession.h"
-#include "ObjectAccessor.h"
 #include "Object.h"
 #include "Chat.h"
 #include "BattleGroundMgr.h"

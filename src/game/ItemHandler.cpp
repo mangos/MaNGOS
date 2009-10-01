@@ -25,7 +25,6 @@
 #include "Player.h"
 #include "Item.h"
 #include "UpdateData.h"
-#include "ObjectAccessor.h"
 
 void WorldSession::HandleSplitItemOpcode( WorldPacket & recv_data )
 {
