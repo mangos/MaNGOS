@@ -2809,7 +2809,7 @@ SpellCastResult SpellMgr::GetSpellAllowedInLocationError(SpellEntry const *spell
     // - with greater than 15 min CD
     if ((spellInfo->AttributesEx4 & SPELL_ATTR_EX4_NOT_USABLE_IN_ARENA) ||
          (GetSpellRecoveryTime(spellInfo) > 15 * MINUTE * IN_MILISECONDS && !(spellInfo->AttributesEx4 & SPELL_ATTR_EX4_USABLE_IN_ARENA)))
-        if (!player || !player->InArena())
+        if (player && player->InArena())
             return SPELL_FAILED_NOT_IN_ARENA;
 
     // Spell casted only on battleground

@@ -533,8 +533,8 @@ enum MangosStrings
     LANG_GET_UINT_FIELD                 = 570,
     LANG_GET_FLOAT                      = 571,              //log
     LANG_GET_FLOAT_FIELD                = 572,
-    LANG_SET_32BIT                      = 573,              //log
-    LANG_SET_32BIT_FIELD                = 574,
+    //                                    573,              //not used
+    //                                    574,              //not used
     LANG_CHANGE_32BIT                   = 575,              //log
     LANG_CHANGE_32BIT_FIELD             = 576,
 

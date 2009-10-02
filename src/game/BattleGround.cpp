@@ -152,6 +152,7 @@ BattleGround::BattleGround()
     m_MinPlayers        = 0;
 
     m_MapId             = 0;
+    m_Map               = NULL;
 
     m_TeamStartLocX[BG_TEAM_ALLIANCE]   = 0;
     m_TeamStartLocX[BG_TEAM_HORDE]      = 0;
@@ -214,10 +215,12 @@ BattleGround::~BattleGround()
     }
 
     sBattleGroundMgr.RemoveBattleGround(GetInstanceID(), GetTypeID());
+
     // unload map
-    if (Map * map = MapManager::Instance().FindMap(GetMapId(), GetInstanceID()))
-        if (map->IsBattleGroundOrArena())
-            ((BattleGroundMap*)map)->SetUnload();
+    // map can be null at bg destruction
+    if (m_Map)
+        m_Map->SetUnload();
+
     // remove from bg free slot queue
     this->RemoveFromBGFreeSlotQueue();
 
@@ -1292,15 +1295,11 @@ void BattleGround::UpdatePlayerScore(Player *Source, uint32 type, uint32 value)
 
 bool BattleGround::AddObject(uint32 type, uint32 entry, float x, float y, float z, float o, float rotation0, float rotation1, float rotation2, float rotation3, uint32 respawnTime)
 {
-    Map * map = MapManager::Instance().FindMap(GetMapId(),GetInstanceID());
-    if (!map)
-        return false;
-
     // must be created this way, adding to godatamap would add it to the base map of the instance
     // and when loading it (in go::LoadFromDB()), a new guid would be assigned to the object, and a new object would be created
     // so we must create it specific for this instance
     GameObject * go = new GameObject;
-    if(!go->Create(objmgr.GenerateLowGuid(HIGHGUID_GAMEOBJECT),entry, map,
+    if(!go->Create(objmgr.GenerateLowGuid(HIGHGUID_GAMEOBJECT),entry, GetBgMap(),
         PHASEMASK_NORMAL, x,y,z,o,rotation0,rotation1,rotation2,rotation3,100,GO_STATE_READY))
     {
         sLog.outErrorDb("Gameobject template %u not found in database! BattleGround not created!", entry);
@@ -1340,7 +1339,7 @@ bool BattleGround::AddObject(uint32 type, uint32 entry, float x, float y, float 
 //it would be nice to correctly implement GO_ACTIVATED state and open/close doors in gameobject code
 void BattleGround::DoorClose(uint64 const& guid)
 {
-    GameObject *obj = HashMapHolder<GameObject>::Find(guid);
+    GameObject *obj = GetBgMap()->GetGameObject(guid);
     if (obj)
     {
         //if doors are open, close it
@@ -1359,7 +1358,7 @@ void BattleGround::DoorClose(uint64 const& guid)
 
 void BattleGround::DoorOpen(uint64 const& guid)
 {
-    GameObject *obj = HashMapHolder<GameObject>::Find(guid);
+    GameObject *obj = GetBgMap()->GetGameObject(guid);
     if (obj)
     {
         //change state to be sure they will be opened
@@ -1459,11 +1458,10 @@ void BattleGround::SpawnEvent(uint8 event1, uint8 event2, bool spawn)
 
 void BattleGround::SpawnBGObject(uint64 const& guid, uint32 respawntime)
 {
-    GameObject *obj = HashMapHolder<GameObject>::Find(guid);
+    Map* map = GetBgMap();
+
+    GameObject *obj = map->GetGameObject(guid);
     if(!obj)
-        return;
-    Map * map = MapManager::Instance().FindMap(GetMapId(),GetInstanceID());
-    if (!map)
         return;
     if (respawntime == 0)
     {
@@ -1483,11 +1481,10 @@ void BattleGround::SpawnBGObject(uint64 const& guid, uint32 respawntime)
 
 void BattleGround::SpawnBGCreature(uint64 const& guid, uint32 respawntime)
 {
-    Creature* obj = HashMapHolder<Creature>::Find(guid);
+    Map* map = GetBgMap();
+
+    Creature* obj = map->GetCreature(guid);
     if (!obj)
-        return;
-    Map * map = MapManager::Instance().FindMap(GetMapId(),GetInstanceID());
-    if (!map)
         return;
     if (respawntime == 0)
     {
@@ -1508,12 +1505,13 @@ bool BattleGround::DelObject(uint32 type)
     if (!m_BgObjects[type])
         return true;
 
-    GameObject *obj = HashMapHolder<GameObject>::Find(m_BgObjects[type]);
+    GameObject *obj = GetBgMap()->GetGameObject(m_BgObjects[type]);
     if (!obj)
     {
         sLog.outError("Can't find gobject guid: %u",GUID_LOPART(m_BgObjects[type]));
         return false;
     }
+
     obj->SetRespawnTime(0);                                 // not save respawn time
     obj->Delete();
     m_BgObjects[type] = 0;
@@ -1560,11 +1558,20 @@ buffs are in their positions when battleground starts
 */
 void BattleGround::HandleTriggerBuff(uint64 const& go_guid)
 {
-    GameObject *obj = HashMapHolder<GameObject>::Find(go_guid);
+    GameObject *obj = GetBgMap()->GetGameObject(go_guid);
     if (!obj || obj->GetGoType() != GAMEOBJECT_TYPE_TRAP || !obj->isSpawned())
         return;
 
-    //change buff type, when buff is used:
+    // static buffs are already handled just by database and don't need
+    // battleground code
+    if (!m_BuffChange)
+    {
+        obj->SetLootState(GO_JUST_DEACTIVATED);             // can be despawned or destroyed
+        return;
+    }
+
+    // change buff type, when buff is used:
+    // TODO this can be done when poolsystem works for instances
     int32 index = m_BgObjects.size() - 1;
     while (index >= 0 && m_BgObjects[index] != go_guid)
         index--;

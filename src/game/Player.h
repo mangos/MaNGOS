@@ -1045,6 +1045,8 @@ class MANGOS_DLL_SPEC Player : public Unit
         bool CanInteractWithNPCs(bool alive = true) const;
         GameObject* GetGameObjectIfCanInteractWith(uint64 guid, GameobjectTypes type) const;
 
+        void UpdateVisibilityForPlayer();
+
         bool ToggleAFK();
         bool ToggleDND();
         bool isAFK() const { return HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_AFK); }

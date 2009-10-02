@@ -1220,7 +1220,8 @@ bool Spell::IsAliveUnitPresentInTargetList()
         {
             Unit *unit = m_caster->GetGUID() == ihit->targetGUID ? m_caster : ObjectAccessor::GetUnit(*m_caster, ihit->targetGUID);
 
-            if (unit && (unit->isAlive() ^ IsDeathOnlySpell(m_spellInfo)))
+            // either unit is alive and normal spell, or unit dead and deathonly-spell
+            if (unit && (unit->isAlive() != IsDeathOnlySpell(m_spellInfo)))
                 needAliveTargetMask &= ~ihit->effectMask;   // remove from need alive mask effect that have alive target
         }
     }
@@ -1359,9 +1360,8 @@ void Spell::SetTargetMap(uint32 effIndex,uint32 targetMode,UnitList& TagUnitMap)
         case TARGET_RANDOM_CIRCUMFERENCE_POINT:
         {
             float angle = 2.0 * M_PI * rand_norm();
-            float dest_x = m_caster->GetPositionX() + cos(angle) * radius;
-            float dest_y = m_caster->GetPositionY() + sin(angle) * radius;
-            float dest_z = m_caster->GetMap()->GetHeight(dest_x, dest_y, MAX_HEIGHT);
+            float dest_x, dest_y, dest_z;
+            m_caster->GetClosePoint(dest_x, dest_y, dest_z, 0.0f, radius, angle);
             m_targets.setDestination(dest_x, dest_y, dest_z);
 
             TagUnitMap.push_back(m_caster);
@@ -1371,9 +1371,8 @@ void Spell::SetTargetMap(uint32 effIndex,uint32 targetMode,UnitList& TagUnitMap)
         {
             radius *= sqrt(rand_norm()); // Get a random point in circle. Use sqrt(rand) to correct distribution when converting polar to Cartesian coordinates.
             float angle = 2.0 * M_PI * rand_norm();
-            float dest_x = m_targets.m_destX + cos(angle) * radius;
-            float dest_y = m_targets.m_destY + sin(angle) * radius;
-            float dest_z = m_caster->GetMap()->GetHeight(dest_x, dest_y, MAX_HEIGHT);
+            float dest_x, dest_y, dest_z;
+            m_caster->GetClosePoint(dest_x, dest_y, dest_z, 0.0f, radius, angle);
             m_targets.setDestination(dest_x, dest_y, dest_z);
 
             if (radius > 0.0f)
@@ -1700,13 +1699,24 @@ void Spell::SetTargetMap(uint32 effIndex,uint32 targetMode,UnitList& TagUnitMap)
             m_targets.setDestination(caster->GetPositionX(), caster->GetPositionY(), caster->GetPositionZ());
             break;
         }
+        case TARGET_ALL_HOSTILE_UNITS_AROUND_CASTER:
+            FillAreaTargets(TagUnitMap, m_targets.m_destX, m_targets.m_destY, radius, PUSH_SELF_CENTER, SPELL_TARGETS_HOSTILE);
+            break;
         case TARGET_ALL_FRIENDLY_UNITS_AROUND_CASTER:
-            // special target order
-            if (m_spellInfo->Id==64904)                     // Hymn of Hope
-                // target amount stored in parent spell dummy effect but hard for access
-                FillRaidOrPartyManaPriorityTargets(TagUnitMap, m_caster, m_caster, radius, 3, true, false, false);
-            else
-                FillAreaTargets(TagUnitMap, m_targets.m_destX, m_targets.m_destY, radius, PUSH_SELF_CENTER, SPELL_TARGETS_FRIENDLY);
+            switch (m_spellInfo->Id)
+            {
+                case 64844:                                     // Divine Hymn
+                    // target amount stored in parent spell dummy effect but hard to access
+                    FillRaidOrPartyHealthPriorityTargets(TagUnitMap, m_caster, m_caster, radius, 3, true, false, false);
+                    break;
+                case 64904:                                     // Hymn of Hope
+                    // target amount stored in parent spell dummy effect but hard to access
+                    FillRaidOrPartyManaPriorityTargets(TagUnitMap, m_caster, m_caster, radius, 3, true, false, false);
+                    break;
+                default:
+                    FillAreaTargets(TagUnitMap, m_targets.m_destX, m_targets.m_destY, radius, PUSH_SELF_CENTER, SPELL_TARGETS_FRIENDLY);
+                    break;
+            }
             break;
         case TARGET_ALL_FRIENDLY_UNITS_IN_AREA:
             // Wild Growth

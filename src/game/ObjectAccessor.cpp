@@ -442,36 +442,6 @@ ObjectAccessor::WorldObjectChangeAccumulator::Visit(PlayerMapType &m)
             ObjectAccessor::_buildPacket(iter->getSource(), &i_object, i_updateDatas);
 }
 
-void
-ObjectAccessor::UpdateObjectVisibility(WorldObject *obj)
-{
-    CellPair p = MaNGOS::ComputeCellPair(obj->GetPositionX(), obj->GetPositionY());
-    Cell cell(p);
-
-    obj->GetMap()->UpdateObjectVisibility(obj, cell, p);
-}
-
-void ObjectAccessor::UpdateVisibilityForPlayer( Player* player )
-{
-    WorldObject const* viewPoint = player->GetViewPoint();
-    Map* m = player->GetMap();
-
-    CellPair p(MaNGOS::ComputeCellPair(player->GetPositionX(), player->GetPositionY()));
-    Cell cell(p);
-
-    m->UpdatePlayerVisibility(player, cell, p);
-
-    if (player!=viewPoint)
-    {
-        CellPair pView(MaNGOS::ComputeCellPair(viewPoint->GetPositionX(), viewPoint->GetPositionY()));
-        Cell cellView(pView);
-
-        m->UpdateObjectsVisibilityFor(player, cellView, pView);
-    }
-    else
-        m->UpdateObjectsVisibilityFor(player, cell, p);
-}
-
 /// Define the static member of HashMapHolder
 
 template <class T> UNORDERED_MAP< uint64, T* > HashMapHolder<T>::m_objectMap;

@@ -3922,7 +3922,7 @@ void Aura::HandleInvisibilityDetect(bool apply, bool Real)
             m_target->m_detectInvisibilityMask |= (1 << m_modifier.m_miscvalue);
     }
     if(Real && m_target->GetTypeId()==TYPEID_PLAYER)
-        ObjectAccessor::UpdateVisibilityForPlayer((Player*)m_target);
+        ((Player*)m_target)->UpdateVisibilityForPlayer();
 }
 
 void Aura::HandleAuraModRoot(bool apply, bool Real)
@@ -6271,7 +6271,7 @@ void Aura::HandleSchoolAbsorb(bool apply, bool Real)
 
 void Aura::PeriodicTick()
 {
-    if (!m_target->isAlive() ^ IsDeathOnlySpell(GetSpellProto()))
+    if (!m_target->isAlive() != IsDeathOnlySpell(GetSpellProto()))
         return;
 
     switch(m_modifier.m_auraname)
@@ -6771,229 +6771,243 @@ void Aura::PeriodicTick()
 
 void Aura::PeriodicDummyTick()
 {
-    Unit *caster = GetCaster();
     SpellEntry const* spell = GetSpellProto();
     switch (spell->SpellFamilyName)
     {
         case SPELLFAMILY_GENERIC:
-        switch (spell->Id)
-        {
-            // Drink
-            case 430:
-            case 431:
-            case 432:
-            case 1133:
-            case 1135:
-            case 1137:
-            case 10250:
-            case 22734:
-            case 27089:
-            case 34291:
-            case 43182:
-            case 43183:
-            case 43706:
-            case 46755:
-            case 49472: // Drink Coffee
-            case 57073:
-            case 61830:
+            switch (spell->Id)
             {
-                if (m_target->GetTypeId() != TYPEID_PLAYER)
-                    return;
-                // Search SPELL_AURA_MOD_POWER_REGEN aura for this spell and add bonus
-                Unit::AuraList const& aura = m_target->GetAurasByType(SPELL_AURA_MOD_POWER_REGEN);
-                for(Unit::AuraList::const_iterator i = aura.begin(); i != aura.end(); ++i)
+                // Drink
+                case 430:
+                case 431:
+                case 432:
+                case 1133:
+                case 1135:
+                case 1137:
+                case 10250:
+                case 22734:
+                case 27089:
+                case 34291:
+                case 43182:
+                case 43183:
+                case 43706:
+                case 46755:
+                case 49472: // Drink Coffee
+                case 57073:
+                case 61830:
                 {
-                    if ((*i)->GetId() == GetId())
-                    {
-                        (*i)->GetModifier()->m_amount = m_modifier.m_amount;
-                        ((Player*)m_target)->UpdateManaRegen();
-                        // Disable continue
-                        m_isPeriodic = false;
+                    if (m_target->GetTypeId() != TYPEID_PLAYER)
                         return;
+                    // Search SPELL_AURA_MOD_POWER_REGEN aura for this spell and add bonus
+                    Unit::AuraList const& aura = m_target->GetAurasByType(SPELL_AURA_MOD_POWER_REGEN);
+                    for(Unit::AuraList::const_iterator i = aura.begin(); i != aura.end(); ++i)
+                    {
+                        if ((*i)->GetId() == GetId())
+                        {
+                            (*i)->GetModifier()->m_amount = m_modifier.m_amount;
+                            ((Player*)m_target)->UpdateManaRegen();
+                            // Disable continue
+                            m_isPeriodic = false;
+                            return;
+                        }
+                    }
+                    return;
+                }
+                // Forsaken Skills
+                case 7054:
+                {
+                    // Possibly need cast one of them (but
+                    // 7038 Forsaken Skill: Swords
+                    // 7039 Forsaken Skill: Axes
+                    // 7040 Forsaken Skill: Daggers
+                    // 7041 Forsaken Skill: Maces
+                    // 7042 Forsaken Skill: Staves
+                    // 7043 Forsaken Skill: Bows
+                    // 7044 Forsaken Skill: Guns
+                    // 7045 Forsaken Skill: 2H Axes
+                    // 7046 Forsaken Skill: 2H Maces
+                    // 7047 Forsaken Skill: 2H Swords
+                    // 7048 Forsaken Skill: Defense
+                    // 7049 Forsaken Skill: Fire
+                    // 7050 Forsaken Skill: Frost
+                    // 7051 Forsaken Skill: Holy
+                    // 7053 Forsaken Skill: Shadow
+                    return;
+                }
+//              // Panda
+//              case 19230: break;
+//              // Gossip NPC Periodic - Talk
+//              case 33208: break;
+//              // Gossip NPC Periodic - Despawn
+//              case 33209: break;
+//              // Steal Weapon
+//              case 36207: break;
+//              // Simon Game START timer, (DND)
+//              case 39993: break;
+//              // Knockdown Fel Cannon: break; The Aggro Burst
+//              case 40119: break;
+//              // Old Mount Spell
+//              case 40154: break;
+//              // Magnetic Pull
+//              case 40581: break;
+//              // Ethereal Ring: break; The Bolt Burst
+//              case 40801: break;
+//              // Crystal Prison
+//              case 40846: break;
+//              // Copy Weapon
+//              case 41054: break;
+//              // Dementia
+//              case 41404: break;
+//              // Ethereal Ring Visual, Lightning Aura
+//              case 41477: break;
+//              // Ethereal Ring Visual, Lightning Aura (Fork)
+//              case 41525: break;
+//              // Ethereal Ring Visual, Lightning Jumper Aura
+//              case 41567: break;
+//              // No Man's Land
+//              case 41955: break;
+//              // Headless Horseman - Fire
+//              case 42074: break;
+//              // Headless Horseman - Visual - Large Fire
+//              case 42075: break;
+//              // Headless Horseman - Start Fire, Periodic Aura
+//              case 42140: break;
+//              // Ram Speed Boost
+//              case 42152: break;
+//              // Headless Horseman - Fires Out Victory Aura
+//              case 42235: break;
+//              // Pumpkin Life Cycle
+//              case 42280: break;
+//              // Brewfest Request Chick Chuck Mug Aura
+//              case 42537: break;
+//              // Squashling
+//              case 42596: break;
+//              // Headless Horseman Climax, Head: Periodic
+//              case 42603: break;
+//              // Fire Bomb
+//              case 42621: break;
+//              // Headless Horseman - Conflagrate, Periodic Aura
+//              case 42637: break;
+//              // Headless Horseman - Create Pumpkin Treats Aura
+//              case 42774: break;
+//              // Headless Horseman Climax - Summoning Rhyme Aura
+//              case 42879: break;
+//              // Tricky Treat
+//              case 42919: break;
+//              // Giddyup!
+//              case 42924: break;
+//              // Ram - Trot
+//              case 42992: break;
+//              // Ram - Canter
+//              case 42993: break;
+//              // Ram - Gallop
+//              case 42994: break;
+//              // Ram Level - Neutral
+//              case 43310: break;
+//              // Headless Horseman - Maniacal Laugh, Maniacal, Delayed 17
+//              case 43884: break;
+//              // Wretched!
+//              case 43963: break;
+//              // Headless Horseman - Maniacal Laugh, Maniacal, other, Delayed 17
+//              case 44000: break;
+//              // Energy Feedback
+//              case 44328: break;
+//              // Romantic Picnic
+//              case 45102: break;
+//              // Romantic Picnic
+//              case 45123: break;
+//              // Looking for Love
+//              case 45124: break;
+//              // Kite - Lightning Strike Kite Aura
+//              case 45197: break;
+//              // Rocket Chicken
+//              case 45202: break;
+//              // Copy Offhand Weapon
+//              case 45205: break;
+//              // Upper Deck - Kite - Lightning Periodic Aura
+//              case 45207: break;
+//              // Kite -Sky  Lightning Strike Kite Aura
+//              case 45251: break;
+//              // Ribbon Pole Dancer Check Aura
+//              case 45390: break;
+//              // Holiday - Midsummer, Ribbon Pole Periodic Visual
+//              case 45406: break;
+//              // Parachute
+//              case 45472: break;
+//              // Alliance Flag, Extra Damage Debuff
+//              case 45898: break;
+//              // Horde Flag, Extra Damage Debuff
+//              case 45899: break;
+//              // Ahune - Summoning Rhyme Aura
+//              case 45926: break;
+//              // Ahune - Slippery Floor
+//              case 45945: break;
+//              // Ahune's Shield
+//              case 45954: break;
+//              // Nether Vapor Lightning
+//              case 45960: break;
+//              // Darkness
+//              case 45996: break;
+//              // Summon Blood Elves Periodic
+//              case 46041: break;
+//              // Transform Visual Missile Periodic
+//              case 46205: break;
+//              // Find Opening Beam End
+//              case 46333: break;
+//              // Ice Spear Control Aura
+//              case 46371: break;
+//              // Hailstone Chill
+//              case 46458: break;
+//              // Hailstone Chill, Internal
+//              case 46465: break;
+//              // Chill, Internal Shifter
+//              case 46549: break;
+//              // Summon Ice Spear Knockback Delayer
+//              case 46878: break;
+//              // Burninate Effect
+//              case 47214: break;
+//              // Fizzcrank Practice Parachute
+//              case 47228: break;
+//              // Send Mug Control Aura
+//              case 47369: break;
+//              // Direbrew's Disarm (precast)
+//              case 47407: break;
+//              // Mole Machine Port Schedule
+//              case 47489: break;
+//              case 47941: break; // Crystal Spike
+//              case 48200: break; // Healer Aura
+//              case 48630: break; // Summon Gauntlet Mobs Periodic
+//              case 49313: break; // Proximity Mine Area Aura
+//              // Mole Machine Portal Schedule
+//              case 49466: break;
+//              case 49555: break; // Corpse Explode
+//              case 49592: break; // Temporal Rift
+//              case 49957: break; // Cutting Laser
+//              case 50085: break; // Slow Fall
+//              // Listening to Music
+//              case 50493: break;
+//              // Love Rocket Barrage
+//              case 50530: break;
+// Exist more after, need add later
+                default:
+                    break;
+            }
+            // Prey on the Weak
+            if (spell->SpellIconID == 2983)
+            {
+                Unit *target=m_target->getVictim();
+                if (target && (m_target->GetHealth() * 100 / m_target->GetMaxHealth() > target->GetHealth() * 100 / target->GetMaxHealth()))
+                {
+                    if(!m_target->HasAura(58670))
+                    {
+                        int32 basepoints = GetBasePoints();
+                        m_target->CastCustomSpell(m_target, 58670, &basepoints, 0, 0, true);
                     }
                 }
-                return;
+                else
+                    m_target->RemoveAurasDueToSpell(58670);
             }
-            // Forsaken Skills
-            case 7054:
-            {
-                // Possibly need cast one of them (but
-                // 7038 Forsaken Skill: Swords
-                // 7039 Forsaken Skill: Axes
-                // 7040 Forsaken Skill: Daggers
-                // 7041 Forsaken Skill: Maces
-                // 7042 Forsaken Skill: Staves
-                // 7043 Forsaken Skill: Bows
-                // 7044 Forsaken Skill: Guns
-                // 7045 Forsaken Skill: 2H Axes
-                // 7046 Forsaken Skill: 2H Maces
-                // 7047 Forsaken Skill: 2H Swords
-                // 7048 Forsaken Skill: Defense
-                // 7049 Forsaken Skill: Fire
-                // 7050 Forsaken Skill: Frost
-                // 7051 Forsaken Skill: Holy
-                // 7053 Forsaken Skill: Shadow
-                return;
-            }
-//        // Panda
-//        case 19230: break;
-//        // Gossip NPC Periodic - Talk
-//        case 33208: break;
-//        // Gossip NPC Periodic - Despawn
-//        case 33209: break;
-//        // Steal Weapon
-//        case 36207: break;
-//        // Simon Game START timer, (DND)
-//        case 39993: break;
-//        // Knockdown Fel Cannon: break; The Aggro Burst
-//        case 40119: break;
-//        // Old Mount Spell
-//        case 40154: break;
-//        // Magnetic Pull
-//        case 40581: break;
-//        // Ethereal Ring: break; The Bolt Burst
-//        case 40801: break;
-//        // Crystal Prison
-//        case 40846: break;
-//        // Copy Weapon
-//        case 41054: break;
-//        // Dementia
-//        case 41404: break;
-//        // Ethereal Ring Visual, Lightning Aura
-//        case 41477: break;
-//        // Ethereal Ring Visual, Lightning Aura (Fork)
-//        case 41525: break;
-//        // Ethereal Ring Visual, Lightning Jumper Aura
-//        case 41567: break;
-//        // No Man's Land
-//        case 41955: break;
-//        // Headless Horseman - Fire
-//        case 42074: break;
-//        // Headless Horseman - Visual - Large Fire
-//        case 42075: break;
-//        // Headless Horseman - Start Fire, Periodic Aura
-//        case 42140: break;
-//        // Ram Speed Boost
-//        case 42152: break;
-//        // Headless Horseman - Fires Out Victory Aura
-//        case 42235: break;
-//        // Pumpkin Life Cycle
-//        case 42280: break;
-//        // Brewfest Request Chick Chuck Mug Aura
-//        case 42537: break;
-//        // Squashling
-//        case 42596: break;
-//        // Headless Horseman Climax, Head: Periodic
-//        case 42603: break;
-//        // Fire Bomb
-//        case 42621: break;
-//        // Headless Horseman - Conflagrate, Periodic Aura
-//        case 42637: break;
-//        // Headless Horseman - Create Pumpkin Treats Aura
-//        case 42774: break;
-//        // Headless Horseman Climax - Summoning Rhyme Aura
-//        case 42879: break;
-//        // Tricky Treat
-//        case 42919: break;
-//        // Giddyup!
-//        case 42924: break;
-//        // Ram - Trot
-//        case 42992: break;
-//        // Ram - Canter
-//        case 42993: break;
-//        // Ram - Gallop
-//        case 42994: break;
-//        // Ram Level - Neutral
-//        case 43310: break;
-//        // Headless Horseman - Maniacal Laugh, Maniacal, Delayed 17
-//        case 43884: break;
-//        // Wretched!
-//        case 43963: break;
-//        // Headless Horseman - Maniacal Laugh, Maniacal, other, Delayed 17
-//        case 44000: break;
-//        // Energy Feedback
-//        case 44328: break;
-//        // Romantic Picnic
-//        case 45102: break;
-//        // Romantic Picnic
-//        case 45123: break;
-//        // Looking for Love
-//        case 45124: break;
-//        // Kite - Lightning Strike Kite Aura
-//        case 45197: break;
-//        // Rocket Chicken
-//        case 45202: break;
-//        // Copy Offhand Weapon
-//        case 45205: break;
-//        // Upper Deck - Kite - Lightning Periodic Aura
-//        case 45207: break;
-//        // Kite -Sky  Lightning Strike Kite Aura
-//        case 45251: break;
-//        // Ribbon Pole Dancer Check Aura
-//        case 45390: break;
-//        // Holiday - Midsummer, Ribbon Pole Periodic Visual
-//        case 45406: break;
-//        // Parachute
-//        case 45472: break;
-//        // Alliance Flag, Extra Damage Debuff
-//        case 45898: break;
-//        // Horde Flag, Extra Damage Debuff
-//        case 45899: break;
-//        // Ahune - Summoning Rhyme Aura
-//        case 45926: break;
-//        // Ahune - Slippery Floor
-//        case 45945: break;
-//        // Ahune's Shield
-//        case 45954: break;
-//        // Nether Vapor Lightning
-//        case 45960: break;
-//        // Darkness
-//        case 45996: break;
-//        // Summon Blood Elves Periodic
-//        case 46041: break;
-//        // Transform Visual Missile Periodic
-//        case 46205: break;
-//        // Find Opening Beam End
-//        case 46333: break;
-//        // Ice Spear Control Aura
-//        case 46371: break;
-//        // Hailstone Chill
-//        case 46458: break;
-//        // Hailstone Chill, Internal
-//        case 46465: break;
-//        // Chill, Internal Shifter
-//        case 46549: break;
-//        // Summon Ice Spear Knockback Delayer
-//        case 46878: break;
-//        // Burninate Effect
-//        case 47214: break;
-//        // Fizzcrank Practice Parachute
-//        case 47228: break;
-//        // Send Mug Control Aura
-//        case 47369: break;
-//        // Direbrew's Disarm (precast)
-//        case 47407: break;
-//        // Mole Machine Port Schedule
-//        case 47489: break;
-//        case 47941: break; // Crystal Spike
-//        case 48200: break; // Healer Aura
-//        case 48630: break; // Summon Gauntlet Mobs Periodic
-//        case 49313: break; // Proximity Mine Area Aura
-//        // Mole Machine Portal Schedule
-//        case 49466: break;
-//        case 49555: break; // Corpse Explode
-//        case 49592: break; // Temporal Rift
-//        case 49957: break; // Cutting Laser
-//        case 50085: break; // Slow Fall
-//        // Listening to Music
-//        case 50493: break;
-//        // Love Rocket Barrage
-//        case 50530: break;
-// Exist more after, need add later
-            default:
-                break;
-        }
-        break;
+            break;
         case SPELLFAMILY_MAGE:
         {
             // Mirror Image
@@ -7035,27 +7049,31 @@ void Aura::PeriodicDummyTick()
         {
             switch (spell->Id)
             {
+                // Killing Spree
                 case 51690:
                 {
+                    if (m_target->hasUnitState(UNIT_STAT_STUNNED) || m_target->HasAuraType(SPELL_AURA_MOD_FEAR))
+                        return;
+
                     std::list<Unit*> targets;
                     {
                         // eff_radius ==0
                         float radius = GetSpellMaxRange(sSpellRangeStore.LookupEntry(spell->rangeIndex));
 
-                        CellPair p(MaNGOS::ComputeCellPair(caster->GetPositionX(),caster->GetPositionY()));
+                        CellPair p(MaNGOS::ComputeCellPair(m_target->GetPositionX(),m_target->GetPositionY()));
                         Cell cell(p);
                         cell.data.Part.reserved = ALL_DISTRICT;
 
-                        MaNGOS::AnyUnfriendlyVisibleUnitInObjectRangeCheck u_check(caster, caster, radius);
-                        MaNGOS::UnitListSearcher<MaNGOS::AnyUnfriendlyVisibleUnitInObjectRangeCheck> checker(caster,targets, u_check);
+                        MaNGOS::AnyUnfriendlyVisibleUnitInObjectRangeCheck u_check(m_target, m_target, radius);
+                        MaNGOS::UnitListSearcher<MaNGOS::AnyUnfriendlyVisibleUnitInObjectRangeCheck> checker(m_target, targets, u_check);
 
                         TypeContainerVisitor<MaNGOS::UnitListSearcher<MaNGOS::AnyUnfriendlyVisibleUnitInObjectRangeCheck>, GridTypeMapContainer > grid_object_checker(checker);
                         TypeContainerVisitor<MaNGOS::UnitListSearcher<MaNGOS::AnyUnfriendlyVisibleUnitInObjectRangeCheck>, WorldTypeMapContainer > world_object_checker(checker);
 
                         CellLock<GridReadGuard> cell_lock(cell, p);
 
-                        cell_lock->Visit(cell_lock, grid_object_checker,  *caster->GetMap(), *caster, radius);
-                        cell_lock->Visit(cell_lock, world_object_checker, *caster->GetMap(), *caster, radius);
+                        cell_lock->Visit(cell_lock, grid_object_checker,  *m_target->GetMap(), *m_target, radius);
+                        cell_lock->Visit(cell_lock, world_object_checker, *m_target->GetMap(), *m_target, radius);
                     }
 
                     if(targets.empty())
@@ -7065,18 +7083,12 @@ void Aura::PeriodicDummyTick()
                     std::advance(itr, rand()%targets.size());
                     Unit* target = *itr;
 
-                    caster->CastSpell(target, 57840, true);
-                    caster->CastSpell(target, 57841, true);
+                    m_target->CastSpell(target, 57840, true);
+                    m_target->CastSpell(target, 57841, true);
                     return;
                 }
-                // Master of Subtlety
-//                case 31666: break;
-                // Killing Spree
-//                case 51690: break;
-                // Overkill
-//                case 58428: break;
-//                default:
-//                    break;
+                default:
+                    break;
             }
             break;
         }
@@ -7125,7 +7137,7 @@ void Aura::PeriodicDummyTick()
             // Death and Decay
             if (spell->SpellFamilyFlags & UI64LIT(0x0000000000000020))
             {
-                if (caster)
+                if (Unit *caster = GetCaster())
                     caster->CastCustomSpell(m_target, 52212, &m_modifier.m_amount, NULL, NULL, true, NULL, this);
                 return;
             }
@@ -7412,6 +7424,17 @@ void Aura::HandleModTargetArmorPct(bool apply, bool Real)
 
 void Aura::HandleAuraModAllCritChance(bool apply, bool Real)
 {
-    this->HandleAuraModCritPercent(apply, Real);
-    this->HandleModSpellCritChance(apply, Real);
+    // spells required only Real aura add/remove
+    if(!Real)
+        return;
+
+    if(m_target->GetTypeId() != TYPEID_PLAYER)
+        return;
+
+    ((Player*)m_target)->HandleBaseModValue(CRIT_PERCENTAGE,         FLAT_MOD, float (m_modifier.m_amount), apply);
+    ((Player*)m_target)->HandleBaseModValue(OFFHAND_CRIT_PERCENTAGE, FLAT_MOD, float (m_modifier.m_amount), apply);
+    ((Player*)m_target)->HandleBaseModValue(RANGED_CRIT_PERCENTAGE,  FLAT_MOD, float (m_modifier.m_amount), apply);
+
+    // included in Player::UpdateSpellCritChance calculation
+    ((Player*)m_target)->UpdateAllSpellCritChances();
 }

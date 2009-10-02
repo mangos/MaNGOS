@@ -469,7 +469,7 @@ void BattleGroundAB::Reset()
     }
 
     m_IsInformedNearVictory                 = false;
-    bool isBGWeekend = sBattleGroundMgr.IsBGWeekend(GetTypeID());
+    bool isBGWeekend = BattleGroundMgr::IsBGWeekend(GetTypeID());
     m_HonorTics = (isBGWeekend) ? BG_AB_ABBGWeekendHonorTicks : BG_AB_NotABBGWeekendHonorTicks;
     m_ReputationTics = (isBGWeekend) ? BG_AB_ABBGWeekendReputationTicks : BG_AB_NotABBGWeekendReputationTicks;
 
