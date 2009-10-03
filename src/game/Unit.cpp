@@ -5850,7 +5850,7 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
 
                     // find caster main aura at beacon
                     Aura* dummy = NULL;
-                    Unit::AuraList const& baa = beacon->GetAurasByType(SPELL_AURA_DUMMY);
+                    Unit::AuraList const& baa = beacon->GetAurasByType(SPELL_AURA_PERIODIC_TRIGGER_SPELL);
                     for(Unit::AuraList::const_iterator i = baa.begin(); i != baa.end(); ++i)
                     {
                         if ((*i)->GetId() == 53563 && (*i)->GetCasterGUID() == pVictim->GetGUID())

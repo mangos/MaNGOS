@@ -2145,6 +2145,11 @@ void Aura::TriggerSpell()
             case 33525:
                 target->CastSpell(target, trigger_spell_id, true);
                 return;
+            // Beacon of Light
+            case 53563:
+                // original caster must be target (beacon)
+                m_target->CastSpell(m_target,trigger_spell_id,true,NULL,this,m_target->GetGUID());
+                return;
         }
     }
 
@@ -2451,9 +2456,7 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
             break;
         }
         case SPELLFAMILY_MAGE:
-        {
             break;
-        }
         case SPELLFAMILY_PRIEST:
         {
             // Pain and Suffering
@@ -2477,19 +2480,7 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
             break;
         }
         case SPELLFAMILY_PALADIN:
-        {
-            // Beacon of Light
-            if (GetId() == 53563)
-            {
-                if(apply)
-                    // original caster must be target (beacon)
-                    m_target->CastSpell(m_target,53651,true,NULL,this,m_target->GetGUID());
-                else
-                    m_target->RemoveAurasByCasterSpell(53651,m_target->GetGUID());
-                return;
-            }
             break;
-        }
         case SPELLFAMILY_DRUID:
         {
             switch(GetId())

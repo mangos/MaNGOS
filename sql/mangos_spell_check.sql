@@ -413,4 +413,5 @@ INSERT INTO spell_check (spellid,SpellFamilyName,SpellFamilyMaskA,SpellFamilyMas
 
 /* some random spells from not proccessed files sorted by spell ids */
 /*id   fm familyMaskA        fmMaskB    icon vis  cat  eff aur ef name                                  code                   */
-(53563,-1,                -1,        -1,  -1,  -1,  -1, -1,  4,-1,'Beacon of Light',                    'Aura::HandleAuraDummy');      /* will outdated in 3.2.x */
+(53563,-1,                -1,        -1,  -1,  -1,  -1, -1, 23,-1,'Beacon of Light',                    'Aura::HandlePeriodicTriggerSpell'),
+(53563,-1,                -1,        -1,  -1,  -1,  -1, -1, 23,-1,'Beacon of Light',                    'Unit::HandleDummyAuraProc');
