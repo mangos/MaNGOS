@@ -7008,7 +7008,8 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
     // Blade Barrier
     if (auraSpellInfo->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT && auraSpellInfo->SpellIconID == 85)
     {
-        if (this->GetTypeId() != TYPEID_PLAYER || !((Player*)this)->IsBaseRuneSlotsOnCooldown(RUNE_BLOOD))
+        if (GetTypeId() != TYPEID_PLAYER || getClass() != CLASS_DEATH_KNIGHT ||
+            !((Player*)this)->IsBaseRuneSlotsOnCooldown(RUNE_BLOOD))
             return false;
     }
 

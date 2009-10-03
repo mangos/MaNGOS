@@ -1982,6 +1982,9 @@ void Player::Regenerate(Powers power, uint32 diff)
         }   break;
         case POWER_RUNE:
         {
+            if (getClass() != CLASS_DEATH_KNIGHT)
+                break;
+
             for(uint32 i = 0; i < MAX_RUNES; ++i)
             {
                 if(uint16 cd = GetRuneCooldown(i))           // if we have cooldown, reduce it...
