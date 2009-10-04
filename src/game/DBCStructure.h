@@ -1105,8 +1105,6 @@ struct MapEntry
     bool IsBattleGround() const { return map_type == MAP_BATTLEGROUND; }
     bool IsBattleArena() const { return map_type == MAP_ARENA; }
     bool IsBattleGroundOrArena() const { return map_type == MAP_BATTLEGROUND || map_type == MAP_ARENA; }
-    bool SupportsHeroicMode() const { return true; }
-    bool HasResetTime() const { return true; }
 
     bool IsMountAllowed() const
     {
@@ -1125,14 +1123,14 @@ struct MapEntry
 
 struct MapDifficultyEntry
 {
-    uint32      Id;                                         // 0
+    //uint32      Id;                                       // 0
     uint32      MapId;                                      // 1
-    uint32      Difficulty;                                 // 2
-    char*       areaTriggerText[16];                        // 3-18 text showed when transfer to map failed (missing requirements)
-    uint32      textFlags;                                  // 19
+    uint32      Difficulty;                                 // 2 (for arenas: arena slot)
+    //char*       areaTriggerText[16];                      // 3-18 text showed when transfer to map failed (missing requirements)
+    //uint32      textFlags;                                // 19
     uint32      resetTime;                                  // 20
     uint32      maxPlayers;                                 // 21
-    char*       difficultyString;                           // 22
+    //char*       difficultyString;                         // 22
 };
 
 struct MovieEntry
@@ -1769,6 +1767,15 @@ struct WorldSafeLocsEntry
 #endif
 
 // Structures not used for casting to loaded DBC data and not required then packing
+struct MapDifficulty
+{
+    MapDifficulty() : resetTime(0), maxPlayers(0) {}
+    MapDifficulty(uint32 _resetTime, uint32 _maxPlayers) : resetTime(_resetTime), maxPlayers(_maxPlayers) {}
+
+    uint32 resetTime;
+    uint32 maxPlayers;
+};
+
 struct TalentSpellPos
 {
     TalentSpellPos() : talent_id(0), rank(0) {}

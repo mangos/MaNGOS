@@ -704,6 +704,9 @@ enum TransferAbortReason
     TRANSFER_ABORT_NEED_GROUP               = 0x0B,         // 3.1
     TRANSFER_ABORT_NOT_FOUND2               = 0x0C,         // 3.1
     TRANSFER_ABORT_NOT_FOUND3               = 0x0D,         // 3.1
+    TRANSFER_ABORT_NOT_FOUND4               = 0x0E,         // 3.2
+    TRANSFER_ABORT_REALM_ONLY               = 0x0F,         // All players on party must be from the same realm.
+    TRANSFER_ABORT_MAP_NOT_ALLOWED          = 0x10,         // Map can't be entered at this time.
 };
 
 enum InstanceResetWarningType
@@ -1039,7 +1042,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void SendInitialPacketsBeforeAddToMap();
         void SendInitialPacketsAfterAddToMap();
         void SendTransferAborted(uint32 mapid, uint8 reason, uint8 arg = 0);
-        void SendInstanceResetWarning(uint32 mapid, uint32 difficulty, uint32 time);
+        void SendInstanceResetWarning(uint32 mapid, Difficulty difficulty, uint32 time);
 
         Creature* GetNPCIfCanInteractWith(uint64 guid, uint32 npcflagmask);
         bool CanInteractWithNPCs(bool alive = true) const;
@@ -1673,11 +1676,11 @@ class MANGOS_DLL_SPEC Player : public Unit
         uint32 GetArenaTeamIdInvited() { return m_ArenaTeamIdInvited; }
         static void LeaveAllArenaTeams(uint64 guid);
 
-        void SetDungeonDifficulty(uint32 dungeon_difficulty) { m_dungeonDifficulty = dungeon_difficulty; }
-        uint8 GetDungeonDifficulty() { return m_dungeonDifficulty; }
-        bool IsHeroicDungeon() { return m_dungeonDifficulty == DUNGEON_DIFFICULTY_HEROIC; }
-        void SetRaidDifficulty(uint32 raid_difficulty) { m_raidDifficulty = raid_difficulty; }
-        uint8 GetRaidDifficulty() { return m_raidDifficulty; }
+        Difficulty GetDifficulty(bool isRaid) const { return isRaid ? m_raidDifficulty : m_dungeonDifficulty; }
+        Difficulty GetDungeonDifficulty() const { return m_dungeonDifficulty; }
+        Difficulty GetRaidDifficulty() const { return m_raidDifficulty; }
+        void SetDungeonDifficulty(Difficulty dungeon_difficulty) { m_dungeonDifficulty = dungeon_difficulty; }
+        void SetRaidDifficulty(Difficulty raid_difficulty) { m_raidDifficulty = raid_difficulty; }
 
         bool UpdateSkill(uint32 skill_id, uint32 step);
         bool UpdateSkillPro(uint16 SkillId, int32 Chance, uint32 step);
@@ -1765,7 +1768,7 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         void SendDungeonDifficulty(bool IsInGroup);
         void SendRaidDifficulty(bool IsInGroup);
-        void ResetInstances(uint8 method);
+        void ResetInstances(uint8 method, bool isRaid);
         void SendResetInstanceSuccess(uint32 MapId);
         void SendResetInstanceFailed(uint32 reason, uint32 MapId);
         void SendResetFailedNotify(uint32 mapid);
@@ -2183,11 +2186,11 @@ class MANGOS_DLL_SPEC Player : public Unit
         uint32 m_HomebindTimer;
         bool m_InstanceValid;
         // permanent binds and solo binds by difficulty
-        BoundInstancesMap m_boundInstances[TOTAL_DUNGEON_DIFFICULTIES];
-        InstancePlayerBind* GetBoundInstance(uint32 mapid, uint8 difficulty);
-        BoundInstancesMap& GetBoundInstances(uint8 difficulty) { return m_boundInstances[difficulty]; }
-        void UnbindInstance(uint32 mapid, uint8 difficulty, bool unload = false);
-        void UnbindInstance(BoundInstancesMap::iterator &itr, uint8 difficulty, bool unload = false);
+        BoundInstancesMap m_boundInstances[MAX_DIFFICULTY];
+        InstancePlayerBind* GetBoundInstance(uint32 mapid, Difficulty difficulty);
+        BoundInstancesMap& GetBoundInstances(Difficulty difficulty) { return m_boundInstances[difficulty]; }
+        void UnbindInstance(uint32 mapid, Difficulty difficulty, bool unload = false);
+        void UnbindInstance(BoundInstancesMap::iterator &itr, Difficulty difficulty, bool unload = false);
         InstancePlayerBind* BindToInstance(InstanceSave *save, bool permanent, bool load = false);
         void SendRaidInfo();
         void SendSavedInstances();
@@ -2339,8 +2342,8 @@ class MANGOS_DLL_SPEC Player : public Unit
         uint32 m_nextSave;
         time_t m_speakTime;
         uint32 m_speakCount;
-        uint32 m_dungeonDifficulty;
-        uint32 m_raidDifficulty;
+        Difficulty m_dungeonDifficulty;
+        Difficulty m_raidDifficulty;
 
         uint32 m_atLoginFlags;
 

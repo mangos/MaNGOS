@@ -47,7 +47,7 @@ class InstanceSave
            - any new instance is being generated
            - the first time a player bound to InstanceId logs in
            - when a group bound to the instance is loaded */
-        InstanceSave(uint16 MapId, uint32 InstanceId, uint8 difficulty, time_t resetTime, bool canReset);
+        InstanceSave(uint16 MapId, uint32 InstanceId, Difficulty difficulty, time_t resetTime, bool canReset);
 
         /* Unloaded when m_playerList and m_groupList become empty
            or when the instance is reset */
@@ -92,7 +92,7 @@ class InstanceSave
 
         /* currently it is possible to omit this information from this structure
            but that would depend on a lot of things that can easily change in future */
-        uint8 GetDifficulty() { return m_difficulty; }
+        Difficulty GetDifficulty() { return m_difficulty; }
 
         typedef std::list<Player*> PlayerListType;
         typedef std::list<Group*> GroupListType;
@@ -105,8 +105,8 @@ class InstanceSave
         GroupListType m_groupList;
         time_t m_resetTime;
         uint32 m_instanceid;
-        uint16 m_mapid;
-        uint8 m_difficulty;
+        uint32 m_mapid;
+        Difficulty m_difficulty;
         bool m_canReset;
 };
 
@@ -143,7 +143,7 @@ class MANGOS_DLL_DECL InstanceSaveManager : public MaNGOS::Singleton<InstanceSav
 
         void Update();
 
-        InstanceSave* AddInstanceSave(uint32 mapId, uint32 instanceId, uint8 difficulty, time_t resetTime, bool canReset, bool load = false);
+        InstanceSave* AddInstanceSave(uint32 mapId, uint32 instanceId, Difficulty difficulty, time_t resetTime, bool canReset, bool load = false);
         void RemoveInstanceSave(uint32 InstanceId);
         static void DeleteInstanceFromDB(uint32 instanceid);
 

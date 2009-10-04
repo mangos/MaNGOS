@@ -3148,7 +3148,14 @@ void ObjectMgr::LoadGroups()
                 continue;
             }
 
-            InstanceSave *save = sInstanceSaveManager.AddInstanceSave(mapEntry->MapID, fields[2].GetUInt32(), fields[4].GetUInt8(), (time_t)fields[5].GetUInt64(), (fields[6].GetUInt32() == 0), true);
+            uint32 diff = fields[4].GetUInt8();
+            if(diff >= (mapEntry->IsRaid() ? MAX_RAID_DIFFICULTY : MAX_DUNGEON_DIFFICULTY))
+            {
+                sLog.outErrorDb("Wrong dungeon difficulty use in group_instance table: %d", diff);
+                diff = 0;                                   // default for both difficaly types
+            }
+
+            InstanceSave *save = sInstanceSaveManager.AddInstanceSave(mapEntry->MapID, fields[2].GetUInt32(), Difficulty(diff), (time_t)fields[5].GetUInt64(), (fields[6].GetUInt32() == 0), true);
             group->BindToInstance(save, fields[3].GetBool(), true);
         }while( result->NextRow() );
         delete result;
@@ -4477,15 +4484,15 @@ void ObjectMgr::LoadInstanceTemplate()
     for(uint32 i = 0; i < sInstanceTemplate.MaxEntry; i++)
     {
         InstanceTemplate* temp = (InstanceTemplate*)GetInstanceTemplate(i);
-        if(!temp) continue;
+        if(!temp)
+            continue;
+
         const MapEntry* entry = sMapStore.LookupEntry(temp->map);
         if(!entry)
         {
             sLog.outErrorDb("ObjectMgr::LoadInstanceTemplate: bad mapid %d for template!", temp->map);
             continue;
         }
-        else if(!entry->HasResetTime())
-            continue;
 
         //FIXME: now exist heroic instance, normal/heroic raid instances
         // entry->resetTimeHeroic store reset time for both heroic mode instance (raid and non-raid)
@@ -4494,16 +4501,24 @@ void ObjectMgr::LoadInstanceTemplate()
         // but at some point wee need implement reset time dependent from raid instance mode
         if(temp->reset_delay == 0)
         {
+            MapDifficulty const* mapDiffNorm   = GetMapDifficultyData(temp->map,DUNGEON_DIFFICULTY_NORMAL);
+            MapDifficulty const* mapDiffHeroic = GetMapDifficultyData(temp->map,DUNGEON_DIFFICULTY_HEROIC);
+
+            // no reset time
+            if ((!mapDiffNorm || mapDiffNorm->resetTime == 0) &&
+                (!mapDiffHeroic || mapDiffHeroic->resetTime == 0))
+                continue;
+
             // use defaults from the DBC
-            /*if(entry->resetTimeHeroic)                      // for both raid and non raids, read above
+            if(mapDiffHeroic && mapDiffHeroic->resetTime)   // for both raid and non raids, read above
             {
-                temp->reset_delay = entry->resetTimeHeroic / DAY;
+                temp->reset_delay = mapDiffHeroic->resetTime / DAY;
             }
-            else if (entry->resetTimeRaid && entry->map_type == MAP_RAID)
+            else if (mapDiffNorm && mapDiffNorm->resetTime && entry->map_type == MAP_RAID)
                                                             // for normal raid only
             {
-                temp->reset_delay = entry->resetTimeRaid / DAY;
-            }*/
+                temp->reset_delay = mapDiffNorm->resetTime / DAY;
+            }
         }
 
         // the reset_delay must be at least one day

@@ -5912,9 +5912,9 @@ bool ChatHandler::HandleInstanceListBindsCommand(const char* /*args*/)
     Player* player = getSelectedPlayer();
     if (!player) player = m_session->GetPlayer();
     uint32 counter = 0;
-    for(uint8 i = 0; i < TOTAL_DUNGEON_DIFFICULTIES; ++i)
+    for(uint8 i = 0; i < MAX_DIFFICULTY; ++i)
     {
-        Player::BoundInstancesMap &binds = player->GetBoundInstances(i);
+        Player::BoundInstancesMap &binds = player->GetBoundInstances(Difficulty(i));
         for(Player::BoundInstancesMap::const_iterator itr = binds.begin(); itr != binds.end(); ++itr)
         {
             InstanceSave *save = itr->second.save;
@@ -5928,9 +5928,9 @@ bool ChatHandler::HandleInstanceListBindsCommand(const char* /*args*/)
     Group *group = player->GetGroup();
     if(group)
     {
-        for(uint8 i = 0; i < TOTAL_DUNGEON_DIFFICULTIES; ++i)
+        for(uint8 i = 0; i < MAX_DIFFICULTY; ++i)
         {
-            Group::BoundInstancesMap &binds = group->GetBoundInstances(i);
+            Group::BoundInstancesMap &binds = group->GetBoundInstances(Difficulty(i));
             for(Group::BoundInstancesMap::const_iterator itr = binds.begin(); itr != binds.end(); ++itr)
             {
                 InstanceSave *save = itr->second.save;
@@ -5956,9 +5956,9 @@ bool ChatHandler::HandleInstanceUnbindCommand(const char* args)
         Player* player = getSelectedPlayer();
         if (!player) player = m_session->GetPlayer();
         uint32 counter = 0;
-        for(uint8 i = 0; i < TOTAL_DUNGEON_DIFFICULTIES; ++i)
+        for(uint8 i = 0; i < MAX_DIFFICULTY; ++i)
         {
-            Player::BoundInstancesMap &binds = player->GetBoundInstances(i);
+            Player::BoundInstancesMap &binds = player->GetBoundInstances(Difficulty(i));
             for(Player::BoundInstancesMap::iterator itr = binds.begin(); itr != binds.end();)
             {
                 if(itr->first != player->GetMapId())
@@ -5966,7 +5966,7 @@ bool ChatHandler::HandleInstanceUnbindCommand(const char* args)
                     InstanceSave *save = itr->second.save;
                     std::string timeleft = GetTimeString(save->GetResetTime() - time(NULL));
                     PSendSysMessage("unbinding map: %d inst: %d perm: %s diff: %s canReset: %s TTR: %s", itr->first, save->GetInstanceId(), itr->second.perm ? "yes" : "no",  save->GetDifficulty() == DUNGEON_DIFFICULTY_NORMAL ? "normal" : "heroic", save->CanReset() ? "yes" : "no", timeleft.c_str());
-                    player->UnbindInstance(itr, i);
+                    player->UnbindInstance(itr, Difficulty(i));
                     counter++;
                 }
                 else

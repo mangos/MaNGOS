@@ -279,13 +279,15 @@ class MANGOS_DLL_SPEC Group
         }
 
         void SetTargetIcon(uint8 id, uint64 guid);
-        void SetDungeonDifficulty(uint8 difficulty);
-        uint8 GetDungeonDifficulty() { return m_dungeonDifficulty; }
-        void SetRaidDifficulty(uint8 difficulty);
-        uint8 GetRaidDifficulty() { return m_raidDifficulty; }
+
+        Difficulty GetDifficulty(bool isRaid) const { return isRaid ? m_raidDifficulty : m_dungeonDifficulty; }
+        Difficulty GetDungeonDifficulty() const { return m_dungeonDifficulty; }
+        Difficulty GetRaidDifficulty() const { return m_raidDifficulty; }
+        void SetDungeonDifficulty(Difficulty difficulty);
+        void SetRaidDifficulty(Difficulty difficulty);
         uint16 InInstance();
         bool InCombatToInstance(uint32 instanceId);
-        void ResetInstances(uint8 method, Player* SendMsgTo);
+        void ResetInstances(uint8 method, bool isRaid, Player* SendMsgTo);
 
         // -no description-
         //void SendInit(WorldSession *session);
@@ -329,8 +331,9 @@ class MANGOS_DLL_SPEC Group
 
         InstanceGroupBind* BindToInstance(InstanceSave *save, bool permanent, bool load = false);
         void UnbindInstance(uint32 mapid, uint8 difficulty, bool unload = false);
-        InstanceGroupBind* GetBoundInstance(uint32 mapid, uint8 difficulty);
-        BoundInstancesMap& GetBoundInstances(uint8 difficulty) { return m_boundInstances[difficulty]; }
+        InstanceGroupBind* GetBoundInstance(Player* player);
+        InstanceGroupBind* GetBoundInstance(Map* aMap);
+        BoundInstancesMap& GetBoundInstances(Difficulty difficulty) { return m_boundInstances[difficulty]; }
 
     protected:
         bool _addMember(const uint64 &guid, const char* name, bool isAssistant=false);
@@ -399,15 +402,15 @@ class MANGOS_DLL_SPEC Group
         uint64              m_mainTank;
         uint64              m_mainAssistant;
         GroupType           m_groupType;
-        uint8               m_dungeonDifficulty;
-        uint8               m_raidDifficulty;
+        Difficulty          m_dungeonDifficulty;
+        Difficulty          m_raidDifficulty;
         BattleGround*       m_bgGroup;
         uint64              m_targetIcons[TARGETICONCOUNT];
         LootMethod          m_lootMethod;
         ItemQualities       m_lootThreshold;
         uint64              m_looterGuid;
         Rolls               RollId;
-        BoundInstancesMap   m_boundInstances[TOTAL_DUNGEON_DIFFICULTIES];
+        BoundInstancesMap   m_boundInstances[MAX_DIFFICULTY];
         uint8*              m_subGroupsCounts;
 };
 #endif

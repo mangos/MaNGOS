@@ -137,10 +137,21 @@ void WorldSession::HandleMoveWorldportAckOpcode()
         }
     }
 
-    if((mEntry->IsRaid() || (mEntry->IsNonRaidDungeon() && mEntry->SupportsHeroicMode() && GetPlayer()->IsHeroicDungeon())) && mInstance)
+    if (mInstance)
     {
-        uint32 timeleft = sInstanceSaveManager.GetResetTimeFor(GetPlayer()->GetMapId()) - time(NULL);
-        GetPlayer()->SendInstanceResetWarning(GetPlayer()->GetMapId(), GetPlayer()->GetDungeonDifficulty(), timeleft);
+        if(mEntry->IsRaid())
+        {
+            uint32 timeleft = sInstanceSaveManager.GetResetTimeFor(GetPlayer()->GetMapId()) - time(NULL);
+            GetPlayer()->SendInstanceResetWarning(GetPlayer()->GetMapId(), GetPlayer()->GetRaidDifficulty(), timeleft);
+        }
+        else if(mEntry->IsNonRaidDungeon() && GetPlayer()->GetDungeonDifficulty() > DUNGEON_DIFFICULTY_NORMAL)
+        {
+            if(MapDifficulty const* mapDiff = GetMapDifficultyData(mEntry->MapID,GetPlayer()->GetDungeonDifficulty()))
+            {
+                uint32 timeleft = sInstanceSaveManager.GetResetTimeFor(GetPlayer()->GetMapId()) - time(NULL);
+                GetPlayer()->SendInstanceResetWarning(GetPlayer()->GetMapId(), GetPlayer()->GetDungeonDifficulty(), timeleft);
+            }
+        }
     }
 
     // mount allow check
