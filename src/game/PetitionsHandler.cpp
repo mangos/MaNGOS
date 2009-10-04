@@ -51,7 +51,7 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket & recv_data)
     recv_data.hexlike();
 
     uint64 guidNPC;
-    uint32 unk2;
+    uint32 clientIndex;                                     // 1 for guild and arenaslot+1 for arenas in client
     std::string name;
 
     recv_data >> guidNPC;                                   // NPC GUID
@@ -74,7 +74,7 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket & recv_data)
     for (int i = 0; i < 10; ++i)
         recv_data.read_skip<std::string>();
 
-    recv_data >> unk2;                                      // index
+    recv_data >> clientIndex;                               // index
     recv_data.read_skip<uint32>();                          // 0
 
     sLog.outDebug("Petitioner with GUID %u tried sell petition: name %s", GUID_LOPART(guidNPC), name.c_str());
@@ -114,7 +114,7 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket & recv_data)
             return;
         }
 
-        switch(unk2)
+        switch(clientIndex)                                 // arenaSlot+1 as received from client (1 from 3 case)
         {
             case 1:
                 charterid = ARENA_TEAM_CHARTER_2v2;
@@ -132,11 +132,11 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket & recv_data)
                 type = 5;                                   // 5v5
                 break;
             default:
-                sLog.outDebug("unknown selection at buy petition: %u", unk2);
+                sLog.outDebug("unknown selection at buy arena petition: %u", clientIndex);
                 return;
         }
 
-        if(_player->GetArenaTeamId(unk2 - 1))
+        if(_player->GetArenaTeamId(clientIndex - 1))        // arenaSlot+1 as received from client
         {
             SendArenaTeamCommandResult(ERR_ARENA_TEAM_CREATE_S, name, "", ERR_ALREADY_IN_ARENA_TEAM);
             return;
@@ -343,9 +343,9 @@ void WorldSession::SendPetitionQueryOpcode(uint64 petitionguid)
     }
     else
     {
-        data << type-1;
-        data << type-1;
-        data << type;                                       // bypass client - side limitation, a different value is needed here for each petition
+        data << uint32(type-1);
+        data << uint32(type-1);
+        data << uint32(type);                               // bypass client - side limitation, a different value is needed here for each petition
     }
     data << uint32(0);                                      // 5
     data << uint32(0);                                      // 6
