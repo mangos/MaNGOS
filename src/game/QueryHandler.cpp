@@ -150,7 +150,8 @@ void WorldSession::HandleCreatureQueryOpcode( WorldPacket & recv_data )
 {
     uint32 entry;
     recv_data >> entry;
-    recv_data.read_skip<uint64>();                          // guid
+    uint64 guid;
+    recv_data >> guid;
 
     CreatureInfo const *ci = objmgr.GetCreatureTemplate(entry);
     if (ci)
@@ -201,9 +202,6 @@ void WorldSession::HandleCreatureQueryOpcode( WorldPacket & recv_data )
     }
     else
     {
-        uint64 guid;
-        recv_data >> guid;
-
         sLog.outDebug("WORLD: CMSG_CREATURE_QUERY - NO CREATURE INFO! (GUID: %u, ENTRY: %u)",
             GUID_LOPART(guid), entry);
         WorldPacket data( SMSG_CREATURE_QUERY_RESPONSE, 4 );
@@ -218,7 +216,8 @@ void WorldSession::HandleGameObjectQueryOpcode( WorldPacket & recv_data )
 {
     uint32 entryID;
     recv_data >> entryID;
-    recv_data.read_skip<uint64>();                          // guid
+    uint64 guid;
+    recv_data >> guid;
 
     const GameObjectInfo *info = objmgr.GetGameObjectInfo(entryID);
     if(info)
@@ -262,9 +261,6 @@ void WorldSession::HandleGameObjectQueryOpcode( WorldPacket & recv_data )
     }
     else
     {
-        uint64 guid;
-        recv_data >> guid;
-
         sLog.outDebug(  "WORLD: CMSG_GAMEOBJECT_QUERY - Missing gameobject info for (GUID: %u, ENTRY: %u)",
             GUID_LOPART(guid), entryID );
         WorldPacket data ( SMSG_GAMEOBJECT_QUERY_RESPONSE, 4 );

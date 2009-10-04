@@ -1131,6 +1131,8 @@ struct MapDifficultyEntry
     char*       areaTriggerText[16];                        // 3-18 text showed when transfer to map failed (missing requirements)
     uint32      textFlags;                                  // 19
     uint32      resetTime;                                  // 20
+    uint32      maxPlayers;                                 // 21
+    char*       difficultyString;                           // 22
 };
 
 struct MovieEntry
