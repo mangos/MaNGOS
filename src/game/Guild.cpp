@@ -647,6 +647,7 @@ void Guild::DelRank()
     // delete lowest guild_rank
     uint32 rank = GetLowestRank();
     CharacterDatabase.PExecute("DELETE FROM guild_rank WHERE rid>='%u' AND guildid='%u'", rank, m_Id);
+    CharacterDatabase.PExecute("DELETE FROM guild_bank_right WHERE rid>='%u' AND guildid='%u'", rank, m_Id);
 
     m_Ranks.pop_back();
 }
@@ -1411,7 +1412,11 @@ void Guild::SetBankRightsAndSlots(uint32 rankId, uint8 TabId, uint32 right, uint
     if (rankId >= m_Ranks.size() ||
         TabId >= GUILD_BANK_MAX_TABS ||
         TabId >= m_PurchasedTabs)
+    {
+        //TODO remove next line, It is there just to repair existing bug in deleting guild rank
+        CharacterDatabase.PExecute("DELETE FROM guild_bank_right WHERE guildid='%u' AND rid='%u' AND TabId='%u'", m_Id, rankId, TabId);
         return;
+    }
 
     if (rankId == GR_GUILDMASTER)
     {
