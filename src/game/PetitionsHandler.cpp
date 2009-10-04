@@ -211,7 +211,6 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket & recv_data)
 
     if (result)
     {
-
         do
         {
             Field *fields = result->Fetch();
@@ -331,11 +330,11 @@ void WorldSession::SendPetitionQueryOpcode(uint64 petitionguid)
         return;
     }
 
-    WorldPacket data(SMSG_PETITION_QUERY_RESPONSE, (4+8+name.size()+1+1+4*13));
-    data << GUID_LOPART(petitionguid);                      // guild/team guid (in mangos always same as GUID_LOPART(petition guid)
-    data << ownerguid;                                      // charter owner guid
+    WorldPacket data(SMSG_PETITION_QUERY_RESPONSE, (4+8+name.size()+1+1+4*12+2+10));
+    data << uint32(GUID_LOPART(petitionguid));              // guild/team guid (in mangos always same as GUID_LOPART(petition guid)
+    data << uint64(ownerguid);                              // charter owner guid
     data << name;                                           // name (guild/arena team)
-    data << uint8(0);                                       // 1
+    data << uint8(0);                                       // some string
     if(type == 9)
     {
         data << uint32(9);
@@ -356,11 +355,17 @@ void WorldSession::SendPetitionQueryOpcode(uint64 petitionguid)
     data << uint32(0);                                      // 10
     data << uint32(0);                                      // 11
     data << uint32(0);                                      // 13 count of next strings?
+
+    for(int i = 0; i < 10; ++i)
+        data << uint8(0);                                   // some string
+
     data << uint32(0);                                      // 14
+
     if(type == 9)
         data << uint32(0);                                  // 15 0 - guild, 1 - arena team
     else
         data << uint32(1);
+
     SendPacket(&data);
 }
 
