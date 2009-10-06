@@ -8478,8 +8478,7 @@ uint32 Unit::SpellDamageBonus(Unit *pVictim, SpellEntry const *spellProto, uint3
         // 50% for damage and healing spells for leech spells from damage bonus and 0% from healing
         for(int j = 0; j < 3; ++j)
         {
-            if( spellProto->Effect[j] == SPELL_EFFECT_HEALTH_LEECH ||
-                spellProto->Effect[j] == SPELL_EFFECT_APPLY_AURA && spellProto->EffectApplyAuraName[j] == SPELL_AURA_PERIODIC_LEECH )
+            if( spellProto->Effect[j] == SPELL_EFFECT_APPLY_AURA && spellProto->EffectApplyAuraName[j] == SPELL_AURA_PERIODIC_LEECH )
             {
                 CastingTime /= 2;
                 break;
