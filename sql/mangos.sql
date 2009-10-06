@@ -963,7 +963,7 @@ CREATE TABLE `creature_template` (
   `questItem3` int(11) UNSIGNED DEFAULT '0' NOT NULL,
   `questItem4` int(11) UNSIGNED DEFAULT '0' NOT NULL,
   `questItem5` int(11) UNSIGNED DEFAULT '0' NOT NULL,
-  `questItem63` int(11) UNSIGNED DEFAULT '0' NOT NULL,
+  `questItem6` int(11) UNSIGNED DEFAULT '0' NOT NULL,
   `movementId` int(11) UNSIGNED DEFAULT '0' NOT NULL,
   `RegenHealth` tinyint(3) unsigned NOT NULL default '1',
   `equipment_id` mediumint(8) unsigned NOT NULL default '0',
