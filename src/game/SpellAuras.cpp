@@ -2657,6 +2657,29 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
             }
             break;
         }
+        case SPELLFAMILY_DEATHKNIGHT:
+        {
+            // Improved Icy Touch
+            if( GetSpellProto()->SpellIconID == 2721 && m_target->GetTypeId()==TYPEID_PLAYER )
+            {
+                if(apply)
+                {
+                    SpellModifier *mod = new SpellModifier;
+                    mod->op = SPELLMOD_EFFECT1;
+                    mod->value = m_modifier.m_amount;
+                    mod->type = SPELLMOD_PCT;
+                    mod->spellId = GetId();
+                    mod->mask = UI64LIT(0x0002);
+                    mod->mask2= UI64LIT(0x0);
+
+                    m_spellmod = mod;
+                }
+
+                ((Player*)m_target)->AddSpellMod(m_spellmod, apply);
+                return;
+            }
+            break;
+        }
     }
 
     // pet auras
