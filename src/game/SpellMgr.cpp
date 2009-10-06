@@ -1584,6 +1584,11 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
                     return false;
             }
 
+            // Inner Fire and Consecration
+            if(spellInfo_2->SpellFamilyName == SPELLFAMILY_PRIEST)
+                if(spellInfo_1->SpellIconID == 51 && spellInfo_2->SpellIconID == 51)
+                return false;
+
             // Combustion and Fire Protection Aura (multi-family check)
             if( spellInfo_2->Id == 11129 && spellInfo_1->SpellIconID == 33 && spellInfo_1->SpellVisual[0] == 321 )
                 return false;
