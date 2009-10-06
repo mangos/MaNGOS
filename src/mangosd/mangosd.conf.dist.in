@@ -1350,8 +1350,13 @@ BattleGround.PremadeGroupWaitForMatch = 1800000
 #        If automatic distribution is enabled in days
 #        Default: 7 (weekly)
 #
-#    Arena.QueueAnnouncer.Enable
-#        Enable bg queue announcer posting to chat
+#    Arena.QueueEnterAnnouncer.Enable
+#        Enable arena queue announcer posting to chat at enter
+#        Default: 0 (disable)
+#                 1 (enable)
+#
+#    Arena.QueueLeaveAnnouncer.Enable
+#        Enable arena queue announcer posting to chat at leave
 #        Default: 0 (disable)
 #                 1 (enable)
 #
@@ -1370,7 +1375,8 @@ Arena.MaxRatingDifference = 150
 Arena.RatingDiscardTimer = 600000
 Arena.AutoDistributePoints = 0
 Arena.AutoDistributeInterval = 7
-Arena.QueueAnnouncer.Enable = 0
+Arena.QueueEnterAnnouncer.Enable = 0
+Arena.QueueLeaveAnnouncer.Enable = 0
 Arena.ArenaSeason.ID = 1
 Arena.ArenaSeason.InProgress = 1
 
