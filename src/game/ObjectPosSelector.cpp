@@ -17,6 +17,7 @@
  */
 
 #include "ObjectPosSelector.h"
+#include "Log.h"
 
 ObjectPosSelector::ObjectPosSelector(float x,float y,float size,float dist)
 : m_center_x(x),m_center_y(y),m_size(size),m_dist(dist)
@@ -99,14 +100,36 @@ bool ObjectPosSelector::NextAngle(float& angle)
 
 bool ObjectPosSelector::NextUsedAngle(float& angle)
 {
+    // Debugging LoS problem when angle == 0.00, set some vars
+    bool localDebug = false;
+    uint32 localCounter = 0;
+
+    // Start outputting debug when angle == 0.00
+    if(!angle)
+    {
+        sLog.outError("ObjectPosSelector::NextUsedAngle: DEBUG START (angle = %f)", angle);
+        localDebug = true;
+    }
+
     while(m_nextUsedPos[USED_POS_PLUS]!=m_UsedPosLists[USED_POS_PLUS].end() ||
         m_nextUsedPos[USED_POS_MINUS]!=m_UsedPosLists[USED_POS_MINUS].end() )
     {
         // calculate next possible angle
         if(!NextPosibleAngle(angle))
+        {
+            if(localDebug) sLog.outError("ObjectPosSelector::NextUsedAngle: RETURN POINT 1 (angle = %f)", angle);
             return true;
+        }
+
+        if(++localCounter > 100)
+        {
+            sLog.outError("ObjectPosSelector::NextUsedAngle: WHILE LOOP more then 100 iterations, BREAK (angle = %f)", angle);
+            break;
+        }
     }
 
+    if(localDebug)
+        sLog.outError("ObjectPosSelector::NextUsedAngle: RETURN POINT 2 (angle = %f)", angle);
     return false;
 }
 
