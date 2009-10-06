@@ -2292,6 +2292,15 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
             return;
         }
 
+        // Vampiric Touch
+        if (caster && (GetSpellProto()->SpellFamilyFlags & UI64LIT(0x40000000000)) && m_removeMode==AURA_REMOVE_BY_DISPEL)
+        {
+            int32 basepoints = GetSpellProto()->EffectBasePoints[1] * 4;
+            basepoints = caster->SpellDamageBonus(m_target, GetSpellProto(), basepoints, DOT);
+            m_target->CastCustomSpell(m_target, 64085, &basepoints, NULL, NULL, false);
+            return;
+        }
+
         switch(GetId())
         {
             case 36730:                                     // Flame Strike
