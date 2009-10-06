@@ -516,6 +516,15 @@ void Spell::EffectSchoolDMG(uint32 effect_idx)
                 {
                     damage += int32(m_caster->GetTotalAttackPowerValue(BASE_ATTACK)*0.08f);
                 }
+                //Improved Insect Swarm
+                else if((m_spellInfo->SpellFamilyFlags & UI64LIT(0x0000000000000001)) && m_spellInfo->SpellIconID==263)
+                {
+                    Aura *ImprovedAura =  m_caster->HasAura(57849) ? m_caster->GetAura(57849,0) : m_caster->HasAura(57850) ?
+                    m_caster->GetAura(57850,0) : m_caster->HasAura(57851) ? m_caster->GetAura(57851,0) : NULL;
+                    //If the target have a Insect Swarm aura and the caster have the improved aura then we apply the % dmg to Wrath.
+                    if(ImprovedAura && unitTarget->GetAura(SPELL_AURA_PERIODIC_DAMAGE,SPELLFAMILY_DRUID,UI64LIT(0x0000000000200000)))
+                        damage = int32(damage*(100.0f+ImprovedAura->GetModifier()->m_amount)/100.0f);
+                }
                 break;
             }
             case SPELLFAMILY_ROGUE:
