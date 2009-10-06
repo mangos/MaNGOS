@@ -2102,35 +2102,35 @@ void BattleGroundMgr::LoadBattleEventIndexes()
     uint32 count = 0;
 
     QueryResult *result =
-        //                              0       1           2             3             4           5           6
-        WorldDatabase.PQuery( "SELECT data.typ, data.guid1, data.ev1 ev1, data.ev2 ev2, data.map m, data.guid2, description.map, "
+        //                              0            1           2             3                     4           5           6
+        WorldDatabase.PQuery( "SELECT data.typ, data.guid1, data.ev1 AS ev1, data.ev2 AS ev2, data.map AS m, data.guid2, description.map, "
         //                              7                  8                   9
                                       "description.event1, description.event2, description.description "
                                  "FROM "
-                                    "(SELECT 1 typ, a.guid guid1, a.event1 ev1, a.event2 ev2, b.map map, b.guid guid2 "
-                                        "FROM gameobject_battleground a "
-                                        "LEFT OUTER JOIN gameobject b ON a.guid = b.guid "
+                                    "(SELECT '1' AS typ, a.guid AS guid1, a.event1 AS ev1, a.event2 AS ev2, b.map AS map, b.guid AS guid2 "
+                                        "FROM gameobject_battleground AS a "
+                                        "LEFT OUTER JOIN gameobject AS b ON a.guid = b.guid "
                                      "UNION "
-                                     "SELECT 2 typ, a.guid guid1, a.event1 ev1, a.event2 ev2, b.map map, b.guid guid2 "
-                                        "FROM creature_battleground a "
-                                        "LEFT OUTER JOIN creature b ON a.guid = b.guid "
+                                     "SELECT '2' AS typ, a.guid AS guid1, a.event1 AS ev1, a.event2 AS ev2, b.map AS map, b.guid AS guid2 "
+                                        "FROM creature_battleground AS a "
+                                        "LEFT OUTER JOIN creature AS b ON a.guid = b.guid "
                                     ") data "
-                                    "RIGHT OUTER JOIN battleground_events description ON data.map = description.map "
+                                    "RIGHT OUTER JOIN battleground_events AS description ON data.map = description.map "
                                         "AND data.ev1 = description.event1 AND data.ev2 = description.event2 "
         // full outer join doesn't work in mysql :-/ so just UNION-select the same again and add a left outer join
                               "UNION "
                               "SELECT data.typ, data.guid1, data.ev1, data.ev2, data.map, data.guid2, description.map, "
                                       "description.event1, description.event2, description.description "
                                  "FROM "
-                                    "(SELECT 1 typ, a.guid guid1, a.event1 ev1, a.event2 ev2, b.map map, b.guid guid2 "
-                                        "FROM gameobject_battleground a "
-                                        "LEFT OUTER JOIN gameobject b ON a.guid = b.guid "
+                                    "(SELECT '1' AS typ, a.guid AS guid1, a.event1 AS ev1, a.event2 AS ev2, b.map AS map, b.guid AS guid2 "
+                                        "FROM gameobject_battleground AS a "
+                                        "LEFT OUTER JOIN gameobject AS b ON a.guid = b.guid "
                                      "UNION "
-                                     "SELECT 2 typ, a.guid guid1, a.event1 ev1, a.event2 ev2, b.map map, b.guid guid2 "
-                                        "FROM creature_battleground a "
-                                        "LEFT OUTER JOIN creature b ON a.guid = b.guid "
+                                     "SELECT '2' AS typ, a.guid AS guid1, a.event1 AS ev1, a.event2 AS ev2, b.map AS map, b.guid AS guid2 "
+                                        "FROM creature_battleground AS a "
+                                        "LEFT OUTER JOIN creature AS b ON a.guid = b.guid "
                                     ") data "
-                                    "LEFT OUTER JOIN battleground_events description ON data.map = description.map "
+                                    "LEFT OUTER JOIN battleground_events AS description ON data.map = description.map "
                                         "AND data.ev1 = description.event1 AND data.ev2 = description.event2 "
                               "ORDER BY m, ev1, ev2" );
     if( !result )
