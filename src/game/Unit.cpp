@@ -9076,6 +9076,13 @@ uint32 Unit::SpellHealingBonus(Unit *pVictim, SpellEntry const *spellProto, uint
         }
     }
 
+    if (damagetype == DOT)
+    {
+        AuraList const& mDecreaseHealingDoT = pVictim->GetAurasByType(SPELL_AURA_DECREASE_PERIODIC_HEAL);
+        for(AuraList::const_iterator i = mDecreaseHealingDoT.begin(); i != mDecreaseHealingDoT.end(); ++i)
+            TakenTotalMod *= ((*i)->GetModifier()->m_amount + 100.0f) / 100.0f;
+    }
+
     heal = (heal + TakenTotal) * TakenTotalMod;
 
     return heal < 0 ? 0 : uint32(heal);
