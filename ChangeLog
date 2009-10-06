@@ -1,6 +1,6 @@
-MaNGOS 0.14   (??? ??? 2009)
+MaNGOS 0.15   (??? ??? 2010)
 
- MaNGOS 0.14 - adds further improvements to the
+ MaNGOS 0.15 - adds further improvements to the
  server core as well as to the majority of game classes and the game content
  database.
 
@@ -9,10 +9,62 @@ MaNGOS 0.14   (??? ??? 2009)
  ==== Server Features ====
 
  ==== Statistics ====
- * Fixed Bugs: ???
- * Total number of changes: ???
+ * Fixed Bugs: ??? tickets and many bugs reported at forum resolved
+ * Total number of changes: ??? revisions (??? commits)
 
- MaNGOS 0.13   (10 June 2009)
+MaNGOS 0.14   (06 October 2009)
+
+ MaNGOS 0.14 - adds further improvements to the
+ server core as well as to the majority of game classes and the game content
+ database.
+
+ ==== Game Features ====
+
+ * Added: Support for 'on demand' regeneration of power instead fixed tick mode.
+ * Added: Allow NPCs to apply taunt.
+ * Added: Update killing quest objectives base at creature_template KillCredit fields.
+ * Added: Implement support `spell_proc_item_enchant` table for ppm item enchantments triggering at hit.
+ * Added: Implement new arena rating-system for season 6.
+ * Added: Allow save and restore at login forms/stances.
+ * Added: Implement far sight like spells work for long distance.
+ * Added: Implement proper storage and use of character specific account data.
+ * Added: Implement battleground bonusweekends call to arms.
+ * Added: Implement DB-based store battleground/arena gameobjects/creatures and related event spawn/despawn requirement.
+ * Improved: Fixes and optimizations in spell cooldown code.
+ * Improved: Fixes and improvements in EventAI code let better EventAI creature scripting.
+ * Improved: Fixes in combat log packets let show more correct info.
+ * Improved: More achievements types support implemented.
+ * Improved: Fixed well known walk-after-taxi bug.
+ * Improved: More improvements in mind control code.
+ * Improved: More improvements in gameobjects spawn/despawn work dependent from gameobject template data.
+ * Improved: Changed formula used for calculation creature damage base at attackpower.
+ * Improved: Propertly storing/restoring BG entry point including mount/taxi state
+ * Improved: More correct work timed quests, other quest code improvements.
+ * Improved: Implement more strict checks for fake messages in chat.
+ * plus lots of fixes for auras, effects, spells, talents, and more.
+
+ ==== Server Features ====
+
+ * Added: Implement support spell casting precasts and aura boost casts for simplify and support related spell cast dependencies.
+ * Added: Implement possibility to reset client cache data from server side.
+ * Added: Implement --enable-builtin-ace option for explicit select builtin/system ACE in Unix/Linux build.
+ * Added: Implement check DBs versions (required_* fields) at mangosd/realmd loading.
+ * Improved: More checks at server startup for DB content.
+ * Improved: Some fields moved from `data` field of characters table to own fields. More planned move to final get rid from `data` field.
+ * Improved: Finish switch to uint32 spell ids use in code.
+ * Improved: Optimizations in map loading and broadcasting. New cell search algorithm implemented.
+ * Improved: Fixed memory leaks (mostly at server shutdown) and code cleanups.
+ * Improved: Use exceptions instead of explicit size checking for each packet, added checks for full read received packets.
+ * Improved: Optimizations for different guild data loading and use.
+ * Improved: Fixed redundant calculation of v and s on every login.
+ * Improved: Fixed race conditions in LockedQueue.
+ * Improved: Fixed long existed bug with vmaps unloading.
+
+ ==== Statistics ====
+ * Fixed Bugs: 60 tickets and many bugs reported at forum resolved
+ * Total number of changes: 600 revisions (635 commits)
+
+MaNGOS 0.13   (10 June 2009)
 
  MaNGOS 0.13 - adds further improvements to the
  server core as well as to the majority of game classes and the game content

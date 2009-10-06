@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005,2006 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@
 
 #ifndef _VERSION
 #if PLATFORM == PLATFORM_WINDOWS
-# define _VERSION(REVD,REVT,REVN,REVH) "0.14.0-DEV" " (" REVD " " REVT " Revision " REVN " - " REVH ")"
+# define _VERSION(REVD,REVT,REVN,REVH) "0.14.1" " (" REVD " " REVT " Revision " REVN " - " REVH ")"
 #else
 # define _VERSION(REVD,REVT,REVN,REVH) "@VERSION@" " (" REVD " " REVT " Revision " REVN " - " REVH ")"
 #endif

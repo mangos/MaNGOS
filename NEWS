@@ -13,8 +13,14 @@ http://getmangos.com/community/
 Please submit bug reports at:
 http://mangos.lighthouseapp.com/
 
-Version 0.14
+Version 0.15
  * Under discussion.
+ * Upgrade to client version 3.2.2a (build 10505).
+
+Version 0.14
+ * Implement possibility to reset client cache data from server side.
+ * DB-based store battleground gameobjects/creatures.
+ * Map search/loading improvements
  * Upgrade to client version 3.1.3 (build 9947).
 
 Version 0.13
