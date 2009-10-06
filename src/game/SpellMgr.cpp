@@ -1307,6 +1307,10 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
                     if( spellInfo_1->SpellIconID == 2010 && spellInfo_2->SpellIconID == 2010 )
                         return false;
 
+                    //Kindred Spirits (allow stack for auras)
+                    if (spellInfo_1->SpellIconID == 3559 && spellInfo_2->SpellIconID == 3559)
+                        return false;
+
                     break;
                 }
                 case SPELLFAMILY_MAGE:
