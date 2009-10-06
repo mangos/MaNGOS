@@ -304,10 +304,6 @@ void WorldSession::HandleGuildPromoteOpcode(WorldPacket& recvPacket)
 
     uint32 newRankId = slot->RankId - 1;                    //when promoting player, rank is decreased
 
-    guild->ChangeRank(plGuid, newRankId);
-    // Put record into guildlog
-    guild->LogGuildEvent(GUILD_EVENT_LOG_PROMOTE_PLAYER, GetPlayer()->GetGUIDLow(), GUID_LOPART(plGuid), newRankId);
-
     WorldPacket data(SMSG_GUILD_EVENT, (2+30));             // guess size
     data << (uint8)GE_PROMOTION;
     data << (uint8)3;                                       // strings count
@@ -315,6 +311,10 @@ void WorldSession::HandleGuildPromoteOpcode(WorldPacket& recvPacket)
     data << plName;
     data << guild->GetRankName(newRankId);
     guild->BroadcastPacket(&data);
+
+    guild->ChangeRank(plGuid, newRankId);
+    // Put record into guildlog
+    guild->LogGuildEvent(GUILD_EVENT_LOG_PROMOTE_PLAYER, GetPlayer()->GetGUIDLow(), GUID_LOPART(plGuid), newRankId);
 }
 
 void WorldSession::HandleGuildDemoteOpcode(WorldPacket& recvPacket)
