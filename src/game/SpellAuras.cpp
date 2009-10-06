@@ -3559,6 +3559,23 @@ void Aura::HandleModFear(bool apply, bool Real)
         return;
 
     m_target->SetFeared(apply, GetCasterGUID(), GetId());
+
+   if(!apply && m_spellProto->SpellFamilyName == SPELLFAMILY_WARLOCK && m_spellProto->SpellIconID == 98)
+     {
+       Unit* caster = GetCaster();
+       int32 spell_id = 0;
+       if(!caster || caster->GetTypeId() != TYPEID_PLAYER)
+          return;
+       else
+       {
+           if(caster->HasAura(53754, 0))
+              spell_id = 60946;
+           else if(caster->HasAura(53759, 0))
+              spell_id = 60947;
+       }
+       if(spell_id)
+          m_target->CastSpell(m_target, spell_id, false);
+    }
 }
 
 void Aura::HandleFeignDeath(bool apply, bool Real)
