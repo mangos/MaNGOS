@@ -1712,8 +1712,9 @@ void BattleGroundMgr::CreateInitialBattleGrounds()
         }
         if (MinLvl == 0 || MaxLvl == 0 || MinLvl > MaxLvl)
         {
-            MinLvl = bl->minlvl;
-            MaxLvl = bl->maxlvl;
+            // TODO: fix me
+            MinLvl = 0;//bl->minlvl;
+            MaxLvl = 80;//bl->maxlvl;
         }
 
         start1 = fields[5].GetUInt32();

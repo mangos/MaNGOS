@@ -572,11 +572,14 @@ void PlayerMenu::SendQuestQueryResponse( Quest const *pQuest )
 
     // rewarded honor points
     data << uint32(MaNGOS::Honor::hk_honor_at_level(pSession->GetPlayer()->getLevel(), pQuest->GetRewHonorableKills()));
+    data << float(1);                                       // weird honor multiplier
     data << uint32(pQuest->GetSrcItemId());                 // source item id
     data << uint32(pQuest->GetFlags() & 0xFFFF);            // quest flags
     data << uint32(pQuest->GetCharTitleId());               // CharTitleId, new 2.4.0, player gets this title (id from CharTitles)
     data << uint32(pQuest->GetPlayersSlain());              // players slain
     data << uint32(pQuest->GetBonusTalents());              // bonus talents
+    data << uint32(0);                                      // bonus arena points
+    data << uint32(0);                                      // unknown
 
     int iI;
 
@@ -601,6 +604,15 @@ void PlayerMenu::SendQuestQueryResponse( Quest const *pQuest )
         }
     }
 
+    for(iI = 0; iI < QUEST_REPUTATIONS_COUNT; ++iI)         // reward factions ids
+        data << uint32(0);
+
+    for(iI = 0; iI < QUEST_REPUTATIONS_COUNT; ++iI)         // columnid+1 QuestFactionReward.dbc?
+        data << uint32(0);
+
+    for(iI = 0; iI < QUEST_REPUTATIONS_COUNT; ++iI)         // unk (0)
+        data << uint32(0);
+
     data << pQuest->GetPointMapId();
     data << pQuest->GetPointX();
     data << pQuest->GetPointY();
@@ -610,6 +622,7 @@ void PlayerMenu::SendQuestQueryResponse( Quest const *pQuest )
     data << Objectives;
     data << Details;
     data << EndText;
+    data << uint8(0);                                       // some string
 
     for (iI = 0; iI < QUEST_OBJECTIVES_COUNT; ++iI)
     {

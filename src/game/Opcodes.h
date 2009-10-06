@@ -1307,7 +1307,11 @@ enum Opcodes
     CMSG_WORLD_STATE_UI_TIMER_UPDATE                = 0x4F6,
     SMSG_WORLD_STATE_UI_TIMER_UPDATE                = 0x4F7,
     CMSG_UNKNOWN_1272                               = 0x4F8, // called from lua: CreateCharacter, paid race change
-    NUM_MSG_TYPES                                   = 0x4F9
+    UMSG_UNKNOWN_1273                               = 0x4F9, // not found 10522
+    SMSG_UNKNOWN_1274                               = 0x4FA, // uint8
+    UMSG_UNKNOWN_1275                               = 0x4FB, // not found 10522
+    SMSG_UNKNOWN_1276                               = 0x4FC, // does nothing in 10522
+    NUM_MSG_TYPES                                   = 0x4FD
 };
 
 /// Player state

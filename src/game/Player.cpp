@@ -18268,7 +18268,7 @@ void Player::SendInitialPacketsBeforeAddToMap()
 
     // set fly flag if in fly form or taxi flight to prevent visually drop at ground in showup moment
     if(HasAuraType(SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED) || HasAuraType(SPELL_AURA_FLY) || isInFlight())
-        m_movementInfo.AddMovementFlag(MOVEMENTFLAG_FLYING2);
+        m_movementInfo.AddMovementFlag(MOVEMENTFLAG_FLYING);
 
     m_mover = this;
 }

@@ -156,7 +156,6 @@ void WorldSession::HandleCreatureQueryOpcode( WorldPacket & recv_data )
     CreatureInfo const *ci = objmgr.GetCreatureTemplate(entry);
     if (ci)
     {
-
         std::string Name, SubName;
         Name = ci->Name;
         SubName = ci->SubName;

@@ -567,16 +567,12 @@ struct BattlemasterListEntry
     uint32  id;                                             // 0
     int32   mapid[8];                                       // 1-8 mapid
     uint32  type;                                           // 9 (3 - BG, 4 - arena)
-    uint32  minlvl;                                         // 10
-    uint32  maxlvl;                                         // 11
-    uint32  maxplayersperteam;                              // 12
-                                                            // 13 minplayers
-                                                            // 14 0 or 9
-                                                            // 15
-    char*   name[16];                                       // 16-31
-                                                            // 32 string flag, unused
-                                                            // 33 unused
-    //uint32 unk;                                           // 34 new 3.1
+    uint32  maxplayersperteam;                              // 10
+    //uint32 unk1;                                          // 11 (0 or 1)
+    char*   name[16];                                       // 12-27
+                                                            // 28 string flag, unused
+                                                            // 29 unused
+    //uint32 unk2;                                          // 30 new 3.1
 };
 
 #define MAX_OUTFIT_ITEMS 24
@@ -784,10 +780,14 @@ struct FactionEntry
     int32       BaseRepValue[4];                            // 10-13    m_reputationBase
     uint32      ReputationFlags[4];                         // 14-17    m_reputationFlags
     uint32      team;                                       // 18       m_parentFactionID
-    char*       name[16];                                   // 19-34    m_name_lang
-                                                            // 35 string flags
-    //char*     description[16];                            // 36-51    m_description_lang
-                                                            // 52 string flags
+    //float     unk1;                                       // 19
+    //float     unk2;                                       // 20
+    //uint32    unk3                                        // 21
+    //uint32    unk4;                                       // 22
+    char*       name[16];                                   // 23-38    m_name_lang
+                                                            // 39 string flags
+    //char*     description[16];                            // 40-55    m_description_lang
+                                                            // 56 string flags
 };
 
 struct FactionTemplateEntry
@@ -1077,23 +1077,24 @@ struct MapEntry
     uint32  MapID;                                          // 0
     //char*       internalname;                             // 1 unused
     uint32  map_type;                                       // 2
-                                                            // 3 0 or 1 for battlegrounds (not arenas)
-    char*   name[16];                                       // 4-19
-                                                            // 20 name flags, unused
-    uint32  linked_zone;                                    // 21 common zone for instance and continent map
-    //char*     hordeIntro[16];                             // 23-37 text for PvP Zones
-                                                            // 38 intro text flags
-    //char*     allianceIntro[16];                          // 39-54 text for PvP Zones
-                                                            // 55 intro text flags
-    uint32  multimap_id;                                    // 56
-                                                            // 57
-    int32   entrance_map;                                   // 58 map_id of entrance map
-    float   entrance_x;                                     // 59 entrance x coordinate (if exist single entry)
-    float   entrance_y;                                     // 60 entrance y coordinate (if exist single entry)
-                                                            // 61 -1, 0 and 720
-    uint32  addon;                                          // 62 (0-original maps,1-tbc addon)
-                                                            // 63 some kind of time?
-    //uint32 maxPlayers;                                    // 64 max players
+    //uint32 unk_330;                                       // 3
+                                                            // 4 0 or 1 for battlegrounds (not arenas)
+    char*   name[16];                                       // 5-20
+                                                            // 21 name flags, unused
+    uint32  linked_zone;                                    // 22 common zone for instance and continent map
+    //char*     hordeIntro[16];                             // 23-38 text for PvP Zones
+                                                            // 39 intro text flags
+    //char*     allianceIntro[16];                          // 40-55 text for PvP Zones
+                                                            // 56 intro text flags
+    uint32  multimap_id;                                    // 57
+                                                            // 58
+    int32   entrance_map;                                   // 59 map_id of entrance map
+    float   entrance_x;                                     // 60 entrance x coordinate (if exist single entry)
+    float   entrance_y;                                     // 61 entrance y coordinate (if exist single entry)
+                                                            // 62 -1, 0 and 720
+    uint32  addon;                                          // 63 (0-original maps,1-tbc addon)
+                                                            // 64 some kind of time?
+    //uint32 maxPlayers;                                    // 65 max players
 
     // Helpers
     uint32 Expansion() const { return addon; }
@@ -1423,6 +1424,7 @@ struct SpellEntry
     //uint32  PowerDisplayId;                               // 234 PowerDisplay.dbc, new in 3.1
     //float   unk_320_4[3];                                 // 235-237  3.2.0
     //uint32  spellDescriptionVariableID;                   // 238      3.2.0
+    //uint32  SpellDifficultyId;                            // 239      3.3.0
 
     // helpers
     int32 CalculateSimpleValue(uint8 eff) const { return EffectBasePoints[eff]+int32(EffectBaseDice[eff]); }

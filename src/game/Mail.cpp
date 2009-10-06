@@ -313,6 +313,7 @@ void WorldSession::HandleMailDelete(WorldPacket & recv_data )
     uint32 mailId;
     recv_data >> mailbox;
     recv_data >> mailId;
+    recv_data.read_skip<uint32>();                          // 3.3.0
 
     if (!GetPlayer()->GetGameObjectIfCanInteractWith(mailbox, GAMEOBJECT_TYPE_MAILBOX))
         return;

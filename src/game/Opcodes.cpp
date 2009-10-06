@@ -1299,4 +1299,8 @@ OpcodeHandler opcodeTable[NUM_MSG_TYPES] =
     /*0x4F6*/ { "CMSG_WORLD_STATE_UI_TIMER_UPDATE",             STATUS_LOGGEDIN, &WorldSession::HandleWorldStateUITimerUpdate   },
     /*0x4F7*/ { "SMSG_WORLD_STATE_UI_TIMER_UPDATE",             STATUS_NEVER,    &WorldSession::Handle_ServerSide               },
     /*0x4F8*/ { "CMSG_UNKNOWN_1272",                            STATUS_NEVER,    &WorldSession::Handle_NULL                     },
+    /*0x4F9*/ { "UMSG_UNKNOWN_1273",                            STATUS_NEVER,    &WorldSession::Handle_NULL                     },
+    /*0x4FA*/ { "SMSG_UNKNOWN_1274",                            STATUS_NEVER,    &WorldSession::Handle_ServerSide               },
+    /*0x4FB*/ { "UMSG_UNKNOWN_1275",                            STATUS_NEVER,    &WorldSession::Handle_NULL                     },
+    /*0x4FC*/ { "SMSG_UNKNOWN_1276",                            STATUS_NEVER,    &WorldSession::Handle_ServerSide               },
 };
