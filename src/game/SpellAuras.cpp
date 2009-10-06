@@ -197,7 +197,7 @@ pAuraHandler AuraHandler[TOTAL_AURAS]=
     &Aura::HandleAuraSafeFall,                              //144 SPELL_AURA_SAFE_FALL                         implemented in WorldSession::HandleMovementOpcodes
     &Aura::HandleAuraModPetTalentsPoints,                   //145 SPELL_AURA_MOD_PET_TALENT_POINTS
     &Aura::HandleNoImmediateEffect,                         //146 SPELL_AURA_ALLOW_TAME_PET_TYPE
-    &Aura::HandleNULL,                                      //147 SPELL_AURA_ADD_CREATURE_IMMUNITY
+    &Aura::HandleAddCreatureImmunity,                       //147 SPELL_AURA_ADD_CREATURE_IMMUNITY
     &Aura::HandleAuraRetainComboPoints,                     //148 SPELL_AURA_RETAIN_COMBO_POINTS
     &Aura::HandleNoImmediateEffect,                         //149 SPELL_AURA_REDUCE_PUSHBACK
     &Aura::HandleShieldBlockValue,                          //150 SPELL_AURA_MOD_SHIELD_BLOCKVALUE_PCT
@@ -7495,6 +7495,22 @@ void Aura::HandlePhase(bool apply, bool Real)
     // need triggering visibility update base at phase update of not GM invisible (other GMs anyway see in any phases)
     if(m_target->GetVisibility() != VISIBILITY_OFF)
         m_target->SetVisibility(m_target->GetVisibility());
+}
+
+void Aura::HandleAddCreatureImmunity(bool apply, bool Real)
+{
+    if(!Real)
+       return;
+
+    if(apply && GetId() == 46924)
+    {
+       Unit::AuraList roots = m_target->GetAurasByType(SPELL_AURA_MOD_ROOT);
+       for(Unit::AuraList::const_iterator itr = roots.begin(); itr != roots.end(); itr++)
+           m_target->RemoveAura((*itr)->GetId(), (*itr)->GetEffIndex());
+       Unit::AuraList snares = m_target->GetAurasByType(SPELL_AURA_MOD_DECREASE_SPEED);
+       for(Unit::AuraList::const_iterator itr = snares.begin(); itr != snares.end(); itr++)
+           m_target->RemoveAura((*itr)->GetId(), (*itr)->GetEffIndex());
+    }
 }
 
 void Aura::UnregisterSingleCastAura()
