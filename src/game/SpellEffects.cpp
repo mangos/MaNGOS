@@ -549,6 +549,13 @@ void Spell::EffectSchoolDMG(uint32 effect_idx)
                         if(m_caster->GetDummyAura(37169))
                             damage += ((Player*)m_caster)->GetComboPoints()*40;
                     }
+                    // must only affect demons
+                    case 45072:
+                    {
+                        if(unitTarget->GetCreatureType() != CREATURE_TYPE_DEMON)
+                            return;
+                        break;
+                    }
                 }
                 // Eviscerate
                 else if ((m_spellInfo->SpellFamilyFlags & UI64LIT(0x00020000)) && m_caster->GetTypeId()==TYPEID_PLAYER)
