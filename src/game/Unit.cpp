@@ -7149,7 +7149,21 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
             !((Player*)this)->IsBaseRuneSlotsOnCooldown(RUNE_BLOOD))
             return false;
     }
-
+    // Special custom triggered spell
+    // Shadow Embrace (special cast for triggered spell)
+    if (auraSpellInfo->SpellIconID == 2209)
+    {
+        uint32 triggered_spell_id = 0;
+        switch (trigger_spell_id)
+        {
+            case 32386: triggered_spell_id = 60448; break;
+            case 32388: triggered_spell_id = 60465; break;
+            case 32389: triggered_spell_id = 60466; break;
+            case 32390: triggered_spell_id = 60467; break;
+            case 32391: triggered_spell_id = 60468; break;
+        }
+        pVictim->CastSpell(pVictim,triggered_spell_id,true,castItem,triggeredByAura);
+    }
     // Custom basepoints/target for exist spell
     // dummy basepoints or other customs
     switch(trigger_spell_id)
