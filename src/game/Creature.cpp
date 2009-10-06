@@ -126,6 +126,8 @@ m_creatureInfo(NULL), m_isActiveObject(false), m_monsterMoveFlags(MONSTER_MOVE_W
     m_GlobalCooldown = 0;
 
     m_monsterMoveFlags = MONSTER_MOVE_WALK;
+
+    ResetObtainedDamage();
 }
 
 Creature::~Creature()
@@ -1543,6 +1545,7 @@ void Creature::setDeathState(DeathState s)
     {
         SetHealth(GetMaxHealth());
         SetLootRecipient(NULL);
+        ResetObtainedDamage();
         CreatureInfo const *cinfo = GetCreatureInfo();
         SetUInt32Value(UNIT_DYNAMIC_FLAGS, 0);
         RemoveFlag (UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);

@@ -121,6 +121,7 @@ ReactorAI::EnterEvadeMode()
     i_victimGuid = 0;
     m_creature->CombatStop(true);
     m_creature->SetLootRecipient(NULL);
+    m_creature->ResetObtainedDamage();
 
     // Remove TargetedMovementGenerator from MotionMaster stack list, and add HomeMovementGenerator instead
     if( m_creature->GetMotionMaster()->GetCurrentMovementGeneratorType() == TARGETED_MOTION_TYPE )
