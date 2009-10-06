@@ -5675,6 +5675,9 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
             // Sheath of Light
             if (dummySpell->SpellIconID == 3030)
             {
+                Unit *caster = triggeredByAura->GetCaster();
+                if (!(caster->IsFriendlyTo(pVictim)))
+                    return false;
                 // 4 healing tick
                 basepoints0 = triggerAmount*damage/400;
                 triggered_spell_id = 54203;
