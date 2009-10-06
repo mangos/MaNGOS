@@ -5657,6 +5657,22 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                 basepoints0 = GetAttackTime(BASE_ATTACK) * int32(ap*0.022f + 0.044f * holy) / 1000;
                 break;
             }
+            // Heart of the Crusader
+            if (dummySpell->SpellIconID == 237)
+            {
+                if (!procSpell)
+                    return false;
+
+                switch(dummySpell->Id)
+                {
+                    case 20335: triggered_spell_id = 21183; break;
+                    case 20336: triggered_spell_id = 54498; break;
+                    case 20337: triggered_spell_id = 54499; break;
+                    default:
+                         return false;
+                }
+                break;
+            }
             // Sacred Shield
             if (dummySpell->SpellFamilyFlags & UI64LIT(0x0008000000000000))
             {
