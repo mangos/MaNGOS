@@ -2133,12 +2133,18 @@ void BattleGroundMgr::LoadBattleEventIndexes()
                                     "LEFT OUTER JOIN battleground_events AS description ON data.map = description.map "
                                         "AND data.ev1 = description.event1 AND data.ev2 = description.event2 "
                               "ORDER BY m, ev1, ev2" );
-    if( !result )
+    if(!result)
     {
-        barGoLink bar( 1 );
+        barGoLink bar(1);
         bar.step();
+
+        sLog.outString();
+        sLog.outErrorDb(">> Loaded 0 battleground eventindexes.");
+        return;
     }
-    barGoLink bar( result->GetRowCount() );
+
+    barGoLink bar(result->GetRowCount());
+
     do
     {
         bar.step();
@@ -2190,10 +2196,9 @@ void BattleGroundMgr::LoadBattleEventIndexes()
 
         ++count;
 
-    } while( result->NextRow() );
+    } while(result->NextRow());
+
     sLog.outString();
     sLog.outString( ">> Loaded %u battleground eventindexes", count);
-    if (count == 0)
-        return;
     delete result;
 }
