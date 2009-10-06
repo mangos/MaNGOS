@@ -591,6 +591,7 @@ void WorldSession::HandlePetCastSpellOpcode( WorldPacket& recvPacket )
         return;
 
     pet->clearUnitState(UNIT_STAT_FOLLOW);
+    pet->InterruptNonMeleeSpells(false);
 
     Spell *spell = new Spell(pet, spellInfo, false);
     spell->m_cast_count = cast_count;                       // probably pending spell cast
