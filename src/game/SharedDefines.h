@@ -2408,25 +2408,6 @@ enum DiminishingGroup
     DIMINISHING_LIMITONLY
 };
 
-enum Difficulty
-{
-    DUNGEON_DIFFICULTY_NORMAL    = 0,
-    DUNGEON_DIFFICULTY_HEROIC    = 1,
-
-    RAID_DIFFICULTY_10MAN_NORMAL = 0,
-    RAID_DIFFICULTY_25MAN_NORMAL = 1,
-    RAID_DIFFICULTY_10MAN_HEROIC = 2,
-    RAID_DIFFICULTY_25MAN_HEROIC = 3,
-};
-
-#define MAX_DUNGEON_DIFFICULTY     2
-#define MAX_RAID_DIFFICULTY        4
-#define MAX_DIFFICULTY             4
-
-enum RaidDifficulties
-{
-};
-
 enum SummonType
 {
     SUMMON_TYPE_CRITTER     = 41,

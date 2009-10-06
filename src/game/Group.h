@@ -23,6 +23,7 @@
 #include "GroupRefManager.h"
 #include "BattleGround.h"
 #include "LootMgr.h"
+#include "DBCEnums.h"
 
 #include <map>
 #include <vector>

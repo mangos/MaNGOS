@@ -26,6 +26,7 @@
 #include <map>
 #include "Utilities/UnorderedMap.h"
 #include "Database/DatabaseEnv.h"
+#include "DBCEnums.h"
 
 struct InstanceTemplate;
 struct MapEntry;
