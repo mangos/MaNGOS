@@ -4912,9 +4912,16 @@ SpellCastResult Spell::CheckCasterAuras() const
 {
     // Flag drop spells totally immuned to caster auras
     // FIXME: find more nice check for all totally immuned spells
-    // AttributesEx3 & 0x10000000?
-    if(m_spellInfo->Id == 23336 || m_spellInfo->Id == 23334 || m_spellInfo->Id == 34991)
-        return SPELL_CAST_OK;
+    switch(m_spellInfo->Id)
+    {
+        case 23336:     // Alliance Flag Drop
+        case 23334:     // Horde Flag Drop
+        case 34991:     // Summon Netherstorm Flag
+        case 22812:     // Barkskin
+            return SPELL_CAST_OK;
+        default:
+            break;
+    }
 
     uint8 school_immune = 0;
     uint32 mechanic_immune = 0;
