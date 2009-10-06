@@ -2885,8 +2885,8 @@ void Map::ScriptsProcess()
                 }
                 if(step.script->datalong <= OBJECT_FIELD_ENTRY || step.script->datalong >= source->GetValuesCount())
                 {
-                    sLog.outError("SCRIPT_COMMAND_FIELD_SET call for wrong field %u (max count: %u) in object (TypeId: %u).",
-                        step.script->datalong,source->GetValuesCount(),source->GetTypeId());
+                    sLog.outError("SCRIPT_COMMAND_FIELD_SET call for wrong field %u (max count: %u) in object (Entry: %u)(TypeId: %u).",
+                        step.script->datalong,source->GetValuesCount(),source->GetEntry(),source->GetTypeId());
                     break;
                 }
 
