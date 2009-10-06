@@ -96,9 +96,9 @@ enum BattleGroundSpells
 enum BattleGroundTimeIntervals
 {
     RESURRECTION_INTERVAL           = 30000,                // ms
-    REMIND_INTERVAL                 = 30000,                // ms
-    INVITATION_REMIND_TIME          = 60000,                // ms
-    INVITE_ACCEPT_WAIT_TIME         = 80000,                // ms
+    //REMIND_INTERVAL                 = 10000,                // ms
+    INVITATION_REMIND_TIME          = 20000,                // ms
+    INVITE_ACCEPT_WAIT_TIME         = 40000,                // ms
     TIME_TO_AUTOREMOVE              = 120000,               // ms
     MAX_OFFLINE_TIME                = 300,                  // secs
     RESPAWN_ONE_DAY                 = 86400,                // secs
@@ -158,11 +158,12 @@ enum BattleGroundQueueTypeId
     BATTLEGROUND_QUEUE_AB       = 3,
     BATTLEGROUND_QUEUE_EY       = 4,
     BATTLEGROUND_QUEUE_SA       = 5,
-    BATTLEGROUND_QUEUE_2v2      = 6,
-    BATTLEGROUND_QUEUE_3v3      = 7,
-    BATTLEGROUND_QUEUE_5v5      = 8
+    BATTLEGROUND_QUEUE_IC       = 6,
+    BATTLEGROUND_QUEUE_2v2      = 7,
+    BATTLEGROUND_QUEUE_3v3      = 8,
+    BATTLEGROUND_QUEUE_5v5      = 9
 };
-#define MAX_BATTLEGROUND_QUEUE_TYPES 9
+#define MAX_BATTLEGROUND_QUEUE_TYPES 10
 
 enum BGQueueIdBasedOnLevel                        // queue_id for level ranges
 {

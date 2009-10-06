@@ -38,7 +38,6 @@ CREATE TABLE `spell_check` (
 INSERT INTO spell_check (spellid,SpellFamilyName,SpellFamilyMaskA,SpellFamilyMaskB,SpellIcon,SpellVisual,SpellCategory,EffectType,EffectAura,EffectIdx,Name,Code) VALUES
 /* sorted by spell ids */
 /*id   fm familyMaskA        fmMaskB    icon vis  cat  eff aur ef name                                  code                   */
-(781,   9,                -1,        -1,  -1,  -1,  -1,  3, -1,-1,'Disengage',                          'Spell::EffectDummy'),
 (1454,  5,0x0000000000040000,0x00000000,  -1,  -1,  -1,  3, -1,-1,'Life Tap',                           'Spell::EffectDummy'),
 (1455,  5,0x0000000000040000,0x00000000,  -1,  -1,  -1,  3, -1,-1,'Life Tap',                           'Spell::EffectDummy'),
 (1456,  5,0x0000000000040000,0x00000000,  -1,  -1,  -1,  3, -1,-1,'Life Tap',                           'Spell::EffectDummy'),
@@ -46,9 +45,9 @@ INSERT INTO spell_check (spellid,SpellFamilyName,SpellFamilyMaskA,SpellFamilyMas
 (4073, -1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Mechanical Dragonling',              'Spell::EffectDummy'),
 (5938,  8,                -1,        -1,  -1,  -1,  -1,  3, -1,-1,'Shiv',                               'Spell::EffectDummy'),
 (5940, -1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Shiv',                               'Spell::EffectDummy'),
-(8017, 11,0x0000000000400000,0x00000000,  -1,  -1,  -1,  3, -1,-1,'Rockbiter Weapon',                   'Spell::EffectDummy'),
-(8018, 11,0x0000000000400000,0x00000000,  -1,  -1,  -1,  3, -1,-1,'Rockbiter Weapon',                   'Spell::EffectDummy'),
-(8019, 11,0x0000000000400000,0x00000000,  -1,  -1,  -1,  3, -1,-1,'Rockbiter Weapon',                   'Spell::EffectDummy'),
+(8017, 11,0x0000000000400000,0x00000000,  -1,  -1,  -1, 54, -1,-1,'Rockbiter Weapon',                   'Spell::EffectEnchantItemTmp'),
+(8018, 11,0x0000000000400000,0x00000000,  -1,  -1,  -1, 54, -1,-1,'Rockbiter Weapon',                   'Spell::EffectEnchantItemTmp'),
+(8019, 11,0x0000000000400000,0x00000000,  -1,  -1,  -1, 54, -1,-1,'Rockbiter Weapon',                   'Spell::EffectEnchantItemTmp'),
 (8063,  0,                -1,        -1,  -1,  -1,  -1,  3, -1,-1,'Deviate Fish',                       'Spell::EffectDummy'),
 (8064, -1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Sleepy',                             'Spell::EffectDummy'),
 (8065, -1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Invigorate',                         'Spell::EffectDummy'),
@@ -61,7 +60,7 @@ INSERT INTO spell_check (spellid,SpellFamilyName,SpellFamilyMaskA,SpellFamilyMas
 (8221, -1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Yaaarrrr',                           'Spell::EffectDummy'),
 (8222, -1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Yaaarrrr',                           'Spell::EffectDummy'),
 (8593,  0,                -1,        -1,  -1,  -1,  -1,  3, -1,-1,'Symbol of life',                     'Spell::EffectDummy'),
-(10399,11,0x0000000000400000,0x00000000,  -1,  -1,  -1,  3, -1,-1,'Rockbiter Weapon',                   'Spell::EffectDummy'),
+(10399,11,0x0000000000400000,0x00000000,  -1,  -1,  -1, 54, -1,-1,'Rockbiter Weapon',                   'Spell::EffectEnchantItemTmp'),
 (11687, 5,0x0000000000040000,0x00000000,  -1,  -1,  -1,  3, -1,-1,'Life Tap',                           'Spell::EffectDummy'),
 (11688, 5,0x0000000000040000,0x00000000,  -1,  -1,  -1,  3, -1,-1,'Life Tap',                           'Spell::EffectDummy'),
 (11689, 5,0x0000000000040000,0x00000000,  -1,  -1,  -1,  3, -1,-1,'Life Tap',                           'Spell::EffectDummy'),
@@ -152,9 +151,6 @@ INSERT INTO spell_check (spellid,SpellFamilyName,SpellFamilyMaskA,SpellFamilyMas
 (26464,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Mercurial Shield',                   'Spell::EffectTriggerSpell'),
 (26467,-1,                -1,        -1,  -1,  -1,  -1,  6, 42, 0,'Persistent Shield',                  'Spell::EffectDummy'),
 (26558, 0,                -1,        -1,  -1,  -1,  -1,  2, -1,-1,'Meteor',                             'Spell::EffectSchoolDMG'),
-(26635,-1,                -1,        -1,  -1,  -1,  -1,  6, -1, 0,'Berserking',                         'Spell::EffectDummy'),
-(26635,-1,                -1,        -1,  -1,  -1,  -1,  6, -1, 1,'Berserking',                         'Spell::EffectDummy'),
-(26635,-1,                -1,        -1,  -1,  -1,  -1,  6, -1, 2,'Berserking',                         'Spell::EffectDummy'),
 (26789, 0,                -1,        -1,  -1,  -1,  -1,  2, -1,-1,'Shard of the Fallen Star',           'Spell::EffectSchoolDMG'),
 (27174,10,                -1,        -1, 156,  -1,  -1,  3, -1,-1,'Holy Shock',                         'Spell::EffectDummy'),
 (27175,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Holy Shock',                         'Spell::EffectDummy'),
@@ -211,10 +207,14 @@ INSERT INTO spell_check (spellid,SpellFamilyName,SpellFamilyMaskA,SpellFamilyMas
 (35744,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Socrethar Portal',                   'Spell::EffectDummy'),
 (35745, 0,                -1,        -1,  -1,  -1,  -1,  3, -1,-1,'Socrethar\'s Stone',                 'Spell::EffectDummy'),
 (36032,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'',                                   'Spell::EffectSchoolDMG'),
-(36494,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Rockbiter Weapon',                   'Spell::EffectDummy'),
-(36750,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Rockbiter Weapon',                   'Spell::EffectDummy'),
-(36755,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Rockbiter Weapon',                   'Spell::EffectDummy'),
-(36759,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Rockbiter Weapon',                   'Spell::EffectDummy'),
+(36744,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Rockbiter Weapon',                   'Spell::EffectEnchantItemTmp'),
+(36751,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Rockbiter Weapon',                   'Spell::EffectEnchantItemTmp'),
+(36753,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Rockbiter Weapon',                   'Spell::EffectEnchantItemTmp'),
+(36754,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Rockbiter Weapon',                   'Spell::EffectEnchantItemTmp'),
+(36755,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Rockbiter Weapon',                   'Spell::EffectEnchantItemTmp'),
+(36758,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Rockbiter Weapon',                   'Spell::EffectEnchantItemTmp'),
+(36760,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Rockbiter Weapon',                   'Spell::EffectEnchantItemTmp'),
+(36761,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Rockbiter Weapon',                   'Spell::EffectEnchantItemTmp'),
 (36837, 0,                -1,        -1,  -1,  -1,  -1,  2, -1,-1,'Meteor',                             'Spell::EffectSchoolDMG'),
 (36890,-1,                -1,        -1,  -1,  -1,  -1,  5, -1,-1,'Area52 Transporter',                 'Spell::EffectTeleportUnits'),
 (36893,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Transporter Malfunction',            'Spell::EffectTeleportUnits'),
@@ -346,7 +346,6 @@ INSERT INTO spell_check (spellid,SpellFamilyName,SpellFamilyMaskA,SpellFamilyMas
 (    0, 3,0x0000000020000000,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Arcane Blast',                       'Spell::EffectSchoolDMG'),
 (    0, 9,0x0000000000000800,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Arcane Shot',                        'Spell::EffectSchoolDMG'),
 (    0,10,0x0000000000004000,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Avenger\'s Shield',                  'Spell::EffectSchoolDMG'),
-(    0, 0,                -1,        -1,1661,  -1,  -1,  3, -1,-1,'Berserking',                         'Spell::EffectDummy'),
 (    0, 4,0x0000040000000000,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Bloodthirst',                        'Spell::EffectSchoolDMG'),
 (0,     4,0x0000000000000001,0x00000000,  -1, 867,  -1,  3, -1,-1,'Charge',                             'Spell::EffectDummy'),
 (    0,11,0x0000000004000000,0x00000000,1673,  -1,  -1,  3, -1,-1,'Cleansing Totem',                    'Spell::EffectDummy'),
@@ -394,7 +393,7 @@ INSERT INTO spell_check (spellid,SpellFamilyName,SpellFamilyMaskA,SpellFamilyMas
 (    0, 7,0x0000000000001000,0x00000000,  -1,  -1,  -1, -1,  3,-1,'Rake',                               'Aura::HandlePeriodicDamage'), /* used in */
 (    0, 7,0x0000000000001000,0x00000000,  -1,  -1,  -1, 80, -1, 2,'Rake',                               'Aura::HandlePeriodicDamage'), /* exactly selected */
 (    0, 4,0x0000000000000400,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Revenge',                            'Spell::EffectSchoolDMG'),
-(    0,11,0x0000000000400000,0x00000000,  -1,  -1,  -1,  3, -1,-1,'Rockbiter Weapon',                   'Spell::EffectDummy'),
+(    0,11,0x0000000000400000,0x00000000,  -1,  -1,  -1, 54, -1,-1,'Rockbiter Weapon',                   'Spell::EffectEnchantItemTmp'),
 (    0, 6,0x0000000200000000,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Shadow Word: Death',                 'Spell::EffectSchoolDMG'),
 (    0, 5,0x0000000000000000,0x00000002,  -1,  -1,  -1, -1,  3,-1,'Shadowflame',                        'Spell::EffectSchoolDMG'),     /* dot */
 (    0, 5,0x0001000000000000,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Shadowflame',                        'Spell::EffectSchoolDMG'),     /* explcit damage */
@@ -414,4 +413,5 @@ INSERT INTO spell_check (spellid,SpellFamilyName,SpellFamilyMaskA,SpellFamilyMas
 
 /* some random spells from not proccessed files sorted by spell ids */
 /*id   fm familyMaskA        fmMaskB    icon vis  cat  eff aur ef name                                  code                   */
-(53563,-1,                -1,        -1,  -1,  -1,  -1, -1,  4,-1,'Beacon of Light',                    'Aura::HandleAuraDummy');      /* will outdated in 3.2.x */
+(53563,-1,                -1,        -1,  -1,  -1,  -1, -1, 23,-1,'Beacon of Light',                    'Aura::HandlePeriodicTriggerSpell'),
+(53563,-1,                -1,        -1,  -1,  -1,  -1, -1, 23,-1,'Beacon of Light',                    'Unit::HandleDummyAuraProc');

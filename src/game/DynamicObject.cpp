@@ -32,7 +32,7 @@ DynamicObject::DynamicObject() : WorldObject(), m_isActiveObject(false)
     m_objectType |= TYPEMASK_DYNAMICOBJECT;
     m_objectTypeId = TYPEID_DYNAMICOBJECT;
 
-    m_updateFlag = (UPDATEFLAG_HIGHGUID | UPDATEFLAG_HAS_POSITION);
+    m_updateFlag = (UPDATEFLAG_HIGHGUID | UPDATEFLAG_HAS_POSITION | UPDATEFLAG_POSITION);
 
     m_valuesCount = DYNAMICOBJECT_END;
 }
@@ -73,9 +73,6 @@ bool DynamicObject::Create( uint32 guidlow, Unit *caster, uint32 spellId, uint32
     SetUInt32Value( DYNAMICOBJECT_BYTES, 0x00000001 );
     SetUInt32Value( DYNAMICOBJECT_SPELLID, spellId );
     SetFloatValue( DYNAMICOBJECT_RADIUS, radius);
-    SetFloatValue( DYNAMICOBJECT_POS_X, x );
-    SetFloatValue( DYNAMICOBJECT_POS_Y, y );
-    SetFloatValue( DYNAMICOBJECT_POS_Z, z );
     SetUInt32Value( DYNAMICOBJECT_CASTTIME, getMSTime() );  // new 2.4.0
 
     m_aliveDuration = duration;

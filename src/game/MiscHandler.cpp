@@ -46,7 +46,7 @@ void WorldSession::HandleRepopRequestOpcode( WorldPacket & recv_data )
 
     recv_data.read_skip<uint8>();
 
-    if(GetPlayer()->isAlive()||GetPlayer()->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))
+    if(GetPlayer()->isAlive() || GetPlayer()->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))
         return;
 
     // the world update order is sessions, players, creatures
@@ -247,8 +247,8 @@ void WorldSession::HandleWhoOpcode( WorldPacket & recv_data )
             break;
     }
 
-    data.put( 0,              clientcount );                //insert right count
-    data.put( sizeof(uint32), clientcount );                //insert right count
+    data.put( 0,              clientcount );                // insert right count
+    data.put( sizeof(uint32), clientcount );                // insert right count
 
     SendPacket(&data);
     sLog.outDebug( "WORLD: Send SMSG_WHO Message" );
@@ -373,8 +373,8 @@ void WorldSession::HandleZoneUpdateOpcode( WorldPacket & recv_data )
 
     // use server size data
     uint32 newzone, newarea;
-    GetPlayer()->GetZoneAndAreaId(newzone,newarea);
-    GetPlayer()->UpdateZone(newzone,newarea);
+    GetPlayer()->GetZoneAndAreaId(newzone, newarea);
+    GetPlayer()->UpdateZone(newzone, newarea);
 }
 
 void WorldSession::HandleSetTargetOpcode( WorldPacket & recv_data )
@@ -383,7 +383,7 @@ void WorldSession::HandleSetTargetOpcode( WorldPacket & recv_data )
     uint64 guid ;
     recv_data >> guid;
 
-    _player->SetUInt32Value(UNIT_FIELD_TARGET,guid);
+    _player->SetTargetGUID(guid);
 
     // update reputation list if need
     Unit* unit = ObjectAccessor::GetUnit(*_player, guid );
@@ -546,7 +546,7 @@ void WorldSession::HandleAddIgnoreOpcodeCallBack(QueryResult *result, uint32 acc
     FriendsResult ignoreResult = FRIEND_IGNORE_NOT_FOUND;
     if(IgnoreGuid)
     {
-        if(IgnoreGuid==session->GetPlayer()->GetGUID())              //not add yourself
+        if(IgnoreGuid == session->GetPlayer()->GetGUID())   //not add yourself
             ignoreResult = FRIEND_IGNORE_SELF;
         else if( session->GetPlayer()->GetSocial()->HasIgnore(GUID_LOPART(IgnoreGuid)) )
             ignoreResult = FRIEND_IGNORE_ALREADY;
@@ -591,10 +591,8 @@ void WorldSession::HandleSetContactNotesOpcode( WorldPacket & recv_data )
 
 void WorldSession::HandleBugOpcode( WorldPacket & recv_data )
 {
-    uint32 suggestion, contentlen;
-    std::string content;
-    uint32 typelen;
-    std::string type;
+    uint32 suggestion, contentlen, typelen;
+    std::string content, type;
 
     recv_data >> suggestion >> contentlen >> content;
 
@@ -683,22 +681,22 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
     uint32 Trigger_ID;
 
     recv_data >> Trigger_ID;
-    sLog.outDebug("Trigger ID:%u",Trigger_ID);
+    sLog.outDebug("Trigger ID: %u", Trigger_ID);
 
     if(GetPlayer()->isInFlight())
     {
-        sLog.outDebug("Player '%s' (GUID: %u) in flight, ignore Area Trigger ID:%u",GetPlayer()->GetName(),GetPlayer()->GetGUIDLow(), Trigger_ID);
+        sLog.outDebug("Player '%s' (GUID: %u) in flight, ignore Area Trigger ID: %u", GetPlayer()->GetName(), GetPlayer()->GetGUIDLow(), Trigger_ID);
         return;
     }
 
     AreaTriggerEntry const* atEntry = sAreaTriggerStore.LookupEntry(Trigger_ID);
     if(!atEntry)
     {
-        sLog.outDebug("Player '%s' (GUID: %u) send unknown (by DBC) Area Trigger ID:%u",GetPlayer()->GetName(),GetPlayer()->GetGUIDLow(), Trigger_ID);
+        sLog.outDebug("Player '%s' (GUID: %u) send unknown (by DBC) Area Trigger ID: %u", GetPlayer()->GetName(), GetPlayer()->GetGUIDLow(), Trigger_ID);
         return;
     }
 
-    if (GetPlayer()->GetMapId()!=atEntry->mapid)
+    if (GetPlayer()->GetMapId() != atEntry->mapid)
     {
         sLog.outDebug("Player '%s' (GUID: %u) too far (trigger map: %u player map: %u), ignore Area Trigger ID: %u", GetPlayer()->GetName(), atEntry->mapid, GetPlayer()->GetMapId(), GetPlayer()->GetGUIDLow(), Trigger_ID);
         return;
@@ -712,7 +710,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
     if (atEntry->radius > 0)
     {
         // if we have radius check it
-        float dist = pl->GetDistance(atEntry->x,atEntry->y,atEntry->z);
+        float dist = pl->GetDistance(atEntry->x, atEntry->y, atEntry->z);
         if(dist > atEntry->radius + delta)
         {
             sLog.outDebug("Player '%s' (GUID: %u) too far (radius: %f distance: %f), ignore Area Trigger ID: %u",
@@ -811,8 +809,16 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
         else if(at->requiredItem2 && !GetPlayer()->HasItemCount(at->requiredItem2, 1))
             missingItem = at->requiredItem2;
 
+        MapEntry const* mapEntry = sMapStore.LookupEntry(at->target_mapId);
+        if(!mapEntry)
+            return;
+
+        bool isHeroicTargetMap = mapEntry->IsRaid()
+            ? (GetPlayer()->GetRaidDifficulty()    >= RAID_DIFFICULTY_10MAN_HEROIC)
+            : (GetPlayer()->GetDungeonDifficulty() >= DUNGEON_DIFFICULTY_HEROIC);
+
         uint32 missingKey = 0;
-        if(GetPlayer()->GetDifficulty() == DIFFICULTY_HEROIC)
+        if(isHeroicTargetMap)
         {
             if(at->heroicKey)
             {
@@ -825,7 +831,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
         }
 
         uint32 missingQuest = 0;
-        if(GetPlayer()->GetDifficulty() == DIFFICULTY_HEROIC)
+        if(isHeroicTargetMap)
         {
             if (at->requiredQuestHeroic && !GetPlayer()->GetQuestRewardStatus(at->requiredQuestHeroic))
                 missingQuest = at->requiredQuestHeroic;
@@ -842,7 +848,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
             if(missingItem)
                 SendAreaTriggerMessage(GetMangosString(LANG_LEVEL_MINREQUIRED_AND_ITEM), at->requiredLevel, objmgr.GetItemPrototype(missingItem)->Name1);
             else if(missingKey)
-                GetPlayer()->SendTransferAborted(at->target_mapId, TRANSFER_ABORT_DIFFICULTY, DIFFICULTY_HEROIC);
+                GetPlayer()->SendTransferAborted(at->target_mapId, TRANSFER_ABORT_DIFFICULTY, isHeroicTargetMap ? DUNGEON_DIFFICULTY_HEROIC : DUNGEON_DIFFICULTY_NORMAL);
             else if(missingQuest)
                 SendAreaTriggerMessage(at->requiredFailedText.c_str());
             else if(missingLevel)
@@ -851,7 +857,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
         }
     }
 
-    GetPlayer()->TeleportTo(at->target_mapId,at->target_X,at->target_Y,at->target_Z,at->target_Orientation,TELE_TO_NOT_LEAVE_TRANSPORT);
+    GetPlayer()->TeleportTo(at->target_mapId, at->target_X, at->target_Y, at->target_Z, at->target_Orientation, TELE_TO_NOT_LEAVE_TRANSPORT);
 }
 
 void WorldSession::HandleUpdateAccountData(WorldPacket &recv_data)
@@ -891,7 +897,7 @@ void WorldSession::HandleUpdateAccountData(WorldPacket &recv_data)
     uLongf realSize = decompressedSize;
     if(uncompress(const_cast<uint8*>(dest.contents()), &realSize, const_cast<uint8*>(recv_data.contents() + recv_data.rpos()), recv_data.size() - recv_data.rpos()) != Z_OK)
     {
-        recv_data.rpos(recv_data.wpos());                   // unnneded warning spam in this case
+        recv_data.rpos(recv_data.wpos());                   // unneded warning spam in this case
         sLog.outError("UAD: Failed to decompress account data");
         return;
     }
@@ -938,8 +944,8 @@ void WorldSession::HandleRequestAccountData(WorldPacket& recv_data)
 
     dest.resize(destSize);
 
-    WorldPacket data (SMSG_UPDATE_ACCOUNT_DATA, 8+4+4+4+destSize);
-    data << uint64(_player->GetGUID());                     // player guid
+    WorldPacket data(SMSG_UPDATE_ACCOUNT_DATA, 8+4+4+4+destSize);
+    data << uint64(_player ? _player->GetGUID() : 0);       // player guid
     data << uint32(type);                                   // type (0-7)
     data << uint32(adata->Time);                            // unix time
     data << uint32(size);                                   // decompressed length
@@ -984,7 +990,7 @@ void WorldSession::HandleSetActionButtonOpcode(WorldPacket& recv_data)
                 sLog.outError( "MISC: Unknown action button type %u for action %u into button %u", type, action, button );
                 return;
         }
-        GetPlayer()->addActionButton(button,action,type);
+        GetPlayer()->addActionButton(button, action, type);
     }
 }
 
@@ -1003,7 +1009,12 @@ void WorldSession::HandleMoveTimeSkippedOpcode( WorldPacket & recv_data )
     /*  WorldSession::Update( getMSTime() );*/
     DEBUG_LOG( "WORLD: Time Lag/Synchronization Resent/Update" );
 
-    recv_data.read_skip<uint64>();
+    uint64 guid;
+    if(!recv_data.readPackGUID(guid))
+    {
+        recv_data.rpos(recv_data.wpos());
+        return;
+    }
     recv_data.read_skip<uint32>();
     /*
         uint64 guid;
@@ -1081,8 +1092,8 @@ void WorldSession::HandleSetActionBarToggles(WorldPacket& recv_data)
 
     if(!GetPlayer())                                        // ignore until not logged (check needed because STATUS_AUTHED)
     {
-        if(ActionBar!=0)
-            sLog.outError("WorldSession::HandleSetActionBarToggles in not logged state with value: %u, ignored",uint32(ActionBar));
+        if(ActionBar != 0)
+            sLog.outError("WorldSession::HandleSetActionBarToggles in not logged state with value: %u, ignored", uint32(ActionBar));
         return;
     }
 
@@ -1095,7 +1106,7 @@ void WorldSession::HandleWardenDataOpcode(WorldPacket& recv_data)
     /*
         uint8 tmp;
         recv_data >> tmp;
-        sLog.outDebug("Received opcode CMSG_WARDEN_DATA, not resolve.uint8 = %u",tmp);
+        sLog.outDebug("Received opcode CMSG_WARDEN_DATA, not resolve.uint8 = %u", tmp);
     */
 }
 
@@ -1195,7 +1206,7 @@ void WorldSession::HandleWorldTeleportOpcode(WorldPacket& recv_data)
     DEBUG_LOG("Time %u sec, map=%u, x=%f, y=%f, z=%f, orient=%f", time/1000, mapid, PositionX, PositionY, PositionZ, Orientation);
 
     if (GetSecurity() >= SEC_ADMINISTRATOR)
-        GetPlayer()->TeleportTo(mapid,PositionX,PositionY,PositionZ,Orientation);
+        GetPlayer()->TeleportTo(mapid, PositionX, PositionY, PositionZ, Orientation);
     else
         SendNotification(LANG_YOU_NOT_HAVE_PERMISSION);
     sLog.outDebug("Received worldport command from player %s", GetPlayer()->GetName());
@@ -1368,7 +1379,7 @@ void WorldSession::HandleTimeSyncResp( WorldPacket & recv_data )
     recv_data >> counter >> time_;
 
     // time_ seems always more than getMSTime()
-    uint32 diff = getMSTimeDiff(getMSTime(),time_);
+    uint32 diff = getMSTimeDiff(getMSTime(), time_);
 
     sLog.outDebug("response sent: counter %u, time %u (HEX: %X), ms. time %u, diff %u", counter, time_, time_, getMSTime(), diff);
 }
@@ -1376,14 +1387,20 @@ void WorldSession::HandleTimeSyncResp( WorldPacket & recv_data )
 void WorldSession::HandleResetInstancesOpcode( WorldPacket & /*recv_data*/ )
 {
     sLog.outDebug("WORLD: CMSG_RESET_INSTANCES");
-    Group *pGroup = _player->GetGroup();
-    if(pGroup)
+
+    if(Group *pGroup = _player->GetGroup())
     {
         if(pGroup->IsLeader(_player->GetGUID()))
-            pGroup->ResetInstances(INSTANCE_RESET_ALL, _player);
+        {
+            pGroup->ResetInstances(INSTANCE_RESET_ALL, false, _player);
+            pGroup->ResetInstances(INSTANCE_RESET_ALL, true,_player);
+        }
     }
     else
-        _player->ResetInstances(INSTANCE_RESET_ALL);
+    {
+        _player->ResetInstances(INSTANCE_RESET_ALL, false);
+        _player->ResetInstances(INSTANCE_RESET_ALL, true);
+    }
 }
 
 void WorldSession::HandleSetDungeonDifficultyOpcode( WorldPacket & recv_data )
@@ -1393,14 +1410,14 @@ void WorldSession::HandleSetDungeonDifficultyOpcode( WorldPacket & recv_data )
     uint32 mode;
     recv_data >> mode;
 
-    if(mode == _player->GetDifficulty())
-        return;
-
-    if(mode > DIFFICULTY_HEROIC)
+    if(mode >= MAX_DUNGEON_DIFFICULTY)
     {
         sLog.outError("WorldSession::HandleSetDungeonDifficultyOpcode: player %d sent an invalid instance mode %d!", _player->GetGUIDLow(), mode);
         return;
     }
+
+    if(Difficulty(mode) == _player->GetDungeonDifficulty())
+        return;
 
     // cannot reset while in an instance
     Map *map = _player->GetMap();
@@ -1412,28 +1429,71 @@ void WorldSession::HandleSetDungeonDifficultyOpcode( WorldPacket & recv_data )
 
     if(_player->getLevel() < LEVELREQUIREMENT_HEROIC)
         return;
-    Group *pGroup = _player->GetGroup();
-    if(pGroup)
+
+    if(Group *pGroup = _player->GetGroup())
     {
         if(pGroup->IsLeader(_player->GetGUID()))
         {
             // the difficulty is set even if the instances can't be reset
             //_player->SendDungeonDifficulty(true);
-            pGroup->ResetInstances(INSTANCE_RESET_CHANGE_DIFFICULTY, _player);
-            pGroup->SetDifficulty(mode);
+            pGroup->ResetInstances(INSTANCE_RESET_CHANGE_DIFFICULTY, false, _player);
+            pGroup->SetDungeonDifficulty(Difficulty(mode));
         }
     }
     else
     {
-        _player->ResetInstances(INSTANCE_RESET_CHANGE_DIFFICULTY);
-        _player->SetDifficulty(mode);
+        _player->ResetInstances(INSTANCE_RESET_CHANGE_DIFFICULTY, false);
+        _player->SetDungeonDifficulty(Difficulty(mode));
+    }
+}
+
+void WorldSession::HandleSetRaidDifficultyOpcode( WorldPacket & recv_data )
+{
+    sLog.outDebug("MSG_SET_RAID_DIFFICULTY");
+
+    uint32 mode;
+    recv_data >> mode;
+
+    if(mode >= MAX_RAID_DIFFICULTY)
+    {
+        sLog.outError("WorldSession::HandleSetRaidDifficultyOpcode: player %d sent an invalid instance mode %d!", _player->GetGUIDLow(), mode);
+        return;
+    }
+
+    if(RaidDifficulties(mode) == _player->GetRaidDifficulty())
+        return;
+
+    // cannot reset while in an instance
+    Map *map = _player->GetMap();
+    if(map && map->IsDungeon())
+    {
+        sLog.outError("WorldSession::HandleSetRaidDifficultyOpcode: player %d tried to reset the instance while inside!", _player->GetGUIDLow());
+        return;
+    }
+
+    if(_player->getLevel() < LEVELREQUIREMENT_HEROIC)
+        return;
+
+    if(Group *pGroup = _player->GetGroup())
+    {
+        if(pGroup->IsLeader(_player->GetGUID()))
+        {
+            // the difficulty is set even if the instances can't be reset
+            //_player->SendDungeonDifficulty(true);
+            pGroup->ResetInstances(INSTANCE_RESET_CHANGE_DIFFICULTY, true, _player);
+            pGroup->SetRaidDifficulty(Difficulty(mode));
+        }
+    }
+    else
+    {
+        _player->ResetInstances(INSTANCE_RESET_CHANGE_DIFFICULTY, true);
+        _player->SetRaidDifficulty(Difficulty(mode));
     }
 }
 
 void WorldSession::HandleCancelMountAuraOpcode( WorldPacket & /*recv_data*/ )
 {
     sLog.outDebug("WORLD: CMSG_CANCEL_MOUNT_AURA");
-    //recv_data.hexlike();
 
     //If player is not mounted, so go out :)
     if (!_player->IsMounted())                              // not blizz like; no any messages on blizz
@@ -1491,9 +1551,16 @@ void WorldSession::HandleQueryInspectAchievements( WorldPacket & recv_data )
     if(!recv_data.readPackGUID(guid))
         return;
 
-    Player *player = objmgr.GetPlayer(guid);
-    if(!player)
-        return;
+    if(Player *player = objmgr.GetPlayer(guid))
+        player->GetAchievementMgr().SendRespondInspectAchievements(_player);
+}
 
-    player->GetAchievementMgr().SendRespondInspectAchievements(_player);
+void WorldSession::HandleWorldStateUITimerUpdate(WorldPacket& recv_data)
+{
+    // empty opcode
+    sLog.outDebug("WORLD: CMSG_WORLD_STATE_UI_TIMER_UPDATE");
+
+    WorldPacket data(SMSG_WORLD_STATE_UI_TIMER_UPDATE, 4);
+    data << uint32(time(NULL));
+    SendPacket(&data);
 }

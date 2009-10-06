@@ -117,6 +117,17 @@ pkgdata_DATA = \
 	8548_02_mangos_gameobject_battleground.sql \
 	8549_03_mangos_battleground_events.sql \
 	8573_01_mangos_mangos_string.sql \
+	8589_01_mangos_creature_template.sql \
+	8589_02_mangos_gameobject_template.sql \
+	8589_03_mangos_item_template.sql \
+	8589_04_characters_groups.sql \
+	8589_05_mangos_battleground_template.sql \
+	8589_06_characters_bugreport.sql \
+	8589_07_mangos_spell_elixir.sql \
+	8589_08_mangos_item_template.sql \
+	8589_09_mangos_spell_chain.sql \
+	8589_10_mangos_spell_proc_event.sql \
+	8589_11_characters_characters.sql \
 	README
 
 ## Additional files to include when running 'make dist'
@@ -214,4 +225,15 @@ EXTRA_DIST = \
 	8548_02_mangos_gameobject_battleground.sql \
 	8549_03_mangos_battleground_events.sql \
 	8573_01_mangos_mangos_string.sql \
+	8589_01_mangos_creature_template.sql \
+	8589_02_mangos_gameobject_template.sql \
+	8589_03_mangos_item_template.sql \
+	8589_04_characters_groups.sql \
+	8589_05_mangos_battleground_template.sql \
+	8589_06_characters_bugreport.sql \
+	8589_07_mangos_spell_elixir.sql \
+	8589_08_mangos_item_template.sql \
+	8589_09_mangos_spell_chain.sql \
+	8589_10_mangos_spell_proc_event.sql \
+	8589_11_characters_characters.sql \
 	README

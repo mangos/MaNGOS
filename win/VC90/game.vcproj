@@ -567,6 +567,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\game\BattleGroundABG.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\BattleGroundABG.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\game\BattleGroundAV.cpp"
 				>
 			</File>
@@ -600,6 +608,14 @@
 			</File>
 			<File
 				RelativePath="..\..\src\game\BattleGroundHandler.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\BattleGroundIC.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\BattleGroundIC.h"
 				>
 			</File>
 			<File

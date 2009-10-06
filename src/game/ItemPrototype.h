@@ -63,10 +63,13 @@ enum ItemModType
     ITEM_MOD_SPELL_DAMAGE_DONE        = 42,                 // deprecated
     ITEM_MOD_MANA_REGENERATION        = 43,
     ITEM_MOD_ARMOR_PENETRATION_RATING = 44,
-    ITEM_MOD_SPELL_POWER              = 45
+    ITEM_MOD_SPELL_POWER              = 45,
+    ITEM_MOD_HEALTH_REGEN             = 46,
+    ITEM_MOD_SPELL_PENETRATION        = 47,
+    ITEM_MOD_BLOCK_VALUE              = 48
 };
 
-#define MAX_ITEM_MOD                    46
+#define MAX_ITEM_MOD                    49
 
 enum ItemSpelltriggerType
 {
@@ -106,16 +109,22 @@ enum ITEM_FLAGS
     ITEM_FLAGS_OPENABLE                       = 0x00000004,
     ITEM_FLAGS_WRAPPED                        = 0x00000008,
     ITEM_FLAGS_BROKEN                         = 0x00000010, // appears red icon (like when item durability==0)
+    ITEM_FLAGS_TOTEM                          = 0x00000020, // ?
+    ITEM_FLAGS_USABLE                         = 0x00000040, // ?
     ITEM_FLAGS_WRAPPER                        = 0x00000200, // used or not used wrapper
     ITEM_FLAGS_PARTY_LOOT                     = 0x00000800, // determines if item is party loot or not
+    ITEM_FLAGS_REFUNDABLE                     = 0x00001000, // item cost can be refunded within 2 hours after purchase
     ITEM_FLAGS_CHARTER                        = 0x00002000, // arena/guild charter
+    ITEM_FLAGS_REFUNDABLE_2                   = 0x00008000,
     ITEM_FLAGS_PROSPECTABLE                   = 0x00040000,
     ITEM_FLAGS_UNIQUE_EQUIPPED                = 0x00080000,
     ITEM_FLAGS_USEABLE_IN_ARENA               = 0x00200000,
     ITEM_FLAGS_THROWABLE                      = 0x00400000, // not used in game for check trow possibility, only for item in game tooltip
     ITEM_FLAGS_SPECIALUSE                     = 0x00800000, // last used flag in 2.3.0
     ITEM_FLAGS_BOA                            = 0x08000000, // bind on account (set in template for items that can binded in like way)
-    ITEM_FLAGS_MILLABLE                       = 0x20000000
+    ITEM_FLAGS_ENCHANT_SCROLL                 = 0x10000000, // for enchant scrolls
+    ITEM_FLAGS_MILLABLE                       = 0x20000000,
+    ITEM_FLAGS_BOP_TRADEABLE                  = 0x80000000
 };
 
 enum BAG_FAMILY_MASK
@@ -508,6 +517,7 @@ struct ItemPrototype
     uint32 DisplayInfoID;                                   // id from ItemDisplayInfo.dbc
     uint32 Quality;
     uint32 Flags;
+    uint32 Faction;
     uint32 BuyCount;
     uint32 BuyPrice;
     uint32 SellPrice;

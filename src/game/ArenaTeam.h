@@ -101,7 +101,7 @@ struct ArenaTeamMember
         else
             personal_rating += mod;
         if(plr)
-            plr->SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (slot*6) + 5, personal_rating);
+            plr->SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (slot * ARENA_TEAM_END) + ARENA_TEAM_PERSONAL_RATING, personal_rating);
     }
 };
 

@@ -5850,7 +5850,7 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
 
                     // find caster main aura at beacon
                     Aura* dummy = NULL;
-                    Unit::AuraList const& baa = beacon->GetAurasByType(SPELL_AURA_DUMMY);
+                    Unit::AuraList const& baa = beacon->GetAurasByType(SPELL_AURA_PERIODIC_TRIGGER_SPELL);
                     for(Unit::AuraList::const_iterator i = baa.begin(); i != baa.end(); ++i)
                     {
                         if ((*i)->GetId() == 53563 && (*i)->GetCasterGUID() == pVictim->GetGUID())
@@ -7658,8 +7658,8 @@ bool Unit::Attack(Unit *victim, bool meleeAttack)
             ((Creature*)this)->SetCombatStartPosition(GetPositionX(), GetPositionY(), GetPositionZ());
     }
 
-    //Set our target
-    SetUInt64Value(UNIT_FIELD_TARGET, victim->GetGUID());
+    // Set our target
+    SetTargetGUID(victim->GetGUID());
 
     if(meleeAttack)
         addUnitState(UNIT_STAT_MELEE_ATTACKING);
@@ -7697,8 +7697,8 @@ bool Unit::AttackStop(bool targetSwitch /*=false*/)
     m_attacking->_removeAttacker(this);
     m_attacking = NULL;
 
-    //Clear our target
-    SetUInt64Value(UNIT_FIELD_TARGET, 0);
+    // Clear our target
+    SetTargetGUID(0);
 
     clearUnitState(UNIT_STAT_MELEE_ATTACKING);
 
@@ -7860,6 +7860,7 @@ void Unit::ModifyAuraState(AuraState flag, bool apply)
         }
     }
 }
+
 Unit *Unit::GetOwner() const
 {
     if(uint64 ownerid = GetOwnerGUID())
@@ -7923,7 +7924,7 @@ float Unit::GetCombatDistance( const Unit* target ) const
 
 void Unit::SetPet(Pet* pet)
 {
-    SetUInt64Value(UNIT_FIELD_SUMMON, pet ? pet->GetGUID() : 0);
+    SetPetGUID(pet ? pet->GetGUID() : 0);
 
     // FIXME: hack, speed must be set only at follow
     if(pet && GetTypeId()==TYPEID_PLAYER)
@@ -7933,15 +7934,13 @@ void Unit::SetPet(Pet* pet)
 
 void Unit::SetCharm(Unit* pet)
 {
-    SetUInt64Value(UNIT_FIELD_CHARM, pet ? pet->GetGUID() : 0);
+    SetCharmGUID(pet ? pet->GetGUID() : 0);
 }
-
 
 void Unit::AddGuardian( Pet* pet )
 {
     m_guardianPets.insert(pet->GetGUID());
 }
-
 
 void Unit::RemoveGuardian( Pet* pet )
 {
@@ -8269,6 +8268,38 @@ uint32 Unit::SpellDamageBonus(Unit *pVictim, SpellEntry const *spellProto, uint3
                 for(Unit::AuraList::const_iterator i = ttw.begin(); i != ttw.end(); ++i)
                 {
                     if ((*i)->GetSpellProto()->SpellIconID == 3263)
+                    {
+                        DoneTotalMod *= ((*i)->GetModifier()->m_amount+100.0f) / 100.0f;
+                        break;
+                    }
+                }
+            }
+            break;
+        }
+        case SPELLFAMILY_DEATHKNIGHT:
+        {
+            // Icy Touch, Howling Blast and Frost Strike
+            if (spellProto->SpellFamilyFlags & UI64LIT(0x0000000600000002))
+            {
+                // search disease
+                bool found = false;
+                Unit::AuraMap const& auras = pVictim->GetAuras();
+                for(Unit::AuraMap::const_iterator itr = auras.begin(); itr!=auras.end(); ++itr)
+                {
+                    if(itr->second->GetSpellProto()->Dispel == DISPEL_DISEASE)
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+                if(!found)
+                    break;
+
+                // search for Glacier Rot dummy aura
+                Unit::AuraList const& dummyAuras = GetAurasByType(SPELL_AURA_DUMMY);
+                for(Unit::AuraList::const_iterator i = dummyAuras.begin(); i != dummyAuras.end(); ++i)
+                {
+                    if ((*i)->GetSpellProto()->EffectMiscValue[(*i)->GetEffIndex()] == 7244)
                     {
                         DoneTotalMod *= ((*i)->GetModifier()->m_amount+100.0f) / 100.0f;
                         break;
@@ -12098,9 +12129,6 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit *pVictim, Aura* aura, SpellEntry con
             else
                 item = ((Player*)this)->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED);
 
-            if (!((Player*)this)->IsUseEquipedWeapon(attType==BASE_ATTACK))
-                return false;
-
             if(!item || item->IsBroken() || item->GetProto()->Class != ITEM_CLASS_WEAPON || !((1<<item->GetProto()->SubClass) & spellProto->EquippedItemSubClassMask))
                 return false;
         }
@@ -12190,7 +12218,7 @@ bool Unit::HandleMendingAuraProc( Aura* triggeredByAura )
 
 void Unit::RemoveAurasAtChanneledTarget(SpellEntry const* spellInfo)
 {
-    uint64 target_guid = GetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT);
+    uint64 target_guid = GetChannelObjectGUID();
 
     if(!IS_UNIT_GUID(target_guid))
         return;

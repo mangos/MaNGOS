@@ -139,7 +139,7 @@ Map* MapInstanced::CreateInstance(const uint32 mapId, Player * player)
     }
     else
     {
-        InstancePlayerBind *pBind = player->GetBoundInstance(GetId(), player->GetDifficulty());
+        InstancePlayerBind *pBind = player->GetBoundInstance(GetId(), player->GetDifficulty(IsRaid()));
         InstanceSave *pSave = pBind ? pBind->save : NULL;
 
         // the player's permanent player bind is taken into consideration first
@@ -149,7 +149,7 @@ Map* MapInstanced::CreateInstance(const uint32 mapId, Player * player)
             InstanceGroupBind *groupBind = NULL;
             Group *group = player->GetGroup();
             // use the player's difficulty setting (it may not be the same as the group's)
-            if(group && (groupBind = group->GetBoundInstance(GetId(), player->GetDifficulty())))
+            if(group && (groupBind = group->GetBoundInstance(this)))
                 pSave = groupBind->save;
         }
 
@@ -167,14 +167,14 @@ Map* MapInstanced::CreateInstance(const uint32 mapId, Player * player)
             // if no instanceId via group members or instance saves is found
             // the instance will be created for the first time
             NewInstanceId = MapManager::Instance().GenerateInstanceId();
-            map = CreateInstance(NewInstanceId, NULL, player->GetDifficulty());
+            map = CreateInstance(NewInstanceId, NULL, player->GetDifficulty(IsRaid()));
         }
     }
 
     return map;
 }
 
-InstanceMap* MapInstanced::CreateInstance(uint32 InstanceId, InstanceSave *save, uint8 difficulty)
+InstanceMap* MapInstanced::CreateInstance(uint32 InstanceId, InstanceSave *save, Difficulty difficulty)
 {
     // load/create a map
     Guard guard(*this);
@@ -194,7 +194,9 @@ InstanceMap* MapInstanced::CreateInstance(uint32 InstanceId, InstanceSave *save,
     }
 
     // some instances only have one difficulty
-    if (entry && !entry->SupportsHeroicMode()) difficulty = DIFFICULTY_NORMAL;
+    MapDifficulty const* mapDiff = GetMapDifficultyData(GetId(),difficulty);
+    if (!mapDiff)
+        difficulty = DUNGEON_DIFFICULTY_NORMAL;
 
     sLog.outDebug("MapInstanced::CreateInstance: %s map instance %d for %d created with difficulty %s", save?"":"new ", InstanceId, GetId(), difficulty?"heroic":"normal");
 

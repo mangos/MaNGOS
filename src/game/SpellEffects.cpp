@@ -543,7 +543,7 @@ void Spell::EffectSchoolDMG(uint32 effect_idx)
                             for (int i=0; i< doses; i++)
                                 unitTarget->RemoveSingleSpellAurasFromStack(spellId);
                             damage *= doses;
-                            damage += int32(((Player*)m_caster)->GetTotalAttackPowerValue(BASE_ATTACK) * 0.03f * doses);
+                            damage += int32(((Player*)m_caster)->GetTotalAttackPowerValue(BASE_ATTACK) * 0.09f * doses);
                         }
                         // Eviscerate and Envenom Bonus Damage (item set effect)
                         if(m_caster->GetDummyAura(37169))
@@ -907,10 +907,6 @@ void Spell::EffectDummy(uint32 i)
                     DEBUG_LOG("AddObject at SpellEfects.cpp EffectDummy");
                     map->Add(pGameObj);
 
-                    WorldPacket data(SMSG_GAMEOBJECT_SPAWN_ANIM_OBSOLETE, 8);
-                    data << uint64(pGameObj->GetGUID());
-                    m_caster->SendMessageToSet(&data, true);
-
                     return;
                 }
                 case 23074:                                 // Arcanite Dragonling
@@ -1268,30 +1264,6 @@ void Spell::EffectDummy(uint32 i)
                     m_caster->CastSpell(unitTarget,60934,true,NULL);
                     return;
             }
-
-            //All IconID Check in there
-            switch(m_spellInfo->SpellIconID)
-            {
-                // Berserking (troll racial traits)
-                case 1661:
-                {
-                    uint32 healthPerc = uint32((float(m_caster->GetHealth())/m_caster->GetMaxHealth())*100);
-                    int32 melee_mod = 10;
-                    if (healthPerc <= 40)
-                        melee_mod = 30;
-                    if (healthPerc < 100 && healthPerc > 40)
-                        melee_mod = 10+(100-healthPerc)/3;
-
-                    int32 hasteModBasePoints0 = melee_mod;          // (EffectBasePoints[0]+1)-1+(5-melee_mod) = (melee_mod-1+1)-1+5-melee_mod = 5-1
-                    int32 hasteModBasePoints1 = (5-melee_mod);
-                    int32 hasteModBasePoints2 = 5;
-
-                    // FIXME: custom spell required this aura state by some unknown reason, we not need remove it anyway
-                    m_caster->ModifyAuraState(AURA_STATE_BERSERKING,true);
-                    m_caster->CastCustomSpell(m_caster, 26635, &hasteModBasePoints0, &hasteModBasePoints1, &hasteModBasePoints2, true, NULL);
-                    return;
-                }
-            }
             break;
         }
         case SPELLFAMILY_MAGE:
@@ -1608,10 +1580,6 @@ void Spell::EffectDummy(uint32 i)
                 uint32 spellid;
                 switch(m_spellInfo->Id)
                 {
-                    case 781:                               // player case
-                        target = m_caster;
-                        spellid = 56446;
-                        break;
                     case 57635: spellid = 57636; break;     // one from creature cases
                     case 61507: spellid = 61508; break;     // one from creature cases
                     default:
@@ -1788,55 +1756,6 @@ void Spell::EffectDummy(uint32 i)
             }
             break;
         case SPELLFAMILY_SHAMAN:
-            // Rockbiter Weapon
-            if (m_spellInfo->SpellFamilyFlags & 0x400000)
-            {
-                // TODO: use expect spell for enchant (if exist talent)
-                // In 3.0.3 no mods present for rockbiter
-                uint32 spell_id = 0;
-                switch(m_spellInfo->Id)
-                {
-                    case  8017: spell_id = 36494; break;    // Rank 1
-                    case  8018: spell_id = 36750; break;    // Rank 2
-                    case  8019: spell_id = 36755; break;    // Rank 3
-                    case 10399: spell_id = 36759; break;    // Rank 4
-                    default:
-                        sLog.outError("Spell::EffectDummy: Spell %u not handled in RW", m_spellInfo->Id);
-                        return;
-                }
-
-                SpellEntry const *spellInfo = sSpellStore.LookupEntry(spell_id);
-
-                if (!spellInfo)
-                {
-                    sLog.outError("WORLD: unknown spell id %i", spell_id);
-                    return;
-                }
-
-                if (m_caster->GetTypeId() != TYPEID_PLAYER)
-                    return;
-
-                for(int j = BASE_ATTACK; j <= OFF_ATTACK; ++j)
-                {
-                    if (Item* item = ((Player*)m_caster)->GetWeaponForAttack(WeaponAttackType(j)))
-                    {
-                        if (item->IsFitToSpellRequirements(m_spellInfo))
-                        {
-                            Spell *spell = new Spell(m_caster, spellInfo, true);
-
-                            // enchanting spell selected by calculated damage-per-sec in enchanting effect
-                            // at calculation applied affect from Elemental Weapons talent
-                            // real enchantment damage-1
-                            spell->m_currentBasePoints[1] = damage-1;
-
-                            SpellCastTargets targets;
-                            targets.setItemTarget( item );
-                            spell->prepare(&targets);
-                        }
-                    }
-                }
-                return;
-            }
             // Cleansing Totem
             if ((m_spellInfo->SpellFamilyFlags & UI64LIT(0x0000000004000000)) && m_spellInfo->SpellIconID==1673)
             {
@@ -4055,64 +3974,61 @@ void Spell::EffectEnchantItemTmp(uint32 i)
 
     Player* p_caster = (Player*)m_caster;
 
+    // Rockbiter Weapon apply to both weapon
+    if (m_spellInfo->SpellFamilyName == SPELLFAMILY_SHAMAN && m_spellInfo->SpellFamilyFlags & UI64LIT(0x0000000000400000))
+    {
+        uint32 spell_id = 0;
+
+        // enchanting spell selected by calculated damage-per-sec stored in Effect[1] base value
+        // Note: damage calculated (correctly) with rounding int32(float(v)) but
+        // RW enchantments applied damage int32(float(v)+0.5), this create  0..1 difference sometime
+        switch(damage)
+        {
+            // Rank 1
+            case  2: spell_id = 36744; break;               //  0% [ 7% ==  2, 14% == 2, 20% == 2]
+            // Rank 2
+            case  4: spell_id = 36753; break;               //  0% [ 7% ==  4, 14% == 4]
+            case  5: spell_id = 36751; break;               // 20%
+            // Rank 3
+            case  6: spell_id = 36754; break;               //  0% [ 7% ==  6, 14% == 6]
+            case  7: spell_id = 36755; break;               // 20%
+            // Rank 4
+            case  9: spell_id = 36761; break;               //  0% [ 7% ==  6]
+            case 10: spell_id = 36758; break;               // 14%
+            case 11: spell_id = 36760; break;               // 20%
+            default:
+                sLog.outError("Spell::EffectEnchantItemTmp: Damage %u not handled in S'RW",damage);
+                return;
+        }
+
+
+        SpellEntry const *spellInfo = sSpellStore.LookupEntry(spell_id);
+        if (!spellInfo)
+        {
+            sLog.outError("Spell::EffectEnchantItemTmp: unknown spell id %i", spell_id);
+            return;
+        }
+
+        for(int j = BASE_ATTACK; j <= OFF_ATTACK; ++j)
+        {
+            if (Item* item = p_caster->GetWeaponForAttack(WeaponAttackType(j)))
+            {
+                if (item->IsFitToSpellRequirements(m_spellInfo))
+                {
+                    Spell *spell = new Spell(m_caster, spellInfo, true);
+                    SpellCastTargets targets;
+                    targets.setItemTarget( item );
+                    spell->prepare(&targets);
+                }
+            }
+        }
+        return;
+    }
+
     if (!itemTarget)
         return;
 
     uint32 enchant_id = m_spellInfo->EffectMiscValue[i];
-
-    // Shaman Rockbiter Weapon
-    if (i==0 && m_spellInfo->Effect[1]==SPELL_EFFECT_DUMMY)
-    {
-        int32 enchnting_damage = m_currentBasePoints[1]+1;
-
-        // enchanting id selected by calculated damage-per-sec stored in Effect[1] base value
-        // with already applied percent bonus from Elemental Weapons talent
-        // Note: damage calculated (correctly) with rounding int32(float(v)) but
-        // RW enchantments applied damage int32(float(v)+0.5), this create  0..1 difference sometime
-        switch(enchnting_damage)
-        {
-            // Rank 1
-            case  2: enchant_id =   29; break;              //  0% [ 7% ==  2, 14% == 2, 20% == 2]
-            // Rank 2
-            case  4: enchant_id =    6; break;              //  0% [ 7% ==  4, 14% == 4]
-            case  5: enchant_id = 3025; break;              // 20%
-            // Rank 3
-            case  6: enchant_id =    1; break;              //  0% [ 7% ==  6, 14% == 6]
-            case  7: enchant_id = 3027; break;              // 20%
-            // Rank 4
-            case  9: enchant_id = 3032; break;              //  0% [ 7% ==  6]
-            case 10: enchant_id =  503; break;              // 14%
-            case 11: enchant_id = 3031; break;              // 20%
-            // Rank 5
-            case 15: enchant_id = 3035; break;              // 0%
-            case 16: enchant_id = 1663; break;              // 7%
-            case 17: enchant_id = 3033; break;              // 14%
-            case 18: enchant_id = 3034; break;              // 20%
-            // Rank 6
-            case 28: enchant_id = 3038; break;              // 0%
-            case 29: enchant_id =  683; break;              // 7%
-            case 31: enchant_id = 3036; break;              // 14%
-            case 33: enchant_id = 3037; break;              // 20%
-            // Rank 7
-            case 40: enchant_id = 3041; break;              // 0%
-            case 42: enchant_id = 1664; break;              // 7%
-            case 45: enchant_id = 3039; break;              // 14%
-            case 48: enchant_id = 3040; break;              // 20%
-            // Rank 8
-            case 49: enchant_id = 3044; break;              // 0%
-            case 52: enchant_id = 2632; break;              // 7%
-            case 55: enchant_id = 3042; break;              // 14%
-            case 58: enchant_id = 3043; break;              // 20%
-            // Rank 9
-            case 62: enchant_id = 2633; break;              // 0%
-            case 66: enchant_id = 3018; break;              // 7%
-            case 70: enchant_id = 3019; break;              // 14%
-            case 74: enchant_id = 3020; break;              // 20%
-            default:
-                sLog.outError("Spell::EffectEnchantItemTmp: Damage %u not handled in S'RW",enchnting_damage);
-                return;
-        }
-    }
 
     if (!enchant_id)
     {
@@ -4603,14 +4519,36 @@ void Spell::EffectWeaponDmg(uint32 i)
                 if (count)
                 {
                     // Effect 1(for Blood-Caked Strike)/3(other) damage is bonus
-                    double bonus = count * CalculateDamage(m_spellInfo->SpellIconID == 1736 ? 0 : 2, unitTarget) / 100.0f;
+                    float bonus = count * CalculateDamage(m_spellInfo->SpellIconID == 1736 ? 0 : 2, unitTarget) / 100.0f;
                     // Blood Strike, Blood-Caked Strike and Obliterate store bonus*2
                     if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0002000000400000) ||
                         m_spellInfo->SpellIconID == 1736)
                         bonus /= 2.0f;
 
-                    totalDamagePercentMod += bonus;
+                    totalDamagePercentMod *= 1.0f + bonus;
                 }
+            }
+            // Glyph of Blood Strike
+            if( m_spellInfo->SpellFamilyFlags & UI64LIT(0x0000000000400000) &&
+                m_caster->HasAura(59332) &&
+                unitTarget->HasAuraType(SPELL_AURA_MOD_DECREASE_SPEED))
+            {
+                totalDamagePercentMod *= 1.2f;              // 120% if snared
+            }
+            // Glyph of Death Strike
+            if( m_spellInfo->SpellFamilyFlags & UI64LIT(0x0000000000000010) &&
+                m_caster->HasAura(59336))
+            {
+                int32 rp = m_caster->GetPower(POWER_RUNIC_POWER) / 10;
+                if(rp > 25)
+                    rp = 25;
+                totalDamagePercentMod *= 1.0f + rp / 100.0f;
+            }
+            // Glyph of Plague Strike
+            if( m_spellInfo->SpellFamilyFlags & UI64LIT(0x0000000000000001) &&
+                m_caster->HasAura(58657) )
+            {
+                totalDamagePercentMod *= 1.2f;
             }
             break;
         }
@@ -5530,6 +5468,37 @@ void Spell::EffectScriptEffect(uint32 effIndex)
             }
             break;
         }
+        case SPELLFAMILY_DEATHKNIGHT:
+        {
+            switch(m_spellInfo->Id)
+            {
+                // Pestilence
+                case 50842:
+                {
+                    if(!unitTarget)
+                        return;
+
+                    Unit* mainTarget = m_targets.getUnitTarget();
+                    if(!mainTarget)
+                        return;
+
+                    // do only refresh diseases on main target if caster has Glyph of Disease
+                    if(mainTarget == unitTarget && !m_caster->HasAura(63334))
+                        return;
+
+                    // Blood Plague
+                    if(mainTarget->HasAura(55078))
+                        m_caster->CastSpell(unitTarget, 55078, true);
+
+                    // Frost Fever
+                    if(mainTarget->HasAura(55095))
+                        m_caster->CastSpell(unitTarget, 55095, true);
+
+                    break;
+                }
+            }
+            break;
+        }
     }
 
     // normal DB scripted effect
@@ -6017,9 +5986,6 @@ void Spell::EffectSummonObject(uint32 i)
     m_caster->AddGameObject(pGameObj);
 
     map->Add(pGameObj);
-    WorldPacket data(SMSG_GAMEOBJECT_SPAWN_ANIM_OBSOLETE, 8);
-    data << uint64(pGameObj->GetGUID());
-    m_caster->SendMessageToSet(&data, true);
 
     m_caster->m_ObjectSlot[slot] = pGameObj->GetGUID();
 }
@@ -6582,7 +6548,7 @@ void Spell::EffectTransmitted(uint32 effIndex)
     {
         case GAMEOBJECT_TYPE_FISHINGNODE:
         {
-            m_caster->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT,pGameObj->GetGUID());
+            m_caster->SetChannelObjectGUID(pGameObj->GetGUID());
             m_caster->AddGameObject(pGameObj);              // will removed at spell cancel
 
             // end time of range when possible catch fish (FISHING_BOBBER_READY_TIME..GetDuration(m_spellInfo))
@@ -6626,10 +6592,6 @@ void Spell::EffectTransmitted(uint32 effIndex)
     //m_ObjToDel.push_back(pGameObj);
 
     cMap->Add(pGameObj);
-
-    WorldPacket data(SMSG_GAMEOBJECT_SPAWN_ANIM_OBSOLETE, 8);
-    data << uint64(pGameObj->GetGUID());
-    m_caster->SendMessageToSet(&data,true);
 
     if(uint32 linkedEntry = pGameObj->GetGOInfo()->GetLinkedGameObjectEntry())
     {

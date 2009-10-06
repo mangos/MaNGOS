@@ -53,7 +53,6 @@ void Totem::Update( uint32 time )
 
 void Totem::Summon(Unit* owner)
 {
-    sLog.outDebug("AddObject at Totem.cpp line 49");
     owner->GetMap()->Add((Creature*)this);
 
     // select totem model in dependent from owner team
@@ -66,10 +65,6 @@ void Totem::Summon(Unit* owner)
             display_id = minfo->modelid;
         SetDisplayId(display_id);
     }
-
-    WorldPacket data(SMSG_GAMEOBJECT_SPAWN_ANIM_OBSOLETE, 8);
-    data << GetGUID();
-    SendMessageToSet(&data,true);
 
     AIM_Initialize();
 
@@ -87,12 +82,10 @@ void Totem::Summon(Unit* owner)
 
 void Totem::UnSummon()
 {
-    SendObjectDeSpawnAnim(GetGUID());
-
     CombatStop();
     RemoveAurasDueToSpell(GetSpell());
-    Unit *owner = GetOwner();
-    if (owner)
+
+    if (Unit *owner = GetOwner())
     {
         // clear owner's totem slot
         for(int i = 0; i < MAX_TOTEM; ++i)
@@ -109,8 +102,10 @@ void Totem::UnSummon()
         //remove aura all party members too
         if (owner->GetTypeId() == TYPEID_PLAYER)
         {
+            ((Player*)owner)->SendAutoRepeatCancel(this);
+
             // Not only the player can summon the totem (scripted AI)
-            if(Group *pGroup = ((Player*)owner)->GetGroup())
+            if (Group *pGroup = ((Player*)owner)->GetGroup())
             {
                 for(GroupReference *itr = pGroup->GetFirstMember(); itr != NULL; itr = itr->next())
                 {

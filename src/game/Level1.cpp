@@ -537,19 +537,22 @@ bool ChatHandler::HandleGonameCommand(const char* args)
 
             // if the player or the player's group is bound to another instance
             // the player will not be bound to another one
-            InstancePlayerBind *pBind = _player->GetBoundInstance(target->GetMapId(), target->GetDifficulty());
+            InstancePlayerBind *pBind = _player->GetBoundInstance(target->GetMapId(), target->GetDifficulty(cMap->IsRaid()));
             if (!pBind)
             {
                 Group *group = _player->GetGroup();
                 // if no bind exists, create a solo bind
-                InstanceGroupBind *gBind = group ? group->GetBoundInstance(target->GetMapId(), target->GetDifficulty()) : NULL;
+                InstanceGroupBind *gBind = group ? group->GetBoundInstance(target) : NULL;
                 // if no bind exists, create a solo bind
                 if (!gBind)
                     if (InstanceSave *save = sInstanceSaveManager.GetInstanceSave(target->GetInstanceId()))
                         _player->BindToInstance(save, !save->CanReset());
             }
 
-            _player->SetDifficulty(target->GetDifficulty());
+            if(cMap->IsRaid())
+                _player->SetRaidDifficulty(target->GetRaidDifficulty());
+            else
+                _player->SetDungeonDifficulty(target->GetDungeonDifficulty());
         }
 
         PSendSysMessage(LANG_APPEARING_AT, chrNameLink.c_str());

@@ -355,11 +355,13 @@
     <ClCompile Include="..\..\src\game\BattleGround.cpp" />
     <ClCompile Include="..\..\src\game\BattleGroundAA.cpp" />
     <ClCompile Include="..\..\src\game\BattleGroundAB.cpp" />
+    <ClCompile Include="..\..\src\game\BattleGroundABG.cpp" />
     <ClCompile Include="..\..\src\game\BattleGroundAV.cpp" />
     <ClCompile Include="..\..\src\game\BattleGroundBE.cpp" />
     <ClCompile Include="..\..\src\game\BattleGroundDS.cpp" />
     <ClCompile Include="..\..\src\game\BattleGroundEY.cpp" />
     <ClCompile Include="..\..\src\game\BattleGroundHandler.cpp" />
+    <ClCompile Include="..\..\src\game\BattleGroundIC.cpp" />
     <ClCompile Include="..\..\src\game\BattleGroundMgr.cpp" />
     <ClCompile Include="..\..\src\game\BattleGroundNA.cpp" />
     <ClCompile Include="..\..\src\game\BattleGroundRL.cpp" />
@@ -502,10 +504,12 @@
     <ClInclude Include="..\..\src\game\BattleGround.h" />
     <ClInclude Include="..\..\src\game\BattleGroundAA.h" />
     <ClInclude Include="..\..\src\game\BattleGroundAB.h" />
+    <ClInclude Include="..\..\src\game\BattleGroundABG.h" />
     <ClInclude Include="..\..\src\game\BattleGroundAV.h" />
     <ClInclude Include="..\..\src\game\BattleGroundBE.h" />
     <ClInclude Include="..\..\src\game\BattleGroundDS.h" />
     <ClInclude Include="..\..\src\game\BattleGroundEY.h" />
+    <ClInclude Include="..\..\src\game\BattleGroundIC.h" />
     <ClInclude Include="..\..\src\game\BattleGroundMgr.h" />
     <ClInclude Include="..\..\src\game\BattleGroundNA.h" />
     <ClInclude Include="..\..\src\game\BattleGroundRL.h" />

@@ -182,10 +182,16 @@ bool MapManager::CanPlayerEnter(uint32 mapid, Player* player)
         }
 
         //The player has a heroic mode and tries to enter into instance which has no a heroic mode
-        if (!entry->SupportsHeroicMode() && player->GetDifficulty() == DIFFICULTY_HEROIC)
+        MapDifficulty const* mapDiff = GetMapDifficultyData(entry->MapID,player->GetDifficulty(entry->map_type == MAP_RAID));
+        if (!mapDiff)
         {
+            bool isHeroicTargetMap = entry->map_type == MAP_RAID
+                ? (player->GetRaidDifficulty()    >= RAID_DIFFICULTY_10MAN_HEROIC)
+                : (player->GetDungeonDifficulty() >= DUNGEON_DIFFICULTY_HEROIC);
+
             //Send aborted message
-            player->SendTransferAborted(mapid, TRANSFER_ABORT_DIFFICULTY, DIFFICULTY_HEROIC);
+            // FIX ME: what about absent normal/heroic mode with specific players limit...
+            player->SendTransferAborted(mapid, TRANSFER_ABORT_DIFFICULTY, isHeroicTargetMap ? DUNGEON_DIFFICULTY_HEROIC : DUNGEON_DIFFICULTY_NORMAL);
             return false;
         }
 
