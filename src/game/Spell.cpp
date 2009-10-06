@@ -2596,6 +2596,12 @@ void Spell::cast(bool skipCheck)
                 AddPrecastSpell(57723);                     // Exhaustion
             break;
         }
+        case SPELLFAMILY_DRUID:
+        {
+            if(m_spellInfo->Id == 16857 && (m_caster->m_form == FORM_BEAR || m_caster->m_form == FORM_DIREBEAR)) //Faerie Fire(Feral)
+                AddPrecastSpell(60089);
+            break;
+        }
         default:
             break;
     }

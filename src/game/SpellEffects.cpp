@@ -480,6 +480,10 @@ void Spell::EffectSchoolDMG(uint32 effect_idx)
                         break;
                     }
                 }
+                if(m_spellInfo->Id == 60089) //Faerie Fire(Feral) DMG
+                {
+                    damage += int32(m_caster->GetTotalAttackPowerValue(BASE_ATTACK)*0.15f);
+                }
                 break;
             }
             case SPELLFAMILY_PRIEST:
