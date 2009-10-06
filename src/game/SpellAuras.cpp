@@ -2611,6 +2611,18 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
         }
         case SPELLFAMILY_HUNTER:
             break;
+        case SPELLFAMILY_WARLOCK:
+        {
+            if (GetSpellProto()->SpellIconID == 3172 && GetSpellProto()->SpellFamilyFlags & 0x4000000000000LL)
+            {
+                if (!apply)
+                {
+                    int32 bp0 = m_damageDoneBySpell * m_modifier.m_amount / 100;
+                    caster->CastCustomSpell(caster,48210,&bp0,NULL,NULL,true);
+                }
+            }
+            break;
+        }
         case SPELLFAMILY_SHAMAN:
         {
             // Improved Weapon Totems
