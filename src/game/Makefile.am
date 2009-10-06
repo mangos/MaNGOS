@@ -88,6 +88,10 @@ libmangosgame_a_SOURCES = \
 	Chat.cpp \
 	Chat.h \
 	ChatHandler.cpp \
+	ChatLexicsCutter.cpp \
+	ChatLexicsCutter.h \
+	ChatLog.cpp \
+	ChatLog.h \
 	CombatHandler.cpp \
 	ConfusedMovementGenerator.cpp \
 	ConfusedMovementGenerator.h \
