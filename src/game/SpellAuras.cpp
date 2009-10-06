@@ -6585,6 +6585,12 @@ void Aura::PeriodicTick()
             sLog.outDetail("PeriodicTick: %u (TypeId: %u) power leech of %u (TypeId: %u) for %u dmg inflicted by %u",
                 GUID_LOPART(GetCasterGUID()), GuidHigh2TypeId(GUID_HIPART(GetCasterGUID())), m_target->GetGUIDLow(), m_target->GetTypeId(), pdamage, GetId());
 
+            // mark of  kaz'rogal part 1/2
+            bool explode = false;
+            if(GetSpellProto()->Id == 31447)
+                if(pdamage>m_target->GetPower(POWER_MANA))
+                    explode = true;
+
             int32 drain_amount = m_target->GetPower(power) > pdamage ? pdamage : m_target->GetPower(power);
 
             // resilience reduce mana draining effect at spell crit damage reduction (added in 2.4)
@@ -6592,6 +6598,10 @@ void Aura::PeriodicTick()
                 drain_amount -= ((Player*)m_target)->GetSpellCritDamageReduction(drain_amount);
 
             m_target->ModifyPower(power, -drain_amount);
+
+            // mark of kaz'rogal part 2/2
+            if(explode)
+                pCaster->CastSpell(m_target,31463,true,0,this);
 
             float gain_multiplier = 0;
 
