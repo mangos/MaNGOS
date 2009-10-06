@@ -2899,6 +2899,9 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
         case FORM_SHADOW:
         case FORM_STEALTH:
             break;
+        case FORM_SHADOWDANCE:
+            PowerType = POWER_ENERGY;
+            break;
         case FORM_TREE:
             modelid = 864;
             break;
@@ -2966,7 +2969,8 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
         if(m_target->m_ShapeShiftFormSpellId)
             m_target->RemoveAurasDueToSpell(m_target->m_ShapeShiftFormSpellId, this);
 
-        m_target->SetByteValue(UNIT_FIELD_BYTES_2, 3, form);
+        // For Shadow Dance we must apply Stealth form (30) instead of current (13)
+        m_target->SetByteValue(UNIT_FIELD_BYTES_2, 3, (form == FORM_SHADOWDANCE) ? uint8(FORM_STEALTH) : form);
 
         if(modelid > 0)
             m_target->SetDisplayId(modelid);
@@ -3031,6 +3035,10 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
                         m_target->SetPower(POWER_RAGE, Rage_val);
                     break;
                 }
+                // Shadow Dance - apply stealth mode stand flag
+                case FORM_SHADOWDANCE:
+                    m_target->SetStandFlags(UNIT_STAND_FLAGS_CREEP);
+                    break;
                 default:
                     break;
             }
@@ -3062,6 +3070,10 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
             case FORM_MOONKIN:
                 if(Aura* dummy = m_target->GetDummyAura(37324) )
                     m_target->CastSpell(m_target, 37325, true, NULL, dummy);
+                break;
+            // Shadow Dance - remove stealth mode stand flag
+            case FORM_SHADOWDANCE:
+                m_target->RemoveStandFlags(UNIT_STAND_FLAGS_CREEP);
                 break;
             default:
                 break;
