@@ -309,6 +309,9 @@ bool Creature::UpdateEntry(uint32 Entry, uint32 team, const CreatureData *data )
                 SetPvP(true);
     }
 
+    if (GetCreatureInfo()->unit_flags & UNIT_FLAG_PVP || GetCreatureInfo()->unit_flags & UNIT_FLAG_PVP_ATTACKABLE)
+        SetPvP(true);
+
     for(int i=0; i < CREATURE_MAX_SPELLS; ++i)
         m_spells[i] = GetCreatureInfo()->spells[i];
 
