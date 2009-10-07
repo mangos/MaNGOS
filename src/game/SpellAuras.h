@@ -296,6 +296,7 @@ class MANGOS_DLL_SPEC Aura
         bool IsRemovedOnShapeLost() const { return m_isRemovedOnShapeLost; }
         bool IsInUse() const { return m_in_use;}
         bool IsDeleted() const { return m_deleted;}
+        bool IsStacking() const { return m_stacking;}
 
         void SetInUse(bool state)
         {
@@ -387,6 +388,7 @@ class MANGOS_DLL_SPEC Aura
         bool m_isRemovedOnShapeLost:1;
         bool m_deleted:1;                                   // true if RemoveAura(iterator) called while in Aura::ApplyModifier call (added to Unit::m_deletedAuras)
         bool m_isSingleTargetAura:1;                        // true if it's a single target spell and registered at caster - can change at spell steal for example
+        bool m_stacking:1;                                  // Aura is not overwritten, but effects are not cumulative with similar effects
 
         uint32 m_in_use;                                    // > 0 while in Aura::ApplyModifier call/Aura::Update/etc
     private:

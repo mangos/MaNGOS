@@ -4844,13 +4844,35 @@ void Aura::HandlePeriodicHealthFunnel(bool apply, bool /*Real*/)
 
 void Aura::HandleAuraModResistanceExclusive(bool apply, bool /*Real*/)
 {
+    m_stacking = false;
+
     for(int8 x = SPELL_SCHOOL_NORMAL; x < MAX_SPELL_SCHOOL;x++)
     {
         if(m_modifier.m_miscvalue & int32(1<<x))
         {
-            m_target->HandleStatModifier(UnitMods(UNIT_MOD_RESISTANCE_START + x), BASE_VALUE, float(m_modifier.m_amount), apply);
+            float current = m_target->GetModifierValue(UnitMods(UNIT_MOD_RESISTANCE_START + x), NONSTACKING_VALUE);
+            float temp = 0;
+
+            if(m_modifier.m_amount < current)
+                continue;
+
+            if(!apply)
+            {
+                Unit::AuraList const& Auras = m_target->GetAurasByType(SPELL_AURA_MOD_RESISTANCE_EXCLUSIVE);
+                for (Unit::AuraList::const_iterator itr = Auras.begin(); itr != Auras.end(); ++itr)
+                {
+                    if( ((*itr)->GetModifier()->m_miscvalue & int32(1<<x)) && (*itr)->GetModifier()->m_amount > temp )
+                    {
+                        temp = (*itr)->GetModifier()->m_amount;
+                    }
+                }
+            }
+            else
+                temp = m_modifier.m_amount;
+
+            m_target->HandleStatModifier(UnitMods(UNIT_MOD_RESISTANCE_START + x), NONSTACKING_VALUE, temp, true);
             if(m_target->GetTypeId() == TYPEID_PLAYER)
-                m_target->ApplyResistanceBuffModsMod(SpellSchools(x), m_positive, m_modifier.m_amount, apply);
+                m_target->ApplyResistanceBuffModsMod(SpellSchools(x), m_positive, temp - current, true);
         }
     }
 }
