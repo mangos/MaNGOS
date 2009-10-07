@@ -1812,6 +1812,11 @@ void Spell::SetTargetMap(uint32 effIndex,uint32 targetMode,UnitList& TagUnitMap)
         case TARGET_IN_FRONT_OF_CASTER:
         {
             bool inFront = m_spellInfo->SpellVisual[0] != 3879;
+            // Pound (not turn caster to target)
+            if (m_spellInfo->SpellIconID == 66)
+            {
+                m_caster->SetOrientation(m_castOrientation);
+            }
             FillAreaTargets(TagUnitMap,m_caster->GetPositionX(), m_caster->GetPositionY(),radius,inFront ? PUSH_IN_FRONT : PUSH_IN_BACK,SPELL_TARGETS_AOE_DAMAGE);
             break;
         }

@@ -3799,6 +3799,23 @@ void Aura::HandleAuraModStun(bool apply, bool Real)
             else
                 delete pObj;
         }
+        // Pound
+        if (GetSpellProto()->SpellIconID == 66)
+        {
+            Unit* caster = GetCaster();
+            if(!caster)
+                return;
+            uint32 spell_id = 0;
+            switch(GetSpellProto()->Id)
+            {
+                case 53472: spell_id = 53509; break;
+                case 59433: spell_id = 59432; break;
+                default: break;
+            }
+            if (spell_id)
+                caster->CastSpell(m_target, spell_id, true, NULL, NULL);
+            return;
+        }
     }
     else
     {
