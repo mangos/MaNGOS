@@ -6552,6 +6552,10 @@ void Aura::PeriodicTick()
 
                 pdamage = pCaster->SpellDamageBonus(m_target, GetSpellProto(), pdamage, DOT, GetStackAmount());
 
+                 // Death Knight Diseases AP Bonus
+                 if (GetSpellProto()->Id == 55095 || GetSpellProto()->Id == 60950)
+                     pdamage+=pCaster->GetTotalAttackPowerValue(BASE_ATTACK)*0.055;
+
                 // Curse of Agony damage-per-tick calculation
                 if (GetSpellProto()->SpellFamilyName==SPELLFAMILY_WARLOCK && (GetSpellProto()->SpellFamilyFlags & UI64LIT(0x0000000000000400)) && GetSpellProto()->SpellIconID==544)
                 {
