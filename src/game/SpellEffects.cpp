@@ -5451,7 +5451,7 @@ void Spell::EffectScriptEffect(uint32 effIndex)
                         //}
                     }
                     if (spellId)
-                        m_caster->CastCustomSpell(target, spellId, &basePoint, 0, 0, false);
+                        m_caster->CastCustomSpell(target, spellId, &basePoint, 0, 0, true);
                     return;
                 }
                 case 53412:                                 // Invigoration (pet triggered script, master targeted)
