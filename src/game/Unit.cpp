@@ -6200,6 +6200,14 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     target = this;
                     break;
                 }
+                // Tidal Force
+                case 55198:
+                {
+                    // Remove aura stack from  caster
+                    RemoveSingleSpellAurasFromStack(55166);
+                    // drop charges
+                    return false;
+                }
                 // Glyph of Healing Wave
                 case 55440:
                 {

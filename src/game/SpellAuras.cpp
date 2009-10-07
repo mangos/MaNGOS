@@ -2249,6 +2249,22 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                 if(m_target->GetTypeId() == TYPEID_PLAYER)
                     ((Player*)m_target)->RemoveAmmo();      // not use ammo and not allow use
                 return;
+            case 55198:                                     // Tidal Force
+            {
+                m_target->CastSpell(m_target,55166,true,NULL,this);
+                // set 3 stacks and 3 charges (to make all auras not disappear at once)
+                Aura* owner_aura = m_target->GetAura(55166,0);
+                if( owner_aura )
+                {
+                    // This aura lasts 2 sec, need this hack to properly proc spells
+                    // TODO: drop aura charges for ApplySpellMod in ProcDamageAndSpell
+                    SetAuraDuration(owner_aura->GetAuraDuration());
+                    // Make aura be not charged-this prevents removing charge on not crit spells
+                    owner_aura->SetAuraCharges(0);
+                    owner_aura->SetStackAmount(owner_aura->GetSpellProto()->StackAmount);
+                }
+                return;
+            }
         }
 
         // Earth Shield
