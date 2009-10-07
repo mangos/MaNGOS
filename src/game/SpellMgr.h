@@ -103,6 +103,7 @@ enum SpellSpecific
     SPELL_FOOD              = 20,
     SPELL_DRINK             = 21,
     SPELL_FOOD_AND_DRINK    = 22,
+    SPELL_MAGE_BOMB         = 23,
 };
 
 SpellSpecific GetSpellSpecific(uint32 spellId);
