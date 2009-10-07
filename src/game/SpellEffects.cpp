@@ -3314,6 +3314,7 @@ void Spell::EffectSummonType(uint32 i)
         case SUMMON_TYPE_WILD2:
         case SUMMON_TYPE_QUEST_WILD:
         case SUMMON_TYPE_CREATURE:
+        case SUMMON_TYPE_SCRAPBOT:
             EffectSummonWild(i);
             break;
         case SUMMON_TYPE_DEMON:
