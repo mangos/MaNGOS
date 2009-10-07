@@ -3025,9 +3025,9 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
 
                     if (m_modifier.m_miscvalue == FORM_CAT)
                     {
-                        m_target->SetPower(POWER_ENERGY, 0);
-                        if(urand(1,100) <= FurorChance)
-                            m_target->CastSpell(m_target, 17099, true, NULL, this);
+                         uint32 currEnergy = m_target->GetPower(POWER_ENERGY);
+                         uint32 newEnergy = (currEnergy <= FurorChance) ? currEnergy : FurorChance;
+                         m_target->SetPower(POWER_ENERGY,newEnergy);
                     }
                     else
                     {
