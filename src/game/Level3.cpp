@@ -50,6 +50,7 @@
 #include "InstanceSaveMgr.h"
 #include "InstanceData.h"
 #include "CreatureEventAIMgr.h"
+#include "DBCEnums.h"
 
 //reload commands
 bool ChatHandler::HandleReloadAllCommand(const char*)

@@ -21,6 +21,7 @@
 #include "Log.h"
 #include "ProgressBar.h"
 #include "SharedDefines.h"
+#include "ObjectDefines.h"
 
 #include "DBCfmt.h"
 

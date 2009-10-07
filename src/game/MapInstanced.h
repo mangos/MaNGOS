@@ -21,6 +21,7 @@
 
 #include "Map.h"
 #include "InstanceSaveMgr.h"
+#include "DBCEnums.h"
 
 class MANGOS_DLL_DECL MapInstanced : public Map
 {

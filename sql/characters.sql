@@ -21,7 +21,7 @@
 
 DROP TABLE IF EXISTS `character_db_version`;
 CREATE TABLE `character_db_version` (
-  `required_8589_11_characters_characters` bit(1) default NULL
+  `required_8596_01_characters_bugreport` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Last applied sql update to DB';
 
 --
@@ -171,8 +171,8 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `bugreport`;
 CREATE TABLE `bugreport` (
   `id` int(11) NOT NULL auto_increment COMMENT 'Identifier',
-  `type` varchar(255) NOT NULL default '',
-  `content` varchar(255) NOT NULL default '',
+  `type` longtext NOT NULL default '',
+  `content` longtext NOT NULL default '',
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Debug System';
 
@@ -866,6 +866,7 @@ CREATE TABLE `groups` (
   `icon8` int(11) unsigned NOT NULL,
   `isRaid` tinyint(1) unsigned NOT NULL,
   `difficulty` tinyint(3) unsigned NOT NULL default '0',
+  `raiddifficulty` int(11) UNSIGNED NOT NULL default '0',
   PRIMARY KEY  (`leaderGuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Groups';
 

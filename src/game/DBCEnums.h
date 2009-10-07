@@ -232,6 +232,21 @@ enum AreaFlags
     AREA_FLAG_OUTDOOR_PVP2     = 0x08000000                 // Wintergrasp and it's subzones
 };
 
+enum Difficulty
+{
+    DUNGEON_DIFFICULTY_NORMAL    = 0,
+    DUNGEON_DIFFICULTY_HEROIC    = 1,
+
+    RAID_DIFFICULTY_10MAN_NORMAL = 0,
+    RAID_DIFFICULTY_25MAN_NORMAL = 1,
+    RAID_DIFFICULTY_10MAN_HEROIC = 2,
+    RAID_DIFFICULTY_25MAN_HEROIC = 3,
+};
+
+#define MAX_DUNGEON_DIFFICULTY     2
+#define MAX_RAID_DIFFICULTY        4
+#define MAX_DIFFICULTY             4
+
 enum FactionTemplateFlags
 {
     FACTION_TEMPLATE_FLAG_CONTESTED_GUARD   =   0x00001000, // faction will attack players that were involved in PvP combats

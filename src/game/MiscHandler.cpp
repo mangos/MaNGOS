@@ -39,6 +39,7 @@
 #include "BattleGround.h"
 #include "Pet.h"
 #include "SocialMgr.h"
+#include "DBCEnums.h"
 
 void WorldSession::HandleRepopRequestOpcode( WorldPacket & recv_data )
 {
@@ -1460,7 +1461,7 @@ void WorldSession::HandleSetRaidDifficultyOpcode( WorldPacket & recv_data )
         return;
     }
 
-    if(RaidDifficulties(mode) == _player->GetRaidDifficulty())
+    if(Difficulty(mode) == _player->GetRaidDifficulty())
         return;
 
     // cannot reset while in an instance

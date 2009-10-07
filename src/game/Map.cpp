@@ -34,6 +34,7 @@
 #include "ScriptCalls.h"
 #include "Group.h"
 #include "MapRefManager.h"
+#include "DBCEnums.h"
 
 #include "MapInstanced.h"
 #include "InstanceSaveMgr.h"

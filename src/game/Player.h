@@ -36,6 +36,7 @@
 #include "AchievementMgr.h"
 #include "ReputationMgr.h"
 #include "BattleGround.h"
+#include "DBCEnums.h"
 
 #include<string>
 #include<vector>
