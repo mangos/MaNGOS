@@ -1029,7 +1029,8 @@ void Aura::_AddAura()
         if(slot < MAX_AURAS)                        // slot found send data to client
         {
             SetAura(false);
-            SetAuraFlags((1 << GetEffIndex()) | AFLAG_NOT_CASTER | ((GetAuraMaxDuration() > 0) ? AFLAG_DURATION : AFLAG_NONE) | (IsPositive() ? AFLAG_POSITIVE : AFLAG_NEGATIVE));
+            SetAuraFlags((1 << GetEffIndex()) | AFLAG_NOT_CASTER | ((GetAuraMaxDuration() > 0) ? AFLAG_DURATION : AFLAG_NONE) |
+                ((IsPositive() || (IsDispelSpell(this->GetSpellProto()) && caster->IsFriendlyTo(m_target))) ? AFLAG_POSITIVE : AFLAG_NEGATIVE));
             SetAuraLevel(caster ? caster->getLevel() : sWorld.getConfig(CONFIG_MAX_PLAYER_LEVEL));
             SendAuraUpdate(false);
         }

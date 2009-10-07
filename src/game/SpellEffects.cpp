@@ -3569,8 +3569,22 @@ void Spell::EffectDispel(uint32 i)
         // Dispell N = damage buffs (or while exist buffs for dispel)
         for (int32 count=0; count < damage && list_size > 0; ++count)
         {
+            Aura *aur = NULL;
+            // Effects granting full immunity have highest priority during dispel
+            for (std::vector<Aura *>::const_iterator iter = dispel_list.begin(), next; iter != dispel_list.end(); iter = next)
+            {
+                next = iter;
+                ++next;
+                if (next == dispel_list.end() || (*iter)->GetId() != (*next)->GetId())
+                    if (GetAllSpellImmunityMask((*iter)->GetSpellProto()) == SPELL_SCHOOL_MASK_ALL)
+                    {
+                        aur = (*iter);
+                        break;
+                    }
+            }
             // Random select buff for dispel
-            Aura *aur = dispel_list[urand(0, list_size-1)];
+            if (!aur)
+                aur = dispel_list[urand(0, list_size-1)];
 
             SpellEntry const* spellInfo = aur->GetSpellProto();
             // Base dispel chance

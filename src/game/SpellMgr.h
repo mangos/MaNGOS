@@ -383,6 +383,15 @@ inline SpellSchoolMask GetSpellSchoolMask(SpellEntry const* spellInfo)
     return SpellSchoolMask(spellInfo->SchoolMask);
 }
 
+inline SpellSchoolMask GetAllSpellImmunityMask(SpellEntry const* spellInfo)
+{
+    uint32 mask = 0;
+    for (int i=0; i< 3; ++i)
+        if (spellInfo->EffectMiscValue[i] && spellInfo->EffectApplyAuraName[i] == SPELL_AURA_SCHOOL_IMMUNITY)
+            mask |= spellInfo->EffectMiscValue[i];
+    return SpellSchoolMask(mask);
+}
+
 inline uint32 GetSpellMechanicMask(SpellEntry const* spellInfo, int32 effect)
 {
     uint32 mask = 0;
