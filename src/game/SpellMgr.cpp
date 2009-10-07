@@ -1685,6 +1685,10 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
                 if (spellInfo_1->SpellIconID==2296 && spellInfo_2->SpellIconID==2296 &&
                     spellInfo_1->SpellFamilyFlags == spellInfo_2->SpellFamilyFlags)
                     return false;
+
+                // Lichborne shapeshift and immunity
+                if (spellInfo_1->SpellFamilyFlags == UI64LIT(0x1000000000) && spellInfo_2->SpellFamilyFlags == UI64LIT(0x1000000000))
+                    return false;
             }
             break;
         default:
