@@ -782,9 +782,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
     {
         BattleGround* bg = GetPlayer()->GetBattleGround();
         if(bg)
-            if(bg->GetStatus() == STATUS_IN_PROGRESS)
-                bg->HandleAreaTrigger(GetPlayer(), Trigger_ID);
-
+            bg->HandleAreaTrigger(GetPlayer(), Trigger_ID);
         return;
     }
 

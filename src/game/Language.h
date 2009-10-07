@@ -686,16 +686,51 @@ enum MangosStrings
     LANG_DIST_ARENA_POINTS_TEAM_START   = 744,
     LANG_DIST_ARENA_POINTS_TEAM_END     = 745,
     LANG_DIST_ARENA_POINTS_END          = 746,
-//                                      = 747, not used
-//                                      = 748, not used
-//                                      = 749, not used
+
     LANG_BATTLEGROUND_PREMATURE_FINISH_WARNING = 750,       // "Not enough players. This game will close in %u mins."
     LANG_BATTLEGROUND_PREMATURE_FINISH_WARNING_SECS = 751,  // "Not enough players. This game will close in %u seconds."
-//                                      = 752, not used
-//  LANG_BG_WS_START_TWO_MINUTES        = 753, - defined above
-//  LANG_BG_AB_START_TWO_MINUTES        = 754, - defined above
-//  LANG_BG_EY_START_TWO_MINUTES        = 755, - defined above
-    // Room for batleground/arena strings 756-799 not used
+    LANG_BATTLEGROUND_ONLY_ALLIANCE_USE = 752, // "Only The Alliance can use that portal"
+    LANG_BATTLEGROUND_ONLY_HORDE_USE    = 753, // "Only The Horde can use that portal"
+
+    LANG_BG_AV_ALLY                     = 757,
+    LANG_BG_AV_HORDE                    = 758,
+    LANG_BG_AV_TOWER_TAKEN              = 759,
+    LANG_BG_AV_TOWER_ASSAULTED          = 760,
+    LANG_BG_AV_TOWER_DEFENDED           = 761,
+    LANG_BG_AV_GRAVE_TAKEN              = 762,
+    LANG_BG_AV_GRAVE_DEFENDED           = 763,
+    LANG_BG_AV_GRAVE_ASSAULTED          = 764,
+    LANG_BG_AV_MINE_TAKEN               = 765,
+    LANG_BG_AV_MINE_NORTH               = 766,
+    LANG_BG_AV_MINE_SOUTH               = 767,
+
+    LANG_BG_AV_NODE_GRAVE_STORM_AID     = 768,
+    LANG_BG_AV_NODE_TOWER_DUN_S         = 769,
+    LANG_BG_AV_NODE_TOWER_DUN_N         = 770,
+    LANG_BG_AV_NODE_GRAVE_STORMPIKE     = 771,
+    LANG_BG_AV_NODE_TOWER_ICEWING       = 772,
+    LANG_BG_AV_NODE_GRAVE_STONE         = 773,
+    LANG_BG_AV_NODE_TOWER_STONE         = 774,
+    LANG_BG_AV_NODE_GRAVE_SNOW          = 775,
+    LANG_BG_AV_NODE_TOWER_ICE           = 776,
+    LANG_BG_AV_NODE_GRAVE_ICE           = 777,
+    LANG_BG_AV_NODE_TOWER_POINT         = 778,
+    LANG_BG_AV_NODE_GRAVE_FROST         = 779,
+    LANG_BG_AV_NODE_TOWER_FROST_E       = 780,
+    LANG_BG_AV_NODE_TOWER_FROST_W       = 781,
+    LANG_BG_AV_NODE_GRAVE_FROST_HUT     = 782,
+
+    LANG_BG_AV_START_TWO_MINUTES        = 783,
+    LANG_BG_AV_START_ONE_MINUTE         = 784,
+    LANG_BG_AV_START_HALF_MINUTE        = 785,
+    LANG_BG_AV_HAS_BEGUN                = 786,
+    LANG_BG_AV_A_NEAR_LOSE              = 787,
+    LANG_BG_AV_H_NEAR_LOSE              = 788,
+    LANG_BG_AV_H_GENERAL_DEAD           = 789,
+    LANG_BG_AV_A_GENERAL_DEAD           = 790,
+
+
+    // Room for batleground/arena strings 790-799 not used
 
     // in game strings
     //                                  = 800, not used
