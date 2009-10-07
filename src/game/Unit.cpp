@@ -8558,6 +8558,17 @@ uint32 Unit::SpellDamageBonus(Unit *pVictim, SpellEntry const *spellProto, uint3
                 mod = dummy->GetModifier()->m_amount;
             TakenTotalMod *= (mod+100.0f)/100.0f;
         }
+        // Icebound Fortitude
+        else if (Aura *dummy = pVictim->GetDummyAura(45182))
+        {
+            // Value is based at info from wowwiki
+            float mod = ((Player*)pVictim)->GetDefenseSkillValue() * (-0.065f);
+            // Base value is 30%. Add 10% back if we don't have Glyph of Icebound Fortitude.
+            if (!pVictim->HasAura(58625))
+                TakenTotalMod += 0.1f;
+
+            TakenTotalMod *= (mod+100.0f)/100.0f;
+        }
     }
 
     // From caster spells
@@ -9464,6 +9475,20 @@ void Unit::MeleeDamageBonus(Unit *pVictim, uint32 *pdamage,WeaponAttackType attT
                     TakenTotalMod *= (mod+100.0f)/100.0f;
                 }
                 break;
+            // Icebound Fortitude
+            case 2720:
+            {
+                if(pVictim->GetTypeId() != TYPEID_PLAYER)
+                    continue;
+                // Value is based at info from wowwiki
+                float mod = ((Player*)pVictim)->GetDefenseSkillValue() * (-0.065f);
+                // Base value is 30%. Add 10% back if we don't have Glyph of Icebound Fortitude.
+                if (!pVictim->HasAura(58625))
+                    TakenTotalMod += 0.1f;
+
+                TakenTotalMod *= (mod+100.0f)/100.0f;
+                break;
+            }
         }
     }
 
