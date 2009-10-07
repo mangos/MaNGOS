@@ -18651,7 +18651,7 @@ bool Player::GetBGAccessByLevel(BattleGroundTypeId bgTypeId) const
     return true;
 }
 
-BGQueueIdBasedOnLevel Player::GetBattleGroundQueueIdFromLevel(BattleGroundTypeId bgTypeId) const
+BGQueueIdBasedOnLevel Player::GetBattleGroundQueueIdFromLevel() const
 {
     // for ranges 0 - 19, 20 - 29, 30 - 39, 40 - 49, 50 - 59, 60 - 69, 70 - 79, 80
     uint32 queue_id = ( getLevel() / 10) - 1;
