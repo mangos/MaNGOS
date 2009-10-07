@@ -7277,14 +7277,21 @@ void Aura::PeriodicDummyTick()
                 //    return;
                 // Feeding Frenzy Rank 1
                 case 53511:
-                    if ( m_target->GetHealth() * 100 < m_target->GetMaxHealth() * 35 )
+                {
+                    Unit* victim = m_target->getVictim();
+                    if( victim && victim->GetHealth() * 100 < victim->GetMaxHealth() * 35 )
                         m_target->CastSpell(m_target, 60096, true, 0, this);
                     return;
+                }
+                break;
                 // Feeding Frenzy Rank 2
                 case 53512:
-                    if ( m_target->GetHealth() * 100 < m_target->GetMaxHealth() * 35 )
+                {
+                    Unit* victim = m_target->getVictim();
+                    if( victim && victim->GetHealth() * 100 < victim->GetMaxHealth() * 35 )
                         m_target->CastSpell(m_target, 60097, true, 0, this);
                     return;
+                }
                 default:
                     break;
             }
