@@ -1670,6 +1670,11 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
                 // Unholy Presence and Unholy Presence (triggered)
                 if( spellInfo_1->SpellIconID == 2633 && spellInfo_2->SpellIconID == 2633 )
                     return false;
+
+                // Desecration (speed reduction aura) and Desecration (owner's damage bonus aura)
+                if (spellInfo_1->SpellIconID==2296 && spellInfo_2->SpellIconID==2296 &&
+                    spellInfo_1->SpellFamilyFlags == spellInfo_2->SpellFamilyFlags)
+                    return false;
             }
             break;
         default:
