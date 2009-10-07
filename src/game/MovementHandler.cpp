@@ -318,8 +318,8 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 
     if(plMover)                                             // nothing is charmed, or player charmed
     {
-        plMover->SetPosition(movementInfo.x, movementInfo.y, movementInfo.z, movementInfo.o);
         plMover->m_movementInfo = movementInfo;
+        plMover->SetPosition(movementInfo.x, movementInfo.y, movementInfo.z, movementInfo.o);
         plMover->UpdateFallInformationIfNeed(movementInfo, opcode);
 
         if(plMover->isMovingOrTurning())
