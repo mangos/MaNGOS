@@ -6542,7 +6542,6 @@ void Aura::PeriodicTick()
             break;
         }
         case SPELL_AURA_PERIODIC_LEECH:
-        case SPELL_AURA_PERIODIC_HEALTH_FUNNEL:
         {
             Unit *pCaster = GetCaster();
             if(!pCaster)
@@ -6615,6 +6614,30 @@ void Aura::PeriodicTick()
 
             int32 gain = pCaster->DealHeal(pCaster, heal, GetSpellProto());
             pCaster->getHostilRefManager().threatAssist(pCaster, gain * 0.5f, GetSpellProto());
+            break;
+        }
+        case SPELL_AURA_PERIODIC_HEALTH_FUNNEL: // only three spells
+        {
+            Unit *donator = GetCaster();
+            if(!donator || !donator->GetHealth())
+                return;
+
+            uint32 pdamage = m_modifier.m_amount > 0 ? m_modifier.m_amount : 0;
+            if(donator->GetHealth() < pdamage)
+                pdamage = donator->GetHealth() - 1;
+            if(!pdamage)
+                return;
+
+            Unit* target = m_target;                        // aura can be deleted in DealDamage
+            SpellEntry const* spellProto = GetSpellProto();
+            //donator->SendSpellNonMeleeDamageLog(donator, GetId(), pdamage, GetSpellSchoolMask(spellProto), 0, 0, false, 0);
+            donator->ModifyHealth(-(int32)pdamage);
+            sLog.outDetail("PeriodicTick: donator %u target %u damage %u.", donator->GetEntry(), target->GetEntry(), pdamage);
+
+            if(spellProto->EffectMultipleValue[GetEffIndex()] > 0)
+                pdamage *= spellProto->EffectMultipleValue[GetEffIndex()];
+
+            donator->DealHeal(target, pdamage, spellProto);
             break;
         }
         case SPELL_AURA_PERIODIC_HEAL:
