@@ -2057,11 +2057,11 @@ void Spell::SetTargetMap(uint32 effIndex,uint32 targetMode,UnitList& TagUnitMap)
                     // IsHostileTo check duel and controlled by enemy
                     if(Target && Target->GetSubGroup()==subgroup && !m_caster->IsHostileTo(Target))
                     {
-                        if( pTarget->IsWithinDistInMap(Target, radius) )
+                        if(Target->getLevel()+10 >= m_spellInfo->spellLevel && pTarget->IsWithinDistInMap(Target, radius))
                             TagUnitMap.push_back(Target);
 
                         if(Pet* pet = Target->GetPet())
-                            if( pTarget->IsWithinDistInMap(pet, radius) )
+                            if(pet->getLevel()+10 >= m_spellInfo->spellLevel && pTarget->IsWithinDistInMap(pet, radius) )
                                 TagUnitMap.push_back(pet);
                     }
                 }
@@ -2076,7 +2076,7 @@ void Spell::SetTargetMap(uint32 effIndex,uint32 targetMode,UnitList& TagUnitMap)
                 TagUnitMap.push_back(pTarget);
 
                 if(Pet* pet = pTarget->GetPet())
-                    if( m_caster->IsWithinDistInMap(pet, radius) )
+                    if(pet->getLevel()+10 >= m_spellInfo->spellLevel && m_caster->IsWithinDistInMap(pet, radius) )
                         TagUnitMap.push_back(pet);
             }
             break;
@@ -2178,9 +2178,7 @@ void Spell::SetTargetMap(uint32 effIndex,uint32 targetMode,UnitList& TagUnitMap)
                     Player* Target = itr->getSource();
 
                     // IsHostileTo check duel and controlled by enemy
-                    if( Target && targetPlayer->IsWithinDistInMap(Target, radius) &&
-                        targetPlayer->getClass() == Target->getClass() &&
-                        !m_caster->IsHostileTo(Target) )
+                    if( Target && Target->getLevel()+10 >= m_spellInfo->spellLevel && targetPlayer->getClass() == Target->getClass() && !m_caster->IsHostileTo(Target) && targetPlayer->IsWithinDistInMap(Target, radius) )
                     {
                         TagUnitMap.push_back(Target);
                     }
