@@ -150,7 +150,7 @@ bool BattleGroundQueue::SelectionPool::AddGroup(GroupQueueInfo *ginfo, uint32 de
 // add group to bg queue with the given leader and bg specifications
 GroupQueueInfo * BattleGroundQueue::AddGroup(Player *leader, BattleGroundTypeId BgTypeId, uint8 ArenaType, bool isRated, bool isPremade, uint32 arenaRating, uint32 arenateamid)
 {
-    BGQueueIdBasedOnLevel queue_id = leader->GetBattleGroundQueueIdFromLevel(BgTypeId);
+    BGQueueIdBasedOnLevel queue_id = leader->GetBattleGroundQueueIdFromLevel();
 
     // create new ginfo
     // cannot use the method like in addplayer, because that could modify an in-queue group's stats
@@ -391,7 +391,7 @@ void BattleGroundQueue::AnnounceWorld(GroupQueueInfo *ginfo, const uint64& playe
             if (!bg || !plr)
                 return;
 
-            BGQueueIdBasedOnLevel queue_id = plr->GetBattleGroundQueueIdFromLevel(bg->GetTypeID());
+            BGQueueIdBasedOnLevel queue_id = plr->GetBattleGroundQueueIdFromLevel();
             char const* bgName = bg->GetName();
             uint32 MinPlayers = bg->GetMinPlayersPerTeam();
             uint32 qHorde = 0;
@@ -1871,7 +1871,7 @@ void BattleGroundMgr::BuildBattleGroundListPacket(WorldPacket *data, const uint6
         uint32 count = 0;
         *data << uint32(0x00);                              // number of bg instances
 
-        uint32 queue_id = plr->GetBattleGroundQueueIdFromLevel(bgTypeId);
+        uint32 queue_id = plr->GetBattleGroundQueueIdFromLevel();
         for(std::set<uint32>::iterator itr = m_ClientBattleGroundIds[bgTypeId][queue_id].begin(); itr != m_ClientBattleGroundIds[bgTypeId][queue_id].end();++itr)
         {
             *data << uint32(*itr);

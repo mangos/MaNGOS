@@ -345,8 +345,10 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
         if(unk1)
         {
             recvPacket.read_skip<uint32>();                 // >> MSG_MOVE_STOP
-            uint64 guid;
-            recvPacket.readPackGUID(guid);
+            uint64 guid;                                    // guid - unused
+            if(!recvPacket.readPackGUID(guid))
+                return;
+
             MovementInfo movementInfo;
             ReadMovementInfo(recvPacket, &movementInfo);
         }

@@ -1969,7 +1969,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         BattleGround* GetBattleGround() const;
 
 
-        BGQueueIdBasedOnLevel GetBattleGroundQueueIdFromLevel(BattleGroundTypeId bgTypeId) const;
+        BGQueueIdBasedOnLevel GetBattleGroundQueueIdFromLevel() const;
 
         bool InBattleGroundQueue() const
         {
