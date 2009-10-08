@@ -431,6 +431,7 @@ class ChatHandler
         bool HandleWpImportCommand(const char* args);
 
         bool HandleHelpCommand(const char* args);
+        bool HandleAHBotOptionsCommand(const char * args);
         bool HandleCommandsCommand(const char* args);
         bool HandleStartCommand(const char* args);
         bool HandleDismountCommand(const char* args);
