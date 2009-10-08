@@ -241,6 +241,7 @@ class Spell
         void EffectSummonChangeItem(uint32 i);
         void EffectProficiency(uint32 i);
         void EffectApplyAreaAura(uint32 i);
+        void EffectRedirectThreat(uint32 i);
         void EffectSummonType(uint32 i);
         void EffectSummon(uint32 i);
         void EffectLearnSpell(uint32 i);

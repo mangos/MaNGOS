@@ -1365,6 +1365,12 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void removeHatedBy(HostilReference* /*pHostilReference*/ ) { /* nothing to do yet */ }
         HostilRefManager& getHostilRefManager() { return m_HostilRefManager; }
 
+        // Threat redirection methods
+        RedirectThreatMap* GetRedirectThreatMap();
+        void AddRedirectThreatEntry(Unit* redirectTo, uint32 spellId, float redirectPct);
+        void RemoveRedirectThreatEntry(uint32 spellId);
+        RedirectThreatEntry* GetRedirectThreatEntry(uint32 spellId);
+
         uint32 GetVisibleAura(uint8 slot)
         {
             VisibleAuraMap::const_iterator itr = m_visibleAuras.find(slot);
@@ -1586,6 +1592,9 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         bool HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggredByAura, SpellEntry const *procSpell, uint32 procFlag, uint32 procEx, uint32 cooldown);
         bool HandleOverrideClassScriptAuraProc(Unit *pVictim, uint32 damage, Aura* triggredByAura, SpellEntry const *procSpell, uint32 cooldown);
         bool HandleMendingAuraProc(Aura* triggeredByAura);
+
+        RedirectThreatEntry* GetRedirectThreatEntry(RedirectThreatMap* map, uint32 spellId);
+        float AddThreatToRedirectionTargets(Unit* pVictim, float threat, SpellSchoolMask schoolMask, SpellEntry const *threatSpell);
 
         uint32 m_state;                                     // Even derived shouldn't modify
         uint32 m_CombatTimer;

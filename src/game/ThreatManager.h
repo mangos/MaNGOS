@@ -45,6 +45,23 @@ class ThreatCalcHelper
 };
 
 //==============================================================
+// Data structures to handle threat redirection cases
+
+struct RedirectThreatEntry
+{
+    RedirectThreatEntry() : m_redirectTo(0), m_redirectPct(0)
+    {}
+    RedirectThreatEntry(Unit* redirectTo, float redirectPct)
+        : m_redirectTo(redirectTo), m_redirectPct(redirectPct)
+    {}
+
+    Unit* m_redirectTo;
+    float m_redirectPct;
+};
+typedef std::map<uint32,RedirectThreatEntry*> RedirectThreatMap;
+
+//==============================================================
+
 class MANGOS_DLL_SPEC HostilReference : public Reference<Unit, ThreatManager>
 {
     public:

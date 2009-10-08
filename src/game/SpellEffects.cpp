@@ -187,7 +187,7 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS]=
     &Spell::EffectProspecting,                              //127 SPELL_EFFECT_PROSPECTING              Prospecting spell
     &Spell::EffectApplyAreaAura,                            //128 SPELL_EFFECT_APPLY_AREA_AURA_FRIEND
     &Spell::EffectApplyAreaAura,                            //129 SPELL_EFFECT_APPLY_AREA_AURA_ENEMY
-    &Spell::EffectNULL,                                     //130 SPELL_EFFECT_REDIRECT_THREAT
+    &Spell::EffectRedirectThreat,                           //130 SPELL_EFFECT_REDIRECT_THREAT
     &Spell::EffectUnused,                                   //131 SPELL_EFFECT_131                      used in some test spells
     &Spell::EffectPlayMusic,                                //132 SPELL_EFFECT_PLAY_MUSIC               sound id in misc value (SoundEntries.dbc)
     &Spell::EffectUnlearnSpecialization,                    //133 SPELL_EFFECT_UNLEARN_SPECIALIZATION   unlearn profession specialization
@@ -3419,6 +3419,35 @@ void Spell::EffectApplyAreaAura(uint32 i)
     unitTarget->AddAura(Aur);
 }
 
+void Spell::EffectRedirectThreat(uint32 i)
+{
+    if(!unitTarget)
+        return;
+    if(!unitTarget->isAlive())
+        return;
+
+    Unit* redirectFrom = 0; Unit* redirectTo = 0;
+    // Check by ID is sufficient as such spells have no ranks
+    switch (m_spellInfo->Id)
+    {
+        // Tricks of the Trade, Misdirection
+        case 57934: case 34477:
+            redirectFrom = m_caster;
+            redirectTo = unitTarget;
+            break;
+        // Vigilance
+        case 59665:
+            redirectFrom = unitTarget;
+            redirectTo = m_caster;
+            break;
+        // No need to continue
+        default:
+            return;
+    }
+
+    redirectFrom->AddRedirectThreatEntry(redirectTo,m_spellInfo->Id,float(damage)/100.0f);
+}
+
 void Spell::EffectSummonType(uint32 i)
 {
     switch(m_spellInfo->EffectMiscValueB[i])
@@ -5277,6 +5306,15 @@ void Spell::EffectScriptEffect(uint32 effIndex)
 
                     break;
                 }
+                // Vigilance
+                case 50725:
+                    if(RedirectThreatEntry* entry = m_caster->GetRedirectThreatEntry(59665))
+                    {
+                        // We must remove Taunt cooldown from Warrior when this spell triggers
+                        if (entry->m_redirectTo->GetTypeId() == TYPEID_PLAYER)
+                            ((Player*)entry->m_redirectTo)->RemoveSpellCooldown(355,true);
+                    }
+                    return;
                 // Emblazon Runeblade
                 case 51770:
                 {
