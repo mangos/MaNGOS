@@ -343,6 +343,12 @@ void Spell::EffectSchoolDMG(uint32 effect_idx)
                             damage = 200;
                         break;
                     }
+                    // Ritual of Doom Sacrifice
+                    case 20625:
+                    {
+                        damage = unitTarget->GetMaxHealth() * damage / 100;
+                        break;
+                    }
                     // Intercept (warrior spell trigger)
                     case 20253:
                     case 61491:
@@ -905,6 +911,18 @@ void Spell::EffectDummy(uint32 i)
                         : 17270;                            // Create Bone Dust
 
                     m_caster->CastSpell(m_caster, spell_id, true, NULL);
+                    return;
+                }
+                case 18541:                                 // Ritual of Doom summon effect
+                {
+                    if (unitTarget == m_caster)
+                    {
+                        m_caster->CastSpell(m_caster,damage,true);
+                        if (m_UniqueTargetInfo.size() == 1) // Warlock is selected as a target for sacrifice
+                            m_caster->CastSpell(unitTarget,20625,true);
+                    }
+                    else
+                        m_caster->CastSpell(unitTarget,20625,true);
                     return;
                 }
                 case 20577:                                 // Cannibalize

@@ -1298,7 +1298,14 @@ void GameObject::Use(Unit* user)
 
     // spell target is user of GO
     SpellCastTargets targets;
-    targets.setUnitTarget( user );
+    if (spellId == 18541) // Ritual of Doom must select random target from participants
+    {
+        std::set<uint32>::const_iterator it = m_unique_users.begin();
+        std::advance(it,urand(0,m_unique_users.size()-1));
+        targets.setUnitTarget(Unit::GetUnit(*this,uint64(*it)));
+    }
+    else
+        targets.setUnitTarget( user );
 
     spell->prepare(&targets);
 }
