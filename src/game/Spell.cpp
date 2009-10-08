@@ -4091,6 +4091,16 @@ SpellCastResult Spell::CheckCast(bool strict)
             if(bg->GetStatus() == STATUS_WAIT_LEAVE)
                 return SPELL_FAILED_DONT_REPORT;
 
+    // Aura 262
+    Unit::AuraList const& ignoreReqAuras = m_caster->GetAurasByType(SPELL_AURA_262);
+
+    for(Unit::AuraList::const_iterator i = ignoreReqAuras.begin(); i != ignoreReqAuras.end(); ++i)
+    {
+        if (!(*i)->isAffectedOnSpell(m_spellInfo))
+                continue;
+        return SPELL_CAST_OK;
+    }
+
     // only check at first call, Stealth auras are already removed at second call
     // for now, ignore triggered spells
     if( strict && !m_IsTriggeredSpell)
