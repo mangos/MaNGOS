@@ -24,6 +24,7 @@
 #include "Player.h"
 #include "ObjectAccessor.h"
 #include "WorldSession.h"
+#include "InstanceSaveMgr.h"
 #include "LootMgr.h"
 #include "Object.h"
 #include "Group.h"
@@ -298,6 +299,25 @@ void WorldSession::DoLootRelease( uint64 lguid )
                 uint32 go_min = go->GetGOInfo()->chest.minSuccessOpens;
                 uint32 go_max = go->GetGOInfo()->chest.maxSuccessOpens;
 
+                if (player->GetInstanceId())
+                {
+                    Map *map = go->GetMap();
+                    if (map->IsDungeon())
+                    {
+                        if (map->IsRaid() || map->IsHeroic())
+                        {
+                            ((InstanceMap *)map)->PermBindAllPlayers(player);
+                        }
+                        else
+                        {
+                            // the reset time is set but not added to the scheduler
+                            // until the players leave the instance
+                            time_t resettime = go->GetRespawnTimeEx() + 2 * HOUR;
+                            if(InstanceSave *save = sInstanceSaveManager.GetInstanceSave(player->GetInstanceId()))
+                            if(save->GetResetTime() < resettime) save->SetResetTime(resettime);
+                        }
+                    }
+                }
                 // only vein pass this check
                 if(go_min != 0 && go_max > go_min)
                 {
