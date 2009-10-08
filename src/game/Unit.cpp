@@ -5199,6 +5199,12 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     ((Player*)this)->RemoveSpellCategoryCooldown(35, true);
                     return true;
                 }
+                // Glyph of Drain Soul (warlock's glyph but has mage's spell family...)
+                case 58070:
+                {
+                    triggered_spell_id = 58068;
+                    break;
+                }
             }
             break;
         }
