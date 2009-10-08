@@ -12927,3 +12927,21 @@ void Unit::SendRemoveFromThreatListOpcode(HostilReference* pHostilReference)
     data.appendPackGUID(pHostilReference->getUnitGuid());
     SendMessageToSet(&data, false);
 }
+
+// Netsky : Method for removing auras with explicit mechanic with do_not_remove exception
+void Unit::RemoveAurasDueToMechanic(uint32 mechanic_mask, uint32 do_not_remove)
+{
+    Unit::AuraMap& Auras = GetAuras();
+    for (AuraMap::iterator iter = m_Auras.begin(); iter != m_Auras.end();)
+    {
+        if (!do_not_remove || iter->second->GetId() != do_not_remove)
+        {
+            if(GetAllSpellMechanicMask(iter->second->GetSpellProto()) & mechanic_mask)
+            {
+                RemoveAura(iter, AURA_REMOVE_BY_DEFAULT);
+                continue;
+            }
+        }
+        ++iter;
+    }
+}

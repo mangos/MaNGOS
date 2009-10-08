@@ -1533,6 +1533,8 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         PetAuraSet m_petAuras;
         void AddPetAura(PetAura const* petSpell);
         void RemovePetAura(PetAura const* petSpell);
+        // Netsky : Method for removing auras with explicit mechanic with do_not_remove exception
+        void RemoveAurasDueToMechanic(uint32 mechanic_mask, uint32 do_not_remove=0);
 
     protected:
         explicit Unit ();

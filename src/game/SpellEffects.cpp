@@ -5802,6 +5802,20 @@ void Spell::EffectScriptEffect(uint32 effIndex)
             }
             break;
         }
+        //Netsky : Shattering Throw Immunity Remove
+        case SPELLFAMILY_WARRIOR:
+        {
+            // Shattering Throw
+            if (m_spellInfo->Id == 64380) 
+            {
+                if (!unitTarget)
+                    return;
+                // remove immunity effects
+                unitTarget->RemoveAurasDueToMechanic(1<<MECHANIC_IMMUNE_SHIELD);
+                return;
+            }
+            break;
+        }
     }
 
     // normal DB scripted effect

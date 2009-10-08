@@ -2764,6 +2764,12 @@ void Spell::cast(bool skipCheck)
                 AddPrecastSpell(60089);
             break;
         }
+        case SPELLFAMILY_WARRIOR:
+        {
+            if(m_spellInfo->Id == 64382)
+                AddPrecastSpell(64380);
+            break;
+        }
         default:
             break;
     }
