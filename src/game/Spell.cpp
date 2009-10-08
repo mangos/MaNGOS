@@ -3936,6 +3936,10 @@ void Spell::TakeReagents()
     if (p_caster->CanNoReagentCast(m_spellInfo))
         return;
 
+    // Vellum case, m_CastItem is consumable -> removed on use, vellum is deleted in DoCreateItem
+    if(m_CastItem && m_CastItem->GetProto()->Flags & ITEM_FLAGS_ENCHANT_SCROLL)
+        return;
+
     for(uint32 x = 0; x < 8; ++x)
     {
         if(m_spellInfo->Reagent[x] <= 0)
@@ -4831,6 +4835,32 @@ SpellCastResult Spell::CheckCast(bool strict)
                     return SPELL_FAILED_BAD_TARGETS;
                 break;
             }
+            case SPELL_EFFECT_ENCHANT_ITEM:
+            {
+                if(Item* Target = m_targets.getItemTarget())
+                {
+                    // Check cheating case
+                    if(!Target->IsFitToSpellRequirements(m_spellInfo))
+                        return SPELL_FAILED_BAD_TARGETS;
+
+                    // Do not enchant vellum with scroll
+                    if(m_CastItem && m_CastItem->GetProto()->Flags & ITEM_FLAGS_ENCHANT_SCROLL && Target->GetProto()->IsVellum())
+                        return SPELL_FAILED_BAD_TARGETS;
+
+                    // Check if we can store a new scroll
+                    if(Target->GetProto()->IsVellum() && m_spellInfo->EffectItemType[i])
+                    {
+                         ItemPosCountVec dest;
+                         uint8 msg = ((Player*)m_caster)->CanStoreNewItem( NULL_BAG, NULL_SLOT, dest, m_spellInfo->EffectItemType[i], 1 );
+                         if(msg != EQUIP_ERR_OK)
+                         {
+                            ((Player*)m_caster)->SendEquipError( msg, NULL, NULL );
+                            return SPELL_FAILED_DONT_REPORT;
+                         }
+                    }
+                }
+                break;
+            }
             default:break;
         }
     }
@@ -5506,12 +5536,17 @@ SpellCastResult Spell::CheckItems()
             uint32 itemid    = m_spellInfo->Reagent[i];
             uint32 itemcount = m_spellInfo->ReagentCount[i];
 
+            // If item is a scroll enchant we don't need reagents
+            if(m_CastItem && m_CastItem->GetProto()->Flags & ITEM_FLAGS_ENCHANT_SCROLL)
+                break;
+
             // if CastItem is also spell reagent
             if( m_CastItem && m_CastItem->GetEntry() == itemid )
             {
                 ItemPrototype const *proto = m_CastItem->GetProto();
                 if(!proto)
                     return SPELL_FAILED_ITEM_NOT_READY;
+
                 for(int s = 0; s < MAX_ITEM_PROTO_SPELLS; ++s)
                 {
                     // CastItem will be used up and does not count as reagent
@@ -5549,6 +5584,13 @@ SpellCastResult Spell::CheckItems()
     uint32 TotemCategory = 2;
     for(int i= 0; i < 2; ++i)
     {
+        // Skip for scroll enchant case
+        if(m_CastItem && m_CastItem->GetProto()->Flags & ITEM_FLAGS_ENCHANT_SCROLL)
+        {
+            TotemCategory = 0;
+            break;
+        }
+
         if(m_spellInfo->TotemCategory[i] != 0)
         {
             if( p_caster->HasItemTotemCategory(m_spellInfo->TotemCategory[i]) )

@@ -2933,7 +2933,11 @@ void Spell::DoCreateItem(uint32 i, uint32 itemtype)
 
         // send info to the client
         if(pItem)
+        {
+            if(Item* ItemTarget = m_targets.getItemTarget())
+                player->DestroyItemCount(ItemTarget->GetEntry(), 1, true);
             player->SendNewItem(pItem, num_to_add, true, bgType == 0);
+        }
 
         // we succeeded in creating at least one item, so a levelup is possible
         if(bgType == 0)
@@ -4307,6 +4311,14 @@ void Spell::EffectEnchantItemTmp(uint32 i)
     Player* item_owner = itemTarget->GetOwner();
     if(!item_owner)
         return;
+
+    ItemPrototype const* targetProto = itemTarget->GetProto();
+    if(m_spellInfo->EffectItemType[i] && targetProto->IsVellum())
+    {
+        unitTarget = m_caster;
+        DoCreateItem(i,m_spellInfo->EffectItemType[i]);
+        return;
+    }
 
     if(item_owner!=p_caster && p_caster->GetSession()->GetSecurity() > SEC_PLAYER && sWorld.getConfig(CONFIG_GM_LOG_TRADE) )
     {

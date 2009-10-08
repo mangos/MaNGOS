@@ -632,6 +632,7 @@ struct ItemPrototype
 
     bool IsPotion() const { return Class==ITEM_CLASS_CONSUMABLE && SubClass==ITEM_SUBCLASS_POTION; }
     bool IsConjuredConsumable() const { return Class == ITEM_CLASS_CONSUMABLE && (Flags & ITEM_FLAGS_CONJURED); }
+    bool IsVellum() const { return Class == ITEM_CLASS_TRADE_GOODS && (0xC000 & (1<<SubClass)); }
 };
 
 struct ItemLocale
