@@ -313,7 +313,7 @@ pAuraHandler AuraHandler[TOTAL_AURAS]=
     &Aura::HandleNoImmediateEffect,                         //260 SPELL_AURA_SCREEN_EFFECT (miscvalue = id in ScreenEffect.dbc) not required any code
     &Aura::HandlePhase,                                     //261 SPELL_AURA_PHASE undetectable invisibility?     implemented in Unit::isVisibleForOrDetect
     &Aura::HandleNULL,                                      //262 ignore combat/aura state?
-    &Aura::HandleNULL,                                      //263 SPELL_AURA_ALLOW_ONLY_ABILITY player can use only abilities set in SpellClassMask
+    &Aura::HandleAllowOnlyAbility,                          //263 SPELL_AURA_ALLOW_ONLY_ABILITY player can use only abilities set in SpellClassMask
     &Aura::HandleUnused,                                    //264 unused (3.0.8a)
     &Aura::HandleUnused,                                    //265 unused (3.0.8a)
     &Aura::HandleUnused,                                    //266 unused (3.0.8a)
@@ -7765,6 +7765,29 @@ void Aura::HandleAddCreatureImmunity(bool apply, bool Real)
        for(Unit::AuraList::const_iterator itr = snares.begin(); itr != snares.end(); itr++)
            m_target->RemoveAura((*itr)->GetId(), (*itr)->GetEffIndex());
     }
+}
+
+void Aura::HandleAllowOnlyAbility(bool apply, bool Real)
+{
+    if(!Real)
+       return;
+
+    if(apply)
+    {
+       m_target->setAttackTimer(BASE_ATTACK,m_duration);
+       m_target->setAttackTimer(RANGED_ATTACK,m_duration);
+       m_target->setAttackTimer(OFF_ATTACK,m_duration);
+    }
+    else
+    {
+       m_target->resetAttackTimer(BASE_ATTACK);
+       m_target->resetAttackTimer(RANGED_ATTACK);
+       m_target->resetAttackTimer(OFF_ATTACK);
+    }
+
+    m_target->UpdateDamagePhysical(BASE_ATTACK);
+    m_target->UpdateDamagePhysical(RANGED_ATTACK);
+    m_target->UpdateDamagePhysical(OFF_ATTACK);
 }
 
 void Aura::UnregisterSingleCastAura()
