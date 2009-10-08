@@ -8726,7 +8726,20 @@ uint32 Unit::SpellDamageBonus(Unit *pVictim, SpellEntry const *spellProto, uint3
             coeff = bonus->direct_damage * LvlPenalty * stack;
 
         if (bonus->ap_bonus)
-            DoneTotal += int32(bonus->ap_bonus * GetTotalAttackPowerValue(BASE_ATTACK) * stack);
+        {
+           float total_bonus = bonus->ap_bonus;
+           if (GetTypeId() == TYPEID_PLAYER && ((Player*)this)->getClass() == CLASS_DEATH_KNIGHT)
+           {
+               uint32 impurity_id[5] = {49220,49633,49635,49636,49638};
+               for (int i = 0; i < 5; ++i)
+                   if (((Player*)this)->HasSpell(impurity_id[i]))
+                   {
+                       total_bonus += bonus->ap_bonus * (sSpellStore.LookupEntry(impurity_id[i])->EffectBasePoints[0] + 1) / 100.0f;
+                       break;
+                   }
+           }
+           DoneTotal += int32(total_bonus * GetTotalAttackPowerValue(BASE_ATTACK) * stack);
+        }
 
         DoneTotal  += int32(DoneAdvertisedBenefit * coeff * SpellModSpellDamage);
         TakenTotal += int32(TakenAdvertisedBenefit * coeff);
@@ -9181,7 +9194,20 @@ uint32 Unit::SpellHealingBonus(Unit *pVictim, SpellEntry const *spellProto, uint
             coeff = bonus->direct_damage * LvlPenalty * stack;
 
         if (bonus->ap_bonus)
-            DoneTotal += int32(bonus->ap_bonus * GetTotalAttackPowerValue(BASE_ATTACK) * stack);
+        {
+           float total_bonus = bonus->ap_bonus;
+           if (GetTypeId() == TYPEID_PLAYER && ((Player*)this)->getClass() == CLASS_DEATH_KNIGHT)
+           {
+               uint32 impurity_id[5] = {49220,49633,49635,49636,49638};
+               for (int i = 0; i < 5; ++i)
+                   if (((Player*)this)->HasSpell(impurity_id[i]))
+                   {
+                       total_bonus += bonus->ap_bonus * (sSpellStore.LookupEntry(impurity_id[i])->EffectBasePoints[0] + 1) / 100.0f;
+                       break;
+                   }
+           }
+           DoneTotal += int32(total_bonus * GetTotalAttackPowerValue(BASE_ATTACK) * stack);
+        }
 
         DoneTotal  += int32(DoneAdvertisedBenefit * coeff * SpellModSpellDamage);
         TakenTotal += int32(TakenAdvertisedBenefit * coeff);
