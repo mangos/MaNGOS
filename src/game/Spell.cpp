@@ -2742,6 +2742,8 @@ void Spell::cast(bool skipCheck)
             }
             else if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x200000000000))
                 AddPrecastSpell(61987);                     // Avenging Wrath Marker
+            else if (m_spellInfo->Id == 19746 && m_caster->HasAura(31821))
+                AddTriggeredSpell(64364);                   // Aura Mastery
             break;
         }
         case SPELLFAMILY_SHAMAN:
