@@ -4785,7 +4785,9 @@ SpellCastResult Spell::CheckCast(bool strict)
 
                     if (m_caster->GetTypeId() == TYPEID_PLAYER && m_caster->getClass() == CLASS_WARLOCK)
                     {
-                        if (strict)                         //starting cast, trigger pet stun (cast by pet so it doesn't attack player)
+                        if(pet->getDeathState() == CORPSE)  // remove summon corpse when starting cast summon
+                            pet->Remove(PET_SAVE_NOT_IN_SLOT);
+                        else if (strict)                    //starting cast, trigger pet stun (cast by pet so it doesn't attack player)
                             pet->CastSpell(pet, 32752, true, NULL, NULL, pet->GetGUID());
                     }
                     else
