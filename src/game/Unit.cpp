@@ -10014,7 +10014,8 @@ void Unit::setDeathState(DeathState s)
         RemoveGuardians();
         UnsummonAllTotems();
 
-        // avoid that corpses run in fear
+        // after removing a Fearaura (in RemoveAllAurasOnDeath)
+        // Unit::SetFeared is called and makes that creatures attack player again
         StopMoving();
 
         ModifyAuraState(AURA_STATE_HEALTHLESS_20_PERCENT, false);
