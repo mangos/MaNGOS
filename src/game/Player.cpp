@@ -4635,6 +4635,7 @@ void Player::LeaveLFGChannel()
             break;
         }
     }
+    SetDisplayId(GetNativeDisplayId());
 }
 
 void Player::UpdateDefense()

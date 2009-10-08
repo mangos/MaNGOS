@@ -557,8 +557,8 @@ namespace MaNGOS
             }
             bool operator()(Creature* u)
             {
-                if (u->getDeathState()!=CORPSE || u->isInFlight() || u->isDeadByDefault() ||
-                    (u->GetDisplayId() != u->GetNativeDisplayId()) ||
+                if ((u->getDeathState()!=CORPSE && u->getDeathState()!=GHOULED) || u->isInFlight() ||
+                    u->isDeadByDefault() || (u->GetDisplayId() != u->GetNativeDisplayId()) ||
                     (u->GetCreatureTypeMask() & CREATURE_TYPEMASK_MECHANICAL_OR_ELEMENTAL)!=0)
                     return false;
 

@@ -487,6 +487,78 @@ WorldObject* Spell::FindCorpseUsing()
     return result;
 }
 
+void Spell::FillCustomTargetMap(uint32 i, UnitList& TagUnitMap)
+{
+    float radius;
+    if (m_spellInfo->EffectRadiusIndex[i])
+        radius = GetSpellRadius(sSpellRadiusStore.LookupEntry(m_spellInfo->EffectRadiusIndex[i]));
+    else
+        radius = GetSpellMaxRange(sSpellRangeStore.LookupEntry(m_spellInfo->rangeIndex));
+    // Resulting effect depends on spell that we want to cast
+    switch (m_spellInfo->Id)
+    {
+        case 48743: // Death Pact
+        {
+            Unit* unit_to_add = NULL;
+            if (Player* modOwner = m_caster->GetSpellModOwner())
+            {
+                // If we have regular pet
+                Pet* pet = modOwner->GetPet();
+                if (pet && pet->GetCreatureInfo()->type == CREATURE_TYPE_UNDEAD)
+                    unit_to_add = pet;
+                else
+                {
+                    // Maybe we have a summoned guardian?
+                    GuardianPetList const& guardians = modOwner->GetGuardians();
+                    for (GuardianPetList::const_iterator itr = guardians.begin(); itr != guardians.end(); ++itr)
+                    {
+                        Pet* temp_pet = ObjectAccessor::GetPet(*itr);
+                        if(temp_pet && temp_pet->isAlive())
+                            if (temp_pet->GetEntry() == 26125 || temp_pet->GetEntry() == 27829)
+                            {
+                                unit_to_add = temp_pet;
+                                break;
+                            }
+                    }
+                }
+                if (unit_to_add)
+                    TagUnitMap.push_back(unit_to_add);
+                else
+                {
+                    if (modOwner->GetTypeId()==TYPEID_PLAYER)
+                        modOwner->RemoveSpellCooldown(m_spellInfo->Id,true);
+                    SendCastResult(SPELL_FAILED_NO_PET);
+                    finish(false);
+                }
+            }
+            break;
+        }
+        case 46584: // Raise Dead
+        {
+            WorldObject* result = FindCorpseUsing <MaNGOS::RaiseDeadObjectCheck>  ();
+
+            if(result)
+            {
+                switch(result->GetTypeId())
+                {
+                    case TYPEID_UNIT:
+                        TagUnitMap.push_back((Unit*)result);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            break;
+        }
+        case 47496: // Ghoul's explode
+        {
+            FillAreaTargets(TagUnitMap,m_targets.m_destX, m_targets.m_destY,radius,PUSH_DEST_CENTER,SPELL_TARGETS_AOE_DAMAGE);
+            break;
+        }
+        break;
+    }
+}
+
 void Spell::FillTargetMap()
 {
     // TODO: ADD the correct target FILLS!!!!!!
@@ -530,6 +602,11 @@ void Spell::FillTargetMap()
                 }
                 break;
             case TARGET_EFFECT_SELECT:
+                if (m_spellInfo->Id == 46584 || m_spellInfo->Id == 47496 || m_spellInfo->Id == 48743)
+                {
+                    FillCustomTargetMap(i,tmpUnitMap);
+                    break;
+                }
                 switch(m_spellInfo->EffectImplicitTargetB[i])
                 {
                     case 0:
@@ -1416,11 +1493,64 @@ void Spell::SetTargetMap(uint32 effIndex,uint32 targetMode,UnitList& TagUnitMap)
         case TARGET_TOTEM_FIRE:
         case TARGET_SELF:
         case TARGET_SELF2:
-        case TARGET_AREAEFFECT_CUSTOM:
         case TARGET_AREAEFFECT_CUSTOM_2:
         case TARGET_SUMMON:
             TagUnitMap.push_back(m_caster);
             break;
+        case TARGET_AREAEFFECT_CUSTOM:
+        {
+            switch (m_spellInfo->SpellFamilyName)
+            {
+                case SPELLFAMILY_DEATHKNIGHT:
+                {
+                    switch (m_spellInfo->SpellIconID)
+                    {
+                        case 1737: // Corpse Explosion
+                        {
+                            // if not our ghoul AND
+                            if (!(m_targets.getUnitTarget()->GetEntry() == 26125 && m_targets.getUnitTarget()->GetOwnerGUID() == m_caster->GetGUID()) &&
+                                // alive target or not suitable corpse
+                                ( ((Creature*)m_targets.getUnitTarget())->isDeadByDefault() ||
+                                (m_targets.getUnitTarget()->getDeathState() != CORPSE && m_targets.getUnitTarget()->getDeathState() != GHOULED) ||
+                                (m_targets.getUnitTarget()->GetCreatureTypeMask() & CREATURE_TYPEMASK_MECHANICAL_OR_ELEMENTAL)!=0 ||
+                                (m_targets.getUnitTarget()->GetDisplayId() != m_targets.getUnitTarget()->GetNativeDisplayId()) ))
+                            {
+                                TagUnitMap.clear();
+                                CleanupTargetList();
+
+                                WorldObject* result = FindCorpseUsing <MaNGOS::ExplodeCorpseObjectCheck> ();
+
+                                if(result)
+                                {
+                                    switch(result->GetTypeId())
+                                    {
+                                        case TYPEID_UNIT:
+                                        case TYPEID_PLAYER:
+                                            TagUnitMap.push_back((Unit*)result);
+                                            break;
+                                    }
+                                }
+                                else
+                                {
+                                    if (m_caster->GetTypeId()==TYPEID_PLAYER)
+                                        ((Player*)m_caster)->RemoveSpellCooldown(m_spellInfo->Id,true);
+                                    SendCastResult(SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW);
+                                    finish(false);
+                                }
+                            }
+                            break;
+                        }
+                    }
+                    break;
+                }
+                default :
+                {
+                    TagUnitMap.push_back(m_caster);
+                    break;
+                }
+            }
+            break;
+        }
         case TARGET_RANDOM_ENEMY_CHAIN_IN_AREA:
         {
             m_targets.m_targetMask = 0;
