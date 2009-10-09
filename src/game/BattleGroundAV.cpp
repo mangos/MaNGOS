@@ -611,7 +611,7 @@ void BattleGroundAV::EventPlayerAssaultsPoint(Player* player, BG_AV_Nodes node)
         SendYell2ToAll(LANG_BG_AV_TOWER_ASSAULTED, LANG_UNIVERSAL, GetSingleCreatureGuid(BG_AV_HERALD, 0),
             GetNodeName(node),
             ( team == BG_TEAM_ALLIANCE ) ? LANG_BG_AV_ALLY:LANG_BG_AV_HORDE);
-        UpdatePlayerScore(player, SCORE_GRAVEYARDS_ASSAULTED, 1);
+        UpdatePlayerScore(player, SCORE_TOWERS_ASSAULTED, 1);
     }
     else
     {
