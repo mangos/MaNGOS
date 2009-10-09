@@ -65,12 +65,13 @@ enum MailAuctionAnswers
 // gathered from Stationery.dbc
 enum MailStationery
 {
-    MAIL_STATIONERY_UNKNOWN = 0x01,
-    MAIL_STATIONERY_NORMAL  = 0x29,
-    MAIL_STATIONERY_GM      = 0x3D,
-    MAIL_STATIONERY_AUCTION = 0x3E,
-    MAIL_STATIONERY_VAL     = 0x40,
-    MAIL_STATIONERY_CHR     = 0x41
+    MAIL_STATIONERY_UNKNOWN =  1,
+    MAIL_STATIONERY_NORMAL  = 41,
+    MAIL_STATIONERY_GM      = 61,
+    MAIL_STATIONERY_AUCTION = 62,
+    MAIL_STATIONERY_VAL     = 64,
+    MAIL_STATIONERY_CHR     = 65,
+    MAIL_STATIONERY_ORP     = 67,                           // new in 3.2.2
 };
 
 struct MailItemInfo
