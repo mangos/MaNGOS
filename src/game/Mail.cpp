@@ -28,6 +28,7 @@
 #include "Unit.h"
 #include "Language.h"
 #include "DBCStores.h"
+#include "BattleGroundMgr.h"
 
 enum MailShowFlags
 {
@@ -823,6 +824,15 @@ void WorldSession::SendMailTo(Player* receiver, uint8 messageType, uint8 station
         expire_delay = HOUR;
     else
         expire_delay = (COD > 0) ? 3 * DAY : 30 * DAY;
+    if (messageType == MAIL_CREATURE)
+    {
+        // mail from battlemaster (rewardmarks) should last only one day
+        BattleGroundTypeId bgTypeId = sBattleGroundMgr.GetBattleMasterBG(sender_guidlow_or_entry);
+        if (bgTypeId != BATTLEGROUND_TYPE_NONE)
+            expire_delay = DAY;
+    }
+
+
 
     time_t expire_time = deliver_time + expire_delay;
 
