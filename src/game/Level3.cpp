@@ -647,7 +647,7 @@ bool ChatHandler::HandleReloadEventAITextsCommand(const char* arg)
 {
 
     sLog.outString( "Re-Loading Texts from `creature_ai_texts`...");
-    CreatureEAI_Mgr.LoadCreatureEventAI_Texts();
+    CreatureEAI_Mgr.LoadCreatureEventAI_Texts(true);
     SendGlobalSysMessage("DB table `creature_ai_texts` reloaded.");
     return true;
 }
@@ -655,7 +655,7 @@ bool ChatHandler::HandleReloadEventAITextsCommand(const char* arg)
 bool ChatHandler::HandleReloadEventAISummonsCommand(const char* arg)
 {
     sLog.outString( "Re-Loading Summons from `creature_ai_summons`...");
-    CreatureEAI_Mgr.LoadCreatureEventAI_Summons();
+    CreatureEAI_Mgr.LoadCreatureEventAI_Summons(true);
     SendGlobalSysMessage("DB table `creature_ai_summons` reloaded.");
     return true;
 }

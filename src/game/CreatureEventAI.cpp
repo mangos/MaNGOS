@@ -345,24 +345,17 @@ void CreatureEventAI::ProcessAction(CreatureEventAI_Action const& action, uint32
     {
         case ACTION_T_TEXT:
         {
-            if (!action.text.TextId1)
+            if (!action.text.TextId[0])
                 return;
 
             int32 temp = 0;
 
-            if (action.text.TextId2 && action.text.TextId3)
-            {
-                switch( rand()%3 )
-                {
-                    case 0: temp = action.text.TextId1; break;
-                    case 1: temp = action.text.TextId2; break;
-                    case 2: temp = action.text.TextId3; break;
-                }
-            }
-            else if (action.text.TextId2 && urand(0,1))
-                temp = action.text.TextId2;
+            if (action.text.TextId[1] && action.text.TextId[2])
+                temp = action.text.TextId[rand()%3];
+            else if (action.text.TextId[1] && urand(0,1))
+                temp = action.text.TextId[1];
             else
-                temp = action.text.TextId1;
+                temp = action.text.TextId[0];
 
             if (temp)
             {
