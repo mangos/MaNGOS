@@ -173,7 +173,7 @@ ChatCommand * ChatHandler::getCommandTable()
 
     static ChatCommand eventCommandTable[] =
     {
-        { "activelist",     SEC_GAMEMASTER,     true,  &ChatHandler::HandleEventActiveListCommand,     "", NULL },
+        { "list",           SEC_GAMEMASTER,     true,  &ChatHandler::HandleEventListCommand,           "", NULL },
         { "start",          SEC_GAMEMASTER,     true,  &ChatHandler::HandleEventStartCommand,          "", NULL },
         { "stop",           SEC_GAMEMASTER,     true,  &ChatHandler::HandleEventStopCommand,           "", NULL },
         { "",               SEC_GAMEMASTER,     true,  &ChatHandler::HandleEventInfoCommand,           "", NULL },
