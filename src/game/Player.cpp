@@ -4823,11 +4823,29 @@ uint32 Player::GetMeleeCritDamageReduction(uint32 damage) const
     return uint32 (melee * damage /100.0f);
 }
 
+uint32 Player::GetMeleeDamageReduction(uint32 damage) const
+{
+    float rate = GetRatingBonusValue(CR_CRIT_TAKEN_MELEE);
+    // Resilience not limited (limit it by 100%)
+    if (rate > 100.0f)
+        rate = 100.0f;
+    return uint32 (rate * damage / 100.0f);
+}
+
 uint32 Player::GetRangedCritDamageReduction(uint32 damage) const
 {
     float ranged = GetRatingBonusValue(CR_CRIT_TAKEN_RANGED)*2.2f;
     if (ranged>33.0f) ranged=33.0f;
     return uint32 (ranged * damage /100.0f);
+}
+
+uint32 Player::GetRangedDamageReduction(uint32 damage) const
+{
+    float rate = GetRatingBonusValue(CR_CRIT_TAKEN_RANGED);
+    // Resilience not limited (limit it by 100%)
+    if (rate > 100.0f)
+        rate = 100.0f;
+    return uint32 (rate * damage / 100.0f);
 }
 
 uint32 Player::GetSpellCritDamageReduction(uint32 damage) const
@@ -4839,13 +4857,13 @@ uint32 Player::GetSpellCritDamageReduction(uint32 damage) const
     return uint32 (spell * damage / 100.0f);
 }
 
-uint32 Player::GetDotDamageReduction(uint32 damage) const
+uint32 Player::GetSpellDamageReduction(uint32 damage) const
 {
-    float spellDot = GetRatingBonusValue(CR_CRIT_TAKEN_SPELL);
-    // Dot resilience not limited (limit it by 100%)
-    if (spellDot > 100.0f)
-        spellDot = 100.0f;
-    return uint32 (spellDot * damage / 100.0f);
+    float rate = GetRatingBonusValue(CR_CRIT_TAKEN_SPELL);
+    // Resilience not limited (limit it by 100%)
+    if (rate > 100.0f)
+        rate = 100.0f;
+    return uint32 (rate * damage / 100.0f);
 }
 
 float Player::GetExpertiseDodgeOrParryReduction(WeaponAttackType attType) const
