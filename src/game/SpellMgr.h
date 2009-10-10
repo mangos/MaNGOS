@@ -478,7 +478,8 @@ enum ProcFlags
    PROC_FLAG_TAKEN_OFFHAND_HIT             = 0x00400000,    // 22 Taken off-hand melee attacks(not used)
    PROC_FLAG_SUCCESSFUL_OFFHAND_HIT        = 0x00800000,    // 23 Successful off-hand melee attacks
 
-   PROC_FLAG_ON_DEATH                      = 0x01000000     // 24 On caster's death
+   PROC_FLAG_ON_DEATH                      = 0x01000000,     // 24 On caster's death
+   PROC_FLAG_ON_AURA_REMOVE                = 0x02000000     // 25 On Aura remove
 };
 
 #define MELEE_BASED_TRIGGER_MASK (PROC_FLAG_SUCCESSFUL_MELEE_HIT        | \
@@ -506,7 +507,7 @@ enum ProcFlagsEx
    PROC_EX_ABSORB              = 0x0000400,
    PROC_EX_REFLECT             = 0x0000800,
    PROC_EX_INTERRUPT           = 0x0001000,                 // Melee hit result can be Interrupt (not used)
-   PROC_EX_RESERVED1           = 0x0002000,
+   PROC_EX_DISPEL              = 0x0002000,
    PROC_EX_RESERVED2           = 0x0004000,
    PROC_EX_RESERVED3           = 0x0008000,
    PROC_EX_EX_TRIGGER_ALWAYS   = 0x0010000,                 // If set trigger always ( no matter another flags) used for drop charges
