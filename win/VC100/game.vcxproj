@@ -1,4 +1,4 @@
-﻿<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<U+FEFF><Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug_NoPCH|Win32">
       <Configuration>Debug_NoPCH</Configuration>
@@ -434,8 +434,18 @@
     <ClCompile Include="..\..\src\game\Object.cpp" />
     <ClCompile Include="..\..\src\game\ObjectAccessor.cpp" />
     <ClCompile Include="..\..\src\game\ObjectGridLoader.cpp" />
+    <ClCompile Include="..\..\src\game\OutdoorPvP.cpp" />
+    <ClCompile Include="..\..\src\game\OutdoorPvPEP.cpp" />
+    <ClCompile Include="..\..\src\game\OutdoorPvPHP.cpp" />
+    <ClCompile Include="..\..\src\game\OutdoorPvPMgr.cpp" />
+    <ClCompile Include="..\..\src\game\OutdoorPvPNA.cpp" />
+    <ClCompile Include="..\..\src\game\OutdoorPvPSI.cpp" />
+    <ClCompile Include="..\..\src\game\OutdoorPvPZM.cpp" />
+    <ClCompile Include="..\..\src\game\OutdoorPvPSI.cpp" />
+    <ClCompile Include="..\..\src\game\OutdoorPvPLA.cpp" />
     <ClCompile Include="..\..\src\game\ObjectMgr.cpp" />
     <ClCompile Include="..\..\src\game\ObjectPosSelector.cpp" />
+    <ClCompile Include="..\..\src\game\OutdoorPvPObjectiveAI.cpp" />
     <ClCompile Include="..\..\src\game\Opcodes.cpp" />
     <ClCompile Include="..\..\src\game\pchdef.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -580,8 +590,18 @@
     <ClInclude Include="..\..\src\game\ObjectAccessor.h" />
     <ClInclude Include="..\..\src\game\ObjectDefines.h" />
     <ClInclude Include="..\..\src\game\ObjectGridLoader.h" />
+    <ClCompile Include="..\..\src\game\OutdoorPvPNA.h" />
+    <ClCompile Include="..\..\src\game\OutdoorPvPMgr.h" />
+    <ClCompile Include="..\..\src\game\OutdoorPvPHP.h" />
+    <ClCompile Include="..\..\src\game\OutdoorPvPEP.h" />
+    <ClCompile Include="..\..\src\game\OutdoorPvP.h" />
+    <ClCompile Include="..\..\src\game\OutdoorPvPSI.h" />
+    <ClCompile Include="..\..\src\game\OutdoorPvPTF.h" />
+    <ClCompile Include="..\..\src\game\OutdoorPvPZM.h" />
+    <ClCompile Include="..\..\src\game\OutdoorPvPLA.h" />
     <ClInclude Include="..\..\src\game\ObjectMgr.h" />
     <ClInclude Include="..\..\src\game\ObjectPosSelector.h" />
+    <ClInclude Include="..\..\src\game\OutdoorPvPObjectiveAI.h" />
     <ClInclude Include="..\..\src\game\Opcodes.h" />
     <ClInclude Include="..\..\src\game\Path.h" />
     <ClInclude Include="..\..\src\game\pchdef.h" />
