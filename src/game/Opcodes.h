@@ -543,7 +543,7 @@ enum Opcodes
     CMSG_GM_NUKE                                    = 0x1FA,
     MSG_RANDOM_ROLL                                 = 0x1FB,
     SMSG_ENVIRONMENTALDAMAGELOG                     = 0x1FC,
-    CMSG_RWHOIS_OBSOLETE                            = 0x1FD,
+    CMSG_PLAYER_DIFFICULTY_CHANGE                   = 0x1FD,
     SMSG_RWHOIS                                     = 0x1FE,
     MSG_LOOKING_FOR_GROUP                           = 0x1FF,
     CMSG_SET_LOOKING_FOR_GROUP                      = 0x200,
@@ -560,7 +560,7 @@ enum Opcodes
     CMSG_UPDATE_ACCOUNT_DATA                        = 0x20B,
     SMSG_UPDATE_ACCOUNT_DATA                        = 0x20C,
     SMSG_CLEAR_FAR_SIGHT_IMMEDIATE                  = 0x20D,
-    SMSG_POWERGAINLOG_OBSOLETE                      = 0x20E,
+    SMSG_PLAYER_DIFFICULTY_CHANGE                   = 0x20E,
     CMSG_GM_TEACH                                   = 0x20F,
     CMSG_GM_CREATE_ITEM_TARGET                      = 0x210,
     CMSG_GMTICKET_GETTICKET                         = 0x211,
@@ -1307,11 +1307,13 @@ enum Opcodes
     CMSG_WORLD_STATE_UI_TIMER_UPDATE                = 0x4F6,
     SMSG_WORLD_STATE_UI_TIMER_UPDATE                = 0x4F7,
     CMSG_UNKNOWN_1272                               = 0x4F8, // called from lua: CreateCharacter, paid race change
-    UMSG_UNKNOWN_1273                               = 0x4F9, // not found 10522
+    UMSG_UNKNOWN_1273                               = 0x4F9, // not found 10554
     SMSG_UNKNOWN_1274                               = 0x4FA, // uint8
-    UMSG_UNKNOWN_1275                               = 0x4FB, // not found 10522
-    SMSG_UNKNOWN_1276                               = 0x4FC, // does nothing in 10522
-    NUM_MSG_TYPES                                   = 0x4FD
+    UMSG_UNKNOWN_1275                               = 0x4FB, // not found 10554
+    SMSG_UNKNOWN_1276                               = 0x4FC, // does nothing in 10554
+    SMSG_UNKNOWN_1277                               = 0x4FD, // loot related?
+    UMSG_UNKNOWN_1278                               = 0x4FE, // not found 10554
+    NUM_MSG_TYPES                                   = 0x4FF
 };
 
 /// Player state
