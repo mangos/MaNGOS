@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="ad"
 	ProjectGUID="{D7552D4F-408F-4F8E-859B-366659150CF4}"
 	RootNamespace="ad"
@@ -310,6 +310,10 @@
 				RelativePath=".\mpq_libmpq.h"
 				>
 			</File>
+			<File
+				RelativePath=".\loadlib\wdt.h"
+				>
+			</File>
 			<Filter
 				Name="libmpq"
 				>
@@ -326,11 +330,19 @@
 					>
 				</File>
 				<File
+					RelativePath=".\loadlib\loadlib.h"
+					>
+				</File>
+				<File
 					RelativePath=".\libmpq\mpq.h"
 					>
 				</File>
 				<File
 					RelativePath=".\libmpq\wave.h"
+					>
+				</File>
+				<File
+					RelativePath=".\libmpq\wdt.h"
 					>
 				</File>
 				<File
