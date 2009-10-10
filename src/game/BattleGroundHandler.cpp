@@ -50,6 +50,9 @@ void WorldSession::HandleBattlemasterHelloOpcode( WorldPacket & recv_data )
 
     BattleGroundTypeId bgTypeId = sBattleGroundMgr.GetBattleMasterBG(unit->GetEntry());
 
+    if (bgTypeId == BATTLEGROUND_TYPE_NONE)
+        return;
+
     if (!_player->GetBGAccessByLevel(bgTypeId))
     {
                                                             // temp, must be gossip message...
@@ -146,7 +149,7 @@ void WorldSession::HandleBattlemasterJoinOpcode( WorldPacket & recv_data )
 
     // _player->GetGroup() was already checked, grp is already initialized
     GroupQueueInfo * ginfo = sBattleGroundMgr.m_BattleGroundQueues[bgQueueTypeId].AddGroup(_player, bgTypeId, 0, false, isPremade, 0);
-    uint32 avgTime = sBattleGroundMgr.m_BattleGroundQueues[bgQueueTypeId].GetAverageQueueWaitTime(ginfo, _player->GetBattleGroundQueueIdFromLevel(bgTypeId));
+    uint32 avgTime = sBattleGroundMgr.m_BattleGroundQueues[bgQueueTypeId].GetAverageQueueWaitTime(ginfo, _player->GetBattleGroundQueueIdFromLevel());
     if (joinAsGroup /* && _player->GetGroup()*/)
     {
         sLog.outDebug("Battleground: the following players are joining as group:");
@@ -181,7 +184,7 @@ void WorldSession::HandleBattlemasterJoinOpcode( WorldPacket & recv_data )
         sBattleGroundMgr.m_BattleGroundQueues[bgQueueTypeId].AddPlayer(_player, ginfo);
         sLog.outDebug("Battleground: player joined queue for bg queue type %u bg type %u: GUID %u, NAME %s",bgQueueTypeId,bgTypeId,_player->GetGUIDLow(), _player->GetName());
     }
-    sBattleGroundMgr.m_BattleGroundQueues[bgQueueTypeId].Update(bgTypeId, _player->GetBattleGroundQueueIdFromLevel(bgTypeId));
+    sBattleGroundMgr.m_BattleGroundQueues[bgQueueTypeId].Update(bgTypeId, _player->GetBattleGroundQueueIdFromLevel());
     if (!ginfo->IsInvitedToBGInstanceGUID)
         sBattleGroundMgr.m_BattleGroundQueues[bgQueueTypeId].AnnounceWorld(ginfo, _player->GetGUID(), true);
 }
@@ -477,7 +480,7 @@ void WorldSession::HandleBattleFieldPortOpcode( WorldPacket &recv_data )
                 sBattleGroundMgr.m_BattleGroundQueues[bgQueueTypeId].RemovePlayer(_player->GetGUID(), true);
                 // player left queue, we should update it - do not update Arena Queue
                 if (!arenaType)
-                    sBattleGroundMgr.m_BattleGroundQueues[bgQueueTypeId].Update(bgTypeId, _player->GetBattleGroundQueueIdFromLevel(bgTypeId), arenaType, isRated, rating);
+                    sBattleGroundMgr.m_BattleGroundQueues[bgQueueTypeId].Update(bgTypeId, _player->GetBattleGroundQueueIdFromLevel(), arenaType, isRated, rating);
                 SendPacket(&data);
                 sLog.outDebug("Battleground: player %s (%u) left queue for bgtype %u, queue type %u.", _player->GetName(), _player->GetGUIDLow(), bg->GetTypeID(), bgQueueTypeId);
                 break;
@@ -560,7 +563,7 @@ void WorldSession::HandleBattlefieldStatusOpcode( WorldPacket & /*recv_data*/ )
             bg = sBattleGroundMgr.GetBattleGroundTemplate(bgTypeId);
             if (!bg)
                 continue;
-            uint32 avgTime = sBattleGroundMgr.m_BattleGroundQueues[bgQueueTypeId].GetAverageQueueWaitTime(itrPlayerStatus->second.GroupInfo, _player->GetBattleGroundQueueIdFromLevel(bgTypeId));
+            uint32 avgTime = sBattleGroundMgr.m_BattleGroundQueues[bgQueueTypeId].GetAverageQueueWaitTime(itrPlayerStatus->second.GroupInfo, _player->GetBattleGroundQueueIdFromLevel());
             // send status in BattleGround Queue
             sBattleGroundMgr.BuildBattleGroundStatusPacket(&data, bg, i, STATUS_WAIT_QUEUE, avgTime, getMSTimeDiff(itrPlayerStatus->second.GroupInfo->JoinTime, getMSTime()), arenaType);
             SendPacket(&data);
@@ -723,7 +726,7 @@ void WorldSession::HandleBattlemasterJoinArena( WorldPacket & recv_data )
     }
 
     GroupQueueInfo * ginfo = sBattleGroundMgr.m_BattleGroundQueues[bgQueueTypeId].AddGroup(_player, bgTypeId, arenatype, isRated, false, arenaRating, ateamId);
-    uint32 avgTime = sBattleGroundMgr.m_BattleGroundQueues[bgQueueTypeId].GetAverageQueueWaitTime(ginfo, _player->GetBattleGroundQueueIdFromLevel(bgTypeId));
+    uint32 avgTime = sBattleGroundMgr.m_BattleGroundQueues[bgQueueTypeId].GetAverageQueueWaitTime(ginfo, _player->GetBattleGroundQueueIdFromLevel());
     if (asGroup)
     {
         sLog.outDebug("Battleground: arena join as group start");
@@ -760,7 +763,7 @@ void WorldSession::HandleBattlemasterJoinArena( WorldPacket & recv_data )
         sBattleGroundMgr.m_BattleGroundQueues[bgQueueTypeId].AddPlayer(_player, ginfo);
         sLog.outDebug("Battleground: player joined queue for arena, skirmish, bg queue type %u bg type %u: GUID %u, NAME %s",bgQueueTypeId,bgTypeId,_player->GetGUIDLow(), _player->GetName());
     }
-    sBattleGroundMgr.m_BattleGroundQueues[bgQueueTypeId].Update(bgTypeId, _player->GetBattleGroundQueueIdFromLevel(bgTypeId), arenatype, isRated, arenaRating);
+    sBattleGroundMgr.m_BattleGroundQueues[bgQueueTypeId].Update(bgTypeId, _player->GetBattleGroundQueueIdFromLevel(), arenatype, isRated, arenaRating);
 }
 
 void WorldSession::HandleReportPvPAFK( WorldPacket & recv_data )

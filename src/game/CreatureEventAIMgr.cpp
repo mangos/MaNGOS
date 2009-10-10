@@ -30,7 +30,7 @@
 INSTANTIATE_SINGLETON_1(CreatureEventAIMgr);
 
 // -------------------
-void CreatureEventAIMgr::LoadCreatureEventAI_Texts()
+void CreatureEventAIMgr::LoadCreatureEventAI_Texts(bool check_entry_use)
 {
     // Drop Existing Text Map, only done once and we are ready to add data from multiple sources.
     m_CreatureEventAI_TextMap.clear();
@@ -97,6 +97,9 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Texts()
 
         delete result;
 
+        if(check_entry_use)
+            CheckUnusedAITexts();
+
         sLog.outString();
         sLog.outString(">> Loaded %u additional CreatureEventAI Texts data.", count);
     }
@@ -107,11 +110,46 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Texts()
         sLog.outString();
         sLog.outString(">> Loaded 0 additional CreatureEventAI Texts data. DB table `creature_ai_texts` is empty.");
     }
+}
 
+void CreatureEventAIMgr::CheckUnusedAITexts()
+{
+    std::set<int32> idx_set;
+    // check not used strings this is negative range
+    for(CreatureEventAI_TextMap::const_iterator itr = m_CreatureEventAI_TextMap.begin(); itr != m_CreatureEventAI_TextMap.end(); ++itr)
+        idx_set.insert(itr->first);
+
+    for(CreatureEventAI_Event_Map::const_iterator itr = m_CreatureEventAI_Event_Map.begin(); itr != m_CreatureEventAI_Event_Map.end(); ++itr)
+    {
+        for(size_t i = 0; i < itr->second.size(); ++i)
+        {
+            CreatureEventAI_Event const& event = itr->second[i];
+
+            for(int j = 0; j < MAX_ACTIONS; ++j)
+            {
+                CreatureEventAI_Action const& action = event.action[j];
+                switch(action.type)
+                {
+                    case ACTION_T_TEXT:
+                    {
+                        for(int k = 0; k < 3; ++k)
+                            if (action.text.TextId[k])
+                                idx_set.erase(action.text.TextId[k]);
+                        break;
+                    }
+                    default: break;
+                }
+
+            }
+        }
+    }
+
+    for(std::set<int32>::const_iterator itr = idx_set.begin(); itr != idx_set.end(); ++itr)
+        sLog.outErrorDb("CreatureEventAI:  Entry %i in table `creature_ai_texts` but not used in EventAI scripts.",*itr);
 }
 
 // -------------------
-void CreatureEventAIMgr::LoadCreatureEventAI_Summons()
+void CreatureEventAIMgr::LoadCreatureEventAI_Summons(bool check_entry_use)
 {
 
     //Drop Existing EventSummon Map
@@ -151,6 +189,9 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Summons()
 
         delete result;
 
+        if(check_entry_use)
+            CheckUnusedAISummons();
+
         sLog.outString();
         sLog.outString(">> Loaded %u CreatureEventAI summon definitions", Count);
     }else
@@ -160,7 +201,41 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Summons()
         sLog.outString();
         sLog.outString(">> Loaded 0 CreatureEventAI Summon definitions. DB table `creature_ai_summons` is empty.");
     }
+}
 
+void CreatureEventAIMgr::CheckUnusedAISummons()
+{
+    std::set<int32> idx_set;
+    // check not used strings this is negative range
+    for(CreatureEventAI_Summon_Map::const_iterator itr = m_CreatureEventAI_Summon_Map.begin(); itr != m_CreatureEventAI_Summon_Map.end(); ++itr)
+        idx_set.insert(itr->first);
+
+    for(CreatureEventAI_Event_Map::const_iterator itr = m_CreatureEventAI_Event_Map.begin(); itr != m_CreatureEventAI_Event_Map.end(); ++itr)
+    {
+        for(size_t i = 0; i < itr->second.size(); ++i)
+        {
+            CreatureEventAI_Event const& event = itr->second[i];
+
+            for(int j = 0; j < MAX_ACTIONS; ++j)
+            {
+                CreatureEventAI_Action const& action = event.action[j];
+                switch(action.type)
+                {
+                    case ACTION_T_SUMMON_ID:
+                    {
+                        if (action.summon_id.spawnId)
+                            idx_set.erase(action.summon_id.spawnId);
+                        break;
+                    }
+                    default: break;
+                }
+
+            }
+        }
+    }
+
+    for(std::set<int32>::const_iterator itr = idx_set.begin(); itr != idx_set.end(); ++itr)
+        sLog.outErrorDb("CreatureEventAI:  Entry %i in table `creature_ai_summons` but not used in EventAI scripts.",*itr);
 }
 
 // -------------------
@@ -421,26 +496,28 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Scripts()
                         break;
                     case ACTION_T_TEXT:
                     {
-                        if (action.text.TextId1 < 0)
+                        bool not_set = false;
+                        for(int k = 0; k < 3; ++k)
                         {
-                            if (m_CreatureEventAI_TextMap.find(action.text.TextId1) == m_CreatureEventAI_TextMap.end())
-                                sLog.outErrorDb("CreatureEventAI:  Event %u Action %u param1 refrences non-existing entry in texts table.", i, j+1);
-                        }
-                        if (action.text.TextId2 < 0)
-                        {
-                            if (m_CreatureEventAI_TextMap.find(action.text.TextId2) == m_CreatureEventAI_TextMap.end())
-                                sLog.outErrorDb("CreatureEventAI:  Event %u Action %u param2 refrences non-existing entry in texts table.", i, j+1);
+                            if (action.text.TextId[k])
+                            {
+                                if (k > 0 && not_set)
+                                    sLog.outErrorDb("CreatureEventAI:  Event %u Action %u has param%d, but it follow after not set param. Required for randomized text.", i, j+1, k+1);
 
-                            if (!action.text.TextId1)
-                                sLog.outErrorDb("CreatureEventAI:  Event %u Action %u has param2, but param1 is not set. Required for randomized text.", i, j+1);
-                        }
-                        if (action.text.TextId3 < 0)
-                        {
-                            if (m_CreatureEventAI_TextMap.find(action.text.TextId3) == m_CreatureEventAI_TextMap.end())
-                                sLog.outErrorDb("CreatureEventAI:  Event %u Action %u param3 refrences non-existing entry in texts table.", i, j+1);
-
-                            if (!action.text.TextId1 || !action.text.TextId2)
-                                sLog.outErrorDb("CreatureEventAI:  Event %u Action %u has param3, but param1 and/or param2 is not set. Required for randomized text.", i, j+1);
+                                if(!action.text.TextId[k])
+                                    not_set = true;
+                                // range negative
+                                else if(action.text.TextId[k] > MIN_CREATURE_AI_TEXT_STRING_ID || action.text.TextId[k] <= MAX_CREATURE_AI_TEXT_STRING_ID)
+                                {
+                                    sLog.outErrorDb("CreatureEventAI:  Event %u Action %u param%d references out-of-range entry (%i) in texts table.", i, j+1, k+1, action.text.TextId[k]);
+                                    action.text.TextId[k] = 0;
+                                }
+                                else if (m_CreatureEventAI_TextMap.find(action.text.TextId[k]) == m_CreatureEventAI_TextMap.end())
+                                {
+                                    sLog.outErrorDb("CreatureEventAI:  Event %u Action %u param%d references non-existing entry (%i) in texts table.", i, j+1, k+1, action.text.TextId[k]);
+                                    action.text.TextId[k] = 0;
+                                }
+                            }
                         }
                         break;
                     }
@@ -699,6 +776,9 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Scripts()
         } while (result->NextRow());
 
         delete result;
+
+        CheckUnusedAITexts();
+        CheckUnusedAISummons();
 
         sLog.outString();
         sLog.outString(">> Loaded %u CreatureEventAI scripts", Count);

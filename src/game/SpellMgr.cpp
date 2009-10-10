@@ -2819,6 +2819,16 @@ SpellCastResult SpellMgr::GetSpellAllowedInLocationError(SpellEntry const *spell
 
     switch(spellInfo->Id)
     {
+        // a trinket in alterac valley allows to teleport to the boss
+        case 22564:                                         // recall
+        case 22563:                                         // recall
+        {
+            if (!player)
+                return SPELL_FAILED_REQUIRES_AREA;
+            BattleGround* bg = player->GetBattleGround();
+            return map_id == 30 && bg
+                && bg->GetStatus() != STATUS_WAIT_JOIN ? SPELL_CAST_OK : SPELL_FAILED_REQUIRES_AREA;
+        }
         case 23333:                                         // Warsong Flag
         case 23335:                                         // Silverwing Flag
             return map_id == 489 && player && player->InBattleGround() ? SPELL_CAST_OK : SPELL_FAILED_REQUIRES_AREA;

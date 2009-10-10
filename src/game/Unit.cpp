@@ -718,10 +718,12 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
             if(BattleGround *bg = killed->GetBattleGround())
                 if(player)
                     bg->HandleKillPlayer(killed, player);
-                //later we can add support for creature->player kills here i'm
-                //not sure, but i guess those kills also get counted in av
-                //else if(GetTypeId() == TYPEID_UNIT)
-                //    bg->HandleKillPlayer(killed,(Creature*)this);
+        }
+        else if(pVictim->GetTypeId() == TYPEID_UNIT)
+        {
+            if (player)
+                if (BattleGround *bg = player->GetBattleGround())
+                    bg->HandleKillUnit((Creature*)pVictim, player);
         }
     }
     else                                                    // if (health <= damage)
@@ -1118,6 +1120,9 @@ void Unit::CalculateSpellDamage(SpellNonMeleeDamage *damageInfo, int32 damage, S
         break;
     }
 
+    if (GetTypeId() == TYPEID_PLAYER && pVictim->GetTypeId() == TYPEID_PLAYER)
+        damage -= ((Player*)pVictim)->GetSpellDamageReduction(damage);
+
     // Calculate absorb resist
     if(damage > 0)
     {
@@ -1404,6 +1409,14 @@ void Unit::CalculateMeleeDamage(Unit *pVictim, uint32 damage, CalcDamageInfo *da
         default:
 
             break;
+    }
+
+    if (GetTypeId() == TYPEID_PLAYER && pVictim->GetTypeId() == TYPEID_PLAYER)
+    {
+        if (attackType != RANGED_ATTACK)
+            damage-=((Player*)pVictim)->GetMeleeDamageReduction(damage);
+        else
+            damage-=((Player*)pVictim)->GetRangedDamageReduction(damage);
     }
 
     // Calculate absorb resist
@@ -10013,6 +10026,10 @@ void Unit::setDeathState(DeathState s)
         RemoveAllAurasOnDeath();
         RemoveGuardians();
         UnsummonAllTotems();
+
+        // after removing a Fearaura (in RemoveAllAurasOnDeath)
+        // Unit::SetFeared is called and makes that creatures attack player again
+        StopMoving();
 
         ModifyAuraState(AURA_STATE_HEALTHLESS_20_PERCENT, false);
         ModifyAuraState(AURA_STATE_HEALTHLESS_35_PERCENT, false);

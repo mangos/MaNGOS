@@ -1371,8 +1371,10 @@ void Spell::SetTargetMap(uint32 effIndex,uint32 targetMode,UnitList& TagUnitMap)
         {
             radius *= sqrt(rand_norm()); // Get a random point in circle. Use sqrt(rand) to correct distribution when converting polar to Cartesian coordinates.
             float angle = 2.0 * M_PI * rand_norm();
-            float dest_x, dest_y, dest_z;
-            m_caster->GetClosePoint(dest_x, dest_y, dest_z, 0.0f, radius, angle);
+            float dest_x = m_targets.m_destX + cos(angle) * radius;
+            float dest_y = m_targets.m_destY + sin(angle) * radius;
+            float dest_z = m_caster->GetPositionZ();
+            m_caster->UpdateGroundPositionZ(dest_x, dest_y, dest_z);
             m_targets.setDestination(dest_x, dest_y, dest_z);
 
             if (radius > 0.0f)

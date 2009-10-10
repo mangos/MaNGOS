@@ -1027,14 +1027,14 @@ struct ItemRandomPropertiesEntry
     uint32    ID;                                           // 0        m_ID
     //char*     internalName                                // 1        m_Name
     uint32    enchant_id[5];                                // 2-6      m_Enchantment
-    //char*     nameSuffix[16]                              // 7-22     m_name_lang
+    char*     nameSuffix[16];                               // 7-22     m_name_lang
                                                             // 23 name flags
 };
 
 struct ItemRandomSuffixEntry
 {
     uint32    ID;                                           // 0        m_ID
-    //char*     name[16]                                    // 1-16     m_name_lang
+    char*     nameSuffix[16];                               // 1-16     m_name_lang
                                                             // 17, name flags
                                                             // 18       m_internalName
     uint32    enchant_id[5];                                // 19-21    m_enchantment

@@ -185,9 +185,7 @@ struct CreatureEventAI_Action
         // ACTION_T_TEXT                                    = 1
         struct
         {
-            int32 TextId1;
-            int32 TextId2;
-            int32 TextId3;
+            int32 TextId[3];
         } text;
         // ACTION_T_SET_FACTION                             = 2
         struct
@@ -534,7 +532,8 @@ struct CreatureEventAI_Event
     CreatureEventAI_Action action[MAX_ACTIONS];
 };
 //Event_Map
-typedef UNORDERED_MAP<uint32, std::vector<CreatureEventAI_Event> > CreatureEventAI_Event_Map;
+typedef std::vector<CreatureEventAI_Event> CreatureEventAI_Event_Vec;
+typedef UNORDERED_MAP<uint32, CreatureEventAI_Event_Vec > CreatureEventAI_Event_Map;
 
 struct CreatureEventAI_Summon
 {
