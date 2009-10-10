@@ -6192,20 +6192,6 @@ void Aura::HandleSpellSpecificBoosts(bool apply)
         if (spellId4)
             m_target->RemoveAurasByCasterSpell(spellId4, GetCasterGUID());
     }
-    // Shadow Embrace (remove triggered spell)
-    if (m_spellProto->SpellFamilyName == SPELLFAMILY_WARLOCK && m_spellProto->SpellFamilyFlags & UI64LIT(0x0000000080000000))
-    {
-        uint32 remove_spell = 0;
-        switch(m_spellProto->Id)
-        {
-            case 32386: remove_spell = 60448; break;
-            case 32388: remove_spell = 60465; break;
-            case 32389: remove_spell = 60466; break;
-            case 32390: remove_spell = 60467; break;
-            case 32391: remove_spell = 60468; break;
-        }
-        m_target->RemoveAurasDueToSpell(remove_spell);
-    }
 
     SetInUse(false);
 }
@@ -6515,6 +6501,21 @@ void Aura::HandleSchoolAbsorb(bool apply, bool Real)
     }
     else
     {
+        // Shadow Embrace (remove triggered spell)
+        if (m_spellProto->SpellFamilyName == SPELLFAMILY_WARLOCK && m_spellProto->SpellFamilyFlags & UI64LIT(0x0000000080000000))
+        {
+            uint32 remove_spell = 0;
+            switch(m_spellProto->Id)
+            {
+                case 32386: remove_spell = 60448; break;
+                case 32388: remove_spell = 60465; break;
+                case 32389: remove_spell = 60466; break;
+                case 32390: remove_spell = 60467; break;
+                case 32391: remove_spell = 60468; break;
+            }
+            m_target->RemoveAurasDueToSpell(remove_spell);
+        }
+
         /*// Ice Barrier (remove effect from Shattered Barrier)
         if (m_spellProto->SpellIconID == 32 && m_spellProto->SpellFamilyName == SPELLFAMILY_MAGE)
         {
