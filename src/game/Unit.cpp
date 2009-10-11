@@ -2042,7 +2042,7 @@ void Unit::CalcAbsorbResist(Unit *pVictim,SpellSchoolMask schoolMask, DamageEffe
 
 void Unit::AttackerStateUpdate (Unit *pVictim, WeaponAttackType attType, bool extra )
 {
-    if(hasUnitState(UNIT_STAT_CONFUSED | UNIT_STAT_STUNNED | UNIT_STAT_FLEEING) || HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED) )
+    if(hasUnitState(UNIT_STAT_CONFUSED | UNIT_STAT_STUNNED | UNIT_STAT_FLEEING | UNIT_STAT_DIED) || HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED) )
         return;
 
     if (!pVictim->isAlive())
@@ -11609,7 +11609,7 @@ void Unit::StopMoving()
     SendMessageToSet(&data,false);
 }
 
-void Unit::SetFeared(bool apply, uint64 casterGUID, uint32 spellID, uint32 time)
+void Unit::SetFeared(bool apply, uint64 const& casterGUID, uint32 spellID, uint32 time)
 {
     if( apply )
     {
@@ -11650,7 +11650,7 @@ void Unit::SetFeared(bool apply, uint64 casterGUID, uint32 spellID, uint32 time)
         ((Player*)this)->SetClientControl(this, !apply);
 }
 
-void Unit::SetConfused(bool apply, uint64 casterGUID, uint32 spellID)
+void Unit::SetConfused(bool apply, uint64 const& casterGUID, uint32 spellID)
 {
     if( apply )
     {
@@ -11666,16 +11666,80 @@ void Unit::SetConfused(bool apply, uint64 casterGUID, uint32 spellID)
 
         GetMotionMaster()->MovementExpired(false);
 
-        if (GetTypeId() == TYPEID_UNIT)
+        if (GetTypeId() != TYPEID_PLAYER && isAlive())
         {
-            // if in combat restore movement generator
+            // restore appropriate movement generator
             if(getVictim())
                 GetMotionMaster()->MoveChase(getVictim());
+            else
+                GetMotionMaster()->Initialize();
         }
     }
 
     if(GetTypeId() == TYPEID_PLAYER)
         ((Player*)this)->SetClientControl(this, !apply);
+}
+
+void Unit::SetFeignDeath(bool apply, uint64 const& casterGUID, uint32 spellID)
+{
+    if( apply )
+    {
+        /*
+        WorldPacket data(SMSG_FEIGN_DEATH_RESISTED, 9);
+        data<<GetGUID();
+        data<<uint8(0);
+        SendMessageToSet(&data,true);
+        */
+
+        if(GetTypeId() != TYPEID_PLAYER)
+            StopMoving();
+        else
+            ((Player*)this)->m_movementInfo.SetMovementFlags(MOVEMENTFLAG_NONE);
+
+                                                            // blizz like 2.0.x
+        SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_29);
+                                                            // blizz like 2.0.x
+        SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
+                                                            // blizz like 2.0.x
+        SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+
+        addUnitState(UNIT_STAT_DIED);
+        CombatStop();
+        RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_IMMUNE_OR_LOST_SELECTION);
+
+        // prevent interrupt message
+        if (casterGUID == GetGUID())
+            FinishSpell(CURRENT_GENERIC_SPELL,false);
+        InterruptNonMeleeSpells(true);
+        getHostilRefManager().deleteReferences();
+    }
+    else
+    {
+        /*
+        WorldPacket data(SMSG_FEIGN_DEATH_RESISTED, 9);
+        data<<GetGUID();
+        data<<uint8(1);
+        SendMessageToSet(&data,true);
+        */
+                                                            // blizz like 2.0.x
+        RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_29);
+                                                            // blizz like 2.0.x
+        RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
+                                                            // blizz like 2.0.x
+        RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+
+        clearUnitState(UNIT_STAT_DIED);
+
+        if (GetTypeId() != TYPEID_PLAYER && isAlive())
+        {
+            // restore appropriate movement generator
+            if(getVictim())
+                GetMotionMaster()->MoveChase(getVictim());
+            else
+                GetMotionMaster()->Initialize();
+        }
+
+    }
 }
 
 bool Unit::IsSitState() const

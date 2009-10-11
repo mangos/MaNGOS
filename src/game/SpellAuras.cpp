@@ -3566,51 +3566,7 @@ void Aura::HandleFeignDeath(bool apply, bool Real)
     if(!Real)
         return;
 
-    if(m_target->GetTypeId() != TYPEID_PLAYER)
-        return;
-
-    if( apply )
-    {
-        /*
-        WorldPacket data(SMSG_FEIGN_DEATH_RESISTED, 9);
-        data<<m_target->GetGUID();
-        data<<uint8(0);
-        m_target->SendMessageToSet(&data,true);
-        */
-                                                            // blizz like 2.0.x
-        m_target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_29);
-                                                            // blizz like 2.0.x
-        m_target->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
-                                                            // blizz like 2.0.x
-        m_target->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
-
-        m_target->addUnitState(UNIT_STAT_DIED);
-        m_target->CombatStop();
-        m_target->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_IMMUNE_OR_LOST_SELECTION);
-
-        // prevent interrupt message
-        if (m_caster_guid==m_target->GetGUID())
-            m_target->FinishSpell(CURRENT_GENERIC_SPELL,false);
-        m_target->InterruptNonMeleeSpells(true);
-        m_target->getHostilRefManager().deleteReferences();
-    }
-    else
-    {
-        /*
-        WorldPacket data(SMSG_FEIGN_DEATH_RESISTED, 9);
-        data<<m_target->GetGUID();
-        data<<uint8(1);
-        m_target->SendMessageToSet(&data,true);
-        */
-                                                            // blizz like 2.0.x
-        m_target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_29);
-                                                            // blizz like 2.0.x
-        m_target->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
-                                                            // blizz like 2.0.x
-        m_target->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
-
-        m_target->clearUnitState(UNIT_STAT_DIED);
-    }
+    m_target->SetFeignDeath(apply, GetCasterGUID(), GetId());
 }
 
 void Aura::HandleAuraModDisarm(bool apply, bool Real)
