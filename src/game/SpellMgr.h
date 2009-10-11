@@ -200,7 +200,7 @@ inline bool IsPassiveSpellStackableWithRanks(SpellEntry const* spellProto)
 
 inline bool IsDeathOnlySpell(SpellEntry const *spellInfo)
 {
-    return spellInfo->AttributesEx & SPELL_ATTR_EX3_CAST_ON_DEAD
+    return spellInfo->AttributesEx3 & SPELL_ATTR_EX3_CAST_ON_DEAD
         || spellInfo->Id == 2584
         || spellInfo->Id == 22011;
 }
