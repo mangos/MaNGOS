@@ -482,10 +482,6 @@ LogColors = ""
 #        Enable or disable instant logout for security level (0..4) or high (NOT in combat/while dueling/while falling)
 #        Default: 1 (Mods/GMs/Admins)
 #
-#    DisableWaterBreath
-#        Disable/enable waterbreathing for security level (0..4) or high
-#        Default: 4 (None)
-#
 #    AllFlightPaths
 #        Players will start with all flight paths (Note: ALL flight paths, not only player's team)
 #        Default: 0 (false)
@@ -548,6 +544,33 @@ LogColors = ""
 #        Increase to store more guild_bank events in table - minimum is 25 (GUILD_BANK_MAX_LOGS) for each guild_bank tab
 #        Useful when you don't want old log events to be overwritten by new, but increasing can slow down performance
 #        Default: 25
+#
+#    TimerBar.Fatigue.GMLevel
+#        Disable/enable fatigue for security level (0..4) or high
+#        Default: 4 (None)
+#
+#    TimerBar.Fatigue.Max
+#        Fatigue max timer value (in secs)
+#        Default: 60 (1 minute)
+#                  0 (instant death)
+#
+#    TimerBar.Breath.GMLevel
+#        Disable/enable waterbreathing for security level (0..4) or high
+#        Default: 4 (None)
+#
+#    TimerBar.Breath.Max
+#        Waterbreathing max timer value (in secs)
+#        Default: 180
+#                   0 (instant underwater breathing damage start)
+#
+#    TimerBar.Fire.GMLevel
+#        Disable/enable lava fire damage for security level (0..4) or high
+#        Default: 4 (None)
+#
+#    TimerBar.Fire.Max
+#        Lava damage delay max timer value (in secs)
+#        Default:  1
+#                  0 (instant in lava damage start)
 #
 #    MaxPrimaryTradeSkill
 #        Max count that player can learn the primary trade skill.
@@ -638,6 +661,12 @@ Quests.LowLevelHideDiff = 4
 Quests.HighLevelHideDiff = 7
 Guild.EventLogRecordsCount = 100
 Guild.BankEventLogRecordsCount = 25
+TimerBar.Fatigue.GMLevel = 4
+TimerBar.Fatigue.Max = 60
+TimerBar.Breath.GMLevel = 4
+TimerBar.Breath.Max = 180
+TimerBar.Fire.GMLevel = 4
+TimerBar.Fire.Max = 1
 MaxPrimaryTradeSkill = 2
 MinPetitionSigns = 9
 MaxGroupXPDistance = 74
