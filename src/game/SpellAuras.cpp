@@ -6595,8 +6595,8 @@ void Aura::HandleSchoolAbsorb(bool apply, bool Real)
                     }
                 }
             }
-        }
-    }*/
+        }*/
+    }
 }
 
 void Aura::PeriodicTick()
