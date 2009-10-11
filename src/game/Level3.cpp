@@ -6211,13 +6211,7 @@ bool ChatHandler::HandleCastBackCommand(const char* args)
 
     bool triggered = (trig_str != NULL);
 
-    // update orientation at server
-    caster->SetOrientation(caster->GetAngle(m_session->GetPlayer()));
-
-    // and client
-    WorldPacket data;
-    caster->BuildHeartBeatMsg(&data);
-    caster->SendMessageToSet(&data,true);
+    caster->SetFacingToObject(m_session->GetPlayer());
 
     caster->CastSpell(m_session->GetPlayer(),spell,triggered);
 
@@ -6302,13 +6296,7 @@ bool ChatHandler::HandleCastTargetCommand(const char* args)
 
     bool triggered = (trig_str != NULL);
 
-    // update orientation at server
-    caster->SetOrientation(caster->GetAngle(m_session->GetPlayer()));
-
-    // and client
-    WorldPacket data;
-    caster->BuildHeartBeatMsg(&data);
-    caster->SendMessageToSet(&data,true);
+    caster->SetFacingToObject(m_session->GetPlayer());
 
     caster->CastSpell(caster->getVictim(),spell,triggered);
 
