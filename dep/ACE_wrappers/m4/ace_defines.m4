@@ -27,7 +27,7 @@ do
 ACE_CHECK_DEFINE($ace_def,
                  [AC_DEFINE_UNQUOTED(AS_TR_CPP([ACE_HAS_$ace_def])) $2],
                  [$3],
-                 [$4])dnl
+                 [$4])
 done
 ])
 
@@ -43,6 +43,6 @@ do
 ACE_CHECK_DEFINE($ace_def,
                  [$2],
                  [AC_DEFINE_UNQUOTED(AS_TR_CPP([ACE_LACKS_$ace_def])) $3],
-                 [$4])dnl
+                 [$4])
 done
 ])

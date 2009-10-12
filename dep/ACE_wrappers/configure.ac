@@ -4660,7 +4660,7 @@ if test "$ace_user_enable_reentrant_funcs" = yes; then
                   fi
                  ],
                  [
-                  dnl Nothing to do!
+                  echo "Nothing to do";
                  ])
                 ],
                 [AC_DEFINE([ACE_LACKS_PWD_REENTRANT_FUNCTIONS])])
