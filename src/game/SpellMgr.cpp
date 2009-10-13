@@ -90,6 +90,60 @@ uint32 GetSpellCastTime(SpellEntry const* spellInfo, Spell const* spell)
     return (castTime > 0) ? uint32(castTime) : 0;
 }
 
+uint16 GetSpellAuraMaxTicks(SpellEntry const* spellInfo)
+{
+    int32 DotDuration = GetSpellDuration(spellInfo);
+    if(DotDuration == 0)
+        return 1;
+
+    // 200% limit
+    if(DotDuration > 30000)
+        DotDuration = 30000;
+
+    int j = 0;
+    for( ; j < 3; j++)
+    {
+        if( spellInfo->Effect[j] == SPELL_EFFECT_APPLY_AURA && (
+            spellInfo->EffectApplyAuraName[j] == SPELL_AURA_PERIODIC_DAMAGE ||
+            spellInfo->EffectApplyAuraName[j] == SPELL_AURA_PERIODIC_HEAL ||
+            spellInfo->EffectApplyAuraName[j] == SPELL_AURA_PERIODIC_LEECH) )
+        {
+            break;
+        }
+    }
+
+    if(spellInfo->EffectAmplitude[j] != 0)
+        return DotDuration / spellInfo->EffectAmplitude[j];
+
+    return 6;
+}
+
+WeaponAttackType GetWeaponAttackType(SpellEntry const *spellInfo)
+{
+    if(!spellInfo)
+        return BASE_ATTACK;
+
+    switch (spellInfo->DmgClass)
+    {
+        case SPELL_DAMAGE_CLASS_MELEE:
+            if (spellInfo->AttributesEx3 & SPELL_ATTR_EX3_REQ_OFFHAND)
+                return OFF_ATTACK;
+            else
+                return BASE_ATTACK;
+            break;
+        case SPELL_DAMAGE_CLASS_RANGED:
+            return RANGED_ATTACK;
+            break;
+        default:
+                                                            // Wands
+            if (spellInfo->AttributesEx2 & SPELL_ATTR_EX2_AUTOREPEAT_FLAG)
+                return RANGED_ATTACK;
+            else
+                return BASE_ATTACK;
+            break;
+    }
+}
+
 bool IsPassiveSpell(uint32 spellId)
 {
     SpellEntry const *spellInfo = sSpellStore.LookupEntry(spellId);

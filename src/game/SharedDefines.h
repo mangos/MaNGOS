@@ -1004,6 +1004,15 @@ enum SpellImmunity
 
 #define MAX_SPELL_IMMUNITY           6
 
+enum WeaponAttackType
+{
+    BASE_ATTACK   = 0,
+    OFF_ATTACK    = 1,
+    RANGED_ATTACK = 2
+};
+
+#define MAX_ATTACK  3
+
 enum Targets
 {
     TARGET_SELF                        = 1,

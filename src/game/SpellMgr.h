@@ -125,6 +125,8 @@ inline float GetSpellMaxRange(SpellRangeEntry const *range, bool friendly = fals
 inline uint32 GetSpellRecoveryTime(SpellEntry const *spellInfo) { return spellInfo->RecoveryTime > spellInfo->CategoryRecoveryTime ? spellInfo->RecoveryTime : spellInfo->CategoryRecoveryTime; }
 int32 GetSpellDuration(SpellEntry const *spellInfo);
 int32 GetSpellMaxDuration(SpellEntry const *spellInfo);
+uint16 GetSpellAuraMaxTicks(SpellEntry const* spellInfo);
+WeaponAttackType GetWeaponAttackType(SpellEntry const *spellInfo);
 
 inline bool IsSpellHaveEffect(SpellEntry const *spellInfo, SpellEffects effect)
 {
