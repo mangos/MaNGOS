@@ -2268,6 +2268,31 @@ void SpellMgr::LoadSpellScriptTarget()
 
     delete result;
 
+    // Check all spells
+    /* Disabled (lot errors at this moment)
+    for(uint32 i = 1; i < sSpellStore.nCount; ++i)
+    {
+        SpellEntry const * spellInfo = sSpellStore.LookupEntry(i);
+        if(!spellInfo)
+            continue;
+
+        bool found = false;
+        for(int j=0; j<3; ++j)
+        {
+            if( spellInfo->EffectImplicitTargetA[j] == TARGET_SCRIPT || spellInfo->EffectImplicitTargetA[j] != TARGET_SELF && spellInfo->EffectImplicitTargetB[j] == TARGET_SCRIPT )
+            {
+                SpellScriptTarget::const_iterator lower = spellmgr.GetBeginSpellScriptTarget(spellInfo->Id);
+                SpellScriptTarget::const_iterator upper = spellmgr.GetEndSpellScriptTarget(spellInfo->Id);
+                if(lower==upper)
+                {
+                    sLog.outErrorDb("Spell (ID: %u) has effect EffectImplicitTargetA/EffectImplicitTargetB = %u (TARGET_SCRIPT), but does not have record in `spell_script_target`",spellInfo->Id,TARGET_SCRIPT);
+                    break;                                  // effects of spell
+                }
+            }
+        }
+    }
+    */
+
     sLog.outString();
     sLog.outString(">> Loaded %u Spell Script Targets", count);
 }
