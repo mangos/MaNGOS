@@ -1305,4 +1305,6 @@ OpcodeHandler opcodeTable[NUM_MSG_TYPES] =
     /*0x4FC*/ { "SMSG_UNKNOWN_1276",                            STATUS_NEVER,    &WorldSession::Handle_ServerSide               },
     /*0x4FD*/ { "SMSG_UNKNOWN_1277",                            STATUS_NEVER,    &WorldSession::Handle_ServerSide               },
     /*0x4FE*/ { "UMSG_UNKNOWN_1278",                            STATUS_NEVER,    &WorldSession::Handle_NULL                     },
+    /*0x4FF*/ { "CMSG_QUERY_QUESTS_COMPLETED",                  STATUS_NEVER,    &WorldSession::Handle_NULL                     },
+    /*0x500*/ { "SMSG_QUERY_QUESTS_COMPLETED_RESPONSE",         STATUS_NEVER,    &WorldSession::Handle_ServerSide               },
 };

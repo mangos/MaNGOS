@@ -348,6 +348,11 @@ bool AuthSocket::_HandleLogonChallenge()
     buf[buf.size() - 1] = 0;
     sAuthLogonChallenge_C *ch = (sAuthLogonChallenge_C*)&buf[0];
 
+    ///- Read the remaining of the packet
+    ibuf.Read((char *)&buf[4], remaining);
+    DEBUG_LOG("[AuthChallenge] got full packet, %#04x bytes", ch->size);
+    DEBUG_LOG("[AuthChallenge] name(%d): '%s'", ch->I_len, ch->I);
+
     // BigEndian code, nop in little endian case
     // size already converted
     EndianConvert(*((uint32*)(&ch->gamename[0])));
@@ -357,11 +362,6 @@ bool AuthSocket::_HandleLogonChallenge()
     EndianConvert(*((uint32*)(&ch->country[0])));
     EndianConvert(ch->timezone_bias);
     EndianConvert(ch->ip);
-
-    ///- Read the remaining of the packet
-    ibuf.Read((char *)&buf[4], remaining);
-    DEBUG_LOG("[AuthChallenge] got full packet, %#04x bytes", ch->size);
-    DEBUG_LOG("[AuthChallenge] name(%d): '%s'", ch->I_len, ch->I);
 
     ByteBuffer pkt;
 

@@ -548,6 +548,7 @@ void PlayerMenu::SendQuestQueryResponse( Quest const *pQuest )
     data << uint32(pQuest->GetQuestId());                   // quest id
     data << uint32(pQuest->GetQuestMethod());               // Accepted values: 0, 1 or 2. 0==IsAutoComplete() (skip objectives/details)
     data << uint32(pQuest->GetQuestLevel());                // may be 0, static data, in other cases must be used dynamic level: Player::GetQuestLevel
+    data << uint32(0);                                      // min level
     data << uint32(pQuest->GetZoneOrSort());                // zone or sort to display in quest log
 
     data << uint32(pQuest->GetType());                      // quest type
@@ -560,6 +561,7 @@ void PlayerMenu::SendQuestQueryResponse( Quest const *pQuest )
     data << uint32(0);                                      // RequiredOpositeRepValue, required faction value with another (oposite) faction (objective)
 
     data << uint32(pQuest->GetNextQuestInChain());          // client will request this quest from NPC, if not 0
+    data << uint32(0);                                      // unk 3.3.0
 
     if (pQuest->HasFlag(QUEST_FLAGS_HIDDEN_REWARDS))
         data << uint32(0);                                  // Hide money rewarded
@@ -570,9 +572,9 @@ void PlayerMenu::SendQuestQueryResponse( Quest const *pQuest )
     data << uint32(pQuest->GetRewSpell());                  // reward spell, this spell will display (icon) (casted if RewSpellCast==0)
     data << uint32(pQuest->GetRewSpellCast());              // casted spell
 
-    // rewarded honor points
+    // rewarded honor points (raw)
     data << uint32(MaNGOS::Honor::hk_honor_at_level(pSession->GetPlayer()->getLevel(), pQuest->GetRewHonorableKills()));
-    data << float(1);                                       // weird honor multiplier
+    data << float(0);                                       // new reward honor (multipled by ~62 at client side)
     data << uint32(pQuest->GetSrcItemId());                 // source item id
     data << uint32(pQuest->GetFlags() & 0xFFFF);            // quest flags
     data << uint32(pQuest->GetCharTitleId());               // CharTitleId, new 2.4.0, player gets this title (id from CharTitles)
@@ -607,10 +609,10 @@ void PlayerMenu::SendQuestQueryResponse( Quest const *pQuest )
     for(iI = 0; iI < QUEST_REPUTATIONS_COUNT; ++iI)         // reward factions ids
         data << uint32(0);
 
-    for(iI = 0; iI < QUEST_REPUTATIONS_COUNT; ++iI)         // columnid+1 QuestFactionReward.dbc?
+    for(iI = 0; iI < QUEST_REPUTATIONS_COUNT; ++iI)         // columnid in QuestFactionReward.dbc (zero based)?
         data << uint32(0);
 
-    for(iI = 0; iI < QUEST_REPUTATIONS_COUNT; ++iI)         // unk (0)
+    for(iI = 0; iI < QUEST_REPUTATIONS_COUNT; ++iI)         // reward reputation override?
         data << uint32(0);
 
     data << pQuest->GetPointMapId();
@@ -622,7 +624,7 @@ void PlayerMenu::SendQuestQueryResponse( Quest const *pQuest )
     data << Objectives;
     data << Details;
     data << EndText;
-    data << uint8(0);                                       // some string
+    data << uint8(0);                                       // Return to <??> text
 
     for (iI = 0; iI < QUEST_OBJECTIVES_COUNT; ++iI)
     {
