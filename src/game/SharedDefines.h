@@ -1004,6 +1004,15 @@ enum SpellImmunity
 
 #define MAX_SPELL_IMMUNITY           6
 
+enum WeaponAttackType
+{
+    BASE_ATTACK   = 0,
+    OFF_ATTACK    = 1,
+    RANGED_ATTACK = 2
+};
+
+#define MAX_ATTACK  3
+
 enum Targets
 {
     TARGET_SELF                        = 1,
@@ -2368,8 +2377,8 @@ enum PetDiet
 enum AiReaction
 {
     AI_REACTION_UNK1    = 1,
-    AI_REACTION_AGGRO   = 2,
-    AI_REACTION_UNK3    = 3,
+    AI_REACTION_AGGRO   = 2,                                // trigger aggro sound to play, if defined in dbc
+    AI_REACTION_UNK3    = 3,                                // seen happen at polymorph, possible when AI not in control of self?
     AI_REACTION_UNK4    = 4
 };
 

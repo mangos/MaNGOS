@@ -619,6 +619,8 @@ class MANGOS_DLL_SPEC Creature : public Unit
 
         float GetAttackDistance(Unit const* pl) const;
 
+        void SendAIReaction(AiReaction reactionType);
+
         void DoFleeToGetAssistance();
         void CallForHelp(float fRadius);
         void CallAssistance();

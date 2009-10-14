@@ -101,12 +101,12 @@ void PetAI::_stopAttack()
     inCombat = false;
     if( !m_creature->isAlive() )
     {
-        DEBUG_LOG("Creature stoped attacking cuz his dead [guid=%u]", m_creature->GetGUIDLow());
+        DEBUG_LOG("PetAI (guid = %u) stopped attack, he is dead.", m_creature->GetGUIDLow());
         m_creature->StopMoving();
         m_creature->GetMotionMaster()->Clear();
         m_creature->GetMotionMaster()->MoveIdle();
         m_creature->CombatStop();
-        m_creature->getHostilRefManager().deleteReferences();
+        m_creature->getHostileRefManager().deleteReferences();
 
         return;
     }
@@ -147,7 +147,7 @@ void PetAI::UpdateAI(const uint32 diff)
     {
         if (_needToStop())
         {
-            DEBUG_LOG("Pet AI stoped attacking [guid=%u]", m_creature->GetGUIDLow());
+            DEBUG_LOG("PetAI (guid = %u) is stopping attack.", m_creature->GetGUIDLow());
             _stopAttack();
             return;
         }
@@ -287,10 +287,10 @@ void PetAI::UpdateAI(const uint32 diff)
             {
                 m_creature->SetInFront(target);
                 if (target->GetTypeId() == TYPEID_PLAYER)
-                    m_creature->SendUpdateToPlayer((Player*)target);
+                    m_creature->SendCreateUpdateToPlayer((Player*)target);
 
                 if (owner && owner->GetTypeId() == TYPEID_PLAYER)
-                    m_creature->SendUpdateToPlayer( (Player*)owner );
+                    m_creature->SendCreateUpdateToPlayer( (Player*)owner );
             }
 
             m_creature->AddCreatureSpellCooldown(spell->m_spellInfo->Id);

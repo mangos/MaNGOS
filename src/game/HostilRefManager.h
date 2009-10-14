@@ -24,18 +24,18 @@
 
 class Unit;
 class ThreatManager;
-class HostilReference;
+class HostileReference;
 struct SpellEntry;
 
 //=================================================
 
-class HostilRefManager : public RefManager<Unit, ThreatManager>
+class HostileRefManager : public RefManager<Unit, ThreatManager>
 {
     private:
         Unit *iOwner;
     public:
-        explicit HostilRefManager(Unit *pOwner) { iOwner = pOwner; }
-        ~HostilRefManager();
+        explicit HostileRefManager(Unit *pOwner) { iOwner = pOwner; }
+        ~HostileRefManager();
 
         Unit* getOwner() { return iOwner; }
 
@@ -50,7 +50,7 @@ class HostilRefManager : public RefManager<Unit, ThreatManager>
         // tell the source to remove them from the list and free the mem
         void deleteReferences();
 
-        HostilReference* getFirst() { return ((HostilReference* ) RefManager<Unit, ThreatManager>::getFirst()); }
+        HostileReference* getFirst() { return ((HostileReference* ) RefManager<Unit, ThreatManager>::getFirst()); }
 
         void updateThreatTables();
 

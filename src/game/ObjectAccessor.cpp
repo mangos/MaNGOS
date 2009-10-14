@@ -183,50 +183,16 @@ ObjectAccessor::SaveAllPlayers()
 }
 
 void
-ObjectAccessor::UpdateObject(Object* obj, Player* exceptPlayer)
-{
-    UpdateDataMapType update_players;
-    obj->BuildUpdate(update_players);
-
-    WorldPacket packet;
-    for(UpdateDataMapType::iterator iter = update_players.begin(); iter != update_players.end(); ++iter)
-    {
-        if(iter->first == exceptPlayer)
-            continue;
-
-        iter->second.BuildPacket(&packet);
-        iter->first->GetSession()->SendPacket(&packet);
-        packet.clear();
-    }
-}
-
-void
 ObjectAccessor::_buildUpdateObject(Object *obj, UpdateDataMapType &update_players)
 {
-    bool build_for_all = true;
-    Player *pl = NULL;
-    if( obj->isType(TYPEMASK_ITEM) )
+    if(obj->isType(TYPEMASK_ITEM))
     {
         Item *item = static_cast<Item *>(obj);
-        pl = item->GetOwner();
-        build_for_all = false;
+        if (Player* pl = item->GetOwner())
+            _buildPacket(pl, obj, update_players);
     }
-
-    if( pl != NULL )
-        _buildPacket(pl, obj, update_players);
-
-    // Capt: okey for all those fools who think its a real fix
-    //       THIS IS A TEMP FIX
-    if( build_for_all )
-    {
-        WorldObject * temp = dynamic_cast<WorldObject*>(obj);
-
-        //assert(dynamic_cast<WorldObject*>(obj)!=NULL);
-        if (temp)
-            _buildChangeObjectForPlayer(temp, update_players);
-        else
-            sLog.outDebug("ObjectAccessor: Ln 405 Temp bug fix");
-    }
+    else
+         _buildChangeObjectForPlayer(static_cast<WorldObject*>(obj), update_players);
 }
 
 void

@@ -33,7 +33,7 @@ FleeingMovementGenerator<T>::_setTargetLocation(T &owner)
     if( !&owner )
         return;
 
-    if( owner.hasUnitState(UNIT_STAT_ROOT | UNIT_STAT_STUNNED) )
+    if( owner.hasUnitState(UNIT_STAT_ROOT | UNIT_STAT_STUNNED | UNIT_STAT_DIED) )
         return;
 
     if(!_setMoveData(owner))
@@ -353,7 +353,7 @@ FleeingMovementGenerator<T>::Update(T &owner, const uint32 & time_diff)
 {
     if( !&owner || !owner.isAlive() )
         return false;
-    if( owner.hasUnitState(UNIT_STAT_ROOT | UNIT_STAT_STUNNED) )
+    if( owner.hasUnitState(UNIT_STAT_ROOT | UNIT_STAT_STUNNED | UNIT_STAT_DIED) )
         return true;
 
     Traveller<T> traveller(owner);
@@ -409,7 +409,7 @@ bool TimedFleeingMovementGenerator::Update(Unit & owner, const uint32 & time_dif
     if( !owner.isAlive() )
         return false;
 
-    if( owner.hasUnitState(UNIT_STAT_ROOT | UNIT_STAT_STUNNED) )
+    if( owner.hasUnitState(UNIT_STAT_ROOT | UNIT_STAT_STUNNED | UNIT_STAT_DIED) )
         return true;
 
     i_totalFleeTime.Update(time_diff);
