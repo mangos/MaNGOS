@@ -5882,7 +5882,7 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                         }
                     }
 
-                    // original heal must be form beacon caster 
+                    // original heal must be form beacon caster
                     if (!dummy)
                         return false;
 
@@ -7121,7 +7121,7 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
         case 53817:
         {
             // have rank dependent proc chance, ignore too often cases
-            // PPM = 2.5 * (rank of talent), 
+            // PPM = 2.5 * (rank of talent),
             uint32 rank = spellmgr.GetSpellRank(auraSpellInfo->Id);
             // 5 rank -> 100% 4 rank -> 80% and etc from full rate
             if(!roll_chance_i(20*rank))
@@ -8273,12 +8273,12 @@ uint32 Unit::SpellDamageBonus(Unit *pVictim, SpellEntry const *spellProto, uint3
                         // Glyph of Ice Lance
                         if (Aura* glyph = GetDummyAura(56377))
                             multiplier = glyph->GetModifier()->m_amount;
-                    
+
                     DoneTotalMod *= multiplier;
                 }
             }
             // Torment the weak affected (Arcane Barrage, Arcane Blast, Frostfire Bolt, Arcane Missiles, Fireball)
-            if ((spellProto->SpellFamilyFlags & UI64LIT(0x0000900020200021)) && 
+            if ((spellProto->SpellFamilyFlags & UI64LIT(0x0000900020200021)) &&
                 (pVictim->HasAuraType(SPELL_AURA_MOD_DECREASE_SPEED) || pVictim->HasAuraType(SPELL_AURA_MELEE_SLOW)))
             {
                 //Search for Torment the weak dummy aura
@@ -8595,7 +8595,7 @@ bool Unit::isSpellCrit(Unit *pVictim, SpellEntry const *spellProto, SpellSchoolM
                             for(AuraList::const_iterator i = mDummyAuras.begin(); i!= mDummyAuras.end(); ++i)
                             {
                                 // Improved Flash Heal
-                                if ((*i)->GetSpellProto()->SpellFamilyName == SPELLFAMILY_PRIEST && 
+                                if ((*i)->GetSpellProto()->SpellFamilyName == SPELLFAMILY_PRIEST &&
                                     (*i)->GetSpellProto()->SpellIconID == 2542)
                                 {
                                     crit_chance+=(*i)->GetModifier()->m_amount;
@@ -9333,7 +9333,7 @@ uint32 Unit::MeleeDamageBonus(Unit *pVictim, uint32 pdamage,WeaponAttackType att
             DoneFlat *= (CastingTime / 3500.0f) * DotFactor * LvlPenalty;
             TakenFlat*= (CastingTime / 3500.0f) * DotFactor * LvlPenalty;
         }
-	}
+    }
     // weapon damage based spells
     else if( APbonus || DoneFlat )
     {
