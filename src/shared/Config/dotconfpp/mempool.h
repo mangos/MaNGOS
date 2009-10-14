@@ -1,6 +1,3 @@
-
-
-
 #ifndef ASYNC_DNS_MEMPOOL_H
 #define ASYNC_DNS_MEMPOOL_H
 
@@ -8,39 +5,39 @@
 #include <string.h>
 #include <sys/types.h>
 
-#undef free
-#undef calloc
-#undef strdup
-
 class AsyncDNSMemPool
 {
-private:
-    struct PoolChunk {
-        void * pool;
-        size_t pos;
-        size_t size;
+    private:
 
-        PoolChunk(size_t _size);
-        ~PoolChunk();
-    };
-    PoolChunk ** chunks;
-    size_t chunksCount;
-    size_t defaultSize;
+        struct PoolChunk
+        {
+            void* pool;
+            size_t pos;
+            size_t size;
 
-    size_t poolUsage;
-    size_t poolUsageCounter;
+            PoolChunk(size_t _size);
+            ~PoolChunk();
+        };
 
-    void addNewChunk(size_t size);
+        PoolChunk** chunks;
+        size_t chunksCount;
+        size_t defaultSize;
 
-public:
-    AsyncDNSMemPool(size_t _defaultSize = 4096);
-    virtual ~AsyncDNSMemPool();
+        size_t poolUsage;
+        size_t poolUsageCounter;
 
-    int initialize();
-    void free();
-    void * alloc(size_t size);
-    void * calloc(size_t size);
-    char * strdup(const char *str);
+        void addNewChunk(size_t size);
+
+    public:
+
+        AsyncDNSMemPool(size_t _defaultSize = 4096);
+        virtual ~AsyncDNSMemPool();
+
+        bool initialize();
+        void Free();
+        void* Alloc(size_t size);
+        void* Calloc(size_t size);
+        char* Strdup(const char *str);
 };
 
 #endif
