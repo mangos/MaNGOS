@@ -498,7 +498,7 @@ enum UnitFlags
     UNIT_FLAG_SILENCED              = 0x00002000,           // silenced, 2.1.1
     UNIT_FLAG_UNK_14                = 0x00004000,           // 2.0.8
     UNIT_FLAG_UNK_15                = 0x00008000,
-    UNIT_FLAG_UNK_16                = 0x00010000,
+    UNIT_FLAG_UNK_16                = 0x00010000,           // removes attackable icon
     UNIT_FLAG_PACIFIED              = 0x00020000,           // 3.0.3 ok
     UNIT_FLAG_STUNNED               = 0x00040000,           // 3.0.3 ok
     UNIT_FLAG_IN_COMBAT             = 0x00080000,
@@ -513,7 +513,7 @@ enum UnitFlags
     UNIT_FLAG_UNK_28                = 0x10000000,
     UNIT_FLAG_UNK_29                = 0x20000000,           // used in Feing Death spell
     UNIT_FLAG_SHEATHE               = 0x40000000,
-    UNIT_FLAG_UNK_31                = 0x80000000
+    UNIT_FLAG_UNK_31                = 0x80000000            // set skinnable icon and also changes color of portrait
 };
 
 // Value masks for UNIT_FIELD_FLAGS_2
