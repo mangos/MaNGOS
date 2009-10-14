@@ -481,12 +481,12 @@ void Spell::FillTargetMap()
             continue;
 
         // targets for TARGET_SCRIPT_COORDINATES (A) and TARGET_SCRIPT
-        // and TARGET_FOCUS_OR_SCRIPTED_GAMEOBJECT (A) if no RequiresSpellFocus set
+        // for TARGET_FOCUS_OR_SCRIPTED_GAMEOBJECT (A) all is checked in Spell::CheckCast and in Spell::CheckItem
         // filled in Spell::CheckCast call
-        if( m_spellInfo->EffectImplicitTargetA[i] == TARGET_SCRIPT_COORDINATES ||
-            m_spellInfo->EffectImplicitTargetA[i] == TARGET_SCRIPT ||
-            (m_spellInfo->EffectImplicitTargetA[i] == TARGET_FOCUS_OR_SCRIPTED_GAMEOBJECT && !m_spellInfo->RequiresSpellFocus) ||
-            (m_spellInfo->EffectImplicitTargetB[i] == TARGET_SCRIPT && m_spellInfo->EffectImplicitTargetA[i] != TARGET_SELF) )
+        if(m_spellInfo->EffectImplicitTargetA[i] == TARGET_SCRIPT_COORDINATES ||
+           m_spellInfo->EffectImplicitTargetA[i] == TARGET_SCRIPT ||
+           m_spellInfo->EffectImplicitTargetA[i] == TARGET_FOCUS_OR_SCRIPTED_GAMEOBJECT ||
+           (m_spellInfo->EffectImplicitTargetB[i] == TARGET_SCRIPT && m_spellInfo->EffectImplicitTargetA[i] != TARGET_SELF))
             continue;
 
         // TODO: find a way so this is not needed?
@@ -1311,31 +1311,6 @@ void Spell::SetTargetMap(uint32 effIndex,uint32 targetMode,UnitList& TagUnitMap)
 
     switch(targetMode)
     {
-        case TARGET_FOCUS_OR_SCRIPTED_GAMEOBJECT:
-        {
-            if(m_spellInfo->RequiresSpellFocus)
-            {
-                CellPair p(MaNGOS::ComputeCellPair(m_caster->GetPositionX(), m_caster->GetPositionY()));
-                Cell cell(p);
-                cell.data.Part.reserved = ALL_DISTRICT;
-
-                GameObject* goTarget = NULL;
-                MaNGOS::GameObjectFocusCheck go_check(m_caster, m_spellInfo->RequiresSpellFocus);
-                MaNGOS::GameObjectSearcher<MaNGOS::GameObjectFocusCheck> checker(m_caster, goTarget, go_check);
-
-                TypeContainerVisitor<MaNGOS::GameObjectSearcher<MaNGOS::GameObjectFocusCheck>, GridTypeMapContainer > object_checker(checker);
-                CellLock<GridReadGuard> cell_lock(cell, p);
-                Map& map = *m_caster->GetMap();
-                cell_lock->Visit(cell_lock, object_checker, map, *m_caster, map.GetVisibilityDistance());
-
-                if(goTarget)
-                    AddGOTarget(goTarget, effIndex);
-            }
-            else if(m_targets.getGOTarget())
-                AddGOTarget(m_targets.getGOTarget(), effIndex);
-
-            break;
-        }
         case TARGET_RANDOM_NEARBY_LOC:
             radius *= sqrt(rand_norm()); // Get a random point in circle. Use sqrt(rand) to correct distribution when converting polar to Cartesian coordinates.
                                          // no 'break' expected since we use code in case TARGET_RANDOM_CIRCUMFERENCE_POINT!!!
@@ -4145,11 +4120,12 @@ SpellCastResult Spell::CheckCast(bool strict)
     {
         for(uint8 j = 0; j < 3; ++j)
         {
-            if( m_spellInfo->EffectImplicitTargetA[j] == TARGET_SCRIPT ||
-                m_spellInfo->EffectImplicitTargetB[j] == TARGET_SCRIPT && m_spellInfo->EffectImplicitTargetA[j] != TARGET_SELF ||
-                m_spellInfo->EffectImplicitTargetA[j] == TARGET_SCRIPT_COORDINATES ||
-                m_spellInfo->EffectImplicitTargetB[j] == TARGET_SCRIPT_COORDINATES ||
-                m_spellInfo->EffectImplicitTargetA[j] == TARGET_FOCUS_OR_SCRIPTED_GAMEOBJECT )
+            if(m_spellInfo->EffectImplicitTargetA[j] == TARGET_SCRIPT ||
+               (m_spellInfo->EffectImplicitTargetB[j] == TARGET_SCRIPT && m_spellInfo->EffectImplicitTargetA[j] != TARGET_SELF) ||
+               m_spellInfo->EffectImplicitTargetA[j] == TARGET_SCRIPT_COORDINATES ||
+               m_spellInfo->EffectImplicitTargetB[j] == TARGET_SCRIPT_COORDINATES ||
+               // Check possible in DB targets only for spells with no implicit spell focus
+               (m_spellInfo->EffectImplicitTargetA[j] == TARGET_FOCUS_OR_SCRIPTED_GAMEOBJECT && !m_spellInfo->RequiresSpellFocus))
             {
 
                 SpellScriptTargetBounds bounds = spellmgr.GetSpellScriptTargetBounds(m_spellInfo->Id);
