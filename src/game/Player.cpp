@@ -2185,7 +2185,7 @@ void Player::SetInWater(bool apply)
     // remove auras that need water/land
     RemoveAurasWithInterruptFlags(apply ? AURA_INTERRUPT_FLAG_NOT_ABOVEWATER : AURA_INTERRUPT_FLAG_NOT_UNDERWATER);
 
-    getHostilRefManager().updateThreatTables();
+    getHostileRefManager().updateThreatTables();
 }
 
 void Player::SetGameMaster(bool on)
@@ -2199,7 +2199,7 @@ void Player::SetGameMaster(bool on)
         if (Pet* pet = GetPet())
         {
             pet->setFaction(35);
-            pet->getHostilRefManager().setOnlineOfflineState(false);
+            pet->getHostileRefManager().setOnlineOfflineState(false);
         }
 
         for (int8 i = 0; i < MAX_TOTEM; ++i)
@@ -2210,7 +2210,7 @@ void Player::SetGameMaster(bool on)
         RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
         ResetContestedPvP();
 
-        getHostilRefManager().setOnlineOfflineState(false);
+        getHostileRefManager().setOnlineOfflineState(false);
         CombatStopWithPets();
 
         SetPhaseMask(PHASEMASK_ANYWHERE,false);             // see and visible in all phases
@@ -2228,7 +2228,7 @@ void Player::SetGameMaster(bool on)
         if (Pet* pet = GetPet())
         {
             pet->setFaction(getFaction());
-            pet->getHostilRefManager().setOnlineOfflineState(true);
+            pet->getHostileRefManager().setOnlineOfflineState(true);
         }
 
         for (int8 i = 0; i < MAX_TOTEM; ++i)
@@ -2243,7 +2243,7 @@ void Player::SetGameMaster(bool on)
         // restore FFA PvP area state, remove not allowed for GM mounts
         UpdateArea(m_areaUpdateId);
 
-        getHostilRefManager().setOnlineOfflineState(true);
+        getHostileRefManager().setOnlineOfflineState(true);
     }
 
     UpdateVisibilityForPlayer();

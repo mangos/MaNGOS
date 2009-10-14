@@ -23,7 +23,7 @@
 
 class ThreatContainer;
 class ThreatManager;
-class HostilReference;
+class HostileReference;
 
 //==============================================================
 //==============================================================
@@ -85,7 +85,7 @@ class MANGOS_DLL_SPEC UnitBaseEvent
 class MANGOS_DLL_SPEC ThreatRefStatusChangeEvent : public UnitBaseEvent
 {
     private:
-        HostilReference* iHostilReference;
+        HostileReference* iHostileReference;
         union
         {
             float iFValue;
@@ -94,13 +94,13 @@ class MANGOS_DLL_SPEC ThreatRefStatusChangeEvent : public UnitBaseEvent
         };
         ThreatManager* iThreatManager;
     public:
-        ThreatRefStatusChangeEvent(uint32 pType) : UnitBaseEvent(pType) { iHostilReference = NULL; }
+        ThreatRefStatusChangeEvent(uint32 pType) : UnitBaseEvent(pType) { iHostileReference = NULL; }
 
-        ThreatRefStatusChangeEvent(uint32 pType, HostilReference* pHostilReference) : UnitBaseEvent(pType) { iHostilReference = pHostilReference; }
+        ThreatRefStatusChangeEvent(uint32 pType, HostileReference* pHostileReference) : UnitBaseEvent(pType) { iHostileReference = pHostileReference; }
 
-        ThreatRefStatusChangeEvent(uint32 pType, HostilReference* pHostilReference, float pValue) : UnitBaseEvent(pType) { iHostilReference = pHostilReference; iFValue = pValue; }
+        ThreatRefStatusChangeEvent(uint32 pType, HostileReference* pHostileReference, float pValue) : UnitBaseEvent(pType) { iHostileReference = pHostileReference; iFValue = pValue; }
 
-        ThreatRefStatusChangeEvent(uint32 pType, HostilReference* pHostilReference, bool pValue) : UnitBaseEvent(pType) { iHostilReference = pHostilReference; iBValue = pValue; }
+        ThreatRefStatusChangeEvent(uint32 pType, HostileReference* pHostileReference, bool pValue) : UnitBaseEvent(pType) { iHostileReference = pHostileReference; iBValue = pValue; }
 
         int32 getIValue() const { return iIValue; }
 
@@ -110,7 +110,7 @@ class MANGOS_DLL_SPEC ThreatRefStatusChangeEvent : public UnitBaseEvent
 
         void setBValue(bool pValue) { iBValue = pValue; }
 
-        HostilReference* getReference() const { return iHostilReference; }
+        HostileReference* getReference() const { return iHostileReference; }
 
         void setThreatManager(ThreatManager* pThreatManager) { iThreatManager = pThreatManager; }
 
@@ -125,7 +125,7 @@ class MANGOS_DLL_SPEC ThreatManagerEvent : public ThreatRefStatusChangeEvent
         ThreatContainer* iThreatContainer;
     public:
         ThreatManagerEvent(uint32 pType) : ThreatRefStatusChangeEvent(pType) {}
-        ThreatManagerEvent(uint32 pType, HostilReference* pHostilReference) : ThreatRefStatusChangeEvent(pType, pHostilReference) {}
+        ThreatManagerEvent(uint32 pType, HostileReference* pHostileReference) : ThreatRefStatusChangeEvent(pType, pHostileReference) {}
 
         void setThreatContainer(ThreatContainer* pThreatContainer) { iThreatContainer = pThreatContainer; }
 

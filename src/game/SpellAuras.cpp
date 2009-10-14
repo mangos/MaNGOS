@@ -4038,7 +4038,7 @@ void Aura::HandleAuraModTotalThreat(bool apply, bool Real)
 
     float threatMod = apply ? float(m_modifier.m_amount) : float(-m_modifier.m_amount);
 
-    m_target->getHostilRefManager().threatAssist(caster, threatMod);
+    m_target->getHostileRefManager().threatAssist(caster, threatMod);
 }
 
 void Aura::HandleModTaunt(bool apply, bool Real)
@@ -6408,7 +6408,7 @@ void Aura::PeriodicTick()
             uint32 heal = pCaster->SpellHealingBonus(pCaster, GetSpellProto(), uint32(new_damage * multiplier), DOT, GetStackAmount());
 
             int32 gain = pCaster->DealHeal(pCaster, heal, GetSpellProto());
-            pCaster->getHostilRefManager().threatAssist(pCaster, gain * 0.5f, GetSpellProto());
+            pCaster->getHostileRefManager().threatAssist(pCaster, gain * 0.5f, GetSpellProto());
             break;
         }
         case SPELL_AURA_PERIODIC_HEAL:
@@ -6460,7 +6460,7 @@ void Aura::PeriodicTick()
                 if( BattleGround *bg = ((Player*)pCaster)->GetBattleGround() )
                     bg->UpdatePlayerScore(((Player*)pCaster), SCORE_HEALING_DONE, gain);
 
-            m_target->getHostilRefManager().threatAssist(pCaster, float(gain) * 0.5f, GetSpellProto());
+            m_target->getHostileRefManager().threatAssist(pCaster, float(gain) * 0.5f, GetSpellProto());
 
             SpellEntry const* spellProto = GetSpellProto();
 
@@ -6590,7 +6590,7 @@ void Aura::PeriodicTick()
             int32 gain = m_target->ModifyPower(power,pdamage);
 
             if(Unit* pCaster = GetCaster())
-                m_target->getHostilRefManager().threatAssist(pCaster, float(gain) * 0.5f, GetSpellProto());
+                m_target->getHostileRefManager().threatAssist(pCaster, float(gain) * 0.5f, GetSpellProto());
             break;
         }
         case SPELL_AURA_OBS_MOD_MANA:
@@ -6612,7 +6612,7 @@ void Aura::PeriodicTick()
             int32 gain = m_target->ModifyPower(POWER_MANA, pdamage);
 
             if(Unit* pCaster = GetCaster())
-                m_target->getHostilRefManager().threatAssist(pCaster, float(gain) * 0.5f, GetSpellProto());
+                m_target->getHostileRefManager().threatAssist(pCaster, float(gain) * 0.5f, GetSpellProto());
             break;
         }
         case SPELL_AURA_POWER_BURN_MANA:
@@ -6665,7 +6665,7 @@ void Aura::PeriodicTick()
         {
             int32 gain = m_target->ModifyHealth(m_modifier.m_amount);
             if (Unit *caster = GetCaster())
-                m_target->getHostilRefManager().threatAssist(caster, float(gain) * 0.5f, GetSpellProto());
+                m_target->getHostileRefManager().threatAssist(caster, float(gain) * 0.5f, GetSpellProto());
             break;
         }
         case SPELL_AURA_MOD_POWER_REGEN:

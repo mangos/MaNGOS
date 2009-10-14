@@ -68,7 +68,7 @@ void
 ReactorAI::UpdateAI(const uint32 /*time_diff*/)
 {
     // update i_victimGuid if i_creature.getVictim() !=0 and changed
-    if(!m_creature->SelectHostilTarget() || !m_creature->getVictim())
+    if(!m_creature->SelectHostileTarget() || !m_creature->getVictim())
         return;
 
     i_victimGuid = m_creature->getVictim()->GetGUID();

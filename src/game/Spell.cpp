@@ -970,7 +970,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
             caster->ProcDamageAndSpell(unitTarget, procAttacker, procVictim, procEx, addhealth, m_attackType, m_spellInfo);
 
         int32 gain = caster->DealHeal(unitTarget, addhealth, m_spellInfo, crit);
-        unitTarget->getHostilRefManager().threatAssist(caster, float(gain) * 0.5f, m_spellInfo);
+        unitTarget->getHostileRefManager().threatAssist(caster, float(gain) * 0.5f, m_spellInfo);
     }
     // Do damage and triggers
     else if (m_damage)
@@ -1116,7 +1116,7 @@ void Spell::DoSpellHitOnUnit(Unit *unit, const uint32 effectMask)
             if (unit->isInCombat() && !(m_spellInfo->AttributesEx & SPELL_ATTR_EX_NO_INITIAL_AGGRO))
             {
                 realCaster->SetInCombatState(unit->GetCombatTimer() > 0);
-                unit->getHostilRefManager().threatAssist(realCaster, 0.0f);
+                unit->getHostileRefManager().threatAssist(realCaster, 0.0f);
             }
         }
     }

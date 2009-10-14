@@ -122,7 +122,7 @@ void
 AggressorAI::UpdateAI(const uint32 /*diff*/)
 {
     // update i_victimGuid if m_creature->getVictim() !=0 and changed
-    if(!m_creature->SelectHostilTarget() || !m_creature->getVictim())
+    if(!m_creature->SelectHostileTarget() || !m_creature->getVictim())
         return;
 
     i_victimGuid = m_creature->getVictim()->GetGUID();

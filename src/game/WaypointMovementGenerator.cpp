@@ -233,7 +233,7 @@ uint32 FlightPathMovementGenerator::GetPathAtMapEnd() const
 
 void FlightPathMovementGenerator::Initialize(Player &player)
 {
-    player.getHostilRefManager().setOnlineOfflineState(false);
+    player.getHostileRefManager().setOnlineOfflineState(false);
     player.addUnitState(UNIT_STAT_IN_FLIGHT);
     player.SetFlag(UNIT_FIELD_FLAGS,UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_TAXI_FLIGHT);
     LoadPath(player);
@@ -258,7 +258,7 @@ void FlightPathMovementGenerator::Finalize(Player & player)
 
     if(player.m_taxi.empty())
     {
-        player.getHostilRefManager().setOnlineOfflineState(true);
+        player.getHostileRefManager().setOnlineOfflineState(true);
         if(player.pvpInfo.inHostileArea)
             player.CastSpell(&player, 2479, true);
 

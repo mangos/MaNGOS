@@ -298,7 +298,7 @@ bool EffectDummyItem(Unit *caster, uint32 spellId, uint32 effIndex, Item *itemTa
 void ScriptedAI::UpdateAI(const uint32)
 {
     //Check if we have a current target
-    if( m_creature->isAlive() && m_creature->SelectHostilTarget() && m_creature->getVictim())
+    if( m_creature->isAlive() && m_creature->SelectHostileTarget() && m_creature->getVictim())
     {
         //If we are within range melee the target
         if( m_creature->IsWithinDistInMap(m_creature->getVictim(), ATTACK_DISTANCE))
