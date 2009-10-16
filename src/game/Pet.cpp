@@ -57,23 +57,24 @@ m_declinedname(NULL)
 
 Pet::~Pet()
 {
-    if(m_uint32Values)                                      // only for fully created Object
-        ObjectAccessor::Instance().RemoveObject(this);
-
     delete m_declinedname;
 }
 
 void Pet::AddToWorld()
 {
     ///- Register the pet for guid lookup
-    if(!IsInWorld()) ObjectAccessor::Instance().AddObject(this);
+    if(!IsInWorld())
+        GetMap()->GetObjectsStore().insert<Pet>(GetGUID(), (Pet*)this);
+
     Unit::AddToWorld();
 }
 
 void Pet::RemoveFromWorld()
 {
     ///- Remove the pet from the accessor
-    if(IsInWorld()) ObjectAccessor::Instance().RemoveObject(this);
+    if(IsInWorld())
+        GetMap()->GetObjectsStore().erase<Pet>(GetGUID(), (Pet*)NULL);
+
     ///- Don't call the function for Creature, normal mobs + totems go in a different storage
     Unit::RemoveFromWorld();
 }

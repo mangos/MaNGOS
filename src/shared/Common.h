@@ -81,12 +81,6 @@
 #include <signal.h>
 #include <assert.h>
 
-#if PLATFORM == PLATFORM_WINDOWS
-#define STRCASECMP stricmp
-#else
-#define STRCASECMP strcasecmp
-#endif
-
 #include <set>
 #include <list>
 #include <string>
@@ -102,7 +96,6 @@
 #include <ace/Guard_T.h>
 #include <ace/RW_Thread_Mutex.h>
 #include <ace/Thread_Mutex.h>
-
 
 #if PLATFORM == PLATFORM_WINDOWS
 #  define FD_SETSIZE 4096
@@ -128,9 +121,7 @@
 #define I32FMT "%08I32X"
 #define I64FMT "%016I64X"
 #define snprintf _snprintf
-#define atoll __atoi64
 #define vsnprintf _vsnprintf
-#define strdup _strdup
 #define finite(X) _finite(X)
 
 #else

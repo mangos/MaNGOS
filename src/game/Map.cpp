@@ -56,6 +56,7 @@ struct ScriptAction
 
 Map::~Map()
 {
+    ObjectAccessor::DelinkMap(this);
     UnloadAll(true);
 
     if(!m_scriptSchedule.empty())
@@ -212,6 +213,7 @@ Map::Map(uint32 id, time_t expiry, uint32 InstanceId, uint8 SpawnMode, Map* _par
             setNGrid(NULL, idx, j);
         }
     }
+    ObjectAccessor::LinkMap(this);
 
     //lets initialize visibility distance for map
     Map::InitVisibilityDistance();
@@ -2761,19 +2763,19 @@ void Map::ScriptsProcess()
                     break;
                 }
                 case HIGHGUID_UNIT:
-                    source = HashMapHolder<Creature>::Find(step.sourceGUID);
+                    source = GetCreature(step.sourceGUID);
                     break;
                 case HIGHGUID_PET:
-                    source = HashMapHolder<Pet>::Find(step.sourceGUID);
+                    source = GetPet(step.sourceGUID);
                     break;
                 case HIGHGUID_VEHICLE:
-                    source = HashMapHolder<Vehicle>::Find(step.sourceGUID);
+                    source = GetVehicle(step.sourceGUID);
                     break;
                 case HIGHGUID_PLAYER:
                     source = HashMapHolder<Player>::Find(step.sourceGUID);
                     break;
                 case HIGHGUID_GAMEOBJECT:
-                    source = HashMapHolder<GameObject>::Find(step.sourceGUID);
+                    source = GetGameObject(step.sourceGUID);
                     break;
                 case HIGHGUID_CORPSE:
                     source = HashMapHolder<Corpse>::Find(step.sourceGUID);
@@ -2793,19 +2795,19 @@ void Map::ScriptsProcess()
             switch(GUID_HIPART(step.targetGUID))
             {
                 case HIGHGUID_UNIT:
-                    target = HashMapHolder<Creature>::Find(step.targetGUID);
+                    target = GetCreature(step.targetGUID);
                     break;
                 case HIGHGUID_PET:
-                    target = HashMapHolder<Pet>::Find(step.targetGUID);
+                    target = GetPet(step.targetGUID);
                     break;
                 case HIGHGUID_VEHICLE:
-                    target = HashMapHolder<Vehicle>::Find(step.targetGUID);
+                    target = GetVehicle(step.targetGUID);
                     break;
                 case HIGHGUID_PLAYER:                       // empty GUID case also
                     target = HashMapHolder<Player>::Find(step.targetGUID);
                     break;
                 case HIGHGUID_GAMEOBJECT:
-                    target = HashMapHolder<GameObject>::Find(step.targetGUID);
+                    target = GetGameObject(step.targetGUID);
                     break;
                 case HIGHGUID_CORPSE:
                     target = HashMapHolder<Corpse>::Find(step.targetGUID);
@@ -3381,44 +3383,35 @@ void Map::ScriptsProcess()
     return;
 }
 
-Creature*
-Map::GetCreature(uint64 guid)
+Creature* Map::GetCreature(uint64 guid)
 {
-    Creature * ret = ObjectAccessor::GetObjectInWorld(guid, (Creature*)NULL);
-    if(!ret)
-        return NULL;
-
-    if(ret->GetMapId() != GetId())
-        return NULL;
-
-    if(ret->GetInstanceId() != GetInstanceId())
-        return NULL;
-
-    return ret;
+    return m_objectsStore.find<Creature>(guid, (Creature*)NULL);
 }
 
-GameObject*
-Map::GetGameObject(uint64 guid)
+Vehicle* Map::GetVehicle(uint64 guid)
 {
-    GameObject * ret = ObjectAccessor::GetObjectInWorld(guid, (GameObject*)NULL);
-    if(!ret)
-        return NULL;
-    if(ret->GetMapId() != GetId())
-        return NULL;
-    if(ret->GetInstanceId() != GetInstanceId())
-        return NULL;
-    return ret;
+    return m_objectsStore.find<Vehicle>(guid, (Vehicle*)NULL);
 }
 
-DynamicObject*
-Map::GetDynamicObject(uint64 guid)
+Pet* Map::GetPet(uint64 guid)
 {
-    DynamicObject * ret = ObjectAccessor::GetObjectInWorld(guid, (DynamicObject*)NULL);
-    if(!ret)
-        return NULL;
-    if(ret->GetMapId() != GetId())
-        return NULL;
-    if(ret->GetInstanceId() != GetInstanceId())
-        return NULL;
-    return ret;
+    return m_objectsStore.find<Pet>(guid, (Pet*)NULL);
+}
+
+Unit* Map::GetCreatureOrPet(uint64 guid)
+{
+    if (Unit* ret = GetCreature(guid))
+        return ret;
+
+    return GetPet(guid);
+}
+
+GameObject* Map::GetGameObject(uint64 guid)
+{
+    return m_objectsStore.find<GameObject>(guid, (GameObject*)NULL);
+}
+
+DynamicObject* Map::GetDynamicObject(uint64 guid)
+{
+    return m_objectsStore.find<DynamicObject>(guid, (DynamicObject*)NULL);
 }
