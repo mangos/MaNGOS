@@ -32,6 +32,7 @@
 #include "Player.h"
 
 #include <set>
+#include <list>
 
 class Creature;
 class Corpse;
@@ -95,29 +96,9 @@ class MANGOS_DLL_DECL ObjectAccessor : public MaNGOS::Singleton<ObjectAccessor, 
             return HashMapHolder<T>::Find(guid);
         }
 
-        static Unit* GetObjectInWorld(uint64 guid, Unit* /*fake*/)
-        {
-            if(!guid)
-                return NULL;
-
-            if (IS_PLAYER_GUID(guid))
-            {
-                Unit * u = (Unit*)HashMapHolder<Player>::Find(guid);
-                if(!u || !u->IsInWorld())
-                    return NULL;
-
-                return u;
-            }
-
-            if (IS_PET_GUID(guid))
-                return (Unit*)HashMapHolder<Pet>::Find(guid);
-
-            return (Unit*)HashMapHolder<Creature>::Find(guid);
-        }
-
         template<class T> static T* GetObjectInWorld(uint32 mapid, float x, float y, uint64 guid, T* /*fake*/)
         {
-            T* obj = HashMapHolder<T>::Find(guid);
+            T* obj = GetObjectInWorld(guid, (T*)NULL);
             if(!obj || obj->GetMapId() != mapid) return NULL;
 
             CellPair p = MaNGOS::ComputeCellPair(x,y);
@@ -201,6 +182,9 @@ class MANGOS_DLL_DECL ObjectAccessor : public MaNGOS::Singleton<ObjectAccessor, 
 
         static void _buildUpdateObject(Object* obj, UpdateDataMapType &);
 
+        // TODO: This methods will need lock in MT environment
+        static void LinkMap(Map* map)   { i_mapList.push_back(map); }
+        static void DelinkMap(Map* map) { i_mapList.remove(map); }
     private:
         struct WorldObjectChangeAccumulator
         {
@@ -210,6 +194,24 @@ class MANGOS_DLL_DECL ObjectAccessor : public MaNGOS::Singleton<ObjectAccessor, 
             void Visit(PlayerMapType &);
             template<class SKIP> void Visit(GridRefManager<SKIP> &) {}
         };
+
+        // TODO: This methods will need lock in MT environment
+        // Theoreticaly multiple threads can enter and search in this method but
+        // in that case linking/delinking other map should be guarded
+        template <class OBJECT> static OBJECT* FindHelper(uint64 guid)
+        {
+            OBJECT* ret = NULL;
+            std::list<Map*>::const_iterator i = i_mapList.begin();
+            while (i != i_mapList.end() && !ret)
+            {
+                ret = (*i)->GetObjectsStore().find<OBJECT>(guid, (OBJECT*)NULL);
+                ++i;
+            }
+
+            return ret;
+        }
+
+        static std::list<Map*> i_mapList;
 
         friend struct WorldObjectChangeAccumulator;
         Player2CorpsesMapType   i_player2corpse;
@@ -223,6 +225,52 @@ class MANGOS_DLL_DECL ObjectAccessor : public MaNGOS::Singleton<ObjectAccessor, 
         LockType i_playerGuard;
         LockType i_updateGuard;
         LockType i_corpseGuard;
-        LockType i_petGuard;
 };
+
+/// Out of class template specializations
+template <> static inline Creature* ObjectAccessor::GetObjectInWorld(uint64 guid, Creature* /*fake*/)
+{
+    return FindHelper<Creature>(guid);
+}
+
+template <> static inline GameObject* ObjectAccessor::GetObjectInWorld(uint64 guid, GameObject* /*fake*/)
+{
+    return FindHelper<GameObject>(guid);
+}
+
+template <> static inline DynamicObject* ObjectAccessor::GetObjectInWorld(uint64 guid, DynamicObject* /*fake*/)
+{
+    return FindHelper<DynamicObject>(guid);
+}
+
+template <> static inline Pet* ObjectAccessor::GetObjectInWorld(uint64 guid, Pet* /*fake*/)
+{
+    return FindHelper<Pet>(guid);
+}
+
+template <> static inline Vehicle* ObjectAccessor::GetObjectInWorld(uint64 guid, Vehicle* /*fake*/)
+{
+    return FindHelper<Vehicle>(guid);
+}
+
+template <> static inline Unit* ObjectAccessor::GetObjectInWorld(uint64 guid, Unit* /*fake*/)
+{
+    if(!guid)
+        return NULL;
+
+    if (IS_PLAYER_GUID(guid))
+    {
+        Unit * u = (Unit*)HashMapHolder<Player>::Find(guid);
+        if(!u || !u->IsInWorld())
+            return NULL;
+
+        return u;
+    }
+
+    if (IS_PET_GUID(guid))
+        return (Unit*)GetObjectInWorld<Pet>(guid, (Pet*)NULL);
+
+    return (Unit*)GetObjectInWorld<Creature>(guid, (Creature*)NULL);
+}
+
 #endif

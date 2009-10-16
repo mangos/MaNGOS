@@ -53,16 +53,16 @@ ObjectAccessor::~ObjectAccessor()
 Creature*
 ObjectAccessor::GetCreatureOrPetOrVehicle(WorldObject const &u, uint64 guid)
 {
-    if(IS_PLAYER_GUID(guid))
+    if(IS_PLAYER_GUID(guid) || !u.IsInWorld())
         return NULL;
 
     if(IS_PET_GUID(guid))
-        return GetPet(guid);
+        return u.GetMap()->GetPet(guid);
 
     if(IS_VEHICLE_GUID(guid))
-        return GetVehicle(guid);
+        return u.GetMap()->GetVehicle(guid);
 
-    return u.IsInWorld() ? u.GetMap()->GetCreature(guid) : NULL;
+    return u.GetMap()->GetCreature(guid);
 }
 
 Unit*
@@ -97,8 +97,8 @@ WorldObject* ObjectAccessor::GetWorldObject(WorldObject const &p, uint64 guid)
         case HIGHGUID_PLAYER:       return FindPlayer(guid);
         case HIGHGUID_GAMEOBJECT:   return p.GetMap()->GetGameObject(guid);
         case HIGHGUID_UNIT:         return p.GetMap()->GetCreature(guid);
-        case HIGHGUID_PET:          return GetPet(guid);
-        case HIGHGUID_VEHICLE:      return GetVehicle(guid);
+        case HIGHGUID_PET:          return p.GetMap()->GetPet(guid);
+        case HIGHGUID_VEHICLE:      return p.GetMap()->GetVehicle(guid);
         case HIGHGUID_DYNAMICOBJECT:return p.GetMap()->GetDynamicObject(guid);
         case HIGHGUID_TRANSPORT:    return NULL;
         case HIGHGUID_CORPSE:       return GetCorpse(p,guid);
@@ -131,11 +131,11 @@ Object* ObjectAccessor::GetObjectByTypeMask(WorldObject const &p, uint64 guid, u
             break;
         case HIGHGUID_PET:
             if(typemask & TYPEMASK_UNIT)
-                return GetPet(guid);
+                return p.GetMap()->GetPet(guid);
             break;
         case HIGHGUID_VEHICLE:
             if(typemask & TYPEMASK_UNIT)
-                return GetVehicle(guid);
+                return p.GetMap()->GetVehicle(guid);
             break;
         case HIGHGUID_DYNAMICOBJECT:
             if(typemask & TYPEMASK_DYNAMICOBJECT)
@@ -416,12 +416,10 @@ template <class T> ACE_Thread_Mutex HashMapHolder<T>::i_lock;
 /// Global definitions for the hashmap storage
 
 template class HashMapHolder<Player>;
-template class HashMapHolder<Pet>;
-template class HashMapHolder<Vehicle>;
-template class HashMapHolder<GameObject>;
-template class HashMapHolder<DynamicObject>;
-template class HashMapHolder<Creature>;
 template class HashMapHolder<Corpse>;
+
+/// Define the static member of ObjectAccessor
+std::list<Map*> ObjectAccessor::i_mapList;
 
 template Player* ObjectAccessor::GetObjectInWorld<Player>(uint32 mapid, float x, float y, uint64 guid, Player* /*fake*/);
 template Pet* ObjectAccessor::GetObjectInWorld<Pet>(uint32 mapid, float x, float y, uint64 guid, Pet* /*fake*/);
