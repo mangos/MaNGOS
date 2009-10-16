@@ -438,7 +438,9 @@ bool IsPositiveEffect(uint32 spellId, uint32 effIndex)
             // some explicitly required dummy effect sets
             switch(spellId)
             {
-                case 28441: return false;                   // AB Effect 000
+                case 28441:                                 // AB Effect 000
+                case 44689:                                 // Relay Race Accept Hidden Debuff - DND
+                    return false;
                 default:
                     break;
             }
