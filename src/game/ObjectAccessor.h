@@ -228,32 +228,32 @@ class MANGOS_DLL_DECL ObjectAccessor : public MaNGOS::Singleton<ObjectAccessor, 
 };
 
 /// Out of class template specializations
-template <> static inline Creature* ObjectAccessor::GetObjectInWorld(uint64 guid, Creature* /*fake*/)
+template <> inline Creature* ObjectAccessor::GetObjectInWorld(uint64 guid, Creature* /*fake*/)
 {
     return FindHelper<Creature>(guid);
 }
 
-template <> static inline GameObject* ObjectAccessor::GetObjectInWorld(uint64 guid, GameObject* /*fake*/)
+template <> inline GameObject* ObjectAccessor::GetObjectInWorld(uint64 guid, GameObject* /*fake*/)
 {
     return FindHelper<GameObject>(guid);
 }
 
-template <> static inline DynamicObject* ObjectAccessor::GetObjectInWorld(uint64 guid, DynamicObject* /*fake*/)
+template <> inline DynamicObject* ObjectAccessor::GetObjectInWorld(uint64 guid, DynamicObject* /*fake*/)
 {
     return FindHelper<DynamicObject>(guid);
 }
 
-template <> static inline Pet* ObjectAccessor::GetObjectInWorld(uint64 guid, Pet* /*fake*/)
+template <> inline Pet* ObjectAccessor::GetObjectInWorld(uint64 guid, Pet* /*fake*/)
 {
     return FindHelper<Pet>(guid);
 }
 
-template <> static inline Vehicle* ObjectAccessor::GetObjectInWorld(uint64 guid, Vehicle* /*fake*/)
+template <> inline Vehicle* ObjectAccessor::GetObjectInWorld(uint64 guid, Vehicle* /*fake*/)
 {
     return FindHelper<Vehicle>(guid);
 }
 
-template <> static inline Unit* ObjectAccessor::GetObjectInWorld(uint64 guid, Unit* /*fake*/)
+template <> inline Unit* ObjectAccessor::GetObjectInWorld(uint64 guid, Unit* /*fake*/)
 {
     if(!guid)
         return NULL;
