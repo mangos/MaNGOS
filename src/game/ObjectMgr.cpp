@@ -1228,11 +1228,18 @@ void ObjectMgr::LoadGameobjects()
 
         if(!gInfo->displayId)
         {
-            sLog.outErrorDb("Gameobject (GUID: %u Entry %u GoType: %u) doesn't have displayId (%u), not loaded.", guid, entry, gInfo->type, gInfo->displayId);
-            continue;
+            switch(gInfo->type)
+            {
+                // can be invisible always and then not req. display id in like case
+                case GAMEOBJECT_TYPE_TRAP:
+                case GAMEOBJECT_TYPE_SPELL_FOCUS:
+                    break;
+                default:
+                    sLog.outErrorDb("Gameobject (GUID: %u Entry %u GoType: %u) have displayId == 0 and then will always invisible in game.", guid, entry, gInfo->type);
+                    break;
+            }
         }
-
-        if (gInfo->displayId && !sGameObjectDisplayInfoStore.LookupEntry(gInfo->displayId))
+        else if (!sGameObjectDisplayInfoStore.LookupEntry(gInfo->displayId))
         {
             sLog.outErrorDb("Gameobject (GUID: %u Entry %u GoType: %u) have invalid displayId (%u), not loaded.", guid, entry, gInfo->type, gInfo->displayId);
             continue;
