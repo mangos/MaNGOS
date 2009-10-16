@@ -1312,10 +1312,11 @@ enum Opcodes
     UMSG_UNKNOWN_1275                               = 0x4FB, // not found 10554
     SMSG_UNKNOWN_1276                               = 0x4FC, // does nothing in 10554
     SMSG_UNKNOWN_1277                               = 0x4FD, // loot related?
-    UMSG_UNKNOWN_1278                               = 0x4FE, // not found 10554
-    CMSG_QUERY_QUESTS_COMPLETED                     = 0x4FF, // lua: QueryQuestsCompleted
-    SMSG_QUERY_QUESTS_COMPLETED_RESPONSE            = 0x500, // response to 0x4FF
-    NUM_MSG_TYPES                                   = 0x501
+    UMSG_UNKNOWN_1278                               = 0x4FE, // not found 10596
+    CMSG_READY_FOR_ACCOUNT_DATA_TIMES               = 0x4FF, // lua: ReadyForAccountDataTimes
+    CMSG_QUERY_QUESTS_COMPLETED                     = 0x500, // lua: QueryQuestsCompleted
+    SMSG_QUERY_QUESTS_COMPLETED_RESPONSE            = 0x501, // response to 0x4FF
+    NUM_MSG_TYPES                                   = 0x502
 };
 
 /// Player state
