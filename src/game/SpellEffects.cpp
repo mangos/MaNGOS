@@ -1043,6 +1043,31 @@ void Spell::EffectDummy(uint32 i)
                     m_caster->CastSpell(m_caster, spell_id, true, NULL);
                     return;
                 }
+                case 34665:                                 //Administer Antidote
+                {
+                    if (!unitTarget || m_caster->GetTypeId() != TYPEID_PLAYER )
+                        return;
+                    // Spell has scriptable target but for sure.
+                    if (unitTarget->GetTypeId() != TYPEID_UNIT)
+                        return;
+
+                    uint32 health = unitTarget->GetHealth();
+                    float x, y, z, o;
+
+                    unitTarget->GetPosition(x, y, z);
+                    o = unitTarget->GetOrientation();
+                    ((Creature*)unitTarget)->ForcedDespawn();
+
+                    if (Creature* summon = m_caster->SummonCreature(16992, x, y, z, o,TEMPSUMMON_TIMED_OR_DEAD_DESPAWN,180000))
+                    {
+                        summon->SetHealth(health);
+                        ((Player*)m_caster)->RewardPlayerAndGroupAtEvent(16992, summon);
+
+                        if (summon->AI())
+                            summon->AI()->AttackStart(m_caster);
+                    }
+                    return;
+                }
                 case 35745:                                 // Socrethar's Stone
                 {
                     uint32 spell_id;
@@ -1122,31 +1147,6 @@ void Spell::EffectDummy(uint32 i)
                     m_caster->CastSpell(m_caster, 42337, true, NULL);
                     return;
                 }
-                case 34665:                                 //Administer Antidote
-                {
-                    if (!unitTarget || m_caster->GetTypeId() != TYPEID_PLAYER )
-                        return;
-                    // Spell has scriptable target but for sure.
-                    if (unitTarget->GetTypeId() != TYPEID_UNIT)
-                        return;
-
-                    uint32 health = unitTarget->GetHealth();
-                    float x, y, z, o;
-
-                    unitTarget->GetPosition(x, y, z);
-                    o = unitTarget->GetOrientation();
-                    ((Creature*)unitTarget)->ForcedDespawn();
-
-                    if (Creature* summon = m_caster->SummonCreature(16992, x, y, z, o,TEMPSUMMON_TIMED_OR_DEAD_DESPAWN,180000))
-                    {
-                        summon->SetHealth(health);
-                        ((Player*)m_caster)->RewardPlayerAndGroupAtEvent(16992, summon);
-
-                        if (summon->AI())
-                            summon->AI()->AttackStart(m_caster);
-                    }
-                    return;
-                }
                 case 44997:                                 // Converting Sentry
                 {
                     //Converted Sentry Credit
@@ -1159,14 +1159,6 @@ void Spell::EffectDummy(uint32 i)
                     m_caster->CastSpell(m_caster, 45088, true);
                     return;
                 }
-                case 55004:                                 // Nitro Boosts
-                    if (!m_CastItem)
-                        return;
-                    if (roll_chance_i(95))                  // Nitro Boosts - success
-                        m_caster->CastSpell(m_caster, 54861, true, m_CastItem);
-                    else                                    // Knocked Up   - backfire 5%
-                        m_caster->CastSpell(m_caster, 46014, true, m_CastItem);
-                    return;
                 case 50243:                                 // Teach Language
                 {
                     if (m_caster->GetTypeId() != TYPEID_PLAYER)
@@ -1240,6 +1232,14 @@ void Spell::EffectDummy(uint32 i)
                     m_caster->CastSpell(m_caster, 54586, true);
                     return;
                 }
+                case 55004:                                 // Nitro Boosts
+                    if (!m_CastItem)
+                        return;
+                    if (roll_chance_i(95))                  // Nitro Boosts - success
+                        m_caster->CastSpell(m_caster, 54861, true, m_CastItem);
+                    else                                    // Knocked Up   - backfire 5%
+                        m_caster->CastSpell(m_caster, 46014, true, m_CastItem);
+                    return;
                 case 58418:                                 // Portal to Orgrimmar
                 case 58420:                                 // Portal to Stormwind
                     return;                                 // implemented in EffectScript[0]
