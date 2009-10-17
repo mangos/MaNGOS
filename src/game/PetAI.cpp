@@ -172,7 +172,7 @@ void PetAI::UpdateAI(const uint32 diff)
                     return;
 
                 //if pet misses its target, it will also be the first in threat list
-                m_creature->getVictim()->AddThreat(m_creature,0.0f);
+                m_creature->getVictim()->AddThreat(m_creature);
 
                 if( _needToStop() )
                     _stopAttack();

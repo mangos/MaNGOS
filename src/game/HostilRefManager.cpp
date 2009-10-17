@@ -40,7 +40,7 @@ void HostileRefManager::threatAssist(Unit *pVictim, float pThreat, SpellEntry co
     ref = getFirst();
     while(ref != NULL)
     {
-        float threat = ThreatCalcHelper::calcThreat(pVictim, iOwner, pThreat, (pThreatSpell ? GetSpellSchoolMask(pThreatSpell) : SPELL_SCHOOL_MASK_NORMAL), pThreatSpell);
+        float threat = ThreatCalcHelper::calcThreat(pVictim, iOwner, pThreat, false, (pThreatSpell ? GetSpellSchoolMask(pThreatSpell) : SPELL_SCHOOL_MASK_NORMAL), pThreatSpell);
         if(pVictim == getOwner())
             ref->addThreat(float (threat) / size);          // It is faster to modify the threat durectly if possible
         else

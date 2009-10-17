@@ -49,7 +49,7 @@ ReactorAI::AttackStart(Unit *p)
     {
         DEBUG_LOG("Tag unit GUID: %u (TypeId: %u) as a victim", p->GetGUIDLow(), p->GetTypeId());
         i_victimGuid = p->GetGUID();
-        m_creature->AddThreat(p, 0.0f);
+        m_creature->AddThreat(p);
 
         m_creature->SetInCombatWith(p);
         p->SetInCombatWith(m_creature);

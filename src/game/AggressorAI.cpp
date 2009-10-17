@@ -60,7 +60,7 @@ AggressorAI::MoveInLineOfSight(Unit *u)
             }
             else if(sMapStore.LookupEntry(m_creature->GetMapId())->IsDungeon())
             {
-                m_creature->AddThreat(u, 0.0f);
+                m_creature->AddThreat(u);
                 u->SetInCombatWith(m_creature);
             }
         }
@@ -155,7 +155,7 @@ AggressorAI::AttackStart(Unit *u)
         //    DEBUG_LOG("Creature %s tagged a victim to kill [guid=%u]", m_creature->GetName(), u->GetGUIDLow());
         i_victimGuid = u->GetGUID();
 
-        m_creature->AddThreat(u, 0.0f);
+        m_creature->AddThreat(u);
         m_creature->SetInCombatWith(u);
         u->SetInCombatWith(m_creature);
 

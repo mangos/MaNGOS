@@ -138,7 +138,7 @@ void GuardAI::AttackStart(Unit *u)
     if(m_creature->Attack(u,true))
     {
         i_victimGuid = u->GetGUID();
-        m_creature->AddThreat(u, 0.0f);
+        m_creature->AddThreat(u);
         m_creature->SetInCombatWith(u);
         u->SetInCombatWith(m_creature);
 
