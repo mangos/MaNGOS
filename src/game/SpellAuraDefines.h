@@ -315,7 +315,7 @@ enum AuraType
     SPELL_AURA_MOD_IGNORE_TARGET_RESIST = 270,              // Possibly need swap vs 195 aura used only in 1 spell Chaos Bolt Passive
     SPELL_AURA_MOD_DAMAGE_FROM_CASTER = 271,
     SPELL_AURA_272 = 272,
-    SPELL_AURA_273 = 273,
+    SPELL_AURA_X_RAY = 273,
     SPELL_AURA_274 = 274,
     SPELL_AURA_MOD_IGNORE_SHAPESHIFT = 275,
     SPELL_AURA_276 = 276,                                   // Only "Test Mod Damage % Mechanic" spell, possible mod damage done
