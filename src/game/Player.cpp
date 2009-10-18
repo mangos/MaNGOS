@@ -12572,6 +12572,13 @@ bool Player::CanRewardQuest( Quest const *pQuest, uint32 reward, bool msg )
     return true;
 }
 
+void Player::SendPetTameFailure(PetTameFailureReason reason)
+{
+    WorldPacket data(SMSG_PET_TAME_FAILURE, 1);
+    data << uint8(reason);
+    GetSession()->SendPacket(&data);
+}
+
 void Player::AddQuest( Quest const *pQuest, Object *questGiver )
 {
     uint16 log_slot = FindQuestSlot( 0 );

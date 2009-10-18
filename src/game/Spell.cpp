@@ -4313,26 +4313,51 @@ SpellCastResult Spell::CheckCast(bool strict)
             }
             case SPELL_EFFECT_TAMECREATURE:
             {
-                if (m_caster->GetTypeId() != TYPEID_PLAYER)
+                if (m_caster->GetTypeId() != TYPEID_PLAYER ||
+                    !m_targets.getUnitTarget() ||
+                    m_targets.getUnitTarget()->GetTypeId() == TYPEID_PLAYER ||
+                    m_targets.getUnitTarget()->isPet())
                     return SPELL_FAILED_BAD_TARGETS;
 
-                if (!m_targets.getUnitTarget() || m_targets.getUnitTarget()->GetTypeId() == TYPEID_PLAYER)
-                    return SPELL_FAILED_BAD_IMPLICIT_TARGETS;
+                Player* plrCaster = (Player*)m_caster;
+
+                if(plrCaster->getClass() != CLASS_HUNTER)
+                {
+                    plrCaster->SendPetTameFailure(PETTAME_UNITSCANTTAME);
+                    return SPELL_FAILED_DONT_REPORT;
+                }
 
                 Creature* target = (Creature*)m_targets.getUnitTarget();
 
-                if (target->getLevel() > m_caster->getLevel())
-                    return SPELL_FAILED_HIGHLEVEL;
+                if(target->isPet() || target->isCharmed())
+                {
+                    plrCaster->SendPetTameFailure(PETTAME_CREATUREALREADYOWNED);
+                    return SPELL_FAILED_DONT_REPORT;
+                }
 
-                // use SMSG_PET_TAME_FAILURE?
-                if (!target->GetCreatureInfo()->isTameable (((Player*)m_caster)->CanTameExoticPets()))
-                    return SPELL_FAILED_BAD_TARGETS;
+                if (target->getLevel() > plrCaster->getLevel())
+                {
+                    plrCaster->SendPetTameFailure(PETTAME_TOOHIGHLEVEL);
+                    return SPELL_FAILED_DONT_REPORT;
+                }
 
-                if(m_caster->GetPetGUID())
-                    return SPELL_FAILED_ALREADY_HAVE_SUMMON;
+                if (target->GetCreatureInfo()->IsExotic() && !plrCaster->CanTameExoticPets())
+                {
+                    plrCaster->SendPetTameFailure(PETTAME_CANTCONTROLEXOTIC);
+                    return SPELL_FAILED_DONT_REPORT;
+                }
 
-                if(m_caster->GetCharmGUID())
-                    return SPELL_FAILED_ALREADY_HAVE_CHARM;
+                if (!target->GetCreatureInfo()->isTameable(plrCaster->CanTameExoticPets()))
+                {
+                    plrCaster->SendPetTameFailure(PETTAME_NOTTAMEABLE);
+                    return SPELL_FAILED_DONT_REPORT;
+                }
+
+                if(plrCaster->GetPetGUID() || plrCaster->GetCharmGUID())
+                {
+                    plrCaster->SendPetTameFailure(PETTAME_ANOTHERSUMMONACTIVE);
+                    return SPELL_FAILED_DONT_REPORT;
+                }
 
                 break;
             }
