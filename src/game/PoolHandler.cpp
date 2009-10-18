@@ -185,11 +185,15 @@ void PoolGroup<T>::SpawnObject(uint32 limit, bool cache)
     if (limit == 1)                                         // This is the only case where explicit chance is used
     {
         uint32 roll = RollOne();
-        if (cache && m_LastDespawnedNode != roll)
-            Despawn1Object(m_LastDespawnedNode);
-
+        if (!cache || (cache && m_LastDespawnedNode != roll))
+        {
+            if (cache)
+                Despawn1Object(m_LastDespawnedNode);
+            Spawn1Object(roll);
+        }
+        else
+            ReSpawn1Object(roll);
         m_LastDespawnedNode = 0;
-        Spawn1Object(roll);
     }
     else if (limit < EqualChanced.size() && m_SpawnedPoolAmount < limit)
     {
