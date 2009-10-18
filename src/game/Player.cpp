@@ -2098,15 +2098,14 @@ Player::GetNPCIfCanInteractWith(uint64 guid, uint32 npcflagmask)
         return NULL;
 
     // player check
-    if(!CanInteractWithNPCs(!unit->isSpiritService()))
+    if(!CanInteractWithNPCs(!(unit->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_GHOST)))
         return NULL;
 
     // appropriate npc type
     if(npcflagmask && !unit->HasFlag( UNIT_NPC_FLAGS, npcflagmask ))
         return NULL;
 
-    // alive or spirit healer
-    if(!unit->isAlive() && (!unit->isSpiritService() || isAlive() ))
+    if (isAlive() && !unit->isAlive())
         return NULL;
 
     // not allow interaction under control, but allow with own pets
