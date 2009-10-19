@@ -46,7 +46,7 @@ AggressorAI::MoveInLineOfSight(Unit *u)
     if( !m_creature->canFly() && m_creature->GetDistanceZ(u) > CREATURE_Z_ATTACK_RANGE )
         return;
 
-    if( !m_creature->hasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_DIED) && u->isTargetableForAttack() &&
+    if( !(m_creature->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_GHOST) && !m_creature->hasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_DIED) && u->isTargetableForAttack() &&
         ( m_creature->IsHostileTo( u ) /*|| u->getVictim() && m_creature->IsFriendlyTo( u->getVictim() )*/ ) &&
         u->isInAccessablePlaceFor(m_creature) )
     {
@@ -60,7 +60,7 @@ AggressorAI::MoveInLineOfSight(Unit *u)
             }
             else if(sMapStore.LookupEntry(m_creature->GetMapId())->IsDungeon())
             {
-                m_creature->AddThreat(u, 0.0f);
+                m_creature->AddThreat(u);
                 u->SetInCombatWith(m_creature);
             }
         }
@@ -155,7 +155,7 @@ AggressorAI::AttackStart(Unit *u)
         //    DEBUG_LOG("Creature %s tagged a victim to kill [guid=%u]", m_creature->GetName(), u->GetGUIDLow());
         i_victimGuid = u->GetGUID();
 
-        m_creature->AddThreat(u, 0.0f);
+        m_creature->AddThreat(u);
         m_creature->SetInCombatWith(u);
         u->SetInCombatWith(m_creature);
 

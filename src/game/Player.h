@@ -1418,6 +1418,8 @@ class MANGOS_DLL_SPEC Player : public Unit
         bool m_mailsLoaded;
         bool m_mailsUpdated;
 
+        void SendPetTameFailure(PetTameFailureReason reason);
+
         void SetBindPoint(uint64 guid);
         void SendTalentWipeConfirm(uint64 guid);
         void RewardRage( uint32 damage, uint32 weaponSpeedHitFactor, bool attacker );

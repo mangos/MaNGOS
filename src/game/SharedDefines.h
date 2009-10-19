@@ -2640,4 +2640,23 @@ enum MailResponseResult
     MAIL_ERR_ITEM_HAS_EXPIRED          = 21,
 };
 
+// reasons for why pet tame may fail
+// in fact, these are also used elsewhere
+enum PetTameFailureReason
+{
+    PETTAME_INVALIDCREATURE         = 0,
+    PETTAME_TOOMANY                 = 1,
+    PETTAME_CREATUREALREADYOWNED    = 2,
+    PETTAME_NOTTAMEABLE             = 3,
+    PETTAME_ANOTHERSUMMONACTIVE     = 4,
+    PETTAME_UNITSCANTTAME           = 5,
+    PETTAME_NOPETAVAILABLE          = 6,  // not used in taming
+    PETTAME_INTERNALERROR           = 7,
+    PETTAME_TOOHIGHLEVEL            = 8,
+    PETTAME_DEAD                    = 9,  // not used in taming
+    PETTAME_NOTDEAD                 = 10, // not used in taming
+    PETTAME_CANTCONTROLEXOTIC       = 11, // 3.x
+    PETTAME_UNKNOWNERROR            = 12
+};
+
 #endif
