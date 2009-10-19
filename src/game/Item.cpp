@@ -996,6 +996,18 @@ bool Item::IsBindedNotWith( Player const* player ) const
     }
 }
 
+void Item::AddToClientUpdateList()
+{
+    if (Player* pl = GetOwner())
+        pl->GetMap()->AddUpdateObject(this);
+}
+
+void Item::RemoveFromClientUpdateList()
+{
+    if (Player* pl = GetOwner())
+        pl->GetMap()->RemoveUpdateObject(this);
+}
+
 void Item::BuildUpdateData(UpdateDataMapType& update_players)
 {
     if (Player* pl = GetOwner())

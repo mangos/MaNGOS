@@ -313,6 +313,8 @@ class MANGOS_DLL_SPEC Item : public Object
         bool IsPotion() const { return GetProto()->IsPotion(); }
         bool IsConjuredConsumable() const { return GetProto()->IsConjuredConsumable(); }
 
+        void AddToClientUpdateList();
+        void RemoveFromClientUpdateList();
         void BuildUpdateData(UpdateDataMapType& update_players);
     private:
         uint8 m_slot;

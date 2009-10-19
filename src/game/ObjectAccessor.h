@@ -152,26 +152,9 @@ class MANGOS_DLL_DECL ObjectAccessor : public MaNGOS::Singleton<ObjectAccessor, 
         void RemoveObject(Player *pl)
         {
             HashMapHolder<Player>::Remove(pl);
-
-            Guard guard(i_updateGuard);
-            i_objects.erase((Object *)pl);
         }
 
         void SaveAllPlayers();
-
-        void AddUpdateObject(Object *obj)
-        {
-            Guard guard(i_updateGuard);
-            i_objects.insert(obj);
-        }
-
-        void RemoveUpdateObject(Object *obj)
-        {
-            Guard guard(i_updateGuard);
-            i_objects.erase( obj );
-        }
-
-        void Update(uint32 diff);
 
         Corpse* GetCorpseForPlayerGUID(uint64 guid);
         void RemoveCorpse(Corpse *corpse);
@@ -206,9 +189,7 @@ class MANGOS_DLL_DECL ObjectAccessor : public MaNGOS::Singleton<ObjectAccessor, 
         typedef ACE_Thread_Mutex LockType;
         typedef MaNGOS::GeneralLock<LockType > Guard;
 
-        std::set<Object *> i_objects;
         LockType i_playerGuard;
-        LockType i_updateGuard;
         LockType i_corpseGuard;
 };
 

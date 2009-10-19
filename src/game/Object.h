@@ -124,7 +124,7 @@ class MANGOS_DLL_SPEC Object
             m_inWorld = true;
 
             // synchronize values mirror with values array (changes will send in updatecreate opcode any way
-            ClearUpdateMask(true);
+            ClearUpdateMask(false);                         // false - we can't have update dat in update queue before adding to world
         }
         virtual void RemoveFromWorld()
         {
@@ -148,6 +148,8 @@ class MANGOS_DLL_SPEC Object
         virtual void BuildCreateUpdateBlockForPlayer( UpdateData *data, Player *target ) const;
         void SendCreateUpdateToPlayer(Player* player);
 
+        virtual void AddToClientUpdateList() =0;
+        virtual void RemoveFromClientUpdateList() =0;
         virtual void BuildUpdateData(UpdateDataMapType& update_players) =0;
         void BuildValuesUpdateBlockForPlayer( UpdateData *data, Player *target ) const;
         void BuildOutOfRangeUpdateBlock( UpdateData *data ) const;
@@ -308,6 +310,7 @@ class MANGOS_DLL_SPEC Object
         virtual void _SetUpdateBits(UpdateMask *updateMask, Player *target) const;
 
         virtual void _SetCreateBits(UpdateMask *updateMask, Player *target) const;
+
         void BuildMovementUpdate(ByteBuffer * data, uint16 flags, uint32 flags2 ) const;
         void BuildValuesUpdate(uint8 updatetype, ByteBuffer *data, UpdateMask *updateMask, Player *target ) const;
         void BuildUpdateDataForPlayer(Player* pl, UpdateDataMapType& update_players);
@@ -494,6 +497,8 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         //this function should be removed in nearest time...
         Map const* GetBaseMap() const;
 
+        void AddToClientUpdateList();
+        void RemoveFromClientUpdateList();
         void BuildUpdateData(UpdateDataMapType &);
 
         Creature* SummonCreature(uint32 id, float x, float y, float z, float ang,TempSummonType spwtype,uint32 despwtime);

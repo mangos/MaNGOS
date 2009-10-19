@@ -268,7 +268,6 @@ MapManager::Update(uint32 diff)
         iter->second->Update(i_timer.GetCurrent());
     }
 
-    ObjectAccessor::Instance().Update(i_timer.GetCurrent());
     for (TransportSet::iterator iter = m_Transports.begin(); iter != m_Transports.end(); ++iter)
         (*iter)->Update(i_timer.GetCurrent());
 
