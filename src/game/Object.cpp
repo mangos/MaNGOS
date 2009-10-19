@@ -31,7 +31,6 @@
 #include "UpdateMask.h"
 #include "Util.h"
 #include "MapManager.h"
-#include "ObjectAccessor.h"
 #include "Log.h"
 #include "Transports.h"
 #include "TargetedMovementGenerator.h"

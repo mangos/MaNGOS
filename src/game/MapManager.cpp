@@ -21,7 +21,6 @@
 #include "Policies/SingletonImp.h"
 #include "Database/DatabaseEnv.h"
 #include "Log.h"
-#include "ObjectAccessor.h"
 #include "Transports.h"
 #include "GridDefines.h"
 #include "MapInstanced.h"
