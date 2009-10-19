@@ -1884,7 +1884,7 @@ enum CreatureFamily
 enum CreatureTypeFlags
 {
     CREATURE_TYPEFLAGS_TAMEABLE         = 0x000001,         // Tameable by any hunter
-    CREATURE_TYPEFLAGS_GHOST            = 0x000002,         // Creature are also visible for not alive player. Allow gossip interaction if npcflag allow?
+    CREATURE_TYPEFLAGS_GHOST_VISIBLE    = 0x000002,         // Creatures which can _also_ be seen when player is a ghost
     CREATURE_TYPEFLAGS_UNK3             = 0x000004,
     CREATURE_TYPEFLAGS_UNK4             = 0x000008,
     CREATURE_TYPEFLAGS_UNK5             = 0x000010,

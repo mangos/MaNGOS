@@ -19,6 +19,7 @@
 #include "AggressorAI.h"
 #include "Errors.h"
 #include "Creature.h"
+#include "SharedDefines.h"
 #include "ObjectAccessor.h"
 #include "VMapFactory.h"
 #include "World.h"
@@ -46,7 +47,7 @@ AggressorAI::MoveInLineOfSight(Unit *u)
     if( !m_creature->canFly() && m_creature->GetDistanceZ(u) > CREATURE_Z_ATTACK_RANGE )
         return;
 
-    if( !(m_creature->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_GHOST) && !m_creature->hasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_DIED) && u->isTargetableForAttack() &&
+    if (!m_creature->hasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_DIED) && u->isTargetableForAttack() &&
         ( m_creature->IsHostileTo( u ) /*|| u->getVictim() && m_creature->IsFriendlyTo( u->getVictim() )*/ ) &&
         u->isInAccessablePlaceFor(m_creature) )
     {
