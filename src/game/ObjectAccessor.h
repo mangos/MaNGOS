@@ -89,7 +89,6 @@ class MANGOS_DLL_DECL ObjectAccessor : public MaNGOS::Singleton<ObjectAccessor, 
 
     public:
         typedef UNORDERED_MAP<uint64, Corpse* >      Player2CorpsesMapType;
-        typedef UNORDERED_MAP<Player*, UpdateData>::value_type UpdateDataValueType;
 
         template<class T> static T* GetObjectInWorld(uint64 guid, T* /*fake*/)
         {
@@ -180,21 +179,10 @@ class MANGOS_DLL_DECL ObjectAccessor : public MaNGOS::Singleton<ObjectAccessor, 
         void AddCorpsesToGrid(GridPair const& gridpair,GridType& grid,Map* map);
         Corpse* ConvertCorpseForPlayer(uint64 player_guid, bool insignia = false);
 
-        static void _buildUpdateObject(Object* obj, UpdateDataMapType &);
-
         // TODO: This methods will need lock in MT environment
         static void LinkMap(Map* map)   { i_mapList.push_back(map); }
         static void DelinkMap(Map* map) { i_mapList.remove(map); }
     private:
-        struct WorldObjectChangeAccumulator
-        {
-            UpdateDataMapType &i_updateDatas;
-            WorldObject &i_object;
-            WorldObjectChangeAccumulator(WorldObject &obj, UpdateDataMapType &d) : i_updateDatas(d), i_object(obj) {}
-            void Visit(PlayerMapType &);
-            template<class SKIP> void Visit(GridRefManager<SKIP> &) {}
-        };
-
         // TODO: This methods will need lock in MT environment
         // Theoreticaly multiple threads can enter and search in this method but
         // in that case linking/delinking other map should be guarded
@@ -213,14 +201,11 @@ class MANGOS_DLL_DECL ObjectAccessor : public MaNGOS::Singleton<ObjectAccessor, 
 
         static std::list<Map*> i_mapList;
 
-        friend struct WorldObjectChangeAccumulator;
         Player2CorpsesMapType   i_player2corpse;
 
         typedef ACE_Thread_Mutex LockType;
         typedef MaNGOS::GeneralLock<LockType > Guard;
 
-        static void _buildChangeObjectForPlayer(WorldObject *, UpdateDataMapType &);
-        static void _buildPacket(Player *, Object *, UpdateDataMapType &);
         std::set<Object *> i_objects;
         LockType i_playerGuard;
         LockType i_updateGuard;

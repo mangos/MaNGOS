@@ -182,49 +182,6 @@ ObjectAccessor::SaveAllPlayers()
         itr->second->SaveToDB();
 }
 
-void
-ObjectAccessor::_buildUpdateObject(Object *obj, UpdateDataMapType &update_players)
-{
-    if(obj->isType(TYPEMASK_ITEM))
-    {
-        Item *item = static_cast<Item *>(obj);
-        if (Player* pl = item->GetOwner())
-            _buildPacket(pl, obj, update_players);
-    }
-    else
-         _buildChangeObjectForPlayer(static_cast<WorldObject*>(obj), update_players);
-}
-
-void
-ObjectAccessor::_buildPacket(Player *pl, Object *obj, UpdateDataMapType &update_players)
-{
-    UpdateDataMapType::iterator iter = update_players.find(pl);
-
-    if( iter == update_players.end() )
-    {
-        std::pair<UpdateDataMapType::iterator, bool> p = update_players.insert( UpdateDataValueType(pl, UpdateData()) );
-        assert(p.second);
-        iter = p.first;
-    }
-
-    obj->BuildValuesUpdateBlockForPlayer(&iter->second, iter->first);
-}
-
-void
-ObjectAccessor::_buildChangeObjectForPlayer(WorldObject *obj, UpdateDataMapType &update_players)
-{
-    CellPair p = MaNGOS::ComputeCellPair(obj->GetPositionX(), obj->GetPositionY());
-    Cell cell(p);
-    cell.data.Part.reserved = ALL_DISTRICT;
-    cell.SetNoCreate();
-    WorldObjectChangeAccumulator notifier(*obj, update_players);
-    TypeContainerVisitor<WorldObjectChangeAccumulator, WorldTypeMapContainer > player_notifier(notifier);
-    CellLock<GridReadGuard> cell_lock(cell, p);
-    Map& map = *obj->GetMap();
-    //we must build packets for all visible players
-    cell_lock->Visit(cell_lock, player_notifier, map, *obj, map.GetVisibilityDistance());
-}
-
 Pet*
 ObjectAccessor::GetPet(uint64 guid)
 {
@@ -386,8 +343,7 @@ ObjectAccessor::Update(uint32 diff)
             i_objects.erase(i_objects.begin());
             if (!obj)
                 continue;
-            _buildUpdateObject(obj, update_players);
-            obj->ClearUpdateMask(false);
+            obj->BuildUpdateData(update_players);
         }
     }
 
@@ -398,14 +354,6 @@ ObjectAccessor::Update(uint32 diff)
         iter->first->GetSession()->SendPacket(&packet);
         packet.clear();                                     // clean the string
     }
-}
-
-void
-ObjectAccessor::WorldObjectChangeAccumulator::Visit(PlayerMapType &m)
-{
-    for(PlayerMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
-        if(iter->getSource()->HaveAtClient(&i_object))
-            ObjectAccessor::_buildPacket(iter->getSource(), &i_object, i_updateDatas);
 }
 
 /// Define the static member of HashMapHolder
