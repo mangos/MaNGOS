@@ -1884,7 +1884,7 @@ enum CreatureFamily
 enum CreatureTypeFlags
 {
     CREATURE_TYPEFLAGS_TAMEABLE        = 0x00001,           //tameable by any hunter
-    CREATURE_TYPEFLAGS_UNK2            = 0x00002,           //? Related to spirits/ghosts in any form? Allow gossip interaction if player is also ghost? Visibility?
+    CREATURE_TYPEFLAGS_GHOST           = 0x00002,           //creature are also visible for not alive player. Allow gossip interaction if npcflag allow?
     CREATURE_TYPEFLAGS_UNK3            = 0x00004,
     CREATURE_TYPEFLAGS_UNK4            = 0x00008,
     CREATURE_TYPEFLAGS_UNK5            = 0x00010,
@@ -1900,8 +1900,8 @@ enum CreatureTypeFlags
     CREATURE_TYPEFLAGS_UNK15           = 0x04000,           //? Possibly not in use
     CREATURE_TYPEFLAGS_ENGINEERLOOT    = 0x08000,           //can be looted by engineer
     CREATURE_TYPEFLAGS_EXOTIC          = 0x10000,           //can be tamed by hunter as exotic pet
-    CREATURE_TYPEFLAGS_UNK18           = 0x20000,           //? Related to veichles/pvp?
-    CREATURE_TYPEFLAGS_UNK19           = 0x40000,           //? Related to veichle/siege weapons?
+    CREATURE_TYPEFLAGS_UNK18           = 0x20000,           //? Related to vehicles/pvp?
+    CREATURE_TYPEFLAGS_UNK19           = 0x40000,           //? Related to vehicle/siege weapons?
     CREATURE_TYPEFLAGS_UNK20           = 0x80000
 };
 
