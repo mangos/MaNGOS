@@ -104,6 +104,7 @@ Unit::Unit()
     //m_AurasCheck = 2000;
     //m_removeAuraTimer = 4;
     m_AurasUpdateIterator = m_Auras.end();
+    m_AuraFlags = 0;
 
     m_Visibility = VISIBILITY_ON;
 
@@ -10627,9 +10628,7 @@ bool Unit::isVisibleForInState( Player const* u, WorldObject const* viewPoint, b
 /// returns true if creature can't be seen by alive units
 bool Unit::isInvisibleForAlive() const
 {
-    // TODO:  more generic check for those auras
-    // TODO: maybe we also don't need an isAlive() check for visibilty.. but only those auras
-    if (HasAura(10848) || HasAura(36978) || HasAura(40131) || HasAura(27978) || HasAura(33900))
+    if (m_AuraFlags & UNIT_AURAFLAG_ALIVE_INVISIBLE)
         return true;
     // TODO: maybe spiritservices also have just an aura
     return isSpiritService();
