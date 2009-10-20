@@ -1746,11 +1746,12 @@ bool Creature::IsVisibleInGridForPlayer(Player* pl) const
     if(pl->isGameMaster())
         return true;
 
+    if (GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_INVISIBLE)
+        return false;
+
     // Live player (or with not release body see live creatures or death creatures with corpse disappearing time > 0
     if(pl->isAlive() || pl->GetDeathTimer() > 0)
     {
-        if (GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_INVISIBLE)
-            return false;
         return (isAlive() || m_deathTimer > 0 || (m_isDeadByDefault && m_deathState == CORPSE));
     }
 

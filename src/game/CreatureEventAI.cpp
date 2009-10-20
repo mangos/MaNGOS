@@ -995,7 +995,7 @@ void CreatureEventAI::MoveInLineOfSight(Unit *who)
         return;
 
     if (!m_creature->hasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_DIED) && who->isTargetableForAttack() &&
-        m_creature->IsHostileTo(who) && who->isInAccessablePlaceFor(m_creature))
+        m_creature->IsHostileTo(who) && who->isInAccessablePlaceFor(m_creature) && !who->isInvisibleForAlive())
     {
         if (!m_creature->canFly() && m_creature->GetDistanceZ(who) > CREATURE_Z_ATTACK_RANGE)
             return;
