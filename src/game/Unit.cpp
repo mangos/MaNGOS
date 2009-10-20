@@ -5387,6 +5387,12 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     triggered_spell_id = 63106;
                     break;
                 }
+                // Glyph of Life Tap
+                case 63320:
+                {
+                    triggered_spell_id = 63321;
+                    break;
+                }
             }
             break;
         }
