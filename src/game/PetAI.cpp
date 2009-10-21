@@ -47,7 +47,7 @@ void PetAI::MoveInLineOfSight(Unit *u)
     if( !m_creature->getVictim() && m_creature->GetCharmInfo() &&
         m_creature->GetCharmInfo()->HasReactState(REACT_AGGRESSIVE) &&
         u->isTargetableForAttack() && m_creature->IsHostileTo( u ) &&
-        u->isInAccessablePlaceFor(m_creature) && !u->isInvisibleForAlive())
+        u->isInAccessablePlaceFor(m_creature))
     {
         float attackRadius = m_creature->GetAttackDistance(u);
         if(m_creature->IsWithinDistInMap(u, attackRadius) && m_creature->GetDistanceZ(u) <= CREATURE_Z_ATTACK_RANGE)
