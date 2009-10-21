@@ -369,7 +369,7 @@ void Creature::Update(uint32 diff)
 
                 uint16 poolid = poolhandler.IsPartOfAPool(GetGUIDLow(), GetTypeId());
                 if (poolid)
-                    poolhandler.UpdatePool(poolid, GetGUIDLow(), GetTypeId());
+                    poolhandler.UpdatePool(poolid, GetGUIDLow(), TYPEID_UNIT);
                 else
                     GetMap()->Add(this);
             }
