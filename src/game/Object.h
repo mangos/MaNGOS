@@ -148,9 +148,11 @@ class MANGOS_DLL_SPEC Object
         virtual void BuildCreateUpdateBlockForPlayer( UpdateData *data, Player *target ) const;
         void SendCreateUpdateToPlayer(Player* player);
 
-        virtual void AddToClientUpdateList() =0;
-        virtual void RemoveFromClientUpdateList() =0;
-        virtual void BuildUpdateData(UpdateDataMapType& update_players) =0;
+        // must be overwrite in appropriate subclasses (WorldObject, Item currently), or will crash
+        virtual void AddToClientUpdateList();
+        virtual void RemoveFromClientUpdateList();
+        virtual void BuildUpdateData(UpdateDataMapType& update_players);
+
         void BuildValuesUpdateBlockForPlayer( UpdateData *data, Player *target ) const;
         void BuildOutOfRangeUpdateBlock( UpdateData *data ) const;
         void BuildMovementUpdateBlock( UpdateData * data, uint32 flags = 0 ) const;
