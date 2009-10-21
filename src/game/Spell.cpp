@@ -3930,7 +3930,7 @@ SpellCastResult Spell::CheckCast(bool strict)
         if(m_spellInfo->TargetAuraStateNot && target->HasAuraState(AuraState(m_spellInfo->TargetAuraStateNot)))
             return SPELL_FAILED_TARGET_AURASTATE;
 
-        if (IsDeathOnlySpell(m_spellInfo) && target->isAlive())
+        if (!m_IsTriggeredSpell && IsDeathOnlySpell(m_spellInfo) && target->isAlive())
             return SPELL_FAILED_TARGET_NOT_DEAD;
 
         // Target aura req check if need
@@ -4124,8 +4124,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                (m_spellInfo->EffectImplicitTargetB[j] == TARGET_SCRIPT && m_spellInfo->EffectImplicitTargetA[j] != TARGET_SELF) ||
                m_spellInfo->EffectImplicitTargetA[j] == TARGET_SCRIPT_COORDINATES ||
                m_spellInfo->EffectImplicitTargetB[j] == TARGET_SCRIPT_COORDINATES ||
-               // Check possible in DB targets only for spells with no implicit spell focus
-               (m_spellInfo->EffectImplicitTargetA[j] == TARGET_FOCUS_OR_SCRIPTED_GAMEOBJECT && !m_spellInfo->RequiresSpellFocus))
+               m_spellInfo->EffectImplicitTargetA[j] == TARGET_FOCUS_OR_SCRIPTED_GAMEOBJECT)
             {
 
                 SpellScriptTargetBounds bounds = spellmgr.GetSpellScriptTargetBounds(m_spellInfo->Id);
@@ -4242,11 +4241,17 @@ SpellCastResult Spell::CheckCast(bool strict)
                 //Missing DB Entry or targets for this spellEffect.
                 else
                 {
-                    // not report target not existence for triggered spells
-                    if(m_triggeredByAuraSpell || m_IsTriggeredSpell)
-                        return SPELL_FAILED_DONT_REPORT;
-                    else
-                        return SPELL_FAILED_BAD_TARGETS;
+                    /* For TARGET_FOCUS_OR_SCRIPTED_GAMEOBJECT makes DB targets optional not required for now
+                     * TODO: Makes more research for this target type
+                     */
+                    if (m_spellInfo->EffectImplicitTargetA[j] != TARGET_FOCUS_OR_SCRIPTED_GAMEOBJECT)
+                    {
+                        // not report target not existence for triggered spells
+                        if(m_triggeredByAuraSpell || m_IsTriggeredSpell)
+                            return SPELL_FAILED_DONT_REPORT;
+                        else
+                            return SPELL_FAILED_BAD_TARGETS;
+                    }
                 }
             }
         }

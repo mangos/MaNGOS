@@ -21,6 +21,7 @@
 
 #include "MapManager.h"
 #include "DestinationHolder.h"
+#include "Unit.h"
 
 #include <cmath>
 

@@ -2205,31 +2205,6 @@ void SpellMgr::LoadSpellScriptTarget()
             continue;
         }
 
-        // More checks on TARGET_FOCUS_OR_SCRIPTED_GAMEOBJECT
-        bool ok = true;
-        for (int i = 0; i < 3; ++i)
-        {
-            if (spellProto->EffectImplicitTargetA[i] == TARGET_FOCUS_OR_SCRIPTED_GAMEOBJECT ||
-                spellProto->EffectImplicitTargetB[i] == TARGET_FOCUS_OR_SCRIPTED_GAMEOBJECT)
-            {
-                if (spellProto->RequiresSpellFocus)
-                {
-                    sLog.outErrorDb("Table `spell_script_target`: spellId %u for TargetEnty %u of type TARGET_FOCUS_OR_SCRIPTED_GAMEOBJECT is wrong because spell has implicit ReqSpellFocus %u.", spellId, targetEntry, spellProto->RequiresSpellFocus);
-                    ok = false;
-                    break;
-                }
-
-                if (type != SPELL_TARGET_TYPE_GAMEOBJECT)
-                {
-                    sLog.outErrorDb("Table `spell_script_target`: spellId %u has target type TARGET_FOCUS_OR_SCRIPTED_GAMEOBJECT but target in table is creature (must be gameobject).", spellId);
-                    ok = false;
-                    break;
-                }
-            }
-        }
-        if (!ok)
-            continue;
-
         // Checks by target type
         switch (type)
         {

@@ -1041,6 +1041,14 @@ void ObjectMgr::LoadCreatures()
             if(cInfo->HeroicEntry)
                 heroicCreatures.insert(cInfo->HeroicEntry);
 
+    // build single time for check spawnmask
+    std::map<uint32,uint32> spawnMasks;
+    for(uint32 i = 0; i < sMapStore.GetNumRows(); ++i)
+        if(sMapStore.LookupEntry(i))
+            for(int k = 0; k < MAX_DIFFICULTY; ++k)
+                if (GetMapDifficultyData(i,Difficulty(k)))
+                    spawnMasks[i] |= (1 << k);
+
     barGoLink bar(result->GetRowCount());
 
     do
@@ -1080,6 +1088,16 @@ void ObjectMgr::LoadCreatures()
         int16 gameEvent     = fields[18].GetInt16();
         int16 PoolId        = fields[19].GetInt16();
 
+        MapEntry const* mapEntry = sMapStore.LookupEntry(data.mapid);
+        if(!mapEntry)
+        {
+            sLog.outErrorDb("Table `creature` have creature (GUID: %u) that spawned at not existed map (Id: %u), skipped.",guid, data.mapid );
+            continue;
+        }
+
+        if (data.spawnMask & ~spawnMasks[data.mapid])
+            sLog.outErrorDb("Table `creature` have creature (GUID: %u) that have wrong spawn mask %u including not supported difficulty modes for map (Id: %u).",guid, data.spawnMask, data.mapid );
+
         if(heroicCreatures.find(data.id)!=heroicCreatures.end())
         {
             sLog.outErrorDb("Table `creature` have creature (GUID: %u) that listed as heroic template (entry: %u) in `creature_template`, skipped.",guid, data.id );
@@ -1103,8 +1121,7 @@ void ObjectMgr::LoadCreatures()
 
         if(cInfo->flags_extra & CREATURE_FLAG_EXTRA_INSTANCE_BIND)
         {
-            MapEntry const* map = sMapStore.LookupEntry(data.mapid);
-            if(!map || !map->IsDungeon())
+            if(!mapEntry || !mapEntry->IsDungeon())
                 sLog.outErrorDb("Table `creature` have creature (GUID: %u Entry: %u) with `creature_template`.`flags_extra` including CREATURE_FLAG_EXTRA_INSTANCE_BIND but creature are not in instance.",guid,data.id);
         }
 
@@ -1209,6 +1226,14 @@ void ObjectMgr::LoadGameobjects()
         return;
     }
 
+    // build single time for check spawnmask
+    std::map<uint32,uint32> spawnMasks;
+    for(uint32 i = 0; i < sMapStore.GetNumRows(); ++i)
+        if(sMapStore.LookupEntry(i))
+            for(int k = 0; k < MAX_DIFFICULTY; ++k)
+                if (GetMapDifficultyData(i,Difficulty(k)))
+                    spawnMasks[i] |= (1 << k);
+
     barGoLink bar(result->GetRowCount());
 
     do
@@ -1258,6 +1283,16 @@ void ObjectMgr::LoadGameobjects()
         data.rotation2      = fields[ 9].GetFloat();
         data.rotation3      = fields[10].GetFloat();
         data.spawntimesecs  = fields[11].GetInt32();
+
+        MapEntry const* mapEntry = sMapStore.LookupEntry(data.mapid);
+        if(!mapEntry)
+        {
+            sLog.outErrorDb("Table `gameobject` have gameobject (GUID: %u Entry: %u) that spawned at not existed map (Id: %u), skip", guid, data.id, data.mapid);
+            continue;
+        }
+
+        if (data.spawnMask & ~spawnMasks[data.mapid])
+            sLog.outErrorDb("Table `gameobject` have gameobject (GUID: %u Entry: %u) that have wrong spawn mask %u including not supported difficulty modes for map (Id: %u), skip", guid, data.id, data.spawnMask, data.mapid);
 
         if (data.spawntimesecs == 0 && gInfo->IsDespawnAtAction())
         {

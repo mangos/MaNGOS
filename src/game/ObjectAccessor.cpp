@@ -331,31 +331,6 @@ ObjectAccessor::ConvertCorpseForPlayer(uint64 player_guid, bool insignia)
     return bones;
 }
 
-void
-ObjectAccessor::Update(uint32 diff)
-{
-    UpdateDataMapType update_players;
-    {
-        Guard guard(i_updateGuard);
-        while(!i_objects.empty())
-        {
-            Object* obj = *i_objects.begin();
-            i_objects.erase(i_objects.begin());
-            if (!obj)
-                continue;
-            obj->BuildUpdateData(update_players);
-        }
-    }
-
-    WorldPacket packet;                                     // here we allocate a std::vector with a size of 0x10000
-    for(UpdateDataMapType::iterator iter = update_players.begin(); iter != update_players.end(); ++iter)
-    {
-        iter->second.BuildPacket(&packet);
-        iter->first->GetSession()->SendPacket(&packet);
-        packet.clear();                                     // clean the string
-    }
-}
-
 /// Define the static member of HashMapHolder
 
 template <class T> UNORDERED_MAP< uint64, T* > HashMapHolder<T>::m_objectMap;
