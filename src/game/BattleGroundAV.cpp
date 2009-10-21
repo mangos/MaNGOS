@@ -336,7 +336,7 @@ void BattleGroundAV::EndBattleGround(uint32 winner)
     // now we have the values give the honor/reputation to the teams:
     uint32 team[BG_TEAMS_COUNT]      = { ALLIANCE, HORDE };
     uint32 faction[BG_TEAMS_COUNT]   = { BG_AV_FACTION_A, BG_AV_FACTION_H };
-    for(uint32 i = 0; i < BG_TEAMS_COUNT; i++)
+    for (uint32 i = 0; i < BG_TEAMS_COUNT; i++)
     {
         if (tower_survived[i])
         {
@@ -800,6 +800,7 @@ void BattleGroundAV::Reset()
     m_RepOwnedGrave       = (isBGWeekend) ? BG_AV_REP_OWNED_GRAVE_HOLIDAY   : BG_AV_REP_OWNED_GRAVE;
     m_RepSurviveCaptain   = (isBGWeekend) ? BG_AV_REP_SURVIVING_CAPTAIN_HOLIDAY : BG_AV_REP_SURVIVING_CAPTAIN;
     m_RepSurviveTower     = (isBGWeekend) ? BG_AV_REP_SURVIVING_TOWER_HOLIDAY : BG_AV_REP_SURVIVING_TOWER;
+    m_RepOwnedMine        = (isBGWeekend) ? BG_AV_REP_OWNED_MINE_HOLIDAY    : BG_AV_REP_OWNED_MINE;
 
     for(uint8 i = 0; i < BG_TEAMS_COUNT; i++)
     {
