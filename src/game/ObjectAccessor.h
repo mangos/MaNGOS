@@ -90,46 +90,25 @@ class MANGOS_DLL_DECL ObjectAccessor : public MaNGOS::Singleton<ObjectAccessor, 
     public:
         typedef UNORDERED_MAP<uint64, Corpse* >      Player2CorpsesMapType;
 
-        template<class T> static T* GetObjectInWorld(uint64 guid, T* /*fake*/)
-        {
-            return HashMapHolder<T>::Find(guid);
-        }
+        // global
+        static Player* GetObjectInWorld(uint64 guid, Player* /*fake*/) { return HashMapHolder<Player>::Find(guid); }
+        static Corpse* GetObjectInWorld(uint64 guid, Corpse* /*fake*/) { return HashMapHolder<Corpse>::Find(guid); }
+        static Unit*   GetObjectInWorld(uint64 guid, Unit*   /*fake*/);
 
-        template<class T> static T* GetObjectInWorld(uint32 mapid, float x, float y, uint64 guid, T* /*fake*/)
-        {
-            T* obj = GetObjectInWorld(guid, (T*)NULL);
-            if(!obj || obj->GetMapId() != mapid) return NULL;
-
-            CellPair p = MaNGOS::ComputeCellPair(x,y);
-            if(p.x_coord >= TOTAL_NUMBER_OF_CELLS_PER_MAP || p.y_coord >= TOTAL_NUMBER_OF_CELLS_PER_MAP )
-            {
-                sLog.outError("ObjectAccessor::GetObjectInWorld: invalid coordinates supplied X:%f Y:%f grid cell [%u:%u]", x, y, p.x_coord, p.y_coord);
-                return NULL;
-            }
-
-            CellPair q = MaNGOS::ComputeCellPair(obj->GetPositionX(),obj->GetPositionY());
-            if(q.x_coord >= TOTAL_NUMBER_OF_CELLS_PER_MAP || q.y_coord >= TOTAL_NUMBER_OF_CELLS_PER_MAP )
-            {
-                sLog.outError("ObjectAccessor::GetObjecInWorld: object (GUID: %u TypeId: %u) has invalid coordinates X:%f Y:%f grid cell [%u:%u]", obj->GetGUIDLow(), obj->GetTypeId(), obj->GetPositionX(), obj->GetPositionY(), q.x_coord, q.y_coord);
-                return NULL;
-            }
-
-            int32 dx = int32(p.x_coord) - int32(q.x_coord);
-            int32 dy = int32(p.y_coord) - int32(q.y_coord);
-
-            if (dx > -2 && dx < 2 && dy > -2 && dy < 2) return obj;
-            else return NULL;
-        }
+        // map local object with global search
+        static Creature*   GetObjectInWorld(uint64 guid, Creature*   /*fake*/) { return FindHelper<Creature>(guid); }
+        static GameObject* GetObjectInWorld(uint64 guid, GameObject* /*fake*/) { return FindHelper<GameObject>(guid); }
+        static Pet*        GetObjectInWorld(uint64 guid, Pet*        /*fake*/) { return FindHelper<Pet>(guid); }
+        static Vehicle*    GetObjectInWorld(uint64 guid, Vehicle*    /*fake*/) { return FindHelper<Vehicle>(guid); }
 
         static WorldObject* GetWorldObject(WorldObject const &, uint64);
         static Object*   GetObjectByTypeMask(WorldObject const &, uint64, uint32 typemask);
         static Creature* GetCreatureOrPetOrVehicle(WorldObject const &, uint64);
         static Unit* GetUnit(WorldObject const &, uint64);
-        static Pet* GetPet(Unit const &, uint64 guid) { return GetPet(guid); }
         static Player* GetPlayer(Unit const &, uint64 guid) { return FindPlayer(guid); }
         static Corpse* GetCorpse(WorldObject const &u, uint64 guid);
-        static Pet* GetPet(uint64 guid);
-        static Vehicle* GetVehicle(uint64 guid);
+        static Pet* GetPet(uint64 guid) { return GetObjectInWorld(guid, (Pet*)NULL); }
+        static Vehicle* GetVehicle(uint64 guid) { return GetObjectInWorld(guid, (Vehicle*)NULL); }
         static Player* FindPlayer(uint64);
 
         Player* FindPlayerByName(const char *name) ;
@@ -139,20 +118,11 @@ class MANGOS_DLL_DECL ObjectAccessor : public MaNGOS::Singleton<ObjectAccessor, 
             return HashMapHolder<Player>::GetContainer();
         }
 
-        template<class T> void AddObject(T *object)
-        {
-            HashMapHolder<T>::Insert(object);
-        }
-
-        template<class T> void RemoveObject(T *object)
-        {
-            HashMapHolder<T>::Remove(object);
-        }
-
-        void RemoveObject(Player *pl)
-        {
-            HashMapHolder<Player>::Remove(pl);
-        }
+        // For call from Player/Corpse AddToWorld/RemoveFromWorld only
+        void AddObject(Corpse *object) { HashMapHolder<Corpse>::Insert(object); }
+        void AddObject(Player *object) { HashMapHolder<Player>::Insert(object); }
+        void RemoveObject(Corpse *object) { HashMapHolder<Corpse>::Remove(object); }
+        void RemoveObject(Player *object) { HashMapHolder<Player>::Remove(object); }
 
         void SaveAllPlayers();
 
@@ -193,33 +163,7 @@ class MANGOS_DLL_DECL ObjectAccessor : public MaNGOS::Singleton<ObjectAccessor, 
         LockType i_corpseGuard;
 };
 
-/// Out of class template specializations
-template <> inline Creature* ObjectAccessor::GetObjectInWorld(uint64 guid, Creature* /*fake*/)
-{
-    return FindHelper<Creature>(guid);
-}
-
-template <> inline GameObject* ObjectAccessor::GetObjectInWorld(uint64 guid, GameObject* /*fake*/)
-{
-    return FindHelper<GameObject>(guid);
-}
-
-template <> inline DynamicObject* ObjectAccessor::GetObjectInWorld(uint64 guid, DynamicObject* /*fake*/)
-{
-    return FindHelper<DynamicObject>(guid);
-}
-
-template <> inline Pet* ObjectAccessor::GetObjectInWorld(uint64 guid, Pet* /*fake*/)
-{
-    return FindHelper<Pet>(guid);
-}
-
-template <> inline Vehicle* ObjectAccessor::GetObjectInWorld(uint64 guid, Vehicle* /*fake*/)
-{
-    return FindHelper<Vehicle>(guid);
-}
-
-template <> inline Unit* ObjectAccessor::GetObjectInWorld(uint64 guid, Unit* /*fake*/)
+inline Unit* ObjectAccessor::GetObjectInWorld(uint64 guid, Unit* /*fake*/)
 {
     if(!guid)
         return NULL;
@@ -234,9 +178,9 @@ template <> inline Unit* ObjectAccessor::GetObjectInWorld(uint64 guid, Unit* /*f
     }
 
     if (IS_PET_GUID(guid))
-        return (Unit*)GetObjectInWorld<Pet>(guid, (Pet*)NULL);
+        return GetObjectInWorld(guid, (Pet*)NULL);
 
-    return (Unit*)GetObjectInWorld<Creature>(guid, (Creature*)NULL);
+    return GetObjectInWorld(guid, (Creature*)NULL);
 }
 
 #endif
