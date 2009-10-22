@@ -107,6 +107,7 @@ template<> void addUnitState(Creature *obj, CellPair const& cell_pair)
 template<class T> bool alreadyLoaded(Map* /*map*/, uint32 /*guid*/, T* /*fake*/)
 {
     // Non creature objects not walk by grids
+    return false;
 }
 
 template<> bool alreadyLoaded(Map* map, uint32 guid, Creature* fake)
