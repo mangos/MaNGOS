@@ -38,7 +38,6 @@
 class Creature;
 class Unit;
 class GameObject;
-class Vehicle;
 class WorldObject;
 class Map;
 
@@ -98,16 +97,14 @@ class MANGOS_DLL_DECL ObjectAccessor : public MaNGOS::Singleton<ObjectAccessor, 
         static Creature*   GetObjectInWorld(uint64 guid, Creature*   /*fake*/) { return FindHelper<Creature>(guid); }
         static GameObject* GetObjectInWorld(uint64 guid, GameObject* /*fake*/) { return FindHelper<GameObject>(guid); }
         static Pet*        GetObjectInWorld(uint64 guid, Pet*        /*fake*/) { return FindHelper<Pet>(guid); }
-        static Vehicle*    GetObjectInWorld(uint64 guid, Vehicle*    /*fake*/) { return FindHelper<Vehicle>(guid); }
+        static Vehicle*    GetObjectInWorld(uint64 guid, Vehicle*    /*fake*/); // no implementation, link error trap until creature move to Map
 
         static WorldObject* GetWorldObject(WorldObject const &, uint64);
         static Object*   GetObjectByTypeMask(WorldObject const &, uint64, uint32 typemask);
-        static Creature* GetCreatureOrPetOrVehicle(WorldObject const &, uint64);
         static Unit* GetUnit(WorldObject const &, uint64);
         static Player* GetPlayer(Unit const &, uint64 guid) { return FindPlayer(guid); }
         static Corpse* GetCorpse(WorldObject const &u, uint64 guid);
         static Pet* GetPet(uint64 guid) { return GetObjectInWorld(guid, (Pet*)NULL); }
-        static Vehicle* GetVehicle(uint64 guid) { return GetObjectInWorld(guid, (Vehicle*)NULL); }
         static Player* FindPlayer(uint64);
 
         Player* FindPlayerByName(const char *name) ;

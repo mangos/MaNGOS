@@ -203,7 +203,7 @@ Map::Map(uint32 id, time_t expiry, uint32 InstanceId, uint8 SpawnMode, Map* _par
   m_activeNonPlayersIter(m_activeNonPlayers.end()),
   i_gridExpiry(expiry), m_parentMap(_parent ? _parent : this),
   m_VisibleDistance(DEFAULT_VISIBILITY_DISTANCE),
-  m_hiDynObjectGuid(1)
+  m_hiDynObjectGuid(1), m_hiVehicleGuid(1)
 {
     for(unsigned int idx=0; idx < MAX_NUMBER_OF_GRIDS; ++idx)
     {
@@ -3425,12 +3425,18 @@ Pet* Map::GetPet(uint64 guid)
     return m_objectsStore.find<Pet>(guid, (Pet*)NULL);
 }
 
-Unit* Map::GetCreatureOrPet(uint64 guid)
+Creature* Map::GetCreatureOrPetOrVehicle(uint64 guid)
 {
-    if (Unit* ret = GetCreature(guid))
-        return ret;
+    if (IS_PLAYER_GUID(guid))
+        return NULL;
 
-    return GetPet(guid);
+    if (IS_PET_GUID(guid))
+        return GetPet(guid);
+
+    if (IS_VEHICLE_GUID(guid))
+        return GetVehicle(guid);
+
+    return GetCreature(guid);
 }
 
 GameObject* Map::GetGameObject(uint64 guid)
@@ -3477,6 +3483,13 @@ uint32 Map::GenerateLocalLowGuid(HighGuid guidhigh)
                 World::StopNow(ERROR_EXIT_CODE);
             }
             return m_hiDynObjectGuid++;
+        case HIGHGUID_VEHICLE:
+            if(m_hiVehicleGuid>=0x00FFFFFF)
+            {
+                sLog.outError("Vehicle guid overflow!! Can't continue, shutting down server. ");
+                World::StopNow(ERROR_EXIT_CODE);
+            }
+            return m_hiVehicleGuid++;
         default:
             ASSERT(0);
     }

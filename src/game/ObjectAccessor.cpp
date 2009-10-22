@@ -50,21 +50,6 @@ ObjectAccessor::~ObjectAccessor()
         delete itr->second;
 }
 
-Creature*
-ObjectAccessor::GetCreatureOrPetOrVehicle(WorldObject const &u, uint64 guid)
-{
-    if(IS_PLAYER_GUID(guid) || !u.IsInWorld())
-        return NULL;
-
-    if(IS_PET_GUID(guid))
-        return u.GetMap()->GetPet(guid);
-
-    if(IS_VEHICLE_GUID(guid))
-        return u.GetMap()->GetVehicle(guid);
-
-    return u.GetMap()->GetCreature(guid);
-}
-
 Unit*
 ObjectAccessor::GetUnit(WorldObject const &u, uint64 guid)
 {
@@ -74,7 +59,10 @@ ObjectAccessor::GetUnit(WorldObject const &u, uint64 guid)
     if(IS_PLAYER_GUID(guid))
         return FindPlayer(guid);
 
-    return GetCreatureOrPetOrVehicle(u, guid);
+    if (!u.IsInWorld())
+        return NULL;
+
+    return u.GetMap()->GetCreatureOrPetOrVehicle(guid);
 }
 
 Corpse*

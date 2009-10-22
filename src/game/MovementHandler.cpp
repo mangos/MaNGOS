@@ -505,7 +505,7 @@ void WorldSession::HandleDismissControlledVehicle(WorldPacket &recv_data)
     _player->m_movementInfo = mi;
 
     // using charm guid, because we don't have vehicle guid...
-    if(Vehicle *vehicle = ObjectAccessor::GetVehicle(vehicleGUID))
+    if(Vehicle *vehicle = _player->GetMap()->GetVehicle(vehicleGUID))
     {
         // Aura::HandleAuraControlVehicle will call Player::ExitVehicle
         vehicle->RemoveSpellsCausingAura(SPELL_AURA_CONTROL_VEHICLE);
