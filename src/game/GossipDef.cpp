@@ -532,8 +532,8 @@ void PlayerMenu::SendQuestQueryResponse( Quest const *pQuest )
     Details = pQuest->GetDetails();
     Objectives = pQuest->GetObjectives();
     EndText = pQuest->GetEndText();
-    for (int i=0;i<QUEST_OBJECTIVES_COUNT;++i)
-        ObjectiveText[i]=pQuest->ObjectiveText[i];
+    for (int i = 0; i < QUEST_OBJECTIVES_COUNT; ++i)
+        ObjectiveText[i] = pQuest->ObjectiveText[i];
 
     int loc_idx = pSession->GetSessionDbLocaleIndex();
     if (loc_idx >= 0)
@@ -550,9 +550,9 @@ void PlayerMenu::SendQuestQueryResponse( Quest const *pQuest )
             if (ql->EndText.size() > loc_idx && !ql->EndText[loc_idx].empty())
                 EndText=ql->EndText[loc_idx];
 
-            for (int i=0;i<QUEST_OBJECTIVES_COUNT;++i)
+            for (int i = 0;i < QUEST_OBJECTIVES_COUNT; ++i)
                 if (ql->ObjectiveText[i].size() > loc_idx && !ql->ObjectiveText[i][loc_idx].empty())
-                    ObjectiveText[i]=ql->ObjectiveText[i][loc_idx];
+                    ObjectiveText[i] = ql->ObjectiveText[i][loc_idx];
         }
     }
 
@@ -654,16 +654,11 @@ void PlayerMenu::SendQuestQueryResponse( Quest const *pQuest )
         data << uint32(pQuest->ReqSourceId[iI]);
     }
 
-    for (iI = 0; iI < QUEST_OBJECTIVES_COUNT; ++iI)
+    for (iI = 0; iI < QUEST_ITEM_OBJECTIVES_COUNT; ++iI)
     {
         data << uint32(pQuest->ReqItemId[iI]);
         data << uint32(pQuest->ReqItemCount[iI]);
     }
-
-    data << uint32(0);                                      // TODO: 5 item objective
-    data << uint32(0);
-    data << uint32(0);                                      // TODO: 6 item objective
-    data << uint32(0);
 
     for (iI = 0; iI < QUEST_OBJECTIVES_COUNT; ++iI)
         data << ObjectiveText[iI];
@@ -824,9 +819,10 @@ void PlayerMenu::SendQuestGiverRequestItems( Quest const *pQuest, uint64 npcGUID
 
     data << uint32( pQuest->GetReqItemsCount() );
     ItemPrototype const *pItem;
-    for (int i = 0; i < QUEST_OBJECTIVES_COUNT; ++i)
+    for (int i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; ++i)
     {
-        if ( !pQuest->ReqItemId[i] ) continue;
+        if ( !pQuest->ReqItemId[i] )
+            continue;
         pItem = objmgr.GetItemPrototype(pQuest->ReqItemId[i]);
         data << uint32(pQuest->ReqItemId[i]);
         data << uint32(pQuest->ReqItemCount[i]);
