@@ -104,6 +104,16 @@ template<> void addUnitState(Creature *obj, CellPair const& cell_pair)
     obj->SetCurrentCell(cell);
 }
 
+template<class T> bool alreadyLoaded(Map* /*map*/, uint32 /*guid*/, T* /*fake*/)
+{
+    // Non creature objects not walk by grids
+}
+
+template<> bool alreadyLoaded(Map* map, uint32 guid, Creature* fake)
+{
+    return map->GetObjectsStore().find<Creature>(guid,fake);
+}
+
 template <class T>
 void LoadHelper(CellGuidSet const& guid_set, CellPair &cell, GridRefManager<T> &m, uint32 &count, Map* map)
 {
@@ -111,8 +121,16 @@ void LoadHelper(CellGuidSet const& guid_set, CellPair &cell, GridRefManager<T> &
 
     for(CellGuidSet::const_iterator i_guid = guid_set.begin(); i_guid != guid_set.end(); ++i_guid)
     {
-        T* obj = new T;
         uint32 guid = *i_guid;
+
+        // Note: this will fully correct work only at non-instanced maps,
+        // at instanced maps will use dynamic selected guid
+        // and then duplicate just will not detected and will be 2 creature with identical DB guid
+        // with some chance
+        if (alreadyLoaded(map,guid,(T*)NULL))
+            continue;                                       // still loaded in another grid (move from respawn [this] grid  early), we not need second copy
+
+        T* obj = new T;
         //sLog.outString("DEBUG: LoadHelper from table: %s for (guid: %u) Loading",table,guid);
         if(!obj->LoadFromDB(guid, map))
         {
