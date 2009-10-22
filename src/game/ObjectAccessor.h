@@ -30,15 +30,14 @@
 #include "GridDefines.h"
 #include "Object.h"
 #include "Player.h"
+#include "Corpse.h"
 
 #include <set>
 #include <list>
 
 class Creature;
-class Corpse;
 class Unit;
 class GameObject;
-class DynamicObject;
 class Vehicle;
 class WorldObject;
 class Map;
