@@ -4509,6 +4509,17 @@ void Aura::HandlePeriodicDamage(bool apply, bool Real)
                 }
                 break;
             }
+            case SPELLFAMILY_WARLOCK:
+            {
+                // Drain Soul
+                if (m_spellProto->SpellFamilyFlags & UI64LIT(0x0000000000004000))
+                {
+                    if (m_target->GetHealth() * 100 / m_target->GetMaxHealth() <= 25)
+                       m_modifier.m_amount *= 4;
+                    return;
+                }
+                break;
+            }
             case SPELLFAMILY_DRUID:
             {
                 // Rake
