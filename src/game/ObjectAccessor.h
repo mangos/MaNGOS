@@ -88,45 +88,42 @@ class MANGOS_DLL_DECL ObjectAccessor : public MaNGOS::Singleton<ObjectAccessor, 
     public:
         typedef UNORDERED_MAP<uint64, Corpse* >      Player2CorpsesMapType;
 
-        // global
-        static Player* GetObjectInWorld(uint64 guid, Player* /*fake*/) { return HashMapHolder<Player>::Find(guid); }
-        static Corpse* GetObjectInWorld(uint64 guid, Corpse* /*fake*/) { return HashMapHolder<Corpse>::Find(guid); }
-        static Unit*   GetObjectInWorld(uint64 guid, Unit*   /*fake*/);
+        // global (obj used for map only location local guid objects (pets currently)
+        static Unit*   GetUnitInWorld(WorldObject const& obj, uint64 guid);
 
-        // map local object with global search
-        static Creature*   GetObjectInWorld(uint64 guid, Creature*   /*fake*/) { return FindHelper<Creature>(guid); }
-        static GameObject* GetObjectInWorld(uint64 guid, GameObject* /*fake*/) { return FindHelper<GameObject>(guid); }
-        static Pet*        GetObjectInWorld(uint64 guid, Pet*        /*fake*/) { return FindHelper<Pet>(guid); }
-        static Vehicle*    GetObjectInWorld(uint64 guid, Vehicle*    /*fake*/); // no implementation, link error trap until creature move to Map
+        // FIXME: map local object with global search
+        static Creature*   GetCreatureInWorld(uint64 guid)   { return FindHelper<Creature>(guid); }
+        static GameObject* GetGameObjectInWorld(uint64 guid) { return FindHelper<GameObject>(guid); }
 
-        static WorldObject* GetWorldObject(WorldObject const &, uint64);
-        static Object*   GetObjectByTypeMask(WorldObject const &, uint64, uint32 typemask);
+        // possible local search for specific object map
+        static Object* GetObjectByTypeMask(WorldObject const &, uint64, uint32 typemask);
         static Unit* GetUnit(WorldObject const &, uint64);
-        static Player* GetPlayer(Unit const &, uint64 guid) { return FindPlayer(guid); }
-        static Corpse* GetCorpse(WorldObject const &u, uint64 guid);
-        static Pet* GetPet(uint64 guid) { return GetObjectInWorld(guid, (Pet*)NULL); }
-        static Player* FindPlayer(uint64);
 
-        Player* FindPlayerByName(const char *name) ;
+        // Player access
+        static Player* FindPlayer(uint64 guid);
+        static Player* FindPlayerByName(const char *name);
+        static void KickPlayer(uint64 guid);
 
         HashMapHolder<Player>::MapType& GetPlayers()
         {
             return HashMapHolder<Player>::GetContainer();
         }
 
+        void SaveAllPlayers();
+
+        // Corpse access
+        Corpse* GetCorpseForPlayerGUID(uint64 guid);
+        static Corpse* GetCorpseInMap(uint64 guid, uint32 mapid);
+        void RemoveCorpse(Corpse *corpse);
+        void AddCorpse(Corpse* corpse);
+        void AddCorpsesToGrid(GridPair const& gridpair,GridType& grid,Map* map);
+        Corpse* ConvertCorpseForPlayer(uint64 player_guid, bool insignia = false);
+
         // For call from Player/Corpse AddToWorld/RemoveFromWorld only
         void AddObject(Corpse *object) { HashMapHolder<Corpse>::Insert(object); }
         void AddObject(Player *object) { HashMapHolder<Player>::Insert(object); }
         void RemoveObject(Corpse *object) { HashMapHolder<Corpse>::Remove(object); }
         void RemoveObject(Player *object) { HashMapHolder<Player>::Remove(object); }
-
-        void SaveAllPlayers();
-
-        Corpse* GetCorpseForPlayerGUID(uint64 guid);
-        void RemoveCorpse(Corpse *corpse);
-        void AddCorpse(Corpse* corpse);
-        void AddCorpsesToGrid(GridPair const& gridpair,GridType& grid,Map* map);
-        Corpse* ConvertCorpseForPlayer(uint64 player_guid, bool insignia = false);
 
         // TODO: This methods will need lock in MT environment
         static void LinkMap(Map* map)   { i_mapList.push_back(map); }
@@ -159,24 +156,18 @@ class MANGOS_DLL_DECL ObjectAccessor : public MaNGOS::Singleton<ObjectAccessor, 
         LockType i_corpseGuard;
 };
 
-inline Unit* ObjectAccessor::GetObjectInWorld(uint64 guid, Unit* /*fake*/)
+inline Unit* ObjectAccessor::GetUnitInWorld(WorldObject const& obj, uint64 guid)
 {
     if(!guid)
         return NULL;
 
     if (IS_PLAYER_GUID(guid))
-    {
-        Unit * u = (Unit*)HashMapHolder<Player>::Find(guid);
-        if(!u || !u->IsInWorld())
-            return NULL;
-
-        return u;
-    }
+        return FindPlayer(guid);
 
     if (IS_PET_GUID(guid))
-        return GetObjectInWorld(guid, (Pet*)NULL);
+        return obj.IsInWorld() ? obj.GetMap()->GetPet(guid) : NULL;
 
-    return GetObjectInWorld(guid, (Creature*)NULL);
+    return GetCreatureInWorld(guid);
 }
 
 #endif

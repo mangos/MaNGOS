@@ -65,36 +65,15 @@ ObjectAccessor::GetUnit(WorldObject const &u, uint64 guid)
     return u.GetMap()->GetCreatureOrPetOrVehicle(guid);
 }
 
-Corpse*
-ObjectAccessor::GetCorpse(WorldObject const &u, uint64 guid)
+Corpse* ObjectAccessor::GetCorpseInMap( uint64 guid, uint32 mapid )
 {
-    Corpse * ret = GetObjectInWorld(guid, (Corpse*)NULL);
+    Corpse * ret = HashMapHolder<Corpse>::Find(guid);
     if(!ret)
         return NULL;
-    if(ret->GetMapId() != u.GetMapId())
+    if(ret->GetMapId() != mapid)
         return NULL;
-    if(ret->GetInstanceId() != u.GetInstanceId())
-        return NULL;
+
     return ret;
-}
-
-WorldObject* ObjectAccessor::GetWorldObject(WorldObject const &p, uint64 guid)
-{
-    switch(GUID_HIPART(guid))
-    {
-        case HIGHGUID_PLAYER:       return FindPlayer(guid);
-        case HIGHGUID_GAMEOBJECT:   return p.GetMap()->GetGameObject(guid);
-        case HIGHGUID_UNIT:         return p.GetMap()->GetCreature(guid);
-        case HIGHGUID_PET:          return p.GetMap()->GetPet(guid);
-        case HIGHGUID_VEHICLE:      return p.GetMap()->GetVehicle(guid);
-        case HIGHGUID_DYNAMICOBJECT:return p.GetMap()->GetDynamicObject(guid);
-        case HIGHGUID_TRANSPORT:    return NULL;
-        case HIGHGUID_CORPSE:       return GetCorpse(p,guid);
-        case HIGHGUID_MO_TRANSPORT: return NULL;
-        default: break;
-    }
-
-    return NULL;
 }
 
 Object* ObjectAccessor::GetObjectByTypeMask(WorldObject const &p, uint64 guid, uint32 typemask)
@@ -141,7 +120,7 @@ Object* ObjectAccessor::GetObjectByTypeMask(WorldObject const &p, uint64 guid, u
 Player*
 ObjectAccessor::FindPlayer(uint64 guid)
 {
-    Player * plr = GetObjectInWorld(guid, (Player*)NULL);
+    Player * plr = HashMapHolder<Player>::Find(guid);;
     if(!plr || !plr->IsInWorld())
         return NULL;
 
@@ -168,6 +147,16 @@ ObjectAccessor::SaveAllPlayers()
     HashMapHolder<Player>::MapType::iterator itr = m.begin();
     for(; itr != m.end(); ++itr)
         itr->second->SaveToDB();
+}
+
+void ObjectAccessor::KickPlayer(uint64 guid)
+{
+    if (Player* p = HashMapHolder<Player>::Find(guid))
+    {
+        WorldSession* s = p->GetSession();
+        s->KickPlayer();                            // mark session to remove at next session list update
+        s->LogoutPlayer(false);                     // logout player without waiting next session list update
+    }
 }
 
 Corpse*

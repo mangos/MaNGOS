@@ -129,7 +129,6 @@ ObjectMgr::ObjectMgr()
 {
     m_hiCharGuid        = 1;
     m_hiCreatureGuid    = 1;
-    m_hiPetGuid         = 1;
     m_hiItemGuid        = 1;
     m_hiGoGuid          = 1;
     m_hiCorpseGuid      = 1;
@@ -5677,13 +5676,6 @@ uint32 ObjectMgr::GenerateLowGuid(HighGuid guidhigh)
                 World::StopNow(ERROR_EXIT_CODE);
             }
             return m_hiCreatureGuid++;
-        case HIGHGUID_PET:
-            if(m_hiPetGuid>=0x00FFFFFE)
-            {
-                sLog.outError("Pet guid overflow!! Can't continue, shutting down server. ");
-                World::StopNow(ERROR_EXIT_CODE);
-            }
-            return m_hiPetGuid++;
         case HIGHGUID_PLAYER:
             if(m_hiCharGuid>=0xFFFFFFFE)
             {

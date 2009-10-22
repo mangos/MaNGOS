@@ -433,6 +433,8 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         Creature* GetCreatureOrPetOrVehicle(uint64 guid);
         GameObject* GetGameObject(uint64 guid);
         DynamicObject* GetDynamicObject(uint64 guid);
+        Corpse* GetCorpse(uint64 guid);
+        WorldObject* GetWorldObject(uint64 guid);
 
         TypeUnorderedMapContainer<AllMapStoredObjectTypes>& GetObjectsStore() { return m_objectsStore; }
 
@@ -532,6 +534,7 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
 
         // Map local low guid counters
         uint32 m_hiDynObjectGuid;
+        uint32 m_hiPetGuid;
         uint32 m_hiVehicleGuid;
 
         // Type specific code for add/remove to/from grid
