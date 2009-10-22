@@ -202,7 +202,8 @@ Map::Map(uint32 id, time_t expiry, uint32 InstanceId, uint8 SpawnMode, Map* _par
   i_id(id), i_InstanceId(InstanceId), m_unloadTimer(0),
   m_activeNonPlayersIter(m_activeNonPlayers.end()),
   i_gridExpiry(expiry), m_parentMap(_parent ? _parent : this),
-  m_VisibleDistance(DEFAULT_VISIBILITY_DISTANCE)
+  m_VisibleDistance(DEFAULT_VISIBILITY_DISTANCE),
+  m_hiDynObjectGuid(1)
 {
     for(unsigned int idx=0; idx < MAX_NUMBER_OF_GRIDS; ++idx)
     {
@@ -3463,3 +3464,24 @@ void Map::SendObjectUpdates()
         packet.clear();                                     // clean the string
     }
 }
+
+uint32 Map::GenerateLocalLowGuid(HighGuid guidhigh)
+{
+    // TODO: for map local guid counters possible force reload map instead shutdown server at guid counter overflow
+    switch(guidhigh)
+    {
+        case HIGHGUID_DYNAMICOBJECT:
+            if (m_hiDynObjectGuid >= 0xFFFFFFFE)
+            {
+                sLog.outError("DynamicObject guid overflow!! Can't continue, shutting down server. ");
+                World::StopNow(ERROR_EXIT_CODE);
+            }
+            return m_hiDynObjectGuid++;
+        default:
+            ASSERT(0);
+    }
+
+    ASSERT(0);
+    return 0;
+}
+

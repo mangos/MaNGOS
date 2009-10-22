@@ -444,6 +444,9 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         {
             i_objectsToClientUpdate.erase( obj );
         }
+
+        // DynObjects currently
+        uint32 GenerateLocalLowGuid(HighGuid guidhigh);
     private:
         void LoadMapAndVMap(int gx, int gy);
         void LoadVMap(int gx, int gy);
@@ -525,6 +528,8 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
 
         std::set<WorldObject *> i_objectsToRemove;
         std::multimap<time_t, ScriptAction> m_scriptSchedule;
+
+        uint32 m_hiDynObjectGuid;                           // Map local dynobject low guid counter
 
         // Type specific code for add/remove to/from grid
         template<class T>
