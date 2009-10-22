@@ -345,6 +345,7 @@ INSERT INTO spell_check (spellid,SpellFamilyName,SpellFamilyMaskA,SpellFamilyMas
 /*id   fm familyMaskA        fmMaskB    icon vis  cat  eff aur ef name                                  code                   */
 (    0, 3,0x0000000020000000,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Arcane Blast',                       'Spell::EffectSchoolDMG'),
 (    0, 9,0x0000000000000800,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Arcane Shot',                        'Spell::EffectSchoolDMG'),
+(    0, 5,0x0000000000004000,0x00000000,  -1,  -1,  -1, -1, -1,-1,'Drain Soul',                         'Aura::HandlePeriodicDamage'),
 (    0,10,0x0000000000004000,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Avenger\'s Shield',                  'Spell::EffectSchoolDMG'),
 (    0, 4,0x0000040000000000,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Bloodthirst',                        'Spell::EffectSchoolDMG'),
 (0,     4,0x0000000000000001,0x00000000,  -1, 867,  -1,  3, -1,-1,'Charge',                             'Spell::EffectDummy'),

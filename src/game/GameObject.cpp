@@ -79,7 +79,7 @@ void GameObject::RemoveFromWorld()
         // Remove GO from owner
         if(uint64 owner_guid = GetOwnerGUID())
         {
-            if (Unit* owner = IS_PLAYER_GUID(owner_guid) ? ObjectAccessor::FindPlayer(owner_guid) : GetMap()->GetCreatureOrPet(owner_guid))
+            if (Unit* owner = ObjectAccessor::GetUnit(*this,owner_guid))
                 owner->RemoveGameObject(this,false);
             else
             {

@@ -1093,6 +1093,10 @@ void LoadLootTemplates_Creature()
     for(LootIdSet::const_iterator itr = ids_setUsed.begin(); itr != ids_setUsed.end(); ++itr)
         ids_set.erase(*itr);
 
+    // for alterac valley we've defined Player-loot inside creature_loot_template id=0
+    // this hack is used, so that we won't need to create an extra table player_loot_template for just one case
+    ids_set.erase(0);
+
     // output error for any still listed (not referenced from appropriate table) ids
     LootTemplates_Creature.ReportUnusedIds(ids_set);
 }
