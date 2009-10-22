@@ -5960,8 +5960,11 @@ bool ChatHandler::HandleInstanceUnbindCommand(const char* args)
     uint32 mapid = 0;
     bool got_map = false;
 
-    if (args != "all")
+    if (strncmp(args,"all",strlen(args)) != 0)
     {
+        if(!isNumeric(args[0]))
+            return false;
+
         got_map = true;
         mapid = atoi(args);
     }
