@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_8693_01_mangos_spell_proc_event` bit(1) default NULL
+  `required_8720_01_mangos_quest_template` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -13677,10 +13677,14 @@ CREATE TABLE `quest_template` (
   `RewItemId2` mediumint(8) unsigned NOT NULL default '0',
   `RewItemId3` mediumint(8) unsigned NOT NULL default '0',
   `RewItemId4` mediumint(8) unsigned NOT NULL default '0',
+  `ReqItemId5` mediumint(8) unsigned NOT NULL default '0',
+  `ReqItemId6` mediumint(8) unsigned NOT NULL default '0',
   `RewItemCount1` smallint(5) unsigned NOT NULL default '0',
   `RewItemCount2` smallint(5) unsigned NOT NULL default '0',
   `RewItemCount3` smallint(5) unsigned NOT NULL default '0',
   `RewItemCount4` smallint(5) unsigned NOT NULL default '0',
+  `ReqItemCount5` smallint(5) unsigned NOT NULL default '0',
+  `ReqItemCount6` smallint(5) unsigned NOT NULL default '0',
   `RewRepFaction1` smallint(5) unsigned NOT NULL default '0' COMMENT 'faction id from Faction.dbc in this case',
   `RewRepFaction2` smallint(5) unsigned NOT NULL default '0' COMMENT 'faction id from Faction.dbc in this case',
   `RewRepFaction3` smallint(5) unsigned NOT NULL default '0' COMMENT 'faction id from Faction.dbc in this case',
