@@ -107,7 +107,7 @@ bool SqlQueryHolder::SetQuery(size_t index, const char *sql)
     }
 
     /// not executed yet, just stored (it's not called a holder for nothing)
-    m_queries[index] = SqlResultPair(strdup(sql), NULL);
+    m_queries[index] = SqlResultPair(strdup(sql), (QueryResult*)NULL);
     return true;
 }
 
