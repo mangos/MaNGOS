@@ -4158,7 +4158,8 @@ void Spell::EffectEnchantItemTmp(uint32 i)
 void Spell::EffectTameCreature(uint32 /*i*/)
 {
     // Caster must be player, checked in Spell::CheckCast
-    Player* plr = (Player*)m_caster;
+    // Spell can be triggered, we need to check original caster prior to caster
+    Player* plr = (Player*)(m_originalCaster ? m_originalCaster : m_caster);
 
     Creature* creatureTarget = (Creature*)unitTarget;
 
