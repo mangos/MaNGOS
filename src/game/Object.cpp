@@ -79,14 +79,21 @@ Object::Object( ) : m_PackGUID(sizeof(uint64)+1)
 
 Object::~Object( )
 {
+    if(IsInWorld())
+    {
+        ///- Do NOT call RemoveFromWorld here, if the object is a player it will crash
+        sLog.outError("Object::~Object (GUID: %u TypeId: %u) deleted but still in world!!", GetGUIDLow(), GetTypeId());
+        ASSERT(false);
+    }
+
+    if(m_objectUpdated)
+    {
+        sLog.outError("Object::~Object (GUID: %u TypeId: %u) deleted but still have updated status!!", GetGUIDLow(), GetTypeId());
+        ASSERT(false);
+    }
+
     if(m_uint32Values)
     {
-        if(IsInWorld())
-        {
-            ///- Do NOT call RemoveFromWorld here, if the object is a player it will crash
-            sLog.outError("Object::~Object (GUID: %u TypeId: %u) deleted but still in world!!", GetGUIDLow(), GetTypeId());
-            //assert(0);
-        }
 
         //DEBUG_LOG("Object desctr 1 check (%p)",(void*)this);
         delete [] m_uint32Values;
@@ -735,10 +742,13 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask *
 
 void Object::ClearUpdateMask(bool remove)
 {
-    for( uint16 index = 0; index < m_valuesCount; ++index )
+    if(m_uint32Values)
     {
-        if(m_uint32Values_mirror[index]!= m_uint32Values[index])
-            m_uint32Values_mirror[index] = m_uint32Values[index];
+        for( uint16 index = 0; index < m_valuesCount; ++index )
+        {
+            if(m_uint32Values_mirror[index]!= m_uint32Values[index])
+                m_uint32Values_mirror[index] = m_uint32Values[index];
+        }
     }
 
     if(m_objectUpdated)
