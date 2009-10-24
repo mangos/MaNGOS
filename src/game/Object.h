@@ -129,8 +129,7 @@ class MANGOS_DLL_SPEC Object
         virtual void RemoveFromWorld()
         {
             // if we remove from world then sending changes not required
-            if(m_uint32Values)
-                ClearUpdateMask(true);
+            ClearUpdateMask(true);
             m_inWorld = false;
         }
 

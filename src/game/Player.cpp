@@ -7488,7 +7488,7 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
     }
     else if (IS_CORPSE_GUID(guid))                          // remove insignia
     {
-        Corpse *bones = ObjectAccessor::GetCorpse(*this, guid);
+        Corpse *bones = GetMap()->GetCorpse(guid);
 
         if (!bones || !((loot_type == LOOT_CORPSE) || (loot_type == LOOT_INSIGNIA)) || (bones->GetType() != CORPSE_BONES) )
         {
@@ -16505,7 +16505,7 @@ Pet* Player::GetMiniPet()
 {
     if(!m_miniPet)
         return NULL;
-    return ObjectAccessor::GetPet(m_miniPet);
+    return GetMap()->GetPet(m_miniPet);
 }
 
 void Player::Uncharm()
@@ -18054,7 +18054,7 @@ WorldObject const* Player::GetViewPoint() const
 {
     if(uint64 far_sight = GetFarSight())
     {
-        WorldObject const* viewPoint = ObjectAccessor::GetWorldObject(*this,far_sight);
+        WorldObject const* viewPoint = GetMap()->GetWorldObject(far_sight);
         return viewPoint ? viewPoint : this;                // always expected not NULL
     }
     else

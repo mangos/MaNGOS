@@ -457,7 +457,7 @@ void BattleGroundAB::Reset()
     //call parent's class reset
     BattleGround::Reset();
 
-    for (uint8 i = 0; i <= BG_TEAMS_COUNT; ++i)
+    for (uint8 i = 0; i < BG_TEAMS_COUNT; ++i)
     {
         m_TeamScores[i]          = 0;
         m_lastTick[i]            = 0;

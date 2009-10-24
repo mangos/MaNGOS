@@ -147,7 +147,7 @@ void PoolGroup<Creature>::Despawn1Object(uint32 guid)
     {
         objmgr.RemoveCreatureFromGrid(guid, data);
 
-        if (Creature* pCreature = ObjectAccessor::Instance().GetObjectInWorld(MAKE_NEW_GUID(guid, data->id, HIGHGUID_UNIT), (Creature*)NULL))
+        if (Creature* pCreature = ObjectAccessor::GetCreatureInWorld(MAKE_NEW_GUID(guid, data->id, HIGHGUID_UNIT)))
             pCreature->AddObjectToRemoveList();
     }
 }
@@ -160,7 +160,7 @@ void PoolGroup<GameObject>::Despawn1Object(uint32 guid)
     {
         objmgr.RemoveGameobjectFromGrid(guid, data);
 
-        if (GameObject* pGameobject = ObjectAccessor::Instance().GetObjectInWorld(MAKE_NEW_GUID(guid, data->id, HIGHGUID_GAMEOBJECT), (GameObject*)NULL))
+        if (GameObject* pGameobject = ObjectAccessor::GetGameObjectInWorld(MAKE_NEW_GUID(guid, data->id, HIGHGUID_GAMEOBJECT)))
             pGameobject->AddObjectToRemoveList();
     }
 }
@@ -314,7 +314,7 @@ bool PoolGroup<Creature>::ReSpawn1Object(uint32 guid)
 {
     if (CreatureData const* data = objmgr.GetCreatureData(guid))
     {
-        if (Creature* pCreature = ObjectAccessor::Instance().GetObjectInWorld(MAKE_NEW_GUID(guid, data->id, HIGHGUID_UNIT), (Creature*)NULL))
+        if (Creature* pCreature = ObjectAccessor::GetCreatureInWorld(MAKE_NEW_GUID(guid, data->id, HIGHGUID_UNIT)))
             pCreature->GetMap()->Add(pCreature);
         return true;
     }
@@ -327,7 +327,7 @@ bool PoolGroup<GameObject>::ReSpawn1Object(uint32 guid)
 {
     if (GameObjectData const* data = objmgr.GetGOData(guid))
     {
-        if (GameObject* pGameobject = ObjectAccessor::Instance().GetObjectInWorld(MAKE_NEW_GUID(guid, data->id, HIGHGUID_GAMEOBJECT), (GameObject*)NULL))
+        if (GameObject* pGameobject = ObjectAccessor::GetGameObjectInWorld(MAKE_NEW_GUID(guid, data->id, HIGHGUID_GAMEOBJECT)))
             pGameobject->GetMap()->Add(pGameobject);
         return true;
     }
