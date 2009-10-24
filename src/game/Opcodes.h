@@ -900,22 +900,22 @@ enum Opcodes
     CMSG_LFM_CLEAR_AUTOFILL                         = 0x35F,    // CMSG SearchLFGLeave
     CMSG_ACCEPT_LFG_MATCH                           = 0x360,    // SMSG uint32, uint32, if(uint8) { uint32 count, for(count) { uint64} }, uint32 count2, uint32, for(count2) { uint64, uint32 flags, if(flags & 0x2) {string}, if(flags & 0x10) {for(3) uint8}, if(flags & 0x80) {uint64, uint32}}, uint32 count3, uint32, for(count3) {uint64, uint32 flags, if(flags & 0x1) {uint8, uint8, uint8, for(3) uint8, uint32, uint32, uint32, uint32, uint32, uint32, float, float, uint32, uint32, uint32, uint32, uint32, float, uint32, uint32, uint32, uint32, uint32, uint32}, if(flags&0x2) string, if(flags&0x4) uint8, if(flags&0x8) uint64, if(flags&0x10) uint8, if(flags&0x20) uint32, if(flags&0x40) uint8, if(flags& 0x80) {uint64, uint32}}
     CMSG_DECLINE_LFG_MATCH                          = 0x361,    // SMSG uint32, uint8, uint32, uint32, uint8, for(uint8) {uint32,uint8,uint8,uint8,uint8}
-    CMSG_CANCEL_PENDING_LFG                         = 0x362,    // CMSG AcceptProposal, RejectProposal
+    CMSG_LFG_PROPOSAL_RESULT                        = 0x362,    // CMSG AcceptProposal, RejectProposal
     CMSG_CLEAR_LOOKING_FOR_GROUP                    = 0x363,    // SMSG uint32, uint8, for(uint8) uint32, uint8, for(uint8) { uint64, uint8, uint32, uint8, }
     CMSG_CLEAR_LOOKING_FOR_MORE                     = 0x364,    // SMSG uint32 unk, uint32, if(unk==6) { uint8 count, for(count) uint64 }
-    CMSG_SET_LOOKING_FOR_MORE                       = 0x365,    // SMSG uint32, uint32, uint32, uint32, uint32, uint32, uint8, uint8, uint8, uint8
+    CMSG_SET_LOOKING_FOR_MORE                       = 0x365,    // SMSG uint32 dungeon, uint32 lfgtype, uint32, uint32, uint32, uint32, uint8, uint8, uint8, uint8
     CMSG_SET_LFG_COMMENT                            = 0x366,    // CMSG SetLFGComment
-    SMSG_LFG_TIMEDOUT                               = 0x367,    // SMSG uint8, if(uint8) { uint8, uint8, uint8, uint8, if(uint8) uint32, string}
+    SMSG_LFG_TIMEDOUT                               = 0x367,    // SMSG uint8, if(uint8) { uint8, uint8, uint8, uint8, if(uint8) for(uint8) uint32, string}
     SMSG_LFG_OTHER_TIMEDOUT                         = 0x368,    // SMSG uint8, if(uint8) { uint8, uint8, uint8, for(3) uint8, uint8, if(uint8) for(uint8) uint32, string}
     SMSG_LFG_AUTOJOIN_FAILED                        = 0x369,    // SMSG uint8
-    SMSG_LFG_AUTOJOIN_FAILED_NO_PLAYER              = 0x36A,    // CMSG SetLFGRoles
-    SMSG_LFG_LEADER_IS_LFM                          = 0x36B,    // CMSG SetLFGNeeds
-    SMSG_LFG_UPDATE                                 = 0x36C,    // CMSG SetLFGBootVote
+    CMSG_LFG_SET_ROLES                              = 0x36A,    // CMSG SetLFGRoles
+    CMSG_LFG_SET_NEEDS                              = 0x36B,    // CMSG SetLFGNeeds
+    CMSG_LFG_SET_BOOT_VOTE                          = 0x36C,    // CMSG SetLFGBootVote
     SMSG_LFG_UPDATE_LFM                             = 0x36D,    // SMSG uint8, uint8, uint8, uint64, uint32, uint32, uint32, uint32
-    SMSG_LFG_UPDATE_LFG                             = 0x36E,    // CMSG RequestLFDPlayerLockInfo
-    SMSG_LFG_UPDATE_QUEUED                          = 0x36F,    // SMSG uint8, for(uint8) { uint32, uint8, uint32, uint32, uint32, uint32, uint8, for(uint8) {uint32,uint32, uint32}}, uint32, for(uint32) {uint32,uint32}
-    SMSG_LFG_PENDING_INVITE                         = 0x370,    // CMSG LFGTeleport
-    SMSG_LFG_PENDING_MATCH                          = 0x371,    // CMSG RequestLFDPartyLockInfo
+    CMSG_LFD_PLAYER_LOCK_INFO_REQUEST               = 0x36E,    // CMSG RequestLFDPlayerLockInfo
+    SMSG_LFG_PLAYER_LOCK_INFO_RESPONSE              = 0x36F,    // SMSG uint8, for(uint8) { uint32, uint8, uint32, uint32, uint32, uint32, uint8, for(uint8) {uint32,uint32, uint32}}, uint32, for(uint32) {uint32,uint32}
+    CMSG_LFG_TELEPORT                               = 0x370,    // CMSG LFGTeleport
+    CMSG_LFD_PARTY_LOCK_INFO_REQUEST                = 0x371,    // CMSG RequestLFDPartyLockInfo
     SMSG_LFG_PENDING_MATCH_DONE                     = 0x372,    // SMSG uint8, for(uint8) uint64
     SMSG_TITLE_EARNED                               = 0x373,
     CMSG_SET_TITLE                                  = 0x374,
@@ -1242,7 +1242,7 @@ enum Opcodes
     SMSG_UNKNOWN_1205                               = 0x4B5, // refund something
     CMSG_CORPSE_MAP_POSITION_QUERY                  = 0x4B6, // CMSG, uint32
     CMSG_CORPSE_MAP_POSITION_QUERY_RESPONSE         = 0x4B7, // SMSG, 3*float+float
-    CMSG_LFG_SET_ROLES                              = 0x4B8, // CMSG, empty, lua: SetLFGRoles
+    CMSG_LFG_SET_ROLES_2                            = 0x4B8, // CMSG, empty, lua: SetLFGRoles
     UMSG_UNKNOWN_1209                               = 0x4B9, // not found
     CMSG_UNKNOWN_1210                               = 0x4BA, // CMSG, uint64, lua: CalendarContextEventSignUp
     SMSG_UNKNOWN_1211                               = 0x4BB, // SMSG, calendar related
@@ -1316,7 +1316,8 @@ enum Opcodes
     CMSG_READY_FOR_ACCOUNT_DATA_TIMES               = 0x4FF, // lua: ReadyForAccountDataTimes
     CMSG_QUERY_QUESTS_COMPLETED                     = 0x500, // lua: QueryQuestsCompleted
     SMSG_QUERY_QUESTS_COMPLETED_RESPONSE            = 0x501, // response to 0x4FF
-    NUM_MSG_TYPES                                   = 0x502
+    CMSG_GM_REPORT_LAG                              = 0x502, // lua: GMReportLag
+    NUM_MSG_TYPES                                   = 0x503
 };
 
 /// Player state

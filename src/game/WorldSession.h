@@ -732,6 +732,8 @@ class MANGOS_DLL_SPEC WorldSession
         void HandleEquipmentSetDelete(WorldPacket& recv_data);
         void HandleEquipmentSetUse(WorldPacket& recv_data);
         void HandleWorldStateUITimerUpdate(WorldPacket& recv_data);
+        void HandleReadyForAccountDataTimes(WorldPacket& recv_data);
+        void HandleQueryQuestsCompleted(WorldPacket& recv_data);
     private:
         // private trade methods
         void moveItems(Item* myItems[], Item* hisItems[]);

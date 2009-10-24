@@ -461,7 +461,7 @@ void WorldSession::HandleRaidTargetUpdateOpcode( WorldPacket & recv_data )
     }
     else                                                    // target icon update
     {
-        if(!group->IsLeader(GetPlayer()->GetGUID()) && !group->IsAssistant(GetPlayer()->GetGUID()))
+        if(group->isRaidGroup() && !group->IsLeader(GetPlayer()->GetGUID()) && !group->IsAssistant(GetPlayer()->GetGUID()))
             return;
 
         uint64 guid;

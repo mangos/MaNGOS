@@ -574,7 +574,7 @@ void PlayerMenu::SendQuestQueryResponse( Quest const *pQuest )
     data << uint32(0);                                      // RequiredOpositeRepValue, required faction value with another (oposite) faction (objective)
 
     data << uint32(pQuest->GetNextQuestInChain());          // client will request this quest from NPC, if not 0
-    data << uint32(0);                                      // unk 3.3.0
+    data << uint32(0);                                      // column index in QuestXP.dbc (row based on quest level)
 
     if (pQuest->HasFlag(QUEST_FLAGS_HIDDEN_REWARDS))
         data << uint32(0);                                  // Hide money rewarded
@@ -622,7 +622,7 @@ void PlayerMenu::SendQuestQueryResponse( Quest const *pQuest )
     for(iI = 0; iI < QUEST_REPUTATIONS_COUNT; ++iI)         // reward factions ids
         data << uint32(0);
 
-    for(iI = 0; iI < QUEST_REPUTATIONS_COUNT; ++iI)         // columnid in QuestFactionReward.dbc (zero based)?
+    for(iI = 0; iI < QUEST_REPUTATIONS_COUNT; ++iI)         // column index in QuestFactionReward.dbc?
         data << uint32(0);
 
     for(iI = 0; iI < QUEST_REPUTATIONS_COUNT; ++iI)         // reward reputation override?

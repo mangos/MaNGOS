@@ -427,9 +427,10 @@ void WorldSession::HandleLfgSetRoles(WorldPacket &recv_data)
 
 void WorldSession::SendLfgUpdate(uint8 unk1, uint8 unk2, uint8 unk3)
 {
-    WorldPacket data(SMSG_LFG_UPDATE, 3);
+    // disabled
+    /*WorldPacket data(SMSG_LFG_UPDATE, 3);
     data << uint8(unk1);
     data << uint8(unk2);
     data << uint8(unk3);
-    SendPacket(&data);
+    SendPacket(&data);*/
 }

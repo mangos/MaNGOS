@@ -1567,3 +1567,11 @@ void WorldSession::HandleWorldStateUITimerUpdate(WorldPacket& recv_data)
     data << uint32(time(NULL));
     SendPacket(&data);
 }
+
+void WorldSession::HandleReadyForAccountDataTimes(WorldPacket& recv_data)
+{
+    // empty opcode
+    sLog.outDebug("WORLD: CMSG_READY_FOR_ACCOUNT_DATA_TIMES");
+
+    SendAccountDataTimes(GLOBAL_CACHE_MASK);
+}

@@ -467,3 +467,22 @@ void WorldSession::HandleCorpseMapPositionQuery( WorldPacket & recv_data )
     data << float(0);
     SendPacket(&data);
 }
+
+void WorldSession::HandleQueryQuestsCompleted( WorldPacket & recv_data )
+{
+    uint32 count = 0;
+
+    WorldPacket data(SMSG_QUERY_QUESTS_COMPLETED_RESPONSE, 4+4*count);
+    data << count;
+
+    for(QuestStatusMap::const_iterator itr = _player->getQuestStatusMap().begin(); itr != _player->getQuestStatusMap().end(); ++itr)
+    {
+        if(itr->second.m_rewarded)
+        {
+            data << uint32(itr->first);
+            count++;
+        }
+    }
+    data.put<uint32>(0, count);
+    SendPacket(&data);
+}

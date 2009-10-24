@@ -921,6 +921,7 @@ void WorldSession::SendAddonsInfo()
         string (16 bytes)
         string (16 bytes)
         uint32
+        uint32
     }*/
 
     SendPacket(&data);
