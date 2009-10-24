@@ -895,7 +895,7 @@ void WorldSession::SendAddonsInfo()
         if (unk1)
         {
             uint8 unk2 = (itr->CRC != 0x4c1c776d);          // If addon is Standard addon CRC
-            data << uint8(unk2);
+            data << uint8(unk2);                            // if 1, than add addon public signature
             if (unk2)                                       // if CRC is wrong, add public key (client need it)
                 data.append(tdata, sizeof(tdata));
 
@@ -903,7 +903,7 @@ void WorldSession::SendAddonsInfo()
         }
 
         uint8 unk3 = 0;                                     // 0 is sent here
-        data << uint8(unk3);
+        data << uint8(unk3);                                // use <Addon>\<Addon>.url file or not
         if (unk3)
         {
             // String, 256 (null terminated?)
@@ -914,7 +914,7 @@ void WorldSession::SendAddonsInfo()
     m_addonsList.clear();
 
     uint32 count = 0;
-    data << uint32(count);
+    data << uint32(count);                                  // BannedAddons count
     /*for(uint32 i = 0; i < count; ++i)
     {
         uint32
