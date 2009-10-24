@@ -134,15 +134,13 @@ class MANGOS_DLL_DECL ObjectAccessor : public MaNGOS::Singleton<ObjectAccessor, 
         // in that case linking/delinking other map should be guarded
         template <class OBJECT> static OBJECT* FindHelper(uint64 guid)
         {
-            OBJECT* ret = NULL;
-            std::list<Map*>::const_iterator i = i_mapList.begin();
-            while (i != i_mapList.end() && !ret)
+            for (std::list<Map*>::const_iterator i = i_mapList.begin() ; i != i_mapList.end(); ++i)
             {
-                ret = (*i)->GetObjectsStore().find<OBJECT>(guid, (OBJECT*)NULL);
-                ++i;
+                if (OBJECT* ret = (*i)->GetObjectsStore().find(guid, (OBJECT*)NULL))
+                    return ret;
             }
 
-            return ret;
+            return NULL;
         }
 
         static std::list<Map*> i_mapList;
