@@ -368,26 +368,26 @@ void WorldSession::HandleLootRoll( WorldPacket &recv_data )
 
     uint64 Guid;
     uint32 NumberOfPlayers;
-    uint8  Choise;
+    uint8  rollType;
     recv_data >> Guid;                                      //guid of the item rolled
     recv_data >> NumberOfPlayers;
-    recv_data >> Choise;                                    //0: pass, 1: need, 2: greed
+    recv_data >> rollType;
 
-    //sLog.outDebug("WORLD RECIEVE CMSG_LOOT_ROLL, From:%u, Numberofplayers:%u, Choise:%u", (uint32)Guid, NumberOfPlayers, Choise);
+    //sLog.outDebug("WORLD RECIEVE CMSG_LOOT_ROLL, From:%u, Numberofplayers:%u, rollType:%u", (uint32)Guid, NumberOfPlayers, rollType);
 
     Group* group = GetPlayer()->GetGroup();
     if(!group)
         return;
 
     // everything's fine, do it
-    group->CountRollVote(GetPlayer()->GetGUID(), Guid, NumberOfPlayers, Choise);
+    group->CountRollVote(GetPlayer()->GetGUID(), Guid, NumberOfPlayers, rollType);
 
-    switch (Choise)
+    switch (rollType)
     {
-        case 1:
+        case ROLL_NEED:
             GetPlayer()->GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_ROLL_NEED, 1);
             break;
-        case 2:
+        case ROLL_GREED:
             GetPlayer()->GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_ROLL_GREED, 1);
             break;
     }
