@@ -1488,20 +1488,13 @@ struct SpellShapeshiftEntry
     //uint32 NameFlags;                                     // 18 unused
     uint32 flags1;                                          // 19
     int32  creatureType;                                    // 20 <=0 humanoid, other normal creature types
-    //uint32 unk1;                                          // 21 unused
+    //uint32 unk1;                                          // 21 unused, related to next field
     uint32 attackSpeed;                                     // 22
     //uint32 modelID;                                       // 23 unused, alliance modelid (where horde case?)
-    //uint32 unk2;                                          // 24 unused
-    //uint32 unk3;                                          // 25 unused
-    //uint32 unk4;                                          // 26 unused
-    //uint32 unk5;                                          // 27 unused
-    //uint32 unk6;                                          // 28 unused
-    //uint32 unk7;                                          // 29 unused
-    //uint32 unk8;                                          // 30 unused
-    //uint32 unk9;                                          // 31 unused
-    //uint32 unk10;                                         // 32 unused
-    //uint32 unk11;                                         // 33 unused
-    //uint32 unk12;                                         // 34 unused
+    //uint32 unk2;                                          // 24 unused, also modelid (single case)
+    //uint32 unk3;                                          // 25 unused, all zeros
+    //uint32 unk4;                                          // 26 unused, all zeros
+    //uint32 spellids[8];                                   // 27-34 unused
 };
 
 struct SpellDurationEntry
