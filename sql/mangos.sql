@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_8726_01_mangos_spell_proc_event` bit(1) default NULL
+  `required_8731_01_mangos_creature_template` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -1061,7 +1061,7 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `creature_template`;
 CREATE TABLE `creature_template` (
   `entry` mediumint(8) unsigned NOT NULL default '0',
-  `heroic_entry` mediumint(8) unsigned NOT NULL default '0',
+  `difficulty_entry_1` mediumint(8) unsigned NOT NULL default '0',
   `KillCredit1` int(11) unsigned NOT NULL default '0',
   `KillCredit2` int(11) unsigned NOT NULL default '0',
   `modelid_A` mediumint(8) unsigned NOT NULL default '0',

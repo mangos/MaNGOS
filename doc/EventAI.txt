@@ -787,13 +787,13 @@ Below is the list of current Event Flags that EventAI can handle. Event flags ar
 
 (bit#   Decimal   Internal Name                  Discription)
 0       1         EFLAG_REPEATABLE               Event repeats (Does not repeat if this flag is not set)
-1       2         EFLAG_NORMAL                   Event occurs in Normal instance difficulty (will not occur in Normal if not set)
-2       4         EFLAG_HEROIC                   Event occurs in Heroic instance difficulty (will not occur in Heroic if not set)
-3       8
-4       16
+1       2         EFLAG_DIFFICULTY_0             Event occurs in instance difficulty 0 (will not occur if not set)
+2       4         EFLAG_DIFFICULTY_1             Event occurs in instance difficulty 1 (will not occur if not set)
+3       8         EFLAG_DIFFICULTY_2             Event occurs in instance difficulty 2 (will not occur if not set)
+4       16        EFLAG_DIFFICULTY_3             Event occurs in instance difficulty 3 (will not occur if not set)
 5       32
 6       64
-7       128        EFLAG_DEBUG_ONLY              Prevents events from occuring on Release builds. Useful for testing new features.
+7       128       EFLAG_DEBUG_ONLY              Prevents events from occuring on Release builds. Useful for testing new features.
 
 NOTE: You can add the numbers in the decimal column to combine flags.
 

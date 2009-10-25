@@ -812,12 +812,12 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
         if(!mapEntry)
             return;
 
-        bool isHeroicTargetMap = mapEntry->IsRaid()
-            ? (GetPlayer()->GetRaidDifficulty()    >= RAID_DIFFICULTY_10MAN_HEROIC)
-            : (GetPlayer()->GetDungeonDifficulty() >= DUNGEON_DIFFICULTY_HEROIC);
+        bool isNormalTargetMap = mapEntry->IsRaid()
+            ? (GetPlayer()->GetRaidDifficulty() == RAID_DIFFICULTY_10MAN_NORMAL)
+            : (GetPlayer()->GetDungeonDifficulty() == DUNGEON_DIFFICULTY_NORMAL);
 
         uint32 missingKey = 0;
-        if(isHeroicTargetMap)
+        if (!isNormalTargetMap)
         {
             if(at->heroicKey)
             {
@@ -830,7 +830,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
         }
 
         uint32 missingQuest = 0;
-        if(isHeroicTargetMap)
+        if (!isNormalTargetMap)
         {
             if (at->requiredQuestHeroic && !GetPlayer()->GetQuestRewardStatus(at->requiredQuestHeroic))
                 missingQuest = at->requiredQuestHeroic;
@@ -847,7 +847,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
             if(missingItem)
                 SendAreaTriggerMessage(GetMangosString(LANG_LEVEL_MINREQUIRED_AND_ITEM), at->requiredLevel, objmgr.GetItemPrototype(missingItem)->Name1);
             else if(missingKey)
-                GetPlayer()->SendTransferAborted(at->target_mapId, TRANSFER_ABORT_DIFFICULTY, isHeroicTargetMap ? DUNGEON_DIFFICULTY_HEROIC : DUNGEON_DIFFICULTY_NORMAL);
+                GetPlayer()->SendTransferAborted(at->target_mapId, TRANSFER_ABORT_DIFFICULTY, isNormalTargetMap ? DUNGEON_DIFFICULTY_NORMAL : DUNGEON_DIFFICULTY_HEROIC);
             else if(missingQuest)
                 SendAreaTriggerMessage(at->requiredFailedText.c_str());
             else if(missingLevel)

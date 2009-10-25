@@ -69,8 +69,7 @@ CreatureEventAI::CreatureEventAI(Creature *c ) : CreatureAI(c)
             #endif
             if (m_creature->GetMap()->IsDungeon())
             {
-                if( (m_creature->GetMap()->IsHeroic() && (*i).event_flags & EFLAG_HEROIC) ||
-                    (!m_creature->GetMap()->IsHeroic() && (*i).event_flags & EFLAG_NORMAL))
+                if ((1 << (m_creature->GetMap()->GetSpawnMode()+1)) & (*i).event_flags)
                 {
                     //event flagged for instance mode
                     CreatureEventAIList.push_back(CreatureEventAIHolder(*i));

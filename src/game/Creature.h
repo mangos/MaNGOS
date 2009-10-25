@@ -158,7 +158,7 @@ enum CreatureFlagsExtra
 struct CreatureInfo
 {
     uint32  Entry;
-    uint32  HeroicEntry;
+    uint32  DifficultyEntry1;
     uint32  KillCredit[MAX_KILL_CREDIT];
     uint32  DisplayID_A[2];
     uint32  DisplayID_H[2];
@@ -742,7 +742,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
         float CombatStartZ;
     private:
         GridReference<Creature> m_gridRef;
-        CreatureInfo const* m_creatureInfo;                 // in heroic mode can different from ObjMgr::GetCreatureTemplate(GetEntry())
+        CreatureInfo const* m_creatureInfo;                 // in difficulty mode > 0 can different from ObjMgr::GetCreatureTemplate(GetEntry())
         bool m_isActiveObject;
         MonsterMovementFlags m_monsterMoveFlags;
 };
