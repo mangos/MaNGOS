@@ -188,18 +188,19 @@ bool Creature::InitEntry(uint32 Entry, uint32 team, const CreatureData *data )
         return false;
     }
 
-    // get heroic mode entry
+    // get difficulty 1 mode entry
     uint32 actualEntry = Entry;
     CreatureInfo const *cinfo = normalInfo;
-    if(normalInfo->HeroicEntry)
+    if(normalInfo->DifficultyEntry1)
     {
         //we already have valid Map pointer for current creature!
-        if(GetMap()->IsHeroic())
+        //FIXME: spawn modes 2-3 must have own case DifficultyEntryN
+        if(GetMap()->GetSpawnMode() > 0)
         {
-            cinfo = objmgr.GetCreatureTemplate(normalInfo->HeroicEntry);
+            cinfo = objmgr.GetCreatureTemplate(normalInfo->DifficultyEntry1);
             if(!cinfo)
             {
-                sLog.outErrorDb("Creature::UpdateEntry creature heroic entry %u does not exist.", actualEntry);
+                sLog.outErrorDb("Creature::UpdateEntry creature difficulty 1 entry %u does not exist.", actualEntry);
                 return false;
             }
         }
@@ -1928,7 +1929,7 @@ CreatureDataAddon const* Creature::GetCreatureAddon() const
             return addon;
     }
 
-    // dependent from heroic mode entry
+    // dependent from difficulty mode entry
     return ObjectMgr::GetCreatureTemplateAddon(GetCreatureInfo()->Entry);
 }
 

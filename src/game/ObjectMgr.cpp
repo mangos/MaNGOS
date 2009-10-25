@@ -473,8 +473,8 @@ void ObjectMgr::LoadCreatureTemplates()
     sLog.outString( ">> Loaded %u creature definitions", sCreatureStorage.RecordCount );
     sLog.outString();
 
-    std::set<uint32> heroicEntries;                         // already loaded heroic value in creatures
-    std::set<uint32> hasHeroicEntries;                      // already loaded creatures with heroic entry values
+    std::set<uint32> difficultyEntries1;                    // already loaded difficulty 1 value in creatures
+    std::set<uint32> hasDifficultyEntries1;                 // already loaded creatures with difficulty 1  values
 
     // check data correctness
     for(uint32 i = 1; i < sCreatureStorage.MaxEntry; ++i)
@@ -483,83 +483,83 @@ void ObjectMgr::LoadCreatureTemplates()
         if (!cInfo)
             continue;
 
-        if (cInfo->HeroicEntry)
+        if (cInfo->DifficultyEntry1)
         {
-            CreatureInfo const* heroicInfo = GetCreatureTemplate(cInfo->HeroicEntry);
-            if (!heroicInfo)
+            CreatureInfo const* difficultyInfo = GetCreatureTemplate(cInfo->DifficultyEntry1);
+            if (!difficultyInfo)
             {
-                sLog.outErrorDb("Creature (Entry: %u) have `heroic_entry`=%u but creature entry %u not exist.", i, cInfo->HeroicEntry, cInfo->HeroicEntry);
+                sLog.outErrorDb("Creature (Entry: %u) have `difficulty_entry_1`=%u but creature entry %u not exist.", i, cInfo->DifficultyEntry1, cInfo->DifficultyEntry1);
                 continue;
             }
 
-            if (heroicEntries.find(i)!=heroicEntries.end())
+            if (difficultyEntries1.find(i)!=difficultyEntries1.end())
             {
-                sLog.outErrorDb("Creature (Entry: %u) listed as heroic but have value in `heroic_entry`.",i);
+                sLog.outErrorDb("Creature (Entry: %u) listed as difficulty 1 but have value in `difficulty_entry_1`.",i);
                 continue;
             }
 
-            if (heroicEntries.find(cInfo->HeroicEntry)!=heroicEntries.end())
+            if (difficultyEntries1.find(cInfo->DifficultyEntry1)!=difficultyEntries1.end())
             {
-                sLog.outErrorDb("Creature (Entry: %u) already listed as heroic for another entry.",cInfo->HeroicEntry);
+                sLog.outErrorDb("Creature (Entry: %u) already listed as difficulty 1 for another entry.",cInfo->DifficultyEntry1);
                 continue;
             }
 
-            if (hasHeroicEntries.find(cInfo->HeroicEntry)!=hasHeroicEntries.end())
+            if (hasDifficultyEntries1.find(cInfo->DifficultyEntry1)!=hasDifficultyEntries1.end())
             {
-                sLog.outErrorDb("Creature (Entry: %u) have `heroic_entry`=%u but creature entry %u have heroic entry also.",i,cInfo->HeroicEntry,cInfo->HeroicEntry);
+                sLog.outErrorDb("Creature (Entry: %u) have `difficulty_entry_1`=%u but creature entry %u have difficulty 1 entry also.",i,cInfo->DifficultyEntry1,cInfo->DifficultyEntry1);
                 continue;
             }
 
-            if (cInfo->unit_class != heroicInfo->unit_class)
+            if (cInfo->unit_class != difficultyInfo->unit_class)
             {
-                sLog.outErrorDb("Creature (Entry: %u, class %u) has different `unit_class` in heroic mode (Entry: %u, class %u).",i, cInfo->unit_class, cInfo->HeroicEntry, heroicInfo->unit_class);
+                sLog.outErrorDb("Creature (Entry: %u, class %u) has different `unit_class` in difficulty 1 mode (Entry: %u, class %u).",i, cInfo->unit_class, cInfo->DifficultyEntry1, difficultyInfo->unit_class);
                 continue;
             }
 
-            if (cInfo->npcflag != heroicInfo->npcflag)
+            if (cInfo->npcflag != difficultyInfo->npcflag)
             {
-                sLog.outErrorDb("Creature (Entry: %u) has different `npcflag` in heroic mode (Entry: %u).",i,cInfo->HeroicEntry);
+                sLog.outErrorDb("Creature (Entry: %u) has different `npcflag` in difficulty 1 mode (Entry: %u).",i,cInfo->DifficultyEntry1);
                 continue;
             }
 
-            if (cInfo->trainer_class != heroicInfo->trainer_class)
+            if (cInfo->trainer_class != difficultyInfo->trainer_class)
             {
-                sLog.outErrorDb("Creature (Entry: %u) has different `trainer_class` in heroic mode (Entry: %u).",i,cInfo->HeroicEntry);
+                sLog.outErrorDb("Creature (Entry: %u) has different `trainer_class` in difficulty 1 mode (Entry: %u).",i,cInfo->DifficultyEntry1);
                 continue;
             }
 
-            if (cInfo->trainer_race != heroicInfo->trainer_race)
+            if (cInfo->trainer_race != difficultyInfo->trainer_race)
             {
-                sLog.outErrorDb("Creature (Entry: %u) has different `trainer_race` in heroic mode (Entry: %u).",i,cInfo->HeroicEntry);
+                sLog.outErrorDb("Creature (Entry: %u) has different `trainer_race` in difficulty 1 mode (Entry: %u).",i,cInfo->DifficultyEntry1);
                 continue;
             }
 
-            if (cInfo->trainer_type != heroicInfo->trainer_type)
+            if (cInfo->trainer_type != difficultyInfo->trainer_type)
             {
-                sLog.outErrorDb("Creature (Entry: %u) has different `trainer_type` in heroic mode (Entry: %u).",i,cInfo->HeroicEntry);
+                sLog.outErrorDb("Creature (Entry: %u) has different `trainer_type` in difficulty 1 mode (Entry: %u).",i,cInfo->DifficultyEntry1);
                 continue;
             }
 
-            if (cInfo->trainer_spell != heroicInfo->trainer_spell)
+            if (cInfo->trainer_spell != difficultyInfo->trainer_spell)
             {
-                sLog.outErrorDb("Creature (Entry: %u) has different `trainer_spell` in heroic mode (Entry: %u).",i,cInfo->HeroicEntry);
+                sLog.outErrorDb("Creature (Entry: %u) has different `trainer_spell` in difficulty 1 mode (Entry: %u).",i,cInfo->DifficultyEntry1);
                 continue;
             }
 
-            if (heroicInfo->AIName && *heroicInfo->AIName)
+            if (difficultyInfo->AIName && *difficultyInfo->AIName)
             {
-                sLog.outErrorDb("Heroic mode creature (Entry: %u) has `AIName`, but in any case will used normal mode creature (Entry: %u) AIName.",cInfo->HeroicEntry,i);
+                sLog.outErrorDb("Difficulty 1 mode creature (Entry: %u) has `AIName`, but in any case will used difficulty 0 mode creature (Entry: %u) AIName.",cInfo->DifficultyEntry1,i);
                 continue;
             }
 
-            if (heroicInfo->ScriptID)
+            if (difficultyInfo->ScriptID)
             {
-                sLog.outErrorDb("Heroic mode creature (Entry: %u) has `ScriptName`, but in any case will used normal mode creature (Entry: %u) ScriptName.",cInfo->HeroicEntry,i);
+                sLog.outErrorDb("Difficulty 1 mode creature (Entry: %u) has `ScriptName`, but in any case will used difficulty 0 mode creature (Entry: %u) ScriptName.",cInfo->DifficultyEntry1,i);
                 continue;
             }
 
-            hasHeroicEntries.insert(i);
-            heroicEntries.insert(cInfo->HeroicEntry);
+            hasDifficultyEntries1.insert(i);
+            difficultyEntries1.insert(cInfo->DifficultyEntry1);
         }
 
         FactionTemplateEntry const* factionTemplate = sFactionTemplateStore.LookupEntry(cInfo->faction_A);
@@ -1032,11 +1032,11 @@ void ObjectMgr::LoadCreatures()
     }
 
     // build single time for check creature data
-    std::set<uint32> heroicCreatures;
+    std::set<uint32> difficultyCreatures1;
     for(uint32 i = 0; i < sCreatureStorage.MaxEntry; ++i)
         if(CreatureInfo const* cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(i))
-            if(cInfo->HeroicEntry)
-                heroicCreatures.insert(cInfo->HeroicEntry);
+            if(cInfo->DifficultyEntry1)
+                difficultyCreatures1.insert(cInfo->DifficultyEntry1);
 
     // build single time for check spawnmask
     std::map<uint32,uint32> spawnMasks;
@@ -1095,9 +1095,9 @@ void ObjectMgr::LoadCreatures()
         if (data.spawnMask & ~spawnMasks[data.mapid])
             sLog.outErrorDb("Table `creature` have creature (GUID: %u) that have wrong spawn mask %u including not supported difficulty modes for map (Id: %u).",guid, data.spawnMask, data.mapid );
 
-        if(heroicCreatures.find(data.id)!=heroicCreatures.end())
+        if(difficultyCreatures1.find(data.id)!=difficultyCreatures1.end())
         {
-            sLog.outErrorDb("Table `creature` have creature (GUID: %u) that listed as heroic template (entry: %u) in `creature_template`, skipped.",guid, data.id );
+            sLog.outErrorDb("Table `creature` have creature (GUID: %u) that listed as difficulty 1 template (entry: %u) in `creature_template`, skipped.",guid, data.id );
             continue;
         }
 

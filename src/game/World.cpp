@@ -1354,7 +1354,7 @@ void World::SetInitialWorldSettings()
     sLog.outString();
     achievementmgr.LoadAchievementReferenceList();
     achievementmgr.LoadAchievementCriteriaList();
-    achievementmgr.LoadAchievementCriteriaData();
+    achievementmgr.LoadAchievementCriteriaRequirements();
     achievementmgr.LoadRewards();
     achievementmgr.LoadRewardLocales();
     achievementmgr.LoadCompletedAchievements();

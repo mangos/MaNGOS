@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_8720_01_mangos_quest_template` bit(1) default NULL
+  `required_8731_01_mangos_creature_template` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -39,11 +39,11 @@ INSERT INTO `db_version` VALUES
 UNLOCK TABLES;
 
 --
--- Table structure for table `achievement_criteria_data`
+-- Table structure for table `achievement_criteria_requirement`
 --
 
-DROP TABLE IF EXISTS `achievement_criteria_data`;
-CREATE TABLE `achievement_criteria_data` (
+DROP TABLE IF EXISTS `achievement_criteria_requirement`;
+CREATE TABLE `achievement_criteria_requirement` (
   `criteria_id` mediumint(8) NOT NULL,
   `type` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `value1` mediumint(8) unsigned NOT NULL DEFAULT '0',
@@ -52,12 +52,12 @@ CREATE TABLE `achievement_criteria_data` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Achievment system';
 
 --
--- Dumping data for table `achievement_criteria_data`
+-- Dumping data for table `achievement_criteria_requirement`
 --
 
-LOCK TABLES `achievement_criteria_data` WRITE;
-/*!40000 ALTER TABLE `achievement_criteria_data` DISABLE KEYS */;
-/*!40000 ALTER TABLE `achievement_criteria_data` ENABLE KEYS */;
+LOCK TABLES `achievement_criteria_requirement` WRITE;
+/*!40000 ALTER TABLE `achievement_criteria_requirement` DISABLE KEYS */;
+/*!40000 ALTER TABLE `achievement_criteria_requirement` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -1061,7 +1061,7 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `creature_template`;
 CREATE TABLE `creature_template` (
   `entry` mediumint(8) unsigned NOT NULL default '0',
-  `heroic_entry` mediumint(8) unsigned NOT NULL default '0',
+  `difficulty_entry_1` mediumint(8) unsigned NOT NULL default '0',
   `KillCredit1` int(11) unsigned NOT NULL default '0',
   `KillCredit2` int(11) unsigned NOT NULL default '0',
   `modelid_A` mediumint(8) unsigned NOT NULL default '0',
@@ -18325,6 +18325,7 @@ INSERT INTO `spell_proc_event` VALUES
 (61356, 0x00000000,  0, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000002, 0.000000, 0.000000,  0),
 (61846, 0x00000000,  0, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000010, 0.000000, 0.000000,  0),
 (61847, 0x00000000,  0, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000010, 0.000000, 0.000000,  0),
+(62600, 0x00000000,  7, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000002, 0.000000, 0.000000,  0),
 (63108, 0x00000000,  5, 0x00000002, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0.000000, 0.000000,  0),
 (63156, 0x00000000,  0, 0x00000001, 0x00000040, 0x00000000, 0x00000000, 0x00000000, 0.000000, 0.000000,  0),
 (63245, 0x00000000,  5, 0x00000100, 0x00800000, 0x00000000, 0x00000000, 0x00000002, 0.000000, 0.000000,  0),

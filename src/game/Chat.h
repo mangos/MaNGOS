@@ -318,7 +318,7 @@ class ChatHandler
 
         bool HandleReloadConfigCommand(const char* args);
 
-        bool HandleReloadAchievementCriteriaDataCommand(const char* args);
+        bool HandleReloadAchievementCriteriaRequirementCommand(const char* args);
         bool HandleReloadAchievementRewardCommand(const char* args);
         bool HandleReloadAreaTriggerTavernCommand(const char* args);
         bool HandleReloadAreaTriggerTeleportCommand(const char* args);
