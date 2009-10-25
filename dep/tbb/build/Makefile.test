@@ -1,0 +1,310 @@
+# Copyright 2005-2009 Intel Corporation.  All Rights Reserved.
+#
+# This file is part of Threading Building Blocks.
+#
+# Threading Building Blocks is free software; you can redistribute it
+# and/or modify it under the terms of the GNU General Public License
+# version 2 as published by the Free Software Foundation.
+#
+# Threading Building Blocks is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+# of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Threading Building Blocks; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+#
+# As a special exception, you may use this file as part of a free software
+# library without restriction.  Specifically, if other files instantiate
+# templates or use macros or inline functions from this file, or you compile
+# this file and link it with other files to produce an executable, this
+# file does not by itself cause the resulting executable to be covered by
+# the GNU General Public License.  This exception does not however
+# invalidate any other reasons why the executable file might be covered by
+# the GNU General Public License.
+
+#------------------------------------------------------------------------------
+# Define rules for making the TBB tests.
+#------------------------------------------------------------------------------
+.PHONY: default test_tbb_plain test_tbb_old clean
+
+default: test_tbb_plain test_tbb_old
+
+tbb_root ?= $(TBB22_INSTALL_DIR)
+BUILDING_PHASE=1
+TEST_RESOURCE = $(TBB.RES)
+include $(tbb_root)/build/common.inc
+DEBUG_SUFFIX=$(findstring _debug,$(call cross_cfg,_$(cfg)))
+
+#------------------------------------------------------------
+# Define static pattern rules dealing with .cpp source files
+#------------------------------------------------------------
+
+VPATH = $(tbb_root)/src/tbb/$(ASSEMBLY_SOURCE) $(tbb_root)/src/tbb $(tbb_root)/src/rml/client $(tbb_root)/src/old $(tbb_root)/src/test $(tbb_root)/src/perf
+
+CPLUS_FLAGS += $(if $(crosstest),$(DEFINE_KEY)__TBB_NO_IMPLICIT_LINKAGE=1)
+
+ifeq (1,$(TBB_NOSTRICT))
+# GNU 3.2.3 headers have a ISO syntax that is rejected by Intel compiler in -strict_ansi mode.
+# The Mac uses gcc 4.0, so the list is empty for that platform.
+# The files below need the -strict_ansi flag downgraded to -ansi to compile
+
+KNOWN_NOSTRICT += \
+	test_concurrent_hash_map.o	\
+	test_concurrent_vector.o	\
+	test_concurrent_queue.o	        \
+	test_enumerable_thread_specific.o \
+	test_handle_perror.o		\
+	test_cache_aligned_allocator_STL.o	\
+	test_task_scheduler_init.o	\
+	test_model_plugin.o	\
+	test_parallel_do.o	\
+	test_lambda.o	\
+	test_eh_algorithms.o	\
+	test_parallel_sort.o    \
+	test_parallel_for_each.o	\
+	test_task_group.o	\
+	test_tbb_header.o	\
+	test_combinable.o	\
+	test_tbb_version.o
+
+endif
+
+include $(tbb_root)/build/common_rules.inc
+
+# Rule for generating executable test
+%.$(TEST_EXT): %.$(OBJ) $(TBB.LIB)
+	$(CPLUS) $(OUTPUT_KEY)$@ $(CPLUS_FLAGS) $< $(LINK_TBB.LIB) $(LIBS) $(LINK_FLAGS)
+
+# Rules for generating a test DLL
+%.$(DLL).$(OBJ): %.cpp
+	$(CPLUS) $(COMPILE_ONLY) $(OUTPUTOBJ_KEY)$@ $(CPLUS_FLAGS_NOSTRICT) $(PIC_KEY) $(DEFINE_KEY)_USRDLL $(INCLUDES) $<
+%.$(DLL): %.$(DLL).$(OBJ) $(TBB.LIB)
+	$(CPLUS) $(OUTPUT_KEY)$@ $(CPLUS_FLAGS) $(PIC_KEY) $< $(LINK_TBB.LIB) $(LIBS) $(LINK_FLAGS) $(DYLIB_KEY)
+
+# Rules for the tests, which use TBB in a dynamically loadable library
+test_model_plugin.$(TEST_EXT): test_model_plugin.$(OBJ) test_model_plugin.$(DLL)
+	$(CPLUS) $(OUTPUT_KEY)$@ $(CPLUS_FLAGS) $< $(LIBDL) $(LIBS) $(LINK_FLAGS)
+
+TASK_CPP_DEPENDENCIES = $(TBB_ASM.OBJ) \
+		cache_aligned_allocator.$(OBJ) \
+		dynamic_link.$(OBJ) \
+		tbb_misc.$(OBJ) \
+		tbb_thread.$(OBJ) \
+		itt_notify.$(OBJ) \
+		mutex.$(OBJ) \
+		spin_rw_mutex.$(OBJ) \
+		spin_mutex.$(OBJ) \
+		private_server.$(OBJ) \
+		rml_tbb.$(OBJ)
+
+ifeq (,$(codecov))
+    TASK_CPP_DEPENDENCIES += itt_notify_proxy.$(OBJ)
+endif
+
+# These executables don't depend on the TBB library, but include task.cpp directly
+TASK_CPP_DIRECTLY_INCLUDED = test_eh_tasks.$(TEST_EXT) \
+ test_task_leaks.$(TEST_EXT) \
+ test_task_assertions.$(TEST_EXT) \
+ test_assembly.$(TEST_EXT)
+
+$(TASK_CPP_DIRECTLY_INCLUDED): WARNING_KEY += $(WARNING_SUPPRESS)
+
+$(TASK_CPP_DIRECTLY_INCLUDED): %.$(TEST_EXT) : %.$(OBJ) $(TASK_CPP_DEPENDENCIES)
+	$(CPLUS) $(OUTPUT_KEY)$@ $(CPLUS_FLAGS) $^ $(LIBDL) $(LIBS) $(LINK_FLAGS)
+
+test_handle_perror.$(TEST_EXT): test_handle_perror.$(OBJ) tbb_misc.$(OBJ) $(TBB_ASM.OBJ)
+	$(CPLUS) $(OUTPUT_KEY)$@ $(CPLUS_FLAGS) $^ $(LINK_TBB.LIB) $(LIBS) $(LINK_FLAGS)
+
+test_tbb_header2.$(OBJ): test_tbb_header.cpp
+	$(CPLUS) $(COMPILE_ONLY) $(CPLUS_FLAGS_NOSTRICT) $(CXX_ONLY_FLAGS) $(CXX_WARN_SUPPRESS) $(INCLUDES) $(DEFINE_KEY)__TBB_TEST_SECONDARY=1 $< $(OUTPUTOBJ_KEY)$@
+
+# Detecting "multiple definition" linker error using the test that covers the whole library
+test_tbb_header.$(TEST_EXT): test_tbb_header.$(OBJ) test_tbb_header2.$(OBJ) $(TBB.LIB)
+	$(CPLUS) $(OUTPUT_KEY)$@ $(CPLUS_FLAGS) $^ $(LINK_TBB.LIB) $(LIBS) $(LINK_FLAGS)
+
+# Rules for the tests, which depend on tbbmalloc
+test_concurrent_hash_map_string.$(TEST_EXT): test_concurrent_hash_map_string.$(OBJ)
+	$(CPLUS) $(OUTPUT_KEY)$@ $(CPLUS_FLAGS) $< $(LINK_TBB.LIB) $(MALLOC.LIB) $(LIBS) $(LINK_FLAGS)
+
+# These are in alphabetical order
+TEST_TBB_PLAIN.EXE = test_assembly.$(TEST_EXT)   \
+	test_aligned_space.$(TEST_EXT)               \
+	test_task_assertions.$(TEST_EXT)             \
+	test_atomic.$(TEST_EXT)                      \
+	test_blocked_range.$(TEST_EXT)               \
+	test_blocked_range2d.$(TEST_EXT)             \
+	test_blocked_range3d.$(TEST_EXT)             \
+	test_compiler.$(TEST_EXT)                    \
+	test_concurrent_queue.$(TEST_EXT)            \
+	test_concurrent_vector.$(TEST_EXT)           \
+	test_concurrent_hash_map.$(TEST_EXT)         \
+	test_enumerable_thread_specific.$(TEST_EXT)  \
+	test_handle_perror.$(TEST_EXT)               \
+	test_halt.$(TEST_EXT)                        \
+	test_lambda.$(TEST_EXT)                      \
+	test_model_plugin.$(TEST_EXT)                \
+	test_mutex.$(TEST_EXT)                       \
+	test_mutex_native_threads.$(TEST_EXT)        \
+	test_rwm_upgrade_downgrade.$(TEST_EXT)       \
+	test_cache_aligned_allocator_STL.$(TEST_EXT) \
+	test_cache_aligned_allocator.$(TEST_EXT)     \
+	test_parallel_for.$(TEST_EXT)                \
+	test_parallel_reduce.$(TEST_EXT)             \
+	test_parallel_sort.$(TEST_EXT)               \
+	test_parallel_scan.$(TEST_EXT)               \
+	test_parallel_while.$(TEST_EXT)              \
+	test_parallel_do.$(TEST_EXT)                 \
+	test_pipeline.$(TEST_EXT)                    \
+	test_pipeline_with_tbf.$(TEST_EXT)           \
+	test_task_scheduler_init.$(TEST_EXT)         \
+	test_task_scheduler_observer.$(TEST_EXT)     \
+	test_task.$(TEST_EXT)                        \
+	test_task_leaks.$(TEST_EXT)                  \
+	test_tbb_thread.$(TEST_EXT)                  \
+	test_tick_count.$(TEST_EXT)                  \
+	test_inits_loop.$(TEST_EXT)                  \
+	test_yield.$(TEST_EXT)                       \
+	test_eh_tasks.$(TEST_EXT)                    \
+	test_eh_algorithms.$(TEST_EXT)               \
+	test_parallel_invoke.$(TEST_EXT)             \
+	test_task_group.$(TEST_EXT)                  \
+	test_ittnotify.$(TEST_EXT)                   \
+	test_parallel_for_each.$(TEST_EXT)           \
+	test_tbb_header.$(TEST_EXT)                  \
+	test_combinable.$(TEST_EXT)                  \
+	test_task_auto_init.$(TEST_EXT)              \
+	test_tbb_version.$(TEST_EXT)                 # insert new files right above
+
+ifdef OPENMP_FLAG
+	TEST_TBB_PLAIN.EXE += test_tbb_openmp
+test_openmp.$(TEST_EXT): test_openmp.cpp
+	$(CPLUS) $(OPENMP_FLAG) $(OUTPUT_KEY)$@ $(CPLUS_FLAGS) $(INCLUDES) $< $(LIBS) $(LINK_TBB.LIB) $(LINK_FLAGS)
+.PHONY: test_tbb_openmp
+test_tbb_openmp: test_openmp.$(TEST_EXT)
+	./test_openmp.$(TEST_EXT) 1:4
+
+endif
+
+# Run tests that are in TEST_TBB_PLAIN.EXE
+# The test are ordered so that simpler components are tested first.
+# If a component Y uses component X, then tests for Y should come after tests for X.
+# Note that usually run_cmd is empty, and tests run directly
+test_tbb_plain: $(TEST_TBB_PLAIN.EXE)
+	$(run_cmd) ./test_assembly.$(TEST_EXT)
+	$(run_cmd) ./test_compiler.$(TEST_EXT)
+        # Yes, 4:8 is intended on the next line. 
+	$(run_cmd) ./test_yield.$(TEST_EXT) 4:8
+	$(run_cmd) ./test_handle_perror.$(TEST_EXT)
+	$(run_cmd) ./test_task_auto_init.$(TEST_EXT)
+	$(run_cmd) ./test_task_scheduler_init.$(TEST_EXT) 1:4
+	$(run_cmd) ./test_task_scheduler_observer.$(TEST_EXT) 1:4
+	$(run_cmd) ./test_task_assertions.$(TEST_EXT)
+	$(run_cmd) ./test_task.$(TEST_EXT) 1:4
+	$(run_cmd) ./test_task_leaks.$(TEST_EXT)
+	$(run_cmd) ./test_atomic.$(TEST_EXT)
+	$(run_cmd) ./test_cache_aligned_allocator.$(TEST_EXT)
+	$(run_cmd) ./test_cache_aligned_allocator_STL.$(TEST_EXT)
+	$(run_cmd) ./test_blocked_range.$(TEST_EXT) 1:4
+	$(run_cmd) ./test_blocked_range2d.$(TEST_EXT) 1:4
+	$(run_cmd) ./test_blocked_range3d.$(TEST_EXT) 1:4
+	$(run_cmd) ./test_parallel_for.$(TEST_EXT) 1:4
+	$(run_cmd) ./test_parallel_sort.$(TEST_EXT) 1:4
+	$(run_cmd) ./test_aligned_space.$(TEST_EXT)
+	$(run_cmd) ./test_parallel_reduce.$(TEST_EXT) 1:4
+	$(run_cmd) ./test_parallel_scan.$(TEST_EXT) 1:4
+	$(run_cmd) ./test_parallel_while.$(TEST_EXT) 1:4
+	$(run_cmd) ./test_parallel_do.$(TEST_EXT) 1:4
+	$(run_cmd) ./test_inits_loop.$(TEST_EXT)
+	$(run_cmd) ./test_lambda.$(TEST_EXT) 1:4
+	$(run_cmd) ./test_mutex.$(TEST_EXT) 1
+	$(run_cmd) ./test_mutex.$(TEST_EXT) 2
+	$(run_cmd) ./test_mutex.$(TEST_EXT) 4
+	$(run_cmd) ./test_mutex_native_threads.$(TEST_EXT) 1:4
+	$(run_cmd) ./test_rwm_upgrade_downgrade.$(TEST_EXT) 4
+        # Yes, 4:8 is intended on the next line. 
+	$(run_cmd) ./test_halt.$(TEST_EXT) 4:8
+	$(run_cmd) ./test_pipeline.$(TEST_EXT) 1:4
+	$(run_cmd) ./test_pipeline_with_tbf.$(TEST_EXT) 1:4
+	$(run_cmd) ./test_tick_count.$(TEST_EXT) 1:4
+	$(run_cmd) ./test_concurrent_queue.$(TEST_EXT) 1:4
+	$(run_cmd) ./test_concurrent_vector.$(TEST_EXT) 1:4
+	$(run_cmd) ./test_concurrent_hash_map.$(TEST_EXT) 1:4
+	$(run_cmd) ./test_enumerable_thread_specific.$(TEST_EXT) 0:4
+	$(run_cmd) ./test_combinable.$(TEST_EXT) 0:4
+	$(run_cmd) ./test_model_plugin.$(TEST_EXT) 4
+	$(run_cmd) ./test_eh_tasks.$(TEST_EXT) 2:4
+	$(run_cmd) ./test_eh_algorithms.$(TEST_EXT) 2:4
+	$(run_cmd) ./test_tbb_thread.$(TEST_EXT)
+	$(run_cmd) ./test_parallel_invoke.$(TEST_EXT) 1:4
+	$(run_cmd) ./test_task_group.$(TEST_EXT) 1:4
+	$(run_cmd) ./test_ittnotify.$(TEST_EXT) 2:2
+	$(run_cmd) ./test_parallel_for_each.$(TEST_EXT) 1:4
+	$(run_cmd) ./test_tbb_header.$(TEST_EXT)
+	$(run_cmd) ./test_tbb_version.$(TEST_EXT)
+
+CPLUS_FLAGS_DEPRECATED = $(DEFINE_KEY)TBB_DEPRECATED=1 $(subst $(WARNING_KEY),,$(CPLUS_FLAGS_NOSTRICT)) $(WARNING_SUPPRESS)
+
+TEST_TBB_OLD.OBJ = test_concurrent_vector_v2.$(OBJ) test_concurrent_queue_v2.$(OBJ) test_mutex_v2.$(OBJ)
+
+TEST_TBB_DEPRECATED.OBJ = test_concurrent_queue_deprecated.$(OBJ) \
+	test_concurrent_vector_deprecated.$(OBJ) \
+
+
+# For deprecated files, we don't mind warnings etc., thus compilation rules are most relaxed
+$(TEST_TBB_OLD.OBJ): %.$(OBJ): %.cpp
+	$(CPLUS) $(COMPILE_ONLY) $(CPLUS_FLAGS_DEPRECATED) $(INCLUDES) $<
+
+%_deprecated.$(OBJ): %.cpp
+	$(CPLUS) $(COMPILE_ONLY) $(OUTPUTOBJ_KEY)$@ $(CPLUS_FLAGS_DEPRECATED) $(INCLUDES) $<
+
+TEST_TBB_OLD.EXE = $(subst .$(OBJ),.$(TEST_EXT),$(TEST_TBB_OLD.OBJ) $(TEST_TBB_DEPRECATED.OBJ))
+
+ifeq (,$(NO_LEGACY_TESTS))
+test_tbb_old: $(TEST_TBB_OLD.EXE)
+	$(run_cmd) ./test_concurrent_vector_v2.$(TEST_EXT) 1:4
+	$(run_cmd) ./test_concurrent_vector_deprecated.$(TEST_EXT) 1:4
+	$(run_cmd) ./test_concurrent_queue_v2.$(TEST_EXT) 1:4
+	$(run_cmd) ./test_concurrent_queue_deprecated.$(TEST_EXT) 1:4
+	$(run_cmd) ./test_mutex_v2.$(TEST_EXT) 1
+	$(run_cmd) ./test_mutex_v2.$(TEST_EXT) 2
+	$(run_cmd) ./test_mutex_v2.$(TEST_EXT) 4
+else
+test_tbb_old:
+	@echo Legacy tests skipped
+endif
+
+ifneq (,$(codecov))
+codecov_gen:
+	profmerge
+	codecov $(if $(findstring -,$(codecov)),$(codecov),) -demang -comp $(tbb_root)/build/codecov.txt
+endif
+
+test_% debug_%: test_%.$(TEST_EXT) $(AUX_TEST_DEPENDENCIES)
+ifeq (,$(repeat))
+	$(run_cmd) ./$< $(args)
+else
+ifeq (windows,$(tbb_os))
+	for /L %%i in (1,1,$(repeat)) do echo %%i of $(repeat): && $(run_cmd) $< $(args)
+else
+	for ((i=1;i<=$(repeat);++i)); do echo $$i of $(repeat): && $(run_cmd) ./$< $(args); done
+endif
+endif # repeat
+ifneq (,$(codecov))
+	profmerge
+	codecov $(if $(findstring -,$(codecov)),$(codecov),) -demang -comp $(tbb_root)/build/codecov.txt
+endif
+
+time_%: time_%.$(TEST_EXT) $(AUX_TEST_DEPENDENCIES)
+	$(run_cmd) ./$< $(args)
+
+
+clean_%: 
+	$(RM) $*.$(OBJ) $*.exe $*.$(DLL) $*.$(LIBEXT) $*.res $*.map $*.ilk $*.pdb $*.exp $*.*manifest $*.tmp $*.d
+
+clean:
+	$(RM) *.$(OBJ) *.exe *.$(DLL) *.$(LIBEXT) *.res *.map *.ilk *.pdb *.exp *.manifest *.tmp *.d pgopti.* *.dyn core core.*[0-9][0-9]
+
+# Include automatically generated dependences
+-include *.d

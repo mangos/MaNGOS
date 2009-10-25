@@ -527,6 +527,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\framework\Policies\MemoryManagement.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\framework\Policies\ObjectLifeTime.cpp"
 				>
 			</File>
@@ -567,15 +571,15 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\framework\Utilities\UnorderedMap.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\src\framework\Utilities\LinkedList.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\src\framework\Utilities\TypeList.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\framework\Utilities\UnorderedMap.h"
 				>
 			</File>
 			<Filter

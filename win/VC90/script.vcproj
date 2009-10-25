@@ -315,7 +315,7 @@
 				AdditionalDependencies="mangosd.lib zlib.lib libmySQL.lib libeay32.lib ws2_32.lib winmm.lib odbc32.lib odbccp32.lib ace.lib"
 				OutputFile="..\..\bin\$(PlatformName)_$(ConfigurationName)\MaNGOSScript.dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories=";.\mangosd__$(PlatformName)_$(ConfigurationName);.\zlib__$(PlatformName)_$(ConfigurationName);..\..\dep\lib\$(PlatformName)_$(ConfigurationName)"
+				AdditionalLibraryDirectories="&quot;.\mangosd__$(PlatformName)_$(ConfigurationName)&quot;;&quot;.\zlib__$(PlatformName)_$(ConfigurationName)&quot;;&quot;..\..\dep\lib\$(PlatformName)_$(ConfigurationName)&quot;"
 				GenerateDebugInformation="false"
 				SubSystem="2"
 				OptimizeReferences="2"
