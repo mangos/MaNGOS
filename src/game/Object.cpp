@@ -1112,6 +1112,7 @@ WorldObject::WorldObject()
 
 void WorldObject::CleanupsBeforeDelete()
 {
+    RemoveFromWorld();
 }
 
 void WorldObject::_Create( uint32 guidlow, HighGuid guidhigh, uint32 phaseMask )
