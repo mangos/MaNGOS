@@ -364,7 +364,7 @@
 		</Configuration>
 		<Configuration
 			Name="Debug_NoPCH|Win32"
-			OutputDirectory=".\tbbmalloc__$(PlatformName)_$(ConfigurationName)"
+			OutputDirectory=".\tbbmalloc__$(PlatformName)_debug"
 			IntermediateDirectory=".\tbbmalloc__$(PlatformName)_$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="0"
@@ -415,7 +415,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/DLL /MAP /DEBUG /fixed:no /INCREMENTAL:NO  /DEF:$(IntDir)\tbbmalloc.def"
-				OutputFile="..\..\dep\lib\$(PlatformName)_$(ConfigurationName)\tbbmalloc_debug.dll"
+				OutputFile="..\..\dep\lib\$(PlatformName)_debug\tbbmalloc_debug.dll"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -448,7 +448,7 @@
 		</Configuration>
 		<Configuration
 			Name="Debug_NoPCH|x64"
-			OutputDirectory=".\tbbmalloc__$(PlatformName)_$(ConfigurationName)"
+			OutputDirectory=".\tbbmalloc__$(PlatformName)_debug"
 			IntermediateDirectory=".\tbbmalloc__$(PlatformName)_$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="0"
@@ -501,7 +501,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/nologo /DLL /MAP /DEBUG /fixed:no /INCREMENTAL:NO  /DEF:$(IntDir)\tbbmalloc.def"
-				OutputFile="..\..\dep\lib\$(PlatformName)_$(ConfigurationName)\tbbmalloc_debug.dll"
+				OutputFile="..\..\dep\lib\$(PlatformName)_debug\tbbmalloc_debug.dll"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="2"

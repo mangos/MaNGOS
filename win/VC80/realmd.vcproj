@@ -571,7 +571,7 @@
 				OutputFile="..\..\bin\$(PlatformName)_$(ConfigurationName)\realmd.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="&quot;..\..\dep\lib\$(PlatformName)_debug"
+				AdditionalLibraryDirectories="..\..\dep\lib\$(PlatformName)_debug"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="..\..\bin\$(PlatformName)_$(ConfigurationName)\realmd.pdb"
 				GenerateMapFile="true"

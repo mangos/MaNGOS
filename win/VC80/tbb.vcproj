@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="tbb"
 	ProjectGUID="{F62787DD-1327-448B-9818-030062BCFAA5}"
 	RootNamespace="tbb"
@@ -354,8 +354,8 @@
 		</Configuration>
 		<Configuration
 			Name="Debug_NoPCH|Win32"
-			OutputDirectory="$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory=".\tbb__$(PlatformName)_debug"
+			IntermediateDirectory=".\tbb__$(PlatformName)_$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="0"
 			>
@@ -403,7 +403,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/DLL /MAP /DEBUG /fixed:no /INCREMENTAL:NO  /DEF:$(IntDir)\tbb.def"
-				OutputFile="..\..\dep\lib\$(PlatformName)_$(ConfigurationName)\tbb_debug.dll"
+				OutputFile="..\..\dep\lib\$(PlatformName)_debug\tbb_debug.dll"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -436,8 +436,8 @@
 		</Configuration>
 		<Configuration
 			Name="Debug_NoPCH|x64"
-			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			OutputDirectory=".\tbb__$(PlatformName)_debug"
+			IntermediateDirectory=".\tbb__$(PlatformName)_$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="0"
 			>
@@ -487,7 +487,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/nologo /DLL /MAP /DEBUG /fixed:no /INCREMENTAL:NO  /DEF:$(IntDir)\tbb.def"
-				OutputFile="..\..\dep\lib\$(PlatformName)_$(ConfigurationName)\tbb_debug.dll"
+				OutputFile="..\..\dep\lib\$(PlatformName)_debug\tbb_debug.dll"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -527,52 +527,6 @@
 			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
-			<File
-				RelativePath="..\..\dep\tbb\src\tbb\ia32-masm\atomic_support.asm"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="MASM"
-						AdditionalOptions="/coff /Zi"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="MASM"
-						AdditionalOptions="/coff /Zi"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="MASM"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug_NoPCH|Win32"
-					>
-					<Tool
-						Name="MASM"
-						AdditionalOptions="/coff /Zi"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug_NoPCH|x64"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="MASM"
-						AdditionalOptions="/coff /Zi"
-					/>
-				</FileConfiguration>
-			</File>
 			<File
 				RelativePath="..\..\dep\tbb\src\tbb\intel64-masm\atomic_support.asm"
 				>
@@ -628,6 +582,52 @@
 						Description="building atomic_support.obj"
 						CommandLine="ml64 /Fo..\..\bin\$(PlatformName)_$(ConfigurationName)\atomic_support.obj&quot; /DUSE_FRAME_POINTER /DEM64T=1 /c /Zi ../../dep/tbb/src/tbb/intel64-masm/atomic_support.asm&#x0D;&#x0A;"
 						Outputs="..\..\bin\$(PlatformName)_$(ConfigurationName)\atomic_support.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\dep\tbb\src\tbb\ia32-masm\atomic_support.asm"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="MASM"
+						AdditionalOptions="/coff /Zi"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="MASM"
+						AdditionalOptions="/coff /Zi"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="MASM"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_NoPCH|Win32"
+					>
+					<Tool
+						Name="MASM"
+						AdditionalOptions="/coff /Zi"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_NoPCH|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="MASM"
+						AdditionalOptions="/coff /Zi"
 					/>
 				</FileConfiguration>
 			</File>
