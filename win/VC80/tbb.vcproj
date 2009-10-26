@@ -354,7 +354,7 @@
 		</Configuration>
 		<Configuration
 			Name="Debug_NoPCH|Win32"
-			OutputDirectory=".\tbb__$(PlatformName)_debug"
+			OutputDirectory=".\tbb__$(PlatformName)_$(ConfigurationName)"
 			IntermediateDirectory=".\tbb__$(PlatformName)_$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="0"
@@ -436,7 +436,7 @@
 		</Configuration>
 		<Configuration
 			Name="Debug_NoPCH|x64"
-			OutputDirectory=".\tbb__$(PlatformName)_debug"
+			OutputDirectory=".\tbb__$(PlatformName)_$(ConfigurationName)"
 			IntermediateDirectory=".\tbb__$(PlatformName)_$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="0"

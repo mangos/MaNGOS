@@ -412,7 +412,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/DLL /MAP /DEBUG /fixed:no /INCREMENTAL:NO  /DEF:$(IntDir)\tbbmalloc.def"
-				OutputFile="..\..\dep\lib\$(PlatformName)_$(ConfigurationName)\tbbmalloc_debug.dll"
+				OutputFile="..\..\dep\lib\$(PlatformName)_debug\tbbmalloc_debug.dll"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -497,7 +497,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/nologo /DLL /MAP /DEBUG /fixed:no /INCREMENTAL:NO  /DEF:$(IntDir)\tbbmalloc.def"
-				OutputFile="..\..\dep\lib\$(PlatformName)_$(ConfigurationName)\tbbmalloc_debug.dll"
+				OutputFile="..\..\dep\lib\$(PlatformName)_debug\tbbmalloc_debug.dll"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="2"

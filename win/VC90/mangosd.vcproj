@@ -42,7 +42,7 @@
 			/>
 			<Tool
 				Name="VCMIDLTool"
-				TypeLibraryName=".\..\..\bin\Release\mangosd.tlb"
+				TypeLibraryName=".\mangosd__$(PlatformName)_$(ConfigurationName)\mangosd.tlb"
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
@@ -143,7 +143,7 @@
 			<Tool
 				Name="VCMIDLTool"
 				TargetEnvironment="3"
-				TypeLibraryName=".\..\..\bin\Release\mangosd.tlb"
+				TypeLibraryName=".\mangosd__$(PlatformName)_$(ConfigurationName)\mangosd.tlb"
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
@@ -487,7 +487,7 @@
 				Version=""
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="&quot;..\..\dep\lib\$(PlatformName)_$(ConfigurationName)&quot;;&quot;.\framework__$(PlatformName)_$(ConfigurationName)&quot;"
+				AdditionalLibraryDirectories="&quot;..\..\dep\lib\$(PlatformName)_debug&quot;;&quot;.\framework__$(PlatformName)_$(ConfigurationName)&quot;"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="..\..\bin\$(PlatformName)_$(ConfigurationName)\mangosd.pdb"
 				GenerateMapFile="true"
@@ -588,7 +588,7 @@
 				Version=""
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="&quot;..\..\dep\lib\$(PlatformName)_$(ConfigurationName)&quot;;&quot;.\framework__$(PlatformName)_$(ConfigurationName)&quot;"
+				AdditionalLibraryDirectories="&quot;..\..\dep\lib\$(PlatformName)_debug&quot;;&quot;.\framework__$(PlatformName)_$(ConfigurationName)&quot;"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="..\..\bin\$(PlatformName)_$(ConfigurationName)\mangosd.pdb"
 				GenerateMapFile="true"

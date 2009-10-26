@@ -364,7 +364,7 @@
 		</Configuration>
 		<Configuration
 			Name="Debug_NoPCH|Win32"
-			OutputDirectory=".\tbbmalloc__$(PlatformName)_debug"
+			OutputDirectory=".\tbbmalloc__$(PlatformName)_$(ConfigurationName)"
 			IntermediateDirectory=".\tbbmalloc__$(PlatformName)_$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="0"
@@ -448,7 +448,7 @@
 		</Configuration>
 		<Configuration
 			Name="Debug_NoPCH|x64"
-			OutputDirectory=".\tbbmalloc__$(PlatformName)_debug"
+			OutputDirectory=".\tbbmalloc__$(PlatformName)_$(ConfigurationName)"
 			IntermediateDirectory=".\tbbmalloc__$(PlatformName)_$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="0"

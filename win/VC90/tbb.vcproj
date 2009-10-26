@@ -351,8 +351,8 @@
 		</Configuration>
 		<Configuration
 			Name="Debug_NoPCH|Win32"
-			OutputDirectory="$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory=".\tbb__$(PlatformName)_$(ConfigurationName)"
+			IntermediateDirectory=".\tbb__$(PlatformName)_$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="0"
 			>
@@ -400,7 +400,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/DLL /MAP /DEBUG /fixed:no /INCREMENTAL:NO  /DEF:$(IntDir)\tbb.def"
-				OutputFile="..\..\dep\lib\$(PlatformName)_$(ConfigurationName)\tbb_debug.dll"
+				OutputFile="..\..\dep\lib\$(PlatformName)_debug\tbb_debug.dll"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -432,8 +432,8 @@
 		</Configuration>
 		<Configuration
 			Name="Debug_NoPCH|x64"
-			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			OutputDirectory=".\tbb__$(PlatformName)_$(ConfigurationName)"
+			IntermediateDirectory=".\tbb__$(PlatformName)_$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="0"
 			>
@@ -483,7 +483,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/nologo /DLL /MAP /DEBUG /fixed:no /INCREMENTAL:NO  /DEF:$(IntDir)\tbb.def"
-				OutputFile="..\..\dep\lib\$(PlatformName)_$(ConfigurationName)\tbb_debug.dll"
+				OutputFile="..\..\dep\lib\$(PlatformName)_debug\tbb_debug.dll"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="2"
