@@ -47,7 +47,7 @@ class SqlStatement : public SqlOperation
         const char *m_sql;
     public:
         SqlStatement(const char *sql) : m_sql(mangos_strdup(sql)){}
-        ~SqlStatement() { void* tofree = const_cast<char*>(m_sql); delete [] tofree; }
+        ~SqlStatement() { char* tofree = const_cast<char*>(m_sql); delete [] tofree; }
         void Execute(Database *db);
 };
 
@@ -85,7 +85,7 @@ class SqlQuery : public SqlOperation
     public:
         SqlQuery(const char *sql, MaNGOS::IQueryCallback * callback, SqlResultQueue * queue)
             : m_sql(mangos_strdup(sql)), m_callback(callback), m_queue(queue) {}
-        ~SqlQuery() { void* tofree = const_cast<char*>(m_sql); delete [] tofree; }
+        ~SqlQuery() { char* tofree = const_cast<char*>(m_sql); delete [] tofree; }
         void Execute(Database *db);
 };
 

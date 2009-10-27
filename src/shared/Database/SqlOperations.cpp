@@ -36,22 +36,22 @@ void SqlTransaction::Execute(Database *db)
     db->DirectExecute("START TRANSACTION");
     while(!m_queue.empty())
     {
-        char const *sql = m_queue.front();
+        char *sql = const_cast<char*>(m_queue.front());
         m_queue.pop();
 
         if(!db->DirectExecute(sql))
         {
-            delete [] ((void*)const_cast<char*>(sql));
+            delete [] sql;
             db->DirectExecute("ROLLBACK");
             while(!m_queue.empty())
             {
-                delete [] ((void*)const_cast<char*>(m_queue.front()));
+                delete [] (const_cast<char*>(m_queue.front()));
                 m_queue.pop();
             }
             return;
         }
 
-        delete [] ((void*)const_cast<char*>(sql));
+        delete [] sql;
     }
     db->DirectExecute("COMMIT");
 }
@@ -141,7 +141,7 @@ QueryResult* SqlQueryHolder::GetResult(size_t index)
         /// the query strings are freed on the first GetResult or in the destructor
         if(m_queries[index].first != NULL)
         {
-            delete [] ((void*)(const_cast<char*>(m_queries[index].first)));
+            delete [] (const_cast<char*>(m_queries[index].first));
             m_queries[index].first = NULL;
         }
         /// when you get a result aways remember to delete it!
@@ -166,7 +166,7 @@ SqlQueryHolder::~SqlQueryHolder()
         /// results used already (getresult called) are expected to be deleted
         if(m_queries[i].first != NULL)
         {
-            delete [] ((void*)(const_cast<char*>(m_queries[i].first)));
+            delete [] (const_cast<char*>(m_queries[i].first));
             if(m_queries[i].second)
                 delete m_queries[i].second;
         }

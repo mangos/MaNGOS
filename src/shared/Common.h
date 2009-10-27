@@ -187,10 +187,7 @@ LocaleConstant GetLocaleByName(const std::string& name);
 //operator new[] based version of strdup() function! Release memory by using operator delete[] !
 inline char * mangos_strdup(const char * source)
 {
-    const size_t length = strlen(source);
-    char * dest = new char[length + 1];
-    //set terminating end-of-string symbol
-    dest[length] = 0;
+    char * dest = new char[strlen(source) + 1];
     strcpy(dest, source);
     return dest;
 }
