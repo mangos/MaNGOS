@@ -14783,9 +14783,7 @@ void Player::_LoadActions(QueryResult *result)
 
 void Player::_LoadAuras(QueryResult *result, uint32 timediff)
 {
-    m_Auras.clear();
-    for (int i = 0; i < TOTAL_AURAS; ++i)
-        m_modAuras[i].clear();
+    RemoveAllAuras();
 
     //QueryResult *result = CharacterDatabase.PQuery("SELECT caster_guid,spell,effect_index,stackcount,amount,maxduration,remaintime,remaincharges FROM character_aura WHERE guid = '%u'",GetGUIDLow());
 
