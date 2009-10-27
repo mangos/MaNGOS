@@ -6382,6 +6382,11 @@ void Aura::PeriodicTick()
             if (isCrit)
                 cleanDamage.hitOutCome = MELEE_HIT_CRIT;
 
+            // Reduce dot damage from resilience for players.
+            // FIXME: need use SpellDamageBonus instead?
+            if (m_target->GetTypeId() == TYPEID_PLAYER)
+                pdamage-=((Player*)m_target)->GetSpellDamageReduction(pdamage);
+
             pCaster->CalcAbsorbResist(m_target, GetSpellSchoolMask(GetSpellProto()), DOT, pdamage, &absorb, &resist);
 
             sLog.outDetail("PeriodicTick: %u (TypeId: %u) attacked %u (TypeId: %u) for %u dmg inflicted by %u abs is %u",
