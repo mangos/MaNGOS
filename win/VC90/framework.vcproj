@@ -532,6 +532,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\framework\Policies\MemoryManagement.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\framework\Policies\ObjectLifeTime.cpp"
 				>
 			</File>

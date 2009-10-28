@@ -242,7 +242,7 @@ void RASocket::zprint( const char * szText )
 
     #ifdef RA_CRYPT
 
-    char *megabuffer=strdup(szText);
+    char *megabuffer = mangos_strdup(szText);
     unsigned int sz=strlen(megabuffer);
     Encrypt(megabuffer,sz);
     send(r,megabuffer,sz,0);

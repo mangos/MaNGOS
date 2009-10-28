@@ -1,0 +1,121 @@
+# Copyright 2005-2009 Intel Corporation.  All Rights Reserved.
+#
+# This file is part of Threading Building Blocks.
+#
+# Threading Building Blocks is free software; you can redistribute it
+# and/or modify it under the terms of the GNU General Public License
+# version 2 as published by the Free Software Foundation.
+#
+# Threading Building Blocks is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+# of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Threading Building Blocks; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+#
+# As a special exception, you may use this file as part of a free software
+# library without restriction.  Specifically, if other files instantiate
+# templates or use macros or inline functions from this file, or you compile
+# this file and link it with other files to produce an executable, this
+# file does not by itself cause the resulting executable to be covered by
+# the GNU General Public License.  This exception does not however
+# invalidate any other reasons why the executable file might be covered by
+# the GNU General Public License.
+
+#------------------------------------------------------------------------------
+# Define rules for making the TBB shared library.
+#------------------------------------------------------------------------------
+
+tbb_root ?= "$(TBB22_INSTALL_DIR)"
+BUILDING_PHASE=1
+include $(tbb_root)/build/common.inc
+DEBUG_SUFFIX=$(findstring _debug,_$(cfg))
+
+#------------------------------------------------------------
+# Define static pattern rules dealing with .cpp source files
+#------------------------------------------------------------
+$(warning CONFIG: cfg=$(cfg) arch=$(arch) compiler=$(compiler) os=$(tbb_os) runtime=$(runtime))
+
+default_tbb: $(TBB.DLL)
+.PHONY: default_tbb tbbvars clean
+.PRECIOUS: %.$(OBJ)
+
+VPATH = $(tbb_root)/src/tbb/$(ASSEMBLY_SOURCE) $(tbb_root)/src/tbb $(tbb_root)/src/old $(tbb_root)/src/rml/client
+
+CPLUS_FLAGS += $(PIC_KEY) $(DEFINE_KEY)__TBB_BUILD=1
+
+ifeq (1,$(TBB_NOSTRICT))
+# GNU 3.2.3 headers have a ISO syntax that is rejected by Intel compiler in -strict_ansi mode.
+# The Mac uses gcc, so the list is empty for that platform.
+# The files below need the -strict_ansi flag downgraded to -ansi to compile
+
+KNOWN_NOSTRICT = concurrent_hash_map.o \
+	concurrent_queue.o    \
+	concurrent_vector_v2.o \
+	concurrent_vector.o
+
+endif
+
+# Object files (that were compiled from C++ code) that gmake up TBB
+TBB_CPLUS.OBJ = concurrent_hash_map.$(OBJ) \
+		concurrent_queue.$(OBJ) \
+		concurrent_vector.$(OBJ) \
+		dynamic_link.$(OBJ) \
+		itt_notify.$(OBJ) \
+		cache_aligned_allocator.$(OBJ) \
+		pipeline.$(OBJ) \
+		queuing_mutex.$(OBJ) \
+		queuing_rw_mutex.$(OBJ) \
+		spin_rw_mutex.$(OBJ) \
+		spin_mutex.$(OBJ) \
+		task.$(OBJ) \
+		tbb_misc.$(OBJ) \
+		mutex.$(OBJ) \
+		recursive_mutex.$(OBJ) \
+		tbb_thread.$(OBJ) \
+		itt_notify_proxy.$(OBJ) \
+		private_server.$(OBJ) \
+		rml_tbb.$(OBJ)
+
+# OLD/Legacy object files for backward binary compatibility
+ifeq (,$(findstring $(DEFINE_KEY)TBB_NO_LEGACY,$(CPLUS_FLAGS)))
+TBB_CPLUS_OLD.OBJ = \
+		concurrent_vector_v2.$(OBJ) \
+		concurrent_queue_v2.$(OBJ) \
+		spin_rw_mutex_v2.$(OBJ)
+endif
+
+# Object files that gmake up TBB (TBB_ASM.OBJ is platform-specific)
+TBB.OBJ = $(TBB_CPLUS.OBJ) $(TBB_CPLUS_OLD.OBJ) $(TBB_ASM.OBJ)
+
+# Suppress superfluous warnings for TBB compilation
+WARNING_KEY += $(WARNING_SUPPRESS)
+
+CXX_WARN_SUPPRESS = $(RML_WARNING_SUPPRESS)
+
+include $(tbb_root)/build/common_rules.inc
+
+ifneq (,$(TBB.DEF))
+tbb.def: $(TBB.DEF)
+	$(CMD) "$(CPLUS) $(PREPROC_ONLY) $(TBB.DEF) $(INCLUDES) $(filter $(DEFINE_KEY)%,$(CPLUS_FLAGS)) >tbb.def 2>$(NUL) || exit 0"
+
+LIB_LINK_FLAGS += $(EXPORT_KEY)tbb.def
+$(TBB.DLL): tbb.def
+endif
+
+$(TBB.DLL): BUILDING_LIBRARY = $(TBB.DLL)
+$(TBB.DLL): $(TBB.OBJ) $(TBB.RES) tbbvars $(TBB_NO_VERSION.DLL)
+	$(LIB_LINK_CMD) $(LIB_OUTPUT_KEY)$(TBB.DLL) $(TBB.OBJ) $(TBB.RES) $(LIB_LINK_LIBS) $(LIB_LINK_FLAGS)
+
+ifneq (,$(TBB_NO_VERSION.DLL))
+$(TBB_NO_VERSION.DLL):
+	echo "INPUT ($(TBB.DLL))" > $(TBB_NO_VERSION.DLL)
+endif
+
+#clean:
+#	$(RM) *.$(OBJ) *.$(DLL) *.res *.map *.ilk *.pdb *.exp *.manifest *.tmp *.d core core.*[0-9][0-9]
+
+# Include automatically generated dependences
+-include *.d

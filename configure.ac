@@ -253,6 +253,7 @@ AC_CONFIG_FILES([
    dep/src/sockets/Makefile
    dep/src/zlib/Makefile
    dep/Makefile
+   dep/tbb/Makefile
    doc/Doxyfile
    doc/Makefile
    Makefile
