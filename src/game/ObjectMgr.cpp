@@ -3278,6 +3278,9 @@ void ObjectMgr::LoadQuests()
     delete result;
 
     // Post processing
+
+    std::map<uint32,uint32> usedMailTemplates;
+
     for (QuestMap::iterator iter = mQuestTemplates.begin(); iter != mQuestTemplates.end(); ++iter)
     {
         Quest * qinfo = iter->second;
@@ -3766,21 +3769,31 @@ void ObjectMgr::LoadQuests()
             }
         }
 
-        if(qinfo->RewMailTemplateId)
+        if (qinfo->RewMailTemplateId)
         {
-            if(!sMailTemplateStore.LookupEntry(qinfo->RewMailTemplateId))
+            if (!sMailTemplateStore.LookupEntry(qinfo->RewMailTemplateId))
             {
                 sLog.outErrorDb("Quest %u has `RewMailTemplateId` = %u but mail template  %u does not exist, quest will not have a mail reward.",
                     qinfo->GetQuestId(),qinfo->RewMailTemplateId,qinfo->RewMailTemplateId);
                 qinfo->RewMailTemplateId = 0;               // no mail will send to player
                 qinfo->RewMailDelaySecs = 0;                // no mail will send to player
             }
+            else if (usedMailTemplates.find(qinfo->RewMailTemplateId) != usedMailTemplates.end())
+            {
+                std::map<uint32,uint32>::const_iterator used_mt_itr = usedMailTemplates.find(qinfo->RewMailTemplateId);
+                sLog.outErrorDb("Quest %u has `RewMailTemplateId` = %u but mail template  %u already used for quest %u, quest will not have a mail reward.",
+                    qinfo->GetQuestId(),qinfo->RewMailTemplateId,qinfo->RewMailTemplateId,used_mt_itr->second);
+                qinfo->RewMailTemplateId = 0;               // no mail will send to player
+                qinfo->RewMailDelaySecs = 0;                // no mail will send to player
+            }
+            else
+                usedMailTemplates[qinfo->RewMailTemplateId] = qinfo->GetQuestId();
         }
 
-        if(qinfo->NextQuestInChain)
+        if (qinfo->NextQuestInChain)
         {
             QuestMap::iterator qNextItr = mQuestTemplates.find(qinfo->NextQuestInChain);
-            if(qNextItr == mQuestTemplates.end())
+            if (qNextItr == mQuestTemplates.end())
             {
                 sLog.outErrorDb("Quest %u has `NextQuestInChain` = %u but quest %u does not exist, quest chain will not work.",
                     qinfo->GetQuestId(),qinfo->NextQuestInChain ,qinfo->NextQuestInChain );
@@ -3791,7 +3804,7 @@ void ObjectMgr::LoadQuests()
         }
 
         // fill additional data stores
-        if(qinfo->PrevQuestId)
+        if (qinfo->PrevQuestId)
         {
             if (mQuestTemplates.find(abs(qinfo->GetPrevQuestId())) == mQuestTemplates.end())
             {

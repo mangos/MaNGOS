@@ -1262,11 +1262,10 @@ void LoadLootTemplates_Mail()
     LootTemplates_Mail.LoadAndCollectLootIds(ids_set);
 
     // remove real entries and check existence loot
-    ObjectMgr::QuestMap const& questMap = objmgr.GetQuestTemplates();
-    for(ObjectMgr::QuestMap::const_iterator itr = questMap.begin(); itr != questMap.end(); ++itr )
-        if(uint32 mail_template_id = itr->second->GetRewMailTemplateId())
-            if(ids_set.count(mail_template_id))
-                ids_set.erase(mail_template_id);
+    for(uint32 i = 1; i < sMailTemplateStore.GetNumRows(); ++i )
+        if(sMailTemplateStore.LookupEntry(i))
+            if(ids_set.count(i))
+                ids_set.erase(i);
 
     // output error for any still listed (not referenced from appropriate table) ids
     LootTemplates_Mail.ReportUnusedIds(ids_set);
