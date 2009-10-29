@@ -314,6 +314,7 @@ void WorldSession::HandleMailDelete(WorldPacket & recv_data )
     uint32 mailId;
     recv_data >> mailbox;
     recv_data >> mailId;
+    recv_data.read_skip<uint32>();                          // mailTemplateId
 
     if (!GetPlayer()->GetGameObjectIfCanInteractWith(mailbox, GAMEOBJECT_TYPE_MAILBOX))
         return;
@@ -709,7 +710,9 @@ void WorldSession::HandleMailCreateTextItem(WorldPacket & recv_data )
     uint64 mailbox;
     uint32 mailId;
 
-    recv_data >> mailbox >> mailId;
+    recv_data >> mailbox;
+    recv_data >> mailId;
+    recv_data.read_skip<uint32>();                          // mailTemplateId, non need, Mail store own 100% correct value anyway
 
     if (!GetPlayer()->GetGameObjectIfCanInteractWith(mailbox, GAMEOBJECT_TYPE_MAILBOX))
         return;
@@ -717,10 +720,25 @@ void WorldSession::HandleMailCreateTextItem(WorldPacket & recv_data )
     Player *pl = _player;
 
     Mail* m = pl->GetMail(mailId);
-    if(!m || !m->itemTextId || m->state == MAIL_STATE_DELETED || m->deliver_time > time(NULL))
+    if(!m || !m->itemTextId && !m->mailTemplateId || m->state == MAIL_STATE_DELETED || m->deliver_time > time(NULL))
     {
         pl->SendMailResult(mailId, MAIL_MADE_PERMANENT, MAIL_ERR_INTERNAL_ERROR);
         return;
+    }
+
+    uint32 itemTextId = m->itemTextId;
+
+    // in mail template case we need create new text id
+    if(!itemTextId)
+    {
+        MailTemplateEntry const* mailTemplateEntry = sMailTemplateStore.LookupEntry(m->mailTemplateId);
+        if(!mailTemplateEntry)
+        {
+            pl->SendMailResult(mailId, MAIL_MADE_PERMANENT, MAIL_ERR_INTERNAL_ERROR);
+            return;
+        }
+
+        itemTextId = objmgr.CreateItemText(mailTemplateEntry->content[GetSessionDbcLocale()]);
     }
 
     Item *bodyItem = new Item;                              // This is not bag and then can be used new Item.
@@ -730,7 +748,7 @@ void WorldSession::HandleMailCreateTextItem(WorldPacket & recv_data )
         return;
     }
 
-    bodyItem->SetUInt32Value( ITEM_FIELD_ITEM_TEXT_ID, m->itemTextId );
+    bodyItem->SetUInt32Value( ITEM_FIELD_ITEM_TEXT_ID, itemTextId );
     bodyItem->SetUInt32Value( ITEM_FIELD_CREATOR, m->sender);
 
     sLog.outDetail("HandleMailCreateTextItem mailid=%u",mailId);
