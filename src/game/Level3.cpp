@@ -360,12 +360,12 @@ bool ChatHandler::HandleReloadLootTemplatesProspectingCommand(const char*)
     return true;
 }
 
-bool ChatHandler::HandleReloadLootTemplatesQuestMailCommand(const char*)
+bool ChatHandler::HandleReloadLootTemplatesMailCommand(const char*)
 {
-    sLog.outString( "Re-Loading Loot Tables... (`quest_mail_loot_template`)" );
-    LoadLootTemplates_QuestMail();
-    LootTemplates_QuestMail.CheckLootRefs();
-    SendGlobalSysMessage("DB table `quest_mail_loot_template` reloaded.");
+    sLog.outString( "Re-Loading Loot Tables... (`mail_loot_template`)" );
+    LoadLootTemplates_Mail();
+    LootTemplates_Mail.CheckLootRefs();
+    SendGlobalSysMessage("DB table `mail_loot_template` reloaded.");
     return true;
 }
 

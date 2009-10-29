@@ -351,11 +351,11 @@ class ChatHandler
         bool HandleReloadLootTemplatesFishingCommand(const char* args);
         bool HandleReloadLootTemplatesGameobjectCommand(const char* args);
         bool HandleReloadLootTemplatesItemCommand(const char* args);
+        bool HandleReloadLootTemplatesMailCommand(const char* args);
         bool HandleReloadLootTemplatesMillingCommand(const char* args);
         bool HandleReloadLootTemplatesPickpocketingCommand(const char* args);
         bool HandleReloadLootTemplatesProspectingCommand(const char* args);
         bool HandleReloadLootTemplatesReferenceCommand(const char* args);
-        bool HandleReloadLootTemplatesQuestMailCommand(const char* args);
         bool HandleReloadLootTemplatesSkinningCommand(const char* args);
         bool HandleReloadLootTemplatesSpellCommand(const char* args);
         bool HandleReloadMangosStringCommand(const char* args);
