@@ -1353,7 +1353,17 @@ bool Creature::LoadFromDB(uint32 guid, Map *map)
     }
 
     m_DBTableGuid = guid;
-    if (map->GetInstanceId() != 0) guid = objmgr.GenerateLowGuid(HIGHGUID_UNIT);
+    if (map->GetInstanceId() == 0)
+    {
+        // Creature can be loaded already in map if grid has been unloaded while creature walk to another grid
+        // FIXME: until creature guids is global and for instances used dynamic generated guids
+        // in instance possible load creature duplicates with same DB guid but different in game guids
+        // This will be until implementing per-map creature guids
+        if (map->GetCreature(MAKE_NEW_GUID(guid,data->id,HIGHGUID_UNIT)))
+            return false;
+    }
+    else
+        guid = objmgr.GenerateLowGuid(HIGHGUID_UNIT);
 
     uint16 team = 0;
     if(!Create(guid,map,data->phaseMask,data->id,team,data))
