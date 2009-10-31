@@ -78,19 +78,16 @@ void WorldSession::HandleSendMail(WorldPacket & recv_data )
     if(items_count > 12)                                    // client limit
     {
         GetPlayer()->SendMailResult(0, MAIL_SEND, MAIL_ERR_TOO_MANY_ATTACHMENTS);
+        recv_data.rpos(recv_data.wpos());                   // set to end to avoid warnings spam
         return;
     }
 
-    if(items_count)
+    for(uint8 i = 0; i < items_count; ++i)
     {
-        for(uint8 i = 0; i < items_count; ++i)
-        {
-            uint8  item_slot;
-            uint64 item_guid;
-            recv_data >> item_slot;
-            recv_data >> item_guid;
-            mi.AddItem(GUID_LOPART(item_guid), item_slot);
-        }
+        uint64 item_guid;
+        recv_data.read_skip<uint8>();                   // item slot in mail, not used
+        recv_data >> item_guid;
+        mi.AddItem(GUID_LOPART(item_guid));
     }
 
     recv_data >> money >> COD;                              // money and cod
@@ -176,51 +173,49 @@ void WorldSession::HandleSendMail(WorldPacket & recv_data )
     else
         rc_account = objmgr.GetPlayerAccountIdByGUID(rc);
 
-    if (items_count)
+    for(MailItemMap::iterator mailItemIter = mi.begin(); mailItemIter != mi.end(); ++mailItemIter)
     {
-        for(MailItemMap::iterator mailItemIter = mi.begin(); mailItemIter != mi.end(); ++mailItemIter)
+        MailItem& mailItem = mailItemIter->second;
+
+        if(!mailItem.item_guidlow)
         {
-            MailItem& mailItem = mailItemIter->second;
+            pl->SendMailResult(0, MAIL_SEND, MAIL_ERR_MAIL_ATTACHMENT_INVALID);
+            return;
+        }
 
-            if(!mailItem.item_guidlow)
-            {
-                pl->SendMailResult(0, MAIL_SEND, MAIL_ERR_MAIL_ATTACHMENT_INVALID);
-                return;
-            }
+        mailItem.item = pl->GetItemByGuid(MAKE_NEW_GUID(mailItem.item_guidlow, 0, HIGHGUID_ITEM));
+        // prevent sending bag with items (cheat: can be placed in bag after adding equipped empty bag to mail)
+        if(!mailItem.item)
+        {
+            pl->SendMailResult(0, MAIL_SEND, MAIL_ERR_MAIL_ATTACHMENT_INVALID);
+            return;
+        }
 
-            mailItem.item = pl->GetItemByGuid(MAKE_NEW_GUID(mailItem.item_guidlow, 0, HIGHGUID_ITEM));
-            // prevent sending bag with items (cheat: can be placed in bag after adding equipped empty bag to mail)
-            if(!mailItem.item)
-            {
-                pl->SendMailResult(0, MAIL_SEND, MAIL_ERR_MAIL_ATTACHMENT_INVALID);
-                return;
-            }
+        if(!mailItem.item->CanBeTraded(true))
+        {
+            pl->SendMailResult(0, MAIL_SEND, MAIL_ERR_EQUIP_ERROR, EQUIP_ERR_MAIL_BOUND_ITEM);
+            return;
+        }
 
-            if(!mailItem.item->CanBeTraded(true))
-            {
-                pl->SendMailResult(0, MAIL_SEND, MAIL_ERR_EQUIP_ERROR, EQUIP_ERR_MAIL_BOUND_ITEM);
-                return;
-            }
+        if(mailItem.item->IsBoundAccountWide() && mailItem.item->IsSoulBound() && pl->GetSession()->GetAccountId() != rc_account)
+        {
+            pl->SendMailResult(0, MAIL_SEND, MAIL_ERR_EQUIP_ERROR, EQUIP_ERR_ARTEFACTS_ONLY_FOR_OWN_CHARACTERS);
+            return;
+        }
 
-            if(mailItem.item->IsBoundAccountWide() && mailItem.item->IsSoulBound() && pl->GetSession()->GetAccountId() != rc_account)
-            {
-                pl->SendMailResult(0, MAIL_SEND, MAIL_ERR_EQUIP_ERROR, EQUIP_ERR_ARTEFACTS_ONLY_FOR_OWN_CHARACTERS);
-                return;
-            }
+        if (mailItem.item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAGS_CONJURED) || mailItem.item->GetUInt32Value(ITEM_FIELD_DURATION))
+        {
+            pl->SendMailResult(0, MAIL_SEND, MAIL_ERR_EQUIP_ERROR, EQUIP_ERR_MAIL_BOUND_ITEM);
+            return;
+        }
 
-            if (mailItem.item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAGS_CONJURED) || mailItem.item->GetUInt32Value(ITEM_FIELD_DURATION))
-            {
-                pl->SendMailResult(0, MAIL_SEND, MAIL_ERR_EQUIP_ERROR, EQUIP_ERR_MAIL_BOUND_ITEM);
-                return;
-            }
-
-            if(COD && mailItem.item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAGS_WRAPPED))
-            {
-                pl->SendMailResult(0, MAIL_SEND, MAIL_ERR_CANT_SEND_WRAPPED_COD);
-                return;
-            }
+        if(COD && mailItem.item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAGS_WRAPPED))
+        {
+            pl->SendMailResult(0, MAIL_SEND, MAIL_ERR_CANT_SEND_WRAPPED_COD);
+            return;
         }
     }
+
     pl->SendMailResult(0, MAIL_SEND, MAIL_OK);
 
     uint32 itemTextId = 0;

@@ -82,9 +82,8 @@ struct MailItemInfo
 
 struct MailItem
 {
-    MailItem() : item_slot(0), item_guidlow(0), item_template(0), item(NULL) {}
+    MailItem() : item_guidlow(0), item_template(0), item(NULL) {}
 
-    uint8 item_slot;                                        // slot in mail
     uint32 item_guidlow;                                    // item guid (low part)
     uint32 item_template;                                   // item entry
     Item *item;                                             // item pointer
@@ -102,21 +101,19 @@ class MailItemsInfo
         MailItemMap::iterator begin() { return i_MailItemMap.begin(); }
         MailItemMap::iterator end() { return i_MailItemMap.end(); }
 
-        void AddItem(uint32 guidlow, uint32 _template, Item *item, uint8 slot = 0)
+        void AddItem(uint32 guidlow, uint32 _template, Item *item)
         {
             MailItem mailItem;
-            mailItem.item_slot = slot;
             mailItem.item_guidlow = guidlow;
             mailItem.item_template = _template;
             mailItem.item = item;
             i_MailItemMap[guidlow] = mailItem;
         }
 
-        void AddItem(uint32 guidlow, uint8 slot = 0)
+        void AddItem(uint32 guidlow)
         {
             MailItem mailItem;
             mailItem.item_guidlow = guidlow;
-            mailItem.item_slot = slot;
             i_MailItemMap[guidlow] = mailItem;
         }
 
