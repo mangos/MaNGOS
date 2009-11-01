@@ -2163,10 +2163,11 @@ void ObjectMgr::LoadPetLevelInfo()
         if (!result)
         {
             barGoLink bar( 1 );
+            bar.step();
 
             sLog.outString();
-            sLog.outString( ">> Loaded %u level pet stats definitions", count );
-            sLog.outErrorDb( "Error loading `pet_levelstats` table or empty table.");
+            sLog.outString(">> Loaded %u level pet stats definitions", count);
+            sLog.outErrorDb("Error loading `pet_levelstats` table or empty table.");
             return;
         }
 
