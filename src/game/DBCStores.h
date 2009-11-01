@@ -33,9 +33,10 @@ uint32 GetTalentSpellCost(uint32 spellId);
 TalentSpellPos const* GetTalentSpellPos(uint32 spellId);
 
 int32 GetAreaFlagByAreaID(uint32 area_id);                  // -1 if not found
-AreaTableEntry const* GetAreaEntryByAreaID(uint32 area_id);
-AreaTableEntry const* GetAreaEntryByAreaFlagAndMap(uint32 area_flag,uint32 map_id);
 uint32 GetAreaFlagByMapId(uint32 mapid);
+
+MANGOS_DLL_SPEC AreaTableEntry const* GetAreaEntryByAreaID(uint32 area_id);
+MANGOS_DLL_SPEC AreaTableEntry const* GetAreaEntryByAreaFlagAndMap(uint32 area_flag,uint32 map_id);
 
 uint32 GetVirtualMapForMapAndZone(uint32 mapid, uint32 zoneId);
 
