@@ -50,6 +50,11 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     // possible errors in the coordinate validity check
     if(!MapManager::IsValidMapCoord(loc.mapid, loc.coord_x, loc.coord_y, loc.coord_z, loc.orientation))
     {
+        sLog.outError("WorldSession::HandleMoveWorldportAckOpcode: player got's teleported far to a not valid location. (map:%u, x:%f, y:%f, z:%f) We log him out and don't save him..", loc.mapid, loc.coord_x, loc.coord_y, loc.coord_z);
+        // stop teleportation else we would try this again in the beginning of WorldSession::LogoutPlayer...
+        GetPlayer()->SetSemaphoreTeleportFar(false);
+        // player don't gets saved - so his coords will stay at the point where
+        // he was last saved
         LogoutPlayer(false);
         return;
     }
