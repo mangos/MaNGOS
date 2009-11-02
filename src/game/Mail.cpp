@@ -56,6 +56,11 @@ void MailItemsInfo::deleteIncludedItems( bool inDB /*= false*/ )
     i_MailItemMap.clear();
 }
 
+void MailItemsInfo::AddItem( Item *item )
+{
+    i_MailItemMap[item->GetGUIDLow()] = item;
+}
+
 void Mail::AddAllItems( MailItemsInfo& pMailItemsInfo )
 {
     for(MailItemMap::iterator mailItemIter = pMailItemsInfo.begin(); mailItemIter != pMailItemsInfo.end(); ++mailItemIter)

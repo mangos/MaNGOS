@@ -90,10 +90,7 @@ class MailItemsInfo
         MailItemMap::iterator begin() { return i_MailItemMap.begin(); }
         MailItemMap::iterator end() { return i_MailItemMap.end(); }
 
-        void AddItem(Item *item)
-        {
-            i_MailItemMap[item->GetGUIDLow()] = item;
-        }
+        void AddItem(Item *item);
 
         uint8 size() const { return i_MailItemMap.size(); }
         bool empty() const { return i_MailItemMap.empty(); }
