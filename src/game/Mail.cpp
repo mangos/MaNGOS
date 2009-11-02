@@ -842,7 +842,7 @@ void WorldSession::SendMailTo(Player* receiver, uint8 messageType, uint8 station
         for(MailItemMap::const_iterator mailItemIter = mi->begin(); mailItemIter != mi->end(); ++mailItemIter)
         {
             Item* item = mailItemIter->second;
-            CharacterDatabase.PExecute("INSERT INTO mail_items (mail_id,item_guid,item_template,receiver) VALUES ('%u', '%u', '%u','%u')", mailId, item->GetGUIDLow(), item->GetEntry(), item->GetGUIDLow());
+            CharacterDatabase.PExecute("INSERT INTO mail_items (mail_id,item_guid,item_template,receiver) VALUES ('%u', '%u', '%u','%u')", mailId, item->GetGUIDLow(), item->GetEntry(), receiver_guidlow);
         }
     }
     CharacterDatabase.CommitTransaction();
