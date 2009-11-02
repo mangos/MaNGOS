@@ -98,20 +98,7 @@ class MailItemsInfo
         uint8 size() const { return i_MailItemMap.size(); }
         bool empty() const { return i_MailItemMap.empty(); }
 
-        void deleteIncludedItems(bool inDB = false)
-        {
-            for(MailItemMap::iterator mailItemIter = begin(); mailItemIter != end(); ++mailItemIter)
-            {
-                Item* item = mailItemIter->second;
-
-                if(inDB)
-                    CharacterDatabase.PExecute("DELETE FROM item_instance WHERE guid='%u'", item->GetGUIDLow());
-
-                delete item;
-            }
-
-            i_MailItemMap.clear();
-        }
+        void deleteIncludedItems(bool inDB = false);
     private:
         MailItemMap i_MailItemMap;                          // Keep the items in a map to avoid duplicate guids (which can happen), store only low part of guid
 };
@@ -143,14 +130,7 @@ struct Mail
         items.push_back(mii);
     }
 
-    void AddAllItems(MailItemsInfo& pMailItemsInfo)
-    {
-        for(MailItemMap::iterator mailItemIter = pMailItemsInfo.begin(); mailItemIter != pMailItemsInfo.end(); ++mailItemIter)
-        {
-            Item* item = mailItemIter->second;
-            AddItem(item->GetGUIDLow(), item->GetEntry());
-        }
-    }
+    void AddAllItems(MailItemsInfo& pMailItemsInfo);
 
     bool RemoveItem(uint32 item_guid)
     {

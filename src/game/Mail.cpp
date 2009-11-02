@@ -29,6 +29,7 @@
 #include "Language.h"
 #include "DBCStores.h"
 #include "BattleGroundMgr.h"
+#include "Item.h"
 
 enum MailShowFlags
 {
@@ -38,6 +39,31 @@ enum MailShowFlags
     MAIL_SHOW_UNK2    = 0x0008,                             // unknown, COD will be shown even without that flag
     MAIL_SHOW_RETURN  = 0x0010,
 };
+
+
+void MailItemsInfo::deleteIncludedItems( bool inDB /*= false*/ )
+{
+    for(MailItemMap::iterator mailItemIter = begin(); mailItemIter != end(); ++mailItemIter)
+    {
+        Item* item = mailItemIter->second;
+
+        if(inDB)
+            CharacterDatabase.PExecute("DELETE FROM item_instance WHERE guid='%u'", item->GetGUIDLow());
+
+        delete item;
+    }
+
+    i_MailItemMap.clear();
+}
+
+void Mail::AddAllItems( MailItemsInfo& pMailItemsInfo )
+{
+    for(MailItemMap::iterator mailItemIter = pMailItemsInfo.begin(); mailItemIter != pMailItemsInfo.end(); ++mailItemIter)
+    {
+        Item* item = mailItemIter->second;
+        AddItem(item->GetGUIDLow(), item->GetEntry());
+    }
+}
 
 void WorldSession::HandleSendMail(WorldPacket & recv_data )
 {
@@ -201,7 +227,7 @@ void WorldSession::HandleSendMail(WorldPacket & recv_data )
 
     pl->SendMailResult(0, MAIL_SEND, MAIL_OK);
 
-    uint32 itemTextId = !body.empty() ? itemTextId = objmgr.CreateItemText( body ) : 0;
+    uint32 itemTextId = !body.empty() ? objmgr.CreateItemText( body ) : 0;
 
     pl->ModifyMoney( -int32(reqmoney) );
     pl->GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GOLD_SPENT_FOR_MAIL, cost);
