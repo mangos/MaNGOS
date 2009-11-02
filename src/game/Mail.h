@@ -80,18 +80,7 @@ struct MailItemInfo
     uint32 item_template;
 };
 
-struct MailItem
-{
-    MailItem() : item_guidlow(0), item_template(0), item(NULL) {}
-
-    uint32 item_guidlow;                                    // item guid (low part)
-    uint32 item_template;                                   // item entry
-    Item *item;                                             // item pointer
-
-    void deleteItem(bool inDB = false);
-};
-
-typedef std::map<uint32, MailItem> MailItemMap;
+typedef std::map<uint32, Item*> MailItemMap;
 
 class MailItemsInfo
 {
@@ -101,20 +90,9 @@ class MailItemsInfo
         MailItemMap::iterator begin() { return i_MailItemMap.begin(); }
         MailItemMap::iterator end() { return i_MailItemMap.end(); }
 
-        void AddItem(uint32 guidlow, uint32 _template, Item *item)
+        void AddItem(Item *item)
         {
-            MailItem mailItem;
-            mailItem.item_guidlow = guidlow;
-            mailItem.item_template = _template;
-            mailItem.item = item;
-            i_MailItemMap[guidlow] = mailItem;
-        }
-
-        void AddItem(uint32 guidlow)
-        {
-            MailItem mailItem;
-            mailItem.item_guidlow = guidlow;
-            i_MailItemMap[guidlow] = mailItem;
+            i_MailItemMap[item->GetGUIDLow()] = item;
         }
 
         uint8 size() const { return i_MailItemMap.size(); }
@@ -124,9 +102,15 @@ class MailItemsInfo
         {
             for(MailItemMap::iterator mailItemIter = begin(); mailItemIter != end(); ++mailItemIter)
             {
-                MailItem& mailItem = mailItemIter->second;
-                mailItem.deleteItem(inDB);
+                Item* item = mailItemIter->second;
+
+                if(inDB)
+                    CharacterDatabase.PExecute("DELETE FROM item_instance WHERE guid='%u'", item->GetGUIDLow());
+
+                delete item;
             }
+
+            i_MailItemMap.clear();
         }
     private:
         MailItemMap i_MailItemMap;                          // Keep the items in a map to avoid duplicate guids (which can happen), store only low part of guid
@@ -163,8 +147,8 @@ struct Mail
     {
         for(MailItemMap::iterator mailItemIter = pMailItemsInfo.begin(); mailItemIter != pMailItemsInfo.end(); ++mailItemIter)
         {
-            MailItem& mailItem = mailItemIter->second;
-            AddItem(mailItem.item_guidlow, mailItem.item_template);
+            Item* item = mailItemIter->second;
+            AddItem(item->GetGUIDLow(), item->GetEntry());
         }
     }
 

@@ -6230,7 +6230,7 @@ bool ChatHandler::HandleSendItemsCommand(const char* args)
         if(Item* item = Item::CreateItem(itr->first,itr->second,m_session ? m_session->GetPlayer() : 0))
         {
             item->SaveToDB();                               // save for prevent lost at next mail load, if send fail then item will deleted
-            mi.AddItem(item->GetGUIDLow(), item->GetEntry(), item);
+            mi.AddItem(item);
         }
     }
 

@@ -935,7 +935,7 @@ void BattleGround::SendRewardMarkByMail(Player *plr,uint32 mark, uint32 count)
 
         // item
         MailItemsInfo mi;
-        mi.AddItem(markItem->GetGUIDLow(), markItem->GetEntry(), markItem);
+        mi.AddItem(markItem);
 
         // subject: item name
         std::string subject = markProto->Name1;

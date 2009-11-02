@@ -3963,7 +3963,7 @@ void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmC
                             continue;
                         }
 
-                        mi.AddItem(item_guidlow, item_template, pItem);
+                        mi.AddItem(pItem);
                     }
                     while (resultItems->NextRow());
 
@@ -14949,7 +14949,7 @@ void Player::_LoadInventory(QueryResult *result, uint32 timediff)
                 Item* item = problematicItems.front();
                 problematicItems.pop_front();
 
-                mi.AddItem(item->GetGUIDLow(), item->GetEntry(), item);
+                mi.AddItem(item);
             }
 
             std::string subject = GetSession()->GetMangosString(LANG_NOT_EQUIPPED_ITEM);
@@ -18823,7 +18823,7 @@ void Player::AutoUnequipOffhandIfNeed()
     else
     {
         MailItemsInfo mi;
-        mi.AddItem(offItem->GetGUIDLow(), offItem->GetEntry(), offItem);
+        mi.AddItem(offItem);
         MoveItemFromInventory(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND, true);
         CharacterDatabase.BeginTransaction();
         offItem->DeleteFromInventoryDB();                   // deletes item from character's inventory

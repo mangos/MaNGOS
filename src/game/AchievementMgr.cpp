@@ -1713,7 +1713,7 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
             item->SaveToDB();                               // save for prevent lost at next mail load, if send fail then item will deleted
 
             // item
-            mi.AddItem(item->GetGUIDLow(), item->GetEntry(), item);
+            mi.AddItem(item);
         }
 
         int loc_idx = GetPlayer()->GetSession()->GetSessionDbLocaleIndex();

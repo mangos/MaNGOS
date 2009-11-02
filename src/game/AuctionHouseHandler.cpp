@@ -444,7 +444,7 @@ void WorldSession::HandleAuctionRemoveItem( WorldPacket & recv_data )
             msgAuctionCanceledOwner << auction->item_template << ":0:" << AUCTION_CANCELED;
 
             MailItemsInfo mi;
-            mi.AddItem(auction->item_guidlow, auction->item_template, pItem);
+            mi.AddItem(pItem);
 
             // item will deleted or added to received mail list
             WorldSession::SendMailTo(pl, MAIL_AUCTION, MAIL_STATIONERY_AUCTION, auction->GetHouseId(), pl->GetGUIDLow(), msgAuctionCanceledOwner.str(), 0, &mi, 0, 0, MAIL_CHECK_MASK_NONE);
