@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_8769_01_mangos_mail_level_reward` bit(1) default NULL
+  `required_8770_01_mangos_quest_template` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -13621,7 +13621,7 @@ CREATE TABLE `quest_template` (
   `ZoneOrSort` smallint(6) NOT NULL default '0',
   `SkillOrClass` smallint(6) NOT NULL default '0',
   `MinLevel` tinyint(3) unsigned NOT NULL default '0',
-  `QuestLevel` tinyint(3) unsigned NOT NULL default '0',
+  `QuestLevel` smallint(6) NOT NULL default '0',
   `Type` smallint(5) unsigned NOT NULL default '0',
   `RequiredRaces` smallint(5) unsigned NOT NULL default '0',
   `RequiredSkillValue` smallint(5) unsigned NOT NULL default '0',

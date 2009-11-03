@@ -151,7 +151,7 @@ void PlayerMenu::SendGossipMenu( uint32 TitleTextId, uint64 npcGUID )
 
         data << uint32(questID);
         data << uint32(qItem.m_qIcon);
-        data << uint32(pSession->GetPlayer()->GetQuestLevel(pQuest));
+        data << int32(pQuest->GetQuestLevel());
         std::string Title = pQuest->GetTitle();
 
         int loc_idx = pSession->GetSessionDbLocaleIndex();
@@ -400,7 +400,7 @@ void PlayerMenu::SendQuestGiverQuestList( QEmote eEmote, const std::string& Titl
 
         data << uint32(questID);
         data << uint32(qmi.m_qIcon);
-        data << uint32(pSession->GetPlayer()->GetQuestLevel(pQuest));
+        data << int32(pQuest->GetQuestLevel());
         data << title;
     }
     pSession->SendPacket( &data );
@@ -547,7 +547,7 @@ void PlayerMenu::SendQuestQueryResponse( Quest const *pQuest )
 
     data << uint32(pQuest->GetQuestId());                   // quest id
     data << uint32(pQuest->GetQuestMethod());               // Accepted values: 0, 1 or 2. 0==IsAutoComplete() (skip objectives/details)
-    data << uint32(pQuest->GetQuestLevel());                // may be 0, static data, in other cases must be used dynamic level: Player::GetQuestLevel
+    data << int32(pQuest->GetQuestLevel());                 // may be -1, static data, in other cases must be used dynamic level: Player::GetQuestLevelForPlayer (0 is not known, but assuming this is no longer valid for quest intended for client)
     data << uint32(pQuest->GetZoneOrSort());                // zone or sort to display in quest log
 
     data << uint32(pQuest->GetType());                      // quest type
