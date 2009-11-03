@@ -2620,6 +2620,27 @@ enum BattleGroundTypeId
 };
 #define MAX_BATTLEGROUND_TYPE_ID 33
 
+enum MailCheckMask
+{
+    MAIL_CHECK_MASK_NONE        = 0x00,
+    MAIL_CHECK_MASK_READ        = 0x01,
+    MAIL_CHECK_MASK_AUCTION     = 0x04,
+    MAIL_CHECK_MASK_COD_PAYMENT = 0x08,
+    MAIL_CHECK_MASK_RETURNED    = 0x10
+};
+
+// gathered from Stationery.dbc
+enum MailStationery
+{
+    MAIL_STATIONERY_UNKNOWN =  1,
+    MAIL_STATIONERY_NORMAL  = 41,
+    MAIL_STATIONERY_GM      = 61,
+    MAIL_STATIONERY_AUCTION = 62,
+    MAIL_STATIONERY_VAL     = 64,
+    MAIL_STATIONERY_CHR     = 65,
+    MAIL_STATIONERY_ORP     = 67,                           // new in 3.2.2
+};
+
 enum MailResponseType
 {
     MAIL_SEND               = 0,

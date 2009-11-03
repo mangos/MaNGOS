@@ -1706,16 +1706,6 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
     {
         Item* item = reward->itemId ? Item::CreateItem(reward->itemId,1,GetPlayer ()) : NULL;
 
-        MailItemsInfo mi;
-        if(item)
-        {
-            // save new item before send
-            item->SaveToDB();                               // save for prevent lost at next mail load, if send fail then item will deleted
-
-            // item
-            mi.AddItem(item);
-        }
-
         int loc_idx = GetPlayer()->GetSession()->GetSessionDbLocaleIndex();
 
         // subject and text
@@ -1734,7 +1724,18 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
 
         uint32 itemTextId = objmgr.CreateItemText( text );
 
-        WorldSession::SendMailTo(GetPlayer(), MAIL_CREATURE, MAIL_STATIONERY_NORMAL, reward->sender, GetPlayer()->GetGUIDLow(), subject, itemTextId , &mi, 0, 0, MAIL_CHECK_MASK_NONE);
+        MailDraft draft(subject, itemTextId);
+
+        if(item)
+        {
+            // save new item before send
+            item->SaveToDB();                               // save for prevent lost at next mail load, if send fail then item will deleted
+
+            // item
+            draft.AddItem(item);
+        }
+
+        draft.SendMailTo(GetPlayer(), MailSender(MAIL_CREATURE, reward->sender));
     }
 }
 

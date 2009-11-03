@@ -141,16 +141,15 @@ void AuctionHouseMgr::SendAuctionWonMail( AuctionEntry *auction )
         CharacterDatabase.PExecute("UPDATE item_instance SET owner_guid = '%u' WHERE guid='%u'",auction->bidder,pItem->GetGUIDLow());
         CharacterDatabase.CommitTransaction();
 
-        MailItemsInfo mi;
-        mi.AddItem(pItem);
-
         if (bidder)
             bidder->GetSession()->SendAuctionBidderNotification( auction->GetHouseId(), auction->Id, bidder_guid, 0, 0, auction->item_template);
         else
             RemoveAItem(pItem->GetGUIDLow());               // we have to remove the item, before we delete it !!
 
         // will delete item or place to receiver mail list
-        WorldSession::SendMailTo(bidder, MAIL_AUCTION, MAIL_STATIONERY_AUCTION, auction->GetHouseId(), auction->bidder, msgAuctionWonSubject.str(), itemTextId, &mi, 0, 0, MAIL_CHECK_MASK_AUCTION);
+        MailDraft(msgAuctionWonSubject.str(), itemTextId)
+            .AddItem(pItem)
+            .SendMailTo(MailReceiver(bidder,auction->bidder), auction, MAIL_CHECK_MASK_AUCTION);
     }
     // receiver not exist
     else
@@ -187,7 +186,8 @@ void AuctionHouseMgr::SendAuctionSalePendingMail( AuctionEntry * auction )
 
         uint32 itemTextId = objmgr.CreateItemText( msgAuctionSalePendingBody.str() );
 
-        WorldSession::SendMailTo(owner, MAIL_AUCTION, MAIL_STATIONERY_AUCTION, auction->GetHouseId(), auction->owner, msgAuctionSalePendingSubject.str(), itemTextId, NULL, 0, 0, MAIL_CHECK_MASK_AUCTION);
+        MailDraft(msgAuctionSalePendingSubject.str(), itemTextId)
+            .SendMailTo(MailReceiver(owner,auction->owner), auction, MAIL_CHECK_MASK_AUCTION);
     }
 }
 
@@ -229,7 +229,9 @@ void AuctionHouseMgr::SendAuctionSuccessfulMail( AuctionEntry * auction )
             owner->GetSession()->SendAuctionOwnerNotification( auction );
         }
 
-        WorldSession::SendMailTo(owner, MAIL_AUCTION, MAIL_STATIONERY_AUCTION, auction->GetHouseId(), auction->owner, msgAuctionSuccessfulSubject.str(), itemTextId, NULL, profit, 0, MAIL_CHECK_MASK_AUCTION, HOUR);
+        MailDraft(msgAuctionSuccessfulSubject.str(), itemTextId)
+            .AddMoney(profit)
+            .SendMailTo(MailReceiver(owner,auction->owner), auction, MAIL_CHECK_MASK_AUCTION, HOUR);
     }
 }
 
@@ -261,11 +263,10 @@ void AuctionHouseMgr::SendAuctionExpiredMail( AuctionEntry * auction )
         else
             RemoveAItem(pItem->GetGUIDLow());               // we have to remove the item, before we delete it !!
 
-        MailItemsInfo mi;
-        mi.AddItem(pItem);
-
         // will delete item or place to receiver mail list
-        WorldSession::SendMailTo(owner, MAIL_AUCTION, MAIL_STATIONERY_AUCTION, auction->GetHouseId(), GUID_LOPART(owner_guid), subject.str(), 0, &mi, 0, 0, MAIL_CHECK_MASK_NONE);
+        MailDraft(subject.str())
+            .AddItem(pItem)
+            .SendMailTo(MailReceiver(owner,auction->owner), auction);
     }
     // owner not found
     else
