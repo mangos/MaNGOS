@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_8749_01_mangos_mail_loot_template` bit(1) default NULL
+  `required_8769_01_mangos_mail_level_reward` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -2709,6 +2709,28 @@ CREATE TABLE `locales_quest` (
 LOCK TABLES `locales_quest` WRITE;
 /*!40000 ALTER TABLE `locales_quest` DISABLE KEYS */;
 /*!40000 ALTER TABLE `locales_quest` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `mail_level_reward`
+--
+
+DROP TABLE IF EXISTS `mail_level_reward`;
+CREATE TABLE `mail_level_reward` (
+  `level` mediumint(8) unsigned NOT NULL default '0',
+  `raceMask` mediumint(8) unsigned NOT NULL default '0',
+  `mailTemplateId` mediumint(8) unsigned NOT NULL default '0',
+  `senderEntry`    mediumint(8) unsigned NOT NULL default '0',
+  PRIMARY KEY  (`level`,`raceMask`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Mail System';
+
+--
+-- Dumping data for table `mail_level_reward`
+--
+
+LOCK TABLES `mail_level_reward` WRITE;
+/*!40000 ALTER TABLE `mail_level_reward` DISABLE KEYS */;
+/*!40000 ALTER TABLE `mail_level_reward` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --

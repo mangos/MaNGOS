@@ -1338,6 +1338,9 @@ void World::SetInitialWorldSettings()
     sLog.outString( "Loading Player Corpses..." );
     objmgr.LoadCorpses();
 
+    sLog.outString( "Loading Player level dependent mail rewards..." );
+    objmgr.LoadMailLevelRewards();
+
     sLog.outString( "Loading Loot Tables..." );
     sLog.outString();
     LoadLootTables();
