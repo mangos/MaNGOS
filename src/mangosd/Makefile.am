@@ -43,10 +43,9 @@ mangos_worldd_LDADD = \
 	../shared/vmap/libmangosvmaps.a \
 	../framework/libmangosframework.a \
 	../../dep/src/sockets/libmangossockets.a \
-	../../dep/src/g3dlite/libg3dlite.a \
-	../../dep/tbb/libtbbmalloc.so
+	../../dep/src/g3dlite/libg3dlite.a
 
-mangos_worldd_LDFLAGS = -L../../dep/src/sockets -L../../dep/src/g3dlite -L../bindings/universal/ -L../../dep/tbb -L$(libdir) $(MANGOS_LIBS) -export-dynamic
+mangos_worldd_LDFLAGS = -L../../dep/src/sockets -L../../dep/src/g3dlite -L../bindings/universal/ -L$(libdir) $(MANGOS_LIBS) -export-dynamic
 
 ## Additional files to include when running 'make dist'
 #  Include world daemon configuration

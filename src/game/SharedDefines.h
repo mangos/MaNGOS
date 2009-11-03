@@ -2387,10 +2387,10 @@ enum PetDiet
 #define CHAIN_SPELL_JUMP_RADIUS 10
 
 // Max values for Guild & Guild Bank
-#define GUILD_BANK_MAX_TABS         6
+#define GUILD_BANK_MAX_TABS         6                       // send by client for money log also
 #define GUILD_BANK_MAX_SLOTS        98
 #define GUILD_BANK_MAX_LOGS         25
-#define GUILD_BANK_MONEY_LOGS_TAB   100
+#define GUILD_BANK_MONEY_LOGS_TAB   100                     // used for money log in DB
 #define GUILD_EVENTLOG_MAX_RECORDS  100
 #define GUILD_RANKS_MIN_COUNT       5
 #define GUILD_RANKS_MAX_COUNT       10
@@ -2619,6 +2619,27 @@ enum BattleGroundTypeId
     BATTLEGROUND_ABG           = 32
 };
 #define MAX_BATTLEGROUND_TYPE_ID 33
+
+enum MailCheckMask
+{
+    MAIL_CHECK_MASK_NONE        = 0x00,
+    MAIL_CHECK_MASK_READ        = 0x01,
+    MAIL_CHECK_MASK_AUCTION     = 0x04,
+    MAIL_CHECK_MASK_COD_PAYMENT = 0x08,
+    MAIL_CHECK_MASK_RETURNED    = 0x10
+};
+
+// gathered from Stationery.dbc
+enum MailStationery
+{
+    MAIL_STATIONERY_UNKNOWN =  1,
+    MAIL_STATIONERY_NORMAL  = 41,
+    MAIL_STATIONERY_GM      = 61,
+    MAIL_STATIONERY_AUCTION = 62,
+    MAIL_STATIONERY_VAL     = 64,
+    MAIL_STATIONERY_CHR     = 65,
+    MAIL_STATIONERY_ORP     = 67,                           // new in 3.2.2
+};
 
 enum MailResponseType
 {

@@ -1281,7 +1281,8 @@ class MANGOS_DLL_SPEC Player : public Unit
         /***                    QUEST SYSTEM                   ***/
         /*********************************************************/
 
-        uint32 GetQuestLevel( Quest const* pQuest ) const { return pQuest && pQuest->GetQuestLevel() ? pQuest->GetQuestLevel() : getLevel(); }
+        // Return player level when QuestLevel is dynamic (-1)
+        uint32 GetQuestLevelForPlayer(Quest const* pQuest) const { return pQuest && (pQuest->GetQuestLevel() > 0) ? (uint32)pQuest->GetQuestLevel() : getLevel(); }
 
         void PrepareQuestMenu( uint64 guid );
         void SendPreparedQuest( uint64 guid );
@@ -1298,6 +1299,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void CompleteQuest( uint32 quest_id );
         void IncompleteQuest( uint32 quest_id );
         void RewardQuest( Quest const *pQuest, uint32 reward, Object* questGiver, bool announce = true );
+
         void FailQuest( uint32 quest_id );
         bool SatisfyQuestSkillOrClass( Quest const* qInfo, bool msg );
         bool SatisfyQuestLevel( Quest const* qInfo, bool msg );
@@ -1731,12 +1733,6 @@ class MANGOS_DLL_SPEC Player : public Unit
         float OCTRegenMPPerSpirit();
         float GetRatingCoefficient(CombatRating cr) const;
         float GetRatingBonusValue(CombatRating cr) const;
-        uint32 GetMeleeCritDamageReduction(uint32 damage) const;
-        uint32 GetMeleeDamageReduction(uint32 damage) const;
-        uint32 GetRangedCritDamageReduction(uint32 damage) const;
-        uint32 GetRangedDamageReduction(uint32 damage) const;
-        uint32 GetSpellCritDamageReduction(uint32 damage) const;
-        uint32 GetSpellDamageReduction(uint32 damage) const;
         uint32 GetBaseSpellPowerBonus() { return m_baseSpellPower; }
 
         float GetExpertiseDodgeOrParryReduction(WeaponAttackType attType) const;

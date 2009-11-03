@@ -36,10 +36,9 @@ mangos_realmd_LDADD = \
 	../shared/Auth/libmangosauth.a \
 	../shared/libmangosshared.a \
 	../framework/libmangosframework.a \
-	../../dep/src/sockets/libmangossockets.a \
-	../../dep/tbb/libtbbmalloc.so
+	../../dep/src/sockets/libmangossockets.a
 
-mangos_realmd_LDFLAGS = -L../../dep/src/sockets -L../../dep/tbb -L$(libdir) $(MANGOS_LIBS)
+mangos_realmd_LDFLAGS = -L../../dep/src/sockets -L$(libdir) $(MANGOS_LIBS)
 
 ## Additional files to include when running 'make dist'
 #  Include realm list daemon configuration

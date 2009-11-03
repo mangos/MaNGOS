@@ -513,8 +513,8 @@ float ArenaTeam::GetChanceAgainst(uint32 own_rating, uint32 enemy_rating)
     // ELO system
 
     if (sWorld.getConfig(CONFIG_ARENA_SEASON_ID) >= 6)
-        if (enemy_rating < 1300)
-            enemy_rating = 1300;
+        if (enemy_rating < 1500)
+            enemy_rating = 1500;
     return 1.0f/(1.0f+exp(log(10.0f)*(float)((float)enemy_rating - (float)own_rating)/400.0f));
 }
 
