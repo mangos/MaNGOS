@@ -23,6 +23,8 @@
 
 struct AuctionEntry;
 class Item;
+class Object;
+class Player;
 
 #define MAIL_BODY_ITEM_TEMPLATE 8383                        // - plain letter, A Dusty Unsent Letter: 889
 #define MAX_MAIL_ITEMS 12
@@ -34,6 +36,27 @@ enum MailMessageType
     MAIL_CREATURE       = 3,                                // client send CMSG_CREATURE_QUERY on this mailmessagetype
     MAIL_GAMEOBJECT     = 4,                                // client send CMSG_GAMEOBJECT_QUERY on this mailmessagetype
     MAIL_ITEM           = 5,                                // client send CMSG_ITEM_QUERY on this mailmessagetype
+};
+
+enum MailCheckMask
+{
+    MAIL_CHECK_MASK_NONE        = 0x00,
+    MAIL_CHECK_MASK_READ        = 0x01,
+    MAIL_CHECK_MASK_AUCTION     = 0x04,
+    MAIL_CHECK_MASK_COD_PAYMENT = 0x08,
+    MAIL_CHECK_MASK_RETURNED    = 0x10
+};
+
+// gathered from Stationery.dbc
+enum MailStationery
+{
+    MAIL_STATIONERY_UNKNOWN =  1,
+    MAIL_STATIONERY_NORMAL  = 41,
+    MAIL_STATIONERY_GM      = 61,
+    MAIL_STATIONERY_AUCTION = 62,
+    MAIL_STATIONERY_VAL     = 64,
+    MAIL_STATIONERY_CHR     = 65,
+    MAIL_STATIONERY_ORP     = 67,                           // new in 3.2.2
 };
 
 enum MailState
