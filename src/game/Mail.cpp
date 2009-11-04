@@ -270,11 +270,11 @@ void WorldSession::HandleMailMarkAsRead(WorldPacket & recv_data )
     uint64 mailbox;
     uint32 mailId;
     recv_data >> mailbox;
+    recv_data >> mailId;
 
     if (!GetPlayer()->GetGameObjectIfCanInteractWith(mailbox, GAMEOBJECT_TYPE_MAILBOX))
         return;
 
-    recv_data >> mailId;
     Player *pl = _player;
     Mail *m = pl->GetMail(mailId);
     if (m)
@@ -381,12 +381,12 @@ void WorldSession::HandleMailTakeItem(WorldPacket & recv_data )
     uint32 mailId;
     uint32 itemId;
     recv_data >> mailbox;
+    recv_data >> mailId;
+    recv_data >> itemId;                                    // item guid low
 
     if (!GetPlayer()->GetGameObjectIfCanInteractWith(mailbox, GAMEOBJECT_TYPE_MAILBOX))
         return;
 
-    recv_data >> mailId;
-    recv_data >> itemId;                                    // item guid low?
     Player* pl = _player;
 
     Mail* m = pl->GetMail(mailId);
