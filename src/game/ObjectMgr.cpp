@@ -4100,6 +4100,16 @@ void ObjectMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
                 break;
             }
 
+            case SCRIPT_COMMAND_KILL_CREDIT:
+            {
+                if (!GetCreatureTemplate(tmp.datalong))
+                {
+                    sLog.outErrorDb("Table `%s` has invalid creature (Entry: %u) in SCRIPT_COMMAND_KILL_CREDIT for script id %u",tablename,tmp.datalong,tmp.id);
+                    continue;
+                }
+                break;
+            }
+
             case SCRIPT_COMMAND_TEMP_SUMMON_CREATURE:
             {
                 if(!MaNGOS::IsValidMapCoord(tmp.x,tmp.y,tmp.z,tmp.o))
