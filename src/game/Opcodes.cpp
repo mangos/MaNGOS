@@ -1309,4 +1309,7 @@ OpcodeHandler opcodeTable[NUM_MSG_TYPES] =
     /*0x500*/ { "CMSG_QUERY_QUESTS_COMPLETED",                  STATUS_LOGGEDIN, &WorldSession::HandleQueryQuestsCompleted      },
     /*0x501*/ { "SMSG_QUERY_QUESTS_COMPLETED_RESPONSE",         STATUS_NEVER,    &WorldSession::Handle_ServerSide               },
     /*0x502*/ { "CMSG_GM_REPORT_LAG",                           STATUS_NEVER,    &WorldSession::Handle_NULL                     },
+    /*0x503*/ { "UMSG_UNKNOWN_1283",                            STATUS_NEVER,    &WorldSession::Handle_NULL                     },
+    /*0x504*/ { "UMSG_UNKNOWN_1284",                            STATUS_NEVER,    &WorldSession::Handle_NULL                     },
+    /*0x505*/ { "UMSG_UNKNOWN_1285",                            STATUS_NEVER,    &WorldSession::Handle_NULL                     },
 };

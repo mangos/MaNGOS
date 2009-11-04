@@ -1315,9 +1315,12 @@ enum Opcodes
     UMSG_UNKNOWN_1278                               = 0x4FE, // not found 10596
     CMSG_READY_FOR_ACCOUNT_DATA_TIMES               = 0x4FF, // lua: ReadyForAccountDataTimes
     CMSG_QUERY_QUESTS_COMPLETED                     = 0x500, // lua: QueryQuestsCompleted
-    SMSG_QUERY_QUESTS_COMPLETED_RESPONSE            = 0x501, // response to 0x4FF
+    SMSG_QUERY_QUESTS_COMPLETED_RESPONSE            = 0x501, // response to 0x500
     CMSG_GM_REPORT_LAG                              = 0x502, // lua: GMReportLag
-    NUM_MSG_TYPES                                   = 0x503
+    UMSG_UNKNOWN_1283                               = 0x503,
+    UMSG_UNKNOWN_1284                               = 0x504,
+    UMSG_UNKNOWN_1285                               = 0x505,
+    NUM_MSG_TYPES                                   = 0x506
 };
 
 /// Player state

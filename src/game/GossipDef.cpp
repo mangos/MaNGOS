@@ -652,6 +652,7 @@ void PlayerMenu::SendQuestQueryResponse( Quest const *pQuest )
         }
         data << uint32(pQuest->ReqCreatureOrGOCount[iI]);
         data << uint32(pQuest->ReqSourceId[iI]);
+        data << uint32(0);                                  // req source count?
     }
 
     for (iI = 0; iI < QUEST_ITEM_OBJECTIVES_COUNT; ++iI)
