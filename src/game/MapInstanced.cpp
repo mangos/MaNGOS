@@ -218,6 +218,9 @@ BattleGroundMap* MapInstanced::CreateBattleGroundMap(uint32 InstanceId, BattleGr
 
     // 0-59 normal spawn 60-69 difficulty_1, 70-79 difficulty_2, 80 dufficulty_3
     uint8 spawnMode = (bg->GetQueueId() > QUEUE_ID_MAX_LEVEL_59) ? (bg->GetQueueId() - QUEUE_ID_MAX_LEVEL_59) : 0;
+    // some bgs don't have different spawnmodes, with this we can stay close to dbc-data
+    while (!GetMapDifficultyData(GetId(), Difficulty(spawnMode)))
+        spawnMode--;
     BattleGroundMap *map = new BattleGroundMap(GetId(), GetGridExpiry(), InstanceId, this, spawnMode);
     ASSERT(map->IsBattleGroundOrArena());
     map->SetBG(bg);
