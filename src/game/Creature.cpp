@@ -1526,29 +1526,29 @@ float Creature::GetAttackDistance(Unit const* pl) const
 
 void Creature::setDeathState(DeathState s)
 {
-    if((s == JUST_DIED && !m_isDeadByDefault)||(s == JUST_ALIVED && m_isDeadByDefault))
+    if ((s == JUST_DIED && !m_isDeadByDefault)||(s == JUST_ALIVED && m_isDeadByDefault))
     {
         m_deathTimer = m_corpseDelay*IN_MILISECONDS;
 
         // always save boss respawn time at death to prevent crash cheating
-        if(sWorld.getConfig(CONFIG_SAVE_RESPAWN_TIME_IMMEDIATLY) || isWorldBoss())
+        if (sWorld.getConfig(CONFIG_SAVE_RESPAWN_TIME_IMMEDIATLY) || isWorldBoss())
             SaveRespawnTime();
 
         if (canFly() && FallGround())
             return;
 
-        if(!IsStopped())
+        if (!IsStopped())
             StopMoving();
     }
     Unit::setDeathState(s);
 
-    if(s == JUST_DIED)
+    if (s == JUST_DIED)
     {
         SetTargetGUID(0);                                   // remove target selection in any cases (can be set at aura remove in Unit::setDeathState)
         SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
 
-        if(!isPet() && GetCreatureInfo()->SkinLootId)
-            if ( LootTemplates_Skinning.HaveLootFor(GetCreatureInfo()->SkinLootId) )
+        if (!isPet() && GetCreatureInfo()->SkinLootId)
+            if (LootTemplates_Skinning.HaveLootFor(GetCreatureInfo()->SkinLootId))
                 SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
 
         if (canFly() && FallGround())
@@ -1557,7 +1557,7 @@ void Creature::setDeathState(DeathState s)
         SetNoSearchAssistance(false);
         Unit::setDeathState(CORPSE);
     }
-    if(s == JUST_ALIVED)
+    if (s == JUST_ALIVED)
     {
         SetHealth(GetMaxHealth());
         SetLootRecipient(NULL);
