@@ -612,7 +612,7 @@ class MANGOS_DLL_SPEC InstanceMap : public Map
 class MANGOS_DLL_SPEC BattleGroundMap : public Map
 {
     public:
-        BattleGroundMap(uint32 id, time_t, uint32 InstanceId, Map* _parent);
+        BattleGroundMap(uint32 id, time_t, uint32 InstanceId, Map* _parent, uint8 spawnMode);
         ~BattleGroundMap();
 
         bool Add(Player *);

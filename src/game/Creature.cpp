@@ -191,17 +191,21 @@ bool Creature::InitEntry(uint32 Entry, uint32 team, const CreatureData *data )
     // get difficulty 1 mode entry
     uint32 actualEntry = Entry;
     CreatureInfo const *cinfo = normalInfo;
-    if(normalInfo->DifficultyEntry1)
+    // TODO correctly implement spawnmodes for non-bg maps
+    for (uint32 diff = 0; diff < MAX_DIFFICULTY - 1; ++diff)
     {
-        //we already have valid Map pointer for current creature!
-        //FIXME: spawn modes 2-3 must have own case DifficultyEntryN
-        if(GetMap()->GetSpawnMode() > 0)
+        if (normalInfo->DifficultyEntry[diff])
         {
-            cinfo = objmgr.GetCreatureTemplate(normalInfo->DifficultyEntry1);
-            if(!cinfo)
+            // we already have valid Map pointer for current creature!
+            if (GetMap()->GetSpawnMode() > diff)
             {
-                sLog.outErrorDb("Creature::UpdateEntry creature difficulty 1 entry %u does not exist.", actualEntry);
-                return false;
+                cinfo = objmgr.GetCreatureTemplate(normalInfo->DifficultyEntry[diff]);
+                if (!cinfo)
+                {
+                    // maybe check such things already at startup
+                    sLog.outErrorDb("Creature::UpdateEntry creature difficulty %u entry %u does not exist.", diff + 1, actualEntry);
+                    return false;
+                }
             }
         }
     }
@@ -361,9 +365,6 @@ void Creature::Update(uint32 diff)
                 }
                 else
                     setDeathState( JUST_ALIVED );
-
-                if (GetMap()->IsBattleGround() && ((BattleGroundMap*)GetMap())->GetBG())
-                    ((BattleGroundMap*)GetMap())->GetBG()->OnCreatureRespawn(this); // for alterac valley needed to adjust the correct level again
 
                 //Call AI respawn virtual function
                 i_AI->JustRespawned();
