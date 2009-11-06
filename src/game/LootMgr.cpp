@@ -386,18 +386,19 @@ void Loot::AddItem(LootStoreItem const & item)
 }
 
 // Calls processor of corresponding LootTemplate (which handles everything including references)
-void Loot::FillLoot(uint32 loot_id, LootStore const& store, Player* loot_owner, bool personal)
+bool Loot::FillLoot(uint32 loot_id, LootStore const& store, Player* loot_owner, bool personal, bool noEmptyError)
 {
     // Must be provided
     if(!loot_owner)
-        return;
+        return false;
 
     LootTemplate const* tab = store.GetLootFor(loot_id);
 
     if (!tab)
     {
-        sLog.outErrorDb("Table '%s' loot id #%u used but it doesn't have records.",store.GetName(),loot_id);
-        return;
+        if (!noEmptyError)
+            sLog.outErrorDb("Table '%s' loot id #%u used but it doesn't have records.",store.GetName(),loot_id);
+        return false;
     }
 
     items.reserve(MAX_NR_LOOT_ITEMS);
@@ -416,6 +417,8 @@ void Loot::FillLoot(uint32 loot_id, LootStore const& store, Player* loot_owner, 
     // ... for personal loot
     else
         FillNotNormalLootFor(loot_owner);
+
+    return true;
 }
 
 void Loot::FillNotNormalLootFor(Player* pl)

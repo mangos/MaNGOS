@@ -270,11 +270,11 @@ void WorldSession::HandleMailMarkAsRead(WorldPacket & recv_data )
     uint64 mailbox;
     uint32 mailId;
     recv_data >> mailbox;
+    recv_data >> mailId;
 
     if (!GetPlayer()->GetGameObjectIfCanInteractWith(mailbox, GAMEOBJECT_TYPE_MAILBOX))
         return;
 
-    recv_data >> mailId;
     Player *pl = _player;
     Mail *m = pl->GetMail(mailId);
     if (m)
@@ -381,12 +381,12 @@ void WorldSession::HandleMailTakeItem(WorldPacket & recv_data )
     uint32 mailId;
     uint32 itemId;
     recv_data >> mailbox;
+    recv_data >> mailId;
+    recv_data >> itemId;                                    // item guid low
 
     if (!GetPlayer()->GetGameObjectIfCanInteractWith(mailbox, GAMEOBJECT_TYPE_MAILBOX))
         return;
 
-    recv_data >> mailId;
-    recv_data >> itemId;                                    // item guid low?
     Player* pl = _player;
 
     Mail* m = pl->GetMail(mailId);
@@ -529,6 +529,13 @@ void WorldSession::HandleGetMailList(WorldPacket & recv_data )
 
     for(PlayerMails::iterator itr = _player->GetMailBegin(); itr != _player->GetMailEnd(); ++itr)
     {
+        // packet send mail count as uint8, prevent overflow
+        if(mailsCount >= 254)
+        {
+            realCount += 1;
+            continue;
+        }
+
         // skip deleted or not delivered (deliver delay not expired) mails
         if ((*itr)->state == MAIL_STATE_DELETED || cur_time < (*itr)->deliver_time)
             continue;
@@ -830,7 +837,8 @@ void MailDraft::prepareItems(Player* receiver)
 
     Loot mailLoot;
 
-    mailLoot.FillLoot(m_mailTemplateId, LootTemplates_Mail, receiver,true);
+    // can be empty
+    mailLoot.FillLoot(m_mailTemplateId, LootTemplates_Mail, receiver, true, true);
 
     uint32 max_slot = mailLoot.GetMaxSlotInLootFor(receiver);
     for(uint32 i = 0; m_items.size() < MAX_MAIL_ITEMS && i < max_slot; ++i)

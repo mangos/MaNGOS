@@ -2628,8 +2628,8 @@ uint32 InstanceMap::GetMaxPlayers() const
 
 /* ******* Battleground Instance Maps ******* */
 
-BattleGroundMap::BattleGroundMap(uint32 id, time_t expiry, uint32 InstanceId, Map* _parent)
-  : Map(id, expiry, InstanceId, DUNGEON_DIFFICULTY_NORMAL, _parent)
+BattleGroundMap::BattleGroundMap(uint32 id, time_t expiry, uint32 InstanceId, Map* _parent, uint8 spawnMode)
+  : Map(id, expiry, InstanceId, spawnMode, _parent)
 {
     //lets initialize visibility distance for BG/Arenas
     BattleGroundMap::InitVisibilityDistance();
@@ -2985,6 +2985,36 @@ void Map::ScriptsProcess()
                 Player* pSource = target && target->GetTypeId() == TYPEID_PLAYER ? (Player*)target : (Player*)source;
 
                 pSource->TeleportTo(step.script->datalong, step.script->x, step.script->y, step.script->z, step.script->o);
+                break;
+            }
+
+            case SCRIPT_COMMAND_KILL_CREDIT:
+            {
+                // accept player in any one from target/source arg
+                if (!target && !source)
+                {
+                    sLog.outError("SCRIPT_COMMAND_KILL_CREDIT call for NULL object.");
+                    break;
+                }
+
+                // must be only Player
+                if((!target || target->GetTypeId() != TYPEID_PLAYER) && (!source || source->GetTypeId() != TYPEID_PLAYER))
+                {
+                    sLog.outError("SCRIPT_COMMAND_KILL_CREDIT call for non-player (TypeIdSource: %u)(TypeIdTarget: %u), skipping.", source ? source->GetTypeId() : 0, target ? target->GetTypeId() : 0);
+                    break;
+                }
+
+                Player* pSource = target && target->GetTypeId() == TYPEID_PLAYER ? (Player*)target : (Player*)source;
+
+                if (step.script->datalong2)
+                {
+                    pSource->RewardPlayerAndGroupAtEvent(step.script->datalong, pSource);
+                }
+                else
+                {
+                    pSource->KilledMonsterCredit(step.script->datalong, 0);
+                }
+
                 break;
             }
 

@@ -148,6 +148,11 @@ pkgdata_DATA = \
 	8749_01_mangos_mail_loot_template.sql \
 	8769_01_mangos_mail_level_reward.sql \
 	8770_01_mangos_quest_template.sql \
+	8775_01_mangos_creature_template.sql \
+	8775_02_mangos_creature.sql \
+	8775_03_mangos_gameobject.sql \
+	8777_01_mangos_creature.sql \
+	8777_02_mangos_gameobject.sql \
 	README
 
 ## Additional files to include when running 'make dist'
@@ -276,4 +281,9 @@ EXTRA_DIST = \
 	8749_01_mangos_mail_loot_template.sql \
 	8769_01_mangos_mail_level_reward.sql \
 	8770_01_mangos_quest_template.sql \
+	8775_01_mangos_creature_template.sql \
+	8775_02_mangos_creature.sql \
+	8775_03_mangos_gameobject.sql \
+	8777_01_mangos_creature.sql \
+	8777_02_mangos_gameobject.sql \
 	README

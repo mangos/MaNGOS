@@ -136,7 +136,7 @@ bool ArenaTeam::AddMember(const uint64& PlayerGuid)
     if (sWorld.getConfig(CONFIG_ARENA_SEASON_ID) >= 6)
     {
         if (m_stats.rating < 1000)
-            newmember.personal_rating = m_stats.rating;
+            newmember.personal_rating = 0;
         else
             newmember.personal_rating = 1000;
     }
@@ -513,8 +513,8 @@ float ArenaTeam::GetChanceAgainst(uint32 own_rating, uint32 enemy_rating)
     // ELO system
 
     if (sWorld.getConfig(CONFIG_ARENA_SEASON_ID) >= 6)
-        if (enemy_rating < 1500)
-            enemy_rating = 1500;
+        if (enemy_rating < 1000)
+            enemy_rating = 1000;
     return 1.0f/(1.0f+exp(log(10.0f)*(float)((float)enemy_rating - (float)own_rating)/400.0f));
 }
 
@@ -542,8 +542,9 @@ int32 ArenaTeam::WonAgainst(uint32 againstRating)
     // called when the team has won
     // 'chance' calculation - to beat the opponent
     float chance = GetChanceAgainst(m_stats.rating, againstRating);
-    // calculate the rating modification (ELO system with k=32)
-    int32 mod = (int32)floor(32.0f * (1.0f - chance));
+    float K = (m_stats.rating < 1000) ? 48.0f : 32.0f;
+    // calculate the rating modification (ELO system with k=32 or k=48 if rating<1000)
+    int32 mod = (int32)floor(K* (1.0f - chance));
     // modify the team stats accordingly
     FinishGame(mod);
     m_stats.wins_week += 1;
@@ -558,8 +559,9 @@ int32 ArenaTeam::LostAgainst(uint32 againstRating)
     // called when the team has lost
     //'chance' calculation - to loose to the opponent
     float chance = GetChanceAgainst(m_stats.rating, againstRating);
-    // calculate the rating modification (ELO system with k=32)
-    int32 mod = (int32)ceil(32.0f * (0.0f - chance));
+    float K = (m_stats.rating < 1000) ? 48.0f : 32.0f;
+    // calculate the rating modification (ELO system with k=32 or k=48 if rating<1000)
+    int32 mod = (int32)floor(K* (1.0f - chance));
     // modify the team stats accordingly
     FinishGame(mod);
 
@@ -576,7 +578,9 @@ void ArenaTeam::MemberLost(Player * plr, uint32 againstRating)
         {
             // update personal rating
             float chance = GetChanceAgainst(itr->personal_rating, againstRating);
-            int32 mod = (int32)ceil(32.0f * (0.0f - chance));
+            float K = (m_stats.rating < 1000) ? 48.0f : 32.0f;
+            // calculate the rating modification (ELO system with k=32 or k=48 if rating<1000)
+            int32 mod = (int32)floor(K* (1.0f - chance));
             itr->ModifyPersonalRating(plr, mod, GetSlot());
             // update personal played stats
             itr->games_week += 1;
@@ -598,7 +602,9 @@ void ArenaTeam::OfflineMemberLost(uint64 guid, uint32 againstRating)
         {
             // update personal rating
             float chance = GetChanceAgainst(itr->personal_rating, againstRating);
-            int32 mod = (int32)ceil(32.0f * (0.0f - chance));
+            float K = (m_stats.rating < 1000) ? 48.0f : 32.0f;
+            // calculate the rating modification (ELO system with k=32 or k=48 if rating<1000)
+            int32 mod = (int32)floor(K* (1.0f - chance));
             if (int32(itr->personal_rating) + mod < 0)
                 itr->personal_rating = 0;
             else
@@ -620,7 +626,9 @@ void ArenaTeam::MemberWon(Player * plr, uint32 againstRating)
         {
             // update personal rating
             float chance = GetChanceAgainst(itr->personal_rating, againstRating);
-            int32 mod = (int32)floor(32.0f * (1.0f - chance));
+            float K = (m_stats.rating < 1000) ? 48.0f : 32.0f;
+            // calculate the rating modification (ELO system with k=32 or k=48 if rating<1000)
+            int32 mod = (int32)floor(K* (1.0f - chance));
             itr->ModifyPersonalRating(plr, mod, GetSlot());
             // update personal stats
             itr->games_week += 1;

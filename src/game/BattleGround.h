@@ -492,11 +492,10 @@ class BattleGround
                                                             // can be extended in in BG subclass
 
         /* event related */
-        // generic implementation in BattleGround-class
         // called when a creature gets added to map (NOTE: only triggered if
         // a player activates the cell of the creature)
-        virtual void OnObjectDBLoad(Creature* /*creature*/);
-        virtual void OnObjectDBLoad(GameObject* /*obj*/);
+        void OnObjectDBLoad(Creature* /*creature*/);
+        void OnObjectDBLoad(GameObject* /*obj*/);
         // (de-)spawns creatures and gameobjects from an event
         void SpawnEvent(uint8 event1, uint8 event2, bool spawn);
         bool IsActiveEvent(uint8 event1, uint8 event2)
@@ -509,9 +508,6 @@ class BattleGround
 
         void OpenDoorEvent(uint8 event1, uint8 event2 = 0);
         bool IsDoor(uint8 event1, uint8 event2);
-
-        /* other things */
-        virtual void OnCreatureRespawn(Creature* /*creature*/) {}
 
         void HandleTriggerBuff(uint64 const& go_guid);
 

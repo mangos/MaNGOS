@@ -232,23 +232,6 @@ void BattleGroundAV::UpdateScore(BattleGroundTeamId team, int32 points )
     UpdateWorldState(((team == BG_TEAM_HORDE) ? BG_AV_Horde_Score : BG_AV_Alliance_Score), m_TeamScores[team]);
 }
 
-void BattleGroundAV::OnObjectDBLoad(Creature* creature)
-{
-    uint32 level = creature->getLevel();
-    if (level != 0)
-        level += GetMaxLevel() - 60;                        // maybe we can do this more generic for custom level - range.. actually it's ok
-    creature->SetLevel(level);
-    BattleGround::OnObjectDBLoad(creature);
-}
-
-void BattleGroundAV::OnCreatureRespawn(Creature* creature)
-{
-    uint32 level = creature->getLevel();
-    if (level != 0)
-        level += GetMaxLevel() - 60;                        // maybe we can do this more generic for custom level - range.. actually it's ok
-    creature->SetLevel(level);
-}
-
 void BattleGroundAV::Update(uint32 diff)
 {
     BattleGround::Update(diff);

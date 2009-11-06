@@ -473,8 +473,8 @@ void ObjectMgr::LoadCreatureTemplates()
     sLog.outString( ">> Loaded %u creature definitions", sCreatureStorage.RecordCount );
     sLog.outString();
 
-    std::set<uint32> difficultyEntries1;                    // already loaded difficulty 1 value in creatures
-    std::set<uint32> hasDifficultyEntries1;                 // already loaded creatures with difficulty 1  values
+    std::set<uint32> difficultyEntries[MAX_DIFFICULTY - 1]; // already loaded difficulty 1 value in creatures
+    std::set<uint32> hasDifficultyEntries[MAX_DIFFICULTY - 1]; // already loaded creatures with difficulty 1  values
 
     // check data correctness
     for(uint32 i = 1; i < sCreatureStorage.MaxEntry; ++i)
@@ -483,84 +483,105 @@ void ObjectMgr::LoadCreatureTemplates()
         if (!cInfo)
             continue;
 
-        if (cInfo->DifficultyEntry1)
+        bool ok = true;                                     // bool to allow continue outside this loop
+        for (uint32 diff = 0; diff < MAX_DIFFICULTY - 1 && ok; ++diff)
         {
-            CreatureInfo const* difficultyInfo = GetCreatureTemplate(cInfo->DifficultyEntry1);
+            if (!cInfo->DifficultyEntry[diff])
+                continue;
+            ok = false;                                     // will be set to true at the end of this loop again
+
+            CreatureInfo const* difficultyInfo = GetCreatureTemplate(cInfo->DifficultyEntry[diff]);
             if (!difficultyInfo)
             {
-                sLog.outErrorDb("Creature (Entry: %u) have `difficulty_entry_1`=%u but creature entry %u not exist.", i, cInfo->DifficultyEntry1, cInfo->DifficultyEntry1);
+                sLog.outErrorDb("Creature (Entry: %u) have `difficulty_entry_%u`=%u but creature entry %u not exist.",
+                    i, diff + 1, cInfo->DifficultyEntry[diff], cInfo->DifficultyEntry[diff]);
                 continue;
             }
 
-            if (difficultyEntries1.find(i)!=difficultyEntries1.end())
+            if (difficultyEntries[diff].find(i) != difficultyEntries[diff].end())
             {
-                sLog.outErrorDb("Creature (Entry: %u) listed as difficulty 1 but have value in `difficulty_entry_1`.",i);
+                sLog.outErrorDb("Creature (Entry: %u) listed as difficulty %u but have value in `difficulty_entry_1`.", i, diff + 1);
                 continue;
             }
 
-            if (difficultyEntries1.find(cInfo->DifficultyEntry1)!=difficultyEntries1.end())
+            bool ok2 = true;
+            for (uint32 diff2 = 0; diff2 < MAX_DIFFICULTY - 1 && ok2; ++diff2)
             {
-                sLog.outErrorDb("Creature (Entry: %u) already listed as difficulty 1 for another entry.",cInfo->DifficultyEntry1);
-                continue;
-            }
+                ok2 = false;
+                if (difficultyEntries[diff2].find(cInfo->DifficultyEntry[diff]) != difficultyEntries[diff2].end())
+                {
+                    sLog.outErrorDb("Creature (Entry: %u) already listed as difficulty %u for another entry.", cInfo->DifficultyEntry[diff], diff2 + 1);
+                    continue;
+                }
 
-            if (hasDifficultyEntries1.find(cInfo->DifficultyEntry1)!=hasDifficultyEntries1.end())
-            {
-                sLog.outErrorDb("Creature (Entry: %u) have `difficulty_entry_1`=%u but creature entry %u have difficulty 1 entry also.",i,cInfo->DifficultyEntry1,cInfo->DifficultyEntry1);
-                continue;
+                if (hasDifficultyEntries[diff2].find(cInfo->DifficultyEntry[diff]) != hasDifficultyEntries[diff2].end())
+                {
+                    sLog.outErrorDb("Creature (Entry: %u) have `difficulty_entry_%u`=%u but creature entry %u have difficulty %u entry also.",
+                        i, diff + 1, cInfo->DifficultyEntry[diff], cInfo->DifficultyEntry[diff], diff2 + 1);
+                    continue;
+                }
+                ok2 = true;
             }
+            if (!ok2)
+                continue;
 
             if (cInfo->unit_class != difficultyInfo->unit_class)
             {
-                sLog.outErrorDb("Creature (Entry: %u, class %u) has different `unit_class` in difficulty 1 mode (Entry: %u, class %u).",i, cInfo->unit_class, cInfo->DifficultyEntry1, difficultyInfo->unit_class);
+                sLog.outErrorDb("Creature (Entry: %u, class %u) has different `unit_class` in difficulty %u mode (Entry: %u, class %u).",
+                    i, cInfo->unit_class, diff + 1, cInfo->DifficultyEntry[diff], difficultyInfo->unit_class);
                 continue;
             }
 
             if (cInfo->npcflag != difficultyInfo->npcflag)
             {
-                sLog.outErrorDb("Creature (Entry: %u) has different `npcflag` in difficulty 1 mode (Entry: %u).",i,cInfo->DifficultyEntry1);
+                sLog.outErrorDb("Creature (Entry: %u) has different `npcflag` in difficulty %u mode (Entry: %u).", i, diff + 1, cInfo->DifficultyEntry[diff]);
                 continue;
             }
 
             if (cInfo->trainer_class != difficultyInfo->trainer_class)
             {
-                sLog.outErrorDb("Creature (Entry: %u) has different `trainer_class` in difficulty 1 mode (Entry: %u).",i,cInfo->DifficultyEntry1);
+                sLog.outErrorDb("Creature (Entry: %u) has different `trainer_class` in difficulty %u mode (Entry: %u).", i, diff + 1, cInfo->DifficultyEntry[diff]);
                 continue;
             }
 
             if (cInfo->trainer_race != difficultyInfo->trainer_race)
             {
-                sLog.outErrorDb("Creature (Entry: %u) has different `trainer_race` in difficulty 1 mode (Entry: %u).",i,cInfo->DifficultyEntry1);
+                sLog.outErrorDb("Creature (Entry: %u) has different `trainer_race` in difficulty %u mode (Entry: %u).", i, diff + 1, cInfo->DifficultyEntry[diff]);
                 continue;
             }
 
             if (cInfo->trainer_type != difficultyInfo->trainer_type)
             {
-                sLog.outErrorDb("Creature (Entry: %u) has different `trainer_type` in difficulty 1 mode (Entry: %u).",i,cInfo->DifficultyEntry1);
+                sLog.outErrorDb("Creature (Entry: %u) has different `trainer_type` in difficulty %u mode (Entry: %u).", i, diff + 1, cInfo->DifficultyEntry[diff]);
                 continue;
             }
 
             if (cInfo->trainer_spell != difficultyInfo->trainer_spell)
             {
-                sLog.outErrorDb("Creature (Entry: %u) has different `trainer_spell` in difficulty 1 mode (Entry: %u).",i,cInfo->DifficultyEntry1);
+                sLog.outErrorDb("Creature (Entry: %u) has different `trainer_spell` in difficulty %u mode (Entry: %u).", i, diff + 1, cInfo->DifficultyEntry[diff]);
                 continue;
             }
 
             if (difficultyInfo->AIName && *difficultyInfo->AIName)
             {
-                sLog.outErrorDb("Difficulty 1 mode creature (Entry: %u) has `AIName`, but in any case will used difficulty 0 mode creature (Entry: %u) AIName.",cInfo->DifficultyEntry1,i);
+                sLog.outErrorDb("Difficulty %u mode creature (Entry: %u) has `AIName`, but in any case will used difficulty 0 mode creature (Entry: %u) AIName.",
+                    diff, cInfo->DifficultyEntry[diff], i);
                 continue;
             }
 
             if (difficultyInfo->ScriptID)
             {
-                sLog.outErrorDb("Difficulty 1 mode creature (Entry: %u) has `ScriptName`, but in any case will used difficulty 0 mode creature (Entry: %u) ScriptName.",cInfo->DifficultyEntry1,i);
+                sLog.outErrorDb("Difficulty %u mode creature (Entry: %u) has `ScriptName`, but in any case will used difficulty 0 mode creature (Entry: %u) ScriptName.",
+                    diff, cInfo->DifficultyEntry[diff], i);
                 continue;
             }
 
-            hasDifficultyEntries1.insert(i);
-            difficultyEntries1.insert(cInfo->DifficultyEntry1);
+            hasDifficultyEntries[diff].insert(i);
+            difficultyEntries[diff].insert(cInfo->DifficultyEntry[diff]);
+            ok = true;
         }
+        if (!ok)
+            continue;
 
         FactionTemplateEntry const* factionTemplate = sFactionTemplateStore.LookupEntry(cInfo->faction_A);
         if (!factionTemplate)
@@ -1032,11 +1053,12 @@ void ObjectMgr::LoadCreatures()
     }
 
     // build single time for check creature data
-    std::set<uint32> difficultyCreatures1;
-    for(uint32 i = 0; i < sCreatureStorage.MaxEntry; ++i)
-        if(CreatureInfo const* cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(i))
-            if(cInfo->DifficultyEntry1)
-                difficultyCreatures1.insert(cInfo->DifficultyEntry1);
+    std::set<uint32> difficultyCreatures[MAX_DIFFICULTY - 1];
+    for (uint32 i = 0; i < sCreatureStorage.MaxEntry; ++i)
+        if (CreatureInfo const* cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(i))
+            for (uint32 diff = 0; diff < MAX_DIFFICULTY - 1; ++diff)
+                if (cInfo->DifficultyEntry[diff])
+                    difficultyCreatures[diff].insert(cInfo->DifficultyEntry[diff]);
 
     // build single time for check spawnmask
     std::map<uint32,uint32> spawnMasks;
@@ -1095,11 +1117,18 @@ void ObjectMgr::LoadCreatures()
         if (data.spawnMask & ~spawnMasks[data.mapid])
             sLog.outErrorDb("Table `creature` have creature (GUID: %u) that have wrong spawn mask %u including not supported difficulty modes for map (Id: %u).",guid, data.spawnMask, data.mapid );
 
-        if(difficultyCreatures1.find(data.id)!=difficultyCreatures1.end())
+        bool ok = true;
+        for (uint32 diff = 0; diff < MAX_DIFFICULTY - 1 && ok; ++diff)
         {
-            sLog.outErrorDb("Table `creature` have creature (GUID: %u) that listed as difficulty 1 template (entry: %u) in `creature_template`, skipped.",guid, data.id );
-            continue;
+            if (difficultyCreatures[diff].find(data.id) != difficultyCreatures[diff].end())
+            {
+                sLog.outErrorDb("Table `creature` have creature (GUID: %u) that listed as difficulty %u template (entry: %u) in `creature_template`, skipped.",
+                    guid, diff + 1, data.id );
+                ok = false;
+            }
         }
+        if (!ok)
+            continue;
 
         if(data.equipmentId > 0)                            // -1 no equipment, 0 use default
         {
@@ -3191,7 +3220,7 @@ void ObjectMgr::LoadGroups()
             uint32 diff = fields[4].GetUInt8();
             if(diff >= (mapEntry->IsRaid() ? MAX_RAID_DIFFICULTY : MAX_DUNGEON_DIFFICULTY))
             {
-                sLog.outErrorDb("Wrong dungeon difficulty use in group_instance table: %d", diff);
+                sLog.outErrorDb("Wrong dungeon difficulty use in group_instance table: %d", diff + 1);
                 diff = 0;                                   // default for both difficaly types
             }
 
@@ -4095,6 +4124,16 @@ void ObjectMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
                 if(!MaNGOS::IsValidMapCoord(tmp.x,tmp.y,tmp.z,tmp.o))
                 {
                     sLog.outErrorDb("Table `%s` has invalid coordinates (X: %f Y: %f) in SCRIPT_COMMAND_TELEPORT_TO for script id %u",tablename,tmp.x,tmp.y,tmp.id);
+                    continue;
+                }
+                break;
+            }
+
+            case SCRIPT_COMMAND_KILL_CREDIT:
+            {
+                if (!GetCreatureTemplate(tmp.datalong))
+                {
+                    sLog.outErrorDb("Table `%s` has invalid creature (Entry: %u) in SCRIPT_COMMAND_KILL_CREDIT for script id %u",tablename,tmp.datalong,tmp.id);
                     continue;
                 }
                 break;
