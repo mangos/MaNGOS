@@ -142,7 +142,7 @@ void WorldSession::HandleWhoOpcode( WorldPacket & recv_data )
     data << clientcount;                                    // clientcount place holder
 
     //TODO: Guard Player map
-    HashMapHolder<Player>::MapType& m = objaccessor.GetPlayers();
+    HashMapHolder<Player>::MapType& m = sObjectAccessor.GetPlayers();
     for(HashMapHolder<Player>::MapType::const_iterator itr = m.begin(); itr != m.end(); ++itr)
     {
         if (security == SEC_PLAYER)
@@ -204,7 +204,7 @@ void WorldSession::HandleWhoOpcode( WorldPacket & recv_data )
         if (!(wplayer_name.empty() || wpname.find(wplayer_name) != std::wstring::npos))
             continue;
 
-        std::string gname = objmgr.GetGuildNameById(itr->second->GetGuildId());
+        std::string gname = sObjectMgr.GetGuildNameById(itr->second->GetGuildId());
         std::wstring wgname;
         if(!Utf8toWStr(gname,wgname))
             continue;
@@ -754,10 +754,10 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
     if(Script->scriptAreaTrigger(GetPlayer(), atEntry))
         return;
 
-    uint32 quest_id = objmgr.GetQuestForAreaTrigger( Trigger_ID );
+    uint32 quest_id = sObjectMgr.GetQuestForAreaTrigger( Trigger_ID );
     if( quest_id && GetPlayer()->isAlive() && GetPlayer()->IsActiveQuest(quest_id) )
     {
-        Quest const* pQuest = objmgr.GetQuestTemplate(quest_id);
+        Quest const* pQuest = sObjectMgr.GetQuestTemplate(quest_id);
         if( pQuest )
         {
             if(GetPlayer()->GetQuestStatus(quest_id) == QUEST_STATUS_INCOMPLETE)
@@ -765,7 +765,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
         }
     }
 
-    if(objmgr.IsTavernAreaTrigger(Trigger_ID))
+    if(sObjectMgr.IsTavernAreaTrigger(Trigger_ID))
     {
         // set resting flag we are in the inn
         GetPlayer()->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING);
@@ -787,7 +787,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
     }
 
     // NULL if all values default (non teleport trigger)
-    AreaTrigger const* at = objmgr.GetAreaTrigger(Trigger_ID);
+    AreaTrigger const* at = sObjectMgr.GetAreaTrigger(Trigger_ID);
     if(!at)
         return;
 
@@ -1129,7 +1129,7 @@ void WorldSession::HandleInspectOpcode(WorldPacket& recv_data)
 
     _player->SetSelection(guid);
 
-    Player *plr = objmgr.GetPlayer(guid);
+    Player *plr = sObjectMgr.GetPlayer(guid);
     if(!plr)                                                // wrong player
         return;
 
@@ -1157,7 +1157,7 @@ void WorldSession::HandleInspectHonorStatsOpcode(WorldPacket& recv_data)
     uint64 guid;
     recv_data >> guid;
 
-    Player *player = objmgr.GetPlayer(guid);
+    Player *player = sObjectMgr.GetPlayer(guid);
 
     if(!player)
     {
@@ -1230,7 +1230,7 @@ void WorldSession::HandleWhoisOpcode(WorldPacket& recv_data)
         return;
     }
 
-    Player *plr = objmgr.GetPlayer(charname.c_str());
+    Player *plr = sObjectMgr.GetPlayer(charname.c_str());
 
     if(!plr)
     {
@@ -1554,7 +1554,7 @@ void WorldSession::HandleQueryInspectAchievements( WorldPacket & recv_data )
     if(!recv_data.readPackGUID(guid))
         return;
 
-    if(Player *player = objmgr.GetPlayer(guid))
+    if(Player *player = sObjectMgr.GetPlayer(guid))
         player->GetAchievementMgr().SendRespondInspectAchievements(_player);
 }
 

@@ -247,7 +247,7 @@ uint32 BattleGroundQueue::GetAverageQueueWaitTime(GroupQueueInfo* ginfo, BGQueue
 //remove player from queue and from group info, if group info is empty then remove it too
 void BattleGroundQueue::RemovePlayer(const uint64& guid, bool decreaseInvitedCount)
 {
-    //Player *plr = objmgr.GetPlayer(guid);
+    //Player *plr = sObjectMgr.GetPlayer(guid);
 
     int32 queue_id = -1;                                     // signed for proper for-loop finish
     QueuedPlayersMap::iterator itr;
@@ -322,11 +322,11 @@ void BattleGroundQueue::RemovePlayer(const uint64& guid, bool decreaseInvitedCou
     //if player leaves queue and he is invited to rated arena match, then he have to loose
     if (group->IsInvitedToBGInstanceGUID && group->IsRated && decreaseInvitedCount)
     {
-        ArenaTeam * at = objmgr.GetArenaTeamById(group->ArenaTeamId);
+        ArenaTeam * at = sObjectMgr.GetArenaTeamById(group->ArenaTeamId);
         if (at)
         {
             sLog.outDebug("UPDATING memberLost's personal arena rating for %u by opponents rating: %u", GUID_LOPART(guid), group->OpponentsTeamRating);
-            Player *plr = objmgr.GetPlayer(guid);
+            Player *plr = sObjectMgr.GetPlayer(guid);
             if (plr)
                 at->MemberLost(plr, group->OpponentsTeamRating);
             else
@@ -348,7 +348,7 @@ void BattleGroundQueue::RemovePlayer(const uint64& guid, bool decreaseInvitedCou
     {
         // remove next player, this is recursive
         // first send removal information
-        if (Player *plr2 = objmgr.GetPlayer(group->Players.begin()->first))
+        if (Player *plr2 = sObjectMgr.GetPlayer(group->Players.begin()->first))
         {
             BattleGround * bg = sBattleGroundMgr.GetBattleGroundTemplate(group->BgTypeId);
             BattleGroundQueueTypeId bgQueueTypeId = BattleGroundMgr::BGQueueTypeId(group->BgTypeId, group->ArenaType);
@@ -386,7 +386,7 @@ void BattleGroundQueue::AnnounceWorld(GroupQueueInfo *ginfo, const uint64& playe
     {
         if (sWorld.getConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_ENABLE))
         {
-            Player *plr = objmgr.GetPlayer(playerGUID);
+            Player *plr = sObjectMgr.GetPlayer(playerGUID);
             BattleGround* bg = sBattleGroundMgr.GetBattleGroundTemplate(ginfo->BgTypeId);
             if (!bg || !plr)
                 return;
@@ -446,7 +446,7 @@ bool BattleGroundQueue::InviteGroupToBG(GroupQueueInfo * ginfo, BattleGround * b
         for(std::map<uint64,PlayerQueueInfo*>::iterator itr = ginfo->Players.begin(); itr != ginfo->Players.end(); ++itr)
         {
             // get the player
-            Player* plr = objmgr.GetPlayer(itr->first);
+            Player* plr = sObjectMgr.GetPlayer(itr->first);
             // if offline, skip him, this should not happen - player is removed from queue when he logs out
             if (!plr)
                 continue;
@@ -1009,7 +1009,7 @@ void BattleGroundQueue::Update(BattleGroundTypeId bgTypeId, BGQueueIdBasedOnLeve
 
 bool BGQueueInviteEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
 {
-    Player* plr = objmgr.GetPlayer( m_PlayerGuid );
+    Player* plr = sObjectMgr.GetPlayer( m_PlayerGuid );
     // player logged off (we should do nothing, he is correctly removed from queue in another procedure)
     if (!plr)
         return true;
@@ -1054,7 +1054,7 @@ void BGQueueInviteEvent::Abort(uint64 /*e_time*/)
 */
 bool BGQueueRemoveEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
 {
-    Player* plr = objmgr.GetPlayer( m_PlayerGuid );
+    Player* plr = sObjectMgr.GetPlayer( m_PlayerGuid );
     if (!plr)
         // player logged off (we should do nothing, he is correctly removed from queue in another procedure)
         return true;
@@ -1332,7 +1332,7 @@ void BattleGroundMgr::BuildPvpLogDataPacket(WorldPacket *data, BattleGround *bg)
         for(int i = 1; i >= 0; --i)
         {
             uint32 at_id = bg->m_ArenaTeamIds[i];
-            ArenaTeam * at = objmgr.GetArenaTeamById(at_id);
+            ArenaTeam * at = sObjectMgr.GetArenaTeamById(at_id);
             if (at)
                 *data << at->GetName();
             else
@@ -1364,7 +1364,7 @@ void BattleGroundMgr::BuildPvpLogDataPacket(WorldPacket *data, BattleGround *bg)
         }
         else
         {
-            Player *plr = objmgr.GetPlayer(itr->first);
+            Player *plr = sObjectMgr.GetPlayer(itr->first);
             uint32 team = bg->GetPlayerTeam(itr->first);
             if (!team && plr)
                 team = plr->GetTeam();
@@ -1597,7 +1597,7 @@ BattleGround * BattleGroundMgr::CreateNewBattleGround(BattleGroundTypeId bgTypeI
     }
 
     // generate a new instance id
-    bg->SetInstanceID(mapmgr.GenerateInstanceId()); // set instance id
+    bg->SetInstanceID(sMapMgr.GenerateInstanceId()); // set instance id
     bg->SetClientInstanceID(CreateClientVisibleInstanceId(bgTypeId, queue_id));
 
     // reset the new bg (set status to status_wait_queue from status_none)
@@ -1807,7 +1807,7 @@ void BattleGroundMgr::DistributeArenaPoints()
     std::map<uint32, uint32> PlayerPoints;
 
     //at first update all points for all team members
-    for(ObjectMgr::ArenaTeamMap::iterator team_itr = objmgr.GetArenaTeamMapBegin(); team_itr != objmgr.GetArenaTeamMapEnd(); ++team_itr)
+    for(ObjectMgr::ArenaTeamMap::iterator team_itr = sObjectMgr.GetArenaTeamMapBegin(); team_itr != sObjectMgr.GetArenaTeamMapEnd(); ++team_itr)
     {
         if (ArenaTeam * at = team_itr->second)
         {
@@ -1821,7 +1821,7 @@ void BattleGroundMgr::DistributeArenaPoints()
         //update to database
         CharacterDatabase.PExecute("UPDATE characters SET arena_pending_points = '%u' WHERE guid = '%u'", plr_itr->second, plr_itr->first);
         //add points if player is online
-        Player* pl = objmgr.GetPlayer(plr_itr->first);
+        Player* pl = sObjectMgr.GetPlayer(plr_itr->first);
         if (pl)
             pl->ModifyArenaPoints(plr_itr->second);
     }
@@ -1831,7 +1831,7 @@ void BattleGroundMgr::DistributeArenaPoints()
     sWorld.SendWorldText(LANG_DIST_ARENA_POINTS_ONLINE_END);
 
     sWorld.SendWorldText(LANG_DIST_ARENA_POINTS_TEAM_START);
-    for(ObjectMgr::ArenaTeamMap::iterator titr = objmgr.GetArenaTeamMapBegin(); titr != objmgr.GetArenaTeamMapEnd(); ++titr)
+    for(ObjectMgr::ArenaTeamMap::iterator titr = sObjectMgr.GetArenaTeamMapBegin(); titr != sObjectMgr.GetArenaTeamMapEnd(); ++titr)
     {
         if (ArenaTeam * at = titr->second)
         {

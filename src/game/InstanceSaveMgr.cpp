@@ -168,7 +168,7 @@ void InstanceSave::SaveToDB()
     // save instance data too
     std::string data;
 
-    Map *map = mapmgr.FindMap(GetMapId(),m_instanceid);
+    Map *map = sMapMgr.FindMap(GetMapId(),m_instanceid);
     if(map)
     {
         assert(map->IsDungeon());
@@ -214,8 +214,8 @@ bool InstanceSave::UnloadIfEmpty()
 {
     if(m_playerList.empty() && m_groupList.empty())
     {
-        if(!sInstanceSaveManager.lock_instLists)
-            sInstanceSaveManager.RemoveInstanceSave(GetInstanceId());
+        if(!sInstanceSaveMgr.lock_instLists)
+            sInstanceSaveMgr.RemoveInstanceSave(GetInstanceId());
         return false;
     }
     else
@@ -258,7 +258,7 @@ void InstanceSaveManager::CleanupInstances()
     bar.step();
 
     // load reset times and clean expired instances
-    sInstanceSaveManager.LoadResetTimes();
+    sInstanceSaveMgr.LoadResetTimes();
 
     // clean character/group - instance binds with invalid group/characters
     _DelHelper(CharacterDatabase, "character_instance.guid, instance", "character_instance", "LEFT JOIN characters ON character_instance.guid = characters.guid WHERE characters.guid IS NULL");
@@ -567,7 +567,7 @@ void InstanceSaveManager::_ResetSave(InstanceSaveHashMap::iterator &itr)
 void InstanceSaveManager::_ResetInstance(uint32 mapid, uint32 instanceId)
 {
     sLog.outDebug("InstanceSaveMgr::_ResetInstance %u, %u", mapid, instanceId);
-    Map *map = (MapInstanced*)mapmgr.CreateBaseMap(mapid);
+    Map *map = (MapInstanced*)sMapMgr.CreateBaseMap(mapid);
     if(!map->Instanceable())
         return;
 
@@ -577,14 +577,14 @@ void InstanceSaveManager::_ResetInstance(uint32 mapid, uint32 instanceId)
 
     Map* iMap = ((MapInstanced*)map)->FindMap(instanceId);
     if(iMap && iMap->IsDungeon()) ((InstanceMap*)iMap)->Reset(INSTANCE_RESET_RESPAWN_DELAY);
-    else objmgr.DeleteRespawnTimeForInstance(instanceId);   // even if map is not loaded
+    else sObjectMgr.DeleteRespawnTimeForInstance(instanceId);   // even if map is not loaded
 }
 
 void InstanceSaveManager::_ResetOrWarnAll(uint32 mapid, bool warn, uint32 timeLeft)
 {
     // global reset for all instances of the given map
     // note: this isn't fast but it's meant to be executed very rarely
-    Map const *map = mapmgr.CreateBaseMap(mapid);
+    Map const *map = sMapMgr.CreateBaseMap(mapid);
     if(!map->Instanceable())
         return;
     uint64 now = (uint64)time(NULL);

@@ -49,7 +49,7 @@ namespace MaNGOS
                 : i_player(pl), i_msgtype(msgtype), i_textId(textId), i_achievementId(ach_id) {}
             void operator()(WorldPacket& data, int32 loc_idx)
             {
-                char const* text = objmgr.GetMangosString(i_textId,loc_idx);
+                char const* text = sObjectMgr.GetMangosString(i_textId,loc_idx);
 
                 data << uint8(i_msgtype);
                 data << uint32(LANG_UNIVERSAL);
@@ -366,7 +366,7 @@ void AchievementMgr::ResetAchievementCriteria(AchievementCriteriaTypes type, uin
     if (!sWorld.getConfig(CONFIG_GM_ALLOW_ACHIEVEMENT_GAINS) && m_player->GetSession()->GetSecurity() > SEC_PLAYER)
         return;
 
-    AchievementCriteriaEntryList const& achievementCriteriaList = achievementmgr.GetAchievementCriteriaByType(type);
+    AchievementCriteriaEntryList const& achievementCriteriaList = sAchievementMgr.GetAchievementCriteriaByType(type);
     for(AchievementCriteriaEntryList::const_iterator i = achievementCriteriaList.begin(); i!=achievementCriteriaList.end(); ++i)
     {
         AchievementCriteriaEntry const *achievementCriteria = (*i);
@@ -522,7 +522,7 @@ void AchievementMgr::LoadFromDB(QueryResult *achievementResult, QueryResult *cri
 
             uint32 achievement_id = fields[0].GetUInt32();
 
-            // don't must happen: cleanup at server startup in achievementmgr.LoadCompletedAchievements()
+            // don't must happen: cleanup at server startup in sAchievementMgr.LoadCompletedAchievements()
             if(!sAchievementStore.LookupEntry(achievement_id))
                 continue;
 
@@ -575,7 +575,7 @@ void AchievementMgr::SendAchievementEarned(AchievementEntry const* achievement)
         sLog.outDebug("AchievementMgr::SendAchievementEarned(%u)", achievement->ID);
     #endif
 
-    if(Guild* guild = objmgr.GetGuildById(GetPlayer()->GetGuildId()))
+    if(Guild* guild = sObjectMgr.GetGuildById(GetPlayer()->GetGuildId()))
     {
         MaNGOS::AchievementChatBuilder say_builder(*GetPlayer(), CHAT_MSG_GUILD_ACHIEVEMENT, LANG_ACHIEVEMENT_EARNED,achievement->ID);
         MaNGOS::LocalizedPacketDo<MaNGOS::AchievementChatBuilder> say_do(say_builder);
@@ -665,7 +665,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
     if (!sWorld.getConfig(CONFIG_GM_ALLOW_ACHIEVEMENT_GAINS) && m_player->GetSession()->GetSecurity() > SEC_PLAYER)
         return;
 
-    AchievementCriteriaEntryList const& achievementCriteriaList = achievementmgr.GetAchievementCriteriaByType(type);
+    AchievementCriteriaEntryList const& achievementCriteriaList = sAchievementMgr.GetAchievementCriteriaByType(type);
     for(AchievementCriteriaEntryList::const_iterator i = achievementCriteriaList.begin(); i!=achievementCriteriaList.end(); ++i)
     {
         AchievementCriteriaEntry const *achievementCriteria = (*i);
@@ -741,7 +741,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                 if (achievementCriteria->win_bg.additionalRequirement1_type)
                 {
                     // those requirements couldn't be found in the dbc
-                    AchievementCriteriaRequirementSet const* data = achievementmgr.GetCriteriaRequirementSet(achievementCriteria);
+                    AchievementCriteriaRequirementSet const* data = sAchievementMgr.GetCriteriaRequirementSet(achievementCriteria);
                     if (!data || !data->Meets(GetPlayer(),unit))
                         continue;
                 }
@@ -787,7 +787,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                     continue;
 
                 // those requirements couldn't be found in the dbc
-                AchievementCriteriaRequirementSet const* data = achievementmgr.GetCriteriaRequirementSet(achievementCriteria);
+                AchievementCriteriaRequirementSet const* data = sAchievementMgr.GetCriteriaRequirementSet(achievementCriteria);
                 if(!data || !data->Meets(GetPlayer(),unit))
                     continue;
 
@@ -833,7 +833,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                 uint32 counter =0;
                 for(QuestStatusMap::const_iterator itr = GetPlayer()->getQuestStatusMap().begin(); itr!=GetPlayer()->getQuestStatusMap().end(); ++itr)
                 {
-                    Quest const* quest = objmgr.GetQuestTemplate(itr->first);
+                    Quest const* quest = sObjectMgr.GetQuestTemplate(itr->first);
                     if(itr->second.m_rewarded && quest->GetZoneOrSort() >= 0 && uint32(quest->GetZoneOrSort()) == achievementCriteria->complete_quests_in_zone.zoneID)
                         counter++;
                 }
@@ -886,7 +886,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                 if(!miscvalue1)
                     continue;
 
-                Map const* map = GetPlayer()->IsInWorld() ? GetPlayer()->GetMap() : mapmgr.FindMap(GetPlayer()->GetMapId(), GetPlayer()->GetInstanceId());
+                Map const* map = GetPlayer()->IsInWorld() ? GetPlayer()->GetMap() : sMapMgr.FindMap(GetPlayer()->GetMapId(), GetPlayer()->GetInstanceId());
                 if(!map || !map->IsDungeon())
                     continue;
 
@@ -955,7 +955,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                     continue;
 
                 // those requirements couldn't be found in the dbc
-                AchievementCriteriaRequirementSet const* data = achievementmgr.GetCriteriaRequirementSet(achievementCriteria);
+                AchievementCriteriaRequirementSet const* data = sAchievementMgr.GetCriteriaRequirementSet(achievementCriteria);
                 if(!data || !data->Meets(GetPlayer(),unit))
                     continue;
 
@@ -997,7 +997,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                     case 1789:
                     {
                         // those requirements couldn't be found in the dbc
-                        AchievementCriteriaRequirementSet const* data = achievementmgr.GetCriteriaRequirementSet(achievementCriteria);
+                        AchievementCriteriaRequirementSet const* data = sAchievementMgr.GetCriteriaRequirementSet(achievementCriteria);
                         if(!data || !data->Meets(GetPlayer(),unit))
                             continue;
                         break;
@@ -1023,7 +1023,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                     continue;
 
                 // those requirements couldn't be found in the dbc
-                AchievementCriteriaRequirementSet const* data = achievementmgr.GetCriteriaRequirementSet(achievementCriteria);
+                AchievementCriteriaRequirementSet const* data = sAchievementMgr.GetCriteriaRequirementSet(achievementCriteria);
                 if(!data)
                     continue;
 
@@ -1053,7 +1053,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                 if(achievementCriteria->loot_type.lootTypeCount==1)
                 {
                     // those requirements couldn't be found in the dbc
-                    AchievementCriteriaRequirementSet const* data = achievementmgr.GetCriteriaRequirementSet(achievementCriteria);
+                    AchievementCriteriaRequirementSet const* data = sAchievementMgr.GetCriteriaRequirementSet(achievementCriteria);
                     if(!data || !data->Meets(GetPlayer(),unit))
                         continue;
                 }
@@ -1076,7 +1076,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                 if(achievementCriteria->win_rated_arena.flag==ACHIEVEMENT_CRITERIA_CONDITION_NO_LOOSE)
                 {
                     // those requirements couldn't be found in the dbc
-                    AchievementCriteriaRequirementSet const* data = achievementmgr.GetCriteriaRequirementSet(achievementCriteria);
+                    AchievementCriteriaRequirementSet const* data = sAchievementMgr.GetCriteriaRequirementSet(achievementCriteria);
                     if(!data || !data->Meets(GetPlayer(),unit,miscvalue1))
                     {
                         // reset the progress as we have a win without the requirement.
@@ -1191,7 +1191,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                 if(achievementCriteria->do_emote.count)
                 {
                     // those requirements couldn't be found in the dbc
-                    AchievementCriteriaRequirementSet const* data = achievementmgr.GetCriteriaRequirementSet(achievementCriteria);
+                    AchievementCriteriaRequirementSet const* data = sAchievementMgr.GetCriteriaRequirementSet(achievementCriteria);
                     if(!data || !data->Meets(GetPlayer(),unit))
                         continue;
                 }
@@ -1254,7 +1254,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                     spellIter != GetPlayer()->GetSpellMap().end();
                     ++spellIter)
                 {
-                    SkillLineAbilityMapBounds bounds = spellmgr.GetSkillLineAbilityMapBounds(spellIter->first);
+                    SkillLineAbilityMapBounds bounds = sSpellMgr.GetSkillLineAbilityMapBounds(spellIter->first);
                     for(SkillLineAbilityMap::const_iterator skillIter = bounds.first; skillIter != bounds.second; ++skillIter)
                     {
                         if(skillIter->second->skillId == achievementCriteria->learn_skillline_spell.skillLine)
@@ -1272,7 +1272,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                 if (achievementCriteria->win_duel.duelCount)
                 {
                     // those requirements couldn't be found in the dbc
-                    AchievementCriteriaRequirementSet const* data = achievementmgr.GetCriteriaRequirementSet(achievementCriteria);
+                    AchievementCriteriaRequirementSet const* data = sAchievementMgr.GetCriteriaRequirementSet(achievementCriteria);
                     if (!data)
                         continue;
 
@@ -1301,7 +1301,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                     spellIter != GetPlayer()->GetSpellMap().end();
                     ++spellIter)
                 {
-                    SkillLineAbilityMapBounds bounds = spellmgr.GetSkillLineAbilityMapBounds(spellIter->first);
+                    SkillLineAbilityMapBounds bounds = sSpellMgr.GetSkillLineAbilityMapBounds(spellIter->first);
                     for(SkillLineAbilityMap::const_iterator skillIter = bounds.first; skillIter != bounds.second; ++skillIter)
                         if (skillIter->second->skillId == achievementCriteria->learn_skill_line.skillLine)
                             spellCount++;
@@ -1371,7 +1371,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                 CompletedAchievement(achievement);
         }
 
-        if(AchievementEntryList const* achRefList = achievementmgr.GetAchievementByReferencedId(achievement->ID))
+        if(AchievementEntryList const* achRefList = sAchievementMgr.GetAchievementByReferencedId(achievement->ID))
         {
             for(AchievementEntryList::const_iterator itr = achRefList->begin(); itr != achRefList->end(); ++itr)
                 if(IsCompletedAchievement(*itr))
@@ -1392,7 +1392,7 @@ bool AchievementMgr::IsCompletedCriteria(AchievementCriteriaEntry const* achieve
     if(achievement->flags & (ACHIEVEMENT_FLAG_REALM_FIRST_REACH | ACHIEVEMENT_FLAG_REALM_FIRST_KILL))
     {
         // someone on this realm has already completed that achievement
-        if(achievementmgr.IsRealmCompleted(achievement))
+        if(sAchievementMgr.IsRealmCompleted(achievement))
             return false;
     }
 
@@ -1554,7 +1554,7 @@ bool AchievementMgr::IsCompletedAchievement(AchievementEntry const* entry)
     uint32 achievmentForTestId = entry->refAchievement ? entry->refAchievement : entry->ID;
     uint32 achievmentForTestCount = entry->count;
 
-    AchievementCriteriaEntryList const* cList = achievementmgr.GetAchievementCriteriaByAchievement(achievmentForTestId);
+    AchievementCriteriaEntryList const* cList = sAchievementMgr.GetAchievementCriteriaByAchievement(achievmentForTestId);
     if(!cList)
         return false;
     uint32 count = 0;
@@ -1683,12 +1683,12 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
     // don't insert for ACHIEVEMENT_FLAG_REALM_FIRST_KILL since otherwise only the first group member would reach that achievement
     // TODO: where do set this instead?
     if(!(achievement->flags & ACHIEVEMENT_FLAG_REALM_FIRST_KILL))
-        achievementmgr.SetRealmCompleted(achievement);
+        sAchievementMgr.SetRealmCompleted(achievement);
 
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_ACHIEVEMENT);
 
     // reward items and titles if any
-    AchievementReward const* reward = achievementmgr.GetAchievementReward(achievement);
+    AchievementReward const* reward = sAchievementMgr.GetAchievementReward(achievement);
 
     // no rewards
     if(!reward)
@@ -1713,7 +1713,7 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
         std::string text = reward->text;
         if ( loc_idx >= 0 )
         {
-            if(AchievementRewardLocale const* loc = achievementmgr.GetAchievementRewardLocale(achievement))
+            if(AchievementRewardLocale const* loc = sAchievementMgr.GetAchievementRewardLocale(achievement))
             {
                 if (loc->subject.size() > size_t(loc_idx) && !loc->subject[loc_idx].empty())
                     subject = loc->subject[loc_idx];
@@ -1722,7 +1722,7 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
             }
         }
 
-        uint32 itemTextId = objmgr.CreateItemText( text );
+        uint32 itemTextId = sObjectMgr.CreateItemText( text );
 
         MailDraft draft(subject, itemTextId);
 
@@ -2164,7 +2164,7 @@ void AchievementGlobalMgr::LoadRewardLocales()
             std::string str = fields[1+2*(i-1)].GetCppString();
             if(!str.empty())
             {
-                int idx = objmgr.GetOrNewIndexForLocale(LocaleConstant(i));
+                int idx = sObjectMgr.GetOrNewIndexForLocale(LocaleConstant(i));
                 if(idx >= 0)
                 {
                     if(data.subject.size() <= size_t(idx))
@@ -2176,7 +2176,7 @@ void AchievementGlobalMgr::LoadRewardLocales()
             str = fields[1+2*(i-1)+1].GetCppString();
             if(!str.empty())
             {
-                int idx = objmgr.GetOrNewIndexForLocale(LocaleConstant(i));
+                int idx = sObjectMgr.GetOrNewIndexForLocale(LocaleConstant(i));
                 if(idx >= 0)
                 {
                     if(data.text.size() <= size_t(idx))

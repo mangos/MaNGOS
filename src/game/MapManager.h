@@ -155,6 +155,6 @@ class MANGOS_DLL_DECL MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::
         uint32 i_MaxInstanceId;
 };
 
-#define mapmgr MapManager::Instance()
+#define sMapMgr MapManager::Instance()
 
 #endif

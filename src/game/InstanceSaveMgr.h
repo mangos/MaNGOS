@@ -169,5 +169,5 @@ class MANGOS_DLL_DECL InstanceSaveManager : public MaNGOS::Singleton<InstanceSav
         ResetTimeQueue m_resetTimeQueue;
 };
 
-#define sInstanceSaveManager MaNGOS::Singleton<InstanceSaveManager>::Instance()
+#define sInstanceSaveMgr MaNGOS::Singleton<InstanceSaveManager>::Instance()
 #endif

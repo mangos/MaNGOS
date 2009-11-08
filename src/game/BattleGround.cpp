@@ -42,7 +42,7 @@ namespace MaNGOS
                 : i_msgtype(msgtype), i_textId(textId), i_source(source), i_args(args) {}
             void operator()(WorldPacket& data, int32 loc_idx)
             {
-                char const* text = objmgr.GetMangosString(i_textId,loc_idx);
+                char const* text = sObjectMgr.GetMangosString(i_textId,loc_idx);
 
                 if (i_args)
                 {
@@ -87,7 +87,7 @@ namespace MaNGOS
                 : i_language(language), i_textId(textId), i_source(source), i_args(args) {}
             void operator()(WorldPacket& data, int32 loc_idx)
             {
-                char const* text = objmgr.GetMangosString(i_textId,loc_idx);
+                char const* text = sObjectMgr.GetMangosString(i_textId,loc_idx);
 
                 if(i_args)
                 {
@@ -134,9 +134,9 @@ namespace MaNGOS
                 : i_msgtype(msgtype), i_textId(textId), i_source(source), i_arg1(arg1), i_arg2(arg2) {}
             void operator()(WorldPacket& data, int32 loc_idx)
             {
-                char const* text = objmgr.GetMangosString(i_textId,loc_idx);
-                char const* arg1str = i_arg1 ? objmgr.GetMangosString(i_arg1,loc_idx) : "";
-                char const* arg2str = i_arg2 ? objmgr.GetMangosString(i_arg2,loc_idx) : "";
+                char const* text = sObjectMgr.GetMangosString(i_textId,loc_idx);
+                char const* arg1str = i_arg1 ? sObjectMgr.GetMangosString(i_arg1,loc_idx) : "";
+                char const* arg2str = i_arg2 ? sObjectMgr.GetMangosString(i_arg2,loc_idx) : "";
 
                 char str [2048];
                 snprintf(str,2048,text, arg1str, arg2str );
@@ -168,9 +168,9 @@ namespace MaNGOS
                 : i_language(language), i_textId(textId), i_source(source), i_arg1(arg1), i_arg2(arg2) {}
             void operator()(WorldPacket& data, int32 loc_idx)
             {
-                char const* text = objmgr.GetMangosString(i_textId,loc_idx);
-                char const* arg1str = i_arg1 ? objmgr.GetMangosString(i_arg1,loc_idx) : "";
-                char const* arg2str = i_arg2 ? objmgr.GetMangosString(i_arg2,loc_idx) : "";
+                char const* text = sObjectMgr.GetMangosString(i_textId,loc_idx);
+                char const* arg1str = i_arg1 ? sObjectMgr.GetMangosString(i_arg1,loc_idx) : "";
+                char const* arg2str = i_arg2 ? sObjectMgr.GetMangosString(i_arg2,loc_idx) : "";
 
                 char str [2048];
                 snprintf(str,2048,text, arg1str, arg2str );
@@ -455,7 +455,7 @@ void BattleGround::Update(uint32 diff)
                 //TODO : add arena sound PlaySoundToAll(SOUND_ARENA_START);
 
                 for(BattleGroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
-                    if (Player *plr = objmgr.GetPlayer(itr->first))
+                    if (Player *plr = sObjectMgr.GetPlayer(itr->first))
                         plr->RemoveAurasDueToSpell(SPELL_ARENA_PREPARATION);
 
                 CheckArenaWinConditions();
@@ -466,7 +466,7 @@ void BattleGround::Update(uint32 diff)
                 PlaySoundToAll(SOUND_BG_START);
 
                 for(BattleGroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
-                    if (Player* plr = objmgr.GetPlayer(itr->first))
+                    if (Player* plr = sObjectMgr.GetPlayer(itr->first))
                         plr->RemoveAurasDueToSpell(SPELL_PREPARATION);
                 //Announce BG starting
                 if (sWorld.getConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_ENABLE))
@@ -517,7 +517,7 @@ void BattleGround::SendPacketToAll(WorldPacket *packet)
 {
     for(BattleGroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
     {
-        Player *plr = objmgr.GetPlayer(itr->first);
+        Player *plr = sObjectMgr.GetPlayer(itr->first);
         if (plr)
             plr->GetSession()->SendPacket(packet);
         else
@@ -529,7 +529,7 @@ void BattleGround::SendPacketToTeam(uint32 TeamID, WorldPacket *packet, Player *
 {
     for(BattleGroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
     {
-        Player *plr = objmgr.GetPlayer(itr->first);
+        Player *plr = sObjectMgr.GetPlayer(itr->first);
 
         if (!plr)
         {
@@ -561,7 +561,7 @@ void BattleGround::PlaySoundToTeam(uint32 SoundID, uint32 TeamID)
 
     for(BattleGroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
     {
-        Player *plr = objmgr.GetPlayer(itr->first);
+        Player *plr = sObjectMgr.GetPlayer(itr->first);
 
         if (!plr)
         {
@@ -584,7 +584,7 @@ void BattleGround::CastSpellOnTeam(uint32 SpellID, uint32 TeamID)
 {
     for(BattleGroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
     {
-        Player *plr = objmgr.GetPlayer(itr->first);
+        Player *plr = sObjectMgr.GetPlayer(itr->first);
 
         if (!plr)
         {
@@ -604,7 +604,7 @@ void BattleGround::RewardHonorToTeam(uint32 Honor, uint32 TeamID)
 {
     for(BattleGroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
     {
-        Player *plr = objmgr.GetPlayer(itr->first);
+        Player *plr = sObjectMgr.GetPlayer(itr->first);
 
         if (!plr)
         {
@@ -629,7 +629,7 @@ void BattleGround::RewardReputationToTeam(uint32 faction_id, uint32 Reputation, 
 
     for(BattleGroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
     {
-        Player *plr = objmgr.GetPlayer(itr->first);
+        Player *plr = sObjectMgr.GetPlayer(itr->first);
 
         if (!plr)
         {
@@ -698,8 +698,8 @@ void BattleGround::EndBattleGround(uint32 winner)
     // arena rating calculation
     if (isArena() && isRated())
     {
-        winner_arena_team = objmgr.GetArenaTeamById(GetArenaTeamIdForTeam(winner));
-        loser_arena_team = objmgr.GetArenaTeamById(GetArenaTeamIdForTeam(GetOtherTeam(winner)));
+        winner_arena_team = sObjectMgr.GetArenaTeamById(GetArenaTeamIdForTeam(winner));
+        loser_arena_team = sObjectMgr.GetArenaTeamById(GetArenaTeamIdForTeam(GetOtherTeam(winner)));
         if (winner_arena_team && loser_arena_team)
         {
             loser_rating = loser_arena_team->GetStats().rating;
@@ -719,7 +719,7 @@ void BattleGround::EndBattleGround(uint32 winner)
 
     for(BattleGroundPlayerMap::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
     {
-        Player *plr = objmgr.GetPlayer(itr->first);
+        Player *plr = sObjectMgr.GetPlayer(itr->first);
         uint32 team = itr->second.Team;
 
         if (!plr)
@@ -937,7 +937,7 @@ void BattleGround::SendRewardMarkByMail(Player *plr,uint32 mark, uint32 count)
         std::string subject = markProto->Name1;
         int loc_idx = plr->GetSession()->GetSessionDbLocaleIndex();
         if (loc_idx >= 0 )
-            if (ItemLocale const *il = objmgr.GetItemLocale(markProto->ItemId))
+            if (ItemLocale const *il = sObjectMgr.GetItemLocale(markProto->ItemId))
                 if (il->Name.size() > size_t(loc_idx) && !il->Name[loc_idx].empty())
                     subject = il->Name[loc_idx];
 
@@ -945,7 +945,7 @@ void BattleGround::SendRewardMarkByMail(Player *plr,uint32 mark, uint32 count)
         std::string textFormat = plr->GetSession()->GetMangosString(LANG_BG_MARK_BY_MAIL);
         char textBuf[300];
         snprintf(textBuf,300,textFormat.c_str(),GetName(),GetName());
-        uint32 itemTextId = objmgr.CreateItemText( textBuf );
+        uint32 itemTextId = sObjectMgr.CreateItemText( textBuf );
 
         MailDraft(subject, itemTextId)
             .AddItem(markItem)
@@ -1003,7 +1003,7 @@ void BattleGround::RemovePlayerAtLeave(uint64 guid, bool Transport, bool SendPac
         m_PlayerScores.erase(itr2);
     }
 
-    Player *plr = objmgr.GetPlayer(guid);
+    Player *plr = sObjectMgr.GetPlayer(guid);
 
     // should remove spirit of redemption
     if (plr && plr->HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION))
@@ -1040,8 +1040,8 @@ void BattleGround::RemovePlayerAtLeave(uint64 guid, bool Transport, bool SendPac
                 if (isRated() && GetStatus() == STATUS_IN_PROGRESS)
                 {
                     //left a rated match while the encounter was in progress, consider as loser
-                    ArenaTeam * winner_arena_team = objmgr.GetArenaTeamById(GetArenaTeamIdForTeam(GetOtherTeam(team)));
-                    ArenaTeam * loser_arena_team = objmgr.GetArenaTeamById(GetArenaTeamIdForTeam(team));
+                    ArenaTeam * winner_arena_team = sObjectMgr.GetArenaTeamById(GetArenaTeamIdForTeam(GetOtherTeam(team)));
+                    ArenaTeam * loser_arena_team = sObjectMgr.GetArenaTeamById(GetArenaTeamIdForTeam(team));
                     if (winner_arena_team && loser_arena_team)
                         loser_arena_team->MemberLost(plr,winner_arena_team->GetRating());
                 }
@@ -1062,8 +1062,8 @@ void BattleGround::RemovePlayerAtLeave(uint64 guid, bool Transport, bool SendPac
             if (isRated() && GetStatus() == STATUS_IN_PROGRESS)
             {
                 //left a rated match while the encounter was in progress, consider as loser
-                ArenaTeam * others_arena_team = objmgr.GetArenaTeamById(GetArenaTeamIdForTeam(GetOtherTeam(team)));
-                ArenaTeam * players_arena_team = objmgr.GetArenaTeamById(GetArenaTeamIdForTeam(team));
+                ArenaTeam * others_arena_team = sObjectMgr.GetArenaTeamById(GetArenaTeamIdForTeam(GetOtherTeam(team)));
+                ArenaTeam * players_arena_team = sObjectMgr.GetArenaTeamById(GetArenaTeamIdForTeam(team));
                 if (others_arena_team && players_arena_team)
                     players_arena_team->OfflineMemberLost(guid, others_arena_team->GetRating());
             }
@@ -1384,7 +1384,7 @@ bool BattleGround::AddObject(uint32 type, uint32 entry, float x, float y, float 
     // and when loading it (in go::LoadFromDB()), a new guid would be assigned to the object, and a new object would be created
     // so we must create it specific for this instance
     GameObject * go = new GameObject;
-    if(!go->Create(objmgr.GenerateLowGuid(HIGHGUID_GAMEOBJECT),entry, GetBgMap(),
+    if(!go->Create(sObjectMgr.GenerateLowGuid(HIGHGUID_GAMEOBJECT),entry, GetBgMap(),
         PHASEMASK_NORMAL, x,y,z,o,rotation0,rotation1,rotation2,rotation3,100,GO_STATE_READY))
     {
         sLog.outErrorDb("Gameobject template %u not found in database! BattleGround not created!", entry);
@@ -1397,7 +1397,7 @@ bool BattleGround::AddObject(uint32 type, uint32 entry, float x, float y, float 
 
     // without this, UseButtonOrDoor caused the crash, since it tried to get go info from godata
     // iirc that was changed, so adding to go data map is no longer required if that was the only function using godata from GameObject without checking if it existed
-    GameObjectData& data = objmgr.NewGOData(guid);
+    GameObjectData& data = sObjectMgr.NewGOData(guid);
 
     data.id             = entry;
     data.mapid          = GetMapId();
@@ -1727,7 +1727,7 @@ void BattleGround::HandleKillPlayer( Player *player, Player *killer )
 
         for(BattleGroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
         {
-            Player *plr = objmgr.GetPlayer(itr->first);
+            Player *plr = sObjectMgr.GetPlayer(itr->first);
 
             if (!plr || plr == killer)
                 continue;
@@ -1784,7 +1784,7 @@ uint32 BattleGround::GetAlivePlayersCountByTeam(uint32 Team) const
     {
         if (itr->second.Team == Team)
         {
-            Player * pl = objmgr.GetPlayer(itr->first);
+            Player * pl = sObjectMgr.GetPlayer(itr->first);
             if (pl && pl->isAlive())
                 ++count;
         }
@@ -1810,7 +1810,7 @@ void BattleGround::SetBgRaid( uint32 TeamID, Group *bg_raid )
 
 WorldSafeLocsEntry const* BattleGround::GetClosestGraveYard( Player* player )
 {
-    return objmgr.GetClosestGraveYard( player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetMapId(), player->GetTeam() );
+    return sObjectMgr.GetClosestGraveYard( player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetMapId(), player->GetTeam() );
 }
 
 bool BattleGround::IsTeamScoreInRange(uint32 team, uint32 minScore, uint32 maxScore) const

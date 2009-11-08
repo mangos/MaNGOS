@@ -50,7 +50,7 @@ void Corpse::AddToWorld()
 {
     ///- Register the corpse for guid lookup
     if(!IsInWorld())
-        objaccessor.AddObject(this);
+        sObjectAccessor.AddObject(this);
 
     Object::AddToWorld();
 }
@@ -59,7 +59,7 @@ void Corpse::RemoveFromWorld()
 {
     ///- Remove the corpse from the accessor
     if(IsInWorld())
-        objaccessor.RemoveObject(this);
+        sObjectAccessor.RemoveObject(this);
 
     Object::RemoveFromWorld();
 }

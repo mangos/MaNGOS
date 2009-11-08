@@ -99,5 +99,5 @@ class PoolManager
 
 };
 
-#define poolhandler MaNGOS::Singleton<PoolManager>::Instance()
+#define sPoolMgr MaNGOS::Singleton<PoolManager>::Instance()
 #endif

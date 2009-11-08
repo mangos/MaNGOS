@@ -102,7 +102,7 @@ void MapManager::LoadTransports()
             m_TransportsByMap[*i].insert(t);
 
         //If we someday decide to use the grid to track transports, here:
-        t->SetMap(mapmgr.CreateMap(mapid, t));
+        t->SetMap(sMapMgr.CreateMap(mapid, t));
 
         //t->GetMap()->Add<GameObject>((GameObject *)t);
         ++count;
@@ -205,7 +205,7 @@ struct keyFrame
 bool Transport::GenerateWaypoints(uint32 pathid, std::set<uint32> &mapids)
 {
     TransportPath path;
-    objmgr.GetTransportPathNodes(pathid, path);
+    sObjectMgr.GetTransportPathNodes(pathid, path);
 
     if (path.Empty())
         return false;
@@ -459,7 +459,7 @@ void Transport::TeleportTransport(uint32 newMapid, float x, float y, float z)
     //we need to create and save new Map object with 'newMapid' because if not done -> lead to invalid Map object reference...
     //player far teleport would try to create same instance, but we need it NOW for transport...
     //correct me if I'm wrong O.o
-    Map * newMap = mapmgr.CreateMap(newMapid, this);
+    Map * newMap = sMapMgr.CreateMap(newMapid, this);
     SetMap(newMap);
 
     if(oldMap != newMap)
