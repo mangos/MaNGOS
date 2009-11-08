@@ -20,7 +20,7 @@
 #include "QuestDef.h"
 #include "GameObject.h"
 #include "ObjectMgr.h"
-#include "PoolHandler.h"
+#include "PoolManager.h"
 #include "SpellMgr.h"
 #include "Spell.h"
 #include "UpdateMask.h"

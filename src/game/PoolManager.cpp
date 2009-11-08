@@ -16,14 +16,14 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "PoolHandler.h"
+#include "PoolManager.h"
 #include "ObjectMgr.h"
 #include "ProgressBar.h"
 #include "Log.h"
 #include "MapManager.h"
 #include "Policies/SingletonImp.h"
 
-INSTANTIATE_SINGLETON_1(PoolHandler);
+INSTANTIATE_SINGLETON_1(PoolManager);
 
 ////////////////////////////////////////////////////////////
 // Methods of template class PoolGroup
@@ -343,14 +343,14 @@ bool PoolGroup<Pool>::ReSpawn1Object(uint32 /*guid*/)
 
 
 ////////////////////////////////////////////////////////////
-// Methods of class PoolHandler
+// Methods of class PoolManager
 
-PoolHandler::PoolHandler()
+PoolManager::PoolManager()
 {
     m_IsPoolSystemStarted = false;
 }
 
-void PoolHandler::LoadFromDB()
+void PoolManager::LoadFromDB()
 {
     QueryResult *result = WorldDatabase.Query("SELECT MAX(entry) FROM pool_template");
     if (!result)
@@ -619,7 +619,7 @@ void PoolHandler::LoadFromDB()
 }
 
 // The initialize method will spawn all pools not in an event and not in another pool, this is why there is 2 left joins with 2 null checks
-void PoolHandler::Initialize()
+void PoolManager::Initialize()
 {
     QueryResult *result = WorldDatabase.Query("SELECT DISTINCT pool_template.entry FROM pool_template LEFT JOIN game_event_pool ON pool_template.entry=game_event_pool.pool_entry LEFT JOIN pool_pool ON pool_template.entry=pool_pool.pool_id WHERE game_event_pool.pool_entry IS NULL AND pool_pool.pool_id IS NULL");
     uint32 count=0;
@@ -648,7 +648,7 @@ void PoolHandler::Initialize()
 
 // Call to spawn a pool, if cache if true the method will spawn only if cached entry is different
 // If it's same, the gameobject/creature is respawned only (added back to map)
-void PoolHandler::SpawnPool(uint16 pool_id, uint32 guid, uint32 type)
+void PoolManager::SpawnPool(uint16 pool_id, uint32 guid, uint32 type)
 {
     switch (type)
     {
@@ -667,7 +667,7 @@ void PoolHandler::SpawnPool(uint16 pool_id, uint32 guid, uint32 type)
 }
 
 // Call to despawn a pool, all gameobjects/creatures in this pool are removed
-void PoolHandler::DespawnPool(uint16 pool_id)
+void PoolManager::DespawnPool(uint16 pool_id)
 {
     if (!mPoolCreatureGroups[pool_id].isEmpty())
         mPoolCreatureGroups[pool_id].DespawnObject();
@@ -682,7 +682,7 @@ void PoolHandler::DespawnPool(uint16 pool_id)
 // Call to update the pool when a gameobject/creature part of pool [pool_id] is ready to respawn
 // Here we cache only the creature/gameobject whose guid is passed as parameter
 // Then the spawn pool call will use this cache to decide
-void PoolHandler::UpdatePool(uint16 pool_id, uint32 guid, uint32 type)
+void PoolManager::UpdatePool(uint16 pool_id, uint32 guid, uint32 type)
 {
     if (uint16 motherpoolid = IsPartOfAPool(pool_id, 0))
         SpawnPool(motherpoolid, 0, 0);
@@ -691,7 +691,7 @@ void PoolHandler::UpdatePool(uint16 pool_id, uint32 guid, uint32 type)
 }
 
 // Method that tell if the gameobject/creature is part of a pool and return the pool id if yes
-uint16 PoolHandler::IsPartOfAPool(uint32 guid, uint32 type)
+uint16 PoolManager::IsPartOfAPool(uint32 guid, uint32 type)
 {
     if (type == 0) // pool of pool
     {
@@ -715,7 +715,7 @@ uint16 PoolHandler::IsPartOfAPool(uint32 guid, uint32 type)
 }
 
 // Method that check chance integrity of the creatures and gameobjects in this pool
-bool PoolHandler::CheckPool(uint16 pool_id)
+bool PoolManager::CheckPool(uint16 pool_id)
 {
     return pool_id <= max_pool_id &&
         mPoolGameobjectGroups[pool_id].CheckPool() &&
@@ -724,7 +724,7 @@ bool PoolHandler::CheckPool(uint16 pool_id)
 }
 
 // Method that tell if a creature or gameobject in pool_id is spawned currently
-bool PoolHandler::IsSpawnedObject(uint16 pool_id, uint32 guid, uint32 type)
+bool PoolManager::IsSpawnedObject(uint16 pool_id, uint32 guid, uint32 type)
 {
     if (pool_id > max_pool_id)
         return false;

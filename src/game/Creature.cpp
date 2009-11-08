@@ -26,7 +26,7 @@
 #include "QuestDef.h"
 #include "GossipDef.h"
 #include "Player.h"
-#include "PoolHandler.h"
+#include "PoolManager.h"
 #include "Opcodes.h"
 #include "Log.h"
 #include "LootMgr.h"

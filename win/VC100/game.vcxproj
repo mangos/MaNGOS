@@ -407,7 +407,7 @@
     <ClCompile Include="..\..\src\game\Guild.cpp" />
     <ClCompile Include="..\..\src\game\GuildHandler.cpp" />
     <ClCompile Include="..\..\src\game\HomeMovementGenerator.cpp" />
-    <ClCompile Include="..\..\src\game\HostilRefManager.cpp" />
+    <ClCompile Include="..\..\src\game\HostileRefManager.cpp" />
     <ClCompile Include="..\..\src\game\IdleMovementGenerator.cpp" />
     <ClCompile Include="..\..\src\game\InstanceData.cpp" />
     <ClCompile Include="..\..\src\game\InstanceSaveMgr.cpp" />
@@ -454,7 +454,7 @@
     <ClCompile Include="..\..\src\game\Player.cpp" />
     <ClCompile Include="..\..\src\game\PlayerDump.cpp" />
     <ClCompile Include="..\..\src\game\PointMovementGenerator.cpp" />
-    <ClCompile Include="..\..\src\game\PoolHandler.cpp" />
+    <ClCompile Include="..\..\src\game\PoolManager.cpp" />
     <ClCompile Include="..\..\src\game\QueryHandler.cpp" />
     <ClCompile Include="..\..\src\game\QuestDef.cpp" />
     <ClCompile Include="..\..\src\game\QuestHandler.cpp" />
@@ -557,7 +557,7 @@
     <ClInclude Include="..\..\src\game\GuardAI.h" />
     <ClInclude Include="..\..\src\game\Guild.h" />
     <ClInclude Include="..\..\src\game\HomeMovementGenerator.h" />
-    <ClInclude Include="..\..\src\game\HostilRefManager.h" />
+    <ClInclude Include="..\..\src\game\HostileRefManager.h" />
     <ClInclude Include="..\..\src\game\IdleMovementGenerator.h" />
     <ClInclude Include="..\..\src\game\InstanceData.h" />
     <ClInclude Include="..\..\src\game\InstanceSaveMgr.h" />
@@ -590,7 +590,7 @@
     <ClInclude Include="..\..\src\game\Player.h" />
     <ClInclude Include="..\..\src\game\PlayerDump.h" />
     <ClInclude Include="..\..\src\game\PointMovementGenerator.h" />
-    <ClInclude Include="..\..\src\game\PoolHandler.h" />
+    <ClInclude Include="..\..\src\game\PoolManager.h" />
     <ClInclude Include="..\..\src\game\QuestDef.h" />
     <ClInclude Include="..\..\src\game\RandomMovementGenerator.h" />
     <ClInclude Include="..\..\src\game\ReactorAI.h" />
