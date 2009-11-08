@@ -30,8 +30,6 @@ noinst_LIBRARIES = libmangosshared.a
 
 #  libmangosshared library will later be reused by ...
 libmangosshared_a_SOURCES = \
-	Base.cpp \
-	Base.h \
 	ByteBuffer.h \
 	Common.cpp \
 	Common.h \

@@ -583,22 +583,6 @@
 				>
 			</File>
 			<Filter
-				Name="CountedReference"
-				>
-				<File
-					RelativePath="..\..\src\framework\Utilities\CountedReference\Reference.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\src\framework\Utilities\CountedReference\ReferenceHolder.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\src\framework\Utilities\CountedReference\ReferenceImpl.h"
-					>
-				</File>
-			</Filter>
-			<Filter
 				Name="LinkedReference"
 				>
 				<File

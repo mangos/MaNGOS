@@ -51,9 +51,6 @@ EXTRA_DIST = \
 	Policies/Singleton.h \
 	Policies/SingletonImp.h \
 	Policies/ThreadingModel.h \
-	Utilities/CountedReference/Reference.h \
-	Utilities/CountedReference/ReferenceHolder.h \
-	Utilities/CountedReference/ReferenceImpl.h \
 	Utilities/LinkedReference/RefManager.h \
 	Utilities/LinkedReference/Reference.h \
 	Utilities/ByteConverter.h \
