@@ -1274,7 +1274,7 @@ void World::SetInitialWorldSettings()
 
     sLog.outString( "Loading Game Event Data...");
     sLog.outString();
-    gameeventmgr.LoadFromDB();
+    sGameEventMgr.LoadFromDB();
     sLog.outString( ">>> Game Event Data loaded" );
     sLog.outString();
 
@@ -1510,7 +1510,7 @@ void World::SetInitialWorldSettings()
     sPoolMgr.Initialize();
 
     sLog.outString("Starting Game Event system..." );
-    uint32 nextGameEvent = gameeventmgr.Initialize();
+    uint32 nextGameEvent = sGameEventMgr.Initialize();
     m_timers[WUPDATE_EVENTS].SetInterval(nextGameEvent);    //depend on next event
 
     sLog.outString( "WORLD: World initialized" );
@@ -1663,7 +1663,7 @@ void World::Update(uint32 diff)
     if (m_timers[WUPDATE_EVENTS].Passed())
     {
         m_timers[WUPDATE_EVENTS].Reset();                   // to give time for Update() to be processed
-        uint32 nextGameEvent = gameeventmgr.Update();
+        uint32 nextGameEvent = sGameEventMgr.Update();
         m_timers[WUPDATE_EVENTS].SetInterval(nextGameEvent);
         m_timers[WUPDATE_EVENTS].Reset();
     }

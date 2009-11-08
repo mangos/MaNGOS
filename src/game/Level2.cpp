@@ -398,7 +398,7 @@ bool ChatHandler::HandleGameObjectTargetCommand(const char* args)
 {
     Player* pl = m_session->GetPlayer();
     QueryResult *result;
-    GameEventMgr::ActiveEvents const& activeEventsList = gameeventmgr.GetActiveEventList();
+    GameEventMgr::ActiveEvents const& activeEventsList = sGameEventMgr.GetActiveEventList();
     if(*args)
     {
         // number or [name] Shift-click form |color|Hgameobject_entry:go_id|h[name]|h|r
@@ -3687,8 +3687,8 @@ bool ChatHandler::HandleLookupEventCommand(const char* args)
 
     uint32 counter = 0;
 
-    GameEventMgr::GameEventDataMap const& events = gameeventmgr.GetEventMap();
-    GameEventMgr::ActiveEvents const& activeEvents = gameeventmgr.GetActiveEventList();
+    GameEventMgr::GameEventDataMap const& events = sGameEventMgr.GetEventMap();
+    GameEventMgr::ActiveEvents const& activeEvents = sGameEventMgr.GetActiveEventList();
 
     for(uint32 id = 0; id < events.size(); ++id )
     {
@@ -3725,8 +3725,8 @@ bool ChatHandler::HandleEventListCommand(const char* args)
     if (arg == "all")
         all = true;
 
-    GameEventMgr::GameEventDataMap const& events = gameeventmgr.GetEventMap();
-    GameEventMgr::ActiveEvents const& activeEvents = gameeventmgr.GetActiveEventList();
+    GameEventMgr::GameEventDataMap const& events = sGameEventMgr.GetEventMap();
+    GameEventMgr::ActiveEvents const& activeEvents = sGameEventMgr.GetActiveEventList();
 
     char const* active = GetMangosString(LANG_ACTIVE);
     char const* inactive = GetMangosString(LANG_FACTION_INACTIVE);
@@ -3771,7 +3771,7 @@ bool ChatHandler::HandleEventInfoCommand(const char* args)
 
     uint32 event_id = atoi(cId);
 
-    GameEventMgr::GameEventDataMap const& events = gameeventmgr.GetEventMap();
+    GameEventMgr::GameEventDataMap const& events = sGameEventMgr.GetEventMap();
 
     if(event_id >=events.size())
     {
@@ -3788,14 +3788,14 @@ bool ChatHandler::HandleEventInfoCommand(const char* args)
         return false;
     }
 
-    GameEventMgr::ActiveEvents const& activeEvents = gameeventmgr.GetActiveEventList();
+    GameEventMgr::ActiveEvents const& activeEvents = sGameEventMgr.GetActiveEventList();
     bool active = activeEvents.find(event_id) != activeEvents.end();
     char const* activeStr = active ? GetMangosString(LANG_ACTIVE) : "";
 
     std::string startTimeStr = TimeToTimestampStr(eventData.start);
     std::string endTimeStr = TimeToTimestampStr(eventData.end);
 
-    uint32 delay = gameeventmgr.NextCheck(event_id);
+    uint32 delay = sGameEventMgr.NextCheck(event_id);
     time_t nextTime = time(NULL)+delay;
     std::string nextStr = nextTime >= eventData.start && nextTime < eventData.end ? TimeToTimestampStr(time(NULL)+delay) : "-";
 
@@ -3820,7 +3820,7 @@ bool ChatHandler::HandleEventStartCommand(const char* args)
 
     int32 event_id = atoi(cId);
 
-    GameEventMgr::GameEventDataMap const& events = gameeventmgr.GetEventMap();
+    GameEventMgr::GameEventDataMap const& events = sGameEventMgr.GetEventMap();
 
     if(event_id < 1 || event_id >=events.size())
     {
@@ -3837,7 +3837,7 @@ bool ChatHandler::HandleEventStartCommand(const char* args)
         return false;
     }
 
-    GameEventMgr::ActiveEvents const& activeEvents = gameeventmgr.GetActiveEventList();
+    GameEventMgr::ActiveEvents const& activeEvents = sGameEventMgr.GetActiveEventList();
     if(activeEvents.find(event_id) != activeEvents.end())
     {
         PSendSysMessage(LANG_EVENT_ALREADY_ACTIVE,event_id);
@@ -3846,7 +3846,7 @@ bool ChatHandler::HandleEventStartCommand(const char* args)
     }
 
     PSendSysMessage(LANG_EVENT_STARTED, event_id, eventData.description.c_str());
-    gameeventmgr.StartEvent(event_id,true);
+    sGameEventMgr.StartEvent(event_id,true);
     return true;
 }
 
@@ -3862,7 +3862,7 @@ bool ChatHandler::HandleEventStopCommand(const char* args)
 
     int32 event_id = atoi(cId);
 
-    GameEventMgr::GameEventDataMap const& events = gameeventmgr.GetEventMap();
+    GameEventMgr::GameEventDataMap const& events = sGameEventMgr.GetEventMap();
 
     if(event_id < 1 || event_id >=events.size())
     {
@@ -3879,7 +3879,7 @@ bool ChatHandler::HandleEventStopCommand(const char* args)
         return false;
     }
 
-    GameEventMgr::ActiveEvents const& activeEvents = gameeventmgr.GetActiveEventList();
+    GameEventMgr::ActiveEvents const& activeEvents = sGameEventMgr.GetActiveEventList();
 
     if(activeEvents.find(event_id) == activeEvents.end())
     {
@@ -3889,7 +3889,7 @@ bool ChatHandler::HandleEventStopCommand(const char* args)
     }
 
     PSendSysMessage(LANG_EVENT_STOPPED, event_id, eventData.description.c_str());
-    gameeventmgr.StopEvent(event_id,true);
+    sGameEventMgr.StopEvent(event_id,true);
     return true;
 }
 

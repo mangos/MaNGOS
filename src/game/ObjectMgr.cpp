@@ -7246,7 +7246,7 @@ bool PlayerCondition::Meets(Player const * player) const
         case CONDITION_NO_AURA:
             return !player->HasAura(value1, value2);
         case CONDITION_ACTIVE_EVENT:
-            return gameeventmgr.IsActiveEvent(value1);
+            return sGameEventMgr.IsActiveEvent(value1);
         default:
             return false;
     }
@@ -7383,7 +7383,7 @@ bool PlayerCondition::IsValid(ConditionType condition, uint32 value1, uint32 val
         }
         case CONDITION_ACTIVE_EVENT:
         {
-            GameEventMgr::GameEventDataMap const& events = gameeventmgr.GetEventMap();
+            GameEventMgr::GameEventDataMap const& events = sGameEventMgr.GetEventMap();
             if(value1 >=events.size() || !events[value1].isValid())
             {
                 sLog.outErrorDb("Active event condition requires existed event id (%u), skipped", value1);

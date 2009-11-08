@@ -750,8 +750,8 @@ GameEventMgr::GameEventMgr()
 
 MANGOS_DLL_SPEC bool IsHolidayActive( HolidayIds id )
 {
-    GameEventMgr::GameEventDataMap const& events = gameeventmgr.GetEventMap();
-    GameEventMgr::ActiveEvents const& ae = gameeventmgr.GetActiveEventList();
+    GameEventMgr::GameEventDataMap const& events = sGameEventMgr.GetEventMap();
+    GameEventMgr::ActiveEvents const& ae = sGameEventMgr.GetActiveEventList();
 
     for(GameEventMgr::ActiveEvents::const_iterator itr = ae.begin(); itr != ae.end(); ++itr)
         if(events[*itr].holiday_id==id)
