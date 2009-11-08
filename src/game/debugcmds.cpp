@@ -614,7 +614,7 @@ bool ChatHandler::HandleDebugSpawnVehicle(const char* args)
     uint32 entry = (uint32)atoi(e);
     uint32 id = (uint32)atoi(i);
 
-    CreatureInfo const *ci = objmgr.GetCreatureTemplate(entry);
+    CreatureInfo const *ci = ObjectMgr::GetCreatureTemplate(entry);
 
     if (!ci)
         return false;

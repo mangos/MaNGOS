@@ -1164,7 +1164,7 @@ valid examples:
                     // read item entry
                     reader.getline(buffer, 256, ':');
 
-                    linkedItem= objmgr.GetItemPrototype(atoi(buffer));
+                    linkedItem = ObjectMgr::GetItemPrototype(atoi(buffer));
                     if(!linkedItem)
                     {
 #ifdef MANGOS_DEBUG

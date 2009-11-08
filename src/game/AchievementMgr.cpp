@@ -104,7 +104,7 @@ bool AchievementCriteriaRequirement::IsValid(AchievementCriteriaEntry const* cri
         case ACHIEVEMENT_CRITERIA_REQUIRE_DISABLED:
             return true;
         case ACHIEVEMENT_CRITERIA_REQUIRE_T_CREATURE:
-            if (!creature.id || !objmgr.GetCreatureTemplate(creature.id))
+            if (!creature.id || !ObjectMgr::GetCreatureTemplate(creature.id))
             {
                 sLog.outErrorDb( "Table `achievement_criteria_requirement` (Entry: %u Type: %u) for requirement ACHIEVEMENT_CRITERIA_REQUIRE_CREATURE (%u) have not existed creature id in value1 (%u), ignore.",
                     criteria->ID, criteria->requiredType,requirementType,creature.id);
@@ -1170,7 +1170,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                     continue;
                 if(miscvalue2 != achievementCriteria->roll_greed_on_loot.rollValue)
                     continue;
-                ItemPrototype const *pProto = objmgr.GetItemPrototype( miscvalue1 );
+                ItemPrototype const *pProto = ObjectMgr::GetItemPrototype( miscvalue1 );
 
                 uint32 requiredItemLevel = 0;
                 if (achievementCriteria->ID == 2412 || achievementCriteria->ID == 2358)
@@ -2087,7 +2087,7 @@ void AchievementGlobalMgr::LoadRewards()
         //check mail data before item for report including wrong item case
         if (reward.sender)
         {
-            if (!objmgr.GetCreatureTemplate(reward.sender))
+            if (!ObjectMgr::GetCreatureTemplate(reward.sender))
             {
                 sLog.outErrorDb( "Table `achievement_reward` (Entry: %u) has invalid creature entry %u as sender, mail reward skipped.", entry, reward.sender);
                 reward.sender = 0;
@@ -2107,7 +2107,7 @@ void AchievementGlobalMgr::LoadRewards()
 
         if (reward.itemId)
         {
-            if (!objmgr.GetItemPrototype(reward.itemId))
+            if (!ObjectMgr::GetItemPrototype(reward.itemId))
             {
                 sLog.outErrorDb( "Table `achievement_reward` (Entry: %u) has invalid item id %u, reward mail will be without item.", entry, reward.itemId);
                 reward.itemId = 0;

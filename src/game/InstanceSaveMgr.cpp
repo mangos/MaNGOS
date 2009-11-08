@@ -196,7 +196,7 @@ time_t InstanceSave::GetResetTimeForDB()
 // to cache or not to cache, that is the question
 InstanceTemplate const* InstanceSave::GetTemplate()
 {
-    return objmgr.GetInstanceTemplate(m_mapid);
+    return ObjectMgr::GetInstanceTemplate(m_mapid);
 }
 
 MapEntry const* InstanceSave::GetMapEntry()
@@ -431,7 +431,7 @@ void InstanceSaveManager::LoadResetTimes()
         {
             Field *fields = result->Fetch();
             uint32 mapid = fields[0].GetUInt32();
-            if(!objmgr.GetInstanceTemplate(mapid))
+            if(!ObjectMgr::GetInstanceTemplate(mapid))
             {
                 sLog.outError("InstanceSaveManager::LoadResetTimes: invalid mapid %u in instance_reset!", mapid);
                 CharacterDatabase.DirectPExecute("DELETE FROM instance_reset WHERE mapid = '%u'", mapid);
@@ -457,7 +457,7 @@ void InstanceSaveManager::LoadResetTimes()
     // add the global reset times to the priority queue
     for(uint32 i = 0; i < sInstanceTemplate.MaxEntry; i++)
     {
-        InstanceTemplate const* temp = objmgr.GetInstanceTemplate(i);
+        InstanceTemplate const* temp = ObjectMgr::GetInstanceTemplate(i);
         if(!temp || temp->reset_delay == 0)
             continue;
 
@@ -592,7 +592,7 @@ void InstanceSaveManager::_ResetOrWarnAll(uint32 mapid, bool warn, uint32 timeLe
     if(!warn)
     {
         // this is called one minute before the reset time
-        InstanceTemplate const* temp = objmgr.GetInstanceTemplate(mapid);
+        InstanceTemplate const* temp = ObjectMgr::GetInstanceTemplate(mapid);
         if(!temp || !temp->reset_delay)
         {
             sLog.outError("InstanceSaveManager::ResetOrWarnAll: no instance template or reset delay for map %d", mapid);

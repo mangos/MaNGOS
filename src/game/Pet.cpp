@@ -138,7 +138,7 @@ bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool 
     PetType pet_type = PetType(fields[18].GetUInt8());
     if(pet_type==HUNTER_PET)
     {
-        CreatureInfo const* creatureInfo = objmgr.GetCreatureTemplate(petentry);
+        CreatureInfo const* creatureInfo = ObjectMgr::GetCreatureTemplate(petentry);
         if(!creatureInfo || !creatureInfo->isTameable(owner->CanTameExoticPets()))
         {
             delete result;

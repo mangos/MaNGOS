@@ -230,7 +230,7 @@ void WorldSession::HandleAuctionSellItem( WorldPacket & recv_data )
     AuctionHouseObject* auctionHouse = auctionmgr.GetAuctionsMap( pCreature->getFaction() );
 
     //we have to take deposit :
-    uint32 deposit = auctionmgr.GetAuctionDeposit( auctionHouseEntry, etime, it );
+    uint32 deposit = AuctionHouseMgr::GetAuctionDeposit( auctionHouseEntry, etime, it );
     if ( pl->GetMoney() < deposit )
     {
         SendAuctionCommandResult(0, AUCTION_SELL_ITEM, AUCTION_NOT_ENOUGHT_MONEY);

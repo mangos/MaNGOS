@@ -3192,7 +3192,7 @@ void Spell::WriteAmmoToPacket( WorldPacket * data )
                 uint32 ammoID = ((Player*)m_caster)->GetUInt32Value(PLAYER_AMMO_ID);
                 if(ammoID)
                 {
-                    ItemPrototype const *pProto = objmgr.GetItemPrototype( ammoID );
+                    ItemPrototype const *pProto = ObjectMgr::GetItemPrototype( ammoID );
                     if(pProto)
                     {
                         ammoDisplayID = pProto->DisplayInfoID;
@@ -5539,7 +5539,7 @@ SpellCastResult Spell::CheckItems()
                             return SPELL_FAILED_NO_AMMO;
                         }
 
-                        ItemPrototype const *ammoProto = objmgr.GetItemPrototype( ammo );
+                        ItemPrototype const *ammoProto = ObjectMgr::GetItemPrototype( ammo );
                         if(!ammoProto)
                             return SPELL_FAILED_NO_AMMO;
 

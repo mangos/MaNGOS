@@ -621,7 +621,7 @@ void GameEventMgr::GameEventUnspawn(int16 event_id)
         {
             objmgr.RemoveGameobjectFromGrid(*itr, data);
 
-            if( GameObject* pGameobject = ObjectAccessor::Instance().GetGameObjectInWorld(MAKE_NEW_GUID(*itr, data->id, HIGHGUID_GAMEOBJECT)) )
+            if( GameObject* pGameobject = ObjectAccessor::GetGameObjectInWorld(MAKE_NEW_GUID(*itr, data->id, HIGHGUID_GAMEOBJECT)) )
                 pGameobject->AddObjectToRemoveList();
         }
     }
@@ -688,7 +688,7 @@ void GameEventMgr::ChangeEquipOrModel(int16 event_id, bool activate)
             CreatureData const* data2 = objmgr.GetCreatureData(itr->first);
             if (data2 && activate)
             {
-                CreatureInfo const *cinfo = objmgr.GetCreatureTemplate(data2->id);
+                CreatureInfo const *cinfo = ObjectMgr::GetCreatureTemplate(data2->id);
                 uint32 display_id = objmgr.ChooseDisplayId(0,cinfo,data2);
                 CreatureModelInfo const *minfo = objmgr.GetCreatureModelRandomGender(display_id);
                 if (minfo)
