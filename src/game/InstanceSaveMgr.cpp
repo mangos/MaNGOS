@@ -258,7 +258,7 @@ void InstanceSaveManager::CleanupInstances()
     bar.step();
 
     // load reset times and clean expired instances
-    sInstanceSaveMgr.LoadResetTimes();
+    LoadResetTimes();
 
     // clean character/group - instance binds with invalid group/characters
     _DelHelper(CharacterDatabase, "character_instance.guid, instance", "character_instance", "LEFT JOIN characters ON character_instance.guid = characters.guid WHERE characters.guid IS NULL");

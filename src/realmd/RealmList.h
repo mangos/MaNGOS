@@ -64,5 +64,7 @@ class RealmList
         time_t   m_NextUpdateTime;
 };
 
+#define sRealmList RealmList::Instance()
+
 #endif
 /// @}

@@ -45,5 +45,3 @@ void WorldLog::Initialize()
         i_file = fopen((logsDir+logname).c_str(), "w");
     }
 }
-
-#define sWorldLog WorldLog::Instance()

@@ -33,7 +33,7 @@ RealmList::RealmList( ) : m_UpdateInterval(0), m_NextUpdateTime(time(NULL))
 {
 }
 
-RealmList& RealmList::Instance()
+RealmList& sRealmList
 {
     static RealmList realmlist;
     return realmlist;

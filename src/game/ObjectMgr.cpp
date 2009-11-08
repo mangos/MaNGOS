@@ -4099,7 +4099,7 @@ void ObjectMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
                     continue;
                 }
 
-                // if(!sObjectMgr.GetMangosStringLocale(tmp.dataint)) will checked after db_script_string loading
+                // if(!GetMangosStringLocale(tmp.dataint)) will checked after db_script_string loading
                 break;
             }
 
@@ -5111,11 +5111,11 @@ uint32 ObjectMgr::GetTaxiMountDisplayId( uint32 id, uint32 team, bool allowed_al
     if (!mount_info)
         return 0;
 
-    uint16 mount_id = sObjectMgr.ChooseDisplayId(team,mount_info);
+    uint16 mount_id = ChooseDisplayId(team,mount_info);
     if (!mount_id)
         return 0;
 
-    CreatureModelInfo const *minfo = sObjectMgr.GetCreatureModelRandomGender(mount_id);
+    CreatureModelInfo const *minfo = GetCreatureModelRandomGender(mount_id);
     if (minfo)
         mount_id = minfo->modelid;
 

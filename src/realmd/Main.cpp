@@ -190,8 +190,8 @@ extern int main(int argc, char **argv)
         return 1;
 
     ///- Get the list of realms for the server
-    RealmList::Instance().Initialize(sConfig.GetIntDefault("RealmsStateUpdateDelay", 20));
-    if (RealmList::Instance().size() == 0)
+    sRealmList.Initialize(sConfig.GetIntDefault("RealmsStateUpdateDelay", 20));
+    if (sRealmList.size() == 0)
     {
         sLog.outError("No valid realms specified.");
         return 1;
