@@ -142,7 +142,7 @@ void WorldSession::HandleWhoOpcode( WorldPacket & recv_data )
     data << clientcount;                                    // clientcount place holder
 
     //TODO: Guard Player map
-    HashMapHolder<Player>::MapType& m = ObjectAccessor::Instance().GetPlayers();
+    HashMapHolder<Player>::MapType& m = objaccessor.GetPlayers();
     for(HashMapHolder<Player>::MapType::const_iterator itr = m.begin(); itr != m.end(); ++itr)
     {
         if (security == SEC_PLAYER)

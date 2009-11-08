@@ -168,4 +168,6 @@ inline Unit* ObjectAccessor::GetUnitInWorld(WorldObject const& obj, uint64 guid)
     return GetCreatureInWorld(guid);
 }
 
+#define objaccessor ObjectAccessor::Instance()
+
 #endif

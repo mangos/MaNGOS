@@ -147,7 +147,7 @@ void LoadHelper(CellCorpseSet const& cell_corpses, CellPair &cell, CorpseMapType
 
         uint32 player_guid = itr->first;
 
-        Corpse *obj = ObjectAccessor::Instance().GetCorpseForPlayerGUID(player_guid);
+        Corpse *obj = objaccessor.GetCorpseForPlayerGUID(player_guid);
         if(!obj)
             continue;
 

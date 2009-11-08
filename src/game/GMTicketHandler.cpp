@@ -116,7 +116,7 @@ void WorldSession::HandleGMTicketCreateOpcode( WorldPacket & recv_data )
     DEBUG_LOG("update the ticket");
 
     //TODO: Guard player map
-    HashMapHolder<Player>::MapType &m = ObjectAccessor::Instance().GetPlayers();
+    HashMapHolder<Player>::MapType &m = objaccessor.GetPlayers();
     for(HashMapHolder<Player>::MapType::const_iterator itr = m.begin(); itr != m.end(); ++itr)
     {
         if(itr->second->GetSession()->GetSecurity() >= SEC_GAMEMASTER && itr->second->isAcceptTickets())
