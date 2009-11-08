@@ -1174,19 +1174,20 @@ struct ScalingStatValuesEntry
     uint32  dpsMod[6];                                      // 10-15 DPS mod for level
     uint32  spellBonus;                                     // 16 spell power for level
     uint32  ssdMultiplier2;                                 // 17 there's data from 3.1 dbc ssdMultiplier[3]
-    //uint32 unk1;                                          // 18 all fields equal to 0
-    //uint32 unk2;                                          // 19 unk, probably also Armor for level
+    uint32  ssdMultiplier3;                                 // 18 3.3
+    //uint32 unk2;                                          // 19 unk, probably also Armor for level (flag 0x80000?)
     uint32  armorMod2[4];                                   // 20-23 Armor for level
 
     uint32  getssdMultiplier(uint32 mask) const
     {
-        if (mask & 0x001F)
+        if (mask & 0x4001F)
         {
             if(mask & 0x00000001) return ssdMultiplier[0];
             if(mask & 0x00000002) return ssdMultiplier[1];
             if(mask & 0x00000004) return ssdMultiplier[2];
             if(mask & 0x00000008) return ssdMultiplier2;
             if(mask & 0x00000010) return ssdMultiplier[3];
+            if(mask & 0x00040000) return ssdMultiplier3;
         }
         return 0;
     }
