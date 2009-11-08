@@ -553,8 +553,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="building atomic_support.obj"
-						CommandLine="ml64 /Fo&quot;..\..\bin\$(PlatformName)_$(ConfigurationName)\atomic_support.obj&quot; /DUSE_FRAME_POINTER /DEM64T=1 /c /Zi ../../dep/tbb/src/tbb/intel64-masm/atomic_support.asm&#x0D;&#x0A;"
-						Outputs="..\..\bin\$(PlatformName)_$(ConfigurationName)\atomic_support.obj"
+						CommandLine="ml64 /Fo&quot;tbbmalloc__$(PlatformName)_$(ConfigurationName)\atomic_support.obj&quot; /DUSE_FRAME_POINTER /DEM64T=1 /c /Zi ../../dep/tbb/src/tbb/intel64-masm/atomic_support.asm&#x0D;&#x0A;"
+						Outputs="tbbmalloc__$(PlatformName)_$(ConfigurationName)\atomic_support.obj"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -571,8 +571,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="building atomic_support.obj"
-						CommandLine="ml64 /Fo&quot;..\..\bin\$(PlatformName)_$(ConfigurationName)\atomic_support.obj&quot;  /DEM64T=1 /c /Zi ../../dep/tbb/src/tbb/intel64-masm/atomic_support.asm&#x0D;&#x0A;"
-						Outputs="..\..\bin\$(PlatformName)_$(ConfigurationName)\atomic_support.obj"
+						CommandLine="ml64 /Fo&quot;tbbmalloc__$(PlatformName)_$(ConfigurationName)\atomic_support.obj&quot;  /DEM64T=1 /c /Zi ../../dep/tbb/src/tbb/intel64-masm/atomic_support.asm&#x0D;&#x0A;"
+						Outputs="tbbmalloc__$(PlatformName)_$(ConfigurationName)\atomic_support.obj"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -589,8 +589,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="building atomic_support.obj"
-						CommandLine="ml64 /Fo&quot;..\..\bin\$(PlatformName)_$(ConfigurationName)\atomic_support.obj&quot; /DUSE_FRAME_POINTER /DEM64T=1 /c /Zi ../../dep/tbb/src/tbb/intel64-masm/atomic_support.asm&#x0D;&#x0A;"
-						Outputs="..\..\bin\$(PlatformName)_$(ConfigurationName)\atomic_support.obj"
+						CommandLine="ml64 /Fo&quot;tbbmalloc__$(PlatformName)_$(ConfigurationName)\atomic_support.obj&quot; /DUSE_FRAME_POINTER /DEM64T=1 /c /Zi ../../dep/tbb/src/tbb/intel64-masm/atomic_support.asm&#x0D;&#x0A;"
+						Outputs="tbbmalloc__$(PlatformName)_$(ConfigurationName)\atomic_support.obj"
 					/>
 				</FileConfiguration>
 			</File>

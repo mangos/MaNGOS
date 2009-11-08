@@ -289,19 +289,19 @@
     <CustomBuild Include="..\..\dep\tbb\src\tbb\em64t-masm\atomic_support.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|X64'">building atomic_support.obj</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|X64'">ml64 /Fo"..\..\bin\$(Platform)_$(Configuration)\atomic_support.obj" /DUSE_FRAME_POINTER /DEM64T=1 /c /Zi ../../dep/tbb/src/tbb/intel64-masm/atomic_support.asm
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|X64'">ml64 /Fo"tbbmalloc__$(Platform)_$(Configuration)\atomic_support.obj" /DUSE_FRAME_POINTER /DEM64T=1 /c /Zi ../../dep/tbb/src/tbb/intel64-masm/atomic_support.asm
 </Command>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|X64'">..\..\bin\$(Platform)_$(Configuration)\atomic_support.obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|X64'">tbbmalloc__$(Platform)_$(Configuration)\atomic_support.obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|X64'">building atomic_support.obj</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|X64'">ml64 /Fo"..\..\bin\$(Platform)_$(Configuration)\atomic_support.obj"  /DEM64T=1 /c /Zi ../../dep/tbb/src/tbb/intel64-masm/atomic_support.asm
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|X64'">ml64 /Fo"tbbmalloc__$(Platform)_$(Configuration)\atomic_support.obj"  /DEM64T=1 /c /Zi ../../dep/tbb/src/tbb/intel64-masm/atomic_support.asm
 </Command>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|X64'">..\..\bin\$(Platform)_$(Configuration)\atomic_support.obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|X64'">tbbmalloc__$(Platform)_$(Configuration)\atomic_support.obj;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_NoPCH|Win32'">true</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug_NoPCH|X64'">building atomic_support.obj</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug_NoPCH|X64'">ml64 /Fo"..\..\bin\$(Platform)_$(Configuration)\atomic_support.obj" /DUSE_FRAME_POINTER /DEM64T=1 /c /Zi ../../dep/tbb/src/tbb/intel64-masm/atomic_support.asm
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug_NoPCH|X64'">ml64 /Fo"tbbmalloc__$(Platform)_$(Configuration)\atomic_support.obj" /DUSE_FRAME_POINTER /DEM64T=1 /c /Zi ../../dep/tbb/src/tbb/intel64-masm/atomic_support.asm
 </Command>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug_NoPCH|X64'">..\..\bin\$(Platform)_$(Configuration)\atomic_support.obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug_NoPCH|X64'">tbbmalloc__$(Platform)_$(Configuration)\atomic_support.obj;%(Outputs)</Outputs>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
