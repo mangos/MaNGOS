@@ -43,6 +43,8 @@ class RealmList
     public:
         typedef std::map<std::string, Realm> RealmMap;
 
+        static RealmList& Instance();
+
         RealmList();
         ~RealmList() {}
 
@@ -61,5 +63,6 @@ class RealmList
         uint32   m_UpdateInterval;
         time_t   m_NextUpdateTime;
 };
+
 #endif
 /// @}
