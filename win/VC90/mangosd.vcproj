@@ -631,7 +631,7 @@
 			Name="doc"
 			>
 			<File
-				RelativePath="..\..\Authors"
+				RelativePath="..\..\AUTHORS"
 				>
 			</File>
 			<File
@@ -639,23 +639,27 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\Copying"
+				RelativePath="..\..\COPYING"
 				>
 			</File>
 			<File
-				RelativePath="..\..\Install"
+				RelativePath="..\..\INSTALL"
 				>
 			</File>
 			<File
-				RelativePath="..\..\News"
+				RelativePath="..\..\NEWS"
 				>
 			</File>
 			<File
-				RelativePath="..\..\Readme"
+				RelativePath="..\..\README"
 				>
 			</File>
 			<File
-				RelativePath="..\..\Thanks"
+				RelativePath="..\..\THANKS"
+				>
+			</File>
+			<File
+				RelativePath="..\..\WARNING"
 				>
 			</File>
 		</Filter>
