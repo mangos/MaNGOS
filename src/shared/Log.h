@@ -23,6 +23,7 @@
 #include "Policies/Singleton.h"
 
 class Config;
+class ByteBuffer;
 
 // bitmask
 enum LogFilters
@@ -110,8 +111,8 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, ACE_Th
                                                             // any log level
         void outChar( const char * str, ... )        ATTR_PRINTF(2,3);
                                                             // any log level
-        void outWorld( const char * str, ... )       ATTR_PRINTF(2,3);
-                                                            // any log level
+        void outWorldPacketDump( uint32 socket, uint32 opcode, char const* opcodeName, ByteBuffer const* packet, bool incoming );
+        // any log level
         void outCharDump( const char * str, uint32 account_id, uint32 guid, const char * name );
         void outRALog( const char * str, ... )       ATTR_PRINTF(2,3);
         void SetLogLevel(char * Level);
@@ -124,7 +125,6 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, ACE_Th
         uint32 getLogFilter() const { return m_logFilter; }
         bool IsOutDebug() const { return m_logLevel > 2 || (m_logFileLevel > 2 && logfile); }
         bool IsOutCharDump() const { return m_charLog_Dump; }
-        bool IsLogWorld() const { return (worldLogfile); }
         bool IsIncludeTime() const { return m_includeTime; }
     private:
         FILE* openLogFile(char const* configFileName,char const* configTimeStampFlag, char const* mode);

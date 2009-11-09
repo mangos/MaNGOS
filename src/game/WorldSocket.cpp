@@ -165,22 +165,7 @@ int WorldSocket::SendPacket (const WorldPacket& pct)
         return -1;
 
     // Dump outgoing packet.
-    if (sLog.IsLogWorld())
-    {
-        sLog.outWorld("S->C - SOCKET: %u LENGTH: %u OPCODE: %s (0x%.4X)\n",
-            uint32(get_handle()), pct.size (), LookupOpcodeName(pct.GetOpcode()), pct.GetOpcode());
-
-        size_t p = 0;
-        while (p < pct.size())
-        {
-            for (size_t j = 0; j < 16 && p < pct.size(); ++j)
-                sLog.outWorld("%.2X ", const_cast<WorldPacket&>(pct)[p++]);
-
-            sLog.outWorld("\n");
-        }
-
-        sLog.outWorld("\n\n");
-    }
+    sLog.outWorldPacketDump(uint32(get_handle()), pct.GetOpcode(), LookupOpcodeName(pct.GetOpcode()), &pct, false);
 
     ServerPktHeader header(pct.size()+2, pct.GetOpcode());
     m_Crypt.EncryptSend ((uint8*)header.header, header.getHeaderLength());
@@ -678,22 +663,7 @@ int WorldSocket::ProcessIncoming (WorldPacket* new_pct)
         return -1;
 
     // Dump received packet.
-    if (sLog.IsLogWorld())
-    {
-        sLog.outWorld("C->S - SOCKET: %u LENGTH: %u OPCODE: %s (0x%.4X)\n",
-            uint32(get_handle()), new_pct->size(), LookupOpcodeName(new_pct->GetOpcode()), new_pct->GetOpcode());
-
-        size_t p = 0;
-        while (p < new_pct->size())
-        {
-            for (size_t j = 0; j < 16 && p < new_pct->size(); ++j)
-                sLog.outWorld("%.2X ", (*new_pct)[p++]);
-
-            sLog.outWorld("\n");
-        }
-
-        sLog.outWorld("\n\n");
-    }
+    sLog.outWorldPacketDump(uint32(get_handle()), new_pct->GetOpcode(), LookupOpcodeName(new_pct->GetOpcode()), new_pct, true);
 
     try
     {

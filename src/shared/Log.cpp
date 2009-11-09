@@ -21,6 +21,7 @@
 #include "Policies/SingletonImp.h"
 #include "Config/ConfigEnv.h"
 #include "Util.h"
+#include "ByteBuffer.h"
 
 #include <stdarg.h>
 
@@ -227,7 +228,7 @@ void Log::Initialize()
     charLogfile = openLogFile("CharLogFile","CharLogTimestamp","a");
     dberLogfile = openLogFile("DBErrorLogFile",NULL,"a");
     raLogfile = openLogFile("RaLogFile",NULL,"a");
-    worldLogfile = openLogFile("WorldLogFile",NULL,"a");
+    worldLogfile = openLogFile("WorldLogFile","WorldLogTimestamp","a");
 
     // Main log file settings
     m_includeTime  = sConfig.GetBoolDefault("LogTime", false);
@@ -698,19 +699,28 @@ void Log::outChar(const char * str, ... )
     }
 }
 
-void Log::outWorld( const char * str, ... )
+void Log::outWorldPacketDump( uint32 socket, uint32 opcode, char const* opcodeName, ByteBuffer const* packet, bool incoming )
 {
-    if (!str)
+    if (!worldLogfile)
         return;
 
-    if (worldLogfile)
+    outTimestamp(worldLogfile);
+
+    fprintf(worldLogfile,"\n%s:\nSOCKET: %u\nLENGTH: %u\nOPCODE: %s (0x%.4X)\nDATA:\n",
+        incoming ? "CLIENT" : "SERVER",
+        socket, packet->size(), opcodeName, opcode);
+
+    size_t p = 0;
+    while (p < packet->size())
     {
-        va_list args;
-        va_start(args, str);
-        vfprintf(worldLogfile, str, args);
-        va_end(args);
-        fflush(worldLogfile);
+        for (size_t j = 0; j < 16 && p < packet->size(); ++j)
+            fprintf(worldLogfile, "%.2X ", (*packet)[p++]);
+
+        fprintf(worldLogfile, "\n");
     }
+
+    fprintf(worldLogfile, "\n\n");
+    fflush(worldLogfile);
 }
 
 void Log::outCharDump( const char * str, uint32 account_id, uint32 guid, const char * name )
