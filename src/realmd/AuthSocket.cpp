@@ -22,7 +22,6 @@
 
 #include "Common.h"
 #include "Database/DatabaseEnv.h"
-#include "ByteBuffer.h"
 #include "Config/ConfigEnv.h"
 #include "Log.h"
 #include "RealmList.h"
@@ -252,13 +251,36 @@ void AuthSocket::OnRead()
     ///- Read the packet
     TcpSocket::OnRead();
     uint8 _cmd;
-    while (1)
+    while (true)
     {
         if (!ibuf.GetLength())
             return;
 
-        ///- Get the command out of it
+        ///- Get the command out of it. We can assume it's there, since length is not 0.
         ibuf.SoftRead((char *)&_cmd, 1);                    // UQ1: No longer exists in new net code ???
+
+        // Dump incoming packet.
+        if (sLog.IsLogWorld())
+        {
+            sLog.outWorld ("C->S - SOCKET: %u LENGTH: %u OPCODE: 0x%.4X\n",
+                GetSocket(), ibuf.GetLength(), _cmd);
+
+            size_t p = 0;
+            while (p < ibuf.GetLength())
+            {
+                char dest;
+                for (size_t j = 0; j < 16 && p < ibuf.GetLength(); ++j)
+                {
+                    ibuf.SoftRead(&dest, 1);
+                    sLog.outWorld("%.2X ", *((uint8*)dest));
+                    p++;
+                }
+
+                sLog.outWorld("\n");
+            }
+
+            sLog.outWorld("\n\n");
+        }
 
         size_t i;
 
@@ -289,7 +311,34 @@ void AuthSocket::OnRead()
     }
 }
 
-/// Make the SRP6 calculation from hash in dB
+void AuthSocket::SendPacket(ByteBuffer* buf)
+{
+    // TODO: Also handle outgoing structs?
+
+    uint8 _cmd = buf->read<uint8>();
+
+    // Dump outgoing packet.
+    if (sLog.IsLogWorld())
+    {
+        sLog.outWorld ("S->C - SOCKET: %u LENGTH: %u OPCODE: 0x%.4X\n",
+            GetSocket(), buf->size(), _cmd);
+
+        size_t p = 0;
+        while (p < buf->size())
+        {
+            for (size_t j = 0; j < 16 && p < buf->size(); ++j)
+                sLog.outWorld("%.2X ", (*buf)[p++]);
+
+            sLog.outWorld("\n");
+        }
+
+        sLog.outWorld("\n\n");
+    }
+
+    SendBuf((char const*)buf->contents(), buf->size());
+}
+
+/// Make the SRP6 calculation from hash in DB
 void AuthSocket::_SetVSFields(const std::string& rI)
 {
     s.SetRand(s_BYTE_SIZE * 8);
@@ -521,7 +570,8 @@ bool AuthSocket::_HandleLogonChallenge()
             pkt<< (uint8) REALM_AUTH_NO_MATCH;
         }
     }
-    SendBuf((char const*)pkt.contents(), pkt.size());
+
+    SendPacket(&pkt);
     return true;
 }
 
@@ -567,7 +617,7 @@ bool AuthSocket::_HandleLogonProof()
             pkt << (uint8) REALM_AUTH_WRONG_BUILD_NUMBER;
             DEBUG_LOG("[AuthChallenge] %u is not a valid client version!", _build);
             DEBUG_LOG("[AuthChallenge] Patch %s not found", tmp);
-            SendBuf((char const*)pkt.contents(), pkt.size());
+            SendPacket(&pkt);
             return true;
         }
         else                                                // have patch
@@ -807,7 +857,7 @@ bool AuthSocket::_HandleReconnectChallenge()
     _reconnectProof.SetRand(16 * 8);
     pkt.append(_reconnectProof.AsByteArray(16),16);         // 16 bytes random
     pkt << (uint64) 0x00 << (uint64) 0x00;                  // 16 bytes zeros
-    SendBuf((char const*)pkt.contents(), pkt.size());
+    SendPacket(&pkt);
     return true;
 }
 
@@ -839,7 +889,7 @@ bool AuthSocket::_HandleReconnectProof()
         pkt << (uint8)  AUTH_RECONNECT_PROOF;
         pkt << (uint8)  0x00;
         pkt << (uint16) 0x00;                               // 2 bytes zeros
-        SendBuf((char const*)pkt.contents(), pkt.size());
+        SendPacket(&pkt);
 
         ///- Set _authed to true!
         _authed = true;
@@ -921,7 +971,7 @@ bool AuthSocket::_HandleRealmList()
     hdr << (uint16)pkt.size();
     hdr.append(pkt);
 
-    SendBuf((char const*)hdr.contents(), hdr.size());
+    SendPacket(&pkt);
 
     return true;
 }

@@ -24,6 +24,7 @@
 #define _AUTHSOCKET_H
 
 #include "Common.h"
+#include "ByteBuffer.h"
 #include "Auth/BigNumber.h"
 #include "sockets/TcpSocket.h"
 #include "sockets/SocketHandler.h"
@@ -54,6 +55,8 @@ class AuthSocket: public TcpSocket
         bool _HandleXferResume();
         bool _HandleXferCancel();
         bool _HandleXferAccept();
+
+        void SendPacket(ByteBuffer* buf);
 
         void _SetVSFields(const std::string& rI);
 

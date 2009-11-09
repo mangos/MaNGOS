@@ -49,6 +49,10 @@ ConfVersion=2007062001
 #        Default: "Realmd.log"
 #                 "" - empty name disable creating log file
 #
+#    WorldLogFile
+#        Packet logging file for the realmserver
+#        Default: "world.log"
+#
 #    LogTimestamp
 #        Logfile with timestamp of server start in name
 #        Default: 0 - no timestamp in name
@@ -105,6 +109,7 @@ PidFile = ""
 LogLevel = 0
 LogTime = 0
 LogFile = "Realmd.log"
+WorldLogFile = ""
 LogTimestamp = 0
 LogFileLevel = 0
 LogColors = ""

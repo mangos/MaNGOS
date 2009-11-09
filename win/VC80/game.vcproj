@@ -1486,14 +1486,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\game\WorldLog.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\game\WorldLog.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\src\game\WorldSession.cpp"
 				>
 			</File>

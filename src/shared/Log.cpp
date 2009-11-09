@@ -225,9 +225,9 @@ void Log::Initialize()
     }
 
     charLogfile = openLogFile("CharLogFile","CharLogTimestamp","a");
-
     dberLogfile = openLogFile("DBErrorLogFile",NULL,"a");
     raLogfile = openLogFile("RaLogFile",NULL,"a");
+    worldLogfile = openLogFile("WorldLogFile",NULL,"a");
 
     // Main log file settings
     m_includeTime  = sConfig.GetBoolDefault("LogTime", false);
@@ -695,6 +695,21 @@ void Log::outChar(const char * str, ... )
         fprintf(charLogfile, "\n" );
         va_end(ap);
         fflush(charLogfile);
+    }
+}
+
+void Log::outWorld( const char * str, ... )
+{
+    if (!str)
+        return;
+
+    if (worldLogfile)
+    {
+        va_list args;
+        va_start(args, str);
+        vfprintf(worldLogfile, str, args);
+        va_end(args);
+        fflush(worldLogfile);
     }
 }
 
