@@ -153,6 +153,7 @@ pkgdata_DATA = \
 	8775_03_mangos_gameobject.sql \
 	8777_01_mangos_creature.sql \
 	8777_02_mangos_gameobject.sql \
+	8800_01_mangos_spell_elixir.sql \
 	README
 
 ## Additional files to include when running 'make dist'
@@ -286,4 +287,5 @@ EXTRA_DIST = \
 	8775_03_mangos_gameobject.sql \
 	8777_01_mangos_creature.sql \
 	8777_02_mangos_gameobject.sql \
+	8800_01_mangos_spell_elixir.sql \
 	README
