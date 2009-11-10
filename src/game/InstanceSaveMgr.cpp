@@ -168,7 +168,7 @@ void InstanceSave::SaveToDB()
     // save instance data too
     std::string data;
 
-    Map *map = MapManager::Instance().FindMap(GetMapId(),m_instanceid);
+    Map *map = sMapMgr.FindMap(GetMapId(),m_instanceid);
     if(map)
     {
         assert(map->IsDungeon());
@@ -196,7 +196,7 @@ time_t InstanceSave::GetResetTimeForDB()
 // to cache or not to cache, that is the question
 InstanceTemplate const* InstanceSave::GetTemplate()
 {
-    return objmgr.GetInstanceTemplate(m_mapid);
+    return ObjectMgr::GetInstanceTemplate(m_mapid);
 }
 
 MapEntry const* InstanceSave::GetMapEntry()
@@ -214,8 +214,8 @@ bool InstanceSave::UnloadIfEmpty()
 {
     if(m_playerList.empty() && m_groupList.empty())
     {
-        if(!sInstanceSaveManager.lock_instLists)
-            sInstanceSaveManager.RemoveInstanceSave(GetInstanceId());
+        if(!sInstanceSaveMgr.lock_instLists)
+            sInstanceSaveMgr.RemoveInstanceSave(GetInstanceId());
         return false;
     }
     else
@@ -258,7 +258,7 @@ void InstanceSaveManager::CleanupInstances()
     bar.step();
 
     // load reset times and clean expired instances
-    sInstanceSaveManager.LoadResetTimes();
+    LoadResetTimes();
 
     // clean character/group - instance binds with invalid group/characters
     _DelHelper(CharacterDatabase, "character_instance.guid, instance", "character_instance", "LEFT JOIN characters ON character_instance.guid = characters.guid WHERE characters.guid IS NULL");
@@ -431,7 +431,7 @@ void InstanceSaveManager::LoadResetTimes()
         {
             Field *fields = result->Fetch();
             uint32 mapid = fields[0].GetUInt32();
-            if(!objmgr.GetInstanceTemplate(mapid))
+            if(!ObjectMgr::GetInstanceTemplate(mapid))
             {
                 sLog.outError("InstanceSaveManager::LoadResetTimes: invalid mapid %u in instance_reset!", mapid);
                 CharacterDatabase.DirectPExecute("DELETE FROM instance_reset WHERE mapid = '%u'", mapid);
@@ -457,7 +457,7 @@ void InstanceSaveManager::LoadResetTimes()
     // add the global reset times to the priority queue
     for(uint32 i = 0; i < sInstanceTemplate.MaxEntry; i++)
     {
-        InstanceTemplate const* temp = objmgr.GetInstanceTemplate(i);
+        InstanceTemplate const* temp = ObjectMgr::GetInstanceTemplate(i);
         if(!temp || temp->reset_delay == 0)
             continue;
 
@@ -567,7 +567,7 @@ void InstanceSaveManager::_ResetSave(InstanceSaveHashMap::iterator &itr)
 void InstanceSaveManager::_ResetInstance(uint32 mapid, uint32 instanceId)
 {
     sLog.outDebug("InstanceSaveMgr::_ResetInstance %u, %u", mapid, instanceId);
-    Map *map = (MapInstanced*)MapManager::Instance().CreateBaseMap(mapid);
+    Map *map = (MapInstanced*)sMapMgr.CreateBaseMap(mapid);
     if(!map->Instanceable())
         return;
 
@@ -577,14 +577,14 @@ void InstanceSaveManager::_ResetInstance(uint32 mapid, uint32 instanceId)
 
     Map* iMap = ((MapInstanced*)map)->FindMap(instanceId);
     if(iMap && iMap->IsDungeon()) ((InstanceMap*)iMap)->Reset(INSTANCE_RESET_RESPAWN_DELAY);
-    else objmgr.DeleteRespawnTimeForInstance(instanceId);   // even if map is not loaded
+    else sObjectMgr.DeleteRespawnTimeForInstance(instanceId);   // even if map is not loaded
 }
 
 void InstanceSaveManager::_ResetOrWarnAll(uint32 mapid, bool warn, uint32 timeLeft)
 {
     // global reset for all instances of the given map
     // note: this isn't fast but it's meant to be executed very rarely
-    Map const *map = MapManager::Instance().CreateBaseMap(mapid);
+    Map const *map = sMapMgr.CreateBaseMap(mapid);
     if(!map->Instanceable())
         return;
     uint64 now = (uint64)time(NULL);
@@ -592,7 +592,7 @@ void InstanceSaveManager::_ResetOrWarnAll(uint32 mapid, bool warn, uint32 timeLe
     if(!warn)
     {
         // this is called one minute before the reset time
-        InstanceTemplate const* temp = objmgr.GetInstanceTemplate(mapid);
+        InstanceTemplate const* temp = ObjectMgr::GetInstanceTemplate(mapid);
         if(!temp || !temp->reset_delay)
         {
             sLog.outError("InstanceSaveManager::ResetOrWarnAll: no instance template or reset delay for map %d", mapid);

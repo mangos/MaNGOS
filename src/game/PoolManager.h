@@ -65,11 +65,11 @@ class Pool                                                  // for Pool of Pool 
 {
 };
 
-class PoolHandler
+class PoolManager
 {
     public:
-        PoolHandler();
-        ~PoolHandler() {};
+        PoolManager();
+        ~PoolManager() {};
         void LoadFromDB();
         uint16 IsPartOfAPool(uint32 guid, uint32 type);
         bool IsSpawnedObject(uint16 pool_id, uint32 guid, uint32 type);
@@ -99,5 +99,5 @@ class PoolHandler
 
 };
 
-#define poolhandler MaNGOS::Singleton<PoolHandler>::Instance()
+#define sPoolMgr MaNGOS::Singleton<PoolManager>::Instance()
 #endif

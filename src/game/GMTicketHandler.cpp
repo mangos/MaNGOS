@@ -50,7 +50,7 @@ void WorldSession::HandleGMTicketGetTicketOpcode( WorldPacket & /*recv_data*/ )
     data << (uint32)0;
     SendPacket( &data );
 
-    GMTicket* ticket = ticketmgr.GetGMTicket(GetPlayer()->GetGUIDLow());
+    GMTicket* ticket = sTicketMgr.GetGMTicket(GetPlayer()->GetGUIDLow());
     if(ticket)
         SendGMTicketGetTicket(0x06,ticket->GetText());
     else
@@ -62,7 +62,7 @@ void WorldSession::HandleGMTicketUpdateTextOpcode( WorldPacket & recv_data )
     std::string ticketText;
     recv_data >> ticketText;
 
-    if(GMTicket* ticket = ticketmgr.GetGMTicket(GetPlayer()->GetGUIDLow()))
+    if(GMTicket* ticket = sTicketMgr.GetGMTicket(GetPlayer()->GetGUIDLow()))
         ticket->SetText(ticketText.c_str());
     else
         sLog.outError("Ticket update: Player %s (GUID: %u) doesn't have active ticket", GetPlayer()->GetName(), GetPlayer()->GetGUIDLow());
@@ -70,7 +70,7 @@ void WorldSession::HandleGMTicketUpdateTextOpcode( WorldPacket & recv_data )
 
 void WorldSession::HandleGMTicketDeleteTicketOpcode( WorldPacket & /*recv_data*/ )
 {
-    ticketmgr.Delete(GetPlayer()->GetGUIDLow());
+    sTicketMgr.Delete(GetPlayer()->GetGUIDLow());
 
     WorldPacket data( SMSG_GMTICKET_DELETETICKET, 4 );
     data << uint32(9);
@@ -95,7 +95,7 @@ void WorldSession::HandleGMTicketCreateOpcode( WorldPacket & recv_data )
 
     sLog.outDebug("TicketCreate: map %u, x %f, y %f, z %f, text %s", map, x, y, z, ticketText.c_str());
 
-    if(ticketmgr.GetGMTicket(GetPlayer()->GetGUIDLow()))
+    if(sTicketMgr.GetGMTicket(GetPlayer()->GetGUIDLow()))
     {
         WorldPacket data( SMSG_GMTICKET_CREATE, 4 );
         data << uint32(1);                                  // 1 - You already have GM ticket
@@ -103,7 +103,7 @@ void WorldSession::HandleGMTicketCreateOpcode( WorldPacket & recv_data )
         return;
     }
 
-    ticketmgr.Create(_player->GetGUIDLow(), ticketText.c_str());
+    sTicketMgr.Create(_player->GetGUIDLow(), ticketText.c_str());
 
     WorldPacket data( SMSG_QUERY_TIME_RESPONSE, 4+4 );
     data << (uint32)time(NULL);
@@ -116,7 +116,7 @@ void WorldSession::HandleGMTicketCreateOpcode( WorldPacket & recv_data )
     DEBUG_LOG("update the ticket");
 
     //TODO: Guard player map
-    HashMapHolder<Player>::MapType &m = ObjectAccessor::Instance().GetPlayers();
+    HashMapHolder<Player>::MapType &m = sObjectAccessor.GetPlayers();
     for(HashMapHolder<Player>::MapType::const_iterator itr = m.begin(); itr != m.end(); ++itr)
     {
         if(itr->second->GetSession()->GetSecurity() >= SEC_GAMEMASTER && itr->second->isAcceptTickets())

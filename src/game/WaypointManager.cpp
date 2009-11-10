@@ -331,7 +331,7 @@ void WaypointManager::CheckTextsExistance(std::set<int32>& ids)
                 }
                 else
                 {
-                    if (!objmgr.GetMangosStringLocale(be->textid[j]))
+                    if (!sObjectMgr.GetMangosStringLocale(be->textid[j]))
                     {
                         sLog.outErrorDb("Some waypoint has textid%u with not existing %u text.", j, be->textid[j]);
                         be->textid[j] = 0;

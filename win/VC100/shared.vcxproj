@@ -435,7 +435,6 @@
     <ClCompile Include="..\..\src\shared\Auth\Hmac.cpp" />
     <ClCompile Include="..\..\src\shared\Auth\SARC4.cpp" />
     <ClCompile Include="..\..\src\shared\Auth\Sha1.cpp" />
-    <ClCompile Include="..\..\src\shared\Base.cpp" />
     <ClCompile Include="..\..\src\shared\Common.cpp" />
     <ClCompile Include="..\..\src\shared\Config\Config.cpp" />
     <ClCompile Include="..\..\src\shared\Config\dotconfpp\dotconfpp.cpp" />
@@ -472,7 +471,6 @@
     <ClInclude Include="..\..\src\shared\Auth\Hmac.h" />
     <ClInclude Include="..\..\src\shared\Auth\SARC4.h" />
     <ClInclude Include="..\..\src\shared\Auth\Sha1.h" />
-    <ClInclude Include="..\..\src\shared\Base.h" />
     <ClInclude Include="..\..\src\shared\ByteBuffer.h" />
     <ClInclude Include="..\..\src\shared\Common.h" />
     <ClInclude Include="..\..\src\shared\Config\Config.h" />

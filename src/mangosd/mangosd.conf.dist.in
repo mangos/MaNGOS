@@ -235,6 +235,11 @@ AddonChannel = 1
 #        Packet logging file for the worldserver
 #        Default: "world.log"
 #
+#    WorldLogTimestamp
+#        Logfile with timestamp of server start in name
+#        Default: 0 - no timestamp in name
+#                 1 - add timestamp in name in form Logname_YYYY-MM-DD_HH-MM-SS.Ext for Logname.Ext
+#
 #    DBErrorLogFile
 #        Log file of DB errors detected at server run
 #        Default: "DBErrors.log"

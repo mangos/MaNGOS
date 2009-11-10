@@ -33,6 +33,12 @@ RealmList::RealmList( ) : m_UpdateInterval(0), m_NextUpdateTime(time(NULL))
 {
 }
 
+RealmList& sRealmList
+{
+    static RealmList realmlist;
+    return realmlist;
+}
+
 /// Load the realm list from the database
 void RealmList::Initialize(uint32 updateInterval)
 {

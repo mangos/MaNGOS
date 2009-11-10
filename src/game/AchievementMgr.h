@@ -323,6 +323,6 @@ class AchievementGlobalMgr
         AchievementRewardLocales m_achievementRewardLocales;
 };
 
-#define achievementmgr MaNGOS::Singleton<AchievementGlobalMgr>::Instance()
+#define sAchievementMgr MaNGOS::Singleton<AchievementGlobalMgr>::Instance()
 
 #endif

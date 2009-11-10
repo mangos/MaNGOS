@@ -32,8 +32,6 @@
 #include "Auth/Sha1.h"
 //#include "Util.h" -- for commented utf8ToUpperOnlyLatin
 
-extern RealmList m_realmList;
-
 extern DatabaseType loginDatabase;
 
 #define ChunkSize 2048
@@ -881,14 +879,14 @@ bool AuthSocket::_HandleRealmList()
     delete result;
 
     ///- Update realm list if need
-    m_realmList.UpdateIfNeed();
+    sRealmList.UpdateIfNeed();
 
     ///- Circle through realms in the RealmList and construct the return packet (including # of user characters in each realm)
     ByteBuffer pkt;
     pkt << (uint32) 0;
-    pkt << (uint16) m_realmList.size();
+    pkt << (uint16) sRealmList.size();
     RealmList::RealmMap::const_iterator i;
-    for( i = m_realmList.begin(); i != m_realmList.end(); ++i )
+    for( i = sRealmList.begin(); i != sRealmList.end(); ++i )
     {
         uint8 AmountOfCharacters;
 

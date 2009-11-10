@@ -124,7 +124,7 @@ bool ChatHandler::HandleCharacterDeleteCommand(const char* args)
     uint64 character_guid;
     uint32 account_id;
 
-    Player *player = objmgr.GetPlayer(character_name.c_str());
+    Player *player = sObjectMgr.GetPlayer(character_name.c_str());
     if(player)
     {
         character_guid = player->GetGUID();
@@ -133,7 +133,7 @@ bool ChatHandler::HandleCharacterDeleteCommand(const char* args)
     }
     else
     {
-        character_guid = objmgr.GetPlayerGUIDByName(character_name);
+        character_guid = sObjectMgr.GetPlayerGUIDByName(character_name);
         if(!character_guid)
         {
             PSendSysMessage(LANG_NO_PLAYER,character_name.c_str());
@@ -141,7 +141,7 @@ bool ChatHandler::HandleCharacterDeleteCommand(const char* args)
             return false;
         }
 
-        account_id = objmgr.GetPlayerAccountIdByGUID(character_guid);
+        account_id = sObjectMgr.GetPlayerAccountIdByGUID(character_guid);
     }
 
     std::string account_name;

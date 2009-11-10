@@ -312,9 +312,6 @@
     <ClInclude Include="..\..\src\framework\Policies\ThreadingModel.h" />
     <ClInclude Include="..\..\src\framework\Utilities\ByteConverter.h" />
     <ClInclude Include="..\..\src\framework\Utilities\Callback.h" />
-    <ClInclude Include="..\..\src\framework\Utilities\CountedReference\Reference.h" />
-    <ClInclude Include="..\..\src\framework\Utilities\CountedReference\ReferenceHolder.h" />
-    <ClInclude Include="..\..\src\framework\Utilities\CountedReference\ReferenceImpl.h" />
     <ClInclude Include="..\..\src\framework\Utilities\EventProcessor.h" />
     <ClInclude Include="..\..\src\framework\Utilities\LinkedList.h" />
     <ClInclude Include="..\..\src\framework\Utilities\LinkedReference\Reference.h" />

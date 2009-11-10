@@ -94,7 +94,7 @@ bool LoadScriptingModule(char const* libName)
     UnloadScriptingModule();
 
     Script=testScript;
-    Script->ScriptsInit(objmgr.GetScriptNames());
+    Script->ScriptsInit(sObjectMgr.GetScriptNames());
 
     sWorld.SetScriptsVersion(Script->ScriptsVersion());
 

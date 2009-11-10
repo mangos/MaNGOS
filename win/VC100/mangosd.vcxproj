@@ -449,13 +449,14 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <None Include="..\..\Authors" />
+    <None Include="..\..\AUTHORS" />
     <None Include="..\..\ChangeLog" />
-    <None Include="..\..\Copying" />
-    <None Include="..\..\Install" />
-    <None Include="..\..\News" />
-    <None Include="..\..\Readme" />
-    <None Include="..\..\Thanks" />
+    <None Include="..\..\COPYING" />
+    <None Include="..\..\INSTALL" />
+    <None Include="..\..\NEWS" />
+    <None Include="..\..\README" />
+    <None Include="..\..\THANKS" />
+    <None Include="..\..\WARNING" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\mangosd\CliRunnable.cpp" />

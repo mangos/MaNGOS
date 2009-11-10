@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "HostilRefManager.h"
+#include "HostileRefManager.h"
 #include "ThreatManager.h"
 #include "Unit.h"
 #include "DBCStructure.h"
