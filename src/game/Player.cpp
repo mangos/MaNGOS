@@ -2358,7 +2358,6 @@ void Player::GiveXP(uint32 xp, Unit* victim)
             xp = uint32(xp*(1.0f + (*i)->GetModifier()->m_amount / 100.0f));
     }
 
-
     // XP resting bonus for kill
     uint32 rested_bonus_xp = victim ? GetXPRestBonus(xp) : 0;
 
