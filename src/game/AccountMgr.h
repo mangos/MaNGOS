@@ -55,5 +55,5 @@ class AccountMgr
         static bool normalizeString(std::string& utf8str);
 };
 
-#define accmgr MaNGOS::Singleton<AccountMgr>::Instance()
+#define sAccountMgr MaNGOS::Singleton<AccountMgr>::Instance()
 #endif
