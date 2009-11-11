@@ -2495,8 +2495,15 @@ void ObjectMgr::LoadPlayerInfo()
                     continue;
                 }
 
+                uint32 spell_id = fields[2].GetUInt32();
+                if (!sSpellStore.LookupEntry(spell_id))
+                {
+                    sLog.outErrorDb("Non existing spell %u in `playercreateinfo_spell` table, ignoring.", spell_id);
+                    continue;
+                }
+
                 PlayerInfo* pInfo = &playerInfo[current_race][current_class];
-                pInfo->spell.push_back(fields[2].GetUInt32());
+                pInfo->spell.push_back(spell_id);
 
                 bar.step();
                 ++count;
