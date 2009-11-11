@@ -2554,8 +2554,15 @@ void ObjectMgr::LoadPlayerInfo()
                     continue;
                 }
 
+                uint8 action_button  = fields[2].GetUInt8();
+                uint32 action = fields[3].GetUInt32();
+                uint8 action_type = fields[4].GetUInt8();
+
+                if (!Player::IsActionButtonDataValid(action_button,action,action_type,NULL))
+                    continue;
+
                 PlayerInfo* pInfo = &playerInfo[current_race][current_class];
-                pInfo->action.push_back(PlayerCreateInfoAction(fields[2].GetUInt8(),fields[3].GetUInt32(),fields[4].GetUInt8()));
+                pInfo->action.push_back(PlayerCreateInfoAction(action_button,action,action_type));
 
                 bar.step();
                 ++count;
