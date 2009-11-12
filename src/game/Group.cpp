@@ -900,7 +900,7 @@ void Group::CountTheRoll(Rolls::iterator rollI, uint32 NumberOfPlayers)
             }
         }
         SendLootRollWon(0, maxguid, maxresul, ROLL_DISENCHANT, *roll);
-        player = objmgr.GetPlayer(maxguid);
+        player = sObjectMgr.GetPlayer(maxguid);
 
         if(player && player->GetSession())
         {
@@ -909,7 +909,7 @@ void Group::CountTheRoll(Rolls::iterator rollI, uint32 NumberOfPlayers)
             roll->getLoot()->NotifyItemRemoved(roll->itemSlot);
             --roll->getLoot()->unlootedCount;
 
-            ItemPrototype const *pProto = objmgr.GetItemPrototype(roll->itemid);
+            ItemPrototype const *pProto = ObjectMgr::GetItemPrototype(roll->itemid);
             player->AutoStoreLoot(pProto->DisenchantID, LootTemplates_Disenchant, true);
         }
     }
