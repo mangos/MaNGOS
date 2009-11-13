@@ -141,6 +141,12 @@ void WaypointManager::Load()
             }
         }
 
+        if (be.spell && ! sSpellStore.LookupEntry(be.spell))
+        {
+            sLog.outErrorDb("Table creature_movement references unknown spellid %u. Skipping id %u.", be.spell, id);
+            continue;
+        }
+
         if (be.emote)
         {
             if (!sEmotesStore.LookupEntry(be.emote))
