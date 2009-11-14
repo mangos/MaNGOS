@@ -68,6 +68,10 @@ void Totem::Summon(Unit* owner)
 
     AIM_Initialize();
 
+    // there are some totems, which exist just for their visual appeareance
+    if (!GetSpell())
+        return;
+
     switch(m_type)
     {
         case TOTEM_PASSIVE:

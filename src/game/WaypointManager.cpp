@@ -83,7 +83,10 @@ void WaypointManager::Load()
         sLog.outString( ">> Paths loaded" );
     }
 
-    result = WorldDatabase.Query("SELECT position_x, position_y, position_z, orientation, model1, model2, waittime, emote, spell, textid1, textid2, textid3, textid4, textid5, id, point FROM creature_movement");
+    //                                   0           1           2           3            4       5
+    result = WorldDatabase.Query("SELECT position_x, position_y, position_z, orientation, model1, model2,"
+    //   6         7      8      9        10       11       12       13       14  15
+        "waittime, emote, spell, textid1, textid2, textid3, textid4, textid5, id, point FROM creature_movement");
 
     barGoLink bar( result->GetRowCount() );
     do
@@ -92,6 +95,12 @@ void WaypointManager::Load()
         Field *fields = result->Fetch();
         uint32 point        = fields[15].GetUInt32();
         uint32 id           = fields[14].GetUInt32();
+        if (!sObjectMgr.GetCreatureData(id))
+        {
+            sLog.outErrorDb("Table creature_movement references unknown creature %u. Skipping.", id);
+            continue;
+        }
+
         WaypointPath &path  = m_pathMap[id];
         // the cleanup queries make sure the following is true
         assert(point >= 1 && point <= path.size());
@@ -139,6 +148,12 @@ void WaypointManager::Load()
                     continue;
                 }
             }
+        }
+
+        if (be.spell && ! sSpellStore.LookupEntry(be.spell))
+        {
+            sLog.outErrorDb("Table creature_movement references unknown spellid %u. Skipping id %u with point %u.", be.spell, id, point);
+            be.spell = 0;
         }
 
         if (be.emote)

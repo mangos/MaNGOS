@@ -200,14 +200,14 @@ bool ChatHandler::HandleAccountPasswordCommand(const char* args)
         return false;
     }
 
-    if (!accmgr.CheckPassword (m_session->GetAccountId(), password_old))
+    if (!sAccountMgr.CheckPassword (m_session->GetAccountId(), password_old))
     {
         SendSysMessage (LANG_COMMAND_WRONGOLDPASSWORD);
         SetSentErrorMessage (true);
         return false;
     }
 
-    AccountOpResult result = accmgr.ChangePassword(m_session->GetAccountId(), password_new);
+    AccountOpResult result = sAccountMgr.ChangePassword(m_session->GetAccountId(), password_new);
 
     switch(result)
     {
