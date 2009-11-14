@@ -209,6 +209,11 @@ extern int main(int argc, char **argv)
         return 1;
     }
 
+    // cleanup query
+    //set expired bans to inactive
+    loginDatabase.Execute("UPDATE account_banned SET active = 0 WHERE unbandate<=UNIX_TIMESTAMP() AND unbandate<>bandate");
+    loginDatabase.Execute("DELETE FROM ip_banned WHERE unbandate<=UNIX_TIMESTAMP() AND unbandate<>bandate");
+
     h.Add(&authListenSocket);
 
     ///- Catch termination signals
