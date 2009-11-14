@@ -1284,6 +1284,9 @@ void World::SetInitialWorldSettings()
     sLog.outString( "Loading Quests..." );
     sObjectMgr.LoadQuests();                                    // must be loaded after DBCs, creature_template, item_template, gameobject tables
 
+    sLog.outString( "Loading Quest POI" );
+    sObjectMgr.LoadQuestPOI();
+
     sLog.outString( "Loading Quests Relations..." );
     sLog.outString();
     sObjectMgr.LoadQuestRelations();                            // must be after quest load

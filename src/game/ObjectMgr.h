@@ -216,6 +216,29 @@ struct PointOfInterest
     std::string icon_name;
 };
 
+struct QuestPOIPoint
+{
+    int32 x;
+    int32 y;
+
+    QuestPOIPoint() : x(0), y(0) {}
+    QuestPOIPoint(int32 _x, int32 _y) : x(_x), y(_y) {}
+};
+
+struct QuestPOI
+{
+    int32 ObjectiveIndex;
+    uint32 MapId;
+    uint32 Unk1;
+    std::vector<QuestPOIPoint> points;
+
+    QuestPOI() : ObjectiveIndex(0), MapId(0), Unk1(0) {}
+    QuestPOI(int32 objIndex, uint32 mapId, uint32 unk1) : ObjectiveIndex(objIndex), MapId(mapId), Unk1(unk1) {}
+};
+
+typedef std::vector<QuestPOI> QuestPOIVector;
+typedef UNORDERED_MAP<uint32, QuestPOIVector> QuestPOIMap;
+
 #define WEATHER_SEASONS 4
 struct WeatherSeasonChances
 {
@@ -479,6 +502,14 @@ class ObjectMgr
             return NULL;
         }
 
+        QuestPOIVector const* GetQuestPOIVector(uint32 questId)
+        {
+            QuestPOIMap::const_iterator itr = mQuestPOIMap.find(questId);
+            if(itr != mQuestPOIMap.end())
+                return &itr->second;
+            return NULL;
+        }
+
         void LoadGuilds();
         void LoadArenaTeams();
         void LoadGroups();
@@ -551,6 +582,7 @@ class ObjectMgr
 
         void LoadReputationOnKill();
         void LoadPointsOfInterest();
+        void LoadQuestPOI();
 
         void LoadNPCSpellClickSpells();
 
@@ -842,6 +874,8 @@ class ObjectMgr
         RepOnKillMap        mRepOnKill;
 
         PointOfInterestMap mPointsOfInterest;
+
+        QuestPOIMap         mQuestPOIMap;
 
         WeatherZoneMap      mWeatherZoneMap;
 
