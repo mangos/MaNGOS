@@ -81,16 +81,12 @@ class BattleGroundQueue
         bool CheckPremadeMatch(BGQueueIdBasedOnLevel queue_id, uint32 MinPlayersPerTeam, uint32 MaxPlayersPerTeam);
         bool CheckNormalMatch(BattleGround* bg_template, BGQueueIdBasedOnLevel queue_id, uint32 minPlayers, uint32 maxPlayers);
         bool CheckSkirmishForSameFaction(BGQueueIdBasedOnLevel queue_id, uint32 minPlayersPerTeam);
-        GroupQueueInfo * AddGroup(Player * leader, BattleGroundTypeId bgTypeId, uint8 ArenaType, bool isRated, bool isPremade, uint32 ArenaRating, uint32 ArenaTeamId = 0);
-        void AddPlayer(Player *plr, GroupQueueInfo *ginfo);
+        GroupQueueInfo * AddGroup(Player* leader, Group* group, BattleGroundTypeId bgTypeId, uint8 ArenaType, bool isRated, bool isPremade, uint32 ArenaRating, uint32 ArenaTeamId = 0);
         void RemovePlayer(const uint64& guid, bool decreaseInvitedCount);
         bool IsPlayerInvited(const uint64& pl_guid, const uint32 bgInstanceGuid, const uint32 removeTime);
         bool GetPlayerGroupInfoData(const uint64& guid, GroupQueueInfo* ginfo);
         void PlayerInvitedToBGUpdateAverageWaitTime(GroupQueueInfo* ginfo, BGQueueIdBasedOnLevel queue_id);
         uint32 GetAverageQueueWaitTime(GroupQueueInfo* ginfo, BGQueueIdBasedOnLevel queue_id);
-
-        void DecreaseGroupLength(uint32 queueId, uint32 AsGroup);
-        void AnnounceWorld(GroupQueueInfo *ginfo, const uint64& playerGUID, bool isAddedToQueue);
 
     private:
         //mutex that should not allow changing private data, nor allowing to update Queue during private data change.
