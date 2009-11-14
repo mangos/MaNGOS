@@ -894,16 +894,16 @@ enum Opcodes
     MSG_MOVE_START_ASCEND                           = 0x359,
     MSG_MOVE_STOP_ASCEND                            = 0x35A,
     SMSG_ARENA_TEAM_STATS                           = 0x35B,
-    CMSG_LFG_SET_AUTOJOIN                           = 0x35C,    // CMSG JoinLFG
-    CMSG_LFG_CLEAR_AUTOJOIN                         = 0x35D,    // CMSG LeaveLFG
-    CMSG_LFM_SET_AUTOFILL                           = 0x35E,    // CMSG SearchLFGJoin
-    CMSG_LFM_CLEAR_AUTOFILL                         = 0x35F,    // CMSG SearchLFGLeave
-    CMSG_ACCEPT_LFG_MATCH                           = 0x360,    // SMSG uint32, uint32, if(uint8) { uint32 count, for(count) { uint64} }, uint32 count2, uint32, for(count2) { uint64, uint32 flags, if(flags & 0x2) {string}, if(flags & 0x10) {for(3) uint8}, if(flags & 0x80) {uint64, uint32}}, uint32 count3, uint32, for(count3) {uint64, uint32 flags, if(flags & 0x1) {uint8, uint8, uint8, for(3) uint8, uint32, uint32, uint32, uint32, uint32, uint32, float, float, uint32, uint32, uint32, uint32, uint32, float, uint32, uint32, uint32, uint32, uint32, uint32}, if(flags&0x2) string, if(flags&0x4) uint8, if(flags&0x8) uint64, if(flags&0x10) uint8, if(flags&0x20) uint32, if(flags&0x40) uint8, if(flags& 0x80) {uint64, uint32}}
-    CMSG_DECLINE_LFG_MATCH                          = 0x361,    // SMSG uint32, uint8, uint32, uint32, uint8, for(uint8) {uint32,uint8,uint8,uint8,uint8}
+    CMSG_LFG_JOIN                                   = 0x35C,    // CMSG JoinLFG
+    CMSG_LFG_LEAVE                                  = 0x35D,    // CMSG LeaveLFG
+    CMSG_SEARCH_LFG_JOIN                            = 0x35E,    // CMSG SearchLFGJoin
+    CMSG_SEARCH_LFG_LEAVE                           = 0x35F,    // CMSG SearchLFGLeave
+    SMSG_ACCEPT_LFG_MATCH                           = 0x360,    // SMSG uint32, uint32, if(uint8) { uint32 count, for(count) { uint64} }, uint32 count2, uint32, for(count2) { uint64, uint32 flags, if(flags & 0x2) {string}, if(flags & 0x10) {for(3) uint8}, if(flags & 0x80) {uint64, uint32}}, uint32 count3, uint32, for(count3) {uint64, uint32 flags, if(flags & 0x1) {uint8, uint8, uint8, for(3) uint8, uint32, uint32, uint32, uint32, uint32, uint32, float, float, uint32, uint32, uint32, uint32, uint32, float, uint32, uint32, uint32, uint32, uint32, uint32}, if(flags&0x2) string, if(flags&0x4) uint8, if(flags&0x8) uint64, if(flags&0x10) uint8, if(flags&0x20) uint32, if(flags&0x40) uint8, if(flags& 0x80) {uint64, uint32}}
+    SMSG_DECLINE_LFG_MATCH                          = 0x361,    // SMSG uint32, uint8, uint32, uint32, uint8, for(uint8) {uint32,uint8,uint8,uint8,uint8}
     CMSG_LFG_PROPOSAL_RESULT                        = 0x362,    // CMSG AcceptProposal, RejectProposal
-    CMSG_CLEAR_LOOKING_FOR_GROUP                    = 0x363,    // SMSG uint32, uint8, for(uint8) uint32, uint8, for(uint8) { uint64, uint8, uint32, uint8, }
-    CMSG_CLEAR_LOOKING_FOR_MORE                     = 0x364,    // SMSG uint32 unk, uint32, if(unk==6) { uint8 count, for(count) uint64 }
-    CMSG_SET_LOOKING_FOR_MORE                       = 0x365,    // SMSG uint32 dungeon, uint32 lfgtype, uint32, uint32, uint32, uint32, uint8, uint8, uint8, uint8
+    SMSG_CLEAR_LOOKING_FOR_GROUP                    = 0x363,    // SMSG uint32, uint8, for(uint8) uint32, uint8, for(uint8) { uint64, uint8, uint32, uint8, }
+    SMSG_CLEAR_LOOKING_FOR_MORE                     = 0x364,    // SMSG uint32 unk, uint32, if(unk==6) { uint8 count, for(count) uint64 }
+    SMSG_SET_LOOKING_FOR_MORE                       = 0x365,    // SMSG uint32 dungeon, uint32 lfgtype, uint32, uint32, uint32, uint32, uint8, uint8, uint8, uint8
     CMSG_SET_LFG_COMMENT                            = 0x366,    // CMSG SetLFGComment
     SMSG_LFG_TIMEDOUT                               = 0x367,    // SMSG uint8, if(uint8) { uint8, uint8, uint8, uint8, if(uint8) for(uint8) uint32, string}
     SMSG_LFG_OTHER_TIMEDOUT                         = 0x368,    // SMSG uint8, if(uint8) { uint8, uint8, uint8, for(3) uint8, uint8, if(uint8) for(uint8) uint32, string}

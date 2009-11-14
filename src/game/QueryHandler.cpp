@@ -486,3 +486,12 @@ void WorldSession::HandleQueryQuestsCompleted( WorldPacket & recv_data )
     data.put<uint32>(0, count);
     SendPacket(&data);
 }
+
+void WorldSession::HandleQuestPOIQuery(WorldPacket& recv_data)
+{
+    recv_data.read_skip<uint64>();
+
+    WorldPacket data(SMSG_QUEST_POI_QUERY_RESPONSE, 4);
+    data << uint32(0);                                      // count
+    SendPacket(&data);
+}

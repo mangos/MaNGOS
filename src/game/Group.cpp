@@ -754,12 +754,12 @@ void Group::CountRollVote(const uint64& playerGUID, const uint64& Guid, uint32 N
         case ROLL_DISENCHANT:                               // player choose Disenchant
         {
             SendLootRoll(0, playerGUID, 128, ROLL_DISENCHANT, *roll);
-            ++roll->totalDisenchant;
+            ++roll->totalGreed;
             itr->second = DISENCHANT;
         }
         break;
     }
-    if (roll->totalPass + roll->totalNeed + roll->totalGreed + roll->totalDisenchant >= roll->totalPlayersRolling)
+    if (roll->totalPass + roll->totalNeed + roll->totalGreed >= roll->totalPlayersRolling)
     {
         CountTheRoll(rollI, NumberOfPlayers);
     }
@@ -840,77 +840,59 @@ void Group::CountTheRoll(Rolls::iterator rollI, uint32 NumberOfPlayers)
             uint8 maxresul = 0;
             uint64 maxguid = (*roll->playerVote.begin()).first;
             Player *player;
+            RollVote rollvote;
 
             Roll::PlayerVote::iterator itr;
             for (itr = roll->playerVote.begin(); itr != roll->playerVote.end(); ++itr)
             {
-                if (itr->second != GREED)
+                if (itr->second != GREED && itr->second != DISENCHANT)
                     continue;
 
                 uint8 randomN = urand(1, 99);
-                SendLootRoll(0, itr->first, randomN, ROLL_GREED, *roll);
+                SendLootRoll(0, itr->first, randomN, itr->second, *roll);
                 if (maxresul < randomN)
                 {
                     maxguid  = itr->first;
                     maxresul = randomN;
+                    rollvote = itr->second;
                 }
             }
-            SendLootRollWon(0, maxguid, maxresul, ROLL_GREED, *roll);
+            SendLootRollWon(0, maxguid, maxresul, rollvote, *roll);
             player = sObjectMgr.GetPlayer(maxguid);
 
             if(player && player->GetSession())
             {
                 player->GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_ROLL_GREED_ON_LOOT, roll->itemid, maxresul);
 
-                ItemPosCountVec dest;
                 LootItem *item = &(roll->getLoot()->items[roll->itemSlot]);
-                uint8 msg = player->CanStoreNewItem( NULL_BAG, NULL_SLOT, dest, roll->itemid, item->count );
-                if ( msg == EQUIP_ERR_OK )
+
+                if(rollvote == GREED)
+                {
+                    ItemPosCountVec dest;
+                    uint8 msg = player->CanStoreNewItem( NULL_BAG, NULL_SLOT, dest, roll->itemid, item->count );
+                    if ( msg == EQUIP_ERR_OK )
+                    {
+                        item->is_looted = true;
+                        roll->getLoot()->NotifyItemRemoved(roll->itemSlot);
+                        --roll->getLoot()->unlootedCount;
+                        player->StoreNewItem( dest, roll->itemid, true, item->randomPropertyId);
+                    }
+                    else
+                    {
+                        item->is_blocked = false;
+                        player->SendEquipError( msg, NULL, NULL );
+                    }
+                }
+                else if(rollvote == DISENCHANT)
                 {
                     item->is_looted = true;
                     roll->getLoot()->NotifyItemRemoved(roll->itemSlot);
                     --roll->getLoot()->unlootedCount;
-                    player->StoreNewItem( dest, roll->itemid, true, item->randomPropertyId);
-                }
-                else
-                {
-                    item->is_blocked = false;
-                    player->SendEquipError( msg, NULL, NULL );
+
+                    ItemPrototype const *pProto = ObjectMgr::GetItemPrototype(roll->itemid);
+                    player->AutoStoreLoot(pProto->DisenchantID, LootTemplates_Disenchant, true);
                 }
             }
-        }
-    }
-    else if(roll->totalDisenchant > 0)
-    {
-        uint8 maxresul = 0;
-        uint64 maxguid  = (*roll->playerVote.begin()).first;
-        Player *player;
-
-        for( Roll::PlayerVote::const_iterator itr = roll->playerVote.begin(); itr != roll->playerVote.end(); ++itr)
-        {
-            if (itr->second != DISENCHANT)
-                continue;
-
-            uint8 randomN = urand(1, 99);
-            SendLootRoll(0, itr->first, randomN, ROLL_DISENCHANT, *roll);
-            if (maxresul < randomN)
-            {
-                maxguid  = itr->first;
-                maxresul = randomN;
-            }
-        }
-        SendLootRollWon(0, maxguid, maxresul, ROLL_DISENCHANT, *roll);
-        player = sObjectMgr.GetPlayer(maxguid);
-
-        if(player && player->GetSession())
-        {
-            LootItem *item = &(roll->getLoot()->items[roll->itemSlot]);
-            item->is_looted = true;
-            roll->getLoot()->NotifyItemRemoved(roll->itemSlot);
-            --roll->getLoot()->unlootedCount;
-
-            ItemPrototype const *pProto = ObjectMgr::GetItemPrototype(roll->itemid);
-            player->AutoStoreLoot(pProto->DisenchantID, LootTemplates_Disenchant, true);
         }
     }
     else
@@ -1273,14 +1255,12 @@ void Group::_removeRolls(const uint64 &guid)
         if(itr2 == roll->playerVote.end())
             continue;
 
-        if (itr2->second == GREED)
+        if (itr2->second == GREED || itr2->second == DISENCHANT)
             --roll->totalGreed;
         if (itr2->second == NEED)
             --roll->totalNeed;
         if (itr2->second == PASS)
             --roll->totalPass;
-        if (itr2->second == DISENCHANT)
-            --roll->totalDisenchant;
         if (itr2->second != NOT_VALID)
             --roll->totalPlayersRolling;
 

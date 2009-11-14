@@ -104,7 +104,7 @@ class Roll : public LootValidatorRef
     public:
         Roll(uint64 _guid, LootItem const& li)
             : itemGUID(_guid), itemid(li.itemid), itemRandomPropId(li.randomPropertyId), itemRandomSuffix(li.randomSuffix), itemCount(li.count),
-            totalPlayersRolling(0), totalNeed(0), totalGreed(0), totalDisenchant(0), totalPass(0), itemSlot(0) {}
+            totalPlayersRolling(0), totalNeed(0), totalGreed(0), totalPass(0), itemSlot(0) {}
         ~Roll() { }
         void setLoot(Loot *pLoot) { link(pLoot, this); }
         Loot *getLoot() { return getTarget(); }
@@ -120,7 +120,6 @@ class Roll : public LootValidatorRef
         uint8 totalPlayersRolling;
         uint8 totalNeed;
         uint8 totalGreed;
-        uint8 totalDisenchant;
         uint8 totalPass;
         uint8 itemSlot;
 };
