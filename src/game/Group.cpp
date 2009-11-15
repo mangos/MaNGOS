@@ -364,8 +364,9 @@ uint32 Group::RemoveMember(const uint64 &guid, const uint8 &method)
             }
             else
             {
-                data.Initialize(SMSG_GROUP_LIST, 24);
-                data << uint64(0) << uint64(0) << uint64(0);
+                data.Initialize(SMSG_GROUP_LIST, 1+1+1+1+8+4+4+8);
+                data << uint8(0x10) << uint8(0) << uint8(0) << uint8(0);
+                data << uint64(0) << uint32(0) << uint32(0) << uint64(0);
                 player->GetSession()->SendPacket(&data);
             }
 
@@ -447,8 +448,9 @@ void Group::Disband(bool hideDestroy)
         }
         else
         {
-            data.Initialize(SMSG_GROUP_LIST, 24);
-            data << uint64(0) << uint64(0) << uint64(0);
+            data.Initialize(SMSG_GROUP_LIST, 1+1+1+1+8+4+4+8);
+            data << uint8(0x10) << uint8(0) << uint8(0) << uint8(0);
+            data << uint64(0) << uint32(0) << uint32(0) << uint64(0);
             player->GetSession()->SendPacket(&data);
         }
 
@@ -979,11 +981,17 @@ void Group::SendUpdate()
             continue;
                                                             // guess size
         WorldPacket data(SMSG_GROUP_LIST, (1+1+1+1+8+4+GetMembersCount()*20));
-        data << (uint8)m_groupType;                         // group type
-        data << (uint8)(isBGGroup() ? 1 : 0);               // 2.0.x, isBattleGroundGroup?
-        data << (uint8)(citr->group);                       // groupid
-        data << (uint8)(citr->assistant?0x01:0);            // 0x2 main assist, 0x4 main tank
+        data << uint8(m_groupType);                         // group type (flags in 3.3)
+        data << uint8(isBGGroup() ? 1 : 0);                 // 2.0.x, isBattleGroundGroup?
+        data << uint8(citr->group);                         // groupid
+        data << uint8(citr->assistant ? 0x01 : 0x00);       // 0x2 main assist, 0x4 main tank
+        if(m_groupType & GROUPTYPE_LFD)
+        {
+            data << uint8(0);
+            data << uint32(0);
+        }
         data << uint64(0x50000000FFFFFFFELL);               // related to voice chat?
+        data << uint32(0);                                  // 3.3, may be some kind of time
         data << uint32(GetMembersCount()-1);
         for(member_citerator citr2 = m_memberSlots.begin(); citr2 != m_memberSlots.end(); ++citr2)
         {
@@ -994,23 +1002,23 @@ void Group::SendUpdate()
             onlineState = onlineState | ((isBGGroup()) ? MEMBER_STATUS_PVP : 0);
 
             data << citr2->name;
-            data << (uint64)citr2->guid;
+            data << uint64(citr2->guid);
                                                             // online-state
-            data << (uint8)(onlineState);
-            data << (uint8)(citr2->group);                  // groupid
-            data << (uint8)(citr2->assistant?0x01:0);       // 0x2 main assist, 0x4 main tank
-            data << uint8(0);                               // 3.3
+            data << uint8(onlineState);
+            data << uint8(citr2->group);                    // groupid
+            data << uint8(citr2->assistant?0x01:0);         // 0x2 main assist, 0x4 main tank
+            data << uint8(0);                               // 3.3, role?
         }
 
         data << uint64(m_leaderGuid);                       // leader guid
         if(GetMembersCount()-1)
         {
-            data << (uint8)m_lootMethod;                    // loot method
-            data << (uint64)m_looterGuid;                   // looter guid
-            data << (uint8)m_lootThreshold;                 // loot threshold
-            data << (uint8)m_dungeonDifficulty;             // Dungeon Difficulty
-            data << (uint8)m_raidDifficulty;                // Raid Difficulty
-            data << uint8(0);                               // 3.3
+            data << uint8(m_lootMethod);                    // loot method
+            data << uint64(m_looterGuid);                   // looter guid
+            data << uint8(m_lootThreshold);                 // loot threshold
+            data << uint8(m_dungeonDifficulty);             // Dungeon Difficulty
+            data << uint8(m_raidDifficulty);                // Raid Difficulty
+            data << uint8(0);                               // 3.3, dynamic difficulty?
         }
         player->GetSession()->SendPacket( &data );
     }

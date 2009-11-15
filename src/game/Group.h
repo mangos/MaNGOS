@@ -57,11 +57,13 @@ enum GroupMemberOnlineStatus
 
 enum GroupType                                              // group type flags?
 {
-    GROUPTYPE_NORMAL = 0,
-    GROUPTYPE_BG     = 1,
-    GROUPTYPE_RAID   = 2,
-    GROUPTYPE_BGRAID = 3,
-    GROUPTYPE_LFD    = 4
+    GROUPTYPE_NORMAL = 0x00,
+    GROUPTYPE_BG     = 0x01,
+    GROUPTYPE_RAID   = 0x02,
+    GROUPTYPE_BGRAID = GROUPTYPE_BG | GROUPTYPE_RAID,       // mask
+    // 0x04?
+    GROUPTYPE_LFD    = 0x08,
+    // 0x10, leave/change group?, I saw this flag when leaving group and after leaving BG while in group
 };
 
 class BattleGround;

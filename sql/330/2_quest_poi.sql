@@ -1,4 +1,4 @@
-DROP TABLE IF EXIST `quest_poi`;
+DROP TABLE IF EXISTS `quest_poi`;
 CREATE TABLE `quest_poi` (
   `questid` int(11) unsigned NOT NULL DEFAULT '0',
   `objIndex` int(11) NOT NULL DEFAULT '0',
@@ -7,7 +7,7 @@ CREATE TABLE `quest_poi` (
   PRIMARY KEY (`questid`,`objIndex`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXIST `quest_poi_points`;
+DROP TABLE IF EXISTS `quest_poi_points`;
 CREATE TABLE `quest_poi_points` (
   `questId` int(11) unsigned NOT NULL DEFAULT '0',
   `objIndex` int(11) NOT NULL DEFAULT '0',
