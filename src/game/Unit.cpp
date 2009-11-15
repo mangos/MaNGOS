@@ -169,10 +169,12 @@ Unit::~Unit()
         }
     }
 
-    RemoveAllGameObjects();
-    RemoveAllDynObjects();
+    if (m_charmInfo)
+        delete m_charmInfo;
 
-    if(m_charmInfo) delete m_charmInfo;
+    // those should be already removed at "RemoveFromWorld()" call
+    assert(m_gameObj.size() == 0);
+    assert(m_dynObjGUIDs.size() == 0);
 }
 
 void Unit::Update( uint32 p_time )
@@ -7977,7 +7979,7 @@ Pet* Unit::GetPet() const
 
 Unit* Unit::GetCharm() const
 {
-    if(uint64 charm_guid = GetCharmGUID())
+    if (uint64 charm_guid = GetCharmGUID())
     {
         if(Unit* pet = ObjectAccessor::GetUnit(*this, charm_guid))
             return pet;
@@ -7987,6 +7989,15 @@ Unit* Unit::GetCharm() const
     }
 
     return NULL;
+}
+
+void Unit::Uncharm()
+{
+    if (Unit* charm = GetCharm())
+    {
+        charm->RemoveSpellsCausingAura(SPELL_AURA_MOD_CHARM);
+        charm->RemoveSpellsCausingAura(SPELL_AURA_MOD_POSSESS);
+    }
 }
 
 float Unit::GetCombatDistance( const Unit* target ) const
@@ -11088,10 +11099,13 @@ void Unit::AddToWorld()
 void Unit::RemoveFromWorld()
 {
     // cleanup
-    if(IsInWorld())
+    if (IsInWorld())
     {
+        Uncharm();
         RemoveNotOwnSingleTargetAuras();
         RemoveGuardians();
+        RemoveAllGameObjects();
+        RemoveAllDynObjects();
     }
 
     Object::RemoveFromWorld();
@@ -11108,8 +11122,6 @@ void Unit::CleanupsBeforeDelete()
         DeleteThreatList();
         getHostileRefManager().setOnlineOfflineState(false);
         RemoveAllAuras(AURA_REMOVE_BY_DELETE);
-        RemoveAllGameObjects();
-        RemoveAllDynObjects();
         GetMotionMaster()->Clear(false);                    // remove different non-standard movement generators.
     }
     WorldObject::CleanupsBeforeDelete();

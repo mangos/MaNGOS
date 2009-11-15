@@ -47,7 +47,10 @@ ObjectAccessor::ObjectAccessor() {}
 ObjectAccessor::~ObjectAccessor()
 {
     for(Player2CorpsesMapType::const_iterator itr = i_player2corpse.begin(); itr != i_player2corpse.end(); ++itr)
+    {
+        itr->second->RemoveFromWorld();
         delete itr->second;
+    }
 }
 
 Unit*
