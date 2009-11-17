@@ -332,7 +332,11 @@ bool StartDB()
     }
 
     if(!loginDatabase.CheckRequiredField("realmd_db_version",REVISION_DB_REALMD))
+    {
+        ///- Wait for already started DB delay threads to end
+        loginDatabase.HaltDelayThread();
         return false;
+    }
 
     return true;
 }
