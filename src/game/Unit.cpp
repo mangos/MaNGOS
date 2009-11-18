@@ -683,7 +683,7 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
 
                 if(m->IsDungeon() && creditedPlayer)
                 {
-                    if(m->IsRaid() || m->IsHeroic())
+                    if (m->IsRaidOrHeroicDungeon())
                     {
                         if(cVictim->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_INSTANCE_BIND)
                             ((InstanceMap *)m)->PermBindAllPlayers(creditedPlayer);

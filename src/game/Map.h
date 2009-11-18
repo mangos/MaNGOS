@@ -227,9 +227,6 @@ struct InstanceTemplate
     uint32 parent;
     uint32 levelMin;
     uint32 levelMax;
-    uint32 maxPlayers;
-    uint32 maxPlayersHeroic;
-    uint32 reset_delay;                                 // FIX ME: now exist normal/heroic raids with possible different time of reset.
     float startLocX;
     float startLocY;
     float startLocZ;
@@ -373,7 +370,7 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         // NOTE: this duplicate of Instanceable(), but Instanceable() can be changed when BG also will be instanceable
         bool IsDungeon() const { return i_mapEntry && i_mapEntry->IsDungeon(); }
         bool IsRaid() const { return i_mapEntry && i_mapEntry->IsRaid(); }
-        bool IsHeroic() const { return IsRaid() ? i_spawnMode >= RAID_DIFFICULTY_10MAN_HEROIC : i_spawnMode >= DUNGEON_DIFFICULTY_HEROIC; }
+        bool IsRaidOrHeroicDungeon() const { return IsRaid() || i_spawnMode > DUNGEON_DIFFICULTY_NORMAL; }
         bool IsBattleGround() const { return i_mapEntry && i_mapEntry->IsBattleGround(); }
         bool IsBattleArena() const { return i_mapEntry && i_mapEntry->IsBattleArena(); }
         bool IsBattleGroundOrArena() const { return i_mapEntry && i_mapEntry->IsBattleGroundOrArena(); }
@@ -599,7 +596,12 @@ class MANGOS_DLL_SPEC InstanceMap : public Map
         bool CanEnter(Player* player);
         void SendResetWarnings(uint32 timeLeft) const;
         void SetResetSchedule(bool on);
+
+        // have meaning only for instanced map (that have set real difficulty)
+        Difficulty GetDifficulty() const { return Difficulty(GetSpawnMode()); }
         uint32 GetMaxPlayers() const;
+        uint32 GetMaxResetDelay() const;
+        MapDifficulty const* GetMapDifficulty() const;
 
         virtual void InitVisibilityDistance();
     private:

@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_8818_01_mangos_mangos_string` bit(1) default NULL
+  `required_8828_02_mangos_instance_template` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -1904,9 +1904,6 @@ CREATE TABLE `instance_template` (
   `parent` int(10) unsigned NOT NULL,
   `levelMin` tinyint(3) unsigned NOT NULL default '0',
   `levelMax` tinyint(3) unsigned NOT NULL default '0',
-  `maxPlayers` tinyint(3) unsigned NOT NULL default '0',
-  `maxPlayersHeroic` tinyint(3) unsigned NOT NULL default '0',
-  `reset_delay` int(10) unsigned NOT NULL default '0',
   `startLocX` float default NULL,
   `startLocY` float default NULL,
   `startLocZ` float default NULL,

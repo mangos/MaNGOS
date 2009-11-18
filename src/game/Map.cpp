@@ -2610,21 +2610,31 @@ void InstanceMap::SetResetSchedule(bool on)
     // only for normal instances
     // the reset time is only scheduled when there are no payers inside
     // it is assumed that the reset time will rarely (if ever) change while the reset is scheduled
-    if(IsDungeon() && !HavePlayers() && !IsRaid() && !IsHeroic())
+    if(IsDungeon() && !HavePlayers() && !IsRaidOrHeroicDungeon())
     {
         InstanceSave *save = sInstanceSaveMgr.GetInstanceSave(GetInstanceId());
         if(!save) sLog.outError("InstanceMap::SetResetSchedule: cannot turn schedule %s, no save available for instance %d of %d", on ? "on" : "off", GetInstanceId(), GetId());
-        else sInstanceSaveMgr.ScheduleReset(on, save->GetResetTime(), InstanceSaveManager::InstResetEvent(0, GetId(), GetInstanceId()));
+        else sInstanceSaveMgr.ScheduleReset(on, save->GetResetTime(), InstanceSaveManager::InstResetEvent(0, GetId(), Difficulty(GetSpawnMode()), GetInstanceId()));
     }
+}
+
+MapDifficulty const* InstanceMap::GetMapDifficulty() const
+{
+    return GetMapDifficultyData(GetId(),GetDifficulty());
 }
 
 uint32 InstanceMap::GetMaxPlayers() const
 {
-    InstanceTemplate const* iTemplate = ObjectMgr::GetInstanceTemplate(GetId());
-    if(!iTemplate)
-        return 0;
-    return IsHeroic() ? iTemplate->maxPlayersHeroic : iTemplate->maxPlayers;
+    MapDifficulty const* mapDiff = GetMapDifficulty();
+    return mapDiff ? mapDiff->maxPlayers : 0;
 }
+
+uint32 InstanceMap::GetMaxResetDelay() const
+{
+    MapDifficulty const* mapDiff = GetMapDifficulty();
+    return mapDiff ? mapDiff->resetTime : 0;
+}
+
 
 /* ******* Battleground Instance Maps ******* */
 
@@ -3560,4 +3570,3 @@ uint32 Map::GenerateLocalLowGuid(HighGuid guidhigh)
     ASSERT(0);
     return 0;
 }
-

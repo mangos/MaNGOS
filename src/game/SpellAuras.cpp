@@ -2319,7 +2319,7 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
             {
                 if (m_target->GetMap()->IsDungeon())
                 {
-                    uint32 spellId = m_target->GetMap()->IsHeroic() ? 46163 : 44190;
+                    uint32 spellId = ((InstanceMap*)m_target->GetMap())->GetDifficulty() == DIFFICULTY_DEFAULT ? 44190 : 46163;
 
                     m_target->CastSpell(m_target, spellId, true, NULL, this);
                 }
