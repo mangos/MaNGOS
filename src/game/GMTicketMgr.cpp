@@ -21,6 +21,7 @@
 #include "Database/SQLStorage.h"
 #include "GMTicketMgr.h"
 #include "ObjectMgr.h"
+#include "ObjectDefines.h"
 #include "ProgressBar.h"
 #include "Policies/SingletonImp.h"
 #include "Player.h"

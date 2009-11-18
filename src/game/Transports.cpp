@@ -21,6 +21,7 @@
 #include "Transports.h"
 #include "MapManager.h"
 #include "ObjectMgr.h"
+#include "ObjectDefines.h"
 #include "Path.h"
 
 #include "WorldPacket.h"
