@@ -126,6 +126,7 @@ class ChatHandler
         bool HandleCharacterLevelCommand(const char* args);
         bool HandleCharacterRenameCommand(const char * args);
         bool HandleCharacterReputationCommand(const char* args);
+        bool HandleCharacterTitlesCommand(const char* args);
 
         bool HandleDebugAnimCommand(const char* args);
         bool HandleDebugArenaCommand(const char * args);
@@ -238,8 +239,8 @@ class ChatHandler
         bool HandleLookupSpellCommand(const char* args);
         bool HandleLookupTaxiNodeCommand(const char * args);
         bool HandleLookupTeleCommand(const char * args);
+        bool HandleLookupTitleCommand(const char * args);
 
-        bool HandleModifyKnownTitlesCommand(const char* args);
         bool HandleModifyHPCommand(const char* args);
         bool HandleModifyManaCommand(const char* args);
         bool HandleModifyRageCommand(const char* args);
@@ -419,6 +420,11 @@ class ChatHandler
         bool HandleTeleDelCommand(const char * args);
         bool HandleTeleGroupCommand(const char* args);
         bool HandleTeleNameCommand(const char* args);
+
+        bool HandleTitlesAddCommand(const char* args);
+        bool HandleTitlesCurrentCommand(const char* args);
+        bool HandleTitlesRemoveCommand(const char* args);
+        bool HandleTitlesSetMaskCommand(const char* args);
 
         bool HandleUnBanAccountCommand(const char* args);
         bool HandleUnBanCharacterCommand(const char* args);
