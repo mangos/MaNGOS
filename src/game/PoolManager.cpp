@@ -18,6 +18,7 @@
 
 #include "PoolManager.h"
 #include "ObjectMgr.h"
+#include "ObjectDefines.h"
 #include "ProgressBar.h"
 #include "Log.h"
 #include "MapManager.h"

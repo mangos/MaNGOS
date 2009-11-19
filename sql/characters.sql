@@ -21,7 +21,7 @@
 
 DROP TABLE IF EXISTS `character_db_version`;
 CREATE TABLE `character_db_version` (
-  `required_8721_01_characters_guild` bit(1) default NULL
+  `required_8828_01_characters_instance_reset` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Last applied sql update to DB';
 
 --
@@ -1170,8 +1170,9 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `instance_reset`;
 CREATE TABLE `instance_reset` (
   `mapid` int(11) unsigned NOT NULL default '0',
+  `difficulty` tinyint(1) unsigned NOT NULL default '0',
   `resettime` bigint(40) NOT NULL default '0',
-  PRIMARY KEY  (`mapid`)
+  PRIMARY KEY  (`mapid`,`difficulty`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --

@@ -118,7 +118,7 @@ MapManager::_createBaseMap(uint32 id)
         }
         else
         {
-            m = new Map(id, i_gridCleanUpDelay, 0, DUNGEON_DIFFICULTY_NORMAL);
+            m = new Map(id, i_gridCleanUpDelay, 0, REGULAR_DIFFICULTY);
         }
         i_maps[id] = m;
     }
@@ -184,13 +184,11 @@ bool MapManager::CanPlayerEnter(uint32 mapid, Player* player)
         MapDifficulty const* mapDiff = GetMapDifficultyData(entry->MapID,player->GetDifficulty(entry->map_type == MAP_RAID));
         if (!mapDiff)
         {
-            bool isNormalTargetMap = entry->map_type == MAP_RAID
-                ? (player->GetRaidDifficulty()    == RAID_DIFFICULTY_10MAN_NORMAL)
-                : (player->GetDungeonDifficulty() == DUNGEON_DIFFICULTY_NORMAL);
+            bool isRegularTargetMap = player->GetDifficulty(entry->IsRaid()) == REGULAR_DIFFICULTY;
 
             //Send aborted message
             // FIX ME: what about absent normal/heroic mode with specific players limit...
-            player->SendTransferAborted(mapid, TRANSFER_ABORT_DIFFICULTY, isNormalTargetMap ? DUNGEON_DIFFICULTY_NORMAL : DUNGEON_DIFFICULTY_HEROIC);
+            player->SendTransferAborted(mapid, TRANSFER_ABORT_DIFFICULTY, isRegularTargetMap ? DUNGEON_DIFFICULTY_NORMAL : DUNGEON_DIFFICULTY_HEROIC);
             return false;
         }
 

@@ -23,6 +23,7 @@
 #include "Player.h"
 #include "World.h"
 #include "ObjectMgr.h"
+#include "ObjectDefines.h"
 #include "Group.h"
 #include "Formulas.h"
 #include "ObjectAccessor.h"

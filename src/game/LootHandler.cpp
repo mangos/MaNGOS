@@ -23,6 +23,7 @@
 #include "GameObject.h"
 #include "Player.h"
 #include "ObjectAccessor.h"
+#include "ObjectDefines.h"
 #include "WorldSession.h"
 #include "LootMgr.h"
 #include "Object.h"

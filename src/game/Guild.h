@@ -22,7 +22,9 @@
 #define WITHDRAW_MONEY_UNLIMITED    0xFFFFFFFF
 #define WITHDRAW_SLOT_UNLIMITED     0xFFFFFFFF
 
+#include "Common.h"
 #include "Item.h"
+#include "ObjectDefines.h"
 
 class Item;
 

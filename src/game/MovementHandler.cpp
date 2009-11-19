@@ -141,20 +141,13 @@ void WorldSession::HandleMoveWorldportAckOpcode()
         }
     }
 
-    if (mInstance)
+    if (mInstance && mEntry->IsDungeon())
     {
-        if(mEntry->IsRaid())
+        Difficulty diff = GetPlayer()->GetDifficulty(mEntry->IsRaid());
+        if (uint32 timeReset = sInstanceSaveMgr.GetResetTimeFor(GetPlayer()->GetMapId(),diff))
         {
-            uint32 timeleft = sInstanceSaveMgr.GetResetTimeFor(GetPlayer()->GetMapId()) - time(NULL);
-            GetPlayer()->SendInstanceResetWarning(GetPlayer()->GetMapId(), GetPlayer()->GetRaidDifficulty(), timeleft);
-        }
-        else if(mEntry->IsNonRaidDungeon() && GetPlayer()->GetDungeonDifficulty() > DUNGEON_DIFFICULTY_NORMAL)
-        {
-            if(MapDifficulty const* mapDiff = GetMapDifficultyData(mEntry->MapID,GetPlayer()->GetDungeonDifficulty()))
-            {
-                uint32 timeleft = sInstanceSaveMgr.GetResetTimeFor(GetPlayer()->GetMapId()) - time(NULL);
-                GetPlayer()->SendInstanceResetWarning(GetPlayer()->GetMapId(), GetPlayer()->GetDungeonDifficulty(), timeleft);
-            }
+            uint32 timeleft = timeReset - time(NULL);
+            GetPlayer()->SendInstanceResetWarning(GetPlayer()->GetMapId(), diff, timeleft);
         }
     }
 

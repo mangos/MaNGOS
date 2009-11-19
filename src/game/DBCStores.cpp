@@ -100,7 +100,6 @@ DBCStorage <MapEntry> sMapStore(MapEntryfmt);
 
 // DBC used only for initialization sMapDifficultyMap at startup.
 DBCStorage <MapDifficultyEntry> sMapDifficultyStore(MapDifficultyEntryfmt); // only for loading
-typedef std::map<uint32/*pair32(map,diff)*/,MapDifficulty> MapDifficultyMap;
 MapDifficultyMap sMapDifficultyMap;
 
 DBCStorage <MovieEntry> sMovieStore(MovieEntryfmt);

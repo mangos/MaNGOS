@@ -19,6 +19,7 @@
 #include "AccountMgr.h"
 #include "Database/DatabaseEnv.h"
 #include "ObjectAccessor.h"
+#include "ObjectDefines.h"
 #include "Player.h"
 #include "Policies/SingletonImp.h"
 #include "Util.h"

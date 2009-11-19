@@ -25,6 +25,7 @@
 #include "Log.h"
 #include "MapManager.h"
 #include "ObjectMgr.h"
+#include "ObjectDefines.h"
 #include "SpellMgr.h"
 #include "UpdateMask.h"
 #include "World.h"
@@ -4593,42 +4594,14 @@ void ObjectMgr::LoadInstanceTemplate()
         if(!temp)
             continue;
 
-        const MapEntry* entry = sMapStore.LookupEntry(temp->map);
-        if(!entry)
-        {
+        if(!MapManager::IsValidMAP(temp->map))
             sLog.outErrorDb("ObjectMgr::LoadInstanceTemplate: bad mapid %d for template!", temp->map);
-            continue;
-        }
 
-        //FIXME: now exist heroic instance, normal/heroic raid instances
-        // entry->resetTimeHeroic store reset time for both heroic mode instance (raid and non-raid)
-        // entry->resetTimeRaid   store reset time for normal raid only
-        // for current state  entry->resetTimeRaid == entry->resetTimeHeroic in case raid instances with heroic mode.
-        // but at some point wee need implement reset time dependent from raid instance mode
-        if(temp->reset_delay == 0)
+        if(!MapManager::IsValidMapCoord(temp->parent,temp->startLocX,temp->startLocY,temp->startLocZ,temp->startLocO))
         {
-            MapDifficulty const* mapDiffNorm   = GetMapDifficultyData(temp->map,DUNGEON_DIFFICULTY_NORMAL);
-            MapDifficulty const* mapDiffHeroic = GetMapDifficultyData(temp->map,DUNGEON_DIFFICULTY_HEROIC);
-
-            // no reset time
-            if ((!mapDiffNorm || mapDiffNorm->resetTime == 0) &&
-                (!mapDiffHeroic || mapDiffHeroic->resetTime == 0))
-                continue;
-
-            // use defaults from the DBC
-            if(mapDiffHeroic && mapDiffHeroic->resetTime)   // for both raid and non raids, read above
-            {
-                temp->reset_delay = mapDiffHeroic->resetTime / DAY;
-            }
-            else if (mapDiffNorm && mapDiffNorm->resetTime && entry->map_type == MAP_RAID)
-                                                            // for normal raid only
-            {
-                temp->reset_delay = mapDiffNorm->resetTime / DAY;
-            }
+            sLog.outErrorDb("ObjectMgr::LoadInstanceTemplate: bad parent entrance coordinates for map id %d template!", temp->map);
+            temp->parent = 0;                               // will have wrong continent 0 parent, at least existed
         }
-
-        // the reset_delay must be at least one day
-        temp->reset_delay = std::max((uint32)1, (uint32)(temp->reset_delay * sWorld.getRate(RATE_INSTANCE_RESET_TIME)));
     }
 
     sLog.outString( ">> Loaded %u Instance Template definitions", sInstanceTemplate.RecordCount );

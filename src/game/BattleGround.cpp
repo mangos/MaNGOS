@@ -27,6 +27,7 @@
 #include "ArenaTeam.h"
 #include "World.h"
 #include "Group.h"
+#include "ObjectDefines.h"
 #include "ObjectMgr.h"
 #include "WorldPacket.h"
 #include "Util.h"
