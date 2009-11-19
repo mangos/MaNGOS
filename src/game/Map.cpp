@@ -1127,6 +1127,23 @@ void Map::UnloadAll(bool pForce)
     }
 }
 
+MapDifficulty const* Map::GetMapDifficulty() const
+{
+    return GetMapDifficultyData(GetId(),GetDifficulty());
+}
+
+uint32 Map::GetMaxPlayers() const
+{
+    MapDifficulty const* mapDiff = GetMapDifficulty();
+    return mapDiff ? mapDiff->maxPlayers : 0;
+}
+
+uint32 Map::GetMaxResetDelay() const
+{
+    MapDifficulty const* mapDiff = GetMapDifficulty();
+    return mapDiff ? mapDiff->resetTime : 0;
+}
+
 //*****************************
 // Grid function
 //*****************************
@@ -2617,24 +2634,6 @@ void InstanceMap::SetResetSchedule(bool on)
         else sInstanceSaveMgr.ScheduleReset(on, save->GetResetTime(), InstanceSaveManager::InstResetEvent(0, GetId(), Difficulty(GetSpawnMode()), GetInstanceId()));
     }
 }
-
-MapDifficulty const* InstanceMap::GetMapDifficulty() const
-{
-    return GetMapDifficultyData(GetId(),GetDifficulty());
-}
-
-uint32 InstanceMap::GetMaxPlayers() const
-{
-    MapDifficulty const* mapDiff = GetMapDifficulty();
-    return mapDiff ? mapDiff->maxPlayers : 0;
-}
-
-uint32 InstanceMap::GetMaxResetDelay() const
-{
-    MapDifficulty const* mapDiff = GetMapDifficulty();
-    return mapDiff ? mapDiff->resetTime : 0;
-}
-
 
 /* ******* Battleground Instance Maps ******* */
 

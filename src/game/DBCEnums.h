@@ -234,7 +234,7 @@ enum AreaFlags
 
 enum Difficulty
 {
-    DIFFICULTY_DEFAULT           = 0,
+    REGULAR_DEFAULT              = 0,
 
     DUNGEON_DIFFICULTY_NORMAL    = 0,
     DUNGEON_DIFFICULTY_HEROIC    = 1,
@@ -251,7 +251,7 @@ enum Difficulty
 
 enum SpawnMask
 {
-    SPAWNMASK_CONTINENT         = (1 << DIFFICULTY_DEFAULT),// any any maps without spawn modes
+    SPAWNMASK_REGULAR           = (1 << REGULAR_DEFAULT),   // any any maps without spawn modes (continents/subway) or in minimal spawnmode
 
     SPAWNMASK_DUNGEON_NORMAL    = (1 << DUNGEON_DIFFICULTY_NORMAL),
     SPAWNMASK_DUNGEON_HEROIC    = (1 << DUNGEON_DIFFICULTY_HEROIC),
