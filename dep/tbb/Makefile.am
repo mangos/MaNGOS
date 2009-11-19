@@ -49,7 +49,7 @@ tbbmalloc:
 	$(MAKE) -r -f $(tbb_root)/build/Makefile.tbbmalloc cfg=release malloc tbb_root=$(tbb_root)
 
 install-exec-local:
-	$(INSTALL) $(work_dir)/lib*.so* $(libdir)
+	$(INSTALL) $(work_dir)/lib*.so* $(DESTDIR)$(libdir)
 
 clean-local:
 	-rm -f *.d *.o
