@@ -48,6 +48,7 @@ libmangosshared_a_SOURCES = \
 	Util.h \
 	WorldPacket.h \
 	revision_nr.h \
+	revision_sql.h \
 	revision.h
 
 # Get revision (git or svn)
