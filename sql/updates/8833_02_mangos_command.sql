@@ -1,6 +1,6 @@
 ALTER TABLE db_version CHANGE COLUMN required_8833_01_mangos_mangos_string required_8833_02_mangos_command bit;
 
-DELETE FROM command where name IN ('character titles','modify titles','titles add','titles current','titles remove');
+DELETE FROM command where name IN ('character titles','modify titles','titles add','titles current','titles remove','titles setmask');
 
 INSERT INTO `command` VALUES
 ('character titles',2,'Syntax: .character titles [$player_name]\r\n\r\nShow known titles list for selected player or player find by $player_name.'),
