@@ -4714,15 +4714,6 @@ void Spell::EffectWeaponDmg(uint32 i)
             else
                 m_caster->CastCustomSpell(m_caster, 53725, &damagePoint, NULL, NULL, true);
         }
-        // Seal of Blood/of the Martyr backlash damage (10%)
-        else if(m_spellInfo->SpellIconID==2293)
-        {
-            int32 damagePoint  = m_damage * 10 / 100;
-            if(m_spellInfo->Id == 31893)
-                m_caster->CastCustomSpell(m_caster, 32221, &damagePoint, NULL, NULL, true);
-            else
-                m_caster->CastCustomSpell(m_caster, 53718, &damagePoint, NULL, NULL, true);
-        }
     }
 
     // take ammo
