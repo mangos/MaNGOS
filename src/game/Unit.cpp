@@ -5793,20 +5793,32 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     }
                     return true;
                 }
-                // Judgements of the Wise
-                case 31876:
-                case 31877:
-                case 31878:
-                    // triggered only at casted Judgement spells, not at additional Judgement effects
-                    if(!procSpell || procSpell->Category != 1210)
-                        return false;
-
-                    target = this;
-                    triggered_spell_id = 31930;
-
-                    // Replenishment
-                    CastSpell(this, 57669, true, NULL, triggeredByAura);
+                // Heart of the Crusader (Rank 1)
+                case 20335:
+                    triggered_spell_id = 21183;
                     break;
+                // Heart of the Crusader (Rank 2)
+                case 20336:
+                    triggered_spell_id = 54498;
+                    break;
+                // Heart of the Crusader (Rank 3)
+                case 20337:
+                    triggered_spell_id = 54499;
+                    break;
+                case 20911:                                 // Blessing of Sanctuary
+                case 25899:                                 // Greater Blessing of Sanctuary
+                {
+                    target = this;
+                    switch (target->getPowerType())
+                    {
+                        case POWER_MANA:
+                            triggered_spell_id = 57319;
+                            break;
+                        default:
+                            return false;
+                    }
+                    break;
+                }
                 // Holy Power (Redemption Armor set)
                 case 28789:
                 {
@@ -5838,20 +5850,6 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     }
                     break;
                 }
-                case 25899:                                 // Greater Blessing of Sanctuary
-                case 20911:                                 // Blessing of Sanctuary
-                {
-                    target = this;
-                    switch (target->getPowerType())
-                    {
-                        case POWER_MANA:
-                            triggered_spell_id = 57319;
-                            break;
-                        default:
-                            return false;
-                    }
-                    break;
-                }
                 // Seal of Vengeance (damage calc on apply aura)
                 case 31801:
                 {
@@ -5875,6 +5873,62 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                         CastSpell(target,42463,true,NULL,triggeredByAura);
                     break;
                 }
+                // Judgements of the Wise
+                case 31876:
+                case 31877:
+                case 31878:
+                    // triggered only at casted Judgement spells, not at additional Judgement effects
+                    if(!procSpell || procSpell->Category != 1210)
+                        return false;
+
+                    target = this;
+                    triggered_spell_id = 31930;
+
+                    // Replenishment
+                    CastSpell(this, 57669, true, NULL, triggeredByAura);
+                    break;
+                // Spiritual Attunement
+                case 31785:
+                case 33776:
+                {
+                    // if healed by another unit (pVictim)
+                    if(this == pVictim)
+                        return false;
+
+                    // heal amount
+                    basepoints0 = triggerAmount*damage/100;
+                    target = this;
+                    triggered_spell_id = 31786;
+                    break;
+                }
+                // Paladin Tier 6 Trinket (Ashtongue Talisman of Zeal)
+                case 40470:
+                {
+                    if (!procSpell)
+                        return false;
+
+                    float  chance;
+
+                    // Flash of light/Holy light
+                    if (procSpell->SpellFamilyFlags & UI64LIT(0x00000000C0000000))
+                    {
+                        triggered_spell_id = 40471;
+                        chance = 15.0f;
+                    }
+                    // Judgement (any)
+                    else if (GetSpellSpecific(procSpell->Id)==SPELL_JUDGEMENT)
+                    {
+                        triggered_spell_id = 40472;
+                        chance = 50.0f;
+                    }
+                    else
+                        return false;
+
+                    if (!roll_chance_f(chance))
+                        return false;
+
+                    break;
+                }
                 // Seal of Corruption (damage calc on apply aura)
                 case 53736:
                 {
@@ -5896,20 +5950,6 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     }
                     if(stacks >= 5)
                         CastSpell(target,53739,true,NULL,triggeredByAura);
-                    break;
-                }
-                // Spiritual Attunement
-                case 31785:
-                case 33776:
-                {
-                    // if healed by another unit (pVictim)
-                    if(this == pVictim)
-                        return false;
-
-                    // heal amount
-                    basepoints0 = triggerAmount*damage/100;
-                    target = this;
-                    triggered_spell_id = 31786;
                     break;
                 }
                 // Light's Beacon (heal target area aura)
@@ -5946,34 +5986,6 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     // cast with original caster set but beacon to beacon for apply caster mods and avoid LoS check
                     beacon->CastCustomSpell(beacon,triggered_spell_id,&basepoints0,NULL,NULL,true,castItem,triggeredByAura,pVictim->GetGUID());
                     return true;
-                }
-                // Paladin Tier 6 Trinket (Ashtongue Talisman of Zeal)
-                case 40470:
-                {
-                    if (!procSpell)
-                        return false;
-
-                    float  chance;
-
-                    // Flash of light/Holy light
-                    if (procSpell->SpellFamilyFlags & UI64LIT(0x00000000C0000000))
-                    {
-                        triggered_spell_id = 40471;
-                        chance = 15.0f;
-                    }
-                    // Judgement (any)
-                    else if (GetSpellSpecific(procSpell->Id)==SPELL_JUDGEMENT)
-                    {
-                        triggered_spell_id = 40472;
-                        chance = 50.0f;
-                    }
-                    else
-                        return false;
-
-                    if (!roll_chance_f(chance))
-                        return false;
-
-                    break;
                 }
                 // Glyph of Divinity
                 case 54939:
