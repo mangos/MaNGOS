@@ -310,7 +310,7 @@ OpcodeHandler opcodeTable[NUM_MSG_TYPES] =
     /*0x119*/ { "CMSG_IGNORE_TRADE",                            STATUS_LOGGEDIN, &WorldSession::HandleIgnoreTradeOpcode         },
     /*0x11A*/ { "CMSG_ACCEPT_TRADE",                            STATUS_LOGGEDIN, &WorldSession::HandleAcceptTradeOpcode         },
     /*0x11B*/ { "CMSG_UNACCEPT_TRADE",                          STATUS_LOGGEDIN, &WorldSession::HandleUnacceptTradeOpcode       },
-    /*0x11C*/ { "CMSG_CANCEL_TRADE",                            STATUS_LOGGEDIN_OR_RECENTLY_LOGGOUT, &WorldSession::HandleCancelTradeOpcode},
+    /*0x11C*/ { "CMSG_CANCEL_TRADE",                            STATUS_LOGGEDIN_OR_RECENTLY_LOGGEDOUT, &WorldSession::HandleCancelTradeOpcode},
     /*0x11D*/ { "CMSG_SET_TRADE_ITEM",                          STATUS_LOGGEDIN, &WorldSession::HandleSetTradeItemOpcode        },
     /*0x11E*/ { "CMSG_CLEAR_TRADE_ITEM",                        STATUS_LOGGEDIN, &WorldSession::HandleClearTradeItemOpcode      },
     /*0x11F*/ { "CMSG_SET_TRADE_GOLD",                          STATUS_LOGGEDIN, &WorldSession::HandleSetTradeGoldOpcode        },
