@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_8840_01_mangos_spell_proc_event` bit(1) default NULL
+  `required_8841_02_mangos_spell_chain` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -17125,6 +17125,10 @@ INSERT INTO spell_chain VALUES
 (51423,49020,49020,2,0),
 (51424,51423,49020,3,0),
 (51425,51424,49020,4,0),
+/*Threat of Thassarian*/
+(65661,0,65661,1,0),
+(66191,65661,65661,2,0),
+(66192,66191,65661,3,0),
 /*------------------
 --(772)Unholy
 ------------------*/
@@ -17567,7 +17571,7 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `spell_proc_event`;
 CREATE TABLE `spell_proc_event` (
-  `entry` smallint(5) unsigned NOT NULL default '0',
+  `entry` mediumint(8) unsigned NOT NULL default '0',
   `SchoolMask` tinyint(4) NOT NULL default '0',
   `SpellFamilyName` smallint(5) unsigned NOT NULL default '0',
   `SpellFamilyMask0` int(10) unsigned NOT NULL default '0',
@@ -18362,7 +18366,9 @@ INSERT INTO `spell_proc_event` VALUES
 (63245, 0x00000000,  5, 0x00000100, 0x00800000, 0x00000000, 0x00000000, 0x00000002, 0.000000, 0.000000,  0),
 (63320, 0x00000000,  5, 0x00040000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0.000000, 0.000000,  0),
 (63730, 0x00000000,  6, 0x00000800, 0x00000004, 0x00000000, 0x00000000, 0x00000000, 0.000000, 0.000000,  0),
-(64928, 0x00000000, 11, 0x00000001, 0x00000000, 0x00000000, 0x00000000, 0x00000002, 0.000000, 0.000000,  0);
+(64928, 0x00000000, 11, 0x00000001, 0x00000000, 0x00000000, 0x00000000, 0x00000002, 0.000000, 0.000000,  0),
+(65661, 0x00000000, 15, 0x00400010, 0x20020004, 0x00000000, 0x00000010, 0x00000000, 0.000000, 100.000000, 0);
+
 /*!40000 ALTER TABLE `spell_proc_event` ENABLE KEYS */;
 UNLOCK TABLES;
 
