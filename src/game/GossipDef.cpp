@@ -160,7 +160,7 @@ void PlayerMenu::SendGossipMenu( uint32 TitleTextId, uint64 npcGUID )
             QuestLocale const *ql = sObjectMgr.GetQuestLocale(questID);
             if (ql)
             {
-                if (ql->Title.size() > loc_idx && !ql->Title[loc_idx].empty())
+                if (ql->Title.size() > (uint)loc_idx && !ql->Title[loc_idx].empty())
                     Title=ql->Title[loc_idx];
             }
         }
@@ -266,9 +266,9 @@ void PlayerMenu::SendTalking( uint32 textID )
             {
                 for (int i=0;i<8;++i)
                 {
-                    if (nl->Text_0[i].size() > loc_idx && !nl->Text_0[i][loc_idx].empty())
+                    if (nl->Text_0[i].size() > (uint)loc_idx && !nl->Text_0[i][loc_idx].empty())
                         Text_0[i]=nl->Text_0[i][loc_idx];
-                    if (nl->Text_1[i].size() > loc_idx && !nl->Text_1[i][loc_idx].empty())
+                    if (nl->Text_1[i].size() > (uint)loc_idx && !nl->Text_1[i][loc_idx].empty())
                         Text_1[i]=nl->Text_1[i][loc_idx];
                 }
             }
@@ -393,7 +393,7 @@ void PlayerMenu::SendQuestGiverQuestList( QEmote eEmote, const std::string& Titl
         {
             if(QuestLocale const *ql = sObjectMgr.GetQuestLocale(questID))
             {
-                if (ql->Title.size() > loc_idx && !ql->Title[loc_idx].empty())
+                if (ql->Title.size() > (uint)loc_idx && !ql->Title[loc_idx].empty())
                     title=ql->Title[loc_idx];
             }
         }
@@ -432,13 +432,13 @@ void PlayerMenu::SendQuestGiverQuestDetails( Quest const *pQuest, uint64 npcGUID
         QuestLocale const *ql = sObjectMgr.GetQuestLocale(pQuest->GetQuestId());
         if (ql)
         {
-            if (ql->Title.size() > loc_idx && !ql->Title[loc_idx].empty())
+            if (ql->Title.size() > (uint)loc_idx && !ql->Title[loc_idx].empty())
                 Title=ql->Title[loc_idx];
-            if (ql->Details.size() > loc_idx && !ql->Details[loc_idx].empty())
+            if (ql->Details.size() > (uint)loc_idx && !ql->Details[loc_idx].empty())
                 Details=ql->Details[loc_idx];
-            if (ql->Objectives.size() > loc_idx && !ql->Objectives[loc_idx].empty())
+            if (ql->Objectives.size() > (uint)loc_idx && !ql->Objectives[loc_idx].empty())
                 Objectives=ql->Objectives[loc_idx];
-            if (ql->EndText.size() > loc_idx && !ql->EndText[loc_idx].empty())
+            if (ql->EndText.size() > (uint)loc_idx && !ql->EndText[loc_idx].empty())
                 EndText=ql->EndText[loc_idx];
         }
     }
@@ -528,17 +528,17 @@ void PlayerMenu::SendQuestQueryResponse( Quest const *pQuest )
         QuestLocale const *ql = sObjectMgr.GetQuestLocale(pQuest->GetQuestId());
         if (ql)
         {
-            if (ql->Title.size() > loc_idx && !ql->Title[loc_idx].empty())
+            if (ql->Title.size() > (uint)loc_idx && !ql->Title[loc_idx].empty())
                 Title=ql->Title[loc_idx];
-            if (ql->Details.size() > loc_idx && !ql->Details[loc_idx].empty())
+            if (ql->Details.size() > (uint)loc_idx && !ql->Details[loc_idx].empty())
                 Details=ql->Details[loc_idx];
-            if (ql->Objectives.size() > loc_idx && !ql->Objectives[loc_idx].empty())
+            if (ql->Objectives.size() > (uint)loc_idx && !ql->Objectives[loc_idx].empty())
                 Objectives=ql->Objectives[loc_idx];
-            if (ql->EndText.size() > loc_idx && !ql->EndText[loc_idx].empty())
+            if (ql->EndText.size() > (uint)loc_idx && !ql->EndText[loc_idx].empty())
                 EndText=ql->EndText[loc_idx];
 
             for (int i = 0;i < QUEST_OBJECTIVES_COUNT; ++i)
-                if (ql->ObjectiveText[i].size() > loc_idx && !ql->ObjectiveText[i][loc_idx].empty())
+                if (ql->ObjectiveText[i].size() > (uint)loc_idx && !ql->ObjectiveText[i][loc_idx].empty())
                     ObjectiveText[i] = ql->ObjectiveText[i][loc_idx];
         }
     }
@@ -650,9 +650,9 @@ void PlayerMenu::SendQuestGiverOfferReward( Quest const* pQuest, uint64 npcGUID,
         QuestLocale const *ql = sObjectMgr.GetQuestLocale(pQuest->GetQuestId());
         if (ql)
         {
-            if (ql->Title.size() > loc_idx && !ql->Title[loc_idx].empty())
+            if (ql->Title.size() > (uint)loc_idx && !ql->Title[loc_idx].empty())
                 Title=ql->Title[loc_idx];
-            if (ql->OfferRewardText.size() > loc_idx && !ql->OfferRewardText[loc_idx].empty())
+            if (ql->OfferRewardText.size() > (uint)loc_idx && !ql->OfferRewardText[loc_idx].empty())
                 OfferRewardText=ql->OfferRewardText[loc_idx];
         }
     }
@@ -738,9 +738,9 @@ void PlayerMenu::SendQuestGiverRequestItems( Quest const *pQuest, uint64 npcGUID
         QuestLocale const *ql = sObjectMgr.GetQuestLocale(pQuest->GetQuestId());
         if (ql)
         {
-            if (ql->Title.size() > loc_idx && !ql->Title[loc_idx].empty())
+            if (ql->Title.size() > (uint)loc_idx && !ql->Title[loc_idx].empty())
                 Title=ql->Title[loc_idx];
-            if (ql->RequestItemsText.size() > loc_idx && !ql->RequestItemsText[loc_idx].empty())
+            if (ql->RequestItemsText.size() > (uint)loc_idx && !ql->RequestItemsText[loc_idx].empty())
                 RequestItemsText=ql->RequestItemsText[loc_idx];
         }
     }

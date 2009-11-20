@@ -291,8 +291,6 @@ int Master::Run()
     uint32 realCurrTime, realPrevTime;
     realCurrTime = realPrevTime = getMSTime();
 
-    uint32 socketSelecttime = sWorld.getConfig(CONFIG_SOCKET_SELECTTIME);
-
     ///- Start up freeze catcher thread
     if(uint32 freeze_delay = sConfig.GetIntDefault("MaxCoreStuckTime", 0))
     {

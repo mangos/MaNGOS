@@ -45,7 +45,7 @@ static void AttemptJoin(Player* _player)
             continue;
 
         // skip not auto add, not group leader cases
-        if(!plr->GetSession()->LookingForGroup_auto_add || plr->GetGroup() && plr->GetGroup()->GetLeaderGUID()!=plr->GetGUID())
+        if (!plr->GetSession()->LookingForGroup_auto_add || (plr->GetGroup() && plr->GetGroup()->GetLeaderGUID()!=plr->GetGUID()))
             continue;
 
         // skip non auto-join or empty slots, or non compatible slots
