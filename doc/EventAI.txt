@@ -136,7 +136,7 @@ Each event type has its own specific interpretation of it's params, like every e
 38   ACTION_T_ZONE_COMBAT_PULSE        No Params                       Puts all players within an instance into combat with the creature. Only works when a creature is already in combat. Doesn't work outside instances.
 39   ACTION_T_CALL_FOR_HELP            Radius                          Call any friendly out-of-combat creatures in a radius (Param1) to attack current creature's target.
 40   ACTION_T_SET_SHEATH               Sheath                          Sets sheath state for a creature (0 = no weapon, 1 = melee weapon, 2 = ranged weapon).
-41   ACTION_T_FORCE_DESPAWN            No Params                       Despawns the creature
+41   ACTION_T_FORCE_DESPAWN            Delay                           Despawns the creature, if delay = 0 immediate otherwise after delay (in ms).
 42   ACTION_T_SET_INVINCIBILITY_HP_LEVEL hp_level, is_percent          Set min. health level for creature that can be set at damage as flat value or percent from max health
 
 * = Use -1 where the param is expected to do nothing. Random constant is generated for each event, so if you have a random yell and a random sound, they will be linked up with each other (ie. param2 with param2).
