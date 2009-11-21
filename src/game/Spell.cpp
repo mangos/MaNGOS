@@ -992,6 +992,13 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
         if (m_canTrigger && missInfo != SPELL_MISS_REFLECT)
             caster->ProcDamageAndSpell(unitTarget, procAttacker, procVictim, procEx, damageInfo.damage, m_attackType, m_spellInfo);
 
+        // Haunt (NOTE: for avoid use additional field damage stored in dummy value (replace unused 100%)
+        // apply before deal damage because aura can be removed at target kill
+        if (m_spellInfo->SpellFamilyName == SPELLFAMILY_WARLOCK && m_spellInfo->SpellIconID == 3172 &&
+            (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0004000000000000)))
+            if(Aura* dummy = unitTarget->GetDummyAura(m_spellInfo->Id))
+                dummy->GetModifier()->m_amount = damageInfo.damage;
+
         caster->DealSpellDamage(&damageInfo, true);
     }
     // Passive spell hits/misses or active spells only misses (only triggers)
