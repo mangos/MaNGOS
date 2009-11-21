@@ -6621,7 +6621,23 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
                     // intellect
                     if (GetStat(STAT_INTELLECT)> stat) { trigger_spell_id = 60234;stat = GetStat(STAT_INTELLECT);}
                     // spirit
-                    if (GetStat(STAT_SPIRIT)   > stat) { trigger_spell_id = 60235;stat = GetStat(STAT_SPIRIT);   }
+                    if (GetStat(STAT_SPIRIT)   > stat) { trigger_spell_id = 60235;                               }
+                }
+                else if (auraSpellInfo->Id==67702)          // Death's Choice, Item - Coliseum 25 Normal Melee Trinket
+                {
+                    float stat = 0.0f;
+                    // strength
+                    if (GetStat(STAT_STRENGTH) > stat) { trigger_spell_id = 67708;stat = GetStat(STAT_STRENGTH); }
+                    // agility
+                    if (GetStat(STAT_AGILITY)  > stat) { trigger_spell_id = 67703;                               }
+                }
+                else if (auraSpellInfo->Id==67771)          // Death's Choice (heroic), Item - Coliseum 25 Heroic Melee Trinket
+                {
+                    float stat = 0.0f;
+                    // strength
+                    if (GetStat(STAT_STRENGTH) > stat) { trigger_spell_id = 67773;stat = GetStat(STAT_STRENGTH); }
+                    // agility
+                    if (GetStat(STAT_AGILITY)  > stat) { trigger_spell_id = 67772;                               }
                 }
                 //else if (auraSpellInfo->Id==31255)        // Deadly Swiftness (Rank 1)
                 //else if (auraSpellInfo->Id==5301)         // Defensive State (DND)
