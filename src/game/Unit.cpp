@@ -12771,13 +12771,13 @@ uint32 Unit::GetCombatRatingDamageReduction(CombatRating cr, float rate, float c
 
 void Unit::SendThreatUpdate()
 {
-    if (uint32 count = getThreatManager().getThreatList().size())
+    ThreatList const& tlist = getThreatManager().getThreatList();
+    if (uint32 count = tlist.size())
     {
         sLog.outDebug( "WORLD: Send SMSG_THREAT_UPDATE Message" );
         WorldPacket data(SMSG_THREAT_UPDATE, 8 + count * 8);
         data.append(GetPackGUID());
         data << uint32(count);
-        ThreatList& tlist = getThreatManager().getThreatList();
         for (ThreatList::const_iterator itr = tlist.begin(); itr != tlist.end(); ++itr)
         {
             data.appendPackGUID((*itr)->getUnitGuid());
@@ -12789,14 +12789,14 @@ void Unit::SendThreatUpdate()
 
 void Unit::SendHighestThreatUpdate(HostileReference* pHostilReference)
 {
-    if (uint32 count = getThreatManager().getThreatList().size())
+    ThreatList const& tlist = getThreatManager().getThreatList();
+    if (uint32 count = tlist.size())
     {
         sLog.outDebug( "WORLD: Send SMSG_HIGHEST_THREAT_UPDATE Message" );
         WorldPacket data(SMSG_HIGHEST_THREAT_UPDATE, 8 + 8 + count * 8);
         data.append(GetPackGUID());
         data.appendPackGUID(pHostilReference->getUnitGuid());
         data << uint32(count);
-        ThreatList const& tlist = getThreatManager().getThreatList();
         for (ThreatList::const_iterator itr = tlist.begin(); itr != tlist.end(); ++itr)
         {
             data.appendPackGUID((*itr)->getUnitGuid());
