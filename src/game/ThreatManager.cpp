@@ -208,7 +208,7 @@ Unit* HostileReference::getSourceUnit()
 
 void ThreatContainer::clearReferences()
 {
-    for(std::list<HostileReference*>::const_iterator i = iThreatList.begin(); i != iThreatList.end(); ++i)
+    for(ThreatList::const_iterator i = iThreatList.begin(); i != iThreatList.end(); ++i)
     {
         (*i)->unlink();
         delete (*i);
@@ -222,7 +222,7 @@ HostileReference* ThreatContainer::getReferenceByTarget(Unit* pVictim)
 {
     HostileReference* result = NULL;
     uint64 guid = pVictim->GetGUID();
-    for(std::list<HostileReference*>::const_iterator i = iThreatList.begin(); i != iThreatList.end(); ++i)
+    for(ThreatList::const_iterator i = iThreatList.begin(); i != iThreatList.end(); ++i)
     {
         if((*i)->getUnitGuid() == guid)
         {
@@ -283,10 +283,10 @@ HostileReference* ThreatContainer::selectNextVictim(Creature* pAttacker, Hostile
     bool found = false;
     bool noPriorityTargetFound = false;
 
-    std::list<HostileReference*>::const_iterator lastRef = iThreatList.end();
+    ThreatList::const_iterator lastRef = iThreatList.end();
     lastRef--;
 
-    for(std::list<HostileReference*>::const_iterator iter = iThreatList.begin(); iter != iThreatList.end() && !found;)
+    for(ThreatList::const_iterator iter = iThreatList.begin(); iter != iThreatList.end() && !found;)
     {
         currentRef = (*iter);
 
@@ -351,7 +351,7 @@ HostileReference* ThreatContainer::selectNextVictim(Creature* pAttacker, Hostile
 //=================== ThreatManager ==========================
 //============================================================
 
-ThreatManager::ThreatManager(Unit* owner) : iCurrentVictim(NULL), iOwner(owner)
+ThreatManager::ThreatManager(Unit* owner) : iCurrentVictim(NULL), iOwner(owner), iUpdateTimer(THREAT_UPDATE_INTERVAL)
 {
 }
 
@@ -362,6 +362,7 @@ void ThreatManager::clearReferences()
     iThreatContainer.clearReferences();
     iThreatOfflineContainer.clearReferences();
     iCurrentVictim = NULL;
+    iUpdateTimer.Reset(THREAT_UPDATE_INTERVAL);
 }
 
 //============================================================
@@ -461,6 +462,9 @@ void ThreatManager::tauntFadeOut(Unit *pTaunter)
 
 void ThreatManager::setCurrentVictim(HostileReference* pHostileReference)
 {
+    if (pHostileReference && pHostileReference != iCurrentVictim)
+        iOwner->SendHighestThreatUpdate(pHostileReference);
+
     iCurrentVictim = pHostileReference;
 }
 
@@ -506,10 +510,24 @@ void ThreatManager::processThreatEvent(ThreatRefStatusChangeEvent* threatRefStat
                 setCurrentVictim(NULL);
                 setDirty(true);
             }
+            iOwner->SendThreatRemove(hostileReference);
             if(hostileReference->isOnline())
                 iThreatContainer.remove(hostileReference);
             else
                 iThreatOfflineContainer.remove(hostileReference);
             break;
+    }
+}
+
+void ThreatManager::UpdateForClient(uint32 diff)
+{
+    if (isThreatListEmpty())
+        return;
+
+    iUpdateTimer.Update(diff);
+    if (iUpdateTimer.Passed())
+    {
+        iOwner->SendThreatUpdate();
+        iUpdateTimer.Reset(THREAT_UPDATE_INTERVAL);
     }
 }

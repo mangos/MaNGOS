@@ -23,7 +23,7 @@
 #include "SharedDefines.h"
 #include "Utilities/LinkedReference/Reference.h"
 #include "UnitEvents.h"
-
+#include "Timer.h"
 #include <list>
 
 //==============================================================
@@ -32,6 +32,8 @@ class Unit;
 class Creature;
 class ThreatManager;
 struct SpellEntry;
+
+#define THREAT_UPDATE_INTERVAL 1 * IN_MILISECONDS    // Server should send threat update to client periodically each second
 
 //==============================================================
 // Class to calculate the real threat based
@@ -127,10 +129,13 @@ class MANGOS_DLL_SPEC HostileReference : public Reference<Unit, ThreatManager>
 //==============================================================
 class ThreatManager;
 
+typedef std::list<HostileReference*> ThreatList;
+
+
 class MANGOS_DLL_SPEC ThreatContainer
 {
     private:
-        std::list<HostileReference*> iThreatList;
+        ThreatList iThreatList;
         bool iDirty;
     protected:
         friend class ThreatManager;
@@ -160,7 +165,8 @@ class MANGOS_DLL_SPEC ThreatContainer
 
         HostileReference* getReferenceByTarget(Unit* pVictim);
 
-        std::list<HostileReference*>& getThreatList() { return iThreatList; }
+        ThreatList& getThreatList() { return iThreatList; }
+        ThreatList const& getThreatList() const { return iThreatList; }
 };
 
 //=================================================
@@ -186,6 +192,8 @@ class MANGOS_DLL_SPEC ThreatManager
 
         void processThreatEvent(ThreatRefStatusChangeEvent* threatRefStatusChangeEvent);
 
+        void UpdateForClient(uint32 time);
+
         HostileReference* getCurrentVictim() { return iCurrentVictim; }
 
         Unit*  getOwner() { return iOwner; }
@@ -201,13 +209,18 @@ class MANGOS_DLL_SPEC ThreatManager
 
         // methods to access the lists from the outside to do sume dirty manipulation (scriping and such)
         // I hope they are used as little as possible.
-        std::list<HostileReference*>& getThreatList() { return iThreatContainer.getThreatList(); }
-        std::list<HostileReference*>& getOfflieThreatList() { return iThreatOfflineContainer.getThreatList(); }
+        ThreatList& getThreatList() { return iThreatContainer.getThreatList(); }
+        ThreatList const& getThreatList() const { return iThreatContainer.getThreatList(); }
+        ThreatList& getOfflieThreatList() { return iThreatOfflineContainer.getThreatList(); }
+        ThreatList const& getOfflieThreatList() const { return iThreatOfflineContainer.getThreatList(); }
         ThreatContainer& getOnlineContainer() { return iThreatContainer; }
+        ThreatContainer const& getOnlineContainer() const { return iThreatContainer; }
         ThreatContainer& getOfflineContainer() { return iThreatOfflineContainer; }
+        ThreatContainer const& getOfflineContainer() const { return iThreatOfflineContainer; }
     private:
         HostileReference* iCurrentVictim;
         Unit* iOwner;
+        TimeTrackerSmall iUpdateTimer;
         ThreatContainer iThreatContainer;
         ThreatContainer iThreatOfflineContainer;
 };
