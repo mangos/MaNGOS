@@ -9006,16 +9006,16 @@ uint8 Player::_CanStoreItem_InBag( uint8 bag, ItemPosCountVec &dest, ItemPrototy
         Item* pItem2 = GetItemByPos( bag, j );
 
         // ignore move item (this slot will be empty at move)
-        if (pItem2==pSrcItem)
+        if (pItem2 == pSrcItem)
             pItem2 = NULL;
 
         // if merge skip empty, if !merge skip non-empty
-        if ((pItem2!=NULL)!=merge)
+        if ((pItem2 != NULL) != merge)
             continue;
 
         if (pItem2)
         {
-            if (pItem2->GetEntry() == pProto->ItemId && pItem2->GetCount() < pProto->GetMaxStackSize())
+            if (!pItem2->m_lootGenerated && pItem2->GetEntry() == pProto->ItemId && pItem2->GetCount() < pProto->GetMaxStackSize())
             {
                 uint32 need_space = pProto->GetMaxStackSize() - pItem2->GetCount();
                 if(need_space > count)
@@ -9067,12 +9067,12 @@ uint8 Player::_CanStoreItem_InInventorySlots( uint8 slot_begin, uint8 slot_end, 
             pItem2 = NULL;
 
         // if merge skip empty, if !merge skip non-empty
-        if ((pItem2!=NULL)!=merge)
+        if ((pItem2 != NULL) != merge)
             continue;
 
         if (pItem2)
         {
-            if (pItem2->GetEntry() == pProto->ItemId && pItem2->GetCount() < pProto->GetMaxStackSize())
+            if (!pItem2->m_lootGenerated && pItem2->GetEntry() == pProto->ItemId && pItem2->GetCount() < pProto->GetMaxStackSize())
             {
                 uint32 need_space = pProto->GetMaxStackSize() - pItem2->GetCount();
                 if (need_space > count)
