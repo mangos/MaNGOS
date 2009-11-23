@@ -206,10 +206,8 @@ class MANGOS_DLL_SPEC ThreatManager
 
         void setDirty(bool pDirty) { iThreatContainer.setDirty(pDirty); }
 
-        // Don't must be used for explcit modify threat values in iterator return pointers
+        // Don't must be used for explicit modify threat values in iterator return pointers
         ThreatList const& getThreatList() const { return iThreatContainer.getThreatList(); }
-        //FIXME: currently used in some known script hacks, but expected as non needed 
-        ThreatContainer& getOnlineContainer() { return iThreatContainer; }
     private:
         HostileReference* iCurrentVictim;
         Unit* iOwner;
