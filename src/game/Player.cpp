@@ -1335,7 +1335,7 @@ void Player::Update( uint32 p_time )
     SendUpdateToOutOfRangeGroupMembers();
 
     Pet* pet = GetPet();
-    if(pet && !IsWithinDistInMap(pet, OWNER_MAX_DISTANCE) && (GetCharmGUID() && (pet->GetGUID() != GetCharmGUID())))
+    if(pet && !pet->IsWithinDistInMap(this, GetMap()->GetVisibilityDistance()) && (GetCharmGUID() && (pet->GetGUID() != GetCharmGUID())))
     {
         RemovePet(pet, PET_SAVE_NOT_IN_SLOT, true);
     }
@@ -1651,7 +1651,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
         if (!(options & TELE_TO_NOT_UNSUMMON_PET))
         {
             //same map, only remove pet if out of range for new position
-            if(pet && !pet->IsWithinDist3d(x,y,z, OWNER_MAX_DISTANCE))
+            if(pet && !pet->IsWithinDist3d(x,y,z,GetMap()->GetVisibilityDistance()))
                 UnsummonPetTemporaryIfAny();
         }
 
@@ -18095,12 +18095,27 @@ bool Player::IsVisibleGloballyFor( Player* u ) const
     return true;
 }
 
+template<class T>
+inline void BeforeVisibilityDestroy(T* /*t*/, Player* /*p*/)
+{
+}
+
+template<>
+inline void BeforeVisibilityDestroy<Creature>(Creature* t, Player* p)
+{
+    if (p->GetPetGUID()==t->GetGUID() && ((Creature*)t)->isPet())
+        ((Pet*)t)->Remove(PET_SAVE_NOT_IN_SLOT, true);
+}
+
 void Player::UpdateVisibilityOf(WorldObject const* viewPoint, WorldObject* target)
 {
     if(HaveAtClient(target))
     {
         if(!target->isVisibleForInState(this, viewPoint, true))
         {
+            if (target->GetTypeId()==TYPEID_UNIT)
+                BeforeVisibilityDestroy<Creature>((Creature*)target,this);
+
             target->DestroyForPlayer(this);
             m_clientGUIDs.erase(target->GetGUID());
 
@@ -18154,6 +18169,8 @@ void Player::UpdateVisibilityOf(WorldObject const* viewPoint, T* target, UpdateD
     {
         if(!target->isVisibleForInState(this,viewPoint,true))
         {
+            BeforeVisibilityDestroy<T>(target,this);
+
             target->BuildOutOfRangeUpdateBlock(&data);
             m_clientGUIDs.erase(target->GetGUID());
 
