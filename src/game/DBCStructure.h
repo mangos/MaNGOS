@@ -1773,7 +1773,7 @@ struct MapDifficulty
     MapDifficulty(uint32 _resetTime, uint32 _maxPlayers) : resetTime(_resetTime), maxPlayers(_maxPlayers) {}
 
     uint32 resetTime;
-    uint32 maxPlayers;
+    uint32 maxPlayers;                                      // some heroic dungeons have 0 when expect same value as in normal dificulty case
 };
 
 struct TalentSpellPos

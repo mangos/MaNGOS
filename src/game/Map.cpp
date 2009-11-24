@@ -1134,8 +1134,18 @@ MapDifficulty const* Map::GetMapDifficulty() const
 
 uint32 Map::GetMaxPlayers() const
 {
-    MapDifficulty const* mapDiff = GetMapDifficulty();
-    return mapDiff ? mapDiff->maxPlayers : 0;
+    if(MapDifficulty const* mapDiff = GetMapDifficulty())
+    {
+        if(mapDiff->maxPlayers || IsRegularDifficulty())    // Normal case (expect that regular difficulty always have correct maxplayers)
+            return mapDiff->maxPlayers;
+        else                                                // DBC have 0 maxplayers for heroic instances with expansion < 2
+        {                                                   // The heroic entry exists, so we don't have to check anything, simply return normal max players
+            MapDifficulty const* normalDiff = GetMapDifficultyData(i_id, REGULAR_DIFFICULTY);
+            return normalDiff ? normalDiff->maxPlayers : 0;
+        }
+    }
+    else                                                    // I'd rather assert(false);
+        return 0;
 }
 
 uint32 Map::GetMaxResetDelay() const
