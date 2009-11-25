@@ -700,29 +700,32 @@ void WorldSession::HandleListInventoryOpcode( WorldPacket & recv_data )
     SendListInventory( guid );
 }
 
-void WorldSession::SendListInventory( uint64 vendorguid )
+void WorldSession::SendListInventory(uint64 vendorguid)
 {
-    sLog.outDebug( "WORLD: Sent SMSG_LIST_INVENTORY" );
+    sLog.outDebug("WORLD: Sent SMSG_LIST_INVENTORY");
 
     Creature *pCreature = GetPlayer()->GetNPCIfCanInteractWith(vendorguid, UNIT_NPC_FLAG_VENDOR);
+
     if (!pCreature)
     {
-        sLog.outDebug( "WORLD: SendListInventory - Unit (GUID: %u) not found or you can't interact with him.", uint32(GUID_LOPART(vendorguid)) );
-        _player->SendSellError( SELL_ERR_CANT_FIND_VENDOR, NULL, 0, 0);
+        sLog.outDebug("WORLD: SendListInventory - Unit (GUID: %u) not found or you can't interact with him.", uint32(GUID_LOPART(vendorguid)));
+        _player->SendSellError(SELL_ERR_CANT_FIND_VENDOR, NULL, 0, 0);
         return;
     }
 
     // remove fake death
-    if(GetPlayer()->hasUnitState(UNIT_STAT_DIED))
+    if (GetPlayer()->hasUnitState(UNIT_STAT_DIED))
         GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 
     // Stop the npc if moving
-    pCreature->StopMoving();
+    if (!pCreature->IsStopped())
+        pCreature->StopMoving();
 
     VendorItemData const* vItems = pCreature->GetVendorItems();
-    if(!vItems)
+
+    if (!vItems)
     {
-        _player->SendSellError( SELL_ERR_CANT_FIND_VENDOR, NULL, 0, 0);
+        _player->SendSellError(SELL_ERR_CANT_FIND_VENDOR, NULL, 0, 0);
         return;
     }
 

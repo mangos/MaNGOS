@@ -32,30 +32,33 @@
 #include "Language.h"
 #include "ScriptCalls.h"
 
-void WorldSession::HandleBattlemasterHelloOpcode( WorldPacket & recv_data )
+void WorldSession::HandleBattlemasterHelloOpcode(WorldPacket & recv_data)
 {
     uint64 guid;
     recv_data >> guid;
-    sLog.outDebug( "WORLD: Recvd CMSG_BATTLEMASTER_HELLO Message from (GUID: %u TypeId:%u)", GUID_LOPART(guid),GuidHigh2TypeId(GUID_HIPART(guid)));
 
-    Creature *unit = GetPlayer()->GetMap()->GetCreature(guid);
-    if (!unit)
+    sLog.outDebug("WORLD: Recvd CMSG_BATTLEMASTER_HELLO Message from (GUID: %u TypeId:%u)", GUID_LOPART(guid),GuidHigh2TypeId(GUID_HIPART(guid)));
+
+    Creature *pCreature = GetPlayer()->GetMap()->GetCreature(guid);
+
+    if (!pCreature)
         return;
 
-    if(!unit->isBattleMaster())                             // it's not battlemaster
+    if (!pCreature->isBattleMaster())                       // it's not battlemaster
         return;
 
     // Stop the npc if moving
-    unit->StopMoving();
+    if (!pCreature->IsStopped())
+        pCreature->StopMoving();
 
-    BattleGroundTypeId bgTypeId = sBattleGroundMgr.GetBattleMasterBG(unit->GetEntry());
+    BattleGroundTypeId bgTypeId = sBattleGroundMgr.GetBattleMasterBG(pCreature->GetEntry());
 
     if (bgTypeId == BATTLEGROUND_TYPE_NONE)
         return;
 
     if (!_player->GetBGAccessByLevel(bgTypeId))
     {
-                                                            // temp, must be gossip message...
+        // temp, must be gossip message...
         SendNotification(LANG_YOUR_BG_LEVEL_REQ_ERROR);
         return;
     }
