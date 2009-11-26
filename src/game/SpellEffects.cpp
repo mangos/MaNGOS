@@ -3390,9 +3390,6 @@ void Spell::EffectSummonType(uint32 i)
         case SUMMON_TYPE_TOTEM:
             EffectSummonTotem(i);
             break;
-        case SUMMON_TYPE_LIGHTWELL:
-            EffectTransmitted(i);
-            break;
         case SUMMON_TYPE_UNKNOWN1:
         case SUMMON_TYPE_UNKNOWN2:
         case SUMMON_TYPE_UNKNOWN3:
