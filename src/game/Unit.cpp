@@ -5426,22 +5426,40 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                 return true;                                // no hidden cooldown
             }
 
-            // Divine Aegis
-            if (dummySpell->SpellIconID == 2820)
+            switch(dummySpell->SpellIconID)
             {
-                basepoints0 = damage * triggerAmount/100;
-                triggered_spell_id = 47753;
-                break;
-            }
-            // Improved Shadowform
-            else if (dummySpell->SpellIconID == 217)
-            {
-                if(!roll_chance_i(triggerAmount))
-                    return false;
+                // Improved Shadowform
+                case 217:
+                {
+                    if(!roll_chance_i(triggerAmount))
+                        return false;
 
-                RemoveSpellsCausingAura(SPELL_AURA_MOD_ROOT);
-                RemoveSpellsCausingAura(SPELL_AURA_MOD_DECREASE_SPEED);
-                break;
+                    RemoveSpellsCausingAura(SPELL_AURA_MOD_ROOT);
+                    RemoveSpellsCausingAura(SPELL_AURA_MOD_DECREASE_SPEED);
+                    break;
+                }
+                // Divine Aegis
+                case 2820:
+                {
+                    basepoints0 = damage * triggerAmount/100;
+                    triggered_spell_id = 47753;
+                    break;
+                }
+                // Improved Devouring Plague
+                case 3790:
+                {
+                    if (!procSpell)
+                        return false;
+
+                    Aura* leachAura = pVictim->GetAura(procSpell->Id,0);
+                    if (!leachAura)
+                        return false;
+
+                    int32 damagefromticks = SpellDamageBonus(pVictim, procSpell, (leachAura->GetModifier()->m_amount* GetSpellAuraMaxTicks(procSpell)), DOT);
+                    basepoints0 = damagefromticks * triggerAmount / 100;
+                    triggered_spell_id = 63675;
+                    break;
+                }
             }
 
             switch(dummySpell->Id)
