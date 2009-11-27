@@ -261,7 +261,27 @@ void Object::BuildMovementUpdate(ByteBuffer * data, uint16 flags, uint32 flags2)
         {
             case TYPEID_UNIT:
             {
-                flags2 = ((Creature*)this)->canFly() ? (MOVEMENTFLAG_FORWARD | MOVEMENTFLAG_LEVITATING) : MOVEMENTFLAG_NONE;
+                flags2 = MOVEMENTFLAG_NONE;
+
+                if (!((Creature*)this)->IsStopped())
+                    flags2 |= MOVEMENTFLAG_FORWARD;         // not set if not really moving
+
+                if (((Creature*)this)->canFly())
+                {
+                    flags2 |= MOVEMENTFLAG_LEVITATING;      // (ok) most seem to have this
+
+                    if (((Creature*)this)->IsStopped())
+                        flags2 |= MOVEMENTFLAG_FLY_UNK1;    // (ok) possibly some "hover" mode
+                    else
+                    {
+                        if (((Creature*)this)->IsMounted())
+                            flags2 |= MOVEMENTFLAG_FLYING;  // seems to be often when mounted
+                        /* for further research
+                        else
+                            flags2 |= MOVEMENTFLAG_FLYING2; // not seen, but work on some, even if not "correct"
+                        */
+                    }
+                }
             }
             break;
             case TYPEID_PLAYER:
