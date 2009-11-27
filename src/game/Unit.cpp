@@ -9355,7 +9355,16 @@ uint32 Unit::MeleeDamageBonus(Unit *pVictim, uint32 pdamage,WeaponAttackType att
     TakenPercent *= pVictim->GetTotalAuraMultiplierByMiscMask(SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN, schoolMask);
 
     // ..taken pct (by mechanic mask)
-    TakenPercent *= pVictim->GetTotalAuraMultiplierByMiscMask(SPELL_AURA_MOD_MECHANIC_DAMAGE_TAKEN_PERCENT, mechanicMask);
+    if (mechanicMask)
+    {
+        AuraList const& mTotalAuraList = GetAurasByType(SPELL_AURA_MOD_MECHANIC_DAMAGE_TAKEN_PERCENT);
+        for(AuraList::const_iterator i = mTotalAuraList.begin(); i != mTotalAuraList.end(); ++i)
+        {
+            Modifier* mod = (*i)->GetModifier();
+            if ((1<<(mod->m_miscvalue-1)) & mechanicMask)
+                TakenPercent *= (100.0f + mod->m_amount)/100.0f;
+        }
+    }
 
     // ..taken pct (melee/ranged)
     if(attType == RANGED_ATTACK)
