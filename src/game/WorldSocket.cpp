@@ -659,6 +659,12 @@ int WorldSocket::ProcessIncoming (WorldPacket* new_pct)
 
     const ACE_UINT16 opcode = new_pct->GetOpcode ();
 
+    if (opcode >= NUM_MSG_TYPES)
+    {
+        sLog.outError( "SESSION: received non-existed opcode 0x%.4X", opcode);
+        return -1;
+    }
+
     if (closing_)
         return -1;
 
@@ -839,9 +845,9 @@ int WorldSocket::HandleAuthSession (WorldPacket& recvPacket)
 
     // Re-check account ban (same check as in realmd)
     QueryResult *banresult =
-          loginDatabase.PQuery ("SELECT 1 FROM account_banned WHERE id = %u AND active = 1 "
+          loginDatabase.PQuery ("SELECT 1 FROM account_banned WHERE id = %u AND active = 1 AND (unbandate > UNIX_TIMESTAMP() OR unbandate = bandate)"
                                 "UNION "
-                                "SELECT 1 FROM ip_banned WHERE ip = '%s'",
+                                "SELECT 1 FROM ip_banned WHERE (unbandate = bandate OR unbandate > UNIX_TIMESTAMP()) AND ip = '%s'",
                                 id, GetRemoteAddress().c_str());
 
     if (banresult) // if account banned

@@ -50,6 +50,9 @@ class HostileRefManager : public RefManager<Unit, ThreatManager>
         // tell the source to remove them from the list and free the mem
         void deleteReferences();
 
+        // Remove specific faction references
+        void deleteReferencesForFaction(uint32 faction);
+
         HostileReference* getFirst() { return ((HostileReference* ) RefManager<Unit, ThreatManager>::getFirst()); }
 
         void updateThreatTables();

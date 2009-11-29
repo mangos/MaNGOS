@@ -209,6 +209,9 @@ void Unit::Update( uint32 p_time )
         delete *itr;
     m_deletedAuras.clear();
 
+    if (CanHaveThreatList())
+        getThreatManager().UpdateForClient(p_time);
+
     // update combat timer only for players and pets
     if (isInCombat() && (GetTypeId() == TYPEID_PLAYER || ((Creature*)this)->isPet() || ((Creature*)this)->isCharmed()))
     {
@@ -574,6 +577,14 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
         {
             player->RewardPlayerAndGroupAtKill(pVictim);
             player->ProcDamageAndSpell(pVictim, PROC_FLAG_KILL, PROC_FLAG_KILLED, PROC_EX_NONE, 0);
+
+            WorldPacket data(SMSG_PARTYKILLLOG, (8+8)); //send event PARTY_KILL
+            data << uint64(player->GetGUID()); //player with killing blow
+            data << uint64(pVictim->GetGUID()); //victim
+            if (Group *group =  player->GetGroup())
+                group->BroadcastPacket(&data, group->GetMemberGroup(player->GetGUID()));
+            else
+                player->SendDirectMessage(&data);
         }
 
         DEBUG_LOG("DealDamageAttackStop");
@@ -5415,22 +5426,55 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                 return true;                                // no hidden cooldown
             }
 
-            // Divine Aegis
-            if (dummySpell->SpellIconID == 2820)
+            switch(dummySpell->SpellIconID)
             {
-                basepoints0 = damage * triggerAmount/100;
-                triggered_spell_id = 47753;
-                break;
-            }
-            // Improved Shadowform
-            else if (dummySpell->SpellIconID == 217)
-            {
-                if(!roll_chance_i(triggerAmount))
-                    return false;
+                // Improved Shadowform
+                case 217:
+                {
+                    if(!roll_chance_i(triggerAmount))
+                        return false;
 
-                RemoveSpellsCausingAura(SPELL_AURA_MOD_ROOT);
-                RemoveSpellsCausingAura(SPELL_AURA_MOD_DECREASE_SPEED);
-                break;
+                    RemoveSpellsCausingAura(SPELL_AURA_MOD_ROOT);
+                    RemoveSpellsCausingAura(SPELL_AURA_MOD_DECREASE_SPEED);
+                    break;
+                }
+                // Divine Aegis
+                case 2820:
+                {
+                    basepoints0 = damage * triggerAmount/100;
+                    triggered_spell_id = 47753;
+                    break;
+                }
+                // Empowered Renew
+                case 3021:
+                {
+                    if (!procSpell)
+                        return false;
+
+                    Aura* healingAura = pVictim->GetAura(procSpell->Id,0);
+                    if (!healingAura)
+                        return false;
+
+                    int32 healingfromticks = SpellHealingBonus(pVictim, procSpell, (healingAura->GetModifier()->m_amount* GetSpellAuraMaxTicks(procSpell)), DOT);
+                    basepoints0 = healingfromticks * triggerAmount / 100;
+                    triggered_spell_id = 63544;
+                    break;
+                }
+                // Improved Devouring Plague
+                case 3790:
+                {
+                    if (!procSpell)
+                        return false;
+
+                    Aura* leachAura = pVictim->GetAura(procSpell->Id,0);
+                    if (!leachAura)
+                        return false;
+
+                    int32 damagefromticks = SpellDamageBonus(pVictim, procSpell, (leachAura->GetModifier()->m_amount* GetSpellAuraMaxTicks(procSpell)), DOT);
+                    basepoints0 = damagefromticks * triggerAmount / 100;
+                    triggered_spell_id = 63675;
+                    break;
+                }
             }
 
             switch(dummySpell->Id)
@@ -5785,20 +5829,32 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     }
                     return true;
                 }
-                // Judgements of the Wise
-                case 31876:
-                case 31877:
-                case 31878:
-                    // triggered only at casted Judgement spells, not at additional Judgement effects
-                    if(!procSpell || procSpell->Category != 1210)
-                        return false;
-
-                    target = this;
-                    triggered_spell_id = 31930;
-
-                    // Replenishment
-                    CastSpell(this, 57669, true, NULL, triggeredByAura);
+                // Heart of the Crusader (Rank 1)
+                case 20335:
+                    triggered_spell_id = 21183;
                     break;
+                // Heart of the Crusader (Rank 2)
+                case 20336:
+                    triggered_spell_id = 54498;
+                    break;
+                // Heart of the Crusader (Rank 3)
+                case 20337:
+                    triggered_spell_id = 54499;
+                    break;
+                case 20911:                                 // Blessing of Sanctuary
+                case 25899:                                 // Greater Blessing of Sanctuary
+                {
+                    target = this;
+                    switch (target->getPowerType())
+                    {
+                        case POWER_MANA:
+                            triggered_spell_id = 57319;
+                            break;
+                        default:
+                            return false;
+                    }
+                    break;
+                }
                 // Holy Power (Redemption Armor set)
                 case 28789:
                 {
@@ -5830,20 +5886,6 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     }
                     break;
                 }
-                case 25899:                                 // Greater Blessing of Sanctuary
-                case 20911:                                 // Blessing of Sanctuary
-                {
-                    target = this;
-                    switch (target->getPowerType())
-                    {
-                        case POWER_MANA:
-                            triggered_spell_id = 57319;
-                            break;
-                        default:
-                            return false;
-                    }
-                    break;
-                }
                 // Seal of Vengeance (damage calc on apply aura)
                 case 31801:
                 {
@@ -5867,6 +5909,62 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                         CastSpell(target,42463,true,NULL,triggeredByAura);
                     break;
                 }
+                // Judgements of the Wise
+                case 31876:
+                case 31877:
+                case 31878:
+                    // triggered only at casted Judgement spells, not at additional Judgement effects
+                    if(!procSpell || procSpell->Category != 1210)
+                        return false;
+
+                    target = this;
+                    triggered_spell_id = 31930;
+
+                    // Replenishment
+                    CastSpell(this, 57669, true, NULL, triggeredByAura);
+                    break;
+                // Spiritual Attunement
+                case 31785:
+                case 33776:
+                {
+                    // if healed by another unit (pVictim)
+                    if(this == pVictim)
+                        return false;
+
+                    // heal amount
+                    basepoints0 = triggerAmount*damage/100;
+                    target = this;
+                    triggered_spell_id = 31786;
+                    break;
+                }
+                // Paladin Tier 6 Trinket (Ashtongue Talisman of Zeal)
+                case 40470:
+                {
+                    if (!procSpell)
+                        return false;
+
+                    float  chance;
+
+                    // Flash of light/Holy light
+                    if (procSpell->SpellFamilyFlags & UI64LIT(0x00000000C0000000))
+                    {
+                        triggered_spell_id = 40471;
+                        chance = 15.0f;
+                    }
+                    // Judgement (any)
+                    else if (GetSpellSpecific(procSpell->Id)==SPELL_JUDGEMENT)
+                    {
+                        triggered_spell_id = 40472;
+                        chance = 50.0f;
+                    }
+                    else
+                        return false;
+
+                    if (!roll_chance_f(chance))
+                        return false;
+
+                    break;
+                }
                 // Seal of Corruption (damage calc on apply aura)
                 case 53736:
                 {
@@ -5888,30 +5986,6 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     }
                     if(stacks >= 5)
                         CastSpell(target,53739,true,NULL,triggeredByAura);
-                    break;
-                }
-                // Spiritual Attunement
-                case 31785:
-                case 33776:
-                {
-                    // if healed by another unit (pVictim)
-                    if(this == pVictim)
-                        return false;
-
-                    // heal amount
-                    basepoints0 = triggerAmount*damage/100;
-                    target = this;
-                    triggered_spell_id = 31786;
-                    break;
-                }
-                // Seal of Blood do damage trigger
-                case 31892:
-                {
-                    // 0 effect - is proc on enemy
-                    if (effIndex == 0 && (procFlag & PROC_FLAG_SUCCESSFUL_MELEE_HIT))
-                        triggered_spell_id = 31893;
-                    else
-                        return true;
                     break;
                 }
                 // Light's Beacon (heal target area aura)
@@ -5948,44 +6022,6 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     // cast with original caster set but beacon to beacon for apply caster mods and avoid LoS check
                     beacon->CastCustomSpell(beacon,triggered_spell_id,&basepoints0,NULL,NULL,true,castItem,triggeredByAura,pVictim->GetGUID());
                     return true;
-                }
-                // Seal of the Martyr do damage trigger
-                case 53720:
-                {
-                    // 0 effect - is proc on enemy
-                    if (effIndex == 0 && (procFlag & PROC_FLAG_SUCCESSFUL_MELEE_HIT))
-                        triggered_spell_id = 53719;
-                    else
-                        return true;
-                    break;
-                }
-                // Paladin Tier 6 Trinket (Ashtongue Talisman of Zeal)
-                case 40470:
-                {
-                    if (!procSpell)
-                        return false;
-
-                    float  chance;
-
-                    // Flash of light/Holy light
-                    if (procSpell->SpellFamilyFlags & UI64LIT(0x00000000C0000000))
-                    {
-                        triggered_spell_id = 40471;
-                        chance = 15.0f;
-                    }
-                    // Judgement (any)
-                    else if (GetSpellSpecific(procSpell->Id)==SPELL_JUDGEMENT)
-                    {
-                        triggered_spell_id = 40472;
-                        chance = 50.0f;
-                    }
-                    else
-                        return false;
-
-                    if (!roll_chance_f(chance))
-                        return false;
-
-                    break;
                 }
                 // Glyph of Divinity
                 case 54939:
@@ -6404,6 +6440,85 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                 triggered_spell_id = 51460;
                 break;
             }
+            // Threat of Thassarian
+            if (dummySpell->SpellIconID == 2023)
+            {
+                // Must Dual Wield
+                if (!procSpell || !haveOffhandWeapon())
+                    return false;
+                // Chance as basepoints for dummy aura
+                if (!roll_chance_i(triggerAmount))
+                    return false;
+
+                switch (procSpell->Id)
+                {
+                    // Obliterate
+                    case 49020:                             // Rank 1
+                        triggered_spell_id = 66198; break;
+                    case 51423:                             // Rank 2
+                        triggered_spell_id = 66972; break;
+                    case 51424:                             // Rank 3
+                        triggered_spell_id = 66973; break;
+                    case 51425:                             // Rank 4
+                        triggered_spell_id = 66974; break;
+                    // Frost Strike
+                    case 49143:                             // Rank 1
+                        triggered_spell_id = 66196; break;
+                    case 51416:                             // Rank 2
+                        triggered_spell_id = 66958; break;
+                    case 51417:                             // Rank 3
+                        triggered_spell_id = 66959; break;
+                    case 51418:                             // Rank 4
+                        triggered_spell_id = 66960; break;
+                    case 51419:                             // Rank 5
+                        triggered_spell_id = 66961; break;
+                    case 51420:                             // Rank 6
+                        triggered_spell_id = 66962; break;
+                    // Plague Strike
+                    case 45462:                             // Rank 1
+                        triggered_spell_id = 66216; break;
+                    case 49917:                             // Rank 2
+                        triggered_spell_id = 66988; break;
+                    case 49918:                             // Rank 3
+                        triggered_spell_id = 66989; break;
+                    case 49919:                             // Rank 4
+                        triggered_spell_id = 66990; break;
+                    case 49920:                             // Rank 5
+                        triggered_spell_id = 66991; break;
+                    case 49921:                             // Rank 6
+                        triggered_spell_id = 66992; break;
+                    // Death Strike
+                    case 49998:                             // Rank 1
+                        triggered_spell_id = 66188; break;
+                    case 49999:                             // Rank 2
+                        triggered_spell_id = 66950; break;
+                    case 45463:                             // Rank 3
+                        triggered_spell_id = 66951; break;
+                    case 49923:                             // Rank 4
+                        triggered_spell_id = 66952; break;
+                    case 49924:                             // Rank 5
+                        triggered_spell_id = 66953; break;
+                    // Rune Strike
+                    case 56815:
+                        triggered_spell_id = 66217; break;
+                    // Blood Strike
+                    case 45902:                             // Rank 1
+                        triggered_spell_id = 66215; break;
+                    case 49926:                             // Rank 2
+                        triggered_spell_id = 66975; break;
+                    case 49927:                             // Rank 3
+                        triggered_spell_id = 66976; break;
+                    case 49928:                             // Rank 4
+                        triggered_spell_id = 66977; break;
+                    case 49929:                             // Rank 5
+                        triggered_spell_id = 66978; break;
+                    case 49930:                             // Rank 6
+                        triggered_spell_id = 66979; break;
+                    default:
+                        return false;
+                }
+                break;
+            }
             // Runic Power Back on Snare/Root
             if (dummySpell->Id == 61257)
             {
@@ -6542,7 +6657,23 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
                     // intellect
                     if (GetStat(STAT_INTELLECT)> stat) { trigger_spell_id = 60234;stat = GetStat(STAT_INTELLECT);}
                     // spirit
-                    if (GetStat(STAT_SPIRIT)   > stat) { trigger_spell_id = 60235;stat = GetStat(STAT_SPIRIT);   }
+                    if (GetStat(STAT_SPIRIT)   > stat) { trigger_spell_id = 60235;                               }
+                }
+                else if (auraSpellInfo->Id==67702)          // Death's Choice, Item - Coliseum 25 Normal Melee Trinket
+                {
+                    float stat = 0.0f;
+                    // strength
+                    if (GetStat(STAT_STRENGTH) > stat) { trigger_spell_id = 67708;stat = GetStat(STAT_STRENGTH); }
+                    // agility
+                    if (GetStat(STAT_AGILITY)  > stat) { trigger_spell_id = 67703;                               }
+                }
+                else if (auraSpellInfo->Id==67771)          // Death's Choice (heroic), Item - Coliseum 25 Heroic Melee Trinket
+                {
+                    float stat = 0.0f;
+                    // strength
+                    if (GetStat(STAT_STRENGTH) > stat) { trigger_spell_id = 67773;stat = GetStat(STAT_STRENGTH); }
+                    // agility
+                    if (GetStat(STAT_AGILITY)  > stat) { trigger_spell_id = 67772;                               }
                 }
                 //else if (auraSpellInfo->Id==31255)        // Deadly Swiftness (Rank 1)
                 //else if (auraSpellInfo->Id==5301)         // Defensive State (DND)
@@ -8701,13 +8832,9 @@ bool Unit::isSpellCrit(Unit *pVictim, SpellEntry const *spellProto, SpellSchoolM
                         // Lava Burst
                         if (spellProto->SpellFamilyFlags & UI64LIT(0x0000100000000000))
                         {
+                            // Flame Shock 
                             if (Aura *flameShock = pVictim->GetAura(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_SHAMAN, UI64LIT(0x0000000010000000), 0, GetGUID()))
-                            {
-                                // Consume shock aura if not have Glyph of Flame Shock
-                                if (!GetAura(55447, 0))
-                                    pVictim->RemoveAurasByCasterSpell(flameShock->GetId(), GetGUID());
                                 return true;
-                            }
                         }
                         break;
                 }
@@ -9261,7 +9388,16 @@ uint32 Unit::MeleeDamageBonus(Unit *pVictim, uint32 pdamage,WeaponAttackType att
     TakenPercent *= pVictim->GetTotalAuraMultiplierByMiscMask(SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN, schoolMask);
 
     // ..taken pct (by mechanic mask)
-    TakenPercent *= pVictim->GetTotalAuraMultiplierByMiscMask(SPELL_AURA_MOD_MECHANIC_DAMAGE_TAKEN_PERCENT, mechanicMask);
+    if (mechanicMask)
+    {
+        AuraList const& mTotalAuraList = GetAurasByType(SPELL_AURA_MOD_MECHANIC_DAMAGE_TAKEN_PERCENT);
+        for(AuraList::const_iterator i = mTotalAuraList.begin(); i != mTotalAuraList.end(); ++i)
+        {
+            Modifier* mod = (*i)->GetModifier();
+            if ((1<<(mod->m_miscvalue-1)) & mechanicMask)
+                TakenPercent *= (100.0f + mod->m_amount)/100.0f;
+        }
+    }
 
     // ..taken pct (melee/ranged)
     if(attType == RANGED_ATTACK)
@@ -9750,10 +9886,6 @@ bool Unit::isVisibleForOrDetect(Unit const* u, WorldObject const* viewPoint, boo
             return false;
     }
 
-    // always seen by owner
-    if (GetCharmerOrOwnerGUID()==u->GetGUID())
-        return true;
-
     // always seen by far sight caster
     if (u->GetTypeId()==TYPEID_PLAYER && ((Player*)u)->GetFarSight()==GetGUID())
         return true;
@@ -9797,6 +9929,10 @@ bool Unit::isVisibleForOrDetect(Unit const* u, WorldObject const* viewPoint, boo
         if (!IsWithinDistInMap(viewPoint, _map.GetVisibilityDistance() + (inVisibleList ? World::GetVisibleUnitGreyDistance() : 0.0f), is3dDistance))
             return false;
     }
+
+    // always seen by owner
+    if (GetCharmerOrOwnerGUID()==u->GetGUID())
+        return true;
 
     // isInvisibleForAlive() those units can only be seen by dead or if other
     // unit is also invisible for alive.. if an isinvisibleforalive unit dies we
@@ -10307,6 +10443,8 @@ void Unit::AddThreat(Unit* pVictim, float threat /*= 0.0f*/, bool crit /*= false
 
 void Unit::DeleteThreatList()
 {
+    if(CanHaveThreatList() && !m_ThreatManager.isThreatListEmpty())
+        SendThreatClear();
     m_ThreatManager.clearReferences();
 }
 
@@ -12667,4 +12805,98 @@ uint32 Unit::GetCombatRatingDamageReduction(CombatRating cr, float rate, float c
     if (percent > cap)
         percent = cap;
     return uint32 (percent * damage / 100.0f);
+}
+
+void Unit::SendThreatUpdate()
+{
+    ThreatList const& tlist = getThreatManager().getThreatList();
+    if (uint32 count = tlist.size())
+    {
+        sLog.outDebug( "WORLD: Send SMSG_THREAT_UPDATE Message" );
+        WorldPacket data(SMSG_THREAT_UPDATE, 8 + count * 8);
+        data.append(GetPackGUID());
+        data << uint32(count);
+        for (ThreatList::const_iterator itr = tlist.begin(); itr != tlist.end(); ++itr)
+        {
+            data.appendPackGUID((*itr)->getUnitGuid());
+            data << uint32((*itr)->getThreat());
+        }
+        SendMessageToSet(&data, false);
+    }
+}
+
+void Unit::SendHighestThreatUpdate(HostileReference* pHostilReference)
+{
+    ThreatList const& tlist = getThreatManager().getThreatList();
+    if (uint32 count = tlist.size())
+    {
+        sLog.outDebug( "WORLD: Send SMSG_HIGHEST_THREAT_UPDATE Message" );
+        WorldPacket data(SMSG_HIGHEST_THREAT_UPDATE, 8 + 8 + count * 8);
+        data.append(GetPackGUID());
+        data.appendPackGUID(pHostilReference->getUnitGuid());
+        data << uint32(count);
+        for (ThreatList::const_iterator itr = tlist.begin(); itr != tlist.end(); ++itr)
+        {
+            data.appendPackGUID((*itr)->getUnitGuid());
+            data << uint32((*itr)->getThreat());
+        }
+        SendMessageToSet(&data, false);
+    }
+}
+
+void Unit::SendThreatClear()
+{
+    sLog.outDebug( "WORLD: Send SMSG_THREAT_CLEAR Message" );
+    WorldPacket data(SMSG_THREAT_CLEAR, 8);
+    data.append(GetPackGUID());
+    SendMessageToSet(&data, false);
+}
+
+void Unit::SendThreatRemove(HostileReference* pHostileReference)
+{
+    sLog.outDebug( "WORLD: Send SMSG_THREAT_REMOVE Message" );
+    WorldPacket data(SMSG_THREAT_REMOVE, 8 + 8);
+    data.append(GetPackGUID());
+    data.appendPackGUID(pHostileReference->getUnitGuid());
+    SendMessageToSet(&data, false);
+}
+
+void Unit::StopAttackFaction(uint32 faction_id)
+{
+    if (Unit* victim = getVictim())
+    {
+        if (victim->getFactionTemplateEntry()->faction==faction_id)
+        {
+            AttackStop();
+            if (IsNonMeleeSpellCasted(false))
+                InterruptNonMeleeSpells(false);
+
+            // melee and ranged forced attack cancel
+            if (GetTypeId() == TYPEID_PLAYER)
+                ((Player*)this)->SendAttackSwingCancelAttack();
+        }
+    }
+
+    AttackerSet const& attackers = getAttackers();
+    for(AttackerSet::const_iterator itr = attackers.begin(); itr != attackers.end();)
+    {
+        if ((*itr)->getFactionTemplateEntry()->faction==faction_id)
+        {
+            (*itr)->AttackStop();
+            itr = attackers.begin();
+        }
+        else
+            ++itr;
+    }
+
+    getHostileRefManager().deleteReferencesForFaction(faction_id);
+
+    if(Pet* pet = GetPet())
+        pet->StopAttackFaction(faction_id);
+    if(Unit* charm = GetCharm())
+        charm->StopAttackFaction(faction_id);
+
+    for(GuardianPetList::const_iterator itr = m_guardianPets.begin(); itr != m_guardianPets.end(); ++itr)
+        if(Unit* guardian = Unit::GetUnit(*this,*itr))
+            guardian->StopAttackFaction(faction_id);
 }

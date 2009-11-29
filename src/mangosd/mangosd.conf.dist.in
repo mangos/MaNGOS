@@ -303,6 +303,7 @@ LogFilter_CreatureMoves = 1
 LogFilter_TransportMoves = 1
 LogFilter_VisibilityChanges = 1
 WorldLogFile = ""
+WorldLogTimestamp = 0
 DBErrorLogFile = "DBErrors.log"
 CharLogFile = "Char.log"
 CharLogTimestamp = 0

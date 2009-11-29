@@ -302,7 +302,7 @@ bool AchievementCriteriaRequirement::Meets(Player const* source, Unit const* tar
                 return false;
             return ((Player*)target)->GetTeam() == team.team;
         case ACHIEVEMENT_CRITERIA_REQUIRE_S_DRUNK:
-            return Player::GetDrunkenstateByValue(source->GetDrunkValue()) >= drunk.state;
+            return (uint32)Player::GetDrunkenstateByValue(source->GetDrunkValue()) >= drunk.state;
         case ACHIEVEMENT_CRITERIA_REQUIRE_HOLIDAY:
             return IsHolidayActive(HolidayIds(holiday.id));
         case ACHIEVEMENT_CRITERIA_REQUIRE_BG_LOSS_TEAM_SCORE:

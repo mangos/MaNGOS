@@ -487,6 +487,23 @@ void Spell::EffectSchoolDMG(uint32 effect_idx)
                 // Shadow Word: Death - deals damage equal to damage done to caster
                 if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0000000200000000))
                     m_caster->CastCustomSpell(m_caster, 32409, &damage, 0, 0, true);
+                // Improved Mind Blast (Mind Blast in shadow form bonus)
+                else if (m_caster->m_form == FORM_SHADOW && (m_spellInfo->SpellFamilyFlags & UI64LIT(0x00002000)))
+                {
+                    Unit::AuraList const& ImprMindBlast = m_caster->GetAurasByType(SPELL_AURA_ADD_FLAT_MODIFIER);
+                    for(Unit::AuraList::const_iterator i = ImprMindBlast.begin(); i != ImprMindBlast.end(); ++i)
+                    {
+                        if ((*i)->GetSpellProto()->SpellFamilyName == SPELLFAMILY_PRIEST &&
+                            ((*i)->GetSpellProto()->SpellIconID == 95))
+                        {
+                            int chance = (*i)->GetSpellProto()->CalculateSimpleValue(1);
+                            if (roll_chance_i(chance))
+                                // Mind Trauma
+                                m_caster->CastSpell(unitTarget, 48301, true, 0);
+                            break;
+                        }
+                    }
+                }
                 break;
             }
             case SPELLFAMILY_DRUID:
@@ -1267,19 +1284,19 @@ void Spell::EffectDummy(uint32 i)
                     if (((Player *)m_caster)->GetTeam() == HORDE)
                     {
                         if (m_caster->GetSpeedRate(MOVE_RUN) >= 2.0f)
-                            // 100% Ram
+                            // Swift Brewfest Ram, 100% Ram
                             m_caster->CastSpell(m_caster, 43900, true);
                         else
-                            // 60% Ram
+                            // Brewfest Ram, 60% Ram
                             m_caster->CastSpell(m_caster, 43899, true);
                     }
                     else
                     {
                         if (((Player *)m_caster)->GetSpeedRate(MOVE_RUN) >= 2.0f)
-                            // 100% Kodo
+                            // Great Brewfest Kodo, 100% Kodo
                             m_caster->CastSpell(m_caster, 49379, true);
                         else
-                            // 60% Kodo
+                            // Brewfest Riding Kodo, 60% Kodo
                             m_caster->CastSpell(m_caster, 49378, true);
                     }
                     return;
@@ -1326,15 +1343,34 @@ void Spell::EffectDummy(uint32 i)
                     if (m_caster->GetTypeId() != TYPEID_PLAYER)
                         return;
 
-                    uint32 spell_id;
-                    switch(urand(1, 3))
+                    uint32 spell_id = 0;
+                    switch(m_caster->getClass())
                     {
-                        case 1: spell_id = 67016; break;
-                        case 2: spell_id = 67017; break;
-                        default:spell_id = 67018; break;
+                        case CLASS_WARRIOR:
+                        case CLASS_DEATH_KNIGHT:
+                            spell_id = 67018;               // STR for Warriors, Death Knights
+                            break;
+                        case CLASS_ROGUE:
+                        case CLASS_HUNTER:
+                            spell_id = 67017;               // AP for Rogues, Hunters
+                            break;
+                        case CLASS_PRIEST:
+                        case CLASS_MAGE:
+                        case CLASS_WARLOCK:
+                            spell_id = 67016;               // SPD for Priests, Mages, Warlocks
+                            break;
+                        case CLASS_SHAMAN:
+                            // random (SPD, AP)
+                            spell_id = roll_chance_i(50) ? 67016 : 67017;
+                            break;
+                        case CLASS_PALADIN:
+                        case CLASS_DRUID:
+                        default:
+                            // random (SPD, STR)
+                            spell_id = roll_chance_i(50) ? 67016 : 67018;
+                            break;
                     }
-
-                    m_caster->CastSpell(m_caster, spell_id, true, NULL);
+                    m_caster->CastSpell(m_caster, spell_id, true);
                     return;
                 }
             }
@@ -4713,15 +4749,6 @@ void Spell::EffectWeaponDmg(uint32 i)
                 m_caster->CastCustomSpell(m_caster, 32220, &damagePoint, NULL, NULL, true);
             else
                 m_caster->CastCustomSpell(m_caster, 53725, &damagePoint, NULL, NULL, true);
-        }
-        // Seal of Blood/of the Martyr backlash damage (10%)
-        else if(m_spellInfo->SpellIconID==2293)
-        {
-            int32 damagePoint  = m_damage * 10 / 100;
-            if(m_spellInfo->Id == 31893)
-                m_caster->CastCustomSpell(m_caster, 32221, &damagePoint, NULL, NULL, true);
-            else
-                m_caster->CastCustomSpell(m_caster, 53718, &damagePoint, NULL, NULL, true);
         }
     }
 
