@@ -1882,9 +1882,6 @@ void Pet::CastPetAuras(bool current)
     if(!owner || owner->GetTypeId()!=TYPEID_PLAYER)
         return;
 
-    if(!IsPermanentPetFor((Player*)owner))
-        return;
-
     for(PetAuraSet::const_iterator itr = owner->m_petAuras.begin(); itr != owner->m_petAuras.end();)
     {
         PetAura const* pa = *itr;
