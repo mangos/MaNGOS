@@ -2499,7 +2499,7 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                 else
                 {
                     int32 bp0 = m_modifier.m_amount;
-                    caster->CastCustomSpell(caster,48210,&bp0,NULL,NULL,true);
+                    m_target->CastCustomSpell(caster,48210,&bp0,NULL,NULL,true);
                 }
             }
             break;
