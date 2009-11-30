@@ -75,7 +75,7 @@ class PlayerDumpWriter : public PlayerDump
     private:
         typedef std::set<uint32> GUIDs;
 
-        void DumpTable(std::string& dump, uint32 guid, char const*tableFrom, char const*tableTo, DumpTableType type);
+        void DumpTableContent(std::string& dump, uint32 guid, char const*tableFrom, char const*tableTo, DumpTableType type);
         std::string GenerateWhereStr(char const* field, GUIDs const& guids, GUIDs::const_iterator& itr);
         std::string GenerateWhereStr(char const* field, uint32 guid);
 
