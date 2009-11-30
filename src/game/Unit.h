@@ -1424,6 +1424,9 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         int32 GetMaxPositiveAuraModifierByMiscValue(AuraType auratype, int32 misc_value) const;
         int32 GetMaxNegativeAuraModifierByMiscValue(AuraType auratype, int32 misc_value) const;
 
+        // misc have plain value but we check it fit to provided values mask (mask & (1 << (misc-1)))
+        float GetTotalAuraMultiplierByMiscValueForMask(AuraType auratype, uint32 mask) const;
+
         Aura* GetDummyAura(uint32 spell_id) const;
 
         uint32 m_AuraFlags;
