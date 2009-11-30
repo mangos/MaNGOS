@@ -8646,16 +8646,16 @@ bool Player::IsBagPos( uint16 pos )
     return false;
 }
 
-bool Player::IsValidPos( uint8 bag, uint8 slot )
+bool Player::IsValidPos( uint8 bag, uint8 slot, bool explicit_pos )
 {
     // post selected
-    if(bag == NULL_BAG)
+    if(bag == NULL_BAG && !explicit_pos)
         return true;
 
     if (bag == INVENTORY_SLOT_BAG_0)
     {
         // any post selected
-        if (slot == NULL_SLOT)
+        if (slot == NULL_SLOT && !explicit_pos)
             return true;
 
         // equipment
@@ -8693,7 +8693,7 @@ bool Player::IsValidPos( uint8 bag, uint8 slot )
             return false;
 
         // any post selected
-        if (slot == NULL_SLOT)
+        if (slot == NULL_SLOT && !explicit_pos)
             return true;
 
         return slot < pBag->GetBagSize();
@@ -8707,7 +8707,7 @@ bool Player::IsValidPos( uint8 bag, uint8 slot )
             return false;
 
         // any post selected
-        if (slot == NULL_SLOT)
+        if (slot == NULL_SLOT && !explicit_pos)
             return true;
 
         return slot < pBag->GetBagSize();
@@ -8999,8 +8999,9 @@ uint8 Player::_CanStoreItem_InBag( uint8 bag, ItemPosCountVec &dest, ItemPrototy
     if (bag==skip_bag)
         return EQUIP_ERR_ITEM_DOESNT_GO_INTO_BAG;
 
+    // skip not existed bag or self targeted bag
     Bag* pBag = (Bag*)GetItemByPos( INVENTORY_SLOT_BAG_0, bag );
-    if (!pBag)
+    if (!pBag || pBag==pSrcItem)
         return EQUIP_ERR_ITEM_DOESNT_GO_INTO_BAG;
 
     ItemPrototype const* pBagProto = pBag->GetProto();
