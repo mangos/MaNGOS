@@ -12176,6 +12176,338 @@ void Player::SendNewItem(Item *item, uint32 count, bool received, bool created, 
 }
 
 /*********************************************************/
+/***                    GOSSIP SYSTEM                  ***/
+/*********************************************************/
+
+void Player::PrepareGossipMenu(WorldObject *pSource, uint32 gossipid)
+{
+    PlayerMenu* pMenu = PlayerTalkClass;
+    pMenu->ClearMenus();
+
+    if (pSource->GetTypeId() != TYPEID_UNIT)
+        return;
+
+    Creature *pCreature = (Creature*)pSource;
+
+    // lazy loading single time at use
+    pCreature->LoadGossipOptions();
+
+    GossipOptionList &iOptList = pCreature->GetGossipOptionList();
+
+    for(GossipOptionList::iterator i = iOptList.begin( ); i != iOptList.end( ); ++i)
+    {
+        GossipOption* gso = &*i;
+
+        if (gso->GossipId == gossipid)
+        {
+            bool cantalking = true;
+
+            if (gso->Id == 1)
+            {
+                uint32 textid = GetGossipTextId(pSource);
+
+                GossipText const* gossiptext = sObjectMgr.GetGossipText(textid);
+
+                if (!gossiptext)
+                    cantalking = false;
+            }
+            else
+            {
+                switch(gso->Action)
+                {
+                    case GOSSIP_OPTION_QUESTGIVER:
+                        PrepareQuestMenu(pSource->GetGUID());
+                        //if (pm->GetQuestMenu()->MenuItemCount() == 0)
+                        cantalking = false;
+                        //pm->GetQuestMenu()->ClearMenu();
+                        break;
+                    case GOSSIP_OPTION_ARMORER:
+                        cantalking = false;                 // added in special mode
+                        break;
+                    case GOSSIP_OPTION_SPIRITHEALER:
+                        if (!isDead())
+                            cantalking = false;
+                        break;
+                    case GOSSIP_OPTION_VENDOR:
+                    {
+                        VendorItemData const* vItems = pCreature->GetVendorItems();
+                        if (!vItems || vItems->Empty())
+                        {
+                            sLog.outErrorDb("Creature %u (Entry: %u) have UNIT_NPC_FLAG_VENDOR but have empty trading item list.",
+                                pCreature->GetGUIDLow(), pCreature->GetEntry());
+                            cantalking = false;
+                        }
+                        break;
+                    }
+                    case GOSSIP_OPTION_TRAINER:
+                        if (!pCreature->isCanTrainingOf(this, false))
+                            cantalking = false;
+                        break;
+                    case GOSSIP_OPTION_UNLEARNTALENTS:
+                        if (!pCreature->isCanTrainingAndResetTalentsOf(this))
+                            cantalking = false;
+                        break;
+                    case GOSSIP_OPTION_UNLEARNPETSKILLS:
+                        if(!GetPet() || GetPet()->getPetType() != HUNTER_PET || GetPet()->m_spells.size() <= 1 || pCreature->GetCreatureInfo()->trainer_type != TRAINER_TYPE_PETS || pCreature->GetCreatureInfo()->trainer_class != CLASS_HUNTER)
+                            cantalking = false;
+                        break;
+                    case GOSSIP_OPTION_TAXIVENDOR:
+                        if (GetSession()->SendLearnNewTaxiNode(pCreature))
+                            return;
+                        break;
+                    case GOSSIP_OPTION_BATTLEFIELD:
+                        if (!pCreature->isCanInteractWithBattleMaster(this, false))
+                            cantalking = false;
+                        break;
+                    case GOSSIP_OPTION_SPIRITGUIDE:
+                    case GOSSIP_OPTION_INNKEEPER:
+                    case GOSSIP_OPTION_BANKER:
+                    case GOSSIP_OPTION_PETITIONER:
+                    case GOSSIP_OPTION_STABLEPET:
+                    case GOSSIP_OPTION_TABARDDESIGNER:
+                    case GOSSIP_OPTION_AUCTIONEER:
+                        break;                              // no checks
+                    default:
+                        sLog.outErrorDb("Creature %u (entry: %u) have unknown gossip option %u", pCreature->GetDBTableGUIDLow(), pCreature->GetEntry(), gso->Action);
+                        break;
+                }
+            }
+
+            //note for future dev: should have database fields for BoxMessage & BoxMoney
+            if (!gso->OptionText.empty() && cantalking)
+            {
+                std::string OptionText = gso->OptionText;
+                std::string BoxText = gso->BoxText;
+                int loc_idx = GetSession()->GetSessionDbLocaleIndex();
+
+                if (loc_idx >= 0)
+                {
+                    if (NpcOptionLocale const *no = sObjectMgr.GetNpcOptionLocale(gso->Id))
+                    {
+                        if (no->OptionText.size() > (size_t)loc_idx && !no->OptionText[loc_idx].empty())
+                            OptionText = no->OptionText[loc_idx];
+
+                        if (no->BoxText.size() > (size_t)loc_idx && !no->BoxText[loc_idx].empty())
+                            BoxText = no->BoxText[loc_idx];
+                    }
+                }
+
+                pMenu->GetGossipMenu().AddMenuItem((uint8)gso->Icon,OptionText, gossipid,gso->Action,BoxText,gso->BoxMoney,gso->Coded);
+            }
+        }
+    }
+
+    ///some gossips aren't handled in normal way ... so we need to do it this way .. TODO: handle it in normal way ;-)
+    if (pMenu->Empty())
+    {
+        if (pCreature->HasFlag(UNIT_NPC_FLAGS,UNIT_NPC_FLAG_TRAINER))
+        {
+            // output error message if need
+            pCreature->isCanTrainingOf(this, true);
+        }
+
+        if (pCreature->HasFlag(UNIT_NPC_FLAGS,UNIT_NPC_FLAG_BATTLEMASTER))
+        {
+            // output error message if need
+            pCreature->isCanInteractWithBattleMaster(this, true);
+        }
+    }
+}
+
+void Player::SendPreparedGossip(WorldObject *pSource)
+{
+    if (!pSource || pSource->GetTypeId() != TYPEID_UNIT)
+        return;
+
+    // in case no gossip flag and quest menu not empty, open quest menu (client expect gossip menu with this flag)
+    if (!((Creature*)pSource)->HasFlag(UNIT_NPC_FLAGS,UNIT_NPC_FLAG_GOSSIP) && !PlayerTalkClass->GetQuestMenu().Empty())
+    {
+        SendPreparedQuest(pSource->GetGUID());
+        return;
+    }
+
+    // in case non empty gossip menu (that not included quests list size) show it
+    // (quest entries from quest menu will be included in list)
+    PlayerTalkClass->SendGossipMenu(GetGossipTextId(pSource), pSource->GetGUID());
+}
+
+void Player::OnGossipSelect(WorldObject* pSource, uint32 option)
+{
+    GossipMenu& gossipmenu = PlayerTalkClass->GetGossipMenu();
+
+    if (option >= gossipmenu.MenuItemCount())
+        return;
+
+    uint32 action = gossipmenu.GetItem(option).m_gAction;
+    uint32 zoneid = GetZoneId();
+    uint64 guid = pSource->GetGUID();
+
+    GossipOption const *gossip = GetGossipOption(pSource, action);
+
+    if (!gossip)
+    {
+        zoneid = 0;
+        gossip = GetGossipOption(pSource, action);
+
+        if (!gossip)
+            return;
+    }
+
+    switch(gossip->Action)
+    {
+        case GOSSIP_OPTION_GOSSIP:
+        {
+            uint32 textid = GetGossipTextId(action, zoneid);
+
+            if (textid == 0)
+                textid = GetGossipTextId(pSource);
+
+            PlayerTalkClass->CloseGossip();
+            PlayerTalkClass->SendTalking(textid);
+            break;
+        }
+        case GOSSIP_OPTION_SPIRITHEALER:
+            if (isDead())
+                ((Creature*)pSource)->CastSpell(((Creature*)pSource),17251,true,NULL,NULL,GetGUID());
+            break;
+        case GOSSIP_OPTION_QUESTGIVER:
+            PrepareQuestMenu(guid);
+            SendPreparedQuest(guid);
+            break;
+        case GOSSIP_OPTION_VENDOR:
+        case GOSSIP_OPTION_ARMORER:
+            GetSession()->SendListInventory(guid);
+            break;
+        case GOSSIP_OPTION_STABLEPET:
+            GetSession()->SendStablePet(guid);
+            break;
+        case GOSSIP_OPTION_TRAINER:
+            GetSession()->SendTrainerList(guid);
+            break;
+        case GOSSIP_OPTION_UNLEARNTALENTS:
+            PlayerTalkClass->CloseGossip();
+            SendTalentWipeConfirm(guid);
+            break;
+        case GOSSIP_OPTION_UNLEARNPETSKILLS:
+            PlayerTalkClass->CloseGossip();
+            SendPetSkillWipeConfirm();
+            break;
+        case GOSSIP_OPTION_TAXIVENDOR:
+            GetSession()->SendTaxiMenu(((Creature*)pSource));
+            break;
+        case GOSSIP_OPTION_INNKEEPER:
+            PlayerTalkClass->CloseGossip();
+            SetBindPoint(guid);
+            break;
+        case GOSSIP_OPTION_BANKER:
+            GetSession()->SendShowBank(guid);
+            break;
+        case GOSSIP_OPTION_PETITIONER:
+            PlayerTalkClass->CloseGossip();
+            GetSession()->SendPetitionShowList(guid);
+            break;
+        case GOSSIP_OPTION_TABARDDESIGNER:
+            PlayerTalkClass->CloseGossip();
+            GetSession()->SendTabardVendorActivate(guid);
+            break;
+        case GOSSIP_OPTION_AUCTIONEER:
+            GetSession()->SendAuctionHello(guid, ((Creature*)pSource));
+            break;
+        case GOSSIP_OPTION_SPIRITGUIDE:
+        case GOSSIP_GUARD_SPELLTRAINER:
+        case GOSSIP_GUARD_SKILLTRAINER:
+            PrepareGossipMenu(pSource, gossip->Id);
+            SendPreparedGossip(pSource);
+            break;
+        case GOSSIP_OPTION_BATTLEFIELD:
+        {
+            BattleGroundTypeId bgTypeId = sBattleGroundMgr.GetBattleMasterBG(pSource->GetEntry());
+
+            if (bgTypeId == BATTLEGROUND_TYPE_NONE)
+            {
+                sLog.outError("a user (guid %u) requested battlegroundlist from a npc who is no battlemaster", GetGUIDLow());
+                return;
+            }
+
+            GetSession()->SendBattlegGroundList(guid, bgTypeId);
+            break;
+        }
+        default:
+            OnPoiSelect(pSource, gossip);
+            break;
+    }
+}
+
+void Player::OnPoiSelect(WorldObject *pSource, GossipOption const *gossip)
+{
+    if(gossip->GossipId==GOSSIP_GUARD_SPELLTRAINER || gossip->GossipId==GOSSIP_GUARD_SKILLTRAINER)
+    {
+        Poi_Icon icon = ICON_POI_BLANK;
+        //need add more case.
+        switch(gossip->Action)
+        {
+            case GOSSIP_GUARD_BANK:
+                icon=ICON_POI_SMALL_HOUSE;
+                break;
+            case GOSSIP_GUARD_RIDE:
+                icon=ICON_POI_RWHORSE;
+                break;
+            case GOSSIP_GUARD_GUILD:
+                icon=ICON_POI_BLUETOWER;
+                break;
+            default:
+                icon=ICON_POI_GREYTOWER;
+                break;
+        }
+        uint32 textid = GetGossipTextId(gossip->Action, GetZoneId());
+        PlayerTalkClass->SendTalking(textid);
+        // std::string areaname= gossip->OptionText;
+        // how this could worked player->PlayerTalkClass->SendPointOfInterest( x, y, icon, 2, 15, areaname.c_str() );
+    }
+}
+
+uint32 Player::GetGossipTextId(uint32 action, uint32 zoneid)
+{
+    QueryResult *result= WorldDatabase.PQuery("SELECT textid FROM npc_gossip_textid WHERE action = '%u' AND zoneid ='%u'", action, zoneid );
+
+    if (!result)
+        return 0;
+
+    Field *fields = result->Fetch();
+    uint32 id = fields[0].GetUInt32();
+
+    delete result;
+
+    return id;
+}
+
+uint32 Player::GetGossipTextId(WorldObject *pSource)
+{
+    if (!pSource || pSource->GetTypeId() != TYPEID_UNIT || !((Creature*)pSource)->GetDBTableGUIDLow())
+        return DEFAULT_GOSSIP_MESSAGE;
+
+    if (uint32 pos = sObjectMgr.GetNpcGossip(((Creature*)pSource)->GetDBTableGUIDLow()))
+        return pos;
+
+    return DEFAULT_GOSSIP_MESSAGE;
+}
+
+GossipOption const* Player::GetGossipOption(WorldObject *pSource, uint32 id) const
+{
+    if (pSource->GetTypeId() == TYPEID_UNIT)
+    {
+        GossipOptionList &iOptlist = ((Creature*)pSource)->GetGossipOptionList();
+
+        for(GossipOptionList::const_iterator i = iOptlist.begin( ); i != iOptlist.end( ); ++i)
+        {
+            if (i->Action == id)
+                return &*i;
+        }
+    }
+    return NULL;
+}
+
+/*********************************************************/
 /***                    QUEST SYSTEM                   ***/
 /*********************************************************/
 
@@ -12282,7 +12614,8 @@ void Player::SendPreparedQuest(uint64 guid)
         // need pet case for some quests
         if (Creature *pCreature = GetMap()->GetCreatureOrPetOrVehicle(guid))
         {
-            uint32 textid = pCreature->GetNpcTextId();
+            uint32 textid = GetGossipTextId(pCreature);
+
             GossipText const* gossiptext = sObjectMgr.GetGossipText(textid);
             if (!gossiptext)
             {

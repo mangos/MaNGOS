@@ -576,16 +576,9 @@ class MANGOS_DLL_SPEC Creature : public Unit
         std::string GetScriptName() const;
         uint32 GetScriptId() const;
 
-        void prepareGossipMenu( Player *pPlayer, uint32 gossipid = 0 );
-        void sendPreparedGossip( Player* player );
-        void OnGossipSelect(Player* player, uint32 option);
-        void OnPoiSelect(Player* player, GossipOption const *gossip);
-
-        uint32 GetGossipTextId(uint32 action, uint32 zoneid);
-        uint32 GetNpcTextId();
         void LoadGossipOptions();
-        GossipOption const* GetGossipOption( uint32 id ) const;
         void addGossipOption(GossipOption const& gso) { m_goptions.push_back(gso); }
+        GossipOptionList &GetGossipOptionList() { return m_goptions; }
 
         void Say(int32 textId, uint32 language, uint64 TargetGuid) { MonsterSay(textId,language,TargetGuid); }
         void Yell(int32 textId, uint32 language, uint64 TargetGuid) { MonsterYell(textId,language,TargetGuid); }

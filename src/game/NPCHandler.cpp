@@ -277,8 +277,8 @@ void WorldSession::HandleGossipHelloOpcode(WorldPacket & recv_data)
     if (!Script->GossipHello(_player, pCreature))
     {
         _player->TalkedToCreature(pCreature->GetEntry(), pCreature->GetGUID());
-        pCreature->prepareGossipMenu(_player);
-        pCreature->sendPreparedGossip(_player);
+        _player->PrepareGossipMenu(pCreature);
+        _player->SendPreparedGossip(pCreature);
     }
 }
 
@@ -287,39 +287,40 @@ void WorldSession::HandleGossipSelectOptionOpcode( WorldPacket & recv_data )
     sLog.outDebug("WORLD: CMSG_GOSSIP_SELECT_OPTION");
 
     uint32 option;
-    uint32 unk;
+    uint32 menuId;
     uint64 guid;
     std::string code = "";
 
-    recv_data >> guid >> unk >> option;
+    recv_data >> guid >> menuId >> option;
 
-    if(_player->PlayerTalkClass->GossipOptionCoded( option ))
+    if (_player->PlayerTalkClass->GossipOptionCoded(option))
     {
         sLog.outBasic("reading string");
         recv_data >> code;
         sLog.outBasic("string read: %s", code.c_str());
     }
 
-    Creature *unit = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_NONE);
-    if (!unit)
+    Creature *pCreature = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_NONE);
+
+    if (!pCreature)
     {
         sLog.outDebug( "WORLD: HandleGossipSelectOptionOpcode - Unit (GUID: %u) not found or you can't interact with him.", uint32(GUID_LOPART(guid)) );
         return;
     }
 
     // remove fake death
-    if(GetPlayer()->hasUnitState(UNIT_STAT_DIED))
+    if (GetPlayer()->hasUnitState(UNIT_STAT_DIED))
         GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 
-    if(!code.empty())
+    if (!code.empty())
     {
-        if (!Script->GossipSelectWithCode(_player, unit, _player->PlayerTalkClass->GossipOptionSender (option), _player->PlayerTalkClass->GossipOptionAction( option ), code.c_str()))
-            unit->OnGossipSelect (_player, option);
+        if (!Script->GossipSelectWithCode(_player, pCreature, _player->PlayerTalkClass->GossipOptionSender(option), _player->PlayerTalkClass->GossipOptionAction(option), code.c_str()))
+            _player->OnGossipSelect(pCreature, option);
     }
     else
     {
-        if (!Script->GossipSelect (_player, unit, _player->PlayerTalkClass->GossipOptionSender (option), _player->PlayerTalkClass->GossipOptionAction (option)))
-           unit->OnGossipSelect (_player, option);
+        if (!Script->GossipSelect(_player, pCreature, _player->PlayerTalkClass->GossipOptionSender(option), _player->PlayerTalkClass->GossipOptionAction(option)))
+           _player->OnGossipSelect(pCreature, option);
     }
 }
 

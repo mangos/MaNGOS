@@ -1296,6 +1296,19 @@ class MANGOS_DLL_SPEC Player : public Unit
         uint32 m_stableSlots;
 
         /*********************************************************/
+        /***                    GOSSIP SYSTEM                  ***/
+        /*********************************************************/
+
+        void PrepareGossipMenu(WorldObject *pSource, uint32 gossipid = 0);
+        void SendPreparedGossip(WorldObject *pSource);
+        void OnGossipSelect(WorldObject *pSource, uint32 option);
+        void OnPoiSelect(WorldObject *pSource, GossipOption const *gossip);
+
+        uint32 GetGossipTextId(uint32 action, uint32 zoneid);
+        uint32 GetGossipTextId(WorldObject *pSource);
+        GossipOption const* GetGossipOption(WorldObject *pSource, uint32 id) const;
+
+        /*********************************************************/
         /***                    QUEST SYSTEM                   ***/
         /*********************************************************/
 
