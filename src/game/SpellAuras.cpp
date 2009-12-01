@@ -2362,7 +2362,6 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                     caster->InterruptSpell(CURRENT_CHANNELED_SPELL);
                 return;
             }
-
         }
     }
 
