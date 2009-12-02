@@ -358,6 +358,10 @@ void Spell::EffectSchoolDMG(uint32 effect_idx)
                         damage = unitTarget->GetMaxHealth() / 10;
                         break;
                     }
+                    // Hand of Rekoning (name not have typos ;) )
+                    case 67485:
+                        damage += uint32(0.5f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK));
+                        break;
                 }
                 break;
             }
