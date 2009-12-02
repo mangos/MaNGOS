@@ -1883,15 +1883,17 @@ void BattleGroundMgr::BuildBattleGroundListPacket(WorldPacket *data, const uint6
     if(bgTypeId == BATTLEGROUND_AA)                         // arena
     {
         *data << uint8(4);                                  // unk
+        *data << uint8(0);                                  // unk
         *data << uint32(0);                                 // unk (count?)
     }
     else                                                    // battleground
     {
-        *data << uint8(0x00);                               // unk, different for each bg type
+        *data << uint8(0);                                  // unk, different for each bg type
+        *data << uint8(0);                                  // unk
 
         size_t count_pos = data->wpos();
         uint32 count = 0;
-        *data << uint32(0x00);                              // number of bg instances
+        *data << uint32(0);                                 // number of bg instances
 
         uint32 queue_id = plr->GetBattleGroundQueueIdFromLevel();
         for(std::set<uint32>::iterator itr = m_ClientBattleGroundIds[bgTypeId][queue_id].begin(); itr != m_ClientBattleGroundIds[bgTypeId][queue_id].end();++itr)

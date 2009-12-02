@@ -474,7 +474,7 @@ void WorldSession::HandleQueryQuestsCompleted( WorldPacket & recv_data )
     uint32 count = 0;
 
     WorldPacket data(SMSG_QUERY_QUESTS_COMPLETED_RESPONSE, 4+4*count);
-    data << count;
+    data << uint32(count);
 
     for(QuestStatusMap::const_iterator itr = _player->getQuestStatusMap().begin(); itr != _player->getQuestStatusMap().end(); ++itr)
     {
