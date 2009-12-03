@@ -3613,20 +3613,22 @@ void Spell::EffectDispel(uint32 i)
     {
         std::list < std::pair<uint32,uint64> > success_list;// (spell_id,casterGuid)
         std::list < uint32 > fail_list;                     // spell_id
-        int32 list_size = dispel_list.size();
 
         // some spells have effect value = 0 and all from its by meaning expect 1
         if(!damage)
             damage = 1;
 
         // Dispell N = damage buffs (or while exist buffs for dispel)
-        for (int32 count=0; count < damage && list_size > 0; ++count)
+        for (int32 count=0; count < damage && !dispel_list.empty(); ++count)
         {
             // Random select buff for dispel
             std::vector<Aura*>::iterator dispel_itr = dispel_list.begin();
-            std::advance(dispel_itr,urand(0, list_size-1));
+            std::advance(dispel_itr,urand(0, dispel_list.size()-1));
 
             Aura *aur = *dispel_itr;
+
+            // remove entry from dispel_list
+            dispel_list.erase(dispel_itr);
 
             SpellEntry const* spellInfo = aur->GetSpellProto();
             // Base dispel chance
@@ -3643,9 +3645,6 @@ void Spell::EffectDispel(uint32 i)
                 fail_list.push_back(spellInfo->Id);
             else
                 success_list.push_back(std::pair<uint32,uint64>(aur->GetId(),aur->GetCasterGUID()));
-
-            // remove entry from dispel_list
-            dispel_list.erase(dispel_itr);
         }
         // Send success log and really remove auras
         if (!success_list.empty())
