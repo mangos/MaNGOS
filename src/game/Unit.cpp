@@ -6919,8 +6919,16 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
             }
             case SPELLFAMILY_DRUID:
             {
+                // Leader of the Pack
+                if (auraSpellInfo->Id == 24932)
+                {
+                    if (triggerAmount == 0)
+                        return false;
+                    basepoints[0] = triggerAmount * GetMaxHealth() / 100;
+                    trigger_spell_id = 34299;
+                }
                 // Druid Forms Trinket
-                if (auraSpellInfo->Id==37336)
+                else if (auraSpellInfo->Id==37336)
                 {
                     switch(m_form)
                     {
@@ -6934,15 +6942,17 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
                             return false;
                     }
                 }
-                //else if (auraSpellInfo->Id==40363)// Entangling Roots ()
-                //    trigger_spell_id = ????;
-                // Leader of the Pack
-                else if (auraSpellInfo->Id == 24932)
+                // Druid T9 Feral Relic (Lacerate, Swipe, Mangle, and Shred)
+                else if (auraSpellInfo->Id==67353)
                 {
-                    if (triggerAmount == 0)
-                        return false;
-                    basepoints[0] = triggerAmount * GetMaxHealth() / 100;
-                    trigger_spell_id = 34299;
+                    switch(m_form)
+                    {
+                        case FORM_CAT:      trigger_spell_id = 67355; break;
+                        case FORM_BEAR:
+                        case FORM_DIREBEAR: trigger_spell_id = 67354; break;
+                        default:
+                            return false;
+                    }
                 }
                 break;
             }
