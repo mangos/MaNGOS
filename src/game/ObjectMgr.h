@@ -230,10 +230,13 @@ struct QuestPOI
     int32 ObjectiveIndex;
     uint32 MapId;
     uint32 Unk1;
+    uint32 Unk2;
+    uint32 Unk3;
+    uint32 Unk4;
     std::vector<QuestPOIPoint> points;
 
-    QuestPOI() : ObjectiveIndex(0), MapId(0), Unk1(0) {}
-    QuestPOI(int32 objIndex, uint32 mapId, uint32 unk1) : ObjectiveIndex(objIndex), MapId(mapId), Unk1(unk1) {}
+    QuestPOI() : ObjectiveIndex(0), MapId(0), Unk1(0), Unk2(0), Unk3(0), Unk4(0) {}
+    QuestPOI(int32 objIndex, uint32 mapId, uint32 unk1, uint32 unk2, uint32 unk3, uint32 unk4) : ObjectiveIndex(objIndex), MapId(mapId), Unk1(unk1), Unk2(unk2), Unk3(unk3), Unk4(unk4) {}
 };
 
 typedef std::vector<QuestPOI> QuestPOIVector;

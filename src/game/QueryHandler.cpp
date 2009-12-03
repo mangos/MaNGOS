@@ -527,9 +527,9 @@ void WorldSession::HandleQuestPOIQuery(WorldPacket& recv_data)
                     data << int32(itr->ObjectiveIndex);     // objective index
                     data << uint32(itr->MapId);             // mapid
                     data << uint32(itr->Unk1);              // unknown
-                    data << uint32(0);
-                    data << uint32(0);
-                    data << uint32(0);
+                    data << uint32(itr->Unk2);              // unknown
+                    data << uint32(itr->Unk3);              // unknown
+                    data << uint32(itr->Unk4);              // unknown
                     data << uint32(itr->points.size());     // POI points count
 
                     for(std::vector<QuestPOIPoint>::const_iterator itr2 = itr->points.begin(); itr2 != itr->points.end(); ++itr2)

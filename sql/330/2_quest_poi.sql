@@ -4,6 +4,9 @@ CREATE TABLE `quest_poi` (
   `objIndex` int(11) NOT NULL DEFAULT '0',
   `mapId` int(11) unsigned NOT NULL DEFAULT '0',
   `unk1` int(11) unsigned NOT NULL DEFAULT '0',
+  `unk2` int(11) unsigned NOT NULL DEFAULT '0',
+  `unk3` int(11) unsigned NOT NULL DEFAULT '0',
+  `unk4` int(11) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`questid`,`objIndex`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
@@ -17,9 +20,9 @@ CREATE TABLE `quest_poi_points` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- Sample data for quest 456
-INSERT INTO quest_poi VALUES (456, 0, 1, 0);
-INSERT INTO quest_poi VALUES (456, 1, 1, 0);
-INSERT INTO quest_poi VALUES (456, -1, 1, 0);
+INSERT INTO quest_poi VALUES (456, 0, 1, 0, 0, 0, 0);
+INSERT INTO quest_poi VALUES (456, 1, 1, 0, 0, 0, 0);
+INSERT INTO quest_poi VALUES (456, -1, 1, 0, 0, 0, 0);
 
 INSERT INTO quest_poi_points VALUES (456, 0, 0x28CF, 0x0217);
 INSERT INTO quest_poi_points VALUES (456, 0, 0x29F4, 0x02AA);
