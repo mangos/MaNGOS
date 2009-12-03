@@ -44,13 +44,13 @@ void WorldSession::HandleSplitItemOpcode( WorldPacket & recv_data )
     if (count == 0)
         return;                                             //check count - if zero it's fake packet
 
-    if(!_player->IsValidPos(srcbag, srcslot))
+    if(!_player->IsValidPos(srcbag, srcslot, true))
     {
         _player->SendEquipError( EQUIP_ERR_ITEM_NOT_FOUND, NULL, NULL );
         return;
     }
 
-    if(!_player->IsValidPos(dstbag, dstslot))
+    if(!_player->IsValidPos(dstbag, dstslot, false))        // can be autostore pos
     {
         _player->SendEquipError( EQUIP_ERR_ITEM_DOESNT_GO_TO_SLOT, NULL, NULL );
         return;
@@ -71,13 +71,13 @@ void WorldSession::HandleSwapInvItemOpcode( WorldPacket & recv_data )
     if(srcslot == dstslot)
         return;
 
-    if(!_player->IsValidPos(INVENTORY_SLOT_BAG_0, srcslot))
+    if(!_player->IsValidPos(INVENTORY_SLOT_BAG_0, srcslot, true))
     {
         _player->SendEquipError( EQUIP_ERR_ITEM_NOT_FOUND, NULL, NULL );
         return;
     }
 
-    if(!_player->IsValidPos(INVENTORY_SLOT_BAG_0,dstslot))
+    if(!_player->IsValidPos(INVENTORY_SLOT_BAG_0, dstslot, true))
     {
         _player->SendEquipError( EQUIP_ERR_ITEM_DOESNT_GO_TO_SLOT, NULL, NULL );
         return;
@@ -123,13 +123,13 @@ void WorldSession::HandleSwapItem( WorldPacket & recv_data )
     if(src == dst)
         return;
 
-    if(!_player->IsValidPos(srcbag, srcslot))
+    if(!_player->IsValidPos(srcbag, srcslot, true))
     {
         _player->SendEquipError( EQUIP_ERR_ITEM_NOT_FOUND, NULL, NULL );
         return;
     }
 
-    if(!_player->IsValidPos(dstbag, dstslot))
+    if(!_player->IsValidPos(dstbag, dstslot, true))
     {
         _player->SendEquipError( EQUIP_ERR_ITEM_DOESNT_GO_TO_SLOT, NULL, NULL );
         return;
@@ -425,7 +425,7 @@ void WorldSession::HandleItemQuerySingleOpcode( WorldPacket & recv_data )
         data << pProto->GemProperties;
         data << pProto->RequiredDisenchantSkill;
         data << pProto->ArmorDamageModifier;
-        data << pProto->Duration;                           // added in 2.4.2.8209, duration (seconds)
+        data << abs(pProto->Duration);                      // added in 2.4.2.8209, duration (seconds)
         data << pProto->ItemLimitCategory;                  // WotLK, ItemLimitCategory
         data << pProto->HolidayId;                          // Holiday.dbc?
         SendPacket( &data );
@@ -783,7 +783,7 @@ void WorldSession::HandleAutoStoreBagItemOpcode( WorldPacket & recv_data )
     if( !pItem )
         return;
 
-    if(!_player->IsValidPos(dstbag, NULL_SLOT))
+    if(!_player->IsValidPos(dstbag, NULL_SLOT, false))      // can be autostore pos
     {
         _player->SendEquipError( EQUIP_ERR_ITEM_DOESNT_GO_TO_SLOT, NULL, NULL );
         return;

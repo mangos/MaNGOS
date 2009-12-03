@@ -24,15 +24,16 @@
 #include "ObjectMgr.h"
 
 // Character Dump tables
-#define DUMP_TABLE_COUNT 21
-
 struct DumpTable
 {
     char const* name;
     DumpTableType type;
+
+    // helpers
+    bool isValid() const { return name != NULL; }
 };
 
-static DumpTable dumpTables[DUMP_TABLE_COUNT] =
+static DumpTable dumpTables[] =
 {
     { "characters",                       DTT_CHARACTER  },
     { "character_achievement",            DTT_CHAR_TABLE },
@@ -44,6 +45,7 @@ static DumpTable dumpTables[DUMP_TABLE_COUNT] =
     { "character_action",                 DTT_CHAR_TABLE },
     { "character_aura",                   DTT_CHAR_TABLE },
     { "character_homebind",               DTT_CHAR_TABLE },
+    { "character_skills",                 DTT_CHAR_TABLE },
     { "character_ticket",                 DTT_CHAR_TABLE },
     { "character_inventory",              DTT_INVENTORY  },
     { "mail",                             DTT_MAIL       },
@@ -55,6 +57,7 @@ static DumpTable dumpTables[DUMP_TABLE_COUNT] =
     { "pet_aura",                         DTT_PET_TABLE  },
     { "pet_spell",                        DTT_PET_TABLE  },
     { "pet_spell_cooldown",               DTT_PET_TABLE  },
+    { NULL,                               DTT_CHAR_TABLE }, // end marker
 };
 
 // Low level functions
@@ -258,7 +261,7 @@ void StoreGUID(QueryResult *result,uint32 data,uint32 field, std::set<uint32>& g
 }
 
 // Writing - High-level functions
-void PlayerDumpWriter::DumpTable(std::string& dump, uint32 guid, char const*tableFrom, char const*tableTo, DumpTableType type)
+void PlayerDumpWriter::DumpTableContent(std::string& dump, uint32 guid, char const*tableFrom, char const*tableTo, DumpTableType type)
 {
     GUIDs const* guids = NULL;
     char const* fieldname = NULL;
@@ -362,8 +365,8 @@ std::string PlayerDumpWriter::GetDump(uint32 guid)
     else
         sLog.outError("Character DB not have 'character_db_version' table, revision guard query not added to pdump.");
 
-    for(int i = 0; i < DUMP_TABLE_COUNT; ++i)
-        DumpTable(dump, guid, dumpTables[i].name, dumpTables[i].name, dumpTables[i].type);
+    for(DumpTable* itr = &dumpTables[0]; itr->isValid(); ++itr)
+        DumpTableContent(dump, guid, itr->name, itr->name, itr->type);
 
     // TODO: Add instance/group..
     // TODO: Add a dump level option to skip some non-important tables
@@ -497,17 +500,17 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
         }
 
         DumpTableType type;
-        uint8 i;
-        for(i = 0; i < DUMP_TABLE_COUNT; ++i)
+        DumpTable* dTable = &dumpTables[0];
+        for(; dTable->isValid(); ++dTable)
         {
-            if (tn == dumpTables[i].name)
+            if (tn == dTable->name)
             {
-                type = dumpTables[i].type;
+                type = dTable->type;
                 break;
             }
         }
 
-        if (i == DUMP_TABLE_COUNT)
+        if (!dTable->isValid())
         {
             sLog.outError("LoadPlayerDump: Unknown table: '%s'!", tn.c_str());
             ROLLBACK(DUMP_FILE_BROKEN);

@@ -2011,10 +2011,11 @@ bool ChatHandler::HandleItemMoveCommand(const char* args)
     if(srcslot==dstslot)
         return true;
 
-    if(!m_session->GetPlayer()->IsValidPos(INVENTORY_SLOT_BAG_0,srcslot))
+    if(!m_session->GetPlayer()->IsValidPos(INVENTORY_SLOT_BAG_0, srcslot, true))
         return false;
 
-    if(!m_session->GetPlayer()->IsValidPos(INVENTORY_SLOT_BAG_0,dstslot))
+    // can be autostore pos
+    if(!m_session->GetPlayer()->IsValidPos(INVENTORY_SLOT_BAG_0,dstslot, false))
         return false;
 
     uint16 src = ((INVENTORY_SLOT_BAG_0 << 8) | srcslot);

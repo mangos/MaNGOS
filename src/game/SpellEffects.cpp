@@ -358,6 +358,10 @@ void Spell::EffectSchoolDMG(uint32 effect_idx)
                         damage = unitTarget->GetMaxHealth() / 10;
                         break;
                     }
+                    // Hand of Rekoning (name not have typos ;) )
+                    case 67485:
+                        damage += uint32(0.5f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK));
+                        break;
                 }
                 break;
             }
@@ -1450,7 +1454,26 @@ void Spell::EffectDummy(uint32 i)
                                                  m_caster->GetTotalAttackPowerValue(BASE_ATTACK)*0.2f);
 
                 m_caster->CastCustomSpell(unitTarget, 20647, &basePoints0, NULL, NULL, true, 0);
-                m_caster->SetPower(POWER_RAGE, m_caster->GetPower(POWER_RAGE)-rage);
+
+                // Sudden Death
+                if(m_caster->HasAura(52437))
+                {
+                    Unit::AuraList const& auras = m_caster->GetAurasByType(SPELL_AURA_PROC_TRIGGER_SPELL);
+                    for (Unit::AuraList::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
+                    {
+                        // Only Sudden Death have this SpellIconID with SPELL_AURA_PROC_TRIGGER_SPELL
+                        if ((*itr)->GetSpellProto()->SpellIconID == 1989)
+                        {
+                            // saved rage top stored in next affect
+                            uint32 lastrage = (*itr)->GetSpellProto()->CalculateSimpleValue(1);
+                            if(lastrage < rage)
+                                rage -= lastrage;
+                            break;
+                        }
+                    }
+                }
+
+                m_caster->SetPower(POWER_RAGE,m_caster->GetPower(POWER_RAGE)-rage);
                 return;
             }
             // Slam
@@ -3580,8 +3603,9 @@ void Spell::EffectDispel(uint32 i)
                 if (positive == unitTarget->IsFriendlyTo(m_caster))
                     continue;
             }
-            // Add aura to dispel list
-            dispel_list.push_back(aur);
+            // Add aura to dispel list (all stack cases)
+            for(int k = 0; k < aur->GetStackAmount(); ++k)
+                dispel_list.push_back(aur);
         }
     }
     // Ok if exist some buffs for dispel try dispel it
@@ -3589,17 +3613,22 @@ void Spell::EffectDispel(uint32 i)
     {
         std::list < std::pair<uint32,uint64> > success_list;// (spell_id,casterGuid)
         std::list < uint32 > fail_list;                     // spell_id
-        int32 list_size = dispel_list.size();
 
         // some spells have effect value = 0 and all from its by meaning expect 1
         if(!damage)
             damage = 1;
 
         // Dispell N = damage buffs (or while exist buffs for dispel)
-        for (int32 count=0; count < damage && list_size > 0; ++count)
+        for (int32 count=0; count < damage && !dispel_list.empty(); ++count)
         {
             // Random select buff for dispel
-            Aura *aur = dispel_list[urand(0, list_size-1)];
+            std::vector<Aura*>::iterator dispel_itr = dispel_list.begin();
+            std::advance(dispel_itr,urand(0, dispel_list.size()-1));
+
+            Aura *aur = *dispel_itr;
+
+            // remove entry from dispel_list
+            dispel_list.erase(dispel_itr);
 
             SpellEntry const* spellInfo = aur->GetSpellProto();
             // Base dispel chance
@@ -3613,21 +3642,9 @@ void Spell::EffectDispel(uint32 i)
             }
             // Try dispel
             if (roll_chance_i(miss_chance))
-                fail_list.push_back(aur->GetId());
+                fail_list.push_back(spellInfo->Id);
             else
                 success_list.push_back(std::pair<uint32,uint64>(aur->GetId(),aur->GetCasterGUID()));
-            // Remove buff from list for prevent doubles
-            for (std::vector<Aura *>::iterator j = dispel_list.begin(); j != dispel_list.end(); )
-            {
-                Aura *dispeled = *j;
-                if (dispeled->GetId() == aur->GetId() && dispeled->GetCasterGUID() == aur->GetCasterGUID())
-                {
-                    j = dispel_list.erase(j);
-                    --list_size;
-                }
-                else
-                    ++j;
-            }
         }
         // Send success log and really remove auras
         if (!success_list.empty())
@@ -3636,7 +3653,7 @@ void Spell::EffectDispel(uint32 i)
             WorldPacket data(SMSG_SPELLDISPELLOG, 8+8+4+1+4+count*5);
             data.append(unitTarget->GetPackGUID());         // Victim GUID
             data.append(m_caster->GetPackGUID());           // Caster GUID
-            data << uint32(m_spellInfo->Id);                // Dispell spell id
+            data << uint32(m_spellInfo->Id);                // Dispel spell id
             data << uint8(0);                               // not used
             data << uint32(count);                          // count
             for (std::list<std::pair<uint32,uint64> >::iterator j = success_list.begin(); j != success_list.end(); ++j)
@@ -3644,7 +3661,7 @@ void Spell::EffectDispel(uint32 i)
                 SpellEntry const* spellInfo = sSpellStore.LookupEntry(j->first);
                 data << uint32(spellInfo->Id);              // Spell Id
                 data << uint8(0);                           // 0 - dispeled !=0 cleansed
-                unitTarget->RemoveAurasDueToSpellByDispel(spellInfo->Id, j->second, m_caster);
+                unitTarget->RemoveSingleAuraDueToSpellByDispel(spellInfo->Id, j->second, m_caster);
             }
             m_caster->SendMessageToSet(&data, true);
 

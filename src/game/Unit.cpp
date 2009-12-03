@@ -3466,6 +3466,23 @@ int32 Unit::GetMaxNegativeAuraModifierByMiscValue(AuraType auratype, int32 misc_
     return modifier;
 }
 
+float Unit::GetTotalAuraMultiplierByMiscValueForMask(AuraType auratype, uint32 mask) const
+{
+    if(!mask)
+        return 1.0f;
+
+    float multiplier = 1.0f;
+
+    AuraList const& mTotalAuraList = GetAurasByType(auratype);
+    for(AuraList::const_iterator i = mTotalAuraList.begin();i != mTotalAuraList.end(); ++i)
+    {
+        Modifier* mod = (*i)->GetModifier();
+        if (mask & (1 << (mod->m_miscvalue -1)))
+            multiplier *= (100.0f + mod->m_amount)/100.0f;
+    }
+    return multiplier;
+}
+
 bool Unit::AddAura(Aura *Aur)
 {
     SpellEntry const* aurSpellInfo = Aur->GetSpellProto();
@@ -3846,34 +3863,27 @@ void Unit::RemoveAurasByCasterSpell(uint32 spellId, uint32 effindex, uint64 cast
     }
 }
 
-void Unit::RemoveAurasDueToSpellByDispel(uint32 spellId, uint64 casterGUID, Unit *dispeler)
+void Unit::RemoveSingleAuraDueToSpellByDispel(uint32 spellId, uint64 casterGUID, Unit *dispeler)
 {
-    for (AuraMap::iterator iter = m_Auras.begin(); iter != m_Auras.end(); )
+    SpellEntry const* spellEntry = sSpellStore.LookupEntry(spellId);
+
+    // Custom dispel case
+    // Unstable Affliction
+    if(spellEntry->SpellFamilyName == SPELLFAMILY_WARLOCK && (spellEntry->SpellFamilyFlags & UI64LIT(0x010000000000)))
     {
-        Aura *aur = iter->second;
-        if (aur->GetId() == spellId && aur->GetCasterGUID() == casterGUID)
+        if (Aura* dotAura = GetAura(SPELL_AURA_PERIODIC_DAMAGE,SPELLFAMILY_WARLOCK,UI64LIT(0x010000000000),0x00000000,casterGUID))
         {
-            // Custom dispel case
-            // Unstable Affliction
-            if (aur->GetSpellProto()->SpellFamilyName == SPELLFAMILY_WARLOCK && (aur->GetSpellProto()->SpellFamilyFlags & UI64LIT(0x010000000000)))
-            {
-                int32 damage = aur->GetModifier()->m_amount*9;
-                uint64 caster_guid = aur->GetCasterGUID();
+            int32 damage = dotAura->GetModifier()->m_amount*9;
 
-                // Remove aura
-                RemoveAura(iter, AURA_REMOVE_BY_DISPEL);
+            // Remove spell auras from stack
+            RemoveSingleSpellAurasByCasterSpell(spellId, casterGUID, AURA_REMOVE_BY_DISPEL);
 
-                // backfire damage and silence
-                dispeler->CastCustomSpell(dispeler, 31117, &damage, NULL, NULL, true, NULL, NULL,caster_guid);
-
-                iter = m_Auras.begin();                     // iterator can be invalidate at cast if self-dispel
-            }
-            else
-                RemoveAura(iter, AURA_REMOVE_BY_DISPEL);
+            // backfire damage and silence
+            dispeler->CastCustomSpell(dispeler, 31117, &damage, NULL, NULL, true, NULL, NULL,casterGUID);
         }
-        else
-            ++iter;
     }
+    else
+        RemoveSingleSpellAurasByCasterSpell(spellId, casterGUID, AURA_REMOVE_BY_DISPEL);
 }
 
 void Unit::RemoveAurasDueToSpellBySteal(uint32 spellId, uint64 casterGUID, Unit *stealer)
@@ -3943,21 +3953,46 @@ void Unit::RemoveAurasWithDispelType( DispelType type )
     }
 }
 
-void Unit::RemoveSingleAuraFromStack(uint32 spellId, uint32 effindex)
+void Unit::RemoveSingleAuraFromStack(AuraMap::iterator &i, AuraRemoveMode mode)
+{
+    if (i->second->modStackAmount(-1))
+        RemoveAura(i,mode);
+}
+
+
+void Unit::RemoveSingleAuraFromStack(uint32 spellId, uint32 effindex, AuraRemoveMode mode)
 {
     AuraMap::iterator iter = m_Auras.find(spellEffectPair(spellId, effindex));
     if(iter != m_Auras.end())
+        RemoveSingleAuraFromStack(iter,mode);
+}
+
+void Unit::RemoveSingleSpellAurasFromStack(uint32 spellId, AuraRemoveMode mode)
+{
+    for (int i=0; i<3; ++i)
+        RemoveSingleAuraFromStack(spellId, i, mode);
+}
+
+void Unit::RemoveSingleSpellAurasByCasterSpell(uint32 spellId, uint64 casterGUID, AuraRemoveMode mode)
+{
+    for (int i=0; i<3; ++i)
+        RemoveSingleAuraByCasterSpell(spellId, i, casterGUID, mode);
+}
+
+void Unit::RemoveSingleAuraByCasterSpell(uint32 spellId, uint32 effindex, uint64 casterGUID, AuraRemoveMode mode)
+{
+    spellEffectPair spair = spellEffectPair(spellId, effindex);
+    for(AuraMap::iterator iter = m_Auras.lower_bound(spair); iter != m_Auras.upper_bound(spair); ++iter)
     {
-        if (iter->second->modStackAmount(-1))
-            RemoveAura(iter);
+        Aura *aur = iter->second;
+        if (aur->GetId() == spellId && aur->GetCasterGUID() == casterGUID)
+        {
+            RemoveSingleAuraFromStack(iter,mode);
+            break;
+        }
     }
 }
 
-void Unit::RemoveSingleSpellAurasFromStack(uint32 spellId)
-{
-    for (int i=0; i<3; ++i)
-        RemoveSingleAuraFromStack(spellId, i);
-}
 
 void Unit::RemoveAurasDueToSpell(uint32 spellId, Aura* except)
 {
@@ -4745,6 +4780,10 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     triggered_spell_id = 26654;
                     break;
                 }
+                // Twisted Reflection (boss spell)
+                case 21063:
+                    triggered_spell_id = 21064;
+                    break;
                 // Unstable Power
                 case 24658:
                 {
@@ -4835,6 +4874,30 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     triggered_spell_id = 34650;
                     break;
                 }
+                // Divine purpose
+                case 31871:
+                case 31872:
+                {
+                    // Roll chane
+                    if (!roll_chance_i(triggerAmount))
+                        return false;
+
+                    // Remove any stun effect on target
+                    AuraMap& Auras = pVictim->GetAuras();
+                    for(AuraMap::const_iterator iter = Auras.begin(); iter != Auras.end();)
+                    {
+                        SpellEntry const *spell = iter->second->GetSpellProto();
+                        if( spell->Mechanic == MECHANIC_STUN ||
+                            spell->EffectMechanic[iter->second->GetEffIndex()] == MECHANIC_STUN)
+                        {
+                            pVictim->RemoveAurasDueToSpell(spell->Id);
+                            iter = Auras.begin();
+                        }
+                        else
+                            ++iter;
+                    }
+                    return true;
+                }
                 // Mark of Malice
                 case 33493:
                 {
@@ -4846,10 +4909,6 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     triggered_spell_id = 33494;
                     break;
                 }
-                // Twisted Reflection (boss spell)
-                case 21063:
-                    triggered_spell_id = 21064;
-                    break;
                 // Vampiric Aura (boss spell)
                 case 38196:
                 {
@@ -4919,12 +4978,6 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                         ((Player*)this)->Say("This is Madness!", LANG_UNIVERSAL);
                     break;
                 }
-                /*
-                // Sunwell Exalted Caster Neck (??? neck)
-                // cast ??? Light's Wrath if Exalted by Aldor
-                // cast ??? Arcane Bolt if Exalted by Scryers*/
-                case 46569:
-                    return false;                           // old unused version
                 // Sunwell Exalted Caster Neck (Shattered Sun Pendant of Acumen neck)
                 // cast 45479 Light's Wrath if Exalted by Aldor
                 // cast 45429 Arcane Bolt if Exalted by Scryers
@@ -5033,6 +5086,12 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     }
                     return false;
                 }
+                /*
+                // Sunwell Exalted Caster Neck (??? neck)
+                // cast ??? Light's Wrath if Exalted by Aldor
+                // cast ??? Arcane Bolt if Exalted by Scryers*/
+                case 46569:
+                    return false;                           // old unused version
                 // Living Seed
                 case 48504:
                 {
@@ -5050,28 +5109,15 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     target = this;
                     break;
                 }
-                // Divine purpose
-                case 31871:
-                case 31872:
+                // Shadowfiend Death (Gain mana if pet dies with Glyph of Shadowfiend)
+                case 57989:
                 {
-                    // Roll chane
-                    if (!roll_chance_i(triggerAmount))
+                    Unit *owner = GetOwner();
+                    if (!owner || owner->GetTypeId() != TYPEID_PLAYER)
                         return false;
 
-                    // Remove any stun effect on target
-                    AuraMap& Auras = pVictim->GetAuras();
-                    for(AuraMap::const_iterator iter = Auras.begin(); iter != Auras.end();)
-                    {
-                        SpellEntry const *spell = iter->second->GetSpellProto();
-                        if( spell->Mechanic == MECHANIC_STUN ||
-                            spell->EffectMechanic[iter->second->GetEffIndex()] == MECHANIC_STUN)
-                        {
-                            pVictim->RemoveAurasDueToSpell(spell->Id);
-                            iter = Auras.begin();
-                        }
-                        else
-                            ++iter;
-                    }
+                    // Glyph of Shadowfiend (need cast as self cast for owner, no hidden cooldown)
+                    owner->CastSpell(owner,58227,true,castItem,triggeredByAura);
                     return true;
                 }
             }
@@ -6873,8 +6919,16 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
             }
             case SPELLFAMILY_DRUID:
             {
+                // Leader of the Pack
+                if (auraSpellInfo->Id == 24932)
+                {
+                    if (triggerAmount == 0)
+                        return false;
+                    basepoints[0] = triggerAmount * GetMaxHealth() / 100;
+                    trigger_spell_id = 34299;
+                }
                 // Druid Forms Trinket
-                if (auraSpellInfo->Id==37336)
+                else if (auraSpellInfo->Id==37336)
                 {
                     switch(m_form)
                     {
@@ -6888,15 +6942,17 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
                             return false;
                     }
                 }
-                //else if (auraSpellInfo->Id==40363)// Entangling Roots ()
-                //    trigger_spell_id = ????;
-                // Leader of the Pack
-                else if (auraSpellInfo->Id == 24932)
+                // Druid T9 Feral Relic (Lacerate, Swipe, Mangle, and Shred)
+                else if (auraSpellInfo->Id==67353)
                 {
-                    if (triggerAmount == 0)
-                        return false;
-                    basepoints[0] = triggerAmount * GetMaxHealth() / 100;
-                    trigger_spell_id = 34299;
+                    switch(m_form)
+                    {
+                        case FORM_CAT:      trigger_spell_id = 67355; break;
+                        case FORM_BEAR:
+                        case FORM_DIREBEAR: trigger_spell_id = 67354; break;
+                        default:
+                            return false;
+                    }
                 }
                 break;
             }
@@ -8571,15 +8627,7 @@ uint32 Unit::SpellDamageBonus(Unit *pVictim, SpellEntry const *spellProto, uint3
     }
 
     // Mod damage from spell mechanic
-    if (uint32 mechanicMask = GetAllSpellMechanicMask(spellProto))
-    {
-        AuraList const& mDamageDoneMechanic = pVictim->GetAurasByType(SPELL_AURA_MOD_MECHANIC_DAMAGE_TAKEN_PERCENT);
-        for(AuraList::const_iterator i = mDamageDoneMechanic.begin();i != mDamageDoneMechanic.end(); ++i)
-        {
-            if (mechanicMask & uint32(1 << ((*i)->GetModifier()->m_miscvalue)))
-                TakenTotalMod *= ((*i)->GetModifier()->m_amount + 100.0f) / 100.0f;
-        }
-    }
+    TakenTotalMod *= pVictim->GetTotalAuraMultiplierByMiscValueForMask(SPELL_AURA_MOD_MECHANIC_DAMAGE_TAKEN_PERCENT,GetAllSpellMechanicMask(spellProto));
 
     // Mod damage taken from AoE spells
     if(IsAreaOfEffectSpell(spellProto))
@@ -9388,16 +9436,7 @@ uint32 Unit::MeleeDamageBonus(Unit *pVictim, uint32 pdamage,WeaponAttackType att
     TakenPercent *= pVictim->GetTotalAuraMultiplierByMiscMask(SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN, schoolMask);
 
     // ..taken pct (by mechanic mask)
-    if (mechanicMask)
-    {
-        AuraList const& mTotalAuraList = GetAurasByType(SPELL_AURA_MOD_MECHANIC_DAMAGE_TAKEN_PERCENT);
-        for(AuraList::const_iterator i = mTotalAuraList.begin(); i != mTotalAuraList.end(); ++i)
-        {
-            Modifier* mod = (*i)->GetModifier();
-            if ((1<<(mod->m_miscvalue-1)) & mechanicMask)
-                TakenPercent *= (100.0f + mod->m_amount)/100.0f;
-        }
-    }
+    TakenPercent *= pVictim->GetTotalAuraMultiplierByMiscValueForMask(SPELL_AURA_MOD_MECHANIC_DAMAGE_TAKEN_PERCENT,mechanicMask);
 
     // ..taken pct (melee/ranged)
     if(attType == RANGED_ATTACK)
