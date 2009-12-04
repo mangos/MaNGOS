@@ -1441,14 +1441,14 @@ void Spell::EffectDummy(uint32 i)
                 uint32 rage = m_caster->GetPower(POWER_RAGE);
 
                 // up to max 30 rage cost
-                if(rage > 30)
-                    rage = 30;
+                if(rage > 300)
+                    rage = 300;
 
                 // Glyph of Execution bonus
                 uint32 rage_modified = rage;
 
                 if (Aura *aura = m_caster->GetDummyAura(58367))
-                    rage_modified +=  aura->GetModifier()->m_amount;
+                    rage_modified +=  aura->GetModifier()->m_amount*10;
 
                 int32 basePoints0 = damage+int32(rage_modified * m_spellInfo->DmgMultiplier[i] +
                                                  m_caster->GetTotalAttackPowerValue(BASE_ATTACK)*0.2f);
@@ -1465,7 +1465,7 @@ void Spell::EffectDummy(uint32 i)
                         if ((*itr)->GetSpellProto()->SpellIconID == 1989)
                         {
                             // saved rage top stored in next affect
-                            uint32 lastrage = (*itr)->GetSpellProto()->CalculateSimpleValue(1);
+                            uint32 lastrage = (*itr)->GetSpellProto()->CalculateSimpleValue(1)*10;
                             if(lastrage < rage)
                                 rage -= lastrage;
                             break;
