@@ -1693,8 +1693,47 @@ void Unit::CalcAbsorbResist(Unit *pVictim,SpellSchoolMask schoolMask, DamageEffe
     // Death Prevention Aura
     SpellEntry const*  preventDeathSpell = NULL;
     int32  preventDeathAmount = 0;
+
+    // full absorb cases (by chance)
+    AuraList const& vAbsorb = pVictim->GetAurasByType(SPELL_AURA_SCHOOL_ABSORB);
+    for(AuraList::const_iterator i = vAbsorb.begin(); i != vAbsorb.end() && RemainingDamage > 0; ++i)
+    {
+        // only work with proper school mask damage
+        Modifier* i_mod = (*i)->GetModifier();
+        if (!(i_mod->m_miscvalue & schoolMask))
+            continue;
+
+        SpellEntry const* i_spellProto = (*i)->GetSpellProto();
+        // Fire Ward or Frost Ward
+        if(i_spellProto->SpellFamilyName == SPELLFAMILY_MAGE && i_spellProto->SpellFamilyFlags & UI64LIT(0x0000000000000108))
+        {
+            int chance = 0;
+            Unit::AuraList const& auras = pVictim->GetAurasByType(SPELL_AURA_ADD_PCT_MODIFIER);
+            for (Unit::AuraList::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
+            {
+                SpellEntry const* itr_spellProto = (*itr)->GetSpellProto();
+                // Frost Warding (chance full absorb)
+                if (itr_spellProto->SpellFamilyName == SPELLFAMILY_MAGE && itr_spellProto->SpellIconID == 501)
+                {
+                    // chance stored in next dummy effect
+                    chance = itr_spellProto->CalculateSimpleValue(1);
+                    break;
+                }
+            }
+            if(roll_chance_i(chance))
+            {
+                int32 amount = RemainingDamage;
+                RemainingDamage = 0;
+                // Frost Warding (mana regen)
+                pVictim->CastCustomSpell(pVictim, 57776, &amount, NULL, NULL, true, NULL, *i);
+                break;
+            }
+        }
+    }
+
     // Need remove expired auras after
     bool existExpired = false;
+
     // absorb without mana cost
     AuraList const& vSchoolAbsorb = pVictim->GetAurasByType(SPELL_AURA_SCHOOL_ABSORB);
     for(AuraList::const_iterator i = vSchoolAbsorb.begin(); i != vSchoolAbsorb.end() && RemainingDamage > 0; ++i)
