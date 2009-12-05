@@ -6259,26 +6259,6 @@ void Aura::HandleSchoolAbsorb(bool apply, bool Real)
             DoneActualBenefit *= caster->CalculateLevelPenalty(GetSpellProto());
 
             m_modifier.m_amount += (int32)DoneActualBenefit;
-
-            // now that the correct amount is computed, apply caster aura, if any
-            switch(m_spellProto->SpellFamilyName)
-            {
-                case SPELLFAMILY_PRIEST:
-                    // Power Word: Shield
-                    if (m_spellProto->SpellFamilyFlags & UI64LIT(0x0000000000000001))
-                    {
-                        // Glyph of Power Word: Shield
-                        if(Aura* glyph = caster->GetAura(55672,0))
-                        {
-                            // instant heal glyph m_amount% of the absorbed amount
-                            int32 heal = (glyph->GetModifier()->m_amount * m_modifier.m_amount)/100;
-                            caster->CastCustomSpell(m_target, 56160, &heal, NULL, NULL, true, 0, this);
-                        }
-                    }
-                    break;
-                default:
-                    break;
-            }
         }
     }
     else
