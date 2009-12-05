@@ -2005,6 +2005,37 @@ void Unit::CalcAbsorbResist(Unit *pVictim,SpellSchoolMask schoolMask, DamageEffe
         RemainingDamage -= currentAbsorb;
     }
 
+    // effects dependent from full absorb amount
+    if (int32 full_absorb = damage - RemainingDamage - *resist)
+    {
+        Unit::AuraList const& auras = pVictim->GetAurasByType(SPELL_AURA_DUMMY);
+        for (Unit::AuraList::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
+        {
+            SpellEntry const* itr_spellProto = (*itr)->GetSpellProto();
+
+            // Incanter's Absorption
+            if (itr_spellProto->SpellFamilyName == SPELLFAMILY_GENERIC &&
+                itr_spellProto->SpellIconID == 2941)
+            {
+
+                int32 amount = int32(full_absorb * (*itr)->GetModifier()->m_amount / 100);
+
+                // apply normalized part of already accumulated amount in aura
+                if (Aura* spdAura = pVictim->GetAura(44413,0))
+                    amount += spdAura->GetModifier()->m_amount * spdAura->GetAuraDuration() / spdAura->GetAuraMaxDuration();
+
+                // limit 5 health percents
+                int32 health_5percent = pVictim->GetMaxHealth()*5/100;
+                if(amount > health_5percent)
+                    amount = health_5percent;
+
+                // Incanter's Absorption (triggered absorb based spell power, will replace existed if any)
+                pVictim->CastCustomSpell(pVictim, 44413, &amount, NULL, NULL, true);
+                break;
+            }
+        }
+    }
+
     // only split damage if not damaging yourself
     if(pVictim != this)
     {
