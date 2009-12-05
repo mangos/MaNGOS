@@ -5350,6 +5350,14 @@ void Spell::EffectScriptEffect(uint32 effIndex)
                     }
                     return;
                 }
+                // Guarded by The Light (Paladin spell with SPELLFAMILY_WARLOCK)
+                case 63521:
+                {
+                    // Divine Plea, refresh on target (3 aura slots)
+                    if (Aura* aura = unitTarget->GetAura(54428,0))
+                        aura->RefreshAura();
+                    return;
+                }
             }
             break;
         }
