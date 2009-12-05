@@ -19123,7 +19123,7 @@ BGQueueIdBasedOnLevel Player::GetBattleGroundQueueIdFromLevel() const
     uint32 queue_id = ( getLevel() / 10) - 1;
     if( queue_id >= MAX_BATTLEGROUND_QUEUES )
     {
-        sLog.outError("BattleGround: too high queue_id %u this shouldn't happen", queue_id);
+        sLog.outError("BattleGround: too high queue_id %u for player %u (acc: %u) with level %u", queue_id, GetGUIDLow(), GetSession()->GetAccountId(), getLevel());
         return QUEUE_ID_MAX_LEVEL_80;
     }
     return BGQueueIdBasedOnLevel(queue_id);
