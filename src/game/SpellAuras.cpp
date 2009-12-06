@@ -355,7 +355,7 @@ pAuraHandler AuraHandler[TOTAL_AURAS]=
     &Aura::HandleUnused,                                    //302 unused (3.2.2a)
     &Aura::HandleNULL,                                      //303 17 spells
     &Aura::HandleNULL,                                      //304 2 spells (alcohol effect?)
-    &Aura::HandleNULL,                                      //305 2 spells
+    &Aura::HandleAuraModIncreaseSpeed,                      //305 SPELL_AURA_MOD_MINIMUM_SPEED
     &Aura::HandleNULL                                       //306 1 spell
 };
 
@@ -5726,6 +5726,8 @@ void Aura::HandleShapeshiftBoosts(bool apply)
                 ((Player*)m_target)->RemoveSpellCooldown(49868);
             break;
         case FORM_GHOSTWOLF:
+            spellId1 = 67116;
+            break;
         case FORM_AMBIENT:
         case FORM_GHOUL:
         case FORM_STEALTH:
