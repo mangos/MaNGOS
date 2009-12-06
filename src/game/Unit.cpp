@@ -5680,6 +5680,34 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
         {
             switch(dummySpell->Id)
             {
+                // Leader of the Pack
+                case 24932:
+                {
+                    // dummy m_amount store health percent (!=0 if Improved Leader of the Pack applied)
+                    int32 heal_percent = triggeredByAura->GetModifier()->m_amount;
+                    if (!heal_percent)
+                        return false;
+
+                    // check explicitly only to prevent mana cast when halth cast cooldown
+                    if (cooldown && ((Player*)this)->HasSpellCooldown(34299))
+                        return false;
+
+                    // health
+                    triggered_spell_id = 34299;
+                    basepoints0 = GetMaxHealth() * heal_percent / 100;
+                    target = this;
+
+                    // mana to caster
+                    if (triggeredByAura->GetCasterGUID() == GetGUID())
+                    {
+                        if (SpellEntry const* manaCastEntry = sSpellStore.LookupEntry(60889))
+                        {
+                            int32 mana_percent = manaCastEntry->CalculateSimpleValue(0) * heal_percent;
+                            CastCustomSpell(this, manaCastEntry, &mana_percent, NULL, NULL, true, castItem, triggeredByAura);
+                        }
+                    }
+                    break;
+                }
                 // Healing Touch (Dreamwalker Raiment set)
                 case 28719:
                 {
@@ -6999,16 +7027,8 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
             }
             case SPELLFAMILY_DRUID:
             {
-                // Leader of the Pack
-                if (auraSpellInfo->Id == 24932)
-                {
-                    if (triggerAmount == 0)
-                        return false;
-                    basepoints[0] = triggerAmount * GetMaxHealth() / 100;
-                    trigger_spell_id = 34299;
-                }
                 // Druid Forms Trinket
-                else if (auraSpellInfo->Id==37336)
+                if (auraSpellInfo->Id==37336)
                 {
                     switch(m_form)
                     {
