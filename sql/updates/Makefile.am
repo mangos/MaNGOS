@@ -192,6 +192,7 @@ pkgdata_DATA = \
 	8923_01_mangos_gossip.sql \
 	8929_01_mangos_gossip_scripts.sql \
 	8930_01_mangos_spell_proc_event.sql \
+	8931_01_mangos_spell_bonus_data.sql \
 	README
 
 ## Additional files to include when running 'make dist'
@@ -364,4 +365,5 @@ EXTRA_DIST = \
 	8923_01_mangos_gossip.sql \
 	8929_01_mangos_gossip_scripts.sql \
 	8930_01_mangos_spell_proc_event.sql \
+	8931_01_mangos_spell_bonus_data.sql \
 	README
