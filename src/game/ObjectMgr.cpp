@@ -43,6 +43,7 @@
 #include "SpellAuras.h"
 #include "Util.h"
 #include "WaypointManager.h"
+#include "GossipDef.h"
 
 INSTANTIATE_SINGLETON_1(ObjectMgr);
 
@@ -51,6 +52,7 @@ ScriptMapMap sQuestStartScripts;
 ScriptMapMap sSpellScripts;
 ScriptMapMap sGameObjectScripts;
 ScriptMapMap sEventScripts;
+ScriptMapMap sGossipScripts;
 
 bool normalizePlayerName(std::string& name)
 {
@@ -4442,6 +4444,13 @@ void ObjectMgr::LoadEventScripts()
     }
 }
 
+void ObjectMgr::LoadGossipScripts()
+{
+    LoadScripts(sGossipScripts, "gossip_scripts");
+
+    // checks are done in LoadGossipMenuItems
+}
+
 void ObjectMgr::LoadItemTexts()
 {
     QueryResult *result = CharacterDatabase.Query("SELECT id, text FROM item_text");
@@ -7918,13 +7927,18 @@ void ObjectMgr::LoadGossipMenuItems()
         bar.step();
 
         sLog.outString();
-        sLog.outErrorDb(">> Loaded gossip_menu_items, table is empty!");
+        sLog.outErrorDb(">> Loaded gossip_menu_option, table is empty!");
         return;
     }
 
     barGoLink bar(result->GetRowCount());
 
     uint32 count = 0;
+
+    std::set<uint32> gossipScriptSet;
+
+    for(ScriptMapMap::const_iterator itr = sGossipScripts.begin(); itr != sGossipScripts.end(); ++itr)
+        gossipScriptSet.insert(itr->first);
 
     do
     {
@@ -7959,24 +7973,50 @@ void ObjectMgr::LoadGossipMenuItems()
 
         if (!PlayerCondition::IsValid(cond_1, cond_1_val_1, cond_1_val_2))
         {
-            sLog.outErrorDb("Table gossip_menu_items menu %u, invalid condition 1 for id %u", gMenuItem.menu_id, gMenuItem.id);
+            sLog.outErrorDb("Table gossip_menu_option menu %u, invalid condition 1 for id %u", gMenuItem.menu_id, gMenuItem.id);
             continue;
         }
         if (!PlayerCondition::IsValid(cond_2, cond_2_val_1, cond_2_val_2))
         {
-            sLog.outErrorDb("Table gossip_menu_items menu %u, invalid condition 2 for id %u", gMenuItem.menu_id, gMenuItem.id);
+            sLog.outErrorDb("Table gossip_menu_option menu %u, invalid condition 2 for id %u", gMenuItem.menu_id, gMenuItem.id);
             continue;
         }
         if (!PlayerCondition::IsValid(cond_3, cond_3_val_1, cond_3_val_2))
         {
-            sLog.outErrorDb("Table gossip_menu_items menu %u, invalid condition 3 for id %u", gMenuItem.menu_id, gMenuItem.id);
+            sLog.outErrorDb("Table gossip_menu_option menu %u, invalid condition 3 for id %u", gMenuItem.menu_id, gMenuItem.id);
             continue;
         }
 
+        if (gMenuItem.option_icon >= GOSSIP_ICON_MAX)
+        {
+            sLog.outErrorDb("Table gossip_menu_option for menu %u, id %u has unknown icon id %u. Replacing with GOSSIP_ICON_CHAT", gMenuItem.menu_id, gMenuItem.id, gMenuItem.option_icon);
+            gMenuItem.option_icon = GOSSIP_ICON_CHAT;
+        }
+
+        if (gMenuItem.option_id >= GOSSIP_OPTION_MAX)
+            sLog.outErrorDb("Table gossip_menu_option for menu %u, id %u has unknown option id %u. Option will not be used", gMenuItem.menu_id, gMenuItem.id, gMenuItem.option_id);
+
         if (gMenuItem.action_poi_id && !GetPointOfInterest(gMenuItem.action_poi_id))
         {
-            sLog.outErrorDb("Table gossip_menu_items for menu %u, id %u use non-existing action_poi_id %u, ignoring", gMenuItem.menu_id, gMenuItem.id, gMenuItem.action_poi_id);
+            sLog.outErrorDb("Table gossip_menu_option for menu %u, id %u use non-existing action_poi_id %u, ignoring", gMenuItem.menu_id, gMenuItem.id, gMenuItem.action_poi_id);
             gMenuItem.action_poi_id = 0;
+        }
+
+        if (gMenuItem.action_script_id)
+        {
+            if (gMenuItem.option_id != GOSSIP_OPTION_GOSSIP)
+            {
+                sLog.outErrorDb("Table gossip_menu_option for menu %u, id %u have action_script_id %u but option_id is not GOSSIP_OPTION_GOSSIP, ignoring", gMenuItem.menu_id, gMenuItem.id, gMenuItem.action_script_id);
+                continue;
+            }
+
+            if (sGossipScripts.find(gMenuItem.action_script_id) == sGossipScripts.end())
+            {
+                sLog.outErrorDb("Table gossip_menu_option for menu %u, id %u have action_script_id %u that does not exist in `gossip_scripts`, ignoring", gMenuItem.menu_id, gMenuItem.id, gMenuItem.action_script_id);
+                continue;
+            }
+
+            gossipScriptSet.erase(gMenuItem.action_script_id);
         }
 
         gMenuItem.cond_1 = GetConditionId(cond_1, cond_1_val_1, cond_1_val_2);
@@ -7992,8 +8032,14 @@ void ObjectMgr::LoadGossipMenuItems()
 
     delete result;
 
+    if (!gossipScriptSet.empty())
+    {
+        for(std::set<uint32>::const_iterator itr = gossipScriptSet.begin(); itr != gossipScriptSet.end(); ++itr)
+            sLog.outErrorDb("Table `gossip_scripts` contain unused script, id %u.", *itr);
+    }
+
     sLog.outString();
-    sLog.outString(">> Loaded %u gossip_menu_items entries", count);
+    sLog.outString(">> Loaded %u gossip_menu_option entries", count);
 }
 
 void ObjectMgr::AddVendorItem( uint32 entry,uint32 item, uint32 maxcount, uint32 incrtime, uint32 extendedcost )

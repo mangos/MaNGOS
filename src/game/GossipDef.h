@@ -47,7 +47,8 @@ enum Gossip_Option
     GOSSIP_OPTION_STABLEPET         = 14,                   //UNIT_NPC_FLAG_STABLE              (4194304)
     GOSSIP_OPTION_ARMORER           = 15,                   //UNIT_NPC_FLAG_ARMORER             (4096)
     GOSSIP_OPTION_UNLEARNTALENTS    = 16,                   //UNIT_NPC_FLAG_TRAINER             (16) (bonus option for GOSSIP_OPTION_TRAINER)
-    GOSSIP_OPTION_UNLEARNPETSKILLS  = 17                    //UNIT_NPC_FLAG_TRAINER             (16) (bonus option for GOSSIP_OPTION_TRAINER)
+    GOSSIP_OPTION_UNLEARNPETSKILLS  = 17,                   //UNIT_NPC_FLAG_TRAINER             (16) (bonus option for GOSSIP_OPTION_TRAINER)
+    GOSSIP_OPTION_MAX
 };
 
 enum GossipOptionIcon
@@ -62,7 +63,8 @@ enum GossipOptionIcon
     GOSSIP_ICON_TALK                = 7,                    //white chat bubble with black dots
     GOSSIP_ICON_TABARD              = 8,                    //tabard
     GOSSIP_ICON_BATTLE              = 9,                    //two swords
-    GOSSIP_ICON_DOT                 = 10                    //yellow dot
+    GOSSIP_ICON_DOT                 = 10,                   //yellow dot
+    GOSSIP_ICON_MAX
 };
 
 //POI icons. Many more exist, list not complete.

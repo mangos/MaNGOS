@@ -1402,6 +1402,9 @@ void World::SetInitialWorldSettings()
     sLog.outString( "Loading Npc Text Id..." );
     sObjectMgr.LoadNpcTextId();                                 // must be after load Creature and NpcText
 
+    sLog.outString( "Loading Gossip scripts..." );
+    sObjectMgr.LoadGossipScripts();                             // must be before gossip menu options
+
     sLog.outString( "Loading Gossip menus..." );
     sObjectMgr.LoadGossipMenu();
 
