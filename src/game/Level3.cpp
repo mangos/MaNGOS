@@ -407,7 +407,8 @@ bool ChatHandler::HandleReloadMangosStringCommand(const char*)
 bool ChatHandler::HandleReloadNpcOptionCommand(const char*)
 {
     sLog.outString( "Re-Loading `npc_option` Table!" );
-    sObjectMgr.LoadNpcOptions();
+    //sObjectMgr.LoadGossipMenu();
+    //sObjectMgr.LoadGossipMenuItems();
     SendGlobalSysMessage("DB table `npc_option` reloaded.");
     return true;
 }
