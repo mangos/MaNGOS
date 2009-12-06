@@ -164,7 +164,7 @@ struct CreatureLocale
     std::vector<std::string> SubName;
 };
 
-struct NpcOptionLocale
+struct GossipMenuItemsLocale
 {
     std::vector<std::string> OptionText;
     std::vector<std::string> BoxText;

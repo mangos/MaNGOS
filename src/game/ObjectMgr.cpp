@@ -338,9 +338,9 @@ void ObjectMgr::LoadCreatureLocales()
     sLog.outString( ">> Loaded %lu creature locale strings", (unsigned long)mCreatureLocaleMap.size() );
 }
 
-void ObjectMgr::LoadNpcOptionLocales()
+void ObjectMgr::LoadGossipMenuItemsLocales()
 {
-    mNpcOptionLocaleMap.clear();                              // need for reload case
+    mGossipMenuItemsLocaleMap.clear();                      // need for reload case
 
     QueryResult *result = WorldDatabase.Query("SELECT menu_id,id,"
         "option_text_loc1,box_text_loc1,option_text_loc2,box_text_loc2,"
@@ -370,7 +370,7 @@ void ObjectMgr::LoadNpcOptionLocales()
         uint16 menuId   = fields[0].GetUInt16();
         uint16 id       = fields[1].GetUInt16();
 
-        NpcOptionLocale& data = mNpcOptionLocaleMap[MAKE_PAIR32(menuId,id)];
+        GossipMenuItemsLocale& data = mGossipMenuItemsLocaleMap[MAKE_PAIR32(menuId,id)];
 
         for(int i = 1; i < MAX_LOCALE; ++i)
         {
@@ -404,7 +404,7 @@ void ObjectMgr::LoadNpcOptionLocales()
     delete result;
 
     sLog.outString();
-    sLog.outString( ">> Loaded %lu gossip_menu_option locale strings", (unsigned long)mNpcOptionLocaleMap.size() );
+    sLog.outString( ">> Loaded %lu gossip_menu_option locale strings", (unsigned long)mGossipMenuItemsLocaleMap.size() );
 }
 
 void ObjectMgr::LoadPointOfInterestLocales()
