@@ -3947,7 +3947,7 @@ void Unit::RemoveSingleAuraDueToSpellByDispel(uint32 spellId, uint64 casterGUID,
 {
     SpellEntry const* spellEntry = sSpellStore.LookupEntry(spellId);
 
-    // Custom dispel case
+    // Custom dispel cases
     // Unstable Affliction
     if(spellEntry->SpellFamilyName == SPELLFAMILY_WARLOCK && (spellEntry->SpellFamilyFlags & UI64LIT(0x010000000000)))
     {
@@ -3961,9 +3961,43 @@ void Unit::RemoveSingleAuraDueToSpellByDispel(uint32 spellId, uint64 casterGUID,
             // backfire damage and silence
             dispeler->CastCustomSpell(dispeler, 31117, &damage, NULL, NULL, true, NULL, NULL,casterGUID);
         }
+        return;
     }
-    else
+    // Flame Shock
+    if (spellEntry->SpellFamilyName == SPELLFAMILY_SHAMAN && (spellEntry->SpellFamilyFlags & UI64LIT(0x10000000)))
+    {
+        Unit* caster = NULL;
+        uint32 triggeredSpell = 0;
+
+        if (Aura* dotAura = GetAura(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_SHAMAN, UI64LIT(0x10000000), 0x00000000, casterGUID))
+            caster = dotAura->GetCaster();
+
+        if (caster && !caster->isDead())
+        {
+            Unit::AuraList const& auras = caster->GetAurasByType(SPELL_AURA_DUMMY);
+            for (Unit::AuraList::const_iterator i = auras.begin(); i != auras.end(); ++i)
+            {
+                switch((*i)->GetId())
+                {
+                    case 51480: triggeredSpell=64694; break;// Lava Flows, Rank 1
+                    case 51481: triggeredSpell=65263; break;// Lava Flows, Rank 2
+                    case 51482: triggeredSpell=65264; break;// Lava Flows, Rank 3
+                    default: continue;
+                }
+                break;
+            }
+        }
+
+        // Remove spell auras from stack
         RemoveSingleSpellAurasByCasterSpell(spellId, casterGUID, AURA_REMOVE_BY_DISPEL);
+
+        // Haste
+        if (triggeredSpell)
+            caster->CastSpell(caster, triggeredSpell, true);
+        return;
+    }
+
+    RemoveSingleSpellAurasByCasterSpell(spellId, casterGUID, AURA_REMOVE_BY_DISPEL);
 }
 
 void Unit::RemoveAurasDueToSpellBySteal(uint32 spellId, uint64 casterGUID, Unit *stealer)
