@@ -5933,13 +5933,6 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                 basepoints0 = GetAttackTime(BASE_ATTACK) * int32(ap*0.022f + 0.044f * holy) / 1000;
                 break;
             }
-            // Sacred Shield
-            if (dummySpell->SpellFamilyFlags & UI64LIT(0x0008000000000000))
-            {
-                triggered_spell_id = 58597;
-                target = this;
-                break;
-            }
             // Righteous Vengeance
             if (dummySpell->SpellIconID == 3025)
             {
@@ -6040,6 +6033,20 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     }
                     break;
                 }
+                // Spiritual Attunement
+                case 31785:
+                case 33776:
+                {
+                    // if healed by another unit (pVictim)
+                    if(this == pVictim)
+                        return false;
+
+                    // heal amount
+                    basepoints0 = triggerAmount*damage/100;
+                    target = this;
+                    triggered_spell_id = 31786;
+                    break;
+                }
                 // Seal of Vengeance (damage calc on apply aura)
                 case 31801:
                 {
@@ -6077,20 +6084,6 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     // Replenishment
                     CastSpell(this, 57669, true, NULL, triggeredByAura);
                     break;
-                // Spiritual Attunement
-                case 31785:
-                case 33776:
-                {
-                    // if healed by another unit (pVictim)
-                    if(this == pVictim)
-                        return false;
-
-                    // heal amount
-                    basepoints0 = triggerAmount*damage/100;
-                    target = this;
-                    triggered_spell_id = 31786;
-                    break;
-                }
                 // Paladin Tier 6 Trinket (Ashtongue Talisman of Zeal)
                 case 40470:
                 {
@@ -6117,29 +6110,6 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     if (!roll_chance_f(chance))
                         return false;
 
-                    break;
-                }
-                // Seal of Corruption (damage calc on apply aura)
-                case 53736:
-                {
-                    if(effIndex != 0)                       // effect 1,2 used by seal unleashing code
-                        return false;
-
-                    triggered_spell_id = 53742;
-
-                    // Add 5-stack effect
-                    int8 stacks = 0;
-                    AuraList const& auras = target->GetAurasByType(SPELL_AURA_PERIODIC_DAMAGE);
-                    for(AuraList::const_iterator itr = auras.begin(); itr!=auras.end(); ++itr)
-                    {
-                        if( ((*itr)->GetId() == 53742) && (*itr)->GetCasterGUID()==GetGUID())
-                        {
-                            stacks = (*itr)->GetStackAmount();
-                            break;
-                        }
-                    }
-                    if(stacks >= 5)
-                        CastSpell(target,53739,true,NULL,triggeredByAura);
                     break;
                 }
                 // Light's Beacon (heal target area aura)
@@ -6177,6 +6147,43 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     beacon->CastCustomSpell(beacon,triggered_spell_id,&basepoints0,NULL,NULL,true,castItem,triggeredByAura,pVictim->GetGUID());
                     return true;
                 }
+                // Seal of Corruption (damage calc on apply aura)
+                case 53736:
+                {
+                    if(effIndex != 0)                       // effect 1,2 used by seal unleashing code
+                        return false;
+
+                    triggered_spell_id = 53742;
+
+                    // Add 5-stack effect
+                    int8 stacks = 0;
+                    AuraList const& auras = target->GetAurasByType(SPELL_AURA_PERIODIC_DAMAGE);
+                    for(AuraList::const_iterator itr = auras.begin(); itr!=auras.end(); ++itr)
+                    {
+                        if( ((*itr)->GetId() == 53742) && (*itr)->GetCasterGUID()==GetGUID())
+                        {
+                            stacks = (*itr)->GetStackAmount();
+                            break;
+                        }
+                    }
+                    if(stacks >= 5)
+                        CastSpell(target,53739,true,NULL,triggeredByAura);
+                    break;
+                }
+                // Glyph of Flash of Light
+                case 54936:
+                    {
+                        triggered_spell_id = 54957;
+                        basepoints0 = triggerAmount*damage/100;
+                        break;
+                    }
+                    // Glyph of Holy Light
+                case 54937:
+                    {
+                        triggered_spell_id = 54968;
+                        basepoints0 = triggerAmount*damage/100;
+                        break;
+                    }
                 // Glyph of Divinity
                 case 54939:
                 {
@@ -6190,18 +6197,23 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                         }
                     return true;
                 }
-                // Glyph of Flash of Light
-                case 54936:
+                // Sacred Shield (buff)
+                case 58597:
                 {
-                    triggered_spell_id = 54957;
-                    basepoints0 = triggerAmount*damage/100;
+                    triggered_spell_id = 66922;
+                    SpellEntry const* triggeredEntry = sSpellStore.LookupEntry(triggered_spell_id);
+                    if (!triggeredEntry)
+                        return false;
+
+                    basepoints0 = int32(damage / (GetSpellDuration(triggeredEntry) / triggeredEntry->EffectAmplitude[0]));
+                    target = this;
                     break;
                 }
-                // Glyph of Holy Light
-                case 54937:
+                // Sacred Shield (talent rank)
+                case 53601: 
                 {
-                    triggered_spell_id = 54968;
-                    basepoints0 = triggerAmount*damage/100;
+                    triggered_spell_id = 58597;
+                    target = this;
                     break;
                 }
             }
