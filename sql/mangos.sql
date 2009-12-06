@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_8931_01_mangos_spell_bonus_data` bit(1) default NULL
+  `required_8932_01_mangos_spell_chain` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -17093,6 +17093,16 @@ INSERT INTO spell_chain VALUES
 (53596,53594,50274,4,0),
 (53597,53596,50274,5,0),
 (53598,53597,50274,6,0),
+/*------------------
+--(767)Pet - Ravager
+------------------*/
+/*Ravage*/
+(50518,0,50518,1,0),
+(53558,50518,50518,2,0),
+(53559,53558,50518,3,0),
+(53560,53559,50518,4,0),
+(53561,53560,50518,5,0),
+(53562,53561,50518,6,0),
 /*------------------
 --(768)Pet-Serpent
 ------------------*/
