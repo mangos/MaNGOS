@@ -1685,8 +1685,16 @@ void Spell::SetTargetMap(uint32 effIndex,uint32 targetMode,UnitList& TagUnitMap)
             }
             break;
         case TARGET_ALL_FRIENDLY_UNITS_IN_AREA:
+            // Death Pact (in fact selection by player selection)
+            if (m_spellInfo->Id == 48743)
+            {
+                // checked in Spell::CheckCast
+                if (m_caster->GetTypeId()==TYPEID_PLAYER)
+                    if (Unit* target = m_caster->GetMap()->GetPet(((Player*)m_caster)->GetSelection()))
+                        TagUnitMap.push_back(target);
+            }
             // Wild Growth
-            if (m_spellInfo->SpellFamilyName == SPELLFAMILY_DRUID && m_spellInfo->SpellIconID == 2864)
+            else if (m_spellInfo->SpellFamilyName == SPELLFAMILY_DRUID && m_spellInfo->SpellIconID == 2864)
             {
                 Unit* target = m_targets.getUnitTarget();
                 if(!target)
@@ -4299,6 +4307,34 @@ SpellCastResult Spell::CheckCast(bool strict)
         // for effects of spells that have only one target
         switch(m_spellInfo->Effect[i])
         {
+            case SPELL_EFFECT_INSTAKILL:
+                // Death Pact
+                if(m_spellInfo->Id == 48743)
+                {
+                    if (m_caster->GetTypeId() != TYPEID_PLAYER)
+                        return SPELL_FAILED_ERROR;
+
+                    if (!((Player*)m_caster)->GetSelection())
+                        return SPELL_FAILED_BAD_IMPLICIT_TARGETS;
+                    Pet* target = m_caster->GetMap()->GetPet(((Player*)m_caster)->GetSelection());
+
+                    // alive 
+                    if (!target || target->isDead())
+                        return SPELL_FAILED_BAD_IMPLICIT_TARGETS;
+                    // undead
+                    if (target->GetCreatureType() != CREATURE_TYPE_UNDEAD)
+                        return SPELL_FAILED_BAD_IMPLICIT_TARGETS;
+                    // owned
+                    if (target->GetOwnerGUID() != m_caster->GetGUID())
+                        return SPELL_FAILED_BAD_IMPLICIT_TARGETS;
+
+                    float dist = GetSpellRadius(sSpellRadiusStore.LookupEntry(m_spellInfo->EffectRadiusIndex[i]));
+                    if (!target->IsWithinDistInMap(m_caster,dist))
+                        return SPELL_FAILED_OUT_OF_RANGE;
+
+                    // will set in target selection code
+                }
+                break;
             case SPELL_EFFECT_DUMMY:
             {
                 if(m_spellInfo->SpellIconID == 1648)        // Execute
