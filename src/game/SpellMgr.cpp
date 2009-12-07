@@ -1412,6 +1412,10 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
                     if( spellId_1 == 35081 && spellInfo_2->SpellIconID==561 && spellInfo_2->SpellVisual[0]==7992)
                         return false;
 
+                    // Blessing of Sanctuary (multi-family check, some from 16 spell icon spells)
+                    if (spellInfo_1->Id == 67480 && spellInfo_2->Id == 20911)
+                        return false;
+
                     break;
                 }
             }
@@ -1640,7 +1644,12 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
                 // Concentration Aura and Improved Concentration Aura and Aura Mastery
                 if ((spellInfo_1->SpellIconID == 1487) && (spellInfo_2->SpellIconID == 1487))
                     return false;
+
             }
+
+            // Blessing of Sanctuary (multi-family check, some from 16 spell icon spells)
+            if (spellInfo_2->Id == 67480 && spellInfo_1->Id == 20911)
+                return false;
 
             // Combustion and Fire Protection Aura (multi-family check)
             if( spellInfo_2->Id == 11129 && spellInfo_1->SpellIconID == 33 && spellInfo_1->SpellVisual[0] == 321 )
