@@ -376,7 +376,7 @@ void ObjectMgr::LoadGossipMenuItemsLocales()
 
         for(int i = 1; i < MAX_LOCALE; ++i)
         {
-            std::string str = fields[1+2*(i-1)].GetCppString();
+            std::string str = fields[2+2*(i-1)].GetCppString();
             if(!str.empty())
             {
                 int idx = GetOrNewIndexForLocale(LocaleConstant(i));
@@ -388,7 +388,7 @@ void ObjectMgr::LoadGossipMenuItemsLocales()
                     data.OptionText[idx] = str;
                 }
             }
-            str = fields[1+2*(i-1)+1].GetCppString();
+            str = fields[2+2*(i-1)+1].GetCppString();
             if(!str.empty())
             {
                 int idx = GetOrNewIndexForLocale(LocaleConstant(i));
