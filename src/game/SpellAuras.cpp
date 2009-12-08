@@ -1418,7 +1418,7 @@ void Aura::HandleAddModifier(bool apply, bool Real)
 
         mod->mask = (uint64)ptr[0] | (uint64)ptr[1]<<32;
         mod->mask2= (uint64)ptr[2];
-        
+
         // prevent expire spell mods with (charges > 0 && m_stackAmount > 1)
         // all this spell expected expire not at use but at spell proc event check
         mod->charges = m_spellProto->StackAmount > 1 ? 0 : m_procCharges;
