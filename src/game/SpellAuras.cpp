@@ -2320,6 +2320,16 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                 }
                 break;
             case SPELLFAMILY_SHAMAN:
+                // Tidal Force
+                if (GetId() == 55198)
+                {
+                    // apply max stack bufs
+                    SpellEntry const* buffEntry = sSpellStore.LookupEntry(55166);
+                    if (!buffEntry)
+                        return;
+                    for(int k = 0; k < buffEntry->StackAmount; ++k)
+                        m_target->CastSpell(m_target, buffEntry, true, NULL, this);
+                }
                 // Earth Shield
                 else if ((GetSpellProto()->SpellFamilyFlags & UI64LIT(0x40000000000)))
                 {
