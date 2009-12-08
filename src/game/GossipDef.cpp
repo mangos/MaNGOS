@@ -103,6 +103,7 @@ void GossipMenu::ClearMenu()
 {
     m_gItems.clear();
     m_gItemsData.clear();
+    m_gMenuId = 0;
 }
 
 PlayerMenu::PlayerMenu( WorldSession *session ) : pSession(session)
