@@ -6471,7 +6471,7 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                         uint32 spell = (*itr)->GetSpellProto()->EffectTriggerSpell[(*itr)->GetEffIndex()];
                         CastSpell(this, spell, true, castItem, triggeredByAura);
                         if ((*itr)->DropAuraCharge())
-                            RemoveAurasDueToSpell((*itr)->GetId());
+                            RemoveSingleSpellAurasFromStack((*itr)->GetId());
                         return true;
                     }
                 }
@@ -6573,7 +6573,7 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                         }
                         CastSpell(target, spell, true, castItem, triggeredByAura);
                         if ((*itr)->DropAuraCharge())
-                            RemoveAurasDueToSpell((*itr)->GetId());
+                            RemoveSingleSpellAurasFromStack((*itr)->GetId());
                         return true;
                     }
                 }
@@ -12039,7 +12039,7 @@ void Unit::ProcDamageAndSpellFor( bool isVictim, Unit * pTarget, uint32 procFlag
         removedSpells.unique();
         // Remove auras from removedAuras
         for(RemoveSpellList::const_iterator i = removedSpells.begin(); i != removedSpells.end();++i)
-            RemoveAurasDueToSpell(*i);
+            RemoveSingleSpellAurasFromStack(*i);
     }
 }
 

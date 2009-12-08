@@ -1418,7 +1418,10 @@ void Aura::HandleAddModifier(bool apply, bool Real)
 
         mod->mask = (uint64)ptr[0] | (uint64)ptr[1]<<32;
         mod->mask2= (uint64)ptr[2];
-        mod->charges = m_procCharges;
+        
+        // prevent expire spell mods with (charges > 0 && m_stackAmount > 1)
+        // all this spell expected expire not at use but at spell proc event check
+        mod->charges = m_spellProto->StackAmount > 1 ? 0 : m_procCharges;
 
         m_spellmod = mod;
     }
@@ -2236,50 +2239,51 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
     // AT APPLY
     if(apply)
     {
-        switch(GetId())
-        {
-            case 1515:                                      // Tame beast
-                // FIX_ME: this is 2.0.12 threat effect replaced in 2.1.x by dummy aura, must be checked for correctness
-                if (m_target->CanHaveThreatList())
-                    if (Unit* caster = GetCaster())
-                        m_target->AddThreat(caster, 10.0f, false, GetSpellSchoolMask(GetSpellProto()), GetSpellProto());
-                return;
-            case 13139:                                     // net-o-matic
-                // root to self part of (root_target->charge->root_self sequence
-                if (Unit* caster = GetCaster())
-                    caster->CastSpell(caster, 13138, true, NULL, this);
-                return;
-            case 39850:                                     // Rocket Blast
-                if(roll_chance_i(20))                       // backfire stun
-                    m_target->CastSpell(m_target, 51581, true, NULL, this);
-                return;
-            case 43873:                                     // Headless Horseman Laugh
-                m_target->PlayDistanceSound(11965);
-                return;
-            case 46354:                                     // Blood Elf Illusion
-                if (Unit* caster = GetCaster())
-                {
-                    switch(caster->getGender())
-                    {
-                        case GENDER_FEMALE:
-                            caster->CastSpell(m_target, 46356, true, NULL, this);
-                            break;
-                        case GENDER_MALE:
-                            caster->CastSpell(m_target, 46355, true, NULL, this);
-                            break;
-                        default:
-                            break;
-                    }
-                }
-                return;
-            case 46699:                                     // Requires No Ammo
-                if(m_target->GetTypeId() == TYPEID_PLAYER)
-                    ((Player*)m_target)->RemoveAmmo();      // not use ammo and not allow use
-                return;
-        }
-
         switch(m_spellProto->SpellFamilyName)
         {
+            case SPELLFAMILY_GENERIC:
+                switch(GetId())
+                {
+                    case 1515:                              // Tame beast
+                        // FIX_ME: this is 2.0.12 threat effect replaced in 2.1.x by dummy aura, must be checked for correctness
+                        if (m_target->CanHaveThreatList())
+                            if (Unit* caster = GetCaster())
+                                m_target->AddThreat(caster, 10.0f, false, GetSpellSchoolMask(GetSpellProto()), GetSpellProto());
+                        return;
+                    case 13139:                             // net-o-matic
+                        // root to self part of (root_target->charge->root_self sequence
+                        if (Unit* caster = GetCaster())
+                            caster->CastSpell(caster, 13138, true, NULL, this);
+                        return;
+                    case 39850:                             // Rocket Blast
+                        if(roll_chance_i(20))               // backfire stun
+                            m_target->CastSpell(m_target, 51581, true, NULL, this);
+                        return;
+                    case 43873:                             // Headless Horseman Laugh
+                        m_target->PlayDistanceSound(11965);
+                        return;
+                    case 46354:                             // Blood Elf Illusion
+                        if (Unit* caster = GetCaster())
+                        {
+                            switch(caster->getGender())
+                            {
+                                case GENDER_FEMALE:
+                                    caster->CastSpell(m_target, 46356, true, NULL, this);
+                                    break;
+                                case GENDER_MALE:
+                                    caster->CastSpell(m_target, 46355, true, NULL, this);
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                        return;
+                    case 46699:                                     // Requires No Ammo
+                        if(m_target->GetTypeId() == TYPEID_PLAYER)
+                            ((Player*)m_target)->RemoveAmmo();      // not use ammo and not allow use
+                        return;
+                }
+                break;
             case SPELLFAMILY_WARRIOR:
                 // Overpower
                 if(m_spellProto->SpellFamilyFlags & UI64LIT(0x0000000000000004))
@@ -2317,7 +2321,7 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                 break;
             case SPELLFAMILY_SHAMAN:
                 // Earth Shield
-                if ((GetSpellProto()->SpellFamilyFlags & UI64LIT(0x40000000000)))
+                else if ((GetSpellProto()->SpellFamilyFlags & UI64LIT(0x40000000000)))
                 {
                     // prevent double apply bonuses
                     if(m_target->GetTypeId() != TYPEID_PLAYER || !((Player*)m_target)->GetSession()->PlayerLoading())
