@@ -7664,6 +7664,9 @@ bool Unit::HandleOverrideClassScriptAuraProc(Unit *pVictim, uint32 damage, Aura 
         case 5497:                                          // Improved Mana Gems (Serpent-Coil Braid)
             triggered_spell_id = 37445;                     // Mana Surge
             break;
+        case 6953:                                          // Warbringer
+            RemoveAurasAtMechanicImmunity(IMMUNE_TO_ROOT_AND_SNARE_MASK,0,true);
+            return true;
         case 8152:                                          // Serendipity
         {
             // if heal your target over maximum health
