@@ -7993,6 +7993,9 @@ void ObjectMgr::LoadGossipMenuItems()
             gMenuItem.option_icon = GOSSIP_ICON_CHAT;
         }
 
+        if (gMenuItem.option_id == GOSSIP_OPTION_NONE)
+            sLog.outErrorDb("Table gossip_menu_option for menu %u, id %u use option id GOSSIP_OPTION_NONE. Option will never be used", gMenuItem.menu_id, gMenuItem.id);
+
         if (gMenuItem.option_id >= GOSSIP_OPTION_MAX)
             sLog.outErrorDb("Table gossip_menu_option for menu %u, id %u has unknown option id %u. Option will not be used", gMenuItem.menu_id, gMenuItem.id, gMenuItem.option_id);
 
