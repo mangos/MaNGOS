@@ -1445,7 +1445,7 @@ void Aura::HandleAddModifier(bool apply, bool Real)
     if (Group* group = ((Player*)m_target)->GetGroup())
         for(GroupReference *itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
             if (Player* member = itr->getSource())
-                if (member != m_target)
+                if (member != m_target && member->IsInMap(m_target))
                     ReapplyAffectedPassiveAuras(member);
 }
 void Aura::HandleAddTargetTrigger(bool apply, bool /*Real*/)
