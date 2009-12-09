@@ -4972,6 +4972,18 @@ SpellCastResult Spell::CheckCasterAuras() const
         prevented_reason = SPELL_FAILED_SILENCED;
     else if (unitflag & UNIT_FLAG_PACIFIED && m_spellInfo->PreventionType == SPELL_PREVENTION_TYPE_PACIFY)
         prevented_reason = SPELL_FAILED_PACIFIED;
+    else if(m_caster->HasAuraType(SPELL_AURA_ALLOW_ONLY_ABILITY))
+    {
+        Unit::AuraList const& casingLimit = m_caster->GetAurasByType(SPELL_AURA_ALLOW_ONLY_ABILITY);
+        for(Unit::AuraList::const_iterator itr = casingLimit.begin(); itr != casingLimit.end(); ++itr)
+        {
+            if(!IsAffectedByAura(*itr))
+            {
+               prevented_reason = SPELL_FAILED_CASTER_AURASTATE;
+               break;
+            }
+        }
+    }
 
     // Attr must make flag drop spell totally immune from all effects
     if (prevented_reason != SPELL_CAST_OK)
@@ -5726,7 +5738,7 @@ void Spell::UpdatePointers()
     m_targets.Update(m_caster);
 }
 
-bool Spell::IsAffectedByAura(Aura *aura)
+bool Spell::IsAffectedByAura(Aura *aura) const
 {
     return sSpellMgr.IsAffectedByMod(m_spellInfo, aura->getAuraSpellMod());
 }

@@ -441,7 +441,7 @@ class Spell
 
         void UpdatePointers();                              // must be used at call Spell code after time delay (non triggered spell cast/update spell call/etc)
 
-        bool IsAffectedByAura(Aura *aura);
+        bool IsAffectedByAura(Aura *aura) const;
 
         bool CheckTargetCreatureType(Unit* target) const;
 
