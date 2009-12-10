@@ -11727,6 +11727,7 @@ bool InitTriggerAuraData()
     isTriggerAura[SPELL_AURA_PROC_TRIGGER_SPELL_WITH_VALUE] = true;
     isTriggerAura[SPELL_AURA_MOD_DAMAGE_FROM_CASTER] = true;
     isTriggerAura[SPELL_AURA_MOD_SPELL_CRIT_CHANCE] = true;
+    isTriggerAura[SPELL_AURA_MAELSTROM_WEAPON] = true;
 
     isNonTriggerAura[SPELL_AURA_MOD_POWER_REGEN]=true;
     isNonTriggerAura[SPELL_AURA_REDUCE_PUSHBACK]=true;
@@ -12017,6 +12018,13 @@ void Unit::ProcDamageAndSpellFor( bool isVictim, Unit * pTarget, uint32 procFlag
                     continue;
                 }
                 break;
+            case SPELL_AURA_MAELSTROM_WEAPON:
+                sLog.outDebug("ProcDamageAndSpell: casting spell id %u (triggered by %s maelstrom aura of spell %u)", spellInfo->Id,(isVictim?"a victim's":"an attacker's"), triggeredByAura->GetId());
+
+                // remove all stack;
+                RemoveSpellsCausingAura(SPELL_AURA_MAELSTROM_WEAPON);
+                triggeredByAura->SetInUse(false);           // this safe, aura locked
+                continue;                                   // avoid re-remove attempts
             default:
                 // nothing do, just charges counter
                 break;
