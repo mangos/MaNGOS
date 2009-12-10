@@ -2167,7 +2167,7 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         void SetHomebindToCurrentPos();
         void RelocateToHomebind() { SetLocationMapId(m_homebindMapId); Relocate(m_homebindX,m_homebindY,m_homebindZ); }
-        void TeleportToHomebind(uint32 options = 0) { TeleportTo(m_homebindMapId, m_homebindX, m_homebindY, m_homebindZ, GetOrientation(),options); }
+        bool TeleportToHomebind(uint32 options = 0) { return TeleportTo(m_homebindMapId, m_homebindX, m_homebindY, m_homebindZ, GetOrientation(),options); }
 
         // currently visible objects at player client
         typedef std::set<uint64> ClientGUIDs;
