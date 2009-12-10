@@ -410,13 +410,7 @@ void WorldSession::SendBindPoint(Creature *npc)
     uint32 bindspell = 3286;
     uint32 zone_id = _player->GetZoneId();
 
-    // update sql homebind
-    CharacterDatabase.PExecute("UPDATE character_homebind SET map = '%u', zone = '%u', position_x = '%f', position_y = '%f', position_z = '%f' WHERE guid = '%u'", _player->GetMapId(), zone_id, _player->GetPositionX(), _player->GetPositionY(), _player->GetPositionZ(), _player->GetGUIDLow());
-    _player->m_homebindMapId = _player->GetMapId();
-    _player->m_homebindZoneId = zone_id;
-    _player->m_homebindX = _player->GetPositionX();
-    _player->m_homebindY = _player->GetPositionY();
-    _player->m_homebindZ = _player->GetPositionZ();
+    _player->SetHomebindToCurrentPos();
 
     // send spell for bind 3286 bind magic
     npc->CastSpell(_player, bindspell, true);
