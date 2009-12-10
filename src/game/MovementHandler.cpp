@@ -238,7 +238,6 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
     ReadMovementInfo(recv_data, &movementInfo);
     /*----------------*/
 
-        recv_data.rpos(recv_data.wpos());                   // prevent warnings spam
     if (!MaNGOS::IsValidMapCoord(movementInfo.x, movementInfo.y, movementInfo.z, movementInfo.o))
     {
         recv_data.rpos(recv_data.wpos());                   // prevent warnings spam

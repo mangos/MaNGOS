@@ -225,7 +225,10 @@ void RASocket::OnRead()
                 if (strlen(buff))
                 {
                     sLog.outRALog("Got '%s' cmd.\n",buff);
-                    sWorld.QueueCliCommand(&RASocket::zprint , buff);
+                    if (strncmp(buff,"quit",4)==0)
+                        SetCloseAndDelete();
+                    else
+                        sWorld.QueueCliCommand(&RASocket::zprint, buff);
                 }
                 else
                     Sendf("mangos>");
