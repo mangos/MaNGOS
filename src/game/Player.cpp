@@ -12258,7 +12258,7 @@ void Player::PrepareGossipMenu(WorldObject *pSource, uint32 menuId)
                         bCanTalk = false;
                     break;
                 case GOSSIP_OPTION_STABLEPET:
-                    if (!GetPet() || GetPet()->getPetType() != HUNTER_PET)
+                    if (getClass() != CLASS_HUNTER)
                         bCanTalk = false;
                     break;
                 case GOSSIP_OPTION_GOSSIP:
