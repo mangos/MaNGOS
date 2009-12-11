@@ -483,7 +483,7 @@ bool IsPositiveEffect(uint32 spellId, uint32 effIndex)
                             break;
                     }
                 }   break;
-                case SPELL_AURA_MOD_DAMAGE_DONE:            // dependent from bas point sign (negative -> negative)
+                case SPELL_AURA_MOD_DAMAGE_DONE:            // dependent from base point sign (negative -> negative)
                 case SPELL_AURA_MOD_STAT:
                 case SPELL_AURA_MOD_SKILL:
                 case SPELL_AURA_MOD_HEALING_PCT:
@@ -496,8 +496,10 @@ bool IsPositiveEffect(uint32 spellId, uint32 effIndex)
                         return false;
                     break;
                 case SPELL_AURA_MOD_SPELL_CRIT_CHANCE:
+                case SPELL_AURA_MOD_INCREASE_HEALTH_PERCENT:
+                case SPELL_AURA_MOD_DAMAGE_PERCENT_DONE:
                     if(spellproto->CalculateSimpleValue(effIndex) > 0)
-                        return true;                        // some expected positive spells have SPELL_ATTR_EX_NEGATIVE
+                        return true;                        // some expected positive spells have SPELL_ATTR_EX_NEGATIVE or unclear target modes
                     break;
                 case SPELL_AURA_ADD_TARGET_TRIGGER:
                     return true;
@@ -573,6 +575,8 @@ bool IsPositiveEffect(uint32 spellId, uint32 effIndex)
                     // some spells negative
                     switch(spellproto->Id)
                     {
+                        case 802:                           // Mutate Bug, wrongly negative by target modes
+                            return true;
                         case 36900:                         // Soul Split: Evil!
                         case 36901:                         // Soul Split: Good
                         case 36893:                         // Transporter Malfunction (decrease size case)
