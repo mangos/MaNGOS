@@ -7244,6 +7244,15 @@ bool PlayerCondition::Meets(Player const * player) const
             return !player->HasAura(value1, value2);
         case CONDITION_ACTIVE_EVENT:
             return sGameEventMgr.IsActiveEvent(value1);
+        case CONDITION_AREA_FLAG:
+        {
+            if (AreaTableEntry const *pAreaEntry = GetAreaEntryByAreaID(player->GetAreaId()))
+            {
+                if ((!value1 || (pAreaEntry->flags & value1)) && (!value2 || !(pAreaEntry->flags & value2)))
+                    return true;
+            }
+            return false;
+        }
         default:
             return false;
     }
@@ -7384,6 +7393,15 @@ bool PlayerCondition::IsValid(ConditionType condition, uint32 value1, uint32 val
             if(value1 >=events.size() || !events[value1].isValid())
             {
                 sLog.outErrorDb("Active event condition requires existed event id (%u), skipped", value1);
+                return false;
+            }
+            break;
+        }
+        case CONDITION_AREA_FLAG:
+        {
+            if (!value1 && !value2)
+            {
+                sLog.outErrorDb("Area flag condition has both values like 0, skipped");
                 return false;
             }
             break;

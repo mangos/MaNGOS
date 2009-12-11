@@ -284,9 +284,10 @@ enum ConditionType
     CONDITION_AD_COMMISSION_AURA    = 10,                   // 0            0,      for condition true while one from AD commission aura active
     CONDITION_NO_AURA               = 11,                   // spell_id     effindex
     CONDITION_ACTIVE_EVENT          = 12,                   // event_id
+    CONDITION_AREA_FLAG             = 13                    // area_flag    area_flag_not
 };
 
-#define MAX_CONDITION                 13                    // maximum value in ConditionType enum
+#define MAX_CONDITION                 14                    // maximum value in ConditionType enum
 
 struct PlayerCondition
 {
