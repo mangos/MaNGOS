@@ -110,7 +110,7 @@ Unit(), i_AI(NULL),
 lootForPickPocketed(false), lootForBody(false), m_groupLootTimer(0), lootingGroupLeaderGUID(0),
 m_lootMoney(0), m_lootRecipient(0),
 m_deathTimer(0), m_respawnTime(0), m_respawnDelay(25), m_corpseDelay(60), m_respawnradius(0.0f),
-m_gossipOptionLoaded(false), m_isPet(false), m_isVehicle(false), m_isTotem(false),
+m_isPet(false), m_isVehicle(false), m_isTotem(false),
 m_defaultMovementType(IDLE_MOTION_TYPE), m_DBTableGuid(0), m_equipmentId(0),
 m_AlreadyCallAssistance(false), m_AlreadySearchedAssistance(false),
 m_regenHealth(true), m_AI_locked(false), m_isDeadByDefault(false), m_meleeDamageSchoolMask(SPELL_SCHOOL_MASK_NORMAL),
@@ -742,21 +742,6 @@ bool Creature::isCanTrainingAndResetTalentsOf(Player* pPlayer) const
     return pPlayer->getLevel() >= 10
         && GetCreatureInfo()->trainer_type == TRAINER_TYPE_CLASS
         && pPlayer->getClass() == GetCreatureInfo()->trainer_class;
-}
-
-void Creature::LoadGossipOptions()
-{
-    if(m_gossipOptionLoaded)
-        return;
-
-    uint32 npcflags=GetUInt32Value(UNIT_NPC_FLAGS);
-
-    CacheNpcOptionList const& noList = sObjectMgr.GetNpcOptions ();
-    for (CacheNpcOptionList::const_iterator i = noList.begin (); i != noList.end (); ++i)
-        if(i->NpcFlag & npcflags)
-            addGossipOption(*i);
-
-    m_gossipOptionLoaded = true;
 }
 
 void Creature::AI_SendMoveToPacket(float x, float y, float z, uint32 time, MonsterMovementFlags flags, uint8 type)

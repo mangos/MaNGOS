@@ -355,7 +355,7 @@ void WorldSession::LogoutPlayer(bool Save)
         ///- Teleport to home if the player is in an invalid instance
         if(!_player->m_InstanceValid && !_player->isGameMaster())
         {
-            _player->TeleportTo(_player->m_homebindMapId, _player->m_homebindX, _player->m_homebindY, _player->m_homebindZ, _player->GetOrientation());
+            _player->TeleportToHomebind();
             //this is a bad place to call for far teleport because we need player to be in world for successful logout
             //maybe we should implement delayed far teleport logout?
         }

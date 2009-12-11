@@ -1329,10 +1329,8 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
                         spellInfo_2->SpellVisual[0] == 99 && spellInfo_1->SpellVisual[0] == 0 ) )
                         return false;
 
-                    // Heart of the Wild and (Primal Instinct (Idol of Terror) triggering spell or Agility)
-                    if( spellInfo_1->SpellIconID == 240 && spellInfo_2->SpellIconID == 240 && (
-                        spellInfo_1->SpellVisual[0] == 0 && spellInfo_2->SpellVisual[0] == 78 ||
-                        spellInfo_2->SpellVisual[0] == 0 && spellInfo_1->SpellVisual[0] == 78 ) )
+                    // Heart of the Wild, Agility and various Idol Triggers
+                    if(spellInfo_1->SpellIconID == 240 && spellInfo_2->SpellIconID == 240)
                         return false;
 
                     // Personalized Weather (thunder effect should overwrite rainy aura)
@@ -1412,6 +1410,10 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
 
                     // *Band of Eternal Champion and Seal of Command(multi-family check)
                     if( spellId_1 == 35081 && spellInfo_2->SpellIconID==561 && spellInfo_2->SpellVisual[0]==7992)
+                        return false;
+
+                    // Blessing of Sanctuary (multi-family check, some from 16 spell icon spells)
+                    if (spellInfo_1->Id == 67480 && spellInfo_2->Id == 20911)
                         return false;
 
                     break;
@@ -1642,7 +1644,12 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
                 // Concentration Aura and Improved Concentration Aura and Aura Mastery
                 if ((spellInfo_1->SpellIconID == 1487) && (spellInfo_2->SpellIconID == 1487))
                     return false;
+
             }
+
+            // Blessing of Sanctuary (multi-family check, some from 16 spell icon spells)
+            if (spellInfo_2->Id == 67480 && spellInfo_1->Id == 20911)
+                return false;
 
             // Combustion and Fire Protection Aura (multi-family check)
             if( spellInfo_2->Id == 11129 && spellInfo_1->SpellIconID == 33 && spellInfo_1->SpellVisual[0] == 321 )
@@ -1662,6 +1669,10 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
                 // Windfury weapon
                 if( spellInfo_1->SpellIconID==220 && spellInfo_2->SpellIconID==220 &&
                     spellInfo_1->SpellFamilyFlags != spellInfo_2->SpellFamilyFlags )
+                    return false;
+
+                // Ghost Wolf
+                if (spellInfo_1->SpellIconID == 67 && spellInfo_2->SpellIconID == 67)
                     return false;
             }
             // Bloodlust and Bloodthirst (multi-family check)
@@ -1711,12 +1722,21 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
     if (spellInfo_1->SpellFamilyName != spellInfo_2->SpellFamilyName)
         return false;
 
+    bool dummy_only = true;
     for (int i = 0; i < 3; ++i)
+    {
         if (spellInfo_1->Effect[i] != spellInfo_2->Effect[i] ||
         spellInfo_1->EffectItemType[i] != spellInfo_2->EffectItemType[i] ||
         spellInfo_1->EffectMiscValue[i] != spellInfo_2->EffectMiscValue[i] ||
         spellInfo_1->EffectApplyAuraName[i] != spellInfo_2->EffectApplyAuraName[i])
             return false;
+
+        // ignore dummy only spells
+        if(spellInfo_1->Effect[i] && spellInfo_1->Effect[i] != SPELL_EFFECT_DUMMY && spellInfo_1->EffectApplyAuraName[i] != SPELL_AURA_DUMMY)
+            dummy_only = false;
+    }
+    if (dummy_only)
+        return false;
 
     return true;
 }

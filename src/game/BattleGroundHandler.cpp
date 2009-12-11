@@ -366,7 +366,8 @@ void WorldSession::HandleBattleFieldPortOpcode( WorldPacket &recv_data )
         //if player don't match battleground max level, then do not allow him to enter! (this might happen when player leveled up during his waiting in queue
         if (_player->getLevel() > bg->GetMaxLevel())
         {
-            sLog.outError("Battleground: Player %s (%u) has level higher than maxlevel of battleground! Do not port him to battleground!", _player->GetName(), _player->GetGUIDLow());
+            sLog.outError("Battleground: Player %s (%u) has level (%u) higher than maxlevel (%u) of battleground (%u)! Do not port him to battleground!",
+                _player->GetName(), _player->GetGUIDLow(), _player->getLevel(), bg->GetMaxLevel(), bg->GetTypeID());
             action = 0;
         }
     }

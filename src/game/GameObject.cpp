@@ -872,13 +872,13 @@ void GameObject::Use(Unit* user)
 
         case GAMEOBJECT_TYPE_QUESTGIVER:                    //2
         {
-            if(user->GetTypeId()!=TYPEID_PLAYER)
+            if (user->GetTypeId() != TYPEID_PLAYER)
                 return;
 
             Player* player = (Player*)user;
 
-            player->PrepareQuestMenu( GetGUID() );
-            player->SendPreparedQuest( GetGUID() );
+            player->PrepareGossipMenu(this, GetGOInfo()->questgiver.gossipID);
+            player->SendPreparedGossip(this);
             return;
         }
         //Sitting: Wooden bench, chairs enzz
@@ -952,11 +952,16 @@ void GameObject::Use(Unit* user)
                 Player* player = (Player*)user;
 
                 // show page
-                if(info->goober.pageId)
+                if (info->goober.pageId)
                 {
                     WorldPacket data(SMSG_GAMEOBJECT_PAGETEXT, 8);
                     data << GetGUID();
                     player->GetSession()->SendPacket(&data);
+                }
+                else if (info->questgiver.gossipID)
+                {
+                    player->PrepareGossipMenu(this, info->goober.gossipID);
+                    player->SendPreparedGossip(this);
                 }
 
                 // possible quest objective for active quests

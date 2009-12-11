@@ -102,7 +102,7 @@ void WorldSession::HandleQuestgiverHelloOpcode(WorldPacket & recv_data)
     if (Script->GossipHello(_player, pCreature))
         return;
 
-    _player->PrepareGossipMenu(pCreature);
+    _player->PrepareGossipMenu(pCreature, pCreature->GetCreatureInfo()->GossipMenuId);
     _player->SendPreparedGossip(pCreature);
 }
 

@@ -2617,7 +2617,7 @@ void InstanceMap::UnloadAll(bool pForce)
         for(MapRefManager::iterator itr = m_mapRefManager.begin(); itr != m_mapRefManager.end(); ++itr)
         {
             Player* plr = itr->getSource();
-            plr->TeleportTo(plr->m_homebindMapId, plr->m_homebindX, plr->m_homebindY, plr->m_homebindZ, plr->GetOrientation());
+            plr->TeleportToHomebind();
         }
     }
 

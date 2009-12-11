@@ -1,0 +1,10 @@
+ALTER TABLE db_version CHANGE COLUMN required_8931_01_mangos_spell_bonus_data required_8932_01_mangos_spell_chain bit;
+
+DELETE FROM spell_chain WHERE spell_id IN (50518,53558,53559,53560,53561,53562);
+INSERT INTO spell_chain VALUES
+(50518,0,50518,1,0),
+(53558,50518,50518,2,0),
+(53559,53558,50518,3,0),
+(53560,53559,50518,4,0),
+(53561,53560,50518,5,0),
+(53562,53561,50518,6,0);
