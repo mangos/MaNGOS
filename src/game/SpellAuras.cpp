@@ -5897,7 +5897,7 @@ void Aura::HandleShapeshiftBoosts(bool apply)
 
 void Aura::HandleSpellSpecificBoosts(bool apply)
 {
-    bool cast_at_remove = false;                            // if spell must be casted at aura remove
+    bool cast_at_remove = false;                            // if spell must be casted at last aura from stack remove
     uint32 spellId1 = 0;
     uint32 spellId2 = 0;
     uint32 spellId3 = 0;
@@ -5907,7 +5907,7 @@ void Aura::HandleSpellSpecificBoosts(bool apply)
     {
         case SPELLFAMILY_MAGE:
         {
-            // Ice Barrier
+            // Ice Barrier (non stacking from one caster)
             if (m_spellProto->SpellIconID == 32)        
             {
                 if (!apply && (m_removeMode == AURA_REMOVE_BY_DISPEL || (m_removeMode == AURA_REMOVE_BY_DEFAULT && !GetModifier()->m_amount)))
@@ -5954,7 +5954,7 @@ void Aura::HandleSpellSpecificBoosts(bool apply)
             break;
         }
         case SPELLFAMILY_WARLOCK:
-            // Fear
+            // Fear (non stacking)
             if (m_spellProto->SpellFamilyFlags & UI64LIT(0x0000040000000000))
             {
                 if(!apply)
