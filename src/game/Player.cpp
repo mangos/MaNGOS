@@ -6532,9 +6532,6 @@ void Player::_ApplyItemMods(Item *item, uint8 slot,bool apply)
     if(slot >= INVENTORY_SLOT_BAG_END || !item)
         return;
 
-    UpdateExpertise(BASE_ATTACK);
-    UpdateArmorPenetration();
-
     // not apply/remove mods for broken item
     if(item->IsBroken())
         return;
