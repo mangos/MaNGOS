@@ -2088,6 +2088,12 @@ Creature* Player::GetNPCIfCanInteractWith(uint64 guid, uint32 npcflagmask)
     if (npcflagmask && !unit->HasFlag( UNIT_NPC_FLAGS, npcflagmask ))
         return NULL;
 
+    if (npcflagmask == UNIT_NPC_FLAG_STABLEMASTER)
+    {
+        if (getClass() != CLASS_HUNTER)
+            return NULL;
+    }
+
     // if a dead unit should be able to talk - the creature must be alive and have special flags
     if (!unit->isAlive())
         return NULL;
