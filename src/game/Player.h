@@ -1162,7 +1162,8 @@ class MANGOS_DLL_SPEC Player : public Unit
         Item* GetItemByGuid( uint64 guid ) const;
         Item* GetItemByPos( uint16 pos ) const;
         Item* GetItemByPos( uint8 bag, uint8 slot ) const;
-        Item* GetWeaponForAttack(WeaponAttackType attackType, bool useable = false) const;
+        Item* GetWeaponForAttack(WeaponAttackType attackType) const { return GetWeaponForAttack(attackType,false,false); }
+        Item* GetWeaponForAttack(WeaponAttackType attackType, bool nonbroken, bool useable) const;
         Item* GetShield(bool useable = false) const;
         static uint32 GetAttackBySlot( uint8 slot );        // MAX_ATTACK if not weapon slot
         std::vector<Item *> &GetItemUpdateQueue() { return m_itemUpdateQueue; }
