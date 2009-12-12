@@ -5907,6 +5907,18 @@ void Aura::HandleSpellSpecificBoosts(bool apply)
 
     switch(GetSpellProto()->SpellFamilyName)
     {
+        case SPELLFAMILY_GENERIC:
+        {
+            // Illusionary Barrier
+            if(GetId() == 57350 && !apply && m_target->getPowerType() == POWER_MANA)
+            {
+                cast_at_remove = true;
+                spellId1 = 60242;                           // Darkmoon Card: Illusion
+            }
+            else
+                return;
+            break;
+        }
         case SPELLFAMILY_MAGE:
         {
             // Ice Barrier (non stacking from one caster)
