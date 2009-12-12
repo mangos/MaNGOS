@@ -7253,6 +7253,10 @@ bool PlayerCondition::Meets(Player const * player) const
             }
             return false;
         }
+        case CONDITION_RACE_CLASS:
+            if ((!value1 || (player->getRaceMask() & value1)) && (!value2 || (player->getClassMask() & value2)))
+                return true;
+            return false;
         default:
             return false;
     }
@@ -7402,6 +7406,27 @@ bool PlayerCondition::IsValid(ConditionType condition, uint32 value1, uint32 val
             if (!value1 && !value2)
             {
                 sLog.outErrorDb("Area flag condition has both values like 0, skipped");
+                return false;
+            }
+            break;
+        }
+        case CONDITION_RACE_CLASS:
+        {
+            if (!value1 && !value2)
+            {
+                sLog.outErrorDb("Race_class condition has both values like 0, skipped");
+                return false;
+            }
+
+            if (value1 && !(value1 & RACEMASK_ALL_PLAYABLE))
+            {
+                sLog.outErrorDb("Race_class condition has invalid player class %u, skipped", value1);
+                return false;
+            }
+
+            if (value2 && !(value2 & CLASSMASK_ALL_PLAYABLE))
+            {
+                sLog.outErrorDb("Race_class condition has invalid race mask %u, skipped", value2);
                 return false;
             }
             break;
