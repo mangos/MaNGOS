@@ -70,7 +70,7 @@ enum GossipOptionIcon
 //POI icons. Many more exist, list not complete.
 enum Poi_Icon
 {
-    ICON_POI_BLANK              =   0,                      // Blank (not visible)
+    ICON_POI_BLANK              =   0,                      // Blank (not visible), in 2.4.3 have value 15 with 1..15 values in 0..14 range
     ICON_POI_GREY_AV_MINE       =   1,                      // Grey mine lorry
     ICON_POI_RED_AV_MINE        =   2,                      // Red mine lorry
     ICON_POI_BLUE_AV_MINE       =   3,                      // Blue mine lorry
