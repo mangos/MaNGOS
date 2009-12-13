@@ -11658,12 +11658,12 @@ void CharmInfo::LoadPetActionBar(const std::string& data )
 
     Tokens tokens = StrSplit(data, " ");
 
-    if (tokens.size() != (ACTION_BAR_INDEX_PET_SPELL_END-ACTION_BAR_INDEX_PET_SPELL_START)*2)
+    if (tokens.size() != (ACTION_BAR_INDEX_END-ACTION_BAR_INDEX_START)*2)
         return;                                             // non critical, will reset to default
 
     int index;
     Tokens::iterator iter;
-    for(iter = tokens.begin(), index = ACTION_BAR_INDEX_PET_SPELL_START; index < ACTION_BAR_INDEX_PET_SPELL_END; ++iter, ++index )
+    for(iter = tokens.begin(), index = ACTION_BAR_INDEX_START; index < ACTION_BAR_INDEX_END; ++iter, ++index )
     {
         // use unsigned cast to avoid sign negative format use at long-> ActiveStates (int) conversion
         uint8 type  = atol((*iter).c_str());
