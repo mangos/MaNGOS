@@ -6639,7 +6639,11 @@ void Aura::PeriodicTick()
 
             // send critical in hit info for threat calculation
             if (isCrit)
+            {
                 cleanDamage.hitOutCome = MELEE_HIT_CRIT;
+                // Resilience - reduce crit damage
+                pdamage -= m_target->GetSpellCritDamageReduction(pdamage);
+            }
 
             // only from players
             // FIXME: need use SpellDamageBonus instead?
