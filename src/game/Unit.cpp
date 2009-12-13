@@ -764,9 +764,18 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
                 ((Creature*)pVictim)->AI()->AttackedBy(this);
         }
 
-        // polymorphed and other negative transformed cases
-        if(pVictim->getTransForm() && pVictim->hasUnitState(UNIT_STAT_CONFUSED))
-            pVictim->RemoveAurasDueToSpell(pVictim->getTransForm());
+        // polymorphed, hex and other negative transformed cases
+        uint32 morphSpell = pVictim->getTransForm();
+        if (morphSpell && !IsPositiveSpell(morphSpell))
+        {
+            if (SpellEntry const* morphEntry = sSpellStore.LookupEntry(morphSpell))
+            {
+                if (IsSpellHaveAura(morphEntry, SPELL_AURA_MOD_CONFUSE))
+                    pVictim->RemoveAurasDueToSpell(morphSpell);
+                else if (IsSpellHaveAura(morphEntry, SPELL_AURA_MOD_PACIFY_SILENCE))
+                    pVictim->RemoveSpellbyDamageTaken(SPELL_AURA_MOD_PACIFY_SILENCE, damage);
+            }
+        }
 
         if(damagetype == DIRECT_DAMAGE || damagetype == SPELL_DIRECT_DAMAGE)
         {
