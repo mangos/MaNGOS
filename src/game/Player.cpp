@@ -12498,7 +12498,7 @@ void Player::OnGossipSelect(WorldObject* pSource, uint32 gossipListId, uint32 me
 uint32 Player::GetGossipTextId(WorldObject *pSource)
 {
     if (!pSource || pSource->GetTypeId() != TYPEID_UNIT || !((Creature*)pSource)->GetDBTableGUIDLow())
-        return 0;
+        return DEFAULT_GOSSIP_MESSAGE;
 
     if (uint32 pos = sObjectMgr.GetNpcGossip(((Creature*)pSource)->GetDBTableGUIDLow()))
         return pos;
