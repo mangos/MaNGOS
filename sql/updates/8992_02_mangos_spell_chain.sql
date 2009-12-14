@@ -17,7 +17,7 @@ INSERT INTO spell_chain VALUES
 (53292, 53291, 53290, 3, 0);
 
 /*Bloodsurge*/
-DELETE FROM spell_chain WHERE first_spell = 53290;
+DELETE FROM spell_chain WHERE first_spell = 46913;
 INSERT INTO spell_chain VALUES
 (46913, 0, 46913, 1, 0),
 (46914, 46913, 46913, 2, 0),
