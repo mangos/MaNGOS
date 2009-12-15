@@ -686,6 +686,9 @@ void Spell::prepareDataForTriggerSystem()
                 // Clearcasting trigger need do it
                 else if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0000000200000000) && m_spellInfo->SpellFamilyFlags2 & 0x8)
                     m_canTrigger = true;
+                // Replenish Mana, item spell with triggered cases (Mana Agate, etc mana gems)
+                else if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0000010000000000))
+                    m_canTrigger = true;
                 break;
             case SPELLFAMILY_WARLOCK: // For Hellfire Effect / Rain of Fire / Seed of Corruption triggers need do it
                 if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0000800000000060))
@@ -2417,11 +2420,10 @@ void Spell::cancel()
                 {
                     Unit* unit = m_caster->GetGUID()==(*ihit).targetGUID ? m_caster : ObjectAccessor::GetUnit(*m_caster, ihit->targetGUID);
                     if( unit && unit->isAlive() )
-                        unit->RemoveAurasDueToSpell(m_spellInfo->Id);
+                        unit->RemoveAurasByCasterSpell(m_spellInfo->Id,m_caster->GetGUID());
                 }
             }
 
-            m_caster->RemoveAurasDueToSpell(m_spellInfo->Id);
             SendChannelUpdate(0);
             SendInterrupted(0);
             SendCastResult(SPELL_FAILED_INTERRUPTED);
@@ -3441,6 +3443,13 @@ void Spell::SendChannelUpdate(uint32 time)
 {
     if(time == 0)
     {
+        m_caster->RemoveAurasByCasterSpell(m_spellInfo->Id,m_caster->GetGUID());
+
+        if(uint64 target_guid = m_caster->GetChannelObjectGUID())
+            if(target_guid != m_caster->GetGUID() && IS_UNIT_GUID(target_guid))
+                if(Unit* target = ObjectAccessor::GetUnit(*m_caster, target_guid))
+                    target->RemoveAurasByCasterSpell(m_spellInfo->Id,m_caster->GetGUID());
+
         m_caster->SetChannelObjectGUID(0);
         m_caster->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
     }
@@ -5563,8 +5572,8 @@ SpellCastResult Spell::CheckItems()
                 if(m_caster->GetTypeId() != TYPEID_PLAYER) return SPELL_FAILED_TARGET_NOT_PLAYER;
                 if( m_attackType != RANGED_ATTACK )
                     break;
-                Item *pItem = ((Player*)m_caster)->GetWeaponForAttack(m_attackType);
-                if(!pItem || pItem->IsBroken())
+                Item *pItem = ((Player*)m_caster)->GetWeaponForAttack(m_attackType,true,false);
+                if (!pItem)
                     return SPELL_FAILED_EQUIPPED_ITEM;
 
                 switch(pItem->GetProto()->SubClass)

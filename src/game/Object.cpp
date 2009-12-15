@@ -667,6 +667,12 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask *
                             if (!((Creature*)this)->isCanTrainingOf(target, false))
                                 appendValue &= ~(UNIT_NPC_FLAG_TRAINER | UNIT_NPC_FLAG_TRAINER_CLASS | UNIT_NPC_FLAG_TRAINER_PROFESSION);
                         }
+
+                        if (appendValue & UNIT_NPC_FLAG_STABLEMASTER)
+                        {
+                            if (target->getClass() != CLASS_HUNTER)
+                                appendValue &= ~UNIT_NPC_FLAG_STABLEMASTER;
+                        }
                     }
 
                     *data << uint32(appendValue);
