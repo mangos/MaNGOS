@@ -346,7 +346,8 @@ enum SummonPropType
     SUMMON_PROP_TYPE_PHASING         = 8,                   // something todo with DK prequest line, 2 spells in 3.0.3 "%s's Opponent"
     SUMMON_PROP_TYPE_SIEGE_VEH       = 9,                   // summon different vehicles, 14 spells in 3.0.3 "%s's Vehicle"
     SUMMON_PROP_TYPE_DRAKE_VEH       = 10,                  // summon drake (vehicle), 3 spells
-    SUMMON_PROP_TYPE_LIGHTWELL       = 11                   // summon lightwell, 6 spells in 3.0.3
+    SUMMON_PROP_TYPE_LIGHTWELL       = 11,                  // summon lightwell, 6 spells in 3.0.3
+    SUMMON_PROP_TYPE_REPAIR_BOT      = 12                   // summon repir bot, 1 spells in 3.2.2a
 };
 
 // SummonProperties.dbc, col 5
