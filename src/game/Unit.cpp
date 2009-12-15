@@ -176,6 +176,7 @@ Unit::~Unit()
     // those should be already removed at "RemoveFromWorld()" call
     assert(m_gameObj.size() == 0);
     assert(m_dynObjGUIDs.size() == 0);
+    assert(m_deletedAuras.size() == 0);
 }
 
 void Unit::Update( uint32 p_time )
@@ -196,6 +197,8 @@ void Unit::Update( uint32 p_time )
     m_Events.Update( p_time );
     _UpdateSpells( p_time );
 
+    CleanupDeletedAuars();
+
     if (m_lastManaUseTimer)
     {
         if (p_time >= m_lastManaUseTimer)
@@ -203,11 +206,6 @@ void Unit::Update( uint32 p_time )
         else
             m_lastManaUseTimer -= p_time;
     }
-
-    // really delete auras "deleted" while processing its ApplyModify code
-    for(AuraList::const_iterator itr = m_deletedAuras.begin(); itr != m_deletedAuras.begin(); ++itr)
-        delete *itr;
-    m_deletedAuras.clear();
 
     if (CanHaveThreatList())
         getThreatManager().UpdateForClient(p_time);
@@ -4254,19 +4252,10 @@ void Unit::RemoveAura(AuraMap::iterator &i, AuraRemoveMode mode)
 
     // Statue unsummoned at aura remove
     Totem* statue = NULL;
-    bool caster_channeled = false;
     if(IsChanneledSpell(AurSpellInfo))
-    {
-        Unit* caster = Aur->GetCaster();
-
-        if(caster)
-        {
+        if(Unit* caster = Aur->GetCaster())
             if(caster->GetTypeId()==TYPEID_UNIT && ((Creature*)caster)->isTotem() && ((Totem*)caster)->GetTotemType()==TOTEM_STATUE)
                 statue = ((Totem*)caster);
-            else
-                caster_channeled = caster==this;
-        }
-    }
 
     sLog.outDebug("Aura %u now is remove mode %d",Aur->GetModifier()->m_auraname, mode);
     if (mode != AURA_REMOVE_BY_DELETE)                      // not unapply if target will deleted
@@ -4286,9 +4275,6 @@ void Unit::RemoveAura(AuraMap::iterator &i, AuraRemoveMode mode)
     else
         delete Aur;
 
-    if(caster_channeled)
-        RemoveAurasAtChanneledTarget (AurSpellInfo);
-
     if(statue)
         statue->UnSummon();
 
@@ -4297,6 +4283,7 @@ void Unit::RemoveAura(AuraMap::iterator &i, AuraRemoveMode mode)
         i = m_Auras.end();
     else
         i = m_Auras.begin();
+
 }
 
 void Unit::RemoveAllAuras(AuraRemoveMode mode /*= AURA_REMOVE_BY_DEFAULT*/)
@@ -11417,6 +11404,7 @@ void Unit::RemoveFromWorld()
         RemoveGuardians();
         RemoveAllGameObjects();
         RemoveAllDynObjects();
+        CleanupDeletedAuars();
     }
 
     Object::RemoveFromWorld();
@@ -12828,26 +12816,6 @@ bool Unit::HandleMendingAuraProc( Aura* triggeredByAura )
     return true;
 }
 
-void Unit::RemoveAurasAtChanneledTarget(SpellEntry const* spellInfo)
-{
-    uint64 target_guid = GetChannelObjectGUID();
-
-    if(!IS_UNIT_GUID(target_guid))
-        return;
-
-    Unit* target = ObjectAccessor::GetUnit(*this, target_guid);
-    if(!target)
-        return;
-
-    for (AuraMap::iterator iter = target->GetAuras().begin(); iter != target->GetAuras().end(); )
-    {
-        if (iter->second->GetId() == spellInfo->Id && iter->second->GetCasterGUID()==GetGUID())
-            target->RemoveAura(iter);
-        else
-            ++iter;
-    }
-}
-
 void Unit::RemoveAurasAtMechanicImmunity(uint32 mechMask, uint32 exceptSpellId, bool non_positive /*= false*/)
 {
     Unit::AuraMap& auras = GetAuras();
@@ -13079,4 +13047,12 @@ void Unit::StopAttackFaction(uint32 faction_id)
     for(GuardianPetList::const_iterator itr = m_guardianPets.begin(); itr != m_guardianPets.end(); ++itr)
         if(Unit* guardian = Unit::GetUnit(*this,*itr))
             guardian->StopAttackFaction(faction_id);
+}
+
+void Unit::CleanupDeletedAuars()
+{
+    // really delete auras "deleted" while processing its ApplyModify code
+    for(AuraList::const_iterator itr = m_deletedAuras.begin(); itr != m_deletedAuras.end(); ++itr)
+        delete *itr;
+    m_deletedAuras.clear();
 }
