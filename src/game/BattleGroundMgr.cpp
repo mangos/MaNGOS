@@ -1241,75 +1241,26 @@ void BattleGroundMgr::Update(uint32 diff)
 
 void BattleGroundMgr::BuildBattleGroundStatusPacket(WorldPacket *data, BattleGround *bg, uint8 QueueSlot, uint8 StatusID, uint32 Time1, uint32 Time2, uint8 arenatype)
 {
-    // we can be in 3 queues in same time...
+    // we can be in 2 queues in same time...
 
     if (StatusID == 0 || !bg)
     {
-        data->Initialize(SMSG_BATTLEFIELD_STATUS, 4*3);
-        *data << uint32(QueueSlot);                         // queue id (0...2)
+        data->Initialize(SMSG_BATTLEFIELD_STATUS, 4+8);
+        *data << uint32(QueueSlot);                         // queue id (0...1)
         *data << uint64(0);
         return;
     }
 
-    data->Initialize(SMSG_BATTLEFIELD_STATUS, (4+1+1+4+2+4+1+4+4+4));
-    *data << uint32(QueueSlot);                             // queue id (0...2) - player can be in 3 queues in time
+    data->Initialize(SMSG_BATTLEFIELD_STATUS, (4+8+1+1+4+1+4+4+4));
+    *data << uint32(QueueSlot);                             // queue id (0...1) - player can be in 2 queues in time
     // uint64 in client
     *data << uint64( uint64(arenatype) | (uint64(0x0D) << 8) | (uint64(bg->GetTypeID()) << 16) | (uint64(0x1F90) << 48) );
+    *data << uint8(0);                                      // 3.3.0
+    *data << uint8(0);                                      // 3.3.0
     *data << uint32(bg->GetClientInstanceID());
     // alliance/horde for BG and skirmish/rated for Arenas
     // following displays the minimap-icon 0 = faction icon 1 = arenaicon
     *data << uint8(bg->isRated());
-/*    *data << uint8(arenatype ? arenatype : bg->GetArenaType());                     // team type (0=BG, 2=2x2, 3=3x3, 5=5x5), for arenas    // NOT PROPER VALUE IF ARENA ISN'T RUNNING YET!!!!
-    switch(bg->GetTypeID())                                 // value depends on bg id
-    {
-        case BATTLEGROUND_AV:
-            *data << uint8(1);
-            break;
-        case BATTLEGROUND_WS:
-            *data << uint8(2);
-            break;
-        case BATTLEGROUND_AB:
-            *data << uint8(3);
-            break;
-        case BATTLEGROUND_NA:
-            *data << uint8(4);
-            break;
-        case BATTLEGROUND_BE:
-            *data << uint8(5);
-            break;
-        case BATTLEGROUND_AA:
-            *data << uint8(6);
-            break;
-        case BATTLEGROUND_EY:
-            *data << uint8(7);
-            break;
-        case BATTLEGROUND_RL:
-            *data << uint8(8);
-            break;
-        case BATTLEGROUND_SA:
-            *data << uint8(9);
-            break;
-        case BATTLEGROUND_DS:
-            *data << uint8(10);
-            break;
-        case BATTLEGROUND_RV:
-            *data << uint8(11);
-            break;
-        default:                                            // unknown
-            *data << uint8(0);
-            break;
-    }
-
-    if (bg->isArena() && (StatusID == STATUS_WAIT_QUEUE))
-        *data << uint32(BATTLEGROUND_AA);                   // all arenas   I don't think so.
-    else
-    *data << uint32(bg->GetTypeID());                   // BG id from DBC
-
-    *data << uint16(0x1F90);                                // unk value 8080
-    *data << uint32(bg->GetInstanceID());                   // instance id
-
-    *data << uint8(bg->isArena());                          // minimap-icon 0=faction 1=arena
-*/
     *data << uint32(StatusID);                              // status
     switch(StatusID)
     {
