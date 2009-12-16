@@ -3414,16 +3414,15 @@ void Spell::EffectSummonType(uint32 i)
         {
             switch(summon_prop->Type)
             {
-                case SUMMON_PROP_TYPE_SIEGE_VEH:
-                case SUMMON_PROP_TYPE_DRAKE_VEH:
+                case SUMMON_PROP_TYPE_OTHER:
                 {
-                    // TODO
-                    // EffectSummonVehicle(i);
-                    break;
-                }
-                case SUMMON_PROP_TYPE_TOTEM:
-                {
-                    EffectSummonTotem(i, summon_prop->Slot);
+                    // those are classical totems - effectbasepoints is their hp and not summon ammount!
+                    //SUMMON_TYPE_TOTEM = 121: 23035, battlestands
+                    //SUMMON_TYPE_TOTEM2 = 647: 52893, Anti-Magic Zone (npc used)
+                    if(prop_id == 121 || prop_id == 647)
+                        EffectSummonTotem(i);
+                    else
+                        EffectSummonWild(i, summon_prop->FactionId);
                     break;
                 }
                 case SUMMON_PROP_TYPE_SUMMON:
@@ -3441,25 +3440,22 @@ void Spell::EffectSummonType(uint32 i)
                         EffectSummonGuardian(i, summon_prop->FactionId);
                     break;
                 }
+                case SUMMON_PROP_TYPE_TOTEM:
+                    EffectSummonTotem(i, summon_prop->Slot);
+                    break;
                 case SUMMON_PROP_TYPE_CRITTER:
-                case SUMMON_PROP_TYPE_REPAIR_BOT:
-                {
                     EffectSummonCritter(i, summon_prop->FactionId);
                     break;
-                }
-                case SUMMON_PROP_TYPE_OTHER:
                 case SUMMON_PROP_TYPE_PHASING:
                 case SUMMON_PROP_TYPE_LIGHTWELL:
-                {
-                    // those are classical totems - effectbasepoints is their hp and not summon ammount!
-                    //SUMMON_TYPE_TOTEM = 121: 23035, battlestands
-                    //SUMMON_TYPE_TOTEM2 = 647: 52893, Anti-Magic Zone (npc used)
-                    if(prop_id == 121 || prop_id == 647)
-                        EffectSummonTotem(i);
-                    else
-                        EffectSummonWild(i, summon_prop->FactionId);
+                case SUMMON_PROP_TYPE_REPAIR_BOT:
+                    EffectSummonWild(i, summon_prop->FactionId);
                     break;
-                }
+                case SUMMON_PROP_TYPE_SIEGE_VEH:
+                case SUMMON_PROP_TYPE_DRAKE_VEH:
+                    // TODO
+                    // EffectSummonVehicle(i);
+                    break;
                 default:
                     sLog.outError("EffectSummonType: Unhandled summon type %u", summon_prop->Type);
                 break;
