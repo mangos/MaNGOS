@@ -14085,7 +14085,7 @@ INSERT INTO `spell_bonus_data` VALUES
 (31803, 0,      0.0156,  0.03,  'Paladin - Holy Vengeance'),
 (2812,  0.07,   0,       0.07,  'Paladin - Holy Wrath'),
 (54158, 0.25,   0,       0,     'Paladin - Judgement'),
-(31898, 0.18,   0,       0.11,  'Paladin - Judgement of Blood Enemy'), 
+(31898, 0.18,   0,       0.11,  'Paladin - Judgement of Blood Enemy'),
 (32220, 0.0594, 0,       0.0363,'Paladin - Judgement of Blood Self'),
 (20467, 0.25,   0,       0.16,  'Paladin - Judgement of Command'),
 (53733, 0,      0,       0,     'Paladin - Judgement of Corruption'),

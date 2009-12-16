@@ -12,7 +12,7 @@ INSERT INTO `spell_bonus_data` VALUES
 (53733, 0, 0, 0, "Paladin - Judgement of Corruption"),
 (31893, 0, 0, 0, "Paladin - Seal of Blood Proc Enemy"),
 (32221, 0, 0, 0, "Paladin - Seal of Blood Proc Self"),
-(31898, 0.18, 0, 0.11, "Paladin - Judgement of Blood Enemy"), 
+(31898, 0.18, 0, 0.11, "Paladin - Judgement of Blood Enemy"),
 (32220, 0.0594, 0, 0.0363, "Paladin - Judgement of Blood Self"),
 (53719, 0, 0, 0, "Paladin - Seal of the Martyr Proc Enemy"),
 (53718, 0, 0, 0, "Paladin - Seal of the Martyr Proc Self"),
