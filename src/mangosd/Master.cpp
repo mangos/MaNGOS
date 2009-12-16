@@ -226,9 +226,17 @@ int Master::Run()
     ///- Launch WorldRunnable thread
     ACE_Based::Thread world_thread(new WorldRunnable);
     world_thread.setPriority(ACE_Based::Highest);
-
-    // set server online
-    loginDatabase.PExecute("UPDATE realmlist SET color = 0, population = 0 WHERE id = '%d'",realmID);
+    
+    // set realmbuilds depend on mangosd expected builds, and set server online
+    {
+        std::ostringstream data;
+        int accepted_versions[] = EXPECTED_MANGOSD_CLIENT_BUILD;
+        for(int i = 0; accepted_versions[i]; ++i)
+        {
+            data << accepted_versions[i] << " ";
+        }
+        loginDatabase.PExecute("UPDATE realmlist SET color = 0, population = 0, realmbuilds = '%s'  WHERE id = '%d'", data.str().c_str(), realmID);
+    }
 
     ACE_Based::Thread* cliThread = NULL;
 

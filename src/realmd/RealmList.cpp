@@ -22,6 +22,8 @@
 
 #include "Common.h"
 #include "RealmList.h"
+#include "AuthCodes.h"
+#include "Util.h"                                           // for Tokens typedef
 #include "Policies/SingletonImp.h"
 #include "Database/DatabaseEnv.h"
 
@@ -48,17 +50,26 @@ void RealmList::Initialize(uint32 updateInterval)
     UpdateRealms(true);
 }
 
-void RealmList::UpdateRealm( uint32 ID, const std::string& name, const std::string& address, uint32 port, uint8 icon, uint8 color, uint8 timezone, AccountTypes allowedSecurityLevel, float popu)
-{
+void RealmList::UpdateRealm( uint32 ID, const std::string& name, const std::string& address, uint32 port, uint8 icon, uint8 color, uint8 timezone, AccountTypes allowedSecurityLevel, float popu, const char* builds)
+{      
     ///- Create new if not exist or update existed
     Realm& realm = m_realms[name];
-
+    
     realm.m_ID      = ID;
     realm.icon      = icon;
     realm.color     = color;
     realm.timezone  = timezone;
     realm.allowedSecurityLevel = allowedSecurityLevel;
     realm.populationLevel        = popu;
+
+	Tokens tokens = StrSplit(builds, " ");
+    Tokens::iterator iter;
+
+    for (iter = tokens.begin(); iter != tokens.end(); ++iter)
+    {
+        uint32 build = atol((*iter).c_str());
+        realm.realmbuilds.insert(build);
+    }
 
     ///- Append port to IP address.
     std::ostringstream ss;
@@ -85,7 +96,8 @@ void RealmList::UpdateRealms(bool init)
 {
     sLog.outDetail("Updating Realm List...");
 
-    QueryResult *result = loginDatabase.Query( "SELECT id, name, address, port, icon, color, timezone, allowedSecurityLevel, population FROM realmlist WHERE color <> 3 ORDER BY name" );
+    ////                                               0    1    2        3     4     5      6         7                     8           9
+    QueryResult *result = loginDatabase.Query( "SELECT id, name, address, port, icon, color, timezone, allowedSecurityLevel, population, realmbuilds FROM realmlist WHERE color <> 3 ORDER BY name" );
 
     ///- Circle through results and add them to the realm map
     if(result)
@@ -96,9 +108,9 @@ void RealmList::UpdateRealms(bool init)
 
             uint8 allowedSecurityLevel = fields[7].GetUInt8();
 
-            UpdateRealm(fields[0].GetUInt32(), fields[1].GetCppString(),fields[2].GetCppString(),fields[3].GetUInt32(),fields[4].GetUInt8(), fields[5].GetUInt8(), fields[6].GetUInt8(), (allowedSecurityLevel <= SEC_ADMINISTRATOR ? AccountTypes(allowedSecurityLevel) : SEC_ADMINISTRATOR), fields[8].GetFloat() );
+            UpdateRealm(fields[0].GetUInt32(), fields[1].GetCppString(),fields[2].GetCppString(),fields[3].GetUInt32(),fields[4].GetUInt8(), fields[5].GetUInt8(), fields[6].GetUInt8(), (allowedSecurityLevel <= SEC_ADMINISTRATOR ? AccountTypes(allowedSecurityLevel) : SEC_ADMINISTRATOR), fields[8].GetFloat(), fields[9].GetString() );
             if(init)
-                sLog.outString("Added realm \"%s\".", fields[1].GetString());
+                sLog.outString("Added realm \"%s\"", fields[1].GetString());
         } while( result->NextRow() );
         delete result;
     }

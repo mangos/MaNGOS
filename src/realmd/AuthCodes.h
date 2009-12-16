@@ -64,11 +64,18 @@ enum LoginResult
     LOGIN_LOCKED_ENFORCED   = 0x10,
 };
 
-// we need to stick to 1 version or half of the stuff will work for someone
-// others will not and opposite
-// will only support WoW, WoW:TBC and WoW:WotLK 3.2.2a client build 10505...
+// will only support WoW 1.12.1/1.12.2 , WoW:TBC 2.4.3 and WoW:WotLK 3.2.2a, client builds 10505, 8606, 6005, 5875
+// if you need more from old build then add it in cases in relamd sources code
+// list sorted from high to low build and first build used as low bound for accepted by default range (any > it will accepted by realmd at least)
 
-#define EXPECTED_MANGOS_CLIENT_BUILD        {10505, 0}
+#define EXPECTED_REALMD_CLIENT_BUILD    \
+{                                       \
+    10505,  /* 3.2.2a and higher */     \
+    8606,   /* 2.4.3  */                \
+    6005,   /* 1.12.2 */                \
+    5875,   /* 1.12.1 */                \
+    0                                   \
+}
 
 // At update excepted builds please update if need define DEFAULT_MAX_LEVEL
 // in DBCEnum.h to default max player level expected by build

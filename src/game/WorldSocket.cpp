@@ -745,7 +745,7 @@ int WorldSocket::HandleAuthSession (WorldPacket& recvPacket)
     BigNumber K;
 
     // Read the content of the packet
-    recvPacket >> BuiltNumberClient;                        // for now no use
+    recvPacket >> BuiltNumberClient;
     recvPacket >> unk2;
     recvPacket >> account;
     recvPacket >> unk3;
@@ -759,6 +759,29 @@ int WorldSocket::HandleAuthSession (WorldPacket& recvPacket)
                 account.c_str (),
                 unk3,
                 clientSeed);
+
+    // Check the version of client trying to connect
+    bool valid_version = false;
+    int accepted_versions[] = EXPECTED_MANGOSD_CLIENT_BUILD;
+    for(int i = 0; accepted_versions[i]; ++i)
+    {
+        if(BuiltNumberClient == accepted_versions[i])
+        {
+            valid_version = true;
+            break;
+        }
+    }
+
+    if(!valid_version)
+    {
+        packet.Initialize (SMSG_AUTH_RESPONSE, 1);
+        packet << uint8 (AUTH_VERSION_MISMATCH);
+
+        SendPacket (packet);
+
+        sLog.outError ("WorldSocket::HandleAuthSession: Sent Auth Response (version mismatch).");
+        return -1;
+    }
 
     // Get the account information from the realmd database
     std::string safe_account = account; // Duplicate, else will screw the SHA hash verification below
