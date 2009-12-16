@@ -7638,16 +7638,6 @@ bool Unit::HandleOverrideClassScriptAuraProc(Unit *pVictim, uint32 damage, Aura 
         case 6953:                                          // Warbringer
             RemoveAurasAtMechanicImmunity(IMMUNE_TO_ROOT_AND_SNARE_MASK,0,true);
             return true;
-        case 8152:                                          // Serendipity
-        {
-            // if heal your target over maximum health
-            if (pVictim->GetHealth() + damage < pVictim->GetMaxHealth())
-                return false;
-            int32 cost = procSpell->manaCost + procSpell->ManaCostPercentage * GetCreateMana() / 100;
-            int32 basepoints0 = cost * triggeredByAura->GetModifier()->m_amount/100;
-            CastCustomSpell(this, 47762, &basepoints0, NULL, NULL, true, NULL, triggeredByAura);
-            return true;
-        }
     }
 
     // not processed
