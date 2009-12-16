@@ -66,6 +66,7 @@ ALTER TABLE locales_npc_option ADD menu_id smallint(6) unsigned NOT NULL default
 ALTER TABLE locales_npc_option DROP PRIMARY KEY;
 ALTER TABLE locales_npc_option ADD PRIMARY KEY (menu_id, id);
 
+DROP TABLE IF EXISTS locales_gossip_menu_option;
 RENAME TABLE locales_npc_option TO locales_gossip_menu_option;
 
 DROP TABLE IF EXISTS npc_option;
