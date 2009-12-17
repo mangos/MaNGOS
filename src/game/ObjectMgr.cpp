@@ -8347,6 +8347,7 @@ void ObjectMgr::LoadDbScriptStrings()
     CheckScripts(sSpellScripts,ids);
     CheckScripts(sGameObjectScripts,ids);
     CheckScripts(sEventScripts,ids);
+    CheckScripts(sGossipScripts,ids);
 
     sWaypointMgr.CheckTextsExistance(ids);
 
