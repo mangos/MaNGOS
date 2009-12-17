@@ -1429,6 +1429,16 @@ bool WorldObject::isInBackInMap(WorldObject const* target, float distance, float
     return IsWithinDistInMap(target, distance) && !HasInArc( 2 * M_PI - arc, target );
 }
 
+bool WorldObject::isInFront(WorldObject const* target, float distance,  float arc) const
+{
+    return IsWithinDist(target, distance) && HasInArc( arc, target );
+}
+
+bool WorldObject::isInBack(WorldObject const* target, float distance, float arc) const
+{
+    return IsWithinDist(target, distance) && !HasInArc( 2 * M_PI - arc, target );
+}
+
 void WorldObject::GetRandomPoint( float x, float y, float z, float distance, float &rand_x, float &rand_y, float &rand_z) const
 {
     if(distance == 0)
