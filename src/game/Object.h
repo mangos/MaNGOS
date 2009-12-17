@@ -436,11 +436,13 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         bool IsWithinDist3d(float x, float y, float z, float dist2compare) const;
         bool IsWithinDist2d(float x, float y, float dist2compare) const;
         bool _IsWithinDist(WorldObject const* obj, float dist2compare, bool is3D) const;
+
+        // use only if you will sure about placing both object at same map
         bool IsWithinDist(WorldObject const* obj, float dist2compare, bool is3D = true) const
-                                                            // use only if you will sure about placing both object at same map
         {
             return obj && _IsWithinDist(obj,dist2compare,is3D);
         }
+
         bool IsWithinDistInMap(WorldObject const* obj, float dist2compare, bool is3D = true) const
         {
             return obj && IsInMap(obj) && _IsWithinDist(obj,dist2compare,is3D);
@@ -457,6 +459,8 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         bool HasInArc( const float arcangle, const WorldObject* obj ) const;
         bool isInFrontInMap(WorldObject const* target,float distance, float arc = M_PI) const;
         bool isInBackInMap(WorldObject const* target, float distance, float arc = M_PI) const;
+        bool isInFront(WorldObject const* target,float distance, float arc = M_PI) const;
+        bool isInBack(WorldObject const* target, float distance, float arc = M_PI) const;
 
         virtual void CleanupsBeforeDelete();                // used in destructor or explicitly before mass creature delete to remove cross-references to already deleted units
 
