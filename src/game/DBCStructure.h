@@ -1491,11 +1491,11 @@ struct SpellShapeshiftEntry
     int32  creatureType;                                    // 20 <=0 humanoid, other normal creature types
     //uint32 unk1;                                          // 21 unused, related to next field
     uint32 attackSpeed;                                     // 22
-    //uint32 modelID;                                       // 23 unused, alliance modelid (where horde case?)
-    //uint32 unk2;                                          // 24 unused, also modelid (single case)
-    //uint32 unk3;                                          // 25 unused, all zeros
-    //uint32 unk4;                                          // 26 unused, all zeros
-    //uint32 spellids[8];                                   // 27-34 unused
+    uint32 modelID_A;                                       // 23 alliance modelid (0 means no model)
+    uint32 modelID_H;                                       // 24 horde modelid (but only for one form)
+    //uint32 unk3;                                          // 25 unused always 0
+    //uint32 unk4;                                          // 26 unused always 0
+    //uint32 spell[8];                                      // 27-34 unused, spells which appear in the bar after shapeshifting
 };
 
 struct SpellDurationEntry

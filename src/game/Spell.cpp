@@ -4320,7 +4320,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                         return SPELL_FAILED_BAD_IMPLICIT_TARGETS;
                     Pet* target = m_caster->GetMap()->GetPet(((Player*)m_caster)->GetSelection());
 
-                    // alive 
+                    // alive
                     if (!target || target->isDead())
                         return SPELL_FAILED_BAD_IMPLICIT_TARGETS;
                     // undead

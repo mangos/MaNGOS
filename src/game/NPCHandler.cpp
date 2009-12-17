@@ -306,7 +306,8 @@ void WorldSession::HandleGossipSelectOptionOpcode( WorldPacket & recv_data )
 
     // TODO: determine if scriptCall is needed for GO and also if scriptCall can be same as current, with modified argument WorldObject*
 
-    if (IS_CREATURE_GUID(guid))
+    // can vehicle have gossip? If so, need check for this also.
+    if (IS_CREATURE_OR_PET_GUID(guid))
     {
         Creature *pCreature = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_NONE);
 

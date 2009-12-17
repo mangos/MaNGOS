@@ -2640,4 +2640,10 @@ enum PetTameFailureReason
     PETTAME_UNKNOWNERROR            = 12
 };
 
+// we need to stick to 1 version or half of the stuff will work for someone
+// others will not and opposite
+// will only support WoW, WoW:TBC and WoW:WotLK 3.3.0a client build 11159...
+
+#define EXPECTED_MANGOSD_CLIENT_BUILD        {11159, 0}
+
 #endif
