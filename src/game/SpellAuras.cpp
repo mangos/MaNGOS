@@ -2925,7 +2925,13 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
     ShapeshiftForm form = ShapeshiftForm(m_modifier.m_miscvalue);
 
     SpellShapeshiftEntry const* ssEntry = sSpellShapeshiftStore.LookupEntry(form);
-    if(ssEntry && ssEntry->modelID_A)
+    if (!ssEntry)
+    {
+        sLog.outError("Unknown shapeshift form %u in spell %u", form, GetId());
+        return;
+    }
+
+    if (ssEntry->modelID_A)
     {
         // i will asume that creatures will always take the defined model from the dbc
         // since no field in creature_templates describes wether an alliance or
@@ -3112,6 +3118,14 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
 
         m_target->m_ShapeShiftFormSpellId = GetId();
         m_target->m_form = form;
+
+        // a form can give the player a new castbar with some spells.. this is a clientside process..
+        // serverside just needs to register the new spells so that player isn't kicked as cheater
+        if (m_target->GetTypeId() == TYPEID_PLAYER)
+            for (uint32 i = 0; i < 8; ++i)
+                if (ssEntry->spellId[i])
+                    ((Player*)m_target)->addSpell(ssEntry->spellId[i], true, false, false, false);
+
     }
     else
     {
@@ -3140,6 +3154,13 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
             default:
                 break;
         }
+
+        // look at the comment in apply-part
+        if (m_target->GetTypeId() == TYPEID_PLAYER)
+            for (uint32 i = 0; i < 8; ++i)
+                if (ssEntry->spellId[i])
+                    ((Player*)m_target)->removeSpell(ssEntry->spellId[i], false, false, false);
+
     }
 
     // adding/removing linked auras

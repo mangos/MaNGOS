@@ -1492,7 +1492,7 @@ struct SpellShapeshiftEntry
     uint32 modelID_H;                                       // 24 horde modelid (but only for one form)
     //uint32 unk3;                                          // 25 unused always 0
     //uint32 unk4;                                          // 26 unused always 0
-    //uint32 spell[8];                                      // 27-34 unused, spells which appear in the bar after shapeshifting
+    uint32 spellId[8];                                      // 27-34 spells which appear in the bar after shapeshifting
 };
 
 struct SpellDurationEntry

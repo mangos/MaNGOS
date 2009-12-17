@@ -3188,7 +3188,7 @@ void Player::learnSpell(uint32 spell_id, bool dependent)
     GetSession()->SendPacket(&data);
 }
 
-void Player::removeSpell(uint32 spell_id, bool disabled, bool learn_low_rank)
+void Player::removeSpell(uint32 spell_id, bool disabled, bool learn_low_rank, bool sendUpdate)
 {
     PlayerSpellMap::iterator itr = m_spells.find(spell_id);
     if (itr == m_spells.end())
@@ -3367,7 +3367,7 @@ void Player::removeSpell(uint32 spell_id, bool disabled, bool learn_low_rank)
     }
 
     // remove from spell book if not replaced by lesser rank
-    if(!prev_activate)
+    if (!prev_activate && sendUpdate)
     {
         WorldPacket data(SMSG_REMOVED_SPELL, 4);
         data << uint32(spell_id);
