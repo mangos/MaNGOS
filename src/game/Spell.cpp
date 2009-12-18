@@ -2525,6 +2525,13 @@ void Spell::cast(bool skipCheck)
             }
             break;
         }
+        case SPELLFAMILY_DRUID:
+        {
+            // Faerie Fire (Feral)
+            if (m_spellInfo->Id == 16857 && m_caster->m_form != FORM_CAT)
+                AddTriggeredSpell(60089);
+            break;
+        }
         case SPELLFAMILY_ROGUE:
             // Fan of Knives (main hand)
             if (m_spellInfo->Id == 51723 && m_caster->GetTypeId() == TYPEID_PLAYER &&
