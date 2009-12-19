@@ -630,7 +630,7 @@ void Spell::EffectSchoolDMG(uint32 effect_idx)
                 else if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x100000000))
                 {
                     int32 base = irand((int32)m_caster->GetWeaponDamageRange(RANGED_ATTACK, MINDAMAGE),(int32)m_caster->GetWeaponDamageRange(RANGED_ATTACK, MAXDAMAGE));
-                    damage += int32(float(base)/m_caster->GetAttackTime(RANGED_ATTACK)*2800 + m_caster->GetTotalAttackPowerValue(RANGED_ATTACK)*0.2f);
+                    damage += int32(float(base)/m_caster->GetAttackTime(RANGED_ATTACK)*2800 + m_caster->GetTotalAttackPowerValue(RANGED_ATTACK)*0.1f);
                 }
                 // Explosive Trap Effect
                 else if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x00000004))
@@ -4580,14 +4580,8 @@ void Spell::EffectWeaponDmg(uint32 i)
     {
         case SPELLFAMILY_WARRIOR:
         {
-            // Whirlwind, single only spell with 2 weapon white damage apply if have
-            if(m_caster->GetTypeId()==TYPEID_PLAYER && (m_spellInfo->SpellFamilyFlags & UI64LIT(0x00000400000000)))
-            {
-                if(((Player*)m_caster)->GetWeaponForAttack(OFF_ATTACK, true, true))
-                    spell_bonus += m_caster->CalculateDamage (OFF_ATTACK, normalized);
-            }
             // Devastate bonus and sunder armor refresh
-            else if(m_spellInfo->SpellVisual[0] == 12295 && m_spellInfo->SpellIconID == 1508)
+            if(m_spellInfo->SpellVisual[0] == 12295 && m_spellInfo->SpellIconID == 1508)
             {
                 uint32 stack = 0;
                 // Need refresh all Sunder Armor auras from this caster
@@ -5464,19 +5458,35 @@ void Spell::EffectScriptEffect(uint32 effIndex)
                         // Serpent Sting - Instantly deals 40% of the damage done by your Serpent Sting.
                         if ((familyFlag & UI64LIT(0x0000000000004000)) && aura->GetEffIndex() == 0)
                         {
-                            spellId = 53353; // 53353 Chimera Shot - Serpent
+                            // m_amount already include RAP bonus
                             basePoint = aura->GetModifier()->m_amount * 5 * 40 / 100;
+                            spellId = 53353;                // Chimera Shot - Serpent
                         }
                         // Viper Sting - Instantly restores mana to you equal to 60% of the total amount drained by your Viper Sting.
                         if ((familyFlag & UI64LIT(0x0000008000000000)) && aura->GetEffIndex() == 0)
                         {
-                            spellId = 53358; // 53358 Chimera Shot - Viper
-                            basePoint = aura->GetModifier()->m_amount * 4 * 60 / 100;
+                            uint32 target_max_mana = unitTarget->GetMaxPower(POWER_MANA);
+                            if (!target_max_mana)
+                                continue;
+
+                            // ignore non positive values (can be result apply spellmods to aura damage
+                            uint32 pdamage = aura->GetModifier()->m_amount > 0 ? aura->GetModifier()->m_amount : 0;
+
+                            // Special case: draining x% of mana (up to a maximum of 2*x% of the caster's maximum mana)
+                            uint32 maxmana = m_caster->GetMaxPower(POWER_MANA)  * pdamage * 2 / 100;
+
+                            pdamage = target_max_mana * pdamage / 100;
+                            if (pdamage > maxmana)
+                                pdamage = maxmana;
+
+                            pdamage *= 4;                   // total aura damage
+                            basePoint = pdamage * 60 / 100;
+                            spellId = 53358;                // Chimera Shot - Viper
                             target = m_caster;
                         }
                         // Scorpid Sting - Attempts to Disarm the target for 10 sec. This effect cannot occur more than once per 1 minute.
                         if (familyFlag & UI64LIT(0x0000000000008000))
-                            spellId = 53359; // 53359 Chimera Shot - Scorpid
+                            spellId = 53359;                // Chimera Shot - Scorpid
                         // ?? nothing say in spell desc (possibly need addition check)
                         //if ((familyFlag & UI64LIT(0x0000010000000000)) || // dot
                         //    (familyFlag & UI64LIT(0x0000100000000000)))   // stun

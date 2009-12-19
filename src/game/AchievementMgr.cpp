@@ -35,6 +35,8 @@
 #include "MapManager.h"
 #include "BattleGround.h"
 #include "BattleGroundAB.h"
+#include "Map.h"
+#include "InstanceData.h"
 
 #include "Policies/SingletonImp.h"
 
@@ -102,6 +104,8 @@ bool AchievementCriteriaRequirement::IsValid(AchievementCriteriaEntry const* cri
         case ACHIEVEMENT_CRITERIA_REQUIRE_NONE:
         case ACHIEVEMENT_CRITERIA_REQUIRE_VALUE:
         case ACHIEVEMENT_CRITERIA_REQUIRE_DISABLED:
+        case ACHIEVEMENT_CRITERIA_REQUIRE_BG_LOSS_TEAM_SCORE:
+        case ACHIEVEMENT_CRITERIA_REQUIRE_INSTANCE_SCRIPT:
             return true;
         case ACHIEVEMENT_CRITERIA_REQUIRE_T_CREATURE:
             if (!creature.id || !ObjectMgr::GetCreatureTemplate(creature.id))
@@ -235,8 +239,6 @@ bool AchievementCriteriaRequirement::IsValid(AchievementCriteriaEntry const* cri
                 return false;
             }
             return true;
-        case ACHIEVEMENT_CRITERIA_REQUIRE_BG_LOSS_TEAM_SCORE:
-            return true;                                    // not check correctness node indexes
         default:
             sLog.outErrorDb( "Table `achievement_criteria_requirement` (Entry: %u Type: %u) have data for not supported data type (%u), ignore.", criteria->ID, criteria->requiredType,requirementType);
             return false;
@@ -244,7 +246,7 @@ bool AchievementCriteriaRequirement::IsValid(AchievementCriteriaEntry const* cri
     return false;
 }
 
-bool AchievementCriteriaRequirement::Meets(Player const* source, Unit const* target, uint32 miscvalue1 /*= 0*/) const
+bool AchievementCriteriaRequirement::Meets(uint32 criteria_id, Player const* source, Unit const* target, uint32 miscvalue1 /*= 0*/) const
 {
     switch(requirementType)
     {
@@ -312,6 +314,16 @@ bool AchievementCriteriaRequirement::Meets(Player const* source, Unit const* tar
                 return false;
             return bg->IsTeamScoreInRange(source->GetTeam()==ALLIANCE ? HORDE : ALLIANCE,bg_loss_team_score.min_score,bg_loss_team_score.max_score);
         }
+        case ACHIEVEMENT_CRITERIA_REQUIRE_INSTANCE_SCRIPT:
+            if (!source->IsInWorld())
+                return false;
+            Map* map = source->GetMap();
+            if (!map->Instanceable())
+                return false;
+            InstanceData* data = ((InstanceMap*)map)->GetInstanceData();
+            if (!data)
+                return false;
+            return data->CheckAchievementCriteriaMeet(criteria_id, source, target, miscvalue1);
     }
     return false;
 }
@@ -319,7 +331,7 @@ bool AchievementCriteriaRequirement::Meets(Player const* source, Unit const* tar
 bool AchievementCriteriaRequirementSet::Meets(Player const* source, Unit const* target, uint32 miscvalue /*= 0*/) const
 {
     for(Storage::const_iterator itr = storage.begin(); itr != storage.end(); ++itr)
-        if(!itr->Meets(source,target,miscvalue))
+        if(!itr->Meets(criteria_id, source, target, miscvalue))
             return false;
 
     return true;
