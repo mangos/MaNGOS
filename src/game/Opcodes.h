@@ -1225,7 +1225,7 @@ enum Opcodes
     CMSG_QUERY_VEHICLE_STATUS                       = 0x4A4, // not found
     UMSG_UNKNOWN_1189                               = 0x4A5, // not found, old SMSG_PET_GUIDS
     SMSG_UNKNOWN_1190                               = 0x4A6, // smsg unk, "You can't do that yet"
-    SMSG_UNKNOWN_1191                               = 0x4A7, // smsg guid+uint32 (vehicle)
+    SMSG_UNKNOWN_1191                               = 0x4A7, // smsg guid+uint32 (vehicle) EVENT_PLAYER_GAINS_VEHICLE_DATA/EVENT_PLAYER_LOSES_VEHICLE_DATA
     CMSG_UNKNOWN_1192                               = 0x4A8, // cmsg uint64
     CMSG_EJECT_PASSENGER                            = 0x4A9, // cmsg uint64
     SMSG_PET_GUIDS                                  = 0x4AA, // shifted+5
@@ -1263,7 +1263,7 @@ enum Opcodes
     UMSG_UNKNOWN_1226                               = 0x4CA, // not found 3.2
     UMSG_UNKNOWN_1227                               = 0x4CB, // not found 3.2
     UMSG_UNKNOWN_1228                               = 0x4CC, // not found 3.2
-    SMSG_UNKNOWN_1229                               = 0x4CD, // SMSG, any opcode?
+    SMSG_UNKNOWN_1229                               = 0x4CD, // SMSG, handles any opcode
     SMSG_UNKNOWN_1230                               = 0x4CE, // SMSG, movement related
     CMSG_UNKNOWN_1231_ACK                           = 0x4CF, // movement related
     SMSG_UNKNOWN_1232                               = 0x4D0, // SMSG, movement related
