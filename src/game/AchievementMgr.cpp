@@ -319,10 +319,18 @@ bool AchievementCriteriaRequirement::Meets(uint32 criteria_id, Player const* sou
                 return false;
             Map* map = source->GetMap();
             if (!map->Instanceable())
-                return false;
+            {
+                sLog.outErrorDb("Achievement system call ACHIEVEMENT_CRITERIA_REQUIRE_INSTANCE_SCRIPT (%u) for achievement criteria %u for non-instance map %u",
+                    ACHIEVEMENT_CRITERIA_REQUIRE_INSTANCE_SCRIPT, criteria_id, map->GetId());
+                    return false;
+            }
             InstanceData* data = ((InstanceMap*)map)->GetInstanceData();
             if (!data)
+            {
+                sLog.outErrorDb("Achievement system call ACHIEVEMENT_CRITERIA_REQUIRE_INSTANCE_SCRIPT (%u) for achievement criteria %u for map %u but map not have instance script",
+                    ACHIEVEMENT_CRITERIA_REQUIRE_INSTANCE_SCRIPT, criteria_id, map->GetId());
                 return false;
+            }
             return data->CheckAchievementCriteriaMeet(criteria_id, source, target, miscvalue1);
     }
     return false;
