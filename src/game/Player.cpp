@@ -16962,7 +16962,7 @@ void Player::Whisper(const std::string& text, uint32 language,uint64 receiver)
         if (language != LANG_ADDON)
         {
             data.Initialize(SMSG_MESSAGECHAT, 200);
-            rPlayer->BuildPlayerChat(&data, CHAT_MSG_REPLY, text, language);
+            rPlayer->BuildPlayerChat(&data, CHAT_MSG_WHISPER_INFORM, text, language);
             GetSession()->SendPacket(&data);
         }
     }

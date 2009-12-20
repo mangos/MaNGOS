@@ -2317,8 +2317,8 @@ enum ChatMsg
     CHAT_MSG_OFFICER                = 0x05,
     CHAT_MSG_YELL                   = 0x06,
     CHAT_MSG_WHISPER                = 0x07,
-    CHAT_MSG_WHISPER_INFORM         = 0x08, // WHISPER_FOREIGN?
-    CHAT_MSG_REPLY                  = 0x09, // WHISPER_INFORM?
+    CHAT_MSG_WHISPER_FOREIGN        = 0x08,
+    CHAT_MSG_WHISPER_INFORM         = 0x09,
     CHAT_MSG_EMOTE                  = 0x0A,
     CHAT_MSG_TEXT_EMOTE             = 0x0B,
     CHAT_MSG_MONSTER_SAY            = 0x0C,
@@ -2350,19 +2350,20 @@ enum ChatMsg
     CHAT_MSG_BG_SYSTEM_HORDE        = 0x26,
     CHAT_MSG_RAID_LEADER            = 0x27,
     CHAT_MSG_RAID_WARNING           = 0x28,
-    CHAT_MSG_RAID_BOSS_WHISPER      = 0x29,
-    CHAT_MSG_RAID_BOSS_EMOTE        = 0x2A,
+    CHAT_MSG_RAID_BOSS_EMOTE        = 0x29,
+    CHAT_MSG_RAID_BOSS_WHISPER      = 0x2A,
     CHAT_MSG_FILTERED               = 0x2B,
     CHAT_MSG_BATTLEGROUND           = 0x2C,
     CHAT_MSG_BATTLEGROUND_LEADER    = 0x2D,
     CHAT_MSG_RESTRICTED             = 0x2E,
-    CHAT_MSG_BN                     = 0x2F,
+    CHAT_MSG_BATTLENET              = 0x2F,
     CHAT_MSG_ACHIEVEMENT            = 0x30,
     CHAT_MSG_GUILD_ACHIEVEMENT      = 0x31,
-    CHAT_MSG_PARTY_LEADER           = 0x32                  // guessed
+    CHAT_MSG_ARENA_POINTS           = 0x32,
+    CHAT_MSG_PARTY_LEADER           = 0x33
 };
 
-#define MAX_CHAT_MSG_TYPE 0x33
+#define MAX_CHAT_MSG_TYPE 0x34
 
 enum ChatLinkColors
 {

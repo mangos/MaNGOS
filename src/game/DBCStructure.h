@@ -1077,7 +1077,7 @@ struct MapEntry
     uint32  MapID;                                          // 0
     //char*       internalname;                             // 1 unused
     uint32  map_type;                                       // 2
-    //uint32 unk_330;                                       // 3
+    //uint32 unk_330;                                       // 3 some kind of flags (0x100 - CAN_CHANGE_PLAYER_DIFFICULTY)
                                                             // 4 0 or 1 for battlegrounds (not arenas)
     char*   name[16];                                       // 5-20
                                                             // 21 name flags, unused
@@ -1086,13 +1086,13 @@ struct MapEntry
                                                             // 39 intro text flags
     //char*     allianceIntro[16];                          // 40-55 text for PvP Zones
                                                             // 56 intro text flags
-    uint32  multimap_id;                                    // 57
-                                                            // 58
+    uint32  multimap_id;                                    // 57 index in  LoadingScreens.dbc
+                                                            // 58 BattlefieldMapIconScale
     int32   entrance_map;                                   // 59 map_id of entrance map
     float   entrance_x;                                     // 60 entrance x coordinate (if exist single entry)
     float   entrance_y;                                     // 61 entrance y coordinate (if exist single entry)
-                                                            // 62 -1, 0 and 720
-    uint32  addon;                                          // 63 (0-original maps,1-tbc addon)
+                                                            // 62 time of day override
+    uint32  addon;                                          // 63 expansion
                                                             // 64 some kind of time?
     //uint32 maxPlayers;                                    // 65 max players
 

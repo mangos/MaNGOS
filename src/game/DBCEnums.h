@@ -285,13 +285,13 @@ enum FactionMasks
     // if none flags set then non-aggressive creature
 };
 
-enum MapTypes
+enum MapTypes                                               // Lua_IsInInstance
 {
-    MAP_COMMON          = 0,
-    MAP_INSTANCE        = 1,
-    MAP_RAID            = 2,
-    MAP_BATTLEGROUND    = 3,
-    MAP_ARENA           = 4
+    MAP_COMMON          = 0,                                // none
+    MAP_INSTANCE        = 1,                                // party
+    MAP_RAID            = 2,                                // raid
+    MAP_BATTLEGROUND    = 3,                                // pvp
+    MAP_ARENA           = 4                                 // arena
 };
 
 enum AbilytyLearnType
