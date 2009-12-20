@@ -1395,30 +1395,14 @@ void Aura::HandleAddModifier(bool apply, bool Real)
                 break;
         }
 
-        SpellModifier *mod = new SpellModifier;
-        mod->op = SpellModOp(m_modifier.m_miscvalue);
-        mod->value = m_modifier.m_amount;
-        mod->type = SpellModType(m_modifier.m_auraname);    // SpellModType value == spell aura types
-        mod->spellId = GetId();
-
-        uint32 const *ptr;
-        switch (m_effIndex)
-        {
-            case 0: ptr = &m_spellProto->EffectSpellClassMaskA[0]; break;
-            case 1: ptr = &m_spellProto->EffectSpellClassMaskB[0]; break;
-            case 2: ptr = &m_spellProto->EffectSpellClassMaskC[0]; break;
-            default:
-                return;
-        }
-
-        mod->mask = (uint64)ptr[0] | (uint64)ptr[1]<<32;
-        mod->mask2= (uint64)ptr[2];
-
-        // prevent expire spell mods with (charges > 0 && m_stackAmount > 1)
-        // all this spell expected expire not at use but at spell proc event check
-        mod->charges = m_spellProto->StackAmount > 1 ? 0 : m_procCharges;
-
-        m_spellmod = mod;
+        m_spellmod = new SpellModifier(
+            SpellModOp(m_modifier.m_miscvalue),
+            SpellModType(m_modifier.m_auraname),            // SpellModType value == spell aura types
+            m_modifier.m_amount,
+            this,
+            // prevent expire spell mods with (charges > 0 && m_stackAmount > 1)
+            // all this spell expected expire not at use but at spell proc event check
+            m_spellProto->StackAmount > 1 ? 0 : m_procCharges);
     }
 
     ((Player*)m_target)->AddSpellMod(m_spellmod, apply);
@@ -1454,18 +1438,10 @@ void Aura::HandleAddTargetTrigger(bool apply, bool /*Real*/)
         SpellModifier *mod = new SpellModifier;
         mod->spellId = GetId();
 
-        uint32 const *ptr;
-        switch (m_effIndex)
-        {
-            case 0: ptr = &m_spellProto->EffectSpellClassMaskA[0]; break;
-            case 1: ptr = &m_spellProto->EffectSpellClassMaskB[0]; break;
-            case 2: ptr = &m_spellProto->EffectSpellClassMaskC[0]; break;
-            default:
-                return;
-        }
+        uint32 const *ptr = m_spellProto->GetEffectSpellClassMask(m_effIndex);
 
         mod->mask = (uint64)ptr[0] | (uint64)ptr[1]<<32;
-        mod->mask2= (uint64)ptr[2];
+        mod->mask2= ptr[2];
         m_spellmod = mod;
     }
     else
@@ -2611,14 +2587,8 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                 if(apply)
                 {
                     // Reduce backfire damage (dot damage) from Shadow Word: Death
-                    SpellModifier *mod = new SpellModifier;
-                    mod->op = SPELLMOD_DOT;
-                    mod->value = m_modifier.m_amount;
-                    mod->type = SPELLMOD_PCT;
-                    mod->spellId = GetId();
-                    mod->mask = UI64LIT(0x0000200000000000);
-                    mod->mask2= UI64LIT(0x0);
-                    m_spellmod = mod;
+                    // aura have wrong effectclassmask, so use hardcoded value
+                    m_spellmod = new SpellModifier(SPELLMOD_DOT,SPELLMOD_PCT,m_modifier.m_amount,GetId(),0x0000200000000000);
                 }
                 ((Player*)m_target)->AddSpellMod(m_spellmod, apply);
                 return;
@@ -2636,17 +2606,8 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         return;
 
                     if(apply)
-                    {
-                        SpellModifier *mod = new SpellModifier;
-                        mod->op = SPELLMOD_DOT;
-                        mod->value = m_modifier.m_amount/7;
-                        mod->type = SPELLMOD_FLAT;
-                        mod->spellId = GetId();
-                        mod->mask = UI64LIT(0x001000000000);
-                        mod->mask2= UI64LIT(0x0);
-
-                        m_spellmod = mod;
-                    }
+                        // dummy not have proper effectclassmask
+                        m_spellmod  = new SpellModifier(SPELLMOD_DOT,SPELLMOD_FLAT,m_modifier.m_amount/7,GetId(),UI64LIT(0x001000000000));
 
                     ((Player*)m_target)->AddSpellMod(m_spellmod, apply);
                     return;
@@ -2770,39 +2731,7 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
             }
             break;
         case SPELLFAMILY_SHAMAN:
-        {
-            // Improved Weapon Totems
-            if( GetSpellProto()->SpellIconID == 57 && m_target->GetTypeId()==TYPEID_PLAYER )
-            {
-                if(apply)
-                {
-                    SpellModifier *mod = new SpellModifier;
-                    mod->op = SPELLMOD_EFFECT1;
-                    mod->value = m_modifier.m_amount;
-                    mod->type = SPELLMOD_PCT;
-                    mod->spellId = GetId();
-                    switch (m_effIndex)
-                    {
-                        case 0:
-                            // Windfury Totem
-                            mod->mask = UI64LIT(0x00200000000);
-                            mod->mask2= UI64LIT(0x0);
-                            break;
-                        case 1:
-                            // Flametongue Totem
-                            mod->mask = UI64LIT(0x00400000000);
-                            mod->mask2= UI64LIT(0x0);
-                            break;
-                    }
-
-                    m_spellmod = mod;
-                }
-
-                ((Player*)m_target)->AddSpellMod(m_spellmod, apply);
-                return;
-            }
             break;
-        }
     }
 
     // pet auras

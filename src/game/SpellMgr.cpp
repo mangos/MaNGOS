@@ -862,25 +862,6 @@ void SpellMgr::LoadSpellTargetPositions()
     sLog.outString( ">> Loaded %u spell teleport coordinates", count );
 }
 
-bool SpellMgr::IsAffectedByMod(SpellEntry const *spellInfo, SpellModifier *mod) const
-{
-    // false for spellInfo == NULL
-    if (!spellInfo || !mod)
-        return false;
-
-    SpellEntry const *affect_spell = sSpellStore.LookupEntry(mod->spellId);
-    // False if affect_spell == NULL or spellFamily not equal
-    if (!affect_spell || affect_spell->SpellFamilyName != spellInfo->SpellFamilyName)
-        return false;
-
-    // true
-    if (mod->mask  & spellInfo->SpellFamilyFlags ||
-        mod->mask2 & spellInfo->SpellFamilyFlags2)
-        return true;
-
-    return false;
-}
-
 struct DoSpellProcEvent
 {
     DoSpellProcEvent(SpellProcEventEntry const& _spe) : spe(_spe) {}

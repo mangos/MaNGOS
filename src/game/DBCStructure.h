@@ -1426,6 +1426,10 @@ struct SpellEntry
 
     // helpers
     int32 CalculateSimpleValue(uint8 eff) const { return EffectBasePoints[eff]+int32(EffectBaseDice[eff]); }
+    uint32 const* GetEffectSpellClassMask(uint8 effect) const
+    {
+        return EffectSpellClassMaskA + effect * 3;
+    }
 
     private:
         // prevent creating custom entries (copy data from original in fact)
