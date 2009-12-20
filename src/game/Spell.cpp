@@ -4079,20 +4079,34 @@ SpellCastResult Spell::CheckCast(bool strict)
             }
         }
 
-        // TODO: this check can be applied and for player to prevent cheating when IsPositiveSpell will return always correct result.
-        // check target for pet/charmed casts (not self targeted), self targeted cast used for area effects and etc
-        if(non_caster_target && m_caster->GetTypeId() == TYPEID_UNIT && m_caster->GetCharmerOrOwnerGUID())
+        if(non_caster_target)
         {
-            // check correctness positive/negative cast target (pet cast real check and cheating check)
-            if(IsPositiveSpell(m_spellInfo->Id))
+            // simple cases
+            if (IsExplicitPositiveTarget(m_spellInfo->EffectImplicitTargetA[0]))
             {
                 if(m_caster->IsHostileTo(target))
                     return SPELL_FAILED_BAD_TARGETS;
             }
-            else
+            else if (IsExplicitNegativeTarget(m_spellInfo->EffectImplicitTargetA[0]))
             {
                 if(m_caster->IsFriendlyTo(target))
                     return SPELL_FAILED_BAD_TARGETS;
+            }
+            // TODO: this check can be applied and for player to prevent cheating when IsPositiveSpell will return always correct result.
+            // check target for pet/charmed casts (not self targeted), self targeted cast used for area effects and etc
+            else if (m_caster->GetTypeId() == TYPEID_UNIT && m_caster->GetCharmerOrOwnerGUID())
+            {
+                // check correctness positive/negative cast target (pet cast real check and cheating check)
+                if(IsPositiveSpell(m_spellInfo->Id))
+                {
+                    if(m_caster->IsHostileTo(target))
+                        return SPELL_FAILED_BAD_TARGETS;
+                }
+                else
+                {
+                    if(m_caster->IsFriendlyTo(target))
+                        return SPELL_FAILED_BAD_TARGETS;
+                }
             }
         }
 
