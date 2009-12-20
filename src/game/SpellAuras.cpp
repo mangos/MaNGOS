@@ -2588,7 +2588,7 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                 {
                     // Reduce backfire damage (dot damage) from Shadow Word: Death
                     // aura have wrong effectclassmask, so use hardcoded value
-                    m_spellmod = new SpellModifier(SPELLMOD_DOT,SPELLMOD_PCT,m_modifier.m_amount,GetId(),0x0000200000000000);
+                    m_spellmod = new SpellModifier(SPELLMOD_DOT,SPELLMOD_PCT,m_modifier.m_amount,GetId(),UI64LIT(0x0000200000000000));
                 }
                 ((Player*)m_target)->AddSpellMod(m_spellmod, apply);
                 return;
