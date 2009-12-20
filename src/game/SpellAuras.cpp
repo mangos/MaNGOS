@@ -3008,27 +3008,30 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
                 case FORM_DIREBEAR:
                 {
                     // get furor proc chance
-                    uint32 FurorChance = 0;
+                    int32 furorChance = 0;
                     Unit::AuraList const& mDummy = m_target->GetAurasByType(SPELL_AURA_DUMMY);
                     for(Unit::AuraList::const_iterator i = mDummy.begin(); i != mDummy.end(); ++i)
                     {
                         if ((*i)->GetSpellProto()->SpellIconID == 238)
                         {
-                            FurorChance = (*i)->GetModifier()->m_amount;
+                            furorChance = (*i)->GetModifier()->m_amount;
                             break;
                         }
                     }
 
+                    if(!furorChance)
+                        break;
+
                     if (m_modifier.m_miscvalue == FORM_CAT)
                     {
                         m_target->SetPower(POWER_ENERGY, 0);
-                        if(urand(1,100) <= FurorChance)
-                            m_target->CastSpell(m_target, 17099, true, NULL, this);
+                        // Furor chance is now amount of energy for cat form
+                        m_target->CastCustomSpell(m_target, 17099, &furorChance, NULL, NULL, this);
                     }
                     else
                     {
                         m_target->SetPower(POWER_RAGE, 0);
-                        if(urand(1,100) <= FurorChance)
+                        if(urand(1,100) <= furorChance)
                             m_target->CastSpell(m_target, 17057, true, NULL, this);
                     }
                     break;
