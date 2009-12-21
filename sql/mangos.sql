@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_9034_01_mangos_spell_proc_event` bit(1) default NULL
+  `required_9045_02_mangos_spell_chain` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -13732,10 +13732,14 @@ CREATE TABLE `quest_template` (
   `ReqItemId2` mediumint(8) unsigned NOT NULL default '0',
   `ReqItemId3` mediumint(8) unsigned NOT NULL default '0',
   `ReqItemId4` mediumint(8) unsigned NOT NULL default '0',
+  `ReqItemId5` mediumint(8) unsigned NOT NULL default '0',
+  `ReqItemId6` mediumint(8) unsigned NOT NULL default '0',
   `ReqItemCount1` smallint(5) unsigned NOT NULL default '0',
   `ReqItemCount2` smallint(5) unsigned NOT NULL default '0',
   `ReqItemCount3` smallint(5) unsigned NOT NULL default '0',
   `ReqItemCount4` smallint(5) unsigned NOT NULL default '0',
+  `ReqItemCount5` smallint(5) unsigned NOT NULL default '0',
+  `ReqItemCount6` smallint(5) unsigned NOT NULL default '0',
   `ReqSourceId1` mediumint(8) unsigned NOT NULL default '0',
   `ReqSourceId2` mediumint(8) unsigned NOT NULL default '0',
   `ReqSourceId3` mediumint(8) unsigned NOT NULL default '0',
@@ -13772,14 +13776,10 @@ CREATE TABLE `quest_template` (
   `RewItemId2` mediumint(8) unsigned NOT NULL default '0',
   `RewItemId3` mediumint(8) unsigned NOT NULL default '0',
   `RewItemId4` mediumint(8) unsigned NOT NULL default '0',
-  `ReqItemId5` mediumint(8) unsigned NOT NULL default '0',
-  `ReqItemId6` mediumint(8) unsigned NOT NULL default '0',
   `RewItemCount1` smallint(5) unsigned NOT NULL default '0',
   `RewItemCount2` smallint(5) unsigned NOT NULL default '0',
   `RewItemCount3` smallint(5) unsigned NOT NULL default '0',
   `RewItemCount4` smallint(5) unsigned NOT NULL default '0',
-  `ReqItemCount5` smallint(5) unsigned NOT NULL default '0',
-  `ReqItemCount6` smallint(5) unsigned NOT NULL default '0',
   `RewRepFaction1` smallint(5) unsigned NOT NULL default '0' COMMENT 'faction id from Faction.dbc in this case',
   `RewRepFaction2` smallint(5) unsigned NOT NULL default '0' COMMENT 'faction id from Faction.dbc in this case',
   `RewRepFaction3` smallint(5) unsigned NOT NULL default '0' COMMENT 'faction id from Faction.dbc in this case',
@@ -16618,6 +16618,10 @@ INSERT INTO spell_chain VALUES
 (26982,26981,774,13,0),
 (48440,26982,774,14,0),
 (48441,48440,774,15,0),
+/*Revitalize*/
+(48539,0,48539,1,0),
+(48544,48539,48539,2,0),
+(48545,48544,48539,3,0),
 /*Revive*/
 (50769,0,50769,1,0),
 (50768,50769,50769,2,0),
@@ -18263,6 +18267,7 @@ INSERT INTO `spell_proc_event` VALUES
 (48516, 0x00000000,  7, 0x00000005, 0x00000000, 0x00000000, 0x00000000, 0x00000002, 0.000000, 0.000000, 30),
 (48521, 0x00000000,  7, 0x00000005, 0x00000000, 0x00000000, 0x00000000, 0x00000002, 0.000000, 0.000000, 30),
 (48525, 0x00000000,  7, 0x00000005, 0x00000000, 0x00000000, 0x00000000, 0x00000002, 0.000000, 0.000000, 30),
+(48539, 0x00000000,  7, 0x00000010, 0x04000000, 0x00000000, 0x00040000, 0x00000000, 0.000000, 0.000000,  0),
 (48833, 0x00000000,  7, 0x00000000, 0x00000440, 0x00000000, 0x00000000, 0x00000000, 0.000000, 0.000000,  0),
 (48835, 0x00000000, 10, 0x00000000, 0x00000008, 0x00000000, 0x00000000, 0x00000000, 0.000000, 0.000000,  0),
 (48837, 0x00000000, 11, 0x90100000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0.000000, 0.000000,  0),
