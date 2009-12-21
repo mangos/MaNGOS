@@ -356,7 +356,17 @@ pAuraHandler AuraHandler[TOTAL_AURAS]=
     &Aura::HandleNULL,                                      //303 17 spells
     &Aura::HandleNULL,                                      //304 2 spells (alcohol effect?)
     &Aura::HandleAuraModIncreaseSpeed,                      //305 SPELL_AURA_MOD_MINIMUM_SPEED
-    &Aura::HandleNULL                                       //306 1 spell
+    &Aura::HandleNULL,                                      //306 1 spell
+    &Aura::HandleNULL,                                      //307 absorb healing?
+    &Aura::HandleNULL,                                      //308 new aura for hunter traps
+    &Aura::HandleNULL,                                      //309 absorb healing?
+    &Aura::HandleNULL,                                      //310 pet avoidance passive?
+    &Aura::HandleNULL,                                      //311 0 spells in 3.3
+    &Aura::HandleNULL,                                      //312 0 spells in 3.3
+    &Aura::HandleNULL,                                      //313 0 spells in 3.3
+    &Aura::HandleNULL,                                      //314 1 test spell (reduce duration of silince/magic)
+    &Aura::HandleNULL,                                      //315 underwater walking
+    &Aura::HandleNULL                                       //316 makes haste affect HOT/DOT ticks
 };
 
 static AuraType const frozenAuraTypes[] = { SPELL_AURA_MOD_ROOT, SPELL_AURA_MOD_STUN, SPELL_AURA_NONE };
