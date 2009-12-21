@@ -429,10 +429,9 @@ bool IsPositiveTarget(uint32 targetA, uint32 targetB)
 
 bool IsExplicitPositiveTarget(uint32 targetA)
 {
-    // positive targets
+    // positive targets that in target selection code expect target in m_targers, so not that auto-select target by spell data by m_caster and etc
     switch(targetA)
     {
-        case TARGET_SELF:
         case TARGET_SINGLE_FRIEND:
         case TARGET_SINGLE_PARTY:
         case TARGET_CHAIN_HEAL:
@@ -448,7 +447,7 @@ bool IsExplicitPositiveTarget(uint32 targetA)
 
 bool IsExplicitNegativeTarget(uint32 targetA)
 {
-    // non-positive targets
+    // non-positive targets that in target selection code expect target in m_targers, so not that auto-select target by spell data by m_caster and etc
     switch(targetA)
     {
         case TARGET_CHAIN_DAMAGE:
