@@ -732,8 +732,6 @@ class SpellMgr
     // Accessors (const or static functions)
     public:
 
-        bool IsAffectedByMod(SpellEntry const *spellInfo, SpellModifier *mod) const;
-
         SpellElixirMap const& GetSpellElixirMap() const { return mSpellElixirs; }
 
         uint32 GetSpellElixirMask(uint32 spellid) const

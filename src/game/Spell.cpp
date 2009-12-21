@@ -5772,7 +5772,10 @@ void Spell::UpdatePointers()
 
 bool Spell::IsAffectedByAura(Aura *aura) const
 {
-    return sSpellMgr.IsAffectedByMod(m_spellInfo, aura->getAuraSpellMod());
+    if(SpellModifier* mod = aura->getAuraSpellMod())
+        return mod->isAffectedOnSpell(m_spellInfo);
+    else
+        return false;
 }
 
 bool Spell::CheckTargetCreatureType(Unit* target) const

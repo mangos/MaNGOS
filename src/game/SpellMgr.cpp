@@ -338,6 +338,7 @@ bool IsSingleFromSpellSpecificPerTargetPerCaster(SpellSpecific spellSpec1,SpellS
         case SPELL_AURA:
         case SPELL_STING:
         case SPELL_CURSE:
+        case SPELL_ASPECT:
         case SPELL_POSITIVE_SHOUT:
         case SPELL_JUDGEMENT:
         case SPELL_HAND:
@@ -355,6 +356,7 @@ bool IsSingleFromSpellSpecificSpellRanksPerTarget(SpellSpecific spellSpec1,Spell
         case SPELL_BLESSING:
         case SPELL_AURA:
         case SPELL_CURSE:
+        case SPELL_ASPECT:
         case SPELL_HAND:
             return spellSpec1==spellSpec2;
         default:
@@ -368,7 +370,6 @@ bool IsSingleFromSpellSpecificPerTarget(SpellSpecific spellSpec1,SpellSpecific s
     switch(spellSpec1)
     {
         case SPELL_SEAL:
-        case SPELL_ASPECT:
         case SPELL_TRACKER:
         case SPELL_WARLOCK_ARMOR:
         case SPELL_MAGE_ARMOR:
@@ -428,10 +429,9 @@ bool IsPositiveTarget(uint32 targetA, uint32 targetB)
 
 bool IsExplicitPositiveTarget(uint32 targetA)
 {
-    // positive targets
+    // positive targets that in target selection code expect target in m_targers, so not that auto-select target by spell data by m_caster and etc
     switch(targetA)
     {
-        case TARGET_SELF:
         case TARGET_SINGLE_FRIEND:
         case TARGET_SINGLE_PARTY:
         case TARGET_CHAIN_HEAL:
@@ -447,7 +447,7 @@ bool IsExplicitPositiveTarget(uint32 targetA)
 
 bool IsExplicitNegativeTarget(uint32 targetA)
 {
-    // non-positive targets
+    // non-positive targets that in target selection code expect target in m_targers, so not that auto-select target by spell data by m_caster and etc
     switch(targetA)
     {
         case TARGET_CHAIN_DAMAGE:
@@ -860,25 +860,6 @@ void SpellMgr::LoadSpellTargetPositions()
 
     sLog.outString();
     sLog.outString( ">> Loaded %u spell teleport coordinates", count );
-}
-
-bool SpellMgr::IsAffectedByMod(SpellEntry const *spellInfo, SpellModifier *mod) const
-{
-    // false for spellInfo == NULL
-    if (!spellInfo || !mod)
-        return false;
-
-    SpellEntry const *affect_spell = sSpellStore.LookupEntry(mod->spellId);
-    // False if affect_spell == NULL or spellFamily not equal
-    if (!affect_spell || affect_spell->SpellFamilyName != spellInfo->SpellFamilyName)
-        return false;
-
-    // true
-    if (mod->mask  & spellInfo->SpellFamilyFlags ||
-        mod->mask2 & spellInfo->SpellFamilyFlags2)
-        return true;
-
-    return false;
 }
 
 struct DoSpellProcEvent
