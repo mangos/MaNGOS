@@ -4174,15 +4174,6 @@ void Player::BuildPlayerRepop()
     SetByteValue(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND);
 }
 
-void Player::SendDelayResponse(const uint32 ml_seconds)
-{
-    //FIXME: is this delay time arg really need? 50msec by default in code
-    WorldPacket data( SMSG_QUERY_TIME_RESPONSE, 4+4 );
-    data << (uint32)time(NULL);
-    data << (uint32)0;
-    GetSession()->SendPacket( &data );
-}
-
 void Player::ResurrectPlayer(float restore_percent, bool applySickness)
 {
     WorldPacket data(SMSG_DEATH_RELEASE_LOC, 4*4);          // remove spirit healer position
@@ -10261,7 +10252,7 @@ uint8 Player::CanUseItem( Item *pItem, bool not_loading ) const
                     return EQUIP_ERR_NO_REQUIRED_PROFICIENCY;
 
                 if (GetSkillValue( pProto->RequiredSkill ) < pProto->RequiredSkillRank)
-                    return EQUIP_ERR_ERR_CANT_EQUIP_SKILL;
+                    return EQUIP_ERR_CANT_EQUIP_SKILL;
             }
 
             if (pProto->RequiredSpell != 0 && !HasSpell(pProto->RequiredSpell))
@@ -10322,7 +10313,7 @@ uint8 Player::CanUseAmmo( uint32 item ) const
             if( GetSkillValue( pProto->RequiredSkill ) == 0 )
                 return EQUIP_ERR_NO_REQUIRED_PROFICIENCY;
             else if( GetSkillValue( pProto->RequiredSkill ) < pProto->RequiredSkillRank )
-                return EQUIP_ERR_ERR_CANT_EQUIP_SKILL;
+                return EQUIP_ERR_CANT_EQUIP_SKILL;
         }
         if( pProto->RequiredSpell != 0 && !HasSpell( pProto->RequiredSpell ) )
             return EQUIP_ERR_NO_REQUIRED_PROFICIENCY;
@@ -11601,24 +11592,38 @@ void Player::RemoveItemFromBuyBackSlot( uint32 slot, bool del )
 void Player::SendEquipError( uint8 msg, Item* pItem, Item *pItem2 )
 {
     sLog.outDebug( "WORLD: Sent SMSG_INVENTORY_CHANGE_FAILURE (%u)", msg);
-    WorldPacket data(SMSG_INVENTORY_CHANGE_FAILURE, (msg == EQUIP_ERR_CANT_EQUIP_LEVEL_I ? 22 : (msg == EQUIP_ERR_OK ? 1 : 18)));
+    WorldPacket data(SMSG_INVENTORY_CHANGE_FAILURE, 1+8+8+1);
     data << uint8(msg);
 
     if (msg != EQUIP_ERR_OK)
     {
         data << uint64(pItem ? pItem->GetGUID() : 0);
         data << uint64(pItem2 ? pItem2->GetGUID() : 0);
-        data << uint8(0);                                   // not 0 there...
+        data << uint8(0);                                   // bag type subclass, used with EQUIP_ERR_EVENT_AUTOEQUIP_BIND_CONFIRM and EQUIP_ERR_ITEM_DOESNT_GO_INTO_BAG2
 
-        if (msg == EQUIP_ERR_CANT_EQUIP_LEVEL_I)
+        switch(msg)
         {
-            uint32 level = 0;
-
-            if (pItem)
-                if (ItemPrototype const* proto =  pItem->GetProto())
-                    level = proto->RequiredLevel;
-
-            data << uint32(level);                          // new 2.4.0
+            case EQUIP_ERR_CANT_EQUIP_LEVEL_I:
+            case EQUIP_ERR_PURCHASE_LEVEL_TOO_LOW:
+                {
+                    ItemPrototype const* proto = pItem ? pItem->GetProto() : NULL;
+                    data << uint32(proto ? proto->RequiredLevel : 0);
+                } break;
+            case EQUIP_ERR_EVENT_AUTOEQUIP_BIND_CONFIRM:    // no idea about this one...
+                {
+                    data << uint64(0);
+                    data << uint32(0);
+                    data << uint64(0);
+                } break;
+            case EQUIP_ERR_ITEM_MAX_LIMIT_CATEGORY_COUNT_EXCEEDED_IS:
+            case EQUIP_ERR_ITEM_MAX_LIMIT_CATEGORY_SOCKETED_EXCEEDED_IS:
+            case EQUIP_ERR_ITEM_MAX_LIMIT_CATEGORY_EQUIPPED_EXCEEDED_IS:
+                {
+                    ItemPrototype const* proto = pItem ? pItem->GetProto() : NULL;
+                    data << uint32(proto ? proto->ItemLimitCategory : 0);
+                } break;
+                default:
+                    break;
         }
     }
     GetSession()->SendPacket(&data);
@@ -18013,7 +18018,7 @@ void Player::UpdateHomebindTime(uint32 time)
             // hide reminder
             WorldPacket data(SMSG_RAID_GROUP_ONLY, 4+4);
             data << uint32(0);
-            data << uint32(0);
+            data << uint32(ERR_RAID_GROUP_NONE);            // error used only when timer = 0
             GetSession()->SendPacket(&data);
         }
         // instance is valid, reset homebind timer
@@ -18036,7 +18041,7 @@ void Player::UpdateHomebindTime(uint32 time)
         // send message to player
         WorldPacket data(SMSG_RAID_GROUP_ONLY, 4+4);
         data << uint32(m_HomebindTimer);
-        data << uint32(1);
+        data << uint32(ERR_RAID_GROUP_NONE);                // error used only when timer = 0
         GetSession()->SendPacket(&data);
         sLog.outDebug("PLAYER: Player '%s' (GUID: %u) will be teleported to homebind in 60 seconds", GetName(),GetGUIDLow());
     }

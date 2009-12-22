@@ -45,10 +45,7 @@ void WorldSession::SendGMTicketGetTicket(uint32 status, char const* text)
 
 void WorldSession::HandleGMTicketGetTicketOpcode( WorldPacket & /*recv_data*/ )
 {
-    WorldPacket data( SMSG_QUERY_TIME_RESPONSE, 4+4 );
-    data << (uint32)time(NULL);
-    data << (uint32)0;
-    SendPacket( &data );
+    SendQueryTimeResponse();
 
     GMTicket* ticket = sTicketMgr.GetGMTicket(GetPlayer()->GetGUIDLow());
     if(ticket)
@@ -105,12 +102,9 @@ void WorldSession::HandleGMTicketCreateOpcode( WorldPacket & recv_data )
 
     sTicketMgr.Create(_player->GetGUIDLow(), ticketText.c_str());
 
-    WorldPacket data( SMSG_QUERY_TIME_RESPONSE, 4+4 );
-    data << (uint32)time(NULL);
-    data << (uint32)0;
-    SendPacket( &data );
+    SendQueryTimeResponse();
 
-    data.Initialize( SMSG_GMTICKET_CREATE, 4 );
+    WorldPacket data( SMSG_GMTICKET_CREATE, 4 );
     data << uint32(2);                                      // 2 - nothing appears (3-error creating, 5-error updating)
     SendPacket( &data );
     DEBUG_LOG("update the ticket");

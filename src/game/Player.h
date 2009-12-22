@@ -394,6 +394,15 @@ struct LookingForGroup
     uint8 roles;
 };
 
+enum RaidGroupError
+{
+    ERR_RAID_GROUP_NONE                 = 0,
+    ERR_RAID_GROUP_LOWLEVEL             = 1,
+    ERR_RAID_GROUP_ONLY                 = 2,
+    ERR_RAID_GROUP_FULL                 = 3,
+    ERR_RAID_GROUP_REQUIREMENTS_UNMATCH = 4
+};
+
 enum PlayerMovementType
 {
     MOVE_ROOT       = 1,
@@ -1805,7 +1814,6 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         void BuildCreateUpdateBlockForPlayer( UpdateData *data, Player *target ) const;
         void DestroyForPlayer( Player *target, bool anim = false ) const;
-        void SendDelayResponse(const uint32);
         void SendLogXPGain(uint32 GivenXP,Unit* victim,uint32 RestXP);
 
         // notifiers

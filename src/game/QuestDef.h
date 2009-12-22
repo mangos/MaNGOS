@@ -59,17 +59,18 @@ enum QuestFailedReasons
 
 enum QuestShareMessages
 {
-    QUEST_PARTY_MSG_SHARING_QUEST           = 0,
-    QUEST_PARTY_MSG_CANT_TAKE_QUEST         = 1,
-    QUEST_PARTY_MSG_ACCEPT_QUEST            = 2,
-    QUEST_PARTY_MSG_DECLINE_QUEST           = 3,
-    QUEST_PARTY_MSG_BUSY                    = 4,
-    QUEST_PARTY_MSG_LOG_FULL                = 5,
-    QUEST_PARTY_MSG_HAVE_QUEST              = 6,
-    QUEST_PARTY_MSG_FINISH_QUEST            = 7,
-    QUEST_PARTY_MSG_CANT_BE_SHARED_TODAY    = 8,
-    QUEST_PARTY_MSG_SHARING_TIMER_EXPIRED   = 9,
-    QUEST_PARTY_MSG_NOT_IN_PARTY            = 10
+    QUEST_PARTY_MSG_SHARING_QUEST           = 0,            // ERR_QUEST_PUSH_SUCCESS_S
+    QUEST_PARTY_MSG_CANT_TAKE_QUEST         = 1,            // ERR_QUEST_PUSH_INVALID_S
+    QUEST_PARTY_MSG_ACCEPT_QUEST            = 2,            // ERR_QUEST_PUSH_ACCEPTED_S
+    QUEST_PARTY_MSG_DECLINE_QUEST           = 3,            // ERR_QUEST_PUSH_DECLINED_S
+    QUEST_PARTY_MSG_BUSY                    = 4,            // ERR_QUEST_PUSH_BUSY_S
+    QUEST_PARTY_MSG_LOG_FULL                = 5,            // ERR_QUEST_PUSH_LOG_FULL_S
+    QUEST_PARTY_MSG_HAVE_QUEST              = 6,            // ERR_QUEST_PUSH_ONQUEST_S
+    QUEST_PARTY_MSG_FINISH_QUEST            = 7,            // ERR_QUEST_PUSH_ALREADY_DONE_S
+    QUEST_PARTY_MSG_CANT_BE_SHARED_TODAY    = 8,            // ERR_QUEST_PUSH_NOT_DAILY_S
+    QUEST_PARTY_MSG_SHARING_TIMER_EXPIRED   = 9,            // ERR_QUEST_PUSH_TIMER_EXPIRED_S
+    QUEST_PARTY_MSG_NOT_IN_PARTY            = 10,           // ERR_QUEST_PUSH_NOT_IN_PARTY_S
+    QUESY_PARTY_MSG_DIFFERENT_SERVER_DAILY  = 11            // ERR_QUEST_PUSH_DIFFERENT_SERVER_DAILY_S
 };
 
 enum __QuestTradeSkill
