@@ -7601,6 +7601,9 @@ bool Unit::HandleOverrideClassScriptAuraProc(Unit *pVictim, uint32 damage, Aura 
     Item* castItem = triggeredByAura->GetCastItemGUID() && GetTypeId()==TYPEID_PLAYER
         ? ((Player*)this)->GetItemByGuid(triggeredByAura->GetCastItemGUID()) : NULL;
 
+    // Basepoints of trigger aura
+    int32 triggerAmount = triggeredByAura->GetModifier()->m_amount;
+
     uint32 triggered_spell_id = 0;
 
     switch(scriptId)
@@ -7629,8 +7632,7 @@ bool Unit::HandleOverrideClassScriptAuraProc(Unit *pVictim, uint32 damage, Aura 
         case 4086:                                          // Improved Mend Pet (Rank 1)
         case 4087:                                          // Improved Mend Pet (Rank 2)
         {
-            int32 chance = triggeredByAura->GetSpellProto()->EffectBasePoints[triggeredByAura->GetEffIndex()];
-            if(!roll_chance_i(chance))
+            if(!roll_chance_i(triggerAmount))
                 return false;
 
             triggered_spell_id = 24406;
@@ -7661,6 +7663,23 @@ bool Unit::HandleOverrideClassScriptAuraProc(Unit *pVictim, uint32 damage, Aura 
         case 6953:                                          // Warbringer
             RemoveAurasAtMechanicImmunity(IMMUNE_TO_ROOT_AND_SNARE_MASK,0,true);
             return true;
+        case 7010:                                          // Revitalize (rank 1)
+        case 7011:                                          // Revitalize (rank 2)
+        case 7012:                                          // Revitalize (rank 3)
+        {
+            if(!roll_chance_i(triggerAmount))
+                return false;
+
+            switch( pVictim->getPowerType() )
+            {
+                case POWER_MANA:        triggered_spell_id = 48542; break;
+                case POWER_RAGE:        triggered_spell_id = 48541; break;
+                case POWER_ENERGY:      triggered_spell_id = 48540; break;
+                case POWER_RUNIC_POWER: triggered_spell_id = 48543; break;
+                default: return false;
+            }
+            break;
+        }
     }
 
     // not processed
@@ -12726,7 +12745,7 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit *pVictim, Aura* aura, SpellEntry con
     }
     // Aura added by spell can`t trogger from self (prevent drop charges/do triggers)
     // But except periodic triggers (can triggered from self)
-    if(procSpell && procSpell->Id == spellProto->Id && !(spellProto->procFlags&PROC_FLAG_ON_TAKE_PERIODIC))
+    if(procSpell && procSpell->Id == spellProto->Id && !(spellProto->procFlags & PROC_FLAG_ON_TAKE_PERIODIC))
         return false;
 
     // Check if current equipment allows aura to proc
