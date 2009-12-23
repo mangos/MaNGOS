@@ -2390,13 +2390,21 @@ void Spell::prepare(SpellCastTargets const* targets, Aura* triggeredByAura)
         m_caster->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
     }
 
-    if(m_IsTriggeredSpell)
-        cast(true);
-    else
+    // add non-triggered (with cast time and without)
+    if (!m_IsTriggeredSpell)
     {
+        // add to cast type slot
         m_caster->SetCurrentCastedSpell( this );
+
+        // will show cast bar
         SendSpellStart();
     }
+    // execute triggered without cast time explicitly in call point
+    else if(m_timer == 0)
+        cast(true);
+    // else triggered with cast time will execute execute at next tick or later
+    // without adding to cast type slot
+    // will not show cast bar but will show effects at casting time etc
 }
 
 void Spell::cancel()
