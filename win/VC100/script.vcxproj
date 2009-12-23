@@ -321,6 +321,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\src\bindings\universal\ScriptMgr.cpp" />
     <ClCompile Include="..\..\src\bindings\universal\Scripts\sc_default.cpp" />
+    <ClCompile Include="..\..\src\bindings\universal\Scripts\sc_defines.cpp" />
     <ClCompile Include="..\..\src\bindings\universal\system.cpp" />
   </ItemGroup>
   <ItemGroup>
