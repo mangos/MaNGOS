@@ -41,6 +41,7 @@ class WorldSocket;
 class QueryResult;
 class LoginQueryHolder;
 class CharacterHandler;
+class GMTicket;
 
 enum AccountDataType
 {
@@ -184,6 +185,7 @@ class MANGOS_DLL_SPEC WorldSession
         void SendSpiritResurrect();
         void SendBindPoint(Creature* npc);
         void SendGMTicketGetTicket(uint32 status, char const* text);
+        void SendGMResponse(GMTicket *ticket);
 
         void SendAttackStop(Unit const* enemy);
 
@@ -340,6 +342,7 @@ class MANGOS_DLL_SPEC WorldSession
         void HandleGMTicketUpdateTextOpcode(WorldPacket& recvPacket);
 
         void HandleGMSurveySubmit(WorldPacket& recvPacket);
+        void HandleGMResponseResolve(WorldPacket& recv_data);
 
         void HandleTogglePvP(WorldPacket& recvPacket);
 

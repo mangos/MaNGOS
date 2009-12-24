@@ -2261,6 +2261,54 @@ bool ChatHandler::HandleTicketCommand(const char* args)
         return true;
     }
 
+    // ticket respond
+    if(strncmp(px,"respond",8) == 0)
+    {
+        char *name = strtok(NULL, " ");
+
+        if(!name)
+        {
+            SendSysMessage(LANG_CMD_SYNTAX);
+            SetSentErrorMessage(true);
+            return false;
+        }
+
+        std::string plName = name;
+        uint64 guid = sObjectMgr.GetPlayerGUIDByName(plName);
+
+        if(!guid)
+        {
+            SendSysMessage(LANG_PLAYER_NOT_FOUND);
+            SetSentErrorMessage(true);
+            return false;
+        }
+
+        GMTicket* ticket = sTicketMgr.GetGMTicket(GUID_LOPART(guid));
+
+        if(!ticket)
+        {
+            PSendSysMessage(LANG_COMMAND_TICKETNOTEXIST, GUID_LOPART(guid));
+            SetSentErrorMessage(true);
+            return false;
+        }
+
+        char* response = strtok(NULL, "");
+
+        if(!response)
+        {
+            SendSysMessage(LANG_CMD_SYNTAX);
+            SetSentErrorMessage(true);
+            return false;
+        }
+
+        ticket->SetResponseText(response);
+
+        if(Player* pl = sObjectMgr.GetPlayer(guid))
+            pl->GetSession()->SendGMResponse(ticket);
+
+        return true;
+    }
+
     // ticket #num
     int num = atoi(px);
     if(num > 0)
@@ -2269,7 +2317,7 @@ bool ChatHandler::HandleTicketCommand(const char* args)
 
         if(!result)
         {
-            PSendSysMessage(LANG_COMMAND_TICKENOTEXIST, num);
+            PSendSysMessage(LANG_COMMAND_TICKETNOTEXIST, num);
             SetSentErrorMessage(true);
             return false;
         }
@@ -2324,7 +2372,7 @@ bool ChatHandler::HandleDelTicketCommand(const char *args)
         QueryResult* result = CharacterDatabase.PQuery("SELECT guid FROM character_ticket ORDER BY ticket_id ASC "_OFFSET_,num-1);
         if(!result)
         {
-            PSendSysMessage(LANG_COMMAND_TICKENOTEXIST, num);
+            PSendSysMessage(LANG_COMMAND_TICKETNOTEXIST, num);
             SetSentErrorMessage(true);
             return false;
         }

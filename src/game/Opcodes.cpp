@@ -1290,7 +1290,7 @@ OpcodeHandler opcodeTable[NUM_MSG_TYPES] =
     /*0x4ED*/ { "SMSG_TOGGLE_XP_GAIN",                          STATUS_NEVER,    &WorldSession::Handle_ServerSide               },
     /*0x4EE*/ { "SMSG_GMRESPONSE_DB_ERROR",                     STATUS_NEVER,    &WorldSession::Handle_ServerSide               },
     /*0x4EF*/ { "SMSG_GMRESPONSE_RECEIVED",                     STATUS_NEVER,    &WorldSession::Handle_ServerSide               },
-    /*0x4F0*/ { "CMSG_GMRESPONSE_RESOLVE",                      STATUS_NEVER,    &WorldSession::Handle_NULL                     },
+    /*0x4F0*/ { "CMSG_GMRESPONSE_RESOLVE",                      STATUS_LOGGEDIN, &WorldSession::HandleGMResponseResolve         },
     /*0x4F1*/ { "SMSG_GMRESPONSE_STATUS_UPDATE",                STATUS_NEVER,    &WorldSession::Handle_ServerSide               },
     /*0x4F2*/ { "UMSG_UNKNOWN_1266",                            STATUS_NEVER,    &WorldSession::Handle_NULL                     },
     /*0x4F3*/ { "UMSG_UNKNOWN_1267",                            STATUS_NEVER,    &WorldSession::Handle_NULL                     },
