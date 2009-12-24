@@ -2231,6 +2231,12 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                             if (Unit* caster = GetCaster())
                                 m_target->AddThreat(caster, 10.0f, false, GetSpellSchoolMask(GetSpellProto()), GetSpellProto());
                         return;
+                    case 7057:                              // Haunting Spirits
+                        // expected to tick with 30 sec period (tick part see in Aura::PeriodicTick)
+                        m_isPeriodic = true;
+                        m_modifier.periodictime = 30*IN_MILISECONDS;
+                        m_periodicTimer = m_modifier.periodictime;
+                        return;
                     case 13139:                             // net-o-matic
                         // root to self part of (root_target->charge->root_self sequence
                         if (Unit* caster = GetCaster())
@@ -7004,6 +7010,7 @@ void Aura::PeriodicTick()
             break;
         }
         // Here tick dummy auras
+        case SPELL_AURA_DUMMY:                              // some spells have dummy aura
         case SPELL_AURA_PERIODIC_DUMMY:
         {
             PeriodicDummyTick();
@@ -7089,6 +7096,10 @@ void Aura::PeriodicDummyTick()
                     // 7053 Forsaken Skill: Shadow
                     return;
                 }
+                case 7057:                                  // Haunting Spirits
+                    if (roll_chance_i(33))
+                        m_target->CastSpell(m_target,m_modifier.m_amount,true,NULL,this);
+                    return;
 //              // Panda
 //              case 19230: break;
 //              // Gossip NPC Periodic - Talk
