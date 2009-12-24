@@ -536,6 +536,10 @@
 					RelativePath="..\..\src\bindings\universal\Scripts\sc_default.cpp"
 					>
 				</File>
+				<File
+					RelativePath="..\..\src\bindings\universal\Scripts\sc_defines.cpp"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter

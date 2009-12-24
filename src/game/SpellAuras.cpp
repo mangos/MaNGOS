@@ -1401,6 +1401,7 @@ void Aura::HandleAddModifier(bool apply, bool Real)
             case 51124:                                     // Killing Machine
             case 54741:                                     // Firestarter
             case 57761:                                     // Fireball!
+            case 64823:                                     // Elune's Wrath (Balance druid t8 set
                 SetAuraCharges(1);
                 break;
         }
@@ -2418,6 +2419,16 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
             }
         }
 
+        // Living Bomb
+        if (m_spellProto->SpellFamilyName == SPELLFAMILY_MAGE && (m_spellProto->SpellFamilyFlags & UI64LIT(0x2000000000000)))
+        {
+            // Zero duration is equal to AURA_REMOVE_BY_DEFAULT. We can't use it directly, as it is set even
+            // when removing aura from one target due to casting Living Bomb at other.
+            if (m_duration == 0 || m_removeMode == AURA_REMOVE_BY_DISPEL)
+                m_target->CastSpell(m_target,m_modifier.m_amount,true,NULL,this);
+            return;
+        }
+
         if (m_removeMode == AURA_REMOVE_BY_DEATH)
         {
             // Stop caster Arcane Missle chanelling on death
@@ -3029,16 +3040,17 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
                         }
                     }
 
-                    if(!furorChance)
-                        break;
-
                     if (m_modifier.m_miscvalue == FORM_CAT)
                     {
-                        m_target->SetPower(POWER_ENERGY, 0);
-                        // Furor chance is now amount of energy for cat form
-                        m_target->CastCustomSpell(m_target, 17099, &furorChance, NULL, NULL, this);
+                        // Furor chance is now amount allowed to save energy for cat form
+                        // without talent it reset to 0
+                        if (m_target->GetPower(POWER_ENERGY) > furorChance)
+                        {
+                            m_target->SetPower(POWER_ENERGY, 0);
+                            m_target->CastCustomSpell(m_target, 17099, &furorChance, NULL, NULL, this);
+                        }
                     }
-                    else
+                    else if(furorChance)                    // only if talent known
                     {
                         m_target->SetPower(POWER_RAGE, 0);
                         if(urand(1,100) <= furorChance)
@@ -5908,6 +5920,7 @@ void Aura::HandleSpellSpecificBoosts(bool apply)
             }
             else
                 return;
+            break;
         }
         case SPELLFAMILY_WARRIOR:
         {
@@ -5931,6 +5944,7 @@ void Aura::HandleSpellSpecificBoosts(bool apply)
             break;
         }
         case SPELLFAMILY_WARLOCK:
+        {
             // Fear (non stacking)
             if (m_spellProto->SpellFamilyFlags & UI64LIT(0x0000040000000000))
             {
@@ -5965,6 +5979,7 @@ void Aura::HandleSpellSpecificBoosts(bool apply)
             else
                 return;
             break;
+        }
         case SPELLFAMILY_PRIEST:
         {
             // Shadow Word: Pain (need visual check fro skip improvement talent) or Vampiric Touch

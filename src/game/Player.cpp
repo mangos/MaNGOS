@@ -11210,12 +11210,12 @@ void Player::SwapItem( uint16 src, uint16 dst )
     Item *pSrcItem = GetItemByPos( srcbag, srcslot );
     Item *pDstItem = GetItemByPos( dstbag, dstslot );
 
-    if( !pSrcItem )
+    if (!pSrcItem)
         return;
 
     sLog.outDebug( "STORAGE: SwapItem bag = %u, slot = %u, item = %u", dstbag, dstslot, pSrcItem->GetEntry());
 
-    if(!isAlive() )
+    if (!isAlive())
     {
         SendEquipError( EQUIP_ERR_YOU_ARE_DEAD, pSrcItem, pDstItem );
         return;
@@ -11223,7 +11223,7 @@ void Player::SwapItem( uint16 src, uint16 dst )
 
     // SRC checks
 
-    if(pSrcItem->m_lootGenerated)                           // prevent swap looting item
+    if (pSrcItem->m_lootGenerated)                          // prevent swap looting item
     {
         //best error message found for attempting to swap while looting
         SendEquipError( EQUIP_ERR_CANT_DO_RIGHT_NOW, pSrcItem, NULL );
@@ -11231,11 +11231,11 @@ void Player::SwapItem( uint16 src, uint16 dst )
     }
 
     // check unequip potability for equipped items and bank bags
-    if(IsEquipmentPos ( src ) || IsBagPos ( src ))
+    if (IsEquipmentPos(src) || IsBagPos(src))
     {
         // bags can be swapped with empty bag slots, or with empty bag (items move possibility checked later)
         uint8 msg = CanUnequipItem( src, !IsBagPos ( src ) || IsBagPos ( dst ) || (pDstItem && pDstItem->IsBag() && ((Bag*)pDstItem)->IsEmpty()));
-        if(msg != EQUIP_ERR_OK)
+        if (msg != EQUIP_ERR_OK)
         {
             SendEquipError( msg, pSrcItem, pDstItem );
             return;
@@ -11243,9 +11243,16 @@ void Player::SwapItem( uint16 src, uint16 dst )
     }
 
     // prevent put equipped/bank bag in self
-    if( IsBagPos ( src ) && srcslot == dstbag)
+    if (IsBagPos(src) && srcslot == dstbag)
     {
         SendEquipError( EQUIP_ERR_NONEMPTY_BAG_OVER_OTHER_BAG, pSrcItem, pDstItem );
+        return;
+    }
+
+    // prevent put equipped/bank bag in self
+    if (IsBagPos(dst) && dstslot == srcbag)
+    {
+        SendEquipError( EQUIP_ERR_NONEMPTY_BAG_OVER_OTHER_BAG, pDstItem, pSrcItem );
         return;
     }
 

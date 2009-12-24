@@ -895,12 +895,18 @@ void World::LoadConfigSettings(bool reload)
 
     if(reload)
     {
-        uint32 val = sConfig.GetIntDefault("Expansion",1);
+        uint32 val = sConfig.GetIntDefault("Expansion",MAX_EXPANSION);
         if(val!=m_configs[CONFIG_EXPANSION])
             sLog.outError("Expansion option can't be changed at mangosd.conf reload, using current value (%u).",m_configs[CONFIG_EXPANSION]);
     }
     else
-        m_configs[CONFIG_EXPANSION] = sConfig.GetIntDefault("Expansion",1);
+        m_configs[CONFIG_EXPANSION] = sConfig.GetIntDefault("Expansion",MAX_EXPANSION);
+
+    if(m_configs[CONFIG_EXPANSION] > MAX_EXPANSION)
+    {
+        sLog.outError("Expansion option can't be  greater %u but set to %u, used %u",MAX_EXPANSION,m_configs[CONFIG_EXPANSION],MAX_EXPANSION);
+        m_configs[CONFIG_EXPANSION] = MAX_EXPANSION;
+    }
 
     m_configs[CONFIG_CHATFLOOD_MESSAGE_COUNT] = sConfig.GetIntDefault("ChatFlood.MessageCount",10);
     m_configs[CONFIG_CHATFLOOD_MESSAGE_DELAY] = sConfig.GetIntDefault("ChatFlood.MessageDelay",1);
