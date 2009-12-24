@@ -3608,15 +3608,24 @@ bool Unit::AddAura(Aura *Aur)
         {
             for(AuraMap::iterator i2 = m_Auras.lower_bound(spair); i2 != m_Auras.upper_bound(spair); ++i2)
             {
-                if(i2->second->GetCasterGUID()==Aur->GetCasterGUID())
+                Aura* aur2 = i2->second;
+                if(aur2->GetCasterGUID()==Aur->GetCasterGUID())
                 {
                     // Aura can stack on self -> Stack it;
                     if(aurSpellInfo->StackAmount)
                     {
                         // can be created with >1 stack by some spell mods
-                        i2->second->modStackAmount(Aur->GetStackAmount());
+                        aur2->modStackAmount(Aur->GetStackAmount());
                         delete Aur;
                         return false;
+                    }
+                    // Carry over removed Aura's remaining damage if Aura still has ticks remaining
+                    else if (aur2->GetSpellProto()->AttributesEx4 & SPELL_ATTR_EX4_STACK_DOT_MODIFIER && aurName == SPELL_AURA_PERIODIC_DAMAGE && aur2->GetAuraDuration() > 0)
+                    {
+                        int32 remainingTicks = 1 + (aur2->GetAuraDuration() / aur2->GetModifier()->periodictime);
+                        int32 maxTicks = aur2->GetAuraMaxDuration() / aur2->GetModifier()->periodictime;
+
+                        Aur->GetModifier()->m_amount += int32(remainingTicks * aur2->GetModifier()->m_amount / maxTicks);
                     }
                     // can be only single (this check done at _each_ aura add
                     RemoveAura(i2,AURA_REMOVE_BY_STACK);
@@ -7007,6 +7016,30 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
             }
             break;
         case SPELLFAMILY_WARRIOR:
+            // Deep Wounds (replace triggered spells to directly apply DoT), dot spell have finilyflags
+            if (auraSpellInfo->SpellFamilyFlags == UI64LIT(0x0) && auraSpellInfo->SpellIconID == 243)
+            {
+                float weaponDamage;
+                // DW should benefit of attack power, damage percent mods etc.
+                // TODO: check if using offhand damage is correct and if it should be divided by 2
+                if (haveOffhandWeapon() && getAttackTimer(BASE_ATTACK) > getAttackTimer(OFF_ATTACK))
+                    weaponDamage = (GetFloatValue(UNIT_FIELD_MINOFFHANDDAMAGE) + GetFloatValue(UNIT_FIELD_MAXOFFHANDDAMAGE))/2;
+                else
+                    weaponDamage = (GetFloatValue(UNIT_FIELD_MINDAMAGE) + GetFloatValue(UNIT_FIELD_MAXDAMAGE))/2;
+
+                switch (auraSpellInfo->Id)
+                {
+                    case 12834: basepoints[0] = int32(weaponDamage * 16 / 100); break;
+                    case 12849: basepoints[0] = int32(weaponDamage * 32 / 100); break;
+                    case 12867: basepoints[0] = int32(weaponDamage * 48 / 100); break;
+                    // Impossible case
+                    default:
+                        return false;
+                }
+
+                trigger_spell_id = 12721;
+                break;
+            }
             if (auraSpellInfo->Id == 50421)             // Scent of Blood
                 trigger_spell_id = 50422;
             break;
@@ -8520,16 +8553,19 @@ uint32 Unit::SpellDamageBonus(Unit *pVictim, SpellEntry const *spellProto, uint3
     if( GetTypeId() == TYPEID_UNIT && !((Creature*)this)->isPet() )
         DoneTotalMod *= ((Creature*)this)->GetSpellDamageMod(((Creature*)this)->GetCreatureInfo()->rank);
 
-    AuraList const& mModDamagePercentDone = GetAurasByType(SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
-    for(AuraList::const_iterator i = mModDamagePercentDone.begin(); i != mModDamagePercentDone.end(); ++i)
+    if (!(spellProto->AttributesEx6 & SPELL_ATTR_EX6_NO_DMG_PERCENT_MODS))
     {
-        if (((*i)->GetModifier()->m_miscvalue & GetSpellSchoolMask(spellProto)) &&
-            (*i)->GetSpellProto()->EquippedItemClass == -1 &&
-                                                            // -1 == any item class (not wand then)
-            (*i)->GetSpellProto()->EquippedItemInventoryTypeMask == 0)
-                                                            // 0 == any inventory type (not wand then)
+        AuraList const& mModDamagePercentDone = GetAurasByType(SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
+        for(AuraList::const_iterator i = mModDamagePercentDone.begin(); i != mModDamagePercentDone.end(); ++i)
         {
-            DoneTotalMod *= ((*i)->GetModifier()->m_amount + 100.0f) / 100.0f;
+            if( ((*i)->GetModifier()->m_miscvalue & GetSpellSchoolMask(spellProto)) &&
+                (*i)->GetSpellProto()->EquippedItemClass == -1 &&
+                                                                // -1 == any item class (not wand then)
+                (*i)->GetSpellProto()->EquippedItemInventoryTypeMask == 0 )
+                                                                // 0 == any inventory type (not wand then)
+            {
+                DoneTotalMod *= ((*i)->GetModifier()->m_amount+100.0f)/100.0f;
+            }
         }
     }
 
