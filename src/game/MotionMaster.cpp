@@ -463,3 +463,12 @@ bool MotionMaster::GetDestination(float &x, float &y, float &z)
 
    return top()->GetDestination(x,y,z);
 }
+
+void MotionMaster::UpdateFinalDistanceToTarget(float fDistance)
+{
+    if (!empty())
+    {
+        if (top()->GetMovementGeneratorType() == TARGETED_MOTION_TYPE)
+            top()->UpdateFinalDistance(fDistance);
+    }
+}

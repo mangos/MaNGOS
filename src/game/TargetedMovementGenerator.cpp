@@ -103,6 +103,19 @@ void TargetedMovementGenerator<Creature>::Initialize(Creature &owner)
 }
 
 template<>
+void TargetedMovementGenerator<Player>::UpdateFinalDistance(float fDistance)
+{
+    // nothing to do for Player
+}
+
+template<>
+void TargetedMovementGenerator<Creature>::UpdateFinalDistance(float fDistance)
+{
+    i_offset = fDistance;
+    i_recalculateTravel = true;
+}
+
+template<>
 void TargetedMovementGenerator<Player>::Initialize(Player &owner)
 {
     _setTargetLocation(owner);
