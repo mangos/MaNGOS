@@ -18,6 +18,7 @@
 
 #include "CreatureAI.h"
 #include "Creature.h"
+#include "DBCStores.h"
 
 CreatureAI::~CreatureAI()
 {
