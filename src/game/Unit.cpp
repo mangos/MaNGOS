@@ -9071,16 +9071,6 @@ bool Unit::isSpellCrit(Unit *pVictim, SpellEntry const *spellProto, SpellSchoolM
         case SPELL_DAMAGE_CLASS_MELEE:
         case SPELL_DAMAGE_CLASS_RANGED:
         {
-            // Judgement of Command proc always crits on stunned target
-            if (spellProto->DmgClass == SPELL_DAMAGE_CLASS_MELEE && spellProto->SpellFamilyName == SPELLFAMILY_PALADIN)
-            {
-                if ((spellProto->SpellFamilyFlags & UI64LIT(0x0000000000800000)) && spellProto->SpellIconID == 561)
-                {
-                    if(pVictim->hasUnitState(UNIT_STAT_STUNNED))
-                        return true;
-                }
-            }
-
             if (pVictim)
                 crit_chance = GetUnitCriticalChance(attackType, pVictim);
 
