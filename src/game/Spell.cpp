@@ -692,24 +692,29 @@ void Spell::prepareDataForTriggerSystem()
                 else if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0000010000000000))
                     m_canTrigger = true;
                 break;
-            case SPELLFAMILY_WARLOCK: // For Hellfire Effect / Rain of Fire / Seed of Corruption triggers need do it
+            case SPELLFAMILY_WARLOCK:
+                // For Hellfire Effect / Rain of Fire / Seed of Corruption triggers need do it
                 if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0000800000000060))
                     m_canTrigger = true;
                 break;
-            case SPELLFAMILY_PRIEST: // For Penance,Mind Sear,Mind Flay heal/damage triggers need do it
+            case SPELLFAMILY_PRIEST:
+                // For Penance,Mind Sear,Mind Flay heal/damage triggers need do it
                 if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0001800000800000) || (m_spellInfo->SpellFamilyFlags2 & 0x00000040))
                     m_canTrigger = true;
                 break;
-            case SPELLFAMILY_ROGUE:   // For poisons need do it
+            case SPELLFAMILY_ROGUE:
+                // For poisons need do it
                 if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x000000101001E000))
                     m_canTrigger = true;
                 break;
-            case SPELLFAMILY_HUNTER:  // Hunter Rapid Killing/Explosive Trap Effect/Immolation Trap Effect/Frost Trap Aura/Snake Trap Effect/Explosive Shot
+            case SPELLFAMILY_HUNTER:
+                // Hunter Rapid Killing/Explosive Trap Effect/Immolation Trap Effect/Frost Trap Aura/Snake Trap Effect/Explosive Shot
                 if ((m_spellInfo->SpellFamilyFlags & UI64LIT(0x0100200000000214)) ||
                     m_spellInfo->SpellFamilyFlags2 & 0x200)
                     m_canTrigger = true;
                 break;
-            case SPELLFAMILY_PALADIN: // For Judgements (all) / Holy Shock triggers need do it
+            case SPELLFAMILY_PALADIN:
+                // For Judgements (all) / Holy Shock triggers need do it
                 if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0001000900B80400))
                     m_canTrigger = true;
                 break;
