@@ -581,7 +581,7 @@ void WorldSession::HandleTextEmoteOpcode( WorldPacket & recv_data )
     MaNGOS::EmoteChatBuilder emote_builder(*GetPlayer(), text_emote, emoteNum, unit);
     MaNGOS::LocalizedPacketDo<MaNGOS::EmoteChatBuilder > emote_do(emote_builder);
     MaNGOS::PlayerDistWorker<MaNGOS::LocalizedPacketDo<MaNGOS::EmoteChatBuilder > > emote_worker(GetPlayer(), sWorld.getConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), emote_do);
-    TypeContainerVisitor<MaNGOS::PlayerDistWorker<MaNGOS::LocalizedPacketDo<MaNGOS::EmoteChatBuilder>>, WorldTypeMapContainer> message(emote_worker);
+    TypeContainerVisitor<MaNGOS::PlayerDistWorker<MaNGOS::LocalizedPacketDo<MaNGOS::EmoteChatBuilder> >, WorldTypeMapContainer> message(emote_worker);
     CellLock<GridReadGuard> cell_lock(cell, p);
     cell_lock->Visit(cell_lock, message, *GetPlayer()->GetMap(), *GetPlayer(), sWorld.getConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE));
 
