@@ -1755,6 +1755,13 @@ uint16 Map::GetAreaFlag(float x, float y, float z) const
         case 856:                                           // The Noxious Glade (Eastern Plaguelands)
         case 2456:                                          // Death's Breach (Eastern Plaguelands)
             if(z > 350.0f) areaflag = 1950; break;
+        // Winterfin Caverns
+        case 1652:                                          // Coldarra
+        case 1653:                                          // The Westrift
+        case 1661:                                          // Winterfin Village
+            if (x > 3823.0f && x < 4141.5f && y > 6247.0f && y < 64890.0f && z < 42.5f)
+                areaflag = 1723;
+            break;
         // Dalaran
         case 2492:                                          // Forlorn Woods (Crystalsong Forest)
         case 2371:                                          // Valley of Echoes (Icecrown Glacier)
