@@ -6439,7 +6439,7 @@ void Spell::EffectPlayerPull(uint32 i)
     if(!unitTarget)
         return;
 
-    unitTarget->KnockBackFrom(m_caster,float(damage ? damage : unitTarget->GetDistance2d(m_caster)),float(m_spellInfo->EffectMiscValue[i])/10);
+    unitTarget->KnockBackFrom(m_caster, -float(damage ? damage : unitTarget->GetDistance2d(m_caster)),float(m_spellInfo->EffectMiscValue[i])/10);
 }
 
 void Spell::EffectDispelMechanic(uint32 i)
