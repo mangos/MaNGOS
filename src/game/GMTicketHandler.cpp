@@ -32,6 +32,7 @@ void WorldSession::SendGMTicketGetTicket(uint32 status, char const* text)
     data << uint32(status);                                 // standard 0x0A, 0x06 if text present
     if(status == 6)
     {
+        data << uint32(123);                                // unk
         data << text;                                       // ticket text
         data << uint8(0x7);                                 // ticket category
         data << float(0);                                   // tickets in queue?

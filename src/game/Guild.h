@@ -117,15 +117,16 @@ enum GuildEvents
     GE_LEADER_CHANGED   = 0x07,
     GE_DISBANDED        = 0x08,
     GE_TABARDCHANGE     = 0x09,
-    GE_UNK1             = 0x0A,                             // string, string
-    GE_UNK2             = 0x0B,
-    GE_SIGNED_ON        = 0x0C,
-    GE_SIGNED_OFF       = 0x0D,
-    GE_UNK3             = 0x0E,
-    GE_BANKTAB_PURCHASED= 0x0F,
-    GE_UNK5             = 0x10,
-    GE_UNK6             = 0x11,                             // string 0000000000002710 is 1 gold
-    GE_UNK7             = 0x12
+    GE_UNK1             = 0x0A,                             // string, string EVENT_GUILD_ROSTER_UPDATE
+    GE_UNK2             = 0x0B,                             // EVENT_GUILD_ROSTER_UPDATE
+    GE_SIGNED_ON        = 0x0C,                             // ERR_FRIEND_ONLINE_SS
+    GE_SIGNED_OFF       = 0x0D,                             // ERR_FRIEND_OFFLINE_S
+    GE_UNK3             = 0x0E,                             // EVENT_GUILDBANKBAGSLOTS_CHANGED
+    GE_BANKTAB_PURCHASED= 0x0F,                             // EVENT_GUILDBANK_UPDATE_TABS
+    GE_UNK5             = 0x10,                             // EVENT_GUILDBANK_UPDATE_TABS
+    GE_UNK6             = 0x11,                             // EVENT_GUILDBANK_UPDATE_MONEY, string 0000000000002710 is 1 gold
+    GE_UNK7             = 0x12,                             // MSG_GUILD_BANK_MONEY_WITHDRAWN
+    GE_UNK8             = 0x13                              // EVENT_GUILDBANK_TEXT_CHANGED
 };
 
 enum PetitionTurns

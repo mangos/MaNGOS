@@ -1320,7 +1320,8 @@ enum Opcodes
     UMSG_UNKNOWN_1283                               = 0x503,
     UMSG_UNKNOWN_1284                               = 0x504,
     UMSG_UNKNOWN_1285                               = 0x505,
-    NUM_MSG_TYPES                                   = 0x506
+    UMSG_UNKNOWN_1285                               = 0x506,
+    NUM_MSG_TYPES                                   = 0x507
 };
 
 /// Player state
