@@ -17095,6 +17095,18 @@ void Player::PetSpellInitialize()
     GetSession()->SendPacket(&data);
 }
 
+void Player::SendPetGUIDs()
+{
+    if(!GetPetGUID())
+        return;
+
+    // Later this function might get modified for multiple guids
+    WorldPacket data(SMSG_PET_GUIDS, 12);
+    data << uint32(1);                      // count
+    data << uint64(GetPetGUID());
+    GetSession()->SendPacket(&data);
+}
+
 void Player::PossessSpellInitialize()
 {
     Unit* charm = GetCharm();

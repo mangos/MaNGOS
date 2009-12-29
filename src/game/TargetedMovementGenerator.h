@@ -61,6 +61,8 @@ class MANGOS_DLL_SPEC TargetedMovementGenerator
         }
 
         void unitSpeedChanged() { i_recalculateTravel=true; }
+        void UpdateFinalDistance(float fDistance);
+
     private:
 
         void _setTargetLocation(T &);

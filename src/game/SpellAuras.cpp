@@ -213,7 +213,7 @@ pAuraHandler AuraHandler[TOTAL_AURAS]=
     &Aura::HandleNoImmediateEffect,                         //160 SPELL_AURA_MOD_AOE_AVOIDANCE          implemented in Unit::MagicSpellHitResult
     &Aura::HandleNoImmediateEffect,                         //161 SPELL_AURA_MOD_HEALTH_REGEN_IN_COMBAT implemented in Player::RegenerateAll and Player::RegenerateHealth
     &Aura::HandleAuraPowerBurn,                             //162 SPELL_AURA_POWER_BURN_MANA
-    &Aura::HandleNoImmediateEffect,                         //163 SPELL_AURA_MOD_CRIT_DAMAGE_BONUS_MELEE implememnted in Unit::CalculateMeleeDamage and Unit::SpellCriticalDamageBonus
+    &Aura::HandleNoImmediateEffect,                         //163 SPELL_AURA_MOD_CRIT_DAMAGE_BONUS      implemented in Unit::CalculateMeleeDamage and Unit::SpellCriticalDamageBonus
     &Aura::HandleUnused,                                    //164 unused (3.0.8a-3.2.2a), only one test spell 10654
     &Aura::HandleNoImmediateEffect,                         //165 SPELL_AURA_MELEE_ATTACK_POWER_ATTACKER_BONUS implemented in Unit::MeleeDamageBonus
     &Aura::HandleAuraModAttackPowerPercent,                 //166 SPELL_AURA_MOD_ATTACK_POWER_PCT
@@ -2241,6 +2241,12 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                             if (Unit* caster = GetCaster())
                                 m_target->AddThreat(caster, 10.0f, false, GetSpellSchoolMask(GetSpellProto()), GetSpellProto());
                         return;
+                    case 7057:                              // Haunting Spirits
+                        // expected to tick with 30 sec period (tick part see in Aura::PeriodicTick)
+                        m_isPeriodic = true;
+                        m_modifier.periodictime = 30*IN_MILISECONDS;
+                        m_periodicTimer = m_modifier.periodictime;
+                        return;
                     case 13139:                             // net-o-matic
                         // root to self part of (root_target->charge->root_self sequence
                         if (Unit* caster = GetCaster())
@@ -2389,6 +2395,14 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
 
         switch(GetId())
         {
+            case 28169:                                     // Mutating Injection
+            {
+                // Mutagen Explosion
+                m_target->CastSpell(m_target, 28206, true, NULL, this);
+                // Poison Cloud
+                m_target->CastSpell(m_target, 28240, true, NULL, this);
+                return;
+            }
             case 36730:                                     // Flame Strike
             {
                 m_target->CastSpell(m_target, 36731, true, NULL, this);
@@ -2813,7 +2827,7 @@ void Aura::HandleAuraMounted(bool apply, bool Real)
         if (minfo)
             display_id = minfo->modelid;
 
-        m_target->Mount(display_id);
+        m_target->Mount(display_id, m_spellProto->Id);
     }
     else
     {
@@ -7014,6 +7028,7 @@ void Aura::PeriodicTick()
             break;
         }
         // Here tick dummy auras
+        case SPELL_AURA_DUMMY:                              // some spells have dummy aura
         case SPELL_AURA_PERIODIC_DUMMY:
         {
             PeriodicDummyTick();
@@ -7099,6 +7114,10 @@ void Aura::PeriodicDummyTick()
                     // 7053 Forsaken Skill: Shadow
                     return;
                 }
+                case 7057:                                  // Haunting Spirits
+                    if (roll_chance_i(33))
+                        m_target->CastSpell(m_target,m_modifier.m_amount,true,NULL,this);
+                    return;
 //              // Panda
 //              case 19230: break;
 //              // Gossip NPC Periodic - Talk
@@ -7253,6 +7272,21 @@ void Aura::PeriodicDummyTick()
 //              case 50493: break;
 //              // Love Rocket Barrage
 //              case 50530: break;
+                case 50789:                                 // Summon iron dwarf (left or right)
+                case 59860:
+                    m_target->CastSpell(m_target, roll_chance_i(50) ? 50790 : 50791, true, NULL, this);
+                    return;
+                case 50792:                                 // Summon iron trogg (left or right)
+                case 59859:
+                    m_target->CastSpell(m_target, roll_chance_i(50) ? 50793 : 50794, true, NULL, this);
+                    return;
+                case 50801:                                 // Summon malformed ooze (left or right)
+                case 59858:
+                    m_target->CastSpell(m_target, roll_chance_i(50) ? 50802 : 50803, true, NULL, this);
+                    return;
+                case 50824:                                 // Summon earthen dwarf
+                    m_target->CastSpell(m_target, roll_chance_i(50) ? 50825 : 50826, true, NULL, this);
+                    return;
 // Exist more after, need add later
                 default:
                     break;

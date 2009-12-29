@@ -34,6 +34,18 @@ struct SpellEntry;
 #define TIME_INTERVAL_LOOK   5000
 #define VISIBILITY_RANGE    10000
 
+enum CanCastResult
+{
+    CAST_OK                     = 0,
+    CAST_FAIL_IS_CASTING        = 1,
+    CAST_FAIL_OTHER             = 2,
+    CAST_FAIL_TOO_FAR           = 3,
+    CAST_FAIL_TOO_CLOSE         = 4,
+    CAST_FAIL_POWER             = 5,
+    CAST_FAIL_STATE             = 6,
+    CAST_FAIL_TARGET_AURA       = 7
+};
+
 enum CastFlags
 {
     CAST_INTURRUPT_PREVIOUS     = 0x01,                     //Interrupt any spell casting
@@ -67,6 +79,10 @@ class MANGOS_DLL_SPEC CreatureAI
 
         // Called at any heal cast/item used (call non implemented)
         virtual void HealBy(Unit * /*healer*/, uint32 /*amount_healed*/) {}
+
+        // Helper functions for cast spell
+        CanCastResult DoCastSpellIfCan(Unit* pTarget, uint32 uiSpell, uint32 uiCastFlags = 0, uint64 uiOriginalCasterGUID = 0);
+        virtual CanCastResult CanCastSpell(Unit* pTarget, const SpellEntry *pSpell, bool isTriggered);
 
         // Called at any Damage to any victim (before damage apply)
         virtual void DamageDeal(Unit * /*done_to*/, uint32 & /*damage*/) {}

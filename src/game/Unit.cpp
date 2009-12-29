@@ -216,17 +216,17 @@ void Unit::Update( uint32 p_time )
         // Check UNIT_STAT_MELEE_ATTACKING or UNIT_STAT_CHASE (without UNIT_STAT_FOLLOW in this case) so pets can reach far away
         // targets without stopping half way there and running off.
         // These flags are reset after target dies or another command is given.
-        if( m_HostileRefManager.isEmpty() )
+        if (m_HostileRefManager.isEmpty())
         {
             // m_CombatTimer set at aura start and it will be freeze until aura removing
-            if ( m_CombatTimer <= p_time )
-                ClearInCombat();
+            if (m_CombatTimer <= p_time)
+                CombatStop();
             else
                 m_CombatTimer -= p_time;
         }
     }
 
-    if(uint32 base_att = getAttackTimer(BASE_ATTACK))
+    if (uint32 base_att = getAttackTimer(BASE_ATTACK))
     {
         setAttackTimer(BASE_ATTACK, (p_time >= base_att ? 0 : base_att - p_time) );
     }
@@ -1292,10 +1292,9 @@ void Unit::CalculateMeleeDamage(Unit *pVictim, uint32 damage, CalcDamageInfo *da
             if(damageInfo->attackType == RANGED_ATTACK)
                 mod += damageInfo->target->GetTotalAuraModifier(SPELL_AURA_MOD_ATTACKER_RANGED_CRIT_DAMAGE);
             else
-            {
                 mod += damageInfo->target->GetTotalAuraModifier(SPELL_AURA_MOD_ATTACKER_MELEE_CRIT_DAMAGE);
-                mod += GetTotalAuraModifier(SPELL_AURA_MOD_CRIT_DAMAGE_BONUS_MELEE);
-            }
+
+            mod += GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_CRIT_DAMAGE_BONUS, SPELL_SCHOOL_MASK_NORMAL);
 
             uint32 crTypeMask = damageInfo->target->GetCreatureTypeMask();
 
@@ -3608,15 +3607,25 @@ bool Unit::AddAura(Aura *Aur)
         {
             for(AuraMap::iterator i2 = m_Auras.lower_bound(spair); i2 != m_Auras.upper_bound(spair); ++i2)
             {
-                if(i2->second->GetCasterGUID()==Aur->GetCasterGUID())
+                Aura* aur2 = i2->second;
+                if(aur2->GetCasterGUID()==Aur->GetCasterGUID())
                 {
                     // Aura can stack on self -> Stack it;
                     if(aurSpellInfo->StackAmount)
                     {
                         // can be created with >1 stack by some spell mods
-                        i2->second->modStackAmount(Aur->GetStackAmount());
+                        aur2->modStackAmount(Aur->GetStackAmount());
                         delete Aur;
                         return false;
+                    }
+                    // Carry over removed Aura's remaining damage if Aura still has ticks remaining
+                    else if (aur2->GetSpellProto()->AttributesEx4 & SPELL_ATTR_EX4_STACK_DOT_MODIFIER && aurName == SPELL_AURA_PERIODIC_DAMAGE && aur2->GetAuraDuration() > 0)
+                    {
+                        int32 remainingTicks = 1 + (aur2->GetAuraDuration() / aur2->GetModifier()->periodictime);
+                        int32 remainingDamage = aur2->GetModifier()->m_amount * remainingTicks;
+
+                        int32 maxTicks = Aur->GetAuraMaxDuration() / Aur->GetModifier()->periodictime;
+                        Aur->GetModifier()->m_amount += int32(remainingDamage / maxTicks);
                     }
                     // can be only single (this check done at _each_ aura add
                     RemoveAura(i2,AURA_REMOVE_BY_STACK);
@@ -5833,6 +5842,8 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                 // Wrath crit
                 if (procSpell->SpellFamilyFlags & UI64LIT(0x0000000000000001))
                 {
+                    if (HasAura(48517))
+                        return false;
                     if (!roll_chance_i(60))
                         return false;
                     triggered_spell_id = 48518;
@@ -5842,6 +5853,8 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                 // Starfire crit
                 if (procSpell->SpellFamilyFlags & UI64LIT(0x0000000000000004))
                 {
+                    if (HasAura(48518))
+                        return false;
                     triggered_spell_id = 48517;
                     target = this;
                     break;
@@ -7007,6 +7020,34 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
             }
             break;
         case SPELLFAMILY_WARRIOR:
+            // Deep Wounds (replace triggered spells to directly apply DoT), dot spell have finilyflags
+            if (auraSpellInfo->SpellFamilyFlags == UI64LIT(0x0) && auraSpellInfo->SpellIconID == 243)
+            {
+                float weaponDamage;
+                // DW should benefit of attack power, damage percent mods etc.
+                // TODO: check if using offhand damage is correct and if it should be divided by 2
+                if (haveOffhandWeapon() && getAttackTimer(BASE_ATTACK) > getAttackTimer(OFF_ATTACK))
+                    weaponDamage = (GetFloatValue(UNIT_FIELD_MINOFFHANDDAMAGE) + GetFloatValue(UNIT_FIELD_MAXOFFHANDDAMAGE))/2;
+                else
+                    weaponDamage = (GetFloatValue(UNIT_FIELD_MINDAMAGE) + GetFloatValue(UNIT_FIELD_MAXDAMAGE))/2;
+
+                switch (auraSpellInfo->Id)
+                {
+                    case 12834: basepoints[0] = int32(weaponDamage * 16 / 100); break;
+                    case 12849: basepoints[0] = int32(weaponDamage * 32 / 100); break;
+                    case 12867: basepoints[0] = int32(weaponDamage * 48 / 100); break;
+                    // Impossible case
+                    default:
+                        sLog.outError("Unit::HandleProcTriggerSpell: DW unknown spell rank %u",auraSpellInfo->Id);
+                        return false;
+                }
+
+                // 1 tick/sec * 6 sec = 6 ticks
+                basepoints[0] /= 6;
+
+                trigger_spell_id = 12721;
+                break;
+            }
             if (auraSpellInfo->Id == 50421)             // Scent of Blood
                 trigger_spell_id = 50422;
             break;
@@ -8346,6 +8387,9 @@ void Unit::SetPet(Pet* pet)
 {
     SetPetGUID(pet ? pet->GetGUID() : 0);
 
+    if(pet && GetTypeId() == TYPEID_PLAYER)
+        ((Player*)this)->SendPetGUIDs();
+
     // FIXME: hack, speed must be set only at follow
     if(pet && GetTypeId()==TYPEID_PLAYER)
         for(int i = 0; i < MAX_MOVE_TYPE; ++i)
@@ -8520,16 +8564,19 @@ uint32 Unit::SpellDamageBonus(Unit *pVictim, SpellEntry const *spellProto, uint3
     if( GetTypeId() == TYPEID_UNIT && !((Creature*)this)->isPet() )
         DoneTotalMod *= ((Creature*)this)->GetSpellDamageMod(((Creature*)this)->GetCreatureInfo()->rank);
 
-    AuraList const& mModDamagePercentDone = GetAurasByType(SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
-    for(AuraList::const_iterator i = mModDamagePercentDone.begin(); i != mModDamagePercentDone.end(); ++i)
+    if (!(spellProto->AttributesEx6 & SPELL_ATTR_EX6_NO_DMG_PERCENT_MODS))
     {
-        if (((*i)->GetModifier()->m_miscvalue & GetSpellSchoolMask(spellProto)) &&
-            (*i)->GetSpellProto()->EquippedItemClass == -1 &&
-                                                            // -1 == any item class (not wand then)
-            (*i)->GetSpellProto()->EquippedItemInventoryTypeMask == 0)
-                                                            // 0 == any inventory type (not wand then)
+        AuraList const& mModDamagePercentDone = GetAurasByType(SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
+        for(AuraList::const_iterator i = mModDamagePercentDone.begin(); i != mModDamagePercentDone.end(); ++i)
         {
-            DoneTotalMod *= ((*i)->GetModifier()->m_amount + 100.0f) / 100.0f;
+            if( ((*i)->GetModifier()->m_miscvalue & GetSpellSchoolMask(spellProto)) &&
+                (*i)->GetSpellProto()->EquippedItemClass == -1 &&
+                                                                // -1 == any item class (not wand then)
+                (*i)->GetSpellProto()->EquippedItemInventoryTypeMask == 0 )
+                                                                // 0 == any inventory type (not wand then)
+            {
+                DoneTotalMod *= ((*i)->GetModifier()->m_amount+100.0f)/100.0f;
+            }
         }
     }
 
@@ -9034,17 +9081,6 @@ bool Unit::isSpellCrit(Unit *pVictim, SpellEntry const *spellProto, SpellSchoolM
             break;
         }
         case SPELL_DAMAGE_CLASS_MELEE:
-        {
-            // Judgement of Command proc always crits on stunned target
-            if(spellProto->SpellFamilyName == SPELLFAMILY_PALADIN)
-            {
-                if(spellProto->SpellFamilyFlags & 0x0000000000800000LL && spellProto->SpellIconID == 561)
-                {
-                    if(pVictim->hasUnitState(UNIT_STAT_STUNNED))
-                        return true;
-                }
-            }
-        }
         case SPELL_DAMAGE_CLASS_RANGED:
         {
             if (pVictim)
@@ -9095,13 +9131,12 @@ uint32 Unit::SpellCriticalDamageBonus(SpellEntry const *spellProto, uint32 damag
         if(GetWeaponAttackType(spellProto) == RANGED_ATTACK)
             critPctDamageMod += pVictim->GetTotalAuraModifier(SPELL_AURA_MOD_ATTACKER_RANGED_CRIT_DAMAGE);
         else
-        {
             critPctDamageMod += pVictim->GetTotalAuraModifier(SPELL_AURA_MOD_ATTACKER_MELEE_CRIT_DAMAGE);
-            critPctDamageMod += GetTotalAuraModifier(SPELL_AURA_MOD_CRIT_DAMAGE_BONUS_MELEE);
-        }
     }
     else
         critPctDamageMod += pVictim->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_ATTACKER_SPELL_CRIT_DAMAGE,GetSpellSchoolMask(spellProto));
+
+    critPctDamageMod += GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_CRIT_DAMAGE_BONUS, GetSpellSchoolMask(spellProto));
 
     uint32 creatureTypeMask = pVictim->GetCreatureTypeMask();
     critPctDamageMod += GetTotalAuraMultiplierByMiscMask(SPELL_AURA_MOD_CRIT_PERCENT_VERSUS, creatureTypeMask);
@@ -9839,9 +9874,9 @@ float Unit::GetPPMProcChance(uint32 WeaponSpeed, float PPM) const
     return WeaponSpeed * PPM / 600.0f;                      // result is chance in percents (probability = Speed_in_sec * (PPM / 60))
 }
 
-void Unit::Mount(uint32 mount)
+void Unit::Mount(uint32 mount, uint32 spellId)
 {
-    if(!mount)
+    if (!mount)
         return;
 
     RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_MOUNTING);
@@ -9850,9 +9885,27 @@ void Unit::Mount(uint32 mount)
 
     SetFlag( UNIT_FIELD_FLAGS, UNIT_FLAG_MOUNT );
 
-    // unsummon pet
-    if(GetTypeId() == TYPEID_PLAYER)
-        ((Player*)this)->UnsummonPetTemporaryIfAny();
+    if (GetTypeId() == TYPEID_PLAYER)
+    {
+        // Called by Taxi system / GM command
+        if (!spellId)
+            ((Player*)this)->UnsummonPetTemporaryIfAny();
+        // Called by mount aura
+        else if (SpellEntry const* spellInfo = sSpellStore.LookupEntry(spellId))
+        {
+            // Flying case (Unsummon any pet)
+            if (IsSpellHaveAura(spellInfo, SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED))
+                ((Player*)this)->UnsummonPetTemporaryIfAny();
+            // Normal case (Unsummon only permanent pet)
+            else if (Pet* pet = GetPet())
+            {
+                if (pet->IsPermanentPetFor((Player*)this))
+                    ((Player*)this)->UnsummonPetTemporaryIfAny();
+                else
+                    pet->ApplyModeFlags(PET_MODE_DISABLE_ACTIONS,true);
+            }
+        }
+    }
 }
 
 void Unit::Unmount()
@@ -9869,7 +9922,12 @@ void Unit::Unmount()
     // this prevents adding a pet to a not created map which would otherwise cause a crash
     // (it could probably happen when logging in after a previous crash)
     if(GetTypeId() == TYPEID_PLAYER)
-        ((Player*)this)->ResummonPetTemporaryUnSummonedIfAny();
+    {
+        if(Pet* pet = GetPet())
+            pet->ApplyModeFlags(PET_MODE_DISABLE_ACTIONS,false);
+        else
+            ((Player*)this)->ResummonPetTemporaryUnSummonedIfAny();
+    }
 }
 
 void Unit::SetInCombatWith(Unit* enemy)
