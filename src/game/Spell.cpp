@@ -1309,11 +1309,31 @@ void Spell::SetTargetMap(uint32 effIndex,uint32 targetMode,UnitList& TagUnitMap)
     // custom target amount cases
     switch(m_spellInfo->SpellFamilyName)
     {
+        case SPELLFAMILY_GENERIC:
+        {
+            switch(m_spellInfo->Id)
+            {
+                case 28796:                                 // Poison Bolt Volley
+                case 29213:                                 // Curse of the Plaguebringer
+                case 31298:                                 // Sleep
+                    unMaxTargets = 3;
+                    break;
+                case 30843:                                 // Enfeeble
+                    unMaxTargets = 5;
+                    break;
+                case 54098:                                 // Poison Bolt Volley
+                case 54835:                                 // Curse of the Plaguebringer
+                    unMaxTargets = 10;
+                    break;
+            }
+            break;
+        }
         case SPELLFAMILY_DRUID:
-            // Starfall
-            if (m_spellInfo->SpellFamilyFlags2 & 0x00000100)
+        {
+            if (m_spellInfo->SpellFamilyFlags2 & 0x00000100)// Starfall
                 unMaxTargets = 2;
             break;
+        }
         default:
             break;
     }
