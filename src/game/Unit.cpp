@@ -9899,7 +9899,7 @@ void Unit::Mount(uint32 mount, uint32 spellId)
             // Normal case (Unsummon only permanent pet)
             else if (Pet* pet = GetPet())
             {
-                if (pet->IsPermanentPetFor((Player*)this))
+                if (pet->IsPermanentPetFor((Player*)this) && !((Player*)this)->InArena())
                     ((Player*)this)->UnsummonPetTemporaryIfAny();
                 else
                     pet->ApplyModeFlags(PET_MODE_DISABLE_ACTIONS,true);
