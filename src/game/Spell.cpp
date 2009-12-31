@@ -1332,6 +1332,16 @@ void Spell::SetTargetMap(uint32 effIndex, uint32 targetMode, UnitList& targetUni
             }
             break;
         }
+        case SPELLFAMILY_PRIEST:
+            if(m_spellInfo->SpellVisual[0] == 8253)         // Circle of Healing
+            {
+                unMaxTargets = 5;
+                
+                // Glyph of Circle of Healing
+                if(Aura const* glyph = m_caster->GetDummyAura(55675))
+                    unMaxTargets += glyph->GetModifier()->m_amount;
+            }
+            break;
         case SPELLFAMILY_DRUID:
         {
             if (m_spellInfo->SpellFamilyFlags2 & 0x00000100)// Starfall
