@@ -7223,8 +7223,11 @@ void Aura::PeriodicDummyTick()
 //              case 45960: break;
 //              // Darkness
 //              case 45996: break;
-//              // Summon Blood Elves Periodic
-//              case 46041: break;
+                case 46041:                                 // Summon Blood Elves Periodic
+                    m_target->CastSpell(m_target, 46037, true, NULL, this);
+                    m_target->CastSpell(m_target, roll_chance_i(50) ? 46038 : 46039, true, NULL, this);
+                    m_target->CastSpell(m_target, 46040, true, NULL, this);
+                    return;
 //              // Transform Visual Missile Periodic
 //              case 46205: break;
 //              // Find Opening Beam End
