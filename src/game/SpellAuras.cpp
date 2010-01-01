@@ -7294,6 +7294,9 @@ void Aura::PeriodicDummyTick()
                 case 50824:                                 // Summon earthen dwarf
                     m_target->CastSpell(m_target, roll_chance_i(50) ? 50825 : 50826, true, NULL, this);
                     return;
+                case 52441:                                 // Cool Down
+                    m_target->CastSpell(m_target, 52443, true);
+                    return;
 // Exist more after, need add later
                 default:
                     break;
