@@ -3345,7 +3345,7 @@ void ObjectMgr::LoadQuests()
         if (qinfo->QuestFlags & ~QUEST_MANGOS_FLAGS_DB_ALLOWED)
         {
             sLog.outErrorDb("Quest %u has `SpecialFlags` = %u > max allowed value. Correct `SpecialFlags` to value <= %u",
-                qinfo->GetQuestId(),qinfo->QuestFlags,QUEST_MANGOS_FLAGS_DB_ALLOWED >> 16);
+                qinfo->GetQuestId(),qinfo->QuestFlags  >> 24,QUEST_MANGOS_FLAGS_DB_ALLOWED >> 24);
             qinfo->QuestFlags &= QUEST_MANGOS_FLAGS_DB_ALLOWED;
         }
 

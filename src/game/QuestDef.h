@@ -138,12 +138,12 @@ enum __QuestFlags
     QUEST_FLAGS_UNK4           = 0x00004000,                // ? Membership Card Renewal
     QUEST_FLAGS_WEEKLY         = 0x00008000,                // Not used currently: Weekly quests
     // 0x20000 - 1 quest in 3.3, 0x40000 - 1 quest in 3.3
-    QUEST_FLAGS_LOW_LEVEL      = 0x00080000                 // quests in starting areas
+    QUEST_FLAGS_LOW_LEVEL      = 0x00080000,                // quests in starting areas
 
     // Mangos flags for set SpecialFlags in DB if required but used only at server
     QUEST_MANGOS_FLAGS_REPEATABLE           = 0x01000000,   // Set by 1 in SpecialFlags from DB
     QUEST_MANGOS_FLAGS_EXPLORATION_OR_EVENT = 0x02000000,   // Set by 2 in SpecialFlags from DB (if required area explore, spell SPELL_EFFECT_QUEST_COMPLETE casting, table `*_script` command SCRIPT_COMMAND_QUEST_EXPLORED use, set from script DLL)
-    QUEST_MANGOS_FLAGS_DB_ALLOWED = 0xFFFF | QUEST_MANGOS_FLAGS_REPEATABLE | QUEST_MANGOS_FLAGS_EXPLORATION_OR_EVENT,
+    QUEST_MANGOS_FLAGS_DB_ALLOWED = 0xFFFFFF | QUEST_MANGOS_FLAGS_REPEATABLE | QUEST_MANGOS_FLAGS_EXPLORATION_OR_EVENT,
 
     // Mangos flags for internal use only
     QUEST_MANGOS_FLAGS_DELIVER              = 0x04000000,   // Internal flag computed only
