@@ -7299,6 +7299,15 @@ void Aura::PeriodicDummyTick()
                     return;
                 case 53520:                                 // Carrion Beetles
                     m_target->CastSpell(m_target, 53521, true, NULL, this);
+                    m_target->CastSpell(m_target, 53521, true, NULL, this);
+                    return;
+                case 55592:                                 // Clean
+                    switch(urand(0,2))
+                    {
+                        case 0: m_target->CastSpell(m_target, 55731, true); break;
+                        case 1: m_target->CastSpell(m_target, 55738, true); break;
+                        case 2: m_target->CastSpell(m_target, 55739, true); break;
+                    }
                     return;
 // Exist more after, need add later
                 default:
