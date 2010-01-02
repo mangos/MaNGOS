@@ -1346,16 +1346,6 @@ void Spell::SetTargetMap(uint32 effIndex, uint32 targetMode, UnitList& targetUni
             }
             break;
         }
-        case SPELLFAMILY_PRIEST:
-            if(m_spellInfo->SpellVisual[0] == 8253)         // Circle of Healing
-            {
-                unMaxTargets = 5;
-                
-                // Glyph of Circle of Healing
-                if(Aura const* glyph = m_caster->GetDummyAura(55675))
-                    unMaxTargets += glyph->GetModifier()->m_amount;
-            }
-            break;
         case SPELLFAMILY_DRUID:
         {
             if (m_spellInfo->SpellFamilyFlags2 & 0x00000100)// Starfall
@@ -1746,6 +1736,20 @@ void Spell::SetTargetMap(uint32 effIndex, uint32 targetMode, UnitList& targetUni
                 if (m_caster->GetTypeId()==TYPEID_PLAYER)
                     if (Unit* target = m_caster->GetMap()->GetPet(((Player*)m_caster)->GetSelection()))
                         targetUnitMap.push_back(target);
+            }
+            // Circle of Healing
+            else if (m_spellInfo->SpellFamilyName == SPELLFAMILY_PRIEST && m_spellInfo->SpellVisual[0] == 8253)
+            {
+                Unit* target = m_targets.getUnitTarget();
+                if(!target)
+                    target = m_caster;
+
+                uint32 count = 5;
+                // Glyph of Circle of Healing
+                if(Aura const* glyph = m_caster->GetDummyAura(55675))
+                    count += glyph->GetModifier()->m_amount;
+
+                FillRaidOrPartyHealthPriorityTargets(targetUnitMap, m_caster, target, radius, count, true, false, true);
             }
             // Wild Growth
             else if (m_spellInfo->SpellFamilyName == SPELLFAMILY_DRUID && m_spellInfo->SpellIconID == 2864)
