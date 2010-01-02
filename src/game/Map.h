@@ -176,7 +176,7 @@ class GridMap
     float  *m_liquid_map;
 
     bool  loadAreaData(FILE *in, uint32 offset, uint32 size);
-    bool  loadHeihgtData(FILE *in, uint32 offset, uint32 size);
+    bool  loadHeightData(FILE *in, uint32 offset, uint32 size);
     bool  loadLiquidData(FILE *in, uint32 offset, uint32 size);
 
     // Get height functions and pointers

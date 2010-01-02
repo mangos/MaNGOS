@@ -329,15 +329,15 @@ void Log::outTitle( const char * str)
         SetColor(true,WHITE);
 
     // not expected utf8 and then send as-is
-    printf( str );
+    printf("%s", str);
 
     if(m_colored)
         ResetColor(true);
 
-    printf( "\n" );
+    printf("\n");
     if(logfile)
     {
-        fprintf(logfile, str);
+        fprintf(logfile, "%s", str);
         fprintf(logfile, "\n" );
         fflush(logfile);
     }
@@ -706,7 +706,7 @@ void Log::outWorldPacketDump( uint32 socket, uint32 opcode, char const* opcodeNa
 
     outTimestamp(worldLogfile);
 
-    fprintf(worldLogfile,"\n%s:\nSOCKET: %u\nLENGTH: %u\nOPCODE: %s (0x%.4X)\nDATA:\n",
+    fprintf(worldLogfile,"\n%s:\nSOCKET: %u\nLENGTH: " SIZEFMTD "\nOPCODE: %s (0x%.4X)\nDATA:\n",
         incoming ? "CLIENT" : "SERVER",
         socket, packet->size(), opcodeName, opcode);
 
@@ -789,10 +789,10 @@ void outstring_log(const char * str, ...)
     char buf[256];
     va_list ap;
     va_start(ap, str);
-    vsnprintf(buf,256, str, ap);
+    vsnprintf(buf, 256, str, ap);
     va_end(ap);
 
-    sLog.outString(buf);
+    sLog.outString("%s", buf);
 }
 
 void detail_log(const char * str, ...)
@@ -806,7 +806,7 @@ void detail_log(const char * str, ...)
     vsnprintf(buf,256, str, ap);
     va_end(ap);
 
-    sLog.outDetail(buf);
+    sLog.outDetail("%s", buf);
 }
 
 void debug_log(const char * str, ...)
@@ -820,7 +820,7 @@ void debug_log(const char * str, ...)
     vsnprintf(buf,256, str, ap);
     va_end(ap);
 
-    sLog.outDebug(buf);
+    sLog.outDebug("%s", buf);
 }
 
 void error_log(const char * str, ...)
@@ -834,7 +834,7 @@ void error_log(const char * str, ...)
     vsnprintf(buf,256, str, ap);
     va_end(ap);
 
-    sLog.outError(buf);
+    sLog.outError("%s", buf);
 }
 
 void error_db_log(const char * str, ...)
@@ -848,5 +848,5 @@ void error_db_log(const char * str, ...)
     vsnprintf(buf,256, str, ap);
     va_end(ap);
 
-    sLog.outErrorDb(buf);
+    sLog.outErrorDb("%s", buf);
 }

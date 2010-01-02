@@ -55,16 +55,16 @@
 #include "Platform/Define.h"
 
 #if COMPILER == COMPILER_MICROSOFT
-#   pragma warning(disable:4996)                            // 'function': was declared deprecated
+#  pragma warning(disable:4996)                             // 'function': was declared deprecated
 #ifndef __SHOW_STUPID_WARNINGS__
-#   pragma warning(disable:4005)                            // 'identifier' : macro redefinition
-#   pragma warning(disable:4018)                            // 'expression' : signed/unsigned mismatch
-#   pragma warning(disable:4244)                            // 'argument' : conversion from 'type1' to 'type2', possible loss of data
-#   pragma warning(disable:4267)                            // 'var' : conversion from 'size_t' to 'type', possible loss of data
-#   pragma warning(disable:4305)                            // 'identifier' : truncation from 'type1' to 'type2'
-#   pragma warning(disable:4311)                            // 'variable' : pointer truncation from 'type' to 'type'
-#   pragma warning(disable:4355)                            // 'this' : used in base member initializer list
-#   pragma warning(disable:4800)                            // 'type' : forcing value to bool 'true' or 'false' (performance warning)
+#  pragma warning(disable:4005)                             // 'identifier' : macro redefinition
+#  pragma warning(disable:4018)                             // 'expression' : signed/unsigned mismatch
+#  pragma warning(disable:4244)                             // 'argument' : conversion from 'type1' to 'type2', possible loss of data
+#  pragma warning(disable:4267)                             // 'var' : conversion from 'size_t' to 'type', possible loss of data
+#  pragma warning(disable:4305)                             // 'identifier' : truncation from 'type1' to 'type2'
+#  pragma warning(disable:4311)                             // 'variable' : pointer truncation from 'type' to 'type'
+#  pragma warning(disable:4355)                             // 'this' : used in base member initializer list
+#  pragma warning(disable:4800)                             // 'type' : forcing value to bool 'true' or 'false' (performance warning)
 #endif                                                      // __SHOW_STUPID_WARNINGS__
 #endif                                                      // __GNUC__
 
@@ -116,20 +116,25 @@
 
 #if COMPILER == COMPILER_MICROSOFT
 
-#include <float.h>
+#  include <float.h>
 
-#define I32FMT "%08I32X"
-#define I64FMT "%016I64X"
-#define snprintf _snprintf
-#define vsnprintf _vsnprintf
-#define finite(X) _finite(X)
+#  define I32FMT "%08I32X"
+#  define I64FMT "%016I64X"
+#  define snprintf _snprintf
+#  define vsnprintf _vsnprintf
+#  define finite(X) _finite(X)
 
 #else
 
-#define stricmp strcasecmp
-#define strnicmp strncasecmp
-#define I32FMT "%08X"
-#define I64FMT "%016llX"
+#  define stricmp strcasecmp
+#  define strnicmp strncasecmp
+
+#  define I32FMT "%08X"
+#  if ACE_SIZEOF_LONG == 8
+#    define I64FMT "%016lX"
+#  else
+#    define I64FMT "%016llX"
+#  endif /* ACE_SIZEOF_LONG == 8 */
 
 #endif
 
@@ -194,15 +199,15 @@ inline char * mangos_strdup(const char * source)
 
 // we always use stdlibc++ std::max/std::min, undefine some not C++ standard defines (Win API and some pother platforms)
 #ifdef max
-#undef max
+#  undef max
 #endif
 
 #ifdef min
-#undef min
+#  undef min
 #endif
 
 #ifndef M_PI
-#define M_PI            3.14159265358979323846
+#  define M_PI          3.14159265358979323846
 #endif
 
 #endif
