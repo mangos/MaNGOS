@@ -5145,6 +5145,19 @@ void Spell::EffectScriptEffect(uint32 effIndex)
 
                     break;
                 }
+                // Surge Needle Teleporter
+                case 47097:
+                {
+                    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
+                        return;
+
+                    if (unitTarget->GetAreaId() == 4156)
+                        unitTarget->CastSpell(unitTarget, 47324, true);
+                    else if (unitTarget->GetAreaId() == 4157)
+                        unitTarget->CastSpell(unitTarget, 47325, true);
+
+                    break;
+                }
                 // Emblazon Runeblade
                 case 51770:
                 {

@@ -1768,6 +1768,11 @@ uint16 Map::GetAreaFlag(float x, float y, float z) const
             if (x > 3823.0f && x < 4141.5f && y > 6247.0f && y < 64890.0f && z < 42.5f)
                 areaflag = 1723;
             break;
+        // Moonrest Gardens
+        case 1787:
+            if (x > 3315.3f && x < 3361.6f && y > 2469.4f && y < 2565.8f && z > 197.0f)
+                areaflag = 1786;                            // Surge Needle (cords not entirely correct, will need round circle if this is really needed(see spell 47097 eff 77))
+            break;
         // Dalaran
         case 2492:                                          // Forlorn Woods (Crystalsong Forest)
         case 2371:                                          // Valley of Echoes (Icecrown Glacier)
