@@ -23,8 +23,6 @@
 #include "Map.h"
 #include "Util.h"
 
-#define RUNNING_CHANCE_RANDOMMV 20                                  //will be "1 / RUNNING_CHANCE_RANDOMMV"
-
 template<>
 void
 RandomMovementGenerator<Creature>::_setRandomLocation(Creature &creature)
@@ -109,11 +107,8 @@ RandomMovementGenerator<Creature>::Initialize(Creature &creature)
 
     if (creature.canFly())
         creature.AddMonsterMoveFlag(MONSTER_MOVE_FLY);
-
-    else if(irand(0,RUNNING_CHANCE_RANDOMMV) > 0)
-        creature.AddMonsterMoveFlag(MONSTER_MOVE_WALK);
     else
-        creature.RemoveMonsterMoveFlag(MONSTER_MOVE_WALK);  // run with 1/RUNNING_CHANCE_RANDOMMV chance
+        creature.AddMonsterMoveFlag(MONSTER_MOVE_WALK);
 
     _setRandomLocation(creature);
 }
@@ -152,10 +147,8 @@ RandomMovementGenerator<Creature>::Update(Creature &creature, const uint32 &diff
         {
             if (creature.canFly())
                 creature.AddMonsterMoveFlag(MONSTER_MOVE_FLY);
-            else if(irand(0,RUNNING_CHANCE_RANDOMMV) > 0)
+            else
                 creature.AddMonsterMoveFlag(MONSTER_MOVE_WALK);
-            else                                            // run with 1/RUNNING_CHANCE_RANDOMMV chance
-                creature.RemoveMonsterMoveFlag(MONSTER_MOVE_WALK);
 
             _setRandomLocation(creature);
         }
