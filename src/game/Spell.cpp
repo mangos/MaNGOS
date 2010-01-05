@@ -1337,6 +1337,7 @@ void Spell::SetTargetMap(uint32 effIndex, uint32 targetMode, UnitList& targetUni
                     unMaxTargets = 3;
                     break;
                 case 30843:                                 // Enfeeble
+                case 42005:                                 // Bloodboil TODO: need to be 5 targets(players) furthest away from caster
                     unMaxTargets = 5;
                     break;
                 case 54098:                                 // Poison Bolt Volley (h)
