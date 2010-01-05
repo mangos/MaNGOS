@@ -1826,22 +1826,23 @@ void Creature::GetRespawnCoord( float &x, float &y, float &z, float* ori, float*
             x = data->posX;
             y = data->posY;
             z = data->posZ;
-            if(ori)
+            if (ori)
                 *ori = data->orientation;
-            if(dist)
+            if (dist)
                 *dist = data->spawndist;
 
             return;
         }
     }
 
-    x = GetPositionX();
-    y = GetPositionY();
-    z = GetPositionZ();
-    if(ori)
-        *ori = GetOrientation();
-    if(dist)
-        *dist = 0;
+    float orient;
+
+    GetSummonPoint(x, y, z, orient);
+
+    if (ori)
+        *ori = orient;
+    if (dist)
+        *dist = GetRespawnRadius();
 }
 
 void Creature::AllLootRemovedFromCorpse()

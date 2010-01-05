@@ -576,6 +576,9 @@ class MANGOS_DLL_SPEC Creature : public Unit
         void SetCombatStartPosition(float x, float y, float z) { CombatStartX = x; CombatStartY = y; CombatStartZ = z; }
         void GetCombatStartPosition(float &x, float &y, float &z) { x = CombatStartX; y = CombatStartY; z = CombatStartZ; }
 
+        void SetSummonPoint(float fX, float fY, float fZ, float fOrient) { m_summonXpoint = fX; m_summonYpoint = fY; m_summonZpoint = fZ; m_summonOrientation = fOrient; }
+        void GetSummonPoint(float &fX, float &fY, float &fZ, float &fOrient) const { fX = m_summonXpoint; fY = m_summonYpoint; fZ = m_summonZpoint; fOrient = m_summonOrientation; }
+
         uint32 GetGlobalCooldown() const { return m_GlobalCooldown; }
 
         void SetDeadByDefault (bool death_state) { m_isDeadByDefault = death_state; }
@@ -629,6 +632,12 @@ class MANGOS_DLL_SPEC Creature : public Unit
         float CombatStartX;
         float CombatStartY;
         float CombatStartZ;
+
+        float m_summonXpoint;
+        float m_summonYpoint;
+        float m_summonZpoint;
+        float m_summonOrientation;
+
     private:
         GridReference<Creature> m_gridRef;
         CreatureInfo const* m_creatureInfo;                 // in difficulty mode > 0 can different from ObjMgr::GetCreatureTemplate(GetEntry())
