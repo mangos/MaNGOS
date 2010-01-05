@@ -31,6 +31,7 @@
 #include "SystemConfig.h"
 #include "revision.h"
 #include "revision_nr.h"
+#include "revision_sql.h"
 #include "Util.h"
 #include <openssl/opensslv.h>
 #include <openssl/crypto.h>
@@ -49,12 +50,11 @@ char serviceDescription[] = "Massive Network Game Object Server";
 int m_ServiceStatus = -1;
 #endif
 
-bool StartDB(std::string &dbstring);
+bool StartDB();
 void UnhookSignals();
 void HookSignals();
 
 bool stopEvent = false;                                     ///< Setting it to true stops the server
-RealmList m_realmList;                                      ///< Holds the list of realms for this server
 
 DatabaseType loginDatabase;                                 ///< Accessor to the realm server database
 
@@ -144,6 +144,7 @@ extern int main(int argc, char **argv)
         sLog.outError("Could not find configuration file %s.", cfg_file);
         return 1;
     }
+    sLog.Initialize();
 
     sLog.outString( "%s [realm-daemon]", _FULLVERSION(REVISION_DATE,REVISION_TIME,REVISION_NR,REVISION_ID) );
     sLog.outString( "<Ctrl-C> to stop.\n" );
@@ -166,7 +167,7 @@ extern int main(int argc, char **argv)
     sLog.outDetail("%s (Library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
     if (SSLeay() < 0x009080bfL )
     {
-        sLog.outDetail("WARNING: Outdated version of OpenSSL lib. Logins to server impossible!");
+        sLog.outDetail("WARNING: Outdated version of OpenSSL lib. Logins to server may not work!");
         sLog.outDetail("WARNING: Minimal required version [OpenSSL 0.9.8k]");
     }
 
@@ -185,13 +186,12 @@ extern int main(int argc, char **argv)
     }
 
     ///- Initialize the database connection
-    std::string dbstring;
-    if(!StartDB(dbstring))
+    if(!StartDB())
         return 1;
 
     ///- Get the list of realms for the server
-    m_realmList.Initialize(sConfig.GetIntDefault("RealmsStateUpdateDelay", 20));
-    if (m_realmList.size() == 0)
+    sRealmList.Initialize(sConfig.GetIntDefault("RealmsStateUpdateDelay", 20));
+    if (sRealmList.size() == 0)
     {
         sLog.outError("No valid realms specified.");
         return 1;
@@ -208,6 +208,11 @@ extern int main(int argc, char **argv)
         sLog.outError( "MaNGOS realmd can not bind to %s:%d",bind_ip.c_str(), rmport );
         return 1;
     }
+
+    // cleanup query
+    //set expired bans to inactive
+    loginDatabase.Execute("UPDATE account_banned SET active = 0 WHERE unbandate<=UNIX_TIMESTAMP() AND unbandate<>bandate");
+    loginDatabase.Execute("DELETE FROM ip_banned WHERE unbandate<=UNIX_TIMESTAMP() AND unbandate<>bandate");
 
     h.Add(&authListenSocket);
 
@@ -310,9 +315,10 @@ void OnSignal(int s)
 }
 
 /// Initialize connection to the database
-bool StartDB(std::string &dbstring)
+bool StartDB()
 {
-    if(!sConfig.GetString("LoginDatabaseInfo", &dbstring))
+    std::string dbstring = sConfig.GetStringDefault("LoginDatabaseInfo", "");
+    if(dbstring.empty())
     {
         sLog.outError("Database not specified");
         return false;
@@ -322,6 +328,13 @@ bool StartDB(std::string &dbstring)
     if(!loginDatabase.Initialize(dbstring.c_str()))
     {
         sLog.outError("Cannot connect to database");
+        return false;
+    }
+
+    if(!loginDatabase.CheckRequiredField("realmd_db_version",REVISION_DB_REALMD))
+    {
+        ///- Wait for already started DB delay threads to end
+        loginDatabase.HaltDelayThread();
         return false;
     }
 

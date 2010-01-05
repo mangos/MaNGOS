@@ -56,45 +56,6 @@ enum BG_WS_WorldStates
     BG_WS_FLAG_STATE_ALLIANCE     = 2339
 };
 
-enum BG_WS_ObjectTypes
-{
-    BG_WS_OBJECT_DOOR_A_1       = 0,
-    BG_WS_OBJECT_DOOR_A_2       = 1,
-    BG_WS_OBJECT_DOOR_A_3       = 2,
-    BG_WS_OBJECT_DOOR_A_4       = 3,
-    BG_WS_OBJECT_DOOR_A_5       = 4,
-    BG_WS_OBJECT_DOOR_A_6       = 5,
-    BG_WS_OBJECT_DOOR_H_1       = 6,
-    BG_WS_OBJECT_DOOR_H_2       = 7,
-    BG_WS_OBJECT_DOOR_H_3       = 8,
-    BG_WS_OBJECT_DOOR_H_4       = 9,
-    BG_WS_OBJECT_A_FLAG         = 10,
-    BG_WS_OBJECT_H_FLAG         = 11,
-    BG_WS_OBJECT_SPEEDBUFF_1    = 12,
-    BG_WS_OBJECT_SPEEDBUFF_2    = 13,
-    BG_WS_OBJECT_REGENBUFF_1    = 14,
-    BG_WS_OBJECT_REGENBUFF_2    = 15,
-    BG_WS_OBJECT_BERSERKBUFF_1  = 16,
-    BG_WS_OBJECT_BERSERKBUFF_2  = 17,
-    BG_WS_OBJECT_MAX            = 18
-};
-
-enum BG_WS_ObjectEntry
-{
-    BG_OBJECT_DOOR_A_1_WS_ENTRY          = 179918,
-    BG_OBJECT_DOOR_A_2_WS_ENTRY          = 179919,
-    BG_OBJECT_DOOR_A_3_WS_ENTRY          = 179920,
-    BG_OBJECT_DOOR_A_4_WS_ENTRY          = 179921,
-    BG_OBJECT_DOOR_A_5_WS_ENTRY          = 180322,
-    BG_OBJECT_DOOR_A_6_WS_ENTRY          = 180322,
-    BG_OBJECT_DOOR_H_1_WS_ENTRY          = 179916,
-    BG_OBJECT_DOOR_H_2_WS_ENTRY          = 179917,
-    BG_OBJECT_DOOR_H_3_WS_ENTRY          = 180322,
-    BG_OBJECT_DOOR_H_4_WS_ENTRY          = 180322,
-    BG_OBJECT_A_FLAG_WS_ENTRY            = 179830,
-    BG_OBJECT_H_FLAG_WS_ENTRY            = 179831
-};
-
 enum BG_WS_FlagState
 {
     BG_WS_FLAG_STATE_ON_BASE      = 0,
@@ -111,14 +72,6 @@ enum BG_WS_Graveyards
     WS_GRAVEYARD_MAIN_HORDE        = 772
 };
 
-enum BG_WS_CreatureTypes
-{
-    WS_SPIRIT_MAIN_ALLIANCE   = 0,
-    WS_SPIRIT_MAIN_HORDE      = 1,
-
-    BG_CREATURES_MAX_WS       = 2
-};
-
 class BattleGroundWGScore : public BattleGroundScore
 {
     public:
@@ -126,6 +79,15 @@ class BattleGroundWGScore : public BattleGroundScore
         virtual ~BattleGroundWGScore() {};
         uint32 FlagCaptures;
         uint32 FlagReturns;
+};
+
+
+enum BG_WS_Events
+{
+    WS_EVENT_FLAG_A               = 0,
+    WS_EVENT_FLAG_H               = 1,
+    // spiritguides will spawn (same moment, like WS_EVENT_DOOR_OPEN)
+    WS_EVENT_SPIRITGUIDES_SPAWN   = 2
 };
 
 class BattleGroundWS : public BattleGround
@@ -180,11 +142,12 @@ class BattleGroundWS : public BattleGround
         void SetTeamPoint(uint32 TeamID, uint32 Points = 0) { m_TeamScores[GetTeamIndexByTeamId(TeamID)] = Points; }
         void RemovePoint(uint32 TeamID, uint32 Points = 1)  { m_TeamScores[GetTeamIndexByTeamId(TeamID)] -= Points; }
     private:
-        uint64 m_FlagKeepers[2];                            // 0 - alliance, 1 - horde
-        uint64 m_DroppedFlagGUID[2];
-        uint8 m_FlagState[2];                               // for checking flag state
-        int32 m_FlagsTimer[2];
-        int32 m_FlagsDropTimer[2];
+        uint64 m_FlagKeepers[BG_TEAMS_COUNT];
+
+        uint64 m_DroppedFlagGUID[BG_TEAMS_COUNT];
+        uint8 m_FlagState[BG_TEAMS_COUNT];
+        int32 m_FlagsTimer[BG_TEAMS_COUNT];
+        int32 m_FlagsDropTimer[BG_TEAMS_COUNT];
 
         uint32 m_ReputationCapture;
         uint32 m_HonorWinKills;

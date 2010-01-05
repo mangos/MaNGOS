@@ -22,7 +22,8 @@
 #include "Common.h"
 #include <openssl/sha.h>
 #include <openssl/crypto.h>
-#include "Auth/BigNumber.h"
+
+class BigNumber;
 
 class Sha1Hash
 {
@@ -41,8 +42,6 @@ class Sha1Hash
 
         uint8 *GetDigest(void) { return mDigest; };
         int GetLength(void) { return SHA_DIGEST_LENGTH; };
-
-        BigNumber GetBigNumber();
 
     private:
         SHA_CTX mC;

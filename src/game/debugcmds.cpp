@@ -30,6 +30,7 @@
 #include "BattleGroundMgr.h"
 #include <fstream>
 #include "ObjectMgr.h"
+#include "ObjectDefines.h"
 #include "SpellMgr.h"
 
 bool ChatHandler::HandleDebugSendSpellFailCommand(const char* args)
@@ -614,7 +615,7 @@ bool ChatHandler::HandleDebugSpawnVehicle(const char* args)
     uint32 entry = (uint32)atoi(e);
     uint32 id = (uint32)atoi(i);
 
-    CreatureInfo const *ci = objmgr.GetCreatureTemplate(entry);
+    CreatureInfo const *ci = ObjectMgr::GetCreatureTemplate(entry);
 
     if (!ci)
         return false;
@@ -626,7 +627,7 @@ bool ChatHandler::HandleDebugSpawnVehicle(const char* args)
 
     Vehicle *v = new Vehicle;
     Map *map = m_session->GetPlayer()->GetMap();
-    if (!v->Create(objmgr.GenerateLowGuid(HIGHGUID_VEHICLE), map, entry, id, m_session->GetPlayer()->GetTeam()))
+    if (!v->Create(map->GenerateLocalLowGuid(HIGHGUID_VEHICLE), map, entry, id, m_session->GetPlayer()->GetTeam()))
     {
         delete v;
         return false;
@@ -653,10 +654,9 @@ bool ChatHandler::HandleDebugSpawnVehicle(const char* args)
 bool ChatHandler::HandleDebugSpellCheckCommand(const char* /*args*/)
 {
     sLog.outString( "Check expected in code spell properties base at table 'spell_check' content...");
-    spellmgr.CheckUsedSpells("spell_check");
+    sSpellMgr.CheckUsedSpells("spell_check");
     return true;
 }
-
 
 bool ChatHandler::HandleDebugSendLargePacketCommand(const char* /*args*/)
 {
@@ -678,7 +678,7 @@ bool ChatHandler::HandleDebugSendSetPhaseShiftCommand(const char* args)
     return true;
 }
 
-bool ChatHandler::HandleDebugSetItemFlagCommand(const char* args)
+bool ChatHandler::HandleDebugGetItemValueCommand(const char* args)
 {
     if (!*args)
         return false;
@@ -690,14 +690,48 @@ bool ChatHandler::HandleDebugSetItemFlagCommand(const char* args)
         return false;
 
     uint32 guid = (uint32)atoi(e);
-    uint32 flag = (uint32)atoi(f);
+    uint32 index = (uint32)atoi(f);
 
     Item *i = m_session->GetPlayer()->GetItemByGuid(MAKE_NEW_GUID(guid, 0, HIGHGUID_ITEM));
 
     if (!i)
         return false;
 
-    i->SetUInt32Value(ITEM_FIELD_FLAGS, flag);
+    if (index >= i->GetValuesCount())
+        return false;
+
+    uint32 value = i->GetUInt32Value(index);
+
+    PSendSysMessage("Item %u: value at %u is %u", guid, index, value);
+
+    return true;
+}
+
+bool ChatHandler::HandleDebugSetItemValueCommand(const char* args)
+{
+    if (!*args)
+        return false;
+
+    char* e = strtok((char*)args, " ");
+    char* f = strtok(NULL, " ");
+    char* g = strtok(NULL, " ");
+
+    if (!e || !f || !g)
+        return false;
+
+    uint32 guid = (uint32)atoi(e);
+    uint32 index = (uint32)atoi(f);
+    uint32 value = (uint32)atoi(g);
+
+    Item *i = m_session->GetPlayer()->GetItemByGuid(MAKE_NEW_GUID(guid, 0, HIGHGUID_ITEM));
+
+    if (!i)
+        return false;
+
+    if (index >= i->GetValuesCount())
+        return false;
+
+    i->SetUInt32Value(index, value);
 
     return true;
 }

@@ -32,10 +32,13 @@
 #define CONTACT_DISTANCE            0.5f
 #define INTERACTION_DISTANCE        5.0f
 #define ATTACK_DISTANCE             5.0f
-#define MAX_VISIBILITY_DISTANCE  (5*SIZE_OF_GRID_CELL/2.0f) // max distance for visible object show, limited by active zone for player based at cell size (active zone = 5x5 cells)
-#define DEFAULT_VISIBILITY_DISTANCE (SIZE_OF_GRID_CELL)     // default visible distance
+#define MAX_VISIBILITY_DISTANCE     333.0f      // max distance for visible object show, limited in 333 yards
+#define DEFAULT_VISIBILITY_DISTANCE 90.0f       // default visible distance, 90 yards on continents
+#define DEFAULT_VISIBILITY_INSTANCE 120.0f      // default visible distance in instances, 120 yards
+#define DEFAULT_VISIBILITY_BGARENAS 180.0f      // default visible distance in BG/Arenas, 180 yards
 
 #define DEFAULT_WORLD_OBJECT_SIZE   0.388999998569489f      // player size, also currently used (correctly?) for any non Unit world objects
+#define MAX_STEALTH_DETECT_RANGE    45.0f
 
 enum TypeMask
 {
@@ -85,7 +88,6 @@ enum PhaseMasks
 
 class WorldPacket;
 class UpdateData;
-class ByteBuffer;
 class WorldSession;
 class Creature;
 class Player;
@@ -122,13 +124,12 @@ class MANGOS_DLL_SPEC Object
             m_inWorld = true;
 
             // synchronize values mirror with values array (changes will send in updatecreate opcode any way
-            ClearUpdateMask(true);
+            ClearUpdateMask(false);                         // false - we can't have update dat in update queue before adding to world
         }
         virtual void RemoveFromWorld()
         {
             // if we remove from world then sending changes not required
-            if(m_uint32Values)
-                ClearUpdateMask(true);
+            ClearUpdateMask(true);
             m_inWorld = false;
         }
 
@@ -144,12 +145,16 @@ class MANGOS_DLL_SPEC Object
         bool isType(uint16 mask) const { return (mask & m_objectType); }
 
         virtual void BuildCreateUpdateBlockForPlayer( UpdateData *data, Player *target ) const;
-        void SendUpdateToPlayer(Player* player);
+        void SendCreateUpdateToPlayer(Player* player);
+
+        // must be overwrite in appropriate subclasses (WorldObject, Item currently), or will crash
+        virtual void AddToClientUpdateList();
+        virtual void RemoveFromClientUpdateList();
+        virtual void BuildUpdateData(UpdateDataMapType& update_players);
 
         void BuildValuesUpdateBlockForPlayer( UpdateData *data, Player *target ) const;
         void BuildOutOfRangeUpdateBlock( UpdateData *data ) const;
         void BuildMovementUpdateBlock( UpdateData * data, uint32 flags = 0 ) const;
-        void BuildUpdate(UpdateDataMapType &);
 
         virtual void DestroyForPlayer( Player *target, bool anim = false ) const;
 
@@ -287,7 +292,6 @@ class MANGOS_DLL_SPEC Object
         }
 
         void ClearUpdateMask(bool remove);
-        void SendUpdateObjectToAllExcept(Player* exceptPlayer);
 
         bool LoadValues(const char* data);
 
@@ -307,8 +311,10 @@ class MANGOS_DLL_SPEC Object
         virtual void _SetUpdateBits(UpdateMask *updateMask, Player *target) const;
 
         virtual void _SetCreateBits(UpdateMask *updateMask, Player *target) const;
-        void _BuildMovementUpdate(ByteBuffer * data, uint16 flags, uint32 flags2 ) const;
-        void _BuildValuesUpdate(uint8 updatetype, ByteBuffer *data, UpdateMask *updateMask, Player *target ) const;
+
+        void BuildMovementUpdate(ByteBuffer * data, uint16 flags, uint32 flags2 ) const;
+        void BuildValuesUpdate(uint8 updatetype, ByteBuffer *data, UpdateMask *updateMask, Player *target ) const;
+        void BuildUpdateDataForPlayer(Player* pl, UpdateDataMapType& update_players);
 
         uint16 m_objectType;
 
@@ -339,8 +345,12 @@ class MANGOS_DLL_SPEC Object
         Object& operator=(Object const&);                   // prevent generation assigment operator
 };
 
+struct WorldObjectChangeAccumulator;
+
 class MANGOS_DLL_SPEC WorldObject : public Object
 {
+    friend struct WorldObjectChangeAccumulator;
+
     public:
         virtual ~WorldObject ( ) {}
 
@@ -426,11 +436,13 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         bool IsWithinDist3d(float x, float y, float z, float dist2compare) const;
         bool IsWithinDist2d(float x, float y, float dist2compare) const;
         bool _IsWithinDist(WorldObject const* obj, float dist2compare, bool is3D) const;
+
+        // use only if you will sure about placing both object at same map
         bool IsWithinDist(WorldObject const* obj, float dist2compare, bool is3D = true) const
-                                                            // use only if you will sure about placing both object at same map
         {
             return obj && _IsWithinDist(obj,dist2compare,is3D);
         }
+
         bool IsWithinDistInMap(WorldObject const* obj, float dist2compare, bool is3D = true) const
         {
             return obj && IsInMap(obj) && _IsWithinDist(obj,dist2compare,is3D);
@@ -445,6 +457,10 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         float GetAngle( const WorldObject* obj ) const;
         float GetAngle( const float x, const float y ) const;
         bool HasInArc( const float arcangle, const WorldObject* obj ) const;
+        bool isInFrontInMap(WorldObject const* target,float distance, float arc = M_PI) const;
+        bool isInBackInMap(WorldObject const* target, float distance, float arc = M_PI) const;
+        bool isInFront(WorldObject const* target,float distance, float arc = M_PI) const;
+        bool isInBack(WorldObject const* target, float distance, float arc = M_PI) const;
 
         virtual void CleanupsBeforeDelete();                // used in destructor or explicitly before mass creature delete to remove cross-references to already deleted units
 
@@ -470,11 +486,13 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         virtual void SaveRespawnTime() {}
         void AddObjectToRemoveList();
 
+        void UpdateObjectVisibility();
+
         // main visibility check function in normal case (ignore grey zone distance check)
-        bool isVisibleFor(Player const* u) const { return isVisibleForInState(u,false); }
+        bool isVisibleFor(Player const* u, WorldObject const* viewPoint) const { return isVisibleForInState(u,viewPoint,false); }
 
         // low level function for visibility change code, must be define in all main world object subclasses
-        virtual bool isVisibleForInState(Player const* u, bool inVisibleList) const = 0;
+        virtual bool isVisibleForInState(Player const* u, WorldObject const* viewPoint, bool inVisibleList) const = 0;
 
         void SetMap(Map * map);
         Map * GetMap() const { ASSERT(m_currMap); return m_currMap; }
@@ -484,17 +502,21 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         //this function should be removed in nearest time...
         Map const* GetBaseMap() const;
 
-        Creature* SummonCreature(uint32 id, float x, float y, float z, float ang,TempSummonType spwtype,uint32 despwtime);
+        void AddToClientUpdateList();
+        void RemoveFromClientUpdateList();
+        void BuildUpdateData(UpdateDataMapType &);
 
+        Creature* SummonCreature(uint32 id, float x, float y, float z, float ang,TempSummonType spwtype,uint32 despwtime);
     protected:
         explicit WorldObject();
-        std::string m_name;
 
         //these functions are used mostly for Relocate() and Corpse/Player specific stuff...
         //use them ONLY in LoadFromDB()/Create() funcs and nowhere else!
         //mapId/instanceId should be set in SetMap() function!
         void SetLocationMapId(uint32 _mapId) { m_mapId = _mapId; }
         void SetLocationInstanceId(uint32 _instanceId) { m_InstanceId = _instanceId; }
+
+        std::string m_name;
 
     private:
         Map * m_currMap;                                    //current object's Map location

@@ -23,5 +23,8 @@ if MANGOS_BUILD_ACE
 SUBDIRS += ACE_wrappers
 endif
 
+# Intel's TBB
+SUBDIRS += tbb
+
 ## Additional files to include when running 'make dist'
 #  Nothing yet.

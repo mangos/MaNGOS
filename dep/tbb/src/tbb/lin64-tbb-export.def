@@ -1,0 +1,311 @@
+/*
+    Copyright 2005-2009 Intel Corporation.  All Rights Reserved.
+
+    This file is part of Threading Building Blocks.
+
+    Threading Building Blocks is free software; you can redistribute it
+    and/or modify it under the terms of the GNU General Public License
+    version 2 as published by the Free Software Foundation.
+
+    Threading Building Blocks is distributed in the hope that it will be
+    useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+    of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Threading Building Blocks; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+    As a special exception, you may use this file as part of a free software
+    library without restriction.  Specifically, if other files instantiate
+    templates or use macros or inline functions from this file, or you compile
+    this file and link it with other files to produce an executable, this
+    file does not by itself cause the resulting executable to be covered by
+    the GNU General Public License.  This exception does not however
+    invalidate any other reasons why the executable file might be covered by
+    the GNU General Public License.
+*/
+
+#include "tbb/tbb_config.h"
+
+{
+global:
+
+/* cache_aligned_allocator.cpp */
+_ZN3tbb8internal12NFS_AllocateEmmPv;
+_ZN3tbb8internal15NFS_GetLineSizeEv;
+_ZN3tbb8internal8NFS_FreeEPv;
+_ZN3tbb8internal23allocate_via_handler_v3Em;
+_ZN3tbb8internal25deallocate_via_handler_v3EPv;
+_ZN3tbb8internal17is_malloc_used_v3Ev;
+
+/* task.cpp v3 */
+_ZN3tbb4task13note_affinityEt;
+_ZN3tbb4task22internal_set_ref_countEi;
+_ZN3tbb4task28internal_decrement_ref_countEv;
+_ZN3tbb4task22spawn_and_wait_for_allERNS_9task_listE;
+_ZN3tbb4task4selfEv;
+_ZN3tbb4task7destroyERS0_;
+_ZNK3tbb4task26is_owned_by_current_threadEv;
+_ZN3tbb8internal19allocate_root_proxy4freeERNS_4taskE;
+_ZN3tbb8internal19allocate_root_proxy8allocateEm;
+_ZN3tbb8internal28affinity_partitioner_base_v36resizeEj;
+_ZNK3tbb8internal20allocate_child_proxy4freeERNS_4taskE;
+_ZNK3tbb8internal20allocate_child_proxy8allocateEm;
+_ZNK3tbb8internal27allocate_continuation_proxy4freeERNS_4taskE;
+_ZNK3tbb8internal27allocate_continuation_proxy8allocateEm;
+_ZNK3tbb8internal34allocate_additional_child_of_proxy4freeERNS_4taskE;
+_ZNK3tbb8internal34allocate_additional_child_of_proxy8allocateEm;
+_ZTIN3tbb4taskE;
+_ZTSN3tbb4taskE;
+_ZTVN3tbb4taskE;
+_ZN3tbb19task_scheduler_init19default_num_threadsEv;
+_ZN3tbb19task_scheduler_init10initializeEim;
+_ZN3tbb19task_scheduler_init10initializeEi;
+_ZN3tbb19task_scheduler_init9terminateEv;
+_ZN3tbb8internal26task_scheduler_observer_v37observeEb;
+_ZN3tbb10empty_task7executeEv;
+_ZN3tbb10empty_taskD0Ev;
+_ZN3tbb10empty_taskD1Ev;
+_ZTIN3tbb10empty_taskE;
+_ZTSN3tbb10empty_taskE;
+_ZTVN3tbb10empty_taskE;
+
+/* exception handling support */
+#if __TBB_EXCEPTIONS
+_ZNK3tbb8internal32allocate_root_with_context_proxy8allocateEm;
+_ZNK3tbb8internal32allocate_root_with_context_proxy4freeERNS_4taskE;
+_ZNK3tbb18task_group_context28is_group_execution_cancelledEv;
+_ZN3tbb18task_group_context22cancel_group_executionEv;
+_ZN3tbb18task_group_context26register_pending_exceptionEv;
+_ZN3tbb18task_group_context5resetEv;
+_ZN3tbb18task_group_context4initEv;
+_ZN3tbb18task_group_contextD1Ev;
+_ZN3tbb18task_group_contextD2Ev;
+_ZNK3tbb18captured_exception4nameEv;
+_ZNK3tbb18captured_exception4whatEv;
+_ZN3tbb18captured_exception10throw_selfEv;
+_ZN3tbb18captured_exception3setEPKcS2_;
+_ZN3tbb18captured_exception4moveEv;
+_ZN3tbb18captured_exception5clearEv;
+_ZN3tbb18captured_exception7destroyEv;
+_ZN3tbb18captured_exception8allocateEPKcS2_;
+_ZN3tbb18captured_exceptionD0Ev;
+_ZN3tbb18captured_exceptionD1Ev;
+_ZTIN3tbb18captured_exceptionE;
+_ZTSN3tbb18captured_exceptionE;
+_ZTVN3tbb18captured_exceptionE;
+_ZN3tbb13tbb_exceptionD2Ev;
+_ZTIN3tbb13tbb_exceptionE;
+_ZTSN3tbb13tbb_exceptionE;
+_ZTVN3tbb13tbb_exceptionE;
+_ZN3tbb14bad_last_allocD0Ev;
+_ZN3tbb14bad_last_allocD1Ev;
+_ZNK3tbb14bad_last_alloc4whatEv;
+_ZTIN3tbb14bad_last_allocE;
+_ZTSN3tbb14bad_last_allocE;
+_ZTVN3tbb14bad_last_allocE;
+#endif /* __TBB_EXCEPTIONS */
+
+/* tbb_misc.cpp */
+_ZN3tbb17assertion_failureEPKciS1_S1_;
+_ZN3tbb21set_assertion_handlerEPFvPKciS1_S1_E;
+_ZN3tbb8internal36get_initial_auto_partitioner_divisorEv;
+_ZN3tbb8internal13handle_perrorEiPKc;
+_ZN3tbb8internal15runtime_warningEPKcz;
+TBB_runtime_interface_version;
+_ZN3tbb8internal33throw_bad_last_alloc_exception_v4Ev;
+
+/* itt_notify.cpp */
+_ZN3tbb8internal32itt_load_pointer_with_acquire_v3EPKv;
+_ZN3tbb8internal33itt_store_pointer_with_release_v3EPvS1_;
+_ZN3tbb8internal20itt_set_sync_name_v3EPvPKc;
+_ZN3tbb8internal19itt_load_pointer_v3EPKv;
+
+/* pipeline.cpp */
+_ZTIN3tbb6filterE;
+_ZTSN3tbb6filterE;
+_ZTVN3tbb6filterE;
+_ZN3tbb6filterD2Ev;
+_ZN3tbb8pipeline10add_filterERNS_6filterE;
+_ZN3tbb8pipeline12inject_tokenERNS_4taskE;
+_ZN3tbb8pipeline13remove_filterERNS_6filterE;
+_ZN3tbb8pipeline3runEm;
+#if __TBB_EXCEPTIONS
+_ZN3tbb8pipeline3runEmRNS_18task_group_contextE;
+#endif
+_ZN3tbb8pipeline5clearEv;
+_ZN3tbb19thread_bound_filter12process_itemEv;
+_ZN3tbb19thread_bound_filter16try_process_itemEv;
+_ZTIN3tbb8pipelineE;
+_ZTSN3tbb8pipelineE;
+_ZTVN3tbb8pipelineE;
+_ZN3tbb8pipelineC1Ev;
+_ZN3tbb8pipelineC2Ev;
+_ZN3tbb8pipelineD0Ev;
+_ZN3tbb8pipelineD1Ev;
+_ZN3tbb8pipelineD2Ev;
+
+/* queuing_rw_mutex.cpp */
+_ZN3tbb16queuing_rw_mutex18internal_constructEv;
+_ZN3tbb16queuing_rw_mutex11scoped_lock17upgrade_to_writerEv;
+_ZN3tbb16queuing_rw_mutex11scoped_lock19downgrade_to_readerEv;
+_ZN3tbb16queuing_rw_mutex11scoped_lock7acquireERS0_b;
+_ZN3tbb16queuing_rw_mutex11scoped_lock7releaseEv;
+_ZN3tbb16queuing_rw_mutex11scoped_lock11try_acquireERS0_b;
+
+#if !TBB_NO_LEGACY
+/* spin_rw_mutex.cpp v2 */
+_ZN3tbb13spin_rw_mutex16internal_upgradeEPS0_;
+_ZN3tbb13spin_rw_mutex22internal_itt_releasingEPS0_;
+_ZN3tbb13spin_rw_mutex23internal_acquire_readerEPS0_;
+_ZN3tbb13spin_rw_mutex23internal_acquire_writerEPS0_;
+_ZN3tbb13spin_rw_mutex18internal_downgradeEPS0_;
+_ZN3tbb13spin_rw_mutex23internal_release_readerEPS0_;
+_ZN3tbb13spin_rw_mutex23internal_release_writerEPS0_;
+_ZN3tbb13spin_rw_mutex27internal_try_acquire_readerEPS0_;
+_ZN3tbb13spin_rw_mutex27internal_try_acquire_writerEPS0_;
+#endif
+
+/* spin_rw_mutex v3 */
+_ZN3tbb16spin_rw_mutex_v318internal_constructEv;
+_ZN3tbb16spin_rw_mutex_v316internal_upgradeEv;
+_ZN3tbb16spin_rw_mutex_v318internal_downgradeEv;
+_ZN3tbb16spin_rw_mutex_v323internal_acquire_readerEv;
+_ZN3tbb16spin_rw_mutex_v323internal_acquire_writerEv;
+_ZN3tbb16spin_rw_mutex_v323internal_release_readerEv;
+_ZN3tbb16spin_rw_mutex_v323internal_release_writerEv;
+_ZN3tbb16spin_rw_mutex_v327internal_try_acquire_readerEv;
+_ZN3tbb16spin_rw_mutex_v327internal_try_acquire_writerEv;
+
+/* spin_mutex.cpp */
+_ZN3tbb10spin_mutex11scoped_lock16internal_acquireERS0_;
+_ZN3tbb10spin_mutex11scoped_lock16internal_releaseEv;
+_ZN3tbb10spin_mutex11scoped_lock20internal_try_acquireERS0_;
+_ZN3tbb10spin_mutex18internal_constructEv;
+
+/* mutex.cpp */
+_ZN3tbb5mutex11scoped_lock16internal_acquireERS0_;
+_ZN3tbb5mutex11scoped_lock16internal_releaseEv;
+_ZN3tbb5mutex11scoped_lock20internal_try_acquireERS0_;
+_ZN3tbb5mutex16internal_destroyEv;
+_ZN3tbb5mutex18internal_constructEv;
+
+/* recursive_mutex.cpp */
+_ZN3tbb15recursive_mutex11scoped_lock16internal_acquireERS0_;
+_ZN3tbb15recursive_mutex11scoped_lock16internal_releaseEv;
+_ZN3tbb15recursive_mutex11scoped_lock20internal_try_acquireERS0_;
+_ZN3tbb15recursive_mutex16internal_destroyEv;
+_ZN3tbb15recursive_mutex18internal_constructEv;
+
+/* QueuingMutex.cpp */
+_ZN3tbb13queuing_mutex18internal_constructEv;
+_ZN3tbb13queuing_mutex11scoped_lock7acquireERS0_;
+_ZN3tbb13queuing_mutex11scoped_lock7releaseEv;
+_ZN3tbb13queuing_mutex11scoped_lock11try_acquireERS0_;
+
+#if !TBB_NO_LEGACY
+/* concurrent_hash_map */
+_ZNK3tbb8internal21hash_map_segment_base23internal_grow_predicateEv;
+
+/* concurrent_queue.cpp v2 */
+_ZN3tbb8internal21concurrent_queue_base12internal_popEPv;
+_ZN3tbb8internal21concurrent_queue_base13internal_pushEPKv;
+_ZN3tbb8internal21concurrent_queue_base21internal_set_capacityElm;
+_ZN3tbb8internal21concurrent_queue_base23internal_pop_if_presentEPv;
+_ZN3tbb8internal21concurrent_queue_base25internal_push_if_not_fullEPKv;
+_ZN3tbb8internal21concurrent_queue_baseC2Em;
+_ZN3tbb8internal21concurrent_queue_baseD2Ev;
+_ZTIN3tbb8internal21concurrent_queue_baseE;
+_ZTSN3tbb8internal21concurrent_queue_baseE;
+_ZTVN3tbb8internal21concurrent_queue_baseE;
+_ZN3tbb8internal30concurrent_queue_iterator_base6assignERKS1_;
+_ZN3tbb8internal30concurrent_queue_iterator_base7advanceEv;
+_ZN3tbb8internal30concurrent_queue_iterator_baseC2ERKNS0_21concurrent_queue_baseE;
+_ZN3tbb8internal30concurrent_queue_iterator_baseD2Ev;
+_ZNK3tbb8internal21concurrent_queue_base13internal_sizeEv;
+#endif
+
+/* concurrent_queue v3 */
+/* constructors */
+_ZN3tbb8internal24concurrent_queue_base_v3C2Em;
+_ZN3tbb8internal33concurrent_queue_iterator_base_v3C2ERKNS0_24concurrent_queue_base_v3E;
+/* destructors */
+_ZN3tbb8internal24concurrent_queue_base_v3D2Ev;
+_ZN3tbb8internal33concurrent_queue_iterator_base_v3D2Ev;
+/* typeinfo */
+_ZTIN3tbb8internal24concurrent_queue_base_v3E;
+_ZTSN3tbb8internal24concurrent_queue_base_v3E;
+/* vtable */
+_ZTVN3tbb8internal24concurrent_queue_base_v3E;
+/* methods */
+_ZN3tbb8internal33concurrent_queue_iterator_base_v36assignERKS1_;
+_ZN3tbb8internal33concurrent_queue_iterator_base_v37advanceEv;
+_ZN3tbb8internal24concurrent_queue_base_v313internal_pushEPKv;
+_ZN3tbb8internal24concurrent_queue_base_v325internal_push_if_not_fullEPKv;
+_ZN3tbb8internal24concurrent_queue_base_v312internal_popEPv;
+_ZN3tbb8internal24concurrent_queue_base_v323internal_pop_if_presentEPv;
+_ZN3tbb8internal24concurrent_queue_base_v321internal_finish_clearEv;
+_ZN3tbb8internal24concurrent_queue_base_v321internal_set_capacityElm;
+_ZNK3tbb8internal24concurrent_queue_base_v313internal_sizeEv;
+_ZNK3tbb8internal24concurrent_queue_base_v314internal_emptyEv;
+_ZNK3tbb8internal24concurrent_queue_base_v324internal_throw_exceptionEv;
+_ZN3tbb8internal24concurrent_queue_base_v36assignERKS1_;
+
+#if !TBB_NO_LEGACY
+/* concurrent_vector.cpp v2 */
+_ZN3tbb8internal22concurrent_vector_base13internal_copyERKS1_mPFvPvPKvmE;
+_ZN3tbb8internal22concurrent_vector_base14internal_clearEPFvPvmEb;
+_ZN3tbb8internal22concurrent_vector_base15internal_assignERKS1_mPFvPvmEPFvS4_PKvmESA_;
+_ZN3tbb8internal22concurrent_vector_base16internal_grow_byEmmPFvPvmE;
+_ZN3tbb8internal22concurrent_vector_base16internal_reserveEmmm;
+_ZN3tbb8internal22concurrent_vector_base18internal_push_backEmRm;
+_ZN3tbb8internal22concurrent_vector_base25internal_grow_to_at_leastEmmPFvPvmE;
+_ZNK3tbb8internal22concurrent_vector_base17internal_capacityEv;
+#endif
+
+/* concurrent_vector v3 */
+_ZN3tbb8internal25concurrent_vector_base_v313internal_copyERKS1_mPFvPvPKvmE;
+_ZN3tbb8internal25concurrent_vector_base_v314internal_clearEPFvPvmE;
+_ZN3tbb8internal25concurrent_vector_base_v315internal_assignERKS1_mPFvPvmEPFvS4_PKvmESA_;
+_ZN3tbb8internal25concurrent_vector_base_v316internal_grow_byEmmPFvPvPKvmES4_;
+_ZN3tbb8internal25concurrent_vector_base_v316internal_reserveEmmm;
+_ZN3tbb8internal25concurrent_vector_base_v318internal_push_backEmRm;
+_ZN3tbb8internal25concurrent_vector_base_v325internal_grow_to_at_leastEmmPFvPvPKvmES4_;
+_ZNK3tbb8internal25concurrent_vector_base_v317internal_capacityEv;
+_ZN3tbb8internal25concurrent_vector_base_v316internal_compactEmPvPFvS2_mEPFvS2_PKvmE;
+_ZN3tbb8internal25concurrent_vector_base_v313internal_swapERS1_;
+_ZNK3tbb8internal25concurrent_vector_base_v324internal_throw_exceptionEm;
+_ZN3tbb8internal25concurrent_vector_base_v3D2Ev;
+_ZN3tbb8internal25concurrent_vector_base_v315internal_resizeEmmmPKvPFvPvmEPFvS4_S3_mE;
+_ZN3tbb8internal25concurrent_vector_base_v337internal_grow_to_at_least_with_resultEmmPFvPvPKvmES4_;
+
+/* tbb_thread */
+_ZN3tbb8internal13tbb_thread_v320hardware_concurrencyEv;
+_ZN3tbb8internal13tbb_thread_v36detachEv;
+_ZN3tbb8internal16thread_get_id_v3Ev;
+_ZN3tbb8internal15free_closure_v3EPv;
+_ZN3tbb8internal13tbb_thread_v34joinEv;
+_ZN3tbb8internal13tbb_thread_v314internal_startEPFPvS2_ES2_;
+_ZN3tbb8internal19allocate_closure_v3Em;
+_ZN3tbb8internal7move_v3ERNS0_13tbb_thread_v3ES2_;
+_ZN3tbb8internal15thread_yield_v3Ev;
+_ZN3tbb8internal15thread_sleep_v3ERKNS_10tick_count10interval_tE;
+
+local:
+
+/* TBB symbols */
+*3tbb*;
+*__TBB*;
+
+/* Intel Compiler (libirc) symbols */
+__intel_*;
+_intel_*;
+get_msg_buf;
+get_text_buf;
+message_catalog;
+print_buf;
+irc__get_msg;
+irc__print;
+
+};

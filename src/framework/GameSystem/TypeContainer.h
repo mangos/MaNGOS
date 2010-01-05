@@ -28,7 +28,113 @@
 #include <vector>
 #include "Platform/Define.h"
 #include "Utilities/TypeList.h"
+#include "Utilities/UnorderedMap.h"
 #include "GameSystem/GridRefManager.h"
+
+template<class OBJECT, class KEY_TYPE> struct ContainerUnorderedMap
+{
+    UNORDERED_MAP<KEY_TYPE, OBJECT*> _element;
+};
+template<class KEY_TYPE> struct ContainerUnorderedMap<TypeNull, KEY_TYPE>
+{
+};
+template<class H, class T, class KEY_TYPE> struct ContainerUnorderedMap< TypeList<H, T>, KEY_TYPE >
+{
+    ContainerUnorderedMap<H, KEY_TYPE> _elements;
+    ContainerUnorderedMap<T, KEY_TYPE> _TailElements;
+};
+
+template<class OBJECT_TYPES, class KEY_TYPE = OBJECT_HANDLE>
+class TypeUnorderedMapContainer
+{
+    public:
+        template<class SPECIFIC_TYPE> bool insert(KEY_TYPE handle, SPECIFIC_TYPE* obj)
+        {
+            return TypeUnorderedMapContainer::insert(i_elements, handle, obj);
+        }
+        template<class SPECIFIC_TYPE> bool erase(KEY_TYPE handle, SPECIFIC_TYPE* /*obj*/)
+        {
+            return TypeUnorderedMapContainer::erase(i_elements, handle, (SPECIFIC_TYPE*)NULL);
+        }
+        template<class SPECIFIC_TYPE> SPECIFIC_TYPE* find(KEY_TYPE hdl, SPECIFIC_TYPE* /*obj*/)
+        {
+            return TypeUnorderedMapContainer::find(i_elements, hdl, (SPECIFIC_TYPE*)NULL);
+        }
+    private:
+        ContainerUnorderedMap<OBJECT_TYPES, KEY_TYPE> i_elements;
+
+        // Helpers
+        // Insert helpers
+        template<class SPECIFIC_TYPE> static bool insert(ContainerUnorderedMap<SPECIFIC_TYPE, KEY_TYPE>& elements, KEY_TYPE handle, SPECIFIC_TYPE* obj)
+        {
+            typename UNORDERED_MAP<OBJECT_HANDLE, SPECIFIC_TYPE*>::iterator i = elements._element.find(handle);
+            if (i == elements._element.end())
+            {
+                elements._element[handle] = obj;
+                return true;
+            }
+            else
+            {
+                assert (i->second == obj && "Object with certain key already in but objects are different!");
+                return false;
+            }
+        }
+        template<class SPECIFIC_TYPE> static bool insert(ContainerUnorderedMap<TypeNull, KEY_TYPE>& /*elements*/, KEY_TYPE /*handle*/, SPECIFIC_TYPE* /*obj*/)
+        {
+            return false;
+        }
+        template<class SPECIFIC_TYPE, class T> static bool insert(ContainerUnorderedMap<T, KEY_TYPE>& /*elements*/, KEY_TYPE /*handle*/, SPECIFIC_TYPE* /*obj*/)
+        {
+            return false;
+        }
+        template<class SPECIFIC_TYPE, class H, class T> static bool insert(ContainerUnorderedMap< TypeList<H, T>, KEY_TYPE >& elements, KEY_TYPE handle, SPECIFIC_TYPE* obj)
+        {
+            bool ret = TypeUnorderedMapContainer::insert(elements._elements, handle, obj);
+            return ret ? ret : TypeUnorderedMapContainer::insert(elements._TailElements, handle, obj);
+        }
+        // Find helpers
+        template<class SPECIFIC_TYPE> static SPECIFIC_TYPE* find(ContainerUnorderedMap<SPECIFIC_TYPE, KEY_TYPE>& elements, KEY_TYPE hdl, SPECIFIC_TYPE* /*obj*/)
+        {
+            typename UNORDERED_MAP<OBJECT_HANDLE, SPECIFIC_TYPE*>::iterator i = elements._element.find(hdl);
+            if (i == elements._element.end())
+                return NULL;
+            else
+                return i->second;
+        }
+        template<class SPECIFIC_TYPE> static SPECIFIC_TYPE* find(ContainerUnorderedMap<TypeNull, KEY_TYPE>& /*elements*/, KEY_TYPE /*hdl*/, SPECIFIC_TYPE* /*obj*/)
+        {
+            return NULL;
+        }
+        template<class SPECIFIC_TYPE, class T> static SPECIFIC_TYPE* find(ContainerUnorderedMap<T, KEY_TYPE>& /*elements*/, KEY_TYPE /*hdl*/, SPECIFIC_TYPE* /*obj*/)
+        {
+            return NULL;
+        }
+        template<class SPECIFIC_TYPE, class H, class T> static SPECIFIC_TYPE* find(ContainerUnorderedMap< TypeList<H, T>, KEY_TYPE >& elements, KEY_TYPE hdl, SPECIFIC_TYPE* /*obj*/)
+        {
+            SPECIFIC_TYPE* ret = TypeUnorderedMapContainer::find(elements._elements, hdl, (SPECIFIC_TYPE*)NULL);
+            return ret ? ret : TypeUnorderedMapContainer::find(elements._TailElements, hdl, (SPECIFIC_TYPE*)NULL);
+        }
+        // Erase helpers
+        template<class SPECIFIC_TYPE> static bool erase(ContainerUnorderedMap<SPECIFIC_TYPE, KEY_TYPE>& elements, KEY_TYPE handle, SPECIFIC_TYPE* /*obj*/)
+        {
+            elements._element.erase(handle);
+
+            return true;
+        }
+        template<class SPECIFIC_TYPE> static bool erase(ContainerUnorderedMap<TypeNull, KEY_TYPE>& /*elements*/, KEY_TYPE /*handle*/, SPECIFIC_TYPE* /*obj*/)
+        {
+            return false;
+        }
+        template<class SPECIFIC_TYPE, class T> static bool erase(ContainerUnorderedMap<T, KEY_TYPE>& /*elements*/, KEY_TYPE /*handle*/, SPECIFIC_TYPE* /*obj*/)
+        {
+            return false;
+        }
+        template<class SPECIFIC_TYPE, class H, class T> static bool erase(ContainerUnorderedMap< TypeList<H, T>, KEY_TYPE >& elements, KEY_TYPE handle, SPECIFIC_TYPE* /*obj*/)
+        {
+            bool ret = TypeUnorderedMapContainer::erase(elements._elements, handle, (SPECIFIC_TYPE*)NULL);
+            return ret ? ret : TypeUnorderedMapContainer::erase(elements._TailElements, handle, (SPECIFIC_TYPE*)NULL);
+        }
+};
 
 /*
  * @class ContainerMapList is a mulit-type container for map elements

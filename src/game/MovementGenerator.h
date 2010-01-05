@@ -44,6 +44,8 @@ class MANGOS_DLL_SPEC MovementGenerator
 
         virtual void unitSpeedChanged() { }
 
+        virtual void UpdateFinalDistance(float fDistance) { }
+
         virtual bool GetDestination(float& /*x*/, float& /*y*/, float& /*z*/) const { return false; }
 };
 

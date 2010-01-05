@@ -19,6 +19,7 @@
 #include "InstanceData.h"
 #include "Database/DatabaseEnv.h"
 #include "Map.h"
+#include "Log.h"
 
 void InstanceData::SaveToDB()
 {
@@ -26,4 +27,11 @@ void InstanceData::SaveToDB()
     std::string data = Save();
     CharacterDatabase.escape_string(data);
     CharacterDatabase.PExecute("UPDATE instance SET data = '%s' WHERE id = '%d'", data.c_str(), instance->GetInstanceId());
+}
+
+bool InstanceData::CheckAchievementCriteriaMeet( uint32 criteria_id, Player const* /*source*/, Unit const* /*target*/ /*= NULL*/, uint32 /*miscvalue1*/ /*= 0*/ )
+{
+    sLog.outError("Achievement system call InstanceData::CheckAchievementCriteriaMeet but instance script for map %u not have implementation for achievement criteria %u",
+        instance->GetId(),criteria_id);
+    return false;
 }

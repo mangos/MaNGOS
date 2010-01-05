@@ -235,6 +235,11 @@ AddonChannel = 1
 #        Packet logging file for the worldserver
 #        Default: "world.log"
 #
+#    WorldLogTimestamp
+#        Logfile with timestamp of server start in name
+#        Default: 0 - no timestamp in name
+#                 1 - add timestamp in name in form Logname_YYYY-MM-DD_HH-MM-SS.Ext for Logname.Ext
+#
 #    DBErrorLogFile
 #        Log file of DB errors detected at server run
 #        Default: "DBErrors.log"
@@ -298,6 +303,7 @@ LogFilter_CreatureMoves = 1
 LogFilter_TransportMoves = 1
 LogFilter_VisibilityChanges = 1
 WorldLogFile = ""
+WorldLogTimestamp = 0
 DBErrorLogFile = "DBErrors.log"
 CharLogFile = "Char.log"
 CharLogTimestamp = 0
@@ -482,10 +488,6 @@ LogColors = ""
 #        Enable or disable instant logout for security level (0..4) or high (NOT in combat/while dueling/while falling)
 #        Default: 1 (Mods/GMs/Admins)
 #
-#    DisableWaterBreath
-#        Disable/enable waterbreathing for security level (0..4) or high
-#        Default: 4 (None)
-#
 #    AllFlightPaths
 #        Players will start with all flight paths (Note: ALL flight paths, not only player's team)
 #        Default: 0 (false)
@@ -548,6 +550,33 @@ LogColors = ""
 #        Increase to store more guild_bank events in table - minimum is 25 (GUILD_BANK_MAX_LOGS) for each guild_bank tab
 #        Useful when you don't want old log events to be overwritten by new, but increasing can slow down performance
 #        Default: 25
+#
+#    TimerBar.Fatigue.GMLevel
+#        Disable/enable fatigue for security level (0..4) or high
+#        Default: 4 (None)
+#
+#    TimerBar.Fatigue.Max
+#        Fatigue max timer value (in secs)
+#        Default: 60 (1 minute)
+#                  0 (instant death)
+#
+#    TimerBar.Breath.GMLevel
+#        Disable/enable waterbreathing for security level (0..4) or high
+#        Default: 4 (None)
+#
+#    TimerBar.Breath.Max
+#        Waterbreathing max timer value (in secs)
+#        Default: 180
+#                   0 (instant underwater breathing damage start)
+#
+#    TimerBar.Fire.GMLevel
+#        Disable/enable lava fire damage for security level (0..4) or high
+#        Default: 4 (None)
+#
+#    TimerBar.Fire.Max
+#        Lava damage delay max timer value (in secs)
+#        Default:  1
+#                  0 (instant in lava damage start)
 #
 #    MaxPrimaryTradeSkill
 #        Max count that player can learn the primary trade skill.
@@ -638,6 +667,12 @@ Quests.LowLevelHideDiff = 4
 Quests.HighLevelHideDiff = 7
 Guild.EventLogRecordsCount = 100
 Guild.BankEventLogRecordsCount = 25
+TimerBar.Fatigue.GMLevel = 4
+TimerBar.Fatigue.Max = 60
+TimerBar.Breath.GMLevel = 4
+TimerBar.Breath.Max = 180
+TimerBar.Fire.GMLevel = 4
+TimerBar.Fire.Max = 1
 MaxPrimaryTradeSkill = 2
 MinPetitionSigns = 9
 MaxGroupXPDistance = 74
@@ -826,6 +861,19 @@ ListenRange.Yell = 300
 #        Default: 0 (disible fake messages preventing)
 #                 1 (enabled fake messages preventing)
 #
+#    ChatStrictLinkChecking.Severity
+#        Check chat messages for ingame links to spells, items, quests, achievements etc.
+#        Default: 0 (disable link checking)
+#                 1 (check if only valid pipe commands are used. This prevents posting pictures for example)
+#                 2 (verifiy that pipe commands are used in a correct order)
+#                 3 (check if color, entry and name don't contradict each other. For correct work, please assure
+#                    that you have extracted locale DBCs of every language specific client playing on this server.)
+#
+#    ChatStrictLinkChecking.Kick
+#        Defines, what should be done if a message is considered to contain invalid pipe commands.
+#        Default: 0 (silently ignore message)
+#                 1 (kick players who sent invalid formed messages)
+#
 #    ChatFlood.MessageCount
 #        Chat anti-flood protection, haste message count to activate protection
 #        Default: 10
@@ -852,6 +900,8 @@ ListenRange.Yell = 300
 ###################################################################################################################
 
 ChatFakeMessagePreventing = 0
+ChatStrictLinkChecking.Severity = 0
+ChatStrictLinkChecking.Kick = 0
 ChatFlood.MessageCount = 10
 ChatFlood.MessageDelay = 1
 ChatFlood.MuteTime = 10
@@ -947,12 +997,12 @@ GM.AllowAchievementGain  = 1
 #                 1 (raid members 100% auto detect invisible player from same raid)
 #                 2 (players from same team can 100% auto detect invisible player)
 #
-#    Visibility.Distance.Creature
-#    Visibility.Distance.Player
-#        Visibility distance for different in game object
+#    Visibility.Distance.Continents
+#    Visibility.Distance.Instances
+#    Visibility.Distance.BGArenas
+#        Visibility distance for different ingame object in different maps.
+#        Visibility on continents on offy ~90 yards. In BG/Arenas ~180. For instances default ~120.
 #        Max limited by active player zone: ~ 333
-#        Min limit dependent from objects
-#        Default: 132 (cell size)
 #        Min limit is max aggro radius (45) * Rate.Creature.Aggro
 #
 #    Visibility.Distance.Object
@@ -978,8 +1028,9 @@ GM.AllowAchievementGain  = 1
 ###################################################################################################################
 
 Visibility.GroupMode = 0
-Visibility.Distance.Creature      = 100
-Visibility.Distance.Player        = 100
+Visibility.Distance.Continents    = 90
+Visibility.Distance.Instances     = 120
+Visibility.Distance.BGArenas      = 180
 Visibility.Distance.Object        = 100
 Visibility.Distance.InFlight      = 100
 Visibility.Distance.Grey.Unit   = 1

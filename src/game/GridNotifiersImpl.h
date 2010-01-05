@@ -31,9 +31,11 @@ template<class T>
 inline void
 MaNGOS::VisibleNotifier::Visit(GridRefManager<T> &m)
 {
+    WorldObject const* viewPoint = i_player.GetViewPoint();
+
     for(typename GridRefManager<T>::iterator iter = m.begin(); iter != m.end(); ++iter)
     {
-        i_player.UpdateVisibilityOf(iter->getSource(),i_data,i_data_updates,i_visibleNow);
+        i_player.UpdateVisibilityOf(viewPoint,iter->getSource(),i_data,i_data_updates,i_visibleNow);
         i_clientGUIDs.erase(iter->getSource()->GetGUID());
     }
 }
@@ -42,8 +44,7 @@ inline void
 MaNGOS::ObjectUpdater::Visit(CreatureMapType &m)
 {
     for(CreatureMapType::iterator iter=m.begin(); iter != m.end(); ++iter)
-        if(!iter->getSource()->isSpiritService())
-            iter->getSource()->Update(i_timeDiff);
+        iter->getSource()->Update(i_timeDiff);
 }
 
 inline void
@@ -64,10 +65,10 @@ MaNGOS::PlayerRelocationNotifier::Visit(PlayerMapType &m)
     }
 }
 
-inline void PlayerCreatureRelocationWorker(Player* pl, Creature* c)
+inline void PlayerCreatureRelocationWorker(Player* pl, WorldObject const* viewPoint, Creature* c)
 {
     // update creature visibility at player/creature move
-    pl->UpdateVisibilityOf(c);
+    pl->UpdateVisibilityOf(viewPoint,c);
 
     // Creature AI reaction
     if(!c->hasUnitState(UNIT_STAT_SEARCHING | UNIT_STAT_FLEEING))
@@ -98,9 +99,11 @@ MaNGOS::PlayerRelocationNotifier::Visit(CreatureMapType &m)
     if(!i_player.isAlive() || i_player.isInFlight())
         return;
 
+    WorldObject const* viewPoint = i_player.GetViewPoint();
+
     for(CreatureMapType::iterator iter=m.begin(); iter != m.end(); ++iter)
-        if( iter->getSource()->isAlive())
-            PlayerCreatureRelocationWorker(&i_player,iter->getSource());
+        if (iter->getSource()->isAlive())
+            PlayerCreatureRelocationWorker(&i_player,viewPoint,iter->getSource());
 }
 
 template<>
@@ -111,8 +114,9 @@ MaNGOS::CreatureRelocationNotifier::Visit(PlayerMapType &m)
         return;
 
     for(PlayerMapType::iterator iter=m.begin(); iter != m.end(); ++iter)
-        if( iter->getSource()->isAlive() && !iter->getSource()->isInFlight())
-            PlayerCreatureRelocationWorker(iter->getSource(), &i_creature);
+        if (Player* player = iter->getSource())
+            if (player->isAlive() && !player->isInFlight())
+                PlayerCreatureRelocationWorker(player, player->GetViewPoint(), &i_creature);
 }
 
 template<>

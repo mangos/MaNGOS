@@ -94,10 +94,10 @@ class GameEventMgr
         GameEventIdMap    mGameEventPoolIds;
         GameEventDataMap  mGameEvent;
         ActiveEvents m_ActiveEvents;
-        bool isSystemInit;
+        bool m_IsGameEventsInit;
 };
 
-#define gameeventmgr MaNGOS::Singleton<GameEventMgr>::Instance()
+#define sGameEventMgr MaNGOS::Singleton<GameEventMgr>::Instance()
 
 MANGOS_DLL_SPEC bool IsHolidayActive(HolidayIds id);
 

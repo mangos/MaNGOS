@@ -159,6 +159,11 @@ uint32 BigNumber::AsDword()
     return (uint32)BN_get_word(_bn);
 }
 
+bool BigNumber::isZero() const
+{
+    return BN_is_zero(_bn)!=0;
+}
+
 uint8 *BigNumber::AsByteArray(int minSize)
 {
     int length = (minSize >= GetNumBytes()) ? minSize : GetNumBytes();
@@ -179,21 +184,6 @@ uint8 *BigNumber::AsByteArray(int minSize)
     std::reverse(_array, _array + length);
 
     return _array;
-}
-
-ByteBuffer BigNumber::AsByteBuffer()
-{
-    ByteBuffer ret(GetNumBytes());
-    ret.append(AsByteArray(), GetNumBytes());
-    return ret;
-}
-
-std::vector<uint8> BigNumber::AsByteVector()
-{
-    std::vector<uint8> ret;
-    ret.resize(GetNumBytes());
-    memcpy(&ret[0], AsByteArray(), GetNumBytes());
-    return ret;
 }
 
 const char *BigNumber::AsHexStr()

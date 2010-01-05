@@ -26,6 +26,7 @@
 #include "Log.h"
 #include "World.h"
 #include "ObjectMgr.h"
+#include "ObjectDefines.h"
 #include "Player.h"
 #include "UpdateMask.h"
 #include "NPCHandler.h"
@@ -36,11 +37,10 @@ void WorldSession::SendNameQueryOpcode(Player *p)
 {
     if(!p)
         return;
-
                                                             // guess size
     WorldPacket data( SMSG_NAME_QUERY_RESPONSE, (8+1+1+1+1+1+10) );
     data.append(p->GetPackGUID());                          // player guid
-    data << uint8(0);                                       // added in 3.1
+    data << uint8(0);                                       // added in 3.1; if > 1, then end of packet
     data << p->GetName();                                   // played name
     data << uint8(0);                                       // realm name for cross realm BG usage
     data << uint8(p->getRace());
@@ -100,11 +100,10 @@ void WorldSession::SendNameQueryOpcodeFromDBCallBack(QueryResult *result, uint32
         pGender      = fields[3].GetUInt8();
         pClass       = fields[4].GetUInt8();
     }
-
                                                             // guess size
     WorldPacket data( SMSG_NAME_QUERY_RESPONSE, (8+1+1+1+1+1+1+10) );
     data.appendPackGUID(MAKE_NEW_GUID(guid, 0, HIGHGUID_PLAYER));
-    data << uint8(0);                                       // added in 3.1
+    data << uint8(0);                                       // added in 3.1; if > 1, then end of packet
     data << name;
     data << uint8(0);                                       // realm name for cross realm BG usage
     data << uint8(pRace);                                   // race
@@ -131,7 +130,7 @@ void WorldSession::HandleNameQueryOpcode( WorldPacket & recv_data )
 
     recv_data >> guid;
 
-    Player *pChar = objmgr.GetPlayer(guid);
+    Player *pChar = sObjectMgr.GetPlayer(guid);
 
     if (pChar)
         SendNameQueryOpcode(pChar);
@@ -152,9 +151,10 @@ void WorldSession::HandleCreatureQueryOpcode( WorldPacket & recv_data )
 {
     uint32 entry;
     recv_data >> entry;
-    recv_data.read_skip<uint64>();                          // guid
+    uint64 guid;
+    recv_data >> guid;
 
-    CreatureInfo const *ci = objmgr.GetCreatureTemplate(entry);
+    CreatureInfo const *ci = ObjectMgr::GetCreatureTemplate(entry);
     if (ci)
     {
 
@@ -165,7 +165,7 @@ void WorldSession::HandleCreatureQueryOpcode( WorldPacket & recv_data )
         int loc_idx = GetSessionDbLocaleIndex();
         if (loc_idx >= 0)
         {
-            CreatureLocale const *cl = objmgr.GetCreatureLocale(entry);
+            CreatureLocale const *cl = sObjectMgr.GetCreatureLocale(entry);
             if (cl)
             {
                 if (cl->Name.size() > size_t(loc_idx) && !cl->Name[loc_idx].empty())
@@ -195,17 +195,14 @@ void WorldSession::HandleCreatureQueryOpcode( WorldPacket & recv_data )
         data << float(ci->unk16);                           // unk
         data << float(ci->unk17);                           // unk
         data << uint8(ci->RacialLeader);
-        for(uint32 i = 0; i < 4; ++i)
-            data << uint32(ci->questItems[i]);              // itemId[4], quest drop
+        for(uint32 i = 0; i < 6; ++i)
+            data << uint32(ci->questItems[i]);              // itemId[6], quest drop
         data << uint32(ci->movementId);                     // CreatureMovementInfo.dbc
         SendPacket( &data );
         sLog.outDebug( "WORLD: Sent SMSG_CREATURE_QUERY_RESPONSE" );
     }
     else
     {
-        uint64 guid;
-        recv_data >> guid;
-
         sLog.outDebug("WORLD: CMSG_CREATURE_QUERY - NO CREATURE INFO! (GUID: %u, ENTRY: %u)",
             GUID_LOPART(guid), entry);
         WorldPacket data( SMSG_CREATURE_QUERY_RESPONSE, 4 );
@@ -220,9 +217,10 @@ void WorldSession::HandleGameObjectQueryOpcode( WorldPacket & recv_data )
 {
     uint32 entryID;
     recv_data >> entryID;
-    recv_data.read_skip<uint64>();                          // guid
+    uint64 guid;
+    recv_data >> guid;
 
-    const GameObjectInfo *info = objmgr.GetGameObjectInfo(entryID);
+    const GameObjectInfo *info = ObjectMgr::GetGameObjectInfo(entryID);
     if(info)
     {
         std::string Name;
@@ -236,7 +234,7 @@ void WorldSession::HandleGameObjectQueryOpcode( WorldPacket & recv_data )
         int loc_idx = GetSessionDbLocaleIndex();
         if (loc_idx >= 0)
         {
-            GameObjectLocale const *gl = objmgr.GetGameObjectLocale(entryID);
+            GameObjectLocale const *gl = sObjectMgr.GetGameObjectLocale(entryID);
             if (gl)
             {
                 if (gl->Name.size() > size_t(loc_idx) && !gl->Name[loc_idx].empty())
@@ -257,17 +255,13 @@ void WorldSession::HandleGameObjectQueryOpcode( WorldPacket & recv_data )
         data << info->unk1;                                 // 2.0.3, string
         data.append(info->raw.data, 24);
         data << float(info->size);                          // go size
-        for(uint32 i = 0; i < 4; ++i)
-            data << uint32(info->questItems[i]);            // itemId[4], quest drop
+        for(uint32 i = 0; i < 6; ++i)
+            data << uint32(info->questItems[i]);            // itemId[6], quest drop
         SendPacket( &data );
         sLog.outDebug( "WORLD: Sent SMSG_GAMEOBJECT_QUERY_RESPONSE" );
     }
     else
     {
-
-        uint64 guid;
-        recv_data >> guid;
-
         sLog.outDebug(  "WORLD: CMSG_GAMEOBJECT_QUERY - Missing gameobject info for (GUID: %u, ENTRY: %u)",
             GUID_LOPART(guid), entryID );
         WorldPacket data ( SMSG_GAMEOBJECT_QUERY_RESPONSE, 4 );
@@ -306,7 +300,7 @@ void WorldSession::HandleCorpseQueryOpcode(WorldPacket & /*recv_data*/)
             if(corpseMapEntry->IsDungeon() && corpseMapEntry->entrance_map >= 0)
             {
                 // if corpse map have entrance
-                if(Map const* entranceMap = MapManager::Instance().CreateBaseMap(corpseMapEntry->entrance_map))
+                if(Map const* entranceMap = sMapMgr.CreateBaseMap(corpseMapEntry->entrance_map))
                 {
                     mapid = corpseMapEntry->entrance_map;
                     x = corpseMapEntry->entrance_x;
@@ -317,13 +311,14 @@ void WorldSession::HandleCorpseQueryOpcode(WorldPacket & /*recv_data*/)
         }
     }
 
-    WorldPacket data(MSG_CORPSE_QUERY, 1+(5*4));
+    WorldPacket data(MSG_CORPSE_QUERY, 1+(6*4));
     data << uint8(1);                                       // corpse found
     data << int32(mapid);
     data << float(x);
     data << float(y);
     data << float(z);
     data << int32(corpsemapid);
+    data << uint32(0);                                      // unknown
     SendPacket(&data);
 }
 
@@ -336,9 +331,9 @@ void WorldSession::HandleNpcTextQueryOpcode( WorldPacket & recv_data )
     sLog.outDetail("WORLD: CMSG_NPC_TEXT_QUERY ID '%u'", textID);
 
     recv_data >> guid;
-    GetPlayer()->SetUInt64Value(UNIT_FIELD_TARGET, guid);
+    _player->SetTargetGUID(guid);
 
-    GossipText const* pGossip = objmgr.GetGossipText(textID);
+    GossipText const* pGossip = sObjectMgr.GetGossipText(textID);
 
     WorldPacket data( SMSG_NPC_TEXT_UPDATE, 100 );          // guess size
     data << textID;
@@ -371,7 +366,7 @@ void WorldSession::HandleNpcTextQueryOpcode( WorldPacket & recv_data )
         int loc_idx = GetSessionDbLocaleIndex();
         if (loc_idx >= 0)
         {
-            NpcTextLocale const *nl = objmgr.GetNpcTextLocale(textID);
+            NpcTextLocale const *nl = sObjectMgr.GetNpcTextLocale(textID);
             if (nl)
             {
                 for (int i = 0; i < 8; ++i)
@@ -415,10 +410,12 @@ void WorldSession::HandleNpcTextQueryOpcode( WorldPacket & recv_data )
 
 void WorldSession::HandlePageTextQueryOpcode( WorldPacket & recv_data )
 {
-    uint32 pageID;
+    sLog.outDetail("WORLD: Received CMSG_PAGE_TEXT_QUERY");
+    recv_data.hexlike();
 
+    uint32 pageID;
     recv_data >> pageID;
-    sLog.outDetail("WORLD: Received CMSG_PAGE_TEXT_QUERY for pageID '%u'", pageID);
+    recv_data.read_skip<uint64>();                          // guid
 
     while (pageID)
     {
@@ -440,7 +437,7 @@ void WorldSession::HandlePageTextQueryOpcode( WorldPacket & recv_data )
             int loc_idx = GetSessionDbLocaleIndex();
             if (loc_idx >= 0)
             {
-                PageTextLocale const *pl = objmgr.GetPageTextLocale(pageID);
+                PageTextLocale const *pl = sObjectMgr.GetPageTextLocale(pageID);
                 if (pl)
                 {
                     if (pl->Text.size() > size_t(loc_idx) && !pl->Text[loc_idx].empty())
@@ -456,4 +453,19 @@ void WorldSession::HandlePageTextQueryOpcode( WorldPacket & recv_data )
 
         sLog.outDebug( "WORLD: Sent SMSG_PAGE_TEXT_QUERY_RESPONSE" );
     }
+}
+
+void WorldSession::HandleCorpseMapPositionQuery( WorldPacket & recv_data )
+{
+    sLog.outDebug( "WORLD: Recv CMSG_CORPSE_MAP_POSITION_QUERY" );
+
+    uint32 unk;
+    recv_data >> unk;
+
+    WorldPacket data(CMSG_CORPSE_MAP_POSITION_QUERY_RESPONSE, 4+4+4+4);
+    data << float(0);
+    data << float(0);
+    data << float(0);
+    data << float(0);
+    SendPacket(&data);
 }

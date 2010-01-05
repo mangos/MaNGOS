@@ -47,12 +47,10 @@ EXTRA_DIST = \
 	Platform/Define.h \
 	Policies/CreationPolicy.h \
 	Policies/ObjectLifeTime.h \
+	Policies/MemoryManagement.cpp \
 	Policies/Singleton.h \
 	Policies/SingletonImp.h \
 	Policies/ThreadingModel.h \
-	Utilities/CountedReference/Reference.h \
-	Utilities/CountedReference/ReferenceHolder.h \
-	Utilities/CountedReference/ReferenceImpl.h \
 	Utilities/LinkedReference/RefManager.h \
 	Utilities/LinkedReference/Reference.h \
 	Utilities/ByteConverter.h \

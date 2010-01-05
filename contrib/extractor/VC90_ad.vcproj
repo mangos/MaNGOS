@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="ad"
 	ProjectGUID="{D7552D4F-408F-4F8E-859B-366659150CF4}"
 	RootNamespace="ad"
@@ -216,15 +216,7 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
 			<File
-				RelativePath=".\loadlib\loadlib.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\loadlib\adt.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\loadlib\wdt.cpp"
 				>
 			</File>
 			<File
@@ -245,6 +237,10 @@
 			</File>
 			<File
 				RelativePath=".\libmpq\huffman.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\loadlib\loadlib.cpp"
 				>
 			</File>
 			<File
@@ -287,11 +283,19 @@
 				RelativePath=".\libmpq\wave.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\loadlib\wdt.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl"
 			>
+			<File
+				RelativePath=".\loadlib\adt.h"
+				>
+			</File>
 			<File
 				RelativePath=".\libmpq\common.h"
 				>
@@ -309,6 +313,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\loadlib\loadlib.h"
+				>
+			</File>
+			<File
 				RelativePath=".\libmpq\mpq.h"
 				>
 			</File>
@@ -318,6 +326,10 @@
 			</File>
 			<File
 				RelativePath=".\libmpq\wave.h"
+				>
+			</File>
+			<File
+				RelativePath=".\loadlib\wdt.h"
 				>
 			</File>
 		</Filter>

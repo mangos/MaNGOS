@@ -159,6 +159,7 @@ class MANGOS_DLL_SPEC Aura
         void HandleFarSight(bool Apply, bool Real);
         void HandleModPossessPet(bool Apply, bool Real);
         void HandleModMechanicImmunity(bool Apply, bool Real);
+        void HandleModMechanicImmunityMask(bool Apply, bool Real);
         void HandleAuraModSkill(bool Apply, bool Real);
         void HandleModDamagePercentDone(bool Apply, bool Real);
         void HandleModPercentStat(bool Apply, bool Real);
@@ -211,6 +212,9 @@ class MANGOS_DLL_SPEC Aura
         void HandleAuraIncreaseBaseHealthPercent(bool Apply, bool Real);
         void HandleNoReagentUseAura(bool Apply, bool Real);
         void HandlePhase(bool Apply, bool Real);
+        void HandleModTargetArmorPct(bool Apply, bool Real);
+        void HandleAuraModAllCritChance(bool Apply, bool Real);
+        void HandleAllowOnlyAbility(bool Apply, bool Real);
 
         virtual ~Aura();
 
@@ -230,7 +234,9 @@ class MANGOS_DLL_SPEC Aura
         void SetAuraMaxDuration(int32 duration) { m_maxduration = duration; }
         int32 GetAuraDuration() const { return m_duration; }
         void SetAuraDuration(int32 duration) { m_duration = duration; }
-        time_t GetAuraApplyTime() { return m_applyTime; }
+        time_t GetAuraApplyTime() const { return m_applyTime; }
+        uint32 GetAuraTicks() const { return m_periodicTick; }
+        uint32 GetAuraMaxTicks() const { return m_maxduration > 0 && m_modifier.periodictime > 0 ? m_maxduration / m_modifier.periodictime : 0; }
 
         SpellModifier *getAuraSpellMod() {return m_spellmod; }
 
@@ -245,6 +251,9 @@ class MANGOS_DLL_SPEC Aura
             m_maxduration = maxduration;
             m_duration = duration;
             m_procCharges = charges;
+
+            if(uint32 maxticks = GetAuraMaxTicks())
+                m_periodicTick = maxticks - m_duration / m_modifier.periodictime;
         }
 
         uint8 GetAuraSlot() const { return m_auraSlot; }
@@ -261,10 +270,17 @@ class MANGOS_DLL_SPEC Aura
             m_procCharges = charges;
             SendAuraUpdate(false);
         }
-        bool DropAuraCharge() // return true if last charge dropped
+        bool DropAuraCharge()                               // return true if last charge dropped
         {
             if (m_procCharges == 0)
                 return false;
+
+            // exist spells that have maxStack > 1 and m_procCharges > 0 (==1 in fact)
+            // all like stacks have 1 value in one from this fields
+            // so return true for allow remove one aura from stacks as expired
+            if (GetStackAmount() > 1)
+                return true;
+
             m_procCharges--;
             SendAuraUpdate(false);
             return m_procCharges == 0;
@@ -328,7 +344,7 @@ class MANGOS_DLL_SPEC Aura
         void TriggerSpell();
         void TriggerSpellWithValue();
 
-        uint32 const *getAuraSpellClassMask() const { return  m_spellProto->EffectSpellClassMaskA + m_effIndex * 3; }
+        uint32 const *getAuraSpellClassMask() const { return  m_spellProto->GetEffectSpellClassMask(m_effIndex); }
         bool isAffectedOnSpell(SpellEntry const *spell) const;
     protected:
         Aura(SpellEntry const* spellproto, uint32 eff, int32 *currentBasePoints, Unit *target, Unit *caster = NULL, Item* castItem = NULL);
@@ -341,6 +357,7 @@ class MANGOS_DLL_SPEC Aura
         void PeriodicDummyTick();
 
         bool IsCritFromAbilityAura(Unit* caster, uint32& damage);
+        void ReapplyAffectedPassiveAuras(Unit* target, bool owner_mode);
 
         Modifier m_modifier;
         SpellModifier *m_spellmod;
@@ -356,6 +373,7 @@ class MANGOS_DLL_SPEC Aura
         int32 m_duration;                                   // Current time
         int32 m_timeCla;                                    // Timer for power per sec calcultion
         int32 m_periodicTimer;                              // Timer for periodic auras
+        uint32 m_periodicTick;                              // Tick count pass (including current if use in tick code) from aura apply, used for some tick count dependent aura effects
 
         AuraRemoveMode m_removeMode:8;                      // Store info for know remove aura reason
         DiminishingGroup m_AuraDRGroup:8;                   // Diminishing
@@ -381,6 +399,7 @@ class MANGOS_DLL_SPEC Aura
         uint32 m_in_use;                                    // > 0 while in Aura::ApplyModifier call/Aura::Update/etc
     private:
         void CleanupTriggeredSpells();
+        bool IsNeedVisibleSlot(Unit const* caster) const;   // helper for check req. visibility slot
 };
 
 class MANGOS_DLL_SPEC AreaAura : public Aura

@@ -25,13 +25,14 @@
 #include "GridNotifiers.h"
 #include "CellImpl.h"
 #include "GridNotifiersImpl.h"
+#include "SpellMgr.h"
 
-DynamicObject::DynamicObject() : WorldObject()
+DynamicObject::DynamicObject() : WorldObject(), m_isActiveObject(false)
 {
     m_objectType |= TYPEMASK_DYNAMICOBJECT;
     m_objectTypeId = TYPEID_DYNAMICOBJECT;
 
-    m_updateFlag = (UPDATEFLAG_HIGHGUID | UPDATEFLAG_HAS_POSITION);
+    m_updateFlag = (UPDATEFLAG_HIGHGUID | UPDATEFLAG_HAS_POSITION | UPDATEFLAG_POSITION);
 
     m_valuesCount = DYNAMICOBJECT_END;
 }
@@ -40,7 +41,7 @@ void DynamicObject::AddToWorld()
 {
     ///- Register the dynamicObject for guid lookup
     if(!IsInWorld())
-        ObjectAccessor::Instance().AddObject(this);
+        GetMap()->GetObjectsStore().insert<DynamicObject>(GetGUID(), (DynamicObject*)this);
 
     Object::AddToWorld();
 }
@@ -49,7 +50,7 @@ void DynamicObject::RemoveFromWorld()
 {
     ///- Remove the dynamicObject from the accessor
     if(IsInWorld())
-        ObjectAccessor::Instance().RemoveObject(this);
+        GetMap()->GetObjectsStore().erase<DynamicObject>(GetGUID(), (DynamicObject*)NULL);
 
     Object::RemoveFromWorld();
 }
@@ -72,15 +73,17 @@ bool DynamicObject::Create( uint32 guidlow, Unit *caster, uint32 spellId, uint32
     SetUInt32Value( DYNAMICOBJECT_BYTES, 0x00000001 );
     SetUInt32Value( DYNAMICOBJECT_SPELLID, spellId );
     SetFloatValue( DYNAMICOBJECT_RADIUS, radius);
-    SetFloatValue( DYNAMICOBJECT_POS_X, x );
-    SetFloatValue( DYNAMICOBJECT_POS_Y, y );
-    SetFloatValue( DYNAMICOBJECT_POS_Z, z );
     SetUInt32Value( DYNAMICOBJECT_CASTTIME, getMSTime() );  // new 2.4.0
 
     m_aliveDuration = duration;
     m_radius = radius;
     m_effIndex = effIndex;
     m_spellId = spellId;
+
+    // set to active for far sight case
+    if(SpellEntry const* spellEntry = sSpellStore.LookupEntry(spellId))
+        m_isActiveObject = IsSpellHaveEffect(spellEntry,SPELL_EFFECT_ADD_FARSIGHT);
+
     return true;
 }
 
@@ -107,20 +110,24 @@ void DynamicObject::Update(uint32 p_time)
     else
         deleteThis = true;
 
-    // TODO: make a timer and update this in larger intervals
-    CellPair p(MaNGOS::ComputeCellPair(GetPositionX(), GetPositionY()));
-    Cell cell(p);
-    cell.data.Part.reserved = ALL_DISTRICT;
-    cell.SetNoCreate();
+    // have radius and work as persistent effect
+    if(m_radius)
+    {
+        // TODO: make a timer and update this in larger intervals
+        CellPair p(MaNGOS::ComputeCellPair(GetPositionX(), GetPositionY()));
+        Cell cell(p);
+        cell.data.Part.reserved = ALL_DISTRICT;
+        cell.SetNoCreate();
 
-    MaNGOS::DynamicObjectUpdater notifier(*this, caster);
+        MaNGOS::DynamicObjectUpdater notifier(*this, caster);
 
-    TypeContainerVisitor<MaNGOS::DynamicObjectUpdater, WorldTypeMapContainer > world_object_notifier(notifier);
-    TypeContainerVisitor<MaNGOS::DynamicObjectUpdater, GridTypeMapContainer > grid_object_notifier(notifier);
+        TypeContainerVisitor<MaNGOS::DynamicObjectUpdater, WorldTypeMapContainer > world_object_notifier(notifier);
+        TypeContainerVisitor<MaNGOS::DynamicObjectUpdater, GridTypeMapContainer > grid_object_notifier(notifier);
 
-    CellLock<GridReadGuard> cell_lock(cell, p);
-    cell_lock->Visit(cell_lock, world_object_notifier, *GetMap());
-    cell_lock->Visit(cell_lock, grid_object_notifier,  *GetMap());
+        CellLock<GridReadGuard> cell_lock(cell, p);
+        cell_lock->Visit(cell_lock, world_object_notifier, *GetMap(), *this, m_radius);
+        cell_lock->Visit(cell_lock, grid_object_notifier,  *GetMap(), *this, m_radius);
+    }
 
     if(deleteThis)
     {
@@ -143,7 +150,15 @@ void DynamicObject::Delay(int32 delaytime)
             (*iunit)->DelayAura(m_spellId, m_effIndex, delaytime);
 }
 
-bool DynamicObject::isVisibleForInState(Player const* u, bool inVisibleList) const
+bool DynamicObject::isVisibleForInState(Player const* u, WorldObject const* viewPoint, bool inVisibleList) const
 {
-    return IsInWorld() && u->IsInWorld() && IsWithinDistInMap(u, World::GetMaxVisibleDistanceForObject() + (inVisibleList ? World::GetVisibleObjectGreyDistance() : 0.0f), false);
+    if(!IsInWorld() || !u->IsInWorld())
+        return false;
+
+    // always seen by owner
+    if(GetCasterGUID()==u->GetGUID())
+        return true;
+
+    // normal case
+    return IsWithinDistInMap(viewPoint, World::GetMaxVisibleDistanceForObject() + (inVisibleList ? World::GetVisibleObjectGreyDistance() : 0.0f), false);
 }

@@ -617,14 +617,6 @@
 			Name="Util"
 			>
 			<File
-				RelativePath="..\..\src\shared\Base.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\shared\Base.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\src\shared\ByteBuffer.h"
 				>
 			</File>
@@ -919,6 +911,10 @@
 		</File>
 		<File
 			RelativePath="..\..\src\shared\revision_nr.h"
+			>
+		</File>
+		<File
+			RelativePath="..\..\src\shared\revision_sql.h"
 			>
 		</File>
 		<File

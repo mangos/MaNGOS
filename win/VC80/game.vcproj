@@ -566,6 +566,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\game\BattleGroundABG.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\BattleGroundABG.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\game\BattleGroundAV.cpp"
 				>
 			</File>
@@ -599,6 +607,14 @@
 			</File>
 			<File
 				RelativePath="..\..\src\game\BattleGroundHandler.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\BattleGroundIC.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\BattleGroundIC.h"
 				>
 			</File>
 			<File
@@ -862,11 +878,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\game\PoolHandler.cpp"
+				RelativePath="..\..\src\game\PoolManager.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\game\PoolHandler.h"
+				RelativePath="..\..\src\game\PoolManager.h"
 				>
 			</File>
 			<File
@@ -1470,14 +1486,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\game\WorldLog.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\game\WorldLog.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\src\game\WorldSession.cpp"
 				>
 			</File>
@@ -1570,11 +1578,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\game\HostilRefManager.cpp"
+				RelativePath="..\..\src\game\HostileRefManager.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\game\HostilRefManager.h"
+				RelativePath="..\..\src\game\HostileRefManager.h"
 				>
 			</File>
 			<File

@@ -28,6 +28,7 @@
 #include "Language.h"
 #include "Log.h"
 #include "ObjectMgr.h"
+#include "ObjectDefines.h"
 #include "Player.h"
 #include "World.h"
 #include "WorldPacket.h"
@@ -79,7 +80,7 @@ void AuctionHouseMgr::SendAuctionWonMail( AuctionEntry *auction )
         return;
 
     uint64 bidder_guid = MAKE_NEW_GUID(auction->bidder, 0, HIGHGUID_PLAYER);
-    Player *bidder = objmgr.GetPlayer(bidder_guid);
+    Player *bidder = sObjectMgr.GetPlayer(bidder_guid);
 
     uint32 bidder_accId = 0;
 
@@ -96,30 +97,30 @@ void AuctionHouseMgr::SendAuctionWonMail( AuctionEntry *auction )
         }
         else
         {
-            bidder_accId = objmgr.GetPlayerAccountIdByGUID(bidder_guid);
-            bidder_security = accmgr.GetSecurity(bidder_accId);
+            bidder_accId = sObjectMgr.GetPlayerAccountIdByGUID(bidder_guid);
+            bidder_security = sAccountMgr.GetSecurity(bidder_accId);
 
             if(bidder_security > SEC_PLAYER )               // not do redundant DB requests
             {
-                if(!objmgr.GetPlayerNameByGUID(bidder_guid,bidder_name))
-                    bidder_name = objmgr.GetMangosStringForDBCLocale(LANG_UNKNOWN);
+                if(!sObjectMgr.GetPlayerNameByGUID(bidder_guid,bidder_name))
+                    bidder_name = sObjectMgr.GetMangosStringForDBCLocale(LANG_UNKNOWN);
             }
         }
 
         if( bidder_security > SEC_PLAYER )
         {
             std::string owner_name;
-            if(!objmgr.GetPlayerNameByGUID(auction->owner,owner_name))
-                owner_name = objmgr.GetMangosStringForDBCLocale(LANG_UNKNOWN);
+            if(!sObjectMgr.GetPlayerNameByGUID(auction->owner,owner_name))
+                owner_name = sObjectMgr.GetMangosStringForDBCLocale(LANG_UNKNOWN);
 
-            uint32 owner_accid = objmgr.GetPlayerAccountIdByGUID(auction->owner);
+            uint32 owner_accid = sObjectMgr.GetPlayerAccountIdByGUID(auction->owner);
 
             sLog.outCommand(bidder_accId,"GM %s (Account: %u) won item in auction: %s (Entry: %u Count: %u) and pay money: %u. Original owner %s (Account: %u)",
                 bidder_name.c_str(),bidder_accId,pItem->GetProto()->Name1,pItem->GetEntry(),pItem->GetCount(),auction->bid,owner_name.c_str(),owner_accid);
         }
     }
     else if(!bidder)
-        bidder_accId = objmgr.GetPlayerAccountIdByGUID(bidder_guid);
+        bidder_accId = sObjectMgr.GetPlayerAccountIdByGUID(bidder_guid);
 
     // receiver exist
     if(bidder || bidder_accId)
@@ -134,15 +135,12 @@ void AuctionHouseMgr::SendAuctionWonMail( AuctionEntry *auction )
         sLog.outDebug( "AuctionWon body string : %s", msgAuctionWonBody.str().c_str() );
 
         //prepare mail data... :
-        uint32 itemTextId = objmgr.CreateItemText( msgAuctionWonBody.str() );
+        uint32 itemTextId = sObjectMgr.CreateItemText( msgAuctionWonBody.str() );
 
         // set owner to bidder (to prevent delete item with sender char deleting)
         // owner in `data` will set at mail receive and item extracting
         CharacterDatabase.PExecute("UPDATE item_instance SET owner_guid = '%u' WHERE guid='%u'",auction->bidder,pItem->GetGUIDLow());
         CharacterDatabase.CommitTransaction();
-
-        MailItemsInfo mi;
-        mi.AddItem(auction->item_guidlow, auction->item_template, pItem);
 
         if (bidder)
             bidder->GetSession()->SendAuctionBidderNotification( auction->GetHouseId(), auction->Id, bidder_guid, 0, 0, auction->item_template);
@@ -150,7 +148,9 @@ void AuctionHouseMgr::SendAuctionWonMail( AuctionEntry *auction )
             RemoveAItem(pItem->GetGUIDLow());               // we have to remove the item, before we delete it !!
 
         // will delete item or place to receiver mail list
-        WorldSession::SendMailTo(bidder, MAIL_AUCTION, MAIL_STATIONERY_AUCTION, auction->GetHouseId(), auction->bidder, msgAuctionWonSubject.str(), itemTextId, &mi, 0, 0, MAIL_CHECK_MASK_AUCTION);
+        MailDraft(msgAuctionWonSubject.str(), itemTextId)
+            .AddItem(pItem)
+            .SendMailTo(MailReceiver(bidder,auction->bidder), auction, MAIL_CHECK_MASK_AUCTION);
     }
     // receiver not exist
     else
@@ -164,10 +164,10 @@ void AuctionHouseMgr::SendAuctionWonMail( AuctionEntry *auction )
 void AuctionHouseMgr::SendAuctionSalePendingMail( AuctionEntry * auction )
 {
     uint64 owner_guid = MAKE_NEW_GUID(auction->owner, 0, HIGHGUID_PLAYER);
-    Player *owner = objmgr.GetPlayer(owner_guid);
+    Player *owner = sObjectMgr.GetPlayer(owner_guid);
 
     // owner exist (online or offline)
-    if(owner || objmgr.GetPlayerAccountIdByGUID(owner_guid))
+    if(owner || sObjectMgr.GetPlayerAccountIdByGUID(owner_guid))
     {
         std::ostringstream msgAuctionSalePendingSubject;
         msgAuctionSalePendingSubject << auction->item_template << ":0:" << AUCTION_SALE_PENDING;
@@ -185,9 +185,10 @@ void AuctionHouseMgr::SendAuctionSalePendingMail( AuctionEntry * auction )
 
         sLog.outDebug("AuctionSalePending body string : %s", msgAuctionSalePendingBody.str().c_str());
 
-        uint32 itemTextId = objmgr.CreateItemText( msgAuctionSalePendingBody.str() );
+        uint32 itemTextId = sObjectMgr.CreateItemText( msgAuctionSalePendingBody.str() );
 
-        WorldSession::SendMailTo(owner, MAIL_AUCTION, MAIL_STATIONERY_AUCTION, auction->GetHouseId(), auction->owner, msgAuctionSalePendingSubject.str(), itemTextId, NULL, 0, 0, MAIL_CHECK_MASK_AUCTION);
+        MailDraft(msgAuctionSalePendingSubject.str(), itemTextId)
+            .SendMailTo(MailReceiver(owner,auction->owner), auction, MAIL_CHECK_MASK_AUCTION);
     }
 }
 
@@ -195,11 +196,11 @@ void AuctionHouseMgr::SendAuctionSalePendingMail( AuctionEntry * auction )
 void AuctionHouseMgr::SendAuctionSuccessfulMail( AuctionEntry * auction )
 {
     uint64 owner_guid = MAKE_NEW_GUID(auction->owner, 0, HIGHGUID_PLAYER);
-    Player *owner = objmgr.GetPlayer(owner_guid);
+    Player *owner = sObjectMgr.GetPlayer(owner_guid);
 
     uint32 owner_accId = 0;
     if(!owner)
-        owner_accId = objmgr.GetPlayerAccountIdByGUID(owner_guid);
+        owner_accId = sObjectMgr.GetPlayerAccountIdByGUID(owner_guid);
 
     // owner exist
     if(owner || owner_accId)
@@ -217,7 +218,7 @@ void AuctionHouseMgr::SendAuctionSuccessfulMail( AuctionEntry * auction )
 
         sLog.outDebug("AuctionSuccessful body string : %s", auctionSuccessfulBody.str().c_str());
 
-        uint32 itemTextId = objmgr.CreateItemText( auctionSuccessfulBody.str() );
+        uint32 itemTextId = sObjectMgr.CreateItemText( auctionSuccessfulBody.str() );
 
         uint32 profit = auction->bid + auction->deposit - auctionCut;
 
@@ -229,7 +230,9 @@ void AuctionHouseMgr::SendAuctionSuccessfulMail( AuctionEntry * auction )
             owner->GetSession()->SendAuctionOwnerNotification( auction );
         }
 
-        WorldSession::SendMailTo(owner, MAIL_AUCTION, MAIL_STATIONERY_AUCTION, auction->GetHouseId(), auction->owner, msgAuctionSuccessfulSubject.str(), itemTextId, NULL, profit, 0, MAIL_CHECK_MASK_AUCTION, HOUR);
+        MailDraft(msgAuctionSuccessfulSubject.str(), itemTextId)
+            .AddMoney(profit)
+            .SendMailTo(MailReceiver(owner,auction->owner), auction, MAIL_CHECK_MASK_AUCTION, HOUR);
     }
 }
 
@@ -244,11 +247,11 @@ void AuctionHouseMgr::SendAuctionExpiredMail( AuctionEntry * auction )
     }
 
     uint64 owner_guid = MAKE_NEW_GUID(auction->owner, 0, HIGHGUID_PLAYER);
-    Player *owner = objmgr.GetPlayer(owner_guid);
+    Player *owner = sObjectMgr.GetPlayer(owner_guid);
 
     uint32 owner_accId = 0;
     if(!owner)
-        owner_accId = objmgr.GetPlayerAccountIdByGUID(owner_guid);
+        owner_accId = sObjectMgr.GetPlayerAccountIdByGUID(owner_guid);
 
     // owner exist
     if(owner || owner_accId)
@@ -261,11 +264,10 @@ void AuctionHouseMgr::SendAuctionExpiredMail( AuctionEntry * auction )
         else
             RemoveAItem(pItem->GetGUIDLow());               // we have to remove the item, before we delete it !!
 
-        MailItemsInfo mi;
-        mi.AddItem(auction->item_guidlow, auction->item_template, pItem);
-
         // will delete item or place to receiver mail list
-        WorldSession::SendMailTo(owner, MAIL_AUCTION, MAIL_STATIONERY_AUCTION, auction->GetHouseId(), GUID_LOPART(owner_guid), subject.str(), 0, &mi, 0, 0, MAIL_CHECK_MASK_NONE);
+        MailDraft(subject.str())
+            .AddItem(pItem)
+            .SendMailTo(MailReceiver(owner,auction->owner), auction);
     }
     // owner not found
     else
@@ -303,11 +305,11 @@ void AuctionHouseMgr::LoadAuctionItems()
         uint32 item_guid        = fields[1].GetUInt32();
         uint32 item_template    = fields[2].GetUInt32();
 
-        ItemPrototype const *proto = objmgr.GetItemPrototype(item_template);
+        ItemPrototype const *proto = ObjectMgr::GetItemPrototype(item_template);
 
         if(!proto)
         {
-            sLog.outError( "ObjectMgr::LoadAuctionItems: Unknown item (GUID: %u id: #%u) in auction, skipped.", item_guid,item_template);
+            sLog.outError( "AuctionHouseMgr::LoadAuctionItems: Unknown item (GUID: %u id: #%u) in auction, skipped.", item_guid,item_template);
             continue;
         }
 
@@ -387,7 +389,7 @@ void AuctionHouseMgr::LoadAuctions()
         aItem->startbid = fields[9].GetUInt32();
         aItem->deposit = fields[10].GetUInt32();
 
-        CreatureData const* auctioneerData = objmgr.GetCreatureData(aItem->auctioneer);
+        CreatureData const* auctioneerData = sObjectMgr.GetCreatureData(aItem->auctioneer);
         if(!auctioneerData)
         {
             aItem->DeleteFromDB();
@@ -396,7 +398,7 @@ void AuctionHouseMgr::LoadAuctions()
             continue;
         }
 
-        CreatureInfo const* auctioneerInfo = objmgr.GetCreatureTemplate(auctioneerData->id);
+        CreatureInfo const* auctioneerInfo = ObjectMgr::GetCreatureTemplate(auctioneerData->id);
         if(!auctioneerInfo)
         {
             aItem->DeleteFromDB();
@@ -416,7 +418,7 @@ void AuctionHouseMgr::LoadAuctions()
         }
 
         // check if sold item exists for guid
-        // and item_template in fact (GetAItem will fail if problematic in result check in ObjectMgr::LoadAuctionItems)
+        // and item_template in fact (GetAItem will fail if problematic in result check in AuctionHouseMgr::LoadAuctionItems)
         if ( !GetAItem( aItem->item_guidlow ) )
         {
             aItem->DeleteFromDB();
@@ -513,7 +515,7 @@ void AuctionHouseObject::Update()
             ///- Either cancel the auction if there was no bidder
             if (itr->second->bidder == 0)
             {
-                auctionmgr.SendAuctionExpiredMail( itr->second );
+                sAuctionMgr.SendAuctionExpiredMail( itr->second );
             }
             ///- Or perform the transaction
             else
@@ -521,13 +523,13 @@ void AuctionHouseObject::Update()
                 //we should send an "item sold" message if the seller is online
                 //we send the item to the winner
                 //we send the money to the seller
-                auctionmgr.SendAuctionSuccessfulMail( itr->second );
-                auctionmgr.SendAuctionWonMail( itr->second );
+                sAuctionMgr.SendAuctionSuccessfulMail( itr->second );
+                sAuctionMgr.SendAuctionWonMail( itr->second );
             }
 
             ///- In any case clear the auction
             itr->second->DeleteFromDB();
-            auctionmgr.RemoveAItem(itr->second->item_guidlow);
+            sAuctionMgr.RemoveAItem(itr->second->item_guidlow);
             delete itr->second;
             RemoveAuction(itr->first);
         }
@@ -572,7 +574,7 @@ void AuctionHouseObject::BuildListAuctionItems(WorldPacket& data, Player* player
     for (AuctionEntryMap::const_iterator itr = AuctionsMap.begin();itr != AuctionsMap.end();++itr)
     {
         AuctionEntry *Aentry = itr->second;
-        Item *item = auctionmgr.GetAItem(Aentry->item_guidlow);
+        Item *item = sAuctionMgr.GetAItem(Aentry->item_guidlow);
         if (!item)
             continue;
 
@@ -603,7 +605,7 @@ void AuctionHouseObject::BuildListAuctionItems(WorldPacket& data, Player* player
         // local name
         if ( loc_idx >= 0 )
         {
-            ItemLocale const *il = objmgr.GetItemLocale(proto->ItemId);
+            ItemLocale const *il = sObjectMgr.GetItemLocale(proto->ItemId);
             if (il)
             {
                 if (il->Name.size() > size_t(loc_idx) && !il->Name[loc_idx].empty())
@@ -626,7 +628,7 @@ void AuctionHouseObject::BuildListAuctionItems(WorldPacket& data, Player* player
 //this function inserts to WorldPacket auction's data
 bool AuctionEntry::BuildAuctionInfo(WorldPacket & data) const
 {
-    Item *pItem = auctionmgr.GetAItem(item_guidlow);
+    Item *pItem = sAuctionMgr.GetAItem(item_guidlow);
     if (!pItem)
     {
         sLog.outError("auction to item, that doesn't exist !!!!");

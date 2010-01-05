@@ -75,23 +75,23 @@ void GuardAI::EnterEvadeMode()
 
     if (!victim)
     {
-        DEBUG_LOG("Creature stopped attacking because victim is non exist [guid=%u]", m_creature->GetGUIDLow());
+        DEBUG_LOG("Creature stopped attacking, no victim [guid=%u]", m_creature->GetGUIDLow());
     }
     else if (!victim->isAlive())
     {
-        DEBUG_LOG("Creature stopped attacking because victim is dead [guid=%u]", m_creature->GetGUIDLow());
+        DEBUG_LOG("Creature stopped attacking, victim is dead [guid=%u]", m_creature->GetGUIDLow());
     }
     else if (victim->HasStealthAura())
     {
-        DEBUG_LOG("Creature stopped attacking because victim is using stealth [guid=%u]", m_creature->GetGUIDLow());
+        DEBUG_LOG("Creature stopped attacking, victim is in stealth [guid=%u]", m_creature->GetGUIDLow());
     }
     else if (victim->isInFlight())
     {
-        DEBUG_LOG("Creature stopped attacking because victim is flying away [guid=%u]", m_creature->GetGUIDLow());
+        DEBUG_LOG("Creature stopped attacking, victim is in flight [guid=%u]", m_creature->GetGUIDLow());
     }
     else
     {
-        DEBUG_LOG("Creature stopped attacking because victim outran him [guid=%u]", m_creature->GetGUIDLow());
+        DEBUG_LOG("Creature stopped attacking, victim out run him [guid=%u]", m_creature->GetGUIDLow());
     }
 
     m_creature->RemoveAllAuras();
@@ -108,7 +108,7 @@ void GuardAI::EnterEvadeMode()
 void GuardAI::UpdateAI(const uint32 /*diff*/)
 {
     // update i_victimGuid if i_creature.getVictim() !=0 and changed
-    if (!m_creature->SelectHostilTarget() || !m_creature->getVictim())
+    if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
         return;
 
     i_victimGuid = m_creature->getVictim()->GetGUID();
@@ -126,7 +126,7 @@ void GuardAI::UpdateAI(const uint32 /*diff*/)
 bool GuardAI::IsVisible(Unit *pl) const
 {
     return m_creature->IsWithinDist(pl,sWorld.getConfig(CONFIG_SIGHT_GUARDER))
-        && pl->isVisibleForOrDetect(m_creature,true);
+        && pl->isVisibleForOrDetect(m_creature,m_creature,true);
 }
 
 void GuardAI::AttackStart(Unit *u)
@@ -138,7 +138,7 @@ void GuardAI::AttackStart(Unit *u)
     if(m_creature->Attack(u,true))
     {
         i_victimGuid = u->GetGUID();
-        m_creature->AddThreat(u, 0.0f);
+        m_creature->AddThreat(u);
         m_creature->SetInCombatWith(u);
         u->SetInCombatWith(m_creature);
 

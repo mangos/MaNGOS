@@ -46,7 +46,7 @@ TargetedMovementGenerator<T>::_setTargetLocation(T &owner)
     if (!i_target.isValid() || !i_target->IsInWorld())
         return;
 
-    if (owner.hasUnitState(UNIT_STAT_ROOT | UNIT_STAT_STUNNED | UNIT_STAT_DISTRACTED))
+    if (owner.hasUnitState(UNIT_STAT_ROOT | UNIT_STAT_STUNNED | UNIT_STAT_DISTRACTED | UNIT_STAT_DIED))
         return;
 
     // prevent redundant micro-movement for pets, other followers.
@@ -103,6 +103,19 @@ void TargetedMovementGenerator<Creature>::Initialize(Creature &owner)
 }
 
 template<>
+void TargetedMovementGenerator<Player>::UpdateFinalDistance(float fDistance)
+{
+    // nothing to do for Player
+}
+
+template<>
+void TargetedMovementGenerator<Creature>::UpdateFinalDistance(float fDistance)
+{
+    i_offset = fDistance;
+    i_recalculateTravel = true;
+}
+
+template<>
 void TargetedMovementGenerator<Player>::Initialize(Player &owner)
 {
     _setTargetLocation(owner);
@@ -132,11 +145,11 @@ TargetedMovementGenerator<T>::Update(T &owner, const uint32 & time_diff)
     if (!owner.isAlive())
         return true;
 
-    if (owner.hasUnitState(UNIT_STAT_ROOT | UNIT_STAT_STUNNED | UNIT_STAT_FLEEING | UNIT_STAT_DISTRACTED))
+    if (owner.hasUnitState(UNIT_STAT_ROOT | UNIT_STAT_STUNNED | UNIT_STAT_FLEEING | UNIT_STAT_DISTRACTED | UNIT_STAT_DIED))
         return true;
 
     // prevent movement while casting spells with cast time or channel time
-    if ( owner.IsNonMeleeSpellCasted(false, false,  true))
+    if (owner.IsNonMeleeSpellCasted(false, false,  true))
     {
         if (!owner.IsStopped())
             owner.StopMoving();
@@ -149,9 +162,9 @@ TargetedMovementGenerator<T>::Update(T &owner, const uint32 & time_diff)
 
     Traveller<T> traveller(owner);
 
-    if( !i_destinationHolder.HasDestination() )
+    if (!i_destinationHolder.HasDestination())
         _setTargetLocation(owner);
-    if( owner.IsStopped() && !i_destinationHolder.HasArrived() )
+    if (owner.IsStopped() && !i_destinationHolder.HasArrived())
     {
         owner.addUnitState(UNIT_STAT_CHASE);
         if (owner.GetTypeId() == TYPEID_UNIT && ((Creature*)&owner)->canFly())
@@ -172,16 +185,16 @@ TargetedMovementGenerator<T>::Update(T &owner, const uint32 & time_diff)
         //More distance let have better performance, less distance let have more sensitive reaction at target move.
 
         // try to counter precision differences
-        if( i_destinationHolder.GetDistance2dFromDestSq(*i_target.getTarget()) >= dist * dist)
+        if (i_destinationHolder.GetDistance3dFromDestSq(*i_target.getTarget()) >= dist * dist)
         {
             owner.SetInFront(i_target.getTarget());         // Set new Angle For Map::
             _setTargetLocation(owner);                      //Calculate New Dest and Send data To Player
         }
         // Update the Angle of the target only for Map::, no need to send packet for player
-        else if ( !i_angle && !owner.HasInArc( 0.01f, i_target.getTarget() ) )
+        else if (!i_angle && !owner.HasInArc(0.01f, i_target.getTarget()))
             owner.SetInFront(i_target.getTarget());
 
-        if(( owner.IsStopped() && !i_destinationHolder.HasArrived() ) || i_recalculateTravel )
+        if ((owner.IsStopped() && !i_destinationHolder.HasArrived()) || i_recalculateTravel)
         {
             i_recalculateTravel = false;
             //Angle update will take place into owner.StopMoving()

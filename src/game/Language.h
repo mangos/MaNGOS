@@ -83,7 +83,10 @@ enum MangosStrings
     LANG_USING_WORLD_DB                 = 57,
     LANG_USING_SCRIPT_LIB               = 58,
     LANG_USING_EVENT_AI                 = 59,
-    // Room for more level 0              60-99 not used
+    LANG_RA_BUSY                        = 60,
+    LANG_RA_USER                        = 61,
+    LANG_RA_PASS                        = 62,
+    // Room for more level 0              63-99 not used
 
     // level 1 chat
     LANG_GLOBAL_NOTIFY                  = 100,
@@ -331,7 +334,16 @@ enum MangosStrings
     LANG_CUSTOMIZE_PLAYER               = 345,
     LANG_CUSTOMIZE_PLAYER_GUID          = 346,
     LANG_COMMAND_GOTAXINODENOTFOUND     = 347,
-    // Room for more level 2              348-399 not used
+    LANG_GAMEOBJECT_HAVE_INVALID_DATA   = 348,
+    LANG_TITLE_LIST_CHAT                = 349,
+    LANG_TITLE_LIST_CONSOLE             = 350,
+    LANG_COMMAND_NOTITLEFOUND           = 351,
+    LANG_INVALID_TITLE_ID               = 352,
+    LANG_TITLE_ADD_RES                  = 353,
+    LANG_TITLE_REMOVE_RES               = 354,
+    LANG_TITLE_CURRENT_RES              = 355,
+    LANG_CURRENT_TITLE_RESET            = 356,
+    // Room for more level 2              357-399 not used
 
     // level 3 chat
     LANG_SCRIPTS_RELOADED               = 400,
@@ -532,8 +544,8 @@ enum MangosStrings
     LANG_GET_UINT_FIELD                 = 570,
     LANG_GET_FLOAT                      = 571,              //log
     LANG_GET_FLOAT_FIELD                = 572,
-    LANG_SET_32BIT                      = 573,              //log
-    LANG_SET_32BIT_FIELD                = 574,
+    //                                    573,              //not used
+    //                                    574,              //not used
     LANG_CHANGE_32BIT                   = 575,              //log
     LANG_CHANGE_32BIT_FIELD             = 576,
 
@@ -570,7 +582,6 @@ enum MangosStrings
     LANG_BG_A_WINS                      = 600,
     LANG_BG_H_WINS                      = 601,
 
-    LANG_BG_WS_START_TWO_MINUTES        = 753,
     LANG_BG_WS_START_ONE_MINUTE         = 602,
     LANG_BG_WS_START_HALF_MINUTE        = 603,
     LANG_BG_WS_HAS_BEGUN                = 604,
@@ -586,14 +597,14 @@ enum MangosStrings
     LANG_BG_WS_F_PLACED                 = 613,
     LANG_BG_WS_ALLIANCE_FLAG_RESPAWNED  = 614,
     LANG_BG_WS_HORDE_FLAG_RESPAWNED     = 615,
-
-    LANG_BG_EY_START_TWO_MINUTES        = 755,
+    // 616 - 635 not used
     LANG_BG_EY_START_ONE_MINUTE         = 636,
     LANG_BG_EY_START_HALF_MINUTE        = 637,
     LANG_BG_EY_HAS_BEGUN                = 638,
+    // 639 - 649 not used
+    LANG_BG_ALLY                        = 650,
+    LANG_BG_HORDE                       = 651,
 
-    LANG_BG_AB_ALLY                     = 650,
-    LANG_BG_AB_HORDE                    = 651,
     LANG_BG_AB_NODE_STABLES             = 652,
     LANG_BG_AB_NODE_BLACKSMITH          = 653,
     LANG_BG_AB_NODE_FARM                = 654,
@@ -604,7 +615,6 @@ enum MangosStrings
     LANG_BG_AB_NODE_ASSAULTED           = 659,
     LANG_BG_AB_NODE_CLAIMED             = 660,
 
-    LANG_BG_AB_START_TWO_MINUTES        = 754,
     LANG_BG_AB_START_ONE_MINUTE         = 661,
     LANG_BG_AB_START_HALF_MINUTE        = 662,
     LANG_BG_AB_HAS_BEGUN                = 663,
@@ -633,7 +643,7 @@ enum MangosStrings
     LANG_BG_EY_CAPTURED_FLAG_H          = 685,
     LANG_BG_EY_DROPPED_FLAG             = 686,
     LANG_BG_EY_RESETED_FLAG             = 687,
-
+    // 688 - 699 not used
     LANG_ARENA_ONE_TOOLOW               = 700,
     LANG_ARENA_ONE_MINUTE               = 701,
     LANG_ARENA_THIRTY_SECONDS           = 702,
@@ -688,13 +698,52 @@ enum MangosStrings
 //                                      = 747, not used
 //                                      = 748, not used
 //                                      = 749, not used
-    LANG_BATTLEGROUND_PREMATURE_FINISH_WARNING = 750,       // "Not enough players. This game will close in %u mins."
+    LANG_BATTLEGROUND_PREMATURE_FINISH_WARNING      = 750,  // "Not enough players. This game will close in %u mins."
     LANG_BATTLEGROUND_PREMATURE_FINISH_WARNING_SECS = 751,  // "Not enough players. This game will close in %u seconds."
-//                                      = 752, not used
-//  LANG_BG_WS_START_TWO_MINUTES        = 753, - defined above
-//  LANG_BG_AB_START_TWO_MINUTES        = 754, - defined above
-//  LANG_BG_EY_START_TWO_MINUTES        = 755, - defined above
-    // Room for batleground/arena strings 756-799 not used
+    LANG_BATTLEGROUND_ONLY_ALLIANCE_USE = 752,              // "Only The Alliance can use that portal"
+    LANG_BATTLEGROUND_ONLY_HORDE_USE    = 753,              // "Only The Horde can use that portal"
+//                                      = 754, not used
+//                                      = 755, not used
+//                                      = 756, not used
+//                                      = 757, not used
+//                                      = 758, not used
+    LANG_BG_AV_TOWER_TAKEN              = 759,
+    LANG_BG_AV_TOWER_ASSAULTED          = 760,
+    LANG_BG_AV_TOWER_DEFENDED           = 761,
+    LANG_BG_AV_GRAVE_TAKEN              = 762,
+    LANG_BG_AV_GRAVE_DEFENDED           = 763,
+    LANG_BG_AV_GRAVE_ASSAULTED          = 764,
+    LANG_BG_AV_MINE_TAKEN               = 765,
+    LANG_BG_AV_MINE_NORTH               = 766,
+    LANG_BG_AV_MINE_SOUTH               = 767,
+
+    LANG_BG_AV_NODE_GRAVE_STORM_AID     = 768,
+    LANG_BG_AV_NODE_TOWER_DUN_S         = 769,
+    LANG_BG_AV_NODE_TOWER_DUN_N         = 770,
+    LANG_BG_AV_NODE_GRAVE_STORMPIKE     = 771,
+    LANG_BG_AV_NODE_TOWER_ICEWING       = 772,
+    LANG_BG_AV_NODE_GRAVE_STONE         = 773,
+    LANG_BG_AV_NODE_TOWER_STONE         = 774,
+    LANG_BG_AV_NODE_GRAVE_SNOW          = 775,
+    LANG_BG_AV_NODE_TOWER_ICE           = 776,
+    LANG_BG_AV_NODE_GRAVE_ICE           = 777,
+    LANG_BG_AV_NODE_TOWER_POINT         = 778,
+    LANG_BG_AV_NODE_GRAVE_FROST         = 779,
+    LANG_BG_AV_NODE_TOWER_FROST_E       = 780,
+    LANG_BG_AV_NODE_TOWER_FROST_W       = 781,
+    LANG_BG_AV_NODE_GRAVE_FROST_HUT     = 782,
+
+//                                      = 783, not used
+    LANG_BG_AV_START_ONE_MINUTE         = 784,
+    LANG_BG_AV_START_HALF_MINUTE        = 785,
+    LANG_BG_AV_HAS_BEGUN                = 786,
+    LANG_BG_AV_A_NEAR_LOSE              = 787,
+    LANG_BG_AV_H_NEAR_LOSE              = 788,
+    LANG_BG_AV_H_GENERAL_DEAD           = 789,
+    LANG_BG_AV_A_GENERAL_DEAD           = 790,
+
+
+    // Room for batleground/arena strings 791-799 not used
 
     // in game strings
     //                                  = 800, not used
@@ -731,7 +780,8 @@ enum MangosStrings
     LANG_ACCOUNT_LIST_BAR               = 1012,
     LANG_ACCOUNT_LIST_LINE              = 1013,
     LANG_ACCOUNT_LIST_EMPTY             = 1014,
-    // Room for more level 4              1015-1099 not used
+    LANG_QUIT_WRONG_USE_ERROR           = 1015,
+    // Room for more level 4              1016-1099 not used
 
     // Level 3 (continue)
     LANG_ACCOUNT_SETADDON               = 1100,
@@ -764,7 +814,9 @@ enum MangosStrings
     LANG_RESET_PET_TALENTS_ONLINE       = 1127,
     LANG_TAXINODE_ENTRY_LIST_CHAT       = 1128,
     LANG_TAXINODE_ENTRY_LIST_CONSOLE    = 1129,
-    // Room for more level 3              1130-1199 not used
+    LANG_EVENT_STARTED                  = 1130,
+    LANG_EVENT_STOPPED                  = 1131,
+    // Room for more level 3              1132-1199 not used
 
     // Debug commands
     LANG_CINEMATIC_NOT_EXIST            = 1200,

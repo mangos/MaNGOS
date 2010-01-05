@@ -87,6 +87,6 @@ class WaypointManager
         WaypointPathMap m_pathMap;
 };
 
-#define WaypointMgr MaNGOS::Singleton<WaypointManager>::Instance()
+#define sWaypointMgr MaNGOS::Singleton<WaypointManager>::Instance()
 
 #endif

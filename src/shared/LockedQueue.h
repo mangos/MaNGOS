@@ -30,99 +30,96 @@ namespace ACE_Based
     template <class T, class LockType, typename StorageType=std::deque<T> >
         class LockedQueue
     {
-        //! Serialize access to the Queue
+        //! Lock access to the queue.
         LockType _lock;
 
-        //! Storage backing the queue
+        //! Storage backing the queue.
         StorageType _queue;
 
-        //! Cancellation flag
-        volatile bool _canceled;
+        //! Cancellation flag.
+        /*volatile*/ bool _canceled;
 
         public:
 
-            //! Create a LockedQueue
-            LockedQueue() : _canceled(false) {}
+            //! Create a LockedQueue.
+            LockedQueue()
+                : _canceled(false)
+            {
+            }
 
-            //! Destroy a LockedQueue
-            virtual ~LockedQueue() { }
+            //! Destroy a LockedQueue.
+            virtual ~LockedQueue()
+            {
+            }
 
-            /**
-             * @see Queue::add(const T& item)
-             */
+            //! Adds an item to the queue.
             void add(const T& item)
             {
-                ACE_Guard<LockType> g(this->_lock);
+                lock();
 
-                ASSERT(!this->_canceled);
+                //ASSERT(!this->_canceled);
                 // throw Cancellation_Exception();
 
-                this->_queue.push_back(item);
+                _queue.push_back(item);
+
+                unlock();
             }
 
-            /**
-             * @see Queue::next()
-             */
-            T next()
+            //! Gets the next result in the queue, if any.
+            bool next(T& result)
             {
                 ACE_Guard<LockType> g(this->_lock);
 
-                ASSERT (!_queue.empty() || !this->_canceled);
+                if (_queue.empty())
+                    return false;
+
+                //ASSERT (!_queue.empty() || !this->_canceled);
                 // throw Cancellation_Exception();
 
-                T item = this->_queue.front();
-                this->_queue.pop_front();
+                result = _queue.front();
+                _queue.pop_front();
 
-                return item;
+                return true;
             }
 
-            T front()
+            //! Peeks at the top of the queue. Remember to unlock after use.
+            T& peek()
             {
-                ACE_Guard<LockType> g(this->_lock);
+                lock();
 
-                ASSERT (!this->_queue.empty());
-                // throw NoSuchElement_Exception();
+                T& result = _queue.front();
 
-                return this->_queue.front();
+                return result;
             }
 
-            /**
-             * @see Queue::cancel()
-             */
+            //! Cancels the queue.
             void cancel()
             {
-                ACE_Guard<LockType> g(this->_lock);
+                lock();
 
-                this->_canceled = true;
+                _canceled = true;
+
+                unlock();
             }
 
-            /**
-             * @see Queue::isCanceled()
-             */
-            bool isCanceled()
+            //! Checks if the queue is cancelled.
+            bool cancelled()
             {
-                // Faster check since the queue will not become un-canceled
-                if(this->_canceled)
-                    return true;
-
                 ACE_Guard<LockType> g(this->_lock);
 
-                return this->_canceled;
+                return _canceled;
             }
 
-            /**
-             * @see Queue::size()
-             */
-            size_t size()
+            //! Locks the queue for access.
+            void lock()
             {
-                ACE_Guard<LockType> g(this->_lock);
-                return this->_queue.size();
+                this->_lock.acquire();
             }
 
-            bool empty()
+            //! Unlocks the queue.
+            void unlock()
             {
-                ACE_Guard<LockType> g(this->_lock);
-                return this->_queue.empty();
+                this->_lock.release();
             }
     };
 }

@@ -30,8 +30,6 @@ noinst_LIBRARIES = libmangosshared.a
 
 #  libmangosshared library will later be reused by ...
 libmangosshared_a_SOURCES = \
-	Base.cpp \
-	Base.h \
 	ByteBuffer.h \
 	Common.cpp \
 	Common.h \
@@ -50,6 +48,7 @@ libmangosshared_a_SOURCES = \
 	Util.h \
 	WorldPacket.h \
 	revision_nr.h \
+	revision_sql.h \
 	revision.h
 
 # Get revision (git or svn)

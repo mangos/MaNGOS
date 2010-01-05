@@ -30,6 +30,7 @@
 #include "revision_nr.h"
 #include <openssl/opensslv.h>
 #include <openssl/crypto.h>
+#include <ace/Version.h>
 
 #ifdef WIN32
 #include "ServiceWin32.h"
@@ -163,9 +164,10 @@ extern int main(int argc, char **argv)
     sLog.outDetail("%s (Library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
     if (SSLeay() < 0x009080bfL )
     {
-        sLog.outDetail("WARNING: Outdated version of OpenSSL lib. Logins to server impossible!");
+        sLog.outDetail("WARNING: Outdated version of OpenSSL lib. Logins to server may not work!");
         sLog.outDetail("WARNING: Minimal required version [OpenSSL 0.9.8k]");
     }
+    sLog.outDetail("Using ACE: %s", ACE_VERSION);
 
     ///- and run the 'Master'
     /// \todo Why do we need this 'Master'? Can't all of this be in the Main as for Realmd?

@@ -31,6 +31,8 @@
 #include "sockets/Utility.h"
 #include "sockets/Parse.h"
 #include "sockets/Socket.h"
+#include "Auth/Sha1.h"
+#include "ByteBuffer.h"
 
 /// Handle login commands
 class AuthSocket: public TcpSocket
@@ -43,6 +45,8 @@ class AuthSocket: public TcpSocket
 
         void OnAccept();
         void OnRead();
+        void SendProof(Sha1Hash sha);
+        void LoadRealmlist(ByteBuffer &pkt, uint32 acctid);
 
         bool _HandleLogonChallenge();
         bool _HandleLogonProof();
