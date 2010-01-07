@@ -182,10 +182,10 @@ struct AchievementCriteriaRequirement
 struct AchievementCriteriaRequirementSet
 {
         AchievementCriteriaRequirementSet() : criteria_id(0) {}
-        explicit AchievementCriteriaRequirementSet(uint32 id) : criteria_id(id) {}
         typedef std::vector<AchievementCriteriaRequirement> Storage;
         void Add(AchievementCriteriaRequirement const& data) { storage.push_back(data); }
         bool Meets(Player const* source, Unit const* target, uint32 miscvalue = 0) const;
+        void SetCriteriaId(uint32 id) {criteria_id = id;}
     private:
         uint32 criteria_id;
         Storage storage;
