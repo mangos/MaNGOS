@@ -1175,6 +1175,7 @@ void Spell::EffectDummy(uint32 i)
 
                     return;
                 }
+                case 46167:                                 // Planning for the Future: Create Snowfall Glade Pup Cover
                 case 50926:                                 // Gluttonous Lurkers: Create Zul'Drak Rat Cover
                 case 51026:                                 // Create Drakkari Medallion Cover
                 case 51592:                                 // Pickup Primordial Hatchling
@@ -1187,6 +1188,7 @@ void Spell::EffectDummy(uint32 i)
 
                     switch(m_spellInfo->Id)
                     {
+                        case 46167: spellId = 46773; break;
                         case 50926: spellId = 50927; break;
                         case 51026: spellId = 50737; break;
                         case 51592: spellId = 51593; break;
