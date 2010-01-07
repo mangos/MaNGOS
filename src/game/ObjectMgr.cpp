@@ -7265,6 +7265,7 @@ bool PlayerCondition::Meets(Player const * player) const
                 case 1: return player->getLevel() >= value1;
                 case 2: return player->getLevel() <= value1;
             }
+            return false;
         }
         default:
             return false;
@@ -7453,6 +7454,8 @@ bool PlayerCondition::IsValid(ConditionType condition, uint32 value1, uint32 val
                 sLog.outErrorDb("Level condition has invalid argument %u (must be 0..2), skipped", value2);
                 return false;
             }
+
+            break;
         }
         case CONDITION_NONE:
             break;
