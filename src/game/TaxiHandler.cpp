@@ -202,14 +202,10 @@ void WorldSession::HandleMoveSplineDoneOpcode(WorldPacket& recv_data)
     // we need proccess only (1)
 
     //movement anticheat code
-    /* extract packet */
     Unit *mover = _player->m_mover;
     Player *plMover = mover->GetTypeId()==TYPEID_PLAYER ? (Player*)mover : NULL;
     if (!plMover)
         return;
-
-    MovementInfo movementInfo;
-    ReadMovementInfo(recv_data, &movementInfo);
     //end movement anticheat
     
     uint32 curDest = GetPlayer()->m_taxi.GetTaxiDestination();
@@ -247,7 +243,7 @@ void WorldSession::HandleMoveSplineDoneOpcode(WorldPacket& recv_data)
     }
 
     //movment anticheat
-    uint32 curloc = objmgr.GetNearestTaxiNode(movementInfo.x,movementInfo.y,movementInfo.z,GetPlayer()->GetMapId(),GetPlayer( )->GetTeam(), curDest);
+    uint32 curloc = sObjectMgr.GetNearestTaxiNode(movementInfo.x,movementInfo.y,movementInfo.z,GetPlayer()->GetMapId(),GetPlayer( )->GetTeam(), curDest);
     //end movement anticheat
 
     //sLog.outBasic("MA-%s > | xyzo: %f,%f,%fo(%f) flags[%X] | curloc: %d | destloc: %d ",
@@ -308,10 +304,10 @@ void WorldSession::HandleMoveSplineDoneOpcode(WorldPacket& recv_data)
     if(curloc != curDest){
          // current source node for next destination
         uint32 sourcenode = GetPlayer()->m_taxi.GetTaxiSource();
-        uint16 MountId = objmgr.GetTaxiMountDisplayId(sourcenode, GetPlayer()->GetTeam());
+        uint16 MountId = sObjectMgr.GetTaxiMountDisplayId(sourcenode, GetPlayer()->GetTeam());
 
         uint32 path, cost;
-        objmgr.GetTaxiPath( sourcenode, curDest, path, cost);
+        sObjectMgr.GetTaxiPath( sourcenode, curDest, path, cost);
 
         if(path && MountId)
             SendDoFlight( MountId, path, 1 );               // skip start fly node

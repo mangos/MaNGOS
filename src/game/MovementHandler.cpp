@@ -296,7 +296,8 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
             }
             //movement anticheat;
             //Correct finding GO guid in DB (thanks to GriffonHeart)
-            GameObject *obj = HashMapHolder<GameObject>::Find(movementInfo.t_guid);
+            //GameObject *obj = HashMapHolder<GameObject>::Find(movementInfo.t_guid);
+            GameObject *obj = ObjectAccessor::GetGameObjectInWorld(movementInfo.t_guid);
             if(obj)
                 plMover->m_anti_TransportGUID = obj->GetDBTableGUIDLow();
             else
@@ -581,7 +582,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
                     #endif
                 }
             } else {
-                if (GameObjectData const* go_data = objmgr.GetGOData(plMover->m_anti_TransportGUID))
+                if (GameObjectData const* go_data = sObjectMgr.GetGOData(plMover->m_anti_TransportGUID))
                 {
                     float delta_gox = go_data->posX - movementInfo.x;
                     float delta_goy = go_data->posY - movementInfo.y;
