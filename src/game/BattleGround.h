@@ -165,18 +165,22 @@ enum BattleGroundQueueTypeId
 };
 #define MAX_BATTLEGROUND_QUEUE_TYPES 10
 
-enum BGQueueIdBasedOnLevel                        // queue_id for level ranges
+enum BattleGroundBracketId                                  // bracketId for level ranges
 {
-    QUEUE_ID_MAX_LEVEL_19   = 0,
-    QUEUE_ID_MAX_LEVEL_29   = 1,
-    QUEUE_ID_MAX_LEVEL_39   = 2,
-    QUEUE_ID_MAX_LEVEL_49   = 3,
-    QUEUE_ID_MAX_LEVEL_59   = 4,
-    QUEUE_ID_MAX_LEVEL_69   = 5,
-    QUEUE_ID_MAX_LEVEL_79   = 6,
-    QUEUE_ID_MAX_LEVEL_80   = 7
+    BG_BRACKET_ID_FIRST          = 0,
+
+    BG_BRACKET_ID_MAX_LEVEL_19   = 0,
+    BG_BRACKET_ID_MAX_LEVEL_29   = 1,
+    BG_BRACKET_ID_MAX_LEVEL_39   = 2,
+    BG_BRACKET_ID_MAX_LEVEL_49   = 3,
+    BG_BRACKET_ID_MAX_LEVEL_59   = 4,
+    BG_BRACKET_ID_MAX_LEVEL_69   = 5,
+    BG_BRACKET_ID_MAX_LEVEL_79   = 6,
+    BG_BRACKET_ID_MAX_LEVEL_80   = 7,
+
+    BG_BRACKET_ID_LAST           = 7
 };
-#define MAX_BATTLEGROUND_QUEUES 8
+#define MAX_BATTLEGROUND_BRACKETS 8
 
 enum ScoreType
 {
@@ -309,7 +313,7 @@ class BattleGround
         // Get methods:
         char const* GetName() const         { return m_Name; }
         BattleGroundTypeId GetTypeID() const { return m_TypeID; }
-        BGQueueIdBasedOnLevel GetQueueId() const { return m_QueueId; }
+        BattleGroundBracketId GetBracketId() const { return m_BracketId; }
         uint32 GetInstanceID() const        { return m_InstanceID; }
         BattleGroundStatus GetStatus() const { return m_Status; }
         uint32 GetClientInstanceID() const  { return m_ClientInstanceID; }
@@ -334,9 +338,9 @@ class BattleGround
         void SetName(char const* Name)      { m_Name = Name; }
         void SetTypeID(BattleGroundTypeId TypeID) { m_TypeID = TypeID; }
         //here we can count minlevel and maxlevel for players
-        void SetQueueId(BGQueueIdBasedOnLevel ID)
+        void SetBracketId(BattleGroundBracketId ID)
         {
-            m_QueueId = ID;
+            m_BracketId = ID;
             uint8 diff = (m_TypeID == BATTLEGROUND_AV) ? 1 : 0;
             this->SetLevelRange((ID + 1) * 10 + diff, (ID + 2) * 10 - ((diff + 1) % 2));
         }
@@ -585,7 +589,7 @@ class BattleGround
         uint32 m_StartTime;
         bool m_ArenaBuffSpawned;                            // to cache if arenabuff event is started (cause bool is faster than checking IsActiveEvent)
         int32 m_EndTime;                                    // it is set to 120000 when bg is ending and it decreases itself
-        BGQueueIdBasedOnLevel m_QueueId;
+        BattleGroundBracketId m_BracketId;
         uint8  m_ArenaType;                                 // 2=2v2, 3=3v3, 5=5v5
         bool   m_InBGFreeSlotQueue;                         // used to make sure that BG is only once inserted into the BattleGroundMgr.BGFreeSlotQueue[bgTypeId] deque
         bool   m_SetDeleteThis;                             // used for safe deletion of the bg after end / all players leave
