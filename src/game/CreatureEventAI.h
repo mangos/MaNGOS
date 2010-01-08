@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -364,7 +364,12 @@ struct CreatureEventAI_Action
         {
             uint32 sheath;
         } set_sheath;
-        // ACTION_T_SET_INVINCIBILITY_HP_LEVEL             = 42
+        // ACTION_T_FORCE_DESPAWN                           = 41
+        struct
+        {
+            uint32 msDelay;
+        } forced_despawn;
+        // ACTION_T_SET_INVINCIBILITY_HP_LEVEL              = 42
         struct
         {
             uint32 hp_level;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2009-2010 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -771,7 +771,7 @@ void CreatureEventAI::ProcessAction(CreatureEventAI_Action const& action, uint32
         }
         case ACTION_T_FORCE_DESPAWN:
         {
-            m_creature->ForcedDespawn();
+            m_creature->ForcedDespawn(action.forced_despawn.msDelay);
             break;
         }
         case ACTION_T_SET_INVINCIBILITY_HP_LEVEL:
