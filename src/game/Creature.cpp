@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -102,6 +102,12 @@ bool AssistDelayEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
             }
         }
     }
+    return true;
+}
+
+bool ForcedDespawnDelayEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
+{
+    m_owner.ForcedDespawn();
     return true;
 }
 
@@ -896,7 +902,7 @@ void Creature::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask)
         << (m_isDeadByDefault ? 1 : 0) << ","               //is_dead
         << GetDefaultMovementType() << ")";                 //default movement generator type
 
-    WorldDatabase.PExecuteLog( ss.str( ).c_str( ) );
+    WorldDatabase.PExecuteLog("%s", ss.str().c_str());
 
     WorldDatabase.CommitTransaction();
 }
@@ -1294,9 +1300,19 @@ void Creature::Respawn()
     }
 }
 
-void Creature::ForcedDespawn()
+void Creature::ForcedDespawn(uint32 timeMSToDespawn)
 {
-    setDeathState(JUST_DIED);
+    if (timeMSToDespawn)
+    {
+        ForcedDespawnDelayEvent *pEvent = new ForcedDespawnDelayEvent(*this);
+
+        m_Events.AddEvent(pEvent, m_Events.CalculateTime(timeMSToDespawn));
+        return;
+    }
+
+    if (isAlive())
+        setDeathState(JUST_DIED);
+
     RemoveCorpse();
     SetHealth(0);                                           // just for nice GM-mode view
 }
@@ -1826,22 +1842,23 @@ void Creature::GetRespawnCoord( float &x, float &y, float &z, float* ori, float*
             x = data->posX;
             y = data->posY;
             z = data->posZ;
-            if(ori)
+            if (ori)
                 *ori = data->orientation;
-            if(dist)
+            if (dist)
                 *dist = data->spawndist;
 
             return;
         }
     }
 
-    x = GetPositionX();
-    y = GetPositionY();
-    z = GetPositionZ();
-    if(ori)
-        *ori = GetOrientation();
-    if(dist)
-        *dist = 0;
+    float orient;
+
+    GetSummonPoint(x, y, z, orient);
+
+    if (ori)
+        *ori = orient;
+    if (dist)
+        *dist = GetRespawnRadius();
 }
 
 void Creature::AllLootRemovedFromCorpse()

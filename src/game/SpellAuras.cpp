@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -373,7 +373,7 @@ static AuraType const frozenAuraTypes[] = { SPELL_AURA_MOD_ROOT, SPELL_AURA_MOD_
 
 Aura::Aura(SpellEntry const* spellproto, uint32 eff, int32 *currentBasePoints, Unit *target, Unit *caster, Item* castItem) :
 m_spellmod(NULL), m_caster_guid(0), m_target(target), m_castItemGuid(castItem?castItem->GetGUID():0),
-m_timeCla(1000), m_periodicTimer(0), m_removeMode(AURA_REMOVE_BY_DEFAULT), m_AuraDRGroup(DIMINISHING_NONE),
+m_timeCla(1000), m_periodicTimer(0), m_periodicTick(0), m_removeMode(AURA_REMOVE_BY_DEFAULT), m_AuraDRGroup(DIMINISHING_NONE),
 m_effIndex(eff), m_auraSlot(MAX_AURAS), m_auraFlags(AFLAG_NONE), m_auraLevel(1), m_procCharges(0), m_stackAmount(1),
 m_positive(false), m_permanent(false), m_isPeriodic(false), m_isAreaAura(false), m_isPersistent(false),
 m_isRemovedOnShapeLost(true), m_in_use(0), m_deleted(false)
@@ -662,6 +662,7 @@ void Aura::Update(uint32 diff)
         {
             // update before applying (aura can be removed in TriggerSpell or PeriodicTick calls)
             m_periodicTimer += m_modifier.periodictime;
+            ++m_periodicTick;                               // for some infinity auras in some cases can overflow and reset
             PeriodicTick();
         }
     }
@@ -2401,6 +2402,13 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                 m_target->CastSpell(m_target, 28206, true, NULL, this);
                 // Poison Cloud
                 m_target->CastSpell(m_target, 28240, true, NULL, this);
+                return;
+            }
+            case 32286:                                     // Focus Target Visual
+            {
+                if (m_removeMode == AURA_REMOVE_BY_DEFAULT)
+                    m_target->CastSpell(m_target, 32301, true, NULL, this);
+
                 return;
             }
             case 36730:                                     // Flame Strike
@@ -4549,7 +4557,7 @@ void Aura::HandlePeriodicEnergize(bool apply, bool Real)
             case 54833:                                     // Glyph of Innervate (value%/2 of casters base mana)
             {
                 if (Unit* caster = GetCaster())
-                    m_modifier.m_amount = int32(caster->GetCreateMana() * GetBasePoints() / (200 * m_maxduration / m_periodicTimer));
+                    m_modifier.m_amount = int32(caster->GetCreateMana() * GetBasePoints() / (200 * GetAuraMaxTicks()));
                 break;
 
             }
@@ -4561,7 +4569,7 @@ void Aura::HandlePeriodicEnergize(bool apply, bool Real)
                     if (caster->HasAura(54832))
                         caster->CastSpell(caster,54833,true,NULL,this);
 
-                    m_modifier.m_amount = int32(caster->GetCreateMana() * GetBasePoints() / (100 * m_maxduration / m_periodicTimer));
+                    m_modifier.m_amount = int32(caster->GetCreateMana() * GetBasePoints() / (100 * GetAuraMaxTicks()));
                 }
                 break;
             }
@@ -6622,10 +6630,10 @@ void Aura::PeriodicTick()
                 if (GetSpellProto()->SpellFamilyName==SPELLFAMILY_WARLOCK && (GetSpellProto()->SpellFamilyFlags & UI64LIT(0x0000000000000400)) && GetSpellProto()->SpellIconID==544)
                 {
                     // 1..4 ticks, 1/2 from normal tick damage
-                    if (m_duration >= ((m_maxduration-m_modifier.periodictime) * 2 / 3))
+                    if (GetAuraTicks() <= 4)
                         pdamage = pdamage/2;
                     // 9..12 ticks, 3/2 from normal tick damage
-                    else if(m_duration < ((m_maxduration-m_modifier.periodictime) / 3))
+                    else if(GetAuraTicks() >= 9)
                         pdamage += (pdamage + 1) / 2;       // +1 prevent 0.5 damage possible lost at 1..4 ticks
                     // 5..8 ticks have normal tick damage
                 }
@@ -6766,8 +6774,8 @@ void Aura::PeriodicTick()
                 // Wild Growth (1/7 - 6 + 2*ramainTicks) %
                 if (m_spellProto->SpellFamilyName == SPELLFAMILY_DRUID && m_spellProto->SpellIconID == 2864)
                 {
-                    int32 ticks = m_maxduration/m_modifier.periodictime;
-                    int32 remainingTicks = int32(float(m_duration) / m_modifier.periodictime + 0.5);
+                    int32 ticks = GetAuraMaxTicks();
+                    int32 remainingTicks = ticks - GetAuraTicks();
                     pdamage = int32(pdamage) + int32(amount)*ticks*(-6+2*remainingTicks)/100;
                 }
             }
@@ -7232,8 +7240,11 @@ void Aura::PeriodicDummyTick()
 //              case 45960: break;
 //              // Darkness
 //              case 45996: break;
-//              // Summon Blood Elves Periodic
-//              case 46041: break;
+                case 46041:                                 // Summon Blood Elves Periodic
+                    m_target->CastSpell(m_target, 46037, true, NULL, this);
+                    m_target->CastSpell(m_target, roll_chance_i(50) ? 46038 : 46039, true, NULL, this);
+                    m_target->CastSpell(m_target, 46040, true, NULL, this);
+                    return;
 //              // Transform Visual Missile Periodic
 //              case 46205: break;
 //              // Find Opening Beam End
@@ -7260,7 +7271,20 @@ void Aura::PeriodicDummyTick()
 //              case 47489: break;
 //              case 47941: break; // Crystal Spike
 //              case 48200: break; // Healer Aura
-//              case 48630: break; // Summon Gauntlet Mobs Periodic
+                case 48630:                                 // Summon Gauntlet Mobs Periodic
+                case 59275:                                 // Below may need some adjustment, pattern for amount of summon and where is not verified 100% (except for odd/even tick)
+                {
+                    bool chance = roll_chance_i(50);
+
+                    m_target->CastSpell(m_target, chance ? 48631 : 48632, true, NULL, this);
+
+                    if (GetAuraTicks() % 2)                 // which doctor at odd tick
+                        m_target->CastSpell(m_target, chance ? 48636 : 48635, true, NULL, this);
+                    else                                    // or harponeer, at even tick
+                        m_target->CastSpell(m_target, chance ? 48634 : 48633, true, NULL, this);
+
+                    return;
+                }
 //              case 49313: break; // Proximity Mine Area Aura
 //              // Mole Machine Portal Schedule
 //              case 49466: break;
@@ -7286,6 +7310,21 @@ void Aura::PeriodicDummyTick()
                     return;
                 case 50824:                                 // Summon earthen dwarf
                     m_target->CastSpell(m_target, roll_chance_i(50) ? 50825 : 50826, true, NULL, this);
+                    return;
+                case 52441:                                 // Cool Down
+                    m_target->CastSpell(m_target, 52443, true);
+                    return;
+                case 53520:                                 // Carrion Beetles
+                    m_target->CastSpell(m_target, 53521, true, NULL, this);
+                    m_target->CastSpell(m_target, 53521, true, NULL, this);
+                    return;
+                case 55592:                                 // Clean
+                    switch(urand(0,2))
+                    {
+                        case 0: m_target->CastSpell(m_target, 55731, true); break;
+                        case 1: m_target->CastSpell(m_target, 55738, true); break;
+                        case 2: m_target->CastSpell(m_target, 55739, true); break;
+                    }
                     return;
 // Exist more after, need add later
                 default:

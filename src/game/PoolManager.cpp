@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2009 MaNGOS <http://www.mangosproject.org/>
+ * Copyright (C) 2005-2010 MaNGOS <http://www.mangosproject.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -605,7 +605,7 @@ void PoolManager::LoadFromDB()
                         ss << *itr << " ";
                     ss << "create(s) a circular reference, which can cause the server to freeze.\nRemoving the last link between mother pool "
                         << poolItr->first << " and child pool " << poolItr->second;
-                    sLog.outErrorDb(ss.str().c_str());
+                    sLog.outErrorDb("%s", ss.str().c_str());
                     mPoolPoolGroups[poolItr->second].RemoveOneRelation(poolItr->first);
                     mPoolSearchMap.erase(poolItr);
                     --count;

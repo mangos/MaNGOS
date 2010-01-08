@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -64,7 +64,7 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS]=
     &Spell::EffectUnused,                                   //  4 SPELL_EFFECT_PORTAL_TELEPORT          unused
     &Spell::EffectTeleportUnits,                            //  5 SPELL_EFFECT_TELEPORT_UNITS
     &Spell::EffectApplyAura,                                //  6 SPELL_EFFECT_APPLY_AURA
-    &Spell::EffectEnvirinmentalDMG,                         //  7 SPELL_EFFECT_ENVIRONMENTAL_DAMAGE
+    &Spell::EffectEnvironmentalDMG,                         //  7 SPELL_EFFECT_ENVIRONMENTAL_DAMAGE
     &Spell::EffectPowerDrain,                               //  8 SPELL_EFFECT_POWER_DRAIN
     &Spell::EffectHealthLeech,                              //  9 SPELL_EFFECT_HEALTH_LEECH
     &Spell::EffectHeal,                                     // 10 SPELL_EFFECT_HEAL
@@ -285,7 +285,7 @@ void Spell::EffectInstaKill(uint32 /*i*/)
     m_caster->DealDamage(unitTarget, unitTarget->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
 }
 
-void Spell::EffectEnvirinmentalDMG(uint32 i)
+void Spell::EffectEnvironmentalDMG(uint32 i)
 {
     uint32 absorb = 0;
     uint32 resist = 0;
@@ -1175,6 +1175,35 @@ void Spell::EffectDummy(uint32 i)
 
                     return;
                 }
+                case 50926:                                 // Gluttonous Lurkers: Create Zul'Drak Rat Cover
+                case 51026:                                 // Create Drakkari Medallion Cover
+                case 51592:                                 // Pickup Primordial Hatchling
+                case 51961:                                 // Captured Chicken Cover
+                {
+                    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_UNIT || m_caster->GetTypeId() != TYPEID_PLAYER)
+                        return;
+
+                    uint32 spellId = 0;
+
+                    switch(m_spellInfo->Id)
+                    {
+                        case 50926: spellId = 50927; break;
+                        case 51026: spellId = 50737; break;
+                        case 51592: spellId = 51593; break;
+                        case 51961: spellId = 51037; break;
+                    }
+
+                    if (const SpellEntry *pSpell = sSpellStore.LookupEntry(spellId))
+                    {
+                        unitTarget->CastSpell(m_caster, spellId, true);
+
+                        Creature* creatureTarget = (Creature*)unitTarget;
+
+                        if (const SpellCastTimesEntry *pCastTime = sSpellCastTimesStore.LookupEntry(pSpell->CastingTimeIndex))
+                            creatureTarget->ForcedDespawn(pCastTime->CastTime + 1);
+                    }
+                    return;
+                }
                 case 51582:                                 //Rocket Boots Engaged (Rocket Boots Xtreme and Rocket Boots Xtreme Lite)
                 {
                     if (m_caster->GetTypeId() != TYPEID_PLAYER)
@@ -1185,17 +1214,6 @@ void Spell::EffectDummy(uint32 i)
 
                     m_caster->CastSpell(m_caster, 30452, true, NULL);
                     return;
-                }
-                case 51592:                                 // Pickup Primordial Hatchling
-                {
-                    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_UNIT)
-                        return;
-
-                    Creature* creatureTarget = (Creature*)unitTarget;
-
-                    creatureTarget->ForcedDespawn();
-                    return;
-
                 }
                 case 52308:                                 // Take Sputum Sample
                 {
@@ -1546,7 +1564,7 @@ void Spell::EffectDummy(uint32 i)
             break;
         case SPELLFAMILY_DRUID:
             // Starfall
-            if (m_spellInfo->SpellFamilyFlags2 & UI64LIT(0x00000100))
+            if (m_spellInfo->SpellFamilyFlags2 & 0x00000100)
             {
                 //Shapeshifting into an animal form or mounting cancels the effect.
                 if(m_caster->GetCreatureType() == CREATURE_TYPE_BEAST || m_caster->IsMounted())
@@ -5142,6 +5160,19 @@ void Spell::EffectScriptEffect(uint32 effIndex)
                         return;
 
                     ((Player*)unitTarget)->ModifyMoney(50000000);
+
+                    break;
+                }
+                // Surge Needle Teleporter
+                case 47097:
+                {
+                    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
+                        return;
+
+                    if (unitTarget->GetAreaId() == 4156)
+                        unitTarget->CastSpell(unitTarget, 47324, true);
+                    else if (unitTarget->GetAreaId() == 4157)
+                        unitTarget->CastSpell(unitTarget, 47325, true);
 
                     break;
                 }

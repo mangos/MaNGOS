@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -3621,11 +3621,10 @@ bool Unit::AddAura(Aura *Aur)
                     // Carry over removed Aura's remaining damage if Aura still has ticks remaining
                     else if (aur2->GetSpellProto()->AttributesEx4 & SPELL_ATTR_EX4_STACK_DOT_MODIFIER && aurName == SPELL_AURA_PERIODIC_DAMAGE && aur2->GetAuraDuration() > 0)
                     {
-                        int32 remainingTicks = 1 + (aur2->GetAuraDuration() / aur2->GetModifier()->periodictime);
+                        int32 remainingTicks = aur2->GetAuraMaxTicks() - aur2->GetAuraTicks();
                         int32 remainingDamage = aur2->GetModifier()->m_amount * remainingTicks;
 
-                        int32 maxTicks = Aur->GetAuraMaxDuration() / Aur->GetModifier()->periodictime;
-                        Aur->GetModifier()->m_amount += int32(remainingDamage / maxTicks);
+                        Aur->GetModifier()->m_amount += int32(remainingDamage / Aur->GetAuraMaxTicks());
                     }
                     // can be only single (this check done at _each_ aura add
                     RemoveAura(i2,AURA_REMOVE_BY_STACK);
@@ -9899,7 +9898,7 @@ void Unit::Mount(uint32 mount, uint32 spellId)
             // Normal case (Unsummon only permanent pet)
             else if (Pet* pet = GetPet())
             {
-                if (pet->IsPermanentPetFor((Player*)this))
+                if (pet->IsPermanentPetFor((Player*)this) && !((Player*)this)->InArena())
                     ((Player*)this)->UnsummonPetTemporaryIfAny();
                 else
                     pet->ApplyModeFlags(PET_MODE_DISABLE_ACTIONS,true);

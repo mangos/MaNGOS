@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -4526,7 +4526,7 @@ void ObjectMgr::LoadPageTexts()
                     ss << *itr << " ";
                 ss << "create(s) a circular reference, which can cause the server to freeze. Changing Next_Page of page "
                     << pageItr->Page_ID <<" to 0";
-                sLog.outErrorDb(ss.str().c_str());
+                sLog.outErrorDb("%s", ss.str().c_str());
                 const_cast<PageText*>(pageItr)->Next_Page = 0;
                 break;
             }
@@ -7321,6 +7321,16 @@ bool PlayerCondition::Meets(Player const * player) const
             if ((!value1 || (player->getRaceMask() & value1)) && (!value2 || (player->getClassMask() & value2)))
                 return true;
             return false;
+        case CONDITION_LEVEL:
+        {
+            switch(value2)
+            {
+                case 0: return player->getLevel() == value1;
+                case 1: return player->getLevel() >= value1;
+                case 2: return player->getLevel() <= value1;
+            }
+            return false;
+        }
         default:
             return false;
     }
@@ -7493,6 +7503,22 @@ bool PlayerCondition::IsValid(ConditionType condition, uint32 value1, uint32 val
                 sLog.outErrorDb("Race_class condition has invalid race mask %u, skipped", value2);
                 return false;
             }
+            break;
+        }
+        case CONDITION_LEVEL:
+        {
+            if (!value1 || value1 > sWorld.getConfig(CONFIG_MAX_PLAYER_LEVEL))
+            {
+                sLog.outErrorDb("Level condition has invalid level %u, skipped", value1);
+                return false;
+            }
+
+            if (value2 > 2)
+            {
+                sLog.outErrorDb("Level condition has invalid argument %u (must be 0..2), skipped", value2);
+                return false;
+            }
+
             break;
         }
         case CONDITION_NONE:

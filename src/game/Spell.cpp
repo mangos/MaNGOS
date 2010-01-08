@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -511,6 +511,27 @@ void Spell::FillTargetMap()
                         break;
                 }
                 break;
+            case TARGET_SELF:
+                switch(m_spellInfo->EffectImplicitTargetB[i])
+                {
+                    case 0:
+                    case TARGET_EFFECT_SELECT:
+                        SetTargetMap(i, m_spellInfo->EffectImplicitTargetA[i], tmpUnitMap);
+                        break;
+                    case TARGET_AREAEFFECT_INSTANT:         // use B case that not dependent from from A in fact
+                        if((m_targets.m_targetMask & TARGET_FLAG_DEST_LOCATION) == 0)
+                            m_targets.setDestination(m_caster->GetPositionX(), m_caster->GetPositionY(), m_caster->GetPositionZ());
+                        SetTargetMap(i, m_spellInfo->EffectImplicitTargetB[i], tmpUnitMap);
+                        break;
+                    case TARGET_BEHIND_VICTIM:              // use B case that not dependent from from A in fact
+                        SetTargetMap(i, m_spellInfo->EffectImplicitTargetB[i], tmpUnitMap);
+                        break;
+                    default:
+                        SetTargetMap(i, m_spellInfo->EffectImplicitTargetA[i], tmpUnitMap);
+                        SetTargetMap(i, m_spellInfo->EffectImplicitTargetB[i], tmpUnitMap);
+                        break;
+                }
+                break;
             case TARGET_EFFECT_SELECT:
                 switch(m_spellInfo->EffectImplicitTargetB[i])
                 {
@@ -538,27 +559,6 @@ void Spell::FillTargetMap()
                         SetTargetMap(i, m_spellInfo->EffectImplicitTargetB[i], tmpUnitMap);
                         break;
                     default:
-                        SetTargetMap(i, m_spellInfo->EffectImplicitTargetB[i], tmpUnitMap);
-                        break;
-                }
-                break;
-            case TARGET_SELF:
-                switch(m_spellInfo->EffectImplicitTargetB[i])
-                {
-                    case 0:
-                    case TARGET_EFFECT_SELECT:
-                        SetTargetMap(i, m_spellInfo->EffectImplicitTargetA[i], tmpUnitMap);
-                        break;
-                    case TARGET_AREAEFFECT_INSTANT:         // use B case that not dependent from from A in fact
-                        if((m_targets.m_targetMask & TARGET_FLAG_DEST_LOCATION) == 0)
-                            m_targets.setDestination(m_caster->GetPositionX(), m_caster->GetPositionY(), m_caster->GetPositionZ());
-                        SetTargetMap(i, m_spellInfo->EffectImplicitTargetB[i], tmpUnitMap);
-                        break;
-                    case TARGET_BEHIND_VICTIM:              // use B case that not dependent from from A in fact
-                        SetTargetMap(i, m_spellInfo->EffectImplicitTargetB[i], tmpUnitMap);
-                        break;
-                    default:
-                        SetTargetMap(i, m_spellInfo->EffectImplicitTargetA[i], tmpUnitMap);
                         SetTargetMap(i, m_spellInfo->EffectImplicitTargetB[i], tmpUnitMap);
                         break;
                 }
@@ -607,6 +607,19 @@ void Spell::FillTargetMap()
                         SetTargetMap(i, m_spellInfo->EffectImplicitTargetA[i], tmpUnitMap);
                         SetTargetMap(i, m_spellInfo->EffectImplicitTargetB[i], tmpUnitMap);
                     break;
+                }
+                break;
+            case TARGET_SELF2:
+                switch(m_spellInfo->EffectImplicitTargetB[i])
+                {
+                    case 0:
+                    case TARGET_EFFECT_SELECT:
+                        SetTargetMap(i, m_spellInfo->EffectImplicitTargetA[i], tmpUnitMap);
+                        break;
+                    // most A/B target pairs is slef->negative and not expect adding caster to target list
+                    default:
+                        SetTargetMap(i, m_spellInfo->EffectImplicitTargetB[i], tmpUnitMap);
+                        break;
                 }
                 break;
             default:
@@ -1313,16 +1326,22 @@ void Spell::SetTargetMap(uint32 effIndex, uint32 targetMode, UnitList& targetUni
         {
             switch(m_spellInfo->Id)
             {
+                case 31347:                                 // Doom TODO: exclude top threat target from target selection
                 case 33711:                                 // Murmur's Touch
                 case 38794:                                 // Murmur's Touch (h)
                     unMaxTargets = 1;
+                    break;
+                case 28542:                                 // Life Drain
+                    unMaxTargets = 2;
                     break;
                 case 28796:                                 // Poison Bolt Volley
                 case 29213:                                 // Curse of the Plaguebringer
                 case 31298:                                 // Sleep
                     unMaxTargets = 3;
                     break;
-                case 30843:                                 // Enfeeble
+                case 30843:                                 // Enfeeble TODO: exclude top threat target from target selection
+                case 42005:                                 // Bloodboil TODO: need to be 5 targets(players) furthest away from caster
+                case 55665:                                 // Life Drain (h)
                     unMaxTargets = 5;
                     break;
                 case 54098:                                 // Poison Bolt Volley (h)
@@ -1393,7 +1412,6 @@ void Spell::SetTargetMap(uint32 effIndex, uint32 targetMode, UnitList& targetUni
         case TARGET_SELF2:
         case TARGET_AREAEFFECT_CUSTOM:
         case TARGET_AREAEFFECT_CUSTOM_2:
-        case TARGET_SUMMON:
             targetUnitMap.push_back(m_caster);
             break;
         case TARGET_RANDOM_ENEMY_CHAIN_IN_AREA:
@@ -1723,6 +1741,20 @@ void Spell::SetTargetMap(uint32 effIndex, uint32 targetMode, UnitList& targetUni
                 if (m_caster->GetTypeId()==TYPEID_PLAYER)
                     if (Unit* target = m_caster->GetMap()->GetPet(((Player*)m_caster)->GetSelection()))
                         targetUnitMap.push_back(target);
+            }
+            // Circle of Healing
+            else if (m_spellInfo->SpellFamilyName == SPELLFAMILY_PRIEST && m_spellInfo->SpellVisual[0] == 8253)
+            {
+                Unit* target = m_targets.getUnitTarget();
+                if(!target)
+                    target = m_caster;
+
+                uint32 count = 5;
+                // Glyph of Circle of Healing
+                if(Aura const* glyph = m_caster->GetDummyAura(55675))
+                    count += glyph->GetModifier()->m_amount;
+
+                FillRaidOrPartyHealthPriorityTargets(targetUnitMap, m_caster, target, radius, count, true, false, true);
             }
             // Wild Growth
             else if (m_spellInfo->SpellFamilyName == SPELLFAMILY_DRUID && m_spellInfo->SpellIconID == 2864)
@@ -2098,16 +2130,19 @@ void Spell::SetTargetMap(uint32 effIndex, uint32 targetMode, UnitList& targetUni
             break;
 
         case TARGET_DYNAMIC_OBJECT_FRONT:
+        case TARGET_DYNAMIC_OBJECT_BEHIND:
         case TARGET_DYNAMIC_OBJECT_LEFT_SIDE:
         case TARGET_DYNAMIC_OBJECT_RIGHT_SIDE:
+        {
             if (!(m_targets.m_targetMask & TARGET_FLAG_DEST_LOCATION))
             {
                 float angle = m_caster->GetOrientation();
                 switch(targetMode)
                 {
-                    case TARGET_DYNAMIC_OBJECT_FRONT:                         break;
-                    case TARGET_DYNAMIC_OBJECT_LEFT_SIDE:  angle -= 3*M_PI/4; break;
-                    case TARGET_DYNAMIC_OBJECT_RIGHT_SIDE: angle += 3*M_PI/4; break;
+                    case TARGET_DYNAMIC_OBJECT_FRONT:                        break;
+                    case TARGET_DYNAMIC_OBJECT_BEHIND:      angle += M_PI;   break;
+                    case TARGET_DYNAMIC_OBJECT_LEFT_SIDE:   angle += M_PI/2; break;
+                    case TARGET_DYNAMIC_OBJECT_RIGHT_SIDE:  angle -= M_PI/2; break;
                 }
 
                 float x,y;
@@ -2117,7 +2152,7 @@ void Spell::SetTargetMap(uint32 effIndex, uint32 targetMode, UnitList& targetUni
 
             targetUnitMap.push_back(m_caster);
             break;
-
+        }
         case TARGET_POINT_AT_NORTH:
         case TARGET_POINT_AT_SOUTH:
         case TARGET_POINT_AT_EAST:
@@ -4110,29 +4145,65 @@ SpellCastResult Spell::CheckCast(bool strict)
         if(non_caster_target)
         {
             // simple cases
-            if (IsExplicitPositiveTarget(m_spellInfo->EffectImplicitTargetA[0]))
+            bool explicit_target_mode = false;
+            bool target_hostile = false;
+            bool target_hostile_checked = false;
+            bool target_friendly = false;
+            bool target_friendly_checked = false;
+            for(int k = 0; k < 3;  ++k)
             {
-                if(m_caster->IsHostileTo(target))
-                    return SPELL_FAILED_BAD_TARGETS;
-            }
-            else if (IsExplicitNegativeTarget(m_spellInfo->EffectImplicitTargetA[0]))
-            {
-                if(m_caster->IsFriendlyTo(target))
-                    return SPELL_FAILED_BAD_TARGETS;
+                if (IsExplicitPositiveTarget(m_spellInfo->EffectImplicitTargetA[k]))
+                {
+                    if (!target_hostile_checked)
+                    {
+                        target_hostile_checked = true;
+                        target_hostile = m_caster->IsHostileTo(target);
+                    }
+
+                    if(target_hostile)
+                        return SPELL_FAILED_BAD_TARGETS;
+
+                    explicit_target_mode = true;
+                }
+                else if (IsExplicitNegativeTarget(m_spellInfo->EffectImplicitTargetA[k]))
+                {
+                    if (!target_friendly_checked)
+                    {
+                        target_friendly_checked = true;
+                        target_friendly = m_caster->IsFriendlyTo(target);
+                    }
+
+                    if(target_friendly)
+                        return SPELL_FAILED_BAD_TARGETS;
+
+                    explicit_target_mode = true;
+                }
             }
             // TODO: this check can be applied and for player to prevent cheating when IsPositiveSpell will return always correct result.
             // check target for pet/charmed casts (not self targeted), self targeted cast used for area effects and etc
-            else if (m_caster->GetTypeId() == TYPEID_UNIT && m_caster->GetCharmerOrOwnerGUID())
+            if (!explicit_target_mode && m_caster->GetTypeId() == TYPEID_UNIT && m_caster->GetCharmerOrOwnerGUID())
             {
                 // check correctness positive/negative cast target (pet cast real check and cheating check)
                 if(IsPositiveSpell(m_spellInfo->Id))
                 {
-                    if(m_caster->IsHostileTo(target))
+                    if (!target_hostile_checked)
+                    {
+                        target_hostile_checked = true;
+                        target_hostile = m_caster->IsHostileTo(target);
+                    }
+
+                    if(target_hostile)
                         return SPELL_FAILED_BAD_TARGETS;
                 }
                 else
                 {
-                    if(m_caster->IsFriendlyTo(target))
+                    if (!target_friendly_checked)
+                    {
+                        target_friendly_checked = true;
+                        target_friendly = m_caster->IsFriendlyTo(target);
+                    }
+
+                    if(target_friendly)
                         return SPELL_FAILED_BAD_TARGETS;
                 }
             }

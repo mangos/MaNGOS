@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -221,7 +221,7 @@ class Spell
         void EffectDistract(uint32 i);
         void EffectPull(uint32 i);
         void EffectSchoolDMG(uint32 i);
-        void EffectEnvirinmentalDMG(uint32 i);
+        void EffectEnvironmentalDMG(uint32 i);
         void EffectInstaKill(uint32 i);
         void EffectDummy(uint32 i);
         void EffectTeleportUnits(uint32 i);

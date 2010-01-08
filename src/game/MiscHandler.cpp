@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -845,7 +845,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
             else if(missingKey)
                 GetPlayer()->SendTransferAborted(at->target_mapId, TRANSFER_ABORT_DIFFICULTY, isRegularTargetMap ? DUNGEON_DIFFICULTY_NORMAL : DUNGEON_DIFFICULTY_HEROIC);
             else if(missingQuest)
-                SendAreaTriggerMessage(at->requiredFailedText.c_str());
+                SendAreaTriggerMessage("%s", at->requiredFailedText.c_str());
             else if(missingLevel)
                 SendAreaTriggerMessage(GetMangosString(LANG_LEVEL_MINREQUIRED), missingLevel);
             return;

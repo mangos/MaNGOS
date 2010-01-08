@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -71,12 +71,6 @@ typedef MaNGOS::SingleThreaded<GridRWLock>::Lock NullGuard;
 //******************************************
 // Map file format defines
 //******************************************
-#define MAP_MAGIC             'SPAM'
-#define MAP_VERSION_MAGIC     '0.1w'
-#define MAP_AREA_MAGIC        'AERA'
-#define MAP_HEIGHT_MAGIC      'TGHM'
-#define MAP_LIQUID_MAGIC      'QILM'
-
 struct map_fileheader
 {
     uint32 mapMagic;
@@ -182,7 +176,7 @@ class GridMap
     float  *m_liquid_map;
 
     bool  loadAreaData(FILE *in, uint32 offset, uint32 size);
-    bool  loadHeihgtData(FILE *in, uint32 offset, uint32 size);
+    bool  loadHeightData(FILE *in, uint32 offset, uint32 size);
     bool  loadLiquidData(FILE *in, uint32 offset, uint32 size);
 
     // Get height functions and pointers

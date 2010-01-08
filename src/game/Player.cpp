@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16594,7 +16594,7 @@ void Player::SavePositionInDB(uint32 mapid, float x,float y,float z,float o,uint
         << "',position_z='"<<z<<"',orientation='"<<o<<"',map='"<<mapid
         << "',zone='"<<zone<<"',trans_x='0',trans_y='0',trans_z='0',"
         << "transguid='0',taxi_path='' WHERE guid='"<< GUID_LOPART(guid) <<"'";
-    sLog.outDebug(ss.str().c_str());
+    sLog.outDebug("%s", ss.str().c_str());
     CharacterDatabase.Execute(ss.str().c_str());
 }
 
@@ -16860,7 +16860,14 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
     if(!pet)
         pet = GetPet();
 
-    if(returnreagent && (pet || m_temporaryUnsummonedPetNumber))
+    if(!pet || pet->GetOwnerGUID()!=GetGUID())
+        return;
+
+    // not save secondary permanent pet as current
+    if (pet && m_temporaryUnsummonedPetNumber != pet->GetCharmInfo()->GetPetNumber() && mode == PET_SAVE_AS_CURRENT)
+        mode = PET_SAVE_NOT_IN_SLOT;
+
+    if(returnreagent && pet && mode != PET_SAVE_AS_CURRENT)
     {
         //returning of reagents only for players, so best done here
         uint32 spellId = pet ? pet->GetUInt32Value(UNIT_CREATED_BY_SPELL) : m_oldpetspell;
@@ -16883,11 +16890,7 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
                 }
             }
         }
-        m_temporaryUnsummonedPetNumber = 0;
     }
-
-    if(!pet || pet->GetOwnerGUID()!=GetGUID())
-        return;
 
     // only if current pet in slot
     switch(pet->getPetType())
@@ -16905,20 +16908,6 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
     }
 
     pet->CombatStop();
-
-    if(returnreagent)
-    {
-        switch(pet->GetEntry())
-        {
-            //warlock pets except imp are removed(?) when logging out
-            case 1860:
-            case 1863:
-            case 417:
-            case 17252:
-                mode = PET_SAVE_NOT_IN_SLOT;
-                break;
-        }
-    }
 
     pet->SavePetToDB(mode);
 
@@ -20421,7 +20410,7 @@ void Player::_LoadSkills(QueryResult *result)
 
             if(count >= PLAYER_MAX_SKILLS)                      // client limit
             {
-                sLog.outError("Character %u has more than %u skills.", PLAYER_MAX_SKILLS);
+                sLog.outError("Character %u has more than %u skills.", GetGUIDLow(), PLAYER_MAX_SKILLS);
                 break;
             }
         } while (result->NextRow());

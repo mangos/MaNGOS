@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -149,7 +149,7 @@ void WorldSession::LogUnexpectedOpcode(WorldPacket* packet, const char *reason)
 /// Logging helper for unexpected opcodes
 void WorldSession::LogUnprocessedTail(WorldPacket *packet)
 {
-    sLog.outError( "SESSION: opcode %s (0x%.4X) have unprocessed tail data (read stop at %u from %u)",
+    sLog.outError( "SESSION: opcode %s (0x%.4X) have unprocessed tail data (read stop at " SIZEFMTD " from " SIZEFMTD ")",
         LookupOpcodeName(packet->GetOpcode()),
         packet->GetOpcode(),
         packet->rpos(),packet->wpos());

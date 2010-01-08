@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -538,7 +538,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
         void RemoveCorpse();
         bool isDeadByDefault() const { return m_isDeadByDefault; };
 
-        void ForcedDespawn();
+        void ForcedDespawn(uint32 timeMSToDespawn = 0);
 
         time_t const& GetRespawnTime() const { return m_respawnTime; }
         time_t GetRespawnTimeEx() const;
@@ -575,6 +575,9 @@ class MANGOS_DLL_SPEC Creature : public Unit
 
         void SetCombatStartPosition(float x, float y, float z) { CombatStartX = x; CombatStartY = y; CombatStartZ = z; }
         void GetCombatStartPosition(float &x, float &y, float &z) { x = CombatStartX; y = CombatStartY; z = CombatStartZ; }
+
+        void SetSummonPoint(float fX, float fY, float fZ, float fOrient) { m_summonXpoint = fX; m_summonYpoint = fY; m_summonZpoint = fZ; m_summonOrientation = fOrient; }
+        void GetSummonPoint(float &fX, float &fY, float &fZ, float &fOrient) const { fX = m_summonXpoint; fY = m_summonYpoint; fZ = m_summonZpoint; fOrient = m_summonOrientation; }
 
         uint32 GetGlobalCooldown() const { return m_GlobalCooldown; }
 
@@ -629,6 +632,12 @@ class MANGOS_DLL_SPEC Creature : public Unit
         float CombatStartX;
         float CombatStartY;
         float CombatStartZ;
+
+        float m_summonXpoint;
+        float m_summonYpoint;
+        float m_summonZpoint;
+        float m_summonOrientation;
+
     private:
         GridReference<Creature> m_gridRef;
         CreatureInfo const* m_creatureInfo;                 // in difficulty mode > 0 can different from ObjMgr::GetCreatureTemplate(GetEntry())
@@ -649,6 +658,16 @@ class AssistDelayEvent : public BasicEvent
         uint64            m_victim;
         std::list<uint64> m_assistants;
         Unit&             m_owner;
+};
+
+class ForcedDespawnDelayEvent : public BasicEvent
+{
+    public:
+        ForcedDespawnDelayEvent(Creature& owner) : BasicEvent(), m_owner(owner) { }
+        bool Execute(uint64 e_time, uint32 p_time);
+
+    private:
+        Creature& m_owner;
 };
 
 #endif

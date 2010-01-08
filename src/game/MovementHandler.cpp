@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -137,13 +137,19 @@ void WorldSession::HandleMoveWorldportAckOpcode()
         }
     }
 
-    if (mInstance && mEntry->IsDungeon())
+    if (mInstance)
     {
         Difficulty diff = GetPlayer()->GetDifficulty(mEntry->IsRaid());
-        if (uint32 timeReset = sInstanceSaveMgr.GetResetTimeFor(GetPlayer()->GetMapId(),diff))
+        if(MapDifficulty const* mapDiff = GetMapDifficultyData(mEntry->MapID,diff))
         {
-            uint32 timeleft = timeReset - time(NULL);
-            GetPlayer()->SendInstanceResetWarning(GetPlayer()->GetMapId(), diff, timeleft);
+            if (mapDiff->resetTime)
+            {
+                if (uint32 timeReset = sInstanceSaveMgr.GetResetTimeFor(mEntry->MapID,diff))
+                {
+                    uint32 timeleft = timeReset - time(NULL);
+                    GetPlayer()->SendInstanceResetWarning(mEntry->MapID, diff, timeleft);
+                }
+            }
         }
     }
 

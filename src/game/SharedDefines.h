@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -1067,7 +1067,7 @@ enum Targets
     TARGET_CHAIN_HEAL                  = 45,
     TARGET_SCRIPT_COORDINATES          = 46,
     TARGET_DYNAMIC_OBJECT_FRONT        = 47,
-    TARGET_SUMMON                      = 48,
+    TARGET_DYNAMIC_OBJECT_BEHIND       = 48,
     TARGET_DYNAMIC_OBJECT_LEFT_SIDE    = 49,
     TARGET_DYNAMIC_OBJECT_RIGHT_SIDE   = 50,
     TARGET_AREAEFFECT_CUSTOM_2         = 52,

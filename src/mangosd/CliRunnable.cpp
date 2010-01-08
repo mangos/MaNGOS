@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,9 +45,9 @@ void utf8print(const char* str)
 
     char temp_buf[6000];
     CharToOemBuffW(&wtemp_buf[0],&temp_buf[0],wtemp_len+1);
-    printf(temp_buf);
+    printf("%s", temp_buf);
 #else
-    printf(str);
+    printf("%s", str);
 #endif
 }
 

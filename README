@@ -1,6 +1,6 @@
 = MaNGOS -- README =
 
-Copyright (C) 2005-2009 MaNGOS project <http://getmangos.com/>
+Copyright (C) 2005-2010 MaNGOS project <http://getmangos.com/>
 
   MaNGOS is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ license details.
 For further information on the MaNGOS project, please visit our project web
 site at <http://getmangos.com/>
 
-Documenation on various development related topics can be found in the doc/
+Documentation on various development related topics can be found in the doc/
 subdirectory, including Doxygen-generated API documentation.
 
 The required SQL files for creating the database backend are included in the

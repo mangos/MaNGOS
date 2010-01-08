@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -182,10 +182,10 @@ struct AchievementCriteriaRequirement
 struct AchievementCriteriaRequirementSet
 {
         AchievementCriteriaRequirementSet() : criteria_id(0) {}
-        explicit AchievementCriteriaRequirementSet(uint32 id) : criteria_id(id) {}
         typedef std::vector<AchievementCriteriaRequirement> Storage;
         void Add(AchievementCriteriaRequirement const& data) { storage.push_back(data); }
         bool Meets(Player const* source, Unit const* target, uint32 miscvalue = 0) const;
+        void SetCriteriaId(uint32 id) {criteria_id = id;}
     private:
         uint32 criteria_id;
         Storage storage;
