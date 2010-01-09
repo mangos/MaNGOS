@@ -439,7 +439,7 @@ void WorldSession::HandlePetRename( WorldPacket & recv_data )
     Pet* pet = _player->GetMap()->GetPet(petguid);
                                                             // check it!
     if( !pet || pet->getPetType() != HUNTER_PET ||
-        pet->GetByteValue(UNIT_FIELD_BYTES_2, 2) != UNIT_RENAME_ALLOWED ||
+        !pet->HasByteFlag(UNIT_FIELD_BYTES_2, 2, UNIT_CAN_BE_RENAMED) ||
         pet->GetOwnerGUID() != _player->GetGUID() || !pet->GetCharmInfo() )
         return;
 
@@ -461,7 +461,7 @@ void WorldSession::HandlePetRename( WorldPacket & recv_data )
     if(_player->GetGroup())
         _player->SetGroupUpdateFlag(GROUP_UPDATE_FLAG_PET_NAME);
 
-    pet->SetByteValue(UNIT_FIELD_BYTES_2, 2, UNIT_RENAME_NOT_ALLOWED);
+    pet->RemoveByteFlag(UNIT_FIELD_BYTES_2, 2, UNIT_CAN_BE_RENAMED);
 
     if(isdeclined)
     {
