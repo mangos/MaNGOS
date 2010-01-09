@@ -222,10 +222,10 @@ const uint32 ItemQualityColors[MAX_ITEM_QUALITY] = {
 #define SPELL_ATTR_RANGED                         0x00000002            // 1 All ranged abilites have this flag
 #define SPELL_ATTR_ON_NEXT_SWING_1                0x00000004            // 2 on next swing
 #define SPELL_ATTR_UNK3                           0x00000008            // 3 not set in 3.0.3
-#define SPELL_ATTR_UNK4                           0x00000010            // 4
+#define SPELL_ATTR_UNK4                           0x00000010            // 4 isAbility
 #define SPELL_ATTR_TRADESPELL                     0x00000020            // 5 trade spells, will be added by client to a sublist of profession spell
 #define SPELL_ATTR_PASSIVE                        0x00000040            // 6 Passive spell
-#define SPELL_ATTR_UNK7                           0x00000080            // 7 visible?
+#define SPELL_ATTR_UNK7                           0x00000080            // 7 can't be linked in chat?
 #define SPELL_ATTR_UNK8                           0x00000100            // 8 hide created item in tooltip (for effect=24)
 #define SPELL_ATTR_UNK9                           0x00000200            // 9
 #define SPELL_ATTR_ON_NEXT_SWING_2                0x00000400            // 10 on next swing 2

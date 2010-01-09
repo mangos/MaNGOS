@@ -364,21 +364,21 @@ enum SummonPropType
 // SummonProperties.dbc, col 5
 enum SummonPropFlags
 {
-    SUMMON_PROP_FLAG_NONE            = 0x0000,              // 1342 spells in 3.0.3
-    SUMMON_PROP_FLAG_UNK1            = 0x0001,              // 75 spells in 3.0.3, something unfriendly
-    SUMMON_PROP_FLAG_UNK2            = 0x0002,              // 616 spells in 3.0.3, something friendly
-    SUMMON_PROP_FLAG_UNK3            = 0x0004,              // 22 spells in 3.0.3, no idea...
-    SUMMON_PROP_FLAG_UNK4            = 0x0008,              // 49 spells in 3.0.3, some mounts
-    SUMMON_PROP_FLAG_UNK5            = 0x0010,              // 25 spells in 3.0.3, quest related?
-    SUMMON_PROP_FLAG_UNK6            = 0x0020,              // 0 spells in 3.0.3, unused
-    SUMMON_PROP_FLAG_UNK7            = 0x0040,              // 12 spells in 3.0.3, no idea
-    SUMMON_PROP_FLAG_UNK8            = 0x0080,              // 4 spells in 3.0.3, no idea
-    SUMMON_PROP_FLAG_UNK9            = 0x0100,              // 51 spells in 3.0.3, no idea, many quest related
-    SUMMON_PROP_FLAG_UNK10           = 0x0200,              // 51 spells in 3.0.3, something defensive
-    SUMMON_PROP_FLAG_UNK11           = 0x0400,              // 3 spells, requires something near?
-    SUMMON_PROP_FLAG_UNK12           = 0x0800,              // 30 spells in 3.0.3, no idea
-    SUMMON_PROP_FLAG_UNK13           = 0x1000,              // 8 spells in 3.0.3, siege vehicle
-    SUMMON_PROP_FLAG_UNK14           = 0x2000,              // 2 spells in 3.0.3, escort?
+    SUMMON_PROP_FLAG_NONE              = 0x0000,            // 1342 spells in 3.0.3
+    SUMMON_PROP_FLAG_UNK1              = 0x0001,            // 75 spells in 3.0.3, something unfriendly
+    SUMMON_PROP_FLAG_UNK2              = 0x0002,            // 616 spells in 3.0.3, something friendly
+    SUMMON_PROP_FLAG_UNK3              = 0x0004,            // 22 spells in 3.0.3, no idea...
+    SUMMON_PROP_FLAG_UNK4              = 0x0008,            // 49 spells in 3.0.3, some mounts
+    SUMMON_PROP_FLAG_UNK5              = 0x0010,            // 25 spells in 3.0.3, quest related?
+    SUMMON_PROP_FLAG_CANT_BE_DISMISSED = 0x0020,            // 0 spells in 3.0.3, unused
+    SUMMON_PROP_FLAG_UNK7              = 0x0040,            // 12 spells in 3.0.3, no idea
+    SUMMON_PROP_FLAG_UNK8              = 0x0080,            // 4 spells in 3.0.3, no idea
+    SUMMON_PROP_FLAG_UNK9              = 0x0100,            // 51 spells in 3.0.3, no idea, many quest related
+    SUMMON_PROP_FLAG_UNK10             = 0x0200,            // 51 spells in 3.0.3, something defensive
+    SUMMON_PROP_FLAG_UNK11             = 0x0400,            // 3 spells, requires something near?
+    SUMMON_PROP_FLAG_UNK12             = 0x0800,            // 30 spells in 3.0.3, no idea
+    SUMMON_PROP_FLAG_UNK13             = 0x1000,            // 8 spells in 3.0.3, siege vehicle
+    SUMMON_PROP_FLAG_UNK14             = 0x2000,            // 2 spells in 3.0.3, escort?
 };
 
 #endif
