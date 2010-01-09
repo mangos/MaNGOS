@@ -19173,22 +19173,15 @@ bool Player::GetBGAccessByLevel(BattleGroundTypeId bgTypeId) const
     if(!bg)
         return false;
 
-    if(getLevel() < bg->GetMinLevel() || getLevel() > bg->GetMaxLevel())
+    // limit check leel to dbc compatible level range
+    uint32 level = getLevel();
+    if (level > DEFAULT_MAX_LEVEL)
+        level = DEFAULT_MAX_LEVEL;
+
+    if(level < bg->GetMinLevel() || level > bg->GetMaxLevel())
         return false;
 
     return true;
-}
-
-BattleGroundBracketId Player::GetBattleGroundBracketIdFromLevel() const
-{
-    // for ranges 0 - 19, 20 - 29, 30 - 39, 40 - 49, 50 - 59, 60 - 69, 70 - 79, 80
-    uint32 bracket_id = ( getLevel() / 10) - 1;
-    if( bracket_id >= MAX_BATTLEGROUND_BRACKETS )
-    {
-        sLog.outError("BattleGround: too high bracket_id %u for player %u (acc: %u) with level %u", bracket_id, GetGUIDLow(), GetSession()->GetAccountId(), getLevel());
-        return BG_BRACKET_ID_LAST;
-    }
-    return BattleGroundBracketId(bracket_id);
 }
 
 float Player::GetReputationPriceDiscount( Creature const* pCreature ) const

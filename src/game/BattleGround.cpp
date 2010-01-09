@@ -1129,7 +1129,6 @@ void BattleGround::RemovePlayerAtLeave(uint64 guid, bool Transport, bool SendPac
 // this method is called when no players remains in battleground
 void BattleGround::Reset()
 {
-    SetBracketId(BG_BRACKET_ID_FIRST);
     SetWinner(WINNER_NONE);
     SetStatus(STATUS_WAIT_QUEUE);
     SetStartTime(0);
@@ -1834,4 +1833,10 @@ bool BattleGround::IsTeamScoreInRange(uint32 team, uint32 minScore, uint32 maxSc
     BattleGroundTeamId team_idx = GetTeamIndexByTeamId(team);
     uint32 score = (m_TeamScores[team_idx] < 0) ? 0 : uint32(m_TeamScores[team_idx]);
     return score >= minScore && score <= maxScore;
+}
+
+void BattleGround::SetBracket( PvPDifficultyEntry const* bracketEntry )
+{
+    m_BracketId  = bracketEntry->GetBracketId();
+    SetLevelRange(bracketEntry->minLevel,bracketEntry->maxLevel);
 }
