@@ -4947,23 +4947,6 @@ void Spell::EffectScriptEffect(uint32 effIndex)
         {
             switch(m_spellInfo->Id)
             {
-                // PX-238 Winter Wondervolt TRAP
-                case 26275:
-                {
-                    uint32 spells[4] = { 26272, 26157, 26273, 26274 };
-
-                    // check presence
-                    for(int j = 0; j < 4; ++j)
-                        if(unitTarget->HasAura(spells[j],0))
-                            return;
-
-                    // select spell
-                    uint32 iTmpSpellId = spells[urand(0,3)];
-
-                    // cast
-                    unitTarget->CastSpell(unitTarget, iTmpSpellId, true);
-                    return;
-                }
                 // Bending Shinbone
                 case 8856:
                 {
@@ -4980,10 +4963,45 @@ void Spell::EffectScriptEffect(uint32 effIndex)
                     m_caster->CastSpell(m_caster,spell_id,true,NULL);
                     return;
                 }
+                // Piccolo of the Flaming Fire
+                case 17512:
+                {
+                    if(!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
+                        return;
+                    unitTarget->HandleEmoteCommand(EMOTE_STATE_DANCE);
+                    return;
+                }
+                // Escape artist
+                case 20589:
+                {
+                    if(!unitTarget)
+                        return;
+
+                    unitTarget->RemoveSpellsCausingAura(SPELL_AURA_MOD_ROOT);
+                    unitTarget->RemoveSpellsCausingAura(SPELL_AURA_MOD_DECREASE_SPEED);
+                    return;
+                }
                 // Brittle Armor - need remove one 24575 Brittle Armor aura
                 case 24590:
                     unitTarget->RemoveSingleSpellAurasFromStack(24575);
                     return;
+                    // PX-238 Winter Wondervolt TRAP
+                case 26275:
+                {
+                    uint32 spells[4] = { 26272, 26157, 26273, 26274 };
+
+                    // check presence
+                    for(int j = 0; j < 4; ++j)
+                        if(unitTarget->HasAura(spells[j],0))
+                            return;
+
+                    // select spell
+                    uint32 iTmpSpellId = spells[urand(0,3)];
+
+                    // cast
+                    unitTarget->CastSpell(unitTarget, iTmpSpellId, true);
+                    return;
+                }
                 // Mercurial Shield - need remove one 26464 Mercurial Shield aura
                 case 26465:
                     unitTarget->RemoveSingleSpellAurasFromStack(26464);
@@ -5059,36 +5077,6 @@ void Spell::EffectScriptEffect(uint32 effIndex)
                         unitTarget->CastSpell(unitTarget, 25863, false);
                     else
                         unitTarget->CastSpell(unitTarget, 26655, false);
-                    return;
-                }
-                // Piccolo of the Flaming Fire
-                case 17512:
-                {
-                    if(!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
-                        return;
-                    unitTarget->HandleEmoteCommand(EMOTE_STATE_DANCE);
-                    return;
-                }
-                // Demonic Empowerment (succubus Vanish effect)
-                case 54436:
-                {
-                    if(!unitTarget)
-                        return;
-
-                    unitTarget->RemoveSpellsCausingAura(SPELL_AURA_MOD_ROOT);
-                    unitTarget->RemoveSpellsCausingAura(SPELL_AURA_MOD_DECREASE_SPEED);
-                    unitTarget->RemoveSpellsCausingAura(SPELL_AURA_MOD_STALKED);
-                    unitTarget->RemoveSpellsCausingAura(SPELL_AURA_MOD_STUN);
-                    return;
-                }
-                // Escape artist
-                case 20589:
-                {
-                    if(!unitTarget)
-                        return;
-
-                    unitTarget->RemoveSpellsCausingAura(SPELL_AURA_MOD_ROOT);
-                    unitTarget->RemoveSpellsCausingAura(SPELL_AURA_MOD_DECREASE_SPEED);
                     return;
                 }
                 // Mirren's Drinking Hat
@@ -5178,6 +5166,11 @@ void Spell::EffectScriptEffect(uint32 effIndex)
 
                     break;
                 }
+                // High Executor's Branding Iron
+                case 48603:
+                    // Torture the Torturer: High Executor's Branding Iron Impact
+                    unitTarget->CastSpell(unitTarget, 48614, true);
+                    return;
                 // Emblazon Runeblade
                 case 51770:
                 {
@@ -5213,6 +5206,18 @@ void Spell::EffectScriptEffect(uint32 effIndex)
                         else
                             unitTarget->CastSpell(unitTarget, 54726, true);
                     }
+                    return;
+                }
+                // Demonic Empowerment (succubus Vanish effect)
+                case 54436:
+                {
+                    if(!unitTarget)
+                        return;
+
+                    unitTarget->RemoveSpellsCausingAura(SPELL_AURA_MOD_ROOT);
+                    unitTarget->RemoveSpellsCausingAura(SPELL_AURA_MOD_DECREASE_SPEED);
+                    unitTarget->RemoveSpellsCausingAura(SPELL_AURA_MOD_STALKED);
+                    unitTarget->RemoveSpellsCausingAura(SPELL_AURA_MOD_STUN);
                     return;
                 }
                 case 55693:                                 // Remove Collapsing Cave Aura
