@@ -1521,15 +1521,6 @@ void Aura::TriggerSpell()
 //                    case 812: break;
 //                    // Polymorphic Ray
 //                    case 6965: break;
-//                    // Fire Nova (1-7 ranks)
-//                    case 8350:
-//                    case 8508:
-//                    case 8509:
-//                    case 11312:
-//                    case 11313:
-//                    case 25540:
-//                    case 25544:
-//                        break;
                     // Thaumaturgy Channel
                     case 9712: trigger_spell_id = 21029; break;
 //                    // Egan's Blaster
