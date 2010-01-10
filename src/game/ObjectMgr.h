@@ -256,16 +256,6 @@ struct QuestPOIPoint
 
     QuestPOIPoint() : x(0), y(0) {}
     QuestPOIPoint(int32 _x, int32 _y) : x(_x), y(_y) {}
-    uint32          npc_option_npcflag;
-    uint32          action_menu_id;
-    uint32          action_poi_id;
-    uint32          action_script_id;
-    bool            box_coded;
-    uint32          box_money;
-    std::string     box_text;
-    uint16          cond_1;
-    uint16          cond_2;
-    uint16          cond_3;
 };
 
 struct QuestPOI
