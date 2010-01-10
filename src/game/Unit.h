@@ -141,7 +141,7 @@ enum UnitStandStateType
     UNIT_STAND_STATE_SUBMERGED         = 9
 };
 
-// byte flag value (UNIT_FIELD_BYTES_1,2)
+// byte flags value (UNIT_FIELD_BYTES_1,2)
 enum UnitStandFlags
 {
     UNIT_STAND_FLAGS_UNK1         = 0x01,
@@ -161,7 +161,7 @@ enum UnitBytes1_Flags
     UNIT_BYTE1_FLAG_ALL          = 0xFF
 };
 
-// high byte (3 from 0..3) of UNIT_FIELD_BYTES_2
+// byte value (UNIT_FIELD_BYTES_2,3)
 enum ShapeshiftForm
 {
     FORM_NONE               = 0x00,
@@ -197,7 +197,7 @@ enum ShapeshiftForm
     FORM_SPIRITOFREDEMPTION = 0x20,
 };
 
-// low byte ( 0 from 0..3 ) of UNIT_FIELD_BYTES_2
+// byte value (UNIT_FIELD_BYTES_2,0)
 enum SheathState
 {
     SHEATH_STATE_UNARMED  = 0,                              // non prepared weapon
@@ -207,7 +207,7 @@ enum SheathState
 
 #define MAX_SHEATH_STATE    3
 
-// byte (1 from 0..3) of UNIT_FIELD_BYTES_2
+// byte flags value (UNIT_FIELD_BYTES_2,1)
 enum UnitPVPStateFlags
 {
     UNIT_BYTE2_FLAG_PVP         = 0x01,
@@ -220,11 +220,11 @@ enum UnitPVPStateFlags
     UNIT_BYTE2_FLAG_UNK7        = 0x80
 };
 
-// byte (2 from 0..3) of UNIT_FIELD_BYTES_2
+// byte flags value (UNIT_FIELD_BYTES_2,2)
 enum UnitRename
 {
-    UNIT_RENAME_NOT_ALLOWED = 0x02,
-    UNIT_RENAME_ALLOWED     = 0x03
+    UNIT_CAN_BE_RENAMED     = 0x01,
+    UNIT_CAN_BE_ABANDONED   = 0x02,
 };
 
 #define CREATURE_MAX_SPELLS     4

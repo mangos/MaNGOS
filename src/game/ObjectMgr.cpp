@@ -3026,9 +3026,11 @@ void ObjectMgr::LoadGuilds()
             delete newGuild;
             continue;
         }
+        newGuild->LoadGuildEventLogFromDB();
+        newGuild->LoadGuildBankEventLogFromDB();
+        newGuild->LoadGuildBankFromDB();
         AddGuild(newGuild);
-
-    }while( result->NextRow() );
+    } while( result->NextRow() );
 
     delete result;
     delete guildRanksResult;
@@ -3348,7 +3350,7 @@ void ObjectMgr::LoadQuests()
         if (qinfo->QuestFlags & ~QUEST_MANGOS_FLAGS_DB_ALLOWED)
         {
             sLog.outErrorDb("Quest %u has `SpecialFlags` = %u > max allowed value. Correct `SpecialFlags` to value <= %u",
-                qinfo->GetQuestId(),qinfo->QuestFlags,QUEST_MANGOS_FLAGS_DB_ALLOWED >> 16);
+                qinfo->GetQuestId(),qinfo->QuestFlags  >> 24,QUEST_MANGOS_FLAGS_DB_ALLOWED >> 24);
             qinfo->QuestFlags &= QUEST_MANGOS_FLAGS_DB_ALLOWED;
         }
 
@@ -4813,7 +4815,7 @@ void ObjectMgr::ReturnOrDeleteOldMails(bool serverUp)
         Player *pl = 0;
         if (serverUp)
             pl = GetPlayer((uint64)m->receiver);
-        if (pl && pl->m_mailsLoaded)
+        if (pl)
         {                                                   //this code will run very improbably (the time is between 4 and 5 am, in game is online a player, who has old mail
             //his in mailbox and he has already listed his mails )
             delete m;
@@ -6366,6 +6368,68 @@ void ObjectMgr::LoadPointsOfInterest()
 
     sLog.outString();
     sLog.outString(">> Loaded %u Points of Interest definitions", count);
+}
+
+void ObjectMgr::LoadQuestPOI()
+{
+    uint32 count = 0;
+
+    //                                                0        1         2      3     4     5     6
+    QueryResult *result = WorldDatabase.Query("SELECT questId, objIndex, mapId, unk1, unk2, unk3, unk4 FROM quest_poi");
+
+    if(!result)
+    {
+        barGoLink bar(1);
+
+        bar.step();
+
+        sLog.outString();
+        sLog.outErrorDb(">> Loaded 0 quest POI definitions. DB table `quest_poi` is empty.");
+        return;
+    }
+
+    barGoLink bar(result->GetRowCount());
+
+    do
+    {
+        Field *fields = result->Fetch();
+        bar.step();
+
+        uint32 questId  = fields[0].GetUInt32();
+        int32 objIndex  = fields[1].GetInt32();
+        uint32 mapId    = fields[2].GetUInt32();
+        uint32 unk1     = fields[3].GetUInt32();
+        uint32 unk2     = fields[4].GetUInt32();
+        uint32 unk3     = fields[5].GetUInt32();
+        uint32 unk4     = fields[6].GetUInt32();
+
+        QuestPOI POI(objIndex, mapId, unk1, unk2, unk3, unk4);
+
+        QueryResult *points = WorldDatabase.PQuery("SELECT x, y FROM quest_poi_points WHERE questId='%u' AND objIndex='%i'", questId, objIndex);
+
+        if(points)
+        {
+            do 
+            {
+                Field *pointFields = points->Fetch();
+                int32 x = pointFields[0].GetInt32();
+                int32 y = pointFields[1].GetInt32();
+                QuestPOIPoint point(x, y);
+                POI.points.push_back(point);
+            } while (points->NextRow());
+
+            delete points;
+        }
+
+        mQuestPOIMap[questId].push_back(POI);
+
+        ++count;
+    } while (result->NextRow());
+
+    delete result;
+
+    sLog.outString();
+    sLog.outString(">> Loaded %u quest POI definitions", count);
 }
 
 void ObjectMgr::LoadNPCSpellClickSpells()

@@ -733,7 +733,7 @@ int WorldSocket::HandleAuthSession (WorldPacket& recvPacket)
     uint32 clientSeed;
     uint32 unk2, unk3;
     uint64 unk4;
-    uint32 BuiltNumberClient;
+    uint32 ClientBuild;
     uint32 id, security;
     uint8 expansion = 0;
     LocaleConstant locale;
@@ -745,7 +745,7 @@ int WorldSocket::HandleAuthSession (WorldPacket& recvPacket)
     BigNumber K;
 
     // Read the content of the packet
-    recvPacket >> BuiltNumberClient;
+    recvPacket >> ClientBuild;
     recvPacket >> unk2;
     recvPacket >> account;
     recvPacket >> unk3;
@@ -754,7 +754,7 @@ int WorldSocket::HandleAuthSession (WorldPacket& recvPacket)
     recvPacket.read (digest, 20);
 
     DEBUG_LOG ("WorldSocket::HandleAuthSession: client %u, unk2 %u, account %s, unk3 %u, clientseed %u",
-                BuiltNumberClient,
+                ClientBuild,
                 unk2,
                 account.c_str (),
                 unk3,
@@ -765,7 +765,7 @@ int WorldSocket::HandleAuthSession (WorldPacket& recvPacket)
     int accepted_versions[] = EXPECTED_MANGOSD_CLIENT_BUILD;
     for(int i = 0; accepted_versions[i]; ++i)
     {
-        if(BuiltNumberClient == accepted_versions[i])
+        if(ClientBuild == accepted_versions[i])
         {
             valid_version = true;
             break;

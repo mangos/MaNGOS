@@ -38,6 +38,7 @@ class Player;
 class WorldPacket;
 class BattleGroundMap;
 
+struct PvPDifficultyEntry;
 struct WorldSafeLocsEntry;
 
 struct BattleGroundEventIdx
@@ -164,23 +165,6 @@ enum BattleGroundQueueTypeId
     BATTLEGROUND_QUEUE_5v5      = 9
 };
 #define MAX_BATTLEGROUND_QUEUE_TYPES 10
-
-enum BattleGroundBracketId                                  // bracketId for level ranges
-{
-    BG_BRACKET_ID_FIRST          = 0,
-
-    BG_BRACKET_ID_MAX_LEVEL_19   = 0,
-    BG_BRACKET_ID_MAX_LEVEL_29   = 1,
-    BG_BRACKET_ID_MAX_LEVEL_39   = 2,
-    BG_BRACKET_ID_MAX_LEVEL_49   = 3,
-    BG_BRACKET_ID_MAX_LEVEL_59   = 4,
-    BG_BRACKET_ID_MAX_LEVEL_69   = 5,
-    BG_BRACKET_ID_MAX_LEVEL_79   = 6,
-    BG_BRACKET_ID_MAX_LEVEL_80   = 7,
-
-    BG_BRACKET_ID_LAST           = 7
-};
-#define MAX_BATTLEGROUND_BRACKETS 8
 
 enum ScoreType
 {
@@ -338,12 +322,7 @@ class BattleGround
         void SetName(char const* Name)      { m_Name = Name; }
         void SetTypeID(BattleGroundTypeId TypeID) { m_TypeID = TypeID; }
         //here we can count minlevel and maxlevel for players
-        void SetBracketId(BattleGroundBracketId ID)
-        {
-            m_BracketId = ID;
-            uint8 diff = (m_TypeID == BATTLEGROUND_AV) ? 1 : 0;
-            this->SetLevelRange((ID + 1) * 10 + diff, (ID + 2) * 10 - ((diff + 1) % 2));
-        }
+        void SetBracket(PvPDifficultyEntry const* bracketEntry);
         void SetInstanceID(uint32 InstanceID) { m_InstanceID = InstanceID; }
         void SetStatus(BattleGroundStatus Status) { m_Status = Status; }
         void SetClientInstanceID(uint32 InstanceID) { m_ClientInstanceID = InstanceID; }

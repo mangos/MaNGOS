@@ -245,8 +245,6 @@ World::AddSession_ (WorldSession* s)
     pkt << uint32(getConfig(CONFIG_CLIENTCACHE_VERSION));
     s->SendPacket(&pkt);
 
-    s->SendAccountDataTimes(GLOBAL_CACHE_MASK);
-
     s->SendTutorialsData();
 
     UpdateMaxSessionCounters ();
@@ -1289,6 +1287,9 @@ void World::SetInitialWorldSettings()
 
     sLog.outString( "Loading Quests..." );
     sObjectMgr.LoadQuests();                                    // must be loaded after DBCs, creature_template, item_template, gameobject tables
+
+    sLog.outString( "Loading Quest POI" );
+    sObjectMgr.LoadQuestPOI();
 
     sLog.outString( "Loading Quests Relations..." );
     sLog.outString();

@@ -513,10 +513,6 @@ void WorldSession::HandleGetMailList(WorldPacket & recv_data )
     if (!GetPlayer()->GetGameObjectIfCanInteractWith(mailbox, GAMEOBJECT_TYPE_MAILBOX))
         return;
 
-    // load players mails, and mailed items
-    if(!_player->m_mailsLoaded)
-        _player->_LoadMail();
-
     // client can't work with packets > max int16 value
     const uint32 maxPacketSize = 32767;
 
@@ -543,7 +539,7 @@ void WorldSession::HandleGetMailList(WorldPacket & recv_data )
 
         uint8 item_count = (*itr)->items.size();            // max count is MAX_MAIL_ITEMS (12)
 
-        size_t next_mail_size = 2+4+1+8+4*8+((*itr)->subject.size()+1)+1+item_count*(1+4+4+6*3*4+4+4+1+4+4+4);
+        size_t next_mail_size = 2+4+1+((*itr)->messageType == MAIL_NORMAL ? 8 : 4)+4*8+((*itr)->subject.size()+1)+1+item_count*(1+4+4+7*3*4+4+4+4+4+4+4+1);
 
         if(data.wpos()+next_mail_size > maxPacketSize)
         {
@@ -727,9 +723,6 @@ void WorldSession::HandleMailCreateTextItem(WorldPacket & recv_data )
 void WorldSession::HandleQueryNextMailTime(WorldPacket & /*recv_data*/ )
 {
     WorldPacket data(MSG_QUERY_NEXT_MAIL_TIME, 8);
-
-    if(!_player->m_mailsLoaded)
-        _player->_LoadMail();
 
     if( _player->unReadMails > 0 )
     {
@@ -957,41 +950,36 @@ void MailDraft::SendMailTo(MailReceiver const& receiver, MailSender const& sende
     {
         pReceiver->AddNewMailDeliverTime(deliver_time);
 
-        if (pReceiver->IsMailsLoaded())
+        Mail *m = new Mail;
+        m->messageID = mailId;
+        m->mailTemplateId = GetMailTemplateId();
+        m->subject = GetSubject();
+        m->itemTextId = GetBodyId();
+        m->money = GetMoney();
+        m->COD = GetCOD();
+
+        for(MailItemMap::const_iterator mailItemIter = m_items.begin(); mailItemIter != m_items.end(); ++mailItemIter)
         {
-            Mail *m = new Mail;
-            m->messageID = mailId;
-            m->mailTemplateId = GetMailTemplateId();
-            m->subject = GetSubject();
-            m->itemTextId = GetBodyId();
-            m->money = GetMoney();
-            m->COD = GetCOD();
-
-            for(MailItemMap::const_iterator mailItemIter = m_items.begin(); mailItemIter != m_items.end(); ++mailItemIter)
-            {
-                Item* item = mailItemIter->second;
-                m->AddItem(item->GetGUIDLow(), item->GetEntry());
-            }
-
-            m->messageType = sender.GetMailMessageType();
-            m->stationery = sender.GetStationery();
-            m->sender = sender.GetSenderId();
-            m->receiver = receiver.GetPlayerGUIDLow();
-            m->expire_time = expire_time;
-            m->deliver_time = deliver_time;
-            m->checked = checked;
-            m->state = MAIL_STATE_UNCHANGED;
-
-            pReceiver->AddMail(m);                           // to insert new mail to beginning of maillist
-
-            if (!m_items.empty())
-            {
-                for(MailItemMap::iterator mailItemIter = m_items.begin(); mailItemIter != m_items.end(); ++mailItemIter)
-                    pReceiver->AddMItem(mailItemIter->second);
-            }
+            Item* item = mailItemIter->second;
+            m->AddItem(item->GetGUIDLow(), item->GetEntry());
         }
-        else if (!m_items.empty())
-            deleteIncludedItems();
+
+        m->messageType = sender.GetMailMessageType();
+        m->stationery = sender.GetStationery();
+        m->sender = sender.GetSenderId();
+        m->receiver = receiver.GetPlayerGUIDLow();
+        m->expire_time = expire_time;
+        m->deliver_time = deliver_time;
+        m->checked = checked;
+        m->state = MAIL_STATE_UNCHANGED;
+
+        pReceiver->AddMail(m);                           // to insert new mail to beginning of maillist
+
+        if (!m_items.empty())
+        {
+            for(MailItemMap::iterator mailItemIter = m_items.begin(); mailItemIter != m_items.end(); ++mailItemIter)
+                pReceiver->AddMItem(mailItemIter->second);
+        }
     }
     else if (!m_items.empty())
         deleteIncludedItems();

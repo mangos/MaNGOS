@@ -59,17 +59,18 @@ enum QuestFailedReasons
 
 enum QuestShareMessages
 {
-    QUEST_PARTY_MSG_SHARING_QUEST           = 0,
-    QUEST_PARTY_MSG_CANT_TAKE_QUEST         = 1,
-    QUEST_PARTY_MSG_ACCEPT_QUEST            = 2,
-    QUEST_PARTY_MSG_DECLINE_QUEST           = 3,
-    QUEST_PARTY_MSG_BUSY                    = 4,
-    QUEST_PARTY_MSG_LOG_FULL                = 5,
-    QUEST_PARTY_MSG_HAVE_QUEST              = 6,
-    QUEST_PARTY_MSG_FINISH_QUEST            = 7,
-    QUEST_PARTY_MSG_CANT_BE_SHARED_TODAY    = 8,
-    QUEST_PARTY_MSG_SHARING_TIMER_EXPIRED   = 9,
-    QUEST_PARTY_MSG_NOT_IN_PARTY            = 10
+    QUEST_PARTY_MSG_SHARING_QUEST           = 0,            // ERR_QUEST_PUSH_SUCCESS_S
+    QUEST_PARTY_MSG_CANT_TAKE_QUEST         = 1,            // ERR_QUEST_PUSH_INVALID_S
+    QUEST_PARTY_MSG_ACCEPT_QUEST            = 2,            // ERR_QUEST_PUSH_ACCEPTED_S
+    QUEST_PARTY_MSG_DECLINE_QUEST           = 3,            // ERR_QUEST_PUSH_DECLINED_S
+    QUEST_PARTY_MSG_BUSY                    = 4,            // ERR_QUEST_PUSH_BUSY_S
+    QUEST_PARTY_MSG_LOG_FULL                = 5,            // ERR_QUEST_PUSH_LOG_FULL_S
+    QUEST_PARTY_MSG_HAVE_QUEST              = 6,            // ERR_QUEST_PUSH_ONQUEST_S
+    QUEST_PARTY_MSG_FINISH_QUEST            = 7,            // ERR_QUEST_PUSH_ALREADY_DONE_S
+    QUEST_PARTY_MSG_CANT_BE_SHARED_TODAY    = 8,            // ERR_QUEST_PUSH_NOT_DAILY_S
+    QUEST_PARTY_MSG_SHARING_TIMER_EXPIRED   = 9,            // ERR_QUEST_PUSH_TIMER_EXPIRED_S
+    QUEST_PARTY_MSG_NOT_IN_PARTY            = 10,           // ERR_QUEST_PUSH_NOT_IN_PARTY_S
+    QUESY_PARTY_MSG_DIFFERENT_SERVER_DAILY  = 11            // ERR_QUEST_PUSH_DIFFERENT_SERVER_DAILY_S
 };
 
 enum __QuestTradeSkill
@@ -125,7 +126,7 @@ enum __QuestFlags
     QUEST_FLAGS_EXPLORATION    = 0x00000004,                // Not used currently
     QUEST_FLAGS_SHARABLE       = 0x00000008,                // Can be shared: Player::CanShareQuest()
     //QUEST_FLAGS_NONE2        = 0x00000010,                // Not used currently
-    QUEST_FLAGS_EPIC           = 0x00000020,                // Not used currently: Unsure of content
+    QUEST_FLAGS_EPIC           = 0x00000020,                // Not used currently - 1 quest in 3.3
     QUEST_FLAGS_RAID           = 0x00000040,                // Not used currently
     QUEST_FLAGS_TBC            = 0x00000080,                // Not used currently: Available if TBC expansion enabled only
     QUEST_FLAGS_UNK2           = 0x00000100,                // Not used currently: _DELIVER_MORE Quest needs more than normal _q-item_ drops from mobs
@@ -133,20 +134,22 @@ enum __QuestFlags
     QUEST_FLAGS_AUTO_REWARDED  = 0x00000400,                // These quests are automatically rewarded on quest complete and they will never appear in quest log client side.
     QUEST_FLAGS_TBC_RACES      = 0x00000800,                // Not used currently: Blood elf/Draenei starting zone quests
     QUEST_FLAGS_DAILY          = 0x00001000,                // Used to know quest is Daily one
-    QUEST_FLAGS_UNK3           = 0x00002000,
+    QUEST_FLAGS_UNK3           = 0x00002000,                // activates PvP?
     QUEST_FLAGS_UNK4           = 0x00004000,                // ? Membership Card Renewal
     QUEST_FLAGS_WEEKLY         = 0x00008000,                // Not used currently: Weekly quests
+    // 0x20000 - 1 quest in 3.3, 0x40000 - 1 quest in 3.3
+    QUEST_FLAGS_LOW_LEVEL      = 0x00080000,                // quests in starting areas
 
     // Mangos flags for set SpecialFlags in DB if required but used only at server
-    QUEST_MANGOS_FLAGS_REPEATABLE           = 0x010000,     // Set by 1 in SpecialFlags from DB
-    QUEST_MANGOS_FLAGS_EXPLORATION_OR_EVENT = 0x020000,     // Set by 2 in SpecialFlags from DB (if required area explore, spell SPELL_EFFECT_QUEST_COMPLETE casting, table `*_script` command SCRIPT_COMMAND_QUEST_EXPLORED use, set from script DLL)
-    QUEST_MANGOS_FLAGS_DB_ALLOWED = 0xFFFF | QUEST_MANGOS_FLAGS_REPEATABLE | QUEST_MANGOS_FLAGS_EXPLORATION_OR_EVENT,
+    QUEST_MANGOS_FLAGS_REPEATABLE           = 0x01000000,   // Set by 1 in SpecialFlags from DB
+    QUEST_MANGOS_FLAGS_EXPLORATION_OR_EVENT = 0x02000000,   // Set by 2 in SpecialFlags from DB (if required area explore, spell SPELL_EFFECT_QUEST_COMPLETE casting, table `*_script` command SCRIPT_COMMAND_QUEST_EXPLORED use, set from script DLL)
+    QUEST_MANGOS_FLAGS_DB_ALLOWED = 0xFFFFFF | QUEST_MANGOS_FLAGS_REPEATABLE | QUEST_MANGOS_FLAGS_EXPLORATION_OR_EVENT,
 
     // Mangos flags for internal use only
-    QUEST_MANGOS_FLAGS_DELIVER              = 0x040000,     // Internal flag computed only
-    QUEST_MANGOS_FLAGS_SPEAKTO              = 0x080000,     // Internal flag computed only
-    QUEST_MANGOS_FLAGS_KILL_OR_CAST         = 0x100000,     // Internal flag computed only
-    QUEST_MANGOS_FLAGS_TIMED                = 0x200000,     // Internal flag computed only
+    QUEST_MANGOS_FLAGS_DELIVER              = 0x04000000,   // Internal flag computed only
+    QUEST_MANGOS_FLAGS_SPEAKTO              = 0x08000000,   // Internal flag computed only
+    QUEST_MANGOS_FLAGS_KILL_OR_CAST         = 0x10000000,   // Internal flag computed only
+    QUEST_MANGOS_FLAGS_TIMED                = 0x20000000,   // Internal flag computed only
 };
 
 struct QuestLocale
