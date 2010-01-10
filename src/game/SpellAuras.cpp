@@ -6005,6 +6005,18 @@ void Aura::HandleSpellSpecificBoosts(bool apply)
                 else
                     return;
             }
+            // Shadowflame (DoT)
+            else if (m_spellProto->SpellFamilyFlags2 & 0x00000002)
+            {
+                // Glyph of Shadowflame
+                Unit* caster;
+                if(!apply)
+                    spellId1 = 63311;
+                else if(((caster = GetCaster())) && caster->HasAura(63310))
+                    spellId1 = 63311;
+                else
+                    return;
+            }
             else
                 return;
             break;
