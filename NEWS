@@ -13,8 +13,16 @@ http://getmangos.com/community/
 Please submit bug reports at:
 http://mangos.lighthouseapp.com/
 
-Version 0.15
+Version 0.16
  * Under discussion.
+ * Upgrade to client version 3.3.0a (build 11159).
+
+Version 0.15
+
+ * Implement AV battleground.
+ * Implement new DB-based gossip system for creatures/gameobjects.
+ * Implement realmd support realms for different client versions.
+ * New memory allocator for MaNGOS, based on Intel Threading Building Blocks library.
  * Upgrade to client version 3.2.2a (build 10505).
 
 Version 0.14

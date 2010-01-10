@@ -1,6 +1,6 @@
-MaNGOS 0.15   (??? ??? 2010)
+MaNGOS 0.16   (??? ??? 2010)
 
- MaNGOS 0.15 - adds further improvements to the
+ MaNGOS 0.16 - adds further improvements to the
  server core as well as to the majority of game classes and the game content
  database.
 
@@ -11,6 +11,46 @@ MaNGOS 0.15   (??? ??? 2010)
  ==== Statistics ====
  * Fixed Bugs: ??? tickets and many bugs reported at forum resolved
  * Total number of changes: ??? revisions (??? commits)
+
+MaNGOS 0.15   (10 January 2010)
+
+ MaNGOS 0.15 - adds further improvements to the
+ server core as well as to the majority of game classes and the game content
+ database.
+
+ ==== Game Features ====
+
+ * Added: Implement AV battleground.
+ * Added: Implement threat level show in client.
+ * Added: Implement dead visible creatures support.
+ * Added: Implement new dungeon/raid difficulties work.
+ * Added: Implement mails sending at player levelup.
+ * Added: Implement new DB-based gossip system for creatures/gameobjects.
+ * Improved: More proper creature movement animation in fly. Improvements in movement generators.
+ * Improved: Fixes in pool system that must allow more wide use pool of pools mode.
+ * Improved: Rewrited battleground spirit guids code for more correct work.
+ * Improved: More achievement types support. Including with DB/script-based achievement requirement checks.
+ * plus lots of fixes for auras, effects, spells, talents, glyphs and more.
+
+ ==== Server Features ====
+
+ * Added: More chat/console commands and config options.
+ * Added: Implement realmd support realms for different client versions.
+ * Added: New memory allocator for MaNGOS, based on Intel Threading Building Blocks library.
+ * Improved: Some guid generation and object stores made map local. More improvements can be possible in future for this part.
+ * Improved: Player updates move to map local code.
+ * Improved: More other changes for thread safe work code in future per-map threads.
+ * Improved: More wide use ACE features instead explicitly hardcoded.
+ * Improved: Rewritten mail preparing code, and cleanup mail system code in general.
+ * Improved: More checks at loading DB data for problems detection.
+ * Improved: Some optimizations in amount data send to client.
+ * Improved: Avoid characters save calls in some redundant cases.
+ * Improved: Progress in move before used at loading values from `data` field to own fields/tables.
+
+ ==== Statistics ====
+ * Fixed Bugs: 100 tickets and many bugs reported at forum resolved
+ * Total number of changes: 547 revisions (560 commits)
+
 
 MaNGOS 0.14   (06 October 2009)
 
