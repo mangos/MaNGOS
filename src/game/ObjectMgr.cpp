@@ -2079,6 +2079,29 @@ void ObjectMgr::LoadItemPrototypes()
             const_cast<ItemPrototype*>(proto)->HolidayId = 0;
         }
     }
+
+    // check some dbc referecned items (avoid duplicate reports)
+    std::set<uint32> notFoundOutfit;
+    for (uint32 i = 1; i < sCharStartOutfitStore.GetNumRows(); ++i)
+    {
+        CharStartOutfitEntry const* entry = sCharStartOutfitStore.LookupEntry(i);
+        if (!entry)
+            continue;
+
+        for(int j = 0; j < MAX_OUTFIT_ITEMS; ++j)
+        {
+            if(entry->ItemId[j] <= 0)
+                continue;
+
+            uint32 item_id = entry->ItemId[j];
+
+            if(!GetItemPrototype(item_id))
+                notFoundOutfit.insert(item_id);
+        }
+    }
+
+    for(std::set<uint32>::const_iterator itr = notFoundOutfit.begin(); itr != notFoundOutfit.end(); ++itr)
+        sLog.outErrorDb("Item (Entry: %u) not exist in `item_template` but referenced in `CharStartOutfit.dnc`", *itr);
 }
 
 void ObjectMgr::LoadItemRequiredTarget()
