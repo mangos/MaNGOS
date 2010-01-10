@@ -2080,7 +2080,7 @@ void ObjectMgr::LoadItemPrototypes()
         }
     }
 
-    // check some dbc referecned items (avoid duplicate reports)
+    // check some dbc referenced items (avoid duplicate reports)
     std::set<uint32> notFoundOutfit;
     for (uint32 i = 1; i < sCharStartOutfitStore.GetNumRows(); ++i)
     {
@@ -2101,7 +2101,7 @@ void ObjectMgr::LoadItemPrototypes()
     }
 
     for(std::set<uint32>::const_iterator itr = notFoundOutfit.begin(); itr != notFoundOutfit.end(); ++itr)
-        sLog.outErrorDb("Item (Entry: %u) not exist in `item_template` but referenced in `CharStartOutfit.dnc`", *itr);
+        sLog.outErrorDb("Item (Entry: %u) not exist in `item_template` but referenced in `CharStartOutfit.dbc`", *itr);
 }
 
 void ObjectMgr::LoadItemRequiredTarget()
