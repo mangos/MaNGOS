@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_9149_01_mangos_spell_bonus_data` bit(1) default NULL
+  `required_9150_01_mangos_spell_bonus_data` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -14119,7 +14119,6 @@ INSERT INTO `spell_bonus_data` VALUES
 (11366, 1.15,   0.05,    0,     'Mage - Pyroblast'),
 (2948,  0.4286, 0,       0,     'Mage - Scorch'),
 /* Paladin */
-(53742, 0,      0.0156,  0.03,  'Paladin - Blood Corruption'),
 (26573, 0,      0.04,    0.04,  'Paladin - Consecration'),
 (879,   0.15,   0,       0.15,  'Paladin - Exorcism'),
 (25997, 0,      0,       0,     'Paladin - Eye for an Eye'),
@@ -14128,13 +14127,11 @@ INSERT INTO `spell_bonus_data` VALUES
 (635,   1.66,   0,       0,     'Paladin - Holy Light'),
 (25912, 0.4286, 0,       0,     'Paladin - Holy Shock Triggered Hurt'),
 (20925, 0.09,   0,       0.056, 'Paladin - Holy Shield'),
-(31803, 0,      0.0156,  0.03,  'Paladin - Holy Vengeance'),
 (2812,  0.07,   0,       0.07,  'Paladin - Holy Wrath'),
 (54158, 0.25,   0,       0,     'Paladin - Judgement'),
 (20467, 0.25,   0,       0.16,  'Paladin - Judgement of Command'),
 (53733, 0,      0,       0,     'Paladin - Judgement of Corruption'),
 (20267, 0.1,    0,       0.1,   'Paladin - Judgement of Light Proc'),
-(20187, 0.32,   0,       0,     'Paladin - Judgement of Righteousness'),
 (31804, 0,      0,       0,     'Paladin - Judgement of Vengeance'),
 (20424, 0,      0,       0,     'Paladin - Seal of Command Proc'),
 (53739, 0,      0.00156, 0.003, 'Paladin - Seal of Corruption (full stack proc)'),
