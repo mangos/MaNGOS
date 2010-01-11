@@ -4925,7 +4925,36 @@ void Player::ApplyRatingMod(CombatRating cr, int32 value, bool apply)
 {
     m_baseRatingValue[cr]+=(apply ? value : -value);
 
-    int32 amount = uint32(m_baseRatingValue[cr]);
+    // explicit affected values
+    switch (cr)
+    {
+        case CR_HASTE_MELEE:
+        {
+            float RatingChange = value / GetRatingCoefficient(cr);
+            ApplyAttackTimePercentMod(BASE_ATTACK,RatingChange,apply);
+            ApplyAttackTimePercentMod(OFF_ATTACK,RatingChange,apply);
+            break;
+        }
+        case CR_HASTE_RANGED:
+        {
+            float RatingChange = value / GetRatingCoefficient(cr);
+            ApplyAttackTimePercentMod(RANGED_ATTACK, RatingChange, apply);
+            break;
+        }
+        case CR_HASTE_SPELL:
+        {
+            float RatingChange = value / GetRatingCoefficient(cr);
+            ApplyCastTimePercentMod(RatingChange,apply);
+            break;
+        }
+    }
+
+    UpdateRating(cr);
+}
+
+void Player::UpdateRating(CombatRating cr)
+{
+    int32 amount = m_baseRatingValue[cr];
     // Apply bonus from SPELL_AURA_MOD_RATING_FROM_STAT
     // stat used stored in miscValueB for this aura
     AuraList const& modRatingFromStat = GetAurasByType(SPELL_AURA_MOD_RATING_FROM_STAT);
@@ -4935,9 +4964,6 @@ void Player::ApplyRatingMod(CombatRating cr, int32 value, bool apply)
     if (amount < 0)
         amount = 0;
     SetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + cr, uint32(amount));
-
-    float RatingCoeffecient = GetRatingCoefficient(cr);
-    float RatingChange = 0.0f;
 
     bool affectStats = CanModifyStats();
 
@@ -4990,18 +5016,9 @@ void Player::ApplyRatingMod(CombatRating cr, int32 value, bool apply)
             break;
         case CR_CRIT_TAKEN_SPELL:                           // Implemented in Unit::SpellCriticalBonus (only for chance to crit)
             break;
-        case CR_HASTE_MELEE:
-            RatingChange = value / RatingCoeffecient;
-            ApplyAttackTimePercentMod(BASE_ATTACK,RatingChange,apply);
-            ApplyAttackTimePercentMod(OFF_ATTACK,RatingChange,apply);
-            break;
+        case CR_HASTE_MELEE:                                // Implemented in Player::ApplyRatingMod
         case CR_HASTE_RANGED:
-            RatingChange = value / RatingCoeffecient;
-            ApplyAttackTimePercentMod(RANGED_ATTACK, RatingChange, apply);
-            break;
         case CR_HASTE_SPELL:
-            RatingChange = value / RatingCoeffecient;
-            ApplyCastTimePercentMod(RatingChange,apply);
             break;
         case CR_WEAPON_SKILL_MAINHAND:                      // Implemented in Unit::RollMeleeOutcomeAgainst
         case CR_WEAPON_SKILL_OFFHAND:
@@ -5019,6 +5036,12 @@ void Player::ApplyRatingMod(CombatRating cr, int32 value, bool apply)
                 UpdateArmorPenetration();
             break;
     }
+}
+
+void Player::UpdateAllRatings()
+{
+    for(int cr = 0; cr < MAX_COMBAT_RATING; ++cr)
+        UpdateRating(CombatRating(cr));
 }
 
 void Player::SetRegularAttackTime()
@@ -14900,8 +14923,6 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
     // cleanup aura list explicitly before skill load wher some spells can be applied
     RemoveAllAuras();
 
-    _LoadSkills(holder->GetResult(PLAYER_LOGIN_QUERY_LOADSKILLS));
-
     // make sure the unit is considered out of combat for proper loading
     ClearInCombat();
 
@@ -14917,9 +14938,12 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
 
     // reset stats before loading any modifiers
     InitStatsForLevel();
-    InitTaxiNodesForLevel();
     InitGlyphsForLevel();
+    InitTaxiNodesForLevel();
     InitRunes();
+
+    // load skills after InitStatsForLevel because it triggering aura apply also
+    _LoadSkills(holder->GetResult(PLAYER_LOGIN_QUERY_LOADSKILLS));
 
     // apply original stats mods before spell loading or item equipment that call before equip _RemoveStatsMods()
 
