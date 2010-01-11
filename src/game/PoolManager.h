@@ -47,13 +47,13 @@ class PoolGroup
         bool isEmpty() const { return ExplicitlyChanced.empty() && EqualChanced.empty(); }
         void AddEntry(PoolObject& poolitem, uint32 maxentries);
         bool CheckPool() const;
-        void RollOne(int32& index, PoolObjectList** store, uint32 triggerFrom);
+        PoolObject* RollOne(uint32 triggerFrom);
         bool IsSpawnedObject(uint32 guid) const;
         void DespawnObject(uint32 guid=0);
         void Despawn1Object(uint32 guid);
         void SpawnObject(uint32 limit, uint32 triggerFrom);
-        bool Spawn1Object(uint32 guid);
-        bool ReSpawn1Object(uint32 guid);
+        void Spawn1Object(PoolObject* obj);
+        void ReSpawn1Object(PoolObject* obj);
         void RemoveOneRelation(uint16 child_pool_id);
     private:
         PoolObjectList ExplicitlyChanced;
