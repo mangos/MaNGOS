@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_9136_06_mangos_spell_proc_event` bit(1) default NULL
+  `required_9148_01_mangos_spell_bonus_data` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -14119,14 +14119,12 @@ INSERT INTO `spell_bonus_data` VALUES
 (11366, 1.15,   0.05,    0,     'Mage - Pyroblast'),
 (2948,  0.4286, 0,       0,     'Mage - Scorch'),
 /* Paladin */
-(31935, 0.07,   0,       0.07,  'Paladin - Avengers Shiled'),
 (53742, 0,      0.0156,  0.03,  'Paladin - Blood Corruption'),
 (26573, 0,      0.04,    0.04,  'Paladin - Consecration'),
 (879,   0.15,   0,       0.15,  'Paladin - Exorcism'),
 (25997, 0,      0,       0,     'Paladin - Eye for an Eye'),
 (19750, 1,      0,       0,     'Paladin - Flash of Light'),
 (53595, 0,      0,       0,     'Paladin - Hammer of the Righteous'),
-(24275, 0.15,   0,       0.15,  'Paladin - Hammer of Wrath'),
 (635,   1.66,   0,       0,     'Paladin - Holy Light'),
 (25912, 0.4286, 0,       0,     'Paladin - Holy Shock Triggered Hurt'),
 (20925, 0.09,   0,       0.056, 'Paladin - Holy Shield'),
