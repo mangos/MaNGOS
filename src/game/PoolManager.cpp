@@ -303,9 +303,7 @@ bool PoolGroup<GameObject>::Spawn1Object(uint32 guid)
 template <>
 bool PoolGroup<Pool>::Spawn1Object(uint32 child_pool_id)
 {
-    sPoolMgr.SpawnPool(child_pool_id, 0, 0);
-    sPoolMgr.SpawnPool(child_pool_id, 0, TYPEID_GAMEOBJECT);
-    sPoolMgr.SpawnPool(child_pool_id, 0, TYPEID_UNIT);
+    sPoolMgr.SpawnPool(child_pool_id);
     return true;
 }
 
@@ -634,9 +632,7 @@ void PoolManager::Initialize()
                 sLog.outErrorDb("Pool Id (%u) has all creatures or gameobjects with explicit chance sum <>100 and no equal chance defined. The pool system cannot pick one to spawn.", pool_entry);
                 continue;
             }
-            SpawnPool(pool_entry, 0, 0);
-            SpawnPool(pool_entry, 0, TYPEID_GAMEOBJECT);
-            SpawnPool(pool_entry, 0, TYPEID_UNIT);
+            SpawnPool(pool_entry);
             count++;
         } while (result->NextRow());
         delete result;
@@ -646,23 +642,37 @@ void PoolManager::Initialize()
 }
 
 // Call to spawn a pool, if cache if true the method will spawn only if cached entry is different
-// If it's same, the gameobject/creature is respawned only (added back to map)
-void PoolManager::SpawnPool(uint16 pool_id, uint32 guid, uint32 type)
+// If it's same, the creature is respawned only (added back to map)
+template<>
+void PoolManager::SpawnPool<Creature>(uint16 pool_id, uint32 db_guid)
 {
-    switch (type)
-    {
-        case TYPEID_UNIT:
-            if (!mPoolCreatureGroups[pool_id].isEmpty())
-                mPoolCreatureGroups[pool_id].SpawnObject(mPoolTemplate[pool_id].MaxLimit, guid);
-            break;
-        case TYPEID_GAMEOBJECT:
-            if (!mPoolGameobjectGroups[pool_id].isEmpty())
-                mPoolGameobjectGroups[pool_id].SpawnObject(mPoolTemplate[pool_id].MaxLimit, guid);
-            break;
-        default:
-            if (!mPoolPoolGroups[pool_id].isEmpty())
-                mPoolPoolGroups[pool_id].SpawnObject(mPoolTemplate[pool_id].MaxLimit, guid);
-    }
+    if (!mPoolCreatureGroups[pool_id].isEmpty())
+        mPoolCreatureGroups[pool_id].SpawnObject(mPoolTemplate[pool_id].MaxLimit, db_guid);
+}
+
+// Call to spawn a pool, if cache if true the method will spawn only if cached entry is different
+// If it's same, the gameobject is respawned only (added back to map)
+template<>
+void PoolManager::SpawnPool<GameObject>(uint16 pool_id, uint32 db_guid)
+{
+    if (!mPoolGameobjectGroups[pool_id].isEmpty())
+        mPoolGameobjectGroups[pool_id].SpawnObject(mPoolTemplate[pool_id].MaxLimit, db_guid);
+}
+
+// Call to spawn a pool, if cache if true the method will spawn only if cached entry is different
+// If it's same, the pool is respawned only
+template<>
+void PoolManager::SpawnPool<Pool>(uint16 pool_id, uint32 sub_pool_id)
+{
+    if (!mPoolPoolGroups[pool_id].isEmpty())
+        mPoolPoolGroups[pool_id].SpawnObject(mPoolTemplate[pool_id].MaxLimit, sub_pool_id);
+}
+
+void PoolManager::SpawnPool( uint16 pool_id )
+{
+    SpawnPool<Pool>(pool_id, 0);
+    SpawnPool<GameObject>(pool_id, 0);
+    SpawnPool<Creature>(pool_id, 0);
 }
 
 // Call to despawn a pool, all gameobjects/creatures in this pool are removed
@@ -678,41 +688,6 @@ void PoolManager::DespawnPool(uint16 pool_id)
         mPoolPoolGroups[pool_id].DespawnObject();
 }
 
-// Call to update the pool when a gameobject/creature part of pool [pool_id] is ready to respawn
-// Here we cache only the creature/gameobject whose guid is passed as parameter
-// Then the spawn pool call will use this cache to decide
-void PoolManager::UpdatePool(uint16 pool_id, uint32 guid, uint32 type)
-{
-    if (uint16 motherpoolid = IsPartOfAPool(pool_id, 0))
-        SpawnPool(motherpoolid, 0, 0);
-    else
-        SpawnPool(pool_id, guid, type);
-}
-
-// Method that tell if the gameobject/creature is part of a pool and return the pool id if yes
-uint16 PoolManager::IsPartOfAPool(uint32 guid, uint32 type) const
-{
-    if (type == 0) // pool of pool
-    {
-        SearchMap::const_iterator itr = mPoolSearchMap.find(guid);
-        if (itr != mPoolSearchMap.end())
-            return itr->second;
-    }
-    else if (type == TYPEID_GAMEOBJECT)
-    {
-        SearchMap::const_iterator itr = mGameobjectSearchMap.find(guid);
-        if (itr != mGameobjectSearchMap.end())
-            return itr->second;
-    }
-    else // creature
-    {
-        SearchMap::const_iterator itr = mCreatureSearchMap.find(guid);
-        if (itr != mCreatureSearchMap.end())
-            return itr->second;
-    }
-    return 0;
-}
-
 // Method that check chance integrity of the creatures and gameobjects in this pool
 bool PoolManager::CheckPool(uint16 pool_id) const
 {
@@ -722,15 +697,45 @@ bool PoolManager::CheckPool(uint16 pool_id) const
         mPoolPoolGroups[pool_id].CheckPool();
 }
 
-// Method that tell if a creature or gameobject in pool_id is spawned currently
-bool PoolManager::IsSpawnedObject(uint16 pool_id, uint32 guid, uint32 type) const
+// Method that tell if a creature in pool_id is spawned currently
+template<>
+bool PoolManager::IsSpawnedObject<Creature>(uint16 pool_id, uint32 db_guid) const
 {
     if (pool_id > max_pool_id)
         return false;
-    if (type == 0)
-        return mPoolPoolGroups[pool_id].IsSpawnedObject(guid);
-    else if (type == TYPEID_GAMEOBJECT)
-        return mPoolGameobjectGroups[pool_id].IsSpawnedObject(guid);
-    else
-        return mPoolCreatureGroups[pool_id].IsSpawnedObject(guid);
+    return mPoolCreatureGroups[pool_id].IsSpawnedObject(db_guid);
 }
+
+// Method that tell if a gameobject in pool_id is spawned currently
+template<>
+bool PoolManager::IsSpawnedObject<GameObject>(uint16 pool_id, uint32 db_guid) const
+{
+    if (pool_id > max_pool_id)
+        return false;
+    return mPoolGameobjectGroups[pool_id].IsSpawnedObject(db_guid);
+}
+
+// Method that tell if a pool in pool_id is spawned currently
+template<>
+bool PoolManager::IsSpawnedObject<Pool>(uint16 pool_id, uint32 sub_pool_id) const
+{
+    if (pool_id > max_pool_id)
+        return false;
+    return mPoolPoolGroups[pool_id].IsSpawnedObject(sub_pool_id);
+}
+
+// Call to update the pool when a gameobject/creature part of pool [pool_id] is ready to respawn
+// Here we cache only the creature/gameobject whose guid is passed as parameter
+// Then the spawn pool call will use this cache to decide
+template<typename T>
+void PoolManager::UpdatePool(uint16 pool_id, uint32 db_guid_or_pool_id)
+{
+    if (uint16 motherpoolid = IsPartOfAPool<Pool>(pool_id))
+        SpawnPool<Pool>(motherpoolid, 0);
+    else
+        SpawnPool<T>(pool_id, db_guid_or_pool_id);
+}
+
+template void PoolManager::UpdatePool<Pool>(uint16 pool_id, uint32 db_guid_or_pool_id);
+template void PoolManager::UpdatePool<GameObject>(uint16 pool_id, uint32 db_guid_or_pool_id);
+template void PoolManager::UpdatePool<Creature>(uint16 pool_id, uint32 db_guid_or_pool_id);

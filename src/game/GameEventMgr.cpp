@@ -580,11 +580,7 @@ void GameEventMgr::GameEventSpawn(int16 event_id)
     }
 
     for (IdList::iterator itr = mGameEventPoolIds[internal_event_id].begin();itr != mGameEventPoolIds[internal_event_id].end();++itr)
-    {
-        sPoolMgr.SpawnPool(*itr, 0, 0);
-        sPoolMgr.SpawnPool(*itr, 0, TYPEID_GAMEOBJECT);
-        sPoolMgr.SpawnPool(*itr, 0, TYPEID_UNIT);
-    }
+        sPoolMgr.SpawnPool(*itr);
 }
 
 void GameEventMgr::GameEventUnspawn(int16 event_id)

@@ -375,9 +375,9 @@ void Creature::Update(uint32 diff)
                 //Call AI respawn virtual function
                 i_AI->JustRespawned();
 
-                uint16 poolid = sPoolMgr.IsPartOfAPool(GetGUIDLow(), GetTypeId());
+                uint16 poolid = GetDBTableGUIDLow() ? sPoolMgr.IsPartOfAPool<Creature>(GetDBTableGUIDLow()) : 0;
                 if (poolid)
-                    sPoolMgr.UpdatePool(poolid, GetGUIDLow(), TYPEID_UNIT);
+                    sPoolMgr.UpdatePool<Creature>(poolid, GetDBTableGUIDLow());
                 else
                     GetMap()->Add(this);
             }
