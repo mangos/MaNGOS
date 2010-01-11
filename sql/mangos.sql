@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_9148_01_mangos_spell_bonus_data` bit(1) default NULL
+  `required_9149_01_mangos_spell_bonus_data` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -14131,23 +14131,15 @@ INSERT INTO `spell_bonus_data` VALUES
 (31803, 0,      0.0156,  0.03,  'Paladin - Holy Vengeance'),
 (2812,  0.07,   0,       0.07,  'Paladin - Holy Wrath'),
 (54158, 0.25,   0,       0,     'Paladin - Judgement'),
-(31898, 0.18,   0,       0.11,  'Paladin - Judgement of Blood Enemy'),
-(32220, 0.0594, 0,       0.0363,'Paladin - Judgement of Blood Self'),
 (20467, 0.25,   0,       0.16,  'Paladin - Judgement of Command'),
 (53733, 0,      0,       0,     'Paladin - Judgement of Corruption'),
 (20267, 0.1,    0,       0.1,   'Paladin - Judgement of Light Proc'),
 (20187, 0.32,   0,       0,     'Paladin - Judgement of Righteousness'),
-(53726, 0.18,   0,       0.11,  'Paladin - Judgement of the Martyr Enemy'),
-(53725, 0.0594, 0,       0.0363,'Paladin - Judgement of the Martyr Self'),
 (31804, 0,      0,       0,     'Paladin - Judgement of Vengeance'),
-(31893, 0,      0,       0,     'Paladin - Seal of Blood Proc Enemy'),
-(32221, 0,      0,       0,     'Paladin - Seal of Blood Proc Self'),
 (20424, 0,      0,       0,     'Paladin - Seal of Command Proc'),
 (53739, 0,      0.00156, 0.003, 'Paladin - Seal of Corruption (full stack proc)'),
 (20167, 0.15,   0,       0.15,  'Paladin - Seal of Light Proc'),
 (25742, 0.07,   0,       0.039, 'Paladin - Seal of Righteousness Dummy Proc'),
-(53719, 0,      0,       0,     'Paladin - Seal of the Martyr Proc Enemy'),
-(53718, 0,      0,       0,     'Paladin - Seal of the Martyr Proc Self'),
 (42463, 0,      0.00156, 0.003, 'Paladin - Seal of Vengeance (full stack proc)'),
 (53600, 0,      0,       0,     'Paladin - Shield of Righteousness'),
 /* Priest */
