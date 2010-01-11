@@ -41,7 +41,7 @@ void PoolGroup<T>::AddEntry(PoolObject& poolitem, uint32 maxentries)
 
 // Method to check the chances are proper in this object pool
 template <class T>
-bool PoolGroup<T>::CheckPool(void)
+bool PoolGroup<T>::CheckPool() const
 {
     if (EqualChanced.size() == 0)
     {
@@ -56,7 +56,7 @@ bool PoolGroup<T>::CheckPool(void)
 
 // Method that tell if the gameobject, creature or pool is spawned currently
 template <class T>
-bool PoolGroup<T>::IsSpawnedObject(uint32 guid)
+bool PoolGroup<T>::IsSpawnedObject(uint32 guid) const
 {
     for (uint32 i = 0; i < ExplicitlyChanced.size(); ++i)
         if (ExplicitlyChanced[i].guid == guid)
@@ -348,7 +348,6 @@ bool PoolGroup<Pool>::ReSpawn1Object(uint32 /*guid*/)
 
 PoolManager::PoolManager()
 {
-    m_IsPoolSystemStarted = false;
 }
 
 void PoolManager::LoadFromDB()
@@ -644,7 +643,6 @@ void PoolManager::Initialize()
     }
 
     sLog.outBasic("Pool handling system initialized, %u pools spawned.", count);
-    m_IsPoolSystemStarted = true;
 }
 
 // Call to spawn a pool, if cache if true the method will spawn only if cached entry is different
@@ -692,7 +690,7 @@ void PoolManager::UpdatePool(uint16 pool_id, uint32 guid, uint32 type)
 }
 
 // Method that tell if the gameobject/creature is part of a pool and return the pool id if yes
-uint16 PoolManager::IsPartOfAPool(uint32 guid, uint32 type)
+uint16 PoolManager::IsPartOfAPool(uint32 guid, uint32 type) const
 {
     if (type == 0) // pool of pool
     {
@@ -716,7 +714,7 @@ uint16 PoolManager::IsPartOfAPool(uint32 guid, uint32 type)
 }
 
 // Method that check chance integrity of the creatures and gameobjects in this pool
-bool PoolManager::CheckPool(uint16 pool_id)
+bool PoolManager::CheckPool(uint16 pool_id) const
 {
     return pool_id <= max_pool_id &&
         mPoolGameobjectGroups[pool_id].CheckPool() &&
@@ -725,7 +723,7 @@ bool PoolManager::CheckPool(uint16 pool_id)
 }
 
 // Method that tell if a creature or gameobject in pool_id is spawned currently
-bool PoolManager::IsSpawnedObject(uint16 pool_id, uint32 guid, uint32 type)
+bool PoolManager::IsSpawnedObject(uint16 pool_id, uint32 guid, uint32 type) const
 {
     if (pool_id > max_pool_id)
         return false;

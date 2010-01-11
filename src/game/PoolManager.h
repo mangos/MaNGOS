@@ -44,11 +44,11 @@ class PoolGroup
     public:
         PoolGroup() : m_SpawnedPoolAmount(0) { }
         ~PoolGroup() {};
-        bool isEmpty() { return ExplicitlyChanced.empty() && EqualChanced.empty(); }
+        bool isEmpty() const { return ExplicitlyChanced.empty() && EqualChanced.empty(); }
         void AddEntry(PoolObject& poolitem, uint32 maxentries);
-        bool CheckPool(void);
+        bool CheckPool() const;
         void RollOne(int32& index, PoolObjectList** store, uint32 triggerFrom);
-        bool IsSpawnedObject(uint32 guid);
+        bool IsSpawnedObject(uint32 guid) const;
         void DespawnObject(uint32 guid=0);
         void Despawn1Object(uint32 guid);
         void SpawnObject(uint32 limit, uint32 triggerFrom);
@@ -71,16 +71,15 @@ class PoolManager
         PoolManager();
         ~PoolManager() {};
         void LoadFromDB();
-        uint16 IsPartOfAPool(uint32 guid, uint32 type);
-        bool IsSpawnedObject(uint16 pool_id, uint32 guid, uint32 type);
-        bool CheckPool(uint16 pool_id);
+        uint16 IsPartOfAPool(uint32 guid, uint32 type) const;
+        bool IsSpawnedObject(uint16 pool_id, uint32 guid, uint32 type) const;
+        bool CheckPool(uint16 pool_id) const;
         void SpawnPool(uint16 pool_id, uint32 guid, uint32 type);
         void DespawnPool(uint16 pool_id);
         void UpdatePool(uint16 pool_id, uint32 guid, uint32 type);
         void Initialize();
 
     protected:
-        bool m_IsPoolSystemStarted;
         uint16 max_pool_id;
         typedef std::vector<PoolTemplateData> PoolTemplateDataMap;
         typedef std::vector<PoolGroup<Creature> >   PoolGroupCreatureMap;
