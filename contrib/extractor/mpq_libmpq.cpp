@@ -1,5 +1,6 @@
 #include "mpq_libmpq.h"
 #include <deque>
+#include <stdio.h>
 
 ArchiveSet gOpenArchives;
 

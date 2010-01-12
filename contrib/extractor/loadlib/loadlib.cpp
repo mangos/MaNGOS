@@ -3,6 +3,8 @@
 #include "loadlib.h"
 #include "../mpq_libmpq.h"
 
+#include <stdio.h>
+
 class MPQFile;
 
 FileLoader::FileLoader()
