@@ -1607,16 +1607,19 @@ void Creature::SaveRespawnTime()
 
 bool Creature::IsOutOfThreatArea(Unit* pVictim) const
 {
-    if(!pVictim)
+    if (!pVictim)
         return true;
 
-    if(!pVictim->IsInMap(this))
+    if (!pVictim->IsInMap(this))
         return true;
 
-    if(!pVictim->isTargetableForAttack())
+    if (!pVictim->isTargetableForAttack())
         return true;
 
-    if(!pVictim->isInAccessablePlaceFor(this))
+    if (!pVictim->isInAccessablePlaceFor(this))
+        return true;
+
+    if (!pVictim->isVisibleForOrDetect(this,this,false))
         return true;
 
     if(sMapStore.LookupEntry(GetMapId())->IsDungeon())
