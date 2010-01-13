@@ -177,12 +177,12 @@ inline void LoadDBC(uint32& availableDbcLocales,barGoLink& bar, StoreProblemList
     if(storage.Load(dbc_filename.c_str()))
     {
         bar.step();
-        for(uint8 i = 0; i < MAX_LOCALE; ++i)
+        for(uint8 i = 0; fullLocaleNameList[i].name; ++i)
         {
             if(!(availableDbcLocales & (1 << i)))
                 continue;
 
-            std::string dbc_filename_loc = dbc_path + localeNames[i] + "/" + filename;
+            std::string dbc_filename_loc = dbc_path + fullLocaleNameList[i].name + "/" + filename;
             if(!storage.LoadStringsFrom(dbc_filename_loc.c_str()))
                 availableDbcLocales &= ~(1<<i);             // mark as not available for speedup next checks
         }
@@ -212,6 +212,8 @@ void LoadDBCStores(const std::string& dataPath)
     barGoLink bar( DBCFilesCount );
 
     StoreProblemList bad_dbc_files;
+
+    // bitmask for index of fullLocaleNameList
     uint32 availableDbcLocales = 0xFFFFFFFF;
 
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sAreaStore,                dbcPath,"AreaTable.dbc");
