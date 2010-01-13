@@ -557,6 +557,8 @@ void Creature::DoFleeToGetAssistance()
         cell_lock->Visit(cell_lock, grid_creature_searcher, *GetMap(), *this, radius);
 
         SetNoSearchAssistance(true);
+        UpdateSpeed(MOVE_RUN, false);
+
         if(!pCreature)
             SetFeared(true, getVictim()->GetGUID(), 0 ,sWorld.getConfig(CONFIG_CREATURE_FAMILY_FLEE_DELAY));
         else
@@ -1242,7 +1244,12 @@ void Creature::setDeathState(DeathState s)
         if (canFly() && FallGround())
             return;
 
-        SetNoSearchAssistance(false);
+        if (HasSearchedAssistance())
+        {
+            SetNoSearchAssistance(false);
+            UpdateSpeed(MOVE_RUN, false);
+        }
+
         Unit::setDeathState(CORPSE);
     }
     if (s == JUST_ALIVED)
