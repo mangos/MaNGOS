@@ -878,7 +878,7 @@ void ExtractMapsFromMpq()
     delete [] map_ids;
 }
 
-bool ExtractFile( int locale, char const* mpq_name, std::string const& filename ) 
+bool ExtractFile( char const* mpq_name, std::string const& filename ) 
 {
     FILE *output = fopen(filename.c_str(), "wb");
     if(!output)
@@ -927,7 +927,7 @@ void ExtractDBCFiles(int locale, bool basicLocale)
         string filename = path;
         filename += (iter->c_str() + strlen("DBFilesClient\\"));
 
-        if(ExtractFile(locale, iter->c_str(), filename))
+        if(ExtractFile(iter->c_str(), filename))
             ++count;
     }
     printf("Extracted %u DBC files\n\n", count);
