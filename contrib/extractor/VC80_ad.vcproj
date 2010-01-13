@@ -78,13 +78,13 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="zlib.lib"
-				OutputFile="ad debug.exe"
+				OutputFile="ad_debug.exe"
 				LinkIncremental="0"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="./debug"
 				IgnoreDefaultLibraryNames="LIBCD.lib"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="./ad debug.pdb"
+				ProgramDatabaseFile="./ad_debug.pdb"
 				SubSystem="1"
 				TargetMachine="1"
 			/>

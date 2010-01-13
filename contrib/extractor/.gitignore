@@ -18,3 +18,4 @@ debug
 release
 *.user
 *.ilk
+ad_debug.exe

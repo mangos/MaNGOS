@@ -878,11 +878,27 @@ void ExtractMapsFromMpq()
     delete [] map_ids;
 }
 
+bool ExtractFile( int locale, char const* mpq_name, std::string const& filename ) 
+{
+    FILE *output = fopen(filename.c_str(), "wb");
+    if(!output)
+    {
+        printf("Can't create the output file '%s'\n", filename.c_str());
+        return false;
+    }
+    MPQFile m(mpq_name);
+    if(!m.isEof())
+        fwrite(m.getPointer(), 1, m.getSize(), output);
+
+    fclose(output);
+    return true;
+}
+
 void ExtractDBCFiles(int locale, bool basicLocale)
 {
     printf("Extracting dbc files...\n");
 
-    set<string> dbcfiles;
+    std::set<std::string> dbcfiles;
 
     // get DBC file list
     for(ArchiveSet::iterator i = gOpenArchives.begin(); i != gOpenArchives.end();++i)
@@ -894,7 +910,7 @@ void ExtractDBCFiles(int locale, bool basicLocale)
                     dbcfiles.insert(*iter);
     }
 
-    string path = output_path;
+    std::string path = output_path;
     path += "/dbc/";
     CreateDir(path);
     if(!basicLocale)
@@ -911,18 +927,8 @@ void ExtractDBCFiles(int locale, bool basicLocale)
         string filename = path;
         filename += (iter->c_str() + strlen("DBFilesClient\\"));
 
-        FILE *output = fopen(filename.c_str(), "wb");
-        if(!output)
-        {
-            printf("Can't create the output file '%s'\n", filename.c_str());
-            continue;
-        }
-        MPQFile m(iter->c_str());
-        if(!m.isEof())
-            fwrite(m.getPointer(), 1, m.getSize(), output);
-
-        fclose(output);
-        ++count;
+        if(ExtractFile(locale, iter->c_str(), filename))
+            ++count;
     }
     printf("Extracted %u DBC files\n\n", count);
 }
@@ -993,8 +999,8 @@ int main(int argc, char * arg[])
             //Extract DBC files
             if(FirstLocale < 0)
             {
-                ExtractDBCFiles(i, true);
                 FirstLocale = i;
+                ExtractDBCFiles(i, true);
             }
             else
                 ExtractDBCFiles(i, false);
