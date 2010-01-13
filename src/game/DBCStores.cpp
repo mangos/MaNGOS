@@ -159,6 +159,25 @@ DBCStorage <WorldSafeLocsEntry> sWorldSafeLocsStore(WorldSafeLocsEntryfmt);
 
 typedef std::list<std::string> StoreProblemList;
 
+bool IsAcceptableClientBuild(uint32 build)
+{
+    int accepted_versions[] = EXPECTED_MANGOSD_CLIENT_BUILD;
+    for(int i = 0; accepted_versions[i]; ++i)
+        if(build == accepted_versions[i])
+            return true;
+
+    return false;
+}
+
+std::string AcceptableClientBuildsListStr()
+{
+    std::ostringstream data;
+    int accepted_versions[] = EXPECTED_MANGOSD_CLIENT_BUILD;
+    for(int i = 0; accepted_versions[i]; ++i)
+        data << accepted_versions[i] << " ";
+    return data.str();
+}
+
 static bool LoadDBC_assert_print(uint32 fsize,uint32 rsize, const std::string& filename)
 {
     sLog.outError("ERROR: Size of '%s' setted by format string (%u) not equal size of C++ structure (%u).",filename.c_str(),fsize,rsize);
@@ -513,7 +532,7 @@ void LoadDBCStores(const std::string& dataPath)
         !sAreaStore.LookupEntry(2905)              ||       // last area (areaflag) added in 3.1.3
         !sItemStore.LookupEntry(46894)             )        // last client known item added in 3.1.3
     {
-        sLog.outError("\nYou have _outdated_ DBC files. Please extract correct versions from current using client.");
+        sLog.outError("\nYou have _outdated_ DBC files. Please re-extract DBC files for one from client build: %s",AcceptableClientBuildsListStr().c_str());
         exit(1);
     }
 
