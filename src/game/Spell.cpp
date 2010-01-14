@@ -1348,6 +1348,9 @@ void Spell::SetTargetMap(uint32 effIndex, uint32 targetMode, UnitList& targetUni
                 case 54835:                                 // Curse of the Plaguebringer (h)
                     unMaxTargets = 10;
                     break;
+                case 25991:                                 // Poison Bolt Volley (Pincess Huhuran)
+                    unMaxTargets = 15;
+                    break;
             }
             break;
         }
