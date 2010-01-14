@@ -189,7 +189,6 @@ static bool ReadDBCBuildFileText(const std::string& dbc_path, char const* locale
         fclose(file);
 
         text = &buf[0];
-        fclose(file);
         return true;
     }
     else
