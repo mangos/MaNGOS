@@ -54,6 +54,7 @@ void WorldSession::HandleGroupInviteOpcode( WorldPacket & recv_data )
 {
     std::string membername;
     recv_data >> membername;
+    recv_data.read_skip<uint32>();                          // 0 for all known invite ways
 
     // attempt add selected player
 
@@ -157,8 +158,10 @@ void WorldSession::HandleGroupInviteOpcode( WorldPacket & recv_data )
     SendPartyResult(PARTY_OP_INVITE, membername, PARTY_RESULT_OK);
 }
 
-void WorldSession::HandleGroupAcceptOpcode( WorldPacket & /*recv_data*/ )
+void WorldSession::HandleGroupAcceptOpcode( WorldPacket & recv_data )
 {
+    recv_data.read_skip<uint32>();                          // value received in WorldSession::HandleGroupInviteOpcode and also skipeed currently?
+
     Group *group = GetPlayer()->GetGroupInvite();
     if (!group) return;
 
