@@ -339,7 +339,7 @@ void GameObject::Update(uint32 /*p_time*/)
                     {
                         Unit *caster =  owner ? owner : ok;
 
-                        caster->CastSpell(ok, goInfo->trap.spellId, true, 0, 0, GetGUID());
+                        caster->CastSpell(ok, goInfo->trap.spellId, true, NULL, NULL, GetGUID());
                         m_cooldownTime = time(NULL) + 4;        // 4 seconds
 
                         // count charges
@@ -804,7 +804,7 @@ void GameObject::TriggeringLinkedGameObject( uint32 trapEntry, Unit* target)
     // found correct GO
     // FIXME: when GO casting will be implemented trap must cast spell to target
     if(trapGO)
-        target->CastSpell(target,trapSpell,true, 0, 0, GetGUID());
+        target->CastSpell(target, trapSpell, true, NULL, NULL, GetGUID());
 }
 
 GameObject* GameObject::LookupFishingHoleAround(float range)

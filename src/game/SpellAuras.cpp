@@ -1540,7 +1540,7 @@ void Aura::TriggerSpell()
                     // Brood Affliction: Bronze
                     case 23170:
                     {
-                        m_target->CastSpell(m_target, 23171, true, 0, this);
+                        m_target->CastSpell(m_target, 23171, true, NULL, this);
                         return;
                     }
 //                    // Mark of Frost
@@ -4363,7 +4363,7 @@ void Aura::HandleModMechanicImmunity(bool apply, bool /*Real*/)
                 if ((*i)->GetSpellProto()->SpellIconID == 2229)
                 {
                     if (apply)
-                        owner->CastSpell(owner, 34471, true, 0, this);
+                        owner->CastSpell(owner, 34471, true, NULL, this);
                     else
                         owner->RemoveAurasDueToSpell(34471);
                     break;
@@ -7488,12 +7488,12 @@ void Aura::PeriodicDummyTick()
                 // Feeding Frenzy Rank 1
                 case 53511:
                     if ( m_target->GetHealth() * 100 < m_target->GetMaxHealth() * 35 )
-                        m_target->CastSpell(m_target, 60096, true, 0, this);
+                        m_target->CastSpell(m_target, 60096, true, NULL, this);
                     return;
                 // Feeding Frenzy Rank 2
                 case 53512:
                     if ( m_target->GetHealth() * 100 < m_target->GetMaxHealth() * 35 )
-                        m_target->CastSpell(m_target, 60097, true, 0, this);
+                        m_target->CastSpell(m_target, 60097, true, NULL, this);
                     return;
                 default:
                     break;

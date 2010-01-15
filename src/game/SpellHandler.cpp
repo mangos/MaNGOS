@@ -537,7 +537,7 @@ void WorldSession::HandleSelfResOpcode( WorldPacket & /*recv_data*/ )
     {
         SpellEntry const *spellInfo = sSpellStore.LookupEntry(_player->GetUInt32Value(PLAYER_SELF_RES_SPELL));
         if(spellInfo)
-            _player->CastSpell(_player,spellInfo,false,0);
+            _player->CastSpell(_player, spellInfo, false);
 
         _player->SetUInt32Value(PLAYER_SELF_RES_SPELL, 0);
     }
