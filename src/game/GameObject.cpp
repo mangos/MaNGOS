@@ -202,10 +202,7 @@ void GameObject::Update(uint32 /*p_time*/)
                             udata.BuildPacket(&packet);
                             ((Player*)caster)->GetSession()->SendPacket(&packet);
 
-                            WorldPacket data(SMSG_GAMEOBJECT_CUSTOM_ANIM,8+4);
-                            data << GetGUID();
-                            data << (uint32)(0);
-                            ((Player*)caster)->SendMessageToSet(&data,true);
+                            SendGameObjectCustomAnim(GetGUID());
                         }
 
                         m_lootState = GO_READY;                 // can be successfully open with some chance

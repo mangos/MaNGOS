@@ -482,6 +482,7 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         void PlayDirectSound(uint32 sound_id, Player* target = NULL);
 
         void SendObjectDeSpawnAnim(uint64 guid);
+        void SendGameObjectCustomAnim(uint64 guid);
 
         virtual void SaveRespawnTime() {}
         void AddObjectToRemoveList();
