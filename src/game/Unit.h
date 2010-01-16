@@ -299,6 +299,7 @@ class Item;
 class Pet;
 class Path;
 class PetAura;
+class Totem;
 
 struct SpellImmune
 {
@@ -1242,6 +1243,8 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         Pet* CreateTamedPetFrom(Creature* creatureTarget,uint32 spell_id = 0);
 
+        Totem* GetTotem(uint8 slot) const;
+
         template<typename Func>
         void CallForAllControlledUnits(Func const& func, bool withTotems, bool withGuardians, bool withCharms);
         template<typename Func>
@@ -1645,6 +1648,8 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         float GetCombatRatingReduction(CombatRating cr) const;
         uint32 GetCombatRatingDamageReduction(CombatRating cr, float rate, float cap, uint32 damage) const;
 
+        Unit* _GetTotem(uint8 slot) const;                  // for templated function without include need
+
         uint32 m_state;                                     // Even derived shouldn't modify
         uint32 m_CombatTimer;
 
@@ -1681,9 +1686,8 @@ void Unit::CallForAllControlledUnits(Func const& func, bool withTotems, bool wit
     if (withTotems)
     {
         for (int8 i = 0; i < MAX_TOTEM; ++i)
-            if(m_TotemSlot[i])
-                if(Creature *totem = GetMap()->GetCreature(m_TotemSlot[i]))
-                    func(totem);
+            if (Unit *totem = _GetTotem(i))
+                func(totem);
     }
 
     if (withCharms)
@@ -1711,10 +1715,9 @@ bool Unit::CheckAllControlledUnits(Func const& func, bool withTotems, bool withG
     if (withTotems)
     {
         for (int8 i = 0; i < MAX_TOTEM; ++i)
-            if (m_TotemSlot[i])
-                if (Creature *totem = GetMap()->GetCreature(m_TotemSlot[i]))
-                    if (func(totem))
-                        return true;
+            if (Unit *totem = _GetTotem(i))
+                if (func(totem))
+                    return true;
     }
 
     if (withCharms)

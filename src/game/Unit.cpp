@@ -8442,6 +8442,20 @@ Pet* Unit::FindGuardianWithEntry(uint32 entry)
     return NULL;
 }
 
+Unit* Unit::_GetTotem(uint8 slot) const
+{
+    return GetTotem(slot);
+}
+
+Totem* Unit::GetTotem( uint8 slot ) const
+{
+    if(slot >= MAX_TOTEM)
+        return NULL;
+
+    Creature *totem = GetMap()->GetCreature(m_TotemSlot[slot]);
+    return totem->isTotem() ? (Totem*)totem : NULL;
+}
+
 void Unit::UnsummonAllTotems()
 {
     for (int8 i = 0; i < MAX_TOTEM; ++i)
