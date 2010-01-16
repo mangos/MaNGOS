@@ -36,7 +36,7 @@ enum MovementGeneratorType
     RANDOM_MOTION_TYPE    = 1,                              // RandomMovementGenerator.h
     WAYPOINT_MOTION_TYPE  = 2,                              // WaypointMovementGenerator.h
     MAX_DB_MOTION_TYPE    = 3,                              // *** this and below motion types can't be set in DB.
-    ANIMAL_RANDOM_MOTION_TYPE = MAX_DB_MOTION_TYPE,         // AnimalRandomMovementGenerator.h
+    ANIMAL_RANDOM_MOTION_TYPE = MAX_DB_MOTION_TYPE,         // Just a dummy
     CONFUSED_MOTION_TYPE  = 4,                              // ConfusedMovementGenerator.h
     TARGETED_MOTION_TYPE  = 5,                              // TargetedMovementGenerator.h
     HOME_MOTION_TYPE      = 6,                              // HomeMovementGenerator.h

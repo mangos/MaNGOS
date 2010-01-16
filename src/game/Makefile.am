@@ -34,7 +34,6 @@ libmangosgame_a_SOURCES = \
 	AchievementMgr.cpp \
 	AggressorAI.cpp \
 	AggressorAI.h \
-	AnimalRandomMovementGenerator.h \
 	ArenaTeam.cpp \
 	ArenaTeam.h \
 	ArenaTeamHandler.cpp \

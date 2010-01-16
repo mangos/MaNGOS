@@ -1014,10 +1014,6 @@
 			Name="Motion generators"
 			>
 			<File
-				RelativePath="..\..\src\game\AnimalRandomMovementGenerator.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\src\game\ConfusedMovementGenerator.cpp"
 				>
 			</File>
