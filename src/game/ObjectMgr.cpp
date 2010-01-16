@@ -5872,7 +5872,7 @@ inline void CheckGOLockId(GameObjectInfo const* goInfo,uint32 dataN,uint32 N)
         return;
 
     sLog.outErrorDb("Gameobject (Entry: %u GoType: %u) have data%d=%u but lock (Id: %u) not found.",
-        goInfo->id,goInfo->type,N,goInfo->door.lockId,goInfo->door.lockId);
+        goInfo->id,goInfo->type,N,dataN,dataN);
 }
 
 inline void CheckGOLinkedTrapId(GameObjectInfo const* goInfo,uint32 dataN,uint32 N)
