@@ -341,15 +341,18 @@ void FleeingMovementGenerator<Creature>::Finalize(Creature &owner)
 }
 
 template<class T>
-void
-FleeingMovementGenerator<T>::Reset(T &owner)
+void FleeingMovementGenerator<T>::Interrupt(T &owner)
+{
+}
+
+template<class T>
+void FleeingMovementGenerator<T>::Reset(T &owner)
 {
     Initialize(owner);
 }
 
 template<class T>
-bool
-FleeingMovementGenerator<T>::Update(T &owner, const uint32 & time_diff)
+bool FleeingMovementGenerator<T>::Update(T &owner, const uint32 & time_diff)
 {
     if( !&owner || !owner.isAlive() )
         return false;
@@ -386,6 +389,8 @@ template bool FleeingMovementGenerator<Player>::_getPoint(Player &, float &, flo
 template bool FleeingMovementGenerator<Creature>::_getPoint(Creature &, float &, float &, float &);
 template void FleeingMovementGenerator<Player>::_setTargetLocation(Player &);
 template void FleeingMovementGenerator<Creature>::_setTargetLocation(Creature &);
+template void FleeingMovementGenerator<Player>::Interrupt(Player &);
+template void FleeingMovementGenerator<Creature>::Interrupt(Creature &);
 template void FleeingMovementGenerator<Player>::Reset(Player &);
 template void FleeingMovementGenerator<Creature>::Reset(Creature &);
 template bool FleeingMovementGenerator<Player>::Update(Player &, const uint32 &);

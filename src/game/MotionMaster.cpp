@@ -434,6 +434,9 @@ void MotionMaster::Mutate(MovementGenerator *m)
             default:
                 break;
         }
+
+        if (!empty())
+            top()->Interrupt(*i_owner);
     }
     m->Initialize(*i_owner);
     push(m);

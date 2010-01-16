@@ -47,6 +47,7 @@ class MANGOS_DLL_SPEC TargetedMovementGenerator
 
         void Initialize(T &);
         void Finalize(T &);
+        void Interrupt(T &);
         void Reset(T &);
         bool Update(T &, const uint32 &);
         MovementGeneratorType GetMovementGeneratorType() { return TARGETED_MOTION_TYPE; }

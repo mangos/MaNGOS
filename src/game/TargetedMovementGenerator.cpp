@@ -89,6 +89,12 @@ TargetedMovementGenerator<T>::_setTargetLocation(T &owner)
 }
 
 template<>
+void TargetedMovementGenerator<Player>::Initialize(Player &owner)
+{
+    _setTargetLocation(owner);
+}
+
+template<>
 void TargetedMovementGenerator<Creature>::Initialize(Creature &owner)
 {
     if (owner.isInCombat())
@@ -113,29 +119,25 @@ void TargetedMovementGenerator<Creature>::UpdateFinalDistance(float fDistance)
     i_recalculateTravel = true;
 }
 
-template<>
-void TargetedMovementGenerator<Player>::Initialize(Player &owner)
+template<class T>
+void TargetedMovementGenerator<T>::Finalize(T &owner)
 {
-    _setTargetLocation(owner);
+    owner.clearUnitState(UNIT_STAT_CHASE | UNIT_STAT_FOLLOW);
 }
 
 template<class T>
-void
-TargetedMovementGenerator<T>::Finalize(T &owner)
+void TargetedMovementGenerator<T>::Interrupt(T &owner)
 {
-    owner.clearUnitState(UNIT_STAT_CHASE);
 }
 
 template<class T>
-void
-TargetedMovementGenerator<T>::Reset(T &owner)
+void TargetedMovementGenerator<T>::Reset(T &owner)
 {
     Initialize(owner);
 }
 
 template<class T>
-bool
-TargetedMovementGenerator<T>::Update(T &owner, const uint32 & time_diff)
+bool TargetedMovementGenerator<T>::Update(T &owner, const uint32 & time_diff)
 {
     if (!i_target.isValid() || !i_target->IsInWorld())
         return false;
@@ -207,8 +209,7 @@ TargetedMovementGenerator<T>::Update(T &owner, const uint32 & time_diff)
 }
 
 template<class T>
-Unit*
-TargetedMovementGenerator<T>::GetTarget() const
+Unit* TargetedMovementGenerator<T>::GetTarget() const
 {
     return i_target.getTarget();
 }
@@ -217,6 +218,8 @@ template void TargetedMovementGenerator<Player>::_setTargetLocation(Player &);
 template void TargetedMovementGenerator<Creature>::_setTargetLocation(Creature &);
 template void TargetedMovementGenerator<Player>::Finalize(Player &);
 template void TargetedMovementGenerator<Creature>::Finalize(Creature &);
+template void TargetedMovementGenerator<Player>::Interrupt(Player &);
+template void TargetedMovementGenerator<Creature>::Interrupt(Creature &);
 template void TargetedMovementGenerator<Player>::Reset(Player &);
 template void TargetedMovementGenerator<Creature>::Reset(Creature &);
 template bool TargetedMovementGenerator<Player>::Update(Player &, const uint32 &);

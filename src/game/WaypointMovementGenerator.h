@@ -82,6 +82,7 @@ public PathMovementBase<Creature, WaypointPath*>
             u.StopMoving();
             LoadPath(u);
         }
+        void Interrupt(Creature &) {}
         void Finalize(Creature &) {}
         void Reset(Creature &u)
         {
@@ -130,6 +131,7 @@ public PathMovementBase<Player>
         explicit FlightPathMovementGenerator(uint32 id, uint32 startNode = 0) : i_pathId(id) { i_currentNode = startNode; }
         void Initialize(Player &);
         void Finalize(Player &);
+        void Interrupt(Player &) {}
         void Reset(Player &) {}
         bool Update(Player &, const uint32 &);
         MovementGeneratorType GetMovementGeneratorType() { return FLIGHT_MOTION_TYPE; }
