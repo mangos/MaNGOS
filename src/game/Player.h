@@ -1170,7 +1170,6 @@ class MANGOS_DLL_SPEC Player : public Unit
         template<typename Func>
         bool CheckAllControlledUnits(Func const& func, bool withTotems, bool withGuardians, bool withCharms, bool withMiniPet) const;
 
-
         uint32 GetPhaseMaskForSpawn() const;                // used for proper set phase for DB at GM-mode creature/GO spawn
 
         void Say(const std::string& text, const uint32 language);
