@@ -1230,7 +1230,13 @@ void Spell::EffectDummy(uint32 i)
                     }
                     return;
                 }
-                case 51582:                                 //Rocket Boots Engaged (Rocket Boots Xtreme and Rocket Boots Xtreme Lite)
+                case 46797:                                 // Quest - Borean Tundra - Set Explosives Cart
+                    if (!unitTarget)
+                        return;
+                    // Quest - Borean Tundra - Summon Explosives Cart
+                    unitTarget->CastSpell(unitTarget,46798,true,m_CastItem,NULL,m_originalCasterGUID);
+                    break;
+                case 51582:                                 // Rocket Boots Engaged (Rocket Boots Xtreme and Rocket Boots Xtreme Lite)
                 {
                     if (m_caster->GetTypeId() != TYPEID_PLAYER)
                         return;
