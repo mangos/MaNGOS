@@ -1240,6 +1240,11 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         Pet* CreateTamedPetFrom(Creature* creatureTarget,uint32 spell_id = 0);
 
+        template<typename Func>
+        void CallForAllControlledUnits(Func const& func, bool withTotems, bool withGuardians, bool withCharms);
+        template<typename Func>
+        bool CheckAllControlledUnits(Func const& func, bool withTotems, bool withGuardians, bool withCharms) const;
+
         bool AddAura(Aura *aur);
 
         // removing specific aura stack
@@ -1535,7 +1540,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         void addFollower(FollowerReference* pRef) { m_FollowingRefManager.insertFirst(pRef); }
         void removeFollower(FollowerReference* /*pRef*/ ) { /* nothing to do yet */ }
-        static Unit* GetUnit(WorldObject& object, uint64 guid);
+        static Unit* GetUnit(WorldObject const& object, uint64 guid);
 
         MotionMaster* GetMotionMaster() { return &i_motionMaster; }
 
@@ -1657,4 +1662,64 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         GuardianPetList m_guardianPets;
 };
+
+template<typename Func>
+void Unit::CallForAllControlledUnits(Func const& func, bool withTotems, bool withGuardians, bool withCharms)
+{
+    if(Pet* pet = GetPet())
+        func(pet);
+
+    if (withGuardians)
+    {
+        for(GuardianPetList::const_iterator itr = m_guardianPets.begin(); itr != m_guardianPets.end(); ++itr)
+            if(Unit* guardian = Unit::GetUnit(*this,*itr))
+                func(guardian);
+    }
+
+    if (withTotems)
+    {
+        for (int8 i = 0; i < MAX_TOTEM; ++i)
+            if(m_TotemSlot[i])
+                if(Creature *totem = GetMap()->GetCreature(m_TotemSlot[i]))
+                    func(totem);
+    }
+
+    if (withCharms)
+        if(Unit* charm = GetCharm())
+            func(charm);
+}
+
+
+template<typename Func>
+bool Unit::CheckAllControlledUnits(Func const& func, bool withTotems, bool withGuardians, bool withCharms) const
+{
+    if (Pet* pet = GetPet())
+        if (func(pet))
+            return true;
+
+    if (withGuardians)
+    {
+        for(GuardianPetList::const_iterator itr = m_guardianPets.begin(); itr != m_guardianPets.end(); ++itr)
+            if (Unit* guardian = Unit::GetUnit(*this,*itr))
+                if (func(guardian))
+                    return true;
+
+    }
+
+    if (withTotems)
+    {
+        for (int8 i = 0; i < MAX_TOTEM; ++i)
+            if (m_TotemSlot[i])
+                if (Creature *totem = GetMap()->GetCreature(m_TotemSlot[i]))
+                    if (func(totem))
+                        return true;
+    }
+
+    if (withCharms)
+        if(Unit* charm = GetCharm())
+            if (func(charm))
+                return true;
+
+    return false;
+}
 #endif
