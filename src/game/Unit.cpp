@@ -3347,10 +3347,10 @@ void Unit::SetInFront(Unit const* target)
     SetOrientation(GetAngle(target));
 }
 
-void Unit::SetFacingToObject(WorldObject* pObject)
+void Unit::SetFacingTo(float ori)
 {
     // update orientation at server
-    SetOrientation(GetAngle(pObject));
+    SetOrientation(ori);
 
     // and client
     WorldPacket data;
@@ -10392,6 +10392,34 @@ bool Unit::canDetectInvisibilityOf(Unit const* u) const
     }
 
     return false;
+}
+
+struct UpdateWalkModeForPetsHelper
+{
+    explicit UpdateWalkModeForPetsHelper(bool _on) : on(_on) {}
+    void operator()(Unit* unit) const { unit->UpdateWalkModeForPets(on); }
+    bool on;
+};
+
+void Unit::UpdateWalkModeForPets(bool on)
+{
+    if (GetTypeId() == TYPEID_PLAYER)
+        ((Player*)this)->CallForAllControlledUnits(UpdateWalkModeForPetsHelper(on),false,true,true,true);
+    else
+    {
+        if (on)
+        {
+            if (((Creature*)this)->isPet() && hasUnitState(UNIT_STAT_FOLLOW))
+                ((Creature*)this)->AddMonsterMoveFlag(MONSTER_MOVE_WALK);
+        }
+        else
+        {
+            if (((Creature*)this)->isPet())
+                ((Creature*)this)->RemoveMonsterMoveFlag(MONSTER_MOVE_WALK);
+        }
+
+        CallForAllControlledUnits(UpdateWalkModeForPetsHelper(on),false,true,true);
+    }
 }
 
 void Unit::UpdateSpeed(UnitMoveType mtype, bool forced)

@@ -1376,7 +1376,8 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void SetBaseWeaponDamage(WeaponAttackType attType ,WeaponDamageRange damageRange, float value) { m_weaponDamage[attType][damageRange] = value; }
 
         void SetInFront(Unit const* target);
-        void SetFacingToObject(WorldObject* pObject);
+        void SetFacingTo(float ori);
+        void SetFacingToObject(WorldObject* pObject) { SetFacingTo(GetAngle(pObject)); }
 
         // Visibility system
         UnitVisibility GetVisibility() const { return m_Visibility; }
@@ -1523,6 +1524,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         uint32 CalcArmorReducedDamage(Unit* pVictim, const uint32 damage);
         void CalcAbsorbResist(Unit *pVictim, SpellSchoolMask schoolMask, DamageEffectType damagetype, const uint32 damage, uint32 *absorb, uint32 *resist, bool canReflect = false);
 
+        void  UpdateWalkModeForPets(bool on);
         void  UpdateSpeed(UnitMoveType mtype, bool forced);
         float GetSpeed( UnitMoveType mtype ) const;
         float GetSpeedRate( UnitMoveType mtype ) const { return m_speed_rate[mtype]; }

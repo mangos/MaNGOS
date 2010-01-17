@@ -300,27 +300,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
         plMover->HandleFall(movementInfo);
 
     if ((opcode == MSG_MOVE_SET_WALK_MODE || opcode == MSG_MOVE_SET_RUN_MODE) && plMover)
-    {
-        Pet* pPet = plMover->GetPet();
-        Pet* pMiniPet = plMover->GetMiniPet();
-
-        if (movementInfo.HasMovementFlag(MOVEMENTFLAG_WALK_MODE))
-        {
-            if (pPet && !pPet->isInCombat())
-                pPet->SetMonsterMoveFlags(MONSTER_MOVE_WALK);
-
-            if (pMiniPet)
-                pMiniPet->SetMonsterMoveFlags(MONSTER_MOVE_WALK);
-        }
-        else
-        {
-            if (pPet)
-                pPet->RemoveMonsterMoveFlag(MONSTER_MOVE_WALK);
-
-            if (pMiniPet)
-                pMiniPet->RemoveMonsterMoveFlag(MONSTER_MOVE_WALK);
-        }
-    }
+        plMover->UpdateWalkModeForPets(movementInfo.HasMovementFlag(MOVEMENTFLAG_WALK_MODE));
 
     if (plMover && (movementInfo.HasMovementFlag(MOVEMENTFLAG_SWIMMING) != plMover->IsInWater()))
     {
