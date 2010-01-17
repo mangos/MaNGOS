@@ -1305,7 +1305,7 @@ void GameObject::Use(Unit* user)
             return;
         }
         default:
-            sLog.outDebug("Unknown Object Type %u", GetGoType());
+            sLog.outDebug("GameObject::Use unhandled GameObject type %u (entry %u).", GetGoType(), GetEntry());
             break;
     }
 
