@@ -892,6 +892,24 @@ void GameObject::Use(Unit* user)
             player->SendPreparedGossip(this);
             return;
         }
+        case GAMEOBJECT_TYPE_CHEST:
+        {
+            if (user->GetTypeId() != TYPEID_PLAYER)
+                return;
+
+            // TODO: possible must be moved to loot release (in different from linked triggering)
+            if (GetGOInfo()->chest.eventId)
+            {
+                sLog.outDebug("Chest ScriptStart id %u for GO %u", GetGOInfo()->chest.eventId, GetDBTableGUIDLow());
+                GetMap()->ScriptsStart(sEventScripts, GetGOInfo()->chest.eventId, user, this);
+            }
+
+            // triggering linked GO
+            if (uint32 trapEntry = GetGOInfo()->chest.linkedTrapId)
+                TriggeringLinkedGameObject(trapEntry, user);
+
+            return;
+        }
         case GAMEOBJECT_TYPE_CHAIR:                         //7 Sitting: Wooden bench, chairs
         {
             GameObjectInfo const* info = GetGOInfo();
@@ -1311,7 +1329,7 @@ void GameObject::Use(Unit* user)
             return;
         }
         default:
-            sLog.outDebug("GameObject::Use unhandled GameObject type %u (entry %u).", GetGoType(), GetEntry());
+            sLog.outError("GameObject::Use unhandled GameObject type %u (entry %u).", GetGoType(), GetEntry());
             break;
     }
 
