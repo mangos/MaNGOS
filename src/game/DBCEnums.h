@@ -241,6 +241,7 @@ enum AreaFlags
     AREA_FLAG_UNK9             = 0x02000000,                // unknown
     AREA_FLAG_UNK10            = 0x04000000,                // unknown
     AREA_FLAG_OUTDOOR_PVP2     = 0x08000000                 // Wintergrasp and it's subzones
+    // 0x20000000 not flyable?
 };
 
 enum Difficulty

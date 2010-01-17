@@ -423,32 +423,32 @@ enum DrunkenState
 
 enum PlayerFlags
 {
-    PLAYER_FLAGS_GROUP_LEADER   = 0x00000001,
-    PLAYER_FLAGS_AFK            = 0x00000002,
-    PLAYER_FLAGS_DND            = 0x00000004,
-    PLAYER_FLAGS_GM             = 0x00000008,
-    PLAYER_FLAGS_GHOST          = 0x00000010,
-    PLAYER_FLAGS_RESTING        = 0x00000020,
-    PLAYER_FLAGS_UNK7           = 0x00000040,
-    PLAYER_FLAGS_UNK8           = 0x00000080,               // pre-3.0.3 PLAYER_FLAGS_FFA_PVP flag for FFA PVP state
-    PLAYER_FLAGS_CONTESTED_PVP  = 0x00000100,               // Player has been involved in a PvP combat and will be attacked by contested guards
-    PLAYER_FLAGS_IN_PVP         = 0x00000200,
-    PLAYER_FLAGS_HIDE_HELM      = 0x00000400,
-    PLAYER_FLAGS_HIDE_CLOAK     = 0x00000800,
-    PLAYER_FLAGS_UNK13          = 0x00001000,               // played long time
-    PLAYER_FLAGS_UNK14          = 0x00002000,               // played too long time
-    PLAYER_FLAGS_UNK15          = 0x00004000,
-    PLAYER_FLAGS_UNK16          = 0x00008000,               // strange visual effect (2.0.1), looks like PLAYER_FLAGS_GHOST flag
-    PLAYER_FLAGS_UNK17          = 0x00010000,               // pre-3.0.3 PLAYER_FLAGS_SANCTUARY flag for player entered sanctuary
-    PLAYER_FLAGS_UNK18          = 0x00020000,               // taxi benchmark mode (on/off) (2.0.1)
-    PLAYER_FLAGS_PVP_TIMER      = 0x00040000,               // 3.0.2, pvp timer active (after you disable pvp manually)
-    PLAYER_FLAGS_UNK20          = 0x00080000,
-    PLAYER_FLAGS_UNK21          = 0x00100000,
-    PLAYER_FLAGS_UNK22          = 0x00200000,
-    PLAYER_FLAGS_UNK23          = 0x00400000,
-    PLAYER_FLAGS_UNK24          = 0x00800000,               // disabled all abilitys on tab except autoattack
-    PLAYER_FLAGS_UNK25          = 0x01000000,               // disabled all melee ability on tab include autoattack
-    PLAYER_FLAGS_NO_XP_GAIN     = 0x02000000,
+    PLAYER_FLAGS_GROUP_LEADER      = 0x00000001,
+    PLAYER_FLAGS_AFK               = 0x00000002,
+    PLAYER_FLAGS_DND               = 0x00000004,
+    PLAYER_FLAGS_GM                = 0x00000008,
+    PLAYER_FLAGS_GHOST             = 0x00000010,
+    PLAYER_FLAGS_RESTING           = 0x00000020,
+    PLAYER_FLAGS_UNK7              = 0x00000040,
+    PLAYER_FLAGS_UNK8              = 0x00000080,            // pre-3.0.3 PLAYER_FLAGS_FFA_PVP flag for FFA PVP state
+    PLAYER_FLAGS_CONTESTED_PVP     = 0x00000100,            // Player has been involved in a PvP combat and will be attacked by contested guards
+    PLAYER_FLAGS_IN_PVP            = 0x00000200,
+    PLAYER_FLAGS_HIDE_HELM         = 0x00000400,
+    PLAYER_FLAGS_HIDE_CLOAK        = 0x00000800,
+    PLAYER_FLAGS_PARTIAL_PLAY_TIME = 0x00001000,            // played long time
+    PLAYER_FLAGS_NO_PLAY_TIME      = 0x00002000,            // played too long time
+    PLAYER_FLAGS_IS_OUT_OF_BOUNDS  = 0x00004000,            // Lua_IsOutOfBounds
+    PLAYER_FLAGS_UNK16             = 0x00008000,            // strange visual effect (2.0.1), looks like PLAYER_FLAGS_GHOST flag
+    PLAYER_FLAGS_UNK17             = 0x00010000,            // pre-3.0.3 PLAYER_FLAGS_SANCTUARY flag for player entered sanctuary
+    PLAYER_FLAGS_TAXI_BENCHMARK    = 0x00020000,            // taxi benchmark mode (on/off) (2.0.1)
+    PLAYER_FLAGS_PVP_TIMER         = 0x00040000,            // 3.0.2, pvp timer active (after you disable pvp manually)
+    PLAYER_FLAGS_COMMENTATOR       = 0x00080000,
+    PLAYER_FLAGS_UNK21             = 0x00100000,
+    PLAYER_FLAGS_UNK22             = 0x00200000,
+    PLAYER_FLAGS_COMMENTATOR2      = 0x00400000,            // something like COMMENTATOR_CAN_USE_INSTANCE_COMMAND
+    PLAYER_FLAGS_UNK24             = 0x00800000,            // EVENT_SPELL_UPDATE_USABLE and EVENT_UPDATE_SHAPESHIFT_USABLE, disabled all abilitys on tab except autoattack
+    PLAYER_FLAGS_UNK25             = 0x01000000,            // EVENT_SPELL_UPDATE_USABLE and EVENT_UPDATE_SHAPESHIFT_USABLE, disabled all melee ability on tab include autoattack
+    PLAYER_FLAGS_XP_USER_DISABLED  = 0x02000000,
 };
 
 // used for PLAYER__FIELD_KNOWN_TITLES field (uint64), (1<<bit_index) without (-1)
