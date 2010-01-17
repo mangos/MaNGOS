@@ -251,9 +251,6 @@ void WorldSession::HandleGameObjectUseOpcode( WorldPacket & recv_data )
     if(!obj)
         return;
 
-    if (Script->GOHello(_player, obj))
-        return;
-
     obj->Use(_player);
 }
 
