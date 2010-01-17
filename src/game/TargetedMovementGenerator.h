@@ -79,9 +79,9 @@ template<class T>
 class MANGOS_DLL_SPEC ChaseMovementGenerator : public TargetedMovementGeneratorMedium<T>
 {
     public:
-        ChaseMovementGenerator(Unit &target) : TargetedMovementGeneratorMedium(target) {}
+        ChaseMovementGenerator(Unit &target) : TargetedMovementGeneratorMedium<T>(target) {}
         ChaseMovementGenerator(Unit &target, float offset, float angle)
-            : TargetedMovementGeneratorMedium(target, offset, angle) {}
+            : TargetedMovementGeneratorMedium<T>(target, offset, angle) {}
         ~ChaseMovementGenerator() {}
 
         MovementGeneratorType GetMovementGeneratorType() { return CHASE_MOTION_TYPE; }
@@ -97,9 +97,9 @@ template<class T>
 class MANGOS_DLL_SPEC FollowMovementGenerator : public TargetedMovementGeneratorMedium<T>
 {
     public:
-        FollowMovementGenerator(Unit &target) : TargetedMovementGeneratorMedium(target) {}
+        FollowMovementGenerator(Unit &target) : TargetedMovementGeneratorMedium<T>(target) {}
         FollowMovementGenerator(Unit &target, float offset, float angle)
-            : TargetedMovementGeneratorMedium(target, offset, angle) {}
+            : TargetedMovementGeneratorMedium<T>(target, offset, angle) {}
         ~FollowMovementGenerator() {}
 
         MovementGeneratorType GetMovementGeneratorType() { return FOLLOW_MOTION_TYPE; }
