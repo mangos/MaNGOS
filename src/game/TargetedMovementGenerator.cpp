@@ -26,22 +26,10 @@
 #define SMALL_ALPHA 0.05f
 
 #include <cmath>
-/*
-struct StackCleaner
-{
-    Creature &i_creature;
-    StackCleaner(Creature &creature) : i_creature(creature) {}
-    void Done(void) { i_creature.StopMoving(); }
-    ~StackCleaner()
-    {
-        i_creature->Clear();
-    }
-};
-*/
 
+//-----------------------------------------------//
 template<class T>
-void
-TargetedMovementGenerator<T>::_setTargetLocation(T &owner)
+void TargetedMovementGeneratorMedium<T>::_setTargetLocation(T &owner)
 {
     if (!i_target.isValid() || !i_target->IsInWorld())
         return;
@@ -89,55 +77,26 @@ TargetedMovementGenerator<T>::_setTargetLocation(T &owner)
 }
 
 template<>
-void TargetedMovementGenerator<Player>::Initialize(Player &owner)
-{
-    _setTargetLocation(owner);
-}
-
-template<>
-void TargetedMovementGenerator<Creature>::Initialize(Creature &owner)
-{
-    if (owner.isInCombat())
-        owner.RemoveMonsterMoveFlag(MONSTER_MOVE_WALK);
-
-    if (((Creature*)&owner)->canFly())
-        owner.AddMonsterMoveFlag(MONSTER_MOVE_FLY);
-
-    _setTargetLocation(owner);
-}
-
-template<>
-void TargetedMovementGenerator<Player>::UpdateFinalDistance(float fDistance)
+void TargetedMovementGeneratorMedium<Player>::UpdateFinalDistance(float fDistance)
 {
     // nothing to do for Player
 }
 
 template<>
-void TargetedMovementGenerator<Creature>::UpdateFinalDistance(float fDistance)
+void TargetedMovementGeneratorMedium<Creature>::UpdateFinalDistance(float fDistance)
 {
     i_offset = fDistance;
     i_recalculateTravel = true;
 }
 
 template<class T>
-void TargetedMovementGenerator<T>::Finalize(T &owner)
+Unit* TargetedMovementGeneratorMedium<T>::GetTarget() const
 {
-    owner.clearUnitState(UNIT_STAT_CHASE | UNIT_STAT_FOLLOW);
+    return i_target.getTarget();
 }
 
 template<class T>
-void TargetedMovementGenerator<T>::Interrupt(T &owner)
-{
-}
-
-template<class T>
-void TargetedMovementGenerator<T>::Reset(T &owner)
-{
-    Initialize(owner);
-}
-
-template<class T>
-bool TargetedMovementGenerator<T>::Update(T &owner, const uint32 & time_diff)
+bool TargetedMovementGeneratorMedium<T>::Update(T &owner, const uint32 & time_diff)
 {
     if (!i_target.isValid() || !i_target->IsInWorld())
         return false;
@@ -208,21 +167,90 @@ bool TargetedMovementGenerator<T>::Update(T &owner, const uint32 & time_diff)
     return true;
 }
 
-template<class T>
-Unit* TargetedMovementGenerator<T>::GetTarget() const
+//-----------------------------------------------//
+template<>
+void ChaseMovementGenerator<Player>::Initialize(Player &owner)
 {
-    return i_target.getTarget();
+    _setTargetLocation(owner);
 }
 
-template void TargetedMovementGenerator<Player>::_setTargetLocation(Player &);
-template void TargetedMovementGenerator<Creature>::_setTargetLocation(Creature &);
-template void TargetedMovementGenerator<Player>::Finalize(Player &);
-template void TargetedMovementGenerator<Creature>::Finalize(Creature &);
-template void TargetedMovementGenerator<Player>::Interrupt(Player &);
-template void TargetedMovementGenerator<Creature>::Interrupt(Creature &);
-template void TargetedMovementGenerator<Player>::Reset(Player &);
-template void TargetedMovementGenerator<Creature>::Reset(Creature &);
-template bool TargetedMovementGenerator<Player>::Update(Player &, const uint32 &);
-template bool TargetedMovementGenerator<Creature>::Update(Creature &, const uint32 &);
-template Unit* TargetedMovementGenerator<Player>::GetTarget() const;
-template Unit* TargetedMovementGenerator<Creature>::GetTarget() const;
+template<>
+void ChaseMovementGenerator<Creature>::Initialize(Creature &owner)
+{
+    owner.RemoveMonsterMoveFlag(MONSTER_MOVE_WALK);
+
+    if (((Creature*)&owner)->canFly())
+        owner.AddMonsterMoveFlag(MONSTER_MOVE_FLY);
+
+    _setTargetLocation(owner);
+}
+
+template<class T>
+void ChaseMovementGenerator<T>::Finalize(T &owner)
+{
+    owner.clearUnitState(UNIT_STAT_CHASE | UNIT_STAT_FOLLOW);
+}
+
+template<class T>
+void ChaseMovementGenerator<T>::Interrupt(T &owner)
+{
+}
+
+template<class T>
+void ChaseMovementGenerator<T>::Reset(T &owner)
+{
+    Initialize(owner);
+}
+
+//-----------------------------------------------//
+template<>
+void FollowMovementGenerator<Player>::Initialize(Player &owner)
+{
+    _setTargetLocation(owner);
+}
+
+template<>
+void FollowMovementGenerator<Creature>::Initialize(Creature &owner)
+{
+    if (((Creature*)&owner)->canFly())
+        owner.AddMonsterMoveFlag(MONSTER_MOVE_FLY);
+
+    _setTargetLocation(owner);
+}
+
+template<class T>
+void FollowMovementGenerator<T>::Finalize(T &owner)
+{
+    owner.clearUnitState(UNIT_STAT_CHASE | UNIT_STAT_FOLLOW);
+}
+
+template<class T>
+void FollowMovementGenerator<T>::Interrupt(T &owner)
+{
+}
+
+template<class T>
+void FollowMovementGenerator<T>::Reset(T &owner)
+{
+    Initialize(owner);
+}
+
+//-----------------------------------------------//
+template Unit* TargetedMovementGeneratorMedium<Player>::GetTarget() const;
+template Unit* TargetedMovementGeneratorMedium<Creature>::GetTarget() const;
+template bool TargetedMovementGeneratorMedium<Player>::Update(Player &, const uint32 &);
+template bool TargetedMovementGeneratorMedium<Creature>::Update(Creature &, const uint32 &);
+
+template void ChaseMovementGenerator<Player>::Finalize(Player &);
+template void ChaseMovementGenerator<Creature>::Finalize(Creature &);
+template void ChaseMovementGenerator<Player>::Interrupt(Player &);
+template void ChaseMovementGenerator<Creature>::Interrupt(Creature &);
+template void ChaseMovementGenerator<Player>::Reset(Player &);
+template void ChaseMovementGenerator<Creature>::Reset(Creature &);
+
+template void FollowMovementGenerator<Player>::Finalize(Player &);
+template void FollowMovementGenerator<Creature>::Finalize(Creature &);
+template void FollowMovementGenerator<Player>::Interrupt(Player &);
+template void FollowMovementGenerator<Creature>::Interrupt(Creature &);
+template void FollowMovementGenerator<Player>::Reset(Player &);
+template void FollowMovementGenerator<Creature>::Reset(Creature &);

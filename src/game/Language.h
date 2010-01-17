@@ -498,9 +498,9 @@ enum MangosStrings
     LANG_MOVEGENS_WAYPOINT              = 529,
     LANG_MOVEGENS_ANIMAL_RANDOM         = 530,
     LANG_MOVEGENS_CONFUSED              = 531,
-    LANG_MOVEGENS_TARGETED_PLAYER       = 532,
-    LANG_MOVEGENS_TARGETED_CREATURE     = 533,
-    LANG_MOVEGENS_TARGETED_NULL         = 534,
+    LANG_MOVEGENS_CHASE_PLAYER          = 532,
+    LANG_MOVEGENS_CHASE_CREATURE        = 533,
+    LANG_MOVEGENS_CHASE_NULL            = 534,
     LANG_MOVEGENS_HOME_CREATURE         = 535,
     LANG_MOVEGENS_HOME_PLAYER           = 536,
     LANG_MOVEGENS_FLIGHT                = 537,
@@ -816,7 +816,10 @@ enum MangosStrings
     LANG_TAXINODE_ENTRY_LIST_CONSOLE    = 1129,
     LANG_EVENT_STARTED                  = 1130,
     LANG_EVENT_STOPPED                  = 1131,
-    // Room for more level 3              1132-1199 not used
+    LANG_MOVEGENS_FOLLOW_PLAYER         = 1132,
+    LANG_MOVEGENS_FOLLOW_CREATURE       = 1133,
+    LANG_MOVEGENS_FOLLOW_NULL           = 1134,
+    // Room for more level 3              1135-1199 not used
 
     // Debug commands
     LANG_CINEMATIC_NOT_EXIST            = 1200,

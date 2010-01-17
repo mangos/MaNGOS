@@ -159,7 +159,7 @@ MotionMaster::DirectExpire(bool reset)
     pop();
 
     // also drop stored under top() targeted motions
-    while( !empty() && top()->GetMovementGeneratorType() == TARGETED_MOTION_TYPE )
+    while (!empty() && (top()->GetMovementGeneratorType() == CHASE_MOTION_TYPE || top()->GetMovementGeneratorType() == FOLLOW_MOTION_TYPE))
     {
         MovementGenerator *temp = top();
         pop();
@@ -192,7 +192,7 @@ MotionMaster::DelayedExpire()
         m_expList = new ExpireList();
 
     // also drop stored under top() targeted motions
-    while( !empty() && top()->GetMovementGeneratorType() == TARGETED_MOTION_TYPE )
+    while (!empty() && (top()->GetMovementGeneratorType() == CHASE_MOTION_TYPE || top()->GetMovementGeneratorType() == FOLLOW_MOTION_TYPE))
     {
         MovementGenerator *temp = top();
         pop();
@@ -236,7 +236,7 @@ MotionMaster::MoveTargetedHome()
             DEBUG_LOG("Following %s (GUID: %u)",
                 target->GetTypeId()==TYPEID_PLAYER ? "player" : "creature",
                 target->GetTypeId()==TYPEID_PLAYER ? target->GetGUIDLow() : ((Creature*)target)->GetDBTableGUIDLow() );
-            Mutate(new TargetedMovementGenerator<Creature>(*target,PET_FOLLOW_DIST,PET_FOLLOW_ANGLE));
+            Mutate(new FollowMovementGenerator<Creature>(*target,PET_FOLLOW_DIST,PET_FOLLOW_ANGLE));
         }
     }
     else
@@ -275,7 +275,7 @@ MotionMaster::MoveChase(Unit* target, float dist, float angle)
             i_owner->GetGUIDLow(),
             target->GetTypeId()==TYPEID_PLAYER ? "player" : "creature",
             target->GetTypeId()==TYPEID_PLAYER ? i_owner->GetGUIDLow() : ((Creature*)i_owner)->GetDBTableGUIDLow() );
-        Mutate(new TargetedMovementGenerator<Player>(*target,dist,angle));
+        Mutate(new ChaseMovementGenerator<Player>(*target,dist,angle));
     }
     else
     {
@@ -283,7 +283,7 @@ MotionMaster::MoveChase(Unit* target, float dist, float angle)
             i_owner->GetEntry(), i_owner->GetGUIDLow(),
             target->GetTypeId()==TYPEID_PLAYER ? "player" : "creature",
             target->GetTypeId()==TYPEID_PLAYER ? target->GetGUIDLow() : ((Creature*)target)->GetDBTableGUIDLow() );
-        Mutate(new TargetedMovementGenerator<Creature>(*target,dist,angle));
+        Mutate(new ChaseMovementGenerator<Creature>(*target,dist,angle));
     }
 }
 
@@ -302,7 +302,7 @@ MotionMaster::MoveFollow(Unit* target, float dist, float angle)
         DEBUG_LOG("Player (GUID: %u) follow to %s (GUID: %u)", i_owner->GetGUIDLow(),
             target->GetTypeId()==TYPEID_PLAYER ? "player" : "creature",
             target->GetTypeId()==TYPEID_PLAYER ? i_owner->GetGUIDLow() : ((Creature*)i_owner)->GetDBTableGUIDLow() );
-        Mutate(new TargetedMovementGenerator<Player>(*target,dist,angle));
+        Mutate(new FollowMovementGenerator<Player>(*target,dist,angle));
     }
     else
     {
@@ -310,7 +310,7 @@ MotionMaster::MoveFollow(Unit* target, float dist, float angle)
             i_owner->GetEntry(), i_owner->GetGUIDLow(),
             target->GetTypeId()==TYPEID_PLAYER ? "player" : "creature",
             target->GetTypeId()==TYPEID_PLAYER ? target->GetGUIDLow() : ((Creature*)target)->GetDBTableGUIDLow() );
-        Mutate(new TargetedMovementGenerator<Creature>(*target,dist,angle));
+        Mutate(new FollowMovementGenerator<Creature>(*target,dist,angle));
     }
 }
 
@@ -470,8 +470,5 @@ bool MotionMaster::GetDestination(float &x, float &y, float &z)
 void MotionMaster::UpdateFinalDistanceToTarget(float fDistance)
 {
     if (!empty())
-    {
-        if (top()->GetMovementGeneratorType() == TARGETED_MOTION_TYPE)
-            top()->UpdateFinalDistance(fDistance);
-    }
+        top()->UpdateFinalDistance(fDistance);
 }
