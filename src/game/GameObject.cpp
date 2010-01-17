@@ -952,7 +952,14 @@ void GameObject::Use(Unit* user)
             player->SetStandState(UNIT_STAND_STATE_SIT_LOW_CHAIR+info->chair.height);
             return;
         }
-        //big gun, its a spell/aura
+        case GAMEOBJECT_TYPE_SPELL_FOCUS:
+        {
+            // triggering linked GO
+            if (uint32 trapEntry = GetGOInfo()->goober.linkedTrapId)
+                TriggeringLinkedGameObject(trapEntry, user);
+
+            break;
+        }
         case GAMEOBJECT_TYPE_GOOBER:                        //10
         {
             GameObjectInfo const* info = GetGOInfo();
