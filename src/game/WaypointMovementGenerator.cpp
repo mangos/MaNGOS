@@ -74,10 +74,6 @@ void WaypointMovementGenerator<Creature>::ClearWaypoints()
     i_path = NULL;
 }
 
-void WaypointMovementGenerator<Creature>::Initialize()
-{
-}
-
 bool WaypointMovementGenerator<Creature>::Update(Creature &creature, const uint32 &diff)
 {
     if (!&creature)

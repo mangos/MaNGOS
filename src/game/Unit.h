@@ -413,9 +413,9 @@ enum UnitState
     UNIT_STAT_STUNNED         = 0x0008,
     UNIT_STAT_ROAMING         = 0x0010,
     UNIT_STAT_CHASE           = 0x0020,
-    UNIT_STAT_SEARCHING       = 0x0040,
+    //UNIT_STAT_SEARCHING       = 0x0040,
     UNIT_STAT_FLEEING         = 0x0080,
-    UNIT_STAT_MOVING          = (UNIT_STAT_ROAMING | UNIT_STAT_CHASE | UNIT_STAT_SEARCHING | UNIT_STAT_FLEEING),
+    UNIT_STAT_MOVING          = (UNIT_STAT_ROAMING | UNIT_STAT_CHASE | UNIT_STAT_FLEEING),
     UNIT_STAT_IN_FLIGHT       = 0x0100,                     // player is in flight mode
     UNIT_STAT_FOLLOW          = 0x0200,
     UNIT_STAT_ROOT            = 0x0400,

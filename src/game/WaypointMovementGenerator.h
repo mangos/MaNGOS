@@ -104,9 +104,6 @@ public PathMovementBase<Creature, WaypointPath*>
         bool IsStoppedByPlayer() { return b_StoppedByPlayer; }
         void SetStoppedByPlayer(bool val) { b_StoppedByPlayer = val; }
 
-        // statics
-        static void Initialize(void);
-
         // allow use for overwrite empty implementation
         bool GetDestination(float& x, float& y, float& z) const { return PathMovementBase<Creature, WaypointPath*>::GetDestination(x,y,z); }
 
