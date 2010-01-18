@@ -263,14 +263,15 @@ void Object::BuildMovementUpdate(ByteBuffer * data, uint16 flags, uint32 flags2)
             {
                 flags2 = MOVEMENTFLAG_NONE;
 
-                if (!((Creature*)this)->IsStopped())
-                    flags2 |= MOVEMENTFLAG_FORWARD;         // not set if not really moving
+                // disabled, makes them run-in-same-place before movement generator updated once.
+                /*if (((Creature*)this)->hasUnitState(UNIT_STAT_MOVING))
+                    flags2 |= MOVEMENTFLAG_FORWARD;*/         // not set if not really moving
 
                 if (((Creature*)this)->canFly())
                 {
                     flags2 |= MOVEMENTFLAG_LEVITATING;      // (ok) most seem to have this
 
-                    if (((Creature*)this)->IsStopped())
+                    if (!((Creature*)this)->hasUnitState(UNIT_STAT_MOVING))
                         flags2 |= MOVEMENTFLAG_FLY_UNK1;    // (ok) possibly some "hover" mode
                     else
                     {
