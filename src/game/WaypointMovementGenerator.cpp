@@ -74,6 +74,32 @@ void WaypointMovementGenerator<Creature>::ClearWaypoints()
     i_path = NULL;
 }
 
+void WaypointMovementGenerator<Creature>::Initialize( Creature &u )
+{
+    i_nextMoveTime.Reset(0);                        // TODO: check the lower bound (0 is probably too small)
+    u.StopMoving();
+    LoadPath(u);
+    u.addUnitState(UNIT_STAT_ROAMING|UNIT_STAT_ROAMING);
+}
+
+void WaypointMovementGenerator<Creature>::Finalize( Creature &u )
+{
+    u.clearUnitState(UNIT_STAT_ROAMING|UNIT_STAT_ROAMING);
+}
+
+void WaypointMovementGenerator<Creature>::Interrupt( Creature &u )
+{
+    u.addUnitState(UNIT_STAT_ROAMING|UNIT_STAT_ROAMING);
+}
+
+void WaypointMovementGenerator<Creature>::Reset( Creature &u )
+{
+    ReloadPath(u);
+    b_StoppedByPlayer = false;
+    i_nextMoveTime.Reset(0);
+    u.addUnitState(UNIT_STAT_ROAMING|UNIT_STAT_ROAMING);
+}
+
 bool WaypointMovementGenerator<Creature>::Update(Creature &creature, const uint32 &diff)
 {
     if (!&creature)
@@ -81,12 +107,18 @@ bool WaypointMovementGenerator<Creature>::Update(Creature &creature, const uint3
 
     // Waypoint movement can be switched on/off
     // This is quite handy for escort quests and other stuff
-    if (creature.hasUnitState(UNIT_STAT_ROOT | UNIT_STAT_STUNNED | UNIT_STAT_DISTRACTED | UNIT_STAT_DIED))
+    if (creature.hasUnitState(UNIT_STAT_NOT_MOVE))
+    {
+        creature.clearUnitState(UNIT_STAT_ROAMING_MOVE);
         return true;
+    }
 
     // prevent a crash at empty waypoint path.
     if (!i_path || i_path->empty())
+    {
+        creature.clearUnitState(UNIT_STAT_ROAMING_MOVE);
         return true;
+    }
 
     // i_path was modified by chat commands for example
     if (i_path->size() != i_hasDone.size())
@@ -108,7 +140,7 @@ bool WaypointMovementGenerator<Creature>::Update(Creature &creature, const uint3
         {
             SetStoppedByPlayer(false);
 
-            creature.addUnitState(UNIT_STAT_ROAMING);
+            creature.addUnitState(UNIT_STAT_ROAMING_MOVE);
 
             if (creature.canFly())
                 creature.AddMonsterMoveFlag(MONSTER_MOVE_FLY);
@@ -183,7 +215,7 @@ bool WaypointMovementGenerator<Creature>::Update(Creature &creature, const uint3
         // If stopped then begin a new move segment
         if (creature.IsStopped())
         {
-            creature.addUnitState(UNIT_STAT_ROAMING);
+            creature.addUnitState(UNIT_STAT_ROAMING_MOVE);
 
             if (creature.canFly())
                 creature.AddMonsterMoveFlag(MONSTER_MOVE_FLY);

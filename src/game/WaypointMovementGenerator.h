@@ -76,20 +76,10 @@ public PathMovementBase<Creature, WaypointPath*>
     public:
         WaypointMovementGenerator(Creature &) : i_nextMoveTime(0), b_StoppedByPlayer(false) {}
         ~WaypointMovementGenerator() { ClearWaypoints(); }
-        void Initialize(Creature &u)
-        {
-            i_nextMoveTime.Reset(0);                        // TODO: check the lower bound (0 is probably too small)
-            u.StopMoving();
-            LoadPath(u);
-        }
-        void Interrupt(Creature &) {}
-        void Finalize(Creature &) {}
-        void Reset(Creature &u)
-        {
-            ReloadPath(u);
-            b_StoppedByPlayer = false;
-            i_nextMoveTime.Reset(0);
-        }
+        void Initialize(Creature &u);
+        void Interrupt(Creature &);
+        void Finalize(Creature &);
+        void Reset(Creature &u);
         bool Update(Creature &u, const uint32 &diff);
 
         void MovementInform(Creature &);

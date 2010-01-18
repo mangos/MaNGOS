@@ -62,7 +62,6 @@ class MANGOS_DLL_SPEC TargetedMovementGeneratorMedium
         void UpdateFinalDistance(float fDistance);
 
     protected:
-
         void _setTargetLocation(T &);
 
         float i_offset;
@@ -87,6 +86,11 @@ class MANGOS_DLL_SPEC ChaseMovementGenerator : public TargetedMovementGeneratorM
         void Finalize(T &);
         void Interrupt(T &);
         void Reset(T &);
+
+        static void _clearUnitStateMove(T &u) { u.clearUnitState(UNIT_STAT_CHASE_MOVE); }
+        static void _addUnitStateMove(T &u)  { u.addUnitState(UNIT_STAT_CHASE_MOVE); }
+        bool _lostTarget(T &u) const { return u.getVictim() != i_target.getTarget(); }
+        void _reachTarget(T &);
 };
 
 template<class T>
@@ -105,6 +109,11 @@ class MANGOS_DLL_SPEC FollowMovementGenerator : public TargetedMovementGenerator
         void Finalize(T &);
         void Interrupt(T &);
         void Reset(T &);
+
+        static void _clearUnitStateMove(T &u) { u.clearUnitState(UNIT_STAT_FOLLOW_MOVE); }
+        static void _addUnitStateMove(T &u)  { u.addUnitState(UNIT_STAT_FOLLOW_MOVE); }
+        bool _lostTarget(T &) const { return false; }
+        void _reachTarget(T &) {}
 };
 
 #endif

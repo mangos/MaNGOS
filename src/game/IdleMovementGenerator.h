@@ -42,8 +42,8 @@ class MANGOS_DLL_SPEC DistractMovementGenerator : public MovementGenerator
 
         void Initialize(Unit& owner);
         void Finalize(Unit& owner);
-        void Interrupt(Unit& ) {}
-        void Reset(Unit& owner) { Initialize(owner); }
+        void Interrupt(Unit& );
+        void Reset(Unit& );
         bool Update(Unit& owner, const uint32& time_diff);
         MovementGeneratorType GetMovementGeneratorType() { return DISTRACT_MOTION_TYPE; }
 

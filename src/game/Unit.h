@@ -405,25 +405,63 @@ enum DeathState
     DEAD_FALLING= 5
 };
 
+// internal state flags for some auras and movement generators, other.
 enum UnitState
 {
-    UNIT_STAT_DIED            = 0x0001,
-    UNIT_STAT_MELEE_ATTACKING = 0x0002,                     // player is melee attacking someone
-    //UNIT_STAT_MELEE_ATTACK_BY = 0x0004,                     // player is melee attack by someone
-    UNIT_STAT_STUNNED         = 0x0008,
-    UNIT_STAT_ROAMING         = 0x0010,
-    UNIT_STAT_CHASE           = 0x0020,
-    //UNIT_STAT_SEARCHING       = 0x0040,
-    UNIT_STAT_FLEEING         = 0x0080,
-    UNIT_STAT_MOVING          = (UNIT_STAT_ROAMING | UNIT_STAT_CHASE | UNIT_STAT_FLEEING),
-    UNIT_STAT_IN_FLIGHT       = 0x0100,                     // player is in flight mode
-    UNIT_STAT_FOLLOW          = 0x0200,
-    UNIT_STAT_ROOT            = 0x0400,
-    UNIT_STAT_CONFUSED        = 0x0800,
-    UNIT_STAT_DISTRACTED      = 0x1000,
-    UNIT_STAT_ISOLATED        = 0x2000,                     // area auras do not affect other players
-    UNIT_STAT_ATTACK_PLAYER   = 0x4000,
-    UNIT_STAT_ALL_STATE       = 0xffff                      //(UNIT_STAT_STOPPED | UNIT_STAT_MOVING | UNIT_STAT_IN_COMBAT | UNIT_STAT_IN_FLIGHT)
+    // persistent state (applied by aura/etc until expire)
+    UNIT_STAT_MELEE_ATTACKING = 0x00000001,                     // unit is melee attacking someone Unit::Attack
+    UNIT_STAT_ATTACK_PLAYER   = 0x00000002,                     // unit attack player or player's controlled unit and have contested pvpv timer setup, until timer expire, combat end and etc
+    UNIT_STAT_DIED            = 0x00000004,                     // Unit::SetFeignDeath
+    UNIT_STAT_STUNNED         = 0x00000008,                     // Aura::HandleAuraModStun
+    UNIT_STAT_ROOT            = 0x00000010,                     // Aura::HandleAuraModRoot
+    UNIT_STAT_ISOLATED        = 0x00000020,                     // area auras do not affect other players, Aura::HandleAuraModSchoolImmunity
+
+    // persistent movement generator state (all time while movement generator applied to unit (independent from top state of movegen)
+    UNIT_STAT_IN_FLIGHT       = 0x00000040,                     // player is in flight mode
+    UNIT_STAT_DISTRACTED      = 0x00000080,                     // DistractedMovementGenerator active
+
+    // persistent movement generator state with non-persistent mirror states for stop support
+    // (can be removed temporary by stop command or another movement generator apply)
+    // not use _MOVE versions for generic movegen state, it can be removed temporary for unit stop and etc
+    UNIT_STAT_CONFUSED        = 0x00000100,                     // ConfusedMovementGenerator active/onstack
+    UNIT_STAT_CONFUSED_MOVE   = 0x00000200,
+    UNIT_STAT_ROAMING         = 0x00000400,                     // RandomMovementGenerator/PointMovementGenerator/WaypointMovementGenerator active (now always set)
+    UNIT_STAT_ROAMING_MOVE    = 0x00000800,
+    UNIT_STAT_CHASE           = 0x00001000,                     // ChaseMovementGenerator active
+    UNIT_STAT_CHASE_MOVE      = 0x00002000,
+    UNIT_STAT_FOLLOW          = 0x00004000,                     // FollowMovementGenerator active
+    UNIT_STAT_FOLLOW_MOVE     = 0x00008000,
+    UNIT_STAT_FLEEING         = 0x00010000,                     // FleeMovementGenerator/TimedFleeingMovementGenerator active/onstack
+    UNIT_STAT_FLEEING_MOVE    = 0x00020000,
+
+    // masks (only for check)
+
+    // can't move currently
+    UNIT_STAT_CAN_NOT_MOVE    = UNIT_STAT_ROOT | UNIT_STAT_STUNNED | UNIT_STAT_DIED,
+
+    // stay by different reasons
+    UNIT_STAT_NOT_MOVE        = UNIT_STAT_ROOT | UNIT_STAT_STUNNED | UNIT_STAT_DIED |
+                                UNIT_STAT_DISTRACTED,
+
+    // stay or scripted movement for effect( = in player case you can't move by client command)
+    UNIT_STAT_NO_FREE_MOVE    = UNIT_STAT_ROOT | UNIT_STAT_STUNNED | UNIT_STAT_DIED |
+                                UNIT_STAT_IN_FLIGHT |
+                                UNIT_STAT_CONFUSED | UNIT_STAT_FLEEING,
+
+    UNIT_STAT_MOVE_INTERRUPRED= UNIT_STAT_ROOT | UNIT_STAT_STUNNED | UNIT_STAT_DIED |
+                                UNIT_STAT_IN_FLIGHT | UNIT_STAT_DISTRACTED |
+                                UNIT_STAT_CONFUSED | UNIT_STAT_FLEEING,
+
+    // not react at move in sight or other
+    UNIT_STAT_CAN_NOT_REACT   = UNIT_STAT_STUNNED | UNIT_STAT_DIED |
+                                UNIT_STAT_CONFUSED | UNIT_STAT_FLEEING,
+
+    // masks (for check or reset)
+
+    // for real move using movegen check and stop (except unstoppable flight)
+    UNIT_STAT_MOVING          = UNIT_STAT_ROAMING_MOVE | UNIT_STAT_CHASE_MOVE | UNIT_STAT_FOLLOW_MOVE | UNIT_STAT_FLEEING_MOVE,
+
+    UNIT_STAT_ALL_STATE       = 0xFFFFFFFF
 };
 
 enum UnitMoveType
@@ -944,12 +982,11 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void SendMeleeAttackStart(Unit* pVictim);
 
         void addUnitState(uint32 f) { m_state |= f; }
-        bool hasUnitState(const uint32 f) const { return (m_state & f); }
+        bool hasUnitState(uint32 f) const { return (m_state & f); }
         void clearUnitState(uint32 f) { m_state &= ~f; }
         bool CanFreeMove() const
         {
-            return !hasUnitState(UNIT_STAT_CONFUSED | UNIT_STAT_FLEEING | UNIT_STAT_IN_FLIGHT |
-                UNIT_STAT_ROOT | UNIT_STAT_STUNNED | UNIT_STAT_DISTRACTED | UNIT_STAT_DIED ) && GetOwnerGUID()==0;
+            return !hasUnitState(UNIT_STAT_NO_FREE_MOVE) && GetOwnerGUID()==0;
         }
 
         uint32 getLevel() const { return GetUInt32Value(UNIT_FIELD_LEVEL); }

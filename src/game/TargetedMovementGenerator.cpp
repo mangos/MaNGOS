@@ -34,7 +34,7 @@ void TargetedMovementGeneratorMedium<T,D>::_setTargetLocation(T &owner)
     if (!i_target.isValid() || !i_target->IsInWorld())
         return;
 
-    if (owner.hasUnitState(UNIT_STAT_ROOT | UNIT_STAT_STUNNED | UNIT_STAT_DISTRACTED | UNIT_STAT_DIED))
+    if (owner.hasUnitState(UNIT_STAT_NOT_MOVE))
         return;
 
     // prevent redundant micro-movement for pets, other followers.
@@ -71,7 +71,8 @@ void TargetedMovementGeneratorMedium<T,D>::_setTargetLocation(T &owner)
     */
     Traveller<T> traveller(owner);
     i_destinationHolder.SetDestination(traveller, x, y, z);
-    owner.addUnitState(UNIT_STAT_CHASE);
+
+    D::_addUnitStateMove(owner);
     if (owner.GetTypeId() == TYPEID_UNIT && ((Creature*)&owner)->canFly())
         ((Creature&)owner).AddMonsterMoveFlag(MONSTER_MOVE_FLY);
 }
@@ -111,8 +112,11 @@ bool TargetedMovementGeneratorMedium<T,D>::Update(T &owner, const uint32 & time_
     if (!owner.isAlive())
         return true;
 
-    if (owner.hasUnitState(UNIT_STAT_ROOT | UNIT_STAT_STUNNED | UNIT_STAT_FLEEING | UNIT_STAT_DISTRACTED | UNIT_STAT_DIED))
+    if (owner.hasUnitState(UNIT_STAT_NOT_MOVE))
+    {
+        D::_clearUnitStateMove(owner);
         return true;
+    }
 
     // prevent movement while casting spells with cast time or channel time
     if (owner.IsNonMeleeSpellCasted(false, false,  true))
@@ -123,8 +127,11 @@ bool TargetedMovementGeneratorMedium<T,D>::Update(T &owner, const uint32 & time_
     }
 
     // prevent crash after creature killed pet
-    if (!owner.hasUnitState(UNIT_STAT_FOLLOW) && owner.getVictim() != i_target.getTarget())
+    if (static_cast<D*>(this)->_lostTarget(owner))
+    {
+        D::_clearUnitStateMove(owner);
         return true;
+    }
 
     Traveller<T> traveller(owner);
 
@@ -132,7 +139,7 @@ bool TargetedMovementGeneratorMedium<T,D>::Update(T &owner, const uint32 & time_
         _setTargetLocation(owner);
     if (owner.IsStopped() && !i_destinationHolder.HasArrived())
     {
-        owner.addUnitState(UNIT_STAT_CHASE);
+        D::_addUnitStateMove(owner);
         if (owner.GetTypeId() == TYPEID_UNIT && ((Creature*)&owner)->canFly())
             ((Creature&)owner).AddMonsterMoveFlag(MONSTER_MOVE_FLY);
 
@@ -167,23 +174,31 @@ bool TargetedMovementGeneratorMedium<T,D>::Update(T &owner, const uint32 & time_
             owner.SetInFront(i_target.getTarget());
 
             owner.StopMoving();
-            if(owner.canReachWithAttack(i_target.getTarget()) && !owner.hasUnitState(UNIT_STAT_FOLLOW))
-                owner.Attack(i_target.getTarget(),true);
+            static_cast<D*>(this)->_reachTarget(owner);
         }
     }
     return true;
 }
 
 //-----------------------------------------------//
+template<class T>
+void ChaseMovementGenerator<T>::_reachTarget(T &owner)
+{
+    if(owner.canReachWithAttack(i_target.getTarget()))
+        owner.Attack(i_target.getTarget(),true);
+}
+
 template<>
 void ChaseMovementGenerator<Player>::Initialize(Player &owner)
 {
+    owner.addUnitState(UNIT_STAT_CHASE|UNIT_STAT_CHASE_MOVE);
     _setTargetLocation(owner);
 }
 
 template<>
 void ChaseMovementGenerator<Creature>::Initialize(Creature &owner)
 {
+    owner.addUnitState(UNIT_STAT_CHASE|UNIT_STAT_CHASE_MOVE);
     owner.RemoveMonsterMoveFlag(MONSTER_MOVE_WALK);
 
     if (((Creature*)&owner)->canFly())
@@ -195,12 +210,13 @@ void ChaseMovementGenerator<Creature>::Initialize(Creature &owner)
 template<class T>
 void ChaseMovementGenerator<T>::Finalize(T &owner)
 {
-    owner.clearUnitState(UNIT_STAT_CHASE | UNIT_STAT_FOLLOW);
+    owner.clearUnitState(UNIT_STAT_CHASE|UNIT_STAT_CHASE_MOVE);
 }
 
 template<class T>
 void ChaseMovementGenerator<T>::Interrupt(T &owner)
 {
+    owner.clearUnitState(UNIT_STAT_CHASE|UNIT_STAT_CHASE_MOVE);
 }
 
 template<class T>
@@ -213,12 +229,15 @@ void ChaseMovementGenerator<T>::Reset(T &owner)
 template<>
 void FollowMovementGenerator<Player>::Initialize(Player &owner)
 {
+    owner.addUnitState(UNIT_STAT_FOLLOW|UNIT_STAT_FOLLOW_MOVE);
     _setTargetLocation(owner);
 }
 
 template<>
 void FollowMovementGenerator<Creature>::Initialize(Creature &owner)
 {
+    owner.addUnitState(UNIT_STAT_FOLLOW|UNIT_STAT_FOLLOW_MOVE);
+
     if (((Creature*)&owner)->canFly())
         owner.AddMonsterMoveFlag(MONSTER_MOVE_FLY);
 
@@ -228,12 +247,13 @@ void FollowMovementGenerator<Creature>::Initialize(Creature &owner)
 template<class T>
 void FollowMovementGenerator<T>::Finalize(T &owner)
 {
-    owner.clearUnitState(UNIT_STAT_CHASE | UNIT_STAT_FOLLOW);
+    owner.clearUnitState(UNIT_STAT_FOLLOW|UNIT_STAT_FOLLOW_MOVE);
 }
 
 template<class T>
 void FollowMovementGenerator<T>::Interrupt(T &owner)
 {
+    owner.clearUnitState(UNIT_STAT_FOLLOW|UNIT_STAT_FOLLOW_MOVE);
 }
 
 template<class T>
@@ -252,6 +272,8 @@ template bool TargetedMovementGeneratorMedium<Player,FollowMovementGenerator<Pla
 template bool TargetedMovementGeneratorMedium<Creature,ChaseMovementGenerator<Creature> >::Update(Creature &, const uint32 &);
 template bool TargetedMovementGeneratorMedium<Creature,FollowMovementGenerator<Creature> >::Update(Creature &, const uint32 &);
 
+template void ChaseMovementGenerator<Player>::_reachTarget(Player &);
+template void ChaseMovementGenerator<Creature>::_reachTarget(Creature &);
 template void ChaseMovementGenerator<Player>::Finalize(Player &);
 template void ChaseMovementGenerator<Creature>::Finalize(Creature &);
 template void ChaseMovementGenerator<Player>::Interrupt(Player &);

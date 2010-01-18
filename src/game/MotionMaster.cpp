@@ -76,7 +76,7 @@ MotionMaster::~MotionMaster()
 void
 MotionMaster::UpdateMotion(uint32 diff)
 {
-    if( i_owner->hasUnitState(UNIT_STAT_ROOT | UNIT_STAT_STUNNED | UNIT_STAT_DIED) )
+    if( i_owner->hasUnitState(UNIT_STAT_CAN_NOT_MOVE) )
         return;
     assert( !empty() );
     m_cleanFlag |= MMCF_UPDATE;
@@ -232,7 +232,6 @@ MotionMaster::MoveTargetedHome()
         Unit *target = ((Creature*)i_owner)->GetCharmerOrOwner();
         if(target)
         {
-            i_owner->addUnitState(UNIT_STAT_FOLLOW);
             DEBUG_LOG("Following %s (GUID: %u)",
                 target->GetTypeId()==TYPEID_PLAYER ? "player" : "creature",
                 target->GetTypeId()==TYPEID_PLAYER ? target->GetGUIDLow() : ((Creature*)target)->GetDBTableGUIDLow() );
@@ -268,7 +267,6 @@ MotionMaster::MoveChase(Unit* target, float dist, float angle)
     if(!target)
         return;
 
-    i_owner->clearUnitState(UNIT_STAT_FOLLOW);
     if(i_owner->GetTypeId()==TYPEID_PLAYER)
     {
         DEBUG_LOG("Player (GUID: %u) chase to %s (GUID: %u)",
@@ -296,7 +294,6 @@ MotionMaster::MoveFollow(Unit* target, float dist, float angle)
     if(!target)
         return;
 
-    i_owner->addUnitState(UNIT_STAT_FOLLOW);
     if(i_owner->GetTypeId()==TYPEID_PLAYER)
     {
         DEBUG_LOG("Player (GUID: %u) follow to %s (GUID: %u)", i_owner->GetGUIDLow(),
