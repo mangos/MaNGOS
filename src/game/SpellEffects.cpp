@@ -3524,8 +3524,7 @@ void Spell::EffectSummon(uint32 i)
 
     spawnCreature->GetCharmInfo()->SetPetNumber(pet_number, false);
     
-    if (m_caster->GetTypeId() == TYPEID_PLAYER)
-        spawnCreature->UpdateWalkModeForPets(((Player*)m_caster)->HasMovementFlag(MOVEMENTFLAG_WALK_MODE));
+    spawnCreature->UpdateWalkMode(m_caster);
 
     spawnCreature->AIM_Initialize();
     spawnCreature->InitPetCreateSpells();
@@ -4393,8 +4392,7 @@ void Spell::EffectSummonPet(uint32 i)
     NewSummon->SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, 1000);
     NewSummon->SetUInt32Value(UNIT_CREATED_BY_SPELL, m_spellInfo->Id);
 
-    if (m_caster->GetTypeId() == TYPEID_PLAYER)
-        NewSummon->UpdateWalkModeForPets(((Player*)m_caster)->HasMovementFlag(MOVEMENTFLAG_WALK_MODE));
+    NewSummon->UpdateWalkMode(m_caster);
 
     NewSummon->GetCharmInfo()->SetPetNumber(pet_number, true);
     // this enables pet details window (Shift+P)

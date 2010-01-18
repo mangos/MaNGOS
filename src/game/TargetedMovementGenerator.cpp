@@ -227,9 +227,22 @@ void ChaseMovementGenerator<T>::Reset(T &owner)
 
 //-----------------------------------------------//
 template<>
+void FollowMovementGenerator<Creature>::_updateWalkMode(Creature &u)
+{
+    if (i_target.isValid() && u.isPet())
+        u.UpdateWalkMode(i_target.getTarget());
+}
+
+template<>
+void FollowMovementGenerator<Player>::_updateWalkMode(Player &)
+{
+}
+
+template<>
 void FollowMovementGenerator<Player>::Initialize(Player &owner)
 {
     owner.addUnitState(UNIT_STAT_FOLLOW|UNIT_STAT_FOLLOW_MOVE);
+    _updateWalkMode(owner);
     _setTargetLocation(owner);
 }
 
@@ -237,6 +250,7 @@ template<>
 void FollowMovementGenerator<Creature>::Initialize(Creature &owner)
 {
     owner.addUnitState(UNIT_STAT_FOLLOW|UNIT_STAT_FOLLOW_MOVE);
+    _updateWalkMode(owner);
 
     if (((Creature*)&owner)->canFly())
         owner.AddMonsterMoveFlag(MONSTER_MOVE_FLY);
@@ -248,12 +262,14 @@ template<class T>
 void FollowMovementGenerator<T>::Finalize(T &owner)
 {
     owner.clearUnitState(UNIT_STAT_FOLLOW|UNIT_STAT_FOLLOW_MOVE);
+    _updateWalkMode(owner);
 }
 
 template<class T>
 void FollowMovementGenerator<T>::Interrupt(T &owner)
 {
     owner.clearUnitState(UNIT_STAT_FOLLOW|UNIT_STAT_FOLLOW_MOVE);
+    _updateWalkMode(owner);
 }
 
 template<class T>

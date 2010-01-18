@@ -429,11 +429,29 @@ class MANGOS_DLL_SPEC Creature : public Unit
         void AI_SendMoveToPacket(float x, float y, float z, uint32 time, MonsterMovementFlags MovementFlags, uint8 type);
         CreatureAI* AI() { return i_AI; }
 
-        void AddMonsterMoveFlag(MonsterMovementFlags f) { m_monsterMoveFlags = MonsterMovementFlags(m_monsterMoveFlags | f); }
-        void RemoveMonsterMoveFlag(MonsterMovementFlags f) { m_monsterMoveFlags = MonsterMovementFlags(m_monsterMoveFlags & ~f); }
+        void AddMonsterMoveFlag(MonsterMovementFlags f)
+        {
+            bool need_walk_sync = (f & MONSTER_MOVE_WALK) != (m_monsterMoveFlags & MONSTER_MOVE_WALK);
+            m_monsterMoveFlags = MonsterMovementFlags(m_monsterMoveFlags | f);
+            if (need_walk_sync)
+                UpdateWalkMode(this,false);
+        }
+        void RemoveMonsterMoveFlag(MonsterMovementFlags f)
+        {
+            bool need_walk_sync = (f & MONSTER_MOVE_WALK) != (m_monsterMoveFlags & MONSTER_MOVE_WALK);
+            m_monsterMoveFlags = MonsterMovementFlags(m_monsterMoveFlags & ~f);
+            if (need_walk_sync)
+                UpdateWalkMode(this,false);
+        }
         bool HasMonsterMoveFlag(MonsterMovementFlags f) const { return m_monsterMoveFlags & f; }
         MonsterMovementFlags GetMonsterMoveFlags() const { return m_monsterMoveFlags; }
-        void SetMonsterMoveFlags(MonsterMovementFlags f) { m_monsterMoveFlags = f; }
+        void SetMonsterMoveFlags(MonsterMovementFlags f)
+        {
+            bool need_walk_sync = (f & MONSTER_MOVE_WALK) != (m_monsterMoveFlags & MONSTER_MOVE_WALK);
+            m_monsterMoveFlags = f;                     // need set before
+            if (need_walk_sync)
+                UpdateWalkMode(this,false);
+        }
 
         void SendMonsterMoveWithSpeed(float x, float y, float z, uint32 transitTime = 0, Player* player = NULL);
         void SendMonsterMoveWithSpeedToCurrentDestination(Player* player = NULL);

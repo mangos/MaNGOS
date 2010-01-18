@@ -293,7 +293,7 @@ bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool 
         SetPower(POWER_MANA, savedmana > GetMaxPower(POWER_MANA) ? GetMaxPower(POWER_MANA) : savedmana);
     }
 
-    UpdateWalkModeForPets(owner->HasMovementFlag(MOVEMENTFLAG_WALK_MODE));
+    UpdateWalkMode(owner);
 
     AIM_Initialize();
     map->Add((Creature*)this);

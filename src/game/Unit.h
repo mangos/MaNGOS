@@ -448,10 +448,6 @@ enum UnitState
                                 UNIT_STAT_IN_FLIGHT |
                                 UNIT_STAT_CONFUSED | UNIT_STAT_FLEEING,
 
-    UNIT_STAT_MOVE_INTERRUPRED= UNIT_STAT_ROOT | UNIT_STAT_STUNNED | UNIT_STAT_DIED |
-                                UNIT_STAT_IN_FLIGHT | UNIT_STAT_DISTRACTED |
-                                UNIT_STAT_CONFUSED | UNIT_STAT_FLEEING,
-
     // not react at move in sight or other
     UNIT_STAT_CAN_NOT_REACT   = UNIT_STAT_STUNNED | UNIT_STAT_DIED |
                                 UNIT_STAT_CONFUSED | UNIT_STAT_FLEEING,
@@ -1561,7 +1557,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         uint32 CalcArmorReducedDamage(Unit* pVictim, const uint32 damage);
         void CalcAbsorbResist(Unit *pVictim, SpellSchoolMask schoolMask, DamageEffectType damagetype, const uint32 damage, uint32 *absorb, uint32 *resist, bool canReflect = false);
 
-        void  UpdateWalkModeForPets(bool on);
+        void  UpdateWalkMode(Unit* source, bool self = true);
         void  UpdateSpeed(UnitMoveType mtype, bool forced);
         float GetSpeed( UnitMoveType mtype ) const;
         float GetSpeedRate( UnitMoveType mtype ) const { return m_speed_rate[mtype]; }

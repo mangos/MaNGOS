@@ -299,9 +299,6 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
     if (opcode == MSG_MOVE_FALL_LAND && plMover && !plMover->isInFlight())
         plMover->HandleFall(movementInfo);
 
-    if ((opcode == MSG_MOVE_SET_WALK_MODE || opcode == MSG_MOVE_SET_RUN_MODE) && plMover)
-        plMover->UpdateWalkModeForPets(movementInfo.HasMovementFlag(MOVEMENTFLAG_WALK_MODE));
-
     if (plMover && (movementInfo.HasMovementFlag(MOVEMENTFLAG_SWIMMING) != plMover->IsInWater()))
     {
         // now client not include swimming flag in case jumping under water
@@ -322,6 +319,10 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
         plMover->SetPosition(movementInfo.x, movementInfo.y, movementInfo.z, movementInfo.o);
         plMover->m_movementInfo = movementInfo;
         plMover->UpdateFallInformationIfNeed(movementInfo, opcode);
+
+        // after move info set
+        if ((opcode == MSG_MOVE_SET_WALK_MODE || opcode == MSG_MOVE_SET_RUN_MODE))
+            plMover->UpdateWalkMode(plMover,false);
 
         if(plMover->isMovingOrTurning())
             plMover->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
