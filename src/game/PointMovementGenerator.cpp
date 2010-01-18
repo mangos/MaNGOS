@@ -82,21 +82,26 @@ bool PointMovementGenerator<T>::Update(T &unit, const uint32 &diff)
     return true;
 }
 
-template<class T>
-void PointMovementGenerator<T>::MovementInform(T& /*unit*/)
+template<>
+void PointMovementGenerator<Player>::MovementInform(Player&)
 {
 }
 
-template <> void PointMovementGenerator<Creature>::MovementInform(Creature &unit)
+template <>
+void PointMovementGenerator<Creature>::MovementInform(Creature &unit)
 {
     unit.AI()->MovementInform(POINT_MOTION_TYPE, id);
 }
 
 template void PointMovementGenerator<Player>::Initialize(Player&);
-template bool PointMovementGenerator<Player>::Update(Player &, const uint32 &diff);
-template void PointMovementGenerator<Player>::MovementInform(Player&);
-
 template void PointMovementGenerator<Creature>::Initialize(Creature&);
+template void PointMovementGenerator<Player>::Finalize(Player&);
+template void PointMovementGenerator<Creature>::Finalize(Creature&);
+template void PointMovementGenerator<Player>::Interrupt(Player&);
+template void PointMovementGenerator<Creature>::Interrupt(Creature&);
+template void PointMovementGenerator<Player>::Reset(Player&);
+template void PointMovementGenerator<Creature>::Reset(Creature&);
+template bool PointMovementGenerator<Player>::Update(Player &, const uint32 &diff);
 template bool PointMovementGenerator<Creature>::Update(Creature&, const uint32 &diff);
 
 void AssistanceMovementGenerator::Finalize(Unit &unit)

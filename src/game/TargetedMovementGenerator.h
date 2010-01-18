@@ -89,7 +89,7 @@ class MANGOS_DLL_SPEC ChaseMovementGenerator : public TargetedMovementGeneratorM
 
         static void _clearUnitStateMove(T &u) { u.clearUnitState(UNIT_STAT_CHASE_MOVE); }
         static void _addUnitStateMove(T &u)  { u.addUnitState(UNIT_STAT_CHASE_MOVE); }
-        bool _lostTarget(T &u) const { return u.getVictim() != GetTarget(); }
+        bool _lostTarget(T &u) const { return u.getVictim() != this->GetTarget(); }
         void _reachTarget(T &);
 };
 
