@@ -33,13 +33,13 @@ class MANGOS_DLL_SPEC TargetedMovementGeneratorBase
         FollowerReference i_target;
 };
 
-template<class T>
+template<class T, typename D>
 class MANGOS_DLL_SPEC TargetedMovementGeneratorMedium
-: public MovementGeneratorMedium< T, TargetedMovementGeneratorMedium<T> >, public TargetedMovementGeneratorBase
+: public MovementGeneratorMedium< T, D >, public TargetedMovementGeneratorBase
 {
     protected:
-        TargetedMovementGeneratorMedium() : MovementGeneratorMedium< T, TargetedMovementGeneratorMedium<T> >(), TargetedMovementGeneratorBase() {}
-
+        TargetedMovementGeneratorMedium()
+            : TargetedMovementGeneratorBase(), i_offset(0), i_angle(0), i_recalculateTravel(false) {}
         TargetedMovementGeneratorMedium(Unit &target)
             : TargetedMovementGeneratorBase(target), i_offset(0), i_angle(0), i_recalculateTravel(false) {}
         TargetedMovementGeneratorMedium(Unit &target, float offset, float angle)
@@ -47,13 +47,9 @@ class MANGOS_DLL_SPEC TargetedMovementGeneratorMedium
         ~TargetedMovementGeneratorMedium() {}
 
     public:
-        void Initialize(T &) {}
-        void Finalize(T &) {}
-        void Interrupt(T &) {}
-        void Reset(T &) {}
         bool Update(T &, const uint32 &);
 
-        Unit* GetTarget() const;
+        Unit* GetTarget() const { return i_target.getTarget(); }
 
         bool GetDestination(float &x, float &y, float &z) const
         {
@@ -76,12 +72,13 @@ class MANGOS_DLL_SPEC TargetedMovementGeneratorMedium
 };
 
 template<class T>
-class MANGOS_DLL_SPEC ChaseMovementGenerator : public TargetedMovementGeneratorMedium<T>
+class MANGOS_DLL_SPEC ChaseMovementGenerator : public TargetedMovementGeneratorMedium<T, ChaseMovementGenerator<T> >
 {
     public:
-        ChaseMovementGenerator(Unit &target) : TargetedMovementGeneratorMedium<T>(target) {}
+        ChaseMovementGenerator(Unit &target)
+            : TargetedMovementGeneratorMedium<T, ChaseMovementGenerator<T> >(target) {}
         ChaseMovementGenerator(Unit &target, float offset, float angle)
-            : TargetedMovementGeneratorMedium<T>(target, offset, angle) {}
+            : TargetedMovementGeneratorMedium<T, ChaseMovementGenerator<T> >(target, offset, angle) {}
         ~ChaseMovementGenerator() {}
 
         MovementGeneratorType GetMovementGeneratorType() { return CHASE_MOTION_TYPE; }
@@ -90,16 +87,16 @@ class MANGOS_DLL_SPEC ChaseMovementGenerator : public TargetedMovementGeneratorM
         void Finalize(T &);
         void Interrupt(T &);
         void Reset(T &);
-        bool Update(T &, const uint32 &);
 };
 
 template<class T>
-class MANGOS_DLL_SPEC FollowMovementGenerator : public TargetedMovementGeneratorMedium<T>
+class MANGOS_DLL_SPEC FollowMovementGenerator : public TargetedMovementGeneratorMedium<T, FollowMovementGenerator<T> >
 {
     public:
-        FollowMovementGenerator(Unit &target) : TargetedMovementGeneratorMedium<T>(target) {}
+        FollowMovementGenerator(Unit &target)
+            : TargetedMovementGeneratorMedium<T, FollowMovementGenerator<T> >(target){}
         FollowMovementGenerator(Unit &target, float offset, float angle)
-            : TargetedMovementGeneratorMedium<T>(target, offset, angle) {}
+            : TargetedMovementGeneratorMedium<T, FollowMovementGenerator<T> >(target, offset, angle) {}
         ~FollowMovementGenerator() {}
 
         MovementGeneratorType GetMovementGeneratorType() { return FOLLOW_MOTION_TYPE; }
@@ -108,7 +105,6 @@ class MANGOS_DLL_SPEC FollowMovementGenerator : public TargetedMovementGenerator
         void Finalize(T &);
         void Interrupt(T &);
         void Reset(T &);
-        bool Update(T &, const uint32 &);
 };
 
 #endif

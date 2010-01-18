@@ -28,8 +28,8 @@
 #include <cmath>
 
 //-----------------------------------------------//
-template<class T>
-void TargetedMovementGeneratorMedium<T>::_setTargetLocation(T &owner)
+template<class T, typename D>
+void TargetedMovementGeneratorMedium<T,D>::_setTargetLocation(T &owner)
 {
     if (!i_target.isValid() || !i_target->IsInWorld())
         return;
@@ -77,26 +77,33 @@ void TargetedMovementGeneratorMedium<T>::_setTargetLocation(T &owner)
 }
 
 template<>
-void TargetedMovementGeneratorMedium<Player>::UpdateFinalDistance(float fDistance)
+void TargetedMovementGeneratorMedium<Player,ChaseMovementGenerator<Player> >::UpdateFinalDistance(float fDistance)
 {
     // nothing to do for Player
 }
 
 template<>
-void TargetedMovementGeneratorMedium<Creature>::UpdateFinalDistance(float fDistance)
+void TargetedMovementGeneratorMedium<Player,FollowMovementGenerator<Player> >::UpdateFinalDistance(float fDistance)
+{
+    // nothing to do for Player
+}
+
+template<>
+void TargetedMovementGeneratorMedium<Creature,ChaseMovementGenerator<Creature> >::UpdateFinalDistance(float fDistance)
 {
     i_offset = fDistance;
     i_recalculateTravel = true;
 }
 
-template<class T>
-Unit* TargetedMovementGeneratorMedium<T>::GetTarget() const
+template<>
+void TargetedMovementGeneratorMedium<Creature,FollowMovementGenerator<Creature> >::UpdateFinalDistance(float fDistance)
 {
-    return i_target.getTarget();
+    i_offset = fDistance;
+    i_recalculateTravel = true;
 }
 
-template<class T>
-bool TargetedMovementGeneratorMedium<T>::Update(T &owner, const uint32 & time_diff)
+template<class T, typename D>
+bool TargetedMovementGeneratorMedium<T,D>::Update(T &owner, const uint32 & time_diff)
 {
     if (!i_target.isValid() || !i_target->IsInWorld())
         return false;
@@ -236,10 +243,14 @@ void FollowMovementGenerator<T>::Reset(T &owner)
 }
 
 //-----------------------------------------------//
-template Unit* TargetedMovementGeneratorMedium<Player>::GetTarget() const;
-template Unit* TargetedMovementGeneratorMedium<Creature>::GetTarget() const;
-template bool TargetedMovementGeneratorMedium<Player>::Update(Player &, const uint32 &);
-template bool TargetedMovementGeneratorMedium<Creature>::Update(Creature &, const uint32 &);
+template void TargetedMovementGeneratorMedium<Player,ChaseMovementGenerator<Player> >::_setTargetLocation(Player &);
+template void TargetedMovementGeneratorMedium<Player,FollowMovementGenerator<Player> >::_setTargetLocation(Player &);
+template void TargetedMovementGeneratorMedium<Creature,ChaseMovementGenerator<Creature> >::_setTargetLocation(Creature &);
+template void TargetedMovementGeneratorMedium<Creature,FollowMovementGenerator<Creature> >::_setTargetLocation(Creature &);
+template bool TargetedMovementGeneratorMedium<Player,ChaseMovementGenerator<Player> >::Update(Player &, const uint32 &);
+template bool TargetedMovementGeneratorMedium<Player,FollowMovementGenerator<Player> >::Update(Player &, const uint32 &);
+template bool TargetedMovementGeneratorMedium<Creature,ChaseMovementGenerator<Creature> >::Update(Creature &, const uint32 &);
+template bool TargetedMovementGeneratorMedium<Creature,FollowMovementGenerator<Creature> >::Update(Creature &, const uint32 &);
 
 template void ChaseMovementGenerator<Player>::Finalize(Player &);
 template void ChaseMovementGenerator<Creature>::Finalize(Creature &);
