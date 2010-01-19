@@ -116,6 +116,7 @@ class MANGOS_DLL_SPEC FollowMovementGenerator : public TargetedMovementGenerator
         void _reachTarget(T &) {}
     private:
         void _updateWalkMode(T &u);
+        void _updateSpeed(T &u);
 };
 
 #endif

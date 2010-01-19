@@ -1136,11 +1136,11 @@ bool ChatHandler::HandleModifyASpeedCommand(const char* args)
     if (needReportToTarget(chr))
         ChatHandler(chr).PSendSysMessage(LANG_YOURS_ASPEED_CHANGED, GetNameLink().c_str(), ASpeed);
 
-    chr->SetSpeed(MOVE_WALK,    ASpeed,true);
-    chr->SetSpeed(MOVE_RUN,     ASpeed,true);
-    chr->SetSpeed(MOVE_SWIM,    ASpeed,true);
-    //chr->SetSpeed(MOVE_TURN,    ASpeed,true);
-    chr->SetSpeed(MOVE_FLIGHT,     ASpeed,true);
+    chr->SetSpeedRate(MOVE_WALK,   ASpeed,true);
+    chr->SetSpeedRate(MOVE_RUN,    ASpeed,true);
+    chr->SetSpeedRate(MOVE_SWIM,   ASpeed,true);
+    //chr->SetSpeed(MOVE_TURN,     ASpeed,true);
+    chr->SetSpeedRate(MOVE_FLIGHT, ASpeed,true);
     return true;
 }
 
@@ -1184,7 +1184,7 @@ bool ChatHandler::HandleModifySpeedCommand(const char* args)
     if (needReportToTarget(chr))
         ChatHandler(chr).PSendSysMessage(LANG_YOURS_SPEED_CHANGED, GetNameLink().c_str(), Speed);
 
-    chr->SetSpeed(MOVE_RUN,Speed,true);
+    chr->SetSpeedRate(MOVE_RUN,Speed,true);
 
     return true;
 }
@@ -1229,7 +1229,7 @@ bool ChatHandler::HandleModifySwimCommand(const char* args)
     if (needReportToTarget(chr))
         ChatHandler(chr).PSendSysMessage(LANG_YOURS_SWIM_SPEED_CHANGED, GetNameLink().c_str(), Swim);
 
-    chr->SetSpeed(MOVE_SWIM,Swim,true);
+    chr->SetSpeedRate(MOVE_SWIM,Swim,true);
 
     return true;
 }
@@ -1274,7 +1274,7 @@ bool ChatHandler::HandleModifyBWalkCommand(const char* args)
     if (needReportToTarget(chr))
         ChatHandler(chr).PSendSysMessage(LANG_YOURS_BACK_SPEED_CHANGED, GetNameLink().c_str(), BSpeed);
 
-    chr->SetSpeed(MOVE_RUN_BACK,BSpeed,true);
+    chr->SetSpeedRate(MOVE_RUN_BACK,BSpeed,true);
 
     return true;
 }
@@ -1310,7 +1310,7 @@ bool ChatHandler::HandleModifyFlyCommand(const char* args)
     if (needReportToTarget(chr))
         ChatHandler(chr).PSendSysMessage(LANG_YOURS_FLY_SPEED_CHANGED, GetNameLink().c_str(), FSpeed);
 
-    chr->SetSpeed(MOVE_FLIGHT,FSpeed,true);
+    chr->SetSpeedRate(MOVE_FLIGHT,FSpeed,true);
 
     return true;
 }
