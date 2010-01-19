@@ -805,6 +805,22 @@ bool Player::StoreNewItemInBestSlots(uint32 titem_id, uint32 titem_amount)
     return false;
 }
 
+// helper function, mainly for script side, but can be used for simple task in mangos also.
+Item* Player::StoreNewItemInInventorySlot(uint32 itemEntry, uint32 amount)
+{
+    ItemPosCountVec vDest;
+
+    uint8 msg = CanStoreNewItem(INVENTORY_SLOT_BAG_0, NULL_SLOT, vDest, itemEntry, amount);
+
+    if (msg == EQUIP_ERR_OK)
+    {
+        if (Item* pItem = StoreNewItem(vDest, itemEntry, true, Item::GenerateItemRandomPropertyId(itemEntry)))
+            return pItem;
+    }
+
+    return NULL;
+}
+
 void Player::SendMirrorTimer(MirrorTimerType Type, uint32 MaxValue, uint32 CurrentValue, int32 Regen)
 {
     if (int(MaxValue) == DISABLED_MIRROR_TIMER)
