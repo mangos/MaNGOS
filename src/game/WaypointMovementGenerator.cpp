@@ -79,17 +79,17 @@ void WaypointMovementGenerator<Creature>::Initialize( Creature &u )
     i_nextMoveTime.Reset(0);                        // TODO: check the lower bound (0 is probably too small)
     u.StopMoving();
     LoadPath(u);
-    u.addUnitState(UNIT_STAT_ROAMING|UNIT_STAT_ROAMING);
+    u.addUnitState(UNIT_STAT_ROAMING|UNIT_STAT_ROAMING_MOVE);
 }
 
 void WaypointMovementGenerator<Creature>::Finalize( Creature &u )
 {
-    u.clearUnitState(UNIT_STAT_ROAMING|UNIT_STAT_ROAMING);
+    u.clearUnitState(UNIT_STAT_ROAMING|UNIT_STAT_ROAMING_MOVE);
 }
 
 void WaypointMovementGenerator<Creature>::Interrupt( Creature &u )
 {
-    u.addUnitState(UNIT_STAT_ROAMING|UNIT_STAT_ROAMING);
+    u.addUnitState(UNIT_STAT_ROAMING|UNIT_STAT_ROAMING_MOVE);
 }
 
 void WaypointMovementGenerator<Creature>::Reset( Creature &u )
@@ -97,7 +97,7 @@ void WaypointMovementGenerator<Creature>::Reset( Creature &u )
     ReloadPath(u);
     b_StoppedByPlayer = false;
     i_nextMoveTime.Reset(0);
-    u.addUnitState(UNIT_STAT_ROAMING|UNIT_STAT_ROAMING);
+    u.addUnitState(UNIT_STAT_ROAMING|UNIT_STAT_ROAMING_MOVE);
 }
 
 bool WaypointMovementGenerator<Creature>::Update(Creature &creature, const uint32 &diff)
