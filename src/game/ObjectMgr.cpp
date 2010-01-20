@@ -6129,12 +6129,13 @@ void ObjectMgr::LoadExplorationBaseXP()
     sLog.outString( ">> Loaded %u BaseXP definitions", count );
 }
 
-uint32 ObjectMgr::GetBaseXP(uint32 level)
+uint32 ObjectMgr::GetBaseXP(uint32 level) const
 {
-    return mBaseXPTable[level] ? mBaseXPTable[level] : 0;
+    BaseXPMap::const_iterator itr = mBaseXPTable.find(level);
+    return itr != mBaseXPTable.end() ? itr->second : 0;
 }
 
-uint32 ObjectMgr::GetXPForLevel(uint32 level)
+uint32 ObjectMgr::GetXPForLevel(uint32 level) const
 {
     if (level < mPlayerXPperLevel.size())
         return mPlayerXPperLevel[level];
