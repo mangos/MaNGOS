@@ -490,8 +490,11 @@ void WorldSession::HandleQuestPOIQuery(WorldPacket& recv_data)
     uint32 count;
     recv_data >> count;                                     // quest count, max=25
 
-    if(count >= MAX_QUEST_LOG_SIZE)
+    if(count > MAX_QUEST_LOG_SIZE)
+    {
+        recv_data.rpos(recv_data.wpos());                   // set to end to avoid warnings spam
         return;
+    }
 
     WorldPacket data(SMSG_QUEST_POI_QUERY_RESPONSE, 4+(4+4)*count);
     data << uint32(count);                                  // count
