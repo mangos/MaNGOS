@@ -4350,8 +4350,8 @@ void Aura::HandleModMechanicImmunity(bool apply, bool /*Real*/)
         // The Beast Within cast on owner if talent present
         if (Unit* owner = m_target->GetOwner())
         {
-            // Search talent
-            Unit::AuraList const& dummyAuras = owner->GetAurasByType(SPELL_AURA_DUMMY);
+            // Search talent The Beast Within
+            Unit::AuraList const& dummyAuras = owner->GetAurasByType(SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
             for(Unit::AuraList::const_iterator i = dummyAuras.begin(); i != dummyAuras.end(); ++i)
             {
                 if ((*i)->GetSpellProto()->SpellIconID == 2229)
