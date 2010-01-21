@@ -20,6 +20,7 @@
 #include "Errors.h"
 #include "Creature.h"
 #include "CreatureAI.h"
+#include "TemporarySummon.h"
 #include "DestinationHolderImp.h"
 #include "World.h"
 
@@ -90,7 +91,20 @@ void PointMovementGenerator<Player>::MovementInform(Player&)
 template <>
 void PointMovementGenerator<Creature>::MovementInform(Creature &unit)
 {
-    unit.AI()->MovementInform(POINT_MOTION_TYPE, id);
+    if (unit.AI())
+        unit.AI()->MovementInform(POINT_MOTION_TYPE, id);
+
+    if (TemporarySummon* pSummon = dynamic_cast<TemporarySummon*>(&unit))
+    {
+        if (Unit* pSummoner = pSummon->GetSummoner())
+        {
+            if (pSummoner->GetTypeId() == TYPEID_UNIT)
+            {
+                if (((Creature*)pSummoner)->AI())
+                    ((Creature*)pSummoner)->AI()->SummonedMovementInform(&unit, POINT_MOTION_TYPE, id);
+            }
+        }
+    }
 }
 
 template void PointMovementGenerator<Player>::Initialize(Player&);
