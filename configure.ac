@@ -97,7 +97,7 @@ AC_CHECK_LIB( pthread, pthread_create, [],
     ])
 AC_CHECK_LIB( z, compress, [ZLIB=-lz],[AC_MSG_ERROR([Missing zlib])] )
 AC_CHECK_LIB( compat, ftime, [COMPATLIB=-lcompat] )
-PKG_CHECK_MODULES(OPENSSL, [openssl], [], [CHECK_SSL()])
+AX_CHECK_OPENSSL()
 
 AC_ARG_WITH(postgresql,
 [  --with-postgresql       Use PostgreSQL as a backend (default: no)],
