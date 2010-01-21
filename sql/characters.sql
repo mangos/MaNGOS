@@ -21,7 +21,7 @@
 
 DROP TABLE IF EXISTS `character_db_version`;
 CREATE TABLE `character_db_version` (
-  `required_8874_01_characters_character_skills` bit(1) default NULL
+  `required_9136_07_characters_characters` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Last applied sql update to DB';
 
 --
@@ -44,7 +44,7 @@ CREATE TABLE `account_data` (
   `account` int(11) unsigned NOT NULL default '0',
   `type` int(11) unsigned NOT NULL default '0',
   `time` bigint(11) unsigned NOT NULL default '0',
-  `data` longtext NOT NULL,
+  `data` longblob NOT NULL,
   PRIMARY KEY  (`account`,`type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -256,7 +256,7 @@ CREATE TABLE `character_account_data` (
   `guid` int(11) unsigned NOT NULL default '0',
   `type` int(11) unsigned NOT NULL default '0',
   `time` bigint(11) unsigned NOT NULL default '0',
-  `data` longtext NOT NULL,
+  `data` longblob NOT NULL,
   PRIMARY KEY  (`guid`,`type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -791,6 +791,7 @@ CREATE TABLE `character_ticket` (
   `ticket_id` int(11) unsigned NOT NULL auto_increment,
   `guid` int(11) unsigned NOT NULL default '0',
   `ticket_text` text,
+  `response_text` text,
   `ticket_lastchange` TIMESTAMP ON  UPDATE  CURRENT_TIMESTAMP  NOT  NULL  DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY  (`ticket_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Player System';

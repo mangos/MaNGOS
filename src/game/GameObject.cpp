@@ -36,6 +36,7 @@
 #include "BattleGround.h"
 #include "BattleGroundAV.h"
 #include "Util.h"
+#include "ScriptCalls.h"
 
 GameObject::GameObject() : WorldObject()
 {
@@ -202,10 +203,7 @@ void GameObject::Update(uint32 /*p_time*/)
                             udata.BuildPacket(&packet);
                             ((Player*)caster)->GetSession()->SendPacket(&packet);
 
-                            WorldPacket data(SMSG_GAMEOBJECT_CUSTOM_ANIM,8+4);
-                            data << GetGUID();
-                            data << (uint32)(0);
-                            ((Player*)caster)->SendMessageToSet(&data,true);
+                            SendGameObjectCustomAnim(GetGUID());
                         }
 
                         m_lootState = GO_READY;                 // can be successfully open with some chance
@@ -258,9 +256,9 @@ void GameObject::Update(uint32 /*p_time*/)
                                 return;
                             }
                                                             // respawn timer
-                            uint16 poolid = sPoolMgr.IsPartOfAPool(GetGUIDLow(), TYPEID_GAMEOBJECT);
+                            uint16 poolid = GetDBTableGUIDLow() ? sPoolMgr.IsPartOfAPool<GameObject>(GetDBTableGUIDLow()) : 0;
                             if (poolid)
-                                sPoolMgr.UpdatePool(poolid, GetGUIDLow(), TYPEID_GAMEOBJECT);
+                                sPoolMgr.UpdatePool<GameObject>(poolid, GetDBTableGUIDLow());
                             else
                                 GetMap()->Add(this);
                             break;
@@ -342,7 +340,7 @@ void GameObject::Update(uint32 /*p_time*/)
                     {
                         Unit *caster =  owner ? owner : ok;
 
-                        caster->CastSpell(ok, goInfo->trap.spellId, true, 0, 0, GetGUID());
+                        caster->CastSpell(ok, goInfo->trap.spellId, true, NULL, NULL, GetGUID());
                         m_cooldownTime = time(NULL) + 4;        // 4 seconds
 
                         // count charges
@@ -380,7 +378,17 @@ void GameObject::Update(uint32 /*p_time*/)
                     if (GetGOInfo()->GetAutoCloseTime() && (m_cooldownTime < time(NULL)))
                         ResetDoorOrButton();
                     break;
-                default: break;
+                case GAMEOBJECT_TYPE_GOOBER:
+                    if (m_cooldownTime < time(NULL))
+                    {
+                        RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE);
+
+                        SetLootState(GO_JUST_DEACTIVATED);
+                        m_cooldownTime = 0;
+                    }
+                    break;
+                default:
+                    break;
             }
             break;
         }
@@ -397,13 +405,16 @@ void GameObject::Update(uint32 /*p_time*/)
                     std::set<uint32>::const_iterator end = m_unique_users.end();
                     for (; it != end; it++)
                     {
-                        Unit* owner = Unit::GetUnit(*this, uint64(*it));
-                        if (owner) owner->CastSpell(owner, spellId, false, 0, 0, GetGUID());
+                        if (Unit* owner = Unit::GetUnit(*this, uint64(*it)))
+                            owner->CastSpell(owner, spellId, false, NULL, NULL, GetGUID());
                     }
 
                     m_unique_users.clear();
                     m_usetimes = 0;
                 }
+
+                SetGoState(GO_STATE_READY);
+
                 //any return here in case battleground traps
             }
 
@@ -473,9 +484,9 @@ void GameObject::Delete()
     SetGoState(GO_STATE_READY);
     SetUInt32Value(GAMEOBJECT_FLAGS, GetGOInfo()->flags);
 
-    uint16 poolid = sPoolMgr.IsPartOfAPool(GetGUIDLow(), TYPEID_GAMEOBJECT);
+    uint16 poolid = GetDBTableGUIDLow() ? sPoolMgr.IsPartOfAPool<GameObject>(GetDBTableGUIDLow()) : 0;
     if (poolid)
-        sPoolMgr.UpdatePool(poolid, GetGUIDLow(), TYPEID_GAMEOBJECT);
+        sPoolMgr.UpdatePool<GameObject>(poolid, GetDBTableGUIDLow());
     else
         AddObjectToRemoveList();
 }
@@ -794,7 +805,7 @@ void GameObject::TriggeringLinkedGameObject( uint32 trapEntry, Unit* target)
     // found correct GO
     // FIXME: when GO casting will be implemented trap must cast spell to target
     if(trapGO)
-        target->CastSpell(target,trapSpell,true, 0, 0, GetGUID());
+        target->CastSpell(target, trapSpell, true, NULL, NULL, GetGUID());
 }
 
 GameObject* GameObject::LookupFishingHoleAround(float range)
@@ -859,17 +870,21 @@ void GameObject::Use(Unit* user)
     uint32 spellId = 0;
     bool triggered = false;
 
+    if (user->GetTypeId() == TYPEID_PLAYER && Script->GOHello((Player*)user, this))
+        return;
+
     switch(GetGoType())
     {
         case GAMEOBJECT_TYPE_DOOR:                          //0
         case GAMEOBJECT_TYPE_BUTTON:                        //1
+        {
             //doors/buttons never really despawn, only reset to default state/flags
             UseDoorOrButton();
 
             // activate script
             GetMap()->ScriptsStart(sGameObjectScripts, GetDBTableGUIDLow(), spellCaster, this);
             return;
-
+        }
         case GAMEOBJECT_TYPE_QUESTGIVER:                    //2
         {
             if (user->GetTypeId() != TYPEID_PLAYER)
@@ -881,14 +896,31 @@ void GameObject::Use(Unit* user)
             player->SendPreparedGossip(this);
             return;
         }
-        //Sitting: Wooden bench, chairs enzz
-        case GAMEOBJECT_TYPE_CHAIR:                         //7
+        case GAMEOBJECT_TYPE_CHEST:
         {
-            GameObjectInfo const* info = GetGOInfo();
-            if(!info)
+            if (user->GetTypeId() != TYPEID_PLAYER)
                 return;
 
-            if(user->GetTypeId()!=TYPEID_PLAYER)
+            // TODO: possible must be moved to loot release (in different from linked triggering)
+            if (GetGOInfo()->chest.eventId)
+            {
+                sLog.outDebug("Chest ScriptStart id %u for GO %u", GetGOInfo()->chest.eventId, GetDBTableGUIDLow());
+                GetMap()->ScriptsStart(sEventScripts, GetGOInfo()->chest.eventId, user, this);
+            }
+
+            // triggering linked GO
+            if (uint32 trapEntry = GetGOInfo()->chest.linkedTrapId)
+                TriggeringLinkedGameObject(trapEntry, user);
+
+            return;
+        }
+        case GAMEOBJECT_TYPE_CHAIR:                         //7 Sitting: Wooden bench, chairs
+        {
+            GameObjectInfo const* info = GetGOInfo();
+            if (!info)
+                return;
+
+            if (user->GetTypeId() != TYPEID_PLAYER)
                 return;
 
             Player* player = (Player*)user;
@@ -896,7 +928,7 @@ void GameObject::Use(Unit* user)
             // a chair may have n slots. we have to calculate their positions and teleport the player to the nearest one
 
             // check if the db is sane
-            if(info->chair.slots > 0)
+            if (info->chair.slots > 0)
             {
                 float lowestDist = DEFAULT_VISIBILITY_DISTANCE;
 
@@ -925,7 +957,7 @@ void GameObject::Use(Unit* user)
                     helper->MonsterSay(output.str().c_str(), LANG_UNIVERSAL, 0);
                     */
 
-                    if(thisDistance <= lowestDist)
+                    if (thisDistance <= lowestDist)
                     {
                         lowestDist = thisDistance;
                         x_lowest = x_i;
@@ -942,7 +974,15 @@ void GameObject::Use(Unit* user)
             player->SetStandState(UNIT_STAND_STATE_SIT_LOW_CHAIR+info->chair.height);
             return;
         }
-        //big gun, its a spell/aura
+        case GAMEOBJECT_TYPE_SPELL_FOCUS:
+        {
+            // triggering linked GO
+            if (uint32 trapEntry = GetGOInfo()->spellFocus.linkedTrapId)
+                TriggeringLinkedGameObject(trapEntry, user);
+
+            // some may be activated in addition? Conditions for this? (ex: entry 181616)
+            break;
+        }
         case GAMEOBJECT_TYPE_GOOBER:                        //10
         {
             GameObjectInfo const* info = GetGOInfo();
@@ -963,12 +1003,38 @@ void GameObject::Use(Unit* user)
                     player->SendPreparedGossip(this);
                 }
 
-                // possible quest objective for active quests
-                player->CastedCreatureOrGO(info->id, GetGUID(), 0);
-
                 if (info->goober.eventId)
+                {
+                    sLog.outDebug("Goober ScriptStart id %u for GO entry %u (GUID %u).", info->goober.eventId, GetEntry(), GetDBTableGUIDLow());
                     GetMap()->ScriptsStart(sEventScripts, info->goober.eventId, player, this);
+                }
+
+                // possible quest objective for active quests
+                if (info->goober.questId && sObjectMgr.GetQuestTemplate(info->goober.questId))
+                {
+                    //Quest require to be active for GO using
+                    if (player->GetQuestStatus(info->goober.questId) != QUEST_STATUS_INCOMPLETE)
+                        break;
+                }
+
+                player->CastedCreatureOrGO(info->id, GetGUID(), 0);
             }
+
+            if (uint32 trapEntry = info->goober.linkedTrapId)
+                TriggeringLinkedGameObject(trapEntry, user);
+
+            SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE);
+            SetLootState(GO_ACTIVATED);
+
+            uint32 time_to_restore = info->GetAutoCloseTime();
+
+            // this appear to be ok, however others exist in addition to this that should have custom (ex: 190510, 188692, 187389)
+            if (time_to_restore && info->goober.customAnim)
+                SendGameObjectCustomAnim(GetGUID());
+            else
+                SetGoState(GO_STATE_ACTIVE);
+
+            m_cooldownTime = time(NULL) + time_to_restore;
 
             // cast this spell later if provided
             spellId = info->goober.spellId;
@@ -981,7 +1047,7 @@ void GameObject::Use(Unit* user)
             if(!info)
                 return;
 
-            if(user->GetTypeId()!=TYPEID_PLAYER)
+            if (user->GetTypeId() != TYPEID_PLAYER)
                 return;
 
             Player* player = (Player*)user;
@@ -994,15 +1060,14 @@ void GameObject::Use(Unit* user)
 
             return;
         }
-        //fishing bobber
-        case GAMEOBJECT_TYPE_FISHINGNODE:                   //17
+        case GAMEOBJECT_TYPE_FISHINGNODE:                   //17 fishing bobber
         {
-            if(user->GetTypeId()!=TYPEID_PLAYER)
+            if (user->GetTypeId() != TYPEID_PLAYER)
                 return;
 
             Player* player = (Player*)user;
 
-            if(player->GetGUID() != GetOwnerGUID())
+            if (player->GetGUID() != GetOwnerGUID())
                 return;
 
             switch(getLootState())
@@ -1016,12 +1081,12 @@ void GameObject::Use(Unit* user)
                     uint32 zone, subzone;
                     GetZoneAndAreaId(zone,subzone);
 
-                    int32 zone_skill = sObjectMgr.GetFishingBaseSkillLevel( subzone );
-                    if(!zone_skill)
-                        zone_skill = sObjectMgr.GetFishingBaseSkillLevel( zone );
+                    int32 zone_skill = sObjectMgr.GetFishingBaseSkillLevel(subzone);
+                    if (!zone_skill)
+                        zone_skill = sObjectMgr.GetFishingBaseSkillLevel(zone);
 
                     //provide error, no fishable zone or area should be 0
-                    if(!zone_skill)
+                    if (!zone_skill)
                         sLog.outErrorDb("Fishable areaId %u are not properly defined in `skill_fishing_base_level`.",subzone);
 
                     int32 skill = player->GetSkillValue(SKILL_FISHING);
@@ -1030,7 +1095,7 @@ void GameObject::Use(Unit* user)
 
                     DEBUG_LOG("Fishing check (skill: %i zone min skill: %i chance %i roll: %i",skill,zone_skill,chance,roll);
 
-                    if(skill >= zone_skill && chance >= roll)
+                    if (skill >= zone_skill && chance >= roll)
                     {
                         // prevent removing GO at spell cancel
                         player->RemoveGameObject(this,false);
@@ -1075,10 +1140,9 @@ void GameObject::Use(Unit* user)
             player->FinishSpell(CURRENT_CHANNELED_SPELL);
             return;
         }
-
         case GAMEOBJECT_TYPE_SUMMONING_RITUAL:              //18
         {
-            if(user->GetTypeId()!=TYPEID_PLAYER)
+            if (user->GetTypeId() != TYPEID_PLAYER)
                 return;
 
             Player* player = (Player*)user;
@@ -1087,27 +1151,27 @@ void GameObject::Use(Unit* user)
 
             GameObjectInfo const* info = GetGOInfo();
 
-            if( !caster || caster->GetTypeId()!=TYPEID_PLAYER )
+            if (!caster || caster->GetTypeId()!=TYPEID_PLAYER)
                 return;
 
             // accept only use by player from same group for caster except caster itself
-            if(((Player*)caster)==player || !((Player*)caster)->IsInSameRaidWith(player))
+            if (((Player*)caster) == player || !((Player*)caster)->IsInSameRaidWith(player))
                 return;
 
             AddUniqueUse(player);
 
             // full amount unique participants including original summoner
-            if(GetUniqueUseCount() < info->summoningRitual.reqParticipants)
+            if (GetUniqueUseCount() < info->summoningRitual.reqParticipants)
                 return;
 
             // in case summoning ritual caster is GO creator
             spellCaster = caster;
 
-            if(!caster->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
+            if (!caster->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
                 return;
 
             spellId = info->summoningRitual.spellId;
-            if(spellId==62330)                              // GO store not existed spell, replace by expected
+            if (spellId == 62330)                           // GO store not existed spell, replace by expected
             {
                 // spell have reagent and mana cost but it not expected use its
                 // it triggered spell in fact casted at currently channeled GO
@@ -1129,16 +1193,16 @@ void GameObject::Use(Unit* user)
             SetUInt32Value(GAMEOBJECT_FLAGS,2);
 
             GameObjectInfo const* info = GetGOInfo();
-            if(!info)
+            if (!info)
                 return;
 
-            if(info->spellcaster.partyOnly)
+            if (info->spellcaster.partyOnly)
             {
                 Unit* caster = GetOwner();
-                if( !caster || caster->GetTypeId()!=TYPEID_PLAYER )
+                if (!caster || caster->GetTypeId() != TYPEID_PLAYER)
                     return;
 
-                if(user->GetTypeId()!=TYPEID_PLAYER || !((Player*)user)->IsInSameRaidWith((Player*)caster))
+                if (user->GetTypeId() != TYPEID_PLAYER || !((Player*)user)->IsInSameRaidWith((Player*)caster))
                     return;
             }
 
@@ -1151,7 +1215,7 @@ void GameObject::Use(Unit* user)
         {
             GameObjectInfo const* info = GetGOInfo();
 
-            if(user->GetTypeId()!=TYPEID_PLAYER)
+            if (user->GetTypeId() != TYPEID_PLAYER)
                 return;
 
             Player* player = (Player*)user;
@@ -1159,37 +1223,37 @@ void GameObject::Use(Unit* user)
             Player* targetPlayer = ObjectAccessor::FindPlayer(player->GetSelection());
 
             // accept only use by player from same group for caster except caster itself
-            if(!targetPlayer || targetPlayer == player || !targetPlayer->IsInSameGroupWith(player))
+            if (!targetPlayer || targetPlayer == player || !targetPlayer->IsInSameGroupWith(player))
                 return;
 
             //required lvl checks!
             uint8 level = player->getLevel();
             if (level < info->meetingstone.minLevel || level > info->meetingstone.maxLevel)
                 return;
+
             level = targetPlayer->getLevel();
             if (level < info->meetingstone.minLevel || level > info->meetingstone.maxLevel)
                 return;
 
-            if(info->id==194097)
+            if (info->id == 194097)
                 spellId = 61994;                            // Ritual of Summoning
             else
                 spellId = 59782;                            // Summoning Stone Effect
 
             break;
         }
-
         case GAMEOBJECT_TYPE_FLAGSTAND:                     // 24
         {
-            if(user->GetTypeId()!=TYPEID_PLAYER)
+            if (user->GetTypeId() != TYPEID_PLAYER)
                 return;
 
             Player* player = (Player*)user;
 
-            if( player->CanUseBattleGroundObject() )
+            if (player->CanUseBattleGroundObject())
             {
                 // in battleground check
                 BattleGround *bg = player->GetBattleGround();
-                if(!bg)
+                if (!bg)
                     return;
                 // BG flag click
                 // AB:
@@ -1205,16 +1269,16 @@ void GameObject::Use(Unit* user)
         }
         case GAMEOBJECT_TYPE_FLAGDROP:                      // 26
         {
-            if(user->GetTypeId()!=TYPEID_PLAYER)
+            if (user->GetTypeId() != TYPEID_PLAYER)
                 return;
 
             Player* player = (Player*)user;
 
-            if( player->CanUseBattleGroundObject() )
+            if (player->CanUseBattleGroundObject())
             {
                 // in battleground check
                 BattleGround *bg = player->GetBattleGround();
-                if(!bg)
+                if (!bg)
                     return;
                 // BG flag dropped
                 // WS:
@@ -1223,7 +1287,7 @@ void GameObject::Use(Unit* user)
                 // EotS:
                 // 184142 - Netherstorm Flag
                 GameObjectInfo const* info = GetGOInfo();
-                if(info)
+                if (info)
                 {
                     switch(info->id)
                     {
@@ -1251,10 +1315,10 @@ void GameObject::Use(Unit* user)
         case GAMEOBJECT_TYPE_BARBER_CHAIR:                  //32
         {
             GameObjectInfo const* info = GetGOInfo();
-            if(!info)
+            if (!info)
                 return;
 
-            if(user->GetTypeId()!=TYPEID_PLAYER)
+            if (user->GetTypeId() != TYPEID_PLAYER)
                 return;
 
             Player* player = (Player*)user;
@@ -1269,15 +1333,15 @@ void GameObject::Use(Unit* user)
             return;
         }
         default:
-            sLog.outDebug("Unknown Object Type %u", GetGoType());
+            sLog.outError("GameObject::Use unhandled GameObject type %u (entry %u).", GetGoType(), GetEntry());
             break;
     }
 
-    if(!spellId)
+    if (!spellId)
         return;
 
     SpellEntry const *spellInfo = sSpellStore.LookupEntry( spellId );
-    if(!spellInfo)
+    if (!spellInfo)
     {
         sLog.outError("WORLD: unknown spell id %u at use action for gameobject (Entry: %u GoType: %u )", spellId,GetEntry(),GetGoType());
         return;

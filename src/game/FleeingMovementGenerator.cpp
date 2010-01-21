@@ -33,7 +33,8 @@ FleeingMovementGenerator<T>::_setTargetLocation(T &owner)
     if( !&owner )
         return;
 
-    if( owner.hasUnitState(UNIT_STAT_ROOT | UNIT_STAT_STUNNED | UNIT_STAT_DIED) )
+    // ignore in case other no reaction state
+    if (owner.hasUnitState(UNIT_STAT_CAN_NOT_REACT & ~UNIT_STAT_FLEEING))
         return;
 
     if(!_setMoveData(owner))
@@ -43,7 +44,7 @@ FleeingMovementGenerator<T>::_setTargetLocation(T &owner)
     if(!_getPoint(owner, x, y, z))
         return;
 
-    owner.addUnitState(UNIT_STAT_FLEEING);
+    owner.addUnitState(UNIT_STAT_FLEEING_MOVE);
     Traveller<T> traveller(owner);
     i_destinationHolder.SetDestination(traveller, x, y, z);
 }
@@ -281,8 +282,7 @@ template<class T>
 void
 FleeingMovementGenerator<T>::Initialize(T &owner)
 {
-    if(!&owner)
-        return;
+    owner.addUnitState(UNIT_STAT_FLEEING|UNIT_STAT_FLEEING_MOVE);
 
     _Init(owner);
 
@@ -310,9 +310,6 @@ template<>
 void
 FleeingMovementGenerator<Creature>::_Init(Creature &owner)
 {
-    if(!&owner)
-        return;
-
     owner.RemoveMonsterMoveFlag(MONSTER_MOVE_WALK);
     owner.SetTargetGUID(0);
     is_water_ok = owner.canSwim();
@@ -330,31 +327,41 @@ FleeingMovementGenerator<Player>::_Init(Player &)
 template<>
 void FleeingMovementGenerator<Player>::Finalize(Player &owner)
 {
-    owner.clearUnitState(UNIT_STAT_FLEEING);
+    owner.clearUnitState(UNIT_STAT_FLEEING|UNIT_STAT_FLEEING_MOVE);
 }
 
 template<>
 void FleeingMovementGenerator<Creature>::Finalize(Creature &owner)
 {
     owner.AddMonsterMoveFlag(MONSTER_MOVE_WALK);
-    owner.clearUnitState(UNIT_STAT_FLEEING);
+    owner.clearUnitState(UNIT_STAT_FLEEING|UNIT_STAT_FLEEING_MOVE);
 }
 
 template<class T>
-void
-FleeingMovementGenerator<T>::Reset(T &owner)
+void FleeingMovementGenerator<T>::Interrupt(T &owner)
+{
+    // flee state still applied while movegen disabled
+    owner.clearUnitState(UNIT_STAT_FLEEING_MOVE);
+}
+
+template<class T>
+void FleeingMovementGenerator<T>::Reset(T &owner)
 {
     Initialize(owner);
 }
 
 template<class T>
-bool
-FleeingMovementGenerator<T>::Update(T &owner, const uint32 & time_diff)
+bool FleeingMovementGenerator<T>::Update(T &owner, const uint32 & time_diff)
 {
     if( !&owner || !owner.isAlive() )
         return false;
-    if( owner.hasUnitState(UNIT_STAT_ROOT | UNIT_STAT_STUNNED | UNIT_STAT_DIED) )
+
+    // ignore in case other no reaction state
+    if (owner.hasUnitState(UNIT_STAT_CAN_NOT_REACT & ~UNIT_STAT_FLEEING))
+    {
+        owner.clearUnitState(UNIT_STAT_FLEEING_MOVE);
         return true;
+    }
 
     Traveller<T> traveller(owner);
 
@@ -386,6 +393,8 @@ template bool FleeingMovementGenerator<Player>::_getPoint(Player &, float &, flo
 template bool FleeingMovementGenerator<Creature>::_getPoint(Creature &, float &, float &, float &);
 template void FleeingMovementGenerator<Player>::_setTargetLocation(Player &);
 template void FleeingMovementGenerator<Creature>::_setTargetLocation(Creature &);
+template void FleeingMovementGenerator<Player>::Interrupt(Player &);
+template void FleeingMovementGenerator<Creature>::Interrupt(Creature &);
 template void FleeingMovementGenerator<Player>::Reset(Player &);
 template void FleeingMovementGenerator<Creature>::Reset(Creature &);
 template bool FleeingMovementGenerator<Player>::Update(Player &, const uint32 &);
@@ -393,7 +402,7 @@ template bool FleeingMovementGenerator<Creature>::Update(Creature &, const uint3
 
 void TimedFleeingMovementGenerator::Finalize(Unit &owner)
 {
-    owner.clearUnitState(UNIT_STAT_FLEEING);
+    owner.clearUnitState(UNIT_STAT_FLEEING|UNIT_STAT_FLEEING_MOVE);
     if (Unit* victim = owner.getVictim())
     {
         if (owner.isAlive())
@@ -409,8 +418,12 @@ bool TimedFleeingMovementGenerator::Update(Unit & owner, const uint32 & time_dif
     if( !owner.isAlive() )
         return false;
 
-    if( owner.hasUnitState(UNIT_STAT_ROOT | UNIT_STAT_STUNNED | UNIT_STAT_DIED) )
+    // ignore in case other no reaction state
+    if (owner.hasUnitState(UNIT_STAT_CAN_NOT_REACT & ~UNIT_STAT_FLEEING))
+    {
+        owner.clearUnitState(UNIT_STAT_FLEEING_MOVE);
         return true;
+    }
 
     i_totalFleeTime.Update(time_diff);
     if (i_totalFleeTime.Passed())

@@ -75,7 +75,6 @@ void PetAI::AttackStart(Unit *u)
 
     if(m_creature->Attack(u,true))
     {
-        m_creature->clearUnitState(UNIT_STAT_FOLLOW);
         // TMGs call CreatureRelocation which via MoveInLineOfSight can call this function
         // thus with the following clear the original TMG gets invalidated and crash, doh
         // hope it doesn't start to leak memory without this :-/
@@ -126,8 +125,7 @@ void PetAI::_stopAttack()
     }
     else
     {
-        m_creature->clearUnitState(UNIT_STAT_FOLLOW);
-        m_creature->GetMotionMaster()->Clear();
+        m_creature->GetMotionMaster()->Clear(false);
         m_creature->GetMotionMaster()->MoveIdle();
     }
     m_creature->AttackStop();
@@ -163,7 +161,7 @@ void PetAI::UpdateAI(const uint32 diff)
             // required to be stopped cases
             if (m_creature->IsStopped() && m_creature->IsNonMeleeSpellCasted(false))
             {
-                if (m_creature->hasUnitState(UNIT_STAT_FOLLOW))
+                if (m_creature->hasUnitState(UNIT_STAT_FOLLOW_MOVE))
                     m_creature->InterruptNonMeleeSpells(false);
                 else
                     return;

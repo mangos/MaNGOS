@@ -105,6 +105,7 @@ MapDifficultyMap sMapDifficultyMap;
 DBCStorage <MovieEntry> sMovieStore(MovieEntryfmt);
 
 DBCStorage <QuestSortEntry> sQuestSortStore(QuestSortEntryfmt);
+DBCStorage <PvPDifficultyEntry> sPvPDifficultyStore(PvPDifficultyfmt);
 
 DBCStorage <RandomPropertiesPointsEntry> sRandomPropertiesPointsStore(RandomPropertiesPointsfmt);
 DBCStorage <ScalingStatDistributionEntry> sScalingStatDistributionStore(ScalingStatDistributionfmt);
@@ -158,6 +159,73 @@ DBCStorage <WorldSafeLocsEntry> sWorldSafeLocsStore(WorldSafeLocsEntryfmt);
 
 typedef std::list<std::string> StoreProblemList;
 
+bool IsAcceptableClientBuild(uint32 build)
+{
+    int accepted_versions[] = EXPECTED_MANGOSD_CLIENT_BUILD;
+    for(int i = 0; accepted_versions[i]; ++i)
+        if(build == accepted_versions[i])
+            return true;
+
+    return false;
+}
+
+std::string AcceptableClientBuildsListStr()
+{
+    std::ostringstream data;
+    int accepted_versions[] = EXPECTED_MANGOSD_CLIENT_BUILD;
+    for(int i = 0; accepted_versions[i]; ++i)
+        data << accepted_versions[i] << " ";
+    return data.str();
+}
+
+static bool ReadDBCBuildFileText(const std::string& dbc_path, char const* localeName, std::string& text)
+{
+    std::string filename  = dbc_path + "component.wow-" + localeName + ".txt";
+
+    if(FILE* file = fopen(filename.c_str(),"rb"))
+    {
+        char buf[100];
+        fread(buf,1,100-1,file);
+        fclose(file);
+
+        text = &buf[0];
+        return true;
+    }
+    else
+        return false;
+}
+
+static uint32 ReadDBCBuild(const std::string& dbc_path, char const* localeName = NULL)
+{
+    std::string text;
+
+    if (!localeName)
+    {
+        for(LocaleNameStr* itr = &fullLocaleNameList[0]; itr->name; ++itr)
+            if (ReadDBCBuildFileText(dbc_path,itr->name,text))
+                break;
+    }
+    else
+        ReadDBCBuildFileText(dbc_path,localeName,text);
+
+    if (text.empty())
+        return 0;
+
+    size_t pos = text.find("version=\"");
+    size_t pos1 = pos + strlen("version=\"");
+    size_t pos2 = text.find("\"",pos1);
+    if (pos == text.npos || pos2 == text.npos || pos1 >= pos2)
+        return 0;
+
+    std::string build_str = text.substr(pos1,pos2-pos1);
+
+    int build = atoi(build_str.c_str());
+    if (build <= 0)
+        return 0;
+
+    return build;
+}
+
 static bool LoadDBC_assert_print(uint32 fsize,uint32 rsize, const std::string& filename)
 {
     sLog.outError("ERROR: Size of '%s' setted by format string (%u) not equal size of C++ structure (%u).",filename.c_str(),fsize,rsize);
@@ -166,8 +234,18 @@ static bool LoadDBC_assert_print(uint32 fsize,uint32 rsize, const std::string& f
     return false;
 }
 
+struct LocalData
+{
+    explicit LocalData(uint32 build) : main_build(build), availableDbcLocales(0xFFFFFFFF),checkedDbcLocaleBuilds(0) {}
+    uint32 main_build;
+
+    // bitmasks for index of fullLocaleNameList
+    uint32 availableDbcLocales;
+    uint32 checkedDbcLocaleBuilds;
+};
+
 template<class T>
-inline void LoadDBC(uint32& availableDbcLocales,barGoLink& bar, StoreProblemList& errlist, DBCStorage<T>& storage, const std::string& dbc_path, const std::string& filename)
+inline void LoadDBC(LocalData& localeData,barGoLink& bar, StoreProblemList& errlist, DBCStorage<T>& storage, const std::string& dbc_path, const std::string& filename)
 {
     // compatibility format and C++ structure sizes
     assert(DBCFileLoader::GetFormatRecordSize(storage.GetFormat()) == sizeof(T) || LoadDBC_assert_print(DBCFileLoader::GetFormatRecordSize(storage.GetFormat()),sizeof(T),filename));
@@ -176,14 +254,38 @@ inline void LoadDBC(uint32& availableDbcLocales,barGoLink& bar, StoreProblemList
     if(storage.Load(dbc_filename.c_str()))
     {
         bar.step();
-        for(uint8 i = 0; i < MAX_LOCALE; ++i)
+        for(uint8 i = 0; fullLocaleNameList[i].name; ++i)
         {
-            if(!(availableDbcLocales & (1 << i)))
+            if (!(localeData.availableDbcLocales & (1 << i)))
                 continue;
 
-            std::string dbc_filename_loc = dbc_path + localeNames[i] + "/" + filename;
+            std::string dbc_dir_loc = dbc_path + fullLocaleNameList[i].name + "/";
+
+            if (!(localeData.checkedDbcLocaleBuilds & (1 << i)))
+            {
+                localeData.checkedDbcLocaleBuilds |= (1<<i);// mark as checked for speedup next checks
+
+                uint32 build_loc = ReadDBCBuild(dbc_dir_loc,fullLocaleNameList[i].name);
+                if(localeData.main_build != build_loc)
+                {
+                    localeData.availableDbcLocales &= ~(1<<i);  // mark as not available for speedup next checks
+
+                    // exist but wrong build
+                    if (build_loc)
+                    {
+                        std::string dbc_filename_loc = dbc_path + fullLocaleNameList[i].name + "/" + filename;
+                        char buf[200];
+                        snprintf(buf,200," (exist, but DBC locale subdir %s have DBCs for build %u instead expected build %u, it and other DBC from subdir skipped)",fullLocaleNameList[i].name,build_loc,localeData.main_build);
+                        errlist.push_back(dbc_filename_loc + buf);
+                    }
+
+                    continue;
+                }
+            }
+
+            std::string dbc_filename_loc = dbc_path + fullLocaleNameList[i].name + "/" + filename;
             if(!storage.LoadStringsFrom(dbc_filename_loc.c_str()))
-                availableDbcLocales &= ~(1<<i);             // mark as not available for speedup next checks
+                localeData.availableDbcLocales &= ~(1<<i);  // mark as not available for speedup next checks
         }
     }
     else
@@ -206,12 +308,25 @@ void LoadDBCStores(const std::string& dataPath)
 {
     std::string dbcPath = dataPath+"dbc/";
 
-    const uint32 DBCFilesCount = 81;
+    uint32 build = ReadDBCBuild(dbcPath);
+
+    // Check the expected DBC version
+    if (!IsAcceptableClientBuild(build))
+    {
+        if (build)
+            sLog.outError("Found DBC files for build %u but mangosd expected DBC for one from builds: %s Please extract correct DBC files.", build, AcceptableClientBuildsListStr().c_str());
+        else
+            sLog.outError("Incorrect DataDir value in mangosd.conf or not found build info (outdated DBC files). Required one from builds: %s Please extract correct DBC files.",AcceptableClientBuildsListStr().c_str());
+        exit(1);
+    }
+
+    const uint32 DBCFilesCount = 82;
 
     barGoLink bar( DBCFilesCount );
 
     StoreProblemList bad_dbc_files;
-    uint32 availableDbcLocales = 0xFFFFFFFF;
+
+    LocalData availableDbcLocales(build);
 
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sAreaStore,                dbcPath,"AreaTable.dbc");
 
@@ -305,6 +420,12 @@ void LoadDBCStores(const std::string& dataPath)
 
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sMovieStore,               dbcPath,"Movie.dbc");
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sQuestSortStore,           dbcPath,"QuestSort.dbc");
+    LoadDBC(availableDbcLocales,bar,bad_dbc_files,sPvPDifficultyStore,       dbcPath,"PvpDifficulty.dbc");   
+    for(uint32 i = 0; i < sPvPDifficultyStore.GetNumRows(); ++i)
+        if (PvPDifficultyEntry const* entry = sPvPDifficultyStore.LookupEntry(i))
+            if (entry->bracketId > MAX_BATTLEGROUND_BRACKETS)
+                assert(false && "Need update MAX_BATTLEGROUND_BRACKETS by DBC data");
+
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sRandomPropertiesPointsStore, dbcPath,"RandPropPoints.dbc");
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sScalingStatDistributionStore, dbcPath,"ScalingStatDistribution.dbc");
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sScalingStatValuesStore,   dbcPath,"ScalingStatValues.dbc");
@@ -496,15 +617,15 @@ void LoadDBCStores(const std::string& dataPath)
     }
 
     // Check loaded DBC files proper version
-    if( !sSpellStore.LookupEntry(66530)            ||       // last added spell in 3.1.3
-        !sMapStore.LookupEntry(624)                ||       // last map added in 3.1.3
-        !sGemPropertiesStore.LookupEntry(1609)     ||       // last gem property added in 3.1.3
-        !sItemExtendedCostStore.LookupEntry(2671)  ||       // last item extended cost added in 3.1.3
-        !sCharTitlesStore.LookupEntry(166)         ||       // last char title added in 3.1.3
-        !sAreaStore.LookupEntry(2905)              ||       // last area (areaflag) added in 3.1.3
-        !sItemStore.LookupEntry(46894)             )        // last client known item added in 3.1.3
+    if( !sSpellStore.LookupEntry(73190)            ||       // last added spell in 3.3.0a
+        !sMapStore.LookupEntry(718)                ||       // last map added in 3.3.0a
+        !sGemPropertiesStore.LookupEntry(1629)     ||       // last gem property added in 3.3.0a
+        !sItemExtendedCostStore.LookupEntry(2935)  ||       // last item extended cost added in 3.3.0a
+        !sCharTitlesStore.LookupEntry(177)         ||       // last char title added in 3.3.0a
+        !sAreaStore.LookupEntry(3460)              ||       // last area (areaflag) added in 3.3.0a
+        !sItemStore.LookupEntry(52062)             )        // last client known item added in 3.3.0a
     {
-        sLog.outError("\nYou have _outdated_ DBC files. Please extract correct versions from current using client.");
+        sLog.outError("\nYou have mixed version DBC files. Please re-extract DBC files for one from client build: %s",AcceptableClientBuildsListStr().c_str());
         exit(1);
     }
 
@@ -676,6 +797,30 @@ MapDifficulty const* GetMapDifficultyData(uint32 mapId, Difficulty difficulty)
 {
     MapDifficultyMap::const_iterator itr = sMapDifficultyMap.find(MAKE_PAIR32(mapId,difficulty));
     return itr != sMapDifficultyMap.end() ? &itr->second : NULL;
+}
+
+PvPDifficultyEntry const* GetBattlegroundBracketByLevel( uint32 mapid, uint32 level )
+{
+    // prevent out-of-range levels for dbc data
+    if (level > DEFAULT_MAX_LEVEL)
+        level = DEFAULT_MAX_LEVEL;
+
+    for(uint32 i = 0; i < sPvPDifficultyStore.GetNumRows(); ++i)
+        if (PvPDifficultyEntry const* entry = sPvPDifficultyStore.LookupEntry(i))
+            if (entry->mapId == mapid && entry->minLevel <= level && entry->maxLevel >= level)
+                return entry;
+
+    return NULL;
+}
+
+PvPDifficultyEntry const* GetBattlegroundBracketById(uint32 mapid, BattleGroundBracketId id)
+{
+    for(uint32 i = 0; i < sPvPDifficultyStore.GetNumRows(); ++i)
+        if (PvPDifficultyEntry const* entry = sPvPDifficultyStore.LookupEntry(i))
+            if (entry->mapId == mapid && entry->GetBracketId() == id)
+                return entry;
+
+    return NULL;
 }
 
 uint32 const* GetTalentTabPages(uint32 cls)

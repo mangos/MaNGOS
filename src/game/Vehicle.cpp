@@ -23,9 +23,8 @@
 #include "Unit.h"
 #include "Util.h"
 
-Vehicle::Vehicle() : Creature(), m_vehicleId(0)
+Vehicle::Vehicle() : Creature(CREATURE_SUBTYPE_VEHICLE), m_vehicleId(0)
 {
-    m_isVehicle = true;
     m_updateFlag = (UPDATEFLAG_LIVING | UPDATEFLAG_HAS_POSITION | UPDATEFLAG_VEHICLE);
 }
 

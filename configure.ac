@@ -14,9 +14,9 @@
 
 ## Prelude, basic settings for Autoconf
 #  PACKAGE:            mangos
-#  VERSION:            0.15.0 (trunk)
+#  VERSION:            0.16.0 (trunk)
 #  BUG-REPORT-ADDRESS: mangos-devs@lists.sourceforge.net
-AC_INIT( [mangos], [0.15.0], [mangos-devs@lists.sourceforge.net])
+AC_INIT( [mangos], [0.16.0], [mangos-devs@lists.sourceforge.net])
 AC_CONFIG_SRCDIR([src/shared/Common.h])
 
 ## Prelude, basic settings for Automake
@@ -97,7 +97,7 @@ AC_CHECK_LIB( pthread, pthread_create, [],
     ])
 AC_CHECK_LIB( z, compress, [ZLIB=-lz],[AC_MSG_ERROR([Missing zlib])] )
 AC_CHECK_LIB( compat, ftime, [COMPATLIB=-lcompat] )
-PKG_CHECK_MODULES(OPENSSL, [openssl], [], [AC_MSG_ERROR([Missing openssl])])
+PKG_CHECK_MODULES(OPENSSL, [openssl], [], [CHECK_SSL()])
 
 AC_ARG_WITH(postgresql,
 [  --with-postgresql       Use PostgreSQL as a backend (default: no)],

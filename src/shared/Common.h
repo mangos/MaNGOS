@@ -173,7 +173,7 @@ enum AccountTypes
 
 enum LocaleConstant
 {
-    LOCALE_enUS = 0,
+    LOCALE_enUS = 0,                                        // also enGB
     LOCALE_koKR = 1,
     LOCALE_frFR = 2,
     LOCALE_deDE = 3,
@@ -186,9 +186,19 @@ enum LocaleConstant
 
 #define MAX_LOCALE 9
 
+LocaleConstant GetLocaleByName(const std::string& name);
+
 extern char const* localeNames[MAX_LOCALE];
 
-LocaleConstant GetLocaleByName(const std::string& name);
+struct LocaleNameStr
+{
+    char const* name;
+    LocaleConstant locale;
+};
+
+// used for iterate all names including alternative
+extern LocaleNameStr fullLocaleNameList[];
+
 //operator new[] based version of strdup() function! Release memory by using operator delete[] !
 inline char * mangos_strdup(const char * source)
 {

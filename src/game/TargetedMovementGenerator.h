@@ -33,25 +33,23 @@ class MANGOS_DLL_SPEC TargetedMovementGeneratorBase
         FollowerReference i_target;
 };
 
-template<class T>
-class MANGOS_DLL_SPEC TargetedMovementGenerator
-: public MovementGeneratorMedium< T, TargetedMovementGenerator<T> >, public TargetedMovementGeneratorBase
+template<class T, typename D>
+class MANGOS_DLL_SPEC TargetedMovementGeneratorMedium
+: public MovementGeneratorMedium< T, D >, public TargetedMovementGeneratorBase
 {
-    public:
-
-        TargetedMovementGenerator(Unit &target)
+    protected:
+        TargetedMovementGeneratorMedium()
+            : TargetedMovementGeneratorBase(), i_offset(0), i_angle(0), i_recalculateTravel(false) {}
+        TargetedMovementGeneratorMedium(Unit &target)
             : TargetedMovementGeneratorBase(target), i_offset(0), i_angle(0), i_recalculateTravel(false) {}
-        TargetedMovementGenerator(Unit &target, float offset, float angle)
+        TargetedMovementGeneratorMedium(Unit &target, float offset, float angle)
             : TargetedMovementGeneratorBase(target), i_offset(offset), i_angle(angle), i_recalculateTravel(false) {}
-        ~TargetedMovementGenerator() {}
+        ~TargetedMovementGeneratorMedium() {}
 
-        void Initialize(T &);
-        void Finalize(T &);
-        void Reset(T &);
+    public:
         bool Update(T &, const uint32 &);
-        MovementGeneratorType GetMovementGeneratorType() { return TARGETED_MOTION_TYPE; }
 
-        Unit* GetTarget() const;
+        Unit* GetTarget() const { return i_target.getTarget(); }
 
         bool GetDestination(float &x, float &y, float &z) const
         {
@@ -63,8 +61,7 @@ class MANGOS_DLL_SPEC TargetedMovementGenerator
         void unitSpeedChanged() { i_recalculateTravel=true; }
         void UpdateFinalDistance(float fDistance);
 
-    private:
-
+    protected:
         void _setTargetLocation(T &);
 
         float i_offset;
@@ -72,4 +69,54 @@ class MANGOS_DLL_SPEC TargetedMovementGenerator
         DestinationHolder< Traveller<T> > i_destinationHolder;
         bool i_recalculateTravel;
 };
+
+template<class T>
+class MANGOS_DLL_SPEC ChaseMovementGenerator : public TargetedMovementGeneratorMedium<T, ChaseMovementGenerator<T> >
+{
+    public:
+        ChaseMovementGenerator(Unit &target)
+            : TargetedMovementGeneratorMedium<T, ChaseMovementGenerator<T> >(target) {}
+        ChaseMovementGenerator(Unit &target, float offset, float angle)
+            : TargetedMovementGeneratorMedium<T, ChaseMovementGenerator<T> >(target, offset, angle) {}
+        ~ChaseMovementGenerator() {}
+
+        MovementGeneratorType GetMovementGeneratorType() { return CHASE_MOTION_TYPE; }
+
+        void Initialize(T &);
+        void Finalize(T &);
+        void Interrupt(T &);
+        void Reset(T &);
+
+        static void _clearUnitStateMove(T &u) { u.clearUnitState(UNIT_STAT_CHASE_MOVE); }
+        static void _addUnitStateMove(T &u)  { u.addUnitState(UNIT_STAT_CHASE_MOVE); }
+        bool _lostTarget(T &u) const { return u.getVictim() != this->GetTarget(); }
+        void _reachTarget(T &);
+};
+
+template<class T>
+class MANGOS_DLL_SPEC FollowMovementGenerator : public TargetedMovementGeneratorMedium<T, FollowMovementGenerator<T> >
+{
+    public:
+        FollowMovementGenerator(Unit &target)
+            : TargetedMovementGeneratorMedium<T, FollowMovementGenerator<T> >(target){}
+        FollowMovementGenerator(Unit &target, float offset, float angle)
+            : TargetedMovementGeneratorMedium<T, FollowMovementGenerator<T> >(target, offset, angle) {}
+        ~FollowMovementGenerator() {}
+
+        MovementGeneratorType GetMovementGeneratorType() { return FOLLOW_MOTION_TYPE; }
+
+        void Initialize(T &);
+        void Finalize(T &);
+        void Interrupt(T &);
+        void Reset(T &);
+
+        static void _clearUnitStateMove(T &u) { u.clearUnitState(UNIT_STAT_FOLLOW_MOVE); }
+        static void _addUnitStateMove(T &u)  { u.addUnitState(UNIT_STAT_FOLLOW_MOVE); }
+        bool _lostTarget(T &) const { return false; }
+        void _reachTarget(T &) {}
+    private:
+        void _updateWalkMode(T &u);
+        void _updateSpeed(T &u);
+};
+
 #endif

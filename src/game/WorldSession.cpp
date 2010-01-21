@@ -567,9 +567,10 @@ void WorldSession::SendAuthWaitQue(uint32 position)
     }
     else
     {
-        WorldPacket packet( SMSG_AUTH_RESPONSE, 5 );
-        packet << uint8( AUTH_WAIT_QUEUE );
-        packet << uint32 (position);
+        WorldPacket packet( SMSG_AUTH_RESPONSE, 1+4+1 );
+        packet << uint8(AUTH_WAIT_QUEUE);
+        packet << uint32(position);
+        packet << uint8(0);                                 // unk 3.3.0
         SendPacket(&packet);
     }
 }
@@ -626,8 +627,9 @@ void WorldSession::SetAccountData(AccountDataType type, time_t time_, std::strin
 
         CharacterDatabase.BeginTransaction ();
         CharacterDatabase.PExecute("DELETE FROM account_data WHERE account='%u' AND type='%u'", acc, type);
-        CharacterDatabase.escape_string(data);
-        CharacterDatabase.PExecute("INSERT INTO account_data VALUES ('%u','%u','%u','%s')", acc, type, (uint32)time_, data.c_str());
+        std::string safe_data = data;
+        CharacterDatabase.escape_string(safe_data);
+        CharacterDatabase.PExecute("INSERT INTO account_data VALUES ('%u','%u','%u','%s')", acc, type, (uint32)time_, safe_data.c_str());
         CharacterDatabase.CommitTransaction ();
     }
     else
@@ -638,8 +640,9 @@ void WorldSession::SetAccountData(AccountDataType type, time_t time_, std::strin
 
         CharacterDatabase.BeginTransaction ();
         CharacterDatabase.PExecute("DELETE FROM character_account_data WHERE guid='%u' AND type='%u'", m_GUIDLow, type);
-        CharacterDatabase.escape_string(data);
-        CharacterDatabase.PExecute("INSERT INTO character_account_data VALUES ('%u','%u','%u','%s')", m_GUIDLow, type, (uint32)time_, data.c_str());
+        std::string safe_data = data;
+        CharacterDatabase.escape_string(safe_data);
+        CharacterDatabase.PExecute("INSERT INTO character_account_data VALUES ('%u','%u','%u','%s')", m_GUIDLow, type, (uint32)time_, safe_data.c_str());
         CharacterDatabase.CommitTransaction ();
     }
 
@@ -741,7 +744,7 @@ void WorldSession::ReadMovementInfo(WorldPacket &data, MovementInfo *mi)
         data >> mi->t_seat;
     }
 
-    if((mi->HasMovementFlag(MovementFlags(MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_FLYING2))) || (mi->unk1 & 0x20))
+    if((mi->HasMovementFlag(MovementFlags(MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_FLYING))) || (mi->unk1 & 0x20))
     {
         data >> mi->s_pitch;
     }
@@ -786,7 +789,7 @@ void WorldSession::WriteMovementInfo(WorldPacket *data, MovementInfo *mi)
         *data << mi->t_seat;
     }
 
-    if((mi->HasMovementFlag(MovementFlags(MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_FLYING2))) || (mi->unk1 & 0x20))
+    if((mi->HasMovementFlag(MovementFlags(MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_FLYING))) || (mi->unk1 & 0x20))
     {
         *data << mi->s_pitch;
     }
@@ -923,6 +926,7 @@ void WorldSession::SendAddonsInfo()
         uint32
         string (16 bytes)
         string (16 bytes)
+        uint32
         uint32
     }*/
 

@@ -54,6 +54,7 @@ void WorldSession::HandleGroupInviteOpcode( WorldPacket & recv_data )
 {
     std::string membername;
     recv_data >> membername;
+    recv_data.read_skip<uint32>();                          // 0 for all known invite ways
 
     // attempt add selected player
 
@@ -157,8 +158,10 @@ void WorldSession::HandleGroupInviteOpcode( WorldPacket & recv_data )
     SendPartyResult(PARTY_OP_INVITE, membername, PARTY_RESULT_OK);
 }
 
-void WorldSession::HandleGroupAcceptOpcode( WorldPacket & /*recv_data*/ )
+void WorldSession::HandleGroupAcceptOpcode( WorldPacket & recv_data )
 {
+    recv_data.read_skip<uint32>();                          // value received in WorldSession::HandleGroupInviteOpcode and also skipeed currently?
+
     Group *group = GetPlayer()->GetGroupInvite();
     if (!group) return;
 
@@ -407,11 +410,11 @@ void WorldSession::HandleMinimapPingOpcode(WorldPacket& recv_data)
     /** error handling **/
     /********************/
 
-    // everything's fine, do it
+    // everything is fine, do it
     WorldPacket data(MSG_MINIMAP_PING, (8+4+4));
-    data << GetPlayer()->GetGUID();
-    data << x;
-    data << y;
+    data << uint64(GetPlayer()->GetGUID());
+    data << float(x);
+    data << float(y);
     GetPlayer()->GetGroup()->BroadcastPacket(&data, true, -1, GetPlayer()->GetGUID());
 }
 
@@ -432,10 +435,10 @@ void WorldSession::HandleRandomRollOpcode(WorldPacket& recv_data)
     //sLog.outDebug("ROLL: MIN: %u, MAX: %u, ROLL: %u", minimum, maximum, roll);
 
     WorldPacket data(MSG_RANDOM_ROLL, 4+4+4+8);
-    data << minimum;
-    data << maximum;
-    data << roll;
-    data << GetPlayer()->GetGUID();
+    data << uint32(minimum);
+    data << uint32(maximum);
+    data << uint32(roll);
+    data << uint64(GetPlayer()->GetGUID());
     if(GetPlayer()->GetGroup())
         GetPlayer()->GetGroup()->BroadcastPacket(&data, false);
     else
@@ -461,7 +464,7 @@ void WorldSession::HandleRaidTargetUpdateOpcode( WorldPacket & recv_data )
     }
     else                                                    // target icon update
     {
-        if(!group->IsLeader(GetPlayer()->GetGUID()) && !group->IsAssistant(GetPlayer()->GetGUID()))
+        if(group->isRaidGroup() && !group->IsLeader(GetPlayer()->GetGUID()) && !group->IsAssistant(GetPlayer()->GetGUID()))
             return;
 
         uint64 guid;

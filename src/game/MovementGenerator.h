@@ -33,9 +33,14 @@ class MANGOS_DLL_SPEC MovementGenerator
     public:
         virtual ~MovementGenerator();
 
+        // called before adding movement generator to motion stack
         virtual void Initialize(Unit &) = 0;
+        // called aftre remove movement generator from motion stack
         virtual void Finalize(Unit &) = 0;
 
+        // called before lost top position (before push new movement generator above)
+        virtual void Interrupt(Unit &) = 0;
+        // called after return movement generator to top position (after remove above movement generator)
         virtual void Reset(Unit &) = 0;
 
         virtual bool Update(Unit &, const uint32 &time_diff) = 0;
@@ -63,6 +68,11 @@ class MANGOS_DLL_SPEC MovementGeneratorMedium : public MovementGenerator
             //u->AssertIsType<T>();
             (static_cast<D*>(this))->Finalize(*((T*)&u));
         }
+        void Interrupt(Unit &u)
+        {
+            //u->AssertIsType<T>();
+            (static_cast<D*>(this))->Interrupt(*((T*)&u));
+        }
         void Reset(Unit &u)
         {
             //u->AssertIsType<T>();
@@ -77,6 +87,7 @@ class MANGOS_DLL_SPEC MovementGeneratorMedium : public MovementGenerator
         // will not link if not overridden in the generators
         void Initialize(T &u);
         void Finalize(T &u);
+        void Interrupt(T &u);
         void Reset(T &u);
         bool Update(T &u, const uint32 &time_diff);
 };

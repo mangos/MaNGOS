@@ -39,6 +39,17 @@ DistractMovementGenerator::Finalize(Unit& owner)
     owner.clearUnitState(UNIT_STAT_DISTRACTED);
 }
 
+void
+DistractMovementGenerator::Reset(Unit& owner)
+{
+    Initialize(owner);
+}
+
+void
+DistractMovementGenerator::Interrupt(Unit& owner)
+{
+}
+
 bool
 DistractMovementGenerator::Update(Unit& /*owner*/, const uint32& time_diff)
 {

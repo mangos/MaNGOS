@@ -1332,6 +1332,8 @@ void Spell::SetTargetMap(uint32 effIndex, uint32 targetMode, UnitList& targetUni
                     unMaxTargets = 1;
                     break;
                 case 28542:                                 // Life Drain
+                case 66013:                                 // Penetrating Cold (10 man)
+                case 68509:                                 // Penetrating Cold (10 man heroic)
                     unMaxTargets = 2;
                     break;
                 case 28796:                                 // Poison Bolt Volley
@@ -1342,15 +1344,32 @@ void Spell::SetTargetMap(uint32 effIndex, uint32 targetMode, UnitList& targetUni
                 case 30843:                                 // Enfeeble TODO: exclude top threat target from target selection
                 case 42005:                                 // Bloodboil TODO: need to be 5 targets(players) furthest away from caster
                 case 55665:                                 // Life Drain (h)
+                case 67700:                                 // Penetrating Cold (25 man)
+                case 68510:                                 // Penetrating Cold (25 man, heroic)
                     unMaxTargets = 5;
                     break;
                 case 54098:                                 // Poison Bolt Volley (h)
                 case 54835:                                 // Curse of the Plaguebringer (h)
                     unMaxTargets = 10;
                     break;
+                case 25991:                                 // Poison Bolt Volley (Pincess Huhuran)
+                    unMaxTargets = 15;
+                    break;
             }
             break;
         }
+        case SPELLFAMILY_PALADIN:
+            if (m_spellInfo->Id == 20424)                   // Seal of Command (2 more target for single targeted spell)
+            {
+                // overwrite EffectChainTarget for non single target spell
+                if (Spell* currSpell = m_caster->GetCurrentSpell(CURRENT_GENERIC_SPELL))
+                    if (currSpell->m_spellInfo->MaxAffectedTargets > 0 ||
+                        currSpell->m_spellInfo->EffectChainTarget[0] > 0 ||
+                        currSpell->m_spellInfo->EffectChainTarget[1] > 0 ||
+                        currSpell->m_spellInfo->EffectChainTarget[2] > 0)
+                        EffectChainTarget = 0;              // no chain targets
+            }
+            break;
         case SPELLFAMILY_DRUID:
         {
             if (m_spellInfo->SpellFamilyFlags2 & 0x00000100)// Starfall
@@ -2910,7 +2929,7 @@ void Spell::update(uint32 difftime)
                         cancel();
 
                     // check for incapacitating player states
-                    if( m_caster->hasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_CONFUSED))
+                    if( m_caster->hasUnitState(UNIT_STAT_CAN_NOT_REACT))
                         cancel();
 
                     // check if player has turned if flag is set

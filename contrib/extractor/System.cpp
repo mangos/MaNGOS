@@ -166,6 +166,43 @@ void HandleArgs(int argc, char * arg[])
     }
 }
 
+uint32 ReadBuild(int locale)
+{
+    // include build info file also
+    std::string filename  = std::string("component.wow-")+langs[locale]+".txt";
+    //printf("Read %s file... ", filename.c_str());
+
+    MPQFile m(filename.c_str());
+    if(m.isEof())
+    {
+        printf("Fatal error: Not found %s file!\n", filename.c_str());
+        exit(1);
+    }
+
+    std::string text = m.getPointer();
+    m.close();
+
+    size_t pos = text.find("version=\"");
+    size_t pos1 = pos + strlen("version=\"");
+    size_t pos2 = text.find("\"",pos1);
+    if (pos == text.npos || pos2 == text.npos || pos1 >= pos2)
+    {
+        printf("Fatal error: Invalid  %s file format!\n", filename.c_str());
+        exit(1);
+    }
+
+    std::string build_str = text.substr(pos1,pos2-pos1);
+
+    int build = atoi(build_str.c_str());
+    if (build <= 0)
+    {
+        printf("Fatal error: Invalid  %s file format!\n", filename.c_str());
+        exit(1);
+    }
+
+    return build;
+}
+
 uint32 ReadMapDBC()
 {
     printf("Read Map.dbc file... ");
@@ -878,11 +915,27 @@ void ExtractMapsFromMpq()
     delete [] map_ids;
 }
 
+bool ExtractFile( char const* mpq_name, std::string const& filename ) 
+{
+    FILE *output = fopen(filename.c_str(), "wb");
+    if(!output)
+    {
+        printf("Can't create the output file '%s'\n", filename.c_str());
+        return false;
+    }
+    MPQFile m(mpq_name);
+    if(!m.isEof())
+        fwrite(m.getPointer(), 1, m.getSize(), output);
+
+    fclose(output);
+    return true;
+}
+
 void ExtractDBCFiles(int locale, bool basicLocale)
 {
     printf("Extracting dbc files...\n");
 
-    set<string> dbcfiles;
+    std::set<std::string> dbcfiles;
 
     // get DBC file list
     for(ArchiveSet::iterator i = gOpenArchives.begin(); i != gOpenArchives.end();++i)
@@ -894,7 +947,7 @@ void ExtractDBCFiles(int locale, bool basicLocale)
                     dbcfiles.insert(*iter);
     }
 
-    string path = output_path;
+    std::string path = output_path;
     path += "/dbc/";
     CreateDir(path);
     if(!basicLocale)
@@ -904,6 +957,14 @@ void ExtractDBCFiles(int locale, bool basicLocale)
         CreateDir(path);
     }
 
+    // extract Build info file
+    {
+        string mpq_name = std::string("component.wow-") + langs[locale] + ".txt";
+        string filename = path + mpq_name;
+
+        ExtractFile(mpq_name.c_str(), filename);
+    }
+
     // extract DBCs
     int count = 0;
     for (set<string>::iterator iter = dbcfiles.begin(); iter != dbcfiles.end(); ++iter)
@@ -911,18 +972,8 @@ void ExtractDBCFiles(int locale, bool basicLocale)
         string filename = path;
         filename += (iter->c_str() + strlen("DBFilesClient\\"));
 
-        FILE *output = fopen(filename.c_str(), "wb");
-        if(!output)
-        {
-            printf("Can't create the output file '%s'\n", filename.c_str());
-            continue;
-        }
-        MPQFile m(iter->c_str());
-        if(!m.isEof())
-            fwrite(m.getPointer(), 1, m.getSize(), output);
-
-        fclose(output);
-        ++count;
+        if(ExtractFile(iter->c_str(), filename))
+            ++count;
     }
     printf("Extracted %u DBC files\n\n", count);
 }
@@ -972,6 +1023,7 @@ int main(int argc, char * arg[])
     HandleArgs(argc, arg);
 
     int FirstLocale = -1;
+    uint32 build = 0;
 
     for (int i = 0; i < LANG_COUNT; i++)
     {
@@ -987,14 +1039,18 @@ int main(int argc, char * arg[])
             if((CONF_extract & EXTRACT_DBC) == 0)
             {
                 FirstLocale = i;
+                build = ReadBuild(FirstLocale);
+                printf("Detected client build: %u\n", build);
                 break;
             }
 
             //Extract DBC files
             if(FirstLocale < 0)
             {
-                ExtractDBCFiles(i, true);
                 FirstLocale = i;
+                build = ReadBuild(FirstLocale);
+                printf("Detected client build: %u\n", build);
+                ExtractDBCFiles(i, true);
             }
             else
                 ExtractDBCFiles(i, false);

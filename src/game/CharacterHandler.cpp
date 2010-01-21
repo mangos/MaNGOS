@@ -39,6 +39,14 @@
 #include "ArenaTeam.h"
 #include "Language.h"
 
+// config option SkipCinematics supported values
+enum CinematicsSkipMode
+{
+    CINEMATICS_SKIP_NONE      = 0,
+    CINEMATICS_SKIP_SAME_RACE = 1,
+    CINEMATICS_SKIP_ALL       = 2,
+};
+
 class LoginQueryHolder : public SqlQueryHolder
 {
     private:
@@ -321,17 +329,17 @@ void WorldSession::HandleCharCreateOpcode( WorldPacket & recv_data )
     }
 
     bool AllowTwoSideAccounts = sWorld.getConfig(CONFIG_ALLOW_TWO_SIDE_ACCOUNTS) || GetSecurity() > SEC_PLAYER;
-    uint32 skipCinematics = sWorld.getConfig(CONFIG_SKIP_CINEMATICS);
+    CinematicsSkipMode skipCinematics = CinematicsSkipMode(sWorld.getConfig(CONFIG_SKIP_CINEMATICS));
 
     bool have_same_race = false;
 
     // if 0 then allowed creating without any characters
     bool have_req_level_for_heroic = (req_level_for_heroic==0);
 
-    if(!AllowTwoSideAccounts || skipCinematics == 1 || class_ == CLASS_DEATH_KNIGHT)
+    if(!AllowTwoSideAccounts || skipCinematics == CINEMATICS_SKIP_SAME_RACE || class_ == CLASS_DEATH_KNIGHT)
     {
         QueryResult *result2 = CharacterDatabase.PQuery("SELECT level,race,class FROM characters WHERE account = '%u' %s",
-            GetAccountId(), (skipCinematics == 1 || class_ == CLASS_DEATH_KNIGHT) ? "" : "LIMIT 1");
+            GetAccountId(), (skipCinematics == CINEMATICS_SKIP_SAME_RACE || class_ == CLASS_DEATH_KNIGHT) ? "" : "LIMIT 1");
         if(result2)
         {
             uint32 team_= Player::TeamForRace(race_);
@@ -351,6 +359,7 @@ void WorldSession::HandleCharCreateOpcode( WorldPacket & recv_data )
                     {
                         data << (uint8)CHAR_CREATE_UNIQUE_CLASS_LIMIT;
                         SendPacket( &data );
+                        delete result2;
                         return;
                     }
                 }
@@ -382,7 +391,7 @@ void WorldSession::HandleCharCreateOpcode( WorldPacket & recv_data )
 
             // search same race for cinematic or same class if need
             // TODO: check if cinematic already shown? (already logged in?; cinematic field)
-            while ((skipCinematics == 1 && !have_same_race) || class_ == CLASS_DEATH_KNIGHT)
+            while ((skipCinematics == CINEMATICS_SKIP_SAME_RACE && !have_same_race) || class_ == CLASS_DEATH_KNIGHT)
             {
                 if(!result2->NextRow())
                     break;
@@ -405,6 +414,7 @@ void WorldSession::HandleCharCreateOpcode( WorldPacket & recv_data )
                         {
                             data << (uint8)CHAR_CREATE_UNIQUE_CLASS_LIMIT;
                             SendPacket( &data );
+                            delete result2;
                             return;
                         }
                     }
@@ -445,7 +455,7 @@ void WorldSession::HandleCharCreateOpcode( WorldPacket & recv_data )
         return;
     }
 
-    if ((have_same_race && skipCinematics == 1) || skipCinematics == 2)
+    if ((have_same_race && skipCinematics == CINEMATICS_SKIP_SAME_RACE) || skipCinematics == CINEMATICS_SKIP_ALL)
         pNewChar->setCinematic(1);                          // not show intro
 
     // Player created, save it now
@@ -643,22 +653,21 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
         if(guild)
         {
             data.Initialize(SMSG_GUILD_EVENT, (2+guild->GetMOTD().size()+1));
-            data << (uint8)GE_MOTD;
-            data << (uint8)1;
+            data << uint8(GE_MOTD);
+            data << uint8(1);
             data << guild->GetMOTD();
             SendPacket(&data);
             DEBUG_LOG( "WORLD: Sent guild-motd (SMSG_GUILD_EVENT)" );
 
+            guild->DisplayGuildBankTabsInfo(this);
+
             data.Initialize(SMSG_GUILD_EVENT, (5+10));      // we guess size
-            data<<(uint8)GE_SIGNED_ON;
-            data<<(uint8)1;
-            data<<pCurrChar->GetName();
-            data<<pCurrChar->GetGUID();
+            data << uint8(GE_SIGNED_ON);
+            data << uint8(1);
+            data << pCurrChar->GetName();
+            data << pCurrChar->GetGUID();
             guild->BroadcastPacket(&data);
             DEBUG_LOG( "WORLD: Sent guild-signed-on (SMSG_GUILD_EVENT)" );
-
-            // Increment online members of the guild
-            guild->IncOnlineMemberCount();
         }
         else
         {
@@ -672,9 +681,6 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
     data << uint32(0);
     data << uint32(0);
     SendPacket(&data);
-
-    if(!pCurrChar->isAlive())
-        pCurrChar->SendCorpseReclaimDelay(true);
 
     pCurrChar->SendInitialPacketsBeforeAddToMap();
 
@@ -728,8 +734,8 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
     {
         // not blizz like, we must correctly save and load player instead...
         if(pCurrChar->getRace() == RACE_NIGHTELF)
-            pCurrChar->CastSpell(pCurrChar, 20584, true, 0);// auras SPELL_AURA_INCREASE_SPEED(+speed in wisp form), SPELL_AURA_INCREASE_SWIM_SPEED(+swim speed in wisp form), SPELL_AURA_TRANSFORM (to wisp form)
-        pCurrChar->CastSpell(pCurrChar, 8326, true, 0);     // auras SPELL_AURA_GHOST, SPELL_AURA_INCREASE_SPEED(why?), SPELL_AURA_INCREASE_SWIM_SPEED(why?)
+            pCurrChar->CastSpell(pCurrChar, 20584, true);   // auras SPELL_AURA_INCREASE_SPEED(+speed in wisp form), SPELL_AURA_INCREASE_SWIM_SPEED(+swim speed in wisp form), SPELL_AURA_TRANSFORM (to wisp form)
+        pCurrChar->CastSpell(pCurrChar, 8326, true);        // auras SPELL_AURA_GHOST, SPELL_AURA_INCREASE_SPEED(why?), SPELL_AURA_INCREASE_SWIM_SPEED(why?)
 
         pCurrChar->SetMovement(MOVE_WATER_WALK);
     }
@@ -745,7 +751,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
 
     // Set FFA PvP for non GM in non-rest mode
     if(sWorld.IsFFAPvPRealm() && !pCurrChar->isGameMaster() && !pCurrChar->HasFlag(PLAYER_FLAGS,PLAYER_FLAGS_RESTING) )
-        pCurrChar->SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
+        pCurrChar->SetFFAPvP(true);
 
     if(pCurrChar->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_CONTESTED_PVP))
         pCurrChar->SetContestedPvP();

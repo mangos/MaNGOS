@@ -57,6 +57,16 @@
         </li>
         <li>
           <a href="#examples">Examples of Use</a>
+          <ul class="toc">
+            <li>
+              <a href=#introsample>Introductionary Sample </a>
+            </li>
+            <li>
+              <a href=#validfile>Checking if a file contains valid UTF-8 text</a>
+            </li>
+            <li>
+              <a href=#fixinvalid>Ensure that a string contains valid UTF-8 text</a>
+            </li>
         </li>
         <li>
           <a href="#reference">Reference</a>
@@ -91,14 +101,14 @@
     </h2>
     <p>
       Many C++ developers miss an easy and portable way of handling Unicode encoded
-      strings. C++ Standard is currently Unicode agnostic, and while some work is being
-      done to introduce Unicode to the next incarnation called C++0x, for the moment
-      nothing of the sort is available. In the meantime, developers use 3rd party
-      libraries like ICU, OS specific capabilities, or simply roll out their own
-      solutions.
+      strings. The original C++ Standard (known as C++98 or C++03) is Unicode agnostic,
+      and while some work is being done to introduce Unicode to the next incarnation
+      called C++0x, for the moment nothing of the sort is available. In the meantime,
+      developers use third party libraries like ICU, OS specific capabilities, or simply
+      roll out their own solutions.
     </p>
     <p>
-      In order to easily handle UTF-8 encoded Unicode strings, I have come up with a small
+      In order to easily handle UTF-8 encoded Unicode strings, I came up with a small
       generic library. For anybody used to work with STL algorithms and iterators, it should be
       easy and natural to use. The code is freely available for any purpose - check out
       the license at the beginning of the utf8.h file. If you run into
@@ -115,11 +125,13 @@
     <h2 id="examples">
       Examples of use
     </h2>
+    <h3 id="introsample">
+      Introductionary Sample
+    </h3>
     <p>
-      To illustrate the use of this utf8 library, we shall open a file containing UTF-8
-      encoded text, check whether it starts with a byte order mark, read each line into a
-      <code>std::string</code>, check it for validity, convert the text to UTF-16, and
-      back to UTF-8:
+      To illustrate the use of the library, let's start with a small but complete program 
+      that opens a file containing UTF-8 encoded text, reads it line by line, checks each line
+      for invalid UTF-8 byte sequences, and converts it to UTF-16 encoding and back to UTF-8:
     </p>
 <pre>
 <span class="preprocessor">#include &lt;fstream&gt;</span>
@@ -128,33 +140,26 @@
 <span class="preprocessor">#include &lt;vector&gt;</span>
 <span class="preprocessor">#include "utf8.h"</span>
 <span class="keyword">using namespace</span> std;
-<span class="keyword">int</span> main()
+<span class="keyword">int</span> main(<span class="keyword">int</span> argc, <span class="keyword">char</span>** argv)
 {
     <span class="keyword">if</span> (argc != <span class="literal">2</span>) {
         cout &lt;&lt; <span class="literal">"\nUsage: docsample filename\n"</span>;
         <span class="keyword">return</span> <span class="literal">0</span>;
     }
+
     <span class="keyword">const char</span>* test_file_path = argv[1];
-    <span class="comment">// Open the test file (must be UTF-8 encoded)</span>
+    <span class="comment">// Open the test file (contains UTF-8 encoded text)</span>
     ifstream fs8(test_file_path);
     <span class="keyword">if</span> (!fs8.is_open()) {
     cout &lt;&lt; <span class=
 "literal">"Could not open "</span> &lt;&lt; test_file_path &lt;&lt; endl;
     <span class="keyword">return</span> <span class="literal">0</span>;
     }
-    <span class="comment">// Read the first line of the file</span>
+
     <span class="keyword">unsigned</span> line_count = <span class="literal">1</span>;
     string line;
-    <span class="keyword">if</span> (!getline(fs8, line)) 
-        <span class="keyword">return</span> <span class="literal">0</span>;
-    <span class="comment">// Look for utf-8 byte-order mark at the beginning</span>
-    <span class="keyword">if</span> (line.size() &gt; <span class="literal">2</span>) {
-        <span class="keyword">if</span> (utf8::is_bom(line.c_str()))
-            cout &lt;&lt; <span class=
-"literal">"There is a byte order mark at the beginning of the file\n"</span>;
-    }
     <span class="comment">// Play with all the lines in the file</span>
-    <span class="keyword">do</span> {
+    <span class="keyword">while</span> (getline(fs8, line)) {
        <span class="comment">// check for invalid utf-8 (for a simple yes/no check, there is also utf8::is_valid function)</span>
         string::iterator end_it = utf8::find_invalid(line.begin(), line.end());
         <span class="keyword">if</span> (end_it != line.end()) {
@@ -165,38 +170,88 @@
 "literal">"This part is fine: "</span> &lt;&lt; string(line.begin(), end_it) &lt;&lt; <span
  class="literal">"\n"</span>;
         }
+
         <span class="comment">// Get the line length (at least for the valid part)</span>
         <span class="keyword">int</span> length = utf8::distance(line.begin(), end_it);
         cout &lt;&lt; <span class=
 "literal">"Length of line "</span> &lt;&lt; line_count &lt;&lt; <span class=
 "literal">" is "</span> &lt;&lt; length &lt;&lt;  <span class="literal">"\n"</span>;
+
         <span class="comment">// Convert it to utf-16</span>
         vector&lt;unsigned short&gt; utf16line;
         utf8::utf8to16(line.begin(), end_it, back_inserter(utf16line));
+
         <span class="comment">// And back to utf-8</span>
         string utf8line; 
         utf8::utf16to8(utf16line.begin(), utf16line.end(), back_inserter(utf8line));
+
         <span class="comment">// Confirm that the conversion went OK:</span>
         <span class="keyword">if</span> (utf8line != string(line.begin(), end_it))
             cout &lt;&lt; <span class=
 "literal">"Error in UTF-16 conversion at line: "</span> &lt;&lt; line_count &lt;&lt; <span
  class="literal">"\n"</span>;        
-        getline(fs8, line);
+
         line_count++;
-    } <span class="keyword">while</span> (!fs8.eof());
+    }
     <span class="keyword">return</span> <span class="literal">0</span>;
 }
 </pre>
     <p>
-      In the previous code sample, we have seen the use of the following functions from
-      <code>utf8</code> namespace: first we used <code>is_bom</code> function to detect
-      UTF-8 byte order mark at the beginning of the file; then for each line we performed
+      In the previous code sample, for each line we performed
       a detection of invalid UTF-8 sequences with <code>find_invalid</code>; the number
-      of characters (more precisely - the number of Unicode code points) in each line was
+      of characters (more precisely - the number of Unicode code points, including the end
+      of line and even BOM if there is one) in each line was
       determined with a use of <code>utf8::distance</code>; finally, we have converted
       each line to UTF-16 encoding with <code>utf8to16</code> and back to UTF-8 with
       <code>utf16to8</code>.
     </p>
+    <h3 id="validfile">Checking if a file contains valid UTF-8 text</h3>
+<p>
+Here is a function that checks whether the content of a file is valid UTF-8 encoded text without
+reading the content into the memory:
+</p>
+<pre>    
+<span class="keyword">bool</span> valid_utf8_file(i<span class="keyword">const char</span>* file_name)
+{
+    ifstream ifs(file_name);
+    <span class="keyword">if</span> (!ifs)
+        <span class="keyword">return false</span>; <span class="comment">// even better, throw here</span>
+
+    istreambuf_iterator&lt;<span class="keyword">char</span>&gt; it(ifs.rdbuf());
+    istreambuf_iterator&lt;<span class="keyword">char</span>&gt; eos;
+
+    <span class="keyword">return</span> utf8::is_valid(it, eos);
+}
+</pre>
+<p>
+Because the function <code>utf8::is_valid()</code> works with input iterators, we were able
+to pass an <code>istreambuf_iterator</code> to it and read the content of the file directly 
+without loading it to the memory first.</p>
+<p>
+Note that other functions that take input iterator arguments can be used in a similar way. For
+instance, to read the content of a UTF-8 encoded text file and convert the text to UTF-16, just 
+do something like:
+</p>
+<pre>
+    utf8::utf8to16(it, eos, back_inserter(u16string));
+</pre>
+    <h3 id="fixinvalid">Ensure that a string contains valid UTF-8 text</h3>
+<p>
+If we have some text that "probably" contains UTF-8 encoded text and we want to
+replace any invalid UTF-8 sequence with a replacement character, something like 
+the following function may be used:
+</p>
+<pre>
+<span class="keyword">void</span> fix_utf8_string(std::string&amp; str)
+{
+    std::string temp;
+    utf8::replace_invalid(str.begin(), str.end(), back_inserter(temp));
+    str = temp;
+}
+</pre>
+<p>The function will replace any invalid UTF-8 sequence with a Unicode replacement character. 
+There is an overloaded function that enables the caller to supply their own replacement character.
+</p>
     <h2 id="reference">
       Reference
     </h2>

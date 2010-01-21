@@ -37,8 +37,9 @@ enum RollVote
     PASS              = 0,
     NEED              = 1,
     GREED             = 2,
-    NOT_EMITED_YET    = 3,
-    NOT_VALID         = 4
+    DISENCHANT        = 3,
+    NOT_EMITED_YET    = 4,
+    NOT_VALID         = 5
 };
 
 enum GroupMemberOnlineStatus
@@ -54,10 +55,15 @@ enum GroupMemberOnlineStatus
     MEMBER_STATUS_UNK5      = 0x0080,                       // never seen
 };
 
-enum GroupType
+enum GroupType                                              // group type flags?
 {
-    GROUPTYPE_NORMAL = 0,
-    GROUPTYPE_RAID   = 1
+    GROUPTYPE_NORMAL = 0x00,
+    GROUPTYPE_BG     = 0x01,
+    GROUPTYPE_RAID   = 0x02,
+    GROUPTYPE_BGRAID = GROUPTYPE_BG | GROUPTYPE_RAID,       // mask
+    // 0x04?
+    GROUPTYPE_LFD    = 0x08,
+    // 0x10, leave/change group?, I saw this flag when leaving group and after leaving BG while in group
 };
 
 class BattleGround;
@@ -251,7 +257,7 @@ class MANGOS_DLL_SPEC Group
         void ConvertToRaid();
 
         void SetBattlegroundGroup(BattleGround *bg) { m_bgGroup = bg; }
-        uint32 CanJoinBattleGroundQueue(BattleGroundTypeId bgTypeId, BattleGroundQueueTypeId bgQueueTypeId, uint32 MinPlayerCount, uint32 MaxPlayerCount, bool isRated, uint32 arenaSlot);
+        uint32 CanJoinBattleGroundQueue(BattleGround const* bgOrTemplate, BattleGroundQueueTypeId bgQueueTypeId, uint32 MinPlayerCount, uint32 MaxPlayerCount, bool isRated, uint32 arenaSlot);
 
         void ChangeMembersGroup(const uint64 &guid, const uint8 &group);
         void ChangeMembersGroup(Player *player, const uint8 &group);

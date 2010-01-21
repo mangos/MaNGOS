@@ -41,6 +41,7 @@ class WorldSocket;
 class QueryResult;
 class LoginQueryHolder;
 class CharacterHandler;
+class GMTicket;
 
 enum AccountDataType
 {
@@ -133,6 +134,7 @@ class MANGOS_DLL_SPEC WorldSession
         void SendPartyResult(PartyOperation operation, const std::string& member, PartyResult res);
         void SendAreaTriggerMessage(const char* Text, ...) ATTR_PRINTF(2,3);
         void SendSetPhaseShift(uint32 phaseShift);
+        void SendQueryTimeResponse();
 
         AccountTypes GetSecurity() const { return _security; }
         uint32 GetAccountId() const { return _accountId; }
@@ -183,6 +185,7 @@ class MANGOS_DLL_SPEC WorldSession
         void SendSpiritResurrect();
         void SendBindPoint(Creature* npc);
         void SendGMTicketGetTicket(uint32 status, char const* text);
+        void SendGMResponse(GMTicket *ticket);
 
         void SendAttackStop(Unit const* enemy);
 
@@ -339,6 +342,7 @@ class MANGOS_DLL_SPEC WorldSession
         void HandleGMTicketUpdateTextOpcode(WorldPacket& recvPacket);
 
         void HandleGMSurveySubmit(WorldPacket& recvPacket);
+        void HandleGMResponseResolve(WorldPacket& recv_data);
 
         void HandleTogglePvP(WorldPacket& recvPacket);
 
@@ -561,6 +565,7 @@ class MANGOS_DLL_SPEC WorldSession
         void HandleQuestPushResult(WorldPacket& recvPacket);
 
         bool processChatmessageFurtherAfterSecurityChecks(std::string&, uint32);
+        void SendPlayerNotFoundNotice(std::string name);
         void HandleMessagechatOpcode(WorldPacket& recvPacket);
         void HandleTextEmoteOpcode(WorldPacket& recvPacket);
         void HandleChatIgnoredOpcode(WorldPacket& recvPacket);
@@ -728,6 +733,9 @@ class MANGOS_DLL_SPEC WorldSession
         void HandleEquipmentSetDelete(WorldPacket& recv_data);
         void HandleEquipmentSetUse(WorldPacket& recv_data);
         void HandleWorldStateUITimerUpdate(WorldPacket& recv_data);
+        void HandleReadyForAccountDataTimes(WorldPacket& recv_data);
+        void HandleQueryQuestsCompleted(WorldPacket& recv_data);
+        void HandleQuestPOIQuery(WorldPacket& recv_data);
     private:
         // private trade methods
         void moveItems(Item* myItems[], Item* hisItems[]);

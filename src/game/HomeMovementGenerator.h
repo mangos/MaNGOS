@@ -39,6 +39,7 @@ class MANGOS_DLL_SPEC HomeMovementGenerator<Creature>
 
         void Initialize(Creature &);
         void Finalize(Creature &) {}
+        void Interrupt(Creature &) {}
         void Reset(Creature &);
         bool Update(Creature &, const uint32 &);
         void modifyTravelTime(uint32 travel_time) { i_travel_timer = travel_time; }

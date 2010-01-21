@@ -365,8 +365,9 @@ uint32 Group::RemoveMember(const uint64 &guid, const uint8 &method)
             }
             else
             {
-                data.Initialize(SMSG_GROUP_LIST, 24);
-                data << uint64(0) << uint64(0) << uint64(0);
+                data.Initialize(SMSG_GROUP_LIST, 1+1+1+1+8+4+4+8);
+                data << uint8(0x10) << uint8(0) << uint8(0) << uint8(0);
+                data << uint64(0) << uint32(0) << uint32(0) << uint64(0);
                 player->GetSession()->SendPacket(&data);
             }
 
@@ -448,8 +449,9 @@ void Group::Disband(bool hideDestroy)
         }
         else
         {
-            data.Initialize(SMSG_GROUP_LIST, 24);
-            data << uint64(0) << uint64(0) << uint64(0);
+            data.Initialize(SMSG_GROUP_LIST, 1+1+1+1+8+4+4+8);
+            data << uint8(0x10) << uint8(0) << uint8(0) << uint8(0);
+            data << uint64(0) << uint32(0) << uint32(0) << uint64(0);
             player->GetSession()->SendPacket(&data);
         }
 
@@ -480,7 +482,7 @@ void Group::Disband(bool hideDestroy)
 
 void Group::SendLootStartRoll(uint32 CountDown, const Roll &r)
 {
-    WorldPacket data(SMSG_LOOT_START_ROLL, (8+4+4+4+4+4+4));
+    WorldPacket data(SMSG_LOOT_START_ROLL, (8+4+4+4+4+4+4+1));
     data << uint64(r.itemGUID);                             // guid of rolled item
     data << uint32(r.totalPlayersRolling);                  // maybe the number of players rolling for it???
     data << uint32(r.itemid);                               // the itemEntryId for the item that shall be rolled for
@@ -488,6 +490,7 @@ void Group::SendLootStartRoll(uint32 CountDown, const Roll &r)
     data << uint32(r.itemRandomPropId);                     // item random property ID
     data << uint32(r.itemCount);                            // items in stack
     data << uint32(CountDown);                              // the countdown time to choose "need" or "greed"
+    data << uint8(ALL_ROLL_TYPE_MASK);                      // roll type mask
 
     for (Roll::PlayerVote::const_iterator itr = r.playerVote.begin(); itr != r.playerVote.end(); ++itr)
     {
@@ -751,8 +754,15 @@ void Group::CountRollVote(const uint64& playerGUID, const uint64& Guid, uint32 N
             itr->second = GREED;
         }
         break;
+        case ROLL_DISENCHANT:                               // player choose Disenchant
+        {
+            SendLootRoll(0, playerGUID, 128, ROLL_DISENCHANT, *roll);
+            ++roll->totalGreed;
+            itr->second = DISENCHANT;
+        }
+        break;
     }
-    if (roll->totalPass + roll->totalGreed + roll->totalNeed >= roll->totalPlayersRolling)
+    if (roll->totalPass + roll->totalNeed + roll->totalGreed >= roll->totalPlayersRolling)
     {
         CountTheRoll(rollI, NumberOfPlayers);
     }
@@ -833,42 +843,57 @@ void Group::CountTheRoll(Rolls::iterator rollI, uint32 NumberOfPlayers)
             uint8 maxresul = 0;
             uint64 maxguid = (*roll->playerVote.begin()).first;
             Player *player;
+            RollVote rollvote;
 
             Roll::PlayerVote::iterator itr;
             for (itr = roll->playerVote.begin(); itr != roll->playerVote.end(); ++itr)
             {
-                if (itr->second != GREED)
+                if (itr->second != GREED && itr->second != DISENCHANT)
                     continue;
 
                 uint8 randomN = urand(1, 99);
-                SendLootRoll(0, itr->first, randomN, ROLL_GREED, *roll);
+                SendLootRoll(0, itr->first, randomN, itr->second, *roll);
                 if (maxresul < randomN)
                 {
                     maxguid  = itr->first;
                     maxresul = randomN;
+                    rollvote = itr->second;
                 }
             }
-            SendLootRollWon(0, maxguid, maxresul, ROLL_GREED, *roll);
+            SendLootRollWon(0, maxguid, maxresul, rollvote, *roll);
             player = sObjectMgr.GetPlayer(maxguid);
 
             if(player && player->GetSession())
             {
                 player->GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_ROLL_GREED_ON_LOOT, roll->itemid, maxresul);
 
-                ItemPosCountVec dest;
                 LootItem *item = &(roll->getLoot()->items[roll->itemSlot]);
-                uint8 msg = player->CanStoreNewItem( NULL_BAG, NULL_SLOT, dest, roll->itemid, item->count );
-                if ( msg == EQUIP_ERR_OK )
+
+                if(rollvote == GREED)
+                {
+                    ItemPosCountVec dest;
+                    uint8 msg = player->CanStoreNewItem( NULL_BAG, NULL_SLOT, dest, roll->itemid, item->count );
+                    if ( msg == EQUIP_ERR_OK )
+                    {
+                        item->is_looted = true;
+                        roll->getLoot()->NotifyItemRemoved(roll->itemSlot);
+                        --roll->getLoot()->unlootedCount;
+                        player->StoreNewItem( dest, roll->itemid, true, item->randomPropertyId);
+                    }
+                    else
+                    {
+                        item->is_blocked = false;
+                        player->SendEquipError( msg, NULL, NULL );
+                    }
+                }
+                else if(rollvote == DISENCHANT)
                 {
                     item->is_looted = true;
                     roll->getLoot()->NotifyItemRemoved(roll->itemSlot);
                     --roll->getLoot()->unlootedCount;
-                    player->StoreNewItem( dest, roll->itemid, true, item->randomPropertyId);
-                }
-                else
-                {
-                    item->is_blocked = false;
-                    player->SendEquipError( msg, NULL, NULL );
+
+                    ItemPrototype const *pProto = ObjectMgr::GetItemPrototype(roll->itemid);
+                    player->AutoStoreLoot(pProto->DisenchantID, LootTemplates_Disenchant, true);
                 }
             }
         }
@@ -897,9 +922,9 @@ void Group::SetTargetIcon(uint8 id, uint64 guid)
     m_targetIcons[id] = guid;
 
     WorldPacket data(MSG_RAID_TARGET_UPDATE, (2+8));
-    data << (uint8)0;
-    data << id;
-    data << guid;
+    data << uint8(0);
+    data << uint8(id);
+    data << uint64(guid);
     BroadcastPacket(&data, true);
 }
 
@@ -939,8 +964,8 @@ void Group::SendTargetIconList(WorldSession *session)
         if(m_targetIcons[i] == 0)
             continue;
 
-        data << (uint8)i;
-        data << m_targetIcons[i];
+        data << uint8(i);
+        data << uint64(m_targetIcons[i]);
     }
 
     session->SendPacket(&data);
@@ -957,11 +982,17 @@ void Group::SendUpdate()
             continue;
                                                             // guess size
         WorldPacket data(SMSG_GROUP_LIST, (1+1+1+1+8+4+GetMembersCount()*20));
-        data << (uint8)m_groupType;                         // group type
-        data << (uint8)(isBGGroup() ? 1 : 0);               // 2.0.x, isBattleGroundGroup?
-        data << (uint8)(citr->group);                       // groupid
-        data << (uint8)(citr->assistant?0x01:0);            // 0x2 main assist, 0x4 main tank
+        data << uint8(m_groupType);                         // group type (flags in 3.3)
+        data << uint8(isBGGroup() ? 1 : 0);                 // 2.0.x, isBattleGroundGroup?
+        data << uint8(citr->group);                         // groupid
+        data << uint8(citr->assistant ? 0x01 : 0x00);       // 0x2 main assist, 0x4 main tank
+        if(m_groupType & GROUPTYPE_LFD)
+        {
+            data << uint8(0);
+            data << uint32(0);
+        }
         data << uint64(0x50000000FFFFFFFELL);               // related to voice chat?
+        data << uint32(0);                                  // 3.3, this value increments every time SMSG_GROUP_LIST is sent
         data << uint32(GetMembersCount()-1);
         for(member_citerator citr2 = m_memberSlots.begin(); citr2 != m_memberSlots.end(); ++citr2)
         {
@@ -972,21 +1003,23 @@ void Group::SendUpdate()
             onlineState = onlineState | ((isBGGroup()) ? MEMBER_STATUS_PVP : 0);
 
             data << citr2->name;
-            data << (uint64)citr2->guid;
+            data << uint64(citr2->guid);
                                                             // online-state
-            data << (uint8)(onlineState);
-            data << (uint8)(citr2->group);                  // groupid
-            data << (uint8)(citr2->assistant?0x01:0);       // 0x2 main assist, 0x4 main tank
+            data << uint8(onlineState);
+            data << uint8(citr2->group);                    // groupid
+            data << uint8(citr2->assistant?0x01:0);         // 0x2 main assist, 0x4 main tank
+            data << uint8(0);                               // 3.3, role?
         }
 
         data << uint64(m_leaderGuid);                       // leader guid
         if(GetMembersCount()-1)
         {
-            data << (uint8)m_lootMethod;                    // loot method
-            data << (uint64)m_looterGuid;                   // looter guid
-            data << (uint8)m_lootThreshold;                 // loot threshold
-            data << (uint8)m_dungeonDifficulty;             // Dungeon Difficulty
-            data << (uint8)m_raidDifficulty;                // Raid Difficulty
+            data << uint8(m_lootMethod);                    // loot method
+            data << uint64(m_looterGuid);                   // looter guid
+            data << uint8(m_lootThreshold);                 // loot threshold
+            data << uint8(m_dungeonDifficulty);             // Dungeon Difficulty
+            data << uint8(m_raidDifficulty);                // Raid Difficulty
+            data << uint8(0);                               // 3.3, dynamic difficulty?
         }
         player->GetSession()->SendPacket( &data );
     }
@@ -1231,7 +1264,7 @@ void Group::_removeRolls(const uint64 &guid)
         if(itr2 == roll->playerVote.end())
             continue;
 
-        if (itr2->second == GREED)
+        if (itr2->second == GREED || itr2->second == DISENCHANT)
             --roll->totalGreed;
         if (itr2->second == NEED)
             --roll->totalNeed;
@@ -1429,7 +1462,7 @@ void Group::UpdateLooterGuid( Creature* creature, bool ifneed )
     SendUpdate();
 }
 
-uint32 Group::CanJoinBattleGroundQueue(BattleGroundTypeId bgTypeId, BattleGroundQueueTypeId bgQueueTypeId, uint32 MinPlayerCount, uint32 MaxPlayerCount, bool isRated, uint32 arenaSlot)
+uint32 Group::CanJoinBattleGroundQueue(BattleGround const* bgOrTemplate, BattleGroundQueueTypeId bgQueueTypeId, uint32 MinPlayerCount, uint32 MaxPlayerCount, bool isRated, uint32 arenaSlot)
 {
     // check for min / max count
     uint32 memberscount = GetMembersCount();
@@ -1444,7 +1477,10 @@ uint32 Group::CanJoinBattleGroundQueue(BattleGroundTypeId bgTypeId, BattleGround
     if(!reference)
         return BG_JOIN_ERR_OFFLINE_MEMBER;
 
-    BGQueueIdBasedOnLevel queue_id = reference->GetBattleGroundQueueIdFromLevel();
+    PvPDifficultyEntry const* bracketEntry = GetBattlegroundBracketByLevel(bgOrTemplate->GetMapId(),reference->getLevel());
+    if(!bracketEntry)
+        return BG_JOIN_ERR_OFFLINE_MEMBER;
+
     uint32 arenaTeamId = reference->GetArenaTeamId(arenaSlot);
     uint32 team = reference->GetTeam();
 
@@ -1459,7 +1495,8 @@ uint32 Group::CanJoinBattleGroundQueue(BattleGroundTypeId bgTypeId, BattleGround
         if(member->GetTeam() != team)
             return BG_JOIN_ERR_MIXED_FACTION;
         // not in the same battleground level braket, don't let join
-        if(member->GetBattleGroundQueueIdFromLevel() != queue_id)
+        PvPDifficultyEntry const* memberBracketEntry = GetBattlegroundBracketByLevel(bracketEntry->mapId,member->getLevel());
+        if(memberBracketEntry != bracketEntry)
             return BG_JOIN_ERR_MIXED_LEVELS;
         // don't let join rated matches if the arena team id doesn't match
         if(isRated && member->GetArenaTeamId(arenaSlot) != arenaTeamId)
@@ -1468,7 +1505,7 @@ uint32 Group::CanJoinBattleGroundQueue(BattleGroundTypeId bgTypeId, BattleGround
         if(member->InBattleGroundQueueForBattleGroundQueueType(bgQueueTypeId))
             return BG_JOIN_ERR_GROUP_MEMBER_ALREADY_IN_QUEUE;
         // check for deserter debuff in case not arena queue
-        if(bgTypeId != BATTLEGROUND_AA && !member->CanJoinToBattleground())
+        if(bgOrTemplate->GetTypeID() != BATTLEGROUND_AA && !member->CanJoinToBattleground())
             return BG_JOIN_ERR_GROUP_DESERTER;
         // check if member can join any more battleground queues
         if(!member->HasFreeBattleGroundQueueId())

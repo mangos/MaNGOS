@@ -472,8 +472,8 @@ bool ChatHandler::HandleGameObjectTargetCommand(const char* args)
         z =       fields[4].GetFloat();
         o =       fields[5].GetFloat();
         mapid =   fields[6].GetUInt16();
-        pool_id = sPoolMgr.IsPartOfAPool(lowguid, TYPEID_GAMEOBJECT);
-        if (!pool_id || (pool_id && sPoolMgr.IsSpawnedObject(pool_id, lowguid, TYPEID_GAMEOBJECT)))
+        pool_id = sPoolMgr.IsPartOfAPool<GameObject>(lowguid);
+        if (!pool_id || (pool_id && sPoolMgr.IsSpawnedObject<GameObject>(pool_id, lowguid)))
             found = true;
     } while( result->NextRow() && (!found) );
 
@@ -1275,7 +1275,7 @@ bool ChatHandler::HandleNpcChangeLevelCommand(const char* args)
     {
         if(((Pet*)pCreature)->getPetType()==HUNTER_PET)
         {
-            pCreature->SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, sObjectMgr.GetXPForLevel(lvl)/4);
+            pCreature->SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, sObjectMgr.GetXPForPetLevel(lvl));
             pCreature->SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
         }
         ((Pet*)pCreature)->GivePetLevel(lvl);
@@ -1745,15 +1745,15 @@ bool ChatHandler::HandleNpcUnFollowCommand(const char* /*args*/)
     }
 
     if (creature->GetMotionMaster()->empty() ||
-        creature->GetMotionMaster()->GetCurrentMovementGeneratorType ()!=TARGETED_MOTION_TYPE)
+        creature->GetMotionMaster()->GetCurrentMovementGeneratorType ()!=FOLLOW_MOTION_TYPE)
     {
         PSendSysMessage(LANG_CREATURE_NOT_FOLLOW_YOU);
         SetSentErrorMessage(true);
         return false;
     }
 
-    TargetedMovementGenerator<Creature> const* mgen
-        = static_cast<TargetedMovementGenerator<Creature> const*>((creature->GetMotionMaster()->top()));
+    FollowMovementGenerator<Creature> const* mgen
+        = static_cast<FollowMovementGenerator<Creature> const*>((creature->GetMotionMaster()->top()));
 
     if(mgen->GetTarget()!=player)
     {
@@ -2261,6 +2261,54 @@ bool ChatHandler::HandleTicketCommand(const char* args)
         return true;
     }
 
+    // ticket respond
+    if(strncmp(px,"respond",8) == 0)
+    {
+        char *name = strtok(NULL, " ");
+
+        if(!name)
+        {
+            SendSysMessage(LANG_CMD_SYNTAX);
+            SetSentErrorMessage(true);
+            return false;
+        }
+
+        std::string plName = name;
+        uint64 guid = sObjectMgr.GetPlayerGUIDByName(plName);
+
+        if(!guid)
+        {
+            SendSysMessage(LANG_PLAYER_NOT_FOUND);
+            SetSentErrorMessage(true);
+            return false;
+        }
+
+        GMTicket* ticket = sTicketMgr.GetGMTicket(GUID_LOPART(guid));
+
+        if(!ticket)
+        {
+            PSendSysMessage(LANG_COMMAND_TICKETNOTEXIST, GUID_LOPART(guid));
+            SetSentErrorMessage(true);
+            return false;
+        }
+
+        char* response = strtok(NULL, "");
+
+        if(!response)
+        {
+            SendSysMessage(LANG_CMD_SYNTAX);
+            SetSentErrorMessage(true);
+            return false;
+        }
+
+        ticket->SetResponseText(response);
+
+        if(Player* pl = sObjectMgr.GetPlayer(guid))
+            pl->GetSession()->SendGMResponse(ticket);
+
+        return true;
+    }
+
     // ticket #num
     int num = atoi(px);
     if(num > 0)
@@ -2269,7 +2317,7 @@ bool ChatHandler::HandleTicketCommand(const char* args)
 
         if(!result)
         {
-            PSendSysMessage(LANG_COMMAND_TICKENOTEXIST, num);
+            PSendSysMessage(LANG_COMMAND_TICKETNOTEXIST, num);
             SetSentErrorMessage(true);
             return false;
         }
@@ -2324,7 +2372,7 @@ bool ChatHandler::HandleDelTicketCommand(const char *args)
         QueryResult* result = CharacterDatabase.PQuery("SELECT guid FROM character_ticket ORDER BY ticket_id ASC "_OFFSET_,num-1);
         if(!result)
         {
-            PSendSysMessage(LANG_COMMAND_TICKENOTEXIST, num);
+            PSendSysMessage(LANG_COMMAND_TICKETNOTEXIST, num);
             SetSentErrorMessage(true);
             return false;
         }

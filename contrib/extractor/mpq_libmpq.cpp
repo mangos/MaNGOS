@@ -1,5 +1,6 @@
 #include "mpq_libmpq.h"
 #include <deque>
+#include <stdio.h>
 
 ArchiveSet gOpenArchives;
 
@@ -67,9 +68,8 @@ MPQFile::MPQFile(const char* filename):
         mpq_hash hash = (*i)->GetHashEntry(filename);
         uint32 blockindex = hash.blockindex;
 
-        if ((blockindex == 0xFFFFFFFF) || (blockindex == 0)) {
+        if (blockindex == 0xFFFFFFFF)
             continue; //file not found
-        }
 
         uint32 fileno = blockindex;
 

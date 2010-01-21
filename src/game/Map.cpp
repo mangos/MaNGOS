@@ -40,8 +40,6 @@
 #include "InstanceSaveMgr.h"
 #include "VMapFactory.h"
 
-#define DEFAULT_GRID_EXPIRY     300
-#define MAX_GRID_LOAD_TIME      50
 #define MAX_CREATURE_ATTACK_RADIUS  (45.0f * sWorld.getRate(RATE_CREATURE_AGGRO))
 
 GridState* si_GridStates[MAX_GRID_STATE];
@@ -387,7 +385,6 @@ Map::EnsureGridLoadedAtEnter(const Cell &cell, Player *player)
 
         if (player)
         {
-            player->SendDelayResponse(MAX_GRID_LOAD_TIME);
             DEBUG_LOG("Player %s enter cell[%u,%u] triggers of loading grid[%u,%u] on map %u", player->GetName(), cell.CellX(), cell.CellY(), cell.GridX(), cell.GridY(), i_id);
         }
         else
