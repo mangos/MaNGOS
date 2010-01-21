@@ -33,9 +33,6 @@
 #include "Database/DatabaseEnv.h"
 #include "Mail.h"
 #include "Map.h"
-#include "Group.h"
-#include "Guild.h"
-#include "ArenaTeam.h"
 #include "ObjectAccessor.h"
 #include "ObjectDefines.h"
 #include "Policies/Singleton.h"
@@ -412,21 +409,21 @@ class ObjectMgr
         void AddGameobjectInfo(GameObjectInfo *goinfo);
 
         Group * GetGroupByLeaderLowGUID(uint32 lowguid) const;
-        void AddGroup(Group* group) { mGroupMap[GUID_LOPART(group->GetLeaderGUID())] = group ; }
-        void RemoveGroup(Group* group) { mGroupMap.erase(GUID_LOPART(group->GetLeaderGUID())); }
+        void AddGroup(Group* group);
+        void RemoveGroup(Group* group);
 
         Guild* GetGuildByLeader(uint64 const&guid) const;
         Guild* GetGuildById(uint32 GuildId) const;
         Guild* GetGuildByName(const std::string& guildname) const;
         std::string GetGuildNameById(uint32 GuildId) const;
-        void AddGuild(Guild* guild) { mGuildMap[guild->GetId()] = guild ; }
-        void RemoveGuild(uint32 Id) { mGuildMap.erase(Id); }
+        void AddGuild(Guild* guild);
+        void RemoveGuild(uint32 Id);
 
         ArenaTeam* GetArenaTeamById(uint32 arenateamid) const;
         ArenaTeam* GetArenaTeamByName(const std::string& arenateamname) const;
         ArenaTeam* GetArenaTeamByCaptain(uint64 const& guid) const;
-        void AddArenaTeam(ArenaTeam* arenaTeam) { mArenaTeamMap[arenaTeam->GetId()] = arenaTeam; }
-        void RemoveArenaTeam(uint32 Id) { mArenaTeamMap.erase(Id); }
+        void AddArenaTeam(ArenaTeam* arenaTeam);
+        void RemoveArenaTeam(uint32 Id);
         ArenaTeamMap::iterator GetArenaTeamMapBegin() { return mArenaTeamMap.begin(); }
         ArenaTeamMap::iterator GetArenaTeamMapEnd()   { return mArenaTeamMap.end(); }
 
