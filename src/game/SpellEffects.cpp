@@ -322,6 +322,8 @@ void Spell::EffectSchoolDMG(uint32 effect_idx)
                     case 42384:                             // Brutal Swipe
                     case 45150:                             // Meteor Slash
                     case 64422: case 64688:                 // Sonic Screech
+                    case 70492: case 72505:                 // Ooze Eruption
+                    case 72624: case 72625:                 // Ooze Eruption
                     {
                         uint32 count = 0;
                         for(std::list<TargetInfo>::iterator ihit= m_UniqueTargetInfo.begin();ihit != m_UniqueTargetInfo.end();++ihit)
