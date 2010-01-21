@@ -33,6 +33,9 @@
 #include "Database/DatabaseEnv.h"
 #include "Mail.h"
 #include "Map.h"
+#include "Group.h"
+#include "Guild.h"
+#include "ArenaTeam.h"
 #include "ObjectAccessor.h"
 #include "ObjectDefines.h"
 #include "Policies/Singleton.h"
@@ -381,9 +384,9 @@ class ObjectMgr
 
         typedef UNORDERED_MAP<uint32, Item*> ItemMap;
 
-        typedef std::set< Group * > GroupSet;
+        typedef UNORDERED_MAP<uint32, Group*> GroupMap;
 
-        typedef UNORDERED_MAP<uint32, Guild *> GuildMap;
+        typedef UNORDERED_MAP<uint32, Guild*> GuildMap;
 
         typedef UNORDERED_MAP<uint32, ArenaTeam*> ArenaTeamMap;
 
@@ -408,22 +411,22 @@ class ObjectMgr
         void LoadGameobjectInfo();
         void AddGameobjectInfo(GameObjectInfo *goinfo);
 
-        Group * GetGroupByLeader(const uint64 &guid) const;
-        void AddGroup(Group* group) { mGroupSet.insert( group ); }
-        void RemoveGroup(Group* group) { mGroupSet.erase( group ); }
+        Group * GetGroupByLeaderLowGUID(uint32 lowguid) const;
+        void AddGroup(Group* group) { mGroupMap[GUID_LOPART(group->GetLeaderGUID())] = group ; }
+        void RemoveGroup(Group* group) { mGroupMap.erase(GUID_LOPART(group->GetLeaderGUID())); }
 
         Guild* GetGuildByLeader(uint64 const&guid) const;
         Guild* GetGuildById(uint32 GuildId) const;
         Guild* GetGuildByName(const std::string& guildname) const;
         std::string GetGuildNameById(uint32 GuildId) const;
-        void AddGuild(Guild* guild);
-        void RemoveGuild(uint32 Id);
+        void AddGuild(Guild* guild) { mGuildMap[guild->GetId()] = guild ; }
+        void RemoveGuild(uint32 Id) { mGuildMap.erase(Id); }
 
         ArenaTeam* GetArenaTeamById(uint32 arenateamid) const;
         ArenaTeam* GetArenaTeamByName(const std::string& arenateamname) const;
         ArenaTeam* GetArenaTeamByCaptain(uint64 const& guid) const;
-        void AddArenaTeam(ArenaTeam* arenaTeam);
-        void RemoveArenaTeam(uint32 Id);
+        void AddArenaTeam(ArenaTeam* arenaTeam) { mArenaTeamMap[arenaTeam->GetId()] = arenaTeam; }
+        void RemoveArenaTeam(uint32 Id) { mArenaTeamMap.erase(Id); }
         ArenaTeamMap::iterator GetArenaTeamMapBegin() { return mArenaTeamMap.begin(); }
         ArenaTeamMap::iterator GetArenaTeamMapEnd()   { return mArenaTeamMap.end(); }
 
@@ -909,7 +912,7 @@ class ObjectMgr
         typedef std::set<uint32> TavernAreaTriggerSet;
         typedef std::set<uint32> GameObjectForQuestSet;
 
-        GroupSet            mGroupSet;
+        GroupMap            mGroupMap;
         GuildMap            mGuildMap;
         ArenaTeamMap        mArenaTeamMap;
 
