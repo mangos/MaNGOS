@@ -45,13 +45,13 @@ namespace utf8
             }
             else if (cp < 0x10000) {              // three octets
                 *(result++) = static_cast<uint8_t>((cp >> 12)         | 0xe0);
-                *(result++) = static_cast<uint8_t>((cp >> 6) & 0x3f   | 0x80);
+                *(result++) = static_cast<uint8_t>(((cp >> 6) & 0x3f) | 0x80);
                 *(result++) = static_cast<uint8_t>((cp & 0x3f)        | 0x80);
             }
             else {                                // four octets
                 *(result++) = static_cast<uint8_t>((cp >> 18)         | 0xf0);
-                *(result++) = static_cast<uint8_t>((cp >> 12)& 0x3f   | 0x80);
-                *(result++) = static_cast<uint8_t>((cp >> 6) & 0x3f   | 0x80);
+                *(result++) = static_cast<uint8_t>(((cp >> 12) & 0x3f)| 0x80);
+                *(result++) = static_cast<uint8_t>(((cp >> 6) & 0x3f) | 0x80);
                 *(result++) = static_cast<uint8_t>((cp & 0x3f)        | 0x80);
             }
             return result;
@@ -132,7 +132,7 @@ namespace utf8
             while (start != end) {
                 uint32_t cp = internal::mask16(*start++);
             // Take care of surrogate pairs first
-                if (internal::is_surrogate(cp)) {
+                if (internal::is_lead_surrogate(cp)) {
                     uint32_t trail_surrogate = internal::mask16(*start++);
                     cp = (cp << 10) + trail_surrogate + internal::SURROGATE_OFFSET;
                 }
