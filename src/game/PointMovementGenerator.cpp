@@ -94,11 +94,12 @@ void PointMovementGenerator<Creature>::MovementInform(Creature &unit)
     if (unit.AI())
         unit.AI()->MovementInform(POINT_MOTION_TYPE, id);
 
-    if (TemporarySummon* pSummon = dynamic_cast<TemporarySummon*>(&unit))
+    if (unit.isTemporarySummon())
     {
-        if (Unit* pSummoner = pSummon->GetSummoner())
+        TemporarySummon* pSummon = (TemporarySummon*)(&unit);
+        if (IS_CREATURE_GUID(pSummon->GetSummonerGUID()))
         {
-            if (pSummoner->GetTypeId() == TYPEID_UNIT)
+            if (Unit* pSummoner = pSummon->GetSummoner())
             {
                 if (((Creature*)pSummoner)->AI())
                     ((Creature*)pSummoner)->AI()->SummonedMovementInform(&unit, POINT_MOTION_TYPE, id);
