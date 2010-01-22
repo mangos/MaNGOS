@@ -1730,6 +1730,10 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
         case SPELLFAMILY_DEATHKNIGHT:
             if (spellInfo_2->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT)
             {
+                // Lichborne  and Lichborne (triggered)
+                if( spellInfo_1->SpellIconID == 61 && spellInfo_2->SpellIconID == 61 )
+                    return false;
+
                 // Frost Presence and Frost Presence (triggered)
                 if( spellInfo_1->SpellIconID == 2632 && spellInfo_2->SpellIconID == 2632 )
                     return false;
