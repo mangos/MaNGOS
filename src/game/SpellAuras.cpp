@@ -2387,6 +2387,9 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
 
         switch(GetId())
         {
+            case 12479:                                     // Hex of Jammal'an
+                m_target->CastSpell(m_target, 12480, true, NULL, this);
+                return;
             case 28169:                                     // Mutating Injection
             {
                 // Mutagen Explosion
