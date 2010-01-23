@@ -124,9 +124,8 @@ void DynamicObject::Update(uint32 p_time)
         TypeContainerVisitor<MaNGOS::DynamicObjectUpdater, WorldTypeMapContainer > world_object_notifier(notifier);
         TypeContainerVisitor<MaNGOS::DynamicObjectUpdater, GridTypeMapContainer > grid_object_notifier(notifier);
 
-        CellLock<GridReadGuard> cell_lock(cell, p);
-        cell_lock->Visit(cell_lock, world_object_notifier, *GetMap(), *this, m_radius);
-        cell_lock->Visit(cell_lock, grid_object_notifier,  *GetMap(), *this, m_radius);
+        cell.Visit(p, world_object_notifier, *GetMap(), *this, m_radius);
+        cell.Visit(p, grid_object_notifier,  *GetMap(), *this, m_radius);
     }
 
     if(deleteThis)
