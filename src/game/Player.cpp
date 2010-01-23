@@ -14555,8 +14555,16 @@ float Player::GetFloatValueFromDB(uint16 index, uint64 guid)
 
 bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
 {
-    ////                                                     0     1        2     3     4     5      6       7      8   9      10           11            12           13          14          15          16   17           18        19         20         21         22          23           24                 25                 26                 27       28       29       30       31         32           33            34        35    36      37                 38         39                  40
-    //QueryResult *result = CharacterDatabase.PQuery("SELECT guid, account, data, name, race, class, gender, level, xp, money, playerBytes, playerBytes2, playerFlags, position_x, position_y, position_z, map, orientation, taximask, cinematic, totaltime, leveltime, rest_bonus, logout_time, is_logout_resting, resettalents_cost, resettalents_time, trans_x, trans_y, trans_z, trans_o, transguid, extra_flags, stable_slots, at_login, zone, online, death_expire_time, taxi_path, dungeon_difficulty, arena_pending_points FROM characters WHERE guid = '%u'", guid);
+    //       0     1        2     3     4     5      6       7      8   9      10           11            12
+    //SELECT guid, account, data, name, race, class, gender, level, xp, money, playerBytes, playerBytes2, playerFlags,"
+    // 13          14          15          16   17           18        19         20         21         22          23           24                 25
+    //"position_x, position_y, position_z, map, orientation, taximask, cinematic, totaltime, leveltime, rest_bonus, logout_time, is_logout_resting, resettalents_cost,"
+    // 26                 27       28       29       30       31         32           33            34        35    36      37                 38         39
+    //"resettalents_time, trans_x, trans_y, trans_z, trans_o, transguid, extra_flags, stable_slots, at_login, zone, online, death_expire_time, taxi_path, dungeon_difficulty,"
+    // 40           41                42                43                    44          45          46              47           48               49              50
+    //"arenaPoints, totalHonorPoints, todayHonorPoints, yesterdayHonorPoints, totalKills, todayKills, yesterdayKills, chosenTitle, knownCurrencies, watchedFaction, drunk,"
+    // 51      52      53      54      55      56      57      58
+    //"health, power1, power2, power3, power4, power5, power6, power7 FROM characters WHERE guid = '%u'", GUID_LOPART(m_guid));
     QueryResult *result = holder->GetResult(PLAYER_LOGIN_QUERY_LOADFROM);
 
     if(!result)
@@ -14610,11 +14618,19 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
 
     SetUInt32Value(UNIT_FIELD_LEVEL, fields[7].GetUInt8());
     SetUInt32Value(PLAYER_XP, fields[8].GetUInt32());
-    SetUInt32Value(PLAYER_FIELD_COINAGE, fields[9].GetUInt32());
+
+    uint32 money = fields[9].GetUInt32();
+    if(money > MAX_MONEY_AMOUNT)
+        money = MAX_MONEY_AMOUNT;
+    SetMoney(money);
+
     SetUInt32Value(PLAYER_BYTES, fields[10].GetUInt32());
     SetUInt32Value(PLAYER_BYTES_2, fields[11].GetUInt32());
-    SetUInt32Value(PLAYER_BYTES_3, (GetUInt32Value(PLAYER_BYTES_3) & ~1) | fields[6].GetUInt8());
+    SetUInt32Value(PLAYER_BYTES_3, (fields[50].GetUInt16() & 0xFFFE) | fields[6].GetUInt8());
     SetUInt32Value(PLAYER_FLAGS, fields[12].GetUInt32());
+    SetUInt32Value(PLAYER_FIELD_WATCHED_FACTION_INDEX, fields[49].GetUInt32());
+    SetUInt64Value(PLAYER_FIELD_KNOWN_CURRENCIES, fields[48].GetUInt64());
+
 
     InitDisplayIds();
 
@@ -14630,10 +14646,6 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
             m_items[slot] = NULL;
         }
     }
-
-    // update money limits
-    if(GetMoney() > MAX_MONEY_AMOUNT)
-        SetMoney(MAX_MONEY_AMOUNT);
 
     sLog.outDebug("Load Basic value of player %s is: ", m_name.c_str());
     outDebugValues();
@@ -14666,7 +14678,7 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
 
     _LoadArenaTeamInfo(holder->GetResult(PLAYER_LOGIN_QUERY_LOADARENAINFO));
 
-    uint32 arena_currency = GetUInt32Value(PLAYER_FIELD_ARENA_CURRENCY) + fields[40].GetUInt32();
+    uint32 arena_currency = GetUInt32Value(fields[40].GetUInt32());
     if (arena_currency > sWorld.getConfig(CONFIG_MAX_ARENA_POINTS))
         arena_currency = sWorld.getConfig(CONFIG_MAX_ARENA_POINTS);
 
@@ -14687,6 +14699,13 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
         for(int j = 0; j < ARENA_TEAM_END; ++j)
             SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (arena_slot * ARENA_TEAM_END) + j, 0);
     }
+
+    SetUInt32Value(PLAYER_FIELD_HONOR_CURRENCY, fields[41].GetUInt32());
+    SetUInt32Value(PLAYER_FIELD_TODAY_CONTRIBUTION, fields[42].GetUInt32());
+    SetUInt32Value(PLAYER_FIELD_YESTERDAY_CONTRIBUTION, fields[43].GetUInt32());
+    SetUInt32Value(PLAYER_FIELD_LIFETIME_HONORBALE_KILLS, fields[44].GetUInt32());
+    SetUInt16Value(PLAYER_FIELD_KILLS, 0, fields[45].GetUInt16());
+    SetUInt16Value(PLAYER_FIELD_KILLS, 1, fields[46].GetUInt16());
 
     _LoadBoundInstances(holder->GetResult(PLAYER_LOGIN_QUERY_LOADBOUNDINSTANCES));
 
@@ -14917,8 +14936,6 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
 
     std::string taxi_nodes = fields[38].GetCppString();
 
-    delete result;
-
     // clear channel spell data (if saved at channel spell casting)
     SetChannelObjectGUID(0);
     SetUInt32Value(UNIT_CHANNEL_SPELL,0);
@@ -14946,12 +14963,6 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
     // make sure the unit is considered not in duel for proper loading
     SetUInt64Value(PLAYER_DUEL_ARBITER, 0);
     SetUInt32Value(PLAYER_DUEL_TEAM, 0);
-
-    // remember loaded power/health values to restore after stats initialization and modifier applying
-    uint32 savedHealth = GetHealth();
-    uint32 savedPower[MAX_POWERS];
-    for(uint32 i = 0; i < MAX_POWERS; ++i)
-        savedPower[i] = GetPower(Powers(i));
 
     // reset stats before loading any modifiers
     InitStatsForLevel();
@@ -15001,11 +15012,11 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
 
     // check PLAYER_CHOSEN_TITLE compatibility with PLAYER__FIELD_KNOWN_TITLES
     // note: PLAYER__FIELD_KNOWN_TITLES updated at quest status loaded
-    if(uint32 curTitle = GetUInt32Value(PLAYER_CHOSEN_TITLE))
-    {
-        if(!HasTitle(curTitle))
-            SetUInt32Value(PLAYER_CHOSEN_TITLE, 0);
-    }
+    uint32 curTitle = fields[10].GetUInt32();
+    if (curTitle && !HasTitle(curTitle))
+        curTitle = 0;
+
+    SetUInt32Value(PLAYER_CHOSEN_TITLE, curTitle);
 
     // Not finish taxi flight path
     if(m_bgData.HasTaxiPath())
@@ -15069,12 +15080,19 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
     UpdateAllStats();
 
     // restore remembered power/health values (but not more max values)
-    SetHealth(savedHealth > GetMaxHealth() ? GetMaxHealth() : savedHealth);
+    uint32 savedhealth = fields[51].GetUInt32();
+    SetHealth(savedhealth > GetMaxHealth() ? GetMaxHealth() : savedhealth);
     for(uint32 i = 0; i < MAX_POWERS; ++i)
-        SetPower(Powers(i),savedPower[i] > GetMaxPower(Powers(i)) ? GetMaxPower(Powers(i)) : savedPower[i]);
+    {
+        uint32 savedpower = fields[52+i].GetUInt32();
+        SetPower(Powers(i),savedpower > GetMaxPower(Powers(i)) ? GetMaxPower(Powers(i)) : savedpower);
+    }
 
     sLog.outDebug("The value of player %s after load item and aura is: ", m_name.c_str());
     outDebugValues();
+
+    // all fields read
+    delete result;
 
     // GM state
     if(GetSession()->GetSecurity() > SEC_PLAYER)
@@ -16116,7 +16134,9 @@ void Player::SaveToDB()
         "taximask, online, cinematic, "
         "totaltime, leveltime, rest_bonus, logout_time, is_logout_resting, resettalents_cost, resettalents_time, "
         "trans_x, trans_y, trans_z, trans_o, transguid, extra_flags, stable_slots, at_login, zone, "
-        "death_expire_time, taxi_path, arena_pending_points) VALUES ("
+        "death_expire_time, taxi_path, arenaPoints, totalHonorPoints, todayHonorPoints, yesterdayHonorPoints, totalKills, "
+        "todayKills, yesterdayKills, chosenTitle, knownCurrencies, watchedFaction, drunk, health, power1, power2, power3, "
+        "power4, power5, power6, power7) VALUES ("
         << GetGUIDLow() << ", "
         << GetSession()->GetAccountId() << ", '"
         << sql_name << "', "
@@ -16195,7 +16215,34 @@ void Player::SaveToDB()
     ss << (uint64)m_deathExpireTime << ", '";
 
     ss << m_taxi.SaveTaxiDestinationsToString() << "', ";
-    ss << "'0' ";                                           // arena_pending_points
+
+    ss << GetArenaPoints() << ", ";
+
+    ss << GetHonorPoints() << ", ";
+
+    ss << GetUInt32Value(PLAYER_FIELD_TODAY_CONTRIBUTION)  << ", ";
+
+    ss << GetUInt32Value(PLAYER_FIELD_YESTERDAY_CONTRIBUTION) << ", ";
+
+    ss << GetUInt32Value(PLAYER_FIELD_LIFETIME_HONORBALE_KILLS) << ", ";
+
+    ss << GetUInt16Value(PLAYER_FIELD_KILLS, 0) << ", ";
+
+    ss << GetUInt16Value(PLAYER_FIELD_KILLS, 1) << ", ";
+
+    ss << GetUInt32Value(PLAYER_CHOSEN_TITLE) << ", ";
+
+    ss << GetUInt64Value(PLAYER_FIELD_KNOWN_CURRENCIES) << ", ";
+
+    ss << GetUInt32Value(PLAYER_FIELD_WATCHED_FACTION_INDEX) << ", ";
+
+    ss << (uint16)(GetUInt32Value(PLAYER_BYTES_3) & 0xFFFE) << ", ";
+
+    ss << GetHealth();
+
+    for(uint32 i = 0; i < MAX_POWERS; ++i)
+        ss << "," << GetPower(Powers(i));
+
     ss << ")";
 
     CharacterDatabase.Execute( ss.str().c_str() );
