@@ -7620,6 +7620,14 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
                 return false;
             break;
         }
+        // Freezing Fog (Rime triggered)
+        case 59052:
+        {
+            // Howling Blast cooldown reset
+            if (GetTypeId() == TYPEID_PLAYER)
+                ((Player*)this)->RemoveSpellCategoryCooldown(1248, true);
+            break;
+        }
         // Druid - Savage Defense
         case 62606:
         {

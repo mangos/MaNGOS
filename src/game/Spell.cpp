@@ -3757,6 +3757,16 @@ SpellCastResult Spell::CheckOrTakeRunePower(bool take)
         if (runeCost[rune] <= 0)
             continue;
 
+        int32 runeCostTemp = runeCost[rune] * 10000;
+        if(Player* modOwner = plr->GetSpellModOwner())
+            modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_COST, runeCostTemp, this);
+
+        if (runeCostTemp <= 0)
+        {
+            --runeCost[rune];
+            continue;
+        }
+
         if(plr->GetRuneCooldown(i) == 0)
         {
             if (take)
