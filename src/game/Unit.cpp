@@ -691,7 +691,7 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
                 if (IS_CREATURE_GUID(pSummon->GetSummonerGUID()))
                     if(Creature* pSummoner = cVictim->GetMap()->GetCreature(pSummon->GetSummonerGUID()))
                         if (pSummoner->AI())
-                            pSummoner->AI()->SummonedCreatureJustDie(cVictim);
+                            pSummoner->AI()->SummonedCreatureJustDied(cVictim);
             }
 
 

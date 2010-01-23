@@ -404,7 +404,7 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Scripts()
                         sLog.outErrorDb("CreatureEventAI:  Creature %u are using event(%u) with param2 < param1 (RepeatMax < RepeatMin). Event will never repeat.", temp.creature_id, i);
                     break;
                 case EVENT_T_SUMMONED_UNIT:
-                case EVENT_T_SUMMONED_JUST_DIE:
+                case EVENT_T_SUMMONED_JUST_DIED:
                 case EVENT_T_SUMMONED_JUST_DESPAWN:
                     if (!sCreatureStorage.LookupEntry<CreatureInfo>(temp.summoned.creatureId))
                         sLog.outErrorDb("CreatureEventAI:  Creature %u are using event(%u) with not existed creature template id (%u) in param1, skipped.", temp.creature_id, i, temp.summoned.creatureId);

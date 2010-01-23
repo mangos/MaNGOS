@@ -85,7 +85,7 @@ Some events such as EVENT_T_AGGRO, EVENT_T_DEATH, EVENT_T_SPAWNED, and EVENT_T_E
 22   EVENT_T_RECEIVE_EMOTE          EmoteId, Condition, CondValue1, CondValue2              Expires when a creature receives an emote with emote text id (enum TextEmotes) in (Param1). Conditions can be defined (Param2) with optional values (Param3,Param4), see enum ConditionType.
 23   EVENT_T_BUFFED                 SpellID, AmmountInStack, RepeatMin, RepeatMax           Expires when a creature has spell (Param1) auras applied in a stack greater or equal to value provided in (Param2). Will repeat every (Param3) and (Param4).
 24   EVENT_T_TARGET_BUFFED          SpellID, AmmountInStack, RepeatMin, RepeatMax           Expires when a target unit has spell (Param1) auras applied in a stack greater or equal to value provided in (Param2). Will repeat every (Param3) and (Param4).
-25   EVENT_T_SUMMONED_JUST_DIE      CreatureId, RepeatMin, RepeatMax                        Expires after creature with entry = (Param1) is die (Param1 = 0 means all spawns). Will repeat every (Param2) and (Param3).
+25   EVENT_T_SUMMONED_JUST_DIED     CreatureId, RepeatMin, RepeatMax                        Expires after creature with entry = (Param1) is die (Param1 = 0 means all spawns). Will repeat every (Param2) and (Param3).
 26   EVENT_T_SUMMONED_JUST_DESPAWN  CreatureId, RepeatMin, RepeatMax                        Expires before creature with entry = (Param1) is despawn (Param1 = 0 means all spawns). Will repeat every (Param2) and (Param3).
 
 
@@ -384,7 +384,7 @@ CONDITION_QUESTTAKEN (9)      quest_id     0, while quest active(incomplete)
 CONDITION_ACTIVE_EVENT (12)   event_id     0, note this is id from dbc, also defined in Mangos source(enum HolidayIds) NOT id of game_event in database
 
 ---------------------------
-25 = EVENT_T_SUMMONED_JUST_DIE:
+25 = EVENT_T_SUMMONED_JUST_DIED:
 ---------------------------
 Parameter 1: CreatureId - The CreatureID that the NPC is watching die to trigger this event
 Parameter 2: RepeatMin - Minimum Time used to calculate Random Repeat Expire

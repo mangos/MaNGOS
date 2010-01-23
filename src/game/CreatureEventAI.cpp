@@ -257,7 +257,7 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
             break;
         }
         case EVENT_T_SUMMONED_UNIT:
-        case EVENT_T_SUMMONED_JUST_DIE:
+        case EVENT_T_SUMMONED_JUST_DIED:
         case EVENT_T_SUMMONED_JUST_DESPAWN:
         {
             //Prevent event from occuring on no unit or non creatures
@@ -913,14 +913,14 @@ void CreatureEventAI::JustSummoned(Creature* pUnit)
     }
 }
 
-void CreatureEventAI::SummonedCreatureJustDie(Creature* pUnit)
+void CreatureEventAI::SummonedCreatureJustDied(Creature* pUnit)
 {
     if (bEmptyList || !pUnit)
         return;
 
     for (std::list<CreatureEventAIHolder>::iterator i = CreatureEventAIList.begin(); i != CreatureEventAIList.end(); ++i)
     {
-        if ((*i).Event.event_type == EVENT_T_SUMMONED_JUST_DIE)
+        if ((*i).Event.event_type == EVENT_T_SUMMONED_JUST_DIED)
             ProcessEvent(*i, pUnit);
     }
 }

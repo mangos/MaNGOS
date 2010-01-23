@@ -96,7 +96,7 @@ class MANGOS_DLL_SPEC CreatureAI
         virtual void JustDied(Unit *) {}
 
         // Called when the creature summon is killed
-        virtual void SummonedCreatureJustDie(Creature* /*unit*/) {}
+        virtual void SummonedCreatureJustDied(Creature* /*unit*/) {}
 
         // Called when the creature kills a unit
         virtual void KilledUnit(Unit *) {}
