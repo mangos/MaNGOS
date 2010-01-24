@@ -876,9 +876,9 @@ void WorldSession::HandleTutorialReset( WorldPacket & /*recv_data*/ )
 void WorldSession::HandleSetWatchedFactionOpcode(WorldPacket & recv_data)
 {
     DEBUG_LOG("WORLD: Received CMSG_SET_WATCHED_FACTION");
-    uint32 fact;
-    recv_data >> fact;
-    GetPlayer()->SetUInt32Value(PLAYER_FIELD_WATCHED_FACTION_INDEX, fact);
+    int32 repId;
+    recv_data >> repId;
+    GetPlayer()->SetInt32Value(PLAYER_FIELD_WATCHED_FACTION_INDEX, repId);
 }
 
 void WorldSession::HandleSetFactionInactiveOpcode(WorldPacket & recv_data)
