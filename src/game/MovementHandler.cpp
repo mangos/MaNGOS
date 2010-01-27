@@ -464,7 +464,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
             //AntiGravitation (thanks to Meekro)
             float JumpHeight = plMover->m_anti_JumpBaseZ - movementInfo.z;
             if ((plMover->m_anti_JumpBaseZ != 0)
-                    && !(movementInfo.flags & (MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_FLYING | MOVEMENTFLAG_FLYING2))
+                    && !(movementInfo.flags & (MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_FLYING))
                     && (JumpHeight < plMover->m_anti_Last_VSpeed))
             {
                 #ifdef MOVEMENT_ANTICHEAT_DEBUG
@@ -515,7 +515,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
                 check_passed = false;
             }
             //Fly hack checks
-            if (((movementInfo.flags & (MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_FLYING | MOVEMENTFLAG_FLYING2)) != 0)
+            if (((movementInfo.flags & (MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_FLYING)) != 0)
                   && !plMover->isGameMaster()
                   && !(plMover->HasAuraType(SPELL_AURA_FLY) || plMover->HasAuraType(SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED)))
             {
@@ -541,7 +541,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
             }
             //Teleport To Plane checks
             if (movementInfo.z < 0.0001f && movementInfo.z > -0.0001f
-                && ((movementInfo.flags & (MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_FLYING | MOVEMENTFLAG_FLYING2)) == 0)
+                && ((movementInfo.flags & (MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_FLYING)) == 0)
                 && !plMover->isGameMaster())
             {
                 // Prevent using TeleportToPlan.
