@@ -716,7 +716,7 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask *
                     if(!target->isAllowedToLoot((Creature*)this))
                         *data << (m_uint32Values[ index ] & ~UNIT_DYNFLAG_LOOTABLE);
                     else
-                        *data << (m_uint32Values[ index ] & ~UNIT_DYNFLAG_OTHER_TAGGER);
+                        *data << (m_uint32Values[ index ] & ~UNIT_DYNFLAG_TAPPED);
                 }
                 else
                 {
