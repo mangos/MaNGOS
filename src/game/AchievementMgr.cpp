@@ -1911,7 +1911,7 @@ void AchievementGlobalMgr::LoadAchievementCriteriaRequirements()
 
         if (!criteria)
         {
-            sLog.outErrorDb( "Table `achievement_criteria_requirement` have data for not existed criteria (Entry: %u), ignore.", criteria_id);
+            sLog.outErrorDb( "Table `achievement_criteria_requirement`.`criteria_id` %u does not exist, ignoring.", criteria_id);
             continue;
         }
 
@@ -2001,8 +2001,8 @@ void AchievementGlobalMgr::LoadAchievementCriteriaRequirements()
                 continue;
         }
 
-        if(!GetCriteriaRequirementSet(criteria))
-            sLog.outErrorDb( "Table `achievement_criteria_requirement` not have expected data for criteria (Entry: %u Type: %u) for achievement %u.", criteria->ID, criteria->requiredType, criteria->referredAchievement);
+        if (!GetCriteriaRequirementSet(criteria))
+            sLog.outErrorDb("Table `achievement_criteria_requirement` is missing expected data for `criteria_id` %u (type: %u) for achievement %u.", criteria->ID, criteria->requiredType, criteria->referredAchievement);
     }
 
     sLog.outString();
