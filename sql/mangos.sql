@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_9244_02_mangos_spell_chain` bit(1) default NULL
+  `required_9262_01_mangos_quest_template` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -13787,7 +13787,7 @@ CREATE TABLE `quest_template` (
   `RequiredMaxRepValue` mediumint(9) NOT NULL default '0',
   `SuggestedPlayers` tinyint(3) unsigned NOT NULL default '0',
   `LimitTime` int(10) unsigned NOT NULL default '0',
-  `QuestFlags` smallint(5) unsigned NOT NULL default '0',
+  `QuestFlags` mediumint(8) unsigned NOT NULL default '0',
   `SpecialFlags` tinyint(3) unsigned NOT NULL default '0',
   `CharTitleId` tinyint(3) unsigned NOT NULL default '0',
   `PlayersSlain` tinyint(3) unsigned NOT NULL default '0',
