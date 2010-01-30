@@ -1775,7 +1775,7 @@ uint16 Map::GetAreaFlag(float x, float y, float z) const
                     // Krasus' Landing (Dalaran), with open east side
                     if (y < 449.33f || (x-5813.9f)*(x-5813.9f)+(y-449.33f)*(y-449.33f) < 1864.0f)
                     {
-                        areaflag = 2533;                    // Note: also 2633, possible one flight allowed and other not allowed case
+                        areaflag = 2531;                    // Note: also 2633, possible one flight allowed and other not allowed case
                         break;
                     }
                 }
