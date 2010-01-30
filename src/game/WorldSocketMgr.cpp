@@ -152,9 +152,7 @@ class ReactorRunnable : protected ACE_Task_Base
         {
             DEBUG_LOG ("Network Thread Starting");
 
-            WorldDatabase.ThreadStart();
-            CharacterDatabase.ThreadStart();
-            loginDatabase.ThreadStart();
+            WorldDatabase.ThreadStart ();
 
             ACE_ASSERT (m_Reactor);
 
@@ -187,9 +185,7 @@ class ReactorRunnable : protected ACE_Task_Base
                 }
             }
 
-            WorldDatabase.ThreadEnd();
-            CharacterDatabase.ThreadEnd();
-            loginDatabase.ThreadEnd();
+            WorldDatabase.ThreadEnd ();
 
             DEBUG_LOG ("Network Thread Exitting");
 
