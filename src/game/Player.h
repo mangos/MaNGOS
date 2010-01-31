@@ -181,6 +181,12 @@ struct ActionButton
     }
 };
 
+// some action button indexes used in code or clarify structure
+enum ActionButtonIndex
+{
+    ACTION_BUTTON_SHAMAN_TOTEMS_BAR = 132,
+};
+
 #define  MAX_ACTION_BUTTONS 144                             //checked in 3.2.0
 
 typedef std::map<uint8,ActionButton> ActionButtonList;
@@ -1692,6 +1698,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         ActionButton* addActionButton(uint8 button, uint32 action, uint8 type);
         void removeActionButton(uint8 button);
         void SendInitialActionButtons() const;
+        ActionButton const* GetActionButton(uint8 button);
 
         PvPInfo pvpInfo;
         void UpdatePvP(bool state, bool ovrride=false);

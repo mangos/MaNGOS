@@ -2306,13 +2306,12 @@ void Spell::SetTargetMap(uint32 effIndex, uint32 targetMode, UnitList& targetUni
                     }
                     break;
                 case SPELL_EFFECT_SUMMON:
-                        targetUnitMap.push_back(m_caster);
-                    break;
                 case SPELL_EFFECT_SUMMON_CHANGE_ITEM:
                 case SPELL_EFFECT_TRANS_DOOR:
                 case SPELL_EFFECT_ADD_FARSIGHT:
                 case SPELL_EFFECT_APPLY_GLYPH:
                 case SPELL_EFFECT_STUCK:
+                case SPELL_EFFECT_SUMMON_ALL_TOTEMS:
                 case SPELL_EFFECT_FEED_PET:
                 case SPELL_EFFECT_DESTROY_ALL_TOTEMS:
                 case SPELL_EFFECT_SKILL:

@@ -5728,6 +5728,15 @@ void Player::removeActionButton(uint8 button)
     sLog.outDetail( "Action Button '%u' Removed from Player '%u'", button, GetGUIDLow() );
 }
 
+ActionButton const* Player::GetActionButton(uint8 button)
+{
+    ActionButtonList::iterator buttonItr = m_actionButtons.find(button);
+    if (buttonItr==m_actionButtons.end() || buttonItr->second.uState == ACTIONBUTTON_DELETED)
+        return NULL;
+
+    return &buttonItr->second;
+}
+
 bool Player::SetPosition(float x, float y, float z, float orientation, bool teleport)
 {
     // prevent crash when a bad coord is sent by the client

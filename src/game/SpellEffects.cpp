@@ -154,7 +154,7 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS]=
     &Spell::EffectSelfResurrect,                            // 94 SPELL_EFFECT_SELF_RESURRECT
     &Spell::EffectSkinning,                                 // 95 SPELL_EFFECT_SKINNING
     &Spell::EffectCharge,                                   // 96 SPELL_EFFECT_CHARGE
-    &Spell::EffectUnused,                                   // 97 SPELL_EFFECT_97
+    &Spell::EffectSummonAllTotems,                          // 97 SPELL_EFFECT_SUMMON_ALL_TOTEMS
     &Spell::EffectKnockBack,                                // 98 SPELL_EFFECT_KNOCK_BACK
     &Spell::EffectDisEnchant,                               // 99 SPELL_EFFECT_DISENCHANT
     &Spell::EffectInebriate,                                //100 SPELL_EFFECT_INEBRIATE
@@ -6524,6 +6524,21 @@ void Spell::EffectSummonDeadPet(uint32 /*i*/)
 
     // _player->PetSpellInitialize(); -- action bar not removed at death and not required send at revive
     pet->SavePetToDB(PET_SAVE_AS_CURRENT);
+}
+
+void Spell::EffectSummonAllTotems(uint32 i)
+{
+    if(m_caster->GetTypeId() != TYPEID_PLAYER)
+        return;
+
+    int32 start_button = ACTION_BUTTON_SHAMAN_TOTEMS_BAR + m_spellInfo->EffectMiscValue[i];
+    int32 amount_buttons = m_spellInfo->EffectMiscValueB[i];
+
+    for(int32 slot = 0; slot < amount_buttons; ++slot)
+        if (ActionButton const* actionButton = ((Player*)m_caster)->GetActionButton(start_button+slot))
+            if (actionButton->GetType()==ACTION_BUTTON_SPELL)
+                if (uint32 spell_id = actionButton->GetAction())
+                    m_caster->CastSpell(unitTarget,spell_id,true);
 }
 
 void Spell::EffectDestroyAllTotems(uint32 /*i*/)
