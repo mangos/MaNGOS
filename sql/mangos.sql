@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_9262_01_mangos_quest_template` bit(1) default NULL
+  `required_9277_01_mangos_spell_bonus_data` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -14117,7 +14117,7 @@ INSERT INTO `spell_bonus_data` VALUES
 /* Druid */
 (5185,  1.6104, 0,       0,     'Druid - Healing Touch'),
 (339,   0,      0.1,     0,     'Druid - Entangling Roots'),
-(60089, 0,      0,       0.05,  'Druid - Faerie Fire (Feral) Triggered'),
+(60089, 0,      0,       0.15,  'Druid - Faerie Fire (Feral) Triggered'),
 (42231, 0.12898,0,       0,     'Druid - Hurricane Triggered'),
 (5570,  0,      0.2,     0,     'Druid - Insect Swarm'),
 (33763, 0,      0.09518, 0,     'Druid - Lifebloom'),
