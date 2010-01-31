@@ -37,7 +37,7 @@ struct ProcTriggerSpell;
 class Aura;
 
 // internal helper
-struct AuraHandleAddModifierHelper;
+struct ReapplyAffectedPassiveAurasHelper;
 
 typedef void(Aura::*pAuraHandler)(bool Apply, bool Real);
 // Real == true at aura add/remove
@@ -55,7 +55,7 @@ typedef void(Aura::*pAuraHandler)(bool Apply, bool Real);
 
 class MANGOS_DLL_SPEC Aura
 {
-    friend struct AuraHandleAddModifierHelper;
+    friend struct ReapplyAffectedPassiveAurasHelper;
     friend Aura* CreateAura(SpellEntry const* spellproto, uint32 eff, int32 *currentBasePoints, Unit *target, Unit *caster, Item* castItem);
 
     public:
@@ -93,6 +93,7 @@ class MANGOS_DLL_SPEC Aura
         void HandleAuraFeatherFall(bool Apply, bool Real);
         void HandleAuraHover(bool Apply, bool Real);
         void HandleAddModifier(bool Apply, bool Real);
+
         void HandleAddTargetTrigger(bool Apply, bool Real);
         void HandleAuraModStun(bool Apply, bool Real);
         void HandleModDamageDone(bool Apply, bool Real);
@@ -361,7 +362,7 @@ class MANGOS_DLL_SPEC Aura
         void PeriodicDummyTick();
 
         bool IsCritFromAbilityAura(Unit* caster, uint32& damage);
-        void ReapplyAffectedPassiveAuras(Unit* target, bool owner_mode);
+        void ReapplyAffectedPassiveAuras();
 
         Modifier m_modifier;
         SpellModifier *m_spellmod;
@@ -404,6 +405,7 @@ class MANGOS_DLL_SPEC Aura
     private:
         void CleanupTriggeredSpells();
         bool IsNeedVisibleSlot(Unit const* caster) const;   // helper for check req. visibility slot
+        void ReapplyAffectedPassiveAuras(Unit* target, bool owner_mode);
 };
 
 class MANGOS_DLL_SPEC AreaAura : public Aura
