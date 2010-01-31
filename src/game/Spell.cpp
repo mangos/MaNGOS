@@ -3812,14 +3812,14 @@ SpellCastResult Spell::CheckOrTakeRunePower(bool take)
 
 void Spell::TakeReagents()
 {
-    if(m_IsTriggeredSpell)                                  // reagents used in triggered spell removed by original spell or don't must be removed.
-        return;
-
     if (m_caster->GetTypeId() != TYPEID_PLAYER)
         return;
 
+    if (IgnoreItemRequirements())                           // reagents used in triggered spell removed by original spell or don't must be removed.
+        return;
+
     Player* p_caster = (Player*)m_caster;
-    if (p_caster->CanNoReagentCast(m_spellInfo))
+    if (p_caster->CanNoReagentCast(m_spellInfo) )
         return;
 
     for(uint32 x = 0; x < 8; ++x)
@@ -5383,6 +5383,18 @@ SpellCastResult Spell::CheckPower()
         return SPELL_CAST_OK;
 }
 
+bool Spell::IgnoreItemRequirements() const
+{
+    if (m_IsTriggeredSpell)
+        return true;
+
+    /// Check if it's an enchant scroll. These have no required reagents even though their spell does.
+    if (m_CastItem && m_CastItem->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAGS_ENCHANT_SCROLL))
+        return true;
+
+    return false;
+}
+
 SpellCastResult Spell::CheckItems()
 {
     if (m_caster->GetTypeId() != TYPEID_PLAYER)
@@ -5499,73 +5511,80 @@ SpellCastResult Spell::CheckItems()
     }
 
     // check reagents (ignore triggered spells with reagents processed by original spell) and special reagent ignore case.
-    if (!m_IsTriggeredSpell && !p_caster->CanNoReagentCast(m_spellInfo))
+    if (!IgnoreItemRequirements())
     {
-        for(uint32 i = 0; i < 8; ++i)
+        if (!p_caster->CanNoReagentCast(m_spellInfo))
         {
-            if(m_spellInfo->Reagent[i] <= 0)
-                continue;
-
-            uint32 itemid    = m_spellInfo->Reagent[i];
-            uint32 itemcount = m_spellInfo->ReagentCount[i];
-
-            // if CastItem is also spell reagent
-            if( m_CastItem && m_CastItem->GetEntry() == itemid )
+            for(uint32 i = 0; i < 8; ++i)
             {
-                ItemPrototype const *proto = m_CastItem->GetProto();
-                if(!proto)
-                    return SPELL_FAILED_REAGENTS;
-                for(int s = 0; s < MAX_ITEM_PROTO_SPELLS; ++s)
+                if(m_spellInfo->Reagent[i] <= 0)
+                    continue;
+
+                uint32 itemid    = m_spellInfo->Reagent[i];
+                uint32 itemcount = m_spellInfo->ReagentCount[i];
+
+                // if CastItem is also spell reagent
+                if (m_CastItem && m_CastItem->GetEntry() == itemid)
                 {
-                    // CastItem will be used up and does not count as reagent
-                    int32 charges = m_CastItem->GetSpellCharges(s);
-                    if (proto->Spells[s].SpellCharges < 0 && abs(charges) < 2)
+                    ItemPrototype const *proto = m_CastItem->GetProto();
+                    if (!proto)
+                        return SPELL_FAILED_REAGENTS;
+                    for(int s = 0; s < MAX_ITEM_PROTO_SPELLS; ++s)
                     {
-                        ++itemcount;
-                        break;
+                        // CastItem will be used up and does not count as reagent
+                        int32 charges = m_CastItem->GetSpellCharges(s);
+                        if (proto->Spells[s].SpellCharges < 0 && abs(charges) < 2)
+                        {
+                            ++itemcount;
+                            break;
+                        }
                     }
                 }
-            }
-            if( !p_caster->HasItemCount(itemid, itemcount) )
-                return SPELL_FAILED_REAGENTS;
-        }
-    }
 
-    // check totem-item requirements (items presence in inventory)
-    uint32 totems = 2;
-    for(int i = 0; i < 2 ; ++i)
-    {
-        if(m_spellInfo->Totem[i] != 0)
+                if (!p_caster->HasItemCount(itemid, itemcount))
+                    return SPELL_FAILED_REAGENTS;
+            }
+        }
+
+        // check totem-item requirements (items presence in inventory)
+        uint32 totems = 2;
+        for(int i = 0; i < 2 ; ++i)
         {
-            if( p_caster->HasItemCount(m_spellInfo->Totem[i], 1) )
+            if (m_spellInfo->Totem[i] != 0)
             {
+                if (p_caster->HasItemCount(m_spellInfo->Totem[i], 1))
+                {
+                    totems -= 1;
+                    continue;
+                }
+            }
+            else
                 totems -= 1;
-                continue;
-            }
-        }else
-        totems -= 1;
-    }
-    if(totems != 0)
-        return SPELL_FAILED_TOTEMS;                         //0x7C
-
-    // Check items for TotemCategory  (items presence in inventory)
-    uint32 TotemCategory = 2;
-    for(int i= 0; i < 2; ++i)
-    {
-        if(m_spellInfo->TotemCategory[i] != 0)
-        {
-            if( p_caster->HasItemTotemCategory(m_spellInfo->TotemCategory[i]) )
-            {
-                TotemCategory -= 1;
-                continue;
-            }
         }
-        else
-            TotemCategory -= 1;
-    }
-    if(TotemCategory != 0)
-        return SPELL_FAILED_TOTEM_CATEGORY;                 //0x7B
 
+        if (totems != 0)
+            return SPELL_FAILED_TOTEMS;                         //0x7C
+
+        // Check items for TotemCategory  (items presence in inventory)
+        uint32 TotemCategory = 2;
+        for(int i= 0; i < 2; ++i)
+        {
+            if (m_spellInfo->TotemCategory[i] != 0)
+            {
+                if (p_caster->HasItemTotemCategory(m_spellInfo->TotemCategory[i]))
+                {
+                    TotemCategory -= 1;
+                    continue;
+                }
+            }
+            else
+                TotemCategory -= 1;
+        }
+
+        if (TotemCategory != 0)
+            return SPELL_FAILED_TOTEM_CATEGORY;                 //0x7B
+
+    }
     // special checks for spell effects
     for(int i = 0; i < 3; ++i)
     {
