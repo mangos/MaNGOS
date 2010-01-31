@@ -5279,6 +5279,24 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                 case 63320:
                     triggered_spell_id = 63321;
                     break;
+                // Item - Shadowmourne Legendary
+                case 71903:
+                {
+                    if (!roll_chance_i(triggerAmount))
+                        return false;
+
+                    Aura *aur = GetAura(71905, 0);
+                    if (aur && aur->GetStackAmount() + 1 >= aur->GetSpellProto()->StackAmount)
+                    {
+                        RemoveAurasDueToSpell(71905);
+                        CastSpell(this, 71904, true);       // Chaos Bane
+                        return true;
+                    }
+                    else
+                        triggered_spell_id = 71905;
+
+                    break;
+                }
             }
             break;
         }
