@@ -29,7 +29,6 @@
 struct ItemPrototype;
 struct AuctionEntry;
 struct DeclinedName;
-struct MovementInfo;
 
 class Creature;
 class Item;
@@ -121,9 +120,6 @@ class MANGOS_DLL_SPEC WorldSession
 
         void ReadAddonsInfo(WorldPacket &data);
         void SendAddonsInfo();
-
-        void ReadMovementInfo(WorldPacket &data, MovementInfo *mi);
-        void WriteMovementInfo(WorldPacket *data, MovementInfo *mi);
 
         void SendPacket(WorldPacket const* packet);
         void SendNotification(const char *format,...) ATTR_PRINTF(2,3);

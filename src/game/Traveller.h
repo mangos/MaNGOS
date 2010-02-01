@@ -112,7 +112,7 @@ inline float Traveller<Player>::Speed()
     if (i_traveller.isInFlight())
         return PLAYER_FLIGHT_SPEED;
     else
-        return i_traveller.GetSpeed(i_traveller.m_movementInfo.HasMovementFlag(MOVEMENTFLAG_WALK_MODE) ? MOVE_WALK : MOVE_RUN);
+        return i_traveller.GetSpeed(i_traveller.m_movementInfo.HasMovementFlag(MOVEFLAG_WALK_MODE) ? MOVE_WALK : MOVE_RUN);
 }
 
 template<>
@@ -137,7 +137,7 @@ inline void Traveller<Player>::Relocation(float x, float y, float z, float orien
 template<>
 inline void Traveller<Player>::MoveTo(float x, float y, float z, uint32 t)
 {
-    //Only send MOVEMENTFLAG_WALK_MODE, client has strange issues with other move flags
+    //Only send MOVEFLAG_WALK_MODE, client has strange issues with other move flags
     i_traveller.SendMonsterMove(x, y, z, 0, MONSTER_MOVE_WALK, t);
 }
 
