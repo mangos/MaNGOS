@@ -5257,6 +5257,14 @@ void Spell::EffectScriptEffect(uint32 effIndex)
                         ((Player*)m_caster)->learnSpell(discoveredSpell, false);
                     return;
                 }
+                case 69377: //Fortitude
+                {
+                    if(!unitTarget)
+                        return;
+
+                    m_caster->CastSpell(unitTarget, 72590, true);
+                    return;
+                }
             }
             break;
         }
