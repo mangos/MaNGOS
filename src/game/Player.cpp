@@ -5266,7 +5266,7 @@ void Player::UpdateWeaponSkill (WeaponAttackType attType)
 {
     // no skill gain in pvp
     Unit *pVictim = getVictim();
-    if(pVictim && pVictim->GetTypeId() == TYPEID_PLAYER)
+    if(pVictim && pVictim->IsCharmerOrOwnerPlayerOrPlayerItself())
         return;
 
     if(IsInFeralForm())
