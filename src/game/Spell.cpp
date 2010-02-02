@@ -5277,7 +5277,7 @@ SpellCastResult Spell::CheckRange(bool strict)
 int32 Spell::CalculatePowerCost()
 {
     // item cast not used power
-    if(m_CastItem)
+    if (m_CastItem)
         return 0;
 
     // Spell drain all exist power on cast (Only paladin lay of Hands)
@@ -6040,6 +6040,12 @@ bool Spell::IsNeedSendToClient() const
 {
     return m_spellInfo->SpellVisual[0] || m_spellInfo->SpellVisual[1] || IsChanneledSpell(m_spellInfo) ||
         m_spellInfo->speed > 0.0f || !m_triggeredByAuraSpell && !m_IsTriggeredSpell;
+}
+
+
+bool Spell::IsTriggeredSpellWithRedundentData() const
+{
+    return m_IsTriggeredSpell && (m_spellInfo->manaCost || m_spellInfo->ManaCostPercentage);
 }
 
 bool Spell::HaveTargetsForEffect( uint8 effect ) const
