@@ -8415,6 +8415,12 @@ void ObjectMgr::RemoveGroup( Group* group )
     mGroupMap.erase(GUID_LOPART(group->GetLeaderGUID()));
 }
 
+void ObjectMgr::UpdateGroup( uint32 old_guidlow, Group* group )
+{
+    mGroupMap.erase(old_guidlow);
+    AddGroup(group);
+}
+
 void ObjectMgr::AddArenaTeam( ArenaTeam* arenaTeam )
 {
     mArenaTeamMap[arenaTeam->GetId()] = arenaTeam;

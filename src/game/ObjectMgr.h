@@ -411,11 +411,7 @@ class ObjectMgr
         Group * GetGroupByLeaderLowGUID(uint32 lowguid) const;
         void AddGroup(Group* group);
         void RemoveGroup(Group* group);
-        void UpdateGroup(Group* group)                      // when need update leader guid as group key
-        {
-            RemoveGroup(group);
-            AddGroup(group);
-        }
+        void UpdateGroup(uint32 old_guidlow, Group* group); // when need update leader guid as group key
 
         Guild* GetGuildByLeader(uint64 const&guid) const;
         Guild* GetGuildById(uint32 GuildId) const;
