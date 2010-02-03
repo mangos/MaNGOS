@@ -43,7 +43,7 @@ enum eAuthResults
     REALM_AUTH_PARENTAL_CONTROL     = 0x0f                  ///< Access to this account has been blocked by parental controls. Your settings may be changed in your account preferences at <site>
 };
 
-// will only support WoW 1.12.1/1.12.2 , WoW:TBC 2.4.3 and WoW:WotLK 3.2.2a, client builds 10505, 8606, 6005, 5875
+// will only support WoW 1.12.1/1.12.2 , WoW:TBC 2.4.3 and official release for WoW:WotLK and later, client builds 10505, 8606, 6005, 5875
 // if you need more from old build then add it in cases in relamd sources code
 // list sorted from high to low build and first build used as low bound for accepted by default range (any > it will accepted by realmd at least)
 
