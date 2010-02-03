@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_9289_01_mangos_spell_proc_event` bit(1) default NULL
+  `required_9291_02_mangos_locales_quest` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -2782,6 +2782,14 @@ CREATE TABLE `locales_quest` (
   `EndText_loc6` text,
   `EndText_loc7` text,
   `EndText_loc8` text,
+  `CompletedText_loc1` text,
+  `CompletedText_loc2` text,
+  `CompletedText_loc3` text,
+  `CompletedText_loc4` text,
+  `CompletedText_loc5` text,
+  `CompletedText_loc6` text,
+  `CompletedText_loc7` text,
+  `CompletedText_loc8` text,
   `ObjectiveText1_loc1` text,
   `ObjectiveText1_loc2` text,
   `ObjectiveText1_loc3` text,
@@ -13805,6 +13813,7 @@ CREATE TABLE `quest_template` (
   `OfferRewardText` text,
   `RequestItemsText` text,
   `EndText` text,
+  `CompletedText` text,
   `ObjectiveText1` text,
   `ObjectiveText2` text,
   `ObjectiveText3` text,

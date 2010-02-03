@@ -162,6 +162,7 @@ struct QuestLocale
     std::vector<std::string> OfferRewardText;
     std::vector<std::string> RequestItemsText;
     std::vector<std::string> EndText;
+    std::vector<std::string> CompletedText;
     std::vector< std::vector<std::string> > ObjectiveText;
 };
 
@@ -212,6 +213,7 @@ class Quest
         std::string GetOfferRewardText() const { return OfferRewardText; }
         std::string GetRequestItemsText() const { return RequestItemsText; }
         std::string GetEndText() const { return EndText; }
+        std::string GetCompletedText() const { return CompletedText; }
         int32  GetRewOrReqMoney() const;
         uint32 GetRewHonorableKills() const { return RewHonorableKills; }
         uint32 GetRewMoneyMaxLevel() const { return RewMoneyMaxLevel; }
@@ -306,6 +308,7 @@ class Quest
         std::string OfferRewardText;
         std::string RequestItemsText;
         std::string EndText;
+        std::string CompletedText;
         uint32 RewHonorableKills;
         int32  RewOrReqMoney;
         uint32 RewMoneyMaxLevel;
