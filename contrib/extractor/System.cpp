@@ -275,16 +275,17 @@ void ReadLiquidTypeTableDBC()
 //
 
 // Map file format data
-#define MAP_MAGIC             'SPAM'
-#define MAP_VERSION_MAGIC     '0.1w'
-#define MAP_AREA_MAGIC        'AERA'
-#define MAP_HEIGHT_MAGIC      'TGHM'
-#define MAP_LIQUID_MAGIC      'QILM'
+static char const* MAP_MAGIC         = "MAPS";
+static char const* MAP_VERSION_MAGIC = "v1.1";
+static char const* MAP_AREA_MAGIC    = "AREA";
+static char const* MAP_HEIGHT_MAGIC  = "MHGT";
+static char const* MAP_LIQUID_MAGIC  = "MLIQ";
 
 struct map_fileheader
 {
     uint32 mapMagic;
     uint32 versionMagic;
+    uint32 buildMagic;
     uint32 areaMapOffset;
     uint32 areaMapSize;
     uint32 heightMapOffset;
@@ -362,7 +363,7 @@ uint8 liquid_type[ADT_CELLS_PER_GRID][ADT_CELLS_PER_GRID];
 bool  liquid_show[ADT_GRID_SIZE][ADT_GRID_SIZE];
 float liquid_height[ADT_GRID_SIZE+1][ADT_GRID_SIZE+1];
 
-bool ConvertADT(char *filename, char *filename2, int cell_y, int cell_x)
+bool ConvertADT(char *filename, char *filename2, int cell_y, int cell_x, uint32 build)
 {
     ADT_file adt;
 
@@ -381,8 +382,9 @@ bool ConvertADT(char *filename, char *filename2, int cell_y, int cell_x)
 
     // Prepare map header
     map_fileheader map;
-    map.mapMagic = MAP_MAGIC;
-    map.versionMagic = MAP_VERSION_MAGIC;
+    map.mapMagic = *(uint32 const*)MAP_MAGIC;
+    map.versionMagic = *(uint32 const*)MAP_VERSION_MAGIC;
+    map.buildMagic = build;
 
     // Get area flags data
     for (int i=0;i<ADT_CELLS_PER_GRID;i++)
@@ -424,7 +426,7 @@ bool ConvertADT(char *filename, char *filename2, int cell_y, int cell_x)
     map.areaMapSize   = sizeof(map_areaHeader);
 
     map_areaHeader areaHeader;
-    areaHeader.fourcc = MAP_AREA_MAGIC;
+    areaHeader.fourcc = *(uint32 const*)MAP_AREA_MAGIC;
     areaHeader.flags = 0;
     if (fullAreaData)
     {
@@ -553,7 +555,7 @@ bool ConvertADT(char *filename, char *filename2, int cell_y, int cell_x)
     map.heightMapSize = sizeof(map_heightHeader);
 
     map_heightHeader heightHeader;
-    heightHeader.fourcc = MAP_HEIGHT_MAGIC;
+    heightHeader.fourcc = *(uint32 const*)MAP_HEIGHT_MAGIC;
     heightHeader.flags = 0;
     heightHeader.gridHeight    = minHeight;
     heightHeader.gridMaxHeight = maxHeight;
@@ -788,7 +790,7 @@ bool ConvertADT(char *filename, char *filename2, int cell_y, int cell_x)
         }
         map.liquidMapOffset = map.heightMapOffset + map.heightMapSize;
         map.liquidMapSize = sizeof(map_liquidHeader);
-        liquidHeader.fourcc = MAP_LIQUID_MAGIC;
+        liquidHeader.fourcc = *(uint32 const*)MAP_LIQUID_MAGIC;
         liquidHeader.flags = 0;
         liquidHeader.liquidType = 0;
         liquidHeader.offsetX = minX;
@@ -867,7 +869,7 @@ bool ConvertADT(char *filename, char *filename2, int cell_y, int cell_x)
     return true;
 }
 
-void ExtractMapsFromMpq()
+void ExtractMapsFromMpq(uint32 build)
 {
     char mpq_filename[1024];
     char output_filename[1024];
@@ -905,7 +907,7 @@ void ExtractMapsFromMpq()
                     continue;
                 sprintf(mpq_filename, "World\\Maps\\%s\\%s_%u_%u.adt", map_ids[z].name, map_ids[z].name, x, y);
                 sprintf(output_filename, "%s/maps/%03u%02u%02u.map", output_path, map_ids[z].id, y, x);
-                ConvertADT(mpq_filename, output_filename, y, x);
+                ConvertADT(mpq_filename, output_filename, y, x, build);
             }
             // draw progress bar
             printf("Processing........................%d%%\r", (100 * (y+1)) / WDT_MAP_SIZE);
@@ -1075,7 +1077,7 @@ int main(int argc, char * arg[])
         LoadCommonMPQFiles();
 
         // Extract maps
-        ExtractMapsFromMpq();
+        ExtractMapsFromMpq(build);
 
         // Close MPQs
         CloseMPQFiles();
