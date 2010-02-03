@@ -367,7 +367,7 @@ enum Opcodes
     SMSG_ATTACKERSTATEUPDATE                        = 0x14A,
     SMSG_BATTLEFIELD_PORT_DENIED                    = 0x14B,
     SMSG_DAMAGE_DONE_OBSOLETE                       = 0x14C,
-    SMSG_DAMAGE_TAKEN_OBSOLETE                      = 0x14D,
+    SMSG_UNIT_SPELLCAST_START                       = 0x14D,
     SMSG_CANCEL_COMBAT                              = 0x14E,
     SMSG_SPELLBREAKLOG                              = 0x14F,
     SMSG_SPELLHEALLOG                               = 0x150,
