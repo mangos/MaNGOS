@@ -2621,7 +2621,24 @@ bool SpellMgr::IsSpellValid(SpellEntry const* spellInfo, Player* pl, bool msg)
             case SPELL_EFFECT_CREATE_ITEM:
             case SPELL_EFFECT_CREATE_ITEM_2:
             {
-                if(!ObjectMgr::GetItemPrototype( spellInfo->EffectItemType[i] ))
+                if (spellInfo->EffectItemType[i] == 0)
+                {
+                    // skip auto-loot crafting spells, its not need explicit item info (but have special fake items sometime)
+                    if (!IsLootCraftingSpell(spellInfo))
+                    {
+                        if(msg)
+                        {
+                            if(pl)
+                                ChatHandler(pl).PSendSysMessage("Craft spell %u not have create item entry.",spellInfo->Id);
+                            else
+                                sLog.outErrorDb("Craft spell %u not have create item entry.",spellInfo->Id);
+                        }
+                        return false;
+                    }
+
+                }
+                // also possible IsLootCraftingSpell case but fake item must exist anyway
+                else if (!ObjectMgr::GetItemPrototype( spellInfo->EffectItemType[i] ))
                 {
                     if(msg)
                     {
