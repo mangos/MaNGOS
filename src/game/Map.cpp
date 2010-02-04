@@ -1891,6 +1891,30 @@ uint16 Map::GetAreaFlag(float x, float y, float z) const
                 if ((x-3546.87f)*(x-3546.87f)+(y-272.71f)*(y-272.71f) < 19600.0f) areaflag = 1791;
             }
             break;
+        // The Forlorn Mine (The Storm Peaks)
+        case 166:                                           // The Storm Peaks
+        case 2207:                                          // Brunnhildar Village (The Storm Peaks)
+        case 2209:                                          // Sifreldar Village (The Storm Peaks)
+        case 2227:                                          // The Foot Steppes (The Storm Peaks)
+            // fast big box
+            if (x > 6812.0f && x < 7049.5f && y > -1474.5f && y < -1162.5f && z < 866.15f)
+            {
+                // east, avoid ground east-south corner wrong detection
+                if (x > 6925.0f && y > -1474.5f && y < -1290.0f)
+                    areaflag = 2213;
+                // east middle, wide part
+                else if (x > 6812.0f && y > -1400.0f && y < -1290.0f)
+                    areaflag = 2213;
+                // west middle, avoid ground west-south corner wrong detection
+                else if (x > 6833.0f && y > -1474.5f && y < -1233.0f)
+                    areaflag = 2213;
+                // west, avoid ground west-south corner wrong detection
+                else if (x > 6885.0f && y > -1474.5f && y < -1162.5f)
+                    areaflag = 2213;
+            }
+            break;
+        default:
+            break;
     }
 
     return areaflag;
