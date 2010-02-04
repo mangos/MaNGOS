@@ -4059,7 +4059,7 @@ void ObjectMgr::LoadQuestLocales()
             }
             for(int k = 0; k < 4; ++k)
             {
-                str = fields[1+10*(i-1)+6+k].GetCppString();
+                str = fields[1+10*(i-1)+7+k].GetCppString();
                 if(!str.empty())
                 {
                     int idx = GetOrNewIndexForLocale(LocaleConstant(i));
