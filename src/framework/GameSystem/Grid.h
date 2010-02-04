@@ -58,22 +58,17 @@ class MANGOS_DLL_DECL Grid
 
         /** an object of interested enters the grid
          */
-        template<class SPECIFIC_OBJECT> bool AddWorldObject(SPECIFIC_OBJECT *obj, OBJECT_HANDLE hdl)
+        template<class SPECIFIC_OBJECT> bool AddWorldObject(SPECIFIC_OBJECT *obj)
         {
-            return i_objects.template insert<SPECIFIC_OBJECT>(hdl, obj);
+            return i_objects.template insert<SPECIFIC_OBJECT>(obj);
         }
 
         /** an object of interested exits the grid
          */
-        template<class SPECIFIC_OBJECT> bool RemoveWorldObject(SPECIFIC_OBJECT *obj, OBJECT_HANDLE hdl)
+        template<class SPECIFIC_OBJECT> bool RemoveWorldObject(SPECIFIC_OBJECT *obj)
         {
-            return i_objects.template remove<SPECIFIC_OBJECT>(obj, hdl);
+            return i_objects.template remove<SPECIFIC_OBJECT>(obj);
         }
-
-        /** Accessors: Returns a specific type of object in the WORDL_OBJECT_TYPES
-         */
-        template<class SPECIFIC_OBJECT> const SPECIFIC_OBJECT* GetWorldObject(OBJECT_HANDLE hdl, SPECIFIC_OBJECT* fake) const { return i_objects.template find<SPECIFIC_OBJECT>(hdl); }
-        template<class SPECIFIC_OBJECT>       SPECIFIC_OBJECT* GetWorldObject(OBJECT_HANDLE hdl, SPECIFIC_OBJECT *fake)       { return i_objects.template find<SPECIFIC_OBJECT>(hdl, fake); }
 
         /** Refreshes/update the grid. This required for remote grids.
          */
@@ -105,27 +100,22 @@ class MANGOS_DLL_DECL Grid
          */
         unsigned int ActiveObjectsInGrid(void) const { return m_activeGridObjects.size()+i_objects.template Count<ACTIVE_OBJECT>(); }
 
-        /** Accessors: Returns a specific type of object in the GRID_OBJECT_TYPES
-         */
-        template<class SPECIFIC_OBJECT> const SPECIFIC_OBJECT* GetGridObject(OBJECT_HANDLE hdl, SPECIFIC_OBJECT *fake) const { return i_container.template find<SPECIFIC_OBJECT>(hdl, fake); }
-        template<class SPECIFIC_OBJECT>       SPECIFIC_OBJECT* GetGridObject(OBJECT_HANDLE hdl, SPECIFIC_OBJECT *fake)       { return i_container.template find<SPECIFIC_OBJECT>(hdl, fake); }
-
         /** Inserts a container type object into the grid.
          */
-        template<class SPECIFIC_OBJECT> bool AddGridObject(SPECIFIC_OBJECT *obj, OBJECT_HANDLE hdl)
+        template<class SPECIFIC_OBJECT> bool AddGridObject(SPECIFIC_OBJECT *obj)
         {
             if(obj->isActiveObject())
                 m_activeGridObjects.insert(obj);
-            return i_container.template insert<SPECIFIC_OBJECT>(hdl, obj);
+            return i_container.template insert<SPECIFIC_OBJECT>(obj);
         }
 
         /** Removes a containter type object from the grid
          */
-        template<class SPECIFIC_OBJECT> bool RemoveGridObject(SPECIFIC_OBJECT *obj, OBJECT_HANDLE hdl)
+        template<class SPECIFIC_OBJECT> bool RemoveGridObject(SPECIFIC_OBJECT *obj)
         {
             if(obj->isActiveObject())
                 m_activeGridObjects.erase(obj);
-            return i_container.template remove<SPECIFIC_OBJECT>(obj, hdl);
+            return i_container.template remove<SPECIFIC_OBJECT>(obj);
         }
 
     private:
