@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_9309_01_mangos_quest_template` bit(1) default NULL
+  `required_9310_01_mangos_spell_elixir` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -17570,7 +17570,6 @@ INSERT INTO `spell_elixir` VALUES
 (17537,0x1),
 (17538,0x1),
 (17539,0x1),
-(17624,0x3),
 (17626,0x3),
 (17627,0x3),
 (17629,0x3),
