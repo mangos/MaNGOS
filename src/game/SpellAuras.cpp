@@ -7569,7 +7569,7 @@ void Aura::PeriodicDummyTick()
                 {
                     Unit* victim = m_target->getVictim();
                     if( victim && victim->GetHealth() * 100 < victim->GetMaxHealth() * 35 )
-                        m_target->CastSpell(m_target, m_spellInfo->Id == 53511 ? 60096 : 60097, true, NULL, this);
+                        m_target->CastSpell(m_target, spell->Id == 53511 ? 60096 : 60097, true, NULL, this);
                     return;
                 }
                 default:
