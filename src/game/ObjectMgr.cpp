@@ -5959,6 +5959,8 @@ void ObjectMgr::LoadGameobjectInfo()
             {
                 if (goInfo->button.lockId)
                     CheckGOLockId(goInfo,goInfo->button.lockId,1);
+                if (goInfo->button.linkedTrapId)              // linked trap
+                    CheckGOLinkedTrapId(goInfo,goInfo->button.linkedTrapId,3);
                 CheckGONoDamageImmuneId(goInfo,goInfo->button.noDamageImmune,4);
                 break;
             }

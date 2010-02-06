@@ -770,6 +770,33 @@ bool GameObject::ActivateToQuest( Player *pTarget)const
     return false;
 }
 
+void GameObject::SummonLinkedTrapIfAny()
+{
+    uint32 linkedEntry = GetGOInfo()->GetLinkedGameObjectEntry();
+    if (!linkedEntry)
+        return;
+
+    GameObject* linkedGO = new GameObject;
+    if (!linkedGO->Create(sObjectMgr.GenerateLowGuid(HIGHGUID_GAMEOBJECT), linkedEntry, GetMap(),
+         GetPhaseMask(), GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 100, GO_STATE_READY))
+    {
+        delete linkedGO;
+        linkedGO = NULL;
+        return;
+    }
+
+    linkedGO->SetRespawnTime(GetRespawnDelay());
+    linkedGO->SetSpellId(GetSpellId());
+
+    if (GetOwnerGUID())
+    {
+        linkedGO->SetOwnerGUID(GetOwnerGUID());
+        linkedGO->SetUInt32Value(GAMEOBJECT_LEVEL, GetUInt32Value(GAMEOBJECT_LEVEL));
+    }
+
+    GetMap()->Add(linkedGO);
+}
+
 void GameObject::TriggeringLinkedGameObject( uint32 trapEntry, Unit* target)
 {
     GameObjectInfo const* trapInfo = sGOStorage.LookupEntry<GameObjectInfo>(trapEntry);
@@ -869,13 +896,26 @@ void GameObject::Use(Unit* user)
     switch(GetGoType())
     {
         case GAMEOBJECT_TYPE_DOOR:                          //0
-        case GAMEOBJECT_TYPE_BUTTON:                        //1
         {
-            //doors/buttons never really despawn, only reset to default state/flags
+            //doors never really despawn, only reset to default state/flags
             UseDoorOrButton();
 
             // activate script
             GetMap()->ScriptsStart(sGameObjectScripts, GetDBTableGUIDLow(), spellCaster, this);
+            return;
+        }
+        case GAMEOBJECT_TYPE_BUTTON:                        //1
+        {
+            //buttons never really despawn, only reset to default state/flags
+            UseDoorOrButton();
+
+            // activate script
+            GetMap()->ScriptsStart(sGameObjectScripts, GetDBTableGUIDLow(), spellCaster, this);
+
+            // triggering linked GO
+            if (uint32 trapEntry = GetGOInfo()->button.linkedTrapId)
+                TriggeringLinkedGameObject(trapEntry, user);
+
             return;
         }
         case GAMEOBJECT_TYPE_QUESTGIVER:                    //2

@@ -65,7 +65,7 @@ struct GameObjectInfo
             uint32 startOpen;                               //0
             uint32 lockId;                                  //1 -> Lock.dbc
             uint32 autoCloseTime;                           //2 secs till autoclose = autoCloseTime / IN_MILISECONDS (previous was 0x10000)
-            uint32 linkedTrap;                              //3
+            uint32 linkedTrapId;                            //3
             uint32 noDamageImmune;                          //4 isBattlegroundObject
             uint32 large;                                   //5
             uint32 openTextID;                              //6 can be used to replace castBarCaption?
@@ -457,6 +457,7 @@ struct GameObjectInfo
     {
         switch(type)
         {
+            case GAMEOBJECT_TYPE_BUTTON:      return button.linkedTrapId;
             case GAMEOBJECT_TYPE_CHEST:       return chest.linkedTrapId;
             case GAMEOBJECT_TYPE_SPELL_FOCUS: return spellFocus.linkedTrapId;
             case GAMEOBJECT_TYPE_GOOBER:      return goober.linkedTrapId;
@@ -677,6 +678,7 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
         void ResetDoorOrButton();
 
 
+        void SummonLinkedTrapIfAny();
         void TriggeringLinkedGameObject( uint32 trapEntry, Unit* target);
 
         bool isVisibleForInState(Player const* u, WorldObject const* viewPoint, bool inVisibleList) const;
