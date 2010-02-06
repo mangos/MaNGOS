@@ -908,7 +908,7 @@ void Group::CountTheRoll(Rolls::iterator rollI, uint32 NumberOfPlayers)
     delete roll;
 }
 
-void Group::SetTargetIcon(uint8 id, uint64 guid)
+void Group::SetTargetIcon(uint8 id, uint64 whoGuid, uint64 targetGuid)
 {
     if(id >= TARGETICONCOUNT)
         return;
@@ -917,12 +917,13 @@ void Group::SetTargetIcon(uint8 id, uint64 guid)
     if( guid != 0 )
         for(int i = 0; i < TARGETICONCOUNT; ++i)
             if( m_targetIcons[i] == guid )
-                SetTargetIcon(i, 0);
+                SetTargetIcon(i, 0, 0);
 
     m_targetIcons[id] = guid;
 
-    WorldPacket data(MSG_RAID_TARGET_UPDATE, (2+8));
-    data << uint8(0);
+    WorldPacket data(MSG_RAID_TARGET_UPDATE, (1+8+1+8));
+    data << uint8(0);                                       // set targets
+    data << uint64(whoGuid);
     data << uint8(id);
     data << uint64(guid);
     BroadcastPacket(&data, true);
@@ -957,7 +958,7 @@ void Group::SendTargetIconList(WorldSession *session)
         return;
 
     WorldPacket data(MSG_RAID_TARGET_UPDATE, (1+TARGETICONCOUNT*9));
-    data << (uint8)1;
+    data << uint8(1);                                       // list targets
 
     for(int i = 0; i < TARGETICONCOUNT; ++i)
     {

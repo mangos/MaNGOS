@@ -121,6 +121,7 @@ enum __QuestGiverStatus
 enum __QuestFlags
 {
     // Flags used at server and sent to client
+    QUEST_FLAGS_NONE           = 0x00000000,
     QUEST_FLAGS_STAY_ALIVE     = 0x00000001,                // Not used currently
     QUEST_FLAGS_PARTY_ACCEPT   = 0x00000002,                // If player in party, all players that can accept this quest will receive confirmation box to accept quest CMSG_QUEST_CONFIRM_ACCEPT/SMSG_QUEST_CONFIRM_ACCEPT
     QUEST_FLAGS_EXPLORATION    = 0x00000004,                // Not used currently
@@ -137,7 +138,9 @@ enum __QuestFlags
     QUEST_FLAGS_UNK3           = 0x00002000,                // activates PvP?
     QUEST_FLAGS_UNK4           = 0x00004000,                // ? Membership Card Renewal
     QUEST_FLAGS_WEEKLY         = 0x00008000,                // Not used currently: Weekly quests
-    // 0x20000 - 1 quest in 3.3, 0x40000 - 1 quest in 3.3
+    QUEST_FLAGS_AUTOCOMPLETE   = 0x00010000,                // auto complete
+    QUEST_FLAGS_UNK5           = 0x00020000,                // has something to do with ReqItemId and SrcItemId
+    QUEST_FLAGS_UNK6           = 0x00040000,                // use Objective text as Complete text
     QUEST_FLAGS_LOW_LEVEL      = 0x00080000,                // quests in starting areas
 
     // Mangos flags for set SpecialFlags in DB if required but used only at server

@@ -469,7 +469,7 @@ void WorldSession::HandleRaidTargetUpdateOpcode( WorldPacket & recv_data )
 
         uint64 guid;
         recv_data >> guid;
-        group->SetTargetIcon(x, guid);
+        group->SetTargetIcon(x, _player->GetGUID(), guid);
     }
 }
 

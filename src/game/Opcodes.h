@@ -576,7 +576,7 @@ enum Opcodes
     SMSG_GMTICKET_SYSTEMSTATUS                      = 0x21B,
     CMSG_SPIRIT_HEALER_ACTIVATE                     = 0x21C,
     CMSG_SET_STAT_CHEAT                             = 0x21D,
-    SMSG_SET_REST_START_OBSOLETE                    = 0x21E,
+    SMSG_QUEST_FORCE_REMOVE                         = 0x21E, // uint32 questid
     CMSG_SKILL_BUY_STEP                             = 0x21F,
     CMSG_SKILL_BUY_RANK                             = 0x220,
     CMSG_XP_CHEAT                                   = 0x221,
