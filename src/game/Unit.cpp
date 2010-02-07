@@ -364,7 +364,7 @@ bool Unit::haveOffhandWeapon() const
 
 void Unit::SendMonsterMove(float NewPosX, float NewPosY, float NewPosZ, uint8 type, SplineFlags flags, uint32 Time, Player* player)
 {
-    float moveTime = Time;
+    float moveTime = (float)Time;
 
     WorldPacket data( SMSG_MONSTER_MOVE, (41 + GetPackGUID().size()) );
     data.append(GetPackGUID());
@@ -1251,8 +1251,8 @@ void Unit::CalculateSpellDamage(SpellNonMeleeDamage *damageInfo, int32 damage, S
         // block (only for damage class ranged and -melee, also non-physical damage possible)
         if (blocked)
         {
-            damageInfo->blocked = uint32(pVictim->GetShieldBlockValue());
-            if (damage < damageInfo->blocked)
+            damageInfo->blocked = pVictim->GetShieldBlockValue();
+            if (damage < (int32)damageInfo->blocked)
                 damageInfo->blocked = damage;
             damage-=damageInfo->blocked;
         }
@@ -2248,7 +2248,7 @@ void Unit::CalcAbsorbResist(Unit *pVictim,SpellSchoolMask schoolMask, DamageEffe
     }
 
     // Apply death prevention spells effects
-    if (preventDeathSpell && RemainingDamage >= pVictim->GetHealth())
+    if (preventDeathSpell && RemainingDamage >= (int32)pVictim->GetHealth())
     {
         switch(preventDeathSpell->SpellFamilyName)
         {
@@ -2894,7 +2894,7 @@ SpellMissInfo Unit::MagicSpellHitResult(Unit *pVictim, SpellEntry const *spell)
 
     int32 tmp = 10000 - HitChance;
 
-    uint32 rand = urand(0,10000);
+    int32 rand = irand(0,10000);
 
     if (rand < tmp)
         return SPELL_MISS_MISS;
@@ -4815,7 +4815,7 @@ void Unit::SendAttackStateUpdate(CalcDamageInfo *damageInfo)
     data << uint32(0);                                      // overkill value
     data << uint8(count);                                   // Sub damage count
 
-    for(int i = 0; i < count; ++i)
+    for(uint32 i = 0; i < count; ++i)
     {
         data << uint32(damageInfo->damageSchoolMask);       // School of sub damage
         data << float(damageInfo->damage);                  // sub damage
@@ -4824,13 +4824,13 @@ void Unit::SendAttackStateUpdate(CalcDamageInfo *damageInfo)
 
     if(damageInfo->HitInfo & (HITINFO_ABSORB | HITINFO_ABSORB2))
     {
-        for(int i = 0; i < count; ++i)
+        for(uint32 i = 0; i < count; ++i)
             data << uint32(damageInfo->absorb);             // Absorb
     }
 
     if(damageInfo->HitInfo & (HITINFO_RESIST | HITINFO_RESIST2))
     {
-        for(int i = 0; i < count; ++i)
+        for(uint32 i = 0; i < count; ++i)
             data << uint32(damageInfo->resist);             // Resist
     }
 
@@ -5031,8 +5031,8 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                 {
                     // return damage % to attacker but < 50% own total health
                     basepoints0 = triggerAmount*int32(damage)/100;
-                    if(basepoints0 > GetMaxHealth()/2)
-                        basepoints0 = GetMaxHealth()/2;
+                    if(basepoints0 > (int32)GetMaxHealth()/2)
+                        basepoints0 = (int32)GetMaxHealth()/2;
 
                     triggered_spell_id = 25997;
                     break;
@@ -5636,7 +5636,7 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
             {
                 Modifier* mod = triggeredByAura->GetModifier();
                 // if damage is more than need or target die from damage deal finish spell
-                if( mod->m_amount <= damage || GetHealth() <= damage )
+                if( mod->m_amount <= damage || (int32)GetHealth() <= damage )
                 {
                     // remember guid before aura delete
                     uint64 casterGuid = triggeredByAura->GetCasterGUID();

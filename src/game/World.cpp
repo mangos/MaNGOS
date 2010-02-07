@@ -317,7 +317,7 @@ bool World::RemoveQueuedPlayer(WorldSession* sess)
         --sessions;
 
     // accept first in queue
-    if( (!m_playerLimit || sessions < m_playerLimit) && !m_QueuedPlayer.empty() )
+    if( (!m_playerLimit || (int32)sessions < m_playerLimit) && !m_QueuedPlayer.empty() )
     {
         WorldSession* pop_sess = m_QueuedPlayer.front();
         pop_sess->SetInQueue(false);

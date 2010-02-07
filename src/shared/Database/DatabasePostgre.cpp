@@ -27,14 +27,6 @@
 #include "Database/SqlOperations.h"
 #include "Timer.h"
 
-void DatabasePostgre::ThreadStart()
-{
-}
-
-void DatabasePostgre::ThreadEnd()
-{
-}
-
 size_t DatabasePostgre::db_count = 0;
 
 DatabasePostgre::DatabasePostgre() : Database(), mPGconn(NULL)

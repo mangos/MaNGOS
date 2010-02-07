@@ -296,7 +296,7 @@ class MANGOS_DLL_SPEC Aura
         void SetAura(bool remove) { m_target->SetVisibleAura(m_auraSlot, remove ? 0 : GetId()); }
         void SendAuraUpdate(bool remove);
 
-        int8 GetStackAmount() {return m_stackAmount;}
+        uint8 GetStackAmount() {return m_stackAmount;}
         void SetStackAmount(uint8 num);
         bool modStackAmount(int32 num); // return true if last charge dropped
         void RefreshAura();

@@ -595,7 +595,7 @@ namespace MaNGOS
                 if(go->GetGOInfo()->spellFocus.focusId != i_focusId)
                     return false;
 
-                float dist = go->GetGOInfo()->spellFocus.dist;
+                float dist = (float)go->GetGOInfo()->spellFocus.dist;
 
                 return go->IsWithinDistInMap(i_unit, dist);
             }
@@ -611,7 +611,7 @@ namespace MaNGOS
             NearestGameObjectFishingHole(WorldObject const& obj, float range) : i_obj(obj), i_range(range) {}
             bool operator()(GameObject* go)
             {
-                if(go->GetGOInfo()->type == GAMEOBJECT_TYPE_FISHINGHOLE && go->isSpawned() && i_obj.IsWithinDistInMap(go, i_range) && i_obj.IsWithinDistInMap(go, go->GetGOInfo()->fishinghole.radius))
+                if(go->GetGOInfo()->type == GAMEOBJECT_TYPE_FISHINGHOLE && go->isSpawned() && i_obj.IsWithinDistInMap(go, i_range) && i_obj.IsWithinDistInMap(go, (float)go->GetGOInfo()->fishinghole.radius))
                 {
                     i_range = i_obj.GetDistance(go);
                     return true;

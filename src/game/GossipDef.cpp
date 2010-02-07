@@ -391,32 +391,37 @@ void PlayerMenu::SendQuestGiverQuestList( QEmote eEmote, const std::string& Titl
     data << Title;
     data << uint32(eEmote._Delay );                         // player emote
     data << uint32(eEmote._Emote );                         // NPC emote
-    data << uint8 ( mQuestMenu.MenuItemCount() );
 
-    for (uint32 iI = 0; iI < mQuestMenu.MenuItemCount(); ++iI )
+    size_t count_pos = data.wpos();
+    data << uint8 ( mQuestMenu.MenuItemCount() );
+    uint32 count = 0;
+    for (; count < mQuestMenu.MenuItemCount(); ++count )
     {
-        QuestMenuItem const& qmi = mQuestMenu.GetItem(iI);
+        QuestMenuItem const& qmi = mQuestMenu.GetItem(count);
 
         uint32 questID = qmi.m_qId;
         Quest const *pQuest = sObjectMgr.GetQuestTemplate(questID);
-
-        std::string title = pQuest ? pQuest->GetTitle() : "";
-
-        int loc_idx = pSession->GetSessionDbLocaleIndex();
-        if (loc_idx >= 0)
+        if(pQuest)
         {
-            if(QuestLocale const *ql = sObjectMgr.GetQuestLocale(questID))
-            {
-                if (ql->Title.size() > (size_t)loc_idx && !ql->Title[loc_idx].empty())
-                    title=ql->Title[loc_idx];
-            }
-        }
+            std::string title = pQuest->GetTitle();
 
-        data << uint32(questID);
-        data << uint32(qmi.m_qIcon);
-        data << int32(pQuest->GetQuestLevel());
-        data << title;
+            int loc_idx = pSession->GetSessionDbLocaleIndex();
+            if (loc_idx >= 0)
+            {
+                if(QuestLocale const *ql = sObjectMgr.GetQuestLocale(questID))
+                {
+                    if (ql->Title.size() > (size_t)loc_idx && !ql->Title[loc_idx].empty())
+                        title=ql->Title[loc_idx];
+                }
+            }
+
+            data << uint32(questID);
+            data << uint32(qmi.m_qIcon);
+            data << int32(pQuest->GetQuestLevel());
+            data << title;
+        }
     }
+    data.put<uint8>(count_pos,count);
     pSession->SendPacket( &data );
     sLog.outDebug("WORLD: Sent SMSG_QUESTGIVER_QUEST_LIST NPC Guid=%u", GUID_LOPART(npcGUID));
 }

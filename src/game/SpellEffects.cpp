@@ -563,7 +563,7 @@ void Spell::EffectSchoolDMG(uint32 effect_idx)
                             uint32 doses = poison->GetStackAmount();
                             if (doses > combo)
                                 doses = combo;
-                            for (int i=0; i< doses; i++)
+                            for (uint32 i = 0; i < doses; ++i)
                                 unitTarget->RemoveSingleSpellAurasFromStack(spellId);
                             damage *= doses;
                             damage += int32(((Player*)m_caster)->GetTotalAttackPowerValue(BASE_ATTACK) * 0.09f * doses);
@@ -1877,7 +1877,7 @@ void Spell::EffectDummy(uint32 i)
                     Unit::AttackerSet attackers = friendTarget->getAttackers();
 
                     // selected from list 3
-                    for(int i = 0; i < std::min(size_t(3),attackers.size()); ++i)
+                    for(uint32 i = 0; i < std::min(size_t(3),attackers.size()); ++i)
                     {
                         Unit::AttackerSet::iterator aItr = attackers.begin();
                         std::advance(aItr, rand() % attackers.size());
@@ -2171,7 +2171,7 @@ void Spell::EffectTriggerSpell(uint32 effIndex)
             if (!spell)
                 return;
 
-            for (int j=0; j < spell->StackAmount; ++j)
+            for (uint32 j=0; j < spell->StackAmount; ++j)
                 m_caster->CastSpell(unitTarget, spell->Id, true, m_CastItem, NULL, m_originalCasterGUID);
             return;
         }
@@ -2183,7 +2183,7 @@ void Spell::EffectTriggerSpell(uint32 effIndex)
             if (!spell)
                 return;
 
-            for (int j=0; j < spell->StackAmount; ++j)
+            for (uint32 j=0; j < spell->StackAmount; ++j)
                 m_caster->CastSpell(unitTarget, spell->Id, true, m_CastItem, NULL, m_originalCasterGUID);
             return;
         }
@@ -2641,15 +2641,16 @@ void Spell::EffectPowerBurn(uint32 i)
     // burn x% of target's mana, up to maximum of 2x% of caster's mana (Mana Burn)
     if (m_spellInfo->ManaCostPercentage)
     {
-        uint32 maxdamage = m_caster->GetMaxPower(powertype) * damage * 2 / 100;
+        int32 maxdamage = m_caster->GetMaxPower(powertype) * damage * 2 / 100;
         damage = unitTarget->GetMaxPower(powertype) * damage / 100;
-        if(damage > maxdamage) damage = maxdamage;
+        if(damage > maxdamage)
+            damage = maxdamage;
     }
 
     int32 curPower = int32(unitTarget->GetPower(powertype));
 
     // resilience reduce mana draining effect at spell crit damage reduction (added in 2.4)
-    uint32 power = damage;
+    int32 power = damage;
     if (powertype == POWER_MANA)
         power -= unitTarget->GetSpellCritDamageReduction(power);
 
@@ -2794,7 +2795,7 @@ void Spell::EffectHealthLeech(uint32 i)
 
     uint32 curHealth = unitTarget->GetHealth();
     damage = m_caster->SpellNonMeleeDamageLog(unitTarget, m_spellInfo->Id, damage );
-    if (curHealth < damage)
+    if ((int32)curHealth < damage)
         damage = curHealth;
 
     float multiplier = m_spellInfo->EffectMultipleValue[i];
@@ -4531,7 +4532,7 @@ void Spell::EffectWeaponDmg(uint32 i)
     // multiple weapon dmg effect workaround
     // execute only the last weapon damage
     // and handle all effects at once
-    for (int j = 0; j < 3; ++j)
+    for (uint32 j = 0; j < 3; ++j)
     {
         switch(m_spellInfo->Effect[j])
         {

@@ -156,17 +156,17 @@ uint32 AccountMgr::GetId(std::string username)
     }
 }
 
-uint32 AccountMgr::GetSecurity(uint32 acc_id)
+AccountTypes AccountMgr::GetSecurity(uint32 acc_id)
 {
     QueryResult *result = loginDatabase.PQuery("SELECT gmlevel FROM account WHERE id = '%u'", acc_id);
     if(result)
     {
-        uint32 sec = (*result)[0].GetUInt32();
+        AccountTypes sec = AccountTypes((*result)[0].GetInt32());
         delete result;
         return sec;
     }
 
-    return 0;
+    return SEC_PLAYER;
 }
 
 bool AccountMgr::GetName(uint32 acc_id, std::string &name)
