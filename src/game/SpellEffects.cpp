@@ -5262,6 +5262,22 @@ void Spell::EffectScriptEffect(uint32 effIndex)
                     m_caster->CastSpell(unitTarget, 72590, true);
                     return;
                 }
+               case 69381: //Gift of the Wild
+               {
+                   if(!unitTarget)
+                       return;
+
+                   m_caster->CastSpell(unitTarget, 72588, true);
+                   return;
+               }
+               case 69378: //Blessing of Forgotten Kings
+               {
+                   if(!unitTarget)
+                       return;
+
+                   m_caster->CastSpell(unitTarget, 72586, true);
+                   return;
+               }
             }
             break;
         }
