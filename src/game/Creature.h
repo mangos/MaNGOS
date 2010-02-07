@@ -438,31 +438,31 @@ class MANGOS_DLL_SPEC Creature : public Unit
 
         bool AIM_Initialize();
 
-        void AI_SendMoveToPacket(float x, float y, float z, uint32 time, MonsterMovementFlags MovementFlags, uint8 type);
+        void AI_SendMoveToPacket(float x, float y, float z, uint32 time, SplineFlags MovementFlags, uint8 type);
         CreatureAI* AI() { return i_AI; }
 
-        void AddMonsterMoveFlag(MonsterMovementFlags f)
+        void AddSplineFlag(SplineFlags f)
         {
-            bool need_walk_sync = (f & MONSTER_MOVE_WALK) != (m_monsterMoveFlags & MONSTER_MOVE_WALK);
-            m_monsterMoveFlags = MonsterMovementFlags(m_monsterMoveFlags | f);
+            bool need_walk_sync = (f & SPLINEFLAG_WALKMODE) != (m_splineFlags & SPLINEFLAG_WALKMODE);
+            m_splineFlags = SplineFlags(m_splineFlags | f);
             if (need_walk_sync)
-                UpdateWalkMode(this,false);
+                UpdateWalkMode(this, false);
         }
-        void RemoveMonsterMoveFlag(MonsterMovementFlags f)
+        void RemoveSplineFlag(SplineFlags f)
         {
-            bool need_walk_sync = (f & MONSTER_MOVE_WALK) != (m_monsterMoveFlags & MONSTER_MOVE_WALK);
-            m_monsterMoveFlags = MonsterMovementFlags(m_monsterMoveFlags & ~f);
+            bool need_walk_sync = (f & SPLINEFLAG_WALKMODE) != (m_splineFlags & SPLINEFLAG_WALKMODE);
+            m_splineFlags = SplineFlags(m_splineFlags & ~f);
             if (need_walk_sync)
-                UpdateWalkMode(this,false);
+                UpdateWalkMode(this, false);
         }
-        bool HasMonsterMoveFlag(MonsterMovementFlags f) const { return m_monsterMoveFlags & f; }
-        MonsterMovementFlags GetMonsterMoveFlags() const { return m_monsterMoveFlags; }
-        void SetMonsterMoveFlags(MonsterMovementFlags f)
+        bool HasSplineFlag(SplineFlags f) const { return m_splineFlags & f; }
+        SplineFlags GetSplineFlags() const { return m_splineFlags; }
+        void SetSplineFlags(SplineFlags f)
         {
-            bool need_walk_sync = (f & MONSTER_MOVE_WALK) != (m_monsterMoveFlags & MONSTER_MOVE_WALK);
-            m_monsterMoveFlags = f;                     // need set before
+            bool need_walk_sync = (f & SPLINEFLAG_WALKMODE) != (m_splineFlags & SPLINEFLAG_WALKMODE);
+            m_splineFlags = f;                              // need set before
             if (need_walk_sync)
-                UpdateWalkMode(this,false);
+                UpdateWalkMode(this, false);
         }
 
         void SendMonsterMoveWithSpeed(float x, float y, float z, uint32 transitTime = 0, Player* player = NULL);
@@ -470,7 +470,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
 
         uint32 GetShieldBlockValue() const                  //dunno mob block value
         {
-            return (getLevel()/2 + uint32(GetStat(STAT_STRENGTH)/20));
+            return (getLevel() / 2 + uint32(GetStat(STAT_STRENGTH) / 20));
         }
 
         SpellSchoolMask GetMeleeDamageSchoolMask() const { return m_meleeDamageSchoolMask; }
@@ -484,7 +484,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
 
         bool HasSpell(uint32 spellID) const;
 
-        bool UpdateEntry(uint32 entry, uint32 team=ALLIANCE, const CreatureData* data=NULL);
+        bool UpdateEntry(uint32 entry, uint32 team = ALLIANCE, const CreatureData* data = NULL);
         bool UpdateStats(Stats stat);
         bool UpdateAllStats();
         void UpdateResistances(uint32 school);
@@ -670,7 +670,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
         GridReference<Creature> m_gridRef;
         CreatureInfo const* m_creatureInfo;                 // in difficulty mode > 0 can different from ObjMgr::GetCreatureTemplate(GetEntry())
         bool m_isActiveObject;
-        MonsterMovementFlags m_monsterMoveFlags;
+        SplineFlags m_splineFlags;
 };
 
 class AssistDelayEvent : public BasicEvent

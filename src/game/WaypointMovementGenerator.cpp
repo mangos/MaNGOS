@@ -143,7 +143,7 @@ bool WaypointMovementGenerator<Creature>::Update(Creature &creature, const uint3
             creature.addUnitState(UNIT_STAT_ROAMING_MOVE);
 
             if (creature.canFly())
-                creature.AddMonsterMoveFlag(MONSTER_MOVE_FLY);
+                creature.AddSplineFlag(SPLINEFLAG_UNKNOWN7);
 
             // Now we re-set destination to same node and start travel
             const WaypointNode &node = i_path->at(i_currentNode);
@@ -218,7 +218,7 @@ bool WaypointMovementGenerator<Creature>::Update(Creature &creature, const uint3
             creature.addUnitState(UNIT_STAT_ROAMING_MOVE);
 
             if (creature.canFly())
-                creature.AddMonsterMoveFlag(MONSTER_MOVE_FLY);
+                creature.AddSplineFlag(SPLINEFLAG_UNKNOWN7);
 
             const WaypointNode &node = i_path->at(i_currentNode);
             i_destinationHolder.SetDestination(traveller, node.x, node.y, node.z);
@@ -292,7 +292,7 @@ void FlightPathMovementGenerator::Initialize(Player &player)
     // do not send movement, it was sent already
     i_destinationHolder.SetDestination(traveller, i_path[i_currentNode].x, i_path[i_currentNode].y, i_path[i_currentNode].z, false);
 
-    player.SendMonsterMoveByPath(GetPath(),GetCurrentNode(),GetPathAtMapEnd(),MONSTER_MOVE_SPLINE_FLY);
+    player.SendMonsterMoveByPath(GetPath(),GetCurrentNode(),GetPathAtMapEnd(), SplineFlags(SPLINEFLAG_WALKMODE|SPLINEFLAG_FLYING));
 }
 
 void FlightPathMovementGenerator::Finalize(Player & player)
