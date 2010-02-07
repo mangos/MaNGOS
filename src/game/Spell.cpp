@@ -373,13 +373,7 @@ Spell::Spell( Unit* Caster, SpellEntry const *info, bool triggered, uint64 origi
     else
         m_originalCasterGUID = m_caster->GetGUID();
 
-    if(m_originalCasterGUID == m_caster->GetGUID())
-        m_originalCaster = m_caster;
-    else
-    {
-        m_originalCaster = ObjectAccessor::GetUnit(*m_caster, m_originalCasterGUID);
-        if(m_originalCaster && !m_originalCaster->IsInWorld()) m_originalCaster = NULL;
-    }
+    UpdateOriginalCasterPointer();
 
     for(int i = 0; i < 3; ++i)
         m_currentBasePoints[i] = m_spellInfo->EffectBasePoints[i];
@@ -947,9 +941,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
         return;
 
     // Get original caster (if exist) and calculate damage/healing from him data
-    Unit *caster = m_originalCaster ? m_originalCaster : m_caster;
-
-    // Skip if m_originalCaster not available
+    Unit *caster = GetAffectiveCaster();
     if (!caster)
         return;
 
@@ -1061,7 +1053,9 @@ void Spell::DoSpellHitOnUnit(Unit *unit, const uint32 effectMask)
     if (!unit || !effectMask)
         return;
 
-    Unit* realCaster = m_originalCaster ? m_originalCaster : m_caster;
+    Unit* realCaster = GetAffectiveCaster();
+    if (!realCaster)
+        return;
 
     // Recheck immune (only for delayed spells)
     if (m_spellInfo->speed && (
@@ -1308,9 +1302,9 @@ void Spell::SetTargetMap(uint32 effIndex, uint32 targetMode, UnitList& targetUni
 
     uint32 EffectChainTarget = m_spellInfo->EffectChainTarget[effIndex];
 
-    if(m_originalCaster)
+    if (Unit* realCaster = GetAffectiveCaster())
     {
-        if(Player* modOwner = m_originalCaster->GetSpellModOwner())
+        if(Player* modOwner = realCaster->GetSpellModOwner())
         {
             modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_RADIUS, radius, this);
             modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_JUMP_TARGETS, EffectChainTarget, this);
@@ -1593,7 +1587,7 @@ void Spell::SetTargetMap(uint32 effIndex, uint32 targetMode, UnitList& targetUni
             else
             {
                 Unit* pUnitTarget = m_targets.getUnitTarget();
-                Unit* originalCaster = GetOriginalCaster();
+                Unit* originalCaster = GetAffectiveCaster();
                 if(!pUnitTarget || !originalCaster)
                     break;
 
@@ -1722,13 +1716,8 @@ void Spell::SetTargetMap(uint32 effIndex, uint32 targetMode, UnitList& targetUni
         case TARGET_CASTER_COORDINATES:
         {
             // Check original caster is GO - set its coordinates as dst cast
-            WorldObject *caster = NULL;
-            if (IS_GAMEOBJECT_GUID(m_originalCasterGUID))
-                caster = m_caster->GetMap()->GetGameObject(m_originalCasterGUID);
-            if (!caster)
-                caster = m_caster;
-            // Set dest for targets
-            m_targets.setDestination(caster->GetPositionX(), caster->GetPositionY(), caster->GetPositionZ());
+            if (WorldObject *caster = GetCastingObject())
+                m_targets.setDestination(caster->GetPositionX(), caster->GetPositionY(), caster->GetPositionZ());
             break;
         }
         case TARGET_ALL_HOSTILE_UNITS_AROUND_CASTER:
@@ -2819,8 +2808,8 @@ void Spell::_handle_immediate_phase()
             m_needSpellLog = false;
 
         uint32 EffectChainTarget = m_spellInfo->EffectChainTarget[j];
-        if(m_originalCaster)
-            if(Player* modOwner = m_originalCaster->GetSpellModOwner())
+        if (Unit* realCaster = GetAffectiveCaster())
+            if(Player* modOwner = realCaster->GetSpellModOwner())
                 modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_JUMP_TARGETS, EffectChainTarget, this);
 
         // initialize multipliers
@@ -4511,9 +4500,8 @@ SpellCastResult Spell::CheckCast(bool strict)
             case SPELL_EFFECT_TAMECREATURE:
             {
                 // Spell can be triggered, we need to check original caster prior to caster
-                Unit* caster = m_originalCaster ? m_originalCaster : m_caster;
-
-                if (caster->GetTypeId() != TYPEID_PLAYER ||
+                Unit* caster = GetAffectiveCaster();
+                if (!caster || caster->GetTypeId() != TYPEID_PLAYER ||
                     !m_targets.getUnitTarget() ||
                     m_targets.getUnitTarget()->GetTypeId() == TYPEID_PLAYER)
                     return SPELL_FAILED_BAD_TARGETS;
@@ -5891,15 +5879,25 @@ void Spell::DelayedChannel()
     SendChannelUpdate(m_timer);
 }
 
-void Spell::UpdatePointers()
+void Spell::UpdateOriginalCasterPointer()
 {
     if(m_originalCasterGUID == m_caster->GetGUID())
         m_originalCaster = m_caster;
+    else if (IS_GAMEOBJECT_GUID(m_originalCasterGUID))
+    {
+        GameObject* go = m_caster->IsInWorld() ? m_caster->GetMap()->GetGameObject(m_originalCasterGUID) : NULL;
+        m_originalCaster = go ? go->GetOwner() : NULL;
+    }
     else
     {
-        m_originalCaster = ObjectAccessor::GetUnit(*m_caster, m_originalCasterGUID);
-        if(m_originalCaster && !m_originalCaster->IsInWorld()) m_originalCaster = NULL;
+        Unit* unit = ObjectAccessor::GetUnit(*m_caster, m_originalCasterGUID);
+        m_originalCaster = unit && unit->IsInWorld() ? unit : NULL;
     }
+}
+
+void Spell::UpdatePointers()
+{
+    UpdateOriginalCasterPointer();
 
     m_targets.Update(m_caster);
 }
@@ -6023,13 +6021,10 @@ bool Spell::CheckTarget( Unit* target, uint32 eff )
             break;
         default:                                            // normal case
             // Get GO cast coordinates if original caster -> GO
-            WorldObject *caster = NULL;
-            if (IS_GAMEOBJECT_GUID(m_originalCasterGUID))
-                caster = m_caster->GetMap()->GetGameObject(m_originalCasterGUID);
-            if (!caster)
-                caster = m_caster;
-            if(target != m_caster && !target->IsWithinLOSInMap(caster))
-                return false;
+            if (target != m_caster)
+                if (WorldObject *caster = GetCastingObject())
+                    if (!target->IsWithinLOSInMap(caster))
+                        return false;
             break;
     }
 
@@ -6335,4 +6330,12 @@ void Spell::FillRaidOrPartyHealthPriorityTargets(UnitList &targetUnitMap, Unit* 
         targetUnitMap.push_back(healthQueue.top().getUnit());
         healthQueue.pop();
     }
+}
+
+WorldObject* Spell::GetCastingObject() const
+{
+    if (IS_GAMEOBJECT_GUID(m_originalCasterGUID))
+        return m_caster->IsInWorld() ? m_caster->GetMap()->GetGameObject(m_originalCasterGUID) : NULL;
+    else
+        return m_caster;
 }
