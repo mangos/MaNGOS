@@ -123,6 +123,7 @@ extern DBCStorage <MapEntry>                     sMapStore;
 extern MapDifficultyMap                          sMapDifficultyMap;
 extern DBCStorage <MovieEntry>                   sMovieStore;
 extern DBCStorage <QuestSortEntry>               sQuestSortStore;
+extern DBCStorage <QuestXPLevel>                 sQuestXPLevelStore;
 //extern DBCStorage <PvPDifficultyEntry>           sPvPDifficultyStore; -- use GetBattlegroundSlotByLevel for access
 extern DBCStorage <RandomPropertiesPointsEntry>  sRandomPropertiesPointsStore;
 extern DBCStorage <ScalingStatDistributionEntry> sScalingStatDistributionStore;

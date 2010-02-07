@@ -165,44 +165,88 @@ Quest::Quest(Field * questRecord)
     }
 }
 
-uint32 Quest::XPValue( Player *pPlayer ) const
+uint32 Quest::XPValue(Player *pPlayer) const
 {
-    if( pPlayer )
+    if (pPlayer)
     {
-        if( RewMoneyMaxLevel > 0 )
-        {
-            uint32 pLevel = pPlayer->getLevel();
-            uint32 qLevel = QuestLevel > 0 ? (uint32)QuestLevel : 0;
-            float fullxp = 0;
-            if (qLevel >= 15)
-                fullxp = RewMoneyMaxLevel / 6.0f;
-            else if (qLevel == 14)
-                fullxp = RewMoneyMaxLevel / 4.8f;
-            else if (qLevel == 13)
-                fullxp = RewMoneyMaxLevel / 3.666f;
-            else if (qLevel == 12)
-                fullxp = RewMoneyMaxLevel / 2.4f;
-            else if (qLevel == 11)
-                fullxp = RewMoneyMaxLevel / 1.2f;
-            else if (qLevel >= 1 && qLevel <= 10)
-                fullxp = RewMoneyMaxLevel / 0.6f;
-            else if (qLevel == 0)
-                fullxp = RewMoneyMaxLevel;
+        uint32 realXP = 0;
+        uint32 xpMultiplier = 0;
+        int32 baseLevel = 0;
+        int32 playerLevel = pPlayer->getLevel();
 
-            if( pLevel <= qLevel +  5 )
-                return (uint32)fullxp;
-            else if( pLevel == qLevel +  6 )
-                return (uint32)(fullxp * 0.8f);
-            else if( pLevel == qLevel +  7 )
-                return (uint32)(fullxp * 0.6f);
-            else if( pLevel == qLevel +  8 )
-                return (uint32)(fullxp * 0.4f);
-            else if( pLevel == qLevel +  9 )
-                return (uint32)(fullxp * 0.2f);
+        // formula can possibly be organized better, using less if's and simplify some.
+
+        if (QuestLevel != -1)
+            baseLevel = QuestLevel;
+
+        if (((baseLevel - playerLevel) + 10)*2 > 10)
+        {
+            baseLevel = playerLevel;
+
+            if (QuestLevel != -1)
+                baseLevel = QuestLevel;
+
+            if (((baseLevel - playerLevel) + 10)*2 <= 10)
+            {
+                if (QuestLevel == -1)
+                    baseLevel = playerLevel;
+
+                xpMultiplier = 2 * (baseLevel - playerLevel) + 20;
+            }
             else
-                return (uint32)(fullxp * 0.1f);
+            {
+                xpMultiplier = 10;
+            }
         }
+        else
+        {
+            baseLevel = playerLevel;
+
+            if (QuestLevel != -1)
+                baseLevel = QuestLevel;
+
+            if (((baseLevel - playerLevel) + 10)*2 >= 1)
+            {
+                baseLevel = playerLevel;
+
+                if (QuestLevel != -1)
+                    baseLevel = QuestLevel;
+
+                if (((baseLevel - playerLevel) + 10)*2 <= 10)
+                {
+                    if (QuestLevel == -1)
+                        baseLevel = playerLevel;
+
+                    xpMultiplier = 2 * (baseLevel - playerLevel) + 20;
+                }
+                else
+                {
+                    xpMultiplier = 10;
+                }
+            }
+            else
+            {
+                xpMultiplier = 1;
+            }
+        }
+
+        const QuestXPLevel* pXPData = sQuestXPLevelStore.LookupEntry(baseLevel);
+
+        uint32 rawXP = xpMultiplier * pXPData->xpIndex[RewXPId] / 10;
+
+        // round values
+        if (rawXP > 1000)
+            realXP = ((rawXP + 25) / 50 * 50);
+        else if (rawXP > 500)
+            realXP = ((rawXP + 12) / 25 * 25);
+        else if (rawXP > 100)
+            realXP = ((rawXP + 5) / 10 * 10);
+        else
+            realXP = ((rawXP + 2) / 5 * 5);
+
+        return realXP;
     }
+
     return 0;
 }
 

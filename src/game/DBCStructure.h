@@ -1161,6 +1161,13 @@ struct QuestSortEntry
                                                             // 17 name flags
 };
 
+struct QuestXPLevel
+{
+    uint32      questLevel;                                 // 0
+    uint32      xpIndex[9];                                 // 1-9
+    //unk                                                   // 10
+};
+
 struct RandomPropertiesPointsEntry
 {
     //uint32  Id;                                           // 0 hidden key
