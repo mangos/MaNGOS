@@ -98,7 +98,7 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS]=
     &Spell::EffectDispel,                                   // 38 SPELL_EFFECT_DISPEL
     &Spell::EffectUnused,                                   // 39 SPELL_EFFECT_LANGUAGE
     &Spell::EffectDualWield,                                // 40 SPELL_EFFECT_DUAL_WIELD
-    &Spell::EffectUnused,                                   // 41 SPELL_EFFECT_JUMP
+    &Spell::EffectJump,                                     // 41 SPELL_EFFECT_JUMP
     &Spell::EffectJump,                                     // 42 SPELL_EFFECT_JUMP2
     &Spell::EffectTeleUnitsFaceCaster,                      // 43 SPELL_EFFECT_TELEPORT_UNITS_FACE_CASTER
     &Spell::EffectLearnSkill,                               // 44 SPELL_EFFECT_SKILL_STEP
