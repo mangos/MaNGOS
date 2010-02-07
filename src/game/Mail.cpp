@@ -184,7 +184,7 @@ void WorldSession::HandleSendMail(WorldPacket & recv_data )
             return;
         }
 
-        if (item->IsBoundAccountWide() && item->IsSoulBound() && pl->GetSession()->GetAccountId() != rc_account)
+        if (item->IsBoundAccountWide() /*&& item->IsSoulBound() */&& pl->GetSession()->GetAccountId() != rc_account)
         {
             pl->SendMailResult(0, MAIL_SEND, MAIL_ERR_EQUIP_ERROR, EQUIP_ERR_ARTEFACTS_ONLY_FOR_OWN_CHARACTERS);
             return;
