@@ -828,6 +828,9 @@ enum MangosStrings
 
     // FREE IDS                           1300-9999
 
+    // Broadcaster
+    LANG_AUTO_BROADCAST                 = 1300,
+
     // Use for not-in-offcial-sources patches
     //                                    10000-10999
 
