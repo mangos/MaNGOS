@@ -408,10 +408,10 @@ class ObjectMgr
         void LoadGameobjectInfo();
         void AddGameobjectInfo(GameObjectInfo *goinfo);
 
-        Group * GetGroupByLeaderLowGUID(uint32 lowguid) const;
+        Group* GetGroupById(uint32 id) const;
+        Group* GetGroupByLeaderLowGUID(uint32 guid) const;  // slow way by leader guid
         void AddGroup(Group* group);
         void RemoveGroup(Group* group);
-        void UpdateGroup(uint32 old_guidlow, Group* group); // when need update leader guid as group key
 
         Guild* GetGuildByLeader(uint64 const&guid) const;
         Guild* GetGuildById(uint32 GuildId) const;
@@ -656,6 +656,7 @@ class ObjectMgr
         uint32 GenerateAuctionID();
         uint64 GenerateEquipmentSetGuid();
         uint32 GenerateGuildId();
+        uint32 GenerateGroupId();
         uint32 GenerateItemTextID();
         uint32 GenerateMailID();
         uint32 GeneratePetNumber();
@@ -894,8 +895,9 @@ class ObjectMgr
         uint32 m_ItemTextId;
         uint32 m_mailid;
         uint32 m_hiPetNumber;
+        uint32 m_groupId;
 
-        // first free low guid for seelcted guid type
+        // first free low guid for selected guid type
         uint32 m_hiCharGuid;
         uint32 m_hiCreatureGuid;
         uint32 m_hiItemGuid;

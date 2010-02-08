@@ -33,18 +33,11 @@
 #include "MapInstanced.h"
 #include "Util.h"
 
-Group::Group()
+Group::Group() : m_Id(0), m_leaderGuid(0), m_mainTank(0), m_mainAssistant(0),  m_groupType(GROUPTYPE_NORMAL),
+    m_dungeonDifficulty(REGULAR_DIFFICULTY), m_raidDifficulty(REGULAR_DIFFICULTY),
+    m_bgGroup(NULL), m_lootMethod(FREE_FOR_ALL), m_looterGuid(0), m_lootThreshold(ITEM_QUALITY_UNCOMMON), 
+    m_subGroupsCounts(NULL)
 {
-    m_leaderGuid        = 0;
-    m_mainTank          = 0;
-    m_mainAssistant     = 0;
-    m_groupType         = (GroupType)0;
-    m_bgGroup           = NULL;
-    m_lootMethod        = (LootMethod)0;
-    m_looterGuid        = 0;
-    m_lootThreshold     = ITEM_QUALITY_UNCOMMON;
-    m_subGroupsCounts   = NULL;
-
     for (int i = 0; i < TARGETICONCOUNT; ++i)
         m_targetIcons[i] = 0;
 }
@@ -123,7 +116,10 @@ bool Group::Create(const uint64 &guid, const char * name)
         return false;
 
     if(!isBGGroup())
+    {
         CharacterDatabase.CommitTransaction();
+        m_Id = sObjectMgr.GenerateGroupId();
+    }
 
     return true;
 }
@@ -194,6 +190,7 @@ bool Group::LoadGroupFromDB(const uint64 &leaderGuid, QueryResult *result, bool 
             return false;
     }
 
+    m_Id = sObjectMgr.GenerateGroupId();
     return true;
 }
 
@@ -616,7 +613,7 @@ void Group::GroupLoot(const uint64& playerGUID, Loot *loot, Creature *creature)
 
             loot->items[itemSlot].is_blocked = true;
             creature->m_groupLootTimer = 60000;
-            creature->lootingGroupLeaderGUID = GetLeaderGUID();
+            creature->m_groupLootId = GetId();
 
             RollId.push_back(r);
         }
@@ -1256,11 +1253,6 @@ void Group::_setLeader(const uint64 &guid)
 
     m_leaderGuid = slot->guid;
     m_leaderName = slot->name;
-
-    // Non-BG groups stored in sObjectMgr with leader low-guids as keys
-    if (IsCreated() && !isBGGroup())
-        sObjectMgr.UpdateGroup(old_guidlow,this);
-
 }
 
 void Group::_removeRolls(const uint64 &guid)

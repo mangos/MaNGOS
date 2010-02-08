@@ -142,6 +142,7 @@ ObjectMgr::ObjectMgr()
     m_guildId           = 1;
     m_arenaTeamId       = 1;
     m_auctionid         = 1;
+    m_groupId           = 1;
 
     // Only zero condition left, others will be added while loading DB tables
     mConditions.resize(1);
@@ -180,16 +181,26 @@ ObjectMgr::~ObjectMgr()
         itr->second.Clear();
 }
 
-Group * ObjectMgr::GetGroupByLeaderLowGUID(uint32 guid) const
+Group* ObjectMgr::GetGroupById(uint32 id) const
 {
-    GroupMap::const_iterator itr = mGroupMap.find(guid);
+    GroupMap::const_iterator itr = mGroupMap.find(id);
     if (itr != mGroupMap.end())
         return itr->second;
 
     return NULL;
 }
 
-Guild * ObjectMgr::GetGuildById(uint32 GuildId) const
+Group* ObjectMgr::GetGroupByLeaderLowGUID(uint32 guid) const
+{
+    for(GroupMap::const_iterator itr = mGroupMap.begin(); itr != mGroupMap.end(); ++itr)
+        if (GUID_LOPART(itr->second->GetLeaderGUID())==guid)
+            return itr->second;
+
+    return NULL;
+}
+
+
+Guild* ObjectMgr::GetGuildById(uint32 GuildId) const
 {
     GuildMap::const_iterator itr = mGuildMap.find(GuildId);
     if (itr != mGuildMap.end())
@@ -3124,6 +3135,8 @@ void ObjectMgr::LoadGroups()
         return;
     }
 
+    std::map<uint32,uint32> leader2groupMap;
+
     barGoLink bar( result->GetRowCount() );
 
     do
@@ -3140,6 +3153,7 @@ void ObjectMgr::LoadGroups()
             continue;
         }
         AddGroup(group);
+        leader2groupMap[GUID_LOPART(leaderGuid)] = group->GetId();
     }while( result->NextRow() );
 
     delete result;
@@ -3173,7 +3187,11 @@ void ObjectMgr::LoadGroups()
             uint32 leaderGuidLow = fields[3].GetUInt32();
             if(!group || GUID_LOPART(group->GetLeaderGUID()) != leaderGuidLow)
             {
-                group = GetGroupByLeaderLowGUID(leaderGuidLow);
+                // find group id in map by leader low guid
+                std::map<uint32,uint32>::const_iterator l2g_itr = leader2groupMap.find(leaderGuidLow);
+                if (l2g_itr != leader2groupMap.end())
+                    group = GetGroupById(l2g_itr->second);
+
                 if(!group)
                 {
                     sLog.outErrorDb("Incorrect entry in group_member table : no group with leader %d for member %d!", leaderGuidLow, memberGuidlow);
@@ -3237,7 +3255,11 @@ void ObjectMgr::LoadGroups()
 
             if(!group || GUID_LOPART(group->GetLeaderGUID()) != leaderGuidLow)
             {
-                group = GetGroupByLeaderLowGUID(leaderGuidLow);
+                // find group id in map by leader low guid
+                std::map<uint32,uint32>::const_iterator l2g_itr = leader2groupMap.find(leaderGuidLow);
+                if (l2g_itr != leader2groupMap.end())
+                    group = GetGroupById(l2g_itr->second);
+
                 if(!group)
                 {
                     sLog.outErrorDb("Incorrect entry in group_instance table : no group with leader %d", leaderGuidLow);
@@ -5704,6 +5726,16 @@ uint32 ObjectMgr::GenerateGuildId()
         World::StopNow(ERROR_EXIT_CODE);
     }
     return m_guildId++;
+}
+
+uint32 ObjectMgr::GenerateGroupId()
+{
+    if(m_groupId>=0xFFFFFFFE)
+    {
+        sLog.outError("Group ids overflow!! Can't continue, shutting down server. ");
+        World::StopNow(ERROR_EXIT_CODE);
+    }
+    return m_groupId++;
 }
 
 uint32 ObjectMgr::GenerateMailID()
@@ -8426,18 +8458,12 @@ void ObjectMgr::RemoveGuild( uint32 Id )
 
 void ObjectMgr::AddGroup( Group* group )
 {
-    mGroupMap[GUID_LOPART(group->GetLeaderGUID())] = group ;
+    mGroupMap[group->GetId()] = group ;
 }
 
 void ObjectMgr::RemoveGroup( Group* group )
 {
-    mGroupMap.erase(GUID_LOPART(group->GetLeaderGUID()));
-}
-
-void ObjectMgr::UpdateGroup( uint32 old_guidlow, Group* group )
-{
-    mGroupMap.erase(old_guidlow);
-    AddGroup(group);
+    mGroupMap.erase(group->GetId());
 }
 
 void ObjectMgr::AddArenaTeam( ArenaTeam* arenaTeam )
