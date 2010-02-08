@@ -233,19 +233,21 @@ uint32 Quest::XPValue(Player *pPlayer) const
             }
         }
 
-        const QuestXPLevel* pXPData = sQuestXPLevelStore.LookupEntry(baseLevel);
+        // not possible to reward XP when baseLevel does not exist in dbc
+        if (const QuestXPLevel* pXPData = sQuestXPLevelStore.LookupEntry(baseLevel))
+        {
+            uint32 rawXP = xpMultiplier * pXPData->xpIndex[RewXPId] / 10;
 
-        uint32 rawXP = xpMultiplier * pXPData->xpIndex[RewXPId] / 10;
-
-        // round values
-        if (rawXP > 1000)
-            realXP = ((rawXP + 25) / 50 * 50);
-        else if (rawXP > 500)
-            realXP = ((rawXP + 12) / 25 * 25);
-        else if (rawXP > 100)
-            realXP = ((rawXP + 5) / 10 * 10);
-        else
-            realXP = ((rawXP + 2) / 5 * 5);
+            // round values
+            if (rawXP > 1000)
+                realXP = ((rawXP + 25) / 50 * 50);
+            else if (rawXP > 500)
+                realXP = ((rawXP + 12) / 25 * 25);
+            else if (rawXP > 100)
+                realXP = ((rawXP + 5) / 10 * 10);
+            else
+                realXP = ((rawXP + 2) / 5 * 5);
+        }
 
         return realXP;
     }
