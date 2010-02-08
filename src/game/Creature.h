@@ -217,7 +217,7 @@ struct CreatureDataAddon
     uint32 bytes1;
     uint32 bytes2;
     uint32 emote;
-    uint32 move_flags;
+    uint32 splineFlags;
     CreatureDataAddonAura const* auras;                     // loaded as char* "spell1 eff1 spell2 eff2 ... "
 };
 

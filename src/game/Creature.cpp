@@ -1691,8 +1691,8 @@ bool Creature::LoadCreaturesAddon(bool reload)
     if (cainfo->emote != 0)
         SetUInt32Value(UNIT_NPC_EMOTESTATE, cainfo->emote);
 
-    if (cainfo->move_flags != 0)
-        SetSplineFlags(SplineFlags(cainfo->move_flags));
+    if (cainfo->splineFlags != 0)
+        SetSplineFlags(SplineFlags(cainfo->splineFlags));
 
     if(cainfo->auras)
     {
