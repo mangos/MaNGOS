@@ -2488,6 +2488,16 @@ void Spell::prepare(SpellCastTargets const* targets, Aura* triggeredByAura)
     {
         m_caster->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
         m_caster->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
+        Unit::AuraList const& dAuras = m_caster->GetAurasByType(SPELL_AURA_MOD_INVISIBILITY);
+        for(Unit::AuraList::const_iterator itr = dAuras.begin(); itr != dAuras.end(); ++itr)
+        {
+            SpellEntry const* itr_spellProto = (*itr)->GetSpellProto();
+            if(itr_spellProto->InterruptFlags != 0x00000000)
+            {
+                m_caster->RemoveAurasDueToSpell((*itr)->GetId());
+                break;
+            }
+        }
     }
 
     // add non-triggered (with cast time and without)
