@@ -31,10 +31,10 @@ void PointMovementGenerator<T>::Initialize(T &unit)
     unit.StopMoving();
     unit.addUnitState(UNIT_STAT_ROAMING|UNIT_STAT_ROAMING_MOVE);
     Traveller<T> traveller(unit);
-    i_destinationHolder.SetDestination(traveller,i_x,i_y,i_z);
+    i_destinationHolder.SetDestination(traveller, i_x, i_y, i_z);
 
     if (unit.GetTypeId() == TYPEID_UNIT && ((Creature*)&unit)->canFly())
-        ((Creature&)unit).AddMonsterMoveFlag(MONSTER_MOVE_FLY);
+        ((Creature&)unit).AddSplineFlag(SPLINEFLAG_UNKNOWN7);
 }
 
 template<class T>

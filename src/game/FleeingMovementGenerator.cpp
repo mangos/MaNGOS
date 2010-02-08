@@ -310,7 +310,7 @@ template<>
 void
 FleeingMovementGenerator<Creature>::_Init(Creature &owner)
 {
-    owner.RemoveMonsterMoveFlag(MONSTER_MOVE_WALK);
+    owner.RemoveSplineFlag(SPLINEFLAG_WALKMODE);
     owner.SetTargetGUID(0);
     is_water_ok = owner.canSwim();
     is_land_ok  = owner.canWalk();
@@ -333,7 +333,7 @@ void FleeingMovementGenerator<Player>::Finalize(Player &owner)
 template<>
 void FleeingMovementGenerator<Creature>::Finalize(Creature &owner)
 {
-    owner.AddMonsterMoveFlag(MONSTER_MOVE_WALK);
+    owner.AddSplineFlag(SPLINEFLAG_WALKMODE);
     owner.clearUnitState(UNIT_STAT_FLEEING|UNIT_STAT_FLEEING_MOVE);
 }
 
