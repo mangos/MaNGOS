@@ -55,11 +55,6 @@ class DatabasePostgre : public Database
 
         unsigned long escape_string(char *to, const char *from, unsigned long length);
         using Database::escape_string;
-
-        // must be call before first query in thread
-        void ThreadStart();
-        // must be call before finish thread run
-        void ThreadEnd();
     private:
         ACE_Thread_Mutex mMutex;
         ACE_Based::Thread * tranThread;
