@@ -6064,16 +6064,8 @@ void Player::RewardReputation(Quest const *pQuest)
         }
         else
         {
-            uint32 row = 1;
-            int32 field = 0;
-
-            if (pQuest->RewRepValueId[i] < 0)
-            {
-                ++row;
-                field = abs(pQuest->RewRepValueId[i]);
-            }
-            else
-                field = pQuest->RewRepValueId[i];
+            uint32 row = ((pQuest->RewRepValueId[i] < 0) ? 1 : 0) + 1;
+            uint32 field = abs(pQuest->RewRepValueId[i]);
 
             if (const QuestFactionRewardEntry *pRow = sQuestFactionRewardStore.LookupEntry(row))
             {
