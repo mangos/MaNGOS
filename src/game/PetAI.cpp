@@ -288,7 +288,7 @@ void PetAI::UpdateAI(const uint32 diff)
             SpellCastTargets targets;
             targets.setUnitTarget( target );
 
-            if (!m_creature->HasInArc(M_PI, target))
+            if (!m_creature->HasInArc(M_PI_F, target))
             {
                 m_creature->SetInFront(target);
                 if (target->GetTypeId() == TYPEID_PLAYER)

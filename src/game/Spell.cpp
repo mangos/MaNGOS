@@ -2114,9 +2114,9 @@ void Spell::SetTargetMap(uint32 effIndex, uint32 targetMode, UnitList& targetUni
                 switch(targetMode)
                 {
                     case TARGET_INFRONT_OF_VICTIM:                      break;
-                    case TARGET_BEHIND_VICTIM:      angle = M_PI;       break;
-                    case TARGET_RIGHT_FROM_VICTIM:  angle = -M_PI / 2;  break;
-                    case TARGET_LEFT_FROM_VICTIM:   angle = M_PI / 2;   break;
+                    case TARGET_BEHIND_VICTIM:      angle = M_PI_F;       break;
+                    case TARGET_RIGHT_FROM_VICTIM:  angle = -M_PI_F / 2;  break;
+                    case TARGET_LEFT_FROM_VICTIM:   angle = M_PI_F / 2;   break;
                 }
 
                 float _target_x, _target_y, _target_z;
@@ -2146,9 +2146,9 @@ void Spell::SetTargetMap(uint32 effIndex, uint32 targetMode, UnitList& targetUni
                 switch(targetMode)
                 {
                     case TARGET_DYNAMIC_OBJECT_FRONT:                           break;
-                    case TARGET_DYNAMIC_OBJECT_BEHIND:      angle += M_PI;      break;
-                    case TARGET_DYNAMIC_OBJECT_LEFT_SIDE:   angle += M_PI / 2;  break;
-                    case TARGET_DYNAMIC_OBJECT_RIGHT_SIDE:  angle -= M_PI / 2;  break;
+                    case TARGET_DYNAMIC_OBJECT_BEHIND:      angle += M_PI_F;      break;
+                    case TARGET_DYNAMIC_OBJECT_LEFT_SIDE:   angle += M_PI_F / 2;  break;
+                    case TARGET_DYNAMIC_OBJECT_RIGHT_SIDE:  angle -= M_PI_F / 2;  break;
                 }
 
                 float x, y;
@@ -2177,13 +2177,13 @@ void Spell::SetTargetMap(uint32 effIndex, uint32 targetMode, UnitList& targetUni
                 switch(targetMode)
                 {
                     case TARGET_POINT_AT_NORTH:                         break;
-                    case TARGET_POINT_AT_SOUTH: angle +=   M_PI;        break;
-                    case TARGET_POINT_AT_EAST:  angle -=   M_PI / 2;    break;
-                    case TARGET_POINT_AT_WEST:  angle +=   M_PI / 2;    break;
-                    case TARGET_POINT_AT_NE:    angle -=   M_PI / 4;    break;
-                    case TARGET_POINT_AT_NW:    angle +=   M_PI / 4;    break;
-                    case TARGET_POINT_AT_SE:    angle -= 3*M_PI / 4;    break;
-                    case TARGET_POINT_AT_SW:    angle += 3*M_PI / 4;    break;
+                    case TARGET_POINT_AT_SOUTH: angle +=   M_PI_F;        break;
+                    case TARGET_POINT_AT_EAST:  angle -=   M_PI_F / 2;    break;
+                    case TARGET_POINT_AT_WEST:  angle +=   M_PI_F / 2;    break;
+                    case TARGET_POINT_AT_NE:    angle -=   M_PI_F / 4;    break;
+                    case TARGET_POINT_AT_NW:    angle +=   M_PI_F / 4;    break;
+                    case TARGET_POINT_AT_SE:    angle -= 3*M_PI_F / 4;    break;
+                    case TARGET_POINT_AT_SW:    angle += 3*M_PI_F / 4;    break;
                 }
 
                 float x, y;
@@ -4211,7 +4211,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                 return SPELL_FAILED_TARGET_AURASTATE;
 
         //Must be behind the target.
-        if( m_spellInfo->AttributesEx2 == 0x100000 && (m_spellInfo->AttributesEx & 0x200) == 0x200 && target->HasInArc(M_PI, m_caster) )
+        if( m_spellInfo->AttributesEx2 == 0x100000 && (m_spellInfo->AttributesEx & 0x200) == 0x200 && target->HasInArc(M_PI_F, m_caster) )
         {
             //Exclusion for Pounce:  Facing Limitation was removed in 2.0.1, but it still uses the same, old Ex-Flags
             //Exclusion for Mutilate:Facing Limitation was removed in 2.0.1 and 3.0.3, but they still use the same, old Ex-Flags
@@ -4224,7 +4224,7 @@ SpellCastResult Spell::CheckCast(bool strict)
         }
 
         //Target must be facing you.
-        if((m_spellInfo->Attributes == 0x150010) && !target->HasInArc(M_PI, m_caster) )
+        if((m_spellInfo->Attributes == 0x150010) && !target->HasInArc(M_PI_F, m_caster) )
         {
             SendInterrupted(2);
             return SPELL_FAILED_NOT_INFRONT;
@@ -4479,7 +4479,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                 {
                     // spell different for friends and enemies
                     // hart version required facing
-                    if(m_targets.getUnitTarget() && !m_caster->IsFriendlyTo(m_targets.getUnitTarget()) && !m_caster->HasInArc( M_PI, m_targets.getUnitTarget() ))
+                    if(m_targets.getUnitTarget() && !m_caster->IsFriendlyTo(m_targets.getUnitTarget()) && !m_caster->HasInArc( M_PI_F, m_targets.getUnitTarget() ))
                         return SPELL_FAILED_UNIT_NOT_INFRONT;
                 }
                 break;
@@ -5247,7 +5247,7 @@ SpellCastResult Spell::CheckRange(bool strict)
         if(min_range && dist < min_range)
             return SPELL_FAILED_TOO_CLOSE;
         if( m_caster->GetTypeId() == TYPEID_PLAYER &&
-            (m_spellInfo->FacingCasterFlags & SPELL_FACING_FLAG_INFRONT) && !m_caster->HasInArc( M_PI, target ) )
+            (m_spellInfo->FacingCasterFlags & SPELL_FACING_FLAG_INFRONT) && !m_caster->HasInArc( M_PI_F, target ) )
             return SPELL_FAILED_UNIT_NOT_INFRONT;
     }
 

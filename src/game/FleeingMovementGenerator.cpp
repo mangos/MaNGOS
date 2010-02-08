@@ -84,59 +84,59 @@ FleeingMovementGenerator<T>::_getPoint(T &owner, float &x, float &y, float &z)
                 distance /= 4;
                 break;
             case 3:
-                angle = i_cur_angle + M_PI/4.0f;
+                angle = i_cur_angle + M_PI_F/4.0f;
                 break;
             case 4:
-                angle = i_cur_angle - M_PI/4.0f;
+                angle = i_cur_angle - M_PI_F/4.0f;
                 break;
             case 5:
-                angle = i_cur_angle + M_PI/4.0f;
+                angle = i_cur_angle + M_PI_F/4.0f;
                 distance /= 2;
                 break;
             case 6:
-                angle = i_cur_angle - M_PI/4.0f;
+                angle = i_cur_angle - M_PI_F/4.0f;
                 distance /= 2;
                 break;
             case 7:
-                angle = i_cur_angle + M_PI/2.0f;
+                angle = i_cur_angle + M_PI_F/2.0f;
                 break;
             case 8:
-                angle = i_cur_angle - M_PI/2.0f;
+                angle = i_cur_angle - M_PI_F/2.0f;
                 break;
             case 9:
-                angle = i_cur_angle + M_PI/2.0f;
+                angle = i_cur_angle + M_PI_F/2.0f;
                 distance /= 2;
                 break;
             case 10:
-                angle = i_cur_angle - M_PI/2.0f;
+                angle = i_cur_angle - M_PI_F/2.0f;
                 distance /= 2;
                 break;
             case 11:
-                angle = i_cur_angle + M_PI/4.0f;
+                angle = i_cur_angle + M_PI_F/4.0f;
                 distance /= 4;
                 break;
             case 12:
-                angle = i_cur_angle - M_PI/4.0f;
+                angle = i_cur_angle - M_PI_F/4.0f;
                 distance /= 4;
                 break;
             case 13:
-                angle = i_cur_angle + M_PI/2.0f;
+                angle = i_cur_angle + M_PI_F/2.0f;
                 distance /= 4;
                 break;
             case 14:
-                angle = i_cur_angle - M_PI/2.0f;
+                angle = i_cur_angle - M_PI_F/2.0f;
                 distance /= 4;
                 break;
             case 15:
-                angle = i_cur_angle + M_PI*3/4.0f;
+                angle = i_cur_angle + M_PI_F*3/4.0f;
                 distance /= 2;
                 break;
             case 16:
-                angle = i_cur_angle - M_PI*3/4.0f;
+                angle = i_cur_angle - M_PI_F*3/4.0f;
                 distance /= 2;
                 break;
             case 17:
-                angle = i_cur_angle + M_PI;
+                angle = i_cur_angle + M_PI_F;
                 distance /= 2;
                 break;
         }
@@ -166,8 +166,8 @@ FleeingMovementGenerator<T>::_getPoint(T &owner, float &x, float &y, float &z)
 
             if( !(new_z - z) || distance / fabs(new_z - z) > 1.0f)
             {
-                float new_z_left = _map->GetHeight(temp_x + 1.0f*cos(angle+M_PI/2),temp_y + 1.0f*sin(angle+M_PI/2),z,true);
-                float new_z_right = _map->GetHeight(temp_x + 1.0f*cos(angle-M_PI/2),temp_y + 1.0f*sin(angle-M_PI/2),z,true);
+                float new_z_left = _map->GetHeight(temp_x + 1.0f*cos(angle+M_PI_F/2),temp_y + 1.0f*sin(angle+M_PI_F/2),z,true);
+                float new_z_right = _map->GetHeight(temp_x + 1.0f*cos(angle-M_PI_F/2),temp_y + 1.0f*sin(angle-M_PI_F/2),z,true);
                 if(fabs(new_z_left - new_z) < 1.2f && fabs(new_z_right - new_z) < 1.2f)
                 {
                     x = temp_x;
@@ -232,13 +232,13 @@ FleeingMovementGenerator<T>::_setMoveData(T &owner)
         else
         {
             cur_dist = cur_dist_xyz;
-            angle_to_caster = owner.GetAngle(i_caster_x, i_caster_y) + M_PI;
+            angle_to_caster = owner.GetAngle(i_caster_x, i_caster_y) + M_PI_F;
         }
     }
     else
     {
         cur_dist = cur_dist_xyz;
-        angle_to_caster = owner.GetAngle(i_caster_x, i_caster_y) + M_PI;
+        angle_to_caster = owner.GetAngle(i_caster_x, i_caster_y) + M_PI_F;
     }
 
     // if we too close may use 'path-finding' else just stop
@@ -249,23 +249,23 @@ FleeingMovementGenerator<T>::_setMoveData(T &owner)
 
     if(i_cur_angle == 0.0f && i_last_distance_from_caster == 0.0f) //just started, first time
     {
-        angle = rand_norm()*(1.0f - cur_dist/MIN_QUIET_DISTANCE) * M_PI/3 + rand_norm()*M_PI*2/3;
+        angle = rand_norm()*(1.0f - cur_dist/MIN_QUIET_DISTANCE) * M_PI_F/3 + rand_norm()*M_PI_F*2/3;
         i_to_distance_from_caster = MIN_QUIET_DISTANCE;
         i_only_forward = true;
     }
     else if(cur_dist < MIN_QUIET_DISTANCE)
     {
-        angle = M_PI/6 + rand_norm()*M_PI*2/3;
+        angle = M_PI_F/6 + rand_norm()*M_PI_F*2/3;
         i_to_distance_from_caster = cur_dist*2/3 + rand_norm()*(MIN_QUIET_DISTANCE - cur_dist*2/3);
     }
     else if(cur_dist > MAX_QUIET_DISTANCE)
     {
-        angle = rand_norm()*M_PI/3 + M_PI*2/3;
+        angle = rand_norm()*M_PI_F/3 + M_PI_F*2/3;
         i_to_distance_from_caster = MIN_QUIET_DISTANCE + 2.5f + rand_norm()*(MAX_QUIET_DISTANCE - MIN_QUIET_DISTANCE - 2.5f);
     }
     else
     {
-        angle = rand_norm()*M_PI;
+        angle = rand_norm()*M_PI_F;
         i_to_distance_from_caster = MIN_QUIET_DISTANCE + 2.5f + rand_norm()*(MAX_QUIET_DISTANCE - MIN_QUIET_DISTANCE - 2.5f);
     }
 

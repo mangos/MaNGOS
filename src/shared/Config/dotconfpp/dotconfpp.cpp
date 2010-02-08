@@ -1,10 +1,10 @@
 #include "Common.h"
 #include "dotconfpp.h"
+#include <ace/OS_NS_stdlib.h>
 
 #ifdef WIN32
 #  define PATH_MAX _MAX_PATH
 #  define strcasecmp stricmp
-#  define realpath(path,resolved_path) _fullpath(resolved_path, path, _MAX_PATH)
 #  include <io.h>
 #else
 #  include <unistd.h>
@@ -405,7 +405,7 @@ int DOTCONFDocument::setContent(const char* _fileName)
     int ret = 0;
     char realpathBuf[PATH_MAX];
 
-    if (realpath(_fileName, realpathBuf) == NULL)
+    if (ACE_OS::realpath(_fileName, realpathBuf) == NULL)
     {
         error(0, NULL, "realpath (%s) failed: %s", _fileName, strerror(errno));
         return -1;
@@ -453,7 +453,7 @@ int DOTCONFDocument::setContent(const char* _fileName)
                         return -1;
                     }
 
-                    if (realpath(tagNode->values[vi], realpathBuf) == NULL)
+                    if (ACE_OS::realpath(tagNode->values[vi], realpathBuf) == NULL)
                     {
                         error(tagNode->lineNum, tagNode->fileName, "realpath (%s) failed: %s", tagNode->values[vi], strerror(errno));
                         return -1;
