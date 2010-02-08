@@ -6047,12 +6047,43 @@ void Player::RewardReputation(Quest const *pQuest)
     // quest reputation reward/loss
     for(int i = 0; i < QUEST_REPUTATIONS_COUNT; ++i)
     {
-        if(pQuest->RewRepFaction[i] && pQuest->RewRepValue[i] )
+        if (!pQuest->RewRepFaction[i])
+            continue;
+
+        // For future, this row should be used as "override". Example quests are 10298 and 10870.
+        // Typically, no diplomacy mod must apply to the final value (flat). Note the formula must be (finalValue = DBvalue/100)
+        if (pQuest->RewRepValue[i])
         {
             int32 rep = CalculateReputationGain(GetQuestLevelForPlayer(pQuest), pQuest->RewRepValue[i], pQuest->RewRepFaction[i], true);
-            FactionEntry const* factionEntry = sFactionStore.LookupEntry(pQuest->RewRepFaction[i]);
-            if(factionEntry)
+
+            if (FactionEntry const* factionEntry = sFactionStore.LookupEntry(pQuest->RewRepFaction[i]))
                 GetReputationMgr().ModifyReputation(factionEntry, rep);
+        }
+        else
+        {
+            uint32 row = 1;
+            int32 field = 0;
+
+            if (pQuest->RewRepValueId[i] < 0)
+            {
+                ++row;
+                field = abs(pQuest->RewRepValueId[i]);
+            }
+            else
+                field = pQuest->RewRepValueId[i];
+
+            if (const QuestFactionRewardEntry *pRow = sQuestFactionRewardStore.LookupEntry(row))
+            {
+                int32 repPoints = pRow->rewardValue[field];
+
+                if (!repPoints)
+                    continue;
+
+                repPoints = CalculateReputationGain(GetQuestLevelForPlayer(pQuest), repPoints, pQuest->RewRepFaction[i], true);
+
+                if (const FactionEntry* factionEntry = sFactionStore.LookupEntry(pQuest->RewRepFaction[i]))
+                    GetReputationMgr().ModifyReputation(factionEntry, repPoints);
+            }
         }
     }
 

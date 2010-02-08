@@ -3326,19 +3326,23 @@ void ObjectMgr::LoadQuests()
         "RewChoiceItemCount1, RewChoiceItemCount2, RewChoiceItemCount3, RewChoiceItemCount4, RewChoiceItemCount5, RewChoiceItemCount6,"
     //   85          86          87          88          89             90             91             92
         "RewItemId1, RewItemId2, RewItemId3, RewItemId4, RewItemCount1, RewItemCount2, RewItemCount3, RewItemCount4,"
-    //   93              94              95              96              97              98            99            100           101           102
-        "RewRepFaction1, RewRepFaction2, RewRepFaction3, RewRepFaction4, RewRepFaction5, RewRepValue1, RewRepValue2, RewRepValue3, RewRepValue4, RewRepValue5,"
-    //   103               104                 105            106               107       108
+    //   93              94              95              96              97
+        "RewRepFaction1, RewRepFaction2, RewRepFaction3, RewRepFaction4, RewRepFaction5,"
+    //   98              99              100             101             102
+        "RewRepValueId1, RewRepValueId2, RewRepValueId3, RewRepValueId4, RewRepValueId5,"
+    //   103           104           105           106           107
+        "RewRepValue1, RewRepValue2, RewRepValue3, RewRepValue4, RewRepValue5,"
+    //   108               109                 110            111               112       113
         "RewHonorAddition, RewHonorMultiplier, RewOrReqMoney, RewMoneyMaxLevel, RewSpell, RewSpellCast,"
-    //   109                110               111         112     113     114
+    //   114                115               116         117     118     119
         "RewMailTemplateId, RewMailDelaySecs, PointMapId, PointX, PointY, PointOpt,"
-    //   115            116            117            118            119                 120                 121                 122
+    //   120            121            122            123            124                 125                 126                 127
         "DetailsEmote1, DetailsEmote2, DetailsEmote3, DetailsEmote4, DetailsEmoteDelay1, DetailsEmoteDelay2, DetailsEmoteDelay3, DetailsEmoteDelay4,"
-    //   123              124            125                126                127                128
+    //   128              129            130                131                132                133
         "IncompleteEmote, CompleteEmote, OfferRewardEmote1, OfferRewardEmote2, OfferRewardEmote3, OfferRewardEmote4,"
-    //   129                     130                     131                     132
+    //   134                     135                     136                     137
         "OfferRewardEmoteDelay1, OfferRewardEmoteDelay2, OfferRewardEmoteDelay3, OfferRewardEmoteDelay4,"
-    //   133          134
+    //   138          139
         "StartScript, CompleteScript"
         " FROM quest_template");
     if(result == NULL)
@@ -3787,23 +3791,19 @@ void ObjectMgr::LoadQuests()
 
         for(int j = 0; j < QUEST_REPUTATIONS_COUNT; ++j)
         {
-            if(qinfo->RewRepFaction[j])
+            if (qinfo->RewRepFaction[j])
             {
-                if(!qinfo->RewRepValue[j])
-                {
-                    sLog.outErrorDb("Quest %u has `RewRepFaction%d` = %u but `RewRepValue%d` = 0, quest will not reward this reputation.",
-                        qinfo->GetQuestId(),j+1,qinfo->RewRepValue[j],j+1);
-                    // no changes
-                }
+                if (abs(qinfo->RewRepValueId[j]) > 9)
+                    sLog.outErrorDb("Quest %u has RewRepValueId%d = %i but value is not valid.", qinfo->GetQuestId(), j+1, qinfo->RewRepValueId[j]);
 
-                if(!sFactionStore.LookupEntry(qinfo->RewRepFaction[j]))
+                if (!sFactionStore.LookupEntry(qinfo->RewRepFaction[j]))
                 {
                     sLog.outErrorDb("Quest %u has `RewRepFaction%d` = %u but raw faction (faction.dbc) %u does not exist, quest will not reward reputation for this faction.",
-                        qinfo->GetQuestId(),j+1,qinfo->RewRepFaction[j] ,qinfo->RewRepFaction[j] );
+                        qinfo->GetQuestId(),j+1,qinfo->RewRepFaction[j] ,qinfo->RewRepFaction[j]);
                     qinfo->RewRepFaction[j] = 0;            // quest will not reward this
                 }
             }
-            else if(qinfo->RewRepValue[j]!=0)
+            else if (qinfo->RewRepValue[j] != 0)
             {
                 sLog.outErrorDb("Quest %u has `RewRepFaction%d` = 0 but `RewRepValue%d` = %u.",
                     qinfo->GetQuestId(),j+1,j+1,qinfo->RewRepValue[j]);

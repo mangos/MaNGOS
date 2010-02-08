@@ -254,6 +254,7 @@ class Quest
         uint32 RewItemId[QUEST_REWARDS_COUNT];
         uint32 RewItemCount[QUEST_REWARDS_COUNT];
         uint32 RewRepFaction[QUEST_REPUTATIONS_COUNT];
+        int32  RewRepValueId[QUEST_REPUTATIONS_COUNT];
         int32  RewRepValue[QUEST_REPUTATIONS_COUNT];
         uint32 DetailsEmote[QUEST_EMOTE_COUNT];
         uint32 DetailsEmoteDelay[QUEST_EMOTE_COUNT];
