@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_9312_01_mangos_quest_template` bit(1) default NULL
+  `required_9329_01_mangos_spell_chain` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -15602,6 +15602,16 @@ INSERT INTO spell_chain VALUES
 (27051,24579,24423,5,0),
 (55487,27051,24423,6,0),
 /*------------------
+--(214)Pet - Crab
+------------------*/
+/* Sonic Blast */
+(50245,0,50245,1,0),
+(53544,50245,50245,2,0),
+(53545,53544,50245,3,0),
+(53546,53545,50245,4,0),
+(53547,53546,50245,5,0),
+(53548,53547,50245,6,0),
+/*------------------
 --(215)Pet-Gorilla
 --(786)Pet-ExoticRhino
 --(775)Pet-Moth
@@ -17144,6 +17154,16 @@ INSERT INTO spell_chain VALUES
 (9484,0,9484,1,0),
 (9485,9484,9484,2,0),
 (10955,9485,9484,3,0),
+/*------------------
+--(654)Pet - Bat
+------------------*/
+/* Pin */
+(50519,0,50519,1,0),
+(53564,50519,50519,2,0),
+(53565,53564,50519,3,0),
+(53566,53565,50519,4,0),
+(53567,53566,50519,5,0),
+(53568,53567,50519,6,0),
 /*------------------
 --(654)Pet-Hyena
 ------------------*/
