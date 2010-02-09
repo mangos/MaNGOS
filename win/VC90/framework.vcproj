@@ -612,14 +612,6 @@
 				>
 			</File>
 		</Filter>
-		<Filter
-			Name="Network"
-			>
-			<File
-				RelativePath="..\..\src\framework\Network\SocketDefines.h"
-				>
-			</File>
-		</Filter>
 	</Files>
 	<Globals>
 	</Globals>

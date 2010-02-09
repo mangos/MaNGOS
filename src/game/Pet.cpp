@@ -519,8 +519,8 @@ void Pet::Update(uint32 diff)
 
             if(m_duration > 0)
             {
-                if(m_duration > diff)
-                    m_duration -= diff;
+                if(m_duration > (int32)diff)
+                    m_duration -= (int32)diff;
                 else
                 {
                     Remove(getPetType() != SUMMON_PET ? PET_SAVE_AS_DELETED:PET_SAVE_NOT_IN_SLOT);
@@ -1184,7 +1184,7 @@ void Pet::_LoadAuras(uint32 timediff)
             // prevent wrong values of remaincharges
             if(spellproto->procCharges)
             {
-                if(remaincharges <= 0 || remaincharges > spellproto->procCharges)
+                if(remaincharges <= 0 || remaincharges > (int32)spellproto->procCharges)
                     remaincharges = spellproto->procCharges;
             }
             else
@@ -1774,7 +1774,7 @@ void Pet::ToggleAutocast(uint32 spellid, bool apply)
 
     PetSpellMap::iterator itr = m_spells.find(spellid);
 
-    int i;
+    uint32 i;
 
     if(apply)
     {

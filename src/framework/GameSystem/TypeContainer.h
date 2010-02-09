@@ -143,7 +143,6 @@ class TypeUnorderedMapContainer
  */
 template<class OBJECT> struct ContainerMapList
 {
-    //std::map<OBJECT_HANDLE, OBJECT *> _element;
     GridRefManager<OBJECT> _element;
 };
 
@@ -156,40 +155,6 @@ template<class H, class T> struct ContainerMapList<TypeList<H, T> >
     ContainerMapList<T> _TailElements;
 };
 
-/*
- * @class ContaierArrayList is a multi-type container for
- * array of elements.
- */
-template<class OBJECT> struct ContainerArrayList
-{
-    std::vector<OBJECT> _element;
-};
-
-// termination condition
-template<> struct ContainerArrayList<TypeNull> {};
-// recursion
-template<class H, class T> struct ContainerArrayList<TypeList<H, T> >
-{
-    ContainerArrayList<H> _elements;
-    ContainerArrayList<T> _TailElements;
-};
-
-/*
- * @class ContainerList is a simple list of different types of elements
- *
- */
-template<class OBJECT> struct ContainerList
-{
-    OBJECT _element;
-};
-
-/* TypeNull is underfined */
-template<> struct ContainerList<TypeNull> {};
-template<class H, class T> struct ContainerList<TypeList<H, T> >
-{
-    ContainerList<H> _elements;
-    ContainerMapList<T> _TailElements;
-};
 
 #include "TypeContainerFunctions.h"
 
@@ -206,22 +171,17 @@ class MANGOS_DLL_DECL TypeMapContainer
     public:
         template<class SPECIFIC_TYPE> size_t Count() const { return MaNGOS::Count(i_elements, (SPECIFIC_TYPE*)NULL); }
 
-        template<class SPECIFIC_TYPE> SPECIFIC_TYPE* find(OBJECT_HANDLE hdl, SPECIFIC_TYPE *fake) { return MaNGOS::Find(i_elements, hdl,fake); }
-
-        /// find a specific type of object in the container
-        template<class SPECIFIC_TYPE> const SPECIFIC_TYPE* find(OBJECT_HANDLE hdl, SPECIFIC_TYPE *fake) const { return MaNGOS::Find(i_elements, hdl,fake); }
-
         /// inserts a specific object into the container
-        template<class SPECIFIC_TYPE> bool insert(OBJECT_HANDLE hdl, SPECIFIC_TYPE *obj)
+        template<class SPECIFIC_TYPE> bool insert(SPECIFIC_TYPE *obj)
         {
-            SPECIFIC_TYPE* t = MaNGOS::Insert(i_elements, obj, hdl);
+            SPECIFIC_TYPE* t = MaNGOS::Insert(i_elements, obj);
             return (t != NULL);
         }
 
         ///  Removes the object from the container, and returns the removed object
-        template<class SPECIFIC_TYPE> bool remove(SPECIFIC_TYPE* obj, OBJECT_HANDLE hdl)
+        template<class SPECIFIC_TYPE> bool remove(SPECIFIC_TYPE* obj)
         {
-            SPECIFIC_TYPE* t = MaNGOS::Remove(i_elements, obj, hdl);
+            SPECIFIC_TYPE* t = MaNGOS::Remove(i_elements, obj);
             return (t != NULL);
         }
 

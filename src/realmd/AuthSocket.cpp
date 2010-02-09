@@ -36,7 +36,6 @@ extern DatabaseType loginDatabase;
 
 enum eAuthCmd
 {
-    //AUTH_NO_CMD                 = 0xFF,
     AUTH_LOGON_CHALLENGE        = 0x00,
     AUTH_LOGON_PROOF            = 0x01,
     AUTH_RECONNECT_CHALLENGE    = 0x02,
@@ -348,6 +347,7 @@ void AuthSocket::SendProof(Sha1Hash sha)
         case 8606:                                          // 2.4.3
         case 10505:                                         // 3.2.2a
         case 11159:                                         // 3.3.0a
+        case 11403:                                         // 3.3.2
         default:                                            // or later
         {
             sAuthLogonProof_S proof;
@@ -982,6 +982,7 @@ void AuthSocket::LoadRealmlist(ByteBuffer &pkt, uint32 acctid)
         case 8606:                                          // 2.4.3
         case 10505:                                         // 3.2.2a
         case 11159:                                         // 3.3.0a
+        case 11403:                                         // 3.3.2
         default:                                            // and later
         {
             pkt << uint32(0);

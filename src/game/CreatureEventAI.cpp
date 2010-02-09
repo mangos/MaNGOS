@@ -652,7 +652,7 @@ void CreatureEventAI::ProcessAction(CreatureEventAI_Action const& action, uint32
             break;
         case ACTION_T_RANGED_MOVEMENT:
             AttackDistance = (float)action.ranged_movement.distance;
-            AttackAngle = action.ranged_movement.angle/180.0f*M_PI;
+            AttackAngle = action.ranged_movement.angle/180.0f*M_PI_F;
 
             if (CombatMovementEnabled)
             {

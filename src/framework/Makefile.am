@@ -42,7 +42,6 @@ EXTRA_DIST = \
 	GameSystem/TypeContainerFunctions.h \
 	GameSystem/TypeContainerFunctionsPtr.h \
 	GameSystem/TypeContainerVisitor.h \
-	Network/SocketDefines.h \
 	Platform/CompilerDefs.h \
 	Platform/Define.h \
 	Policies/CreationPolicy.h \

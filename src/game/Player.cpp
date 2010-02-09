@@ -731,7 +731,7 @@ bool Player::Create( uint32 guidlow, const std::string& name, uint8 race, uint8 
                 continue;
 
             // BuyCount by default
-            uint32 count = iProto->BuyCount;
+            int32 count = iProto->BuyCount;
 
             // special amount for foor/drink
             if(iProto->Class==ITEM_CLASS_CONSUMABLE && iProto->SubClass==ITEM_SUBCLASS_FOOD)
@@ -925,13 +925,13 @@ int32 Player::getMaxTimer(MirrorTimerType timer)
     switch (timer)
     {
         case FATIGUE_TIMER:
-            if (GetSession()->GetSecurity() >= sWorld.getConfig(CONFIG_TIMERBAR_FATIGUE_GMLEVEL))
+            if (GetSession()->GetSecurity() >= (AccountTypes)sWorld.getConfig(CONFIG_TIMERBAR_FATIGUE_GMLEVEL))
                 return DISABLED_MIRROR_TIMER;
             return sWorld.getConfig(CONFIG_TIMERBAR_FATIGUE_MAX)*IN_MILISECONDS;
         case BREATH_TIMER:
         {
             if (!isAlive() || HasAuraType(SPELL_AURA_WATER_BREATHING) ||
-                GetSession()->GetSecurity() >= sWorld.getConfig(CONFIG_TIMERBAR_BREATH_GMLEVEL))
+                GetSession()->GetSecurity() >= (AccountTypes)sWorld.getConfig(CONFIG_TIMERBAR_BREATH_GMLEVEL))
                 return DISABLED_MIRROR_TIMER;
             int32 UnderWaterTime = sWorld.getConfig(CONFIG_TIMERBAR_BREATH_MAX)*IN_MILISECONDS;
             AuraList const& mModWaterBreathing = GetAurasByType(SPELL_AURA_MOD_WATER_BREATHING);
@@ -941,7 +941,7 @@ int32 Player::getMaxTimer(MirrorTimerType timer)
         }
         case FIRE_TIMER:
         {
-            if (!isAlive() || GetSession()->GetSecurity() >= sWorld.getConfig(CONFIG_TIMERBAR_FIRE_GMLEVEL))
+            if (!isAlive() || GetSession()->GetSecurity() >= (AccountTypes)sWorld.getConfig(CONFIG_TIMERBAR_FIRE_GMLEVEL))
                 return DISABLED_MIRROR_TIMER;
             return sWorld.getConfig(CONFIG_TIMERBAR_FIRE_MAX)*IN_MILISECONDS;
         }
@@ -1208,7 +1208,7 @@ void Player::Update( uint32 p_time )
                     }
                 }
                 //120 degrees of radiant range
-                else if( !HasInArc( 2*M_PI/3, pVictim ))
+                else if( !HasInArc( 2*M_PI_F/3, pVictim ))
                 {
                     setAttackTimer(BASE_ATTACK,100);
                     if(m_swingErrorMsg != 2)                // send single time (client auto repeat)
@@ -1239,7 +1239,7 @@ void Player::Update( uint32 p_time )
                 {
                     setAttackTimer(OFF_ATTACK,100);
                 }
-                else if( !HasInArc( 2*M_PI/3, pVictim ))
+                else if( !HasInArc( 2*M_PI_F/3, pVictim ))
                 {
                     setAttackTimer(OFF_ATTACK,100);
                 }
@@ -1531,7 +1531,8 @@ bool Player::BuildEnumData( QueryResult * result, WorldPacket * p_data )
     *p_data << uint32(char_flags);                          // character flags
     // character customize flags
     *p_data << uint32(atLoginFlags & AT_LOGIN_CUSTOMIZE ? CHAR_CUSTOMIZE_FLAG_CUSTOMIZE : CHAR_CUSTOMIZE_FLAG_NONE);
-    *p_data << uint8(1);                                    // unknown
+    // First login
+    *p_data << uint8(atLoginFlags & AT_LOGIN_FIRST ? 1 : 0);
 
     // Pets info
     {
@@ -1994,7 +1995,7 @@ void Player::RewardRage( uint32 damage, uint32 weaponSpeedHitFactor, bool attack
 
         // Berserker Rage effect
         if(HasAura(18499,0))
-            addRage *= 1.3;
+            addRage *= 1.3f;
     }
 
     addRage *= sWorld.getRate(RATE_POWER_RAGE_INCOME);
@@ -2123,7 +2124,7 @@ void Player::RegenerateHealth(uint32 diff)
 
     // polymorphed case
     if ( IsPolymorphed() )
-        addvalue = GetMaxHealth()/3;
+        addvalue = (float)GetMaxHealth()/3;
     // normal regen case (maybe partly in combat case)
     else if (!isInCombat() || HasAuraType(SPELL_AURA_MOD_REGEN_DURING_COMBAT) )
     {
@@ -4008,12 +4009,12 @@ void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmC
     LeaveAllArenaTeams(playerguid);
 
     // the player was uninvited already on logout so just remove from group
-    QueryResult *resultGroup = CharacterDatabase.PQuery("SELECT leaderGuid FROM group_member WHERE memberGuid='%u'", guid);
+    QueryResult *resultGroup = CharacterDatabase.PQuery("SELECT groupId FROM group_member WHERE memberGuid='%u'", guid);
     if(resultGroup)
     {
-        uint32 leaderGuidLow = (*resultGroup)[0].GetUInt32();
+        uint32 groupId = (*resultGroup)[0].GetUInt32();
         delete resultGroup;
-        if (Group* group = sObjectMgr.GetGroupByLeaderLowGUID(leaderGuidLow))
+        if (Group* group = sObjectMgr.GetGroupById(groupId))
             RemoveFromGroup(group, playerguid);
     }
 
@@ -5300,7 +5301,7 @@ void Player::UpdateWeaponSkill (WeaponAttackType attType)
 {
     // no skill gain in pvp
     Unit *pVictim = getVictim();
-    if(pVictim && pVictim->GetTypeId() == TYPEID_PLAYER)
+    if(pVictim && pVictim->IsCharmerOrOwnerPlayerOrPlayerItself())
         return;
 
     if(IsInFeralForm())
@@ -6013,7 +6014,7 @@ int32 Player::CalculateReputationGain(uint32 creatureOrQuestLevel, int32 rep, in
     if (rate != 1.0f && creatureOrQuestLevel <= MaNGOS::XP::GetGrayLevel(getLevel()))
         percent *= rate;
 
-    float repMod = GetTotalAuraModifier(SPELL_AURA_MOD_REPUTATION_GAIN);
+    float repMod = (float)GetTotalAuraModifier(SPELL_AURA_MOD_REPUTATION_GAIN);
 
     if (!for_quest)
         repMod += GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_FACTION_REPUTATION_GAIN, faction);
@@ -6080,12 +6081,43 @@ void Player::RewardReputation(Quest const *pQuest)
     // quest reputation reward/loss
     for(int i = 0; i < QUEST_REPUTATIONS_COUNT; ++i)
     {
-        if(pQuest->RewRepFaction[i] && pQuest->RewRepValue[i] )
+        if (!pQuest->RewRepFaction[i])
+            continue;
+
+        // For future, this row should be used as "override". Example quests are 10298 and 10870.
+        // Typically, no diplomacy mod must apply to the final value (flat). Note the formula must be (finalValue = DBvalue/100)
+        if (pQuest->RewRepValue[i])
         {
             int32 rep = CalculateReputationGain(GetQuestLevelForPlayer(pQuest), pQuest->RewRepValue[i], pQuest->RewRepFaction[i], true);
-            FactionEntry const* factionEntry = sFactionStore.LookupEntry(pQuest->RewRepFaction[i]);
-            if(factionEntry)
+
+            if (FactionEntry const* factionEntry = sFactionStore.LookupEntry(pQuest->RewRepFaction[i]))
                 GetReputationMgr().ModifyReputation(factionEntry, rep);
+        }
+        else
+        {
+            uint32 row = 1;
+            int32 field = 0;
+
+            if (pQuest->RewRepValueId[i] < 0)
+            {
+                ++row;
+                field = abs(pQuest->RewRepValueId[i]);
+            }
+            else
+                field = pQuest->RewRepValueId[i];
+
+            if (const QuestFactionRewardEntry *pRow = sQuestFactionRewardStore.LookupEntry(row))
+            {
+                int32 repPoints = pRow->rewardValue[field];
+
+                if (!repPoints)
+                    continue;
+
+                repPoints = CalculateReputationGain(GetQuestLevelForPlayer(pQuest), repPoints, pQuest->RewRepFaction[i], true);
+
+                if (const FactionEntry* factionEntry = sFactionStore.LookupEntry(pQuest->RewRepFaction[i]))
+                    GetReputationMgr().ModifyReputation(factionEntry, repPoints);
+            }
         }
     }
 
@@ -6100,12 +6132,12 @@ void Player::UpdateArenaFields(void)
 void Player::UpdateHonorFields()
 {
     /// called when rewarding honor and at each save
-    uint64 now = time(NULL);
-    uint64 today = uint64(time(NULL) / DAY) * DAY;
+    time_t now = time(NULL);
+    time_t today = (time(NULL) / DAY) * DAY;
 
     if(m_lastHonorUpdateTime < today)
     {
-        uint64 yesterday = today - DAY;
+        time_t yesterday = today - DAY;
 
         uint16 kills_today = PAIR32_LOPART(GetUInt32Value(PLAYER_FIELD_KILLS));
 
@@ -6681,7 +6713,7 @@ void Player::_ApplyItemBonuses(ItemPrototype const *proto, uint8 slot, bool appl
     if (only_level_scale && !ssv)
         return;
 
-    for (int i = 0; i < MAX_ITEM_PROTO_STATS; ++i)
+    for (uint32 i = 0; i < MAX_ITEM_PROTO_STATS; ++i)
     {
         uint32 statType = 0;
         int32  val = 0;
@@ -7175,7 +7207,7 @@ void Player::CastItemCombatSpell(Unit* Target, WeaponAttackType attType)
         if( m_extraAttacks && IsSpellHaveEffect(spellInfo,SPELL_EFFECT_ADD_EXTRA_ATTACKS) )
             return;
 
-        float chance = spellInfo->procChance;
+        float chance = (float)spellInfo->procChance;
 
         if(spellData.SpellPPMRate)
         {
@@ -8660,7 +8692,7 @@ Item* Player::GetItemByPos( uint8 bag, uint8 slot ) const
 
 Item* Player::GetWeaponForAttack(WeaponAttackType attackType, bool nonbroken, bool useable) const
 {
-    uint16 slot;
+    uint8 slot;
     switch (attackType)
     {
         case BASE_ATTACK:   slot = EQUIPMENT_SLOT_MAINHAND; break;
@@ -11516,7 +11548,7 @@ void Player::SwapItem( uint16 src, uint16 dst )
 
             uint32 count = 0;
 
-            for(int i=0; i < fullBag->GetBagSize(); ++i)
+            for(uint32 i=0; i < fullBag->GetBagSize(); ++i)
             {
                 Item *bagItem = fullBag->GetItemByPos(i);
                 if (!bagItem)
@@ -11543,7 +11575,7 @@ void Player::SwapItem( uint16 src, uint16 dst )
 
             // Items swap
             count = 0;                                      // will pos in new bag
-            for(int i = 0; i< fullBag->GetBagSize(); ++i)
+            for(uint32 i = 0; i< fullBag->GetBagSize(); ++i)
             {
                 Item *bagItem = fullBag->GetItemByPos(i);
                 if (!bagItem)
@@ -12770,7 +12802,7 @@ void Player::SendPreparedQuest(uint64 guid)
                         NpcTextLocale const *nl = sObjectMgr.GetNpcTextLocale(textid);
                         if (nl)
                         {
-                            if (nl->Text_0[0].size() > loc_idx && !nl->Text_0[0][loc_idx].empty())
+                            if ((int32)nl->Text_0[0].size() > loc_idx && !nl->Text_0[0][loc_idx].empty())
                                 title = nl->Text_0[0][loc_idx];
                         }
                     }
@@ -12785,7 +12817,7 @@ void Player::SendPreparedQuest(uint64 guid)
                         NpcTextLocale const *nl = sObjectMgr.GetNpcTextLocale(textid);
                         if (nl)
                         {
-                            if (nl->Text_1[0].size() > loc_idx && !nl->Text_1[0][loc_idx].empty())
+                            if ((int32)nl->Text_1[0].size() > loc_idx && !nl->Text_1[0][loc_idx].empty())
                                 title = nl->Text_1[0][loc_idx];
                         }
                     }
@@ -13239,8 +13271,8 @@ void Player::RewardQuest( Quest const *pQuest, uint32 reward, Object* questGiver
     }
 
     // honor reward
-    if (pQuest->GetRewHonorableKills())
-        RewardHonor(NULL, 0, MaNGOS::Honor::hk_honor_at_level(getLevel(), pQuest->GetRewHonorableKills()));
+    if (pQuest->GetRewHonorAddition())
+        RewardHonor(NULL, 0, MaNGOS::Honor::hk_honor_at_level(getLevel(), pQuest->GetRewHonorAddition()));
 
     // title reward
     if (pQuest->GetCharTitleId())
@@ -14258,7 +14290,7 @@ bool Player::HasQuestForItem( uint32 itemid ) const
                     ItemPrototype const *pProto = ObjectMgr::GetItemPrototype(itemid);
 
                     // 'unique' item
-                    if (pProto->MaxCount && GetItemCount(itemid,true) < pProto->MaxCount)
+                    if (pProto->MaxCount && (int32)GetItemCount(itemid,true) < pProto->MaxCount)
                         return true;
 
                     // allows custom amount drop when not 0
@@ -14266,7 +14298,7 @@ bool Player::HasQuestForItem( uint32 itemid ) const
                     {
                         if (GetItemCount(itemid,true) < qinfo->ReqSourceCount[j])
                             return true;
-                    } else if (GetItemCount(itemid,true) < pProto->Stackable)
+                    } else if ((int32)GetItemCount(itemid,true) < pProto->Stackable)
                         return true;
                 }
             }
@@ -14304,7 +14336,7 @@ void Player::SendQuestReward( Quest const *pQuest, uint32 XP, Object * questGive
         data << uint32(pQuest->GetRewOrReqMoney() + int32(pQuest->GetRewMoneyMaxLevel() * sWorld.getRate(RATE_DROP_MONEY)));
     }
 
-    data << uint32(10*MaNGOS::Honor::hk_honor_at_level(getLevel(), pQuest->GetRewHonorableKills()));
+    data << uint32(10*MaNGOS::Honor::hk_honor_at_level(getLevel(), pQuest->GetRewHonorAddition()));
     data << uint32(pQuest->GetBonusTalents());              // bonus talents
     data << uint32(0);
     GetSession()->SendPacket( &data );
@@ -14356,7 +14388,7 @@ void Player::SendQuestConfirmAccept(const Quest* pQuest, Player* pReceiver)
         {
             if (const QuestLocale* pLocale = sObjectMgr.GetQuestLocale(pQuest->GetQuestId()))
             {
-                if (pLocale->Title.size() > loc_idx && !pLocale->Title[loc_idx].empty())
+                if ((int32)pLocale->Title.size() > loc_idx && !pLocale->Title[loc_idx].empty())
                     strTitle = pLocale->Title[loc_idx];
             }
         }
@@ -14911,9 +14943,9 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
 
     m_rest_bonus = fields[22].GetFloat();
     //speed collect rest bonus in offline, in logout, far from tavern, city (section/in hour)
-    float bubble0 = 0.031;
+    float bubble0 = 0.031f;
     //speed collect rest bonus in offline, in logout, in tavern, city (section/in hour)
-    float bubble1 = 0.125;
+    float bubble1 = 0.125f;
 
     if(time_diff > 0)
     {
@@ -15037,7 +15069,7 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
 
     // check PLAYER_CHOSEN_TITLE compatibility with PLAYER__FIELD_KNOWN_TITLES
     // note: PLAYER__FIELD_KNOWN_TITLES updated at quest status loaded
-    uint32 curTitle = fields[10].GetUInt32();
+    uint32 curTitle = fields[47].GetUInt32();
     if (curTitle && !HasTitle(curTitle))
         curTitle = 0;
 
@@ -15255,10 +15287,10 @@ void Player::_LoadAuras(QueryResult *result, uint32 timediff)
             uint32 spellid = fields[1].GetUInt32();
             uint32 effindex = fields[2].GetUInt32();
             uint32 stackcount = fields[3].GetUInt32();
-            int32 damage     = (int32)fields[4].GetUInt32();
-            int32 maxduration = (int32)fields[5].GetUInt32();
-            int32 remaintime = (int32)fields[6].GetUInt32();
-            int32 remaincharges = (int32)fields[7].GetUInt32();
+            int32 damage     = fields[4].GetInt32();
+            int32 maxduration = fields[5].GetInt32();
+            int32 remaintime = fields[6].GetInt32();
+            int32 remaincharges = fields[7].GetInt32();
 
             SpellEntry const* spellproto = sSpellStore.LookupEntry(spellid);
             if(!spellproto)
@@ -15285,7 +15317,7 @@ void Player::_LoadAuras(QueryResult *result, uint32 timediff)
             // prevent wrong values of remaincharges
             if(spellproto->procCharges)
             {
-                if(remaincharges <= 0 || remaincharges > spellproto->procCharges)
+                if(remaincharges <= 0 || remaincharges > (int32)spellproto->procCharges)
                     remaincharges = spellproto->procCharges;
             }
             else
@@ -15818,13 +15850,13 @@ void Player::_LoadSpells(QueryResult *result)
 
 void Player::_LoadGroup(QueryResult *result)
 {
-    //QueryResult *result = CharacterDatabase.PQuery("SELECT leaderGuid FROM group_member WHERE memberGuid='%u'", GetGUIDLow());
+    //QueryResult *result = CharacterDatabase.PQuery("SELECT groupId FROM group_member WHERE memberGuid='%u'", GetGUIDLow());
     if (result)
     {
-        uint32 leaderGuidLow = (*result)[0].GetUInt32();
+        uint32 groupId = (*result)[0].GetUInt32();
         delete result;
 
-        if (Group* group = sObjectMgr.GetGroupByLeaderLowGUID(leaderGuidLow))
+        if (Group* group = sObjectMgr.GetGroupById(groupId))
         {
             uint8 subgroup = group->GetMemberGroup(GetGUID());
             SetGroup(group, subgroup);
@@ -16068,9 +16100,12 @@ void Player::ConvertInstancesToGroup(Player *player, Group *group, uint64 player
     }
 
     // if the player's not online we don't know what binds it has
-    if(!player || !group || has_binds) CharacterDatabase.PExecute("INSERT INTO group_instance SELECT guid, instance, permanent FROM character_instance WHERE guid = '%u'", GUID_LOPART(player_guid));
+    if(!player || !group || has_binds)
+        CharacterDatabase.PExecute("INSERT INTO group_instance SELECT guid, instance, permanent FROM character_instance WHERE guid = '%u'", GUID_LOPART(player_guid));
+
     // the following should not get executed when changing leaders
-    if(!player || has_solo) CharacterDatabase.PExecute("DELETE FROM character_instance WHERE guid = '%d' AND permanent = 0", GUID_LOPART(player_guid));
+    if(!player || has_solo)
+        CharacterDatabase.PExecute("DELETE FROM character_instance WHERE guid = '%d' AND permanent = 0", GUID_LOPART(player_guid));
 }
 
 bool Player::_LoadHomeBind(QueryResult *result)
@@ -17796,7 +17831,7 @@ void Player::ContinueTaxiFlight()
     GetSession()->SendDoFlight(mountDisplayId, path, startNode);
 }
 
-void Player::ProhibitSpellScholl(SpellSchoolMask idSchoolMask, uint32 unTimeMs )
+void Player::ProhibitSpellSchool(SpellSchoolMask idSchoolMask, uint32 unTimeMs )
 {
                                                             // last check 2.0.10
     WorldPacket data(SMSG_SPELL_COOLDOWN, 8+1+m_spells.size()*8);
@@ -19619,7 +19654,8 @@ uint32 Player::GetResurrectionSpellId()
     }
 
     // Reincarnation (passive spell)                        // prio: 1
-    if(prio < 1 && HasSpell(20608) && !HasSpellCooldown(21169) && HasItemCount(17030,1))
+    // Glyph of Renewed Life remove reagent requiremnnt
+    if (prio < 1 && HasSpell(20608) && !HasSpellCooldown(21169) && (HasItemCount(17030,1) || HasAura(58059, 0)))
         spell_id = 21169;
 
     return spell_id;
@@ -20254,8 +20290,8 @@ void Player::ExitVehicle(Vehicle *vehicle)
     WorldPacket data(MSG_MOVE_TELEPORT_ACK, 30);
     data.append(GetPackGUID());
     data << uint32(0);                                      // counter?
-    data << uint32(MOVEFLAG_FLY_UNK1);                      // fly unk
-    data << uint16(0x40);                                   // special flags
+    data << uint32(MOVEFLAG_ROOT);                          // fly unk
+    data << uint16(MOVEFLAG2_UNK4);                         // special flags
     data << uint32(getMSTime());                            // time
     data << vehicle->GetPositionX();                        // x
     data << vehicle->GetPositionY();                        // y
@@ -20714,7 +20750,7 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank)
         return;
 
     // find current max talent rank
-    int32 curtalent_maxrank = 0;
+    uint32 curtalent_maxrank = 0;
     for(int32 k = MAX_TALENT_RANK-1; k > -1; --k)
     {
         if(talentInfo->RankID[k] && HasSpell(talentInfo->RankID[k]))
@@ -20860,7 +20896,7 @@ void Player::LearnPetTalent(uint64 petGuid, uint32 talentId, uint32 talentRank)
     }
 
     // we already have same or higher talent rank learned
-    if(curtalent_maxrank >= (talentRank + 1))
+    if(curtalent_maxrank >= int32(talentRank + 1))
         return;
 
     // check if we have enough talent points

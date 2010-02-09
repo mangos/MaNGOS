@@ -408,7 +408,8 @@ class ObjectMgr
         void LoadGameobjectInfo();
         void AddGameobjectInfo(GameObjectInfo *goinfo);
 
-        Group * GetGroupByLeaderLowGUID(uint32 lowguid) const;
+        void PackGroupIds();
+        Group* GetGroupById(uint32 id) const;
         void AddGroup(Group* group);
         void RemoveGroup(Group* group);
 
@@ -655,6 +656,7 @@ class ObjectMgr
         uint32 GenerateAuctionID();
         uint64 GenerateEquipmentSetGuid();
         uint32 GenerateGuildId();
+        uint32 GenerateGroupId();
         uint32 GenerateItemTextID();
         uint32 GenerateMailID();
         uint32 GeneratePetNumber();
@@ -893,8 +895,9 @@ class ObjectMgr
         uint32 m_ItemTextId;
         uint32 m_mailid;
         uint32 m_hiPetNumber;
+        uint32 m_groupId;
 
-        // first free low guid for seelcted guid type
+        // first free low guid for selected guid type
         uint32 m_hiCharGuid;
         uint32 m_hiCreatureGuid;
         uint32 m_hiItemGuid;

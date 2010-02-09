@@ -2159,7 +2159,7 @@ bool ChatHandler::HandlePInfoCommand(const char* args)
 
     std::string username = GetMangosString(LANG_ERROR);
     std::string last_ip = GetMangosString(LANG_ERROR);
-    uint32 security = 0;
+    AccountTypes security = SEC_PLAYER;
     std::string last_login = GetMangosString(LANG_ERROR);
 
     QueryResult* result = loginDatabase.PQuery("SELECT username,gmlevel,last_ip,last_login FROM account WHERE id = '%u'",accId);
@@ -2167,7 +2167,7 @@ bool ChatHandler::HandlePInfoCommand(const char* args)
     {
         Field* fields = result->Fetch();
         username = fields[0].GetCppString();
-        security = fields[1].GetUInt32();
+        security = (AccountTypes)fields[1].GetUInt32();
 
         if(!m_session || m_session->GetSecurity() >= security)
         {
@@ -3681,7 +3681,7 @@ bool ChatHandler::HandleHonorAddCommand(const char* args)
     if (HasLowerSecurity(target, 0))
         return false;
 
-    uint32 amount = (uint32)atoi(args);
+    float amount = (float)atof(args);
     target->RewardHonor(NULL, 1, amount);
     return true;
 }
@@ -3873,7 +3873,7 @@ bool ChatHandler::HandleEventStartCommand(const char* args)
 
     GameEventMgr::GameEventDataMap const& events = sGameEventMgr.GetEventMap();
 
-    if(event_id < 1 || event_id >=events.size())
+    if(event_id < 1 || event_id >=(int32)events.size())
     {
         SendSysMessage(LANG_EVENT_NOT_EXIST);
         SetSentErrorMessage(true);
@@ -3915,7 +3915,7 @@ bool ChatHandler::HandleEventStopCommand(const char* args)
 
     GameEventMgr::GameEventDataMap const& events = sGameEventMgr.GetEventMap();
 
-    if(event_id < 1 || event_id >=events.size())
+    if(event_id < 1 || event_id >=(int32)events.size())
     {
         SendSysMessage(LANG_EVENT_NOT_EXIST);
         SetSentErrorMessage(true);

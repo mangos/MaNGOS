@@ -71,9 +71,9 @@ inline uint32 Traveller<T>::GetTotalTrevelTimeTo(float x, float y, float z)
 template<>
 inline float Traveller<Creature>::Speed()
 {
-    if(i_traveller.HasMonsterMoveFlag(MONSTER_MOVE_WALK))
+    if(i_traveller.HasSplineFlag(SPLINEFLAG_WALKMODE))
         return i_traveller.GetSpeed(MOVE_WALK);
-    else if(i_traveller.HasMonsterMoveFlag(MONSTER_MOVE_FLY))
+    else if(i_traveller.HasSplineFlag(SPLINEFLAG_UNKNOWN7))
         return i_traveller.GetSpeed(MOVE_FLIGHT);
     else
         return i_traveller.GetSpeed(MOVE_RUN);
@@ -102,7 +102,7 @@ inline float Traveller<Creature>::GetMoveDestinationTo(float x, float y, float z
 template<>
 inline void Traveller<Creature>::MoveTo(float x, float y, float z, uint32 t)
 {
-    i_traveller.AI_SendMoveToPacket(x, y, z, t, i_traveller.GetMonsterMoveFlags(), 0);
+    i_traveller.AI_SendMoveToPacket(x, y, z, t, i_traveller.GetSplineFlags(), 0);
 }
 
 // specialization for players
@@ -137,8 +137,8 @@ inline void Traveller<Player>::Relocation(float x, float y, float z, float orien
 template<>
 inline void Traveller<Player>::MoveTo(float x, float y, float z, uint32 t)
 {
-    //Only send MOVEFLAG_WALK_MODE, client has strange issues with other move flags
-    i_traveller.SendMonsterMove(x, y, z, 0, MONSTER_MOVE_WALK, t);
+    //Only send SPLINEFLAG_WALKMODE, client has strange issues with other move flags
+    i_traveller.SendMonsterMove(x, y, z, 0, SPLINEFLAG_WALKMODE, t);
 }
 
 typedef Traveller<Creature> CreatureTraveller;

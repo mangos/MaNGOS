@@ -1154,11 +1154,24 @@ struct PvPDifficultyEntry
     BattleGroundBracketId GetBracketId() const { return BattleGroundBracketId(bracketId); }
 };
 
+struct QuestFactionRewardEntry
+{
+    uint32      id;                                         // 0
+    int32       rewardValue[10];                            // 1-10
+};
+
 struct QuestSortEntry
 {
     uint32      id;                                         // 0        m_ID
     //char*       name[16];                                 // 1-16     m_SortName_lang
                                                             // 17 name flags
+};
+
+struct QuestXPLevel
+{
+    uint32      questLevel;                                 // 0
+    uint32      xpIndex[9];                                 // 1-9
+    //unk                                                   // 10
 };
 
 struct RandomPropertiesPointsEntry

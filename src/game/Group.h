@@ -163,7 +163,7 @@ class MANGOS_DLL_SPEC Group
 
         // group manipulation methods
         bool   Create(const uint64 &guid, const char * name);
-        bool   LoadGroupFromDB(const uint64 &leaderGuid, QueryResult *result = NULL, bool loadMembers = true);
+        bool   LoadGroupFromDB(Field *fields);
         bool   LoadMemberFromDB(uint32 guidLow, uint8 subgroup, bool assistant);
         bool   AddInvite(Player *player);
         uint32 RemoveInvite(Player *player);
@@ -180,6 +180,7 @@ class MANGOS_DLL_SPEC Group
         void   Disband(bool hideDestroy=false);
 
         // properties accessories
+        uint32 GetId() const { return m_Id; }
         bool IsFull() const { return (m_groupType==GROUPTYPE_NORMAL) ? (m_memberSlots.size()>=MAXGROUPSIZE) : (m_memberSlots.size()>=MAXRAIDSIZE); }
         bool isRaidGroup() const { return m_groupType==GROUPTYPE_RAID; }
         bool isBGGroup()   const { return m_bgGroup != NULL; }
@@ -286,7 +287,7 @@ class MANGOS_DLL_SPEC Group
                 SendUpdate();
         }
 
-        void SetTargetIcon(uint8 id, uint64 guid);
+        void SetTargetIcon(uint8 id, uint64 whoGuid, uint64 targetGuid);
 
         Difficulty GetDifficulty(bool isRaid) const { return isRaid ? m_raidDifficulty : m_dungeonDifficulty; }
         Difficulty GetDungeonDifficulty() const { return m_dungeonDifficulty; }
@@ -402,6 +403,7 @@ class MANGOS_DLL_SPEC Group
                 --m_subGroupsCounts[subgroup];
         }
 
+        uint32              m_Id;                           // 0 for not created or BG groups
         MemberSlotList      m_memberSlots;
         GroupRefManager     m_memberMgr;
         InvitesList         m_invitees;

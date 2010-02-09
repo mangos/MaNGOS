@@ -276,7 +276,7 @@ void Object::BuildMovementUpdate(ByteBuffer * data, uint16 updateFlags) const
                     if (!((Creature*)unit)->hasUnitState(UNIT_STAT_MOVING))
                     {
                         // (ok) possibly some "hover" mode
-                        unit->m_movementInfo.AddMovementFlag(MOVEFLAG_FLY_UNK1);
+                        unit->m_movementInfo.AddMovementFlag(MOVEFLAG_ROOT);
                     }
                     else
                     {
@@ -299,13 +299,13 @@ void Object::BuildMovementUpdate(ByteBuffer * data, uint16 updateFlags) const
                     player->m_movementInfo.RemoveMovementFlag(MOVEFLAG_ONTRANSPORT);
 
                 // remove unknown, unused etc flags for now
-                player->m_movementInfo.RemoveMovementFlag(MOVEFLAG_SPLINE2);
+                player->m_movementInfo.RemoveMovementFlag(MOVEFLAG_SPLINE_ENABLED);
 
                 if(player->isInFlight())
                 {
                     ASSERT(player->GetMotionMaster()->GetCurrentMovementGeneratorType() == FLIGHT_MOTION_TYPE);
                     player->m_movementInfo.AddMovementFlag(MOVEFLAG_FORWARD);
-                    player->m_movementInfo.AddMovementFlag(MOVEFLAG_SPLINE2);
+                    player->m_movementInfo.AddMovementFlag(MOVEFLAG_SPLINE_ENABLED);
                 }
             }
             break;
@@ -328,11 +328,11 @@ void Object::BuildMovementUpdate(ByteBuffer * data, uint16 updateFlags) const
         *data << float(unit->GetSpeed(MOVE_PITCH_RATE));
 
         // 0x08000000
-        if(unit->m_movementInfo.GetMovementFlags() & MOVEFLAG_SPLINE2)
+        if(unit->m_movementInfo.GetMovementFlags() & MOVEFLAG_SPLINE_ENABLED)
         {
             if(GetTypeId() != TYPEID_PLAYER)
             {
-                sLog.outDebug("_BuildMovementUpdate: MOVEFLAG_SPLINE2 for non-player");
+                sLog.outDebug("_BuildMovementUpdate: MOVEFLAG_SPLINE_ENABLED for non-player");
                 return;
             }
 
@@ -340,7 +340,7 @@ void Object::BuildMovementUpdate(ByteBuffer * data, uint16 updateFlags) const
 
             if(!player->isInFlight())
             {
-                sLog.outDebug("_BuildMovementUpdate: MOVEFLAG_SPLINE2 but not in flight");
+                sLog.outDebug("_BuildMovementUpdate: MOVEFLAG_SPLINE_ENABLED but not in flight");
                 return;
             }
 
@@ -348,23 +348,23 @@ void Object::BuildMovementUpdate(ByteBuffer * data, uint16 updateFlags) const
 
             FlightPathMovementGenerator *fmg = (FlightPathMovementGenerator*)(player->GetMotionMaster()->top());
 
-            uint32 flags3 = MONSTER_MOVE_SPLINE_FLY;
+            uint32 flags3 = SPLINEFLAG_WALKMODE | SPLINEFLAG_FLYING;
 
             *data << uint32(flags3);                        // splines flag?
 
-            if(flags3 & SPLINE_MOVE_FLAG_FACING)            // may be orientation
+            if(flags3 & SPLINEFLAG_FINALFACING)             // may be orientation
             {
                 *data << float(0);
             }
             else
             {
-                if(flags3 & SPLINE_MOVE_FLAG_GUID)          // probably guid there
+                if(flags3 & SPLINEFLAG_FINALTARGET)         // probably guid there
                 {
                     *data << uint64(0);
                 }
                 else
                 {
-                    if(flags3 & SPLINE_MOVE_FLAG_POINT)     // probably x,y,z coords there
+                    if(flags3 & SPLINEFLAG_FINALPOINT)      // probably x,y,z coords there
                     {
                         *data << float(0);
                         *data << float(0);
@@ -1349,7 +1349,7 @@ float WorldObject::GetAngle( const float x, const float y ) const
     float dy = y - GetPositionY();
 
     float ang = atan2(dy, dx);
-    ang = (ang >= 0) ? ang : 2 * M_PI + ang;
+    ang = (ang >= 0) ? ang : 2 * M_PI_F + ang;
     return ang;
 }
 
@@ -1362,19 +1362,19 @@ bool WorldObject::HasInArc(const float arcangle, const WorldObject* obj) const
     float arc = arcangle;
 
     // move arc to range 0.. 2*pi
-    while( arc >= 2.0f * M_PI )
-        arc -=  2.0f * M_PI;
+    while( arc >= 2.0f * M_PI_F )
+        arc -=  2.0f * M_PI_F;
     while( arc < 0 )
-        arc +=  2.0f * M_PI;
+        arc +=  2.0f * M_PI_F;
 
     float angle = GetAngle( obj );
     angle -= m_orientation;
 
     // move angle to range -pi ... +pi
-    while( angle > M_PI)
-        angle -= 2.0f * M_PI;
-    while(angle < -M_PI)
-        angle += 2.0f * M_PI;
+    while( angle > M_PI_F)
+        angle -= 2.0f * M_PI_F;
+    while(angle < -M_PI_F)
+        angle += 2.0f * M_PI_F;
 
     float lborder =  -1 * (arc/2.0f);                       // in range -pi..0
     float rborder = (arc/2.0f);                             // in range 0..pi
@@ -1388,7 +1388,7 @@ bool WorldObject::isInFrontInMap(WorldObject const* target, float distance,  flo
 
 bool WorldObject::isInBackInMap(WorldObject const* target, float distance, float arc) const
 {
-    return IsWithinDistInMap(target, distance) && !HasInArc( 2 * M_PI - arc, target );
+    return IsWithinDistInMap(target, distance) && !HasInArc( 2 * M_PI_F - arc, target );
 }
 
 bool WorldObject::isInFront(WorldObject const* target, float distance,  float arc) const
@@ -1398,7 +1398,7 @@ bool WorldObject::isInFront(WorldObject const* target, float distance,  float ar
 
 bool WorldObject::isInBack(WorldObject const* target, float distance, float arc) const
 {
-    return IsWithinDist(target, distance) && !HasInArc( 2 * M_PI - arc, target );
+    return IsWithinDist(target, distance) && !HasInArc( 2 * M_PI_F - arc, target );
 }
 
 void WorldObject::GetRandomPoint( float x, float y, float z, float distance, float &rand_x, float &rand_y, float &rand_z) const
@@ -1412,7 +1412,7 @@ void WorldObject::GetRandomPoint( float x, float y, float z, float distance, flo
     }
 
     // angle to face `obj` to `this`
-    float angle = rand_norm()*2*M_PI;
+    float angle = rand_norm()*2*M_PI_F;
     float new_dist = rand_norm()*distance;
 
     rand_x = x + new_dist * cos(angle);
@@ -1730,10 +1730,10 @@ namespace MaNGOS
                 float angle = i_object.GetAngle(u)-i_angle;
 
                 // move angle to range -pi ... +pi
-                while( angle > M_PI)
-                    angle -= 2.0f * M_PI;
-                while(angle < -M_PI)
-                    angle += 2.0f * M_PI;
+                while( angle > M_PI_F)
+                    angle -= 2.0f * M_PI_F;
+                while(angle < -M_PI_F)
+                    angle += 2.0f * M_PI_F;
 
                 // dist include size of u
                 float dist2d = i_object.GetDistance2d(x,y);

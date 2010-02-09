@@ -121,6 +121,7 @@ enum __QuestGiverStatus
 enum __QuestFlags
 {
     // Flags used at server and sent to client
+    QUEST_FLAGS_NONE           = 0x00000000,
     QUEST_FLAGS_STAY_ALIVE     = 0x00000001,                // Not used currently
     QUEST_FLAGS_PARTY_ACCEPT   = 0x00000002,                // If player in party, all players that can accept this quest will receive confirmation box to accept quest CMSG_QUEST_CONFIRM_ACCEPT/SMSG_QUEST_CONFIRM_ACCEPT
     QUEST_FLAGS_EXPLORATION    = 0x00000004,                // Not used currently
@@ -137,7 +138,9 @@ enum __QuestFlags
     QUEST_FLAGS_UNK3           = 0x00002000,                // activates PvP?
     QUEST_FLAGS_UNK4           = 0x00004000,                // ? Membership Card Renewal
     QUEST_FLAGS_WEEKLY         = 0x00008000,                // Not used currently: Weekly quests
-    // 0x20000 - 1 quest in 3.3, 0x40000 - 1 quest in 3.3
+    QUEST_FLAGS_AUTOCOMPLETE   = 0x00010000,                // auto complete
+    QUEST_FLAGS_UNK5           = 0x00020000,                // has something to do with ReqItemId and SrcItemId
+    QUEST_FLAGS_UNK6           = 0x00040000,                // use Objective text as Complete text
     QUEST_FLAGS_LOW_LEVEL      = 0x00080000,                // quests in starting areas
 
     // Mangos flags for set SpecialFlags in DB if required but used only at server
@@ -162,6 +165,7 @@ struct QuestLocale
     std::vector<std::string> OfferRewardText;
     std::vector<std::string> RequestItemsText;
     std::vector<std::string> EndText;
+    std::vector<std::string> CompletedText;
     std::vector< std::vector<std::string> > ObjectiveText;
 };
 
@@ -200,6 +204,7 @@ class Quest
         int32  GetNextQuestId() const { return NextQuestId; }
         int32  GetExclusiveGroup() const { return ExclusiveGroup; }
         uint32 GetNextQuestInChain() const { return NextQuestInChain; }
+        uint32 GetRewXPId() const { return RewXPId; }
         uint32 GetCharTitleId() const { return CharTitleId; }
         uint32 GetPlayersSlain() const { return PlayersSlain; }
         uint32 GetBonusTalents() const { return BonusTalents; }
@@ -212,8 +217,10 @@ class Quest
         std::string GetOfferRewardText() const { return OfferRewardText; }
         std::string GetRequestItemsText() const { return RequestItemsText; }
         std::string GetEndText() const { return EndText; }
+        std::string GetCompletedText() const { return CompletedText; }
         int32  GetRewOrReqMoney() const;
-        uint32 GetRewHonorableKills() const { return RewHonorableKills; }
+        uint32 GetRewHonorAddition() const { return RewHonorAddition; }
+        float GetRewHonorMultiplier() const { return RewHonorMultiplier; }
         uint32 GetRewMoneyMaxLevel() const { return RewMoneyMaxLevel; }
                                                             // use in XP calculation at client
         uint32 GetRewSpell() const { return RewSpell; }
@@ -247,6 +254,7 @@ class Quest
         uint32 RewItemId[QUEST_REWARDS_COUNT];
         uint32 RewItemCount[QUEST_REWARDS_COUNT];
         uint32 RewRepFaction[QUEST_REPUTATIONS_COUNT];
+        int32  RewRepValueId[QUEST_REPUTATIONS_COUNT];
         int32  RewRepValue[QUEST_REPUTATIONS_COUNT];
         uint32 DetailsEmote[QUEST_EMOTE_COUNT];
         uint32 DetailsEmoteDelay[QUEST_EMOTE_COUNT];
@@ -297,6 +305,7 @@ class Quest
         int32  NextQuestId;
         int32  ExclusiveGroup;
         uint32 NextQuestInChain;
+        uint32 RewXPId;
         uint32 SrcItemId;
         uint32 SrcItemCount;
         uint32 SrcSpell;
@@ -306,7 +315,9 @@ class Quest
         std::string OfferRewardText;
         std::string RequestItemsText;
         std::string EndText;
-        uint32 RewHonorableKills;
+        std::string CompletedText;
+        uint32 RewHonorAddition;
+        float RewHonorMultiplier;
         int32  RewOrReqMoney;
         uint32 RewMoneyMaxLevel;
         uint32 RewSpell;

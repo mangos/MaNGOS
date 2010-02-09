@@ -21,13 +21,13 @@
 #ifndef _DATABASEMYSQL_H
 #define _DATABASEMYSQL_H
 
+#include "Common.h"
 #include "Database.h"
 #include "Policies/Singleton.h"
 #include "ace/Thread_Mutex.h"
 #include "ace/Guard_T.h"
 
 #ifdef WIN32
-#define FD_SETSIZE 1024
 #include <winsock2.h>
 #include <mysql/mysql.h>
 #else
