@@ -3,7 +3,6 @@
 #include <ace/OS_NS_stdlib.h>
 
 #ifdef WIN32
-#  define PATH_MAX _MAX_PATH
 #  define strcasecmp stricmp
 #  include <io.h>
 #else
@@ -403,7 +402,7 @@ int DOTCONFDocument::checkConfig(const NodeList::iterator& from)
 int DOTCONFDocument::setContent(const char* _fileName)
 {
     int ret = 0;
-    char realpathBuf[PATH_MAX];
+    char realpathBuf[MANGOS_PATH_MAX];
 
     if (ACE_OS::realpath(_fileName, realpathBuf) == NULL)
     {

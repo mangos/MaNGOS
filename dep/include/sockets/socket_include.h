@@ -203,7 +203,9 @@ namespace SOCKETS_NAMESPACE {
 
 // 1.8.6: define FD_SETSIZE to something bigger than 64 if there are a lot of
 // simultaneous connections (must be done before including winsock.h)
+#ifndef FD_SETSIZE
 #define FD_SETSIZE 1024
+#endif
 
 // windows 2000 with ipv6 preview installed:
 //    http://msdn.microsoft.com/downloads/sdks/platform/tpipv6.asp
