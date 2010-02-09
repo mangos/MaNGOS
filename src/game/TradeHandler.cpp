@@ -149,8 +149,8 @@ void WorldSession::SendUpdateTrade()
                                                             // gift creator
             data << (uint64) item->GetUInt64Value(ITEM_FIELD_GIFTCREATOR);
             data << (uint32) item->GetEnchantmentId(PERM_ENCHANTMENT_SLOT);
-            for(uint8 j = 0; j < 3; ++j)
-                data << (uint32) 0;                         // enchantment id (permanent/gems?)
+            for(uint32 enchant_slot = SOCK_ENCHANTMENT_SLOT; enchant_slot < SOCK_ENCHANTMENT_SLOT+MAX_GEM_SOCKETS; ++enchant_slot)
+                data << (uint32) item->GetEnchantmentId(EnchantmentSlot(enchant_slot));
                                                             // creator
             data << (uint64) item->GetUInt64Value(ITEM_FIELD_CREATOR);
             data << (uint32) item->GetSpellCharges();       // charges
