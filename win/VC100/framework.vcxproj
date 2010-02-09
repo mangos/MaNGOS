@@ -302,7 +302,6 @@
     <ClInclude Include="..\..\src\framework\GameSystem\TypeContainer.h" />
     <ClInclude Include="..\..\src\framework\GameSystem\TypeContainerFunctions.h" />
     <ClInclude Include="..\..\src\framework\GameSystem\TypeContainerVisitor.h" />
-    <ClInclude Include="..\..\src\framework\Network\SocketDefines.h" />
     <ClInclude Include="..\..\src\framework\Platform\CompilerDefs.h" />
     <ClInclude Include="..\..\src\framework\Platform\Define.h" />
     <ClInclude Include="..\..\src\framework\Policies\CreationPolicy.h" />

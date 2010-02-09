@@ -190,16 +190,6 @@ Group* ObjectMgr::GetGroupById(uint32 id) const
     return NULL;
 }
 
-Group* ObjectMgr::GetGroupByLeaderLowGUID(uint32 guid) const
-{
-    for(GroupMap::const_iterator itr = mGroupMap.begin(); itr != mGroupMap.end(); ++itr)
-        if (GUID_LOPART(itr->second->GetLeaderGUID())==guid)
-            return itr->second;
-
-    return NULL;
-}
-
-
 Guild* ObjectMgr::GetGuildById(uint32 GuildId) const
 {
     GuildMap::const_iterator itr = mGuildMap.find(GuildId);
@@ -304,7 +294,7 @@ void ObjectMgr::LoadCreatureLocales()
                 int idx = GetOrNewIndexForLocale(LocaleConstant(i));
                 if(idx >= 0)
                 {
-                    if(data.Name.size() <= idx)
+                    if((int32)data.Name.size() <= idx)
                         data.Name.resize(idx+1);
 
                     data.Name[idx] = str;
@@ -316,7 +306,7 @@ void ObjectMgr::LoadCreatureLocales()
                 int idx = GetOrNewIndexForLocale(LocaleConstant(i));
                 if(idx >= 0)
                 {
-                    if(data.SubName.size() <= idx)
+                    if((int32)data.SubName.size() <= idx)
                         data.SubName.resize(idx+1);
 
                     data.SubName[idx] = str;
@@ -373,7 +363,7 @@ void ObjectMgr::LoadGossipMenuItemsLocales()
                 int idx = GetOrNewIndexForLocale(LocaleConstant(i));
                 if(idx >= 0)
                 {
-                    if(data.OptionText.size() <= idx)
+                    if((int32)data.OptionText.size() <= idx)
                         data.OptionText.resize(idx+1);
 
                     data.OptionText[idx] = str;
@@ -385,7 +375,7 @@ void ObjectMgr::LoadGossipMenuItemsLocales()
                 int idx = GetOrNewIndexForLocale(LocaleConstant(i));
                 if(idx >= 0)
                 {
-                    if(data.BoxText.size() <= idx)
+                    if((int32)data.BoxText.size() <= idx)
                         data.BoxText.resize(idx+1);
 
                     data.BoxText[idx] = str;
@@ -437,7 +427,7 @@ void ObjectMgr::LoadPointOfInterestLocales()
             int idx = GetOrNewIndexForLocale(LocaleConstant(i));
             if(idx >= 0)
             {
-                if(data.IconName.size() <= idx)
+                if((int32)data.IconName.size() <= idx)
                     data.IconName.resize(idx+1);
 
                 data.IconName[idx] = str;
@@ -855,10 +845,10 @@ void ObjectMgr::LoadCreatureAddons(SQLStorage& creatureaddons, char const* entry
         if (!sEmotesStore.LookupEntry(addon->emote))
             sLog.outErrorDb("Creature (%s %u) have invalid emote (%u) defined in `%s`.", entryName, addon->guidOrEntry, addon->emote, creatureaddons.GetTableName());
 
-        if (addon->move_flags & (SPLINEFLAG_TRAJECTORY|SPLINEFLAG_UNKNOWN3))
+        if (addon->splineFlags & (SPLINEFLAG_TRAJECTORY|SPLINEFLAG_UNKNOWN3))
         {
-            sLog.outErrorDb("Creature (%s %u) movement flags mask defined in `%s` include forbidden  flags (" I32FMT ") that can crash client, cleanup at load.", entryName, addon->guidOrEntry, creatureaddons.GetTableName(), (SPLINEFLAG_TRAJECTORY|SPLINEFLAG_UNKNOWN3));
-            const_cast<CreatureDataAddon*>(addon)->move_flags &= ~(SPLINEFLAG_TRAJECTORY|SPLINEFLAG_UNKNOWN3);
+            sLog.outErrorDb("Creature (%s %u) spline flags mask defined in `%s` include forbidden flags (" I32FMT ") that can crash client, cleanup at load.", entryName, addon->guidOrEntry, creatureaddons.GetTableName(), (SPLINEFLAG_TRAJECTORY|SPLINEFLAG_UNKNOWN3));
+            const_cast<CreatureDataAddon*>(addon)->splineFlags &= ~(SPLINEFLAG_TRAJECTORY|SPLINEFLAG_UNKNOWN3);
         }
 
         ConvertCreatureAddonAuras(const_cast<CreatureDataAddon*>(addon), creatureaddons.GetTableName(), entryName);
@@ -1616,7 +1606,7 @@ void ObjectMgr::LoadItemLocales()
                 int idx = GetOrNewIndexForLocale(LocaleConstant(i));
                 if(idx >= 0)
                 {
-                    if(data.Name.size() <= idx)
+                    if((int32)data.Name.size() <= idx)
                         data.Name.resize(idx+1);
 
                     data.Name[idx] = str;
@@ -1629,7 +1619,7 @@ void ObjectMgr::LoadItemLocales()
                 int idx = GetOrNewIndexForLocale(LocaleConstant(i));
                 if(idx >= 0)
                 {
-                    if(data.Description.size() <= idx)
+                    if((int32)data.Description.size() <= idx)
                         data.Description.resize(idx+1);
 
                     data.Description[idx] = str;
@@ -3121,10 +3111,10 @@ void ObjectMgr::LoadGroups()
 {
     // -- loading groups --
     uint32 count = 0;
-    //                                                     0         1              2           3           4              5      6      7      8      9      10     11     12     13      14         15              16
-    QueryResult *result = CharacterDatabase.Query("SELECT mainTank, mainAssistant, lootMethod, looterGuid, lootThreshold, icon1, icon2, icon3, icon4, icon5, icon6, icon7, icon8, isRaid, difficulty, raiddifficulty, leaderGuid FROM groups");
+    //                                                    0         1              2           3           4              5      6      7      8      9      10     11     12     13      14          15              16          17
+    QueryResult *result = CharacterDatabase.Query("SELECT mainTank, mainAssistant, lootMethod, looterGuid, lootThreshold, icon1, icon2, icon3, icon4, icon5, icon6, icon7, icon8, isRaid, difficulty, raiddifficulty, leaderGuid, groupId FROM groups");
 
-    if( !result )
+    if (!result)
     {
         barGoLink bar( 1 );
 
@@ -3135,8 +3125,6 @@ void ObjectMgr::LoadGroups()
         return;
     }
 
-    std::map<uint32,uint32> leader2groupMap;
-
     barGoLink bar( result->GetRowCount() );
 
     do
@@ -3144,16 +3132,14 @@ void ObjectMgr::LoadGroups()
         bar.step();
         Field *fields = result->Fetch();
         ++count;
-        uint64 leaderGuid = MAKE_NEW_GUID(fields[16].GetUInt32(),0,HIGHGUID_PLAYER);
         Group *group = new Group;
-        if(!group->LoadGroupFromDB(leaderGuid, result, false))
+        if (!group->LoadGroupFromDB(fields))
         {
             group->Disband();
             delete group;
             continue;
         }
         AddGroup(group);
-        leader2groupMap[GUID_LOPART(leaderGuid)] = group->GetId();
     }while( result->NextRow() );
 
     delete result;
@@ -3163,9 +3149,9 @@ void ObjectMgr::LoadGroups()
 
     // -- loading members --
     count = 0;
-    //                                        0           1          2         3
-    result = CharacterDatabase.Query("SELECT memberGuid, assistant, subgroup, leaderGuid FROM group_member ORDER BY leaderGuid");
-    if(!result)
+    //                                       0           1          2         3
+    result = CharacterDatabase.Query("SELECT memberGuid, assistant, subgroup, groupId FROM group_member ORDER BY groupId");
+    if (!result)
     {
         barGoLink bar2( 1 );
         bar2.step();
@@ -3184,25 +3170,21 @@ void ObjectMgr::LoadGroups()
             uint32 memberGuidlow = fields[0].GetUInt32();
             bool   assistent     = fields[1].GetBool();
             uint8  subgroup      = fields[2].GetUInt8();
-            uint32 leaderGuidLow = fields[3].GetUInt32();
-            if(!group || GUID_LOPART(group->GetLeaderGUID()) != leaderGuidLow)
+            uint32 groupId       = fields[3].GetUInt32();
+            if (!group || group->GetId() != groupId)
             {
-                // find group id in map by leader low guid
-                std::map<uint32,uint32>::const_iterator l2g_itr = leader2groupMap.find(leaderGuidLow);
-                if (l2g_itr != leader2groupMap.end())
-                    group = GetGroupById(l2g_itr->second);
-
-                if(!group)
+                group = GetGroupById(groupId);
+                if (!group)
                 {
-                    sLog.outErrorDb("Incorrect entry in group_member table : no group with leader %d for member %d!", leaderGuidLow, memberGuidlow);
+                    sLog.outErrorDb("Incorrect entry in group_member table : no group with Id %d for member %d!", groupId, memberGuidlow);
                     CharacterDatabase.PExecute("DELETE FROM group_member WHERE memberGuid = '%d'", memberGuidlow);
                     continue;
                 }
             }
 
-            if(!group->LoadMemberFromDB(memberGuidlow, subgroup, assistent))
+            if (!group->LoadMemberFromDB(memberGuidlow, subgroup, assistent))
             {
-                sLog.outErrorDb("Incorrect entry in group_member table : member %d cannot be added to player %d's group!", memberGuidlow, leaderGuidLow);
+                sLog.outErrorDb("Incorrect entry in group_member table : member %d cannot be added to player %d's group (Id: %u)!", memberGuidlow, GUID_LOPART(group->GetLeaderGUID()), groupId);
                 CharacterDatabase.PExecute("DELETE FROM group_member WHERE memberGuid = '%d'", memberGuidlow);
             }
         }while( result->NextRow() );
@@ -3226,14 +3208,16 @@ void ObjectMgr::LoadGroups()
     // -- loading instances --
     count = 0;
     result = CharacterDatabase.Query(
-        //      0           1    2         3          4           5
-        "SELECT leaderGuid, map, instance, permanent, difficulty, resettime, "
+        //      0                          1    2         3          4                    5
+        "SELECT group_instance.leaderGuid, map, instance, permanent, instance.difficulty, resettime, "
         // 6
-        "(SELECT COUNT(*) FROM character_instance WHERE guid = leaderGuid AND instance = group_instance.instance AND permanent = 1 LIMIT 1) "
-        "FROM group_instance LEFT JOIN instance ON instance = id ORDER BY leaderGuid"
+        "(SELECT COUNT(*) FROM character_instance WHERE guid = group_instance.leaderGuid AND instance = group_instance.instance AND permanent = 1 LIMIT 1), "
+        // 7
+        " groups.groupId "
+        "FROM group_instance LEFT JOIN instance ON instance = id LEFT JOIN groups ON groups.leaderGUID = group_instance.leaderGUID ORDER BY leaderGuid"
     );
 
-    if(!result)
+    if (!result)
     {
         barGoLink bar2( 1 );
         bar2.step();
@@ -3251,16 +3235,14 @@ void ObjectMgr::LoadGroups()
 
             uint32 leaderGuidLow = fields[0].GetUInt32();
             uint32 mapId = fields[1].GetUInt32();
-            uint32 diff = fields[4].GetUInt8();
+            Difficulty diff = (Difficulty)fields[4].GetUInt8();
+            uint32 groupId = fields[7].GetUInt32();
 
-            if(!group || GUID_LOPART(group->GetLeaderGUID()) != leaderGuidLow)
+            if (!group || group->GetId() != groupId)
             {
                 // find group id in map by leader low guid
-                std::map<uint32,uint32>::const_iterator l2g_itr = leader2groupMap.find(leaderGuidLow);
-                if (l2g_itr != leader2groupMap.end())
-                    group = GetGroupById(l2g_itr->second);
-
-                if(!group)
+                group = GetGroupById(groupId);
+                if (!group)
                 {
                     sLog.outErrorDb("Incorrect entry in group_instance table : no group with leader %d", leaderGuidLow);
                     continue;
@@ -3268,16 +3250,16 @@ void ObjectMgr::LoadGroups()
             }
 
             MapEntry const* mapEntry = sMapStore.LookupEntry(mapId);
-            if(!mapEntry || !mapEntry->IsDungeon())
+            if (!mapEntry || !mapEntry->IsDungeon())
             {
                 sLog.outErrorDb("Incorrect entry in group_instance table : no dungeon map %d", mapId);
                 continue;
             }
 
-            if(diff >= (mapEntry->IsRaid() ? MAX_RAID_DIFFICULTY : MAX_DUNGEON_DIFFICULTY))
+            if (diff >= (mapEntry->IsRaid() ? MAX_RAID_DIFFICULTY : MAX_DUNGEON_DIFFICULTY))
             {
                 sLog.outErrorDb("Wrong dungeon difficulty use in group_instance table: %d", diff + 1);
-                diff = 0;                                   // default for both difficaly types
+                diff = REGULAR_DIFFICULTY;                  // default for both difficaly types
             }
 
             InstanceSave *save = sInstanceSaveMgr.AddInstanceSave(mapEntry->MapID, fields[2].GetUInt32(), Difficulty(diff), (time_t)fields[5].GetUInt64(), (fields[6].GetUInt32() == 0), true);
@@ -3326,19 +3308,23 @@ void ObjectMgr::LoadQuests()
         "RewChoiceItemCount1, RewChoiceItemCount2, RewChoiceItemCount3, RewChoiceItemCount4, RewChoiceItemCount5, RewChoiceItemCount6,"
     //   85          86          87          88          89             90             91             92
         "RewItemId1, RewItemId2, RewItemId3, RewItemId4, RewItemCount1, RewItemCount2, RewItemCount3, RewItemCount4,"
-    //   93              94              95              96              97              98            99            100           101           102
-        "RewRepFaction1, RewRepFaction2, RewRepFaction3, RewRepFaction4, RewRepFaction5, RewRepValue1, RewRepValue2, RewRepValue3, RewRepValue4, RewRepValue5,"
-    //   103               104                 105            106               107       108
+    //   93              94              95              96              97
+        "RewRepFaction1, RewRepFaction2, RewRepFaction3, RewRepFaction4, RewRepFaction5,"
+    //   98              99              100             101             102
+        "RewRepValueId1, RewRepValueId2, RewRepValueId3, RewRepValueId4, RewRepValueId5,"
+    //   103           104           105           106           107
+        "RewRepValue1, RewRepValue2, RewRepValue3, RewRepValue4, RewRepValue5,"
+    //   108               109                 110            111               112       113
         "RewHonorAddition, RewHonorMultiplier, RewOrReqMoney, RewMoneyMaxLevel, RewSpell, RewSpellCast,"
-    //   109                110               111         112     113     114
+    //   114                115               116         117     118     119
         "RewMailTemplateId, RewMailDelaySecs, PointMapId, PointX, PointY, PointOpt,"
-    //   115            116            117            118            119                 120                 121                 122
+    //   120            121            122            123            124                 125                 126                 127
         "DetailsEmote1, DetailsEmote2, DetailsEmote3, DetailsEmote4, DetailsEmoteDelay1, DetailsEmoteDelay2, DetailsEmoteDelay3, DetailsEmoteDelay4,"
-    //   123              124            125                126                127                128
+    //   128              129            130                131                132                133
         "IncompleteEmote, CompleteEmote, OfferRewardEmote1, OfferRewardEmote2, OfferRewardEmote3, OfferRewardEmote4,"
-    //   129                     130                     131                     132
+    //   134                     135                     136                     137
         "OfferRewardEmoteDelay1, OfferRewardEmoteDelay2, OfferRewardEmoteDelay3, OfferRewardEmoteDelay4,"
-    //   133          134
+    //   138          139
         "StartScript, CompleteScript"
         " FROM quest_template");
     if(result == NULL)
@@ -3787,23 +3773,19 @@ void ObjectMgr::LoadQuests()
 
         for(int j = 0; j < QUEST_REPUTATIONS_COUNT; ++j)
         {
-            if(qinfo->RewRepFaction[j])
+            if (qinfo->RewRepFaction[j])
             {
-                if(!qinfo->RewRepValue[j])
-                {
-                    sLog.outErrorDb("Quest %u has `RewRepFaction%d` = %u but `RewRepValue%d` = 0, quest will not reward this reputation.",
-                        qinfo->GetQuestId(),j+1,qinfo->RewRepValue[j],j+1);
-                    // no changes
-                }
+                if (abs(qinfo->RewRepValueId[j]) > 9)
+                    sLog.outErrorDb("Quest %u has RewRepValueId%d = %i but value is not valid.", qinfo->GetQuestId(), j+1, qinfo->RewRepValueId[j]);
 
-                if(!sFactionStore.LookupEntry(qinfo->RewRepFaction[j]))
+                if (!sFactionStore.LookupEntry(qinfo->RewRepFaction[j]))
                 {
                     sLog.outErrorDb("Quest %u has `RewRepFaction%d` = %u but raw faction (faction.dbc) %u does not exist, quest will not reward reputation for this faction.",
-                        qinfo->GetQuestId(),j+1,qinfo->RewRepFaction[j] ,qinfo->RewRepFaction[j] );
+                        qinfo->GetQuestId(),j+1,qinfo->RewRepFaction[j] ,qinfo->RewRepFaction[j]);
                     qinfo->RewRepFaction[j] = 0;            // quest will not reward this
                 }
             }
-            else if(qinfo->RewRepValue[j]!=0)
+            else if (qinfo->RewRepValue[j] != 0)
             {
                 sLog.outErrorDb("Quest %u has `RewRepFaction%d` = 0 but `RewRepValue%d` = %u.",
                     qinfo->GetQuestId(),j+1,j+1,qinfo->RewRepValue[j]);
@@ -4006,7 +3988,7 @@ void ObjectMgr::LoadQuestLocales()
                 int idx = GetOrNewIndexForLocale(LocaleConstant(i));
                 if(idx >= 0)
                 {
-                    if(data.Title.size() <= idx)
+                    if((int32)data.Title.size() <= idx)
                         data.Title.resize(idx+1);
 
                     data.Title[idx] = str;
@@ -4018,7 +4000,7 @@ void ObjectMgr::LoadQuestLocales()
                 int idx = GetOrNewIndexForLocale(LocaleConstant(i));
                 if(idx >= 0)
                 {
-                    if(data.Details.size() <= idx)
+                    if((int32)data.Details.size() <= idx)
                         data.Details.resize(idx+1);
 
                     data.Details[idx] = str;
@@ -4030,7 +4012,7 @@ void ObjectMgr::LoadQuestLocales()
                 int idx = GetOrNewIndexForLocale(LocaleConstant(i));
                 if(idx >= 0)
                 {
-                    if(data.Objectives.size() <= idx)
+                    if((int32)data.Objectives.size() <= idx)
                         data.Objectives.resize(idx+1);
 
                     data.Objectives[idx] = str;
@@ -4042,7 +4024,7 @@ void ObjectMgr::LoadQuestLocales()
                 int idx = GetOrNewIndexForLocale(LocaleConstant(i));
                 if(idx >= 0)
                 {
-                    if(data.OfferRewardText.size() <= idx)
+                    if((int32)data.OfferRewardText.size() <= idx)
                         data.OfferRewardText.resize(idx+1);
 
                     data.OfferRewardText[idx] = str;
@@ -4054,7 +4036,7 @@ void ObjectMgr::LoadQuestLocales()
                 int idx = GetOrNewIndexForLocale(LocaleConstant(i));
                 if(idx >= 0)
                 {
-                    if(data.RequestItemsText.size() <= idx)
+                    if((int32)data.RequestItemsText.size() <= idx)
                         data.RequestItemsText.resize(idx+1);
 
                     data.RequestItemsText[idx] = str;
@@ -4066,7 +4048,7 @@ void ObjectMgr::LoadQuestLocales()
                 int idx = GetOrNewIndexForLocale(LocaleConstant(i));
                 if(idx >= 0)
                 {
-                    if(data.EndText.size() <= idx)
+                    if((int32)data.EndText.size() <= idx)
                         data.EndText.resize(idx+1);
 
                     data.EndText[idx] = str;
@@ -4078,7 +4060,7 @@ void ObjectMgr::LoadQuestLocales()
                 int idx = GetOrNewIndexForLocale(LocaleConstant(i));
                 if(idx >= 0)
                 {
-                    if(data.CompletedText.size() <= idx)
+                    if((int32)data.CompletedText.size() <= idx)
                         data.CompletedText.resize(idx+1);
 
                     data.CompletedText[idx] = str;
@@ -4092,7 +4074,7 @@ void ObjectMgr::LoadQuestLocales()
                     int idx = GetOrNewIndexForLocale(LocaleConstant(i));
                     if(idx >= 0)
                     {
-                        if(data.ObjectiveText[k].size() <= idx)
+                        if((int32)data.ObjectiveText[k].size() <= idx)
                             data.ObjectiveText[k].resize(idx+1);
 
                         data.ObjectiveText[k][idx] = str;
@@ -4623,7 +4605,7 @@ void ObjectMgr::LoadPageTextLocales()
             int idx = GetOrNewIndexForLocale(LocaleConstant(i));
             if(idx >= 0)
             {
-                if(data.Text.size() <= idx)
+                if((int32)data.Text.size() <= idx)
                     data.Text.resize(idx+1);
 
                 data.Text[idx] = str;
@@ -4785,7 +4767,7 @@ void ObjectMgr::LoadNpcTextLocales()
                     int idx = GetOrNewIndexForLocale(LocaleConstant(i));
                     if(idx >= 0)
                     {
-                        if(data.Text_0[j].size() <= idx)
+                        if((int32)data.Text_0[j].size() <= idx)
                             data.Text_0[j].resize(idx+1);
 
                         data.Text_0[j][idx] = str0;
@@ -4797,7 +4779,7 @@ void ObjectMgr::LoadNpcTextLocales()
                     int idx = GetOrNewIndexForLocale(LocaleConstant(i));
                     if(idx >= 0)
                     {
-                        if(data.Text_1[j].size() <= idx)
+                        if((int32)data.Text_1[j].size() <= idx)
                             data.Text_1[j].resize(idx+1);
 
                         data.Text_1[j][idx] = str1;
@@ -5602,6 +5584,52 @@ AreaTrigger const* ObjectMgr::GetMapEntranceTrigger(uint32 Map) const
     return NULL;
 }
 
+void ObjectMgr::PackGroupIds()
+{
+    // this routine renumbers groups in such a way so they start from 1 and go up
+
+    // obtain set of all groups
+    std::set<uint32> groupIds;
+
+    // all valid ids are in the instance table
+    // any associations to ids not in this table are assumed to be
+    // cleaned already in CleanupInstances
+    QueryResult *result = CharacterDatabase.Query("SELECT groupId FROM groups");
+    if( result )
+    {
+        do
+        {
+            Field *fields = result->Fetch();
+            groupIds.insert(fields[0].GetUInt32());
+        }
+        while (result->NextRow());
+        delete result;
+    }
+
+    barGoLink bar( groupIds.size() + 1);
+    bar.step();
+
+    uint32 groupId = 1;
+    // we do assume std::set is sorted properly on integer value
+    for (std::set<uint32>::iterator i = groupIds.begin(); i != groupIds.end(); ++i)
+    {
+        if (*i != groupId)
+        {
+            // remap group id
+            CharacterDatabase.PExecute("UPDATE groups SET groupId = '%u' WHERE groupId = '%u'", groupId, *i);
+            CharacterDatabase.PExecute("UPDATE group_member SET groupId = '%u' WHERE groupId = '%u'", groupId, *i);
+        }
+
+        ++groupId;
+        bar.step();
+    }
+
+    m_groupId = groupId;
+
+    sLog.outString( ">> Group Ids remapped, next group id is %u", groupId );
+    sLog.outString();
+}
+
 void ObjectMgr::SetHighestGuids()
 {
     QueryResult *result = CharacterDatabase.Query( "SELECT MAX(guid) FROM characters" );
@@ -5684,6 +5712,13 @@ void ObjectMgr::SetHighestGuids()
     if (result)
     {
         m_guildId = (*result)[0].GetUInt32()+1;
+        delete result;
+    }
+
+    result = CharacterDatabase.Query( "SELECT MAX(groupId) FROM groups" );
+    if (result)
+    {
+        m_groupId = (*result)[0].GetUInt32()+1;
         delete result;
     }
 }
@@ -5858,7 +5893,7 @@ void ObjectMgr::LoadGameObjectLocales()
                 int idx = GetOrNewIndexForLocale(LocaleConstant(i));
                 if(idx >= 0)
                 {
-                    if(data.Name.size() <= idx)
+                    if((int32)data.Name.size() <= idx)
                         data.Name.resize(idx+1);
 
                     data.Name[idx] = str;
@@ -5874,7 +5909,7 @@ void ObjectMgr::LoadGameObjectLocales()
                 int idx = GetOrNewIndexForLocale(LocaleConstant(i));
                 if(idx >= 0)
                 {
-                    if(data.CastBarCaption.size() <= idx)
+                    if((int32)data.CastBarCaption.size() <= idx)
                         data.CastBarCaption.resize(idx+1);
 
                     data.CastBarCaption[idx] = str;
@@ -7025,7 +7060,7 @@ int ObjectMgr::GetIndexForLocale( LocaleConstant loc )
 
 LocaleConstant ObjectMgr::GetLocaleForIndex(int i)
 {
-    if (i<0 || i>=m_LocalForIndex.size())
+    if (i<0 || i>=(int32)m_LocalForIndex.size())
         return LOCALE_enUS;
 
     return m_LocalForIndex[i];
@@ -7198,7 +7233,7 @@ bool ObjectMgr::LoadMangosStrings(DatabaseType& db, char const* table, int32 min
                 if (idx >= 0)
                 {
                     // 0 -> default, idx in to idx+1
-                    if (data.Content.size() <= idx+1)
+                    if ((int32)data.Content.size() <= idx+1)
                         data.Content.resize(idx+2);
 
                     data.Content[idx+1] = str;
@@ -7224,7 +7259,7 @@ const char *ObjectMgr::GetMangosString(int32 entry, int locale_idx) const
     // Content[0] always exist if exist MangosStringLocale
     if(MangosStringLocale const *msl = GetMangosStringLocale(entry))
     {
-        if(msl->Content.size() > locale_idx+1 && !msl->Content[locale_idx+1].empty())
+        if((int32)msl->Content.size() > locale_idx+1 && !msl->Content[locale_idx+1].empty())
             return msl->Content[locale_idx+1].c_str();
         else
             return msl->Content[0].c_str();
@@ -7397,7 +7432,7 @@ bool PlayerCondition::Meets(Player const * player) const
         case CONDITION_REPUTATION_RANK:
         {
             FactionEntry const* faction = sFactionStore.LookupEntry(value1);
-            return faction && player->GetReputationMgr().GetRank(faction) >= int32(value2);
+            return faction && player->GetReputationMgr().GetRank(faction) >= ReputationRank(value2);
         }
         case CONDITION_TEAM:
             return player->GetTeam() == value1;

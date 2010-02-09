@@ -464,11 +464,11 @@ void PlayerMenu::SendQuestGiverQuestDetails( Quest const *pQuest, uint64 npcGUID
     data << Title;
     data << Details;
     data << Objectives;
-    data << uint8(ActivateAccept ? 1 : 0);
+    data << uint8(ActivateAccept ? 1 : 0);                  // auto finish?
     data << uint32(pQuest->GetSuggestedPlayers());
-    data << uint8(0);                                       // new wotlk
-    data << uint8(0);                                       // new 3.1
-    data << uint8(0);                                       // new 3.3.0
+    data << uint8(0);                                       // flags PvP
+    data << uint8(0);                                       // value is sent back to server in quest accept packet
+    data << uint8(0);                                       // auto accept?
 
     if (pQuest->HasFlag(QUEST_FLAGS_HIDDEN_REWARDS))
     {
@@ -534,17 +534,18 @@ void PlayerMenu::SendQuestGiverQuestDetails( Quest const *pQuest, uint64 npcGUID
     data << uint32(pQuest->GetRewSpellCast());              // casted spell
     data << uint32(pQuest->GetCharTitleId());               // CharTitleId, new 2.4.0, player gets this title (id from CharTitles)
     data << uint32(pQuest->GetBonusTalents());              // bonus talents
-    data << uint32(0);
-    data << uint32(0);
+    data << uint32(0);                                      // bonus arena points
+    data << uint32(0);                                      // rep reward show mask?
 
-    for(int i = 0; i < QUEST_REPUTATIONS_COUNT; ++i)
-        data << uint32(0);
+    for(int i = 0; i < QUEST_REPUTATIONS_COUNT; ++i)        // reward factions ids
+        data << uint32(pQuest->RewRepFaction[i]);
 
-    for(int i = 0; i < QUEST_REPUTATIONS_COUNT; ++i)
-        data << uint32(0);
+    for(int i = 0; i < QUEST_REPUTATIONS_COUNT; ++i)        // columnid in QuestFactionReward.dbc (if negative, from second row)
+        data << int32(pQuest->RewRepValueId[i]);
 
-    for(int i = 0; i < QUEST_REPUTATIONS_COUNT; ++i)
-        data << uint32(0);
+    for(int i = 0; i < QUEST_REPUTATIONS_COUNT; ++i)        // reward reputation override. No bonus is expected given
+        data << int32(0);
+        //data << int32(pQuest->RewRepValue[i]);            // current field for store of rep value, can be reused to implement "override value"
 
     data << uint32(QUEST_EMOTE_COUNT);
 
@@ -635,7 +636,7 @@ void PlayerMenu::SendQuestQueryResponse( Quest const *pQuest )
     data << uint32(pQuest->GetPlayersSlain());              // players slain
     data << uint32(pQuest->GetBonusTalents());              // bonus talents
     data << uint32(0);                                      // bonus arena points
-    data << uint32(0);                                      // unknown
+    data << uint32(0);                                      // rew rep show mask?
 
     int iI;
 
@@ -660,14 +661,15 @@ void PlayerMenu::SendQuestQueryResponse( Quest const *pQuest )
         }
     }
 
-    for(iI = 0; iI < QUEST_REPUTATIONS_COUNT; ++iI)         // reward factions ids
-        data << uint32(0);
+    for(int i = 0; i < QUEST_REPUTATIONS_COUNT; ++i)        // reward factions ids
+        data << uint32(pQuest->RewRepFaction[i]);
 
-    for(iI = 0; iI < QUEST_REPUTATIONS_COUNT; ++iI)         // column index in QuestFactionReward.dbc?
-        data << uint32(0);
+    for(int i = 0; i < QUEST_REPUTATIONS_COUNT; ++i)        // columnid in QuestFactionReward.dbc (if negative, from second row)
+        data << int32(pQuest->RewRepValueId[i]);
 
-    for(iI = 0; iI < QUEST_REPUTATIONS_COUNT; ++iI)         // reward reputation override?
-        data << uint32(0);
+    for(int i = 0; i < QUEST_REPUTATIONS_COUNT; ++i)        // reward reputation override. No bonus is expected given
+        data << int32(0);
+        //data << int32(pQuest->RewRepValue[i]);            // current field for store of rep value, can be reused to implement "override value"
 
     data << pQuest->GetPointMapId();
     data << pQuest->GetPointX();
@@ -734,8 +736,8 @@ void PlayerMenu::SendQuestGiverOfferReward( Quest const* pQuest, uint64 npcGUID,
     data << Title;
     data << OfferRewardText;
 
-    data << uint8(EnableNext ? 1 : 0);
-    data << uint32(0);                                      // unk
+    data << uint8(EnableNext ? 1 : 0);                      // Auto Finish?
+    data << uint32(0);                                      // SuggestedGroupNum
 
     uint32 EmoteCount = 0;
     for (uint32 i = 0; i < QUEST_EMOTE_COUNT; ++i)
@@ -799,16 +801,17 @@ void PlayerMenu::SendQuestGiverOfferReward( Quest const* pQuest, uint64 npcGUID,
     data << uint32(pQuest->GetCharTitleId());               // character title
     data << uint32(pQuest->GetBonusTalents());              // bonus talents
     data << uint32(0);                                      // bonus arena points
-    data << uint32(0);                                      // unknown
+    data << uint32(0);                                      // rew rep show mask?
 
     for(int i = 0; i < QUEST_REPUTATIONS_COUNT; ++i)        // reward factions ids
-        data << uint32(0);
+        data << uint32(pQuest->RewRepFaction[i]);
 
-    for(int i = 0; i < QUEST_REPUTATIONS_COUNT; ++i)        // columnid in QuestFactionReward.dbc (zero based)?
-        data << uint32(0);
+    for(int i = 0; i < QUEST_REPUTATIONS_COUNT; ++i)        // columnid in QuestFactionReward.dbc (if negative, from second row)
+        data << int32(pQuest->RewRepValueId[i]);
 
-    for(int i = 0; i < QUEST_REPUTATIONS_COUNT; ++i)        // reward reputation override?
-        data << uint32(0);
+    for(int i = 0; i < QUEST_REPUTATIONS_COUNT; ++i)        // reward reputation override. No diplomacy bonus is expected given, reward also does not display in chat window
+        data << int32(0);
+        //data << int32(pQuest->RewRepValue[i]);
 
     pSession->SendPacket( &data );
     sLog.outDebug( "WORLD: Sent SMSG_QUESTGIVER_OFFER_REWARD NPCGuid=%u, questid=%u", GUID_LOPART(npcGUID), pQuest->GetQuestId() );
@@ -847,20 +850,20 @@ void PlayerMenu::SendQuestGiverRequestItems( Quest const *pQuest, uint64 npcGUID
     data << Title;
     data << RequestItemsText;
 
-    data << uint32(0x00);                                   // unknown
+    data << uint32(0x00);                                   // emote delay
 
     if(Completable)
-        data << pQuest->GetCompleteEmote();
+        data << pQuest->GetCompleteEmote();                 // emote id
     else
         data << pQuest->GetIncompleteEmote();
 
     // Close Window after cancel
     if (CloseOnCancel)
-        data << uint32(0x01);
+        data << uint32(0x01);                               // auto finish?
     else
         data << uint32(0x00);
 
-    data << uint32(0x00);                                   // unknown
+    data << uint32(0x00);                                   // SuggestedGroupNum
 
     // Required Money
     data << uint32(pQuest->GetRewOrReqMoney() < 0 ? -pQuest->GetRewOrReqMoney() : 0);

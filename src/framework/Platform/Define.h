@@ -48,10 +48,11 @@ typedef ACE_SHLIB_HANDLE MANGOS_LIBRARY_HANDLE;
 #define MANGOS_CLOSE_LIBRARY(hlib)      ACE_OS::dlclose(hlib)
 #define MANGOS_GET_PROC_ADDR(hlib,name) ACE_OS::dlsym(hlib,name)
 
+#define MANGOS_PATH_MAX PATH_MAX                            // ace/os_include/os_limits.h -> ace/Basic_Types.h
+
 #if PLATFORM == PLATFORM_WINDOWS
 #  define MANGOS_EXPORT __declspec(dllexport)
 #  define MANGOS_IMPORT __cdecl
-#  define MANGOS_PATH_MAX MAX_PATH
 #else //PLATFORM != PLATFORM_WINDOWS
 #  define MANGOS_EXPORT export
 #  if defined(__APPLE_CC__) && defined(BIG_ENDIAN)
@@ -61,7 +62,6 @@ typedef ACE_SHLIB_HANDLE MANGOS_LIBRARY_HANDLE;
 #  else
 #    define MANGOS_IMPORT __attribute__ ((cdecl))
 #  endif //__APPLE_CC__ && BIG_ENDIAN
-#  define MANGOS_PATH_MAX PATH_MAX
 #endif //PLATFORM
 
 #if PLATFORM == PLATFORM_WINDOWS

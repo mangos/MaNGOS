@@ -408,8 +408,8 @@ class ObjectMgr
         void LoadGameobjectInfo();
         void AddGameobjectInfo(GameObjectInfo *goinfo);
 
+        void PackGroupIds();
         Group* GetGroupById(uint32 id) const;
-        Group* GetGroupByLeaderLowGUID(uint32 guid) const;  // slow way by leader guid
         void AddGroup(Group* group);
         void RemoveGroup(Group* group);
 

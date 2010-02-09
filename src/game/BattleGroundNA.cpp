@@ -105,7 +105,7 @@ void BattleGroundNA::HandleKillPlayer(Player *player, Player *killer)
 
 bool BattleGroundNA::HandlePlayerUnderMap(Player *player)
 {
-    player->TeleportTo(GetMapId(),4055.504395,2919.660645,13.611241,player->GetOrientation(),false);
+    player->TeleportTo(GetMapId(),4055.504395f,2919.660645f,13.611241f,player->GetOrientation(),false);
     return true;
 }
 
