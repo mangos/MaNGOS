@@ -575,7 +575,7 @@ void PlayerMenu::SendQuestQueryResponse( Quest const *pQuest )
     data << uint32(pQuest->GetQuestId());                   // quest id
     data << uint32(pQuest->GetQuestMethod());               // Accepted values: 0, 1 or 2. 0==IsAutoComplete() (skip objectives/details)
     data << int32(pQuest->GetQuestLevel());                 // may be -1, static data, in other cases must be used dynamic level: Player::GetQuestLevelForPlayer (0 is not known, but assuming this is no longer valid for quest intended for client)
-    data << uint32(0);                                      // min level
+    data << uint32(pQuest->GetMinLevel());                  // min required level to obtain (added for 3.3). Assumed allowed (database) range is -1 to 255 (still using uint32, since negative value would not be of any known use for client)
     data << uint32(pQuest->GetZoneOrSort());                // zone or sort to display in quest log
 
     data << uint32(pQuest->GetType());                      // quest type
@@ -754,8 +754,8 @@ void PlayerMenu::SendQuestGiverOfferReward( Quest const* pQuest, uint64 npcGUID,
             data << uint32(0);
     }
 
-    data << uint32(0);
-    data << uint32(pQuest->GetRewOrReqMoney());
+    data << uint32(pQuest->GetRewOrReqMoney());             // money
+    data << uint32(pQuest->XPValue(pSession->GetPlayer())); // xp
 
     // rewarded honor points. Multiply with 10 to satisfy client
     data << uint32(10*MaNGOS::Honor::hk_honor_at_level(pSession->GetPlayer()->getLevel(), pQuest->GetRewHonorableKills()));
@@ -763,10 +763,10 @@ void PlayerMenu::SendQuestGiverOfferReward( Quest const* pQuest, uint64 npcGUID,
     data << uint32(0x08);                                   // unused by client?
     data << uint32(pQuest->GetRewSpell());                  // reward spell, this spell will display (icon) (casted if RewSpellCast==0)
     data << uint32(pQuest->GetRewSpellCast());              // casted spell
-    data << uint32(0);                                      // unknown
+    data << uint32(pQuest->GetCharTitleId());               // character title
     data << uint32(pQuest->GetBonusTalents());              // bonus talents
-    data << uint32(0);
-    data << uint32(0);
+    data << uint32(0);                                      // bonus arena points
+    data << uint32(0);                                      // unknown
 
     for(int i = 0; i < QUEST_REPUTATIONS_COUNT; ++i)        // reward factions ids
         data << uint32(0);

@@ -33,8 +33,33 @@ struct PoolObject
 {
     uint32  guid;
     float   chance;
-    bool    spawned;
-    PoolObject(uint32 _guid, float _chance): guid(_guid), chance(fabs(_chance)), spawned(false) {}
+    PoolObject(uint32 _guid, float _chance): guid(_guid), chance(fabs(_chance)) {}
+};
+
+class Pool                                                  // for Pool of Pool case
+{
+};
+
+typedef std::set<uint32> SpawnedPoolObjects;
+typedef std::map<uint32,uint32> SpawnedPoolPools;
+
+class SpawnedPoolData
+{
+    public:
+        template<typename T>
+        bool IsSpawnedObject(uint32 db_guid_or_pool_id) const;
+
+        uint32 GetSpawnedObjects(uint32 pool_id) const;
+
+        template<typename T>
+        void AddSpawn(uint32 db_guid_or_pool_id, uint32 pool_id);
+
+        template<typename T>
+        void RemoveSpawn(uint32 db_guid_or_pool_id, uint32 pool_id);
+    private:
+        SpawnedPoolObjects mSpawnedCreatures;
+        SpawnedPoolObjects mSpawnedGameobjects;
+        SpawnedPoolPools   mSpawnedPools;
 };
 
 template <class T>
@@ -42,27 +67,24 @@ class PoolGroup
 {
     typedef std::vector<PoolObject> PoolObjectList;
     public:
-        PoolGroup() : m_SpawnedPoolAmount(0) { }
+        explicit PoolGroup() : poolId(0) { }
+        void SetPoolId(uint32 pool_id) { poolId = pool_id; }
         ~PoolGroup() {};
         bool isEmpty() const { return ExplicitlyChanced.empty() && EqualChanced.empty(); }
         void AddEntry(PoolObject& poolitem, uint32 maxentries);
         bool CheckPool() const;
-        PoolObject* RollOne(uint32 triggerFrom);
-        bool IsSpawnedObject(uint32 guid) const;
-        void DespawnObject(uint32 guid=0);
+        PoolObject* RollOne(SpawnedPoolData& spawns, uint32 triggerFrom);
+        void DespawnObject(SpawnedPoolData& spawns, uint32 guid=0);
         void Despawn1Object(uint32 guid);
-        void SpawnObject(uint32 limit, uint32 triggerFrom);
+        void SpawnObject(SpawnedPoolData& spawns, uint32 limit, uint32 triggerFrom);
+
         void Spawn1Object(PoolObject* obj);
         void ReSpawn1Object(PoolObject* obj);
         void RemoveOneRelation(uint16 child_pool_id);
     private:
+        uint32 poolId;
         PoolObjectList ExplicitlyChanced;
         PoolObjectList EqualChanced;
-        uint32 m_SpawnedPoolAmount;                         // Used to know the number of spawned objects
-};
-
-class Pool                                                  // for Pool of Pool case
-{
 };
 
 class PoolManager
@@ -78,7 +100,7 @@ class PoolManager
         uint16 IsPartOfAPool(uint32 db_guid_or_pool_id) const;
 
         template<typename T>
-        bool IsSpawnedObject(uint16 pool_id, uint32 db_guid_or_pool_id) const;
+        bool IsSpawnedObject(uint32 db_guid_or_pool_id) const { return mSpawnedData.IsSpawnedObject<T>(db_guid_or_pool_id); }
 
         bool CheckPool(uint16 pool_id) const;
 
@@ -94,6 +116,7 @@ class PoolManager
 
         uint16 max_pool_id;
         typedef std::vector<PoolTemplateData> PoolTemplateDataMap;
+
         typedef std::vector<PoolGroup<Creature> >   PoolGroupCreatureMap;
         typedef std::vector<PoolGroup<GameObject> > PoolGroupGameObjectMap;
         typedef std::vector<PoolGroup<Pool> >       PoolGroupPoolMap;
@@ -110,6 +133,8 @@ class PoolManager
         SearchMap mGameobjectSearchMap;
         SearchMap mPoolSearchMap;
 
+        // dynamic data
+        SpawnedPoolData mSpawnedData;
 };
 
 #define sPoolMgr MaNGOS::Singleton<PoolManager>::Instance()

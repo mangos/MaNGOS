@@ -165,11 +165,10 @@ void TemporarySummon::UnSummon()
 {
     CombatStop();
 
-    Unit* sum = m_summoner ? ObjectAccessor::GetUnit(*this, m_summoner) : NULL;
-    if (sum  && sum->GetTypeId() == TYPEID_UNIT && ((Creature*)sum)->AI())
-    {
-        ((Creature*)sum)->AI()->SummonedCreatureDespawn(this);
-    }
+    if (IS_CREATURE_GUID(GetSummonerGUID()))
+        if(Creature* sum = GetMap()->GetCreature(GetSummonerGUID()))
+            if (sum->AI())
+                sum->AI()->SummonedCreatureDespawn(this);
 
     AddObjectToRemoveList();
 }

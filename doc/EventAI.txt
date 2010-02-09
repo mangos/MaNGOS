@@ -62,29 +62,31 @@ Some events such as EVENT_T_AGGRO, EVENT_T_DEATH, EVENT_T_SPAWNED, and EVENT_T_E
 
 #   Internal name                Param usage                                             Description
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-0    EVENT_T_TIMER               InitialMin, InitialMax, RepeatMin, RepeatMax            Expires at first between (Param1) and (Param2) and then will repeat between every (Param3) and (Param4),  EXPIRES ONLY IN COMBAT.
-1    EVENT_T_TIMER_OOC           InitialMin, InitialMax, RepeatMin, RepeatMax            Expires at first between (Param1) and (Param2) and then will repeat between every (Param3) and (Param4),  EXPIRES ONLY OUT OF COMBAT.
-2    EVENT_T_HP                  HPMax%, HPMin%, RepeatMin, RepeatMax                    Expires when the Creature's HP is between (Param1) and (Param2). Will repeat between every (Param3) and (Param4).
-3    EVENT_T_MANA                ManaMax%,ManaMin% RepeatMin, RepeatMax                  Expires once the Creature's Mana% is between (Param1) and (Param2). Will repeat between every (Param3) and (Param4).
-4    EVENT_T_AGGRO               NONE                                                    Expires ONLY upon the Creature's INITIAL Aggro at the Start of Combat (Does NOT Repeat).
-5    EVENT_T_KILL                RepeatMin, RepeatMax                                    Expires upon Killing a Player. Will repeat between (Param1) and (Param2).
-6    EVENT_T_DEATH               NONE                                                    Expires upon the Creature's Death. (This Triggers At The Moment The Creature Dies)
-7    EVENT_T_EVADE               NONE                                                    Expires at the moment the Creature EnterEvadeMode().
-8    EVENT_T_SPELLHIT            SpellID, Schoolmask, RepeatMin, RepeatMax               Expires upon a Spell Hit on the Creature. When (param1) is set, it is the specific Spell ID used as the trigger. With (param2) specified, the expiration is limited to specific spell schools (-1 for all). Will repeat every (Param3) and (Param4). Only A Spell ID or Spell School may be Specified but NOT both.
-9    EVENT_T_RANGE               MinDist, MaxDist, RepeatMin, RepeatMax                  Expires when the Highest Threat Target Distance is Greater than (Param1) and Less than (Param2). Will repeat between every (Param3) and (Param4).
-10   EVENT_T_OOC_LOS             Hostile-or-Not, MaxAllowedRange, RepeatMin, RepeatMax   Expires when a unit moves within distance (MaxAllowedRange) of a creature. If (Param1) is zero it will expire only when unit is hostile, friendly otherwise (Param1 = 1), depends generally on faction. Will repeat every (Param3) and (Param4). Does not expire when the creature is in combat.
-11   EVENT_T_SPAWNED             NONE                                                    Expires on initial spawn and on creature respawn (useful for setting ranged movement type).
-12   EVENT_T_TARGET_HP           HPMax%, HPMin%, RepeatMin, RepeatMax                    Expires when current target's HP is between (Param1) and (Param2). Will repeat every (Param3) and (Param4).
-13   EVENT_T_TARGET_CASTING      RepeatMin, RepeatatMax                                  Expires when the current target is casting a spell. Will repeat every (Param1) and (Param2).
-14   EVENT_T_FRIENDLY_HP         HPDeficit, Radius, RepeatMin, RepeatMax                 Expires when a friendly unit in radius has at least (Param1) HP missing. Will repeat every (Param3) and (Param4).
-15   EVENT_T_FRIENDLY_IS_CC      DispelType, Radius, RepeatMin, RepeatMax                Expires when a friendly unit is crowd controlled within the given radius (Param2). Will repeat every (Param3) and (Param4).
-16   EVENT_T_MISSING_BUFF        SpellId, Radius, RepeatMin, RepeatMax                   Expires when a friendly unit is missing aura(s) given by a spell (Param1) within radius (Param2). Will repeat every (Param3) and (Param4).
-17   EVENT_T_SUMMONED_UNIT       CreatureId, RepeatMin, RepeatMax                        Expires after creature with entry = (Param1) is spawned (Param1 = 0 means all spawns). Will repeat every (Param2) and (Param3).
-18   EVENT_T_TARGET_MANA         ManaMax%, ManaMin%, RepeatMin, RepeatMax                Expires when current target's Mana is between (Param1) and (Param2). Will repeat every (Param3) and (Param4).
-21   EVENT_T_REACHED_HOME        NONE                                                    Expires when a creature reaches it's home (spawn) location after evade.
-22   EVENT_T_RECEIVE_EMOTE       EmoteId, Condition, CondValue1, CondValue2              Expires when a creature receives an emote with emote text id (enum TextEmotes) in (Param1). Conditions can be defined (Param2) with optional values (Param3,Param4), see enum ConditionType.
-23   EVENT_T_BUFFED              SpellID, AmmountInStack, RepeatMin, RepeatMax           Expires when a creature has spell (Param1) auras applied in a stack greater or equal to value provided in (Param2). Will repeat every (Param3) and (Param4).
-24   EVENT_T_TARGET_BUFFED       SpellID, AmmountInStack, RepeatMin, RepeatMax           Expires when a target unit has spell (Param1) auras applied in a stack greater or equal to value provided in (Param2). Will repeat every (Param3) and (Param4).
+0    EVENT_T_TIMER                  InitialMin, InitialMax, RepeatMin, RepeatMax            Expires at first between (Param1) and (Param2) and then will repeat between every (Param3) and (Param4),  EXPIRES ONLY IN COMBAT.
+1    EVENT_T_TIMER_OOC              InitialMin, InitialMax, RepeatMin, RepeatMax            Expires at first between (Param1) and (Param2) and then will repeat between every (Param3) and (Param4),  EXPIRES ONLY OUT OF COMBAT.
+2    EVENT_T_HP                     HPMax%, HPMin%, RepeatMin, RepeatMax                    Expires when the Creature's HP is between (Param1) and (Param2). Will repeat between every (Param3) and (Param4).
+3    EVENT_T_MANA                   ManaMax%,ManaMin% RepeatMin, RepeatMax                  Expires once the Creature's Mana% is between (Param1) and (Param2). Will repeat between every (Param3) and (Param4).
+4    EVENT_T_AGGRO                  NONE                                                    Expires ONLY upon the Creature's INITIAL Aggro at the Start of Combat (Does NOT Repeat).
+5    EVENT_T_KILL                   RepeatMin, RepeatMax                                    Expires upon Killing a Player. Will repeat between (Param1) and (Param2).
+6    EVENT_T_DEATH                  NONE                                                    Expires upon the Creature's Death. (This Triggers At The Moment The Creature Dies)
+7    EVENT_T_EVADE                  NONE                                                    Expires at the moment the Creature EnterEvadeMode().
+8    EVENT_T_SPELLHIT               SpellID, Schoolmask, RepeatMin, RepeatMax               Expires upon a Spell Hit on the Creature. When (param1) is set, it is the specific Spell ID used as the trigger. With (param2) specified, the expiration is limited to specific spell schools (-1 for all). Will repeat every (Param3) and (Param4). Only A Spell ID or Spell School may be Specified but NOT both.
+9    EVENT_T_RANGE                  MinDist, MaxDist, RepeatMin, RepeatMax                  Expires when the Highest Threat Target Distance is Greater than (Param1) and Less than (Param2). Will repeat between every (Param3) and (Param4).
+10   EVENT_T_OOC_LOS                Hostile-or-Not, MaxAllowedRange, RepeatMin, RepeatMax   Expires when a unit moves within distance (MaxAllowedRange) of a creature. If (Param1) is zero it will expire only when unit is hostile, friendly otherwise (Param1 = 1), depends generally on faction. Will repeat every (Param3) and (Param4). Does not expire when the creature is in combat.
+11   EVENT_T_SPAWNED                NONE                                                    Expires on initial spawn and on creature respawn (useful for setting ranged movement type).
+12   EVENT_T_TARGET_HP              HPMax%, HPMin%, RepeatMin, RepeatMax                    Expires when current target's HP is between (Param1) and (Param2). Will repeat every (Param3) and (Param4).
+13   EVENT_T_TARGET_CASTING         RepeatMin, RepeatatMax                                  Expires when the current target is casting a spell. Will repeat every (Param1) and (Param2).
+14   EVENT_T_FRIENDLY_HP            HPDeficit, Radius, RepeatMin, RepeatMax                 Expires when a friendly unit in radius has at least (Param1) HP missing. Will repeat every (Param3) and (Param4).
+15   EVENT_T_FRIENDLY_IS_CC         DispelType, Radius, RepeatMin, RepeatMax                Expires when a friendly unit is crowd controlled within the given radius (Param2). Will repeat every (Param3) and (Param4).
+16   EVENT_T_MISSING_BUFF           SpellId, Radius, RepeatMin, RepeatMax                   Expires when a friendly unit is missing aura(s) given by a spell (Param1) within radius (Param2). Will repeat every (Param3) and (Param4).
+17   EVENT_T_SUMMONED_UNIT          CreatureId, RepeatMin, RepeatMax                        Expires after creature with entry = (Param1) is spawned (Param1 = 0 means all spawns). Will repeat every (Param2) and (Param3).
+18   EVENT_T_TARGET_MANA            ManaMax%, ManaMin%, RepeatMin, RepeatMax                Expires when current target's Mana is between (Param1) and (Param2). Will repeat every (Param3) and (Param4).
+21   EVENT_T_REACHED_HOME           NONE                                                    Expires when a creature reaches it's home (spawn) location after evade.
+22   EVENT_T_RECEIVE_EMOTE          EmoteId, Condition, CondValue1, CondValue2              Expires when a creature receives an emote with emote text id (enum TextEmotes) in (Param1). Conditions can be defined (Param2) with optional values (Param3,Param4), see enum ConditionType.
+23   EVENT_T_BUFFED                 SpellID, AmmountInStack, RepeatMin, RepeatMax           Expires when a creature has spell (Param1) auras applied in a stack greater or equal to value provided in (Param2). Will repeat every (Param3) and (Param4).
+24   EVENT_T_TARGET_BUFFED          SpellID, AmmountInStack, RepeatMin, RepeatMax           Expires when a target unit has spell (Param1) auras applied in a stack greater or equal to value provided in (Param2). Will repeat every (Param3) and (Param4).
+25   EVENT_T_SUMMONED_JUST_DIED     CreatureId, RepeatMin, RepeatMax                        Expires after creature with entry = (Param1) is die (Param1 = 0 means all spawns). Will repeat every (Param2) and (Param3).
+26   EVENT_T_SUMMONED_JUST_DESPAWN  CreatureId, RepeatMin, RepeatMax                        Expires before creature with entry = (Param1) is despawn (Param1 = 0 means all spawns). Will repeat every (Param2) and (Param3).
 
 
 =========================================
@@ -380,6 +382,27 @@ CONDITION_SKILL (7)           skill_id     min_skill_value
 CONDITION_QUESTREWARDED (8)   quest_id     0, if quest are rewarded
 CONDITION_QUESTTAKEN (9)      quest_id     0, while quest active(incomplete)
 CONDITION_ACTIVE_EVENT (12)   event_id     0, note this is id from dbc, also defined in Mangos source(enum HolidayIds) NOT id of game_event in database
+
+---------------------------
+25 = EVENT_T_SUMMONED_JUST_DIED:
+---------------------------
+Parameter 1: CreatureId - The CreatureID that the NPC is watching die to trigger this event
+Parameter 2: RepeatMin - Minimum Time used to calculate Random Repeat Expire
+Parameter 3: RepeatMax - Maximum Time used to calculate Random Repeat Expire
+
+BOTH - Expires after creature with entry(Param1) is die or for all spawns if param1 = 0. Will repeat every (Param2) and (Param3) .
+This is commonly used for NPC's who will do something special once another NPC is die. Usually used is Complex Scripts or Special Events.
+
+---------------------------
+26 = EVENT_T_SUMMONED_JUST_DESPAWN:
+---------------------------
+Parameter 1: CreatureId - The CreatureID that the NPC is watching despawn to trigger this event
+Parameter 2: RepeatMin - Minimum Time used to calculate Random Repeat Expire
+Parameter 3: RepeatMax - Maximum Time used to calculate Random Repeat Expire
+
+BOTH - Expires before creature with entry(Param1) is dwspawned or for all spawns if param1 = 0. Will repeat every (Param2) and (Param3) .
+This is commonly used for NPC's who will do something special once another NPC is despawn. Usually used is Complex Scripts or Special Events.
+NOTE: called before despawn happens, so summoned creature still in world at expire moment.
 
 =========================================
 Action Types

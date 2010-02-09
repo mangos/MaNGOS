@@ -181,6 +181,12 @@ struct ActionButton
     }
 };
 
+// some action button indexes used in code or clarify structure
+enum ActionButtonIndex
+{
+    ACTION_BUTTON_SHAMAN_TOTEMS_BAR = 132,
+};
+
 #define  MAX_ACTION_BUTTONS 144                             //checked in 3.2.0
 
 typedef std::map<uint8,ActionButton> ActionButtonList;
@@ -423,6 +429,7 @@ enum DrunkenState
 
 enum PlayerFlags
 {
+    PLAYER_FLAGS_NONE              = 0x00000000,
     PLAYER_FLAGS_GROUP_LEADER      = 0x00000001,
     PLAYER_FLAGS_AFK               = 0x00000002,
     PLAYER_FLAGS_DND               = 0x00000004,
@@ -438,7 +445,7 @@ enum PlayerFlags
     PLAYER_FLAGS_PARTIAL_PLAY_TIME = 0x00001000,            // played long time
     PLAYER_FLAGS_NO_PLAY_TIME      = 0x00002000,            // played too long time
     PLAYER_FLAGS_IS_OUT_OF_BOUNDS  = 0x00004000,            // Lua_IsOutOfBounds
-    PLAYER_FLAGS_UNK16             = 0x00008000,            // strange visual effect (2.0.1), looks like PLAYER_FLAGS_GHOST flag
+    PLAYER_FLAGS_DEVELOPER         = 0x00008000,            // <Dev> prefix for something?
     PLAYER_FLAGS_UNK17             = 0x00010000,            // pre-3.0.3 PLAYER_FLAGS_SANCTUARY flag for player entered sanctuary
     PLAYER_FLAGS_TAXI_BENCHMARK    = 0x00020000,            // taxi benchmark mode (on/off) (2.0.1)
     PLAYER_FLAGS_PVP_TIMER         = 0x00040000,            // 3.0.2, pvp timer active (after you disable pvp manually)
@@ -809,7 +816,7 @@ struct MovementInfo
     // common
     uint64 guid;
     uint32 flags;                                           // see enum MovementFlags
-    uint16  unk1;
+    uint16  moveFlags2;
     uint32  time;
     float   x, y, z, o;
     // transport
@@ -817,21 +824,22 @@ struct MovementInfo
     float   t_x, t_y, t_z, t_o;
     uint32  t_time;
     int8    t_seat;
+    uint32  t_time2;
     // swimming and unknown
     float   s_pitch;
     // last fall time
     uint32  fallTime;
     // jumping
-    float   j_unk, j_sinAngle, j_cosAngle, j_xyspeed;
+    float   j_velocity, j_sinAngle, j_cosAngle, j_xyspeed;
     // spline
     float   u_unk1;
 
     MovementInfo()
     {
         flags = MOVEMENTFLAG_NONE;
-        time = t_time = fallTime = 0;
-        unk1 = 0;
-        x = y = z = o = t_x = t_y = t_z = t_o = s_pitch = j_unk = j_sinAngle = j_cosAngle = j_xyspeed = u_unk1 = 0.0f;
+        time = t_time = t_time2 = fallTime = 0;
+        moveFlags2 = 0;
+        x = y = z = o = t_x = t_y = t_z = t_o = s_pitch = j_velocity = j_sinAngle = j_cosAngle = j_xyspeed = u_unk1 = 0.0f;
         t_guid = 0;
     }
 
@@ -1692,6 +1700,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         ActionButton* addActionButton(uint8 button, uint32 action, uint8 type);
         void removeActionButton(uint8 button);
         void SendInitialActionButtons() const;
+        ActionButton const* GetActionButton(uint8 button);
 
         PvPInfo pvpInfo;
         void UpdatePvP(bool state, bool ovrride=false);

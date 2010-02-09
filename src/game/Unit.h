@@ -650,6 +650,24 @@ enum MonsterMovementFlags
     MONSTER_MOVE_SPLINE_FLY     = 0x00003000,               // fly by points
 };
 
+enum MovementFlags2
+{
+    MOVEFLAG2_NONE              = 0x0000,
+    MOVEFLAG2_ALLOW_PITCHING    = 0x0020,
+    MOVEFLAG2_UNK1              = 0x0400,
+    MOVEFLAG2_UNK2              = 0x0800,
+    MOVEFLAG2_UNK3              = 0x1000,
+    MOVEFLAG2_INTERP_MASK       = MOVEFLAG2_UNK1 | MOVEFLAG2_UNK2 | MOVEFLAG2_UNK3,
+};
+
+enum SplineMoveFlags                                        // possibly exactly same as MonsterMovementFlags
+{
+    SPLINE_MOVE_FLAG_NONE   = 0x00000000,
+    SPLINE_MOVE_FLAG_POINT  = 0x00008000,
+    SPLINE_MOVE_FLAG_GUID   = 0x00010000,
+    SPLINE_MOVE_FLAG_FACING = 0x00020000,
+};
+
 enum DiminishingLevels
 {
     DIMINISHING_LEVEL_1             = 0,

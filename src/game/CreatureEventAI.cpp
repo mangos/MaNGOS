@@ -257,17 +257,19 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
             break;
         }
         case EVENT_T_SUMMONED_UNIT:
+        case EVENT_T_SUMMONED_JUST_DIED:
+        case EVENT_T_SUMMONED_JUST_DESPAWN:
         {
             //Prevent event from occuring on no unit or non creatures
             if (!pActionInvoker || pActionInvoker->GetTypeId()!=TYPEID_UNIT)
                 return false;
 
             //Creature id doesn't match up
-            if (((Creature*)pActionInvoker)->GetEntry() != event.summon_unit.creatureId)
+            if (((Creature*)pActionInvoker)->GetEntry() != event.summoned.creatureId)
                 return false;
 
             //Repeat Timers
-            pHolder.UpdateRepeatTimer(m_creature,event.summon_unit.repeatMin,event.summon_unit.repeatMax);
+            pHolder.UpdateRepeatTimer(m_creature,event.summoned.repeatMin,event.summoned.repeatMax);
             break;
         }
         case EVENT_T_TARGET_MANA:
@@ -911,6 +913,30 @@ void CreatureEventAI::JustSummoned(Creature* pUnit)
     }
 }
 
+void CreatureEventAI::SummonedCreatureJustDied(Creature* pUnit)
+{
+    if (bEmptyList || !pUnit)
+        return;
+
+    for (std::list<CreatureEventAIHolder>::iterator i = CreatureEventAIList.begin(); i != CreatureEventAIList.end(); ++i)
+    {
+        if ((*i).Event.event_type == EVENT_T_SUMMONED_JUST_DIED)
+            ProcessEvent(*i, pUnit);
+    }
+}
+
+void CreatureEventAI::SummonedCreatureDespawn(Creature* pUnit)
+{
+    if (bEmptyList || !pUnit)
+        return;
+
+    for (std::list<CreatureEventAIHolder>::iterator i = CreatureEventAIList.begin(); i != CreatureEventAIList.end(); ++i)
+    {
+        if ((*i).Event.event_type == EVENT_T_SUMMONED_JUST_DESPAWN)
+            ProcessEvent(*i, pUnit);
+    }
+}
+
 void CreatureEventAI::EnterCombat(Unit *enemy)
 {
     //Check for on combat start events
@@ -1208,8 +1234,7 @@ Unit* CreatureEventAI::DoSelectLowestHpFriendly(float range, uint32 MinHPDiff)
     */
     TypeContainerVisitor<MaNGOS::UnitLastSearcher<MaNGOS::MostHPMissingInRange>, GridTypeMapContainer >  grid_unit_searcher(searcher);
 
-    CellLock<GridReadGuard> cell_lock(cell, p);
-    cell_lock->Visit(cell_lock, grid_unit_searcher, *m_creature->GetMap(), *m_creature, range);
+    cell.Visit(p, grid_unit_searcher, *m_creature->GetMap(), *m_creature, range);
     return pUnit;
 }
 
@@ -1225,8 +1250,7 @@ void CreatureEventAI::DoFindFriendlyCC(std::list<Creature*>& _list, float range)
 
     TypeContainerVisitor<MaNGOS::CreatureListSearcher<MaNGOS::FriendlyCCedInRange>, GridTypeMapContainer >  grid_creature_searcher(searcher);
 
-    CellLock<GridReadGuard> cell_lock(cell, p);
-    cell_lock->Visit(cell_lock, grid_creature_searcher, *m_creature->GetMap(), *m_creature, range);
+    cell.Visit(p, grid_creature_searcher, *m_creature->GetMap(), *m_creature, range);
 }
 
 void CreatureEventAI::DoFindFriendlyMissingBuff(std::list<Creature*>& _list, float range, uint32 spellid)
@@ -1241,8 +1265,7 @@ void CreatureEventAI::DoFindFriendlyMissingBuff(std::list<Creature*>& _list, flo
 
     TypeContainerVisitor<MaNGOS::CreatureListSearcher<MaNGOS::FriendlyMissingBuffInRange>, GridTypeMapContainer >  grid_creature_searcher(searcher);
 
-    CellLock<GridReadGuard> cell_lock(cell, p);
-    cell_lock->Visit(cell_lock, grid_creature_searcher, *m_creature->GetMap(), *m_creature, range);
+    cell.Visit(p, grid_creature_searcher, *m_creature->GetMap(), *m_creature, range);
 }
 
 //*********************************

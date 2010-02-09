@@ -33,18 +33,17 @@ inline Cell::Cell(CellPair const& p)
     data.Part.reserved = 0;
 }
 
-template<class LOCK_TYPE,class T, class CONTAINER>
+template<class T, class CONTAINER>
 inline void
-Cell::Visit(const CellLock<LOCK_TYPE> &l, TypeContainerVisitor<T, CONTAINER> &visitor, Map &m) const
+Cell::Visit(const CellPair &standing_cell, TypeContainerVisitor<T, CONTAINER> &visitor, Map &m) const
 {
-    const CellPair &standing_cell = l.i_cellPair;
     if (standing_cell.x_coord >= TOTAL_NUMBER_OF_CELLS_PER_MAP || standing_cell.y_coord >= TOTAL_NUMBER_OF_CELLS_PER_MAP)
         return;
 
     uint16 district = (District)this->data.Part.reserved;
     if(district == CENTER_DISTRICT)
     {
-        m.Visit(l, visitor);
+        m.Visit(*this, visitor);
         return;
     }
 
@@ -121,9 +120,8 @@ Cell::Visit(const CellLock<LOCK_TYPE> &l, TypeContainerVisitor<T, CONTAINER> &vi
         {
             CellPair cell_pair(x,y);
             Cell r_zone(cell_pair);
-            r_zone.data.Part.nocreate = l->data.Part.nocreate;
-            CellLock<LOCK_TYPE> lock(r_zone, cell_pair);
-            m.Visit(lock, visitor);
+            r_zone.data.Part.nocreate = data.Part.nocreate;
+            m.Visit(r_zone, visitor);
         }
     }
 }
@@ -165,11 +163,10 @@ inline CellArea Cell::CalculateCellArea(const WorldObject &obj, float radius)
     return CellArea(right, left, upper, lower);
 }
 
-template<class LOCK_TYPE, class T, class CONTAINER>
+template<class T, class CONTAINER>
 inline void
-Cell::Visit(const CellLock<LOCK_TYPE> &l, TypeContainerVisitor<T, CONTAINER> &visitor, Map &m, const WorldObject &obj, float radius) const
+Cell::Visit(const CellPair &standing_cell, TypeContainerVisitor<T, CONTAINER> &visitor, Map &m, const WorldObject &obj, float radius) const
 {
-    const CellPair &standing_cell = l.i_cellPair;
     if (standing_cell.x_coord >= TOTAL_NUMBER_OF_CELLS_PER_MAP || standing_cell.y_coord >= TOTAL_NUMBER_OF_CELLS_PER_MAP)
         return;
 
@@ -178,7 +175,7 @@ Cell::Visit(const CellLock<LOCK_TYPE> &l, TypeContainerVisitor<T, CONTAINER> &vi
     //maybe it is better to just return when radius <= 0.0f?
     if(radius <= 0.0f)
     {
-        m.Visit(l, visitor);
+        m.Visit(*this, visitor);
         return;
     }
     //lets limit the upper value for search radius
@@ -190,7 +187,7 @@ Cell::Visit(const CellLock<LOCK_TYPE> &l, TypeContainerVisitor<T, CONTAINER> &vi
     //if radius fits inside standing cell
     if(!area)
     {
-        m.Visit(l, visitor);
+        m.Visit(*this, visitor);
         return;
     }
 
@@ -204,13 +201,13 @@ Cell::Visit(const CellLock<LOCK_TYPE> &l, TypeContainerVisitor<T, CONTAINER> &vi
     //there are nothing to optimize because SIZE_OF_GRID_CELL is too big...
     if(((end_cell.x_coord - begin_cell.x_coord) > 4) && ((end_cell.y_coord - begin_cell.y_coord) > 4))
     {
-        VisitCircle(l, visitor, m, begin_cell, end_cell);
+        VisitCircle(standing_cell, visitor, m, begin_cell, end_cell);
         return;
     }
 
     //ALWAYS visit standing cell first!!! Since we deal with small radiuses
     //it is very essential to call visitor for standing cell firstly...
-    m.Visit(l, visitor);
+    m.Visit(*this, visitor);
 
     // loop the cell range
     for(uint32 x = begin_cell.x_coord; x <= end_cell.x_coord; x++)
@@ -222,17 +219,16 @@ Cell::Visit(const CellLock<LOCK_TYPE> &l, TypeContainerVisitor<T, CONTAINER> &vi
             if(cell_pair != standing_cell)
             {
                 Cell r_zone(cell_pair);
-                r_zone.data.Part.nocreate = l->data.Part.nocreate;
-                CellLock<LOCK_TYPE> lock(r_zone, cell_pair);
-                m.Visit(lock, visitor);
+                r_zone.data.Part.nocreate = data.Part.nocreate;
+                m.Visit(r_zone, visitor);
             }
         }
     }
 }
 
-template<class LOCK_TYPE, class T, class CONTAINER>
+template<class T, class CONTAINER>
 inline void
-Cell::VisitCircle(const CellLock<LOCK_TYPE> &l, TypeContainerVisitor<T, CONTAINER> &visitor, Map &m, const CellPair& begin_cell, const CellPair& end_cell) const
+Cell::VisitCircle(const CellPair &standing_cell, TypeContainerVisitor<T, CONTAINER> &visitor, Map &m, const CellPair& begin_cell, const CellPair& end_cell) const
 {
     //here is an algorithm for 'filling' circum-squared octagon
     uint32 x_shift = (uint32)ceilf((end_cell.x_coord - begin_cell.x_coord) * 0.3f - 0.5f);
@@ -247,9 +243,8 @@ Cell::VisitCircle(const CellLock<LOCK_TYPE> &l, TypeContainerVisitor<T, CONTAINE
         {
             CellPair cell_pair(x,y);
             Cell r_zone(cell_pair);
-            r_zone.data.Part.nocreate = l->data.Part.nocreate;
-            CellLock<LOCK_TYPE> lock(r_zone, cell_pair);
-            m.Visit(lock, visitor);
+            r_zone.data.Part.nocreate = data.Part.nocreate;
+            m.Visit(r_zone, visitor);
         }
     }
 
@@ -272,16 +267,14 @@ Cell::VisitCircle(const CellLock<LOCK_TYPE> &l, TypeContainerVisitor<T, CONTAINE
             //e.g. filling 2 trapezoids after filling central cell strip...
             CellPair cell_pair_left(x_start - step, y);
             Cell r_zone_left(cell_pair_left);
-            r_zone_left.data.Part.nocreate = l->data.Part.nocreate;
-            CellLock<LOCK_TYPE> lock_left(r_zone_left, cell_pair_left);
-            m.Visit(lock_left, visitor);
+            r_zone_left.data.Part.nocreate = data.Part.nocreate;
+            m.Visit(r_zone_left, visitor);
 
             //right trapezoid cell visit
             CellPair cell_pair_right(x_end + step, y);
             Cell r_zone_right(cell_pair_right);
-            r_zone_right.data.Part.nocreate = l->data.Part.nocreate;
-            CellLock<LOCK_TYPE> lock_right(r_zone_right, cell_pair_right);
-            m.Visit(lock_right, visitor);
+            r_zone_right.data.Part.nocreate = data.Part.nocreate;
+            m.Visit(r_zone_right, visitor);
         }
     }
 }
