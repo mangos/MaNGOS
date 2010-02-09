@@ -124,71 +124,40 @@ bool Group::Create(const uint64 &guid, const char * name)
     return true;
 }
 
-bool Group::LoadGroupFromDB(const uint64 &leaderGuid, QueryResult *result, bool loadMembers)
+bool Group::LoadGroupFromDB(Field* fields)
 {
-    if(isBGGroup())
-        return false;
+    //                                          0         1              2           3           4              5      6      7      8      9      10     11     12     13      14          15              16
+    // result = CharacterDatabase.Query("SELECT mainTank, mainAssistant, lootMethod, looterGuid, lootThreshold, icon1, icon2, icon3, icon4, icon5, icon6, icon7, icon8, isRaid, difficulty, raiddifficulty, leaderGuid FROM groups");
 
-    bool external = true;
-    if(!result)
-    {
-        external = false;
-        //                                       0          1              2           3           4              5      6      7      8      9      10     11     12     13      14          15
-        result = CharacterDatabase.PQuery("SELECT mainTank, mainAssistant, lootMethod, looterGuid, lootThreshold, icon1, icon2, icon3, icon4, icon5, icon6, icon7, icon8, isRaid, difficulty, raiddifficulty FROM groups WHERE leaderGuid ='%u'", GUID_LOPART(leaderGuid));
-        if(!result)
-            return false;
-    }
-
-    m_leaderGuid = leaderGuid;
+    m_leaderGuid = MAKE_NEW_GUID(fields[16].GetUInt32(),0,HIGHGUID_PLAYER);
 
     // group leader not exist
     if(!sObjectMgr.GetPlayerNameByGUID(m_leaderGuid, m_leaderName))
-    {
-        if(!external) delete result;
         return false;
-    }
 
-    m_groupType  = (*result)[13].GetBool() ? GROUPTYPE_RAID : GROUPTYPE_NORMAL;
+    m_groupType  = fields[13].GetBool() ? GROUPTYPE_RAID : GROUPTYPE_NORMAL;
 
     if (m_groupType == GROUPTYPE_RAID)
         _initRaidSubGroupsCounter();
 
-    uint32 diff = (*result)[14].GetUInt8();
+    uint32 diff = fields[14].GetUInt8();
     if (diff >= MAX_DUNGEON_DIFFICULTY)
         diff = DUNGEON_DIFFICULTY_NORMAL;
     m_dungeonDifficulty = Difficulty(diff);
 
-    uint32 r_diff = (*result)[15].GetUInt8();
+    uint32 r_diff = fields[15].GetUInt8();
     if (r_diff >= MAX_RAID_DIFFICULTY)
         r_diff = RAID_DIFFICULTY_10MAN_NORMAL;
     m_raidDifficulty = Difficulty(r_diff);
 
-    m_mainTank = (*result)[0].GetUInt64();
-    m_mainAssistant = (*result)[1].GetUInt64();
-    m_lootMethod = (LootMethod)(*result)[2].GetUInt8();
-    m_looterGuid = MAKE_NEW_GUID((*result)[3].GetUInt32(), 0, HIGHGUID_PLAYER);
-    m_lootThreshold = (ItemQualities)(*result)[4].GetUInt16();
+    m_mainTank = fields[0].GetUInt64();
+    m_mainAssistant = fields[1].GetUInt64();
+    m_lootMethod = (LootMethod)fields[2].GetUInt8();
+    m_looterGuid = MAKE_NEW_GUID(fields[3].GetUInt32(), 0, HIGHGUID_PLAYER);
+    m_lootThreshold = (ItemQualities)fields[4].GetUInt16();
 
     for(int i = 0; i < TARGETICONCOUNT; ++i)
-        m_targetIcons[i] = (*result)[5+i].GetUInt64();
-    if(!external)
-        delete result;
-
-    if(loadMembers)
-    {
-        result = CharacterDatabase.PQuery("SELECT memberGuid, assistant, subgroup FROM group_member WHERE leaderGuid ='%u'", GUID_LOPART(leaderGuid));
-        if(!result)
-            return false;
-
-        do
-        {
-            LoadMemberFromDB((*result)[0].GetUInt32(), (*result)[2].GetUInt8(), (*result)[1].GetBool());
-        } while( result->NextRow() );
-        delete result;
-        // group too small
-        if(GetMembersCount() < 2)
-            return false;
-    }
+        m_targetIcons[i] = fields[5+i].GetUInt64();
 
     m_Id = sObjectMgr.GenerateGroupId();
     return true;

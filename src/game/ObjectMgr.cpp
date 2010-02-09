@@ -3124,7 +3124,7 @@ void ObjectMgr::LoadGroups()
     //                                                     0         1              2           3           4              5      6      7      8      9      10     11     12     13      14         15              16
     QueryResult *result = CharacterDatabase.Query("SELECT mainTank, mainAssistant, lootMethod, looterGuid, lootThreshold, icon1, icon2, icon3, icon4, icon5, icon6, icon7, icon8, isRaid, difficulty, raiddifficulty, leaderGuid FROM groups");
 
-    if( !result )
+    if (!result)
     {
         barGoLink bar( 1 );
 
@@ -3144,16 +3144,15 @@ void ObjectMgr::LoadGroups()
         bar.step();
         Field *fields = result->Fetch();
         ++count;
-        uint64 leaderGuid = MAKE_NEW_GUID(fields[16].GetUInt32(),0,HIGHGUID_PLAYER);
         Group *group = new Group;
-        if(!group->LoadGroupFromDB(leaderGuid, result, false))
+        if (!group->LoadGroupFromDB(fields))
         {
             group->Disband();
             delete group;
             continue;
         }
         AddGroup(group);
-        leader2groupMap[GUID_LOPART(leaderGuid)] = group->GetId();
+        leader2groupMap[GUID_LOPART(group->GetLeaderGUID())] = group->GetId();
     }while( result->NextRow() );
 
     delete result;
@@ -3165,7 +3164,7 @@ void ObjectMgr::LoadGroups()
     count = 0;
     //                                        0           1          2         3
     result = CharacterDatabase.Query("SELECT memberGuid, assistant, subgroup, leaderGuid FROM group_member ORDER BY leaderGuid");
-    if(!result)
+    if (!result)
     {
         barGoLink bar2( 1 );
         bar2.step();
@@ -3185,14 +3184,14 @@ void ObjectMgr::LoadGroups()
             bool   assistent     = fields[1].GetBool();
             uint8  subgroup      = fields[2].GetUInt8();
             uint32 leaderGuidLow = fields[3].GetUInt32();
-            if(!group || GUID_LOPART(group->GetLeaderGUID()) != leaderGuidLow)
+            if (!group || GUID_LOPART(group->GetLeaderGUID()) != leaderGuidLow)
             {
                 // find group id in map by leader low guid
                 std::map<uint32,uint32>::const_iterator l2g_itr = leader2groupMap.find(leaderGuidLow);
                 if (l2g_itr != leader2groupMap.end())
                     group = GetGroupById(l2g_itr->second);
 
-                if(!group)
+                if (!group)
                 {
                     sLog.outErrorDb("Incorrect entry in group_member table : no group with leader %d for member %d!", leaderGuidLow, memberGuidlow);
                     CharacterDatabase.PExecute("DELETE FROM group_member WHERE memberGuid = '%d'", memberGuidlow);
@@ -3200,7 +3199,7 @@ void ObjectMgr::LoadGroups()
                 }
             }
 
-            if(!group->LoadMemberFromDB(memberGuidlow, subgroup, assistent))
+            if (!group->LoadMemberFromDB(memberGuidlow, subgroup, assistent))
             {
                 sLog.outErrorDb("Incorrect entry in group_member table : member %d cannot be added to player %d's group!", memberGuidlow, leaderGuidLow);
                 CharacterDatabase.PExecute("DELETE FROM group_member WHERE memberGuid = '%d'", memberGuidlow);
@@ -3233,7 +3232,7 @@ void ObjectMgr::LoadGroups()
         "FROM group_instance LEFT JOIN instance ON instance = id ORDER BY leaderGuid"
     );
 
-    if(!result)
+    if (!result)
     {
         barGoLink bar2( 1 );
         bar2.step();
@@ -3253,14 +3252,14 @@ void ObjectMgr::LoadGroups()
             uint32 mapId = fields[1].GetUInt32();
             Difficulty diff = (Difficulty)fields[4].GetUInt8();
 
-            if(!group || GUID_LOPART(group->GetLeaderGUID()) != leaderGuidLow)
+            if (!group || GUID_LOPART(group->GetLeaderGUID()) != leaderGuidLow)
             {
                 // find group id in map by leader low guid
                 std::map<uint32,uint32>::const_iterator l2g_itr = leader2groupMap.find(leaderGuidLow);
                 if (l2g_itr != leader2groupMap.end())
                     group = GetGroupById(l2g_itr->second);
 
-                if(!group)
+                if (!group)
                 {
                     sLog.outErrorDb("Incorrect entry in group_instance table : no group with leader %d", leaderGuidLow);
                     continue;
@@ -3268,13 +3267,13 @@ void ObjectMgr::LoadGroups()
             }
 
             MapEntry const* mapEntry = sMapStore.LookupEntry(mapId);
-            if(!mapEntry || !mapEntry->IsDungeon())
+            if (!mapEntry || !mapEntry->IsDungeon())
             {
                 sLog.outErrorDb("Incorrect entry in group_instance table : no dungeon map %d", mapId);
                 continue;
             }
 
-            if(diff >= (mapEntry->IsRaid() ? MAX_RAID_DIFFICULTY : MAX_DUNGEON_DIFFICULTY))
+            if (diff >= (mapEntry->IsRaid() ? MAX_RAID_DIFFICULTY : MAX_DUNGEON_DIFFICULTY))
             {
                 sLog.outErrorDb("Wrong dungeon difficulty use in group_instance table: %d", diff + 1);
                 diff = REGULAR_DIFFICULTY;                  // default for both difficaly types
