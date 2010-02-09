@@ -872,11 +872,6 @@ void WorldSession::HandleRequestPartyMemberStatsOpcode( WorldPacket &recv_data )
     _player->SendRaidInfo();
 }
 
-/*void WorldSession::HandleGroupCancelOpcode( WorldPacket & recv_data )
-{
-    sLog.outDebug( "WORLD: got CMSG_GROUP_CANCEL." );
-}*/
-
 void WorldSession::HandleOptOutOfLootOpcode( WorldPacket & recv_data )
 {
     sLog.outDebug("WORLD: Received CMSG_OPT_OUT_OF_LOOT");
