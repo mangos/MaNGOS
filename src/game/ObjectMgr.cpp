@@ -190,16 +190,6 @@ Group* ObjectMgr::GetGroupById(uint32 id) const
     return NULL;
 }
 
-Group* ObjectMgr::GetGroupByLeaderLowGUID(uint32 guid) const
-{
-    for(GroupMap::const_iterator itr = mGroupMap.begin(); itr != mGroupMap.end(); ++itr)
-        if (GUID_LOPART(itr->second->GetLeaderGUID())==guid)
-            return itr->second;
-
-    return NULL;
-}
-
-
 Guild* ObjectMgr::GetGuildById(uint32 GuildId) const
 {
     GuildMap::const_iterator itr = mGuildMap.find(GuildId);
@@ -3121,8 +3111,8 @@ void ObjectMgr::LoadGroups()
 {
     // -- loading groups --
     uint32 count = 0;
-    //                                                     0         1              2           3           4              5      6      7      8      9      10     11     12     13      14         15              16
-    QueryResult *result = CharacterDatabase.Query("SELECT mainTank, mainAssistant, lootMethod, looterGuid, lootThreshold, icon1, icon2, icon3, icon4, icon5, icon6, icon7, icon8, isRaid, difficulty, raiddifficulty, leaderGuid FROM groups");
+    //                                                    0         1              2           3           4              5      6      7      8      9      10     11     12     13      14          15              16          17
+    QueryResult *result = CharacterDatabase.Query("SELECT mainTank, mainAssistant, lootMethod, looterGuid, lootThreshold, icon1, icon2, icon3, icon4, icon5, icon6, icon7, icon8, isRaid, difficulty, raiddifficulty, leaderGuid, groupId FROM groups");
 
     if (!result)
     {
@@ -3134,8 +3124,6 @@ void ObjectMgr::LoadGroups()
         sLog.outString( ">> Loaded %u group definitions", count );
         return;
     }
-
-    std::map<uint32,uint32> leader2groupMap;
 
     barGoLink bar( result->GetRowCount() );
 
@@ -3152,7 +3140,6 @@ void ObjectMgr::LoadGroups()
             continue;
         }
         AddGroup(group);
-        leader2groupMap[GUID_LOPART(group->GetLeaderGUID())] = group->GetId();
     }while( result->NextRow() );
 
     delete result;
@@ -3162,8 +3149,8 @@ void ObjectMgr::LoadGroups()
 
     // -- loading members --
     count = 0;
-    //                                        0           1          2         3
-    result = CharacterDatabase.Query("SELECT memberGuid, assistant, subgroup, leaderGuid FROM group_member ORDER BY leaderGuid");
+    //                                       0           1          2         3
+    result = CharacterDatabase.Query("SELECT memberGuid, assistant, subgroup, groupId FROM group_member ORDER BY groupId");
     if (!result)
     {
         barGoLink bar2( 1 );
@@ -3183,17 +3170,13 @@ void ObjectMgr::LoadGroups()
             uint32 memberGuidlow = fields[0].GetUInt32();
             bool   assistent     = fields[1].GetBool();
             uint8  subgroup      = fields[2].GetUInt8();
-            uint32 leaderGuidLow = fields[3].GetUInt32();
-            if (!group || GUID_LOPART(group->GetLeaderGUID()) != leaderGuidLow)
+            uint32 groupId       = fields[3].GetUInt32();
+            if (!group || group->GetId() != groupId)
             {
-                // find group id in map by leader low guid
-                std::map<uint32,uint32>::const_iterator l2g_itr = leader2groupMap.find(leaderGuidLow);
-                if (l2g_itr != leader2groupMap.end())
-                    group = GetGroupById(l2g_itr->second);
-
+                group = GetGroupById(groupId);
                 if (!group)
                 {
-                    sLog.outErrorDb("Incorrect entry in group_member table : no group with leader %d for member %d!", leaderGuidLow, memberGuidlow);
+                    sLog.outErrorDb("Incorrect entry in group_member table : no group with Id %d for member %d!", groupId, memberGuidlow);
                     CharacterDatabase.PExecute("DELETE FROM group_member WHERE memberGuid = '%d'", memberGuidlow);
                     continue;
                 }
@@ -3201,7 +3184,7 @@ void ObjectMgr::LoadGroups()
 
             if (!group->LoadMemberFromDB(memberGuidlow, subgroup, assistent))
             {
-                sLog.outErrorDb("Incorrect entry in group_member table : member %d cannot be added to player %d's group!", memberGuidlow, leaderGuidLow);
+                sLog.outErrorDb("Incorrect entry in group_member table : member %d cannot be added to player %d's group (Id: %u)!", memberGuidlow, GUID_LOPART(group->GetLeaderGUID()), groupId);
                 CharacterDatabase.PExecute("DELETE FROM group_member WHERE memberGuid = '%d'", memberGuidlow);
             }
         }while( result->NextRow() );
@@ -3225,11 +3208,13 @@ void ObjectMgr::LoadGroups()
     // -- loading instances --
     count = 0;
     result = CharacterDatabase.Query(
-        //      0           1    2         3          4           5
-        "SELECT leaderGuid, map, instance, permanent, difficulty, resettime, "
+        //      0                          1    2         3          4                    5
+        "SELECT group_instance.leaderGuid, map, instance, permanent, instance.difficulty, resettime, "
         // 6
-        "(SELECT COUNT(*) FROM character_instance WHERE guid = leaderGuid AND instance = group_instance.instance AND permanent = 1 LIMIT 1) "
-        "FROM group_instance LEFT JOIN instance ON instance = id ORDER BY leaderGuid"
+        "(SELECT COUNT(*) FROM character_instance WHERE guid = group_instance.leaderGuid AND instance = group_instance.instance AND permanent = 1 LIMIT 1), "
+        // 7
+        " groups.groupId "
+        "FROM group_instance LEFT JOIN instance ON instance = id LEFT JOIN groups ON groups.leaderGUID = group_instance.leaderGUID ORDER BY leaderGuid"
     );
 
     if (!result)
@@ -3251,14 +3236,12 @@ void ObjectMgr::LoadGroups()
             uint32 leaderGuidLow = fields[0].GetUInt32();
             uint32 mapId = fields[1].GetUInt32();
             Difficulty diff = (Difficulty)fields[4].GetUInt8();
+            uint32 groupId = fields[7].GetUInt32();
 
-            if (!group || GUID_LOPART(group->GetLeaderGUID()) != leaderGuidLow)
+            if (!group || group->GetId() != groupId)
             {
                 // find group id in map by leader low guid
-                std::map<uint32,uint32>::const_iterator l2g_itr = leader2groupMap.find(leaderGuidLow);
-                if (l2g_itr != leader2groupMap.end())
-                    group = GetGroupById(l2g_itr->second);
-
+                group = GetGroupById(groupId);
                 if (!group)
                 {
                     sLog.outErrorDb("Incorrect entry in group_instance table : no group with leader %d", leaderGuidLow);
@@ -5601,6 +5584,52 @@ AreaTrigger const* ObjectMgr::GetMapEntranceTrigger(uint32 Map) const
     return NULL;
 }
 
+void ObjectMgr::PackGroupIds()
+{
+    // this routine renumbers groups in such a way so they start from 1 and go up
+
+    // obtain set of all groups
+    std::set<uint32> groupIds;
+
+    // all valid ids are in the instance table
+    // any associations to ids not in this table are assumed to be
+    // cleaned already in CleanupInstances
+    QueryResult *result = CharacterDatabase.Query("SELECT groupId FROM groups");
+    if( result )
+    {
+        do
+        {
+            Field *fields = result->Fetch();
+            groupIds.insert(fields[0].GetUInt32());
+        }
+        while (result->NextRow());
+        delete result;
+    }
+
+    barGoLink bar( groupIds.size() + 1);
+    bar.step();
+
+    uint32 groupId = 1;
+    // we do assume std::set is sorted properly on integer value
+    for (std::set<uint32>::iterator i = groupIds.begin(); i != groupIds.end(); ++i)
+    {
+        if (*i != groupId)
+        {
+            // remap group id
+            CharacterDatabase.PExecute("UPDATE groups SET groupId = '%u' WHERE groupId = '%u'", groupId, *i);
+            CharacterDatabase.PExecute("UPDATE group_member SET groupId = '%u' WHERE groupId = '%u'", groupId, *i);
+        }
+
+        ++groupId;
+        bar.step();
+    }
+
+    m_groupId = groupId;
+
+    sLog.outString( ">> Group Ids remapped, next group id is %u", groupId );
+    sLog.outString();
+}
+
 void ObjectMgr::SetHighestGuids()
 {
     QueryResult *result = CharacterDatabase.Query( "SELECT MAX(guid) FROM characters" );
@@ -5683,6 +5712,13 @@ void ObjectMgr::SetHighestGuids()
     if (result)
     {
         m_guildId = (*result)[0].GetUInt32()+1;
+        delete result;
+    }
+
+    result = CharacterDatabase.Query( "SELECT MAX(groupId) FROM groups" );
+    if (result)
+    {
+        m_groupId = (*result)[0].GetUInt32()+1;
         delete result;
     }
 }
