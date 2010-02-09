@@ -885,7 +885,7 @@ void WorldSession::HandleMoveKnockBackAck( WorldPacket & recv_data )
 
     _player->m_movementInfo = movementInfo;
     _player->m_anti_Last_HSpeed = movementInfo.j_xyspeed;
-    _player->m_anti_Last_VSpeed = movementInfo.j_unk < 3.2f ? movementInfo.j_unk - 1.0f : 3.2f;
+    _player->m_anti_Last_VSpeed = movementInfo.j_velocity < 3.2f ? movementInfo.j_velocity - 1.0f : 3.2f;
 
     uint32 dt = (_player->m_anti_Last_VSpeed < 0) ? (int)(ceil(_player->m_anti_Last_VSpeed/-25)*1000) : (int)(ceil(_player->m_anti_Last_VSpeed/25)*1000);
     _player->m_anti_LastSpeedChangeTime = movementInfo.time + dt + 1000;
