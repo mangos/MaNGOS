@@ -15035,7 +15035,7 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
 
     // check PLAYER_CHOSEN_TITLE compatibility with PLAYER__FIELD_KNOWN_TITLES
     // note: PLAYER__FIELD_KNOWN_TITLES updated at quest status loaded
-    uint32 curTitle = fields[10].GetUInt32();
+    uint32 curTitle = fields[47].GetUInt32();
     if (curTitle && !HasTitle(curTitle))
         curTitle = 0;
 
