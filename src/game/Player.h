@@ -2512,29 +2512,6 @@ class MANGOS_DLL_SPEC Player : public Unit
         float m_rest_bonus;
         RestType rest_type;
         ////////////////////Rest System/////////////////////
-        //movement anticheat
-        uint32 m_anti_LastClientTime;     //last movement client time
-        uint32 m_anti_LastServerTime;     //last movement server time
-        uint32 m_anti_DeltaClientTime;    //client side session time
-        uint32 m_anti_DeltaServerTime;    //server side session time
-        uint32 m_anti_MistimingCount;     //mistiming counts before kick
-
-        uint32 m_anti_LastSpeedChangeTime;//last speed change time
-        uint32 m_anti_BeginFallTime;      //alternative falling begin time (obsolete)
-
-        float  m_anti_Last_HSpeed;        //horizontal speed, default RUN speed
-        float  m_anti_Last_VSpeed;        //vertical speed, default max jump height
-
-        uint64 m_anti_TransportGUID;      //current transport GUID
-
-        uint32 m_anti_JustTeleported;     //seted when player was teleported
-        uint32 m_anti_TeleToPlane_Count;  //Teleport To Plane alarm counter
-
-        uint64 m_anti_AlarmCount;         //alarm counter
-
-        uint32 m_anti_JustJumped;         //Jump already began, anti air jump check
-        float  m_anti_JumpBaseZ;           //Z coord before jump
-        // << movement anticheat
 
         // Transports
         Transport * m_transport;
