@@ -5600,7 +5600,17 @@ void ObjectMgr::PackGroupIds()
         do
         {
             Field *fields = result->Fetch();
-            groupIds.insert(fields[0].GetUInt32());
+
+            uint32 id = fields[0].GetUInt32();
+
+            if (id == 0)
+            {
+                CharacterDatabase.PExecute("DELETE FROM groups WHERE groupId = '%u'", id);
+                CharacterDatabase.PExecute("DELETE FROM group_member WHERE groupId = '%u'", id);
+                continue;
+            }
+
+            groupIds.insert(id);
         }
         while (result->NextRow());
         delete result;

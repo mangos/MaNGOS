@@ -93,6 +93,8 @@ bool Group::Create(const uint64 &guid, const char * name)
     m_raidDifficulty = RAID_DIFFICULTY_10MAN_NORMAL;
     if(!isBGGroup())
     {
+        m_Id = sObjectMgr.GenerateGroupId();
+
         Player *leader = sObjectMgr.GetPlayer(guid);
         if(leader)
         {
@@ -116,10 +118,7 @@ bool Group::Create(const uint64 &guid, const char * name)
         return false;
 
     if(!isBGGroup())
-    {
         CharacterDatabase.CommitTransaction();
-        m_Id = sObjectMgr.GenerateGroupId();
-    }
 
     return true;
 }
@@ -438,7 +437,6 @@ void Group::Disband(bool hideDestroy)
         ResetInstances(INSTANCE_RESET_GROUP_DISBAND, true, NULL);
     }
 
-    m_Id = 0;
     m_leaderGuid = 0;
     m_leaderName = "";
 }
@@ -1217,8 +1215,6 @@ void Group::_setLeader(const uint64 &guid)
         CharacterDatabase.PExecute("UPDATE groups SET leaderGuid='%u' WHERE groupId='%u'", GUID_LOPART(slot->guid), m_Id);
         CharacterDatabase.CommitTransaction();
     }
-
-    uint32 old_guidlow = GUID_LOPART(m_leaderGuid);
 
     m_leaderGuid = slot->guid;
     m_leaderName = slot->name;
