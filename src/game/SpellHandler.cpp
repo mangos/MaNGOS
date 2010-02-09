@@ -347,8 +347,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
             if(!recvPacket.readPackGUID(guid))
                 return;
 
-            MovementInfo movementInfo;
-            ReadMovementInfo(recvPacket, &movementInfo);
+            MovementInfo movementInfo(recvPacket);
         }
     }
 
