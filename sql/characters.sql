@@ -21,7 +21,7 @@
 
 DROP TABLE IF EXISTS `character_db_version`;
 CREATE TABLE `character_db_version` (
-  `required_9349_01_characters_character_action` bit(1) default NULL
+  `required_9354_01_characters_character_action` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Last applied sql update to DB';
 
 --
@@ -341,7 +341,7 @@ CREATE TABLE `character_action` (
   `button` tinyint(3) unsigned NOT NULL default '0',
   `action` int(11) unsigned NOT NULL default '0',
   `type` tinyint(3) unsigned NOT NULL default '0',
-  PRIMARY KEY  (`guid`,`button`)
+  PRIMARY KEY  (`guid`,`spec`,`button`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Player System';
 
 --

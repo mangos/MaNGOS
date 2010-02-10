@@ -5634,7 +5634,7 @@ void Player::SendInitialActionButtons() const
     sLog.outDetail( "Initializing Action Buttons for '%u'", GetGUIDLow() );
 
     WorldPacket data(SMSG_ACTION_BUTTONS, 1+(MAX_ACTION_BUTTONS*4));
-    data << uint8(0);                                       // can be 0, 1, 2 (talent spec)
+    data << uint8(1);                                       // can be 0, 1, 2 (talent spec)
     ActionButtonList const& currentActionButtonList = m_actionButtons[m_activeSpec];
     for(int button = 0; button < MAX_ACTION_BUTTONS; ++button)
     {
@@ -21315,12 +21315,34 @@ void Player::DeleteEquipmentSet(uint64 setGuid)
     }
 }
 
-void Player::ActivateSpec(uint32 specNum)
+void Player::ActivateSpec(uint8 specNum)
 {
     if(GetActiveSpec() == specNum)
         return;
 
     resetTalents(true);
+
+    SetActiveSpec(specNum);
+
+    SendInitialActionButtons();
+
+    InitTalentForLevel();
+}
+
+void Player::UpdateSpecCount(uint8 count)
+{
+    uint8 curCount = GetSpecsCount();
+    if(curCount == count)
+        return;
+
+    if(count > curCount)
+    {
+        //TODO: copy current action button set
+    }
+
+    SetSpecsCount(count);
+
+    SendTalentsInfoData(false);
 }
 
 void Player::RemoveAtLoginFlag( AtLoginFlags f, bool in_db_also /*= false*/ )
