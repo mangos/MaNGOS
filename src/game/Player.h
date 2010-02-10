@@ -1611,7 +1611,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         }
 
         static bool IsActionButtonDataValid(uint8 button, uint32 action, uint8 type, Player* player);
-        ActionButton* addActionButton(uint8 button, uint32 action, uint8 type);
+        ActionButton* addActionButton(uint8 spec, uint8 button, uint32 action, uint8 type);
         void removeActionButton(uint8 button);
         void SendInitialActionButtons() const;
         ActionButton const* GetActionButton(uint8 button);
@@ -2360,7 +2360,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         uint32 m_activeSpec;
         uint32 m_specsCount;
 
-        ActionButtonList m_actionButtons;
+        ActionButtonList m_actionButtons[MAX_TALENT_SPEC_COUNT];
 
         float m_auraBaseMod[BASEMOD_END][MOD_END];
         int16 m_baseRatingValue[MAX_COMBAT_RATING];
