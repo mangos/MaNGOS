@@ -376,7 +376,7 @@ void WorldSession::LogoutPlayer(bool Save)
 
         ///- Reset the online field in the account table
         // no point resetting online in character table here as Player::SaveToDB() will set it to 1 since player has not been removed from world at this stage
-        //No SQL injection as AccountID is uint32
+        // No SQL injection as AccountID is uint32
         loginDatabase.PExecute("UPDATE account SET active_realm_id = 0 WHERE id = '%u'", GetAccountId());
 
         ///- If the player is in a guild, update the guild roster and broadcast a logout message to other guild members
@@ -386,16 +386,11 @@ void WorldSession::LogoutPlayer(bool Save)
             guild->SetMemberStats(_player->GetGUID());
             guild->UpdateLogoutTime(_player->GetGUID());
 
-            WorldPacket data(SMSG_GUILD_EVENT, (1+1+12+8)); // name limited to 12 in character table.
-            data<<(uint8)GE_SIGNED_OFF;
-            data<<(uint8)1;
-            data<<_player->GetName();
-            data<<_player->GetGUID();
-            guild->BroadcastPacket(&data);
+            guild->BroadcastEvent(GE_SIGNED_OFF, _player->GetGUID(), 1, _player->GetName(), "", "");
         }
 
         ///- Remove pet
-        _player->RemovePet(NULL,PET_SAVE_AS_CURRENT, true);
+        _player->RemovePet(NULL, PET_SAVE_AS_CURRENT, true);
 
         ///- empty buyback items and save the player in the database
         // some save parts only correctly work in case player present in map/player_lists (pets, etc)

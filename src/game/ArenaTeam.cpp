@@ -294,9 +294,8 @@ void ArenaTeam::Disband(WorldSession *session)
     // event
     if (session)
     {
-        WorldPacket data;
-        session->BuildArenaTeamEventPacket(&data, ERR_ARENA_TEAM_DISBANDED_S, 2, session->GetPlayerName(), GetName(), "");
-        BroadcastPacket(&data);
+        // probably only 1 string required...
+        BroadcastEvent(ERR_ARENA_TEAM_DISBANDED_S, 0, 2, session->GetPlayerName(), GetName(), "");
     }
 
     while (!m_members.empty())
@@ -307,7 +306,7 @@ void ArenaTeam::Disband(WorldSession *session)
 
     CharacterDatabase.BeginTransaction();
     CharacterDatabase.PExecute("DELETE FROM arena_team WHERE arenateamid = '%u'", m_TeamId);
-    CharacterDatabase.PExecute("DELETE FROM arena_team_member WHERE arenateamid = '%u'", m_TeamId); //< this should be alredy done by calling DelMember(memberGuids[j]); for each member
+    CharacterDatabase.PExecute("DELETE FROM arena_team_member WHERE arenateamid = '%u'", m_TeamId); //< this should be already done by calling DelMember(memberGuids[j]); for each member
     CharacterDatabase.PExecute("DELETE FROM arena_team_stats WHERE arenateamid = '%u'", m_TeamId);
     CharacterDatabase.CommitTransaction();
     sObjectMgr.RemoveArenaTeam(m_TeamId);
@@ -464,6 +463,37 @@ void ArenaTeam::BroadcastPacket(WorldPacket *packet)
     }
 }
 
+void ArenaTeam::BroadcastEvent(ArenaTeamEvents event, uint64 guid, uint8 strCount, std::string str1, std::string str2, std::string str3)
+{
+    WorldPacket data(SMSG_ARENA_TEAM_EVENT, 1+1+1);
+    data << uint8(event);
+    data << uint8(strCount);
+    switch(strCount)
+    {
+        case 0:
+            break;
+        case 1:
+            data << str1;
+            break;
+        case 2:
+            data << str1 << str2;
+            break;
+        case 3:
+            data << str1 << str2 << str3;
+            break;
+        default:
+            sLog.outError("Unhandled strCount %u in ArenaTeam::BroadcastEvent", strCount);
+            return;
+    }
+
+    if(guid)
+        data << uint64(guid);
+
+    BroadcastPacket(&data);
+
+    sLog.outDebug("WORLD: Sent SMSG_ARENA_TEAM_EVENT");
+}
+
 uint8 ArenaTeam::GetSlotByType( uint32 type )
 {
     switch(type)
@@ -494,7 +524,7 @@ uint32 ArenaTeam::GetPoints(uint32 MemberRating)
 
     uint32 rating = MemberRating + 150 < m_stats.rating ? MemberRating : m_stats.rating;
 
-    if(rating<=1500)
+    if(rating <= 1500)
         points = (float)rating * 0.22f + 14.0f;
     else
         points = 1511.26f / (1.0f + 1639.28f * exp(-0.00412f * (float)rating));
