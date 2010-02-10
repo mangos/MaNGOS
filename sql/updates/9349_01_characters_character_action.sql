@@ -1,0 +1,1 @@
+ALTER TABLE `character_action` ADD `spec` tinyint(3) unsigned NOT NULL default 0 AFTER `guid`;
