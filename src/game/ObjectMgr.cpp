@@ -3084,7 +3084,6 @@ void ObjectMgr::LoadArenaTeams()
 
     do
     {
-        Field *fields = result->Fetch();
 
         bar.step();
         ++count;
@@ -3787,7 +3786,7 @@ void ObjectMgr::LoadQuests()
             }
             else if (qinfo->RewRepValue[j] != 0)
             {
-                sLog.outErrorDb("Quest %u has `RewRepFaction%d` = 0 but `RewRepValue%d` = %u.",
+                sLog.outErrorDb("Quest %u has `RewRepFaction%d` = 0 but `RewRepValue%d` = %i.",
                     qinfo->GetQuestId(),j+1,j+1,qinfo->RewRepValue[j]);
                 // no changes, quest ignore this data
             }
