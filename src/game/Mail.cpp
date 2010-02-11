@@ -747,17 +747,16 @@ void WorldSession::HandleQueryNextMailTime(WorldPacket & /*recv_data*/ )
             switch(m->messageType)
             {
                 case MAIL_AUCTION:
-                    data << uint32(2);
-                    data << uint32(2);
-                    data << uint32(m->stationery);
+                    data << uint32(m->sender);              // auction house id
+                    data << uint32(MAIL_AUCTION);           // message type
                     break;
                 default:
                     data << uint32(0);
                     data << uint32(0);
-                    data << uint32(m->stationery);
                     break;
             }
 
+            data << uint32(m->stationery);
             data << uint32(0xC6000000);                     // float unk, time or something
 
             ++count;
