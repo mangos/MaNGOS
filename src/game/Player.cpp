@@ -5636,7 +5636,7 @@ void Player::SendInitialActionButtons() const
     WorldPacket data(SMSG_ACTION_BUTTONS, 1+(MAX_ACTION_BUTTONS*4));
     data << uint8(1);                                       // can be 0, 1, 2 (talent spec)
     ActionButtonList const& currentActionButtonList = m_actionButtons[m_activeSpec];
-    for(int button = 0; button < MAX_ACTION_BUTTONS; ++button)
+    for(uint8 button = 0; button < MAX_ACTION_BUTTONS; ++button)
     {
         ActionButtonList::const_iterator itr = currentActionButtonList.find(button);
         if(itr != currentActionButtonList.end() && itr->second.uState != ACTIONBUTTON_DELETED)
@@ -5706,8 +5706,8 @@ bool Player::IsActionButtonDataValid(uint8 button, uint32 action, uint8 type, Pl
 
 ActionButton* Player::addActionButton(uint8 spec, uint8 button, uint32 action, uint8 type)
 {
-
-    if (!IsActionButtonDataValid(button,action,type,this))
+    // check action only for active spec (so not check at copy/load passive spec)
+    if (spec == GetActiveSpec() && !IsActionButtonDataValid(button,action,type,this))
         return NULL;
 
     // it create new button (NEW state) if need or return existed
@@ -5716,23 +5716,23 @@ ActionButton* Player::addActionButton(uint8 spec, uint8 button, uint32 action, u
     // set data and update to CHANGED if not NEW
     ab.SetActionAndType(action,ActionButtonType(type));
 
-    sLog.outDetail( "Player '%u' Added Action '%u' (type %u) to Button '%u'", GetGUIDLow(), action, uint32(type), button );
+    sLog.outDetail("Player '%u' Added Action '%u' (type %u) to Button '%u' for spec %u", GetGUIDLow(), action, uint32(type), button, spec);
     return &ab;
 }
 
-void Player::removeActionButton(uint8 button)
+void Player::removeActionButton(uint8 spec, uint8 button)
 {
-    ActionButtonList& currentActionButtonList = m_actionButtons[m_activeSpec];
+    ActionButtonList& currentActionButtonList = m_actionButtons[spec];
     ActionButtonList::iterator buttonItr = currentActionButtonList.find(button);
-    if (buttonItr==currentActionButtonList.end())
+    if (buttonItr == currentActionButtonList.end() || buttonItr->second.uState == ACTIONBUTTON_DELETED)
         return;
 
-    if(buttonItr->second.uState==ACTIONBUTTON_NEW)
+    if (buttonItr->second.uState == ACTIONBUTTON_NEW)
         currentActionButtonList.erase(buttonItr);           // new and not saved
     else
         buttonItr->second.uState = ACTIONBUTTON_DELETED;    // saved, will deleted at next save
 
-    sLog.outDetail( "Action Button '%u' Removed from Player '%u'", button, GetGUIDLow() );
+    sLog.outDetail("Action Button '%u' Removed from Player '%u' for spec %u", button, GetGUIDLow(), spec);
 }
 
 ActionButton const* Player::GetActionButton(uint8 button)
@@ -21331,9 +21331,20 @@ void Player::ActivateSpec(uint8 specNum)
     if(GetActiveSpec() == specNum)
         return;
 
-    resetTalents(true);
+    if(specNum >= GetSpecsCount())
+        return;
+
+    // unlearn GetActiveSpec() talents (not learned in specNum);
+    // learn specNum talents
 
     SetActiveSpec(specNum);
+
+    // recheck action buttons (not checked at loading/spec copy)
+    ActionButtonList const& currentActionButtonList = m_actionButtons[m_activeSpec];
+    for(ActionButtonList::const_iterator itr = currentActionButtonList.begin(); itr != currentActionButtonList.end(); ++itr)
+        if (itr->second.uState != ACTIONBUTTON_DELETED)
+           if (!IsActionButtonDataValid(itr->first,itr->second.GetAction(),itr->second.GetType(), this))
+               removeActionButton(m_activeSpec,itr->first);
 
     SendInitialActionButtons();
 
@@ -21343,12 +21354,44 @@ void Player::ActivateSpec(uint8 specNum)
 void Player::UpdateSpecCount(uint8 count)
 {
     uint8 curCount = GetSpecsCount();
-    if(curCount == count)
+    if (curCount == count)
         return;
 
-    if(count > curCount)
+    // maybe current spec data must be copied to 0 spec?
+    if (m_activeSpec >= count)
+        ActivateSpec(0);
+
+    // copy spec data from new specs
+    if (count > curCount)
     {
-        //TODO: copy current action button set
+        // copy action buttons from active spec (more easy in this case iterate first by button)
+        ActionButtonList const& currentActionButtonList = m_actionButtons[m_activeSpec];
+
+        for(ActionButtonList::const_iterator itr = currentActionButtonList.begin(); itr != currentActionButtonList.end(); ++itr)
+        {
+            if (itr->second.uState != ACTIONBUTTON_DELETED)
+            {
+                for(uint8 spec = curCount; spec < count; ++spec)
+                    addActionButton(spec,itr->first,itr->second.GetAction(),itr->second.GetType());
+            }
+        }
+
+        // other data copy
+        // for(uint8 spec = curCount; spec < count; ++spec)
+        //     ...
+    }
+    // delete spec data for removed specs
+    else if (count < curCount)
+    {
+        // delete action buttons for removed spec
+        for(uint8 spec = count; spec < curCount; ++spec)
+        {
+            // delete action buttons for removed spec
+            for(uint8 button = 0; button < MAX_ACTION_BUTTONS; ++button)
+                removeActionButton(spec,button);
+
+            // other data remove
+        }
     }
 
     SetSpecsCount(count);

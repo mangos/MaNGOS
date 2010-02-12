@@ -962,7 +962,7 @@ void WorldSession::HandleSetActionButtonOpcode(WorldPacket& recv_data)
     if (!packetData)
     {
         sLog.outDetail( "MISC: Remove action from button %u", button );
-        GetPlayer()->removeActionButton(button);
+        GetPlayer()->removeActionButton(GetPlayer()->GetActiveSpec(),button);
     }
     else
     {
