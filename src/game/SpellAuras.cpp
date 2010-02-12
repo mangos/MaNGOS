@@ -5193,14 +5193,15 @@ void Aura::HandleAuraModIncreaseHealth(bool apply, bool Real)
         case 44055: case 55915: case 55917: case 67596:     // Tremendous Fortitude (Battlemaster's Alacrity)
         case 50322:                                         // Survival Instincts
         case 54443:                                         // Demonic Empowerment (Voidwalker)
+        case 55233:                                         // Vampiric Blood
         {
             if(Real)
             {
                 if(apply)
                 {
-                    // Demonic Empowerment (Voidwalker) - special case, store percent in data
+                    // Demonic Empowerment (Voidwalker) & Vampiric Blood - special cases, store percent in data
                     // recalculate to full amount at apply for proper remove
-                    if (GetId() == 54443)
+                    if (GetId() == 54443 || GetId() == 55233)
                         m_modifier.m_amount = m_target->GetMaxHealth() * m_modifier.m_amount / 100;
 
                     m_target->HandleStatModifier(UNIT_MOD_HEALTH, TOTAL_VALUE, float(m_modifier.m_amount), apply);
