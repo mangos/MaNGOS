@@ -4485,6 +4485,13 @@ SpellCastResult Spell::CheckCast(bool strict)
                     if(m_targets.getUnitTarget() && !m_caster->IsFriendlyTo(m_targets.getUnitTarget()) && !m_caster->HasInArc( M_PI_F, m_targets.getUnitTarget() ))
                         return SPELL_FAILED_UNIT_NOT_INFRONT;
                 }
+                // Fire Nova
+                if (m_spellInfo->SpellFamilyName == SPELLFAMILY_SHAMAN && m_spellInfo->SpellIconID == 33)
+                {
+                    // fire totems slot
+                    if (!m_caster->m_TotemSlot[0])
+                        return SPELL_FAILED_TOTEMS;
+                }
                 break;
             }
             case SPELL_EFFECT_SCHOOL_DAMAGE:
