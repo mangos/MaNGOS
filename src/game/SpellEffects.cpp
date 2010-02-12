@@ -4645,6 +4645,17 @@ void Spell::EffectWeaponDmg(uint32 i)
             }
             break;
         }
+        case SPELLFAMILY_HUNTER:
+        {
+            // Kill Shot
+            if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x80000000000000))
+            {
+                // 0.4*RAP added to damage (that is 0.2 if we apply PercentMod (200%) to spell_bonus, too)
+                spellBonusNeedWeaponDamagePercentMod = true;
+                spell_bonus += int32( 0.2f * m_caster->GetTotalAttackPowerValue(RANGED_ATTACK) );
+            }
+            break;
+        }
         case SPELLFAMILY_SHAMAN:
         {
             // Skyshatter Harness item set bonus
