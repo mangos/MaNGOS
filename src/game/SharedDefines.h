@@ -2429,14 +2429,12 @@ enum DiminishingGroup
     DIMINISHING_TRIGGER_STUN,                               // By aura proced stuns, usualy chance on hit talents
     DIMINISHING_CONTROL_ROOT,                               // Immobilizing effects from casted spells
     DIMINISHING_TRIGGER_ROOT,                               // Immobilizing effects from triggered spells like Frostbite
-    DIMINISHING_FEAR_BLIND,                                 // Fears & blind
-    DIMINISHING_CHARM,
-    DIMINISHING_POLYMORPH_GOUGE_SAP,
-    // Warlock Specific
-    DIMINISHING_DEATHCOIL,                                  // Death Coil Diminish only with another Death Coil
-    // Druid Specific
-    DIMINISHING_CYCLONE,                                    // From 2.3.0
     // Shared Class Specific
+    DIMINISHING_FEAR_CHARM_BLIND,                           // Fears & charm and Blind
+    DIMINISHING_DISORIENT,
+    DIMINISHING_HORROR,
+    // Druid Specific
+    DIMINISHING_CYCLONE,
     DIMINISHING_CHEAPSHOT_POUNCE,
     DIMINISHING_DISARM,                                     // From 2.3.0
     DIMINISHING_SILENCE,                                    // From 2.3.0
