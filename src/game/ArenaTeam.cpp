@@ -153,11 +153,11 @@ bool ArenaTeam::AddMember(const uint64& PlayerGuid)
     {
         pl->SetInArenaTeam(m_TeamId, GetSlot(), GetType());
         pl->SetArenaTeamIdInvited(0);
-        pl->SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (GetSlot() * ARENA_TEAM_END) + ARENA_TEAM_PERSONAL_RATING, newmember.personal_rating );
+        pl->SetArenaTeamInfoField(GetSlot(), ARENA_TEAM_PERSONAL_RATING, newmember.personal_rating);
 
         // hide promote/remove buttons
         if(m_CaptainGuid != PlayerGuid)
-            pl->SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (GetSlot() * ARENA_TEAM_END) + ARENA_TEAM_MEMBER, 1);
+            pl->SetArenaTeamInfoField(GetSlot(), ARENA_TEAM_MEMBER, 1);
     }
     return true;
 }
@@ -253,7 +253,7 @@ void ArenaTeam::SetCaptain(const uint64& guid)
     // disable remove/promote buttons
     Player *oldcaptain = sObjectMgr.GetPlayer(GetCaptain());
     if(oldcaptain)
-        oldcaptain->SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (GetSlot() * ARENA_TEAM_END) + ARENA_TEAM_MEMBER, 1);
+        oldcaptain->SetArenaTeamInfoField(GetSlot(), ARENA_TEAM_MEMBER, 1);
 
     // set new captain
     m_CaptainGuid = guid;
@@ -264,7 +264,7 @@ void ArenaTeam::SetCaptain(const uint64& guid)
     // enable remove/promote buttons
     Player *newcaptain = sObjectMgr.GetPlayer(guid);
     if(newcaptain)
-        newcaptain->SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (GetSlot() * ARENA_TEAM_END) + ARENA_TEAM_MEMBER, 0);
+        newcaptain->SetArenaTeamInfoField(GetSlot(), ARENA_TEAM_MEMBER, 0);
 }
 
 void ArenaTeam::DelMember(uint64 guid)
@@ -283,7 +283,7 @@ void ArenaTeam::DelMember(uint64 guid)
         player->GetSession()->SendArenaTeamCommandResult(ERR_ARENA_TEAM_QUIT_S, GetName(), "", 0);
         // delete all info regarding this team
         for(int i = 0; i < ARENA_TEAM_END; ++i)
-            player->SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (GetSlot() * ARENA_TEAM_END) + i, 0);
+            player->SetArenaTeamInfoField(GetSlot(), ArenaTeamInfoType(i), 0);
     }
 
     CharacterDatabase.PExecute("DELETE FROM arena_team_member WHERE arenateamid = '%u' AND guid = '%u'", GetId(), GUID_LOPART(guid));
@@ -617,8 +617,8 @@ void ArenaTeam::MemberLost(Player * plr, uint32 againstRating)
             itr->games_week += 1;
             itr->games_season += 1;
             // update the unit fields
-            plr->SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (GetSlot() * ARENA_TEAM_END) + ARENA_TEAM_GAMES_WEEK, itr->games_week);
-            plr->SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (GetSlot() * ARENA_TEAM_END) + ARENA_TEAM_GAMES_SEASON, itr->games_season);
+            plr->SetArenaTeamInfoField(GetSlot(), ARENA_TEAM_GAMES_WEEK,  itr->games_week);
+            plr->SetArenaTeamInfoField(GetSlot(), ARENA_TEAM_GAMES_SEASON,  itr->games_season);
             return;
         }
     }
@@ -667,8 +667,8 @@ void ArenaTeam::MemberWon(Player * plr, uint32 againstRating)
             itr->wins_season += 1;
             itr->wins_week += 1;
             // update unit fields
-            plr->SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (GetSlot() * ARENA_TEAM_END) + ARENA_TEAM_GAMES_WEEK, itr->games_week);
-            plr->SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (GetSlot() * ARENA_TEAM_END) + ARENA_TEAM_GAMES_SEASON, itr->games_season);
+            plr->SetArenaTeamInfoField(GetSlot(), ARENA_TEAM_GAMES_WEEK, itr->games_week);
+            plr->SetArenaTeamInfoField(GetSlot(), ARENA_TEAM_GAMES_SEASON, itr->games_season);
             return;
         }
     }
