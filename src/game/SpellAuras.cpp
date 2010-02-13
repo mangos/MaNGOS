@@ -2362,6 +2362,36 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                             // not use ammo and not allow use
                             ((Player*)m_target)->RemoveAmmo();
                         return;
+                    case 55328:                                 // Stoneclaw Totem I
+                        m_target->CastSpell(m_target, 5728, true);
+                        return;
+                    case 55329:                                 // Stoneclaw Totem II
+                        m_target->CastSpell(m_target, 6397, true);
+                        return;
+                    case 55330:                                 // Stoneclaw Totem III
+                        m_target->CastSpell(m_target, 6398, true);
+                        return;
+                    case 55332:                                 // Stoneclaw Totem IV
+                        m_target->CastSpell(m_target, 6399, true);
+                        return;
+                    case 55333:                                 // Stoneclaw Totem V
+                        m_target->CastSpell(m_target, 10425, true);
+                        return;
+                    case 55335:                                 // Stoneclaw Totem VI
+                        m_target->CastSpell(m_target, 10426, true);
+                        return;
+                    case 55278:                                 // Stoneclaw Totem VII
+                        m_target->CastSpell(m_target, 25513, true);
+                        return;
+                    case 58589:                                 // Stoneclaw Totem VIII
+                        m_target->CastSpell(m_target, 58583, true);
+                        return;
+                    case 58590:                                 // Stoneclaw Totem IX
+                        m_target->CastSpell(m_target, 58584, true);
+                        return;
+                    case 58591:                                 // Stoneclaw Totem X
+                        m_target->CastSpell(m_target, 58585, true);
+                        return;
                     case 62061:                             // Festive Holiday Mount
                         if (m_target->HasAuraType(SPELL_AURA_MOUNTED))
                             // Reindeer Transformation
