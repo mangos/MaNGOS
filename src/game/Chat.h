@@ -308,6 +308,7 @@ class ChatHandler
         bool HandleReloadAllCommand(const char* args);
         bool HandleReloadAllAchievementCommand(const char* args);
         bool HandleReloadAllAreaCommand(const char* args);
+        bool HandleReloadAllGossipsCommand(const char* args);
         bool HandleReloadAllItemCommand(const char* args);
         bool HandleReloadAllLootCommand(const char* args);
         bool HandleReloadAllNpcCommand(const char* args);
