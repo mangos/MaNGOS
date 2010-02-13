@@ -3778,18 +3778,23 @@ SpellCastResult Spell::CheckOrTakeRunePower(bool take)
     for(uint32 i = 0; i < MAX_RUNES; ++i)
     {
         RuneType rune = plr->GetCurrentRune(i);
+        RuneType real = plr->GetBaseRune(i);
+
+        if (runeCost[real] > 0)
+        {
+            int32 runeCostTemp = runeCost[real] * 1000;
+            if(Player* modOwner = plr->GetSpellModOwner())
+                modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_COST, runeCostTemp, this);
+
+            if (runeCostTemp <= 0)
+            {
+                --runeCost[real];
+                continue;
+            }
+        }
+        
         if (runeCost[rune] <= 0)
             continue;
-
-        int32 runeCostTemp = runeCost[rune] * 10000;
-        if(Player* modOwner = plr->GetSpellModOwner())
-            modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_COST, runeCostTemp, this);
-
-        if (runeCostTemp <= 0)
-        {
-            --runeCost[rune];
-            continue;
-        }
 
         if(plr->GetRuneCooldown(i) == 0)
         {
