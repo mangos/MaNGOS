@@ -6617,6 +6617,13 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     triggered_spell_id = 64930;            // Electrified
                     break;
                 }
+                // Shaman T9 Elemental 4P Bonus
+                case 67228:
+                {
+                    basepoints0 = int32( triggerAmount * damage / 100 );
+                    triggered_spell_id = 71824;
+                    break;
+                }
             }
             // Storm, Earth and Fire
             if (dummySpell->SpellIconID == 3063)

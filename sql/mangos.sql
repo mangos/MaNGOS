@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_9331_01_mangos_quest_template` bit(1) default NULL
+  `required_9366_02_mangos_spell_proc_event` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -14263,7 +14263,8 @@ INSERT INTO `spell_bonus_data` VALUES
 (17712, 0,      0,       0,     'Item - Lifestone Healing'),
 (5707,  0,      0,       0,     'Item - Lifestone Regeneration'),
 (38395, 0,      0,       0,     'Item - Siphon Essence'),
-(40293, 0,      0,       0,     'Item - Siphon Essence');
+(40293, 0,      0,       0,     'Item - Siphon Essence'),
+(71824, 0,      0,       0,     'Item - Shaman T9 Elemental 4P Bonus');
 /*!40000 ALTER TABLE `spell_bonus_data` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -18652,6 +18653,7 @@ INSERT INTO `spell_proc_event` VALUES
 (64976, 0x00000000,  4, 0x00000001, 0x00000000, 0x00000000, 0x00010000, 0x00000000, 0.000000, 0.000000,  0),
 (65661, 0x00000000, 15, 0x00400011, 0x00020004, 0x00000000, 0x00000010, 0x00000001, 0.000000, 100.000000,0),
 (64127, 0x00000000,  6, 0x00000001, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0.000000, 0.000000,  0),
+(67228, 0x00000004, 11, 0x00000000, 0x00001000, 0x00000000, 0x00000000, 0x00000000, 0.000000, 0.000000, 0),
 (67353, 0x00000000,  7, 0x00008000, 0x00100500, 0x00000000, 0x00000000, 0x00000000, 0.000000, 0.000000,  0),
 (67667, 0x00000000,  0, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0.000000, 0.000000, 45),
 (67672, 0x00000000,  0, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0.000000, 0.000000, 50),
