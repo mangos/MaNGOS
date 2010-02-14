@@ -6886,7 +6886,7 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                         triggered_spell_id = 66960; break;
                     case 51419:                             // Rank 5
                         triggered_spell_id = 66961; break;
-                    case 51420:                             // Rank 6
+                    case 55268:                             // Rank 6
                         triggered_spell_id = 66962; break;
                     // Plague Strike
                     case 45462:                             // Rank 1
