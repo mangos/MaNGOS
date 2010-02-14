@@ -33,7 +33,7 @@ class MANGOS_DLL_SPEC barGoLink
     public:
 
         void step( void );
-        barGoLink( uint64 );
+        barGoLink( int );
         ~barGoLink();
 };
 #endif

@@ -639,7 +639,7 @@ void InstanceSaveManager::_ResetOrWarnAll(uint32 mapid, Difficulty difficulty, b
         uint32 period = mapDiff->resetTime * DAY;
         time_t next_reset = ((now + timeLeft + MINUTE) / DAY * DAY) + period + diff;
         // update it in the DB
-        CharacterDatabase.PExecute("UPDATE instance_reset SET resettime = '"UI64FMTD"' WHERE mapid = '%d' AND difficulty = '%d'", next_reset, mapid, difficulty);
+        CharacterDatabase.PExecute("UPDATE instance_reset SET resettime = '"UI64FMTD"' WHERE mapid = '%d' AND difficulty = '%d'", (uint64)next_reset, mapid, difficulty);
     }
 
     // note: this isn't fast but it's meant to be executed very rarely
