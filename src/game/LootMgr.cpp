@@ -102,7 +102,7 @@ void LootStore::LoadLootTable()
 
     if (result)
     {
-        barGoLink bar(result->GetRowCount());
+        barGoLink bar((int)result->GetRowCount());
 
         do
         {
@@ -816,7 +816,7 @@ LootStoreItem const * LootTemplate::LootGroup::Roll() const
 {
     if (!ExplicitlyChanced.empty())                         // First explicitly chanced entries are checked
     {
-        float Roll = rand_chance();
+        float Roll = rand_chance_f();
 
         for (uint32 i=0; i<ExplicitlyChanced.size(); ++i)    //check each explicitly chanced entry in the template and modify its chance based on quality.
         {

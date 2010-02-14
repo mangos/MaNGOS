@@ -88,7 +88,7 @@ void WaypointManager::Load()
     //   6         7      8      9        10       11       12       13       14  15
         "waittime, emote, spell, textid1, textid2, textid3, textid4, textid5, id, point FROM creature_movement");
 
-    barGoLink bar( result->GetRowCount() );
+    barGoLink bar( (int)result->GetRowCount() );
     do
     {
         bar.step();

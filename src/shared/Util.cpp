@@ -56,6 +56,11 @@ double rand_chance (void)
     return mtRand->randExc (100.0);
 }
 
+float rand_chance_f(void)
+{
+    return (float)mtRand->randExc (100.0);
+}
+
 Tokens StrSplit(const std::string &src, const std::string &sep)
 {
     Tokens r;

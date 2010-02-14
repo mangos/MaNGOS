@@ -91,9 +91,6 @@ enum WorldConfigs
     CONFIG_INTERVAL_CHANGEWEATHER,
     CONFIG_PORT_WORLD,
     CONFIG_SOCKET_SELECTTIME,
-    CONFIG_GROUP_XP_DISTANCE,
-    CONFIG_SIGHT_MONSTER,
-    CONFIG_SIGHT_GUARDER,
     CONFIG_GAME_TYPE,
     CONFIG_REALM_ZONE,
     CONFIG_ALLOW_TWO_SIDE_ACCOUNTS,
@@ -166,8 +163,6 @@ enum WorldConfigs
     CONFIG_CHATFLOOD_MESSAGE_DELAY,
     CONFIG_CHATFLOOD_MUTE_TIME,
     CONFIG_EVENT_ANNOUNCE,
-    CONFIG_CREATURE_FAMILY_FLEE_ASSISTANCE_RADIUS,
-    CONFIG_CREATURE_FAMILY_ASSISTANCE_RADIUS,
     CONFIG_CREATURE_FAMILY_ASSISTANCE_DELAY,
     CONFIG_CREATURE_FAMILY_FLEE_DELAY,
     CONFIG_WORLD_BOSS_LEVEL_DIFF,
@@ -195,9 +190,6 @@ enum WorldConfigs
     CONFIG_INSTANT_LOGOUT,
     CONFIG_ALL_TAXI_PATHS,
     CONFIG_DECLINED_NAMES_USED,
-    CONFIG_LISTEN_RANGE_SAY,
-    CONFIG_LISTEN_RANGE_TEXTEMOTE,
-    CONFIG_LISTEN_RANGE_YELL,
     CONFIG_SKILL_MILLING,
     CONFIG_BATTLEGROUND_CAST_DESERTER,
     CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_ENABLE,
@@ -285,6 +277,16 @@ enum Rates
     RATE_DURABILITY_LOSS_PARRY,
     RATE_DURABILITY_LOSS_ABSORB,
     RATE_DURABILITY_LOSS_BLOCK,
+    //{ TODO: store float config values (not only rates), need rename to more generic name
+    RATE_SIGHT_GUARDER,
+    RATE_SIGHT_MONSTER,
+    RATE_LISTEN_RANGE_SAY,
+    RATE_LISTEN_RANGE_YELL,
+    RATE_LISTEN_RANGE_TEXTEMOTE,
+    RATE_CREATURE_FAMILY_FLEE_ASSISTANCE_RADIUS,
+    RATE_CREATURE_FAMILY_ASSISTANCE_RADIUS,
+    RATE_GROUP_XP_DISTANCE,
+    //}
     MAX_RATES
 };
 
@@ -472,20 +474,9 @@ class World
         float getRate(Rates rate) const { return rate_values[rate]; }
 
         /// Set a server configuration element (see #WorldConfigs)
-        void setConfig(uint32 index,uint32 value)
-        {
-            if(index<CONFIG_VALUE_COUNT)
-                m_configs[index]=value;
-        }
-
+        void setConfig(WorldConfigs index,uint32 value) { m_configs[index]=value; }
         /// Get a server configuration element (see #WorldConfigs)
-        uint32 getConfig(uint32 index) const
-        {
-            if(index<CONFIG_VALUE_COUNT)
-                return m_configs[index];
-            else
-                return 0;
-        }
+        uint32 getConfig(WorldConfigs index) const { return m_configs[index]; }
 
         /// Are we on a "Player versus Player" server?
         bool IsPvPRealm() { return (getConfig(CONFIG_GAME_TYPE) == REALM_TYPE_PVP || getConfig(CONFIG_GAME_TYPE) == REALM_TYPE_RPPVP || getConfig(CONFIG_GAME_TYPE) == REALM_TYPE_FFA_PVP); }

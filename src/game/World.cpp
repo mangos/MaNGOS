@@ -546,8 +546,20 @@ void World::LoadConfigSettings(bool reload)
         rate_values[RATE_DURABILITY_LOSS_BLOCK] = 0.0f;
     }
 
-    ///- Read other configuration items from the config file
+    rate_values[RATE_LISTEN_RANGE_SAY]       = sConfig.GetFloatDefault("ListenRange.Say", 25);
+    rate_values[RATE_LISTEN_RANGE_YELL]      = sConfig.GetFloatDefault("ListenRange.Yell", 300);
+    rate_values[RATE_LISTEN_RANGE_TEXTEMOTE] = sConfig.GetFloatDefault("ListenRange.TextEmote", 25);
 
+    rate_values[RATE_GROUP_XP_DISTANCE] = sConfig.GetFloatDefault("MaxGroupXPDistance", 74);
+    /// \todo Add MonsterSight and GuarderSight (with meaning) in mangosd.conf or put them as define
+    rate_values[RATE_SIGHT_GUARDER]     = sConfig.GetFloatDefault("GuarderSight", 50);
+    rate_values[RATE_SIGHT_MONSTER]     = sConfig.GetFloatDefault("MonsterSight", 50);
+
+    rate_values[RATE_CREATURE_FAMILY_ASSISTANCE_RADIUS]      = sConfig.GetFloatDefault("CreatureFamilyAssistanceRadius",10);
+    rate_values[RATE_CREATURE_FAMILY_FLEE_ASSISTANCE_RADIUS] = sConfig.GetFloatDefault("CreatureFamilyFleeAssistanceRadius",30);
+
+
+    ///- Read other configuration items from the config file
     m_configs[CONFIG_COMPRESSION] = sConfig.GetIntDefault("Compression", 1);
     if(m_configs[CONFIG_COMPRESSION] < 1 || m_configs[CONFIG_COMPRESSION] > 9)
     {
@@ -595,11 +607,6 @@ void World::LoadConfigSettings(bool reload)
     }
     else
         m_configs[CONFIG_SOCKET_SELECTTIME] = sConfig.GetIntDefault("SocketSelectTime", DEFAULT_SOCKET_SELECT_TIME);
-
-    m_configs[CONFIG_GROUP_XP_DISTANCE] = sConfig.GetIntDefault("MaxGroupXPDistance", 74);
-    /// \todo Add MonsterSight and GuarderSight (with meaning) in mangosd.conf or put them as define
-    m_configs[CONFIG_SIGHT_MONSTER] = sConfig.GetIntDefault("MonsterSight", 50);
-    m_configs[CONFIG_SIGHT_GUARDER] = sConfig.GetIntDefault("GuarderSight", 50);
 
     if(reload)
     {
@@ -912,8 +919,6 @@ void World::LoadConfigSettings(bool reload)
 
     m_configs[CONFIG_EVENT_ANNOUNCE] = sConfig.GetIntDefault("Event.Announce",0);
 
-    m_configs[CONFIG_CREATURE_FAMILY_FLEE_ASSISTANCE_RADIUS] = sConfig.GetIntDefault("CreatureFamilyFleeAssistanceRadius",30);
-    m_configs[CONFIG_CREATURE_FAMILY_ASSISTANCE_RADIUS] = sConfig.GetIntDefault("CreatureFamilyAssistanceRadius",10);
     m_configs[CONFIG_CREATURE_FAMILY_ASSISTANCE_DELAY]  = sConfig.GetIntDefault("CreatureFamilyAssistanceDelay",1500);
     m_configs[CONFIG_CREATURE_FAMILY_FLEE_DELAY]        = sConfig.GetIntDefault("CreatureFamilyFleeDelay",7000);
 
@@ -954,10 +959,6 @@ void World::LoadConfigSettings(bool reload)
     // always use declined names in the russian client
     m_configs[CONFIG_DECLINED_NAMES_USED] =
         (m_configs[CONFIG_REALM_ZONE] == REALM_ZONE_RUSSIAN) ? true : sConfig.GetBoolDefault("DeclinedNames", false);
-
-    m_configs[CONFIG_LISTEN_RANGE_SAY]       = sConfig.GetIntDefault("ListenRange.Say", 25);
-    m_configs[CONFIG_LISTEN_RANGE_TEXTEMOTE] = sConfig.GetIntDefault("ListenRange.TextEmote", 25);
-    m_configs[CONFIG_LISTEN_RANGE_YELL]      = sConfig.GetIntDefault("ListenRange.Yell", 300);
 
     m_configs[CONFIG_BATTLEGROUND_CAST_DESERTER]                = sConfig.GetBoolDefault("Battleground.CastDeserter", true);
     m_configs[CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_ENABLE]       = sConfig.GetBoolDefault("Battleground.QueueAnnouncer.Enable", false);
