@@ -24,7 +24,7 @@
 #include "Opcodes.h"
 #include "InstanceSaveMgr.h"
 
-void WorldSession::HandleCalendarGetCalendar(WorldPacket &recv_data)
+void WorldSession::HandleCalendarGetCalendar(WorldPacket &/*recv_data*/)
 {
     sLog.outDebug("WORLD: CMSG_CALENDAR_GET_CALENDAR");     // empty
 

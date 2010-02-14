@@ -46,6 +46,11 @@ double rand_norm(void)
     return mtRand->randExc ();
 }
 
+float rand_norm_f(void)
+{
+    return (float)mtRand->randExc ();
+}
+
 double rand_chance (void)
 {
     return mtRand->randExc (100.0);
@@ -102,12 +107,12 @@ void stripLineInvisibleChars(std::string &str)
         str.erase(wpos,str.size());
 }
 
-std::string secsToTimeString(uint32 timeInSecs, bool shortText, bool hoursOnly)
+std::string secsToTimeString(time_t timeInSecs, bool shortText, bool hoursOnly)
 {
-    uint32 secs    = timeInSecs % MINUTE;
-    uint32 minutes = timeInSecs % HOUR / MINUTE;
-    uint32 hours   = timeInSecs % DAY  / HOUR;
-    uint32 days    = timeInSecs / DAY;
+    time_t secs    = timeInSecs % MINUTE;
+    time_t minutes = timeInSecs % HOUR / MINUTE;
+    time_t hours   = timeInSecs % DAY  / HOUR;
+    time_t days    = timeInSecs / DAY;
 
     std::ostringstream ss;
     if(days)

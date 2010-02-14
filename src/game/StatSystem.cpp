@@ -428,8 +428,8 @@ void Player::CalculateMinMaxDamage(WeaponAttackType attType, bool normalized, fl
         uint32 lvl = getLevel();
         if ( lvl > 60 ) lvl = 60;
 
-        weapon_mindamage = lvl*0.85*att_speed;
-        weapon_maxdamage = lvl*1.25*att_speed;
+        weapon_mindamage = lvl*0.85f*att_speed;
+        weapon_maxdamage = lvl*1.25f*att_speed;
     }
     else if(!IsUseEquipedWeapon(attType==BASE_ATTACK))      //check if player not in form but still can't use weapon (broken/etc)
     {
@@ -1060,16 +1060,16 @@ void Pet::UpdateDamagePhysical(WeaponAttackType attType)
         {
             case HAPPY:
                 // 125% of normal damage
-                mindamage = mindamage * 1.25;
-                maxdamage = maxdamage * 1.25;
+                mindamage = mindamage * 1.25f;
+                maxdamage = maxdamage * 1.25f;
                 break;
             case CONTENT:
                 // 100% of normal damage, nothing to modify
                 break;
             case UNHAPPY:
                 // 75% of normal damage
-                mindamage = mindamage * 0.75;
-                maxdamage = maxdamage * 0.75;
+                mindamage = mindamage * 0.75f;
+                maxdamage = maxdamage * 0.75f;
                 break;
         }
     }

@@ -211,7 +211,7 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
             if (!m_creature->isInCombat())
                 return false;
 
-            Unit* pUnit = DoSelectLowestHpFriendly(event.friendly_hp.radius, event.friendly_hp.hpDeficit);
+            Unit* pUnit = DoSelectLowestHpFriendly((float)event.friendly_hp.radius, event.friendly_hp.hpDeficit);
             if (!pUnit)
                 return false;
 
@@ -227,7 +227,7 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
                 return false;
 
             std::list<Creature*> pList;
-            DoFindFriendlyCC(pList, event.friendly_is_cc.radius);
+            DoFindFriendlyCC(pList, (float)event.friendly_is_cc.radius);
 
             //List is empty
             if (pList.empty())
@@ -243,7 +243,7 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
         case EVENT_T_FRIENDLY_MISSING_BUFF:
         {
             std::list<Creature*> pList;
-            DoFindFriendlyMissingBuff(pList, event.friendly_buff.radius, event.friendly_buff.spellId);
+            DoFindFriendlyMissingBuff(pList, (float)event.friendly_buff.radius, event.friendly_buff.spellId);
 
             //List is empty
             if (pList.empty())
@@ -766,7 +766,7 @@ void CreatureEventAI::ProcessAction(CreatureEventAI_Action const& action, uint32
         }
         case ACTION_T_CALL_FOR_HELP:
         {
-            m_creature->CallForHelp(action.call_for_help.radius);
+            m_creature->CallForHelp((float)action.call_for_help.radius);
             break;
         }
         case ACTION_T_SET_SHEATH:
@@ -1005,7 +1005,7 @@ void CreatureEventAI::MoveInLineOfSight(Unit *who)
             if ((*itr).Event.event_type == EVENT_T_OOC_LOS)
             {
                 //can trigger if closer than fMaxAllowedRange
-                float fMaxAllowedRange = (*itr).Event.ooc_los.maxRange;
+                float fMaxAllowedRange = (float)(*itr).Event.ooc_los.maxRange;
 
                 //if range is ok and we are actually in LOS
                 if (m_creature->IsWithinDistInMap(who, fMaxAllowedRange) && m_creature->IsWithinLOSInMap(who))
@@ -1136,7 +1136,7 @@ void CreatureEventAI::UpdateAI(const uint32 diff)
 
 bool CreatureEventAI::IsVisible(Unit *pl) const
 {
-    return m_creature->IsWithinDist(pl,sWorld.getConfig(CONFIG_SIGHT_MONSTER))
+    return m_creature->IsWithinDist(pl,(float)sWorld.getConfig(CONFIG_SIGHT_MONSTER))
         && pl->isVisibleForOrDetect(m_creature,m_creature,true);
 }
 
@@ -1411,7 +1411,7 @@ void CreatureEventAI::ReceiveEmote(Player* pPlayer, uint32 text_emote)
     }
 }
 
-void CreatureEventAI::DamageTaken( Unit* done_by, uint32& damage )
+void CreatureEventAI::DamageTaken( Unit* /*done_by*/, uint32& damage )
 {
     if(InvinceabilityHpLevel > 0 && m_creature->GetHealth() < InvinceabilityHpLevel+damage)
     {

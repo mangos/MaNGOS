@@ -33,7 +33,7 @@ barGoLink::~barGoLink()
     fflush(stdout);
 }
 
-barGoLink::barGoLink( int row_count )
+barGoLink::barGoLink( uint64 row_count )
 {
     rec_no    = 0;
     rec_pos   = 0;

@@ -110,5 +110,5 @@ float Config::GetFloatDefault(const char* name, float def)
     if (!node || !node->getValue())
         return def;
 
-    return atof(node->getValue());
+    return (float)atof(node->getValue());
 }

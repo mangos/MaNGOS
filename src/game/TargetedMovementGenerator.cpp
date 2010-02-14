@@ -78,13 +78,13 @@ void TargetedMovementGeneratorMedium<T,D>::_setTargetLocation(T &owner)
 }
 
 template<>
-void TargetedMovementGeneratorMedium<Player,ChaseMovementGenerator<Player> >::UpdateFinalDistance(float fDistance)
+void TargetedMovementGeneratorMedium<Player,ChaseMovementGenerator<Player> >::UpdateFinalDistance(float /*fDistance*/)
 {
     // nothing to do for Player
 }
 
 template<>
-void TargetedMovementGeneratorMedium<Player,FollowMovementGenerator<Player> >::UpdateFinalDistance(float fDistance)
+void TargetedMovementGeneratorMedium<Player,FollowMovementGenerator<Player> >::UpdateFinalDistance(float /*fDistance*/)
 {
     // nothing to do for Player
 }
@@ -239,7 +239,7 @@ void FollowMovementGenerator<Player>::_updateWalkMode(Player &)
 }
 
 template<>
-void FollowMovementGenerator<Player>::_updateSpeed(Player &u)
+void FollowMovementGenerator<Player>::_updateSpeed(Player &/*u*/)
 {
     // nothing to do for Player
 }

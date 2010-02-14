@@ -39,7 +39,7 @@ Weather::Weather(uint32 zone, WeatherZoneChances const* weatherChances) : m_zone
 }
 
 /// Launch a weather update
-bool Weather::Update(uint32 diff)
+bool Weather::Update(time_t diff)
 {
     if (m_timer.GetCurrent()>=0)
         m_timer.Update(diff);
@@ -168,16 +168,16 @@ bool Weather::ReGenerate()
     }
     else if (u < 90)
     {
-        m_grade = rand_norm() * 0.3333f;
+        m_grade = rand_norm_f() * 0.3333f;
     }
     else
     {
         // Severe change, but how severe?
         rnd = urand(0, 99);
         if (rnd < 50)
-            m_grade = rand_norm() * 0.3333f + 0.3334f;
+            m_grade = rand_norm_f() * 0.3333f + 0.3334f;
         else
-            m_grade = rand_norm() * 0.3333f + 0.6667f;
+            m_grade = rand_norm_f() * 0.3333f + 0.6667f;
     }
 
     // return true only in case weather changes

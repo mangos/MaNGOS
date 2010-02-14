@@ -46,7 +46,7 @@ DistractMovementGenerator::Reset(Unit& owner)
 }
 
 void
-DistractMovementGenerator::Interrupt(Unit& owner)
+DistractMovementGenerator::Interrupt(Unit& /*owner*/)
 {
 }
 

@@ -167,9 +167,9 @@ DestinationHolder<TRAVELLER>::GetLocationNow(const Map * map, float &x, float &y
     else if (HasDestination())
     {
         double percent_passed = (double)i_timeElapsed / (double)i_totalTravelTime;
-        const float distanceX = ((i_destX - i_fromX) * percent_passed);
-        const float distanceY = ((i_destY - i_fromY) * percent_passed);
-        const float distanceZ = ((i_destZ - i_fromZ) * percent_passed);
+        const float distanceX = float((i_destX - i_fromX) * percent_passed);
+        const float distanceY = float((i_destY - i_fromY) * percent_passed);
+        const float distanceZ = float((i_destZ - i_fromZ) * percent_passed);
         x = i_fromX + distanceX;
         y = i_fromY + distanceY;
         float z2 = i_fromZ + distanceZ;
@@ -218,9 +218,9 @@ DestinationHolder<TRAVELLER>::GetLocationNowNoMicroMovement(float &x, float &y, 
     else
     {
         double percent_passed = (double)i_timeElapsed / (double)i_totalTravelTime;
-        x = i_fromX + ((i_destX - i_fromX) * percent_passed);
-        y = i_fromY + ((i_destY - i_fromY) * percent_passed);
-        z = i_fromZ + ((i_destZ - i_fromZ) * percent_passed);
+        x = i_fromX + float((i_destX - i_fromX) * percent_passed);
+        y = i_fromY + float((i_destY - i_fromY) * percent_passed);
+        z = i_fromZ + float((i_destZ - i_fromZ) * percent_passed);
     }
 }
 
