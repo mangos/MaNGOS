@@ -207,8 +207,6 @@ struct Glyph
     GlyphUpdateState uState;
 
     Glyph() : id(0), uState(GLYPH_UNCHANGED) { }
-    
-    Glyph(uint32 _id, GlyphUpdateState _uState) : id(_id), uState(_uState) { }
 
     uint32 GetId() { return id; }
 
@@ -232,12 +230,10 @@ struct Glyph
         {
             uState = GLYPH_CHANGED;
         }
-            
+
         id = newId;
     }
 };
-
-typedef std::map<uint16 /*pair16(spec, slot)*/,ActionButton> GlyphList;
 
 struct PlayerCreateInfoItem
 {
