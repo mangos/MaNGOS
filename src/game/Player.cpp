@@ -4090,6 +4090,7 @@ void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmC
     CharacterDatabase.PExecute("DELETE FROM character_action WHERE guid = '%u'",guid);
     CharacterDatabase.PExecute("DELETE FROM character_aura WHERE guid = '%u'",guid);
     CharacterDatabase.PExecute("DELETE FROM character_gifts WHERE guid = '%u'",guid);
+    CharacterDatabase.PExecute("DELETE FROM character_glyphs WHERE guid = '%u'",guid);
     CharacterDatabase.PExecute("DELETE FROM character_homebind WHERE guid = '%u'",guid);
     CharacterDatabase.PExecute("DELETE FROM character_instance WHERE guid = '%u'",guid);
     CharacterDatabase.PExecute("DELETE FROM group_instance WHERE leaderGuid = '%u'",guid);
@@ -14999,8 +15000,10 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
     m_specsCount = fields[59].GetUInt8();
     m_activeSpec = fields[60].GetUInt8();
 
+    _LoadGlyphs(holder->GetResult(PLAYER_LOGIN_QUERY_LOADGLYPHS));
+
     _LoadAuras(holder->GetResult(PLAYER_LOGIN_QUERY_LOADAURAS), time_diff);
-    _LoadGlyphAuras();
+    ApplyGlyphAuras(true);
 
     // add ghost flag (must be after aura load: PLAYER_FLAGS_GHOST set in aura)
     if( HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST) )
@@ -15314,34 +15317,48 @@ void Player::_LoadAuras(QueryResult *result, uint32 timediff)
         CastSpell(this,SPELL_ID_PASSIVE_BATTLE_STANCE,true);
 }
 
-void Player::_LoadGlyphAuras()
+void Player::_LoadGlyphs(QueryResult *result)
 {
-    for (uint8 i = 0; i < MAX_GLYPH_SLOT_INDEX; ++i)
-    {
-        if (uint32 glyph = GetGlyph(i))
-        {
-            if (GlyphPropertiesEntry const *gp = sGlyphPropertiesStore.LookupEntry(glyph))
-            {
-                if (GlyphSlotEntry const *gs = sGlyphSlotStore.LookupEntry(GetGlyphSlot(i)))
-                {
-                    if(gp->TypeFlags == gs->TypeFlags)
-                    {
-                        CastSpell(this, gp->SpellId, true);
-                        continue;
-                    }
-                    else
-                        sLog.outError("Player %s has glyph with typeflags %u in slot with typeflags %u, removing.", m_name.c_str(), gp->TypeFlags, gs->TypeFlags);
-                }
-                else
-                    sLog.outError("Player %s has not existing glyph slot entry %u on index %u", m_name.c_str(), GetGlyphSlot(i), i);
-            }
-            else
-                sLog.outError("Player %s has not existing glyph entry %u on index %u", m_name.c_str(), glyph, i);
+    if(!result)
+        return;
 
-            // On any error remove glyph
-            SetGlyph(i, 0);
+    //         0     1     2
+    // "SELECT spec, slot, glyph FROM character_glyphs WHERE guid='%u'"
+
+    do
+    {
+        Field *fields = result->Fetch();
+        uint8 spec = fields[0].GetUInt8();
+        uint8 slot = fields[1].GetUInt8();
+        uint32 glyph = fields[2].GetUInt32();
+
+        GlyphPropertiesEntry const *gp = sGlyphPropertiesStore.LookupEntry(glyph);
+        if(!gp)
+        {
+            sLog.outError("Player %s has not existing glyph entry %u on index %u, spec %u", m_name.c_str(), glyph, slot, spec);
+            continue;
         }
-    }
+
+        GlyphSlotEntry const *gs = sGlyphSlotStore.LookupEntry(GetGlyphSlot(slot));
+        if (!gs)
+        {
+            sLog.outError("Player %s has not existing glyph slot entry %u on index %u, spec %u", m_name.c_str(), GetGlyphSlot(slot), slot, spec);
+            continue;
+        }
+
+        if(gp->TypeFlags != gs->TypeFlags)
+        {
+            sLog.outError("Player %s has glyph with typeflags %u in slot with typeflags %u, removing.", m_name.c_str(), gp->TypeFlags, gs->TypeFlags);
+            continue;
+        }
+
+        m_glyphs[spec][slot].id = glyph;
+
+    } while( result->NextRow() );
+
+    delete result;
+
+
 }
 
 void Player::LoadCorpse()
@@ -16294,6 +16311,7 @@ void Player::SaveToDB()
     m_reputationMgr.SaveToDB();
     _SaveEquipmentSets();
     GetSession()->SaveTutorialsData();                      // changed only while character in game
+    _SaveGlyphs();
 
     CharacterDatabase.CommitTransaction();
 
@@ -16405,6 +16423,32 @@ void Player::_SaveAuras()
     // if something changed execute
     if (!first_round)
         CharacterDatabase.Execute( ss.str().c_str() );
+}
+
+void Player::_SaveGlyphs()
+{
+
+    for (uint8 spec = 0; spec < m_specsCount; ++spec)
+    {
+        for (uint8 slot = 0; slot < MAX_GLYPH_SLOT_INDEX; ++slot)
+        {
+            switch(m_glyphs[spec][slot].uState)
+            {
+                case GLYPH_NEW:
+                    CharacterDatabase.PExecute("INSERT INTO character_glyphs (guid, spec, slot, glyph) VALUES ('%u', '%u', '%u', '%u')", GetGUIDLow(), spec, slot, m_glyphs[spec][slot].GetId());
+                    break;
+                case GLYPH_CHANGED:
+                    CharacterDatabase.PExecute("UPDATE character_glyphs SET glyph = '%u' WHERE guid='%u' AND spec = '%u' AND slot = '%u'", m_glyphs[spec][slot].GetId(), GetGUIDLow(), spec, slot);
+                    break;
+                case GLYPH_DELETED:
+                    CharacterDatabase.PExecute("DELETE FROM character_glyphs WHERE guid='%u' AND spec = '%u' AND slot = '%u'",GetGUIDLow(), spec, slot);
+                    break;
+                case GLYPH_UNCHANGED:
+                    break;
+            }
+            m_glyphs[spec][slot].uState = GLYPH_UNCHANGED;
+        }
+    }
 }
 
 void Player::_SaveInventory()
@@ -20188,6 +20232,23 @@ void Player::InitGlyphsForLevel()
     SetUInt32Value(PLAYER_GLYPHS_ENABLED, value);
 }
 
+void Player::ApplyGlyphAuras(bool apply)
+{
+    for (uint8 i = 0; i < MAX_GLYPH_SLOT_INDEX; ++i)
+    {
+        if (uint32 glyph = GetGlyph(i))
+        {
+            if(GlyphPropertiesEntry const *gp = sGlyphPropertiesStore.LookupEntry(glyph))
+            {
+                if(apply)
+                    CastSpell(this, gp->SpellId, true);
+                else
+                    RemoveAurasDueToSpell(gp->SpellId);
+            }
+        }
+    }
+}
+
 void Player::EnterVehicle(Vehicle *vehicle)
 {
     VehicleEntry const *ve = sVehicleStore.LookupEntry(vehicle->GetVehicleId());
@@ -21070,8 +21131,9 @@ void Player::BuildPlayerTalentsInfoData(WorldPacket *data)
 
             *data << uint8(MAX_GLYPH_SLOT_INDEX);           // glyphs count
 
+            // GlyphProperties.dbc
             for(uint8 i = 0; i < MAX_GLYPH_SLOT_INDEX; ++i)
-                *data << uint16(GetGlyph(i));               // GlyphProperties.dbc
+                *data << uint16(m_glyphs[specIdx][i].GetId());
         }
     }
 }
@@ -21337,6 +21399,8 @@ void Player::ActivateSpec(uint8 specNum)
     // unlearn GetActiveSpec() talents (not learned in specNum);
     // learn specNum talents
 
+    ApplyGlyphAuras(false);
+
     SetActiveSpec(specNum);
 
     // recheck action buttons (not checked at loading/spec copy)
@@ -21345,6 +21409,8 @@ void Player::ActivateSpec(uint8 specNum)
         if (itr->second.uState != ACTIONBUTTON_DELETED)
            if (!IsActionButtonDataValid(itr->first,itr->second.GetAction(),itr->second.GetType(), this))
                removeActionButton(m_activeSpec,itr->first);
+
+    ApplyGlyphAuras(true);
 
     SendInitialActionButtons();
 

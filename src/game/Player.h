@@ -193,6 +193,52 @@ enum ActionButtonIndex
 
 typedef std::map<uint8,ActionButton> ActionButtonList;
 
+enum GlyphUpdateState
+{
+    GLYPH_UNCHANGED = 0,
+    GLYPH_CHANGED   = 1,
+    GLYPH_NEW       = 2,
+    GLYPH_DELETED   = 3
+};
+
+struct Glyph
+{
+    uint32 id;
+    GlyphUpdateState uState;
+
+    Glyph() : id(0), uState(GLYPH_UNCHANGED) { }
+    
+    Glyph(uint32 _id, GlyphUpdateState _uState) : id(_id), uState(_uState) { }
+
+    uint32 GetId() { return id; }
+
+    void SetId(uint32 newId)
+    {
+        if(newId == id)
+            return;
+
+        if(id == 0 && uState == GLYPH_UNCHANGED)            // not exist yet in db and already saved
+        {
+            uState = GLYPH_NEW;
+        }
+        else if (newId == 0)
+        {
+            if(uState == GLYPH_NEW)                         // delete before add new -> no change
+                uState = GLYPH_UNCHANGED;
+            else                                            // delete existing data
+                uState = GLYPH_DELETED;
+        }
+        else if (uState != GLYPH_NEW)                       // if not new data, change current data
+        {
+            uState = GLYPH_CHANGED;
+        }
+            
+        id = newId;
+    }
+};
+
+typedef std::map<uint16 /*pair16(spec, slot)*/,ActionButton> GlyphList;
+
 struct PlayerCreateInfoItem
 {
     PlayerCreateInfoItem(uint32 id, uint32 amount) : item_id(id), item_amount(amount) {}
@@ -847,7 +893,8 @@ enum PlayerLoginQueryIndex
     PLAYER_LOGIN_QUERY_LOADBGDATA               = 21,
     PLAYER_LOGIN_QUERY_LOADACCOUNTDATA          = 22,
     PLAYER_LOGIN_QUERY_LOADSKILLS               = 23,
-    MAX_PLAYER_LOGIN_QUERY                      = 24
+    PLAYER_LOGIN_QUERY_LOADGLYPHS               = 24,
+    MAX_PLAYER_LOGIN_QUERY                      = 25
 };
 
 enum PlayerDelayedOperations
@@ -1540,8 +1587,9 @@ class MANGOS_DLL_SPEC Player : public Unit
         void InitGlyphsForLevel();
         void SetGlyphSlot(uint8 slot, uint32 slottype) { SetUInt32Value(PLAYER_FIELD_GLYPH_SLOTS_1 + slot, slottype); }
         uint32 GetGlyphSlot(uint8 slot) { return GetUInt32Value(PLAYER_FIELD_GLYPH_SLOTS_1 + slot); }
-        void SetGlyph(uint8 slot, uint32 glyph) { SetUInt32Value(PLAYER_FIELD_GLYPHS_1 + slot, glyph); }
-        uint32 GetGlyph(uint8 slot) { return GetUInt32Value(PLAYER_FIELD_GLYPHS_1 + slot); }
+        void SetGlyph(uint8 slot, uint32 glyph) { m_glyphs[m_activeSpec][slot].SetId(glyph); SetUInt32Value(PLAYER_FIELD_GLYPHS_1 + slot, glyph); }
+        uint32 GetGlyph(uint8 slot) { return m_glyphs[m_activeSpec][slot].GetId(); }
+        void ApplyGlyphAuras(bool apply);
 
         uint32 GetFreePrimaryProfessionPoints() const { return GetUInt32Value(PLAYER_CHARACTER_POINTS2); }
         void SetFreePrimaryProfessions(uint16 profs) { SetUInt32Value(PLAYER_CHARACTER_POINTS2, profs); }
@@ -2275,7 +2323,6 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         void _LoadActions(QueryResult *result);
         void _LoadAuras(QueryResult *result, uint32 timediff);
-        void _LoadGlyphAuras();
         void _LoadBoundInstances(QueryResult *result);
         void _LoadInventory(QueryResult *result, uint32 timediff);
         void _LoadMailInit(QueryResult *resultUnread, QueryResult *resultDelivery);
@@ -2292,6 +2339,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void _LoadArenaTeamInfo(QueryResult *result);
         void _LoadEquipmentSets(QueryResult *result);
         void _LoadBGData(QueryResult* result);
+        void _LoadGlyphs(QueryResult *result);
 
         /*********************************************************/
         /***                   SAVE SYSTEM                     ***/
@@ -2307,6 +2355,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void _SaveSpells();
         void _SaveEquipmentSets();
         void _SaveBGData();
+        void _SaveGlyphs();
 
         void _SetCreateBits(UpdateMask *updateMask, Player *target) const;
         void _SetUpdateBits(UpdateMask *updateMask, Player *target) const;
@@ -2365,6 +2414,8 @@ class MANGOS_DLL_SPEC Player : public Unit
         uint8 m_specsCount;
 
         ActionButtonList m_actionButtons[MAX_TALENT_SPEC_COUNT];
+
+        Glyph m_glyphs[MAX_TALENT_SPEC_COUNT][MAX_GLYPH_SLOT_INDEX];
 
         float m_auraBaseMod[BASEMOD_END][MOD_END];
         int16 m_baseRatingValue[MAX_COMBAT_RATING];
