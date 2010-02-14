@@ -21,7 +21,7 @@
 
 DROP TABLE IF EXISTS `character_db_version`;
 CREATE TABLE `character_db_version` (
-  `required_9374_01_characters_character_glyphs` bit(1) default NULL
+  `required_9375_01_characters_character_glyphs` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Last applied sql update to DB';
 
 --
