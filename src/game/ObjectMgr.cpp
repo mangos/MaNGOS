@@ -6424,6 +6424,8 @@ void ObjectMgr::LoadReputationOnKill()
 
 void ObjectMgr::LoadPointsOfInterest()
 {
+    mPointsOfInterest.clear();                              // need for reload case
+
     uint32 count = 0;
 
     //                                                0      1  2  3      4     5
@@ -6476,6 +6478,8 @@ void ObjectMgr::LoadPointsOfInterest()
 
 void ObjectMgr::LoadQuestPOI()
 {
+    mQuestPOIMap.clear();                              // need for reload case
+
     uint32 count = 0;
 
     //                                                0        1         2      3     4     5     6

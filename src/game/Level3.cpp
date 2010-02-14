@@ -65,6 +65,7 @@ bool ChatHandler::HandleReloadAllCommand(const char*)
     HandleReloadAllQuestCommand("");
     HandleReloadAllSpellCommand("");
     HandleReloadAllItemCommand("");
+    HandleReloadAllGossipsCommand("");
     HandleReloadAllLocalesCommand("");
 
     HandleReloadMailLevelRewardCommand("");
@@ -99,9 +100,10 @@ bool ChatHandler::HandleReloadAllLootCommand(const char*)
     return true;
 }
 
-bool ChatHandler::HandleReloadAllNpcCommand(const char* /*args*/)
+bool ChatHandler::HandleReloadAllNpcCommand(const char* args)
 {
-    HandleReloadNpcGossipCommand("a");
+    if(*args!='a')                                          // will be reloaded from all_gossips
+        HandleReloadNpcGossipCommand("a");
     HandleReloadNpcTrainerCommand("a");
     HandleReloadNpcVendorCommand("a");
     HandleReloadPointsOfInterestCommand("a");
@@ -112,6 +114,7 @@ bool ChatHandler::HandleReloadAllNpcCommand(const char* /*args*/)
 bool ChatHandler::HandleReloadAllQuestCommand(const char* /*args*/)
 {
     HandleReloadQuestAreaTriggersCommand("a");
+    HandleReloadQuestPOICommand("a");
     HandleReloadQuestTemplateCommand("a");
 
     sLog.outString( "Re-Loading Quests Relations..." );
@@ -165,6 +168,17 @@ bool ChatHandler::HandleReloadAllSpellCommand(const char*)
     HandleReloadSpellThreatsCommand("a");
     HandleReloadSpellPetAurasCommand("a");
     HandleReloadSpellDisabledCommand("a");
+    return true;
+}
+
+bool ChatHandler::HandleReloadAllGossipsCommand(const char* args)
+{
+    HandleReloadGossipMenuCommand("a");
+    HandleReloadGossipMenuOptionCommand("a");
+    if(*args!='a')                                          // already reload from all_scripts
+        HandleReloadGossipScriptsCommand("a");
+    HandleReloadNpcGossipCommand("a");
+    HandleReloadPointsOfInterestCommand("a");
     return true;
 }
 
@@ -471,6 +485,14 @@ bool ChatHandler::HandleReloadPointsOfInterestCommand(const char*)
     sLog.outString( "Re-Loading `points_of_interest` Table!" );
     sObjectMgr.LoadPointsOfInterest();
     SendGlobalSysMessage("DB table `points_of_interest` reloaded.");
+    return true;
+}
+
+bool ChatHandler::HandleReloadQuestPOICommand(const char*)
+{
+    sLog.outString( "Re-Loading `quest_poi` and `quest_poi_points` Tables!" );
+    sObjectMgr.LoadQuestPOI();
+    SendGlobalSysMessage("DB Table `quest_poi` and `quest_poi_points` reloaded.");
     return true;
 }
 
