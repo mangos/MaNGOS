@@ -941,8 +941,8 @@ void Creature::SelectLevel(const CreatureInfo *cinfo)
 
     // TODO: set UNIT_FIELD_POWER*, for some creature class case (energy, etc)
 
-    SetModifierValue(UNIT_MOD_HEALTH, BASE_VALUE, health);
-    SetModifierValue(UNIT_MOD_MANA, BASE_VALUE, mana);
+    SetModifierValue(UNIT_MOD_HEALTH, BASE_VALUE, float(health));
+    SetModifierValue(UNIT_MOD_MANA, BASE_VALUE, float(mana));
 
     // damage
     float damagemod = _GetDamageMod(rank);

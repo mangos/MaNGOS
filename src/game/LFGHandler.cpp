@@ -425,7 +425,7 @@ void WorldSession::HandleLfgSetRoles(WorldPacket &recv_data)
     _player->m_lookingForGroup.roles = roles;
 }
 
-void WorldSession::SendLfgUpdate(uint8 unk1, uint8 unk2, uint8 unk3)
+void WorldSession::SendLfgUpdate(uint8 /*unk1*/, uint8 /*unk2*/, uint8 /*unk3*/)
 {
     // disabled
     /*WorldPacket data(SMSG_LFG_UPDATE, 3);

@@ -197,7 +197,7 @@ void SpellCastTargets::Update(Unit* caster)
         {
             Player* pTrader = ((Player*)caster)->GetTrader();
             if(pTrader && m_itemTargetGUID < TRADE_SLOT_COUNT)
-                m_itemTarget = pTrader->GetItemByPos(pTrader->GetItemPosByTradeSlot(m_itemTargetGUID));
+                m_itemTarget = pTrader->GetItemByPos(pTrader->GetItemPosByTradeSlot(uint32(m_itemTargetGUID)));
         }
         if(m_itemTarget)
             m_itemTargetEntry = m_itemTarget->GetEntry();
@@ -1389,11 +1389,11 @@ void Spell::SetTargetMap(uint32 effIndex, uint32 targetMode, UnitList& targetUni
     switch(targetMode)
     {
         case TARGET_RANDOM_NEARBY_LOC:
-            radius *= sqrt(rand_norm()); // Get a random point in circle. Use sqrt(rand) to correct distribution when converting polar to Cartesian coordinates.
+            radius *= sqrtf(rand_norm_f()); // Get a random point in circle. Use sqrt(rand) to correct distribution when converting polar to Cartesian coordinates.
                                          // no 'break' expected since we use code in case TARGET_RANDOM_CIRCUMFERENCE_POINT!!!
         case TARGET_RANDOM_CIRCUMFERENCE_POINT:
         {
-            float angle = 2.0 * M_PI * rand_norm();
+            float angle = 2.0f * M_PI_F * rand_norm_f();
             float dest_x, dest_y, dest_z;
             m_caster->GetClosePoint(dest_x, dest_y, dest_z, 0.0f, radius, angle);
             m_targets.setDestination(dest_x, dest_y, dest_z);
@@ -1403,8 +1403,8 @@ void Spell::SetTargetMap(uint32 effIndex, uint32 targetMode, UnitList& targetUni
         }
         case TARGET_RANDOM_NEARBY_DEST:
         {
-            radius *= sqrt(rand_norm()); // Get a random point in circle. Use sqrt(rand) to correct distribution when converting polar to Cartesian coordinates.
-            float angle = 2.0 * M_PI * rand_norm();
+            radius *= sqrtf(rand_norm_f()); // Get a random point in circle. Use sqrt(rand) to correct distribution when converting polar to Cartesian coordinates.
+            float angle = 2.0f * M_PI_F * rand_norm_f();
             float dest_x = m_targets.m_destX + cos(angle) * radius;
             float dest_y = m_targets.m_destY + sin(angle) * radius;
             float dest_z = m_caster->GetPositionZ();
@@ -2202,7 +2202,7 @@ void Spell::SetTargetMap(uint32 effIndex, uint32 targetMode, UnitList& targetUni
                 SpellRangeEntry const* rEntry = sSpellRangeStore.LookupEntry(m_spellInfo->rangeIndex);
                 float minRange = GetSpellMinRange(rEntry);
                 float maxRange = GetSpellMaxRange(rEntry);
-                float dist = minRange+ rand_norm()*(maxRange-minRange);
+                float dist = minRange+ rand_norm_f()*(maxRange-minRange);
 
                 float _target_x, _target_y, _target_z;
                 m_caster->GetClosePoint(_target_x, _target_y, _target_z, m_caster->GetObjectSize(), dist);
@@ -3802,7 +3802,7 @@ SpellCastResult Spell::CheckOrTakeRunePower(bool take)
     if(take)
     {
         // you can gain some runic power when use runes
-        float rp = src->runePowerGain;;
+        float rp = float(src->runePowerGain);
         rp *= sWorld.getRate(RATE_POWER_RUNICPOWER_INCOME);
         plr->ModifyPower(POWER_RUNIC_POWER, (int32)rp);
     }

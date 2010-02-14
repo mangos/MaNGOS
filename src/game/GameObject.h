@@ -620,10 +620,10 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
                 return now;
         }
 
-        void SetRespawnTime(int32 respawn)
+        void SetRespawnTime(time_t respawn)
         {
             m_respawnTime = respawn > 0 ? time(NULL) + respawn : 0;
-            m_respawnDelayTime = respawn > 0 ? respawn : 0;
+            m_respawnDelayTime = respawn > 0 ? uint32(respawn) : 0;
         }
         void Respawn();
         bool isSpawned() const

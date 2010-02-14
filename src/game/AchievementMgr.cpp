@@ -186,7 +186,7 @@ bool AchievementCriteriaRequirement::IsValid(AchievementCriteriaEntry const* cri
             }
             return true;
         case ACHIEVEMENT_CRITERIA_REQUIRE_T_LEVEL:
-            if (level.minlevel < 0 || level.minlevel > STRONG_MAX_LEVEL)
+            if (level.minlevel > STRONG_MAX_LEVEL)
             {
                 sLog.outErrorDb( "Table `achievement_criteria_requirement` (Entry: %u Type: %u) for requirement ACHIEVEMENT_CRITERIA_REQUIRE_T_LEVEL (%u) have wrong minlevel in value1 (%u), ignore.",
                     criteria->ID, criteria->requiredType,requirementType,level.minlevel);

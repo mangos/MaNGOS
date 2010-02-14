@@ -201,7 +201,7 @@ Cell::Visit(const CellPair &standing_cell, TypeContainerVisitor<T, CONTAINER> &v
     //there are nothing to optimize because SIZE_OF_GRID_CELL is too big...
     if(((end_cell.x_coord - begin_cell.x_coord) > 4) && ((end_cell.y_coord - begin_cell.y_coord) > 4))
     {
-        VisitCircle(standing_cell, visitor, m, begin_cell, end_cell);
+        VisitCircle(visitor, m, begin_cell, end_cell);
         return;
     }
 
@@ -228,7 +228,7 @@ Cell::Visit(const CellPair &standing_cell, TypeContainerVisitor<T, CONTAINER> &v
 
 template<class T, class CONTAINER>
 inline void
-Cell::VisitCircle(const CellPair &standing_cell, TypeContainerVisitor<T, CONTAINER> &visitor, Map &m, const CellPair& begin_cell, const CellPair& end_cell) const
+Cell::VisitCircle(TypeContainerVisitor<T, CONTAINER> &visitor, Map &m, const CellPair& begin_cell, const CellPair& end_cell) const
 {
     //here is an algorithm for 'filling' circum-squared octagon
     uint32 x_shift = (uint32)ceilf((end_cell.x_coord - begin_cell.x_coord) * 0.3f - 0.5f);

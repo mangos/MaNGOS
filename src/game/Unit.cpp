@@ -1519,7 +1519,7 @@ void Unit::CalculateMeleeDamage(Unit *pVictim, uint32 damage, CalcDamageInfo *da
             if(lowEnd > highEnd)                            // prevent negative range size
                 lowEnd = highEnd;
 
-            reducePercent = lowEnd + rand_norm() * ( highEnd - lowEnd );
+            reducePercent = lowEnd + rand_norm_f() * ( highEnd - lowEnd );
 
             damageInfo->cleanDamage += damageInfo->damage-uint32(reducePercent *  damageInfo->damage);
             damageInfo->damage   = uint32(reducePercent *  damageInfo->damage);
@@ -1619,7 +1619,7 @@ void Unit::DealMeleeDamage(CalcDamageInfo *damageInfo, bool durabilityLoss)
         }
         else
         {
-            float percent20 = pVictim->GetAttackTime(BASE_ATTACK) * 0.20;
+            float percent20 = pVictim->GetAttackTime(BASE_ATTACK) * 0.20f;
             float percent60 = 3.0f * percent20;
             if(basetime > percent20 && basetime <= percent60)
             {
@@ -1747,7 +1747,7 @@ uint32 Unit::CalcNotIgnoreDamageRedunction( uint32 damage, SpellSchoolMask damag
 uint32 Unit::CalcArmorReducedDamage(Unit* pVictim, const uint32 damage)
 {
     uint32 newdamage = 0;
-    float armor = pVictim->GetArmor();
+    float armor = (float)pVictim->GetArmor();
 
     // Ignore enemy armor by SPELL_AURA_MOD_TARGET_RESISTANCE aura
     armor += GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_TARGET_RESISTANCE, SPELL_SCHOOL_MASK_NORMAL);
@@ -1759,7 +1759,7 @@ uint32 Unit::CalcArmorReducedDamage(Unit* pVictim, const uint32 damage)
     if (armor < 0.0f)
         armor = 0.0f;
 
-    float levelModifier = getLevel();
+    float levelModifier = (float)getLevel();
     if (levelModifier > 59)
         levelModifier = levelModifier + (4.5f * (levelModifier-59));
 
@@ -1795,12 +1795,12 @@ void Unit::CalcAbsorbResist(Unit *pVictim,SpellSchoolMask schoolMask, DamageEffe
         if (tmpvalue2 > 0.75f)
             tmpvalue2 = 0.75f;
         uint32 ran = urand(0, 100);
-        uint32 faq[4] = {24,6,4,6};
+        float faq[4] = {24.0f,6.0f,4.0f,6.0f};
         uint8 m = 0;
         float Binom = 0.0f;
         for (uint8 i = 0; i < 4; ++i)
         {
-            Binom += 2400 *( powf(tmpvalue2, i) * powf( (1-tmpvalue2), (4-i)))/faq[i];
+            Binom += 2400 *( powf(tmpvalue2, float(i)) * powf( (1-tmpvalue2), float(4-i)))/faq[i];
             if (ran > Binom )
                 ++m;
             else
@@ -4865,7 +4865,7 @@ void Unit::SendAttackStateUpdate(CalcDamageInfo *damageInfo)
     SendMessageToSet( &data, true );
 }
 
-void Unit::SendAttackStateUpdate(uint32 HitInfo, Unit *target, uint8 SwingType, SpellSchoolMask damageSchoolMask, uint32 Damage, uint32 AbsorbDamage, uint32 Resist, VictimState TargetState, uint32 BlockedAmount)
+void Unit::SendAttackStateUpdate(uint32 HitInfo, Unit *target, uint8 /*SwingType*/, SpellSchoolMask damageSchoolMask, uint32 Damage, uint32 AbsorbDamage, uint32 Resist, VictimState TargetState, uint32 BlockedAmount)
 {
     CalcDamageInfo dmgInfo;
     dmgInfo.HitInfo = HitInfo;
@@ -6632,8 +6632,7 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                 if(procSpell->Id != 2484)
                     return false;
 
-                float chance = triggerAmount;
-                if (!roll_chance_f(chance))
+                if (!roll_chance_i(triggerAmount))
                     return false;
 
                 triggered_spell_id = 64695;
@@ -7809,7 +7808,7 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
     return true;
 }
 
-bool Unit::HandleOverrideClassScriptAuraProc(Unit *pVictim, uint32 damage, Aura *triggeredByAura, SpellEntry const *procSpell, uint32 cooldown)
+bool Unit::HandleOverrideClassScriptAuraProc(Unit *pVictim, uint32 /*damage*/, Aura *triggeredByAura, SpellEntry const *procSpell, uint32 cooldown)
 {
     int32 scriptId = triggeredByAura->GetModifier()->m_miscvalue;
 
@@ -9372,7 +9371,7 @@ uint32 Unit::SpellCriticalHealingBonus(SpellEntry const *spellProto, uint32 dama
     return damage;
 }
 
-uint32 Unit::SpellHealingBonus(Unit *pVictim, SpellEntry const *spellProto, uint32 healamount, DamageEffectType damagetype, uint32 stack)
+int32 Unit::SpellHealingBonus(Unit *pVictim, SpellEntry const *spellProto, int32 healamount, DamageEffectType damagetype, uint32 stack)
 {
     // For totems get healing bonus from owner (statue isn't totem in fact)
     if( GetTypeId()==TYPEID_UNIT && ((Creature*)this)->isTotem() && ((Totem*)this)->GetTotemType()!=TOTEM_STATUE)
@@ -9393,8 +9392,8 @@ uint32 Unit::SpellHealingBonus(Unit *pVictim, SpellEntry const *spellProto, uint
     // No heal amount for this class spells
     if (spellProto->DmgClass == SPELL_DAMAGE_CLASS_NONE)
     {
-        healamount = healamount * TakenTotalMod;
-        return healamount < 0 ? 0 : uint32(healamount);
+        healamount = healamount * int32(TakenTotalMod);
+        return healamount < 0 ? 0 : healamount;
     }
 
     // Healing Done
@@ -10677,7 +10676,7 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced)
             else             // Use not mount (shapeshift for example) auras (should stack)
                 main_speed_mod  = GetTotalAuraModifier(SPELL_AURA_MOD_SPEED_FLIGHT);
             stack_bonus     = GetTotalAuraMultiplier(SPELL_AURA_MOD_FLIGHT_SPEED_ALWAYS);
-            non_stack_bonus = (100.0 + GetMaxPositiveAuraModifier(SPELL_AURA_MOD_FLIGHT_SPEED_NOT_STACK))/100.0f;
+            non_stack_bonus = (100.0f + GetMaxPositiveAuraModifier(SPELL_AURA_MOD_FLIGHT_SPEED_NOT_STACK))/100.0f;
             break;
         }
         case MOVE_FLIGHT_BACK:
@@ -11978,7 +11977,7 @@ void CharmInfo::LoadPetActionBar(const std::string& data )
     for(iter = tokens.begin(), index = ACTION_BAR_INDEX_START; index < ACTION_BAR_INDEX_END; ++iter, ++index )
     {
         // use unsigned cast to avoid sign negative format use at long-> ActiveStates (int) conversion
-        uint8 type  = atol((*iter).c_str());
+        uint8 type  = (uint8)atol((*iter).c_str());
         ++iter;
         uint32 action = atol((*iter).c_str());
 
@@ -12552,7 +12551,7 @@ void Unit::SetConfused(bool apply, uint64 const& casterGUID, uint32 spellID)
         ((Player*)this)->SetClientControl(this, !apply);
 }
 
-void Unit::SetFeignDeath(bool apply, uint64 const& casterGUID, uint32 spellID)
+void Unit::SetFeignDeath(bool apply, uint64 const& casterGUID, uint32 /*spellID*/)
 {
     if( apply )
     {
@@ -13270,7 +13269,7 @@ void Unit::SetFFAPvP( bool state )
 
 void Unit::KnockBackFrom(Unit* target, float horizintalSpeed, float verticalSpeed)
 {
-    float angle = this == target ? GetOrientation() + M_PI : target->GetAngle(this);
+    float angle = this == target ? GetOrientation() + M_PI_F : target->GetAngle(this);
     float vsin = sin(angle);
     float vcos = cos(angle);
 
@@ -13298,7 +13297,7 @@ void Unit::KnockBackFrom(Unit* target, float horizintalSpeed, float verticalSpee
         float fz = oz;
 
         float fx2, fy2, fz2;                                // getObjectHitPos overwrite last args in any result case
-        if(VMAP::VMapFactory::createOrGetVMapManager()->getObjectHitPos(GetMapId(), ox,oy,oz+0.5, fx,fy,oz+0.5,fx2,fy2,fz2, -0.5))
+        if(VMAP::VMapFactory::createOrGetVMapManager()->getObjectHitPos(GetMapId(), ox,oy,oz+0.5f, fx,fy,oz+0.5f,fx2,fy2,fz2, -0.5f))
         {
             fx = fx2;
             fy = fy2;

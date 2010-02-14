@@ -1604,7 +1604,7 @@ void Aura::TriggerSpell()
 
                             // casted in left/right (but triggered spell have wide forward cone)
                             float forward = m_target->GetOrientation();
-                            float angle = m_target->GetOrientation() + ( tick % 2 == 0 ? M_PI / 2 : - M_PI / 2);
+                            float angle = m_target->GetOrientation() + ( tick % 2 == 0 ? M_PI_F / 2 : - M_PI_F / 2);
                             m_target->SetOrientation(angle);
                             target->CastSpell(target, trigger_spell_id, true, NULL, this, casterGUID);
                             m_target->SetOrientation(forward);
@@ -1753,7 +1753,7 @@ void Aura::TriggerSpell()
                     // Doomfire
                     case 31944:
                     {
-                        int32 damage = m_modifier.m_amount * ((float)(GetAuraDuration() + m_modifier.periodictime) / GetAuraMaxDuration());
+                        int32 damage = m_modifier.m_amount * ((GetAuraDuration() + m_modifier.periodictime) / GetAuraMaxDuration());
                         target->CastCustomSpell(target, 31969, &damage, NULL, NULL, true, NULL, this, casterGUID);
                         return;
                     }
@@ -3697,7 +3697,7 @@ void Aura::HandleModCharm(bool apply, bool Real)
                     //just to enable stat window
                     charmInfo->SetPetNumber(sObjectMgr.GeneratePetNumber(), true);
                     //if charmed two demons the same session, the 2nd gets the 1st one's name
-                    m_target->SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, time(NULL));
+                    m_target->SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, uint32(time(NULL)));
                 }
             }
         }
@@ -6852,7 +6852,7 @@ void Aura::PeriodicTick()
             if(Player *modOwner = pCaster->GetSpellModOwner())
                 modOwner->ApplySpellMod(GetId(), SPELLMOD_MULTIPLE_VALUE, multiplier);
 
-            uint32 heal = pCaster->SpellHealingBonus(pCaster, GetSpellProto(), uint32(new_damage * multiplier), DOT, GetStackAmount());
+            int32 heal = pCaster->SpellHealingBonus(pCaster, GetSpellProto(), int32(new_damage * multiplier), DOT, GetStackAmount());
 
             int32 gain = pCaster->DealHeal(pCaster, heal, GetSpellProto());
             pCaster->getHostileRefManager().threatAssist(pCaster, gain * 0.5f, GetSpellProto());
@@ -7891,7 +7891,7 @@ bool Aura::IsCritFromAbilityAura(Unit* caster, uint32& damage)
     return false;
 }
 
-void Aura::HandleModTargetArmorPct(bool apply, bool Real)
+void Aura::HandleModTargetArmorPct(bool /*apply*/, bool /*Real*/)
 {
     if(m_target->GetTypeId() != TYPEID_PLAYER)
         return;

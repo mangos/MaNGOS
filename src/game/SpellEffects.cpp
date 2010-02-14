@@ -2042,7 +2042,7 @@ void Spell::EffectDummy(uint32 i)
                     if (unitTarget->GetCreatureType() != CREATURE_TYPE_UNDEAD)
                         return;
 
-                    int32 bp = damage * 1.5f;
+                    int32 bp = int32(damage * 1.5f);
                     m_caster->CastCustomSpell(unitTarget, 47633, &bp, NULL, NULL, true);
                 }
                 else
@@ -2076,7 +2076,7 @@ void Spell::EffectDummy(uint32 i)
                     }
                 }
 
-                int32 bp = count * m_caster->GetMaxHealth() * m_spellInfo->DmgMultiplier[0] / 100;
+                int32 bp = int32(count * m_caster->GetMaxHealth() * m_spellInfo->DmgMultiplier[0] / 100);
                 m_caster->CastCustomSpell(m_caster, 45470, &bp, NULL, NULL, true);
                 return;
             }
@@ -2826,7 +2826,7 @@ void Spell::EffectHealMechanical( uint32 /*i*/ )
         if (!caster)
             return;
 
-        uint32 addhealth = caster->SpellHealingBonus(unitTarget, m_spellInfo, uint32(damage), HEAL);
+        uint32 addhealth = caster->SpellHealingBonus(unitTarget, m_spellInfo, damage, HEAL);
         caster->DealHeal(unitTarget, addhealth, m_spellInfo);
     }
 }
@@ -2853,7 +2853,7 @@ void Spell::EffectHealthLeech(uint32 i)
     if (Player *modOwner = m_caster->GetSpellModOwner())
         modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_MULTIPLE_VALUE, multiplier);
 
-    uint32 heal = uint32(damage*multiplier);
+    int32 heal = int32(damage*multiplier);
     if (m_caster->isAlive())
     {
         heal = m_caster->SpellHealingBonus(m_caster, m_spellInfo, heal, HEAL);
@@ -3021,7 +3021,7 @@ void Spell::EffectCreateItem2(uint32 i)
     }
 }
 
-void Spell::EffectCreateRandomItem(uint32 i)
+void Spell::EffectCreateRandomItem(uint32 /*eff_idx*/)
 {
     if (m_caster->GetTypeId()!=TYPEID_PLAYER)
         return;
@@ -4052,7 +4052,7 @@ void Spell::EffectAddHonor(uint32 /*i*/)
     // not scale value for item based reward (/10 value expected)
     if (m_CastItem)
     {
-        ((Player*)unitTarget)->RewardHonor(NULL, 1, damage / 10);
+        ((Player*)unitTarget)->RewardHonor(NULL, 1, float(damage / 10));
         sLog.outDebug("SpellEffect::AddHonor (spell_id %u) rewards %d honor points (item %u) for player: %u", m_spellInfo->Id, damage/10, m_CastItem->GetEntry(),((Player*)unitTarget)->GetGUIDLow());
         return;
     }
@@ -4060,14 +4060,14 @@ void Spell::EffectAddHonor(uint32 /*i*/)
     // do not allow to add too many honor for player (50 * 21) = 1040 at level 70, or (50 * 31) = 1550 at level 80
     if (damage <= 50)
     {
-        uint32 honor_reward = MaNGOS::Honor::hk_honor_at_level(unitTarget->getLevel(), damage);
+        float honor_reward = MaNGOS::Honor::hk_honor_at_level(unitTarget->getLevel(), damage);
         ((Player*)unitTarget)->RewardHonor(NULL, 1, honor_reward);
         sLog.outDebug("SpellEffect::AddHonor (spell_id %u) rewards %u honor points (scale) to player: %u", m_spellInfo->Id, honor_reward, ((Player*)unitTarget)->GetGUIDLow());
     }
     else
     {
         //maybe we have correct honor_gain in damage already
-        ((Player*)unitTarget)->RewardHonor(NULL, 1, damage);
+        ((Player*)unitTarget)->RewardHonor(NULL, 1, (float)damage);
         sLog.outError("SpellEffect::AddHonor (spell_id %u) rewards %u honor points (non scale) for player: %u", m_spellInfo->Id, damage, ((Player*)unitTarget)->GetGUIDLow());
     }
 }
@@ -4473,7 +4473,7 @@ void Spell::EffectSummonPet(uint32 i)
     NewSummon->setFaction(faction);
     NewSummon->SetUInt32Value(UNIT_FIELD_BYTES_0, 2048);
     NewSummon->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
-    NewSummon->SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, time(NULL));
+    NewSummon->SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, uint32(time(NULL)));
     NewSummon->SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
     NewSummon->SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, 1000);
     NewSummon->SetUInt32Value(UNIT_CREATED_BY_SPELL, m_spellInfo->Id);
@@ -5995,7 +5995,7 @@ void Spell::EffectSummonTotem(uint32 i, uint8 slot)
         return;
     }
 
-    float angle = slot < MAX_TOTEM ? M_PI/MAX_TOTEM - (slot*2*M_PI/MAX_TOTEM) : 0;
+    float angle = slot < MAX_TOTEM ? M_PI_F/MAX_TOTEM - (slot*2*M_PI_F/MAX_TOTEM) : 0;
 
     float x, y, z;
     m_caster->GetClosePoint(x, y, z, pTotem->GetObjectSize(), 2.0f, angle);
@@ -6304,7 +6304,7 @@ void Spell::EffectLeapForward(uint32 i)
         unitTarget->GetPosition(ox, oy, oz);
 
         float fx2, fy2, fz2;                                // getObjectHitPos overwrite last args in any result case
-        if(VMAP::VMapFactory::createOrGetVMapManager()->getObjectHitPos(unitTarget->GetMapId(), ox,oy,oz+0.5, fx,fy,oz+0.5,fx2,fy2,fz2, -0.5))
+        if(VMAP::VMapFactory::createOrGetVMapManager()->getObjectHitPos(unitTarget->GetMapId(), ox,oy,oz+0.5f, fx,fy,oz+0.5f,fx2,fy2,fz2, -0.5f))
         {
             fx = fx2;
             fy = fy2;
@@ -6572,7 +6572,7 @@ void Spell::EffectPlayerPull(uint32 i)
 
     float dist = unitTarget->GetDistance2d(m_caster);
     if (damage && dist > damage)
-        dist = damage;
+        dist = float(damage);
 
     unitTarget->KnockBackFrom(m_caster,-dist,float(m_spellInfo->EffectMiscValue[i])/10);
 }
@@ -6754,7 +6754,7 @@ void Spell::EffectTransmitted(uint32 effIndex)
     {
         float min_dis = GetSpellMinRange(sSpellRangeStore.LookupEntry(m_spellInfo->rangeIndex));
         float max_dis = GetSpellMaxRange(sSpellRangeStore.LookupEntry(m_spellInfo->rangeIndex));
-        float dis = rand_norm() * (max_dis - min_dis) + min_dis;
+        float dis = rand_norm_f() * (max_dis - min_dis) + min_dis;
 
         m_caster->GetClosePoint(fx, fy, fz, DEFAULT_WORLD_OBJECT_SIZE, dis);
     }

@@ -231,7 +231,7 @@ bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool 
     InitStatsForLevel(petlevel);
     InitTalentForLevel();                                   // set original talents points before spell loading
 
-    SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, time(NULL));
+    SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, uint32(time(NULL)));
     SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, fields[5].GetUInt32());
     SetCreatorGUID(owner->GetGUID());
 
@@ -259,7 +259,7 @@ bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool 
         m_charmInfo->LoadPetActionBar(fields[13].GetCppString());
 
     // since last save (in seconds)
-    uint32 timediff = (time(NULL) - fields[14].GetUInt32());
+    uint32 timediff = uint32(time(NULL) - fields[14].GetUInt32());
 
     m_resetTalentsCost = fields[15].GetUInt32();
     m_resetTalentsTime = fields[16].GetUInt64();
@@ -873,7 +873,7 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
                     case CLASS_MAGE:
                     {
                                                             //40% damage bonus of mage's frost damage
-                        float val = owner->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + SPELL_SCHOOL_FROST) * 0.4;
+                        float val = owner->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + SPELL_SCHOOL_FROST) * 0.4f;
                         if(val < 0)
                             val = 0;
                         SetBonusDamage( int32(val));
@@ -1032,7 +1032,7 @@ void Pet::_LoadSpellCooldowns()
     {
         time_t curTime = time(NULL);
 
-        WorldPacket data(SMSG_SPELL_COOLDOWN, (8+1+result->GetRowCount()*8));
+        WorldPacket data(SMSG_SPELL_COOLDOWN, (8+1+size_t(result->GetRowCount())*8));
         data << GetGUID();
         data << uint8(0x0);                                 // flags (0x1, 0x2)
 
@@ -1742,7 +1742,7 @@ void Pet::InitTalentForLevel()
 
 uint32 Pet::resetTalentsCost() const
 {
-    uint32 days = (sWorld.GetGameTime() - m_resetTalentsTime)/DAY;
+    uint32 days = uint32(sWorld.GetGameTime() - m_resetTalentsTime)/DAY;
 
     // The first time reset costs 10 silver; after 1 day cost is reset to 10 silver
     if(m_resetTalentsCost < 10*SILVER || days > 0)

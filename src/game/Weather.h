@@ -60,7 +60,7 @@ class Weather
         void SetWeather(WeatherType type, float grade);
         /// For which zone is this weather?
         uint32 GetZone() { return m_zone; };
-        bool Update(uint32 diff);
+        bool Update(time_t diff);
     private:
         WeatherState GetWeatherState() const;
         uint32 m_zone;

@@ -331,7 +331,7 @@ void WorldSession::DoLootRelease( uint64 lguid )
                                 ReqValue = lockInfo->Skill[0];
                             float skill = float(player->GetSkillValue(SKILL_MINING))/(ReqValue+25);
                             double chance = pow(0.8*chance_rate,4*(1/double(max_amount))*double(uses));
-                            if(roll_chance_f(100*chance+skill))
+                            if(roll_chance_f(float(100.0f*chance+skill)))
                             {
                                 go->SetLootState(GO_READY);
                             }

@@ -249,27 +249,27 @@ FleeingMovementGenerator<T>::_setMoveData(T &owner)
 
     if(i_cur_angle == 0.0f && i_last_distance_from_caster == 0.0f) //just started, first time
     {
-        angle = rand_norm()*(1.0f - cur_dist/MIN_QUIET_DISTANCE) * M_PI_F/3 + rand_norm()*M_PI_F*2/3;
+        angle = rand_norm_f()*(1.0f - cur_dist/MIN_QUIET_DISTANCE) * M_PI_F/3 + rand_norm_f()*M_PI_F*2/3;
         i_to_distance_from_caster = MIN_QUIET_DISTANCE;
         i_only_forward = true;
     }
     else if(cur_dist < MIN_QUIET_DISTANCE)
     {
-        angle = M_PI_F/6 + rand_norm()*M_PI_F*2/3;
-        i_to_distance_from_caster = cur_dist*2/3 + rand_norm()*(MIN_QUIET_DISTANCE - cur_dist*2/3);
+        angle = M_PI_F/6 + rand_norm_f()*M_PI_F*2/3;
+        i_to_distance_from_caster = cur_dist*2/3 + rand_norm_f()*(MIN_QUIET_DISTANCE - cur_dist*2/3);
     }
     else if(cur_dist > MAX_QUIET_DISTANCE)
     {
-        angle = rand_norm()*M_PI_F/3 + M_PI_F*2/3;
-        i_to_distance_from_caster = MIN_QUIET_DISTANCE + 2.5f + rand_norm()*(MAX_QUIET_DISTANCE - MIN_QUIET_DISTANCE - 2.5f);
+        angle = rand_norm_f()*M_PI_F/3 + M_PI_F*2/3;
+        i_to_distance_from_caster = MIN_QUIET_DISTANCE + 2.5f + rand_norm_f()*(MAX_QUIET_DISTANCE - MIN_QUIET_DISTANCE - 2.5f);
     }
     else
     {
-        angle = rand_norm()*M_PI_F;
-        i_to_distance_from_caster = MIN_QUIET_DISTANCE + 2.5f + rand_norm()*(MAX_QUIET_DISTANCE - MIN_QUIET_DISTANCE - 2.5f);
+        angle = rand_norm_f()*M_PI_F;
+        i_to_distance_from_caster = MIN_QUIET_DISTANCE + 2.5f + rand_norm_f()*(MAX_QUIET_DISTANCE - MIN_QUIET_DISTANCE - 2.5f);
     }
 
-    int8 sign = rand_norm() > 0.5f ? 1 : -1;
+    int8 sign = rand_norm_f() > 0.5f ? 1 : -1;
     i_cur_angle = sign*angle + angle_to_caster;
 
     // current distance

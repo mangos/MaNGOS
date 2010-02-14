@@ -66,7 +66,7 @@ void WaypointManager::Load()
         sLog.outString( ">> Loaded 0 paths. DB table `creature_movement` is empty." );
         return;
     } else {
-        total_paths = result->GetRowCount();
+        total_paths = (uint32)result->GetRowCount();
         barGoLink bar( total_paths );
         do
         {

@@ -251,7 +251,7 @@ World::AddSession_ (WorldSession* s)
     // Updates the population
     if (pLimit > 0)
     {
-        float popu = GetActiveSessionCount ();              // updated number of users on the server
+        float popu = float(GetActiveSessionCount());        // updated number of users on the server
         popu /= pLimit;
         popu *= 2;
         loginDatabase.PExecute ("UPDATE realmlist SET population = '%f' WHERE id = '%d'", popu, realmID);
@@ -852,28 +852,28 @@ void World::LoadConfigSettings(bool reload)
     m_configs[CONFIG_SKILL_MILLING] = sConfig.GetBoolDefault("SkillChance.Milling",false);
 
     m_configs[CONFIG_SKILL_GAIN_CRAFTING]  = sConfig.GetIntDefault("SkillGain.Crafting", 1);
-    if(m_configs[CONFIG_SKILL_GAIN_CRAFTING] < 0)
+    if(m_configs[CONFIG_SKILL_GAIN_CRAFTING] < 0)           // warning: comparison of unsigned expression < 0 is always false
     {
         sLog.outError("SkillGain.Crafting (%i) can't be negative. Set to 1.",m_configs[CONFIG_SKILL_GAIN_CRAFTING]);
         m_configs[CONFIG_SKILL_GAIN_CRAFTING] = 1;
     }
 
     m_configs[CONFIG_SKILL_GAIN_DEFENSE]  = sConfig.GetIntDefault("SkillGain.Defense", 1);
-    if(m_configs[CONFIG_SKILL_GAIN_DEFENSE] < 0)
+    if(m_configs[CONFIG_SKILL_GAIN_DEFENSE] < 0)            // warning: comparison of unsigned expression < 0 is always false
     {
         sLog.outError("SkillGain.Defense (%i) can't be negative. Set to 1.",m_configs[CONFIG_SKILL_GAIN_DEFENSE]);
         m_configs[CONFIG_SKILL_GAIN_DEFENSE] = 1;
     }
 
     m_configs[CONFIG_SKILL_GAIN_GATHERING]  = sConfig.GetIntDefault("SkillGain.Gathering", 1);
-    if(m_configs[CONFIG_SKILL_GAIN_GATHERING] < 0)
+    if(m_configs[CONFIG_SKILL_GAIN_GATHERING] < 0)          // warning: comparison of unsigned expression < 0 is always false
     {
         sLog.outError("SkillGain.Gathering (%i) can't be negative. Set to 1.",m_configs[CONFIG_SKILL_GAIN_GATHERING]);
         m_configs[CONFIG_SKILL_GAIN_GATHERING] = 1;
     }
 
     m_configs[CONFIG_SKILL_GAIN_WEAPON]  = sConfig.GetIntDefault("SkillGain.Weapon", 1);
-    if(m_configs[CONFIG_SKILL_GAIN_WEAPON] < 0)
+    if(m_configs[CONFIG_SKILL_GAIN_WEAPON] < 0)             // warning: comparison of unsigned expression < 0 is always false
     {
         sLog.outError("SkillGain.Weapon (%i) can't be negative. Set to 1.",m_configs[CONFIG_SKILL_GAIN_WEAPON]);
         m_configs[CONFIG_SKILL_GAIN_WEAPON] = 1;
@@ -1491,9 +1491,9 @@ void World::SetInitialWorldSettings()
     //to set mailtimer to return mails every day between 4 and 5 am
     //mailtimer is increased when updating auctions
     //one second is 1000 -(tested on win system)
-    mail_timer = ((((localtime( &m_gameTime )->tm_hour + 20) % 24)* HOUR * IN_MILISECONDS) / m_timers[WUPDATE_AUCTIONS].GetInterval() );
+    mail_timer = uint32((((localtime( &m_gameTime )->tm_hour + 20) % 24)* HOUR * IN_MILISECONDS) / m_timers[WUPDATE_AUCTIONS].GetInterval() );
                                                             //1440
-    mail_timer_expires = ( (DAY * IN_MILISECONDS) / (m_timers[WUPDATE_AUCTIONS].GetInterval()));
+    mail_timer_expires = uint32( (DAY * IN_MILISECONDS) / (m_timers[WUPDATE_AUCTIONS].GetInterval()));
     sLog.outDebug("Mail timer set to: %u, mail return is called every %u minutes", mail_timer, mail_timer_expires);
 
     ///- Initilize static helper structures
@@ -1644,7 +1644,7 @@ void World::Update(uint32 diff)
     /// <li> Update uptime table
     if (m_timers[WUPDATE_UPTIME].Passed())
     {
-        uint32 tmpDiff = (m_gameTime - m_startTime);
+        uint32 tmpDiff = uint32(m_gameTime - m_startTime);
         uint32 maxClientsNum = GetMaxActiveSessionCount();
 
         m_timers[WUPDATE_UPTIME].Reset();

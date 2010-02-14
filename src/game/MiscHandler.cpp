@@ -732,8 +732,8 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
         float playerBoxDistX = pl->GetPositionX() - atEntry->x;
         float playerBoxDistY = pl->GetPositionY() - atEntry->y;
 
-        float rotPlayerX = atEntry->x + playerBoxDistX * cosVal - playerBoxDistY*sinVal;
-        float rotPlayerY = atEntry->y + playerBoxDistY * cosVal + playerBoxDistX*sinVal;
+        float rotPlayerX = float(atEntry->x + playerBoxDistX * cosVal - playerBoxDistY*sinVal);
+        float rotPlayerY = float(atEntry->y + playerBoxDistY * cosVal + playerBoxDistX*sinVal);
 
         // box edges are parallel to coordiante axis, so we can treat every dimension independently :D
         float dz = pl->GetPositionZ() - atEntry->z;
@@ -1556,7 +1556,7 @@ void WorldSession::HandleQueryInspectAchievements( WorldPacket & recv_data )
         player->GetAchievementMgr().SendRespondInspectAchievements(_player);
 }
 
-void WorldSession::HandleWorldStateUITimerUpdate(WorldPacket& recv_data)
+void WorldSession::HandleWorldStateUITimerUpdate(WorldPacket& /*recv_data*/)
 {
     // empty opcode
     sLog.outDebug("WORLD: CMSG_WORLD_STATE_UI_TIMER_UPDATE");
@@ -1566,7 +1566,7 @@ void WorldSession::HandleWorldStateUITimerUpdate(WorldPacket& recv_data)
     SendPacket(&data);
 }
 
-void WorldSession::HandleReadyForAccountDataTimes(WorldPacket& recv_data)
+void WorldSession::HandleReadyForAccountDataTimes(WorldPacket& /*recv_data*/)
 {
     // empty opcode
     sLog.outDebug("WORLD: CMSG_READY_FOR_ACCOUNT_DATA_TIMES");
