@@ -289,7 +289,7 @@ struct Areas
 };
 
 #define MAX_RUNES       6
-#define RUNE_COOLDOWN   10000                               // msec
+#define RUNE_COOLDOWN   (2*5*IN_MILISECONDS)                // msec
 
 enum RuneType
 {
