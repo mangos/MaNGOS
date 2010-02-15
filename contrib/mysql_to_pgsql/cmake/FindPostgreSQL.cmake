@@ -11,24 +11,9 @@ IF (PGSQL_INCLUDE_DIR)
   SET(PostgreSQL_FIND_QUIETLY TRUE)
 ENDIF (PGSQL_INCLUDE_DIR)
 
-# the registry settings checked are in order:
-# - for pgInstaller 8.2.x postgresql version
-# - for pgInstaller 8.3.x postgresql version
-SET(PGSQL_WIN_BASE
- "[HKEY_LOCAL_MACHINE\\SOFTWARE\\PostgreSQL\\Installations\\{B823632F-3B72-4514-8861-B961CE263224};Base Directory]"
- "[HKEY_LOCAL_MACHINE\\SOFTWARE\\PostgreSQL\\Installations\\{1F701DBD-1660-4108-B10A-FB435EA63BF0};Base Directory]")
-
-IF(PGSQL_WIN_BASE)
-  IF(MSVC)
-    SET(PGSQL_SEARCH_LIB_PATHS "${PGSQL_WIN_BASE}/lib/ms")
-  ELSE(MSVC)
-    SET(PGSQL_SEARCH_LIB_PATHS "${PGSQL_WIN_BASE}/lib")
-  ENDIF(MSVC)
-ENDIF(PGSQL_WIN_BASE)
-
 FIND_PATH(PGSQL_INCLUDE_DIR libpq-fe.h
-  "[HKEY_LOCAL_MACHINE\\SOFTWARE\\PostgreSQL\\Installations\\{1F701DBD-1660-4108-B10A-FB435EA63BF0};Base Directory]/include"
-  "[HKEY_LOCAL_MACHINE\\SOFTWARE\\PostgreSQL\\Installations\\{B823632F-3B72-4514-8861-B961CE263224};Base Directory]/include"
+  $ENV{ProgramFiles}/PostgreSQL/*/include
+  $ENV{SystemDrive}/PostgreSQL/*/include
   /usr/local/pgsql/include
   /usr/local/postgresql/include
   /usr/local/include/pgsql
@@ -44,8 +29,8 @@ FIND_PATH(PGSQL_INCLUDE_DIR libpq-fe.h
 SET(PGSQL_NAMES pq libpq)
 SET(PGSQL_SEARCH_LIB_PATHS
   ${PGSQL_SEARCH_LIB_PATHS}
-  "[HKEY_LOCAL_MACHINE\\SOFTWARE\\PostgreSQL\\Installations\\{1F701DBD-1660-4108-B10A-FB435EA63BF0};Base Directory]/lib"
-  "[HKEY_LOCAL_MACHINE\\SOFTWARE\\PostgreSQL\\Installations\\{B823632F-3B72-4514-8861-B961CE263224};Base Directory]/lib"
+  $ENV{ProgramFiles}/PostgreSQL/*/lib
+  $ENV{SystemDrive}/PostgreSQL/*/lib
   /usr/local/pgsql/lib
   /usr/local/lib
   /usr/lib
