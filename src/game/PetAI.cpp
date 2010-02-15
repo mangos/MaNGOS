@@ -311,7 +311,7 @@ void PetAI::UpdateAI(const uint32 diff)
 
 bool PetAI::_isVisible(Unit *u) const
 {
-    return m_creature->IsWithinDist(u,sWorld.getRate(RATE_SIGHT_GUARDER))
+    return m_creature->IsWithinDist(u,sWorld.getConfig(CONFIG_FLOAT_SIGHT_GUARDER))
         && u->isVisibleForOrDetect(m_creature,m_creature,true);
 }
 

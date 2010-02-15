@@ -221,7 +221,7 @@ void WorldSession::HandleLootMoneyOpcode( WorldPacket & /*recv_data*/ )
                 Player* playerGroup = itr->getSource();
                 if(!playerGroup)
                     continue;
-                if (player->IsWithinDistInMap(playerGroup,sWorld.getRate(RATE_GROUP_XP_DISTANCE),false))
+                if (player->IsWithinDistInMap(playerGroup,sWorld.getConfig(CONFIG_FLOAT_GROUP_XP_DISTANCE),false))
                     playersNear.push_back(playerGroup);
             }
 
@@ -312,7 +312,7 @@ void WorldSession::DoLootRelease( uint64 lguid )
                 // only vein pass this check
                 if(go_min != 0 && go_max > go_min)
                 {
-                    float amount_rate = sWorld.getRate(RATE_MINING_AMOUNT);
+                    float amount_rate = sWorld.getConfig(CONFIG_FLOAT_RATE_MINING_AMOUNT);
                     float min_amount = go_min*amount_rate;
                     float max_amount = go_max*amount_rate;
 
@@ -323,7 +323,7 @@ void WorldSession::DoLootRelease( uint64 lguid )
                     {
                         if(uses >= min_amount)
                         {
-                            float chance_rate = sWorld.getRate(RATE_MINING_NEXT);
+                            float chance_rate = sWorld.getConfig(CONFIG_FLOAT_RATE_MINING_NEXT);
 
                             int32 ReqValue = 175;
                             LockEntry const *lockInfo = sLockStore.LookupEntry(go->GetGOInfo()->chest.lockId);
