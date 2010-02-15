@@ -44,7 +44,7 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Texts(bool check_entry_use)
     sLog.outString("Loading EventAI Texts additional data...");
     if (result)
     {
-        barGoLink bar(result->GetRowCount());
+        barGoLink bar((int)result->GetRowCount());
         uint32 count = 0;
 
         do
@@ -159,7 +159,7 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Summons(bool check_entry_use)
     QueryResult *result = WorldDatabase.Query("SELECT id, position_x, position_y, position_z, orientation, spawntimesecs FROM creature_ai_summons");
     if (result)
     {
-        barGoLink bar(result->GetRowCount());
+        barGoLink bar((int)result->GetRowCount());
         uint32 Count = 0;
 
         do
@@ -253,7 +253,7 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Scripts()
         "FROM creature_ai_scripts");
     if (result)
     {
-        barGoLink bar(result->GetRowCount());
+        barGoLink bar((int)result->GetRowCount());
         uint32 Count = 0;
 
         do

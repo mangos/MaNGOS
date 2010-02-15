@@ -62,6 +62,8 @@ MANGOS_DLL_SPEC float rand_norm_f(void);
  * With an FPU, there is usually no difference in performance between float and double. */
 MANGOS_DLL_SPEC double rand_chance(void);
 
+MANGOS_DLL_SPEC float rand_chance_f(void);
+
 /* Return true if a random roll fits in the specified chance (range 0-100). */
 inline bool roll_chance_f(float chance)
 {

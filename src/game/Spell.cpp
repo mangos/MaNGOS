@@ -2555,6 +2555,19 @@ void Spell::cast(bool skipCheck)
 {
     SetExecutedCurrently(true);
 
+    if (!m_caster->CheckAndIncreaseCastCounter())
+    {
+        if (m_triggeredByAuraSpell)
+            sLog.outError("Spell %u triggered by aura spell %u too deep in cast chain for cast. Cast not allowed for prevent overflow stack crash.");
+        else
+            sLog.outError("Spell %u too deep in cast chain for cast. Cast not allowed for prevent overflow stack crash.");
+
+        SendCastResult(SPELL_FAILED_ERROR);
+        finish(false);
+        SetExecutedCurrently(false);
+        return;
+    }
+
     // update pointers base at GUIDs to prevent access to non-existed already object
     UpdatePointers();
 
@@ -2562,6 +2575,7 @@ void Spell::cast(bool skipCheck)
     if(!m_targets.getUnitTarget() && m_targets.getUnitTargetGUID() && m_targets.getUnitTargetGUID() != m_caster->GetGUID())
     {
         cancel();
+        m_caster->DecreaseCastCounter();
         SetExecutedCurrently(false);
         return;
     }
@@ -2574,6 +2588,7 @@ void Spell::cast(bool skipCheck)
     {
         SendCastResult(castResult);
         finish(false);
+        m_caster->DecreaseCastCounter();
         SetExecutedCurrently(false);
         return;
     }
@@ -2586,6 +2601,7 @@ void Spell::cast(bool skipCheck)
         {
             SendCastResult(castResult);
             finish(false);
+            m_caster->DecreaseCastCounter();
             SetExecutedCurrently(false);
             return;
         }
@@ -2700,6 +2716,7 @@ void Spell::cast(bool skipCheck)
 
     if(m_spellState == SPELL_STATE_FINISHED)                // stop cast if spell marked as finish somewhere in FillTargetMap
     {
+        m_caster->DecreaseCastCounter();
         SetExecutedCurrently(false);
         return;
     }
@@ -2732,6 +2749,7 @@ void Spell::cast(bool skipCheck)
         handle_immediate();
     }
 
+    m_caster->DecreaseCastCounter();
     SetExecutedCurrently(false);
 }
 
