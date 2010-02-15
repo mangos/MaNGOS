@@ -22,6 +22,7 @@
 #include "ProgressBar.h"
 #include "Log.h"
 #include "MapManager.h"
+#include "World.h"
 #include "Policies/SingletonImp.h"
 
 INSTANTIATE_SINGLETON_1(PoolManager);
@@ -253,7 +254,7 @@ void PoolGroup<Pool>::RemoveOneRelation(uint16 child_pool_id)
 }
 
 template <class T>
-void PoolGroup<T>::SpawnObject(SpawnedPoolData& spawns, uint32 limit, uint32 triggerFrom)
+void PoolGroup<T>::SpawnObject(SpawnedPoolData& spawns, uint32 limit, uint32 triggerFrom, bool instantly)
 {
     uint32 lastDespawned = 0;
     int count = limit - spawns.GetSpawnedObjects(poolId);
@@ -283,7 +284,7 @@ void PoolGroup<T>::SpawnObject(SpawnedPoolData& spawns, uint32 limit, uint32 tri
         }
 
         spawns.AddSpawn<T>(obj->guid,poolId);
-        Spawn1Object(obj);
+        Spawn1Object(obj, instantly);
 
         if (triggerFrom)
         {
@@ -297,7 +298,7 @@ void PoolGroup<T>::SpawnObject(SpawnedPoolData& spawns, uint32 limit, uint32 tri
 
 // Method that is actualy doing the spawn job on 1 creature
 template <>
-void PoolGroup<Creature>::Spawn1Object(PoolObject* obj)
+void PoolGroup<Creature>::Spawn1Object(PoolObject* obj, bool instantly)
 {
     if (CreatureData const* data = sObjectMgr.GetCreatureData(obj->guid))
     {
@@ -305,7 +306,7 @@ void PoolGroup<Creature>::Spawn1Object(PoolObject* obj)
 
         // Spawn if necessary (loaded grids only)
         Map* map = const_cast<Map*>(sMapMgr.CreateBaseMap(data->mapid));
-        // We use spawn coords to spawn
+        // We use spawn coords to spawn (avoid work for instances until implemented support)
         if (!map->Instanceable() && map->IsLoaded(data->posX, data->posY))
         {
             Creature* pCreature = new Creature;
@@ -316,14 +317,28 @@ void PoolGroup<Creature>::Spawn1Object(PoolObject* obj)
                 return;
             }
             else
+            {
+                // if new spawn replaces a just despawned creature, not instantly spawn but set respawn timer
+                if(!instantly)
+                {
+                    pCreature->SetRespawnTime( pCreature->GetRespawnDelay() );
+                    if (sWorld.getConfig(CONFIG_SAVE_RESPAWN_TIME_IMMEDIATLY) || pCreature->isWorldBoss())
+                        pCreature->SaveRespawnTime();
+                }
                 map->Add(pCreature);
+            }
+        }
+        // for not loaded grid just update respawn time (avoid work for instances until implemented support)
+        else if(!map->Instanceable() && !instantly)
+        {
+            sObjectMgr.SaveCreatureRespawnTime(obj->guid,map->GetInstanceId(),time(NULL) + data->spawntimesecs);
         }
     }
 }
 
 // Same for 1 gameobject
 template <>
-void PoolGroup<GameObject>::Spawn1Object(PoolObject* obj)
+void PoolGroup<GameObject>::Spawn1Object(PoolObject* obj, bool instantly)
 {
     if (GameObjectData const* data = sObjectMgr.GetGOData(obj->guid))
     {
@@ -332,6 +347,7 @@ void PoolGroup<GameObject>::Spawn1Object(PoolObject* obj)
         // this base map checked as non-instanced and then only existed
         Map* map = const_cast<Map*>(sMapMgr.CreateBaseMap(data->mapid));
         // We use current coords to unspawn, not spawn coords since creature can have changed grid
+        // (avoid work for instances until implemented support)
         if (!map->Instanceable() && map->IsLoaded(data->posX, data->posY))
         {
             GameObject* pGameobject = new GameObject;
@@ -344,17 +360,33 @@ void PoolGroup<GameObject>::Spawn1Object(PoolObject* obj)
             else
             {
                 if (pGameobject->isSpawnedByDefault())
+                {
+                    // if new spawn replaces a just despawned object, not instantly spawn but set respawn timer
+                    if(!instantly)
+                    {
+                        pGameobject->SetRespawnTime( pGameobject->GetRespawnDelay() );
+                        if (sWorld.getConfig(CONFIG_SAVE_RESPAWN_TIME_IMMEDIATLY))
+                            pGameobject->SaveRespawnTime();
+                    }
                     map->Add(pGameobject);
+                }
             }
+        }
+        // for not loaded grid just update respawn time (avoid work for instances until implemented support)
+        else if(!map->Instanceable() && !instantly)
+        {
+            // for spawned by default object only
+            if (data->spawntimesecs >= 0)
+                sObjectMgr.SaveGORespawnTime(obj->guid,map->GetInstanceId(),time(NULL) + data->spawntimesecs);
         }
     }
 }
 
 // Same for 1 pool
 template <>
-void PoolGroup<Pool>::Spawn1Object(PoolObject* obj)
+void PoolGroup<Pool>::Spawn1Object(PoolObject* obj, bool instantly)
 {
-    sPoolMgr.SpawnPool(obj->guid);
+    sPoolMgr.SpawnPool(obj->guid, instantly);
 }
 
 // Method that does the respawn job on the specified creature
@@ -676,7 +708,7 @@ void PoolManager::Initialize()
                 sLog.outErrorDb("Pool Id (%u) has all creatures or gameobjects with explicit chance sum <>100 and no equal chance defined. The pool system cannot pick one to spawn.", pool_entry);
                 continue;
             }
-            SpawnPool(pool_entry);
+            SpawnPool(pool_entry, true);
             count++;
         } while (result->NextRow());
         delete result;
@@ -688,35 +720,37 @@ void PoolManager::Initialize()
 // Call to spawn a pool, if cache if true the method will spawn only if cached entry is different
 // If it's same, the creature is respawned only (added back to map)
 template<>
-void PoolManager::SpawnPool<Creature>(uint16 pool_id, uint32 db_guid)
+void PoolManager::SpawnPoolGroup<Creature>(uint16 pool_id, uint32 db_guid, bool instantly)
 {
     if (!mPoolCreatureGroups[pool_id].isEmpty())
-        mPoolCreatureGroups[pool_id].SpawnObject(mSpawnedData, mPoolTemplate[pool_id].MaxLimit, db_guid);
+        mPoolCreatureGroups[pool_id].SpawnObject(mSpawnedData, mPoolTemplate[pool_id].MaxLimit, db_guid, instantly);
 }
 
 // Call to spawn a pool, if cache if true the method will spawn only if cached entry is different
 // If it's same, the gameobject is respawned only (added back to map)
 template<>
-void PoolManager::SpawnPool<GameObject>(uint16 pool_id, uint32 db_guid)
+void PoolManager::SpawnPoolGroup<GameObject>(uint16 pool_id, uint32 db_guid, bool instantly)
 {
     if (!mPoolGameobjectGroups[pool_id].isEmpty())
-        mPoolGameobjectGroups[pool_id].SpawnObject(mSpawnedData, mPoolTemplate[pool_id].MaxLimit, db_guid);
+        mPoolGameobjectGroups[pool_id].SpawnObject(mSpawnedData, mPoolTemplate[pool_id].MaxLimit, db_guid, instantly);
 }
 
 // Call to spawn a pool, if cache if true the method will spawn only if cached entry is different
 // If it's same, the pool is respawned only
 template<>
-void PoolManager::SpawnPool<Pool>(uint16 pool_id, uint32 sub_pool_id)
+void PoolManager::SpawnPoolGroup<Pool>(uint16 pool_id, uint32 sub_pool_id, bool instantly)
 {
     if (!mPoolPoolGroups[pool_id].isEmpty())
-        mPoolPoolGroups[pool_id].SpawnObject(mSpawnedData, mPoolTemplate[pool_id].MaxLimit, sub_pool_id);
+        mPoolPoolGroups[pool_id].SpawnObject(mSpawnedData, mPoolTemplate[pool_id].MaxLimit, sub_pool_id, instantly);
 }
 
-void PoolManager::SpawnPool( uint16 pool_id )
+/*!
+    \param instantly defines if (leaf-)objects are spawned instantly or with fresh respawn timer */
+void PoolManager::SpawnPool(uint16 pool_id, bool instantly)
 {
-    SpawnPool<Pool>(pool_id, 0);
-    SpawnPool<GameObject>(pool_id, 0);
-    SpawnPool<Creature>(pool_id, 0);
+    SpawnPoolGroup<Pool>(pool_id, 0, instantly);
+    SpawnPoolGroup<GameObject>(pool_id, 0, instantly);
+    SpawnPoolGroup<Creature>(pool_id, 0, instantly);
 }
 
 // Call to despawn a pool, all gameobjects/creatures in this pool are removed
@@ -748,9 +782,9 @@ template<typename T>
 void PoolManager::UpdatePool(uint16 pool_id, uint32 db_guid_or_pool_id)
 {
     if (uint16 motherpoolid = IsPartOfAPool<Pool>(pool_id))
-        SpawnPool<Pool>(motherpoolid, pool_id);
+        SpawnPoolGroup<Pool>(motherpoolid, pool_id, false);
     else
-        SpawnPool<T>(pool_id, db_guid_or_pool_id);
+        SpawnPoolGroup<T>(pool_id, db_guid_or_pool_id, false);
 }
 
 template void PoolManager::UpdatePool<Pool>(uint16 pool_id, uint32 db_guid_or_pool_id);
