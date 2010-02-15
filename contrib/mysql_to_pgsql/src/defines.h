@@ -42,7 +42,7 @@ typedef unsigned int     uint32;
 #else
 #include <stdint.h>
 #ifndef uint64_t
-#include <linux/types.h>
+#include <unistd.h>
 #endif
 typedef uint64_t      uint64;
 typedef unsigned int  uint32;
