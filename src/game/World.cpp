@@ -919,7 +919,7 @@ void World::LoadConfigSettings(bool reload)
     m_configUint32Values[CONFIG_UINT32_CHATFLOOD_MESSAGE_DELAY] = sConfig.GetIntDefault("ChatFlood.MessageDelay",1);
     m_configUint32Values[CONFIG_UINT32_CHATFLOOD_MUTE_TIME]     = sConfig.GetIntDefault("ChatFlood.MuteTime",10);
 
-    m_configUint32Values[CONFIG_UINT32_EVENT_ANNOUNCE] = sConfig.GetIntDefault("Event.Announce",0);
+    m_configBoolValues[CONFIG_BOOL_EVENT_ANNOUNCE] = sConfig.GetBoolDefault("Event.Announce",false);
 
     m_configUint32Values[CONFIG_UINT32_CREATURE_FAMILY_ASSISTANCE_DELAY]  = sConfig.GetIntDefault("CreatureFamilyAssistanceDelay",1500);
     m_configUint32Values[CONFIG_UINT32_CREATURE_FAMILY_FLEE_DELAY]        = sConfig.GetIntDefault("CreatureFamilyFleeDelay",7000);
