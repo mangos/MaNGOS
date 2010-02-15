@@ -508,6 +508,12 @@ LogColors = ""
 #        Default: 1 (true)
 #                 0 (false)
 #
+#    MaxSpellCastsInChain
+#        Max amount triggered spell casts in chain by one caster, prevent stack overflow crash
+#        Too Low value will make some correct triggered casts fail
+#                 0 (no limit)
+#        Default: 10
+#
 #    Instance.IgnoreLevel
 #        Ignore level requirement to enter instance
 #        Default: 0 (false)
