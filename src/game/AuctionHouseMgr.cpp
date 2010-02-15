@@ -50,7 +50,7 @@ AuctionHouseMgr::~AuctionHouseMgr()
 
 AuctionHouseObject * AuctionHouseMgr::GetAuctionsMap( uint32 factionTemplateId )
 {
-    if(sWorld.getConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_AUCTION))
+    if(sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_AUCTION))
         return &mNeutralAuctions;
 
     // team have linked auction houses
@@ -69,7 +69,7 @@ uint32 AuctionHouseMgr::GetAuctionDeposit(AuctionHouseEntry const* entry, uint32
 {
     uint32 deposit = pItem->GetProto()->SellPrice * pItem->GetCount() * (time / MIN_AUCTION_TIME );
 
-    return uint32(deposit * entry->depositPercent * 3 * sWorld.getRate(RATE_AUCTION_DEPOSIT) / 100.0f );
+    return uint32(deposit * entry->depositPercent * 3 * sWorld.getConfig(CONFIG_FLOAT_RATE_AUCTION_DEPOSIT) / 100.0f );
 }
 
 //does not clear ram
@@ -85,7 +85,7 @@ void AuctionHouseMgr::SendAuctionWonMail( AuctionEntry *auction )
     uint32 bidder_accId = 0;
 
     // data for gm.log
-    if( sWorld.getConfig(CONFIG_GM_LOG_TRADE) )
+    if( sWorld.getConfig(CONFIG_BOOL_GM_LOG_TRADE) )
     {
         uint32 bidder_security = 0;
         std::string bidder_name;
@@ -465,7 +465,7 @@ AuctionHouseEntry const* AuctionHouseMgr::GetAuctionHouseEntry(uint32 factionTem
 {
     uint32 houseid = 1;                                     // dwarf auction house (used for normal cut/etc percents)
 
-    if(!sWorld.getConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_AUCTION))
+    if(!sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_AUCTION))
     {
         //FIXME: found way for proper auctionhouse selection by another way
         // AuctionHo use.dbc have faction field with _player_ factions associated with auction house races.
@@ -662,7 +662,7 @@ bool AuctionEntry::BuildAuctionInfo(WorldPacket & data) const
 
 uint32 AuctionEntry::GetAuctionCut() const
 {
-    return uint32(auctionHouseEntry->cutPercent * bid * sWorld.getRate(RATE_AUCTION_CUT) / 100.0f);
+    return uint32(auctionHouseEntry->cutPercent * bid * sWorld.getConfig(CONFIG_FLOAT_RATE_AUCTION_CUT) / 100.0f);
 }
 
 /// the sum of outbid is (1% from current bid)*5, if bid is very small, it is 1c

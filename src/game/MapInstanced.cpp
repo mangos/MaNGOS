@@ -241,7 +241,7 @@ void MapInstanced::DestroyInstance(InstancedMaps::iterator &itr)
 {
     itr->second->UnloadAll(true);
     // should only unload VMaps if this is the last instance and grid unloading is enabled
-    if(m_InstancedMaps.size() <= 1 && sWorld.getConfig(CONFIG_GRID_UNLOAD))
+    if(m_InstancedMaps.size() <= 1 && sWorld.getConfig(CONFIG_BOOL_GRID_UNLOAD))
     {
         VMAP::VMapFactory::createOrGetVMapManager()->unloadMap(itr->second->GetId());
         // in that case, unload grids of the base map, too

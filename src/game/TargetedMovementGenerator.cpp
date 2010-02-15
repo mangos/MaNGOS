@@ -153,7 +153,7 @@ bool TargetedMovementGeneratorMedium<T,D>::Update(T &owner, const uint32 & time_
         if (owner.GetObjectSize())
             i_destinationHolder.ResetUpdate(50);
 
-        float dist = i_target->GetObjectSize() + owner.GetObjectSize() + sWorld.getRate(RATE_TARGET_POS_RECALCULATION_RANGE);
+        float dist = i_target->GetObjectSize() + owner.GetObjectSize() + sWorld.getConfig(CONFIG_FLOAT_RATE_TARGET_POS_RECALCULATION_RANGE);
 
         //More distance let have better performance, less distance let have more sensitive reaction at target move.
 

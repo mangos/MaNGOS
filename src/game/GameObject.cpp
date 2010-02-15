@@ -448,7 +448,7 @@ void GameObject::Update(uint32 /*p_time*/)
             m_respawnTime = time(NULL) + m_respawnDelayTime;
 
             // if option not set then object will be saved at grid unload
-            if(sWorld.getConfig(CONFIG_SAVE_RESPAWN_TIME_IMMEDIATLY))
+            if(sWorld.getConfig(CONFIG_BOOL_SAVE_RESPAWN_TIME_IMMEDIATLY))
                 SaveRespawnTime();
 
             UpdateObjectVisibility();
