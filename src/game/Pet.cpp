@@ -259,7 +259,7 @@ bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool 
         m_charmInfo->LoadPetActionBar(fields[13].GetCppString());
 
     // since last save (in seconds)
-    uint32 timediff = uint32(time(NULL) - fields[14].GetUInt32());
+    uint32 timediff = uint32(time(NULL) - fields[14].GetUInt64());
 
     m_resetTalentsCost = fields[15].GetUInt32();
     m_resetTalentsTime = fields[16].GetUInt64();

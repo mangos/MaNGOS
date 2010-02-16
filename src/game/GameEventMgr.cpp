@@ -481,14 +481,8 @@ void GameEventMgr::UnApplyEvent(uint16 event_id)
 
 void GameEventMgr::ApplyNewEvent(uint16 event_id)
 {
-    switch(sWorld.getConfig(CONFIG_UINT32_EVENT_ANNOUNCE))
-    {
-        case 0:                                             // disable
-            break;
-        case 1:                                             // announce events
-            sWorld.SendWorldText(LANG_EVENTMESSAGE, mGameEvent[event_id].description.c_str());
-            break;
-    }
+    if (sWorld.getConfig(CONFIG_BOOL_EVENT_ANNOUNCE))
+        sWorld.SendWorldText(LANG_EVENTMESSAGE, mGameEvent[event_id].description.c_str());
 
     sLog.outString("GameEvent %u \"%s\" started.", event_id, mGameEvent[event_id].description.c_str());
     // spawn positive event tagget objects
@@ -580,7 +574,7 @@ void GameEventMgr::GameEventSpawn(int16 event_id)
     }
 
     for (IdList::iterator itr = mGameEventPoolIds[internal_event_id].begin();itr != mGameEventPoolIds[internal_event_id].end();++itr)
-        sPoolMgr.SpawnPool(*itr);
+        sPoolMgr.SpawnPool(*itr, true);
 }
 
 void GameEventMgr::GameEventUnspawn(int16 event_id)

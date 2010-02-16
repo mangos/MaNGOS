@@ -545,7 +545,7 @@ int WorldSocket::handle_input_missing_data (void)
                                           recv_size);
 
     if (n <= 0)
-        return n;
+        return (int)n;
 
     message_block.wr_ptr (n);
 

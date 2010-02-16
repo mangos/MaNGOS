@@ -76,9 +76,9 @@ class PoolGroup
         PoolObject* RollOne(SpawnedPoolData& spawns, uint32 triggerFrom);
         void DespawnObject(SpawnedPoolData& spawns, uint32 guid=0);
         void Despawn1Object(uint32 guid);
-        void SpawnObject(SpawnedPoolData& spawns, uint32 limit, uint32 triggerFrom);
+        void SpawnObject(SpawnedPoolData& spawns, uint32 limit, uint32 triggerFrom, bool instantly);
 
-        void Spawn1Object(PoolObject* obj);
+        void Spawn1Object(PoolObject* obj, bool instantly);
         void ReSpawn1Object(PoolObject* obj);
         void RemoveOneRelation(uint16 child_pool_id);
     private:
@@ -104,7 +104,7 @@ class PoolManager
 
         bool CheckPool(uint16 pool_id) const;
 
-        void SpawnPool(uint16 pool_id);
+        void SpawnPool(uint16 pool_id, bool instantly);
         void DespawnPool(uint16 pool_id);
 
         template<typename T>
@@ -112,7 +112,7 @@ class PoolManager
 
     protected:
         template<typename T>
-        void SpawnPool(uint16 pool_id, uint32 db_guid_or_pool_id);
+        void SpawnPoolGroup(uint16 pool_id, uint32 db_guid_or_pool_id, bool instantly);
 
         uint16 max_pool_id;
         typedef std::vector<PoolTemplateData> PoolTemplateDataMap;
