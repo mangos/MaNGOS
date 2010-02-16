@@ -950,7 +950,7 @@ void World::LoadConfigSettings(bool reload)
     m_configUint32Values[CONFIG_UINT32_CORPSE_DECAY_RAREELITE] = sConfig.GetIntDefault("Corpse.Decay.RAREELITE", 300);
     m_configUint32Values[CONFIG_UINT32_CORPSE_DECAY_WORLDBOSS] = sConfig.GetIntDefault("Corpse.Decay.WORLDBOSS", 3600);
 
-    m_configUint32Values[CONFIG_UINT32_DEATH_SICKNESS_LEVEL]           = sConfig.GetIntDefault ("Death.SicknessLevel", 11);
+    m_configInt32Values[CONFIG_INT32_DEATH_SICKNESS_LEVEL]     = sConfig.GetIntDefault ("Death.SicknessLevel", 11);
 
     m_configBoolValues[CONFIG_BOOL_DEATH_CORPSE_RECLAIM_DELAY_PVP] = sConfig.GetBoolDefault("Death.CorpseReclaimDelay.PvP", true);
     m_configBoolValues[CONFIG_BOOL_DEATH_CORPSE_RECLAIM_DELAY_PVE] = sConfig.GetBoolDefault("Death.CorpseReclaimDelay.PvE", true);
