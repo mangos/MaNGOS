@@ -35,6 +35,7 @@
 #include "Group.h"
 #include "MapRefManager.h"
 #include "DBCEnums.h"
+#include "MovementGenerator.h"
 
 #include "MapInstanced.h"
 #include "InstanceSaveMgr.h"
@@ -890,6 +891,11 @@ Map::PlayerRelocation(Player *player, float x, float y, float z, float orientati
 void
 Map::CreatureRelocation(Creature *creature, float x, float y, float z, float ang)
 {
+    // Creature relocation acts like instant movement generator, so current generator expects interrupt/reset calls to react properly
+    if (!creature->GetMotionMaster()->empty())
+        if (MovementGenerator *movgen = creature->GetMotionMaster()->top())
+            movgen->Interrupt(*creature);
+
     assert(CheckGridIntegrity(creature,false));
 
     Cell old_cell = creature->GetCurrentCell();
@@ -898,10 +904,10 @@ Map::CreatureRelocation(Creature *creature, float x, float y, float z, float ang
     Cell new_cell(new_val);
 
     // delay creature move for grid/cell to grid/cell moves
-    if( old_cell.DiffCell(new_cell) || old_cell.DiffGrid(new_cell) )
+    if (old_cell.DiffCell(new_cell) || old_cell.DiffGrid(new_cell))
     {
         #ifdef MANGOS_DEBUG
-        if((sLog.getLogFilter() & LOG_FILTER_CREATURE_MOVES) == 0)
+        if ((sLog.getLogFilter() & LOG_FILTER_CREATURE_MOVES) == 0)
             sLog.outDebug("Creature (GUID: %u Entry: %u) added to moving list from grid[%u,%u]cell[%u,%u] to grid[%u,%u]cell[%u,%u].", creature->GetGUIDLow(), creature->GetEntry(), old_cell.GridX(), old_cell.GridY(), old_cell.CellX(), old_cell.CellY(), new_cell.GridX(), new_cell.GridY(), new_cell.CellX(), new_cell.CellY());
         #endif
         AddCreatureToMoveList(creature, x, y, z, ang);
@@ -912,7 +918,14 @@ Map::CreatureRelocation(Creature *creature, float x, float y, float z, float ang
         creature->Relocate(x, y, z, ang);
         CreatureRelocationNotify(creature, new_cell, new_val);
     }
+
     assert(CheckGridIntegrity(creature,true));
+
+    // finished relocation, movegen can different from top before creature relocation,
+    // but apply Reset expected to be safe in any case
+    if (!creature->GetMotionMaster()->empty())
+        if (MovementGenerator *movgen = creature->GetMotionMaster()->top())
+            movgen->Reset(*creature);
 }
 
 void Map::AddCreatureToMoveList(Creature *c, float x, float y, float z, float ang)
