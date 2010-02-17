@@ -15018,7 +15018,7 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
     _LoadGlyphs(holder->GetResult(PLAYER_LOGIN_QUERY_LOADGLYPHS));
 
     _LoadAuras(holder->GetResult(PLAYER_LOGIN_QUERY_LOADAURAS), time_diff);
-    ApplyGlyphAuras(true);
+    ApplyGlyphs(true);
 
     // add ghost flag (must be after aura load: PLAYER_FLAGS_GHOST set in aura)
     if( HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST) )
@@ -20223,21 +20223,30 @@ void Player::InitGlyphsForLevel()
     SetUInt32Value(PLAYER_GLYPHS_ENABLED, value);
 }
 
-void Player::ApplyGlyphAuras(bool apply)
+void Player::ApplyGlyph(uint8 slot, bool apply)
 {
-    for (uint8 i = 0; i < MAX_GLYPH_SLOT_INDEX; ++i)
+    if (uint32 glyph = GetGlyph(slot))
     {
-        if (uint32 glyph = GetGlyph(i))
+        if(GlyphPropertiesEntry const *gp = sGlyphPropertiesStore.LookupEntry(glyph))
         {
-            if(GlyphPropertiesEntry const *gp = sGlyphPropertiesStore.LookupEntry(glyph))
+            if(apply)
             {
-                if(apply)
-                    CastSpell(this, gp->SpellId, true);
-                else
-                    RemoveAurasDueToSpell(gp->SpellId);
+                CastSpell(this, gp->SpellId, true);
+                SetUInt32Value(PLAYER_FIELD_GLYPHS_1 + slot, glyph);
+            }
+            else
+            {
+                RemoveAurasDueToSpell(gp->SpellId);
+                SetUInt32Value(PLAYER_FIELD_GLYPHS_1 + slot, 0);
             }
         }
     }
+}
+
+void Player::ApplyGlyphs(bool apply)
+{
+    for (uint8 i = 0; i < MAX_GLYPH_SLOT_INDEX; ++i)
+        ApplyGlyph(i,apply);
 }
 
 void Player::EnterVehicle(Vehicle *vehicle)
@@ -21390,7 +21399,7 @@ void Player::ActivateSpec(uint8 specNum)
     // unlearn GetActiveSpec() talents (not learned in specNum);
     // learn specNum talents
 
-    ApplyGlyphAuras(false);
+    ApplyGlyphs(false);
 
     SetActiveSpec(specNum);
 
@@ -21402,7 +21411,7 @@ void Player::ActivateSpec(uint8 specNum)
             if (!IsActionButtonDataValid(itr->first,itr->second.GetAction(),itr->second.GetType(), this, false))
                 removeActionButton(m_activeSpec,itr->first);
 
-    ApplyGlyphAuras(true);
+    ApplyGlyphs(true);
 
     SendInitialActionButtons();
 

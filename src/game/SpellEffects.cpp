@@ -5951,17 +5951,9 @@ void Spell::EffectApplyGlyph(uint32 i)
             }
 
             // remove old glyph
-            if(uint32 oldglyph = player->GetGlyph(m_glyphIndex))
-            {
-                if(GlyphPropertiesEntry const *old_gp = sGlyphPropertiesStore.LookupEntry(oldglyph))
-                {
-                    player->RemoveAurasDueToSpell(old_gp->SpellId);
-                    player->SetGlyph(m_glyphIndex, 0);
-                }
-            }
-
-            player->CastSpell(m_caster, gp->SpellId, true);
+            player->ApplyGlyph(m_glyphIndex, false);
             player->SetGlyph(m_glyphIndex, glyph);
+            player->ApplyGlyph(m_glyphIndex, true);
             player->SendTalentsInfoData(false);
         }
     }
