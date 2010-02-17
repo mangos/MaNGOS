@@ -13382,8 +13382,9 @@ void Unit::KnockBackFrom(Unit* target, float horizintalSpeed, float verticalSpee
             fx = fx2;
             fy = fy2;
             fz = fz2;
-            UpdateGroundPositionZ(fx, fy, fz);
         }
+
+        UpdateGroundPositionZ(fx, fy, fz);
 
         //FIXME: this mostly hack, must exist some packet for proper creature move at client side
         //       with CreatureRelocation at server side

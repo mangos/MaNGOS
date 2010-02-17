@@ -271,10 +271,10 @@ MapManager::Update(uint32 diff)
     i_timer.SetCurrent(0);
 }
 
-void MapManager::DoDelayedMovesAndRemoves()
+void MapManager::RemoveAllObjectsInRemoveList()
 {
     for(MapMapType::iterator iter=i_maps.begin(); iter != i_maps.end(); ++iter)
-        iter->second->DoDelayedMovesAndRemoves();
+        iter->second->RemoveAllObjectsInRemoveList();
 }
 
 bool MapManager::ExistMapAndVMap(uint32 mapid, float x,float y)
