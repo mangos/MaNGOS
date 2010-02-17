@@ -156,8 +156,6 @@ enum eConfigUint32Values
     CONFIG_UINT32_CORPSE_DECAY_ELITE,
     CONFIG_UINT32_CORPSE_DECAY_RAREELITE,
     CONFIG_UINT32_CORPSE_DECAY_WORLDBOSS,
-    CONFIG_UINT32_DEATH_SICKNESS_LEVEL,
-    CONFIG_UINT32_THREAT_RADIUS,
     CONFIG_UINT32_INSTANT_LOGOUT,
     CONFIG_UINT32_BATTLEGROUND_INVITATION_TYPE,
     CONFIG_UINT32_BATTLEGROUND_PREMATURE_FINISH_TIMER,
@@ -181,7 +179,8 @@ enum eConfigUint32Values
 /// Configuration elements
 enum eConfigInt32Values
 {
-    CONFIG_INT32_VALUE_COUNT = 1
+    CONFIG_INT32_DEATH_SICKNESS_LEVEL = 0,
+    CONFIG_INT32_VALUE_COUNT
 };
 
 /// Server config
@@ -252,6 +251,7 @@ enum eConfigFLoatValues
     CONFIG_FLOAT_CREATURE_FAMILY_FLEE_ASSISTANCE_RADIUS,
     CONFIG_FLOAT_CREATURE_FAMILY_ASSISTANCE_RADIUS,
     CONFIG_FLOAT_GROUP_XP_DISTANCE,
+    CONFIG_FLOAT_THREAT_RADIUS,
     CONFIG_FLOAT_VALUE_COUNT
 };
 
@@ -300,7 +300,6 @@ enum eConfigBoolValues
     CONFIG_BOOL_BATTLEGROUND_QUEUE_ANNOUNCER_ENABLE,
     CONFIG_BOOL_BATTLEGROUND_QUEUE_ANNOUNCER_PLAYERONLY,
     CONFIG_BOOL_ARENA_AUTO_DISTRIBUTE_POINTS,
-    CONFIG_BOOL_ARENA_AUTO_DISTRIBUTE_INTERVAL_DAYS,
     CONFIG_BOOL_ARENA_QUEUE_ANNOUNCER_ENABLE,
     CONFIG_BOOL_VALUE_COUNT
 };
@@ -556,6 +555,23 @@ class World
         void InitDailyQuestResetTime();
         void ResetDailyQuests();
     private:
+        void setConfig(eConfigUint32Values index, char const* fieldname, uint32 defvalue);
+        void setConfig(eConfigInt32Values index, char const* fieldname, int32 defvalue);
+        void setConfig(eConfigFLoatValues index, char const* fieldname, float defvalue);
+        void setConfig(eConfigBoolValues index, char const* fieldname, bool defvalue);
+        void setConfigPos(eConfigUint32Values index, char const* fieldname, uint32 defvalue);
+        void setConfigPos(eConfigFLoatValues index, char const* fieldname, float defvalue);
+        void setConfigMin(eConfigUint32Values index, char const* fieldname, uint32 defvalue, uint32 minvalue);
+        void setConfigMin(eConfigInt32Values index, char const* fieldname, int32 defvalue, int32 minvalue);
+        void setConfigMin(eConfigFLoatValues index, char const* fieldname, float defvalue, float minvalue);
+        void setConfigMinMax(eConfigUint32Values index, char const* fieldname, uint32 defvalue, uint32 minvalue, uint32 maxvalue);
+        void setConfigMinMax(eConfigInt32Values index, char const* fieldname, int32 defvalue, int32 minvalue, int32 maxvalue);
+        void setConfigMinMax(eConfigFLoatValues index, char const* fieldname, float defvalue, float minvalue, float maxvalue);
+        bool configNoReload(bool reload, eConfigUint32Values index, char const* fieldname, uint32 defvalue);
+        bool configNoReload(bool reload, eConfigInt32Values index, char const* fieldname, int32 defvalue);
+        bool configNoReload(bool reload, eConfigFLoatValues index, char const* fieldname, float defvalue);
+        bool configNoReload(bool reload, eConfigBoolValues index, char const* fieldname, bool defvalue);
+
         static volatile bool m_stopEvent;
         static uint8 m_ExitCode;
         uint32 m_ShutdownTimer;

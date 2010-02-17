@@ -4245,7 +4245,7 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
     //Characters from level 11-19 will suffer from one minute of sickness
     //for each level they are above 10.
     //Characters level 20 and up suffer from ten minutes of sickness.
-    int32 startLevel = sWorld.getConfig(CONFIG_UINT32_DEATH_SICKNESS_LEVEL);
+    int32 startLevel = sWorld.getConfig(CONFIG_INT32_DEATH_SICKNESS_LEVEL);
 
     if(int32(getLevel()) >= startLevel)
     {

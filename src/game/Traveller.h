@@ -102,7 +102,7 @@ inline float Traveller<Creature>::GetMoveDestinationTo(float x, float y, float z
 template<>
 inline void Traveller<Creature>::MoveTo(float x, float y, float z, uint32 t)
 {
-    i_traveller.AI_SendMoveToPacket(x, y, z, t, i_traveller.GetSplineFlags(), 0);
+    i_traveller.AI_SendMoveToPacket(x, y, z, t, i_traveller.GetSplineFlags(), SPLINETYPE_NORMAL);
 }
 
 // specialization for players
@@ -138,7 +138,7 @@ template<>
 inline void Traveller<Player>::MoveTo(float x, float y, float z, uint32 t)
 {
     //Only send SPLINEFLAG_WALKMODE, client has strange issues with other move flags
-    i_traveller.SendMonsterMove(x, y, z, 0, SPLINEFLAG_WALKMODE, t);
+    i_traveller.SendMonsterMove(x, y, z, SPLINETYPE_NORMAL, SPLINEFLAG_WALKMODE, t);
 }
 
 typedef Traveller<Creature> CreatureTraveller;

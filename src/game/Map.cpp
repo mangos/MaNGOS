@@ -898,10 +898,10 @@ Map::CreatureRelocation(Creature *creature, float x, float y, float z, float ang
     Cell new_cell(new_val);
 
     // delay creature move for grid/cell to grid/cell moves
-    if( old_cell.DiffCell(new_cell) || old_cell.DiffGrid(new_cell) )
+    if (old_cell.DiffCell(new_cell) || old_cell.DiffGrid(new_cell))
     {
         #ifdef MANGOS_DEBUG
-        if((sLog.getLogFilter() & LOG_FILTER_CREATURE_MOVES) == 0)
+        if ((sLog.getLogFilter() & LOG_FILTER_CREATURE_MOVES) == 0)
             sLog.outDebug("Creature (GUID: %u Entry: %u) added to moving list from grid[%u,%u]cell[%u,%u] to grid[%u,%u]cell[%u,%u].", creature->GetGUIDLow(), creature->GetEntry(), old_cell.GridX(), old_cell.GridY(), old_cell.CellX(), old_cell.CellY(), new_cell.GridX(), new_cell.GridY(), new_cell.CellX(), new_cell.CellY());
         #endif
         AddCreatureToMoveList(creature, x, y, z, ang);
@@ -912,6 +912,7 @@ Map::CreatureRelocation(Creature *creature, float x, float y, float z, float ang
         creature->Relocate(x, y, z, ang);
         CreatureRelocationNotify(creature, new_cell, new_val);
     }
+
     assert(CheckGridIntegrity(creature,true));
 }
 
@@ -2985,8 +2986,7 @@ void Map::ScriptsProcess()
                     sLog.outError("SCRIPT_COMMAND_MOVE_TO call for non-creature (TypeId: %u), skipping.",source->GetTypeId());
                     break;
                 }
-                ((Creature*)source)->SendMonsterMoveWithSpeed(step.script->x, step.script->y, step.script->z, step.script->datalong2 );
-                ((Creature*)source)->GetMap()->CreatureRelocation(((Creature*)source), step.script->x, step.script->y, step.script->z, 0);
+                ((Unit*)source)->MonsterMoveWithSpeed(step.script->x, step.script->y, step.script->z, step.script->datalong2 );
                 break;
             case SCRIPT_COMMAND_FLAG_SET:
                 if(!source)
