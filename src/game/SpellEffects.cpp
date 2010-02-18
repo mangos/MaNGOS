@@ -2116,7 +2116,7 @@ void Spell::EffectDummy(uint32 i)
                     if(unitTarget->GetTypeId() != TYPEID_PLAYER)
                     {
                         unitTarget->GetMap()->CreatureRelocation((Creature*)unitTarget,x,y,z,orientation);
-                        ((Creature*)unitTarget)->SendMonsterMove(x, y, z, orientation, SPLINEFLAG_UNKNOWN11, 1);
+                        ((Creature*)unitTarget)->SendMonsterMove(x, y, z, SPLINETYPE_NORMAL, SPLINEFLAG_UNKNOWN11, 1);
                     }
                     else
                         unitTarget->NearTeleportTo(x,y,z,orientation,false);
