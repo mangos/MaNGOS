@@ -1129,14 +1129,11 @@ void WorldSession::HandleRemoveGlyph( WorldPacket & recv_data )
         return;
     }
 
-    if(uint32 glyph = _player->GetGlyph(slot))
+    if(_player->GetGlyph(slot))
     {
-        if(GlyphPropertiesEntry const *gp = sGlyphPropertiesStore.LookupEntry(glyph))
-        {
-            _player->RemoveAurasDueToSpell(gp->SpellId);
-            _player->SetGlyph(slot, 0);
-            _player->SendTalentsInfoData(false);
-        }
+        _player->ApplyGlyph(slot, false);
+        _player->SetGlyph(slot, 0);
+        _player->SendTalentsInfoData(false);
     }
 }
 

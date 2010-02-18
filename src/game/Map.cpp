@@ -40,8 +40,6 @@
 #include "InstanceSaveMgr.h"
 #include "VMapFactory.h"
 
-#define MAX_CREATURE_ATTACK_RADIUS  (45.0f * sWorld.getConfig(CONFIG_FLOAT_RATE_CREATURE_AGGRO))
-
 GridState* si_GridStates[MAX_GRID_STATE];
 
 static char const* MAP_MAGIC         = "MAPS";
@@ -344,9 +342,9 @@ void Map::AddNotifier(Player* obj, Cell const& cell, CellPair const& cellpair)
 }
 
 template<>
-void Map::AddNotifier(Creature* obj, Cell const& cell, CellPair const& cellpair)
+void Map::AddNotifier(Creature* obj, Cell const&, CellPair const&)
 {
-    CreatureRelocationNotify(obj,cell,cellpair);
+    obj->SetNeedNotify();
 }
 
 void
@@ -904,62 +902,38 @@ Map::CreatureRelocation(Creature *creature, float x, float y, float z, float ang
         if ((sLog.getLogFilter() & LOG_FILTER_CREATURE_MOVES) == 0)
             sLog.outDebug("Creature (GUID: %u Entry: %u) added to moving list from grid[%u,%u]cell[%u,%u] to grid[%u,%u]cell[%u,%u].", creature->GetGUIDLow(), creature->GetEntry(), old_cell.GridX(), old_cell.GridY(), old_cell.CellX(), old_cell.CellY(), new_cell.GridX(), new_cell.GridY(), new_cell.CellX(), new_cell.CellY());
         #endif
-        AddCreatureToMoveList(creature, x, y, z, ang);
-        // in diffcell/diffgrid case notifiers called at finishing move creature in Map::MoveAllCreaturesInMoveList
-    }
-    else
-    {
-        creature->Relocate(x, y, z, ang);
-        CreatureRelocationNotify(creature, new_cell, new_val);
-    }
-
-    assert(CheckGridIntegrity(creature,true));
-}
-
-void Map::AddCreatureToMoveList(Creature *c, float x, float y, float z, float ang)
-{
-    if(!c)
-        return;
-
-    i_creaturesToMove[c] = CreatureMover(x, y, z, ang);
-}
-
-void Map::MoveAllCreaturesInMoveList()
-{
-    while(!i_creaturesToMove.empty())
-    {
-        // get data and remove element;
-        CreatureMoveList::iterator iter = i_creaturesToMove.begin();
-        Creature* c = iter->first;
-        CreatureMover cm = iter->second;
-        i_creaturesToMove.erase(iter);
-
-        // calculate cells
-        CellPair new_val = MaNGOS::ComputeCellPair(cm.x, cm.y);
-        Cell new_cell(new_val);
 
         // do move or do move to respawn or remove creature if previous all fail
-        if(CreatureCellRelocation(c,new_cell))
+        if(CreatureCellRelocation(creature,new_cell))
         {
             // update pos
-            c->Relocate(cm.x, cm.y, cm.z, cm.ang);
-            CreatureRelocationNotify(c, new_cell, new_cell.cellPair());
+            creature->Relocate(x, y, z, ang);
+
+            // in diffcell/diffgrid case notifiers called in Creature::Update
+            creature->SetNeedNotify();
         }
         else
         {
             // if creature can't be move in new cell/grid (not loaded) move it to repawn cell/grid
             // creature coordinates will be updated and notifiers send
-            if(!CreatureRespawnRelocation(c))
+            if(!CreatureRespawnRelocation(creature))
             {
                 // ... or unload (if respawn grid also not loaded)
                 #ifdef MANGOS_DEBUG
                 if((sLog.getLogFilter() & LOG_FILTER_CREATURE_MOVES)==0)
-                    sLog.outDebug("Creature (GUID: %u Entry: %u ) can't be move to unloaded respawn grid.",c->GetGUIDLow(),c->GetEntry());
+                    sLog.outDebug("Creature (GUID: %u Entry: %u ) can't be move to unloaded respawn grid.",creature->GetGUIDLow(),creature->GetEntry());
                 #endif
-                AddObjectToRemoveList(c);
+                creature->SetNeedNotify();
             }
         }
     }
+    else
+    {
+        creature->Relocate(x, y, z, ang);
+        creature->SetNeedNotify();
+    }
+
+    assert(CheckGridIntegrity(creature,true));
 }
 
 bool Map::CreatureCellRelocation(Creature *c, Cell new_cell)
@@ -1055,7 +1029,7 @@ bool Map::CreatureRespawnRelocation(Creature *c)
     {
         c->Relocate(resp_x, resp_y, resp_z, resp_o);
         c->GetMotionMaster()->Initialize();                 // prevent possible problems with default move generators
-        CreatureRelocationNotify(c,resp_cell,resp_cell.cellPair());
+        c->SetNeedNotify();
         return true;
     }
     else
@@ -1074,15 +1048,15 @@ bool Map::UnloadGrid(const uint32 &x, const uint32 &y, bool pForce)
         DEBUG_LOG("Unloading grid[%u,%u] for map %u", x,y, i_id);
         ObjectGridUnloader unloader(*grid);
 
-        // Finish creature moves, remove and delete all creatures with delayed remove before moving to respawn grids
+        // Finish remove and delete all creatures with delayed remove before moving to respawn grids
         // Must know real mob position before move
-        DoDelayedMovesAndRemoves();
+        RemoveAllObjectsInRemoveList();
 
         // move creatures to respawn grids if this is diff.grid or to remove list
         unloader.MoveToRespawnN();
 
-        // Finish creature moves, remove and delete all creatures with delayed remove before unload
-        DoDelayedMovesAndRemoves();
+        // Finish remove and delete all creatures with delayed remove before unload
+        RemoveAllObjectsInRemoveList();
 
         unloader.UnloadN();
         delete getNGrid(x, y);
@@ -1115,9 +1089,6 @@ bool Map::UnloadGrid(const uint32 &x, const uint32 &y, bool pForce)
 
 void Map::UnloadAll(bool pForce)
 {
-    // clear all delayed moves, useless anyway do this moves before map unload.
-    i_creaturesToMove.clear();
-
     for (GridRefManager<NGridType>::iterator i = GridRefManager<NGridType>::begin(); i != GridRefManager<NGridType>::end(); )
     {
         NGridType &grid(*i->getSource());
@@ -2066,21 +2037,10 @@ void Map::PlayerRelocationNotify( Player* player, Cell cell, CellPair cellpair )
     TypeContainerVisitor<MaNGOS::PlayerRelocationNotifier, GridTypeMapContainer >  p2grid_relocation(relocationNotifier);
     TypeContainerVisitor<MaNGOS::PlayerRelocationNotifier, WorldTypeMapContainer > p2world_relocation(relocationNotifier);
 
-    cell.Visit(cellpair, p2grid_relocation, *this, *player, MAX_CREATURE_ATTACK_RADIUS);
-    cell.Visit(cellpair, p2world_relocation, *this, *player, MAX_CREATURE_ATTACK_RADIUS);
-}
+    float radius = MAX_CREATURE_ATTACK_RADIUS * sWorld.getConfig(CONFIG_FLOAT_RATE_CREATURE_AGGRO);
 
-void Map::CreatureRelocationNotify(Creature *creature, Cell cell, CellPair cellpair)
-{
-    MaNGOS::CreatureRelocationNotifier relocationNotifier(*creature);
-    cell.data.Part.reserved = ALL_DISTRICT;
-    cell.SetNoCreate();                                     // not trigger load unloaded grids at notifier call
-
-    TypeContainerVisitor<MaNGOS::CreatureRelocationNotifier, WorldTypeMapContainer > c2world_relocation(relocationNotifier);
-    TypeContainerVisitor<MaNGOS::CreatureRelocationNotifier, GridTypeMapContainer >  c2grid_relocation(relocationNotifier);
-
-    cell.Visit(cellpair, c2world_relocation, *this, *creature, MAX_CREATURE_ATTACK_RADIUS);
-    cell.Visit(cellpair, c2grid_relocation, *this, *creature, MAX_CREATURE_ATTACK_RADIUS);
+    cell.Visit(cellpair, p2grid_relocation, *this, *player, radius);
+    cell.Visit(cellpair, p2world_relocation, *this, *player, radius);
 }
 
 void Map::SendInitSelf( Player * player )
@@ -2173,12 +2133,6 @@ inline void Map::setNGrid(NGridType *grid, uint32 x, uint32 y)
         assert(false);
     }
     i_grids[x][y] = grid;
-}
-
-void Map::DoDelayedMovesAndRemoves()
-{
-    MoveAllCreaturesInMoveList();
-    RemoveAllObjectsInRemoveList();
 }
 
 void Map::AddObjectToRemoveList(WorldObject *obj)

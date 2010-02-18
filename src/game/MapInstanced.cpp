@@ -66,16 +66,6 @@ void MapInstanced::Update(const uint32& t)
     }
 }
 
-void MapInstanced::MoveAllCreaturesInMoveList()
-{
-    for (InstancedMaps::iterator i = m_InstancedMaps.begin(); i != m_InstancedMaps.end(); ++i)
-    {
-        i->second->MoveAllCreaturesInMoveList();
-    }
-
-    Map::MoveAllCreaturesInMoveList();
-}
-
 void MapInstanced::RemoveAllObjectsInRemoveList()
 {
     for (InstancedMaps::iterator i = m_InstancedMaps.begin(); i != m_InstancedMaps.end(); ++i)
