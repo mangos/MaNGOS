@@ -476,6 +476,8 @@ void InstanceSaveManager::LoadResetTimes()
 
         // the reset_delay must be at least one day
         uint32 period =  uint32(mapDiff->resetTime / DAY * sWorld.getConfig(CONFIG_FLOAT_RATE_INSTANCE_RESET_TIME)) * DAY;
+        if (period < DAY)
+            period = DAY;
 
         time_t t = GetResetTimeFor(mapid,difficulty);
         if(!t)
