@@ -457,7 +457,7 @@ void CreatureEventAI::ProcessAction(CreatureEventAI_Action const& action, uint32
             // If cast flag CAST_AURA_NOT_PRESENT is active, check if target already has aura on them
             if(action.cast.castFlags & CAST_AURA_NOT_PRESENT)
             {
-                for(uint8 i = 0; i < 3; ++i)
+                for(int i = 0; i < MAX_EFFECT_INDEX; ++i)
                     if(target->HasAura(action.cast.spellId, i))
                         return;
             }

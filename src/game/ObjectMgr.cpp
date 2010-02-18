@@ -792,7 +792,7 @@ void ObjectMgr::ConvertCreatureAddonAuras(CreatureDataAddon* addon, char const* 
         CreatureDataAddonAura& cAura = const_cast<CreatureDataAddonAura&>(addon->auras[i]);
         cAura.spell_id = (uint32)val[2*j+0];
         cAura.effect_idx  = (uint32)val[2*j+1];
-        if ( cAura.effect_idx > 2 )
+        if (cAura.effect_idx >= MAX_EFFECT_INDEX)
         {
             sLog.outErrorDb("Creature (%s: %u) has wrong effect %u for spell %u in `auras` field in `%s`.",guidEntryStr,addon->guidOrEntry,cAura.effect_idx,cAura.spell_id,table);
             continue;
@@ -816,7 +816,7 @@ void ObjectMgr::ConvertCreatureAddonAuras(CreatureDataAddon* addon, char const* 
     // fill terminator element (after last added)
     CreatureDataAddonAura& endAura = const_cast<CreatureDataAddonAura&>(addon->auras[i]);
     endAura.spell_id   = 0;
-    endAura.effect_idx = 0;
+    endAura.effect_idx = EFFECT_INDEX_0;
 }
 
 void ObjectMgr::LoadCreatureAddons(SQLStorage& creatureaddons, char const* entryName, char const* comment)
@@ -2138,7 +2138,7 @@ void ObjectMgr::LoadItemRequiredTarget()
                     if (bounds.first != bounds.second)
                         break;
 
-                    for (int j = 0; j < 3; ++j)
+                    for (int j = 0; j < MAX_EFFECT_INDEX; ++j)
                     {
                         if (pSpellInfo->EffectImplicitTargetA[j] == TARGET_CHAIN_DAMAGE ||
                             pSpellInfo->EffectImplicitTargetB[j] == TARGET_CHAIN_DAMAGE ||
@@ -3648,7 +3648,7 @@ void ObjectMgr::LoadQuests()
                 if(!qinfo->ReqCreatureOrGOId[j])
                 {
                     bool found = false;
-                    for(int k = 0; k < 3; ++k)
+                    for(int k = 0; k < MAX_EFFECT_INDEX; ++k)
                     {
                         if ((spellInfo->Effect[k] == SPELL_EFFECT_QUEST_COMPLETE && uint32(spellInfo->EffectMiscValue[k]) == qinfo->QuestId) ||
                             spellInfo->Effect[k] == SPELL_EFFECT_SEND_EVENT)
@@ -3914,7 +3914,7 @@ void ObjectMgr::LoadQuests()
         if(!spellInfo)
             continue;
 
-        for(int j = 0; j < 3; ++j)
+        for(int j = 0; j < MAX_EFFECT_INDEX; ++j)
         {
             if(spellInfo->Effect[j] != SPELL_EFFECT_QUEST_COMPLETE)
                 continue;

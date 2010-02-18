@@ -399,7 +399,7 @@ void Spell::EffectSchoolDMG(uint32 effect_idx)
                 // Shockwave ${$m3/100*$AP}
                 else if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0000800000000000))
                 {
-                    int32 pct = m_caster->CalculateSpellDamage(m_spellInfo, 2, m_spellInfo->EffectBasePoints[EFFECT_INDEX_2], unitTarget);
+                    int32 pct = m_caster->CalculateSpellDamage(m_spellInfo, EFFECT_INDEX_2, m_spellInfo->EffectBasePoints[EFFECT_INDEX_2], unitTarget);
                     if (pct > 0)
                         damage+= int32(m_caster->GetTotalAttackPowerValue(BASE_ATTACK) * pct / 100);
                     break;
@@ -718,7 +718,7 @@ void Spell::EffectSchoolDMG(uint32 effect_idx)
                 {
                     // Add main hand dps * effect[2] amount
                     float average = (m_caster->GetFloatValue(UNIT_FIELD_MINDAMAGE) + m_caster->GetFloatValue(UNIT_FIELD_MAXDAMAGE)) / 2;
-                    int32 count = m_caster->CalculateSpellDamage(m_spellInfo, 2, m_spellInfo->EffectBasePoints[EFFECT_INDEX_2], unitTarget);
+                    int32 count = m_caster->CalculateSpellDamage(m_spellInfo, EFFECT_INDEX_2, m_spellInfo->EffectBasePoints[EFFECT_INDEX_2], unitTarget);
                     damage += count * int32(average * IN_MILISECONDS) / m_caster->GetAttackTime(BASE_ATTACK);
                 }
                 // Shield of Righteousness
@@ -1274,7 +1274,7 @@ void Spell::EffectDummy(uint32 i)
                 {
                     switch(i)
                     {
-                        case 0:
+                        case EFFECT_INDEX_0:
                         {
                             uint32 spellID = m_spellInfo->CalculateSimpleValue(EFFECT_INDEX_0);
                             uint32 reqAuraID = m_spellInfo->CalculateSimpleValue(EFFECT_INDEX_1);
@@ -1283,7 +1283,7 @@ void Spell::EffectDummy(uint32 i)
                                 m_caster->CastSpell(m_caster, spellID, true, NULL);
                             return;
                         }
-                        case 1:
+                        case EFFECT_INDEX_1:
                             return;                         // additional data for dummy[0]
                     }
                     return;
@@ -4594,7 +4594,7 @@ void Spell::EffectWeaponDmg(uint32 i)
     // multiple weapon dmg effect workaround
     // execute only the last weapon damage
     // and handle all effects at once
-    for (uint32 j = 0; j < 3; ++j)
+    for (int j = 0; j < MAX_EFFECT_INDEX; ++j)
     {
         switch(m_spellInfo->Effect[j])
         {
@@ -4602,7 +4602,7 @@ void Spell::EffectWeaponDmg(uint32 i)
             case SPELL_EFFECT_WEAPON_DAMAGE_NOSCHOOL:
             case SPELL_EFFECT_NORMALIZED_WEAPON_DMG:
             case SPELL_EFFECT_WEAPON_PERCENT_DAMAGE:
-                if (j < i)                                  // we must calculate only at last weapon effect
+                if (j < int(i))                             // we must calculate only at last weapon effect
                     return;
             break;
         }
@@ -4640,7 +4640,7 @@ void Spell::EffectWeaponDmg(uint32 i)
                     }
                 }
                 if (stack)
-                    spell_bonus += stack * CalculateDamage(2, unitTarget);
+                    spell_bonus += stack * CalculateDamage(EFFECT_INDEX_2, unitTarget);
                 if (!stack || stack < spellInfo->StackAmount)
                     // Devastate causing Sunder Armor Effect
                     // and no need to cast over max stack amount
@@ -4745,7 +4745,7 @@ void Spell::EffectWeaponDmg(uint32 i)
                 if (count)
                 {
                     // Effect 1(for Blood-Caked Strike)/3(other) damage is bonus
-                    float bonus = count * CalculateDamage(m_spellInfo->SpellIconID == 1736 ? 0 : 2, unitTarget) / 100.0f;
+                    float bonus = count * CalculateDamage(m_spellInfo->SpellIconID == 1736 ? EFFECT_INDEX_0 : EFFECT_INDEX_2, unitTarget) / 100.0f;
                     // Blood Strike, Blood-Caked Strike and Obliterate store bonus*2
                     if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0002000000400000) ||
                         m_spellInfo->SpellIconID == 1736)
@@ -4786,7 +4786,7 @@ void Spell::EffectWeaponDmg(uint32 i)
     }
 
     int32 fixed_bonus = 0;
-    for (int j = 0; j < 3; ++j)
+    for (int j = 0; j < MAX_EFFECT_INDEX; ++j)
     {
         switch(m_spellInfo->Effect[j])
         {

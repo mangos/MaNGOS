@@ -3279,7 +3279,7 @@ void Player::removeSpell(uint32 spell_id, bool disabled, bool learn_low_rank, bo
     RemoveAurasDueToSpell(spell_id);
 
     // remove pet auras
-    for(int i = 0; i < 3; ++i)
+    for(int i = 0; i < MAX_EFFECT_INDEX; ++i)
         if(PetAura const* petSpell = sSpellMgr.GetPetAura(spell_id, i))
             RemovePetAura(petSpell);
 
@@ -4256,7 +4256,7 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
         {
             int32 delta = (int32(getLevel()) - startLevel + 1)*MINUTE;
 
-            for(int i =0; i < 3; ++i)
+            for(int i =0; i < MAX_EFFECT_INDEX; ++i)
             {
                 if(Aura* Aur = GetAura(SPELL_ID_PASSIVE_RESURRECTION_SICKNESS,i))
                 {
@@ -7078,7 +7078,7 @@ void Player::ApplyEquipSpell(SpellEntry const* spellInfo, Item* item, bool apply
         if(form_change)                                     // check aura active state from other form
         {
             bool found = false;
-            for (int k=0; k < 3; ++k)
+            for (int k=0; k < MAX_EFFECT_INDEX; ++k)
             {
                 spellEffectPair spair = spellEffectPair(spellInfo->Id, k);
                 for (AuraMap::const_iterator iter = m_Auras.lower_bound(spair); iter != m_Auras.upper_bound(spair); ++iter)
@@ -15305,7 +15305,7 @@ void Player::_LoadAuras(QueryResult *result, uint32 timediff)
                 remaincharges = 0;
 
 
-            for(uint32 i=0; i<stackcount; ++i)
+            for(uint32 i=0; i < stackcount; ++i)
             {
                 Aura* aura = CreateAura(spellproto, effindex, NULL, this, NULL);
                 if(!damage)
@@ -19125,7 +19125,7 @@ void Player::learnQuestRewardedSpells(Quest const* quest)
 
     // check learned spells state
     bool found = false;
-    for(int i=0; i < 3; ++i)
+    for(int i=0; i < MAX_EFFECT_INDEX; ++i)
     {
         if(spellInfo->Effect[i] == SPELL_EFFECT_LEARN_SPELL && !HasSpell(spellInfo->EffectTriggerSpell[i]))
         {
@@ -19240,7 +19240,7 @@ void Player::SendAurasForTarget(Unit *target)
     Unit::VisibleAuraMap const *visibleAuras = target->GetVisibleAuras();
     for(Unit::VisibleAuraMap::const_iterator itr = visibleAuras->begin(); itr != visibleAuras->end(); ++itr)
     {
-        for(uint32 j = 0; j < 3; ++j)
+        for(int j = 0; j < MAX_EFFECT_INDEX; ++j)
         {
             if(Aura *aura = target->GetAura(itr->second, j))
             {

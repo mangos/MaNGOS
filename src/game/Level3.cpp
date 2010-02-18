@@ -3594,7 +3594,7 @@ bool ChatHandler::HandleAuraCommand(const char* args)
     SpellEntry const *spellInfo = sSpellStore.LookupEntry( spellID );
     if(spellInfo)
     {
-        for(uint32 i = 0;i<3;++i)
+        for(uint32 i = 0; i < MAX_EFFECT_INDEX; ++i)
         {
             uint8 eff = spellInfo->Effect[i];
             if (eff>=TOTAL_SPELL_EFFECTS)

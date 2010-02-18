@@ -1166,7 +1166,7 @@ void Pet::_LoadAuras(uint32 timediff)
                 continue;
             }
 
-            if(effindex >= 3)
+            if(effindex >= MAX_EFFECT_INDEX)
             {
                 sLog.outError("Invalid effect index (spellid %u, effindex %u), ignore.",spellid,effindex);
                 continue;
@@ -1236,7 +1236,7 @@ void Pet::_SaveAuras()
                 {
                     // skip all auras from spell that apply at cast SPELL_AURA_MOD_SHAPESHIFT or pet area auras.
                     uint8 i;
-                    for (i = 0; i < 3; ++i)
+                    for (i = 0; i < MAX_EFFECT_INDEX; ++i)
                         if (spellInfo->EffectApplyAuraName[i] == SPELL_AURA_MOD_STEALTH ||
                             spellInfo->Effect[i] == SPELL_EFFECT_APPLY_AREA_AURA_OWNER ||
                             spellInfo->Effect[i] == SPELL_EFFECT_APPLY_AREA_AURA_PET )

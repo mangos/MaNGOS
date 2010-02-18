@@ -573,7 +573,7 @@ Aura* CreateAura(SpellEntry const* spellproto, uint32 eff, int32 *currentBasePoi
     uint32 triggeredSpellId = spellproto->EffectTriggerSpell[eff];
 
     if(SpellEntry const* triggeredSpellInfo = sSpellStore.LookupEntry(triggeredSpellId))
-        for (int i = 0; i < 3; ++i)
+        for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
             if (triggeredSpellInfo->EffectImplicitTargetA[i] == TARGET_SINGLE_ENEMY)
                 return new SingleEnemyTargetAura(spellproto, eff, currentBasePoints, target, caster, castItem);
 
@@ -1117,7 +1117,7 @@ bool Aura::_RemoveAura()
     bool lastaura = true;
 
     // find other aura in same slot (current already removed from list)
-    for(uint8 i = 0; i < 3; ++i)
+    for(int i = 0; i < MAX_EFFECT_INDEX; ++i)
     {
         Unit::spellEffectPair spair = Unit::spellEffectPair(GetId(), i);
         for(Unit::AuraMap::const_iterator itr = m_target->GetAuras().lower_bound(spair); itr != m_target->GetAuras().upper_bound(spair); ++itr)
@@ -3135,7 +3135,7 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
                             if(itr->second->state == PLAYERSPELL_REMOVED) continue;
                             SpellEntry const *spellInfo = sSpellStore.LookupEntry(itr->first);
                             if (spellInfo && spellInfo->SpellFamilyName == SPELLFAMILY_WARRIOR && spellInfo->SpellIconID == 139)
-                                Rage_val += m_target->CalculateSpellDamage(spellInfo, 0, spellInfo->EffectBasePoints[EFFECT_INDEX_0], m_target) * 10;
+                                Rage_val += m_target->CalculateSpellDamage(spellInfo, EFFECT_INDEX_0, spellInfo->EffectBasePoints[EFFECT_INDEX_0], m_target) * 10;
                         }
                     }
 
@@ -7506,7 +7506,7 @@ void Aura::PeriodicDummyTick()
                     if (rage == 0)
                         return;
                     int32 mod = (rage < 100) ? rage : 100;
-                    int32 points = m_target->CalculateSpellDamage(spell, 1, spell->EffectBasePoints[EFFECT_INDEX_1], m_target);
+                    int32 points = m_target->CalculateSpellDamage(spell, EFFECT_INDEX_1, spell->EffectBasePoints[EFFECT_INDEX_1], m_target);
                     int32 regen = m_target->GetMaxHealth() * (mod * points / 10) / 1000;
                     m_target->CastCustomSpell(m_target, 22845, &regen, NULL, NULL, true, NULL, this);
                     m_target->SetPower(POWER_RAGE, rage-mod);
@@ -7642,7 +7642,7 @@ void Aura::PeriodicDummyTick()
             {
                 // Increases your attack power by $s1 for every $s2 armor value you have.
                 // Calculate AP bonus (from 1 efect of this spell)
-                int32 apBonus = m_modifier.m_amount * m_target->GetArmor() / m_target->CalculateSpellDamage(spell, 1, spell->EffectBasePoints[EFFECT_INDEX_1], m_target);
+                int32 apBonus = m_modifier.m_amount * m_target->GetArmor() / m_target->CalculateSpellDamage(spell, EFFECT_INDEX_1, spell->EffectBasePoints[EFFECT_INDEX_1], m_target);
                 m_target->CastCustomSpell(m_target, 61217, &apBonus, &apBonus, NULL, true, NULL, this);
                 return;
             }
