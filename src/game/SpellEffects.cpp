@@ -2091,7 +2091,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
     }
 
     // Script based implementation. Must be used only for not good for implementation in core spell effects
-    // So called only for not proccessed cases
+    // So called only for not processed cases
     if (gameObjTarget)
         Script->EffectDummyGameObj(m_caster, m_spellInfo->Id, eff_idx, gameObjTarget);
     else if (unitTarget && unitTarget->GetTypeId()==TYPEID_UNIT)

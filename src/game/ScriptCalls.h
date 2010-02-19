@@ -21,6 +21,7 @@
 
 #include "Common.h"
 #include "ObjectMgr.h"
+#include "DBCEnums.h"
 
 class Creature;
 class CreatureAI;
@@ -55,9 +56,9 @@ typedef bool(MANGOS_IMPORT * scriptCallItemQuestAccept)(Player *player, Item *, 
 typedef bool(MANGOS_IMPORT * scriptCallGOQuestAccept)(Player *player, GameObject *, Quest const*);
 typedef bool(MANGOS_IMPORT * scriptCallGOChooseReward)(Player *player, GameObject *, Quest const*, uint32 opt );
 typedef bool(MANGOS_IMPORT * scriptCallItemUse) (Player *player, Item *_Item, SpellCastTargets const& targets);
-typedef bool(MANGOS_IMPORT * scriptCallEffectDummyGameObj) (Unit *caster, uint32 spellId, uint32 effIndex, GameObject *gameObjTarget);
-typedef bool(MANGOS_IMPORT * scriptCallEffectDummyCreature) (Unit *caster, uint32 spellId, uint32 effIndex, Creature *crTarget);
-typedef bool(MANGOS_IMPORT * scriptCallEffectDummyItem) (Unit *caster, uint32 spellId, uint32 effIndex, Item *itemTarget);
+typedef bool(MANGOS_IMPORT * scriptCallEffectDummyGameObj) (Unit *caster, uint32 spellId, SpellEffectIndex effIndex, GameObject *gameObjTarget);
+typedef bool(MANGOS_IMPORT * scriptCallEffectDummyCreature) (Unit *caster, uint32 spellId, SpellEffectIndex effIndex, Creature *crTarget);
+typedef bool(MANGOS_IMPORT * scriptCallEffectDummyItem) (Unit *caster, uint32 spellId, SpellEffectIndex effIndex, Item *itemTarget);
 typedef CreatureAI* (MANGOS_IMPORT * scriptCallGetAI) ( Creature *_Creature );
 typedef InstanceData* (MANGOS_IMPORT * scriptCallCreateInstanceData) (Map *map);
 
