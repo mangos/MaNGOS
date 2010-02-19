@@ -1394,28 +1394,28 @@ struct SpellEntry
     int32     EquippedItemClass;                            // 68       m_equippedItemClass (value)
     int32     EquippedItemSubClassMask;                     // 69       m_equippedItemSubclass (mask)
     int32     EquippedItemInventoryTypeMask;                // 70       m_equippedItemInvTypes (mask)
-    uint32    Effect[3];                                    // 71-73    m_effect
-    int32     EffectDieSides[3];                            // 74-76    m_effectDieSides
-    uint32    EffectBaseDice[3];                            // 77-79    m_effectBaseDice
-    float     EffectDicePerLevel[3];                        // 80-82    m_effectDicePerLevel
-    float     EffectRealPointsPerLevel[3];                  // 83-85    m_effectRealPointsPerLevel
-    int32     EffectBasePoints[3];                          // 86-88    m_effectBasePoints (don't must be used in spell/auras explicitly, must be used cached Spell::m_currentBasePoints)
-    uint32    EffectMechanic[3];                            // 89-91    m_effectMechanic
-    uint32    EffectImplicitTargetA[3];                     // 92-94    m_implicitTargetA
-    uint32    EffectImplicitTargetB[3];                     // 95-97    m_implicitTargetB
-    uint32    EffectRadiusIndex[3];                         // 98-100   m_effectRadiusIndex - spellradius.dbc
-    uint32    EffectApplyAuraName[3];                       // 101-103  m_effectAura
-    uint32    EffectAmplitude[3];                           // 104-106  m_effectAuraPeriod
-    float     EffectMultipleValue[3];                       // 107-109  m_effectAmplitude
-    uint32    EffectChainTarget[3];                         // 110-112  m_effectChainTargets
-    uint32    EffectItemType[3];                            // 113-115  m_effectItemType
-    int32     EffectMiscValue[3];                           // 116-118  m_effectMiscValue
-    int32     EffectMiscValueB[3];                          // 119-121  m_effectMiscValueB
-    uint32    EffectTriggerSpell[3];                        // 122-124  m_effectTriggerSpell
-    float     EffectPointsPerComboPoint[3];                 // 125-127  m_effectPointsPerCombo
-    uint32    EffectSpellClassMaskA[3];                     // 128-130  m_effectSpellClassMaskA
-    uint32    EffectSpellClassMaskB[3];                     // 131-133  m_effectSpellClassMaskB
-    uint32    EffectSpellClassMaskC[3];                     // 134-136  m_effectSpellClassMaskC
+    uint32    Effect[MAX_EFFECT_INDEX];                     // 71-73    m_effect
+    int32     EffectDieSides[MAX_EFFECT_INDEX];             // 74-76    m_effectDieSides
+    uint32    EffectBaseDice[MAX_EFFECT_INDEX];             // 77-79    m_effectBaseDice
+    float     EffectDicePerLevel[MAX_EFFECT_INDEX];         // 80-82    m_effectDicePerLevel
+    float     EffectRealPointsPerLevel[MAX_EFFECT_INDEX];   // 83-85    m_effectRealPointsPerLevel
+    int32     EffectBasePoints[MAX_EFFECT_INDEX];           // 86-88    m_effectBasePoints (don't must be used in spell/auras explicitly, must be used cached Spell::m_currentBasePoints)
+    uint32    EffectMechanic[MAX_EFFECT_INDEX];             // 89-91    m_effectMechanic
+    uint32    EffectImplicitTargetA[MAX_EFFECT_INDEX];      // 92-94    m_implicitTargetA
+    uint32    EffectImplicitTargetB[MAX_EFFECT_INDEX];      // 95-97    m_implicitTargetB
+    uint32    EffectRadiusIndex[MAX_EFFECT_INDEX];          // 98-100   m_effectRadiusIndex - spellradius.dbc
+    uint32    EffectApplyAuraName[MAX_EFFECT_INDEX];        // 101-103  m_effectAura
+    uint32    EffectAmplitude[MAX_EFFECT_INDEX];            // 104-106  m_effectAuraPeriod
+    float     EffectMultipleValue[MAX_EFFECT_INDEX];        // 107-109  m_effectAmplitude
+    uint32    EffectChainTarget[MAX_EFFECT_INDEX];          // 110-112  m_effectChainTargets
+    uint32    EffectItemType[MAX_EFFECT_INDEX];             // 113-115  m_effectItemType
+    int32     EffectMiscValue[MAX_EFFECT_INDEX];            // 116-118  m_effectMiscValue
+    int32     EffectMiscValueB[MAX_EFFECT_INDEX];           // 119-121  m_effectMiscValueB
+    uint32    EffectTriggerSpell[MAX_EFFECT_INDEX];         // 122-124  m_effectTriggerSpell
+    float     EffectPointsPerComboPoint[MAX_EFFECT_INDEX];  // 125-127  m_effectPointsPerCombo
+    uint32    EffectSpellClassMaskA[3];                     // 128-130  m_effectSpellClassMaskA, effect 0
+    uint32    EffectSpellClassMaskB[3];                     // 131-133  m_effectSpellClassMaskB, effect 1
+    uint32    EffectSpellClassMaskC[3];                     // 134-136  m_effectSpellClassMaskC, effect 2
     uint32    SpellVisual[2];                               // 137-138  m_spellVisualID
     uint32    SpellIconID;                                  // 139      m_spellIconID
     uint32    activeIconID;                                 // 140      m_activeIconID
@@ -1439,7 +1439,7 @@ struct SpellEntry
     uint32    DmgClass;                                     // 219      m_defenseType
     uint32    PreventionType;                               // 220      m_preventionType
     //uint32    StanceBarOrder;                             // 221      m_stanceBarOrder not used
-    float     DmgMultiplier[3];                             // 222-224  m_effectChainAmplitude
+    float     DmgMultiplier[MAX_EFFECT_INDEX];                             // 222-224  m_effectChainAmplitude
     //uint32    MinFactionId;                               // 225      m_minFactionID not used
     //uint32    MinReputation;                              // 226      m_minReputation not used
     //uint32    RequiredAuraVision;                         // 227      m_requiredAuraVision not used
@@ -1454,8 +1454,8 @@ struct SpellEntry
     //uint32  SpellDifficultyId;                            // 239      3.3.0
 
     // helpers
-    int32 CalculateSimpleValue(uint8 eff) const { return EffectBasePoints[eff]+int32(EffectBaseDice[eff]); }
-    uint32 const* GetEffectSpellClassMask(uint8 effect) const
+    int32 CalculateSimpleValue(SpellEffectIndex eff) const { return EffectBasePoints[eff]+int32(EffectBaseDice[eff]); }
+    uint32 const* GetEffectSpellClassMask(SpellEffectIndex effect) const
     {
         return EffectSpellClassMaskA + effect * 3;
     }
