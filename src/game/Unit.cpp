@@ -5785,7 +5785,7 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                         return false;
 
                     // find Divine Aegis on the target and get absorb amount
-                    Aura* DivineAegis = pVictim->GetAura(47753,0);
+                    Aura* DivineAegis = pVictim->GetAura(47753,EFFECT_INDEX_0);
                     if (DivineAegis)
                         basepoints0 = DivineAegis->GetModifier()->m_amount;
                     basepoints0 += damage * triggerAmount/100;

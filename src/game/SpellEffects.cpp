@@ -2089,7 +2089,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                 {
                     if ((*iter)->GetSpellProto()->SpellIconID == 2751 && (*iter)->GetSpellProto()->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT)
                     {
-                        bp += (*iter)->GetSpellProto()->CalculateSimpleValue(2) * bp / 100;
+                        bp += (*iter)->GetSpellProto()->CalculateSimpleValue(EFFECT_INDEX_2) * bp / 100;
                         break;
                     }
                 }
@@ -5404,7 +5404,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                             m_caster->CastCustomSpell(totem, 55277, &damage, NULL, NULL, true);
                     }
                     // Glyph of Stoneclaw Totem
-                    if(Aura* auraGlyph = unitTarget->GetAura(63298, 0))
+                    if(Aura* auraGlyph = unitTarget->GetAura(63298, EFFECT_INDEX_0))
                     {
                         int32 playerAbsorb = damage * auraGlyph->GetModifier()->m_amount;
                         m_caster->CastCustomSpell(unitTarget, 55277, &playerAbsorb, NULL, NULL, true);
