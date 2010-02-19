@@ -163,7 +163,7 @@ bool AchievementCriteriaRequirement::IsValid(AchievementCriteriaEntry const* cri
                     criteria->ID, criteria->requiredType,(requirementType==ACHIEVEMENT_CRITERIA_REQUIRE_S_AURA?"ACHIEVEMENT_CRITERIA_REQUIRE_S_AURA":"ACHIEVEMENT_CRITERIA_REQUIRE_T_AURA"),requirementType,aura.spell_id);
                 return false;
             }
-            if (aura.effect_idx >= 3)
+            if (aura.effect_idx >= MAX_EFFECT_INDEX)
             {
                 sLog.outErrorDb( "Table `achievement_criteria_requirement` (Entry: %u Type: %u) for requirement %s (%u) have wrong spell effect index in value2 (%u), ignore.",
                     criteria->ID, criteria->requiredType,(requirementType==ACHIEVEMENT_CRITERIA_REQUIRE_S_AURA?"ACHIEVEMENT_CRITERIA_REQUIRE_S_AURA":"ACHIEVEMENT_CRITERIA_REQUIRE_T_AURA"),requirementType,aura.effect_idx);
@@ -276,7 +276,7 @@ bool AchievementCriteriaRequirement::Meets(uint32 criteria_id, Player const* sou
             // flag set == must be same team, not set == different team
             return (((Player*)target)->GetTeam() == source->GetTeam()) == (player_dead.own_team_flag != 0);
         case ACHIEVEMENT_CRITERIA_REQUIRE_S_AURA:
-            return source->HasAura(aura.spell_id,aura.effect_idx);
+            return source->HasAura(aura.spell_id,SpellEffectIndex(aura.effect_idx));
         case ACHIEVEMENT_CRITERIA_REQUIRE_S_AREA:
         {
             uint32 zone_id,area_id;
@@ -284,7 +284,7 @@ bool AchievementCriteriaRequirement::Meets(uint32 criteria_id, Player const* sou
             return area.id==zone_id || area.id==area_id;
         }
         case ACHIEVEMENT_CRITERIA_REQUIRE_T_AURA:
-            return target && target->HasAura(aura.spell_id,aura.effect_idx);
+            return target && target->HasAura(aura.spell_id,SpellEffectIndex(aura.effect_idx));
         case ACHIEVEMENT_CRITERIA_REQUIRE_VALUE:
             return miscvalue1 >= value.minvalue;
         case ACHIEVEMENT_CRITERIA_REQUIRE_T_LEVEL:

@@ -467,7 +467,7 @@ void Spell::FillTargetMap()
 {
     // TODO: ADD the correct target FILLS!!!!!!
 
-    for(uint32 i = 0; i < MAX_EFFECT_INDEX; ++i)
+    for(int i = 0; i < MAX_EFFECT_INDEX; ++i)
     {
         // not call for empty effect.
         // Also some spells use not used effect targets for store targets for dummy effect in triggered spells
@@ -486,7 +486,7 @@ void Spell::FillTargetMap()
         // TODO: find a way so this is not needed?
         // for area auras always add caster as target (needed for totems for example)
         if(IsAreaAuraEffect(m_spellInfo->Effect[i]))
-            AddUnitTarget(m_caster, i);
+            AddUnitTarget(m_caster, SpellEffectIndex(i));
 
         std::list<Unit*> tmpUnitMap;
 
@@ -498,10 +498,10 @@ void Spell::FillTargetMap()
                 switch(m_spellInfo->EffectImplicitTargetB[i])
                 {
                     case 0:
-                        SetTargetMap(i, TARGET_EFFECT_SELECT, tmpUnitMap);
+                        SetTargetMap(SpellEffectIndex(i), TARGET_EFFECT_SELECT, tmpUnitMap);
                         break;
                     default:
-                        SetTargetMap(i, m_spellInfo->EffectImplicitTargetB[i], tmpUnitMap);
+                        SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetB[i], tmpUnitMap);
                         break;
                 }
                 break;
@@ -510,19 +510,19 @@ void Spell::FillTargetMap()
                 {
                     case 0:
                     case TARGET_EFFECT_SELECT:
-                        SetTargetMap(i, m_spellInfo->EffectImplicitTargetA[i], tmpUnitMap);
+                        SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetA[i], tmpUnitMap);
                         break;
                     case TARGET_AREAEFFECT_INSTANT:         // use B case that not dependent from from A in fact
                         if((m_targets.m_targetMask & TARGET_FLAG_DEST_LOCATION) == 0)
                             m_targets.setDestination(m_caster->GetPositionX(), m_caster->GetPositionY(), m_caster->GetPositionZ());
-                        SetTargetMap(i, m_spellInfo->EffectImplicitTargetB[i], tmpUnitMap);
+                        SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetB[i], tmpUnitMap);
                         break;
                     case TARGET_BEHIND_VICTIM:              // use B case that not dependent from from A in fact
-                        SetTargetMap(i, m_spellInfo->EffectImplicitTargetB[i], tmpUnitMap);
+                        SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetB[i], tmpUnitMap);
                         break;
                     default:
-                        SetTargetMap(i, m_spellInfo->EffectImplicitTargetA[i], tmpUnitMap);
-                        SetTargetMap(i, m_spellInfo->EffectImplicitTargetB[i], tmpUnitMap);
+                        SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetA[i], tmpUnitMap);
+                        SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetB[i], tmpUnitMap);
                         break;
                 }
                 break;
@@ -531,7 +531,7 @@ void Spell::FillTargetMap()
                 {
                     case 0:
                     case TARGET_EFFECT_SELECT:
-                        SetTargetMap(i, m_spellInfo->EffectImplicitTargetA[i], tmpUnitMap);
+                        SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetA[i], tmpUnitMap);
                         break;
                     case TARGET_INNKEEPER_COORDINATES:
                     case TARGET_TABLE_X_Y_Z_COORDINATES:
@@ -549,11 +549,11 @@ void Spell::FillTargetMap()
                     case TARGET_POINT_AT_SE:
                     case TARGET_POINT_AT_SW:
                         // need some target for processing
-                        SetTargetMap(i, m_spellInfo->EffectImplicitTargetA[i], tmpUnitMap);
-                        SetTargetMap(i, m_spellInfo->EffectImplicitTargetB[i], tmpUnitMap);
+                        SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetA[i], tmpUnitMap);
+                        SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetB[i], tmpUnitMap);
                         break;
                     default:
-                        SetTargetMap(i, m_spellInfo->EffectImplicitTargetB[i], tmpUnitMap);
+                        SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetB[i], tmpUnitMap);
                         break;
                 }
                 break;
@@ -571,17 +571,17 @@ void Spell::FillTargetMap()
                         }
                         else
                         {
-                            SetTargetMap(i, m_spellInfo->EffectImplicitTargetA[i], tmpUnitMap);
-                            SetTargetMap(i, m_spellInfo->EffectImplicitTargetB[i], tmpUnitMap);
+                            SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetA[i], tmpUnitMap);
+                            SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetB[i], tmpUnitMap);
                         }
                         break;
                     case 0:
-                        SetTargetMap(i, m_spellInfo->EffectImplicitTargetA[i], tmpUnitMap);
+                        SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetA[i], tmpUnitMap);
                         tmpUnitMap.push_back(m_caster);
                         break;
                     default:
-                        SetTargetMap(i, m_spellInfo->EffectImplicitTargetA[i], tmpUnitMap);
-                        SetTargetMap(i, m_spellInfo->EffectImplicitTargetB[i], tmpUnitMap);
+                        SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetA[i], tmpUnitMap);
+                        SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetB[i], tmpUnitMap);
                         break;
                 }
                 break;
@@ -589,17 +589,17 @@ void Spell::FillTargetMap()
                 switch(m_spellInfo->EffectImplicitTargetB[i])
                 {
                     case 0:
-                        SetTargetMap(i, m_spellInfo->EffectImplicitTargetA[i], tmpUnitMap);
+                        SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetA[i], tmpUnitMap);
 
                         // need some target for processing
-                        SetTargetMap(i, TARGET_EFFECT_SELECT, tmpUnitMap);
+                        SetTargetMap(SpellEffectIndex(i), TARGET_EFFECT_SELECT, tmpUnitMap);
                         break;
                     case TARGET_AREAEFFECT_INSTANT:         // All 17/7 pairs used for dest teleportation, A processed in effect code
-                        SetTargetMap(i, m_spellInfo->EffectImplicitTargetB[i], tmpUnitMap);
+                        SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetB[i], tmpUnitMap);
                         break;
                     default:
-                        SetTargetMap(i, m_spellInfo->EffectImplicitTargetA[i], tmpUnitMap);
-                        SetTargetMap(i, m_spellInfo->EffectImplicitTargetB[i], tmpUnitMap);
+                        SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetA[i], tmpUnitMap);
+                        SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetB[i], tmpUnitMap);
                     break;
                 }
                 break;
@@ -608,11 +608,11 @@ void Spell::FillTargetMap()
                 {
                     case 0:
                     case TARGET_EFFECT_SELECT:
-                        SetTargetMap(i, m_spellInfo->EffectImplicitTargetA[i], tmpUnitMap);
+                        SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetA[i], tmpUnitMap);
                         break;
                     // most A/B target pairs is self->negative and not expect adding caster to target list
                     default:
-                        SetTargetMap(i, m_spellInfo->EffectImplicitTargetB[i], tmpUnitMap);
+                        SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetB[i], tmpUnitMap);
                         break;
                 }
                 break;
@@ -621,14 +621,14 @@ void Spell::FillTargetMap()
                 {
                     case 0:
                     case TARGET_EFFECT_SELECT:
-                        SetTargetMap(i, m_spellInfo->EffectImplicitTargetA[i], tmpUnitMap);
+                        SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetA[i], tmpUnitMap);
                         break;
                     case TARGET_SCRIPT_COORDINATES:         // B case filled in CheckCast but we need fill unit list base at A case
-                        SetTargetMap(i, m_spellInfo->EffectImplicitTargetA[i], tmpUnitMap);
+                        SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetA[i], tmpUnitMap);
                         break;
                     default:
-                        SetTargetMap(i, m_spellInfo->EffectImplicitTargetA[i], tmpUnitMap);
-                        SetTargetMap(i, m_spellInfo->EffectImplicitTargetB[i], tmpUnitMap);
+                        SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetA[i], tmpUnitMap);
+                        SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetB[i], tmpUnitMap);
                         break;
                 }
                 break;
@@ -652,7 +652,7 @@ void Spell::FillTargetMap()
 
         for (std::list<Unit*>::iterator itr = tmpUnitMap.begin(); itr != tmpUnitMap.end();)
         {
-            if (!CheckTarget (*itr, i))
+            if (!CheckTarget (*itr, SpellEffectIndex(i)))
             {
                 itr = tmpUnitMap.erase(itr);
                 continue;
@@ -662,7 +662,7 @@ void Spell::FillTargetMap()
         }
 
         for(std::list<Unit*>::const_iterator iunit = tmpUnitMap.begin(); iunit != tmpUnitMap.end(); ++iunit)
-            AddUnitTarget((*iunit), i);
+            AddUnitTarget((*iunit), SpellEffectIndex(i));
     }
 }
 
@@ -782,7 +782,7 @@ void Spell::CleanupTargetList()
     m_delayMoment = 0;
 }
 
-void Spell::AddUnitTarget(Unit* pVictim, uint32 effIndex)
+void Spell::AddUnitTarget(Unit* pVictim, SpellEffectIndex effIndex)
 {
     if( m_spellInfo->Effect[effIndex] == 0 )
         return;
@@ -848,14 +848,14 @@ void Spell::AddUnitTarget(Unit* pVictim, uint32 effIndex)
     m_UniqueTargetInfo.push_back(target);
 }
 
-void Spell::AddUnitTarget(uint64 unitGUID, uint32 effIndex)
+void Spell::AddUnitTarget(uint64 unitGUID, SpellEffectIndex effIndex)
 {
     Unit* unit = m_caster->GetGUID() == unitGUID ? m_caster : ObjectAccessor::GetUnit(*m_caster, unitGUID);
     if (unit)
         AddUnitTarget(unit, effIndex);
 }
 
-void Spell::AddGOTarget(GameObject* pVictim, uint32 effIndex)
+void Spell::AddGOTarget(GameObject* pVictim, SpellEffectIndex effIndex)
 {
     if( m_spellInfo->Effect[effIndex] == 0 )
         return;
@@ -897,14 +897,14 @@ void Spell::AddGOTarget(GameObject* pVictim, uint32 effIndex)
     m_UniqueGOTargetInfo.push_back(target);
 }
 
-void Spell::AddGOTarget(uint64 goGUID, uint32 effIndex)
+void Spell::AddGOTarget(uint64 goGUID, SpellEffectIndex effIndex)
 {
     GameObject* go = m_caster->GetMap()->GetGameObject(goGUID);
     if (go)
         AddGOTarget(go, effIndex);
 }
 
-void Spell::AddItemTarget(Item* pitem, uint32 effIndex)
+void Spell::AddItemTarget(Item* pitem, SpellEffectIndex effIndex)
 {
     if( m_spellInfo->Effect[effIndex] == 0 )
         return;
@@ -1295,7 +1295,7 @@ struct TargetDistanceOrder : public std::binary_function<const Unit, const Unit,
     }
 };
 
-void Spell::SetTargetMap(uint32 effIndex, uint32 targetMode, UnitList& targetUnitMap)
+void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList& targetUnitMap)
 {
     float radius;
     if (m_spellInfo->EffectRadiusIndex[effIndex])
@@ -2818,7 +2818,7 @@ void Spell::_handle_immediate_phase()
             continue;
 
         // apply Send Event effect to ground in case empty target lists
-        if( m_spellInfo->Effect[j] == SPELL_EFFECT_SEND_EVENT && !HaveTargetsForEffect(j) )
+        if( m_spellInfo->Effect[j] == SPELL_EFFECT_SEND_EVENT && !HaveTargetsForEffect(SpellEffectIndex(j)) )
         {
             HandleEffects(NULL, NULL, NULL, SpellEffectIndex(j));
             continue;
@@ -3036,7 +3036,7 @@ void Spell::finish(bool ok)
                 if (unit && unit->isAlive())
                 {
                     SpellEntry const *auraSpellInfo = (*i)->GetSpellProto();
-                    uint32 auraSpellIdx = (*i)->GetEffIndex();
+                    SpellEffectIndex auraSpellIdx = (*i)->GetEffIndex();
                     // Calculate chance at that moment (can be depend for example from combo points)
                     int32 chance = m_caster->CalculateSpellDamage(auraSpellInfo, auraSpellIdx, (*i)->GetBasePoints(),unit);
                     if(roll_chance_i(chance))
@@ -3903,7 +3903,7 @@ void Spell::HandleEffects(Unit *pUnitTarget,Item *pItemTarget,GameObject *pGOTar
 
     uint8 eff = m_spellInfo->Effect[i];
 
-    damage = int32(CalculateDamage((uint8)i, unitTarget) * DamageMultiplier);
+    damage = int32(CalculateDamage(i, unitTarget) * DamageMultiplier);
 
     sLog.outDebug( "Spell %u Effect%d : %u", m_spellInfo->Id, i, eff);
 
@@ -4093,7 +4093,8 @@ SpellCastResult Spell::CheckCast(bool strict)
                 for(int i = 0; i < MAX_EFFECT_INDEX; ++i)
                 {
                     // check only spell that apply positive auras
-                    if (IsPositiveEffect(m_spellInfo->Id, i) && m_spellInfo->Effect[i] == SPELL_EFFECT_APPLY_AURA &&
+                    if (m_spellInfo->Effect[i] == SPELL_EFFECT_APPLY_AURA &&
+                        IsPositiveEffect(m_spellInfo->Id, SpellEffectIndex(i)) &&
                         // at not self target
                         !IsCasterSourceTarget(m_spellInfo->EffectImplicitTargetA[i]) &&
                         // and target low level
@@ -4387,14 +4388,14 @@ SpellCastResult Spell::CheckCast(bool strict)
                         m_targets.setDestination(creatureScriptTarget->GetPositionX(),creatureScriptTarget->GetPositionY(),creatureScriptTarget->GetPositionZ());
 
                         if (m_spellInfo->EffectImplicitTargetA[j] == TARGET_SCRIPT_COORDINATES && m_spellInfo->Effect[j] != SPELL_EFFECT_PERSISTENT_AREA_AURA)
-                            AddUnitTarget(creatureScriptTarget, j);
+                            AddUnitTarget(creatureScriptTarget, SpellEffectIndex(j));
                     }
                     // store explicit target for TARGET_SCRIPT
                     else
                     {
                         if (m_spellInfo->EffectImplicitTargetA[j] == TARGET_SCRIPT ||
                             m_spellInfo->EffectImplicitTargetB[j] == TARGET_SCRIPT)
-                            AddUnitTarget(creatureScriptTarget, j);
+                            AddUnitTarget(creatureScriptTarget, SpellEffectIndex(j));
                     }
                 }
                 else if (goScriptTarget)
@@ -4406,14 +4407,14 @@ SpellCastResult Spell::CheckCast(bool strict)
                         m_targets.setDestination(goScriptTarget->GetPositionX(),goScriptTarget->GetPositionY(),goScriptTarget->GetPositionZ());
 
                         if (m_spellInfo->EffectImplicitTargetA[j] == TARGET_SCRIPT_COORDINATES && m_spellInfo->Effect[j] != SPELL_EFFECT_PERSISTENT_AREA_AURA)
-                            AddGOTarget(goScriptTarget, j);
+                            AddGOTarget(goScriptTarget, SpellEffectIndex(j));
                     }
                     // store explicit target for TARGET_FOCUS_OR_SCRIPTED_GAMEOBJECT
                     else
                     {
                         if (m_spellInfo->EffectImplicitTargetA[j] == TARGET_FOCUS_OR_SCRIPTED_GAMEOBJECT ||
                             m_spellInfo->EffectImplicitTargetB[j] == TARGET_FOCUS_OR_SCRIPTED_GAMEOBJECT)
-                            AddGOTarget(goScriptTarget, j);
+                            AddGOTarget(goScriptTarget, SpellEffectIndex(j));
                     }
                 }
                 //Missing DB Entry or targets for this spellEffect.
@@ -4732,7 +4733,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                 int32 skillValue = 0;
 
                 // check lock compatibility
-                SpellCastResult res = CanOpenLock(i, lockId, skillId, reqSkillValue, skillValue);
+                SpellCastResult res = CanOpenLock(SpellEffectIndex(i), lockId, skillId, reqSkillValue, skillValue);
                 if(res != SPELL_CAST_OK)
                     return res;
 
@@ -4906,7 +4907,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                 if(m_targets.getUnitTarget()->GetCharmerGUID())
                     return SPELL_FAILED_CHARMED;
 
-                if(int32(m_targets.getUnitTarget()->getLevel()) > CalculateDamage(i,m_targets.getUnitTarget()))
+                if(int32(m_targets.getUnitTarget()->getLevel()) > CalculateDamage(SpellEffectIndex(i),m_targets.getUnitTarget()))
                     return SPELL_FAILED_HIGHLEVEL;
 
                 break;
@@ -4931,7 +4932,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                 if(m_targets.getUnitTarget()->GetCharmerGUID())
                     return SPELL_FAILED_CHARMED;
 
-                if(int32(m_targets.getUnitTarget()->getLevel()) > CalculateDamage(i,m_targets.getUnitTarget()))
+                if(int32(m_targets.getUnitTarget()->getLevel()) > CalculateDamage(SpellEffectIndex(i),m_targets.getUnitTarget()))
                     return SPELL_FAILED_HIGHLEVEL;
 
                 break;
@@ -5217,19 +5218,19 @@ bool Spell::CanAutoCast(Unit* target)
         {
             if( m_spellInfo->StackAmount <= 1)
             {
-                if( target->HasAura(m_spellInfo->Id, j) )
+                if( target->HasAura(m_spellInfo->Id, SpellEffectIndex(j)) )
                     return false;
             }
             else
             {
-                if(Aura* aura = target->GetAura(m_spellInfo->Id, j))
+                if(Aura* aura = target->GetAura(m_spellInfo->Id, SpellEffectIndex(j)))
                     if(aura->GetStackAmount() >= m_spellInfo->StackAmount)
                         return false;
             }
         }
         else if ( IsAreaAuraEffect( m_spellInfo->Effect[j] ))
         {
-                if( target->HasAura(m_spellInfo->Id, j) )
+                if( target->HasAura(m_spellInfo->Id, SpellEffectIndex(j)) )
                     return false;
         }
     }
@@ -5889,13 +5890,10 @@ void Spell::DelayedChannel()
     {
         if ((*ihit).missCondition == SPELL_MISS_NONE)
         {
-            Unit* unit = m_caster->GetGUID() == ihit->targetGUID ? m_caster : ObjectAccessor::GetUnit(*m_caster, ihit->targetGUID);
-            if (unit)
-            {
+            if (Unit* unit = m_caster->GetGUID() == ihit->targetGUID ? m_caster : ObjectAccessor::GetUnit(*m_caster, ihit->targetGUID))
                 for (int j = 0; j < MAX_EFFECT_INDEX; ++j)
-                    if( ihit->effectMask & (1 << j) )
-                        unit->DelayAura(m_spellInfo->Id, j, delaytime);
-            }
+                    if (ihit->effectMask & (1 << j))
+                        unit->DelayAura(m_spellInfo->Id, SpellEffectIndex(j), delaytime);
 
         }
     }
@@ -5903,8 +5901,7 @@ void Spell::DelayedChannel()
     for(int j = 0; j < MAX_EFFECT_INDEX; ++j)
     {
         // partially interrupt persistent area auras
-        DynamicObject* dynObj = m_caster->GetDynObject(m_spellInfo->Id, j);
-        if(dynObj)
+        if (DynamicObject* dynObj = m_caster->GetDynObject(m_spellInfo->Id, SpellEffectIndex(j)))
             dynObj->Delay(delaytime);
     }
 
@@ -5981,7 +5978,7 @@ CurrentSpellTypes Spell::GetCurrentContainer()
         return(CURRENT_GENERIC_SPELL);
 }
 
-bool Spell::CheckTarget( Unit* target, uint32 eff )
+bool Spell::CheckTarget( Unit* target, SpellEffectIndex eff )
 {
     // Check targets for creature type mask and remove not appropriate (skip explicit self target case, maybe need other explicit targets)
     if(m_spellInfo->EffectImplicitTargetA[eff] != TARGET_SELF )
@@ -6075,7 +6072,7 @@ bool Spell::IsTriggeredSpellWithRedundentData() const
     return m_IsTriggeredSpell && (m_spellInfo->manaCost || m_spellInfo->ManaCostPercentage);
 }
 
-bool Spell::HaveTargetsForEffect( uint8 effect ) const
+bool Spell::HaveTargetsForEffect(SpellEffectIndex effect) const
 {
     for(std::list<TargetInfo>::const_iterator itr = m_UniqueTargetInfo.begin(); itr != m_UniqueTargetInfo.end(); ++itr)
         if(itr->effectMask & (1 << effect))
@@ -6211,7 +6208,7 @@ bool SpellEvent::IsDeletable() const
     return m_Spell->IsDeletable();
 }
 
-SpellCastResult Spell::CanOpenLock(uint32 effIndex, uint32 lockId, SkillType& skillId, int32& reqSkillValue, int32& skillValue)
+SpellCastResult Spell::CanOpenLock(SpellEffectIndex effIndex, uint32 lockId, SkillType& skillId, int32& reqSkillValue, int32& skillValue)
 {
     if(!lockId)                                             // possible case for GO and maybe for items.
         return SPELL_CAST_OK;

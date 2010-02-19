@@ -1152,7 +1152,7 @@ void Pet::_LoadAuras(uint32 timediff)
             Field *fields = result->Fetch();
             uint64 caster_guid = fields[0].GetUInt64();
             uint32 spellid = fields[1].GetUInt32();
-            uint32 effindex = fields[2].GetUInt32();
+            SpellEffectIndex effindex = SpellEffectIndex(fields[2].GetUInt32());
             uint32 stackcount= fields[3].GetUInt32();
             int32 damage     = (int32)fields[4].GetUInt32();
             int32 maxduration = (int32)fields[5].GetUInt32();
@@ -1194,7 +1194,7 @@ void Pet::_LoadAuras(uint32 timediff)
             if (caster_guid != GetGUID() && IsSingleTargetSpell(spellproto))
                 continue;
 
-            for(uint32 i=0; i<stackcount; ++i)
+            for(uint32 i=0; i < stackcount; ++i)
             {
                 Aura* aura = CreateAura(spellproto, effindex, NULL, this, NULL);
 

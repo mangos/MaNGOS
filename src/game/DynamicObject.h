@@ -33,11 +33,11 @@ class DynamicObject : public WorldObject
         void AddToWorld();
         void RemoveFromWorld();
 
-        bool Create(uint32 guidlow, Unit *caster, uint32 spellId, uint32 effIndex, float x, float y, float z, int32 duration, float radius);
+        bool Create(uint32 guidlow, Unit *caster, uint32 spellId, SpellEffectIndex effIndex, float x, float y, float z, int32 duration, float radius);
         void Update(uint32 p_time);
         void Delete();
         uint32 GetSpellId() const { return m_spellId; }
-        uint32 GetEffIndex() const { return m_effIndex; }
+        SpellEffectIndex GetEffIndex() const { return m_effIndex; }
         uint32 GetDuration() const { return m_aliveDuration; }
         uint64 GetCasterGUID() const { return GetUInt64Value(DYNAMICOBJECT_CASTER); }
         Unit* GetCaster() const;
@@ -59,7 +59,7 @@ class DynamicObject : public WorldObject
         bool isActiveObject() const { return m_isActiveObject; }
     protected:
         uint32 m_spellId;
-        uint32 m_effIndex;
+        SpellEffectIndex m_effIndex;
         int32 m_aliveDuration;
         float m_radius;                                     // radius apply persistent effect, 0 = no persistent effect
         AffectedSet m_affected;

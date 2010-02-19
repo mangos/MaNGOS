@@ -144,7 +144,7 @@ inline bool IsSpellHaveAura(SpellEntry const *spellInfo, AuraType aura)
     return false;
 }
 
-inline bool IsSpellLastAuraEffect(SpellEntry const *spellInfo, int effecIdx)
+inline bool IsSpellLastAuraEffect(SpellEntry const *spellInfo, SpellEffectIndex effecIdx)
 {
     for(int i = effecIdx+1; i < MAX_EFFECT_INDEX; ++i)
         if(spellInfo->EffectApplyAuraName[i])
@@ -152,7 +152,7 @@ inline bool IsSpellLastAuraEffect(SpellEntry const *spellInfo, int effecIdx)
     return true;
 }
 
-bool IsNoStackAuraDueToAura(uint32 spellId_1, uint32 effIndex_1, uint32 spellId_2, uint32 effIndex_2);
+bool IsNoStackAuraDueToAura(uint32 spellId_1, SpellEffectIndex effIndex_1, uint32 spellId_2, SpellEffectIndex effIndex_2);
 
 inline bool IsSealSpell(SpellEntry const *spellInfo)
 {
@@ -184,7 +184,7 @@ inline bool IsLootCraftingSpell(SpellEntry const *spellInfo)
         (spellInfo->Effect[EFFECT_INDEX_0] == SPELL_EFFECT_CREATE_ITEM_2 && spellInfo->TotemCategory[0] != 0));
 }
 
-int32 CompareAuraRanks(uint32 spellId_1, uint32 effIndex_1, uint32 spellId_2, uint32 effIndex_2);
+int32 CompareAuraRanks(uint32 spellId_1, SpellEffectIndex effIndex_1, uint32 spellId_2, SpellEffectIndex effIndex_2);
 
 // order from less to more strict
 bool IsSingleFromSpellSpecificPerTargetPerCaster(SpellSpecific spellSpec1,SpellSpecific spellSpec2);
@@ -218,7 +218,7 @@ inline bool IsNonCombatSpell(SpellEntry const *spellInfo)
 }
 
 bool IsPositiveSpell(uint32 spellId);
-bool IsPositiveEffect(uint32 spellId, uint32 effIndex);
+bool IsPositiveEffect(uint32 spellId, SpellEffectIndex effIndex);
 bool IsPositiveTarget(uint32 targetA, uint32 targetB);
 
 bool IsExplicitPositiveTarget(uint32 targetA);
@@ -407,7 +407,7 @@ inline uint32 GetAllSpellMechanicMask(SpellEntry const* spellInfo)
     return mask;
 }
 
-inline Mechanics GetEffectMechanic(SpellEntry const* spellInfo, int32 effect)
+inline Mechanics GetEffectMechanic(SpellEntry const* spellInfo, SpellEffectIndex effect)
 {
     if (spellInfo->EffectMechanic[effect])
         return Mechanics(spellInfo->EffectMechanic[effect]);
@@ -932,7 +932,7 @@ class SpellMgr
             return SkillLineAbilityMapBounds(mSkillLineAbilityMap.lower_bound(spell_id),mSkillLineAbilityMap.upper_bound(spell_id));
         }
 
-        PetAura const* GetPetAura(uint32 spell_id, uint8 eff)
+        PetAura const* GetPetAura(uint32 spell_id, SpellEffectIndex eff)
         {
             SpellPetAuraMap::const_iterator itr = mSpellPetAuraMap.find((spell_id<<8) + eff);
             if(itr != mSpellPetAuraMap.end())

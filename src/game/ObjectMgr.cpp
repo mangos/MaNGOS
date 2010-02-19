@@ -790,8 +790,8 @@ void ObjectMgr::ConvertCreatureAddonAuras(CreatureDataAddon* addon, char const* 
     for(uint32 j = 0; j < val.size()/2; ++j)
     {
         CreatureDataAddonAura& cAura = const_cast<CreatureDataAddonAura&>(addon->auras[i]);
-        cAura.spell_id = (uint32)val[2*j+0];
-        cAura.effect_idx  = (uint32)val[2*j+1];
+        cAura.spell_id = uint32(val[2*j+0]);
+        cAura.effect_idx  = SpellEffectIndex(val[2*j+1]);
         if (cAura.effect_idx >= MAX_EFFECT_INDEX)
         {
             sLog.outErrorDb("Creature (%s: %u) has wrong effect %u for spell %u in `auras` field in `%s`.",guidEntryStr,addon->guidOrEntry,cAura.effect_idx,cAura.spell_id,table);
@@ -7386,7 +7386,7 @@ bool PlayerCondition::Meets(Player const * player) const
         case CONDITION_NONE:
             return true;                                    // empty condition, always met
         case CONDITION_AURA:
-            return player->HasAura(value1, value2);
+            return player->HasAura(value1, SpellEffectIndex(value2));
         case CONDITION_ITEM:
             return player->HasItemCount(value1, value2);
         case CONDITION_ITEM_EQUIPPED:
@@ -7418,7 +7418,7 @@ bool PlayerCondition::Meets(Player const * player) const
             return false;
         }
         case CONDITION_NO_AURA:
-            return !player->HasAura(value1, value2);
+            return !player->HasAura(value1, SpellEffectIndex(value2));
         case CONDITION_ACTIVE_EVENT:
             return sGameEventMgr.IsActiveEvent(value1);
         case CONDITION_AREA_FLAG:
@@ -7467,9 +7467,9 @@ bool PlayerCondition::IsValid(ConditionType condition, uint32 value1, uint32 val
                 sLog.outErrorDb("Aura condition requires to have non existing spell (Id: %d), skipped", value1);
                 return false;
             }
-            if(value2 > EFFECT_INDEX_2)
+            if(value2 >= MAX_EFFECT_INDEX)
             {
-                sLog.outErrorDb("Aura condition requires to have non existing effect index (%u) (must be 0..2), skipped", value2);
+                sLog.outErrorDb("Aura condition requires to have non existing effect index (%u) (must be 0..%u), skipped", value2, MAX_EFFECT_INDEX-1);
                 return false;
             }
             break;
@@ -7571,9 +7571,9 @@ bool PlayerCondition::IsValid(ConditionType condition, uint32 value1, uint32 val
                 sLog.outErrorDb("Aura condition requires to have non existing spell (Id: %d), skipped", value1);
                 return false;
             }
-            if(value2 > EFFECT_INDEX_2)
+            if(value2 > MAX_EFFECT_INDEX)
             {
-                sLog.outErrorDb("Aura condition requires to have non existing effect index (%u) (must be 0..2), skipped", value2);
+                sLog.outErrorDb("Aura condition requires to have non existing effect index (%u) (must be 0..%u), skipped", value2, MAX_EFFECT_INDEX-1);
                 return false;
             }
             break;

@@ -458,7 +458,7 @@ void CreatureEventAI::ProcessAction(CreatureEventAI_Action const& action, uint32
             if(action.cast.castFlags & CAST_AURA_NOT_PRESENT)
             {
                 for(int i = 0; i < MAX_EFFECT_INDEX; ++i)
-                    if(target->HasAura(action.cast.spellId, i))
+                    if(target->HasAura(action.cast.spellId, SpellEffectIndex(i)))
                         return;
             }
 
