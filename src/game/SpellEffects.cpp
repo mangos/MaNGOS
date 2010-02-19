@@ -476,7 +476,9 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                     {
                         // DoT not have applied spell bonuses in m_amount
                         int32 damagetick = m_caster->SpellDamageBonus(unitTarget, aura->GetSpellProto(), aura->GetModifier()->m_amount, DOT);
-                        damage += damagetick * 4;
+                        // Save value of further damage
+                        m_currentBasePoints[1] = damagetick * 2 / 3;
+                        damage += damagetick * 3;
 
                         // Glyph of Conflagrate
                         if (!m_caster->HasAura(56235))
