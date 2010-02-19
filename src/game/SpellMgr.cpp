@@ -1872,7 +1872,7 @@ SpellEntry const* SpellMgr::SelectAuraRankForPlayerLevel(SpellEntry const* spell
         return spellInfo;
 
     bool needRankSelection = false;
-    for(int i=0;i<3;++i)
+    for(int i = 0; i < MAX_EFFECT_INDEX; ++i)
     {
         if (IsPositiveEffect(spellInfo->Id, SpellEffectIndex(i)) && (
             spellInfo->Effect[i] == SPELL_EFFECT_APPLY_AURA ||
@@ -2340,7 +2340,7 @@ void SpellMgr::LoadSpellScriptTarget()
             continue;
 
         bool found = false;
-        for(int j=0; j<3; ++j)
+        for(int j = 0; j < MAX_EFFECT_INDEX; ++j)
         {
             if( spellInfo->EffectImplicitTargetA[j] == TARGET_SCRIPT || spellInfo->EffectImplicitTargetA[j] != TARGET_SELF && spellInfo->EffectImplicitTargetB[j] == TARGET_SCRIPT )
             {
@@ -2617,7 +2617,7 @@ bool SpellMgr::IsSpellValid(SpellEntry const* spellInfo, Player* pl, bool msg)
     bool need_check_reagents = false;
 
     // check effects
-    for(int i=0; i<3; ++i)
+    for(int i = 0; i < MAX_EFFECT_INDEX; ++i)
     {
         switch(spellInfo->Effect[i])
         {

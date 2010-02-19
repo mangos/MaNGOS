@@ -883,36 +883,36 @@ void ObjectMgr::LoadEquipmentTemplates()
 {
     sEquipmentStorage.Load();
 
-    for(uint32 i=0; i< sEquipmentStorage.MaxEntry; ++i)
+    for(uint32 i=0; i < sEquipmentStorage.MaxEntry; ++i)
     {
         EquipmentInfo const* eqInfo = sEquipmentStorage.LookupEntry<EquipmentInfo>(i);
 
-        if(!eqInfo)
+        if (!eqInfo)
             continue;
 
-        for(uint8 j=0; j<3; j++)
+        for(uint8 j = 0; j < 3; ++j)
         {
-            if(!eqInfo->equipentry[j])
+            if (!eqInfo->equipentry[j])
                continue;
 
             ItemEntry const *dbcitem = sItemStore.LookupEntry(eqInfo->equipentry[j]);
 
-            if(!dbcitem)
+            if (!dbcitem)
             {
                 sLog.outErrorDb("Unknown item (entry=%u) in creature_equip_template.equipentry%u for entry = %u, forced to 0.", eqInfo->equipentry[j], j+1, i);
                 const_cast<EquipmentInfo*>(eqInfo)->equipentry[j] = 0;
                 continue;
             }
 
-            if(dbcitem->InventoryType != INVTYPE_WEAPON &&
-                    dbcitem->InventoryType != INVTYPE_SHIELD &&
-                    dbcitem->InventoryType != INVTYPE_RANGED &&
-                    dbcitem->InventoryType != INVTYPE_2HWEAPON &&
-                    dbcitem->InventoryType != INVTYPE_WEAPONMAINHAND &&
-                    dbcitem->InventoryType != INVTYPE_WEAPONOFFHAND &&
-                    dbcitem->InventoryType != INVTYPE_HOLDABLE &&
-                    dbcitem->InventoryType != INVTYPE_THROWN &&
-                    dbcitem->InventoryType != INVTYPE_RANGEDRIGHT)
+            if (dbcitem->InventoryType != INVTYPE_WEAPON &&
+                dbcitem->InventoryType != INVTYPE_SHIELD &&
+                dbcitem->InventoryType != INVTYPE_RANGED &&
+                dbcitem->InventoryType != INVTYPE_2HWEAPON &&
+                dbcitem->InventoryType != INVTYPE_WEAPONMAINHAND &&
+                dbcitem->InventoryType != INVTYPE_WEAPONOFFHAND &&
+                dbcitem->InventoryType != INVTYPE_HOLDABLE &&
+                dbcitem->InventoryType != INVTYPE_THROWN &&
+                dbcitem->InventoryType != INVTYPE_RANGEDRIGHT)
             {
                 sLog.outErrorDb("Item (entry=%u) in creature_equip_template.equipentry%u for entry = %u is not equipable in a hand, forced to 0.", eqInfo->equipentry[j], j+1, i);
                 const_cast<EquipmentInfo*>(eqInfo)->equipentry[j] = 0;
@@ -4406,20 +4406,20 @@ void ObjectMgr::LoadSpellScripts()
 
         //check for correct spellEffect
         bool found = false;
-        for(int i=0; i<3; ++i)
+        for(int i = 0; i < MAX_EFFECT_INDEX; ++i)
         {
             // skip empty effects
-            if( !spellInfo->Effect[i] )
+            if (!spellInfo->Effect[i])
                 continue;
 
-            if( spellInfo->Effect[i] == SPELL_EFFECT_SCRIPT_EFFECT )
+            if (spellInfo->Effect[i] == SPELL_EFFECT_SCRIPT_EFFECT)
             {
                 found =  true;
                 break;
             }
         }
 
-        if(!found)
+        if (!found)
             sLog.outErrorDb("Table `spell_scripts` has unsupported spell (Id: %u) without SPELL_EFFECT_SCRIPT_EFFECT (%u) spell effect",itr->first,SPELL_EFFECT_SCRIPT_EFFECT);
     }
 }
@@ -4459,7 +4459,7 @@ void ObjectMgr::LoadEventScripts()
         SpellEntry const * spell = sSpellStore.LookupEntry(i);
         if (spell)
         {
-            for(int j=0; j<3; ++j)
+            for(int j = 0; j < MAX_EFFECT_INDEX; ++j)
             {
                 if( spell->Effect[j] == SPELL_EFFECT_SEND_EVENT )
                 {
@@ -7957,11 +7957,11 @@ void ObjectMgr::LoadTrainerSpell()
 
         // calculate learned spell for profession case when stored cast-spell
         trainerSpell.learnedSpell = spell;
-        for(int i = 0; i <3; ++i)
+        for(int i = 0; i < MAX_EFFECT_INDEX; ++i)
         {
-            if(spellinfo->Effect[i] != SPELL_EFFECT_LEARN_SPELL)
+            if (spellinfo->Effect[i] != SPELL_EFFECT_LEARN_SPELL)
                 continue;
-            if(SpellMgr::IsProfessionOrRidingSpell(spellinfo->EffectTriggerSpell[i]))
+            if (SpellMgr::IsProfessionOrRidingSpell(spellinfo->EffectTriggerSpell[i]))
             {
                 trainerSpell.learnedSpell = spellinfo->EffectTriggerSpell[i];
                 break;

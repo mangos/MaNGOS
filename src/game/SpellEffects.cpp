@@ -1677,7 +1677,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     if (!pEnchant)
                         return;
 
-                    for (int s=0;s<3;s++)
+                    for (int s = 0; s < 3; ++s)
                     {
                         if (pEnchant->type[s]!=ITEM_ENCHANTMENT_TYPE_COMBAT_SPELL)
                             continue;
