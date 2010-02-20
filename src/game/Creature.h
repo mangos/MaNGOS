@@ -24,6 +24,7 @@
 #include "UpdateMask.h"
 #include "ItemPrototype.h"
 #include "LootMgr.h"
+#include "DBCEnums.h"
 #include "Database/DatabaseEnv.h"
 #include "Cell.h"
 

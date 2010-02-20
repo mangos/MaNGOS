@@ -19,6 +19,7 @@
 #define MANGOS_SPELLAURAS_H
 
 #include "SpellAuraDefines.h"
+#include "DBCEnums.h"
 
 struct Modifier
 {

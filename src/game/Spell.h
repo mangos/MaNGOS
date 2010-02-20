@@ -21,6 +21,7 @@
 
 #include "GridDefines.h"
 #include "SharedDefines.h"
+#include "DBCEnums.h"
 
 class WorldSession;
 class Unit;

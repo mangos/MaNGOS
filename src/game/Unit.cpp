@@ -6437,13 +6437,15 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                 case 54939:
                 {
                     // Lookup base amount mana restore
-                    for (int i=0; i<3;++i)
+                    for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
+                    {
                         if (procSpell->Effect[i] == SPELL_EFFECT_ENERGIZE)
                         {
                             int32 mana = procSpell->EffectBasePoints[i];
                             CastCustomSpell(this, 54986, NULL, &mana, NULL, true, castItem, triggeredByAura);
                             break;
                         }
+                    }
                     return true;
                 }
                 // Sacred Shield (buff)
@@ -12920,9 +12922,9 @@ uint32 Unit::GetCastingTimeForBonus( SpellEntry const *spellProto, DamageEffectT
     bool DirectDamage = false;
     bool AreaEffect   = false;
 
-    for ( uint32 i=0; i<3;++i)
+    for (uint32 i = 0; i < MAX_EFFECT_INDEX; ++i)
     {
-        switch ( spellProto->Effect[i] )
+        switch (spellProto->Effect[i])
         {
             case SPELL_EFFECT_SCHOOL_DAMAGE:
             case SPELL_EFFECT_POWER_DRAIN:
@@ -12933,7 +12935,7 @@ uint32 Unit::GetCastingTimeForBonus( SpellEntry const *spellProto, DamageEffectT
                 DirectDamage = true;
                 break;
             case SPELL_EFFECT_APPLY_AURA:
-                switch ( spellProto->EffectApplyAuraName[i] )
+                switch (spellProto->EffectApplyAuraName[i])
                 {
                     case SPELL_AURA_PERIODIC_DAMAGE:
                     case SPELL_AURA_PERIODIC_HEAL:
@@ -12950,12 +12952,12 @@ uint32 Unit::GetCastingTimeForBonus( SpellEntry const *spellProto, DamageEffectT
                 break;
         }
 
-        if(IsAreaEffectTarget(Targets(spellProto->EffectImplicitTargetA[i])) || IsAreaEffectTarget(Targets(spellProto->EffectImplicitTargetB[i])))
+        if (IsAreaEffectTarget(Targets(spellProto->EffectImplicitTargetA[i])) || IsAreaEffectTarget(Targets(spellProto->EffectImplicitTargetB[i])))
             AreaEffect = true;
     }
 
     // Combined Spells with Both Over Time and Direct Damage
-    if ( overTime > 0 && CastingTime > 0 && DirectDamage )
+    if (overTime > 0 && CastingTime > 0 && DirectDamage)
     {
         // mainly for DoTs which are 3500 here otherwise
         uint32 OriginalCastTime = GetSpellCastTime(spellProto);
@@ -12964,22 +12966,22 @@ uint32 Unit::GetCastingTimeForBonus( SpellEntry const *spellProto, DamageEffectT
         // Portion to Over Time
         float PtOT = (overTime / 15000.0f) / ((overTime / 15000.0f) + (OriginalCastTime / 3500.0f));
 
-        if ( damagetype == DOT )
+        if (damagetype == DOT)
             CastingTime = uint32(CastingTime * PtOT);
-        else if ( PtOT < 1.0f )
+        else if (PtOT < 1.0f)
             CastingTime  = uint32(CastingTime * (1 - PtOT));
         else
             CastingTime = 0;
     }
 
     // Area Effect Spells receive only half of bonus
-    if ( AreaEffect )
+    if (AreaEffect)
         CastingTime /= 2;
 
     // -5% of total per any additional effect
-    for ( uint8 i=0; i<effects; ++i)
+    for (uint8 i = 0; i < effects; ++i)
     {
-        if ( CastingTime > 175 )
+        if (CastingTime > 175)
         {
             CastingTime -= 175;
         }
@@ -13418,7 +13420,7 @@ void Unit::SetFFAPvP( bool state )
     CallForAllControlledUnits(SetFFAPvPHelper(state),true,true,true);
 }
 
-void Unit::KnockBackFrom(Unit* target, float horizintalSpeed, float verticalSpeed)
+void Unit::KnockBackFrom(Unit* target, float horizontalSpeed, float verticalSpeed)
 {
     float angle = this == target ? GetOrientation() + M_PI_F : target->GetAngle(this);
     float vsin = sin(angle);
@@ -13432,13 +13434,13 @@ void Unit::KnockBackFrom(Unit* target, float horizintalSpeed, float verticalSpee
         data << uint32(0);                                  // Sequence
         data << float(vcos);                                // x direction
         data << float(vsin);                                // y direction
-        data << float(horizintalSpeed);                     // Horizontal speed
+        data << float(horizontalSpeed);                     // Horizontal speed
         data << float(-verticalSpeed);                      // Z Movement speed (vertical)
         ((Player*)this)->GetSession()->SendPacket(&data);
     }
     else
     {
-        float dis = horizintalSpeed;
+        float dis = horizontalSpeed;
 
         float ox, oy, oz;
         GetPosition(ox, oy, oz);

@@ -20,6 +20,7 @@
 #define MANGOSSERVER_DYNAMICOBJECT_H
 
 #include "Object.h"
+#include "DBCEnums.h"
 
 class Unit;
 struct SpellEntry;
