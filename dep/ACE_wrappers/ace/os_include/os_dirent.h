@@ -6,7 +6,7 @@
  *
  *  format of directory entries
  *
- *  $Id: os_dirent.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: os_dirent.h 82985 2008-10-08 18:15:30Z johnnyw $
  *
  *  @author Don Hinton <dhinton@dresystems.com>
  *  @author This code was originally in various places including ace/OS.h.
@@ -64,6 +64,7 @@ struct dirent {
 };
 
 #define ACE_DIRENT dirent
+#define ACE_HAS_TCHAR_DIRENT
 
 struct ACE_DIR {
   /// The name of the directory we are looking into
@@ -82,6 +83,7 @@ struct ACE_DIR {
   int started_reading_;
 };
 #elif defined (ACE_WIN32) && (__BORLANDC__) && defined (ACE_USES_WCHAR)
+#define ACE_HAS_TCHAR_DIRENT
 #define ACE_DIRENT wdirent
 typedef wDIR ACE_DIR;
 #else

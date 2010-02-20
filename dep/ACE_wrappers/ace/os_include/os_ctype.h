@@ -6,7 +6,7 @@
  *
  *  character types
  *
- *  $Id: os_ctype.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: os_ctype.h 83520 2008-11-03 08:54:08Z johnnyw $
  *
  *  @author Don Hinton <dhinton@dresystems.com>
  *  @author This code was originally in various places including ace/OS.h.
@@ -36,6 +36,9 @@ extern "C"
 
 // @todo move the is* and is* emulation methods in ACE_OS here
 // and let ACE_OS just call them.
+#if !defined (ACE_HAS_CTYPE_T)
+typedef int ctype_t;
+#endif
 
 #ifdef __cplusplus
 }

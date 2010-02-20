@@ -6,7 +6,7 @@
  *
  *  signals
  *
- *  $Id: os_signal.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: os_signal.h 83735 2008-11-14 09:41:52Z johnnyw $
  *
  *  @author Don Hinton <dhinton@dresystems.com>
  *  @author This code was originally in various places including ace/OS.h.
@@ -25,7 +25,6 @@
 #endif /* ACE_LACKS_PRAGMA_ONCE */
 
 #include "ace/os_include/sys/os_types.h"
-#include "ace/os_include/os_pthread.h"
 
 #if !defined (ACE_LACKS_SIGNAL_H)
    extern "C" {
@@ -135,6 +134,14 @@ extern "C"
 #  define SIGALRM 0
 #endif /* SIGALRM */
 
+#if !defined (SIGABRT)
+#  define SIGABRT 0
+#endif /* SIGABRT */
+
+#if !defined (SIGTERM)
+#  define SIGTERM 0
+#endif /* SIGTERM */
+
 #if !defined (SIG_DFL)
 #  define SIG_DFL ((__sighandler_t) 0)
 #endif /* SIG_DFL */
@@ -166,7 +173,11 @@ extern "C"
 #  define ACE_NSIG NSIG
 #endif /* __Lynx__ */
 
-#if defined (ACE_HAS_CONSISTENT_SIGNAL_PROTOTYPES)
+#if defined (ACE_HAS_WINCE)
+  typedef void (__cdecl * __sighandler_t)(int);
+#endif
+
+#if defined (ACE_HAS_CONSISTENT_SIGNAL_PROTOTYPES) || defined (ACE_HAS_LYNXOS50_SIGNALS)
    // Prototypes for both signal() and struct sigaction are consistent..
   typedef void (*ACE_SignalHandler)(int);
   typedef void (*ACE_SignalHandlerV)(int);
