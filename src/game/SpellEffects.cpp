@@ -1201,7 +1201,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                             m_caster->CastSpell(m_caster, 49378, true);
                     }
                     return;
-                case 45980:
+                case 45980:                                 // Re-Cursive Transmatter Injection
                 {
                     if (m_caster->GetTypeId() == TYPEID_PLAYER && unitTarget)
                     {
@@ -1215,6 +1215,16 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                             ((Creature*)unitTarget)->ForcedDespawn();
                     }
 
+                    return;
+                }
+                case 45990:                                 // Collect Oil
+                {
+                    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_UNIT)
+                        return;
+
+                    m_caster->CastSpell(m_caster, 45991, true);
+                    unitTarget->setDeathState(JUST_DIED);
+                    unitTarget->SetHealth(0);
                     return;
                 }
                 case 50243:                                 // Teach Language
