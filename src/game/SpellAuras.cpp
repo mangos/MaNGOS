@@ -2280,6 +2280,16 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         if (Unit* caster = GetCaster())
                             caster->CastSpell(caster, 13138, true, NULL, this);
                         return;
+                    case 35357:                             // Spawn Feign Death
+                        if (m_target->GetTypeId() == TYPEID_UNIT)
+                        {
+                            // flags not set like it's done in SetFeignDeath(), also this aura expected to be existing always/from spawn
+                            m_target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_29);
+                            m_target->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
+
+                            m_target->addUnitState(UNIT_STAT_DIED);
+                        }
+                        return;
                     case 39850:                             // Rocket Blast
                         if(roll_chance_i(20))               // backfire stun
                             m_target->CastSpell(m_target, 51581, true, NULL, this);

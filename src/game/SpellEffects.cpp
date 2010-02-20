@@ -1222,9 +1222,11 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     if (!unitTarget || unitTarget->GetTypeId() != TYPEID_UNIT)
                         return;
 
-                    m_caster->CastSpell(m_caster, 45991, true);
-                    unitTarget->setDeathState(JUST_DIED);
-                    unitTarget->SetHealth(0);
+                    if (const SpellEntry *pSpell = sSpellStore.LookupEntry(45991))
+                    {
+                        unitTarget->CastSpell(unitTarget, pSpell, true);
+                        ((Creature*)unitTarget)->ForcedDespawn(GetSpellDuration(pSpell) + 1);
+                    }
                     return;
                 }
                 case 50243:                                 // Teach Language
