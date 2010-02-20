@@ -84,6 +84,9 @@ class AuctionHouseObject
 
         uint32 Getcount() { return AuctionsMap.size(); }
 
+        AuctionEntryMap::iterator GetAuctionsBegin() {return AuctionsMap.begin();}
+        AuctionEntryMap::iterator GetAuctionsEnd() {return AuctionsMap.end();}
+
         void AddAuction(AuctionEntry *ah)
         {
             ASSERT( ah );
