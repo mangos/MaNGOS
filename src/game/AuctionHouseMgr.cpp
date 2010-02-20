@@ -463,12 +463,12 @@ void AuctionHouseMgr::Update()
 
 AuctionHouseEntry const* AuctionHouseMgr::GetAuctionHouseEntry(uint32 factionTemplateId)
 {
-    uint32 houseid = 1;                                     // dwarf auction house (used for normal cut/etc percents)
+    uint32 houseid = 7;                            // goblin auction house
 
     if(!sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_AUCTION))
     {
         //FIXME: found way for proper auctionhouse selection by another way
-        // AuctionHo use.dbc have faction field with _player_ factions associated with auction house races.
+        // AuctionHouse.dbc have faction field with _player_ factions associated with auction house races.
         // but no easy way convert creature faction to player race faction for specific city
         switch(factionTemplateId)
         {
