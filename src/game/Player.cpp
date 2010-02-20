@@ -11426,10 +11426,16 @@ void Player::SwapItem( uint16 src, uint16 dst )
         else
             return;
 
+if(pSrcItem->GetCount() > pSrcItem->GetProto()->GetMaxStackSize() || pDstItem->GetCount() > pDstItem->GetProto()->GetMaxStackSize())
+    {
+        SendEquipError( EQUIP_ERR_TRIED_TO_SPLIT_MORE_THAN_COUNT, pSrcItem, NULL );
+        return;
+    }
+
         // can be merge/fill
         if(msg == EQUIP_ERR_OK)
         {
-            if( pSrcItem->GetCount() + pDstItem->GetCount() <= pSrcItem->GetProto()->GetMaxStackSize())
+            if( pSrcItem->GetCount() + pDstItem->GetCount() <= pSrcItem->GetProto()->GetMaxStackSize() && pSrcItem->GetCount() + pDstItem->GetCount() <= pDstItem->GetProto()->GetMaxStackSize() )
             {
                 RemoveItem(srcbag, srcslot, true);
 
@@ -15138,11 +15144,12 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
     outDebugValues();
 
     // all fields read
-    delete result;
+//    if(result) delete result;
 
     // GM state
     if(GetSession()->GetSecurity() > SEC_PLAYER)
     {
+        sLog.outDebug("GM parameters for player %s ", m_name.c_str());
         switch(sWorld.getConfig(CONFIG_UINT32_GM_LOGIN_STATE))
         {
             default:
@@ -15198,14 +15205,18 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
                 break;
         }
     }
-
+    sLog.outDebug("Declined names for player %s ", m_name.c_str());
     _LoadDeclinedNames(holder->GetResult(PLAYER_LOGIN_QUERY_LOADDECLINEDNAMES));
 
+    sLog.outDebug("Achievments for player %s ", m_name.c_str());
     m_achievementMgr.LoadFromDB(holder->GetResult(PLAYER_LOGIN_QUERY_LOADACHIEVEMENTS), holder->GetResult(PLAYER_LOGIN_QUERY_LOADCRITERIAPROGRESS));
     m_achievementMgr.CheckAllAchievementCriteria();
-
+    sLog.outDebug("Equipmentsets for player %s ", m_name.c_str());
     _LoadEquipmentSets(holder->GetResult(PLAYER_LOGIN_QUERY_LOADEQUIPMENTSETS));
 
+    sLog.outDebug("Load data for player %s complete. ", m_name.c_str());
+
+    if(result) delete result;
     return true;
 }
 

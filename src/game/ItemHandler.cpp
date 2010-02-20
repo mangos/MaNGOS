@@ -533,7 +533,7 @@ void WorldSession::HandleSellItemOpcode( WorldPacket & recv_data )
         else
         {
             // prevent sell more items that exist in stack (possible only not from client)
-            if(count > pItem->GetCount())
+            if(count > pItem->GetCount() || count > pItem->GetProto()->GetMaxStackSize())
             {
                 _player->SendSellError( SELL_ERR_CANT_SELL_ITEM, pCreature, itemguid, 0);
                 return;
@@ -545,12 +545,18 @@ void WorldSession::HandleSellItemOpcode( WorldPacket & recv_data )
         {
             if( pProto->SellPrice > 0 )
             {
-                if(count < pItem->GetCount())               // need split items
+                if(count > 0 && count < pItem->GetCount() && count < pItem->GetProto()->GetMaxStackSize())               // need split items
                 {
                     Item *pNewItem = pItem->CloneItem( count, _player );
                     if (!pNewItem)
                     {
                         sLog.outError("WORLD: HandleSellItemOpcode - could not create clone of item %u; count = %u", pItem->GetEntry(), count );
+                        _player->SendSellError( SELL_ERR_CANT_SELL_ITEM, pCreature, itemguid, 0);
+                        return;
+                    }
+                    if ( (pItem->GetCount() - count) < 0 || (pItem->GetCount() - count) > pItem->GetProto()->GetMaxStackSize()) // hackers dupe item check
+                    {
+                        sLog.outError("WORLD: HandleSellItemOpcode - could not change stack of item %u; count = %u", pItem->GetEntry(), count );
                         _player->SendSellError( SELL_ERR_CANT_SELL_ITEM, pCreature, itemguid, 0);
                         return;
                     }
@@ -1065,6 +1071,12 @@ void WorldSession::HandleWrapItemOpcode(WorldPacket& recv_data)
     }
 
     if(item->GetMaxStackCount() != 1)
+    {
+        _player->SendEquipError( EQUIP_ERR_STACKABLE_CANT_BE_WRAPPED, item, NULL );
+        return;
+    }
+
+    if(item->GetProto()->GetMaxStackSize() > 1 )
     {
         _player->SendEquipError( EQUIP_ERR_STACKABLE_CANT_BE_WRAPPED, item, NULL );
         return;
