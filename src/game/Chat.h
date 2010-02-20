@@ -108,7 +108,7 @@ class ChatHandler
         bool HandleAccountSetAddonCommand(const char* args);
         bool HandleAccountSetGmLevelCommand(const char* args);
         bool HandleAccountSetPasswordCommand(const char* args);
-
+        bool HandleAHBotOptionsCommand(const char* args);
         bool HandleBanAccountCommand(const char* args);
         bool HandleBanCharacterCommand(const char* args);
         bool HandleBanIPCommand(const char* args);

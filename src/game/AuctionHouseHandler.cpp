@@ -28,6 +28,7 @@
 #include "AuctionHouseMgr.h"
 #include "Mail.h"
 #include "Util.h"
+#include "AuctionHouseBot.h"
 
 // please DO NOT use iterator++, because it is slower than ++iterator!!!
 // post-incrementation is always slower than pre-incrementation !
@@ -122,7 +123,10 @@ void WorldSession::SendAuctionOutbiddedMail(AuctionEntry *auction, uint32 newPri
         std::ostringstream msgAuctionOutbiddedSubject;
         msgAuctionOutbiddedSubject << auction->item_template << ":0:" << AUCTION_OUTBIDDED << ":0:0";
 
-        if (oldBidder)
+        if (oldBidder && !_player)
+            oldBidder->GetSession()->SendAuctionBidderNotification( auction->GetHouseId(), auction->Id, auctionbot.GetAHBplayerGUID(), newPrice, auction->GetAuctionOutBid(), auction->item_template);
+
+        if (oldBidder && _player)
             oldBidder->GetSession()->SendAuctionBidderNotification( auction->GetHouseId(), auction->Id, _player->GetGUID(), newPrice, auction->GetAuctionOutBid(), auction->item_template);
 
         MailDraft(msgAuctionOutbiddedSubject.str(), "")     // TODO: fix body
@@ -252,7 +256,10 @@ void WorldSession::HandleAuctionSellItem( WorldPacket & recv_data )
 
     AuctionEntry *AH = new AuctionEntry;
     AH->Id = sObjectMgr.GenerateAuctionID();
-    AH->auctioneer = GUID_LOPART(auctioneer);
+    if(sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_AUCTION))
+        AH->auctioneer = 23442;
+    else
+        AH->auctioneer = GUID_LOPART(auctioneer);
     AH->item_guidlow = GUID_LOPART(item);
     AH->item_template = it->GetEntry();
     AH->owner = pl->GetGUIDLow();
@@ -267,6 +274,7 @@ void WorldSession::HandleAuctionSellItem( WorldPacket & recv_data )
     DETAIL_LOG("selling item %u to auctioneer %u with initial bid %u with buyout %u and with time %u (in sec) in auctionhouse %u", GUID_LOPART(item), GUID_LOPART(auctioneer), bid, buyout, auction_time, AH->GetHouseId());
     auctionHouse->AddAuction(AH);
 
+    auctionHouse->AddAuction(AH);
     sAuctionMgr.AddAItem(it);
     pl->MoveItemFromInventory( it->GetBagSlot(), it->GetSlot(), true);
 
