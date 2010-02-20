@@ -1201,6 +1201,22 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                             m_caster->CastSpell(m_caster, 49378, true);
                     }
                     return;
+                case 45980:
+                {
+                    if (m_caster->GetTypeId() == TYPEID_PLAYER && unitTarget)
+                    {
+                        if (const SpellEntry *pSpell = sSpellStore.LookupEntry(46022))
+                        {
+                            m_caster->CastSpell(unitTarget, pSpell, true);
+                            ((Player*)m_caster)->KilledMonsterCredit(pSpell->EffectMiscValue[EFFECT_INDEX_0], 0);
+                        }
+
+                        if (unitTarget->GetTypeId() == TYPEID_UNIT)
+                            ((Creature*)unitTarget)->ForcedDespawn();
+                    }
+
+                    return;
+                }
                 case 50243:                                 // Teach Language
                 {
                     if (m_caster->GetTypeId() != TYPEID_PLAYER)
