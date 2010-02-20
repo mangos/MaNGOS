@@ -78,6 +78,12 @@ float World::m_MaxVisibleDistanceInFlight     = DEFAULT_VISIBILITY_DISTANCE;
 float World::m_VisibleUnitGreyDistance        = 0;
 float World::m_VisibleObjectGreyDistance      = 0;
 
+//movement anticheat
+bool World::m_EnableMvAnticheat = true;
+uint32 World::m_TeleportToPlaneAlarms = 50;
+uint32 World::m_MistimingAlarms = 20;
+uint32 World::m_MistimingDelta = 2000;
+
 /// World constructor
 World::World()
 {
@@ -513,6 +519,42 @@ void World::LoadConfigSettings(bool reload)
 
     setConfigPos(CONFIG_FLOAT_CREATURE_FAMILY_ASSISTANCE_RADIUS,      "CreatureFamilyAssistanceRadius",     10.0f);
     setConfigPos(CONFIG_FLOAT_CREATURE_FAMILY_FLEE_ASSISTANCE_RADIUS, "CreatureFamilyFleeAssistanceRadius", 30.0f);
+
+    ///- Read movement anticheat from the config file
+    m_EnableMvAnticheat = sConfig.GetBoolDefault("Anticheat.Movement.Enable",true);
+    m_TeleportToPlaneAlarms = sConfig.GetIntDefault("Anticheat.Movement.TeleportToPlaneAlarms", 50);
+    if (m_TeleportToPlaneAlarms<20)
+    {
+        sLog.outError("Anticheat.Movement.TeleportToPlaneAlarms (%d) must be >=20. Using 20 instead.",m_TeleportToPlaneAlarms);
+        m_TeleportToPlaneAlarms = 20;
+    }
+    if (m_TeleportToPlaneAlarms>100)
+    {
+        sLog.outError("Anticheat.Movement.TeleportToPlaneAlarms (%d) must be <=100. Using 100 instead.",m_TeleportToPlaneAlarms);
+        m_TeleportToPlaneAlarms = 100;
+    }
+    m_MistimingDelta = sConfig.GetIntDefault("Anticheat.Movement.MistimingDelta",10000);
+    if (m_MistimingDelta<1000)
+    {
+        sLog.outError("Anticheat.Movement.m_MistimingDelta (%d) must be >=1000ms. Using 1000 instead.",m_TeleportToPlaneAlarms);
+        m_MistimingDelta = 1000;
+    }
+    if (m_MistimingDelta>15000)
+    {
+        sLog.outError("Anticheat.Movement.m_MistimingDelta (%d) must be <=15000ms. Using 15000 instead.",m_TeleportToPlaneAlarms);
+        m_MistimingDelta = 15000;
+    }
+    m_MistimingAlarms = sConfig.GetIntDefault("Anticheat.Movement.MistimingAlarms",20);
+    if (m_MistimingAlarms<10)
+    {
+        sLog.outError("Anticheat.Movement.MistimingAlarms (%d) must be >=20. Using 10 instead.",m_TeleportToPlaneAlarms);
+        m_MistimingAlarms = 10;
+    }
+    if (m_MistimingAlarms>50)
+    {
+        sLog.outError("Anticheat.Movement.m_MistimingAlarms (%d) must be <=50. Using 50 instead.",m_TeleportToPlaneAlarms);
+        m_MistimingAlarms = 50;
+    }
 
     ///- Read other configuration items from the config file
     setConfigMinMax(CONFIG_UINT32_COMPRESSION, "Compression", 1, 1, 9);
