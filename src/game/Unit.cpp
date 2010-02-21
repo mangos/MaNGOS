@@ -11649,6 +11649,12 @@ void Unit::SetMaxHealth(uint32 val)
         SetHealth(val);
 }
 
+void Unit::SetHealthPercent(float percent)
+{
+    uint32 newHealth = GetMaxHealth() * percent/100.0f;
+    SetHealth(newHealth);
+}
+
 void Unit::SetPower(Powers power, uint32 val)
 {
     if(GetPower(power) == val)
