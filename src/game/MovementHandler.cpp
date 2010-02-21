@@ -542,7 +542,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 
             //Water-Walk checks
             if (movementInfo.HasMovementFlag(MOVEFLAG_WATERWALKING)
-                  && !plMover->isGameMaster()
+                  && !plMover->isGameMaster() && !curDest
                   && !(plMover->HasAuraType(SPELL_AURA_WATER_WALK) | plMover->HasAuraType(SPELL_AURA_GHOST)))
             {
                 #ifdef MOVEMENT_ANTICHEAT_DEBUG
@@ -658,7 +658,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
         movementInfo.UpdateTime(getMSTime());
 
         WorldPacket data(opcode, recv_data.size());
-        data.appendPackGUID(mover->GetGUID());                  // write guid
+        data.appendPackGUID(plMover->GetGUID());                  // write guid
         movementInfo.Write(data);                               // write data
         GetPlayer()->SendMessageToSet(&data, false);
 
@@ -716,8 +716,8 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
         }
         else                                                    // creature charmed
         {
-            if(mover->IsInWorld())
-                mover->GetMap()->CreatureRelocation((Creature*)mover, movementInfo.GetPos()->x, movementInfo.GetPos()->y, movementInfo.GetPos()->z, movementInfo.GetPos()->o);
+            if(plMover->IsInWorld())
+                plMover->GetMap()->CreatureRelocation((Creature*)plMover, movementInfo.GetPos()->x, movementInfo.GetPos()->y, movementInfo.GetPos()->z, movementInfo.GetPos()->o);
         }
     }
     else if (plMover)
