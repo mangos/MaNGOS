@@ -81,9 +81,8 @@ bool Vehicle::Create(uint32 guidlow, Map *map, uint32 Entry, uint32 vehicleId, u
 
     CreatureInfo const *ci = GetCreatureInfo();
     setFaction(team == ALLIANCE ? ci->faction_A : ci->faction_H);
-    SetMaxHealth(ci->maxhealth);
+
     SelectLevel(ci);
-    SetHealth(GetMaxHealth());
 
     return true;
 }
