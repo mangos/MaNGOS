@@ -5880,12 +5880,12 @@ void Player::removeActionButton(uint8 spec, uint8 button)
     if (buttonItr == currentActionButtonList.end() || buttonItr->second.uState == ACTIONBUTTON_DELETED)
         return;
 
-/*    if (!buttonItr->second.canRemoveByClient)
+    if (!buttonItr->second.canRemoveByClient)
     {
         buttonItr->second.canRemoveByClient = true;
         return;
     }
-*/
+
     if (buttonItr->second.uState == ACTIONBUTTON_NEW)
         currentActionButtonList.erase(buttonItr);           // new and not saved
     else
@@ -15500,6 +15500,7 @@ void Player::_LoadActions(QueryResult *result, bool startup)
             else
             {
                 sLog.outError( "  ...at loading, and will deleted in DB also");
+
                 // Will deleted in DB at next save (it can create data until save but marked as deleted)
                 m_actionButtons[spec][button].uState = ACTIONBUTTON_DELETED;
             }

@@ -1589,7 +1589,6 @@ class MANGOS_DLL_SPEC Player : public Unit
         void SetActiveSpec(uint8 spec) { m_activeSpec = spec; }
         uint8 GetSpecsCount() { return m_specsCount; }
         void SetSpecsCount(uint8 count) { m_specsCount = count; }
-//        void ActivateSpec(uint8 specNum);
         void UpdateSpecCount(uint8 count);
 
         void InitGlyphsForLevel();
@@ -1672,8 +1671,6 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         void SendInitialActionButtons() const { SendActionButtons(0); }
         void SendActionButtons(uint32 state) const;
-
-//        void SendInitialActionButtons() const;
 
         ActionButton const* GetActionButton(uint8 button);
 
@@ -2433,7 +2430,6 @@ class MANGOS_DLL_SPEC Player : public Unit
         uint8 m_activeSpec;
         uint8 m_specsCount;
 
-//        ActionButtonList m_actionButtons;
         ActionButtonList m_actionButtons[MAX_TALENT_SPEC_COUNT];
 
         Glyph m_glyphs[MAX_TALENT_SPEC_COUNT][MAX_GLYPH_SLOT_INDEX];
