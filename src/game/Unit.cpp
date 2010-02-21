@@ -11221,8 +11221,9 @@ int32 Unit::CalculateSpellDuration(SpellEntry const* spellProto, SpellEffectInde
         int32 mechanic = GetEffectMechanic(spellProto, effect_index);
         // Find total mod value (negative bonus)
         int32 durationMod_always = target->GetTotalAuraModifierByMiscValue(SPELL_AURA_MECHANIC_DURATION_MOD, mechanic);
-        // Modify from SPELL_AURA_MOD_DURATION_OF_EFFECTS_BY_DISPEL aura (stack always ?)
-        durationMod_always+=target->GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_DURATION_OF_EFFECTS_BY_DISPEL, spellProto->Dispel);
+        // Modify from SPELL_AURA_MOD_DURATION_OF_EFFECTS_BY_DISPEL aura for negatve effects (stack always ?)
+        if (!IsPositiveEffect(spellProto->Id, effect_index))
+            durationMod_always+=target->GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_DURATION_OF_EFFECTS_BY_DISPEL, spellProto->Dispel);
         // Find max mod (negative bonus)
         int32 durationMod_not_stack = target->GetMaxNegativeAuraModifierByMiscValue(SPELL_AURA_MECHANIC_DURATION_MOD_NOT_STACK, mechanic);
 
