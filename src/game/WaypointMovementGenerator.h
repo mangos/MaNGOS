@@ -71,7 +71,7 @@ class MANGOS_DLL_SPEC WaypointMovementGenerator;
 template<>
 class MANGOS_DLL_SPEC WaypointMovementGenerator<Creature>
 : public MovementGeneratorMedium< Creature, WaypointMovementGenerator<Creature> >,
-public PathMovementBase<Creature, WaypointPath*>
+public PathMovementBase<Creature, WaypointPath const*>
 {
     public:
         WaypointMovementGenerator(Creature &) : i_nextMoveTime(0), b_StoppedByPlayer(false) {}
@@ -95,7 +95,7 @@ public PathMovementBase<Creature, WaypointPath*>
         void SetStoppedByPlayer(bool val) { b_StoppedByPlayer = val; }
 
         // allow use for overwrite empty implementation
-        bool GetDestination(float& x, float& y, float& z) const { return PathMovementBase<Creature, WaypointPath*>::GetDestination(x,y,z); }
+        bool GetDestination(float& x, float& y, float& z) const { return PathMovementBase<Creature, WaypointPath const*>::GetDestination(x,y,z); }
 
     private:
         void ClearWaypoints();

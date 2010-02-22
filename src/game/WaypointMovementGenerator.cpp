@@ -206,6 +206,17 @@ bool WaypointMovementGenerator<Creature>::Update(Creature &creature, const uint3
 
             i_hasDone[idx] = true;
             MovementInform(creature);
+
+            // force stop processing (script change movegen list)
+            if (creature.GetMotionMaster()->empty() || creature.GetMotionMaster()->top() != this)
+                return true;                                // not expire now, but already lost
+
+            // prevent a crash at empty waypoint path.
+            if (!i_path || i_path->empty())
+            {
+                creature.clearUnitState(UNIT_STAT_ROAMING_MOVE);
+                return true;
+            }
         }                                                   // HasDone == false
     }                                                       // i_creature.IsStopped()
 
