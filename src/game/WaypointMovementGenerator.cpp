@@ -94,7 +94,6 @@ void WaypointMovementGenerator<Creature>::Interrupt( Creature &u )
 
 void WaypointMovementGenerator<Creature>::Reset( Creature &u )
 {
-    ReloadPath(u);
     b_StoppedByPlayer = false;
     i_nextMoveTime.Reset(0);
     u.addUnitState(UNIT_STAT_ROAMING|UNIT_STAT_ROAMING_MOVE);

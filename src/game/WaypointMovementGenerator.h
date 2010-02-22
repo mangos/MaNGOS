@@ -54,6 +54,7 @@ class MANGOS_DLL_SPEC PathMovementBase
         uint32 GetCurrentNode() const { return i_currentNode; }
 
         bool GetDestination(float& x, float& y, float& z) const { i_destinationHolder.GetDestination(x,y,z); return true; }
+        bool GetPosition(float& x, float& y, float& z) const { i_destinationHolder.GetLocationNowNoMicroMovement(x,y,z); return true; }
     protected:
         uint32 i_currentNode;
         DestinationHolder< Traveller<T> > i_destinationHolder;
@@ -96,6 +97,11 @@ public PathMovementBase<Creature, WaypointPath const*>
 
         // allow use for overwrite empty implementation
         bool GetDestination(float& x, float& y, float& z) const { return PathMovementBase<Creature, WaypointPath const*>::GetDestination(x,y,z); }
+
+        bool GetResetPosition(Creature&, float& x, float& y, float& z)
+        {
+            return PathMovementBase<Creature, WaypointPath const*>::GetPosition(x,y,z);
+        }
 
     private:
         void ClearWaypoints();
