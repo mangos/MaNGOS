@@ -1703,6 +1703,7 @@ void ChatHandler::FillMessageData( WorldPacket *data, WorldSession* session, uin
     {
         case CHAT_MSG_SAY:
         case CHAT_MSG_PARTY:
+        case CHAT_MSG_PARTY_LEADER:
         case CHAT_MSG_RAID:
         case CHAT_MSG_GUILD:
         case CHAT_MSG_OFFICER:
