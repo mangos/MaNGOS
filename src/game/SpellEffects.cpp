@@ -1089,32 +1089,6 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     m_caster->CastSpell(m_caster, spell_id, true, NULL);
                     return;
                 }
-                case 34665:                                 //Administer Antidote
-                {
-                    if (!unitTarget || m_caster->GetTypeId() != TYPEID_PLAYER )
-                        return;
-
-                    // Spell has scriptable target but for sure.
-                    if (unitTarget->GetTypeId() != TYPEID_UNIT)
-                        return;
-
-                    uint32 health = unitTarget->GetHealth();
-                    float x, y, z, o;
-
-                    unitTarget->GetPosition(x, y, z);
-                    o = unitTarget->GetOrientation();
-                    ((Creature*)unitTarget)->ForcedDespawn();
-
-                    if (Creature* summon = m_caster->SummonCreature(16992, x, y, z, o,TEMPSUMMON_TIMED_OR_DEAD_DESPAWN,180000))
-                    {
-                        summon->SetHealth(health);
-                        ((Player*)m_caster)->RewardPlayerAndGroupAtEvent(16992, summon);
-
-                        if (summon->AI())
-                            summon->AI()->AttackStart(m_caster);
-                    }
-                    return;
-                }
                 case 35745:                                 // Socrethar's Stone
                 {
                     uint32 spell_id;
