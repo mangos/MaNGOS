@@ -294,7 +294,7 @@ bool ChatHandler::HandleGPSCommand(const char* args)
     float zone_x = obj->GetPositionX();
     float zone_y = obj->GetPositionY();
 
-    if (Map2ZoneCoordinates(zone_x,zone_y,zone_id))
+    if (!Map2ZoneCoordinates(zone_x, zone_y, zone_id))
     {
         zone_x = 0;
         zone_y = 0;
