@@ -1754,6 +1754,34 @@ uint16 Map::GetAreaFlag(float x, float y, float z) const
                     }
                 }
 
+                // Sunreaver's Sanctuary (Dalaran) (Enter,Left,Right-border lines)
+                if ((y-548.11f)/(568.80f-548.11f) <= (x-5849.30f)/(5866.57f-5849.30f) &&
+                    (y-582.76f)/(622.97f-582.76f) <= (x-5961.64f)/(5886.09f-5961.64f) &&
+                    (y-446.79f)/(508.22f-446.79f) >= (x-5867.66f)/(5846.12f-5867.66f))
+                {
+                    // need exclude 2 shop rooms
+                    if (((x-5862.26f)*(x-5862.26f)+(y-554.76f)*(y-554.76f) > 335.85f/*310.64f*/ || z > 671.12f) &&
+                        ((y-580.51f)/(608.37f-580.51f) <= (x-5896.23f)/(5859.79f-5896.23f) ||
+                         (y-580.51f)/(610.49f-580.51f) <= (x-5896.23f)/(5919.15f-5896.23f) || z > 669.10f))
+                    {
+                        areaflag = 2687;
+                        break;
+                    }
+                }
+
+                // The Silver Enclave (Dalaran) (Enter,Left,Right-border lines)
+                if ((y-693.19f)/(737.41f-693.19f) >= (x-5732.80f)/(5769.38f-5732.80f) &&
+                    (y-693.19f)/(787.00f-693.19f) >= (x-5732.80f)/(5624.17f-5732.80f) &&
+                    (y-737.41f)/(831.30f-737.41f) <= (x-5769.38f)/(5671.15f-5769.38f))
+                {
+                    // need exclude ground floor shop room
+                    if ((x-5758.07f)*(x-5758.07f)+(y-738.18f)*(y-738.18f) > 83.30f || z > 650.00f)
+                    {
+                        areaflag = 3007;
+                        break;
+                    }
+                }
+
                 // Dalaran
                 areaflag = 2153;
             }
@@ -1771,6 +1799,28 @@ uint16 Map::GetAreaFlag(float x, float y, float z) const
                     if ((x-5803.0f)*(x-5803.0f)+(y-846.18f)*(y-846.18f) < 6690.0f)
                     {
                         areaflag = 2696;
+                        break;
+                    }
+                }
+
+                // Sunreaver's Sanctuary (Dalaran) (Enter,Left,Right-border lines)
+                if ((y-581.27f)/(596.73f-581.27f) <= (x-5858.57f)/(5871.87f-5858.57f) &&
+                    (y-582.76f)/(622.97f-582.76f) <= (x-5961.64f)/(5886.09f-5961.64f) &&
+                    (y-446.79f)/(508.22f-446.79f) >= (x-5867.66f)/(5846.12f-5867.66f))
+                {
+                    areaflag = 2687;
+                    break;
+                }
+
+                // The Silver Enclave (Dalaran) (Enter,Left,Right-border lines)
+                if ((y-693.19f)/(737.41f-693.19f) >= (x-5732.80f)/(5769.38f-5732.80f) &&
+                    (y-693.19f)/(787.00f-693.19f) >= (x-5732.80f)/(5624.17f-5732.80f) &&
+                    (y-737.41f)/(831.30f-737.41f) <= (x-5769.38f)/(5671.15f-5769.38f))
+                {
+                    // need exclude ground floor shop room
+                    if ((x-5758.07f)*(x-5758.07f)+(y-738.18f)*(y-738.18f) > 64.30f || z > 650.00f)
+                    {
+                        areaflag = 3007;
                         break;
                     }
                 }
