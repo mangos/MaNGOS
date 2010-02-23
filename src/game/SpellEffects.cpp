@@ -1155,6 +1155,15 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     return;
                 }
                 */
+                case 43882:                                 // Scourging Crystal Controller Dummy
+                {
+                    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_UNIT)
+                        return;
+
+                    // see spell dummy 50133
+                    unitTarget->RemoveAurasDueToSpell(43874);
+                    return;
+                }
                 case 44875:                                 // Complete Raptor Capture
                 {
                     if (!unitTarget || unitTarget->GetTypeId() != TYPEID_UNIT)
@@ -1305,6 +1314,22 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                             // 60% Kodo
                             m_caster->CastSpell(m_caster, 49378, true);
                     }
+                    return;
+                }
+                case 50133:                                 // Scourging Crystal Controller
+                {
+                    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_UNIT)
+                        return;
+
+                    if (unitTarget->HasAura(43874))
+                    {
+                        // someone else is already channeling target
+                        if (unitTarget->HasAura(43878))
+                            return;
+
+                        m_caster->CastSpell(unitTarget, 43878, true, m_CastItem);
+                    }
+
                     return;
                 }
                 case 50243:                                 // Teach Language
