@@ -5289,6 +5289,39 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     unitTarget->CastSpell(unitTarget, 44870, true);
                     break;
                 }
+                /* Spell 51912 that trigger this need correction before this can work.
+                   Some additional research also seem to be needed + adjustment, this is mostly place holder for spells used.
+                case 45668:                                 // Ultra-Advanced Proto-Typical Shortening Blaster
+                {
+                    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_UNIT)
+                        return;
+
+                    if (roll_chance_i(50))                  // chance unknown, using 50
+                        return;
+
+                    static uint32 const spellPlayer[5] =
+                    {
+                        {45674},                            // Bigger!
+                        {45675},                            // Shrunk
+                        {45678},                            // Yellow
+                        {45682},                            // Ghost
+                        {45684}                             // Polymorph
+                    };
+
+                    static uint32 const spellTarget[5] =
+                    {
+                        {45673},                            // Bigger!
+                        {45672},                            // Shrunk
+                        {45677},                            // Yellow
+                        {45681},                            // Ghost
+                        {45683}                             // Polymorph
+                    };
+
+                    m_caster->CastSpell(m_caster, spellPlayer[urand(0,4)], true);
+                    unitTarget->CastSpell(unitTarget, spellTarget[urand(0,4)], true);
+
+                    return;
+                }*/
                 case 46203:                                 // Goblin Weather Machine
                 {
                     if (!unitTarget)
