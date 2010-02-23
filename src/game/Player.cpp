@@ -1568,8 +1568,18 @@ bool Player::BuildEnumData( QueryResult * result, WorldPacket * p_data )
         *p_data << uint8(proto->InventoryType);
         *p_data << uint32(enchant ? enchant->aura_id : 0);
     }
-    *p_data << uint32(0);                                   // first bag display id
-    *p_data << uint8(0);                                    // first bag inventory type
+
+    *p_data << uint32(0);                                   // bag 1 display id
+    *p_data << uint8(0);                                    // bag 1 inventory type
+    *p_data << uint32(0);                                   // enchant?
+    *p_data << uint32(0);                                   // bag 2 display id
+    *p_data << uint8(0);                                    // bag 2 inventory type
+    *p_data << uint32(0);                                   // enchant?
+    *p_data << uint32(0);                                   // bag 3 display id
+    *p_data << uint8(0);                                    // bag 3 inventory type
+    *p_data << uint32(0);                                   // enchant?
+    *p_data << uint32(0);                                   // bag 4 display id
+    *p_data << uint8(0);                                    // bag 4 inventory type
     *p_data << uint32(0);                                   // enchant?
 
     return true;

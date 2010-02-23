@@ -371,7 +371,7 @@ void Unit::SendMonsterMove(float NewPosX, float NewPosY, float NewPosZ, SplineTy
 
     WorldPacket data( SMSG_MONSTER_MOVE, (41 + GetPackGUID().size()) );
     data.append(GetPackGUID());
-    data << uint8(0);                                       // new in 3.1
+    data << uint8(0);                                       // new in 3.1 bool, used to toggle MOVEFLAG2_UNK4 = 0x0040 on client side
     data << GetPositionX() << GetPositionY() << GetPositionZ();
     data << uint32(getMSTime());
 
@@ -1132,13 +1132,13 @@ void Unit::CastCustomSpell(Unit* Victim,SpellEntry const *spellInfo, int32 const
     Spell *spell = new Spell(this, spellInfo, triggered, originalCaster);
 
     if(bp0)
-        spell->m_currentBasePoints[EFFECT_INDEX_0] = *bp0-int32(spellInfo->EffectBaseDice[EFFECT_INDEX_0]);
+        spell->m_currentBasePoints[EFFECT_INDEX_0] = *bp0-int32(1);
 
     if(bp1)
-        spell->m_currentBasePoints[EFFECT_INDEX_1] = *bp1-int32(spellInfo->EffectBaseDice[EFFECT_INDEX_1]);
+        spell->m_currentBasePoints[EFFECT_INDEX_1] = *bp1-int32(1);
 
     if(bp2)
-        spell->m_currentBasePoints[EFFECT_INDEX_2] = *bp2-int32(spellInfo->EffectBaseDice[EFFECT_INDEX_2]);
+        spell->m_currentBasePoints[EFFECT_INDEX_2] = *bp2-int32(1);
 
     SpellCastTargets targets;
     targets.setUnitTarget( Victim );
@@ -11159,15 +11159,15 @@ int32 Unit::CalculateSpellDamage(SpellEntry const* spellProto, SpellEffectIndex 
     level-= (int32)spellProto->spellLevel;
 
     float basePointsPerLevel = spellProto->EffectRealPointsPerLevel[effect_index];
-    float randomPointsPerLevel = spellProto->EffectDicePerLevel[effect_index];
+    float randomPointsPerLevel = 1;
     int32 basePoints = int32(effBasePoints + level * basePointsPerLevel);
     int32 randomPoints = int32(spellProto->EffectDieSides[effect_index] + level * randomPointsPerLevel);
     float comboDamage = spellProto->EffectPointsPerComboPoint[effect_index];
 
     // range can have possitive and negative values, so order its for irand
-    int32 randvalue = int32(spellProto->EffectBaseDice[effect_index]) >= randomPoints
-        ? irand(randomPoints, int32(spellProto->EffectBaseDice[effect_index]))
-        : irand(int32(spellProto->EffectBaseDice[effect_index]), randomPoints);
+    int32 randvalue = int32(1) >= randomPoints
+        ? irand(randomPoints, int32(1))
+        : irand(int32(1), randomPoints);
 
     int32 value = basePoints + randvalue;
     //random damage

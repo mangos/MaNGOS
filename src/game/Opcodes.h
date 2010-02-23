@@ -1320,8 +1320,14 @@ enum Opcodes
     UMSG_UNKNOWN_1283                               = 0x503,
     UMSG_UNKNOWN_1284                               = 0x504,
     UMSG_UNKNOWN_1285                               = 0x505,
-    UMSG_UNKNOWN_1286                               = 0x506,
-    NUM_MSG_TYPES                                   = 0x507
+    SMSG_UNKNOWN_1286                               = 0x506, // ERR_CORPSE_IS_NOT_IN_INSTANCE = 0x1A8,
+    // ? 0x507
+    // ? 0x508 CMSG SetAllowLowLevelRaid
+    // ? 0x509 CMSG SetAllowLowLevelRaid
+    // ? 0x50A SMSG camera shake?
+    // ? 0x50B SMSG some item update packet?
+    // ? 0x50C
+    NUM_MSG_TYPES                                   = 0x50D
 };
 
 /// Player state
