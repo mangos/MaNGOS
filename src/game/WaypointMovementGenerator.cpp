@@ -271,6 +271,11 @@ void WaypointMovementGenerator<Creature>::MovementInform(Creature &unit)
         unit.AI()->MovementInform(WAYPOINT_MOTION_TYPE, i_currentNode);
 }
 
+bool WaypointMovementGenerator<Creature>::GetResetPosition( Creature&, float& x, float& y, float& z )
+{
+    return PathMovementBase<Creature, WaypointPath const*>::GetPosition(x,y,z);
+}
+
 //----------------------------------------------------//
 void FlightPathMovementGenerator::LoadPath(Player &)
 {

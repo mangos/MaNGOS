@@ -98,10 +98,7 @@ public PathMovementBase<Creature, WaypointPath const*>
         // allow use for overwrite empty implementation
         bool GetDestination(float& x, float& y, float& z) const { return PathMovementBase<Creature, WaypointPath const*>::GetDestination(x,y,z); }
 
-        bool GetResetPosition(Creature&, float& x, float& y, float& z)
-        {
-            return PathMovementBase<Creature, WaypointPath const*>::GetPosition(x,y,z);
-        }
+        bool GetResetPosition(Creature&, float& x, float& y, float& z);
 
     private:
         void ClearWaypoints();
