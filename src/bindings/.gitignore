@@ -10,5 +10,10 @@
 
 #
 # Scripting projects
+# This excludes all 3rd party script libraries
 #
-#universal
+*
+!universal/*
+!universal/*/*
+!Makefile.am
+!.gitignore
