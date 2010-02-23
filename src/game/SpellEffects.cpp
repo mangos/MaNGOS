@@ -2292,7 +2292,7 @@ void Spell::EffectTriggerSpell(SpellEffectIndex effIndex)
             for (PlayerSpellMap::const_iterator itr = sp_list.begin(); itr != sp_list.end(); ++itr)
             {
                 // only highest rank is shown in spell book, so simply check if shown in spell book
-                if (!itr->second->active || itr->second->disabled || itr->second->state == PLAYERSPELL_REMOVED)
+                if (!itr->second.active || itr->second.disabled || itr->second.state == PLAYERSPELL_REMOVED)
                     continue;
 
                 SpellEntry const *spellInfo = sSpellStore.LookupEntry(itr->first);
