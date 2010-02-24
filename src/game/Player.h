@@ -102,9 +102,7 @@ struct PlayerTalent
 };
 
 typedef UNORDERED_MAP<uint32, PlayerTalent*> PlayerTalentMap;
-
 typedef UNORDERED_MAP<uint32, PlayerSpell> PlayerSpellMap;
-//typedef UNORDERED_MAP<uint32, PlayerSpell*> PlayerSpellMap;
 
 // Spell modifier (used for modify other spells)
 struct SpellModifier
