@@ -129,7 +129,11 @@ bool WaypointMovementGenerator<Creature>::Update(Creature &creature, const uint3
     CreatureTraveller traveller(creature);
 
     i_nextMoveTime.Update(diff);
-    i_destinationHolder.UpdateTraveller(traveller, diff, false, true);
+    if (i_destinationHolder.UpdateTraveller(traveller, diff, false, true))
+    {
+        if (!IsActive(creature))                            // force stop processing (movement can move out active zone with cleanup movegens list)
+            return true;                                    // not expire now, but already lost
+    }
 
     // creature has been stopped in middle of the waypoint segment
     if (!i_destinationHolder.HasArrived() && creature.IsStopped())
@@ -206,12 +210,11 @@ bool WaypointMovementGenerator<Creature>::Update(Creature &creature, const uint3
             i_hasDone[idx] = true;
             MovementInform(creature);
 
-            // force stop processing (script change movegen list)
-            if (creature.GetMotionMaster()->empty() || creature.GetMotionMaster()->top() != this)
+            if (!IsActive(creature))                        // force stop processing (movement can move out active zone with cleanup movegens list)
                 return true;                                // not expire now, but already lost
 
             // prevent a crash at empty waypoint path.
-            if (!i_path || i_path->empty())
+            if (!i_path || i_path->empty() || i_currentNode >= i_path->size())
             {
                 creature.clearUnitState(UNIT_STAT_ROAMING_MOVE);
                 return true;

@@ -59,7 +59,11 @@ bool
 HomeMovementGenerator<Creature>::Update(Creature &owner, const uint32& time_diff)
 {
     CreatureTraveller traveller( owner);
-    i_destinationHolder.UpdateTraveller(traveller, time_diff, false);
+    if (i_destinationHolder.UpdateTraveller(traveller, time_diff, false))
+    {
+        if (!IsActive(owner))                               // force stop processing (movement can move out active zone with cleanup movegens list)
+            return true;                                    // not expire now, but already lost
+    }
 
     if (time_diff > i_travel_timer)
     {
