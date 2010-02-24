@@ -101,6 +101,11 @@ struct PlayerTalent
     uint8 spec             : 8;
 };
 
+typedef UNORDERED_MAP<uint32, PlayerTalent*> PlayerTalentMap;
+
+typedef UNORDERED_MAP<uint32, PlayerSpell> PlayerSpellMap;
+//typedef UNORDERED_MAP<uint32, PlayerSpell*> PlayerSpellMap;
+
 // Spell modifier (used for modify other spells)
 struct SpellModifier
 {
@@ -126,8 +131,6 @@ struct SpellModifier
     Spell const* lastAffected;
 };
 
-typedef UNORDERED_MAP<uint32, PlayerTalent*> PlayerTalentMap;
-typedef UNORDERED_MAP<uint32, PlayerSpell*> PlayerSpellMap;
 typedef std::list<SpellModifier*> SpellModList;
 
 struct SpellCooldown

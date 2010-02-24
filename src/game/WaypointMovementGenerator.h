@@ -54,6 +54,7 @@ class MANGOS_DLL_SPEC PathMovementBase
         uint32 GetCurrentNode() const { return i_currentNode; }
 
         bool GetDestination(float& x, float& y, float& z) const { i_destinationHolder.GetDestination(x,y,z); return true; }
+        bool GetPosition(float& x, float& y, float& z) const { i_destinationHolder.GetLocationNowNoMicroMovement(x,y,z); return true; }
     protected:
         uint32 i_currentNode;
         DestinationHolder< Traveller<T> > i_destinationHolder;
@@ -71,7 +72,7 @@ class MANGOS_DLL_SPEC WaypointMovementGenerator;
 template<>
 class MANGOS_DLL_SPEC WaypointMovementGenerator<Creature>
 : public MovementGeneratorMedium< Creature, WaypointMovementGenerator<Creature> >,
-public PathMovementBase<Creature, WaypointPath*>
+public PathMovementBase<Creature, WaypointPath const*>
 {
     public:
         WaypointMovementGenerator(Creature &) : i_nextMoveTime(0), b_StoppedByPlayer(false) {}
@@ -95,7 +96,9 @@ public PathMovementBase<Creature, WaypointPath*>
         void SetStoppedByPlayer(bool val) { b_StoppedByPlayer = val; }
 
         // allow use for overwrite empty implementation
-        bool GetDestination(float& x, float& y, float& z) const { return PathMovementBase<Creature, WaypointPath*>::GetDestination(x,y,z); }
+        bool GetDestination(float& x, float& y, float& z) const { return PathMovementBase<Creature, WaypointPath const*>::GetDestination(x,y,z); }
+
+        bool GetResetPosition(Creature&, float& x, float& y, float& z);
 
     private:
         void ClearWaypoints();
