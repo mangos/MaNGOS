@@ -41,6 +41,8 @@ class MANGOS_DLL_SPEC RandomMovementGenerator
             i_destinationHolder.GetLocationNow(mapid, x,y,z);
         }
         MovementGeneratorType GetMovementGeneratorType() { return RANDOM_MOTION_TYPE; }
+
+        bool GetResetPosition(T&, float& x, float& y, float& z);
     private:
         TimeTrackerSmall i_nextMoveTime;
 

@@ -95,6 +95,8 @@ struct PlayerSpell
     bool disabled          : 1;                             // first rank has been learned in result talent learn but currently talent unlearned, save max learned ranks
 };
 
+typedef UNORDERED_MAP<uint32, PlayerSpell> PlayerSpellMap;
+
 // Spell modifier (used for modify other spells)
 struct SpellModifier
 {
@@ -120,7 +122,6 @@ struct SpellModifier
     Spell const* lastAffected;
 };
 
-typedef UNORDERED_MAP<uint32, PlayerSpell*> PlayerSpellMap;
 typedef std::list<SpellModifier*> SpellModList;
 
 struct SpellCooldown

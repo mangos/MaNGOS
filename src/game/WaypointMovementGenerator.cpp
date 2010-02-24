@@ -94,7 +94,6 @@ void WaypointMovementGenerator<Creature>::Interrupt( Creature &u )
 
 void WaypointMovementGenerator<Creature>::Reset( Creature &u )
 {
-    ReloadPath(u);
     b_StoppedByPlayer = false;
     i_nextMoveTime.Reset(0);
     u.addUnitState(UNIT_STAT_ROAMING|UNIT_STAT_ROAMING_MOVE);
@@ -206,6 +205,17 @@ bool WaypointMovementGenerator<Creature>::Update(Creature &creature, const uint3
 
             i_hasDone[idx] = true;
             MovementInform(creature);
+
+            // force stop processing (script change movegen list)
+            if (creature.GetMotionMaster()->empty() || creature.GetMotionMaster()->top() != this)
+                return true;                                // not expire now, but already lost
+
+            // prevent a crash at empty waypoint path.
+            if (!i_path || i_path->empty())
+            {
+                creature.clearUnitState(UNIT_STAT_ROAMING_MOVE);
+                return true;
+            }
         }                                                   // HasDone == false
     }                                                       // i_creature.IsStopped()
 
@@ -259,6 +269,11 @@ void WaypointMovementGenerator<Creature>::MovementInform(Creature &unit)
 {
     if (unit.AI())
         unit.AI()->MovementInform(WAYPOINT_MOTION_TYPE, i_currentNode);
+}
+
+bool WaypointMovementGenerator<Creature>::GetResetPosition( Creature&, float& x, float& y, float& z )
+{
+    return PathMovementBase<Creature, WaypointPath const*>::GetPosition(x,y,z);
 }
 
 //----------------------------------------------------//
