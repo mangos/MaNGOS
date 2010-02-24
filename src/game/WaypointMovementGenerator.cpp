@@ -67,7 +67,6 @@ void WaypointMovementGenerator<Creature>::LoadPath(Creature &c)
     // so when the routine is called the first time, wpSys gets the last waypoint
     // and this prevents the system from performing text/emote, etc
     i_hasDone[node_count - 1] = true;
-     i_currentNode = 0;
 }
 
 void WaypointMovementGenerator<Creature>::ClearWaypoints()
@@ -245,12 +244,6 @@ bool WaypointMovementGenerator<Creature>::Update(Creature &creature, const uint3
             // If not stopped then stop it and set the reset of TimeTracker to waittime
             creature.StopMoving();
             SetStoppedByPlayer(false);
-
-             if(!i_path)
-             {
-                 sLog.outDebug("wtf? path is null!\n"); //-----add this check
-                 return true;
-             }
 
             i_nextMoveTime.Reset(i_path->at(i_currentNode).delay);
             ++i_currentNode;
