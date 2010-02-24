@@ -23,6 +23,7 @@
 #include "../../game/Player.h"
 #include "../../game/Map.h"
 #include "../../game/ObjectMgr.h"
+#include "../../game/SpellAuras.h"
 
 //uint8 loglevel = 0;
 int nrscripts;
@@ -308,6 +309,16 @@ bool EffectDummyItem(Unit *caster, uint32 spellId, SpellEffectIndex effIndex, It
         return false;
 
     return tmpscript->pEffectDummyItem(caster, spellId, effIndex, itemTarget);
+}
+
+MANGOS_DLL_EXPORT
+bool EffectAuraDummy(const Aura* pAura, bool apply)
+{
+    Script *tmpscript = m_scripts[((Creature*)pAura->GetTarget())->GetScriptId()];
+    if (!tmpscript || !tmpscript->pEffectAuraDummy)
+        return false;
+
+    return tmpscript->pEffectAuraDummy(pAura, apply);
 }
 
 void ScriptedAI::UpdateAI(const uint32)
