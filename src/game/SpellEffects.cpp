@@ -1449,6 +1449,16 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
 
                     return;
                 }
+                case 55818:                                 // Hurl Boulder
+                {
+                    // unclear how many summon min/max random, best guess below
+                    uint32 random = urand(3,5);
+
+                    for(uint32 i = 0; i < random; ++i)
+                        m_caster->CastSpell(m_caster, 55528, true);
+
+                    return;
+                }
                 case 58418:                                 // Portal to Orgrimmar
                 case 58420:                                 // Portal to Stormwind
                     return;                                 // implemented in EffectScript[0]
