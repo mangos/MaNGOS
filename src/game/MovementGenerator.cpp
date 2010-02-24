@@ -17,6 +17,7 @@
  */
 
 #include "MovementGenerator.h"
+#include "Unit.h"
 
 MovementGenerator::~MovementGenerator()
 {
