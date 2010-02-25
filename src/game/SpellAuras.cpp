@@ -4855,6 +4855,20 @@ void Aura::HandleAuraPeriodicDummy(bool apply, bool Real)
 void Aura::HandlePeriodicHeal(bool apply, bool /*Real*/)
 {
     m_isPeriodic = apply;
+
+	// Gift of the Naaru
+	if ((m_spellProto->SpellFamilyFlags2 & UI64LIT(0x80000000)) && m_spellProto->SpellVisual[0] == 7625)
+	{
+		Unit *caster = GetCaster();
+		if (!caster)
+			return;
+
+		int32 ap = int32 (0.22f * caster->GetTotalAttackPowerValue(BASE_ATTACK));
+		int32 holy = caster->SpellBaseDamageBonus(GetSpellSchoolMask(m_spellProto))
+				   + caster->SpellBaseDamageBonusForVictim(GetSpellSchoolMask(m_spellProto), m_target);
+		holy = int32(holy * 377 / 1000);
+		m_modifier.m_amount += ap > holy ? ap : holy;
+	}
 }
 
 void Aura::HandlePeriodicDamage(bool apply, bool Real)
