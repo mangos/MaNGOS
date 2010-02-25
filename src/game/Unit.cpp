@@ -7667,6 +7667,12 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
                 trigger_spell_id = 50475;
                 basepoints[0] = damage * triggerAmount / 100;
             }
+            // Glyph of Death's Embrace
+            else if (auraSpellInfo->Id == 58677)
+            {
+                if (procSpell->Id != 47633)
+                    return false;
+            }
             // Blade Barrier
             else if (auraSpellInfo->SpellIconID == 85)
             {
