@@ -4928,7 +4928,7 @@ bool Unit::HandleHasteAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                 case 13877:
                 case 33735:
                 {
-                    target = SelectNearbyTarget(pVictim);
+                    target = SelectRandomUnfriendlyTarget(pVictim);
                     if(!target)
                         return false;
                     basepoints0 = damage;
@@ -5071,7 +5071,7 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     if(procSpell && procSpell->Id == 26654)
                         return false;
 
-                    target = SelectNearbyTarget(pVictim);
+                    target = SelectRandomUnfriendlyTarget(pVictim);
                     if(!target)
                         return false;
 
@@ -5646,7 +5646,7 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                 if(procSpell && procSpell->Id == 26654)
                     return false;
 
-                target = SelectNearbyTarget(pVictim);
+                target = SelectRandomUnfriendlyTarget(pVictim);
                 if(!target)
                     return false;
 
@@ -6008,6 +6008,28 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     basepoints0 = triggerAmount * damage / 100;
                     triggered_spell_id = 54755;
                     break;
+                }
+                // Item - Druid T10 Restoration 4P Bonus (Rejuvenation)
+                case 70664:
+                {
+                    if (!procSpell || GetTypeId() != TYPEID_PLAYER)
+                        return false;
+
+                    float radius;
+                    if (procSpell->EffectRadiusIndex[EFFECT_INDEX_0])
+                        radius = GetSpellRadius(sSpellRadiusStore.LookupEntry(procSpell->EffectRadiusIndex[EFFECT_INDEX_0]));
+                    else
+                        radius = GetSpellMaxRange(sSpellRangeStore.LookupEntry(procSpell->rangeIndex));
+
+                    ((Player*)this)->ApplySpellMod(procSpell->Id, SPELLMOD_RADIUS, radius,NULL);
+
+                    Unit *second = pVictim->SelectRandomFriendlyTarget(pVictim, radius);
+
+                    if (!second)
+                        return false;
+
+                    pVictim->CastSpell(second, procSpell, true, NULL, triggeredByAura, GetGUID());
+                    return true;
                 }
             }
             // Eclipse
@@ -12765,7 +12787,7 @@ void Unit::UpdateReactives( uint32 p_time )
     }
 }
 
-Unit* Unit::SelectNearbyTarget(Unit* except /*= NULL*/) const
+Unit* Unit::SelectRandomUnfriendlyTarget(Unit* except /*= NULL*/, float radius /*= ATTACK_DISTANCE*/) const
 {
     CellPair p(MaNGOS::ComputeCellPair(GetPositionX(), GetPositionY()));
     Cell cell(p);
@@ -12774,14 +12796,62 @@ Unit* Unit::SelectNearbyTarget(Unit* except /*= NULL*/) const
 
     std::list<Unit *> targets;
 
-    MaNGOS::AnyUnfriendlyUnitInObjectRangeCheck u_check(this, this, ATTACK_DISTANCE);
+    MaNGOS::AnyUnfriendlyUnitInObjectRangeCheck u_check(this, this, radius);
     MaNGOS::UnitListSearcher<MaNGOS::AnyUnfriendlyUnitInObjectRangeCheck> searcher(this, targets, u_check);
 
     TypeContainerVisitor<MaNGOS::UnitListSearcher<MaNGOS::AnyUnfriendlyUnitInObjectRangeCheck>, WorldTypeMapContainer > world_unit_searcher(searcher);
     TypeContainerVisitor<MaNGOS::UnitListSearcher<MaNGOS::AnyUnfriendlyUnitInObjectRangeCheck>, GridTypeMapContainer >  grid_unit_searcher(searcher);
 
-    cell.Visit(p, world_unit_searcher, *GetMap(), *this, ATTACK_DISTANCE);
-    cell.Visit(p, grid_unit_searcher, *GetMap(), *this, ATTACK_DISTANCE);
+    cell.Visit(p, world_unit_searcher, *GetMap(), *this, radius);
+    cell.Visit(p, grid_unit_searcher, *GetMap(), *this, radius);
+
+    // remove current target
+    if(except)
+        targets.remove(except);
+
+    // remove not LoS targets
+    for(std::list<Unit *>::iterator tIter = targets.begin(); tIter != targets.end();)
+    {
+        if(!IsWithinLOSInMap(*tIter))
+        {
+            std::list<Unit *>::iterator tIter2 = tIter;
+            ++tIter;
+            targets.erase(tIter2);
+        }
+        else
+            ++tIter;
+    }
+
+    // no appropriate targets
+    if(targets.empty())
+        return NULL;
+
+    // select random
+    uint32 rIdx = urand(0,targets.size()-1);
+    std::list<Unit *>::const_iterator tcIter = targets.begin();
+    for(uint32 i = 0; i < rIdx; ++i)
+        ++tcIter;
+
+    return *tcIter;
+}
+
+Unit* Unit::SelectRandomFriendlyTarget(Unit* except /*= NULL*/, float radius /*= ATTACK_DISTANCE*/) const
+{
+    CellPair p(MaNGOS::ComputeCellPair(GetPositionX(), GetPositionY()));
+    Cell cell(p);
+    cell.data.Part.reserved = ALL_DISTRICT;
+    cell.SetNoCreate();
+
+    std::list<Unit *> targets;
+
+    MaNGOS::AnyFriendlyUnitInObjectRangeCheck u_check(this, this, radius);
+    MaNGOS::UnitListSearcher<MaNGOS::AnyFriendlyUnitInObjectRangeCheck> searcher(this, targets, u_check);
+
+    TypeContainerVisitor<MaNGOS::UnitListSearcher<MaNGOS::AnyFriendlyUnitInObjectRangeCheck>, WorldTypeMapContainer > world_unit_searcher(searcher);
+    TypeContainerVisitor<MaNGOS::UnitListSearcher<MaNGOS::AnyFriendlyUnitInObjectRangeCheck>, GridTypeMapContainer >  grid_unit_searcher(searcher);
+
+    cell.Visit(p, world_unit_searcher, *GetMap(), *this, radius);
+    cell.Visit(p, grid_unit_searcher, *GetMap(), *this, radius);
 
     // remove current target
     if(except)
