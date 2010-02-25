@@ -117,9 +117,12 @@ bool ConfusedMovementGenerator<T>::Update(T &unit, const uint32 &diff)
         // currently moving, update location
         unit.addUnitState(UNIT_STAT_CONFUSED_MOVE);
         Traveller<T> traveller(unit);
-        if( i_destinationHolder.UpdateTraveller(traveller, diff, false))
+        if (i_destinationHolder.UpdateTraveller(traveller, diff, false))
         {
-            if( i_destinationHolder.HasArrived())
+            if (!IsActive(unit))                            // force stop processing (movement can move out active zone with cleanup movegens list)
+                return true;                                // not expire now, but already lost
+
+            if (i_destinationHolder.HasArrived())
             {
                 // arrived, stop and wait a bit
                 unit.StopMoving();

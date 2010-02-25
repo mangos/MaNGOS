@@ -738,7 +738,7 @@ AllFlightPaths = 0
 AlwaysMaxSkillForLevel = 0
 ActivateWeather = 1
 CastUnstuck = 1
-MaxSpellCastsInChain =10
+MaxSpellCastsInChain = 10
 Instance.IgnoreLevel = 0
 Instance.IgnoreRaid = 0
 Instance.ResetTimeHour = 4
@@ -1255,7 +1255,7 @@ Visibility.Distance.Grey.Object = 10
 #         Starting Character start gain sickness at spirit resurrection (1 min)
 #         Default: 11
 #                  -10 - character will have full time (10min) sickness at 1 level
-#                  maxplayerlevel+1 - chaarcter will not have sickess at any level
+#                  maxplayerlevel+1 - character will not have sickness at any level
 #
 #    Death.CorpseReclaimDelay.PvP
 #    Death.CorpseReclaimDelay.PvE
@@ -1393,8 +1393,13 @@ BattleGround.PremadeGroupWaitForMatch = 1800000
 #        If automatic distribution is enabled in days
 #        Default: 7 (weekly)
 #
-#    Arena.QueueAnnouncer.Enable
-#        Enable bg queue announcer posting to chat
+#    Arena.QueueJoinAnnouncer.Enable
+#        Enable arena queue announcer posting to chat at join
+#        Default: 0 (disable)
+#                 1 (enable)
+#
+#    Arena.QueueExitAnnouncer.Enable
+#        Enable arena queue announcer posting to chat at exit
 #        Default: 0 (disable)
 #                 1 (enable)
 #
@@ -1413,7 +1418,8 @@ Arena.MaxRatingDifference = 150
 Arena.RatingDiscardTimer = 600000
 Arena.AutoDistributePoints = 0
 Arena.AutoDistributeInterval = 7
-Arena.QueueAnnouncer.Enable = 0
+Arena.QueueJoinAnnouncer.Enable = 0
+Arena.QueueExitAnnouncer.Enable = 0
 Arena.ArenaSeason.ID = 1
 Arena.ArenaSeason.InProgress = 1
 
