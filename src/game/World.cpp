@@ -720,8 +720,7 @@ void World::LoadConfigSettings(bool reload)
     setConfig(CONFIG_UINT32_ARENA_RATING_DISCARD_TIMER,                "Arena.RatingDiscardTimer", 10 * MINUTE * IN_MILISECONDS);
     setConfig(CONFIG_BOOL_ARENA_AUTO_DISTRIBUTE_POINTS,                "Arena.AutoDistributePoints", false);
     setConfig(CONFIG_UINT32_ARENA_AUTO_DISTRIBUTE_INTERVAL_DAYS,       "Arena.AutoDistributeInterval", 7);
-    setConfig(CONFIG_BOOL_ARENA_QUEUE_JOIN_ANNOUNCER_ENABLE,           "Arena.QueueJoinAnnouncer.Enable", false);
-    setConfig(CONFIG_BOOL_ARENA_QUEUE_EXIT_ANNOUNCER_ENABLE,           "Arena.QueueExitAnnouncer.Enable", false);
+    setConfig(CONFIG_BOOL_ARENA_QUEUE_ANNOUNCER_ENABLE,                "Arena.QueueAnnouncer.Enable", false);
     setConfig(CONFIG_UINT32_ARENA_SEASON_ID,                           "Arena.ArenaSeason.ID", 1);
     setConfig(CONFIG_BOOL_ARENA_SEASON_IN_PROGRESS,                    "Arena.ArenaSeason.InProgress", true);
 
