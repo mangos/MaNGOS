@@ -2276,6 +2276,24 @@ void Aura::TriggerSpell()
             case 33525:
                 target->CastSpell(target, trigger_spell_id, true, NULL, this, casterGUID);
                 return;
+            // Penance
+            case 47758: // Hurt effect - Rank 1
+            case 53001: // Hurt effect - Rank 2
+            case 53002: // Hurt effect - Rank 3
+            case 53003: // Hurt effect - Rank 4
+            case 47757: // Heal effect - Rank 1
+            case 52986: // Heal effect - Rank 2
+            case 52987: // Heal effect - Rank 3
+            case 52988: // Heal effect - Rank 4
+            {
+                Unit* caster = GetCaster();
+                if (!target->isAlive())
+                {
+                    caster->RemoveAurasDueToSpell(auraId);
+                    return;
+                }
+                break;
+            }
             // Beacon of Light
             case 53563:
                 // original caster must be target (beacon)
@@ -2792,6 +2810,17 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
         }
         case SPELLFAMILY_PRIEST:
         {
+            // Penance
+            if (m_spellProto->SpellIconID == 225)
+            {
+                Unit* caster = GetCaster();
+                if (!caster || caster->GetTypeId() != TYPEID_PLAYER)
+                    return;
+
+                if (apply && m_target)
+                    ((Player*)caster)->SetSelection(m_target->GetGUID());
+                return;
+            }
             // Pain and Suffering
             if( m_spellProto->SpellIconID == 2874 && m_target->GetTypeId()==TYPEID_PLAYER )
             {
