@@ -1238,13 +1238,14 @@ Death.Bones.BattlegroundOrArena = 1
 #        Default: 1 (enable)
 #                 0 (disable)
 #
-#    Battleground.QueueAnnouncer.Enable
-#        Enable queue announcer posting to chat
-#        Default: 0 (disable)
-#                 1 (enable)
+#    Battleground.QueueAnnouncer.Join
+#        Enable queue announcer posting to chat at join
+#        Default: 0 (not send)
+#                 1 (send to joined player only)
+#                 2 (send to all players)
 #
-#    Battleground.QueueAnnouncer.PlayerOnly
-#        Enable queue announcer posting to chat
+#    Battleground.QueueAnnouncer.Start
+#        Enable queue announcer posting to chat at BG start
 #        Default: 0 (disable)
 #                 1 (enable)
 #
@@ -1266,8 +1267,8 @@ Death.Bones.BattlegroundOrArena = 1
 ###################################################################################################################
 
 Battleground.CastDeserter = 1
-Battleground.QueueAnnouncer.Enable = 0
-Battleground.QueueAnnouncer.PlayerOnly = 0
+Battleground.QueueAnnouncer.Join = 0
+Battleground.QueueAnnouncer.Start = 0
 Battleground.InvitationType = 0
 BattleGround.PrematureFinishTimer = 300000
 BattleGround.PremadeGroupWaitForMatch = 1800000
@@ -1297,12 +1298,12 @@ BattleGround.PremadeGroupWaitForMatch = 1800000
 #        If automatic distribution is enabled in days
 #        Default: 7 (weekly)
 #
-#    Arena.QueueJoinAnnouncer.Enable
+#    Arena.QueueAnnouncer.Join
 #        Enable arena queue announcer posting to chat at join
 #        Default: 0 (disable)
 #                 1 (enable)
 #
-#    Arena.QueueExitAnnouncer.Enable
+#    Arena.QueueAnnouncer.Exit
 #        Enable arena queue announcer posting to chat at exit
 #        Default: 0 (disable)
 #                 1 (enable)
@@ -1322,8 +1323,8 @@ Arena.MaxRatingDifference = 150
 Arena.RatingDiscardTimer = 600000
 Arena.AutoDistributePoints = 0
 Arena.AutoDistributeInterval = 7
-Arena.QueueJoinAnnouncer.Enable = 0
-Arena.QueueExitAnnouncer.Enable = 0
+Arena.QueueAnnouncer.Join = 0
+Arena.QueueAnnouncer.Exit = 0
 Arena.ArenaSeason.ID = 1
 Arena.ArenaSeason.InProgress = 1
 
