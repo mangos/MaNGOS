@@ -39,6 +39,7 @@
 #include "ScriptCalls.h"
 #include "Util.h"
 #include "revision_sql.h"
+#include "MaNGOSsoap.h"
 
 #include "sockets/TcpSocket.h"
 #include "sockets/Utility.h"
@@ -223,7 +224,7 @@ int Master::Run()
     ///- Launch WorldRunnable thread
     ACE_Based::Thread world_thread(new WorldRunnable);
     world_thread.setPriority(ACE_Based::Highest);
-    
+
     // set realmbuilds depend on mangosd expected builds, and set server online
     {
         std::string builds = AcceptableClientBuildsListStr();
@@ -289,6 +290,18 @@ int Master::Run()
     }
     #endif
 
+    ///- Start soap serving thread
+    ACE_Based::Thread* soap_thread = NULL;
+
+    if(sConfig.GetBoolDefault("SOAP.Enabled", false))
+    {
+        MaNGOSsoapRunnable *runnable = new MaNGOSsoapRunnable();
+
+        runnable->setListenArguments(sConfig.GetStringDefault("SOAP.IP", "127.0.0.1"), sConfig.GetIntDefault("SOAP.Port", 7878));
+        soap_thread = new ACE_Based::Thread(runnable);
+    }
+
+
     uint32 realCurrTime, realPrevTime;
     realCurrTime = realPrevTime = getMSTime();
 
@@ -320,6 +333,14 @@ int Master::Run()
     {
         freeze_thread->destroy();
         delete freeze_thread;
+    }
+
+    ///- Stop soap thread
+    if(soap_thread)
+    {
+        soap_thread->wait();
+        soap_thread->destroy();
+        delete soap_thread;
     }
 
     ///- Set server offline in realmlist
