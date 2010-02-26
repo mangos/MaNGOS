@@ -1213,6 +1213,15 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
 
                     return;
                 }
+                case 45685:                                 // Magnataur On Death 2
+                {
+                    m_caster->RemoveAurasDueToSpell(45673);
+                    m_caster->RemoveAurasDueToSpell(45672);
+                    m_caster->RemoveAurasDueToSpell(45677);
+                    m_caster->RemoveAurasDueToSpell(45681);
+                    m_caster->RemoveAurasDueToSpell(45683);
+                    return;
+                }
                 case 45990:                                 // Collect Oil
                 {
                     if (!unitTarget || unitTarget->GetTypeId() != TYPEID_UNIT)
@@ -5410,6 +5419,24 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
 
                     m_caster->CastSpell(m_caster, spellPlayer[urand(0,4)], true);
                     unitTarget->CastSpell(unitTarget, spellTarget[urand(0,4)], true);
+
+                    return;
+                }
+                case 45691:                                 // Magnataur On Death 1
+                {
+                    // assuming caster is creature, if not, then return
+                    if (m_caster->GetTypeId() != TYPEID_UNIT)
+                        return;
+
+                    Player* pPlayer = ((Creature*)m_caster)->GetLootRecipient();
+
+                    if (!pPlayer)
+                        return;
+
+                    if (pPlayer->HasAura(45674) || pPlayer->HasAura(45675) || pPlayer->HasAura(45678) || pPlayer->HasAura(45682) || pPlayer->HasAura(45684))
+                        pPlayer->CastSpell(pPlayer, 45686, true);
+
+                    m_caster->CastSpell(m_caster, 45685, true);
 
                     return;
                 }
