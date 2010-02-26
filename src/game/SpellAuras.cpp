@@ -946,12 +946,9 @@ bool Aura::IsNeedVisibleSlot(Unit const* caster) const
     bool totemAura = caster && caster->GetTypeId() == TYPEID_UNIT && ((Creature*)caster)->isTotem();
 
     // passive auras (except totem auras) do not get placed in the slots
-    if (m_isPassive && !totemAura)
-        return false;
-
     // generic not caster case
-    if (m_target != caster)
-        return true;
+    if (m_isPassive && !totemAura && m_target == caster)
+        return false;
 
     // special area auras case at caster
     switch(m_spellProto->Effect[GetEffIndex()])
@@ -4910,19 +4907,29 @@ void Aura::HandlePeriodicHeal(bool apply, bool /*Real*/)
 {
     m_isPeriodic = apply;
 
-	// Gift of the Naaru
-	if ((m_spellProto->SpellFamilyFlags2 & UI64LIT(0x80000000)) && m_spellProto->SpellVisual[0] == 7625)
-	{
-		Unit *caster = GetCaster();
-		if (!caster)
-			return;
+    // For prevent double apply bonuses
+    bool loading = (m_target->GetTypeId() == TYPEID_PLAYER && ((Player*)m_target)->GetSession()->PlayerLoading());
 
-		int32 ap = int32 (0.22f * caster->GetTotalAttackPowerValue(BASE_ATTACK));
-		int32 holy = caster->SpellBaseDamageBonus(GetSpellSchoolMask(m_spellProto))
-				   + caster->SpellBaseDamageBonusForVictim(GetSpellSchoolMask(m_spellProto), m_target);
-		holy = int32(holy * 377 / 1000);
-		m_modifier.m_amount += ap > holy ? ap : holy;
-	}
+    // Custom damage calculation after
+    if (apply)
+    {
+        if(loading)
+            return;
+
+        Unit *caster = GetCaster();
+        if (!caster)
+            return;
+
+        // Gift of the Naaru (have diff spellfamilies)
+        if (m_spellProto->SpellIconID == 329 && m_spellProto->SpellVisual[0] == 7625)
+        {
+            int32 ap = int32 (0.22f * caster->GetTotalAttackPowerValue(BASE_ATTACK));
+            int32 holy = caster->SpellBaseDamageBonus(GetSpellSchoolMask(m_spellProto))
+                + caster->SpellBaseDamageBonusForVictim(GetSpellSchoolMask(m_spellProto), m_target);
+            holy = int32(holy * 377 / 1000);
+            m_modifier.m_amount += ap > holy ? ap : holy;
+        }
+    }
 }
 
 void Aura::HandlePeriodicDamage(bool apply, bool Real)

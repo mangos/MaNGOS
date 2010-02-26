@@ -50,7 +50,6 @@ class MANGOS_DLL_SPEC PathMovementBase
 
         // template pattern, not defined .. override required
         void LoadPath(T &);
-        void ReloadPath(T &);
         uint32 GetCurrentNode() const { return i_currentNode; }
 
         bool GetDestination(float& x, float& y, float& z) const { i_destinationHolder.GetDestination(x,y,z); return true; }
@@ -76,7 +75,7 @@ public PathMovementBase<Creature, WaypointPath const*>
 {
     public:
         WaypointMovementGenerator(Creature &) : i_nextMoveTime(0), b_StoppedByPlayer(false) {}
-        ~WaypointMovementGenerator() { ClearWaypoints(); }
+        ~WaypointMovementGenerator() { i_path = NULL; }
         void Initialize(Creature &u);
         void Interrupt(Creature &);
         void Finalize(Creature &);
@@ -89,7 +88,6 @@ public PathMovementBase<Creature, WaypointPath const*>
 
         // now path movement implmementation
         void LoadPath(Creature &c);
-        void ReloadPath(Creature &c) { ClearWaypoints(); LoadPath(c); }
 
         // Player stoping creature
         bool IsStoppedByPlayer() { return b_StoppedByPlayer; }
@@ -101,7 +99,6 @@ public PathMovementBase<Creature, WaypointPath const*>
         bool GetResetPosition(Creature&, float& x, float& y, float& z);
 
     private:
-        void ClearWaypoints();
 
         TimeTrackerSmall i_nextMoveTime;
         std::vector<bool> i_hasDone;
@@ -121,13 +118,12 @@ public PathMovementBase<Player>
         explicit FlightPathMovementGenerator(uint32 id, uint32 startNode = 0) : i_pathId(id) { i_currentNode = startNode; }
         void Initialize(Player &);
         void Finalize(Player &);
-        void Interrupt(Player &) {}
-        void Reset(Player &) {}
+        void Interrupt(Player &);
+        void Reset(Player &);
         bool Update(Player &, const uint32 &);
         MovementGeneratorType GetMovementGeneratorType() { return FLIGHT_MOTION_TYPE; }
 
         void LoadPath(Player &);
-        void ReloadPath(Player &) { /* don't reload flight path */ }
 
         Path& GetPath() { return i_path; }
         uint32 GetPathAtMapEnd() const;
