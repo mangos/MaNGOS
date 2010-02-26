@@ -47,14 +47,21 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 
     recvPacket >> bagIndex >> slot >> cast_count >> spellid >> item_guid >> glyphIndex >> unk_flags;
 
-    Item *pItem = pUser->GetItemByPos(bagIndex, slot);
-    if(!pItem)
+    // reject fake data
+    if (glyphIndex >= MAX_GLYPH_SLOT_INDEX)
     {
         pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, NULL, NULL );
         return;
     }
 
-    if(pItem->GetGUID() != item_guid)
+    Item *pItem = pUser->GetItemByPos(bagIndex, slot);
+    if (!pItem)
+    {
+        pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, NULL, NULL );
+        return;
+    }
+
+    if (pItem->GetGUID() != item_guid)
     {
         pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, NULL, NULL );
         return;
@@ -63,28 +70,28 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
     sLog.outDetail("WORLD: CMSG_USE_ITEM packet, bagIndex: %u, slot: %u, cast_count: %u, spellid: %u, Item: %u, glyphIndex: %u, unk_flags: %u, data length = %i", bagIndex, slot, cast_count, spellid, pItem->GetEntry(), glyphIndex, unk_flags, (uint32)recvPacket.size());
 
     ItemPrototype const *proto = pItem->GetProto();
-    if(!proto)
+    if (!proto)
     {
         pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, pItem, NULL );
         return;
     }
 
     // some item classes can be used only in equipped state
-    if(proto->InventoryType != INVTYPE_NON_EQUIP && !pItem->IsEquipped())
+    if (proto->InventoryType != INVTYPE_NON_EQUIP && !pItem->IsEquipped())
     {
         pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, pItem, NULL );
         return;
     }
 
     uint8 msg = pUser->CanUseItem(pItem);
-    if( msg != EQUIP_ERR_OK )
+    if (msg != EQUIP_ERR_OK)
     {
         pUser->SendEquipError( msg, pItem, NULL );
         return;
     }
 
     // only allow conjured consumable, bandage, poisons (all should have the 2^21 item flag set in DB)
-    if( proto->Class == ITEM_CLASS_CONSUMABLE &&
+    if (proto->Class == ITEM_CLASS_CONSUMABLE &&
         !(proto->Flags & ITEM_FLAGS_USEABLE_IN_ARENA) &&
         pUser->InArena())
     {

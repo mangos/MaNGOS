@@ -424,7 +424,7 @@ void Unit::SendMonsterMoveByPath(Path const& path, uint32 start, uint32 end, Spl
     data << GetPositionY();
     data << GetPositionZ();
     data << uint32(getMSTime());
-    data << uint8(0);
+    data << uint8(SPLINETYPE_NORMAL);
     data << uint32(flags);
     data << uint32(traveltime);
     data << uint32(pathSize);
@@ -1494,6 +1494,9 @@ void Unit::CalculateMeleeDamage(Unit *pVictim, uint32 damage, CalcDamageInfo *da
                 damageInfo->blocked_amount = damageInfo->damage;
                 damageInfo->procEx |= PROC_EX_FULL_BLOCK;
             }
+            else
+                damageInfo->procEx |= PROC_EX_NORMAL_HIT;   // Partial blocks can still cause attacker procs
+
             damageInfo->damage      -= damageInfo->blocked_amount;
             damageInfo->cleanDamage += damageInfo->blocked_amount;
             break;
