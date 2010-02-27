@@ -1215,6 +1215,15 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
 
                     return;
                 }
+                case 45685:                                 // Magnataur On Death 2
+                {
+                    m_caster->RemoveAurasDueToSpell(45673);
+                    m_caster->RemoveAurasDueToSpell(45672);
+                    m_caster->RemoveAurasDueToSpell(45677);
+                    m_caster->RemoveAurasDueToSpell(45681);
+                    m_caster->RemoveAurasDueToSpell(45683);
+                    return;
+                }
                 case 45990:                                 // Collect Oil
                 {
                     if (!unitTarget || unitTarget->GetTypeId() != TYPEID_UNIT)
@@ -1758,6 +1767,10 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                         return;
                 }
 
+                // prevent interrupted message for main spell
+                finish(true);
+
+                // replace cast by selected spell, this also make it interruptible including target death case
                 if (m_caster->IsFriendlyTo(unitTarget))
                     m_caster->CastSpell(unitTarget, heal, false);
                 else
@@ -5101,6 +5114,20 @@ void Spell::EffectWeaponDmg(SpellEffectIndex eff_idx)
         else if(uint32 ammo = ((Player*)m_caster)->GetUInt32Value(PLAYER_AMMO_ID))
             ((Player*)m_caster)->DestroyItemCount(ammo, 1, true);
     }
+
+    switch(m_spellInfo->Id)                     // for spells with divided damage to targets
+    {
+        case 66765: case 67333:                 // Meteor Fists
+        {
+            uint32 count = 0;
+            for(std::list<TargetInfo>::iterator ihit= m_UniqueTargetInfo.begin();ihit != m_UniqueTargetInfo.end();++ihit) 
+            ++count;
+
+            m_damage /= count;                    // divide to all targets
+            break;
+        }
+        break;
+    }
 }
 
 void Spell::EffectThreat(SpellEffectIndex /*eff_idx*/)
@@ -5467,39 +5494,55 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     unitTarget->CastSpell(unitTarget, 44870, true);
                     break;
                 }
-                /* Spell 51912 that trigger this need correction before this can work.
-                   Some additional research also seem to be needed + adjustment, this is mostly place holder for spells used.
                 case 45668:                                 // Ultra-Advanced Proto-Typical Shortening Blaster
                 {
                     if (!unitTarget || unitTarget->GetTypeId() != TYPEID_UNIT)
                         return;
 
-                    if (roll_chance_i(50))                  // chance unknown, using 50
+                    if (roll_chance_i(25))                  // chance unknown, using 25
                         return;
 
                     static uint32 const spellPlayer[5] =
                     {
-                        {45674},                            // Bigger!
-                        {45675},                            // Shrunk
-                        {45678},                            // Yellow
-                        {45682},                            // Ghost
-                        {45684}                             // Polymorph
+                        45674,                              // Bigger!
+                        45675,                              // Shrunk
+                        45678,                              // Yellow
+                        45682,                              // Ghost
+                        45684                               // Polymorph
                     };
 
                     static uint32 const spellTarget[5] =
                     {
-                        {45673},                            // Bigger!
-                        {45672},                            // Shrunk
-                        {45677},                            // Yellow
-                        {45681},                            // Ghost
-                        {45683}                             // Polymorph
+                        45673,                              // Bigger!
+                        45672,                              // Shrunk
+                        45677,                              // Yellow
+                        45681,                              // Ghost
+                        45683                               // Polymorph
                     };
 
                     m_caster->CastSpell(m_caster, spellPlayer[urand(0,4)], true);
                     unitTarget->CastSpell(unitTarget, spellTarget[urand(0,4)], true);
 
                     return;
-                }*/
+                }
+                case 45691:                                 // Magnataur On Death 1
+                {
+                    // assuming caster is creature, if not, then return
+                    if (m_caster->GetTypeId() != TYPEID_UNIT)
+                        return;
+
+                    Player* pPlayer = ((Creature*)m_caster)->GetLootRecipient();
+
+                    if (!pPlayer)
+                        return;
+
+                    if (pPlayer->HasAura(45674) || pPlayer->HasAura(45675) || pPlayer->HasAura(45678) || pPlayer->HasAura(45682) || pPlayer->HasAura(45684))
+                        pPlayer->CastSpell(pPlayer, 45686, true);
+
+                    m_caster->CastSpell(m_caster, 45685, true);
+
+                    return;
+                }
                 case 46203:                                 // Goblin Weather Machine
                 {
                     if (!unitTarget)

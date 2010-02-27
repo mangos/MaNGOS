@@ -375,6 +375,9 @@ bool FleeingMovementGenerator<T>::Update(T &owner, const uint32 & time_diff)
 
     if (i_destinationHolder.UpdateTraveller(traveller, time_diff, false))
     {
+        if (!IsActive(owner))                               // force stop processing (movement can move out active zone with cleanup movegens list)
+            return true;                                    // not expire now, but already lost
+
         i_destinationHolder.ResetUpdate(50);
         if(i_nextCheckTime.Passed() && i_destinationHolder.HasArrived())
         {

@@ -101,7 +101,8 @@ DestinationHolder<TRAVELLER>::UpdateTraveller(TRAVELLER &traveller, uint32 diff,
         if (i_tracker.Passed() || force_update)
         {
             ResetUpdate();
-            if (!i_destSet) return true;
+            if (!i_destSet)
+                return true;
 
             float x,y,z;
             GetLocationNowNoMicroMovement(x, y, z);
