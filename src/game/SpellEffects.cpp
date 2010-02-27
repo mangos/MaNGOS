@@ -1146,6 +1146,30 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     DoCreateItem(eff_idx, newitemid);
                     return;
                 }
+                case 42287:                                 // Salvage Wreckage
+                {
+                    if (m_caster->GetTypeId() != TYPEID_PLAYER)
+                        return;
+
+                    if (roll_chance_i(66))
+                        m_caster->CastSpell(m_caster, 42289, true, m_CastItem);
+                    else
+                        m_caster->CastSpell(m_caster, 42288, true);
+
+                    return;
+                }
+                case 43036:                                 // Dismembering Corpse
+                {
+                    if (!unitTarget || m_caster->GetTypeId() != TYPEID_PLAYER)
+                        return;
+
+                    if (unitTarget->HasAura(43059, EFFECT_INDEX_0))
+                        return;
+
+                    unitTarget->CastSpell(m_caster, 43037, true);
+                    unitTarget->CastSpell(unitTarget, 43059, true);
+                    return;
+                }
                 // Demon Broiled Surprise
                 /* FIX ME: Required for correct work implementing implicit target 7 (in pair (22,7))
                 case 43723:
@@ -1370,6 +1394,31 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                         // 01001000 - goblin binary
                         m_caster->CastSpell(m_caster, 50246, true);
                     }
+
+                    return;
+                }
+                case 51330:                                 // Shoot RJR
+                {
+                    if (!unitTarget)
+                        return;
+
+                    // guessed chances
+                    if (roll_chance_i(75))
+                        m_caster->CastSpell(unitTarget, roll_chance_i(50) ? 51332 : 51366, true, m_CastItem);
+                    else
+                        m_caster->CastSpell(unitTarget, 51331, true, m_CastItem);
+
+                    return;
+                }
+                case 51333:                                 // Dig For Treasure
+                {
+                    if (!unitTarget)
+                        return;
+
+                    if (roll_chance_i(75))
+                        m_caster->CastSpell(unitTarget, 51370, true, m_CastItem);
+                    else
+                        m_caster->CastSpell(m_caster, 51345, true);
 
                     return;
                 }

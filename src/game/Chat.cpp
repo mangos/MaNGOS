@@ -874,6 +874,7 @@ bool ChatHandler::ExecuteCommandInTable(ChatCommand *table, const char* text, co
                     SendSysMessage(LANG_CMD_SYNTAX);
 
                 ShowHelpForCommand(table[i].ChildCommands,text);
+                SetSentErrorMessage(true);
             }
 
             return true;
@@ -901,12 +902,13 @@ bool ChatHandler::ExecuteCommandInTable(ChatCommand *table, const char* text, co
             }
         }
         // some commands have custom error messages. Don't send the default one in these cases.
-        else if(!sentErrorMessage)
+        else if(!HasSentErrorMessage())
         {
             if(!table[i].Help.empty())
                 SendSysMessage(table[i].Help.c_str());
             else
                 SendSysMessage(LANG_CMD_SYNTAX);
+            SetSentErrorMessage(true);
         }
 
         return true;
@@ -1000,7 +1002,10 @@ int ChatHandler::ParseCommands(const char* text)
     std::string fullcmd = text;                             // original `text` can't be used. It content destroyed in command code processing.
 
     if (!ExecuteCommandInTable(getCommandTable(), text, fullcmd))
+    {
         SendSysMessage(LANG_NO_CMD);
+        SetSentErrorMessage(true);
+    }
 
     return 1;
 }
@@ -2257,8 +2262,8 @@ bool CliHandler::isAvailable(ChatCommand const& cmd) const
 
 void CliHandler::SendSysMessage(const char *str)
 {
-    m_print(str);
-    m_print("\r\n");
+    m_print(m_callbackArg, str);
+    m_print(m_callbackArg, "\r\n");
 }
 
 std::string CliHandler::GetNameLink() const

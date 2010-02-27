@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="mangosd"
 	ProjectGUID="{A3A04E47-43A2-4C08-90B3-029CEF558594}"
 	RootNamespace="mangosd"
@@ -48,7 +48,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\..\dep\include,..\..\src\framework,..\..\src\shared,..\..\src\game,..\..\src\mangosd;..\..\dep\ACE_wrappers"
+				AdditionalIncludeDirectories="..\..\dep\include\gsoap;..\..\dep\include;..\..\src\framework;..\..\src\shared;..\..\src\game;..\..\src\mangosd;..\..\dep\ACE_wrappers"
 				PreprocessorDefinitions="VERSION=&quot;0.16.0-DEV&quot;;WIN32;NDEBUG;_CONSOLE;ENABLE_CLI;_SECURE_SCL=0"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -149,7 +149,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\..\dep\include,..\..\src\framework,..\..\src\shared,..\..\src\game,..\..\src\mangosd;..\..\dep\ACE_wrappers"
+				AdditionalIncludeDirectories="..\..\dep\include\gsoap;..\..\dep\include,..\..\src\framework,..\..\src\shared,..\..\src\game,..\..\src\mangosd;..\..\dep\ACE_wrappers"
 				PreprocessorDefinitions="VERSION=&quot;0.16.0-DEV&quot;;WIN32;NDEBUG;_CONSOLE;ENABLE_CLI;_SECURE_SCL=0"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -248,7 +248,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\dep\include,..\..\src\framework,..\..\src\shared,..\..\src\game,..\..\src\mangosd;..\..\dep\ACE_wrappers"
+				AdditionalIncludeDirectories="..\..\dep\include\gsoap;..\..\dep\include,..\..\src\framework,..\..\src\shared,..\..\src\game,..\..\src\mangosd;..\..\dep\ACE_wrappers"
 				PreprocessorDefinitions="VERSION=&quot;0.16.0-DEV&quot;;WIN32;_DEBUG;MANGOS_DEBUG;_CONSOLE;ENABLE_CLI"
 				IgnoreStandardIncludePath="false"
 				BasicRuntimeChecks="3"
@@ -350,7 +350,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\dep\include,..\..\src\framework,..\..\src\shared,..\..\src\game,..\..\src\mangosd;..\..\dep\ACE_wrappers"
+				AdditionalIncludeDirectories="..\..\dep\include\gsoap;..\..\dep\include,..\..\src\framework,..\..\src\shared,..\..\src\game,..\..\src\mangosd;..\..\dep\ACE_wrappers"
 				PreprocessorDefinitions="VERSION=&quot;0.16.0-DEV&quot;;WIN32;_DEBUG;MANGOS_DEBUG;_CONSOLE;ENABLE_CLI"
 				IgnoreStandardIncludePath="false"
 				BasicRuntimeChecks="3"
@@ -450,7 +450,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\dep\include,..\..\src\framework,..\..\src\shared,..\..\src\game,..\..\src\mangosd;..\..\dep\ACE_wrappers"
+				AdditionalIncludeDirectories="..\..\dep\include\gsoap;..\..\dep\include,..\..\src\framework,..\..\src\shared,..\..\src\game,..\..\src\mangosd;..\..\dep\ACE_wrappers"
 				PreprocessorDefinitions="VERSION=&quot;0.16.0-DEV&quot;;WIN32;_DEBUG;MANGOS_DEBUG;_CONSOLE;ENABLE_CLI"
 				IgnoreStandardIncludePath="false"
 				BasicRuntimeChecks="3"
@@ -552,7 +552,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\dep\include,..\..\src\framework,..\..\src\shared,..\..\src\game,..\..\src\mangosd;..\..\dep\ACE_wrappers"
+				AdditionalIncludeDirectories="..\..\dep\include\gsoap;..\..\dep\include,..\..\src\framework,..\..\src\shared,..\..\src\game,..\..\src\mangosd;..\..\dep\ACE_wrappers"
 				PreprocessorDefinitions="VERSION=&quot;0.16.0-DEV&quot;;WIN32;_DEBUG;MANGOS_DEBUG;_CONSOLE;ENABLE_CLI"
 				IgnoreStandardIncludePath="false"
 				BasicRuntimeChecks="3"
@@ -680,6 +680,14 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\src\mangosd\MaNGOSsoap.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\src\mangosd\MaNGOSsoap.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\src\mangosd\Master.cpp"
 			>
 		</File>
@@ -693,6 +701,30 @@
 		</File>
 		<File
 			RelativePath="..\..\src\mangosd\RASocket.h"
+			>
+		</File>
+		<File
+			RelativePath="..\..\src\mangosd\soapC.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\src\mangosd\soapH.h"
+			>
+		</File>
+		<File
+			RelativePath="..\..\src\mangosd\soapServer.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\src\mangosd\soapStub.h"
+			>
+		</File>
+		<File
+			RelativePath="..\..\dep\src\gsoap\stdsoap2.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\dep\include\gsoap\stdsoap2.h"
 			>
 		</File>
 		<File

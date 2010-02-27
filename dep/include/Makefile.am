@@ -207,3 +207,8 @@ EXTRA_DIST += \
 	utf8cpp/utf8/checked.h \
 	utf8cpp/utf8/core.h \
 	utf8cpp/utf8/unchecked.h
+
+# gsoap header file
+EXTRA_DIST += \
+	gsoap/stdsoap2.h
+
