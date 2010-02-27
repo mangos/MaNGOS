@@ -946,9 +946,12 @@ bool Aura::IsNeedVisibleSlot(Unit const* caster) const
     bool totemAura = caster && caster->GetTypeId() == TYPEID_UNIT && ((Creature*)caster)->isTotem();
 
     // passive auras (except totem auras) do not get placed in the slots
-    // generic not caster case
-    if (m_isPassive && !totemAura && m_target == caster)
+    if (m_isPassive && !totemAura)
         return false;
+
+    // generic not caster case
+    if (m_target != caster)
+        return true;
 
     // special area auras case at caster
     switch(m_spellProto->Effect[GetEffIndex()])
