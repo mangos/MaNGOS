@@ -1759,9 +1759,9 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                 }
 
                 if (m_caster->IsFriendlyTo(unitTarget))
-                    m_caster->CastSpell(unitTarget, heal, false);
+                    m_caster->CastSpell(unitTarget, heal, true);
                 else
-                    m_caster->CastSpell(unitTarget, hurt, false);
+                    m_caster->CastSpell(unitTarget, hurt, true);
 
                 return;
             }
