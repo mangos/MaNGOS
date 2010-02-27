@@ -1371,6 +1371,19 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
 
                     return;
                 }
+                case 51330:                                 // Shoot RJR
+                {
+                    if (!unitTarget)
+                        return;
+
+                    // guessed chances
+                    if (roll_chance_i(75))
+                        m_caster->CastSpell(unitTarget, roll_chance_i(50) ? 51332 : 51366, true, m_CastItem);
+                    else
+                        m_caster->CastSpell(unitTarget, 51331, true, m_CastItem);
+
+                    return;
+                }
                 case 51582:                                 // Rocket Boots Engaged (Rocket Boots Xtreme and Rocket Boots Xtreme Lite)
                 {
                     if (m_caster->GetTypeId() != TYPEID_PLAYER)
