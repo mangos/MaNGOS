@@ -177,7 +177,12 @@ bool WaypointMovementGenerator<Creature>::Update(Creature &creature, const uint3
                     creature.SetUInt32Value(UNIT_NPC_EMOTESTATE, behavior->emote);
 
                 if (behavior->spell != 0)
+                {
                     creature.CastSpell(&creature, behavior->spell, false);
+
+                    if (!IsActive(creature))                // force stop processing (cast can change movegens list)
+                        return true;                        // not expire now, but already lost
+                }
 
                 if (behavior->model1 != 0)
                     creature.SetDisplayId(behavior->model1);

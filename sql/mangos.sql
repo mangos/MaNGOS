@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_9450_01_mangos_spell_proc_event` bit(1) default NULL
+  `required_9464_01_mangos_spell_proc_event` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -14212,6 +14212,8 @@ INSERT INTO `spell_bonus_data` VALUES
 (8129,  0,      0,       0,     'Priest - Mana Burn'),
 (58381, 0.257143,0,      0,     'Priest - Mind Flay Triggered'),
 (49821, 0.14286,0,       0,     'Priest - Mind Sear Trigger'),
+(47666, 0.229,  0,       0,     'Priest - Penance dmg effect'),
+(47750, 0.537,  0,       0,     'Priest - Penance heal effect'),
 (17,    0.8068, 0,       0,     'Priest - Power Word: Shield'),
 (33110, 0.8068, 0,       0,     'Priest - Prayer of Mending Heal Proc'),
 (33619, 0,      0,       0,     'Priest - Reflective Shield'),
@@ -17127,6 +17129,16 @@ INSERT INTO spell_chain VALUES
 (53005,47540,47540,2,0),
 (53006,53005,47540,3,0),
 (53007,53006,47540,4,0),
+/*Penance (damage)*/
+(47666,0,47666,1,0),
+(52998,47666,47666,2,0),
+(52999,52998,47666,3,0),
+(53000,52999,47666,4,0),
+/*Penance (healing)*/
+(47750,0,47750,1,0),
+(52983,47750,47750,2,0),
+(52984,52983,47750,3,0),
+(52985,52984,47750,4,0),
 /*PowerWord:Fortitude*/
 (1243,0,1243,1,0),
 (1244,1243,1243,2,0),
@@ -18667,7 +18679,8 @@ INSERT INTO `spell_proc_event` VALUES
 (67672, 0x00000000,  0, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0.000000, 0.000000, 50),
 (67702, 0x00000000,  0, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0.000000, 0.000000, 45),
 (67771, 0x00000000,  0, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0.000000, 0.000000, 45),
-(70664, 0x00000000,  7, 0x00000010, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x000000, 2.000000,  0);
+(70664, 0x00000000,  7, 0x00000010, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x000000, 2.000000,  0),
+(70748, 0x00000000,  3, 0x00000000, 0x00200000, 0x00000000, 0x00000000, 0x00000000, 0x000000, 0.000000,  0);
 
 /*!40000 ALTER TABLE `spell_proc_event` ENABLE KEYS */;
 UNLOCK TABLES;
