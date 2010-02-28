@@ -2268,22 +2268,6 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         if (Unit* caster = GetCaster())
                             caster->CastSpell(caster, 13138, true, NULL, this);
                         return;
-                    case 35356:                             // Spawn Feign Death
-                    case 35357:                             // Spawn Feign Death
-                    case 42557:                             // Feign Death
-                    {
-                        if (m_target->GetTypeId() == TYPEID_UNIT)
-                        {
-                            // Flags not set like it's done in SetFeignDeath() and apparently always applied at spawn of creature
-                            // All three does however have SPELL_EFFECT_SPAWN(46) as effect1
-                            // It is possible this effect will remove some flags, and then the three here can be handled "normally"
-                            m_target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_29);
-                            m_target->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
-
-                            m_target->addUnitState(UNIT_STAT_DIED);
-                        }
-                        return;
-                    }
                     case 39850:                             // Rocket Blast
                         if(roll_chance_i(20))               // backfire stun
                             m_target->CastSpell(m_target, 51581, true, NULL, this);
@@ -2448,19 +2432,6 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                 m_target->CastSpell(m_target, 28240, true, NULL, this);
                 return;
             }
-            case 35356:                                     // Spawn Feign Death
-            case 35357:                                     // Spawn Feign Death
-            case 42557:                                     // Feign Death
-            {
-                if (m_target->GetTypeId() == TYPEID_UNIT)
-                {
-                    m_target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_29);
-                    m_target->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
-
-                    m_target->clearUnitState(UNIT_STAT_DIED);
-                }
-                return;
-            }
             case 32286:                                     // Focus Target Visual
             {
                 if (m_removeMode == AURA_REMOVE_BY_DEFAULT)
@@ -2593,6 +2564,32 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                     if (m_target->GetTypeId() == TYPEID_UNIT)
                         m_target->SetFeignDeath(apply);
 
+                    return;
+                }
+                case 35356:                             // Spawn Feign Death
+                case 35357:                             // Spawn Feign Death
+                case 42557:                             // Feign Death
+                {
+                    if (m_target->GetTypeId() == TYPEID_UNIT)
+                    {
+                        // Flags not set like it's done in SetFeignDeath() and apparently always applied at spawn of creature
+                        // All three does however have SPELL_EFFECT_SPAWN(46) as effect1
+                        // It is possible this effect will remove some flags, and then the three here can be handled "normally"
+                        if (apply)
+                        {
+                            m_target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_29);
+                            m_target->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
+
+                            m_target->addUnitState(UNIT_STAT_DIED);
+                        }
+                        else
+                        {
+                            m_target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_29);
+                            m_target->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
+
+                            m_target->clearUnitState(UNIT_STAT_DIED);
+                        }
+                    }
                     return;
                 }
                 //Summon Fire Elemental
