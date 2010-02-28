@@ -1743,15 +1743,19 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
             if (spellInfo_2->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT)
             {
                 // Lichborne  and Lichborne (triggered)
-                if( spellInfo_1->SpellIconID == 61 && spellInfo_2->SpellIconID == 61 )
+                if (spellInfo_1->SpellIconID == 61 && spellInfo_2->SpellIconID == 61)
                     return false;
 
                 // Frost Presence and Frost Presence (triggered)
-                if( spellInfo_1->SpellIconID == 2632 && spellInfo_2->SpellIconID == 2632 )
+                if (spellInfo_1->SpellIconID == 2632 && spellInfo_2->SpellIconID == 2632)
                     return false;
 
                 // Unholy Presence and Unholy Presence (triggered)
-                if( spellInfo_1->SpellIconID == 2633 && spellInfo_2->SpellIconID == 2633 )
+                if (spellInfo_1->SpellIconID == 2633 && spellInfo_2->SpellIconID == 2633)
+                    return false;
+
+                // Unholy Presence and Unholy Presence (triggered)
+                if (spellInfo_1->SpellIconID == 2636 && spellInfo_2->SpellIconID == 2636)
                     return false;
             }
             break;

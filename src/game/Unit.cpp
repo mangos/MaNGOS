@@ -6886,15 +6886,6 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
         }
         case SPELLFAMILY_DEATHKNIGHT:
         {
-            // Blood Aura
-            if (dummySpell->SpellIconID == 2636)
-            {
-                if (GetTypeId() != TYPEID_PLAYER || !((Player*)this)->isHonorOrXPTarget(pVictim))
-                    return false;
-                basepoints[0] = triggerAmount * damage / 100;
-                triggered_spell_id = 53168;
-                break;
-            }
             // Butchery
             if (dummySpell->SpellIconID == 2664)
             {
@@ -7670,22 +7661,20 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
                         return false;
                 }
             }
-            // Blood Presence
-            else if (auraSpellInfo->Id == 48266)
-            {
-                if (GetTypeId() != TYPEID_PLAYER)
-                    return false;
-                if (!((Player*)this)->isHonorOrXPTarget(pVictim))
-                    return false;
-                trigger_spell_id = 50475;
-                basepoints[0] = damage * triggerAmount / 100;
-            }
             // Blade Barrier
             else if (auraSpellInfo->SpellIconID == 85)
             {
                 if (GetTypeId() != TYPEID_PLAYER || getClass() != CLASS_DEATH_KNIGHT ||
                     !((Player*)this)->IsBaseRuneSlotsOnCooldown(RUNE_BLOOD))
                     return false;
+            }
+            // Improved Blood Presence
+            else if (auraSpellInfo->Id == 63611)
+            {
+                if (GetTypeId() != TYPEID_PLAYER || !((Player*)this)->isHonorOrXPTarget(pVictim) || !damage)
+                    return false;
+                basepoints[0] = triggerAmount * damage / 100;
+                trigger_spell_id = 50475;
             }
             break;
         }
