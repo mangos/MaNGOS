@@ -2268,6 +2268,11 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         if (Unit* caster = GetCaster())
                             caster->CastSpell(caster, 13138, true, NULL, this);
                         return;
+                    case 29266:                             // Permanent Feign Death
+                        if (m_target->GetTypeId() == TYPEID_UNIT)
+                            m_target->SetFeignDeath(true);
+
+                        return;
                     case 35357:                             // Spawn Feign Death
                         if (m_target->GetTypeId() == TYPEID_UNIT)
                         {
