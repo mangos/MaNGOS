@@ -5914,7 +5914,7 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                 // Glyph of Prayer of Healing
                 case 55680:
                 {
-                    basepoints0 = int32(damage * 20 / 100 / 2);   // divided in two ticks
+                    basepoints[0] = int32(damage * 20 / 100 / 2);   // divided in two ticks
                     triggered_spell_id = 56161;
                     break;
                 }
@@ -6059,7 +6059,7 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                 if (procSpell->Id == 5229 && triggeredByAura->GetMiscValue() == 126)
                 {
                     // note : the remove part is done in spellAuras/HandlePeriodicEnergize as RemoveAurasDueToSpell
-                    basepoints0 = triggerAmount;
+                    basepoints[0] = triggerAmount;
                     triggered_spell_id = 51185;
                     target = this;
                     break;
@@ -6067,7 +6067,7 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                 // Tiger Fury (cat) - all ranks - the aura for the cat form from the 2 existing kotj auras has a miscValue != 126
                 if (procSpell->SpellFamilyFlags2 & UI64LIT(0x00000800)  && triggeredByAura->GetMiscValue() != 126)
                 {
-                    basepoints0 = triggerAmount;
+                    basepoints[0] = triggerAmount;
                     triggered_spell_id = 51178;
                     target = this;
                     break;
@@ -6807,7 +6807,7 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     float BaseWeaponSpeed = GetAttackTime(OFF_ATTACK)/1000.0;
 
                     // Value1: add the tooltip damage by swingspeed + Value2: add spelldmg by swingspeed
-                    basepoints0 = int32( (fire_onhit * BaseWeaponSpeed) + (add_spellpower * BaseWeaponSpeed) );
+                    basepoints[0] = int32( (fire_onhit * BaseWeaponSpeed) + (add_spellpower * BaseWeaponSpeed) );
                     triggered_spell_id = 10444;
                 }
 
@@ -6817,7 +6817,7 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     float BaseWeaponSpeed = GetAttackTime(BASE_ATTACK)/1000.0;
 
                     // Value1: add the tooltip damage by swingspeed +  Value2: add spelldmg by swingspeed
-                    basepoints0 = int32( (fire_onhit * BaseWeaponSpeed) + (add_spellpower * BaseWeaponSpeed) );
+                    basepoints[0] = int32( (fire_onhit * BaseWeaponSpeed) + (add_spellpower * BaseWeaponSpeed) );
                     triggered_spell_id = 10444;
                 }
 
@@ -6825,7 +6825,7 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                 else
                     return false;
 
-                CastCustomSpell(pVictim,triggered_spell_id,&basepoints0,NULL,NULL,true,castItem,triggeredByAura);
+                CastCustomSpell(pVictim,triggered_spell_id,&basepoints[0],NULL,NULL,true,castItem,triggeredByAura);
                 return true;
             }
             // Improved Water Shield
@@ -7007,7 +7007,7 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
             // Unholy Blight
             if (dummySpell->Id == 49194)
             {
-                basepoints0 = triggerAmount * damage / 1000;
+                basepoints[0] = triggerAmount * damage / 1000;
                 triggered_spell_id = 50536;
                 break;
             }
