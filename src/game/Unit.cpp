@@ -6664,6 +6664,34 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     triggered_spell_id = 58879;
                     break;
                 }
+                // Glyph of Totem of Wrath
+                case 63280:
+                {
+                    Totem* totem = GetTotem(TOTEM_SLOT_FIRE);
+                    if (!totem)
+                        return false;
+
+                    // find totem aura bonus
+                    AuraList const& spellPower = totem->GetAurasByType(SPELL_AURA_NONE);
+                    for(AuraList::const_iterator i = spellPower.begin();i != spellPower.end(); ++i)
+                    {
+                        // select proper aura for format aura type in spell proto
+                        if ((*i)->GetTarget()==totem && (*i)->GetSpellProto()->EffectApplyAuraName[(*i)->GetEffIndex()] == SPELL_AURA_MOD_HEALING_DONE &&
+                            (*i)->GetSpellProto()->SpellFamilyName == SPELLFAMILY_SHAMAN && (*i)->GetSpellProto()->SpellFamilyFlags & UI64LIT(0x0000000004000000))
+                        {
+                            basepoints[0] = triggerAmount * (*i)->GetModifier()->m_amount / 100;
+                            break;
+                        }
+                    }
+
+                    if (!basepoints[0])
+                        return false;
+
+                    basepoints[1] = basepoints[0];
+                    triggered_spell_id = 63283;             // Totem of Wrath, caster bonus
+                    target = this;
+                    break;
+                }
                 // Shaman T8 Elemental 4P Bonus
                 case 64928:
                 {
