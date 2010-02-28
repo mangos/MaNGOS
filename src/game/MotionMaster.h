@@ -79,29 +79,17 @@ class MANGOS_DLL_SPEC MotionMaster : private std::stack<MovementGenerator *>
         const_iterator end() const { return Impl::c.end(); }
 
         void UpdateMotion(uint32 diff);
-        void Clear(bool reset = true)
+        void Clear(bool reset = true, bool all = false)
         {
             if (m_cleanFlag & MMCF_UPDATE)
-            {
-                if(reset)
-                    m_cleanFlag |= MMCF_RESET;
-                else
-                    m_cleanFlag &= ~MMCF_RESET;
-                DelayedClean();
-            }
+                DelayedClean(reset, all);
             else
-                DirectClean(reset);
+                DirectClean(reset, all);
         }
         void MovementExpired(bool reset = true)
         {
             if (m_cleanFlag & MMCF_UPDATE)
-            {
-                if(reset)
-                    m_cleanFlag |= MMCF_RESET;
-                else
-                    m_cleanFlag &= ~MMCF_RESET;
-                DelayedExpire();
-            }
+                DelayedExpire(reset);
             else
                 DirectExpire(reset);
         }
@@ -129,11 +117,11 @@ class MANGOS_DLL_SPEC MotionMaster : private std::stack<MovementGenerator *>
     private:
         void Mutate(MovementGenerator *m);                  // use Move* functions instead
 
-        void DirectClean(bool reset);
-        void DelayedClean();
+        void DirectClean(bool reset, bool all);
+        void DelayedClean(bool reset, bool all);
 
         void DirectExpire(bool reset);
-        void DelayedExpire();
+        void DelayedExpire(bool reset);
 
         Unit       *i_owner;
         ExpireList *m_expList;
