@@ -2268,33 +2268,6 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         if (Unit* caster = GetCaster())
                             caster->CastSpell(caster, 13138, true, NULL, this);
                         return;
-                    case 29266:                             // Permanent Feign Death
-                    case 31261:                             // Permanent Feign Death (Root)
-                    case 37493:                             // Feign Death
-                    case 51329:                             // Feign Death
-                    case 52593:                             // Bloated Abomination Feign Death
-                    case 55795:                             // Falling Dragon Feign Death
-                    case 57626:                             // Feign Death
-                    case 57685:                             // Permanent Feign Death
-                    case 58768:                             // Permanent Feign Death (Freeze Jumpend)
-                    case 58806:                             // Permanent Feign Death (Drowned Anim)
-                    case 58951:                             // Permanent Feign Death
-                    case 64461:                             // Permanent Feign Death (No Anim) (Root)
-                    case 65985:                             // Permanent Feign Death (Root Silence Pacify)
-                    case 70630:                             // Frozen Aftermath - Feign Death
-                    case 70592:                             // Permanent Feign Death
-                    case 70628:                             // Permanent Feign Death
-                    case 71598:                             // Feign Death
-                    {
-                        // Unclear what the difference really is between them.
-                        // Some has effect1 that makes the difference, however not all.
-                        // Some appear to be used depending on creature location, in water, at solid ground, in air/suspended, etc
-                        // For now, just handle all the same way
-                        if (m_target->GetTypeId() == TYPEID_UNIT)
-                            m_target->SetFeignDeath(true);
-
-                        return;
-                    }
                     case 35356:                             // Spawn Feign Death
                     case 35357:                             // Spawn Feign Death
                     case 42557:                             // Feign Death
@@ -2475,29 +2448,6 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                 m_target->CastSpell(m_target, 28240, true, NULL, this);
                 return;
             }
-            case 29266:                                     // Permanent Feign Death
-            case 31261:                                     // Permanent Feign Death (Root)
-            case 37493:                                     // Feign Death
-            case 51329:                                     // Feign Death
-            case 52593:                                     // Bloated Abomination Feign Death
-            case 55795:                                     // Falling Dragon Feign Death
-            case 57626:                                     // Feign Death
-            case 57685:                                     // Permanent Feign Death
-            case 58768:                                     // Permanent Feign Death (Freeze Jumpend)
-            case 58806:                                     // Permanent Feign Death (Drowned Anim)
-            case 58951:                                     // Permanent Feign Death
-            case 64461:                                     // Permanent Feign Death (No Anim) (Root)
-            case 65985:                                     // Permanent Feign Death (Root Silence Pacify)
-            case 70630:                                     // Frozen Aftermath - Feign Death
-            case 70592:                                     // Permanent Feign Death
-            case 70628:                                     // Permanent Feign Death
-            case 71598:                                     // Feign Death
-            {
-                if (m_target->GetTypeId() == TYPEID_UNIT)
-                    m_target->SetFeignDeath(false);
-
-                return;
-            }
             case 35356:                                     // Spawn Feign Death
             case 35357:                                     // Spawn Feign Death
             case 42557:                                     // Feign Death
@@ -2616,6 +2566,33 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         return;
                     }
                     m_target->RemoveAurasDueToSpell(spellId);
+                    return;
+                }
+                case 29266:                             // Permanent Feign Death
+                case 31261:                             // Permanent Feign Death (Root)
+                case 37493:                             // Feign Death
+                case 51329:                             // Feign Death
+                case 52593:                             // Bloated Abomination Feign Death
+                case 55795:                             // Falling Dragon Feign Death
+                case 57626:                             // Feign Death
+                case 57685:                             // Permanent Feign Death
+                case 58768:                             // Permanent Feign Death (Freeze Jumpend)
+                case 58806:                             // Permanent Feign Death (Drowned Anim)
+                case 58951:                             // Permanent Feign Death
+                case 64461:                             // Permanent Feign Death (No Anim) (Root)
+                case 65985:                             // Permanent Feign Death (Root Silence Pacify)
+                case 70592:                             // Permanent Feign Death
+                case 70628:                             // Permanent Feign Death
+                case 70630:                             // Frozen Aftermath - Feign Death
+                case 71598:                             // Feign Death
+                {
+                    // Unclear what the difference really is between them.
+                    // Some has effect1 that makes the difference, however not all.
+                    // Some appear to be used depending on creature location, in water, at solid ground, in air/suspended, etc
+                    // For now, just handle all the same way
+                    if (m_target->GetTypeId() == TYPEID_UNIT)
+                        m_target->SetFeignDeath(apply);
+
                     return;
                 }
                 //Summon Fire Elemental
