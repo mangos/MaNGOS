@@ -2648,6 +2648,19 @@ enum PetTameFailureReason
     PETTAME_UNKNOWNERROR            = 13
 };
 
+// Stored in SummonProperties.dbc with slot+1 values
+enum TotemSlot
+{
+    TOTEM_SLOT_FIRE   = 0,
+    TOTEM_SLOT_EARTH  = 1,
+    TOTEM_SLOT_WATER  = 2,
+    TOTEM_SLOT_AIR    = 3,
+};
+
+#define TOTEM_SLOT_NONE 255                                 // custom value for no slot case
+
+#define MAX_TOTEM_SLOT  4
+
 // we need to stick to 1 version or half of the stuff will work for someone
 // others will not and opposite
 // will only support WoW, WoW:TBC and WoW:WotLK 3.3.2 client build 11403...

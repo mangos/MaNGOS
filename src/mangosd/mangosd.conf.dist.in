@@ -1535,7 +1535,7 @@ AuctionHouseBot.UseBuyPriceForBuyer = 0
 AuctionHouseBot.MaxItemLevel = 200
 
 ###################################################################################################################
-# CONSOLE AND REMOTE ACCESS
+# CONSOLE, REMOTE ACCESS AND SOAP
 #
 #    Console.Enable
 #        Enable console
@@ -1559,6 +1559,20 @@ AuctionHouseBot.MaxItemLevel = 200
 #    Ra.Secure
 #        Kick client on wrong pass
 #
+#
+#    SOAP.Enable
+#        Enable soap service
+#        Default: 0 - off
+#                 1 - on
+#
+#    SOAP.IP
+#        Bound SOAP service ip address, use 0.0.0.0 to access from everywhere
+#        Default: 127.0.0.1
+#
+#    SOAP.Port
+#        SOAP port
+#        Default: 7878
+#
 ###################################################################################################################
 
 Console.Enable = 1
@@ -1567,6 +1581,9 @@ Ra.IP = 0.0.0.0
 Ra.Port = 3443
 Ra.MinLevel = 3
 Ra.Secure = 1
+SOAP.Enabled = 0
+SOAP.IP = 127.0.0.1
+SOAP.Port = 7878
 
 ###################################################################################################################
 # MOVEMENT ANTICHEAT
@@ -1591,3 +1608,4 @@ Anticheat.Movement.Enable = 1
 Anticheat.Movement.TeleportToPlaneAlarms = 50
 Anticheat.Movement.MistimingDelta = 10000
 Anticheat.Movement.MistimingAlarms = 20
+

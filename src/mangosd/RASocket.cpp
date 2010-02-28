@@ -31,22 +31,11 @@
 #include "Language.h"
 #include "ObjectMgr.h"
 
-/// \todo Make this thread safe if in the future 2 admins should be able to log at the same time.
-SOCKET r;
-
-uint32 iSession=0;                                          ///< Session number (incremented each time a new connection is made)
-unsigned int iUsers=0;                                      ///< Number of active administrators
-
-typedef int(* pPrintf)(const char*,...);
-
-void ParseCommand(CliCommandHolder::Print*, char*command);
+// TODO: drop old socket library and implement RASocket using ACE
 
 /// RASocket constructor
 RASocket::RASocket(ISocketHandler &h): TcpSocket(h)
 {
-
-    ///- Increment the session number
-    iSess =iSession++ ;
 
     ///- Get the config parameters
     bSecure = sConfig.GetBoolDefault( "RA.Secure", true );
@@ -54,20 +43,13 @@ RASocket::RASocket(ISocketHandler &h): TcpSocket(h)
 
     ///- Initialize buffer and data
     iInputLength=0;
-    buff=new char[RA_BUFF_SIZE];
     stage=NONE;
 }
 
 /// RASocket destructor
 RASocket::~RASocket()
 {
-    ///- Delete buffer and decrease active admins count
-    delete [] buff;
-
     sLog.outRALog("Connection was closed.\n");
-
-    if(stage==OK)
-        iUsers--;
 }
 
 /// Accept an incoming connection
@@ -75,15 +57,8 @@ void RASocket::OnAccept()
 {
     std::string ss=GetRemoteAddress();
     sLog.outRALog("Incoming connection from %s.\n",ss.c_str());
-    ///- If there is already an active admin, drop the connection
-    if(iUsers)
-    {
-        Sendf(sObjectMgr.GetMangosStringForDBCLocale(LANG_RA_BUSY));
-        SetCloseAndDelete();
-        return;
-    }
 
-    ///- Else print Motd
+    ///- print Motd
     Sendf("%s\r\n",sWorld.GetMotd());
     Sendf("\r\n%s",sObjectMgr.GetMangosStringForDBCLocale(LANG_RA_USER));
 }
@@ -98,14 +73,6 @@ void RASocket::OnRead()
     if (iInputLength+sz>=RA_BUFF_SIZE)
     {
         sLog.outRALog("Input buffer overflow, possible DOS attack.\n");
-        SetCloseAndDelete();
-        return;
-    }
-
-    ///- If there is already an active admin (other than you), drop the connection
-    if (stage!=OK && iUsers)
-    {
-        Sendf(sObjectMgr.GetMangosStringForDBCLocale(LANG_RA_BUSY));
         SetCloseAndDelete();
         return;
     }
@@ -157,7 +124,8 @@ void RASocket::OnRead()
                 {
                     Sendf("-No such user.\r\n");
                     sLog.outRALog("User %s does not exist.\n",szLogin.c_str());
-                    if(bSecure)SetCloseAndDelete();
+                    if(bSecure)
+                        SetCloseAndDelete();
                     Sendf("\r\n%s",sObjectMgr.GetMangosStringForDBCLocale(LANG_RA_USER));
                 }
                 else
@@ -169,7 +137,8 @@ void RASocket::OnRead()
                     {
                         Sendf("-Not enough privileges.\r\n");
                         sLog.outRALog("User %s has no privilege.\n",szLogin.c_str());
-                        if(bSecure)SetCloseAndDelete();
+                        if(bSecure)
+                            SetCloseAndDelete();
                         Sendf("\r\n%s",sObjectMgr.GetMangosStringForDBCLocale(LANG_RA_USER));
                     }
                     else
@@ -202,9 +171,8 @@ void RASocket::OnRead()
                 if (check)
                 {
                     delete check;
-                    r=GetSocket();
+                    GetSocket();
                     stage=OK;
-                    ++iUsers;
 
                     Sendf("+Logged in.\r\n");
                     sLog.outRALog("User %s has logged in.\n",szLogin.c_str());
@@ -215,7 +183,8 @@ void RASocket::OnRead()
                     ///- Else deny access
                     Sendf("-Wrong pass.\r\n");
                     sLog.outRALog("User %s has failed to log in.\n",szLogin.c_str());
-                    if(bSecure)SetCloseAndDelete();
+                    if(bSecure)
+                        SetCloseAndDelete();
                     Sendf("\r\n%s",sObjectMgr.GetMangosStringForDBCLocale(LANG_RA_PASS));
                 }
                 break;
@@ -228,7 +197,12 @@ void RASocket::OnRead()
                     if (strncmp(buff,"quit",4)==0)
                         SetCloseAndDelete();
                     else
-                        sWorld.QueueCliCommand(&RASocket::zprint, buff);
+                    {
+                        SetDeleteByHandler(false);
+                        CliCommandHolder* cmd = new CliCommandHolder(this, buff, &RASocket::zprint, &RASocket::commandFinished);
+                        sWorld.QueueCliCommand(cmd);
+                        ++pendingCommands;
+                    }
                 }
                 else
                     Sendf("mangos>");
@@ -240,23 +214,22 @@ void RASocket::OnRead()
 }
 
 /// Output function
-void RASocket::zprint( const char * szText )
+void RASocket::zprint(void* callbackArg, const char * szText )
 {
     if( !szText )
         return;
 
-    #ifdef RA_CRYPT
-
-    char *megabuffer = mangos_strdup(szText);
-    unsigned int sz=strlen(megabuffer);
-    Encrypt(megabuffer,sz);
-    send(r,megabuffer,sz,0);
-    delete [] megabuffer;
-
-    #else
-
     unsigned int sz=strlen(szText);
-    send(r,szText,sz,0);
-
-    #endif
+    send(((RASocket*)callbackArg)->GetSocket(), szText, sz, 0);
 }
+
+void RASocket::commandFinished(void* callbackArg, bool success)
+{
+    RASocket* raSocket = (RASocket*)callbackArg;
+    raSocket->Sendf("mangos>");
+    uint64 remainingCommands = --raSocket->pendingCommands;
+
+    if(remainingCommands == 0)
+        raSocket->SetDeleteByHandler(true);
+}
+
