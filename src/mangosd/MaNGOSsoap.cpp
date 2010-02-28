@@ -129,7 +129,11 @@ int ns1__executeCommand(soap* soap, char* command, char** result)
 
     // wait for callback to complete command
 
-    connection.pendingCommands.acquire();
+    int acc = connection.pendingCommands.acquire();
+    if(acc)
+    {
+        sLog.outError("MaNGOSsoap: Error while acquiring lock, acc = %i, errno = %u", acc, errno);
+    }
 
     // alright, command finished
 
