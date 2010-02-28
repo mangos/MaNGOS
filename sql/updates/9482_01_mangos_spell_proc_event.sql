@@ -1,8 +1,5 @@
 ALTER TABLE db_version CHANGE COLUMN required_9477_01_mangos_spell_proc_event required_9482_01_mangos_spell_proc_event bit;
 
--- (48266) Blood Presence ()
-DELETE FROM `spell_proc_event` WHERE `entry` IN (50689);
-
 -- (63611) Improved Blood Presence ()
 DELETE FROM `spell_proc_event` WHERE `entry` IN (63611);
 INSERT INTO `spell_proc_event` VALUES

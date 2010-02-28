@@ -1754,7 +1754,7 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
                 if (spellInfo_1->SpellIconID == 2633 && spellInfo_2->SpellIconID == 2633)
                     return false;
 
-                // Unholy Presence and Unholy Presence (triggered)
+                // Blood Presence and Blood Presence (triggered)
                 if (spellInfo_1->SpellIconID == 2636 && spellInfo_2->SpellIconID == 2636)
                     return false;
             }
