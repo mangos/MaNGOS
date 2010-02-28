@@ -2269,20 +2269,48 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                             caster->CastSpell(caster, 13138, true, NULL, this);
                         return;
                     case 29266:                             // Permanent Feign Death
+                    case 31261:                             // Permanent Feign Death (Root)
+                    case 37493:                             // Feign Death
+                    case 51329:                             // Feign Death
+                    case 52593:                             // Bloated Abomination Feign Death
+                    case 55795:                             // Falling Dragon Feign Death
+                    case 57626:                             // Feign Death
+                    case 57685:                             // Permanent Feign Death
+                    case 58768:                             // Permanent Feign Death (Freeze Jumpend)
+                    case 58806:                             // Permanent Feign Death (Drowned Anim)
+                    case 58951:                             // Permanent Feign Death
+                    case 64461:                             // Permanent Feign Death (No Anim) (Root)
+                    case 65985:                             // Permanent Feign Death (Root Silence Pacify)
+                    case 70630:                             // Frozen Aftermath - Feign Death
+                    case 70592:                             // Permanent Feign Death
+                    case 70628:                             // Permanent Feign Death
+                    case 71598:                             // Feign Death
+                    {
+                        // Unclear what the difference really is between them.
+                        // Some has effect1 that makes the difference, however not all.
+                        // Some appear to be used depending on creature location, in water, at solid ground, in air/suspended, etc
+                        // For now, just handle all the same way
                         if (m_target->GetTypeId() == TYPEID_UNIT)
                             m_target->SetFeignDeath(true);
 
                         return;
+                    }
+                    case 35356:                             // Spawn Feign Death
                     case 35357:                             // Spawn Feign Death
+                    case 42557:                             // Feign Death
+                    {
                         if (m_target->GetTypeId() == TYPEID_UNIT)
                         {
-                            // flags not set like it's done in SetFeignDeath(), also this aura expected to be existing always/from spawn
+                            // Flags not set like it's done in SetFeignDeath() and apparently always applied at spawn of creature
+                            // All three does however have SPELL_EFFECT_SPAWN(46) as effect1
+                            // It is possible this effect will remove some flags, and then the three here can be handled "normally"
                             m_target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_29);
                             m_target->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
 
                             m_target->addUnitState(UNIT_STAT_DIED);
                         }
                         return;
+                    }
                     case 39850:                             // Rocket Blast
                         if(roll_chance_i(20))               // backfire stun
                             m_target->CastSpell(m_target, 51581, true, NULL, this);
@@ -2445,6 +2473,42 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                 m_target->CastSpell(m_target, 28206, true, NULL, this);
                 // Poison Cloud
                 m_target->CastSpell(m_target, 28240, true, NULL, this);
+                return;
+            }
+            case 29266:                                     // Permanent Feign Death
+            case 31261:                                     // Permanent Feign Death (Root)
+            case 37493:                                     // Feign Death
+            case 51329:                                     // Feign Death
+            case 52593:                                     // Bloated Abomination Feign Death
+            case 55795:                                     // Falling Dragon Feign Death
+            case 57626:                                     // Feign Death
+            case 57685:                                     // Permanent Feign Death
+            case 58768:                                     // Permanent Feign Death (Freeze Jumpend)
+            case 58806:                                     // Permanent Feign Death (Drowned Anim)
+            case 58951:                                     // Permanent Feign Death
+            case 64461:                                     // Permanent Feign Death (No Anim) (Root)
+            case 65985:                                     // Permanent Feign Death (Root Silence Pacify)
+            case 70630:                                     // Frozen Aftermath - Feign Death
+            case 70592:                                     // Permanent Feign Death
+            case 70628:                                     // Permanent Feign Death
+            case 71598:                                     // Feign Death
+            {
+                if (m_target->GetTypeId() == TYPEID_UNIT)
+                    m_target->SetFeignDeath(false);
+
+                return;
+            }
+            case 35356:                                     // Spawn Feign Death
+            case 35357:                                     // Spawn Feign Death
+            case 42557:                                     // Feign Death
+            {
+                if (m_target->GetTypeId() == TYPEID_UNIT)
+                {
+                    m_target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_29);
+                    m_target->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
+
+                    m_target->clearUnitState(UNIT_STAT_DIED);
+                }
                 return;
             }
             case 32286:                                     // Focus Target Visual
