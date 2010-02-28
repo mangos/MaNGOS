@@ -6171,7 +6171,7 @@ void Aura::HandleShapeshiftBoosts(bool apply)
                     if ((*i)->GetSpellProto()->SpellFamilyName==SPELLFAMILY_DRUID &&
                         (*i)->GetSpellProto()->SpellIconID == 961)
                     {
-                        int32 bp = (*i)->GetSpellProto()->CalculateSimpleValue(2);
+                        int32 bp = (*i)->GetSpellProto()->CalculateSimpleValue(EFFECT_INDEX_2);
                         if (bp)
                             m_target->CastCustomSpell(m_target, 62069, &bp, NULL, NULL, true, NULL, this);
                         break;
