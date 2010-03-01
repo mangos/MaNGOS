@@ -30,16 +30,27 @@ void SqlDelayThread::run()
     mysql_thread_init();
     #endif
 
+    const uint32 loopSleepms = 10;
+
+    const uint32 pingEveryLoop = m_dbEngine->GetPingIntervall()/loopSleepms;
+
+    uint32 loopCounter = 0;
     while (m_running)
     {
         // if the running state gets turned off while sleeping
         // empty the queue before exiting
-        ACE_Based::Thread::Sleep(10);
+
+        ACE_Based::Thread::Sleep(loopSleepms);
         SqlOperation* s;
         while (m_sqlQueue.next(s))
         {
             s->Execute(m_dbEngine);
             delete s;
+        }
+        if((loopCounter++) >= pingEveryLoop)
+        {
+            loopCounter = 0;
+            delete m_dbEngine->Query("SELECT 1");
         }
     }
 
