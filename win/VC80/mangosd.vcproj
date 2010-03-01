@@ -88,6 +88,7 @@
 				GenerateMapFile="true"
 				MapFileName="..\..\bin\$(PlatformName)_$(ConfigurationName)\mangosd.map"
 				SubSystem="1"
+				StackReserveSize="4194304"
 				LargeAddressAware="2"
 				LinkTimeCodeGeneration="0"
 				ImportLibrary="$(OutDir)\mangosd.lib"
@@ -189,6 +190,7 @@
 				GenerateMapFile="true"
 				MapFileName="..\..\bin\$(PlatformName)_$(ConfigurationName)\mangosd.map"
 				SubSystem="1"
+				StackReserveSize="4194304"
 				LinkTimeCodeGeneration="0"
 				ImportLibrary="$(OutDir)\mangosd.lib"
 				TargetMachine="17"
@@ -290,6 +292,7 @@
 				GenerateMapFile="true"
 				MapFileName="..\..\bin\$(PlatformName)_$(ConfigurationName)\mangosd.map"
 				SubSystem="1"
+				StackReserveSize="4194304"
 				LargeAddressAware="2"
 				ImportLibrary="$(OutDir)\mangosd.lib"
 				FixedBaseAddress="1"
@@ -391,6 +394,7 @@
 				GenerateMapFile="true"
 				MapFileName="..\..\bin\$(PlatformName)_$(ConfigurationName)\mangosd.map"
 				SubSystem="1"
+				StackReserveSize="4194304"
 				ImportLibrary="$(OutDir)\mangosd.lib"
 				TargetMachine="17"
 				FixedBaseAddress="1"
@@ -492,6 +496,7 @@
 				GenerateMapFile="true"
 				MapFileName="..\..\bin\$(PlatformName)_$(ConfigurationName)\mangosd.map"
 				SubSystem="1"
+				StackReserveSize="4194304"
 				LargeAddressAware="2"
 				ImportLibrary="$(OutDir)\mangosd.lib"
 				FixedBaseAddress="1"
@@ -593,6 +598,7 @@
 				GenerateMapFile="true"
 				MapFileName="..\..\bin\$(PlatformName)_$(ConfigurationName)\mangosd.map"
 				SubSystem="1"
+				StackReserveSize="4194304"
 				ImportLibrary="$(OutDir)\mangosd.lib"
 				TargetMachine="17"
 				FixedBaseAddress="1"
@@ -704,22 +710,6 @@
 			>
 		</File>
 		<File
-			RelativePath="..\..\src\shared\WheatyExceptionReport.cpp"
-			>
-		</File>
-		<File
-			RelativePath="..\..\src\shared\WheatyExceptionReport.h"
-			>
-		</File>
-		<File
-			RelativePath="..\..\src\mangosd\WorldRunnable.cpp"
-			>
-		</File>
-		<File
-			RelativePath="..\..\src\mangosd\WorldRunnable.h"
-			>
-		</File>
-		<File
 			RelativePath="..\..\src\mangosd\soapC.cpp"
 			>
 		</File>
@@ -741,6 +731,22 @@
 		</File>
 		<File
 			RelativePath="..\..\dep\include\gsoap\stdsoap2.h"
+			>
+		</File>
+		<File
+			RelativePath="..\..\src\shared\WheatyExceptionReport.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\src\shared\WheatyExceptionReport.h"
+			>
+		</File>
+		<File
+			RelativePath="..\..\src\mangosd\WorldRunnable.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\src\mangosd\WorldRunnable.h"
 			>
 		</File>
 	</Files>

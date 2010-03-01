@@ -525,7 +525,7 @@ void Object::BuildMovementUpdate(ByteBuffer * data, uint16 updateFlags) const
     if(updateFlags & UPDATEFLAG_VEHICLE)                    // unused for now
     {
         *data << uint32(((Vehicle*)this)->GetVehicleId());  // vehicle id
-        *data << float(0);                                  // facing adjustment
+        *data << float(((WorldObject*)this)->GetOrientation());
     }
 
     // 0x200

@@ -68,7 +68,7 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS]=
     &Spell::EffectPowerDrain,                               //  8 SPELL_EFFECT_POWER_DRAIN
     &Spell::EffectHealthLeech,                              //  9 SPELL_EFFECT_HEALTH_LEECH
     &Spell::EffectHeal,                                     // 10 SPELL_EFFECT_HEAL
-    &Spell::EffectUnused,                                   // 11 SPELL_EFFECT_BIND
+    &Spell::EffectNULL,                                     // 11 SPELL_EFFECT_BIND
     &Spell::EffectNULL,                                     // 12 SPELL_EFFECT_PORTAL
     &Spell::EffectUnused,                                   // 13 SPELL_EFFECT_RITUAL_BASE              unused
     &Spell::EffectUnused,                                   // 14 SPELL_EFFECT_RITUAL_SPECIALIZE        unused
@@ -98,7 +98,7 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS]=
     &Spell::EffectDispel,                                   // 38 SPELL_EFFECT_DISPEL
     &Spell::EffectUnused,                                   // 39 SPELL_EFFECT_LANGUAGE
     &Spell::EffectDualWield,                                // 40 SPELL_EFFECT_DUAL_WIELD
-    &Spell::EffectUnused,                                   // 41 SPELL_EFFECT_JUMP
+    &Spell::EffectJump,                                     // 41 SPELL_EFFECT_JUMP
     &Spell::EffectJump,                                     // 42 SPELL_EFFECT_JUMP2
     &Spell::EffectTeleUnitsFaceCaster,                      // 43 SPELL_EFFECT_TELEPORT_UNITS_FACE_CASTER
     &Spell::EffectLearnSkill,                               // 44 SPELL_EFFECT_SKILL_STEP
@@ -130,7 +130,7 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS]=
     &Spell::EffectPull,                                     // 70 SPELL_EFFECT_PULL                     one spell: Distract Move
     &Spell::EffectPickPocket,                               // 71 SPELL_EFFECT_PICKPOCKET
     &Spell::EffectAddFarsight,                              // 72 SPELL_EFFECT_ADD_FARSIGHT
-    &Spell::EffectUnused,                                   // 73 SPELL_EFFECT_UNTRAIN_TALENTS
+    &Spell::EffectNULL,                                     // 73 SPELL_EFFECT_UNTRAIN_TALENTS          one spell: Trainer: Untrain Talents
     &Spell::EffectApplyGlyph,                               // 74 SPELL_EFFECT_APPLY_GLYPH
     &Spell::EffectHealMechanical,                           // 75 SPELL_EFFECT_HEAL_MECHANICAL          one spell: Mechanical Patch Kit
     &Spell::EffectSummonObjectWild,                         // 76 SPELL_EFFECT_SUMMON_OBJECT_WILD
@@ -144,13 +144,13 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS]=
     &Spell::EffectStuck,                                    // 84 SPELL_EFFECT_STUCK
     &Spell::EffectSummonPlayer,                             // 85 SPELL_EFFECT_SUMMON_PLAYER
     &Spell::EffectActivateObject,                           // 86 SPELL_EFFECT_ACTIVATE_OBJECT
-    &Spell::EffectUnused,                                   // 87 SPELL_EFFECT_WMO_DAMAGE
-    &Spell::EffectUnused,                                   // 88 SPELL_EFFECT_WMO_REPAIR
-    &Spell::EffectUnused,                                   // 89 SPELL_EFFECT_WMO_CHANGE
+    &Spell::EffectNULL,                                     // 87 SPELL_EFFECT_WMO_DAMAGE (57 spells in 3.3.2)
+    &Spell::EffectNULL,                                     // 88 SPELL_EFFECT_WMO_REPAIR (2 spells in 3.3.2)
+    &Spell::EffectNULL,                                     // 89 SPELL_EFFECT_WMO_CHANGE (7 spells in 3.3.2)
     &Spell::EffectKillCreditPersonal,                       // 90 SPELL_EFFECT_KILL_CREDIT              Kill credit but only for single person
     &Spell::EffectUnused,                                   // 91 SPELL_EFFECT_THREAT_ALL               one spell: zzOLDBrainwash
     &Spell::EffectEnchantHeldItem,                          // 92 SPELL_EFFECT_ENCHANT_HELD_ITEM
-    &Spell::EffectUnused,                                   // 93 SPELL_EFFECT_SUMMON_PHANTASM
+    &Spell::EffectUnused,                                   // 93 SPELL_EFFECT_93 (old SPELL_EFFECT_SUMMON_PHANTASM)
     &Spell::EffectSelfResurrect,                            // 94 SPELL_EFFECT_SELF_RESURRECT
     &Spell::EffectSkinning,                                 // 95 SPELL_EFFECT_SKINNING
     &Spell::EffectCharge,                                   // 96 SPELL_EFFECT_CHARGE
@@ -169,7 +169,7 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS]=
     &Spell::EffectSummonDeadPet,                            //109 SPELL_EFFECT_SUMMON_DEAD_PET
     &Spell::EffectDestroyAllTotems,                         //110 SPELL_EFFECT_DESTROY_ALL_TOTEMS
     &Spell::EffectDurabilityDamage,                         //111 SPELL_EFFECT_DURABILITY_DAMAGE
-    &Spell::EffectUnused,                                   //112 SPELL_EFFECT_112
+    &Spell::EffectUnused,                                   //112 SPELL_EFFECT_112 (old SPELL_EFFECT_SUMMON_DEMON)
     &Spell::EffectResurrectNew,                             //113 SPELL_EFFECT_RESURRECT_NEW
     &Spell::EffectTaunt,                                    //114 SPELL_EFFECT_ATTACK_ME
     &Spell::EffectDurabilityDamagePCT,                      //115 SPELL_EFFECT_DURABILITY_DAMAGE_PCT
@@ -196,7 +196,7 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS]=
     &Spell::EffectHealPct,                                  //136 SPELL_EFFECT_HEAL_PCT
     &Spell::EffectEnergisePct,                              //137 SPELL_EFFECT_ENERGIZE_PCT
     &Spell::EffectLeapBack,                                 //138 SPELL_EFFECT_LEAP_BACK                Leap back
-    &Spell::EffectUnused,                                   //139 SPELL_EFFECT_CLEAR_QUEST              (misc - is quest ID)
+    &Spell::EffectNULL,                                     //139 SPELL_EFFECT_CLEAR_QUEST              (misc - is quest ID)
     &Spell::EffectForceCast,                                //140 SPELL_EFFECT_FORCE_CAST
     &Spell::EffectNULL,                                     //141 SPELL_EFFECT_141                      damage and reduce speed?
     &Spell::EffectTriggerSpellWithValue,                    //142 SPELL_EFFECT_TRIGGER_SPELL_WITH_VALUE
@@ -205,19 +205,19 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS]=
     &Spell::EffectNULL,                                     //145 SPELL_EFFECT_145                      Black Hole Effect
     &Spell::EffectActivateRune,                             //146 SPELL_EFFECT_ACTIVATE_RUNE
     &Spell::EffectQuestFail,                                //147 SPELL_EFFECT_QUEST_FAIL               quest fail
-    &Spell::EffectUnused,                                   //148 SPELL_EFFECT_148                      unused
+    &Spell::EffectNULL,                                     //148 SPELL_EFFECT_148                      single spell: Inflicts Fire damage to an enemy.
     &Spell::EffectCharge2,                                  //149 SPELL_EFFECT_CHARGE2                  swoop
-    &Spell::EffectUnused,                                   //150 SPELL_EFFECT_150                      unused
+    &Spell::EffectNULL,                                     //150 SPELL_EFFECT_150                      2 spells in 3.3.2
     &Spell::EffectTriggerRitualOfSummoning,                 //151 SPELL_EFFECT_TRIGGER_SPELL_2
     &Spell::EffectNULL,                                     //152 SPELL_EFFECT_152                      summon Refer-a-Friend
     &Spell::EffectNULL,                                     //153 SPELL_EFFECT_CREATE_PET               misc value is creature entry
-    &Spell::EffectNULL,                                     //154 unused
+    &Spell::EffectNULL,                                     //154 (single spell: Teach River's Heart Taxi Path)
     &Spell::EffectTitanGrip,                                //155 SPELL_EFFECT_TITAN_GRIP Allows you to equip two-handed axes, maces and swords in one hand, but you attack $49152s1% slower than normal.
     &Spell::EffectEnchantItemPrismatic,                     //156 SPELL_EFFECT_ENCHANT_ITEM_PRISMATIC
     &Spell::EffectCreateItem2,                              //157 SPELL_EFFECT_CREATE_ITEM_2            create item or create item template and replace by some randon spell loot item
     &Spell::EffectMilling,                                  //158 SPELL_EFFECT_MILLING                  milling
     &Spell::EffectRenamePet,                                //159 SPELL_EFFECT_ALLOW_RENAME_PET         allow rename pet once again
-    &Spell::EffectNULL,                                     //160 SPELL_EFFECT_160                      unused
+    &Spell::EffectNULL,                                     //160 SPELL_EFFECT_160                      single spell: Nerub'ar Web Random Unit
     &Spell::EffectSpecCount,                                //161 SPELL_EFFECT_TALENT_SPEC_COUNT        second talent spec (learn/revert)
     &Spell::EffectActivateSpec,                             //162 SPELL_EFFECT_TALENT_SPEC_SELECT       activate primary/secondary spec
 };
