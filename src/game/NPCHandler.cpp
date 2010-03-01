@@ -425,38 +425,12 @@ void WorldSession::SendBindPoint(Creature *npc)
     if(GetPlayer()->GetMap()->Instanceable())
         return;
 
-    uint32 bindspell = 3286;
-    uint32 zone_id = _player->GetZoneId();
-
-    _player->SetHomebindToCurrentPos();
-
     // send spell for bind 3286 bind magic
-    npc->CastSpell(_player, bindspell, true);
+    npc->CastSpell(_player, 3286, true);                    // Bind
 
     WorldPacket data( SMSG_TRAINER_BUY_SUCCEEDED, (8+4));
-    data << npc->GetGUID();
-    data << bindspell;
-    SendPacket( &data );
-
-    // binding
-    data.Initialize( SMSG_BINDPOINTUPDATE, (4+4+4+4+4) );
-    data << float(_player->GetPositionX());
-    data << float(_player->GetPositionY());
-    data << float(_player->GetPositionZ());
-    data << uint32(_player->GetMapId());
-    data << uint32(zone_id);
-    SendPacket( &data );
-
-    DEBUG_LOG("New Home Position X is %f",_player->GetPositionX());
-    DEBUG_LOG("New Home Position Y is %f",_player->GetPositionY());
-    DEBUG_LOG("New Home Position Z is %f",_player->GetPositionZ());
-    DEBUG_LOG("New Home MapId is %u",_player->GetMapId());
-    DEBUG_LOG("New Home ZoneId is %u",zone_id);
-
-    // zone update
-    data.Initialize( SMSG_PLAYERBOUND, 8+4 );
-    data << uint64(_player->GetGUID());
-    data << uint32(zone_id);
+    data << uint64(npc->GetGUID());
+    data << uint32(3286);                                   // Bind
     SendPacket( &data );
 
     _player->PlayerTalkClass->CloseGossip();
