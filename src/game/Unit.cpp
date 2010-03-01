@@ -388,8 +388,8 @@ void Unit::SendMonsterMove(float NewPosX, float NewPosY, float NewPosZ, SplineTy
             data << float(0);
             data << float(0);
             break;
-        case SPLINETYPE_FACINGTARGET:                       // not used currently
-            data << uint64(0);                              // probably target guid (facing target?)
+        case SPLINETYPE_FACINGTARGET:
+            data << uint64(m_InteractionObject);            // set in SetFacingToObject()
             break;
         case SPLINETYPE_FACINGANGLE:                        // not used currently
             data << float(0);                               // facing angle
@@ -3513,6 +3513,24 @@ void Unit::SetFacingTo(float ori)
     WorldPacket data;
     BuildHeartBeatMsg(&data);
     SendMessageToSet(&data, false);
+}
+
+// Consider move this to Creature:: since only creature appear to be able to use this
+void Unit::SetFacingToObject(WorldObject* pObject)
+{
+    if (GetTypeId() != TYPEID_UNIT)
+        return;
+
+    // never face when already moving
+    if (!IsStopped())
+        return;
+
+    m_InteractionObject = pObject->GetGUID();
+
+    // TODO: figure out under what conditions creature will move towards object instead of facing it where it currently is.
+
+    SetOrientation(GetAngle(pObject));
+    SendMonsterMove(GetPositionX(), GetPositionY(), GetPositionZ(), SPLINETYPE_FACINGTARGET, ((Creature*)this)->GetSplineFlags(), 0);
 }
 
 bool Unit::isInAccessablePlaceFor(Creature const* c) const
