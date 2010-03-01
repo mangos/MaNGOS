@@ -2268,6 +2268,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                     }
                     break;
                 }
+                case SPELL_EFFECT_BIND:
                 case SPELL_EFFECT_RESURRECT:
                 case SPELL_EFFECT_PARRY:
                 case SPELL_EFFECT_BLOCK:
@@ -2480,21 +2481,13 @@ void Spell::prepare(SpellCastTargets const* targets, Aura* triggeredByAura)
     {
         m_caster->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
         m_caster->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
-        Unit::AuraList const& dAuras = m_caster->GetAurasByType(SPELL_AURA_MOD_INVISIBILITY);
-        for(Unit::AuraList::const_iterator itr = dAuras.begin(); itr != dAuras.end(); ++itr)
-        {
-            SpellEntry const* itr_spellProto = (*itr)->GetSpellProto();
-            if(itr_spellProto->InterruptFlags != 0x00000000)
-            {
-                m_caster->RemoveAurasDueToSpell((*itr)->GetId());
-                break;
-            }
-        }
     }
 
     // add non-triggered (with cast time and without)
     if (!m_IsTriggeredSpell)
     {
+        m_caster->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CAST);
+
         // add to cast type slot
         m_caster->SetCurrentCastedSpell( this );
 
