@@ -6465,13 +6465,13 @@ void Aura::HandleSpellSpecificBoosts(bool apply)
                 if (apply && (m_target->HasAura(48263) || m_target->HasAura(48266)))
                 {
                     int32 bp = GetModifier()->m_amount;
-                    m_target->CastCustomSpell(m_target, 61261, &bp, NULL, NULL, true, NULL, this);
+                    m_target->CastCustomSpell(m_target, 65095, &bp, NULL, NULL, true, NULL, this);
 
                     spellId1 = 49772;
                 }
                 else
                 {
-                    m_target->RemoveAurasDueToSpell(61261);
+                    m_target->RemoveAurasDueToSpell(65095);
 
                     if (!apply)
                         spellId1 = 49772;
