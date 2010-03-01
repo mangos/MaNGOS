@@ -25,6 +25,7 @@
 #include "Chat.h"
 #include "Spell.h"
 #include "BattleGroundMgr.h"
+#include "MapManager.h"
 
 SpellMgr::SpellMgr()
 {
