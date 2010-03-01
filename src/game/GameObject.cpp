@@ -1076,6 +1076,16 @@ void GameObject::Use(Unit* user)
             // cast this spell later if provided
             spellId = info->goober.spellId;
 
+            // database may contain a dummy spell, so it need replacement by actually existing
+            switch(spellId)
+            {
+                case 34448: spellId = 26566; break;
+                case 34452: spellId = 26572; break;
+                case 37639: spellId = 36326; break;
+                case 45367: spellId = 45371; break;
+                case 45370: spellId = 45368; break;
+            }
+
             break;
         }
         case GAMEOBJECT_TYPE_CAMERA:                        //13
