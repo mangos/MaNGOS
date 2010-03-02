@@ -7242,10 +7242,10 @@ void Player::CastItemUseSpell(Item *item,SpellCastTargets const& targets,uint8 c
         uint32 learning_spell_id = proto->Spells[1].SpellId;
 
         SpellEntry const *spellInfo = sSpellStore.LookupEntry(learn_spell_id);
-        if(!spellInfo)
+        if (!spellInfo)
         {
             sLog.outError("Player::CastItemUseSpell: Item (Entry: %u) in have wrong spell id %u, ignoring ",proto->ItemId, learn_spell_id);
-            SendEquipError(EQUIP_ERR_NONE,item,NULL);
+            SendEquipError(EQUIP_ERR_NONE, item);
             return;
         }
 
@@ -8593,6 +8593,35 @@ uint32 Player::GetItemCount( uint32 item, bool inBankAlso, Item* skipItem ) cons
     return count;
 }
 
+uint32 Player::GetItemCountWithLimitCategory( uint32 limitCategory ) const
+{
+    uint32 count = 0;
+    for(int i = EQUIPMENT_SLOT_START; i < INVENTORY_SLOT_ITEM_END; ++i)
+        if (Item *pItem = GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+            if (pItem->GetProto()->ItemLimitCategory == limitCategory)
+                count += pItem->GetCount();
+
+    for(int i = KEYRING_SLOT_START; i < CURRENCYTOKEN_SLOT_END; ++i)
+        if (Item *pItem = GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+            if (pItem->GetProto()->ItemLimitCategory == limitCategory)
+                count += pItem->GetCount();
+
+    for(int i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
+        if (Bag* pBag = (Bag*)GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+            count += pBag->GetItemCountWithLimitCategory(limitCategory);
+
+    for(int i = BANK_SLOT_ITEM_START; i < BANK_SLOT_ITEM_END; ++i)
+        if (Item *pItem = GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+            if (pItem->GetProto()->ItemLimitCategory == limitCategory)
+                count += pItem->GetCount();
+
+    for(int i = BANK_SLOT_BAG_START; i < BANK_SLOT_BAG_END; ++i)
+        if (Bag* pBag = (Bag*)GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+            count += pBag->GetItemCountWithLimitCategory(limitCategory);
+
+    return count;
+}
+
 Item* Player::GetItemByGuid( uint64 guid ) const
 {
     for(int i = EQUIPMENT_SLOT_START; i < INVENTORY_SLOT_ITEM_END; ++i)
@@ -8981,16 +9010,40 @@ uint8 Player::_CanTakeMoreSimilarItems(uint32 entry, uint32 count, Item* pItem, 
     }
 
     // no maximum
-    if(pProto->MaxCount <= 0)
-        return EQUIP_ERR_OK;
-
-    uint32 curcount = GetItemCount(pProto->ItemId,true,pItem);
-
-    if (curcount + count > uint32(pProto->MaxCount))
+    if(pProto->MaxCount > 0)
     {
-        if(no_space_count)
-            *no_space_count = count +curcount - pProto->MaxCount;
-        return EQUIP_ERR_CANT_CARRY_MORE_OF_THIS;
+        uint32 curcount = GetItemCount(pProto->ItemId,true,pItem);
+
+        if (curcount + count > uint32(pProto->MaxCount))
+        {
+            if(no_space_count)
+                *no_space_count = count +curcount - pProto->MaxCount;
+            return EQUIP_ERR_CANT_CARRY_MORE_OF_THIS;
+        }
+    }
+
+    // check unique-equipped limit
+    if (pProto->ItemLimitCategory)
+    {
+        ItemLimitCategoryEntry const* limitEntry = sItemLimitCategoryStore.LookupEntry(pProto->ItemLimitCategory);
+        if (!limitEntry)
+        {
+            if(no_space_count)
+                *no_space_count = count;
+            return EQUIP_ERR_ITEM_CANT_BE_EQUIPPED;
+        }
+
+        if (limitEntry->mode == ITEM_LIMIT_CATEGORY_MODE_HAVE)
+        {
+            uint32 curcount = GetItemCountWithLimitCategory(pProto->ItemLimitCategory);
+
+            if (curcount + count > uint32(limitEntry->maxCount))
+            {
+                if(no_space_count)
+                    *no_space_count = count + curcount - limitEntry->maxCount;
+                return EQUIP_ERR_ITEM_MAX_LIMIT_CATEGORY_COUNT_EXCEEDED_IS;
+            }
+        }
     }
 
     return EQUIP_ERR_OK;
@@ -10429,12 +10482,12 @@ void Player::SetAmmo( uint32 item )
         return;
 
     // check ammo
-    if(item)
+    if (item)
     {
         uint8 msg = CanUseAmmo( item );
-        if( msg != EQUIP_ERR_OK )
+        if (msg != EQUIP_ERR_OK)
         {
-            SendEquipError( msg, NULL, NULL );
+            SendEquipError(msg, NULL, NULL, item);
             return;
         }
     }
@@ -10450,7 +10503,7 @@ void Player::RemoveAmmo()
 
     m_ammoDPS = 0.0f;
 
-    if(CanModifyStats())
+    if (CanModifyStats())
         UpdateDamagePhysical(RANGED_ATTACK);
 }
 
@@ -11674,7 +11727,7 @@ void Player::RemoveItemFromBuyBackSlot( uint32 slot, bool del )
     }
 }
 
-void Player::SendEquipError( uint8 msg, Item* pItem, Item *pItem2 )
+void Player::SendEquipError( uint8 msg, Item* pItem, Item *pItem2, uint32 itemid /*= 0*/ )
 {
     sLog.outDebug( "WORLD: Sent SMSG_INVENTORY_CHANGE_FAILURE (%u)", msg);
     WorldPacket data(SMSG_INVENTORY_CHANGE_FAILURE, 1+8+8+1);
@@ -11690,25 +11743,28 @@ void Player::SendEquipError( uint8 msg, Item* pItem, Item *pItem2 )
         {
             case EQUIP_ERR_CANT_EQUIP_LEVEL_I:
             case EQUIP_ERR_PURCHASE_LEVEL_TOO_LOW:
-                {
-                    ItemPrototype const* proto = pItem ? pItem->GetProto() : NULL;
-                    data << uint32(proto ? proto->RequiredLevel : 0);
-                } break;
+            {
+                ItemPrototype const* proto = pItem ? pItem->GetProto() : sObjectMgr.GetItemPrototype(itemid);
+                data << uint32(proto ? proto->RequiredLevel : 0);
+                break;
+            }
             case EQUIP_ERR_EVENT_AUTOEQUIP_BIND_CONFIRM:    // no idea about this one...
-                {
-                    data << uint64(0);
-                    data << uint32(0);
-                    data << uint64(0);
-                } break;
+            {
+                data << uint64(0);
+                data << uint32(0);
+                data << uint64(0);
+                break;
+            }
             case EQUIP_ERR_ITEM_MAX_LIMIT_CATEGORY_COUNT_EXCEEDED_IS:
             case EQUIP_ERR_ITEM_MAX_LIMIT_CATEGORY_SOCKETED_EXCEEDED_IS:
             case EQUIP_ERR_ITEM_MAX_LIMIT_CATEGORY_EQUIPPED_EXCEEDED_IS:
-                {
-                    ItemPrototype const* proto = pItem ? pItem->GetProto() : NULL;
-                    data << uint32(proto ? proto->ItemLimitCategory : 0);
-                } break;
-                default:
-                    break;
+            {
+                ItemPrototype const* proto = pItem ? pItem->GetProto() : sObjectMgr.GetItemPrototype(itemid);
+                data << uint32(proto ? proto->ItemLimitCategory : 0);
+                break;
+            }
+            default:
+                break;
         }
     }
     GetSession()->SendPacket(&data);
@@ -12888,7 +12944,7 @@ bool Player::CanAddQuest( Quest const *pQuest, bool msg )
             return true;
         else if( msg2 != EQUIP_ERR_OK )
         {
-            SendEquipError( msg2, NULL, NULL );
+            SendEquipError(msg2, NULL, NULL, srcitem);
             return false;
         }
     }
@@ -13000,7 +13056,7 @@ bool Player::CanRewardQuest( Quest const *pQuest, bool msg )
                 GetItemCount(pQuest->ReqItemId[i]) < pQuest->ReqItemCount[i] )
             {
                 if(msg)
-                    SendEquipError( EQUIP_ERR_ITEM_NOT_FOUND, NULL, NULL );
+                    SendEquipError( EQUIP_ERR_ITEM_NOT_FOUND, NULL, NULL, pQuest->ReqItemId[i]);
                 return false;
             }
         }
@@ -13027,7 +13083,7 @@ bool Player::CanRewardQuest( Quest const *pQuest, uint32 reward, bool msg )
             uint8 res = CanStoreNewItem( NULL_BAG, NULL_SLOT, dest, pQuest->RewChoiceItemId[reward], pQuest->RewChoiceItemCount[reward] );
             if( res != EQUIP_ERR_OK )
             {
-                SendEquipError( res, NULL, NULL );
+                SendEquipError( res, NULL, NULL, pQuest->RewChoiceItemId[reward] );
                 return false;
             }
         }
@@ -13725,7 +13781,7 @@ bool Player::GiveQuestSourceItem( Quest const *pQuest )
         else if( msg == EQUIP_ERR_CANT_CARRY_MORE_OF_THIS )
             return true;
         else
-            SendEquipError( msg, NULL, NULL );
+            SendEquipError( msg, NULL, NULL, srcitem );
         return false;
     }
 
@@ -13750,7 +13806,7 @@ bool Player::TakeQuestSourceItem( uint32 quest_id, bool msg )
             if(res != EQUIP_ERR_OK)
             {
                 if(msg)
-                    SendEquipError( res, NULL, NULL );
+                    SendEquipError( res, NULL, NULL, srcitem );
                 return false;
             }
 
@@ -18056,7 +18112,7 @@ bool Player::BuyItemFromVendor(uint64 vendorguid, uint32 item, uint8 count, uint
         uint8 msg = CanStoreNewItem( bag, slot, dest, item, pProto->BuyCount * count );
         if (msg != EQUIP_ERR_OK)
         {
-            SendEquipError( msg, NULL, NULL );
+            SendEquipError( msg, NULL, NULL, item );
             return false;
         }
 
@@ -18101,7 +18157,7 @@ bool Player::BuyItemFromVendor(uint64 vendorguid, uint32 item, uint8 count, uint
         uint8 msg = CanEquipNewItem( slot, dest, item, false );
         if (msg != EQUIP_ERR_OK)
         {
-            SendEquipError( msg, NULL, NULL );
+            SendEquipError( msg, NULL, NULL, item );
             return false;
         }
 
@@ -20472,7 +20528,7 @@ void Player::AutoStoreLoot(uint8 bag, uint8 slot, uint32 loot_id, LootStore cons
             msg = CanStoreNewItem( NULL_BAG, NULL_SLOT,dest,lootItem->itemid,lootItem->count);
         if(msg != EQUIP_ERR_OK)
         {
-            SendEquipError( msg, NULL, NULL );
+            SendEquipError( msg, NULL, NULL, lootItem->itemid );
             continue;
         }
 
@@ -20689,14 +20745,16 @@ uint8 Player::CanEquipUniqueItem( ItemPrototype const* itemProto, uint8 except_s
     {
         ItemLimitCategoryEntry const* limitEntry = sItemLimitCategoryStore.LookupEntry(itemProto->ItemLimitCategory);
         if(!limitEntry)
-            return EQUIP_ERR_ITEM_UNIQUE_EQUIPABLE;
+            return EQUIP_ERR_ITEM_CANT_BE_EQUIPPED;
+
+        // NOTE: limitEntry->mode not checked because if item have have-limit then it applied and to equip case
 
         if(limit_count > limitEntry->maxCount)
-            return EQUIP_ERR_ITEM_UNIQUE_EQUIPABLE;         // attempt add too many limit category items (gems)
+            return EQUIP_ERR_ITEM_MAX_LIMIT_CATEGORY_EQUIPPED_EXCEEDED_IS;
 
         // there is an equip limit on this item
         if(HasItemOrGemWithLimitCategoryEquipped(itemProto->ItemLimitCategory,limitEntry->maxCount-limit_count+1,except_slot))
-            return EQUIP_ERR_ITEM_UNIQUE_EQUIPABLE;
+            return EQUIP_ERR_ITEM_MAX_LIMIT_CATEGORY_EQUIPPED_EXCEEDED_IS;
     }
 
     return EQUIP_ERR_OK;

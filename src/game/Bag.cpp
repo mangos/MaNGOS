@@ -203,6 +203,17 @@ uint32 Bag::GetItemCount( uint32 item, Item* eItem ) const
     return count;
 }
 
+uint32 Bag::GetItemCountWithLimitCategory(uint32 limitCategory) const
+{
+    uint32 count = 0;
+    for(uint32 i = 0; i < GetBagSize(); ++i)
+        if (m_bagslot[i])
+            if (m_bagslot[i]->GetProto()->ItemLimitCategory == limitCategory )
+                count += m_bagslot[i]->GetCount();
+
+    return count;
+}
+
 uint8 Bag::GetSlotByItemGUID(uint64 guid) const
 {
     for(uint32 i = 0; i < GetBagSize(); ++i)

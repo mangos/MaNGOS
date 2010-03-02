@@ -5616,7 +5616,7 @@ SpellCastResult Spell::CheckItems()
                     uint8 msg = p_caster->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, m_spellInfo->EffectItemType[i], 1 );
                     if (msg != EQUIP_ERR_OK )
                     {
-                        p_caster->SendEquipError( msg, NULL, NULL );
+                        p_caster->SendEquipError( msg, NULL, NULL, m_spellInfo->EffectItemType[i] );
                         return SPELL_FAILED_DONT_REPORT;
                     }
                 }
