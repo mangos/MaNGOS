@@ -116,6 +116,7 @@ void AggressorAI::EnterEvadeMode()
     i_victimGuid = 0;
     m_creature->CombatStop(true);
     m_creature->SetLootRecipient(NULL);
+    m_creature->ResetObtainedDamage();
 }
 
 void
