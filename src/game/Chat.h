@@ -71,6 +71,7 @@ class ChatHandler
         int ParseCommands(const char* text);
 
         bool isValidChatMessage(const char* msg);
+        bool HasSentErrorMessage() { return sentErrorMessage;}
     protected:
         explicit ChatHandler() : m_session(NULL) {}      // for CLI subclass
 
@@ -553,8 +554,8 @@ class ChatHandler
 class CliHandler : public ChatHandler
 {
     public:
-        typedef void Print(char const*);
-        explicit CliHandler(Print* zprint) : m_print(zprint) {}
+        typedef void Print(void*, char const*);
+        explicit CliHandler(void* callbackArg, Print* zprint) : m_callbackArg(callbackArg), m_print(zprint) {}
 
         // overwrite functions
         const char *GetMangosString(int32 entry) const;
@@ -566,6 +567,7 @@ class CliHandler : public ChatHandler
         int GetSessionDbLocaleIndex() const;
 
     private:
+        void* m_callbackArg;
         Print* m_print;
 };
 

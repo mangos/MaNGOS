@@ -95,6 +95,8 @@ struct PlayerSpell
     bool disabled          : 1;                             // first rank has been learned in result talent learn but currently talent unlearned, save max learned ranks
 };
 
+typedef UNORDERED_MAP<uint32, PlayerSpell> PlayerSpellMap;
+
 // Spell modifier (used for modify other spells)
 struct SpellModifier
 {
@@ -120,7 +122,6 @@ struct SpellModifier
     Spell const* lastAffected;
 };
 
-typedef UNORDERED_MAP<uint32, PlayerSpell*> PlayerSpellMap;
 typedef std::list<SpellModifier*> SpellModList;
 
 struct SpellCooldown
@@ -288,7 +289,7 @@ struct PlayerInfo
     }
 
     uint32 mapId;
-    uint32 zoneId;
+    uint32 areaId;
     float positionX;
     float positionY;
     float positionZ;
@@ -1147,6 +1148,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void SetSheath( SheathState sheathed );             // overwrite Unit version
         uint8 FindEquipSlot( ItemPrototype const* proto, uint32 slot, bool swap ) const;
         uint32 GetItemCount( uint32 item, bool inBankAlso = false, Item* skipItem = NULL ) const;
+        uint32 GetItemCountWithLimitCategory(uint32 limitCategory) const;
         Item* GetItemByGuid( uint64 guid ) const;
         Item* GetItemByPos( uint16 pos ) const;
         Item* GetItemByPos( uint8 bag, uint8 slot ) const;
@@ -1242,7 +1244,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         Item* GetItemFromBuyBackSlot( uint32 slot );
         void RemoveItemFromBuyBackSlot( uint32 slot, bool del );
         uint32 GetMaxKeyringSize() const { return KEYRING_SLOT_END-KEYRING_SLOT_START; }
-        void SendEquipError( uint8 msg, Item* pItem, Item *pItem2 );
+        void SendEquipError( uint8 msg, Item* pItem, Item *pItem2 = NULL, uint32 itemid = 0 );
         void SendBuyError( uint8 msg, Creature* pCreature, uint32 item, uint32 param );
         void SendSellError( uint8 msg, Creature* pCreature, uint64 guid, uint32 param );
         void AddWeaponProficiency(uint32 newflag) { m_WeaponProficiency |= newflag; }
@@ -2167,7 +2169,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         float  m_recallO;
         void   SaveRecallPosition();
 
-        void SetHomebindToCurrentPos();
+        void SetHomebindToLocation(WorldLocation const& loc, uint32 area_id);
         void RelocateToHomebind() { SetLocationMapId(m_homebindMapId); Relocate(m_homebindX, m_homebindY, m_homebindZ); }
         bool TeleportToHomebind(uint32 options = 0) { return TeleportTo(m_homebindMapId, m_homebindX, m_homebindY, m_homebindZ, GetOrientation(), options); }
 
@@ -2563,7 +2565,7 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         // Homebind coordinates
         uint32 m_homebindMapId;
-        uint16 m_homebindZoneId;
+        uint16 m_homebindAreaId;
         float m_homebindX;
         float m_homebindY;
         float m_homebindZ;

@@ -257,7 +257,12 @@ private:
 }
 #endif
 
-#else 
+#elif defined(sun) || defined(__sun__)
+
+#define MSG_NOSIGNAL 0
+typedef unsigned short port_t;
+
+#else
 // ----------------------------------------
 // LINUX 
 typedef unsigned long ipaddr_t;

@@ -31,6 +31,7 @@ class Item;
 class GameObject;
 class SpellCastTargets;
 class Map;
+class Aura;
 
 #define MAX_SCRIPTS 1000
 #define MAX_INSTANCE_SCRIPTS 1000
@@ -42,7 +43,7 @@ struct Script
         pQuestSelect(NULL), pQuestComplete(NULL), pNPCDialogStatus(NULL), pGODialogStatus(NULL), pChooseReward(NULL),
         pItemHello(NULL), pGOHello(NULL), pAreaTrigger(NULL), pItemQuestAccept(NULL), pGOQuestAccept(NULL),
         pGOChooseReward(NULL), pItemUse(NULL), pEffectDummyGameObj(NULL), pEffectDummyCreature(NULL),
-        pEffectDummyItem(NULL), GetAI(NULL)
+        pEffectDummyItem(NULL), pEffectAuraDummy(NULL), GetAI(NULL)
     {}
 
     std::string Name;
@@ -67,6 +68,7 @@ struct Script
     bool (*pEffectDummyGameObj  )(Unit*, uint32, SpellEffectIndex, GameObject* );
     bool (*pEffectDummyCreature )(Unit*, uint32, SpellEffectIndex, Creature* );
     bool (*pEffectDummyItem     )(Unit*, uint32, SpellEffectIndex, Item* );
+    bool (*pEffectAuraDummy     )(const Aura*, bool);
 
     CreatureAI* (*GetAI)(Creature *_Creature);
     InstanceData* (*GetInstanceData)(Map*);

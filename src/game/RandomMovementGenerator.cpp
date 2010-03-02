@@ -137,15 +137,13 @@ void RandomMovementGenerator<Creature>::Interrupt(Creature &creature)
 }
 
 template<>
-void
-RandomMovementGenerator<Creature>::Finalize(Creature &creature)
+void RandomMovementGenerator<Creature>::Finalize(Creature &creature)
 {
     creature.clearUnitState(UNIT_STAT_ROAMING|UNIT_STAT_ROAMING_MOVE);
 }
 
 template<>
-bool
-RandomMovementGenerator<Creature>::Update(Creature &creature, const uint32 &diff)
+bool RandomMovementGenerator<Creature>::Update(Creature &creature, const uint32 &diff)
 {
     if (creature.hasUnitState(UNIT_STAT_NOT_MOVE))
     {
@@ -166,6 +164,9 @@ RandomMovementGenerator<Creature>::Update(Creature &creature, const uint32 &diff
 
     if (i_destinationHolder.UpdateTraveller(traveller, diff, false, true))
     {
+        if (!IsActive(creature))                        // force stop processing (movement can move out active zone with cleanup movegens list)
+            return true;                                // not expire now, but already lost
+
         if (i_nextMoveTime.Passed())
         {
             if (creature.canFly())
@@ -181,5 +182,18 @@ RandomMovementGenerator<Creature>::Update(Creature &creature, const uint32 &diff
            _setRandomLocation(creature);
         }
     }
+    return true;
+}
+
+template<>
+bool RandomMovementGenerator<Creature>::GetResetPosition(Creature& c, float& x, float& y, float& z)
+{
+    float radius;
+    c.GetRespawnCoord(x, y, z, NULL, &radius);
+
+    // use current if in range
+    if (c.IsWithinDist2d(x,y,radius))
+        c.GetPosition(x,y,z);
+
     return true;
 }

@@ -435,14 +435,7 @@ void GameObject::Update(uint32 /*p_time*/)
             if(!m_respawnDelayTime)
                 return;
 
-            if(!m_spawnedByDefault)
-            {
-                m_respawnTime = 0;
-                return;
-            }
-
-            // since pool system can fail to roll unspawned object, this one can remain spawned, so must set respawn nevertheless
-            m_respawnTime = time(NULL) + m_respawnDelayTime;
+            m_respawnTime = m_spawnedByDefault ? time(NULL) + m_respawnDelayTime : 0;
 
             // if option not set then object will be saved at grid unload
             if(sWorld.getConfig(CONFIG_BOOL_SAVE_RESPAWN_TIME_IMMEDIATLY))
@@ -1075,6 +1068,16 @@ void GameObject::Use(Unit* user)
 
             // cast this spell later if provided
             spellId = info->goober.spellId;
+
+            // database may contain a dummy spell, so it need replacement by actually existing
+            switch(spellId)
+            {
+                case 34448: spellId = 26566; break;
+                case 34452: spellId = 26572; break;
+                case 37639: spellId = 36326; break;
+                case 45367: spellId = 45371; break;
+                case 45370: spellId = 45368; break;
+            }
 
             break;
         }

@@ -621,7 +621,7 @@ enum SpellEffects
     SPELL_EFFECT_KILL_CREDIT               = 90,
     SPELL_EFFECT_THREAT_ALL                = 91,
     SPELL_EFFECT_ENCHANT_HELD_ITEM         = 92,
-    SPELL_EFFECT_SUMMON_PHANTASM           = 93,
+    SPELL_EFFECT_93                        = 93,            // old SPELL_EFFECT_SUMMON_PHANTASM
     SPELL_EFFECT_SELF_RESURRECT            = 94,
     SPELL_EFFECT_SKINNING                  = 95,
     SPELL_EFFECT_CHARGE                    = 96,
@@ -640,7 +640,7 @@ enum SpellEffects
     SPELL_EFFECT_SUMMON_DEAD_PET           = 109,
     SPELL_EFFECT_DESTROY_ALL_TOTEMS        = 110,
     SPELL_EFFECT_DURABILITY_DAMAGE         = 111,
-    SPELL_EFFECT_112                       = 112,
+    SPELL_EFFECT_112                       = 112,           // old SPELL_EFFECT_SUMMON_DEMON
     SPELL_EFFECT_RESURRECT_NEW             = 113,
     SPELL_EFFECT_ATTACK_ME                 = 114,
     SPELL_EFFECT_DURABILITY_DAMAGE_PCT     = 115,
@@ -2643,6 +2643,19 @@ enum PetTameFailureReason
     PETTAME_CANTCONTROLEXOTIC       = 12,                   // 3.x
     PETTAME_UNKNOWNERROR            = 13
 };
+
+// Stored in SummonProperties.dbc with slot+1 values
+enum TotemSlot
+{
+    TOTEM_SLOT_FIRE   = 0,
+    TOTEM_SLOT_EARTH  = 1,
+    TOTEM_SLOT_WATER  = 2,
+    TOTEM_SLOT_AIR    = 3,
+};
+
+#define TOTEM_SLOT_NONE 255                                 // custom value for no slot case
+
+#define MAX_TOTEM_SLOT  4
 
 // we need to stick to 1 version or half of the stuff will work for someone
 // others will not and opposite

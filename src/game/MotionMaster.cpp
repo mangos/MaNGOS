@@ -40,20 +40,13 @@ void
 MotionMaster::Initialize()
 {
     // clear ALL movement generators (including default)
-    while(!empty())
-    {
-        MovementGenerator *curr = top();
-        pop();
-        curr->Finalize(*i_owner);
-        if( !isStatic( curr ) )
-            delete curr;
-    }
+    Clear(false,true);
 
     // set new default movement generator
-    if(i_owner->GetTypeId() == TYPEID_UNIT)
+    if (i_owner->GetTypeId() == TYPEID_UNIT)
     {
         MovementGenerator* movement = FactorySelector::selectMovementGenerator((Creature*)i_owner);
-        push(  movement == NULL ? &si_idleMovement : movement );
+        push(movement == NULL ? &si_idleMovement : movement);
         top()->Initialize(*i_owner);
     }
     else
@@ -63,14 +56,7 @@ MotionMaster::Initialize()
 MotionMaster::~MotionMaster()
 {
     // clear ALL movement generators (including default)
-    while(!empty())
-    {
-        MovementGenerator *curr = top();
-        pop();
-        curr->Finalize(*i_owner);
-        if( !isStatic( curr ) )
-            delete curr;
-    }
+    DirectClean(false,true);
 }
 
 void
@@ -112,18 +98,18 @@ MotionMaster::UpdateMotion(uint32 diff)
 }
 
 void
-MotionMaster::DirectClean(bool reset)
+MotionMaster::DirectClean(bool reset, bool all)
 {
-    while( !empty() && size() > 1 )
+    while( all ? !empty() : size() > 1 )
     {
         MovementGenerator *curr = top();
         pop();
         curr->Finalize(*i_owner);
-        if( !isStatic( curr ) )
+        if (!isStatic( curr ))
             delete curr;
     }
 
-    if (reset)
+    if (!all && reset)
     {
         assert( !empty() );
         top()->Reset(*i_owner);
@@ -131,20 +117,25 @@ MotionMaster::DirectClean(bool reset)
 }
 
 void
-MotionMaster::DelayedClean()
+MotionMaster::DelayedClean(bool reset, bool all)
 {
-    if (empty() || size() == 1)
+    if(reset)
+        m_cleanFlag |= MMCF_RESET;
+    else
+        m_cleanFlag &= ~MMCF_RESET;
+
+    if (empty() || !all && size() == 1)
         return;
 
-    if(!m_expList)
+    if (!m_expList)
         m_expList = new ExpireList();
 
-    while( !empty() && size() > 1 )
+    while( all ? !empty() : size() > 1 )
     {
         MovementGenerator *curr = top();
         pop();
         curr->Finalize(*i_owner);
-        if( !isStatic( curr ) )
+        if (!isStatic( curr ))
             m_expList->push_back(curr);
     }
 }
@@ -152,7 +143,7 @@ MotionMaster::DelayedClean()
 void
 MotionMaster::DirectExpire(bool reset)
 {
-    if( empty() || size() == 1 )
+    if (empty() || size() == 1)
         return;
 
     MovementGenerator *curr = top();
@@ -170,25 +161,31 @@ MotionMaster::DirectExpire(bool reset)
     // it can add another motions instead
     curr->Finalize(*i_owner);
 
-    if( !isStatic(curr) )
+    if (!isStatic(curr))
         delete curr;
 
-    if( empty() )
+    if (empty())
         Initialize();
 
-    if (reset) top()->Reset(*i_owner);
+    if (reset)
+        top()->Reset(*i_owner);
 }
 
 void
-MotionMaster::DelayedExpire()
+MotionMaster::DelayedExpire(bool reset)
 {
-    if( empty() || size() == 1 )
+    if (reset)
+        m_cleanFlag |= MMCF_RESET;
+    else
+        m_cleanFlag &= ~MMCF_RESET;
+
+    if (empty() || size() == 1)
         return;
 
     MovementGenerator *curr = top();
     pop();
 
-    if(!m_expList)
+    if (!m_expList)
         m_expList = new ExpireList();
 
     // also drop stored under top() targeted motions
@@ -202,14 +199,14 @@ MotionMaster::DelayedExpire()
 
     curr->Finalize(*i_owner);
 
-    if( !isStatic(curr) )
+    if (!isStatic(curr))
         m_expList->push_back(curr);
 }
 
 void MotionMaster::MoveIdle()
 {
-    if( empty() || !isStatic( top() ) )
-        push( &si_idleMovement );
+    if (empty() || !isStatic(top()))
+        push(&si_idleMovement);
 }
 
 void

@@ -573,7 +573,10 @@ void WorldSession::HandleSellItemOpcode( WorldPacket & recv_data )
                     _player->AddItemToBuyBackSlot( pItem );
                 }
 
-                _player->ModifyMoney( pProto->SellPrice * count );
+                uint32 money = pProto->SellPrice * count;
+
+                _player->ModifyMoney( money );
+                _player->GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_MONEY_FROM_VENDORS, money);
             }
             else
                 _player->SendSellError( SELL_ERR_CANT_SELL_ITEM, pCreature, itemguid, 0);
@@ -621,6 +624,7 @@ void WorldSession::HandleBuybackItem(WorldPacket & recv_data)
             _player->ModifyMoney( -(int32)price );
             _player->RemoveItemFromBuyBackSlot( slot, false );
             _player->ItemAddedQuestCheck( pItem->GetEntry(), pItem->GetCount());
+            _player->GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_RECEIVE_EPIC_ITEM, pItem->GetEntry(), pItem->GetCount());
             _player->StoreItem( dest, pItem, true );
         }
         else
@@ -1226,6 +1230,8 @@ void WorldSession::HandleSocketOpcode(WorldPacket& recv_data)
         {
             if(ItemLimitCategoryEntry const* limitEntry = sItemLimitCategoryStore.LookupEntry(iGemProto->ItemLimitCategory))
             {
+                // NOTE: limitEntry->mode not checked because if item have have-limit then it applied and to equip case
+
                 for (int j = 0; j < MAX_GEM_SOCKETS; ++j)
                 {
                     if (Gems[j])

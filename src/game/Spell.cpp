@@ -2268,6 +2268,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                     }
                     break;
                 }
+                case SPELL_EFFECT_BIND:
                 case SPELL_EFFECT_RESURRECT:
                 case SPELL_EFFECT_PARRY:
                 case SPELL_EFFECT_BLOCK:
@@ -2480,21 +2481,13 @@ void Spell::prepare(SpellCastTargets const* targets, Aura* triggeredByAura)
     {
         m_caster->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
         m_caster->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
-        Unit::AuraList const& dAuras = m_caster->GetAurasByType(SPELL_AURA_MOD_INVISIBILITY);
-        for(Unit::AuraList::const_iterator itr = dAuras.begin(); itr != dAuras.end(); ++itr)
-        {
-            SpellEntry const* itr_spellProto = (*itr)->GetSpellProto();
-            if(itr_spellProto->InterruptFlags != 0x00000000)
-            {
-                m_caster->RemoveAurasDueToSpell((*itr)->GetId());
-                break;
-            }
-        }
     }
 
     // add non-triggered (with cast time and without)
     if (!m_IsTriggeredSpell)
     {
+        m_caster->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CAST);
+
         // add to cast type slot
         m_caster->SetCurrentCastedSpell( this );
 
@@ -2694,6 +2687,9 @@ void Spell::cast(bool skipCheck)
             // Heroism
             else if (m_spellInfo->Id == 32182)
                 AddPrecastSpell(57723);                     // Exhaustion
+            else if (m_spellInfo->Effect[EFFECT_INDEX_0]==SPELL_EFFECT_APPLY_AREA_AURA_RAID && m_spellInfo->SpellFamilyFlags & UI64LIT(0x0000000004000000))
+                // only for main totem spell cast
+                AddTriggeredSpell(30708);                   // Totem of Wrath
             break;
         }
         default:
@@ -4549,7 +4545,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                 if (m_spellInfo->SpellFamilyName == SPELLFAMILY_SHAMAN && m_spellInfo->SpellIconID == 33)
                 {
                     // fire totems slot
-                    if (!m_caster->m_TotemSlot[0])
+                    if (!m_caster->GetTotemGUID(TOTEM_SLOT_FIRE))
                         return SPELL_FAILED_TOTEMS;
                 }
                 break;
@@ -4811,17 +4807,6 @@ SpellCastResult Spell::CheckCast(bool strict)
                             return SPELL_FAILED_ALREADY_HAVE_CHARM;
                     }
                 }
-
-                break;
-            }
-            // Not used for summon?
-            case SPELL_EFFECT_SUMMON_PHANTASM:
-            {
-                if(m_caster->GetPetGUID())
-                    return SPELL_FAILED_ALREADY_HAVE_SUMMON;
-
-                if(m_caster->GetCharmGUID())
-                    return SPELL_FAILED_ALREADY_HAVE_CHARM;
 
                 break;
             }
@@ -5661,7 +5646,7 @@ SpellCastResult Spell::CheckItems()
                     uint8 msg = p_caster->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, m_spellInfo->EffectItemType[i], 1 );
                     if (msg != EQUIP_ERR_OK )
                     {
-                        p_caster->SendEquipError( msg, NULL, NULL );
+                        p_caster->SendEquipError( msg, NULL, NULL, m_spellInfo->EffectItemType[i] );
                         return SPELL_FAILED_DONT_REPORT;
                     }
                 }

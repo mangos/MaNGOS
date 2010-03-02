@@ -52,6 +52,13 @@ class MANGOS_DLL_SPEC MovementGenerator
         virtual void UpdateFinalDistance(float /*fDistance*/) { }
 
         virtual bool GetDestination(float& /*x*/, float& /*y*/, float& /*z*/) const { return false; }
+
+        // used by Evade code for select point to evade with expected restart default movement
+        virtual bool GetResetPosition(Unit &, float& /*x*/, float& /*y*/, float& /*z*/) { return false; }
+
+        // used for check from Update call is movegen still be active (top movement generator)
+        // after some not safe for this calls
+        bool IsActive(Unit& u);
 };
 
 template<class T, class D>
@@ -83,6 +90,11 @@ class MANGOS_DLL_SPEC MovementGeneratorMedium : public MovementGenerator
             //u->AssertIsType<T>();
             return (static_cast<D*>(this))->Update(*((T*)&u), time_diff);
         }
+        bool GetResetPosition(Unit& u, float& x, float& y, float& z)
+        {
+            //u->AssertIsType<T>();
+            return (static_cast<D*>(this))->GetResetPosition(*((T*)&u), x, y, z);
+        }
     public:
         // will not link if not overridden in the generators
         void Initialize(T &u);
@@ -90,6 +102,9 @@ class MANGOS_DLL_SPEC MovementGeneratorMedium : public MovementGenerator
         void Interrupt(T &u);
         void Reset(T &u);
         bool Update(T &u, const uint32 &time_diff);
+
+        // not need always overwrites
+        bool GetResetPosition(T& /*u*/, float& /*x*/, float& /*y*/, float& /*z*/) { return false; }
 };
 
 struct SelectableMovement : public FactoryHolder<MovementGenerator,MovementGeneratorType>
@@ -109,3 +124,4 @@ typedef FactoryHolder<MovementGenerator,MovementGeneratorType> MovementGenerator
 typedef FactoryHolder<MovementGenerator,MovementGeneratorType>::FactoryHolderRegistry MovementGeneratorRegistry;
 typedef FactoryHolder<MovementGenerator,MovementGeneratorType>::FactoryHolderRepository MovementGeneratorRepository;
 #endif
+

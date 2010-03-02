@@ -326,6 +326,7 @@ struct AchievementCriteriaEntry
         struct
         {
             uint32  itemSlot;                               // 3
+            uint32  count;                                  // 4
         } equip_epic_item;
 
         // ACHIEVEMENT_CRITERIA_TYPE_ROLL_NEED_ON_LOOT      = 50
@@ -1019,7 +1020,7 @@ struct ItemLimitCategoryEntry
     //char*     name[16]                                    // 1-16     m_name_lang
                                                             // 17 name flags
     uint32      maxCount;                                   // 18, max allowed equipped as item or in gem slot
-    //uint32      unk;                                      // 19, 1 for gems only...
+    uint32      mode;                                       // 19, 0 = have, 1 = equip (enum ItemLimitCategoryMode)
 };
 
 struct ItemRandomPropertiesEntry

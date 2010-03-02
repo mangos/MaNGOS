@@ -385,7 +385,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
 
         bool Create(uint32 guidlow, Map *map, uint32 phaseMask, uint32 Entry, uint32 team, const CreatureData *data = NULL);
         bool LoadCreaturesAddon(bool reload = false);
-        void SelectLevel(const CreatureInfo *cinfo);
+        void SelectLevel(const CreatureInfo *cinfo, float percentHealth = 100.0f, float percentMana = 100.0f);
         void LoadEquipment(uint32 equip_entry, bool force=false);
 
         uint32 GetDBTableGUIDLow() const { return m_DBTableGuid; }
@@ -484,7 +484,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
 
         bool HasSpell(uint32 spellID) const;
 
-        bool UpdateEntry(uint32 entry, uint32 team = ALLIANCE, const CreatureData* data = NULL);
+        bool UpdateEntry(uint32 entry, uint32 team = ALLIANCE, const CreatureData* data = NULL, bool preserveHPAndPower = true);
         bool UpdateStats(Stats stat);
         bool UpdateAllStats();
         void UpdateResistances(uint32 school);
@@ -620,10 +620,37 @@ class MANGOS_DLL_SPEC Creature : public Unit
 
         void SendAreaSpiritHealerQueryOpcode(Player *pl);
 
+        void IncrementReceivedDamage(Unit* pAttacker, uint32 unDamage)
+        {
+            if(!pAttacker || !unDamage)
+                return;
+
+            if(pAttacker->GetCharmerOrOwnerPlayerOrPlayerItself())
+            {
+                m_unPlayerDamageDone += unDamage;
+                return;
+            }
+            else if(pAttacker->GetTypeId() == TYPEID_UNIT)
+            {
+                //some conditions can be placed here
+                m_unUnitDamageDone += unDamage;
+                return;
+            }
+        }
+        bool AreLootAndRewardAllowed() { return (m_unPlayerDamageDone > m_unUnitDamageDone); }
+        void ResetObtainedDamage()
+        {
+            m_unPlayerDamageDone = 0;
+            m_unUnitDamageDone = 0;
+        }
+
     protected:
         bool CreateFromProto(uint32 guidlow,uint32 Entry,uint32 team, const CreatureData *data = NULL);
         bool InitEntry(uint32 entry, uint32 team=ALLIANCE, const CreatureData* data=NULL);
         void RelocationNotify();
+
+        uint32 m_unPlayerDamageDone;
+        uint32 m_unUnitDamageDone;
 
         // vendor items
         VendorItemCounts m_vendorItemCounts;

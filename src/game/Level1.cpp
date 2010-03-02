@@ -294,7 +294,11 @@ bool ChatHandler::HandleGPSCommand(const char* args)
     float zone_x = obj->GetPositionX();
     float zone_y = obj->GetPositionY();
 
-    Map2ZoneCoordinates(zone_x,zone_y,zone_id);
+    if (!Map2ZoneCoordinates(zone_x, zone_y, zone_id))
+    {
+        zone_x = 0;
+        zone_y = 0;
+    }
 
     Map const *map = obj->GetMap();
     float ground_z = map->GetHeight(obj->GetPositionX(), obj->GetPositionY(), MAX_HEIGHT);
@@ -2409,7 +2413,12 @@ bool ChatHandler::HandleGoZoneXYCommand(const char* args)
         return false;
     }
 
-    Zone2MapCoordinates(x,y,zoneEntry->ID);
+    if (!Zone2MapCoordinates(x,y,zoneEntry->ID))
+    {
+        PSendSysMessage(LANG_INVALID_ZONE_MAP,areaEntry->ID,areaEntry->area_name[GetSessionDbcLocale()],map->GetId(),map->GetMapName());
+        SetSentErrorMessage(true);
+        return false;
+    }
 
     if(!MapManager::IsValidMapCoord(zoneEntry->mapid,x,y))
     {
