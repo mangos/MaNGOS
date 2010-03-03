@@ -123,7 +123,7 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS]=
     &Spell::EffectThreat,                                   // 63 SPELL_EFFECT_THREAT
     &Spell::EffectTriggerSpell,                             // 64 SPELL_EFFECT_TRIGGER_SPELL
     &Spell::EffectApplyAreaAura,                            // 65 SPELL_EFFECT_APPLY_AREA_AURA_RAID
-    &Spell::EffectUnused,                                   // 66 SPELL_EFFECT_CREATE_MANA_GEM          (possibly recharge it, misc - is item ID)
+    &Spell::EffectRestoreItemCharges,                       // 66 SPELL_EFFECT_RESTORE_ITEM_CHARGES     itemtype - is affected item ID
     &Spell::EffectHealMaxHealth,                            // 67 SPELL_EFFECT_HEAL_MAX_HEALTH
     &Spell::EffectInterruptCast,                            // 68 SPELL_EFFECT_INTERRUPT_CAST
     &Spell::EffectDistract,                                 // 69 SPELL_EFFECT_DISTRACT
@@ -1663,6 +1663,21 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     }
                     return;
                 }
+            }
+
+            // Conjure Mana Gem
+            if (eff_idx == EFFECT_INDEX_1 && m_spellInfo->Effect[EFFECT_INDEX_0] == SPELL_EFFECT_CREATE_ITEM)
+            {
+                if (m_caster->GetTypeId()!=TYPEID_PLAYER)
+                    return;
+
+                // checked in create item check, avoid unexpected 
+                if (Item* item = ((Player*)m_caster)->GetItemByLimitedCategory(ITEM_LIMIT_CATEGORY_MANA_GEM))
+                    if (item->HasMaxCharges())
+                        return;
+
+                unitTarget->CastSpell( unitTarget, m_spellInfo->CalculateSimpleValue(eff_idx), true, m_CastItem);
+                return;
             }
             break;
         }
@@ -3237,6 +3252,10 @@ void Spell::DoCreateItem(SpellEffectIndex eff_idx, uint32 itemtype)
             num_to_add -= no_space;
         else
         {
+            // ignore mana gem case (next effect will recharge existed example)
+            if (eff_idx == EFFECT_INDEX_0 && m_spellInfo->Effect[EFFECT_INDEX_1] == SPELL_EFFECT_DUMMY )
+                return;
+
             // if not created by another reason from full inventory or unique items amount limitation
             player->SendEquipError( msg, NULL, NULL, newitemid );
             return;
@@ -3905,6 +3924,9 @@ void Spell::DoSummon(SpellEffectIndex eff_idx)
         spawnCreature->SavePetToDB(PET_SAVE_AS_CURRENT);
         ((Player*)m_caster)->PetSpellInitialize();
     }
+
+    if (m_caster->GetTypeId() == TYPEID_UNIT && ((Creature*)m_caster)->AI())
+        ((Creature*)m_caster)->AI()->JustSummoned((Creature*)spawnCreature);
 }
 
 void Spell::EffectLearnSpell(SpellEffectIndex eff_idx)
@@ -7580,4 +7602,28 @@ void Spell::EffectBind(SpellEffectIndex eff_idx)
     data << uint64(player->GetGUID());
     data << uint32(area_id);
     player->SendMessageToSet( &data, true );
+}
+
+void Spell::EffectRestoreItemCharges( SpellEffectIndex eff_idx )
+{
+    if (m_caster->GetTypeId() != TYPEID_PLAYER)
+        return;
+
+    Player* player = (Player*)unitTarget;
+
+    ItemPrototype const* itemProto = ObjectMgr::GetItemPrototype(m_spellInfo->EffectItemType[eff_idx]);
+    if (!itemProto)
+        return;
+
+    // In case item from limited category recharge any from category, is this valid checked early in spell checks
+    Item* item;
+    if (itemProto->ItemLimitCategory)
+        item = player->GetItemByLimitedCategory(itemProto->ItemLimitCategory);
+    else
+        item = player->GetItemByEntry(m_spellInfo->EffectItemType[eff_idx]);
+
+    if (!item)
+        return;
+
+    item->RestoreCharges();
 }

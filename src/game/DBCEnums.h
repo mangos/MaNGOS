@@ -329,6 +329,12 @@ enum ItemLimitCategoryMode
     ITEM_LIMIT_CATEGORY_MODE_EQUIP = 1,                      // limit applied to amount equipped items (including used gems)
 };
 
+// some used in code cases
+enum ItemLimitCategory
+{
+    ITEM_LIMIT_CATEGORY_MANA_GEM   = 4,
+};
+
 enum TotemCategoryType
 {
     TOTEM_CATEGORY_TYPE_KNIFE   = 1,

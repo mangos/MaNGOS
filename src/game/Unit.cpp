@@ -704,6 +704,10 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
 
         // find player: owner of controlled `this` or `this` itself maybe
         Player *player = GetCharmerOrOwnerPlayerOrPlayerItself();
+
+        // find owner of pVictim, used for creature cases, AI calls
+        Unit* pOwner = pVictim->GetCharmerOrOwner();
+
         bool bRewardIsAllowed = true;
         if (pVictim->GetTypeId() == TYPEID_UNIT)
         {
@@ -845,7 +849,11 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
                         if (pSummoner->AI())
                             pSummoner->AI()->SummonedCreatureJustDied(cVictim);
             }
-
+            else if (pOwner && pOwner->GetTypeId() == TYPEID_UNIT)
+            {
+                if (((Creature*)pOwner)->AI())
+                    ((Creature*)pOwner)->AI()->SummonedCreatureJustDied(cVictim);
+            }
 
             // Dungeon specific stuff, only applies to players killing creatures
             if(cVictim->GetInstanceId())
@@ -7420,20 +7428,8 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
             break;
         case SPELLFAMILY_WARLOCK:
         {
-            // Pyroclasm
-            if (auraSpellInfo->SpellIconID == 1137)
-            {
-                switch (auraSpellInfo->Id)
-                {
-                    case 18096: trigger_spell_id = 18093; break; // Rank 1
-                    case 18073: trigger_spell_id = 63243; break; // Rank 2
-                    case 63245: trigger_spell_id = 63244; break; // Rank 3
-                    default:
-                        return false;
-                }
-            }
             // Drain Soul
-            else if (auraSpellInfo->SpellFamilyFlags & UI64LIT(0x0000000000004000))
+            if (auraSpellInfo->SpellFamilyFlags & UI64LIT(0x0000000000004000))
             {
                 Unit::AuraList const& mAddFlatModifier = GetAurasByType(SPELL_AURA_ADD_FLAT_MODIFIER);
                 for(Unit::AuraList::const_iterator i = mAddFlatModifier.begin(); i != mAddFlatModifier.end(); ++i)
