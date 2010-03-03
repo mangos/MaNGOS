@@ -179,6 +179,15 @@ bool Bag::IsEmpty() const
     return true;
 }
 
+Item* Bag::GetItemByEntry( uint32 item ) const
+{
+    for(uint32 i = 0; i < GetBagSize(); ++i)
+        if (m_bagslot[i] && m_bagslot[i]->GetEntry() == item)
+            return m_bagslot[i];
+
+    return NULL;
+}
+
 uint32 Bag::GetItemCount( uint32 item, Item* eItem ) const
 {
     Item *pItem;

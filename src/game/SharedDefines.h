@@ -594,7 +594,7 @@ enum SpellEffects
     SPELL_EFFECT_THREAT                    = 63,
     SPELL_EFFECT_TRIGGER_SPELL             = 64,
     SPELL_EFFECT_APPLY_AREA_AURA_RAID      = 65,
-    SPELL_EFFECT_CREATE_MANA_GEM           = 66,
+    SPELL_EFFECT_RESTORE_ITEM_CHARGES      = 66,
     SPELL_EFFECT_HEAL_MAX_HEALTH           = 67,
     SPELL_EFFECT_INTERRUPT_CAST            = 68,
     SPELL_EFFECT_DISTRACT                  = 69,
