@@ -2060,6 +2060,31 @@ void ObjectMgr::LoadItemPrototypes()
             sLog.outErrorDb("Item (Entry: %u) has wrong HolidayId value (%u)", i, proto->HolidayId);
             const_cast<ItemPrototype*>(proto)->HolidayId = 0;
         }
+
+        if(proto->NonConsumable)
+        {
+            if (proto->NonConsumable > 1)
+            {
+                sLog.outErrorDb("Item (Entry: %u) has wrong NonConsumable (%u), must be 0..1",i,proto->NonConsumable);
+                const_cast<ItemPrototype*>(proto)->NonConsumable = 1;
+            }
+
+            bool can_be_need = false;
+            for (int j = 0; j < MAX_ITEM_PROTO_SPELLS; ++j)
+            {
+                if(proto->Spells[j].SpellCharges < 0)
+                {
+                    can_be_need = true;
+                    break;
+                }
+            }
+
+            if (!can_be_need)
+            {
+                sLog.outErrorDb("Item (Entry: %u) has redundant NonConsumable (%u), item not have negative charges",i,proto->NonConsumable);
+                const_cast<ItemPrototype*>(proto)->NonConsumable = 0;
+            }
+        }
     }
 
     // check some dbc referenced items (avoid duplicate reports)
