@@ -1151,6 +1151,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         uint32 GetItemCountWithLimitCategory(uint32 limitCategory) const;
         Item* GetItemByGuid( uint64 guid ) const;
         Item* GetItemByEntry(uint32 item) const;            // only for special cases
+        Item* GetItemByLimitedCategory(uint32 limitedCategory) const;
         Item* GetItemByPos( uint16 pos ) const;
         Item* GetItemByPos( uint8 bag, uint8 slot ) const;
         Item* GetWeaponForAttack(WeaponAttackType attackType) const { return GetWeaponForAttack(attackType,false,false); }

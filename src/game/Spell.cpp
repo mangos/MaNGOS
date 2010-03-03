@@ -5614,16 +5614,22 @@ SpellCastResult Spell::CheckItems()
             {
                 if (!m_IsTriggeredSpell && m_spellInfo->EffectItemType[i])
                 {
-                    // Conjure Mana Gem
+                    // Conjure Mana Gem (skip same or low level ranks for later recharge)
                     if (i == EFFECT_INDEX_0 && m_spellInfo->Effect[EFFECT_INDEX_1] == SPELL_EFFECT_DUMMY)
                     {
-                        if (Item* item = p_caster->GetItemByEntry(m_spellInfo->EffectItemType[i]))
+                        if (ItemPrototype const* itemProto = ObjectMgr::GetItemPrototype(m_spellInfo->EffectItemType[i]))
                         {
-                            if (item->HasMaxCharges())
-                                return SPELL_FAILED_ITEM_AT_MAX_CHARGES;
+                            if (Item* item = p_caster->GetItemByLimitedCategory(itemProto->ItemLimitCategory))
+                            {
+                                if (item->GetProto()->ItemLevel <= itemProto->ItemLevel)
+                                {
+                                    if (item->HasMaxCharges())
+                                        return SPELL_FAILED_ITEM_AT_MAX_CHARGES;
 
-                            // will recharge in next effect
-                            continue;
+                                    // will recharge in next effect
+                                    continue;
+                                }
+                            }
                         }
                     }
 

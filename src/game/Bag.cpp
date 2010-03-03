@@ -188,6 +188,15 @@ Item* Bag::GetItemByEntry( uint32 item ) const
     return NULL;
 }
 
+Item* Bag::GetItemByLimitedCategory(uint32 limitedCategory) const
+{
+    for(uint32 i = 0; i < GetBagSize(); ++i)
+        if (m_bagslot[i] && m_bagslot[i]->GetProto()->ItemLimitCategory == limitedCategory)
+            return m_bagslot[i];
+
+    return NULL;
+}
+
 uint32 Bag::GetItemCount( uint32 item, Item* eItem ) const
 {
     Item *pItem;

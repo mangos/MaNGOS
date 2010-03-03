@@ -1656,6 +1656,14 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
             // Conjure Mana Gem
             if (eff_idx == EFFECT_INDEX_1 && m_spellInfo->Effect[EFFECT_INDEX_0] == SPELL_EFFECT_CREATE_ITEM)
             {
+                if (m_caster->GetTypeId()!=TYPEID_PLAYER)
+                    return;
+
+                // checked in create item check, avoid unexpected 
+                if (Item* item = ((Player*)m_caster)->GetItemByLimitedCategory(ITEM_LIMIT_CATEGORY_MANA_GEM))
+                    if (item->HasMaxCharges())
+                        return;
+
                 unitTarget->CastSpell( unitTarget, m_spellInfo->CalculateSimpleValue(eff_idx), true, m_CastItem);
                 return;
             }
@@ -7455,6 +7463,19 @@ void Spell::EffectRestoreItemCharges( SpellEffectIndex eff_idx )
 
     Player* player = (Player*)unitTarget;
 
-    if (Item* item = player->GetItemByEntry(m_spellInfo->EffectItemType[eff_idx]))
-        item->RestoreCharges();
+    ItemPrototype const* itemProto = ObjectMgr::GetItemPrototype(m_spellInfo->EffectItemType[eff_idx]);
+    if (!itemProto)
+        return;
+
+    // In case item from limited category recharge any from category, is this valid checked early in spell checks
+    Item* item;
+    if (itemProto->ItemLimitCategory)
+        item = player->GetItemByLimitedCategory(itemProto->ItemLimitCategory);
+    else
+        item = player->GetItemByEntry(m_spellInfo->EffectItemType[eff_idx]);
+
+    if (!item)
+        return;
+
+    item->RestoreCharges();
 }

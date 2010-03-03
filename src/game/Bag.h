@@ -43,6 +43,7 @@ class Bag : public Item
 
         Item* GetItemByPos( uint8 slot ) const;
         Item* GetItemByEntry( uint32 item ) const;
+        Item* GetItemByLimitedCategory(uint32 limitedCategory) const;
         uint32 GetItemCount( uint32 item, Item* eItem = NULL ) const;
         uint32 GetItemCountWithLimitCategory(uint32 limitCategory) const;
 
