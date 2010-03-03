@@ -3326,31 +3326,20 @@ void Unit::_UpdateSpells( uint32 time )
 
 void Unit::_UpdateAutoRepeatSpell()
 {
-    bool isAutoShot = m_currentSpells[CURRENT_AUTOREPEAT_SPELL]->m_spellInfo->Id == SPELL_ID_AUTOSHOT;
-
-    //check movement
-    if (GetTypeId() == TYPEID_PLAYER && ((Player*)this)->isMoving())
+    //check "realtime" interrupts
+    if ( (GetTypeId() == TYPEID_PLAYER && ((Player*)this)->isMoving()) || IsNonMeleeSpellCasted(false,false,true) )
     {
         // cancel wand shoot
-        if(!isAutoShot)
+        if(m_currentSpells[CURRENT_AUTOREPEAT_SPELL]->m_spellInfo->Id != SPELL_ID_AUTOSHOT)
             InterruptSpell(CURRENT_AUTOREPEAT_SPELL);
-        // auto shot just waits
+        m_AutoRepeatFirstCast = true;
         return;
     }
 
-    // check spell casts
-    if (IsNonMeleeSpellCasted(false, false, true))
-    {
-        // cancel wand shoot
-        if(!isAutoShot)
-        {
-            InterruptSpell(CURRENT_AUTOREPEAT_SPELL);
-            return;
-        }
-        // auto shot is delayed by everythihng, except ranged(!) CURRENT_GENERIC_SPELL's -> recheck that
-        else if (!(m_currentSpells[CURRENT_GENERIC_SPELL] && m_currentSpells[CURRENT_GENERIC_SPELL]->IsRangedSpell()))
-            return;
-    }
+    //apply delay
+    if ( m_AutoRepeatFirstCast && getAttackTimer(RANGED_ATTACK) < 500 )
+        setAttackTimer(RANGED_ATTACK,500);
+    m_AutoRepeatFirstCast = false;
 
     //castroutine
     if (isAttackReady(RANGED_ATTACK))
@@ -3396,6 +3385,7 @@ void Unit::SetCurrentCastedSpell( Spell * pSpell )
                 // break autorepeat if not Auto Shot
                 if (m_currentSpells[CURRENT_AUTOREPEAT_SPELL]->m_spellInfo->Id != SPELL_ID_AUTOSHOT)
                     InterruptSpell(CURRENT_AUTOREPEAT_SPELL);
+                m_AutoRepeatFirstCast = true;
             }
         } break;
 
@@ -3419,10 +3409,9 @@ void Unit::SetCurrentCastedSpell( Spell * pSpell )
                 // generic autorepeats break generic non-delayed and channeled non-delayed spells
                 InterruptSpell(CURRENT_GENERIC_SPELL,false);
                 InterruptSpell(CURRENT_CHANNELED_SPELL,false);
-                // special action: first cast delay
-                if ( getAttackTimer(RANGED_ATTACK) < 500 )
-                    setAttackTimer(RANGED_ATTACK,500);
             }
+            // special action: set first cast flag
+            m_AutoRepeatFirstCast = true;
         } break;
 
         default:
@@ -3442,14 +3431,14 @@ void Unit::SetCurrentCastedSpell( Spell * pSpell )
     pSpell->m_selfContainer = &(m_currentSpells[pSpell->GetCurrentContainer()]);
 }
 
-void Unit::InterruptSpell(CurrentSpellTypes spellType, bool withDelayed, bool sendAutoRepeatCancelToClient)
+void Unit::InterruptSpell(CurrentSpellTypes spellType, bool withDelayed)
 {
     assert(spellType < CURRENT_MAX_SPELL);
 
     if (m_currentSpells[spellType] && (withDelayed || m_currentSpells[spellType]->getState() != SPELL_STATE_DELAYED) )
     {
         // send autorepeat cancel message for autorepeat spells
-        if (spellType == CURRENT_AUTOREPEAT_SPELL && sendAutoRepeatCancelToClient)
+        if (spellType == CURRENT_AUTOREPEAT_SPELL)
         {
             if(GetTypeId() == TYPEID_PLAYER)
                 ((Player*)this)->SendAutoRepeatCancel(this);

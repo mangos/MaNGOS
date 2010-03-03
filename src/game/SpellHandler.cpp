@@ -494,9 +494,9 @@ void WorldSession::HandleCancelGrowthAuraOpcode( WorldPacket& /*recvPacket*/)
 
 void WorldSession::HandleCancelAutoRepeatSpellOpcode( WorldPacket& /*recvPacket*/)
 {
+    // may be better send SMSG_CANCEL_AUTO_REPEAT?
     // cancel and prepare for deleting
-    // do not send SMSG_CANCEL_AUTO_REPEAT! client will send this Opcode again (loop)
-    _player->m_mover->InterruptSpell(CURRENT_AUTOREPEAT_SPELL, true, false);
+    _player->m_mover->InterruptSpell(CURRENT_AUTOREPEAT_SPELL);
 }
 
 void WorldSession::HandleCancelChanneling( WorldPacket & recv_data)
