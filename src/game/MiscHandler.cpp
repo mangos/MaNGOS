@@ -1573,3 +1573,17 @@ void WorldSession::HandleReadyForAccountDataTimes(WorldPacket& /*recv_data*/)
 
     SendAccountDataTimes(GLOBAL_CACHE_MASK);
 }
+
+void WorldSession::HandleHearthandResurrect(WorldPacket & /*recv_data*/)
+{
+    sLog.outDebug("WORLD: CMSG_HEARTH_AND_RESURRECT");
+
+    // Can't use in flight
+    if (_player->isInFlight())
+        return;
+
+    // Send Everytime
+    _player->BuildPlayerRepop();
+    _player->ResurrectPlayer(100);
+    _player->TeleportToHomebind();
+}
