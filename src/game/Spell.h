@@ -664,7 +664,7 @@ namespace MaNGOS
             : i_data(&data), i_spell(spell), i_push_type(type), i_radius(radius), i_TargetType(TargetType)
         {
             i_originalCaster = spell.GetCastingObject();
-            i_playerControled = i_originalCaster->IsControlledByPlayer();
+            i_playerControled = i_originalCaster  ? i_originalCaster->IsControlledByPlayer() : false;
         }
 
         template<class T> inline void Visit(GridRefManager<T>  &m)
