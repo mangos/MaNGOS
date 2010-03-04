@@ -1445,7 +1445,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
             std::list<Unit *> tempTargetUnitMap;
 
             {
-                MaNGOS::AnyAoETargetUnitInObjectRangeCheck u_check(m_caster, m_caster, max_range);
+                MaNGOS::AnyAoETargetUnitInObjectRangeCheck u_check(m_caster, max_range);
                 MaNGOS::UnitListSearcher<MaNGOS::AnyAoETargetUnitInObjectRangeCheck> searcher(m_caster, tempTargetUnitMap, u_check);
 
                 TypeContainerVisitor<MaNGOS::UnitListSearcher<MaNGOS::AnyAoETargetUnitInObjectRangeCheck>, WorldTypeMapContainer > world_unit_searcher(searcher);
@@ -1514,7 +1514,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
             cell.SetNoCreate();
             std::list<Unit*> tempTargetUnitMap;
             {
-                MaNGOS::AnyFriendlyUnitInObjectRangeCheck u_check(m_caster, m_caster, max_range);
+                MaNGOS::AnyFriendlyUnitInObjectRangeCheck u_check(m_caster, max_range);
                 MaNGOS::UnitListSearcher<MaNGOS::AnyFriendlyUnitInObjectRangeCheck> searcher(m_caster, tempTargetUnitMap, u_check);
 
                 TypeContainerVisitor<MaNGOS::UnitListSearcher<MaNGOS::AnyFriendlyUnitInObjectRangeCheck>, WorldTypeMapContainer > world_unit_searcher(searcher);
@@ -1610,10 +1610,10 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
 
                 std::list<Unit *> tempTargetUnitMap;
                 {
-                    MaNGOS::AnyAoETargetUnitInObjectRangeCheck u_check(pUnitTarget, originalCaster, max_range, false);
-                    MaNGOS::UnitListSearcher<MaNGOS::AnyAoETargetUnitInObjectRangeCheck> searcher(m_caster, tempTargetUnitMap, u_check);
-                    TypeContainerVisitor<MaNGOS::UnitListSearcher<MaNGOS::AnyAoETargetUnitInObjectRangeCheck>, WorldTypeMapContainer> world_unit_searcher(searcher);
-                    TypeContainerVisitor<MaNGOS::UnitListSearcher<MaNGOS::AnyAoETargetUnitInObjectRangeCheck>, GridTypeMapContainer>  grid_unit_searcher(searcher);
+                    MaNGOS::AnyAoEVisibleTargetUnitInObjectRangeCheck u_check(pUnitTarget, originalCaster, max_range);
+                    MaNGOS::UnitListSearcher<MaNGOS::AnyAoEVisibleTargetUnitInObjectRangeCheck> searcher(m_caster, tempTargetUnitMap, u_check);
+                    TypeContainerVisitor<MaNGOS::UnitListSearcher<MaNGOS::AnyAoEVisibleTargetUnitInObjectRangeCheck>, WorldTypeMapContainer> world_unit_searcher(searcher);
+                    TypeContainerVisitor<MaNGOS::UnitListSearcher<MaNGOS::AnyAoEVisibleTargetUnitInObjectRangeCheck>, GridTypeMapContainer>  grid_unit_searcher(searcher);
 
                     cell.Visit(p, world_unit_searcher, *m_caster->GetMap(), *pUnitTarget, max_range);
                     cell.Visit(p, grid_unit_searcher, *m_caster->GetMap(), *pUnitTarget, max_range);
@@ -3192,20 +3192,20 @@ void Spell::SendCastResult(Player* caster, SpellEntry const* spellInfo, uint8 ca
 
 void Spell::SendSpellStart()
 {
-    if(!IsNeedSendToClient())
+    if (!IsNeedSendToClient())
         return;
 
     sLog.outDebug("Sending SMSG_SPELL_START id=%u", m_spellInfo->Id);
 
     uint32 castFlags = CAST_FLAG_UNKNOWN1;
-    if(IsRangedSpell())
+    if (IsRangedSpell())
         castFlags |= CAST_FLAG_AMMO;
 
-    if(m_spellInfo->runeCostID)
+    if (m_spellInfo->runeCostID)
         castFlags |= CAST_FLAG_UNKNOWN10;
 
     WorldPacket data(SMSG_SPELL_START, (8+8+4+4+2));
-    if(m_CastItem)
+    if (m_CastItem)
         data.append(m_CastItem->GetPackGUID());
     else
         data.append(m_caster->GetPackGUID());
@@ -3285,7 +3285,7 @@ void Spell::SendSpellGo()
     m_targets.write(&data);
 
     if ( castFlags & CAST_FLAG_UNKNOWN6 )                   // unknown wotlk, predicted power?
-        data << uint32(0);
+        data << uint32(m_caster->GetPower(m_caster->getPowerType())); // Yes, it is really predicted power.
 
     if ( castFlags & CAST_FLAG_UNKNOWN7 )                   // rune cooldowns list
     {
@@ -4530,6 +4530,12 @@ SpellCastResult Spell::CheckCast(bool strict)
                 {
                     if(m_caster->IsInWater())
                         return SPELL_FAILED_ONLY_ABOVEWATER;
+                }
+                else if (m_spellInfo->SpellFamilyFlags == UI64LIT(0x2000)) // Death Coil (DeathKnight)
+                {
+                    Unit* target = m_targets.getUnitTarget();
+                    if (!target || (target->IsFriendlyTo(m_caster) && target->GetCreatureType() != CREATURE_TYPE_UNDEAD))
+                        return SPELL_FAILED_BAD_TARGETS;
                 }
                 else if(m_spellInfo->SpellIconID == 156)    // Holy Shock
                 {

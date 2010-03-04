@@ -1958,3 +1958,21 @@ void WorldObject::BuildUpdateData( UpdateDataMapType & update_players)
 
     ClearUpdateMask(false);
 }
+
+bool WorldObject::IsControlledByPlayer() const
+{
+    switch (GetTypeId())
+    {
+        case TYPEID_GAMEOBJECT:
+            return IS_PLAYER_GUID(((GameObject*)this)->GetOwnerGUID());
+        case TYPEID_UNIT:
+        case TYPEID_PLAYER:
+            return ((Unit*)this)->IsCharmerOrOwnerPlayerOrPlayerItself();
+        case TYPEID_DYNAMICOBJECT:
+            return IS_PLAYER_GUID(((DynamicObject*)this)->GetCasterGUID());
+        case TYPEID_CORPSE:
+            return true;
+        default:
+            return false;
+    }
+}

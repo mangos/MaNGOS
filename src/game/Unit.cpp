@@ -5631,6 +5631,12 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     pVictim->RemoveSpellsCausingAura(SPELL_AURA_PERIODIC_DAMAGE_PERCENT);
                     return true;
                 }
+                // Glyph of Drain Soul (warlock's glyph but has mage's spell family...)
+                case 58070:
+                {
+                    triggered_spell_id = 58068;
+                    break;
+                }
             }
             break;
         }
@@ -7431,13 +7437,15 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
             // Drain Soul
             if (auraSpellInfo->SpellFamilyFlags & UI64LIT(0x0000000000004000))
             {
-                Unit::AuraList const& mAddFlatModifier = GetAurasByType(SPELL_AURA_ADD_FLAT_MODIFIER);
-                for(Unit::AuraList::const_iterator i = mAddFlatModifier.begin(); i != mAddFlatModifier.end(); ++i)
+                // search for "Improved Drain Soul" dummy aura
+                Unit::AuraList const& mDummyAura = GetAurasByType(SPELL_AURA_DUMMY);
+                for(Unit::AuraList::const_iterator i = mDummyAura.begin(); i != mDummyAura.end(); ++i)
                 {
-                    if ((*i)->GetModifier()->m_miscvalue == SPELLMOD_CHANCE_OF_SUCCESS && (*i)->GetSpellProto()->SpellIconID == 113)
+                    if ((*i)->GetSpellProto()->SpellFamilyName == SPELLFAMILY_WARLOCK && (*i)->GetSpellProto()->SpellIconID == 113)
                     {
-                        // Drain Soul
-                        CastCustomSpell(this, 18371, &basepoints[0], NULL, NULL, true, castItem, triggeredByAura);
+                        // basepoints of trigger spell stored in dummyeffect of spellProto
+                        int32 basepoints = (GetMaxPower(POWER_MANA) * ((*i)->GetSpellProto()->EffectBasePoints[2]+1))/100.0f;
+                        CastCustomSpell(this, 18371, &basepoints, NULL, NULL, true, castItem, triggeredByAura);
                         break;
                     }
                 }
@@ -13092,7 +13100,7 @@ Unit* Unit::SelectRandomFriendlyTarget(Unit* except /*= NULL*/, float radius /*=
 
     std::list<Unit *> targets;
 
-    MaNGOS::AnyFriendlyUnitInObjectRangeCheck u_check(this, this, radius);
+    MaNGOS::AnyFriendlyUnitInObjectRangeCheck u_check(this, radius);
     MaNGOS::UnitListSearcher<MaNGOS::AnyFriendlyUnitInObjectRangeCheck> searcher(this, targets, u_check);
 
     TypeContainerVisitor<MaNGOS::UnitListSearcher<MaNGOS::AnyFriendlyUnitInObjectRangeCheck>, WorldTypeMapContainer > world_unit_searcher(searcher);

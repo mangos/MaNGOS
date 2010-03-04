@@ -620,12 +620,12 @@ namespace MaNGOS
         Spell &i_spell;
         const uint32& i_index;
         float i_radius;
-        Unit* i_originalCaster;
+        WorldObject* i_originalCaster;
 
         SpellNotifierPlayer(Spell &spell, std::list<Unit*> &data, const uint32 &i, float radius)
             : i_data(data), i_spell(spell), i_index(i), i_radius(radius)
         {
-            i_originalCaster = i_spell.GetAffectiveCaster();
+            i_originalCaster = i_spell.GetCastingObject();
         }
 
         void Visit(PlayerMapType &m)
@@ -656,13 +656,15 @@ namespace MaNGOS
         SpellNotifyPushType i_push_type;
         float i_radius;
         SpellTargets i_TargetType;
-        Unit* i_originalCaster;
+        WorldObject* i_originalCaster;
+        bool i_playerControled;
 
         SpellNotifierCreatureAndPlayer(Spell &spell, std::list<Unit*> &data, float radius, SpellNotifyPushType type,
             SpellTargets TargetType = SPELL_TARGETS_NOT_FRIENDLY)
             : i_data(&data), i_spell(spell), i_push_type(type), i_radius(radius), i_TargetType(TargetType)
         {
-            i_originalCaster = spell.GetAffectiveCaster();
+            i_originalCaster = spell.GetCastingObject();
+            i_playerControled = i_originalCaster  ? i_originalCaster->IsControlledByPlayer() : false;
         }
 
         template<class T> inline void Visit(GridRefManager<T>  &m)
@@ -704,16 +706,14 @@ namespace MaNGOS
                         if(itr->getSource()->GetTypeId()==TYPEID_UNIT && ((Creature*)itr->getSource())->isTotem())
                             continue;
 
-                        Unit* check = i_originalCaster->GetCharmerOrOwnerOrSelf();
-
-                        if( check->GetTypeId()==TYPEID_PLAYER )
+                        if (i_playerControled)
                         {
-                            if (check->IsFriendlyTo( itr->getSource() ))
+                            if (i_originalCaster->IsFriendlyTo( itr->getSource() ))
                                 continue;
                         }
                         else
                         {
-                            if (!check->IsHostileTo( itr->getSource() ))
+                            if (!i_originalCaster->IsHostileTo( itr->getSource() ))
                                 continue;
                         }
                     }

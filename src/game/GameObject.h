@@ -677,6 +677,8 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
                                                             // 0 = use `gameobject`.`spawntimesecs`
         void ResetDoorOrButton();
 
+        bool IsHostileTo(Unit const* unit) const;
+        bool IsFriendlyTo(Unit const* unit) const;
 
         void SummonLinkedTrapIfAny();
         void TriggeringLinkedGameObject( uint32 trapEntry, Unit* target);

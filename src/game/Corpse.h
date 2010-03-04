@@ -71,6 +71,9 @@ class Corpse : public WorldObject
         void ResetGhostTime() { m_time = time(NULL); }
         CorpseType GetType() const { return m_type; }
 
+        bool IsHostileTo(Unit const* unit) const;
+        bool IsFriendlyTo(Unit const* unit) const;
+
         GridPair const& GetGrid() const { return m_grid; }
         void SetGrid(GridPair const& grid) { m_grid = grid; }
 

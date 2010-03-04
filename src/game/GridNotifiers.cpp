@@ -229,10 +229,10 @@ bool CannibalizeObjectCheck::operator()(Corpse* u)
 
     Player* owner = ObjectAccessor::FindPlayer(u->GetOwnerGUID());
 
-    if( !owner || i_funit->IsFriendlyTo(owner))
+    if( !owner || i_fobj->IsFriendlyTo(owner))
         return false;
 
-    if(i_funit->IsWithinDistInMap(u, i_range) )
+    if(i_fobj->IsWithinDistInMap(u, i_range) )
         return true;
 
     return false;
