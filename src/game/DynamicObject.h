@@ -47,6 +47,10 @@ class DynamicObject : public WorldObject
         void AddAffected(Unit *unit) { m_affected.insert(unit); }
         void RemoveAffected(Unit *unit) { m_affected.erase(unit); }
         void Delay(int32 delaytime);
+
+        bool IsHostileTo(Unit const* unit) const;
+        bool IsFriendlyTo(Unit const* unit) const;
+
         bool isVisibleForInState(Player const* u, WorldObject const* viewPoint, bool inVisibleList) const;
 
         void Say(int32 textId, uint32 language, uint64 TargetGuid) { MonsterSay(textId,language,TargetGuid); }

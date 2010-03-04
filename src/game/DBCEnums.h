@@ -213,34 +213,34 @@ enum AchievementCriteriaTypes
 
 enum AreaFlags
 {
-    AREA_FLAG_SNOW             = 0x00000001,                // snow (only Dun Morogh, Naxxramas, Razorfen Downs and Winterspring)
-    AREA_FLAG_UNK1             = 0x00000002,                // may be necropolis?
-    AREA_FLAG_UNK2             = 0x00000004,                // Only used for areas on map 571 (development before)
-    AREA_FLAG_SLAVE_CAPITAL    = 0x00000008,                // city and city subsones
-    AREA_FLAG_UNK3             = 0x00000010,                // can't find common meaning
-    AREA_FLAG_SLAVE_CAPITAL2   = 0x00000020,                // slave capital city flag?
-    AREA_FLAG_UNK4             = 0x00000040,                // many zones have this flag
-    AREA_FLAG_ARENA            = 0x00000080,                // arena, both instanced and world arenas
-    AREA_FLAG_CAPITAL          = 0x00000100,                // main capital city flag
-    AREA_FLAG_CITY             = 0x00000200,                // only for one zone named "City" (where it located?)
-    AREA_FLAG_OUTLAND          = 0x00000400,                // expansion zones? (only Eye of the Storm not have this flag, but have 0x00004000 flag)
-    AREA_FLAG_SANCTUARY        = 0x00000800,                // sanctuary area (PvP disabled)
-    AREA_FLAG_NEED_FLY         = 0x00001000,                // only Netherwing Ledge, Socrethar's Seat, Tempest Keep, The Arcatraz, The Botanica, The Mechanar, Sorrow Wing Point, Dragonspine Ridge, Netherwing Mines, Dragonmaw Base Camp, Dragonmaw Skyway
-    AREA_FLAG_UNUSED1          = 0x00002000,                // not used now (no area/zones with this flag set in 3.0.3)
-    AREA_FLAG_OUTLAND2         = 0x00004000,                // expansion zones? (only Circle of Blood Arena not have this flag, but have 0x00000400 flag)
-    AREA_FLAG_PVP              = 0x00008000,                // pvp objective area? (Death's Door also has this flag although it's no pvp object area)
-    AREA_FLAG_ARENA_INSTANCE   = 0x00010000,                // used by instanced arenas only
-    AREA_FLAG_UNUSED2          = 0x00020000,                // not used now (no area/zones with this flag set in 3.0.3)
-    AREA_FLAG_UNK5             = 0x00040000,                // only used for Amani Pass, Hatchet Hills
-    AREA_FLAG_UNK6             = 0x00080000,                // Valgarde and Acherus: The Ebon Hold
-    AREA_FLAG_LOWLEVEL         = 0x00100000,                // used for some starting areas with area_level <=15
-    AREA_FLAG_TOWN             = 0x00200000,                // small towns with Inn
-    AREA_FLAG_UNK7             = 0x00400000,                // Warsong Hold, Acherus: The Ebon Hold, New Agamand Inn, Vengeance Landing Inn
-    AREA_FLAG_UNK8             = 0x00800000,                // Westguard Inn, Acherus: The Ebon Hold, Valgarde
-    AREA_FLAG_OUTDOOR_PVP      = 0x01000000,                // Wintergrasp and it's subzones
-    AREA_FLAG_UNK9             = 0x02000000,                // unknown
-    AREA_FLAG_UNK10            = 0x04000000,                // unknown
-    AREA_FLAG_OUTDOOR_PVP2     = 0x08000000                 // Wintergrasp and it's subzones
+    AREA_FLAG_SNOW                  = 0x00000001,           // snow (only Dun Morogh, Naxxramas, Razorfen Downs and Winterspring)
+    AREA_FLAG_UNK1                  = 0x00000002,           // may be necropolis?
+    AREA_FLAG_UNK2                  = 0x00000004,           // Only used for areas on map 571 (development before)
+    AREA_FLAG_SLAVE_CAPITAL         = 0x00000008,           // city and city subsones
+    AREA_FLAG_UNK3                  = 0x00000010,           // can't find common meaning
+    AREA_FLAG_SLAVE_CAPITAL2        = 0x00000020,           // slave capital city flag?
+    AREA_FLAG_UNK4                  = 0x00000040,           // many zones have this flag
+    AREA_FLAG_ARENA                 = 0x00000080,           // arena, both instanced and world arenas
+    AREA_FLAG_CAPITAL               = 0x00000100,           // main capital city flag
+    AREA_FLAG_CITY                  = 0x00000200,           // only for one zone named "City" (where it located?)
+    AREA_FLAG_OUTLAND               = 0x00000400,           // expansion zones? (only Eye of the Storm not have this flag, but have 0x00004000 flag)
+    AREA_FLAG_SANCTUARY             = 0x00000800,           // sanctuary area (PvP disabled)
+    AREA_FLAG_NEED_FLY              = 0x00001000,           // only Netherwing Ledge, Socrethar's Seat, Tempest Keep, The Arcatraz, The Botanica, The Mechanar, Sorrow Wing Point, Dragonspine Ridge, Netherwing Mines, Dragonmaw Base Camp, Dragonmaw Skyway
+    AREA_FLAG_UNUSED1               = 0x00002000,           // not used now (no area/zones with this flag set in 3.0.3)
+    AREA_FLAG_OUTLAND2              = 0x00004000,           // expansion zones? (only Circle of Blood Arena not have this flag, but have 0x00000400 flag)
+    AREA_FLAG_PVP                   = 0x00008000,           // pvp objective area? (Death's Door also has this flag although it's no pvp object area)
+    AREA_FLAG_ARENA_INSTANCE        = 0x00010000,           // used by instanced arenas only
+    AREA_FLAG_UNUSED2               = 0x00020000,           // not used now (no area/zones with this flag set in 3.0.3)
+    AREA_FLAG_UNK5                  = 0x00040000,           // only used for Amani Pass, Hatchet Hills
+    AREA_FLAG_UNK6                  = 0x00080000,           // Valgarde and Acherus: The Ebon Hold
+    AREA_FLAG_LOWLEVEL              = 0x00100000,           // used for some starting areas with area_level <=15
+    AREA_FLAG_TOWN                  = 0x00200000,           // small towns with Inn
+    AREA_FLAG_UNK7                  = 0x00400000,           // Warsong Hold, Acherus: The Ebon Hold, New Agamand Inn, Vengeance Landing Inn
+    AREA_FLAG_UNK8                  = 0x00800000,           // Westguard Inn, Acherus: The Ebon Hold, Valgarde
+    AREA_FLAG_OUTDOOR_PVP           = 0x01000000,           // Wintergrasp and it's subzones
+    AREA_FLAG_UNK9                  = 0x02000000,           // unknown
+    AREA_FLAG_UNK10                 = 0x04000000,           // unknown
+    AREA_FLAG_CAN_HEARTH_AND_RES    = 0x08000000            // Wintergrasp and it's subzones
     // 0x20000000 not flyable?
 };
 
