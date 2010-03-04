@@ -2033,10 +2033,18 @@ void Player::Regenerate(Powers power, uint32 diff)
             if (getClass() != CLASS_DEATH_KNIGHT)
                 break;
 
-            for(uint32 i = 0; i < MAX_RUNES; ++i)
+            for(uint32 rune = 0; rune < MAX_RUNES; ++rune)
             {
-                if(uint16 cd = GetRuneCooldown(i))           // if we have cooldown, reduce it...
-                    SetRuneCooldown(i, (cd < diff) ? 0 : cd - diff);
+                if(uint16 cd = GetRuneCooldown(rune))       // if we have cooldown, reduce it...
+                {
+                    uint32 cd_diff = diff;
+                    AuraList const& ModPowerRegenPCTAuras = GetAurasByType(SPELL_AURA_MOD_POWER_REGEN_PERCENT);
+                    for(AuraList::const_iterator i = ModPowerRegenPCTAuras.begin(); i != ModPowerRegenPCTAuras.end(); ++i)
+                        if ((*i)->GetModifier()->m_miscvalue == power && (*i)->GetMiscBValue()==GetCurrentRune(rune))
+                            cd_diff = cd_diff * ((*i)->GetModifier()->m_amount + 100) / 100.0f;
+
+                    SetRuneCooldown(rune, (cd < cd_diff) ? 0 : cd - cd_diff);
+                }
             }
         }   break;
         case POWER_FOCUS:
