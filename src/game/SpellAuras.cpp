@@ -6899,12 +6899,15 @@ void Aura::PeriodicTick()
                 {
                     case 43093: case 31956: case 38801:
                     case 35321: case 38363: case 39215:
+                    case 48920:
+                    {
                         if(m_target->GetHealth() == m_target->GetMaxHealth() )
                         {
                             m_target->RemoveAurasDueToSpell(GetId());
                             return;
                         }
                         break;
+                    }
                     case 38772:
                     {
                         uint32 percent =
