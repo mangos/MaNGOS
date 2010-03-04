@@ -2826,7 +2826,14 @@ void Spell::EffectApplyAura(SpellEffectIndex eff_idx)
 
     Unit* caster = GetAffectiveCaster();
     if(!caster)
-        return;
+    {
+        // FIXME: currently we can't have auras applied explIcitly by gameobjects
+        // so for auras from wild gameobjects (no owner) target used
+        if (IS_GAMEOBJECT_GUID(m_originalCasterGUID))
+            caster = unitTarget;
+        else
+            return;
+    }
 
     sLog.outDebug("Spell: Aura is: %u", m_spellInfo->EffectApplyAuraName[eff_idx]);
 
