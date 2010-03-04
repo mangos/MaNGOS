@@ -1578,6 +1578,10 @@ void WorldSession::HandleHearthandResurrect(WorldPacket & /*recv_data*/)
 {
     sLog.outDebug("WORLD: CMSG_HEARTH_AND_RESURRECT");
 
+    AreaTableEntry const* atEntry = sAreaStore.LookupEntry(_player->GetAreaId());
+    if(!atEntry || !(atEntry->flags & AREA_FLAG_CAN_HEARTH_AND_RES))
+        return;
+
     // Can't use in flight
     if (_player->isInFlight())
         return;
