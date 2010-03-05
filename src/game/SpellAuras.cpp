@@ -2475,6 +2475,14 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                 m_target->CastSpell(m_target, 47287, true, NULL, this);
                 return;
             }
+            case 58600:                                     // Restricted Flight Area
+            {
+                // Remove Flight Auras
+                m_target->CastSpell(m_target, 58601, true);
+                // Parachute
+                m_target->CastSpell(m_target, 45472, true);
+                return;
+            }
         }
 
         // Living Bomb

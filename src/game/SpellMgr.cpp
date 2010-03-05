@@ -509,6 +509,7 @@ bool IsPositiveEffect(uint32 spellId, SpellEffectIndex effIndex)
                         case 38639:                         // Nether Exhaustion (blue)
                         case 11196:                         // Recently Bandaged
                         case 44689:                         // Relay Race Accept Hidden Debuff - DND
+                        case 58600:                         // Restricted Flight Area
                             return false;
                         // some spells have unclear target modes for selection, so just make effect positive
                         case 27184:
