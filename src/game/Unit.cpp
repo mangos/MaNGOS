@@ -3813,8 +3813,13 @@ bool Unit::AddAura(Aura *Aur)
                         delete Aur;
                         return false;
                     }
+
+                    // Check for coexisting Weapon-proced Auras
+                    if (Aur->isWeaponBuffCoexistableWith(aur2))
+                        continue;
+
                     // Carry over removed Aura's remaining damage if Aura still has ticks remaining
-                    else if (aur2->GetSpellProto()->AttributesEx4 & SPELL_ATTR_EX4_STACK_DOT_MODIFIER && aurName == SPELL_AURA_PERIODIC_DAMAGE && aur2->GetAuraDuration() > 0)
+                    if (aur2->GetSpellProto()->AttributesEx4 & SPELL_ATTR_EX4_STACK_DOT_MODIFIER && aurName == SPELL_AURA_PERIODIC_DAMAGE && aur2->GetAuraDuration() > 0)
                     {
                         int32 remainingTicks = aur2->GetAuraMaxTicks() - aur2->GetAuraTicks();
                         int32 remainingDamage = aur2->GetModifier()->m_amount * remainingTicks;
