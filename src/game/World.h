@@ -376,13 +376,15 @@ struct CliCommandHolder
     typedef void Print(void*, const char*);
     typedef void CommandFinished(void*, bool success);
 
+    uint32 m_cliAccountId;                                  // 0 for console and real account id for RA/soap
+    AccountTypes m_cliAccessLevel;
     void* m_callbackArg;
     char *m_command;
     Print* m_print;
     CommandFinished* m_commandFinished;
 
-    CliCommandHolder(void* callbackArg, const char *command, Print* zprint, CommandFinished* commandFinished)
-        : m_callbackArg(callbackArg), m_print(zprint), m_commandFinished(commandFinished)
+    CliCommandHolder(uint32 accountId, AccountTypes cliAccessLevel, void* callbackArg, const char *command, Print* zprint, CommandFinished* commandFinished)
+        : m_cliAccountId(accountId), m_cliAccessLevel(cliAccessLevel), m_callbackArg(callbackArg), m_print(zprint), m_commandFinished(commandFinished)
     {
         size_t len = strlen(command)+1;
         m_command = new char[len];
