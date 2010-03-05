@@ -211,7 +211,7 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS]=
     &Spell::EffectTriggerRitualOfSummoning,                 //151 SPELL_EFFECT_TRIGGER_SPELL_2
     &Spell::EffectNULL,                                     //152 SPELL_EFFECT_152                      summon Refer-a-Friend
     &Spell::EffectNULL,                                     //153 SPELL_EFFECT_CREATE_PET               misc value is creature entry
-    &Spell::EffectNULL,                                     //154 (single spell: Teach River's Heart Taxi Path)
+    &Spell::EffectTeachTaxiNode,                            //154 SPELL_EFFECT_TEACH_TAXI_NODE          single spell: Teach River's Heart Taxi Path
     &Spell::EffectTitanGrip,                                //155 SPELL_EFFECT_TITAN_GRIP Allows you to equip two-handed axes, maces and swords in one hand, but you attack $49152s1% slower than normal.
     &Spell::EffectEnchantItemPrismatic,                     //156 SPELL_EFFECT_ENCHANT_ITEM_PRISMATIC
     &Spell::EffectCreateItem2,                              //157 SPELL_EFFECT_CREATE_ITEM_2            create item or create item template and replace by some randon spell loot item
@@ -7471,7 +7471,7 @@ void Spell::EffectBind(SpellEffectIndex eff_idx)
 
 void Spell::EffectRestoreItemCharges( SpellEffectIndex eff_idx )
 {
-    if (m_caster->GetTypeId() != TYPEID_PLAYER)
+    if (unitTarget->GetTypeId() != TYPEID_PLAYER)
         return;
 
     Player* player = (Player*)unitTarget;
@@ -7491,4 +7491,27 @@ void Spell::EffectRestoreItemCharges( SpellEffectIndex eff_idx )
         return;
 
     item->RestoreCharges();
+}
+
+void Spell::EffectTeachTaxiNode( SpellEffectIndex eff_idx )
+{
+    if (unitTarget->GetTypeId() != TYPEID_PLAYER)
+        return;
+
+    Player* player = (Player*)unitTarget;
+
+    uint32 taxiNodeId = m_spellInfo->EffectMiscValue[eff_idx];
+    if (!sTaxiNodesStore.LookupEntry(taxiNodeId))
+        return;
+
+    if (player->m_taxi.SetTaximaskNode(taxiNodeId))
+    {
+        WorldPacket data(SMSG_NEW_TAXI_PATH, 0);
+        player->SendDirectMessage( &data );
+
+        data.Initialize( SMSG_TAXINODE_STATUS, 9 );
+        data << uint64( m_caster->GetGUID() );
+        data << uint8( 1 );
+        player->SendDirectMessage( &data );
+    }
 }

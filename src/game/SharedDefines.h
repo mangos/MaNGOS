@@ -682,7 +682,7 @@ enum SpellEffects
     SPELL_EFFECT_TRIGGER_SPELL_2           = 151,
     SPELL_EFFECT_152                       = 152,
     SPELL_EFFECT_153                       = 153,
-    SPELL_EFFECT_154                       = 154,
+    SPELL_EFFECT_TEACH_TAXI_NODE           = 154,
     SPELL_EFFECT_TITAN_GRIP                = 155,
     SPELL_EFFECT_ENCHANT_ITEM_PRISMATIC    = 156,
     SPELL_EFFECT_CREATE_ITEM_2             = 157,
