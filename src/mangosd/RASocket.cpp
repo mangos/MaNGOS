@@ -42,7 +42,8 @@ stage(NONE)
 {
     ///- Get the config parameters
     bSecure = sConfig.GetBoolDefault( "RA.Secure", true );
-    iMinLevel = sConfig.GetIntDefault( "RA.MinLevel", SEC_ADMINISTRATOR );
+    bStricted = sConfig.GetBoolDefault( "RA.Stricted", false );
+    iMinLevel = AccountTypes(sConfig.GetIntDefault( "RA.MinLevel", SEC_ADMINISTRATOR ));
     reference_counting_policy ().value (ACE_Event_Handler::Reference_Counting_Policy::ENABLED);
 }
 
@@ -198,30 +199,32 @@ int RASocket::handle_input(ACE_HANDLE)
                     }
                     sendf("\r\n");
                     sendf(sObjectMgr.GetMangosStringForDBCLocale(LANG_RA_USER));
+                    break;
                 }
-                else
-                {
-                    AccountTypes sec = sAccountMgr.GetSecurity(accId);
 
-                    ///- if gmlevel is too low, deny access
-                    if (sec < iMinLevel)
+                accAccessLevel = sAccountMgr.GetSecurity(accId);
+
+                ///- if gmlevel is too low, deny access
+                if (accAccessLevel < iMinLevel)
+                {
+                    sendf("-Not enough privileges.\r\n");
+                    sLog.outRALog("User %s has no privilege.",szLogin.c_str());
+                    if(bSecure)
                     {
-                        sendf("-Not enough privileges.\r\n");
-                        sLog.outRALog("User %s has no privilege.",szLogin.c_str());
-                        if(bSecure)
-                        {
-                            handle_output();
-                            return -1;
-                        }
-                        sendf("\r\n");
-                        sendf(sObjectMgr.GetMangosStringForDBCLocale(LANG_RA_USER));
+                        handle_output();
+                        return -1;
                     }
-                    else
-                    {
-                        stage=LG;
-                        sendf(sObjectMgr.GetMangosStringForDBCLocale(LANG_RA_PASS));
-                    }
+                    sendf("\r\n");
+                    sendf(sObjectMgr.GetMangosStringForDBCLocale(LANG_RA_USER));
+                    break;
                 }
+
+                ///- allow by remotely connected admin use console level commands dependent from config setting
+                if (accAccessLevel >= SEC_ADMINISTRATOR && !bStricted)
+                    accAccessLevel = SEC_CONSOLE;
+
+                stage=LG;
+                sendf(sObjectMgr.GetMangosStringForDBCLocale(LANG_RA_PASS));
                 break;
             }
             ///<li> If the input is '<password>' (and the user already gave his username)
@@ -261,7 +264,7 @@ int RASocket::handle_input(ACE_HANDLE)
                         return -1;
                     else
                     {
-                        CliCommandHolder* cmd = new CliCommandHolder(this, inputBuffer, &RASocket::zprint, &RASocket::commandFinished);
+                        CliCommandHolder* cmd = new CliCommandHolder(accId, accAccessLevel, this, inputBuffer, &RASocket::zprint, &RASocket::commandFinished);
                         sWorld.QueueCliCommand(cmd);
                         pendingCommands.acquire();
                     }

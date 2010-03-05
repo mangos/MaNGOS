@@ -1,7 +1,7 @@
 #####################################
 # MaNGOS Configuration file         #
 #####################################
-ConfVersion=2008080101
+ConfVersion=2010030401
 
 ###################################################################################################################
 # CONNECTIONS AND DIRECTORIES
@@ -1373,12 +1373,21 @@ Network.TcpNodelay = 1
 #
 #    Ra.Port
 #        Default remote console port
+#        Default: 3443
 #
 #    Ra.MinLevel
 #        Minimum level that's required to login,3 by default
+#        Default: 3 (Administrator)
 #
 #    Ra.Secure
 #        Kick client on wrong pass
+#                 0 - off
+#        Default: 1 - on
+#
+#    Ra.Stricted
+#        Not allow execute console level only commands remotly by RA
+#                 0 - off
+#        Default: 1 - on
 #
 #
 #    SOAP.Enable
@@ -1402,6 +1411,7 @@ Ra.IP = 0.0.0.0
 Ra.Port = 3443
 Ra.MinLevel = 3
 Ra.Secure = 1
+Ra.Stricted = 1
 
 SOAP.Enabled = 0
 SOAP.IP = 127.0.0.1

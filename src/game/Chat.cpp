@@ -75,10 +75,10 @@ ChatCommand * ChatHandler::getCommandTable()
         { "create",         SEC_CONSOLE,        true,  &ChatHandler::HandleAccountCreateCommand,       "", NULL },
         { "delete",         SEC_CONSOLE,        true,  &ChatHandler::HandleAccountDeleteCommand,       "", NULL },
         { "onlinelist",     SEC_CONSOLE,        true,  &ChatHandler::HandleAccountOnlineListCommand,   "", NULL },
-        { "lock",           SEC_PLAYER,         false, &ChatHandler::HandleAccountLockCommand,         "", NULL },
+        { "lock",           SEC_PLAYER,         true,  &ChatHandler::HandleAccountLockCommand,         "", NULL },
         { "set",            SEC_ADMINISTRATOR,  true,  NULL,                                           "", accountSetCommandTable },
-        { "password",       SEC_PLAYER,         false, &ChatHandler::HandleAccountPasswordCommand,     "", NULL },
-        { "",               SEC_PLAYER,         false, &ChatHandler::HandleAccountCommand,             "", NULL },
+        { "password",       SEC_PLAYER,         true,  &ChatHandler::HandleAccountPasswordCommand,     "", NULL },
+        { "",               SEC_PLAYER,         true,  &ChatHandler::HandleAccountCommand,             "", NULL },
         { NULL,             0,                  false, NULL,                                           "", NULL }
     };
 
@@ -703,10 +703,20 @@ const char *ChatHandler::GetMangosString(int32 entry) const
     return m_session->GetMangosString(entry);
 }
 
+uint32 ChatHandler::GetAccountId() const
+{
+    return m_session->GetAccountId();
+}
+
+AccountTypes ChatHandler::GetAccessLevel() const
+{
+    return m_session->GetSecurity();
+}
+
 bool ChatHandler::isAvailable(ChatCommand const& cmd) const
 {
     // check security level only for simple  command (without child commands)
-    return m_session->GetSecurity() >= (AccountTypes)cmd.SecurityLevel;
+    return GetAccessLevel() >= (AccountTypes)cmd.SecurityLevel;
 }
 
 bool ChatHandler::HasLowerSecurity(Player* target, uint64 guid, bool strong)
@@ -733,12 +743,8 @@ bool ChatHandler::HasLowerSecurityAccount(WorldSession* target, uint32 target_ac
 {
     AccountTypes target_sec;
 
-    // allow everything from console and RA console
-    if (!m_session)
-        return false;
-
     // ignore only for non-players for non strong checks (when allow apply command at least to same sec level)
-    if (m_session->GetSecurity() > SEC_PLAYER && !strong && !sWorld.getConfig(CONFIG_BOOL_GM_LOWER_SECURITY))
+    if (GetAccessLevel() > SEC_PLAYER && !strong && !sWorld.getConfig(CONFIG_BOOL_GM_LOWER_SECURITY))
         return false;
 
     if (target)
@@ -748,7 +754,7 @@ bool ChatHandler::HasLowerSecurityAccount(WorldSession* target, uint32 target_ac
     else
         return true;                                        // caller must report error for (target==NULL && target_account==0)
 
-    if (m_session->GetSecurity() < target_sec || (strong && m_session->GetSecurity() <= target_sec))
+    if (GetAccessLevel() < target_sec || (strong && GetAccessLevel() <= target_sec))
     {
         SendSysMessage(LANG_YOURS_SECURITY_IS_LOW);
         SetSentErrorMessage(true);
@@ -890,13 +896,18 @@ bool ChatHandler::ExecuteCommandInTable(ChatCommand *table, const char* text, co
             if(table[i].SecurityLevel > SEC_PLAYER)
             {
                 // chat case
-                if(m_session)
+                if (m_session)
                 {
                     Player* p = m_session->GetPlayer();
                     uint64 sel_guid = p->GetSelection();
-                    sLog.outCommand(m_session->GetAccountId(),"Command: %s [Player: %s (Account: %u) X: %f Y: %f Z: %f Map: %u Selected: %s (GUID: %u)]",
-                        fullcmd.c_str(),p->GetName(),m_session->GetAccountId(),p->GetPositionX(),p->GetPositionY(),p->GetPositionZ(),p->GetMapId(),
+                    sLog.outCommand(GetAccountId(),"Command: %s [Player: %s (Account: %u) X: %f Y: %f Z: %f Map: %u Selected: %s (GUID: %u)]",
+                        fullcmd.c_str(),p->GetName(),GetAccountId(),p->GetPositionX(),p->GetPositionY(),p->GetPositionZ(),p->GetMapId(),
                         GetLogNameForGuid(sel_guid),GUID_LOPART(sel_guid));
+                }
+                else                                        // 0 account -> console
+                {
+                    sLog.outCommand(GetAccountId(),"Command: %s [Account: %u from %s]",
+                        fullcmd.c_str(),GetAccountId(),GetAccountId() ? "RA-connection" : "Console");
                 }
             }
         }
@@ -2253,10 +2264,24 @@ const char *CliHandler::GetMangosString(int32 entry) const
     return sObjectMgr.GetMangosStringForDBCLocale(entry);
 }
 
+uint32 CliHandler::GetAccountId() const
+{
+    return m_accountId;
+}
+
+AccountTypes CliHandler::GetAccessLevel() const
+{
+    return m_loginAccessLevel;
+}
+
 bool CliHandler::isAvailable(ChatCommand const& cmd) const
 {
     // skip non-console commands in console case
-    return cmd.AllowConsole;
+    if (!cmd.AllowConsole)
+        return false;
+
+    // normal case
+    return GetAccessLevel() >= (AccountTypes)cmd.SecurityLevel;
 }
 
 void CliHandler::SendSysMessage(const char *str)

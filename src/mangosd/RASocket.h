@@ -77,10 +77,11 @@ class RASocket: protected RAHandler
         uint32 outputBufferLen;
 
         uint32 accId;
+        AccountTypes accAccessLevel;
         bool bSecure;                                       //kick on wrong pass, non exist. user OR user with no priv
         //will protect from DOS, bruteforce attacks
-        //some 'smart' protection must be added for more security
-        uint8 iMinLevel;
+        bool bStricted;                                     // not allow execute console only commands (SEC_CONSOLE) remotly
+        AccountTypes iMinLevel;
         enum
         {
             NONE,                                           //initial value

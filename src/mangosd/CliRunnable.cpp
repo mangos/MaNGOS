@@ -348,7 +348,7 @@ void CliRunnable::run()
                 continue;
             }
 
-            sWorld.QueueCliCommand(new CliCommandHolder(NULL, command.c_str(), &utf8print, &commandFinished));
+            sWorld.QueueCliCommand(new CliCommandHolder(0, SEC_CONSOLE, NULL, command.c_str(), &utf8print, &commandFinished));
         }
         else if (feof(stdin))
         {

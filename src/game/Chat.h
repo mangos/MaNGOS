@@ -78,6 +78,8 @@ class ChatHandler
         bool hasStringAbbr(const char* name, const char* part);
 
         // function with different implementation for chat/console
+        virtual uint32 GetAccountId() const;
+        virtual AccountTypes GetAccessLevel() const;
         virtual bool isAvailable(ChatCommand const& cmd) const;
         virtual std::string GetNameLink() const { return GetNameLink(m_session->GetPlayer()); }
         virtual bool needReportToTarget(Player* chr) const;
@@ -554,10 +556,13 @@ class CliHandler : public ChatHandler
 {
     public:
         typedef void Print(void*, char const*);
-        explicit CliHandler(void* callbackArg, Print* zprint) : m_callbackArg(callbackArg), m_print(zprint) {}
+        explicit CliHandler(uint32 accountId, AccountTypes accessLevel, void* callbackArg, Print* zprint)
+            : m_accountId(accountId), m_loginAccessLevel(accessLevel), m_callbackArg(callbackArg), m_print(zprint) {}
 
         // overwrite functions
         const char *GetMangosString(int32 entry) const;
+        uint32 GetAccountId() const;
+        AccountTypes GetAccessLevel() const;
         bool isAvailable(ChatCommand const& cmd) const;
         void SendSysMessage(const char *str);
         std::string GetNameLink() const;
@@ -566,6 +571,8 @@ class CliHandler : public ChatHandler
         int GetSessionDbLocaleIndex() const;
 
     private:
+        uint32 m_accountId;
+        AccountTypes m_loginAccessLevel;
         void* m_callbackArg;
         Print* m_print;
 };

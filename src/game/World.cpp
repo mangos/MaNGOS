@@ -1819,7 +1819,7 @@ void World::UpdateSessions( uint32 diff )
     }
 }
 
-// This handles the issued and queued CLI commands
+// This handles the issued and queued CLI/RA commands
 void World::ProcessCliCommands()
 {
     CliCommandHolder::Print* zprint = NULL;
@@ -1830,7 +1830,7 @@ void World::ProcessCliCommands()
         sLog.outDebug("CLI command under processing...");
         zprint = command->m_print;
         callbackArg = command->m_callbackArg;
-        CliHandler handler(callbackArg, zprint);
+        CliHandler handler(command->m_cliAccountId, command->m_cliAccessLevel, callbackArg, zprint);
         handler.ParseCommands(command->m_command);
 
         if(command->m_commandFinished)
