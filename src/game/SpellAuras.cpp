@@ -5316,6 +5316,7 @@ void Aura::HandleAuraModIncreaseHealth(bool apply, bool Real)
         case 50322:                                         // Survival Instincts
         case 54443:                                         // Demonic Empowerment (Voidwalker)
         case 55233:                                         // Vampiric Blood
+        case 59465:                                         // Brood Rage (Ahn'Kahet)
         {
             if(Real)
             {
