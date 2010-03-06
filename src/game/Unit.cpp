@@ -7274,6 +7274,13 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
                 //case 59288: break;                        // Infra-Green Shield
                 //case 59532: break;                        // Abandon Passengers on Poly
                 //case 59735: break:                        // Woe Strike
+                case 64415:                                 // // Val'anyr Hammer of Ancient Kings - Equip Effect
+                {
+                    // for DOT procs
+                    if (!IsPositiveSpell(procSpell->Id))
+                        return false;
+                    break;
+                }
                 case 67702:                                 // Death's Choice, Item - Coliseum 25 Normal Melee Trinket
                 {
                     float stat = 0.0f;
