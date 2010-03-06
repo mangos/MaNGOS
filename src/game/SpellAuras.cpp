@@ -4495,6 +4495,9 @@ void Aura::HandleModMechanicImmunity(bool apply, bool /*Real*/)
             }
         }
     }
+    // Heroic Fury (Intercept cooldown remove)
+    else if (apply && GetSpellProto()->Id == 60970 && m_target->GetTypeId() == TYPEID_PLAYER)
+        ((Player*)m_target)->RemoveSpellCooldown(20252, true);
 }
 
 void Aura::HandleModMechanicImmunityMask(bool apply, bool /*Real*/)
