@@ -401,6 +401,9 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                 // Heroic Throw ${$m1+$AP*.50}
                 else if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0000000100000000))
                     damage+= uint32(m_caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.5f);
+                // Shattering Throw ${$m1+$AP*.50}
+                else if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0040000000000000))
+                    damage+= uint32(m_caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.5f);
                 // Shockwave ${$m3/100*$AP}
                 else if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0000800000000000))
                 {
