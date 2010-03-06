@@ -5141,7 +5141,7 @@ SpellCastResult Spell::CheckCasterAuras() const
         Unit::AuraList const& casingLimit = m_caster->GetAurasByType(SPELL_AURA_ALLOW_ONLY_ABILITY);
         for(Unit::AuraList::const_iterator itr = casingLimit.begin(); itr != casingLimit.end(); ++itr)
         {
-            if(!IsAffectedByAura(*itr))
+            if(!(*itr)->isAffectedOnSpell(m_spellInfo))
             {
                prevented_reason = SPELL_FAILED_CASTER_AURASTATE;
                break;
@@ -5951,14 +5951,6 @@ void Spell::UpdatePointers()
     UpdateOriginalCasterPointer();
 
     m_targets.Update(m_caster);
-}
-
-bool Spell::IsAffectedByAura(Aura *aura) const
-{
-    if(SpellModifier* mod = aura->getAuraSpellMod())
-        return mod->isAffectedOnSpell(m_spellInfo);
-    else
-        return false;
 }
 
 bool Spell::CheckTargetCreatureType(Unit* target) const
