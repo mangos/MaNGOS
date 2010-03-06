@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_9528_01_mangos_spell_bonus_data` bit(1) default NULL
+  `required_9539_01_mangos_spell_bonus_data` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -14157,6 +14157,8 @@ INSERT INTO `spell_bonus_data` VALUES
 (61391, 0.193,  0,       0,     'Druid - Typhoon'),
 (48438, 0,      0.11505, 0,     'Druid - Wild Growth'),
 (5176,  0.5714, 0,       0,     'Druid - Wrath'),
+/* Generic */
+(54757, 0,      0,       0,     'Generic - Pyro Rocket'),
 /* Mage */
 (44425, 0.714286,0,      0,     'Mage - Arcane Barrage'),
 (30451, 0.7143, 0,       0,     'Mage - Arcane Blast'),
@@ -14270,6 +14272,7 @@ INSERT INTO `spell_bonus_data` VALUES
 /* Item */
 (56131, 0,      0,       0,     'Item - Glyph of Dispel Magic'),
 (56160, 0,      0,       0,     'Item - Glyph of Power Word: Shield'),
+(46567, 0,      0,       0,     'Item - Goblin Rocket Launcher'),
 (31024, 0,      0,       0,     'Item - Living Ruby Pedant'),
 (17712, 0,      0,       0,     'Item - Lifestone Healing'),
 (5707,  0,      0,       0,     'Item - Lifestone Regeneration'),
