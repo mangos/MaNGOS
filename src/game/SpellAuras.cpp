@@ -6430,7 +6430,7 @@ void Aura::HandleSpellSpecificBoosts(bool apply)
                         }
 
                         if (power_pct || !apply)
-                            spellId2 = 49772;                   // Unholy Presence, speed part
+                            spellId2 = 49772;                   // Unholy Presence, speed part, spell1 used for Improvement presence fit to own presence
                     }
                     else
                         spellId1 = 49772;                       // Unholy Presence move speed
@@ -6464,7 +6464,7 @@ void Aura::HandleSpellSpecificBoosts(bool apply)
 
                     if (GetId()==48265)                     // Unholy Presence
                     {
-                        // Improved Unholy Presence
+                        // Improved Unholy Presence, special case for own presence
                         int32 power_pct = 0;
                         if (apply)
                         {
@@ -6493,9 +6493,6 @@ void Aura::HandleSpellSpecificBoosts(bool apply)
                             m_target->RemoveAurasDueToSpell(65095);
                         }
                     }
-                    else
-                        spellId1 = 63611;                   // Improved Blood Presence, trigger for heal
-
                     break;
                 }
             }
