@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_9512_01_mangos_spell_proc_event` bit(1) default NULL
+  `required_9528_01_mangos_spell_bonus_data` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -14268,6 +14268,7 @@ INSERT INTO `spell_bonus_data` VALUES
 (30294, 0,      0,       0,     'Warlock - Soul Leech'),
 (31117, 1.8,    0,       0,     'Warlock - Unstable Affliction Dispell'),
 /* Item */
+(56131, 0,      0,       0,     'Item - Glyph of Dispel Magic'),
 (56160, 0,      0,       0,     'Item - Glyph of Power Word: Shield'),
 (31024, 0,      0,       0,     'Item - Living Ruby Pedant'),
 (17712, 0,      0,       0,     'Item - Lifestone Healing'),
@@ -17992,8 +17993,8 @@ INSERT INTO `spell_proc_event` VALUES
 (16880, 0x00000000,  0, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000002, 0.000000, 0.000000,  0),
 (16923, 0x00000000,  7, 0x00000004, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0.000000, 0.000000,  0),
 (16924, 0x00000000,  7, 0x00000004, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0.000000, 0.000000,  0),
-(16952, 0x00000000,  7, 0x00039000, 0x00000400, 0x00000000, 0x00040000, 0x00000002, 0.000000, 0.000000,  0),
-(16954, 0x00000000,  7, 0x00039000, 0x00000400, 0x00000000, 0x00040000, 0x00000002, 0.000000, 0.000000,  0),
+(16952, 0x00000000,  7, 0x00039000, 0x00000400, 0x00040000, 0x00000000, 0x00000002, 0.000000, 0.000000,  0),
+(16954, 0x00000000,  7, 0x00039000, 0x00000400, 0x00040000, 0x00000000, 0x00000002, 0.000000, 0.000000,  0),
 (16958, 0x00000000,  0, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000002, 0.000000, 0.000000,  0),
 (16961, 0x00000000,  0, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000002, 0.000000, 0.000000,  0),
 (17106, 0x00000000,  7, 0x00080000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0.000000, 0.000000,  0),
