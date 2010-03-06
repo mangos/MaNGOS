@@ -8830,7 +8830,7 @@ bool Player::IsBagPos( uint16 pos )
     return false;
 }
 
-bool Player::IsValidPos( uint8 bag, uint8 slot, bool explicit_pos )
+bool Player::IsValidPos( uint8 bag, uint8 slot, bool explicit_pos ) const
 {
     // post selected
     if(bag == NULL_BAG && !explicit_pos)
