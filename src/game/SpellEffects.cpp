@@ -3072,7 +3072,20 @@ void Spell::EffectHeal(SpellEffectIndex /*eff_idx*/)
         else
             addhealth = caster->SpellHealingBonus(unitTarget, m_spellInfo, addhealth, HEAL);
 
-        m_healing+=addhealth;
+        m_healing += addhealth;
+
+        // Chain Healing
+        if (m_spellInfo->SpellFamilyName == SPELLFAMILY_SHAMAN && m_spellInfo->SpellFamilyFlags & UI64LIT(0x0000000000000100))
+        {
+            // check for Riptide
+            if (unitTarget != m_targets.getUnitTarget())
+                return;
+            Aura* riptide = unitTarget->GetAura(SPELL_AURA_PERIODIC_HEAL, SPELLFAMILY_SHAMAN, 0, 0x00000010, caster->GetGUID());
+            if (!riptide)
+                return;
+            m_healing += m_healing/4;
+            unitTarget->RemoveAura(riptide);
+        }
     }
 }
 
