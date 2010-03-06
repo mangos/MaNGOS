@@ -354,6 +354,14 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                         damage+= uint32(m_caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.12f);
                         break;
                     }
+                    // percent max target health
+                    case 29142:                             // Eyesore Blaster
+                    case 35139:                             // Throw Boom's Doom
+                    case 49882:                             // Leviroth Self-Impale
+                    {
+                        damage = damage * unitTarget->GetMaxHealth() / 100;
+                        break;
+                    }
                     // Cataclysmic Bolt
                     case 38441:
                     {
