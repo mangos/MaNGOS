@@ -84,7 +84,7 @@ public PathMovementBase<Creature, WaypointPath const*>
 
         void MovementInform(Creature &);
 
-        MovementGeneratorType GetMovementGeneratorType() { return WAYPOINT_MOTION_TYPE; }
+        MovementGeneratorType GetMovementGeneratorType() const { return WAYPOINT_MOTION_TYPE; }
 
         // now path movement implmementation
         void LoadPath(Creature &c);
@@ -121,7 +121,7 @@ public PathMovementBase<Player>
         void Interrupt(Player &);
         void Reset(Player &);
         bool Update(Player &, const uint32 &);
-        MovementGeneratorType GetMovementGeneratorType() { return FLIGHT_MOTION_TYPE; }
+        MovementGeneratorType GetMovementGeneratorType() const { return FLIGHT_MOTION_TYPE; }
 
         void LoadPath(Player &);
 

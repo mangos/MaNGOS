@@ -38,7 +38,7 @@ class MANGOS_DLL_SPEC ConfusedMovementGenerator
         void Reset(T &);
         bool Update(T &, const uint32 &);
 
-        MovementGeneratorType GetMovementGeneratorType() { return CONFUSED_MOTION_TYPE; }
+        MovementGeneratorType GetMovementGeneratorType() const { return CONFUSED_MOTION_TYPE; }
     private:
         void _InitSpecific(T &, bool &, bool &);
         TimeTracker i_nextMoveTime;
