@@ -194,6 +194,7 @@ libmangosgame_a_SOURCES = \
 	ObjectAccessor.cpp \
 	ObjectAccessor.h \
 	Object.cpp \
+	ObjectGuid.cpp \
 	ObjectGuid.h \
 	ObjectGridLoader.cpp \
 	ObjectGridLoader.h \

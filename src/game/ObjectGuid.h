@@ -19,7 +19,35 @@
 #ifndef MANGOS_OBJECT_GUID_H
 #define MANGOS_OBJECT_GUID_H
 
-#include "Platform/Define.h"
+#include "Common.h"
+
+class ByteBuffer;
+
+enum TypeID
+{
+    TYPEID_OBJECT        = 0,
+    TYPEID_ITEM          = 1,
+    TYPEID_CONTAINER     = 2,
+    TYPEID_UNIT          = 3,
+    TYPEID_PLAYER        = 4,
+    TYPEID_GAMEOBJECT    = 5,
+    TYPEID_DYNAMICOBJECT = 6,
+    TYPEID_CORPSE        = 7
+};
+
+#define MAX_TYPE_ID        8
+
+enum TypeMask
+{
+    TYPEMASK_OBJECT         = 0x0001,
+    TYPEMASK_ITEM           = 0x0002,
+    TYPEMASK_CONTAINER      = 0x0006,                       // TYPEMASK_ITEM | 0x0004
+    TYPEMASK_UNIT           = 0x0008,
+    TYPEMASK_PLAYER         = 0x0010,
+    TYPEMASK_GAMEOBJECT     = 0x0020,
+    TYPEMASK_DYNAMICOBJECT  = 0x0040,
+    TYPEMASK_CORPSE         = 0x0080
+};
 
 enum HighGuid
 {
@@ -36,8 +64,7 @@ enum HighGuid
     HIGHGUID_MO_TRANSPORT   = 0x1FC0,                       // blizz 1FC0 (for GAMEOBJECT_TYPE_MO_TRANSPORT)
 };
 
-#define IS_EMPTY_GUID(Guid)          ( Guid == 0 )
-
+//*** Must be replaced by ObjectGuid use ***
 #define IS_CREATURE_GUID(Guid)       ( GUID_HIPART(Guid) == HIGHGUID_UNIT )
 #define IS_PET_GUID(Guid)            ( GUID_HIPART(Guid) == HIGHGUID_PET )
 #define IS_VEHICLE_GUID(Guid)        ( GUID_HIPART(Guid) == HIGHGUID_VEHICLE )
@@ -47,9 +74,7 @@ enum HighGuid
                                                             // special case for empty guid need check
 #define IS_ITEM_GUID(Guid)           ( GUID_HIPART(Guid) == HIGHGUID_ITEM )
 #define IS_GAMEOBJECT_GUID(Guid)     ( GUID_HIPART(Guid) == HIGHGUID_GAMEOBJECT )
-#define IS_DYNAMICOBJECT_GUID(Guid)  ( GUID_HIPART(Guid) == HIGHGUID_DYNAMICOBJECT )
 #define IS_CORPSE_GUID(Guid)         ( GUID_HIPART(Guid) == HIGHGUID_CORPSE )
-#define IS_TRANSPORT(Guid)           ( GUID_HIPART(Guid) == HIGHGUID_TRANSPORT )
 #define IS_MO_TRANSPORT(Guid)        ( GUID_HIPART(Guid) == HIGHGUID_MO_TRANSPORT )
 
 // l - OBJECT_FIELD_GUID
@@ -88,22 +113,92 @@ inline bool IsGuidHaveEnPart(uint64 const& guid)
 #define GUID_ENPART(x) (IsGuidHaveEnPart(x) ? _GUID_ENPART_3(x) : _GUID_ENPART_2(x))
 #define GUID_LOPART(x) (IsGuidHaveEnPart(x) ? _GUID_LOPART_3(x) : _GUID_LOPART_2(x))
 
-inline char const* GetLogNameForGuid(uint64 guid)
+//*** Must be replaced by ObjectGuid use END ***
+
+class ObjectGuid
 {
-    switch(GUID_HIPART(guid))
-    {
-        case HIGHGUID_ITEM:         return "item";
-        case HIGHGUID_PLAYER:       return guid ? "player" : "none";
-        case HIGHGUID_GAMEOBJECT:   return "gameobject";
-        case HIGHGUID_TRANSPORT:    return "transport";
-        case HIGHGUID_UNIT:         return "creature";
-        case HIGHGUID_PET:          return "pet";
-        case HIGHGUID_VEHICLE:      return "vehicle";
-        case HIGHGUID_DYNAMICOBJECT:return "dynobject";
-        case HIGHGUID_CORPSE:       return "corpse";
-        case HIGHGUID_MO_TRANSPORT: return "mo_transport";
-        default:
-            return "<unknown>";
-    }
-}
+    public:                                                 // constructors
+        ObjectGuid() : m_guid(0) {}
+        ObjectGuid(uint64 const& guid) : m_guid(guid) {}    // NOTE: must be explicit in future for more strict control type conversions
+        ObjectGuid(HighGuid hi, uint32 entry, uint32 counter) : m_guid(uint64(counter) | (uint64(entry) << 24) | (uint64(hi) << 48)) {}
+
+    public:                                                 // modifiers
+        void Set(uint64 const& guid) { m_guid = guid; }
+
+        // Possible removed in future for more strict control type conversions
+        void operator= (uint64 const& guid) { m_guid = guid; }
+    public:                                                 // accessors
+        uint64 const& GetRawValue() const { return m_guid; }
+        HighGuid GetHigh() const { return HighGuid((m_guid >> 48) & 0x0000FFFF); }
+        uint32   GetEntry() const { return HasEntry() ? uint32((m_guid >> 24) & UI64LIT(0x0000000000FFFFFF)) : 0; }
+        uint32   GetCounter()  const
+        {
+            return HasEntry()
+                ? uint32(m_guid & UI64LIT(0x0000000000FFFFFF))
+                : uint32(m_guid & UI64LIT(0x00000000FFFFFFFF));
+        }
+
+        bool IsEmpty()         const { return m_guid == 0; }
+        bool IsCreature()      const { return GetHigh() == HIGHGUID_UNIT; }
+        bool IsPet()           const { return GetHigh() == HIGHGUID_PET; }
+        bool IsVehicle()       const { return GetHigh() == HIGHGUID_VEHICLE; }
+        bool IsCreatureOrPet() const { return GetHigh() == HIGHGUID_VEHICLE; }
+        bool IsPlayer()        const { return !IsEmpty() && GetHigh() == HIGHGUID_PLAYER; }
+        bool IsUnit()          const { return IsCreatureOrPet() || IsPlayer(); }
+        bool IsItem()          const { return GetHigh() == HIGHGUID_ITEM; }
+        bool IsGameobject()    const { return GetHigh() == HIGHGUID_GAMEOBJECT; }
+        bool IsDynamicObject() const { return GetHigh() == HIGHGUID_DYNAMICOBJECT; }
+        bool IsCorpse()        const { return GetHigh() == HIGHGUID_CORPSE; }
+        bool IsTransport()     const { return GetHigh() == HIGHGUID_TRANSPORT; }
+        bool IsMOTransport()   const { return GetHigh() == HIGHGUID_MO_TRANSPORT; }
+
+        TypeID GetTypeId()
+        {
+            switch(GetHigh())
+            {
+                case HIGHGUID_ITEM:         return TYPEID_ITEM;
+                //case HIGHGUID_CONTAINER:    return TYPEID_CONTAINER; HIGHGUID_CONTAINER==HIGHGUID_ITEM currently
+                case HIGHGUID_UNIT:         return TYPEID_UNIT;
+                case HIGHGUID_PET:          return TYPEID_UNIT;
+                case HIGHGUID_PLAYER:       return TYPEID_PLAYER;
+                case HIGHGUID_GAMEOBJECT:   return TYPEID_GAMEOBJECT;
+                case HIGHGUID_DYNAMICOBJECT:return TYPEID_DYNAMICOBJECT;
+                case HIGHGUID_CORPSE:       return TYPEID_CORPSE;
+                case HIGHGUID_MO_TRANSPORT: return TYPEID_GAMEOBJECT;
+                case HIGHGUID_VEHICLE:      return TYPEID_UNIT;
+                // unknown
+                default:                    return TYPEID_OBJECT;
+            }
+        }
+    public:                                                 // accessors - for debug
+        char const* GetTypeName() const;
+        std::string GetString() const;
+    private:                                                // internal functions
+        bool HasEntry() const
+        {
+            switch(GetHigh())
+            {
+                case HIGHGUID_ITEM:
+                case HIGHGUID_PLAYER:
+                case HIGHGUID_DYNAMICOBJECT:
+                case HIGHGUID_CORPSE:
+                    return false;
+                case HIGHGUID_GAMEOBJECT:
+                case HIGHGUID_TRANSPORT:
+                case HIGHGUID_UNIT:
+                case HIGHGUID_PET:
+                case HIGHGUID_VEHICLE:
+                case HIGHGUID_MO_TRANSPORT:
+                default:
+                    return true;
+            }
+        }
+
+    private:                                                // fields
+        uint64 m_guid;
+};
+
+ByteBuffer& operator<< (ByteBuffer& buf, ObjectGuid const& guid);
+ByteBuffer& operator>> (ByteBuffer& buf, ObjectGuid&       guid);
+
 #endif

@@ -26,19 +26,19 @@
 
 void WorldSession::HandleAttackSwingOpcode( WorldPacket & recv_data )
 {
-    uint64 guid;
+    ObjectGuid guid;
     recv_data >> guid;
 
-    DEBUG_LOG( "WORLD: Recvd CMSG_ATTACKSWING Message guidlow:%u guidhigh:%u", GUID_LOPART(guid), GUID_HIPART(guid) );
+    DEBUG_LOG("WORLD: Recvd CMSG_ATTACKSWING Message %s", guid.GetString().c_str());
 
-    Unit *pEnemy = ObjectAccessor::GetUnit(*_player, guid);
+    Unit *pEnemy = ObjectAccessor::GetUnit(*_player, guid.GetRawValue());
 
     if(!pEnemy)
     {
-        if(!IS_UNIT_GUID(guid))
-            sLog.outError("WORLD: Object %u (TypeID: %u) isn't player, pet or creature",GUID_LOPART(guid),GuidHigh2TypeId(GUID_HIPART(guid)));
+        if(!guid.IsUnit())
+            sLog.outError("WORLD: %u isn't player, pet or creature", guid.GetString().c_str());
         else
-            sLog.outError( "WORLD: Enemy %s %u not found",GetLogNameForGuid(guid),GUID_LOPART(guid));
+            sLog.outError( "WORLD: Enemy %s not found", guid.GetString().c_str());
 
         // stop attack state at client
         SendAttackStop(NULL);
@@ -47,7 +47,7 @@ void WorldSession::HandleAttackSwingOpcode( WorldPacket & recv_data )
 
     if(_player->IsFriendlyTo(pEnemy) || pEnemy->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE))
     {
-        sLog.outError( "WORLD: Enemy %s %u is friendly",(IS_PLAYER_GUID(guid) ? "player" : "creature"),GUID_LOPART(guid));
+        sLog.outError( "WORLD: Enemy %s is friendly",guid.GetString().c_str());
 
         // stop attack state at client
         SendAttackStop(pEnemy);
