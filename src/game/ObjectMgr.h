@@ -313,9 +313,10 @@ enum ConditionType
     CONDITION_AREA_FLAG             = 13,                   // area_flag    area_flag_not
     CONDITION_RACE_CLASS            = 14,                   // race_mask    class_mask
     CONDITION_LEVEL                 = 15,                   // player_level 0, 1 or 2 (0: equal to, 1: equal or higher than, 2: equal or less than)
+    CONDITION_NOITEM                = 16,                   // item_id      count
 };
 
-#define MAX_CONDITION                 16                    // maximum value in ConditionType enum
+#define MAX_CONDITION                 17                    // maximum value in ConditionType enum
 
 struct PlayerCondition
 {
