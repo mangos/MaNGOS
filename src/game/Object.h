@@ -24,7 +24,7 @@
 #include "UpdateFields.h"
 #include "UpdateData.h"
 #include "GameSystem/GridReference.h"
-#include "ObjectDefines.h"
+#include "ObjectGuid.h"
 
 #include <set>
 #include <string>

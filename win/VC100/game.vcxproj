@@ -576,7 +576,7 @@
     <ClInclude Include="..\..\src\game\NullCreatureAI.h" />
     <ClInclude Include="..\..\src\game\Object.h" />
     <ClInclude Include="..\..\src\game\ObjectAccessor.h" />
-    <ClInclude Include="..\..\src\game\ObjectDefines.h" />
+    <ClInclude Include="..\..\src\game\ObjectGuid.h" />
     <ClInclude Include="..\..\src\game\ObjectGridLoader.h" />
     <ClInclude Include="..\..\src\game\ObjectMgr.h" />
     <ClInclude Include="..\..\src\game\ObjectPosSelector.h" />

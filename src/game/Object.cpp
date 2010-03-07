@@ -27,7 +27,7 @@
 #include "Player.h"
 #include "Vehicle.h"
 #include "ObjectMgr.h"
-#include "ObjectDefines.h"
+#include "ObjectGuid.h"
 #include "UpdateData.h"
 #include "UpdateMask.h"
 #include "Util.h"
