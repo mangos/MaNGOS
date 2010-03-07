@@ -142,7 +142,7 @@ class ObjectGuid
         bool IsCreature()      const { return GetHigh() == HIGHGUID_UNIT; }
         bool IsPet()           const { return GetHigh() == HIGHGUID_PET; }
         bool IsVehicle()       const { return GetHigh() == HIGHGUID_VEHICLE; }
-        bool IsCreatureOrPet() const { return GetHigh() == HIGHGUID_VEHICLE; }
+        bool IsCreatureOrPet() const { return IsCreature() || IsPet(); }
         bool IsPlayer()        const { return !IsEmpty() && GetHigh() == HIGHGUID_PLAYER; }
         bool IsUnit()          const { return IsCreatureOrPet() || IsPlayer(); }
         bool IsItem()          const { return GetHigh() == HIGHGUID_ITEM; }
