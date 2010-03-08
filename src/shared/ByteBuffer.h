@@ -240,7 +240,7 @@ class ByteBuffer
         }
 
         template<class T>
-        ByteBuffer &operator>>(Unused<T> &)
+        ByteBuffer &operator>>(Unused<T> const&)
         {
             read_skip<T>();
             return *this;
