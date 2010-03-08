@@ -1297,7 +1297,7 @@ void WorldSession::HandleEquipmentSetUse(WorldPacket &recv_data)
         recv_data >> itemGuid.ReadAsPacked();
         recv_data >> srcbag >> srcslot;
 
-        sLog.outDebug("Item " I64FMT ": srcbag %u, srcslot %u", itemGuid, srcbag, srcslot);
+        sLog.outDebug("Item " I64FMT ": srcbag %u, srcslot %u", itemGuid.GetRawValue(), srcbag, srcslot);
 
         Item *item = _player->GetItemByGuid(itemGuid.GetRawValue());
 
