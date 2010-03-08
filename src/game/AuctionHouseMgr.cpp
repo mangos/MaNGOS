@@ -28,7 +28,7 @@
 #include "Language.h"
 #include "Log.h"
 #include "ObjectMgr.h"
-#include "ObjectDefines.h"
+#include "ObjectGuid.h"
 #include "Player.h"
 #include "World.h"
 #include "WorldPacket.h"

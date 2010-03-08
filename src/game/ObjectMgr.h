@@ -34,7 +34,7 @@
 #include "Mail.h"
 #include "Map.h"
 #include "ObjectAccessor.h"
-#include "ObjectDefines.h"
+#include "ObjectGuid.h"
 #include "Policies/Singleton.h"
 #include "Database/SQLStorage.h"
 
