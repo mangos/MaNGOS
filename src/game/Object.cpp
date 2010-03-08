@@ -27,7 +27,7 @@
 #include "Player.h"
 #include "Vehicle.h"
 #include "ObjectMgr.h"
-#include "ObjectDefines.h"
+#include "ObjectGuid.h"
 #include "UpdateData.h"
 #include "UpdateMask.h"
 #include "Util.h"
@@ -60,7 +60,7 @@ uint32 GuidHigh2TypeId(uint32 guid_hi)
         case HIGHGUID_MO_TRANSPORT: return TYPEID_GAMEOBJECT;
         case HIGHGUID_VEHICLE:      return TYPEID_UNIT;
     }
-    return NUM_CLIENT_OBJECT_TYPES;                         // unknown
+    return TYPEID_OBJECT;                                   // unknown
 }
 
 Object::Object( ) : m_PackGUID(sizeof(uint64)+1)

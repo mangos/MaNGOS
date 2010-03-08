@@ -24,7 +24,7 @@
 #include "ObjectMgr.h"
 #include "ProgressBar.h"
 #include "Policies/SingletonImp.h"
-#include "ObjectDefines.h"
+#include "ObjectGuid.h"
 #include "GridDefines.h"
 
 INSTANTIATE_SINGLETON_1(CreatureEventAIMgr);
