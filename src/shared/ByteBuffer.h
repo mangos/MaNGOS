@@ -45,6 +45,12 @@ class ByteBufferException
         size_t size;
 };
 
+template<class T>
+struct Unused
+{
+    Unused() {}
+};
+
 class ByteBuffer
 {
     public:
@@ -233,6 +239,14 @@ class ByteBuffer
             return *this;
         }
 
+        template<class T>
+        ByteBuffer &operator>>(Unused<T> &)
+        {
+            read_skip<T>();
+            return *this;
+        }
+
+
         uint8 operator[](size_t pos) const
         {
             return read<uint8>(pos);
@@ -288,13 +302,9 @@ class ByteBuffer
             _rpos += len;
         }
 
-        bool readPackGUID(uint64& guid)
+        uint64 readPackGUID()
         {
-            if(rpos() + 1 > size())
-                return false;
-
-            guid = 0;
-
+            uint64 guid = 0;
             uint8 guidmark = 0;
             (*this) >> guidmark;
 
@@ -302,16 +312,13 @@ class ByteBuffer
             {
                 if(guidmark & (uint8(1) << i))
                 {
-                    if(rpos() + 1 > size())
-                        return false;
-
                     uint8 bit;
                     (*this) >> bit;
                     guid |= (uint64(bit) << (i * 8));
                 }
             }
 
-            return true;
+            return guid;
         }
 
         const uint8 *contents() const { return &_storage[0]; }
