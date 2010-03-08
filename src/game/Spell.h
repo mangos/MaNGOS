@@ -102,6 +102,8 @@ namespace MaNGOS
     struct SpellNotifierCreatureAndPlayer;
 }
 
+class SpellCastTargets;
+
 struct SpellCastTargetsReader
 {
     explicit SpellCastTargetsReader(SpellCastTargets& _targets, Unit* _caster) : targets(_targets), caster(_caster) {}
