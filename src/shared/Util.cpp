@@ -18,10 +18,10 @@
 
 #include "Util.h"
 
-#include "sockets/socket_include.h"
 #include "utf8cpp/utf8.h"
 #include "mersennetwister/MersenneTwister.h"
 #include <ace/TSS_T.h>
+#include <ace/INET_Addr.h>
 
 typedef ACE_TSS<MTRand> MTRandTSS;
 static MTRandTSS mtRand;

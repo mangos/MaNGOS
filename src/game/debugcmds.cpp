@@ -30,7 +30,7 @@
 #include "BattleGroundMgr.h"
 #include <fstream>
 #include "ObjectMgr.h"
-#include "ObjectDefines.h"
+#include "ObjectGuid.h"
 #include "SpellMgr.h"
 
 bool ChatHandler::HandleDebugSendSpellFailCommand(const char* args)
@@ -183,7 +183,7 @@ bool ChatHandler::HandleDebugSendOpcodeCommand(const char* /*args*/)
         }
         else if(type == "pguid")
         {
-            data.append(unit->GetPackGUID());
+            data << unit->GetPackGUID();
         }
         else
         {

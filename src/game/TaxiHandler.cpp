@@ -186,13 +186,12 @@ void WorldSession::HandleMoveSplineDoneOpcode(WorldPacket& recv_data)
 {
     sLog.outDebug( "WORLD: Received CMSG_MOVE_SPLINE_DONE" );
 
-    uint64 guid;                                            // used only for proper packet read
-    if(!recv_data.readPackGUID(guid))
-        return;
+    ObjectGuid guid;                                        // used only for proper packet read
+    MovementInfo movementInfo;                              // used only for proper packet read
 
-    MovementInfo movementInfo(recv_data);                   // used only for proper packet read
-
-    recv_data.read_skip<uint32>();                          // unk
+    recv_data >> guid.ReadAsPacked();
+    recv_data >> movementInfo;
+    recv_data >> Unused<uint32>();                          // unk
 
 
     // in taxi flight packet received in 2 case:

@@ -973,7 +973,7 @@ bool ChatHandler::HandleAccountSetGmLevelCommand(const char* args)
         return false;
 
     /// account can't set security to same or grater level, need more power GM or console
-    AccountTypes plSecurity = m_session ? m_session->GetSecurity() : SEC_CONSOLE;
+    AccountTypes plSecurity = GetAccessLevel();
     if (AccountTypes(gm) >= plSecurity )
     {
         SendSysMessage(LANG_YOURS_SECURITY_IS_LOW);
@@ -5441,7 +5441,7 @@ bool ChatHandler::HandleGMFlyCommand(const char* args)
         SendSysMessage(LANG_USE_BOL);
         return false;
     }
-    data.append(target->GetPackGUID());
+    data << target->GetPackGUID();
     data << uint32(0);                                      // unknown
     target->SendMessageToSet(&data, true);
     PSendSysMessage(LANG_COMMAND_FLYMODE_STATUS, GetNameLink(target).c_str(), args);
@@ -5632,7 +5632,6 @@ bool ChatHandler::HandleMovegensCommand(const char* /*args*/)
             case IDLE_MOTION_TYPE:          SendSysMessage(LANG_MOVEGENS_IDLE);          break;
             case RANDOM_MOTION_TYPE:        SendSysMessage(LANG_MOVEGENS_RANDOM);        break;
             case WAYPOINT_MOTION_TYPE:      SendSysMessage(LANG_MOVEGENS_WAYPOINT);      break;
-            case ANIMAL_RANDOM_MOTION_TYPE: SendSysMessage(LANG_MOVEGENS_ANIMAL_RANDOM); break;
             case CONFUSED_MOTION_TYPE:      SendSysMessage(LANG_MOVEGENS_CONFUSED);      break;
             case CHASE_MOTION_TYPE:
             {
@@ -6003,7 +6002,7 @@ bool ChatHandler::HandleInstanceListBindsCommand(const char* /*args*/)
             if (const MapEntry* entry = sMapStore.LookupEntry(itr->first))
             {
                 PSendSysMessage("map: %d (%s) inst: %d perm: %s diff: %d canReset: %s TTR: %s",
-                    itr->first, entry->name[m_session->GetSessionDbcLocale()], save->GetInstanceId(), itr->second.perm ? "yes" : "no",
+                    itr->first, entry->name[GetSessionDbcLocale()], save->GetInstanceId(), itr->second.perm ? "yes" : "no",
                     save->GetDifficulty(), save->CanReset() ? "yes" : "no", timeleft.c_str());
             }
             else
@@ -6026,7 +6025,7 @@ bool ChatHandler::HandleInstanceListBindsCommand(const char* /*args*/)
                 if (const MapEntry* entry = sMapStore.LookupEntry(itr->first))
                 {
                     PSendSysMessage("map: %d (%s) inst: %d perm: %s diff: %d canReset: %s TTR: %s",
-                        itr->first, entry->name[m_session->GetSessionDbcLocale()], save->GetInstanceId(), itr->second.perm ? "yes" : "no",
+                        itr->first, entry->name[GetSessionDbcLocale()], save->GetInstanceId(), itr->second.perm ? "yes" : "no",
                         save->GetDifficulty(), save->CanReset() ? "yes" : "no", timeleft.c_str());
                 }
                 else
@@ -6079,7 +6078,7 @@ bool ChatHandler::HandleInstanceUnbindCommand(const char* args)
                 if (const MapEntry* entry = sMapStore.LookupEntry(itr->first))
                 {
                     PSendSysMessage("unbinding map: %d (%s) inst: %d perm: %s diff: %d canReset: %s TTR: %s",
-                        itr->first, entry->name[m_session->GetSessionDbcLocale()], save->GetInstanceId(), itr->second.perm ? "yes" : "no",
+                        itr->first, entry->name[GetSessionDbcLocale()], save->GetInstanceId(), itr->second.perm ? "yes" : "no",
                         save->GetDifficulty(), save->CanReset() ? "yes" : "no", timeleft.c_str());
                 }
                 else
@@ -6209,7 +6208,7 @@ bool ChatHandler::HandleAccountSetAddonCommand(const char* args)
 
     // Let set addon state only for lesser (strong) security level
     // or to self account
-    if (m_session && m_session->GetAccountId () != account_id &&
+    if (GetAccountId() && GetAccountId () != account_id &&
         HasLowerSecurityAccount (NULL,account_id,true))
         return false;
 

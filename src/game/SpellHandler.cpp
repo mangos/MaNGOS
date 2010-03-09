@@ -125,8 +125,8 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
     }
 
     SpellCastTargets targets;
-    if (!targets.read(&recvPacket, pUser))
-        return;
+
+    recvPacket >> targets.ReadForCaster(pUser);
 
     targets.Update(pUser);
 
@@ -334,27 +334,25 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
 
     // client provided targets
     SpellCastTargets targets;
-    if(!targets.read(&recvPacket,mover))
-    {
-        recvPacket.rpos(recvPacket.wpos());                 // prevent spam at ignore packet
-        return;
-    }
+
+    recvPacket >> targets.ReadForCaster(mover);
 
     // some spell cast packet including more data (for projectiles?)
     if (unk_flags & 0x02)
     {
-        recvPacket.read_skip<float>();                      // unk1, coords?
-        recvPacket.read_skip<float>();                      // unk1, coords?
         uint8 unk1;
+
+        recvPacket >> Unused<float>();                      // unk1, coords?
+        recvPacket >> Unused<float>();                      // unk1, coords?
         recvPacket >> unk1;                                 // >> 1 or 0
         if(unk1)
         {
-            recvPacket.read_skip<uint32>();                 // >> MSG_MOVE_STOP
-            uint64 guid;                                    // guid - unused
-            if(!recvPacket.readPackGUID(guid))
-                return;
+            ObjectGuid guid;                                // guid - unused
+            MovementInfo movementInfo;
 
-            MovementInfo movementInfo(recvPacket);
+            recvPacket >> Unused<uint32>();                 // >> MSG_MOVE_STOP
+            recvPacket >> guid.ReadAsPacked();
+            recvPacket >> movementInfo;
         }
     }
 

@@ -25,7 +25,7 @@
 #include "Log.h"
 #include "MapManager.h"
 #include "ObjectMgr.h"
-#include "ObjectDefines.h"
+#include "ObjectGuid.h"
 #include "SpellMgr.h"
 #include "UpdateMask.h"
 #include "World.h"
@@ -2059,6 +2059,31 @@ void ObjectMgr::LoadItemPrototypes()
         {
             sLog.outErrorDb("Item (Entry: %u) has wrong HolidayId value (%u)", i, proto->HolidayId);
             const_cast<ItemPrototype*>(proto)->HolidayId = 0;
+        }
+
+        if(proto->NonConsumable)
+        {
+            if (proto->NonConsumable > 1)
+            {
+                sLog.outErrorDb("Item (Entry: %u) has wrong NonConsumable (%u), must be 0..1",i,proto->NonConsumable);
+                const_cast<ItemPrototype*>(proto)->NonConsumable = 1;
+            }
+
+            bool can_be_need = false;
+            for (int j = 0; j < MAX_ITEM_PROTO_SPELLS; ++j)
+            {
+                if(proto->Spells[j].SpellCharges < 0)
+                {
+                    can_be_need = true;
+                    break;
+                }
+            }
+
+            if (!can_be_need)
+            {
+                sLog.outErrorDb("Item (Entry: %u) has redundant NonConsumable (%u), item not have negative charges",i,proto->NonConsumable);
+                const_cast<ItemPrototype*>(proto)->NonConsumable = 0;
+            }
         }
     }
 
@@ -7513,6 +7538,8 @@ bool PlayerCondition::Meets(Player const * player) const
             }
             return false;
         }
+        case CONDITION_NOITEM:
+            return !player->HasItemCount(value1, value2);
         default:
             return false;
     }
@@ -7544,11 +7571,18 @@ bool PlayerCondition::IsValid(ConditionType condition, uint32 value1, uint32 val
             break;
         }
         case CONDITION_ITEM:
+        case CONDITION_NOITEM:
         {
             ItemPrototype const *proto = ObjectMgr::GetItemPrototype(value1);
             if(!proto)
             {
                 sLog.outErrorDb("Item condition requires to have non existing item (%u), skipped", value1);
+                return false;
+            }
+
+            if(value2 < 1)
+            {
+                sLog.outErrorDb("Item condition useless with count < 1, skipped");
                 return false;
             }
             break;

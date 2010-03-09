@@ -123,7 +123,7 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS]=
     &Spell::EffectThreat,                                   // 63 SPELL_EFFECT_THREAT
     &Spell::EffectTriggerSpell,                             // 64 SPELL_EFFECT_TRIGGER_SPELL
     &Spell::EffectApplyAreaAura,                            // 65 SPELL_EFFECT_APPLY_AREA_AURA_RAID
-    &Spell::EffectUnused,                                   // 66 SPELL_EFFECT_CREATE_MANA_GEM          (possibly recharge it, misc - is item ID)
+    &Spell::EffectRestoreItemCharges,                       // 66 SPELL_EFFECT_RESTORE_ITEM_CHARGES     itemtype - is affected item ID
     &Spell::EffectHealMaxHealth,                            // 67 SPELL_EFFECT_HEAL_MAX_HEALTH
     &Spell::EffectInterruptCast,                            // 68 SPELL_EFFECT_INTERRUPT_CAST
     &Spell::EffectDistract,                                 // 69 SPELL_EFFECT_DISTRACT
@@ -211,7 +211,7 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS]=
     &Spell::EffectTriggerRitualOfSummoning,                 //151 SPELL_EFFECT_TRIGGER_SPELL_2
     &Spell::EffectNULL,                                     //152 SPELL_EFFECT_152                      summon Refer-a-Friend
     &Spell::EffectNULL,                                     //153 SPELL_EFFECT_CREATE_PET               misc value is creature entry
-    &Spell::EffectNULL,                                     //154 (single spell: Teach River's Heart Taxi Path)
+    &Spell::EffectTeachTaxiNode,                            //154 SPELL_EFFECT_TEACH_TAXI_NODE          single spell: Teach River's Heart Taxi Path
     &Spell::EffectTitanGrip,                                //155 SPELL_EFFECT_TITAN_GRIP Allows you to equip two-handed axes, maces and swords in one hand, but you attack $49152s1% slower than normal.
     &Spell::EffectEnchantItemPrismatic,                     //156 SPELL_EFFECT_ENCHANT_ITEM_PRISMATIC
     &Spell::EffectCreateItem2,                              //157 SPELL_EFFECT_CREATE_ITEM_2            create item or create item template and replace by some randon spell loot item
@@ -364,6 +364,14 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                         damage+= uint32(m_caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.12f);
                         break;
                     }
+                    // percent max target health
+                    case 29142:                             // Eyesore Blaster
+                    case 35139:                             // Throw Boom's Doom
+                    case 49882:                             // Leviroth Self-Impale
+                    {
+                        damage = damage * unitTarget->GetMaxHealth() / 100;
+                        break;
+                    }
                     // Cataclysmic Bolt
                     case 38441:
                     {
@@ -410,6 +418,9 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                     damage+= uint32(m_caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.207f);
                 // Heroic Throw ${$m1+$AP*.50}
                 else if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0000000100000000))
+                    damage+= uint32(m_caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.5f);
+                // Shattering Throw ${$m1+$AP*.50}
+                else if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0040000000000000))
                     damage+= uint32(m_caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.5f);
                 // Shockwave ${$m3/100*$AP}
                 else if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0000800000000000))
@@ -1548,6 +1559,12 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                 case 58418:                                 // Portal to Orgrimmar
                 case 58420:                                 // Portal to Stormwind
                     return;                                 // implemented in EffectScript[0]
+                case 58601:                                 // Remove Flight Auras
+                {
+                    m_caster->RemoveSpellsCausingAura(SPELL_AURA_FLY);
+                    m_caster->RemoveSpellsCausingAura(SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED);
+                    return;
+                }
                 case 59640:                                 // Underbelly Elixir
                 {
                     if (m_caster->GetTypeId() != TYPEID_PLAYER)
@@ -1663,6 +1680,21 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     }
                     return;
                 }
+            }
+
+            // Conjure Mana Gem
+            if (eff_idx == EFFECT_INDEX_1 && m_spellInfo->Effect[EFFECT_INDEX_0] == SPELL_EFFECT_CREATE_ITEM)
+            {
+                if (m_caster->GetTypeId()!=TYPEID_PLAYER)
+                    return;
+
+                // checked in create item check, avoid unexpected 
+                if (Item* item = ((Player*)m_caster)->GetItemByLimitedCategory(ITEM_LIMIT_CATEGORY_MANA_GEM))
+                    if (item->HasMaxCharges())
+                        return;
+
+                unitTarget->CastSpell( unitTarget, m_spellInfo->CalculateSimpleValue(eff_idx), true, m_CastItem);
+                return;
             }
             break;
         }
@@ -2857,7 +2889,14 @@ void Spell::EffectApplyAura(SpellEffectIndex eff_idx)
 
     Unit* caster = GetAffectiveCaster();
     if(!caster)
-        return;
+    {
+        // FIXME: currently we can't have auras applied explIcitly by gameobjects
+        // so for auras from wild gameobjects (no owner) target used
+        if (IS_GAMEOBJECT_GUID(m_originalCasterGUID))
+            caster = unitTarget;
+        else
+            return;
+    }
 
     sLog.outDebug("Spell: Aura is: %u", m_spellInfo->EffectApplyAuraName[eff_idx]);
 
@@ -3079,7 +3118,20 @@ void Spell::EffectHeal(SpellEffectIndex /*eff_idx*/)
         else
             addhealth = caster->SpellHealingBonus(unitTarget, m_spellInfo, addhealth, HEAL);
 
-        m_healing+=addhealth;
+        m_healing += addhealth;
+
+        // Chain Healing
+        if (m_spellInfo->SpellFamilyName == SPELLFAMILY_SHAMAN && m_spellInfo->SpellFamilyFlags & UI64LIT(0x0000000000000100))
+        {
+            // check for Riptide
+            if (unitTarget != m_targets.getUnitTarget())
+                return;
+            Aura* riptide = unitTarget->GetAura(SPELL_AURA_PERIODIC_HEAL, SPELLFAMILY_SHAMAN, 0, 0x00000010, caster->GetGUID());
+            if (!riptide)
+                return;
+            m_healing += m_healing/4;
+            unitTarget->RemoveAura(riptide);
+        }
     }
 }
 
@@ -3237,6 +3289,10 @@ void Spell::DoCreateItem(SpellEffectIndex eff_idx, uint32 itemtype)
             num_to_add -= no_space;
         else
         {
+            // ignore mana gem case (next effect will recharge existed example)
+            if (eff_idx == EFFECT_INDEX_0 && m_spellInfo->Effect[EFFECT_INDEX_1] == SPELL_EFFECT_DUMMY )
+                return;
+
             // if not created by another reason from full inventory or unique items amount limitation
             player->SendEquipError( msg, NULL, NULL, newitemid );
             return;
@@ -3905,6 +3961,9 @@ void Spell::DoSummon(SpellEffectIndex eff_idx)
         spawnCreature->SavePetToDB(PET_SAVE_AS_CURRENT);
         ((Player*)m_caster)->PetSpellInitialize();
     }
+
+    if (m_caster->GetTypeId() == TYPEID_UNIT && ((Creature*)m_caster)->AI())
+        ((Creature*)m_caster)->AI()->JustSummoned((Creature*)spawnCreature);
 }
 
 void Spell::EffectLearnSpell(SpellEffectIndex eff_idx)
@@ -4006,8 +4065,8 @@ void Spell::EffectDispel(SpellEffectIndex eff_idx)
         {
             int32 count = success_list.size();
             WorldPacket data(SMSG_SPELLDISPELLOG, 8+8+4+1+4+count*5);
-            data.append(unitTarget->GetPackGUID());         // Victim GUID
-            data.append(m_caster->GetPackGUID());           // Caster GUID
+            data << unitTarget->GetPackGUID();              // Victim GUID
+            data << m_caster->GetPackGUID();                // Caster GUID
             data << uint32(m_spellInfo->Id);                // Dispel spell id
             data << uint8(0);                               // not used
             data << uint32(count);                          // count
@@ -6194,6 +6253,27 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
             }
             break;
         }
+        case SPELLFAMILY_WARRIOR:
+        {
+            switch(m_spellInfo->Id)
+            {
+                case 64380:                                 // Shattering Throw
+                {
+                    if (!unitTarget || !unitTarget->isAlive())
+                        return;
+
+                    // remove immunity effects
+                    unitTarget->RemoveAurasDueToSpell(642); // Divine Shield
+                    unitTarget->RemoveAurasDueToSpell(1022); // Hand of Protection rank 1
+                    unitTarget->RemoveAurasDueToSpell(5599); // Hand of Protection rank 2
+                    unitTarget->RemoveAurasDueToSpell(10278); // Hand of Protection rank 3
+                    unitTarget->RemoveAurasDueToSpell(19753); // Divine Intervention
+                    unitTarget->RemoveAurasDueToSpell(45438); // Ice Block
+                    break;
+                }
+            }
+            break;
+        }
     }
 
     // normal DB scripted effect
@@ -7415,8 +7495,8 @@ void Spell::EffectStealBeneficialBuff(SpellEffectIndex eff_idx)
         {
             int32 count = success_list.size();
             WorldPacket data(SMSG_SPELLSTEALLOG, 8+8+4+1+4+count*5);
-            data.append(unitTarget->GetPackGUID());  // Victim GUID
-            data.append(m_caster->GetPackGUID());    // Caster GUID
+            data << unitTarget->GetPackGUID();       // Victim GUID
+            data << m_caster->GetPackGUID();         // Caster GUID
             data << uint32(m_spellInfo->Id);         // Dispell spell id
             data << uint8(0);                        // not used
             data << uint32(count);                   // count
@@ -7580,4 +7660,51 @@ void Spell::EffectBind(SpellEffectIndex eff_idx)
     data << uint64(player->GetGUID());
     data << uint32(area_id);
     player->SendMessageToSet( &data, true );
+}
+
+void Spell::EffectRestoreItemCharges( SpellEffectIndex eff_idx )
+{
+    if (unitTarget->GetTypeId() != TYPEID_PLAYER)
+        return;
+
+    Player* player = (Player*)unitTarget;
+
+    ItemPrototype const* itemProto = ObjectMgr::GetItemPrototype(m_spellInfo->EffectItemType[eff_idx]);
+    if (!itemProto)
+        return;
+
+    // In case item from limited category recharge any from category, is this valid checked early in spell checks
+    Item* item;
+    if (itemProto->ItemLimitCategory)
+        item = player->GetItemByLimitedCategory(itemProto->ItemLimitCategory);
+    else
+        item = player->GetItemByEntry(m_spellInfo->EffectItemType[eff_idx]);
+
+    if (!item)
+        return;
+
+    item->RestoreCharges();
+}
+
+void Spell::EffectTeachTaxiNode( SpellEffectIndex eff_idx )
+{
+    if (unitTarget->GetTypeId() != TYPEID_PLAYER)
+        return;
+
+    Player* player = (Player*)unitTarget;
+
+    uint32 taxiNodeId = m_spellInfo->EffectMiscValue[eff_idx];
+    if (!sTaxiNodesStore.LookupEntry(taxiNodeId))
+        return;
+
+    if (player->m_taxi.SetTaximaskNode(taxiNodeId))
+    {
+        WorldPacket data(SMSG_NEW_TAXI_PATH, 0);
+        player->SendDirectMessage( &data );
+
+        data.Initialize( SMSG_TAXINODE_STATUS, 9 );
+        data << uint64( m_caster->GetGUID() );
+        data << uint8( 1 );
+        player->SendDirectMessage( &data );
+    }
 }

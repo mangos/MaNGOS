@@ -26,7 +26,7 @@
 #include "Log.h"
 #include "World.h"
 #include "ObjectMgr.h"
-#include "ObjectDefines.h"
+#include "ObjectGuid.h"
 #include "Player.h"
 #include "UpdateMask.h"
 #include "NPCHandler.h"
@@ -39,7 +39,7 @@ void WorldSession::SendNameQueryOpcode(Player *p)
         return;
                                                             // guess size
     WorldPacket data( SMSG_NAME_QUERY_RESPONSE, (8+1+1+1+1+1+10) );
-    data.append(p->GetPackGUID());                          // player guid
+    data << p->GetPackGUID();                               // player guid
     data << uint8(0);                                       // added in 3.1; if > 1, then end of packet
     data << p->GetName();                                   // played name
     data << uint8(0);                                       // realm name for cross realm BG usage
@@ -458,7 +458,7 @@ void WorldSession::HandleCorpseMapPositionQuery( WorldPacket & recv_data )
     uint32 unk;
     recv_data >> unk;
 
-    WorldPacket data(CMSG_CORPSE_MAP_POSITION_QUERY_RESPONSE, 4+4+4+4);
+    WorldPacket data(SMSG_CORPSE_MAP_POSITION_QUERY_RESPONSE, 4+4+4+4);
     data << float(0);
     data << float(0);
     data << float(0);

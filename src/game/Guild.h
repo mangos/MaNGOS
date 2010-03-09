@@ -24,7 +24,6 @@
 
 #include "Common.h"
 #include "Item.h"
-#include "ObjectDefines.h"
 
 class Item;
 

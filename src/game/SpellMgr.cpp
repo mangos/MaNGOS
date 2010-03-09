@@ -522,6 +522,7 @@ bool IsPositiveEffect(uint32 spellId, SpellEffectIndex effIndex)
                         case 38639:                         // Nether Exhaustion (blue)
                         case 11196:                         // Recently Bandaged
                         case 44689:                         // Relay Race Accept Hidden Debuff - DND
+                        case 58600:                         // Restricted Flight Area
                             return false;
                         // some spells have unclear target modes for selection, so just make effect positive
                         case 27184:
@@ -1520,6 +1521,10 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
             // Arcane Intellect and Insight
             if( spellInfo_1->SpellIconID == 125 && spellInfo_2->Id == 18820 )
                 return false;
+
+            // Arcane Intellect and Dalaran Intellect
+            if( (spellInfo_1->SpellFamilyFlags & UI64LIT(0x400)) && (spellInfo_2->SpellFamilyFlags & UI64LIT(0x400)) )
+                return true;
 
             break;
         case SPELLFAMILY_WARLOCK:

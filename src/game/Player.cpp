@@ -42,7 +42,7 @@
 #include "CellImpl.h"
 #include "ObjectMgr.h"
 #include "ObjectAccessor.h"
-#include "ObjectDefines.h"
+#include "ObjectGuid.h"
 #include "CreatureAI.h"
 #include "Formulas.h"
 #include "Group.h"
@@ -2071,10 +2071,18 @@ void Player::Regenerate(Powers power, uint32 diff)
             if (getClass() != CLASS_DEATH_KNIGHT)
                 break;
 
-            for(uint32 i = 0; i < MAX_RUNES; ++i)
+            for(uint32 rune = 0; rune < MAX_RUNES; ++rune)
             {
-                if(uint16 cd = GetRuneCooldown(i))           // if we have cooldown, reduce it...
-                    SetRuneCooldown(i, (cd < diff) ? 0 : cd - diff);
+                if(uint16 cd = GetRuneCooldown(rune))       // if we have cooldown, reduce it...
+                {
+                    uint32 cd_diff = diff;
+                    AuraList const& ModPowerRegenPCTAuras = GetAurasByType(SPELL_AURA_MOD_POWER_REGEN_PERCENT);
+                    for(AuraList::const_iterator i = ModPowerRegenPCTAuras.begin(); i != ModPowerRegenPCTAuras.end(); ++i)
+                        if ((*i)->GetModifier()->m_miscvalue == power && (*i)->GetMiscBValue()==GetCurrentRune(rune))
+                            cd_diff = cd_diff * ((*i)->GetModifier()->m_amount + 100) / 100.0f;
+
+                    SetRuneCooldown(rune, (cd < cd_diff) ? 0 : cd - cd_diff);
+                }
             }
         }   break;
         case POWER_FOCUS:
@@ -4164,7 +4172,7 @@ void Player::SetMovement(PlayerMovementType pType)
             sLog.outError("Player::SetMovement: Unsupported move type (%d), data not sent to client.",pType);
             return;
     }
-    data.append(GetPackGUID());
+    data << GetPackGUID();
     data << uint32(0);
     GetSession()->SendPacket( &data );
 }
@@ -4176,7 +4184,7 @@ void Player::SetMovement(PlayerMovementType pType)
 void Player::BuildPlayerRepop()
 {
     WorldPacket data(SMSG_PRE_RESURRECT, GetPackGUID().size());
-    data.append(GetPackGUID());
+    data << GetPackGUID();
     GetSession()->SendPacket(&data);
 
     if(getRace() == RACE_NIGHTELF)
@@ -4191,7 +4199,8 @@ void Player::BuildPlayerRepop()
     if(GetCorpse())
     {
         sLog.outError("BuildPlayerRepop: player %s(%d) already has a corpse", GetName(), GetGUIDLow());
-        assert(false);
+        sLog.outError("Removing player %s(%d) corpse from DB", GetName(), GetGUIDLow());
+        CharacterDatabase.PExecute("DELETE FROM corpse WHERE player = '%d'",GetGUIDLow());
     }
 
     // create a corpse and place it at the player's location
@@ -8660,6 +8669,46 @@ uint32 Player::GetItemCountWithLimitCategory( uint32 limitCategory ) const
     return count;
 }
 
+Item* Player::GetItemByEntry( uint32 item ) const
+{
+    for(int i = EQUIPMENT_SLOT_START; i < INVENTORY_SLOT_ITEM_END; ++i)
+        if (Item *pItem = GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+            if (pItem->GetEntry() == item)
+                return pItem;
+
+    for(int i = KEYRING_SLOT_START; i < CURRENCYTOKEN_SLOT_END; ++i)
+        if (Item *pItem = GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+            if (pItem->GetEntry() == item)
+                return pItem;
+
+    for(int i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
+        if (Bag* pBag = (Bag*)GetItemByPos( INVENTORY_SLOT_BAG_0, i))
+            if (Item* itemPtr = pBag->GetItemByEntry(item))
+                return itemPtr;
+
+    return NULL;
+}
+
+Item* Player::GetItemByLimitedCategory(uint32 limitedCategory) const
+{
+    for(int i = EQUIPMENT_SLOT_START; i < INVENTORY_SLOT_ITEM_END; ++i)
+        if (Item *pItem = GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+            if (pItem->GetProto()->ItemLimitCategory == limitedCategory)
+                return pItem;
+
+    for(int i = KEYRING_SLOT_START; i < CURRENCYTOKEN_SLOT_END; ++i)
+        if (Item *pItem = GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+            if (pItem->GetProto()->ItemLimitCategory == limitedCategory)
+                return pItem;
+
+    for(int i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
+        if (Bag* pBag = (Bag*)GetItemByPos( INVENTORY_SLOT_BAG_0, i))
+            if (Item* itemPtr = pBag->GetItemByLimitedCategory(limitedCategory))
+                return itemPtr;
+
+    return NULL;
+}
+
 Item* Player::GetItemByGuid( uint64 guid ) const
 {
     for(int i = EQUIPMENT_SLOT_START; i < INVENTORY_SLOT_ITEM_END; ++i)
@@ -8820,7 +8869,7 @@ bool Player::IsBagPos( uint16 pos )
     return false;
 }
 
-bool Player::IsValidPos( uint8 bag, uint8 slot, bool explicit_pos )
+bool Player::IsValidPos( uint8 bag, uint8 slot, bool explicit_pos ) const
 {
     // post selected
     if(bag == NULL_BAG && !explicit_pos)
@@ -15553,7 +15602,7 @@ void Player::_LoadInventory(QueryResult *result, uint32 timediff)
             }
 
             // "Conjured items disappear if you are logged out for more than 15 minutes"
-            if ((timediff > 15*60) && (item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAGS_CONJURED)))
+            if (timediff > 15*MINUTE && item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAGS_CONJURED))
             {
                 CharacterDatabase.PExecute("DELETE FROM character_inventory WHERE item = '%u'", item_guid);
                 item->FSetState(ITEM_REMOVED);
@@ -15621,7 +15670,13 @@ void Player::_LoadInventory(QueryResult *result, uint32 timediff)
 
             // item's state may have changed after stored
             if (success)
+            {
                 item->SetState(ITEM_UNCHANGED, this);
+
+                // recharged mana gem
+                if (timediff > 15*MINUTE && proto->ItemLimitCategory ==ITEM_LIMIT_CATEGORY_MANA_GEM)
+                    item->RestoreCharges();
+            }
             else
             {
                 sLog.outError("Player::_LoadInventory: Player %s has item (GUID: %u Entry: %u) can't be loaded to inventory (Bag GUID: %u Slot: %u) by some reason, will send by mail.", GetName(),item_guid, item_id, bag_guid, slot);
@@ -16957,7 +17012,7 @@ void Player::SendAttackSwingBadFacingAttack()
 void Player::SendAutoRepeatCancel(Unit *target)
 {
     WorldPacket data(SMSG_CANCEL_AUTO_REPEAT, target->GetPackGUID().size());
-    data.append(target->GetPackGUID());                     // may be it's target guid
+    data << target->GetPackGUID();                          // may be it's target guid
     GetSession()->SendPacket( &data );
 }
 
@@ -18932,7 +18987,7 @@ void Player::SendComboPoints()
     if (combotarget)
     {
         WorldPacket data(SMSG_UPDATE_COMBO_POINTS, combotarget->GetPackGUID().size()+1);
-        data.append(combotarget->GetPackGUID());
+        data << combotarget->GetPackGUID();
         data << uint8(m_comboPoints);
         GetSession()->SendPacket(&data);
     }
@@ -19092,7 +19147,7 @@ void Player::SendInitialPacketsAfterAddToMap()
     if(HasAuraType(SPELL_AURA_MOD_ROOT))
     {
         WorldPacket data2(SMSG_FORCE_MOVE_ROOT, 10);
-        data2.append(GetPackGUID());
+        data2 << GetPackGUID();
         data2 << (uint32)2;
         SendMessageToSet(&data2,true);
     }
@@ -19336,7 +19391,7 @@ void Player::SendAurasForTarget(Unit *target)
         return;
 
     WorldPacket data(SMSG_AURA_UPDATE_ALL);
-    data.append(target->GetPackGUID());
+    data << target->GetPackGUID();
 
     Unit::VisibleAuraMap const *visibleAuras = target->GetVisibleAuras();
     for(Unit::VisibleAuraMap::const_iterator itr = visibleAuras->begin(); itr != visibleAuras->end(); ++itr)
@@ -19775,7 +19830,7 @@ uint32 Player::GetResurrectionSpellId()
 }
 
 // Used in triggers for check "Only to targets that grant experience or honor" req
-bool Player::isHonorOrXPTarget(Unit* pVictim)
+bool Player::isHonorOrXPTarget(Unit* pVictim) const
 {
     uint32 v_level = pVictim->getLevel();
     uint32 k_grey  = MaNGOS::XP::GetGrayLevel(getLevel());
@@ -19979,7 +20034,7 @@ void Player::ResurectUsingRequestData()
 void Player::SetClientControl(Unit* target, uint8 allowMove)
 {
     WorldPacket data(SMSG_CLIENT_CONTROL_UPDATE, target->GetPackGUID().size()+1);
-    data.append(target->GetPackGUID());
+    data << target->GetPackGUID();
     data << uint8(allowMove);
     GetSession()->SendPacket(&data);
 }
@@ -20375,7 +20430,7 @@ void Player::EnterVehicle(Vehicle *vehicle)
     GetSession()->SendPacket(&data);
 
     data.Initialize(MSG_MOVE_TELEPORT_ACK, 30);
-    data.append(GetPackGUID());
+    data << GetPackGUID();
     data << uint32(0);                                      // counter?
     data << uint32(MOVEFLAG_ONTRANSPORT);                   // transport
     data << uint16(0);                                      // special flags
@@ -20427,7 +20482,7 @@ void Player::ExitVehicle(Vehicle *vehicle)
     SetMover(NULL);
 
     WorldPacket data(MSG_MOVE_TELEPORT_ACK, 30);
-    data.append(GetPackGUID());
+    data << GetPackGUID();
     data << uint32(0);                                      // counter?
     data << uint32(MOVEFLAG_ROOT);                          // fly unk
     data << uint16(MOVEFLAG2_UNK4);                         // special flags
@@ -21591,7 +21646,7 @@ void Player::SendClearCooldown( uint32 spell_id, Unit* target )
 void Player::BuildTeleportAckMsg( WorldPacket *data, float x, float y, float z, float ang ) const
 {
     data->Initialize(MSG_MOVE_TELEPORT_ACK, 41);
-    data->append(GetPackGUID());
+    *data << GetPackGUID();
     *data << uint32(0);                                     // this value increments every time
     *data << uint32(m_movementInfo.GetMovementFlags());     // movement flags
     *data << uint16(0);                                     // 2.3.0

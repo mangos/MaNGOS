@@ -27,7 +27,7 @@
 #include "ArenaTeam.h"
 #include "World.h"
 #include "Group.h"
-#include "ObjectDefines.h"
+#include "ObjectGuid.h"
 #include "ObjectMgr.h"
 #include "WorldPacket.h"
 #include "Util.h"
@@ -797,6 +797,7 @@ void BattleGround::EndBattleGround(uint32 winner)
         {
             RewardMark(plr,ITEM_WINNER_COUNT);
             RewardQuestComplete(plr);
+            plr->GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_BG, 1);
         }
         else
             RewardMark(plr,ITEM_LOSER_COUNT);

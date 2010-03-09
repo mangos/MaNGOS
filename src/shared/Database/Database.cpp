@@ -40,6 +40,7 @@ bool Database::Initialize(const char *)
             m_logsDir.append("/");
     }
 
+    m_pingIntervallms = sConfig.GetIntDefault ("MaxPingTime", 30) * (MINUTE * 1000);
     return true;
 }
 

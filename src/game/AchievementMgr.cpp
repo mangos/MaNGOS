@@ -651,7 +651,7 @@ void AchievementMgr::SendAchievementEarned(AchievementEntry const* achievement)
     }
 
     WorldPacket data(SMSG_ACHIEVEMENT_EARNED, 8+4+8);
-    data.append(GetPlayer()->GetPackGUID());
+    data << GetPlayer()->GetPackGUID();
     data << uint32(achievement->ID);
     data << uint32(secsToTimeBitFields(time(NULL)));
     data << uint32(0);
@@ -666,7 +666,7 @@ void AchievementMgr::SendCriteriaUpdate(uint32 id, CriteriaProgress const* progr
     // the counter is packed like a packed Guid
     data.appendPackGUID(progress->counter);
 
-    data.append(GetPlayer()->GetPackGUID());
+    data << GetPlayer()->GetPackGUID();
     data << uint32(0);
     data << uint32(secsToTimeBitFields(progress->date));
     data << uint32(0);  // timer 1
@@ -784,7 +784,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                 if (achievementCriteria->win_bg.bgMapID != GetPlayer()->GetMapId())
                     continue;
 
-                if (achievementCriteria->win_bg.additionalRequirement1_type)
+                if (achievementCriteria->win_bg.additionalRequirement1_type || achievementCriteria->win_bg.additionalRequirement2_type)
                 {
                     // those requirements couldn't be found in the dbc
                     AchievementCriteriaRequirementSet const* data = sAchievementMgr.GetCriteriaRequirementSet(achievementCriteria);
@@ -1855,7 +1855,7 @@ void AchievementMgr::SendRespondInspectAchievements(Player* player)
 {
     // since we don't know the exact size of the packed GUIDs this is just an approximation
     WorldPacket data(SMSG_RESPOND_INSPECT_ACHIEVEMENTS, 4+4*2+m_completedAchievements.size()*4*2+m_completedAchievements.size()*7*4);
-    data.append(GetPlayer()->GetPackGUID());
+    data << GetPlayer()->GetPackGUID();
     BuildAllDataPacket(&data);
     player->GetSession()->SendPacket(&data);
 }
@@ -1876,7 +1876,7 @@ void AchievementMgr::BuildAllDataPacket(WorldPacket *data)
     {
         *data << uint32(iter->first);
         data->appendPackGUID(iter->second.counter);
-        data->append(GetPlayer()->GetPackGUID());
+        *data << GetPlayer()->GetPackGUID();
         *data << uint32(0);
         *data << uint32(secsToTimeBitFields(iter->second.date));
         *data << uint32(0);
@@ -2021,7 +2021,7 @@ void AchievementGlobalMgr::LoadAchievementCriteriaRequirements()
         switch(criteria->requiredType)
         {
             case ACHIEVEMENT_CRITERIA_TYPE_WIN_BG:
-                if(!criteria->win_bg.additionalRequirement1_type)
+                if(!criteria->win_bg.additionalRequirement1_type && !criteria->win_bg.additionalRequirement2_type)
                     continue;
                 break;
             case ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE:

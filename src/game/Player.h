@@ -1150,6 +1150,8 @@ class MANGOS_DLL_SPEC Player : public Unit
         uint32 GetItemCount( uint32 item, bool inBankAlso = false, Item* skipItem = NULL ) const;
         uint32 GetItemCountWithLimitCategory(uint32 limitCategory) const;
         Item* GetItemByGuid( uint64 guid ) const;
+        Item* GetItemByEntry(uint32 item) const;            // only for special cases
+        Item* GetItemByLimitedCategory(uint32 limitedCategory) const;
         Item* GetItemByPos( uint16 pos ) const;
         Item* GetItemByPos( uint8 bag, uint8 slot ) const;
         Item* GetWeaponForAttack(WeaponAttackType attackType) const { return GetWeaponForAttack(attackType,false,false); }
@@ -1164,8 +1166,8 @@ class MANGOS_DLL_SPEC Player : public Unit
         static bool IsBagPos( uint16 pos );
         static bool IsBankPos( uint16 pos ) { return IsBankPos(pos >> 8, pos & 255); }
         static bool IsBankPos( uint8 bag, uint8 slot );
-        bool IsValidPos( uint16 pos, bool explicit_pos ) { return IsValidPos(pos >> 8, pos & 255, explicit_pos); }
-        bool IsValidPos( uint8 bag, uint8 slot, bool explicit_pos );
+        bool IsValidPos( uint16 pos, bool explicit_pos ) const { return IsValidPos(pos >> 8, pos & 255, explicit_pos); }
+        bool IsValidPos( uint8 bag, uint8 slot, bool explicit_pos ) const;
         uint8 GetBankBagSlotCount() const { return GetByteValue(PLAYER_BYTES_2, 2); }
         void SetBankBagSlotCount(uint8 count) { SetByteValue(PLAYER_BYTES_2, 2, count); }
         bool HasItemCount( uint32 item, uint32 count, bool inBankAlso = false ) const;
@@ -1893,7 +1895,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         bool IsAtGroupRewardDistance(WorldObject const* pRewardSource) const;
         bool RewardPlayerAndGroupAtKill(Unit* pVictim);
         void RewardPlayerAndGroupAtEvent(uint32 creature_id,WorldObject* pRewardSource);
-        bool isHonorOrXPTarget(Unit* pVictim);
+        bool isHonorOrXPTarget(Unit* pVictim) const;
 
         ReputationMgr&       GetReputationMgr()       { return m_reputationMgr; }
         ReputationMgr const& GetReputationMgr() const { return m_reputationMgr; }

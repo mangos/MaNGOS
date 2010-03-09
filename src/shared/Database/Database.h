@@ -130,8 +130,11 @@ class MANGOS_DLL_SPEC Database
         void SetResultQueue(SqlResultQueue * queue);
 
         bool CheckRequiredField(char const* table_name, char const* required_name);
+        uint32 GetPingIntervall() { return m_pingIntervallms;}
+
     private:
         bool m_logSQL;
         std::string m_logsDir;
+        uint32 m_pingIntervallms;
 };
 #endif
