@@ -276,7 +276,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
         }
 
         // Movement anticheat
-        if (plMover && plMover->m_anti_TransportGUID == 0 && (movementInfo.t_guid !=0))
+        if (plMover && plMover->m_anti_TransportGUID == 0 && (movementInfo.t_guid.GetRawValue() !=0))
         {
             // if we boarded a transport, add us to it
             if (plMover && !plMover->m_transport)
@@ -294,11 +294,11 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
             }
             //movement anticheat
             //Correct finding GO guid in DB (thanks to GriffonHeart)
-            GameObject *obj = ObjectAccessor::GetGameObjectInWorld(movementInfo.t_guid);
+            GameObject *obj = ObjectAccessor::GetGameObjectInWorld(movementInfo.t_guid.GetRawValue());
             if(obj)
                 plMover->m_anti_TransportGUID = obj->GetDBTableGUIDLow();
             else
-                plMover->m_anti_TransportGUID = GUID_LOPART(movementInfo.t_guid);
+                plMover->m_anti_TransportGUID = GUID_LOPART(movementInfo.t_guid.GetRawValue());
             //end movement anticheat
         }
     }
@@ -339,7 +339,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
                     plMover->GetName(),movementInfo.time,movementInfo.fallTime,movementInfo.x,movementInfo.y,movementInfo.z,movementInfo.o,
                     movementInfo.flags, LookupOpcodeName(opcode),movementInfo.t_x,movementInfo.t_y,movementInfo.t_z,movementInfo.t_o);
         sLog.outBasic("MA-%s Transport > server GUID: %d |  client GUID: (lo)%d - (hi)%d",
-                    plMover->GetName(),plMover->m_anti_TransportGUID, GUID_LOPART(movementInfo.t_guid), GUID_HIPART(movementInfo.t_guid));
+                    plMover->GetName(),plMover->m_anti_TransportGUID, GUID_LOPART(movementInfo.t_guid.GetRawValue()), GUID_HIPART(movementInfo.t_guid.GetRawValue()));
     }
     else
     {
@@ -347,7 +347,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
                     movementInfo.time,movementInfo.fallTime,movementInfo.x,movementInfo.y,movementInfo.z,movementInfo.o,
                     movementInfo.flags, LookupOpcodeName(opcode),movementInfo.t_x,movementInfo.t_y,movementInfo.t_z,movementInfo.t_o);
         sLog.outBasic("MA Transport > server GUID:  |  client GUID: (lo)%d - (hi)%d",
-                    GUID_LOPART(movementInfo.t_guid), GUID_HIPART(movementInfo.t_guid));
+                    GUID_LOPART(movementInfo.t_guid), GUID_HIPART(movementInfo.t_guid.GetRawValue()));
     }
     #endif
 
@@ -829,7 +829,7 @@ void WorldSession::HandleMoveNotActiveMover(WorldPacket &recv_data)
 
     if(_player->m_mover->GetGUID() == old_mover_guid.GetRawValue())
     {
-        sLog.outError("HandleMoveNotActiveMover: incorrect mover guid: mover is " I64FMT " and should be " I64FMT " instead of " UI64FMTD, _player->m_mover->GetGUID(), _player->GetGUID(), old_mover_guid);
+        sLog.outError("HandleMoveNotActiveMover: incorrect mover guid: mover is " I64FMT " and should be " I64FMT " instead of " UI64FMTD, _player->m_mover->GetGUID(), _player->GetGUID(), old_mover_guid.GetRawValue());
         recv_data.rpos(recv_data.wpos());                   // prevent warnings spam
         return;
     }
