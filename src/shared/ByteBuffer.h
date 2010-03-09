@@ -45,6 +45,12 @@ class ByteBufferException
         size_t size;
 };
 
+template<class T>
+struct Unused
+{
+    Unused() {}
+};
+
 class ByteBuffer
 {
     public:
@@ -69,12 +75,6 @@ class ByteBuffer
         {
             _storage.clear();
             _rpos = _wpos = 0;
-        }
-
-        template <typename T> void append(T value)
-        {
-            EndianConvert(value);
-            append((uint8 *)&value, sizeof(value));
         }
 
         template <typename T> void put(size_t pos,T value)
@@ -239,6 +239,14 @@ class ByteBuffer
             return *this;
         }
 
+        template<class T>
+        ByteBuffer &operator>>(Unused<T> const&)
+        {
+            read_skip<T>();
+            return *this;
+        }
+
+
         uint8 operator[](size_t pos) const
         {
             return read<uint8>(pos);
@@ -294,13 +302,9 @@ class ByteBuffer
             _rpos += len;
         }
 
-        bool readPackGUID(uint64& guid)
+        uint64 readPackGUID()
         {
-            if(rpos() + 1 > size())
-                return false;
-
-            guid = 0;
-
+            uint64 guid = 0;
             uint8 guidmark = 0;
             (*this) >> guidmark;
 
@@ -308,16 +312,13 @@ class ByteBuffer
             {
                 if(guidmark & (uint8(1) << i))
                 {
-                    if(rpos() + 1 > size())
-                        return false;
-
                     uint8 bit;
                     (*this) >> bit;
                     guid |= (uint64(bit) << (i * 8));
                 }
             }
 
-            return true;
+            return guid;
         }
 
         const uint8 *contents() const { return &_storage[0]; }
@@ -491,6 +492,13 @@ class ByteBuffer
             }
             sLog.outDebugInLine("\n");
         }
+    private:
+        // limited for internal use because can "append" any unexpected type (like pointer and etc) with hard detection problem
+        template <typename T> void append(T value)
+        {
+            EndianConvert(value);
+            append((uint8 *)&value, sizeof(value));
+        }
 
     protected:
         size_t _rpos, _wpos;
@@ -498,7 +506,7 @@ class ByteBuffer
 };
 
 template <typename T>
-inline ByteBuffer &operator<<(ByteBuffer &b, std::vector<T> v)
+inline ByteBuffer &operator<<(ByteBuffer &b, std::vector<T> const& v)
 {
     b << (uint32)v.size();
     for (typename std::vector<T>::iterator i = v.begin(); i != v.end(); ++i)
@@ -524,7 +532,7 @@ inline ByteBuffer &operator>>(ByteBuffer &b, std::vector<T> &v)
 }
 
 template <typename T>
-inline ByteBuffer &operator<<(ByteBuffer &b, std::list<T> v)
+inline ByteBuffer &operator<<(ByteBuffer &b, std::list<T> const& v)
 {
     b << (uint32)v.size();
     for (typename std::list<T>::iterator i = v.begin(); i != v.end(); ++i)
