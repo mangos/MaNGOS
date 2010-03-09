@@ -6259,7 +6259,7 @@ void Aura::HandleSpellSpecificBoosts(bool apply)
                     return;
 
                 // Glyph of Power Word: Shield
-                if(Aura* glyph = caster->GetAura(55672,0))
+                if (Aura* glyph = caster->GetAura(55672, EFFECT_INDEX_0))
                 {
                     int32 heal = (glyph->GetModifier()->m_amount * m_modifier.m_amount)/100;
                     caster->CastCustomSpell(m_target, 56160, &heal, NULL, NULL, true, 0, this);
