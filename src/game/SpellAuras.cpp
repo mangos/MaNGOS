@@ -1244,7 +1244,7 @@ bool Aura::_RemoveAura()
 void Aura::SendFakeAuraUpdate(uint32 auraId, bool remove)
 {
     WorldPacket data(SMSG_AURA_UPDATE);
-    data.append(m_target->GetPackGUID());
+    data << m_target->GetPackGUID();
     data << uint8(64);
     data << uint32(remove ? 0 : auraId);
 
