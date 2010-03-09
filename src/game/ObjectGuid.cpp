@@ -66,8 +66,8 @@ ByteBuffer& operator<< (ByteBuffer& buf, PackedGuid const& guid)
     return buf;
 }
 
-ByteBuffer &operator>>(ByteBuffer& buf, PackedGuidReader& guid)
+ByteBuffer &operator>>(ByteBuffer& buf, PackedGuidReader const& guid)
 {
-    guid.m_guidRef.Set(buf.readPackGUID());
+    guid.m_guidPtr->Set(buf.readPackGUID());
     return buf;
 }

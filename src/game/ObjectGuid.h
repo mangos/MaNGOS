@@ -118,8 +118,8 @@ class PackedGuid;
 
 struct PackedGuidReader
 {
-    explicit PackedGuidReader(ObjectGuid& guid) : m_guidRef(guid) {}
-    ObjectGuid& m_guidRef;
+    explicit PackedGuidReader(ObjectGuid& guid) : m_guidPtr(&guid) {}
+    ObjectGuid* m_guidPtr;
 };
 
 class ObjectGuid
@@ -233,7 +233,7 @@ ByteBuffer& operator<< (ByteBuffer& buf, ObjectGuid const& guid);
 ByteBuffer& operator>> (ByteBuffer& buf, ObjectGuid&       guid);
 
 ByteBuffer& operator<< (ByteBuffer& buf, PackedGuid const& guid);
-ByteBuffer& operator>> (ByteBuffer& buf, PackedGuidReader& guid);
+ByteBuffer& operator>> (ByteBuffer& buf, PackedGuidReader const& guid);
 
 inline PackedGuid ObjectGuid::WriteAsPacked() const { return PackedGuid(*this); }
 
