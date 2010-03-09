@@ -100,6 +100,7 @@ bool Group::Create(const uint64 &guid, const char * name)
         {
             m_dungeonDifficulty = leader->GetDungeonDifficulty();
             m_raidDifficulty = leader->GetRaidDifficulty();
+            SetGroupFactionRace(leader->getRace());
         }
 
         Player::ConvertInstancesToGroup(leader, this, guid);
@@ -294,9 +295,9 @@ bool Group::AddMember(const uint64 &guid, const char* name)
             if(sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_GROUP))
             {
                 Group *group = player->GetGroup();
-                if(Player *leader = sObjectMgr.GetPlayer(group->GetLeaderGUID()))
+                if(uint8 FactionRace = group->GetGroupFactionRace())
                 {
-                    player->setFactionForRace(leader->getRace());
+                    player->setFactionForRace(FactionRace);
                     sLog.outDebug( "WORLD: Group Interfaction Interactions - Faction changed (AddMember)" );
                 }
             }

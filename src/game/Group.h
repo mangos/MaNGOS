@@ -192,8 +192,8 @@ class MANGOS_DLL_SPEC Group
         ItemQualities GetLootThreshold() const { return m_lootThreshold; }
 
         // InterFaction change
-        const uint8& GetGroupFaction() const { return m_GroupFaction; }
-        void SetGroupFaction() { m_GroupFaction = getRace(m_leaderGuid); }
+        const uint8& GetGroupFactionRace() const { return m_GroupFactionRace; }
+        void SetGroupFactionRace(const uint8 race) { m_GroupFactionRace = race; }
 
         // member manipulation methods
         bool IsMember(const uint64& guid) const { return _getMemberCSlot(guid) != m_memberSlots.end(); }
@@ -412,7 +412,7 @@ class MANGOS_DLL_SPEC Group
         GroupRefManager     m_memberMgr;
         InvitesList         m_invitees;
         uint64              m_leaderGuid;
-        uint8               m_GroupFaction;
+        uint8               m_GroupFactionRace;
         std::string         m_leaderName;
         uint64              m_mainTank;
         uint64              m_mainAssistant;
