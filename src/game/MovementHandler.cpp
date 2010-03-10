@@ -184,8 +184,8 @@ void WorldSession::HandleMoveTeleportAck(WorldPacket& recv_data)
 
     uint32 flags, time;
     recv_data >> flags >> time;
-    sLog.outDebug("Guid " UI64FMTD, guid.GetEntry());
-    sLog.outDebug("Flags %u, time %u", flags, time/IN_MILISECONDS);
+    DEBUG_LOG("Guid " UI64FMTD, guid.GetRawValue());
+    DEBUG_LOG("Flags %u, time %u", flags, time/IN_MILISECONDS);
 
     Unit *mover = _player->m_mover;
     Player *plMover = mover->GetTypeId() == TYPEID_PLAYER ? (Player*)mover : NULL;
