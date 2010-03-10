@@ -21,6 +21,10 @@
 ObjectPosSelector::ObjectPosSelector(float x,float y,float size,float dist)
 : m_center_x(x),m_center_y(y),m_size(size),m_dist(dist)
 {
+    // if size == 0, m_anglestep will become 0 -> freeze
+    if(m_size == 0.0f)
+        m_size = DEFAULT_WORLD_OBJECT_SIZE;
+
     m_anglestep = acos(m_dist/(m_dist+2*m_size));
 
     m_nextUsedPos[USED_POS_PLUS]  = m_UsedPosLists[USED_POS_PLUS].end();

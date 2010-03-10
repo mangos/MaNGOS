@@ -1688,7 +1688,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                 if (m_caster->GetTypeId()!=TYPEID_PLAYER)
                     return;
 
-                // checked in create item check, avoid unexpected 
+                // checked in create item check, avoid unexpected
                 if (Item* item = ((Player*)m_caster)->GetItemByLimitedCategory(ITEM_LIMIT_CATEGORY_MANA_GEM))
                     if (item->HasMaxCharges())
                         return;
@@ -3938,7 +3938,7 @@ void Spell::DoSummon(SpellEffectIndex eff_idx)
     spawnCreature->InitStatsForLevel(level, m_caster);
 
     spawnCreature->GetCharmInfo()->SetPetNumber(pet_number, false);
-    
+
     spawnCreature->UpdateWalkMode(m_caster);
 
     spawnCreature->AIM_Initialize();
@@ -6077,7 +6077,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     }
 
                     if (spellId)
-                        m_caster->CastCustomSpell(target, spellId, &basePoint, 0, 0, false);
+                        m_caster->CastCustomSpell(target, spellId, &basePoint, 0, 0, true);
 
                     return;
                 }
