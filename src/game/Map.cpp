@@ -1717,6 +1717,11 @@ uint16 Map::GetAreaFlag(float x, float y, float z) const
     //       not provided correct areaflag with this hacks
     switch(areaflag)
     {
+        case 1146:                                          // Blade's Edge Mountains
+        case 1409:                                          // Forge Camp: Wrath (Blade's Edge Mountains)
+            if (x > 3025.0f && x < 3207.0f && y > 6987.0f && y < 7165.0f && z < 183.0f)
+                areaflag = 1404;                            // Blackwing Coven (Blade's Edge Mountains)
+            break;
         // Acherus: The Ebon Hold (Plaguelands: The Scarlet Enclave)
         case 1984:                                          // Plaguelands: The Scarlet Enclave
         case 2076:                                          // Death's Breach (Plaguelands: The Scarlet Enclave)
