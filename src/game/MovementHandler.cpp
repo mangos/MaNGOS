@@ -178,7 +178,7 @@ void WorldSession::HandleMoveTeleportAck(WorldPacket& recv_data)
 
     uint32 flags, time;
     recv_data >> flags >> time;
-    DEBUG_LOG("Guid " UI64FMTD, guid);
+    DEBUG_LOG("Guid " UI64FMTD, guid.GetRawValue());
     DEBUG_LOG("Flags %u, time %u", flags, time/IN_MILISECONDS);
 
     Unit *mover = _player->m_mover;
@@ -457,7 +457,7 @@ void WorldSession::HandleMoveNotActiveMover(WorldPacket &recv_data)
 
     if(_player->m_mover->GetGUID() == old_mover_guid.GetRawValue())
     {
-        sLog.outError("HandleMoveNotActiveMover: incorrect mover guid: mover is " I64FMT " and should be " I64FMT " instead of " UI64FMTD, _player->m_mover->GetGUID(), _player->GetGUID(), old_mover_guid);
+        sLog.outError("HandleMoveNotActiveMover: incorrect mover guid: mover is " I64FMT " and should be " I64FMT " instead of " UI64FMTD, _player->m_mover->GetGUID(), _player->GetGUID(), old_mover_guid.GetRawValue());
         recv_data.rpos(recv_data.wpos());                   // prevent warnings spam
         return;
     }
