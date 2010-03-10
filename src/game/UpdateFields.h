@@ -19,7 +19,7 @@
 #ifndef _UPDATEFIELDS_AUTO_H
 #define _UPDATEFIELDS_AUTO_H
 
-// Auto generated for version 0, 3, 3, 11573
+// Auto generated for version 0, 3, 3, 11643
 
 enum EObjectFields
 {
@@ -67,10 +67,10 @@ enum EItemFields
     ITEM_FIELD_ENCHANTMENT_12_3               = OBJECT_END + 0x0033, // Size: 1, Type: TWO_SHORT, Flags: PUBLIC
     ITEM_FIELD_PROPERTY_SEED                  = OBJECT_END + 0x0034, // Size: 1, Type: INT, Flags: PUBLIC
     ITEM_FIELD_RANDOM_PROPERTIES_ID           = OBJECT_END + 0x0035, // Size: 1, Type: INT, Flags: PUBLIC
-    ITEM_FIELD_ITEM_TEXT_ID                   = OBJECT_END + 0x0036, // Size: 1, Type: INT, Flags: OWNER
-    ITEM_FIELD_DURABILITY                     = OBJECT_END + 0x0037, // Size: 1, Type: INT, Flags: OWNER, ITEM_OWNER
-    ITEM_FIELD_MAXDURABILITY                  = OBJECT_END + 0x0038, // Size: 1, Type: INT, Flags: OWNER, ITEM_OWNER
-    ITEM_FIELD_CREATE_PLAYED_TIME             = OBJECT_END + 0x0039, // Size: 1, Type: INT, Flags: PUBLIC
+    ITEM_FIELD_DURABILITY                     = OBJECT_END + 0x0036, // Size: 1, Type: INT, Flags: OWNER, ITEM_OWNER
+    ITEM_FIELD_MAXDURABILITY                  = OBJECT_END + 0x0037, // Size: 1, Type: INT, Flags: OWNER, ITEM_OWNER
+    ITEM_FIELD_CREATE_PLAYED_TIME             = OBJECT_END + 0x0038, // Size: 1, Type: INT, Flags: PUBLIC
+    ITEM_FIELD_PAD                            = OBJECT_END + 0x0039, // Size: 1, Type: INT, Flags: NONE
     ITEM_END                                  = OBJECT_END + 0x003A,
 };
 
@@ -389,7 +389,7 @@ enum EUnitFields
     PLAYER_FIELD_GLYPH_SLOTS_1                = UNIT_END + 0x048C, // Size: 6, Type: INT, Flags: PRIVATE
     PLAYER_FIELD_GLYPHS_1                     = UNIT_END + 0x0492, // Size: 6, Type: INT, Flags: PRIVATE
     PLAYER_GLYPHS_ENABLED                     = UNIT_END + 0x0498, // Size: 1, Type: INT, Flags: PRIVATE
-    PLAYER_FIELD_PADDING                      = UNIT_END + 0x0499, // Size: 1, Type: INT, Flags: NONE
+    PLAYER_PET_SPELL_POWER                    = UNIT_END + 0x0499, // Size: 1, Type: INT, Flags: PRIVATE
     PLAYER_END                                = UNIT_END + 0x049A,
 };
 

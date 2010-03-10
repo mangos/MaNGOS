@@ -1096,6 +1096,9 @@ class MANGOS_DLL_SPEC Player : public Unit
         uint32 GetTotalPlayedTime() { return m_Played_time[PLAYED_TIME_TOTAL]; }
         uint32 GetLevelPlayedTime() { return m_Played_time[PLAYED_TIME_LEVEL]; }
 
+        void ResetTimeSync();
+        void SendTimeSync();
+
         void setDeathState(DeathState s);                   // overwrite Unit::setDeathState
 
         void InnEnter (time_t time, uint32 mapid, float x, float y, float z)
@@ -2563,6 +2566,11 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         AchievementMgr m_achievementMgr;
         ReputationMgr  m_reputationMgr;
+
+        uint32 m_timeSyncCounter;
+        uint32 m_timeSyncTimer;
+        uint32 m_timeSyncClient;
+        uint32 m_timeSyncServer;
 };
 
 void AddItemsSetItem(Player*player,Item *item);

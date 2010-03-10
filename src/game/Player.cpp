@@ -1295,6 +1295,14 @@ void Player::Update( uint32 p_time )
             m_zoneUpdateTimer -= p_time;
     }
 
+    if (m_timeSyncTimer > 0)
+    {
+        if(p_time >= m_timeSyncTimer)
+            SendTimeSync();
+        else
+            m_timeSyncTimer -= p_time;
+    }
+
     if (isAlive())
     {
         // if no longer casting, set regen power as soon as it is up.
@@ -1306,9 +1314,7 @@ void Player::Update( uint32 p_time )
     }
 
     if (m_deathState == JUST_DIED)
-    {
         KillPlayer();
-    }
 
     if(m_nextSave > 0)
     {
@@ -1319,9 +1325,7 @@ void Player::Update( uint32 p_time )
             sLog.outDetail("Player '%s' (GUID: %u) saved", GetName(), GetGUIDLow());
         }
         else
-        {
             m_nextSave -= p_time;
-        }
     }
 
     //Handle Water/drowning
@@ -18977,9 +18981,8 @@ void Player::SendInitialPacketsAfterAddToMap()
     GetZoneAndAreaId(newzone,newarea);
     UpdateZone(newzone,newarea);                            // also call SendInitWorldStates();
 
-    WorldPacket data(SMSG_TIME_SYNC_REQ, 4);                // new 2.0.x, enable movement
-    data << uint32(0x00000000);                             // on blizz it increments periodically
-    GetSession()->SendPacket(&data);
+    ResetTimeSync();
+    SendTimeSync();
 
     CastSpell(this, 836, true);                             // LOGINEFFECT
 
@@ -21541,6 +21544,25 @@ void Player::UpdateVisibilityForPlayer()
     }
     else
         m->UpdateObjectsVisibilityFor(this, cell, p);
+}
+
+void Player::ResetTimeSync()
+{
+    m_timeSyncCounter = 0;
+    m_timeSyncTimer = 0;
+    m_timeSyncClient = 0;
+    m_timeSyncServer = getMSTime();
+}
+
+void Player::SendTimeSync()
+{
+    WorldPacket data(SMSG_TIME_SYNC_REQ, 4);
+    data << uint32(m_timeSyncCounter++);
+    GetSession()->SendPacket(&data);
+
+    // Schedule next sync in 10 sec
+    m_timeSyncTimer = 10000;
+    m_timeSyncServer = getMSTime();
 }
 
 void Player::SendDuelCountdown(uint32 counter)
