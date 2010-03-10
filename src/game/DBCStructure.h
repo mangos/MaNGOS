@@ -1145,8 +1145,8 @@ struct MovieEntry
 struct PvPDifficultyEntry
 {
     //uint32      id;                                       // 0        m_ID
-    uint32      mapId;                                      // 1  
-    uint32      bracketId;                                  // 2 
+    uint32      mapId;                                      // 1
+    uint32      bracketId;                                  // 2
     uint32      minLevel;                                   // 3
     uint32      maxLevel;                                   // 4
     uint32      difficulty;                                 // 5

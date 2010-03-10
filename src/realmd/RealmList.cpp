@@ -51,10 +51,10 @@ void RealmList::Initialize(uint32 updateInterval)
 }
 
 void RealmList::UpdateRealm( uint32 ID, const std::string& name, const std::string& address, uint32 port, uint8 icon, uint8 color, uint8 timezone, AccountTypes allowedSecurityLevel, float popu, const char* builds)
-{      
+{
     ///- Create new if not exist or update existed
     Realm& realm = m_realms[name];
-    
+
     realm.m_ID      = ID;
     realm.icon      = icon;
     realm.color     = color;

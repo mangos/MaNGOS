@@ -1465,7 +1465,7 @@ void Aura::HandleAddModifier(bool apply, bool Real)
             case 31834:                                     // Light's Grace
             case 34754:                                     // Clearcasting
             case 34936:                                     // Backlash
-            case 44401:                                     // Missile Barrage 
+            case 44401:                                     // Missile Barrage
             case 48108:                                     // Hot Streak
             case 51124:                                     // Killing Machine
             case 54741:                                     // Firestarter
@@ -7192,7 +7192,7 @@ void Aura::PeriodicTick()
             Unit *pCaster = GetCaster();
             if(!pCaster)
                 return;
-            
+
             // heal for caster damage (must be alive)
             if(m_target != pCaster && GetSpellProto()->SpellVisual[0] == 163 && !pCaster->isAlive())
                 return;
