@@ -21,6 +21,7 @@
 ObjectPosSelector::ObjectPosSelector(float x,float y,float size,float dist)
 : m_center_x(x),m_center_y(y),m_size(size),m_dist(dist)
 {
+    // if size == 0, m_anglestep will become 0 -> freeze
     if(m_size == 0.0f)
         m_size = DEFAULT_WORLD_OBJECT_SIZE;
 

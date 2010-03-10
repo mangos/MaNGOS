@@ -6542,7 +6542,7 @@ void ObjectMgr::LoadQuestPOI()
 
         if(points)
         {
-            do 
+            do
             {
                 Field *pointFields = points->Fetch();
                 int32 x = pointFields[0].GetInt32();
