@@ -95,7 +95,11 @@ int ThreadPriority::getPriority(Priority p) const
     return m_priority[p];
 }
 
-#define THREADFLAG (THR_NEW_LWP | THR_SCHED_DEFAULT| THR_JOINABLE)
+#ifndef __sun__
+# define THREADFLAG (THR_NEW_LWP | THR_JOINABLE | THR_SCHED_DEFAULT)
+#else
+# define THREADFLAG (THR_NEW_LWP | THR_JOINABLE)
+#endif
 
 Thread::Thread() : m_task(0), m_iThreadId(0), m_hThreadHandle(0)
 {
@@ -220,10 +224,12 @@ Thread * Thread::current()
 
 void Thread::setPriority(Priority type)
 {
+#ifndef __sun__
     int _priority = m_TpEnum.getPriority(type);
     int _ok = ACE_Thread::setprio(m_hThreadHandle, _priority);
     //remove this ASSERT in case you don't want to know is thread priority change was successful or not
     ASSERT (_ok == 0);
+#endif
 }
 
 void Thread::Sleep(unsigned long msecs)

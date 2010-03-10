@@ -47,14 +47,21 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 
     recvPacket >> bagIndex >> slot >> cast_count >> spellid >> item_guid >> glyphIndex >> unk_flags;
 
-    Item *pItem = pUser->GetItemByPos(bagIndex, slot);
-    if(!pItem)
+    // reject fake data
+    if (glyphIndex >= MAX_GLYPH_SLOT_INDEX)
     {
         pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, NULL, NULL );
         return;
     }
 
-    if(pItem->GetGUID() != item_guid)
+    Item *pItem = pUser->GetItemByPos(bagIndex, slot);
+    if (!pItem)
+    {
+        pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, NULL, NULL );
+        return;
+    }
+
+    if (pItem->GetGUID() != item_guid)
     {
         pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, NULL, NULL );
         return;
@@ -63,28 +70,28 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
     sLog.outDetail("WORLD: CMSG_USE_ITEM packet, bagIndex: %u, slot: %u, cast_count: %u, spellid: %u, Item: %u, glyphIndex: %u, unk_flags: %u, data length = %i", bagIndex, slot, cast_count, spellid, pItem->GetEntry(), glyphIndex, unk_flags, (uint32)recvPacket.size());
 
     ItemPrototype const *proto = pItem->GetProto();
-    if(!proto)
+    if (!proto)
     {
         pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, pItem, NULL );
         return;
     }
 
     // some item classes can be used only in equipped state
-    if(proto->InventoryType != INVTYPE_NON_EQUIP && !pItem->IsEquipped())
+    if (proto->InventoryType != INVTYPE_NON_EQUIP && !pItem->IsEquipped())
     {
         pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, pItem, NULL );
         return;
     }
 
     uint8 msg = pUser->CanUseItem(pItem);
-    if( msg != EQUIP_ERR_OK )
+    if (msg != EQUIP_ERR_OK)
     {
         pUser->SendEquipError( msg, pItem, NULL );
         return;
     }
 
     // only allow conjured consumable, bandage, poisons (all should have the 2^21 item flag set in DB)
-    if( proto->Class == ITEM_CLASS_CONSUMABLE &&
+    if (proto->Class == ITEM_CLASS_CONSUMABLE &&
         !(proto->Flags & ITEM_FLAGS_USEABLE_IN_ARENA) &&
         pUser->InArena())
     {
@@ -118,8 +125,8 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
     }
 
     SpellCastTargets targets;
-    if (!targets.read(&recvPacket, pUser))
-        return;
+
+    recvPacket >> targets.ReadForCaster(pUser);
 
     targets.Update(pUser);
 
@@ -327,27 +334,25 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
 
     // client provided targets
     SpellCastTargets targets;
-    if(!targets.read(&recvPacket,mover))
-    {
-        recvPacket.rpos(recvPacket.wpos());                 // prevent spam at ignore packet
-        return;
-    }
+
+    recvPacket >> targets.ReadForCaster(mover);
 
     // some spell cast packet including more data (for projectiles?)
     if (unk_flags & 0x02)
     {
-        recvPacket.read_skip<float>();                      // unk1, coords?
-        recvPacket.read_skip<float>();                      // unk1, coords?
         uint8 unk1;
+
+        recvPacket >> Unused<float>();                      // unk1, coords?
+        recvPacket >> Unused<float>();                      // unk1, coords?
         recvPacket >> unk1;                                 // >> 1 or 0
         if(unk1)
         {
-            recvPacket.read_skip<uint32>();                 // >> MSG_MOVE_STOP
-            uint64 guid;                                    // guid - unused
-            if(!recvPacket.readPackGUID(guid))
-                return;
+            ObjectGuid guid;                                // guid - unused
+            MovementInfo movementInfo;
 
-            MovementInfo movementInfo(recvPacket);
+            recvPacket >> Unused<uint32>();                 // >> MSG_MOVE_STOP
+            recvPacket >> guid.ReadAsPacked();
+            recvPacket >> movementInfo;
         }
     }
 
@@ -487,9 +492,9 @@ void WorldSession::HandleCancelGrowthAuraOpcode( WorldPacket& /*recvPacket*/)
 
 void WorldSession::HandleCancelAutoRepeatSpellOpcode( WorldPacket& /*recvPacket*/)
 {
-    // may be better send SMSG_CANCEL_AUTO_REPEAT?
     // cancel and prepare for deleting
-    _player->m_mover->InterruptSpell(CURRENT_AUTOREPEAT_SPELL);
+    // do not send SMSG_CANCEL_AUTO_REPEAT! client will send this Opcode again (loop)
+    _player->m_mover->InterruptSpell(CURRENT_AUTOREPEAT_SPELL, true, false);
 }
 
 void WorldSession::HandleCancelChanneling( WorldPacket & recv_data)
@@ -514,15 +519,11 @@ void WorldSession::HandleTotemDestroyed( WorldPacket& recvPacket)
 
     recvPacket >> slotId;
 
-    if (slotId >= MAX_TOTEM)
+    if (int(slotId) >= MAX_TOTEM_SLOT)
         return;
 
-    if(!_player->m_TotemSlot[slotId])
-        return;
-
-    Creature* totem = GetPlayer()->GetMap()->GetCreature(_player->m_TotemSlot[slotId]);
-    if(totem && totem->isTotem())
-        ((Totem*)totem)->UnSummon();
+    if (Totem* totem = GetPlayer()->GetTotem(TotemSlot(slotId)))
+        totem->UnSummon();
 }
 
 void WorldSession::HandleSelfResOpcode( WorldPacket & /*recv_data*/ )

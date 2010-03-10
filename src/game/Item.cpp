@@ -19,7 +19,7 @@
 #include "Common.h"
 #include "Item.h"
 #include "ObjectMgr.h"
-#include "ObjectDefines.h"
+#include "ObjectGuid.h"
 #include "WorldPacket.h"
 #include "Database/DatabaseEnv.h"
 #include "ItemEnchantmentMgr.h"
@@ -1053,5 +1053,30 @@ bool ItemRequiredTarget::IsFitToRequirements( Unit* pUnitTarget ) const
             return !pUnitTarget->isAlive();
         default:
             return false;
+    }
+}
+
+bool Item::HasMaxCharges() const
+{
+    ItemPrototype const* itemProto = GetProto();
+
+    for(int i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
+        if (GetSpellCharges(i) != itemProto->Spells[i].SpellCharges)
+            return false;
+
+    return true;
+}
+
+void Item::RestoreCharges()
+{
+    ItemPrototype const* itemProto = GetProto();
+
+    for(int i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
+    {
+        if (GetSpellCharges(i) != itemProto->Spells[i].SpellCharges)
+        {
+            SetSpellCharges(i, itemProto->Spells[i].SpellCharges);
+            SetState(ITEM_CHANGED);
+        }
     }
 }

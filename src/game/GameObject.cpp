@@ -334,7 +334,8 @@ void GameObject::Update(uint32 /*p_time*/)
                         Unit *caster =  owner ? owner : ok;
 
                         caster->CastSpell(ok, goInfo->trap.spellId, true, NULL, NULL, GetGUID());
-                        m_cooldownTime = time(NULL) + 4;        // 4 seconds
+                        // use template cooldown if provided
+                        m_cooldownTime = time(NULL) + (goInfo->trap.cooldown ? goInfo->trap.cooldown : uint32(4));
 
                         // count charges
                         if(goInfo->trap.charges > 0)
@@ -1076,6 +1077,16 @@ void GameObject::Use(Unit* user)
             // cast this spell later if provided
             spellId = info->goober.spellId;
 
+            // database may contain a dummy spell, so it need replacement by actually existing
+            switch(spellId)
+            {
+                case 34448: spellId = 26566; break;
+                case 34452: spellId = 26572; break;
+                case 37639: spellId = 36326; break;
+                case 45367: spellId = 45371; break;
+                case 45370: spellId = 45368; break;
+            }
+
             break;
         }
         case GAMEOBJECT_TYPE_CAMERA:                        //13
@@ -1438,3 +1449,90 @@ void GameObject::UpdateRotationFields(float rotation2 /*=0.0f*/, float rotation3
     SetFloatValue(GAMEOBJECT_PARENTROTATION+2, rotation2);
     SetFloatValue(GAMEOBJECT_PARENTROTATION+3, rotation3);
 }
+
+bool GameObject::IsHostileTo(Unit const* unit) const
+{
+    // always non-hostile to GM in GM mode
+    if(unit->GetTypeId()==TYPEID_PLAYER && ((Player const*)unit)->isGameMaster())
+        return false;
+
+    // test owner instead if have
+    if (Unit const* owner = GetOwner())
+        return owner->IsHostileTo(unit);
+
+    if (Unit const* targetOwner = unit->GetCharmerOrOwner())
+        return IsHostileTo(targetOwner);
+
+    // for not set faction case (wild object) use hostile case
+    if(!GetGOInfo()->faction)
+        return true;
+
+    // faction base cases
+    FactionTemplateEntry const*tester_faction = sFactionTemplateStore.LookupEntry(GetGOInfo()->faction);
+    FactionTemplateEntry const*target_faction = unit->getFactionTemplateEntry();
+    if(!tester_faction || !target_faction)
+        return false;
+
+    // GvP forced reaction and reputation case
+    if(unit->GetTypeId()==TYPEID_PLAYER)
+    {
+        // forced reaction
+        if(tester_faction->faction)
+        {
+            if(ReputationRank const* force = ((Player*)unit)->GetReputationMgr().GetForcedRankIfAny(tester_faction))
+                return *force <= REP_HOSTILE;
+
+            // apply reputation state
+            FactionEntry const* raw_tester_faction = sFactionStore.LookupEntry(tester_faction->faction);
+            if(raw_tester_faction && raw_tester_faction->reputationListID >=0 )
+                return ((Player const*)unit)->GetReputationMgr().GetRank(raw_tester_faction) <= REP_HOSTILE;
+        }
+    }
+
+    // common faction based case (GvC,GvP)
+    return tester_faction->IsHostileTo(*target_faction);
+}
+
+bool GameObject::IsFriendlyTo(Unit const* unit) const
+{
+    // always friendly to GM in GM mode
+    if(unit->GetTypeId()==TYPEID_PLAYER && ((Player const*)unit)->isGameMaster())
+        return true;
+
+    // test owner instead if have
+    if (Unit const* owner = GetOwner())
+        return owner->IsFriendlyTo(unit);
+
+    if (Unit const* targetOwner = unit->GetCharmerOrOwner())
+        return IsFriendlyTo(targetOwner);
+
+    // for not set faction case (wild object) use hostile case
+    if(!GetGOInfo()->faction)
+        return false;
+
+    // faction base cases
+    FactionTemplateEntry const*tester_faction = sFactionTemplateStore.LookupEntry(GetGOInfo()->faction);
+    FactionTemplateEntry const*target_faction = unit->getFactionTemplateEntry();
+    if(!tester_faction || !target_faction)
+        return false;
+
+    // GvP forced reaction and reputation case
+    if(unit->GetTypeId()==TYPEID_PLAYER)
+    {
+        // forced reaction
+        if(tester_faction->faction)
+        {
+            if(ReputationRank const* force =((Player*)unit)->GetReputationMgr().GetForcedRankIfAny(tester_faction))
+                return *force >= REP_FRIENDLY;
+
+            // apply reputation state
+            if(FactionEntry const* raw_tester_faction = sFactionStore.LookupEntry(tester_faction->faction))
+                if(raw_tester_faction->reputationListID >=0 )
+                    return ((Player const*)unit)->GetReputationMgr().GetRank(raw_tester_faction) >= REP_FRIENDLY;
+        }
+    }
+
+    // common faction based case (GvC,GvP)
+    return tester_faction->IsFriendlyTo(*target_faction);
+}
+

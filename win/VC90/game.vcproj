@@ -1311,7 +1311,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\game\ObjectDefines.h"
+				RelativePath="..\..\src\game\ObjectGuid.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\ObjectGuid.h"
 				>
 			</File>
 			<File

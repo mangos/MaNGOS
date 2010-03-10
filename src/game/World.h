@@ -159,6 +159,7 @@ enum eConfigUint32Values
     CONFIG_UINT32_BATTLEGROUND_INVITATION_TYPE,
     CONFIG_UINT32_BATTLEGROUND_PREMATURE_FINISH_TIMER,
     CONFIG_UINT32_BATTLEGROUND_PREMADE_GROUP_WAIT_FOR_MATCH,
+    CONFIG_UINT32_BATTLEGROUND_QUEUE_ANNOUNCER_JOIN,
     CONFIG_UINT32_ARENA_MAX_RATING_DIFFERENCE,
     CONFIG_UINT32_ARENA_RATING_DISCARD_TIMER,
     CONFIG_UINT32_ARENA_AUTO_DISTRIBUTE_INTERVAL_DAYS,
@@ -296,10 +297,10 @@ enum eConfigBoolValues
     CONFIG_BOOL_DECLINED_NAMES_USED,
     CONFIG_BOOL_SKILL_MILLING,
     CONFIG_BOOL_BATTLEGROUND_CAST_DESERTER,
-    CONFIG_BOOL_BATTLEGROUND_QUEUE_ANNOUNCER_ENABLE,
-    CONFIG_BOOL_BATTLEGROUND_QUEUE_ANNOUNCER_PLAYERONLY,
+    CONFIG_BOOL_BATTLEGROUND_QUEUE_ANNOUNCER_START,
     CONFIG_BOOL_ARENA_AUTO_DISTRIBUTE_POINTS,
-    CONFIG_BOOL_ARENA_QUEUE_ANNOUNCER_ENABLE,
+    CONFIG_BOOL_ARENA_QUEUE_ANNOUNCER_JOIN,
+    CONFIG_BOOL_ARENA_QUEUE_ANNOUNCER_EXIT,
     CONFIG_BOOL_VALUE_COUNT
 };
 
@@ -371,13 +372,18 @@ enum RealmZone
 /// Storage class for commands issued for delayed execution
 struct CliCommandHolder
 {
-    typedef void Print(const char*);
+    typedef void Print(void*, const char*);
+    typedef void CommandFinished(void*, bool success);
 
+    uint32 m_cliAccountId;                                  // 0 for console and real account id for RA/soap
+    AccountTypes m_cliAccessLevel;
+    void* m_callbackArg;
     char *m_command;
     Print* m_print;
+    CommandFinished* m_commandFinished;
 
-    CliCommandHolder(const char *command, Print* zprint)
-        : m_print(zprint)
+    CliCommandHolder(uint32 accountId, AccountTypes cliAccessLevel, void* callbackArg, const char *command, Print* zprint, CommandFinished* commandFinished)
+        : m_cliAccountId(accountId), m_cliAccessLevel(cliAccessLevel), m_callbackArg(callbackArg), m_print(zprint), m_commandFinished(commandFinished)
     {
         size_t len = strlen(command)+1;
         m_command = new char[len];
@@ -527,7 +533,7 @@ class World
         static float GetVisibleObjectGreyDistance()         { return m_VisibleObjectGreyDistance;     }
 
         void ProcessCliCommands();
-        void QueueCliCommand( CliCommandHolder::Print* zprintf, char const* input ) { cliCmdQueue.add(new CliCommandHolder(input, zprintf)); }
+        void QueueCliCommand(CliCommandHolder* commandHolder) { cliCmdQueue.add(commandHolder); }
 
         void UpdateResultQueue();
         void InitResultQueue();

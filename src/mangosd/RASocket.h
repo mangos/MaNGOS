@@ -24,42 +24,73 @@
 #define _RASOCKET_H
 
 #include "Common.h"
-#include "sockets/TcpSocket.h"
+#include <ace/Synch_Traits.h>
+#include <ace/Svc_Handler.h>
+#include <ace/SOCK_Acceptor.h>
+#include <ace/Acceptor.h>
+#include <ace/Thread_Mutex.h>
+#include <ace/Semaphore.h>
 
-#define RA_BUFF_SIZE 1024
+#define RA_BUFF_SIZE 8192
 
-class ISocketHandler;
 
 /// Remote Administration socket
-class RASocket: public TcpSocket
+typedef ACE_Svc_Handler < ACE_SOCK_STREAM, ACE_NULL_SYNCH> RAHandler;
+class RASocket: protected RAHandler
 {
     public:
+        ACE_Semaphore pendingCommands;
+        typedef ACE_Acceptor<RASocket, ACE_SOCK_ACCEPTOR > Acceptor;
+        friend class ACE_Acceptor<RASocket, ACE_SOCK_ACCEPTOR >;
 
-        RASocket(ISocketHandler& h);
-        ~RASocket();
+        int sendf(const char*);
 
-        void OnAccept();
-        void OnRead();
+    protected:
+        /// things called by ACE framework.
+        RASocket(void);
+        virtual ~RASocket(void);
+
+        /// Called on open ,the void* is the acceptor.
+        virtual int open (void *);
+
+        /// Called on failures inside of the acceptor, don't call from your code.
+        virtual int close (int);
+
+        /// Called when we can read from the socket.
+        virtual int handle_input (ACE_HANDLE = ACE_INVALID_HANDLE);
+
+        /// Called when the socket can write.
+        virtual int handle_output (ACE_HANDLE = ACE_INVALID_HANDLE);
+
+        /// Called when connection is closed or error happens.
+        virtual int handle_close (ACE_HANDLE = ACE_INVALID_HANDLE,
+            ACE_Reactor_Mask = ACE_Event_Handler::ALL_EVENTS_MASK);
 
     private:
+        bool outActive;
 
-        char * buff;
-        std::string szLogin;
-        uint32 iSess;
-        unsigned int iInputLength;
-        bool bLog;
-        bool bSecure;                                       //kick on wrong pass, non exist. user, user with no priv
+        char inputBuffer[RA_BUFF_SIZE];
+        uint32 inputBufferLen;
+
+        ACE_Thread_Mutex outBufferLock;
+        char outputBuffer[RA_BUFF_SIZE];
+        uint32 outputBufferLen;
+
+        uint32 accId;
+        AccountTypes accAccessLevel;
+        bool bSecure;                                       //kick on wrong pass, non exist. user OR user with no priv
         //will protect from DOS, bruteforce attacks
-        //some 'smart' protection must be added for more security
-        uint8 iMinLevel;
+        bool bStricted;                                     // not allow execute console only commands (SEC_CONSOLE) remotly
+        AccountTypes iMinLevel;
         enum
         {
             NONE,                                           //initial value
             LG,                                             //only login was entered
-            OK,                                             //both login and pass were given, and they are correct and user have enough priv.
+            OK,                                             //both login and pass were given, they were correct and user has enough priv.
         }stage;
 
-        static void zprint( const char * szText );
+        static void zprint(void* callbackArg, const char * szText );
+        static void commandFinished(void* callbackArg, bool success);
 };
 #endif
 /// @}

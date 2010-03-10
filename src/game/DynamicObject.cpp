@@ -161,3 +161,19 @@ bool DynamicObject::isVisibleForInState(Player const* u, WorldObject const* view
     // normal case
     return IsWithinDistInMap(viewPoint, World::GetMaxVisibleDistanceForObject() + (inVisibleList ? World::GetVisibleObjectGreyDistance() : 0.0f), false);
 }
+
+bool DynamicObject::IsHostileTo( Unit const* unit ) const
+{
+    if (Unit* owner = GetCaster())
+        return owner->IsHostileTo(unit);
+    else
+        return false;
+}
+
+bool DynamicObject::IsFriendlyTo( Unit const* unit ) const
+{
+    if (Unit* owner = GetCaster())
+        return owner->IsFriendlyTo(unit);
+    else
+        return true;
+}

@@ -33,7 +33,7 @@
 #include "CellImpl.h"
 #include "GridNotifiersImpl.h"
 #include "Opcodes.h"
-#include "ObjectDefines.h"
+#include "ObjectGuid.h"
 #include "MapInstanced.h"
 #include "World.h"
 

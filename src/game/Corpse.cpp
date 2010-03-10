@@ -21,11 +21,12 @@
 #include "Player.h"
 #include "UpdateMask.h"
 #include "ObjectAccessor.h"
-#include "ObjectDefines.h"
+#include "ObjectGuid.h"
 #include "Database/DatabaseEnv.h"
 #include "Opcodes.h"
 #include "GossipDef.h"
 #include "World.h"
+#include "ObjectMgr.h"
 
 Corpse::Corpse(CorpseType type) : WorldObject()
 {
@@ -231,4 +232,20 @@ bool Corpse::LoadFromDB(uint32 guid, Field *fields)
 bool Corpse::isVisibleForInState(Player const* u, WorldObject const* viewPoint, bool inVisibleList) const
 {
     return IsInWorld() && u->IsInWorld() && IsWithinDistInMap(viewPoint, World::GetMaxVisibleDistanceForObject() + (inVisibleList ? World::GetVisibleObjectGreyDistance() : 0.0f), false);
+}
+
+bool Corpse::IsHostileTo( Unit const* unit ) const
+{
+    if (Player* owner = sObjectMgr.GetPlayer(GetOwnerGUID()))
+        return owner->IsHostileTo(unit);
+    else
+        return false;
+}
+
+bool Corpse::IsFriendlyTo( Unit const* unit ) const
+{
+    if (Player* owner = sObjectMgr.GetPlayer(GetOwnerGUID()))
+        return owner->IsFriendlyTo(unit);
+    else
+        return true;
 }

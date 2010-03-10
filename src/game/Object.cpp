@@ -27,7 +27,7 @@
 #include "Player.h"
 #include "Vehicle.h"
 #include "ObjectMgr.h"
-#include "ObjectDefines.h"
+#include "ObjectGuid.h"
 #include "UpdateData.h"
 #include "UpdateMask.h"
 #include "Util.h"
@@ -60,10 +60,10 @@ uint32 GuidHigh2TypeId(uint32 guid_hi)
         case HIGHGUID_MO_TRANSPORT: return TYPEID_GAMEOBJECT;
         case HIGHGUID_VEHICLE:      return TYPEID_UNIT;
     }
-    return NUM_CLIENT_OBJECT_TYPES;                         // unknown
+    return TYPEID_OBJECT;                                   // unknown
 }
 
-Object::Object( ) : m_PackGUID(sizeof(uint64)+1)
+Object::Object( )
 {
     m_objectTypeId      = TYPEID_OBJECT;
     m_objectType        = TYPEMASK_OBJECT;
@@ -74,8 +74,6 @@ Object::Object( ) : m_PackGUID(sizeof(uint64)+1)
 
     m_inWorld           = false;
     m_objectUpdated     = false;
-
-    m_PackGUID.appendPackGUID(0);
 }
 
 Object::~Object( )
@@ -121,8 +119,7 @@ void Object::_Create( uint32 guidlow, uint32 entry, HighGuid guidhigh )
     uint64 guid = MAKE_NEW_GUID(guidlow, entry, guidhigh);
     SetUInt64Value(OBJECT_FIELD_GUID, guid);
     SetUInt32Value(OBJECT_FIELD_TYPE, m_objectType);
-    m_PackGUID.wpos(0);
-    m_PackGUID.appendPackGUID(GetGUID());
+    m_PackGUID.Set(guid);
 }
 
 void Object::BuildMovementUpdateBlock(UpdateData * data, uint16 flags ) const
@@ -130,7 +127,7 @@ void Object::BuildMovementUpdateBlock(UpdateData * data, uint16 flags ) const
     ByteBuffer buf(500);
 
     buf << uint8(UPDATETYPE_MOVEMENT);
-    buf.append(GetPackGUID());
+    buf << GetPackGUID();
 
     BuildMovementUpdate(&buf, flags);
 
@@ -189,7 +186,7 @@ void Object::BuildCreateUpdateBlockForPlayer(UpdateData *data, Player *target) c
 
     ByteBuffer buf(500);
     buf << uint8(updatetype);
-    buf.append(GetPackGUID());
+    buf << GetPackGUID();
     buf << uint8(m_objectTypeId);
 
     BuildMovementUpdate(&buf, updateFlags);
@@ -217,7 +214,7 @@ void Object::BuildValuesUpdateBlockForPlayer(UpdateData *data, Player *target) c
     ByteBuffer buf(500);
 
     buf << uint8(UPDATETYPE_VALUES);
-    buf.append(GetPackGUID());
+    buf << GetPackGUID();
 
     UpdateMask updateMask;
     updateMask.SetCount(m_valuesCount);
@@ -510,7 +507,7 @@ void Object::BuildMovementUpdate(ByteBuffer * data, uint16 updateFlags) const
     if(updateFlags & UPDATEFLAG_HAS_ATTACKING_TARGET)       // packed guid (current target guid)
     {
         if (((Unit*)this)->getVictim())
-            data->append(((Unit*)this)->getVictim()->GetPackGUID());
+            *data << ((Unit*)this)->getVictim()->GetPackGUID();
         else
             data->appendPackGUID(0);
     }
@@ -525,7 +522,7 @@ void Object::BuildMovementUpdate(ByteBuffer * data, uint16 updateFlags) const
     if(updateFlags & UPDATEFLAG_VEHICLE)                    // unused for now
     {
         *data << uint32(((Vehicle*)this)->GetVehicleId());  // vehicle id
-        *data << float(0);                                  // facing adjustment
+        *data << float(((WorldObject*)this)->GetOrientation());
     }
 
     // 0x200
@@ -1957,4 +1954,22 @@ void WorldObject::BuildUpdateData( UpdateDataMapType & update_players)
     cell.Visit(p, player_notifier, *aMap, *this, aMap->GetVisibilityDistance());
 
     ClearUpdateMask(false);
+}
+
+bool WorldObject::IsControlledByPlayer() const
+{
+    switch (GetTypeId())
+    {
+        case TYPEID_GAMEOBJECT:
+            return IS_PLAYER_GUID(((GameObject*)this)->GetOwnerGUID());
+        case TYPEID_UNIT:
+        case TYPEID_PLAYER:
+            return ((Unit*)this)->IsCharmerOrOwnerPlayerOrPlayerItself();
+        case TYPEID_DYNAMICOBJECT:
+            return IS_PLAYER_GUID(((DynamicObject*)this)->GetCasterGUID());
+        case TYPEID_CORPSE:
+            return true;
+        default:
+            return false;
+    }
 }

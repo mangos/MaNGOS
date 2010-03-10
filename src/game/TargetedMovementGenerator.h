@@ -80,7 +80,7 @@ class MANGOS_DLL_SPEC ChaseMovementGenerator : public TargetedMovementGeneratorM
             : TargetedMovementGeneratorMedium<T, ChaseMovementGenerator<T> >(target, offset, angle) {}
         ~ChaseMovementGenerator() {}
 
-        MovementGeneratorType GetMovementGeneratorType() { return CHASE_MOTION_TYPE; }
+        MovementGeneratorType GetMovementGeneratorType() const { return CHASE_MOTION_TYPE; }
 
         void Initialize(T &);
         void Finalize(T &);
@@ -103,7 +103,7 @@ class MANGOS_DLL_SPEC FollowMovementGenerator : public TargetedMovementGenerator
             : TargetedMovementGeneratorMedium<T, FollowMovementGenerator<T> >(target, offset, angle) {}
         ~FollowMovementGenerator() {}
 
-        MovementGeneratorType GetMovementGeneratorType() { return FOLLOW_MOTION_TYPE; }
+        MovementGeneratorType GetMovementGeneratorType() const { return FOLLOW_MOTION_TYPE; }
 
         void Initialize(T &);
         void Finalize(T &);

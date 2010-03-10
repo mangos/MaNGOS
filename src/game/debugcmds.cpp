@@ -30,7 +30,7 @@
 #include "BattleGroundMgr.h"
 #include <fstream>
 #include "ObjectMgr.h"
-#include "ObjectDefines.h"
+#include "ObjectGuid.h"
 #include "SpellMgr.h"
 
 bool ChatHandler::HandleDebugSendSpellFailCommand(const char* args)
@@ -98,7 +98,7 @@ bool ChatHandler::HandleDebugSendEquipErrorCommand(const char* args)
         return false;
 
     uint8 msg = atoi(args);
-    m_session->GetPlayer()->SendEquipError(msg, 0, 0);
+    m_session->GetPlayer()->SendEquipError(msg, NULL, NULL);
     return true;
 }
 
@@ -183,7 +183,7 @@ bool ChatHandler::HandleDebugSendOpcodeCommand(const char* /*args*/)
         }
         else if(type == "pguid")
         {
-            data.append(unit->GetPackGUID());
+            data << unit->GetPackGUID();
         }
         else
         {

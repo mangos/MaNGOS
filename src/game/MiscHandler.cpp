@@ -26,7 +26,7 @@
 #include "Player.h"
 #include "World.h"
 #include "ObjectMgr.h"
-#include "ObjectDefines.h"
+#include "ObjectGuid.h"
 #include "WorldSession.h"
 #include "Auth/BigNumber.h"
 #include "Auth/Sha1.h"
@@ -292,7 +292,7 @@ void WorldSession::HandleLogoutRequestOpcode( WorldPacket & /*recv_data*/ )
         GetPlayer()->SetStandState(UNIT_STAND_STATE_SIT);
 
         WorldPacket data( SMSG_FORCE_MOVE_ROOT, (8+4) );    // guess size
-        data.append(GetPlayer()->GetPackGUID());
+        data << GetPlayer()->GetPackGUID();
         data << (uint32)2;
         SendPacket( &data );
         GetPlayer()->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
@@ -324,7 +324,7 @@ void WorldSession::HandleLogoutCancelOpcode( WorldPacket & /*recv_data*/ )
     {
         //!we can move again
         data.Initialize( SMSG_FORCE_MOVE_UNROOT, 8 );       // guess size
-        data.append(GetPlayer()->GetPackGUID());
+        data << GetPlayer()->GetPackGUID();
         data << uint32(0);
         SendPacket( &data );
 
@@ -1004,13 +1004,11 @@ void WorldSession::HandleMoveTimeSkippedOpcode( WorldPacket & recv_data )
     /*  WorldSession::Update( getMSTime() );*/
     DEBUG_LOG( "WORLD: Time Lag/Synchronization Resent/Update" );
 
-    uint64 guid;
-    if(!recv_data.readPackGUID(guid))
-    {
-        recv_data.rpos(recv_data.wpos());
-        return;
-    }
-    recv_data.read_skip<uint32>();
+    ObjectGuid guid;
+
+    recv_data >> guid.ReadAsPacked();
+    recv_data >> Unused<uint32>();
+
     /*
         uint64 guid;
         uint32 time_skipped;
@@ -1133,7 +1131,7 @@ void WorldSession::HandleInspectOpcode(WorldPacket& recv_data)
         return;
 
     WorldPacket data(SMSG_INSPECT_TALENT, 50);
-    data.append(plr->GetPackGUID());
+    data << plr->GetPackGUID();
 
     if(sWorld.getConfig(CONFIG_BOOL_TALENTS_INSPECTING) || _player->isGameMaster())
     {
@@ -1524,15 +1522,13 @@ void WorldSession::HandleMoveSetCanFlyAckOpcode( WorldPacket & recv_data )
     sLog.outDebug("WORLD: CMSG_MOVE_SET_CAN_FLY_ACK");
     //recv_data.hexlike();
 
-    uint64 guid;                                            // guid - unused
-    if(!recv_data.readPackGUID(guid))
-        return;
+    ObjectGuid guid;                                        // guid - unused
+    MovementInfo movementInfo;
 
-    recv_data.read_skip<uint32>();                          // unk
-
-    MovementInfo movementInfo(recv_data);
-
-    recv_data.read_skip<float>();                           // unk2
+    recv_data >> guid.ReadAsPacked();
+    recv_data >> Unused<uint32>();                          // unk
+    recv_data >> movementInfo;
+    recv_data >> Unused<float>();                           // unk2
 
     _player->m_movementInfo.SetMovementFlags(movementInfo.GetMovementFlags());
 }
@@ -1555,11 +1551,11 @@ void WorldSession::HandleSetTaxiBenchmarkOpcode( WorldPacket & recv_data )
 
 void WorldSession::HandleQueryInspectAchievements( WorldPacket & recv_data )
 {
-    uint64 guid;
-    if(!recv_data.readPackGUID(guid))
-        return;
+    ObjectGuid guid;
 
-    if(Player *player = sObjectMgr.GetPlayer(guid))
+    recv_data >> guid.ReadAsPacked();
+
+    if(Player *player = sObjectMgr.GetPlayer(guid.GetRawValue()))
         player->GetAchievementMgr().SendRespondInspectAchievements(_player);
 }
 
@@ -1579,4 +1575,22 @@ void WorldSession::HandleReadyForAccountDataTimes(WorldPacket& /*recv_data*/)
     sLog.outDebug("WORLD: CMSG_READY_FOR_ACCOUNT_DATA_TIMES");
 
     SendAccountDataTimes(GLOBAL_CACHE_MASK);
+}
+
+void WorldSession::HandleHearthandResurrect(WorldPacket & /*recv_data*/)
+{
+    sLog.outDebug("WORLD: CMSG_HEARTH_AND_RESURRECT");
+
+    AreaTableEntry const* atEntry = sAreaStore.LookupEntry(_player->GetAreaId());
+    if(!atEntry || !(atEntry->flags & AREA_FLAG_CAN_HEARTH_AND_RES))
+        return;
+
+    // Can't use in flight
+    if (_player->isInFlight())
+        return;
+
+    // Send Everytime
+    _player->BuildPlayerRepop();
+    _player->ResurrectPlayer(100);
+    _player->TeleportToHomebind();
 }

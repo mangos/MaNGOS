@@ -45,7 +45,7 @@ class MANGOS_DLL_SPEC MovementGenerator
 
         virtual bool Update(Unit &, const uint32 &time_diff) = 0;
 
-        virtual MovementGeneratorType GetMovementGeneratorType() = 0;
+        virtual MovementGeneratorType GetMovementGeneratorType() const = 0;
 
         virtual void unitSpeedChanged() { }
 
@@ -55,6 +55,10 @@ class MANGOS_DLL_SPEC MovementGenerator
 
         // used by Evade code for select point to evade with expected restart default movement
         virtual bool GetResetPosition(Unit &, float& /*x*/, float& /*y*/, float& /*z*/) { return false; }
+
+        // used for check from Update call is movegen still be active (top movement generator)
+        // after some not safe for this calls
+        bool IsActive(Unit& u);
 };
 
 template<class T, class D>
@@ -119,4 +123,6 @@ struct MovementGeneratorFactory : public SelectableMovement
 typedef FactoryHolder<MovementGenerator,MovementGeneratorType> MovementGeneratorCreator;
 typedef FactoryHolder<MovementGenerator,MovementGeneratorType>::FactoryHolderRegistry MovementGeneratorRegistry;
 typedef FactoryHolder<MovementGenerator,MovementGeneratorType>::FactoryHolderRepository MovementGeneratorRepository;
+
 #endif
+

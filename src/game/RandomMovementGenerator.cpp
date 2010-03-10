@@ -164,6 +164,9 @@ bool RandomMovementGenerator<Creature>::Update(Creature &creature, const uint32 
 
     if (i_destinationHolder.UpdateTraveller(traveller, diff, false, true))
     {
+        if (!IsActive(creature))                        // force stop processing (movement can move out active zone with cleanup movegens list)
+            return true;                                // not expire now, but already lost
+
         if (i_nextMoveTime.Passed())
         {
             if (creature.canFly())

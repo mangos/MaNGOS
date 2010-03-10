@@ -69,11 +69,6 @@ void WaypointMovementGenerator<Creature>::LoadPath(Creature &c)
     i_hasDone[node_count - 1] = true;
 }
 
-void WaypointMovementGenerator<Creature>::ClearWaypoints()
-{
-    i_path = NULL;
-}
-
 void WaypointMovementGenerator<Creature>::Initialize( Creature &u )
 {
     i_nextMoveTime.Reset(0);                        // TODO: check the lower bound (0 is probably too small)
@@ -129,7 +124,11 @@ bool WaypointMovementGenerator<Creature>::Update(Creature &creature, const uint3
     CreatureTraveller traveller(creature);
 
     i_nextMoveTime.Update(diff);
-    i_destinationHolder.UpdateTraveller(traveller, diff, false, true);
+    if (i_destinationHolder.UpdateTraveller(traveller, diff, false, true))
+    {
+        if (!IsActive(creature))                            // force stop processing (movement can move out active zone with cleanup movegens list)
+            return true;                                    // not expire now, but already lost
+    }
 
     // creature has been stopped in middle of the waypoint segment
     if (!i_destinationHolder.HasArrived() && creature.IsStopped())
@@ -178,7 +177,12 @@ bool WaypointMovementGenerator<Creature>::Update(Creature &creature, const uint3
                     creature.SetUInt32Value(UNIT_NPC_EMOTESTATE, behavior->emote);
 
                 if (behavior->spell != 0)
+                {
                     creature.CastSpell(&creature, behavior->spell, false);
+
+                    if (!IsActive(creature))                // force stop processing (cast can change movegens list)
+                        return true;                        // not expire now, but already lost
+                }
 
                 if (behavior->model1 != 0)
                     creature.SetDisplayId(behavior->model1);
@@ -206,12 +210,11 @@ bool WaypointMovementGenerator<Creature>::Update(Creature &creature, const uint3
             i_hasDone[idx] = true;
             MovementInform(creature);
 
-            // force stop processing (script change movegen list)
-            if (creature.GetMotionMaster()->empty() || creature.GetMotionMaster()->top() != this)
+            if (!IsActive(creature))                        // force stop processing (movement can move out active zone with cleanup movegens list)
                 return true;                                // not expire now, but already lost
 
             // prevent a crash at empty waypoint path.
-            if (!i_path || i_path->empty())
+            if (!i_path || i_path->empty() || i_currentNode >= i_path->size())
             {
                 creature.clearUnitState(UNIT_STAT_ROAMING_MOVE);
                 return true;
@@ -299,15 +302,8 @@ uint32 FlightPathMovementGenerator::GetPathAtMapEnd() const
 
 void FlightPathMovementGenerator::Initialize(Player &player)
 {
-    player.getHostileRefManager().setOnlineOfflineState(false);
-    player.addUnitState(UNIT_STAT_IN_FLIGHT);
-    player.SetFlag(UNIT_FIELD_FLAGS,UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_TAXI_FLIGHT);
     LoadPath(player);
-    Traveller<Player> traveller(player);
-    // do not send movement, it was sent already
-    i_destinationHolder.SetDestination(traveller, i_path[i_currentNode].x, i_path[i_currentNode].y, i_path[i_currentNode].z, false);
-
-    player.SendMonsterMoveByPath(GetPath(),GetCurrentNode(),GetPathAtMapEnd(), SplineFlags(SPLINEFLAG_WALKMODE|SPLINEFLAG_FLYING));
+    Reset(player);
 }
 
 void FlightPathMovementGenerator::Finalize(Player & player)
@@ -335,6 +331,23 @@ void FlightPathMovementGenerator::Finalize(Player & player)
     }
 }
 
+void FlightPathMovementGenerator::Interrupt(Player & player)
+{
+    player.clearUnitState(UNIT_STAT_IN_FLIGHT);
+}
+
+void FlightPathMovementGenerator::Reset(Player & player)
+{
+    player.getHostileRefManager().setOnlineOfflineState(false);
+    player.addUnitState(UNIT_STAT_IN_FLIGHT);
+    player.SetFlag(UNIT_FIELD_FLAGS,UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_TAXI_FLIGHT);
+    Traveller<Player> traveller(player);
+    // do not send movement, it was sent already
+    i_destinationHolder.SetDestination(traveller, i_path[i_currentNode].x, i_path[i_currentNode].y, i_path[i_currentNode].z, false);
+
+    player.SendMonsterMoveByPath(GetPath(),GetCurrentNode(),GetPathAtMapEnd(), SplineFlags(SPLINEFLAG_WALKMODE|SPLINEFLAG_FLYING));
+}
+
 bool FlightPathMovementGenerator::Update(Player &player, const uint32 &diff)
 {
     if( MovementInProgress() )
@@ -342,6 +355,9 @@ bool FlightPathMovementGenerator::Update(Player &player, const uint32 &diff)
         Traveller<Player> traveller(player);
         if( i_destinationHolder.UpdateTraveller(traveller, diff, false) )
         {
+            if (!IsActive(player))                          // force stop processing (movement can move out active zone with cleanup movegens list)
+                return true;                                // not expire now, but already lost
+
             i_destinationHolder.ResetUpdate(FLIGHT_TRAVEL_UPDATE);
             if( i_destinationHolder.HasArrived() )
             {

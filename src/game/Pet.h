@@ -19,7 +19,7 @@
 #ifndef MANGOSSERVER_PET_H
 #define MANGOSSERVER_PET_H
 
-#include "ObjectDefines.h"
+#include "ObjectGuid.h"
 #include "Creature.h"
 #include "Unit.h"
 

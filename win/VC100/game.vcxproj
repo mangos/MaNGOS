@@ -435,6 +435,7 @@
     <ClCompile Include="..\..\src\game\ObjectAccessor.cpp" />
     <ClCompile Include="..\..\src\game\ObjectGridLoader.cpp" />
     <ClCompile Include="..\..\src\game\ObjectMgr.cpp" />
+    <ClInclude Include="..\..\src\game\ObjectGuid.cpp" />
     <ClCompile Include="..\..\src\game\ObjectPosSelector.cpp" />
     <ClCompile Include="..\..\src\game\Opcodes.cpp" />
     <ClCompile Include="..\..\src\game\pchdef.cpp">
@@ -576,7 +577,7 @@
     <ClInclude Include="..\..\src\game\NullCreatureAI.h" />
     <ClInclude Include="..\..\src\game\Object.h" />
     <ClInclude Include="..\..\src\game\ObjectAccessor.h" />
-    <ClInclude Include="..\..\src\game\ObjectDefines.h" />
+    <ClInclude Include="..\..\src\game\ObjectGuid.h" />
     <ClInclude Include="..\..\src\game\ObjectGridLoader.h" />
     <ClInclude Include="..\..\src\game\ObjectMgr.h" />
     <ClInclude Include="..\..\src\game\ObjectPosSelector.h" />

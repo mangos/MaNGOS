@@ -25,7 +25,7 @@
 #include "Log.h"
 #include "MapManager.h"
 #include "ObjectMgr.h"
-#include "ObjectDefines.h"
+#include "ObjectGuid.h"
 #include "SpellMgr.h"
 #include "UpdateMask.h"
 #include "World.h"
@@ -2060,6 +2060,31 @@ void ObjectMgr::LoadItemPrototypes()
             sLog.outErrorDb("Item (Entry: %u) has wrong HolidayId value (%u)", i, proto->HolidayId);
             const_cast<ItemPrototype*>(proto)->HolidayId = 0;
         }
+
+        if(proto->NonConsumable)
+        {
+            if (proto->NonConsumable > 1)
+            {
+                sLog.outErrorDb("Item (Entry: %u) has wrong NonConsumable (%u), must be 0..1",i,proto->NonConsumable);
+                const_cast<ItemPrototype*>(proto)->NonConsumable = 1;
+            }
+
+            bool can_be_need = false;
+            for (int j = 0; j < MAX_ITEM_PROTO_SPELLS; ++j)
+            {
+                if(proto->Spells[j].SpellCharges < 0)
+                {
+                    can_be_need = true;
+                    break;
+                }
+            }
+
+            if (!can_be_need)
+            {
+                sLog.outErrorDb("Item (Entry: %u) has redundant NonConsumable (%u), item not have negative charges",i,proto->NonConsumable);
+                const_cast<ItemPrototype*>(proto)->NonConsumable = 0;
+            }
+        }
     }
 
     // check some dbc referenced items (avoid duplicate reports)
@@ -2333,7 +2358,7 @@ void ObjectMgr::LoadPlayerInfo()
             uint32 current_race = fields[0].GetUInt32();
             uint32 current_class = fields[1].GetUInt32();
             uint32 mapId     = fields[2].GetUInt32();
-            uint32 zoneId    = fields[3].GetUInt32();
+            uint32 areaId    = fields[3].GetUInt32();
             float  positionX = fields[4].GetFloat();
             float  positionY = fields[5].GetFloat();
             float  positionZ = fields[6].GetFloat();
@@ -2379,7 +2404,7 @@ void ObjectMgr::LoadPlayerInfo()
             PlayerInfo* pInfo = &playerInfo[current_race][current_class];
 
             pInfo->mapId     = mapId;
-            pInfo->zoneId    = zoneId;
+            pInfo->areaId    = areaId;
             pInfo->positionX = positionX;
             pInfo->positionY = positionY;
             pInfo->positionZ = positionZ;
@@ -6517,7 +6542,7 @@ void ObjectMgr::LoadQuestPOI()
 
         if(points)
         {
-            do 
+            do
             {
                 Field *pointFields = points->Fetch();
                 int32 x = pointFields[0].GetInt32();
@@ -7444,6 +7469,8 @@ bool PlayerCondition::Meets(Player const * player) const
             }
             return false;
         }
+        case CONDITION_NOITEM:
+            return !player->HasItemCount(value1, value2);
         default:
             return false;
     }
@@ -7475,11 +7502,18 @@ bool PlayerCondition::IsValid(ConditionType condition, uint32 value1, uint32 val
             break;
         }
         case CONDITION_ITEM:
+        case CONDITION_NOITEM:
         {
             ItemPrototype const *proto = ObjectMgr::GetItemPrototype(value1);
             if(!proto)
             {
                 sLog.outErrorDb("Item condition requires to have non existing item (%u), skipped", value1);
+                return false;
+            }
+
+            if(value2 < 1)
+            {
+                sLog.outErrorDb("Item condition useless with count < 1, skipped");
                 return false;
             }
             break;

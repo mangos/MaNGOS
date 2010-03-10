@@ -1230,6 +1230,8 @@ void WorldSession::HandleSocketOpcode(WorldPacket& recv_data)
         {
             if(ItemLimitCategoryEntry const* limitEntry = sItemLimitCategoryStore.LookupEntry(iGemProto->ItemLimitCategory))
             {
+                // NOTE: limitEntry->mode not checked because if item have have-limit then it applied and to equip case
+
                 for (int j = 0; j < MAX_GEM_SOCKETS; ++j)
                 {
                     if (Gems[j])

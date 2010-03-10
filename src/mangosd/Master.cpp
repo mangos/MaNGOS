@@ -20,8 +20,6 @@
     \ingroup mangosd
 */
 
-#include <ace/OS_NS_signal.h>
-
 #include "WorldSocketMgr.h"
 #include "Common.h"
 #include "Master.h"
@@ -39,13 +37,11 @@
 #include "ScriptCalls.h"
 #include "Util.h"
 #include "revision_sql.h"
+#include "MaNGOSsoap.h"
 
-#include "sockets/TcpSocket.h"
-#include "sockets/Utility.h"
-#include "sockets/Parse.h"
-#include "sockets/Socket.h"
-#include "sockets/SocketHandler.h"
-#include "sockets/ListenSocket.h"
+#include <ace/OS_NS_signal.h>
+#include <ace/TP_Reactor.h>
+#include <ace/Dev_Poll_Reactor.h>
 
 #ifdef WIN32
 #include "ServiceWin32.h"
@@ -114,74 +110,68 @@ public:
 
 class RARunnable : public ACE_Based::Runnable
 {
+private:
+    ACE_Reactor *m_Reactor;
+    RASocket::Acceptor *m_Acceptor;
 public:
-    uint32 numLoops, loopCounter;
-
-    RARunnable ()
+    RARunnable()
     {
-        uint32 socketSelecttime = sWorld.getConfig (CONFIG_UINT32_SOCKET_SELECTTIME);
-        numLoops = (sConfig.GetIntDefault ("MaxPingTime", 30) * (MINUTE * 1000000 / socketSelecttime));
-        loopCounter = 0;
+        ACE_Reactor_Impl* imp = 0;
+
+        #if defined (ACE_HAS_EVENT_POLL) || defined (ACE_HAS_DEV_POLL)
+
+        imp = new ACE_Dev_Poll_Reactor ();
+
+        imp->max_notify_iterations (128);
+        imp->restart (1);
+
+        #else
+
+        imp = new ACE_TP_Reactor ();
+        imp->max_notify_iterations (128);
+
+        #endif
+
+        m_Reactor = new ACE_Reactor (imp, 1 /* 1= delete implementation so we don't have to care */);
+
+        m_Acceptor = new RASocket::Acceptor;
+
     }
 
-    void checkping ()
+    ~RARunnable()
     {
-        // ping if need
-        if ((++loopCounter) == numLoops)
-        {
-            loopCounter = 0;
-            sLog.outDetail ("Ping MySQL to keep connection alive");
-            delete WorldDatabase.Query ("SELECT 1 FROM command LIMIT 1");
-            delete loginDatabase.Query ("SELECT 1 FROM realmlist LIMIT 1");
-            delete CharacterDatabase.Query ("SELECT 1 FROM bugreport LIMIT 1");
-        }
+        delete m_Reactor;
+        delete m_Acceptor;
     }
 
     void run ()
     {
-        SocketHandler h;
+        uint16 raport = sConfig.GetIntDefault ("Ra.Port", 3443);
+        std::string stringip = sConfig.GetStringDefault ("Ra.IP", "0.0.0.0");
 
-        // Launch the RA listener socket
-        ListenSocket<RASocket> RAListenSocket (h);
-        bool usera = sConfig.GetBoolDefault ("Ra.Enable", false);
+        ACE_INET_Addr listen_addr(raport, stringip.c_str());
 
-        if (usera)
+        if (m_Acceptor->open (listen_addr, m_Reactor, ACE_NONBLOCK) == -1)
         {
-            port_t raport = sConfig.GetIntDefault ("Ra.Port", 3443);
-            std::string stringip = sConfig.GetStringDefault ("Ra.IP", "0.0.0.0");
-            ipaddr_t raip;
-            if (!Utility::u2ip (stringip, raip))
-                sLog.outError ("MaNGOS RA can not bind to ip %s", stringip.c_str ());
-            else if (RAListenSocket.Bind (raip, raport))
-                sLog.outError ("MaNGOS RA can not bind to port %d on %s", raport, stringip.c_str ());
-            else
-            {
-                h.Add (&RAListenSocket);
-
-                sLog.outString ("Starting Remote access listner on port %d on %s", raport, stringip.c_str ());
-            }
+            sLog.outError ("MaNGOS RA can not bind to port %d on %s", raport, stringip.c_str ());
         }
 
-        // Socket Selet time is in microseconds , not miliseconds!!
-        uint32 socketSelecttime = sWorld.getConfig (CONFIG_UINT32_SOCKET_SELECTTIME);
+        sLog.outString ("Starting Remote access listner on port %d on %s", raport, stringip.c_str ());
 
-        // if use ra spend time waiting for io, if not use ra ,just sleep
-        if (usera)
+        while (!m_Reactor->reactor_event_loop_done())
         {
-            while (!World::IsStopped())
+            ACE_Time_Value interval (0, 10000);
+
+            if (m_Reactor->run_reactor_event_loop (interval) == -1)
+                break;
+
+            if(World::IsStopped())
             {
-                h.Select (0, socketSelecttime);
-                checkping ();
+                m_Acceptor->close();
+                break;
             }
         }
-        else
-        {
-            while (!World::IsStopped())
-            {
-                ACE_Based::Thread::Sleep(static_cast<unsigned long> (socketSelecttime / 1000));
-                checkping ();
-            }
-        }
+        sLog.outString("RARunnable thread ended");
     }
 };
 
@@ -223,7 +213,7 @@ int Master::Run()
     ///- Launch WorldRunnable thread
     ACE_Based::Thread world_thread(new WorldRunnable);
     world_thread.setPriority(ACE_Based::Highest);
-    
+
     // set realmbuilds depend on mangosd expected builds, and set server online
     {
         std::string builds = AcceptableClientBuildsListStr();
@@ -243,7 +233,11 @@ int Master::Run()
         cliThread = new ACE_Based::Thread(new CliRunnable);
     }
 
-    ACE_Based::Thread rar_thread(new RARunnable);
+    ACE_Based::Thread* rar_thread = NULL;
+    if(sConfig.GetBoolDefault ("Ra.Enable", false))
+    {
+        rar_thread = new ACE_Based::Thread(new RARunnable);
+    }
 
     ///- Handle affinity for multiple processors and process priority on Windows
     #ifdef WIN32
@@ -289,6 +283,18 @@ int Master::Run()
     }
     #endif
 
+    ///- Start soap serving thread
+    ACE_Based::Thread* soap_thread = NULL;
+
+    if(sConfig.GetBoolDefault("SOAP.Enabled", false))
+    {
+        MaNGOSsoapRunnable *runnable = new MaNGOSsoapRunnable();
+
+        runnable->setListenArguments(sConfig.GetStringDefault("SOAP.IP", "127.0.0.1"), sConfig.GetIntDefault("SOAP.Port", 7878));
+        soap_thread = new ACE_Based::Thread(runnable);
+    }
+
+
     uint32 realCurrTime, realPrevTime;
     realCurrTime = realPrevTime = getMSTime();
 
@@ -303,7 +309,7 @@ int Master::Run()
     }
 
     ///- Launch the world listener socket
-    port_t wsport = sWorld.getConfig (CONFIG_UINT32_PORT_WORLD);
+    uint16 wsport = sWorld.getConfig (CONFIG_UINT32_PORT_WORLD);
     std::string bind_ip = sConfig.GetStringDefault ("BindIP", "0.0.0.0");
 
     if (sWorldSocketMgr->StartNetwork (wsport, bind_ip.c_str ()) == -1)
@@ -322,6 +328,14 @@ int Master::Run()
         delete freeze_thread;
     }
 
+    ///- Stop soap thread
+    if(soap_thread)
+    {
+        soap_thread->wait();
+        soap_thread->destroy();
+        delete soap_thread;
+    }
+
     ///- Set server offline in realmlist
     loginDatabase.PExecute("UPDATE realmlist SET color = 2 WHERE id = '%d'",realmID);
 
@@ -331,7 +345,13 @@ int Master::Run()
     // when the main thread closes the singletons get unloaded
     // since worldrunnable uses them, it will crash if unloaded after master
     world_thread.wait();
-    rar_thread.wait ();
+
+    if(rar_thread)
+    {
+        rar_thread->wait();
+        rar_thread->destroy();
+        delete rar_thread;
+    }
 
     ///- Clean account database before leaving
     clearOnlineAccounts();

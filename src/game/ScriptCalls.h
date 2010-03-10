@@ -59,6 +59,7 @@ typedef bool(MANGOS_IMPORT * scriptCallItemUse) (Player *player, Item *_Item, Sp
 typedef bool(MANGOS_IMPORT * scriptCallEffectDummyGameObj) (Unit *caster, uint32 spellId, SpellEffectIndex effIndex, GameObject *gameObjTarget);
 typedef bool(MANGOS_IMPORT * scriptCallEffectDummyCreature) (Unit *caster, uint32 spellId, SpellEffectIndex effIndex, Creature *crTarget);
 typedef bool(MANGOS_IMPORT * scriptCallEffectDummyItem) (Unit *caster, uint32 spellId, SpellEffectIndex effIndex, Item *itemTarget);
+typedef bool(MANGOS_IMPORT * scriptCallEffectAuraDummy) (const Aura* pAura, bool apply);
 typedef CreatureAI* (MANGOS_IMPORT * scriptCallGetAI) ( Creature *_Creature );
 typedef InstanceData* (MANGOS_IMPORT * scriptCallCreateInstanceData) (Map *map);
 
@@ -87,6 +88,7 @@ typedef struct
     scriptCallEffectDummyGameObj  EffectDummyGameObj;
     scriptCallEffectDummyCreature EffectDummyCreature;
     scriptCallEffectDummyItem     EffectDummyItem;
+    scriptCallEffectAuraDummy     EffectAuraDummy;
     scriptCallGetAI GetAI;
     scriptCallCreateInstanceData CreateInstanceData;
 
