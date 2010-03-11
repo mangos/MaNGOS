@@ -495,9 +495,9 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         std::multimap<time_t, ScriptAction> m_scriptSchedule;
 
         // Map local low guid counters
-        uint32 m_hiDynObjectGuid;
-        uint32 m_hiPetGuid;
-        uint32 m_hiVehicleGuid;
+        ObjectGuidGenerator<HIGHGUID_DYNAMICOBJECT> m_DynObjectGuids;
+        ObjectGuidGenerator<HIGHGUID_PET> m_PetGuids;
+        ObjectGuidGenerator<HIGHGUID_VEHICLE> m_VehicleGuids;
 
         // Type specific code for add/remove to/from grid
         template<class T>

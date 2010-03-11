@@ -45,6 +45,8 @@
 #include "WaypointManager.h"
 #include "GossipDef.h"
 
+#include <limits>
+
 INSTANTIATE_SINGLETON_1(ObjectMgr);
 
 ScriptMapMap sQuestEndScripts;
@@ -128,22 +130,30 @@ bool SpellClickInfo::IsFitToRequirements(Player const* player) const
     return true;
 }
 
-ObjectMgr::ObjectMgr()
+template<typename T>
+T IdGenerator<T>::Generate()
 {
-    m_hiCharGuid        = 1;
-    m_hiCreatureGuid    = 1;
-    m_hiItemGuid        = 1;
-    m_hiGoGuid          = 1;
-    m_hiCorpseGuid      = 1;
-    m_hiPetNumber       = 1;
-    m_ItemTextId        = 1;
-    m_mailid            = 1;
-    m_equipmentSetGuid  = 1;
-    m_guildId           = 1;
-    m_arenaTeamId       = 1;
-    m_auctionid         = 1;
-    m_groupId           = 1;
+    if (m_nextGuid >= std::numeric_limits<T>::max()-1)
+    {
+        sLog.outError("%s guid overflow!! Can't continue, shutting down server. ",m_name);
+        World::StopNow(ERROR_EXIT_CODE);
+    }
+    return m_nextGuid++;
+}
 
+template uint32 IdGenerator<uint32>::Generate();
+template uint64 IdGenerator<uint64>::Generate();
+
+ObjectMgr::ObjectMgr() :
+    m_ArenaTeamIds("Arena team ids"),
+    m_AuctionIds("Auction ids"),
+    m_EquipmentSetIds("Equipment set ids"),
+    m_GuildIds("Guild ids"),
+    m_ItemTextIds("Item text ids"),
+    m_MailIds("Mail ids"),
+    m_PetNumbers("Pet numbers"),
+    m_GroupIds("Group ids")
+{
     // Only zero condition left, others will be added while loading DB tables
     mConditions.resize(1);
 }
@@ -5658,7 +5668,7 @@ void ObjectMgr::PackGroupIds()
         bar.step();
     }
 
-    m_groupId = groupId;
+    m_GroupIds.Set(groupId);
 
     sLog.outString( ">> Group Ids remapped, next group id is %u", groupId );
     sLog.outString();
@@ -5669,162 +5679,92 @@ void ObjectMgr::SetHighestGuids()
     QueryResult *result = CharacterDatabase.Query( "SELECT MAX(guid) FROM characters" );
     if( result )
     {
-        m_hiCharGuid = (*result)[0].GetUInt32()+1;
+        m_CharGuids.Set((*result)[0].GetUInt32()+1);
         delete result;
     }
 
     result = WorldDatabase.Query( "SELECT MAX(guid) FROM creature" );
     if( result )
     {
-        m_hiCreatureGuid = (*result)[0].GetUInt32()+1;
+        m_CreatureGuids.Set((*result)[0].GetUInt32()+1);
         delete result;
     }
 
     result = CharacterDatabase.Query( "SELECT MAX(guid) FROM item_instance" );
     if( result )
     {
-        m_hiItemGuid = (*result)[0].GetUInt32()+1;
+        m_ItemGuids.Set((*result)[0].GetUInt32()+1);
         delete result;
     }
 
     // Cleanup other tables from not existed guids (>=m_hiItemGuid)
-    CharacterDatabase.PExecute("DELETE FROM character_inventory WHERE item >= '%u'", m_hiItemGuid);
-    CharacterDatabase.PExecute("DELETE FROM mail_items WHERE item_guid >= '%u'", m_hiItemGuid);
-    CharacterDatabase.PExecute("DELETE FROM auctionhouse WHERE itemguid >= '%u'", m_hiItemGuid);
-    CharacterDatabase.PExecute("DELETE FROM guild_bank_item WHERE item_guid >= '%u'", m_hiItemGuid);
+    CharacterDatabase.PExecute("DELETE FROM character_inventory WHERE item >= '%u'", m_ItemGuids.GetNextAfterMaxUsed());
+    CharacterDatabase.PExecute("DELETE FROM mail_items WHERE item_guid >= '%u'", m_ItemGuids.GetNextAfterMaxUsed());
+    CharacterDatabase.PExecute("DELETE FROM auctionhouse WHERE itemguid >= '%u'", m_ItemGuids.GetNextAfterMaxUsed());
+    CharacterDatabase.PExecute("DELETE FROM guild_bank_item WHERE item_guid >= '%u'", m_ItemGuids.GetNextAfterMaxUsed());
 
     result = WorldDatabase.Query("SELECT MAX(guid) FROM gameobject" );
     if( result )
     {
-        m_hiGoGuid = (*result)[0].GetUInt32()+1;
+        m_GameobjectGuids.Set((*result)[0].GetUInt32()+1);
         delete result;
     }
 
     result = CharacterDatabase.Query("SELECT MAX(id) FROM auctionhouse" );
     if( result )
     {
-        m_auctionid = (*result)[0].GetUInt32()+1;
+        m_AuctionIds.Set((*result)[0].GetUInt32()+1);
         delete result;
     }
 
     result = CharacterDatabase.Query( "SELECT MAX(id) FROM mail" );
     if( result )
     {
-        m_mailid = (*result)[0].GetUInt32()+1;
+        m_MailIds.Set((*result)[0].GetUInt32()+1);
         delete result;
     }
 
     result = CharacterDatabase.Query( "SELECT MAX(id) FROM item_text" );
     if( result )
     {
-        m_ItemTextId = (*result)[0].GetUInt32()+1;
+        m_ItemTextIds.Set((*result)[0].GetUInt32()+1);
         delete result;
     }
 
     result = CharacterDatabase.Query( "SELECT MAX(guid) FROM corpse" );
     if( result )
     {
-        m_hiCorpseGuid = (*result)[0].GetUInt32()+1;
+        m_CorpseGuids.Set((*result)[0].GetUInt32()+1);
         delete result;
     }
 
     result = CharacterDatabase.Query("SELECT MAX(arenateamid) FROM arena_team");
     if (result)
     {
-        m_arenaTeamId = (*result)[0].GetUInt32()+1;
+        m_ArenaTeamIds.Set((*result)[0].GetUInt32()+1);
         delete result;
     }
 
     result = CharacterDatabase.Query("SELECT MAX(setguid) FROM character_equipmentsets");
     if (result)
     {
-        m_equipmentSetGuid = (*result)[0].GetUInt64()+1;
+        m_EquipmentSetIds.Set((*result)[0].GetUInt64()+1);
         delete result;
     }
 
     result = CharacterDatabase.Query( "SELECT MAX(guildid) FROM guild" );
     if (result)
     {
-        m_guildId = (*result)[0].GetUInt32()+1;
+        m_GuildIds.Set((*result)[0].GetUInt32()+1);
         delete result;
     }
 
     result = CharacterDatabase.Query( "SELECT MAX(groupId) FROM groups" );
     if (result)
     {
-        m_groupId = (*result)[0].GetUInt32()+1;
+        m_GroupIds.Set((*result)[0].GetUInt32()+1);
         delete result;
     }
-}
-
-uint32 ObjectMgr::GenerateArenaTeamId()
-{
-    if(m_arenaTeamId>=0xFFFFFFFE)
-    {
-        sLog.outError("Arena team ids overflow!! Can't continue, shutting down server. ");
-        World::StopNow(ERROR_EXIT_CODE);
-    }
-    return m_arenaTeamId++;
-}
-
-uint32 ObjectMgr::GenerateAuctionID()
-{
-    if(m_auctionid>=0xFFFFFFFE)
-    {
-        sLog.outError("Auctions ids overflow!! Can't continue, shutting down server. ");
-        World::StopNow(ERROR_EXIT_CODE);
-    }
-    return m_auctionid++;
-}
-
-uint64 ObjectMgr::GenerateEquipmentSetGuid()
-{
-    if(m_equipmentSetGuid>=0xFFFFFFFFFFFFFFFEll)
-    {
-        sLog.outError("EquipmentSet guid overflow!! Can't continue, shutting down server. ");
-        World::StopNow(ERROR_EXIT_CODE);
-    }
-    return m_equipmentSetGuid++;
-}
-
-uint32 ObjectMgr::GenerateGuildId()
-{
-    if(m_guildId>=0xFFFFFFFE)
-    {
-        sLog.outError("Guild ids overflow!! Can't continue, shutting down server. ");
-        World::StopNow(ERROR_EXIT_CODE);
-    }
-    return m_guildId++;
-}
-
-uint32 ObjectMgr::GenerateGroupId()
-{
-    if(m_groupId>=0xFFFFFFFE)
-    {
-        sLog.outError("Group ids overflow!! Can't continue, shutting down server. ");
-        World::StopNow(ERROR_EXIT_CODE);
-    }
-    return m_groupId++;
-}
-
-uint32 ObjectMgr::GenerateMailID()
-{
-    if(m_mailid>=0xFFFFFFFE)
-    {
-        sLog.outError("Mail ids overflow!! Can't continue, shutting down server. ");
-        World::StopNow(ERROR_EXIT_CODE);
-    }
-    return m_mailid++;
-}
-
-uint32 ObjectMgr::GenerateItemTextID()
-{
-    if(m_ItemTextId>=0xFFFFFFFE)
-    {
-        sLog.outError("Item text ids overflow!! Can't continue, shutting down server. ");
-        World::StopNow(ERROR_EXIT_CODE);
-    }
-    return m_ItemTextId++;
 }
 
 uint32 ObjectMgr::CreateItemText(std::string text)
@@ -5846,40 +5786,15 @@ uint32 ObjectMgr::GenerateLowGuid(HighGuid guidhigh)
     switch(guidhigh)
     {
         case HIGHGUID_ITEM:
-            if(m_hiItemGuid>=0xFFFFFFFE)
-            {
-                sLog.outError("Item guid overflow!! Can't continue, shutting down server. ");
-                World::StopNow(ERROR_EXIT_CODE);
-            }
-            return m_hiItemGuid++;
+            return m_ItemGuids.Generate();
         case HIGHGUID_UNIT:
-            if(m_hiCreatureGuid>=0x00FFFFFE)
-            {
-                sLog.outError("Creature guid overflow!! Can't continue, shutting down server. ");
-                World::StopNow(ERROR_EXIT_CODE);
-            }
-            return m_hiCreatureGuid++;
+            return m_CreatureGuids.Generate();
         case HIGHGUID_PLAYER:
-            if(m_hiCharGuid>=0xFFFFFFFE)
-            {
-                sLog.outError("Players guid overflow!! Can't continue, shutting down server. ");
-                World::StopNow(ERROR_EXIT_CODE);
-            }
-            return m_hiCharGuid++;
+            return m_CharGuids.Generate();
         case HIGHGUID_GAMEOBJECT:
-            if(m_hiGoGuid>=0x00FFFFFE)
-            {
-                sLog.outError("Gameobject guid overflow!! Can't continue, shutting down server. ");
-                World::StopNow(ERROR_EXIT_CODE);
-            }
-            return m_hiGoGuid++;
+            return m_GameobjectGuids.Generate();
         case HIGHGUID_CORPSE:
-            if(m_hiCorpseGuid>=0xFFFFFFFE)
-            {
-                sLog.outError("Corpse guid overflow!! Can't continue, shutting down server. ");
-                World::StopNow(ERROR_EXIT_CODE);
-            }
-            return m_hiCorpseGuid++;
+            return m_CorpseGuids.Generate();
         default:
             ASSERT(0);
     }
@@ -6291,7 +6206,7 @@ void ObjectMgr::LoadPetNumber()
     if(result)
     {
         Field *fields = result->Fetch();
-        m_hiPetNumber = fields[0].GetUInt32()+1;
+        m_PetNumbers.Set(fields[0].GetUInt32()+1);
         delete result;
     }
 
@@ -6299,7 +6214,7 @@ void ObjectMgr::LoadPetNumber()
     bar.step();
 
     sLog.outString();
-    sLog.outString( ">> Loaded the max pet number: %d", m_hiPetNumber-1);
+    sLog.outString( ">> Loaded the max pet number: %d", m_PetNumbers.GetNextAfterMaxUsed()-1);
 }
 
 std::string ObjectMgr::GeneratePetName(uint32 entry)
@@ -6317,11 +6232,6 @@ std::string ObjectMgr::GeneratePetName(uint32 entry)
     }
 
     return *(list0.begin()+urand(0, list0.size()-1)) + *(list1.begin()+urand(0, list1.size()-1));
-}
-
-uint32 ObjectMgr::GeneratePetNumber()
-{
-    return ++m_hiPetNumber;
 }
 
 void ObjectMgr::LoadCorpses()
