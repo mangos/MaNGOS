@@ -1348,12 +1348,18 @@ Arena.ArenaSeason.InProgress = 1
 #         Default: 0 (enable Nagle algorithm, less traffic, more latency)
 #                  1 (TCP_NO_DELAY, disable Nagle algorithm, more traffic but less latency)
 #
+#    Network.KickOnBadPacket
+#         Kick player on bad packet format.
+#         Default: 0 - do not kick
+#                  1 - kick
+#
 ###################################################################################################################
 
 Network.Threads = 1
 Network.OutKBuff = -1
 Network.OutUBuff = 65536
 Network.TcpNodelay = 1
+Network.KickOnBadPacket = 0
 
 ###################################################################################################################
 # CONSOLE, REMOTE ACCESS AND SOAP
