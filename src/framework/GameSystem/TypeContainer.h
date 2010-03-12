@@ -67,7 +67,7 @@ class TypeUnorderedMapContainer
         // Insert helpers
         template<class SPECIFIC_TYPE> static bool insert(ContainerUnorderedMap<SPECIFIC_TYPE, KEY_TYPE>& elements, KEY_TYPE handle, SPECIFIC_TYPE* obj)
         {
-            typename UNORDERED_MAP<OBJECT_HANDLE, SPECIFIC_TYPE*>::iterator i = elements._element.find(handle);
+            typename UNORDERED_MAP<KEY_TYPE, SPECIFIC_TYPE*>::iterator i = elements._element.find(handle);
             if (i == elements._element.end())
             {
                 elements._element[handle] = obj;
@@ -95,7 +95,7 @@ class TypeUnorderedMapContainer
         // Find helpers
         template<class SPECIFIC_TYPE> static SPECIFIC_TYPE* find(ContainerUnorderedMap<SPECIFIC_TYPE, KEY_TYPE>& elements, KEY_TYPE hdl, SPECIFIC_TYPE* /*obj*/)
         {
-            typename UNORDERED_MAP<OBJECT_HANDLE, SPECIFIC_TYPE*>::iterator i = elements._element.find(hdl);
+            typename UNORDERED_MAP<KEY_TYPE, SPECIFIC_TYPE*>::iterator i = elements._element.find(hdl);
             if (i == elements._element.end())
                 return NULL;
             else
