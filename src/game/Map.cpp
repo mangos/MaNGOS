@@ -3506,6 +3506,27 @@ void Map::ScriptsProcess()
 
                 break;
             }
+            case SCRIPT_COMMAND_DESPAWN_SELF:
+            {
+                if (!target && !source)
+                {
+                    sLog.outError("SCRIPT_COMMAND_DESPAWN_SELF call for NULL object.");
+                    break;
+                }
+
+                // only creature
+                if ((!target || target->GetTypeId() != TYPEID_UNIT) && (!source || source->GetTypeId() != TYPEID_UNIT))
+                {
+                    sLog.outError("SCRIPT_COMMAND_DESPAWN_SELF call for non-creature (TypeIdSource: %u)(TypeIdTarget: %u), skipping.", source ? source->GetTypeId() : 0, target ? target->GetTypeId() : 0);
+                    break;
+                }
+
+                Creature* pCreature = target && target->GetTypeId() == TYPEID_UNIT ? (Creature*)target : (Creature*)source;
+
+                pCreature->ForcedDespawn(step.script->datalong);
+
+                break;
+            }
             default:
                 sLog.outError("Unknown script command %u called.",step.script->command);
                 break;

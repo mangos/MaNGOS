@@ -4386,6 +4386,11 @@ void ObjectMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
                 }
                 break;
             }
+            case SCRIPT_COMMAND_DESPAWN_SELF:
+            {
+                // for later, we might consider despawn by database guid, and define in datalong2 as option to despawn self.
+                break;
+            }
         }
 
         if (scripts.find(tmp.id) == scripts.end())
