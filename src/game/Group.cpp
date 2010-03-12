@@ -290,17 +290,6 @@ bool Group::AddMember(const uint64 &guid, const char* name)
                     player->SendRaidDifficulty(true);
                 }
             }
-            // Group Interfactions interactions (test)
-            if(sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_GROUP))
-            {
-                Group *group = player->GetGroup();
-                if(Player *leader = sObjectMgr.GetPlayer(group->GetLeaderGUID()))
-                {
-                    player->setFactionForRace(leader->getRace());
-                    sLog.outDebug( "WORLD: Group Interfaction Interactions - Faction changed (AddMember)" );
-                }
-            }
-
         }
         player->SetGroupUpdateFlag(GROUP_UPDATE_FULL);
         UpdatePlayerOutOfRange(player);
@@ -402,13 +391,6 @@ void Group::Disband(bool hideDestroy)
                 player->SetOriginalGroup(NULL);
             else
                 player->SetGroup(NULL);
-            // Restore original faction if needed
-            if(sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_GROUP))
-            {
-                player->setFactionForRace(player->getRace());
-                sLog.outDebug( "WORLD: Group Interfaction Interactions - Restore original faction (Disband)" );
-            }
-
         }
 
         // quest related GO state dependent from raid membership
@@ -437,12 +419,7 @@ void Group::Disband(bool hideDestroy)
             data << uint64(0) << uint32(0) << uint32(0) << uint64(0);
             player->GetSession()->SendPacket(&data);
         }
-        // Restore original faction if needed
-        if(sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_GROUP))
-        {
-                player->setFactionForRace(player->getRace());
-                sLog.outDebug( "WORLD: Group Interfaction Interactions - Restore original faction (RemoveMember)" );
-        }
+
         _homebindIfInstance(player);
     }
     RollId.clear();
