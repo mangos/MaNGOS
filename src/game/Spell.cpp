@@ -192,7 +192,7 @@ void SpellCastTargets::Update(Unit* caster)
     if(caster->GetTypeId() == TYPEID_PLAYER)
     {
         if(m_targetMask & TARGET_FLAG_ITEM)
-            m_itemTarget = ((Player*)caster)->GetItemByGuid(m_itemTargetGUID.GetRawValue());
+            m_itemTarget = ((Player*)caster)->GetItemByGuid(m_itemTargetGUID);
         else if(m_targetMask & TARGET_FLAG_TRADE_ITEM)
         {
             Player* pTrader = ((Player*)caster)->GetTrader();

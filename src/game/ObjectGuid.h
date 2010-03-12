@@ -75,9 +75,7 @@ enum HighGuid
 #define IS_PLAYER_GUID(Guid)         ( GUID_HIPART(Guid) == HIGHGUID_PLAYER && Guid!=0 )
 #define IS_UNIT_GUID(Guid)           ( IS_CREATURE_OR_PET_GUID(Guid) || IS_PLAYER_GUID(Guid) )
                                                             // special case for empty guid need check
-#define IS_ITEM_GUID(Guid)           ( GUID_HIPART(Guid) == HIGHGUID_ITEM )
 #define IS_GAMEOBJECT_GUID(Guid)     ( GUID_HIPART(Guid) == HIGHGUID_GAMEOBJECT )
-#define IS_CORPSE_GUID(Guid)         ( GUID_HIPART(Guid) == HIGHGUID_CORPSE )
 #define IS_MO_TRANSPORT(Guid)        ( GUID_HIPART(Guid) == HIGHGUID_MO_TRANSPORT )
 
 // l - OBJECT_FIELD_GUID
@@ -232,6 +230,8 @@ class ObjectGuid
     private:                                                // fields
         uint64 m_guid;
 };
+
+typedef std::set<ObjectGuid> ObjectGuidSet;
 
 class PackedGuid
 {
