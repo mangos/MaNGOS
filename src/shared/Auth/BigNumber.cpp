@@ -164,7 +164,7 @@ bool BigNumber::isZero() const
     return BN_is_zero(_bn)!=0;
 }
 
-uint8 *BigNumber::AsByteArray(int minSize)
+uint8 *BigNumber::AsByteArray(int minSize, bool reverse)
 {
     int length = (minSize >= GetNumBytes()) ? minSize : GetNumBytes();
 
@@ -181,7 +181,8 @@ uint8 *BigNumber::AsByteArray(int minSize)
 
     BN_bn2bin(_bn, (unsigned char *)_array);
 
-    std::reverse(_array, _array + length);
+    if (reverse)
+        std::reverse(_array, _array + length);
 
     return _array;
 }
