@@ -17,6 +17,7 @@
  */
 
 #include "ObjectPosSelector.h"
+#include "Object.h"
 
 ObjectPosSelector::ObjectPosSelector(float x,float y,float size,float dist)
 : m_center_x(x),m_center_y(y),m_size(size),m_dist(dist)

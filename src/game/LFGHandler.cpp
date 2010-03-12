@@ -147,10 +147,27 @@ static void AttemptAddMore(Player* _player)
     }
 }
 
-void WorldSession::HandleLfgSetAutoJoinOpcode( WorldPacket & /*recv_data*/ )
+void WorldSession::HandleLfgJoinOpcode( WorldPacket & recv_data )
 {
-    sLog.outDebug("CMSG_LFG_SET_AUTOJOIN");
+    sLog.outDebug("CMSG_LFG_JOIN");
     LookingForGroup_auto_join = true;
+
+    uint8 counter1, counter2;
+    std::string comment;
+
+    recv_data >> Unused<uint32>();                          // lfg roles
+    recv_data >> Unused<uint8>();                           // unk1 (unused?)
+    recv_data >> Unused<uint8>();                           // unk2 (unused?)
+
+    recv_data >> counter1;
+    for (uint8 i = 0; i < counter1; i++)
+        recv_data >> Unused<uint32>();                      // queue block? (type/zone?)
+
+    recv_data >> counter2;
+    for (uint8 i = 0; i < counter2; i++)
+        recv_data >> Unused<uint8>();                       // unk (unused?)
+
+    recv_data >> comment;                                   // lfg comment
 
     if(!_player)                                            // needed because STATUS_AUTHED
         return;
@@ -158,16 +175,18 @@ void WorldSession::HandleLfgSetAutoJoinOpcode( WorldPacket & /*recv_data*/ )
     AttemptJoin(_player);
 }
 
-void WorldSession::HandleLfgClearAutoJoinOpcode( WorldPacket & /*recv_data*/ )
+void WorldSession::HandleLfgLeaveOpcode( WorldPacket & /*recv_data*/ )
 {
-    sLog.outDebug("CMSG_LFG_CLEAR_AUTOJOIN");
+    sLog.outDebug("CMSG_LFG_LEAVE");
     LookingForGroup_auto_join = false;
 }
 
-void WorldSession::HandleLfmSetAutoFillOpcode( WorldPacket & /*recv_data*/ )
+void WorldSession::HandleSearchLfgJoinOpcode( WorldPacket & recv_data )
 {
-    sLog.outDebug("CMSG_LFM_SET_AUTOFILL");
+    sLog.outDebug("CMSG_SEARCH_LFG_JOIN");
     LookingForGroup_auto_add = true;
+
+    recv_data >> Unused<uint32>();                          // join id?
 
     if(!_player)                                            // needed because STATUS_AUTHED
         return;
@@ -175,10 +194,12 @@ void WorldSession::HandleLfmSetAutoFillOpcode( WorldPacket & /*recv_data*/ )
     AttemptAddMore(_player);
 }
 
-void WorldSession::HandleLfmClearAutoFillOpcode( WorldPacket & /*recv_data*/ )
+void WorldSession::HandleSearchLfgLeaveOpcode( WorldPacket & recv_data )
 {
-    sLog.outDebug("CMSG_LFM_CLEAR_AUTOFILL");
+    sLog.outDebug("CMSG_SEARCH_LFG_LEAVE");
     LookingForGroup_auto_add = false;
+
+    recv_data >> Unused<uint32>();                          // join id?
 }
 
 void WorldSession::HandleLfgClearOpcode( WorldPacket & /*recv_data */ )

@@ -2179,8 +2179,10 @@ class MANGOS_DLL_SPEC Player : public Unit
         void RelocateToHomebind() { SetLocationMapId(m_homebindMapId); Relocate(m_homebindX, m_homebindY, m_homebindZ); }
         bool TeleportToHomebind(uint32 options = 0) { return TeleportTo(m_homebindMapId, m_homebindX, m_homebindY, m_homebindZ, GetOrientation(), options); }
 
+        Object* GetObjectByTypeMask(ObjectGuid guid, TypeMask typemask);
+
         // currently visible objects at player client
-        typedef std::set<uint64> ClientGUIDs;
+        typedef std::set<ObjectGuid> ClientGUIDs;
         ClientGUIDs m_clientGUIDs;
 
         bool HaveAtClient(WorldObject const* u) { return u==this || m_clientGUIDs.find(u->GetGUID())!=m_clientGUIDs.end(); }
