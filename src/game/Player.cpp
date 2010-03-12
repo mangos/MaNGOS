@@ -15851,7 +15851,7 @@ void Player::_LoadGroup(QueryResult *result)
                 SetRaidDifficulty(group->GetRaidDifficulty());
                 if(sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_GROUP))
                      if(uint8 FactionRace = group->GetGroupFactionRace())
-                       { if (FactionRace > 11 || FactionRace < 1) FactionRace = 1;
+                       { if (FactionRace > 11) FactionRace = 1;
                         setFactionForRace(FactionRace);
                         sLog.outDebug( "PLAYER LOAD: Group Interfaction Interactions - Faction changed (LoadMember)" );
                        }
