@@ -713,7 +713,7 @@ int WorldSocket::ProcessIncoming (WorldPacket* new_pct)
     }
     catch (ByteBufferException &)
     {
-        sLog.outError("WorldSocket::ProcessIncoming ByteBufferException occured while parsing an instant handled packet (opcode: %u) from client %s, accountid=%i. Disconnected client.",
+        sLog.outError("WorldSocket::ProcessIncoming ByteBufferException occured while parsing an instant handled packet (opcode: %u) from client %s, accountid=%i.",
                 opcode, GetRemoteAddress().c_str(), m_Session?m_Session->GetAccountId():-1);
         if(sLog.IsOutDebug())
         {
@@ -721,7 +721,15 @@ int WorldSocket::ProcessIncoming (WorldPacket* new_pct)
             new_pct->hexlike();
         }
 
-        return -1;
+        if (sWorld.getConfig(CONFIG_BOOL_KICK_PLAYER_ON_BAD_PACKET))
+        {
+            sLog.outDetail("Disconnecting session [account id %i / address %s] for badly formatted packet.",
+                m_Session?m_Session->GetAccountId():-1, GetRemoteAddress().c_str());
+
+            return -1;
+        }
+        else
+            return 0;
     }
 
     ACE_NOTREACHED (return 0);

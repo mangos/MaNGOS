@@ -304,8 +304,6 @@ void WorldSession::HandleGossipSelectOptionOpcode( WorldPacket & recv_data )
     if (GetPlayer()->hasUnitState(UNIT_STAT_DIED))
         GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 
-    // TODO: determine if scriptCall is needed for GO and also if scriptCall can be same as current, with modified argument WorldObject*
-
     // can vehicle have gossip? If so, need check for this also.
     if (IS_CREATURE_OR_PET_GUID(guid))
     {
@@ -338,7 +336,16 @@ void WorldSession::HandleGossipSelectOptionOpcode( WorldPacket & recv_data )
             return;
         }
 
-        _player->OnGossipSelect(pGo, gossipListId, menuId);
+        if (!code.empty())
+        {
+            if (!Script->GOGossipSelectWithCode(_player, pGo, _player->PlayerTalkClass->GossipOptionSender(gossipListId), _player->PlayerTalkClass->GossipOptionAction(gossipListId), code.c_str()))
+                _player->OnGossipSelect(pGo, gossipListId, menuId);
+        }
+        else
+        {
+            if (!Script->GOGossipSelect(_player, pGo, _player->PlayerTalkClass->GossipOptionSender(gossipListId), _player->PlayerTalkClass->GossipOptionAction(gossipListId)))
+                _player->OnGossipSelect(pGo, gossipListId, menuId);
+        }
     }
 }
 

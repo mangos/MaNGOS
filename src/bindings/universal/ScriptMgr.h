@@ -39,7 +39,8 @@ class Aura;
 struct Script
 {
     Script() :
-        pGossipHello(NULL), pQuestAccept(NULL), pGossipSelect(NULL), pGossipSelectWithCode(NULL),
+        pGossipHello(NULL), pGOGossipHello(NULL), pQuestAccept(NULL), pGossipSelect(NULL), pGOGossipSelect(NULL),
+        pGossipSelectWithCode(NULL), pGOGossipSelectWithCode(NULL),
         pQuestSelect(NULL), pQuestComplete(NULL), pNPCDialogStatus(NULL), pGODialogStatus(NULL), pChooseReward(NULL),
         pItemHello(NULL), pGOHello(NULL), pAreaTrigger(NULL), pItemQuestAccept(NULL), pGOQuestAccept(NULL),
         pGOChooseReward(NULL), pItemUse(NULL), pEffectDummyGameObj(NULL), pEffectDummyCreature(NULL),
@@ -50,9 +51,12 @@ struct Script
 
     // -- Quest/gossip Methods to be scripted --
     bool (*pGossipHello         )(Player *player, Creature *_Creature);
+    bool (*pGOGossipHello       )(Player *player, GameObject *_GO);
     bool (*pQuestAccept         )(Player *player, Creature *_Creature, Quest const*_Quest );
     bool (*pGossipSelect        )(Player *player, Creature *_Creature, uint32 sender, uint32 action );
+    bool (*pGOGossipSelect      )(Player *player, GameObject *_GO, uint32 sender, uint32 action );
     bool (*pGossipSelectWithCode)(Player *player, Creature *_Creature, uint32 sender, uint32 action, const char* sCode );
+    bool (*pGOGossipSelectWithCode)(Player *player, GameObject *_GO, uint32 sender, uint32 action, const char* sCode );
     bool (*pQuestSelect         )(Player *player, Creature *_Creature, Quest const*_Quest );
     bool (*pQuestComplete       )(Player *player, Creature *_Creature, Quest const*_Quest );
     uint32 (*pNPCDialogStatus   )(Player *player, Creature *_Creature );

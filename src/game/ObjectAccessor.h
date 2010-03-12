@@ -58,9 +58,9 @@ class HashMapHolder
             m_objectMap.erase(o->GetGUID());
         }
 
-        static T* Find(uint64 guid)
+        static T* Find(ObjectGuid guid)
         {
-            typename MapType::iterator itr = m_objectMap.find(guid);
+            typename MapType::iterator itr = m_objectMap.find(guid.GetRawValue());
             return (itr != m_objectMap.end()) ? itr->second : NULL;
         }
 
@@ -89,18 +89,17 @@ class MANGOS_DLL_DECL ObjectAccessor : public MaNGOS::Singleton<ObjectAccessor, 
         typedef UNORDERED_MAP<uint64, Corpse* >      Player2CorpsesMapType;
 
         // global (obj used for map only location local guid objects (pets currently)
-        static Unit*   GetUnitInWorld(WorldObject const& obj, uint64 guid);
+        static Unit*   GetUnitInWorld(WorldObject const& obj, ObjectGuid guid);
 
         // FIXME: map local object with global search
-        static Creature*   GetCreatureInWorld(uint64 guid)   { return FindHelper<Creature>(guid); }
-        static GameObject* GetGameObjectInWorld(uint64 guid) { return FindHelper<GameObject>(guid); }
+        static Creature*   GetCreatureInWorld(ObjectGuid guid)   { return FindHelper<Creature>(guid); }
+        static GameObject* GetGameObjectInWorld(ObjectGuid guid) { return FindHelper<GameObject>(guid); }
 
         // possible local search for specific object map
-        static Object* GetObjectByTypeMask(WorldObject const &, uint64, uint32 typemask);
-        static Unit* GetUnit(WorldObject const &, uint64);
+        static Unit* GetUnit(WorldObject const &, ObjectGuid guid);
 
         // Player access
-        static Player* FindPlayer(uint64 guid);
+        static Player* FindPlayer(ObjectGuid guid);
         static Player* FindPlayerByName(const char *name);
         static void KickPlayer(uint64 guid);
 
@@ -112,12 +111,12 @@ class MANGOS_DLL_DECL ObjectAccessor : public MaNGOS::Singleton<ObjectAccessor, 
         void SaveAllPlayers();
 
         // Corpse access
-        Corpse* GetCorpseForPlayerGUID(uint64 guid);
-        static Corpse* GetCorpseInMap(uint64 guid, uint32 mapid);
+        Corpse* GetCorpseForPlayerGUID(ObjectGuid guid);
+        static Corpse* GetCorpseInMap(ObjectGuid guid, uint32 mapid);
         void RemoveCorpse(Corpse *corpse);
         void AddCorpse(Corpse* corpse);
         void AddCorpsesToGrid(GridPair const& gridpair,GridType& grid,Map* map);
-        Corpse* ConvertCorpseForPlayer(uint64 player_guid, bool insignia = false);
+        Corpse* ConvertCorpseForPlayer(ObjectGuid player_guid, bool insignia = false);
 
         // For call from Player/Corpse AddToWorld/RemoveFromWorld only
         void AddObject(Corpse *object) { HashMapHolder<Corpse>::Insert(object); }
@@ -132,11 +131,11 @@ class MANGOS_DLL_DECL ObjectAccessor : public MaNGOS::Singleton<ObjectAccessor, 
         // TODO: This methods will need lock in MT environment
         // Theoreticaly multiple threads can enter and search in this method but
         // in that case linking/delinking other map should be guarded
-        template <class OBJECT> static OBJECT* FindHelper(uint64 guid)
+        template <class OBJECT> static OBJECT* FindHelper(ObjectGuid guid)
         {
             for (std::list<Map*>::const_iterator i = i_mapList.begin() ; i != i_mapList.end(); ++i)
             {
-                if (OBJECT* ret = (*i)->GetObjectsStore().find(guid, (OBJECT*)NULL))
+                if (OBJECT* ret = (*i)->GetObjectsStore().find(guid.GetRawValue(), (OBJECT*)NULL))
                     return ret;
             }
 
@@ -154,15 +153,15 @@ class MANGOS_DLL_DECL ObjectAccessor : public MaNGOS::Singleton<ObjectAccessor, 
         LockType i_corpseGuard;
 };
 
-inline Unit* ObjectAccessor::GetUnitInWorld(WorldObject const& obj, uint64 guid)
+inline Unit* ObjectAccessor::GetUnitInWorld(WorldObject const& obj, ObjectGuid guid)
 {
-    if(!guid)
+    if(guid.IsEmpty())
         return NULL;
 
-    if (IS_PLAYER_GUID(guid))
+    if (guid.IsPlayer())
         return FindPlayer(guid);
 
-    if (IS_PET_GUID(guid))
+    if (guid.IsPet())
         return obj.IsInWorld() ? obj.GetMap()->GetPet(guid) : NULL;
 
     return GetCreatureInWorld(guid);

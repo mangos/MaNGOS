@@ -80,6 +80,18 @@ bool GossipHello ( Player * player, Creature *_Creature )
 }
 
 MANGOS_DLL_EXPORT
+bool GOGossipHello(Player *pPlayer, GameObject *pGo)
+{
+    Script *tmpscript = m_scripts[pGo->GetGOInfo()->ScriptId];
+    if (!tmpscript || !tmpscript->pGOGossipHello)
+        return false;
+
+    pPlayer->PlayerTalkClass->ClearMenus();
+
+    return tmpscript->pGOGossipHello(pPlayer, pGo);
+}
+
+MANGOS_DLL_EXPORT
 bool GossipSelect( Player *player, Creature *_Creature,uint32 sender, uint32 action )
 {
     debug_log("DEBUG: Gossip selection, sender: %d, action: %d",sender, action);
@@ -94,6 +106,20 @@ bool GossipSelect( Player *player, Creature *_Creature,uint32 sender, uint32 act
 }
 
 MANGOS_DLL_EXPORT
+bool GOGossipSelect(Player *pPlayer, GameObject *pGo, uint32 sender, uint32 action)
+{
+    debug_log("DEBUG: GO Gossip selection, sender: %u, action: %u", sender, action);
+
+    Script *tmpscript = m_scripts[pGo->GetGOInfo()->ScriptId];
+    if (!tmpscript || !tmpscript->pGOGossipSelect)
+        return false;
+
+    pPlayer->PlayerTalkClass->ClearMenus();
+
+    return tmpscript->pGOGossipSelect(pPlayer, pGo, sender, action);
+}
+
+MANGOS_DLL_EXPORT
 bool GossipSelectWithCode( Player *player, Creature *_Creature, uint32 sender, uint32 action, const char* sCode )
 {
     debug_log("DEBUG: Gossip selection, sender: %d, action: %d",sender, action);
@@ -105,6 +131,20 @@ bool GossipSelectWithCode( Player *player, Creature *_Creature, uint32 sender, u
     player->PlayerTalkClass->ClearMenus();
 
     return tmpscript->pGossipSelectWithCode(player,_Creature,sender,action,sCode);
+}
+
+MANGOS_DLL_EXPORT
+bool GOGossipSelectWithCode(Player *pPlayer, GameObject *pGo, uint32 sender, uint32 action, const char* sCode)
+{
+    debug_log("DEBUG: GO Gossip selection, sender: %u, action: %u", sender, action);
+
+    Script *tmpscript = m_scripts[pGo->GetGOInfo()->ScriptId];
+    if (!tmpscript || !tmpscript->pGOGossipSelectWithCode)
+        return false;
+
+    pPlayer->PlayerTalkClass->ClearMenus();
+
+    return tmpscript->pGOGossipSelectWithCode(pPlayer, pGo, sender, action, sCode);
 }
 
 MANGOS_DLL_EXPORT

@@ -726,6 +726,8 @@ void World::LoadConfigSettings(bool reload)
 
     setConfig(CONFIG_BOOL_OFFHAND_CHECK_AT_TALENTS_RESET, "OffhandCheckAtTalentsReset", false);
 
+    setConfig(CONFIG_BOOL_KICK_PLAYER_ON_BAD_PACKET, "Network.KickOnBadPacket", false);
+
     if(int clientCacheId = sConfig.GetIntDefault("ClientCacheVersion", 0))
     {
         // overwrite DB/old value

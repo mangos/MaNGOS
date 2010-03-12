@@ -205,8 +205,7 @@ Map::Map(uint32 id, time_t expiry, uint32 InstanceId, uint8 SpawnMode, Map* _par
   i_id(id), i_InstanceId(InstanceId), m_unloadTimer(0),
   m_VisibleDistance(DEFAULT_VISIBILITY_DISTANCE),
   m_activeNonPlayersIter(m_activeNonPlayers.end()),
-  i_gridExpiry(expiry), m_parentMap(_parent ? _parent : this),
-  m_hiDynObjectGuid(1), m_hiPetGuid(1), m_hiVehicleGuid(1)
+  i_gridExpiry(expiry), m_parentMap(_parent ? _parent : this)
 {
     for(unsigned int idx=0; idx < MAX_NUMBER_OF_GRIDS; ++idx)
     {
@@ -3485,6 +3484,49 @@ void Map::ScriptsProcess()
                     pSource->PlayDirectSound(step.script->datalong,pTarget);
                 break;
             }
+            case SCRIPT_COMMAND_CREATE_ITEM:
+            {
+                if (!target && !source)
+                {
+                    sLog.outError("SCRIPT_COMMAND_CREATE_ITEM call for NULL object.");
+                    break;
+                }
+
+                // only Player
+                if ((!target || target->GetTypeId() != TYPEID_PLAYER) && (!source || source->GetTypeId() != TYPEID_PLAYER))
+                {
+                    sLog.outError("SCRIPT_COMMAND_CREATE_ITEM call for non-player (TypeIdSource: %u)(TypeIdTarget: %u), skipping.", source ? source->GetTypeId() : 0, target ? target->GetTypeId() : 0);
+                    break;
+                }
+
+                Player* pReceiver = target && target->GetTypeId() == TYPEID_PLAYER ? (Player*)target : (Player*)source;
+
+                if (Item* pItem = pReceiver->StoreNewItemInInventorySlot(step.script->datalong, step.script->datalong2))
+                    pReceiver->SendNewItem(pItem, step.script->datalong2, true, false);
+
+                break;
+            }
+            case SCRIPT_COMMAND_DESPAWN_SELF:
+            {
+                if (!target && !source)
+                {
+                    sLog.outError("SCRIPT_COMMAND_DESPAWN_SELF call for NULL object.");
+                    break;
+                }
+
+                // only creature
+                if ((!target || target->GetTypeId() != TYPEID_UNIT) && (!source || source->GetTypeId() != TYPEID_UNIT))
+                {
+                    sLog.outError("SCRIPT_COMMAND_DESPAWN_SELF call for non-creature (TypeIdSource: %u)(TypeIdTarget: %u), skipping.", source ? source->GetTypeId() : 0, target ? target->GetTypeId() : 0);
+                    break;
+                }
+
+                Creature* pCreature = target && target->GetTypeId() == TYPEID_UNIT ? (Creature*)target : (Creature*)source;
+
+                pCreature->ForcedDespawn(step.script->datalong);
+
+                break;
+            }
             default:
                 sLog.outError("Unknown script command %u called.",step.script->command);
                 break;
@@ -3498,22 +3540,22 @@ void Map::ScriptsProcess()
     return;
 }
 
-Creature* Map::GetCreature(uint64 guid)
+Creature* Map::GetCreature(ObjectGuid guid)
 {
-    return m_objectsStore.find<Creature>(guid, (Creature*)NULL);
+    return m_objectsStore.find<Creature>(guid.GetRawValue(), (Creature*)NULL);
 }
 
-Vehicle* Map::GetVehicle(uint64 guid)
+Vehicle* Map::GetVehicle(ObjectGuid guid)
 {
-    return m_objectsStore.find<Vehicle>(guid, (Vehicle*)NULL);
+    return m_objectsStore.find<Vehicle>(guid.GetRawValue(), (Vehicle*)NULL);
 }
 
-Pet* Map::GetPet(uint64 guid)
+Pet* Map::GetPet(ObjectGuid guid)
 {
-    return m_objectsStore.find<Pet>(guid, (Pet*)NULL);
+    return m_objectsStore.find<Pet>(guid.GetRawValue(), (Pet*)NULL);
 }
 
-Corpse* Map::GetCorpse(uint64 guid)
+Corpse* Map::GetCorpse(ObjectGuid guid)
 {
     Corpse * ret = ObjectAccessor::GetCorpseInMap(guid,GetId());
     if (!ret)
@@ -3523,33 +3565,32 @@ Corpse* Map::GetCorpse(uint64 guid)
     return ret;
 }
 
-Creature* Map::GetCreatureOrPetOrVehicle(uint64 guid)
+Creature* Map::GetCreatureOrPetOrVehicle(ObjectGuid guid)
 {
-    if (IS_PLAYER_GUID(guid))
-        return NULL;
+    switch(guid.GetHigh())
+    {
+        case HIGHGUID_UNIT:         return GetCreature(guid);
+        case HIGHGUID_PET:          return GetPet(guid);
+        case HIGHGUID_VEHICLE:      return GetVehicle(guid);
+        default:                    break;
+    }
 
-    if (IS_PET_GUID(guid))
-        return GetPet(guid);
-
-    if (IS_VEHICLE_GUID(guid))
-        return GetVehicle(guid);
-
-    return GetCreature(guid);
+    return NULL;
 }
 
-GameObject* Map::GetGameObject(uint64 guid)
+GameObject* Map::GetGameObject(ObjectGuid guid)
 {
-    return m_objectsStore.find<GameObject>(guid, (GameObject*)NULL);
+    return m_objectsStore.find<GameObject>(guid.GetRawValue(), (GameObject*)NULL);
 }
 
-DynamicObject* Map::GetDynamicObject(uint64 guid)
+DynamicObject* Map::GetDynamicObject(ObjectGuid guid)
 {
-    return m_objectsStore.find<DynamicObject>(guid, (DynamicObject*)NULL);
+    return m_objectsStore.find<DynamicObject>(guid.GetRawValue(), (DynamicObject*)NULL);
 }
 
-WorldObject* Map::GetWorldObject(uint64 guid)
+WorldObject* Map::GetWorldObject(ObjectGuid guid)
 {
-    switch(GUID_HIPART(guid))
+    switch(guid.GetHigh())
     {
         case HIGHGUID_PLAYER:       return ObjectAccessor::FindPlayer(guid);
         case HIGHGUID_GAMEOBJECT:   return GetGameObject(guid);
@@ -3592,26 +3633,11 @@ uint32 Map::GenerateLocalLowGuid(HighGuid guidhigh)
     switch(guidhigh)
     {
         case HIGHGUID_DYNAMICOBJECT:
-            if (m_hiDynObjectGuid >= 0xFFFFFFFE)
-            {
-                sLog.outError("DynamicObject guid overflow!! Can't continue, shutting down server. ");
-                World::StopNow(ERROR_EXIT_CODE);
-            }
-            return m_hiDynObjectGuid++;
+            return m_DynObjectGuids.Generate();
         case HIGHGUID_PET:
-            if(m_hiPetGuid>=0x00FFFFFE)
-            {
-                sLog.outError("Pet guid overflow!! Can't continue, shutting down server. ");
-                World::StopNow(ERROR_EXIT_CODE);
-            }
-            return m_hiPetGuid++;
+            return m_PetGuids.Generate();
         case HIGHGUID_VEHICLE:
-            if(m_hiVehicleGuid>=0x00FFFFFF)
-            {
-                sLog.outError("Vehicle guid overflow!! Can't continue, shutting down server. ");
-                World::StopNow(ERROR_EXIT_CODE);
-            }
-            return m_hiVehicleGuid++;
+            return m_VehicleGuids.Generate();
         default:
             ASSERT(0);
     }

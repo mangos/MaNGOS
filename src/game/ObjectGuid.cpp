@@ -17,22 +17,25 @@
  */
 
 #include "ObjectGuid.h"
+
+#include "World.h"
+
 #include <sstream>
 
-char const* ObjectGuid::GetTypeName() const
+char const* ObjectGuid::GetTypeName(HighGuid high)
 {
-    switch(GetHigh())
+    switch(high)
     {
-        case HIGHGUID_ITEM:         return "item";
-        case HIGHGUID_PLAYER:       return !IsEmpty() ? "player" : "none";
-        case HIGHGUID_GAMEOBJECT:   return "gameobject";
-        case HIGHGUID_TRANSPORT:    return "transport";
-        case HIGHGUID_UNIT:         return "creature";
-        case HIGHGUID_PET:          return "pet";
-        case HIGHGUID_VEHICLE:      return "vehicle";
-        case HIGHGUID_DYNAMICOBJECT:return "dynobject";
-        case HIGHGUID_CORPSE:       return "corpse";
-        case HIGHGUID_MO_TRANSPORT: return "mo_transport";
+        case HIGHGUID_ITEM:         return "Item";
+        case HIGHGUID_PLAYER:       return "Player";
+        case HIGHGUID_GAMEOBJECT:   return "Gameobject";
+        case HIGHGUID_TRANSPORT:    return "Transport";
+        case HIGHGUID_UNIT:         return "Creature";
+        case HIGHGUID_PET:          return "Pet";
+        case HIGHGUID_VEHICLE:      return "Vehicle";
+        case HIGHGUID_DYNAMICOBJECT:return "DynObject";
+        case HIGHGUID_CORPSE:       return "Corpse";
+        case HIGHGUID_MO_TRANSPORT: return "MoTransport";
         default:
             return "<unknown>";
     }
@@ -46,6 +49,17 @@ std::string ObjectGuid::GetString() const
         str << "Entry: " << GetEntry() << " ";
     str << "Guid: " << GetCounter() << ")";
     return str.str();
+}
+
+template<HighGuid high>
+uint32 ObjectGuidGenerator<high>::Generate()
+{
+    if (m_nextGuid >= ObjectGuid::GetMaxCounter(high)-1)
+    {
+        sLog.outError("%s guid overflow!! Can't continue, shutting down server. ",ObjectGuid::GetTypeName(high));
+        World::StopNow(ERROR_EXIT_CODE);
+    }
+    return m_nextGuid++;
 }
 
 ByteBuffer& operator<< (ByteBuffer& buf, ObjectGuid const& guid)
@@ -71,3 +85,13 @@ ByteBuffer &operator>>(ByteBuffer& buf, PackedGuidReader const& guid)
     guid.m_guidPtr->Set(buf.readPackGUID());
     return buf;
 }
+
+template uint32 ObjectGuidGenerator<HIGHGUID_ITEM>::Generate();
+template uint32 ObjectGuidGenerator<HIGHGUID_PLAYER>::Generate();
+template uint32 ObjectGuidGenerator<HIGHGUID_GAMEOBJECT>::Generate();
+template uint32 ObjectGuidGenerator<HIGHGUID_TRANSPORT>::Generate();
+template uint32 ObjectGuidGenerator<HIGHGUID_UNIT>::Generate();
+template uint32 ObjectGuidGenerator<HIGHGUID_PET>::Generate();
+template uint32 ObjectGuidGenerator<HIGHGUID_VEHICLE>::Generate();
+template uint32 ObjectGuidGenerator<HIGHGUID_DYNAMICOBJECT>::Generate();
+template uint32 ObjectGuidGenerator<HIGHGUID_CORPSE>::Generate();
