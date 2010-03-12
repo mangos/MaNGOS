@@ -248,14 +248,22 @@ bool WorldSession::Update(uint32 /*diff*/)
                     break;
             }
         }
-        catch(ByteBufferException &)
+        catch (ByteBufferException &)
         {
-            sLog.outError("WorldSession::Update ByteBufferException occured while parsing a packet (opcode: %u) from client %s, accountid=%i. Skipped packet.",
+            sLog.outError("WorldSession::Update ByteBufferException occured while parsing a packet (opcode: %u) from client %s, accountid=%i.",
                     packet->GetOpcode(), GetRemoteAddress().c_str(), GetAccountId());
             if(sLog.IsOutDebug())
             {
                 sLog.outDebug("Dumping error causing packet:");
                 packet->hexlike();
+            }
+
+            if (sWorld.getConfig(CONFIG_BOOL_KICK_PLAYER_ON_BAD_PACKET))
+            {
+                sLog.outDetail("Disconnecting session [account id %u / address %s] for badly formatted packet.",
+                    GetAccountId(), GetRemoteAddress().c_str());
+
+                KickPlayer();
             }
         }
 

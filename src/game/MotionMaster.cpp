@@ -28,6 +28,7 @@
 #include "PointMovementGenerator.h"
 #include "TargetedMovementGenerator.h"
 #include "WaypointMovementGenerator.h"
+#include "RandomMovementGenerator.h"
 
 #include <cassert>
 
@@ -207,6 +208,19 @@ void MotionMaster::MoveIdle()
 {
     if (empty() || !isStatic(top()))
         push(&si_idleMovement);
+}
+
+void MotionMaster::MoveRandom()
+{
+    if (i_owner->GetTypeId() == TYPEID_PLAYER)
+    {
+        sLog.outError("Player (GUID: %u) attempt to move random.", i_owner->GetGUIDLow());
+    }
+    else
+    {
+        DEBUG_LOG("Creature (Entry: %u GUID: %u) move random.", i_owner->GetEntry(), i_owner->GetGUIDLow());
+        Mutate(new RandomMovementGenerator<Creature>(*i_owner));
+    }
 }
 
 void
