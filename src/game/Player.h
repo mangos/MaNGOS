@@ -2178,7 +2178,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         Object* GetObjectByTypeMask(ObjectGuid guid, TypeMask typemask);
 
         // currently visible objects at player client
-        typedef std::set<uint64> ClientGUIDs;
+        typedef std::set<ObjectGuid> ClientGUIDs;
         ClientGUIDs m_clientGUIDs;
 
         bool HaveAtClient(WorldObject const* u) { return u==this || m_clientGUIDs.find(u->GetGUID())!=m_clientGUIDs.end(); }

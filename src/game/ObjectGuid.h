@@ -71,7 +71,6 @@ enum HighGuid
 //*** Must be replaced by ObjectGuid use ***
 #define IS_CREATURE_GUID(Guid)       ( GUID_HIPART(Guid) == HIGHGUID_UNIT )
 #define IS_PET_GUID(Guid)            ( GUID_HIPART(Guid) == HIGHGUID_PET )
-#define IS_VEHICLE_GUID(Guid)        ( GUID_HIPART(Guid) == HIGHGUID_VEHICLE )
 #define IS_CREATURE_OR_PET_GUID(Guid)( IS_CREATURE_GUID(Guid) || IS_PET_GUID(Guid) )
 #define IS_PLAYER_GUID(Guid)         ( GUID_HIPART(Guid) == HIGHGUID_PLAYER && Guid!=0 )
 #define IS_UNIT_GUID(Guid)           ( IS_CREATURE_OR_PET_GUID(Guid) || IS_PLAYER_GUID(Guid) )
@@ -169,6 +168,7 @@ class ObjectGuid
         bool IsPet()           const { return GetHigh() == HIGHGUID_PET; }
         bool IsVehicle()       const { return GetHigh() == HIGHGUID_VEHICLE; }
         bool IsCreatureOrPet() const { return IsCreature() || IsPet(); }
+        bool IsCreatureOrVehicle() const { return IsCreature() || IsVehicle(); }
         bool IsPlayer()        const { return !IsEmpty() && GetHigh() == HIGHGUID_PLAYER; }
         bool IsUnit()          const { return IsCreatureOrPet() || IsPlayer(); }
         bool IsItem()          const { return GetHigh() == HIGHGUID_ITEM; }
@@ -198,6 +198,8 @@ class ObjectGuid
         }
 
         TypeID GetTypeId() const { return GetTypeId(GetHigh()); }
+
+        bool operator< (ObjectGuid const& guid) const { return GetRawValue() < guid.GetRawValue(); }
 
     public:                                                 // accessors - for debug
         static char const* GetTypeName(HighGuid high);

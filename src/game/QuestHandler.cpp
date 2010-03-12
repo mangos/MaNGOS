@@ -644,7 +644,7 @@ void WorldSession::HandleQuestgiverStatusMultipleQuery(WorldPacket& /*recvPacket
         uint8 questStatus = DIALOG_STATUS_NONE;
         uint8 defstatus = DIALOG_STATUS_NONE;
 
-        if (IS_CREATURE_OR_PET_GUID(*itr))
+        if (itr->IsCreatureOrPet())
         {
             // need also pet quests case support
             Creature *questgiver = GetPlayer()->GetMap()->GetCreatureOrPetOrVehicle(*itr);
@@ -660,7 +660,7 @@ void WorldSession::HandleQuestgiverStatusMultipleQuery(WorldPacket& /*recvPacket
             data << uint8(questStatus);
             ++count;
         }
-        else if(IS_GAMEOBJECT_GUID(*itr))
+        else if (itr->IsGameobject())
         {
             GameObject *questgiver = GetPlayer()->GetMap()->GetGameObject(*itr);
             if(!questgiver)
