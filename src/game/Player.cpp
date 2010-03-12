@@ -15849,12 +15849,13 @@ void Player::_LoadGroup(QueryResult *result)
                 // the group leader may change the instance difficulty while the player is offline
                 SetDungeonDifficulty(group->GetDungeonDifficulty());
                 SetRaidDifficulty(group->GetRaidDifficulty());
-                if(sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_GROUP))
-                     if(uint8 FactionRace = group->GetGroupFactionRace())
+                if(sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_GROUP)) {
+                       if(Player *leader = sObjectMgr.GetPlayer(group->GetLeaderGUID()))
                        {
-                        setFactionForRace(FactionRace);
-                        sLog.outDebug( "PLAYER LOAD: Group Interfaction Interactions - Faction changed (LoadMember)" );
-                       }
+                        setFactionForRace(leader->getRace());
+                        sLog.outDebug( "PLAYER LOAD: Group Interfaction Interactions - Faction changed (AddMember)" );
+                       } else sLog.outDebug( "PLAYER LOAD: Leader off - cannot change faction" );
+                }
             }
         }
     }
