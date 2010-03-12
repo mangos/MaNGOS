@@ -396,14 +396,14 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
 
         void RemoveFromActive(Creature* obj);
 
-        Creature* GetCreature(uint64 guid);
-        Vehicle* GetVehicle(uint64 guid);
-        Pet* GetPet(uint64 guid);
-        Creature* GetCreatureOrPetOrVehicle(uint64 guid);
-        GameObject* GetGameObject(uint64 guid);
-        DynamicObject* GetDynamicObject(uint64 guid);
-        Corpse* GetCorpse(uint64 guid);
-        WorldObject* GetWorldObject(uint64 guid);
+        Creature* GetCreature(ObjectGuid guid);
+        Vehicle* GetVehicle(ObjectGuid guid);
+        Pet* GetPet(ObjectGuid guid);
+        Creature* GetCreatureOrPetOrVehicle(ObjectGuid guid);
+        GameObject* GetGameObject(ObjectGuid guid);
+        DynamicObject* GetDynamicObject(ObjectGuid guid);
+        Corpse* GetCorpse(ObjectGuid guid);
+        WorldObject* GetWorldObject(ObjectGuid guid);
 
         TypeUnorderedMapContainer<AllMapStoredObjectTypes>& GetObjectsStore() { return m_objectsStore; }
 
