@@ -470,12 +470,11 @@ void WorldSession::HandlePageQuerySkippedOpcode( WorldPacket & recv_data )
     sLog.outDebug( "WORLD: Received CMSG_PAGE_TEXT_QUERY" );
 
     uint32 itemid;
-    uint64 guid;
+    ObjectGuid guid;
 
     recv_data >> itemid >> guid;
 
-    sLog.outDetail( "Packet Info: itemid: %u guidlow: %u guidentry: %u guidhigh: %u",
-        itemid, GUID_LOPART(guid), GUID_ENPART(guid), GUID_HIPART(guid));
+    sLog.outDetail( "Packet Info: itemid: %u guid: %s", itemid, guid.GetString().c_str());
 }
 
 void WorldSession::HandleSellItemOpcode( WorldPacket & recv_data )
