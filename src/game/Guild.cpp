@@ -746,7 +746,7 @@ void Guild::Roster(WorldSession *session /*= NULL*/)
         }
         else
         {
-            data << uint64(ObjectGuid(HIGHGUID_PLAYER, itr->first).GetRawValue());
+            data << ObjectGuid(HIGHGUID_PLAYER, itr->first);
             data << uint8(0);
             data << itr->second.Name;
             data << uint32(itr->second.RankId);

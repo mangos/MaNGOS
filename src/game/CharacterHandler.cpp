@@ -1264,7 +1264,7 @@ void WorldSession::HandleEquipmentSetSave(WorldPacket &recv_data)
         if(!item && !itemGuid.IsEmpty())                    // cheating check 1
             return;
 
-        if(item && item->GetGUID() != itemGuid.GetRawValue())// cheating check 2
+        if(item && item->GetObjectGuid() != itemGuid)       // cheating check 2
             return;
 
         eqSet.Items[i] = itemGuid.GetCounter();
@@ -1297,9 +1297,9 @@ void WorldSession::HandleEquipmentSetUse(WorldPacket &recv_data)
         recv_data >> itemGuid.ReadAsPacked();
         recv_data >> srcbag >> srcslot;
 
-        sLog.outDebug("Item " I64FMT ": srcbag %u, srcslot %u", itemGuid.GetRawValue(), srcbag, srcslot);
+        sLog.outDebug("Item (%s): srcbag %u, srcslot %u", itemGuid.GetString().c_str(), srcbag, srcslot);
 
-        Item *item = _player->GetItemByGuid(itemGuid.GetRawValue());
+        Item *item = _player->GetItemByGuid(itemGuid);
 
         uint16 dstpos = i | (INVENTORY_SLOT_BAG_0 << 8);
 

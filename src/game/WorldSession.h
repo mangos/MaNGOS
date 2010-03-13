@@ -30,6 +30,7 @@ struct ItemPrototype;
 struct AuctionEntry;
 struct DeclinedName;
 
+class ObjectGuid;
 class Creature;
 class Item;
 class Object;
@@ -255,7 +256,7 @@ class MANGOS_DLL_SPEC WorldSession
 
         void BuildPartyMemberStatsChangedPacket(Player *player, WorldPacket *data);
 
-        void DoLootRelease( uint64 lguid );
+        void DoLootRelease(ObjectGuid lguid);
 
         // Account mute time
         time_t m_muteTime;
