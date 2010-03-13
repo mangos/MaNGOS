@@ -139,10 +139,10 @@ void WorldSession::HandleWhoOpcode( WorldPacket & recv_data )
     AccountTypes gmLevelInWhoList = (AccountTypes)sWorld.getConfig(CONFIG_UINT32_GM_LEVEL_IN_WHO_LIST);
 
     WorldPacket data( SMSG_WHO, 50 );                       // guess size
-    data << clientcount;                                    // clientcount place holder
-    data << clientcount;                                    // clientcount place holder
+    data << uint32(clientcount);                            // clientcount place holder, listed count
+    data << uint32(clientcount);                            // clientcount place holder, online count
 
-    //TODO: Guard Player map
+    // TODO: Guard Player map
     HashMapHolder<Player>::MapType& m = sObjectAccessor.GetPlayers();
     for(HashMapHolder<Player>::MapType::const_iterator itr = m.begin(); itr != m.end(); ++itr)
     {
@@ -157,7 +157,7 @@ void WorldSession::HandleWhoOpcode( WorldPacket & recv_data )
                 continue;
         }
 
-        //do not process players which are not in world
+        // do not process players which are not in world
         if(!(itr->second->IsInWorld()))
             continue;
 
@@ -244,13 +244,14 @@ void WorldSession::HandleWhoOpcode( WorldPacket & recv_data )
         data << uint8(0);                                   // new 2.4.0
         data << uint32( pzoneid );                          // player zone id
 
-        // 49 is maximum player count sent to client
-        if ((++clientcount) == 49)
+        // 50 is maximum player count sent to client
+        if ((++clientcount) == 50)
             break;
     }
 
-    data.put( 0,              clientcount );                // insert right count
-    data.put( sizeof(uint32), clientcount );                // insert right count
+    uint32 count = m.size();
+    data.put( 0, clientcount );                             // insert right count, listed count
+    data.put( 4, count > 50 ? count : clientcount );        // insert right count, online count
 
     SendPacket(&data);
     sLog.outDebug( "WORLD: Send SMSG_WHO Message" );

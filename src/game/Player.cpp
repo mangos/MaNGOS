@@ -13535,13 +13535,12 @@ bool Player::SatisfyQuestLog( bool msg )
     if( FindQuestSlot(0) < MAX_QUEST_LOG_SIZE )
         return true;
 
-    if( msg )
-    {
-        WorldPacket data( SMSG_QUESTLOG_FULL, 0 );
-        GetSession()->SendPacket( &data );
-        sLog.outDebug( "WORLD: Sent QUEST_LOG_FULL_MESSAGE" );
-    }
-    return false;
+    if( !msg )
+        return false;
+
+    WorldPacket data( SMSG_QUESTLOG_FULL, 0 );
+    GetSession()->SendPacket( &data );
+    sLog.outDebug( "WORLD: Sent SMSG_QUESTLOG_FULL" );
 }
 
 bool Player::SatisfyQuestPreviousQuest( Quest const* qInfo, bool msg )
@@ -14431,7 +14430,7 @@ void Player::SendQuestReward( Quest const *pQuest, uint32 XP, Object * questGive
 
     data << uint32(10*MaNGOS::Honor::hk_honor_at_level(getLevel(), pQuest->GetRewHonorAddition()));
     data << uint32(pQuest->GetBonusTalents());              // bonus talents
-    data << uint32(0);
+    data << uint32(0);                                      // arena points
     GetSession()->SendPacket( &data );
 
     if (pQuest->GetQuestCompleteScript() != 0)
