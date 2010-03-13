@@ -1548,7 +1548,7 @@ void WorldSession::HandleQueryInspectAchievements( WorldPacket & recv_data )
 
     recv_data >> guid.ReadAsPacked();
 
-    if(Player *player = sObjectMgr.GetPlayer(guid.GetRawValue()))
+    if(Player *player = sObjectMgr.GetPlayer(guid))
         player->GetAchievementMgr().SendRespondInspectAchievements(_player);
 }
 
