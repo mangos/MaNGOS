@@ -30,6 +30,7 @@ struct ItemPrototype;
 struct AuctionEntry;
 struct DeclinedName;
 
+class ObjectGuid;
 class Creature;
 class Item;
 class Object;

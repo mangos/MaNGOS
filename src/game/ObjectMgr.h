@@ -420,7 +420,7 @@ class ObjectMgr
         typedef std::vector<std::string> ScriptNameMap;
 
         Player* GetPlayer(const char* name) const { return ObjectAccessor::FindPlayerByName(name);}
-        Player* GetPlayer(uint64 guid) const { return ObjectAccessor::FindPlayer(guid); }
+        Player* GetPlayer(ObjectGuid guid) const { return ObjectAccessor::FindPlayer(guid); }
 
         static GameObjectInfo const *GetGameObjectInfo(uint32 id) { return sGOStorage.LookupEntry<GameObjectInfo>(id); }
 

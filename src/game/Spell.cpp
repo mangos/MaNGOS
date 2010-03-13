@@ -183,9 +183,9 @@ void SpellCastTargets::setCorpseTarget(Corpse* corpse)
 
 void SpellCastTargets::Update(Unit* caster)
 {
-    m_GOTarget   = !m_GOTargetGUID.IsEmpty() ? caster->GetMap()->GetGameObject(m_GOTargetGUID.GetRawValue()) : NULL;
+    m_GOTarget   = !m_GOTargetGUID.IsEmpty() ? caster->GetMap()->GetGameObject(m_GOTargetGUID) : NULL;
     m_unitTarget = !m_unitTargetGUID.IsEmpty() ?
-        ( m_unitTargetGUID.GetRawValue() == caster->GetGUID() ? caster : ObjectAccessor::GetUnit(*caster, m_unitTargetGUID.GetRawValue()) ) :
+        ( m_unitTargetGUID == caster->GetObjectGuid() ? caster : ObjectAccessor::GetUnit(*caster, m_unitTargetGUID) ) :
     NULL;
 
     m_itemTarget = NULL;
@@ -3636,7 +3636,7 @@ void Spell::TakeCastItem()
     {
         // This code is to avoid a crash
         // I'm not sure, if this is really an error, but I guess every item needs a prototype
-        sLog.outError("Cast item has no item prototype highId=%d, lowId=%d",m_CastItem->GetGUIDHigh(), m_CastItem->GetGUIDLow());
+        sLog.outError("Cast item (%s) has no item prototype", m_CastItem->GetObjectGuid().GetString().c_str());
         return;
     }
 

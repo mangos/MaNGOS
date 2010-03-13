@@ -12783,7 +12783,7 @@ void Unit::ClearComboPointHolders()
     {
         uint32 lowguid = *m_ComboPointHolders.begin();
 
-        Player* plr = sObjectMgr.GetPlayer(MAKE_NEW_GUID(lowguid, 0, HIGHGUID_PLAYER));
+        Player* plr = sObjectMgr.GetPlayer(ObjectGuid(HIGHGUID_PLAYER, lowguid));
         if(plr && plr->GetComboTarget()==GetGUID())         // recheck for safe
             plr->ClearComboPoints();                        // remove also guid from m_ComboPointHolders;
         else

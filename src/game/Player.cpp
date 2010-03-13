@@ -2138,10 +2138,10 @@ void Player::RegenerateHealth(uint32 diff)
     ModifyHealth(int32(addvalue));
 }
 
-Creature* Player::GetNPCIfCanInteractWith(uint64 guid, uint32 npcflagmask)
+Creature* Player::GetNPCIfCanInteractWith(ObjectGuid guid, uint32 npcflagmask)
 {
-    // unit checks
-    if (!guid || !IsInWorld() || isInFlight())
+    // some basic checks
+    if (guid.IsEmpty() || !IsInWorld() || isInFlight())
         return NULL;
 
     // exist (we need look pets also for some interaction (quest/etc)
@@ -2188,8 +2188,12 @@ Creature* Player::GetNPCIfCanInteractWith(uint64 guid, uint32 npcflagmask)
     return unit;
 }
 
-GameObject* Player::GetGameObjectIfCanInteractWith(uint64 guid, uint32 gameobject_type) const
+GameObject* Player::GetGameObjectIfCanInteractWith(ObjectGuid guid, uint32 gameobject_type) const
 {
+    // some basic checks
+    if (guid.IsEmpty() || !IsInWorld() || isInFlight())
+        return NULL;
+
     if (GameObject *go = GetMap()->GetGameObject(guid))
     {
         if (uint32(go->GetGoType()) == gameobject_type || gameobject_type == MAX_GAMEOBJECT_TYPE)
@@ -8701,26 +8705,26 @@ Item* Player::GetItemByGuid(ObjectGuid guid) const
 {
     for(int i = EQUIPMENT_SLOT_START; i < INVENTORY_SLOT_ITEM_END; ++i)
         if (Item *pItem = GetItemByPos(INVENTORY_SLOT_BAG_0, i))
-            if (pItem->GetGUID() == guid.GetRawValue())
+            if (pItem->GetObjectGuid() == guid)
                 return pItem;
 
     for(int i = KEYRING_SLOT_START; i < CURRENCYTOKEN_SLOT_END; ++i)
         if (Item *pItem = GetItemByPos(INVENTORY_SLOT_BAG_0, i))
-            if (pItem->GetGUID() == guid.GetRawValue())
+            if (pItem->GetObjectGuid() == guid)
                 return pItem;
 
     for(int i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
         if (Bag *pBag = (Bag*)GetItemByPos(INVENTORY_SLOT_BAG_0, i))
             for(uint32 j = 0; j < pBag->GetBagSize(); ++j)
                 if (Item* pItem = pBag->GetItemByPos(j))
-                    if (pItem->GetGUID() == guid.GetRawValue())
+                    if (pItem->GetObjectGuid() == guid)
                         return pItem;
 
     for(int i = BANK_SLOT_BAG_START; i < BANK_SLOT_BAG_END; ++i)
         if (Bag *pBag = (Bag*)GetItemByPos(INVENTORY_SLOT_BAG_0, i))
             for(uint32 j = 0; j < pBag->GetBagSize(); ++j)
                 if (Item* pItem = pBag->GetItemByPos(j))
-                    if (pItem->GetGUID() == guid.GetRawValue())
+                    if (pItem->GetObjectGuid() == guid)
                         return pItem;
 
     return NULL;
@@ -21713,13 +21717,13 @@ Object* Player::GetObjectByTypeMask(ObjectGuid guid, TypeMask typemask)
     {
         case HIGHGUID_ITEM:
             if (typemask & TYPEMASK_ITEM)
-                return GetItemByGuid(guid.GetRawValue());
+                return GetItemByGuid(guid);
             break;
         case HIGHGUID_PLAYER:
-            if (GetGUID()==guid.GetRawValue())
+            if (GetObjectGuid()==guid)
                 return this;
             if ((typemask & TYPEMASK_PLAYER) && IsInWorld())
-                return ObjectAccessor::FindPlayer(guid.GetRawValue());
+                return ObjectAccessor::FindPlayer(guid);
             break;
         case HIGHGUID_GAMEOBJECT:
             if ((typemask & TYPEMASK_GAMEOBJECT) && IsInWorld())

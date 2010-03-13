@@ -71,9 +71,8 @@ enum HighGuid
 //*** Must be replaced by ObjectGuid use ***
 #define IS_CREATURE_GUID(Guid)       ( GUID_HIPART(Guid) == HIGHGUID_UNIT )
 #define IS_PET_GUID(Guid)            ( GUID_HIPART(Guid) == HIGHGUID_PET )
-#define IS_CREATURE_OR_PET_GUID(Guid)( IS_CREATURE_GUID(Guid) || IS_PET_GUID(Guid) )
 #define IS_PLAYER_GUID(Guid)         ( GUID_HIPART(Guid) == HIGHGUID_PLAYER && Guid!=0 )
-#define IS_UNIT_GUID(Guid)           ( IS_CREATURE_OR_PET_GUID(Guid) || IS_PLAYER_GUID(Guid) )
+#define IS_UNIT_GUID(Guid)           ( IS_CREATURE_GUID(Guid) || IS_PET_GUID(Guid) || IS_PLAYER_GUID(Guid) )
                                                             // special case for empty guid need check
 #define IS_GAMEOBJECT_GUID(Guid)     ( GUID_HIPART(Guid) == HIGHGUID_GAMEOBJECT )
 #define IS_MO_TRANSPORT(Guid)        ( GUID_HIPART(Guid) == HIGHGUID_MO_TRANSPORT )
@@ -86,8 +85,6 @@ enum HighGuid
 #define GUID_HIPART(x)   (uint32)((uint64(x) >> 48) & 0x0000FFFF)
 
 // We have different low and middle part size for different guid types
-#define _GUID_ENPART_2(x) 0
-#define _GUID_ENPART_3(x) (uint32)((uint64(x) >> 24) & UI64LIT(0x0000000000FFFFFF))
 #define _GUID_LOPART_2(x) (uint32)(uint64(x)         & UI64LIT(0x00000000FFFFFFFF))
 #define _GUID_LOPART_3(x) (uint32)(uint64(x)         & UI64LIT(0x0000000000FFFFFF))
 
@@ -111,7 +108,6 @@ inline bool IsGuidHaveEnPart(uint64 const& guid)
     }
 }
 
-#define GUID_ENPART(x) (IsGuidHaveEnPart(x) ? _GUID_ENPART_3(x) : _GUID_ENPART_2(x))
 #define GUID_LOPART(x) (IsGuidHaveEnPart(x) ? _GUID_LOPART_3(x) : _GUID_LOPART_2(x))
 
 //*** Must be replaced by ObjectGuid use END ***
@@ -197,6 +193,8 @@ class ObjectGuid
 
         TypeID GetTypeId() const { return GetTypeId(GetHigh()); }
 
+        bool operator== (ObjectGuid const& guid) const { return GetRawValue() == guid.GetRawValue(); }
+        bool operator!= (ObjectGuid const& guid) const { return GetRawValue() != guid.GetRawValue(); }
         bool operator< (ObjectGuid const& guid) const { return GetRawValue() < guid.GetRawValue(); }
 
     public:                                                 // accessors - for debug
