@@ -23,18 +23,19 @@
 #include "Log.h"
 #include "Opcodes.h"
 #include "World.h"
+#include "ObjectGuid.h"
 #include <zlib/zlib.h>
 
 UpdateData::UpdateData() : m_blockCount(0)
 {
 }
 
-void UpdateData::AddOutOfRangeGUID(std::set<uint64>& guids)
+void UpdateData::AddOutOfRangeGUID(std::set<ObjectGuid>& guids)
 {
     m_outOfRangeGUIDs.insert(guids.begin(),guids.end());
 }
 
-void UpdateData::AddOutOfRangeGUID(const uint64 &guid)
+void UpdateData::AddOutOfRangeGUID(ObjectGuid const &guid)
 {
     m_outOfRangeGUIDs.insert(guid);
 }
@@ -114,10 +115,8 @@ bool UpdateData::BuildPacket(WorldPacket *packet)
         buf << (uint8) UPDATETYPE_OUT_OF_RANGE_OBJECTS;
         buf << (uint32) m_outOfRangeGUIDs.size();
 
-        for(std::set<uint64>::const_iterator i = m_outOfRangeGUIDs.begin(); i != m_outOfRangeGUIDs.end(); ++i)
-        {
-            buf.appendPackGUID(*i);
-        }
+        for(std::set<ObjectGuid>::const_iterator i = m_outOfRangeGUIDs.begin(); i != m_outOfRangeGUIDs.end(); ++i)
+            buf << i->WriteAsPacked();
     }
 
     buf.append(m_data);
