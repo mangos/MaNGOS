@@ -1153,7 +1153,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         uint8 FindEquipSlot( ItemPrototype const* proto, uint32 slot, bool swap ) const;
         uint32 GetItemCount( uint32 item, bool inBankAlso = false, Item* skipItem = NULL ) const;
         uint32 GetItemCountWithLimitCategory(uint32 limitCategory) const;
-        Item* GetItemByGuid( uint64 guid ) const;
+        Item* GetItemByGuid(ObjectGuid uint64) const;
         Item* GetItemByEntry(uint32 item) const;            // only for special cases
         Item* GetItemByLimitedCategory(uint32 limitedCategory) const;
         Item* GetItemByPos( uint16 pos ) const;
@@ -1793,8 +1793,8 @@ class MANGOS_DLL_SPEC Player : public Unit
         void ApplyManaRegenBonus(int32 amount, bool apply);
         void UpdateManaRegen();
 
-        const uint64& GetLootGUID() const { return m_lootGuid; }
-        void SetLootGUID(const uint64 &guid) { m_lootGuid = guid; }
+        const uint64& GetLootGUID() const { return m_lootGuid.GetRawValue(); }
+        void SetLootGUID(ObjectGuid const& guid) { m_lootGuid = guid; }
 
         void RemovedInsignia(Player* looterPlr);
 
@@ -1989,8 +1989,8 @@ class MANGOS_DLL_SPEC Player : public Unit
         PlayerMenu* PlayerTalkClass;
         std::vector<ItemSetEffect *> ItemSetEff;
 
-        void SendLoot(uint64 guid, LootType loot_type);
-        void SendLootRelease( uint64 guid );
+        void SendLoot(ObjectGuid guid, LootType loot_type);
+        void SendLootRelease(ObjectGuid guid );
         void SendNotifyLootItemRemoved(uint8 lootSlot);
         void SendNotifyLootMoneyRemoved();
 
@@ -2182,8 +2182,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         Object* GetObjectByTypeMask(ObjectGuid guid, TypeMask typemask);
 
         // currently visible objects at player client
-        typedef std::set<ObjectGuid> ClientGUIDs;
-        ClientGUIDs m_clientGUIDs;
+        ObjectGuidSet m_clientGUIDs;
 
         bool HaveAtClient(WorldObject const* u) { return u==this || m_clientGUIDs.find(u->GetGUID())!=m_clientGUIDs.end(); }
 
@@ -2379,7 +2378,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         time_t m_lastHonorUpdateTime;
 
         void outDebugValues() const;
-        uint64 m_lootGuid;
+        ObjectGuid m_lootGuid;
 
         uint32 m_team;
         uint32 m_nextSave;
