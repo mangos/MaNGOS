@@ -13535,12 +13535,13 @@ bool Player::SatisfyQuestLog( bool msg )
     if( FindQuestSlot(0) < MAX_QUEST_LOG_SIZE )
         return true;
 
-    if( !msg )
-        return false;
-
-    WorldPacket data( SMSG_QUESTLOG_FULL, 0 );
-    GetSession()->SendPacket( &data );
-    sLog.outDebug( "WORLD: Sent SMSG_QUESTLOG_FULL" );
+    if( msg )
+    {
+        WorldPacket data( SMSG_QUESTLOG_FULL, 0 );
+        GetSession()->SendPacket( &data );
+        sLog.outDebug( "WORLD: Sent SMSG_QUESTLOG_FULL" );
+    }
+    return true;
 }
 
 bool Player::SatisfyQuestPreviousQuest( Quest const* qInfo, bool msg )
