@@ -8641,11 +8641,6 @@ void Unit::SetPet(Pet* pet)
 
     if(pet && GetTypeId() == TYPEID_PLAYER)
         ((Player*)this)->SendPetGUIDs();
-
-    // FIXME: hack, speed must be set only at follow
-    if(pet && GetTypeId()==TYPEID_PLAYER)
-        for(int i = 0; i < MAX_MOVE_TYPE; ++i)
-            pet->SetSpeedRate(UnitMoveType(i), m_speed_rate[i], true);
 }
 
 void Unit::SetCharm(Unit* pet)
@@ -10727,7 +10722,7 @@ void Unit::UpdateWalkMode(Unit* source, bool self)
         CallForAllControlledUnits(UpdateWalkModeHelper(source), false, true, true);
 }
 
-void Unit::UpdateSpeed(UnitMoveType mtype, bool forced)
+void Unit::UpdateSpeed(UnitMoveType mtype, bool forced, float ratio)
 {
     // not in combat pet have same speed as owner
     switch(mtype)
@@ -10837,7 +10832,7 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced)
         if (speed < min_speed)
             speed = min_speed;
     }
-    SetSpeedRate(mtype, speed, forced);
+    SetSpeedRate(mtype, speed * ratio, forced);
 }
 
 float Unit::GetSpeed( UnitMoveType mtype ) const
