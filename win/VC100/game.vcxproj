@@ -434,7 +434,7 @@
     <ClCompile Include="..\..\src\game\ObjectAccessor.cpp" />
     <ClCompile Include="..\..\src\game\ObjectGridLoader.cpp" />
     <ClCompile Include="..\..\src\game\ObjectMgr.cpp" />
-    <ClInclude Include="..\..\src\game\ObjectGuid.cpp" />
+    <ClCompile Include="..\..\src\game\ObjectGuid.cpp" />
     <ClCompile Include="..\..\src\game\ObjectPosSelector.cpp" />
     <ClCompile Include="..\..\src\game\Opcodes.cpp" />
     <ClCompile Include="..\..\src\game\pchdef.cpp">
