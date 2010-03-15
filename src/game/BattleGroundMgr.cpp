@@ -938,6 +938,8 @@ void BattleGroundQueue::Update(BattleGroundTypeId bgTypeId, BattleGroundBracketI
 
         //optimalization : --- we dont need to use selection_pools - each update we select max 2 groups
 
+        uint32 teamId = 0;
+
         for(uint32 i = BG_QUEUE_PREMADE_ALLIANCE; i < BG_QUEUE_NORMAL_ALLIANCE; i++)
         {
             // take the group that joined first
@@ -969,8 +971,11 @@ void BattleGroundQueue::Update(BattleGroundTypeId bgTypeId, BattleGroundBracketI
                     && (((*itr_team[BG_TEAM_ALLIANCE])->ArenaTeamRating >= arenaMinRating && (*itr_team[BG_TEAM_ALLIANCE])->ArenaTeamRating <= arenaMaxRating)
                         || (*itr_team[BG_TEAM_ALLIANCE])->JoinTime < discardTime) )
                 {
-                    m_SelectionPools[BG_TEAM_ALLIANCE].AddGroup((*itr_team[BG_TEAM_ALLIANCE]), MaxPlayersPerTeam);
-                    break;
+                    if((*itr_team[BG_TEAM_ALLIANCE])->ArenaTeamId != teamId)
+                    {
+                        m_SelectionPools[BG_TEAM_ALLIANCE].AddGroup((*itr_team[BG_TEAM_ALLIANCE]), MaxPlayersPerTeam);
+                        break;
+                    }
                 }
             }
         }
@@ -985,8 +990,11 @@ void BattleGroundQueue::Update(BattleGroundTypeId bgTypeId, BattleGroundBracketI
                     && (((*itr_team[BG_TEAM_HORDE])->ArenaTeamRating >= arenaMinRating && (*itr_team[BG_TEAM_HORDE])->ArenaTeamRating <= arenaMaxRating)
                         || (*itr_team[BG_TEAM_HORDE])->JoinTime < discardTime) )
                 {
-                    m_SelectionPools[BG_TEAM_HORDE].AddGroup((*itr_team[BG_TEAM_HORDE]), MaxPlayersPerTeam);
-                    break;
+                    if((*itr_team[BG_TEAM_HORDE])->ArenaTeamId != teamId)
+                    {
+                        m_SelectionPools[BG_TEAM_HORDE].AddGroup((*itr_team[BG_TEAM_HORDE]), MaxPlayersPerTeam);
+                        break;
+                    }
                 }
             }
         }
