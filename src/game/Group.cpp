@@ -1246,12 +1246,15 @@ void Group::_setLeader(const uint64 &guid)
 
 void Group::_removeRolls(const uint64 &guid)
 {
-    for (Rolls::iterator it = RollId.begin(); it < RollId.end(); )
+    for (Rolls::iterator it = RollId.begin(); it != RollId.end(); )
     {
         Roll* roll = *it;
         Roll::PlayerVote::iterator itr2 = roll->playerVote.find(guid);
         if(itr2 == roll->playerVote.end())
+        {
+            ++it;
             continue;
+        }
 
         if (itr2->second == GREED || itr2->second == DISENCHANT)
             --roll->totalGreed;
