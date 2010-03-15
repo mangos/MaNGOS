@@ -1534,15 +1534,6 @@ uint32 Group::CanJoinBattleGroundQueue(BattleGround const* bgOrTemplate, BattleG
         ++allowedPlayerCount;
     }
 
-    if(bgTypeId == BATTLEGROUND_AA)
-    {
-        if(allowedPlayerCount < MinPlayerCount)
-            return BG_JOIN_ERR_GROUP_NOT_ENOUGH;
-
-        if(allowedPlayerCount > MaxPlayerCount)
-            return BG_JOIN_ERR_GROUP_TOO_MANY;
-    }
-
     return BG_JOIN_ERR_OK;
 }
 
