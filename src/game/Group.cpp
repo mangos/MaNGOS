@@ -711,7 +711,7 @@ bool Group::CountRollVote(ObjectGuid const& playerGUID, Rolls::iterator& rollI, 
     Roll::PlayerVote::iterator itr = roll->playerVote.find(playerGUID.GetRawValue());
     // this condition means that player joins to the party after roll begins
     if (itr == roll->playerVote.end())
-        return false;
+        return true;                                        // result used for need iterator ++, so avoid for end of list
 
     if (roll->getLoot())
         if (roll->getLoot()->items.empty())
