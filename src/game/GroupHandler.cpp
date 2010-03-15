@@ -369,11 +369,11 @@ void WorldSession::HandleLootMethodOpcode( WorldPacket & recv_data )
 
 void WorldSession::HandleLootRoll( WorldPacket &recv_data )
 {
-    uint64 Guid;
-    uint32 NumberOfPlayers;
+    ObjectGuid lootedTarget;
+    uint32 itemSlot;
     uint8  rollType;
-    recv_data >> Guid;                                      //guid of the item rolled
-    recv_data >> NumberOfPlayers;
+    recv_data >> lootedTarget;                                  //guid of the item rolled
+    recv_data >> itemSlot;
     recv_data >> rollType;
 
     //sLog.outDebug("WORLD RECIEVE CMSG_LOOT_ROLL, From:%u, Numberofplayers:%u, rollType:%u", (uint32)Guid, NumberOfPlayers, rollType);
@@ -383,7 +383,7 @@ void WorldSession::HandleLootRoll( WorldPacket &recv_data )
         return;
 
     // everything's fine, do it
-    group->CountRollVote(GetPlayer()->GetGUID(), Guid, NumberOfPlayers, rollType);
+    group->CountRollVote(GetPlayer()->GetObjectGuid(), lootedTarget, itemSlot, rollType);
 
     switch (rollType)
     {

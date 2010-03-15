@@ -104,15 +104,14 @@ class InstanceSave;
 class Roll : public LootValidatorRef
 {
     public:
-        Roll(ObjectGuid  _itemGuid, ObjectGuid _lootedTragetGuid, LootItem const& li)
-            : itemGUID(_itemGuid), lootedTargetGUID(_lootedTragetGuid), itemid(li.itemid), itemRandomPropId(li.randomPropertyId), itemRandomSuffix(li.randomSuffix),
-            totalPlayersRolling(0), totalNeed(0), totalGreed(0), totalPass(0), itemSlot(0) {}
+        Roll(ObjectGuid _lootedTragetGuid, LootItem const& li)
+            : lootedTargetGUID(_lootedTragetGuid), itemid(li.itemid), itemRandomPropId(li.randomPropertyId), itemRandomSuffix(li.randomSuffix),
+            itemCount(li.count), totalPlayersRolling(0), totalNeed(0), totalGreed(0), totalPass(0), itemSlot(0) {}
         ~Roll() { }
         void setLoot(Loot *pLoot) { link(pLoot, this); }
         Loot *getLoot() { return getTarget(); }
         void targetObjectBuildLink();
 
-        ObjectGuid itemGUID;
         ObjectGuid lootedTargetGUID;
         uint32 itemid;
         int32  itemRandomPropId;
@@ -316,24 +315,11 @@ class MANGOS_DLL_SPEC Group
         void SendLootStartRoll(uint32 CountDown, const Roll &r);
         void SendLootRoll(ObjectGuid const& targetGuid, uint8 rollNumber, uint8 rollType, const Roll &r);
         void SendLootRollWon(ObjectGuid const& targetGuid, uint8 rollNumber, uint8 rollType, const Roll &r);
-        void SendLootAllPassed(uint32 NumberOfPlayers, const Roll &r);
+        void SendLootAllPassed(const Roll &r);
         void GroupLoot(ObjectGuid const& playerGUID, Loot *loot, Creature *creature);
         void NeedBeforeGreed(ObjectGuid const& playerGUID, Loot *loot, Creature *creature);
         void MasterLoot(ObjectGuid const& playerGUID, Loot *loot, Creature *creature);
-        Rolls::iterator GetRoll(ObjectGuid const& Guid)
-        {
-            Rolls::iterator iter;
-            for (iter=RollId.begin(); iter != RollId.end(); ++iter)
-            {
-                if ((*iter)->itemGUID == Guid && (*iter)->isValid())
-                {
-                    return iter;
-                }
-            }
-            return RollId.end();
-        }
-        void CountTheRoll(Rolls::iterator roll, uint32 NumberOfPlayers);
-        void CountRollVote(ObjectGuid const& playerGUID, ObjectGuid const& itemGuid, uint32 numberOfPlayers, uint8 choise);
+        void CountRollVote(ObjectGuid const& playerGUID, ObjectGuid const& lootedTarget, uint32 itemSlot, uint8 choise);
         void EndRoll();
 
         void LinkMember(GroupReference *pRef) { m_memberMgr.insertFirst(pRef); }
@@ -403,6 +389,9 @@ class MANGOS_DLL_SPEC Group
             if (m_subGroupsCounts)
                 --m_subGroupsCounts[subgroup];
         }
+
+        void CountTheRoll(Rolls::iterator& roll);           // iterator update to next, in CountRollVote if true
+        bool CountRollVote(ObjectGuid const& playerGUID, Rolls::iterator& roll, uint8 choise);
 
         uint32              m_Id;                           // 0 for not created or BG groups
         MemberSlotList      m_memberSlots;

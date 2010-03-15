@@ -1739,7 +1739,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void CalcAbsorbResist(Unit *pVictim, SpellSchoolMask schoolMask, DamageEffectType damagetype, const uint32 damage, uint32 *absorb, uint32 *resist, bool canReflect = false);
 
         void  UpdateWalkMode(Unit* source, bool self = true);
-        void  UpdateSpeed(UnitMoveType mtype, bool forced);
+        void  UpdateSpeed(UnitMoveType mtype, bool forced, float ratio = 1.0f);
         float GetSpeed( UnitMoveType mtype ) const;
         float GetSpeedRate( UnitMoveType mtype ) const { return m_speed_rate[mtype]; }
         void SetSpeedRate(UnitMoveType mtype, float rate, bool forced = false);
