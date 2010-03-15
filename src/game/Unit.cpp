@@ -55,7 +55,7 @@ float baseMoveSpeed[MAX_MOVE_TYPE] =
 {
     2.5f,                                                   // MOVE_WALK
     7.0f,                                                   // MOVE_RUN
-    1.25f,                                                  // MOVE_RUN_BACK
+    2.5f,                                                   // MOVE_RUN_BACK
     4.722222f,                                              // MOVE_SWIM
     4.5f,                                                   // MOVE_SWIM_BACK
     3.141594f,                                              // MOVE_TURN_RATE
@@ -376,8 +376,9 @@ void Unit::SendMonsterMove(float NewPosX, float NewPosY, float NewPosZ, SplineTy
 
     data << uint32(flags);
 
-    if(flags & SPLINEFLAG_WALKMODE)
-        moveTime *= 1.05f;
+    // enable me if things goes wrong or looks ugly, it is however an old hack
+    // if(flags & SPLINEFLAG_WALKMODE)
+        // moveTime *= 1.05f;
 
     data << uint32(moveTime);                               // Time in between points
     data << uint32(1);                                      // 1 single waypoint

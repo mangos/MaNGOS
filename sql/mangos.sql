@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_9539_01_mangos_spell_bonus_data` bit(1) default NULL
+  `required_9589_01_mangos_creature_template` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -1098,7 +1098,8 @@ CREATE TABLE `creature_template` (
   `faction_A` smallint(5) unsigned NOT NULL default '0',
   `faction_H` smallint(5) unsigned NOT NULL default '0',
   `npcflag` int(10) unsigned NOT NULL default '0',
-  `speed` float NOT NULL default '1',
+  `speed_walk` float NOT NULL default '1' COMMENT 'Result of 2.5/2.5, most common value',
+  `speed_run` float NOT NULL default '1.14286' COMMENT 'Result of 8.0/7.0, most common value',
   `scale` float NOT NULL default '1',
   `rank` tinyint(3) unsigned NOT NULL default '0',
   `mindmg` float NOT NULL default '0',
