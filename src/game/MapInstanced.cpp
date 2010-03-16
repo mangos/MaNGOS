@@ -139,7 +139,7 @@ Map* MapInstanced::CreateInstance(const uint32 mapId, Player * player)
             InstanceGroupBind *groupBind = NULL;
             Group *group = player->GetGroup();
             // use the player's difficulty setting (it may not be the same as the group's)
-            if(group && (groupBind = group->GetBoundInstance(this)))
+            if(group && (groupBind = group->GetBoundInstance(this,player->GetDifficulty(IsRaid()))))
                 pSave = groupBind->save;
         }
 

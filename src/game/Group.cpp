@@ -1644,11 +1644,8 @@ InstanceGroupBind* Group::GetBoundInstance(Player* player)
         return NULL;
 }
 
-InstanceGroupBind* Group::GetBoundInstance(Map* aMap)
+InstanceGroupBind* Group::GetBoundInstance(Map* aMap, Difficulty difficulty)
 {
-    // Currently spawn numbering not different from map difficulty
-    Difficulty difficulty = GetDifficulty(aMap->IsRaid());
-
     // some instances only have one difficulty
     MapDifficulty const* mapDiff = GetMapDifficultyData(aMap->GetId(),difficulty);
     if(!mapDiff)
