@@ -208,7 +208,6 @@ void BattleGround::BroadcastWorker(Do& _do)
 BattleGround::BattleGround()
 {
     m_TypeID            = BattleGroundTypeId(0);
-    m_InstanceID        = 0;
     m_Status            = STATUS_NONE;
     m_ClientInstanceID  = 0;
     m_EndTime           = 0;
@@ -1326,10 +1325,9 @@ void BattleGround::RemoveFromBGFreeSlotQueue()
 {
     // set to be able to re-add if needed
     m_InBGFreeSlotQueue = false;
-    // uncomment this code when battlegrounds will work like instances
     for (BGFreeSlotQueueType::iterator itr = sBattleGroundMgr.BGFreeSlotQueue[m_TypeID].begin(); itr != sBattleGroundMgr.BGFreeSlotQueue[m_TypeID].end(); ++itr)
     {
-        if ((*itr)->GetInstanceID() == m_InstanceID)
+        if ((*itr)->GetInstanceID() == GetInstanceID())
         {
             sBattleGroundMgr.BGFreeSlotQueue[m_TypeID].erase(itr);
             return;
