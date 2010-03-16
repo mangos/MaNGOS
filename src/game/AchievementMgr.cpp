@@ -331,6 +331,9 @@ bool AchievementCriteriaRequirement::Meets(uint32 criteria_id, Player const* sou
             if (!source->IsInWorld())
                 return false;
             Map* map = source->GetMap();
+            // BattleGroundMap-class is instanceable, but no InstanceMap-class
+            if (map->IsBattleGroundOrArena())
+                return false;
             if (!map->Instanceable())
             {
                 sLog.outErrorDb("Achievement system call ACHIEVEMENT_CRITERIA_REQUIRE_INSTANCE_SCRIPT (%u) for achievement criteria %u for non-instance map %u",
