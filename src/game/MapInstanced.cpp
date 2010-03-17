@@ -104,11 +104,8 @@ void MapInstanced::UnloadAll(bool pForce)
     Map::UnloadAll(pForce);
 }
 
-/*
-- return the right instance for the object, based on its InstanceId
-- create the instance if it's not created already
-- the player is not actually added to the instance (only in InstanceMap::Add)
-*/
+/// returns a new or existing Instance
+/// in case of battlegrounds it will only return an existing map, those maps are created by bg-system
 Map* MapInstanced::CreateInstance(const uint32 mapId, Player * player)
 {
     if(GetId() != mapId || !player)
@@ -119,13 +116,11 @@ Map* MapInstanced::CreateInstance(const uint32 mapId, Player * player)
 
     if(IsBattleGroundOrArena())
     {
-        // instantiate or find existing bg map for player
-        // the instance id is set in battlegroundid
+        // find existing bg map for player
         NewInstanceId = player->GetBattleGroundId();
         ASSERT(NewInstanceId);
         map = _FindMap(NewInstanceId);
-        if(!map)
-            map = CreateBattleGroundMap(NewInstanceId, player->GetBattleGround());
+        ASSERT(map);
     }
     else
     {
@@ -139,7 +134,7 @@ Map* MapInstanced::CreateInstance(const uint32 mapId, Player * player)
             InstanceGroupBind *groupBind = NULL;
             Group *group = player->GetGroup();
             // use the player's difficulty setting (it may not be the same as the group's)
-            if(group && (groupBind = group->GetBoundInstance(this)))
+            if(group && (groupBind = group->GetBoundInstance(this,player->GetDifficulty(IsRaid()))))
                 pSave = groupBind->save;
         }
 
