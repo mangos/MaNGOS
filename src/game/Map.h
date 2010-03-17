@@ -576,6 +576,7 @@ class MANGOS_DLL_SPEC BattleGroundMap : public Map
         BattleGroundMap(uint32 id, time_t, uint32 InstanceId, Map* _parent, uint8 spawnMode);
         ~BattleGroundMap();
 
+        void Update(const uint32&);
         bool Add(Player *);
         void Remove(Player *, bool);
         bool CanEnter(Player* player);

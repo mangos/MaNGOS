@@ -138,6 +138,13 @@ Map* MapManager::CreateMap(uint32 id, const WorldObject* obj)
     return m;
 }
 
+Map* MapManager::CreateBgMap(uint32 mapid, BattleGround* bg)
+{
+    Map *m = _createBaseMap(mapid);
+    ((MapInstanced*)m)->CreateBattleGroundMap(sMapMgr.GenerateInstanceId(), bg);
+    return m;
+}
+
 Map* MapManager::FindMap(uint32 mapid, uint32 instanceId) const
 {
     Map *map = _findMap(mapid);
