@@ -33,6 +33,7 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include "Mail.h"
 
 #include "Policies/SingletonImp.h"
 
@@ -134,9 +135,6 @@ void AuctionHouseMgr::SendAuctionWonMail( AuctionEntry *auction )
         msgAuctionWonBody << std::dec << ":" << auction->bid << ":" << auction->buyout;
         sLog.outDebug( "AuctionWon body string : %s", msgAuctionWonBody.str().c_str() );
 
-        //prepare mail data... :
-        uint32 itemTextId = sObjectMgr.CreateItemText( msgAuctionWonBody.str() );
-
         // set owner to bidder (to prevent delete item with sender char deleting)
         // owner in `data` will set at mail receive and item extracting
         CharacterDatabase.PExecute("UPDATE item_instance SET owner_guid = '%u' WHERE guid='%u'",auction->bidder,pItem->GetGUIDLow());
@@ -152,7 +150,7 @@ void AuctionHouseMgr::SendAuctionWonMail( AuctionEntry *auction )
             RemoveAItem(pItem->GetGUIDLow());               // we have to remove the item, before we delete it !!
 
         // will delete item or place to receiver mail list
-        MailDraft(msgAuctionWonSubject.str(), itemTextId)
+        MailDraft(msgAuctionWonSubject.str(), msgAuctionWonBody.str())
             .AddItem(pItem)
             .SendMailTo(MailReceiver(bidder,auction->bidder), auction, MAIL_CHECK_MASK_AUCTION);
     }
@@ -189,9 +187,7 @@ void AuctionHouseMgr::SendAuctionSalePendingMail( AuctionEntry * auction )
 
         sLog.outDebug("AuctionSalePending body string : %s", msgAuctionSalePendingBody.str().c_str());
 
-        uint32 itemTextId = sObjectMgr.CreateItemText( msgAuctionSalePendingBody.str() );
-
-        MailDraft(msgAuctionSalePendingSubject.str(), itemTextId)
+        MailDraft(msgAuctionSalePendingSubject.str(), msgAuctionSalePendingBody.str())
             .SendMailTo(MailReceiver(owner,auction->owner), auction, MAIL_CHECK_MASK_AUCTION);
     }
 }
@@ -222,8 +218,6 @@ void AuctionHouseMgr::SendAuctionSuccessfulMail( AuctionEntry * auction )
 
         sLog.outDebug("AuctionSuccessful body string : %s", auctionSuccessfulBody.str().c_str());
 
-        uint32 itemTextId = sObjectMgr.CreateItemText( auctionSuccessfulBody.str() );
-
         uint32 profit = auction->bid + auction->deposit - auctionCut;
 
         if (owner)
@@ -235,7 +229,7 @@ void AuctionHouseMgr::SendAuctionSuccessfulMail( AuctionEntry * auction )
             owner->GetSession()->SendAuctionOwnerNotification( auction );
         }
 
-        MailDraft(msgAuctionSuccessfulSubject.str(), itemTextId)
+        MailDraft(msgAuctionSuccessfulSubject.str(), auctionSuccessfulBody.str())
             .AddMoney(profit)
             .SendMailTo(MailReceiver(owner,auction->owner), auction, MAIL_CHECK_MASK_AUCTION, HOUR);
     }
