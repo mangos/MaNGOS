@@ -29,6 +29,7 @@
 #include "SpellMgr.h"
 #include "ArenaTeam.h"
 #include "ProgressBar.h"
+#include "Mail.h"
 #include "GridNotifiersImpl.h"
 #include "CellImpl.h"
 #include "Language.h"
@@ -1829,9 +1830,7 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
             }
         }
 
-        uint32 itemTextId = sObjectMgr.CreateItemText( text );
-
-        MailDraft draft(subject, itemTextId);
+        MailDraft draft(subject, text);
 
         if(item)
         {

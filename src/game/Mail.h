@@ -109,15 +109,15 @@ enum MailAuctionAnswers
 class MailSender
 {
     public:                                                 // Constructors
-               /**
-                * Creates a new MailSender object.
-                *
-                * @param messageType the type of the mail.
-                * @param sender_guidlow_or_entry The lower part of the GUID of the player sending
-                *                                                                this mail, or the Entry of the non-player object.
-                * @param stationery The stationary associated with this MailSender.
-                *
-                */
+       /**
+        * Creates a new MailSender object.
+        *
+        * @param messageType the type of the mail.
+        * @param sender_guidlow_or_entry The lower part of the GUID of the player sending
+        *                                                                this mail, or the Entry of the non-player object.
+        * @param stationery The stationary associated with this MailSender.
+        *
+        */
         MailSender(MailMessageType messageType, uint32 sender_guidlow_or_entry, MailStationery stationery = MAIL_STATIONERY_NORMAL)
             : m_messageType(messageType), m_senderId(sender_guidlow_or_entry), m_stationery(stationery)
         {
@@ -170,30 +170,37 @@ class MailReceiver
  */
 class MailDraft
 {
-    /**
-     * Holds a Map of GUIDs of items and pointers to the items.
-     */
-       typedef std::map<uint32, Item*> MailItemMap;
+        /**
+         * Holds a Map of GUIDs of items and pointers to the items.
+         */
+        typedef std::map<uint32, Item*> MailItemMap;
 
     public:                                                 // Constructors
-               /**
-                * Creates a new MailDraft object.
-                *
-                * @param mailTemplateId The ID of the Template to be used.
-                * @param a boolean specifying whether the mail needs items or not.
-                *
-                */
+       /**
+        * Creates a new MailDraft object using mail template id.
+        *
+        * @param mailTemplateId The ID of the Template to be used.
+        * @param a boolean specifying whether the mail needs items or not.
+        *
+        */
         explicit MailDraft(uint16 mailTemplateId, bool need_items = true)
             : m_mailTemplateId(mailTemplateId), m_mailTemplateItemsNeed(need_items), m_bodyId(0), m_money(0), m_COD(0)
         {}
         /**
-         * Creates a new MailDraft object.
+         * Creates a new MailDraft object using subject text and content text id.
          *
          * @param subject The subject of the mail.
          * @param itemTextId The id of the body of the mail.
          */
         MailDraft(std::string subject, uint32 itemTextId = 0)
             : m_mailTemplateId(0), m_mailTemplateItemsNeed(false), m_subject(subject), m_bodyId(itemTextId), m_money(0), m_COD(0) {}
+        /**
+         * Creates a new MailDraft object using subject and contect texts.
+         *
+         * @param subject The subject of the mail.
+         * @param itemText The text of the body of the mail.
+         */
+        MailDraft(std::string subject, std::string text);
     public:                                                 // Accessors
         /// Returns the template ID used for this MailDraft.
         uint16 GetMailTemplateId() const { return m_mailTemplateId; }
