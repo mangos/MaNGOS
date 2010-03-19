@@ -26,6 +26,7 @@
 #include "Player.h"
 #include "UpdateMask.h"
 #include "AuctionHouseMgr.h"
+#include "Mail.h"
 #include "Util.h"
 #include "AuctionHouseBot.h"
 

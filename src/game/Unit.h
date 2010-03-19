@@ -1342,6 +1342,8 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void RemoveSpellbyDamageTaken(AuraType auraType, uint32 damage);
 
         bool isTargetableForAttack(bool inversAlive = false) const;
+        bool isPassiveToHostile() { return HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE); }
+
         virtual bool IsInWater() const;
         virtual bool IsUnderWater() const;
         bool isInAccessablePlaceFor(Creature const* c) const;
