@@ -226,13 +226,11 @@ void WorldSession::HandleGuildInfoOpcode(WorldPacket& /*recvPacket*/)
         return;
     }
 
-    WorldPacket data(SMSG_GUILD_INFO, (5*4 + guild->GetName().size() + 1));
+    WorldPacket data(SMSG_GUILD_INFO, (guild->GetName().size() + 4 + 4 + 4));
     data << guild->GetName();
-    data << guild->GetCreatedDay();
-    data << guild->GetCreatedMonth();
-    data << guild->GetCreatedYear();
-    data << guild->GetMemberSize();
-    data << guild->GetMemberSize();
+    data << uint32(secsToTimeBitFields(guild->GetCreatedDate())); // 3.x (prev. day + month + year)
+    data << uint32(guild->GetMemberSize());                 // amount of chars
+    data << uint32(guild->GetMemberSize());                 // amount of accounts (TODO: implement)
 
     SendPacket(&data);
 }
