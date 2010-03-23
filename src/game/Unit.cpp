@@ -50,6 +50,7 @@
 #include "MovementGenerator.h"
 
 #include <math.h>
+#include <varargs.h>
 
 float baseMoveSpeed[MAX_MOVE_TYPE] =
 {
@@ -343,8 +344,12 @@ bool Unit::haveOffhandWeapon() const
         return false;
 }
 
-void Unit::SendMonsterMove(float NewPosX, float NewPosY, float NewPosZ, SplineType type, SplineFlags flags, uint32 Time, Player* player)
+void Unit::SendMonsterMove(float NewPosX, float NewPosY, float NewPosZ, SplineType type, SplineFlags flags, uint32 Time, Player* player, ...)
 {
+
+    va_list vargs;
+    va_start(vargs,player);
+
     float moveTime = (float)Time;
 
     WorldPacket data( SMSG_MONSTER_MOVE, (41 + GetPackGUID().size()) );
@@ -359,18 +364,21 @@ void Unit::SendMonsterMove(float NewPosX, float NewPosY, float NewPosZ, SplineTy
         case SPLINETYPE_NORMAL:                             // normal packet
             break;
         case SPLINETYPE_STOP:                               // stop packet (raw pos?)
+            va_end(vargs);
             SendMessageToSet( &data, true );
             return;
         case SPLINETYPE_FACINGSPOT:                         // facing spot, not used currently
-            data << float(0);
-            data << float(0);
-            data << float(0);
+        {
+            data << float(va_arg(vargs,float));
+            data << float(va_arg(vargs,float));
+            data << float(va_arg(vargs,float));
             break;
+        }
         case SPLINETYPE_FACINGTARGET:
-            data << uint64(m_InteractionObject);            // set in SetFacingToObject()
+            data << uint64(va_arg(vargs,uint64));
             break;
         case SPLINETYPE_FACINGANGLE:                        // not used currently
-            data << float(0);                               // facing angle
+            data << float(va_arg(vargs,float));             // facing angle
             break;
     }
 
@@ -383,6 +391,8 @@ void Unit::SendMonsterMove(float NewPosX, float NewPosY, float NewPosZ, SplineTy
     data << uint32(moveTime);                               // Time in between points
     data << uint32(1);                                      // 1 single waypoint
     data << NewPosX << NewPosY << NewPosZ;                  // the single waypoint Point B
+
+    va_end(vargs);
 
     if(player)
         player->GetSession()->SendPacket(&data);
@@ -3515,12 +3525,10 @@ void Unit::SetFacingToObject(WorldObject* pObject)
     if (!IsStopped())
         return;
 
-    m_InteractionObject = pObject->GetGUID();
-
     // TODO: figure out under what conditions creature will move towards object instead of facing it where it currently is.
 
     SetOrientation(GetAngle(pObject));
-    SendMonsterMove(GetPositionX(), GetPositionY(), GetPositionZ(), SPLINETYPE_FACINGTARGET, ((Creature*)this)->GetSplineFlags(), 0);
+    SendMonsterMove(GetPositionX(), GetPositionY(), GetPositionZ(), SPLINETYPE_FACINGTARGET, ((Creature*)this)->GetSplineFlags(), 0, NULL, pObject->GetGUID());
 }
 
 bool Unit::isInAccessablePlaceFor(Creature const* c) const
