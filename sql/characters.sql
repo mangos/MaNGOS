@@ -21,7 +21,7 @@
 
 DROP TABLE IF EXISTS `character_db_version`;
 CREATE TABLE `character_db_version` (
-  `required_9375_01_characters_character_glyphs` bit(1) default NULL
+  `required_9611_01_characters` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Last applied sql update to DB';
 
 --
@@ -466,7 +466,8 @@ CREATE TABLE `character_equipmentsets` (
   `item17` int(11) NOT NULL default '0',
   `item18` int(11) NOT NULL default '0',
   PRIMARY KEY  (`setguid`),
-  UNIQUE KEY `idx_set` (`guid`,`setguid`,`setindex`)
+  UNIQUE KEY `idx_set` (`guid`,`setguid`,`setindex`),
+  INDEX `Idx_setindex` (`setindex`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -898,7 +899,9 @@ CREATE TABLE `corpse` (
   `instance` int(11) unsigned NOT NULL default '0',
   PRIMARY KEY  (`guid`),
   KEY `idx_type` (`corpse_type`),
-  KEY `instance` (`instance`)
+  KEY `instance` (`instance`),
+  INDEX `Idx_player`(`player`),
+  INDEX `Idx_time`(`time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Death System';
 
 --
@@ -978,7 +981,8 @@ CREATE TABLE `group_member` (
   `memberGuid` int(11) unsigned NOT NULL,
   `assistant` tinyint(1) unsigned NOT NULL,
   `subgroup` smallint(6) unsigned NOT NULL,
-  PRIMARY KEY  (`groupId`,`memberGuid`)
+  PRIMARY KEY  (`groupId`,`memberGuid`),
+  INDEX `Idx_memberGuid`(`memberGuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Groups';
 
 --
@@ -1036,7 +1040,9 @@ CREATE TABLE `guild_bank_eventlog` (
   `DestTabId` tinyint(1) unsigned NOT NULL default '0' COMMENT 'Destination Tab Id',
   `TimeStamp` bigint(20) unsigned NOT NULL default '0' COMMENT 'Event UNIX time',
   PRIMARY KEY  (`guildid`,`LogGuid`,`TabId`),
-  KEY `guildid_key` (`guildid`)
+  KEY `guildid_key` (`guildid`),
+  INDEX `Idx_PlayerGuid`(`PlayerGuid`),
+  INDEX `Idx_LogGuid`(`LogGuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -1060,7 +1066,8 @@ CREATE TABLE `guild_bank_item` (
   `item_guid` int(11) unsigned NOT NULL default '0',
   `item_entry` int(11) unsigned NOT NULL default '0',
   PRIMARY KEY  (`guildid`,`tabid`,`slotid`),
-  KEY `guildid_key` (`guildid`)
+  KEY `guildid_key` (`guildid`),
+  INDEX `Idx_item_guid`(`item_guid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -1133,7 +1140,10 @@ CREATE TABLE `guild_eventlog` (
   `PlayerGuid2` int(11) NOT NULL COMMENT 'Player 2',
   `NewRank` tinyint(2) NOT NULL COMMENT 'New rank(in case promotion/demotion)',
   `TimeStamp` bigint(20) NOT NULL COMMENT 'Event UNIX time',
-  PRIMARY KEY (`guildid`, `LogGuid`)
+  PRIMARY KEY (`guildid`, `LogGuid`),
+  INDEX `Idx_PlayerGuid1`(`PlayerGuid1`),
+  INDEX `Idx_PlayerGuid2`(`PlayerGuid2`),
+  INDEX `Idx_LogGuid`(`LogGuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT 'Guild Eventlog';
 
 --
@@ -1195,7 +1205,8 @@ CREATE TABLE `guild_rank` (
   `rname` varchar(255) NOT NULL default '',
   `rights` int(3) unsigned NOT NULL default '0',
   `BankMoneyPerDay` int(11) unsigned NOT NULL default '0',
-  PRIMARY KEY  (`guildid`,`rid`)
+  PRIMARY KEY  (`guildid`,`rid`),
+  INDEX `Idx_rid`(`rid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Guild System';
 
 --
@@ -1453,7 +1464,9 @@ CREATE TABLE `petition_sign` (
   `playerguid` int(11) unsigned NOT NULL default '0',
   `player_account` int(11) unsigned NOT NULL default '0',
   `type` int(10) unsigned NOT NULL default '0',
-  PRIMARY KEY  (`petitionguid`,`playerguid`)
+  PRIMARY KEY  (`petitionguid`,`playerguid`),
+  INDEX `Idx_playerguid`(`playerguid`),
+  INDEX `Idx_ownerguid`(`ownerguid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Guild System';
 
 --
