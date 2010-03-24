@@ -1335,11 +1335,13 @@ enum Opcodes
     CMSG_UNKNOWN_1298                               = 0x512, // something with networking
     UMSG_UNKNOWN_1299                               = 0x513, // not found
     SMSG_UNKNOWN_1300                               = 0x514, // SMSG
-    SMSG_UNKNOWN_1301                               = 0x515, // event 0x204 (opens dungeon finder, probably for outdoor bosses)
+    SMSG_UNKNOWN_1301                               = 0x515, // event EVENT_LFG_OPEN_FROM_GOSSIP (opens dungeon finder, probably for outdoor bosses)
     SMSG_UNKNOWN_1302                               = 0x516, // something with player movement (move event 58?)
     CMSG_UNKNOWN_1303                               = 0x517, // something with player movement (move event 58?)
     SMSG_UNKNOWN_1304                               = 0x518, // something with player movement (move event 58?), speed packet
-    NUM_MSG_TYPES                                   = 0x519
+    UMSG_UNKNOWN_1305                               = 0x519, // not found
+    UMSG_UNKNOWN_1306                               = 0x51A, // not found
+    NUM_MSG_TYPES                                   = 0x51B
 };
 
 /// Player state
