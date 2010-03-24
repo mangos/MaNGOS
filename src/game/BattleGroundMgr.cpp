@@ -1138,55 +1138,21 @@ BattleGroundMgr::~BattleGroundMgr()
 
 void BattleGroundMgr::DeleteAllBattleGrounds()
 {
+    // will also delete template bgs:
     for(uint32 i = BATTLEGROUND_TYPE_NONE; i < MAX_BATTLEGROUND_TYPE_ID; i++)
     {
         for(BattleGroundSet::iterator itr = m_BattleGrounds[i].begin(); itr != m_BattleGrounds[i].end();)
         {
             BattleGround * bg = itr->second;
-            m_BattleGrounds[i].erase(itr++);
-            if (!m_ClientBattleGroundIds[i][bg->GetBracketId()].empty())
-                m_ClientBattleGroundIds[i][bg->GetBracketId()].erase(bg->GetClientInstanceID());
+            itr++;
             delete bg;
         }
-    }
-
-    // destroy template battlegrounds that listed only in queues (other already terminated)
-    for(uint32 bgTypeId = 0; bgTypeId < MAX_BATTLEGROUND_TYPE_ID; ++bgTypeId)
-    {
-        // ~BattleGround call unregistring BG from queue
-        while(!BGFreeSlotQueue[bgTypeId].empty())
-            delete BGFreeSlotQueue[bgTypeId].front();
     }
 }
 
 // used to update running battlegrounds, and delete finished ones
 void BattleGroundMgr::Update(uint32 diff)
 {
-    BattleGroundSet::iterator itr, next;
-    for(uint32 i = BATTLEGROUND_TYPE_NONE; i < MAX_BATTLEGROUND_TYPE_ID; i++)
-    {
-        itr = m_BattleGrounds[i].begin();
-        // skip updating battleground template
-        if (itr != m_BattleGrounds[i].end())
-            ++itr;
-        for(; itr != m_BattleGrounds[i].end(); itr = next)
-        {
-            next = itr;
-            ++next;
-            itr->second->Update(diff);
-            // use the SetDeleteThis variable
-            // direct deletion caused crashes
-            if (itr->second->m_SetDeleteThis)
-            {
-                BattleGround * bg = itr->second;
-                m_BattleGrounds[i].erase(itr);
-                if (!m_ClientBattleGroundIds[i][bg->GetBracketId()].empty())
-                    m_ClientBattleGroundIds[i][bg->GetBracketId()].erase(bg->GetClientInstanceID());
-                delete bg;
-            }
-        }
-    }
-
     // update scheduled queues
     if (!m_QueueUpdateScheduler.empty())
     {
@@ -1576,8 +1542,9 @@ BattleGround * BattleGroundMgr::CreateNewBattleGround(BattleGroundTypeId bgTypeI
             return 0;
     }
 
-    // generate a new instance id
-    bg->SetInstanceID(sMapMgr.GenerateInstanceId()); // set instance id
+    // will also set m_bgMap, instanceid
+    sMapMgr.CreateBgMap(bg->GetMapId(), bg);
+
     bg->SetClientInstanceID(CreateClientVisibleInstanceId(bgTypeId, bracketEntry->GetBracketId()));
 
     // reset the new bg (set status to status_wait_queue from status_none)
@@ -1617,7 +1584,6 @@ uint32 BattleGroundMgr::CreateBattleGround(BattleGroundTypeId bgTypeId, bool IsA
 
     bg->SetMapId(MapID);
     bg->SetTypeID(bgTypeId);
-    bg->SetInstanceID(0);
     bg->SetArenaorBGType(IsArena);
     bg->SetMinPlayersPerTeam(MinPlayersPerTeam);
     bg->SetMaxPlayersPerTeam(MaxPlayersPerTeam);

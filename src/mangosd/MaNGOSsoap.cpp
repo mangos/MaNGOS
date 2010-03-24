@@ -29,6 +29,8 @@ void MaNGOSsoapRunnable::run()
     struct soap soap;
     int m, s;
     soap_init(&soap);
+    soap_set_imode(&soap, SOAP_C_UTFSTRING);
+    soap_set_omode(&soap, SOAP_C_UTFSTRING);
     m = soap_bind(&soap, m_host.c_str(), m_port, 100);
 
     // check every 3 seconds if world ended

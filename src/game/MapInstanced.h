@@ -58,11 +58,11 @@ class MANGOS_DLL_DECL MapInstanced : public Map
 
         InstancedMaps &GetInstancedMaps() { return m_InstancedMaps; }
         virtual void InitVisibilityDistance();
+        BattleGroundMap* CreateBattleGroundMap(uint32 InstanceId, BattleGround* bg);
 
     private:
 
         InstanceMap* CreateInstance(uint32 InstanceId, InstanceSave *save, Difficulty difficulty);
-        BattleGroundMap* CreateBattleGroundMap(uint32 InstanceId, BattleGround* bg);
 
         InstancedMaps m_InstancedMaps;
 

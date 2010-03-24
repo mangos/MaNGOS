@@ -211,6 +211,11 @@ class BattleGroundMgr
         void AddBattleGround(uint32 InstanceID, BattleGroundTypeId bgTypeId, BattleGround* BG) { m_BattleGrounds[bgTypeId][InstanceID] = BG; };
         void RemoveBattleGround(uint32 instanceID, BattleGroundTypeId bgTypeId) { m_BattleGrounds[bgTypeId].erase(instanceID); }
         uint32 CreateClientVisibleInstanceId(BattleGroundTypeId bgTypeId, BattleGroundBracketId bracket_id);
+        void DeleteClientVisibleInstanceId(BattleGroundTypeId bgTypeId, BattleGroundBracketId bracket_id, uint32 clientInstanceID)
+        {
+            if (!m_ClientBattleGroundIds[bgTypeId][bracket_id].empty())
+                m_ClientBattleGroundIds[bgTypeId][bracket_id].erase(clientInstanceID);
+        }
 
         void CreateInitialBattleGrounds();
         void DeleteAllBattleGrounds();

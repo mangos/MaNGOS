@@ -711,7 +711,7 @@ bool Group::CountRollVote(ObjectGuid const& playerGUID, Rolls::iterator& rollI, 
     Roll::PlayerVote::iterator itr = roll->playerVote.find(playerGUID.GetRawValue());
     // this condition means that player joins to the party after roll begins
     if (itr == roll->playerVote.end())
-        return false;
+        return true;                                        // result used for need iterator ++, so avoid for end of list
 
     if (roll->getLoot())
         if (roll->getLoot()->items.empty())
@@ -1246,12 +1246,15 @@ void Group::_setLeader(const uint64 &guid)
 
 void Group::_removeRolls(const uint64 &guid)
 {
-    for (Rolls::iterator it = RollId.begin(); it < RollId.end(); )
+    for (Rolls::iterator it = RollId.begin(); it != RollId.end(); )
     {
         Roll* roll = *it;
         Roll::PlayerVote::iterator itr2 = roll->playerVote.find(guid);
         if(itr2 == roll->playerVote.end())
+        {
+            ++it;
             continue;
+        }
 
         if (itr2->second == GREED || itr2->second == DISENCHANT)
             --roll->totalGreed;
@@ -1641,11 +1644,8 @@ InstanceGroupBind* Group::GetBoundInstance(Player* player)
         return NULL;
 }
 
-InstanceGroupBind* Group::GetBoundInstance(Map* aMap)
+InstanceGroupBind* Group::GetBoundInstance(Map* aMap, Difficulty difficulty)
 {
-    // Currently spawn numbering not different from map difficulty
-    Difficulty difficulty = GetDifficulty(aMap->IsRaid());
-
     // some instances only have one difficulty
     MapDifficulty const* mapDiff = GetMapDifficultyData(aMap->GetId(),difficulty);
     if(!mapDiff)

@@ -26,6 +26,7 @@
 #include "Player.h"
 #include "UpdateMask.h"
 #include "AuctionHouseMgr.h"
+#include "Mail.h"
 #include "Util.h"
 
 //please DO NOT use iterator++, because it is slower than ++iterator!!!
