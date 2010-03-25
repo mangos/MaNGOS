@@ -264,7 +264,7 @@ void AuctionHouseMgr::SendAuctionExpiredMail( AuctionEntry * auction )
             RemoveAItem(pItem->GetGUIDLow());               // we have to remove the item, before we delete it !!
 
         // will delete item or place to receiver mail list
-        MailDraft(subject.str(), "", 0)
+        MailDraft(subject.str(), "")                        // TODO: fix body
             .AddItem(pItem)
             .SendMailTo(MailReceiver(owner,auction->owner), auction);
     }

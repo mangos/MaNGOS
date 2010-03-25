@@ -184,23 +184,16 @@ class MailDraft
         *
         */
         explicit MailDraft(uint16 mailTemplateId, bool need_items = true)
-            : m_mailTemplateId(mailTemplateId), m_mailTemplateItemsNeed(need_items), m_bodyId(0), m_money(0), m_COD(0)
+            : m_mailTemplateId(mailTemplateId), m_mailTemplateItemsNeed(need_items), m_money(0), m_COD(0)
         {}
-        /**
-         * Creates a new MailDraft object using subject text and content text id.
-         *
-         * @param subject The subject of the mail.
-         * @param itemTextId The id of the body of the mail.
-         */
-        MailDraft(std::string subject, std::string body, uint32 itemTextId)
-            : m_mailTemplateId(0), m_mailTemplateItemsNeed(false), m_subject(subject), m_body(body), m_bodyId(itemTextId), m_money(0), m_COD(0) {}
         /**
          * Creates a new MailDraft object using subject and content texts.
          *
          * @param subject The subject of the mail.
          * @param itemText The text of the body of the mail.
          */
-        MailDraft(std::string subject, std::string text);
+        MailDraft(std::string subject, std::string body)
+            : m_mailTemplateId(0), m_mailTemplateItemsNeed(false), m_subject(subject), m_body(body), m_money(0), m_COD(0) {}
     public:                                                 // Accessors
         /// Returns the template ID used for this MailDraft.
         uint16 GetMailTemplateId() const { return m_mailTemplateId; }
@@ -208,8 +201,6 @@ class MailDraft
         std::string const& GetSubject() const { return m_subject; }
         /// Returns the subject of this MailDraft.
         std::string const& GetBody() const { return m_body; }
-        /// Returns the ID of the text of this MailDraft.
-        uint32 GetBodyId() const { return m_bodyId; }
         /// Returns the amount of money in this MailDraft.
         uint32 GetMoney() const { return m_money; }
         /// Returns the Cost of delivery of this MailDraft.
@@ -243,8 +234,6 @@ class MailDraft
         std::string m_subject;
         /// The body of the MailDraft.
         std::string m_body;
-        /// The ID of the body of the MailDraft.
-        uint32      m_bodyId;
         /// A map of items in this MailDraft.
         MailItemMap m_items;                                ///< Keep the items in a map to avoid duplicate guids (which can happen), store only low part of guid
 
@@ -282,8 +271,6 @@ struct Mail
     std::string subject;
     /// the body of the mail
     std::string body;
-    /// The ID of the itemtext.
-    uint32 itemTextId;
     /// A vector containing Information about the items in this mail.
     std::vector<MailItemInfo> items;
     /// A vector containing Information about the items that where already take from this mail.
