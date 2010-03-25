@@ -256,7 +256,7 @@ void AuctionHouseMgr::SendAuctionExpiredMail( AuctionEntry * auction )
     if(owner || owner_accId)
     {
         std::ostringstream subject;
-        subject << auction->item_template << ":0:" << AUCTION_EXPIRED;
+        subject << auction->item_template << ":0:" << AUCTION_EXPIRED << ":0:0";
 
         if ( owner )
             owner->GetSession()->SendAuctionOwnerNotification( auction );
@@ -264,7 +264,7 @@ void AuctionHouseMgr::SendAuctionExpiredMail( AuctionEntry * auction )
             RemoveAItem(pItem->GetGUIDLow());               // we have to remove the item, before we delete it !!
 
         // will delete item or place to receiver mail list
-        MailDraft(subject.str())
+        MailDraft(subject.str(), "", 0)
             .AddItem(pItem)
             .SendMailTo(MailReceiver(owner,auction->owner), auction);
     }

@@ -697,7 +697,7 @@ enum Opcodes
     CMSG_MEETINGSTONE_CHEAT                         = 0x294, // not found 3.3
     SMSG_MEETINGSTONE_SETQUEUE                      = 0x295, // string, showed in console
     CMSG_MEETINGSTONE_INFO                          = 0x296, // EVENT_LFG_UPDATE
-    SMSG_MEETINGSTONE_COMPLETE                      = 0x297, // EVENT_MAIL_SHOW
+    SMSG_MEETINGSTONE_COMPLETE                      = 0x297, // mail open from gossip?, EVENT_MAIL_SHOW
     SMSG_MEETINGSTONE_IN_PROGRESS                   = 0x298, // uint32, some UPDATE_COOLDOWN events
     SMSG_MEETINGSTONE_MEMBER_ADDED                  = 0x299, // uint32, errors: ERR_NOT_IN_GROUP (2,51) and ERR_NOT_IN_RAID (3,39,40)
     CMSG_GMTICKETSYSTEM_TOGGLE                      = 0x29A,
@@ -1324,14 +1324,14 @@ enum Opcodes
     UMSG_UNKNOWN_1287                               = 0x507, // not found
     CMSG_UNKNOWN_1288                               = 0x508, // lua: SetAllowLowLevelRaid
     CMSG_UNKNOWN_1289                               = 0x509, // lua: SetAllowLowLevelRaid
-    SMSG_UNKNOWN_1290                               = 0x50A, // camera shake?
+    SMSG_UNKNOWN_1290                               = 0x50A, // uint32 SpellEffectCameraShakes.dbc uint32, camera shake?
     SMSG_UNKNOWN_1291                               = 0x50B, // some item update packet?
     UMSG_UNKNOWN_1292                               = 0x50C, // not found
-    UMSG_UNKNOWN_1293                               = 0x50D, // not found - disconnect
+    SMSG_UNKNOWN_1293                               = 0x50D, //
     CMSG_UNKNOWN_1294                               = 0x50E, // something with networking
-    UMSG_UNKNOWN_1295                               = 0x50F, // not found - disconnect
+    SMSG_UNKNOWN_1295                               = 0x50F, //
     CMSG_UNKNOWN_1296                               = 0x510, // something with networking
-    UMSG_UNKNOWN_1297                               = 0x511, // not found - crash
+    SMSG_UNKNOWN_1297                               = 0x511, //
     CMSG_UNKNOWN_1298                               = 0x512, // something with networking
     UMSG_UNKNOWN_1299                               = 0x513, // not found
     SMSG_UNKNOWN_1300                               = 0x514, // SMSG

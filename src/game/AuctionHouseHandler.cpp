@@ -120,12 +120,12 @@ void WorldSession::SendAuctionOutbiddedMail(AuctionEntry *auction, uint32 newPri
     if(oldBidder || oldBidder_accId)
     {
         std::ostringstream msgAuctionOutbiddedSubject;
-        msgAuctionOutbiddedSubject << auction->item_template << ":0:" << AUCTION_OUTBIDDED;
+        msgAuctionOutbiddedSubject << auction->item_template << ":0:" << AUCTION_OUTBIDDED << ":0:0";
 
         if (oldBidder)
             oldBidder->GetSession()->SendAuctionBidderNotification( auction->GetHouseId(), auction->Id, _player->GetGUID(), newPrice, auction->GetAuctionOutBid(), auction->item_template);
 
-        MailDraft(msgAuctionOutbiddedSubject.str())
+        MailDraft(msgAuctionOutbiddedSubject.str(), "", 0)
             .AddMoney(auction->bid)
             .SendMailTo(MailReceiver(oldBidder, auction->bidder), auction);
     }
@@ -145,9 +145,9 @@ void WorldSession::SendAuctionCancelledToBidderMail( AuctionEntry* auction )
     if(bidder || bidder_accId)
     {
         std::ostringstream msgAuctionCancelledSubject;
-        msgAuctionCancelledSubject << auction->item_template << ":0:" << AUCTION_CANCELLED_TO_BIDDER;
+        msgAuctionCancelledSubject << auction->item_template << ":0:" << AUCTION_CANCELLED_TO_BIDDER << ":0:0";
 
-        MailDraft(msgAuctionCancelledSubject.str())
+        MailDraft(msgAuctionCancelledSubject.str(), "", 0)
             .AddMoney(auction->bid)
             .SendMailTo(MailReceiver(bidder, auction->bidder), auction);
     }
@@ -161,7 +161,7 @@ void WorldSession::HandleAuctionSellItem( WorldPacket & recv_data )
     recv_data >> auctioneer;
     recv_data.read_skip<uint32>();                          // const 1?
     recv_data >> item;
-    recv_data.read_skip<uint32>();                          // unk 3.2.2, const 1?
+    recv_data.read_skip<uint32>();                          // stack size
     recv_data >> bid;
     recv_data >> buyout;
     recv_data >> etime;
@@ -204,14 +204,14 @@ void WorldSession::HandleAuctionSellItem( WorldPacket & recv_data )
         GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 
     Item *it = pl->GetItemByGuid( item );
-    //do not allow to sell already auctioned items
+    // do not allow to sell already auctioned items
     if(sAuctionMgr.GetAItem(GUID_LOPART(item)))
     {
         sLog.outError("AuctionError, player %s is sending item id: %u, but item is already in another auction", pl->GetName(), GUID_LOPART(item));
         SendAuctionCommandResult(0, AUCTION_SELL_ITEM, AUCTION_INTERNAL_ERROR);
         return;
     }
-    // prevent sending bag with items (cheat: can be placed in bag after adding equiped empty bag to auction)
+    // prevent sending bag with items (cheat: can be placed in bag after adding equipped empty bag to auction)
     if(!it)
     {
         SendAuctionCommandResult(0, AUCTION_SELL_ITEM, AUCTION_ITEM_NOT_FOUND);
@@ -450,10 +450,10 @@ void WorldSession::HandleAuctionRemoveItem( WorldPacket & recv_data )
             }
             // Return the item by mail
             std::ostringstream msgAuctionCanceledOwner;
-            msgAuctionCanceledOwner << auction->item_template << ":0:" << AUCTION_CANCELED;
+            msgAuctionCanceledOwner << auction->item_template << ":0:" << AUCTION_CANCELED << ":0:0";
 
             // item will deleted or added to received mail list
-            MailDraft(msgAuctionCanceledOwner.str())
+            MailDraft(msgAuctionCanceledOwner.str(), "", 0)
                 .AddItem(pItem)
                 .SendMailTo(pl, auction);
         }

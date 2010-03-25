@@ -241,7 +241,7 @@ void WorldSession::HandleSendMail(WorldPacket & recv_data )
 
     bool needItemDelay = false;
 
-    MailDraft draft(subject, itemTextId);
+    MailDraft draft(subject, body, itemTextId);
 
     if (items_count > 0 || money > 0)
     {
@@ -400,7 +400,7 @@ void WorldSession::HandleMailReturnToSender(WorldPacket & recv_data )
     // send back only to players and simple drop for other cases
     if (m->messageType == MAIL_NORMAL)
     {
-        MailDraft draft(m->subject, m->itemTextId);
+        MailDraft draft(m->subject, m->body, m->itemTextId);
         if (m->mailTemplateId)
             draft = MailDraft(m->mailTemplateId,false);     // items already included
 
@@ -499,7 +499,7 @@ void WorldSession::HandleMailTakeItem(WorldPacket & recv_data )
             // check player existence
             if(receive || sender_accId)
             {
-                MailDraft(m->subject)
+                MailDraft(m->subject, "", 0)
                     .AddMoney(m->COD)
                     .SendMailTo(MailReceiver(receive,m->sender),MailSender(MAIL_NORMAL,m->receiver), MAIL_CHECK_MASK_COD_PAYMENT);
             }
@@ -598,7 +598,7 @@ void WorldSession::HandleGetMailList(WorldPacket & recv_data )
 
         uint8 item_count = (*itr)->items.size();            // max count is MAX_MAIL_ITEMS (12)
 
-        size_t next_mail_size = 2+4+1+((*itr)->messageType == MAIL_NORMAL ? 8 : 4)+4*8+((*itr)->subject.size()+1)+1+item_count*(1+4+4+7*3*4+4+4+4+4+4+4+1);
+        size_t next_mail_size = 2+4+1+((*itr)->messageType == MAIL_NORMAL ? 8 : 4)+4*8+((*itr)->subject.size()+1)+((*itr)->body.size()+1)+1+item_count*(1+4+4+7*3*4+4+4+4+4+4+4+1);
 
         if(data.wpos()+next_mail_size > maxPacketSize)
         {
@@ -634,14 +634,14 @@ void WorldSession::HandleGetMailList(WorldPacket & recv_data )
         }
 
         data << uint32((*itr)->COD);                        // COD
-        data << uint32((*itr)->itemTextId);                 // sure about this
-        data << uint32(0);                                  // unknown
+        data << uint32((*itr)->itemTextId);                 // probably changed in 3.3.3
         data << uint32((*itr)->stationery);                 // stationery (Stationery.dbc)
         data << uint32((*itr)->money);                      // Gold
         data << uint32(show_flags);                         // unknown, 0x4 - auction, 0x10 - normal
         data << float(((*itr)->expire_time-time(NULL))/DAY);// Time
         data << uint32((*itr)->mailTemplateId);             // mail template (MailTemplate.dbc)
-        data << (*itr)->subject;                            // Subject string - once 00, when mail type = 3
+        data << (*itr)->subject;                            // Subject string - once 00, when mail type = 3, max 256
+        data << (*itr)->body;                               // message? max 8000
 
         data << uint8(item_count);                          // client limit is 0x10
 
@@ -710,7 +710,7 @@ void WorldSession::HandleItemTextQuery(WorldPacket & recv_data )
     sLog.outDebug("CMSG_ITEM_TEXT_QUERY itemguid: %u, mailId: %u, unk: %u", itemTextId, mailId, unk);
 
     WorldPacket data(SMSG_ITEM_TEXT_QUERY_RESPONSE, (4+10));// guess size
-    data << itemTextId;
+    data << uint32(itemTextId);
     data << sObjectMgr.GetItemText( itemTextId );
     SendPacket(&data);
 }
@@ -729,7 +729,6 @@ void WorldSession::HandleMailCreateTextItem(WorldPacket & recv_data )
 
     recv_data >> mailbox;
     recv_data >> mailId;
-    recv_data.read_skip<uint32>();                          // mailTemplateId, non need, Mail store own 100% correct value anyway
 
     if (!GetPlayer()->GetGameObjectIfCanInteractWith(mailbox, GAMEOBJECT_TYPE_MAILBOX))
         return;
@@ -909,12 +908,12 @@ MailReceiver::MailReceiver( Player* receiver,uint32 receiver_lowguid ) : m_recei
 }
 
 /**
- * Creates a new MailDraft object using subject and contect texts.
+ * Creates a new MailDraft object using subject and content texts.
  *
  * @param subject The subject of the mail.
  * @param itemText The text of the body of the mail.
  */
-MailDraft::MailDraft( std::string subject, std::string text ) : m_mailTemplateId(0), m_mailTemplateItemsNeed(false), m_subject(subject),
+MailDraft::MailDraft( std::string subject, std::string text ) : m_mailTemplateId(0), m_mailTemplateItemsNeed(false), m_subject(subject), m_body(text),
 m_bodyId(!text.empty() ? sObjectMgr.CreateItemText(text) : 0), m_money(0), m_COD(0)
 {
 
@@ -948,9 +947,9 @@ void MailDraft::prepareItems(Player* receiver)
     uint32 max_slot = mailLoot.GetMaxSlotInLootFor(receiver);
     for(uint32 i = 0; m_items.size() < MAX_MAIL_ITEMS && i < max_slot; ++i)
     {
-        if (LootItem* lootitem = mailLoot.LootItemInSlot(i,receiver))
+        if (LootItem* lootitem = mailLoot.LootItemInSlot(i, receiver))
         {
-            if (Item* item = Item::CreateItem(lootitem->itemid,lootitem->count,receiver))
+            if (Item* item = Item::CreateItem(lootitem->itemid, lootitem->count, receiver))
             {
                 item->SaveToDB();                           // save for prevent lost at next mail load, if send fail then item will deleted
                 AddItem(item);
@@ -981,7 +980,7 @@ void MailDraft::deleteIncludedItems( bool inDB /**= false*/ )
  * Returns a mail to its sender.
  * @param sender_acc           The id of the account of the sender.
  * @param sender_guid          The low part of the GUID of the sender.
- * @param receiver_guid        The low part of the GUID of the reciever.
+ * @param receiver_guid        The low part of the GUID of the receiver.
  */
 void MailDraft::SendReturnToSender(uint32 sender_acc, uint32 sender_guid, uint32 receiver_guid )
 {
@@ -1058,12 +1057,16 @@ void MailDraft::SendMailTo(MailReceiver const& receiver, MailSender const& sende
 
     // Add to DB
     std::string safe_subject = GetSubject();
-
     CharacterDatabase.BeginTransaction();
     CharacterDatabase.escape_string(safe_subject);
-    CharacterDatabase.PExecute("INSERT INTO mail (id,messageType,stationery,mailTemplateId,sender,receiver,subject,itemTextId,has_items,expire_time,deliver_time,money,cod,checked) "
-        "VALUES ('%u', '%u', '%u', '%u', '%u', '%u', '%s', '%u', '%u', '" UI64FMTD "','" UI64FMTD "', '%u', '%u', '%d')",
-        mailId, sender.GetMailMessageType(), sender.GetStationery(), GetMailTemplateId(), sender.GetSenderId(), receiver.GetPlayerGUIDLow(), safe_subject.c_str(), GetBodyId(), (m_items.empty() ? 0 : 1), (uint64)expire_time, (uint64)deliver_time, m_money, m_COD, checked);
+
+    std::string safe_body = GetBody();
+    CharacterDatabase.BeginTransaction();
+    CharacterDatabase.escape_string(safe_body);
+
+    CharacterDatabase.PExecute("INSERT INTO mail (id,messageType,stationery,mailTemplateId,sender,receiver,subject,body,itemTextId,has_items,expire_time,deliver_time,money,cod,checked) "
+        "VALUES ('%u', '%u', '%u', '%u', '%u', '%u', '%s', '%s', '%u', '%u', '" UI64FMTD "','" UI64FMTD "', '%u', '%u', '%d')",
+        mailId, sender.GetMailMessageType(), sender.GetStationery(), GetMailTemplateId(), sender.GetSenderId(), receiver.GetPlayerGUIDLow(), safe_subject.c_str(), safe_body.c_str(), GetBodyId(), (m_items.empty() ? 0 : 1), (uint64)expire_time, (uint64)deliver_time, m_money, m_COD, checked);
 
     for(MailItemMap::const_iterator mailItemIter = m_items.begin(); mailItemIter != m_items.end(); ++mailItemIter)
     {
@@ -1081,6 +1084,7 @@ void MailDraft::SendMailTo(MailReceiver const& receiver, MailSender const& sende
         m->messageID = mailId;
         m->mailTemplateId = GetMailTemplateId();
         m->subject = GetSubject();
+        m->body = GetBody();
         m->itemTextId = GetBodyId();
         m->money = GetMoney();
         m->COD = GetCOD();
