@@ -21,7 +21,7 @@
 #include "ObjectAccessor.h"
 #include "CreatureAI.h"
 
-TemporarySummon::TemporarySummon( uint64 summoner ) :
+TemporarySummon::TemporarySummon( ObjectGuid summoner ) :
 Creature(CREATURE_SUBTYPE_TEMPORARY_SUMMON), m_type(TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN), m_timer(0), m_lifetime(0), m_summoner(summoner)
 {
 }
@@ -165,8 +165,8 @@ void TemporarySummon::UnSummon()
 {
     CombatStop();
 
-    if (IS_CREATURE_GUID(GetSummonerGUID()))
-        if(Creature* sum = GetMap()->GetCreature(GetSummonerGUID()))
+    if (GetSummonerGuid().IsCreature())
+        if(Creature* sum = GetMap()->GetCreature(GetSummonerGuid()))
             if (sum->AI())
                 sum->AI()->SummonedCreatureDespawn(this);
 

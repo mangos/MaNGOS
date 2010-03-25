@@ -69,14 +69,8 @@ enum HighGuid
 };
 
 //*** Must be replaced by ObjectGuid use ***
-#define IS_CREATURE_GUID(Guid)       ( GUID_HIPART(Guid) == HIGHGUID_UNIT )
-#define IS_PET_GUID(Guid)            ( GUID_HIPART(Guid) == HIGHGUID_PET )
 #define IS_PLAYER_GUID(Guid)         ( GUID_HIPART(Guid) == HIGHGUID_PLAYER && Guid!=0 )
-#define IS_UNIT_GUID(Guid)           ( IS_CREATURE_GUID(Guid) || IS_PET_GUID(Guid) || IS_PLAYER_GUID(Guid) )
                                                             // special case for empty guid need check
-#define IS_GAMEOBJECT_GUID(Guid)     ( GUID_HIPART(Guid) == HIGHGUID_GAMEOBJECT )
-#define IS_MO_TRANSPORT(Guid)        ( GUID_HIPART(Guid) == HIGHGUID_MO_TRANSPORT )
-
 // l - OBJECT_FIELD_GUID
 // e - OBJECT_FIELD_ENTRY for GO (except GAMEOBJECT_TYPE_MO_TRANSPORT) and creatures or UNIT_FIELD_PETNUMBER for pets
 // h - OBJECT_FIELD_GUID + 1
@@ -96,13 +90,13 @@ inline bool IsGuidHaveEnPart(uint64 const& guid)
         case HIGHGUID_PLAYER:
         case HIGHGUID_DYNAMICOBJECT:
         case HIGHGUID_CORPSE:
+        case HIGHGUID_MO_TRANSPORT:
             return false;
         case HIGHGUID_GAMEOBJECT:
         case HIGHGUID_TRANSPORT:
         case HIGHGUID_UNIT:
         case HIGHGUID_PET:
         case HIGHGUID_VEHICLE:
-        case HIGHGUID_MO_TRANSPORT:
         default:
             return true;
     }
@@ -127,6 +121,9 @@ class ObjectGuid
         ObjectGuid(uint64 const& guid) : m_guid(guid) {}    // NOTE: must be explicit in future for more strict control type conversions
         ObjectGuid(HighGuid hi, uint32 entry, uint32 counter) : m_guid(uint64(counter) | (uint64(entry) << 24) | (uint64(hi) << 48)) {}
         ObjectGuid(HighGuid hi, uint32 counter) : m_guid(uint64(counter) | (uint64(hi) << 48)) {}
+
+    public:                                                 // statics
+        static ObjectGuid const EmptyGuid;
 
     public:                                                 // modifiers
         PackedGuidReader ReadAsPacked() { return PackedGuidReader(*this); }
@@ -211,13 +208,13 @@ class ObjectGuid
                 case HIGHGUID_PLAYER:
                 case HIGHGUID_DYNAMICOBJECT:
                 case HIGHGUID_CORPSE:
+                case HIGHGUID_MO_TRANSPORT:
                     return false;
                 case HIGHGUID_GAMEOBJECT:
                 case HIGHGUID_TRANSPORT:
                 case HIGHGUID_UNIT:
                 case HIGHGUID_PET:
                 case HIGHGUID_VEHICLE:
-                case HIGHGUID_MO_TRANSPORT:
                 default:
                     return true;
             }
