@@ -1372,10 +1372,10 @@ class MANGOS_DLL_SPEC Player : public Unit
         void GroupEventHappens( uint32 questId, WorldObject const* pEventObject );
         void ItemAddedQuestCheck( uint32 entry, uint32 count );
         void ItemRemovedQuestCheck( uint32 entry, uint32 count );
-        void KilledMonster( CreatureInfo const* cInfo, uint64 guid );
-        void KilledMonsterCredit( uint32 entry, uint64 guid );
-        void CastedCreatureOrGO( uint32 entry, uint64 guid, uint32 spell_id );
-        void TalkedToCreature( uint32 entry, uint64 guid );
+        void KilledMonster( CreatureInfo const* cInfo, ObjectGuid guid );
+        void KilledMonsterCredit( uint32 entry, ObjectGuid guid );
+        void CastedCreatureOrGO( uint32 entry, ObjectGuid guid, uint32 spell_id );
+        void TalkedToCreature( uint32 entry, ObjectGuid guid );
         void MoneyChanged( uint32 value );
         void ReputationChanged(FactionEntry const* factionEntry );
         bool HasQuestForItem( uint32 itemid ) const;
@@ -1391,7 +1391,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void SendQuestConfirmAccept(Quest const* pQuest, Player* pReceiver);
         void SendPushToPartyResponse( Player *pPlayer, uint32 msg );
         void SendQuestUpdateAddItem( Quest const* pQuest, uint32 item_idx, uint32 count );
-        void SendQuestUpdateAddCreatureOrGo( Quest const* pQuest, uint64 guid, uint32 creatureOrGO_idx, uint32 old_count, uint32 add_count );
+        void SendQuestUpdateAddCreatureOrGo( Quest const* pQuest, ObjectGuid guid, uint32 creatureOrGO_idx, uint32 old_count, uint32 add_count );
 
         uint64 GetDivider() { return m_divider; }
         void SetDivider( uint64 guid ) { m_divider = guid; }

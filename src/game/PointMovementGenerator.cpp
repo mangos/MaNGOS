@@ -101,8 +101,8 @@ void PointMovementGenerator<Creature>::MovementInform(Creature &unit)
     if (unit.isTemporarySummon())
     {
         TemporarySummon* pSummon = (TemporarySummon*)(&unit);
-        if (IS_CREATURE_GUID(pSummon->GetSummonerGUID()))
-            if(Creature* pSummoner = unit.GetMap()->GetCreature(pSummon->GetSummonerGUID()))
+        if (pSummon->GetSummonerGuid().IsCreature())
+            if(Creature* pSummoner = unit.GetMap()->GetCreature(pSummon->GetSummonerGuid()))
                 if (pSummoner->AI())
                     pSummoner->AI()->SummonedMovementInform(&unit, POINT_MOTION_TYPE, id);
     }

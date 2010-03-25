@@ -14059,17 +14059,17 @@ void Player::ItemRemovedQuestCheck( uint32 entry, uint32 count )
     UpdateForQuestWorldObjects();
 }
 
-void Player::KilledMonster( CreatureInfo const* cInfo, uint64 guid )
+void Player::KilledMonster( CreatureInfo const* cInfo, ObjectGuid guid )
 {
     if(cInfo->Entry)
-        KilledMonsterCredit(cInfo->Entry,guid);
+        KilledMonsterCredit(cInfo->Entry, guid);
 
     for(int i = 0; i < MAX_KILL_CREDIT; ++i)
         if(cInfo->KillCredit[i])
-            KilledMonsterCredit(cInfo->KillCredit[i],guid);
+            KilledMonsterCredit(cInfo->KillCredit[i], guid);
 }
 
-void Player::KilledMonsterCredit( uint32 entry, uint64 guid )
+void Player::KilledMonsterCredit( uint32 entry, ObjectGuid guid )
 {
     uint32 addkillcount = 1;
     GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE, entry, addkillcount);
@@ -14123,9 +14123,9 @@ void Player::KilledMonsterCredit( uint32 entry, uint64 guid )
     }
 }
 
-void Player::CastedCreatureOrGO( uint32 entry, uint64 guid, uint32 spell_id )
+void Player::CastedCreatureOrGO( uint32 entry, ObjectGuid guid, uint32 spell_id )
 {
-    bool isCreature = IS_CREATURE_GUID(guid);
+    bool isCreature = guid.IsCreature();
 
     uint32 addCastCount = 1;
     for( int i = 0; i < MAX_QUEST_LOG_SIZE; ++i)
@@ -14192,7 +14192,7 @@ void Player::CastedCreatureOrGO( uint32 entry, uint64 guid, uint32 spell_id )
     }
 }
 
-void Player::TalkedToCreature( uint32 entry, uint64 guid )
+void Player::TalkedToCreature( uint32 entry, ObjectGuid guid )
 {
     uint32 addTalkCount = 1;
     for( int i = 0; i < MAX_QUEST_LOG_SIZE; ++i )
@@ -14481,7 +14481,7 @@ void Player::SendQuestUpdateAddItem( Quest const* /*pQuest*/, uint32 /*item_idx*
     GetSession()->SendPacket( &data );
 }
 
-void Player::SendQuestUpdateAddCreatureOrGo( Quest const* pQuest, uint64 guid, uint32 creatureOrGO_idx, uint32 old_count, uint32 add_count )
+void Player::SendQuestUpdateAddCreatureOrGo( Quest const* pQuest, ObjectGuid guid, uint32 creatureOrGO_idx, uint32 old_count, uint32 add_count )
 {
     assert(old_count + add_count < 65536 && "mob/GO count store in 16 bits 2^16 = 65536 (0..65536)");
 
@@ -14496,7 +14496,7 @@ void Player::SendQuestUpdateAddCreatureOrGo( Quest const* pQuest, uint64 guid, u
     data << uint32(entry);
     data << uint32(old_count + add_count);
     data << uint32(pQuest->ReqCreatureOrGOCount[ creatureOrGO_idx ]);
-    data << uint64(guid);
+    data << guid;
     GetSession()->SendPacket(&data);
 
     uint16 log_slot = FindQuestSlot( pQuest->GetQuestId() );
@@ -19846,7 +19846,7 @@ bool Player::RewardPlayerAndGroupAtKill(Unit* pVictim)
                     {
                         // normal creature (not pet/etc) can be only in !PvP case
                         if(pVictim->GetTypeId()==TYPEID_UNIT)
-                            pGroupGuy->KilledMonster(((Creature*)pVictim)->GetCreatureInfo(), pVictim->GetGUID());
+                            pGroupGuy->KilledMonster(((Creature*)pVictim)->GetCreatureInfo(), pVictim->GetObjectGuid());
                     }
                 }
             }
@@ -19871,7 +19871,7 @@ bool Player::RewardPlayerAndGroupAtKill(Unit* pVictim)
 
             // normal creature (not pet/etc) can be only in !PvP case
             if(pVictim->GetTypeId()==TYPEID_UNIT)
-                KilledMonster(((Creature*)pVictim)->GetCreatureInfo(), pVictim->GetGUID());
+                KilledMonster(((Creature*)pVictim)->GetCreatureInfo(), pVictim->GetObjectGuid());
         }
     }
     return xp || honored_kill;

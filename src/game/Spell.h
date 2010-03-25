@@ -22,6 +22,7 @@
 #include "GridDefines.h"
 #include "SharedDefines.h"
 #include "DBCEnums.h"
+#include "ObjectGuid.h"
 
 class WorldSession;
 class Unit;
@@ -357,7 +358,7 @@ class Spell
         void EffectSpecCount(SpellEffectIndex eff_idx);
         void EffectActivateSpec(SpellEffectIndex eff_idx);
 
-        Spell( Unit* Caster, SpellEntry const *info, bool triggered, uint64 originalCasterGUID = 0, Spell** triggeringContainer = NULL );
+        Spell( Unit* Caster, SpellEntry const *info, bool triggered, ObjectGuid originalCasterGUID = ObjectGuid::EmptyGuid, Spell** triggeringContainer = NULL );
         ~Spell();
 
         void prepare(SpellCastTargets const* targets, Aura* triggeredByAura = NULL);
@@ -474,7 +475,7 @@ class Spell
         // formal spell caster, in game source of spell affects cast
         Unit* GetCaster() const { return m_caster; }
         // real source of cast affects, explcit caster, or DoT/HoT applier, or GO owner, etc. Can be NULL
-        Unit* GetAffectiveCaster() const { return m_originalCasterGUID ? m_originalCaster : m_caster; }
+        Unit* GetAffectiveCaster() const { return !m_originalCasterGUID.IsEmpty() ? m_originalCaster : m_caster; }
         // m_originalCasterGUID can store GO guid, and in this case this is visual caster
         WorldObject* GetCastingObject() const;
 
@@ -500,7 +501,7 @@ class Spell
 
         Unit* m_caster;
 
-        uint64 m_originalCasterGUID;                        // real source of cast (aura caster/etc), used for spell targets selection
+        ObjectGuid m_originalCasterGUID;                    // real source of cast (aura caster/etc), used for spell targets selection
                                                             // e.g. damage around area spell trigered by victim aura and da,age emeies of aura caster
         Unit* m_originalCaster;                             // cached pointer for m_originalCaster, updated at Spell::UpdatePointers()
 
@@ -570,7 +571,7 @@ class Spell
         // Targets store structures and data
         struct TargetInfo
         {
-            uint64 targetGUID;
+            ObjectGuid targetGUID;
             uint64 timeDelay;
             SpellMissInfo missCondition:8;
             SpellMissInfo reflectResult:8;
@@ -582,7 +583,7 @@ class Spell
 
         struct GOTargetInfo
         {
-            uint64 targetGUID;
+            ObjectGuid targetGUID;
             uint64 timeDelay;
             uint8  effectMask:8;
             bool   processed:1;

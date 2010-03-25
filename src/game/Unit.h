@@ -773,7 +773,7 @@ class MovementInfo
             t_time = time;
             t_seat = seat;
         }
-        uint64 GetTransportGuid() const { return t_guid.GetRawValue(); }
+        ObjectGuid const& GetTransportGuid() const { return t_guid; }
         Position const *GetTransportPos() const { return &t_pos; }
         int8 GetTransportSeat() const { return t_seat; }
         uint32 GetTransportTime() const { return t_time; }
@@ -1352,12 +1352,12 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void SendEnergizeSpellLog(Unit *pVictim, uint32 SpellID, uint32 Damage,Powers powertype);
         void EnergizeBySpell(Unit *pVictim, uint32 SpellID, uint32 Damage, Powers powertype);
         uint32 SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage);
-        void CastSpell(Unit* Victim, uint32 spellId, bool triggered, Item *castItem = NULL, Aura* triggeredByAura = NULL, uint64 originalCaster = 0);
-        void CastSpell(Unit* Victim,SpellEntry const *spellInfo, bool triggered, Item *castItem= NULL, Aura* triggeredByAura = NULL, uint64 originalCaster = 0);
-        void CastCustomSpell(Unit* Victim, uint32 spellId, int32 const* bp0, int32 const* bp1, int32 const* bp2, bool triggered, Item *castItem= NULL, Aura* triggeredByAura = NULL, uint64 originalCaster = 0);
-        void CastCustomSpell(Unit* Victim,SpellEntry const *spellInfo, int32 const* bp0, int32 const* bp1, int32 const* bp2, bool triggered, Item *castItem= NULL, Aura* triggeredByAura = NULL, uint64 originalCaster = 0);
-        void CastSpell(float x, float y, float z, uint32 spellId, bool triggered, Item *castItem = NULL, Aura* triggeredByAura = NULL, uint64 originalCaster = 0);
-        void CastSpell(float x, float y, float z, SpellEntry const *spellInfo, bool triggered, Item *castItem = NULL, Aura* triggeredByAura = NULL, uint64 originalCaster = 0);
+        void CastSpell(Unit* Victim, uint32 spellId, bool triggered, Item *castItem = NULL, Aura* triggeredByAura = NULL, ObjectGuid originalCaster = ObjectGuid::EmptyGuid);
+        void CastSpell(Unit* Victim,SpellEntry const *spellInfo, bool triggered, Item *castItem= NULL, Aura* triggeredByAura = NULL, ObjectGuid originalCaster = ObjectGuid::EmptyGuid);
+        void CastCustomSpell(Unit* Victim, uint32 spellId, int32 const* bp0, int32 const* bp1, int32 const* bp2, bool triggered, Item *castItem= NULL, Aura* triggeredByAura = NULL, ObjectGuid originalCaster = ObjectGuid::EmptyGuid);
+        void CastCustomSpell(Unit* Victim,SpellEntry const *spellInfo, int32 const* bp0, int32 const* bp1, int32 const* bp2, bool triggered, Item *castItem= NULL, Aura* triggeredByAura = NULL, ObjectGuid originalCaster = ObjectGuid::EmptyGuid);
+        void CastSpell(float x, float y, float z, uint32 spellId, bool triggered, Item *castItem = NULL, Aura* triggeredByAura = NULL, ObjectGuid originalCaster = ObjectGuid::EmptyGuid);
+        void CastSpell(float x, float y, float z, SpellEntry const *spellInfo, bool triggered, Item *castItem = NULL, Aura* triggeredByAura = NULL, ObjectGuid originalCaster = ObjectGuid::EmptyGuid);
 
         bool IsDamageToThreatSpell(SpellEntry const * spellInfo) const;
 

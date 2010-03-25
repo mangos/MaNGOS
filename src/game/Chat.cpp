@@ -1748,9 +1748,9 @@ void ChatHandler::FillMessageData( WorldPacket *data, WorldSession* session, uin
             *data << uint32(0);                             // 2.1.0
             *data << uint32(strlen(speaker->GetName()) + 1);
             *data << speaker->GetName();
-            uint64 listener_guid = 0;
-            *data << uint64(listener_guid);
-            if(listener_guid && !IS_PLAYER_GUID(listener_guid))
+            ObjectGuid listener_guid;
+            *data << listener_guid;
+            if (!listener_guid.IsEmpty() && !listener_guid.IsPlayer())
             {
                 *data << uint32(1);                         // string listener_name_length
                 *data << uint8(0);                          // string listener_name

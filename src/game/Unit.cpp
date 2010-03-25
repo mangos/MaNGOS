@@ -594,7 +594,7 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
         // some critters required for quests (need normal entry instead possible heroic in any cases)
         if(GetTypeId() == TYPEID_PLAYER)
             if(CreatureInfo const* normalInfo = ObjectMgr::GetCreatureTemplate(pVictim->GetEntry()))
-                ((Player*)this)->KilledMonster(normalInfo,pVictim->GetGUID());
+                ((Player*)this)->KilledMonster(normalInfo,pVictim->GetObjectGuid());
 
         return damage;
     }
@@ -820,8 +820,8 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
             if (cVictim->isTemporarySummon())
             {
                 TemporarySummon* pSummon = (TemporarySummon*)cVictim;
-                if (IS_CREATURE_GUID(pSummon->GetSummonerGUID()))
-                    if(Creature* pSummoner = cVictim->GetMap()->GetCreature(pSummon->GetSummonerGUID()))
+                if (pSummon->GetSummonerGuid().IsCreature())
+                    if(Creature* pSummoner = cVictim->GetMap()->GetCreature(pSummon->GetSummonerGuid()))
                         if (pSummoner->AI())
                             pSummoner->AI()->SummonedCreatureJustDied(cVictim);
             }
@@ -1064,34 +1064,34 @@ void Unit::CastStop(uint32 except_spellid)
             InterruptSpell(CurrentSpellTypes(i),false);
 }
 
-void Unit::CastSpell(Unit* Victim, uint32 spellId, bool triggered, Item *castItem, Aura* triggeredByAura, uint64 originalCaster)
+void Unit::CastSpell(Unit* Victim, uint32 spellId, bool triggered, Item *castItem, Aura* triggeredByAura, ObjectGuid originalCaster)
 {
-    SpellEntry const *spellInfo = sSpellStore.LookupEntry(spellId );
+    SpellEntry const *spellInfo = sSpellStore.LookupEntry(spellId);
 
     if(!spellInfo)
     {
-        sLog.outError("CastSpell: unknown spell id %i by caster: %s %u)", spellId,(GetTypeId()==TYPEID_PLAYER ? "player (GUID:" : "creature (Entry:"),(GetTypeId()==TYPEID_PLAYER ? GetGUIDLow() : GetEntry()));
+        sLog.outError("CastSpell: unknown spell id %i by caster: %s", spellId, GetObjectGuid().GetString().c_str());
         return;
     }
 
-    CastSpell(Victim,spellInfo,triggered,castItem,triggeredByAura, originalCaster);
+    CastSpell(Victim, sSpellStore.LookupEntry(spellId), triggered, castItem, triggeredByAura, originalCaster);
 }
 
-void Unit::CastSpell(Unit* Victim,SpellEntry const *spellInfo, bool triggered, Item *castItem, Aura* triggeredByAura, uint64 originalCaster)
+void Unit::CastSpell(Unit* Victim,SpellEntry const *spellInfo, bool triggered, Item *castItem, Aura* triggeredByAura, ObjectGuid originalCaster)
 {
     if(!spellInfo)
     {
-        sLog.outError("CastSpell: unknown spell by caster: %s %u)", (GetTypeId()==TYPEID_PLAYER ? "player (GUID:" : "creature (Entry:"),(GetTypeId()==TYPEID_PLAYER ? GetGUIDLow() : GetEntry()));
+        sLog.outError("CastSpell: unknown spell by caster: %s", GetObjectGuid().GetString().c_str());
         return;
     }
 
     if (castItem)
         DEBUG_LOG("WORLD: cast Item spellId - %i", spellInfo->Id);
 
-    if(!originalCaster && triggeredByAura)
+    if(originalCaster.IsEmpty() && triggeredByAura)
         originalCaster = triggeredByAura->GetCasterGUID();
 
-    Spell *spell = new Spell(this, spellInfo, triggered, originalCaster );
+    Spell *spell = new Spell(this, spellInfo, triggered, originalCaster);
 
     SpellCastTargets targets;
     targets.setUnitTarget( Victim );
@@ -1099,31 +1099,31 @@ void Unit::CastSpell(Unit* Victim,SpellEntry const *spellInfo, bool triggered, I
     spell->prepare(&targets, triggeredByAura);
 }
 
-void Unit::CastCustomSpell(Unit* Victim,uint32 spellId, int32 const* bp0, int32 const* bp1, int32 const* bp2, bool triggered, Item *castItem, Aura* triggeredByAura, uint64 originalCaster)
+void Unit::CastCustomSpell(Unit* Victim,uint32 spellId, int32 const* bp0, int32 const* bp1, int32 const* bp2, bool triggered, Item *castItem, Aura* triggeredByAura, ObjectGuid originalCaster)
 {
-    SpellEntry const *spellInfo = sSpellStore.LookupEntry(spellId );
+    SpellEntry const *spellInfo = sSpellStore.LookupEntry(spellId);
 
     if(!spellInfo)
     {
-        sLog.outError("CastCustomSpell: unknown spell id %i", spellId);
+        sLog.outError("CastCustomSpell: unknown spell id %i by caster: %s", spellId, GetObjectGuid().GetString().c_str());
         return;
     }
 
-    CastCustomSpell(Victim,spellInfo,bp0,bp1,bp2,triggered,castItem,triggeredByAura, originalCaster);
+    CastCustomSpell(Victim, spellInfo, bp0, bp1, bp2, triggered, castItem, triggeredByAura, originalCaster);
 }
 
-void Unit::CastCustomSpell(Unit* Victim,SpellEntry const *spellInfo, int32 const* bp0, int32 const* bp1, int32 const* bp2, bool triggered, Item *castItem, Aura* triggeredByAura, uint64 originalCaster)
+void Unit::CastCustomSpell(Unit* Victim, SpellEntry const *spellInfo, int32 const* bp0, int32 const* bp1, int32 const* bp2, bool triggered, Item *castItem, Aura* triggeredByAura, ObjectGuid originalCaster)
 {
     if(!spellInfo)
     {
-        sLog.outError("CastCustomSpell: unknown spell");
+        sLog.outError("CastCustomSpell: unknown spell by caster: %s", GetObjectGuid().GetString().c_str());
         return;
     }
 
     if (castItem)
         DEBUG_LOG("WORLD: cast Item spellId - %i", spellInfo->Id);
 
-    if(!originalCaster && triggeredByAura)
+    if(originalCaster.IsEmpty() && triggeredByAura)
         originalCaster = triggeredByAura->GetCasterGUID();
 
     Spell *spell = new Spell(this, spellInfo, triggered, originalCaster);
@@ -1144,35 +1144,35 @@ void Unit::CastCustomSpell(Unit* Victim,SpellEntry const *spellInfo, int32 const
 }
 
 // used for scripting
-void Unit::CastSpell(float x, float y, float z, uint32 spellId, bool triggered, Item *castItem, Aura* triggeredByAura, uint64 originalCaster)
+void Unit::CastSpell(float x, float y, float z, uint32 spellId, bool triggered, Item *castItem, Aura* triggeredByAura, ObjectGuid originalCaster)
 {
-    SpellEntry const *spellInfo = sSpellStore.LookupEntry(spellId );
+    SpellEntry const *spellInfo = sSpellStore.LookupEntry(spellId);
 
     if(!spellInfo)
     {
-        sLog.outError("CastSpell(x,y,z): unknown spell id %i by caster: %s %u)", spellId,(GetTypeId()==TYPEID_PLAYER ? "player (GUID:" : "creature (Entry:"),(GetTypeId()==TYPEID_PLAYER ? GetGUIDLow() : GetEntry()));
+        sLog.outError("CastSpell(x,y,z): unknown spell id %i by caster: %s", spellId, GetObjectGuid().GetString().c_str());
         return;
     }
 
-    CastSpell(x, y, z,spellInfo,triggered,castItem,triggeredByAura, originalCaster);
+    CastSpell(x, y, z, spellInfo, triggered, castItem, triggeredByAura, originalCaster);
 }
 
 // used for scripting
-void Unit::CastSpell(float x, float y, float z, SpellEntry const *spellInfo, bool triggered, Item *castItem, Aura* triggeredByAura, uint64 originalCaster)
+void Unit::CastSpell(float x, float y, float z, SpellEntry const *spellInfo, bool triggered, Item *castItem, Aura* triggeredByAura, ObjectGuid originalCaster)
 {
     if(!spellInfo)
     {
-        sLog.outError("CastSpell(x,y,z): unknown spell by caster: %s %u)", (GetTypeId()==TYPEID_PLAYER ? "player (GUID:" : "creature (Entry:"),(GetTypeId()==TYPEID_PLAYER ? GetGUIDLow() : GetEntry()));
+        sLog.outError("CastSpell(x,y,z): unknown spell by caster: %s", GetObjectGuid().GetString().c_str());
         return;
     }
 
     if (castItem)
         DEBUG_LOG("WORLD: cast Item spellId - %i", spellInfo->Id);
 
-    if(!originalCaster && triggeredByAura)
+    if(originalCaster.IsEmpty() && triggeredByAura)
         originalCaster = triggeredByAura->GetCasterGUID();
 
-    Spell *spell = new Spell(this, spellInfo, triggered, originalCaster );
+    Spell *spell = new Spell(this, spellInfo, triggered, originalCaster);
 
     SpellCastTargets targets;
     targets.setDestination(x, y, z);
