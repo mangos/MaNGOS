@@ -721,14 +721,14 @@ bool Group::CountRollVote(ObjectGuid const& playerGUID, Rolls::iterator& rollI, 
     {
         case ROLL_PASS:                                     // Player choose pass
         {
-            SendLootRoll(playerGUID, 0, ROLL_PASS, *roll);
+            SendLootRoll(playerGUID, 128, ROLL_PASS, *roll);
             ++roll->totalPass;
             itr->second = PASS;
         }
         break;
         case ROLL_NEED:                                     // player choose Need
         {
-            SendLootRoll(playerGUID, 0, ROLL_NEED, *roll);
+            SendLootRoll(playerGUID, 0, 0, *roll);
             ++roll->totalNeed;
             itr->second = NEED;
         }
