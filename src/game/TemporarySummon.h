@@ -25,7 +25,7 @@
 class TemporarySummon : public Creature
 {
     public:
-        explicit TemporarySummon(ObjectGuid summoner = ObjectGuid::EmptyGuid);
+        explicit TemporarySummon(ObjectGuid summoner = ObjectGuid());
         virtual ~TemporarySummon(){};
         void Update(uint32 time);
         void Summon(TempSummonType type, uint32 lifetime);
