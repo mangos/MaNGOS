@@ -369,16 +369,16 @@ void Unit::SendMonsterMove(float NewPosX, float NewPosY, float NewPosZ, SplineTy
             return;
         case SPLINETYPE_FACINGSPOT:                         // facing spot, not used currently
         {
-            data << float(va_arg(vargs,float));
-            data << float(va_arg(vargs,float));
-            data << float(va_arg(vargs,float));
+            data << float(va_arg(vargs,double));
+            data << float(va_arg(vargs,double));
+            data << float(va_arg(vargs,double));
             break;
         }
         case SPLINETYPE_FACINGTARGET:
             data << uint64(va_arg(vargs,uint64));
             break;
         case SPLINETYPE_FACINGANGLE:                        // not used currently
-            data << float(va_arg(vargs,float));             // facing angle
+            data << float(va_arg(vargs,double));            // facing angle
             break;
     }
 
