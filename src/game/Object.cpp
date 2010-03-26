@@ -1641,7 +1641,7 @@ void WorldObject::AddObjectToRemoveList()
 
 Creature* WorldObject::SummonCreature(uint32 id, float x, float y, float z, float ang,TempSummonType spwtype,uint32 despwtime)
 {
-    TemporarySummon* pCreature = new TemporarySummon(GetGUID());
+    TemporarySummon* pCreature = new TemporarySummon(GetObjectGuid());
 
     uint32 team = 0;
     if (GetTypeId()==TYPEID_PLAYER)
