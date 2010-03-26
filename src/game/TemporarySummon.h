@@ -25,18 +25,18 @@
 class TemporarySummon : public Creature
 {
     public:
-        explicit TemporarySummon(uint64 summoner = 0);
+        explicit TemporarySummon(ObjectGuid summoner = ObjectGuid());
         virtual ~TemporarySummon(){};
         void Update(uint32 time);
         void Summon(TempSummonType type, uint32 lifetime);
         void MANGOS_DLL_SPEC UnSummon();
         void SaveToDB();
-        uint64 GetSummonerGUID() const { return m_summoner ; }
-        Unit* GetSummoner() const { return m_summoner ? ObjectAccessor::GetUnit(*this, m_summoner) : NULL; }
+        ObjectGuid const& GetSummonerGuid() const { return m_summoner ; }
+        Unit* GetSummoner() const { return ObjectAccessor::GetUnit(*this, m_summoner); }
     private:
         TempSummonType m_type;
         uint32 m_timer;
         uint32 m_lifetime;
-        uint64 m_summoner;
+        ObjectGuid m_summoner;
 };
 #endif
