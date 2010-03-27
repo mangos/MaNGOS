@@ -255,7 +255,7 @@ int WorldSocket::open (void *a)
 
     BigNumber seed2;
     seed2.SetRand(16 * 8);
-    packet.append(seed1.AsByteArray(16), 16);               // new encryption seeds
+    packet.append(seed2.AsByteArray(16), 16);               // new encryption seeds
 
     if (SendPacket (packet) == -1)
         return -1;
