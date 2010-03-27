@@ -889,7 +889,9 @@ enum PlayerLoginQueryIndex
     PLAYER_LOGIN_QUERY_LOADACCOUNTDATA          = 20,
     PLAYER_LOGIN_QUERY_LOADSKILLS               = 21,
     PLAYER_LOGIN_QUERY_LOADGLYPHS               = 22,
-    MAX_PLAYER_LOGIN_QUERY                      = 23
+    PLAYER_LOGIN_QUERY_LOADMAILS                = 23,
+    PLAYER_LOGIN_QUERY_LOADMAILEDITEMS          = 24,
+    MAX_PLAYER_LOGIN_QUERY                      = 25
 };
 
 enum PlayerDelayedOperations
@@ -2311,8 +2313,8 @@ class MANGOS_DLL_SPEC Player : public Unit
         void _LoadAuras(QueryResult *result, uint32 timediff);
         void _LoadBoundInstances(QueryResult *result);
         void _LoadInventory(QueryResult *result, uint32 timediff);
-        void _LoadMail();
-        void _LoadMailedItems(Mail *mail);
+        void _LoadMails(QueryResult *result);
+        void _LoadMailedItems(QueryResult *result);
         void _LoadQuestStatus(QueryResult *result);
         void _LoadDailyQuestStatus(QueryResult *result);
         void _LoadGroup(QueryResult *result);
