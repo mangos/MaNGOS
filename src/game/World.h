@@ -81,7 +81,7 @@ enum WorldTimers
 };
 
 /// Configuration elements
-enum eConfigUint32Values
+enum eConfigUInt32Values
 {
     CONFIG_UINT32_COMPRESSION = 0,
     CONFIG_UINT32_INTERVAL_SAVE,
@@ -184,7 +184,7 @@ enum eConfigInt32Values
 };
 
 /// Server config
-enum eConfigFLoatValues
+enum eConfigFloatValues
 {
     CONFIG_FLOAT_RATE_HEALTH = 0,
     CONFIG_FLOAT_RATE_POWER_MANA,
@@ -491,15 +491,15 @@ class World
 
         void UpdateSessions( uint32 diff );
 
-        /// et a server configuration element (see #eConfigFLoatValues)
-        void setConfig(eConfigFLoatValues index,float value) { m_configFloatValues[index]=value; }
-        /// Get a server configuration element (see #eConfigFLoatValues)
-        float getConfig(eConfigFLoatValues rate) const { return m_configFloatValues[rate]; }
+        /// et a server configuration element (see #eConfigFloatValues)
+        void setConfig(eConfigFloatValues index,float value) { m_configFloatValues[index]=value; }
+        /// Get a server configuration element (see #eConfigFloatValues)
+        float getConfig(eConfigFloatValues rate) const { return m_configFloatValues[rate]; }
 
-        /// Set a server configuration element (see #eConfigUint32Values)
-        void setConfig(eConfigUint32Values index, uint32 value) { m_configUint32Values[index]=value; }
-        /// Get a server configuration element (see #eConfigUint32Values)
-        uint32 getConfig(eConfigUint32Values index) const { return m_configUint32Values[index]; }
+        /// Set a server configuration element (see #eConfigUInt32Values)
+        void setConfig(eConfigUInt32Values index, uint32 value) { m_configUint32Values[index]=value; }
+        /// Get a server configuration element (see #eConfigUInt32Values)
+        uint32 getConfig(eConfigUInt32Values index) const { return m_configUint32Values[index]; }
 
         /// Set a server configuration element (see #eConfigInt32Values)
         void setConfig(eConfigInt32Values index, int32 value) { m_configInt32Values[index]=value; }
@@ -562,21 +562,21 @@ class World
         void InitDailyQuestResetTime();
         void ResetDailyQuests();
     private:
-        void setConfig(eConfigUint32Values index, char const* fieldname, uint32 defvalue);
+        void setConfig(eConfigUInt32Values index, char const* fieldname, uint32 defvalue);
         void setConfig(eConfigInt32Values index, char const* fieldname, int32 defvalue);
-        void setConfig(eConfigFLoatValues index, char const* fieldname, float defvalue);
+        void setConfig(eConfigFloatValues index, char const* fieldname, float defvalue);
         void setConfig(eConfigBoolValues index, char const* fieldname, bool defvalue);
-        void setConfigPos(eConfigUint32Values index, char const* fieldname, uint32 defvalue);
-        void setConfigPos(eConfigFLoatValues index, char const* fieldname, float defvalue);
-        void setConfigMin(eConfigUint32Values index, char const* fieldname, uint32 defvalue, uint32 minvalue);
+        void setConfigPos(eConfigUInt32Values index, char const* fieldname, uint32 defvalue);
+        void setConfigPos(eConfigFloatValues index, char const* fieldname, float defvalue);
+        void setConfigMin(eConfigUInt32Values index, char const* fieldname, uint32 defvalue, uint32 minvalue);
         void setConfigMin(eConfigInt32Values index, char const* fieldname, int32 defvalue, int32 minvalue);
-        void setConfigMin(eConfigFLoatValues index, char const* fieldname, float defvalue, float minvalue);
-        void setConfigMinMax(eConfigUint32Values index, char const* fieldname, uint32 defvalue, uint32 minvalue, uint32 maxvalue);
+        void setConfigMin(eConfigFloatValues index, char const* fieldname, float defvalue, float minvalue);
+        void setConfigMinMax(eConfigUInt32Values index, char const* fieldname, uint32 defvalue, uint32 minvalue, uint32 maxvalue);
         void setConfigMinMax(eConfigInt32Values index, char const* fieldname, int32 defvalue, int32 minvalue, int32 maxvalue);
-        void setConfigMinMax(eConfigFLoatValues index, char const* fieldname, float defvalue, float minvalue, float maxvalue);
-        bool configNoReload(bool reload, eConfigUint32Values index, char const* fieldname, uint32 defvalue);
+        void setConfigMinMax(eConfigFloatValues index, char const* fieldname, float defvalue, float minvalue, float maxvalue);
+        bool configNoReload(bool reload, eConfigUInt32Values index, char const* fieldname, uint32 defvalue);
         bool configNoReload(bool reload, eConfigInt32Values index, char const* fieldname, int32 defvalue);
-        bool configNoReload(bool reload, eConfigFLoatValues index, char const* fieldname, float defvalue);
+        bool configNoReload(bool reload, eConfigFloatValues index, char const* fieldname, float defvalue);
         bool configNoReload(bool reload, eConfigBoolValues index, char const* fieldname, bool defvalue);
 
         static volatile bool m_stopEvent;
