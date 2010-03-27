@@ -254,7 +254,7 @@ int WorldSocket::open (void *a)
     packet.append(seed1.AsByteArray(16), 16);               // new encryption seeds
 
     BigNumber seed2;
-    seed1.SetRand(16 * 8);
+    seed2.SetRand(16 * 8);
     packet.append(seed1.AsByteArray(16), 16);               // new encryption seeds
 
     if (SendPacket (packet) == -1)
