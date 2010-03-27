@@ -2957,7 +2957,7 @@ bool Player::addSpell(uint32 spell_id, bool active, bool learning, bool dependen
             if(active)
             {
                 if (IsPassiveSpell(spell_id) && IsNeedCastPassiveSpellAtLearn(spellInfo))
-                    CastSpell (this,spell_id,true);
+                    CastSpell (this, spell_id, true);
             }
             else if(IsInWorld())
             {
@@ -3023,10 +3023,10 @@ bool Player::addSpell(uint32 spell_id, bool active, bool learning, bool dependen
                 {
                     // skip learning spell and no rank spell case
                     uint32 rankSpellId = talentInfo->RankID[i];
-                    if(!rankSpellId || rankSpellId==spell_id)
+                    if(!rankSpellId || rankSpellId == spell_id)
                         continue;
 
-                    removeSpell(rankSpellId,false,false);
+                    removeSpell(rankSpellId, false, false);
                 }
             }
         }
@@ -3034,9 +3034,9 @@ bool Player::addSpell(uint32 spell_id, bool active, bool learning, bool dependen
         else if(uint32 prev_spell = sSpellMgr.GetPrevSpellInChain(spell_id))
         {
             if(!IsInWorld() || disabled)                    // at spells loading, no output, but allow save
-                addSpell(prev_spell,active,true,true,disabled);
+                addSpell(prev_spell, active, true, true, disabled);
             else                                            // at normal learning
-                learnSpell(prev_spell,true);
+                learnSpell(prev_spell, 0, true);
         }
 
         PlayerSpell newspell;
@@ -3054,7 +3054,7 @@ bool Player::addSpell(uint32 spell_id, bool active, bool learning, bool dependen
                 SpellEntry const *i_spellInfo = sSpellStore.LookupEntry(itr2->first);
                 if(!i_spellInfo) continue;
 
-                if( sSpellMgr.IsRankSpellDueToSpell(spellInfo,itr2->first) )
+                if( sSpellMgr.IsRankSpellDueToSpell(spellInfo, itr2->first) )
                 {
                     if(itr2->second.active)
                     {
@@ -3198,7 +3198,7 @@ bool Player::addSpell(uint32 spell_id, bool active, bool learning, bool dependen
             if (!IsInWorld() || !itr2->second.active)       // at spells loading, no output, but allow save
                 addSpell(itr2->second.spell,itr2->second.active,true,true,false);
             else                                            // at normal learning
-                learnSpell(itr2->second.spell,true);
+                learnSpell(itr2->second.spell, 0, true);
         }
     }
 
@@ -3228,14 +3228,14 @@ bool Player::IsNeedCastPassiveSpellAtLearn(SpellEntry const* spellInfo) const
     return need_cast && (!spellInfo->CasterAuraState || HasAuraState(AuraState(spellInfo->CasterAuraState)));
 }
 
-void Player::learnSpell(uint32 spell_id, bool dependent)
+void Player::learnSpell(uint32 spell_id, uint32 triggeredBySpell, bool dependent)
 {
     PlayerSpellMap::iterator itr = m_spells.find(spell_id);
 
     bool disabled = (itr != m_spells.end()) ? itr->second.disabled : false;
     bool active = disabled ? itr->second.active : true;
 
-    bool learning = addSpell(spell_id,active,true,dependent,false);
+    bool learning = addSpell(spell_id, active, true, dependent, false);
 
     // learn all disabled higher ranks (recursive)
     if(disabled)
@@ -3245,7 +3245,7 @@ void Player::learnSpell(uint32 spell_id, bool dependent)
         {
             PlayerSpellMap::iterator iter = m_spells.find(i->second);
             if (iter != m_spells.end() && iter->second.disabled)
-                learnSpell(i->second,false);
+                learnSpell(i->second, 0, false);
         }
     }
 
@@ -3253,8 +3253,9 @@ void Player::learnSpell(uint32 spell_id, bool dependent)
     if(!learning || !IsInWorld ())
         return;
 
-    WorldPacket data(SMSG_LEARNED_SPELL, 4);
-    data << uint32(spell_id);
+    WorldPacket data(SMSG_LEARNED_SPELL, 6);
+    data << uint32((triggeredBySpell == 0) ? spell_id : triggeredBySpell);
+    data << uint16(0);
     GetSession()->SendPacket(&data);
 }
 
@@ -3400,7 +3401,7 @@ void Player::removeSpell(uint32 spell_id, bool disabled, bool learn_low_rank, bo
         if (talentCosts)
         {
             if(learn_low_rank)
-                learnSpell (prev_id,false);
+                learnSpell(prev_id, 0, false);
         }
         // if ranked non-stackable spell: need activate lesser rank and update dendence state
         else if (cur_active && !SpellMgr::canStackSpellRanks(spellInfo) && sSpellMgr.GetSpellRank(spellInfo->Id) != 0)
@@ -5165,10 +5166,10 @@ bool Player::UpdateCraftSkill(uint32 spellid)
 
             // Alchemy Discoveries here
             SpellEntry const* spellEntry = sSpellStore.LookupEntry(spellid);
-            if (spellEntry && spellEntry->Mechanic==MECHANIC_DISCOVERY)
+            if (spellEntry && spellEntry->Mechanic == MECHANIC_DISCOVERY)
             {
                 if (uint32 discoveredSpell = GetSkillDiscoverySpell(_spell_idx->second->skillId, spellid, this))
-                    learnSpell(discoveredSpell,false);
+                    learnSpell(discoveredSpell, 0, false);
             }
 
             uint32 craft_skill_gain = sWorld.getConfig(CONFIG_UINT32_SKILL_GAIN_CRAFTING);
@@ -19208,9 +19209,9 @@ void Player::learnDefaultSpells()
         uint32 tspell = *itr;
         sLog.outDebug("PLAYER (Class: %u Race: %u): Adding initial spell, id = %u",uint32(getClass()),uint32(getRace()), tspell);
         if(!IsInWorld())                                    // will send in INITIAL_SPELLS in list anyway at map add
-            addSpell(tspell,true,true,true,false);
+            addSpell(tspell, true, true, true, false);
         else                                                // but send in normal spell in game learn case
-            learnSpell(tspell,true);
+            learnSpell(tspell, 0, true);
     }
 }
 
@@ -19306,7 +19307,7 @@ void Player::learnSkillRewardedSpells(uint32 skill_id, uint32 skill_value )
 {
     uint32 raceMask  = getRaceMask();
     uint32 classMask = getClassMask();
-    for (uint32 j=0; j<sSkillLineAbilityStore.GetNumRows(); ++j)
+    for (uint32 j = 0; j<sSkillLineAbilityStore.GetNumRows(); ++j)
     {
         SkillLineAbilityEntry const *pAbility = sSkillLineAbilityStore.LookupEntry(j);
         if (!pAbility || pAbility->skillId!=skill_id || pAbility->learnOnGetSkill != ABILITY_LEARNED_ON_GET_PROFESSION_SKILL)
@@ -19325,9 +19326,9 @@ void Player::learnSkillRewardedSpells(uint32 skill_id, uint32 skill_value )
                 removeSpell(pAbility->spellId);
             // need learn
             else if (!IsInWorld())
-                addSpell(pAbility->spellId,true,true,true,false);
+                addSpell(pAbility->spellId, true, true, true, false);
             else
-                learnSpell(pAbility->spellId,true);
+                learnSpell(pAbility->spellId, 0, true);
         }
     }
 }
@@ -20614,16 +20615,16 @@ bool Player::IsKnowHowFlyIn(uint32 mapid, uint32 zone) const
 struct DoPlayerLearnSpell
 {
     DoPlayerLearnSpell(Player& _player) : player(_player) {}
-    void operator() (uint32 spell_id) { player.learnSpell(spell_id,false); }
+    void operator() (uint32 spell_id) { player.learnSpell(spell_id, 0, false); }
     Player& player;
 };
 
 void Player::learnSpellHighRank(uint32 spellid)
 {
-    learnSpell(spellid,false);
+    learnSpell(spellid, 0, false);
 
     DoPlayerLearnSpell worker(*this);
-    sSpellMgr.doForHighRanks(spellid,worker);
+    sSpellMgr.doForHighRanks(spellid, worker);
 }
 
 void Player::_LoadSkills(QueryResult *result)
@@ -20971,7 +20972,7 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank)
         return;
 
     // learn! (other talent ranks will unlearned at learning)
-    learnSpell(spellid, false);
+    learnSpell(spellid, 0, false);
     sLog.outDetail("TalentID: %u Rank: %u Spell: %u\n", talentId, talentRank, spellid);
 
     // update free talent points

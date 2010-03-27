@@ -1543,7 +1543,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void SendProficiency(uint8 pr1, uint32 pr2);
         void SendInitialSpells();
         bool addSpell(uint32 spell_id, bool active, bool learning, bool dependent, bool disabled);
-        void learnSpell(uint32 spell_id, bool dependent);
+        void learnSpell(uint32 spell_id, uint32 triggeredBySpell, bool dependent);
         void removeSpell(uint32 spell_id, bool disabled = false, bool learn_low_rank = true, bool sendUpdate = true);
         void resetSpells();
         void learnDefaultSpells();

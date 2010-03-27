@@ -220,6 +220,8 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS]=
     &Spell::EffectNULL,                                     //160 SPELL_EFFECT_160                      single spell: Nerub'ar Web Random Unit
     &Spell::EffectSpecCount,                                //161 SPELL_EFFECT_TALENT_SPEC_COUNT        second talent spec (learn/revert)
     &Spell::EffectActivateSpec,                             //162 SPELL_EFFECT_TALENT_SPEC_SELECT       activate primary/secondary spec
+    &Spell::EffectNULL,                                     //163
+    &Spell::EffectNULL,                                     //164 cancel's some aura...
 };
 
 void Spell::EffectEmpty(SpellEffectIndex /*eff_idx*/)
@@ -3938,7 +3940,7 @@ void Spell::EffectLearnSpell(SpellEffectIndex eff_idx)
     Player *player = (Player*)unitTarget;
 
     uint32 spellToLearn = ((m_spellInfo->Id==SPELL_ID_GENERIC_LEARN) || (m_spellInfo->Id==SPELL_ID_GENERIC_LEARN_PET)) ? damage : m_spellInfo->EffectTriggerSpell[eff_idx];
-    player->learnSpell(spellToLearn,false);
+    player->learnSpell(spellToLearn, m_spellInfo->Id, false);
 
     sLog.outDebug( "Spell: Player %u has learned spell %u from NpcGUID=%u", player->GetGUIDLow(), spellToLearn, m_caster->GetGUIDLow() );
 }
@@ -5698,11 +5700,11 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
 
                     // learn random explicit discovery recipe (if any)
                     if (uint32 discoveredSpell = GetExplicitDiscoverySpell(m_spellInfo->Id, (Player*)m_caster))
-                        ((Player*)m_caster)->learnSpell(discoveredSpell, false);
+                        ((Player*)m_caster)->learnSpell(discoveredSpell, 0, false);
 
                     return;
                 }
-                case 69377:                                 //Fortitude
+                case 69377:                                 // Fortitude
                 {
                     if (!unitTarget)
                         return;
@@ -5710,7 +5712,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     m_caster->CastSpell(unitTarget, 72590, true);
                     return;
                 }
-                case 69378:                                 //Blessing of Forgotten Kings
+                case 69378:                                 // Blessing of Forgotten Kings
                 {
                     if (!unitTarget)
                         return;
@@ -5718,7 +5720,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     m_caster->CastSpell(unitTarget, 72586, true);
                     return;
                 }
-                case 69381:                                 //Gift of the Wild
+                case 69381:                                 // Gift of the Wild
                 {
                     if (!unitTarget)
                         return;
@@ -5807,15 +5809,15 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     uint32 spellID;
                     switch(entry)
                     {
-                        case   416: spellID = 54444; break; //imp
-                        case   417: spellID = 54509; break; //fellhunter
-                        case  1860: spellID = 54443; break; //void
-                        case  1863: spellID = 54435; break; //succubus
-                        case 17252: spellID = 54508; break; //fellguard
+                        case   416: spellID = 54444; break; // imp
+                        case   417: spellID = 54509; break; // fellhunter
+                        case  1860: spellID = 54443; break; // void
+                        case  1863: spellID = 54435; break; // succubus
+                        case 17252: spellID = 54508; break; // fellguard
                         default:
                             return;
                     }
-                    unitTarget->CastSpell(unitTarget,spellID,true);
+                    unitTarget->CastSpell(unitTarget, spellID, true);
                     return;
                 }
                 case 47422:                                 // Everlasting Affliction
@@ -5827,7 +5829,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                         SpellEntry const *spellInfo = (*itr).second->GetSpellProto();
                         if(spellInfo->SpellFamilyName == SPELLFAMILY_WARLOCK &&
                            (spellInfo->SpellFamilyFlags & UI64LIT(0x0000000000000002)) &&
-                           (*itr).second->GetCasterGUID()==m_caster->GetGUID())
+                           (*itr).second->GetCasterGUID() == m_caster->GetGUID())
                            (*itr).second->RefreshAura();
                     }
                     return;

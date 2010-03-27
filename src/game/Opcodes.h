@@ -470,7 +470,7 @@ enum Opcodes
     SMSG_TRAINER_LIST                               = 0x1B1,
     CMSG_TRAINER_BUY_SPELL                          = 0x1B2,
     SMSG_TRAINER_BUY_SUCCEEDED                      = 0x1B3,
-    SMSG_TRAINER_BUY_FAILED                         = 0x1B4,
+    SMSG_TRAINER_BUY_FAILED                         = 0x1B4, // uint64, uint32, uint32 (0...2)
     CMSG_BINDER_ACTIVATE                            = 0x1B5,
     SMSG_PLAYERBINDERROR                            = 0x1B6,
     CMSG_BANKER_ACTIVATE                            = 0x1B7,
