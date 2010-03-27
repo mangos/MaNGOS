@@ -4889,18 +4889,18 @@ bool ChatHandler::HandleQuestComplete(const char* args)
         if(uint32 spell_id = pQuest->ReqSpell[i])
         {
             for(uint16 z = 0; z < creaturecount; ++z)
-                player->CastedCreatureOrGO(creature, ObjectGuid::EmptyGuid, spell_id);
+                player->CastedCreatureOrGO(creature, ObjectGuid(), spell_id);
         }
         else if(creature > 0)
         {
             if(CreatureInfo const* cInfo = ObjectMgr::GetCreatureTemplate(creature))
                 for(uint16 z = 0; z < creaturecount; ++z)
-                    player->KilledMonster(cInfo, ObjectGuid::EmptyGuid);
+                    player->KilledMonster(cInfo, ObjectGuid());
         }
         else if(creature < 0)
         {
             for(uint16 z = 0; z < creaturecount; ++z)
-                player->CastedCreatureOrGO(-creature, ObjectGuid::EmptyGuid, 0);
+                player->CastedCreatureOrGO(-creature, ObjectGuid(), 0);
         }
     }
 

@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_9590_01_mangos_db_script_string` bit(1) default NULL
+  `required_9622_01_mangos_gameobject` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -1702,7 +1702,9 @@ CREATE TABLE `gameobject` (
   `spawntimesecs` int(11) NOT NULL default '0',
   `animprogress` tinyint(3) unsigned NOT NULL default '0',
   `state` tinyint(3) unsigned NOT NULL default '0',
-  PRIMARY KEY  (`guid`)
+  PRIMARY KEY  (`guid`),
+  KEY `idx_map` (`map`),
+  KEY `idx_id` (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Gameobject System';
 
 --

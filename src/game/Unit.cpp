@@ -369,16 +369,16 @@ void Unit::SendMonsterMove(float NewPosX, float NewPosY, float NewPosZ, SplineTy
             return;
         case SPLINETYPE_FACINGSPOT:                         // facing spot, not used currently
         {
-            data << float(va_arg(vargs,float));
-            data << float(va_arg(vargs,float));
-            data << float(va_arg(vargs,float));
+            data << float(va_arg(vargs,double));
+            data << float(va_arg(vargs,double));
+            data << float(va_arg(vargs,double));
             break;
         }
         case SPLINETYPE_FACINGTARGET:
             data << uint64(va_arg(vargs,uint64));
             break;
         case SPLINETYPE_FACINGANGLE:                        // not used currently
-            data << float(va_arg(vargs,float));             // facing angle
+            data << float(va_arg(vargs,double));            // facing angle
             break;
     }
 
@@ -1074,7 +1074,7 @@ void Unit::CastSpell(Unit* Victim, uint32 spellId, bool triggered, Item *castIte
         return;
     }
 
-    CastSpell(Victim, sSpellStore.LookupEntry(spellId), triggered, castItem, triggeredByAura, originalCaster);
+    CastSpell(Victim, spellInfo, triggered, castItem, triggeredByAura, originalCaster);
 }
 
 void Unit::CastSpell(Unit* Victim,SpellEntry const *spellInfo, bool triggered, Item *castItem, Aura* triggeredByAura, ObjectGuid originalCaster)

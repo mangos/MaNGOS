@@ -439,7 +439,7 @@ LogColors = ""
 #
 #    MinLevelForHeroicCharacterCreating
 #        Limit creating heroic characters only for account with another character of specific level (ignored for GM accounts)
-#                 0  - not require any existed chaarcter
+#                 0  - not require any existed character
 #                 1  - require at least any character existed
 #        Default: 55 - default requirement
 #
