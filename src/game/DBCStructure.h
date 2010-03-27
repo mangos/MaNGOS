@@ -1456,7 +1456,7 @@ struct SpellEntry
     //uint32  SpellDifficultyId;                            // 239      3.3.0
 
     // helpers
-    int32 CalculateSimpleValue(SpellEffectIndex eff) const { return EffectBasePoints[eff]+int32(1); }
+    int32 CalculateSimpleValue(SpellEffectIndex eff) const { return EffectBasePoints[eff] + int32(1); }
     uint32 const* GetEffectSpellClassMask(SpellEffectIndex effect) const
     {
         return EffectSpellClassMaskA + effect * 3;

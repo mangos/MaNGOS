@@ -3940,7 +3940,7 @@ void Spell::EffectLearnSpell(SpellEffectIndex eff_idx)
     Player *player = (Player*)unitTarget;
 
     uint32 spellToLearn = ((m_spellInfo->Id==SPELL_ID_GENERIC_LEARN) || (m_spellInfo->Id==SPELL_ID_GENERIC_LEARN_PET)) ? damage : m_spellInfo->EffectTriggerSpell[eff_idx];
-    player->learnSpell(spellToLearn, m_spellInfo->Id, false);
+    player->learnSpell(spellToLearn, false);
 
     sLog.outDebug( "Spell: Player %u has learned spell %u from NpcGUID=%u", player->GetGUIDLow(), spellToLearn, m_caster->GetGUIDLow() );
 }
@@ -4344,7 +4344,7 @@ void Spell::EffectLearnSkill(SpellEffectIndex eff_idx)
 
     uint32 skillid =  m_spellInfo->EffectMiscValue[eff_idx];
     uint16 skillval = ((Player*)unitTarget)->GetPureSkillValue(skillid);
-    ((Player*)unitTarget)->SetSkill(skillid, skillval ? skillval : 1, damage * 75);
+    ((Player*)unitTarget)->SetSkill(skillid, m_spellInfo->CalculateSimpleValue(eff_idx), skillval ? skillval : 1, damage * 75);
 }
 
 void Spell::EffectAddHonor(SpellEffectIndex /*eff_idx*/)
@@ -5700,7 +5700,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
 
                     // learn random explicit discovery recipe (if any)
                     if (uint32 discoveredSpell = GetExplicitDiscoverySpell(m_spellInfo->Id, (Player*)m_caster))
-                        ((Player*)m_caster)->learnSpell(discoveredSpell, 0, false);
+                        ((Player*)m_caster)->learnSpell(discoveredSpell, false);
 
                     return;
                 }

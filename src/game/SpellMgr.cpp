@@ -2113,15 +2113,16 @@ void SpellMgr::LoadSpellLearnSkills()
 
         for(int i = 0; i < MAX_EFFECT_INDEX; ++i)
         {
-            if(entry->Effect[i]==SPELL_EFFECT_SKILL)
+            if(entry->Effect[i] == SPELL_EFFECT_SKILL)
             {
                 SpellLearnSkillNode dbc_node;
                 dbc_node.skill    = entry->EffectMiscValue[i];
+                dbc_node.step     = entry->CalculateSimpleValue(SpellEffectIndex(i));
                 if ( dbc_node.skill != SKILL_RIDING )
                     dbc_node.value = 1;
                 else
-                    dbc_node.value = entry->CalculateSimpleValue(SpellEffectIndex(i))*75;
-                dbc_node.maxvalue = entry->CalculateSimpleValue(SpellEffectIndex(i))*75;
+                    dbc_node.value = dbc_node.step * 75;
+                dbc_node.maxvalue = dbc_node.step * 75;
 
                 mSpellLearnSkills[spell] = dbc_node;
                 ++dbc_count;

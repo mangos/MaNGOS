@@ -664,9 +664,10 @@ typedef std::multimap<uint32, uint32> SpellChainMapNext;
 // Spell learning properties (accessed using SpellMgr functions)
 struct SpellLearnSkillNode
 {
-    uint32 skill;
-    uint32 value;                                           // 0  - max skill value for player level
-    uint32 maxvalue;                                        // 0  - max skill value for player level
+    uint16 skill;
+    uint16 step;
+    uint16 value;                                           // 0  - max skill value for player level
+    uint16 maxvalue;                                        // 0  - max skill value for player level
 };
 
 typedef std::map<uint32, SpellLearnSkillNode> SpellLearnSkillMap;
