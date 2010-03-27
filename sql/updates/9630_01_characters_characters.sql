@@ -1,3 +1,5 @@
+ALTER TABLE character_db_version CHANGE COLUMN required_9611_01_characters required_9630_01_characters_characters bit;
+
 ALTER TABLE characters
   ADD COLUMN `exploredZones` longtext AFTER activeSpec,
   ADD COLUMN `equipmentCache` longtext AFTER exploredZones,
