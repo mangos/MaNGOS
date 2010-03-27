@@ -14655,7 +14655,7 @@ void Player::_LoadExploredZones(const char* data)
 {
     if(!data)
         return;
-    
+
     Tokens tokens = StrSplit(data, " ");
 
     if(tokens.size() != 128)
@@ -14669,6 +14669,24 @@ void Player::_LoadExploredZones(const char* data)
     }
 }
 
+void Player::_LoadKnownTitles(const char* data)
+{
+    if(!data)
+        return;
+
+    Tokens tokens = StrSplit(data, " ");
+
+    if(tokens.size() != 6)
+        return;
+
+    Tokens::iterator iter;
+    int index;
+    for (iter = tokens.begin(), index = 0; index < 6; ++iter, ++index)
+    {
+        m_uint32Values[PLAYER__FIELD_KNOWN_TITLES + index] = atol((*iter).c_str());
+    }
+}
+
 bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
 {
     //       0     1        2     3     4      5       6      7   8      9            10            11
@@ -14679,8 +14697,8 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
     //"resettalents_time, trans_x, trans_y, trans_z, trans_o, transguid, extra_flags, stable_slots, at_login, zone, online, death_expire_time, taxi_path, dungeon_difficulty,"
     // 39           40                41                42                    43          44          45              46           47               48              49
     //"arenaPoints, totalHonorPoints, todayHonorPoints, yesterdayHonorPoints, totalKills, todayKills, yesterdayKills, chosenTitle, knownCurrencies, watchedFaction, drunk,"
-    // 50      51      52      53      54      55      56      57      58         59          60             61              62
-    //"health, power1, power2, power3, power4, power5, power6, power7, specCount, activeSpec, exploredZones, equipmentCache, ammoId  FROM characters WHERE guid = '%u'", GUID_LOPART(m_guid));
+    // 50      51      52      53      54      55      56      57      58         59          60             61              62      63
+    //"health, power1, power2, power3, power4, power5, power6, power7, specCount, activeSpec, exploredZones, equipmentCache, ammoId, knownTitles  FROM characters WHERE guid = '%u'", GUID_LOPART(m_guid));
     QueryResult *result = holder->GetResult(PLAYER_LOGIN_QUERY_LOADFROM);
 
     if(!result)
@@ -14729,6 +14747,7 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
     SetUInt32Value(PLAYER_XP, fields[7].GetUInt32());
 
     _LoadExploredZones(fields[60].GetString());
+    _LoadKnownTitles(fields[63].GetString());
     SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, DEFAULT_WORLD_OBJECT_SIZE);
     SetFloatValue(UNIT_FIELD_COMBATREACH, 1.5f);
     SetFloatValue(UNIT_FIELD_HOVERHEIGHT, 1.0f);
@@ -16246,7 +16265,7 @@ void Player::SaveToDB()
         "trans_x, trans_y, trans_z, trans_o, transguid, extra_flags, stable_slots, at_login, zone, "
         "death_expire_time, taxi_path, arenaPoints, totalHonorPoints, todayHonorPoints, yesterdayHonorPoints, totalKills, "
         "todayKills, yesterdayKills, chosenTitle, knownCurrencies, watchedFaction, drunk, health, power1, power2, power3, "
-        "power4, power5, power6, power7, specCount, activeSpec, exploredZones, equipmentCache, ammoId) VALUES ("
+        "power4, power5, power6, power7, specCount, activeSpec, exploredZones, equipmentCache, ammoId, knownTitles) VALUES ("
         << GetGUIDLow() << ", "
         << GetSession()->GetAccountId() << ", '"
         << sql_name << "', "
@@ -16361,8 +16380,12 @@ void Player::SaveToDB()
     }
 
     ss << "',";
-    ss << GetUInt32Value(PLAYER_AMMO_ID);
-    ss << ")";
+    ss << GetUInt32Value(PLAYER_AMMO_ID) << ", '";
+    for(uint32 i = 0; i < 6; ++i )
+    {
+        ss << GetUInt32Value(PLAYER__FIELD_KNOWN_TITLES + i) << " ";
+    }
+    ss << "')";
 
     CharacterDatabase.Execute( ss.str().c_str() );
 
