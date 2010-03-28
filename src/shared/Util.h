@@ -27,6 +27,8 @@
 typedef std::vector<std::string> Tokens;
 
 Tokens StrSplit(const std::string &src, const std::string &sep);
+uint32 GetUInt32ValueFromArray(Tokens const& data, uint16 index);
+float GetFloatValueFromArray(Tokens const& data, uint16 index);
 
 void stripLineInvisibleChars(std::string &src);
 
