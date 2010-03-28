@@ -276,11 +276,11 @@ void AuthSocket::OnRead()
                 (table[i].status == STATUS_CONNECTED ||
                 (_authed && table[i].status == STATUS_AUTHED)))
             {
-                DEBUG_LOG("[Auth] got data for cmd %u ibuf length %u", (uint32)_cmd, ibuf.GetLength());
+                DEBUG_LOG("[Auth] got data for cmd %u ibuf length "SIZEFMTD" ", (uint32)_cmd, ibuf.GetLength());
 
                 if (!(*this.*table[i].handler)())
                 {
-                    DEBUG_LOG("Command handler failed for cmd %u ibuf length %u", (uint32)_cmd, ibuf.GetLength());
+                    DEBUG_LOG("Command handler failed for cmd %u ibuf length "SIZEFMTD" ", (uint32)_cmd, ibuf.GetLength());
                     return;
                 }
                 break;

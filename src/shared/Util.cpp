@@ -81,6 +81,23 @@ Tokens StrSplit(const std::string &src, const std::string &sep)
     return r;
 }
 
+uint32 GetUInt32ValueFromArray(Tokens const& data, uint16 index)
+{
+    if(index >= data.size())
+        return 0;
+
+    return (uint32)atoi(data[index].c_str());
+}
+
+float GetFloatValueFromArray(Tokens const& data, uint16 index)
+{
+    float result;
+    uint32 temp = GetUInt32ValueFromArray(data,index);
+    memcpy(&result, &temp, sizeof(result));
+
+    return result;
+}
+
 void stripLineInvisibleChars(std::string &str)
 {
     static std::string invChars = " \t\7\n";

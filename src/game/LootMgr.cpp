@@ -25,7 +25,7 @@
 #include "SharedDefines.h"
 #include "SpellMgr.h"
 
-static eConfigFLoatValues const qualityToRate[MAX_ITEM_QUALITY] = {
+static eConfigFloatValues const qualityToRate[MAX_ITEM_QUALITY] = {
     CONFIG_FLOAT_RATE_DROP_ITEM_POOR,                                    // ITEM_QUALITY_POOR
     CONFIG_FLOAT_RATE_DROP_ITEM_NORMAL,                                  // ITEM_QUALITY_NORMAL
     CONFIG_FLOAT_RATE_DROP_ITEM_UNCOMMON,                                // ITEM_QUALITY_UNCOMMON
