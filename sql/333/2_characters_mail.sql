@@ -1,3 +1,3 @@
-UPDATE `mail` SET `body` = (SELECT `text` FROM `item_text` WHERE `item_text`.`id`=`mail`.`itemTextId`);
-DELETE FROM `item_text` WHERE `id` IN (SELECT `itemTextId` FROM `mail`);
-ALTER TABLE `mail` DROP COLUMN `itemTextId`;
+UPDATE `mail` LEFT JOIN `item_text` ON `mail`.`itemtextid` = `item_text`.`id` SET `mail`.`body`=`item_text`.`text`;
+DELETE item_text FROM mail, item_text WHERE mail.itemtextid = item_text.id;
+ALTER TABLE `mail` DROP COLUMN `itemtextid`;
