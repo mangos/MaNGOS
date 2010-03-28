@@ -100,6 +100,9 @@ bool Corpse::Create( uint32 guidlow, Player *owner)
 
 void Corpse::SaveToDB()
 {
+    // bones should not be saved to DB (would be deleted on startup anyway)
+    assert(GetType() != CORPSE_BONES);
+
     // prevent DB data inconsistence problems and duplicates
     CharacterDatabase.BeginTransaction();
     DeleteFromDB();
@@ -137,12 +140,11 @@ void Corpse::DeleteBonesFromWorld()
 
 void Corpse::DeleteFromDB()
 {
-    if(GetType() == CORPSE_BONES)
-        // only specific bones
-        CharacterDatabase.PExecute("DELETE FROM corpse WHERE guid = '%d'", GetGUIDLow());
-    else
-        // all corpses (not bones)
-        CharacterDatabase.PExecute("DELETE FROM corpse WHERE player = '%d' AND corpse_type <> '0'",  GUID_LOPART(GetOwnerGUID()));
+    // bones should not be saved to DB (would be deleted on startup anyway)
+    assert(GetType() != CORPSE_BONES);
+
+    // all corpses (not bones)
+    CharacterDatabase.PExecute("DELETE FROM corpse WHERE player = '%d' AND corpse_type <> '0'",  GUID_LOPART(GetOwnerGUID()));
 }
 
 bool Corpse::LoadFromDB(uint32 guid, Field *fields)
