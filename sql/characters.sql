@@ -21,7 +21,7 @@
 
 DROP TABLE IF EXISTS `character_db_version`;
 CREATE TABLE `character_db_version` (
-  `required_9630_01_characters_characters` bit(1) default NULL
+  `required_9632_01_characters_characters` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Last applied sql update to DB';
 
 --
@@ -254,6 +254,7 @@ CREATE TABLE `characters` (
   `exploredZones` longtext,
   `equipmentCache` longtext,
   `ammoId` int(10) UNSIGNED NOT NULL default '0',
+  `knownTitles` longtext,
   PRIMARY KEY  (`guid`),
   KEY `idx_account` (`account`),
   KEY `idx_online` (`online`),

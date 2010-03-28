@@ -2326,6 +2326,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void _LoadBGData(QueryResult* result);
         void _LoadGlyphs(QueryResult *result);
         void _LoadExploredZones(const char* data);
+        void _LoadKnownTitles(const char* data);
 
         /*********************************************************/
         /***                   SAVE SYSTEM                     ***/
