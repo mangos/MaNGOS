@@ -312,7 +312,7 @@ class MANGOS_DLL_SPEC Group
         /***                   LOOT SYSTEM                     ***/
         /*********************************************************/
 
-        void SendLootStartRoll(uint32 CountDown, const Roll &r);
+        void SendLootStartRoll(uint32 CountDown, uint32 mapid, const Roll &r);
         void SendLootRoll(ObjectGuid const& targetGuid, uint8 rollNumber, uint8 rollType, const Roll &r);
         void SendLootRollWon(ObjectGuid const& targetGuid, uint8 rollNumber, uint8 rollType, const Roll &r);
         void SendLootAllPassed(const Roll &r);

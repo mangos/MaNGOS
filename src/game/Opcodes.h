@@ -1334,7 +1334,7 @@ enum Opcodes
     SMSG_UNKNOWN_1297                               = 0x511, //
     CMSG_UNKNOWN_1298                               = 0x512, // something with networking
     UMSG_UNKNOWN_1299                               = 0x513, // not found
-    SMSG_UNKNOWN_1300                               = 0x514, // SMSG
+    SMSG_UNKNOWN_1300                               = 0x514, // SMSG, multi combatlog
     SMSG_UNKNOWN_1301                               = 0x515, // event EVENT_LFG_OPEN_FROM_GOSSIP (opens dungeon finder, probably for outdoor bosses)
     SMSG_UNKNOWN_1302                               = 0x516, // something with player movement (move event 58?)
     CMSG_UNKNOWN_1303                               = 0x517, // something with player movement (move event 58?)
