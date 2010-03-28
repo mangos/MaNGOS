@@ -6259,8 +6259,12 @@ std::string ObjectMgr::GeneratePetName(uint32 entry)
 void ObjectMgr::LoadCorpses()
 {
     uint32 count = 0;
-    //                                                     0           1           2           3            4    5     6     7            8         10
-    QueryResult *result = CharacterDatabase.Query("SELECT position_x, position_y, position_z, orientation, map, data, time, corpse_type, instance, guid FROM corpse WHERE corpse_type <> 0");
+    //                                                    0            1       2                  3                  4                  5                   6
+    QueryResult *result = CharacterDatabase.Query("SELECT corpse.guid, player, corpse.position_x, corpse.position_y, corpse.position_z, corpse.orientation, corpse.map, "
+    //   7     8            9         10         11      12    13     14           15            16              17       18
+        "time, corpse_type, instance, phaseMask, gender, race, class, playerBytes, playerBytes2, equipmentCache, guildId, playerFlags FROM corpse "
+        "JOIN characters ON player = characters.guid "
+        "LEFT JOIN guild_member ON player=guild_member.guid WHERE corpse_type <> 0");
 
     if( !result )
     {
@@ -6281,7 +6285,7 @@ void ObjectMgr::LoadCorpses()
 
         Field *fields = result->Fetch();
 
-        uint32 guid = fields[result->GetFieldCount()-1].GetUInt32();
+        uint32 guid = fields[0].GetUInt32();
 
         Corpse *corpse = new Corpse;
         if(!corpse->LoadFromDB(guid,fields))
