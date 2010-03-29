@@ -7495,7 +7495,7 @@ void Spell::EffectBind(SpellEffectIndex eff_idx)
     data.Initialize(SMSG_PLAYERBOUND, 8+4);
     data << uint64(player->GetGUID());
     data << uint32(area_id);
-    player->SendMessageToSet( &data, true );
+    player->SendDirectMessage( &data );
 }
 
 void Spell::EffectRestoreItemCharges( SpellEffectIndex eff_idx )
