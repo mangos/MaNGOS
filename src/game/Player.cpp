@@ -6029,11 +6029,26 @@ void Player::RewardReputation(Unit *pVictim, float rate)
     if(!Rep)
         return;
 
+    uint32 tabardFactionId = 0;
+
+    // Has reputational tabard
+    if (HasAura(57818))
+    {
+        if (Item* pTabard = GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_TABARD))
+            tabardFactionId = pTabard->GetProto()->RequiredReputationFaction;
+    }
+
     if(Rep->repfaction1 && (!Rep->team_dependent || GetTeam()==ALLIANCE))
     {
-        int32 donerep1 = CalculateReputationGain(pVictim->getLevel(), Rep->repvalue1, Rep->repfaction1, false);
+        uint32 factionId = Rep->repfaction1;
+
+        // Alliance Vanguard
+        if (tabardFactionId && Rep->repfaction1 == 1037)
+            factionId = tabardFactionId;
+
+        int32 donerep1 = CalculateReputationGain(pVictim->getLevel(), Rep->repvalue1, factionId, false);
         donerep1 = int32(donerep1*rate);
-        FactionEntry const *factionEntry1 = sFactionStore.LookupEntry(Rep->repfaction1);
+        FactionEntry const *factionEntry1 = sFactionStore.LookupEntry(factionId);
         uint32 current_reputation_rank1 = GetReputationMgr().GetRank(factionEntry1);
         if (factionEntry1 && current_reputation_rank1 <= Rep->reputation_max_cap1)
             GetReputationMgr().ModifyReputation(factionEntry1, donerep1);
@@ -6049,9 +6064,15 @@ void Player::RewardReputation(Unit *pVictim, float rate)
 
     if(Rep->repfaction2 && (!Rep->team_dependent || GetTeam()==HORDE))
     {
-        int32 donerep2 = CalculateReputationGain(pVictim->getLevel(), Rep->repvalue2, Rep->repfaction2, false);
+        uint32 factionId = Rep->repfaction2;
+
+        // Horde Expedition
+        if (tabardFactionId && Rep->repfaction2 == 1052)
+            factionId = tabardFactionId;
+
+        int32 donerep2 = CalculateReputationGain(pVictim->getLevel(), Rep->repvalue2, factionId, false);
         donerep2 = int32(donerep2*rate);
-        FactionEntry const *factionEntry2 = sFactionStore.LookupEntry(Rep->repfaction2);
+        FactionEntry const *factionEntry2 = sFactionStore.LookupEntry(factionId);
         uint32 current_reputation_rank2 = GetReputationMgr().GetRank(factionEntry2);
         if (factionEntry2 && current_reputation_rank2 <= Rep->reputation_max_cap2)
             GetReputationMgr().ModifyReputation(factionEntry2, donerep2);
