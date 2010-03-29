@@ -195,7 +195,7 @@ void ReputationMgr::SendVisible(FactionState const* faction) const
     m_player->SendDirectMessage(&data);
 }
 
-void ReputationMgr::Initilize()
+void ReputationMgr::Initialize()
 {
     m_factions.clear();
     m_visibleFactionCount = 0;
@@ -386,7 +386,7 @@ void ReputationMgr::SetInactive(FactionState* faction, bool inactive)
 void ReputationMgr::LoadFromDB(QueryResult *result)
 {
     // Set initial reputations (so everything is nifty before DB data load)
-    Initilize();
+    Initialize();
 
     //QueryResult *result = CharacterDatabase.PQuery("SELECT faction,standing,flags FROM character_reputation WHERE guid = '%u'",GetGUIDLow());
 
