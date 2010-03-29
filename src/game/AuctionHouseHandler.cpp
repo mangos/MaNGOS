@@ -466,7 +466,7 @@ void WorldSession::HandleAuctionRemoveItem( WorldPacket & recv_data )
     else
     {
         SendAuctionCommandResult( 0, AUCTION_CANCEL, AUCTION_INTERNAL_ERROR );
-        //this code isn't possible ... maybe there should be assert
+        //this code isn't possible ... maybe there should be ASSERT
         sLog.outError("CHEATER : %u, he tried to cancel auction (id: %u) of another player, or auction is NULL", pl->GetGUIDLow(), auctionId );
         return;
     }
