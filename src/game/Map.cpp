@@ -2973,7 +2973,7 @@ void Map::ScriptsProcess()
                     break;
                 }
 
-                ((Creature *)source)->HandleEmoteCommand(step.script->datalong);
+                ((Creature *)source)->HandleEmote(step.script->datalong);
                 break;
             case SCRIPT_COMMAND_FIELD_SET:
                 if(!source)

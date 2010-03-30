@@ -854,7 +854,10 @@ void ObjectMgr::LoadCreatureAddons(SQLStorage& creatureaddons, char const* entry
         }
 
         if (!sEmotesStore.LookupEntry(addon->emote))
+        {
             sLog.outErrorDb("Creature (%s %u) have invalid emote (%u) defined in `%s`.", entryName, addon->guidOrEntry, addon->emote, creatureaddons.GetTableName());
+            const_cast<CreatureDataAddon*>(addon)->emote = 0;
+        }
 
         if (addon->splineFlags & (SPLINEFLAG_TRAJECTORY|SPLINEFLAG_UNKNOWN3))
         {
