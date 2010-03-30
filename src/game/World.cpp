@@ -919,7 +919,7 @@ void World::SetInitialWorldSettings()
     loginDatabase.PExecute("UPDATE realmlist SET icon = %u, timezone = %u WHERE id = '%d'", server_type, realm_zone, realmID);
 
     ///- Remove the bones after a restart
-    CharacterDatabase.PExecute("DELETE FROM corpse WHERE corpse_type = '0'");
+    CharacterDatabase.Execute("DELETE FROM corpse WHERE corpse_type = '0'");
 
     ///- Load the DBC files
     sLog.outString("Initialize data stores...");
@@ -1273,7 +1273,7 @@ void World::SetInitialWorldSettings()
     mail_timer_expires = uint32( (DAY * IN_MILISECONDS) / (m_timers[WUPDATE_AUCTIONS].GetInterval()));
     sLog.outDebug("Mail timer set to: %u, mail return is called every %u minutes", mail_timer, mail_timer_expires);
 
-    ///- Initilize static helper structures
+    ///- Initialize static helper structures
     AIRegistry::Initialize();
     Player::InitVisibleBits();
 
@@ -2056,7 +2056,7 @@ void World::LoadDBVersion()
         m_CreatureEventAIVersion = "Unknown creature EventAI.";
 }
 
-void World::setConfig(eConfigUint32Values index, char const* fieldname, uint32 defvalue)
+void World::setConfig(eConfigUInt32Values index, char const* fieldname, uint32 defvalue)
 {
     setConfig(index, sConfig.GetIntDefault(fieldname,defvalue));
 }
@@ -2066,7 +2066,7 @@ void World::setConfig(eConfigInt32Values index, char const* fieldname, int32 def
     setConfig(index, sConfig.GetIntDefault(fieldname,defvalue));
 }
 
-void World::setConfig(eConfigFLoatValues index, char const* fieldname, float defvalue)
+void World::setConfig(eConfigFloatValues index, char const* fieldname, float defvalue)
 {
     setConfig(index, sConfig.GetFloatDefault(fieldname,defvalue));
 }
@@ -2076,7 +2076,7 @@ void World::setConfig( eConfigBoolValues index, char const* fieldname, bool defv
     setConfig(index, sConfig.GetBoolDefault(fieldname,defvalue));
 }
 
-void World::setConfigPos(eConfigUint32Values index, char const* fieldname, uint32 defvalue)
+void World::setConfigPos(eConfigUInt32Values index, char const* fieldname, uint32 defvalue)
 {
     setConfig(index, fieldname, defvalue);
     if (int32(getConfig(index)) < 0)
@@ -2086,7 +2086,7 @@ void World::setConfigPos(eConfigUint32Values index, char const* fieldname, uint3
     }
 }
 
-void World::setConfigPos(eConfigFLoatValues index, char const* fieldname, float defvalue)
+void World::setConfigPos(eConfigFloatValues index, char const* fieldname, float defvalue)
 {
     setConfig(index, fieldname, defvalue);
     if (getConfig(index) < 0.0f)
@@ -2096,7 +2096,7 @@ void World::setConfigPos(eConfigFLoatValues index, char const* fieldname, float 
     }
 }
 
-void World::setConfigMin(eConfigUint32Values index, char const* fieldname, uint32 defvalue, uint32 minvalue)
+void World::setConfigMin(eConfigUInt32Values index, char const* fieldname, uint32 defvalue, uint32 minvalue)
 {
     setConfig(index, fieldname, defvalue);
     if (getConfig(index) < minvalue)
@@ -2116,7 +2116,7 @@ void World::setConfigMin(eConfigInt32Values index, char const* fieldname, int32 
     }
 }
 
-void World::setConfigMin(eConfigFLoatValues index, char const* fieldname, float defvalue, float minvalue)
+void World::setConfigMin(eConfigFloatValues index, char const* fieldname, float defvalue, float minvalue)
 {
     setConfig(index, fieldname, defvalue);
     if (getConfig(index) < minvalue)
@@ -2126,7 +2126,7 @@ void World::setConfigMin(eConfigFLoatValues index, char const* fieldname, float 
     }
 }
 
-void World::setConfigMinMax(eConfigUint32Values index, char const* fieldname, uint32 defvalue, uint32 minvalue, uint32 maxvalue)
+void World::setConfigMinMax(eConfigUInt32Values index, char const* fieldname, uint32 defvalue, uint32 minvalue, uint32 maxvalue)
 {
     setConfig(index, fieldname, defvalue);
     if (getConfig(index) < minvalue)
@@ -2156,7 +2156,7 @@ void World::setConfigMinMax(eConfigInt32Values index, char const* fieldname, int
     }
 }
 
-void World::setConfigMinMax(eConfigFLoatValues index, char const* fieldname, float defvalue, float minvalue, float maxvalue)
+void World::setConfigMinMax(eConfigFloatValues index, char const* fieldname, float defvalue, float minvalue, float maxvalue)
 {
     setConfig(index, fieldname, defvalue);
     if (getConfig(index) < minvalue)
@@ -2171,7 +2171,7 @@ void World::setConfigMinMax(eConfigFLoatValues index, char const* fieldname, flo
     }
 }
 
-bool World::configNoReload(bool reload, eConfigUint32Values index, char const* fieldname, uint32 defvalue)
+bool World::configNoReload(bool reload, eConfigUInt32Values index, char const* fieldname, uint32 defvalue)
 {
     if (!reload)
         return true;
@@ -2195,7 +2195,7 @@ bool World::configNoReload(bool reload, eConfigInt32Values index, char const* fi
     return false;
 }
 
-bool World::configNoReload(bool reload, eConfigFLoatValues index, char const* fieldname, float defvalue)
+bool World::configNoReload(bool reload, eConfigFloatValues index, char const* fieldname, float defvalue)
 {
     if (!reload)
         return true;
