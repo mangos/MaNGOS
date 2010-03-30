@@ -2072,28 +2072,37 @@ void ObjectMgr::LoadItemPrototypes()
             const_cast<ItemPrototype*>(proto)->HolidayId = 0;
         }
 
-        if(proto->NonConsumable)
+        if(proto->ExtraFlags)
         {
-            if (proto->NonConsumable > 1)
-            {
-                sLog.outErrorDb("Item (Entry: %u) has wrong NonConsumable (%u), must be 0..1",i,proto->NonConsumable);
-                const_cast<ItemPrototype*>(proto)->NonConsumable = 1;
-            }
+            if (proto->ExtraFlags & ~ITEM_EXTRA_ALL)
+                sLog.outErrorDb("Item (Entry: %u) has wrong ExtraFlags (%u) with unused bits set",i,proto->ExtraFlags);
 
-            bool can_be_need = false;
-            for (int j = 0; j < MAX_ITEM_PROTO_SPELLS; ++j)
+            if (proto->ExtraFlags & ITEM_EXTRA_NON_CONSUMABLE)
             {
-                if(proto->Spells[j].SpellCharges < 0)
+                bool can_be_need = false;
+                for (int j = 0; j < MAX_ITEM_PROTO_SPELLS; ++j)
                 {
-                    can_be_need = true;
-                    break;
+                    if(proto->Spells[j].SpellCharges < 0)
+                    {
+                        can_be_need = true;
+                        break;
+                    }
+                }
+
+                if (!can_be_need)
+                {
+                    sLog.outErrorDb("Item (Entry: %u) has redundant non-consumable flag in ExtraFlags, item not have negative charges", i);
+                    const_cast<ItemPrototype*>(proto)->ExtraFlags &= ~ITEM_EXTRA_NON_CONSUMABLE;
                 }
             }
 
-            if (!can_be_need)
+            if (proto->ExtraFlags & ITEM_EXTRA_REAL_TIME_DURATION)
             {
-                sLog.outErrorDb("Item (Entry: %u) has redundant NonConsumable (%u), item not have negative charges",i,proto->NonConsumable);
-                const_cast<ItemPrototype*>(proto)->NonConsumable = 0;
+                if (proto->Duration == 0)
+                {
+                    sLog.outErrorDb("Item (Entry: %u) has redundant real-time duration flag in ExtraFlags, item not have duration", i);
+                    const_cast<ItemPrototype*>(proto)->ExtraFlags &= ~ITEM_EXTRA_REAL_TIME_DURATION;
+                }
             }
         }
     }
