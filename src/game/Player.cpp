@@ -971,7 +971,7 @@ void Player::HandleDrowning(uint32 time_diff)
     }
 
     // In dark water
-    if (m_MirrorTimerFlags & UNDERWARER_INDARKWATER)
+    if (m_MirrorTimerFlags & UNDERWATER_INDARKWATER)
     {
         // Fatigue timer not activated - activate it
         if (m_MirrorTimer[FATIGUE_TIMER] == DISABLED_MIRROR_TIMER)
@@ -994,7 +994,7 @@ void Player::HandleDrowning(uint32 time_diff)
                 else if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))       // Teleport ghost to graveyard
                     RepopAtGraveyard();
             }
-            else if (!(m_MirrorTimerFlagsLast & UNDERWARER_INDARKWATER))
+            else if (!(m_MirrorTimerFlagsLast & UNDERWATER_INDARKWATER))
                 SendMirrorTimer(FATIGUE_TIMER, getMaxTimer(FATIGUE_TIMER), m_MirrorTimer[FATIGUE_TIMER], -1);
         }
     }
@@ -1004,7 +1004,7 @@ void Player::HandleDrowning(uint32 time_diff)
         m_MirrorTimer[FATIGUE_TIMER]+=10*time_diff;
         if (m_MirrorTimer[FATIGUE_TIMER] >= DarkWaterTime || !isAlive())
             StopMirrorTimer(FATIGUE_TIMER);
-        else if (m_MirrorTimerFlagsLast & UNDERWARER_INDARKWATER)
+        else if (m_MirrorTimerFlagsLast & UNDERWATER_INDARKWATER)
             SendMirrorTimer(FATIGUE_TIMER, DarkWaterTime, m_MirrorTimer[FATIGUE_TIMER], 10);
     }
 
@@ -20095,7 +20095,7 @@ void Player::UpdateUnderwaterState( Map* m, float x, float y, float z )
     ZLiquidStatus res = m->getLiquidStatus(x, y, z, MAP_ALL_LIQUIDS, &liquid_status);
     if (!res)
     {
-        m_MirrorTimerFlags &= ~(UNDERWATER_INWATER|UNDERWATER_INLAVA|UNDERWATER_INSLIME|UNDERWARER_INDARKWATER);
+        m_MirrorTimerFlags &= ~(UNDERWATER_INWATER|UNDERWATER_INLAVA|UNDERWATER_INSLIME|UNDERWATER_INDARKWATER);
         // Small hack for enable breath in WMO
         if (IsInWater())
             m_MirrorTimerFlags|=UNDERWATER_INWATER;
@@ -20113,9 +20113,9 @@ void Player::UpdateUnderwaterState( Map* m, float x, float y, float z )
 
     // Allow travel in dark water on taxi or transport
     if ((liquid_status.type & MAP_LIQUID_TYPE_DARK_WATER) && !isInFlight() && !GetTransport())
-        m_MirrorTimerFlags |= UNDERWARER_INDARKWATER;
+        m_MirrorTimerFlags |= UNDERWATER_INDARKWATER;
     else
-        m_MirrorTimerFlags &= ~UNDERWARER_INDARKWATER;
+        m_MirrorTimerFlags &= ~UNDERWATER_INDARKWATER;
 
     // in lava check, anywhere in lava level
     if (liquid_status.type&MAP_LIQUID_TYPE_MAGMA)
