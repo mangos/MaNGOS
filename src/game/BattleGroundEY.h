@@ -23,8 +23,8 @@
 
 class BattleGround;
 
-#define BG_EY_FLAG_RESPAWN_TIME         (10*IN_MILISECONDS) //10 seconds
-#define BG_EY_FPOINTS_TICK_TIME         (2*IN_MILISECONDS)  //2 seconds
+#define BG_EY_FLAG_RESPAWN_TIME         (10*IN_MILLISECONDS) //10 seconds
+#define BG_EY_FPOINTS_TICK_TIME         (2*IN_MILLISECONDS)  //2 seconds
 
 enum BG_EY_WorldStates
 {

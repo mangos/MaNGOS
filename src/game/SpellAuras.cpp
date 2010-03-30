@@ -615,7 +615,7 @@ void Aura::Update(uint32 diff)
             {
                 Powers powertype = Powers(m_spellProto->powerType);
                 int32 manaPerSecond = m_spellProto->manaPerSecond + m_spellProto->manaPerSecondPerLevel * caster->getLevel();
-                m_timeCla = 1*IN_MILISECONDS;
+                m_timeCla = 1*IN_MILLISECONDS;
                 if (manaPerSecond)
                 {
                     if(powertype==POWER_HEALTH)
@@ -2293,7 +2293,7 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                     case 7057:                              // Haunting Spirits
                         // expected to tick with 30 sec period (tick part see in Aura::PeriodicTick)
                         m_isPeriodic = true;
-                        m_modifier.periodictime = 30*IN_MILISECONDS;
+                        m_modifier.periodictime = 30*IN_MILLISECONDS;
                         m_periodicTimer = m_modifier.periodictime;
                         return;
                     case 13139:                             // net-o-matic
@@ -3403,7 +3403,7 @@ void Aura::HandleAuraTransform(bool apply, bool Real)
             // for players, start regeneration after 1s (in polymorph fast regeneration case)
             // only if caster is Player (after patch 2.4.2)
             if (IS_PLAYER_GUID(GetCasterGUID()) )
-                ((Player*)m_target)->setRegenTimer(1*IN_MILISECONDS);
+                ((Player*)m_target)->setRegenTimer(1*IN_MILLISECONDS);
 
             //dismount polymorphed target (after patch 2.4.2)
             if (m_target->IsMounted())
@@ -3925,7 +3925,7 @@ void Aura::HandleAuraModStun(bool apply, bool Real)
             if(pObj->Create(sObjectMgr.GenerateLowGuid(HIGHGUID_GAMEOBJECT), 185584, m_target->GetMap(), m_target->GetPhaseMask(),
                 m_target->GetPositionX(), m_target->GetPositionY(), m_target->GetPositionZ(), m_target->GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 100, GO_STATE_READY))
             {
-                pObj->SetRespawnTime(GetAuraDuration()/IN_MILISECONDS);
+                pObj->SetRespawnTime(GetAuraDuration()/IN_MILLISECONDS);
                 pObj->SetSpellId(GetId());
                 m_target->AddGameObject(pObj);
                 m_target->GetMap()->Add(pObj);

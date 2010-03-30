@@ -3659,7 +3659,11 @@ bool ChatHandler::HandleModifyStandStateCommand(const char* args)
         return false;
 
     uint32 anim_id = atoi((char*)args);
-    m_session->GetPlayer( )->SetUInt32Value( UNIT_NPC_EMOTESTATE , anim_id );
+
+    if (!sEmotesStore.LookupEntry(anim_id))
+        return false;
+
+    m_session->GetPlayer()->HandleEmoteState(anim_id);
 
     return true;
 }
