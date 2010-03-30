@@ -11557,7 +11557,7 @@ int32 Unit::CalculateSpellDuration(SpellEntry const* spellProto, SpellEffectInde
                 {
                     // Glyph of Thorns
                     if (Aura *aur = GetAura(57862, EFFECT_INDEX_0))
-                        duration += aur->GetModifier()->m_amount * MINUTE * IN_MILISECONDS;
+                        duration += aur->GetModifier()->m_amount * MINUTE * IN_MILLISECONDS;
                 }
                 break;
             case SPELLFAMILY_PALADIN:
@@ -11565,13 +11565,13 @@ int32 Unit::CalculateSpellDuration(SpellEntry const* spellProto, SpellEffectInde
                 {
                     // Glyph of Blessing of Might
                     if (Aura *aur = GetAura(57958, EFFECT_INDEX_0))
-                        duration += aur->GetModifier()->m_amount * MINUTE * IN_MILISECONDS;
+                        duration += aur->GetModifier()->m_amount * MINUTE * IN_MILLISECONDS;
                 }
                 else if (spellProto->SpellIconID == 306 && spellProto->SpellFamilyFlags & UI64LIT(0x00010000))
                 {
                     // Glyph of Blessing of Wisdom
                     if (Aura *aur = GetAura(57979, EFFECT_INDEX_0))
-                        duration += aur->GetModifier()->m_amount * MINUTE * IN_MILISECONDS;
+                        duration += aur->GetModifier()->m_amount * MINUTE * IN_MILLISECONDS;
                 }
                 break;
             default:
