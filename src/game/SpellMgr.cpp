@@ -555,6 +555,7 @@ bool IsPositiveEffect(uint32 spellId, SpellEffectIndex effIndex)
                         return true;                        // some expected positive spells have SPELL_ATTR_EX_NEGATIVE or unclear target modes
                     break;
                 case SPELL_AURA_ADD_TARGET_TRIGGER:
+                case SPELL_AURA_INITIALIZE_IMAGES:
                     return true;
                 case SPELL_AURA_PERIODIC_TRIGGER_SPELL:
                     if (spellId != spellproto->EffectTriggerSpell[effIndex])
