@@ -334,7 +334,7 @@ pAuraHandler AuraHandler[TOTAL_AURAS]=
     &Aura::HandleNoImmediateEffect,                         //281 SPELL_AURA_MOD_HONOR_GAIN             implemented in Player::RewardHonor
     &Aura::HandleAuraIncreaseBaseHealthPercent,             //282 SPELL_AURA_INCREASE_BASE_HEALTH_PERCENT
     &Aura::HandleNoImmediateEffect,                         //283 SPELL_AURA_MOD_HEALING_RECEIVED       implemented in Unit::SpellHealingBonus
-    &Aura::HandleNULL,                                      //284 51 spells
+    &Aura::HandleAuraLinked,                                //284 SPELL_AURA_LINKED
     &Aura::HandleAuraModAttackPowerOfArmor,                 //285 SPELL_AURA_MOD_ATTACK_POWER_OF_ARMOR  implemented in Player::UpdateAttackPowerAndDamage
     &Aura::HandleNoImmediateEffect,                         //286 SPELL_AURA_ABILITY_PERIODIC_CRIT      implemented in Aura::IsCritFromAbilityAura called from Aura::PeriodicTick
     &Aura::HandleNoImmediateEffect,                         //287 SPELL_AURA_DEFLECT_SPELLS             implemented in Unit::MagicSpellHitResult and Unit::MeleeSpellHitResult
@@ -8564,4 +8564,30 @@ void Aura::HandleAllowOnlyAbility(bool apply, bool Real)
     m_target->UpdateDamagePhysical(BASE_ATTACK);
     m_target->UpdateDamagePhysical(RANGED_ATTACK);
     m_target->UpdateDamagePhysical(OFF_ATTACK);
+}
+
+void Aura::HandleAuraLinked(bool apply, bool Real)
+{
+    if(!Real)
+        return;
+
+    uint32 linked_spell_id = GetSpellProto()->EffectTriggerSpell[GetEffIndex()];
+    int32 basepoints = GetModifier()->m_amount;
+
+    SpellEntry const *spellInfo = sSpellStore.LookupEntry(linked_spell_id);
+    if (!spellInfo)
+    {
+        sLog.outError("HandleAuraLinked of spell %u: triggering unknown spell id %i", GetSpellProto()->Id, linked_spell_id);
+        return;
+    }
+
+    if (apply)
+    {
+        if (basepoints)
+            m_target->CastCustomSpell(m_target, spellInfo, &basepoints, NULL, NULL, true, NULL, this, GetCaster() ? GetCaster()->GetGUID() : NULL);
+        else
+            m_target->CastSpell(m_target, spellInfo, true, NULL, this, GetCaster() ? GetCaster()->GetGUID() : NULL);
+    }
+    else
+        m_target->RemoveAurasDueToSpell(linked_spell_id);
 }
