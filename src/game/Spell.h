@@ -695,7 +695,7 @@ namespace MaNGOS
 
         template<class T> inline void Visit(GridRefManager<T>  &m)
         {
-            assert(i_data);
+            ASSERT(i_data);
 
             if(!i_originalCaster)
                 return;
