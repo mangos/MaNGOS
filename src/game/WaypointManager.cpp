@@ -103,7 +103,7 @@ void WaypointManager::Load()
 
         WaypointPath &path  = m_pathMap[id];
         // the cleanup queries make sure the following is true
-        assert(point >= 1 && point <= path.size());
+        ASSERT(point >= 1 && point <= path.size());
         WaypointNode &node  = path[point-1];
 
         node.x              = fields[0].GetFloat();
@@ -191,7 +191,7 @@ void WaypointManager::Cleanup()
         WorldDatabase.DirectExecute("UPDATE creature_movement AS T SET point = (SELECT COUNT(*) FROM temp WHERE id = T.id AND point <= T.point)");
         WorldDatabase.DirectExecute("ALTER TABLE creature_movement ADD PRIMARY KEY (id, point)");
         WorldDatabase.DirectExecute("DROP TABLE temp");
-        assert(!(result = WorldDatabase.Query("SELECT 1 from creature_movement As T WHERE point <> (SELECT COUNT(*) FROM creature_movement WHERE id = T.id AND point <= T.point) LIMIT 1")));
+        ASSERT(!(result = WorldDatabase.Query("SELECT 1 from creature_movement As T WHERE point <> (SELECT COUNT(*) FROM creature_movement WHERE id = T.id AND point <= T.point) LIMIT 1")));
     }
 }
 

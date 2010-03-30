@@ -496,7 +496,7 @@ void Pet::Update(uint32 diff)
         {
             if( m_deathTimer <= diff )
             {
-                assert(getPetType()!=SUMMON_PET && "Must be already removed.");
+                ASSERT(getPetType()!=SUMMON_PET && "Must be already removed.");
                 Remove(PET_SAVE_NOT_IN_SLOT);               //hunters' pets never get removed because of death, NEVER!
                 return;
             }
@@ -801,7 +801,7 @@ bool Pet::CreateBaseAtCreature(Creature* creature)
 bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
 {
     CreatureInfo const *cinfo = GetCreatureInfo();
-    assert(cinfo);
+    ASSERT(cinfo);
 
     if(!owner)
     {
@@ -1058,7 +1058,7 @@ void Pet::_LoadSpellCooldowns()
                 continue;
 
             data << uint32(spell_id);
-            data << uint32(uint32(db_time-curTime)*IN_MILISECONDS);
+            data << uint32(uint32(db_time-curTime)*IN_MILLISECONDS);
 
             _AddCreatureSpellCooldown(spell_id,db_time);
 
@@ -1179,10 +1179,10 @@ void Pet::_LoadAuras(uint32 timediff)
             // negative effects should continue counting down after logout
             if (remaintime != -1 && !IsPositiveEffect(spellid, effindex))
             {
-                if (remaintime/IN_MILISECONDS <= int32(timediff))
+                if (remaintime/IN_MILLISECONDS <= int32(timediff))
                     continue;
 
-                remaintime -= timediff*IN_MILISECONDS;
+                remaintime -= timediff*IN_MILLISECONDS;
             }
 
             // prevent wrong values of remaincharges

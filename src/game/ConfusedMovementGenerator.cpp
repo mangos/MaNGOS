@@ -140,7 +140,7 @@ bool ConfusedMovementGenerator<T>::Update(T &unit, const uint32 &diff)
         {
             // start moving
             unit.addUnitState(UNIT_STAT_CONFUSED_MOVE);
-            assert( i_nextMove <= MAX_CONF_WAYPOINTS );
+            ASSERT( i_nextMove <= MAX_CONF_WAYPOINTS );
             const float x = i_waypoints[i_nextMove][0];
             const float y = i_waypoints[i_nextMove][1];
             const float z = i_waypoints[i_nextMove][2];
