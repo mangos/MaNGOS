@@ -124,7 +124,7 @@ class ReputationMgr
         void SendStates() const;
 
     private:                                                // internal helper functions
-        void Initialize();
+        void Initilize();
         uint32 GetDefaultStateFlags(const FactionEntry *factionEntry) const;
         bool SetReputation(FactionEntry const* factionEntry, int32 standing, bool incremental);
         bool SetOneFactionReputation(FactionEntry const* factionEntry, int32 standing, bool incremental);
