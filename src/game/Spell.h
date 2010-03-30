@@ -233,7 +233,7 @@ enum SpellTargets
     SPELL_TARGETS_AOE_DAMAGE
 };
 
-#define SPELL_SPELL_CHANNEL_UPDATE_INTERVAL (1*IN_MILISECONDS)
+#define SPELL_SPELL_CHANNEL_UPDATE_INTERVAL (1*IN_MILLISECONDS)
 
 typedef std::multimap<uint64, uint64> SpellTargetTimeMap;
 
