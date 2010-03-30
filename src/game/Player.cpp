@@ -14819,7 +14819,7 @@ bool Player::MinimalLoadFromDB( QueryResult *result, uint32 guid )
     if (!result)
     {
         //                                        0     1     2     3           4           5           6    7          8          9         10    11
-        result = CharacterDatabase.PQuery("SELECT guid, data, name, position_x, position_y, position_z, map, totaltime, leveltime, at_login, zone, level FROM characters WHERE guid = '%u'",guid);
+        result = CharacterDatabase.PQuery("SELECT guid, name, position_x, position_y, position_z, map, totaltime, leveltime, at_login, zone, level FROM characters WHERE guid = '%u'",guid);
         if (!result)
             return false;
     }
@@ -14830,7 +14830,7 @@ bool Player::MinimalLoadFromDB( QueryResult *result, uint32 guid )
 
     if (!LoadValues( fields[1].GetString()))
     {
-        sLog.outError("Player #%d have broken data in `data` field. Can't be loaded for character list.",GUID_LOPART(guid));
+        sLog.outError("Player #%d have broken data in `name` field. Can't be loaded for character list.",GUID_LOPART(guid));
         if (delete_result)
             delete result;
         return false;
@@ -14839,17 +14839,17 @@ bool Player::MinimalLoadFromDB( QueryResult *result, uint32 guid )
     // overwrite possible wrong/corrupted guid
     SetUInt64Value(OBJECT_FIELD_GUID, MAKE_NEW_GUID(guid, 0, HIGHGUID_PLAYER));
 
-    m_name = fields[2].GetCppString();
+    m_name = fields[1].GetCppString();
 
-    Relocate(fields[3].GetFloat(),fields[4].GetFloat(),fields[5].GetFloat());
-    SetLocationMapId(fields[6].GetUInt32());
+    Relocate(fields[2].GetFloat(),fields[3].GetFloat(),fields[4].GetFloat());
+    SetLocationMapId(fields[5].GetUInt32());
 
     // the instance id is not needed at character enum
 
-    m_Played_time[PLAYED_TIME_TOTAL] = fields[7].GetUInt32();
-    m_Played_time[PLAYED_TIME_LEVEL] = fields[8].GetUInt32();
+    m_Played_time[PLAYED_TIME_TOTAL] = fields[6].GetUInt32();
+    m_Played_time[PLAYED_TIME_LEVEL] = fields[7].GetUInt32();
 
-    m_atLoginFlags = fields[9].GetUInt32();
+    m_atLoginFlags = fields[8].GetUInt32();
 
     // I don't see these used anywhere ..
     /*_LoadGroup();
