@@ -520,14 +520,13 @@ void WorldSession::HandleQuestPOIQuery(WorldPacket& recv_data)
                 data << uint32(questId);                    // quest ID
                 data << uint32(POI->size());                // POI count
 
-                int index = 0;
                 for(QuestPOIVector::const_iterator itr = POI->begin(); itr != POI->end(); ++itr)
                 {
-                    data << uint32(index);                  // POI index
+                    data << uint32(itr->PoiId);             // POI index
                     data << int32(itr->ObjectiveIndex);     // objective index
                     data << uint32(itr->MapId);             // mapid
-                    data << uint32(itr->Unk1);              // unknown
-                    data << uint32(itr->Unk2);              // unknown
+                    data << uint32(itr->MapAreaId);         // world map area id
+                    data << uint32(itr->FloorId);           // floor id
                     data << uint32(itr->Unk3);              // unknown
                     data << uint32(itr->Unk4);              // unknown
                     data << uint32(itr->points.size());     // POI points count
@@ -537,7 +536,6 @@ void WorldSession::HandleQuestPOIQuery(WorldPacket& recv_data)
                         data << int32(itr2->x);             // POI point x
                         data << int32(itr2->y);             // POI point y
                     }
-                    ++index;
                 }
             }
             else
@@ -553,7 +551,6 @@ void WorldSession::HandleQuestPOIQuery(WorldPacket& recv_data)
         }
     }
 
-    data.hexlike();
     SendPacket(&data);
 }
 
