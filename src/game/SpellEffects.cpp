@@ -2107,7 +2107,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     if (!unitTarget)
                         return;
 
-                    uint32 spell_id = m_currentBasePoints[eff_idx]+1;
+                    uint32 spell_id = m_currentBasePoints[eff_idx];
                     SpellEntry const* spell_proto = sSpellStore.LookupEntry(spell_id);
                     if (!spell_proto)
                         return;
@@ -3197,9 +3197,9 @@ void Spell::DoCreateItem(SpellEffectIndex eff_idx, uint32 itemtype)
         int32 basePoints = m_currentBasePoints[eff_idx];
         int32 randomPoints = m_spellInfo->EffectDieSides[eff_idx];
         if (randomPoints)
-            num_to_add = basePoints + irand(1, randomPoints);
+            num_to_add = basePoints + irand(0, randomPoints);
         else
-            num_to_add = basePoints + 1;
+            num_to_add = basePoints;
     }
     else if (pProto->MaxCount == 1)
         num_to_add = 1;
@@ -3207,7 +3207,7 @@ void Spell::DoCreateItem(SpellEffectIndex eff_idx, uint32 itemtype)
     {
         int32 basePoints = m_currentBasePoints[eff_idx];
         float pointPerLevel = m_spellInfo->EffectRealPointsPerLevel[eff_idx];
-        num_to_add = basePoints + 1 + uint32((player->getLevel() - m_spellInfo->spellLevel)*pointPerLevel);
+        num_to_add = basePoints + uint32((player->getLevel() - m_spellInfo->spellLevel)*pointPerLevel);
     }
     else
         num_to_add = 2;
@@ -6439,11 +6439,11 @@ void Spell::EffectEnchantHeldItem(SpellEffectIndex eff_idx)
     if (m_spellInfo->EffectMiscValue[eff_idx])
     {
         uint32 enchant_id = m_spellInfo->EffectMiscValue[eff_idx];
-        int32 duration = GetSpellDuration(m_spellInfo);          //Try duration index first ..
+        int32 duration = GetSpellDuration(m_spellInfo);     // Try duration index first...
         if(!duration)
-            duration = m_currentBasePoints[eff_idx]+1;            //Base points after ..
+            duration = m_currentBasePoints[eff_idx];        // Base points after...
         if(!duration)
-            duration = 10;                                  //10 seconds for enchants which don't have listed duration
+            duration = 10;                                  // 10 seconds for enchants which don't have listed duration
 
         SpellItemEnchantmentEntry const *pEnchant = sSpellItemEnchantmentStore.LookupEntry(enchant_id);
         if(!pEnchant)
@@ -6704,7 +6704,7 @@ void Spell::EffectReputation(SpellEffectIndex eff_idx)
 
     Player *_player = (Player*)unitTarget;
 
-    int32  rep_change = m_currentBasePoints[eff_idx]+1;           // field store reputation change -1
+    int32  rep_change = m_currentBasePoints[eff_idx];       // field store reputation change -1
 
     uint32 faction_id = m_spellInfo->EffectMiscValue[eff_idx];
 
