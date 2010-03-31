@@ -1008,7 +1008,7 @@ void Player::HandleDrowning(uint32 time_diff)
     }
 
     // In dark water
-    if (m_MirrorTimerFlags & UNDERWARER_INDARKWATER)
+    if (m_MirrorTimerFlags & UNDERWATER_INDARKWATER)
     {
         // Fatigue timer not activated - activate it
         if (m_MirrorTimer[FATIGUE_TIMER] == DISABLED_MIRROR_TIMER)
@@ -1031,7 +1031,7 @@ void Player::HandleDrowning(uint32 time_diff)
                 else if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))       // Teleport ghost to graveyard
                     RepopAtGraveyard();
             }
-            else if (!(m_MirrorTimerFlagsLast & UNDERWARER_INDARKWATER))
+            else if (!(m_MirrorTimerFlagsLast & UNDERWATER_INDARKWATER))
                 SendMirrorTimer(FATIGUE_TIMER, getMaxTimer(FATIGUE_TIMER), m_MirrorTimer[FATIGUE_TIMER], -1);
         }
     }
@@ -1041,7 +1041,7 @@ void Player::HandleDrowning(uint32 time_diff)
         m_MirrorTimer[FATIGUE_TIMER]+=10*time_diff;
         if (m_MirrorTimer[FATIGUE_TIMER] >= DarkWaterTime || !isAlive())
             StopMirrorTimer(FATIGUE_TIMER);
-        else if (m_MirrorTimerFlagsLast & UNDERWARER_INDARKWATER)
+        else if (m_MirrorTimerFlagsLast & UNDERWATER_INDARKWATER)
             SendMirrorTimer(FATIGUE_TIMER, DarkWaterTime, m_MirrorTimer[FATIGUE_TIMER], 10);
     }
 
@@ -4308,8 +4308,7 @@ void Player::BuildPlayerRepop()
     }
 
     // create a corpse and place it at the player's location
-    CreateCorpse();
-    Corpse *corpse = GetCorpse();
+    Corpse *corpse = CreateCorpse();
     if(!corpse)
     {
         sLog.outError("Error creating corpse for Player %s [%u]", GetName(), GetGUIDLow());
@@ -4435,7 +4434,7 @@ void Player::KillPlayer()
     UpdateObjectVisibility();
 }
 
-void Player::CreateCorpse()
+Corpse* Player::CreateCorpse()
 {
     // prevent existence 2 corpse for player
     SpawnCorpseBones();
@@ -4448,7 +4447,7 @@ void Player::CreateCorpse()
     if(!corpse->Create(sObjectMgr.GenerateLowGuid(HIGHGUID_CORPSE), this))
     {
         delete corpse;
-        return;
+        return NULL;
     }
 
     _uf = GetUInt32Value(UNIT_FIELD_BYTES_0);
@@ -4504,6 +4503,7 @@ void Player::CreateCorpse()
 
     // register for player, but not show
     sObjectAccessor.AddCorpse(corpse);
+    return corpse;
 }
 
 void Player::SpawnCorpseBones()
@@ -6794,15 +6794,21 @@ void Player::_ApplyItemMods(Item *item, uint8 slot,bool apply)
     if(slot >= INVENTORY_SLOT_BAG_END || !item)
         return;
 
-    // not apply/remove mods for broken item
-    if(item->IsBroken())
-        return;
-
     ItemPrototype const *proto = item->GetProto();
 
     if(!proto)
         return;
 
+    if(item->IsBroken() && proto->Socket[0].Color)  //This need to remove bonuses from meta if item broken
+    {
+        CorrectMetaGemEnchants(slot, apply);
+        return;
+    }
+
+    // not apply/remove mods for broken item
+    if(item->IsBroken())
+        return;
+  
     sLog.outDetail("applying mods for item %u ",item->GetGUIDLow());
 
     uint32 attacktype = Player::GetAttackBySlot(slot);
@@ -7152,7 +7158,7 @@ void Player::_ApplyWeaponDependentAuraCritMod(Item *item, WeaponAttackType attac
         default: return;
     }
 
-    if (item->IsFitToSpellRequirements(aura->GetSpellProto()))
+    if (!item->IsBroken() && item->IsFitToSpellRequirements(aura->GetSpellProto()))
     {
         HandleBaseModValue(mod, FLAT_MOD, float (aura->GetModifier()->m_amount), apply);
     }
@@ -7186,7 +7192,7 @@ void Player::_ApplyWeaponDependentAuraDamageMod(Item *item, WeaponAttackType att
         default: return;
     }
 
-    if (item->IsFitToSpellRequirements(aura->GetSpellProto()))
+    if (!item->IsBroken() && item->IsFitToSpellRequirements(aura->GetSpellProto()))
     {
         HandleStatModifier(unitMod, unitModType, float(modifier->m_amount),apply);
     }
@@ -14183,7 +14189,7 @@ void Player::GroupEventHappens( uint32 questId, WorldObject const* pEventObject 
             Player *pGroupGuy = itr->getSource();
 
             // for any leave or dead (with not released body) group member at appropriate distance
-            if( pGroupGuy && pGroupGuy->IsAtGroupRewardDistance(pEventObject) && !pGroupGuy->GetCorpse() )
+            if( pGroupGuy && pGroupGuy->IsAtGroupRewardDistance(pEventObject) && !pGroupGuy->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST) )
                 pGroupGuy->AreaExploredOrEventHappens(questId);
         }
     }
@@ -17321,17 +17327,17 @@ void Player::UpdateDuelFlag(time_t currTime)
 
 void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
 {
-    if(!pet)
+    if (!pet)
         pet = GetPet();
 
-    if(!pet || pet->GetOwnerGUID()!=GetGUID())
+    if (!pet || pet->GetOwnerGUID() != GetGUID())
         return;
 
     // not save secondary permanent pet as current
-    if (pet && m_temporaryUnsummonedPetNumber != pet->GetCharmInfo()->GetPetNumber() && mode == PET_SAVE_AS_CURRENT)
+    if (pet && m_temporaryUnsummonedPetNumber && m_temporaryUnsummonedPetNumber != pet->GetCharmInfo()->GetPetNumber() && mode == PET_SAVE_AS_CURRENT)
         mode = PET_SAVE_NOT_IN_SLOT;
 
-    if(returnreagent && pet && mode != PET_SAVE_AS_CURRENT && !InBattleGround())
+    if (returnreagent && pet && mode != PET_SAVE_AS_CURRENT && !InBattleGround())
     {
         //returning of reagents only for players, so best done here
         uint32 spellId = pet ? pet->GetUInt32Value(UNIT_CREATED_BY_SPELL) : m_oldpetspell;
@@ -17366,7 +17372,7 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
             RemoveGuardian(pet);
             break;
         default:
-            if(GetPetGUID() == pet->GetGUID())
+            if (GetPetGUID() == pet->GetGUID())
                 SetPet(NULL);
             break;
     }
@@ -17378,7 +17384,7 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
     pet->AddObjectToRemoveList();
     pet->m_removed = true;
 
-    if(pet->isControlled())
+    if (pet->isControlled())
     {
         RemovePetActionBar();
 
@@ -17389,7 +17395,7 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
 
 void Player::RemoveMiniPet()
 {
-    if(Pet* pet = GetMiniPet())
+    if (Pet* pet = GetMiniPet())
     {
         pet->Remove(PET_SAVE_AS_DELETED);
         m_miniPet = 0;
@@ -17398,8 +17404,9 @@ void Player::RemoveMiniPet()
 
 Pet* Player::GetMiniPet()
 {
-    if(!m_miniPet)
+    if (!m_miniPet)
         return NULL;
+
     return GetMap()->GetPet(m_miniPet);
 }
 
@@ -20071,7 +20078,7 @@ bool Player::RewardPlayerAndGroupAtKill(Unit* pVictim)
                     }
 
                     // quest objectives updated only for alive group member or dead but with not released body
-                    if(pGroupGuy->isAlive()|| !pGroupGuy->GetCorpse())
+                    if(pGroupGuy->isAlive()|| !pGroupGuy->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))
                     {
                         // normal creature (not pet/etc) can be only in !PvP case
                         if(pVictim->GetTypeId()==TYPEID_UNIT)
@@ -20123,7 +20130,7 @@ void Player::RewardPlayerAndGroupAtEvent(uint32 creature_id, WorldObject* pRewar
                 continue;                               // member (alive or dead) or his corpse at req. distance
 
             // quest objectives updated only for alive group member or dead but with not released body
-            if(pGroupGuy->isAlive()|| !pGroupGuy->GetCorpse())
+            if(pGroupGuy->isAlive()|| !pGroupGuy->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))
                 pGroupGuy->KilledMonsterCredit(creature_id, creature_guid);
         }
     }
@@ -20390,7 +20397,7 @@ void Player::UpdateUnderwaterState( Map* m, float x, float y, float z )
     ZLiquidStatus res = m->getLiquidStatus(x, y, z, MAP_ALL_LIQUIDS, &liquid_status);
     if (!res)
     {
-        m_MirrorTimerFlags &= ~(UNDERWATER_INWATER|UNDERWATER_INLAVA|UNDERWATER_INSLIME|UNDERWARER_INDARKWATER);
+        m_MirrorTimerFlags &= ~(UNDERWATER_INWATER|UNDERWATER_INLAVA|UNDERWATER_INSLIME|UNDERWATER_INDARKWATER);
         // Small hack for enable breath in WMO
         if (IsInWater())
             m_MirrorTimerFlags|=UNDERWATER_INWATER;
@@ -20408,9 +20415,9 @@ void Player::UpdateUnderwaterState( Map* m, float x, float y, float z )
 
     // Allow travel in dark water on taxi or transport
     if ((liquid_status.type & MAP_LIQUID_TYPE_DARK_WATER) && !isInFlight() && !GetTransport())
-        m_MirrorTimerFlags |= UNDERWARER_INDARKWATER;
+        m_MirrorTimerFlags |= UNDERWATER_INDARKWATER;
     else
-        m_MirrorTimerFlags &= ~UNDERWARER_INDARKWATER;
+        m_MirrorTimerFlags &= ~UNDERWATER_INDARKWATER;
 
     // in lava check, anywhere in lava level
     if (liquid_status.type&MAP_LIQUID_TYPE_MAGMA)

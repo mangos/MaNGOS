@@ -174,7 +174,7 @@ bool WaypointMovementGenerator<Creature>::Update(Creature &creature, const uint3
             if (WaypointBehavior *behavior = i_path->at(idx).behavior)
             {
                 if (behavior->emote != 0)
-                    creature.SetUInt32Value(UNIT_NPC_EMOTESTATE, behavior->emote);
+                    creature.HandleEmote(behavior->emote);
 
                 if (behavior->spell != 0)
                 {
