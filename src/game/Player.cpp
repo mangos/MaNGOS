@@ -15707,7 +15707,7 @@ void Player::_LoadMails(QueryResult *result)
         m->sender = fields[2].GetUInt32();
         m->receiver = fields[3].GetUInt32();
         m->subject = fields[4].GetCppString();
-        m->body = fields[5].GetUInt32();
+        m->body = fields[5].GetCppString();
         bool has_items = fields[6].GetBool();
         m->expire_time = (time_t)fields[7].GetUInt64();
         m->deliver_time = (time_t)fields[8].GetUInt64();

@@ -107,9 +107,9 @@ enum __QuestGiverStatus
 {
     DIALOG_STATUS_NONE                     = 0,
     DIALOG_STATUS_UNAVAILABLE              = 1,
-    DIALOG_STATUS_CHAT                     = 2,             // 3.1 LowLevelQuest
-    DIALOG_STATUS_UNK1                     = 3,             // 3.1 LowLevelRepeatableHandin
-    DIALOG_STATUS_UNK2                     = 4,             // 3.1 LowLevelRepeatableAvailable
+    DIALOG_STATUS_LOW_LEVEL_AVAILABLE      = 2,
+    DIALOG_STATUS_LOW_LEVEL_REWARD_REP     = 3,
+    DIALOG_STATUS_LOW_LEVEL_AVAILABLE_REP  = 4,
     DIALOG_STATUS_INCOMPLETE               = 5,
     DIALOG_STATUS_REWARD_REP               = 6,
     DIALOG_STATUS_AVAILABLE_REP            = 7,
