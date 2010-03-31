@@ -12801,11 +12801,11 @@ void Player::PrepareQuestMenu( uint64 guid )
         uint32 quest_id = i->second;
         QuestStatus status = GetQuestStatus( quest_id );
         if ( status == QUEST_STATUS_COMPLETE && !GetQuestRewardStatus( quest_id ) )
-            qm.AddMenuItem(quest_id, DIALOG_STATUS_UNK2);
+            qm.AddMenuItem(quest_id, DIALOG_STATUS_REWARD);
         else if ( status == QUEST_STATUS_INCOMPLETE )
-            qm.AddMenuItem(quest_id, DIALOG_STATUS_UNK2);
+            qm.AddMenuItem(quest_id, DIALOG_STATUS_INCOMPLETE);
         else if (status == QUEST_STATUS_AVAILABLE )
-            qm.AddMenuItem(quest_id, DIALOG_STATUS_CHAT);
+            qm.AddMenuItem(quest_id, DIALOG_STATUS_AVAILABLE);
     }
 
     for(QuestRelations::const_iterator i = pObjectQR->lower_bound(pObject->GetEntry()); i != pObjectQR->upper_bound(pObject->GetEntry()); ++i)
@@ -12817,9 +12817,9 @@ void Player::PrepareQuestMenu( uint64 guid )
         QuestStatus status = GetQuestStatus( quest_id );
 
         if (pQuest->IsAutoComplete() && CanTakeQuest(pQuest, false))
-            qm.AddMenuItem(quest_id, DIALOG_STATUS_UNK2);
+            qm.AddMenuItem(quest_id, DIALOG_STATUS_AVAILABLE_REP);
         else if ( status == QUEST_STATUS_NONE && CanTakeQuest( pQuest, false ) )
-            qm.AddMenuItem(quest_id, DIALOG_STATUS_CHAT);
+            qm.AddMenuItem(quest_id, DIALOG_STATUS_AVAILABLE);
     }
 }
 
@@ -12843,9 +12843,9 @@ void Player::SendPreparedQuest(uint64 guid)
 
         if (pQuest)
         {
-            if (status == DIALOG_STATUS_UNK2 && !GetQuestRewardStatus(quest_id))
+            if (status == DIALOG_STATUS_REWARD && !GetQuestRewardStatus(quest_id))
                 PlayerTalkClass->SendQuestGiverRequestItems(pQuest, guid, CanRewardQuest(pQuest, false), true);
-            else if (status == DIALOG_STATUS_UNK2)
+            else if (status == DIALOG_STATUS_INCOMPLETE)
                 PlayerTalkClass->SendQuestGiverRequestItems(pQuest, guid, CanRewardQuest(pQuest, false), true);
             // Send completable on repeatable and autoCompletable quest if player don't have quest
             // TODO: verify if check for !pQuest->IsDaily() is really correct (possibly not)
