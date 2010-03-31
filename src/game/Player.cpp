@@ -6651,15 +6651,21 @@ void Player::_ApplyItemMods(Item *item, uint8 slot,bool apply)
     if(slot >= INVENTORY_SLOT_BAG_END || !item)
         return;
 
-    // not apply/remove mods for broken item
-    if(item->IsBroken())
-        return;
-
     ItemPrototype const *proto = item->GetProto();
 
     if(!proto)
         return;
 
+    if(item->IsBroken() && proto->Socket[0].Color)  //This need to remove bonuses from meta if item broken
+    {
+        CorrectMetaGemEnchants(slot, apply);
+        return;
+    }
+
+    // not apply/remove mods for broken item
+    if(item->IsBroken())
+        return;
+  
     sLog.outDetail("applying mods for item %u ",item->GetGUIDLow());
 
     uint32 attacktype = Player::GetAttackBySlot(slot);
@@ -7006,7 +7012,7 @@ void Player::_ApplyWeaponDependentAuraCritMod(Item *item, WeaponAttackType attac
         default: return;
     }
 
-    if (item->IsFitToSpellRequirements(aura->GetSpellProto()))
+    if (!item->IsBroken() && item->IsFitToSpellRequirements(aura->GetSpellProto()))
     {
         HandleBaseModValue(mod, FLAT_MOD, float (aura->GetModifier()->m_amount), apply);
     }
@@ -7040,7 +7046,7 @@ void Player::_ApplyWeaponDependentAuraDamageMod(Item *item, WeaponAttackType att
         default: return;
     }
 
-    if (item->IsFitToSpellRequirements(aura->GetSpellProto()))
+    if (!item->IsBroken() && item->IsFitToSpellRequirements(aura->GetSpellProto()))
     {
         HandleStatModifier(unitMod, unitModType, float(modifier->m_amount),apply);
     }
