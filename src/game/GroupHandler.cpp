@@ -227,6 +227,7 @@ void WorldSession::HandleGroupUninviteGuidOpcode(WorldPacket & recv_data)
 {
     uint64 guid;
     recv_data >> guid;
+    read_skip<uint8>();
 
     //can't uninvite yourself
     if(guid == GetPlayer()->GetGUID())
