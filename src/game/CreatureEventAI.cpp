@@ -424,7 +424,7 @@ void CreatureEventAI::ProcessAction(CreatureEventAI_Action const& action, uint32
             m_creature->PlayDirectSound(action.sound.soundId);
             break;
         case ACTION_T_EMOTE:
-            m_creature->HandleEmoteCommand(action.emote.emoteId);
+            m_creature->HandleEmote(action.emote.emoteId);
             break;
         case ACTION_T_RANDOM_SOUND:
         {
@@ -437,7 +437,7 @@ void CreatureEventAI::ProcessAction(CreatureEventAI_Action const& action, uint32
         {
             int32 temp = GetRandActionParam(rnd, action.random_emote.emoteId1, action.random_emote.emoteId2, action.random_emote.emoteId3);
             if (temp >= 0)
-                m_creature->HandleEmoteCommand(temp);
+                m_creature->HandleEmote(temp);
             break;
         }
         case ACTION_T_CAST:
@@ -1315,7 +1315,7 @@ void CreatureEventAI::DoScriptText(int32 textEntry, WorldObject* pSource, Unit* 
     {
         if (pSource->GetTypeId() == TYPEID_UNIT || pSource->GetTypeId() == TYPEID_PLAYER)
         {
-            ((Unit*)pSource)->HandleEmoteCommand((*i).second.Emote);
+            ((Unit*)pSource)->HandleEmote((*i).second.Emote);
         }
         else
             sLog.outErrorDb("CreatureEventAI: DoScriptText entry %i tried to process emote for invalid TypeId (%u).",textEntry,pSource->GetTypeId());
