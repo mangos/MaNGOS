@@ -1,4 +1,4 @@
-/* crypto/tmdiff.h */
+/* crypto/mdc2/mdc2.h */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
  *
@@ -56,34 +56,36 @@
  * [including the GNU Public Licence.]
  */
 
-/* Header for dynamic hash table routines
- * Author - Eric Young
- */
-/* ... erm yeah, "dynamic hash tables" you say?
- * 
- * And what would dynamic hash tables have to do with any of this code *now*?
- * AFAICS, this code is only referenced by crypto/bn/exp.c which is an unused
- * file that I doubt compiles any more. speed.c is the only thing that could
- * use this (and it has nothing to do with hash tables), yet it instead has its
- * own duplication of all this stuff and looks, if anything, more complete. See
- * the corresponding note in apps/speed.c.
- * The Bemused - Geoff
- */
+#ifndef HEADER_MDC2_H
+#define HEADER_MDC2_H
 
-#ifndef HEADER_TMDIFF_H
-#define HEADER_TMDIFF_H
+#include <openssl/des.h>
 
 #ifdef  __cplusplus
 extern "C" {
 #endif
 
-typedef struct ms_tm MS_TM;
+#ifdef OPENSSL_NO_MDC2
+#error MDC2 is disabled.
+#endif
 
-MS_TM *ms_time_new(void );
-void ms_time_free(MS_TM *a);
-void ms_time_get(MS_TM *a);
-double ms_time_diff(MS_TM *start, MS_TM *end);
-int ms_time_cmp(const MS_TM *ap, const MS_TM *bp);
+#define MDC2_BLOCK              8
+#define MDC2_DIGEST_LENGTH      16
+ 
+typedef struct mdc2_ctx_st
+	{
+	unsigned int num;
+	unsigned char data[MDC2_BLOCK];
+	DES_cblock h,hh;
+	int pad_type; /* either 1 or 2, default 1 */
+	} MDC2_CTX;
+
+
+int MDC2_Init(MDC2_CTX *c);
+int MDC2_Update(MDC2_CTX *c, const unsigned char *data, size_t len);
+int MDC2_Final(unsigned char *md, MDC2_CTX *c);
+unsigned char *MDC2(const unsigned char *d, size_t n,
+	unsigned char *md);
 
 #ifdef  __cplusplus
 }
