@@ -394,7 +394,6 @@
     <ClCompile Include="..\..\src\game\FollowerReference.cpp" />
     <ClCompile Include="..\..\src\game\GameEventMgr.cpp" />
     <ClCompile Include="..\..\src\game\GameObject.cpp" />
-    <ClCompile Include="..\..\src\game\GlobalEvents.cpp" />
     <ClCompile Include="..\..\src\game\GMTicketHandler.cpp" />
     <ClCompile Include="..\..\src\game\GMTicketMgr.cpp" />
     <ClCompile Include="..\..\src\game\GossipDef.cpp" />
@@ -543,7 +542,6 @@
     <ClInclude Include="..\..\src\game\Formulas.h" />
     <ClInclude Include="..\..\src\game\GameEventMgr.h" />
     <ClInclude Include="..\..\src\game\GameObject.h" />
-    <ClInclude Include="..\..\src\game\GlobalEvents.h" />
     <ClInclude Include="..\..\src\game\GMTicketMgr.h" />
     <ClInclude Include="..\..\src\game\GossipDef.h" />
     <ClInclude Include="..\..\src\game\GridDefines.h" />
