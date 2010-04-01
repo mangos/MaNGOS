@@ -1380,11 +1380,8 @@ bool Pet::addSpell(uint32 spell_id,ActiveStates active /*= ACT_DECIDE*/, PetSpel
     uint32 talentCost = GetTalentSpellCost(spell_id);
     if (talentCost)
     {
-        int32 free_points = GetMaxTalentPointsForLevel(getLevel());
         m_usedTalentCount+=talentCost;
-        // update free talent points
-        free_points-=m_usedTalentCount;
-        SetFreeTalentPoints(free_points > 0 ? free_points : 0);
+        UpdateFreeTalentPoints(false);
     }
     return true;
 }
@@ -1493,9 +1490,8 @@ bool Pet::removeSpell(uint32 spell_id, bool learn_prev, bool clear_ab)
             m_usedTalentCount-=talentCost;
         else
             m_usedTalentCount = 0;
-        // update free talent points
-        int32 free_points = GetMaxTalentPointsForLevel(getLevel()) - m_usedTalentCount;
-        SetFreeTalentPoints(free_points > 0 ? free_points : 0);
+
+        UpdateFreeTalentPoints(false);
     }
 
     if (learn_prev)
@@ -1720,17 +1716,33 @@ void Pet::resetTalentsForAllPetsOf(Player* owner, Pet* online_pet /*= NULL*/)
     CharacterDatabase.Execute(ss.str().c_str());
 }
 
-void Pet::InitTalentForLevel()
+void Pet::UpdateFreeTalentPoints(bool resetIfNeed)
 {
     uint32 level = getLevel();
     uint32 talentPointsForLevel = GetMaxTalentPointsForLevel(level);
     // Reset talents in case low level (on level down) or wrong points for level (hunter can unlearn TP increase talent)
-    if(talentPointsForLevel == 0 || m_usedTalentCount > talentPointsForLevel)
+    if (talentPointsForLevel == 0 || m_usedTalentCount > talentPointsForLevel)
     {
-        // Remove all talent points
-        resetTalents(true);
+        // Remove all talent points (except for admin pets)
+        if (resetIfNeed)
+        {
+            Unit *owner = GetOwner();
+            if (!owner || owner->GetTypeId() != TYPEID_PLAYER || ((Player*)owner)->GetSession()->GetSecurity() < SEC_ADMINISTRATOR)
+                resetTalents(true);
+            else
+                SetFreeTalentPoints(0);
+        }
+        else
+            SetFreeTalentPoints(0);
     }
-    SetFreeTalentPoints(talentPointsForLevel - m_usedTalentCount);
+    else
+        SetFreeTalentPoints(talentPointsForLevel - m_usedTalentCount);
+}
+
+
+void Pet::InitTalentForLevel()
+{
+    UpdateFreeTalentPoints();
 
     Unit *owner = GetOwner();
     if (!owner || owner->GetTypeId() != TYPEID_PLAYER)

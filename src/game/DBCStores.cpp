@@ -665,12 +665,17 @@ TalentSpellPos const* GetTalentSpellPos(uint32 spellId)
     return &itr->second;
 }
 
-uint32 GetTalentSpellCost(uint32 spellId)
+uint32 GetTalentSpellCost(TalentSpellPos const* pos)
 {
-    if(TalentSpellPos const* pos = GetTalentSpellPos(spellId))
+    if (pos)
         return pos->rank+1;
 
     return 0;
+}
+
+uint32 GetTalentSpellCost(uint32 spellId)
+{
+    return GetTalentSpellCost(GetTalentSpellPos(spellId));
 }
 
 int32 GetAreaFlagByAreaID(uint32 area_id)

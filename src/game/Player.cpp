@@ -2518,16 +2518,17 @@ void Player::GiveLevel(uint32 level)
     GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_LEVEL);
 }
 
-void Player::InitTalentForLevel()
+void Player::UpdateFreeTalentPoints(bool resetIfNeed)
 {
     uint32 level = getLevel();
     // talents base at level diff ( talents = level - 9 but some can be used already)
-    if(level < 10)
+    if (level < 10)
     {
         // Remove all talent points
-        if(m_usedTalentCount > 0)                           // Free any used talents
+        if (m_usedTalentCount > 0)                           // Free any used talents
         {
-            resetTalents(true);
+            if (resetIfNeed)
+                resetTalents(true);
             SetFreeTalentPoints(0);
         }
     }
@@ -2536,9 +2537,9 @@ void Player::InitTalentForLevel()
         uint32 talentPointsForLevel = CalculateTalentsPoints();
 
         // if used more that have then reset
-        if(m_usedTalentCount > talentPointsForLevel)
+        if (m_usedTalentCount > talentPointsForLevel)
         {
-            if (GetSession()->GetSecurity() < SEC_ADMINISTRATOR)
+            if (resetIfNeed && GetSession()->GetSecurity() < SEC_ADMINISTRATOR)
                 resetTalents(true);
             else
                 SetFreeTalentPoints(0);
@@ -2547,8 +2548,13 @@ void Player::InitTalentForLevel()
         else
             SetFreeTalentPoints(talentPointsForLevel-m_usedTalentCount);
     }
+}
 
-    if(!GetSession()->PlayerLoading())
+void Player::InitTalentForLevel()
+{
+    UpdateFreeTalentPoints();
+
+    if (!GetSession()->PlayerLoading())
         SendTalentsInfoData(false);                         // update at client
 }
 
@@ -2996,10 +3002,12 @@ bool Player::addSpell(uint32 spell_id, bool active, bool learning, bool dependen
         }
     }
 
+    TalentSpellPos const* talentPos = GetTalentSpellPos(spell_id);
+
     if(!disabled_case) // skip new spell adding if spell already known (disabled spells case)
     {
         // talent: unlearn all other talent ranks (high and low)
-        if(TalentSpellPos const* talentPos = GetTalentSpellPos(spell_id))
+        if (talentPos)
         {
             if(TalentEntry const *talentInfo = sTalentStore.LookupEntry( talentPos->talent_id ))
             {
@@ -3085,11 +3093,23 @@ bool Player::addSpell(uint32 spell_id, bool active, bool learning, bool dependen
             return false;
     }
 
-    uint32 talentCost = GetTalentSpellCost(spell_id);
+    if (talentPos)
+    {
+        // update used talent points count
+        m_usedTalentCount += GetTalentSpellCost(talentPos);
+        UpdateFreeTalentPoints(false);
+    }
+
+    // update free primary prof.points (if any, can be none in case GM .learn prof. learning)
+    if (uint32 freeProfs = GetFreePrimaryProfessionPoints())
+    {
+        if(sSpellMgr.IsPrimaryProfessionFirstRankSpell(spell_id))
+            SetFreePrimaryProfessions(freeProfs-1);
+    }
 
     // cast talents with SPELL_EFFECT_LEARN_SPELL (other dependent spells will learned later as not auto-learned)
     // note: all spells with SPELL_EFFECT_LEARN_SPELL isn't passive
-    if (talentCost > 0 && IsSpellHaveEffect(spellInfo,SPELL_EFFECT_LEARN_SPELL))
+    if (talentPos && IsSpellHaveEffect(spellInfo,SPELL_EFFECT_LEARN_SPELL))
     {
         // ignore stance requirement for talent learn spell (stance set for spell only for client spell description show)
         CastSpell(this, spell_id, true);
@@ -3104,16 +3124,6 @@ bool Player::addSpell(uint32 spell_id, bool active, bool learning, bool dependen
     {
         CastSpell(this, spell_id, true);
         return false;
-    }
-
-    // update used talent points count
-    m_usedTalentCount += talentCost;
-
-    // update free primary prof.points (if any, can be none in case GM .learn prof. learning)
-    if (uint32 freeProfs = GetFreePrimaryProfessionPoints())
-    {
-        if(sSpellMgr.IsPrimaryProfessionFirstRankSpell(spell_id))
-            SetFreePrimaryProfessions(freeProfs-1);
     }
 
     // add dependent skills
@@ -3286,14 +3296,18 @@ void Player::removeSpell(uint32 spell_id, bool disabled, bool learn_low_rank, bo
         if(PetAura const* petSpell = sSpellMgr.GetPetAura(spell_id, SpellEffectIndex(i)))
             RemovePetAura(petSpell);
 
-    // free talent points
-    uint32 talentCosts = GetTalentSpellCost(spell_id);
-    if(talentCosts > 0)
+    TalentSpellPos const* talentPos = GetTalentSpellPos(spell_id);
+    if (talentPos)
     {
+        // free talent points
+        uint32 talentCosts = GetTalentSpellCost(talentPos);
+
         if(talentCosts < m_usedTalentCount)
             m_usedTalentCount -= talentCosts;
         else
             m_usedTalentCount = 0;
+
+        UpdateFreeTalentPoints(false);
     }
 
     // update free primary prof.points (if not overflow setting, can be in case GM use before .learn prof. learning)
@@ -3381,7 +3395,7 @@ void Player::removeSpell(uint32 spell_id, bool disabled, bool learn_low_rank, bo
         SpellEntry const *spellInfo = sSpellStore.LookupEntry(spell_id);
 
         // if talent then lesser rank also talent and need learn
-        if (talentCosts)
+        if (talentPos)
         {
             if(learn_low_rank)
                 learnSpell (prev_id,false);
@@ -3626,20 +3640,20 @@ bool Player::resetTalents(bool no_cost)
 
         TalentTabEntry const *talentTabInfo = sTalentTabStore.LookupEntry( talentInfo->TalentTab );
 
-        if(!talentTabInfo)
+        if (!talentTabInfo)
             continue;
 
         // unlearn only talents for character class
         // some spell learned by one class as normal spells or know at creation but another class learn it as talent,
         // to prevent unexpected lost normal learned spell skip another class talents
-        if( (getClassMask() & talentTabInfo->ClassMask) == 0 )
+        if ((getClassMask() & talentTabInfo->ClassMask) == 0)
             continue;
 
         for (int j = 0; j < MAX_TALENT_RANK; ++j)
         {
             for(PlayerSpellMap::iterator itr = GetSpellMap().begin(); itr != GetSpellMap().end();)
             {
-                if(itr->second.state == PLAYERSPELL_REMOVED || itr->second.disabled)
+                if (itr->second.state == PLAYERSPELL_REMOVED || itr->second.disabled)
                 {
                     ++itr;
                     continue;
@@ -5632,10 +5646,10 @@ int16 Player::GetSkillTempBonusValue(uint32 skill) const
 
 void Player::SendInitialActionButtons() const
 {
-    sLog.outDetail( "Initializing Action Buttons for '%u'", GetGUIDLow() );
+    sLog.outDetail( "Initializing Action Buttons for '%u' spec '%u'", GetGUIDLow(), m_activeSpec);
 
     WorldPacket data(SMSG_ACTION_BUTTONS, 1+(MAX_ACTION_BUTTONS*4));
-    data << uint8(1);                                       // can be 0, 1, 2 (talent spec)
+    data << uint8(m_activeSpec);                                  // can be 0, 1, 2 (talent spec)
     ActionButtonList const& currentActionButtonList = m_actionButtons[m_activeSpec];
     for(uint8 button = 0; button < MAX_ACTION_BUTTONS; ++button)
     {
@@ -5647,7 +5661,7 @@ void Player::SendInitialActionButtons() const
     }
 
     GetSession()->SendPacket( &data );
-    sLog.outDetail( "Action Buttons for '%u' Initialized", GetGUIDLow() );
+    sLog.outDetail( "Action Buttons for '%u' spec '%u' Initialized", GetGUIDLow(), m_activeSpec );
 }
 
 bool Player::IsActionButtonDataValid(uint8 button, uint32 action, uint8 type, Player* player, bool msg)
@@ -15874,7 +15888,9 @@ void Player::_LoadSpells(QueryResult *result)
         {
             Field *fields = result->Fetch();
 
-            addSpell(fields[0].GetUInt32(), fields[1].GetBool(), false, false, fields[2].GetBool());
+            uint32 spell_id = fields[0].GetUInt32();
+
+            addSpell(spell_id, fields[1].GetBool(), false, false, fields[2].GetBool());
         }
         while( result->NextRow() );
 
@@ -20892,9 +20908,6 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank)
     // learn! (other talent ranks will unlearned at learning)
     learnSpell(spellid, false);
     sLog.outDetail("TalentID: %u Rank: %u Spell: %u\n", talentId, talentRank, spellid);
-
-    // update free talent points
-    SetFreeTalentPoints(CurTalentPoints - (talentRank - curtalent_maxrank + 1));
 }
 
 void Player::LearnPetTalent(uint64 petGuid, uint32 talentId, uint32 talentRank)
