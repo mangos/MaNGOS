@@ -1486,14 +1486,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\game\GlobalEvents.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\game\GlobalEvents.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\src\game\Opcodes.cpp"
 				>
 			</File>

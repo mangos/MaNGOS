@@ -76,18 +76,6 @@ void MapInstanced::RemoveAllObjectsInRemoveList()
     Map::RemoveAllObjectsInRemoveList();
 }
 
-bool MapInstanced::RemoveBones(uint64 guid, float x, float y)
-{
-    bool remove_result = false;
-
-    for (InstancedMaps::iterator i = m_InstancedMaps.begin(); i != m_InstancedMaps.end(); ++i)
-    {
-        remove_result = remove_result || i->second->RemoveBones(guid, x, y);
-    }
-
-    return remove_result || Map::RemoveBones(guid,x,y);
-}
-
 void MapInstanced::UnloadAll(bool pForce)
 {
     // Unload instanced maps

@@ -35,7 +35,6 @@ class MANGOS_DLL_DECL MapInstanced : public Map
         // functions overwrite Map versions
         void Update(const uint32&);
         void RemoveAllObjectsInRemoveList();
-        bool RemoveBones(uint64 guid, float x, float y);
         void UnloadAll(bool pForce);
 
         Map* CreateInstance(const uint32 mapId, Player * player);
