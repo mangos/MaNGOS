@@ -4302,7 +4302,7 @@ Corpse* Player::CreateCorpse()
     Corpse *corpse = new Corpse( (m_ExtraFlags & PLAYER_EXTRA_PVP_DEATH) ? CORPSE_RESURRECTABLE_PVP : CORPSE_RESURRECTABLE_PVE );
     SetPvPDeath(false);
 
-    if(!corpse->Create(sObjectMgr.GenerateLowGuid(HIGHGUID_CORPSE), this))
+    if (!corpse->Create(sObjectMgr.GenerateLowGuid(HIGHGUID_CORPSE), this))
     {
         delete corpse;
         return NULL;
@@ -4326,11 +4326,11 @@ Corpse* Player::CreateCorpse()
     corpse->SetUInt32Value( CORPSE_FIELD_BYTES_2, _cfb2 );
 
     uint32 flags = CORPSE_FLAG_UNK2;
-    if(HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_HIDE_HELM))
+    if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_HIDE_HELM))
         flags |= CORPSE_FLAG_HIDE_HELM;
-    if(HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_HIDE_CLOAK))
+    if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_HIDE_CLOAK))
         flags |= CORPSE_FLAG_HIDE_CLOAK;
-    if(InBattleGround() && !InArena())
+    if (InBattleGround() && !InArena())
         flags |= CORPSE_FLAG_LOOTABLE;                      // to be able to remove insignia
     corpse->SetUInt32Value( CORPSE_FIELD_FLAGS, flags );
 
@@ -4343,7 +4343,7 @@ Corpse* Player::CreateCorpse()
     uint32 _cfi;
     for (int i = 0; i < EQUIPMENT_SLOT_END; ++i)
     {
-        if(m_items[i])
+        if (m_items[i])
         {
             iDisplayID = m_items[i]->GetProto()->DisplayInfoID;
             iIventoryType = m_items[i]->GetProto()->InventoryType;
@@ -4353,10 +4353,8 @@ Corpse* Player::CreateCorpse()
         }
     }
 
-    // we don't SaveToDB for players in battlegrounds so don't do it for corpses either
-    const MapEntry *entry = sMapStore.LookupEntry(corpse->GetMapId());
-    ASSERT(entry);
-    if(entry->map_type != MAP_BATTLEGROUND)
+    // we not need saved corpses for BG/arenas
+    if (!GetMap()->IsBattleGroundOrArena())
         corpse->SaveToDB();
 
     // register for player, but not show
