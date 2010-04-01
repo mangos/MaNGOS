@@ -5649,7 +5649,7 @@ void Player::SendInitialActionButtons() const
     sLog.outDetail( "Initializing Action Buttons for '%u' spec '%u'", GetGUIDLow(), m_activeSpec);
 
     WorldPacket data(SMSG_ACTION_BUTTONS, 1+(MAX_ACTION_BUTTONS*4));
-    data << uint8(m_activeSpec);                                  // can be 0, 1, 2 (talent spec)
+    data << uint8(1);                                       // talent spec amount
     ActionButtonList const& currentActionButtonList = m_actionButtons[m_activeSpec];
     for(uint8 button = 0; button < MAX_ACTION_BUTTONS; ++button)
     {
