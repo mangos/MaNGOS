@@ -3431,6 +3431,17 @@ void Player::removeSpell(uint32 spell_id, bool disabled, bool learn_low_rank, bo
         }
     }
 
+    if (m_canTitanGrip)
+    {
+        SpellEntry const *spellInfo = sSpellStore.LookupEntry(spell_id);
+        if (IsSpellHaveEffect(spellInfo, SPELL_EFFECT_TITAN_GRIP))
+        {
+            m_canTitanGrip = false;
+            if(sWorld.getConfig(CONFIG_BOOL_OFFHAND_CHECK_AT_TALENTS_RESET))
+                AutoUnequipOffhandIfNeed();
+        }
+    }
+
     // remove from spell book if not replaced by lesser rank
     if (!prev_activate && sendUpdate)
     {
@@ -3700,15 +3711,6 @@ bool Player::resetTalents(bool no_cost)
             RemovePet(NULL,PET_SAVE_NOT_IN_SLOT, true);
     }
     */
-
-
-    if(m_canTitanGrip)
-    {
-        m_canTitanGrip = false;
-        if(sWorld.getConfig(CONFIG_BOOL_OFFHAND_CHECK_AT_TALENTS_RESET))
-            AutoUnequipOffhandIfNeed();
-    }
-
     return true;
 }
 
