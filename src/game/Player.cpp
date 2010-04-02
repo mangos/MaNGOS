@@ -3615,11 +3615,9 @@ bool Player::resetTalents(bool no_cost)
     if(HasAtLoginFlag(AT_LOGIN_RESET_TALENTS))
         RemoveAtLoginFlag(AT_LOGIN_RESET_TALENTS,true);
 
-    uint32 talentPointsForLevel = CalculateTalentsPoints();
-
     if (m_usedTalentCount == 0)
     {
-        SetFreeTalentPoints(talentPointsForLevel);
+        UpdateFreeTalentPoints(false);                      // for fix if need counter
         return false;
     }
 
@@ -3685,7 +3683,7 @@ bool Player::resetTalents(bool no_cost)
         }
     }
 
-    SetFreeTalentPoints(talentPointsForLevel);
+    UpdateFreeTalentPoints(false);
 
     if(!no_cost)
     {
@@ -20898,6 +20896,7 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank)
                     if (HasSpell(depTalentInfo->RankID[i]))
                         hasEnoughRank = true;
             }
+
             if (!hasEnoughRank)
                 return;
         }
@@ -21084,9 +21083,6 @@ void Player::LearnPetTalent(uint64 petGuid, uint32 talentId, uint32 talentRank)
     // learn! (other talent ranks will unlearned at learning)
     pet->learnSpell(spellid);
     sLog.outDetail("PetTalentID: %u Rank: %u Spell: %u\n", talentId, talentRank, spellid);
-
-    // update free talent points
-    pet->SetFreeTalentPoints(CurTalentPoints - (talentRank - curtalent_maxrank + 1));
 }
 
 void Player::UpdateKnownCurrencies(uint32 itemId, bool apply)
