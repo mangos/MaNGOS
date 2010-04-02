@@ -2864,6 +2864,53 @@ bool ChatHandler::HandleLookupSkillCommand(const char* args)
     return true;
 }
 
+void ChatHandler::ShowSpellListHelper(Player* target, SpellEntry const* spellInfo, LocaleConstant loc)
+{
+    uint32 id = spellInfo->Id;
+
+    bool known = target && target->HasSpell(id);
+    bool learn = (spellInfo->Effect[EFFECT_INDEX_0] == SPELL_EFFECT_LEARN_SPELL);
+
+    uint32 talentCost = GetTalentSpellCost(id);
+
+    bool talent = (talentCost > 0);
+    bool passive = IsPassiveSpell(id);
+    bool active = target && target->HasAura(id);
+
+    // unit32 used to prevent interpreting uint8 as char at output
+    // find rank of learned spell for learning spell, or talent rank
+    uint32 rank = talentCost ? talentCost : sSpellMgr.GetSpellRank(learn ? spellInfo->EffectTriggerSpell[EFFECT_INDEX_0] : id);
+
+    // send spell in "id - [name, rank N] [talent] [passive] [learn] [known]" format
+    std::ostringstream ss;
+    if (m_session)
+        ss << id << " - |cffffffff|Hspell:" << id << "|h[" << spellInfo->SpellName[loc];
+    else
+        ss << id << " - " << spellInfo->SpellName[loc];
+
+    // include rank in link name
+    if(rank)
+        ss << GetMangosString(LANG_SPELL_RANK) << rank;
+
+    if (m_session)
+        ss << " " << localeNames[loc] << "]|h|r";
+    else
+        ss << " " << localeNames[loc];
+
+    if(talent)
+        ss << GetMangosString(LANG_TALENT);
+    if(passive)
+        ss << GetMangosString(LANG_PASSIVE);
+    if(learn)
+        ss << GetMangosString(LANG_LEARN);
+    if(known)
+        ss << GetMangosString(LANG_KNOWN);
+    if(active)
+        ss << GetMangosString(LANG_ACTIVE);
+
+    SendSysMessage(ss.str().c_str());
+}
+
 bool ChatHandler::HandleLookupSpellCommand(const char* args)
 {
     if(!*args)
@@ -2913,48 +2960,7 @@ bool ChatHandler::HandleLookupSpellCommand(const char* args)
 
             if(loc < MAX_LOCALE)
             {
-                bool known = target && target->HasSpell(id);
-                bool learn = (spellInfo->Effect[EFFECT_INDEX_0] == SPELL_EFFECT_LEARN_SPELL);
-
-                uint32 talentCost = GetTalentSpellCost(id);
-
-                bool talent = (talentCost > 0);
-                bool passive = IsPassiveSpell(id);
-                bool active = target && target->HasAura(id);
-
-                // unit32 used to prevent interpreting uint8 as char at output
-                // find rank of learned spell for learning spell, or talent rank
-                uint32 rank = talentCost ? talentCost : sSpellMgr.GetSpellRank(learn ? spellInfo->EffectTriggerSpell[EFFECT_INDEX_0] : id);
-
-                // send spell in "id - [name, rank N] [talent] [passive] [learn] [known]" format
-                std::ostringstream ss;
-                if (m_session)
-                    ss << id << " - |cffffffff|Hspell:" << id << "|h[" << name;
-                else
-                    ss << id << " - " << name;
-
-                // include rank in link name
-                if(rank)
-                    ss << GetMangosString(LANG_SPELL_RANK) << rank;
-
-                if (m_session)
-                    ss << " " << localeNames[loc] << "]|h|r";
-                else
-                    ss << " " << localeNames[loc];
-
-                if(talent)
-                    ss << GetMangosString(LANG_TALENT);
-                if(passive)
-                    ss << GetMangosString(LANG_PASSIVE);
-                if(learn)
-                    ss << GetMangosString(LANG_LEARN);
-                if(known)
-                    ss << GetMangosString(LANG_KNOWN);
-                if(active)
-                    ss << GetMangosString(LANG_ACTIVE);
-
-                SendSysMessage(ss.str().c_str());
-
+                ShowSpellListHelper(target, spellInfo, LocaleConstant(loc));
                 ++counter;
             }
         }
@@ -4343,6 +4349,43 @@ bool ChatHandler::HandleListAurasCommand (const char * /*args*/)
             }
         }
     }
+    return true;
+}
+
+bool ChatHandler::HandleListTalentsCommand (const char * /*args*/)
+{
+    Player *player = getSelectedPlayer();
+    if (!player)
+    {
+        SendSysMessage(LANG_NO_CHAR_SELECTED);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    SendSysMessage(LANG_LIST_TALENTS_TITLE);
+    uint32 count = 0;
+    uint32 cost = 0;
+    PlayerSpellMap const& uSpells = player->GetSpellMap();
+    for (PlayerSpellMap::const_iterator itr = uSpells.begin(); itr != uSpells.end(); ++itr)
+    {
+        if (itr->second.state == PLAYERSPELL_REMOVED)
+            continue;
+
+        uint32 cost_itr = GetTalentSpellCost(itr->first);
+
+        if (cost_itr == 0)
+            continue;
+
+        SpellEntry const* spellEntry = sSpellStore.LookupEntry(itr->first);
+        if (!spellEntry)
+            continue;
+
+        ShowSpellListHelper(player, spellEntry, GetSessionDbcLocale());
+        ++count;
+        cost += cost_itr;
+    }
+    PSendSysMessage(LANG_LIST_TALENTS_COUNT, count, cost);
+
     return true;
 }
 
