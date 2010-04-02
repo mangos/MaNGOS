@@ -4368,7 +4368,7 @@ bool ChatHandler::HandleListTalentsCommand (const char * /*args*/)
     PlayerSpellMap const& uSpells = player->GetSpellMap();
     for (PlayerSpellMap::const_iterator itr = uSpells.begin(); itr != uSpells.end(); ++itr)
     {
-        if (itr->second.state == PLAYERSPELL_REMOVED)
+        if (itr->second.state == PLAYERSPELL_REMOVED || itr->second.disabled)
             continue;
 
         uint32 cost_itr = GetTalentSpellCost(itr->first);
