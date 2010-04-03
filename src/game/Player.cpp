@@ -12427,7 +12427,7 @@ void Player::SendNewItem(Item *item, uint32 count, bool received, bool created, 
     data << uint64(GetGUID());                              // player GUID
     data << uint32(received);                               // 0=looted, 1=from npc
     data << uint32(created);                                // 0=received, 1=created
-    data << uint32(1);                                      // always 0x01 (probably meant to be count of listed items)
+    data << uint32(1);                                      // IsShowChatMessage
     data << uint8(item->GetBagSlot());                      // bagslot
                                                             // item slot, but when added to stack: 0xFFFFFFFF
     data << uint32((item->GetCount() == count) ? item->GetSlot() : -1);
@@ -20227,15 +20227,15 @@ PartyResult Player::CanUninviteFromGroup() const
 {
     const Group* grp = GetGroup();
     if(!grp)
-        return PARTY_RESULT_YOU_NOT_IN_GROUP;
+        return ERR_NOT_IN_GROUP;
 
     if(!grp->IsLeader(GetGUID()) && !grp->IsAssistant(GetGUID()))
-        return PARTY_RESULT_YOU_NOT_LEADER;
+        return ERR_NOT_LEADER;
 
     if(InBattleGround())
-        return PARTY_RESULT_INVITE_RESTRICTED;
+        return ERR_INVITE_RESTRICTED;
 
-    return PARTY_RESULT_OK;
+    return ERR_PARTY_RESULT_OK;
 }
 
 void Player::SetBattleGroundRaid(Group* group, int8 subgroup)
