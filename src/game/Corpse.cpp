@@ -268,3 +268,11 @@ bool Corpse::IsFriendlyTo( Unit const* unit ) const
     else
         return true;
 }
+
+bool Corpse::IsExpired(time_t t) const
+{
+    if(m_type == CORPSE_BONES)
+        return m_time < t - 60*MINUTE;
+    else
+        return m_time < t - 3*DAY;
+}
