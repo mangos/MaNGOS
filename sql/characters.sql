@@ -21,7 +21,7 @@
 
 DROP TABLE IF EXISTS `character_db_version`;
 CREATE TABLE `character_db_version` (
-  `required_9646_01_characters_characters` bit(1) default NULL
+  `required_9661_01_characters_character_talent` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Last applied sql update to DB';
 
 --
@@ -828,6 +828,31 @@ CREATE TABLE `character_spell_cooldown` (
 LOCK TABLES `character_spell_cooldown` WRITE;
 /*!40000 ALTER TABLE `character_spell_cooldown` DISABLE KEYS */;
 /*!40000 ALTER TABLE `character_spell_cooldown` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `character_talent`
+--
+
+DROP TABLE IF EXISTS `character_talent`;
+CREATE TABLE `character_talent` (
+  `guid` int(11) unsigned NOT NULL,
+  `talent_id` int(11) unsigned NOT NULL,
+  `current_rank` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `spec` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`guid`,`talent_id`,`spec`),
+  KEY guid_key (`guid`),
+  KEY talent_key (`talent_id`),
+  KEY spec_key (`spec`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `character_talent`
+--
+
+LOCK TABLES `character_talent` WRITE;
+/*!40000 ALTER TABLE `character_talent` DISABLE KEYS */;
+/*!40000 ALTER TABLE `character_talent` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
