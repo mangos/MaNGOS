@@ -14840,7 +14840,11 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
             SetArenaTeamInfoField(arena_slot, ArenaTeamInfoType(j), 0);
     }
 
-    SetUInt32Value(PLAYER_FIELD_HONOR_CURRENCY, fields[40].GetUInt32());
+    uint32 honor_currency = fields[40].GetUInt32();
+    if (honor_currency > sWorld.getConfig(CONFIG_UINT32_MAX_HONOR_POINTS))
+        honor_currency = sWorld.getConfig(CONFIG_UINT32_MAX_HONOR_POINTS);
+    SetUInt32Value(PLAYER_FIELD_HONOR_CURRENCY, honor_currency);
+
     SetUInt32Value(PLAYER_FIELD_TODAY_CONTRIBUTION, fields[41].GetUInt32());
     SetUInt32Value(PLAYER_FIELD_YESTERDAY_CONTRIBUTION, fields[42].GetUInt32());
     SetUInt32Value(PLAYER_FIELD_LIFETIME_HONORBALE_KILLS, fields[43].GetUInt32());
