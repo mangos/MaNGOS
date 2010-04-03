@@ -1399,6 +1399,10 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
                         (spellInfo_2->Id == 8326 && spellInfo_1->Id == 20584) )
                          return false;
 
+                    // Kindred Spirits
+                    if( spellInfo_1->SpellIconID == 3559 && spellInfo_2->SpellIconID == 3559 )
+                        return false;
+
                     break;
                 }
                 case SPELLFAMILY_MAGE:
