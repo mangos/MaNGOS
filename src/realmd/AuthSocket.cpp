@@ -964,14 +964,14 @@ void AuthSocket::LoadRealmlist(ByteBuffer &pkt, uint32 acctid)
                 uint8 color = (std::find(i->second.realmbuilds.begin(), i->second.realmbuilds.end(), _build) != i->second.realmbuilds.end()) ? i->second.color : 2;
                 color = (i->second.allowedSecurityLevel > _accountSecurityLevel) ? 2 : color;
 
-                pkt << uint32(i->second.icon);                      // realm type
-                pkt << uint8(color);                                // if 2, then realm is offline
-                pkt << i->first;                                    // name
-                pkt << i->second.address;                           // address
+                pkt << uint32(i->second.icon);              // realm type
+                pkt << uint8(color);                        // if 2, then realm is offline
+                pkt << i->first;                            // name
+                pkt << i->second.address;                   // address
                 pkt << float(i->second.populationLevel);
                 pkt << uint8(AmountOfCharacters);
-                pkt << uint8(i->second.timezone);                   // realm category
-                pkt << uint8(0x00);                                 // unk, may be realm number/id?
+                pkt << uint8(i->second.timezone);           // realm category
+                pkt << uint8(0x00);                         // unk, may be realm number/id?
             }
 
             pkt << uint8(0x00);
@@ -1008,19 +1008,26 @@ void AuthSocket::LoadRealmlist(ByteBuffer &pkt, uint32 acctid)
                 // Show offline state for unsupported client builds
                 uint8 color = (std::find(i->second.realmbuilds.begin(), i->second.realmbuilds.end(), _build) != i->second.realmbuilds.end()) ? i->second.color : 2;
 
-                pkt << uint8(i->second.icon);                       // realm type
-                pkt << uint8(lock);                                 // if 1, then realm locked
-                pkt << uint8(color);                                // if 2, then realm is offline
-                pkt << i->first;                                    // name
-                pkt << i->second.address;                           // address
+                pkt << uint8(i->second.icon);               // realm type (this is second column in Cfg_Configs.dbc)
+                pkt << uint8(lock);                         // flags, if 0x01, then realm locked
+                pkt << uint8(color);                        // see enum RealmFlags
+                pkt << i->first;                            // name
+                pkt << i->second.address;                   // address
                 pkt << float(i->second.populationLevel);
                 pkt << uint8(AmountOfCharacters);
-                pkt << uint8(i->second.timezone);                   // realm category
-                pkt << uint8(0x2C);                                 // unk, may be realm number/id?
+                pkt << uint8(i->second.timezone);           // realm category (Cfg_Categories.dbc)
+                pkt << uint8(0x2C);                         // unk, may be realm number/id?
+
+                /*if(realmFlags & REALM_FLAG_SPECIFYBUILD)
+                {
+                    pkt << uint8(0);                        // major
+                    pkt << uint8(0);                        // minor
+                    pkt << uint8(0);                        // revision
+                    pkt << uint16(0);                       // build
+                }*/
             }
 
-            pkt << uint8(0x10);
-            pkt << uint8(0x00);
+            pkt << uint16(0x0010);
             break;
         }
     }
