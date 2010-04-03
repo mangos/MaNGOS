@@ -2601,14 +2601,14 @@ enum BattleGroundTypeId
     BATTLEGROUND_AB            = 3,
     BATTLEGROUND_NA            = 4,
     BATTLEGROUND_BE            = 5,
-    BATTLEGROUND_AA            = 6,
+    BATTLEGROUND_AA            = 6,                         // all arenas
     BATTLEGROUND_EY            = 7,
     BATTLEGROUND_RL            = 8,
     BATTLEGROUND_SA            = 9,
     BATTLEGROUND_DS            = 10,
     BATTLEGROUND_RV            = 11,
     BATTLEGROUND_IC            = 30,
-    BATTLEGROUND_ABG           = 32
+    BATTLEGROUND_RB            = 32                         // random battleground
 };
 #define MAX_BATTLEGROUND_TYPE_ID 33
 
