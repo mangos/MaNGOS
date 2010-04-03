@@ -96,7 +96,7 @@ ConfVersion=2007062001
 #
 ###################################################################################################################
 
-LoginDatabaseInfo = "127.0.0.1;3306;root;mangos;realmd"
+LoginDatabaseInfo = "127.0.0.1;3306;mangos;mangos;realmd"
 LogsDir = ""
 MaxPingTime = 30
 RealmServerPort = 3724
