@@ -44,6 +44,7 @@ void HMACSHA1::UpdateData(const std::string &str)
 {
     UpdateData((uint8 const*)str.c_str(), str.length());
 }
+
 void HMACSHA1::Finalize()
 {
     uint32 length = 0;

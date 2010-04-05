@@ -21,7 +21,7 @@
 #include "Log.h"
 #include "BigNumber.h"
 
-AuthCrypt::AuthCrypt()
+AuthCrypt::AuthCrypt() : _clientDecrypt(SHA_DIGEST_LENGTH), _serverEncrypt(SHA_DIGEST_LENGTH)
 {
     _initialized = false;
 }
