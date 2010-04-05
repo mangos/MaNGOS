@@ -21565,9 +21565,11 @@ void Player::ActivateSpec(uint8 specNum)
         // remove any talent rank if talent not listed in temp spec
         if (iterTempSpec == tempSpec.end() || iterTempSpec->second.state == PLAYERSPELL_REMOVED)
         {
+            TalentEntry const *talentInfo = talent.m_talentEntry;
+
             for(int r = 0; r < MAX_TALENT_RANK; ++r)
-                if (talent.m_talentEntry->RankID[r])
-                    removeSpell(talent.m_talentEntry->RankID[r],!IsPassiveSpell(talent.m_talentEntry->RankID[r]),false);
+                if (talentInfo->RankID[r])
+                    removeSpell(talentInfo->RankID[r],!IsPassiveSpell(talentInfo->RankID[r]),false);
 
             specIter = m_talents[m_activeSpec].begin();
         }
