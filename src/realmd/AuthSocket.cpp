@@ -429,7 +429,7 @@ bool AuthSocket::_HandleLogonChallenge()
         "(unbandate = bandate OR unbandate > UNIX_TIMESTAMP()) AND ip = '%s'", address.c_str());
     if (result)
     {
-        pkt << (uint8)REALM_AUTH_ACCOUNT_BANNED;
+        pkt << (uint8)WOW_FAIL_BANNED;
         sLog.outBasic("[AuthChallenge] Banned ip %s tries to login!", GetRemoteAddress().c_str());
         delete result;
     }
@@ -450,7 +450,7 @@ bool AuthSocket::_HandleLogonChallenge()
                 if ( strcmp((*result)[3].GetString(),GetRemoteAddress().c_str()) )
                 {
                     DEBUG_LOG("[AuthChallenge] Account IP differs");
-                    pkt << (uint8) REALM_AUTH_ACCOUNT_FREEZED;
+                    pkt << (uint8) WOW_FAIL_SUSPENDED;
                     locked=true;
                 }
                 else
@@ -472,12 +472,12 @@ bool AuthSocket::_HandleLogonChallenge()
                 {
                     if((*banresult)[0].GetUInt64() != (*banresult)[1].GetUInt64())
                     {
-                        pkt << (uint8) REALM_AUTH_ACCOUNT_BANNED;
+                        pkt << (uint8) WOW_FAIL_BANNED;
                         sLog.outBasic("[AuthChallenge] Banned account %s tries to login!",_login.c_str ());
                     }
                     else
                     {
-                        pkt << (uint8) REALM_AUTH_ACCOUNT_FREEZED;
+                        pkt << (uint8) WOW_FAIL_SUSPENDED;
                         sLog.outBasic("[AuthChallenge] Temporarily banned account %s tries to login!",_login.c_str ());
                     }
 
@@ -513,7 +513,7 @@ bool AuthSocket::_HandleLogonChallenge()
                     unk3.SetRand(16 * 8);
 
                     ///- Fill the response packet with the result
-                    pkt << uint8(REALM_AUTH_SUCCESS);
+                    pkt << uint8(WOW_SUCCESS);
 
                     // B may be calculated < 32B so we force minimal length to 32B
                     pkt.append(B.AsByteArray(32), 32);      // 32 bytes
@@ -560,7 +560,7 @@ bool AuthSocket::_HandleLogonChallenge()
         }
         else                                                // no account
         {
-            pkt<< (uint8) REALM_AUTH_NO_MATCH;
+            pkt<< (uint8) WOW_FAIL_UNKNOWN_ACCOUNT;
         }
     }
     SendBuf((char const*)pkt.contents(), pkt.size());
@@ -612,7 +612,7 @@ bool AuthSocket::_HandleLogonProof()
             ByteBuffer pkt;
             pkt << (uint8) AUTH_LOGON_CHALLENGE;
             pkt << (uint8) 0x00;
-            pkt << (uint8) REALM_AUTH_WRONG_BUILD_NUMBER;
+            pkt << (uint8) WOW_FAIL_VERSION_INVALID;
             DEBUG_LOG("[AuthChallenge] %u is not a valid client version!", _build);
             DEBUG_LOG("[AuthChallenge] Patch %s not found", tmp);
             SendBuf((char const*)pkt.contents(), pkt.size());
@@ -636,7 +636,7 @@ bool AuthSocket::_HandleLogonProof()
             }
 
             ///- Send a packet to the client with the file length and MD5 hash
-            uint8 data[2] = { AUTH_LOGON_PROOF, REALM_AUTH_UPDATE_CLIENT };
+            uint8 data[2] = { AUTH_LOGON_PROOF, WOW_FAIL_VERSION_UPDATE };
             SendBuf((const char*)data, sizeof(data));
 
             memcpy(&xferh, "0\x05Patch", 7);
@@ -747,7 +747,7 @@ bool AuthSocket::_HandleLogonProof()
     }
     else
     {
-        char data[4]= { AUTH_LOGON_PROOF, REALM_AUTH_NO_MATCH, 3, 0};
+        char data[4]= { AUTH_LOGON_PROOF, WOW_FAIL_UNKNOWN_ACCOUNT, 3, 0};
         SendBuf(data, sizeof(data));
         sLog.outBasic("[AuthChallenge] account %s tried to login with wrong password!",_login.c_str ());
 
@@ -964,14 +964,14 @@ void AuthSocket::LoadRealmlist(ByteBuffer &pkt, uint32 acctid)
                 uint8 color = (std::find(i->second.realmbuilds.begin(), i->second.realmbuilds.end(), _build) != i->second.realmbuilds.end()) ? i->second.color : 2;
                 color = (i->second.allowedSecurityLevel > _accountSecurityLevel) ? 2 : color;
 
-                pkt << uint32(i->second.icon);                      // realm type
-                pkt << uint8(color);                                // if 2, then realm is offline
-                pkt << i->first;                                    // name
-                pkt << i->second.address;                           // address
+                pkt << uint32(i->second.icon);              // realm type
+                pkt << uint8(color);                        // if 2, then realm is offline
+                pkt << i->first;                            // name
+                pkt << i->second.address;                   // address
                 pkt << float(i->second.populationLevel);
                 pkt << uint8(AmountOfCharacters);
-                pkt << uint8(i->second.timezone);                   // realm category
-                pkt << uint8(0x00);                                 // unk, may be realm number/id?
+                pkt << uint8(i->second.timezone);           // realm category
+                pkt << uint8(0x00);                         // unk, may be realm number/id?
             }
 
             pkt << uint8(0x00);
@@ -1008,19 +1008,26 @@ void AuthSocket::LoadRealmlist(ByteBuffer &pkt, uint32 acctid)
                 // Show offline state for unsupported client builds
                 uint8 color = (std::find(i->second.realmbuilds.begin(), i->second.realmbuilds.end(), _build) != i->second.realmbuilds.end()) ? i->second.color : 2;
 
-                pkt << uint8(i->second.icon);                       // realm type
-                pkt << uint8(lock);                                 // if 1, then realm locked
-                pkt << uint8(color);                                // if 2, then realm is offline
-                pkt << i->first;                                    // name
-                pkt << i->second.address;                           // address
+                pkt << uint8(i->second.icon);               // realm type (this is second column in Cfg_Configs.dbc)
+                pkt << uint8(lock);                         // flags, if 0x01, then realm locked
+                pkt << uint8(color);                        // see enum RealmFlags
+                pkt << i->first;                            // name
+                pkt << i->second.address;                   // address
                 pkt << float(i->second.populationLevel);
                 pkt << uint8(AmountOfCharacters);
-                pkt << uint8(i->second.timezone);                   // realm category
-                pkt << uint8(0x2C);                                 // unk, may be realm number/id?
+                pkt << uint8(i->second.timezone);           // realm category (Cfg_Categories.dbc)
+                pkt << uint8(0x2C);                         // unk, may be realm number/id?
+
+                /*if(realmFlags & REALM_FLAG_SPECIFYBUILD)
+                {
+                    pkt << uint8(3);                        // major
+                    pkt << uint8(3);                        // minor
+                    pkt << uint8(3);                        // revision
+                    pkt << uint16(11723);                   // build
+                }*/
             }
 
-            pkt << uint8(0x10);
-            pkt << uint8(0x00);
+            pkt << uint16(0x0010);
             break;
         }
     }

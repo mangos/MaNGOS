@@ -7,12 +7,6 @@
 # command after changing this file, to see if there are
 # any tracked files which get ignored after the change.
 #
-# MaNGOS generated files at Windows build
+# Doxygen generic files
 #
-
-*.ncb
-*.suo
-*.sdf
-*.opensdf
-*.sln.cache
-ipch
+bnetd
