@@ -15951,7 +15951,7 @@ void Player::_LoadTalents(QueryResult *result)
         do
         {
             Field *fields = result->Fetch();
- 
+
             uint32 talent_id = fields[0].GetUInt32();
             TalentEntry const *talentInfo = sTalentStore.LookupEntry( talent_id );
 
@@ -16511,10 +16511,13 @@ void Player::SaveToDB()
     GetSession()->SaveTutorialsData();                      // changed only while character in game
     _SaveGlyphs();
     _SaveTalents();
-    if(m_session->isLogingOut())                            // only save stats on logout
-        _SaveStats();
 
     CharacterDatabase.CommitTransaction();
+
+    // check if stats should only be saved on logout
+    // save stats can be out of transaction
+    if(m_session->isLogingOut() || !sWorld.getConfig(CONFIG_BOOL_STATS_SAVE_ONLY_ON_LOGOUT))
+        _SaveStats();
 
     // save pet (hunter pet level and experience and all type pets health/mana).
     if(Pet* pet = GetPet())
@@ -21295,7 +21298,7 @@ void Player::BuildPlayerTalentsInfoData(WorldPacket *data)
                 for(PlayerTalentMap::iterator iter = m_talents[specIdx].begin(); iter != m_talents[specIdx].end(); ++iter)
                 {
                     PlayerTalent talent = (*iter).second;
-                    
+
                     if (talent.state == PLAYERSPELL_REMOVED)
                         continue;
 
@@ -21617,7 +21620,7 @@ void Player::ActivateSpec(uint8 specNum)
         }
         else
             ++specIter;
-    }   
+    }
 
     // now new spec data have only talents (maybe different rank) as in temp spec data, sync ranks then.
     for (PlayerTalentMap::const_iterator tempIter = tempSpec.begin(); tempIter != tempSpec.end(); ++tempIter)
