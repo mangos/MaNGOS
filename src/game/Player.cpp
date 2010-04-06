@@ -1138,7 +1138,7 @@ void Player::Update( uint32 p_time )
 
     if (!m_timedquests.empty())
     {
-        std::set<uint32>::iterator iter = m_timedquests.begin();
+        QuestSet::iterator iter = m_timedquests.begin();
         while (iter != m_timedquests.end())
         {
             QuestStatusData& q_status = mQuestStatus[*iter];
@@ -13106,15 +13106,15 @@ bool Player::CanCompleteRepeatableQuest( Quest const *pQuest )
 bool Player::CanRewardQuest( Quest const *pQuest, bool msg )
 {
     // not auto complete quest and not completed quest (only cheating case, then ignore without message)
-    if(!pQuest->IsAutoComplete() && GetQuestStatus(pQuest->GetQuestId()) != QUEST_STATUS_COMPLETE)
+    if (!pQuest->IsAutoComplete() && GetQuestStatus(pQuest->GetQuestId()) != QUEST_STATUS_COMPLETE)
         return false;
 
     // daily quest can't be rewarded (25 daily quest already completed)
-    if(!SatisfyQuestDay(pQuest,true))
+    if (!SatisfyQuestDay(pQuest,true))
         return false;
 
     // rewarded and not repeatable quest (only cheating case, then ignore without message)
-    if(GetQuestRewardStatus(pQuest->GetQuestId()))
+    if (GetQuestRewardStatus(pQuest->GetQuestId()))
         return false;
 
     // prevent receive reward with quest items in bank
@@ -13133,7 +13133,7 @@ bool Player::CanRewardQuest( Quest const *pQuest, bool msg )
     }
 
     // prevent receive reward with low money and GetRewOrReqMoney() < 0
-    if(pQuest->GetRewOrReqMoney() < 0 && GetMoney() < uint32(-pQuest->GetRewOrReqMoney()) )
+    if (pQuest->GetRewOrReqMoney() < 0 && GetMoney() < uint32(-pQuest->GetRewOrReqMoney()) )
         return false;
 
     return true;
@@ -13710,7 +13710,7 @@ bool Player::SatisfyQuestTimed(Quest const* qInfo, bool msg)
 bool Player::SatisfyQuestExclusiveGroup( Quest const* qInfo, bool msg )
 {
     // non positive exclusive group, if > 0 then can be start if any other quest in exclusive group already started/completed
-    if(qInfo->GetExclusiveGroup() <= 0)
+    if (qInfo->GetExclusiveGroup() <= 0)
         return true;
 
     ObjectMgr::ExclusiveQuestGroups::const_iterator iter = sObjectMgr.mExclusiveQuestGroups.lower_bound(qInfo->GetExclusiveGroup());
@@ -13723,12 +13723,12 @@ bool Player::SatisfyQuestExclusiveGroup( Quest const* qInfo, bool msg )
         uint32 exclude_Id = iter->second;
 
         // skip checked quest id, only state of other quests in group is interesting
-        if(exclude_Id == qInfo->GetQuestId())
+        if (exclude_Id == qInfo->GetQuestId())
             continue;
 
         // not allow have daily quest if daily quest from exclusive group already recently completed
         Quest const* Nquest = sObjectMgr.GetQuestTemplate(exclude_Id);
-        if( !SatisfyQuestDay(Nquest, false) )
+        if (!SatisfyQuestDay(Nquest, false))
         {
             if( msg )
                 SendCanTakeQuestResponse( INVALIDREASON_DONT_HAVE_REQ );
@@ -13738,8 +13738,8 @@ bool Player::SatisfyQuestExclusiveGroup( Quest const* qInfo, bool msg )
         QuestStatusMap::iterator i_exstatus = mQuestStatus.find( exclude_Id );
 
         // alternative quest already started or completed
-        if( i_exstatus != mQuestStatus.end()
-            && (i_exstatus->second.m_status == QUEST_STATUS_COMPLETE || i_exstatus->second.m_status == QUEST_STATUS_INCOMPLETE) )
+        if (i_exstatus != mQuestStatus.end()
+            && (i_exstatus->second.m_status == QUEST_STATUS_COMPLETE || i_exstatus->second.m_status == QUEST_STATUS_INCOMPLETE))
         {
             if( msg )
                 SendCanTakeQuestResponse( INVALIDREASON_DONT_HAVE_REQ );
@@ -13806,21 +13806,21 @@ bool Player::SatisfyQuestPrevChain( Quest const* qInfo, bool msg )
 
 bool Player::SatisfyQuestDay( Quest const* qInfo, bool msg )
 {
-    if(!qInfo->IsDaily())
+    if (!qInfo->IsDaily())
         return true;
 
     bool have_slot = false;
     for(uint32 quest_daily_idx = 0; quest_daily_idx < PLAYER_MAX_DAILY_QUESTS; ++quest_daily_idx)
     {
         uint32 id = GetUInt32Value(PLAYER_FIELD_DAILY_QUESTS_1+quest_daily_idx);
-        if(qInfo->GetQuestId()==id)
+        if (qInfo->GetQuestId()==id)
             return false;
 
         if(!id)
             have_slot = true;
     }
 
-    if(!have_slot)
+    if (!have_slot)
     {
         if( msg )
             SendCanTakeQuestResponse( INVALIDREASON_DAILY_QUESTS_REMAINING );
@@ -13833,7 +13833,7 @@ bool Player::SatisfyQuestDay( Quest const* qInfo, bool msg )
 bool Player::GiveQuestSourceItem( Quest const *pQuest )
 {
     uint32 srcitem = pQuest->GetSrcItemId();
-    if( srcitem > 0 )
+    if (srcitem > 0)
     {
         uint32 count = pQuest->GetSrcItemCount();
         if( count <= 0 )
@@ -13841,14 +13841,14 @@ bool Player::GiveQuestSourceItem( Quest const *pQuest )
 
         ItemPosCountVec dest;
         uint8 msg = CanStoreNewItem( NULL_BAG, NULL_SLOT, dest, srcitem, count );
-        if( msg == EQUIP_ERR_OK )
+        if (msg == EQUIP_ERR_OK)
         {
             Item * item = StoreNewItem(dest, srcitem, true);
             SendNewItem(item, count, true, false);
             return true;
         }
         // player already have max amount required item, just report success
-        else if( msg == EQUIP_ERR_CANT_CARRY_MORE_OF_THIS )
+        else if (msg == EQUIP_ERR_CANT_CARRY_MORE_OF_THIS)
             return true;
         else
             SendEquipError( msg, NULL, NULL, srcitem );
@@ -16493,7 +16493,7 @@ void Player::SaveToDB()
 
     CharacterDatabase.Execute( ss.str().c_str() );
 
-    if(m_mailsUpdated)                                      //save mails only when needed
+    if (m_mailsUpdated)                                     //save mails only when needed
         _SaveMail();
 
     _SaveBGData();
@@ -16516,11 +16516,11 @@ void Player::SaveToDB()
 
     // check if stats should only be saved on logout
     // save stats can be out of transaction
-    if(m_session->isLogingOut() || !sWorld.getConfig(CONFIG_BOOL_STATS_SAVE_ONLY_ON_LOGOUT))
+    if (m_session->isLogingOut() || !sWorld.getConfig(CONFIG_BOOL_STATS_SAVE_ONLY_ON_LOGOUT))
         _SaveStats();
 
     // save pet (hunter pet level and experience and all type pets health/mana).
-    if(Pet* pet = GetPet())
+    if (Pet* pet = GetPet())
         pet->SavePetToDB(PET_SAVE_AS_CURRENT);
 }
 
@@ -16803,7 +16803,7 @@ void Player::_SaveQuestStatus()
 
 void Player::_SaveDailyQuestStatus()
 {
-    if(!m_DailyQuestChanged)
+    if (!m_DailyQuestChanged)
         return;
 
     m_DailyQuestChanged = false;
@@ -16813,7 +16813,7 @@ void Player::_SaveDailyQuestStatus()
     // we don't need transactions here.
     CharacterDatabase.PExecute("DELETE FROM character_queststatus_daily WHERE guid = '%u'",GetGUIDLow());
     for(uint32 quest_daily_idx = 0; quest_daily_idx < PLAYER_MAX_DAILY_QUESTS; ++quest_daily_idx)
-        if(GetUInt32Value(PLAYER_FIELD_DAILY_QUESTS_1+quest_daily_idx))
+        if (GetUInt32Value(PLAYER_FIELD_DAILY_QUESTS_1+quest_daily_idx))
             CharacterDatabase.PExecute("INSERT INTO character_queststatus_daily (guid,quest,time) VALUES ('%u', '%u','" UI64FMTD "')",
                 GetGUIDLow(), GetUInt32Value(PLAYER_FIELD_DAILY_QUESTS_1+quest_daily_idx),uint64(m_lastDailyQuestTime));
 }

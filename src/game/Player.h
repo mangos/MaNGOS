@@ -2312,7 +2312,8 @@ class MANGOS_DLL_SPEC Player : public Unit
         /*********************************************************/
 
         //We allow only one timed quest active at the same time. Below can then be simple value instead of set.
-        std::set<uint32> m_timedquests;
+        typedef std::set<uint32> QuestSet;
+        QuestSet m_timedquests;
 
         uint64 m_divider;
         uint32 m_ingametime;

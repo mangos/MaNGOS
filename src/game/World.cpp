@@ -1329,15 +1329,18 @@ void World::Update(uint32 diff)
 {
     ///- Update the different timers
     for(int i = 0; i < WUPDATE_COUNT; ++i)
-        if(m_timers[i].GetCurrent()>=0)
+    {
+        if (m_timers[i].GetCurrent()>=0)
             m_timers[i].Update(diff);
-    else m_timers[i].SetCurrent(0);
+        else
+            m_timers[i].SetCurrent(0);
+    }
 
     ///- Update the game time and check for shutdown time
     _UpdateGameTime();
 
     /// Handle daily quests reset time
-    if(m_gameTime > m_NextDailyQuestReset)
+    if (m_gameTime > m_NextDailyQuestReset)
     {
         ResetDailyQuests();
         m_NextDailyQuestReset += DAY;
@@ -1915,13 +1918,13 @@ void World::ResetDailyQuests()
     sLog.outDetail("Daily quests reset for all characters.");
     CharacterDatabase.Execute("DELETE FROM character_queststatus_daily");
     for(SessionMap::const_iterator itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
-        if(itr->second->GetPlayer())
+        if (itr->second->GetPlayer())
             itr->second->GetPlayer()->ResetDailyQuestStatus();
 }
 
 void World::SetPlayerLimit( int32 limit, bool needUpdate )
 {
-    if(limit < -SEC_ADMINISTRATOR)
+    if (limit < -SEC_ADMINISTRATOR)
         limit = -SEC_ADMINISTRATOR;
 
     // lock update need
@@ -1929,7 +1932,7 @@ void World::SetPlayerLimit( int32 limit, bool needUpdate )
 
     m_playerLimit = limit;
 
-    if(db_update_need)
+    if (db_update_need)
         loginDatabase.PExecute("UPDATE realmlist SET allowedSecurityLevel = '%u' WHERE id = '%d'",uint8(GetPlayerSecurityLimit()),realmID);
 }
 
