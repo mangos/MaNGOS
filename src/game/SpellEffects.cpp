@@ -3301,19 +3301,24 @@ void Spell::EffectCreateItem2(SpellEffectIndex eff_idx)
         return;
     Player* player = (Player*)m_caster;
 
+    // explicit item (possible fake)
     uint32 item_id = m_spellInfo->EffectItemType[eff_idx];
 
-    DoCreateItem(eff_idx, item_id);
+    if (item_id)
+        DoCreateItem(eff_idx, item_id);
 
-    // special case: fake item replaced by generate using spell_loot_template
+    // not explicit loot (with fake item drop if need)
     if (IsLootCraftingSpell(m_spellInfo))
     {
-        if (!player->HasItemCount(item_id, 1))
-            return;
+        if(item_id)
+        {
+            if (!player->HasItemCount(item_id, 1))
+                return;
 
-        // remove reagent
-        uint32 count = 1;
-        player->DestroyItemCount(item_id, count, true);
+            // remove reagent
+            uint32 count = 1;
+            player->DestroyItemCount(item_id, count, true);
+        }
 
         // create some random items
         player->AutoStoreLoot(m_spellInfo->Id, LootTemplates_Spell);
