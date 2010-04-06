@@ -11308,15 +11308,20 @@ int32 Unit::CalculateSpellDamage(SpellEntry const* spellProto, SpellEffectIndex 
     int32 randomPoints = int32(spellProto->EffectDieSides[effect_index]);
     float comboDamage = spellProto->EffectPointsPerComboPoint[effect_index];
 
-    if(randomPoints != 0)
+    switch(randomPoints)
     {
-        // range can have positive and negative values, so order its for irand
-        int32 randvalue = (0 > randomPoints)
-            ? irand(randomPoints, 0)
-            : irand(0, randomPoints);
+        case 0: break;                                      // not used
+        case 1: basePoints += 1; break;                     // range 1..1
+        default:
+            // range can have positive (1..rand) and negative (rand..1) values, so order its for irand
+            int32 randvalue = (randomPoints >= 1)
+                ? irand(1, randomPoints)
+                : irand(randomPoints, 1);
 
-        basePoints += randvalue;
+            basePoints += randvalue;
+            break;
     }
+        
 
     int32 value = basePoints;
 
