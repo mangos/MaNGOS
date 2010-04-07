@@ -1020,10 +1020,10 @@ void AuthSocket::LoadRealmlist(ByteBuffer &pkt, uint32 acctid)
 
                 /*if(realmFlags & REALM_FLAG_SPECIFYBUILD)
                 {
-                    pkt << uint8(3);                        // major
-                    pkt << uint8(3);                        // minor
-                    pkt << uint8(3);                        // revision
-                    pkt << uint16(11723);                   // build
+                    pkt << uint8(0);                        // major
+                    pkt << uint8(0);                        // minor
+                    pkt << uint8(0);                        // revision
+                    pkt << uint16(0);                       // build
                 }*/
             }
 

@@ -21,7 +21,7 @@
 
 DROP TABLE IF EXISTS `character_db_version`;
 CREATE TABLE `character_db_version` (
-  `required_9661_01_characters_character_talent` bit(1) default NULL
+  `required_9687_01_characters_character_queststatus_daily` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Last applied sql update to DB';
 
 --
@@ -702,7 +702,6 @@ DROP TABLE IF EXISTS `character_queststatus_daily`;
 CREATE TABLE `character_queststatus_daily` (
   `guid` int(11) unsigned NOT NULL default '0' COMMENT 'Global Unique Identifier',
   `quest` int(11) unsigned NOT NULL default '0' COMMENT 'Quest Identifier',
-  `time` bigint(20) unsigned NOT NULL default '0',
   PRIMARY KEY  (`guid`,`quest`),
   KEY `idx_guid` (`guid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Player System';
@@ -714,6 +713,27 @@ CREATE TABLE `character_queststatus_daily` (
 LOCK TABLES `character_queststatus_daily` WRITE;
 /*!40000 ALTER TABLE `character_queststatus_daily` DISABLE KEYS */;
 /*!40000 ALTER TABLE `character_queststatus_daily` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `character_queststatus_weekly`
+--
+
+DROP TABLE IF EXISTS `character_queststatus_weekly`;
+CREATE TABLE `character_queststatus_weekly` (
+  `guid` int(11) unsigned NOT NULL default '0' COMMENT 'Global Unique Identifier',
+  `quest` int(11) unsigned NOT NULL default '0' COMMENT 'Quest Identifier',
+  PRIMARY KEY  (`guid`,`quest`),
+  KEY `idx_guid` (`guid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Player System';
+
+--
+-- Dumping data for table `character_queststatus_weekly`
+--
+
+LOCK TABLES `character_queststatus_weekly` WRITE;
+/*!40000 ALTER TABLE `character_queststatus_weekly` DISABLE KEYS */;
+/*!40000 ALTER TABLE `character_queststatus_weekly` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -828,6 +848,55 @@ CREATE TABLE `character_spell_cooldown` (
 LOCK TABLES `character_spell_cooldown` WRITE;
 /*!40000 ALTER TABLE `character_spell_cooldown` DISABLE KEYS */;
 /*!40000 ALTER TABLE `character_spell_cooldown` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `character_stats`
+--
+
+DROP TABLE IF EXISTS `character_stats`;
+CREATE TABLE `character_stats` (
+  `guid` int(11) unsigned NOT NULL default '0' COMMENT 'Global Unique Identifier, Low part',
+  `maxhealth` int(10) UNSIGNED NOT NULL default '0',
+  `maxpower1` int(10) UNSIGNED NOT NULL default '0',
+  `maxpower2` int(10) UNSIGNED NOT NULL default '0',
+  `maxpower3` int(10) UNSIGNED NOT NULL default '0',
+  `maxpower4` int(10) UNSIGNED NOT NULL default '0',
+  `maxpower5` int(10) UNSIGNED NOT NULL default '0',
+  `maxpower6` int(10) UNSIGNED NOT NULL default '0',
+  `maxpower7` int(10) UNSIGNED NOT NULL default '0',
+  `strength` int(10) UNSIGNED NOT NULL default '0',
+  `agility` int(10) UNSIGNED NOT NULL default '0',
+  `stamina` int(10) UNSIGNED NOT NULL default '0',
+  `intellect` int(10) UNSIGNED NOT NULL default '0',
+  `spirit` int(10) UNSIGNED NOT NULL default '0',
+  `armor` int(10) UNSIGNED NOT NULL default '0',
+  `resHoly` int(10) UNSIGNED NOT NULL default '0',
+  `resFire` int(10) UNSIGNED NOT NULL default '0',
+  `resNature` int(10) UNSIGNED NOT NULL default '0',
+  `resFrost` int(10) UNSIGNED NOT NULL default '0',
+  `resShadow` int(10) UNSIGNED NOT NULL default '0',
+  `resArcane` int(10) UNSIGNED NOT NULL default '0',
+  `blockPct` float UNSIGNED NOT NULL default '0',
+  `dodgePct` float UNSIGNED NOT NULL default '0',
+  `parryPct` float UNSIGNED NOT NULL default '0',
+  `critPct` float UNSIGNED NOT NULL default '0',  
+  `rangedCritPct` float UNSIGNED NOT NULL default '0',
+  `spellCritPct` float UNSIGNED NOT NULL default '0',
+  `attackPower` int(10) UNSIGNED NOT NULL default '0',
+  `rangedAttackPower` int(10) UNSIGNED NOT NULL default '0',
+  `spellPower` int(10) UNSIGNED NOT NULL default '0',
+   
+  PRIMARY KEY  (`guid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `character_stats`
+--
+
+LOCK TABLES `character_stats` WRITE;
+/*!40000 ALTER TABLE `character_stats` DISABLE KEYS */;
+/*!40000 ALTER TABLE `character_stats` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -1512,7 +1581,9 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `saved_variables`;
 CREATE TABLE `saved_variables` (
-    `NextArenaPointDistributionTime` bigint(40) UNSIGNED NOT NULL DEFAULT '0'
+    `NextArenaPointDistributionTime` bigint(40) UNSIGNED NOT NULL DEFAULT '0',
+    `NextDailyQuestResetTime` bigint(40) unsigned NOT NULL default '0',
+    `NextWeeklyQuestResetTime` bigint(40) unsigned NOT NULL default '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Variable Saves';
 
 --
