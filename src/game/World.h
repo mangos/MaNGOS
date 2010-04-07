@@ -148,6 +148,9 @@ enum eConfigUInt32Values
     CONFIG_UINT32_WORLD_BOSS_LEVEL_DIFF,
     CONFIG_UINT32_QUEST_LOW_LEVEL_HIDE_DIFF,
     CONFIG_UINT32_QUEST_HIGH_LEVEL_HIDE_DIFF,
+    CONFIG_UINT32_QUEST_DAILY_RESET_HOUR,
+    CONFIG_UINT32_QUEST_WEEKLY_RESET_WEEK_DAY,
+    CONFIG_UINT32_QUEST_WEEKLY_RESET_HOUR,
     CONFIG_UINT32_CHAT_STRICT_LINK_CHECKING_SEVERITY,
     CONFIG_UINT32_CHAT_STRICT_LINK_CHECKING_KICK,
     CONFIG_UINT32_CORPSE_DECAY_NORMAL,
@@ -173,6 +176,7 @@ enum eConfigUInt32Values
     CONFIG_UINT32_TIMERBAR_BREATH_MAX,
     CONFIG_UINT32_TIMERBAR_FIRE_GMLEVEL,
     CONFIG_UINT32_TIMERBAR_FIRE_MAX,
+    CONFIG_UINT32_MIN_LEVEL_STAT_SAVE,
     CONFIG_UINT32_VALUE_COUNT
 };
 
@@ -302,6 +306,7 @@ enum eConfigBoolValues
     CONFIG_BOOL_ARENA_QUEUE_ANNOUNCER_JOIN,
     CONFIG_BOOL_ARENA_QUEUE_ANNOUNCER_EXIT,
     CONFIG_BOOL_KICK_PLAYER_ON_BAD_PACKET,
+    CONFIG_BOOL_STATS_SAVE_ONLY_ON_LOGOUT,
     CONFIG_BOOL_VALUE_COUNT
 };
 
@@ -319,7 +324,7 @@ enum BillingPlanFlags
     SESSION_ENABLE_CAIS     = 0x80,
 };
 
-/// Type of server, this is values from second column of Cfg_Configs.dbc
+/// Type of server, this is values from second column of Cfg_Configs.dbc (1.12.1 have another numeration)
 enum RealmType
 {
     REALM_TYPE_NORMAL   = 0,
@@ -331,7 +336,7 @@ enum RealmType
                                                             // replaced by REALM_PVP in realm list
 };
 
-/// This is values from first column of Cfg_Categories.dbc
+/// This is values from first column of Cfg_Categories.dbc (1.12.1 have another numeration)
 enum RealmZone
 {
     REALM_ZONE_UNKNOWN       = 0,                           // any language
@@ -365,6 +370,7 @@ enum RealmZone
     REALM_ZONE_QA_SERVER     = 28,                          // any language
     REALM_ZONE_CN9           = 29,                          // basic-Latin at create, any at login
     REALM_ZONE_TEST_SERVER_2 = 30,                          // any language
+    // in 3.x
     REALM_ZONE_CN10          = 31,                          // basic-Latin at create, any at login
     REALM_ZONE_CTC           = 32,
     REALM_ZONE_CNC           = 33,
@@ -483,6 +489,7 @@ class World
         uint32 GetUptime() const { return uint32(m_gameTime - m_startTime); }
         /// Next daily quests reset time
         time_t GetNextDailyQuestsResetTime() const { return m_NextDailyQuestReset; }
+        time_t GetNextWeeklyQuestsResetTime() const { return m_NextWeeklyQuestReset; }
 
         /// Get the maximum skill level a player can reach
         uint16 GetConfigMaxSkillValue() const
@@ -583,7 +590,9 @@ class World
         void _UpdateRealmCharCount(QueryResult *resultCharCount, uint32 accountId);
 
         void InitDailyQuestResetTime();
+        void InitWeeklyQuestResetTime();
         void ResetDailyQuests();
+        void ResetWeeklyQuests();
     private:
         void setConfig(eConfigUInt32Values index, char const* fieldname, uint32 defvalue);
         void setConfig(eConfigInt32Values index, char const* fieldname, int32 defvalue);
@@ -653,6 +662,7 @@ class World
 
         // next daily quests reset time
         time_t m_NextDailyQuestReset;
+        time_t m_NextWeeklyQuestReset;
 
         //Player Queue
         Queue m_QueuedPlayer;

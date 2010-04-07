@@ -1,7 +1,7 @@
 #####################################
 # MaNGOS Configuration file         #
 #####################################
-ConfVersion=2010030401
+ConfVersion=2010040601
 
 ###################################################################################################################
 # CONNECTIONS AND DIRECTORIES
@@ -112,9 +112,19 @@ BindIP = "0.0.0.0"
 #        Weather update interval (in milliseconds)
 #        Default: 600000 (10 min)
 #
-#    PlayerSaveInterval
+#    PlayerSave.Interval
 #        Player save interval (in milliseconds)
 #        Default: 900000 (15 min)
+#
+#    PlayerSave.Stats.MinLevel
+#        Minimum level for saving character stats for external usage in database
+#        Default: 0  (do not save character stats)
+#                 1+ (save stats for characters with level 1+)
+#
+#    PlayerSave.Stats.SaveOnlyOnLogout
+#        Enable/Disable saving of character stats only on logout
+#        Default: 1 (only save on logout)
+#                 0 (save on every player save)
 #
 #    vmap.enableLOS
 #    vmap.enableHeight
@@ -159,6 +169,7 @@ BindIP = "0.0.0.0"
 #        Default: 1 (permit addon channel)
 #                 0 (do not permit addon channel)
 #
+#
 ###################################################################################################################
 
 UseProcessors = 0
@@ -172,7 +183,9 @@ SocketSelectTime = 10000
 GridCleanUpDelay = 300000
 MapUpdateInterval = 100
 ChangeWeatherInterval = 600000
-PlayerSaveInterval = 900000
+PlayerSave.Interval = 900000
+PlayerSave.Stats.MinLevel = 0
+PlayerSave.Stats.SaveOnlyOnLogout = 1
 vmap.enableLOS = 0
 vmap.enableHeight = 0
 vmap.ignoreMapIds = "369"
@@ -545,6 +558,18 @@ LogColors = ""
 #        Default: 7
 #                -1 (show all available quests marks)
 #
+#    Quests.Daily.ResetHour
+#        Hour when daily quests reset (0..23)
+#        Default: 6
+#
+#    Quests.Weekly.ResetWeekDay
+#        Week day when daily quests reset (0..6) 0 == Sunday
+#        Default: 3
+#
+#    Quests.Weekly.ResetHour
+#        Hour in one from weekly days when weekly quests reset (0..23)
+#        Default: 6
+#
 #    Guild.EventLogRecordsCount
 #        Count of guild event log records stored in guild_eventlog table
 #        Increase to store more guild events in table, minimum is 100
@@ -672,6 +697,9 @@ Instance.ResetTimeHour = 4
 Instance.UnloadDelay = 1800000
 Quests.LowLevelHideDiff = 4
 Quests.HighLevelHideDiff = 7
+Quests.Daily.ResetHour = 6
+Quests.Weekly.ResetWeekDay = 3
+Quests.Weekly.ResetHour = 6
 Guild.EventLogRecordsCount = 100
 Guild.BankEventLogRecordsCount = 25
 TimerBar.Fatigue.GMLevel = 4
