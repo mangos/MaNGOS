@@ -1,3 +1,5 @@
+ALTER TABLE db_version CHANGE COLUMN required_9690_01_mangos_spell_proc_event required_9692_03_mangos_spell_proc_event bit;
+
 -- Rampage: now passive instead of being a proc
 DELETE FROM `spell_proc_event` WHERE `entry` = 29801;
 -- Unleashed Rage: now passive instead of being a proc
