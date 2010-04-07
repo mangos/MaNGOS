@@ -616,6 +616,10 @@ void WorldSession::HandleBugOpcode( WorldPacket & recv_data )
 void WorldSession::HandleReclaimCorpseOpcode(WorldPacket &recv_data)
 {
     sLog.outDetail("WORLD: Received CMSG_RECLAIM_CORPSE");
+
+    uint64 guid;
+    recv_data >> guid;
+
     if (GetPlayer()->isAlive())
         return;
 
@@ -639,9 +643,6 @@ void WorldSession::HandleReclaimCorpseOpcode(WorldPacket &recv_data)
     if (!corpse->IsWithinDistInMap(GetPlayer(), CORPSE_RECLAIM_RADIUS, true))
         return;
 
-    uint64 guid;
-    recv_data >> guid;
-
     // resurrect
     GetPlayer()->ResurrectPlayer(GetPlayer()->InBattleGround() ? 1.0f : 0.5f);
 
@@ -653,13 +654,13 @@ void WorldSession::HandleResurrectResponseOpcode(WorldPacket & recv_data)
 {
     sLog.outDetail("WORLD: Received CMSG_RESURRECT_RESPONSE");
 
-    if(GetPlayer()->isAlive())
-        return;
-
     uint64 guid;
     uint8 status;
     recv_data >> guid;
     recv_data >> status;
+
+    if(GetPlayer()->isAlive())
+        return;
 
     if(status == 0)
     {

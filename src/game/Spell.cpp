@@ -1799,6 +1799,10 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                 Unit* target = m_targets.getUnitTarget();
                 if(!target)
                     target = m_caster;
+                // prevent center adding to heal list
+                else if (!m_caster->IsFriendlyTo(target))
+                    targetUnitMap.remove(target);
+
                 uint32 count = CalculateDamage(EFFECT_INDEX_2,m_caster); // stored in dummy effect, affected by mods
 
                 FillRaidOrPartyHealthPriorityTargets(targetUnitMap, m_caster, target, radius, count, true, false, true);
