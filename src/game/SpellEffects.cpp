@@ -4579,7 +4579,7 @@ void Spell::EffectEnchantItemTmp(SpellEffectIndex eff_idx)
     uint32 duration;
 
     // rogue family enchantments exception by duration
-    if(m_spellInfo->Id == 38615)
+    if(m_spellInfo->Id == 38615)                            // Poison
         duration = 1800;                                    // 30 mins
     // other rogue family enchantments always 1 hour (some have spell damage=0, but some have wrong data in EffBasePoints)
     else if(m_spellInfo->SpellFamilyName == SPELLFAMILY_ROGUE)
@@ -4596,9 +4596,9 @@ void Spell::EffectEnchantItemTmp(SpellEffectIndex eff_idx)
     // shaman rockbiter enchantments
     else if(m_spellInfo->SpellVisual[0] == 0)
         duration = 1800;                                    // 30 mins
-    else if(m_spellInfo->Id == 29702)
+    else if(m_spellInfo->Id == 29702)                       // Greater Ward of Shielding
         duration = 300;                                     // 5 mins
-    else if(m_spellInfo->Id == 37360)
+    else if(m_spellInfo->Id == 37360)                       // Consecrated Weapon
         duration = 300;                                     // 5 mins
     // default case
     else
