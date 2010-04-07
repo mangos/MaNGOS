@@ -1928,7 +1928,7 @@ void World::InitDailyQuestResetTime()
     if (!result)
         m_NextDailyQuestReset = time_t(time(NULL));         // game time not yet init
     else
-        m_NextWeeklyQuestReset = time_t((*result)[0].GetUInt64());
+        m_NextDailyQuestReset = time_t((*result)[0].GetUInt64());
 
     // generate time by config
     time_t curTime = time(NULL);
