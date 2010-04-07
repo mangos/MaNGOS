@@ -3425,7 +3425,7 @@ void ObjectMgr::LoadQuests()
         if (qinfo->QuestFlags & QUEST_FLAGS_DAILY && qinfo->QuestFlags & QUEST_FLAGS_WEEKLY)
         {
             sLog.outErrorDb("Weekly Quest %u is marked as daily quest in `QuestFlags`, removed daily flag.",qinfo->GetQuestId());
-            qinfo->QuestFlags &= QUEST_FLAGS_DAILY;
+            qinfo->QuestFlags &= ~QUEST_FLAGS_DAILY;
         }
 
         if (qinfo->QuestFlags & QUEST_FLAGS_DAILY)
