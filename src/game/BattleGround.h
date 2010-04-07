@@ -68,13 +68,15 @@ enum BattleGroundQuests
 
 enum BattleGroundMarks
 {
-    SPELL_WS_MARK_LOSER             = 24950,
-    SPELL_WS_MARK_WINNER            = 24951,
-    SPELL_AB_MARK_LOSER             = 24952,
-    SPELL_AB_MARK_WINNER            = 24953,
-    SPELL_AV_MARK_LOSER             = 24954,
-    SPELL_AV_MARK_WINNER            = 24955,
-    ITEM_EY_MARK_OF_HONOR           = 29024
+    SPELL_WS_MARK_LOSER             = 24950,                // not create marks now
+    SPELL_WS_MARK_WINNER            = 24951,                // not create marks now
+    SPELL_AB_MARK_LOSER             = 24952,                // not create marks now
+    SPELL_AB_MARK_WINNER            = 24953,                // not create marks now
+    SPELL_AV_MARK_LOSER             = 24954,                // not create marks now
+    SPELL_AV_MARK_WINNER            = 24955,                // not create marks now
+
+    SPELL_WG_MARK_VICTORY           = 24955,                // honor + mark
+    SPELL_WG_MARK_DEFEAT            = 58494,                // honor + mark
 };
 
 enum BattleGroundMarksCount

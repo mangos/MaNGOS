@@ -882,7 +882,6 @@ void BattleGround::RewardMark(Player *plr,uint32 count)
             break;
         case BATTLEGROUND_EY:
             IsSpell = false;
-            mark = ITEM_EY_MARK_OF_HONOR;
             break;
         default:
             return;
