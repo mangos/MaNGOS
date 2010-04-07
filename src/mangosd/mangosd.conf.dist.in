@@ -558,6 +558,18 @@ LogColors = ""
 #        Default: 7
 #                -1 (show all available quests marks)
 #
+#    Quests.Daily.ResetHour
+#        Hour when daily quests reset (0..23)
+#        Default: 6
+#
+#    Quests.Weekly.ResetWeekDay
+#        Week day when daily quests reset (0..6) 0 == Sunday
+#        Default: 3
+#
+#    Quests.Weekly.ResetHour
+#        Hour in one from weekly days when weekly quests reset (0..23)
+#        Default: 6
+#
 #    Guild.EventLogRecordsCount
 #        Count of guild event log records stored in guild_eventlog table
 #        Increase to store more guild events in table, minimum is 100
@@ -685,6 +697,9 @@ Instance.ResetTimeHour = 4
 Instance.UnloadDelay = 1800000
 Quests.LowLevelHideDiff = 4
 Quests.HighLevelHideDiff = 7
+Quests.Daily.ResetHour = 6
+Quests.Weekly.ResetWeekDay = 3
+Quests.Weekly.ResetHour = 6
 Guild.EventLogRecordsCount = 100
 Guild.BankEventLogRecordsCount = 25
 TimerBar.Fatigue.GMLevel = 4
