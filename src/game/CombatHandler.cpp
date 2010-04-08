@@ -36,7 +36,7 @@ void WorldSession::HandleAttackSwingOpcode( WorldPacket & recv_data )
     if(!pEnemy)
     {
         if(!guid.IsUnit())
-            sLog.outError("WORLD: %u isn't player, pet or creature", guid.GetString().c_str());
+            sLog.outError("WORLD: %s isn't player, pet or creature", guid.GetString().c_str());
         else
             sLog.outError( "WORLD: Enemy %s not found", guid.GetString().c_str());
 
