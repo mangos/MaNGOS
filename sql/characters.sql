@@ -21,7 +21,7 @@
 
 DROP TABLE IF EXISTS `character_db_version`;
 CREATE TABLE `character_db_version` (
-  `required_9687_01_characters_character_queststatus_daily` bit(1) default NULL
+  `required_9692_02_characters_mail` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Last applied sql update to DB';
 
 --
@@ -1414,7 +1414,7 @@ CREATE TABLE `mail` (
   `sender` int(11) unsigned NOT NULL default '0' COMMENT 'Character Global Unique Identifier',
   `receiver` int(11) unsigned NOT NULL default '0' COMMENT 'Character Global Unique Identifier',
   `subject` longtext,
-  `itemTextId` int(11) unsigned NOT NULL default '0',
+  `body` longtext,
   `has_items` tinyint(3) unsigned NOT NULL default '0',
   `expire_time` bigint(40) NOT NULL default '0',
   `deliver_time` bigint(40) NOT NULL default '0',

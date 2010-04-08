@@ -42,10 +42,11 @@
 
 void WorldSession::SendPartyResult(PartyOperation operation, const std::string& member, PartyResult res)
 {
-    WorldPacket data(SMSG_PARTY_COMMAND_RESULT, (8+member.size()+1));
-    data << (uint32)operation;
-    data << member;
-    data << (uint32)res;
+    WorldPacket data(SMSG_PARTY_COMMAND_RESULT, (4+member.size()+1+4+4));
+    data << uint32(operation);
+    data << member;                                         // max len 48
+    data << uint32(res);
+    data << uint32(0);                                      // LFD cooldown related (used with ERR_PARTY_LFG_BOOT_COOLDOWN_S and ERR_PARTY_LFG_BOOT_NOT_ELIGIBLE_S)
 
     SendPacket( &data );
 }
@@ -54,14 +55,14 @@ void WorldSession::HandleGroupInviteOpcode( WorldPacket & recv_data )
 {
     std::string membername;
     recv_data >> membername;
-    recv_data.read_skip<uint32>();                          // 0 for all known invite ways
+    recv_data.read_skip<uint32>();                          // roles mask?
 
     // attempt add selected player
 
     // cheating
     if(!normalizePlayerName(membername))
     {
-        SendPartyResult(PARTY_OP_INVITE, membername, PARTY_RESULT_CANT_FIND_TARGET);
+        SendPartyResult(PARTY_OP_INVITE, membername, ERR_BAD_PLAYER_NAME_S);
         return;
     }
 
@@ -70,25 +71,25 @@ void WorldSession::HandleGroupInviteOpcode( WorldPacket & recv_data )
     // no player
     if(!player)
     {
-        SendPartyResult(PARTY_OP_INVITE, membername, PARTY_RESULT_CANT_FIND_TARGET);
+        SendPartyResult(PARTY_OP_INVITE, membername, ERR_BAD_PLAYER_NAME_S);
         return;
     }
 
     // can't group with
     if(!sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_GROUP) && GetPlayer()->GetTeam() != player->GetTeam())
     {
-        SendPartyResult(PARTY_OP_INVITE, membername, PARTY_RESULT_TARGET_UNFRIENDLY);
+        SendPartyResult(PARTY_OP_INVITE, membername, ERR_PLAYER_WRONG_FACTION);
         return;
     }
     if(GetPlayer()->GetInstanceId() != 0 && player->GetInstanceId() != 0 && GetPlayer()->GetInstanceId() != player->GetInstanceId() && GetPlayer()->GetMapId() == player->GetMapId())
     {
-        SendPartyResult(PARTY_OP_INVITE, membername, PARTY_RESULT_NOT_IN_YOUR_INSTANCE);
+        SendPartyResult(PARTY_OP_INVITE, membername, ERR_TARGET_NOT_IN_INSTANCE_S);
         return;
     }
     // just ignore us
     if(player->GetSocial()->HasIgnore(GetPlayer()->GetGUIDLow()))
     {
-        SendPartyResult(PARTY_OP_INVITE, membername, PARTY_RESULT_TARGET_IGNORE_YOU);
+        SendPartyResult(PARTY_OP_INVITE, membername, ERR_IGNORING_YOU_S);
         return;
     }
 
@@ -102,7 +103,7 @@ void WorldSession::HandleGroupInviteOpcode( WorldPacket & recv_data )
     // player already in another group or invited
     if( group2 || player->GetGroupInvite() )
     {
-        SendPartyResult(PARTY_OP_INVITE, membername, PARTY_RESULT_ALREADY_IN_GROUP);
+        SendPartyResult(PARTY_OP_INVITE, membername, ERR_ALREADY_IN_GROUP_S);
         return;
     }
 
@@ -111,13 +112,13 @@ void WorldSession::HandleGroupInviteOpcode( WorldPacket & recv_data )
         // not have permissions for invite
         if(!group->IsLeader(GetPlayer()->GetGUID()) && !group->IsAssistant(GetPlayer()->GetGUID()))
         {
-            SendPartyResult(PARTY_OP_INVITE, "", PARTY_RESULT_YOU_NOT_LEADER);
+            SendPartyResult(PARTY_OP_INVITE, "", ERR_NOT_LEADER);
             return;
         }
         // not have place
         if(group->IsFull())
         {
-            SendPartyResult(PARTY_OP_INVITE, "", PARTY_RESULT_PARTY_FULL);
+            SendPartyResult(PARTY_OP_INVITE, "", ERR_GROUP_FULL);
             return;
         }
     }
@@ -151,19 +152,25 @@ void WorldSession::HandleGroupInviteOpcode( WorldPacket & recv_data )
 
     // ok, we do it
     WorldPacket data(SMSG_GROUP_INVITE, 10);                // guess size
-    data << uint8(1);                                       // ok
-    data << GetPlayer()->GetName();
+    data << uint8(1);                                       // invited/already in group flag
+    data << GetPlayer()->GetName();                         // max len 48
+    data << uint32(0);                                      // unk
+    data << uint8(0);                                       // count
+    //for(int i = 0; i < count; ++i)
+    //    data << uint32(0);
+    data << uint32(0);                                      // unk
     player->GetSession()->SendPacket(&data);
 
-    SendPartyResult(PARTY_OP_INVITE, membername, PARTY_RESULT_OK);
+    SendPartyResult(PARTY_OP_INVITE, membername, ERR_PARTY_RESULT_OK);
 }
 
 void WorldSession::HandleGroupAcceptOpcode( WorldPacket & recv_data )
 {
-    recv_data.read_skip<uint32>();                          // value received in WorldSession::HandleGroupInviteOpcode and also skipeed currently?
+    recv_data.read_skip<uint32>();                          // roles mask?
 
     Group *group = GetPlayer()->GetGroupInvite();
-    if (!group) return;
+    if (!group)
+        return;
 
     if(group->GetLeaderGUID() == GetPlayer()->GetGUID())
     {
@@ -171,7 +178,7 @@ void WorldSession::HandleGroupAcceptOpcode( WorldPacket & recv_data )
         return;
     }
 
-    // remove in from ivites in any case
+    // remove in from invites in any case
     group->RemoveInvite(GetPlayer());
 
     /** error handling **/
@@ -180,7 +187,7 @@ void WorldSession::HandleGroupAcceptOpcode( WorldPacket & recv_data )
     // not have place
     if(group->IsFull())
     {
-        SendPartyResult(PARTY_OP_INVITE, "", PARTY_RESULT_PARTY_FULL);
+        SendPartyResult(PARTY_OP_INVITE, "", ERR_GROUP_FULL);
         return;
     }
 
@@ -197,10 +204,9 @@ void WorldSession::HandleGroupAcceptOpcode( WorldPacket & recv_data )
             return;
     }
 
-    // everything's fine, do it, PLAYER'S GROUP IS SET IN ADDMEMBER!!!
+    // everything is fine, do it, PLAYER'S GROUP IS SET IN ADDMEMBER!!!
     if(!group->AddMember(GetPlayer()->GetGUID(), GetPlayer()->GetName()))
         return;
-
 }
 
 void WorldSession::HandleGroupDeclineOpcode( WorldPacket & /*recv_data*/ )
@@ -228,8 +234,9 @@ void WorldSession::HandleGroupUninviteGuidOpcode(WorldPacket & recv_data)
 {
     uint64 guid;
     recv_data >> guid;
+    recv_data.read_skip<std::string>();                     // reason
 
-    //can't uninvite yourself
+    // can't uninvite yourself
     if(guid == GetPlayer()->GetGUID())
     {
         sLog.outError("WorldSession::HandleGroupUninviteGuidOpcode: leader %s(%d) tried to uninvite himself from the group.", GetPlayer()->GetName(), GetPlayer()->GetGUIDLow());
@@ -237,7 +244,7 @@ void WorldSession::HandleGroupUninviteGuidOpcode(WorldPacket & recv_data)
     }
 
     PartyResult res = GetPlayer()->CanUninviteFromGroup();
-    if(res != PARTY_RESULT_OK)
+    if(res != ERR_PARTY_RESULT_OK)
     {
         SendPartyResult(PARTY_OP_LEAVE, "", res);
         return;
@@ -259,7 +266,7 @@ void WorldSession::HandleGroupUninviteGuidOpcode(WorldPacket & recv_data)
         return;
     }
 
-    SendPartyResult(PARTY_OP_LEAVE, "", PARTY_RESULT_NOT_IN_YOUR_PARTY);
+    SendPartyResult(PARTY_OP_LEAVE, "", ERR_TARGET_NOT_IN_GROUP_S);
 }
 
 void WorldSession::HandleGroupUninviteOpcode(WorldPacket & recv_data)
@@ -279,7 +286,7 @@ void WorldSession::HandleGroupUninviteOpcode(WorldPacket & recv_data)
     }
 
     PartyResult res = GetPlayer()->CanUninviteFromGroup();
-    if(res != PARTY_RESULT_OK)
+    if(res != ERR_PARTY_RESULT_OK)
     {
         SendPartyResult(PARTY_OP_LEAVE, "", res);
         return;
@@ -301,7 +308,7 @@ void WorldSession::HandleGroupUninviteOpcode(WorldPacket & recv_data)
         return;
     }
 
-    SendPartyResult(PARTY_OP_LEAVE, membername, PARTY_RESULT_NOT_IN_YOUR_PARTY);
+    SendPartyResult(PARTY_OP_LEAVE, membername, ERR_TARGET_NOT_IN_GROUP_S);
 }
 
 void WorldSession::HandleGroupSetLeaderOpcode( WorldPacket & recv_data )
@@ -320,7 +327,7 @@ void WorldSession::HandleGroupSetLeaderOpcode( WorldPacket & recv_data )
         return;
     /********************/
 
-    // everything's fine, do it
+    // everything is fine, do it
     group->ChangeLeader(guid);
 }
 
@@ -331,15 +338,15 @@ void WorldSession::HandleGroupDisbandOpcode( WorldPacket & /*recv_data*/ )
 
     if(_player->InBattleGround())
     {
-        SendPartyResult(PARTY_OP_INVITE, "", PARTY_RESULT_INVITE_RESTRICTED);
+        SendPartyResult(PARTY_OP_INVITE, "", ERR_INVITE_RESTRICTED);
         return;
     }
 
     /** error handling **/
     /********************/
 
-    // everything's fine, do it
-    SendPartyResult(PARTY_OP_LEAVE, GetPlayer()->GetName(), PARTY_RESULT_OK);
+    // everything is fine, do it
+    SendPartyResult(PARTY_OP_LEAVE, GetPlayer()->GetName(), ERR_PARTY_RESULT_OK);
 
     GetPlayer()->RemoveFromGroup();
 }
@@ -360,7 +367,7 @@ void WorldSession::HandleLootMethodOpcode( WorldPacket & recv_data )
         return;
     /********************/
 
-    // everything's fine, do it
+    // everything is fine, do it
     group->SetLootMethod((LootMethod)lootMethod);
     group->SetLooterGuid(lootMaster);
     group->SetLootThreshold((ItemQualities)lootThreshold);
@@ -382,7 +389,7 @@ void WorldSession::HandleLootRoll( WorldPacket &recv_data )
     if(!group)
         return;
 
-    // everything's fine, do it
+    // everything is fine, do it
     group->CountRollVote(GetPlayer()->GetObjectGuid(), lootedTarget, itemSlot, rollType);
 
     switch (rollType)
@@ -429,7 +436,7 @@ void WorldSession::HandleRandomRollOpcode(WorldPacket& recv_data)
         return;
     /********************/
 
-    // everything's fine, do it
+    // everything is fine, do it
     roll = urand(minimum, maximum);
 
     //sLog.outDebug("ROLL: MIN: %u, MAX: %u, ROLL: %u", minimum, maximum, roll);
@@ -457,7 +464,7 @@ void WorldSession::HandleRaidTargetUpdateOpcode( WorldPacket & recv_data )
     /** error handling **/
     /********************/
 
-    // everything's fine, do it
+    // everything is fine, do it
     if(x == 0xFF)                                           // target icon request
     {
         group->SendTargetIconList(this);
@@ -487,8 +494,8 @@ void WorldSession::HandleGroupRaidConvertOpcode( WorldPacket & /*recv_data*/ )
         return;
     /********************/
 
-    // everything's fine, do it (is it 0 (PARTY_OP_INVITE) correct code)
-    SendPartyResult(PARTY_OP_INVITE, "", PARTY_RESULT_OK);
+    // everything is fine, do it (is it 0 (PARTY_OP_INVITE) correct code)
+    SendPartyResult(PARTY_OP_INVITE, "", ERR_PARTY_RESULT_OK);
     group->ConvertToRaid();
 }
 
@@ -513,7 +520,7 @@ void WorldSession::HandleGroupChangeSubGroupOpcode( WorldPacket & recv_data )
         return;
     /********************/
 
-    // everything's fine, do it
+    // everything is fine, do it
     group->ChangeMembersGroup(sObjectMgr.GetPlayer(name.c_str()), groupNr);
 }
 
@@ -533,7 +540,7 @@ void WorldSession::HandleGroupAssistantLeaderOpcode( WorldPacket & recv_data )
         return;
     /********************/
 
-    // everything's fine, do it
+    // everything is fine, do it
     group->SetAssistant(guid, (flag==0?false:true));
 }
 
@@ -560,7 +567,7 @@ void WorldSession::HandlePartyAssignmentOpcode( WorldPacket & recv_data )
         return;
     /********************/
 
-    // everything's fine, do it
+    // everything is fine, do it
     if(flag1 == 1)
         group->SetMainAssistant(guid);
     if(flag2 == 1)
@@ -580,7 +587,7 @@ void WorldSession::HandleRaidReadyCheckOpcode( WorldPacket & recv_data )
             return;
         /********************/
 
-        // everything's fine, do it
+        // everything is fine, do it
         WorldPacket data(MSG_RAID_READY_CHECK, 8);
         data << GetPlayer()->GetGUID();
         group->BroadcastPacket(&data, false, -1);
@@ -596,10 +603,10 @@ void WorldSession::HandleRaidReadyCheckOpcode( WorldPacket & recv_data )
         if(!group)
             return;
 
-        // everything's fine, do it
+        // everything is fine, do it
         WorldPacket data(MSG_RAID_READY_CHECK_CONFIRM, 9);
-        data << GetPlayer()->GetGUID();
-        data << state;
+        data << uint64(GetPlayer()->GetGUID());
+        data << uint8(state);
         group->BroadcastReadyCheck(&data);
     }
 }
@@ -636,45 +643,45 @@ void WorldSession::BuildPartyMemberStatsChangedPacket(Player *player, WorldPacke
 
     data->Initialize(SMSG_PARTY_MEMBER_STATS, 8 + 4 + byteCount);
     *data << player->GetPackGUID();
-    *data << (uint32) mask;
+    *data << uint32(mask);
 
     if (mask & GROUP_UPDATE_FLAG_STATUS)
     {
         if (player)
         {
             if (player->IsPvP())
-                *data << (uint16) (MEMBER_STATUS_ONLINE | MEMBER_STATUS_PVP);
+                *data << uint16(MEMBER_STATUS_ONLINE | MEMBER_STATUS_PVP);
             else
-                *data << (uint16) MEMBER_STATUS_ONLINE;
+                *data << uint16(MEMBER_STATUS_ONLINE);
         }
         else
-            *data << (uint16) MEMBER_STATUS_OFFLINE;
+            *data << uint16(MEMBER_STATUS_OFFLINE);
     }
 
     if (mask & GROUP_UPDATE_FLAG_CUR_HP)
-        *data << (uint32) player->GetHealth();
+        *data << uint32(player->GetHealth());
 
     if (mask & GROUP_UPDATE_FLAG_MAX_HP)
-        *data << (uint32) player->GetMaxHealth();
+        *data << uint32(player->GetMaxHealth());
 
     Powers powerType = player->getPowerType();
     if (mask & GROUP_UPDATE_FLAG_POWER_TYPE)
-        *data << (uint8) powerType;
+        *data << uint8(powerType);
 
     if (mask & GROUP_UPDATE_FLAG_CUR_POWER)
-        *data << (uint16) player->GetPower(powerType);
+        *data << uint16(player->GetPower(powerType));
 
     if (mask & GROUP_UPDATE_FLAG_MAX_POWER)
-        *data << (uint16) player->GetMaxPower(powerType);
+        *data << uint16(player->GetMaxPower(powerType));
 
     if (mask & GROUP_UPDATE_FLAG_LEVEL)
-        *data << (uint16) player->getLevel();
+        *data << uint16(player->getLevel());
 
     if (mask & GROUP_UPDATE_FLAG_ZONE)
-        *data << (uint16) player->GetZoneId();
+        *data << uint16(player->GetZoneId());
 
     if (mask & GROUP_UPDATE_FLAG_POSITION)
-        *data << (uint16) player->GetPositionX() << (uint16) player->GetPositionY();
+        *data << uint16(player->GetPositionX()) << uint16(player->GetPositionY());
 
     if (mask & GROUP_UPDATE_FLAG_AURAS)
     {
@@ -694,9 +701,9 @@ void WorldSession::BuildPartyMemberStatsChangedPacket(Player *player, WorldPacke
     if (mask & GROUP_UPDATE_FLAG_PET_GUID)
     {
         if(pet)
-            *data << (uint64) pet->GetGUID();
+            *data << uint64(pet->GetGUID());
         else
-            *data << (uint64) 0;
+            *data << uint64(0);
     }
 
     if (mask & GROUP_UPDATE_FLAG_PET_NAME)
@@ -704,55 +711,55 @@ void WorldSession::BuildPartyMemberStatsChangedPacket(Player *player, WorldPacke
         if(pet)
             *data << pet->GetName();
         else
-            *data << (uint8)  0;
+            *data << uint8(0);
     }
 
     if (mask & GROUP_UPDATE_FLAG_PET_MODEL_ID)
     {
         if(pet)
-            *data << (uint16) pet->GetDisplayId();
+            *data << uint16(pet->GetDisplayId());
         else
-            *data << (uint16) 0;
+            *data << uint16(0);
     }
 
     if (mask & GROUP_UPDATE_FLAG_PET_CUR_HP)
     {
         if(pet)
-            *data << (uint32) pet->GetHealth();
+            *data << uint32(pet->GetHealth());
         else
-            *data << (uint32) 0;
+            *data << uint32(0);
     }
 
     if (mask & GROUP_UPDATE_FLAG_PET_MAX_HP)
     {
         if(pet)
-            *data << (uint32) pet->GetMaxHealth();
+            *data << uint32(pet->GetMaxHealth());
         else
-            *data << (uint32) 0;
+            *data << uint32(0);
     }
 
     if (mask & GROUP_UPDATE_FLAG_PET_POWER_TYPE)
     {
         if(pet)
-            *data << (uint8)  pet->getPowerType();
+            *data << uint8(pet->getPowerType());
         else
-            *data << (uint8)  0;
+            *data << uint8(0);
     }
 
     if (mask & GROUP_UPDATE_FLAG_PET_CUR_POWER)
     {
         if(pet)
-            *data << (uint16) pet->GetPower(pet->getPowerType());
+            *data << uint16(pet->GetPower(pet->getPowerType()));
         else
-            *data << (uint16) 0;
+            *data << uint16(0);
     }
 
     if (mask & GROUP_UPDATE_FLAG_PET_MAX_POWER)
     {
         if(pet)
-            *data << (uint16) pet->GetMaxPower(pet->getPowerType());
+            *data << uint16(pet->GetMaxPower(pet->getPowerType()));
         else
-            *data << (uint16) 0;
+            *data << uint16(0);
     }
 
     if (mask & GROUP_UPDATE_FLAG_PET_AURAS)
@@ -771,7 +778,7 @@ void WorldSession::BuildPartyMemberStatsChangedPacket(Player *player, WorldPacke
             }
         }
         else
-            *data << (uint64) 0;
+            *data << uint64(0);
     }
 }
 
@@ -788,8 +795,8 @@ void WorldSession::HandleRequestPartyMemberStatsOpcode( WorldPacket &recv_data )
         WorldPacket data(SMSG_PARTY_MEMBER_STATS_FULL, 3+4+2);
         data << uint8(0);                                   // only for SMSG_PARTY_MEMBER_STATS_FULL, probably arena/bg related
         data.appendPackGUID(Guid);
-        data << (uint32) GROUP_UPDATE_FLAG_STATUS;
-        data << (uint16) MEMBER_STATUS_OFFLINE;
+        data << uint32(GROUP_UPDATE_FLAG_STATUS);
+        data << uint16(MEMBER_STATUS_OFFLINE);
         SendPacket(&data);
         return;
     }
@@ -805,68 +812,68 @@ void WorldSession::HandleRequestPartyMemberStatsOpcode( WorldPacket &recv_data )
         mask1 = 0x7FFFFFFF;                                 // for hunters and other classes with pets
 
     Powers powerType = player->getPowerType();
-    data << (uint32) mask1;                                 // group update mask
-    data << (uint16) MEMBER_STATUS_ONLINE;                  // member's online status
-    data << (uint32) player->GetHealth();                   // GROUP_UPDATE_FLAG_CUR_HP
-    data << (uint32) player->GetMaxHealth();                // GROUP_UPDATE_FLAG_MAX_HP
-    data << (uint8)  powerType;                             // GROUP_UPDATE_FLAG_POWER_TYPE
-    data << (uint16) player->GetPower(powerType);           // GROUP_UPDATE_FLAG_CUR_POWER
-    data << (uint16) player->GetMaxPower(powerType);        // GROUP_UPDATE_FLAG_MAX_POWER
-    data << (uint16) player->getLevel();                    // GROUP_UPDATE_FLAG_LEVEL
-    data << (uint16) player->GetZoneId();                   // GROUP_UPDATE_FLAG_ZONE
-    data << (uint16) player->GetPositionX();                // GROUP_UPDATE_FLAG_POSITION
-    data << (uint16) player->GetPositionY();                // GROUP_UPDATE_FLAG_POSITION
+    data << uint32(mask1);                                  // group update mask
+    data << uint16(MEMBER_STATUS_ONLINE);                   // member's online status
+    data << uint32(player->GetHealth());                    // GROUP_UPDATE_FLAG_CUR_HP
+    data << uint32(player->GetMaxHealth());                 // GROUP_UPDATE_FLAG_MAX_HP
+    data << uint8(powerType);                               // GROUP_UPDATE_FLAG_POWER_TYPE
+    data << uint16(player->GetPower(powerType));            // GROUP_UPDATE_FLAG_CUR_POWER
+    data << uint16(player->GetMaxPower(powerType));         // GROUP_UPDATE_FLAG_MAX_POWER
+    data << uint16(player->getLevel());                     // GROUP_UPDATE_FLAG_LEVEL
+    data << uint16(player->GetZoneId());                    // GROUP_UPDATE_FLAG_ZONE
+    data << uint16(player->GetPositionX());                 // GROUP_UPDATE_FLAG_POSITION
+    data << uint16(player->GetPositionY());                 // GROUP_UPDATE_FLAG_POSITION
 
     uint64 auramask = 0;
     size_t maskPos = data.wpos();
-    data << (uint64) auramask;                              // placeholder
+    data << uint64(auramask);                               // placeholder
     for(uint8 i = 0; i < MAX_AURAS; ++i)
     {
         if(uint32 aura = player->GetVisibleAura(i))
         {
             auramask |= (uint64(1) << i);
-            data << (uint32) aura;
-            data << (uint8)  1;
+            data << uint32(aura);
+            data << uint8(1);
         }
     }
-    data.put<uint64>(maskPos,auramask);                     // GROUP_UPDATE_FLAG_AURAS
+    data.put<uint64>(maskPos, auramask);                    // GROUP_UPDATE_FLAG_AURAS
 
     if(pet)
     {
         Powers petpowertype = pet->getPowerType();
-        data << (uint64) pet->GetGUID();                    // GROUP_UPDATE_FLAG_PET_GUID
+        data << uint64(pet->GetGUID());                     // GROUP_UPDATE_FLAG_PET_GUID
         data << pet->GetName();                             // GROUP_UPDATE_FLAG_PET_NAME
-        data << (uint16) pet->GetDisplayId();               // GROUP_UPDATE_FLAG_PET_MODEL_ID
-        data << (uint32) pet->GetHealth();                  // GROUP_UPDATE_FLAG_PET_CUR_HP
-        data << (uint32) pet->GetMaxHealth();               // GROUP_UPDATE_FLAG_PET_MAX_HP
-        data << (uint8)  petpowertype;                      // GROUP_UPDATE_FLAG_PET_POWER_TYPE
-        data << (uint16) pet->GetPower(petpowertype);       // GROUP_UPDATE_FLAG_PET_CUR_POWER
-        data << (uint16) pet->GetMaxPower(petpowertype);    // GROUP_UPDATE_FLAG_PET_MAX_POWER
+        data << uint16(pet->GetDisplayId());                // GROUP_UPDATE_FLAG_PET_MODEL_ID
+        data << uint32(pet->GetHealth());                   // GROUP_UPDATE_FLAG_PET_CUR_HP
+        data << uint32(pet->GetMaxHealth());                // GROUP_UPDATE_FLAG_PET_MAX_HP
+        data << uint8(petpowertype);                        // GROUP_UPDATE_FLAG_PET_POWER_TYPE
+        data << uint16(pet->GetPower(petpowertype));        // GROUP_UPDATE_FLAG_PET_CUR_POWER
+        data << uint16(pet->GetMaxPower(petpowertype));     // GROUP_UPDATE_FLAG_PET_MAX_POWER
 
         uint64 petauramask = 0;
         size_t petMaskPos = data.wpos();
-        data << (uint64) petauramask;                       // placeholder
+        data << uint64(petauramask);                        // placeholder
         for(uint8 i = 0; i < MAX_AURAS; ++i)
         {
             if(uint32 petaura = pet->GetVisibleAura(i))
             {
                 petauramask |= (uint64(1) << i);
-                data << (uint32) petaura;
-                data << (uint8)  1;
+                data << uint32(petaura);
+                data << uint8(1);
             }
         }
-        data.put<uint64>(petMaskPos,petauramask);           // GROUP_UPDATE_FLAG_PET_AURAS
+        data.put<uint64>(petMaskPos, petauramask);          // GROUP_UPDATE_FLAG_PET_AURAS
     }
     else
     {
-        data << (uint8)  0;                                 // GROUP_UPDATE_FLAG_PET_NAME
-        data << (uint64) 0;                                 // GROUP_UPDATE_FLAG_PET_AURAS
+        data << uint8(0);                                   // GROUP_UPDATE_FLAG_PET_NAME
+        data << uint64(0);                                  // GROUP_UPDATE_FLAG_PET_AURAS
     }
 
     SendPacket(&data);
 }
 
-/*!*/void WorldSession::HandleRequestRaidInfoOpcode( WorldPacket & /*recv_data*/ )
+void WorldSession::HandleRequestRaidInfoOpcode( WorldPacket & /*recv_data*/ )
 {
     // every time the player checks the character screen
     _player->SendRaidInfo();
@@ -882,11 +889,11 @@ void WorldSession::HandleOptOutOfLootOpcode( WorldPacket & recv_data )
     // ignore if player not loaded
     if(!GetPlayer())                                        // needed because STATUS_AUTHED
     {
-        if(unkn!=0)
+        if(unkn != 0)
             sLog.outError("CMSG_GROUP_PASS_ON_LOOT value<>0 for not-loaded character!");
         return;
     }
 
-    if(unkn!=0)
+    if(unkn != 0)
         sLog.outError("CMSG_GROUP_PASS_ON_LOOT: activation not implemented!");
 }

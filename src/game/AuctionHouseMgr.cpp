@@ -152,7 +152,7 @@ void AuctionHouseMgr::SendAuctionWonMail( AuctionEntry *auction )
         // will delete item or place to receiver mail list
         MailDraft(msgAuctionWonSubject.str(), msgAuctionWonBody.str())
             .AddItem(pItem)
-            .SendMailTo(MailReceiver(bidder,auction->bidder), auction, MAIL_CHECK_MASK_AUCTION);
+            .SendMailTo(MailReceiver(bidder,auction->bidder), MailSender(auction), MAIL_CHECK_MASK_NONE);
     }
     // receiver not exist
     else
@@ -188,7 +188,7 @@ void AuctionHouseMgr::SendAuctionSalePendingMail( AuctionEntry * auction )
         sLog.outDebug("AuctionSalePending body string : %s", msgAuctionSalePendingBody.str().c_str());
 
         MailDraft(msgAuctionSalePendingSubject.str(), msgAuctionSalePendingBody.str())
-            .SendMailTo(MailReceiver(owner,auction->owner), auction, MAIL_CHECK_MASK_AUCTION);
+            .SendMailTo(MailReceiver(owner,auction->owner), auction, MAIL_CHECK_MASK_NONE);
     }
 }
 
@@ -231,7 +231,7 @@ void AuctionHouseMgr::SendAuctionSuccessfulMail( AuctionEntry * auction )
 
         MailDraft(msgAuctionSuccessfulSubject.str(), auctionSuccessfulBody.str())
             .AddMoney(profit)
-            .SendMailTo(MailReceiver(owner,auction->owner), auction, MAIL_CHECK_MASK_AUCTION, HOUR);
+            .SendMailTo(MailReceiver(owner,auction->owner), auction, MAIL_CHECK_MASK_NONE, HOUR);
     }
 }
 
@@ -256,7 +256,7 @@ void AuctionHouseMgr::SendAuctionExpiredMail( AuctionEntry * auction )
     if(owner || owner_accId)
     {
         std::ostringstream subject;
-        subject << auction->item_template << ":0:" << AUCTION_EXPIRED;
+        subject << auction->item_template << ":0:" << AUCTION_EXPIRED << ":0:0";
 
         if ( owner )
             owner->GetSession()->SendAuctionOwnerNotification( auction );
@@ -264,7 +264,7 @@ void AuctionHouseMgr::SendAuctionExpiredMail( AuctionEntry * auction )
             RemoveAItem(pItem->GetGUIDLow());               // we have to remove the item, before we delete it !!
 
         // will delete item or place to receiver mail list
-        MailDraft(subject.str())
+        MailDraft(subject.str(), "")                        // TODO: fix body
             .AddItem(pItem)
             .SendMailTo(MailReceiver(owner,auction->owner), auction);
     }
