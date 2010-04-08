@@ -1538,23 +1538,10 @@ GroupJoinBattlegroundResult Group::CanJoinBattleGroundQueue(BattleGround const* 
             return ERR_GROUP_JOIN_BATTLEGROUND_DESERTERS;
         // check if member can join any more battleground queues
         if(!member->HasFreeBattleGroundQueueId())
-            return BG_JOIN_ERR_ALL_QUEUES_USED;
-
-        ++allowedPlayerCount;
+            return ERR_BATTLEGROUND_TOO_MANY_QUEUES;        // not blizz-like
     }
-
-    if(bgOrTemplate->GetTypeID() == BATTLEGROUND_AA)
-    {
-        if(allowedPlayerCount < MinPlayerCount)
-            return BG_JOIN_ERR_GROUP_NOT_ENOUGH;
-
-        if(allowedPlayerCount > MaxPlayerCount)
-            return BG_JOIN_ERR_GROUP_TOO_MANY;
-    }
-
-    return BG_JOIN_ERR_OK;
+    return GroupJoinBattlegroundResult(bgOrTemplate->GetTypeID());
 }
-
 //===================================================
 //============== Roll ===============================
 //===================================================
