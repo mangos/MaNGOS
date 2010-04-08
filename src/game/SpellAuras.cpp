@@ -404,7 +404,7 @@ m_isRemovedOnShapeLost(true), m_in_use(0), m_deleted(false)
     {
         m_caster_guid = caster->GetGUID();
 
-        damage        = caster->CalculateSpellDamage(m_spellProto,m_effIndex,m_currentBasePoints,target);
+        damage        = caster->CalculateSpellDamage(target, m_spellProto, m_effIndex, &m_currentBasePoints);
         m_maxduration = caster->CalculateSpellDuration(m_spellProto, m_effIndex, target);
 
         if (!damage && castItem && castItem->GetItemSuffixFactor())
@@ -1272,7 +1272,7 @@ void Aura::SetStackAmount(uint8 stackAmount)
     if (stackAmount != m_stackAmount)
     {
         m_stackAmount = stackAmount;
-        int32 amount = m_stackAmount * caster->CalculateSpellDamage(m_spellProto, m_effIndex, m_currentBasePoints, target);
+        int32 amount = m_stackAmount * caster->CalculateSpellDamage(target, m_spellProto, m_effIndex, &m_currentBasePoints);
         // Reapply if amount change
         if (amount!=m_modifier.m_amount)
         {
@@ -3215,7 +3215,7 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
                             if(itr->second.state == PLAYERSPELL_REMOVED) continue;
                             SpellEntry const *spellInfo = sSpellStore.LookupEntry(itr->first);
                             if (spellInfo && spellInfo->SpellFamilyName == SPELLFAMILY_WARRIOR && spellInfo->SpellIconID == 139)
-                                Rage_val += m_target->CalculateSpellDamage(spellInfo, EFFECT_INDEX_0, spellInfo->EffectBasePoints[EFFECT_INDEX_0], m_target) * 10;
+                                Rage_val += m_target->CalculateSpellDamage(m_target, spellInfo, EFFECT_INDEX_0) * 10;
                         }
                     }
 
@@ -6999,7 +6999,7 @@ void Aura::PeriodicTick()
                     {
                         uint32 percent =
                             GetEffIndex() < EFFECT_INDEX_2 && GetSpellProto()->Effect[GetEffIndex()] == SPELL_EFFECT_DUMMY ?
-                            pCaster->CalculateSpellDamage(GetSpellProto(), SpellEffectIndex(GetEffIndex() + 1), GetSpellProto()->EffectBasePoints[GetEffIndex() + 1], m_target) :
+                            pCaster->CalculateSpellDamage(m_target, GetSpellProto(), SpellEffectIndex(GetEffIndex() + 1)) :
                             100;
                         if(m_target->GetHealth() * 100 >= m_target->GetMaxHealth() * percent )
                         {
@@ -7841,7 +7841,7 @@ void Aura::PeriodicDummyTick()
                     if (rage == 0)
                         return;
                     int32 mod = (rage < 100) ? rage : 100;
-                    int32 points = m_target->CalculateSpellDamage(spell, EFFECT_INDEX_1, spell->EffectBasePoints[EFFECT_INDEX_1], m_target);
+                    int32 points = m_target->CalculateSpellDamage(m_target, spell, EFFECT_INDEX_1);
                     int32 regen = m_target->GetMaxHealth() * (mod * points / 10) / 1000;
                     m_target->CastCustomSpell(m_target, 22845, &regen, NULL, NULL, true, NULL, this);
                     m_target->SetPower(POWER_RAGE, rage-mod);
@@ -7977,7 +7977,7 @@ void Aura::PeriodicDummyTick()
             {
                 // Increases your attack power by $s1 for every $s2 armor value you have.
                 // Calculate AP bonus (from 1 efect of this spell)
-                int32 apBonus = m_modifier.m_amount * m_target->GetArmor() / m_target->CalculateSpellDamage(spell, EFFECT_INDEX_1, spell->EffectBasePoints[EFFECT_INDEX_1], m_target);
+                int32 apBonus = m_modifier.m_amount * m_target->GetArmor() / m_target->CalculateSpellDamage(m_target, spell, EFFECT_INDEX_1);
                 m_target->CastCustomSpell(m_target, 61217, &apBonus, &apBonus, NULL, true, NULL, this);
                 return;
             }
