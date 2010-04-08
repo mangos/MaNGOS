@@ -150,7 +150,6 @@ ObjectMgr::ObjectMgr() :
     m_AuctionIds("Auction ids"),
     m_EquipmentSetIds("Equipment set ids"),
     m_GuildIds("Guild ids"),
-    m_ItemTextIds("Item text ids"),
     m_MailIds("Mail ids"),
     m_PetNumbers("Pet numbers"),
     m_GroupIds("Group ids")
@@ -5762,13 +5761,6 @@ void ObjectMgr::SetHighestGuids()
     if( result )
     {
         m_MailIds.Set((*result)[0].GetUInt32()+1);
-        delete result;
-    }
-
-    result = CharacterDatabase.Query( "SELECT MAX(id) FROM item_text" );
-    if( result )
-    {
-        m_ItemTextIds.Set((*result)[0].GetUInt32()+1);
         delete result;
     }
 

@@ -681,7 +681,6 @@ class ObjectMgr
         uint32 GeneratePetNumber() { return m_PetNumbers.Generate(); }
 
         void CreateItemText(uint32 guid, std::string text);
-        void AddItemText(uint32 guid, std::string text) { mItemTexts[guid] = text; }
         std::string GetItemText( uint32 id )
         {
             ItemTextMap::const_iterator itr = mItemTexts.find( id );
@@ -911,7 +910,6 @@ class ObjectMgr
         IdGenerator<uint32> m_AuctionIds;
         IdGenerator<uint64> m_EquipmentSetIds;
         IdGenerator<uint32> m_GuildIds;
-        IdGenerator<uint32> m_ItemTextIds;
         IdGenerator<uint32> m_MailIds;
         IdGenerator<uint32> m_PetNumbers;
         IdGenerator<uint32> m_GroupIds;
