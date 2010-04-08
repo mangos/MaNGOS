@@ -4564,43 +4564,6 @@ void ObjectMgr::LoadGossipScripts()
     // checks are done in LoadGossipMenuItems
 }
 
-void ObjectMgr::LoadItemTexts()
-{
-    QueryResult *result = CharacterDatabase.Query("SELECT id, text FROM item_text");
-
-    uint32 count = 0;
-
-    if( !result )
-    {
-        barGoLink bar( 1 );
-        bar.step();
-
-        sLog.outString();
-        sLog.outString( ">> Loaded %u item pages", count );
-        return;
-    }
-
-    barGoLink bar( (int)result->GetRowCount() );
-
-    Field* fields;
-    do
-    {
-        bar.step();
-
-        fields = result->Fetch();
-
-        mItemTexts[ fields[0].GetUInt32() ] = fields[1].GetCppString();
-
-        ++count;
-
-    } while ( result->NextRow() );
-
-    delete result;
-
-    sLog.outString();
-    sLog.outString( ">> Loaded %u item texts", count );
-}
-
 void ObjectMgr::LoadPageTexts()
 {
     sPageTextStore.Free();                                  // for reload case
@@ -5798,19 +5761,6 @@ void ObjectMgr::SetHighestGuids()
         m_GroupIds.Set((*result)[0].GetUInt32()+1);
         delete result;
     }
-}
-
-void ObjectMgr::CreateItemText(uint32 guid, std::string text)
-{
-    // insert new item text to container
-    mItemTexts[ guid ] = text;
-
-    // save new item text
-    CharacterDatabase.escape_string(text);
-
-    std::ostringstream query;
-    query << "INSERT INTO item_text (id,text) VALUES ( '" << guid << "', '" << text << "')";
-    CharacterDatabase.Execute(query.str().c_str());         // needs to be run this way, because mail body may be more than 1024 characters
 }
 
 uint32 ObjectMgr::GenerateLowGuid(HighGuid guidhigh)

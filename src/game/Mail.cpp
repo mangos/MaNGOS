@@ -667,34 +667,6 @@ void WorldSession::HandleGetMailList(WorldPacket & recv_data )
 }
 
 /**
- * Handles the packet sent by the client when requesting information about the body of a mail.
- *
- * This function is called when client needs mail message body,
- * or when player clicks on item which has some flag set
- */
-void WorldSession::HandleItemTextQuery(WorldPacket & recv_data )
-{
-    uint64 itemGuid;
-    recv_data >> itemGuid;
-
-    sLog.outDebug("CMSG_ITEM_TEXT_QUERY item guid: %u", GUID_LOPART(itemGuid));
-
-    WorldPacket data(SMSG_ITEM_TEXT_QUERY_RESPONSE, (4+10));    // guess size
-
-    if(Item *item = _player->GetItemByGuid(itemGuid))
-    {
-        data << uint8(0);                                       // has text
-        data << uint64(itemGuid);                               // item guid
-        data << sObjectMgr.GetItemText(item->GetGUIDLow());     // max 8000
-    }
-    else
-    {
-        data << uint8(1);                                       // no text
-    }
-    SendPacket(&data);
-}
-
-/**
  * Handles the packet sent by the client when he copies the body a mail to his inventory.
  *
  * When a player copies the body of a mail to his inventory this method is called. It will create
@@ -738,13 +710,14 @@ void WorldSession::HandleMailCreateTextItem(WorldPacket & recv_data )
             return;
         }
 
-        sObjectMgr.CreateItemText(bodyItem->GetGUIDLow(), mailTemplateEntry->content[GetSessionDbcLocale()]);
+        bodyItem->SetText(mailTemplateEntry->content[GetSessionDbcLocale()]);
     }
     else
-        sObjectMgr.CreateItemText(bodyItem->GetGUIDLow(), m->body);
+        bodyItem->SetText(m->body);
 
     bodyItem->SetUInt32Value(ITEM_FIELD_CREATOR, m->sender);
     bodyItem->SetFlag(ITEM_FIELD_FLAGS, ITEM_FLAGS_WRAPPER | ITEM_FLAGS_REFUNDABLE_2 | ITEM_FLAGS_UNK1);
+
 
     sLog.outDetail("HandleMailCreateTextItem mailid=%u", mailId);
 

@@ -628,7 +628,6 @@ class ObjectMgr
         void LoadTavernAreaTriggers();
         void LoadGameObjectForQuests();
 
-        void LoadItemTexts();
         void LoadPageTexts();
 
         void LoadPlayerInfo();
@@ -679,16 +678,6 @@ class ObjectMgr
         //uint32 GenerateItemTextID() { return m_ItemGuids.Generate(); }
         uint32 GenerateMailID() { return m_MailIds.Generate(); }
         uint32 GeneratePetNumber() { return m_PetNumbers.Generate(); }
-
-        void CreateItemText(uint32 guid, std::string text);
-        std::string GetItemText( uint32 id )
-        {
-            ItemTextMap::const_iterator itr = mItemTexts.find( id );
-            if ( itr != mItemTexts.end() )
-                return itr->second;
-            else
-                return "There is no info for this item";
-        }
 
         typedef std::multimap<int32, uint32> ExclusiveQuestGroups;
         ExclusiveQuestGroups mExclusiveQuestGroups;
@@ -925,15 +914,12 @@ class ObjectMgr
 
         typedef UNORDERED_MAP<uint32, GossipText> GossipTextMap;
         typedef UNORDERED_MAP<uint32, uint32> QuestAreaTriggerMap;
-        typedef UNORDERED_MAP<uint32, std::string> ItemTextMap;
         typedef std::set<uint32> TavernAreaTriggerSet;
         typedef std::set<uint32> GameObjectForQuestSet;
 
         GroupMap            mGroupMap;
         GuildMap            mGuildMap;
         ArenaTeamMap        mArenaTeamMap;
-
-        ItemTextMap         mItemTexts;
 
         QuestAreaTriggerMap mQuestAreaTriggerMap;
         TavernAreaTriggerSet mTavernAreaTriggerSet;
