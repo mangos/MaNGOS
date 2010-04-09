@@ -1258,7 +1258,7 @@ void BattleGroundMgr::BuildBattleGroundStatusPacket(WorldPacket *data, BattleGro
             *data << uint32(bg->GetMapId());                // map id
             *data << uint32(Time1);                         // time to bg auto leave, 0 at bg start, 120000 after bg end, milliseconds
             *data << uint32(Time2);                         // time from bg start, milliseconds
-            *data << uint8(0x1);                            // unk sometimes 0x0!
+            *data << uint8(0x1);                            // Lua_GetBattlefieldArenaFaction (bool)
             break;
         default:
             sLog.outError("Unknown BG status!");
@@ -1361,7 +1361,7 @@ void BattleGroundMgr::BuildPvpLogDataPacket(WorldPacket *data, BattleGround *bg)
             case BATTLEGROUND_DS:                           // wotlk
             case BATTLEGROUND_RV:                           // wotlk
             case BATTLEGROUND_IC:                           // wotlk
-            case BATTLEGROUND_ABG:                          // wotlk
+            case BATTLEGROUND_RB:                           // wotlk
                 *data << (int32)0;                          // 0
                 break;
             default:
@@ -1372,19 +1372,12 @@ void BattleGroundMgr::BuildPvpLogDataPacket(WorldPacket *data, BattleGround *bg)
     }
 }
 
-void BattleGroundMgr::BuildGroupJoinedBattlegroundPacket(WorldPacket *data, BattleGroundTypeId bgTypeId)
+void BattleGroundMgr::BuildGroupJoinedBattlegroundPacket(WorldPacket *data, GroupJoinBattlegroundResult result)
 {
-    /*bgTypeId is:
-    0 - Your group has joined a battleground queue, but you are not eligible
-    1 - Your group has joined the queue for AV
-    2 - Your group has joined the queue for WS
-    3 - Your group has joined the queue for AB
-    4 - Your group has joined the queue for NA
-    5 - Your group has joined the queue for BE Arena
-    6 - Your group has joined the queue for All Arenas
-    7 - Your group has joined the queue for EotS*/
     data->Initialize(SMSG_GROUP_JOINED_BATTLEGROUND, 4);
-    *data << uint32(bgTypeId);
+    *data << int32(result);
+    if(result == ERR_BATTLEGROUND_JOIN_TIMED_OUT || result == ERR_BATTLEGROUND_JOIN_FAILED)
+        *data << uint64(0);                                 // player guid
 }
 
 void BattleGroundMgr::BuildUpdateWorldStatePacket(WorldPacket *data, uint32 field, uint32 value)
@@ -1542,7 +1535,7 @@ BattleGround * BattleGroundMgr::CreateNewBattleGround(BattleGroundTypeId bgTypeI
         case BATTLEGROUND_IC:
             bg = new BattleGroundIC(*(BattleGroundIC*)bg_template);
             break;
-        case BATTLEGROUND_ABG:
+        case BATTLEGROUND_RB:
             bg = new BattleGroundABG(*(BattleGroundABG*)bg_template);
             break;
         default:
@@ -1586,7 +1579,7 @@ uint32 BattleGroundMgr::CreateBattleGround(BattleGroundTypeId bgTypeId, bool IsA
         case BATTLEGROUND_DS: bg = new BattleGroundDS; break;
         case BATTLEGROUND_RV: bg = new BattleGroundRV; break;
         case BATTLEGROUND_IC: bg = new BattleGroundIC; break;
-        case BATTLEGROUND_ABG: bg = new BattleGroundABG; break;
+        case BATTLEGROUND_RB: bg = new BattleGroundABG; break;
         default:bg = new BattleGround;   break;             // placeholder for non implemented BG
     }
 
@@ -1661,8 +1654,8 @@ void BattleGroundMgr::CreateInitialBattleGrounds()
         //check values from DB
         if (MaxPlayersPerTeam == 0 || MinPlayersPerTeam == 0 || MinPlayersPerTeam > MaxPlayersPerTeam)
         {
-            MaxPlayersPerTeam = bl->maxplayersperteam;
-            MinPlayersPerTeam = bl->maxplayersperteam;      // by default now expected strong full bg requirement
+            MinPlayersPerTeam = 0;                          // by default now expected strong full bg requirement
+            MaxPlayersPerTeam = 40;
         }
         if (MinLvl == 0 || MaxLvl == 0 || MinLvl > MaxLvl)
         {
@@ -1681,7 +1674,7 @@ void BattleGroundMgr::CreateInitialBattleGrounds()
             AStartLoc[2] = start->z;
             AStartLoc[3] = fields[6].GetFloat();
         }
-        else if (bgTypeID == BATTLEGROUND_AA || bgTypeID == BATTLEGROUND_ABG)
+        else if (bgTypeID == BATTLEGROUND_AA || bgTypeID == BATTLEGROUND_RB)
         {
             AStartLoc[0] = 0;
             AStartLoc[1] = 0;
@@ -1704,7 +1697,7 @@ void BattleGroundMgr::CreateInitialBattleGrounds()
             HStartLoc[2] = start->z;
             HStartLoc[3] = fields[8].GetFloat();
         }
-        else if (bgTypeID == BATTLEGROUND_AA || bgTypeID == BATTLEGROUND_ABG)
+        else if (bgTypeID == BATTLEGROUND_AA || bgTypeID == BATTLEGROUND_RB)
         {
             HStartLoc[0] = 0;
             HStartLoc[1] = 0;
@@ -1810,17 +1803,32 @@ void BattleGroundMgr::BuildBattleGroundListPacket(WorldPacket *data, const uint6
     *data << uint64(guid);                                  // battlemaster guid
     *data << uint8(fromWhere);                              // from where you joined
     *data << uint32(bgTypeId);                              // battleground id
+    *data << uint8(0);                                      // unk
+    *data << uint8(0);                                      // unk
+
+    // Rewards
+    *data << uint8(0);                                      // 3.3.3 hasWin
+    *data << uint32(0);                                     // 3.3.3 winHonor
+    *data << uint32(0);                                     // 3.3.3 winArena
+    *data << uint32(0);                                     // 3.3.3 lossHonor
+
+    uint8 isRandom = 0;
+    *data << uint8(isRandom);                               // 3.3.3 isRandom
+    if(isRandom)
+    {
+        // Rewards (random)
+        *data << uint8(0);                                  // 3.3.3 hasWin_Random
+        *data << uint32(0);                                 // 3.3.3 winHonor_Random
+        *data << uint32(0);                                 // 3.3.3 winArena_Random
+        *data << uint32(0);                                 // 3.3.3 lossHonor_Random
+    }
+
     if(bgTypeId == BATTLEGROUND_AA)                         // arena
     {
-        *data << uint8(4);                                  // unk
-        *data << uint8(0);                                  // unk
-        *data << uint32(0);                                 // unk (count?)
+        *data << uint32(0);                                 // arena - no instances showed
     }
     else                                                    // battleground
     {
-        *data << uint8(0);                                  // unk, different for each bg type
-        *data << uint8(0);                                  // unk
-
         size_t count_pos = data->wpos();
         uint32 count = 0;
         *data << uint32(0);                                 // number of bg instances
@@ -1887,7 +1895,7 @@ BattleGroundQueueTypeId BattleGroundMgr::BGQueueTypeId(BattleGroundTypeId bgType
             return BATTLEGROUND_QUEUE_SA;
         case BATTLEGROUND_IC:
             return BATTLEGROUND_QUEUE_IC;
-        case BATTLEGROUND_ABG:
+        case BATTLEGROUND_RB:
             return BATTLEGROUND_QUEUE_NONE;
         case BATTLEGROUND_AA:
         case BATTLEGROUND_NA:

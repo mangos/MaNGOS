@@ -203,6 +203,7 @@ typedef std::map<uint32,AchievementCriteriaRequirementSet> AchievementCriteriaRe
 
 struct AchievementReward
 {
+    Gender gender;
     uint32 titleId[2];
     uint32 itemId;
     uint32 sender;
@@ -210,15 +211,16 @@ struct AchievementReward
     std::string text;
 };
 
-typedef std::map<uint32,AchievementReward> AchievementRewards;
+typedef std::multimap<uint32,AchievementReward> AchievementRewards;
 
 struct AchievementRewardLocale
 {
+    Gender gender;
     std::vector<std::string> subject;
     std::vector<std::string> text;
 };
 
-typedef std::map<uint32,AchievementRewardLocale> AchievementRewardLocales;
+typedef std::multimap<uint32,AchievementRewardLocale> AchievementRewardLocales;
 
 
 struct CompletedAchievementData
@@ -284,16 +286,26 @@ class AchievementGlobalMgr
             return itr != m_AchievementListByReferencedId.end() ? &itr->second : NULL;
         }
 
-        AchievementReward const* GetAchievementReward(AchievementEntry const* achievement) const
+        AchievementReward const* GetAchievementReward(AchievementEntry const* achievement, uint8 gender) const
         {
-            AchievementRewards::const_iterator iter = m_achievementRewards.find(achievement->ID);
-            return iter!=m_achievementRewards.end() ? &iter->second : NULL;
+            AchievementRewards::const_iterator iter_low = m_achievementRewards.lower_bound(achievement->ID);
+            AchievementRewards::const_iterator iter_up  = m_achievementRewards.upper_bound(achievement->ID);
+            for (AchievementRewards::const_iterator iter = iter_low; iter != iter_up; ++iter)
+                if(iter->second.gender == GENDER_NONE || uint8(iter->second.gender) == gender)
+                    return &iter->second;
+
+            return NULL;
         }
 
-        AchievementRewardLocale const* GetAchievementRewardLocale(AchievementEntry const* achievement) const
+        AchievementRewardLocale const* GetAchievementRewardLocale(AchievementEntry const* achievement, uint8 gender) const
         {
-            AchievementRewardLocales::const_iterator iter = m_achievementRewardLocales.find(achievement->ID);
-            return iter!=m_achievementRewardLocales.end() ? &iter->second : NULL;
+            AchievementRewardLocales::const_iterator iter_low = m_achievementRewardLocales.lower_bound(achievement->ID);
+            AchievementRewardLocales::const_iterator iter_up  = m_achievementRewardLocales.upper_bound(achievement->ID);
+            for (AchievementRewardLocales::const_iterator iter = iter_low; iter != iter_up; ++iter)
+                if(iter->second.gender == GENDER_NONE || uint8(iter->second.gender) == gender)
+                    return &iter->second;
+
+            return NULL;
         }
 
         AchievementCriteriaRequirementSet const* GetCriteriaRequirementSet(AchievementCriteriaEntry const *achievementCriteria)

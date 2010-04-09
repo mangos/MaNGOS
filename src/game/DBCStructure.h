@@ -568,12 +568,13 @@ struct BattlemasterListEntry
     uint32  id;                                             // 0
     int32   mapid[8];                                       // 1-8 mapid
     uint32  type;                                           // 9 (3 - BG, 4 - arena)
-    uint32  maxplayersperteam;                              // 10
-    //uint32 canJoinAsGroup;                                // 11 (0 or 1)
-    char*   name[16];                                       // 12-27
-                                                            // 28 string flag, unused
-    //uint32 maxGroupSize                                   // 29 maxGroupSize?
-    //uint32 HolidayWorldStateId;                           // 30 new 3.1
+    //uint32 canJoinAsGroup;                                // 10 (0 or 1)
+    char*   name[16];                                       // 11-26
+    //uint32 nameFlags                                      // 27 string flag, unused
+    uint32 maxGroupSize;                                    // 28 maxGroupSize, used for checking if queue as group
+    //uint32 HolidayWorldStateId;                           // 29 new 3.1
+    //uint32 MinLevel;                                      // 30
+    //uint32 SomeLevel;                                     // 31, may be max level
 };
 
 /*struct Cfg_CategoriesEntry
@@ -1415,8 +1416,8 @@ struct SpellEntry
     int32     EquippedItemInventoryTypeMask;                // 70       m_equippedItemInvTypes (mask)
     uint32    Effect[MAX_EFFECT_INDEX];                     // 71-73    m_effect
     int32     EffectDieSides[MAX_EFFECT_INDEX];             // 74-76    m_effectDieSides
-    uint32    EffectBaseDice[MAX_EFFECT_INDEX];             // 77-79    m_effectBaseDice
-    float     EffectDicePerLevel[MAX_EFFECT_INDEX];         // 80-82    m_effectDicePerLevel
+    //uint32    EffectBaseDice[MAX_EFFECT_INDEX];             // 77-79    m_effectBaseDice
+    //float     EffectDicePerLevel[MAX_EFFECT_INDEX];         // 80-82    m_effectDicePerLevel
     float     EffectRealPointsPerLevel[MAX_EFFECT_INDEX];   // 83-85    m_effectRealPointsPerLevel
     int32     EffectBasePoints[MAX_EFFECT_INDEX];           // 86-88    m_effectBasePoints (don't must be used in spell/auras explicitly, must be used cached Spell::m_currentBasePoints)
     uint32    EffectMechanic[MAX_EFFECT_INDEX];             // 89-91    m_effectMechanic
@@ -1473,7 +1474,7 @@ struct SpellEntry
     //uint32  SpellDifficultyId;                            // 239      3.3.0
 
     // helpers
-    int32 CalculateSimpleValue(SpellEffectIndex eff) const { return EffectBasePoints[eff]+int32(EffectBaseDice[eff]); }
+    int32 CalculateSimpleValue(SpellEffectIndex eff) const { return EffectBasePoints[eff] + int32(1); }
     uint32 const* GetEffectSpellClassMask(SpellEffectIndex effect) const
     {
         return EffectSpellClassMaskA + effect * 3;
