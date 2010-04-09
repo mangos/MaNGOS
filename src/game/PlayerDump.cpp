@@ -35,28 +35,33 @@ struct DumpTable
 
 static DumpTable dumpTables[] =
 {
-    { "characters",                       DTT_CHARACTER  },
+    { "characters",                       DTT_CHARACTER  }, // -> guid
+    { "character_account_data",           DTT_CHAR_TABLE },
     { "character_achievement",            DTT_CHAR_TABLE },
     { "character_achievement_progress",   DTT_CHAR_TABLE },
-    { "character_queststatus",            DTT_CHAR_TABLE },
-    { "character_reputation",             DTT_CHAR_TABLE },
-    { "character_spell",                  DTT_CHAR_TABLE },
-    { "character_spell_cooldown",         DTT_CHAR_TABLE },
     { "character_action",                 DTT_CHAR_TABLE },
     { "character_aura",                   DTT_CHAR_TABLE },
+    { "character_declinedname",           DTT_CHAR_TABLE },
+    { "character_equipmentsets",          DTT_EQSET_TABLE},
+    { "character_glyphs",                 DTT_CHAR_TABLE },
     { "character_homebind",               DTT_CHAR_TABLE },
+    { "character_inventory",              DTT_INVENTORY  }, // -> item guids
+    { "character_queststatus",            DTT_CHAR_TABLE },
+    { "character_pet",                    DTT_PET        }, // -> pet number
+    { "character_pet_declinedname",       DTT_PET_DECL   }, //                  <- pet number
+    { "character_reputation",             DTT_CHAR_TABLE },
     { "character_skills",                 DTT_CHAR_TABLE },
-    { "character_ticket",                 DTT_CHAR_TABLE },
+    { "character_spell",                  DTT_CHAR_TABLE },
+    { "character_spell_cooldown",         DTT_CHAR_TABLE },
     { "character_talent",                 DTT_CHAR_TABLE },
-    { "character_inventory",              DTT_INVENTORY  },
-    { "mail",                             DTT_MAIL       },
-    { "mail_items",                       DTT_MAIL_ITEM  },
-    { "item_instance",                    DTT_ITEM       },
-    { "character_gifts",                  DTT_ITEM_GIFT  },
-    { "character_pet",                    DTT_PET        },
-    { "pet_aura",                         DTT_PET_TABLE  },
-    { "pet_spell",                        DTT_PET_TABLE  },
-    { "pet_spell_cooldown",               DTT_PET_TABLE  },
+    { "character_ticket",                 DTT_CHAR_TABLE },
+    { "mail",                             DTT_MAIL       }, // -> mail guids
+    { "mail_items",                       DTT_MAIL_ITEM  }, // -> item guids    <- mail guids 
+    { "pet_aura",                         DTT_PET_TABLE  }, //                  <- pet number
+    { "pet_spell",                        DTT_PET_TABLE  }, //                  <- pet number
+    { "pet_spell_cooldown",               DTT_PET_TABLE  }, //                  <- pet number
+    { "character_gifts",                  DTT_ITEM_GIFT  }, //                  <- item guids
+    { "item_instance",                    DTT_ITEM       }, //                  <- item guids
     { NULL,                               DTT_CHAR_TABLE }, // end marker
 };
 
@@ -450,6 +455,7 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
 
     std::map<uint32,uint32> items;
     std::map<uint32,uint32> mails;
+    std::map<uint32,uint32> eqsets;
     char buf[32000] = "";
 
     typedef std::map<uint32, uint32> PetIds;                // old->new petid relation
@@ -624,6 +630,25 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
 
                 break;
             }
+            case DTT_PET_DECL:                              // character_pet_declinedname
+            {
+                snprintf(currpetid, 20, "%s", getnth(line, 1).c_str());
+
+                // lookup currpetid and match to new inserted pet id
+                std::map<uint32, uint32> :: const_iterator petids_iter = petids.find(atoi(currpetid));
+                if (petids_iter == petids.end())            // couldn't find new inserted id
+                    ROLLBACK(DUMP_FILE_BROKEN);
+
+                snprintf(newpetid, 20, "%d", petids_iter->second);
+
+                if (!changenth(line, 1, newpetid))          // character_pet_declinedname.id
+                    ROLLBACK(DUMP_FILE_BROKEN);
+
+                if (!changenth(line, 2, newguid))           // character_pet_declinedname.owner update
+                    ROLLBACK(DUMP_FILE_BROKEN);
+
+                break;
+            }
             case DTT_MAIL:                                  // mail
             {
                 if (!changeGuid(line, 1, mails, sObjectMgr.m_MailIds.GetNextAfterMaxUsed()))
@@ -642,6 +667,16 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
                     ROLLBACK(DUMP_FILE_BROKEN);
                 break;
             }
+            case DTT_EQSET_TABLE:
+                if(!changenth(line, 1, newguid))            // character_equipmentsets.guid update
+                    ROLLBACK(DUMP_FILE_BROKEN);
+                if (!changeGuid(line, 2, eqsets, sObjectMgr.m_EquipmentSetIds.GetNextAfterMaxUsed()))
+                    ROLLBACK(DUMP_FILE_BROKEN);             // character_equipmentsets.setguid
+                for(int i = 0; i < 19; ++i)                 // character_equipmentsets.item0..item18
+                    if(!changeGuid(line, 6+i, items, sObjectMgr.m_ItemGuids.GetNextAfterMaxUsed()))
+                        ROLLBACK(DUMP_FILE_BROKEN);
+                break;
+
             default:
                 sLog.outError("Unknown dump table type: %u",type);
                 break;
@@ -656,6 +691,7 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
     //FIXME: current code with post-updating guids not safe for future per-map threads
     sObjectMgr.m_ItemGuids.Set(sObjectMgr.m_ItemGuids.GetNextAfterMaxUsed() + items.size());
     sObjectMgr.m_MailIds.Set(sObjectMgr.m_MailIds.GetNextAfterMaxUsed() +  mails.size());
+    sObjectMgr.m_EquipmentSetIds.Set(sObjectMgr.m_EquipmentSetIds.GetNextAfterMaxUsed() + eqsets.size());
 
     if(incHighest)
         sObjectMgr.m_CharGuids.Set(sObjectMgr.m_CharGuids.GetNextAfterMaxUsed()+1);
