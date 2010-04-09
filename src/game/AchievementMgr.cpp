@@ -1796,7 +1796,7 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_ACHIEVEMENT);
 
     // reward items and titles if any
-    AchievementReward const* reward = sAchievementMgr.GetAchievementReward(achievement);
+    AchievementReward const* reward = sAchievementMgr.GetAchievementReward(achievement, GetPlayer()->getGender());
 
     // no rewards
     if(!reward)
@@ -1821,7 +1821,7 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
         std::string text = reward->text;
         if ( loc_idx >= 0 )
         {
-            if(AchievementRewardLocale const* loc = sAchievementMgr.GetAchievementRewardLocale(achievement))
+            if(AchievementRewardLocale const* loc = sAchievementMgr.GetAchievementRewardLocale(achievement, GetPlayer()->getGender()))
             {
                 if (loc->subject.size() > size_t(loc_idx) && !loc->subject[loc_idx].empty())
                     subject = loc->subject[loc_idx];
@@ -2128,8 +2128,8 @@ void AchievementGlobalMgr::LoadRewards()
 {
     m_achievementRewards.clear();                           // need for reload case
 
-    //                                                0      1        2        3     4       5        6
-    QueryResult *result = WorldDatabase.Query("SELECT entry, title_A, title_H, item, sender, subject, text FROM achievement_reward");
+    //                                                0      1       2        3        4     5       6        7
+    QueryResult *result = WorldDatabase.Query("SELECT entry, gender, title_A, title_H, item, sender, subject, text FROM achievement_reward");
 
     if(!result)
     {
@@ -2158,12 +2158,16 @@ void AchievementGlobalMgr::LoadRewards()
         }
 
         AchievementReward reward;
-        reward.titleId[0] = fields[1].GetUInt32();
-        reward.titleId[1] = fields[2].GetUInt32();
-        reward.itemId     = fields[3].GetUInt32();
-        reward.sender     = fields[4].GetUInt32();
-        reward.subject    = fields[5].GetCppString();
-        reward.text       = fields[6].GetCppString();
+        reward.gender     = Gender(fields[1].GetUInt8());
+        reward.titleId[0] = fields[2].GetUInt32();
+        reward.titleId[1] = fields[3].GetUInt32();
+        reward.itemId     = fields[4].GetUInt32();
+        reward.sender     = fields[5].GetUInt32();
+        reward.subject    = fields[6].GetCppString();
+        reward.text       = fields[7].GetCppString();
+
+        if (reward.gender >= MAX_GENDER)
+            sLog.outErrorDb( "Table `achievement_reward` (Entry: %u) has wrong gender %u.", entry, reward.gender);
 
         if ((reward.titleId[0]==0)!=(reward.titleId[1]==0))
             sLog.outErrorDb( "Table `achievement_reward` (Entry: %u) has title (A: %u H: %u) only for one from teams.", entry, reward.titleId[0], reward.titleId[1]);
@@ -2225,7 +2229,7 @@ void AchievementGlobalMgr::LoadRewards()
             }
         }
 
-        m_achievementRewards[entry] = reward;
+        m_achievementRewards.insert(AchievementRewards::value_type(entry,reward));
         ++count;
 
     } while (result->NextRow());
@@ -2240,7 +2244,7 @@ void AchievementGlobalMgr::LoadRewardLocales()
 {
     m_achievementRewardLocales.clear();                       // need for reload case
 
-    QueryResult *result = WorldDatabase.Query("SELECT entry,subject_loc1,text_loc1,subject_loc2,text_loc2,subject_loc3,text_loc3,subject_loc4,text_loc4,subject_loc5,text_loc5,subject_loc6,text_loc6,subject_loc7,text_loc7,subject_loc8,text_loc8 FROM locales_achievement_reward");
+    QueryResult *result = WorldDatabase.Query("SELECT entry,gender,subject_loc1,text_loc1,subject_loc2,text_loc2,subject_loc3,text_loc3,subject_loc4,text_loc4,subject_loc5,text_loc5,subject_loc6,text_loc6,subject_loc7,text_loc7,subject_loc8,text_loc8 FROM locales_achievement_reward");
 
     if(!result)
     {
@@ -2268,11 +2272,16 @@ void AchievementGlobalMgr::LoadRewardLocales()
             continue;
         }
 
-        AchievementRewardLocale& data = m_achievementRewardLocales[entry];
+        AchievementRewardLocale data;
+
+        data.gender = Gender(fields[1].GetUInt8());
+
+        if (data.gender >= MAX_GENDER)
+            sLog.outErrorDb( "Table `locales_achievement_reward` (Entry: %u) has wrong gender %u.", entry, data.gender);
 
         for(int i = 1; i < MAX_LOCALE; ++i)
         {
-            std::string str = fields[1+2*(i-1)].GetCppString();
+            std::string str = fields[2+2*(i-1)].GetCppString();
             if(!str.empty())
             {
                 int idx = sObjectMgr.GetOrNewIndexForLocale(LocaleConstant(i));
@@ -2284,7 +2293,7 @@ void AchievementGlobalMgr::LoadRewardLocales()
                     data.subject[idx] = str;
                 }
             }
-            str = fields[1+2*(i-1)+1].GetCppString();
+            str = fields[2+2*(i-1)+1].GetCppString();
             if(!str.empty())
             {
                 int idx = sObjectMgr.GetOrNewIndexForLocale(LocaleConstant(i));
@@ -2297,6 +2306,9 @@ void AchievementGlobalMgr::LoadRewardLocales()
                 }
             }
         }
+
+        m_achievementRewardLocales.insert(AchievementRewardLocales::value_type(entry,data));
+
     } while (result->NextRow());
 
     delete result;

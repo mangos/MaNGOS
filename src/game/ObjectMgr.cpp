@@ -1011,7 +1011,7 @@ void ObjectMgr::LoadCreatureModelInfo()
         if (!sCreatureDisplayInfoStore.LookupEntry(minfo->modelid))
             sLog.outErrorDb("Table `creature_model_info` has model for not existed display id (%u).", minfo->modelid);
 
-        if (minfo->gender > GENDER_NONE)
+        if (minfo->gender >= MAX_GENDER)
         {
             sLog.outErrorDb("Table `creature_model_info` has wrong gender (%u) for display id (%u).", uint32(minfo->gender), minfo->modelid);
             const_cast<CreatureModelInfo*>(minfo)->gender = GENDER_MALE;

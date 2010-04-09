@@ -29,6 +29,8 @@ enum Gender
     GENDER_NONE                        = 2
 };
 
+#define MAX_GENDER                       3
+
 // Race value is index in ChrRaces.dbc
 enum Races
 {
