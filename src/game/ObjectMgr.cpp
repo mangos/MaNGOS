@@ -7381,6 +7381,15 @@ bool PlayerCondition::Meets(Player const * player) const
         }
         case CONDITION_NOITEM:
             return !player->HasItemCount(value1, value2);
+        case CONDITION_SPELL:
+        {
+            switch(value2)
+            {
+                case 0: return player->HasSpell(value1);
+                case 1: return !player->HasSpell(value1);
+            }
+            return false;
+        }
         default:
             return false;
     }
@@ -7573,6 +7582,22 @@ bool PlayerCondition::IsValid(ConditionType condition, uint32 value1, uint32 val
             if (value2 > 2)
             {
                 sLog.outErrorDb("Level condition has invalid argument %u (must be 0..2), skipped", value2);
+                return false;
+            }
+
+            break;
+        }
+        case CONDITION_SPELL:
+        {
+            if(!sSpellStore.LookupEntry(value1))
+            {
+                sLog.outErrorDb("Spell condition requires to have non existing spell (Id: %d), skipped", value1);
+                return false;
+            }
+
+            if (value2 > 1)
+            {
+                sLog.outErrorDb("Spell condition has invalid argument %u (must be 0..1), skipped", value2);
                 return false;
             }
 

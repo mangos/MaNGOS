@@ -12688,8 +12688,20 @@ void Player::OnGossipSelect(WorldObject* pSource, uint32 gossipListId, uint32 me
     if (menuId != gossipmenu.GetMenuId())
         return;
 
-    uint32 gossipOptionId = gossipmenu.GetItem(gossipListId).m_gOptionId;
+    GossipMenuItem const&  menu_item = gossipmenu.GetItem(gossipListId);
+
+    uint32 gossipOptionId = menu_item.m_gOptionId;
     uint64 guid = pSource->GetGUID();
+    uint32 moneyTake = menu_item.m_gBoxMoney;
+
+    // if this function called and player have money for pay MoneyTake or cheating, proccess both cases
+    if (moneyTake > 0)
+    {
+        if (GetMoney() >= moneyTake)
+            ModifyMoney(-int32(moneyTake));
+        else
+            return;                                         // cheating
+    }
 
     if (pSource->GetTypeId() == TYPEID_GAMEOBJECT)
     {

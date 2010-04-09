@@ -314,9 +314,10 @@ enum ConditionType
     CONDITION_RACE_CLASS            = 14,                   // race_mask    class_mask
     CONDITION_LEVEL                 = 15,                   // player_level 0, 1 or 2 (0: equal to, 1: equal or higher than, 2: equal or less than)
     CONDITION_NOITEM                = 16,                   // item_id      count
+    CONDITION_SPELL                 = 17,                   // spell_id     0, 1 (0: has spell, 1: hasn't spell)
 };
 
-#define MAX_CONDITION                 17                    // maximum value in ConditionType enum
+#define MAX_CONDITION                 18                    // maximum value in ConditionType enum
 
 struct PlayerCondition
 {
