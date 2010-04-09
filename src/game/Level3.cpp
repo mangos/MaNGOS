@@ -4534,12 +4534,47 @@ bool ChatHandler::HandleResetSpellsCommand(const char * args)
     return true;
 }
 
-bool ChatHandler::HandleResetTalentsCommand(const char * args)
+bool ChatHandler::HandleResetSpecsCommand(const char * args)
 {
     Player* target;
     uint64 target_guid;
     std::string target_name;
     if (!extractPlayerTarget((char*)args, &target, &target_guid, &target_name))
+        return false;
+
+    if (target)
+    {
+        target->resetTalents(true,true);
+        target->SendTalentsInfoData(false);
+        ChatHandler(target).SendSysMessage(LANG_RESET_TALENTS);
+        if (!m_session || m_session->GetPlayer() != target)
+            PSendSysMessage(LANG_RESET_TALENTS_ONLINE,GetNameLink(target).c_str());
+
+        Pet* pet = target->GetPet();
+        Pet::resetTalentsForAllPetsOf(target, pet);
+        if(pet)
+            target->SendTalentsInfoData(true);
+        return true;
+    }
+    else if (target_guid)
+    {
+        uint32 at_flags = AT_LOGIN_RESET_TALENTS | AT_LOGIN_RESET_PET_TALENTS;
+        CharacterDatabase.PExecute("UPDATE characters SET at_login = at_login | '%u' WHERE guid = '%u'", at_flags, GUID_LOPART(target_guid) );
+        std::string nameLink = playerLink(target_name);
+        PSendSysMessage(LANG_RESET_TALENTS_OFFLINE, nameLink.c_str());
+        return true;
+    }
+
+    SendSysMessage(LANG_NO_CHAR_SELECTED);
+    SetSentErrorMessage(true);
+    return false;
+}
+
+bool ChatHandler::HandleResetTalentsCommand(const char * args)
+{
+    Player* target;
+    std::string target_name;
+    if (!extractPlayerTarget((char*)args, &target, NULL, &target_name))
     {
         // Try reset talents as Hunter Pet
         Creature* creature = getSelectedCreature();
@@ -4575,14 +4610,6 @@ bool ChatHandler::HandleResetTalentsCommand(const char * args)
         Pet::resetTalentsForAllPetsOf(target, pet);
         if(pet)
             target->SendTalentsInfoData(true);
-        return true;
-    }
-    else if (target_guid)
-    {
-        uint32 at_flags = AT_LOGIN_RESET_PET_TALENTS;
-        CharacterDatabase.PExecute("UPDATE characters SET at_login = at_login | '%u' WHERE guid = '%u'", at_flags, GUID_LOPART(target_guid) );
-        std::string nameLink = playerLink(target_name);
-        PSendSysMessage(LANG_RESET_TALENTS_OFFLINE, nameLink.c_str());
         return true;
     }
 

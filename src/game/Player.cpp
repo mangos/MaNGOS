@@ -3666,13 +3666,13 @@ uint32 Player::resetTalentsCost() const
     }
 }
 
-bool Player::resetTalents(bool no_cost)
+bool Player::resetTalents(bool no_cost, bool all_specs)
 {
     // not need after this call
-    if(HasAtLoginFlag(AT_LOGIN_RESET_TALENTS))
+    if(HasAtLoginFlag(AT_LOGIN_RESET_TALENTS) && all_specs)
         RemoveAtLoginFlag(AT_LOGIN_RESET_TALENTS,true);
 
-    if (m_usedTalentCount == 0)
+    if (m_usedTalentCount == 0 && !all_specs)
     {
         UpdateFreeTalentPoints(false);                      // for fix if need counter
         return false;
@@ -3728,6 +3728,33 @@ bool Player::resetTalents(bool no_cost)
                 removeSpell(talentInfo->RankID[j],!IsPassiveSpell(talentInfo->RankID[j]),false);
 
         iter = m_talents[m_activeSpec].begin();
+    }
+
+    // for not current spec just mark removed all saved to DB case and drop not saved
+    if (all_specs)
+    {
+        for (uint8 spec = 0; spec < MAX_TALENT_SPEC_COUNT; ++spec)
+        {
+            if (spec == m_activeSpec)
+                continue;
+
+            for (PlayerTalentMap::iterator iter = m_talents[spec].begin(); iter != m_talents[spec].end();)
+            {
+                switch (iter->second.state)
+                {
+                case PLAYERSPELL_REMOVED:
+                    ++iter;
+                    break;
+                case PLAYERSPELL_NEW:
+                    m_talents[spec].erase(iter++);
+                    break;
+                default:
+                    iter->second.state = PLAYERSPELL_REMOVED;
+                    ++iter;
+                    break;
+                }
+            }
+        }
     }
 
     UpdateFreeTalentPoints(false);
