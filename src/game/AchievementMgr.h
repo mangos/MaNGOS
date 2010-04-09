@@ -23,6 +23,7 @@
 #include "Database/DatabaseEnv.h"
 #include "DBCEnums.h"
 #include "DBCStores.h"
+#include "SharedDefines.h"
 
 #include <map>
 #include <string>
