@@ -11312,7 +11312,7 @@ int32 Unit::CalculateSpellDamage(Unit const* target, SpellEntry const* spellProt
 
     switch(randomPoints)
     {
-        case 0: break;                                      // not used
+        case 0:                                             // not used
         case 1: basePoints += 1; break;                     // range 1..1
         default:
             // range can have positive (1..rand) and negative (rand..1) values, so order its for irand
