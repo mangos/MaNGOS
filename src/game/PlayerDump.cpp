@@ -277,6 +277,7 @@ void PlayerDumpWriter::DumpTableContent(std::string& dump, uint32 guid, char con
         case DTT_ITEM_GIFT: fieldname = "item_guid"; guids = &items; break;
         case DTT_PET:       fieldname = "owner";                     break;
         case DTT_PET_TABLE: fieldname = "guid";      guids = &pets;  break;
+        case DTT_PET_DECL:  fieldname = "id";                        break;
         case DTT_MAIL:      fieldname = "receiver";                  break;
         case DTT_MAIL_ITEM: fieldname = "mail_id";   guids = &mails; break;
         default:            fieldname = "guid";                      break;
