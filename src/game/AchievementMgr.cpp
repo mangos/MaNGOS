@@ -16,7 +16,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "AchievementMgr.h"
 #include "Common.h"
 #include "Player.h"
 #include "WorldPacket.h"
@@ -38,6 +37,7 @@
 #include "BattleGroundAB.h"
 #include "Map.h"
 #include "InstanceData.h"
+#include "AchievementMgr.h"
 
 #include "Policies/SingletonImp.h"
 
