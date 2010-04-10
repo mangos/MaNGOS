@@ -18,10 +18,10 @@
 
 #include "Player.h"
 #include "BattleGround.h"
-#include "BattleGroundABG.h"
+#include "BattleGroundRB.h"
 #include "Language.h"
 
-BattleGroundABG::BattleGroundABG()
+BattleGroundRB::BattleGroundRB()
 {
     //TODO FIX ME!
     m_StartMessageIds[BG_STARTING_EVENT_FIRST]  = 0;
@@ -30,25 +30,25 @@ BattleGroundABG::BattleGroundABG()
     m_StartMessageIds[BG_STARTING_EVENT_FOURTH] = LANG_BG_WS_HAS_BEGUN;
 }
 
-BattleGroundABG::~BattleGroundABG()
+BattleGroundRB::~BattleGroundRB()
 {
 
 }
 
-void BattleGroundABG::Update(uint32 diff)
+void BattleGroundRB::Update(uint32 diff)
 {
     BattleGround::Update(diff);
 }
 
-void BattleGroundABG::StartingEventCloseDoors()
+void BattleGroundRB::StartingEventCloseDoors()
 {
 }
 
-void BattleGroundABG::StartingEventOpenDoors()
+void BattleGroundRB::StartingEventOpenDoors()
 {
 }
 
-void BattleGroundABG::AddPlayer(Player *plr)
+void BattleGroundRB::AddPlayer(Player *plr)
 {
     BattleGround::AddPlayer(plr);
     //create score and add it to map, default values are set in constructor
@@ -57,19 +57,19 @@ void BattleGroundABG::AddPlayer(Player *plr)
     m_PlayerScores[plr->GetGUID()] = sc;
 }
 
-void BattleGroundABG::RemovePlayer(Player* /*plr*/,uint64 /*guid*/)
+void BattleGroundRB::RemovePlayer(Player* /*plr*/,uint64 /*guid*/)
 {
 
 }
 
-void BattleGroundABG::HandleAreaTrigger(Player * /*Source*/, uint32 /*Trigger*/)
+void BattleGroundRB::HandleAreaTrigger(Player * /*Source*/, uint32 /*Trigger*/)
 {
     // this is wrong way to implement these things. On official it done by gameobject spell cast.
     if (GetStatus() != STATUS_IN_PROGRESS)
         return;
 }
 
-void BattleGroundABG::UpdatePlayerScore(Player* Source, uint32 type, uint32 value)
+void BattleGroundRB::UpdatePlayerScore(Player* Source, uint32 type, uint32 value)
 {
 
     std::map<uint64, BattleGroundScore*>::iterator itr = m_PlayerScores.find(Source->GetGUID());
