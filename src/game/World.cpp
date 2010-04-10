@@ -1101,6 +1101,9 @@ void World::SetInitialWorldSettings()
     sLog.outString( "Loading Player level dependent mail rewards..." );
     sObjectMgr.LoadMailLevelRewards();
 
+    sLog.outString( "Loading Spell disabled..." );
+    sObjectMgr.LoadSpellDisabledEntrys();
+
     sLog.outString( "Loading Loot Tables..." );
     sLog.outString();
     LoadLootTables();
