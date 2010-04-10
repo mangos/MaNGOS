@@ -7589,6 +7589,12 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
                 trigger_spell_id = 37661;
                 target = pVictim;
             }
+            // Unyielding Knights
+            else if (auraSpellInfo->Id == 38164)
+            {
+                if (!pVictim->GetEntry() == 19457)
+                    return false;
+            }
             // Bonus Healing (Crystal Spire of Karabor mace)
             else if (auraSpellInfo->Id == 40971)
             {
