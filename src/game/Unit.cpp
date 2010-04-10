@@ -5826,6 +5826,7 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     if (triggeredByAura->GetEffIndex() != EFFECT_INDEX_0)
                         return false;
 
+                    // Glyph of Siphon Life
                     if (Aura *aur = GetAura(56216, EFFECT_INDEX_0))
                         triggerAmount += triggerAmount * aur->GetModifier()->m_amount / 100;
 
