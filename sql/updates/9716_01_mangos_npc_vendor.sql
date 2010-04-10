@@ -2,4 +2,4 @@ ALTER TABLE db_version CHANGE COLUMN required_9710_01_mangos_command required_97
 
 ALTER TABLE npc_vendor
   DROP PRIMARY KEY,
-  PRIMARY KEY  (`entry`,`item`,`ExtendedCost`);
+  ADD PRIMARY KEY  (`entry`,`item`,`ExtendedCost`);
