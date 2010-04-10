@@ -1064,6 +1064,10 @@ void Aura::_AddAura()
             if (m_spellProto->SpellFamilyName == SPELLFAMILY_DRUID && (m_spellProto->SpellFamilyFlags & UI64LIT(0x0000000000000400)))
                 m_target->ModifyAuraState(AURA_STATE_FAERIE_FIRE, true);
 
+            // Sting (hunter's pet ability)
+            if (m_spellProto->Category == 1133)
+                m_target->ModifyAuraState(AURA_STATE_FAERIE_FIRE, true);
+
             // Victorious
             if (m_spellProto->SpellFamilyName == SPELLFAMILY_WARRIOR && (m_spellProto->SpellFamilyFlags & UI64LIT(0x0004000000000000)))
                 m_target->ModifyAuraState(AURA_STATE_WARRIOR_VICTORY_RUSH, true);
