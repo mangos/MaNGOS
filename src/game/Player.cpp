@@ -8416,10 +8416,9 @@ void Player::SendPetSkillWipeConfirm()
 
 void Player::LearnDualSpec(uint64 guid)
 {
-    ModifyMoney(-1000*GOLD);
-
     CastSpell(this, 63680, true, NULL, NULL, guid);
     CastSpell(this, 63624, true, NULL, NULL, guid);
+    sLog.outDetail("Player (GUID %u) get dual specialization",guid);
 }
 
 /*********************************************************/
@@ -12849,8 +12848,8 @@ void Player::OnGossipSelect(WorldObject* pSource, uint32 gossipListId, uint32 me
             GetSession()->SendTrainerList(guid);
             break;
         case GOSSIP_OPTION_LEARNDUALSPEC:
-            PlayerTalkClass->CloseGossip();
             LearnDualSpec(guid);
+            PlayerTalkClass->CloseGossip();
             break;
         case GOSSIP_OPTION_UNLEARNTALENTS:
             PlayerTalkClass->CloseGossip();

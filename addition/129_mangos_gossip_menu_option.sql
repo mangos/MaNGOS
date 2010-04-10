@@ -1,3 +1,5 @@
-DELETE FROM `gossip_menu_option` WHERE `gossip_menu_option`.`option_id` IN (18,19);
-INSERT INTO `gossip_menu_option` VALUES 
-(0, 51, 0, 'Purchase a Dual Talent Specialization.', 18, 16, 0, 0, 0, 0, 10000000, 'Are you sure you wish to purchase a Dual Talent Specialization?', 0, 0, 0, 0, 0, 0, 0, 0, 0);
+DELETE FROM `gossip_menu_option` WHERE `gossip_menu_option`.`option_id` = 18;
+INSERT INTO `gossip_menu_option` VALUES (0, 16, 0, 'Purchase a Dual Talent Specialization.', 1, 16, 0, 0, 0, 0, 10000000, 'Are you sure you wish to purchase a Dual Talent Specialization?', 15, 40, 1, 0, 0, 0, 0, 0, 0);
+INSERT INTO `locales_gossip_menu_option` (`menu_id`, `id`, `option_text_loc1`, `option_text_loc2`, `option_text_loc3`, `option_text_loc4`, `option_text_loc5`, `option_text_loc6`, `option_text_loc7`, `option_text_loc8`, `box_text_loc1`, `box_text_loc2`, `box_text_loc3`, `box_text_loc4`, `box_text_loc5`, `box_text_loc6`, `box_text_loc7`, `box_text_loc8`) VALUES
+(0, 10371, 'I want to buy dual-talent specialization', NULL, NULL, NULL, NULL, NULL, NULL, 'Я хочу купить специализацию Двойной талант', 'Are you sure you wish to purchase a Dual Talent Specialization?', NULL, NULL, NULL, NULL, NULL, NULL, 'Вы хотите купить специализацию Двойной талант?');
+UPDATE `mangos`.`gossip_menu_option` SET `option_id` = '18' WHERE `gossip_menu_option`.`menu_id` =10371 AND `gossip_menu_option`.`id` =0 LIMIT 1 ;
