@@ -3183,28 +3183,7 @@ void Spell::DoCreateItem(SpellEffectIndex eff_idx, uint32 itemtype)
             break;
     }
 
-    uint32 num_to_add;
-
-    // TODO: maybe all this can be replaced by using correct calculated `damage` value
-    if(pProto->Class != ITEM_CLASS_CONSUMABLE || m_spellInfo->SpellFamilyName != SPELLFAMILY_MAGE)
-    {
-        int32 basePoints = m_currentBasePoints[eff_idx];
-        int32 randomPoints = m_spellInfo->EffectDieSides[eff_idx];
-        if (randomPoints)
-            num_to_add = basePoints + irand(0, randomPoints);
-        else
-            num_to_add = basePoints;
-    }
-    else if (pProto->MaxCount == 1)
-        num_to_add = 1;
-    else if(player->getLevel() >= m_spellInfo->spellLevel)
-    {
-        int32 basePoints = m_currentBasePoints[eff_idx];
-        float pointPerLevel = m_spellInfo->EffectRealPointsPerLevel[eff_idx];
-        num_to_add = basePoints + uint32((player->getLevel() - m_spellInfo->spellLevel)*pointPerLevel);
-    }
-    else
-        num_to_add = 2;
+    uint32 num_to_add = damage;
 
     if (num_to_add < 1)
         num_to_add = 1;
