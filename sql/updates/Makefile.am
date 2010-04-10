@@ -112,6 +112,8 @@ pkgdata_DATA = \
 	9702_01_characters_item.sql \
 	9704_01_mangos_achievement_reward.sql \
 	9710_01_mangos_command.sql \
+	9716_01_mangos_npc_vendor.sql \
+	9716_02_mangos_mangos_string.sql \
 	README
 
 ## Additional files to include when running 'make dist'
@@ -204,4 +206,6 @@ EXTRA_DIST = \
 	9702_01_characters_item.sql \
 	9704_01_mangos_achievement_reward.sql \
 	9710_01_mangos_command.sql \
+	9716_01_mangos_npc_vendor.sql \
+	9716_02_mangos_mangos_string.sql \
 	README

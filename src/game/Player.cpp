@@ -18296,7 +18296,7 @@ void Player::InitDisplayIds()
 }
 
 // Return true is the bought item has a max count to force refresh of window by caller
-bool Player::BuyItemFromVendor(uint64 vendorguid, uint32 item, uint8 count, uint8 bag, uint8 slot)
+bool Player::BuyItemFromVendorSlot(uint64 vendorguid, uint32 vendorslot, uint32 item, uint8 count, uint8 bag, uint8 slot)
 {
     // cheating attempt
     if (count < 1) count = 1;
@@ -18326,14 +18326,19 @@ bool Player::BuyItemFromVendor(uint64 vendorguid, uint32 item, uint8 count, uint
         return false;
     }
 
-    size_t vendor_slot = vItems->FindItemSlot(item);
-    if (vendor_slot >= vItems->GetItemCount())
+    if (vendorslot >= vItems->GetItemCount())
     {
         SendBuyError( BUY_ERR_CANT_FIND_ITEM, pCreature, item, 0);
         return false;
     }
 
-    VendorItem const* crItem = vItems->m_items[vendor_slot];
+    VendorItem const* crItem = vItems->m_items[vendorslot];
+    if(!crItem || crItem->item != item)                     // store diff item (cheating)
+    {
+        SendBuyError( BUY_ERR_CANT_FIND_ITEM, pCreature, item, 0);
+        return false;
+    }
+
 
     // check current item amount if it limited
     if (crItem->maxcount != 0)
@@ -18435,7 +18440,7 @@ bool Player::BuyItemFromVendor(uint64 vendorguid, uint32 item, uint8 count, uint
 
             WorldPacket data(SMSG_BUY_ITEM, (8+4+4+4));
             data << uint64(pCreature->GetGUID());
-            data << uint32(vendor_slot+1);                  // numbered from 1 at client
+            data << uint32(vendorslot+1);                   // numbered from 1 at client
             data << uint32(crItem->maxcount > 0 ? new_count : 0xFFFFFFFF);
             data << uint32(count);
             GetSession()->SendPacket(&data);
@@ -18480,7 +18485,7 @@ bool Player::BuyItemFromVendor(uint64 vendorguid, uint32 item, uint8 count, uint
 
             WorldPacket data(SMSG_BUY_ITEM, (8+4+4+4));
             data << uint64(pCreature->GetGUID());
-            data << uint32(vendor_slot + 1);                // numbered from 1 at client
+            data << uint32(vendorslot + 1);                 // numbered from 1 at client
             data << uint32(crItem->maxcount > 0 ? new_count : 0xFFFFFFFF);
             data << uint32(count);
             GetSession()->SendPacket(&data);

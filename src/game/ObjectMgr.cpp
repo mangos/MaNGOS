@@ -8274,10 +8274,9 @@ bool ObjectMgr::RemoveVendorItem( uint32 entry,uint32 item )
     if(iter == m_mCacheVendorItemMap.end())
         return false;
 
-    if(!iter->second.FindItem(item))
+    if(!iter->second.RemoveItem(item))
         return false;
 
-    iter->second.RemoveItem(item);
     WorldDatabase.PExecuteLog("DELETE FROM npc_vendor WHERE entry='%u' AND item='%u'",entry, item);
     return true;
 }
@@ -8348,12 +8347,12 @@ bool ObjectMgr::IsVendorItemValid( uint32 vendor_entry, uint32 item_id, uint32 m
     if(!vItems)
         return true;                                        // later checks for non-empty lists
 
-    if(vItems->FindItem(item_id))
+    if(vItems->FindItemCostPair(item_id,ExtendedCost))
     {
         if(pl)
-            ChatHandler(pl).PSendSysMessage(LANG_ITEM_ALREADY_IN_LIST,item_id);
+            ChatHandler(pl).PSendSysMessage(LANG_ITEM_ALREADY_IN_LIST, item_id, ExtendedCost);
         else
-            sLog.outErrorDb( "Table `npc_vendor` has duplicate items %u for vendor (Entry: %u), ignoring", item_id, vendor_entry);
+            sLog.outErrorDb( "Table `npc_vendor` has duplicate items %u (with extended cost %u) for vendor (Entry: %u), ignoring", item_id, ExtendedCost, vendor_entry);
         return false;
     }
 

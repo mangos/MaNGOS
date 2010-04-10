@@ -643,6 +643,11 @@ void WorldSession::HandleBuyItemInSlotOpcode( WorldPacket & recv_data )
 
     recv_data >> vendorguid >> item  >> slot >> bagguid >> bagslot >> count;
 
+    if (slot < 1)
+        return;                                             // client numbering slots from 1
+
+    --slot;
+
     uint8 bag = NULL_BAG;                                   // init for case invalid bagGUID
 
     // find bag slot by bag guid
@@ -667,7 +672,7 @@ void WorldSession::HandleBuyItemInSlotOpcode( WorldPacket & recv_data )
     if (bag == NULL_BAG)
         return;
 
-    GetPlayer()->BuyItemFromVendor(vendorguid, item, count, bag, bagslot);
+    GetPlayer()->BuyItemFromVendorSlot(vendorguid, slot, item, count, bag, bagslot);
 }
 
 void WorldSession::HandleBuyItemOpcode( WorldPacket & recv_data )
@@ -679,7 +684,12 @@ void WorldSession::HandleBuyItemOpcode( WorldPacket & recv_data )
 
     recv_data >> vendorguid >> item >> slot >> count >> unk1;
 
-    GetPlayer()->BuyItemFromVendor(vendorguid, item, count, NULL_BAG, NULL_SLOT);
+    if (slot < 1)
+        return;                                             // client numbering slots from 1
+
+    --slot;
+
+    GetPlayer()->BuyItemFromVendorSlot(vendorguid, slot, item, count, NULL_BAG, NULL_SLOT);
 }
 
 void WorldSession::HandleListInventoryOpcode( WorldPacket & recv_data )
