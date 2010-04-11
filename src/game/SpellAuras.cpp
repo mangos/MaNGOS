@@ -3802,6 +3802,8 @@ void Aura::HandleModPossess(bool apply, bool Real)
             ((Player*)m_target)->SetClientControl(m_target, 0);
         }
 
+        m_target->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
+
         if(CharmInfo *charmInfo = m_target->InitCharmInfo(m_target))
             charmInfo->InitPossessCreateSpells();
 
@@ -3835,10 +3837,17 @@ void Aura::HandleModPossess(bool apply, bool Real)
 
         if(m_target->GetTypeId() == TYPEID_UNIT)
         {
+            m_target->CombatStop();
+            m_target->getHostileRefManager().clearReferences();
+            m_target->getThreatManager().clearReferences();
+
             ((Creature*)m_target)->AIM_Initialize();
 
             if (((Creature*)m_target)->AI())
+            {
                 ((Creature*)m_target)->AI()->AttackedBy(caster);
+                ((Creature*)m_target)->AI()->AttackStart(caster);
+            }
         }
     }
 }
