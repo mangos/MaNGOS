@@ -362,7 +362,6 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         void AddObjectToRemoveList(WorldObject *obj);
 
         void UpdateObjectVisibility(WorldObject* obj, Cell cell, CellPair cellpair);
-        void UpdatePlayerVisibility(Player* player, Cell cell, CellPair cellpair);
         void UpdateObjectsVisibilityFor(Player* player, Cell cell, CellPair cellpair);
 
         void resetMarkedCells() { marked_cells.reset(); }

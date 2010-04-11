@@ -28,13 +28,13 @@ class BattleGroundABGScore : public BattleGroundScore
         virtual ~BattleGroundABGScore() {};
 };
 
-class BattleGroundABG : public BattleGround
+class BattleGroundRB : public BattleGround
 {
     friend class BattleGroundMgr;
 
     public:
-        BattleGroundABG();
-        ~BattleGroundABG();
+        BattleGroundRB();
+        ~BattleGroundRB();
         void Update(uint32 diff);
 
         /* inherited from BattlegroundClass */

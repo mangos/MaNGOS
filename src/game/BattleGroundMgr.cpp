@@ -32,7 +32,7 @@
 #include "BattleGroundDS.h"
 #include "BattleGroundRV.h"
 #include "BattleGroundIC.h"
-#include "BattleGroundABG.h"
+#include "BattleGroundRB.h"
 #include "MapManager.h"
 #include "Map.h"
 #include "MapInstanced.h"
@@ -1528,7 +1528,7 @@ BattleGround * BattleGroundMgr::CreateNewBattleGround(BattleGroundTypeId bgTypeI
             bg = new BattleGroundIC(*(BattleGroundIC*)bg_template);
             break;
         case BATTLEGROUND_RB:
-            bg = new BattleGroundABG(*(BattleGroundABG*)bg_template);
+            bg = new BattleGroundRB(*(BattleGroundRB*)bg_template);
             break;
         default:
             //error, but it is handled few lines above
@@ -1571,7 +1571,7 @@ uint32 BattleGroundMgr::CreateBattleGround(BattleGroundTypeId bgTypeId, bool IsA
         case BATTLEGROUND_DS: bg = new BattleGroundDS; break;
         case BATTLEGROUND_RV: bg = new BattleGroundRV; break;
         case BATTLEGROUND_IC: bg = new BattleGroundIC; break;
-        case BATTLEGROUND_RB: bg = new BattleGroundABG; break;
+        case BATTLEGROUND_RB: bg = new BattleGroundRB; break;
         default:bg = new BattleGround;   break;             // placeholder for non implemented BG
     }
 
@@ -1643,18 +1643,25 @@ void BattleGroundMgr::CreateInitialBattleGrounds()
         MaxPlayersPerTeam = fields[2].GetUInt32();
         MinLvl = fields[3].GetUInt32();
         MaxLvl = fields[4].GetUInt32();
+
         //check values from DB
-        if (MaxPlayersPerTeam == 0 || MinPlayersPerTeam == 0 || MinPlayersPerTeam > MaxPlayersPerTeam)
+        if (MaxPlayersPerTeam == 0 || MinPlayersPerTeam == 0)
         {
-            MinPlayersPerTeam = 0;                          // by default now expected strong full bg requirement
-            MaxPlayersPerTeam = 40;
+            sLog.outErrorDb("Table `battleground_template` for id %u have wrong min/max players per team settings. BG not created.", bgTypeID);
+            continue;
         }
-        if (MinLvl == 0 || MaxLvl == 0 || MinLvl > MaxLvl)
+
+        if (MinPlayersPerTeam > MaxPlayersPerTeam)
+            MinPlayersPerTeam = MaxPlayersPerTeam;
+
+        if (MinLvl == 0 || MaxLvl == 0)
         {
-            // TODO: fix me
-            MinLvl = 0;//bl->minlvl;
-            MaxLvl = 80;//bl->maxlvl;
+            sLog.outErrorDb("Table `battleground_template` for id %u have wrong min/max level settings. BG not created.", bgTypeID);
+            continue;
         }
+
+        if (MinLvl > MaxLvl)
+            MinLvl = MaxLvl;
 
         start1 = fields[5].GetUInt32();
 

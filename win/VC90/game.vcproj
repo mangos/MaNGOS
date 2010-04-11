@@ -567,14 +567,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\game\BattleGroundABG.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\game\BattleGroundABG.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\src\game\BattleGroundAV.cpp"
 				>
 			</File>
@@ -632,6 +624,14 @@
 			</File>
 			<File
 				RelativePath="..\..\src\game\BattleGroundNA.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\BattleGroundRB.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\BattleGroundRB.h"
 				>
 			</File>
 			<File
