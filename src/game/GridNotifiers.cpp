@@ -28,22 +28,6 @@
 using namespace MaNGOS;
 
 void
-MaNGOS::PlayerNotifier::Visit(PlayerMapType &m)
-{
-    WorldObject const* viewPoint = i_player.GetViewPoint();
-
-    for(PlayerMapType::iterator iter=m.begin(); iter != m.end(); ++iter)
-    {
-        Player* player = iter->getSource();
-        if( player == &i_player )
-            continue;
-
-        player->UpdateVisibilityOf(player->GetViewPoint(),&i_player);
-        i_player.UpdateVisibilityOf(viewPoint,player);
-    }
-}
-
-void
 VisibleChangesNotifier::Visit(PlayerMapType &m)
 {
     for(PlayerMapType::iterator iter=m.begin(); iter != m.end(); ++iter)
@@ -53,23 +37,6 @@ VisibleChangesNotifier::Visit(PlayerMapType &m)
             continue;
 
         player->UpdateVisibilityOf(player->GetViewPoint(),&i_object);
-    }
-}
-
-void
-VisibleNotifier::Visit(PlayerMapType &m)
-{
-    WorldObject const* viewPoint = i_player.GetViewPoint();
-
-    for(PlayerMapType::iterator iter=m.begin(); iter != m.end(); ++iter)
-    {
-        Player* player = iter->getSource();
-        if( player == &i_player )
-            continue;
-
-        player->UpdateVisibilityOf(player->GetViewPoint(),&i_player);
-        i_player.UpdateVisibilityOf(viewPoint,player,i_data,i_data_updates,i_visibleNow);
-        i_clientGUIDs.erase(player->GetGUID());
     }
 }
 
