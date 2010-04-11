@@ -3913,16 +3913,15 @@ void Player::InitVisibleBits()
 
 void Player::BuildCreateUpdateBlockForPlayer( UpdateData *data, Player *target ) const
 {
-    for(int i = 0; i < EQUIPMENT_SLOT_END; ++i)
-    {
-        if(m_items[i] == NULL)
-            continue;
-
-        m_items[i]->BuildCreateUpdateBlockForPlayer( data, target );
-    }
-
     if(target == this)
     {
+        for(int i = 0; i < EQUIPMENT_SLOT_END; ++i)
+        {
+            if(m_items[i] == NULL)
+                continue;
+
+            m_items[i]->BuildCreateUpdateBlockForPlayer( data, target );
+        }
         for(int i = INVENTORY_SLOT_BAG_START; i < BANK_SLOT_BAG_END; ++i)
         {
             if(m_items[i] == NULL)
