@@ -21929,7 +21929,7 @@ void Player::UpdateVisibilityForPlayer()
     CellPair p(MaNGOS::ComputeCellPair(GetPositionX(), GetPositionY()));
     Cell cell(p);
 
-    m->UpdatePlayerVisibility(this, cell, p);
+    m->UpdateObjectVisibility(this, cell, p);
 
     if (this != viewPoint)
     {
