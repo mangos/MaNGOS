@@ -57,7 +57,9 @@ enum HighGuid
 {
     HIGHGUID_ITEM           = 0x4700,                       // blizz 4700
     HIGHGUID_CONTAINER      = 0x4700,                       // blizz 4700
-    HIGHGUID_PLAYER         = 0x0700,                       // blizz 0700
+    HIGHGUID_PLAYER         = 0x0000,                       // blizz 0700 (temporary reverted back to 0 high guid
+                                                            // in result unknown source visibility player with
+                                                            // player problems. please reapply only after its resolve)
     HIGHGUID_GAMEOBJECT     = 0xF110,                       // blizz F110/F510
     HIGHGUID_TRANSPORT      = 0xF120,                       // blizz F120/F520 (for GAMEOBJECT_TYPE_TRANSPORT)
     HIGHGUID_UNIT           = 0xF130,                       // blizz F130/F530
