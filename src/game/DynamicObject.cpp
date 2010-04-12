@@ -114,18 +114,8 @@ void DynamicObject::Update(uint32 p_time)
     if(m_radius)
     {
         // TODO: make a timer and update this in larger intervals
-        CellPair p(MaNGOS::ComputeCellPair(GetPositionX(), GetPositionY()));
-        Cell cell(p);
-        cell.data.Part.reserved = ALL_DISTRICT;
-        cell.SetNoCreate();
-
         MaNGOS::DynamicObjectUpdater notifier(*this, caster);
-
-        TypeContainerVisitor<MaNGOS::DynamicObjectUpdater, WorldTypeMapContainer > world_object_notifier(notifier);
-        TypeContainerVisitor<MaNGOS::DynamicObjectUpdater, GridTypeMapContainer > grid_object_notifier(notifier);
-
-        cell.Visit(p, world_object_notifier, *GetMap(), *this, m_radius);
-        cell.Visit(p, grid_object_notifier,  *GetMap(), *this, m_radius);
+        Cell::VisitAllObjects(this, notifier, m_radius);
     }
 
     if(deleteThis)

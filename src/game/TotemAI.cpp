@@ -78,20 +78,11 @@ TotemAI::UpdateAI(const uint32 /*diff*/)
         !victim->isTargetableForAttack() || !m_creature->IsWithinDistInMap(victim, max_range) ||
         m_creature->IsFriendlyTo(victim) || !victim->isVisibleForOrDetect(m_creature,m_creature,false) )
     {
-        CellPair p(MaNGOS::ComputeCellPair(m_creature->GetPositionX(),m_creature->GetPositionY()));
-        Cell cell(p);
-        cell.data.Part.reserved = ALL_DISTRICT;
-
         victim = NULL;
 
         MaNGOS::NearestAttackableUnitInObjectRangeCheck u_check(m_creature, m_creature, max_range);
         MaNGOS::UnitLastSearcher<MaNGOS::NearestAttackableUnitInObjectRangeCheck> checker(m_creature,victim, u_check);
-
-        TypeContainerVisitor<MaNGOS::UnitLastSearcher<MaNGOS::NearestAttackableUnitInObjectRangeCheck>, GridTypeMapContainer > grid_object_checker(checker);
-        TypeContainerVisitor<MaNGOS::UnitLastSearcher<MaNGOS::NearestAttackableUnitInObjectRangeCheck>, WorldTypeMapContainer > world_object_checker(checker);
-
-        cell.Visit(p, grid_object_checker,  *m_creature->GetMap(), *m_creature, max_range);
-        cell.Visit(p, world_object_checker, *m_creature->GetMap(), *m_creature, max_range);
+        Cell::VisitAllObjects(m_creature, checker, max_range);
     }
 
     // If have target
