@@ -8482,7 +8482,7 @@ void Aura::UnregisterSingleCastAura()
         else
         {
             sLog.outError("Couldn't find the caster of the single target aura (SpellId %u), may crash later!", GetId());
-            ASSERT(false);
+            //ASSERTt(false);
         }
         m_isSingleTargetAura = false;
     }
