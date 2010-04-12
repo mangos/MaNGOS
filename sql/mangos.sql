@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_9720_01_mangos_spell_proc_event` bit(1) default NULL
+  `required_9728_01_mangos_gossip_menu_option` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -1992,7 +1992,7 @@ INSERT INTO gossip_menu_option VALUES
 (0,11,6,'GOSSIP_OPTION_AUCTIONEER',      13,0x200000,0,0,0,0,0,NULL,0,0,0,0,0,0,0,0,0),
 (0,12,0,'GOSSIP_OPTION_STABLEPET',       14,0x400000,0,0,0,0,0,NULL,0,0,0,0,0,0,0,0,0),
 (0,13,1,'GOSSIP_OPTION_ARMORER',         15,0x001000,0,0,0,0,0,NULL,0,0,0,0,0,0,0,0,0),
-(0,14,2,'GOSSIP_OPTION_UNLEARNTALENTS',  16,0x000010,0,0,0,0,0,NULL,0,0,0,0,0,0,0,0,0),
+(0,14,0,'GOSSIP_OPTION_UNLEARNTALENTS',  16,0x000010,0,0,0,0,0,NULL,0,0,0,0,0,0,0,0,0),
 (0,15,2,'GOSSIP_OPTION_UNLEARNPETSKILLS',17,0x000010,0,0,0,0,0,NULL,0,0,0,0,0,0,0,0,0);
 /*!40000 ALTER TABLE `gossip_menu_option` ENABLE KEYS */;
 UNLOCK TABLES;
