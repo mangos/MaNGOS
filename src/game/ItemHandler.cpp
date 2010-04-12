@@ -649,6 +649,12 @@ void WorldSession::HandleBuyItemInSlotOpcode( WorldPacket & recv_data )
 
     recv_data >> vendorguid >> item  >> slot >> bagguid >> bagslot >> count;
 
+    // client side expected counting from 1, and we send to client vendorslot+1 already
+    if (slot > 0)
+        --slot;
+    else
+        return;                                             // cheating
+
     uint8 bag = NULL_BAG;                                   // init for case invalid bagGUID
 
     // find bag slot by bag guid
@@ -684,6 +690,12 @@ void WorldSession::HandleBuyItemOpcode( WorldPacket & recv_data )
     uint8 unk1;
 
     recv_data >> vendorguid >> item >> slot >> count >> unk1;
+
+    // client side expected counting from 1, and we send to client vendorslot+1 already
+    if (slot > 0)
+        --slot;
+    else
+        return;                                             // cheating
 
     GetPlayer()->BuyItemFromVendorSlot(vendorguid, slot, item, count, NULL_BAG, NULL_SLOT);
 }
@@ -756,7 +768,7 @@ void WorldSession::SendListInventory(uint64 vendorguid)
                 // reputation discount
                 uint32 price = uint32(floor(pProto->BuyPrice * discountMod));
 
-                data << uint32(vendorslot);
+                data << uint32(vendorslot +1);              // client size expected counting from 1
                 data << uint32(crItem->item);
                 data << uint32(pProto->DisplayInfoID);
                 data << uint32(crItem->maxcount <= 0 ? 0xFFFFFFFF : pCreature->GetVendorItemCurrentCount(crItem));
