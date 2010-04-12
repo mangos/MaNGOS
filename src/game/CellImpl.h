@@ -286,7 +286,7 @@ inline void Cell::VisitGridObjects(const WorldObject *center_obj, T &visitor, fl
     Cell cell(p);
     if (dont_load)
         cell.SetNoCreate();
-    typename TypeContainerVisitor<T, GridTypeMapContainer > gnotifier(visitor);
+    TypeContainerVisitor<T, GridTypeMapContainer > gnotifier(visitor);
     cell.Visit(p, gnotifier, *center_obj->GetMap(), *center_obj, radius);
 }
 
@@ -297,7 +297,7 @@ inline void Cell::VisitWorldObjects(const WorldObject *center_obj, T &visitor, f
     Cell cell(p);
     if (dont_load)
         cell.SetNoCreate();
-    typename TypeContainerVisitor<T, WorldTypeMapContainer > gnotifier(visitor);
+    TypeContainerVisitor<T, WorldTypeMapContainer > gnotifier(visitor);
     cell.Visit(p, gnotifier, *center_obj->GetMap(), *center_obj, radius);
 }
 
@@ -308,8 +308,8 @@ inline void Cell::VisitAllObjects(const WorldObject *center_obj, T &visitor, flo
     Cell cell(p);
     if (dont_load)
         cell.SetNoCreate();
-    typename TypeContainerVisitor<T, GridTypeMapContainer > gnotifier(visitor);
-    typename TypeContainerVisitor<T, WorldTypeMapContainer > wnotifier(visitor);
+    TypeContainerVisitor<T, GridTypeMapContainer > gnotifier(visitor);
+    TypeContainerVisitor<T, WorldTypeMapContainer > wnotifier(visitor);
     cell.Visit(p, gnotifier, *center_obj->GetMap(), *center_obj, radius);
     cell.Visit(p, wnotifier, *center_obj->GetMap(), *center_obj, radius);
 }
