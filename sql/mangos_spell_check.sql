@@ -392,6 +392,11 @@ INSERT INTO spell_check (spellid,SpellFamilyName,SpellFamilyMaskA,SpellFamilyMas
 (53343, 0,                -1,        -1,  -1,  -1,  -1,  3, -1,-1,'Rune of Razorice',                   'Spell::EffectDummy'),
 (53478, 9,                -1,        -1,  -1,  -1,  -1,  3, -1,-1,'Last Stand',                         'Spell::EffectDummy'),
 (53479,-1,                -1,        -1,  -1,  -1,  -1, -1, 34, 0,'Last Stand',                         'Spell::EffectDummy'),
+(54049, 5,0x0040000000000000,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Shadow Bite',                        'Spell::EffectSchoolDMG'),
+(54050, 5,0x0040000000000000,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Shadow Bite',                        'Spell::EffectSchoolDMG'),
+(54051, 5,0x0040000000000000,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Shadow Bite',                        'Spell::EffectSchoolDMG'),
+(54052, 5,0x0040000000000000,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Shadow Bite',                        'Spell::EffectSchoolDMG'),
+(54053, 5,0x0040000000000000,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Shadow Bite',                        'Spell::EffectSchoolDMG'),
 (54216,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Master''s Call',                     'Spell::EffectDummy'),
 (54586,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Runeforging Credit',                 'Spell::EffectDummy'),
 (54824,-1,                -1,        -1,  -1,  -1,  -1, -1,  4,-1,'Glyph of Swiftmend',                 'Spell::EffectHeal'),
@@ -524,6 +529,7 @@ INSERT INTO spell_check (spellid,SpellFamilyName,SpellFamilyMaskA,SpellFamilyMas
 (    0,11,                -1,        -1, 338,  -1,  -1, -1,  4, 1,'Restorative Totems',                 'Spell::EffectSchoolDMG'), 	/*part 1*/
 (    0, 4,0x0000000000000400,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Revenge',                            'Spell::EffectSchoolDMG'),
 (    0,11,0x0000000000400000,0x00000000,  -1,  -1,  -1, 54, -1,-1,'Rockbiter Weapon',                   'Spell::EffectEnchantItemTmp'),
+(    0, 5,0x0040000000000000,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Shadow Bite',                        'Spell::EffectSchoolDMG'),
 (    0, 6,0x0000000200000000,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Shadow Word: Death',                 'Spell::EffectSchoolDMG'),
 (    0, 5,0x0000000000000000,0x00000002,  -1,  -1,  -1, -1,  3,-1,'Shadowflame',                        'Spell::EffectSchoolDMG'),     /* dot */
 (    0, 5,0x0001000000000000,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Shadowflame',                        'Spell::EffectSchoolDMG'),     /* explcit damage */
