@@ -3864,6 +3864,12 @@ bool Unit::AddAura(Aura *Aur)
                     // can be only single (this check done at _each_ aura add
                     RemoveAura(i2,AURA_REMOVE_BY_STACK);
                     break;
+                }  
+                // Judgements are always single 
+                else if (GetSpellSpecific(Aur->GetId()) == SPELL_JUDGEMENT)
+                {
+                    RemoveAura(i2,AURA_REMOVE_BY_STACK);
+                    break;
                 }
 
                 bool stop = false;
