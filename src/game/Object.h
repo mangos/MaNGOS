@@ -66,6 +66,7 @@ class WorldPacket;
 class UpdateData;
 class WorldSession;
 class Creature;
+class GameObject;
 class Player;
 class Unit;
 class Map;
@@ -486,10 +487,12 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         void BuildUpdateData(UpdateDataMapType &);
 
         Creature* SummonCreature(uint32 id, float x, float y, float z, float ang,TempSummonType spwtype,uint32 despwtime);
+        GameObject* SummonGameobject(uint32 id, float x, float y, float z, float angle, uint32 despwtime);
 
         bool isActiveObject() const { return m_isActiveObject || m_viewPoint.hasViewers(); }
 
         ViewPoint& GetViewPoint() { return m_viewPoint; }
+
     protected:
         explicit WorldObject();
 
