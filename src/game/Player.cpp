@@ -2146,6 +2146,10 @@ Creature* Player::GetNPCIfCanInteractWith(ObjectGuid guid, uint32 npcflagmask)
     if (guid.IsEmpty() || !IsInWorld() || isInFlight())
         return NULL;
 
+    // needed by Aura 292
+    if (GetGUID() == guid.GetRawValue())
+        return ((Creature*)this);
+
     // exist (we need look pets also for some interaction (quest/etc)
     Creature *unit = GetMap()->GetCreatureOrPetOrVehicle(guid);
     if (!unit)
