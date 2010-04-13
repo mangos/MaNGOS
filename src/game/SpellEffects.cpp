@@ -464,6 +464,22 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                         break;
                     }
                 }
+                // Shadow Bite 
+                else if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0040000000000000))
+                {
+                    Unit *owner = m_caster->GetOwner();
+                    if (!owner)
+                        break;
+
+                    uint32 counter = 0;
+                    Unit::AuraList const& dotAuras = unitTarget->GetAurasByType(SPELL_AURA_PERIODIC_DAMAGE);
+                    for(Unit::AuraList::const_iterator itr = dotAuras.begin(); itr!=dotAuras.end(); ++itr)
+                        if ((*itr)->GetCasterGUID() == owner->GetGUID())
+                            ++counter;
+
+                    if (counter)
+                        damage += (counter * owner->CalculateSpellDamage(unitTarget, m_spellInfo, EFFECT_INDEX_2) * damage) / 100.0f;
+                }
                 // Conflagrate - consumes Immolate or Shadowflame
                 else if (m_spellInfo->TargetAuraState == AURA_STATE_CONFLAGRATE)
                 {
