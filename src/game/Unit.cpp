@@ -1985,8 +1985,9 @@ void Unit::CalcAbsorbResist(Unit *pVictim,SpellSchoolMask schoolMask, DamageEffe
                     spellProto->Id == 60218)   // Essence of Gossamer
                 {
                     // Max absorb stored in 1 dummy effect
-                    if (spellProto->EffectBasePoints[EFFECT_INDEX_1] < currentAbsorb)
-                        currentAbsorb = spellProto->EffectBasePoints[EFFECT_INDEX_1];
+                    uint32 max_absorb = spellProto->CalculateSimpleValue(EFFECT_INDEX_1);
+                    if (max_absorb < currentAbsorb)
+                        currentAbsorb = max_absorb;
                     break;
                 }
                 break;
@@ -6540,7 +6541,7 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     {
                         if (procSpell->Effect[i] == SPELL_EFFECT_ENERGIZE)
                         {
-                            int32 mana = procSpell->EffectBasePoints[i];
+                            int32 mana = procSpell->CalculateSimpleValue(SpellEffectIndex(i));
                             CastCustomSpell(this, 54986, NULL, &mana, NULL, true, castItem, triggeredByAura);
                             break;
                         }
@@ -7252,7 +7253,7 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
                 //                       27526; - drain mana if possible
                 case 43820:                                 // Charm of the Witch Doctor (Amani Charm of the Witch Doctor trinket)
                     // Pct value stored in dummy
-                    basepoints[0] = pVictim->GetCreateHealth() * auraSpellInfo->EffectBasePoints[EFFECT_INDEX_1] / 100;
+                    basepoints[0] = pVictim->GetCreateHealth() * auraSpellInfo->CalculateSimpleValue(EFFECT_INDEX_1) / 100;
                     target = pVictim;
                     break;
                 //case 45205: break;                        // Copy Offhand Weapon
