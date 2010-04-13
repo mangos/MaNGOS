@@ -530,10 +530,6 @@ INSERT INTO spell_check (spellid,SpellFamilyName,SpellFamilyMaskA,SpellFamilyMas
 (    0, 4,0x0000000000000400,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Revenge',                            'Spell::EffectSchoolDMG'),
 (    0,11,0x0000000000400000,0x00000000,  -1,  -1,  -1, 54, -1,-1,'Rockbiter Weapon',                   'Spell::EffectEnchantItemTmp'),
 (    0, 5,0x0040000000000000,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Shadow Bite',                        'Spell::EffectSchoolDMG'),
-(    0, 5,0x0040000000000000,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Shadow Bite',                        'Spell::EffectSchoolDMG'),
-(    0, 5,0x0040000000000000,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Shadow Bite',                        'Spell::EffectSchoolDMG'),
-(    0, 5,0x0040000000000000,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Shadow Bite',                        'Spell::EffectSchoolDMG'),
-(    0, 5,0x0040000000000000,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Shadow Bite',                        'Spell::EffectSchoolDMG'),
 (    0, 6,0x0000000200000000,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Shadow Word: Death',                 'Spell::EffectSchoolDMG'),
 (    0, 5,0x0000000000000000,0x00000002,  -1,  -1,  -1, -1,  3,-1,'Shadowflame',                        'Spell::EffectSchoolDMG'),     /* dot */
 (    0, 5,0x0001000000000000,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Shadowflame',                        'Spell::EffectSchoolDMG'),     /* explcit damage */
