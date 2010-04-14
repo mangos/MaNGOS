@@ -118,6 +118,7 @@ pkgdata_DATA = \
 	9728_01_mangos_gossip_menu_option.sql \
 	9735_01_mangos_spell_proc_event.sql \
 	9735_02_mangos_spell_chain.sql \
+	9746_01_realmd_realmlist.sql \
 	README
 
 ## Additional files to include when running 'make dist'
@@ -216,4 +217,5 @@ EXTRA_DIST = \
 	9728_01_mangos_gossip_menu_option.sql \
 	9735_01_mangos_spell_proc_event.sql \
 	9735_02_mangos_spell_chain.sql \
+	9746_01_realmd_realmlist.sql \
 	README
