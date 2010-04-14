@@ -1644,6 +1644,11 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     m_caster->CastSpell(m_caster, spell_id, true);
                     return;
                 }
+                case 51662:                                 // Hunger for Blood
+                {
+                    m_caster->CastSpell(m_caster, 63848, true);
+                    return;
+                }
             }
             break;
         }
@@ -5444,7 +5449,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
         {
             switch(m_spellInfo->Id)
             {
-                case 6962:
+                case 6962:                                  // Pet Summoned
                 {
                     if(m_caster->GetTypeId() != TYPEID_PLAYER)
                         return;
@@ -6329,6 +6334,27 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     return;//break;
                 }
 
+            }
+            break;
+        }
+        case SPELLFAMILY_WARRIOR:
+        {
+            switch(m_spellInfo->Id)
+            {
+                case 64380:                                 // Shattering Throw
+                {
+                    if (!unitTarget || !unitTarget->isAlive())
+                        return;
+
+                    // remove immunity effects
+                    unitTarget->RemoveAurasDueToSpell(642); // Divine Shield
+                    unitTarget->RemoveAurasDueToSpell(1022); // Hand of Protection rank 1
+                    unitTarget->RemoveAurasDueToSpell(5599); // Hand of Protection rank 2
+                    unitTarget->RemoveAurasDueToSpell(10278); // Hand of Protection rank 3
+                    unitTarget->RemoveAurasDueToSpell(19753); // Divine Intervention
+                    unitTarget->RemoveAurasDueToSpell(45438); // Ice Block
+                    break;
+                }
             }
             break;
         }
@@ -7247,7 +7273,8 @@ void Spell::EffectSummonAllTotems(SpellEffectIndex eff_idx)
         if (ActionButton const* actionButton = ((Player*)m_caster)->GetActionButton(start_button+slot))
             if (actionButton->GetType()==ACTION_BUTTON_SPELL)
                 if (uint32 spell_id = actionButton->GetAction())
-                    m_caster->CastSpell(unitTarget,spell_id,true);
+                    if (((Player*)m_caster)->HasSpellCooldown(spell_id))
+                        m_caster->CastSpell(unitTarget, spell_id, true);
 }
 
 void Spell::EffectDestroyAllTotems(SpellEffectIndex /*eff_idx*/)

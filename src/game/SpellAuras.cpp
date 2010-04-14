@@ -312,7 +312,7 @@ pAuraHandler AuraHandler[TOTAL_AURAS]=
     &Aura::HandleNULL,                                      //259 corrupt healing over time spell
     &Aura::HandleNoImmediateEffect,                         //260 SPELL_AURA_SCREEN_EFFECT (miscvalue = id in ScreenEffect.dbc) not required any code
     &Aura::HandlePhase,                                     //261 SPELL_AURA_PHASE undetectable invisibility?     implemented in Unit::isVisibleForOrDetect
-    &Aura::HandleNULL,                                      //262 ignore combat/aura state?
+    &Aura::HandleIgnoreUnitState,                           //262 SPELL_AURA_IGNORE_UNIT_STATE Allows some abilities which are avaible only in some cases.... implemented in Unit::isIgnoreUnitState & Spell::CheckCast
     &Aura::HandleAllowOnlyAbility,                          //263 SPELL_AURA_ALLOW_ONLY_ABILITY player can use only abilities set in SpellClassMask
     &Aura::HandleUnused,                                    //264 unused (3.0.8a-3.2.2a)
     &Aura::HandleUnused,                                    //265 unused (3.0.8a-3.2.2a)
@@ -3542,6 +3542,10 @@ void Aura::HandleAuraTransform(bool apply, bool Real)
 
             m_target->SetDisplayId(model_id);
 
+            // creature case, need to update equipment
+            if (ci && m_target->GetTypeId() == TYPEID_UNIT)
+                ((Creature*)m_target)->LoadEquipment(ci->equipmentId, true);
+
             // Dragonmaw Illusion (set mount model also)
             if(GetId()==42016 && m_target->GetMountID() && !m_target->GetAurasByType(SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED).empty())
                 m_target->SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID,16314);
@@ -3570,7 +3574,11 @@ void Aura::HandleAuraTransform(bool apply, bool Real)
         m_target->setTransForm(0);
         m_target->SetDisplayId(m_target->GetNativeDisplayId());
 
-        // re-aplly some from still active with preference negative cases
+        // apply default equipment for creature case
+        if (m_target->GetTypeId() == TYPEID_UNIT)
+            ((Creature*)m_target)->LoadEquipment(((Creature*)m_target)->GetCreatureInfo()->equipmentId, true);
+
+        // re-apply some from still active with preference negative cases
         Unit::AuraList const& otherTransforms = m_target->GetAurasByType(SPELL_AURA_TRANSFORM);
         if (!otherTransforms.empty())
         {
@@ -8469,6 +8477,45 @@ void Aura::HandlePhase(bool apply, bool Real)
         m_target->SetVisibility(m_target->GetVisibility());
 }
 
+void Aura::HandleIgnoreUnitState(bool apply, bool Real)
+{
+    if(m_target->GetTypeId() != TYPEID_PLAYER || !Real)
+        return;
+
+    if(Unit* caster = GetCaster())
+    {
+        if (apply)
+        {
+            switch(GetId())
+            {
+                // Fingers of Frost
+                case 44544:
+                    SetAuraCharges(3); // 3 because first is droped on proc
+                    break;
+                // Juggernaut & Warbringer both need special slot and flag
+                // for alowing charge in combat and Warbringer
+                // for alowing charge in different stances, too
+                case 64976:
+                case 57499:
+                    SetAuraSlot(255);
+                    SetAuraFlags(19);
+                    SendAuraUpdate(false);
+                    break;
+            }
+        }
+        else
+        {
+            switch(GetId())
+            {
+                case 64976:
+                case 57499:
+                    SendAuraUpdate(true);
+                    break;
+            }
+        }
+    }
+}
+
 void Aura::UnregisterSingleCastAura()
 {
     if (IsSingleTarget())
@@ -8572,7 +8619,6 @@ void Aura::HandleAuraOpenStable(bool apply, bool Real)
     data << uint64(caster->GetGUID());
     ((Player*)caster)->GetSession()->HandleListStabledPetsOpcode(data);
 }
-
 
 void Aura::HandleAuraInitializeImages(bool Apply, bool Real)
 {

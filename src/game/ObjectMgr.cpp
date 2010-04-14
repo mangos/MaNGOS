@@ -7350,12 +7350,12 @@ uint16 ObjectMgr::GetConditionId( ConditionType condition, uint32 value1, uint32
 
 bool ObjectMgr::CheckDeclinedNames( std::wstring w_ownname, DeclinedName const& names )
 {
-	// get main part of the name
-	std::wstring mainpart = GetMainPartOfName(w_ownname, 0);
-	// prepare flags
-	bool x = true;
-	bool y = true;
-	// check declined names
+    // get main part of the name
+    std::wstring mainpart = GetMainPartOfName(w_ownname, 0);
+    // prepare flags
+    bool x = true;
+    bool y = true;
+    // check declined names
     for(int i =0; i < MAX_DECLINED_NAME_CASES; ++i)
     {
         std::wstring wname;
@@ -7365,8 +7365,8 @@ bool ObjectMgr::CheckDeclinedNames( std::wstring w_ownname, DeclinedName const& 
         if(mainpart!=GetMainPartOfName(wname,i+1))
             x = false;
 
-		if(w_ownname!=wname)
-			y = false;
+        if(w_ownname!=wname)
+            y = false;
     }
     return (x||y);
 }

@@ -46,24 +46,4 @@ enum AuthResult
     WOW_FAIL_USE_BATTLENET          = 0x12,                 ///< WOW_FAIL_OTHER This account is now attached to a Battle.net account. Please login with your Battle.net account email address and password.
 };
 
-// will only support WoW 1.12.1/1.12.2 , WoW:TBC 2.4.3 and official release for WoW:WotLK and later, client builds 10505, 8606, 6005, 5875
-// if you need more from old build then add it in cases in realmd sources code
-// list sorted from high to low build and first build used as low bound for accepted by default range (any > it will accepted by realmd at least)
-
-#define EXPECTED_REALMD_CLIENT_BUILD    \
-{                                       \
-    11723,  /* 3.3.3a and higher */     \
-    11403,  /* 3.3.2 */                 \
-    11159,  /* 3.3.0a */                \
-    10505,  /* 3.2.2a */                \
-    8606,   /* 2.4.3  */                \
-    6005,   /* 1.12.2 */                \
-    5875,   /* 1.12.1 */                \
-    0                                   \
-}
-
-// At update excepted builds please update if need define DEFAULT_MAX_LEVEL
-// in DBCEnum.h to default max player level expected by build
-// and also in mangosd.conf.in
-
 #endif

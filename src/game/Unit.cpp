@@ -1998,7 +1998,7 @@ void Unit::CalcAbsorbResist(Unit *pVictim,SpellSchoolMask schoolMask, DamageEffe
                     spellProto->Id == 60218)   // Essence of Gossamer
                 {
                     // Max absorb stored in 1 dummy effect
-                    uint32 max_absorb = spellProto->CalculateSimpleValue(EFFECT_INDEX_1);
+                    int32 max_absorb = spellProto->CalculateSimpleValue(EFFECT_INDEX_1);
                     if (max_absorb < currentAbsorb)
                         currentAbsorb = max_absorb;
                     break;
@@ -2994,8 +2994,7 @@ SpellMissInfo Unit::SpellHitResult(Unit *pVictim, SpellEntry const *spell, bool 
     if (pVictim->GetTypeId()==TYPEID_UNIT && ((Creature*)pVictim)->IsInEvadeMode())
         return SPELL_MISS_EVADE;
 
-	if (!(spell->Id == 64380 || spell->Id == 64382 || spell->Id == 32375 ||
-        spell->Id == 32592 || spell->Id == 39897))
+    if (!(spell->Attributes & SPELL_ATTR_UNAFFECTED_BY_INVULNERABILITY))
     {
         // Check for immune
         if (pVictim->IsImmunedToSpell(spell))
@@ -3864,6 +3863,12 @@ bool Unit::AddAura(Aura *Aur)
                         Aur->GetModifier()->m_amount += int32(remainingDamage / Aur->GetAuraMaxTicks());
                     }
                     // can be only single (this check done at _each_ aura add
+                    RemoveAura(i2,AURA_REMOVE_BY_STACK);
+                    break;
+                }  
+                // Judgements are always single 
+                else if (GetSpellSpecific(Aur->GetId()) == SPELL_JUDGEMENT)
+                {
                     RemoveAura(i2,AURA_REMOVE_BY_STACK);
                     break;
                 }
@@ -5896,8 +5901,9 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     basepoints[0] += damage * triggerAmount/100;
 
                     // limit absorb amount
-                    if (basepoints[0] > pVictim->getLevel()*125)
-                        basepoints[0] = pVictim->getLevel()*125;
+                    int32 levelbonus = pVictim->getLevel()*125;
+                    if (basepoints[0] > levelbonus)
+                        basepoints[0] = levelbonus;
                     triggered_spell_id = 47753;
                     break;
                 }
@@ -7739,7 +7745,7 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
             // Unyielding Knights
             else if (auraSpellInfo->Id == 38164)
             {
-                if (pVictim->GetEntry()!=19457)
+                if (pVictim->GetEntry() != 19457)
                     return false;
             }
             // Bonus Healing (Crystal Spire of Karabor mace)
@@ -9207,7 +9213,7 @@ uint32 Unit::SpellDamageBonus(Unit *pVictim, SpellEntry const *spellProto, uint3
             // Ice Lance
             if (spellProto->SpellIconID == 186)
             {
-                if (pVictim->isFrozen())
+                if (pVictim->isFrozen() || isIgnoreUnitState(spellProto))
                 {
                     float multiplier = 3.0f;
 
@@ -9559,9 +9565,9 @@ bool Unit::isSpellCrit(Unit *pVictim, SpellEntry const *spellProto, SpellSchoolM
                         continue;
                     switch((*i)->GetModifier()->m_miscvalue)
                     {
-                        case  849: if (pVictim->isFrozen()) crit_chance+= 17.0f; break; //Shatter Rank 1
-                        case  910: if (pVictim->isFrozen()) crit_chance+= 34.0f; break; //Shatter Rank 2
-                        case  911: if (pVictim->isFrozen()) crit_chance+= 50.0f; break; //Shatter Rank 3
+                        case  849: if (pVictim->isFrozen() || isIgnoreUnitState(spellProto)) crit_chance+= 17.0f; break; //Shatter Rank 1
+                        case  910: if (pVictim->isFrozen() || isIgnoreUnitState(spellProto)) crit_chance+= 34.0f; break; //Shatter Rank 2
+                        case  911: if (pVictim->isFrozen() || isIgnoreUnitState(spellProto)) crit_chance+= 50.0f; break; //Shatter Rank 3
                         case 7917:                          // Glyph of Shadowburn
                             if (pVictim->HasAuraState(AURA_STATE_HEALTHLESS_35_PERCENT))
                                 crit_chance+=(*i)->GetModifier()->m_amount;
@@ -11615,6 +11621,18 @@ int32 Unit::CalculateSpellDamage(Unit const* target, SpellEntry const* spellProt
             (spellProto->Effect[effect_index] != SPELL_EFFECT_APPLY_AURA || spellProto->EffectApplyAuraName[effect_index] != SPELL_AURA_MOD_DECREASE_SPEED))
         value = int32(value*0.25f*exp(getLevel()*(70-spellProto->spellLevel)/1000.0f));
 
+    // Frostbite trigger aura: if Fingers of Frost is active, it has saved a roll:
+    if(spellProto->EffectTriggerSpell[effect_index] == 12494)
+    {
+        sLog.outDebug("CalculateSpellDamage: called for 12494 (Frostbite), chance is: %u", value);
+        if(m_lastAuraProcRoll >=0) //override independent trigger
+        {
+            sLog.outDebug("CalculateSpellDamage: saved roll from FoF is: %f", m_lastAuraProcRoll);
+            return value > m_lastAuraProcRoll ? 100 : 0;
+        }
+        sLog.outDebug("CalculateSpellDamage: no  saved roll for 12494 (Frostbite)");
+    }
+
     return value;
 }
 
@@ -11739,7 +11757,7 @@ void Unit::IncrDiminishing(DiminishingGroup group)
 
 void Unit::ApplyDiminishingToDuration(DiminishingGroup group, int32 &duration,Unit* caster,DiminishingLevels Level, int32 limitduration)
 {
-    if(duration == -1 || group == DIMINISHING_NONE || caster->IsFriendlyTo(this) )
+    if(duration == -1 || group == DIMINISHING_NONE)
         return;
 
     // Duration of crowd control abilities on pvp target is limited by 10 sec. (2.2.0)
@@ -12669,6 +12687,9 @@ void Unit::ProcDamageAndSpellFor( bool isVictim, Unit * pTarget, uint32 procFlag
 
     RemoveSpellList removedSpells;
     ProcTriggeredList procTriggered;
+    // reset saved roll from Fingers of Frost:
+    if(GetTypeId() == TYPEID_PLAYER)
+        m_lastAuraProcRoll = -1.0f;
     // Fill procTriggered list
     for(AuraMap::const_iterator itr = GetAuras().begin(); itr!= GetAuras().end(); ++itr)
     {
@@ -13640,6 +13661,13 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit *pVictim, Aura* aura, SpellEntry con
         modOwner->ApplySpellMod(spellProto->Id,SPELLMOD_CHANCE_OF_SUCCESS,chance);
         modOwner->ApplySpellMod(spellProto->Id,SPELLMOD_FREQUENCY_OF_SUCCESS,chance);
     }
+    // Fingers of Frost: save roll for re-use in Frostbite trigger
+    if(aura->GetSpellProto()->EffectTriggerSpell[aura->GetEffIndex()] == 44544)
+    {
+        sLog.outDebug("Fingers of Frost: saving roll; triggered by %u", aura->GetId());
+        m_lastAuraProcRoll = rand_chance();
+        return chance > m_lastAuraProcRoll;
+    }
 
     return roll_chance_f(chance);
 }
@@ -13997,6 +14025,32 @@ void Unit::StopAttackFaction(uint32 faction_id)
     getHostileRefManager().deleteReferencesForFaction(faction_id);
 
     CallForAllControlledUnits(StopAttackFactionHelper(faction_id),false,true,true);
+}
+
+bool Unit::isIgnoreUnitState(SpellEntry const *spell)
+{
+    if(!HasAuraType(SPELL_AURA_IGNORE_UNIT_STATE))
+        return false;
+
+    if(spell->SpellFamilyName == SPELLFAMILY_MAGE)
+    {
+        // Ice Lance
+        if(spell->SpellIconID == 186)
+            return true;
+        // Shatter
+        if(spell->Id == 11170 || spell->Id == 12982 || spell->Id == 12983)
+            return true;
+    }
+    Unit::AuraList const& stateAuras = GetAurasByType(SPELL_AURA_IGNORE_UNIT_STATE);
+    for(Unit::AuraList::const_iterator j = stateAuras.begin();j != stateAuras.end(); ++j)
+    {
+        if((*j)->isAffectedOnSpell(spell))
+        {
+            return true;
+            break;
+        }
+    }
+    return false;
 }
 
 void Unit::CleanupDeletedAuras()

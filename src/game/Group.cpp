@@ -1539,7 +1539,14 @@ GroupJoinBattlegroundResult Group::CanJoinBattleGroundQueue(BattleGround const* 
         // check if member can join any more battleground queues
         if(!member->HasFreeBattleGroundQueueId())
             return ERR_BATTLEGROUND_TOO_MANY_QUEUES;        // not blizz-like
+
+        ++allowedPlayerCount;
     }
+
+    if(bgOrTemplate->GetTypeID() == BATTLEGROUND_AA)
+        if(allowedPlayerCount < MinPlayerCount || allowedPlayerCount > MaxPlayerCount)
+            return ERR_ARENA_TEAM_PARTY_SIZE;
+
     return GroupJoinBattlegroundResult(bgOrTemplate->GetTypeID());
 }
 //===================================================

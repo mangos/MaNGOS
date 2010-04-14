@@ -694,12 +694,18 @@ bool GameObject::isVisibleForInState(Player const* u, WorldObject const* viewPoi
             return false;
 
         // special invisibility cases
-        /* TODO: implement trap stealth, take look at spell 2836
-        if(GetGOInfo()->type == GAMEOBJECT_TYPE_TRAP && GetGOInfo()->trap.stealthed && u->IsHostileTo(GetOwner()))
+        // TODO: implement trap stealth, take look at spell 2836
+        if(GetGOInfo()->type == GAMEOBJECT_TYPE_TRAP && GetGOInfo()->trap.stealthed)
         {
-            if(check stuff here)
-                return false;
-        }*/
+            if(u->HasAura(2836) && u->isInFront(this, 15.0f, M_PI_F/2))   // hack, maybe values are wrong
+                return true;
+
+            if (Unit* TrapOwner = GetOwner())
+                if (TrapOwner->GetTypeId() == TYPEID_PLAYER && ((Player*)TrapOwner)->IsInSameRaidWith(u))
+                    return true;
+
+            return false;
+        }
     }
 
     // check distance
