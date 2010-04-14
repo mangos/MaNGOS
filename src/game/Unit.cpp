@@ -1985,7 +1985,7 @@ void Unit::CalcAbsorbResist(Unit *pVictim,SpellSchoolMask schoolMask, DamageEffe
                     spellProto->Id == 60218)   // Essence of Gossamer
                 {
                     // Max absorb stored in 1 dummy effect
-                    uint32 max_absorb = spellProto->CalculateSimpleValue(EFFECT_INDEX_1);
+                    int32 max_absorb = spellProto->CalculateSimpleValue(EFFECT_INDEX_1);
                     if (max_absorb < currentAbsorb)
                         currentAbsorb = max_absorb;
                     break;
