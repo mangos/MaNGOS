@@ -708,14 +708,14 @@ bool GameObject::isVisibleForInState(Player const* u, WorldObject const* viewPoi
         // TODO: implement trap stealth, take look at spell 2836
         if(GetGOInfo()->type == GAMEOBJECT_TYPE_TRAP && GetGOInfo()->trap.stealthed)
         {
-            if(u->HasAura(2836) && isInFront(u, 15.0f))   // hack, maybe values are wrong
+            if(u->HasAura(2836) && u->isInFront(this, 15.0f, M_PI_F/2))   // hack, maybe values are wrong
                 return true;
 
-            if (GetOwner() && u->IsFriendlyTo(GetOwner()))
-                return true;
+            if (Unit* TrapOwner = GetOwner())
+                if (TrapOwner->GetTypeId() == TYPEID_PLAYER && ((Player*)TrapOwner)->IsInSameRaidWith(u))
+                    return true;
 
-            if(m_lootState == GO_READY)
-                return false;
+            return false;
         }
     }
 
