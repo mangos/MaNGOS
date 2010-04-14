@@ -25,17 +25,31 @@
 
 #include "Common.h"
 
+struct RealmBuildInfo
+{
+    int build;
+    int major_version;
+    int minor_version;
+    int bugfix_version;
+    int hotfix_version;
+};
+
+RealmBuildInfo const* FindBuildInfo(uint16 _build);
+
+typedef std::set<uint32> RealmBuilds;
+
 /// Storage object for a realm
 struct Realm
 {
     std::string address;
     uint8 icon;
-    uint8 color;
+    RealmFlags realmflags;                                  // realmflags
     uint8 timezone;
     uint32 m_ID;
-    AccountTypes allowedSecurityLevel;
+    AccountTypes allowedSecurityLevel;                      // current allowed join security level (show as locked for not fit accounts)
     float populationLevel;
-    std::set<uint32> realmbuilds;
+    RealmBuilds realmbuilds;                                // list of supported builds (updated in DB by mangosd)
+    RealmBuildInfo realmBuildInfo;                          // build info for show version in list
 };
 
 /// Storage object for the list of realms on the server
@@ -58,7 +72,7 @@ class RealmList
         uint32 size() const { return m_realms.size(); }
     private:
         void UpdateRealms(bool init);
-        void UpdateRealm( uint32 ID, const std::string& name, const std::string& address, uint32 port, uint8 icon, uint8 color, uint8 timezone, AccountTypes allowedSecurityLevel, float popu, const char* builds);
+        void UpdateRealm( uint32 ID, const std::string& name, const std::string& address, uint32 port, uint8 icon, RealmFlags realmflags, uint8 timezone, AccountTypes allowedSecurityLevel, float popu, const char* builds);
     private:
         RealmMap m_realms;                                  ///< Internal map of realms
         uint32   m_UpdateInterval;
