@@ -384,7 +384,7 @@ m_isRemovedOnShapeLost(true), m_in_use(0), m_deleted(false)
 
     m_spellProto = spellproto;
 
-    m_currentBasePoints = currentBasePoints ? *currentBasePoints : m_spellProto->EffectBasePoints[eff] + 1;
+    m_currentBasePoints = currentBasePoints ? *currentBasePoints : m_spellProto->CalculateSimpleValue(eff);
 
     m_isPassive = IsPassiveSpell(GetId());
     m_positive = IsPositiveEffect(GetId(), m_effIndex);
@@ -397,7 +397,7 @@ m_isRemovedOnShapeLost(true), m_in_use(0), m_deleted(false)
     if(!caster)
     {
         m_caster_guid = target->GetGUID();
-        damage = m_currentBasePoints;                       // stored value-1
+        damage = m_currentBasePoints;
         m_maxduration = target->CalculateSpellDuration(m_spellProto, m_effIndex, target);
     }
     else
@@ -818,7 +818,7 @@ void AreaAura::Update(uint32 diff)
                     int32 actualBasePoints = m_currentBasePoints;
                     // recalculate basepoints for lower rank (all AreaAura spell not use custom basepoints?)
                     if(actualSpellInfo != GetSpellProto())
-                        actualBasePoints = actualSpellInfo->EffectBasePoints[m_effIndex];
+                        actualBasePoints = actualSpellInfo->CalculateSimpleValue(m_effIndex);
                     AreaAura *aur = new AreaAura(actualSpellInfo, m_effIndex, &actualBasePoints, (*tIter), caster, NULL);
                     aur->SetAuraDuration(GetAuraDuration());
                     (*tIter)->AddAura(aur);
@@ -3542,6 +3542,10 @@ void Aura::HandleAuraTransform(bool apply, bool Real)
 
             m_target->SetDisplayId(model_id);
 
+            // creature case, need to update equipment
+            if (ci && m_target->GetTypeId() == TYPEID_UNIT)
+                ((Creature*)m_target)->LoadEquipment(ci->equipmentId, true);
+
             // Dragonmaw Illusion (set mount model also)
             if(GetId()==42016 && m_target->GetMountID() && !m_target->GetAurasByType(SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED).empty())
                 m_target->SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID,16314);
@@ -3570,7 +3574,11 @@ void Aura::HandleAuraTransform(bool apply, bool Real)
         m_target->setTransForm(0);
         m_target->SetDisplayId(m_target->GetNativeDisplayId());
 
-        // re-aplly some from still active with preference negative cases
+        // apply default equipment for creature case
+        if (m_target->GetTypeId() == TYPEID_UNIT)
+            ((Creature*)m_target)->LoadEquipment(((Creature*)m_target)->GetCreatureInfo()->equipmentId, true);
+
+        // re-apply some from still active with preference negative cases
         Unit::AuraList const& otherTransforms = m_target->GetAurasByType(SPELL_AURA_TRANSFORM);
         if (!otherTransforms.empty())
         {

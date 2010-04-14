@@ -15,4 +15,5 @@
 *.sdf
 *.opensdf
 *.sln.cache
+*.vsp
 ipch
