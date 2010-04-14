@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_9735_02_mangos_spell_chain` bit(1) default NULL
+  `required_9747_01_mangos_battleground_template` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -456,17 +456,17 @@ LOCK TABLES `battleground_template` WRITE;
 INSERT INTO `battleground_template` VALUES
 (1,0,0,0,0,611,2.72532,610,2.27452),
 (2,0,0,0,0,769,3.14159,770,3.14159),
-(4,0,2,10,70,929,0,936,3.14159),
+(4,5,5,10,70,929,0,936,3.14159),
 (3,0,0,0,0,890,3.40156,889,0.263892),
-(5,0,2,10,70,939,0,940,3.14159),
-(6,0,2,10,70,0,0,0,0),
+(5,5,5,10,70,939,0,940,3.14159),
+(6,5,5,10,70,0,0,0,0),
 (7,0,0,0,0,1103,3.40156,1104,0.263892),
-(8,0,2,10,70,1258,0,1259,3.14159),
+(8,5,5,10,70,1258,0,1259,3.14159),
 (9,0,0,0,0,1367,0,1368,0),
 (10,5,5,10,80,1362,0,1363,0),
 (11,5,5,10,80,1364,0,1365,0),
 (30,20,40,71,80,1485,0,1486,0),
-(32,0,40,0,80,0,0,0,0);
+(32,5,5,0,80,0,0,0,0);
 /*!40000 ALTER TABLE `battleground_template` ENABLE KEYS */;
 UNLOCK TABLES;
 
