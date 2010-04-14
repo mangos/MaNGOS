@@ -21,7 +21,7 @@
 
 DROP TABLE IF EXISTS `realmd_db_version`;
 CREATE TABLE `realmd_db_version` (
-  `required_9746_01_realmd_realmlist` bit(1) default NULL
+  `required_9748_01_realmd_realmlist` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Last applied sql update to DB';
 
 --
@@ -157,7 +157,7 @@ CREATE TABLE `realmlist` (
   `address` varchar(32) NOT NULL default '127.0.0.1',
   `port` int(11) NOT NULL default '8085',
   `icon` tinyint(3) unsigned NOT NULL default '0',
-  `realmflags` tinyint(3) unsigned NOT NULL default '0' COMMENT 'Supported masks: 0x1 (invalid, not show in realm list), 0x4 (show version and build), 0x20 (new players), 0x40 (recommended)',
+  `realmflags` tinyint(3) unsigned NOT NULL default '2' COMMENT 'Supported masks: 0x1 (invalid, not show in realm list), 0x2 (offline, set by mangosd), 0x4 (show version and build), 0x20 (new players), 0x40 (recommended)',
   `timezone` tinyint(3) unsigned NOT NULL default '0',
   `allowedSecurityLevel` tinyint(3) unsigned NOT NULL default '0',
   `population` float unsigned NOT NULL default '0',

@@ -82,8 +82,6 @@ void RealmList::Initialize(uint32 updateInterval)
 
 void RealmList::UpdateRealm( uint32 ID, const std::string& name, const std::string& address, uint32 port, uint8 icon, RealmFlags realmflags, uint8 timezone, AccountTypes allowedSecurityLevel, float popu, const char* builds)
 {
-    realmflags = RealmFlags(realmflags | REALM_FLAG_SPECIFYBUILD);
-
     ///- Create new if not exist or update existed
     Realm& realm = m_realms[name];
 
@@ -92,7 +90,7 @@ void RealmList::UpdateRealm( uint32 ID, const std::string& name, const std::stri
     realm.realmflags = realmflags;
     realm.timezone   = timezone;
     realm.allowedSecurityLevel = allowedSecurityLevel;
-    realm.populationLevel        = popu;
+    realm.populationLevel      = popu;
 
 	Tokens tokens = StrSplit(builds, " ");
     Tokens::iterator iter;
@@ -155,10 +153,10 @@ void RealmList::UpdateRealms(bool init)
 
             uint8 realmflags = fields[5].GetUInt8();
 
-            if (realmflags & ~(REALM_FLAG_NEW_PLAYERS|REALM_FLAG_RECOMMENDED|REALM_FLAG_SPECIFYBUILD))
+            if (realmflags & ~(REALM_FLAG_OFFLINE|REALM_FLAG_NEW_PLAYERS|REALM_FLAG_RECOMMENDED|REALM_FLAG_SPECIFYBUILD))
             {
-                sLog.outError("Realm allowed have only NEWPLAYERS (mask 0x20), or RECOMENDED (mask 0x40), or SPECIFICBUILD (mask 0x04) flags in DB");
-                realmflags &= (REALM_FLAG_NEW_PLAYERS|REALM_FLAG_RECOMMENDED|REALM_FLAG_SPECIFYBUILD);
+                sLog.outError("Realm allowed have only OFFLINE Mask 0x2), or NEWPLAYERS (mask 0x20), or RECOMENDED (mask 0x40), or SPECIFICBUILD (mask 0x04) flags in DB");
+                realmflags &= (REALM_FLAG_OFFLINE|REALM_FLAG_NEW_PLAYERS|REALM_FLAG_RECOMMENDED|REALM_FLAG_SPECIFYBUILD);
             }
 
             UpdateRealm(
