@@ -5100,6 +5100,20 @@ void Spell::EffectWeaponDmg(SpellEffectIndex eff_idx)
                 if (weapon && weapon->GetProto()->SubClass == ITEM_SUBCLASS_WEAPON_DAGGER)
                     totalDamagePercentMod *= 1.5f;          // 150% to daggers
             }
+            // Ghostly Strike
+            else if (m_caster->GetTypeId() == TYPEID_PLAYER && m_spellInfo->Id == 14278)
+            {
+                Item* weapon = ((Player*)m_caster)->GetWeaponForAttack(m_attackType,true,true);
+                if (weapon && weapon->GetProto()->SubClass == ITEM_SUBCLASS_WEAPON_DAGGER)
+                    totalDamagePercentMod *= 1.45f;        // 145% to daggers
+            }
+            // Hemorrhage
+            else if (m_caster->GetTypeId() == TYPEID_PLAYER && (m_spellInfo->SpellFamilyFlags & UI64LIT(0x2000000)))
+            {
+                Item* weapon = ((Player*)m_caster)->GetWeaponForAttack(m_attackType,true,true);
+                if (weapon && weapon->GetProto()->SubClass == ITEM_SUBCLASS_WEAPON_DAGGER)
+                    totalDamagePercentMod *= 1.44f;        // 144% to daggers
+            }
             break;
         }
         case SPELLFAMILY_PALADIN:
@@ -5201,10 +5215,10 @@ void Spell::EffectWeaponDmg(SpellEffectIndex eff_idx)
                 totalDamagePercentMod *= 1.2f;
             }
             // Rune strike
-            if (m_spellInfo->SpellIconID == 3007)
+            if( m_spellInfo->SpellIconID == 3007)
             {
-            int32 count = CalculateDamage(EFFECT_INDEX_2, unitTarget);
-            spell_bonus += int32(count*m_caster->GetTotalAttackPowerValue(BASE_ATTACK)/100.0f);
+                int32 count = CalculateDamage(EFFECT_INDEX_2, unitTarget);
+                spell_bonus += int32(count * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) / 100.0f);
             }
             break;
         }
