@@ -94,6 +94,7 @@
 #include <ace/Guard_T.h>
 #include <ace/RW_Thread_Mutex.h>
 #include <ace/Thread_Mutex.h>
+#include <ace/OS_NS_arpa_inet.h>
 
 #if PLATFORM == PLATFORM_WINDOWS
 #  define FD_SETSIZE 4096
