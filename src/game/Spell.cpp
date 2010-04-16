@@ -4933,7 +4933,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                 break;
             }
             case SPELL_AURA_FLY:
-            case SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED:
+            case SPELL_AURA_MOD_FLIGHT_SPEED_MOUNTED:
             {
                 // not allow cast fly spells if not have req. skills  (all spells is self target)
                 // allow always ghost flight spells

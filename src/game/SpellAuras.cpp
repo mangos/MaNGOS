@@ -256,12 +256,12 @@ pAuraHandler AuraHandler[TOTAL_AURAS]=
     &Aura::HandleNoImmediateEffect,                         //203 SPELL_AURA_MOD_ATTACKER_MELEE_CRIT_DAMAGE  implemented in Unit::CalculateMeleeDamage and Unit::SpellCriticalDamageBonus
     &Aura::HandleNoImmediateEffect,                         //204 SPELL_AURA_MOD_ATTACKER_RANGED_CRIT_DAMAGE implemented in Unit::CalculateMeleeDamage and Unit::SpellCriticalDamageBonus
     &Aura::HandleNoImmediateEffect,                         //205 SPELL_AURA_MOD_ATTACKER_SPELL_CRIT_DAMAGE  implemented in Unit::SpellCriticalDamageBonus
-    &Aura::HandleNULL,                                      //206 SPELL_AURA_MOD_SPEED_MOUNTED
-    &Aura::HandleAuraModIncreaseFlightSpeed,                //207 SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED
-    &Aura::HandleAuraModIncreaseFlightSpeed,                //208 SPELL_AURA_MOD_SPEED_FLIGHT, used only in spell: Flight Form (Passive)
-    &Aura::HandleAuraModIncreaseFlightSpeed,                //209 SPELL_AURA_MOD_FLIGHT_SPEED_ALWAYS
-    &Aura::HandleNULL,                                      //210 "Increase flight speed by"
-    &Aura::HandleAuraModIncreaseFlightSpeed,                //211 SPELL_AURA_MOD_FLIGHT_SPEED_NOT_STACK
+    &Aura::HandleAuraModIncreaseFlightSpeed,                //206 SPELL_AURA_MOD_FLIGHT_SPEED
+    &Aura::HandleAuraModIncreaseFlightSpeed,                //207 SPELL_AURA_MOD_FLIGHT_SPEED_MOUNTED
+    &Aura::HandleAuraModIncreaseFlightSpeed,                //208 SPELL_AURA_MOD_FLIGHT_SPEED_STACKING
+    &Aura::HandleAuraModIncreaseFlightSpeed,                //209 SPELL_AURA_MOD_FLIGHT_SPEED_MOUNTED_STACKING
+    &Aura::HandleAuraModIncreaseFlightSpeed,                //210 SPELL_AURA_MOD_FLIGHT_SPEED_NOT_STACKING
+    &Aura::HandleAuraModIncreaseFlightSpeed,                //211 SPELL_AURA_MOD_FLIGHT_SPEED_MOUNTED_NOT_STACKING
     &Aura::HandleAuraModRangedAttackPowerOfStatPercent,     //212 SPELL_AURA_MOD_RANGED_ATTACK_POWER_OF_STAT_PERCENT
     &Aura::HandleNoImmediateEffect,                         //213 SPELL_AURA_MOD_RAGE_FROM_DAMAGE_DEALT implemented in Player::RewardRage
     &Aura::HandleUnused,                                    //214 Tamed Pet Passive (single test like spell 20782, also single for 157 aura)
@@ -3377,7 +3377,7 @@ void Aura::HandleAuraTransform(bool apply, bool Real)
                 ((Creature*)m_target)->LoadEquipment(ci->equipmentId, true);
 
             // Dragonmaw Illusion (set mount model also)
-            if(GetId()==42016 && m_target->GetMountID() && !m_target->GetAurasByType(SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED).empty())
+            if(GetId()==42016 && m_target->GetMountID() && !m_target->GetAurasByType(SPELL_AURA_MOD_FLIGHT_SPEED_MOUNTED).empty())
                 m_target->SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID,16314);
         }
 
@@ -4371,7 +4371,7 @@ void Aura::HandleAuraModIncreaseFlightSpeed(bool apply, bool Real)
         return;
 
     // Enable Fly mode for flying mounts
-    if (m_modifier.m_auraname == SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED)
+    if (m_modifier.m_auraname == SPELL_AURA_MOD_FLIGHT_SPEED_MOUNTED)
     {
         WorldPacket data;
         if(apply)
@@ -4394,6 +4394,34 @@ void Aura::HandleAuraModIncreaseFlightSpeed(bool apply, bool Real)
         if (apply && GetSpellProto()->SpellIconID != 1794 && m_target->HasAura(62061))
             // Reindeer Transformation
             m_target->CastSpell(m_target, 25860, true, NULL, this);
+    }
+
+    // Swift Flight Form check for higher speed flying mounts
+    if (apply && m_target->GetTypeId() == TYPEID_PLAYER && GetSpellProto()->Id == 40121)
+    {
+        for (PlayerSpellMap::const_iterator iter = ((Player*)m_target)->GetSpellMap().begin(); iter != ((Player*)m_target)->GetSpellMap().end(); ++iter)
+        {
+            if (iter->second.state != PLAYERSPELL_REMOVED)
+            {
+                bool changedSpeed = false;
+                SpellEntry const *spellInfo = sSpellStore.LookupEntry(iter->first);
+                for(int i = 0; i < MAX_EFFECT_INDEX; ++i)
+                {
+                    if(spellInfo->EffectApplyAuraName[i] == SPELL_AURA_MOD_FLIGHT_SPEED_MOUNTED)
+                    {
+                        int32 mountSpeed = spellInfo->CalculateSimpleValue(SpellEffectIndex(i));
+                        if (mountSpeed > m_modifier.m_amount)
+                        {
+                            m_modifier.m_amount = mountSpeed;
+                            changedSpeed = true;
+                            break;
+                        }
+                    }
+                }
+                if (changedSpeed)
+                    break;
+            }
+        }
     }
 
     m_target->UpdateSpeed(MOVE_FLIGHT, true);

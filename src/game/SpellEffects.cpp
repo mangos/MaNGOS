@@ -1570,7 +1570,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                 case 58601:                                 // Remove Flight Auras
                 {
                     m_caster->RemoveSpellsCausingAura(SPELL_AURA_FLY);
-                    m_caster->RemoveSpellsCausingAura(SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED);
+                    m_caster->RemoveSpellsCausingAura(SPELL_AURA_MOD_FLIGHT_SPEED_MOUNTED);
                     return;
                 }
                 case 59640:                                 // Underbelly Elixir
