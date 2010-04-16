@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_9752_01_mangos_gameobject_template` bit(1) default NULL
+  `required_9753_01_mangos_instance_template` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -2033,7 +2033,7 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `instance_template`;
 CREATE TABLE `instance_template` (
   `map` smallint(5) unsigned NOT NULL,
-  `parent` int(10) unsigned NOT NULL,
+  `parent` smallint(5) unsigned NOT NULL default '0',
   `levelMin` tinyint(3) unsigned NOT NULL default '0',
   `levelMax` tinyint(3) unsigned NOT NULL default '0',
   `startLocX` float default NULL,
