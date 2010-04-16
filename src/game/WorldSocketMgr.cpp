@@ -273,12 +273,15 @@ WorldSocketMgr::StartReactiveIO (ACE_UINT16 port, const char* address)
 }
 
 int
-WorldSocketMgr::StartNetwork (ACE_UINT16 port, const char* address)
+WorldSocketMgr::StartNetwork (ACE_UINT16 port, std::string& address)
 {
+    m_addr = address;
+    m_port = port;
+
     if (!sLog.IsOutDebug ())
         ACE_Log_Msg::instance ()->priority_mask (LM_ERROR, ACE_Log_Msg::PROCESS);
 
-    if (StartReactiveIO (port, address) == -1)
+    if (StartReactiveIO (port, address.c_str()) == -1)
         return -1;
 
     return 0;

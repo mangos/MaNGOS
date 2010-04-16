@@ -35,6 +35,8 @@
 #include "BattleGroundMgr.h"
 #include "MapManager.h"
 #include "SocialMgr.h"
+#include "Auth/AuthCrypt.h"
+#include "Auth/HMACSHA1.h"
 #include "zlib/zlib.h"
 
 /// WorldSession constructor
@@ -855,4 +857,23 @@ void WorldSession::SetPlayer( Player *plr )
     // set m_GUID that can be used while player loggined and later until m_playerRecentlyLogout not reset
     if(_player)
         m_GUIDLow = _player->GetGUIDLow();
+}
+
+void WorldSession::SendRedirectClient(std::string& ip, uint16 port)
+{
+    uint32 ip2 = ACE_OS::inet_addr(ip.c_str());
+    WorldPacket pkt(SMSG_REDIRECT_CLIENT, 4 + 2 + 4 + 20);
+
+    pkt << uint32(ip2);                                     // inet_addr(ipstr)
+    pkt << uint16(port);                                    // port
+
+    pkt << uint32(GetLatency());                            // latency-related?
+
+    HMACSHA1 sha1(20, m_Socket->GetSessionKey().AsByteArray());
+    sha1.UpdateData((uint8*)&ip2, 4);
+    sha1.UpdateData((uint8*)&port, 2);
+    sha1.Finalize();
+    pkt.append(sha1.GetDigest(), 20);                       // hmacsha1(ip+port) w/ sessionkey as seed
+
+    SendPacket(&pkt);
 }
