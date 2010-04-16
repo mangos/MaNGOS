@@ -206,7 +206,7 @@ bool IsIPAddress(char const* ipaddress)
 
     // Let the big boys do it.
     // Drawback: all valid ip address formats are recognized e.g.: 12.23,121234,0xABCD)
-    return inet_addr(ipaddress) != INADDR_NONE;
+    return ACE_OS::inet_addr(ipaddress) != INADDR_NONE;
 }
 
 /// create PID file

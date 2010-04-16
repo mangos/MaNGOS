@@ -203,6 +203,7 @@ struct ReputationOnKillEntry
     uint32 reputation_max_cap2;
     int32 repvalue2;
     bool team_dependent;
+    uint32 championingAura;
 };
 
 struct PointOfInterest
