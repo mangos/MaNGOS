@@ -7689,6 +7689,7 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
                     sLog.outDebug("       if(lootid)");
                     loot->clear();
                     loot->FillLoot(lootid, LootTemplates_Gameobject, this, false);
+                    loot->generateMoneyLoot(go->GetGOInfo()->MinMoneyLoot, go->GetGOInfo()->MaxMoneyLoot);
                 }
 
                 if (loot_type == LOOT_FISHING)
