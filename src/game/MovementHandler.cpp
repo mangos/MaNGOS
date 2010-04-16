@@ -600,7 +600,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
             {
                 Anti__CheatOccurred(CurTime,"Fly hack",
                                     ((uint8)(GetPlayer()->HasAuraType(SPELL_AURA_FLY))) +
-                                    ((uint8)(GetPlayer()->HasAuraType(SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED))*2),
+                                    ((uint8)(GetPlayer()->HasAuraType(SPELL_AURA_MOD_FLIGHT_SPEED_MOUNTED))*2),
                                     NULL,GetPlayer()->GetPositionZ()-Anti__MapZ);
             }
              
