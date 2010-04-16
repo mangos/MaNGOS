@@ -158,6 +158,7 @@ class MANGOS_DLL_SPEC WorldSession
         void SendAreaTriggerMessage(const char* Text, ...) ATTR_PRINTF(2,3);
         void SendSetPhaseShift(uint32 phaseShift);
         void SendQueryTimeResponse();
+        void SendRedirectClient(std::string& ip, uint16 port);
 
         AccountTypes GetSecurity() const { return _security; }
         uint32 GetAccountId() const { return _accountId; }
