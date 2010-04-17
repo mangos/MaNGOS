@@ -83,6 +83,8 @@ class DBCStorage
             nCount = 0;
         }
 
+        void EraseEntry(uint32 id) { indexTable[id] = NULL; }
+
     private:
         uint32 nCount;
         uint32 fieldCount;
