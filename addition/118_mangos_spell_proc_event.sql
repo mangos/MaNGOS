@@ -1,3 +1,5 @@
-DELETE FROM `spell_proc_event` WHERE `entry` IN (53551,53552,53553);
-INSERT INTO `spell_proc_event` VALUES
-(53551,0x00000000,10,0x00001000,0x00000000,0x00000000,0x00000000,0x00000000,0.0,0.0,0);
+update `spell_proc_event` set `ppmRate` = 3 where `entry` = 12322;
+update `spell_proc_event` set `ppmRate` = 6 where `entry` = 12999;
+update `spell_proc_event` set `ppmRate` = 9 where `entry` = 13000;
+update `spell_proc_event` set `ppmRate` = 12 where `entry` = 13001;
+update `spell_proc_event` set `ppmRate` = 15 where `entry` = 13002;
