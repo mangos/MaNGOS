@@ -4676,17 +4676,42 @@ void ObjectMgr::LoadInstanceTemplate()
 
     for(uint32 i = 0; i < sInstanceTemplate.MaxEntry; i++)
     {
-        InstanceTemplate* temp = (InstanceTemplate*)GetInstanceTemplate(i);
-        if(!temp)
+        InstanceTemplate const* temp = GetInstanceTemplate(i);
+        if (!temp)
             continue;
 
-        if(!MapManager::IsValidMAP(temp->map))
-            sLog.outErrorDb("ObjectMgr::LoadInstanceTemplate: bad mapid %d for template!", temp->map);
-
-        if(!MapManager::IsValidMapCoord(temp->parent,temp->startLocX,temp->startLocY,temp->startLocZ,temp->startLocO))
+        MapEntry const* mapEntry = sMapStore.LookupEntry(temp->map);
+        if (!mapEntry)
         {
-            sLog.outErrorDb("ObjectMgr::LoadInstanceTemplate: bad parent entrance coordinates for map id %d template!", temp->map);
-            temp->parent = 0;                               // will have wrong continent 0 parent, at least existed
+            sLog.outErrorDb("ObjectMgr::LoadInstanceTemplate: bad mapid %d for template!", temp->map);
+            sInstanceTemplate.EraseEntry(i);
+            continue;
+        }
+
+        if (mapEntry->IsContinent())
+        {
+            sLog.outErrorDb("ObjectMgr::LoadInstanceTemplate: continent mapid %d for template!", temp->map);
+            sInstanceTemplate.EraseEntry(i);
+            continue;
+        }
+
+        if (temp->parent > 0)
+        {
+            // check existence 
+            MapEntry const* parentEntry = sMapStore.LookupEntry(temp->parent);
+            if (!parentEntry)
+            {
+                sLog.outErrorDb("ObjectMgr::LoadInstanceTemplate: bad parent map id for instance template %d template!", parentEntry,temp->map);
+                const_cast<InstanceTemplate*>(temp)->parent = 0;
+                continue;
+            }
+
+            if (parentEntry->IsContinent())
+            {
+                sLog.outErrorDb("ObjectMgr::LoadInstanceTemplate: parent point to continent map id %u for instance template %d template, ignored, need be set only for non-continent parents!", parentEntry->MapID,temp->map);
+                const_cast<InstanceTemplate*>(temp)->parent = 0;
+                continue;
+            }
         }
     }
 
@@ -5349,23 +5374,23 @@ WorldSafeLocsEntry const *ObjectMgr::GetClosestGraveYard(float x, float y, float
         if(data.team != 0 && team != 0 && data.team != team)
             continue;
 
-        // find now nearest graveyard at other map
+        // find now nearest graveyard at other (continent) map
         if(MapId != entry->map_id)
         {
             // if find graveyard at different map from where entrance placed (or no entrance data), use any first
             if (!mapEntry ||
-                 mapEntry->entrance_map < 0 ||
-                 mapEntry->entrance_map != entry->map_id ||
-                (mapEntry->entrance_x == 0 && mapEntry->entrance_y == 0))
+                 mapEntry->ghost_entrance_map < 0 ||
+                 mapEntry->ghost_entrance_map != entry->map_id ||
+                (mapEntry->ghost_entrance_x == 0 && mapEntry->ghost_entrance_y == 0))
             {
-                // not have any corrdinates for check distance anyway
+                // not have any coordinates for check distance anyway
                 entryFar = entry;
                 continue;
             }
 
             // at entrance map calculate distance (2D);
-            float dist2 = (entry->x - mapEntry->entrance_x)*(entry->x - mapEntry->entrance_x)
-                +(entry->y - mapEntry->entrance_y)*(entry->y - mapEntry->entrance_y);
+            float dist2 = (entry->x - mapEntry->ghost_entrance_x)*(entry->x - mapEntry->ghost_entrance_x)
+                +(entry->y - mapEntry->ghost_entrance_y)*(entry->y - mapEntry->ghost_entrance_y);
             if(foundEntr)
             {
                 if(dist2 < distEntr)
@@ -5586,18 +5611,18 @@ void ObjectMgr::LoadAreaTriggerTeleports()
 }
 
 /*
- * Searches for the areatrigger which teleports players out of the given map
+ * Searches for the areatrigger which teleports players out of the given map (only direct to continent)
  */
-AreaTrigger const* ObjectMgr::GetGoBackTrigger(uint32 Map) const
+AreaTrigger const* ObjectMgr::GetGoBackTrigger(uint32 map_id) const
 {
-    const MapEntry *mapEntry = sMapStore.LookupEntry(Map);
+    const MapEntry *mapEntry = sMapStore.LookupEntry(map_id);
     if(!mapEntry) return NULL;
     for (AreaTriggerMap::const_iterator itr = mAreaTriggers.begin(); itr != mAreaTriggers.end(); ++itr)
     {
-        if(itr->second.target_mapId == mapEntry->entrance_map)
+        if(itr->second.target_mapId == mapEntry->ghost_entrance_map)
         {
             AreaTriggerEntry const* atEntry = sAreaTriggerStore.LookupEntry(itr->first);
-            if(atEntry && atEntry->mapid == Map)
+            if(atEntry && atEntry->mapid == map_id)
                 return &itr->second;
         }
     }

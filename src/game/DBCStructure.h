@@ -1108,9 +1108,9 @@ struct MapEntry
                                                             // 56 intro text flags
     uint32  multimap_id;                                    // 57 index in  LoadingScreens.dbc
     //float   BattlefieldMapIconScale;                      // 58 BattlefieldMapIconScale
-    int32   entrance_map;                                   // 59 map_id of entrance map
-    float   entrance_x;                                     // 60 entrance x coordinate (if exist single entry)
-    float   entrance_y;                                     // 61 entrance y coordinate (if exist single entry)
+    int32   ghost_entrance_map;                             // 59 map_id of entrance map in ghost mode (continent always and in most cases = normal entrance)
+    float   ghost_entrance_x;                               // 60 entrance x coordinate in ghost mode  (in most cases = normal entrance)
+    float   ghost_entrance_y;                               // 61 entrance y coordinate in ghost mode  (in most cases = normal entrance)
     //uint32  timeOfDayOverride;                            // 62 time of day override
     uint32  addon;                                          // 63 expansion
                                                             // 64 some kind of time?
