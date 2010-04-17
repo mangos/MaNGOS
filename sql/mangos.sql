@@ -2036,10 +2036,6 @@ CREATE TABLE `instance_template` (
   `parent` smallint(5) unsigned NOT NULL default '0',
   `levelMin` tinyint(3) unsigned NOT NULL default '0',
   `levelMax` tinyint(3) unsigned NOT NULL default '0',
-  `startLocX` float default NULL,
-  `startLocY` float default NULL,
-  `startLocZ` float default NULL,
-  `startLocO` float default NULL,
   `script` varchar(128) NOT NULL default '',
   PRIMARY KEY  (`map`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
