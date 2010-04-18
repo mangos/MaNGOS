@@ -2534,6 +2534,8 @@ void Spell::cast(bool skipCheck)
                 AddPrecastSpell(11196);                     // Recently Bandaged
             else if(m_spellInfo->Id == 20594)               // Stoneskin
                 AddTriggeredSpell(65116);                   // Stoneskin - armor 10% for 8 sec
+            else if(m_spellInfo->Id == 71904)               // Chaos Bane strength buff
+                AddTriggeredSpell(73422);
             break;
         }
         case SPELLFAMILY_MAGE:
