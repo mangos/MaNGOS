@@ -578,10 +578,10 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
         }
          
         // Check for walking upwards a mountain while not beeing able to do that
-        if ((tg_z > 85.0f))
+        /*if ((tg_z > 85.0f))
         {
             Anti__CheatOccurred(CurTime,"Mount hack",tg_z,NULL,delta,delta_z);
-        }
+        }*/
         
         
         static const float DIFF_OVERGROUND = 10.0f;
