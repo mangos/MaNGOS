@@ -68,6 +68,7 @@ class SQLStorage
         void Load();
         void Free();
 
+        void EraseEntry(uint32 id);
     private:
         void init(const char * _entry_field, const char * sqlname)
         {
