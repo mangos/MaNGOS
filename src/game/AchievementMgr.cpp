@@ -17,6 +17,7 @@
  */
 
 #include "Common.h"
+#include "AchievementMgr.h"
 #include "Player.h"
 #include "WorldPacket.h"
 #include "DBCEnums.h"
@@ -37,7 +38,6 @@
 #include "BattleGroundAB.h"
 #include "Map.h"
 #include "InstanceData.h"
-#include "AchievementMgr.h"
 
 #include "Policies/SingletonImp.h"
 

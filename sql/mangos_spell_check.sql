@@ -458,6 +458,7 @@ INSERT INTO spell_check (spellid,SpellFamilyName,SpellFamilyMaskA,SpellFamilyMas
 (72505, 0,                -1,        -1,  -1,  -1,  -1,  2, -1,-1,'Ooze Eruption',                      'Spell::EffectSchoolDMG'),
 (72624, 0,                -1,        -1,  -1,  -1,  -1,  2, -1,-1,'Ooze Eruption',                      'Spell::EffectSchoolDMG'),
 (72625, 0,                -1,        -1,  -1,  -1,  -1,  2, -1,-1,'Ooze Eruption',                      'Spell::EffectSchoolDMG'),
+(73422, 0,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Chaos Bane',                         'Spell::cast'),
 
 /*id   fm familyMaskA        fmMaskB    icon vis  cat  eff aur ef name                                  code                   */
 

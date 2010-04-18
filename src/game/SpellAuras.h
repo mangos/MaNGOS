@@ -376,7 +376,7 @@ class MANGOS_DLL_SPEC Aura
         uint64 m_castItemGuid;                              // it is NOT safe to keep a pointer to the item because it may get deleted
         time_t m_applyTime;
 
-        int32 m_currentBasePoints;                          // cache SpellEntry::EffectBasePoints+1 and use for set custom base points
+        int32 m_currentBasePoints;                          // cache SpellEntry::CalculateSimpleValue and use for set custom base points
         int32 m_maxduration;                                // Max aura duration
         int32 m_duration;                                   // Current time
         int32 m_timeCla;                                    // Timer for power per sec calcultion

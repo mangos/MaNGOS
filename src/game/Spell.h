@@ -436,7 +436,7 @@ class Spell
         //void HandleAddAura(Unit* Target);
 
         SpellEntry const* m_spellInfo;
-        int32 m_currentBasePoints[3];                       // cache SpellEntry::EffectBasePoints and use for set custom base points
+        int32 m_currentBasePoints[MAX_EFFECT_INDEX];        // cache SpellEntry::CalculateSimpleValue and use for set custom base points
         Item* m_CastItem;
         uint8 m_cast_count;
         uint32 m_glyphIndex;
