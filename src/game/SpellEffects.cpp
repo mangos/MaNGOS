@@ -7180,7 +7180,7 @@ void Spell::EffectSummonAllTotems(SpellEffectIndex eff_idx)
         if (ActionButton const* actionButton = ((Player*)m_caster)->GetActionButton(start_button+slot))
             if (actionButton->GetType()==ACTION_BUTTON_SPELL)
                 if (uint32 spell_id = actionButton->GetAction())
-                    if (((Player*)m_caster)->HasSpellCooldown(spell_id))
+                    if (!((Player*)m_caster)->HasSpellCooldown(spell_id))
                         m_caster->CastSpell(unitTarget, spell_id, true);
 }
 
