@@ -480,7 +480,7 @@ enum MangosStrings
     LANG_CREATURE_ENTRY_LIST_CHAT       = 514,
     LANG_CREATURE_LIST_CHAT             = 515,
     LANG_GO_ENTRY_LIST_CHAT             = 516,
-    LANG_GO_LIST_CHAT                   = 517,
+    LANG_GO_MIXED_LIST_CHAT             = 517,
     LANG_ITEMSET_LIST_CHAT              = 518,
     LANG_TELE_LIST                      = 519,
     LANG_SPELL_LIST                     = 520,
@@ -821,7 +821,8 @@ enum MangosStrings
     LANG_MOVEGENS_FOLLOW_NULL           = 1134,
     LANG_LIST_TALENTS_TITLE             = 1135,
     LANG_LIST_TALENTS_COUNT             = 1136,
-    // Room for more level 3              1137-1199 not used
+    LANG_GO_LIST_CHAT                   = 1137,
+    // Room for more level 3              1138-1199 not used
 
     // Debug commands
     LANG_CINEMATIC_NOT_EXIST            = 1200,
