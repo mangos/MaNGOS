@@ -6701,7 +6701,7 @@ void Spell::EffectReputation(SpellEffectIndex eff_idx)
 
     Player *_player = (Player*)unitTarget;
 
-    int32  rep_change = m_currentBasePoints[eff_idx];       // field store reputation change -1
+    int32  rep_change = m_currentBasePoints[eff_idx];
 
     uint32 faction_id = m_spellInfo->EffectMiscValue[eff_idx];
 
