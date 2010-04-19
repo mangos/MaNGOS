@@ -6878,7 +6878,7 @@ void Spell::EffectReputation(SpellEffectIndex eff_idx)
 
     Player *_player = (Player*)unitTarget;
 
-    int32  rep_change = m_currentBasePoints[eff_idx];       // field store reputation change -1
+    int32  rep_change = m_currentBasePoints[eff_idx];
 
     uint32 faction_id = m_spellInfo->EffectMiscValue[eff_idx];
 
@@ -7180,7 +7180,7 @@ void Spell::EffectSummonAllTotems(SpellEffectIndex eff_idx)
         if (ActionButton const* actionButton = ((Player*)m_caster)->GetActionButton(start_button+slot))
             if (actionButton->GetType()==ACTION_BUTTON_SPELL)
                 if (uint32 spell_id = actionButton->GetAction())
-                    if (((Player*)m_caster)->HasSpellCooldown(spell_id))
+                    if (!((Player*)m_caster)->HasSpellCooldown(spell_id))
                         m_caster->CastSpell(unitTarget, spell_id, true);
 }
 
