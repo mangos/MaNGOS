@@ -1644,11 +1644,6 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     m_caster->CastSpell(m_caster, spell_id, true);
                     return;
                 }
-                case 51662:                                 // Hunger for Blood
-                {
-                    m_caster->CastSpell(m_caster, 63848, true);
-                    return;
-                }
             }
             break;
         }
@@ -1987,6 +1982,11 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                 case 31231:                                 // Cheat Death
                 {
                     m_caster->CastSpell(m_caster, 45182, true);
+                    return;
+                }
+                case 51662:                                 // Hunger for Blood
+                {
+                    m_caster->CastSpell(m_caster, 63848, true);
                     return;
                 }
             }
