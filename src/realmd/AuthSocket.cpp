@@ -811,6 +811,8 @@ bool AuthSocket::_HandleReconnectChallenge()
     DEBUG_LOG("[ReconnectChallenge] name(%d): '%s'", ch->I_len, ch->I);
 
     _login = (const char*)ch->I;
+    _build = ch->build;
+
     _safelogin = _login;
     loginDatabase.escape_string(_safelogin);
 
