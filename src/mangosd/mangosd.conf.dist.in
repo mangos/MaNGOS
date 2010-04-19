@@ -1451,3 +1451,29 @@ SOAP.Enabled = 0
 SOAP.IP = 127.0.0.1
 SOAP.Port = 7878
 
+###################################################################################################################
+#    CharDelete.Method
+#        Character deletion behavior
+#        Default: 0  - Completely remove the character from the database
+#                 1  - Unlinking, the character gets unlinked from the account,
+#                      the name gets freed up and appears as deleted ingame
+#
+#    CharDelete.MinLevel
+#        Character gets deleted by CharDelete.Mode=0 when the character
+#        hasn't the specified level yet.
+#        Default: 0  - For all characters the specified mode will be used
+#                 1+ - Only for players which have reached the specified level
+#                      will be deleted by the specified mode.
+#                      the rest will be deleted by CharDelete.Mode=0
+#
+#    CharDelete.KeepDays
+#        Define the amount of days for which the characters are kept in the database before
+#        they will be removed
+#        Default: 30
+#                 0  - Don't delete any characters, they stay in the database forever.
+#
+###################################################################################################################
+
+CharDelete.Method = 0
+CharDelete.MinLevel = 0
+CharDelete.KeepDays = 30

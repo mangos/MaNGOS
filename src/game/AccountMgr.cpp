@@ -62,6 +62,7 @@ AccountOpResult AccountMgr::DeleteAccount(uint32 accid)
         return AOR_NAME_NOT_EXIST;                          // account doesn't exist
     delete result;
 
+    // existed chaarcters list
     result = CharacterDatabase.PQuery("SELECT guid FROM characters WHERE account='%d'",accid);
     if (result)
     {
@@ -180,6 +181,21 @@ bool AccountMgr::GetName(uint32 acc_id, std::string &name)
     }
 
     return false;
+}
+
+uint32 AccountMgr::GetCharactersCount(uint32 acc_id)
+{
+    // check character count
+    QueryResult *result = CharacterDatabase.PQuery("SELECT COUNT(guid) FROM characters WHERE account = '%d'", acc_id);
+    if (result)
+    {
+        Field *fields=result->Fetch();
+        uint32 charcount = fields[0].GetUInt32();
+        delete result;
+        return charcount;
+    }
+    else
+        return 0;
 }
 
 bool AccountMgr::CheckPassword(uint32 accid, std::string passwd)
