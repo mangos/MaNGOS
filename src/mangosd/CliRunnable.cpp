@@ -174,7 +174,7 @@ bool ChatHandler::GetDeletedCharacterInfoList(DeletedInfoList& foundList, std::s
  * @param itr_end      a reference to an deleted info list iterator end()
  * @return             returns generated where list string in form: 'guid IN (gui1, guid2, ...)'
  */
-std::string ChatHandler::GenerateDeletedCharacterGUIDsWhereStr(DeletedInfoList::const_iterator& itr, DeletedInfoList::const_iterator const const& itr_end)
+std::string ChatHandler::GenerateDeletedCharacterGUIDsWhereStr(DeletedInfoList::const_iterator& itr, DeletedInfoList::const_iterator const& itr_end)
 {
     std::ostringstream wherestr;
     wherestr << "guid IN ('";
