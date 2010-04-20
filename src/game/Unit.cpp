@@ -4902,7 +4902,7 @@ void Unit::SendPeriodicAuraLog(SpellPeriodicAuraLogInfo *pInfo)
     {
         case SPELL_AURA_PERIODIC_DAMAGE:
         case SPELL_AURA_PERIODIC_DAMAGE_PERCENT:
-            data << uint32(pInfo->damage);                  // damage
+            data << uint32(pInfo->damage - pInfo->absorb - pInfo->resist);   // damage
             data << uint32(pInfo->overDamage);              // overkill?
             data << uint32(GetSpellSchoolMask(aura->GetSpellProto()));
             data << uint32(pInfo->absorb);                  // absorb
