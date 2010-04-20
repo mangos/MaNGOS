@@ -327,6 +327,8 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
         plMover->SetInWater( !plMover->IsInWater() || plMover->GetBaseMap()->IsUnderWater(movementInfo.GetPos()->x, movementInfo.GetPos()->y, movementInfo.GetPos()->z) );
     }
 
+    if (!plMover) return;
+
     /*----------------------*/
     /* anti-cheat features */
     bool check_passed = true;
