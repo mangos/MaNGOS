@@ -317,7 +317,9 @@ bool ChatHandler::HandleCharacterDeletedRestoreCommand(const char* args)
     std::string newCharName;
     uint32 newAccount = 0;
 
-    std::istringstream(args) >> searchString >> newCharName >> newAccount;
+    // GCC by some strange reason fail build code without temporary variable
+    std::istringstream params(args);
+    params >> searchString >> newCharName >> newAccount;
 
     DeletedInfoList foundList;
     if (!GetDeletedCharacterInfoList(foundList, searchString))
