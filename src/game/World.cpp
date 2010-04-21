@@ -851,6 +851,11 @@ void World::LoadConfigSettings(bool reload)
         m_MaxVisibleDistanceInFlight = MAX_VISIBILITY_DISTANCE - m_VisibleObjectGreyDistance;
     }
 
+    ///- Load the CharDelete related config options
+    setConfigMinMax(CONFIG_UINT32_CHARDELETE_METHOD, "CharDelete.Method", 0, 0, 1);
+    setConfigMinMax(CONFIG_UINT32_CHARDELETE_MIN_LEVEL, "CharDelete.MinLevel", 0, 0, getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL));
+    setConfigPos(CONFIG_UINT32_CHARDELETE_KEEP_DAYS, "CharDelete.KeepDays", 30);
+
     ///- Read the "Data" directory from the config file
     std::string dataPath = sConfig.GetStringDefault("DataDir","./");
     if( dataPath.at(dataPath.length()-1)!='/' && dataPath.at(dataPath.length()-1)!='\\' )
@@ -1266,6 +1271,7 @@ void World::SetInitialWorldSettings()
     m_timers[WUPDATE_UPTIME].SetInterval(m_configUint32Values[CONFIG_UINT32_UPTIME_UPDATE]*MINUTE*IN_MILLISECONDS);
                                                             //Update "uptime" table based on configuration entry in minutes.
     m_timers[WUPDATE_CORPSES].SetInterval(3*HOUR*IN_MILLISECONDS);
+    m_timers[WUPDATE_DELETECHARS].SetInterval(DAY*IN_MILLISECONDS); // check for chars to delete every day
     m_timers[WUPDATE_AUTOBROADCAST].SetInterval(abtimer);
 
     //to set mailtimer to return mails every day between 4 and 5 am
@@ -1311,6 +1317,9 @@ void World::SetInitialWorldSettings()
 
     sLog.outString("Initialize AuctionHouseBot...");
     auctionbot.Initialize();
+
+    // Delete all characters which have been deleted X days before
+    Player::DeleteOldCharacters();
 
     sLog.outString("Starting Autobroadcast system by Xeross..." );
     sLog.outString( "WORLD: World initialized" );
@@ -1456,6 +1465,13 @@ void World::Update(uint32 diff)
         sMapMgr.Update(diff);                // As interval = 0
 
         sBattleGroundMgr.Update(diff);
+    }
+
+    ///- Delete all characters which have been deleted X days before
+    if (m_timers[WUPDATE_DELETECHARS].Passed())
+    {
+        m_timers[WUPDATE_DELETECHARS].Reset();
+        Player::DeleteOldCharacters();
     }
 
     // execute callbacks from sql queries that were queued recently
