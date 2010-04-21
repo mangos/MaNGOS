@@ -1459,12 +1459,12 @@ SOAP.Port = 7878
 #                      the name gets freed up and appears as deleted ingame
 #
 #    CharDelete.MinLevel
-#        Character gets deleted by CharDelete.Mode=0 when the character
+#        Character gets deleted by CharDelete.Method=0 when the character
 #        hasn't the specified level yet.
 #        Default: 0  - For all characters the specified mode will be used
 #                 1+ - Only for players which have reached the specified level
 #                      will be deleted by the specified mode.
-#                      the rest will be deleted by CharDelete.Mode=0
+#                      the rest will be deleted by CharDelete.Method=0
 #
 #    CharDelete.KeepDays
 #        Define the amount of days for which the characters are kept in the database before
