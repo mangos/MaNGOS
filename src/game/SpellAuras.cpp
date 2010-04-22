@@ -3631,10 +3631,22 @@ void Aura::HandleModPossess(bool apply, bool Real)
     }
     else
     {
+        p_caster->InterruptSpell(CURRENT_CHANNELED_SPELL);  // the spell is not automatically canceled when interrupted, do it now
+        p_caster->SetCharm(NULL);
+
+        p_caster->SetFarSightGUID(0);
+        p_caster->SetClientControl(m_target, 0);
+        p_caster->SetMover(NULL);
+
+        p_caster->RemovePetActionBar();
+
+        // on delete only do caster related effects
+        if(m_removeMode == AURA_REMOVE_BY_DELETE)
+            return;
+
         m_target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
 
         m_target->SetCharmerGUID(0);
-        p_caster->InterruptSpell(CURRENT_CHANNELED_SPELL);  // the spell is not automatically canceled when interrupted, do it now
 
         if(m_target->GetTypeId() == TYPEID_PLAYER)
         {
@@ -3646,14 +3658,6 @@ void Aura::HandleModPossess(bool apply, bool Real)
             CreatureInfo const *cinfo = ((Creature*)m_target)->GetCreatureInfo();
             m_target->setFaction(cinfo->faction_A);
         }
-
-        p_caster->SetCharm(NULL);
-
-        p_caster->SetFarSightGUID(0);
-        p_caster->SetClientControl(m_target, 0);
-        p_caster->SetMover(NULL);
-
-        p_caster->RemovePetActionBar();
 
         if(m_target->GetTypeId() == TYPEID_UNIT)
         {
