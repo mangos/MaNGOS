@@ -24,4 +24,3 @@ LOCK TABLES `reference_loot_template` WRITE;
 /*!40000 ALTER TABLE `reference_loot_template` DISABLE KEYS */;
 /*!40000 ALTER TABLE `reference_loot_template` ENABLE KEYS */;
 UNLOCK TABLES;
-

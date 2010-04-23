@@ -31,6 +31,3 @@ INSERT INTO `spell_chain` (spell_id,prev_spell,first_spell,rank,req_spell) VALUE
 (16813,16812,16689,5,9852),
 (17329,16813,16689,6,9853),
 (27009,17329,16689,7,26989);
-
-
-

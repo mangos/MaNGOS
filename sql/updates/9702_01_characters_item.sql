@@ -6,4 +6,3 @@ ALTER TABLE `item_instance`
 
 -- indexes in any case broken and lost after 3.3.3 switch.
 DROP TABLE IF EXISTS `item_text`;
-

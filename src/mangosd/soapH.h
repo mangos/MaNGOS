@@ -236,4 +236,3 @@ SOAP_FMAC3 char * * SOAP_FMAC4 soap_in_string(struct soap*, const char*, char **
 #endif
 
 /* End of soapH.h */
-

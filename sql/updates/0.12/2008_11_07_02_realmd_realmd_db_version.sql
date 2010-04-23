@@ -17,4 +17,3 @@ INSERT INTO `realmd_db_version` VALUES
 (NULL);
 /*!40000 ALTER TABLE `realmd_db_version` ENABLE KEYS */;
 UNLOCK TABLES;
-

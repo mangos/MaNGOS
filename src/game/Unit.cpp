@@ -1917,7 +1917,7 @@ void Unit::CalcAbsorbResist(Unit *pVictim,SpellSchoolMask schoolMask, DamageEffe
     // Need remove expired auras after
     bool existExpired = false;
 
-    // Incanter's Absorption, for converting to spell power 
+    // Incanter's Absorption, for converting to spell power
     int32 incanterAbsorption = 0;
 
     // absorb without mana cost
@@ -2127,7 +2127,7 @@ void Unit::CalcAbsorbResist(Unit *pVictim,SpellSchoolMask schoolMask, DamageEffe
         RemainingDamage -= currentAbsorb;
 
         // Fire Ward or Frost Ward or Ice Barrier (or Mana Shield)
-        // for Incanter's Absorption converting to spell power 
+        // for Incanter's Absorption converting to spell power
         if (spellProto->SpellFamilyName == SPELLFAMILY_MAGE && spellProto->SpellFamilyFlags2 & 0x000008)
             incanterAbsorption += currentAbsorb;
 
@@ -2189,7 +2189,7 @@ void Unit::CalcAbsorbResist(Unit *pVictim,SpellSchoolMask schoolMask, DamageEffe
         }
 
         // Mana Shield (or Fire Ward or Frost Ward or Ice Barrier)
-        // for Incanter's Absorption converting to spell power 
+        // for Incanter's Absorption converting to spell power
         if ((*i)->GetSpellProto()->SpellFamilyName == SPELLFAMILY_MAGE && (*i)->GetSpellProto()->SpellFamilyFlags2 & 0x000008)
             incanterAbsorption += currentAbsorb;
 
@@ -11332,7 +11332,6 @@ int32 Unit::CalculateSpellDamage(Unit const* target, SpellEntry const* spellProt
             basePoints += randvalue;
             break;
     }
-        
 
     int32 value = basePoints;
 

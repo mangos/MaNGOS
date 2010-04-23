@@ -55,4 +55,3 @@ INSERT INTO `spell_proc_event` VALUES (47539, 0x00, 6, 0x00001800, 0x00800000, 0
 -- (61257) Runic Power Back on Snare/Root (Rank 5)
 DELETE FROM `spell_proc_event` WHERE `entry` IN (61257);
 INSERT INTO `spell_proc_event` VALUES (61257, 0x00, 0, 0x00000000, 0x00000000, 0x00000000, 0x000202A8, 0x00010000, 0.000000, 0.000000, 0);
-

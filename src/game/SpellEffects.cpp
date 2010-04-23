@@ -464,7 +464,7 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                         break;
                     }
                 }
-                // Shadow Bite 
+                // Shadow Bite
                 else if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0040000000000000))
                 {
                     Unit *owner = m_caster->GetOwner();
