@@ -1524,4 +1524,3 @@ bool GameObject::IsFriendlyTo(Unit const* unit) const
     // common faction based case (GvC,GvP)
     return tester_faction->IsFriendlyTo(*target_faction);
 }
-

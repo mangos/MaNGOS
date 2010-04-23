@@ -1642,4 +1642,3 @@ SOAP_FMAC3 char * * SOAP_FMAC4 soap_in_string(struct soap *soap, const char *tag
 }
 
 /* End of soapC.cpp */
-

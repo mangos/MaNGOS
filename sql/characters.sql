@@ -884,13 +884,12 @@ CREATE TABLE `character_stats` (
   `blockPct` float UNSIGNED NOT NULL default '0',
   `dodgePct` float UNSIGNED NOT NULL default '0',
   `parryPct` float UNSIGNED NOT NULL default '0',
-  `critPct` float UNSIGNED NOT NULL default '0',  
+  `critPct` float UNSIGNED NOT NULL default '0',
   `rangedCritPct` float UNSIGNED NOT NULL default '0',
   `spellCritPct` float UNSIGNED NOT NULL default '0',
   `attackPower` int(10) UNSIGNED NOT NULL default '0',
   `rangedAttackPower` int(10) UNSIGNED NOT NULL default '0',
   `spellPower` int(10) UNSIGNED NOT NULL default '0',
-   
   PRIMARY KEY  (`guid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

@@ -2,4 +2,3 @@ ALTER TABLE character_db_version CHANGE COLUMN required_7255_01_characters_chara
 
 ALTER TABLE auctionhouse
   DROP COLUMN location;
-

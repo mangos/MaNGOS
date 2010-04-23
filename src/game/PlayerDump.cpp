@@ -57,7 +57,7 @@ static DumpTable dumpTables[] =
     { "character_talent",                 DTT_CHAR_TABLE },
     { "character_ticket",                 DTT_CHAR_TABLE },
     { "mail",                             DTT_MAIL       }, // -> mail guids
-    { "mail_items",                       DTT_MAIL_ITEM  }, // -> item guids    <- mail guids 
+    { "mail_items",                       DTT_MAIL_ITEM  }, // -> item guids    <- mail guids
     { "pet_aura",                         DTT_PET_TABLE  }, //                  <- pet number
     { "pet_spell",                        DTT_PET_TABLE  }, //                  <- pet number
     { "pet_spell_cooldown",               DTT_PET_TABLE  }, //                  <- pet number
