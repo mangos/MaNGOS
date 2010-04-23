@@ -927,6 +927,17 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
     uint32 procVictim   = m_procVictim;
     uint32 procEx       = PROC_EX_NONE;
 
+    if (m_spellInfo->speed > 0)
+    {
+        // mark effects that were already handled in Spell::HandleDelayedSpellLaunch on spell launch as processed
+        for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
+            if (IsEffectHandledOnDelayedSpellLaunch(m_spellInfo, SpellEffectIndex(i)))
+                mask &= ~(1<<i);
+
+        // maybe used in effects that are handled on hit
+        m_damage += target->damage;
+    }
+
     if (missInfo==SPELL_MISS_NONE)                          // In case spell hit target, do all effect on that target
         DoSpellHitOnUnit(unit, mask);
     else if (missInfo == SPELL_MISS_REFLECT)                // In case spell reflect from target, do all effect on caster (if hit)
@@ -966,8 +977,16 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
         // Fill base damage struct (unitTarget - is real spell target)
         SpellNonMeleeDamage damageInfo(caster, unitTarget, m_spellInfo->Id, m_spellSchoolMask);
 
+        if (m_spellInfo->speed > 0)
+        {
+            damageInfo.damage = m_damage;
+            damageInfo.HitInfo = target->HitInfo;
+        }
         // Add bonuses and fill damageInfo struct
-        caster->CalculateSpellDamage(&damageInfo, m_damage, m_spellInfo, m_attackType);
+        else
+            caster->CalculateSpellDamage(&damageInfo, m_damage, m_spellInfo, m_attackType);
+
+        unitTarget->CalculateAbsorbResistBlock(caster, &damageInfo, m_spellInfo);
 
         caster->DealDamageMods(damageInfo.target, damageInfo.damage, &damageInfo.absorb);
 
@@ -1182,6 +1201,56 @@ void Spell::DoAllEffectOnTarget(ItemTargetInfo *target)
     for(int effectNumber = 0; effectNumber < MAX_EFFECT_INDEX; ++effectNumber)
         if (effectMask & (1 << effectNumber))
             HandleEffects(NULL, target->item, NULL, SpellEffectIndex(effectNumber));
+}
+
+void Spell::HandleDelayedSpellLaunch(TargetInfo *target)
+{
+     // Get mask of effects for target
+    uint32 mask = target->effectMask;
+
+    Unit* unit = m_caster->GetObjectGuid() == target->targetGUID ? m_caster : ObjectAccessor::GetUnit(*m_caster, target->targetGUID);
+    if (!unit)
+        return;
+
+    // Get original caster (if exist) and calculate damage/healing from him data
+    Unit *real_caster = GetAffectiveCaster();
+    // FIXME: in case wild GO heal/damage spells will be used target bonuses
+    Unit *caster = real_caster ? real_caster : m_caster;
+
+    SpellMissInfo missInfo = target->missCondition;
+    // Need init unitTarget by default unit (can changed in code on reflect)
+    // Or on missInfo!=SPELL_MISS_NONE unitTarget undefined (but need in trigger subsystem)
+    unitTarget = unit;
+
+    // Reset damage/healing counter
+    m_damage = 0;
+    m_healing = 0; // healing maybe not needed at this point
+
+    // Fill base damage struct (unitTarget - is real spell target)
+    SpellNonMeleeDamage damageInfo(caster, unitTarget, m_spellInfo->Id, m_spellSchoolMask);
+
+    for (int32 effectNumber = 0; effectNumber < MAX_EFFECT_INDEX; ++effectNumber)
+    {
+        if (mask & (1 << effectNumber) && IsEffectHandledOnDelayedSpellLaunch(m_spellInfo, SpellEffectIndex(effectNumber)))
+        {
+            HandleEffects(unit, NULL, NULL, SpellEffectIndex(effectNumber), m_damageMultipliers[effectNumber]);
+            if ( m_applyMultiplierMask & (1 << effectNumber) )
+            {
+                // Get multiplier
+                float multiplier = m_spellInfo->DmgMultiplier[effectNumber];
+                // Apply multiplier mods
+                if (real_caster)
+                    if(Player* modOwner = real_caster->GetSpellModOwner())
+                        modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_EFFECT_PAST_FIRST, multiplier, this);
+                m_damageMultipliers[effectNumber] *= multiplier;
+            }
+        }
+    }
+
+    caster->CalculateSpellDamage(&damageInfo, m_damage, m_spellInfo, m_attackType);
+
+    target->damage = damageInfo.damage;
+    target->HitInfo = damageInfo.HitInfo;
 }
 
 bool Spell::IsAliveUnitPresentInTargetList()
@@ -2657,6 +2726,10 @@ void Spell::cast(bool skipCheck)
         // Remove used for cast item if need (it can be already NULL after TakeReagents call
         // in case delayed spell remove item at cast delay start
         TakeCastItem();
+
+        // fill initial spell damage from caster for delayed casted spells
+        for(std::list<TargetInfo>::iterator ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
+            HandleDelayedSpellLaunch(&(*ihit));
 
         // Okay, maps created, now prepare flags
         m_immediateHandled = false;

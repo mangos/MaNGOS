@@ -877,7 +877,7 @@ struct CalcDamageInfo
 struct SpellNonMeleeDamage{
     SpellNonMeleeDamage(Unit *_attacker, Unit *_target, uint32 _SpellID, uint32 _schoolMask)
         : target(_target), attacker(_attacker), SpellID(_SpellID), damage(0), overkill(0), schoolMask(_schoolMask),
-        absorb(0), resist(0), physicalLog(false), unused(false), blocked(0), HitInfo(0), cleanDamage(0)
+        absorb(0), resist(0), physicalLog(false), unused(false), blocked(0), HitInfo(0)
     {}
 
     Unit   *target;
@@ -892,8 +892,6 @@ struct SpellNonMeleeDamage{
     bool   unused;
     uint32 blocked;
     uint32 HitInfo;
-    // Used for help
-    uint32 cleanDamage;
 };
 
 struct SpellPeriodicAuraLogInfo
@@ -1742,6 +1740,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         uint32 CalcArmorReducedDamage(Unit* pVictim, const uint32 damage);
         void CalculateAbsorbAndResist(Unit *pCaster, SpellSchoolMask schoolMask, DamageEffectType damagetype, const uint32 damage, uint32 *absorb, uint32 *resist, bool canReflect = false);
+        void CalculateAbsorbResistBlock(Unit *pCaster, SpellNonMeleeDamage *damageInfo, SpellEntry const* spellProto, WeaponAttackType attType = BASE_ATTACK);
 
         void  UpdateWalkMode(Unit* source, bool self = true);
         void  UpdateSpeed(UnitMoveType mtype, bool forced, float ratio = 1.0f);

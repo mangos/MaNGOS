@@ -7478,6 +7478,8 @@ void Aura::PeriodicTick()
             SpellNonMeleeDamage damageInfo(pCaster, m_target, spellProto->Id, spellProto->SchoolMask);
             pCaster->CalculateSpellDamage(&damageInfo, gain, spellProto);
 
+            damageInfo.target->CalculateAbsorbResistBlock(pCaster, &damageInfo, spellProto);
+
             pCaster->DealDamageMods(damageInfo.target, damageInfo.damage, &damageInfo.absorb);
 
             pCaster->SendSpellNonMeleeDamageLog(&damageInfo);
