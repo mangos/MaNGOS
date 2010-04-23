@@ -4701,7 +4701,7 @@ void ObjectMgr::LoadInstanceTemplate()
             MapEntry const* parentEntry = sMapStore.LookupEntry(temp->parent);
             if (!parentEntry)
             {
-                sLog.outErrorDb("ObjectMgr::LoadInstanceTemplate: bad parent map id for instance template %d template!",
+                sLog.outErrorDb("ObjectMgr::LoadInstanceTemplate: bad parent map id %u for instance template %d template!",
                     parentEntry->MapID, temp->map);
                 const_cast<InstanceTemplate*>(temp)->parent = 0;
                 continue;
