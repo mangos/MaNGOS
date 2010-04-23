@@ -21,14 +21,19 @@
 
 #include "Platform/Define.h"
 
-#include<map>
+#include <map>
 
 // Note. All times are in milliseconds here.
 
 class BasicEvent
 {
     public:
-        BasicEvent() { to_Abort = false; }
+
+        BasicEvent()
+            : to_Abort(false)
+        {
+        }
+
         virtual ~BasicEvent()                               // override destructor to perform some actions on event removal
         {
         };
@@ -55,6 +60,7 @@ typedef std::multimap<uint64, BasicEvent*> EventList;
 class EventProcessor
 {
     public:
+
         EventProcessor();
         ~EventProcessor();
 
@@ -62,9 +68,12 @@ class EventProcessor
         void KillAllEvents(bool force);
         void AddEvent(BasicEvent* Event, uint64 e_time, bool set_addtime = true);
         uint64 CalculateTime(uint64 t_offset);
+
     protected:
+
         uint64 m_time;
         EventList m_events;
         bool m_aborting;
 };
+
 #endif

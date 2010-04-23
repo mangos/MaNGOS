@@ -191,6 +191,15 @@ inline bool isNumericOrSpace(wchar_t wchar)
     return isNumeric(wchar) || wchar == L' ';
 }
 
+inline bool isNumeric(char const* str)
+{
+    for(char const* c = str; *c; ++c)
+        if (!isNumeric(*c))
+            return false;
+
+    return true;
+}
+
 inline bool isNumeric(std::string const& str)
 {
     for(std::string::const_iterator itr = str.begin(); itr != str.end(); ++itr)

@@ -30,25 +30,29 @@
 namespace MaNGOS
 {
     template
-        <
-        typename T,
-        class ThreadingModel = MaNGOS::SingleThreaded<T>,
-        class CreatePolicy = MaNGOS::OperatorNew<T>,
-        class LifeTimePolicy = MaNGOS::ObjectLifeTime<T>
-        >
-        class MANGOS_DLL_DECL Singleton
+    <
+    typename T,
+    class ThreadingModel = MaNGOS::SingleThreaded<T>,
+    class CreatePolicy = MaNGOS::OperatorNew<T>,
+    class LifeTimePolicy = MaNGOS::ObjectLifeTime<T>
+    >
+    class MANGOS_DLL_DECL Singleton
     {
         public:
+
             static T& Instance();
 
         protected:
-            Singleton() {};
+
+            Singleton()
+            {
+            }
 
         private:
 
             // Prohibited actions...this does not prevent hijacking.
-            Singleton(const Singleton &);
-            Singleton& operator=(const Singleton &);
+            Singleton(const Singleton&);
+            Singleton& operator=(const Singleton&);
 
             // Singleton Helpers
             static void DestroySingleton();
@@ -59,4 +63,5 @@ namespace MaNGOS
             static bool si_destroyed;
     };
 }
+
 #endif

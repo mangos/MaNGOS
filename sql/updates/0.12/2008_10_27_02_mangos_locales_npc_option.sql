@@ -18,5 +18,3 @@ CREATE TABLE `locales_npc_option` (
   `box_text_loc8` text,
   PRIMARY KEY  (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
-

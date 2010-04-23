@@ -171,4 +171,3 @@ struct Namespace namespaces[] =
   { "ns1", "urn:MaNGOS" },     // "ns1" namespace prefix
   { NULL, NULL }
 };
-

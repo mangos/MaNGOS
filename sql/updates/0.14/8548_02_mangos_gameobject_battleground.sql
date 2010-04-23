@@ -7,4 +7,3 @@ CREATE TABLE `gameobject_battleground` (
     `event2` tinyint(3) unsigned NOT NULL COMMENT 'sub event',
     PRIMARY KEY  (`guid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='GameObject battleground indexing system';
-

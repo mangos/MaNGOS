@@ -8,4 +8,3 @@ ALTER TABLE `characters`
   ADD COLUMN `bgy` float NOT NULL default '0' AFTER `bgx`,
   ADD COLUMN `bgz` float NOT NULL default '0' AFTER `bgy`,
   ADD COLUMN `bgo` float NOT NULL default '0' AFTER `bgz`;
-

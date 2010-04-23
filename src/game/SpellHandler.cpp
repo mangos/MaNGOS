@@ -650,3 +650,4 @@ void WorldSession::HandleMirrorImageDataRequest( WorldPacket& recv_data )
 
     SendPacket( &data );
 }
+

@@ -2,4 +2,3 @@ ALTER TABLE realmd_db_version CHANGE COLUMN required_2008_11_07_02_realmd_realmd
 
 ALTER TABLE `account`
   CHANGE COLUMN  `email` `email` text;
-

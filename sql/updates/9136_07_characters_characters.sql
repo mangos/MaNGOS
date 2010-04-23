@@ -56,7 +56,7 @@ UPDATE `characters` SET `data` = CONCAT(
 	'0 ',
 	SUBSTRING_INDEX(SUBSTRING_INDEX(`data`, ' ', 298 + 1), ' ', -298 + 162 + 4*24 - 1), ' ',
 	'0 ',
-	SUBSTRING_INDEX(SUBSTRING_INDEX(`data`, ' ', 1300 + 1), ' ', -1300 + 299 - 1), ' '	
+	SUBSTRING_INDEX(SUBSTRING_INDEX(`data`, ' ', 1300 + 1), ' ', -1300 + 299 - 1), ' '
 	)
 WHERE length(SUBSTRING_INDEX(data, ' ', 1300)) < length(data) and length(SUBSTRING_INDEX(data, ' ', 1300+1)) >= length(data);
 

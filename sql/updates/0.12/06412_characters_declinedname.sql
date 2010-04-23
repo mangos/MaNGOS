@@ -21,4 +21,3 @@ CREATE TABLE `character_pet_declinedname` (
   PRIMARY KEY  (`id`),
   KEY owner_key (`owner`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
-

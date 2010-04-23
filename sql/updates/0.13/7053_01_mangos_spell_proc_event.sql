@@ -59,4 +59,3 @@ INSERT INTO `spell_proc_event` VALUES (31877, 0x00, 10, 0x00800000, 0x00000000, 
 -- (31878) Judgements of the Wise (Rank 3)
 DELETE FROM `spell_proc_event` WHERE `entry` IN (31878);
 INSERT INTO `spell_proc_event` VALUES (31878, 0x00, 10, 0x00800000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0.000000, 0.000000, 0);
-

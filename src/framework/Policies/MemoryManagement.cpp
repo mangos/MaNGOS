@@ -22,17 +22,23 @@
 
 #include "../../dep/tbb/include/tbb/scalable_allocator.h"
 
-void * operator new(size_t sz)
+void* operator new(size_t sz)
 {
     void *res = scalable_malloc(sz);
-    if (NULL == res) throw std::bad_alloc();
+
+    if (res == NULL)
+        throw std::bad_alloc();
+
     return res;
 }
 
 void* operator new[](size_t sz)
 {
     void *res = scalable_malloc(sz);
-    if (NULL == res) throw std::bad_alloc();
+
+    if (res == NULL)
+        throw std::bad_alloc();
+
     return res;
 }
 

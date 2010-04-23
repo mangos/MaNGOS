@@ -11,4 +11,3 @@ UPDATE item_template
 
 ALTER TABLE item_template
   CHANGE COLUMN Duration Duration int(11) UNSIGNED DEFAULT '0' NOT NULL;
-
