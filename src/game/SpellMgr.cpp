@@ -1718,6 +1718,10 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
                     (spellInfo_2->SpellFamilyFlags & UI64LIT(0x4)) && (spellInfo_1->SpellFamilyFlags & UI64LIT(0x00000004000)) )
                     return false;
 
+                // Deterrence
+                if( spellInfo_1->SpellIconID == 83 && spellInfo_2->SpellIconID == 83 )
+                    return false;
+
                 // Bestial Wrath
                 if( spellInfo_1->SpellIconID == 1680 && spellInfo_2->SpellIconID == 1680 )
                     return false;

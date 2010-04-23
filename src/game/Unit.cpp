@@ -2870,23 +2870,13 @@ SpellMissInfo Unit::MeleeSpellHitResult(Unit *pVictim, SpellEntry const *spell, 
     bool canDodge = true;
     bool canParry = true;
 
-    // Same spells cannot be parry/dodge
+    // Some spells cannot be parry/dodge
     if (spell->Attributes & SPELL_ATTR_IMPOSSIBLE_DODGE_PARRY_BLOCK)
         return SPELL_MISS_NONE;
 
-    // Ranged attack cannot be parry/dodge only deflect
+    // Ranged attack cannot be parry/dodge only miss
     if (attType == RANGED_ATTACK)
-    {
-        // only if in front
-        if (pVictim->HasInArc(M_PI_F,this))
-        {
-            int32 deflect_chance = pVictim->GetTotalAuraModifier(SPELL_AURA_DEFLECT_SPELLS)*100;
-            tmp+=deflect_chance;
-            if (roll < tmp)
-                return SPELL_MISS_DEFLECT;
-        }
         return SPELL_MISS_NONE;
-    }
 
     // Check for attack from behind
     if (!pVictim->HasInArc(M_PI_F,this))
@@ -2895,7 +2885,8 @@ SpellMissInfo Unit::MeleeSpellHitResult(Unit *pVictim, SpellEntry const *spell, 
         if (GetTypeId() == TYPEID_PLAYER && pVictim->GetTypeId() == TYPEID_PLAYER)
             canDodge = false;
         // Can`t parry
-        canParry = false;
+        if (!pVictim->HasAura(19263))
+            canParry = false;
     }
     // Check creatures flags_extra for disable parry
     if(pVictim->GetTypeId()==TYPEID_UNIT)
@@ -3029,14 +3020,10 @@ SpellMissInfo Unit::MagicSpellHitResult(Unit *pVictim, SpellEntry const *spell)
     if (rand < tmp)
         return SPELL_MISS_MISS;
 
-    // cast by caster in front of victim
-    if (pVictim->HasInArc(M_PI_F,this))
-    {
-        int32 deflect_chance = pVictim->GetTotalAuraModifier(SPELL_AURA_DEFLECT_SPELLS)*100;
-        tmp+=deflect_chance;
-        if (rand < tmp)
-            return SPELL_MISS_DEFLECT;
-    }
+    int32 deflect_chance = pVictim->GetTotalAuraModifier(SPELL_AURA_DEFLECT_SPELLS)*100;
+    tmp+=deflect_chance;
+    if (rand < tmp)
+        return SPELL_MISS_DEFLECT;
 
     return SPELL_MISS_NONE;
 }
