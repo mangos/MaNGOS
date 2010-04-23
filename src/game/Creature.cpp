@@ -64,7 +64,7 @@ bool VendorItemData::RemoveItem( uint32 item_id )
         // can have many examples
         if((*i)->item == item_id)
         {
-            m_items.erase(i++);
+            i = m_items.erase(i);
             found = true;
         }
         else
