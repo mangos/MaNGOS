@@ -77,13 +77,9 @@ enum WorldTimers
     WUPDATE_UPTIME      = 4,
     WUPDATE_CORPSES     = 5,
     WUPDATE_EVENTS      = 6,
-<<<<<<< HEAD:src/game/World.h
     WUPDATE_AUTOBROADCAST = 7,
-    WUPDATE_COUNT         = 8
-=======
-    WUPDATE_DELETECHARS = 7,
-    WUPDATE_COUNT       = 8
->>>>>>> 9eecfa0f17ddb64dabe7fb7d9912de24c6bb9889:src/game/World.h
+    WUPDATE_DELETECHARS = 8,
+    WUPDATE_COUNT       = 9
 };
 
 /// Configuration elements
