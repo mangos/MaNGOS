@@ -7295,12 +7295,6 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                 triggered_spell_id = dummySpell->EffectTriggerSpell[effIndex];
                 break;
             }
-            // Rune strike
-            if (dummySpell->Id == 56817)
-            {
-                if (procSpell && procSpell->Id != 56815)
-                    return false;
-            }
             break;
         }
         default:
