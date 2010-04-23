@@ -4,7 +4,7 @@ DELETE FROM spell_threat WHERE entry IN (
 -- Battle Shout
 6673, 5242, 6192, 11549, 11550, 11551, 25289, 2048, 47436,
 -- Commanding Shout
-469, 47439, 47440, 
+469, 47439, 47440,
 -- Demoralizing Shout
 1160, 6190, 11554, 11555, 11556, 25202, 25203, 47437,
 -- Cleave
@@ -22,7 +22,7 @@ DELETE FROM spell_threat WHERE entry IN (
 -- Shield Slam
 47488, 47487,
 -- Sunder Armor (remove only)
-47467, 25225, 11597, 11596, 8380, 7405, 
+47467, 25225, 11597, 11596, 8380, 7405,
 -- Thunder Clap
 47502, 47501,
 -- Maul

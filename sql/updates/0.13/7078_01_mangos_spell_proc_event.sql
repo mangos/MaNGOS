@@ -19,5 +19,3 @@ INSERT INTO `spell_proc_event` VALUES (44395, 0x00, 0, 0x00000000, 0x00000000, 0
 -- (44396) Incanter's Absorption (Rank 3)
 DELETE FROM `spell_proc_event` WHERE `entry` IN (44396);
 INSERT INTO `spell_proc_event` VALUES (44396, 0x00, 0, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000400, 0.000000, 0.000000, 0);
-
-

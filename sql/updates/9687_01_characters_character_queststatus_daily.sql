@@ -5,4 +5,3 @@ ALTER TABLE `character_queststatus_daily`
 
 ALTER TABLE `saved_variables`
   ADD COLUMN `NextDailyQuestResetTime` bigint(40) unsigned NOT NULL default '0' AFTER `NextArenaPointDistributionTime`;
-

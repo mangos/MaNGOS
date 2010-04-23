@@ -302,7 +302,7 @@ void Spell::EffectEnvironmentalDMG(SpellEffectIndex eff_idx)
     // currently each enemy selected explicitly and self cast damage, we prevent apply self casted spell bonuses/etc
     damage = m_spellInfo->CalculateSimpleValue(eff_idx);
 
-    m_caster->CalcAbsorbResist(m_caster, GetSpellSchoolMask(m_spellInfo), SPELL_DIRECT_DAMAGE, damage, &absorb, &resist);
+    m_caster->CalculateAbsorbAndResist(m_caster, GetSpellSchoolMask(m_spellInfo), SPELL_DIRECT_DAMAGE, damage, &absorb, &resist);
 
     m_caster->SendSpellNonMeleeDamageLog(m_caster, m_spellInfo->Id, damage, GetSpellSchoolMask(m_spellInfo), absorb, resist, false, 0, false);
     if(m_caster->GetTypeId() == TYPEID_PLAYER)
@@ -474,7 +474,7 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                         break;
                     }
                 }
-                // Shadow Bite 
+                // Shadow Bite
                 else if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0040000000000000))
                 {
                     Unit *owner = m_caster->GetOwner();
@@ -5157,6 +5157,9 @@ void Spell::EffectWeaponDmg(SpellEffectIndex eff_idx)
             {
                 int32 count = CalculateDamage(EFFECT_INDEX_2, unitTarget);
                 spell_bonus += int32(count * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) / 100.0f);
+                
+                if( Aura * pAura = m_caster->GetAura(56816, EFFECT_INDEX_0))
+                    pAura->SendFakeAuraUpdate(56817, true);
             }
             break;
         }

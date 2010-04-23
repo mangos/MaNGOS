@@ -4697,18 +4697,20 @@ void ObjectMgr::LoadInstanceTemplate()
 
         if (temp->parent > 0)
         {
-            // check existence 
+            // check existence
             MapEntry const* parentEntry = sMapStore.LookupEntry(temp->parent);
             if (!parentEntry)
             {
-                sLog.outErrorDb("ObjectMgr::LoadInstanceTemplate: bad parent map id for instance template %d template!", parentEntry,temp->map);
+                sLog.outErrorDb("ObjectMgr::LoadInstanceTemplate: bad parent map id %u for instance template %d template!",
+                    parentEntry->MapID, temp->map);
                 const_cast<InstanceTemplate*>(temp)->parent = 0;
                 continue;
             }
 
             if (parentEntry->IsContinent())
             {
-                sLog.outErrorDb("ObjectMgr::LoadInstanceTemplate: parent point to continent map id %u for instance template %d template, ignored, need be set only for non-continent parents!", parentEntry->MapID,temp->map);
+                sLog.outErrorDb("ObjectMgr::LoadInstanceTemplate: parent point to continent map id %u for instance template %d template, ignored, need be set only for non-continent parents!",
+                    parentEntry->MapID,temp->map);
                 const_cast<InstanceTemplate*>(temp)->parent = 0;
                 continue;
             }

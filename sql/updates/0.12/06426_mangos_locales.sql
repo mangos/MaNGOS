@@ -84,4 +84,3 @@ ALTER TABLE mangos_string
   ADD COLUMN content_loc8 text AFTER content_loc7;
 
 UPDATE mangos_string SET content_loc8 = content_loc7;
-

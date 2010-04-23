@@ -75,4 +75,3 @@ INSERT INTO `spell_proc_event` VALUES (48159, 0x20, 6, 0x0000000000000000, 0x000
 -- (48160) Vampiric Touch (Rank 5)
 DELETE FROM `spell_proc_event` WHERE `entry` IN (48160);
 INSERT INTO `spell_proc_event` VALUES (48160, 0x20, 6, 0x0000000000000000, 0x00000000, 0x00000000, 0.000000, 0.000000, 0);
-

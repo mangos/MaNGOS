@@ -10,4 +10,3 @@ CREATE TABLE `character_queststatus_weekly` (
 
 ALTER TABLE `saved_variables`
   ADD COLUMN `NextWeeklyQuestResetTime` bigint(40) unsigned NOT NULL default '0' AFTER `NextArenaPointDistributionTime`;
-
