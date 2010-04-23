@@ -6318,8 +6318,8 @@ void ObjectMgr::LoadReputationOnKill()
 
     //                                                0            1                     2
     QueryResult *result = WorldDatabase.Query("SELECT creature_id, RewOnKillRepFaction1, RewOnKillRepFaction2,"
-    //   3             4             5                   6             7             8                   9
-        "IsTeamAward1, MaxStanding1, RewOnKillRepValue1, IsTeamAward2, MaxStanding2, RewOnKillRepValue2, TeamDependent "
+    //   3             4             5                   6             7             8                   9              10
+        "IsTeamAward1, MaxStanding1, RewOnKillRepValue1, IsTeamAward2, MaxStanding2, RewOnKillRepValue2, TeamDependent, ChampioningAura "
         "FROM creature_onkill_reputation");
 
     if(!result)
@@ -6352,6 +6352,7 @@ void ObjectMgr::LoadReputationOnKill()
         repOnKill.reputation_max_cap2  = fields[7].GetUInt32();
         repOnKill.repvalue2            = fields[8].GetInt32();
         repOnKill.team_dependent       = fields[9].GetUInt8();
+        repOnKill.championingAura      = fields[10].GetUInt32();
 
         if(!GetCreatureTemplate(creature_id))
         {
@@ -7377,12 +7378,12 @@ uint16 ObjectMgr::GetConditionId( ConditionType condition, uint32 value1, uint32
 
 bool ObjectMgr::CheckDeclinedNames( std::wstring w_ownname, DeclinedName const& names )
 {
-	// get main part of the name
-	std::wstring mainpart = GetMainPartOfName(w_ownname, 0);
-	// prepare flags
-	bool x = true;
-	bool y = true;
-	// check declined names
+    // get main part of the name
+    std::wstring mainpart = GetMainPartOfName(w_ownname, 0);
+    // prepare flags
+    bool x = true;
+    bool y = true;
+    // check declined names
     for(int i =0; i < MAX_DECLINED_NAME_CASES; ++i)
     {
         std::wstring wname;
@@ -7392,8 +7393,8 @@ bool ObjectMgr::CheckDeclinedNames( std::wstring w_ownname, DeclinedName const& 
         if(mainpart!=GetMainPartOfName(wname,i+1))
             x = false;
 
-		if(w_ownname!=wname)
-			y = false;
+        if(w_ownname!=wname)
+            y = false;
     }
     return (x||y);
 }

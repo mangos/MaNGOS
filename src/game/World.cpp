@@ -1272,6 +1272,7 @@ void World::SetInitialWorldSettings()
                                                             //Update "uptime" table based on configuration entry in minutes.
     m_timers[WUPDATE_CORPSES].SetInterval(3*HOUR*IN_MILLISECONDS);
     m_timers[WUPDATE_DELETECHARS].SetInterval(DAY*IN_MILLISECONDS); // check for chars to delete every day
+    m_timers[WUPDATE_AUTOBROADCAST].SetInterval(abtimer);
 
     //to set mailtimer to return mails every day between 4 and 5 am
     //mailtimer is increased when updating auctions
@@ -1317,10 +1318,10 @@ void World::SetInitialWorldSettings()
     sLog.outString("Initialize AuctionHouseBot...");
     auctionbot.Initialize();
 
-    sLog.outString("Starting Autobroadcast system by Xeross..." );
-
     // Delete all characters which have been deleted X days before
     Player::DeleteOldCharacters();
+
+    sLog.outString("Starting Autobroadcast system by Xeross..." );
 
     sLog.outString( "WORLD: World initialized" );
 

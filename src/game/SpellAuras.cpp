@@ -312,7 +312,7 @@ pAuraHandler AuraHandler[TOTAL_AURAS]=
     &Aura::HandleNULL,                                      //259 corrupt healing over time spell
     &Aura::HandleNoImmediateEffect,                         //260 SPELL_AURA_SCREEN_EFFECT (miscvalue = id in ScreenEffect.dbc) not required any code
     &Aura::HandlePhase,                                     //261 SPELL_AURA_PHASE undetectable invisibility?     implemented in Unit::isVisibleForOrDetect
-    &Aura::HandleNULL,                                      //262 ignore combat/aura state?
+    &Aura::HandleIgnoreUnitState,                           //262 SPELL_AURA_IGNORE_UNIT_STATE Allows some abilities which are avaible only in some cases.... implemented in Unit::isIgnoreUnitState & Spell::CheckCast
     &Aura::HandleAllowOnlyAbility,                          //263 SPELL_AURA_ALLOW_ONLY_ABILITY player can use only abilities set in SpellClassMask
     &Aura::HandleUnused,                                    //264 unused (3.0.8a-3.2.2a)
     &Aura::HandleUnused,                                    //265 unused (3.0.8a-3.2.2a)
@@ -351,7 +351,7 @@ pAuraHandler AuraHandler[TOTAL_AURAS]=
     &Aura::HandleUnused,                                    //298 unused (3.2.2a)
     &Aura::HandleUnused,                                    //299 unused (3.2.2a)
     &Aura::HandleNULL,                                      //300 3 spells (share damage?)
-    &Aura::HandleNULL,                                      //301 5 spells
+    &Aura::HandleNoImmediateEffect,                         //301 SPELL_AURA_SCHOOL_HEAL_ABSORB         implemented in Unit::CalcHealAbsorb
     &Aura::HandleUnused,                                    //302 unused (3.2.2a)
     &Aura::HandleNULL,                                      //303 17 spells
     &Aura::HandleNULL,                                      //304 2 spells (alcohol effect?)
@@ -2279,6 +2279,10 @@ void Aura::TriggerSpell()
             // Ground Slam
             case 33525:
                 target->CastSpell(target, trigger_spell_id, true, NULL, this, casterGUID);
+                return;
+            // Intense Cold
+            case 48094:
+                target->CastSpell(target, trigger_spell_id, true, NULL, this);
                 return;
             // Beacon of Light
             case 53563:
@@ -7546,8 +7550,12 @@ void Aura::PeriodicTick()
             sLog.outDetail("PeriodicTick: %u (TypeId: %u) heal of %u (TypeId: %u) for %u health inflicted by %u",
                 GUID_LOPART(GetCasterGUID()), GuidHigh2TypeId(GUID_HIPART(GetCasterGUID())), m_target->GetGUIDLow(), m_target->GetTypeId(), pdamage, GetId());
 
+            // calculate heal absorb and reduce healing
+            uint32 absorb = 0;
+            pCaster->CalcHealAbsorb(m_target, GetSpellProto(), pdamage, absorb);
+
             int32 gain = m_target->ModifyHealth(pdamage);
-            SpellPeriodicAuraLogInfo pInfo(this, pdamage, (pdamage - uint32(gain)), 0, 0, 0.0f, isCrit);
+            SpellPeriodicAuraLogInfo pInfo(this, pdamage, (pdamage - uint32(gain)), absorb, 0, 0.0f, isCrit);
             m_target->SendPeriodicAuraLog(&pInfo);
 
             // Set trigger flag
@@ -8502,6 +8510,45 @@ void Aura::HandlePhase(bool apply, bool Real)
         m_target->SetVisibility(m_target->GetVisibility());
 }
 
+void Aura::HandleIgnoreUnitState(bool apply, bool Real)
+{
+    if(m_target->GetTypeId() != TYPEID_PLAYER || !Real)
+        return;
+
+    if(Unit* caster = GetCaster())
+    {
+        if (apply)
+        {
+            switch(GetId())
+            {
+                // Fingers of Frost
+                case 44544:
+                    SetAuraCharges(3); // 3 because first is droped on proc
+                    break;
+                // Juggernaut & Warbringer both need special slot and flag
+                // for alowing charge in combat and Warbringer
+                // for alowing charge in different stances, too
+                case 64976:
+                case 57499:
+                    SetAuraSlot(255);
+                    SetAuraFlags(19);
+                    SendAuraUpdate(false);
+                    break;
+            }
+        }
+        else
+        {
+            switch(GetId())
+            {
+                case 64976:
+                case 57499:
+                    SendAuraUpdate(true);
+                    break;
+            }
+        }
+    }
+}
+
 void Aura::UnregisterSingleCastAura()
 {
     if (IsSingleTarget())
@@ -8598,14 +8645,13 @@ void Aura::HandleAuraOpenStable(bool apply, bool Real)
         return;
 
     Unit* caster = GetCaster();
-    if(!caster || caster->GetTypeId() != TYPEID_PLAYER)
+    if(!caster || !caster->IsInWorld() || caster->GetTypeId() != TYPEID_PLAYER)
         return;
 
     WorldPacket data;
     data << uint64(caster->GetGUID());
     ((Player*)caster)->GetSession()->HandleListStabledPetsOpcode(data);
 }
-
 
 void Aura::HandleAuraInitializeImages(bool Apply, bool Real)
 {

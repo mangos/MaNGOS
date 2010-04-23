@@ -2010,7 +2010,7 @@ void Unit::CalculateAbsorbAndResist(Unit *pCaster, SpellSchoolMask schoolMask, D
                 // Primal Tenacity
                 if (spellProto->SpellIconID == 2253)
                 {
-                    //reduces all damage taken while Stunned and in Cat Form
+                    //reduces all damage taken while Stunned & in Cat Form
                     if (m_form == FORM_CAT && (unitflag & UNIT_FLAG_STUNNED))
                         RemainingDamage -= RemainingDamage * currentAbsorb / 100;
                     continue;
@@ -2343,6 +2343,67 @@ void Unit::CalculateAbsorbAndResist(Unit *pCaster, SpellSchoolMask schoolMask, D
     }
 
     *absorb = damage - RemainingDamage - *resist;
+}
+
+void Unit::CalcHealAbsorb(Unit *pVictim, const SpellEntry *spellProto, uint32 &HealAmount, uint32 &Absorbed)
+{
+    int32 finalAmount = int32(HealAmount);
+    bool existExpired = false;
+
+    // handle heal absorb effects
+    AuraList const& healAbsorbAuras = pVictim->GetAurasByType(SPELL_AURA_SCHOOL_HEAL_ABSORB);
+    for (AuraList::const_iterator aura = healAbsorbAuras.begin(); aura != healAbsorbAuras.end() && finalAmount > 0; ++aura)
+    {
+        Modifier* mod = (*aura)->GetModifier();
+
+        // check if affects this school
+        if (!(mod->m_miscvalue & spellProto->SchoolMask))
+            continue;
+
+        // max amount that can be absorbed by this aura
+        int32 currentAbsorb = mod->m_amount;
+
+       // found empty aura (impossible but..)
+        if (currentAbsorb <= 0)
+        {
+            existExpired = true;
+           continue;
+        }
+
+        // can't absorb more than heal amount
+        if (finalAmount < currentAbsorb)
+            currentAbsorb = finalAmount;
+
+        // reduce heal amount by absorb amount
+        finalAmount -= currentAbsorb;
+
+        // reduce aura amount
+        mod->m_amount -= currentAbsorb;
+
+        if ((*aura)->DropAuraCharge())
+            mod->m_amount = 0;
+
+        // check if aura needs to be removed
+        if (mod->m_amount <= 0)
+            existExpired = true;
+    }
+    // Remove all consumed absorb auras
+    if (existExpired)
+    {
+        for (AuraList::const_iterator aura = healAbsorbAuras.begin(); aura != healAbsorbAuras.end(); )
+        {
+            if ((*aura)->GetModifier()->m_amount <= 0)
+            {
+                pVictim->RemoveAurasDueToSpell((*aura)->GetId());
+                aura = healAbsorbAuras.begin();
+            }
+            else
+                ++aura;
+        }
+    }
+
+    Absorbed = HealAmount - finalAmount;
+    HealAmount = finalAmount;
 }
 
 void Unit::AttackerStateUpdate (Unit *pVictim, WeaponAttackType attType, bool extra )
@@ -2809,23 +2870,13 @@ SpellMissInfo Unit::MeleeSpellHitResult(Unit *pVictim, SpellEntry const *spell, 
     bool canDodge = true;
     bool canParry = true;
 
-    // Same spells cannot be parry/dodge
+    // Some spells cannot be parry/dodge
     if (spell->Attributes & SPELL_ATTR_IMPOSSIBLE_DODGE_PARRY_BLOCK)
         return SPELL_MISS_NONE;
 
-    // Ranged attack cannot be parry/dodge only deflect
+    // Ranged attack cannot be parry/dodge only miss
     if (attType == RANGED_ATTACK)
-    {
-        // only if in front
-        if (pVictim->HasInArc(M_PI_F,this))
-        {
-            int32 deflect_chance = pVictim->GetTotalAuraModifier(SPELL_AURA_DEFLECT_SPELLS)*100;
-            tmp+=deflect_chance;
-            if (roll < tmp)
-                return SPELL_MISS_DEFLECT;
-        }
         return SPELL_MISS_NONE;
-    }
 
     // Check for attack from behind
     if (!pVictim->HasInArc(M_PI_F,this))
@@ -2834,7 +2885,8 @@ SpellMissInfo Unit::MeleeSpellHitResult(Unit *pVictim, SpellEntry const *spell, 
         if (GetTypeId() == TYPEID_PLAYER && pVictim->GetTypeId() == TYPEID_PLAYER)
             canDodge = false;
         // Can`t parry
-        canParry = false;
+        if (!pVictim->HasAura(19263))
+            canParry = false;
     }
     // Check creatures flags_extra for disable parry
     if(pVictim->GetTypeId()==TYPEID_UNIT)
@@ -2968,14 +3020,10 @@ SpellMissInfo Unit::MagicSpellHitResult(Unit *pVictim, SpellEntry const *spell)
     if (rand < tmp)
         return SPELL_MISS_MISS;
 
-    // cast by caster in front of victim
-    if (pVictim->HasInArc(M_PI_F,this))
-    {
-        int32 deflect_chance = pVictim->GetTotalAuraModifier(SPELL_AURA_DEFLECT_SPELLS)*100;
-        tmp+=deflect_chance;
-        if (rand < tmp)
-            return SPELL_MISS_DEFLECT;
-    }
+    int32 deflect_chance = pVictim->GetTotalAuraModifier(SPELL_AURA_DEFLECT_SPELLS)*100;
+    tmp+=deflect_chance;
+    if (rand < tmp)
+        return SPELL_MISS_DEFLECT;
 
     return SPELL_MISS_NONE;
 }
@@ -2994,8 +3042,7 @@ SpellMissInfo Unit::SpellHitResult(Unit *pVictim, SpellEntry const *spell, bool 
     if (pVictim->GetTypeId()==TYPEID_UNIT && ((Creature*)pVictim)->IsInEvadeMode())
         return SPELL_MISS_EVADE;
 
-	if (!(spell->Id == 64380 || spell->Id == 64382 || spell->Id == 32375 ||
-        spell->Id == 32592 || spell->Id == 39897))
+    if (!(spell->Attributes & SPELL_ATTR_UNAFFECTED_BY_INVULNERABILITY))
     {
         // Check for immune
         if (pVictim->IsImmunedToSpell(spell))
@@ -3864,6 +3911,12 @@ bool Unit::AddAura(Aura *Aur)
                         Aur->GetModifier()->m_amount += int32(remainingDamage / Aur->GetAuraMaxTicks());
                     }
                     // can be only single (this check done at _each_ aura add
+                    RemoveAura(i2,AURA_REMOVE_BY_STACK);
+                    break;
+                }  
+                // Judgements are always single 
+                else if (GetSpellSpecific(Aur->GetId()) == SPELL_JUDGEMENT)
+                {
                     RemoveAura(i2,AURA_REMOVE_BY_STACK);
                     break;
                 }
@@ -4849,6 +4902,7 @@ void Unit::SendPeriodicAuraLog(SpellPeriodicAuraLogInfo *pInfo)
         case SPELL_AURA_OBS_MOD_HEALTH:
             data << uint32(pInfo->damage);                  // damage
             data << uint32(pInfo->overDamage);              // overheal?
+            data << uint32(pInfo->absorb);                  // absorb
             data << uint8(pInfo->critical ? 1 : 0);         // new 3.1.2 critical flag
             break;
         case SPELL_AURA_OBS_MOD_MANA:
@@ -5898,8 +5952,9 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     basepoints[0] += damage * triggerAmount/100;
 
                     // limit absorb amount
-                    if (basepoints[0] > pVictim->getLevel()*125)
-                        basepoints[0] = pVictim->getLevel()*125;
+                    int32 levelbonus = pVictim->getLevel()*125;
+                    if (basepoints[0] > levelbonus)
+                        basepoints[0] = levelbonus;
                     triggered_spell_id = 47753;
                     break;
                 }
@@ -7233,13 +7288,6 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                 triggered_spell_id = dummySpell->EffectTriggerSpell[effIndex];
                 break;
             }
-              // Rune strike
-            if (dummySpell->Id == 56817)
-            {   //Must proc only from Rune strike (56815) 
-                if (procSpell)
-                     if (procSpell->Id!= 56815)
-                          return false;
-            }
             break;
         }
         default:
@@ -7734,7 +7782,7 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
             // Unyielding Knights
             else if (auraSpellInfo->Id == 38164)
             {
-                if (pVictim->GetEntry()!=19457)
+                if (pVictim->GetEntry() != 19457)
                     return false;
             }
             // Bonus Healing (Crystal Spire of Karabor mace)
@@ -7767,7 +7815,7 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
         case SPELLFAMILY_SHAMAN:
         {
             // Lightning Shield (overwrite non existing triggered spell call in spell.dbc
-            if (auraSpellInfo->SpellFamilyFlags & UI64LIT(0x0000000000000400))
+            if (auraSpellInfo->SpellFamilyFlags & UI64LIT(0x0000000000000400) && auraSpellInfo->SpellVisual[0] == 37)
             {
                 switch(auraSpellInfo->Id)
                 {
@@ -7858,6 +7906,13 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
             {
                 if (procSpell->Id != 47633)
                     return false;
+            }
+            // Rune Strike
+            else if (auraSpellInfo->Id == 56816)
+            {
+                if( Aura * pAura = this->GetAura(56816, EFFECT_INDEX_0))
+                    pAura->SendFakeAuraUpdate(56817, false);
+                    return true;
             }
             // Blade Barrier
             else if (auraSpellInfo->SpellIconID == 85)
@@ -8935,7 +8990,11 @@ void Unit::UnsummonAllTotems()
 
 int32 Unit::DealHeal(Unit *pVictim, uint32 addhealth, SpellEntry const *spellProto, bool critical)
 {
-    int32 gain = pVictim->ModifyHealth(int32(addhealth));
+    // calculate heal absorb and reduce healing
+    uint32 absorb = 0;
+    CalcHealAbsorb(pVictim, spellProto, addhealth, absorb);
+
+    int32 gain = addhealth ? pVictim->ModifyHealth(int32(addhealth)) : 0;
 
     Unit* unit = this;
 
@@ -8945,7 +9004,7 @@ int32 Unit::DealHeal(Unit *pVictim, uint32 addhealth, SpellEntry const *spellPro
     if (unit->GetTypeId()==TYPEID_PLAYER)
     {
         // overheal = addhealth - gain
-        unit->SendHealSpellLog(pVictim, spellProto->Id, addhealth, addhealth - gain, critical);
+        unit->SendHealSpellLog(pVictim, spellProto->Id, addhealth, addhealth - gain, absorb, critical);
 
         if (BattleGround *bg = ((Player*)unit)->GetBattleGround())
             bg->UpdatePlayerScore((Player*)unit, SCORE_HEALING_DONE, gain);
@@ -8995,15 +9054,16 @@ Unit* Unit::SelectMagnetTarget(Unit *victim, SpellEntry const *spellInfo)
     return victim;
 }
 
-void Unit::SendHealSpellLog(Unit *pVictim, uint32 SpellID, uint32 Damage, uint32 OverHeal, bool critical)
+void Unit::SendHealSpellLog(Unit *pVictim, uint32 SpellID, uint32 Damage, uint32 OverHeal, uint32 Absorbed, bool critical)
 {
     // we guess size
-    WorldPacket data(SMSG_SPELLHEALLOG, (8+8+4+4+1));
+    WorldPacket data(SMSG_SPELLHEALLOG, (8+8+4+4+4+4+1+1));
     data << pVictim->GetPackGUID();
     data << GetPackGUID();
     data << uint32(SpellID);
     data << uint32(Damage);
     data << uint32(OverHeal);
+    data << uint32(Absorbed);
     data << uint8(critical ? 1 : 0);
     data << uint8(0);                                       // unused in client?
     SendMessageToSet(&data, true);
@@ -9214,7 +9274,7 @@ uint32 Unit::SpellDamageBonus(Unit *pVictim, SpellEntry const *spellProto, uint3
             // Ice Lance
             if (spellProto->SpellIconID == 186)
             {
-                if (pVictim->isFrozen())
+                if (pVictim->isFrozen() || isIgnoreUnitState(spellProto))
                 {
                     float multiplier = 3.0f;
 
@@ -9566,9 +9626,9 @@ bool Unit::IsSpellCrit(Unit *pVictim, SpellEntry const *spellProto, SpellSchoolM
                         continue;
                     switch((*i)->GetModifier()->m_miscvalue)
                     {
-                        case  849: if (pVictim->isFrozen()) crit_chance+= 17.0f; break; //Shatter Rank 1
-                        case  910: if (pVictim->isFrozen()) crit_chance+= 34.0f; break; //Shatter Rank 2
-                        case  911: if (pVictim->isFrozen()) crit_chance+= 50.0f; break; //Shatter Rank 3
+                        case  849: if (pVictim->isFrozen() || isIgnoreUnitState(spellProto)) crit_chance+= 17.0f; break; //Shatter Rank 1
+                        case  910: if (pVictim->isFrozen() || isIgnoreUnitState(spellProto)) crit_chance+= 34.0f; break; //Shatter Rank 2
+                        case  911: if (pVictim->isFrozen() || isIgnoreUnitState(spellProto)) crit_chance+= 50.0f; break; //Shatter Rank 3
                         case 7917:                          // Glyph of Shadowburn
                             if (pVictim->HasAuraState(AURA_STATE_HEALTHLESS_35_PERCENT))
                                 crit_chance+=(*i)->GetModifier()->m_amount;
@@ -10856,6 +10916,10 @@ bool Unit::isVisibleForOrDetect(Unit const* u, WorldObject const* viewPoint, boo
         invisible = false;
     }
 
+    // Arena preparation hack
+    if(HasAura(SPELL_ARENA_PREPARATION))
+        invisible = true;
+
     // special cases for always overwrite invisibility/stealth
     if(invisible || m_Visibility == VISIBILITY_GROUP_STEALTH)
     {
@@ -11627,6 +11691,18 @@ int32 Unit::CalculateSpellDamage(Unit const* target, SpellEntry const* spellProt
             (spellProto->Effect[effect_index] != SPELL_EFFECT_APPLY_AURA || spellProto->EffectApplyAuraName[effect_index] != SPELL_AURA_MOD_DECREASE_SPEED))
         value = int32(value*0.25f*exp(getLevel()*(70-spellProto->spellLevel)/1000.0f));
 
+    // Frostbite trigger aura: if Fingers of Frost is active, it has saved a roll:
+    if(spellProto->EffectTriggerSpell[effect_index] == 12494)
+    {
+        sLog.outDebug("CalculateSpellDamage: called for 12494 (Frostbite), chance is: %u", value);
+        if(m_lastAuraProcRoll >=0) //override independent trigger
+        {
+            sLog.outDebug("CalculateSpellDamage: saved roll from FoF is: %f", m_lastAuraProcRoll);
+            return value > m_lastAuraProcRoll ? 100 : 0;
+        }
+        sLog.outDebug("CalculateSpellDamage: no  saved roll for 12494 (Frostbite)");
+    }
+
     return value;
 }
 
@@ -11751,7 +11827,7 @@ void Unit::IncrDiminishing(DiminishingGroup group)
 
 void Unit::ApplyDiminishingToDuration(DiminishingGroup group, int32 &duration,Unit* caster,DiminishingLevels Level, int32 limitduration)
 {
-    if(duration == -1 || group == DIMINISHING_NONE || caster->IsFriendlyTo(this) )
+    if(duration == -1 || group == DIMINISHING_NONE)
         return;
 
     // Duration of crowd control abilities on pvp target is limited by 10 sec. (2.2.0)
@@ -12681,6 +12757,9 @@ void Unit::ProcDamageAndSpellFor( bool isVictim, Unit * pTarget, uint32 procFlag
 
     RemoveSpellList removedSpells;
     ProcTriggeredList procTriggered;
+    // reset saved roll from Fingers of Frost:
+    if(GetTypeId() == TYPEID_PLAYER)
+        m_lastAuraProcRoll = -1.0f;
     // Fill procTriggered list
     for(AuraMap::const_iterator itr = GetAuras().begin(); itr!= GetAuras().end(); ++itr)
     {
@@ -13652,6 +13731,13 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit *pVictim, Aura* aura, SpellEntry con
         modOwner->ApplySpellMod(spellProto->Id,SPELLMOD_CHANCE_OF_SUCCESS,chance);
         modOwner->ApplySpellMod(spellProto->Id,SPELLMOD_FREQUENCY_OF_SUCCESS,chance);
     }
+    // Fingers of Frost: save roll for re-use in Frostbite trigger
+    if(aura->GetSpellProto()->EffectTriggerSpell[aura->GetEffIndex()] == 44544)
+    {
+        sLog.outDebug("Fingers of Frost: saving roll; triggered by %u", aura->GetId());
+        m_lastAuraProcRoll = rand_chance();
+        return chance > m_lastAuraProcRoll;
+    }
 
     return roll_chance_f(chance);
 }
@@ -14009,6 +14095,32 @@ void Unit::StopAttackFaction(uint32 faction_id)
     getHostileRefManager().deleteReferencesForFaction(faction_id);
 
     CallForAllControlledUnits(StopAttackFactionHelper(faction_id),false,true,true);
+}
+
+bool Unit::isIgnoreUnitState(SpellEntry const *spell)
+{
+    if(!HasAuraType(SPELL_AURA_IGNORE_UNIT_STATE))
+        return false;
+
+    if(spell->SpellFamilyName == SPELLFAMILY_MAGE)
+    {
+        // Ice Lance
+        if(spell->SpellIconID == 186)
+            return true;
+        // Shatter
+        if(spell->Id == 11170 || spell->Id == 12982 || spell->Id == 12983)
+            return true;
+    }
+    Unit::AuraList const& stateAuras = GetAurasByType(SPELL_AURA_IGNORE_UNIT_STATE);
+    for(Unit::AuraList::const_iterator j = stateAuras.begin();j != stateAuras.end(); ++j)
+    {
+        if((*j)->isAffectedOnSpell(spell))
+        {
+            return true;
+            break;
+        }
+    }
+    return false;
 }
 
 void Unit::CleanupDeletedAuras()

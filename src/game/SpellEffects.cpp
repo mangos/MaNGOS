@@ -1819,22 +1819,6 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
             // Life Tap
             if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0000000000040000))
             {
-                // In 303 exist spirit depend
-                uint32 spirit = uint32(m_caster->GetStat(STAT_SPIRIT));
-                switch (m_spellInfo->Id)
-                {
-                    case  1454: damage+=spirit; break;
-                    case  1455: damage+=spirit*15/10; break;
-                    case  1456: damage+=spirit*2; break;
-                    case 11687: damage+=spirit*25/10; break;
-                    case 11688:
-                    case 11689:
-                    case 27222:
-                    case 57946: damage+=spirit*3; break;
-                    default:
-                        sLog.outError("Spell::EffectDummy: %u Life Tap need set spirit multipler", m_spellInfo->Id);
-                        return;
-                }
 //              Think its not need (also need remove Life Tap from SpellDamageBonus or add new value)
 //              damage = m_caster->SpellDamageBonus(m_caster, m_spellInfo,uint32(damage > 0 ? damage : 0), SPELL_DIRECT_DAMAGE);
                 if (unitTarget && (int32(unitTarget->GetHealth()) > damage))
@@ -1842,7 +1826,8 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     // Shouldn't Appear in Combat Log
                     unitTarget->ModifyHealth(-damage);
 
-                    int32 mana = damage;
+                    int32 spell_power = m_caster->SpellBaseDamageBonus(GetSpellSchoolMask(m_spellInfo)) + m_caster->SpellBaseDamageBonusForVictim(GetSpellSchoolMask(m_spellInfo), unitTarget);
+                    int32 mana = damage + (spell_power * 5/10 * m_caster->CalculateLevelPenalty(m_spellInfo));
                     // Improved Life Tap mod
                     Unit::AuraList const& auraDummy = m_caster->GetAurasByType(SPELL_AURA_DUMMY);
                     for(Unit::AuraList::const_iterator itr = auraDummy.begin(); itr != auraDummy.end(); ++itr)
@@ -3169,7 +3154,7 @@ void Spell::EffectHeal(SpellEffectIndex /*eff_idx*/)
             }
 
             int32 tickheal = caster->SpellHealingBonus(unitTarget, targetAura->GetSpellProto(), targetAura->GetModifier()->m_amount, DOT);
-            int32 tickcount = GetSpellDuration(targetAura->GetSpellProto()) / targetAura->GetSpellProto()->EffectAmplitude[idx];
+            int32 tickcount = (GetSpellDuration(targetAura->GetSpellProto()) / targetAura->GetSpellProto()->EffectAmplitude[idx]) - 1;
 
             // Glyph of Swiftmend
             if (!caster->HasAura(54824))
@@ -5095,6 +5080,20 @@ void Spell::EffectWeaponDmg(SpellEffectIndex eff_idx)
                 if (weapon && weapon->GetProto()->SubClass == ITEM_SUBCLASS_WEAPON_DAGGER)
                     totalDamagePercentMod *= 1.5f;          // 150% to daggers
             }
+            // Ghostly Strike
+            else if (m_caster->GetTypeId() == TYPEID_PLAYER && m_spellInfo->Id == 14278)
+            {
+                Item* weapon = ((Player*)m_caster)->GetWeaponForAttack(m_attackType,true,true);
+                if (weapon && weapon->GetProto()->SubClass == ITEM_SUBCLASS_WEAPON_DAGGER)
+                    totalDamagePercentMod *= 1.45f;        // 145% to daggers
+            }
+            // Hemorrhage
+            else if (m_caster->GetTypeId() == TYPEID_PLAYER && (m_spellInfo->SpellFamilyFlags & UI64LIT(0x2000000)))
+            {
+                Item* weapon = ((Player*)m_caster)->GetWeaponForAttack(m_attackType,true,true);
+                if (weapon && weapon->GetProto()->SubClass == ITEM_SUBCLASS_WEAPON_DAGGER)
+                    totalDamagePercentMod *= 1.44f;        // 144% to daggers
+            }
             break;
         }
         case SPELLFAMILY_PALADIN:
@@ -5196,12 +5195,11 @@ void Spell::EffectWeaponDmg(SpellEffectIndex eff_idx)
                 totalDamagePercentMod *= 1.2f;
             }
             // Rune strike
-            if (m_spellInfo->SpellIconID == 3007)
+            if( m_spellInfo->SpellIconID == 3007)
             {
-            int32 count = CalculateDamage(EFFECT_INDEX_2, unitTarget);
-            spell_bonus += int32(count*m_caster->GetTotalAttackPowerValue(BASE_ATTACK)/100.0f);
-
-            if (Aura* pAura = m_caster->GetAura(56816, EFFECT_INDEX_0))
+                int32 count = CalculateDamage(EFFECT_INDEX_2, unitTarget);
+                spell_bonus += int32(count * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) / 100.0f);
+                if( Aura * pAura = m_caster->GetAura(56816, EFFECT_INDEX_0))
                     pAura->SendFakeAuraUpdate(56817, true);
             }
             break;
@@ -5447,7 +5445,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
         {
             switch(m_spellInfo->Id)
             {
-                case 6962:
+                case 6962:                                  // Pet Summoned
                 {
                     if(m_caster->GetTypeId() != TYPEID_PLAYER)
                         return;
@@ -7250,7 +7248,8 @@ void Spell::EffectSummonAllTotems(SpellEffectIndex eff_idx)
         if (ActionButton const* actionButton = ((Player*)m_caster)->GetActionButton(start_button+slot))
             if (actionButton->GetType()==ACTION_BUTTON_SPELL)
                 if (uint32 spell_id = actionButton->GetAction())
-                    m_caster->CastSpell(unitTarget,spell_id,true);
+                    if (!((Player*)m_caster)->HasSpellCooldown(spell_id))
+                        m_caster->CastSpell(unitTarget, spell_id, true);
 }
 
 void Spell::EffectDestroyAllTotems(SpellEffectIndex /*eff_idx*/)

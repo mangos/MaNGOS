@@ -6227,26 +6227,28 @@ void Player::RewardReputation(Unit *pVictim, float rate)
     if(!Rep)
         return;
 
-    uint32 tabardFactionId = 0;
-
-    // Has reputational tabard
-    if (HasAura(57818))
+    uint32 Repfaction1 = Rep->repfaction1;
+    uint32 Repfaction2 = Rep->repfaction2;
+    uint32 tabardFactionID = 0;
+    
+    // Championning tabard reputation system
+    if(HasAura(Rep->championingAura))
     {
-        if (Item* pTabard = GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_TABARD))
-            tabardFactionId = pTabard->GetProto()->RequiredReputationFaction;
+        if( Item* pItem = GetItemByPos( INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_TABARD ) )
+        {                 
+            if ( tabardFactionID = pItem->GetProto()->RequiredReputationFaction ) 
+            {
+                Repfaction1 = tabardFactionID;
+                Repfaction2 = tabardFactionID;
+            }
+        }
     }
 
     if(Rep->repfaction1 && (!Rep->team_dependent || GetTeam()==ALLIANCE))
     {
-        uint32 factionId = Rep->repfaction1;
-
-        // Alliance Vanguard
-        if (tabardFactionId && Rep->repfaction1 == 1037)
-            factionId = tabardFactionId;
-
-        int32 donerep1 = CalculateReputationGain(pVictim->getLevel(), Rep->repvalue1, factionId, false);
+        int32 donerep1 = CalculateReputationGain(pVictim->getLevel(), Rep->repvalue1, Repfaction1, false);
         donerep1 = int32(donerep1*rate);
-        FactionEntry const *factionEntry1 = sFactionStore.LookupEntry(factionId);
+        FactionEntry const *factionEntry1 = sFactionStore.LookupEntry(Repfaction1);
         uint32 current_reputation_rank1 = GetReputationMgr().GetRank(factionEntry1);
         if (factionEntry1 && current_reputation_rank1 <= Rep->reputation_max_cap1)
             GetReputationMgr().ModifyReputation(factionEntry1, donerep1);
@@ -6262,15 +6264,9 @@ void Player::RewardReputation(Unit *pVictim, float rate)
 
     if(Rep->repfaction2 && (!Rep->team_dependent || GetTeam()==HORDE))
     {
-        uint32 factionId = Rep->repfaction2;
-
-        // Horde Expedition
-        if (tabardFactionId && Rep->repfaction2 == 1052)
-            factionId = tabardFactionId;
-
-        int32 donerep2 = CalculateReputationGain(pVictim->getLevel(), Rep->repvalue2, factionId, false);
+        int32 donerep2 = CalculateReputationGain(pVictim->getLevel(), Rep->repvalue2, Repfaction2, false);
         donerep2 = int32(donerep2*rate);
-        FactionEntry const *factionEntry2 = sFactionStore.LookupEntry(factionId);
+        FactionEntry const *factionEntry2 = sFactionStore.LookupEntry(Repfaction2);
         uint32 current_reputation_rank2 = GetReputationMgr().GetRank(factionEntry2);
         if (factionEntry2 && current_reputation_rank2 <= Rep->reputation_max_cap2)
             GetReputationMgr().ModifyReputation(factionEntry2, donerep2);
@@ -19564,6 +19560,25 @@ void Player::SendInitialPacketsAfterAddToMap()
     SendAurasForTarget(this);
     SendEnchantmentDurations();                             // must be after add to map
     SendItemDurations();                                    // must be after add to map
+
+    // Juggernaut & Warbringer both need special packet
+    // for alowing charge in combat and Warbringer
+    // for alowing charge in different stances, too
+    if(HasAura(64976) || HasAura(57499))
+    {
+        WorldPacket aura_update(SMSG_AURA_UPDATE);
+        aura_update << GetPackGUID();
+        aura_update << uint8(255);
+        if(HasAura(64976))
+            aura_update << uint32(64976);
+        if(HasAura(57499))
+            aura_update << uint32(57499);
+        aura_update << uint8(19);
+        aura_update << uint8(getLevel());
+        aura_update << uint8(1);
+        aura_update << uint8(0);
+        GetSession()->SendPacket(&aura_update);
+    }
 }
 
 void Player::SendUpdateToOutOfRangeGroupMembers()

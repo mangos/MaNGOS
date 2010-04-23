@@ -1369,6 +1369,16 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
             {
                 case SPELLFAMILY_GENERIC:                   // same family case
                 {
+                    // Dark Essence & Light Essence
+                    if ((spellInfo_1->Id == 65684 && spellInfo_2->Id == 65686) ||
+                        (spellInfo_2->Id == 65684 && spellInfo_1->Id == 65686))
+                        return true;
+
+                    //Potent Fungus and Mini must remove each other (Amanitar encounter, Ahn'kahet)
+                    if ((spellInfo_1->Id == 57055 && spellInfo_2->Id == 56648) ||
+                        (spellInfo_2->Id == 57055 && spellInfo_1->Id == 56648))
+                        return true;
+
                     // Thunderfury
                     if ((spellInfo_1->Id == 21992 && spellInfo_2->Id == 27648) ||
                         (spellInfo_2->Id == 21992 && spellInfo_1->Id == 27648))
@@ -1555,6 +1565,10 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
                 // Metamorphosis, diff effects
                 if (spellInfo_1->SpellIconID == 3314 && spellInfo_2->SpellIconID == 3314)
                     return false;
+
+                // Nether Protection effects
+                if( spellInfo_2->SpellIconID == 1985 && spellInfo_1->SpellIconID == 1985 && spellInfo_1->SpellVisual[0] == 9750 )
+                    return false;
             }
             // Detect Invisibility and Mana Shield (multi-family check)
             if( spellInfo_1->Id == 132 && spellInfo_2->SpellIconID == 209 && spellInfo_2->SpellVisual[0] == 968 )
@@ -1571,6 +1585,11 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
                 // Battle Shout and Rampage
                 if( (spellInfo_1->SpellIconID == 456 && spellInfo_2->SpellIconID == 2006) ||
                     (spellInfo_2->SpellIconID == 456 && spellInfo_1->SpellIconID == 2006) )
+                    return false;
+
+                // Taste of Blood and Sudden Death
+                if( (spellInfo_1->Id == 52437 && spellInfo_2->Id == 60503) ||
+                    (spellInfo_2->Id == 52437 && spellInfo_1->Id == 60503) )
                     return false;
             }
 
@@ -1700,6 +1719,10 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
                     (spellInfo_2->SpellFamilyFlags & UI64LIT(0x4)) && (spellInfo_1->SpellFamilyFlags & UI64LIT(0x00000004000)) )
                     return false;
 
+                // Deterrence
+                if( spellInfo_1->SpellIconID == 83 && spellInfo_2->SpellIconID == 83 )
+                    return false;
+
                 // Bestial Wrath
                 if( spellInfo_1->SpellIconID == 1680 && spellInfo_2->SpellIconID == 1680 )
                     return false;
@@ -1744,6 +1767,11 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
 
             // Blessing of Sanctuary (multi-family check, some from 16 spell icon spells)
             if (spellInfo_2->Id == 67480 && spellInfo_1->Id == 20911)
+                return false;
+
+            // Inner Fire and Consecration
+            if(spellInfo_2->SpellFamilyName == SPELLFAMILY_PRIEST)
+                if(spellInfo_1->SpellIconID == 51 && spellInfo_2->SpellIconID == 51)
                 return false;
 
             // Combustion and Fire Protection Aura (multi-family check)
