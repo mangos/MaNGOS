@@ -71,28 +71,30 @@ void EventProcessor::KillAllEvents(bool force)
 
         i_old->second->to_Abort = true;
         i_old->second->Abort(m_time);
-        if(force || i_old->second->IsDeletable())
+        if (force || i_old->second->IsDeletable())
         {
             delete i_old->second;
 
-            if(!force)                                      // need per-element cleanup
+            if (!force)                                      // need per-element cleanup
                 m_events.erase (i_old);
         }
     }
 
     // fast clear event list (in force case)
-    if(force)
+    if (force)
         m_events.clear();
 }
 
 void EventProcessor::AddEvent(BasicEvent* Event, uint64 e_time, bool set_addtime)
 {
-    if (set_addtime) Event->m_addTime = m_time;
+    if (set_addtime)
+        Event->m_addTime = m_time;
+
     Event->m_execTime = e_time;
     m_events.insert(std::pair<uint64, BasicEvent*>(e_time, Event));
 }
 
 uint64 EventProcessor::CalculateTime(uint64 t_offset)
 {
-    return(m_time + t_offset);
+    return m_time + t_offset;
 }

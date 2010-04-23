@@ -125,4 +125,3 @@ typedef FactoryHolder<MovementGenerator,MovementGeneratorType>::FactoryHolderReg
 typedef FactoryHolder<MovementGenerator,MovementGeneratorType>::FactoryHolderRepository MovementGeneratorRepository;
 
 #endif
-

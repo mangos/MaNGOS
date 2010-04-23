@@ -181,4 +181,3 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_serve_ns1__executeCommand(struct soap*);
 #endif
 
 /* End of soapStub.h */
-

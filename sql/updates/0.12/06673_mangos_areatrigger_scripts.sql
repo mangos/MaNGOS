@@ -4,4 +4,3 @@ CREATE TABLE `areatrigger_scripts` (
     `ScriptName` CHAR( 64 ) NOT NULL ,
     PRIMARY KEY ( `entry` )
 ) ENGINE = MYISAM DEFAULT CHARSET=utf8;
-

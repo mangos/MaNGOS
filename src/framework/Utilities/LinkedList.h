@@ -27,17 +27,20 @@ class LinkedListHead;
 class LinkedListElement
 {
     private:
+
         friend class LinkedListHead;
 
         LinkedListElement* iNext;
         LinkedListElement* iPrev;
+
     public:
-        LinkedListElement() { iNext = NULL; iPrev = NULL; }
+
+        LinkedListElement()  { iNext = NULL; iPrev = NULL; }
         ~LinkedListElement() { delink(); }
 
-        bool hasNext() const { return(iNext->iNext != NULL); }
-        bool hasPrev() const { return(iPrev->iPrev != NULL); }
-        bool isInList() const { return(iNext != NULL && iPrev != NULL); }
+        bool hasNext() const  { return (iNext->iNext != NULL); }
+        bool hasPrev() const  { return (iPrev->iPrev != NULL); }
+        bool isInList() const { return (iNext != NULL && iPrev != NULL); }
 
         LinkedListElement      * next()       { return hasNext() ? iNext : NULL; }
         LinkedListElement const* next() const { return hasNext() ? iNext : NULL; }
@@ -51,9 +54,12 @@ class LinkedListElement
 
         void delink()
         {
-            if(isInList())
+            if (isInList())
             {
-                iNext->iPrev = iPrev; iPrev->iNext = iNext; iNext = NULL; iPrev = NULL;
+                iNext->iPrev = iPrev;
+                iPrev->iNext = iNext;
+                iNext = NULL;
+                iPrev = NULL;
             }
         }
 
@@ -79,10 +85,13 @@ class LinkedListElement
 class LinkedListHead
 {
     private:
+
         LinkedListElement iFirst;
         LinkedListElement iLast;
         uint32 iSize;
+
     public:
+
         LinkedListHead()
         {
             // create empty list
@@ -92,13 +101,13 @@ class LinkedListHead
             iSize = 0;
         }
 
-        bool isEmpty() const { return(!iFirst.iNext->isInList()); }
+        bool isEmpty() const { return (!iFirst.iNext->isInList()); }
 
-        LinkedListElement      * getFirst()       { return(isEmpty() ? NULL : iFirst.iNext); }
-        LinkedListElement const* getFirst() const { return(isEmpty() ? NULL : iFirst.iNext); }
+        LinkedListElement      * getFirst()       { return (isEmpty() ? NULL : iFirst.iNext); }
+        LinkedListElement const* getFirst() const { return (isEmpty() ? NULL : iFirst.iNext); }
 
-        LinkedListElement      * getLast() { return(isEmpty() ? NULL : iLast.iPrev); }
-        LinkedListElement const* getLast() const  { return(isEmpty() ? NULL : iLast.iPrev); }
+        LinkedListElement      * getLast()        { return (isEmpty() ? NULL : iLast.iPrev); }
+        LinkedListElement const* getLast() const  { return (isEmpty() ? NULL : iLast.iPrev); }
 
         void insertFirst(LinkedListElement* pElem)
         {
@@ -112,15 +121,17 @@ class LinkedListHead
 
         uint32 getSize() const
         {
-            if(!iSize)
+            if (!iSize)
             {
                 uint32 result = 0;
                 LinkedListElement const* e = getFirst();
+
                 while(e)
                 {
                     ++result;
                     e = e->next();
                 }
+
                 return result;
             }
             else
@@ -131,24 +142,27 @@ class LinkedListHead
         void decSize() { --iSize; }
 
         template<class _Ty>
-            class Iterator
+        class Iterator
         {
             public:
-                typedef std::bidirectional_iterator_tag     iterator_category;
-                typedef _Ty                                 value_type;
-                typedef ptrdiff_t                           difference_type;
-                typedef ptrdiff_t                           distance_type;
-                typedef _Ty*                                pointer;
-                typedef _Ty const*                          const_pointer;
-                typedef _Ty&                                reference;
-                typedef _Ty const &                         const_reference;
+
+                typedef std::bidirectional_iterator_tag iterator_category;
+                typedef _Ty value_type;
+                typedef ptrdiff_t difference_type;
+                typedef ptrdiff_t distance_type;
+                typedef _Ty* pointer;
+                typedef _Ty const* const_pointer;
+                typedef _Ty& reference;
+                typedef _Ty const& const_reference;
 
 
-                Iterator() : _Ptr(0)
+                Iterator()
+                    : _Ptr(0)
                 {                                           // construct with null node pointer
                 }
 
-                Iterator(pointer _Pnode) : _Ptr(_Pnode)
+                Iterator(pointer _Pnode)
+                    : _Ptr(_Pnode)
                 {                                           // construct with node pointer _Pnode
                 }
 
@@ -229,13 +243,13 @@ class LinkedListHead
                     return (_Ptr != &_Right);
                 }
 
-
                 pointer _Mynode()
                 {                                           // return node pointer
                     return (_Ptr);
                 }
 
             protected:
+
                 pointer _Ptr;                               // pointer to node
         };
 
@@ -243,4 +257,5 @@ class LinkedListHead
 };
 
 //============================================
+
 #endif

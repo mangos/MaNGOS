@@ -27,5 +27,3 @@ INSERT INTO `spell_proc_event` VALUES (47557, 0x00, 6, 0x00001800, 0x00000000, 0
 -- (32409) Shadow Word: Death ()
 DELETE FROM `spell_proc_event` WHERE `entry` IN (32409);
 INSERT INTO `spell_proc_event` VALUES (32409, 0x00, 0, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0.000000, 0.000000, 0);
-
-

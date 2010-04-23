@@ -18,4 +18,3 @@ CREATE TABLE `db_script_string` (
   `content_loc8` text,
   PRIMARY KEY  (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
