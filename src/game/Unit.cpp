@@ -2330,7 +2330,34 @@ void Unit::CalculateAbsorbAndResist(Unit *pCaster, SpellSchoolMask schoolMask, D
     *absorb = damage - RemainingDamage - *resist;
 }
 
-<<<<<<< HEAD:src/game/Unit.cpp
+void Unit::CalculateAbsorbResistBlock(Unit *pCaster, SpellNonMeleeDamage *damageInfo, SpellEntry const* spellProto, WeaponAttackType attType)
+{
+    bool blocked = false;
+    // Get blocked status
+    switch (spellProto->DmgClass)
+    {
+        // Melee and Ranged Spells
+        case SPELL_DAMAGE_CLASS_RANGED:
+        case SPELL_DAMAGE_CLASS_MELEE:
+            blocked = IsSpellBlocked(pCaster, spellProto, attType);
+            break;
+        default:
+            break;
+    }
+
+    if (blocked)
+    {
+        damageInfo->blocked = GetShieldBlockValue();
+        if (damageInfo->damage < (int32)damageInfo->blocked)
+            damageInfo->blocked = damageInfo->damage;
+        damageInfo->damage-=damageInfo->blocked;
+    }
+
+    uint32 absorb_affected_damage = pCaster->CalcNotIgnoreAbsorbDamage(damageInfo->damage,GetSpellSchoolMask(spellProto),spellProto);
+    CalculateAbsorbAndResist(pCaster, GetSpellSchoolMask(spellProto), SPELL_DIRECT_DAMAGE, absorb_affected_damage, &damageInfo->absorb, &damageInfo->resist, !(spellProto->AttributesEx2 & SPELL_ATTR_EX2_CANT_REFLECTED));
+    damageInfo->damage-= damageInfo->absorb + damageInfo->resist;
+}
+
 void Unit::CalcHealAbsorb(Unit *pVictim, const SpellEntry *spellProto, uint32 &HealAmount, uint32 &Absorbed)
 {
     int32 finalAmount = int32(HealAmount);
@@ -2390,34 +2417,6 @@ void Unit::CalcHealAbsorb(Unit *pVictim, const SpellEntry *spellProto, uint32 &H
 
     Absorbed = HealAmount - finalAmount;
     HealAmount = finalAmount;
-}
-
-void Unit::CalculateAbsorbResistBlock(Unit *pCaster, SpellNonMeleeDamage *damageInfo, SpellEntry const* spellProto, WeaponAttackType attType)
-{
-    bool blocked = false;
-    // Get blocked status
-    switch (spellProto->DmgClass)
-    {
-        // Melee and Ranged Spells
-        case SPELL_DAMAGE_CLASS_RANGED:
-        case SPELL_DAMAGE_CLASS_MELEE:
-            blocked = IsSpellBlocked(pCaster, spellProto, attType);
-            break;
-        default:
-            break;
-    }
-
-    if (blocked)
-    {
-        damageInfo->blocked = GetShieldBlockValue();
-        if (damageInfo->damage < (int32)damageInfo->blocked)
-            damageInfo->blocked = damageInfo->damage;
-        damageInfo->damage-=damageInfo->blocked;
-    }
-
-    uint32 absorb_affected_damage = pCaster->CalcNotIgnoreAbsorbDamage(damageInfo->damage,GetSpellSchoolMask(spellProto),spellProto);
-    CalculateAbsorbAndResist(pCaster, GetSpellSchoolMask(spellProto), SPELL_DIRECT_DAMAGE, absorb_affected_damage, &damageInfo->absorb, &damageInfo->resist, !(spellProto->AttributesEx2 & SPELL_ATTR_EX2_CANT_REFLECTED));
-    damageInfo->damage-= damageInfo->absorb + damageInfo->resist;
 }
 
 void Unit::AttackerStateUpdate (Unit *pVictim, WeaponAttackType attType, bool extra )
