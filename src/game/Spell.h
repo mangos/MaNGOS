@@ -574,6 +574,8 @@ class Spell
         {
             ObjectGuid targetGUID;
             uint64 timeDelay;
+            uint32 HitInfo;
+            uint32 damage;
             SpellMissInfo missCondition:8;
             SpellMissInfo reflectResult:8;
             uint8  effectMask:8;
@@ -604,6 +606,7 @@ class Spell
         void AddGOTarget(uint64 goGUID, SpellEffectIndex effIndex);
         void AddItemTarget(Item* target, SpellEffectIndex effIndex);
         void DoAllEffectOnTarget(TargetInfo *target);
+        void HandleDelayedSpellLaunch(TargetInfo *target);
         void DoSpellHitOnUnit(Unit *unit, uint32 effectMask);
         void DoAllEffectOnTarget(GOTargetInfo *target);
         void DoAllEffectOnTarget(ItemTargetInfo *target);
