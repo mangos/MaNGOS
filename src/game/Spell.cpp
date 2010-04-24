@@ -312,13 +312,22 @@ void SpellCastTargets::write( ByteBuffer& data ) const
         data << m_strTarget;
 }
 
-Spell::Spell( Unit* Caster, SpellEntry const *info, bool triggered, ObjectGuid originalCasterGUID, Spell** triggeringContainer )
+Spell::Spell( Unit* caster, SpellEntry const *info, bool triggered, ObjectGuid originalCasterGUID, Spell** triggeringContainer )
 {
-    ASSERT( Caster != NULL && info != NULL );
+    ASSERT( caster != NULL && info != NULL );
     ASSERT( info == sSpellStore.LookupEntry( info->Id ) && "`info` must be pointer to sSpellStore element");
 
-    m_spellInfo = info;
-    m_caster = Caster;
+    if (caster->GetTypeId() != TYPEID_PLAYER && caster->IsInWorld() && caster->GetMap()->IsDungeon())
+    {
+        if (SpellEntry const* spellEntry = GetSpellEntryByDifficulty(info->SpellDifficultyId, caster->GetMap()->GetDifficulty()))
+            m_spellInfo = spellEntry;
+        else
+            m_spellInfo = info;
+    }
+    else
+        m_spellInfo = info;
+
+    m_caster = caster;
     m_selfContainer = NULL;
     m_triggeringContainer = triggeringContainer;
     m_referencedFromCurrentSpell = false;
