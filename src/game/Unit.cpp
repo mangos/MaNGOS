@@ -1995,11 +1995,7 @@ void Unit::CalculateAbsorbAndResist(Unit *pCaster, SpellSchoolMask schoolMask, D
                 // Primal Tenacity
                 if (spellProto->SpellIconID == 2253)
                 {
-<<<<<<< HEAD:src/game/Unit.cpp
-                    //reduces all damage taken while Stunned & in Cat Form
-=======
                     //reduces all damage taken while Stunned and in Cat Form
->>>>>>> 14a497a80060dab56d66491e56dffc0f118c1a7d:src/game/Unit.cpp
                     if (m_form == FORM_CAT && (unitflag & UNIT_FLAG_STUNNED))
                         RemainingDamage -= RemainingDamage * currentAbsorb / 100;
                     continue;
