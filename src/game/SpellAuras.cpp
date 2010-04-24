@@ -351,7 +351,7 @@ pAuraHandler AuraHandler[TOTAL_AURAS]=
     &Aura::HandleUnused,                                    //298 unused (3.2.2a)
     &Aura::HandleUnused,                                    //299 unused (3.2.2a)
     &Aura::HandleNULL,                                      //300 3 spells (share damage?)
-    &Aura::HandleNoImmediateEffect,                         //301 SPELL_AURA_SCHOOL_HEAL_ABSORB         implemented in Unit::CalcHealAbsorb
+    &Aura::HandleNoImmediateEffect,                         //301 SPELL_AURA_SCHOOL_HEAL_ABSORB         implemented in Unit::CalculateHealAbsorb
     &Aura::HandleUnused,                                    //302 unused (3.2.2a)
     &Aura::HandleNULL,                                      //303 17 spells
     &Aura::HandleNULL,                                      //304 2 spells (alcohol effect?)
@@ -7549,7 +7549,7 @@ void Aura::PeriodicTick()
 
             // calculate heal absorb and reduce healing
             uint32 absorb = 0;
-            pCaster->CalcHealAbsorb(m_target, GetSpellProto(), pdamage, absorb);
+            pCaster->CalculateHealAbsorb(m_target, GetSpellProto(), pdamage, absorb);
 
             int32 gain = m_target->ModifyHealth(pdamage);
             SpellPeriodicAuraLogInfo pInfo(this, pdamage, (pdamage - uint32(gain)), absorb, 0, 0.0f, isCrit);
