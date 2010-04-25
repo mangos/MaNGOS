@@ -1,1 +1,1 @@
-DELETE FROM `spell_bonus_data` WHERE `id` = 54158;
+DELETE FROM `spell_bonus_data` WHERE `entry` = 54158;
