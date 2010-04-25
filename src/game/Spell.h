@@ -607,6 +607,7 @@ class Spell
         void AddItemTarget(Item* target, SpellEffectIndex effIndex);
         void DoAllEffectOnTarget(TargetInfo *target);
         void HandleDelayedSpellLaunch(TargetInfo *target);
+        void InitializeDamageMultipliers();
         void DoSpellHitOnUnit(Unit *unit, uint32 effectMask);
         void DoAllEffectOnTarget(GOTargetInfo *target);
         void DoAllEffectOnTarget(ItemTargetInfo *target);
