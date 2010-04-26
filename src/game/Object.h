@@ -429,6 +429,7 @@ class MANGOS_DLL_SPEC WorldObject : public Object
 
         virtual void SendMessageToSet(WorldPacket *data, bool self);
         virtual void SendMessageToSetInRange(WorldPacket *data, float dist, bool self);
+        void SendMessageToSetExcept(WorldPacket *data, Player const* skipped_receiver);
 
         void MonsterSay(const char* text, uint32 language, uint64 TargetGuid);
         void MonsterYell(const char* text, uint32 language, uint64 TargetGuid);
