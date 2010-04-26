@@ -327,7 +327,19 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
         plMover->SetInWater( !plMover->IsInWater() || plMover->GetBaseMap()->IsUnderWater(movementInfo.GetPos()->x, movementInfo.GetPos()->y, movementInfo.GetPos()->z) );
     }
 
-    if (!plMover) return;
+    if (!plMover) // Override for mind control amd other. by /dev/rsa. testing...
+    { 
+        movementInfo.UpdateTime(getMSTime());
+
+        WorldPacket data(opcode, recv_data.size());
+        data.appendPackGUID(mover->GetGUID());                  // write guid
+        movementInfo.Write(data);                               // write data
+        mover->SendMessageToSetExcept(&data, _player);
+
+//        if(mover->IsInWorld())
+//                    mover->GetMap()->CreatureRelocation((Creature*)mover, movementInfo.GetPos()->x, movementInfo.GetPos()->y, movementInfo.GetPos()->z, movementInfo.GetPos()->o);
+        return;
+    }
 
     /*----------------------*/
     /* anti-cheat features */
@@ -634,7 +646,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
         WorldPacket data(opcode, recv_data.size());
         data.appendPackGUID(plMover->GetGUID());                  // write guid
         movementInfo.Write(data);                               // write data
-        GetPlayer()->SendMessageToSet(&data, false);
+        mover->SendMessageToSetExcept(&data, _player);
 
         if(plMover)                                             // nothing is charmed, or player charmed
         {

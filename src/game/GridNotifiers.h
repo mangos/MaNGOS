@@ -87,6 +87,19 @@ namespace MaNGOS
         template<class SKIP> void Visit(GridRefManager<SKIP> &) {}
     };
 
+    struct MessageDelivererExcept
+    {
+        uint32        i_phaseMask;
+        WorldPacket*  i_message;
+        Player const* i_skipped_receiver;
+
+        MessageDelivererExcept(WorldObject const* obj, WorldPacket *msg, Player const* skipped)
+            : i_phaseMask(obj->GetPhaseMask()), i_message(msg), i_skipped_receiver(skipped) {}
+
+        void Visit(PlayerMapType &m);
+        template<class SKIP> void Visit(GridRefManager<SKIP> &) {}
+    };
+
     struct MANGOS_DLL_DECL ObjectMessageDeliverer
     {
         uint32 i_phaseMask;

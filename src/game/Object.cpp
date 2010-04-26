@@ -1136,7 +1136,7 @@ void WorldObject::GetZoneAndAreaId(uint32& zoneid, uint32& areaid) const
     GetBaseMap()->GetZoneAndAreaId(zoneid, areaid, m_positionX, m_positionY, m_positionZ);
 }
 
-InstanceData* WorldObject::GetInstanceData()
+InstanceData* WorldObject::GetInstanceData() const
 {
     Map *map = GetMap();
     return map->IsDungeon() ? ((InstanceMap*)map)->GetInstanceData() : NULL;
@@ -1579,9 +1579,18 @@ void WorldObject::SendMessageToSet(WorldPacket *data, bool /*bToSelf*/)
 void WorldObject::SendMessageToSetInRange(WorldPacket *data, float dist, bool /*bToSelf*/)
 {
     //if object is in world, map for it already created!
-    Map * _map = IsInWorld() ? GetMap() : sMapMgr.FindMap(GetMapId(), GetInstanceId());
-    if(_map)
+    if (Map * _map = IsInWorld() ? GetMap() : sMapMgr.FindMap(GetMapId(), GetInstanceId()))
         _map->MessageDistBroadcast(this, data, dist);
+}
+
+void WorldObject::SendMessageToSetExcept(WorldPacket *data, Player const* skipped_receiver)
+{
+    //if object is in world, map for it already created!
+    if (Map * _map = IsInWorld() ? GetMap() : sMapMgr.FindMap(GetMapId(), GetInstanceId()))
+    {
+        MaNGOS::MessageDelivererExcept notifier(this, data, skipped_receiver);
+        Cell::VisitWorldObjects(this, notifier, _map->GetVisibilityDistance());
+    }
 }
 
 void WorldObject::SendObjectDeSpawnAnim(uint64 guid)

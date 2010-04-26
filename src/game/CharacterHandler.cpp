@@ -474,14 +474,14 @@ void WorldSession::HandleCharCreateOpcode( WorldPacket & recv_data )
     loginDatabase.PExecute("DELETE FROM realmcharacters WHERE acctid= '%d' AND realmid = '%d'", GetAccountId(), realmID);
     loginDatabase.PExecute("INSERT INTO realmcharacters (numchars, acctid, realmid) VALUES (%u, %u, %u)",  charcount, GetAccountId(), realmID);
 
-    delete pNewChar;                                        // created only to call SaveToDB()
-
     data << (uint8)CHAR_CREATE_SUCCESS;
     SendPacket( &data );
 
     std::string IP_str = GetRemoteAddress();
-    sLog.outBasic("Account: %d (IP: %s) Create Character:[%s]", GetAccountId(), IP_str.c_str(), name.c_str());
-    sLog.outChar("Account: %d (IP: %s) Create Character:[%s]", GetAccountId(), IP_str.c_str(), name.c_str());
+    sLog.outBasic("Account: %d (IP: %s) Create Character:[%s] (guid: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), pNewChar->GetGUIDLow());
+    sLog.outChar("Account: %d (IP: %s) Create Character:[%s] (guid: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), pNewChar->GetGUIDLow());
+
+    delete pNewChar;                                        // created only to call SaveToDB()
 }
 
 void WorldSession::HandleCharDeleteOpcode( WorldPacket & recv_data )
@@ -787,7 +787,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
         SendNotification(LANG_GM_ON);
 
     std::string IP_str = GetRemoteAddress();
-    sLog.outChar("Account: %d (IP: %s) Login Character:[%s] (guid:%u)",
+    sLog.outChar("Account: %d (IP: %s) Login Character:[%s] (guid: %u)",
         GetAccountId(), IP_str.c_str(), pCurrChar->GetName(), pCurrChar->GetGUIDLow());
 
     if(!pCurrChar->IsStandState() && !pCurrChar->hasUnitState(UNIT_STAT_STUNNED))

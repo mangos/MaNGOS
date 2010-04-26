@@ -64,26 +64,10 @@ bool ChatHandler::HandleAccountDeleteCommand(const char* args)
     if (!*args)
         return false;
 
-    ///- Get the account name from the command line
-    char *account_name_str=strtok ((char*)args," ");
-    if (!account_name_str)
-        return false;
-
-    std::string account_name = account_name_str;
-    if (!AccountMgr::normalizeString(account_name))
-    {
-        PSendSysMessage(LANG_ACCOUNT_NOT_EXIST,account_name.c_str());
-        SetSentErrorMessage(true);
-        return false;
-    }
-
-    uint32 account_id = sAccountMgr.GetId(account_name);
+    std::string account_name;
+    uint32 account_id = extractAccountId((char*)args,&account_name);
     if (!account_id)
-    {
-        PSendSysMessage(LANG_ACCOUNT_NOT_EXIST,account_name.c_str());
-        SetSentErrorMessage(true);
         return false;
-    }
 
     /// Commands not recommended call from chat, but support anyway
     /// can delete only for account with less security

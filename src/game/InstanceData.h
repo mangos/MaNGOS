@@ -73,6 +73,10 @@ class MANGOS_DLL_SPEC InstanceData
 
         // Achievement criteria additional requirements check
         // NOTE: not use this if same can be checked existed requirement types from AchievementCriteriaRequirementType
-        virtual bool CheckAchievementCriteriaMeet(uint32 /*criteria_id*/, Player const* /*source*/, Unit const* /*target*/ = NULL, uint32 /*miscvalue1*/ = 0);
+        virtual bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const* source, Unit const* target = NULL, uint32 miscvalue1 = 0);
+
+        // Condition criteria additional requirements check
+        // This is used for such things are heroic loot
+        virtual bool CheckConditionCriteriaMeet(Player const* source, uint32 map_id, uint32 instance_condition_id);
 };
 #endif

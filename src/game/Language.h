@@ -833,7 +833,11 @@ enum MangosStrings
     LANG_LIST_TALENTS_TITLE             = 1135,
     LANG_LIST_TALENTS_COUNT             = 1136,
     LANG_GO_LIST_CHAT                   = 1137,
-    // Room for more level 3              1138-1199 not used
+    LANG_ACCOUNT_CHARACTERS_LIST_BAR    = 1138,
+    LANG_ACCOUNT_CHARACTERS_LIST_HEADER = 1139,
+    LANG_ACCOUNT_CHARACTERS_LIST_LINE_CONSOLE = 1140,
+    LANG_ACCOUNT_CHARACTERS_LIST_LINE_CHAT = 1141,
+    // Room for more level 3              1142-1199 not used
 
     // Debug commands
     LANG_CINEMATIC_NOT_EXIST            = 1200,
