@@ -380,7 +380,7 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         uint32 GetAreaId() const;
         void GetZoneAndAreaId(uint32& zoneid, uint32& areaid) const;
 
-        InstanceData* GetInstanceData();
+        InstanceData* GetInstanceData() const;
 
         const char* GetName() const { return m_name.c_str(); }
         void SetName(const std::string& newname) { m_name=newname; }
