@@ -1,6 +1,6 @@
 ALTER TABLE db_version CHANGE COLUMN required_9794_01_mangos_mangos_string required_9794_02_mangos_command bit;
 
-DELETE FROM command WHERE name IN('account characters','account set gmlevel','account set password');
+DELETE FROM command WHERE name IN('account characters','account set addon','account set gmlevel','account set password');
 INSERT INTO command (name, security, help) VALUES
 ('account characters',3,'Syntax: .account characters [#accountId|$accountName]\r\n\r\nShow list all characters for account seelcted by provided #accountId or $accountName, or for selected player in game.'),
 ('account set addon',3,'Syntax: .account set addon [#accountId|$accountName] #addon\r\n\r\nSet user (possible targeted) expansion addon level allowed. Addon values: 0 - normal, 1 - tbc, 2 - wotlk.'),
