@@ -99,6 +99,7 @@ class ChatHandler
         ChatCommand* getCommandTable();
 
         bool HandleAccountCommand(const char* args);
+        bool HandleAccountCharactersCommand(const char* args);
         bool HandleAccountCreateCommand(const char* args);
         bool HandleAccountDeleteCommand(const char* args);
         bool HandleAccountLockCommand(const char* args);
@@ -536,6 +537,8 @@ class ChatHandler
 
         std::string playerLink(std::string const& name) const { return m_session ? "|cffffffff|Hplayer:"+name+"|h["+name+"]|h|r" : name; }
         std::string GetNameLink(Player* chr) const { return playerLink(chr->GetName()); }
+
+        uint32 extractAccountId(char* args, std::string* accountName = NULL, Player** targetIfNullArg = NULL);
 
         GameObject* GetObjectGlobalyWithGuidOrNearWithDbGuid(uint32 lowguid,uint32 entry);
 

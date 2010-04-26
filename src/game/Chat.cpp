@@ -72,6 +72,7 @@ ChatCommand * ChatHandler::getCommandTable()
 
     static ChatCommand accountCommandTable[] =
     {
+        { "characters",     SEC_CONSOLE,        true,  &ChatHandler::HandleAccountCharactersCommand,   "", NULL },
         { "create",         SEC_CONSOLE,        true,  &ChatHandler::HandleAccountCreateCommand,       "", NULL },
         { "delete",         SEC_CONSOLE,        true,  &ChatHandler::HandleAccountDeleteCommand,       "", NULL },
         { "onlinelist",     SEC_CONSOLE,        true,  &ChatHandler::HandleAccountOnlineListCommand,   "", NULL },
@@ -2246,6 +2247,83 @@ char* ChatHandler::extractQuotedArg( char* args )
             return false;
         return strtok(NULL, "\"");
     }
+}
+
+uint32 ChatHandler::extractAccountId(char* args, std::string* accountName /*= NULL*/, Player** targetIfNullArg /*= NULL*/)
+{
+    uint32 account_id = 0;
+
+    ///- Get the account name from the command line
+    char* account_str = args ? strtok (args," ") : NULL;
+
+    if (!account_str)
+    {
+        if (!targetIfNullArg)
+            return 0;
+
+        /// only target player different from self allowed (if targetPlayer!=NULL then not console)
+        Player* targetPlayer = getSelectedPlayer();
+        if (!targetPlayer)
+            return 0;
+
+        account_id = targetPlayer->GetSession()->GetAccountId();
+
+        if (accountName)
+            sAccountMgr.GetName(account_id, *accountName);
+        
+        if (targetIfNullArg)
+            *targetIfNullArg = targetPlayer;
+
+        return account_id;
+    }
+
+    std::string account_name;
+
+    if (isNumeric(account_str))
+    {
+        long id = atol(account_str);
+        if (id <= 0 || ((unsigned long)id) >= std::numeric_limits<uint32>::max())
+        {
+            PSendSysMessage(LANG_ACCOUNT_NOT_EXIST,account_str);
+            SetSentErrorMessage(true);
+            return 0;
+        }
+
+        account_id = uint32(id);
+
+        if (!sAccountMgr.GetName(account_id, account_name))
+        {
+            PSendSysMessage(LANG_ACCOUNT_NOT_EXIST,account_str);
+            SetSentErrorMessage(true);
+            return 0;
+        }
+    }
+    else
+    {
+        account_name = account_str;
+        if (!AccountMgr::normalizeString(account_name))
+        {
+            PSendSysMessage(LANG_ACCOUNT_NOT_EXIST,account_name.c_str());
+            SetSentErrorMessage(true);
+            return 0;
+        }
+
+        account_id = sAccountMgr.GetId(account_name);
+        if (!account_id)
+        {
+            PSendSysMessage(LANG_ACCOUNT_NOT_EXIST,account_name.c_str());
+            SetSentErrorMessage(true);
+            return 0;
+        }
+    }
+
+    if (accountName)
+        *accountName = account_name;
+
+    if (targetIfNullArg)
+        *targetIfNullArg = NULL;
+
+    return account_id;
 }
 
 bool ChatHandler::needReportToTarget(Player* chr) const
