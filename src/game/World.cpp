@@ -1355,16 +1355,11 @@ void World::Update(uint32 diff)
 
     /// Handle daily quests reset time
     if (m_gameTime > m_NextDailyQuestReset)
-    {
         ResetDailyQuests();
-        m_NextDailyQuestReset += DAY;
-    }
 
-    if(m_gameTime > m_NextWeeklyQuestReset)
-    {
+    /// Handle weekly quests reset time
+    if (m_gameTime > m_NextWeeklyQuestReset)
         ResetWeeklyQuests();
-        m_NextWeeklyQuestReset += WEEK;
-    }
 
     /// <ul><li> Handle auctions when the timer has passed
     if (m_timers[WUPDATE_AUCTIONS].Passed())
