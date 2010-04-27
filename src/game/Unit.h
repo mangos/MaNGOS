@@ -1703,12 +1703,18 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         bool HasAuraStateForCaster(AuraState flag, uint64 caster) const;
         void UnsummonAllTotems();
         Unit* SelectMagnetTarget(Unit *victim, SpellEntry const *spellInfo = NULL);
-        int32 SpellBaseDamageBonus(SpellSchoolMask schoolMask);
-        int32 SpellBaseHealingBonus(SpellSchoolMask schoolMask);
-        int32 SpellBaseDamageBonusForVictim(SpellSchoolMask schoolMask, Unit *pVictim);
-        int32 SpellBaseHealingBonusForVictim(SpellSchoolMask schoolMask, Unit *pVictim);
-        uint32 SpellDamageBonus(Unit *pVictim, SpellEntry const *spellProto, uint32 damage, DamageEffectType damagetype, uint32 stack = 1);
-        int32 SpellHealingBonus(Unit *pVictim, SpellEntry const *spellProto, int32 healamount, DamageEffectType damagetype, uint32 stack = 1);
+
+        int32 SpellBaseDamageBonusDone(SpellSchoolMask schoolMask);
+        int32 SpellBaseDamageBonusTaken(SpellSchoolMask schoolMask);
+        uint32 SpellDamageBonusDone(Unit *pVictim, SpellEntry const *spellProto, uint32 pdamage, DamageEffectType damagetype, uint32 stack = 1);
+        uint32 SpellDamageBonusTaken(Unit *pCaster, SpellEntry const *spellProto, uint32 pdamage, DamageEffectType damagetype, uint32 stack = 1);
+        int32 SpellBaseHealingBonusDone(SpellSchoolMask schoolMask);
+        int32 SpellBaseHealingBonusTaken(SpellSchoolMask schoolMask);
+        uint32 SpellHealingBonusDone(Unit *pVictim, SpellEntry const *spellProto, int32 healamount, DamageEffectType damagetype, uint32 stack = 1);
+        uint32 SpellHealingBonusTaken(Unit *pCaster, SpellEntry const *spellProto, int32 healamount, DamageEffectType damagetype, uint32 stack = 1);
+        uint32 MeleeDamageBonusDone(Unit *pVictim, uint32 damage, WeaponAttackType attType, SpellEntry const *spellProto = NULL, DamageEffectType damagetype = DIRECT_DAMAGE, uint32 stack = 1);
+        uint32 MeleeDamageBonusTaken(Unit *pCaster, uint32 pdamage,WeaponAttackType attType, SpellEntry const *spellProto = NULL, DamageEffectType damagetype = DIRECT_DAMAGE, uint32 stack = 1);
+
         bool   IsSpellBlocked(Unit *pCaster, SpellEntry const *spellProto, WeaponAttackType attackType = BASE_ATTACK);
         bool   IsSpellCrit(Unit *pVictim, SpellEntry const *spellProto, SpellSchoolMask schoolMask, WeaponAttackType attackType = BASE_ATTACK);
         uint32 SpellCriticalDamageBonus(SpellEntry const *spellProto, uint32 damage, Unit *pVictim);
@@ -1727,7 +1733,6 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         void SetContestedPvP(Player *attackedPlayer = NULL);
 
-        uint32 MeleeDamageBonus(Unit *pVictim, uint32 damage, WeaponAttackType attType, SpellEntry const *spellProto = NULL, DamageEffectType damagetype = DIRECT_DAMAGE, uint32 stack =1);
         uint32 GetCastingTimeForBonus( SpellEntry const *spellProto, DamageEffectType damagetype, uint32 CastingTime );
 
         void ApplySpellImmune(uint32 spellId, uint32 op, uint32 type, bool apply);

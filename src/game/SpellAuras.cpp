@@ -64,7 +64,7 @@ pAuraHandler AuraHandler[TOTAL_AURAS]=
     &Aura::HandleModTaunt,                                  // 11 SPELL_AURA_MOD_TAUNT
     &Aura::HandleAuraModStun,                               // 12 SPELL_AURA_MOD_STUN
     &Aura::HandleModDamageDone,                             // 13 SPELL_AURA_MOD_DAMAGE_DONE
-    &Aura::HandleNoImmediateEffect,                         // 14 SPELL_AURA_MOD_DAMAGE_TAKEN   implemented in Unit::MeleeDamageBonus and Unit::SpellBaseDamageBonusForVictim
+    &Aura::HandleNoImmediateEffect,                         // 14 SPELL_AURA_MOD_DAMAGE_TAKEN   implemented in Unit::MeleeDamageBonusTaken and Unit::SpellBaseDamageBonusTaken
     &Aura::HandleNoImmediateEffect,                         // 15 SPELL_AURA_DAMAGE_SHIELD      implemented in Unit::DealMeleeDamage
     &Aura::HandleModStealth,                                // 16 SPELL_AURA_MOD_STEALTH
     &Aura::HandleNoImmediateEffect,                         // 17 SPELL_AURA_MOD_STEALTH_DETECT implemented in Unit::isVisibleForOrDetect
@@ -109,7 +109,7 @@ pAuraHandler AuraHandler[TOTAL_AURAS]=
     &Aura::HandleAuraTransform,                             // 56 SPELL_AURA_TRANSFORM
     &Aura::HandleModSpellCritChance,                        // 57 SPELL_AURA_MOD_SPELL_CRIT_CHANCE
     &Aura::HandleAuraModIncreaseSwimSpeed,                  // 58 SPELL_AURA_MOD_INCREASE_SWIM_SPEED
-    &Aura::HandleNoImmediateEffect,                         // 59 SPELL_AURA_MOD_DAMAGE_DONE_CREATURE implemented in Unit::MeleeDamageBonus and Unit::SpellDamageBonus
+    &Aura::HandleNoImmediateEffect,                         // 59 SPELL_AURA_MOD_DAMAGE_DONE_CREATURE implemented in Unit::MeleeDamageBonusDone and Unit::SpellDamageBonusDone
     &Aura::HandleAuraModPacifyAndSilence,                   // 60 SPELL_AURA_MOD_PACIFY_SILENCE
     &Aura::HandleAuraModScale,                              // 61 SPELL_AURA_MOD_SCALE
     &Aura::HandlePeriodicHealthFunnel,                      // 62 SPELL_AURA_PERIODIC_HEALTH_FUNNEL
@@ -137,7 +137,7 @@ pAuraHandler AuraHandler[TOTAL_AURAS]=
     &Aura::HandleModRegen,                                  // 84 SPELL_AURA_MOD_REGEN
     &Aura::HandleModPowerRegen,                             // 85 SPELL_AURA_MOD_POWER_REGEN
     &Aura::HandleChannelDeathItem,                          // 86 SPELL_AURA_CHANNEL_DEATH_ITEM
-    &Aura::HandleNoImmediateEffect,                         // 87 SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN implemented in Unit::MeleeDamageBonus and Unit::SpellDamageBonus
+    &Aura::HandleNoImmediateEffect,                         // 87 SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN implemented in Unit::MeleeDamageBonusTaken and Unit::SpellDamageBonusTaken
     &Aura::HandleNoImmediateEffect,                         // 88 SPELL_AURA_MOD_HEALTH_REGEN_PERCENT implemented in Player::RegenerateHealth
     &Aura::HandlePeriodicDamagePCT,                         // 89 SPELL_AURA_PERIODIC_DAMAGE_PERCENT
     &Aura::HandleUnused,                                    // 90 unused (3.0.8a-3.2.2a) old SPELL_AURA_MOD_RESIST_CHANCE
@@ -152,7 +152,7 @@ pAuraHandler AuraHandler[TOTAL_AURAS]=
     &Aura::HandleAuraModAttackPower,                        // 99 SPELL_AURA_MOD_ATTACK_POWER
     &Aura::HandleUnused,                                    //100 SPELL_AURA_AURAS_VISIBLE obsolete 3.x? all player can see all auras now, but still have 2 spells including GM-spell (1852,2855)
     &Aura::HandleModResistancePercent,                      //101 SPELL_AURA_MOD_RESISTANCE_PCT
-    &Aura::HandleNoImmediateEffect,                         //102 SPELL_AURA_MOD_MELEE_ATTACK_POWER_VERSUS implemented in Unit::MeleeDamageBonus
+    &Aura::HandleNoImmediateEffect,                         //102 SPELL_AURA_MOD_MELEE_ATTACK_POWER_VERSUS implemented in Unit::MeleeDamageBonusDone
     &Aura::HandleAuraModTotalThreat,                        //103 SPELL_AURA_MOD_TOTAL_THREAT
     &Aura::HandleAuraWaterWalk,                             //104 SPELL_AURA_WATER_WALK
     &Aura::HandleAuraFeatherFall,                           //105 SPELL_AURA_FEATHER_FALL
@@ -163,30 +163,30 @@ pAuraHandler AuraHandler[TOTAL_AURAS]=
     &Aura::HandleModPowerRegenPCT,                          //110 SPELL_AURA_MOD_POWER_REGEN_PERCENT
     &Aura::HandleNoImmediateEffect,                         //111 SPELL_AURA_ADD_CASTER_HIT_TRIGGER implemented in Unit::SelectMagnetTarget
     &Aura::HandleNoImmediateEffect,                         //112 SPELL_AURA_OVERRIDE_CLASS_SCRIPTS implemented in diff functions.
-    &Aura::HandleNoImmediateEffect,                         //113 SPELL_AURA_MOD_RANGED_DAMAGE_TAKEN implemented in Unit::MeleeDamageBonus
-    &Aura::HandleNoImmediateEffect,                         //114 SPELL_AURA_MOD_RANGED_DAMAGE_TAKEN_PCT implemented in Unit::MeleeDamageBonus
-    &Aura::HandleNoImmediateEffect,                         //115 SPELL_AURA_MOD_HEALING                 implemented in Unit::SpellBaseHealingBonusForVictim
+    &Aura::HandleNoImmediateEffect,                         //113 SPELL_AURA_MOD_RANGED_DAMAGE_TAKEN implemented in Unit::MeleeDamageBonusTaken
+    &Aura::HandleNoImmediateEffect,                         //114 SPELL_AURA_MOD_RANGED_DAMAGE_TAKEN_PCT implemented in Unit::MeleeDamageBonusTaken
+    &Aura::HandleNoImmediateEffect,                         //115 SPELL_AURA_MOD_HEALING                 implemented in Unit::SpellBaseHealingBonusTaken
     &Aura::HandleNoImmediateEffect,                         //116 SPELL_AURA_MOD_REGEN_DURING_COMBAT     imppemented in Player::RegenerateAll and Player::RegenerateHealth
     &Aura::HandleNoImmediateEffect,                         //117 SPELL_AURA_MOD_MECHANIC_RESISTANCE     implemented in Unit::MagicSpellHitResult
-    &Aura::HandleNoImmediateEffect,                         //118 SPELL_AURA_MOD_HEALING_PCT             implemented in Unit::SpellHealingBonus
+    &Aura::HandleNoImmediateEffect,                         //118 SPELL_AURA_MOD_HEALING_PCT             implemented in Unit::SpellHealingBonusTaken
     &Aura::HandleUnused,                                    //119 unused (3.0.8a-3.2.2a) old SPELL_AURA_SHARE_PET_TRACKING
     &Aura::HandleAuraUntrackable,                           //120 SPELL_AURA_UNTRACKABLE
     &Aura::HandleAuraEmpathy,                               //121 SPELL_AURA_EMPATHY
     &Aura::HandleModOffhandDamagePercent,                   //122 SPELL_AURA_MOD_OFFHAND_DAMAGE_PCT
     &Aura::HandleModTargetResistance,                       //123 SPELL_AURA_MOD_TARGET_RESISTANCE
     &Aura::HandleAuraModRangedAttackPower,                  //124 SPELL_AURA_MOD_RANGED_ATTACK_POWER
-    &Aura::HandleNoImmediateEffect,                         //125 SPELL_AURA_MOD_MELEE_DAMAGE_TAKEN implemented in Unit::MeleeDamageBonus
-    &Aura::HandleNoImmediateEffect,                         //126 SPELL_AURA_MOD_MELEE_DAMAGE_TAKEN_PCT implemented in Unit::MeleeDamageBonus
-    &Aura::HandleNoImmediateEffect,                         //127 SPELL_AURA_RANGED_ATTACK_POWER_ATTACKER_BONUS implemented in Unit::MeleeDamageBonus
+    &Aura::HandleNoImmediateEffect,                         //125 SPELL_AURA_MOD_MELEE_DAMAGE_TAKEN implemented in Unit::MeleeDamageBonusTaken
+    &Aura::HandleNoImmediateEffect,                         //126 SPELL_AURA_MOD_MELEE_DAMAGE_TAKEN_PCT implemented in Unit::MeleeDamageBonusTaken
+    &Aura::HandleNoImmediateEffect,                         //127 SPELL_AURA_RANGED_ATTACK_POWER_ATTACKER_BONUS implemented in Unit::MeleeDamageBonusDone
     &Aura::HandleModPossessPet,                             //128 SPELL_AURA_MOD_POSSESS_PET
     &Aura::HandleAuraModIncreaseSpeed,                      //129 SPELL_AURA_MOD_SPEED_ALWAYS
     &Aura::HandleAuraModIncreaseMountedSpeed,               //130 SPELL_AURA_MOD_MOUNTED_SPEED_ALWAYS
-    &Aura::HandleNoImmediateEffect,                         //131 SPELL_AURA_MOD_RANGED_ATTACK_POWER_VERSUS implemented in Unit::MeleeDamageBonus
+    &Aura::HandleNoImmediateEffect,                         //131 SPELL_AURA_MOD_RANGED_ATTACK_POWER_VERSUS implemented in Unit::MeleeDamageBonusDone
     &Aura::HandleAuraModIncreaseEnergyPercent,              //132 SPELL_AURA_MOD_INCREASE_ENERGY_PERCENT
     &Aura::HandleAuraModIncreaseHealthPercent,              //133 SPELL_AURA_MOD_INCREASE_HEALTH_PERCENT
     &Aura::HandleAuraModRegenInterrupt,                     //134 SPELL_AURA_MOD_MANA_REGEN_INTERRUPT
     &Aura::HandleModHealingDone,                            //135 SPELL_AURA_MOD_HEALING_DONE
-    &Aura::HandleNoImmediateEffect,                         //136 SPELL_AURA_MOD_HEALING_DONE_PERCENT   implemented in Unit::SpellHealingBonus
+    &Aura::HandleNoImmediateEffect,                         //136 SPELL_AURA_MOD_HEALING_DONE_PERCENT   implemented in Unit::SpellHealingBonusDone
     &Aura::HandleModTotalPercentStat,                       //137 SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE
     &Aura::HandleHaste,                                     //138 SPELL_AURA_MOD_HASTE
     &Aura::HandleForceReaction,                             //139 SPELL_AURA_FORCE_REACTION
@@ -215,22 +215,22 @@ pAuraHandler AuraHandler[TOTAL_AURAS]=
     &Aura::HandleAuraPowerBurn,                             //162 SPELL_AURA_POWER_BURN_MANA
     &Aura::HandleNoImmediateEffect,                         //163 SPELL_AURA_MOD_CRIT_DAMAGE_BONUS      implemented in Unit::CalculateMeleeDamage and Unit::SpellCriticalDamageBonus
     &Aura::HandleUnused,                                    //164 unused (3.0.8a-3.2.2a), only one test spell 10654
-    &Aura::HandleNoImmediateEffect,                         //165 SPELL_AURA_MELEE_ATTACK_POWER_ATTACKER_BONUS implemented in Unit::MeleeDamageBonus
+    &Aura::HandleNoImmediateEffect,                         //165 SPELL_AURA_MELEE_ATTACK_POWER_ATTACKER_BONUS implemented in Unit::MeleeDamageBonusDone
     &Aura::HandleAuraModAttackPowerPercent,                 //166 SPELL_AURA_MOD_ATTACK_POWER_PCT
     &Aura::HandleAuraModRangedAttackPowerPercent,           //167 SPELL_AURA_MOD_RANGED_ATTACK_POWER_PCT
-    &Aura::HandleNoImmediateEffect,                         //168 SPELL_AURA_MOD_DAMAGE_DONE_VERSUS            implemented in Unit::SpellDamageBonus, Unit::MeleeDamageBonus
+    &Aura::HandleNoImmediateEffect,                         //168 SPELL_AURA_MOD_DAMAGE_DONE_VERSUS            implemented in Unit::SpellDamageBonusDone, Unit::MeleeDamageBonusDone
     &Aura::HandleNoImmediateEffect,                         //169 SPELL_AURA_MOD_CRIT_PERCENT_VERSUS           implemented in Unit::DealDamageBySchool, Unit::DoAttackDamage, Unit::SpellCriticalBonus
     &Aura::HandleNULL,                                      //170 SPELL_AURA_DETECT_AMORE       different spells that ignore transformation effects
     &Aura::HandleAuraModIncreaseSpeed,                      //171 SPELL_AURA_MOD_SPEED_NOT_STACK
     &Aura::HandleAuraModIncreaseMountedSpeed,               //172 SPELL_AURA_MOD_MOUNTED_SPEED_NOT_STACK
     &Aura::HandleUnused,                                    //173 unused (3.0.8a-3.2.2a) no spells, old SPELL_AURA_ALLOW_CHAMPION_SPELLS  only for Proclaim Champion spell
-    &Aura::HandleModSpellDamagePercentFromStat,             //174 SPELL_AURA_MOD_SPELL_DAMAGE_OF_STAT_PERCENT  implemented in Unit::SpellBaseDamageBonus
-    &Aura::HandleModSpellHealingPercentFromStat,            //175 SPELL_AURA_MOD_SPELL_HEALING_OF_STAT_PERCENT implemented in Unit::SpellBaseHealingBonus
+    &Aura::HandleModSpellDamagePercentFromStat,             //174 SPELL_AURA_MOD_SPELL_DAMAGE_OF_STAT_PERCENT  implemented in Unit::SpellBaseDamageBonusDone
+    &Aura::HandleModSpellHealingPercentFromStat,            //175 SPELL_AURA_MOD_SPELL_HEALING_OF_STAT_PERCENT implemented in Unit::SpellBaseHealingBonusDone
     &Aura::HandleSpiritOfRedemption,                        //176 SPELL_AURA_SPIRIT_OF_REDEMPTION   only for Spirit of Redemption spell, die at aura end
     &Aura::HandleNULL,                                      //177 SPELL_AURA_AOE_CHARM (22 spells)
     &Aura::HandleNoImmediateEffect,                         //178 SPELL_AURA_MOD_DEBUFF_RESISTANCE          implemented in Unit::MagicSpellHitResult
     &Aura::HandleNoImmediateEffect,                         //179 SPELL_AURA_MOD_ATTACKER_SPELL_CRIT_CHANCE implemented in Unit::SpellCriticalBonus
-    &Aura::HandleNoImmediateEffect,                         //180 SPELL_AURA_MOD_FLAT_SPELL_DAMAGE_VERSUS   implemented in Unit::SpellDamageBonus
+    &Aura::HandleNoImmediateEffect,                         //180 SPELL_AURA_MOD_FLAT_SPELL_DAMAGE_VERSUS   implemented in Unit::SpellDamageBonusDone
     &Aura::HandleUnused,                                    //181 unused (3.0.8a-3.2.2a) old SPELL_AURA_MOD_FLAT_SPELL_CRIT_DAMAGE_VERSUS
     &Aura::HandleAuraModResistenceOfStatPercent,            //182 SPELL_AURA_MOD_RESISTANCE_OF_STAT_PERCENT
     &Aura::HandleNoImmediateEffect,                         //183 SPELL_AURA_MOD_CRITICAL_THREAT only used in 28746, implemented in ThreatCalcHelper::calcThreat
@@ -279,7 +279,7 @@ pAuraHandler AuraHandler[TOTAL_AURAS]=
     &Aura::HandleAuraPeriodicDummy,                         //226 SPELL_AURA_PERIODIC_DUMMY
     &Aura::HandlePeriodicTriggerSpellWithValue,             //227 SPELL_AURA_PERIODIC_TRIGGER_SPELL_WITH_VALUE
     &Aura::HandleNoImmediateEffect,                         //228 SPELL_AURA_DETECT_STEALTH
-    &Aura::HandleNoImmediateEffect,                         //229 SPELL_AURA_MOD_AOE_DAMAGE_AVOIDANCE        implemented in Unit::SpellDamageBonus
+    &Aura::HandleNoImmediateEffect,                         //229 SPELL_AURA_MOD_AOE_DAMAGE_AVOIDANCE        implemented in Unit::SpellDamageBonusTaken
     &Aura::HandleAuraModIncreaseMaxHealth,                  //230 Commanding Shout
     &Aura::HandleNoImmediateEffect,                         //231 SPELL_AURA_PROC_TRIGGER_SPELL_WITH_VALUE
     &Aura::HandleNoImmediateEffect,                         //232 SPELL_AURA_MECHANIC_DURATION_MOD           implement in Unit::CalculateSpellDuration
@@ -287,8 +287,8 @@ pAuraHandler AuraHandler[TOTAL_AURAS]=
     &Aura::HandleNoImmediateEffect,                         //234 SPELL_AURA_MECHANIC_DURATION_MOD_NOT_STACK implement in Unit::CalculateSpellDuration
     &Aura::HandleAuraModDispelResist,                       //235 SPELL_AURA_MOD_DISPEL_RESIST               implement in Unit::MagicSpellHitResult
     &Aura::HandleAuraControlVehicle,                        //236 SPELL_AURA_CONTROL_VEHICLE
-    &Aura::HandleModSpellDamagePercentFromAttackPower,      //237 SPELL_AURA_MOD_SPELL_DAMAGE_OF_ATTACK_POWER  implemented in Unit::SpellBaseDamageBonus
-    &Aura::HandleModSpellHealingPercentFromAttackPower,     //238 SPELL_AURA_MOD_SPELL_HEALING_OF_ATTACK_POWER implemented in Unit::SpellBaseHealingBonus
+    &Aura::HandleModSpellDamagePercentFromAttackPower,      //237 SPELL_AURA_MOD_SPELL_DAMAGE_OF_ATTACK_POWER  implemented in Unit::SpellBaseDamageBonusDone
+    &Aura::HandleModSpellHealingPercentFromAttackPower,     //238 SPELL_AURA_MOD_SPELL_HEALING_OF_ATTACK_POWER implemented in Unit::SpellBaseHealingBonusDone
     &Aura::HandleAuraModScale,                              //239 SPELL_AURA_MOD_SCALE_2 only in Noggenfogger Elixir (16595) before 2.3.0 aura 61
     &Aura::HandleAuraModExpertise,                          //240 SPELL_AURA_MOD_EXPERTISE
     &Aura::HandleForceMoveForward,                          //241 Forces the player to move forward
@@ -305,7 +305,7 @@ pAuraHandler AuraHandler[TOTAL_AURAS]=
     &Aura::HandleModCombatSpeedPct,                         //252 SPELL_AURA_SLOW_ALL
     &Aura::HandleNoImmediateEffect,                         //253 SPELL_AURA_MOD_BLOCK_CRIT_CHANCE             implemented in Unit::CalculateMeleeDamage
     &Aura::HandleNULL,                                      //254 SPELL_AURA_MOD_DISARM_SHIELD disarm Shield
-    &Aura::HandleNoImmediateEffect,                         //255 SPELL_AURA_MOD_MECHANIC_DAMAGE_TAKEN_PERCENT    implemented in Unit::SpellDamageBonus
+    &Aura::HandleNoImmediateEffect,                         //255 SPELL_AURA_MOD_MECHANIC_DAMAGE_TAKEN_PERCENT    implemented in Unit::SpellDamageBonusTaken
     &Aura::HandleNoReagentUseAura,                          //256 SPELL_AURA_NO_REAGENT_USE Use SpellClassMask for spell select
     &Aura::HandleNULL,                                      //257 SPELL_AURA_MOD_TARGET_RESIST_BY_SPELL_CLASS Use SpellClassMask for spell select
     &Aura::HandleNULL,                                      //258 SPELL_AURA_MOD_SPELL_VISUAL
@@ -321,7 +321,7 @@ pAuraHandler AuraHandler[TOTAL_AURAS]=
     &Aura::HandleAuraModAttackPowerOfStatPercent,           //268 SPELL_AURA_MOD_ATTACK_POWER_OF_STAT_PERCENT
     &Aura::HandleNoImmediateEffect,                         //269 SPELL_AURA_MOD_IGNORE_DAMAGE_REDUCTION_SCHOOL   implemented in Unit::CalcNotIgnoreDamageRedunction
     &Aura::HandleUnused,                                    //270 SPELL_AURA_MOD_IGNORE_TARGET_RESIST (unused in 3.2.2a)
-    &Aura::HandleNoImmediateEffect,                         //271 SPELL_AURA_MOD_DAMAGE_FROM_CASTER    implemented in Unit::SpellDamageBonus
+    &Aura::HandleNoImmediateEffect,                         //271 SPELL_AURA_MOD_DAMAGE_FROM_CASTER    implemented in Unit::SpellDamageBonusTaken
     &Aura::HandleNoImmediateEffect,                         //272 SPELL_AURA_MAELSTROM_WEAPON (unclear use for aura, it used in (3.2.2a...3.3.0) in single spell 53817 that spellmode stacked and charged spell expected to be drop as stack
     &Aura::HandleNoImmediateEffect,                         //273 SPELL_AURA_X_RAY (client side implementation)
     &Aura::HandleNULL,                                      //274 proc free shot?
@@ -333,7 +333,7 @@ pAuraHandler AuraHandler[TOTAL_AURAS]=
     &Aura::HandleModTargetArmorPct,                         //280 SPELL_AURA_MOD_TARGET_ARMOR_PCT
     &Aura::HandleNoImmediateEffect,                         //281 SPELL_AURA_MOD_HONOR_GAIN             implemented in Player::RewardHonor
     &Aura::HandleAuraIncreaseBaseHealthPercent,             //282 SPELL_AURA_INCREASE_BASE_HEALTH_PERCENT
-    &Aura::HandleNoImmediateEffect,                         //283 SPELL_AURA_MOD_HEALING_RECEIVED       implemented in Unit::SpellHealingBonus
+    &Aura::HandleNoImmediateEffect,                         //283 SPELL_AURA_MOD_HEALING_RECEIVED       implemented in Unit::SpellHealingBonusTaken
     &Aura::HandleNULL,                                      //284 51 spells
     &Aura::HandleAuraModAttackPowerOfArmor,                 //285 SPELL_AURA_MOD_ATTACK_POWER_OF_ARMOR  implemented in Player::UpdateAttackPowerAndDamage
     &Aura::HandleNoImmediateEffect,                         //286 SPELL_AURA_ABILITY_PERIODIC_CRIT      implemented in Aura::IsCritFromAbilityAura called from Aura::PeriodicTick
@@ -2386,8 +2386,13 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                 {
                     // prevent double apply bonuses
                     if (m_target->GetTypeId() != TYPEID_PLAYER || !((Player*)m_target)->GetSession()->PlayerLoading())
+                    {
                         if (Unit* caster = GetCaster())
-                            m_modifier.m_amount = caster->SpellHealingBonus(m_target, GetSpellProto(), m_modifier.m_amount, SPELL_DIRECT_DAMAGE);
+                        {
+                            m_modifier.m_amount = caster->SpellHealingBonusDone(m_target, GetSpellProto(), m_modifier.m_amount, SPELL_DIRECT_DAMAGE);
+                            m_modifier.m_amount = m_target->SpellHealingBonusTaken(caster, GetSpellProto(), m_modifier.m_amount, SPELL_DIRECT_DAMAGE);
+                        }
+                    }
                     return;
                 }
                 break;
@@ -2791,9 +2796,14 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                 if (apply)
                 {
                     if (Unit* caster = GetCaster())
+                    {
                         // prevent double apply bonuses
                         if (m_target->GetTypeId() != TYPEID_PLAYER || !((Player*)m_target)->GetSession()->PlayerLoading())
-                            m_modifier.m_amount = caster->SpellHealingBonus(m_target, GetSpellProto(), m_modifier.m_amount, SPELL_DIRECT_DAMAGE);
+                        {
+                            m_modifier.m_amount = caster->SpellHealingBonusDone(m_target, GetSpellProto(), m_modifier.m_amount, SPELL_DIRECT_DAMAGE);
+                            m_modifier.m_amount = m_target->SpellHealingBonusTaken(caster, GetSpellProto(), m_modifier.m_amount, SPELL_DIRECT_DAMAGE);
+                        }
+                    }
                 }
                 else
                 {
@@ -4804,11 +4814,13 @@ void Aura::HandlePeriodicHeal(bool apply, bool /*Real*/)
         if (m_spellProto->SpellIconID == 329 && m_spellProto->SpellVisual[0] == 7625)
         {
             int32 ap = int32 (0.22f * caster->GetTotalAttackPowerValue(BASE_ATTACK));
-            int32 holy = caster->SpellBaseDamageBonus(GetSpellSchoolMask(m_spellProto))
-                + caster->SpellBaseDamageBonusForVictim(GetSpellSchoolMask(m_spellProto), m_target);
+            int32 holy = caster->SpellBaseDamageBonusDone(GetSpellSchoolMask(m_spellProto))
+                + m_target->SpellBaseDamageBonusTaken(GetSpellSchoolMask(m_spellProto));
             holy = int32(holy * 377 / 1000);
             m_modifier.m_amount += ap > holy ? ap : holy;
         }
+
+        m_modifier.m_amount = caster->SpellHealingBonusDone(m_target, GetSpellProto(), m_modifier.m_amount, DOT, GetStackAmount());
     }
 }
 
@@ -4971,8 +4983,8 @@ void Aura::HandlePeriodicDamage(bool apply, bool Real)
                 {
                     // AP * 0.025 + SPH * 0.013 bonus per tick
                     float ap = caster->GetTotalAttackPowerValue(BASE_ATTACK);
-                    int32 holy = caster->SpellBaseDamageBonus(GetSpellSchoolMask(m_spellProto)) +
-                                 caster->SpellBaseDamageBonusForVictim(GetSpellSchoolMask(m_spellProto), GetTarget());
+                    int32 holy = caster->SpellBaseDamageBonusDone(GetSpellSchoolMask(m_spellProto)) +
+                                 GetTarget()->SpellBaseDamageBonusTaken(GetSpellSchoolMask(m_spellProto));
                     m_modifier.m_amount += int32(GetStackAmount()) * (int32(ap * 0.025f) + int32(holy * 13 / 1000));
                     return;
                 }
@@ -4980,6 +4992,19 @@ void Aura::HandlePeriodicDamage(bool apply, bool Real)
             }
             default:
                 break;
+        }
+
+        if(m_modifier.m_auraname == SPELL_AURA_PERIODIC_DAMAGE)
+        {
+            // SpellDamageBonusDone for magic spells
+            if(GetSpellProto()->DmgClass == SPELL_DAMAGE_CLASS_NONE || GetSpellProto()->DmgClass == SPELL_DAMAGE_CLASS_MAGIC)
+                m_modifier.m_amount = caster->SpellDamageBonusDone(m_target, GetSpellProto(), m_modifier.m_amount, DOT, GetStackAmount());
+            // MeleeDamagebonusDone for weapon based spells
+            else
+            {
+                WeaponAttackType attackType = GetWeaponAttackType(GetSpellProto());
+                m_modifier.m_amount = caster->MeleeDamageBonusDone(m_target, m_modifier.m_amount, attackType, GetSpellProto(), DOT, GetStackAmount());
+            }
         }
     }
     // remove time effects
@@ -4999,6 +5024,22 @@ void Aura::HandlePeriodicDamagePCT(bool apply, bool /*Real*/)
 void Aura::HandlePeriodicLeech(bool apply, bool /*Real*/)
 {
     m_isPeriodic = apply;
+    
+    // For prevent double apply bonuses
+    bool loading = (m_target->GetTypeId() == TYPEID_PLAYER && ((Player*)m_target)->GetSession()->PlayerLoading());
+
+    // Custom damage calculation after
+    if (apply)
+    {
+        if(loading)
+            return;
+
+        Unit *caster = GetCaster();
+        if (!caster)
+            return;
+
+        m_modifier.m_amount = caster->SpellDamageBonusDone(m_target, GetSpellProto(), m_modifier.m_amount, DOT, GetStackAmount());
+    }
 }
 
 void Aura::HandlePeriodicManaLeech(bool apply, bool /*Real*/)
@@ -5009,6 +5050,22 @@ void Aura::HandlePeriodicManaLeech(bool apply, bool /*Real*/)
 void Aura::HandlePeriodicHealthFunnel(bool apply, bool /*Real*/)
 {
     m_isPeriodic = apply;
+
+    // For prevent double apply bonuses
+    bool loading = (m_target->GetTypeId() == TYPEID_PLAYER && ((Player*)m_target)->GetSession()->PlayerLoading());
+
+    // Custom damage calculation after
+    if (apply)
+    {
+        if(loading)
+            return;
+
+        Unit *caster = GetCaster();
+        if (!caster)
+            return;
+
+        m_modifier.m_amount = caster->SpellDamageBonusDone(m_target, GetSpellProto(), m_modifier.m_amount, DOT, GetStackAmount());
+    }
 }
 
 /*********************************************************/
@@ -5146,7 +5203,7 @@ void Aura::HandleModSpellDamagePercentFromStat(bool /*apply*/, bool /*Real*/)
     if(m_target->GetTypeId() != TYPEID_PLAYER)
         return;
 
-    // Magic damage modifiers implemented in Unit::SpellDamageBonus
+    // Magic damage modifiers implemented in Unit::SpellDamageBonusDone
     // This information for client side use only
     // Recalculate bonus
     ((Player*)m_target)->UpdateSpellDamageAndHealingBonus();
@@ -5175,7 +5232,7 @@ void Aura::HandleModSpellDamagePercentFromAttackPower(bool /*apply*/, bool /*Rea
     if(m_target->GetTypeId() != TYPEID_PLAYER)
         return;
 
-    // Magic damage modifiers implemented in Unit::SpellDamageBonus
+    // Magic damage modifiers implemented in Unit::SpellDamageBonusDone
     // This information for client side use only
     // Recalculate bonus
     ((Player*)m_target)->UpdateSpellDamageAndHealingBonus();
@@ -5194,7 +5251,7 @@ void Aura::HandleModHealingDone(bool /*apply*/, bool /*Real*/)
 {
     if(m_target->GetTypeId() != TYPEID_PLAYER)
         return;
-    // implemented in Unit::SpellHealingBonus
+    // implemented in Unit::SpellHealingBonusDone
     // this information is for client side only
     ((Player*)m_target)->UpdateSpellDamageAndHealingBonus();
 }
@@ -5734,7 +5791,7 @@ void Aura::HandleModDamageDone(bool apply, bool Real)
         return;
     }
 
-    // Magic damage modifiers implemented in Unit::SpellDamageBonus
+    // Magic damage modifiers implemented in Unit::SpellDamageBonusDone
     // This information for client side use only
     if(m_target->GetTypeId() == TYPEID_PLAYER)
     {
@@ -5812,7 +5869,7 @@ void Aura::HandleModDamagePercentDone(bool apply, bool Real)
         return;
     }
 
-    // Magic damage percent modifiers implemented in Unit::SpellDamageBonus
+    // Magic damage percent modifiers implemented in Unit::SpellDamageBonusDone
     // Send info to client
     if(m_target->GetTypeId() == TYPEID_PLAYER)
         for(int i = SPELL_SCHOOL_HOLY; i < MAX_SPELL_SCHOOL; ++i)
@@ -6860,7 +6917,7 @@ void Aura::HandleSchoolAbsorb(bool apply, bool Real)
                     if (m_spellProto->SpellFamilyFlags & UI64LIT(0x0000000000000001))
                     {
                         //+80.68% from +spell bonus
-                        DoneActualBenefit = caster->SpellBaseHealingBonus(GetSpellSchoolMask(m_spellProto)) * 0.8068f;
+                        DoneActualBenefit = caster->SpellBaseHealingBonusDone(GetSpellSchoolMask(m_spellProto)) * 0.8068f;
                         //Borrowed Time
                         Unit::AuraList const& borrowedTime = caster->GetAurasByType(SPELL_AURA_DUMMY);
                         for(Unit::AuraList::const_iterator itr = borrowedTime.begin(); itr != borrowedTime.end(); ++itr)
@@ -6879,17 +6936,17 @@ void Aura::HandleSchoolAbsorb(bool apply, bool Real)
                     // Frost Ward, Fire Ward
                     if (m_spellProto->SpellFamilyFlags & UI64LIT(0x0000000000000108))
                         //+10% from +spell bonus
-                        DoneActualBenefit = caster->SpellBaseDamageBonus(GetSpellSchoolMask(m_spellProto)) * 0.1f;
+                        DoneActualBenefit = caster->SpellBaseDamageBonusDone(GetSpellSchoolMask(m_spellProto)) * 0.1f;
                     // Ice Barrier
                     else if (m_spellProto->SpellFamilyFlags & UI64LIT(0x0000000100000000))
                         //+80.67% from +spell bonus
-                        DoneActualBenefit = caster->SpellBaseDamageBonus(GetSpellSchoolMask(m_spellProto)) * 0.8067f;
+                        DoneActualBenefit = caster->SpellBaseDamageBonusDone(GetSpellSchoolMask(m_spellProto)) * 0.8067f;
                     break;
                 case SPELLFAMILY_WARLOCK:
                     // Shadow Ward
                     if (m_spellProto->SpellFamilyFlags2 & 0x00000040)
                         //+30% from +spell bonus
-                        DoneActualBenefit = caster->SpellBaseDamageBonus(GetSpellSchoolMask(m_spellProto)) * 0.30f;
+                        DoneActualBenefit = caster->SpellBaseDamageBonusDone(GetSpellSchoolMask(m_spellProto)) * 0.30f;
                     break;
                 case SPELLFAMILY_PALADIN:
                     // Sacred Shield
@@ -6897,7 +6954,7 @@ void Aura::HandleSchoolAbsorb(bool apply, bool Real)
                     if (m_spellProto->SpellFamilyFlags & UI64LIT(0x0008000000000000))
                     {
                         // +75% from spell power
-                        DoneActualBenefit = caster->SpellBaseHealingBonus(GetSpellSchoolMask(m_spellProto)) * 0.75f;
+                        DoneActualBenefit = caster->SpellBaseHealingBonusDone(GetSpellSchoolMask(m_spellProto)) * 0.75f;
                     }
                     break;
                 default:
@@ -7044,43 +7101,42 @@ void Aura::PeriodicTick()
             uint32 pdamage;
 
             if(m_modifier.m_auraname == SPELL_AURA_PERIODIC_DAMAGE)
-            {
                 pdamage = amount;
-
-                // SpellDamageBonus for magic spells
-                if(GetSpellProto()->DmgClass == SPELL_DAMAGE_CLASS_NONE || GetSpellProto()->DmgClass == SPELL_DAMAGE_CLASS_MAGIC)
-                    pdamage = pCaster->SpellDamageBonus(m_target, GetSpellProto(), pdamage, DOT, GetStackAmount());
-                // MeleeDamagebonus for weapon based spells
-                else
-                {
-                    WeaponAttackType attackType = GetWeaponAttackType(GetSpellProto());
-                    pdamage = pCaster->MeleeDamageBonus(m_target, pdamage, attackType, GetSpellProto(), DOT, GetStackAmount());
-                }
-
-                // Calculate armor mitigation if it is a physical spell
-                // But not for bleed mechanic spells
-                if (GetSpellSchoolMask(GetSpellProto()) & SPELL_SCHOOL_MASK_NORMAL &&
-                    GetEffectMechanic(GetSpellProto(), m_effIndex) != MECHANIC_BLEED)
-                {
-                    uint32 pdamageReductedArmor = pCaster->CalcArmorReducedDamage(m_target, pdamage);
-                    cleanDamage.damage += pdamage - pdamageReductedArmor;
-                    pdamage = pdamageReductedArmor;
-                }
-
-                // Curse of Agony damage-per-tick calculation
-                if (GetSpellProto()->SpellFamilyName==SPELLFAMILY_WARLOCK && (GetSpellProto()->SpellFamilyFlags & UI64LIT(0x0000000000000400)) && GetSpellProto()->SpellIconID==544)
-                {
-                    // 1..4 ticks, 1/2 from normal tick damage
-                    if (GetAuraTicks() <= 4)
-                        pdamage = pdamage/2;
-                    // 9..12 ticks, 3/2 from normal tick damage
-                    else if(GetAuraTicks() >= 9)
-                        pdamage += (pdamage + 1) / 2;       // +1 prevent 0.5 damage possible lost at 1..4 ticks
-                    // 5..8 ticks have normal tick damage
-                }
-            }
             else
                 pdamage = uint32(m_target->GetMaxHealth()*amount/100);
+
+            
+            // SpellDamageBonus for magic spells
+            if(GetSpellProto()->DmgClass == SPELL_DAMAGE_CLASS_NONE || GetSpellProto()->DmgClass == SPELL_DAMAGE_CLASS_MAGIC)
+                pdamage = m_target->SpellDamageBonusTaken(pCaster, GetSpellProto(), pdamage, DOT, GetStackAmount());
+            // MeleeDamagebonus for weapon based spells
+            else
+            {
+                WeaponAttackType attackType = GetWeaponAttackType(GetSpellProto());
+                pdamage = m_target->MeleeDamageBonusTaken(pCaster, pdamage, attackType, GetSpellProto(), DOT, GetStackAmount());
+            }
+
+            // Calculate armor mitigation if it is a physical spell
+            // But not for bleed mechanic spells
+            if (GetSpellSchoolMask(GetSpellProto()) & SPELL_SCHOOL_MASK_NORMAL &&
+                GetEffectMechanic(GetSpellProto(), m_effIndex) != MECHANIC_BLEED)
+            {
+                uint32 pdamageReductedArmor = pCaster->CalcArmorReducedDamage(m_target, pdamage);
+                cleanDamage.damage += pdamage - pdamageReductedArmor;
+                pdamage = pdamageReductedArmor;
+            }
+
+            // Curse of Agony damage-per-tick calculation
+            if (GetSpellProto()->SpellFamilyName==SPELLFAMILY_WARLOCK && (GetSpellProto()->SpellFamilyFlags & UI64LIT(0x0000000000000400)) && GetSpellProto()->SpellIconID==544)
+            {
+                // 1..4 ticks, 1/2 from normal tick damage
+                if (GetAuraTicks() <= 4)
+                    pdamage = pdamage/2;
+                // 9..12 ticks, 3/2 from normal tick damage
+                else if(GetAuraTicks() >= 9)
+                    pdamage += (pdamage + 1) / 2;       // +1 prevent 0.5 damage possible lost at 1..4 ticks
+                // 5..8 ticks have normal tick damage
+            }
 
             // This method can modify pdamage
             bool isCrit = IsCritFromAbilityAura(pCaster, pdamage);
@@ -7157,7 +7213,8 @@ void Aura::PeriodicTick()
                 pdamage = pdamageReductedArmor;
             }
 
-            pdamage = pCaster->SpellDamageBonus(m_target, GetSpellProto(), pdamage, DOT, GetStackAmount());
+            pdamage = m_target->SpellDamageBonusTaken(pCaster, GetSpellProto(), pdamage, DOT, GetStackAmount());
+
             bool isCrit = IsCritFromAbilityAura(pCaster, pdamage);
 
             // send critical in hit info for threat calculation
@@ -7204,7 +7261,7 @@ void Aura::PeriodicTick()
             if(Player *modOwner = pCaster->GetSpellModOwner())
                 modOwner->ApplySpellMod(GetId(), SPELLMOD_MULTIPLE_VALUE, multiplier);
 
-            int32 heal = pCaster->SpellHealingBonus(pCaster, GetSpellProto(), int32(new_damage * multiplier), DOT, GetStackAmount());
+            int32 heal = pCaster->SpellHealingBonusTaken(pCaster, GetSpellProto(), int32(new_damage * multiplier), DOT, GetStackAmount());
 
             int32 gain = pCaster->DealHeal(pCaster, heal, GetSpellProto());
             pCaster->getHostileRefManager().threatAssist(pCaster, gain * 0.5f, GetSpellProto());
@@ -7252,7 +7309,7 @@ void Aura::PeriodicTick()
                 }
             }
 
-            pdamage = pCaster->SpellHealingBonus(m_target, GetSpellProto(), pdamage, DOT, GetStackAmount());
+            pdamage = m_target->SpellHealingBonusTaken(pCaster, GetSpellProto(), pdamage, DOT, GetStackAmount());
 
             // This method can modify pdamage
             bool isCrit = IsCritFromAbilityAura(pCaster, pdamage);
@@ -8043,7 +8100,7 @@ void Aura::HandleManaShield(bool apply, bool Real)
                     {
                         // Mana Shield
                         // +50% from +spd bonus
-                        DoneActualBenefit = caster->SpellBaseDamageBonus(GetSpellSchoolMask(m_spellProto)) * 0.5f;
+                        DoneActualBenefit = caster->SpellBaseDamageBonusDone(GetSpellSchoolMask(m_spellProto)) * 0.5f;
                         break;
                     }
                     break;
