@@ -2621,19 +2621,6 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
             return;
         }
 
-        // Vampiric Touch
-        if ((GetSpellProto()->SpellFamilyFlags & UI64LIT(0x40000000000)) && m_removeMode==AURA_REMOVE_BY_DISPEL)
-        {
-            Unit* caster = GetCaster();
-            if (!caster)
-                return;
-
-            int32 basepoints = GetSpellProto()->EffectBasePoints[1] * 8;
-            basepoints = caster->SpellDamageBonus(m_target, GetSpellProto(), basepoints, DOT);
-            m_target->CastCustomSpell(m_target, 64085, &basepoints, NULL, NULL, false);
-            return;
-        }
-
         if (m_removeMode == AURA_REMOVE_BY_DEATH)
         {
             // Stop caster Arcane Missle chanelling on death
