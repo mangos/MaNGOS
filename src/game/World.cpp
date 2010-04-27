@@ -1380,16 +1380,11 @@ void World::Update(uint32 diff)
 
     /// Handle daily quests reset time
     if (m_gameTime > m_NextDailyQuestReset)
-    {
         ResetDailyQuests();
-        m_NextDailyQuestReset += DAY;
-    }
 
-    if(m_gameTime > m_NextWeeklyQuestReset)
-    {
+    /// Handle weekly quests reset time
+    if (m_gameTime > m_NextWeeklyQuestReset)
         ResetWeeklyQuests();
-        m_NextWeeklyQuestReset += WEEK;
-    }
 
     if (m_gameTime > m_NextRandomBGReset)
     {
