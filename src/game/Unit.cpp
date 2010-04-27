@@ -6956,6 +6956,51 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                 triggered_spell_id = 379;
                 break;
             }
+            // Flametongue Weapon (Passive)
+            if (dummySpell->SpellFamilyFlags & UI64LIT(0x200000))
+            {
+                if(GetTypeId()!=TYPEID_PLAYER)
+                    return false;
+
+                if(!castItem || !castItem->IsEquipped())
+                    return false;
+
+                //  firehit =  dummySpell->EffectBasePoints[0] / ((4*19.25) * 1.3);
+                float fire_onhit = dummySpell->EffectBasePoints[0] / 100.0;
+
+                float add_spellpower = SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FIRE) +
+                                                      pVictim->SpellBaseDamageBonusTaken(SPELL_SCHOOL_MASK_FIRE);
+
+                // 1.3speed = 5%, 2.6speed = 10%, 4.0 speed = 15%, so, 1.0speed = 3.84%
+                add_spellpower= add_spellpower / 100.0 * 3.84;
+
+                // Enchant on Off-Hand and ready?
+                if ( castItem->GetSlot() == EQUIPMENT_SLOT_OFFHAND && isAttackReady(OFF_ATTACK))
+                {
+                    float BaseWeaponSpeed = GetAttackTime(OFF_ATTACK)/1000.0;
+
+                    // Value1: add the tooltip damage by swingspeed + Value2: add spelldmg by swingspeed
+                    basepoints[0] = int32( (fire_onhit * BaseWeaponSpeed) + (add_spellpower * BaseWeaponSpeed) );
+                    triggered_spell_id = 10444;
+                }
+
+                // Enchant on Main-Hand and ready?
+                else if ( castItem->GetSlot() == EQUIPMENT_SLOT_MAINHAND && isAttackReady(BASE_ATTACK))
+                {
+                    float BaseWeaponSpeed = GetAttackTime(BASE_ATTACK)/1000.0;
+
+                    // Value1: add the tooltip damage by swingspeed +  Value2: add spelldmg by swingspeed
+                    basepoints[0] = int32( (fire_onhit * BaseWeaponSpeed) + (add_spellpower * BaseWeaponSpeed) );
+                    triggered_spell_id = 10444;
+                }
+
+                // If not ready, we should  return, shouldn't we?!
+                else
+                    return false;
+
+                CastCustomSpell(pVictim,triggered_spell_id,&basepoints[0],NULL,NULL,true,castItem,triggeredByAura);
+                return true;
+            }
             // Improved Water Shield
             if (dummySpell->SpellIconID == 2287)
             {
