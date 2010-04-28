@@ -2626,19 +2626,6 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
             return;
         }
 
-        // Vampiric Touch
-        if ((GetSpellProto()->SpellFamilyFlags & UI64LIT(0x40000000000)) && m_removeMode==AURA_REMOVE_BY_DISPEL)
-        {
-            Unit* caster = GetCaster();
-            if (!caster)
-                return;
-
-            int32 basepoints = GetSpellProto()->EffectBasePoints[1] * 8;
-            basepoints = caster->SpellDamageBonusDone(m_target, GetSpellProto(), basepoints, DOT);
-            m_target->CastCustomSpell(m_target, 64085, &basepoints, NULL, NULL, false);
-            return;
-        }
-
         if (m_removeMode == AURA_REMOVE_BY_DEATH)
         {
             // Stop caster Arcane Missle chanelling on death
@@ -6230,9 +6217,13 @@ void Aura::HandleShapeshiftBoosts(bool apply)
             break;
         case FORM_SHADOW:
             spellId1 = 49868;
+            spellId2 = 71167;
 
-            if(m_target->GetTypeId() == TYPEID_PLAYER)      // Spell 49868 have same category as main form spell and share cooldown
+            if(m_target->GetTypeId() == TYPEID_PLAYER)      // Spell 49868 and 71167 have same category as main form spell and share cooldown
+            {
                 ((Player*)m_target)->RemoveSpellCooldown(49868);
+                ((Player*)m_target)->RemoveSpellCooldown(71167);
+            }
             break;
         case FORM_GHOSTWOLF:
             spellId1 = 67116;
@@ -8171,6 +8162,30 @@ void Aura::PeriodicDummyTick()
                         case 2: m_target->CastSpell(m_target, 55739, true); break;
                     }
                     return;
+                case 66118:                                 // Leeching Swarm 10 man
+                case 68646:
+                {
+                    int32 damage = (m_modifier.m_amount * m_target->GetHealth()) / 100;
+                    if (damage < 250)
+                        damage = 250;
+                    int32 heal = damage * 68 / 100;
+                    m_target->CastCustomSpell(m_target, 66240, &damage, NULL, NULL, true, NULL, this);
+                    if (Unit* caster = GetCaster())
+                        m_target->CastCustomSpell(caster, 66125, &heal, NULL, NULL, true, NULL, this);
+                    return;
+                }
+                case 67630:                                 // Leeching Swarm 25 man
+                case 68647:
+                {
+                    int32 damage = (m_modifier.m_amount * m_target->GetHealth()) / 100;
+                    if (damage < 250)
+                        damage = 250;
+                    int32 heal = damage * 155 / 100;
+                    m_target->CastCustomSpell(m_target, 66240, &damage, NULL, NULL, true, NULL, this);
+                    if (Unit* caster = GetCaster())
+                        m_target->CastCustomSpell(caster, 66125, &heal, NULL, NULL, true, NULL, this);
+                    return;
+                }
 // Exist more after, need add later
                 default:
                     break;
@@ -8616,7 +8631,7 @@ void Aura::UnregisterSingleCastAura()
         else
         {
             sLog.outError("Couldn't find the caster of the single target aura (SpellId %u), may crash later!", GetId());
-            //ASSERT(false);
+            //ASSERTt(false);
         }
         m_isSingleTargetAura = false;
     }
