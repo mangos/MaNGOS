@@ -1497,14 +1497,12 @@ BattleGround * BattleGroundMgr::CreateNewBattleGround(BattleGroundTypeId bgTypeI
     }
 
     bool isRandom = false;
-    BattleGroundTypeId bgRandomTypeId = BattleGroundTypeId(0);
 
     if(bgTypeId==BATTLEGROUND_RB)
     {
         BattleGroundTypeId random_bgs[] = {BATTLEGROUND_AV, BATTLEGROUND_WS, BATTLEGROUND_AB, BATTLEGROUND_EY/*, BATTLEGROUND_SA, BATTLEGROUND_IC*/};
         uint32 bg_num = urand(0,3/*5*/);
         bgTypeId = random_bgs[bg_num];
-        bgRandomTypeId = bgTypeId;
         bg_template = GetBattleGroundTemplate(bgTypeId);
         if (!bg_template)
         {
@@ -1562,12 +1560,10 @@ BattleGround * BattleGroundMgr::CreateNewBattleGround(BattleGroundTypeId bgTypeI
             return 0;
     }
 
-    bgTypeId = isRandom ? BATTLEGROUND_RB : bgTypeId;
-
     // will also set m_bgMap, instanceid
     sMapMgr.CreateBgMap(bg->GetMapId(), bg);
 
-    bg->SetClientInstanceID(CreateClientVisibleInstanceId(bgTypeId, bracketEntry->GetBracketId()));
+    bg->SetClientInstanceID(CreateClientVisibleInstanceId(isRandom ? BATTLEGROUND_RB : bgTypeId, bracketEntry->GetBracketId()));
 
     // reset the new bg (set status to status_wait_queue from status_none)
     bg->Reset();
@@ -1578,8 +1574,8 @@ BattleGround * BattleGroundMgr::CreateNewBattleGround(BattleGroundTypeId bgTypeI
     bg->SetArenaType(arenaType);
     bg->SetRated(isRated);
     bg->SetRandom(isRandom);
-    bg->SetTypeID(bgTypeId);
-    bg->SetRandomTypeID(bgRandomTypeId);
+    bg->SetTypeID(isRandom ? BATTLEGROUND_RB : bgTypeId);
+    bg->SetRandomTypeID(bgTypeId);
 
     return bg;
 }
