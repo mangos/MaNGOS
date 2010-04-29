@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_9794_02_mangos_command` bit(1) default NULL
+  `required_9803_01_mangos_spell_bonus_data` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -14252,7 +14252,7 @@ INSERT INTO `spell_bonus_data` VALUES
 (34433, 0.65,   0,       0,     'Priest - Shadowfiend'),
 (585,   0.714,  0,       0,     'Priest - Smite'),
 (34914, 0,      0.4,     0,     'Priest - Vampiric Touch'),
-(64085, 0,      0,       0,     'Priest - Vampiric Touch Dispel'),
+(64085, 1.2,    0,       0,     'Priest - Vampiric Touch Dispel'),
 /* Shaman */
 (974,   0.4762, 0,       0,     'Shaman - Earth Shield'),
 (379,   0,      0,       0,     'Shaman - Earth Shield Triggered'),
