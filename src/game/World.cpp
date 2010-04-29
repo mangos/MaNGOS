@@ -734,7 +734,6 @@ void World::LoadConfigSettings(bool reload)
     setConfig(CONFIG_UINT32_BATTLEGROUND_INVITATION_TYPE,              "Battleground.InvitationType", 0);
     setConfig(CONFIG_UINT32_BATTLEGROUND_PREMATURE_FINISH_TIMER,       "BattleGround.PrematureFinishTimer", 5 * MINUTE * IN_MILLISECONDS);
     setConfig(CONFIG_UINT32_BATTLEGROUND_PREMADE_GROUP_WAIT_FOR_MATCH, "BattleGround.PremadeGroupWaitForMatch", 30 * MINUTE * IN_MILLISECONDS);
-    setConfigMinMax(CONFIG_UINT32_RANDOM_BG_RESET_HOUR,                "BattleGround.Random.ResetHour", 6, 0, 23);
     setConfig(CONFIG_UINT32_ARENA_MAX_RATING_DIFFERENCE,               "Arena.MaxRatingDifference", 150);
     setConfig(CONFIG_UINT32_ARENA_RATING_DISCARD_TIMER,                "Arena.RatingDiscardTimer", 10 * MINUTE * IN_MILLISECONDS);
     setConfig(CONFIG_BOOL_ARENA_AUTO_DISTRIBUTE_POINTS,                "Arena.AutoDistributePoints", false);
@@ -1299,9 +1298,6 @@ void World::SetInitialWorldSettings()
     sLog.outString("Calculate next weekly quest reset time..." );
     InitWeeklyQuestResetTime();
 
-    sLog.outString("Calculate random battleground reset time..." );
-    InitRandomBGResetTime();
-
     sLog.outString("Starting objects Pooling system..." );
     sPoolMgr.Initialize();
 
@@ -1389,12 +1385,6 @@ void World::Update(uint32 diff)
     {
         ResetWeeklyQuests();
         m_NextWeeklyQuestReset += WEEK;
-    }
-
-    if (m_gameTime > m_NextRandomBGReset)
-    {
-        ResetRandomBG();
-        m_NextRandomBGReset += DAY;
     }
 
     /// <ul><li> Handle auctions when the timer has passed
@@ -2058,37 +2048,6 @@ void World::InitDailyQuestResetTime()
         delete result;
 }
 
-void World::InitRandomBGResetTime()
-{
-    QueryResult * result = CharacterDatabase.Query("SELECT NextRandomBGResetTime FROM saved_variables");
-    if (!result)
-        m_NextRandomBGReset = time_t(time(NULL));         // game time not yet init
-    else
-        m_NextRandomBGReset = time_t((*result)[0].GetUInt64());
-
-    // generate time by config
-    time_t curTime = time(NULL);
-    tm localTm = *localtime(&curTime);
-    localTm.tm_hour = getConfig(CONFIG_UINT32_RANDOM_BG_RESET_HOUR);
-    localTm.tm_min  = 0;
-    localTm.tm_sec  = 0;
-
-    // current day reset time
-    time_t nextDayResetTime = mktime(&localTm);
-
-    // next reset time before current moment
-    if (curTime >= nextDayResetTime)
-        nextDayResetTime += DAY;
-
-    // normalize reset time
-    m_NextRandomBGReset = m_NextRandomBGReset < curTime ? nextDayResetTime - DAY : nextDayResetTime;
-
-    if (!result)
-        CharacterDatabase.PExecute("INSERT INTO saved_variables (NextRandomBGResetTime) VALUES ('"UI64FMTD"')", uint64(m_NextRandomBGReset));
-    else
-        delete result;
-}
-
 void World::ResetDailyQuests()
 {
     sLog.outDetail("Daily quests reset for all characters.");
@@ -2111,18 +2070,6 @@ void World::ResetWeeklyQuests()
 
     m_NextWeeklyQuestReset = time_t(m_NextWeeklyQuestReset + WEEK);
     CharacterDatabase.PExecute("UPDATE saved_variables SET NextWeeklyQuestResetTime = '"UI64FMTD"'", uint64(m_NextWeeklyQuestReset));
-}
-
-void World::ResetRandomBG()
-{
-    sLog.outDetail("Random BG status reset for all characters.");
-    CharacterDatabase.Execute("DELETE FROM character_battleground_random");
-    for(SessionMap::const_iterator itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
-        if (itr->second->GetPlayer())
-            itr->second->GetPlayer()->SetRandomWinner(false);
-
-    m_NextRandomBGReset = time_t(m_NextRandomBGReset + DAY);
-    CharacterDatabase.PExecute("UPDATE saved_variables SET NextRandomBGResetTime = '"UI64FMTD"'", uint64(m_NextRandomBGReset));
 }
 
 void World::SetPlayerLimit( int32 limit, bool needUpdate )
