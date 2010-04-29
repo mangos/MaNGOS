@@ -1319,7 +1319,7 @@ OpcodeHandler opcodeTable[NUM_MSG_TYPES] =
     /*0x50A*/ { "SMSG_CAMERA_SHAKE",                            STATUS_NEVER,    &WorldSession::Handle_ServerSide               },
     /*0x50B*/ { "SMSG_UNKNOWN_1291",                            STATUS_NEVER,    &WorldSession::Handle_ServerSide               },
     /*0x50C*/ { "UMSG_UNKNOWN_1292",                            STATUS_NEVER,    &WorldSession::Handle_NULL                     },
-    /*0x50D*/ { "UMSG_REDIRECT_CLIENT",                         STATUS_NEVER,    &WorldSession::Handle_NULL                     },
+    /*0x50D*/ { "SMSG_REDIRECT_CLIENT",                         STATUS_NEVER,    &WorldSession::Handle_NULL                     },
     /*0x50E*/ { "CMSG_UNKNOWN_1294",                            STATUS_NEVER,    &WorldSession::Handle_NULL                     },
     /*0x50F*/ { "UMSG_UNKNOWN_1295",                            STATUS_NEVER,    &WorldSession::Handle_NULL                     },
     /*0x510*/ { "CMSG_UNKNOWN_1296",                            STATUS_NEVER,    &WorldSession::Handle_NULL                     },
