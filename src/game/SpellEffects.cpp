@@ -5630,6 +5630,22 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     unitTarget->CastSpell(unitTarget, damage, false);
                     break;
                 }
+                case 52941:                                 // Song of Cleansing
+                {
+                    uint32 spellId = 0;
+
+                    switch(m_caster->GetAreaId())
+                    {
+                        case 4385: spellId = 52954; break;  // Bittertide Lake
+                        case 4290: spellId = 52958; break;  // River's Heart
+                        case 4388: spellId = 52959; break;  // Wintergrasp River
+                    }
+
+                    if (spellId)
+                        m_caster->CastSpell(m_caster, spellId, true);
+
+                    break;
+                }
                 case 54729:                                 // Winged Steed of the Ebon Blade
                 {
                     if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
