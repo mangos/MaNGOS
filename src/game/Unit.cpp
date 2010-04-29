@@ -4316,6 +4316,24 @@ void Unit::RemoveSingleAuraDueToSpellByDispel(uint32 spellId, uint64 casterGUID,
             caster->CastSpell(caster, triggeredSpell, true);
         return;
     }
+    // Vampiric touch (first dummy aura)
+    else if (spellEntry->SpellFamilyName == SPELLFAMILY_PRIEST && spellEntry->SpellFamilyFlags & UI64LIT(0x0000040000000000))
+    {
+        if (Aura *dot = GetAura(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_PRIEST, UI64LIT(0x0000040000000000), 0x00000000, casterGUID))
+        {
+            if(Unit* caster = dot->GetCaster())
+            {
+                int32 bp0 = dot->GetModifier()->m_amount;
+                bp0 = 8 * caster->SpellDamageBonus(this, spellEntry, bp0, DOT, 1);
+
+                // Remove spell auras from stack
+                RemoveSingleSpellAurasByCasterSpell(spellId, casterGUID, AURA_REMOVE_BY_DISPEL);
+
+                CastCustomSpell(this, 64085, &bp0, NULL, NULL, true, NULL, NULL, casterGUID);
+                return;
+            }
+        }
+    }
 
     RemoveSingleSpellAurasByCasterSpell(spellId, casterGUID, AURA_REMOVE_BY_DISPEL);
 }
