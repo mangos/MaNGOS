@@ -308,7 +308,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
             plMover->m_transport->RemovePassenger(plMover);
             plMover->m_transport = NULL;
         }
-        movementInfo.SetTransportData(0, 0.0f, 0.0f, 0.0f, 0.0f, 0, -1);
+        movementInfo.ClearTransportData();
         plMover->m_anti_TransportGUID = 0; // Movement anticheat
     }
 
@@ -632,7 +632,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
                     plMover->m_transport->RemovePassenger(plMover);
                     plMover->m_transport = NULL;
                 }
-                movementInfo.SetTransportData(0, 0.0f, 0.0f, 0.0f, 0.0f, 0, 0);
+                movementInfo.ClearTransportData();
                 plMover->m_anti_TransportGUID = 0;
             }
         }
