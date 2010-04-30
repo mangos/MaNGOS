@@ -22317,3 +22317,4 @@ void Player::_LoadRandomBGStatus(QueryResult *result)
         delete result;
     }
 }
+

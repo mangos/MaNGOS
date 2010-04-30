@@ -1560,8 +1560,6 @@ BattleGround * BattleGroundMgr::CreateNewBattleGround(BattleGroundTypeId bgTypeI
             return 0;
     }
 
-    bgTypeId = isRandom ? BATTLEGROUND_RB : bgTypeId;
-
     // will also set m_bgMap, instanceid
     sMapMgr.CreateBgMap(bg->GetMapId(), bg);
 
