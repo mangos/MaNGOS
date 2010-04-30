@@ -6961,54 +6961,6 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                 triggered_spell_id = 379;
                 break;
             }
-<<<<<<< HEAD:src/game/Unit.cpp
-            // Flametongue Weapon (Passive)
-            if (dummySpell->SpellFamilyFlags & UI64LIT(0x200000))
-            {
-                if(GetTypeId()!=TYPEID_PLAYER)
-                    return false;
-
-                if(!castItem || !castItem->IsEquipped())
-                    return false;
-
-                //  firehit =  dummySpell->EffectBasePoints[0] / ((4*19.25) * 1.3);
-                float fire_onhit = dummySpell->EffectBasePoints[0] / 100.0;
-
-                float add_spellpower = SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FIRE) +
-                                       pVictim->SpellBaseDamageBonusTaken(SPELL_SCHOOL_MASK_FIRE);
-
-                // 1.3speed = 5%, 2.6speed = 10%, 4.0 speed = 15%, so, 1.0speed = 3.84%
-                add_spellpower= add_spellpower / 100.0 * 3.84;
-
-                // Enchant on Off-Hand and ready?
-                if ( castItem->GetSlot() == EQUIPMENT_SLOT_OFFHAND && isAttackReady(OFF_ATTACK))
-                {
-                    float BaseWeaponSpeed = GetAttackTime(OFF_ATTACK)/1000.0;
-
-                    // Value1: add the tooltip damage by swingspeed + Value2: add spelldmg by swingspeed
-                    basepoints[0] = int32( (fire_onhit * BaseWeaponSpeed) + (add_spellpower * BaseWeaponSpeed) );
-                    triggered_spell_id = 10444;
-                }
-
-                // Enchant on Main-Hand and ready?
-                else if ( castItem->GetSlot() == EQUIPMENT_SLOT_MAINHAND && isAttackReady(BASE_ATTACK))
-                {
-                    float BaseWeaponSpeed = GetAttackTime(BASE_ATTACK)/1000.0;
-
-                    // Value1: add the tooltip damage by swingspeed +  Value2: add spelldmg by swingspeed
-                    basepoints[0] = int32( (fire_onhit * BaseWeaponSpeed) + (add_spellpower * BaseWeaponSpeed) );
-                    triggered_spell_id = 10444;
-                }
-
-                // If not ready, we should  return, shouldn't we?!
-                else
-                    return false;
-
-                CastCustomSpell(pVictim,triggered_spell_id,&basepoints[0],NULL,NULL,true,castItem,triggeredByAura);
-                return true;
-            }
-=======
->>>>>>> 7a2ed7529cba1396f2f9ef60b8201181c3c9cef8:src/game/Unit.cpp
             // Improved Water Shield
             if (dummySpell->SpellIconID == 2287)
             {
@@ -10052,19 +10004,7 @@ uint32 Unit::SpellHealingBonusDone(Unit *pVictim, SpellEntry const *spellProto, 
         if (bonus->ap_bonus)
             DoneTotal += int32(bonus->ap_bonus * GetTotalAttackPowerValue(BASE_ATTACK));
 
-<<<<<<< HEAD:src/game/Unit.cpp
-        // Spellmod SpellBonusDamage
-        if (modOwner)
-        {
-            coeff *= 100.0f;
-            modOwner->ApplySpellMod(spellProto->Id,SPELLMOD_SPELL_BONUS_DAMAGE,coeff);
-            coeff /= 100.0f;
-        }
-
-        DoneTotal  += int32(DoneAdvertisedBenefit * coeff);
-=======
         DoneTotal  += int32(DoneAdvertisedBenefit * coeff * SpellModSpellDamage);
->>>>>>> 7a2ed7529cba1396f2f9ef60b8201181c3c9cef8:src/game/Unit.cpp
     }
     // Default calculation
     else if (DoneAdvertisedBenefit)
@@ -10092,22 +10032,7 @@ uint32 Unit::SpellHealingBonusDone(Unit *pVictim, SpellEntry const *spellProto, 
                 break;
             }
         }
-<<<<<<< HEAD:src/game/Unit.cpp
-
-        float coeff = (CastingTime / 3500.0f) * DotFactor * 1.88f;
-
-        // Spellmod SpellBonusDamage
-        if (modOwner)
-        {
-            coeff *= 100.0f;
-            modOwner->ApplySpellMod(spellProto->Id,SPELLMOD_SPELL_BONUS_DAMAGE,coeff);
-            coeff /= 100.0f;
-        }
-
-        DoneTotal  += int32(DoneAdvertisedBenefit * coeff * LvlPenalty);
-=======
         DoneTotal  += int32(DoneAdvertisedBenefit * (CastingTime / 3500.0f) * DotFactor * LvlPenalty * SpellModSpellDamage * 1.88f);
->>>>>>> 7a2ed7529cba1396f2f9ef60b8201181c3c9cef8:src/game/Unit.cpp
     }
 
     // use float as more appropriate for negative values and percent applying

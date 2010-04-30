@@ -1839,13 +1839,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     // Shouldn't Appear in Combat Log
                     unitTarget->ModifyHealth(-damage);
 
-<<<<<<< HEAD:src/game/SpellEffects.cpp
-                    int32 spell_power = m_caster->SpellBaseDamageBonusDone(GetSpellSchoolMask(m_spellInfo)) +
-                                        unitTarget->SpellBaseDamageBonusTaken(GetSpellSchoolMask(m_spellInfo));
-                    int32 mana = damage + (spell_power * 5/10 * m_caster->CalculateLevelPenalty(m_spellInfo));
-=======
                     int32 mana = damage;
->>>>>>> 7a2ed7529cba1396f2f9ef60b8201181c3c9cef8:src/game/SpellEffects.cpp
                     // Improved Life Tap mod
                     Unit::AuraList const& auraDummy = m_caster->GetAurasByType(SPELL_AURA_DUMMY);
                     for(Unit::AuraList::const_iterator itr = auraDummy.begin(); itr != auraDummy.end(); ++itr)
