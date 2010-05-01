@@ -157,7 +157,7 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map *map, uint32 phaseMa
     return true;
 }
 
-void GameObject::Update(uint32 /*p_time*/)
+void GameObject::Update(uint32 diff)
 {
     if (GetObjectGuid().IsMOTransport())
     {
@@ -361,6 +361,20 @@ void GameObject::Update(uint32 /*p_time*/)
 
                         SetLootState(GO_JUST_DEACTIVATED);
                         m_cooldownTime = 0;
+                    }
+                    break;
+                case GAMEOBJECT_TYPE_CHEST:
+                    if (m_groupLootTimer)
+                    {
+                        if (m_groupLootTimer <= diff)
+                        {
+                            Group* group = sObjectMgr.GetGroupById(m_groupLootId);
+                            if (group)
+                                group->EndRoll();
+                            m_groupLootTimer = 0;
+                            m_groupLootId = 0;
+                        }
+                        else m_groupLootTimer -= diff;
                     }
                     break;
                 default:

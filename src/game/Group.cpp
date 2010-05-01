@@ -625,6 +625,11 @@ void Group::GroupLoot(ObjectGuid const& playerGUID, Loot *loot, WorldObject *pSo
                     GameObject *gameobject = (GameObject*)pSource;
                     group->SendLootStartRoll(60000, gameobject->GetMapId(), *r);
                     //need implement
+
+                    loot->items[itemSlot].is_blocked = true;
+
+                    gameobject->m_groupLootTimer = 60000;
+                    gameobject->m_groupLootId = GetId();
                    }
                 }
 
