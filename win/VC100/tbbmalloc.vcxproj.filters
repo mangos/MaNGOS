@@ -183,11 +183,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="..\..\dep\tbb\src\tbbmalloc\tbbmalloc.rc">
-      <Filter>Resource Files</Filter>
-    </ResourceCompile>
-  </ItemGroup>
-  <ItemGroup>
     <CustomBuild Include="..\..\dep\tbb\src\tbb\em64t-masm\atomic_support.asm">
       <Filter>Source Files</Filter>
     </CustomBuild>

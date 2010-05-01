@@ -961,7 +961,7 @@ void Aura::_AddAura()
     // Try find slot for aura
     uint8 slot = NULL_AURA_SLOT;
     // Lookup for some spell auras (and get slot from it)
-    for(uint8 i = 0; i < m_effIndex; ++i)
+    for(uint8 i = 0; i < MAX_EFFECT_INDEX; ++i)
     {
         Unit::spellEffectPair spair = Unit::spellEffectPair(GetId(), SpellEffectIndex(i));
         for(Unit::AuraMap::const_iterator itr = m_target->GetAuras().lower_bound(spair); itr != m_target->GetAuras().upper_bound(spair); ++itr)
