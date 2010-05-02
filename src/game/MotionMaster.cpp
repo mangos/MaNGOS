@@ -360,9 +360,17 @@ MotionMaster::MoveTaxiFlight(uint32 path, uint32 pathnode)
 {
     if(i_owner->GetTypeId()==TYPEID_PLAYER)
     {
-        DEBUG_LOG("%s taxi to (Path %u node %u)", i_owner->GetObjectGuid().GetString().c_str(), path, pathnode);
-        FlightPathMovementGenerator* mgen = new FlightPathMovementGenerator(path,pathnode);
-        Mutate(mgen);
+        if(path < sTaxiPathNodesByPath.size())
+        {
+            DEBUG_LOG("%s taxi to (Path %u node %u)", i_owner->GetObjectGuid().GetString().c_str(), path, pathnode);
+            FlightPathMovementGenerator* mgen = new FlightPathMovementGenerator(sTaxiPathNodesByPath[path],pathnode);
+            Mutate(mgen);
+        }
+        else
+        {
+            sLog.outError("%s attempt taxi to (not existed Path %u node %u)",
+                i_owner->GetObjectGuid().GetString().c_str(), path, pathnode );
+        }
     }
     else
     {

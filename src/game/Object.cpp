@@ -370,7 +370,7 @@ void Object::BuildMovementUpdate(ByteBuffer * data, uint16 updateFlags) const
                 }
             }
 
-            Path &path = fmg->GetPath();
+            TaxiPathNodeList const& path = fmg->GetPath();
 
             float x, y, z;
             player->GetPosition(x, y, z);
@@ -388,21 +388,21 @@ void Object::BuildMovementUpdate(ByteBuffer * data, uint16 updateFlags) const
 
             *data << uint32(0);                             // added in 3.1
 
-            uint32 poscount = uint32(path.Size());
+            uint32 poscount = uint32(path.size());
             *data << uint32(poscount);                      // points count
 
             for(uint32 i = 0; i < poscount; ++i)
             {
-                *data << float(path.GetNodes()[i].x);
-                *data << float(path.GetNodes()[i].y);
-                *data << float(path.GetNodes()[i].z);
+                *data << float(path[i].x);
+                *data << float(path[i].y);
+                *data << float(path[i].z);
             }
 
             *data << uint8(0);                              // splineMode
 
-            *data << float(path.GetNodes()[poscount-1].x);
-            *data << float(path.GetNodes()[poscount-1].y);
-            *data << float(path.GetNodes()[poscount-1].z);
+            *data << float(path[poscount-1].x);
+            *data << float(path[poscount-1].y);
+            *data << float(path[poscount-1].z);
         }
     }
     else
