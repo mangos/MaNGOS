@@ -215,7 +215,7 @@ void WorldSession::HandleMoveSplineDoneOpcode(WorldPacket& recv_data)
             flight->Interrupt(*GetPlayer());                // will reset at map landing
 
             flight->SetCurrentNodeAfterTeleport();
-            Path::PathNode const& node = flight->GetPath()[flight->GetCurrentNode()];
+            TaxiPathNodeEntry const& node = flight->GetPath()[flight->GetCurrentNode()];
             flight->SkipCurrentNode();
 
             GetPlayer()->TeleportTo(curDestNode->map_id,node.x,node.y,node.z,GetPlayer()->GetOrientation());
