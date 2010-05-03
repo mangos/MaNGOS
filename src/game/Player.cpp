@@ -8406,6 +8406,22 @@ void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
             break;
     }
     GetSession()->SendPacket(&data);
+    SendBGWeekendWorldStates();
+}
+
+void Player::SendBGWeekendWorldStates()
+{
+    for(int i = 1; i < sSpellStore.GetNumRows(); ++i)
+    {
+        BattlemasterListEntry const * bl = sBattlemasterListStore.LookupEntry(i);
+        if(bl && bl->HolidayWorldStateId)
+        {
+            if(BattleGroundMgr::IsBGWeekend((BattleGroundTypeId)bl->id))
+                SendUpdateWorldState(bl->HolidayWorldStateId,1);
+            else
+                SendUpdateWorldState(bl->HolidayWorldStateId,0);
+        }
+    }
 }
 
 uint32 Player::GetXPRestBonus(uint32 xp)

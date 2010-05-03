@@ -1989,6 +1989,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void SendInitWorldStates(uint32 zone, uint32 area);
         void SendUpdateWorldState(uint32 Field, uint32 Value);
         void SendDirectMessage(WorldPacket *data);
+        void SendBGWeekendWorldStates();
 
         void SendAurasForTarget(Unit *target);
 
