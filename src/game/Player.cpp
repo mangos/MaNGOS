@@ -491,8 +491,6 @@ Player::Player (WorldSession *session): Unit(), m_achievementMgr(this), m_reputa
     // Honor System
     m_lastHonorUpdateTime = time(NULL);
 
-    m_IsBGRandomWinner = false;
-
     // Player summoning
     m_summon_expire = 0;
     m_summon_mapid = 0;
@@ -7753,7 +7751,7 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
                 uint32 lootid =  go->GetGOInfo()->GetLootId();
                 if ((go->GetEntry() == BG_AV_OBJECTID_MINE_N || go->GetEntry() == BG_AV_OBJECTID_MINE_S))
                     if (BattleGround *bg = GetBattleGround())
-                        if (bg->GetTypeID(true) == BATTLEGROUND_AV)
+                        if (bg->GetTypeID() == BATTLEGROUND_AV)
                             if (!(((BattleGroundAV*)bg)->PlayerCanDoMineQuest(go->GetEntry(), GetTeam())))
                             {
                                 SendLootRelease(guid);
@@ -7828,7 +7826,7 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
                 bones->lootForBody = true;
                 uint32 pLevel = bones->loot.gold;
                 bones->loot.clear();
-                if (GetBattleGround() && GetBattleGround()->GetTypeID(true) == BATTLEGROUND_AV)
+                if (GetBattleGround()->GetTypeID() == BATTLEGROUND_AV)
                     loot->FillLoot(0, LootTemplates_Creature, this, false);
                 // It may need a better formula
                 // Now it works like this: lvl10: ~6copper, lvl70: ~9silver
@@ -8121,7 +8119,7 @@ void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
         case 2257:
             break;
         case 2597:                                          // AV
-            if (bg && bg->GetTypeID(true) == BATTLEGROUND_AV)
+            if (bg && bg->GetTypeID() == BATTLEGROUND_AV)
                 bg->FillInitialWorldStates(data);
             else
             {
@@ -8203,7 +8201,7 @@ void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
             }
             break;
         case 3277:                                          // WS
-            if (bg && bg->GetTypeID(true) == BATTLEGROUND_WS)
+            if (bg && bg->GetTypeID() == BATTLEGROUND_WS)
                 bg->FillInitialWorldStates(data);
             else
             {
@@ -8218,7 +8216,7 @@ void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
             }
             break;
         case 3358:                                          // AB
-            if (bg && bg->GetTypeID(true) == BATTLEGROUND_AB)
+            if (bg && bg->GetTypeID() == BATTLEGROUND_AB)
                 bg->FillInitialWorldStates(data);
             else
             {
@@ -8257,7 +8255,7 @@ void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
             }
             break;
         case 3820:                                          // EY
-            if (bg && bg->GetTypeID(true) == BATTLEGROUND_EY)
+            if (bg && bg->GetTypeID() == BATTLEGROUND_EY)
                 bg->FillInitialWorldStates(data);
             else
             {
@@ -8369,7 +8367,7 @@ void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
             data << uint32(0xa5f) << uint32(0x0);           // 35
             break;
         case 3698:                                          // Nagrand Arena
-            if (bg && bg->GetTypeID(true) == BATTLEGROUND_NA)
+            if (bg && bg->GetTypeID() == BATTLEGROUND_NA)
                 bg->FillInitialWorldStates(data);
             else
             {
@@ -8379,7 +8377,7 @@ void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
             }
             break;
         case 3702:                                          // Blade's Edge Arena
-            if (bg && bg->GetTypeID(true) == BATTLEGROUND_BE)
+            if (bg && bg->GetTypeID() == BATTLEGROUND_BE)
                 bg->FillInitialWorldStates(data);
             else
             {
@@ -8389,7 +8387,7 @@ void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
             }
             break;
         case 3968:                                          // Ruins of Lordaeron
-            if (bg && bg->GetTypeID(true) == BATTLEGROUND_RL)
+            if (bg && bg->GetTypeID() == BATTLEGROUND_RL)
                 bg->FillInitialWorldStates(data);
             else
             {
@@ -13490,7 +13488,7 @@ void Player::RewardQuest( Quest const *pQuest, uint32 reward, Object* questGiver
     RemoveTimedQuest(quest_id);
 
     if (BattleGround* bg = GetBattleGround())
-        if (bg->GetTypeID(true) == BATTLEGROUND_AV)
+        if (bg->GetTypeID() == BATTLEGROUND_AV)
             ((BattleGroundAV*)bg)->HandleQuestComplete(pQuest->GetQuestId(), this);
 
     if (pQuest->GetRewChoiceItemsCount() > 0)
@@ -15072,10 +15070,10 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
 
         if(player_at_bg && currentBg->GetStatus() != STATUS_WAIT_LEAVE)
         {
-            BattleGroundQueueTypeId bgQueueTypeId = BattleGroundMgr::BGQueueTypeId(currentBg->GetTypeID(true), currentBg->GetArenaType());
+            BattleGroundQueueTypeId bgQueueTypeId = BattleGroundMgr::BGQueueTypeId(currentBg->GetTypeID(), currentBg->GetArenaType());
             AddBattleGroundQueueId(bgQueueTypeId);
 
-            m_bgData.bgTypeID = currentBg->GetTypeID(true);
+            m_bgData.bgTypeID = currentBg->GetTypeID();
 
             //join player to battleground group
             currentBg->EventPlayerLoggedIn(this, GetGUID());
@@ -15324,7 +15322,6 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
     _LoadQuestStatus(holder->GetResult(PLAYER_LOGIN_QUERY_LOADQUESTSTATUS));
     _LoadDailyQuestStatus(holder->GetResult(PLAYER_LOGIN_QUERY_LOADDAILYQUESTSTATUS));
     _LoadWeeklyQuestStatus(holder->GetResult(PLAYER_LOGIN_QUERY_LOADWEEKLYQUESTSTATUS));
-    _LoadRandomBGStatus(holder->GetResult(PLAYER_LOGIN_QUERY_LOADRANDOMBG));
 
     _LoadTalents(holder->GetResult(PLAYER_LOGIN_QUERY_LOADTALENTS));
 
@@ -22194,22 +22191,3 @@ void Player::SetRestType( RestType n_r_type, uint32 areaTriggerId /*= 0*/)
             SetFFAPvP(false);
     }
 }
-
-void Player::SetRandomWinner(bool isWinner)
-{
-    m_IsBGRandomWinner = isWinner;
-    if(m_IsBGRandomWinner)
-        CharacterDatabase.PExecute("INSERT INTO character_battleground_random (guid) VALUES ('%u')", GetGUIDLow());
-}
-
-void Player::_LoadRandomBGStatus(QueryResult *result)
-{
-    //QueryResult *result = CharacterDatabase.PQuery("SELECT guid FROM character_battleground_random WHERE guid = '%u'", GetGUIDLow());
-
-    if (result)
-    {
-        m_IsBGRandomWinner = true;
-        delete result;
-    }
-}
-
