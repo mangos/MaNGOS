@@ -421,7 +421,7 @@ uint32 GameEventMgr::Initialize()                           // return the next e
 {
     m_ActiveEvents.clear();
     uint32 delay = Update();
-    sLog.outBasic("Game Event system initialized." );
+    BASIC_LOG("Game Event system initialized." );
     m_IsGameEventsInit = true;
     return delay;
 }
@@ -435,13 +435,13 @@ uint32 GameEventMgr::Update()                               // return the next e
         //sLog.outErrorDb("Checking event %u",itr);
         if (CheckOneGameEvent(itr))
         {
-            //sLog.outDebug("GameEvent %u is active",itr->first);
+            //DEBUG_LOG("GameEvent %u is active",itr->first);
             if (!IsActiveEvent(itr))
                 StartEvent(itr);
         }
         else
         {
-            //sLog.outDebug("GameEvent %u is not active",itr->first);
+            //DEBUG_LOG("GameEvent %u is not active",itr->first);
             if (IsActiveEvent(itr))
                 StopEvent(itr);
             else
@@ -461,7 +461,7 @@ uint32 GameEventMgr::Update()                               // return the next e
         if (calcDelay < nextEventDelay)
             nextEventDelay = calcDelay;
     }
-    sLog.outBasic("Next game event check in %u seconds.", nextEventDelay + 1);
+    BASIC_LOG("Next game event check in %u seconds.", nextEventDelay + 1);
     return (nextEventDelay + 1) * IN_MILLISECONDS;           // Add 1 second to be sure event has started/stopped at next call
 }
 
@@ -520,7 +520,7 @@ void GameEventMgr::GameEventSpawn(int16 event_id)
             if(!map->Instanceable() && map->IsLoaded(data->posX,data->posY))
             {
                 Creature* pCreature = new Creature;
-                //sLog.outDebug("Spawning creature %u",*itr);
+                //DEBUG_LOG("Spawning creature %u",*itr);
                 if (!pCreature->LoadFromDB(*itr, map))
                 {
                     delete pCreature;
@@ -553,7 +553,7 @@ void GameEventMgr::GameEventSpawn(int16 event_id)
             if(!map->Instanceable() && map->IsLoaded(data->posX, data->posY))
             {
                 GameObject* pGameobject = new GameObject;
-                //sLog.outDebug("Spawning gameobject %u", *itr);
+                //DEBUG_LOG("Spawning gameobject %u", *itr);
                 if (!pGameobject->LoadFromDB(*itr, map))
                 {
                     delete pGameobject;

@@ -310,7 +310,7 @@ void PoolGroup<Creature>::Spawn1Object(PoolObject* obj, bool instantly)
         if (!map->Instanceable() && map->IsLoaded(data->posX, data->posY))
         {
             Creature* pCreature = new Creature;
-            //sLog.outDebug("Spawning creature %u",obj->guid);
+            //DEBUG_LOG("Spawning creature %u",obj->guid);
             if (!pCreature->LoadFromDB(obj->guid, map))
             {
                 delete pCreature;
@@ -351,7 +351,7 @@ void PoolGroup<GameObject>::Spawn1Object(PoolObject* obj, bool instantly)
         if (!map->Instanceable() && map->IsLoaded(data->posX, data->posY))
         {
             GameObject* pGameobject = new GameObject;
-            //sLog.outDebug("Spawning gameobject %u", obj->guid);
+            //DEBUG_LOG("Spawning gameobject %u", obj->guid);
             if (!pGameobject->LoadFromDB(obj->guid, map))
             {
                 delete pGameobject;
@@ -714,7 +714,7 @@ void PoolManager::Initialize()
         delete result;
     }
 
-    sLog.outBasic("Pool handling system initialized, %u pools spawned.", count);
+    BASIC_LOG("Pool handling system initialized, %u pools spawned.", count);
 }
 
 // Call to spawn a pool, if cache if true the method will spawn only if cached entry is different

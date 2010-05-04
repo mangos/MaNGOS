@@ -33,7 +33,7 @@
 
 void WorldSession::HandleAutostoreLootItemOpcode( WorldPacket & recv_data )
 {
-    sLog.outDebug("WORLD: CMSG_AUTOSTORE_LOOT_ITEM");
+    DEBUG_LOG("WORLD: CMSG_AUTOSTORE_LOOT_ITEM");
     Player  *player =   GetPlayer();
     ObjectGuid lguid = player->GetLootGUID();
     Loot    *loot;
@@ -171,7 +171,7 @@ void WorldSession::HandleAutostoreLootItemOpcode( WorldPacket & recv_data )
 
 void WorldSession::HandleLootMoneyOpcode( WorldPacket & /*recv_data*/ )
 {
-    sLog.outDebug("WORLD: CMSG_LOOT_MONEY");
+    DEBUG_LOG("WORLD: CMSG_LOOT_MONEY");
 
     Player *player = GetPlayer();
     ObjectGuid guid = player->GetLootGUID();
@@ -262,7 +262,7 @@ void WorldSession::HandleLootMoneyOpcode( WorldPacket & /*recv_data*/ )
 
 void WorldSession::HandleLootOpcode( WorldPacket & recv_data )
 {
-    sLog.outDebug("WORLD: CMSG_LOOT");
+    DEBUG_LOG("WORLD: CMSG_LOOT");
 
     uint64 guid;
     recv_data >> guid;
@@ -276,7 +276,7 @@ void WorldSession::HandleLootOpcode( WorldPacket & recv_data )
 
 void WorldSession::HandleLootReleaseOpcode( WorldPacket & recv_data )
 {
-    sLog.outDebug("WORLD: CMSG_LOOT_RELEASE");
+    DEBUG_LOG("WORLD: CMSG_LOOT_RELEASE");
 
     // cheaters can modify lguid to prevent correct apply loot release code and re-loot
     // use internal stored guid
@@ -481,7 +481,7 @@ void WorldSession::HandleLootMasterGiveOpcode( WorldPacket & recv_data )
     if(!target)
         return;
 
-    sLog.outDebug("WorldSession::HandleLootMasterGiveOpcode (CMSG_LOOT_MASTER_GIVE, 0x02A3) Target = %s [%s].", target_playerguid.GetString().c_str(), target->GetName());
+    DEBUG_LOG("WorldSession::HandleLootMasterGiveOpcode (CMSG_LOOT_MASTER_GIVE, 0x02A3) Target = %s [%s].", target_playerguid.GetString().c_str(), target->GetName());
 
     if(_player->GetLootGUID() != lootguid.GetRawValue())
         return;
@@ -509,7 +509,7 @@ void WorldSession::HandleLootMasterGiveOpcode( WorldPacket & recv_data )
 
     if (slotid > pLoot->items.size())
     {
-        sLog.outDebug("AutoLootItem: Player %s might be using a hack! (slot %d, size %lu)",GetPlayer()->GetName(), slotid, (unsigned long)pLoot->items.size());
+        DEBUG_LOG("AutoLootItem: Player %s might be using a hack! (slot %d, size %lu)",GetPlayer()->GetName(), slotid, (unsigned long)pLoot->items.size());
         return;
     }
 

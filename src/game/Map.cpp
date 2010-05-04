@@ -125,10 +125,10 @@ void Map::LoadVMap(int gx,int gy)
     switch(vmapLoadResult)
     {
         case VMAP::VMAP_LOAD_RESULT_OK:
-            sLog.outDetail("VMAP loaded name:%s, id:%d, x:%d, y:%d (vmap rep.: x:%d, y:%d)", GetMapName(), GetId(), gx,gy,gx,gy);
+            DETAIL_LOG("VMAP loaded name:%s, id:%d, x:%d, y:%d (vmap rep.: x:%d, y:%d)", GetMapName(), GetId(), gx,gy,gx,gy);
             break;
         case VMAP::VMAP_LOAD_RESULT_ERROR:
-            sLog.outDetail("Could not load VMAP name:%s, id:%d, x:%d, y:%d (vmap rep.: x:%d, y:%d)", GetMapName(), GetId(), gx,gy,gx,gy);
+            DETAIL_LOG("Could not load VMAP name:%s, id:%d, x:%d, y:%d (vmap rep.: x:%d, y:%d)", GetMapName(), GetId(), gx,gy,gx,gy);
             break;
         case VMAP::VMAP_LOAD_RESULT_IGNORED:
             DEBUG_LOG("Ignored VMAP name:%s, id:%d, x:%d, y:%d (vmap rep.: x:%d, y:%d)", GetMapName(), GetId(), gx,gy,gx,gy);
@@ -158,7 +158,7 @@ void Map::LoadMap(int gx,int gy, bool reload)
     //map already load, delete it before reloading (Is it necessary? Do we really need the ability the reload maps during runtime?)
     if(GridMaps[gx][gy])
     {
-        sLog.outDetail("Unloading already loaded map %u before reloading.",i_id);
+        DETAIL_LOG("Unloading already loaded map %u before reloading.",i_id);
         delete (GridMaps[gx][gy]);
         GridMaps[gx][gy]=NULL;
     }
@@ -168,7 +168,7 @@ void Map::LoadMap(int gx,int gy, bool reload)
     int len = sWorld.GetDataPath().length()+strlen("maps/%03u%02u%02u.map")+1;
     tmp = new char[len];
     snprintf(tmp, len, (char *)(sWorld.GetDataPath()+"maps/%03u%02u%02u.map").c_str(),i_id,gx,gy);
-    sLog.outDetail("Loading map %s",tmp);
+    DETAIL_LOG("Loading map %s",tmp);
     // loading data
     GridMaps[gx][gy] = new GridMap();
     if (!GridMaps[gx][gy]->loadData(tmp))
@@ -384,11 +384,11 @@ Map::EnsureGridLoadedAtEnter(const Cell &cell, Player *player)
 
         if (player)
         {
-            DEBUG_LOG("Player %s enter cell[%u,%u] triggers of loading grid[%u,%u] on map %u", player->GetName(), cell.CellX(), cell.CellY(), cell.GridX(), cell.GridY(), i_id);
+            DEBUG_FILTER_LOG(LOG_FILTER_PLAYER_MOVES, "Player %s enter cell[%u,%u] triggers of loading grid[%u,%u] on map %u", player->GetName(), cell.CellX(), cell.CellY(), cell.GridX(), cell.GridY(), i_id);
         }
         else
         {
-            DEBUG_LOG("Active object nearby triggers of loading grid [%u,%u] on map %u", cell.GridX(), cell.GridY(), i_id);
+            DEBUG_FILTER_LOG(LOG_FILTER_PLAYER_MOVES, "Active object nearby triggers of loading grid [%u,%u] on map %u", cell.GridX(), cell.GridY(), i_id);
         }
 
         ResetGridExpiry(*getNGrid(cell.GridX(), cell.GridY()), 0.1f);
@@ -751,7 +751,7 @@ void Map::Remove(Player *player, bool remove)
         return;
     }
 
-    DEBUG_LOG("Remove player %s from grid[%u,%u]", player->GetName(), cell.GridX(), cell.GridY());
+    DEBUG_FILTER_LOG(LOG_FILTER_PLAYER_MOVES, "Remove player %s from grid[%u,%u]", player->GetName(), cell.GridX(), cell.GridY());
     NGridType *grid = getNGrid(cell.GridX(), cell.GridY());
     ASSERT(grid != NULL);
 
@@ -824,7 +824,7 @@ Map::PlayerRelocation(Player *player, float x, float y, float z, float orientati
 
     if( old_cell.DiffGrid(new_cell) || old_cell.DiffCell(new_cell) )
     {
-        DEBUG_LOG("Player %s relocation grid[%u,%u]cell[%u,%u]->grid[%u,%u]cell[%u,%u]", player->GetName(), old_cell.GridX(), old_cell.GridY(), old_cell.CellX(), old_cell.CellY(), new_cell.GridX(), new_cell.GridY(), new_cell.CellX(), new_cell.CellY());
+        DEBUG_FILTER_LOG(LOG_FILTER_PLAYER_MOVES, "Player %s relocation grid[%u,%u]cell[%u,%u]->grid[%u,%u]cell[%u,%u]", player->GetName(), old_cell.GridX(), old_cell.GridY(), old_cell.CellX(), old_cell.CellY(), new_cell.GridX(), new_cell.GridY(), new_cell.CellX(), new_cell.CellY());
 
         // update player position for group at taxi flight
         if(player->GetGroup() && player->isInFlight())
@@ -2032,7 +2032,7 @@ void Map::PlayerRelocationNotify( Player* player, Cell cell, CellPair cellpair )
 
 void Map::SendInitSelf( Player * player )
 {
-    sLog.outDetail("Creating player data for himself %u", player->GetGUIDLow());
+    DETAIL_LOG("Creating player data for himself %u", player->GetGUIDLow());
 
     UpdateData data;
 
@@ -2129,7 +2129,7 @@ void Map::AddObjectToRemoveList(WorldObject *obj)
     obj->CleanupsBeforeDelete();                            // remove or simplify at least cross referenced links
 
     i_objectsToRemove.insert(obj);
-    //sLog.outDebug("Object (GUID: %u TypeId: %u ) added to removing list.",obj->GetGUIDLow(),obj->GetTypeId());
+    //DEBUG_LOG("Object (GUID: %u TypeId: %u ) added to removing list.",obj->GetGUIDLow(),obj->GetTypeId());
 }
 
 void Map::RemoveAllObjectsInRemoveList()
@@ -2137,7 +2137,7 @@ void Map::RemoveAllObjectsInRemoveList()
     if(i_objectsToRemove.empty())
         return;
 
-    //sLog.outDebug("Object remover 1 check.");
+    //DEBUG_LOG("Object remover 1 check.");
     while(!i_objectsToRemove.empty())
     {
         WorldObject* obj = *i_objectsToRemove.begin();
@@ -2169,7 +2169,7 @@ void Map::RemoveAllObjectsInRemoveList()
                 break;
         }
     }
-    //sLog.outDebug("Object remover 2 check.");
+    //DEBUG_LOG("Object remover 2 check.");
 }
 
 uint32 Map::GetPlayersCountExceptGMs() const
@@ -2325,7 +2325,7 @@ bool InstanceMap::CanEnter(Player *player)
     uint32 maxPlayers = GetMaxPlayers();
     if (!player->isGameMaster() && GetPlayersCountExceptGMs() >= maxPlayers)
     {
-        sLog.outDetail("MAP: Instance '%u' of map '%s' cannot have more than '%u' players. Player '%s' rejected", GetInstanceId(), GetMapName(), maxPlayers, player->GetName());
+        DETAIL_LOG("MAP: Instance '%u' of map '%s' cannot have more than '%u' players. Player '%s' rejected", GetInstanceId(), GetMapName(), maxPlayers, player->GetName());
         player->SendTransferAborted(GetId(), TRANSFER_ABORT_MAX_PLAYERS);
         return false;
     }
@@ -2362,7 +2362,7 @@ bool InstanceMap::Add(Player *player)
             InstanceSave *mapSave = sInstanceSaveMgr.GetInstanceSave(GetInstanceId());
             if(!mapSave)
             {
-                sLog.outDetail("InstanceMap::Add: creating instance save for map %d spawnmode %d with instance id %d", GetId(), GetSpawnMode(), GetInstanceId());
+                DETAIL_LOG("InstanceMap::Add: creating instance save for map %d spawnmode %d with instance id %d", GetId(), GetSpawnMode(), GetInstanceId());
                 mapSave = sInstanceSaveMgr.AddInstanceSave(GetId(), GetInstanceId(), Difficulty(GetSpawnMode()), 0, true);
             }
 
@@ -2436,7 +2436,7 @@ bool InstanceMap::Add(Player *player)
         // first player enters (no players yet)
         SetResetSchedule(false);
 
-        sLog.outDetail("MAP: Player '%s' is entering instance '%u' of map '%s'", player->GetName(), GetInstanceId(), GetMapName());
+        DETAIL_LOG("MAP: Player '%s' is entering instance '%u' of map '%s'", player->GetName(), GetInstanceId(), GetMapName());
         // initialize unload state
         m_unloadTimer = 0;
         m_resetAfterUnload = false;
@@ -2469,7 +2469,7 @@ void BattleGroundMap::Update(const uint32& diff)
 
 void InstanceMap::Remove(Player *player, bool remove)
 {
-    sLog.outDetail("MAP: Removing player '%s' from instance '%u' of map '%s' before relocating to other map", player->GetName(), GetInstanceId(), GetMapName());
+    DETAIL_LOG("MAP: Removing player '%s' from instance '%u' of map '%s' before relocating to other map", player->GetName(), GetInstanceId(), GetMapName());
     //if last player set unload timer
     if(!m_unloadTimer && m_mapRefManager.getSize() == 1)
         m_unloadTimer = m_unloadWhenEmpty ? MIN_UNLOAD_DELAY : std::max(sWorld.getConfig(CONFIG_UINT32_INSTANCE_UNLOAD_DELAY), (uint32)MIN_UNLOAD_DELAY);
@@ -2503,7 +2503,7 @@ void InstanceMap::CreateInstanceData(bool load)
             const char* data = fields[0].GetString();
             if(data)
             {
-                sLog.outDebug("Loading instance data for `%s` with id %u", sObjectMgr.GetScriptName(i_script_id), i_InstanceId);
+                DEBUG_LOG("Loading instance data for `%s` with id %u", sObjectMgr.GetScriptName(i_script_id), i_InstanceId);
                 i_data->Load(data);
             }
             delete result;
@@ -2511,7 +2511,7 @@ void InstanceMap::CreateInstanceData(bool load)
     }
     else
     {
-        sLog.outDebug("New instance data, \"%s\" ,initialized!", sObjectMgr.GetScriptName(i_script_id));
+        DEBUG_LOG("New instance data, \"%s\" ,initialized!", sObjectMgr.GetScriptName(i_script_id));
         i_data->Initialize();
     }
 }
@@ -2678,7 +2678,7 @@ bool BattleGroundMap::Add(Player * player)
 
 void BattleGroundMap::Remove(Player *player, bool remove)
 {
-    sLog.outDetail("MAP: Removing player '%s' from bg '%u' of map '%s' before relocating to other map", player->GetName(), GetInstanceId(), GetMapName());
+    DETAIL_LOG("MAP: Removing player '%s' from bg '%u' of map '%s' before relocating to other map", player->GetName(), GetInstanceId(), GetMapName());
     Map::Remove(player, remove);
 }
 

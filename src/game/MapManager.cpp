@@ -181,7 +181,7 @@ bool MapManager::CanPlayerEnter(uint32 mapid, Player* player)
                     // probably there must be special opcode, because client has this string constant in GlobalStrings.lua
                     // TODO: this is not a good place to send the message
                     player->GetSession()->SendAreaTriggerMessage("You must be in a raid group to enter %s instance", mapName);
-                    sLog.outDebug("MAP: Player '%s' must be in a raid group to enter instance of '%s'", player->GetName(), mapName);
+                    DEBUG_LOG("MAP: Player '%s' must be in a raid group to enter instance of '%s'", player->GetName(), mapName);
                     return false;
                 }
             }
@@ -218,21 +218,21 @@ bool MapManager::CanPlayerEnter(uint32 mapid, Player* player)
                 if (!instance_map)
                 {
                     player->GetSession()->SendAreaTriggerMessage("You cannot enter %s while in a ghost mode", mapName);
-                    sLog.outDebug("MAP: Player '%s' doesn't has a corpse in instance '%s' and can't enter", player->GetName(), mapName);
+                    DEBUG_LOG("MAP: Player '%s' doesn't has a corpse in instance '%s' and can't enter", player->GetName(), mapName);
                     return false;
                 }
-                sLog.outDebug("MAP: Player '%s' has corpse in instance '%s' and can enter", player->GetName(), mapName);
+                DEBUG_LOG("MAP: Player '%s' has corpse in instance '%s' and can enter", player->GetName(), mapName);
             }
             else
             {
-                sLog.outDebug("Map::CanEnter - player '%s' is dead but doesn't have a corpse!", player->GetName());
+                DEBUG_LOG("Map::CanEnter - player '%s' is dead but doesn't have a corpse!", player->GetName());
             }
         }
 
         // TODO: move this to a map dependent location
         /*if(i_data && i_data->IsEncounterInProgress())
         {
-            sLog.outDebug("MAP: Player '%s' can't enter instance '%s' while an encounter is in progress.", player->GetName(), GetMapName());
+            DEBUG_LOG("MAP: Player '%s' can't enter instance '%s' while an encounter is in progress.", player->GetName(), GetMapName());
             player->SendTransferAborted(GetId(), TRANSFER_ABORT_ZONE_IN_COMBAT);
             return(false);
         }*/

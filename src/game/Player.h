@@ -2391,7 +2391,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         /*********************************************************/
         time_t m_lastHonorUpdateTime;
 
-        void outDebugValues() const;
+        void outDebugStatsValues() const;
         ObjectGuid m_lootGuid;
 
         uint32 m_team;
