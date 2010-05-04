@@ -252,7 +252,7 @@ enum ChatType
     CHAT_TYPE_ZONE_YELL         = 6
 };
 
-//Selection method used by SelectTarget (CreatureEventAI)
+// Selection method used by SelectAttackingTarget
 enum AttackingTarget
 {
     ATTACKING_TARGET_RANDOM = 0,                            //Just selects a random target
@@ -589,6 +589,8 @@ class MANGOS_DLL_SPEC Creature : public Unit
         void SendZoneUnderAttackMessage(Player* attacker);
 
         void SetInCombatWithZone();
+
+        Unit* SelectAttackingTarget(AttackingTarget target, uint32 position) const;
 
         bool hasQuest(uint32 quest_id) const;
         bool hasInvolvedQuest(uint32 quest_id)  const;
