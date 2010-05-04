@@ -1745,7 +1745,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
             else
             {
                 // remove not targetable units if spell has no script targets
-                for (UnitList::const_iterator itr = targetUnitMap.begin(); itr != targetUnitMap.end(); )
+                for (UnitList::iterator itr = targetUnitMap.begin(); itr != targetUnitMap.end(); )
                 {
                     if (!(*itr)->isTargetableForAttack(m_spellInfo->AttributesEx3 & SPELL_ATTR_EX3_CAST_ON_DEAD))
                         targetUnitMap.erase(itr++);
