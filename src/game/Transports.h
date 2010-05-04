@@ -43,13 +43,19 @@ class Transport : public GameObject
         struct WayPoint
         {
             WayPoint() : mapid(0), x(0), y(0), z(0), teleport(false) {}
-            WayPoint(uint32 _mapid, float _x, float _y, float _z, bool _teleport) :
-            mapid(_mapid), x(_x), y(_y), z(_z), teleport(_teleport) {}
+            WayPoint(uint32 _mapid, float _x, float _y, float _z, bool _teleport, uint32 _arrivalEventID = 0, uint32 _departureEventID = 0)
+                : mapid(_mapid), x(_x), y(_y), z(_z), teleport(_teleport),
+                arrivalEventID(_arrivalEventID), departureEventID(_departureEventID)
+            {
+            }
+
             uint32 mapid;
             float x;
             float y;
             float z;
             bool teleport;
+            uint32 arrivalEventID;
+            uint32 departureEventID;
         };
 
         typedef std::map<uint32, WayPoint> WayPointMap;
@@ -69,6 +75,7 @@ class Transport : public GameObject
     private:
         void TeleportTransport(uint32 newMapid, float x, float y, float z);
         void UpdateForMap(Map const* map);
+        void DoEventIfAny(WayPointMap::value_type const& node, bool departure);
         WayPointMap::const_iterator GetNextWayPoint();
 };
 #endif

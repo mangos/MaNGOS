@@ -310,7 +310,8 @@ bool Transport::GenerateWaypoints(uint32 pathid, std::set<uint32> &mapids)
     if (keyFrames[keyFrames.size() - 1].node->mapid != keyFrames[0].node->mapid)
         teleport = true;
 
-    WayPoint pos(keyFrames[0].node->mapid, keyFrames[0].node->x, keyFrames[0].node->y, keyFrames[0].node->z, teleport);
+    WayPoint pos(keyFrames[0].node->mapid, keyFrames[0].node->x, keyFrames[0].node->y, keyFrames[0].node->z, teleport,
+        keyFrames[0].node->arrivalEventID, keyFrames[0].node->departureEventID);
     m_WayPoints[0] = pos;
     t += keyFrames[0].node->delay * 1000;
 
@@ -390,7 +391,8 @@ bool Transport::GenerateWaypoints(uint32 pathid, std::set<uint32> &mapids)
             cM = keyFrames[i + 1].node->mapid;
         }
 
-        WayPoint pos(keyFrames[i + 1].node->mapid, keyFrames[i + 1].node->x, keyFrames[i + 1].node->y, keyFrames[i + 1].node->z, teleport);
+        WayPoint pos(keyFrames[i + 1].node->mapid, keyFrames[i + 1].node->x, keyFrames[i + 1].node->y, keyFrames[i + 1].node->z, teleport,
+            keyFrames[i + 1].node->arrivalEventID, keyFrames[i + 1].node->departureEventID);
 
         //        sLog.outString("T: %d, x: %f, y: %f, z: %f, t:%d", t, pos.x, pos.y, pos.z, teleport);
 
@@ -490,8 +492,13 @@ void Transport::Update(time_t /*p_time*/)
     m_timer = getMSTime() % m_period;
     while (((m_timer - m_curr->first) % m_pathTime) > ((m_next->first - m_curr->first) % m_pathTime))
     {
+
+        DoEventIfAny(*m_curr,true);
+
         m_curr = GetNextWayPoint();
         m_next = GetNextWayPoint();
+
+        DoEventIfAny(*m_curr,false);
 
         // first check help in case client-server transport coordinates de-synchronization
         if (m_curr->second.mapid != GetMapId() || m_curr->second.teleport)
@@ -552,5 +559,14 @@ void Transport::UpdateForMap(Map const* targetMap)
         for(Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
             if(this != itr->getSource()->GetTransport())
                 itr->getSource()->SendDirectMessage(&out_packet);
+    }
+}
+
+void Transport::DoEventIfAny(WayPointMap::value_type const& node, bool departure)
+{
+    if (uint32 eventid = departure ? node.second.departureEventID : node.second.arrivalEventID)
+    {
+        DEBUG_LOG("Taxi %s event %u of node %u of %s (%s) path", departure ? "departure" : "arrival", eventid, node.first, GetName(), GetObjectGuid().GetString().c_str());
+        GetMap()->ScriptsStart(sEventScripts, eventid, this, this);
     }
 }

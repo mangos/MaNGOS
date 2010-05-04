@@ -130,6 +130,7 @@ public PathMovementBase<Player,TaxiPathNodeList const*>
         bool HasArrived() const { return (i_currentNode >= i_path->size()); }
         void SetCurrentNodeAfterTeleport();
         void SkipCurrentNode() { ++i_currentNode; }
+        void DoEventIfAny(Player& player, TaxiPathNodeEntry const& node, bool departure);
 
         // allow use for overwrite empty implementation
         bool GetDestination(float& x, float& y, float& z) const { return PathMovementBase<Player,TaxiPathNodeList const*>::GetDestination(x,y,z); }

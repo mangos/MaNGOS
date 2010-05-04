@@ -357,10 +357,14 @@ bool FlightPathMovementGenerator::Update(Player &player, const uint32 &diff)
             i_destinationHolder.ResetUpdate(FLIGHT_TRAVEL_UPDATE);
             if (i_destinationHolder.HasArrived())
             {
+                DoEventIfAny(player,(*i_path)[i_currentNode],false);
+
                 uint32 curMap = (*i_path)[i_currentNode].mapid;
                 ++i_currentNode;
                 if (MovementInProgress())
                 {
+                    DoEventIfAny(player,(*i_path)[i_currentNode],true);
+
                     DEBUG_LOG("loading node %u for player %s", i_currentNode, player.GetName());
                     if ((*i_path)[i_currentNode].mapid == curMap)
                     {
@@ -369,7 +373,6 @@ bool FlightPathMovementGenerator::Update(Player &player, const uint32 &diff)
                     }
                     return true;
                 }
-                //else HasArrived()
             }
             else
                 return true;
@@ -396,6 +399,15 @@ void FlightPathMovementGenerator::SetCurrentNodeAfterTeleport()
             i_currentNode = i;
             return;
         }
+    }
+}
+
+void FlightPathMovementGenerator::DoEventIfAny(Player& player, TaxiPathNodeEntry const& node, bool departure)
+{
+    if (uint32 eventid = departure ? node.departureEventID : node.arrivalEventID)
+    {
+        DEBUG_LOG("Taxi %s event %u of node %u of path %u for player %s", departure ? "departure" : "arrival", eventid, node.index, node.path, player.GetName());
+        player.GetMap()->ScriptsStart(sEventScripts, eventid, &player, &player);
     }
 }
 
