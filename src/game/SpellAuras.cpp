@@ -2250,10 +2250,6 @@ void Aura::TriggerSpell()
             case 33525:
                 target->CastSpell(target, trigger_spell_id, true, NULL, this, casterGUID);
                 return;
-            // Intense Cold
-            case 48094:
-                target->CastSpell(target, trigger_spell_id, true, NULL, this);
-                return;
             // Rod of Purification - for quest 10839 (Veil Skith: Darkstone of Terokk)
             case 38736:
             {
@@ -8771,30 +8767,4 @@ void Aura::HandleAuraCloneCaster(bool Apply, bool Real)
     // Set item visual
     m_target->SetDisplayId(caster->GetDisplayId());
     m_target->SetUInt32Value(UNIT_FIELD_FLAGS_2, 2064);
-}
-
-void Aura::HandleAuraLinked(bool apply, bool Real)
-{
-    if(!Real)
-        return;
-
-    uint32 linked_spell_id = GetSpellProto()->EffectTriggerSpell[GetEffIndex()];
-    int32 basepoints = GetModifier()->m_amount;
-
-    SpellEntry const *spellInfo = sSpellStore.LookupEntry(linked_spell_id);
-    if (!spellInfo)
-    {
-        sLog.outError("HandleAuraLinked of spell %u: triggering unknown spell id %i", GetSpellProto()->Id, linked_spell_id);
-        return;
-    }
-
-    if (apply)
-    {
-        if (basepoints)
-            m_target->CastCustomSpell(m_target, spellInfo, &basepoints, NULL, NULL, true, NULL, this, GetCaster() ? GetCaster()->GetGUID() : NULL);
-        else
-            m_target->CastSpell(m_target, spellInfo, true, NULL, this, GetCaster() ? GetCaster()->GetGUID() : NULL);
-    }
-    else
-        m_target->RemoveAurasDueToSpell(linked_spell_id);
 }
