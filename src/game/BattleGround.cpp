@@ -805,7 +805,7 @@ void BattleGround::EndBattleGround(uint32 winner)
             RewardMark(plr,ITEM_WINNER_COUNT);
             RewardQuestComplete(plr);
 
-            if(IsRandom())
+            if (IsRandom() || BattleGroundMgr::IsBGWeekend(GetTypeID()))
             {
                 UpdatePlayerScore(plr, SCORE_BONUS_HONOR, GetBonusHonorFromKill(win_kills*4));
                 plr->ModifyArenaPoints(win_arena);
@@ -818,7 +818,7 @@ void BattleGround::EndBattleGround(uint32 winner)
         else
         {
             RewardMark(plr,ITEM_LOSER_COUNT);
-            if(IsRandom())
+            if (IsRandom() || BattleGroundMgr::IsBGWeekend(GetTypeID()))
                 UpdatePlayerScore(plr, SCORE_BONUS_HONOR, GetBonusHonorFromKill(loos_kills*4));
         }
 

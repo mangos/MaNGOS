@@ -2261,6 +2261,10 @@ void Aura::TriggerSpell()
                     caster->CastSpell(target, trigger_spell_id, true, NULL, this);
                 return;
             }
+            // Intense Cold
+            case 48094:
+                target->CastSpell(target, trigger_spell_id, true, NULL, this);
+                return;
             // Beacon of Light
             case 53563:
                 // original caster must be target (beacon)
@@ -2809,7 +2813,7 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                     int32 bp0 = m_modifier.m_amount;
 
                     if (Unit* caster = GetCaster())
-                        m_target->CastCustomSpell(caster,48210,&bp0,NULL,NULL,true);
+                        m_target->CastCustomSpell(caster,48210,&bp0,NULL,NULL,true,NULL,this,GetCasterGUID());
                 }
             }
             break;
@@ -8685,6 +8689,25 @@ void Aura::HandleAllowOnlyAbility(bool apply, bool Real)
     m_target->UpdateDamagePhysical(BASE_ATTACK);
     m_target->UpdateDamagePhysical(RANGED_ATTACK);
     m_target->UpdateDamagePhysical(OFF_ATTACK);
+}
+
+void Aura::HandleAuraLinked(bool apply, bool Real)
+{
+    if (!Real)
+        return;
+
+    uint32 linkedSpell = m_spellProto->EffectTriggerSpell[m_effIndex];
+    SpellEntry const *spellInfo = sSpellStore.LookupEntry(linkedSpell);
+    if (!spellInfo)
+    {
+        sLog.outError("HandleAuraLinked for spell %u effect %u: triggering unknown spell %u", m_spellProto->Id, m_effIndex, linkedSpell);
+        return;
+    }
+
+    if (apply)
+        m_target->CastSpell(m_target, linkedSpell, true, NULL, this);
+    else
+        m_target->RemoveAurasByCasterSpell(linkedSpell, GetCasterGUID());
 }
 
 void Aura::HandleAuraOpenStable(bool apply, bool Real)
