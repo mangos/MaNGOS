@@ -1796,6 +1796,45 @@ void Creature::SetInCombatWithZone()
     }
 }
 
+Unit* Creature::SelectAttackingTarget(AttackingTarget target, uint32 position) const
+{
+    if (!CanHaveThreatList())
+        return NULL;
+
+    //ThreatList m_threatlist;
+    ThreatList const& threatlist = getThreatManager().getThreatList();
+    ThreatList::const_iterator i = threatlist.begin();
+    ThreatList::const_reverse_iterator r = threatlist.rbegin();
+
+    if (position >= threatlist.size() || !threatlist.size())
+        return NULL;
+
+    switch(target)
+    {
+        case ATTACKING_TARGET_RANDOM:
+        {
+            advance(i, position + (rand() % (threatlist.size() - position)));
+            return Unit::GetUnit(*this, (*i)->getUnitGuid());
+        }
+        case ATTACKING_TARGET_TOPAGGRO:
+        {
+            advance(i, position);
+            return Unit::GetUnit(*this, (*i)->getUnitGuid());
+        }
+        case ATTACKING_TARGET_BOTTOMAGGRO:
+        {
+            advance(r, position);
+            return Unit::GetUnit(*this, (*r)->getUnitGuid());
+        }
+        // TODO: implement these
+        //case ATTACKING_TARGET_RANDOM_PLAYER:
+        //case ATTACKING_TARGET_TOPAGGRO_PLAYER:
+        //case ATTACKING_TARGET_BOTTOMAGGRO_PLAYER:
+    }
+
+    return NULL;
+}
+
 void Creature::_AddCreatureSpellCooldown(uint32 spell_id, time_t end_time)
 {
     m_CreatureSpellCooldowns[spell_id] = end_time;
