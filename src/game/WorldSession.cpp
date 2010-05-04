@@ -186,7 +186,7 @@ bool WorldSession::Update(uint32 /*diff*/)
                     else if(_player->IsInWorld())
                     {
                         (this->*opHandle.handler)(*packet);
-                        if (sLog.IsOutDebug() && packet->rpos() < packet->wpos())
+                        if (packet->rpos() < packet->wpos() && sLog.HasLogLevelOrHigher(LOG_LVL_DEBUG))
                             LogUnprocessedTail(packet);
                     }
                     // lag can cause STATUS_LOGGEDIN opcodes to arrive after the player started a transfer
@@ -200,7 +200,7 @@ bool WorldSession::Update(uint32 /*diff*/)
                     {
                         // not expected _player or must checked in packet hanlder
                         (this->*opHandle.handler)(*packet);
-                        if (sLog.IsOutDebug() && packet->rpos() < packet->wpos())
+                        if (packet->rpos() < packet->wpos() && sLog.HasLogLevelOrHigher(LOG_LVL_DEBUG))
                             LogUnprocessedTail(packet);
                     }
                     break;
@@ -212,7 +212,7 @@ bool WorldSession::Update(uint32 /*diff*/)
                     else
                     {
                         (this->*opHandle.handler)(*packet);
-                        if (sLog.IsOutDebug() && packet->rpos() < packet->wpos())
+                        if (packet->rpos() < packet->wpos() && sLog.HasLogLevelOrHigher(LOG_LVL_DEBUG))
                             LogUnprocessedTail(packet);
                     }
                     break;
@@ -230,7 +230,7 @@ bool WorldSession::Update(uint32 /*diff*/)
                         m_playerRecentlyLogout = false;
 
                     (this->*opHandle.handler)(*packet);
-                    if (sLog.IsOutDebug() && packet->rpos() < packet->wpos())
+                    if (packet->rpos() < packet->wpos() && sLog.HasLogLevelOrHigher(LOG_LVL_DEBUG))
                         LogUnprocessedTail(packet);
                     break;
                 case STATUS_NEVER:
@@ -254,7 +254,7 @@ bool WorldSession::Update(uint32 /*diff*/)
         {
             sLog.outError("WorldSession::Update ByteBufferException occured while parsing a packet (opcode: %u) from client %s, accountid=%i.",
                     packet->GetOpcode(), GetRemoteAddress().c_str(), GetAccountId());
-            if(sLog.IsOutDebug())
+            if (sLog.HasLogLevelOrHigher(LOG_LVL_DEBUG))
             {
                 sLog.outDebug("Dumping error causing packet:");
                 packet->hexlike();

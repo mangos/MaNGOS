@@ -25,13 +25,21 @@
 class Config;
 class ByteBuffer;
 
+enum LogLevel
+{
+    LOG_LVL_MINIMAL = 0,                                    // unconditional and errors
+    LOG_LVL_BASIC   = 1,
+    LOG_LVL_DETAIL  = 2,
+    LOG_LVL_DEBUG   = 3
+};
+
 // bitmask
 enum LogFilters
 {
-    LOG_FILTER_TRANSPORT_MOVES    = 1,
-    LOG_FILTER_CREATURE_MOVES     = 2,
-    LOG_FILTER_VISIBILITY_CHANGES = 4,
-    LOG_FILTER_ACHIEVEMENT_UPDATES= 8
+    LOG_FILTER_TRANSPORT_MOVES    = 0x01,
+    LOG_FILTER_CREATURE_MOVES     = 0x02,
+    LOG_FILTER_VISIBILITY_CHANGES = 0x04,
+    LOG_FILTER_ACHIEVEMENT_UPDATES= 0x08
 };
 
 enum Color
@@ -123,7 +131,7 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, ACE_Th
         static void outTimestamp(FILE* file);
         static std::string GetTimestampStr();
         uint32 getLogFilter() const { return m_logFilter; }
-        bool IsOutDebug() const { return m_logLevel > 2 || (m_logFileLevel > 2 && logfile); }
+        bool HasLogLevelOrHigher(LogLevel loglvl) const { return m_logLevel >= loglvl || (m_logFileLevel >= loglvl && logfile); }
         bool IsOutCharDump() const { return m_charLog_Dump; }
         bool IsIncludeTime() const { return m_includeTime; }
     private:
@@ -138,8 +146,8 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, ACE_Th
         FILE* worldLogfile;
 
         // log/console control
-        uint32 m_logLevel;
-        uint32 m_logFileLevel;
+        LogLevel m_logLevel;
+        LogLevel m_logFileLevel;
         bool m_colored;
         bool m_includeTime;
         Color m_colors[4];
@@ -159,11 +167,14 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, ACE_Th
 
 #define sLog MaNGOS::Singleton<Log>::Instance()
 
-#ifdef MANGOS_DEBUG
-#define DEBUG_LOG sLog.outDebug
-#else
-#define DEBUG_LOG
-#endif
+#define BASIC_LOG(...) if (sLog.HasLogLevelOrHigher(LOG_LVL_BASIC)) sLog.outBasic(__VA_ARGS__)
+#define BASIC_FILTER_LOG(F,...) if (sLog.HasLogLevelOrHigher(LOG_LVL_BASIC) && (sLog.getLogFilter() & (F))==0) sLog.outBasic(__VA_ARGS__)
+
+#define DETAIL_LOG(...) if (sLog.HasLogLevelOrHigher(LOG_LVL_DETAIL)) sLog.outDebug(__VA_ARGS__)
+#define DETAIL_FILTER_LOG(F,...) if (sLog.HasLogLevelOrHigher(LOG_LVL_DETAIL) && (sLog.getLogFilter() & (F))==0) sLog.outDetail(__VA_ARGS__)
+
+#define DEBUG_LOG(...) if (sLog.HasLogLevelOrHigher(LOG_LVL_DEBUG)) sLog.outDebug( __VA_ARGS__)
+#define DEBUG_FILTER_LOG(F,...) if (sLog.HasLogLevelOrHigher(LOG_LVL_DEBUG) && (sLog.getLogFilter() & (F))==0) sLog.outDetail(__VA_ARGS__)
 
 // primary for script library
 void MANGOS_DLL_SPEC outstring_log(const char * str, ...) ATTR_PRINTF(1,2);
