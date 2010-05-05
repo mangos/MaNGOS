@@ -616,10 +616,7 @@ void AchievementMgr::SendAchievementEarned(AchievementEntry const* achievement)
     if(GetPlayer()->GetSession()->PlayerLoading())
         return;
 
-    #ifdef MANGOS_DEBUG
-    if((sLog.getLogFilter() & LOG_FILTER_ACHIEVEMENT_UPDATES)==0)
-        sLog.outDebug("AchievementMgr::SendAchievementEarned(%u)", achievement->ID);
-    #endif
+    DEBUG_FILTER_LOG(LOG_FILTER_ACHIEVEMENT_UPDATES, "AchievementMgr::SendAchievementEarned(%u)", achievement->ID);
 
     if(Guild* guild = sObjectMgr.GetGuildById(GetPlayer()->GetGuildId()))
     {

@@ -65,10 +65,7 @@ VisibleNotifier::Notify()
     {
         i_player.m_clientGUIDs.erase(*itr);
 
-        #ifdef MANGOS_DEBUG
-        if((sLog.getLogFilter() & LOG_FILTER_VISIBILITY_CHANGES)==0)
-            sLog.outDebug("%s is out of range (no in active cells set) now for player %u",itr->GetString().c_str(),i_player.GetGUIDLow());
-        #endif
+        DEBUG_FILTER_LOG(LOG_FILTER_VISIBILITY_CHANGES, "%s is out of range (no in active cells set) now for player %u",itr->GetString().c_str(),i_player.GetGUIDLow());
     }
 
     // send update to other players (except player updates that already sent using SendUpdateToPlayer)
