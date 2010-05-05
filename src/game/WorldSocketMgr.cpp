@@ -278,7 +278,7 @@ WorldSocketMgr::StartNetwork (ACE_UINT16 port, std::string& address)
     m_addr = address;
     m_port = port;
 
-    if (!sLog.IsOutDebug ())
+    if (!sLog.HasLogLevelOrHigher(LOG_LVL_DEBUG))
         ACE_Log_Msg::instance ()->priority_mask (LM_ERROR, ACE_Log_Msg::PROCESS);
 
     if (StartReactiveIO (port, address.c_str()) == -1)
