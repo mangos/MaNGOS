@@ -3988,6 +3988,12 @@ SpellEntry const* GetSpellEntryByDifficulty(uint32 id, Difficulty difficulty)
     if (!spellDiff->spellId[difficulty])
         return NULL;
 
+    sLog.outDebug("Searching spell %u in SpellDifficulty.dbc: Result is: %u/%u/%u/%u ",id, 
+    spellDiff->spellId[RAID_DIFFICULTY_10MAN_NORMAL],
+    spellDiff->spellId[RAID_DIFFICULTY_25MAN_NORMAL],
+    spellDiff->spellId[RAID_DIFFICULTY_10MAN_HEROIC],
+    spellDiff->spellId[RAID_DIFFICULTY_25MAN_HEROIC]);
+
     SpellEntry const* spellEntry = sSpellStore.LookupEntry(spellDiff->spellId[difficulty]);
     return spellEntry;
 }
