@@ -240,9 +240,19 @@ AddonChannel = 1
 #    LogFilter_CreatureMoves
 #    LogFilter_TransportMoves
 #    LogFilter_VisibilityChanges
-#        Log filters
+#    LogFilter_Weather
+#        Log filters (active by default)
 #        Default: 1 - not include with any log level
 #                 0 - include in log if log level permit
+#
+#    LogFilter_PeriodicAffects
+#    LogFilter_PlayerMoves
+#    LogFilter_SQLText
+#    LogFilter_AIAndMovegens
+#    LogFilter_PlayerStats
+#        Log filters (disabled by default, mostly debug only output affected cases)
+#        Default: 0 - include in log if log level permit
+#                 1 - not include with any log level
 #
 #    WorldLogFile
 #        Packet logging file for the worldserver

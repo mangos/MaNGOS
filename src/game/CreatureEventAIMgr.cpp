@@ -590,7 +590,7 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Scripts()
                             {
                                 //output as debug for now, also because there's no general rule all spells have RecoveryTime
                                 if (temp.event_param3 < spell->RecoveryTime)
-                                    sLog.outDebug("CreatureEventAI:  Event %u Action %u uses SpellID %u but cooldown is longer(%u) than minumum defined in event param3(%u).", i, j+1,action.cast.spellId, spell->RecoveryTime, temp.event_param3);
+                                    DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "CreatureEventAI:  Event %u Action %u uses SpellID %u but cooldown is longer(%u) than minumum defined in event param3(%u).", i, j+1,action.cast.spellId, spell->RecoveryTime, temp.event_param3);
                             }
                         }
                         */

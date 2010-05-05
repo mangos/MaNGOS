@@ -403,7 +403,11 @@ INSERT INTO spell_check (spellid,SpellFamilyName,SpellFamilyMaskA,SpellFamilyMas
 (54861,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Nitro Boosts',                       'Spell::EffectDummy'),
 (55004, 0,                -1,        -1,  -1,  -1,  -1,  3, -1,-1,'Nitro Boosts',                       'Spell::EffectDummy'),
 (55078,-1,                -1,        -1,  -1,  -1,  -1, -1,  3,-1,'Blood Plague',                       'Spell::EffectScriptEffect'),
+(55090, 15,0x0800000000000000,       -1,  -1,  -1,  -1, -1, -1,-1,'Scourge Strike',                     'Spell::DoAllEffectOnTarget'),
 (55095,-1,                -1,        -1,  -1,  -1,  -1, -1,  3,-1,'Frost Fever',                        'Spell::EffectScriptEffect'),
+(55265, 15,0x0800000000000000,       -1,  -1,  -1,  -1, -1, -1,-1,'Scourge Strike',                     'Spell::DoAllEffectOnTarget'),
+(55270, 15,0x0800000000000000,       -1,  -1,  -1,  -1, -1, -1,-1,'Scourge Strike',                     'Spell::DoAllEffectOnTarget'),
+(55271, 15,0x0800000000000000,       -1,  -1,  -1,  -1, -1, -1,-1,'Scourge Strike',                     'Spell::DoAllEffectOnTarget'),
 (55363,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Create Ghoul Drool Cover',           'Spell::EffectDummy'),
 (55364, 0,                -1,        -1,  -1,  -1,  -1,  3, -1,-1,'Create Ghoul Drool Cover',           'Spell::EffectDummy'),
 (55441,11,                -1,        -1,  -1,  -1,  -1, -1,  4,-1,'Glyph of Mana Tide',                 'Spell::EffectDummy'),
@@ -530,6 +534,7 @@ INSERT INTO spell_check (spellid,SpellFamilyName,SpellFamilyMaskA,SpellFamilyMas
 (    0,11,                -1,        -1, 338,  -1,  -1, -1,  4, 1,'Restorative Totems',                 'Spell::EffectSchoolDMG'), 	/*part 1*/
 (    0, 4,0x0000000000000400,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Revenge',                            'Spell::EffectSchoolDMG'),
 (    0,11,0x0000000000400000,0x00000000,  -1,  -1,  -1, 54, -1,-1,'Rockbiter Weapon',                   'Spell::EffectEnchantItemTmp'),
+(    0,15,0x0800000000000000,0x00000000,  -1,  -1,  -1, -1, -1,-1,'Scourge Strike',                     'Spell::DoAllEffectOnTarget'),
 (    0, 5,0x0040000000000000,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Shadow Bite',                        'Spell::EffectSchoolDMG'),
 (    0, 6,0x0000000200000000,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Shadow Word: Death',                 'Spell::EffectSchoolDMG'),
 (    0, 5,0x0000000000000000,0x00000002,  -1,  -1,  -1, -1,  3,-1,'Shadowflame',                        'Spell::EffectSchoolDMG'),     /* dot */

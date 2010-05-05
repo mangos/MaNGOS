@@ -1063,6 +1063,27 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
                 dummy->GetModifier()->m_amount = damageInfo.damage;
 
         caster->DealSpellDamage(&damageInfo, true);
+
+        // Scourge Strike, here because needs to use final damage in second part of the spell
+        if (m_spellInfo->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT && m_spellInfo->SpellFamilyFlags & UI64LIT(0x0800000000000000))
+        {
+            uint32 count = 0;
+            Unit::AuraMap const& auras = unitTarget->GetAuras();
+            for(Unit::AuraMap::const_iterator itr = auras.begin(); itr!=auras.end(); ++itr)
+            {
+                if(itr->second->GetSpellProto()->Dispel == DISPEL_DISEASE &&
+                    itr->second->GetCasterGUID() == caster->GetGUID() &&
+                    IsSpellLastAuraEffect(itr->second->GetSpellProto(), itr->second->GetEffIndex()))
+                    ++count;
+            }
+
+            if (count)
+            {
+                int32 bp = count * CalculateDamage(EFFECT_INDEX_2, unitTarget) * damageInfo.damage / 100;
+                if (bp)
+                    caster->CastCustomSpell(unitTarget, 70890, &bp, NULL, NULL, true);
+            }
+        }
     }
     // Passive spell hits/misses or active spells only misses (only triggers)
     else
@@ -3400,7 +3421,7 @@ void Spell::SendSpellStart()
     if (!IsNeedSendToClient())
         return;
 
-    sLog.outDebug("Sending SMSG_SPELL_START id=%u", m_spellInfo->Id);
+    DEBUG_LOG("Sending SMSG_SPELL_START id=%u", m_spellInfo->Id);
 
     uint32 castFlags = CAST_FLAG_UNKNOWN1;
     if (IsRangedSpell())
@@ -3460,7 +3481,7 @@ void Spell::SendSpellGo()
     if(!IsNeedSendToClient())
         return;
 
-    sLog.outDebug("Sending SMSG_SPELL_GO id=%u", m_spellInfo->Id);
+    DEBUG_LOG("Sending SMSG_SPELL_GO id=%u", m_spellInfo->Id);
 
     uint32 castFlags = CAST_FLAG_UNKNOWN3;
     if(IsRangedSpell())
@@ -4139,11 +4160,11 @@ void Spell::HandleEffects(Unit *pUnitTarget,Item *pItemTarget,GameObject *pGOTar
 
     damage = int32(CalculateDamage(i, unitTarget) * DamageMultiplier);
 
-    sLog.outDebug("Spell %u Effect%d : %u", m_spellInfo->Id, i, eff);
+    DEBUG_LOG("Spell %u Effect%d : %u", m_spellInfo->Id, i, eff);
 
     if(eff < TOTAL_SPELL_EFFECTS)
     {
-        //sLog.outDebug( "WORLD: Spell FX %d < TOTAL_SPELL_EFFECTS ", eff);
+        //DEBUG_LOG( "WORLD: Spell FX %d < TOTAL_SPELL_EFFECTS ", eff);
         (*this.*SpellEffects[eff])(i);
     }
     else
@@ -5582,7 +5603,7 @@ int32 Spell::CalculatePowerCost()
                 break;
             case POWER_RUNE:
             case POWER_RUNIC_POWER:
-                sLog.outDebug("Spell::CalculateManaCost: Not implemented yet!");
+                DEBUG_LOG("Spell::CalculateManaCost: Not implemented yet!");
                 break;
             default:
                 sLog.outError("Spell::CalculateManaCost: Unknown power type '%d' in spell %d", m_spellInfo->powerType, m_spellInfo->Id);
@@ -6115,7 +6136,7 @@ void Spell::Delayed()
     else
         m_timer += delaytime;
 
-    sLog.outDetail("Spell %u partially interrupted for (%d) ms at damage", m_spellInfo->Id, delaytime);
+    DETAIL_LOG("Spell %u partially interrupted for (%d) ms at damage", m_spellInfo->Id, delaytime);
 
     WorldPacket data(SMSG_SPELL_DELAYED, 8+4);
     data << m_caster->GetPackGUID();
@@ -6150,7 +6171,7 @@ void Spell::DelayedChannel()
     else
         m_timer -= delaytime;
 
-    sLog.outDebug("Spell %u partially interrupted for %i ms, new duration: %u ms", m_spellInfo->Id, delaytime, m_timer);
+    DEBUG_LOG("Spell %u partially interrupted for %i ms, new duration: %u ms", m_spellInfo->Id, delaytime, m_timer);
 
     for(std::list<TargetInfo>::const_iterator ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
     {
