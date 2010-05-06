@@ -56,7 +56,7 @@ void MaNGOSsoapRunnable::run()
             continue;
         }
 
-        sLog.outDebug("MaNGOSsoap: accepted connection from IP=%d.%d.%d.%d", (int)(soap.ip>>24)&0xFF, (int)(soap.ip>>16)&0xFF, (int)(soap.ip>>8)&0xFF, (int)soap.ip&0xFF);
+        DEBUG_LOG("MaNGOSsoap: accepted connection from IP=%d.%d.%d.%d", (int)(soap.ip>>24)&0xFF, (int)(soap.ip>>16)&0xFF, (int)(soap.ip>>8)&0xFF, (int)soap.ip&0xFF);
         struct soap* thread_soap = soap_copy(&soap);// make a safe copy
 
         ACE_Message_Block *mb = new ACE_Message_Block(sizeof(struct soap*));
@@ -93,33 +93,33 @@ int ns1__executeCommand(soap* soap, char* command, char** result)
     // security check
     if (!soap->userid || !soap->passwd)
     {
-        sLog.outDebug("MaNGOSsoap: Client didn't provide login information");
+        DEBUG_LOG("MaNGOSsoap: Client didn't provide login information");
         return 401;
     }
 
     uint32 accountId = sAccountMgr.GetId(soap->userid);
     if(!accountId)
     {
-        sLog.outDebug("MaNGOSsoap: Client used invalid username '%s'", soap->userid);
+        DEBUG_LOG("MaNGOSsoap: Client used invalid username '%s'", soap->userid);
         return 401;
     }
 
     if(!sAccountMgr.CheckPassword(accountId, soap->passwd))
     {
-        sLog.outDebug("MaNGOSsoap: invalid password for account '%s'", soap->userid);
+        DEBUG_LOG("MaNGOSsoap: invalid password for account '%s'", soap->userid);
         return 401;
     }
 
     if(sAccountMgr.GetSecurity(accountId) < SEC_ADMINISTRATOR)
     {
-        sLog.outDebug("MaNGOSsoap: %s's gmlevel is too low", soap->userid);
+        DEBUG_LOG("MaNGOSsoap: %s's gmlevel is too low", soap->userid);
         return 403;
     }
 
     if(!command || !*command)
         return soap_sender_fault(soap, "Command mustn't be empty", "The supplied command was an empty string");
 
-    sLog.outDebug("MaNGOSsoap: got command '%s'", command);
+    DEBUG_LOG("MaNGOSsoap: got command '%s'", command);
     SOAPCommand connection;
 
     // commands are executed in the world thread. We have to wait for them to be completed

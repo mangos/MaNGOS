@@ -45,7 +45,7 @@ alter table creature_movement add `wpguid` int(11) default '0';
 //-----------------------------------------------//
 void WaypointMovementGenerator<Creature>::LoadPath(Creature &c)
 {
-    sLog.outDetail("LoadPath: loading waypoint path for creature %u, %u", c.GetGUIDLow(), c.GetDBTableGUIDLow());
+    DETAIL_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "LoadPath: loading waypoint path for creature %u, %u", c.GetGUIDLow(), c.GetDBTableGUIDLow());
 
     i_path = sWaypointMgr.GetPath(c.GetDBTableGUIDLow());
 
@@ -365,7 +365,7 @@ bool FlightPathMovementGenerator::Update(Player &player, const uint32 &diff)
                 {
                     DoEventIfAny(player,(*i_path)[i_currentNode],true);
 
-                    DEBUG_LOG("loading node %u for player %s", i_currentNode, player.GetName());
+                    DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "loading node %u for player %s", i_currentNode, player.GetName());
                     if ((*i_path)[i_currentNode].mapid == curMap)
                     {
                         // do not send movement, it was sent already
@@ -406,7 +406,7 @@ void FlightPathMovementGenerator::DoEventIfAny(Player& player, TaxiPathNodeEntry
 {
     if (uint32 eventid = departure ? node.departureEventID : node.arrivalEventID)
     {
-        DEBUG_LOG("Taxi %s event %u of node %u of path %u for player %s", departure ? "departure" : "arrival", eventid, node.index, node.path, player.GetName());
+        DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "Taxi %s event %u of node %u of path %u for player %s", departure ? "departure" : "arrival", eventid, node.index, node.path, player.GetName());
         player.GetMap()->ScriptsStart(sEventScripts, eventid, &player, &player);
     }
 }

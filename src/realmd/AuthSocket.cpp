@@ -250,7 +250,7 @@ AuthSocket::~AuthSocket()
 /// Accept the connection and set the s random value for SRP6
 void AuthSocket::OnAccept()
 {
-    sLog.outBasic("Accepting connection from '%s:%d'",
+    BASIC_LOG("Accepting connection from '%s:%d'",
         GetRemoteAddress().c_str(), GetRemotePort());
 
 }
@@ -433,7 +433,7 @@ bool AuthSocket::_HandleLogonChallenge()
     if (result)
     {
         pkt << (uint8)WOW_FAIL_BANNED;
-        sLog.outBasic("[AuthChallenge] Banned ip %s tries to login!", GetRemoteAddress().c_str());
+        BASIC_LOG("[AuthChallenge] Banned ip %s tries to login!", GetRemoteAddress().c_str());
         delete result;
     }
     else
@@ -476,12 +476,12 @@ bool AuthSocket::_HandleLogonChallenge()
                     if((*banresult)[0].GetUInt64() != (*banresult)[1].GetUInt64())
                     {
                         pkt << (uint8) WOW_FAIL_BANNED;
-                        sLog.outBasic("[AuthChallenge] Banned account %s tries to login!",_login.c_str ());
+                        BASIC_LOG("[AuthChallenge] Banned account %s tries to login!",_login.c_str ());
                     }
                     else
                     {
                         pkt << (uint8) WOW_FAIL_SUSPENDED;
-                        sLog.outBasic("[AuthChallenge] Temporarily banned account %s tries to login!",_login.c_str ());
+                        BASIC_LOG("[AuthChallenge] Temporarily banned account %s tries to login!",_login.c_str ());
                     }
 
                     delete banresult;
@@ -495,7 +495,7 @@ bool AuthSocket::_HandleLogonChallenge()
                     std::string databaseV = (*result)[5].GetCppString();
                     std::string databaseS = (*result)[6].GetCppString();
 
-                    sLog.outDebug("database authentication values: v='%s' s='%s'", databaseV.c_str(), databaseS.c_str());
+                    DEBUG_LOG("database authentication values: v='%s' s='%s'", databaseV.c_str(), databaseS.c_str());
 
                     // multiply with 2, bytes are stored as hexstring
                     if(databaseV.size() != s_BYTE_SIZE*2 || databaseS.size() != s_BYTE_SIZE*2)
@@ -556,7 +556,7 @@ bool AuthSocket::_HandleLogonChallenge()
                     for(int i = 0; i < 4; ++i)
                         _localizationName[i] = ch->country[4-i-1];
 
-                    sLog.outBasic("[AuthChallenge] account %s is using '%c%c%c%c' locale (%u)", _login.c_str (), ch->country[3], ch->country[2], ch->country[1], ch->country[0], GetLocaleByName(_localizationName));
+                    BASIC_LOG("[AuthChallenge] account %s is using '%c%c%c%c' locale (%u)", _login.c_str (), ch->country[3], ch->country[2], ch->country[1], ch->country[0], GetLocaleByName(_localizationName));
                 }
             }
             delete result;
@@ -715,7 +715,7 @@ bool AuthSocket::_HandleLogonProof()
     ///- Check if SRP6 results match (password is correct), else send an error
     if (!memcmp(M.AsByteArray(), lp.M1, 20))
     {
-        sLog.outBasic("User '%s' successfully authenticated", _login.c_str());
+        BASIC_LOG("User '%s' successfully authenticated", _login.c_str());
 
         ///- Update the sessionkey, last_ip, last login time and reset number of failed logins in the account table for this account
         // No SQL injection (escaped user name) and IP address as received by socket
@@ -737,7 +737,7 @@ bool AuthSocket::_HandleLogonProof()
     {
         char data[4]= { AUTH_LOGON_PROOF, WOW_FAIL_UNKNOWN_ACCOUNT, 3, 0};
         SendBuf(data, sizeof(data));
-        sLog.outBasic("[AuthChallenge] account %s tried to login with wrong password!",_login.c_str ());
+        BASIC_LOG("[AuthChallenge] account %s tried to login with wrong password!",_login.c_str ());
 
         uint32 MaxWrongPassCount = sConfig.GetIntDefault("WrongPass.MaxCount", 0);
         if(MaxWrongPassCount > 0)
@@ -760,7 +760,7 @@ bool AuthSocket::_HandleLogonProof()
                         uint32 acc_id = fields[0].GetUInt32();
                         loginDatabase.PExecute("INSERT INTO account_banned VALUES ('%u',UNIX_TIMESTAMP(),UNIX_TIMESTAMP()+'%u','MaNGOS realmd','Failed login autoban',1)",
                             acc_id, WrongPassBanTime);
-                        sLog.outBasic("[AuthChallenge] account %s got banned for '%u' seconds because it failed to authenticate '%u' times",
+                        BASIC_LOG("[AuthChallenge] account %s got banned for '%u' seconds because it failed to authenticate '%u' times",
                             _login.c_str(), WrongPassBanTime, failed_logins);
                     }
                     else
@@ -769,7 +769,7 @@ bool AuthSocket::_HandleLogonProof()
                         loginDatabase.escape_string(current_ip);
                         loginDatabase.PExecute("INSERT INTO ip_banned VALUES ('%s',UNIX_TIMESTAMP(),UNIX_TIMESTAMP()+'%u','MaNGOS realmd','Failed login autoban')",
                             current_ip.c_str(), WrongPassBanTime);
-                        sLog.outBasic("[AuthChallenge] IP %s got banned for '%u' seconds because account %s failed to authenticate '%u' times",
+                        BASIC_LOG("[AuthChallenge] IP %s got banned for '%u' seconds because account %s failed to authenticate '%u' times",
                             current_ip.c_str(), WrongPassBanTime, _login.c_str(), failed_logins);
                     }
                 }
@@ -1200,7 +1200,7 @@ void Patcher::LoadPatchMD5(char * szFileName)
     std::string path = "./patches/";
     path += szFileName;
     FILE *pPatch = fopen(path.c_str(), "rb");
-    sLog.outDebug("Loading patch info from %s\n", path.c_str());
+    DEBUG_LOG("Loading patch info from %s\n", path.c_str());
     if(!pPatch)
     {
         sLog.outError("Error loading patch %s\n", path.c_str());

@@ -977,7 +977,7 @@ bool ChatHandler::SetDataForCommandInTable(ChatCommand *table, const char* text,
         }
 
         if(table[i].SecurityLevel != security)
-            sLog.outDetail("Table `command` overwrite for command '%s' default security (%u) by %u",fullcommand.c_str(),table[i].SecurityLevel,security);
+            DETAIL_LOG("Table `command` overwrite for command '%s' default security (%u) by %u",fullcommand.c_str(),table[i].SecurityLevel,security);
 
         table[i].SecurityLevel = security;
         table[i].Help          = help;
@@ -1120,18 +1120,14 @@ valid examples:
         }
         else if(reader.get() != '|')
         {
-#ifdef MANGOS_DEBUG
-            sLog.outBasic("ChatHandler::isValidChatMessage sequence aborted unexpectedly");
-#endif
+            DEBUG_LOG("ChatHandler::isValidChatMessage sequence aborted unexpectedly");
             return false;
         }
 
         // pipe has always to be followed by at least one char
         if ( reader.peek() == '\0')
         {
-#ifdef MANGOS_DEBUG
-            sLog.outBasic("ChatHandler::isValidChatMessage pipe followed by \\0");
-#endif
+            DEBUG_LOG("ChatHandler::isValidChatMessage pipe followed by \\0");
             return false;
         }
 
@@ -1154,18 +1150,14 @@ valid examples:
             }
             else
             {
-#ifdef MANGOS_DEBUG
-                sLog.outBasic("ChatHandler::isValidChatMessage invalid sequence, expected %c but got %c", *validSequenceIterator, commandChar);
-#endif
+                DEBUG_LOG("ChatHandler::isValidChatMessage invalid sequence, expected %c but got %c", *validSequenceIterator, commandChar);
                 return false;
             }
         }
         else if(validSequence != validSequenceIterator)
         {
             // no escaped pipes in sequences
-#ifdef MANGOS_DEBUG
-            sLog.outBasic("ChatHandler::isValidChatMessage got escaped pipe in sequence");
-#endif
+            DEBUG_LOG("ChatHandler::isValidChatMessage got escaped pipe in sequence");
             return false;
         }
 
@@ -1180,9 +1172,7 @@ valid examples:
                     reader >> c;
                     if(!c)
                     {
-#ifdef MANGOS_DEBUG
-                        sLog.outBasic("ChatHandler::isValidChatMessage got \\0 while reading color in |c command");
-#endif
+                        DEBUG_LOG("ChatHandler::isValidChatMessage got \\0 while reading color in |c command");
                         return false;
                     }
 
@@ -1198,9 +1188,7 @@ valid examples:
                         color |= 10+c-'a';
                         continue;
                     }
-#ifdef MANGOS_DEBUG
-                    sLog.outBasic("ChatHandler::isValidChatMessage got non hex char '%c' while reading color", c);
-#endif
+                    DEBUG_LOG("ChatHandler::isValidChatMessage got non hex char '%c' while reading color", c);
                     return false;
                 }
                 break;
@@ -1216,18 +1204,14 @@ valid examples:
                     linkedItem = ObjectMgr::GetItemPrototype(atoi(buffer));
                     if(!linkedItem)
                     {
-#ifdef MANGOS_DEBUG
-                        sLog.outBasic("ChatHandler::isValidChatMessage got invalid itemID %u in |item command", atoi(buffer));
-#endif
+                        DEBUG_LOG("ChatHandler::isValidChatMessage got invalid itemID %u in |item command", atoi(buffer));
                         return false;
                     }
 
                     if (color != ItemQualityColors[linkedItem->Quality])
                     {
-#ifdef MANGOS_DEBUG
-                        sLog.outBasic("ChatHandler::isValidChatMessage linked item has color %u, but user claims %u", ItemQualityColors[linkedItem->Quality],
+                        DEBUG_LOG("ChatHandler::isValidChatMessage linked item has color %u, but user claims %u", ItemQualityColors[linkedItem->Quality],
                                 color);
-#endif
                         return false;
                     }
 
@@ -1296,9 +1280,7 @@ valid examples:
 
                     if(!linkedQuest)
                     {
-#ifdef MANOGS_DEBUG
-                        sLog.outBasic("ChatHandler::isValidChatMessage Questtemplate %u not found", questid);
-#endif
+                        DEBUG_LOG("ChatHandler::isValidChatMessage Questtemplate %u not found", questid);
                         return false;
                     }
                     c = reader.peek();
@@ -1436,9 +1418,7 @@ valid examples:
                 }
                 else
                 {
-#ifdef MANGOS_DEBUG
-                    sLog.outBasic("ChatHandler::isValidChatMessage user sent unsupported link type '%s'", buffer);
-#endif
+                    DEBUG_LOG("ChatHandler::isValidChatMessage user sent unsupported link type '%s'", buffer);
                     return false;
                 }
                 break;
@@ -1449,9 +1429,7 @@ valid examples:
                     // links start with '['
                     if (reader.get() != '[')
                     {
-#ifdef MANGOS_DEBUG
-                        sLog.outBasic("ChatHandler::isValidChatMessage link caption doesn't start with '['");
-#endif
+                        DEBUG_LOG("ChatHandler::isValidChatMessage link caption doesn't start with '['");
                         return false;
                     }
                     reader.getline(buffer, 256, ']');
@@ -1514,9 +1492,7 @@ valid examples:
 
                             if (!ql)
                             {
-#ifdef MANOGS_DEBUG
-                                sLog.outBasic("ChatHandler::isValidChatMessage default questname didn't match and there is no locale");
-#endif
+                                DEBUG_LOG("ChatHandler::isValidChatMessage default questname didn't match and there is no locale");
                                 return false;
                             }
 
@@ -1531,9 +1507,7 @@ valid examples:
                             }
                             if (!foundName)
                             {
-#ifdef MANOGS_DEBUG
-                                sLog.outBasic("ChatHandler::isValidChatMessage no quest locale title matched")
-#endif
+                                DEBUG_LOG("ChatHandler::isValidChatMessage no quest locale title matched");
                                 return false;
                             }
                         }
@@ -1575,9 +1549,7 @@ valid examples:
                             }
                             if (!foundName)
                             {
-#ifdef MANGOS_DEBUG
-                                sLog.outBasic("ChatHandler::isValidChatMessage linked item name wasn't found in any localization");
-#endif
+                                DEBUG_LOG("ChatHandler::isValidChatMessage linked item name wasn't found in any localization");
                                 return false;
                             }
                         }
@@ -1607,18 +1579,15 @@ valid examples:
                 // no further payload
                 break;
             default:
-#ifdef MANGOS_DEBUG
-                sLog.outBasic("ChatHandler::isValidChatMessage got invalid command |%c", commandChar);
-#endif
+                DEBUG_LOG("ChatHandler::isValidChatMessage got invalid command |%c", commandChar);
                 return false;
         }
     }
 
     // check if every opened sequence was also closed properly
-#ifdef MANGOS_DEBUG
     if(validSequence != validSequenceIterator)
-        sLog.outBasic("ChatHandler::isValidChatMessage EOF in active sequence");
-#endif
+        DEBUG_LOG("ChatHandler::isValidChatMessage EOF in active sequence");
+
     return validSequence == validSequenceIterator;
 }
 

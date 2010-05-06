@@ -928,7 +928,7 @@ void GameObject::Use(Unit* user)
             // TODO: possible must be moved to loot release (in different from linked triggering)
             if (GetGOInfo()->chest.eventId)
             {
-                sLog.outDebug("Chest ScriptStart id %u for GO %u", GetGOInfo()->chest.eventId, GetDBTableGUIDLow());
+                DEBUG_LOG("Chest ScriptStart id %u for GO %u", GetGOInfo()->chest.eventId, GetDBTableGUIDLow());
                 GetMap()->ScriptsStart(sEventScripts, GetGOInfo()->chest.eventId, user, this);
             }
 
@@ -1032,7 +1032,7 @@ void GameObject::Use(Unit* user)
 
                 if (info->goober.eventId)
                 {
-                    sLog.outDebug("Goober ScriptStart id %u for GO entry %u (GUID %u).", info->goober.eventId, GetEntry(), GetDBTableGUIDLow());
+                    DEBUG_LOG("Goober ScriptStart id %u for GO entry %u (GUID %u).", info->goober.eventId, GetEntry(), GetDBTableGUIDLow());
                     GetMap()->ScriptsStart(sEventScripts, info->goober.eventId, player, this);
                 }
 

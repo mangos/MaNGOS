@@ -70,7 +70,7 @@ void AggressorAI::EnterEvadeMode()
 {
     if (!m_creature->isAlive())
     {
-        DEBUG_LOG("Creature stopped attacking, he is dead [guid=%u]", m_creature->GetGUIDLow());
+        DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "Creature stopped attacking, he is dead [guid=%u]", m_creature->GetGUIDLow());
         i_victimGuid = 0;
         m_creature->CombatStop(true);
         m_creature->DeleteThreatList();
@@ -81,23 +81,23 @@ void AggressorAI::EnterEvadeMode()
 
     if (!victim)
     {
-        DEBUG_LOG("Creature stopped attacking, no victim [guid=%u]", m_creature->GetGUIDLow());
+        DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "Creature stopped attacking, no victim [guid=%u]", m_creature->GetGUIDLow());
     }
     else if (!victim->isAlive())
     {
-        DEBUG_LOG("Creature stopped attacking, victim is dead [guid=%u]", m_creature->GetGUIDLow());
+        DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "Creature stopped attacking, victim is dead [guid=%u]", m_creature->GetGUIDLow());
     }
     else if (victim->HasStealthAura())
     {
-        DEBUG_LOG("Creature stopped attacking, victim is in stealth [guid=%u]", m_creature->GetGUIDLow());
+        DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "Creature stopped attacking, victim is in stealth [guid=%u]", m_creature->GetGUIDLow());
     }
     else if (victim->isInFlight())
     {
-        DEBUG_LOG("Creature stopped attacking, victim is in flight [guid=%u]", m_creature->GetGUIDLow());
+        DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "Creature stopped attacking, victim is in flight [guid=%u]", m_creature->GetGUIDLow());
     }
     else
     {
-        DEBUG_LOG("Creature stopped attacking, victim out run him [guid=%u]", m_creature->GetGUIDLow());
+        DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "Creature stopped attacking, victim out run him [guid=%u]", m_creature->GetGUIDLow());
         //i_state = STATE_LOOK_AT_VICTIM;
         //i_tracker.Reset(TIME_INTERVAL_LOOK);
     }
@@ -152,7 +152,6 @@ AggressorAI::AttackStart(Unit *u)
 
     if(m_creature->Attack(u,true))
     {
-        //    DEBUG_LOG("Creature %s tagged a victim to kill [guid=%u]", m_creature->GetName(), u->GetGUIDLow());
         i_victimGuid = u->GetGUID();
 
         m_creature->AddThreat(u);

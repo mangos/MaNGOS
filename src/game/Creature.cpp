@@ -592,7 +592,7 @@ bool Creature::AIM_Initialize()
     // make sure nothing can change the AI during AI update
     if(m_AI_locked)
     {
-        sLog.outDebug("AIM_Initialize: failed to init, locked.");
+        DEBUG_LOG("AIM_Initialize: failed to init, locked.");
         return false;
     }
 
@@ -1185,7 +1185,7 @@ void Creature::DeleteFromDB()
 {
     if (!m_DBTableGuid)
     {
-        sLog.outDebug("Trying to delete not saved creature!");
+        DEBUG_LOG("Trying to delete not saved creature!");
         return;
     }
 
@@ -1529,7 +1529,7 @@ void Creature::SendAIReaction(AiReaction reactionType)
 
     ((WorldObject*)this)->SendMessageToSet(&data, true);
 
-    sLog.outDebug("WORLD: Sent SMSG_AI_REACTION, type %u.", reactionType);
+    DEBUG_LOG("WORLD: Sent SMSG_AI_REACTION, type %u.", reactionType);
 }
 
 void Creature::CallAssistance()
@@ -1743,7 +1743,7 @@ bool Creature::LoadCreaturesAddon(bool reload)
 
             Aura* AdditionalAura = CreateAura(AdditionalSpellInfo, cAura->effect_idx, NULL, this, this, 0);
             AddAura(AdditionalAura);
-            sLog.outDebug("Spell: %u with Aura %u added to creature (GUIDLow: %u Entry: %u )", cAura->spell_id, AdditionalSpellInfo->EffectApplyAuraName[EFFECT_INDEX_0],GetGUIDLow(),GetEntry());
+            DEBUG_LOG("Spell: %u with Aura %u added to creature (GUIDLow: %u Entry: %u )", cAura->spell_id, AdditionalSpellInfo->EffectApplyAuraName[EFFECT_INDEX_0],GetGUIDLow(),GetEntry());
         }
     }
     return true;

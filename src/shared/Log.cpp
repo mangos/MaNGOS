@@ -246,14 +246,25 @@ void Log::Initialize()
 
     m_logFilter = 0;
 
-    if (sConfig.GetBoolDefault("LogFilter_TransportMoves", true))
+    if (sConfig.GetBoolDefault("LogFilter_TransportMoves",     true))
         m_logFilter |= LOG_FILTER_TRANSPORT_MOVES;
-    if (sConfig.GetBoolDefault("LogFilter_CreatureMoves", true))
+    if (sConfig.GetBoolDefault("LogFilter_CreatureMoves",      true))
         m_logFilter |= LOG_FILTER_CREATURE_MOVES;
-    if (sConfig.GetBoolDefault("LogFilter_VisibilityChanges", true))
+    if (sConfig.GetBoolDefault("LogFilter_VisibilityChanges",  true))
         m_logFilter |= LOG_FILTER_VISIBILITY_CHANGES;
     if (sConfig.GetBoolDefault("LogFilter_AchievementUpdates", true))
         m_logFilter |= LOG_FILTER_ACHIEVEMENT_UPDATES;
+    if (sConfig.GetBoolDefault("LogFilter_Weather",            true))
+        m_logFilter |= LOG_FILTER_WEATHER;
+
+    if (sConfig.GetBoolDefault("LogFilter_SQLText",            false))
+        m_logFilter |= LOG_FILTER_SQL_TEXT;
+    if (sConfig.GetBoolDefault("LogFilter_PlayerMoves",        false))
+        m_logFilter |= LOG_FILTER_PLAYER_MOVES;
+    if (sConfig.GetBoolDefault("LogFilter_PeriodicAffects",    false))
+        m_logFilter |= LOG_FILTER_PERIODIC_AFFECTS;
+    if (sConfig.GetBoolDefault("LogFilter_AIAndMovegens",      false))
+        m_logFilter |= LOG_FILTER_AI_AND_MOVEGENSS;
 
     // Char log settings
     m_charLog_Dump = sConfig.GetBoolDefault("CharLogDump", false);
@@ -843,7 +854,7 @@ void debug_log(const char * str, ...)
     vsnprintf(buf,256, str, ap);
     va_end(ap);
 
-    sLog.outDebug("%s", buf);
+    DEBUG_LOG("%s", buf);
 }
 
 void error_log(const char * str, ...)
