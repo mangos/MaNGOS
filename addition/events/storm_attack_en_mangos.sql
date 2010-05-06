@@ -1,9 +1,9 @@
-﻿## Stormwind City Under Attack 
-## Authors: GrEM fM Team
-## Adapted to 3.3.2: Кот ДаWINчи
-## Redesinged & modified by Selector
-## EN-texts
-## Game-event number - 77, length 60min(1hour), occurence 10080(1week). Day/time of event - Tuesday 20:00
+-- Stormwind City Under Attack 
+-- Authors: GrEM fM Team
+-- Adapted to 3.3.2: Кот ДаWINчи
+-- Redesinged & modified by Selector
+-- EN-texts
+-- Game-event number - 77, length 60min(1hour), occurence 10080(1week). Day/time of event - Tuesday 20:00
 
 REPLACE INTO game_event VALUES ( 77, '2010-04-20 20:00:00', '2020-12-31 21:00:00', 10080, 60, 0, 'Stormwind City Under Attack');
 
