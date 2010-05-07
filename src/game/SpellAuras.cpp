@@ -5271,11 +5271,21 @@ void Aura::HandleAuraModResistanceExclusive(bool apply, bool /*Real*/)
 {
     for(int8 x = SPELL_SCHOOL_NORMAL; x < MAX_SPELL_SCHOOL;x++)
     {
+        int32 oldMaxValue = 0;
         if(m_modifier.m_miscvalue & int32(1<<x))
         {
-            m_target->HandleStatModifier(UnitMods(UNIT_MOD_RESISTANCE_START + x), BASE_VALUE, float(m_modifier.m_amount), apply);
+            // no same resistance auras stack together
+            Unit::AuraList const& REAuras = m_target->GetAurasByType(SPELL_AURA_MOD_RESISTANCE_EXCLUSIVE);
+            for (Unit::AuraList::const_iterator i = REAuras.begin(); i != REAuras.end(); ++i)
+                if (((*i)->GetMiscValue() & int32(1<<x))  && (*i)->GetSpellProto()->Id != GetSpellProto()->Id)
+                    if (oldMaxValue < (*i)->GetModifier()->m_amount)
+                        oldMaxValue = (*i)->GetModifier()->m_amount;
+
+            float value = (m_modifier.m_amount > oldMaxValue) ? m_modifier.m_amount - oldMaxValue : 0.0f;
+
+            m_target->HandleStatModifier(UnitMods(UNIT_MOD_RESISTANCE_START + x), BASE_VALUE, value, apply);
             if(m_target->GetTypeId() == TYPEID_PLAYER)
-                m_target->ApplyResistanceBuffModsMod(SpellSchools(x), m_positive, float(m_modifier.m_amount), apply);
+                m_target->ApplyResistanceBuffModsMod(SpellSchools(x), m_positive, value, apply);
         }
     }
 }
