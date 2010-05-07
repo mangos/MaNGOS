@@ -7306,6 +7306,12 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                 triggered_spell_id = dummySpell->EffectTriggerSpell[effIndex];
                 break;
             }
+            // Hungering Cold - not break from diseases
+            if (dummySpell->SpellIconID == 2797)
+            {
+                if (procSpell && procSpell->Dispel == DISPEL_DISEASE)
+                    return false;
+            }
             break;
         }
         default:
@@ -7428,6 +7434,10 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
                 //case 36207: break:                        // Steal Weapon
                 //case 36576: break:                        // Shaleskin (Shaleskin Flayer, Shaleskin Ripper) 30023 trigger
                 //case 37030: break;                        // Chaotic Temperament
+                case 38164:                                 // Unyielding Knights
+                    if (pVictim->GetEntry() != 19457)
+                        return false;
+                    break;
                 //case 38363: break;                        // Gushing Wound
                 //case 39215: break;                        // Gushing Wound
                 //case 40250: break;                        // Improved Duration
@@ -7796,12 +7806,6 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
                 RemoveAurasDueToSpell(37658);
                 trigger_spell_id = 37661;
                 target = pVictim;
-            }
-            // Unyielding Knights
-            else if (auraSpellInfo->Id == 38164)
-            {
-                if (pVictim->GetTypeId() == TYPEID_PLAYER || pVictim->GetEntry() != 19457)
-                    return false;
             }
             // Bonus Healing (Crystal Spire of Karabor mace)
             else if (auraSpellInfo->Id == 40971)
@@ -13061,6 +13065,7 @@ void Unit::ProcDamageAndSpellFor( bool isVictim, Unit * pTarget, uint32 procFlag
             case SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN:
             case SPELL_AURA_MANA_SHIELD:
             case SPELL_AURA_OBS_MOD_MANA:
+            case SPELL_AURA_MOD_STUN:
             case SPELL_AURA_ADD_PCT_MODIFIER:
             case SPELL_AURA_DUMMY:
             {
