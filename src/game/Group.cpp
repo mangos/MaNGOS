@@ -33,6 +33,7 @@
 #include "InstanceSaveMgr.h"
 #include "MapInstanced.h"
 #include "Util.h"
+#include "LootMgr.h"
 
 Group::Group() : m_Id(0), m_leaderGuid(0), m_mainTank(0), m_mainAssistant(0),  m_groupType(GROUPTYPE_NORMAL),
     m_dungeonDifficulty(REGULAR_DIFFICULTY), m_raidDifficulty(REGULAR_DIFFICULTY),
@@ -483,7 +484,7 @@ void Group::SendLootStartRoll(uint32 CountDown, uint32 mapid, const Roll &r)
     data << uint32(r.itemRandomPropId);                     // item random property ID
     data << uint32(r.itemCount);                            // items in stack
     data << uint32(CountDown);                              // the countdown time to choose "need" or "greed"
-    data << uint8(ALL_ROLL_TYPE_MASK);                      // roll type mask
+    data << uint8(ALL_ROLL_VOTE_MASK);                      // roll type mask, allowed choises
 
     for (Roll::PlayerVote::const_iterator itr = r.playerVote.begin(); itr != r.playerVote.end(); ++itr)
     {
@@ -491,7 +492,7 @@ void Group::SendLootStartRoll(uint32 CountDown, uint32 mapid, const Roll &r)
         if(!p || !p->GetSession())
             continue;
 
-        if(itr->second != NOT_VALID)
+        if(itr->second != ROLL_NOT_VALID)
             p->GetSession()->SendPacket( &data );
     }
 }
@@ -515,12 +516,12 @@ void Group::SendLootRoll(ObjectGuid const& targetGuid, uint8 rollNumber, uint8 r
         if(!p || !p->GetSession())
             continue;
 
-        if(itr->second != NOT_VALID)
+        if(itr->second != ROLL_NOT_VALID)
             p->GetSession()->SendPacket( &data );
     }
 }
 
-void Group::SendLootRollWon(ObjectGuid const& targetGuid, uint8 rollNumber, uint8 rollType, const Roll &r)
+void Group::SendLootRollWon(ObjectGuid const& targetGuid, uint8 rollNumber, RollVote rollType, const Roll &r)
 {
     WorldPacket data(SMSG_LOOT_ROLL_WON, (8+4+4+4+4+8+1+1));
     data << r.lootedTargetGUID;                             // creature guid what we're looting
@@ -538,7 +539,7 @@ void Group::SendLootRollWon(ObjectGuid const& targetGuid, uint8 rollNumber, uint
         if(!p || !p->GetSession())
             continue;
 
-        if(itr->second != NOT_VALID)
+        if(itr->second != ROLL_NOT_VALID)
             p->GetSession()->SendPacket( &data );
     }
 }
@@ -558,7 +559,7 @@ void Group::SendLootAllPassed(Roll const& r)
         if(!p || !p->GetSession())
             continue;
 
-        if(itr->second != NOT_VALID)
+        if(itr->second != ROLL_NOT_VALID)
             p->GetSession()->SendPacket( &data );
     }
 }
@@ -595,7 +596,7 @@ void Group::GroupLoot(ObjectGuid const& playerGUID, Loot *loot, WorldObject *pSo
                 {
                     if (member->IsWithinDist(pSource, sWorld.getConfig(CONFIG_FLOAT_GROUP_XP_DISTANCE), false))
                     {
-                        r->playerVote[member->GetGUID()] = NOT_EMITED_YET;
+                        r->playerVote[member->GetGUID()] = ROLL_NOT_EMITED_YET;
                         ++r->totalPlayersRolling;
                     }
                 }
@@ -607,7 +608,7 @@ void Group::GroupLoot(ObjectGuid const& playerGUID, Loot *loot, WorldObject *pSo
                 r->itemSlot = itemSlot;
 
                 if (r->totalPlayersRolling == 1)            // single looter
-                    r->playerVote.begin()->second = NEED;
+                    r->playerVote.begin()->second = ROLL_NEED;
                 else
                 {
                    if (pSource->GetTypeId() == TYPEID_UNIT)
@@ -669,7 +670,7 @@ void Group::NeedBeforeGreed(ObjectGuid const& playerGUID, Loot *loot, WorldObjec
                 {
                     if (playerToRoll->IsWithinDist(pSource, sWorld.getConfig(CONFIG_FLOAT_GROUP_XP_DISTANCE), false))
                     {
-                        r->playerVote[playerToRoll->GetGUID()] = NOT_EMITED_YET;
+                        r->playerVote[playerToRoll->GetGUID()] = ROLL_NOT_EMITED_YET;
                         ++r->totalPlayersRolling;
                     }
                 }
@@ -681,7 +682,7 @@ void Group::NeedBeforeGreed(ObjectGuid const& playerGUID, Loot *loot, WorldObjec
                 r->itemSlot = itemSlot;
 
                 if (r->totalPlayersRolling == 1)            // single looter
-                    r->playerVote.begin()->second = NEED;
+                    r->playerVote.begin()->second = ROLL_NEED;
                 else
                 {
                     group->SendLootStartRoll(60000, pSource->GetMapId(), *r);
@@ -734,7 +735,7 @@ void Group::MasterLoot(ObjectGuid const& playerGUID, Loot* /*loot*/, WorldObject
     }
 }
 
-void Group::CountRollVote(ObjectGuid const& playerGUID, ObjectGuid const& lootedTarget, uint32 itemSlot, uint8 choise)
+void Group::CountRollVote(ObjectGuid const& playerGUID, ObjectGuid const& lootedTarget, uint32 itemSlot, RollVote choise)
 {
     Rolls::iterator rollI = RollId.begin();
     for (; rollI != RollId.end(); ++rollI)
@@ -747,7 +748,7 @@ void Group::CountRollVote(ObjectGuid const& playerGUID, ObjectGuid const& looted
     CountRollVote(playerGUID, rollI, choise);
 }
 
-bool Group::CountRollVote(ObjectGuid const& playerGUID, Rolls::iterator& rollI, uint8 choise)
+bool Group::CountRollVote(ObjectGuid const& playerGUID, Rolls::iterator& rollI, RollVote choise)
 {
     Roll* roll = *rollI;
 
@@ -764,33 +765,36 @@ bool Group::CountRollVote(ObjectGuid const& playerGUID, Rolls::iterator& rollI, 
     {
         case ROLL_PASS:                                     // Player choose pass
         {
-            SendLootRoll(playerGUID, 128, ROLL_PASS, *roll);
+            SendLootRoll(playerGUID, 128, 128, *roll);
             ++roll->totalPass;
-            itr->second = PASS;
+            itr->second = ROLL_PASS;
+            break;
         }
-        break;
         case ROLL_NEED:                                     // player choose Need
         {
             SendLootRoll(playerGUID, 0, 0, *roll);
             ++roll->totalNeed;
-            itr->second = NEED;
+            itr->second = ROLL_NEED;
+            break;
         }
-        break;
         case ROLL_GREED:                                    // player choose Greed
         {
             SendLootRoll(playerGUID, 128, ROLL_GREED, *roll);
             ++roll->totalGreed;
-            itr->second = GREED;
+            itr->second = ROLL_GREED;
+            break;
         }
-        break;
         case ROLL_DISENCHANT:                               // player choose Disenchant
         {
             SendLootRoll(playerGUID, 128, ROLL_DISENCHANT, *roll);
             ++roll->totalGreed;
-            itr->second = DISENCHANT;
+            itr->second = ROLL_DISENCHANT;
+            break;
         }
-        break;
+        default:                                            // Roll removed case
+            break;
     }
+
     if (roll->totalPass + roll->totalNeed + roll->totalGreed >= roll->totalPlayersRolling)
     {
         CountTheRoll(rollI);
@@ -832,7 +836,7 @@ void Group::CountTheRoll(Rolls::iterator& rollI)
 
             for( Roll::PlayerVote::const_iterator itr = roll->playerVote.begin(); itr != roll->playerVote.end(); ++itr)
             {
-                if (itr->second != NEED)
+                if (itr->second != ROLL_NEED)
                     continue;
 
                 uint8 randomN = urand(1, 99);
@@ -875,12 +879,12 @@ void Group::CountTheRoll(Rolls::iterator& rollI)
             uint8 maxresul = 0;
             uint64 maxguid = (*roll->playerVote.begin()).first;
             Player *player;
-            RollVote rollvote = PASS;                       //Fixed: Using uninitialized memory 'rollvote'
+            RollVote rollvote = ROLL_PASS;                  //Fixed: Using uninitialized memory 'rollvote'
 
             Roll::PlayerVote::iterator itr;
             for (itr = roll->playerVote.begin(); itr != roll->playerVote.end(); ++itr)
             {
-                if (itr->second != GREED && itr->second != DISENCHANT)
+                if (itr->second != ROLL_GREED && itr->second != ROLL_DISENCHANT)
                     continue;
 
                 uint8 randomN = urand(1, 99);
@@ -901,7 +905,7 @@ void Group::CountTheRoll(Rolls::iterator& rollI)
 
                 LootItem *item = &(roll->getLoot()->items[roll->itemSlot]);
 
-                if(rollvote == GREED)
+                if(rollvote == ROLL_GREED)
                 {
                     ItemPosCountVec dest;
                     uint8 msg = player->CanStoreNewItem( NULL_BAG, NULL_SLOT, dest, roll->itemid, item->count );
@@ -918,7 +922,7 @@ void Group::CountTheRoll(Rolls::iterator& rollI)
                         player->SendEquipError( msg, NULL, NULL, roll->itemid );
                     }
                 }
-                else if(rollvote == DISENCHANT)
+                else if(rollvote == ROLL_DISENCHANT)
                 {
                     item->is_looted = true;
                     roll->getLoot()->NotifyItemRemoved(roll->itemSlot);
@@ -1299,18 +1303,18 @@ void Group::_removeRolls(const uint64 &guid)
             continue;
         }
 
-        if (itr2->second == GREED || itr2->second == DISENCHANT)
+        if (itr2->second == ROLL_GREED || itr2->second == ROLL_DISENCHANT)
             --roll->totalGreed;
-        if (itr2->second == NEED)
+        if (itr2->second == ROLL_NEED)
             --roll->totalNeed;
-        if (itr2->second == PASS)
+        if (itr2->second == ROLL_PASS)
             --roll->totalPass;
-        if (itr2->second != NOT_VALID)
+        if (itr2->second != ROLL_NOT_VALID)
             --roll->totalPlayersRolling;
 
         roll->playerVote.erase(itr2);
 
-        if (!CountRollVote(guid, it, MAX_ROLL_TYPE))
+        if (!CountRollVote(guid, it, ROLL_NOT_EMITED_YET))
             ++it;
     }
 }

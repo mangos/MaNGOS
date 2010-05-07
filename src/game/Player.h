@@ -2704,5 +2704,4 @@ bool Player::CheckAllControlledUnits(Func const& func, bool withTotems, bool wit
     return Unit::CheckAllControlledUnits(func,withTotems,withGuardians,withCharms);
 }
 
-
 #endif
