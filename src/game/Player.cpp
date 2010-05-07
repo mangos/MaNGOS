@@ -8498,7 +8498,7 @@ void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
 
 void Player::SendBGWeekendWorldStates()
 {
-    for(int i = 1; i < sSpellStore.GetNumRows(); ++i)
+    for(uint32 i = 1; i < sBattlemasterListStore.GetNumRows(); ++i)
     {
         BattlemasterListEntry const * bl = sBattlemasterListStore.LookupEntry(i);
         if(bl && bl->HolidayWorldStateId)
