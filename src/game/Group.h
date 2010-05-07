@@ -32,14 +32,29 @@
 #define MAXRAIDSIZE 40
 #define TARGETICONCOUNT 8
 
+enum LootMethod
+{
+    FREE_FOR_ALL      = 0,
+    ROUND_ROBIN       = 1,
+    MASTER_LOOT       = 2,
+    GROUP_LOOT        = 3,
+    NEED_BEFORE_GREED = 4
+};
+
+#define ALL_ROLL_VOTE_MASK 0x0F                             // set what votes allowed
+
 enum RollVote
 {
-    PASS              = 0,
-    NEED              = 1,
-    GREED             = 2,
-    DISENCHANT        = 3,
-    NOT_EMITED_YET    = 4,
-    NOT_VALID         = 5
+    ROLL_PASS              = 0,
+    ROLL_NEED              = 1,
+    ROLL_GREED             = 2,
+    ROLL_DISENCHANT        = 3,
+
+    // other not send by client
+    MAX_ROLL_FROM_CLIENT   = 4,
+
+    ROLL_NOT_EMITED_YET    = 4,                             // send to client
+    ROLL_NOT_VALID         = 5                              // not send to client
 };
 
 enum GroupMemberOnlineStatus
@@ -314,12 +329,12 @@ class MANGOS_DLL_SPEC Group
 
         void SendLootStartRoll(uint32 CountDown, uint32 mapid, const Roll &r);
         void SendLootRoll(ObjectGuid const& targetGuid, uint8 rollNumber, uint8 rollType, const Roll &r);
-        void SendLootRollWon(ObjectGuid const& targetGuid, uint8 rollNumber, uint8 rollType, const Roll &r);
+        void SendLootRollWon(ObjectGuid const& targetGuid, uint8 rollNumber, RollVote rollType, const Roll &r);
         void SendLootAllPassed(const Roll &r);
         void GroupLoot(ObjectGuid const& playerGUID, Loot *loot, Creature *creature);
         void NeedBeforeGreed(ObjectGuid const& playerGUID, Loot *loot, Creature *creature);
         void MasterLoot(ObjectGuid const& playerGUID, Loot *loot, Creature *creature);
-        void CountRollVote(ObjectGuid const& playerGUID, ObjectGuid const& lootedTarget, uint32 itemSlot, uint8 choise);
+        void CountRollVote(ObjectGuid const& playerGUID, ObjectGuid const& lootedTarget, uint32 itemSlot, RollVote choise);
         void EndRoll();
 
         void LinkMember(GroupReference *pRef) { m_memberMgr.insertFirst(pRef); }
@@ -391,7 +406,7 @@ class MANGOS_DLL_SPEC Group
         }
 
         void CountTheRoll(Rolls::iterator& roll);           // iterator update to next, in CountRollVote if true
-        bool CountRollVote(ObjectGuid const& playerGUID, Rolls::iterator& roll, uint8 choise);
+        bool CountRollVote(ObjectGuid const& playerGUID, Rolls::iterator& roll, RollVote choise);
 
         uint32              m_Id;                           // 0 for not created or BG groups
         MemberSlotList      m_memberSlots;

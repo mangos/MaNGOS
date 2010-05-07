@@ -386,11 +386,14 @@ void WorldSession::HandleLootRoll( WorldPacket &recv_data )
     //DEBUG_LOG("WORLD RECIEVE CMSG_LOOT_ROLL, From:%u, Numberofplayers:%u, rollType:%u", (uint32)Guid, NumberOfPlayers, rollType);
 
     Group* group = GetPlayer()->GetGroup();
-    if(!group)
+    if (!group)
+        return;
+
+    if (rollType >= MAX_ROLL_FROM_CLIENT)
         return;
 
     // everything is fine, do it
-    group->CountRollVote(GetPlayer()->GetObjectGuid(), lootedTarget, itemSlot, rollType);
+    group->CountRollVote(GetPlayer()->GetObjectGuid(), lootedTarget, itemSlot, RollVote(rollType));
 
     switch (rollType)
     {
