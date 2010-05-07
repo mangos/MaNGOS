@@ -5691,6 +5691,36 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
 
                     break;
                 }
+                case 47393:                                 // The Focus on the Beach: Quest Completion Script
+                {
+                    if (!unitTarget)
+                        return;
+
+                    if (unitTarget->HasAura(47391, EFFECT_INDEX_0))
+                        unitTarget->RemoveAurasDueToSpell(47391);
+
+                    return;
+                }
+                case 47615:                                 // Atop the Woodlands: Quest Completion Script
+                {
+                    if (!unitTarget)
+                        return;
+
+                    if (unitTarget->HasAura(47473, EFFECT_INDEX_0))
+                        unitTarget->RemoveAurasDueToSpell(47473);
+
+                    return;
+                }
+                case 47638:                                 // The End of the Line: Quest Completion Script
+                {
+                    if (!unitTarget)
+                        return;
+
+                    if (unitTarget->HasAura(47636, EFFECT_INDEX_0))
+                        unitTarget->RemoveAurasDueToSpell(47636);
+
+                    return;
+                }
                 case 48603:                                 // High Executor's Branding Iron
                     // Torture the Torturer: High Executor's Branding Iron Impact
                     unitTarget->CastSpell(unitTarget, 48614, true);
