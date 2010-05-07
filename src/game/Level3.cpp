@@ -973,7 +973,7 @@ bool ChatHandler::HandleAccountSetPasswordCommand(const char* args)
     uint32 targetAccountId = extractAccountId((char*)args, &account_name);
     if (!targetAccountId)
         return false;
-    
+
     char *szPassword1 =  strtok (NULL," ");
     char *szPassword2 =  strtok (NULL," ");
     if (!szPassword1 || !szPassword2)

@@ -169,7 +169,7 @@ void Log::SetLogLevel(char* level)
         newLevel = LOG_LVL_DEBUG;
 
     m_logLevel = LogLevel(newLevel);
-                     
+
     printf("LogLevel is %u\n", m_logLevel);
 }
 

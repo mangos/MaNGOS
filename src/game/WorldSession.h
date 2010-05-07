@@ -259,7 +259,7 @@ class MANGOS_DLL_SPEC WorldSession
                     m_tutorialState = TUTORIALDATA_CHANGED;
             }
         }
-                                                             //used with item_page table
+        //used with item_page table
         bool SendItemInfo( uint32 itemid, WorldPacket data );
 
         //auction
