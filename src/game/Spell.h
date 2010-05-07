@@ -475,7 +475,9 @@ class Spell
         // caster types:
         // formal spell caster, in game source of spell affects cast
         Unit* GetCaster() const { return m_caster; }
-        // real source of cast affects, explcit caster, or DoT/HoT applier, or GO owner, etc. Can be NULL
+        // real source of cast affects, explcit caster, or DoT/HoT applier, or GO owner, or wild GO itself. Can be NULL
+        WorldObject* GetAffectiveCasterObject() const;
+        // limited version returning NULL in cases not Unit* caster object, need for Aura (auras currently not support non-Unit caster)
         Unit* GetAffectiveCaster() const { return !m_originalCasterGUID.IsEmpty() ? m_originalCaster : m_caster; }
         // m_originalCasterGUID can store GO guid, and in this case this is visual caster
         WorldObject* GetCastingObject() const;
@@ -656,7 +658,7 @@ namespace MaNGOS
         SpellNotifierPlayer(Spell &spell, std::list<Unit*> &data, const uint32 &i, float radius)
             : i_data(data), i_spell(spell), i_index(i), i_radius(radius)
         {
-            i_originalCaster = i_spell.GetCastingObject();
+            i_originalCaster = i_spell.GetAffectiveCasterObject();
         }
 
         void Visit(PlayerMapType &m)
@@ -694,7 +696,7 @@ namespace MaNGOS
             SpellTargets TargetType = SPELL_TARGETS_NOT_FRIENDLY)
             : i_data(&data), i_spell(spell), i_push_type(type), i_radius(radius), i_TargetType(TargetType)
         {
-            i_originalCaster = spell.GetCastingObject();
+            i_originalCaster = i_spell.GetAffectiveCasterObject();
             i_playerControled = i_originalCaster  ? i_originalCaster->IsControlledByPlayer() : false;
         }
 
