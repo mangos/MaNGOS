@@ -1312,7 +1312,7 @@ void WorldSession::HandleSetTitleOpcode( WorldPacket & recv_data )
     // -1 at none
     if(title > 0 && title < MAX_TITLE_INDEX)
     {
-       if(!GetPlayer()->HasTitle(title))
+        if(!GetPlayer()->HasTitle(title))
             return;
     }
     else

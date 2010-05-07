@@ -265,7 +265,7 @@ void BattleGroundAV::Update(uint32 diff)
             if (m_Nodes[i].Timer > diff)
                 m_Nodes[i].Timer -= diff;
             else
-                 EventPlayerDestroyedPoint(i);
+                EventPlayerDestroyedPoint(i);
         }
     }
 }
@@ -477,9 +477,9 @@ void BattleGroundAV::ChangeMineOwner(uint8 mine, uint32 team)
 bool BattleGroundAV::PlayerCanDoMineQuest(int32 GOId, uint32 team)
 {
     if (GOId == BG_AV_OBJECTID_MINE_N)
-         return (m_Mine_Owner[BG_AV_NORTH_MINE] == GetTeamIndexByTeamId(team));
+        return (m_Mine_Owner[BG_AV_NORTH_MINE] == GetTeamIndexByTeamId(team));
     if (GOId == BG_AV_OBJECTID_MINE_S)
-         return (m_Mine_Owner[BG_AV_SOUTH_MINE] == GetTeamIndexByTeamId(team));
+        return (m_Mine_Owner[BG_AV_SOUTH_MINE] == GetTeamIndexByTeamId(team));
     return true;                                            // cause it's no mine'object it is ok if this is true
 }
 

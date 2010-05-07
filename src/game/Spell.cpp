@@ -5258,8 +5258,8 @@ SpellCastResult Spell::CheckCasterAuras() const
         {
             if(!(*itr)->isAffectedOnSpell(m_spellInfo))
             {
-               prevented_reason = SPELL_FAILED_CASTER_AURASTATE;
-               break;
+                prevented_reason = SPELL_FAILED_CASTER_AURASTATE;
+                break;
             }
         }
     }

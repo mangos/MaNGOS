@@ -1694,7 +1694,7 @@ bool AchievementMgr::IsCompletedAchievement(AchievementEntry const* entry)
 
         // completed as have req. count of completed criterias
         if(achievementForTestCount > 0 && achievementForTestCount <= count)
-           return true;
+            return true;
     }
 
     // all criterias completed requirement

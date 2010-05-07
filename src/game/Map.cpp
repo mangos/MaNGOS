@@ -1560,13 +1560,13 @@ inline ZLiquidStatus GridMap::getLiquidStatus(float x, float y, float z, uint8 R
     int delta = int((liquid_level - z) * 10);
 
     // Get position delta
-    if (delta > 20)                   // Under water
+    if (delta > 20)                                         // Under water
         return LIQUID_MAP_UNDER_WATER;
-    if (delta > 0 )                   // In water
+    if (delta > 0 )                                         // In water
         return LIQUID_MAP_IN_WATER;
-    if (delta > -1)                   // Walk on water
+    if (delta > -1)                                         // Walk on water
         return LIQUID_MAP_WATER_WALK;
-                                      // Above water
+                                                            // Above water
     return LIQUID_MAP_ABOVE_WATER;
 }
 
