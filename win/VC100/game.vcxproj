@@ -373,6 +373,7 @@
     <ClCompile Include="..\..\src\game\Channel.cpp" />
     <ClCompile Include="..\..\src\game\ChannelHandler.cpp" />
     <ClCompile Include="..\..\src\game\ChannelMgr.cpp" />
+    <ClCompile Include="..\..\src\game\CharacterDatabaseCleaner.cpp" />
     <ClCompile Include="..\..\src\game\CharacterHandler.cpp" />
     <ClCompile Include="..\..\src\game\Chat.cpp" />
     <ClCompile Include="..\..\src\game\ChatHandler.cpp" />
@@ -519,6 +520,7 @@
     <ClInclude Include="..\..\src\game\CellImpl.h" />
     <ClInclude Include="..\..\src\game\Channel.h" />
     <ClInclude Include="..\..\src\game\ChannelMgr.h" />
+    <ClInclude Include="..\..\src\game\CharacterDatabaseCleaner.h" />
     <ClInclude Include="..\..\src\game\Chat.h" />
     <ClInclude Include="..\..\src\game\ConfusedMovementGenerator.h" />
     <ClInclude Include="..\..\src\game\Corpse.h" />
