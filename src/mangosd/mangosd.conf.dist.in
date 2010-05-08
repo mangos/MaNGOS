@@ -169,6 +169,10 @@ BindIP = "0.0.0.0"
 #        Default: 1 (permit addon channel)
 #                 0 (do not permit addon channel)
 #
+#    CleanCharacterDB
+#        Perform character db clean ups on start up
+#        Default: 1 (Enable)
+#                 0 (Disabled)
 #
 ###################################################################################################################
 
@@ -195,6 +199,7 @@ TargetPosRecalculateRange = 1.5
 UpdateUptimeInterval = 10
 MaxCoreStuckTime = 0
 AddonChannel = 1
+CleanCharacterDB = 1
 
 ###################################################################################################################
 # SERVER LOGGING
