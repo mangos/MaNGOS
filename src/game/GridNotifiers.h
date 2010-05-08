@@ -821,34 +821,36 @@ namespace MaNGOS
     class AnyAoEVisibleTargetUnitInObjectRangeCheck
     {
         public:
-            AnyAoEVisibleTargetUnitInObjectRangeCheck(WorldObject const* obj, Unit const* funit, float range)
-                : i_obj(obj), i_funit(funit), i_range(range)
+            AnyAoEVisibleTargetUnitInObjectRangeCheck(WorldObject const* obj, WorldObject const* originalCaster, float range)
+                : i_obj(obj), i_originalCaster(originalCaster), i_range(range)
             {
-                Unit const* check = i_funit;
-                Unit const* owner = i_funit->GetOwner();
-                if(owner)
-                    check = owner;
-                i_targetForPlayer = ( check->GetTypeId()==TYPEID_PLAYER );
+                i_targetForUnit = i_originalCaster->isType(TYPEMASK_UNIT);
+                i_targetForPlayer = (i_originalCaster->GetTypeId() == TYPEID_PLAYER);
             }
             bool operator()(Unit* u)
             {
                 // Check contains checks for: live, non-selectable, non-attackable flags, flight check and GM check, ignore totems
                 if (!u->isTargetableForAttack())
                     return false;
+
+                // ignore totems as AoE targets
                 if(u->GetTypeId()==TYPEID_UNIT && ((Creature*)u)->isTotem())
                     return false;
-                if (!u->isVisibleForOrDetect(i_funit, i_funit, false))
+
+                // check visibility only for unit-like original casters
+                if (i_targetForUnit && !u->isVisibleForOrDetect((Unit const*)i_originalCaster, i_originalCaster, false))
                     return false;
 
-                if(( i_targetForPlayer ? !i_funit->IsFriendlyTo(u) : i_funit->IsHostileTo(u) )&& i_obj->IsWithinDistInMap(u, i_range))
+                if ((i_targetForPlayer ? !i_originalCaster->IsFriendlyTo(u) : i_originalCaster->IsHostileTo(u)) && i_obj->IsWithinDistInMap(u, i_range))
                     return true;
 
                 return false;
             }
         private:
+            bool i_targetForUnit;
             bool i_targetForPlayer;
             WorldObject const* i_obj;
-            Unit const* i_funit;
+            WorldObject const* i_originalCaster;
             float i_range;
     };
 
