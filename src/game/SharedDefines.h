@@ -42,7 +42,7 @@ enum Races
     RACE_TAUREN         = 6,
     RACE_GNOME          = 7,
     RACE_TROLL          = 8,
-    //RACE_GOBLIN         = 9,
+    RACE_GOBLIN         = 9,
     RACE_BLOODELF       = 10,
     RACE_DRAENEI        = 11,
     //RACE_FEL_ORC        = 12,
@@ -55,16 +55,17 @@ enum Races
     //RACE_TAUNKA         = 19,
     //RACE_NORTHREND_SKELETON = 20,
     //RACE_ICE_TROLL      = 21
+    RACE_WORGEN         = 22
 };
 
 // max+1 for player race
-#define MAX_RACES         12
+#define MAX_RACES         23
 
 #define RACEMASK_ALL_PLAYABLE \
-    ((1<<(RACE_HUMAN-1))   |(1<<(RACE_ORC-1))          |(1<<(RACE_DWARF-1))   | \
+    ((1<<(RACE_HUMAN-1))  |(1<<(RACE_ORC-1))          |(1<<(RACE_DWARF-1))   | \
     (1<<(RACE_NIGHTELF-1))|(1<<(RACE_UNDEAD_PLAYER-1))|(1<<(RACE_TAUREN-1))  | \
     (1<<(RACE_GNOME-1))   |(1<<(RACE_TROLL-1))        |(1<<(RACE_BLOODELF-1))| \
-    (1<<(RACE_DRAENEI-1)) )
+    (1<<(RACE_DRAENEI-1)) |(1<<(RACE_GOBLIN-1))       |(1<<(RACE_WORGEN-1)))
 
 // Class value is index in ChrClasses.dbc
 enum Classes
@@ -139,10 +140,12 @@ enum Powers
     POWER_HAPPINESS                     = 4,
     POWER_RUNE                          = 5,
     POWER_RUNIC_POWER                   = 6,
+    POWER_SOUL_SHARDS                   = 7,
+    POWER_ECLIPSE                       = 8,
     POWER_HEALTH                        = 0xFFFFFFFE    // (-2 as signed value)
 };
 
-#define MAX_POWERS                        7
+#define MAX_POWERS                        9
 
 enum SpellSchools
 {
@@ -512,10 +515,12 @@ enum Language
     LANG_ZOMBIE         = 36,
     LANG_GNOMISH_BINARY = 37,
     LANG_GOBLIN_BINARY  = 38,
+    LANG_WORGEN         = 39,
+    LANG_GOBLIN         = 40,
     LANG_ADDON          = 0xFFFFFFFF                        // used by addons, in 2.4.0 not exit, replaced by messagetype?
 };
 
-#define LANGUAGES_COUNT   19
+#define LANGUAGES_COUNT   21
 
 enum Team
 {
@@ -2198,10 +2203,25 @@ enum SkillType
     SKILL_PET_WASP                 = 785,
     SKILL_PET_EXOTIC_RHINO         = 786,
     SKILL_PET_EXOTIC_CORE_HOUND    = 787,
-    SKILL_PET_EXOTIC_SPIRIT_BEAST  = 788
+    SKILL_PET_EXOTIC_SPIRIT_BEAST  = 788,
+    SKILL_RACIAL_WORGEN            = 789,
+    SKILL_RACIAL_GOBLIN            = 790,
+    SKILL_LANG_WORGEN              = 791,
+    SKILL_LANG_GOBLIN              = 792,
+    SKILL_ARCHAEOLOGY              = 794,
+    SKILL_GENERAL_HUNTER           = 795,
+    SKILL_GENERAL_DEATHKNIGHT      = 796,
+    SKILL_GENERAL_ROGUE            = 797,
+    SKILL_GENERAL_DRUID            = 798,
+    SKILL_GENERAL_MAGE             = 799,
+    SKILL_GENERAL_PALADIN          = 800,
+    SKILL_GENERAL_SHAMAN           = 801,
+    SKILL_GENERAL_WARLOCK          = 802,
+    SKILL_GENERAL_WARRIOR          = 803,
+    SKILL_GENERAL_PRIEST           = 804
 };
 
-#define MAX_SKILL_TYPE               789
+#define MAX_SKILL_TYPE               805
 
 inline SkillType SkillByLockType(LockType locktype)
 {
