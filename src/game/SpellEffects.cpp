@@ -629,7 +629,7 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
 
                             if(needConsume)
                                 for (uint32 i = 0; i < doses; ++i)
-                                    unitTarget->RemoveSingleSpellAurasFromStack(spellId);
+                                    unitTarget->RemoveSingleSpellAurasByCasterSpell(spellId, m_caster->GetGUID());
 
                             damage *= doses;
                             damage += int32(((Player*)m_caster)->GetTotalAttackPowerValue(BASE_ATTACK) * 0.09f * doses);
