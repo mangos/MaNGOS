@@ -710,7 +710,7 @@ void WorldSession::HandleMailCreateTextItem(WorldPacket & recv_data )
             return;
         }
 
-        bodyItem->SetText(mailTemplateEntry->content);
+        bodyItem->SetText(mailTemplateEntry->content[GetSessionDbcLocale()]);
     }
     else
         bodyItem->SetText(m->body);

@@ -165,7 +165,7 @@ bool MapManager::CanPlayerEnter(uint32 mapid, Player* player)
 {
     const MapEntry *entry = sMapStore.LookupEntry(mapid);
     if(!entry) return false;
-    const char *mapName = entry->name;
+    const char *mapName = entry->name[player->GetSession()->GetSessionDbcLocale()];
 
     if(entry->map_type == MAP_INSTANCE || entry->map_type == MAP_RAID)
     {

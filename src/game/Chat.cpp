@@ -1461,8 +1461,8 @@ valid examples:
 
                             for(uint8 i=0; i<MAX_LOCALE; ++i)
                             {
-                                uint32 skillLineNameLength = strlen(skillLine->name);
-                                if (skillLineNameLength > 0 && strncmp(skillLine->name, buffer, skillLineNameLength) == 0)
+                                uint32 skillLineNameLength = strlen(skillLine->name[i]);
+                                if (skillLineNameLength > 0 && strncmp(skillLine->name[i], buffer, skillLineNameLength) == 0)
                                 {
                                     // found the prefix, remove it to perform spellname validation below
                                     // -2 = strlen(": ")
@@ -1474,7 +1474,7 @@ valid examples:
                         bool foundName = false;
                         for(uint8 i=0; i<MAX_LOCALE; ++i)
                         {
-                            if (*linkedSpell->SpellName && strcmp(linkedSpell->SpellName, buffer) == 0)
+                            if (*linkedSpell->SpellName[i] && strcmp(linkedSpell->SpellName[i], buffer) == 0)
                             {
                                 foundName = true;
                                 break;
@@ -1513,13 +1513,13 @@ valid examples:
                     }
                     else if(linkedItem)
                     {
-                        char* const suffix = itemSuffix?itemSuffix->nameSuffix:(itemProperty?itemProperty->nameSuffix:NULL);
+                        DBCString suffix = itemSuffix?itemSuffix->nameSuffix:(itemProperty?itemProperty->nameSuffix:NULL);
 
                         std::string expectedName = std::string(linkedItem->Name1);
                         if (suffix)
                         {
                             expectedName += " ";
-                            expectedName += suffix;
+                            expectedName += suffix[LOCALE_enUS];
                         }
 
                         if (expectedName != buffer)
@@ -1538,7 +1538,7 @@ valid examples:
                                 if (suffix)
                                 {
                                     expectedName += " ";
-                                    expectedName += suffix;
+                                    expectedName += suffix[i];
                                 }
                                 if ( expectedName == buffer)
                                 {
@@ -1558,7 +1558,7 @@ valid examples:
                         bool foundName = false;
                         for(uint8 i=0; i<MAX_LOCALE; ++i)
                         {
-                            if (*linkedAchievement->name && strcmp(linkedAchievement->name, buffer) == 0)
+                            if (*linkedAchievement->name[i] && strcmp(linkedAchievement->name[i], buffer) == 0)
                             {
                                 foundName = true;
                                 break;
