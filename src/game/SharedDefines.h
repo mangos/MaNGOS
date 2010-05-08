@@ -2676,15 +2676,15 @@ enum TotemSlot
 
 // we need to stick to 1 version or half of the stuff will work for someone
 // others will not and opposite
-// will only support WoW, WoW:TBC and WoW:WotLK 3.3.3 client build 11723...
+// will only support WoW, WoW:TBC and WoW:WotLK 4.0.0 client build 11927...
 
-#define EXPECTED_MANGOSD_CLIENT_BUILD        {11723, 0}
+#define EXPECTED_MANGOSD_CLIENT_BUILD        {11927, 0}
 
 // max supported expansion level in mangosd
 // NOTE: not set it more that supported by targeted client version with all expansions installed
 // account with expansion > client supported will rejected at connection by client
 // because if client receive unsupported expansion level it think
 // that it not have expansion installed and reject
-#define MAX_EXPANSION 2
+#define MAX_EXPANSION 3
 
 #endif

@@ -614,7 +614,7 @@ void Aura::Update(uint32 diff)
             if(Unit* caster = GetCaster())
             {
                 Powers powertype = Powers(m_spellProto->powerType);
-                int32 manaPerSecond = m_spellProto->manaPerSecond + m_spellProto->manaPerSecondPerLevel * caster->getLevel();
+                int32 manaPerSecond = m_spellProto->manaPerSecond;
                 m_timeCla = 1*IN_MILLISECONDS;
                 if (manaPerSecond)
                 {
