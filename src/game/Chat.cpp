@@ -1519,7 +1519,7 @@ valid examples:
                         if (suffix)
                         {
                             expectedName += " ";
-                            expectedName += suffix[LOCALE_enUS];
+                            expectedName += suffix;
                         }
 
                         if (expectedName != buffer)
@@ -1538,7 +1538,7 @@ valid examples:
                                 if (suffix)
                                 {
                                     expectedName += " ";
-                                    expectedName += suffix[i];
+                                    expectedName += suffix;
                                 }
                                 if ( expectedName == buffer)
                                 {
