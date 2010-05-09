@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_9826_01_mangos_spell_script_target` bit(1) default NULL
+  `required_9854_01_mangos_spell_bonus_data` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -14165,6 +14165,7 @@ INSERT INTO `spell_bonus_data` VALUES
 (50401, 0,      0,       0,     'Death Knight - Razor Frost'),
 (47476, 0,      0,       0.06,  'Death Knight - Strangulate'),
 (50536, 0,      0,       0.013, 'Death Knight - Unholy Blight Triggered'),
+(48743, 0,      0,       0,     'Death Knight - Death Pact'),
 /* Druid */
 (5185,  1.6104, 0,       0,     'Druid - Healing Touch'),
 (339,   0,      0.1,     0,     'Druid - Entangling Roots'),
