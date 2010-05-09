@@ -1502,6 +1502,30 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     m_caster->CastSpell(m_caster, 30452, true, NULL);
                     return;
                 }
+                case 51840:                                 // Despawn Fruit Tosser
+                {
+                    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_UNIT)
+                        return;
+
+                    if (roll_chance_i(20))
+                    {
+                        // summon NPC, or...
+                        unitTarget->CastSpell(m_caster, 52070, true);
+                    }
+                    else
+                    {
+                        // ...drop banana, orange or papaya
+                        switch(urand(0,2))
+                        {
+                            case 0: unitTarget->CastSpell(m_caster, 51836, true); break;
+                            case 1: unitTarget->CastSpell(m_caster, 51837, true); break;
+                            case 2: unitTarget->CastSpell(m_caster, 51839, true); break;
+                        }
+                    }
+
+                    ((Creature*)unitTarget)->ForcedDespawn();
+                    return;
+                }
                 case 52308:                                 // Take Sputum Sample
                 {
                     switch(eff_idx)
