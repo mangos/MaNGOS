@@ -1526,6 +1526,17 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     ((Creature*)unitTarget)->ForcedDespawn();
                     return;
                 }
+                case 51964:                                 // Tormentor's Incense
+                {
+                    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_UNIT)
+                        return;
+
+                    // This might not be the best way, and effect may need some adjustment. Removal of any aura from surrounding dummy creatures?
+                    if (((Creature*)unitTarget)->AI())
+                        ((Creature*)unitTarget)->AI()->AttackStart(m_caster);
+
+                    return;
+                }
                 case 52308:                                 // Take Sputum Sample
                 {
                     switch(eff_idx)
@@ -3152,14 +3163,16 @@ void Spell::EffectHeal(SpellEffectIndex /*eff_idx*/)
         // Chain Healing
         if (m_spellInfo->SpellFamilyName == SPELLFAMILY_SHAMAN && m_spellInfo->SpellFamilyFlags & UI64LIT(0x0000000000000100))
         {
-            // check for Riptide
-            if (unitTarget != m_targets.getUnitTarget())
-                return;
-            Aura* riptide = unitTarget->GetAura(SPELL_AURA_PERIODIC_HEAL, SPELLFAMILY_SHAMAN, 0, 0x00000010, caster->GetGUID());
-            if (!riptide)
-                return;
-            addhealth += addhealth/4;
-            unitTarget->RemoveAura(riptide);
+            if (unitTarget == m_targets.getUnitTarget())
+            {
+                // check for Riptide
+                Aura* riptide = unitTarget->GetAura(SPELL_AURA_PERIODIC_HEAL, SPELLFAMILY_SHAMAN, 0, 0x00000010, caster->GetGUID());
+                if (riptide)
+                {
+                    addhealth += addhealth/4;
+                    unitTarget->RemoveAura(riptide);
+                }
+            }
         }
 
         addhealth = caster->SpellHealingBonusDone(unitTarget, m_spellInfo, addhealth, HEAL);
@@ -5770,6 +5783,17 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                         m_caster->CastSpell(m_caster, spellId, true);
 
                     break;
+                }
+                case 54182:                                 // An End to the Suffering: Quest Completion Script
+                {
+                    if (!unitTarget)
+                        return;
+
+                    // Remove aura given at quest accept / gossip
+                    if (unitTarget->HasAura(51967))
+                        unitTarget->RemoveAurasDueToSpell(51967);
+
+                    return;
                 }
                 case 54729:                                 // Winged Steed of the Ebon Blade
                 {

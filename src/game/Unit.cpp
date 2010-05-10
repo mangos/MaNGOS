@@ -5897,7 +5897,10 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     if (!procSpell)
                         return false;
 
-                    Aura* leachAura = pVictim->GetAura(procSpell->Id, EFFECT_INDEX_0);
+                    if (triggeredByAura->GetEffIndex() != EFFECT_INDEX_1)
+                        return false;
+
+                    Aura* leachAura = pVictim->GetAura(SPELL_AURA_PERIODIC_LEECH, SPELLFAMILY_PRIEST, UI64LIT(0x02000000), NULL, GetGUID());
                     if (!leachAura)
                         return false;
 
