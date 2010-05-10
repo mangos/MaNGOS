@@ -247,7 +247,7 @@ char* DBCFileLoader::AutoProduceStringsArrayHolders(const char* format, char* da
     char* stringHoldersPool= new char[stringHoldersPoolSize];
 
     // dbc strings expected to have at least empty string
-    for(int i = 0; i < stringHoldersPoolSize / sizeof(char*); ++i)
+    for(size_t i = 0; i < stringHoldersPoolSize / sizeof(char*); ++i)
         ((char const**)stringHoldersPool)[i] = nullStr;
 
     uint32 offset=0;

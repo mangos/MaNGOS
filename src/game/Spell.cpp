@@ -3958,7 +3958,7 @@ void Spell::TakeReagents()
     if (p_caster->CanNoReagentCast(m_spellInfo) )
         return;
 
-    for(uint32 x = 0; x < 8; ++x)
+    for(uint32 x = 0; x < MAX_REAGENTS; ++x)
     {
         if(m_spellInfo->Reagent[x] <= 0)
             continue;
@@ -5643,7 +5643,7 @@ SpellCastResult Spell::CheckItems()
     {
         if (!p_caster->CanNoReagentCast(m_spellInfo))
         {
-            for(uint32 i = 0; i < 8; ++i)
+            for(uint32 i = 0; i < MAX_REAGENTS; ++i)
             {
                 if(m_spellInfo->Reagent[i] <= 0)
                     continue;
