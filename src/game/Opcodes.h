@@ -1320,7 +1320,7 @@ enum Opcodes
     UMSG_UNKNOWN_1283                               = 0x503, // not found
     UMSG_UNKNOWN_1284                               = 0x504, // not found
     UMSG_UNKNOWN_1285                               = 0x505, // not found
-    SMSG_UNKNOWN_1286                               = 0x506, // ERR_CORPSE_IS_NOT_IN_INSTANCE = 0x1A8,
+    SMSG_CORPSE_IS_NOT_IN_INSTANCE                  = 0x506, // ERR_CORPSE_IS_NOT_IN_INSTANCE = 0x1A8,
     UMSG_UNKNOWN_1287                               = 0x507, // not found
     CMSG_SET_ALLOW_LOW_LEVEL_RAID1                  = 0x508, // lua: SetAllowLowLevelRaid
     CMSG_SET_ALLOW_LOW_LEVEL_RAID2                  = 0x509, // lua: SetAllowLowLevelRaid
