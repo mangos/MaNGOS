@@ -5779,6 +5779,17 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
 
                     break;
                 }
+                case 54182:                                 // An End to the Suffering: Quest Completion Script
+                {
+                    if (!unitTarget)
+                        return;
+
+                    // Remove aura given at quest accept / gossip
+                    if (unitTarget->HasAura(51967))
+                        unitTarget->RemoveAurasDueToSpell(51967);
+
+                    return;
+                }
                 case 54729:                                 // Winged Steed of the Ebon Blade
                 {
                     if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
