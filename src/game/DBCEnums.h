@@ -407,6 +407,5 @@ enum SpellEffectIndex
 };
 
 #define MAX_EFFECT_INDEX 3
-#define MAX_REAGENTS 8
 
 #endif
