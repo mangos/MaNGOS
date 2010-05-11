@@ -5340,20 +5340,6 @@ void Spell::EffectWeaponDmg(SpellEffectIndex eff_idx)
         else if(uint32 ammo = ((Player*)m_caster)->GetUInt32Value(PLAYER_AMMO_ID))
             ((Player*)m_caster)->DestroyItemCount(ammo, 1, true);
     }
-
-    switch(m_spellInfo->Id)                     // for spells with divided damage to targets
-    {
-        case 66765: case 67333:                 // Meteor Fists
-        {
-            uint32 count = 0;
-            for(std::list<TargetInfo>::iterator ihit= m_UniqueTargetInfo.begin();ihit != m_UniqueTargetInfo.end();++ihit) 
-            ++count;
-
-            m_damage /= count;                    // divide to all targets
-            break;
-        }
-        break;
-    }
 }
 
 void Spell::EffectThreat(SpellEffectIndex /*eff_idx*/)
