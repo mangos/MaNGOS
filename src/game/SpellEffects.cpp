@@ -153,7 +153,7 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS]=
     &Spell::EffectKillCreditPersonal,                       // 90 SPELL_EFFECT_KILL_CREDIT              Kill credit but only for single person
     &Spell::EffectUnused,                                   // 91 SPELL_EFFECT_THREAT_ALL               one spell: zzOLDBrainwash
     &Spell::EffectEnchantHeldItem,                          // 92 SPELL_EFFECT_ENCHANT_HELD_ITEM
-    &Spell::EffectSummonPhantasm,                           // 93 SPELL_EFFECT_93
+    &Spell::EffectUnused,                                   // 93 SPELL_EFFECT_93 (old SPELL_EFFECT_SUMMON_PHANTASM)
     &Spell::EffectSelfResurrect,                            // 94 SPELL_EFFECT_SELF_RESURRECT
     &Spell::EffectSkinning,                                 // 95 SPELL_EFFECT_SKINNING
     &Spell::EffectCharge,                                   // 96 SPELL_EFFECT_CHARGE
@@ -7371,16 +7371,6 @@ void Spell::EffectDestroyAllTotems(SpellEffectIndex /*eff_idx*/)
 
     if (mana)
         m_caster->CastCustomSpell(m_caster, 39104, &mana, NULL, NULL, true);
-}
-
-void Spell::EffectSummonPhantasm (SpellEffectIndex /* eff_idx */)
-{
-    if (m_caster->GetTypeId() != TYPEID_PLAYER)
-        return;
-
-    WorldPacket data(SMSG_CLEAR_TARGET, 8);
-    data << uint64(m_caster->GetGUID());
-    m_caster->SendMessageToSet(&data, false);
 }
 
 void Spell::EffectDurabilityDamage(SpellEffectIndex eff_idx)
