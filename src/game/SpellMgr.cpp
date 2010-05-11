@@ -411,9 +411,9 @@ bool IsSingleFromSpellSpecificPerTarget(SpellSpecific spellSpec1,SpellSpecific s
 
 bool IsPositiveTarget(uint32 targetA, uint32 targetB)
 {
-    // non-positive targets
     switch(targetA)
     {
+        // non-positive targets
         case TARGET_CHAIN_DAMAGE:
         case TARGET_ALL_ENEMY_IN_AREA:
         case TARGET_ALL_ENEMY_IN_AREA_INSTANT:
@@ -423,6 +423,7 @@ bool IsPositiveTarget(uint32 targetA, uint32 targetB)
         case TARGET_SINGLE_ENEMY:
         case TARGET_IN_FRONT_OF_CASTER_30:
             return false;
+        // positive or dependent
         case TARGET_CASTER_COORDINATES:
             return (targetB == TARGET_ALL_PARTY || targetB == TARGET_ALL_FRIENDLY_UNITS_AROUND_CASTER);
         default:

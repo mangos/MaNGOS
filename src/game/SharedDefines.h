@@ -1055,7 +1055,7 @@ enum Targets
     TARGET_GAMEOBJECT_ITEM             = 26,
     TARGET_MASTER                      = 27,
     TARGET_ALL_ENEMY_IN_AREA_CHANNELED = 28,
-    TARGET_ALL_FRIENDLY_UNITS_AROUND_CASTER = 30,           // in TargetB used only with TARGET_ALL_AROUND_CASTER and in self casting range in TargetA
+    TARGET_ALL_FRIENDLY_UNITS_AROUND_CASTER = 30,           // select friendly for caster object faction (in different original caster faction) in TargetB used only with TARGET_ALL_AROUND_CASTER and in self casting range in TargetA
     TARGET_ALL_FRIENDLY_UNITS_IN_AREA  = 31,
     TARGET_MINION                      = 32,
     TARGET_ALL_PARTY                   = 33,
