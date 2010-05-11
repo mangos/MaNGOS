@@ -153,7 +153,6 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS]=
     &Spell::EffectKillCreditPersonal,                       // 90 SPELL_EFFECT_KILL_CREDIT              Kill credit but only for single person
     &Spell::EffectUnused,                                   // 91 SPELL_EFFECT_THREAT_ALL               one spell: zzOLDBrainwash
     &Spell::EffectEnchantHeldItem,                          // 92 SPELL_EFFECT_ENCHANT_HELD_ITEM
-    &Spell::EffectSummonPhantasm,                           // 93 SPELL_EFFECT_93
     &Spell::EffectBreakPlayerTargeting,                     // 93 SPELL_EFFECT_BREAK_PLAYER_TARGETING
     &Spell::EffectSelfResurrect,                            // 94 SPELL_EFFECT_SELF_RESURRECT
     &Spell::EffectSkinning,                                 // 95 SPELL_EFFECT_SKINNING
@@ -5126,6 +5125,7 @@ void Spell::EffectWeaponDmg(SpellEffectIndex eff_idx)
                     }
                 }
             }
+
             break;
         }
         case SPELLFAMILY_WARRIOR:
@@ -5413,20 +5413,6 @@ void Spell::EffectWeaponDmg(SpellEffectIndex eff_idx)
         }
         else if(uint32 ammo = ((Player*)m_caster)->GetUInt32Value(PLAYER_AMMO_ID))
             ((Player*)m_caster)->DestroyItemCount(ammo, 1, true);
-    }
-
-    switch(m_spellInfo->Id)                     // for spells with divided damage to targets
-    {
-        case 66765: case 67333:                 // Meteor Fists
-        {
-            uint32 count = 0;
-            for(std::list<TargetInfo>::iterator ihit= m_UniqueTargetInfo.begin();ihit != m_UniqueTargetInfo.end();++ihit) 
-            ++count;
-
-            m_damage /= count;                    // divide to all targets
-            break;
-        }
-        break;
     }
 }
 
@@ -7480,16 +7466,6 @@ void Spell::EffectDestroyAllTotems(SpellEffectIndex /*eff_idx*/)
 
     if (mana)
         m_caster->CastCustomSpell(m_caster, 39104, &mana, NULL, NULL, true);
-}
-
-void Spell::EffectSummonPhantasm (SpellEffectIndex /* eff_idx */)
-{
-    if (m_caster->GetTypeId() != TYPEID_PLAYER)
-        return;
-
-    WorldPacket data(SMSG_CLEAR_TARGET, 8);
-    data << uint64(m_caster->GetGUID());
-    m_caster->SendMessageToSet(&data, false);
 }
 
 void Spell::EffectBreakPlayerTargeting (SpellEffectIndex /* eff_idx */)
