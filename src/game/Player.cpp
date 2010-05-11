@@ -18746,7 +18746,7 @@ void Player::SendCooldownEvent(SpellEntry const *spellInfo, uint32 itemId, Spell
 
 void Player::UpdatePotionCooldown(Spell* spell)
 {
-    // no potion used i combat or still in combat
+    // no potion used in combat or still in combat
     if(!m_lastPotionId || isInCombat())
         return;
 
