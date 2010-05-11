@@ -199,18 +199,23 @@ static bool ReadDBCBuildFileText(const std::string& dbc_path, char const* locale
         return false;
 }
 
-static uint32 ReadDBCBuild(const std::string& dbc_path, char const* localeName = NULL)
+static uint32 ReadDBCBuild(const std::string& dbc_path, LocaleNameStr const* localeNameStr = NULL)
 {
     std::string text;
 
-    if (!localeName)
+    if (!localeNameStr)
     {
-        for(LocaleNameStr* itr = &fullLocaleNameList[0]; itr->name; ++itr)
+        for(LocaleNameStr const* itr = &fullLocaleNameList[0]; itr->name; ++itr)
+        {
             if (ReadDBCBuildFileText(dbc_path,itr->name,text))
+            {
+                localeNameStr = itr;
                 break;
+            }
+        }
     }
     else
-        ReadDBCBuildFileText(dbc_path,localeName,text);
+        ReadDBCBuildFileText(dbc_path,localeNameStr->name,text);
 
     if (text.empty())
         return 0;
@@ -240,7 +245,9 @@ static bool LoadDBC_assert_print(uint32 fsize,uint32 rsize, const std::string& f
 
 struct LocalData
 {
-    explicit LocalData(uint32 build) : main_build(build), availableDbcLocales(0xFFFFFFFF),checkedDbcLocaleBuilds(0) {}
+    LocalData(uint32 build)
+        : main_build(build), availableDbcLocales(0xFFFFFFFF),checkedDbcLocaleBuilds(0) {}
+
     uint32 main_build;
 
     // bitmasks for index of fullLocaleNameList
@@ -263,13 +270,16 @@ inline void LoadDBC(LocalData& localeData,barGoLink& bar, StoreProblemList& errl
             if (!(localeData.availableDbcLocales & (1 << i)))
                 continue;
 
-            std::string dbc_dir_loc = dbc_path + fullLocaleNameList[i].name + "/";
+            LocaleNameStr const* localStr = &fullLocaleNameList[i];
+
+            std::string dbc_dir_loc = dbc_path + localStr->name + "/";
 
             if (!(localeData.checkedDbcLocaleBuilds & (1 << i)))
             {
                 localeData.checkedDbcLocaleBuilds |= (1<<i);// mark as checked for speedup next checks
 
-                uint32 build_loc = ReadDBCBuild(dbc_dir_loc,fullLocaleNameList[i].name);
+
+                uint32 build_loc = ReadDBCBuild(dbc_dir_loc,localStr);
                 if(localeData.main_build != build_loc)
                 {
                     localeData.availableDbcLocales &= ~(1<<i);  // mark as not available for speedup next checks
@@ -277,9 +287,9 @@ inline void LoadDBC(LocalData& localeData,barGoLink& bar, StoreProblemList& errl
                     // exist but wrong build
                     if (build_loc)
                     {
-                        std::string dbc_filename_loc = dbc_path + fullLocaleNameList[i].name + "/" + filename;
+                        std::string dbc_filename_loc = dbc_path + localStr->name + "/" + filename;
                         char buf[200];
-                        snprintf(buf,200," (exist, but DBC locale subdir %s have DBCs for build %u instead expected build %u, it and other DBC from subdir skipped)",fullLocaleNameList[i].name,build_loc,localeData.main_build);
+                        snprintf(buf,200," (exist, but DBC locale subdir %s have DBCs for build %u instead expected build %u, it and other DBC from subdir skipped)",localStr->name,build_loc,localeData.main_build);
                         errlist.push_back(dbc_filename_loc + buf);
                     }
 
@@ -287,7 +297,7 @@ inline void LoadDBC(LocalData& localeData,barGoLink& bar, StoreProblemList& errl
                 }
             }
 
-            std::string dbc_filename_loc = dbc_path + fullLocaleNameList[i].name + "/" + filename;
+            std::string dbc_filename_loc = dbc_path + localStr->name + "/" + filename;
             if(!storage.LoadStringsFrom(dbc_filename_loc.c_str()))
                 localeData.availableDbcLocales &= ~(1<<i);  // mark as not available for speedup next checks
         }
@@ -647,7 +657,7 @@ SimpleFactionsList const* GetFactionTeamList(uint32 faction)
     return &itr->second;
 }
 
-char* GetPetName(uint32 petfamily, uint32 dbclang)
+char const* GetPetName(uint32 petfamily, uint32 dbclang)
 {
     if(!petfamily)
         return NULL;
