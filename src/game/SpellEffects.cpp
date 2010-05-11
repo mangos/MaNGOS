@@ -269,26 +269,6 @@ void Spell::EffectInstaKill(SpellEffectIndex /*eff_idx*/)
     if( !unitTarget || !unitTarget->isAlive() )
         return;
 
-    // Demonic Sacrifice
-    if(m_spellInfo->Id==18788 && unitTarget->GetTypeId()==TYPEID_UNIT)
-    {
-        uint32 entry = unitTarget->GetEntry();
-        uint32 spellID;
-        switch(entry)
-        {
-            case   416: spellID=18789; break;               //imp
-            case   417: spellID=18792; break;               //fellhunter
-            case  1860: spellID=18790; break;               //void
-            case  1863: spellID=18791; break;               //succubus
-            case 17252: spellID=35701; break;               //fellguard
-            default:
-                sLog.outError("EffectInstaKill: Unhandled creature entry (%u) case.", entry);
-                return;
-        }
-
-        m_caster->CastSpell(m_caster, spellID, true);
-    }
-
     if(m_caster == unitTarget)                              // prevent interrupt message
         finish();
 
@@ -4752,25 +4732,7 @@ void Spell::EffectSummonPet(SpellEffectIndex eff_idx)
 
     // petentry==0 for hunter "call pet" (current pet summoned if any)
     if(m_caster->GetTypeId() == TYPEID_PLAYER && NewSummon->LoadPetFromDB((Player*)m_caster, petentry))
-    {
-        if(NewSummon->getPetType() == SUMMON_PET)
-        {
-            // Remove Demonic Sacrifice auras (known pet)
-            Unit::AuraList const& auraClassScripts = m_caster->GetAurasByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
-            for(Unit::AuraList::const_iterator itr = auraClassScripts.begin(); itr != auraClassScripts.end();)
-            {
-                if((*itr)->GetModifier()->m_miscvalue == 2228)
-                {
-                    m_caster->RemoveAurasDueToSpell((*itr)->GetId());
-                    itr = auraClassScripts.begin();
-                }
-                else
-                    ++itr;
-            }
-        }
-
         return;
-    }
 
     // not error in case fail hunter call pet
     if(!petentry)
@@ -4855,19 +4817,6 @@ void Spell::EffectSummonPet(SpellEffectIndex eff_idx)
 
     if(NewSummon->getPetType() == SUMMON_PET)
     {
-        // Remove Demonic Sacrifice auras (new pet)
-        Unit::AuraList const& auraClassScripts = m_caster->GetAurasByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
-        for(Unit::AuraList::const_iterator itr = auraClassScripts.begin(); itr != auraClassScripts.end();)
-        {
-            if((*itr)->GetModifier()->m_miscvalue == 2228)
-            {
-                m_caster->RemoveAurasDueToSpell((*itr)->GetId());
-                itr = auraClassScripts.begin();
-            }
-            else
-                ++itr;
-        }
-
         // generate new name for summon pet
         std::string new_name = sObjectMgr.GeneratePetName(petentry);
         if(!new_name.empty())
