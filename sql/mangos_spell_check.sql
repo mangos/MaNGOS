@@ -96,7 +96,6 @@ INSERT INTO spell_check (spellid,SpellFamilyName,SpellFamilyMaskA,SpellFamilyMas
 (17269,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Create Resonating Skull',            'Spell::EffectDummy'),
 (17270,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Create Bone Dust',                   'Spell::EffectDummy'),
 (17271, 0,                -1,        -1,  -1,  -1,  -1,  3, -1,-1,'Test Fetid Skull',                   'Spell::EffectDummy'),
-(18788,-1,                -1,        -1,  -1,  -1,  -1,  1, -1,-1,'Demonic Sacrifice',                  'Spell::EffectInstaKill'),
 (18789,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'',                                   'Spell::EffectInstaKill'),
 (18790,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'',                                   'Spell::EffectInstaKill'),
 (18791,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'',                                   'Spell::EffectInstaKill'),
