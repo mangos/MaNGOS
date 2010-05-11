@@ -4992,9 +4992,13 @@ void Spell::EffectWeaponDmg(SpellEffectIndex eff_idx)
     {
         case SPELLFAMILY_GENERIC:
         {
-            switch(m_spellInfo->Id)                         // for spells with divided damage to targets
+            switch(m_spellInfo->Id)
             {
-                case 66765: case 67333:                     // Meteor Fists
+                // for spells with divided damage to targets
+                case 66765: case 66809: case 67331:         // Meteor Fists
+                case 67333:                                 // Meteor Fists
+                case 69055:                                 // Bone Slice
+                case 71021:                                 // Saber Lash
                 {
                     uint32 count = 0;
                     for(std::list<TargetInfo>::iterator ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit) 
