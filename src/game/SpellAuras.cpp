@@ -8769,7 +8769,7 @@ void Aura::HandleAuraInitializeImages(bool Apply, bool Real)
     pImmage->SetMaxPower(POWER_MANA, creator->GetMaxPower(POWER_MANA));
     pImmage->SetPower(POWER_MANA, creator->GetPower(POWER_MANA));
     pImmage->setFaction(creator->getFaction());
-    pImmage->SetUInt32Value(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_UNK2 | UNIT_FLAG2_REGENERATE_POWER);
+    pImmage->SetUInt32Value(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FORCE_MOVE | UNIT_FLAG2_REGENERATE_POWER);
     if (creator->IsPvP())
     {
      pImmage->SetPvP(true);
