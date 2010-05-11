@@ -112,6 +112,13 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
                 }
             }
         }
+
+        // Prevent potion drink if another potion in processing (client have potions disabled in like case)
+        if (pItem->IsPotion() && pUser->GetLastPotionId())
+        {
+            pUser->SendEquipError(EQUIP_ERR_OBJECT_IS_BUSY,pItem,NULL);
+            return;
+        }
     }
 
     // check also  BIND_WHEN_PICKED_UP and BIND_QUEST_ITEM for .additem or .additemset case by GM (not binded at adding to inventory)

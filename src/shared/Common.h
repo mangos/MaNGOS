@@ -220,7 +220,7 @@ struct LocaleNameStr
 };
 
 // used for iterate all names including alternative
-extern LocaleNameStr fullLocaleNameList[];
+extern LocaleNameStr const fullLocaleNameList[];
 
 //operator new[] based version of strdup() function! Release memory by using operator delete[] !
 inline char * mangos_strdup(const char * source)

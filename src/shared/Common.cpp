@@ -31,7 +31,7 @@ char const* localeNames[MAX_LOCALE] = {
 };
 
 // used for search by name or iterate all names
-LocaleNameStr fullLocaleNameList[] =
+LocaleNameStr const fullLocaleNameList[] =
 {
     { "enUS", LOCALE_enUS },
     { "enGB", LOCALE_enUS },
@@ -48,7 +48,7 @@ LocaleNameStr fullLocaleNameList[] =
 
 LocaleConstant GetLocaleByName(const std::string& name)
 {
-    for(LocaleNameStr* itr = &fullLocaleNameList[0]; itr->name; ++itr)
+    for(LocaleNameStr const* itr = &fullLocaleNameList[0]; itr->name; ++itr)
         if (name==itr->name)
             return itr->locale;
 

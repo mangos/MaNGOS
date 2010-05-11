@@ -242,6 +242,7 @@ char* DBCFileLoader::AutoProduceStrings(const char* format, char* dataTable)
                 offset+=1;
                 break;
             case FT_STRING:
+            {
                 // fill only not filled entries
                 char** slot = (char**)(&dataTable[offset]);
                 if(!*slot || !**slot)
@@ -251,6 +252,13 @@ char* DBCFileLoader::AutoProduceStrings(const char* format, char* dataTable)
                 }
                 offset+=sizeof(char*);
                 break;
+            }
+            case FT_NA:
+            case FT_NA_BYTE:
+            case FT_SORT:
+                break;
+            default:
+                assert(false && "unknown format character");
         }
     }
 
