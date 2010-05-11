@@ -1423,7 +1423,7 @@ struct SpellEntry
     uint32    EffectImplicitTargetA[MAX_EFFECT_INDEX];      // 86-88    m_implicitTargetA
     uint32    EffectImplicitTargetB[MAX_EFFECT_INDEX];      // 89-91    m_implicitTargetB
     uint32    EffectRadiusIndex[MAX_EFFECT_INDEX];          // 92-94    m_effectRadiusIndex - spellradius.dbc
-    //uint32   unk[3];                                      // 4.0.0 - 97-99
+    //uint32   EffectRadiusMaxIndex[3];                     // 4.0.0 - 97-99
     uint32    EffectApplyAuraName[MAX_EFFECT_INDEX];        // 95-97    m_effectAura
     uint32    EffectAmplitude[MAX_EFFECT_INDEX];            // 98-100   m_effectAuraPeriod
     float     EffectMultipleValue[MAX_EFFECT_INDEX];        // 101-103  m_effectAmplitude

@@ -423,7 +423,7 @@ void WorldSession::HandleItemQuerySingleOpcode( WorldPacket & recv_data )
         data << pProto->Duration;                           // added in 2.4.2.8209, duration (seconds)
         data << pProto->ItemLimitCategory;                  // WotLK, ItemLimitCategory
         data << pProto->HolidayId;                          // Holiday.dbc?
-        data << float(0);
+        data << float(0);                                   // damage/armor scaling factor
         SendPacket( &data );
     }
     else
