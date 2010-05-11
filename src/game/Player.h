@@ -1642,6 +1642,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void _LoadSpellCooldowns(QueryResult *result);
         void _SaveSpellCooldowns();
         void SetLastPotionId(uint32 item_id) { m_lastPotionId = item_id; }
+        uint32 GetLastPotionId() { return m_lastPotionId; }
         void UpdatePotionCooldown(Spell* spell = NULL);
 
         void setResurrectRequestData(uint64 guid, uint32 mapId, float X, float Y, float Z, uint32 health, uint32 mana)
