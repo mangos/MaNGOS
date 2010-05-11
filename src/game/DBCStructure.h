@@ -581,8 +581,7 @@ struct BattlemasterListEntry
     uint32 Unk1;
     uint32 Unk2;
     uint32 IsTournamentRealm;
-    char *categoryName[16];
-    uint32 categoryNameFlags;
+    char *categoryName;
 }*/
 
 /*struct Cfg_ConfigsEntry
@@ -740,8 +739,7 @@ struct CreatureTypeEntry
 {
     uint32    ID;                                           // 0
     uint32    Unk1;                                         // 1        0 for known categories and 3 for unknown one (3.0.9)
-    char*   Name[16];                                       // 2-17     name
-    //                                                      // 18       string flags
+    char*   Name;                                           // 2        name
 };*/
 
 struct CurrencyTypesEntry
@@ -954,15 +952,13 @@ struct GtRegenMPPerSptEntry
 /*struct HolidayDescriptionsEntry
 {
     uint32 ID;                                              // 0, this is NOT holiday id
-    //char*     name[16]                                    // 1-16 m_name_lang
-                                                            // 17 name flags
+    //char*     name;                                       // 1    m_name_lang
 };*/
 
 /*struct HolidayNamesEntry
 {
     uint32 ID;                                              // 0, this is NOT holiday id
-    //char*     name[16]                                    // 1-16 m_name_lang
-    // 17 name flags
+    //char*     name;                                       // 1    m_name_lang
 };*/
 
 struct HolidaysEntry
@@ -1146,7 +1142,7 @@ struct MapDifficultyEntry
     //uint32      Id;                                       // 0
     uint32      MapId;                                      // 1
     uint32      Difficulty;                                 // 2 (for arenas: arena slot)
-    //char*       areaTriggerText[16];                      // 3 text showed when transfer to map failed (missing requirements)
+    //char*       areaTriggerText;                          // 3 text showed when transfer to map failed (missing requirements)
     uint32      resetTime;                                  // 4
     uint32      maxPlayers;                                 // 5
     //char*       difficultyString;                         // 6
@@ -1283,9 +1279,8 @@ struct ScalingStatValuesEntry
 
 //struct SkillLineCategoryEntry{
 //    uint32    id;                                         // 0      m_ID
-//    char*     name[16];                                   // 1-17   m_name_lang
-//                                                          // 18 string flag
-//    uint32    displayOrder;                               // 19     m_sortIndex
+//    char*     name;                                       // 1      m_name_lang
+//    uint32    displayOrder;                               // 2      m_sortIndex
 //};
 
 //struct SkillRaceClassInfoEntry{
