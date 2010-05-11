@@ -3210,15 +3210,15 @@ void Map::ScriptsProcess()
             }
             case SCRIPT_COMMAND_QUEST_EXPLORED:
             {
-                if(!source)
+                if (!source)
                 {
-                    sLog.outError("SCRIPT_COMMAND_QUEST_EXPLORED call for NULL source.");
+                    sLog.outError("SCRIPT_COMMAND_QUEST_EXPLORED (script id %u) call for NULL source.", step.script->id);
                     break;
                 }
 
-                if(!target)
+                if (!target)
                 {
-                    sLog.outError("SCRIPT_COMMAND_QUEST_EXPLORED call for NULL target.");
+                    sLog.outError("SCRIPT_COMMAND_QUEST_EXPLORED (script id %u) call for NULL target.", step.script->id);
                     break;
                 }
 
@@ -3226,11 +3226,11 @@ void Map::ScriptsProcess()
                 WorldObject* worldObject;
                 Player* player;
 
-                if(target->GetTypeId()==TYPEID_PLAYER)
+                if (target->GetTypeId() == TYPEID_PLAYER)
                 {
-                    if(source->GetTypeId()!=TYPEID_UNIT && source->GetTypeId()!=TYPEID_GAMEOBJECT)
+                    if (source->GetTypeId() != TYPEID_UNIT && source->GetTypeId() != TYPEID_GAMEOBJECT && source->GetTypeId() != TYPEID_PLAYER)
                     {
-                        sLog.outError("SCRIPT_COMMAND_QUEST_EXPLORED call for non-creature and non-gameobject (TypeId: %u), skipping.",source->GetTypeId());
+                        sLog.outError("SCRIPT_COMMAND_QUEST_EXPLORED (script id %u) call for non-creature, non-gameobject or non-player (TypeId: %u), skipping.", step.script->id, source->GetTypeId());
                         break;
                     }
 
@@ -3239,15 +3239,15 @@ void Map::ScriptsProcess()
                 }
                 else
                 {
-                    if(target->GetTypeId()!=TYPEID_UNIT && target->GetTypeId()!=TYPEID_GAMEOBJECT)
+                    if (target->GetTypeId() != TYPEID_UNIT && target->GetTypeId() != TYPEID_GAMEOBJECT && target->GetTypeId() != TYPEID_PLAYER)
                     {
-                        sLog.outError("SCRIPT_COMMAND_QUEST_EXPLORED call for non-creature and non-gameobject (TypeId: %u), skipping.",target->GetTypeId());
+                        sLog.outError("SCRIPT_COMMAND_QUEST_EXPLORED (script id %u) call for non-creature, non-gameobject or non-player (TypeId: %u), skipping.", step.script->id, target->GetTypeId());
                         break;
                     }
 
-                    if(source->GetTypeId()!=TYPEID_PLAYER)
+                    if (source->GetTypeId() != TYPEID_PLAYER)
                     {
-                        sLog.outError("SCRIPT_COMMAND_QUEST_EXPLORED call for non-player(TypeId: %u), skipping.",source->GetTypeId());
+                        sLog.outError("SCRIPT_COMMAND_QUEST_EXPLORED (script id %u) call for non-player (TypeId: %u), skipping.", step.script->id, source->GetTypeId());
                         break;
                     }
 
@@ -3256,15 +3256,14 @@ void Map::ScriptsProcess()
                 }
 
                 // quest id and flags checked at script loading
-                if( (worldObject->GetTypeId()!=TYPEID_UNIT || ((Unit*)worldObject)->isAlive()) &&
-                    (step.script->datalong2==0 || worldObject->IsWithinDistInMap(player,float(step.script->datalong2))) )
+                if ((worldObject->GetTypeId() != TYPEID_UNIT || ((Unit*)worldObject)->isAlive()) &&
+                    (step.script->datalong2 == 0 || worldObject->IsWithinDistInMap(player, float(step.script->datalong2))))
                     player->AreaExploredOrEventHappens(step.script->datalong);
                 else
                     player->FailQuest(step.script->datalong);
 
                 break;
             }
-
             case SCRIPT_COMMAND_ACTIVATE_OBJECT:
             {
                 if(!source)
