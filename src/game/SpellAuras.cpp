@@ -4509,16 +4509,13 @@ void Aura::HandleModTaunt(bool apply, bool Real)
 /*********************************************************/
 /***                  MODIFY SPEED                     ***/
 /*********************************************************/
-void Aura::HandleAuraModIncreaseSpeed(bool apply, bool Real)
+void Aura::HandleAuraModIncreaseSpeed(bool /*apply*/, bool Real)
 {
     // all applied/removed only at real aura add/remove
     if(!Real)
         return;
 
     m_target->UpdateSpeed(MOVE_RUN, true);
-
-    if (apply && GetSpellProto()->Id == 58875)
-        m_target->CastSpell(m_target, 58876, true);
 }
 
 void Aura::HandleAuraModIncreaseMountedSpeed(bool apply, bool Real)
