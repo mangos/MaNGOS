@@ -2291,7 +2291,7 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                             ((Player*)m_target)->RemoveAmmo();
                         return;
                     case 48025:                             // Headless Horseman's Mount
-                        Spell::SelectMountByAreaAndSkill(m_target, 51621, 48024, 51617, 48023, NULL);
+                        Spell::SelectMountByAreaAndSkill(m_target, 51621, 48024, 51617, 48023, 0);
                         return;
                     case 62061:                             // Festive Holiday Mount
                         if (m_target->HasAuraType(SPELL_AURA_MOUNTED))
@@ -2309,10 +2309,10 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                             ((Player*)m_target)->removeSpell(63680);
                         return;
                     case 72286:                             // Invincible
-                        Spell::SelectMountByAreaAndSkill(m_target, 72281, 72282, 72283, 72284, NULL);
+                        Spell::SelectMountByAreaAndSkill(m_target, 72281, 72282, 72283, 72284, 0);
                         return;
                     case 74856:                             // Blazing Hippogryph
-                        Spell::SelectMountByAreaAndSkill(m_target, NULL, NULL, 74854, 74855, NULL);
+                        Spell::SelectMountByAreaAndSkill(m_target, 0, 0, 74854, 74855, 0);
                         return;
                     case 75614:                             // Celestial Steed
                         Spell::SelectMountByAreaAndSkill(m_target, 75619, 75620, 75617, 75618, 76153);

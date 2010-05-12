@@ -6556,7 +6556,6 @@ void Spell::SelectMountByAreaAndSkill(Unit* target, uint32 spellId75, uint32 spe
             {
                 if (iter->second.state != PLAYERSPELL_REMOVED)
                 {
-                    bool changedSpeed = false;
                     SpellEntry const *spellInfo = sSpellStore.LookupEntry(iter->first);
                     for(int i = 0; i < MAX_EFFECT_INDEX; ++i)
                     {
@@ -6564,8 +6563,8 @@ void Spell::SelectMountByAreaAndSkill(Unit* target, uint32 spellId75, uint32 spe
                         {
                             int32 mountSpeed = spellInfo->CalculateSimpleValue(SpellEffectIndex(i));
 
-                            // speed higher than 300 replace it
-                            if (mountSpeed > 300)
+                            // speed higher than 280 replace it
+                            if (mountSpeed > 280)
                                 target->CastSpell(target, spellIdSpecial, true);
                             return;
                         }
