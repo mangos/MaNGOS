@@ -1942,6 +1942,8 @@ enum CreatureEliteType
 // values based at Holidays.dbc
 enum HolidayIds
 {
+    HOLIDAY_NONE                     = 0,
+
     HOLIDAY_FIREWORKS_SPECTACULAR    = 62,
     HOLIDAY_FEAST_OF_WINTER_VEIL     = 141,
     HOLIDAY_NOBLEGARDEN              = 181,
