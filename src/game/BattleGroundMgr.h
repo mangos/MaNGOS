@@ -272,6 +272,8 @@ class BattleGroundMgr
         static BattleGroundTypeId BGTemplateId(BattleGroundQueueTypeId bgQueueTypeId);
         static uint8 BGArenaType(BattleGroundQueueTypeId bgQueueTypeId);
 
+        static HolidayIds BGTypeToWeekendHolidayId(BattleGroundTypeId bgTypeId);
+        static BattleGroundTypeId WeekendHolidayIdToBGType(HolidayIds holiday);
         static bool IsBGWeekend(BattleGroundTypeId bgTypeId);
     private:
         ACE_Thread_Mutex    SchedulerLock;

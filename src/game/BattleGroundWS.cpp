@@ -596,35 +596,34 @@ WorldSafeLocsEntry const* BattleGroundWS::GetClosestGraveYard(Player* player)
     }
 }
 
-void BattleGroundWS::FillInitialWorldStates(WorldPacket& data)
+void BattleGroundWS::FillInitialWorldStates(WorldPacket& data, uint32& count)
 {
-    data << uint32(BG_WS_FLAG_CAPTURES_ALLIANCE) << uint32(GetTeamScore(ALLIANCE));
-    data << uint32(BG_WS_FLAG_CAPTURES_HORDE) << uint32(GetTeamScore(HORDE));
+    FillInitialWorldState(data, count, BG_WS_FLAG_CAPTURES_ALLIANCE, GetTeamScore(ALLIANCE));
+    FillInitialWorldState(data, count, BG_WS_FLAG_CAPTURES_HORDE, GetTeamScore(HORDE));
 
     if (m_FlagState[BG_TEAM_ALLIANCE] == BG_WS_FLAG_STATE_ON_GROUND)
-        data << uint32(BG_WS_FLAG_UNK_ALLIANCE) << uint32(-1);
+        FillInitialWorldState(data, count, BG_WS_FLAG_UNK_ALLIANCE, -1);
     else if (m_FlagState[BG_TEAM_ALLIANCE] == BG_WS_FLAG_STATE_ON_PLAYER)
-        data << uint32(BG_WS_FLAG_UNK_ALLIANCE) << uint32(1);
+        FillInitialWorldState(data, count, BG_WS_FLAG_UNK_ALLIANCE, 1);
     else
-        data << uint32(BG_WS_FLAG_UNK_ALLIANCE) << uint32(0);
+        FillInitialWorldState(data, count, BG_WS_FLAG_UNK_ALLIANCE, 0);
 
     if (m_FlagState[BG_TEAM_HORDE] == BG_WS_FLAG_STATE_ON_GROUND)
-        data << uint32(BG_WS_FLAG_UNK_HORDE) << uint32(-1);
+        FillInitialWorldState(data, count, BG_WS_FLAG_UNK_HORDE, -1);
     else if (m_FlagState[BG_TEAM_HORDE] == BG_WS_FLAG_STATE_ON_PLAYER)
-        data << uint32(BG_WS_FLAG_UNK_HORDE) << uint32(1);
+        FillInitialWorldState(data, count, BG_WS_FLAG_UNK_HORDE, 1);
     else
-        data << uint32(BG_WS_FLAG_UNK_HORDE) << uint32(0);
+        FillInitialWorldState(data, count, BG_WS_FLAG_UNK_HORDE, 0);
 
-    data << uint32(BG_WS_FLAG_CAPTURES_MAX) << uint32(BG_WS_MAX_TEAM_SCORE);
+    FillInitialWorldState(data, count, BG_WS_FLAG_CAPTURES_MAX, BG_WS_MAX_TEAM_SCORE);
 
     if (m_FlagState[BG_TEAM_HORDE] == BG_WS_FLAG_STATE_ON_PLAYER)
-        data << uint32(BG_WS_FLAG_STATE_HORDE) << uint32(2);
+        FillInitialWorldState(data, count, BG_WS_FLAG_STATE_HORDE, 2);
     else
-        data << uint32(BG_WS_FLAG_STATE_HORDE) << uint32(1);
+        FillInitialWorldState(data, count, BG_WS_FLAG_STATE_HORDE, 1);
 
     if (m_FlagState[BG_TEAM_ALLIANCE] == BG_WS_FLAG_STATE_ON_PLAYER)
-        data << uint32(BG_WS_FLAG_STATE_ALLIANCE) << uint32(2);
+        FillInitialWorldState(data, count, BG_WS_FLAG_STATE_ALLIANCE, 2);
     else
-        data << uint32(BG_WS_FLAG_STATE_ALLIANCE) << uint32(1);
-
+        FillInitialWorldState(data, count, BG_WS_FLAG_STATE_ALLIANCE, 1);
 }
