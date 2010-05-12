@@ -4159,7 +4159,7 @@ void ObjectMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
 
     scripts.clear();                                        // need for reload support
 
-    QueryResult *result = WorldDatabase.PQuery( "SELECT id,delay,command,datalong,datalong2,dataint, x, y, z, o FROM %s", tablename );
+    QueryResult *result = WorldDatabase.PQuery( "SELECT id, delay, command, datalong, datalong2, datalong3, datalong4, data_flags, dataint, x, y, z, o FROM %s", tablename );
 
     uint32 count = 0;
 
@@ -4181,25 +4181,28 @@ void ObjectMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
 
         Field *fields = result->Fetch();
         ScriptInfo tmp;
-        tmp.id        = fields[0].GetUInt32();
-        tmp.delay     = fields[1].GetUInt32();
-        tmp.command   = fields[2].GetUInt32();
-        tmp.datalong  = fields[3].GetUInt32();
-        tmp.datalong2 = fields[4].GetUInt32();
-        tmp.dataint   = fields[5].GetInt32();
-        tmp.x         = fields[6].GetFloat();
-        tmp.y         = fields[7].GetFloat();
-        tmp.z         = fields[8].GetFloat();
-        tmp.o         = fields[9].GetFloat();
+        tmp.id          = fields[0].GetUInt32();
+        tmp.delay       = fields[1].GetUInt32();
+        tmp.command     = fields[2].GetUInt32();
+        tmp.datalong    = fields[3].GetUInt32();
+        tmp.datalong2   = fields[4].GetUInt32();
+        tmp.datalong3   = fields[5].GetUInt32();
+        tmp.datalong4   = fields[6].GetUInt32();
+        tmp.data_flags  = fields[7].GetUInt32();
+        tmp.dataint     = fields[8].GetInt32();
+        tmp.x           = fields[9].GetFloat();
+        tmp.y           = fields[10].GetFloat();
+        tmp.z           = fields[11].GetFloat();
+        tmp.o           = fields[12].GetFloat();
 
         // generic command args check
         switch(tmp.command)
         {
             case SCRIPT_COMMAND_TALK:
             {
-                if(tmp.datalong > 3)
+                if(tmp.datalong > CHAT_TYPE_ZONE_YELL)
                 {
-                    sLog.outErrorDb("Table `%s` has invalid talk type (datalong = %u) in SCRIPT_COMMAND_TALK for script id %u",tablename,tmp.datalong,tmp.id);
+                    sLog.outErrorDb("Table `%s` has invalid CHAT_TYPE_ (datalong = %u) in SCRIPT_COMMAND_TALK for script id %u",tablename,tmp.datalong,tmp.id);
                     continue;
                 }
                 if(tmp.dataint==0)
