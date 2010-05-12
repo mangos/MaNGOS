@@ -342,7 +342,7 @@ pAuraHandler AuraHandler[TOTAL_AURAS]=
     &Aura::HandleUnused,                                    //289 unused (3.2.2a)
     &Aura::HandleAuraModAllCritChance,                      //290 SPELL_AURA_MOD_ALL_CRIT_CHANCE
     &Aura::HandleNoImmediateEffect,                         //291 SPELL_AURA_MOD_QUEST_XP_PCT           implemented in Player::GiveXP
-    &Aura::HandleNULL,                                      //292 call stabled pet
+    &Aura::HandleAuraOpenStable,                            //292 call stabled pet
     &Aura::HandleNULL,                                      //293 3 spells
     &Aura::HandleNULL,                                      //294 2 spells, possible prevent mana regen
     &Aura::HandleUnused,                                    //295 unused (3.2.2a)
@@ -8671,6 +8671,20 @@ void Aura::HandleAuraModAllCritChance(bool apply, bool Real)
 
     // included in Player::UpdateSpellCritChance calculation
     ((Player*)m_target)->UpdateAllSpellCritChances();
+}
+
+void Aura::HandleAuraOpenStable(bool apply, bool Real)
+{
+    if(!apply || !Real)
+        return;
+
+    Unit* caster = GetCaster();
+    if(!caster || !caster->IsInWorld() || caster->GetTypeId() != TYPEID_PLAYER)
+        return;
+
+    WorldPacket data;
+    data << uint64(caster->GetGUID());
+    ((Player*)caster)->GetSession()->HandleListStabledPetsOpcode(data);
 }
 
 void Aura::HandleAllowOnlyAbility(bool apply, bool Real)
