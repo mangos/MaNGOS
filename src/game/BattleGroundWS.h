@@ -134,7 +134,7 @@ class BattleGroundWS : public BattleGround
         void UpdatePlayerScore(Player *Source, uint32 type, uint32 value);
         void SetDroppedFlagGUID(uint64 guid, uint32 TeamID)  { m_DroppedFlagGUID[GetTeamIndexByTeamId(TeamID)] = guid;}
         uint64 GetDroppedFlagGUID(uint32 TeamID)             { return m_DroppedFlagGUID[GetTeamIndexByTeamId(TeamID)];}
-        virtual void FillInitialWorldStates(WorldPacket& data);
+        virtual void FillInitialWorldStates(WorldPacket& data, uint32& count);
 
         /* Scorekeeping */
         uint32 GetTeamScore(uint32 TeamID) const            { return m_TeamScores[GetTeamIndexByTeamId(TeamID)]; }

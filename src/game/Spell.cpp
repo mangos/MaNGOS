@@ -930,8 +930,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
     unitTarget = unit;
 
     // Reset damage/healing counter
-    m_damage = 0;
-    m_healing = 0;
+    ResetEffectDamageAndHeal();
 
     // Fill base trigger info
     uint32 procAttacker = m_procAttacker;
@@ -1085,6 +1084,8 @@ void Spell::DoSpellHitOnUnit(Unit *unit, const uint32 effectMask)
     {
         if (realCaster)
             realCaster->SendSpellMiss(unit, m_spellInfo->Id, SPELL_MISS_IMMUNE);
+
+        ResetEffectDamageAndHeal();
         return;
     }
 
@@ -1105,6 +1106,7 @@ void Spell::DoSpellHitOnUnit(Unit *unit, const uint32 effectMask)
             unit->GetCharmerOrOwnerGUID() != m_caster->GetGUID())
         {
             realCaster->SendSpellMiss(unit, m_spellInfo->Id, SPELL_MISS_EVADE);
+            ResetEffectDamageAndHeal();
             return;
         }
 
@@ -1115,6 +1117,7 @@ void Spell::DoSpellHitOnUnit(Unit *unit, const uint32 effectMask)
                 !unit->isVisibleForOrDetect(m_caster, m_caster, false))
             {
                 realCaster->SendSpellMiss(unit, m_spellInfo->Id, SPELL_MISS_EVADE);
+                ResetEffectDamageAndHeal();
                 return;
             }
 
@@ -1153,6 +1156,7 @@ void Spell::DoSpellHitOnUnit(Unit *unit, const uint32 effectMask)
             if (m_spellInfo->speed > 0.0f && !IsPositiveSpell(m_spellInfo->Id))
             {
                 realCaster->SendSpellMiss(unit, m_spellInfo->Id, SPELL_MISS_EVADE);
+                ResetEffectDamageAndHeal();
                 return;
             }
 
@@ -1861,7 +1865,8 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                     FillRaidOrPartyManaPriorityTargets(targetUnitMap, m_caster, m_caster, radius, 3, true, false, false);
                     break;
                 default:
-                    FillAreaTargets(targetUnitMap, m_targets.m_destX, m_targets.m_destY, radius, PUSH_SELF_CENTER, SPELL_TARGETS_FRIENDLY);
+                    // selected friendly units (for casting objects) around casting object
+                    FillAreaTargets(targetUnitMap, m_targets.m_destX, m_targets.m_destY, radius, PUSH_SELF_CENTER, SPELL_TARGETS_FRIENDLY, GetCastingObject());
                     break;
             }
             break;
@@ -6500,13 +6505,24 @@ SpellCastResult Spell::CanOpenLock(SpellEffectIndex effIndex, uint32 lockId, Ski
     return SPELL_CAST_OK;
 }
 
-void Spell::FillAreaTargets(UnitList &targetUnitMap, float x, float y, float radius, SpellNotifyPushType pushType, SpellTargets spellTargets)
+/*
+ * Fill target list by units around (x,y) points at radius distance
+
+ * @param targetUnitMap        Reference to target list that filled by function
+ * @param x                    X coordinates of center point for target search
+ * @param y                    Y coordinates of center point for target search
+ * @param radius               Radius around (x,y) for target search
+ * @param pushType             Additional rules for target area selection (in front, angle, etc)
+ * @param spellTargets         Additional rules for target selection base at hostile/friendly state to original spell caster
+ * @param originalCaster       If provided set alternative original caster, if =NULL then used Spell::GetAffectiveObject() return
+ */
+void Spell::FillAreaTargets(UnitList &targetUnitMap, float x, float y, float radius, SpellNotifyPushType pushType, SpellTargets spellTargets, WorldObject* originalCaster /*=NULL*/)
 {
     CellPair p(MaNGOS::ComputeCellPair(x, y));
     Cell cell(p);
     cell.data.Part.reserved = ALL_DISTRICT;
     cell.SetNoCreate();
-    MaNGOS::SpellNotifierCreatureAndPlayer notifier(*this, targetUnitMap, radius, pushType, spellTargets);
+    MaNGOS::SpellNotifierCreatureAndPlayer notifier(*this, targetUnitMap, radius, pushType, spellTargets, originalCaster);
     TypeContainerVisitor<MaNGOS::SpellNotifierCreatureAndPlayer, WorldTypeMapContainer > world_notifier(notifier);
     TypeContainerVisitor<MaNGOS::SpellNotifierCreatureAndPlayer, GridTypeMapContainer > grid_notifier(notifier);
     cell.Visit(p, world_notifier, *m_caster->GetMap(), *m_caster, radius);
@@ -6607,4 +6623,10 @@ WorldObject* Spell::GetCastingObject() const
         return m_caster->IsInWorld() ? m_caster->GetMap()->GetGameObject(m_originalCasterGUID) : NULL;
     else
         return m_caster;
+}
+
+void Spell::ResetEffectDamageAndHeal()
+{
+    m_damage = 0;
+    m_healing = 0;
 }
