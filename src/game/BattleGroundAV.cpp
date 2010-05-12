@@ -608,7 +608,7 @@ void BattleGroundAV::EventPlayerAssaultsPoint(Player* player, BG_AV_Nodes node)
     PlaySoundToAll((team == BG_TEAM_ALLIANCE) ? BG_AV_SOUND_ALLIANCE_ASSAULTS : BG_AV_SOUND_HORDE_ASSAULTS);
 }
 
-void BattleGroundAV::FillInitialWorldStates(WorldPacket& data)
+void BattleGroundAV::FillInitialWorldStates(WorldPacket& data, uint32& count)
 {
     bool stateok;
     for (uint32 i = BG_AV_NODES_FIRSTAID_STATION; i < BG_AV_NODES_MAX; ++i)
@@ -616,28 +616,36 @@ void BattleGroundAV::FillInitialWorldStates(WorldPacket& data)
         for (uint8 j = 0; j < BG_AV_MAX_STATES; j++)
         {
             stateok = (m_Nodes[i].State == j);
-            data << uint32(BG_AV_NodeWorldStates[i][GetWorldStateType(j, BG_TEAM_ALLIANCE)]) << uint32((m_Nodes[i].Owner == BG_TEAM_ALLIANCE && stateok) ? 1 : 0);
-            data << uint32(BG_AV_NodeWorldStates[i][GetWorldStateType(j, BG_TEAM_HORDE)]) << uint32((m_Nodes[i].Owner == BG_TEAM_HORDE && stateok) ? 1 : 0);
+            FillInitialWorldState(data, count, BG_AV_NodeWorldStates[i][GetWorldStateType(j, BG_TEAM_ALLIANCE)],
+                m_Nodes[i].Owner == BG_TEAM_ALLIANCE && stateok);
+            FillInitialWorldState(data, count, BG_AV_NodeWorldStates[i][GetWorldStateType(j, BG_TEAM_HORDE)],
+                m_Nodes[i].Owner == BG_TEAM_HORDE && stateok);
         }
     }
 
     if( m_Nodes[BG_AV_NODES_SNOWFALL_GRAVE].Owner == BG_AV_NEUTRAL_TEAM )   // cause neutral teams aren't handled generic
-        data << uint32(AV_SNOWFALL_N) << uint32(1);
+        FillInitialWorldState(data, count, AV_SNOWFALL_N, 1);
 
-    data << uint32(BG_AV_Alliance_Score)  << uint32(m_TeamScores[BG_TEAM_ALLIANCE]);
-    data << uint32(BG_AV_Horde_Score) << uint32(m_TeamScores[BG_TEAM_HORDE]);
+    FillInitialWorldState(data, count, BG_AV_Alliance_Score, m_TeamScores[BG_TEAM_ALLIANCE]);
+    FillInitialWorldState(data, count, BG_AV_Horde_Score,    m_TeamScores[BG_TEAM_HORDE]);
     if( GetStatus() == STATUS_IN_PROGRESS )                 // only if game is running the teamscores are displayed
     {
-        data << uint32(BG_AV_SHOW_A_SCORE) << uint32(1);
-        data << uint32(BG_AV_SHOW_H_SCORE) << uint32(1);
+        FillInitialWorldState(data, count, BG_AV_SHOW_A_SCORE, 1);
+        FillInitialWorldState(data, count, BG_AV_SHOW_H_SCORE, 1);
     }
     else
     {
-        data << uint32(BG_AV_SHOW_A_SCORE) << uint32(0);
-        data << uint32(BG_AV_SHOW_H_SCORE) << uint32(0);
+        FillInitialWorldState(data, count, BG_AV_SHOW_A_SCORE, 0);
+        FillInitialWorldState(data, count, BG_AV_SHOW_H_SCORE, 0);
     }
-    SendMineWorldStates(BG_AV_NORTH_MINE);
-    SendMineWorldStates(BG_AV_SOUTH_MINE);
+
+    FillInitialWorldState(data, count, BG_AV_MineWorldStates[BG_AV_NORTH_MINE][m_Mine_Owner[BG_AV_NORTH_MINE]], 1);
+    if (m_Mine_Owner[BG_AV_NORTH_MINE] != m_Mine_PrevOwner[BG_AV_NORTH_MINE])
+        FillInitialWorldState(data, count, BG_AV_MineWorldStates[BG_AV_NORTH_MINE][m_Mine_PrevOwner[BG_AV_NORTH_MINE]], 0);
+
+    FillInitialWorldState(data, count, BG_AV_MineWorldStates[BG_AV_SOUTH_MINE][m_Mine_Owner[BG_AV_SOUTH_MINE]], 1);
+    if (m_Mine_Owner[BG_AV_SOUTH_MINE] != m_Mine_PrevOwner[BG_AV_SOUTH_MINE])
+        FillInitialWorldState(data, count, BG_AV_MineWorldStates[BG_AV_SOUTH_MINE][m_Mine_PrevOwner[BG_AV_SOUTH_MINE]], 0);
 }
 
 void BattleGroundAV::UpdateNodeWorldState(BG_AV_Nodes node)

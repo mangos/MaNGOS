@@ -40,7 +40,7 @@ class BattleGroundRL : public BattleGround
         /* inherited from BattlegroundClass */
         virtual void AddPlayer(Player *plr);
         virtual void Reset();
-        virtual void FillInitialWorldStates(WorldPacket &d);
+        virtual void FillInitialWorldStates(WorldPacket &d, uint32& count);
         virtual void StartingEventCloseDoors();
         virtual void StartingEventOpenDoors();
 
