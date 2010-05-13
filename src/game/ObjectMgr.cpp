@@ -4200,19 +4200,29 @@ void ObjectMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
         {
             case SCRIPT_COMMAND_TALK:
             {
-                if(tmp.datalong > CHAT_TYPE_ZONE_YELL)
+                if (tmp.datalong > CHAT_TYPE_ZONE_YELL)
                 {
-                    sLog.outErrorDb("Table `%s` has invalid CHAT_TYPE_ (datalong = %u) in SCRIPT_COMMAND_TALK for script id %u",tablename,tmp.datalong,tmp.id);
+                    sLog.outErrorDb("Table `%s` has invalid CHAT_TYPE_ (datalong = %u) in SCRIPT_COMMAND_TALK for script id %u", tablename, tmp.datalong, tmp.id);
                     continue;
                 }
-                if(tmp.dataint==0)
+                if (tmp.datalong2 && !GetCreatureTemplate(tmp.datalong2))
                 {
-                    sLog.outErrorDb("Table `%s` has invalid talk text id (dataint = %i) in SCRIPT_COMMAND_TALK for script id %u",tablename,tmp.dataint,tmp.id);
+                    sLog.outErrorDb("Table `%s` has datalong2 = %u in SCRIPT_COMMAND_TALK for script id %u, but this creature_template does not exist.", tablename, tmp.datalong2, tmp.id);
                     continue;
                 }
-                if(tmp.dataint < MIN_DB_SCRIPT_STRING_ID || tmp.dataint >= MAX_DB_SCRIPT_STRING_ID)
+                if (tmp.datalong2 && !tmp.datalong3)
                 {
-                    sLog.outErrorDb("Table `%s` has out of range text id (dataint = %i expected %u-%u) in SCRIPT_COMMAND_TALK for script id %u",tablename,tmp.dataint,MIN_DB_SCRIPT_STRING_ID,MAX_DB_SCRIPT_STRING_ID,tmp.id);
+                    sLog.outErrorDb("Table `%s` has datalong2 = %u in SCRIPT_COMMAND_TALK for script id %u, but search radius is too small (datalong3 = %u).", tablename, tmp.datalong2, tmp.id, tmp.datalong3);
+                    continue;
+                }
+                if (tmp.dataint == 0)
+                {
+                    sLog.outErrorDb("Table `%s` has invalid talk text id (dataint = %i) in SCRIPT_COMMAND_TALK for script id %u", tablename, tmp.dataint, tmp.id);
+                    continue;
+                }
+                if (tmp.dataint < MIN_DB_SCRIPT_STRING_ID || tmp.dataint >= MAX_DB_SCRIPT_STRING_ID)
+                {
+                    sLog.outErrorDb("Table `%s` has out of range text id (dataint = %i expected %u-%u) in SCRIPT_COMMAND_TALK for script id %u", tablename, tmp.dataint, MIN_DB_SCRIPT_STRING_ID, MAX_DB_SCRIPT_STRING_ID, tmp.id);
                     continue;
                 }
 
