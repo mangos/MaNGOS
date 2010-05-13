@@ -20906,11 +20906,8 @@ uint32 Player::CalculateTalentsPoints() const
     return uint32(talentPointsForLevel * sWorld.getConfig(CONFIG_FLOAT_RATE_TALENT));
 }
 
-bool Player::IsKnowHowFlyIn(uint32 mapid) const
+bool Player::IsKnowHowFlyIn(uint32 mapid, uint32 zone, uint32 area) const
 {
-    uint32 zone;
-    uint32 area;
-    GetZoneAndAreaId(zone, area);
     // continent checked in SpellMgr::GetSpellAllowedInLocationError at cast and area update
     uint32 v_map = GetVirtualMapForMapAndZone(mapid, zone);
 
