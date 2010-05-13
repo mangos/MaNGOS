@@ -570,7 +570,7 @@ struct BattlemasterListEntry
     //uint32 canJoinAsGroup;                                // 10 (0 or 1)
     DBCString name;                                         // 11
     uint32 maxGroupSize;                                    // 12 maxGroupSize, used for checking if queue as group
-    //uint32 HolidayWorldStateId;                           // 13 new 3.1
+    uint32 HolidayWorldStateId;                             // 13 new 3.1
     uint32 minLevel;                                        // 14, min level (sync with PvPDifficulty.dbc content)
     uint32 maxLevel;                                        // 15, max level (sync with PvPDifficulty.dbc content)
 };

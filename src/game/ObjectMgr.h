@@ -75,6 +75,9 @@ struct ScriptInfo
     uint32 command;
     uint32 datalong;
     uint32 datalong2;
+    uint32 datalong3;
+    uint32 datalong4;
+    uint32 data_flags;
     int32  dataint;
     float x;
     float y;

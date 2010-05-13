@@ -2856,37 +2856,95 @@ void Map::ScriptsProcess()
             {
                 if (!source)
                 {
-                    sLog.outError("SCRIPT_COMMAND_TALK (script id %u) call for NULL creature.", step.script->id);
+                    sLog.outError("SCRIPT_COMMAND_TALK (script id %u) call for NULL source.", step.script->id);
                     break;
                 }
 
-                if (source->GetTypeId()!=TYPEID_UNIT)
+                WorldObject* pSource = dynamic_cast<WorldObject*>(source);
+
+                if (!pSource)
                 {
-                    sLog.outError("SCRIPT_COMMAND_TALK (script id %u) call for non-creature (TypeId: %u), skipping.", step.script->id, source->GetTypeId());
+                    sLog.outError("SCRIPT_COMMAND_TALK (script id %u) call for unsupported non-worldobject (TypeId: %u), skipping.", step.script->id, source->GetTypeId());
                     break;
                 }
+
+                Creature* pBuddy = NULL;
+
+                // flag_target_player_as_source     0x01
+                // flag_original_source_as_target   0x02
+                // flag_buddy_as_target             0x04
+
+                // If target is player (and not already the source) but should be the source
+                if (target && target->GetTypeId() == TYPEID_PLAYER && step.script->data_flags & 0x01)
+                {
+                    if (source->GetTypeId() != TYPEID_PLAYER)
+                        pSource = (WorldObject*)target;
+                }
+
+                // If step has a buddy entry defined, search for it.
+                if (step.script->datalong2)
+                {
+                    MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck u_check(*pSource, step.script->datalong2, true, step.script->datalong3);
+                    MaNGOS::CreatureLastSearcher<MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck> searcher(pSource, pBuddy, u_check);
+
+                    Cell::VisitGridObjects(pSource, searcher, step.script->datalong3);
+                }
+
+                // If buddy found, then use it
+                if (pBuddy)
+                {
+                    // pBuddy can be target of talk
+                    if (step.script->data_flags & 0x04)
+                    {
+                        target = (Object*)pBuddy;
+                    }
+                    else
+                    {
+                        // If not target of talk, then set pBuddy as source
+                        // Useless when source is already flagged to be player, and should maybe produce error.
+                        if (!(step.script->data_flags & 0x01))
+                            pSource = (WorldObject*)pBuddy;
+                    }
+                }
+
+                // If we should talk to the original source instead of target
+                if (step.script->data_flags & 0x02)
+                    target = source;
 
                 uint64 unit_target = target ? target->GetGUID() : 0;
 
-                //datalong 0=normal say, 1=whisper, 2=yell, 3=emote text
                 switch(step.script->datalong)
                 {
-                    case 0:                                 // Say
-                        ((Creature *)source)->Say(step.script->dataint, LANG_UNIVERSAL, unit_target);
+                    case CHAT_TYPE_SAY:
+                        pSource->MonsterSay(step.script->dataint, LANG_UNIVERSAL, unit_target);
                         break;
-                    case 1:                                 // Whisper
-                        if (!unit_target)
+                    case CHAT_TYPE_YELL:
+                        pSource->MonsterYell(step.script->dataint, LANG_UNIVERSAL, unit_target);
+                        break;
+                    case CHAT_TYPE_TEXT_EMOTE:
+                        pSource->MonsterTextEmote(step.script->dataint, unit_target);
+                        break;
+                    case CHAT_TYPE_BOSS_EMOTE:
+                        pSource->MonsterTextEmote(step.script->dataint, unit_target, true);
+                        break;
+                    case CHAT_TYPE_WHISPER:
+                        if (!unit_target || !IS_PLAYER_GUID(unit_target))
                         {
-                            sLog.outError("SCRIPT_COMMAND_TALK (script id %u) attempt to whisper (%u) NULL, skipping.", step.script->id, step.script->datalong);
+                            sLog.outError("SCRIPT_COMMAND_TALK (script id %u) attempt to whisper (%u) 0-guid or non-player, skipping.", step.script->id, step.script->datalong);
                             break;
                         }
-                        ((Creature *)source)->Whisper(step.script->dataint, unit_target);
+                        pSource->MonsterWhisper(step.script->dataint, unit_target);
                         break;
-                    case 2:                                 // Yell
-                        ((Creature *)source)->Yell(step.script->dataint, LANG_UNIVERSAL, unit_target);
+                    case CHAT_TYPE_BOSS_WHISPER:
+                        if (!unit_target || !IS_PLAYER_GUID(unit_target))
+                        {
+                            sLog.outError("SCRIPT_COMMAND_TALK (script id %u) attempt to whisper (%u) 0-guid or non-player, skipping.", step.script->id, step.script->datalong);
+                            break;
+                        }
+                        pSource->MonsterWhisper(step.script->dataint, unit_target, true);
                         break;
-                    case 3:                                 // Emote text
-                        ((Creature *)source)->TextEmote(step.script->dataint, unit_target);
+                    case CHAT_TYPE_ZONE_YELL:
+                        pSource->MonsterYellToZone(step.script->dataint, LANG_UNIVERSAL, unit_target);
                         break;
                     default:
                         break;                              // must be already checked at load

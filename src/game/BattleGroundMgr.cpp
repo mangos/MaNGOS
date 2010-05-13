@@ -2043,21 +2043,33 @@ void BattleGroundMgr::LoadBattleMastersEntry()
     sLog.outString( ">> Loaded %u battlemaster entries", count );
 }
 
-bool BattleGroundMgr::IsBGWeekend(BattleGroundTypeId bgTypeId)
+HolidayIds BattleGroundMgr::BGTypeToWeekendHolidayId(BattleGroundTypeId bgTypeId)
 {
     switch (bgTypeId)
     {
-        case BATTLEGROUND_AV:
-            return IsHolidayActive(HOLIDAY_CALL_TO_ARMS_AV);
-        case BATTLEGROUND_EY:
-            return IsHolidayActive(HOLIDAY_CALL_TO_ARMS_EY);
-        case BATTLEGROUND_WS:
-            return IsHolidayActive(HOLIDAY_CALL_TO_ARMS_WS);
-        case BATTLEGROUND_SA:
-            return IsHolidayActive(HOLIDAY_CALL_TO_ARMS_SA);
-        default:
-            return false;
+        case BATTLEGROUND_AV: return HOLIDAY_CALL_TO_ARMS_AV;
+        case BATTLEGROUND_EY: return HOLIDAY_CALL_TO_ARMS_EY;
+        case BATTLEGROUND_WS: return HOLIDAY_CALL_TO_ARMS_WS;
+        case BATTLEGROUND_SA: return HOLIDAY_CALL_TO_ARMS_SA;
+        default: return HOLIDAY_NONE;
     }
+}
+
+BattleGroundTypeId BattleGroundMgr::WeekendHolidayIdToBGType(HolidayIds holiday)
+{
+    switch (holiday)
+    {
+        case HOLIDAY_CALL_TO_ARMS_AV: return BATTLEGROUND_AV;
+        case HOLIDAY_CALL_TO_ARMS_EY: return BATTLEGROUND_EY;
+        case HOLIDAY_CALL_TO_ARMS_WS: return BATTLEGROUND_WS;
+        case HOLIDAY_CALL_TO_ARMS_SA: return BATTLEGROUND_SA;
+        default: return BATTLEGROUND_TYPE_NONE;
+    }
+}
+
+bool BattleGroundMgr::IsBGWeekend(BattleGroundTypeId bgTypeId)
+{
+    return IsHolidayActive(BGTypeToWeekendHolidayId(bgTypeId));
 }
 
 void BattleGroundMgr::LoadBattleEventIndexes()

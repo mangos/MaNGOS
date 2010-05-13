@@ -411,7 +411,7 @@ class Spell
         void FillTargetMap();
         void SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList &targetUnitMap);
 
-        void FillAreaTargets(UnitList &targetUnitMap, float x, float y, float radius, SpellNotifyPushType pushType, SpellTargets spellTargets);
+        void FillAreaTargets(UnitList &targetUnitMap, float x, float y, float radius, SpellNotifyPushType pushType, SpellTargets spellTargets, WorldObject* originalCaster = NULL);
         void FillRaidOrPartyTargets(UnitList &targetUnitMap, Unit* member, Unit* center, float radius, bool raid, bool withPets, bool withcaster);
         void FillRaidOrPartyManaPriorityTargets(UnitList &targetUnitMap, Unit* member, Unit* center, float radius, uint32 count, bool raid, bool withPets, bool withcaster);
         void FillRaidOrPartyHealthPriorityTargets(UnitList &targetUnitMap, Unit* member, Unit* center, float radius, uint32 count, bool raid, bool withPets, bool withcaster);
@@ -497,6 +497,8 @@ class Spell
         void CastTriggerSpells();
 
         void CleanupTargetList();
+
+        static void SelectMountByAreaAndSkill(Unit* target, uint32 spellId75, uint32 spellId150, uint32 spellId225, uint32 spellId300, uint32 spellIdSpecial);
     protected:
 
         void SendLoot(uint64 guid, LootType loottype);
@@ -611,6 +613,7 @@ class Spell
         void DoAllEffectOnTarget(TargetInfo *target);
         void HandleDelayedSpellLaunch(TargetInfo *target);
         void InitializeDamageMultipliers();
+        void ResetEffectDamageAndHeal();
         void DoSpellHitOnUnit(Unit *unit, uint32 effectMask);
         void DoAllEffectOnTarget(GOTargetInfo *target);
         void DoAllEffectOnTarget(ItemTargetInfo *target);
@@ -694,10 +697,12 @@ namespace MaNGOS
         bool i_playerControled;
 
         SpellNotifierCreatureAndPlayer(Spell &spell, std::list<Unit*> &data, float radius, SpellNotifyPushType type,
-            SpellTargets TargetType = SPELL_TARGETS_NOT_FRIENDLY)
-            : i_data(&data), i_spell(spell), i_push_type(type), i_radius(radius), i_TargetType(TargetType)
+            SpellTargets TargetType = SPELL_TARGETS_NOT_FRIENDLY, WorldObject* originalCaster = NULL)
+            : i_data(&data), i_spell(spell), i_push_type(type), i_radius(radius), i_TargetType(TargetType),
+            i_originalCaster(originalCaster)
         {
-            i_originalCaster = i_spell.GetAffectiveCasterObject();
+            if (!i_originalCaster)
+                i_originalCaster = i_spell.GetAffectiveCasterObject();
             i_playerControled = i_originalCaster  ? i_originalCaster->IsControlledByPlayer() : false;
         }
 
