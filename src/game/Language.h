@@ -776,9 +776,9 @@ enum MangosStrings
     LANG_ACCOUNT_NOT_CREATED            = 1008,
     LANG_CHARACTER_DELETED              = 1009,
     LANG_ACCOUNT_LIST_HEADER            = 1010,
-    LANG_ACCOUNT_LIST_ERROR             = 1011,
+    //                                  = 1011, not used
     LANG_ACCOUNT_LIST_BAR               = 1012,
-    LANG_ACCOUNT_LIST_LINE              = 1013,
+    LANG_ACCOUNT_LIST_LINE_CONSOLE      = 1013,
     LANG_ACCOUNT_LIST_EMPTY             = 1014,
     LANG_QUIT_WRONG_USE_ERROR           = 1015,
     LANG_CHARACTER_DELETED_LIST_HEADER  = 1016,
@@ -833,11 +833,12 @@ enum MangosStrings
     LANG_LIST_TALENTS_TITLE             = 1135,
     LANG_LIST_TALENTS_COUNT             = 1136,
     LANG_GO_LIST_CHAT                   = 1137,
-    LANG_ACCOUNT_CHARACTERS_LIST_BAR    = 1138,
-    LANG_ACCOUNT_CHARACTERS_LIST_HEADER = 1139,
-    LANG_ACCOUNT_CHARACTERS_LIST_LINE_CONSOLE = 1140,
-    LANG_ACCOUNT_CHARACTERS_LIST_LINE_CHAT = 1141,
-    // Room for more level 3              1142-1199 not used
+    LANG_CHARACTERS_LIST_BAR            = 1138,
+    LANG_CHARACTERS_LIST_HEADER         = 1139,
+    LANG_CHARACTERS_LIST_LINE_CONSOLE   = 1140,
+    LANG_CHARACTERS_LIST_LINE_CHAT      = 1141,
+    LANG_ACCOUNT_LIST_LINE_CHAT         = 1142,
+    // Room for more level 3              1143-1199 not used
 
     // Debug commands
     LANG_CINEMATIC_NOT_EXIST            = 1200,

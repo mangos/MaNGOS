@@ -4092,6 +4092,112 @@ bool ChatHandler::HandleLearnAllRecipesCommand(const char* args)
     return true;
 }
 
+bool ChatHandler::HandleLookupAccountEmailCommand(const char* args)
+{
+
+    if (!*args)
+        return false;
+
+    std::string email = strtok ((char*)args, " ");
+    char* limit_str = strtok (NULL, " ");
+    uint32 limit = limit_str ? atoi (limit_str) : 100;
+
+    loginDatabase.escape_string (email);
+    //                                                 0   1         2        3        4
+    QueryResult *result = loginDatabase.PQuery("SELECT id, username, last_ip, gmlevel, expansion FROM account WHERE email "_LIKE_" "_CONCAT3_("'%%'","'%s'","'%%'"), email.c_str ());
+
+    return ShowAccountListHelper(result,&limit);
+}
+
+bool ChatHandler::HandleLookupAccountIpCommand(const char* args)
+{
+
+    if (!*args)
+        return false;
+
+    std::string ip = strtok ((char*)args, " ");
+    char* limit_str = strtok (NULL, " ");
+    uint32 limit = limit_str ? atoi (limit_str) : 100;
+
+    loginDatabase.escape_string (ip);
+
+    //                                                 0   1         2        3        4
+    QueryResult *result = loginDatabase.PQuery("SELECT id, username, last_ip, gmlevel, expansion FROM account WHERE last_ip "_LIKE_" "_CONCAT3_("'%%'","'%s'","'%%'"), ip.c_str ());
+
+    return ShowAccountListHelper(result,&limit);
+}
+
+bool ChatHandler::HandleLookupAccountNameCommand(const char* args)
+{
+    if (!*args)
+        return false;
+
+    std::string account = strtok ((char*)args, " ");
+    char* limit_str = strtok (NULL, " ");
+    uint32 limit = limit_str ? atoi (limit_str) : 100;
+
+    if (!AccountMgr::normalizeString (account))
+        return false;
+
+    loginDatabase.escape_string (account);
+    //                                                 0   1         2        3        4
+    QueryResult *result = loginDatabase.PQuery("SELECT id, username, last_ip, gmlevel, expansion FROM account WHERE username "_LIKE_" "_CONCAT3_("'%%'","'%s'","'%%'"), account.c_str ());
+
+    return ShowAccountListHelper(result,&limit);
+}
+
+bool ChatHandler::ShowAccountListHelper(QueryResult* result, uint32* limit, bool title, bool error)
+{
+    if (!result)
+    {
+        if (error)
+            SendSysMessage(LANG_ACCOUNT_LIST_EMPTY);
+        return true;
+    }
+
+    ///- Display the list of account/characters online
+    if (!m_session && title)                                // not output header for online case
+    {
+        SendSysMessage(LANG_ACCOUNT_LIST_BAR);
+        SendSysMessage(LANG_ACCOUNT_LIST_HEADER);
+        SendSysMessage(LANG_ACCOUNT_LIST_BAR);
+    }
+
+    ///- Circle through accounts
+    do
+    {
+        // check limit
+        if (limit)
+        {
+            if(*limit == 0)
+                break;
+            --*limit;
+        }
+
+        Field *fields = result->Fetch();
+        uint32 account = fields[0].GetUInt32();
+
+        WorldSession* session = sWorld.FindSession(account);
+        Player* player = session ? session->GetPlayer() : NULL;
+        char const* char_name = player ? player->GetName() : " - ";
+
+        if(m_session)
+            PSendSysMessage(LANG_ACCOUNT_LIST_LINE_CHAT,
+            account,fields[1].GetString(),char_name,fields[2].GetString(),fields[3].GetUInt32(),fields[4].GetUInt32());
+        else
+            PSendSysMessage(LANG_ACCOUNT_LIST_LINE_CONSOLE,
+            account,fields[1].GetString(),char_name,fields[2].GetString(),fields[3].GetUInt32(),fields[4].GetUInt32());
+
+    }while(result->NextRow());
+
+    delete result;
+
+    if (!m_session)                                         // not output header for online case
+        SendSysMessage(LANG_ACCOUNT_LIST_BAR);
+
+    return true;
+}
+
 bool ChatHandler::HandleLookupPlayerIpCommand(const char* args)
 {
 
@@ -4100,13 +4206,13 @@ bool ChatHandler::HandleLookupPlayerIpCommand(const char* args)
 
     std::string ip = strtok ((char*)args, " ");
     char* limit_str = strtok (NULL, " ");
-    int32 limit = limit_str ? atoi (limit_str) : -1;
+    uint32 limit = limit_str ? atoi (limit_str) : 100;
 
     loginDatabase.escape_string (ip);
 
-    QueryResult* result = loginDatabase.PQuery ("SELECT id,username FROM account WHERE last_ip = '%s'", ip.c_str ());
+    QueryResult* result = loginDatabase.PQuery ("SELECT id,username FROM account WHERE last_ip "_LIKE_" "_CONCAT3_("'%%'","'%s'","'%%'"), ip.c_str ());
 
-    return LookupPlayerSearchCommand (result,limit);
+    return LookupPlayerSearchCommand (result,&limit);
 }
 
 bool ChatHandler::HandleLookupPlayerAccountCommand(const char* args)
@@ -4116,16 +4222,16 @@ bool ChatHandler::HandleLookupPlayerAccountCommand(const char* args)
 
     std::string account = strtok ((char*)args, " ");
     char* limit_str = strtok (NULL, " ");
-    int32 limit = limit_str ? atoi (limit_str) : -1;
+    uint32 limit = limit_str ? atoi (limit_str) : 100;
 
     if (!AccountMgr::normalizeString (account))
         return false;
 
     loginDatabase.escape_string (account);
 
-    QueryResult* result = loginDatabase.PQuery ("SELECT id,username FROM account WHERE username = '%s'", account.c_str ());
+    QueryResult* result = loginDatabase.PQuery ("SELECT id,username FROM account WHERE username "_LIKE_" "_CONCAT3_("'%%'","'%s'","'%%'"), account.c_str ());
 
-    return LookupPlayerSearchCommand (result,limit);
+    return LookupPlayerSearchCommand (result,&limit);
 }
 
 bool ChatHandler::HandleLookupPlayerEmailCommand(const char* args)
@@ -4136,57 +4242,57 @@ bool ChatHandler::HandleLookupPlayerEmailCommand(const char* args)
 
     std::string email = strtok ((char*)args, " ");
     char* limit_str = strtok (NULL, " ");
-    int32 limit = limit_str ? atoi (limit_str) : -1;
+    uint32 limit = limit_str ? atoi (limit_str) : 100;
 
     loginDatabase.escape_string (email);
 
-    QueryResult* result = loginDatabase.PQuery ("SELECT id,username FROM account WHERE email = '%s'", email.c_str ());
+    QueryResult* result = loginDatabase.PQuery ("SELECT id,username FROM account WHERE email "_LIKE_" "_CONCAT3_("'%%'","'%s'","'%%'"), email.c_str ());
 
-    return LookupPlayerSearchCommand (result,limit);
+    return LookupPlayerSearchCommand (result,&limit);
 }
 
-bool ChatHandler::LookupPlayerSearchCommand(QueryResult* result, int32 limit)
+bool ChatHandler::LookupPlayerSearchCommand(QueryResult* result, uint32* limit)
 {
-    if(!result)
+    if (!result)
     {
         PSendSysMessage(LANG_NO_PLAYERS_FOUND);
         SetSentErrorMessage(true);
         return false;
     }
 
-    int i =0;
+    uint32 limit_original = limit ? *limit : 100;
+
+    uint32 limit_local = limit_original;
+
+    if (!limit)
+        limit = &limit_local;
+
     do
     {
+        if (limit && *limit == 0)
+            break;
+
         Field* fields = result->Fetch();
         uint32 acc_id = fields[0].GetUInt32();
         std::string acc_name = fields[1].GetCppString();
 
-        QueryResult* chars = CharacterDatabase.PQuery("SELECT guid,name FROM characters WHERE account = '%u'", acc_id);
-        if(chars)
+        ///- Get the characters for account id
+        QueryResult *chars = CharacterDatabase.PQuery( "SELECT guid, name, race, class, level FROM characters WHERE account = %u", acc_id);
+        if (chars)
         {
-            PSendSysMessage(LANG_LOOKUP_PLAYER_ACCOUNT,acc_name.c_str(),acc_id);
-
-            uint64 guid = 0;
-            std::string name;
-
-            do
+            if (chars->GetRowCount())
             {
-                Field* charfields = chars->Fetch();
-                guid = charfields[0].GetUInt64();
-                name = charfields[1].GetCppString();
-
-                PSendSysMessage(LANG_LOOKUP_PLAYER_CHARACTER,name.c_str(),guid);
-                ++i;
-
-            } while( chars->NextRow() && ( limit == -1 || i < limit ) );
-
-            delete chars;
+                PSendSysMessage(LANG_LOOKUP_PLAYER_ACCOUNT,acc_name.c_str(),acc_id);
+                ShowPlayerListHelper(chars,limit,true,false);
+            }
+            else
+                delete chars;
         }
     } while(result->NextRow());
 
     delete result;
 
-    if(i==0)                                                // empty accounts only
+    if (*limit==limit_original)                             // empty accounts only
     {
         PSendSysMessage(LANG_NO_PLAYERS_FOUND);
         SetSentErrorMessage(true);
