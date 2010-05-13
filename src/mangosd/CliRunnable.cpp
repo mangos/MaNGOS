@@ -476,50 +476,16 @@ bool ChatHandler::HandleServerExitCommand(const char* /*args*/)
 }
 
 /// Display info on users currently in the realm
-bool ChatHandler::HandleAccountOnlineListCommand(const char* /*args*/)
+bool ChatHandler::HandleAccountOnlineListCommand(const char* args)
 {
+    char* limit_str = *args ? strtok((char*)args, " ") : NULL;
+    uint32 limit = limit_str ? atoi (limit_str) : 100;
+
     ///- Get the list of accounts ID logged to the realm
-    QueryResult *resultDB = CharacterDatabase.Query("SELECT name,account FROM characters WHERE online > 0");
-    if (!resultDB)
-    {
-        SendSysMessage(LANG_ACCOUNT_LIST_EMPTY);
-        return true;
-    }
+    //                                                 0   1         2        3        4
+    QueryResult *result = loginDatabase.PQuery("SELECT id, username, last_ip, gmlevel, expansion FROM account WHERE realm = %u", realmID);
 
-    ///- Display the list of account/characters online
-    SendSysMessage(LANG_ACCOUNT_LIST_BAR);
-    SendSysMessage(LANG_ACCOUNT_LIST_HEADER);
-    SendSysMessage(LANG_ACCOUNT_LIST_BAR);
-
-    ///- Circle through accounts
-    do
-    {
-        Field *fieldsDB = resultDB->Fetch();
-        std::string name = fieldsDB[0].GetCppString();
-        uint32 account = fieldsDB[1].GetUInt32();
-
-        ///- Get the username, last IP and GM level of each account
-        // No SQL injection. account is uint32.
-        //                                                      0         1        2        3
-        QueryResult *resultLogin = loginDatabase.PQuery("SELECT username, last_ip, gmlevel, expansion FROM account WHERE id = '%u'",account);
-
-        if(resultLogin)
-        {
-            Field *fieldsLogin = resultLogin->Fetch();
-            PSendSysMessage(LANG_ACCOUNT_LIST_LINE,
-                fieldsLogin[0].GetString(),name.c_str(),fieldsLogin[1].GetString(),fieldsLogin[2].GetUInt32(),fieldsLogin[3].GetUInt32());
-
-            delete resultLogin;
-        }
-        else
-            PSendSysMessage(LANG_ACCOUNT_LIST_ERROR,name.c_str());
-
-    }while(resultDB->NextRow());
-
-    delete resultDB;
-
-    SendSysMessage(LANG_ACCOUNT_LIST_BAR);
-    return true;
+    return ShowAccountListHelper(result,&limit);
 }
 
 /// Create an account

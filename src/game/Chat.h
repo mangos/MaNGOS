@@ -233,6 +233,9 @@ class ChatHandler
         bool HandleListObjectCommand(const char* args);
         bool HandleListTalentsCommand(const char * args);
 
+        bool HandleLookupAccountEmailCommand(const char* args);
+        bool HandleLookupAccountIpCommand(const char* args);
+        bool HandleLookupAccountNameCommand(const char* args);
         bool HandleLookupAreaCommand(const char* args);
         bool HandleLookupCreatureCommand(const char* args);
         bool HandleLookupEventCommand(const char* args);
@@ -545,7 +548,9 @@ class ChatHandler
 
         // Utility methods for commands
         void ShowTicket(uint64 guid, char const* text, char const* time);
-        bool LookupPlayerSearchCommand(QueryResult* result, int32 limit);
+        bool ShowAccountListHelper(QueryResult* result, uint32* limit = NULL, bool title = true, bool error = true);
+        bool ShowPlayerListHelper(QueryResult* result, uint32* limit = NULL, bool title = true, bool error = true);
+        bool LookupPlayerSearchCommand(QueryResult* result, uint32* limit = NULL);
         bool HandleBanListHelper(QueryResult* result);
         bool HandleBanHelper(BanMode mode,char const* args);
         bool HandleBanInfoHelper(uint32 accountid, char const* accountname);

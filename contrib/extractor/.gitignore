@@ -14,8 +14,10 @@
 *.ncb
 *.pdb
 *.suo
+*.sdf
 debug
 release
+ipch
 *.user
 *.ilk
 ad_debug.exe
