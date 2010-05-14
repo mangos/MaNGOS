@@ -45,10 +45,11 @@ struct WaypointNode
     float z;
     float orientation;
     uint32 delay;
+    uint32 script_id;                                       // Added may 2010. WaypointBehavior w/DB data should in time be removed.
     WaypointBehavior * behavior;
-    WaypointNode() : x(0.0f), y(0.0f), z(0.0f), orientation(0.0f), delay(0), behavior(NULL) {}
-    WaypointNode(float _x, float _y, float _z, float _o, uint32 _delay, WaypointBehavior * _behavior)
-      : x(_x), y(_y), z(_z), orientation(_o), delay(_delay), behavior(_behavior) {}
+    WaypointNode() : x(0.0f), y(0.0f), z(0.0f), orientation(0.0f), delay(0), script_id(0), behavior(NULL) {}
+    WaypointNode(float _x, float _y, float _z, float _o, uint32 _delay, uint32 _script_id, WaypointBehavior * _behavior)
+      : x(_x), y(_y), z(_z), orientation(_o), delay(_delay), script_id(_script_id), behavior(_behavior) {}
 };
 
 typedef std::vector<WaypointNode> WaypointPath;
