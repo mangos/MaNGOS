@@ -1341,7 +1341,35 @@ enum Opcodes
     SMSG_UNKNOWN_1304                               = 0x518, // something with player movement (move event 58?), speed packet
     UMSG_UNKNOWN_1305                               = 0x519, // not found
     UMSG_UNKNOWN_1306                               = 0x51A, // not found
-    NUM_MSG_TYPES                                   = 0x51B
+    CMSG_UNKNOWN_1307                               = 0x51B, // Lua_CommentatorSetSkirmishMatchmakingMode and Lua_CommentatorRequestSkirmishQueueData
+    SMSG_UNKNOWN_1308                               = 0x51C, // EVENT_COMMENTATOR_SKIRMISH_QUEUE_REQUEST
+    CMSG_UNKNOWN_1309                               = 0x51D, // Lua_Transform
+    SMSG_UNKNOWN_1310                               = 0x51E, // ERR_ALTERED_FORM_CANT_TRANSFORM_RIGHT_NOW or ERR_ALTERED_FORM_CAN_NEVER_TRANSFORM
+    SMSG_UNKNOWN_1311                               = 0x51F, // related to transform
+    SMSG_UNKNOWN_1312                               = 0x520, // related to transform
+    UMSG_UNKNOWN_1313                               = 0x521, // not found
+    SMSG_UNKNOWN_1314                               = 0x522, // sets unit+4336 to value from packet
+    SMSG_UNKNOWN_1315                               = 0x523, // related to opcode 0x522
+    SMSG_UNKNOWN_1316                               = 0x524, // sets unit+4338 to value from packet
+    SMSG_UNKNOWN_1317                               = 0x525, // sets unit+4340 to value from packet
+    UMSG_UNKNOWN_1318                               = 0x526, // not found
+    UMSG_UNKNOWN_1319                               = 0x527, // not found
+    CMSG_UNKNOWN_1320                               = 0x528, // setcurrency console command?
+    UMSG_UNKNOWN_1321                               = 0x529, // not found
+    UMSG_UNKNOWN_1322                               = 0x52A, // not found
+    UMSG_UNKNOWN_1323                               = 0x52B, // not found
+    UMSG_UNKNOWN_1324                               = 0x52C, // not found
+    UMSG_UNKNOWN_1325                               = 0x52D, // not found
+    UMSG_UNKNOWN_1326                               = 0x52E, // not found
+    UMSG_UNKNOWN_1327                               = 0x52F, // not found
+    UMSG_UNKNOWN_1328                               = 0x530, // not found
+    SMSG_UNKNOWN_1329                               = 0x531, // faction related
+    UMSG_UNKNOWN_1330                               = 0x532, // not found
+    UMSG_UNKNOWN_1331                               = 0x533, // not found
+    UMSG_UNKNOWN_1332                               = 0x534, // not found
+    UMSG_UNKNOWN_1333                               = 0x535, // not found
+    UMSG_UNKNOWN_1334                               = 0x536, // not found
+    NUM_MSG_TYPES                                   = 0x537
 };
 
 /// Player state
