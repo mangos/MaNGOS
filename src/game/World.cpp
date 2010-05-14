@@ -1185,6 +1185,9 @@ void World::SetInitialWorldSettings()
     sLog.outString( "Loading Trainers..." );
     sObjectMgr.LoadTrainerSpell();                              // must be after load CreatureTemplate
 
+    sLog.outString( "Loading Waypoint scripts..." );            // before loading from creature_movement
+    sObjectMgr.LoadCreatureMovementScripts();
+
     sLog.outString( "Loading Waypoints..." );
     sLog.outString();
     sWaypointMgr.Load();

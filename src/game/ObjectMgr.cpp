@@ -57,6 +57,7 @@ ScriptMapMap sSpellScripts;
 ScriptMapMap sGameObjectScripts;
 ScriptMapMap sEventScripts;
 ScriptMapMap sGossipScripts;
+ScriptMapMap sCreatureMovementScripts;
 
 bool normalizePlayerName(std::string& name)
 {
@@ -4579,6 +4580,11 @@ void ObjectMgr::LoadGossipScripts()
     // checks are done in LoadGossipMenuItems
 }
 
+void ObjectMgr::LoadCreatureMovementScripts()
+{
+    LoadScripts(sCreatureMovementScripts, "creature_movement_scripts");
+}
+
 void ObjectMgr::LoadPageTexts()
 {
     sPageTextStore.Free();                                  // for reload case
@@ -8477,6 +8483,7 @@ void ObjectMgr::LoadDbScriptStrings()
     CheckScripts(sGameObjectScripts,ids);
     CheckScripts(sEventScripts,ids);
     CheckScripts(sGossipScripts,ids);
+    CheckScripts(sCreatureMovementScripts,ids);
 
     sWaypointMgr.CheckTextsExistance(ids);
 
