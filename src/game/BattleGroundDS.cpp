@@ -16,14 +16,16 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include "Object.h"
 #include "Player.h"
 #include "BattleGround.h"
 #include "BattleGroundDS.h"
+#include "ObjectMgr.h"
+#include "WorldPacket.h"
 #include "Language.h"
 
 BattleGroundDS::BattleGroundDS()
 {
-
     m_StartDelayTimes[BG_STARTING_EVENT_FIRST]  = BG_START_DELAY_1M;
     m_StartDelayTimes[BG_STARTING_EVENT_SECOND] = BG_START_DELAY_30S;
     m_StartDelayTimes[BG_STARTING_EVENT_THIRD]  = BG_START_DELAY_15S;
@@ -43,6 +45,24 @@ BattleGroundDS::~BattleGroundDS()
 void BattleGroundDS::Update(uint32 diff)
 {
     BattleGround::Update(diff);
+    if (GetStatus() == STATUS_IN_PROGRESS)
+    {
+        // knockback
+        if(m_uiKnockback < diff)
+        {
+            for(BattleGroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
+            {
+                Player * plr = sObjectMgr.GetPlayer(itr->first);
+                if (plr && plr->IsWithinLOS(1214,765,14) && plr->GetDistance2d(1214,765) <= 50)
+                    plr->KnockBackPlayerWithAngle(6.40f,55,7);
+                if (plr && plr->IsWithinLOS(1369,817,14) && plr->GetDistance2d(1369,817) <= 50)
+                    plr->KnockBackPlayerWithAngle(3.03f,55,7);
+            }
+            m_uiKnockback = 1000;
+        }
+        else
+            m_uiKnockback -= diff;
+    }
 }
 
 void BattleGroundDS::StartingEventCloseDoors()
@@ -51,6 +71,7 @@ void BattleGroundDS::StartingEventCloseDoors()
 
 void BattleGroundDS::StartingEventOpenDoors()
 {
+    OpenDoorEvent(BG_EVENT_DOOR);
 }
 
 void BattleGroundDS::AddPlayer(Player *plr)
@@ -60,19 +81,76 @@ void BattleGroundDS::AddPlayer(Player *plr)
     BattleGroundDSScore* sc = new BattleGroundDSScore;
 
     m_PlayerScores[plr->GetGUID()] = sc;
+
+    UpdateWorldState(0xe11, GetAlivePlayersCountByTeam(ALLIANCE));
+    UpdateWorldState(0xe10, GetAlivePlayersCountByTeam(HORDE));
 }
 
-void BattleGroundDS::RemovePlayer(Player * /*plr*/, uint64 /*guid*/)
+void BattleGroundDS::RemovePlayer(Player* /*plr*/, uint64 /*guid*/)
 {
+    if (GetStatus() == STATUS_WAIT_LEAVE)
+        return;
+
+    UpdateWorldState(0xe11, GetAlivePlayersCountByTeam(ALLIANCE));
+    UpdateWorldState(0xe10, GetAlivePlayersCountByTeam(HORDE));
+
+    CheckArenaWinConditions();
 }
 
-void BattleGroundDS::HandleKillPlayer(Player* player, Player* killer)
+void BattleGroundDS::HandleKillPlayer(Player *player, Player *killer)
 {
-    BattleGround::HandleKillPlayer(player, killer);
+    if (GetStatus() != STATUS_IN_PROGRESS)
+        return;
+
+    if (!killer)
+    {
+        sLog.outError("BattleGroundDS: Killer player not found");
+        return;
+    }
+
+    BattleGround::HandleKillPlayer(player,killer);
+
+    UpdateWorldState(0xe11, GetAlivePlayersCountByTeam(ALLIANCE));
+    UpdateWorldState(0xe10, GetAlivePlayersCountByTeam(HORDE));
+
+    CheckArenaWinConditions();
 }
 
-void BattleGroundDS::HandleAreaTrigger(Player * /*Source*/, uint32 /*Trigger*/)
+bool BattleGroundDS::HandlePlayerUnderMap(Player *player)
 {
+    player->TeleportTo(GetMapId(),1299.046f,784.825f,9.338f,player->GetOrientation(),false);
+    return true;
+}
+
+void BattleGroundDS::HandleAreaTrigger(Player *Source, uint32 Trigger)
+{
+    if (GetStatus() != STATUS_IN_PROGRESS)
+        return;
+
+    switch(Trigger)
+    {
+        case 5347:
+        case 5348:
+            break;
+        default:
+            sLog.outError("WARNING: Unhandled AreaTrigger in Battleground: %u", Trigger);
+            Source->GetSession()->SendAreaTriggerMessage("Warning: Unhandled AreaTrigger in Battleground: %u", Trigger);
+            break;
+    }
+}
+
+void BattleGroundDS::FillInitialWorldStates(WorldPacket &data, uint32& count)
+{
+    FillInitialWorldState(data, count, 0xe11, GetAlivePlayersCountByTeam(ALLIANCE));
+    FillInitialWorldState(data, count, 0xe10, GetAlivePlayersCountByTeam(HORDE));
+    FillInitialWorldState(data, count, 0xe1a, 1);
+}
+
+void BattleGroundDS::Reset()
+{
+    //call parent's class reset
+    BattleGround::Reset();
+    m_uiKnockback = 5000;
 }
 
 bool BattleGroundDS::SetupBattleGround()
