@@ -7177,6 +7177,9 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
             // Necrosis
             if (dummySpell->SpellIconID == 2709)
             {
+                if(!(procFlag & PROC_FLAG_SUCCESSFUL_MELEE_HIT))
+                    return false;
+
                 basepoints[0] = triggerAmount * damage / 100;
                 triggered_spell_id = 51460;
                 break;
