@@ -2860,14 +2860,13 @@ void Map::ScriptsProcess()
                     break;
                 }
 
-                WorldObject* pSource = dynamic_cast<WorldObject*>(source);
-
-                if (!pSource)
+                if (!source->isType(TYPEMASK_WORLDOBJECT))
                 {
                     sLog.outError("SCRIPT_COMMAND_TALK (script id %u) call for unsupported non-worldobject (TypeId: %u), skipping.", step.script->id, source->GetTypeId());
                     break;
                 }
 
+                WorldObject* pSource = (WorldObject*)source;
                 Creature* pBuddy = NULL;
 
                 // flag_target_player_as_source     0x01
@@ -3091,13 +3090,13 @@ void Map::ScriptsProcess()
                     break;
                 }
 
-                WorldObject* summoner = dynamic_cast<WorldObject*>(source);
-
-                if (!summoner)
+                if (!source->isType(TYPEMASK_WORLDOBJECT))
                 {
                     sLog.outError("SCRIPT_COMMAND_TEMP_SUMMON_CREATURE (script id %u) call for non-WorldObject (TypeId: %u), skipping.", step.script->id, source->GetTypeId());
                     break;
                 }
+
+                WorldObject* summoner = (WorldObject*)source;
 
                 float x = step.script->x;
                 float y = step.script->y;
@@ -3127,13 +3126,13 @@ void Map::ScriptsProcess()
                     break;
                 }
 
-                WorldObject* summoner = dynamic_cast<WorldObject*>(source);
-
-                if (!summoner)
+                if (!source->isType(TYPEMASK_WORLDOBJECT))
                 {
                     sLog.outError("SCRIPT_COMMAND_RESPAWN_GAMEOBJECT (script id %u) call for non-WorldObject (TypeId: %u), skipping.", step.script->id, source->GetTypeId());
                     break;
                 }
+
+                WorldObject* summoner = (WorldObject*)source;
 
                 GameObject *go = NULL;
                 int32 time_to_despawn = step.script->datalong2<5 ? 5 : (int32)step.script->datalong2;
@@ -3428,13 +3427,13 @@ void Map::ScriptsProcess()
                     break;
                 }
 
-                WorldObject* pSource = dynamic_cast<WorldObject*>(source);
-
-                if (!pSource)
+                if (!source->isType(TYPEMASK_WORLDOBJECT))
                 {
                     sLog.outError("SCRIPT_COMMAND_PLAY_SOUND (script id %u) call for non-world object (TypeId: %u), skipping.", step.script->id, source->GetTypeId());
                     break;
                 }
+
+                WorldObject* pSource = (WorldObject*)source;
 
                 // bitmask: 0/1=anyone/target, 0/2=with distance dependent
                 Player* pTarget = NULL;
