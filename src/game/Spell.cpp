@@ -188,6 +188,10 @@ void SpellCastTargets::Update(Unit* caster)
         ( m_unitTargetGUID == caster->GetObjectGuid() ? caster : ObjectAccessor::GetUnit(*caster, m_unitTargetGUID) ) :
     NULL;
 
+    if (m_unitTarget && m_unitTargetGUID != caster->GetObjectGuid() &&
+        !m_unitTarget->isVisibleForOrDetect(caster, caster, false))
+            m_unitTarget = NULL;
+
     m_itemTarget = NULL;
     if(caster->GetTypeId() == TYPEID_PLAYER)
     {
