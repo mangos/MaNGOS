@@ -66,10 +66,18 @@ enum ItemModType
     ITEM_MOD_SPELL_POWER              = 45,
     ITEM_MOD_HEALTH_REGEN             = 46,
     ITEM_MOD_SPELL_PENETRATION        = 47,
-    ITEM_MOD_BLOCK_VALUE              = 48
+    ITEM_MOD_BLOCK_VALUE              = 48,
+    ITEM_MOD_MASTERY_RATING           = 49,
+    ITEM_MOD_EXTRA_ARMOR              = 50,
+    ITEM_MOD_FIRE_RESISTANCE          = 51,
+    ITEM_MOD_FROST_RESISTANCE         = 52,
+    ITEM_MOD_HOLY_RESISTANCE          = 53,
+    ITEM_MOD_SHADOW_RESISTANCE        = 54,
+    ITEM_MOD_NATURE_RESISTANCE        = 55,
+    ITEM_MOD_ARCANE_RESISTANCE        = 56
 };
 
-#define MAX_ITEM_MOD                    49
+#define MAX_ITEM_MOD                    57
 
 enum ItemSpelltriggerType
 {
