@@ -3295,35 +3295,6 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
                 case FORM_BEAR:
                 case FORM_DIREBEAR:
                 {
-                    // Heart of the Wild
-                    Unit::AuraList const& mStats = m_target->GetAurasByType(SPELL_AURA_MOD_STAT);
-                    for(Unit::AuraList::const_iterator i = mStats.begin(); i != mStats.end(); ++i)
-                    {
-                        switch ((*i)->GetSpellProto()->Id)
-                        {
-                            case 17003:
-                            case 17004:
-                            case 17005:
-                            case 17006:
-                            case 24894:
-                            {
-                                int32 statsBonus = (*i)->GetSpellProto()->EffectBasePoints[1];
-                                if (form == FORM_CAT)
-                                    m_target->CastCustomSpell(m_target, 24900, &statsBonus, NULL, NULL, true);
-                                else
-                                {
-                                    m_target->CastCustomSpell(m_target, 24899, &statsBonus, NULL, NULL, true);
-                                    int32 health = statsBonus * m_target->GetMaxHealth() / 100;
-                                    m_target->CastCustomSpell(m_target, 25142, &health, NULL, NULL, true);
-                                }
-                                break;
-                            }
-                            default:
-                                continue;
-                        }
-                        break;
-                    }
-
                     // get furor proc chance
                     int32 furorChance = 0;
                     Unit::AuraList const& mDummy = m_target->GetAurasByType(SPELL_AURA_DUMMY);
