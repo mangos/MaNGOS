@@ -9157,12 +9157,6 @@ uint32 Unit::SpellDamageBonusDone(Unit *pVictim, SpellEntry const *spellProto, u
     {
         float LvlPenalty = CalculateLevelPenalty(spellProto);
 
-        // Spellmod SpellDamage
-        float SpellModSpellDamage = 100.0f;
-        if(Player* modOwner = GetSpellModOwner())
-            modOwner->ApplySpellMod(spellProto->Id,SPELLMOD_SPELL_BONUS_DAMAGE,SpellModSpellDamage);
-        SpellModSpellDamage /= 100.0f;
-
         // Distribute Damage over multiple effects, reduce by AoE
         float coeff;
 
@@ -9181,7 +9175,15 @@ uint32 Unit::SpellDamageBonusDone(Unit *pVictim, SpellEntry const *spellProto, u
         else
             coeff = CalculateDefaultCoefficient(spellProto, damagetype);
 
-        DoneTotal  += int32(DoneAdvertisedBenefit * coeff * LvlPenalty * SpellModSpellDamage);
+        // Spellmod SpellDamage
+        if(Player* modOwner = GetSpellModOwner())
+        {
+            coeff *= 100.0f;
+            modOwner->ApplySpellMod(spellProto->Id,SPELLMOD_SPELL_BONUS_DAMAGE, coeff);
+            coeff /= 100.0f;
+        }
+
+        DoneTotal  += int32(DoneAdvertisedBenefit * coeff * LvlPenalty);
     }
 
     float tmpDamage = (int32(pdamage) + DoneTotal * int32(stack)) * DoneTotalMod;
@@ -9264,6 +9266,14 @@ uint32 Unit::SpellDamageBonusTaken(Unit *pCaster, SpellEntry const *spellProto, 
         // Default calculation
         else 
             coeff = CalculateDefaultCoefficient(spellProto, damagetype);
+
+        // Spellmod SpellDamage
+        if(Player* modOwner = pCaster->GetSpellModOwner())
+        {
+            coeff *= 100.0f;
+            modOwner->ApplySpellMod(spellProto->Id,SPELLMOD_SPELL_BONUS_DAMAGE, coeff);
+            coeff /= 100.0f;
+        }
 
         TakenTotal += int32(TakenAdvertisedBenefit * coeff * LvlPenalty);
     }
@@ -9670,12 +9680,6 @@ uint32 Unit::SpellHealingBonusDone(Unit *pVictim, SpellEntry const *spellProto, 
     {
         float LvlPenalty = CalculateLevelPenalty(spellProto);
 
-        // Spellmod SpellDamage
-        float SpellModSpellDamage = 100.0f;
-        if(Player* modOwner = GetSpellModOwner())
-            modOwner->ApplySpellMod(spellProto->Id, SPELLMOD_SPELL_BONUS_DAMAGE, SpellModSpellDamage);
-        SpellModSpellDamage /= 100.0f;
-
         // Distribute Damage over multiple effects, reduce by AoE
         float coeff;
 
@@ -9694,7 +9698,15 @@ uint32 Unit::SpellHealingBonusDone(Unit *pVictim, SpellEntry const *spellProto, 
         else
             coeff = CalculateDefaultCoefficient(spellProto, damagetype) * 1.88f;
 
-        DoneTotal  += int32(DoneAdvertisedBenefit * coeff * LvlPenalty * SpellModSpellDamage);
+        // Spellmod SpellDamage
+        if(Player* modOwner = GetSpellModOwner())
+        {
+            coeff *= 100.0f;
+            modOwner->ApplySpellMod(spellProto->Id,SPELLMOD_SPELL_BONUS_DAMAGE, coeff);
+            coeff /= 100.0f;
+        }
+
+        DoneTotal  += int32(DoneAdvertisedBenefit * coeff * LvlPenalty);
     }
 
     // use float as more appropriate for negative values and percent applying
@@ -9753,6 +9765,14 @@ uint32 Unit::SpellHealingBonusTaken(Unit *pCaster, SpellEntry const *spellProto,
         // Default calculation
         else
             coeff = CalculateDefaultCoefficient(spellProto, damagetype) * 1.88f;
+
+        // Spellmod SpellDamage
+        if(Player* modOwner = pCaster->GetSpellModOwner())
+        {
+            coeff *= 100.0f;
+            modOwner->ApplySpellMod(spellProto->Id,SPELLMOD_SPELL_BONUS_DAMAGE, coeff);
+            coeff /= 100.0f;
+        }
 
         TakenTotal += int32(TakenAdvertisedBenefit * coeff * LvlPenalty);
     }
@@ -10156,6 +10176,14 @@ uint32 Unit::MeleeDamageBonusDone(Unit *pVictim, uint32 pdamage,WeaponAttackType
         else if (DoneFlat)
             coeff = CalculateDefaultCoefficient(spellProto, damagetype);
 
+        // Spellmod SpellDamage
+        if(Player* modOwner = GetSpellModOwner())
+        {
+            coeff *= 100.0f;
+            modOwner->ApplySpellMod(spellProto->Id,SPELLMOD_SPELL_BONUS_DAMAGE, coeff);
+            coeff /= 100.0f;
+        }
+
         DoneTotal += DoneFlat * coeff * LvlPenalty;
     }
     // weapon damage based spells
@@ -10299,6 +10327,14 @@ uint32 Unit::MeleeDamageBonusTaken(Unit *pCaster, uint32 pdamage,WeaponAttackTyp
             // Default calculation
             else if (TakenFlat)
                 coeff = CalculateDefaultCoefficient(spellProto, damagetype);
+
+            // Spellmod SpellDamage
+            if(Player* modOwner = pCaster->GetSpellModOwner())
+            {
+                coeff *= 100.0f;
+                modOwner->ApplySpellMod(spellProto->Id,SPELLMOD_SPELL_BONUS_DAMAGE, coeff);
+                coeff /= 100.0f;
+            }
 
             TakenFlat *= coeff * LvlPenalty;
         }
