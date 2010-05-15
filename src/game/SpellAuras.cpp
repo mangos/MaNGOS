@@ -2390,7 +2390,7 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         return;
                     case 71342:                             // Big Love Rocket
                         Spell::SelectMountByAreaAndSkill(m_target, 71344, 71345, 71346, 71347, 0);
-                        return; 
+                        return;
                     case 72286:                             // Invincible
                         Spell::SelectMountByAreaAndSkill(m_target, 72281, 72282, 72283, 72284, 0);
                         return;
