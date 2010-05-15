@@ -222,6 +222,25 @@ uint16 GetSpellAuraMaxTicks(SpellEntry const* spellInfo)
     return 6;
 }
 
+float CalculateDefaultCoefficient(SpellEntry const *spellProto, DamageEffectType const damagetype)
+{
+    // Damage over Time spells bonus calculation
+    float DotFactor = 1.0f;
+    if (damagetype == DOT)
+    {
+        if (!IsChanneledSpell(spellProto))
+            DotFactor = GetSpellDuration(spellProto) / 15000.0f;
+
+        if (uint16 DotTicks = GetSpellAuraMaxTicks(spellProto))
+            DotFactor /= DotTicks;
+    }
+
+    // Distribute Damage over multiple effects, reduce by AoE
+    float coeff = GetSpellCastTimeForBonus(spellProto, damagetype) / 3500.0f;
+
+    return coeff * DotFactor;
+}
+
 WeaponAttackType GetWeaponAttackType(SpellEntry const *spellInfo)
 {
     if(!spellInfo)

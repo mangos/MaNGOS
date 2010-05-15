@@ -9177,26 +9177,15 @@ uint32 Unit::SpellDamageBonusDone(Unit *pVictim, SpellEntry const *spellProto, u
     // Default calculation
     else if (DoneAdvertisedBenefit)
     {
-        // Damage over Time spells bonus calculation
-        float DotFactor = 1.0f;
-        if (damagetype == DOT)
-        {
-            if (!IsChanneledSpell(spellProto))
-                DotFactor = GetSpellDuration(spellProto) / 15000.0f;
-
-            if (uint16 DotTicks = GetSpellAuraMaxTicks(spellProto))
-                DoneAdvertisedBenefit = DoneAdvertisedBenefit / DotTicks;
-        }
-
         // Distribute Damage over multiple effects, reduce by AoE
         // Not apply this to creature casted spells
         float coeff;
         if (GetTypeId()==TYPEID_UNIT && !((Creature*)this)->isPet())
             coeff = 1.0f;
         else
-            coeff = GetSpellCastTimeForBonus(spellProto, damagetype) / 3500.0f;
+            coeff = CalculateDefaultCoefficient(spellProto, damagetype);
 
-        DoneTotal += int32(DoneAdvertisedBenefit * coeff * DotFactor * LvlPenalty * SpellModSpellDamage);
+        DoneTotal += int32(DoneAdvertisedBenefit * coeff * LvlPenalty * SpellModSpellDamage);
     }
 
     float tmpDamage = (int32(pdamage) + DoneTotal * int32(stack)) * DoneTotalMod;
@@ -9279,26 +9268,15 @@ uint32 Unit::SpellDamageBonusTaken(Unit *pCaster, SpellEntry const *spellProto, 
     // Default calculation
     else if (TakenAdvertisedBenefit)
     {
-        // Damage over Time spells bonus calculation
-        float DotFactor = 1.0f;
-        if (damagetype == DOT)
-        {
-            if (!IsChanneledSpell(spellProto))
-                DotFactor = GetSpellDuration(spellProto) / 15000.0f;
-
-            if (uint16 DotTicks = GetSpellAuraMaxTicks(spellProto))
-                TakenAdvertisedBenefit = TakenAdvertisedBenefit / DotTicks;
-        }
-
         // Distribute Damage over multiple effects, reduce by AoE
         // Not apply this to creature casted spells
         float coeff;
         if (pCaster->GetTypeId()==TYPEID_UNIT && !((Creature*)pCaster)->isPet())
             coeff = 1.0f;
         else
-            coeff = GetSpellCastTimeForBonus(spellProto, damagetype) / 3500.0f;
+            coeff = CalculateDefaultCoefficient(spellProto, damagetype);
 
-        TakenTotal+= int32(TakenAdvertisedBenefit * coeff * DotFactor * LvlPenalty);
+        TakenTotal+= int32(TakenAdvertisedBenefit * coeff * LvlPenalty);
     }
 
     float tmpDamage = (int32(pdamage) + TakenTotal * int32(stack)) * TakenTotalMod;
@@ -9724,26 +9702,15 @@ uint32 Unit::SpellHealingBonusDone(Unit *pVictim, SpellEntry const *spellProto, 
     // Default calculation
     else if (DoneAdvertisedBenefit)
     {
-        // Damage over Time spells bonus calculation
-        float DotFactor = 1.0f;
-        if(damagetype == DOT)
-        {
-            if(!IsChanneledSpell(spellProto))
-                DotFactor = GetSpellDuration(spellProto) / 15000.0f;
-            uint16 DotTicks = GetSpellAuraMaxTicks(spellProto);
-            if(DotTicks)
-                DoneAdvertisedBenefit = DoneAdvertisedBenefit / DotTicks;
-        }
-
         // Distribute Damage over multiple effects, reduce by AoE
         // Not apply this to creature casted spells
         float coeff;
         if (GetTypeId()==TYPEID_UNIT && !((Creature*)this)->isPet())
             coeff = 1.0f;
         else
-            coeff = GetSpellCastTimeForBonus(spellProto, damagetype) / 3500.0f;
+            coeff = CalculateDefaultCoefficient(spellProto, damagetype);
 
-        DoneTotal  += int32(DoneAdvertisedBenefit * coeff * DotFactor * LvlPenalty * SpellModSpellDamage * 1.88f);
+        DoneTotal  += int32(DoneAdvertisedBenefit * coeff * LvlPenalty * SpellModSpellDamage * 1.88f);
     }
 
     // use float as more appropriate for negative values and percent applying
@@ -9803,26 +9770,15 @@ uint32 Unit::SpellHealingBonusTaken(Unit *pCaster, SpellEntry const *spellProto,
     // Default calculation
     else if (TakenAdvertisedBenefit)
     {
-        // Damage over Time spells bonus calculation
-        float DotFactor = 1.0f;
-        if(damagetype == DOT)
-        {
-            if(!IsChanneledSpell(spellProto))
-                DotFactor = GetSpellDuration(spellProto) / 15000.0f;
-            uint16 DotTicks = GetSpellAuraMaxTicks(spellProto);
-            if(DotTicks)
-                TakenAdvertisedBenefit = TakenAdvertisedBenefit / DotTicks;
-        }
-
         // Distribute Damage over multiple effects, reduce by AoE
         // Not apply this to creature casted spells
         float coeff;
         if (GetTypeId()==TYPEID_UNIT && !((Creature*)this)->isPet())
             coeff = 1.0f;
         else
-            coeff = GetSpellCastTimeForBonus(spellProto, damagetype) / 3500.0f;
+            coeff = CalculateDefaultCoefficient(spellProto, damagetype);
 
-        TakenTotal += int32(TakenAdvertisedBenefit * coeff * DotFactor * LvlPenalty * 1.88f);
+        TakenTotal += int32(TakenAdvertisedBenefit * coeff * LvlPenalty * 1.88f);
     }
 
     AuraList const& mHealingGet= GetAurasByType(SPELL_AURA_MOD_HEALING_RECEIVED);
@@ -10221,26 +10177,15 @@ uint32 Unit::MeleeDamageBonusDone(Unit *pVictim, uint32 pdamage,WeaponAttackType
         // Default calculation
         else if (DoneFlat)
         {
-            // Damage over Time spells bonus calculation
-            float DotFactor = 1.0f;
-            if(damagetype == DOT)
-            {
-                if(!IsChanneledSpell(spellProto))
-                    DotFactor = GetSpellDuration(spellProto) / 15000.0f;
-                uint16 DotTicks = GetSpellAuraMaxTicks(spellProto);
-                if(DotTicks)
-                    DoneFlat = DoneFlat / DotTicks;
-            }
-
             // Distribute Damage over multiple effects, reduce by AoE
             // Not apply this to creature casted spells
             float coeff;
             if (GetTypeId()==TYPEID_UNIT && !((Creature*)this)->isPet())
                 coeff = 1.0f;
             else
-                coeff = GetSpellCastTimeForBonus(spellProto, damagetype) / 3500.0f;
+                coeff = CalculateDefaultCoefficient(spellProto, damagetype);
 
-            DoneFlat *= coeff * DotFactor * LvlPenalty;
+            DoneFlat *= coeff * LvlPenalty;
         }
     }
     // weapon damage based spells
@@ -10381,26 +10326,15 @@ uint32 Unit::MeleeDamageBonusTaken(Unit *pCaster, uint32 pdamage,WeaponAttackTyp
         // Default calculation
         else if (TakenFlat)
         {
-            // Damage over Time spells bonus calculation
-            float DotFactor = 1.0f;
-            if(damagetype == DOT)
-            {
-                if(!IsChanneledSpell(spellProto))
-                    DotFactor = GetSpellDuration(spellProto) / 15000.0f;
-                uint16 DotTicks = GetSpellAuraMaxTicks(spellProto);
-                if(DotTicks)
-                    TakenFlat = TakenFlat / DotTicks;
-            }
-
             // Distribute Damage over multiple effects, reduce by AoE
             // Not apply this to creature casted spells
             float coeff;
             if (pCaster->GetTypeId()==TYPEID_UNIT && !((Creature*)pCaster)->isPet())
                 coeff = 1.0f;
             else
-                coeff = GetSpellCastTimeForBonus(spellProto, damagetype) / 3500.0f;
+                coeff = CalculateDefaultCoefficient(spellProto, damagetype);
 
-            TakenFlat*= coeff * DotFactor * LvlPenalty;
+            TakenFlat*= coeff * LvlPenalty;
         }
     }
 
