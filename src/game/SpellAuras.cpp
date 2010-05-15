@@ -1225,38 +1225,6 @@ bool Aura::_RemoveAura()
     return true;
 }
 
-void Aura::SendFakeAuraUpdate(uint32 auraId, bool remove)
-{
-    WorldPacket data(SMSG_AURA_UPDATE);
-    data << m_target->GetPackGUID();
-    data << uint8(64);
-    data << uint32(remove ? 0 : auraId);
-
-    if(remove)
-    {
-        m_target->SendMessageToSet(&data, true);
-        return;
-    }
-
-    uint8 auraFlags = GetAuraFlags();
-    data << uint8(auraFlags);
-    data << uint8(GetAuraLevel());
-    data << uint8(m_procCharges ? m_procCharges : m_stackAmount);
-
-    if(!(auraFlags & AFLAG_NOT_CASTER))
-    {
-        data << uint8(0);                                   // pguid
-    }
-
-    if(auraFlags & AFLAG_DURATION)
-    {
-        data << uint32(GetAuraMaxDuration());
-        data << uint32(GetAuraDuration());
-    }
-
-    m_target->SendMessageToSet(&data, true);
-}
-
 void Aura::SendAuraUpdate(bool remove)
 {
     WorldPacket data(SMSG_AURA_UPDATE);
@@ -3295,35 +3263,6 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
                 case FORM_BEAR:
                 case FORM_DIREBEAR:
                 {
-                    // Heart of the Wild
-                    Unit::AuraList const& mStats = m_target->GetAurasByType(SPELL_AURA_MOD_STAT);
-                    for(Unit::AuraList::const_iterator i = mStats.begin(); i != mStats.end(); ++i)
-                    {
-                        switch ((*i)->GetSpellProto()->Id)
-                        {
-                            case 17003:
-                            case 17004:
-                            case 17005:
-                            case 17006:
-                            case 24894:
-                            {
-                                int32 statsBonus = (*i)->GetSpellProto()->EffectBasePoints[1];
-                                if (form == FORM_CAT)
-                                    m_target->CastCustomSpell(m_target, 24900, &statsBonus, NULL, NULL, true);
-                                else
-                                {
-                                    m_target->CastCustomSpell(m_target, 24899, &statsBonus, NULL, NULL, true);
-                                    int32 health = statsBonus * m_target->GetMaxHealth() / 100;
-                                    m_target->CastCustomSpell(m_target, 25142, &health, NULL, NULL, true);
-                                }
-                                break;
-                            }
-                            default:
-                                continue;
-                        }
-                        break;
-                    }
-
                     // get furor proc chance
                     int32 furorChance = 0;
                     Unit::AuraList const& mDummy = m_target->GetAurasByType(SPELL_AURA_DUMMY);
@@ -4689,10 +4628,10 @@ void Aura::HandleModMechanicImmunity(bool apply, bool /*Real*/)
         {
             GameObject* obj = m_target->GetGameObject(48018);
             if (obj)
-                if (m_target->IsWithinDist(obj,GetSpellMaxRange(sSpellRangeStore.LookupEntry(GetSpellProto()->rangeIndex))))
-                    ((Player*)m_target)->TeleportTo(obj->GetMapId(),obj->GetPositionX(),obj->GetPositionY(),obj->GetPositionZ(),obj->GetOrientation());
+                ((Player*)m_target)->TeleportTo(obj->GetMapId(),obj->GetPositionX(),obj->GetPositionY(),obj->GetPositionZ(),obj->GetOrientation());
         }
     }
+
     // Bestial Wrath
     if (GetSpellProto()->SpellFamilyName == SPELLFAMILY_HUNTER && GetSpellProto()->SpellIconID == 1680)
     {
@@ -4981,13 +4920,13 @@ void Aura::HandleAuraPeriodicDummy(bool apply, bool Real)
             switch (spell->Id)
             {
                 case 48018:
-                    if (apply)
-                        SendFakeAuraUpdate(62388,false);
-                    else
-                    {
-                        m_target->RemoveGameObject(spell->Id,true);
-                        SendFakeAuraUpdate(62388,true);
-                    }
+                       if (apply)
+                          m_target->CastSpell(m_target, 62388, true);                
+                        else
+                        {
+                          m_target->RemoveGameObject(spell->Id,true);
+                          m_target->RemoveAurasDueToSpell(62388);
+                        }
                 break;
             }
         }
@@ -8247,13 +8186,18 @@ void Aura::PeriodicDummyTick()
             {
                 case 48018:
                     GameObject* obj = m_target->GetGameObject(spell->Id);
-                    if (!obj) return;
+                    if (!obj)
+                    {
+                         m_target->RemoveAurasDueToSpell(spell->Id);
+                         m_target->RemoveAurasDueToSpell(62388); 
+                         return;
+                    }
                     // We must take a range of teleport spell, not summon.
                     const SpellEntry* goToCircleSpell = sSpellStore.LookupEntry(48020);
                     if (m_target->IsWithinDist(obj,GetSpellMaxRange(sSpellRangeStore.LookupEntry(goToCircleSpell->rangeIndex))))
-                        SendFakeAuraUpdate(62388,false);
+                        m_target->CastSpell(m_target, 62388, true);
                     else
-                        SendFakeAuraUpdate(62388,true);
+                        m_target->RemoveAurasDueToSpell(62388);
             }
             break;
         case SPELLFAMILY_ROGUE:

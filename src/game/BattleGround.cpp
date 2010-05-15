@@ -874,42 +874,30 @@ uint32 BattleGround::GetBattlemasterEntry() const
 
 void BattleGround::RewardMark(Player *plr,uint32 count)
 {
-    BattleGroundMarks mark;
-    bool IsSpell;
     switch(GetTypeID(true))
     {
         case BATTLEGROUND_AV:
-            IsSpell = true;
             if (count == ITEM_WINNER_COUNT)
-                mark = SPELL_AV_MARK_WINNER;
+                RewardSpellCast(plr,SPELL_AV_MARK_WINNER);
             else
-                mark = SPELL_AV_MARK_LOSER;
+                RewardSpellCast(plr,SPELL_AV_MARK_LOSER);
             break;
         case BATTLEGROUND_WS:
-            IsSpell = true;
             if (count == ITEM_WINNER_COUNT)
-                mark = SPELL_WS_MARK_WINNER;
+                RewardSpellCast(plr,SPELL_WS_MARK_WINNER);
             else
-                mark = SPELL_WS_MARK_LOSER;
+                RewardSpellCast(plr,SPELL_WS_MARK_LOSER);
             break;
         case BATTLEGROUND_AB:
-            IsSpell = true;
             if (count == ITEM_WINNER_COUNT)
-                mark = SPELL_AB_MARK_WINNER;
+                RewardSpellCast(plr,SPELL_AB_MARK_WINNER);
             else
-                mark = SPELL_AB_MARK_LOSER;
+                RewardSpellCast(plr,SPELL_AB_MARK_LOSER);
             break;
-        case BATTLEGROUND_EY:
-            IsSpell = false;
-            break;
+        case BATTLEGROUND_EY:                               // no rewards
         default:
-            return;
+            break;
     }
-
-    if (IsSpell)
-        RewardSpellCast(plr,mark);
-    else
-        RewardItem(plr,mark,count);
 }
 
 void BattleGround::RewardSpellCast(Player *plr, uint32 spell_id)
