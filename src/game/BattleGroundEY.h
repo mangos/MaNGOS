@@ -86,11 +86,11 @@ enum BG_EY_Spells
 enum EYBattleGroundPointsTrigger
 {
     TR_BLOOD_ELF_POINT        = 4476,
-    TR_FEL_REALVER_POINT      = 4514,
+    TR_FEL_REAVER_POINT       = 4514,
     TR_MAGE_TOWER_POINT       = 4516,
     TR_DRAENEI_RUINS_POINT    = 4518,
     TR_BLOOD_ELF_BUFF         = 4568,
-    TR_FEL_REALVER_BUFF       = 4569,
+    TR_FEL_REAVER_BUFF        = 4569,
     TR_MAGE_TOWER_BUFF        = 4570,
     TR_DRAENEI_RUINS_BUFF     = 4571
 };
@@ -99,54 +99,47 @@ enum EYBattleGroundGaveyards
 {
     EY_GRAVEYARD_MAIN_ALLIANCE     = 1103,
     EY_GRAVEYARD_MAIN_HORDE        = 1104,
-    EY_GRAVEYARD_FEL_REALVER       = 1105,
+    EY_GRAVEYARD_FEL_REAVER        = 1105,
     EY_GRAVEYARD_BLOOD_ELF         = 1106,
     EY_GRAVEYARD_DRAENEI_RUINS     = 1107,
     EY_GRAVEYARD_MAGE_TOWER        = 1108
 };
 
-// deprecated
-enum EYBattleGroundPoints
-{
-    FEL_REALVER     = 0,
-    BLOOD_ELF       = 1,
-    DRAENEI_RUINS   = 2,
-    MAGE_TOWER      = 3,
-
-    EY_PLAYERS_OUT_OF_POINTS  = 4,
-};
-
 enum BG_EY_Nodes
 {
-    BG_EY_NODE_FEL_REALVER     = 0,
-    BG_EY_NODE_BLOOD_ELF       = 1,
-    BG_EY_NODE_DRAENEI_RUINS   = 2,
-    BG_EY_NODE_MAGE_TOWER      = 3,
-    BG_EY_NODES_ERROR          = 255
+    BG_EY_NODE_FEL_REAVER         = 0,
+    BG_EY_NODE_BLOOD_ELF          = 1,
+    BG_EY_NODE_DRAENEI_RUINS      = 2,
+    BG_EY_NODE_MAGE_TOWER         = 3,
+
+    // special internal node
+    BG_EY_PLAYERS_OUT_OF_POINTS   = 4,                      // used for store out of node players data
 };
-#define BG_EY_NODES_MAX        4
+
+#define BG_EY_NODES_MAX             4
+#define BG_EY_NODES_MAX_WITH_SPEIAL 5
 
 // node-events work like this: event1:nodeid, event2:state (0alliance,1horde,2neutral)
 #define BG_EYE_NEUTRAL_TEAM 2
-#define BG_EY_EVENT_CAPTURE_FLAG 4      // event1=4, event2=nodeid or 4 for the default center spawn
-    #define BG_EY_EVENT2_FLAG_CENTER 4  // maximum node is 3 so 4 for center is ok
-    // all other event2 are just nodeids, i won't define something here
+#define BG_EY_EVENT_CAPTURE_FLAG 4                          // event1=4, event2=nodeid or 4 for the default center spawn
+#define BG_EY_EVENT2_FLAG_CENTER 4                          // maximum node is 3 so 4 for center is ok
+// all other event2 are just nodeids, i won't define something here
 
 // x, y, z
 // used to check, when player is in range of a node
-const float BG_EY_NodePositions[BG_EY_NODES_MAX][4] = {
-    {2024.600708f, 1742.819580f, 1195.157715f},             // FEL_REALVER
-    {2050.493164f, 1372.235962f, 1194.563477f},             // BLOOD_ELF
-    {2301.010498f, 1386.931641f, 1197.183472f},             // DRAENEI_RUINS
-    {2282.121582f, 1760.006958f, 1189.707153f}              // MAGE_TOWER
+const float BG_EY_NodePositions[BG_EY_NODES_MAX][3] = {
+    {2024.600708f, 1742.819580f, 1195.157715f},             // BG_EY_NODE_FEL_REAVER
+    {2050.493164f, 1372.235962f, 1194.563477f},             // BG_EY_NODE_BLOOD_ELF
+    {2301.010498f, 1386.931641f, 1197.183472f},             // BG_EY_NODE_DRAENEI_RUINS
+    {2282.121582f, 1760.006958f, 1189.707153f}              // BG_EY_NODE_MAGE_TOWER
 };
 
 enum EYBattleGroundObjectTypes
 {
     //buffs
-    BG_EY_OBJECT_SPEEDBUFF_FEL_REALVER          = 1,
-    BG_EY_OBJECT_REGENBUFF_FEL_REALVER          = 2,
-    BG_EY_OBJECT_BERSERKBUFF_FEL_REALVER        = 3,
+    BG_EY_OBJECT_SPEEDBUFF_FEL_REAVER           = 1,
+    BG_EY_OBJECT_REGENBUFF_FEL_REAVER           = 2,
+    BG_EY_OBJECT_BERSERKBUFF_FEL_REAVER         = 3,
     BG_EY_OBJECT_SPEEDBUFF_BLOOD_ELF            = 4,
     BG_EY_OBJECT_REGENBUFF_BLOOD_ELF            = 5,
     BG_EY_OBJECT_BERSERKBUFF_BLOOD_ELF          = 6,
@@ -232,7 +225,7 @@ const BattleGroundEYLoosingPointStruct LoosingPointTypes[BG_EY_NODES_MAX] =
 };
 const BattleGroundEYCapturingPointStruct CapturingPointTypes[BG_EY_NODES_MAX] =
 {
-    BattleGroundEYCapturingPointStruct(LANG_BG_EY_HAS_TAKEN_A_F_RUINS, LANG_BG_EY_HAS_TAKEN_H_F_RUINS, EY_GRAVEYARD_FEL_REALVER),
+    BattleGroundEYCapturingPointStruct(LANG_BG_EY_HAS_TAKEN_A_F_RUINS, LANG_BG_EY_HAS_TAKEN_H_F_RUINS, EY_GRAVEYARD_FEL_REAVER),
     BattleGroundEYCapturingPointStruct(LANG_BG_EY_HAS_TAKEN_A_B_TOWER, LANG_BG_EY_HAS_TAKEN_H_B_TOWER, EY_GRAVEYARD_BLOOD_ELF),
     BattleGroundEYCapturingPointStruct(LANG_BG_EY_HAS_TAKEN_A_D_RUINS, LANG_BG_EY_HAS_TAKEN_H_D_RUINS, EY_GRAVEYARD_DRAENEI_RUINS),
     BattleGroundEYCapturingPointStruct(LANG_BG_EY_HAS_TAKEN_A_M_TOWER, LANG_BG_EY_HAS_TAKEN_H_M_TOWER, EY_GRAVEYARD_MAGE_TOWER)
@@ -323,7 +316,7 @@ class BattleGroundEY : public BattleGround
         uint8 m_PointState[BG_EY_NODES_MAX];
         int32 m_PointBarStatus[BG_EY_NODES_MAX];
         typedef std::vector<uint64> PlayersNearPointType;
-        PlayersNearPointType m_PlayersNearPoint[BG_EY_NODES_MAX + 1];
+        PlayersNearPointType m_PlayersNearPoint[BG_EY_NODES_MAX_WITH_SPEIAL];
         uint8 m_CurrentPointPlayersCount[2*BG_EY_NODES_MAX];
 
         int32 m_PointAddingTimer;
