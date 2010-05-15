@@ -9153,39 +9153,35 @@ uint32 Unit::SpellDamageBonusDone(Unit *pVictim, SpellEntry const *spellProto, u
     if (GetTypeId() == TYPEID_UNIT && ((Creature*)this)->isPet())
         DoneAdvertisedBenefit += ((Pet*)this)->GetBonusDamage();
 
-    float LvlPenalty = CalculateLevelPenalty(spellProto);
-    // Spellmod SpellDamage
-    float SpellModSpellDamage = 100.0f;
-    if(Player* modOwner = GetSpellModOwner())
-        modOwner->ApplySpellMod(spellProto->Id,SPELLMOD_SPELL_BONUS_DAMAGE,SpellModSpellDamage);
-    SpellModSpellDamage /= 100.0f;
-
-    // Check for table values
-    if (SpellBonusEntry const* bonus = sSpellMgr.GetSpellBonusData(spellProto->Id))
+    if (DoneAdvertisedBenefit)
     {
-        float coeff;
-        if (damagetype == DOT)
-            coeff = bonus->dot_damage * LvlPenalty;
-        else
-            coeff = bonus->direct_damage * LvlPenalty;
+        float LvlPenalty = CalculateLevelPenalty(spellProto);
 
-        if (bonus->ap_bonus)
-            DoneTotal += int32(bonus->ap_bonus * GetTotalAttackPowerValue(BASE_ATTACK));
+        // Spellmod SpellDamage
+        float SpellModSpellDamage = 100.0f;
+        if(Player* modOwner = GetSpellModOwner())
+            modOwner->ApplySpellMod(spellProto->Id,SPELLMOD_SPELL_BONUS_DAMAGE,SpellModSpellDamage);
+        SpellModSpellDamage /= 100.0f;
 
-        DoneTotal  += int32(DoneAdvertisedBenefit * coeff * SpellModSpellDamage);
-    }
-    // Default calculation
-    else if (DoneAdvertisedBenefit)
-    {
         // Distribute Damage over multiple effects, reduce by AoE
-        // Not apply this to creature casted spells
         float coeff;
+
+        // Not apply this to creature casted spells
         if (GetTypeId()==TYPEID_UNIT && !((Creature*)this)->isPet())
             coeff = 1.0f;
+        // Check for table values
+        else if (SpellBonusEntry const* bonus = sSpellMgr.GetSpellBonusData(spellProto->Id))
+        {
+            coeff = damagetype == DOT ? bonus->dot_damage : bonus->direct_damage;
+
+            if (bonus->ap_bonus)
+                DoneTotal += int32(bonus->ap_bonus * GetTotalAttackPowerValue(BASE_ATTACK));
+        }
+        // Default calculation
         else
             coeff = CalculateDefaultCoefficient(spellProto, damagetype);
 
-        DoneTotal += int32(DoneAdvertisedBenefit * coeff * LvlPenalty * SpellModSpellDamage);
+        DoneTotal  += int32(DoneAdvertisedBenefit * coeff * LvlPenalty * SpellModSpellDamage);
     }
 
     float tmpDamage = (int32(pdamage) + DoneTotal * int32(stack)) * DoneTotalMod;
@@ -9252,31 +9248,24 @@ uint32 Unit::SpellDamageBonusTaken(Unit *pCaster, SpellEntry const *spellProto, 
     // Taken fixed damage bonus auras
     int32 TakenAdvertisedBenefit = SpellBaseDamageBonusTaken(GetSpellSchoolMask(spellProto));
 
-    float LvlPenalty = pCaster->CalculateLevelPenalty(spellProto);
-
-    // Check for table values
-    if (SpellBonusEntry const* bonus = sSpellMgr.GetSpellBonusData(spellProto->Id))
+    if (TakenAdvertisedBenefit)
     {
-        float coeff;
-        if (damagetype == DOT)
-            coeff = bonus->dot_damage * LvlPenalty;
-        else
-            coeff = bonus->direct_damage * LvlPenalty;
+        float LvlPenalty = pCaster->CalculateLevelPenalty(spellProto);
 
-        TakenTotal += int32(TakenAdvertisedBenefit * coeff);
-    }
-    // Default calculation
-    else if (TakenAdvertisedBenefit)
-    {
         // Distribute Damage over multiple effects, reduce by AoE
-        // Not apply this to creature casted spells
         float coeff;
+
+        // Not apply this to creature casted spells
         if (pCaster->GetTypeId()==TYPEID_UNIT && !((Creature*)pCaster)->isPet())
             coeff = 1.0f;
-        else
+        // Check for table values
+        else if (SpellBonusEntry const* bonus = sSpellMgr.GetSpellBonusData(spellProto->Id))
+            coeff = damagetype == DOT ? bonus->dot_damage : bonus->direct_damage;
+        // Default calculation
+        else 
             coeff = CalculateDefaultCoefficient(spellProto, damagetype);
 
-        TakenTotal+= int32(TakenAdvertisedBenefit * coeff * LvlPenalty);
+        TakenTotal += int32(TakenAdvertisedBenefit * coeff * LvlPenalty);
     }
 
     float tmpDamage = (int32(pdamage) + TakenTotal * int32(stack)) * TakenTotalMod;
@@ -9677,40 +9666,35 @@ uint32 Unit::SpellHealingBonusDone(Unit *pVictim, SpellEntry const *spellProto, 
     // Done fixed damage bonus auras
     int32 DoneAdvertisedBenefit  = SpellBaseHealingBonusDone(GetSpellSchoolMask(spellProto));
 
-    float LvlPenalty = CalculateLevelPenalty(spellProto);
-    // Spellmod SpellDamage
-    float SpellModSpellDamage = 100.0f;
-    if(Player* modOwner = GetSpellModOwner())
-        modOwner->ApplySpellMod(spellProto->Id, SPELLMOD_SPELL_BONUS_DAMAGE, SpellModSpellDamage);
-    SpellModSpellDamage /= 100.0f;
-
-    // Check for table values
-    SpellBonusEntry const* bonus = sSpellMgr.GetSpellBonusData(spellProto->Id);
-    if (bonus)
+    if (DoneAdvertisedBenefit)
     {
-        float coeff;
-        if (damagetype == DOT)
-            coeff = bonus->dot_damage * LvlPenalty;
-        else
-            coeff = bonus->direct_damage * LvlPenalty;
+        float LvlPenalty = CalculateLevelPenalty(spellProto);
 
-        if (bonus->ap_bonus)
-            DoneTotal += int32(bonus->ap_bonus * GetTotalAttackPowerValue(BASE_ATTACK));
+        // Spellmod SpellDamage
+        float SpellModSpellDamage = 100.0f;
+        if(Player* modOwner = GetSpellModOwner())
+            modOwner->ApplySpellMod(spellProto->Id, SPELLMOD_SPELL_BONUS_DAMAGE, SpellModSpellDamage);
+        SpellModSpellDamage /= 100.0f;
 
-        DoneTotal  += int32(DoneAdvertisedBenefit * coeff * SpellModSpellDamage);
-    }
-    // Default calculation
-    else if (DoneAdvertisedBenefit)
-    {
         // Distribute Damage over multiple effects, reduce by AoE
-        // Not apply this to creature casted spells
         float coeff;
+
+        // Not apply this to creature casted spells
         if (GetTypeId()==TYPEID_UNIT && !((Creature*)this)->isPet())
             coeff = 1.0f;
-        else
-            coeff = CalculateDefaultCoefficient(spellProto, damagetype);
+        // Check for table values
+        else if (SpellBonusEntry const* bonus = sSpellMgr.GetSpellBonusData(spellProto->Id))
+        {
+            coeff = damagetype == DOT ? bonus->dot_damage : bonus->direct_damage;
 
-        DoneTotal  += int32(DoneAdvertisedBenefit * coeff * LvlPenalty * SpellModSpellDamage * 1.88f);
+            if (bonus->ap_bonus)
+                DoneTotal += int32(bonus->ap_bonus * GetTotalAttackPowerValue(BASE_ATTACK));
+        }
+        // Default calculation
+        else
+            coeff = CalculateDefaultCoefficient(spellProto, damagetype) * 1.88f;
+
+        DoneTotal  += int32(DoneAdvertisedBenefit * coeff * LvlPenalty * SpellModSpellDamage);
     }
 
     // use float as more appropriate for negative values and percent applying
@@ -9753,32 +9737,24 @@ uint32 Unit::SpellHealingBonusTaken(Unit *pCaster, SpellEntry const *spellProto,
     // Taken fixed damage bonus auras
     int32 TakenAdvertisedBenefit = SpellBaseHealingBonusTaken(GetSpellSchoolMask(spellProto));
 
-    float LvlPenalty = pCaster->CalculateLevelPenalty(spellProto);
-
-    // Check for table values
-    SpellBonusEntry const* bonus = sSpellMgr.GetSpellBonusData(spellProto->Id);
-    if (bonus)
+    if (TakenAdvertisedBenefit)
     {
-        float coeff;
-        if (damagetype == DOT)
-            coeff = bonus->dot_damage * LvlPenalty;
-        else
-            coeff = bonus->direct_damage * LvlPenalty;
+        float LvlPenalty = pCaster->CalculateLevelPenalty(spellProto);
 
-        TakenTotal += int32(TakenAdvertisedBenefit * coeff);
-    }
-    // Default calculation
-    else if (TakenAdvertisedBenefit)
-    {
         // Distribute Damage over multiple effects, reduce by AoE
-        // Not apply this to creature casted spells
         float coeff;
+
+        // Not apply this to creature casted spells
         if (GetTypeId()==TYPEID_UNIT && !((Creature*)this)->isPet())
             coeff = 1.0f;
+        // Check for table values
+        else if (SpellBonusEntry const* bonus = sSpellMgr.GetSpellBonusData(spellProto->Id))
+            coeff = damagetype == DOT ? bonus->dot_damage : bonus->direct_damage;
+        // Default calculation
         else
-            coeff = CalculateDefaultCoefficient(spellProto, damagetype);
+            coeff = CalculateDefaultCoefficient(spellProto, damagetype) * 1.88f;
 
-        TakenTotal += int32(TakenAdvertisedBenefit * coeff * LvlPenalty * 1.88f);
+        TakenTotal += int32(TakenAdvertisedBenefit * coeff * LvlPenalty);
     }
 
     AuraList const& mHealingGet= GetAurasByType(SPELL_AURA_MOD_HEALING_RECEIVED);
@@ -10160,33 +10136,25 @@ uint32 Unit::MeleeDamageBonusDone(Unit *pVictim, uint32 pdamage,WeaponAttackType
     {
         float LvlPenalty = CalculateLevelPenalty(spellProto);
 
+        // Distribute Damage over multiple effects, reduce by AoE
+        float coeff = 0.0f;
+
+        // Not apply this to creature casted spells
+        if (GetTypeId()==TYPEID_UNIT && !((Creature*)this)->isPet())
+            coeff = 1.0f;
         // Check for table values
-        if (SpellBonusEntry const* bonus = sSpellMgr.GetSpellBonusData(spellProto->Id))
+        else if (SpellBonusEntry const* bonus = sSpellMgr.GetSpellBonusData(spellProto->Id))
         {
-            float coeff;
-            if (damagetype == DOT)
-                coeff = bonus->dot_damage * LvlPenalty;
-            else
-                coeff = bonus->direct_damage * LvlPenalty;
+            coeff =  damagetype == DOT ? bonus->dot_damage : bonus->direct_damage;
 
             if (bonus->ap_bonus)
                 DoneFlat += bonus->ap_bonus * (GetTotalAttackPowerValue(BASE_ATTACK) + APbonus);
-
-            DoneFlat  *= coeff;
         }
         // Default calculation
         else if (DoneFlat)
-        {
-            // Distribute Damage over multiple effects, reduce by AoE
-            // Not apply this to creature casted spells
-            float coeff;
-            if (GetTypeId()==TYPEID_UNIT && !((Creature*)this)->isPet())
-                coeff = 1.0f;
-            else
-                coeff = CalculateDefaultCoefficient(spellProto, damagetype);
+            coeff = CalculateDefaultCoefficient(spellProto, damagetype);
 
-            DoneFlat *= coeff * LvlPenalty;
-        }
+        DoneFlat  *= coeff * LvlPenalty;
     }
     // weapon damage based spells
     else if( APbonus || DoneFlat )
@@ -10310,31 +10278,25 @@ uint32 Unit::MeleeDamageBonusTaken(Unit *pCaster, uint32 pdamage,WeaponAttackTyp
     // scaling of non weapon based spells
     if (!isWeaponDamageBasedSpell)
     {
-        float LvlPenalty = pCaster->CalculateLevelPenalty(spellProto);
 
-        // Check for table values
-        if (SpellBonusEntry const* bonus = sSpellMgr.GetSpellBonusData(spellProto->Id))
+        if (TakenFlat)
         {
-            float coeff;
-            if (damagetype == DOT)
-                coeff = bonus->dot_damage * LvlPenalty;
-            else
-                coeff = bonus->direct_damage * LvlPenalty;
+            float LvlPenalty = pCaster->CalculateLevelPenalty(spellProto);
 
-            TakenFlat *= coeff;
-        }
-        // Default calculation
-        else if (TakenFlat)
-        {
             // Distribute Damage over multiple effects, reduce by AoE
-            // Not apply this to creature casted spells
             float coeff;
+
+            // Not apply this to creature casted spells
             if (pCaster->GetTypeId()==TYPEID_UNIT && !((Creature*)pCaster)->isPet())
                 coeff = 1.0f;
-            else
+            // Check for table values
+            else if (SpellBonusEntry const* bonus = sSpellMgr.GetSpellBonusData(spellProto->Id))
+                coeff =  damagetype == DOT ? bonus->dot_damage : bonus->direct_damage;
+            // Default calculation
+            else if (TakenFlat)
                 coeff = CalculateDefaultCoefficient(spellProto, damagetype);
 
-            TakenFlat*= coeff * LvlPenalty;
+            TakenFlat *= coeff * LvlPenalty;
         }
     }
 
