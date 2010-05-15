@@ -1044,14 +1044,14 @@ void SpellMgr::LoadSpellProcItemEnchant()
     sLog.outString( ">> Loaded %u proc item enchant definitions", count );
 }
 
-struct DoSpellBonusess
+struct DoSpellBonuses
 {
-    DoSpellBonusess(SpellBonusEntry const& _spellBonus) : spellBonus(_spellBonus) {}
+    DoSpellBonuses(SpellBonusEntry const& _spellBonus) : spellBonus(_spellBonus) {}
     void operator() (uint32 spell_id) { sSpellMgr.mSpellBonusMap[spell_id] = spellBonus; }
     SpellBonusEntry const& spellBonus;
 };
 
-void SpellMgr::LoadSpellBonusess()
+void SpellMgr::LoadSpellBonuses()
 {
     mSpellBonusMap.clear();                             // need for reload case
     uint32 count = 0;
@@ -1098,7 +1098,7 @@ void SpellMgr::LoadSpellBonusess()
         mSpellBonusMap[entry] = sbe;
 
         // also add to high ranks
-        DoSpellBonusess worker(sbe);
+        DoSpellBonuses worker(sbe);
         doForHighRanks(entry,worker);
 
         ++count;

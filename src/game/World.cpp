@@ -970,10 +970,10 @@ void World::SetInitialWorldSettings()
     sSpellMgr.LoadSpellProcEvents();
 
     sLog.outString( "Loading Spell Bonus Data..." );
-    sSpellMgr.LoadSpellBonusess();
+    sSpellMgr.LoadSpellBonuses();                           // must be after LoadSpellChains
 
     sLog.outString( "Loading Spell Proc Item Enchant..." );
-    sSpellMgr.LoadSpellProcItemEnchant();                    // must be after LoadSpellChains
+    sSpellMgr.LoadSpellProcItemEnchant();                   // must be after LoadSpellChains
 
     sLog.outString( "Loading Aggro Spells Definitions...");
     sSpellMgr.LoadSpellThreats();

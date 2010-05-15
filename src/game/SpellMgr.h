@@ -739,7 +739,7 @@ inline bool IsProfessionOrRidingSkill(uint32 skill)
 
 class SpellMgr
 {
-    friend struct DoSpellBonusess;
+    friend struct DoSpellBonuses;
     friend struct DoSpellProcEvent;
     friend struct DoSpellProcItemEnchant;
 
@@ -1022,7 +1022,7 @@ class SpellMgr
         void LoadSpellElixirs();
         void LoadSpellProcEvents();
         void LoadSpellProcItemEnchant();
-        void LoadSpellBonusess();
+        void LoadSpellBonuses();
         void LoadSpellTargetPositions();
         void LoadSpellThreats();
         void LoadSkillLineAbilityMap();
