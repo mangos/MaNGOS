@@ -7,5 +7,5 @@ DELETE FROM `spell_bonus_data` WHERE `entry` IN (
 
 INSERT INTO `spell_bonus_data` VALUES
 (53739, 0,     0, 0.003, 'Paladin - Seal of Corruption (full stack proc)'),
-(42463, 0,     0, 0.003, 'Paladin - Seal of Vengeance (full stack proc)');
-(49821, 0.2857,0, 0,     'Priest - Mind Sear Trigger'),
+(42463, 0,     0, 0.003, 'Paladin - Seal of Vengeance (full stack proc)'),
+(49821, 0.2857,0, 0,     'Priest - Mind Sear Trigger');
