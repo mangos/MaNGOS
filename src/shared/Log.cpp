@@ -22,8 +22,13 @@
 #include "Config/ConfigEnv.h"
 #include "Util.h"
 #include "ByteBuffer.h"
+#include "ProgressBar.h"
 
 #include <stdarg.h>
+#include <fstream>
+#include <iostream>
+
+#include "ace/OS_NS_unistd.h"
 
 INSTANTIATE_SINGLETON_1( Log );
 
@@ -813,6 +818,29 @@ void Log::outRALog(    const char * str, ... )
     }
 
     fflush(stdout);
+}
+
+void Log::WaitBeforeContinueIfNeed()
+{
+    int mode = sConfig.GetIntDefault("WaitAtStartupError",0);
+
+    if (mode < 0)
+    {
+        printf("\nPress <Enter> for continue\n");
+
+        std::string line;
+        std::getline (std::cin, line);
+    }
+    else if (mode > 0)
+    {
+        printf("\nWait %u secs for continue.\n",mode);
+        barGoLink bar(mode);
+        for(int i = 0; i < mode; ++i)
+        {
+            bar.step();
+            ACE_OS::sleep(1);
+        }
+    }
 }
 
 void outstring_log(const char * str, ...)
