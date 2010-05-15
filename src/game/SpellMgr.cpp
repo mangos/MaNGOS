@@ -1215,6 +1215,97 @@ void SpellMgr::LoadSpellBonuses()
         sbe.dot_damage    = fields[2].GetFloat();
         sbe.ap_bonus      = fields[3].GetFloat();
 
+        bool need_dot = false;
+        bool need_direct = false;
+        uint32 x = 0;                                       // count all, including empty, meaning: not all existed effect is DoTs/HoTs
+        for(int i = 0; i < MAX_EFFECT_INDEX; ++i)
+        {
+            if (!spell->Effect[i])
+            {
+                ++x;
+                continue;
+            }
+
+            // DoTs/HoTs
+            switch(spell->EffectApplyAuraName[i])
+            {
+                case SPELL_AURA_PERIODIC_DAMAGE:
+                case SPELL_AURA_PERIODIC_DAMAGE_PERCENT:
+                case SPELL_AURA_PERIODIC_LEECH:
+                case SPELL_AURA_PERIODIC_HEAL:
+                case SPELL_AURA_OBS_MOD_HEALTH:
+                case SPELL_AURA_PERIODIC_MANA_LEECH:
+                case SPELL_AURA_OBS_MOD_MANA:
+                case SPELL_AURA_POWER_BURN_MANA:
+                    need_dot = true;
+                    ++x;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        //TODO: maybe add explicit list possible direct damage spell effects...
+        if (x < MAX_EFFECT_INDEX)
+            need_direct = true;
+
+        // Check if direct_bonus is needed in `spell_bonus_data`
+        float direct_calc;
+        float direct_diff = 1000.0f;                        // for have big diff if no DB field value
+        if (sbe.direct_damage)
+        {
+            bool isHeal = false;
+            for(int i = 0; i < 3; ++i)
+            {
+                // Heals (Also count Mana Shield and Absorb effects as heals)
+                if (spell->Effect[i] == SPELL_EFFECT_HEAL || spell->Effect[i] == SPELL_EFFECT_HEAL_MAX_HEALTH ||
+                    (spell->Effect[i] == SPELL_EFFECT_APPLY_AURA && (spell->EffectApplyAuraName[i] == SPELL_AURA_SCHOOL_ABSORB || spell->EffectApplyAuraName[i] == SPELL_AURA_PERIODIC_HEAL)) )
+                {
+                    isHeal = true;
+                    break;
+                }
+            }
+            direct_calc = CalculateDefaultCoefficient(spell, SPELL_DIRECT_DAMAGE) * (isHeal ? 1.88f : 1.0f);
+            direct_diff = std::abs(sbe.direct_damage - direct_calc);
+        }
+
+        // Check if dot_bonus is needed in `spell_bonus_data`
+        float dot_calc;
+        float dot_diff = 1000.0f;                           // for have big diff if no DB field value
+        if (sbe.dot_damage)
+        {
+            bool isHeal = false;
+            for(int i = 0; i < 3; ++i)
+            {
+                // Periodic Heals
+                if (spell->Effect[i] == SPELL_EFFECT_APPLY_AURA && spell->EffectApplyAuraName[i] == SPELL_AURA_PERIODIC_HEAL)
+                {
+                    isHeal = true;
+                    break;
+                }
+            }
+            dot_calc = CalculateDefaultCoefficient(spell, DOT) * (isHeal ? 1.88f : 1.0f);
+            dot_diff = std::abs(sbe.dot_damage - dot_calc);
+        }
+
+        if (direct_diff < 0.02f && !need_dot && !sbe.ap_bonus)
+            sLog.outErrorDb("`spell_bonus_data` entry for spell %u `direct_bonus` not needed (data from table: %f, calculated %f, difference of %f) and `dot_bonus` also not used",
+                entry, sbe.direct_damage, direct_calc, direct_diff);
+        else if (direct_diff < 0.02f && dot_diff < 0.02f && !sbe.ap_bonus)
+        {
+            sLog.outErrorDb("`spell_bonus_data` entry for spell %u `direct_bonus` not needed (data from table: %f, calculated %f, difference of %f) and ",
+                entry, sbe.direct_damage, direct_calc, direct_diff);
+            sLog.outErrorDb("                                  ... `dot_bonus` not needed (data from table: %f, calculated %f, difference of %f)",
+                sbe.dot_damage, dot_calc, dot_diff);
+        }
+        else if (!need_direct && dot_diff < 0.02f && !sbe.ap_bonus)
+            sLog.outErrorDb("`spell_bonus_data` entry for spell %u `dot_bonus` not needed (data from table: %f, calculated %f, difference of %f) and direct also not used",
+            entry, sbe.dot_damage, dot_calc, dot_diff);
+        else if (!need_direct && sbe.direct_damage)
+            sLog.outErrorDb("`spell_bonus_data` entry for spell %u `direct_bonus` not used (spell not have non-periodic affects)", entry);
+        else if (!need_dot && sbe.dot_damage)
+            sLog.outErrorDb("`spell_bonus_data` entry for spell %u `dot_bonus` not used (spell not have periodic affects)", entry);
+
         mSpellBonusMap[entry] = sbe;
 
         // also add to high ranks
