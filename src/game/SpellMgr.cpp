@@ -151,6 +151,7 @@ uint32 GetSpellCastTimeForBonus( SpellEntry const *spellProto, DamageEffectType 
                     default:
                         break;
                 }
+                break;
             default:
                 break;
         }
