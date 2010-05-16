@@ -603,8 +603,8 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
             // Need a better way to do that - currently a lot of fake alarms
             else if ((Anti__MapZ+DIFF_AIRJUMP < GetPlayer()->GetPositionZ() &&
                     (movementInfo.GetMovementFlags() & (MOVEFLAG_FALLINGFAR | MOVEFLAG_PENDINGSTOP))==0) ||
-                    (Anti__MapZ < GetPlayer()->GetPositionZ() && 
-                    opcode==MSG_MOVE_JUMP))
+                    (Anti__MapZ < GetPlayer()->GetPositionZ() && opcode==MSG_MOVE_JUMP) &&
+                    !GetPlayer()->HasAuraType(SPELL_AURA_FEATHER_FALL))
             {
                 if (sWorld.GetMvAnticheatJumpCheck())
                     Anti__CheatOccurred(CurTime,"Possible Air Jump Hack",0.0f,LookupOpcodeName(opcode),0.0f,movementInfo.GetMovementFlags());
