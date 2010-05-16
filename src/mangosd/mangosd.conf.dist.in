@@ -669,6 +669,12 @@ LogColors = ""
 #        Default: 1 (true)
 #                 0 (false)
 #
+#    WaitAtStartupError
+#        After startup error report wait <Enter> or some time before continue (and possible close console window)
+#                 -1 (wait until <Enter> press)
+#        Default:  0 (not wait)
+#                  N (>0, wait N secs)
+#
 #    Motd
 #        Message of the Day. Displayed at worldlogin for every user ('@' for a newline).
 #
@@ -733,6 +739,7 @@ OffhandCheckAtTalentsReset = 0
 ClientCacheVersion = 0
 Event.Announce = 0
 BeepAtStart = 1
+WaitAtStartupError = 0
 Motd = "Welcome to the Massive Network Game Object Server."
 
 ###################################################################################################################

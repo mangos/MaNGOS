@@ -95,6 +95,108 @@ uint32 GetSpellCastTime(SpellEntry const* spellInfo, Spell const* spell)
     return (castTime > 0) ? uint32(castTime) : 0;
 }
 
+uint32 GetSpellCastTimeForBonus( SpellEntry const *spellProto, DamageEffectType damagetype )
+{
+    uint32 CastingTime = !IsChanneledSpell(spellProto) ? GetSpellCastTime(spellProto) : GetSpellDuration(spellProto);
+
+    if (CastingTime > 7000) CastingTime = 7000;
+    if (CastingTime < 1500) CastingTime = 1500;
+
+    if(damagetype == DOT && !IsChanneledSpell(spellProto))
+        CastingTime = 3500;
+
+    int32 overTime    = 0;
+    uint8 effects     = 0;
+    bool DirectDamage = false;
+    bool AreaEffect   = false;
+
+    for (uint32 i = 0; i < MAX_EFFECT_INDEX; ++i)
+        if (IsAreaEffectTarget(Targets(spellProto->EffectImplicitTargetA[i])) || IsAreaEffectTarget(Targets(spellProto->EffectImplicitTargetB[i])))
+            AreaEffect = true;
+
+    for (uint32 i = 0; i < MAX_EFFECT_INDEX; ++i)
+    {
+        switch (spellProto->Effect[i])
+        {
+            case SPELL_EFFECT_SCHOOL_DAMAGE:
+            case SPELL_EFFECT_POWER_DRAIN:
+            case SPELL_EFFECT_HEALTH_LEECH:
+            case SPELL_EFFECT_ENVIRONMENTAL_DAMAGE:
+            case SPELL_EFFECT_POWER_BURN:
+            case SPELL_EFFECT_HEAL:
+                DirectDamage = true;
+                break;
+            case SPELL_EFFECT_APPLY_AURA:
+                switch (spellProto->EffectApplyAuraName[i])
+                {
+                    case SPELL_AURA_PERIODIC_DAMAGE:
+                    case SPELL_AURA_PERIODIC_HEAL:
+                    case SPELL_AURA_PERIODIC_LEECH:
+                        if ( GetSpellDuration(spellProto) )
+                            overTime = GetSpellDuration(spellProto);
+                        break;
+                    // Penalty for additional effects
+                    case SPELL_AURA_DUMMY:
+                        ++effects;
+                        break;
+                    case SPELL_AURA_MOD_DECREASE_SPEED:
+                        ++effects;
+                        break;
+                    case SPELL_AURA_MOD_CONFUSE:
+                    case SPELL_AURA_MOD_STUN:
+                    case SPELL_AURA_MOD_ROOT:
+                        // -10% per effect
+                        effects += 2;
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    // Combined Spells with Both Over Time and Direct Damage
+    if (overTime > 0 && CastingTime > 0 && DirectDamage)
+    {
+        // mainly for DoTs which are 3500 here otherwise
+        uint32 OriginalCastTime = GetSpellCastTime(spellProto);
+        if (OriginalCastTime > 7000) OriginalCastTime = 7000;
+        if (OriginalCastTime < 1500) OriginalCastTime = 1500;
+        // Portion to Over Time
+        float PtOT = (overTime / 15000.0f) / ((overTime / 15000.0f) + (OriginalCastTime / 3500.0f));
+
+        if (damagetype == DOT)
+            CastingTime = uint32(CastingTime * PtOT);
+        else if (PtOT < 1.0f)
+            CastingTime  = uint32(CastingTime * (1 - PtOT));
+        else
+            CastingTime = 0;
+    }
+
+    // Area Effect Spells receive only half of bonus
+    if (AreaEffect)
+        CastingTime /= 2;
+
+    // 50% for damage and healing spells for leech spells from damage bonus and 0% from healing
+    for(int j = 0; j < MAX_EFFECT_INDEX; ++j)
+    {
+        if (spellProto->Effect[j] == SPELL_EFFECT_HEALTH_LEECH ||
+            spellProto->Effect[j] == SPELL_EFFECT_APPLY_AURA && spellProto->EffectApplyAuraName[j] == SPELL_AURA_PERIODIC_LEECH)
+        {
+            CastingTime /= 2;
+            break;
+        }
+    }
+
+    // -5% of total per any additional effect (multiplicative)
+    for (int i = 0; i < effects; ++i)
+        CastingTime *= 0.95f;
+
+    return CastingTime;
+}
+
 uint16 GetSpellAuraMaxTicks(SpellEntry const* spellInfo)
 {
     int32 DotDuration = GetSpellDuration(spellInfo);
@@ -119,6 +221,25 @@ uint16 GetSpellAuraMaxTicks(SpellEntry const* spellInfo)
     }
 
     return 6;
+}
+
+float CalculateDefaultCoefficient(SpellEntry const *spellProto, DamageEffectType const damagetype)
+{
+    // Damage over Time spells bonus calculation
+    float DotFactor = 1.0f;
+    if (damagetype == DOT)
+    {
+        if (!IsChanneledSpell(spellProto))
+            DotFactor = GetSpellDuration(spellProto) / 15000.0f;
+
+        if (uint16 DotTicks = GetSpellAuraMaxTicks(spellProto))
+            DotFactor /= DotTicks;
+    }
+
+    // Distribute Damage over multiple effects, reduce by AoE
+    float coeff = GetSpellCastTimeForBonus(spellProto, damagetype) / 3500.0f;
+
+    return coeff * DotFactor;
 }
 
 WeaponAttackType GetWeaponAttackType(SpellEntry const *spellInfo)
@@ -1044,14 +1165,14 @@ void SpellMgr::LoadSpellProcItemEnchant()
     sLog.outString( ">> Loaded %u proc item enchant definitions", count );
 }
 
-struct DoSpellBonusess
+struct DoSpellBonuses
 {
-    DoSpellBonusess(SpellBonusEntry const& _spellBonus) : spellBonus(_spellBonus) {}
+    DoSpellBonuses(SpellBonusEntry const& _spellBonus) : spellBonus(_spellBonus) {}
     void operator() (uint32 spell_id) { sSpellMgr.mSpellBonusMap[spell_id] = spellBonus; }
     SpellBonusEntry const& spellBonus;
 };
 
-void SpellMgr::LoadSpellBonusess()
+void SpellMgr::LoadSpellBonuses()
 {
     mSpellBonusMap.clear();                             // need for reload case
     uint32 count = 0;
@@ -1095,10 +1216,101 @@ void SpellMgr::LoadSpellBonusess()
         sbe.dot_damage    = fields[2].GetFloat();
         sbe.ap_bonus      = fields[3].GetFloat();
 
+        bool need_dot = false;
+        bool need_direct = false;
+        uint32 x = 0;                                       // count all, including empty, meaning: not all existed effect is DoTs/HoTs
+        for(int i = 0; i < MAX_EFFECT_INDEX; ++i)
+        {
+            if (!spell->Effect[i])
+            {
+                ++x;
+                continue;
+            }
+
+            // DoTs/HoTs
+            switch(spell->EffectApplyAuraName[i])
+            {
+                case SPELL_AURA_PERIODIC_DAMAGE:
+                case SPELL_AURA_PERIODIC_DAMAGE_PERCENT:
+                case SPELL_AURA_PERIODIC_LEECH:
+                case SPELL_AURA_PERIODIC_HEAL:
+                case SPELL_AURA_OBS_MOD_HEALTH:
+                case SPELL_AURA_PERIODIC_MANA_LEECH:
+                case SPELL_AURA_OBS_MOD_MANA:
+                case SPELL_AURA_POWER_BURN_MANA:
+                    need_dot = true;
+                    ++x;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        //TODO: maybe add explicit list possible direct damage spell effects...
+        if (x < MAX_EFFECT_INDEX)
+            need_direct = true;
+
+        // Check if direct_bonus is needed in `spell_bonus_data`
+        float direct_calc;
+        float direct_diff = 1000.0f;                        // for have big diff if no DB field value
+        if (sbe.direct_damage)
+        {
+            bool isHeal = false;
+            for(int i = 0; i < 3; ++i)
+            {
+                // Heals (Also count Mana Shield and Absorb effects as heals)
+                if (spell->Effect[i] == SPELL_EFFECT_HEAL || spell->Effect[i] == SPELL_EFFECT_HEAL_MAX_HEALTH ||
+                    (spell->Effect[i] == SPELL_EFFECT_APPLY_AURA && (spell->EffectApplyAuraName[i] == SPELL_AURA_SCHOOL_ABSORB || spell->EffectApplyAuraName[i] == SPELL_AURA_PERIODIC_HEAL)) )
+                {
+                    isHeal = true;
+                    break;
+                }
+            }
+            direct_calc = CalculateDefaultCoefficient(spell, SPELL_DIRECT_DAMAGE) * (isHeal ? 1.88f : 1.0f);
+            direct_diff = std::abs(sbe.direct_damage - direct_calc);
+        }
+
+        // Check if dot_bonus is needed in `spell_bonus_data`
+        float dot_calc;
+        float dot_diff = 1000.0f;                           // for have big diff if no DB field value
+        if (sbe.dot_damage)
+        {
+            bool isHeal = false;
+            for(int i = 0; i < 3; ++i)
+            {
+                // Periodic Heals
+                if (spell->Effect[i] == SPELL_EFFECT_APPLY_AURA && spell->EffectApplyAuraName[i] == SPELL_AURA_PERIODIC_HEAL)
+                {
+                    isHeal = true;
+                    break;
+                }
+            }
+            dot_calc = CalculateDefaultCoefficient(spell, DOT) * (isHeal ? 1.88f : 1.0f);
+            dot_diff = std::abs(sbe.dot_damage - dot_calc);
+        }
+
+        if (direct_diff < 0.02f && !need_dot && !sbe.ap_bonus)
+            sLog.outErrorDb("`spell_bonus_data` entry for spell %u `direct_bonus` not needed (data from table: %f, calculated %f, difference of %f) and `dot_bonus` also not used",
+                entry, sbe.direct_damage, direct_calc, direct_diff);
+        else if (direct_diff < 0.02f && dot_diff < 0.02f && !sbe.ap_bonus)
+        {
+            sLog.outErrorDb("`spell_bonus_data` entry for spell %u `direct_bonus` not needed (data from table: %f, calculated %f, difference of %f) and ",
+                entry, sbe.direct_damage, direct_calc, direct_diff);
+            sLog.outErrorDb("                                  ... `dot_bonus` not needed (data from table: %f, calculated %f, difference of %f)",
+                sbe.dot_damage, dot_calc, dot_diff);
+        }
+        else if (!need_direct && dot_diff < 0.02f && !sbe.ap_bonus)
+            sLog.outErrorDb("`spell_bonus_data` entry for spell %u `dot_bonus` not needed (data from table: %f, calculated %f, difference of %f) and direct also not used",
+            entry, sbe.dot_damage, dot_calc, dot_diff);
+        else if (!need_direct && sbe.direct_damage)
+            sLog.outErrorDb("`spell_bonus_data` entry for spell %u `direct_bonus` not used (spell not have non-periodic affects)", entry);
+        else if (!need_dot && sbe.dot_damage)
+            sLog.outErrorDb("`spell_bonus_data` entry for spell %u `dot_bonus` not used (spell not have periodic affects)", entry);
+
         mSpellBonusMap[entry] = sbe;
 
         // also add to high ranks
-        DoSpellBonusess worker(sbe);
+        DoSpellBonuses worker(sbe);
         doForHighRanks(entry,worker);
 
         ++count;

@@ -2308,6 +2308,9 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         if (m_target->GetTypeId() == TYPEID_PLAYER)
                             ((Player*)m_target)->removeSpell(63680);
                         return;
+                    case 71342:                             // Big Love Rocket
+                        Spell::SelectMountByAreaAndSkill(m_target, 71344, 71345, 71346, 71347, 0);
+                        return;
                     case 72286:                             // Invincible
                         Spell::SelectMountByAreaAndSkill(m_target, 72281, 72282, 72283, 72284, 0);
                         return;
@@ -2483,6 +2486,16 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
             {
                 // casted only at creatures at spawn
                 m_target->CastSpell(m_target, 47287, true, NULL, this);
+                return;
+            }
+            case 51870:                                     // Collect Hair Sample
+            {
+                if (Unit* pCaster = GetCaster())
+                {
+                    if (m_removeMode == AURA_REMOVE_BY_DEFAULT)
+                        pCaster->CastSpell(m_target, 51872, true, NULL, this);
+                }
+
                 return;
             }
             case 58600:                                     // Restricted Flight Area

@@ -4491,7 +4491,8 @@ SpellCastResult Spell::CheckCast(bool strict)
                                 MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck u_check(*m_caster, i_spellST->second.targetEntry, i_spellST->second.type != SPELL_TARGET_TYPE_DEAD, range);
                                 MaNGOS::CreatureLastSearcher<MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck> searcher(m_caster, p_Creature, u_check);
 
-                                Cell::VisitGridObjects(m_caster, searcher, range);
+                                // Visit all, need to find also Pet* objects
+                                Cell::VisitAllObjects(m_caster, searcher, range);
 
                                 range = u_check.GetLastRange();
                             }
@@ -6402,7 +6403,7 @@ SpellCastResult Spell::CanOpenLock(SpellEffectIndex effIndex, uint32 lockId, Ski
     return SPELL_CAST_OK;
 }
 
-/*
+/**
  * Fill target list by units around (x,y) points at radius distance
 
  * @param targetUnitMap        Reference to target list that filled by function
