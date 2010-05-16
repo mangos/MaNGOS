@@ -365,7 +365,7 @@ class MANGOS_DLL_SPEC WorldObject : public Object
             return ( m_valuesCount > UNIT_FIELD_BOUNDINGRADIUS ) ? m_floatValues[UNIT_FIELD_BOUNDINGRADIUS] : DEFAULT_WORLD_OBJECT_SIZE;
         }
         bool IsPositionValid() const;
-        void UpdateGroundPositionZ(float x, float y, float &z) const;
+        void UpdateGroundPositionZ(float x, float y, float &z, float maxDiff = 30.0f) const;
 
         void GetRandomPoint( float x, float y, float z, float distance, float &rand_x, float &rand_y, float &rand_z ) const;
 

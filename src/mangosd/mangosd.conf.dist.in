@@ -1707,4 +1707,3 @@ Anticheat.Movement.MistimingAlarms = 20
 CharDelete.Method = 1
 CharDelete.MinLevel = 10
 CharDelete.KeepDays = 30
-

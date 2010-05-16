@@ -188,10 +188,6 @@ void SpellCastTargets::Update(Unit* caster)
         ( m_unitTargetGUID == caster->GetObjectGuid() ? caster : ObjectAccessor::GetUnit(*caster, m_unitTargetGUID) ) :
     NULL;
 
-    if (m_unitTarget && m_unitTargetGUID != caster->GetObjectGuid() &&
-        !m_unitTarget->isVisibleForOrDetect(caster, caster, false))
-            m_unitTarget = NULL;
-
     m_itemTarget = NULL;
     if(caster->GetTypeId() == TYPEID_PLAYER)
     {
@@ -3153,6 +3149,9 @@ void Spell::update(uint32 difftime)
         {
             if(m_timer)
             {
+                if (m_targets.getUnitTarget() && !m_targets.getUnitTarget()->isVisibleForOrDetect(m_caster, m_caster, false))
+                    cancel();
+
                 if(difftime >= m_timer)
                     m_timer = 0;
                 else
@@ -4645,7 +4644,8 @@ SpellCastResult Spell::CheckCast(bool strict)
                                 MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck u_check(*m_caster, i_spellST->second.targetEntry, i_spellST->second.type != SPELL_TARGET_TYPE_DEAD, range);
                                 MaNGOS::CreatureLastSearcher<MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck> searcher(m_caster, p_Creature, u_check);
 
-                                Cell::VisitGridObjects(m_caster, searcher, range);
+                                // Visit all, need to find also Pet* objects
+                                Cell::VisitAllObjects(m_caster, searcher, range);
 
                                 range = u_check.GetLastRange();
                             }
