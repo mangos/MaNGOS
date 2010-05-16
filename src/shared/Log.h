@@ -140,6 +140,8 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, ACE_Th
         bool HasLogLevelOrHigher(LogLevel loglvl) const { return m_logLevel >= loglvl || (m_logFileLevel >= loglvl && logfile); }
         bool IsOutCharDump() const { return m_charLog_Dump; }
         bool IsIncludeTime() const { return m_includeTime; }
+
+        static void WaitBeforeContinueIfNeed();
     private:
         FILE* openLogFile(char const* configFileName,char const* configTimeStampFlag, char const* mode);
         FILE* openGmlogPerAccount(uint32 account);
