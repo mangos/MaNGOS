@@ -394,27 +394,3 @@ void WaypointManager::CheckTextsExistance(std::set<int32>& ids)
         }
     }
 }
-
-void WaypointManager::CheckScriptExistance(std::set<uint32>& ids)
-{
-    WaypointPathMap::iterator pmItr = m_pathMap.begin();
-    for ( ; pmItr != m_pathMap.end(); ++pmItr)
-    {
-        for (size_t i = 0; i < pmItr->second.size(); ++i)
-        {
-            uint32 script_id = pmItr->second[i].script_id;
-            if (!script_id)
-                continue;
-
-            // Now we check text existence and put all zero texts ids to the end of array
-            if (sCreatureMovementScripts.find(script_id)==sCreatureMovementScripts.end())
-            {
-                sLog.outErrorDb("Some waypoint has not existing scriptid %u.", script_id);
-                pmItr->second[i].script_id = 0;
-                continue;
-            }
-            else
-                ids.erase(script_id);
-        }
-    }
-}

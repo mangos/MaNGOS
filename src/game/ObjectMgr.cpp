@@ -4584,15 +4584,7 @@ void ObjectMgr::LoadCreatureMovementScripts()
 {
     LoadScripts(sCreatureMovementScripts, "creature_movement_scripts");
 
-    std::set<uint32> ids;
-
-    for(ScriptMapMap::const_iterator itr = sCreatureMovementScripts.begin(); itr != sEventScripts.end(); ++itr)
-        ids.insert(itr->first);
-
-    sWaypointMgr.CheckScriptExistance(ids);
-
-    for(std::set<uint32>::const_iterator itr = ids.begin(); itr != ids.end(); ++itr)
-        sLog.outErrorDb("Table `creature_movement_scripts` has script (Id: %u) not referring to any waypoint.", *itr);
+    // checks are done in WaypointManager::Load
 }
 
 void ObjectMgr::LoadPageTexts()
