@@ -8066,6 +8066,8 @@ static WorldStatePair WS_world_states[] =
     { 0x641, 0x3 },                                         // 12 1601 unk (max flag captures?)
     { 0x922, 0x1 },                                         // 13 2338 horde (0 - hide, 1 - flag ok, 2 - flag picked up (flashing), 3 - flag picked up (not flashing)
     { 0x923, 0x1 },                                         // 14 2339 alliance (0 - hide, 1 - flag ok, 2 - flag picked up (flashing), 3 - flag picked up (not flashing)
+    { 0x1097,0x1 },                                         // 15 4247 show time limit?
+    { 0x1098,0x19 },                                        // 16 4248 time remaining in minutes
     { 0x0,   0x0 }
 };
 
