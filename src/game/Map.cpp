@@ -3608,6 +3608,28 @@ void Map::SendObjectUpdates()
     }
 }
 
+bool Map::IsNextZcoordOK(float x, float y, float oldZ, float maxDiff) const
+{
+    // The fastest way to get an accurate result 90% of the time.
+    // Better result can be obtained like 99% accuracy with a ray light, but the cost is too high and the code is too long.
+    maxDiff = maxDiff >= 100.0f ? 10.0f : sqrtf(maxDiff);
+    bool useVmaps = false;
+    if( GetHeight(x, y, oldZ, false) <  GetHeight(x, y, oldZ, true) ) // check use of vmaps
+        useVmaps = true;
+
+    float newZ = GetHeight(x, y, oldZ+maxDiff-2.0f, useVmaps);
+
+    if (fabs(newZ-oldZ) > maxDiff)                              // bad...
+    {
+        useVmaps = !useVmaps;                                     // try change vmap use
+        newZ = GetHeight(x, y, oldZ+maxDiff-2.0f, useVmaps);
+
+        if (fabs(newZ-oldZ) > maxDiff)
+            return false;
+    }
+    return true;
+}
+
 uint32 Map::GenerateLocalLowGuid(HighGuid guidhigh)
 {
     // TODO: for map local guid counters possible force reload map instead shutdown server at guid counter overflow
