@@ -698,6 +698,18 @@ void PlayerMenu::SendQuestQueryResponse( Quest const *pQuest )
     for (iI = 0; iI < QUEST_OBJECTIVES_COUNT; ++iI)
         data << ObjectiveText[iI];
 
+    for(iI = 0; iI < 4; ++i)                                // 4.0.0
+    {
+        data << uint32(0);
+        data << uint32(0);
+    }
+
+    for(iI = 0; iI < 4; ++i)                                // 4.0.0
+    {
+        data << uint32(0);
+        data << uint32(0);
+    }
+
     pSession->SendPacket( &data );
     DEBUG_LOG( "WORLD: Sent SMSG_QUEST_QUERY_RESPONSE questid=%u", pQuest->GetQuestId() );
 }
