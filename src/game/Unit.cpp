@@ -7965,14 +7965,6 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
                 if(pVictim == this)   // Temp fix, somehow its twice-procced from Chains of Ice
                         return false;
             }
-            // Rune Strike
-            else if (auraSpellInfo->Id == 56816)
-            {
-                if( Aura * pAura = this->GetAura(56816, EFFECT_INDEX_0))
-                    pAura->SendFakeAuraUpdate(56817, false);
-                    return true;
-            }
-            break;
         }
         default:
              break;
