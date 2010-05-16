@@ -427,9 +427,7 @@ void World::LoadConfigSettings(bool reload)
         sLog.outError(" WARNING: mangosd.conf does not include a ConfVersion variable.");
         sLog.outError("          Your configuration file may be out of date!");
         sLog.outError("*****************************************************************************");
-        clock_t pause = 3000 + clock();
-        while (pause > clock())
-            ;                                               // empty body
+        Log::WaitBeforeContinueIfNeed();
     }
     else
     {
@@ -440,9 +438,7 @@ void World::LoadConfigSettings(bool reload)
             sLog.outError("          Please check for updates, as your current default values may cause");
             sLog.outError("          unexpected behavior.");
             sLog.outError("*****************************************************************************");
-            clock_t pause = 3000 + clock();
-            while (pause > clock())
-                ;                                           // empty body
+            Log::WaitBeforeContinueIfNeed();
         }
     }
 

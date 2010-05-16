@@ -5,17 +5,23 @@ Copyright (c) 2005-2010 MaNGOS <http://getmangos.com/>
 See the COPYING file for copying conditions.
 
 == Database Updates ==
+
 This folder contains SQL files which will apply required updates to your MySQL
 database, whenever the MaNGOS database structure has been changed or extended.
 
 To see if you need an update, the file names have been given a fixed structure
 that should enable you to see if you need an update or not.
 
-=== File name descriptin ===
-File names are divided into two parts. First part is the revision+counter
-that show commit revision that will be compatible with database after apply update.
-Counter set order in sql updates apply for same revision.
-The second part of the name of the database and the table that needs and update or has been added.
+=== File Name Description ===
+
+File names are divided into two parts.
+
+First part is the revision and counter that shows the commit revision that
+will be compatible with the database after apply that particular update.
+Counter sets the order to apply sql updates for the same revision.
+
+The second part of the name is the database and the table that needs an update or has been added.
+
 See an example below:
 
          6936_01_mangos_spell_chain.sql
@@ -27,18 +33,19 @@ See an example below:
          |    |  Name of affected DB (default recommended name)
          |    |  Can be: characters, mangos, realmd
          |    |
-         |    Counter show number of sql update in updates list for provided revision
+         |    Counter show number of sql updates in updates list for provided revision
          |    and set proper order for sql updates for same revision
          |
-         MaNGOS commit revison related to sql update.
+         MaNGOS commit revision related to sql update.
          It included in commit description in form [6936] as you can see at http://github.com/mangos/mangos/commits/master
 
-After appling this update DB compatiable with database that include this sql update.
-SQL update include special protection against multiply and wrong order SQL updates apply.
-So attempt apply sql update to more old DB without previous SQL update in list for targeted database
-or to DB with already applied this or later SQL update will generate error and not applied.
+After applying an update the DB is compatible with the mangos revision of this sql update.
+SQL updates include special protection against multiple and wrong order of update application.
 
-=== For commiters ====
+Attempts to apply sql updates to an older DB without previous SQL updates in list for the database
+or to DB with already applied this or later SQL update will generate an error and not be applied.
+
+=== For Commiters ====
 
 MaNGOS sources include special tool ( contrib/git_id ) for generation revision info
 in commit notes and in src/shared/revision_nr.h file. It have option '-s' that let set

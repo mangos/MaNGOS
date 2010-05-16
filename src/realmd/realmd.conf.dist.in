@@ -76,6 +76,12 @@ ConfVersion=2007062001
 #        Default: 1 (HIGH)
 #                 0 (Normal)
 #
+#    WaitAtStartupError
+#        After startup error report wait <Enter> or some time before continue (and possible close console window)
+#                 -1 (wait until <Enter> press)
+#        Default:  0 (not wait)
+#                  N (>0, wait N secs)
+#
 #    RealmsStateUpdateDelay
 #        Realm list Update up delay (updated at realm list request if delay expired).
 #        Default: 20
@@ -110,6 +116,7 @@ LogFileLevel = 0
 LogColors = ""
 UseProcessors = 0
 ProcessPriority = 1
+WaitAtStartupError = 0
 RealmsStateUpdateDelay = 20
 WrongPass.MaxCount = 0
 WrongPass.BanTime = 600

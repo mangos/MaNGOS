@@ -204,6 +204,18 @@ bool Database::CheckRequiredField( char const* table_name, char const* required_
     // check fail, prepare readabale error message
 
     // search current required_* field in DB
+    const char* db_name;
+    if(!strcmp(table_name, "db_version"))
+        db_name = "WORLD";
+    else if(!strcmp(table_name, "character_db_version"))
+        db_name = "CHARACTER";
+    else if(!strcmp(table_name, "realmd_db_version"))
+        db_name = "REALMD";
+    else
+        db_name = "UNKNOWN";
+
+    char const* req_sql_update_name = required_name+strlen("required_");
+
     QueryNamedResult* result2 = PQueryNamed("SELECT * FROM %s LIMIT 1",table_name);
     if(result2)
     {
@@ -220,13 +232,49 @@ bool Database::CheckRequiredField( char const* table_name, char const* required_
 
         delete result2;
 
+        std::string cur_sql_update_name = reqName.substr(strlen("required_"),reqName.npos);
+
         if(!reqName.empty())
-            sLog.outErrorDb("Table `%s` have field `%s` but expected `%s`! Not all sql updates applied?",table_name,reqName.c_str(),required_name);
+        {
+            sLog.outErrorDb("The table `%s` in your [%s] database indicates that this database is out of date!",table_name,db_name);
+            sLog.outErrorDb("");
+            sLog.outErrorDb("  [A] You have: --> `%s.sql`",cur_sql_update_name.c_str());
+            sLog.outErrorDb("");
+            sLog.outErrorDb("  [B] You need: --> `%s.sql`",req_sql_update_name);
+            sLog.outErrorDb("");
+            sLog.outErrorDb("You must apply all updates after [A] to [B] to use mangos with this database.");
+            sLog.outErrorDb("These updates are included in the sql/updates folder.");
+            sLog.outErrorDb("Please read the included [README] in sql/updates for instructions on updating.");
+        }
         else
-            sLog.outErrorDb("Table `%s` not have required_* field but expected `%s`! Not all sql updates applied?",table_name,required_name);
+        {
+            sLog.outErrorDb("The table `%s` in your [%s] database is missing its version info.",table_name,db_name);
+            sLog.outErrorDb("MaNGOS cannot find the version info needed to check that the db is up to date.",table_name,db_name);
+            sLog.outErrorDb("");
+            sLog.outErrorDb("This revision of MaNGOS requires a database updated to:");
+            sLog.outErrorDb("`%s.sql`",req_sql_update_name);
+            sLog.outErrorDb("");
+
+            if(!strcmp(db_name, "WORLD"))
+                sLog.outErrorDb("Post this error to your database provider forum or find a solution there.");
+            else
+                sLog.outErrorDb("Reinstall your [%s] database with the included sql file in the sql folder.",db_name);
+        }
     }
     else
-        sLog.outErrorDb("Table `%s` fields list query fail but expected have `%s`! No records in `%s`?",table_name,required_name,table_name);
+    {
+        sLog.outErrorDb("The table `%s` in your [%s] database is missing or corrupt.",table_name,db_name);
+        sLog.outErrorDb("MaNGOS cannot find the version info needed to check that the db is up to date.",table_name,db_name);
+        sLog.outErrorDb("");
+        sLog.outErrorDb("This revision of mangos requires a database updated to:");
+        sLog.outErrorDb("`%s.sql`",req_sql_update_name);
+        sLog.outErrorDb("");
+
+        if(!strcmp(db_name, "WORLD"))
+            sLog.outErrorDb("Post this error to your database provider forum or find a solution there.");
+        else
+            sLog.outErrorDb("Reinstall your [%s] database with the included sql file in the sql folder.",db_name);
+    }
 
     return false;
 }
