@@ -39,11 +39,19 @@ bool Player::UpdateStats(Stats stat)
 
     SetStat(stat, int32(value));
 
-    if(stat == STAT_STAMINA || stat == STAT_INTELLECT)
+    if(stat == STAT_STAMINA || stat == STAT_INTELLECT || stat == STAT_STRENGTH)
     {
         Pet *pet = GetPet();
         if(pet)
+        {
             pet->UpdateStats(stat);
+
+            if (getClass() == CLASS_DEATH_KNIGHT && pet->getPetType() == SUMMON_PET)
+                {
+                    pet->RemoveAllAuras();
+                    pet->CastPetAuras(true);
+                }
+        }
     }
 
     switch(stat)
@@ -880,6 +888,14 @@ bool Pet::UpdateStats(Stats stat)
         else if (owner)
             value += float(owner->GetStat(stat)) * 0.3f;
     }
+
+    else if ( stat == STAT_STRENGTH && getPetType() == SUMMON_PET )
+    {
+        if (owner && (owner->getClass() == CLASS_DEATH_KNIGHT))
+        {
+            value += float(owner->GetStat(stat)) * 1.0f;
+        }
+    }
                                                             //warlock's and mage's pets gain 30% of owner's intellect
     else if ( stat == STAT_INTELLECT && getPetType() == SUMMON_PET )
     {
@@ -1026,6 +1042,12 @@ void Pet::UpdateAttackPowerAndDamage(bool ranged)
         {
             bonusAP = owner->GetTotalAttackPowerValue(RANGED_ATTACK) * 0.22f;
             SetBonusDamage( int32(owner->GetTotalAttackPowerValue(RANGED_ATTACK) * 0.1287f));
+        }
+        //ghouls benefit from deathknight's attack power
+        else if(getPetType() == SUMMON_PET && owner->getClass() == CLASS_DEATH_KNIGHT)
+        {
+            bonusAP = owner->GetTotalAttackPowerValue(BASE_ATTACK) * 0.82f;
+            SetBonusDamage( int32(owner->GetTotalAttackPowerValue(BASE_ATTACK) * 0.8287f));
         }
         //demons benefit from warlocks shadow or fire damage
         else if(getPetType() == SUMMON_PET && owner->getClass() == CLASS_WARLOCK)
