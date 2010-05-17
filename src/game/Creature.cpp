@@ -168,6 +168,10 @@ void Creature::RemoveCorpse()
     m_deathTimer = 0;
     setDeathState(DEAD);
     UpdateObjectVisibility();
+
+    // stop loot rolling before loot clear and for close client dialogs
+    StopGroupLoot();
+
     loot.clear();
     uint32 respawnDelay = m_respawnDelay;
     if (AI())
@@ -413,19 +417,12 @@ void Creature::Update(uint32 diff)
             else
             {
                 m_deathTimer -= diff;
-                if (m_groupLootTimer && m_groupLootId)
+                if (m_groupLootId)
                 {
-                    if(diff <= m_groupLootTimer)
-                    {
+                    if(diff < m_groupLootTimer)
                         m_groupLootTimer -= diff;
-                    }
                     else
-                    {
-                        if (Group* group = sObjectMgr.GetGroupById(m_groupLootId))
-                            group->EndRoll();
-                        m_groupLootTimer = 0;
-                        m_groupLootId = 0;
-                    }
+                        StopGroupLoot();
                 }
             }
 
@@ -502,6 +499,25 @@ void Creature::Update(uint32 diff)
         default:
             break;
     }
+}
+
+
+void Creature::StartGroupLoot( Group* group, uint32 timer )
+{
+    m_groupLootId = group->GetId();
+    m_groupLootTimer = timer;
+}
+
+void Creature::StopGroupLoot()
+{
+    if (!m_groupLootId)
+        return;
+
+    if (Group* group = sObjectMgr.GetGroupById(m_groupLootId))
+        group->EndRoll();
+
+    m_groupLootTimer = 0;
+    m_groupLootId = 0;
 }
 
 void Creature::RegenerateMana()
