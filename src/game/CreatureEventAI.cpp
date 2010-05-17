@@ -698,7 +698,7 @@ void CreatureEventAI::ProcessAction(CreatureEventAI_Action const& action, uint32
             break;
         }
         case ACTION_T_KILLED_MONSTER:
-            //first attempt player who tapped creature
+            //first attempt player/group who tapped creature
             if (Player* pPlayer = m_creature->GetLootRecipient())
                 pPlayer->RewardPlayerAndGroupAtEvent(action.killed_monster.creatureId, m_creature);
             else

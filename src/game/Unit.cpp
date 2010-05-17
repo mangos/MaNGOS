@@ -658,7 +658,7 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
     if (pVictim->GetTypeId() == TYPEID_PLAYER)
         ((Player*)pVictim)->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_HIT_RECEIVED, damage);
 
-    if (pVictim->GetTypeId() == TYPEID_UNIT && !((Creature*)pVictim)->isPet() && !((Creature*)pVictim)->hasLootRecipient())
+    if (pVictim->GetTypeId() == TYPEID_UNIT && !((Creature*)pVictim)->isPet() && !((Creature*)pVictim)->HasLootRecipient())
         ((Creature*)pVictim)->SetLootRecipient(this);
 
     if (health <= damage)
@@ -666,35 +666,50 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
         DEBUG_LOG("DealDamage: victim just died");
 
         // find player: owner of controlled `this` or `this` itself maybe
-        Player *player = GetCharmerOrOwnerPlayerOrPlayerItself();
+        // for loot will be sued only if group_tap==NULL
+        Player *player_tap = GetCharmerOrOwnerPlayerOrPlayerItself();
+        Group *group_tap = NULL;
 
         // find owner of pVictim, used for creature cases, AI calls
         Unit* pOwner = pVictim->GetCharmerOrOwner();
 
-        if(pVictim->GetTypeId() == TYPEID_UNIT && ((Creature*)pVictim)->GetLootRecipient())
-            player = ((Creature*)pVictim)->GetLootRecipient();
+        if (pVictim->GetTypeId() == TYPEID_UNIT)
+        {
+            group_tap = ((Creature*)pVictim)->GetGroupLootRecipient();
+
+            if (Player* recipient = ((Creature*)pVictim)->GetOriginalLootRecipient())
+                player_tap = recipient;
+        }
 
         if (pVictim->GetTypeId() == TYPEID_PLAYER)
         {
             ((Player*)pVictim)->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_TOTAL_DAMAGE_RECEIVED, health);
-            if (player)
-                player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_SPECIAL_PVP_KILL,1,0,pVictim);
+            if (player_tap)
+                player_tap->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_SPECIAL_PVP_KILL,1,0,pVictim);
+        }
+
+        // call kill spell proc event (before real die and combat stop to triggering auras removed at death/combat stop)
+        if(player_tap && player_tap != pVictim)
+        {
+            player_tap->ProcDamageAndSpell(pVictim, PROC_FLAG_KILL, PROC_FLAG_KILLED, PROC_EX_NONE, 0);
+
+            WorldPacket data(SMSG_PARTYKILLLOG, (8+8));     //send event PARTY_KILL
+            data << player_tap->GetObjectGuid();            //player with killing blow
+            data << pVictim->GetObjectGuid();              //victim
+
+            if (group_tap)
+                group_tap->BroadcastPacket(&data, false, group_tap->GetMemberGroup(player_tap->GetGUID()),player_tap->GetGUID());
+
+            player_tap->SendDirectMessage(&data);
         }
 
         // Reward player, his pets, and group/raid members
-        // call kill spell proc event (before real die and combat stop to triggering auras removed at death/combat stop)
-        if(player && player!=pVictim)
+        if (player_tap != pVictim)
         {
-            player->RewardPlayerAndGroupAtKill(pVictim);
-            player->ProcDamageAndSpell(pVictim, PROC_FLAG_KILL, PROC_FLAG_KILLED, PROC_EX_NONE, 0);
-
-            WorldPacket data(SMSG_PARTYKILLLOG, (8+8)); //send event PARTY_KILL
-            data << uint64(player->GetGUID()); //player with killing blow
-            data << uint64(pVictim->GetGUID()); //victim
-            if (Group *group =  player->GetGroup())
-                group->BroadcastPacket(&data, group->GetMemberGroup(player->GetGUID()));
-            else
-                player->SendDirectMessage(&data);
+            if (group_tap)
+                group_tap->RewardGroupAtKill(pVictim);
+            else if (player_tap)
+                player_tap->RewardSinglePlayerAtKill(pVictim);
         }
 
         DEBUG_LOG("DealDamageAttackStop");
@@ -749,7 +764,7 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
         // remember victim PvP death for corpse type and corpse reclaim delay
         // at original death (not at SpiritOfRedemtionTalent timeout)
         if( pVictim->GetTypeId()==TYPEID_PLAYER && !damageFromSpiritOfRedemtionTalent )
-            ((Player*)pVictim)->SetPvPDeath(player!=NULL);
+            ((Player*)pVictim)->SetPvPDeath(player_tap != NULL);
 
         // Call KilledUnit for creatures
         if (GetTypeId() == TYPEID_UNIT && ((Creature*)this)->AI())
@@ -769,7 +784,7 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
         if (pVictim->GetTypeId() == TYPEID_PLAYER)
         {
             // only if not player and not controlled by player pet. And not at BG
-            if (durabilityLoss && !player && !((Player*)pVictim)->InBattleGround())
+            if (durabilityLoss && !player_tap && !((Player*)pVictim)->InBattleGround())
             {
                 DEBUG_LOG("We are dead, loosing 10 percents durability");
                 ((Player*)pVictim)->DurabilityLossAll(0.10f,false);
@@ -855,14 +870,14 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
         {
             Player *killed = ((Player*)pVictim);
             if(BattleGround *bg = killed->GetBattleGround())
-                if(player)
-                    bg->HandleKillPlayer(killed, player);
+                if(player_tap)
+                    bg->HandleKillPlayer(killed, player_tap);
         }
         else if(pVictim->GetTypeId() == TYPEID_UNIT)
         {
-            if (player)
-                if (BattleGround *bg = player->GetBattleGround())
-                    bg->HandleKillUnit((Creature*)pVictim, player);
+            if (player_tap)
+                if (BattleGround *bg = player_tap->GetBattleGround())
+                    bg->HandleKillUnit((Creature*)pVictim, player_tap);
         }
     }
     else                                                    // if (health <= damage)

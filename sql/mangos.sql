@@ -1547,8 +1547,8 @@ CREATE TABLE `game_event` (
   `entry` mediumint(8) unsigned NOT NULL COMMENT 'Entry of the game event',
   `start_time` timestamp NOT NULL default '0000-00-00 00:00:00' COMMENT 'Absolute start date, the event will never start before',
   `end_time` timestamp NOT NULL default '0000-00-00 00:00:00' COMMENT 'Absolute end date, the event will never start afler',
-  `occurence` bigint(20) unsigned NOT NULL default '86400' COMMENT 'Delay in hours between occurences of the event',
-  `length` bigint(20) unsigned NOT NULL default '43200' COMMENT 'Length in hours of the event',
+  `occurence` bigint(20) unsigned NOT NULL default '86400' COMMENT 'Delay in minutes between occurences of the event',
+  `length` bigint(20) unsigned NOT NULL default '43200' COMMENT 'Length in minutes of the event',
   `holiday` mediumint(8) unsigned NOT NULL default '0' COMMENT 'Client side holiday id',
   `description` varchar(255) default NULL COMMENT 'Description of the event displayed in console',
   PRIMARY KEY  (`entry`)

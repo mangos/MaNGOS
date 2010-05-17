@@ -344,7 +344,16 @@ bool ChatHandler::HandleDebugGetLootRecipientCommand(const char* /*args*/)
     if (!target)
         return false;
 
-    PSendSysMessage("loot recipient: %s", target->hasLootRecipient()?(target->GetLootRecipient()?target->GetLootRecipient()->GetName():"offline"):"no loot recipient");
+    if (!target->HasLootRecipient())
+        SendSysMessage("loot recipient: no loot recipient");
+    else if(Player* recipient = target->GetLootRecipient())
+        PSendSysMessage("loot recipient: %s with raw data %s from group %u",
+            recipient->GetObjectGuid().GetString().c_str(),
+            target->GetLootRecipientGuid().GetString().c_str(),
+            target->GetLootGroupRecipientId());
+    else
+        SendSysMessage("loot recipient: offline ");
+
     return true;
 }
 
