@@ -130,6 +130,7 @@ class MANGOS_DLL_SPEC ObjectGuid
         PackedGuidReader ReadAsPacked() { return PackedGuidReader(*this); }
 
         void Set(uint64 const& guid) { m_guid = guid; }
+        void Clear() { m_guid = 0; }
 
         // Possible removed in future for more strict control type conversions
         void operator= (uint64 const& guid) { m_guid = guid; }

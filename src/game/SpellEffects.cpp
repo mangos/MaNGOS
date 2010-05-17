@@ -5675,7 +5675,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     if (m_caster->GetTypeId() != TYPEID_UNIT)
                         return;
 
-                    Player* pPlayer = ((Creature*)m_caster)->GetLootRecipient();
+                    Player* pPlayer = ((Creature*)m_caster)->GetOriginalLootRecipient();
 
                     if (!pPlayer)
                         return;

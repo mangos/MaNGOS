@@ -1691,3 +1691,75 @@ void Group::_homebindIfInstance(Player *player)
             player->m_InstanceValid = false;
     }
 }
+
+void Group::RewardGroupAtKill(Unit* pVictim)
+{
+    // for creature case use tapped group (for avoid use group if not set and use if player switch group after tap
+    //Group* pGroup = pVictim->GetTypeId() == TYPEID_UNIT ? ((Creature*)pVictim)->GetGroupLootRecipient() : GetGroup();
+
+    bool PvP = pVictim->isCharmedOwnedByPlayerOrPlayer();
+
+    // prepare data for near group iteration (PvP and !PvP cases)
+    uint32 xp = 0;
+
+    uint32 count = 0;
+    uint32 sum_level = 0;
+    Player* member_with_max_level = NULL;
+    Player* not_gray_member_with_max_level = NULL;
+
+    GetDataForXPAtKill(pVictim,count,sum_level,member_with_max_level,not_gray_member_with_max_level);
+
+    if(member_with_max_level)
+    {
+        /// not get Xp in PvP or no not gray players in group
+        xp = (PvP || !not_gray_member_with_max_level) ? 0 : MaNGOS::XP::Gain(not_gray_member_with_max_level, pVictim);
+
+        /// skip in check PvP case (for speed, not used)
+        bool is_raid = PvP ? false : sMapStore.LookupEntry(pVictim->GetMapId())->IsRaid() && isRaidGroup();
+        bool is_dungeon = PvP ? false : sMapStore.LookupEntry(pVictim->GetMapId())->IsDungeon();
+        float group_rate = MaNGOS::XP::xp_in_group_rate(count,is_raid);
+
+        for(GroupReference *itr = GetFirstMember(); itr != NULL; itr = itr->next())
+        {
+            Player* pGroupGuy = itr->getSource();
+            if(!pGroupGuy)
+                continue;
+
+            if(!pGroupGuy->IsAtGroupRewardDistance(pVictim))
+                continue;                               // member (alive or dead) or his corpse at req. distance
+
+            // honor can be in PvP and !PvP (racial leader) cases (for alive)
+            if (pGroupGuy->isAlive())
+                pGroupGuy->RewardHonor(pVictim,count);
+
+            // xp and reputation only in !PvP case
+            if(!PvP)
+            {
+                float rate = group_rate * float(pGroupGuy->getLevel()) / sum_level;
+
+                // if is in dungeon then all receive full reputation at kill
+                // rewarded any alive/dead/near_corpse group member
+                pGroupGuy->RewardReputation(pVictim,is_dungeon ? 1.0f : rate);
+
+                // XP updated only for alive group member
+                if(pGroupGuy->isAlive() && not_gray_member_with_max_level &&
+                    pGroupGuy->getLevel() <= not_gray_member_with_max_level->getLevel())
+                {
+                    uint32 itr_xp = (member_with_max_level == not_gray_member_with_max_level) ? uint32(xp*rate) : uint32((xp*rate/2)+1);
+
+                    pGroupGuy->GiveXP(itr_xp, pVictim);
+                    if(Pet* pet = pGroupGuy->GetPet())
+                        pet->GivePetXP(itr_xp/2);
+                }
+
+                // quest objectives updated only for alive group member or dead but with not released body
+                if(pGroupGuy->isAlive()|| !pGroupGuy->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))
+                {
+                    // normal creature (not pet/etc) can be only in !PvP case
+                    if(pVictim->GetTypeId()==TYPEID_UNIT)
+                        pGroupGuy->KilledMonster(((Creature*)pVictim)->GetCreatureInfo(), pVictim->GetObjectGuid());
+                }
+            }
+        }
+    }
+}
