@@ -19,6 +19,7 @@
 #include "ObjectGuid.h"
 
 #include "World.h"
+#include "ObjectMgr.h"
 
 #include <sstream>
 
@@ -44,7 +45,16 @@ char const* ObjectGuid::GetTypeName(HighGuid high)
 std::string ObjectGuid::GetString() const
 {
     std::ostringstream str;
-    str << GetTypeName() << " (";
+    str << GetTypeName();
+    
+    if (IsPlayer())
+    {
+        std::string name;
+        if (sObjectMgr.GetPlayerNameByGUID(m_guid, name))
+            str << " " << name;
+    }
+
+    str << " (";
     if (HasEntry())
         str << "Entry: " << GetEntry() << " ";
     str << "Guid: " << GetCounter() << ")";
