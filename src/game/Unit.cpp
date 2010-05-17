@@ -660,7 +660,7 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
 
     if (pVictim->GetTypeId() == TYPEID_UNIT && !((Creature*)pVictim)->isPet())
     {
-        if(!((Creature*)pVictim)->hasLootRecipient())
+        if(!((Creature*)pVictim)->HasLootRecipient())
             ((Creature*)pVictim)->SetLootRecipient(this);
 
         ((Creature*)pVictim)->IncrementReceivedDamage(this, health < damage ? health : damage);
