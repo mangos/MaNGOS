@@ -698,13 +698,13 @@ void PlayerMenu::SendQuestQueryResponse( Quest const *pQuest )
     for (iI = 0; iI < QUEST_OBJECTIVES_COUNT; ++iI)
         data << ObjectiveText[iI];
 
-    for(iI = 0; iI < 4; ++i)                                // 4.0.0
+    for(iI = 0; iI < 4; ++iI)                               // 4.0.0 currency reward id and count
     {
         data << uint32(0);
         data << uint32(0);
     }
 
-    for(iI = 0; iI < 4; ++i)                                // 4.0.0
+    for(iI = 0; iI < 4; ++iI)                               // 4.0.0 currency required id and count
     {
         data << uint32(0);
         data << uint32(0);
