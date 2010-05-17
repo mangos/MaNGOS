@@ -436,10 +436,9 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
             loot = &pCreature->loot;
 
             // update next looter
-            if(Player *recipient = pCreature->GetLootRecipient())
-                if(Group* group = recipient->GetGroup())
-                    if (group->GetLooterGuid() == player->GetGUID())
-                        group->UpdateLooterGuid(pCreature);
+            if(Group* group = pCreature->GetGroupLootRecipient())
+                if (group->GetLooterGuid() == player->GetGUID())
+                    group->UpdateLooterGuid(pCreature);
 
             if (loot->isLooted())
             {
