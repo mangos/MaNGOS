@@ -658,13 +658,8 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
     if (pVictim->GetTypeId() == TYPEID_PLAYER)
         ((Player*)pVictim)->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_HIT_RECEIVED, damage);
 
-    if (pVictim->GetTypeId() == TYPEID_UNIT && !((Creature*)pVictim)->isPet())
-    {
-        if(!((Creature*)pVictim)->hasLootRecipient())
-            ((Creature*)pVictim)->SetLootRecipient(this);
-
-        ((Creature*)pVictim)->IncrementReceivedDamage(this, health < damage ? health : damage);
-    }
+    if (pVictim->GetTypeId() == TYPEID_UNIT && !((Creature*)pVictim)->isPet() && !((Creature*)pVictim)->hasLootRecipient())
+        ((Creature*)pVictim)->SetLootRecipient(this);
 
     if (health <= damage)
     {
@@ -676,15 +671,7 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
         // find owner of pVictim, used for creature cases, AI calls
         Unit* pOwner = pVictim->GetCharmerOrOwner();
 
-        bool bRewardIsAllowed = true;
-        if (pVictim->GetTypeId() == TYPEID_UNIT)
-        {
-            bRewardIsAllowed = ((Creature*)pVictim)->AreLootAndRewardAllowed();
-            if(!bRewardIsAllowed)
-                ((Creature*)pVictim)->SetLootRecipient(NULL);
-        }
-
-        if(bRewardIsAllowed && pVictim->GetTypeId() == TYPEID_UNIT && ((Creature*)pVictim)->GetLootRecipient())
+        if(pVictim->GetTypeId() == TYPEID_UNIT && ((Creature*)pVictim)->GetLootRecipient())
             player = ((Creature*)pVictim)->GetLootRecipient();
 
         if (pVictim->GetTypeId() == TYPEID_PLAYER)
@@ -696,7 +683,7 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
 
         // Reward player, his pets, and group/raid members
         // call kill spell proc event (before real die and combat stop to triggering auras removed at death/combat stop)
-        if (player && player!=pVictim && bRewardIsAllowed)
+        if(player && player!=pVictim)
         {
             player->RewardPlayerAndGroupAtKill(pVictim);
             player->ProcDamageAndSpell(pVictim, PROC_FLAG_KILL, PROC_FLAG_KILLED, PROC_EX_NONE, 0);
