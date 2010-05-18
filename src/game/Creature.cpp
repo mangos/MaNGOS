@@ -130,8 +130,6 @@ m_creatureInfo(NULL), m_isActiveObject(false), m_splineFlags(SPLINEFLAG_WALKMODE
     m_GlobalCooldown = 0;
 
     m_splineFlags = SPLINEFLAG_WALKMODE;
-
-    ResetObtainedDamage();
 }
 
 Creature::~Creature()
@@ -1332,7 +1330,6 @@ void Creature::setDeathState(DeathState s)
     {
         SetHealth(GetMaxHealth());
         SetLootRecipient(NULL);
-        ResetObtainedDamage();
         CreatureInfo const *cinfo = GetCreatureInfo();
         SetUInt32Value(UNIT_DYNAMIC_FLAGS, 0);
         RemoveFlag (UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);

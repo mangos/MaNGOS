@@ -5125,6 +5125,17 @@ void Aura::HandlePeriodicDamage(bool apply, bool Real)
                 }
                 break;
             }
+            case SPELLFAMILY_DEATHKNIGHT:
+            {
+                // Frost Fever / Blood Plague
+                if(GetSpellProto()->SpellFamilyFlags2 & 0x2)
+                {
+                    // orginally 0.055 * 1.55
+                    m_modifier.m_amount = int32(caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.08525);
+                    return;
+                }
+                break;
+            }
             default:
                 break;
         }
@@ -7460,6 +7471,7 @@ void Aura::PeriodicTick()
             DETAIL_FILTER_LOG(LOG_FILTER_PERIODIC_AFFECTS, "PeriodicTick: %u (TypeId: %u) health leech of %u (TypeId: %u) for %u dmg inflicted by %u abs is %u",
                 GUID_LOPART(GetCasterGUID()), GuidHigh2TypeId(GUID_HIPART(GetCasterGUID())), m_target->GetGUIDLow(), m_target->GetTypeId(), pdamage, GetId(),absorb);
 
+            pCaster->DealDamageMods(m_target, pdamage, &absorb);
             pCaster->SendSpellNonMeleeDamageLog(m_target, GetId(), pdamage, GetSpellSchoolMask(GetSpellProto()), absorb, resist, false, 0, isCrit);
 
             float multiplier = GetSpellProto()->EffectMultipleValue[GetEffIndex()] > 0 ? GetSpellProto()->EffectMultipleValue[GetEffIndex()] : 1;

@@ -15663,9 +15663,6 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
 
 bool Player::isAllowedToLoot(Creature* creature)
 {
-    if(creature && creature->isDead() && !creature->AreLootAndRewardAllowed())
-        return false;
-
     if(Player* recipient = creature->GetLootRecipient())
     {
         if (recipient == this)

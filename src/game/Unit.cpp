@@ -495,7 +495,7 @@ void Unit::DealDamageMods(Unit *pVictim, uint32 &damage, uint32* absorb)
     if (!pVictim->isAlive() || pVictim->isInFlight() || pVictim->GetTypeId() == TYPEID_UNIT && ((Creature*)pVictim)->IsInEvadeMode())
     {
         if(absorb)
-            absorb += damage;
+            *absorb += damage;
         damage = 0;
         return;
     }
@@ -508,7 +508,7 @@ void Unit::DealDamageMods(Unit *pVictim, uint32 &damage, uint32* absorb)
         if(area && area->flags & AREA_FLAG_SANCTUARY)       //sanctuary
         {
             if(absorb)
-                absorb += damage;
+                *absorb += damage;
             damage = 0;
         }
     }
@@ -523,7 +523,7 @@ void Unit::DealDamageMods(Unit *pVictim, uint32 &damage, uint32* absorb)
         ((Creature *)pVictim)->AI()->DamageTaken(this, damage);
 
     if(absorb && originalDamage > damage)
-        absorb += (originalDamage - damage);
+        *absorb += (originalDamage - damage);
 }
 
 uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellEntry const *spellProto, bool durabilityLoss)
@@ -658,13 +658,8 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
     if (pVictim->GetTypeId() == TYPEID_PLAYER)
         ((Player*)pVictim)->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_HIT_RECEIVED, damage);
 
-    if (pVictim->GetTypeId() == TYPEID_UNIT && !((Creature*)pVictim)->isPet())
-    {
-        if(!((Creature*)pVictim)->HasLootRecipient())
-            ((Creature*)pVictim)->SetLootRecipient(this);
-
-        ((Creature*)pVictim)->IncrementReceivedDamage(this, health < damage ? health : damage);
-    }
+    if (pVictim->GetTypeId() == TYPEID_UNIT && !((Creature*)pVictim)->isPet() && !((Creature*)pVictim)->HasLootRecipient())
+        ((Creature*)pVictim)->SetLootRecipient(this);
 
     if (health <= damage)
     {
@@ -678,17 +673,8 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
         // find owner of pVictim, used for creature cases, AI calls
         Unit* pOwner = pVictim->GetCharmerOrOwner();
 
-        bool bRewardIsAllowed = true;
-
         // in creature kill case group/player tap stored for creature
         if (pVictim->GetTypeId() == TYPEID_UNIT)
-        {
-            bRewardIsAllowed = ((Creature*)pVictim)->AreLootAndRewardAllowed();
-            if(!bRewardIsAllowed)
-                ((Creature*)pVictim)->SetLootRecipient(NULL);
-        }
-
-        if (bRewardIsAllowed && pVictim->GetTypeId() == TYPEID_UNIT)
         {
             group_tap = ((Creature*)pVictim)->GetGroupLootRecipient();
 
@@ -710,7 +696,7 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
         }
 
         // call kill spell proc event (before real die and combat stop to triggering auras removed at death/combat stop)
-        if(player_tap && player_tap != pVictim && bRewardIsAllowed)
+        if(player_tap && player_tap != pVictim)
         {
             player_tap->ProcDamageAndSpell(pVictim, PROC_FLAG_KILL, PROC_FLAG_KILLED, PROC_EX_NONE, 0);
 
@@ -1712,6 +1698,23 @@ void Unit::DealMeleeDamage(CalcDamageInfo *damageInfo, bool durabilityLoss)
                 alreadyDone.insert(*i);
                 uint32 damage=(*i)->GetModifier()->m_amount;
                 SpellEntry const *i_spellProto = (*i)->GetSpellProto();
+
+                // Thorns
+                if (i_spellProto->SpellFamilyName == SPELLFAMILY_DRUID && i_spellProto->SpellFamilyFlags & UI64LIT(0x00000100))
+                {
+                    Unit::AuraList const& dummyList = pVictim->GetAurasByType(SPELL_AURA_DUMMY);
+                    for(Unit::AuraList::const_iterator iter = dummyList.begin(); iter != dummyList.end(); ++iter)
+                    {
+                        // Brambles
+                        if((*iter)->GetSpellProto()->SpellFamilyName == SPELLFAMILY_DRUID &&
+                            (*iter)->GetSpellProto()->SpellIconID == 53)
+                        {
+                            damage += uint32(damage * (*iter)->GetModifier()->m_amount / 100);
+                            break;
+                        }
+                    }
+                }
+
                 //Calculate absorb resist ??? no data in opcode for this possibly unable to absorb or resist?
                 //uint32 absorb;
                 //uint32 resist;
@@ -2472,8 +2475,8 @@ void Unit::AttackerStateUpdate (Unit *pVictim, WeaponAttackType attType, bool ex
     // Send log damage message to client
     DealDamageMods(pVictim,damageInfo.damage,&damageInfo.absorb);
     SendAttackStateUpdate(&damageInfo);
-    ProcDamageAndSpell(damageInfo.target, damageInfo.procAttacker, damageInfo.procVictim, damageInfo.procEx, damageInfo.damage, damageInfo.attackType);
     DealMeleeDamage(&damageInfo,true);
+    ProcDamageAndSpell(damageInfo.target, damageInfo.procAttacker, damageInfo.procVictim, damageInfo.procEx, damageInfo.damage, damageInfo.attackType);
 
     if (GetTypeId() == TYPEID_PLAYER)
         DEBUG_FILTER_LOG(LOG_FILTER_COMBAT,"AttackerStateUpdate: (Player) %u attacked %u (TypeId: %u) for %u dmg, absorbed %u, blocked %u, resisted %u.",
@@ -7175,11 +7178,20 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
             if (dummySpell->Id == 49028)
             {
                 // 1 dummy aura for dismiss rune blade
-                if (effIndex != EFFECT_INDEX_2)
+                if (effIndex != EFFECT_INDEX_1)
                     return false;
-                // TODO: wite script for this "fights on its own, doing the same attacks"
-                // NOTE: Trigger here on every attack and spell cast
-                return false;
+
+                Pet* runeBlade = FindGuardianWithEntry(27893);
+
+                if (runeBlade && pVictim && damage && procSpell)
+                {
+                    int32 procDmg = damage * 0.5;
+                    runeBlade->CastCustomSpell(pVictim, procSpell->Id, &procDmg, NULL, NULL, true, NULL, NULL, runeBlade->GetGUID());
+                    SendSpellNonMeleeDamageLog(pVictim, procSpell->Id, procDmg, SPELL_SCHOOL_MASK_NORMAL, 0, 0, false, 0, false);
+                    break;
+                }
+                else 
+                    return false;
             }
             // Mark of Blood
             if (dummySpell->Id == 49005)
@@ -9436,6 +9448,13 @@ uint32 Unit::SpellDamageBonusDone(Unit *pVictim, SpellEntry const *spellProto, u
                         break;
                     }
                 }
+            }
+            // Glyph of Unholy Blight
+            if (spellProto->Id == 50536)
+            {
+                if (Aura *glyphAura = GetDummyAura(63332))
+                    DoneTotalMod *= (glyphAura->GetModifier()->m_amount + 100.0f)/ 100.0f;
+                break;
             }
             break;
         }
