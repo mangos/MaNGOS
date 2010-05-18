@@ -14434,7 +14434,7 @@ void Player::KilledMonsterCredit( uint32 entry, ObjectGuid guid )
             continue;
         // just if !ingroup || !noraidgroup || raidgroup
         QuestStatusData& q_status = mQuestStatus[questid];
-        if( q_status.m_status == QUEST_STATUS_INCOMPLETE && (!GetGroup() || !GetGroup()->isRaidGroup() || qInfo->IsAllowedInRaid())
+        if( q_status.m_status == QUEST_STATUS_INCOMPLETE && (!GetGroup() || !GetGroup()->isRaidGroup() || qInfo->IsAllowedInRaid()))
         {
             if( qInfo->HasFlag( QUEST_MANGOS_FLAGS_KILL_OR_CAST) )
             {
