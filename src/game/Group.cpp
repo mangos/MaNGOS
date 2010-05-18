@@ -909,7 +909,7 @@ void Group::GetDataForXPAtKill(Unit const* victim, uint32& count,uint32& sum_lev
             continue;
 
         // will proccesed later
-        if (member = additional)
+        if (member == additional)
             continue;
 
         if (!member->IsAtGroupRewardDistance(victim))       // at req. distance
