@@ -550,9 +550,15 @@ ChatCommand * ChatHandler::getCommandTable()
         { NULL,             0,                  false, NULL,                                           "", NULL }
     };
 
+    static ChatCommand serverLogCommandTable[] =
+    {
+        { "filter",         SEC_CONSOLE,        true,  &ChatHandler::HandleServerLogFilterCommand,     "", NULL },
+        { "level",          SEC_CONSOLE,        true,  &ChatHandler::HandleServerLogLevelCommand,      "", NULL },
+        { NULL,             0,                  false, NULL,                                           "", NULL }
+    };
+
     static ChatCommand serverSetCommandTable[] =
     {
-        { "loglevel",       SEC_CONSOLE,        true,  &ChatHandler::HandleServerSetLogLevelCommand,   "", NULL },
         { "motd",           SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleServerSetMotdCommand,       "", NULL },
         { NULL,             0,                  false, NULL,                                           "", NULL }
     };
@@ -564,6 +570,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { "idlerestart",    SEC_ADMINISTRATOR,  true,  NULL,                                           "", serverIdleRestartCommandTable },
         { "idleshutdown",   SEC_ADMINISTRATOR,  true,  NULL,                                           "", serverShutdownCommandTable },
         { "info",           SEC_PLAYER,         true,  &ChatHandler::HandleServerInfoCommand,          "", NULL },
+        { "log",            SEC_CONSOLE,        true,  NULL,                                           "", serverLogCommandTable },
         { "motd",           SEC_PLAYER,         true,  &ChatHandler::HandleServerMotdCommand,          "", NULL },
         { "plimit",         SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleServerPLimitCommand,        "", NULL },
         { "restart",        SEC_ADMINISTRATOR,  true,  NULL,                                           "", serverRestartCommandTable },
@@ -612,29 +619,29 @@ ChatCommand * ChatHandler::getCommandTable()
     static ChatCommand commandTable[] =
     {
         { "account",        SEC_PLAYER,         true,  NULL,                                           "", accountCommandTable  },
-        { "gm",             SEC_MODERATOR,      true,  NULL,                                           "", gmCommandTable       },
-        { "npc",            SEC_MODERATOR,      false, NULL,                                           "", npcCommandTable      },
-        { "go",             SEC_MODERATOR,      false, NULL,                                           "", goCommandTable       },
-        { "learn",          SEC_MODERATOR,      false, NULL,                                           "", learnCommandTable    },
-        { "modify",         SEC_MODERATOR,      false, NULL,                                           "", modifyCommandTable   },
-        { "debug",          SEC_MODERATOR,      true,  NULL,                                           "", debugCommandTable    },
-        { "tele",           SEC_MODERATOR,      true,  NULL,                                           "", teleCommandTable     },
+        { "cast",           SEC_ADMINISTRATOR,  false, NULL,                                           "", castCommandTable     },
         { "character",      SEC_GAMEMASTER,     true,  NULL,                                           "", characterCommandTable},
+        { "debug",          SEC_MODERATOR,      true,  NULL,                                           "", debugCommandTable    },
         { "event",          SEC_GAMEMASTER,     false, NULL,                                           "", eventCommandTable    },
-        { "gobject",        SEC_GAMEMASTER,     false, NULL,                                           "", gobjectCommandTable  },
+        { "gm",             SEC_MODERATOR,      true,  NULL,                                           "", gmCommandTable       },
         { "honor",          SEC_GAMEMASTER,     false, NULL,                                           "", honorCommandTable    },
-        { "wp",             SEC_GAMEMASTER,     false, NULL,                                           "", wpCommandTable       },
-        { "titles",         SEC_GAMEMASTER,     false, NULL,                                           "", titlesCommandTable   },
-        { "quest",          SEC_ADMINISTRATOR,  false, NULL,                                           "", questCommandTable    },
-        { "reload",         SEC_ADMINISTRATOR,  true,  NULL,                                           "", reloadCommandTable   },
+        { "go",             SEC_MODERATOR,      false, NULL,                                           "", goCommandTable       },
+        { "gobject",        SEC_GAMEMASTER,     false, NULL,                                           "", gobjectCommandTable  },
+        { "guild",          SEC_ADMINISTRATOR,  true,  NULL,                                           "", guildCommandTable    },
+        { "instance",       SEC_ADMINISTRATOR,  true,  NULL,                                           "", instanceCommandTable },
+        { "learn",          SEC_MODERATOR,      false, NULL,                                           "", learnCommandTable    },
         { "list",           SEC_ADMINISTRATOR,  true,  NULL,                                           "", listCommandTable     },
         { "lookup",         SEC_ADMINISTRATOR,  true,  NULL,                                           "", lookupCommandTable   },
+        { "modify",         SEC_MODERATOR,      false, NULL,                                           "", modifyCommandTable   },
+        { "npc",            SEC_MODERATOR,      false, NULL,                                           "", npcCommandTable      },
         { "pdump",          SEC_ADMINISTRATOR,  true,  NULL,                                           "", pdumpCommandTable    },
-        { "guild",          SEC_ADMINISTRATOR,  true,  NULL,                                           "", guildCommandTable    },
-        { "cast",           SEC_ADMINISTRATOR,  false, NULL,                                           "", castCommandTable     },
+        { "quest",          SEC_ADMINISTRATOR,  false, NULL,                                           "", questCommandTable    },
+        { "reload",         SEC_ADMINISTRATOR,  true,  NULL,                                           "", reloadCommandTable   },
         { "reset",          SEC_ADMINISTRATOR,  true,  NULL,                                           "", resetCommandTable    },
-        { "instance",       SEC_ADMINISTRATOR,  true,  NULL,                                           "", instanceCommandTable },
         { "server",         SEC_ADMINISTRATOR,  true,  NULL,                                           "", serverCommandTable   },
+        { "tele",           SEC_MODERATOR,      true,  NULL,                                           "", teleCommandTable     },
+        { "titles",         SEC_GAMEMASTER,     false, NULL,                                           "", titlesCommandTable   },
+        { "wp",             SEC_GAMEMASTER,     false, NULL,                                           "", wpCommandTable       },
 
         { "aura",           SEC_ADMINISTRATOR,  false, &ChatHandler::HandleAuraCommand,                "", NULL },
         { "unaura",         SEC_ADMINISTRATOR,  false, &ChatHandler::HandleUnAuraCommand,              "", NULL },

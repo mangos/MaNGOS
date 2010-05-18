@@ -535,7 +535,7 @@ void WorldSession::HandleTotemDestroyed( WorldPacket& recvPacket)
 
 void WorldSession::HandleSelfResOpcode( WorldPacket & /*recv_data*/ )
 {
-    DEBUG_LOG("WORLD: CMSG_SELF_RES");                  // empty opcode
+    DEBUG_FILTER_LOG(LOG_FILTER_SPELL_CAST, "WORLD: CMSG_SELF_RES");                  // empty opcode
 
     if(_player->GetUInt32Value(PLAYER_SELF_RES_SPELL))
     {

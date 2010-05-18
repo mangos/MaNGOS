@@ -255,6 +255,9 @@ CleanCharacterDB = 1
 #    LogFilter_SQLText
 #    LogFilter_AIAndMovegens
 #    LogFilter_PlayerStats
+#    LogFilter_Damage
+#    LogFilter_Combat
+#    LogFilter_SpellCast
 #        Log filters (disabled by default, mostly debug only output affected cases)
 #        Default: 0 - include in log if log level permit
 #                 1 - not include with any log level
