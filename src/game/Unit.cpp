@@ -1698,6 +1698,23 @@ void Unit::DealMeleeDamage(CalcDamageInfo *damageInfo, bool durabilityLoss)
                 alreadyDone.insert(*i);
                 uint32 damage=(*i)->GetModifier()->m_amount;
                 SpellEntry const *i_spellProto = (*i)->GetSpellProto();
+
+                // Thorns
+                if (i_spellProto->SpellFamilyName == SPELLFAMILY_DRUID && i_spellProto->SpellFamilyFlags & UI64LIT(0x00000100))
+                {
+                    Unit::AuraList const& dummyList = pVictim->GetAurasByType(SPELL_AURA_DUMMY);
+                    for(Unit::AuraList::const_iterator iter = dummyList.begin(); iter != dummyList.end(); ++iter)
+                    {
+                        // Brambles
+                        if((*iter)->GetSpellProto()->SpellFamilyName == SPELLFAMILY_DRUID &&
+                            (*iter)->GetSpellProto()->SpellIconID == 53)
+                        {
+                            damage += uint32(damage * (*iter)->GetModifier()->m_amount / 100);
+                            break;
+                        }
+                    }
+                }
+
                 //Calculate absorb resist ??? no data in opcode for this possibly unable to absorb or resist?
                 //uint32 absorb;
                 //uint32 resist;
