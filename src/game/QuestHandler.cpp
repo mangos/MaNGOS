@@ -408,7 +408,7 @@ void WorldSession::HandleQuestConfirmAccept(WorldPacket& recv_data)
         if (!pOriginalPlayer)
             return;
 
-        if (pQuest->GetType() == QUEST_TYPE_RAID)
+        if (pQuest->IsAllowedInRaid())
         {
             if (!_player->IsInSameRaidWith(pOriginalPlayer))
                 return;
