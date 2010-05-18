@@ -9404,6 +9404,13 @@ uint32 Unit::SpellDamageBonusDone(Unit *pVictim, SpellEntry const *spellProto, u
                     }
                 }
             }
+            // Glyph of Unholy Blight
+            if (spellProto->Id == 50536)
+            {
+                if (Aura *glyphAura = GetDummyAura(63332))
+                    DoneTotalMod *= (glyphAura->GetModifier()->m_amount + 100.0f)/ 100.0f;
+                break;
+            }
             break;
         }
         default:
