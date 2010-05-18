@@ -2713,7 +2713,7 @@ void Spell::EffectTriggerMissileSpell(SpellEffectIndex effect_idx)
     }
 
     if (m_CastItem)
-        DEBUG_LOG("WORLD: cast Item spellId - %i", spellInfo->Id);
+        DEBUG_FILTER_LOG(LOG_FILTER_SPELL_CAST, "WORLD: cast Item spellId - %i", spellInfo->Id);
 
     m_caster->CastSpell(m_targets.m_destX, m_targets.m_destY, m_targets.m_destZ, spellInfo, true, m_CastItem, 0, m_originalCasterGUID);
 }
@@ -2957,7 +2957,7 @@ void Spell::EffectApplyAura(SpellEffectIndex eff_idx)
             return;
     }
 
-    DEBUG_LOG("Spell: Aura is: %u", m_spellInfo->EffectApplyAuraName[eff_idx]);
+    DEBUG_FILTER_LOG(LOG_FILTER_SPELL_CAST, "Spell: Aura is: %u", m_spellInfo->EffectApplyAuraName[eff_idx]);
 
     Aura* Aur = CreateAura(m_spellInfo, eff_idx, &m_currentBasePoints[eff_idx], unitTarget, caster, m_CastItem);
 
@@ -3052,7 +3052,7 @@ void Spell::EffectSendEvent(SpellEffectIndex effectIndex)
     /*
     we do not handle a flag dropping or clicking on flag in battleground by sendevent system
     */
-    DEBUG_LOG("Spell ScriptStart %u for spellid %u in EffectSendEvent ", m_spellInfo->EffectMiscValue[effectIndex], m_spellInfo->Id);
+    DEBUG_FILTER_LOG(LOG_FILTER_SPELL_CAST, "Spell ScriptStart %u for spellid %u in EffectSendEvent ", m_spellInfo->EffectMiscValue[effectIndex], m_spellInfo->Id);
     m_caster->GetMap()->ScriptsStart(sEventScripts, m_spellInfo->EffectMiscValue[effectIndex], m_caster, focusObject);
 }
 
@@ -3245,7 +3245,7 @@ void Spell::EffectHealthLeech(SpellEffectIndex eff_idx)
     if (damage < 0)
         return;
 
-    DEBUG_LOG("HealthLeech :%i", damage);
+    DEBUG_FILTER_LOG(LOG_FILTER_SPELL_CAST, "HealthLeech :%i", damage);
 
     uint32 curHealth = unitTarget->GetHealth();
     damage = m_caster->SpellNonMeleeDamageLog(unitTarget, m_spellInfo->Id, damage );
@@ -4447,7 +4447,7 @@ void Spell::EffectAddHonor(SpellEffectIndex /*eff_idx*/)
     if (m_CastItem)
     {
         ((Player*)unitTarget)->RewardHonor(NULL, 1, float(damage / 10));
-        DEBUG_LOG("SpellEffect::AddHonor (spell_id %u) rewards %d honor points (item %u) for player: %u", m_spellInfo->Id, damage/10, m_CastItem->GetEntry(),((Player*)unitTarget)->GetGUIDLow());
+        DEBUG_FILTER_LOG(LOG_FILTER_SPELL_CAST, "SpellEffect::AddHonor (spell_id %u) rewards %d honor points (item %u) for player: %u", m_spellInfo->Id, damage/10, m_CastItem->GetEntry(),((Player*)unitTarget)->GetGUIDLow());
         return;
     }
 
@@ -4456,7 +4456,7 @@ void Spell::EffectAddHonor(SpellEffectIndex /*eff_idx*/)
     {
         float honor_reward = MaNGOS::Honor::hk_honor_at_level(unitTarget->getLevel(), damage);
         ((Player*)unitTarget)->RewardHonor(NULL, 1, honor_reward);
-        DEBUG_LOG("SpellEffect::AddHonor (spell_id %u) rewards %f honor points (scale) to player: %u", m_spellInfo->Id, honor_reward, ((Player*)unitTarget)->GetGUIDLow());
+        DEBUG_FILTER_LOG(LOG_FILTER_SPELL_CAST, "SpellEffect::AddHonor (spell_id %u) rewards %f honor points (scale) to player: %u", m_spellInfo->Id, honor_reward, ((Player*)unitTarget)->GetGUIDLow());
     }
     else
     {
@@ -6346,7 +6346,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
     if (!unitTarget)
         return;
 
-    DEBUG_LOG("Spell ScriptStart spellid %u in EffectScriptEffect ", m_spellInfo->Id);
+    DEBUG_FILTER_LOG(LOG_FILTER_SPELL_CAST, "Spell ScriptStart spellid %u in EffectScriptEffect ", m_spellInfo->Id);
     m_caster->GetMap()->ScriptsStart(sSpellScripts, m_spellInfo->Id, m_caster, unitTarget);
 }
 

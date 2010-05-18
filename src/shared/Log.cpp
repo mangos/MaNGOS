@@ -44,6 +44,9 @@ LogFilterData logFilterData[LOG_FILTER_COUNT] =
     { "player_moves",        "LogFilter_PlayerMoves",        false },
     { "periodic_effects",    "LogFilter_PeriodicAffects",    false },
     { "ai_and_movegens",     "LogFilter_AIAndMovegens",      false },
+    { "damage",              "LogFilter_Damage",             false },
+    { "combat",              "LogFilter_Combat",             false },
+    { "spell_cast",          "LogFilter_SpellCast",          false },
 };
 
 enum LogType
