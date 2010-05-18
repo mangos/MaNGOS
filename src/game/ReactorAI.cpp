@@ -121,7 +121,6 @@ ReactorAI::EnterEvadeMode()
     i_victimGuid = 0;
     m_creature->CombatStop(true);
     m_creature->SetLootRecipient(NULL);
-    m_creature->ResetObtainedDamage();
 
     // Remove ChaseMovementGenerator from MotionMaster stack list, and add HomeMovementGenerator instead
     if (m_creature->GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE)
