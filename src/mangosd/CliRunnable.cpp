@@ -531,17 +531,69 @@ bool ChatHandler::HandleAccountCreateCommand(const char* args)
     return true;
 }
 
-/// Set the level of logging
-bool ChatHandler::HandleServerSetLogLevelCommand(const char *args)
+/// Set the filters of logging
+bool ChatHandler::HandleServerLogFilterCommand(const char* args)
 {
     if(!*args)
+    {
+        uint32 logfiler = sLog.getLogFilter();
+
+        SendSysMessage(LANG_LOG_FILTERS_STATE_HEADER);
+        for(int i = 0; i < LOG_FILTER_COUNT; ++i)
+            PSendSysMessage("  %-20s = %s",logFilterData[i].name,(logfiler & (1 << i)) !=0 ? GetMangosString(LANG_ON) : GetMangosString(LANG_OFF));
+        return true;
+    }
+
+    char *filtername = strtok((char*)args, " ");
+    if (!filtername)
         return false;
 
-    char *NewLevel = strtok((char*)args, " ");
-    if (!NewLevel)
+    char *value_str = strtok(NULL, " ");
+    if (!value_str)
         return false;
 
-    sLog.SetLogLevel(NewLevel);
+    bool value;
+    if (strncmp(value_str, "on", 3) == 0)
+        value = true;
+    else if (strncmp(value_str, "off", 4) == 0)
+        value = false;
+    else
+    {
+        SendSysMessage(LANG_USE_BOL);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    if (strncmp(filtername, "all", 4) == 0)
+    {
+        sLog.SetLogFilter(LogFilters(0xFFFFFFFF),value);
+        PSendSysMessage(LANG_ALL_LOG_FILTERS_SET_TO_S, value ? GetMangosString(LANG_ON) : GetMangosString(LANG_OFF));
+        return true;
+    }
+
+    for(int i = 0; i < LOG_FILTER_COUNT; ++i)
+    {
+        if (!strncmp(filtername,logFilterData[i].name,strlen(filtername)))
+        {
+            sLog.SetLogFilter(LogFilters(1 << i),value);
+            PSendSysMessage("  %-20s = %s",logFilterData[i].name,value ? GetMangosString(LANG_ON) : GetMangosString(LANG_OFF));
+            return true;
+        }
+    }
+
+    return false;
+}
+
+/// Set the level of logging
+bool ChatHandler::HandleServerLogLevelCommand(const char *args)
+{
+    if(!*args)
+    {
+        PSendSysMessage("Log level: %u");
+        return true;
+    }
+
+    sLog.SetLogLevel((char*)args);
     return true;
 }
 

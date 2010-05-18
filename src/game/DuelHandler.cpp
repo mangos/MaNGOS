@@ -41,9 +41,9 @@ void WorldSession::HandleDuelAcceptedOpcode(WorldPacket& recvPacket)
     if(pl == pl->duel->initiator || !plTarget || pl == plTarget || pl->duel->startTime != 0 || plTarget->duel->startTime != 0)
         return;
 
-    //DEBUG_LOG( "WORLD: received CMSG_DUEL_ACCEPTED" );
-    DEBUG_LOG("Player 1 is: %u (%s)", pl->GetGUIDLow(), pl->GetName());
-    DEBUG_LOG("Player 2 is: %u (%s)", plTarget->GetGUIDLow(), plTarget->GetName());
+    DEBUG_FILTER_LOG(LOG_FILTER_COMBAT, "WORLD: received CMSG_DUEL_ACCEPTED" );
+    DEBUG_FILTER_LOG(LOG_FILTER_COMBAT, "Player 1 is: %u (%s)", pl->GetGUIDLow(), pl->GetName());
+    DEBUG_FILTER_LOG(LOG_FILTER_COMBAT, "Player 2 is: %u (%s)", plTarget->GetGUIDLow(), plTarget->GetName());
 
     time_t now = time(NULL);
     pl->duel->startTimer = now;
