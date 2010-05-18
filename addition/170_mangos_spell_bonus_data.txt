@@ -1,1 +1,1 @@
-DELETE FROM `spell_proc_event` WHERE `entry` IN (55078,55095);
+DELETE FROM `spell_bonus_data` WHERE `entry` IN (55078,55095);
