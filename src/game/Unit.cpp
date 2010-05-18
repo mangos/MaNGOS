@@ -714,7 +714,7 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
         if (player_tap != pVictim)
         {
             if (group_tap)
-                group_tap->RewardGroupAtKill(pVictim);
+                group_tap->RewardGroupAtKill(pVictim, player_tap);
             else if (player_tap)
                 player_tap->RewardSinglePlayerAtKill(pVictim);
         }
