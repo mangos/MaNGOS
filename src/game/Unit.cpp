@@ -673,12 +673,19 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
         // find owner of pVictim, used for creature cases, AI calls
         Unit* pOwner = pVictim->GetCharmerOrOwner();
 
+        // in creature kill case group/player tap stored for creature
         if (pVictim->GetTypeId() == TYPEID_UNIT)
         {
             group_tap = ((Creature*)pVictim)->GetGroupLootRecipient();
 
             if (Player* recipient = ((Creature*)pVictim)->GetOriginalLootRecipient())
                 player_tap = recipient;
+        }
+        // in player kill case group tap selected by player_tap (killer-player itself, or charmer, or owner, etc)
+        else
+        {
+            if (player_tap)
+                group_tap = player_tap->GetGroup();
         }
 
         if (pVictim->GetTypeId() == TYPEID_PLAYER)
