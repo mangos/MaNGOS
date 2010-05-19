@@ -8665,6 +8665,16 @@ void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
                 FillInitialWorldState(data,count,0xe1a,0x0);// 9 show
             }
             break;
+        case 4406:                                          // Ring of Valor
+            if (bg && bg->GetTypeID(true) == BATTLEGROUND_RV)
+                bg->FillInitialWorldStates(data, count);
+            else
+            {
+                FillInitialWorldState(data,count,0xe11,0x0);// 7 gold
+                FillInitialWorldState(data,count,0xe10,0x0);// 8 green
+                FillInitialWorldState(data,count,0xe1a,0x0);// 9 show
+            }
+            break;
         case 3703:                                          // Shattrath City
             break;
         default:
