@@ -14325,38 +14325,40 @@ void Player::KilledMonsterCredit( uint32 entry, ObjectGuid guid )
             continue;
 
         Quest const* qInfo = sObjectMgr.GetQuestTemplate(questid);
-        if( !qInfo )
+        if (!qInfo)
             continue;
         // just if !ingroup || !noraidgroup || raidgroup
         QuestStatusData& q_status = mQuestStatus[questid];
-        if( q_status.m_status == QUEST_STATUS_INCOMPLETE && (!GetGroup() || !GetGroup()->isRaidGroup() || qInfo->GetType() == QUEST_TYPE_RAID))
+        if (q_status.m_status == QUEST_STATUS_INCOMPLETE && (!GetGroup() || !GetGroup()->isRaidGroup() || qInfo->IsAllowedInRaid()))
         {
-            if( qInfo->HasFlag( QUEST_MANGOS_FLAGS_KILL_OR_CAST) )
+            if (qInfo->HasFlag( QUEST_MANGOS_FLAGS_KILL_OR_CAST))
             {
                 for (int j = 0; j < QUEST_OBJECTIVES_COUNT; ++j)
                 {
                     // skip GO activate objective or none
-                    if(qInfo->ReqCreatureOrGOId[j] <=0)
+                    if (qInfo->ReqCreatureOrGOId[j] <=0)
                         continue;
 
                     // skip Cast at creature objective
-                    if(qInfo->ReqSpell[j] !=0 )
+                    if (qInfo->ReqSpell[j] !=0 )
                         continue;
 
                     uint32 reqkill = qInfo->ReqCreatureOrGOId[j];
 
-                    if ( reqkill == entry )
+                    if (reqkill == entry)
                     {
                         uint32 reqkillcount = qInfo->ReqCreatureOrGOCount[j];
                         uint32 curkillcount = q_status.m_creatureOrGOcount[j];
-                        if ( curkillcount < reqkillcount )
+                        if (curkillcount < reqkillcount)
                         {
                             q_status.m_creatureOrGOcount[j] = curkillcount + addkillcount;
-                            if (q_status.uState != QUEST_NEW) q_status.uState = QUEST_CHANGED;
+                            if (q_status.uState != QUEST_NEW)
+                                q_status.uState = QUEST_CHANGED;
 
                             SendQuestUpdateAddCreatureOrGo( qInfo, guid, j, curkillcount, addkillcount);
                         }
-                        if ( CanCompleteQuest( questid ) )
+
+                        if (CanCompleteQuest( questid ))
                             CompleteQuest( questid );
 
                         // same objective target can be in many active quests, but not in 2 objectives for single quest (code optimization).
@@ -14572,8 +14574,7 @@ bool Player::HasQuestForItem( uint32 itemid ) const
                 continue;
 
             // hide quest if player is in raid-group and quest is no raid quest
-            if (GetGroup() && GetGroup()->isRaidGroup() && qinfo->GetType() != QUEST_TYPE_RAID
-                && !InBattleGround())
+            if (GetGroup() && GetGroup()->isRaidGroup() && qinfo->IsAllowedInRaid() && !InBattleGround())
                 continue;
 
             // There should be no mixed ReqItem/ReqSource drop
@@ -19883,7 +19884,7 @@ bool Player::HasQuestForGO(int32 GOId) const
             if(!qinfo)
                 continue;
 
-            if(GetGroup() && GetGroup()->isRaidGroup() && qinfo->GetType() != QUEST_TYPE_RAID)
+            if(GetGroup() && GetGroup()->isRaidGroup() && qinfo->IsAllowedInRaid())
                 continue;
 
             for (int j = 0; j < QUEST_OBJECTIVES_COUNT; ++j)

@@ -1,7 +1,7 @@
 #####################################
 # MaNGOS Configuration file         #
 #####################################
-ConfVersion=2010040601
+ConfVersion=2010051901
 
 ###################################################################################################################
 # CONNECTIONS AND DIRECTORIES
@@ -822,8 +822,8 @@ Motd = "Welcome to the Massive Network Game Object Server."
 #
 #    AllowTwoSide.Accounts
 #        Allow or not accounts to create characters in the 2 teams in any game type.
-#        Default: 0 (Not allowed)
-#                 1 (Allowed)
+#                 0 (Not allowed)
+#        Default: 1 (Allowed)
 #
 #    AllowTwoSide.Interaction.Chat
 #    AllowTwoSide.Interaction.Channel
@@ -854,7 +854,7 @@ Motd = "Welcome to the Massive Network Game Object Server."
 #
 ###################################################################################################################
 
-AllowTwoSide.Accounts = 0
+AllowTwoSide.Accounts = 1
 AllowTwoSide.Interaction.Chat = 0
 AllowTwoSide.Interaction.Channel = 0
 AllowTwoSide.Interaction.Group = 0
