@@ -370,6 +370,7 @@ void Creature::Update(uint32 diff)
                 m_respawnTime = 0;
                 lootForPickPocketed = false;
                 lootForBody         = false;
+                lootForSkin         = false;
 
                 if(m_originalEntry != GetEntry())
                     UpdateEntry(m_originalEntry);
@@ -809,6 +810,38 @@ void Creature::AI_SendMoveToPacket(float x, float y, float z, uint32 time, Splin
         m_moveTime = time;*/
     SendMonsterMove(x, y, z, type, flags, time);
 }
+
+void Creature::PrepareBodyLootState()
+{
+    loot.clear();
+
+    // if have normal loot then prepare it access
+    if (!isAlive() && GetCreatureInfo()->lootid && !lootForBody)
+    {
+        SetUInt32Value(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
+        return;
+    }
+
+    // if not have normal loot allow skinning if need
+    if (!isAlive() && !lootForSkin)
+    {
+        lootForBody = true;                                 // pass this loot mode
+
+        if (GetCreatureInfo()->SkinLootId)
+        {
+            if (LootTemplates_Skinning.HaveLootFor(GetCreatureInfo()->SkinLootId))
+            {
+                RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
+                SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
+                return;
+            }
+        }
+    }
+
+    RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
+    RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
+}
+
 
 /**
  * Return original player who tap creature, it can be different from player/group allowed to loot so not use it for loot code
@@ -1329,10 +1362,6 @@ void Creature::setDeathState(DeathState s)
     {
         SetTargetGUID(0);                                   // remove target selection in any cases (can be set at aura remove in Unit::setDeathState)
         SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
-
-        if (!isPet() && GetCreatureInfo()->SkinLootId)
-            if (LootTemplates_Skinning.HaveLootFor(GetCreatureInfo()->SkinLootId))
-                SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
 
         if (canFly() && FallGround())
             return;

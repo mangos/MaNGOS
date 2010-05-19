@@ -7886,8 +7886,16 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
                 // possible only if creature->lootForBody && loot->empty() at spell cast check
                 if (loot_type == LOOT_SKINNING)
                 {
-                    loot->clear();
-                    loot->FillLoot(creature->GetCreatureInfo()->SkinLootId, LootTemplates_Skinning, this, false);
+                    if (!creature->lootForSkin)
+                    {
+                        creature->lootForSkin = true;
+                        loot->clear();
+                        loot->FillLoot(creature->GetCreatureInfo()->SkinLootId, LootTemplates_Skinning, this, false);
+
+                        // let reopen skinning loot if will closed.
+                        if (!loot->empty())
+                            creature->SetUInt32Value(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
+                    }
                 }
                 // set group rights only for loot_type != LOOT_SKINNING
                 else

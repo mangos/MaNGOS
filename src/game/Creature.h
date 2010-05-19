@@ -531,7 +531,9 @@ class MANGOS_DLL_SPEC Creature : public Unit
         Loot loot;
         bool lootForPickPocketed;
         bool lootForBody;
+        bool lootForSkin;
 
+        void PrepareBodyLootState();
         ObjectGuid GetLootRecipientGuid() const { return m_lootRecipientGuid; }
         uint32 GetLootGroupRecipientId() const { return m_lootGroupRecipientId; }
         Player* GetLootRecipient() const;                   // use group cases as prefered
