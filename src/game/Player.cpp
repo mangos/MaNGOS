@@ -12786,7 +12786,7 @@ void Player::PrepareGossipMenu(WorldObject *pSource, uint32 menuId)
                     break;
                 case GOSSIP_OPTION_LEARNDUALSPEC:
                     if(!(GetSpecsCount() == 1 && pCreature->isCanTrainingAndResetTalentsOf(this) && !(getLevel() < sWorld.getConfig(CONFIG_UINT32_MIN_DUALSPEC_LEVEL))))
-                        bCanTalk=false;
+                        hasMenuItem = false;
                     break;
                 case GOSSIP_OPTION_UNLEARNTALENTS:
                     if (!pCreature->isCanTrainingAndResetTalentsOf(this))
