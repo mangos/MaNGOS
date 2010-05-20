@@ -278,7 +278,6 @@ void WorldSession::HandleGossipHelloOpcode(WorldPacket & recv_data)
 
     if (!Script->GossipHello(_player, pCreature))
     {
-        _player->TalkedToCreature(pCreature->GetEntry(), pCreature->GetGUID());
         _player->PrepareGossipMenu(pCreature, pCreature->GetCreatureInfo()->GossipMenuId);
         _player->SendPreparedGossip(pCreature);
     }

@@ -442,12 +442,11 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
 
             if (loot->isLooted())
             {
-                // skip pickpocketing loot for speed, skinning timer redunction is no-op in fact
+                // for example skinning after normal loot
+                pCreature->PrepareBodyLootState();
+
                 if(!pCreature->isAlive())
                     pCreature->AllLootRemovedFromCorpse();
-
-                pCreature->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
-                loot->clear();
             }
             break;
         }
