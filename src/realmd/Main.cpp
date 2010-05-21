@@ -177,6 +177,8 @@ extern int main(int argc, char **argv)
         DETAIL_LOG("WARNING: Minimal required version [OpenSSL 0.9.8k]");
     }
 
+    DETAIL_LOG("Using ACE: %s", ACE_VERSION);
+
 #if defined (ACE_HAS_EVENT_POLL) || defined (ACE_HAS_DEV_POLL)
     ACE_Reactor::instance(new ACE_Reactor(new ACE_Dev_Poll_Reactor(ACE::max_handles(), 1), 1), true);
 #endif

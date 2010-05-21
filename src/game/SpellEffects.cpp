@@ -1523,7 +1523,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                         }
                     }
 
-                    ((Creature*)unitTarget)->ForcedDespawn();
+                    ((Creature*)unitTarget)->ForcedDespawn(5000);
                     return;
                 }
                 case 51866:                                 // Kick Nass
@@ -1661,29 +1661,26 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                 }
                 case 53808:                                 // Pygmy Oil
                 {
-                    const SpellEntry *pSpellShrink = sSpellStore.LookupEntry(53805);
-                    const SpellEntry *pSpellTransf = sSpellStore.LookupEntry(53806);
+                    const uint32 spellShrink = 53805;
+                    const uint32 spellTransf = 53806;
 
-                    if (!pSpellTransf || !pSpellShrink)
-                        return;
-
-                    if (Aura* pAura = m_caster->GetAura(pSpellShrink->Id, EFFECT_INDEX_0))
+                    if (Aura* pAura = m_caster->GetAura(spellShrink, EFFECT_INDEX_0))
                     {
                         uint8 stackNum = pAura->GetStackAmount();
 
                         // chance to become pygmified (5, 10, 15 etc)
                         if (roll_chance_i(stackNum*5))
                         {
-                            m_caster->RemoveAurasDueToSpell(pSpellShrink->Id);
-                            m_caster->CastSpell(m_caster, pSpellTransf, true);
+                            m_caster->RemoveAurasDueToSpell(spellShrink);
+                            m_caster->CastSpell(m_caster, spellTransf, true);
                             return;
                         }
                     }
 
-                    if (m_caster->HasAura(pSpellTransf->Id, EFFECT_INDEX_0))
+                    if (m_caster->HasAura(spellTransf, EFFECT_INDEX_0))
                         return;
 
-                    m_caster->CastSpell(m_caster, pSpellShrink, true);
+                    m_caster->CastSpell(m_caster, spellShrink, true);
                     return;
                 }
                 case 55004:                                 // Nitro Boosts
@@ -2692,11 +2689,11 @@ void Spell::EffectTriggerSpell(SpellEffectIndex effIndex)
             Unit::AuraMap& Auras = unitTarget->GetAuras();
             for(Unit::AuraMap::iterator iter = Auras.begin(); iter != Auras.end(); ++iter)
             {
-                // remove all harmful spells on you...
-                if( // ignore positive and passive auras
-                    !iter->second->IsPositive() && !iter->second->IsPassive() &&
-                    // ignore physical auras
-                    (GetSpellSchoolMask(iter->second->GetSpellProto()) & SPELL_SCHOOL_MASK_NORMAL)==0 )
+                // Remove all harmful spells on you except positive/passive/physical auras
+                if (!iter->second->IsPositive() &&
+                    !iter->second->IsPassive() &&
+                    !iter->second->IsDeathPersistent() &&
+                    (GetSpellSchoolMask(iter->second->GetSpellProto()) & SPELL_SCHOOL_MASK_NORMAL) == 0)
                 {
                     m_caster->RemoveAurasDueToSpell(iter->second->GetSpellProto()->Id);
                     iter = Auras.begin();
@@ -5873,9 +5870,8 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     if (!unitTarget)
                         return;
 
-                    if (unitTarget->HasAura(47391, EFFECT_INDEX_0))
-                        unitTarget->RemoveAurasDueToSpell(47391);
-
+                    // Ley Line Information
+                    unitTarget->RemoveAurasDueToSpell(47391);
                     return;
                 }
                 case 47615:                                 // Atop the Woodlands: Quest Completion Script
@@ -5883,9 +5879,8 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     if (!unitTarget)
                         return;
 
-                    if (unitTarget->HasAura(47473, EFFECT_INDEX_0))
-                        unitTarget->RemoveAurasDueToSpell(47473);
-
+                    // Ley Line Information
+                    unitTarget->RemoveAurasDueToSpell(47473);
                     return;
                 }
                 case 47638:                                 // The End of the Line: Quest Completion Script
@@ -5893,9 +5888,8 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     if (!unitTarget)
                         return;
 
-                    if (unitTarget->HasAura(47636, EFFECT_INDEX_0))
-                        unitTarget->RemoveAurasDueToSpell(47636);
-
+                    // Ley Line Information
+                    unitTarget->RemoveAurasDueToSpell(47636);
                     return;
                 }
                 case 48603:                                 // High Executor's Branding Iron
@@ -5983,10 +5977,8 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     if (!unitTarget)
                         return;
 
-                    // Remove aura given at quest accept / gossip
-                    if (unitTarget->HasAura(51967))
-                        unitTarget->RemoveAurasDueToSpell(51967);
-
+                    // Remove aura (Mojo of Rhunok) given at quest accept / gossip
+                    unitTarget->RemoveAurasDueToSpell(51967);
                     return;
                 }
                 case 54729:                                 // Winged Steed of the Ebon Blade
