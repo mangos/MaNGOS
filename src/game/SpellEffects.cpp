@@ -1504,7 +1504,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                         }
                     }
 
-                    ((Creature*)unitTarget)->ForcedDespawn(5000);
+                    ((Creature*)unitTarget)->ForcedDespawn();
                     return;
                 }
                 case 51866:                                 // Kick Nass
@@ -1642,29 +1642,26 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                 }
                 case 53808:                                 // Pygmy Oil
                 {
-                    const SpellEntry *pSpellShrink = sSpellStore.LookupEntry(53805);
-                    const SpellEntry *pSpellTransf = sSpellStore.LookupEntry(53806);
+                    const uint32 spellShrink = 53805;
+                    const uint32 spellTransf = 53806;
 
-                    if (!pSpellTransf || !pSpellShrink)
-                        return;
-
-                    if (Aura* pAura = m_caster->GetAura(pSpellShrink->Id, EFFECT_INDEX_0))
+                    if (Aura* pAura = m_caster->GetAura(spellShrink, EFFECT_INDEX_0))
                     {
                         uint8 stackNum = pAura->GetStackAmount();
 
                         // chance to become pygmified (5, 10, 15 etc)
                         if (roll_chance_i(stackNum*5))
                         {
-                            m_caster->RemoveAurasDueToSpell(pSpellShrink->Id);
-                            m_caster->CastSpell(m_caster, pSpellTransf, true);
+                            m_caster->RemoveAurasDueToSpell(spellShrink);
+                            m_caster->CastSpell(m_caster, spellTransf, true);
                             return;
                         }
                     }
 
-                    if (m_caster->HasAura(pSpellTransf->Id, EFFECT_INDEX_0))
+                    if (m_caster->HasAura(spellTransf, EFFECT_INDEX_0))
                         return;
 
-                    m_caster->CastSpell(m_caster, pSpellShrink, true);
+                    m_caster->CastSpell(m_caster, spellShrink, true);
                     return;
                 }
                 case 55004:                                 // Nitro Boosts
@@ -5728,6 +5725,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     if (!unitTarget)
                         return;
 
+                    // Ley Line Information
                     if (unitTarget->HasAura(47391, EFFECT_INDEX_0))
                         unitTarget->RemoveAurasDueToSpell(47391);
 
@@ -5738,6 +5736,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     if (!unitTarget)
                         return;
 
+                    // Ley Line Information
                     if (unitTarget->HasAura(47473, EFFECT_INDEX_0))
                         unitTarget->RemoveAurasDueToSpell(47473);
 
@@ -5748,6 +5747,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     if (!unitTarget)
                         return;
 
+                    // Ley Line Information
                     if (unitTarget->HasAura(47636, EFFECT_INDEX_0))
                         unitTarget->RemoveAurasDueToSpell(47636);
 
@@ -5839,7 +5839,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                         return;
 
                     // Remove aura given at quest accept / gossip
-                    if (unitTarget->HasAura(51967))
+                    if (unitTarget->HasAura(51967))         // Mojo of Rhunok
                         unitTarget->RemoveAurasDueToSpell(51967);
 
                     return;
