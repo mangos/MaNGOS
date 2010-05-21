@@ -1504,7 +1504,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                         }
                     }
 
-                    ((Creature*)unitTarget)->ForcedDespawn();
+                    ((Creature*)unitTarget)->ForcedDespawn(5000);
                     return;
                 }
                 case 51866:                                 // Kick Nass
@@ -5726,9 +5726,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                         return;
 
                     // Ley Line Information
-                    if (unitTarget->HasAura(47391, EFFECT_INDEX_0))
-                        unitTarget->RemoveAurasDueToSpell(47391);
-
+                    unitTarget->RemoveAurasDueToSpell(47391);
                     return;
                 }
                 case 47615:                                 // Atop the Woodlands: Quest Completion Script
@@ -5737,9 +5735,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                         return;
 
                     // Ley Line Information
-                    if (unitTarget->HasAura(47473, EFFECT_INDEX_0))
-                        unitTarget->RemoveAurasDueToSpell(47473);
-
+                    unitTarget->RemoveAurasDueToSpell(47473);
                     return;
                 }
                 case 47638:                                 // The End of the Line: Quest Completion Script
@@ -5748,9 +5744,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                         return;
 
                     // Ley Line Information
-                    if (unitTarget->HasAura(47636, EFFECT_INDEX_0))
-                        unitTarget->RemoveAurasDueToSpell(47636);
-
+                    unitTarget->RemoveAurasDueToSpell(47636);
                     return;
                 }
                 case 48603:                                 // High Executor's Branding Iron
@@ -5838,10 +5832,8 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     if (!unitTarget)
                         return;
 
-                    // Remove aura given at quest accept / gossip
-                    if (unitTarget->HasAura(51967))         // Mojo of Rhunok
-                        unitTarget->RemoveAurasDueToSpell(51967);
-
+                    // Remove aura (Mojo of Rhunok) given at quest accept / gossip
+                    unitTarget->RemoveAurasDueToSpell(51967);
                     return;
                 }
                 case 54729:                                 // Winged Steed of the Ebon Blade
