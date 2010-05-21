@@ -816,26 +816,26 @@ void Creature::PrepareBodyLootState()
     loot.clear();
 
     // if have normal loot then prepare it access
-    if (!isAlive() && GetCreatureInfo()->lootid && !lootForBody)
+    if (!isAlive() && !lootForBody)
     {
-        SetUInt32Value(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
-        return;
+        // have normal loot
+        if (GetCreatureInfo()->maxgold > 0 || GetCreatureInfo()->lootid ||
+            // ... or can have skinning after
+            GetCreatureInfo()->SkinLootId && sWorld.getConfig(CONFIG_BOOL_CORPSE_EMPTY_LOOT_SHOW))
+        {
+            SetUInt32Value(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
+            return;
+        }
     }
 
     // if not have normal loot allow skinning if need
-    if (!isAlive() && !lootForSkin)
+    if (!isAlive() && !lootForSkin && GetCreatureInfo()->SkinLootId)
     {
         lootForBody = true;                                 // pass this loot mode
 
-        if (GetCreatureInfo()->SkinLootId)
-        {
-            if (LootTemplates_Skinning.HaveLootFor(GetCreatureInfo()->SkinLootId))
-            {
-                RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
-                SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
-                return;
-            }
-        }
+        RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
+        SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
+        return;
     }
 
     RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
@@ -2031,14 +2031,14 @@ void Creature::GetRespawnCoord( float &x, float &y, float &z, float* ori, float*
 
 void Creature::AllLootRemovedFromCorpse()
 {
-    if (!HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE))
+    if (lootForBody && !HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE))
     {
         uint32 nDeathTimer;
 
         CreatureInfo const *cinfo = GetCreatureInfo();
 
         // corpse was not skinnable -> apply corpse looted timer
-        if (!cinfo || !cinfo->SkinLootId)
+        if (!cinfo->SkinLootId)
             nDeathTimer = (uint32)((m_corpseDelay * IN_MILLISECONDS) * sWorld.getConfig(CONFIG_FLOAT_RATE_CORPSE_DECAY_LOOTED));
         // corpse skinnable, but without skinning flag, and then skinned, corpse will despawn next update
         else

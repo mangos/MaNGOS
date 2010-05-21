@@ -829,6 +829,11 @@ TalentsInspecting = 1
 #        Difference for boss dynamic level with target
 #        Default: 3
 #
+#    Corpse.EmptyLootShow
+#        If target can have loot (or can be skining after loot) but no loot generated still show loot window
+#        Default: 1 (show)
+#                 0 (not show)
+#
 #    Corpse.Decay.NORMAL
 #    Corpse.Decay.RARE
 #    Corpse.Decay.ELITE
@@ -886,6 +891,7 @@ CreatureFamilyAssistanceRadius = 10
 CreatureFamilyAssistanceDelay = 1500
 CreatureFamilyFleeDelay = 7000
 WorldBossLevelDiff = 3
+Corpse.EmptyLootShow = 1
 Corpse.Decay.NORMAL = 60
 Corpse.Decay.RARE = 300
 Corpse.Decay.ELITE = 300
