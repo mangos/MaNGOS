@@ -510,6 +510,9 @@ void WorldSession::HandleGroupChangeSubGroupOpcode( WorldPacket & recv_data )
 
     recv_data >> groupNr;
 
+    if (groupNr >= MAX_RAID_SUBGROUPS)
+        return;
+
     // we will get correct pointer for group here, so we don't have to check if group is BG raid
     Group *group = GetPlayer()->GetGroup();
     if(!group)
@@ -524,7 +527,10 @@ void WorldSession::HandleGroupChangeSubGroupOpcode( WorldPacket & recv_data )
     /********************/
 
     // everything is fine, do it
-    group->ChangeMembersGroup(sObjectMgr.GetPlayer(name.c_str()), groupNr);
+    if (Player* player = sObjectMgr.GetPlayer(name.c_str()))
+        group->ChangeMembersGroup(player, groupNr);
+    else
+        group->ChangeMembersGroup(sObjectMgr.GetPlayerGUIDByName(name.c_str()), groupNr);
 }
 
 void WorldSession::HandleGroupAssistantLeaderOpcode( WorldPacket & recv_data )
