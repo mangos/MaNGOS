@@ -2421,7 +2421,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
             {
                 if (m_caster->IsFriendlyTo(unitTarget))
                 {
-                    if (unitTarget->GetCreatureType() != CREATURE_TYPE_UNDEAD)
+                    if (!unitTarget || unitTarget->GetCreatureType() != CREATURE_TYPE_UNDEAD)
                         return;
 
                     int32 bp = int32(damage * 1.5f);
