@@ -607,7 +607,7 @@ bool ChatHandler::HandleGameObjectTurnCommand(const char* args)
     obj->SaveToDB();
     obj->Refresh();
 
-    PSendSysMessage(LANG_COMMAND_TURNOBJMESSAGE, obj->GetGUIDLow(), obj->GetGOInfo()->name, obj->GetGUIDLow(), o);
+    PSendSysMessage(LANG_COMMAND_TURNOBJMESSAGE, obj->GetGUIDLow(), obj->GetGOInfo()->name, obj->GetGUIDLow());
 
     return true;
 }
