@@ -12729,7 +12729,7 @@ void Player::PrepareGossipMenu(WorldObject *pSource, uint32 menuId)
     if (pMenuItemBounds.first == pMenuItemBounds.second && menuId == GetDefaultGossipMenuForSource(pSource))
         pMenuItemBounds = sObjectMgr.GetGossipMenuItemsMapBounds(0);
 
-    bool canTalkToCredit = true;
+    bool canTalkToCredit = pSource->GetTypeId() == TYPEID_UNIT;
 
     for(GossipMenuItemsMap::const_iterator itr = pMenuItemBounds.first; itr != pMenuItemBounds.second; ++itr)
     {
@@ -12825,8 +12825,6 @@ void Player::PrepareGossipMenu(WorldObject *pSource, uint32 menuId)
         {
             GameObject *pGo = (GameObject*)pSource;
 
-            canTalkToCredit = false;
-
             switch(itr->second.option_id)
             {
                 case GOSSIP_OPTION_QUESTGIVER:
@@ -12873,7 +12871,7 @@ void Player::PrepareGossipMenu(WorldObject *pSource, uint32 menuId)
     if (canTalkToCredit)
     {
         if (pSource->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
-            TalkedToCreature(((Creature*)pSource)->GetEntry(), ((Creature*)pSource)->GetGUID());
+            TalkedToCreature(pSource->GetEntry(), pSource->GetGUID());
     }
 
     // some gossips aren't handled in normal way ... so we need to do it this way .. TODO: handle it in normal way ;-)
@@ -19646,25 +19644,6 @@ void Player::SendInitialPacketsAfterAddToMap()
     SendAurasForTarget(this);
     SendEnchantmentDurations();                             // must be after add to map
     SendItemDurations();                                    // must be after add to map
-
-    // Juggernaut & Warbringer both need special packet
-    // for alowing charge in combat and Warbringer
-    // for alowing charge in different stances, too
-    if(HasAura(64976) || HasAura(57499))
-    {
-        WorldPacket aura_update(SMSG_AURA_UPDATE);
-        aura_update << GetPackGUID();
-        aura_update << uint8(255);
-        if(HasAura(64976))
-            aura_update << uint32(64976);
-        if(HasAura(57499))
-            aura_update << uint32(57499);
-        aura_update << uint8(19);
-        aura_update << uint8(getLevel());
-        aura_update << uint8(1);
-        aura_update << uint8(0);
-        GetSession()->SendPacket(&aura_update);
-    }
 }
 
 void Player::SendUpdateToOutOfRangeGroupMembers()

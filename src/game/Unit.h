@@ -1868,7 +1868,6 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         uint32 m_reactiveTimer[MAX_REACTIVE];
         uint32 m_regenTimer;
         uint32 m_lastManaUseTimer;
-        float m_lastAuraProcRoll;
 
     private:
         void CleanupDeletedAuras();
