@@ -12564,7 +12564,7 @@ void Player::PrepareGossipMenu(WorldObject *pSource, uint32 menuId)
     if (pMenuItemBounds.first == pMenuItemBounds.second && menuId == GetDefaultGossipMenuForSource(pSource))
         pMenuItemBounds = sObjectMgr.GetGossipMenuItemsMapBounds(0);
 
-    bool canTalkToCredit = true;
+    bool canTalkToCredit = pSource->GetTypeId() == TYPEID_UNIT;
 
     for(GossipMenuItemsMap::const_iterator itr = pMenuItemBounds.first; itr != pMenuItemBounds.second; ++itr)
     {
@@ -12656,8 +12656,6 @@ void Player::PrepareGossipMenu(WorldObject *pSource, uint32 menuId)
         {
             GameObject *pGo = (GameObject*)pSource;
 
-            canTalkToCredit = false;
-
             switch(itr->second.option_id)
             {
                 case GOSSIP_OPTION_QUESTGIVER:
@@ -12704,7 +12702,7 @@ void Player::PrepareGossipMenu(WorldObject *pSource, uint32 menuId)
     if (canTalkToCredit)
     {
         if (pSource->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
-            TalkedToCreature(((Creature*)pSource)->GetEntry(), ((Creature*)pSource)->GetGUID());
+            TalkedToCreature(pSource->GetEntry(), pSource->GetGUID());
     }
 
     // some gossips aren't handled in normal way ... so we need to do it this way .. TODO: handle it in normal way ;-)
