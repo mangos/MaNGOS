@@ -19485,25 +19485,6 @@ void Player::SendInitialPacketsAfterAddToMap()
     SendAurasForTarget(this);
     SendEnchantmentDurations();                             // must be after add to map
     SendItemDurations();                                    // must be after add to map
-
-    // Juggernaut & Warbringer both need special packet
-    // for alowing charge in combat and Warbringer
-    // for alowing charge in different stances, too
-    if(HasAura(64976) || HasAura(57499))
-    {
-        WorldPacket aura_update(SMSG_AURA_UPDATE);
-        aura_update << GetPackGUID();
-        aura_update << uint8(255);
-        if(HasAura(64976))
-            aura_update << uint32(64976);
-        if(HasAura(57499))
-            aura_update << uint32(57499);
-        aura_update << uint8(19);
-        aura_update << uint8(getLevel());
-        aura_update << uint8(1);
-        aura_update << uint8(0);
-        GetSession()->SendPacket(&aura_update);
-    }
 }
 
 void Player::SendUpdateToOutOfRangeGroupMembers()
