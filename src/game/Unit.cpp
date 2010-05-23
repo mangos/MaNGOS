@@ -7022,12 +7022,11 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
             // Improved Water Shield
             if (dummySpell->SpellIconID == 2287)
             {
-                uint32 rank = GetTalentSpellCost(dummySpell->Id);
-                // Lesser Healing Wave need aditional 20/40/60% roll
-                if ((procSpell->SpellFamilyFlags & UI64LIT(0x0000000000000080)) && !roll_chance_i(20*rank))
+                // Lesser Healing Wave need aditional 60% roll
+                if ((procSpell->SpellFamilyFlags & UI64LIT(0x0000000000000080)) && !roll_chance_i(60))
                     return false;
-                // Chain Heal needs additional 10/20/30% roll
-                if ((procSpell->SpellFamilyFlags & UI64LIT(0x0000000000000100)) && !roll_chance_i(10*rank))
+                // Chain Heal needs additional 30% roll
+                if ((procSpell->SpellFamilyFlags & UI64LIT(0x0000000000000100)) && !roll_chance_i(30))
                     return false;
                 // lookup water shield
                 AuraList const& vs = GetAurasByType(SPELL_AURA_PROC_TRIGGER_SPELL);
@@ -9427,15 +9426,7 @@ uint32 Unit::SpellDamageBonusDone(Unit *pVictim, SpellEntry const *spellProto, u
             break;
         }
         case SPELLFAMILY_WARLOCK:
-        {
-            // Drain Soul
-            if (spellProto->SpellFamilyFlags & UI64LIT(0x0000000000004000))
-            {
-                if (pVictim->GetHealth() * 100 / pVictim->GetMaxHealth() <= 25)
-                    DoneTotalMod *= 4;
-            }
             break;
-        }
         case SPELLFAMILY_PRIEST:
         {
             // Glyph of Smite
