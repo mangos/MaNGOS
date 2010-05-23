@@ -6482,14 +6482,6 @@ void Aura::HandleSpellSpecificBoosts(bool apply)
             // second part of spell apply
             switch (GetId())
             {
-                case 45524:                                 // Chains of Ice
-                {
-                    if (apply)
-                        spellId1 = 55095;                   // Frost Fever
-                    else
-                        return;
-                    break;
-                }
                 case 49039: spellId1 = 50397; break;        // Lichborne
 
                 case 48263:                                 // Frost Presence

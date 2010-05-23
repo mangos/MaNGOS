@@ -2832,6 +2832,13 @@ void Spell::cast(bool skipCheck)
                 AddTriggeredSpell(30708);                   // Totem of Wrath
             break;
         }
+        case SPELLFAMILY_DEATHKNIGHT:
+        {
+            // Chains of Ice
+            if (m_spellInfo->Id == 45524)
+                AddTriggeredSpell(55095);                   // Frost Fever
+            break;
+        }
         default:
             break;
     }
