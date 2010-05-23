@@ -3515,11 +3515,15 @@ void Aura::HandleChannelDeathItem(bool apply, bool Real)
         if (!caster || caster->GetTypeId() != TYPEID_PLAYER)
             return;
 
-        // Soul Shard only from non-grey units
-        if( spellInfo->EffectItemType[m_effIndex] == 6265 &&
-            (victim->getLevel() <= MaNGOS::XP::GetGrayLevel(caster->getLevel()) ||
-             victim->GetTypeId()==TYPEID_UNIT && !((Player*)caster)->isAllowedToLoot((Creature*)victim)) )
-            return;
+        // Soul Shard (target req.)
+        if (spellInfo->EffectItemType[m_effIndex] == 6265)
+        {
+            // Only from non-grey units
+            if ((victim->getLevel() <= MaNGOS::XP::GetGrayLevel(caster->getLevel()) ||
+                victim->GetTypeId() == TYPEID_UNIT && !((Player*)caster)->isAllowedToLoot((Creature*)victim)))
+                return;
+        }
+
         //Adding items
         uint32 noSpaceForCount = 0;
         uint32 count = m_modifier.m_amount;
@@ -3535,7 +3539,15 @@ void Aura::HandleChannelDeathItem(bool apply, bool Real)
         }
 
         Item* newitem = ((Player*)caster)->StoreNewItem(dest, spellInfo->EffectItemType[m_effIndex], true);
-        ((Player*)caster)->SendNewItem(newitem, count, true, false);
+        ((Player*)caster)->SendNewItem(newitem, count, true, true);
+
+        // Soul Shard (glyph bonus)
+        if (spellInfo->EffectItemType[m_effIndex] == 6265)
+        {
+            // Glyph of Soul Shard
+            if (caster->HasAura(58070) && roll_chance_i(40))
+                caster->CastSpell(caster, 58068, true, NULL, this);
+        }
     }
 }
 
