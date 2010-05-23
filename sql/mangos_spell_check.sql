@@ -505,6 +505,10 @@ INSERT INTO spell_check (spellid,SpellFamilyName,SpellFamilyMaskA,SpellFamilyMas
 (56153,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Guardian Aura - Ahn\'Kahet',         'Spell::SetTargetMap'),
 (56235,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Glyph of Conflagrate',               'Spell::EffectSchoolDMG'),
 (56446,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Disengage',                          'Spell::EffectDummy'),
+(57085,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Refreshment',                        'Spell::EffectScriptEffect'),
+(57292,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Refreshment',                        'Spell::EffectScriptEffect'),
+(57337, 0,                -1,        -1,  -1,  -1,  -1, 77, -1,-1,'Great Feast',                        'Spell::EffectScriptEffect'),
+(57397, 0,                -1,        -1,  -1,  -1,  -1, 77, -1,-1,'Fish Feast',                         'Spell::EffectScriptEffect'),
 (57467, 0,                -1,        -1,  -1,  -1,  -1,  2, -1,-1,'Meteor',                             'Spell::EffectSchoolDMG'),
 (57627,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Charge',                             'Spell::EffectSchoolDMG'),
 (57635, 9,                -1,        -1,  -1,  -1,  -1,  3, -1,-1,'Disengage',                          'Spell::EffectDummy'),
@@ -512,9 +516,12 @@ INSERT INTO spell_check (spellid,SpellFamilyName,SpellFamilyMaskA,SpellFamilyMas
 (57669,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Replenishment',                      'Spell::SetTargetMap'),
 (57723,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Exhaustion',                         'Spell::cast'),
 (57724,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Sated',                              'Spell::cast'),
+(58067,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Refreshment',                        'Spell::EffectScriptEffect'),
 (58367,-1,                -1,        -1,  -1,  -1,  -1, -1,  4,-1,'Glyph of Execution',                 'Spell::EffectDummy'),
 (58418, 0,                -1,        -1,  -1,  -1,  -1,  3, -1,-1,'Portal to Orgrimmar',                'Spell::EffectDummy'),
 (58420, 0,                -1,        -1,  -1,  -1,  -1,  3, -1,-1,'Portal to Stormwind',                'Spell::EffectDummy'),
+(58466, 0,                -1,        -1,  -1,  -1,  -1, 77, -1,-1,'Gigantic Feast',                     'Spell::EffectScriptEffect'),
+(58475, 0,                -1,        -1,  -1,  -1,  -1, 77, -1,-1,'Small Feast',                        'Spell::EffectScriptEffect'),
 (58601, 0,                -1,        -1,  -1,  -1,  -1,  3, -1,-1,'Remove Flight Auras',                'Spell::EffectDummy'),
 (58657,-1,                -1,        -1,  -1,  -1,  -1, -1,  4,-1,'Glyph of Plague Strike',             'Spell::EffectWeaponDmg'),
 (58875,11,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Spirit Walk',                        'Spell::cast'),
@@ -538,6 +545,7 @@ INSERT INTO spell_check (spellid,SpellFamilyName,SpellFamilyMaskA,SpellFamilyMas
 (61650,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Fire Nova',                          'Spell::EffectDummy'),
 (61654,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Fire Nova',                          'Spell::EffectDummy'),
 (61657,11,                -1,        -1,  33,  -1,  -1,  3, -1,-1,'Fire Nova',                          'Spell::EffectDummy'),
+(61832, 0,                -1,        -1,  -1,  -1,  -1,  3, -1,-1,'Rifle the Bodies: Create Magehunter Personal Effects Cover','Spell::EffectDummy'),
 (61987,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Avenging Wrath Marker',              'Spell::cast'),
 (61987,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Avenging Wrath Marker',              'Spell::CheckCast'),
 (62124,10,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Hand of Reckoning',                  'Spell::cast'),
@@ -552,7 +560,10 @@ INSERT INTO spell_check (spellid,SpellFamilyName,SpellFamilyMaskA,SpellFamilyMas
 (64844,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Divine Hymn',                        'Spell::SetTargetMap'),
 (64904,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Hymn of Hope',                       'Spell::SetTargetMap'),
 (65116,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Stoneskin',                          'Spell::cast'),
+(65422,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Food',                               'Spell::EffectScriptEffect'),
 (66013, 0,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Penetrating Cold',                   'Spell::SetTargetMap'),
+(66477, 0,                -1,        -1,  -1,  -1,  -1, 77, -1,-1,'Bountiful Feast',                    'Spell::EffectScriptEffect'),
+(66622,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Refreshment',                        'Spell::EffectScriptEffect'),
 (67016,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Flask of the North',                 'Spell::EffectDummy'),
 (67017,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Flask of the North',                 'Spell::EffectDummy'),
 (67018,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Flask of the North',                 'Spell::EffectDummy'),
@@ -593,14 +604,6 @@ INSERT INTO spell_check (spellid,SpellFamilyName,SpellFamilyMaskA,SpellFamilyMas
 (75620, 0,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Celestial Steed',                    'Aura::HandleAuraDummy'),
 (76153, 0,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Celestial Steed',                    'Aura::HandleAuraDummy'),
 /*id   fm familyMaskA        fmMaskB    icon vis  cat  eff aur ef name                                  code                   */
-
-
-
-
-(61832, 0,                -1,        -1,  -1,  -1,  -1,  3, -1,-1,'Rifle the Bodies: Create Magehunter Personal Effects Cover','Spell::EffectDummy'),
-
-
-
 
 /* sorted by spell names */
 /*id   fm familyMaskA        fmMaskB    icon vis  cat  eff aur ef name                                  code                   */
