@@ -9125,15 +9125,7 @@ uint32 Unit::SpellDamageBonusDone(Unit *pVictim, SpellEntry const *spellProto, u
             break;
         }
         case SPELLFAMILY_WARLOCK:
-        {
-            // Drain Soul
-            if (spellProto->SpellFamilyFlags & UI64LIT(0x0000000000004000))
-            {
-                if (pVictim->GetHealth() * 100 / pVictim->GetMaxHealth() <= 25)
-                    DoneTotalMod *= 4;
-            }
             break;
-        }
         case SPELLFAMILY_PRIEST:
         {
             // Glyph of Smite
