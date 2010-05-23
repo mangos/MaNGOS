@@ -3659,11 +3659,15 @@ void Aura::HandleChannelDeathItem(bool apply, bool Real)
         if (!caster || caster->GetTypeId() != TYPEID_PLAYER)
             return;
 
-        // Soul Shard only from non-grey units
-        if( spellInfo->EffectItemType[m_effIndex] == 6265 &&
-            (victim->getLevel() <= MaNGOS::XP::GetGrayLevel(caster->getLevel()) ||
-             victim->GetTypeId()==TYPEID_UNIT && !((Player*)caster)->isAllowedToLoot((Creature*)victim)) )
-            return;
+        // Soul Shard (target req.)
+        if (spellInfo->EffectItemType[m_effIndex] == 6265)
+        {
+            // Only from non-grey units
+            if ((victim->getLevel() <= MaNGOS::XP::GetGrayLevel(caster->getLevel()) ||
+                victim->GetTypeId() == TYPEID_UNIT && !((Player*)caster)->isAllowedToLoot((Creature*)victim)))
+                return;
+        }
+
         //Adding items
         uint32 noSpaceForCount = 0;
         uint32 count = m_modifier.m_amount;
@@ -3679,7 +3683,15 @@ void Aura::HandleChannelDeathItem(bool apply, bool Real)
         }
 
         Item* newitem = ((Player*)caster)->StoreNewItem(dest, spellInfo->EffectItemType[m_effIndex], true);
-        ((Player*)caster)->SendNewItem(newitem, count, true, false);
+        ((Player*)caster)->SendNewItem(newitem, count, true, true);
+
+        // Soul Shard (glyph bonus)
+        if (spellInfo->EffectItemType[m_effIndex] == 6265)
+        {
+            // Glyph of Soul Shard
+            if (caster->HasAura(58070) && roll_chance_i(40))
+                caster->CastSpell(caster, 58068, true, NULL, this);
+        }
     }
 }
 
@@ -5067,6 +5079,16 @@ void Aura::HandlePeriodicDamage(bool apply, bool Real)
                     if (m_spellProto->CalculateSimpleValue(EFFECT_INDEX_1) !=0 &&
                         m_target->GetHealth() > m_target->GetMaxHealth() * m_spellProto->CalculateSimpleValue(EFFECT_INDEX_1) / 100)
                         m_modifier.m_amount += m_modifier.m_amount * m_spellProto->CalculateSimpleValue(EFFECT_INDEX_2) / 100;
+                }
+                break;
+            }
+            case SPELLFAMILY_WARLOCK:
+            {
+                // Drain Soul
+                if (m_spellProto->SpellFamilyFlags & UI64LIT(0x0000000000004000))
+                {
+                    if (m_target->GetHealth() * 100 / m_target->GetMaxHealth() <= 25)
+                        m_modifier.m_amount *= 4;
                 }
                 break;
             }
@@ -6725,6 +6747,14 @@ void Aura::HandleSpellSpecificBoosts(bool apply)
             // second part of spell apply
             switch (GetId())
             {
+                case 45524:                                 // Chains of Ice
+                {
+                    if (apply)
+                        spellId1 = 55095;                   // Frost Fever
+                    else
+                        return;
+                    break;
+                }
                 case 49039: spellId1 = 50397; break;        // Lichborne
 
                 case 48263:                                 // Frost Presence

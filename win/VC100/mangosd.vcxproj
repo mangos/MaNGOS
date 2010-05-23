@@ -494,9 +494,6 @@
     <ProjectReference Include="shared.vcxproj">
       <Project>{90297c34-f231-4df4-848e-a74bcc0e40ed}</Project>
     </ProjectReference>
-    <ProjectReference Include="sockets.vcxproj">
-      <Project>{04baf755-0d67-46f8-b1c6-77ae5368f3cb}</Project>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
