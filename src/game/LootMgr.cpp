@@ -724,11 +724,11 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
         case ALL_PERMISSION:
         case MASTER_PERMISSION:
         {
-            uint8 slot_type = (lv.permission==MASTER_PERMISSION) ? 2 : 0;
             for (uint8 i = 0; i < l.items.size(); ++i)
             {
                 if (!l.items[i].is_looted && !l.items[i].freeforall && !l.items[i].conditionId && l.items[i].AllowedForPlayer(lv.viewer))
                 {
+                    uint8 slot_type = (lv.permission==MASTER_PERMISSION && !l.items[i].is_underthreshold) ? 2 : 0;
                     b << uint8(i) << l.items[i];            //only send one-player loot items now, free for all will be sent later
                     b << uint8(slot_type);                  // 0 - get 2 - master selection
                     ++itemsShown;
