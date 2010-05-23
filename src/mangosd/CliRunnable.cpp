@@ -540,7 +540,8 @@ bool ChatHandler::HandleServerLogFilterCommand(const char* args)
 
         SendSysMessage(LANG_LOG_FILTERS_STATE_HEADER);
         for(int i = 0; i < LOG_FILTER_COUNT; ++i)
-            PSendSysMessage("  %-20s = %s",logFilterData[i].name,(logfiler & (1 << i)) !=0 ? GetMangosString(LANG_ON) : GetMangosString(LANG_OFF));
+            if (*logFilterData[i].name)
+                PSendSysMessage("  %-20s = %s",logFilterData[i].name,(logfiler & (1 << i)) !=0 ? GetMangosString(LANG_ON) : GetMangosString(LANG_OFF));
         return true;
     }
 
@@ -573,6 +574,9 @@ bool ChatHandler::HandleServerLogFilterCommand(const char* args)
 
     for(int i = 0; i < LOG_FILTER_COUNT; ++i)
     {
+        if (!*logFilterData[i].name)
+            continue;
+
         if (!strncmp(filtername,logFilterData[i].name,strlen(filtername)))
         {
             sLog.SetLogFilter(LogFilters(1 << i),value);
