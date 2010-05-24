@@ -606,8 +606,17 @@ void Group::NeedBeforeGreed(WorldObject* object, Loot *loot)
     }
 }
 
-void Group::MasterLoot(WorldObject* object, Loot* /*loot*/)
+void Group::MasterLoot(WorldObject* object, Loot* loot)
 {
+    for (LootItemList::iterator i=loot->items.begin(); i != loot->items.end(); ++i)
+    {
+        ItemPrototype const *item = ObjectMgr::GetItemPrototype(i->itemid);
+        if (!item)
+            continue;
+        if (item->Quality < uint32(m_lootThreshold))
+            i->is_underthreshold = 1;
+    }
+
     uint32 real_count = 0;
 
     WorldPacket data(SMSG_LOOT_MASTER_LIST, 330);
