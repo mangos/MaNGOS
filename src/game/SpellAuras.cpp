@@ -6747,14 +6747,6 @@ void Aura::HandleSpellSpecificBoosts(bool apply)
             // second part of spell apply
             switch (GetId())
             {
-                case 45524:                                 // Chains of Ice
-                {
-                    if (apply)
-                        spellId1 = 55095;                   // Frost Fever
-                    else
-                        return;
-                    break;
-                }
                 case 49039: spellId1 = 50397; break;        // Lichborne
 
                 case 48263:                                 // Frost Presence
@@ -7436,7 +7428,7 @@ void Aura::PeriodicTick()
 
             // only from players
             // FIXME: need use SpellDamageBonus instead?
-            if (IS_PLAYER_GUID(m_caster_guid))
+            if (pCaster->GetTypeId() == TYPEID_PLAYER)
                 pdamage -= m_target->GetSpellDamageReduction(pdamage);
 
             m_target->CalculateAbsorbAndResist(pCaster, GetSpellSchoolMask(GetSpellProto()), DOT, pdamage, &absorb, &resist, !(GetSpellProto()->AttributesEx2 & SPELL_ATTR_EX2_CANT_REFLECTED));
@@ -7460,6 +7452,19 @@ void Aura::PeriodicTick()
             pCaster->ProcDamageAndSpell(m_target, procAttacker, procVictim, PROC_EX_NORMAL_HIT, pdamage, BASE_ATTACK, GetSpellProto());
 
             pCaster->DealDamage(m_target, pdamage, &cleanDamage, DOT, GetSpellSchoolMask(GetSpellProto()), GetSpellProto(), true);
+
+            // Drain Soul (chance soul shard)
+            if (pCaster->GetTypeId() == TYPEID_PLAYER && m_spellProto->SpellFamilyName == SPELLFAMILY_WARLOCK && m_spellProto->SpellFamilyFlags & UI64LIT(0x0000000000004000))
+            {
+                // Only from non-grey units
+                if (roll_chance_i(10) &&                    // 1-2 from drain with final and without glyph, 0-1 from damage
+                    m_target->getLevel() > MaNGOS::XP::GetGrayLevel(pCaster->getLevel()) &&
+                    (m_target->GetTypeId() != TYPEID_UNIT || ((Player*)pCaster)->isAllowedToLoot((Creature*)m_target)))
+                {
+                    pCaster->CastSpell(pCaster, 43836, true, NULL, this);
+                }
+            }
+
             break;
         }
         case SPELL_AURA_PERIODIC_LEECH:
