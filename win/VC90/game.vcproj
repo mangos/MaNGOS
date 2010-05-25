@@ -699,14 +699,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\game\CharacterDatabaseCleaner.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\game\CharacterDatabaseCleaner.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\src\game\CharacterHandler.cpp"
 				>
 			</File>
@@ -1542,6 +1534,14 @@
 		<Filter
 			Name="Tool"
 			>
+			<File
+				RelativePath="..\..\src\game\CharacterDatabaseCleaner.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\CharacterDatabaseCleaner.h"
+				>
+			</File>
 			<File
 				RelativePath="..\..\src\game\Language.h"
 				>
