@@ -905,6 +905,14 @@ void WorldSession::HandleAutoBankItemOpcode(WorldPacket& recvPacket)
         return;
     }
 
+    // no-op: placed in same slot
+    if(dest.size() == 1 && dest[0].pos == pItem->GetPos())
+    {
+        // just remove gray item state
+        _player->SendEquipError( EQUIP_ERR_NONE, pItem, NULL );
+        return;
+    }
+
     _player->RemoveItem(srcbag, srcslot, true);
     _player->BankItem( dest, pItem, true );
 }
