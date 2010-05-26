@@ -82,6 +82,13 @@ enum GroupType                                              // group type flags?
     // 0x10, leave/change group?, I saw this flag when leaving group and after leaving BG while in group
 };
 
+enum GroupFlagMask
+{
+    GROUP_ASSISTENT      = 0x01,
+    GROUP_MAIN_ASSISTENT = 0x02,
+    GROUP_MAIN_TANK      = 0x04,
+};
+
 class BattleGround;
 
 enum GroupUpdateFlags
@@ -409,6 +416,18 @@ class MANGOS_DLL_SPEC Group
 
         void CountTheRoll(Rolls::iterator& roll);           // iterator update to next, in CountRollVote if true
         bool CountRollVote(ObjectGuid const& playerGUID, Rolls::iterator& roll, RollVote choise);
+
+        GroupFlagMask GetFlags(MemberSlot const& slot) const
+        {
+            uint8 flags = 0;
+            if (slot.assistant)
+                flags |= GROUP_ASSISTENT;
+            if (slot.guid == m_mainAssistant)
+                flags |= GROUP_MAIN_ASSISTENT;
+            if (slot.guid == m_mainTank)
+                flags |= GROUP_MAIN_TANK;
+            return GroupFlagMask(flags);
+        }
 
         uint32              m_Id;                           // 0 for not created or BG groups
         MemberSlotList      m_memberSlots;
