@@ -4994,7 +4994,7 @@ void Aura::HandlePeriodicDamage(bool apply, bool Real)
                 if (m_spellProto->SpellFamilyFlags & UI64LIT(0x400080000000000))
                 {
                     m_modifier.m_amount += int32(caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.055f * 1.15f);
-                };
+                }
                 break;
             }
             default:
