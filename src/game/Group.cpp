@@ -1016,16 +1016,16 @@ void Group::UpdatePlayerOutOfRange(Player* pPlayer)
     if(!pPlayer || !pPlayer->IsInWorld())
         return;
 
-    Player *player;
+    if (pPlayer->GetGroupUpdateFlag() == GROUP_UPDATE_FLAG_NONE)
+        return;
+
     WorldPacket data;
     pPlayer->GetSession()->BuildPartyMemberStatsChangedPacket(pPlayer, &data);
 
     for(GroupReference *itr = GetFirstMember(); itr != NULL; itr = itr->next())
-    {
-        player = itr->getSource();
-        if (player && player != pPlayer && !pPlayer->isVisibleFor(player,player->GetViewPoint()))
-            player->GetSession()->SendPacket(&data);
-    }
+        if (Player *player = itr->getSource())
+            if (player != pPlayer && !player->HaveAtClient(pPlayer))
+                player->GetSession()->SendPacket(&data);
 }
 
 void Group::BroadcastPacket(WorldPacket *packet, bool ignorePlayersInBGRaid, int group, uint64 ignore)
