@@ -3955,10 +3955,7 @@ void Spell::TakeCastItem()
         ((Player*)m_caster)->DestroyItemCount(m_CastItem, count, true);
 
         // prevent crash at access to deleted m_targets.getItemTarget
-        if(m_CastItem == m_targets.getItemTarget())
-            m_targets.setItemTarget(NULL);
-
-        m_CastItem = NULL;
+        ClearCastItem();
     }
 }
 
@@ -6758,4 +6755,12 @@ void Spell::SelectMountByAreaAndSkill(Unit* target, uint32 spellId75, uint32 spe
         target->CastSpell(target, spellId75, true);
 
     return;
+}
+
+void Spell::ClearCastItem()
+{
+    if (m_CastItem==m_targets.getItemTarget())
+        m_targets.setItemTarget(NULL);
+
+    m_CastItem = NULL;
 }
