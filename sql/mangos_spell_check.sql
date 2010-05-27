@@ -516,6 +516,8 @@ INSERT INTO spell_check (spellid,SpellFamilyName,SpellFamilyMaskA,SpellFamilyMas
 (57669,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Replenishment',                      'Spell::SetTargetMap'),
 (57723,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Exhaustion',                         'Spell::cast'),
 (57724,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Sated',                              'Spell::cast'),
+(57908, 0,                -1,        -1,  -1,  -1,  -1,  3, -1,-1,'Stain Cloth',                        'Spell::EffectDummy'),
+(57915,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Create Cloth',                       'Spell::EffectDummy'),
 (58067,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Refreshment',                        'Spell::EffectScriptEffect'),
 (58367,-1,                -1,        -1,  -1,  -1,  -1, -1,  4,-1,'Glyph of Execution',                 'Spell::EffectDummy'),
 (58418, 0,                -1,        -1,  -1,  -1,  -1,  3, -1,-1,'Portal to Orgrimmar',                'Spell::EffectDummy'),

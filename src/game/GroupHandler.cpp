@@ -636,9 +636,6 @@ void WorldSession::BuildPartyMemberStatsChangedPacket(Player *player, WorldPacke
 {
     uint32 mask = player->GetGroupUpdateFlag();
 
-    if (mask == GROUP_UPDATE_FLAG_NONE)
-        return;
-
     if (mask & GROUP_UPDATE_FLAG_POWER_TYPE)                // if update power type, update current/max power also
         mask |= (GROUP_UPDATE_FLAG_CUR_POWER | GROUP_UPDATE_FLAG_MAX_POWER);
 
