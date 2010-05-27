@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_9978_01_mangos_spell_bonus_data` bit(1) default NULL
+  `required_9988_01_mangos_spell_chain` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -15838,6 +15838,10 @@ INSERT INTO spell_chain VALUES
 (10140,10139,5504,7,0),
 (37420,10140,5504,8,0),
 (27090,37420,5504,9,0),
+/*Dalaran Intellect*/
+(61024,61024,61024,1,27126),
+/*Dalaran Brilliance*/
+(61316,61316,61316,1,27127),
 /*DampenMagic*/
 (604,0,604,1,0),
 (8450,604,604,2,0),
