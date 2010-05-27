@@ -5691,6 +5691,12 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                 triggered_spell_id = 22858;
                 break;
             }
+            // Gag Order
+            if (dummySpell->SpellIconID == 280)
+            {
+                triggered_spell_id = 18498;                 // Silenced - Gag Order
+                break;
+            }
             // Second Wind
             if (dummySpell->SpellIconID == 1697)
             {
