@@ -592,7 +592,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
             if ((movementInfo.GetMovementFlags() & (MOVEFLAG_CAN_FLY | MOVEFLAG_FLYING | MOVEFLAG_ROOT)) != 0) // Fly Hack
             {
                 // Fix Aura 55164
-                if (!GetPlayer()->HasAura(55164))
+                if (!GetPlayer()->HasAura(55164) || !GetPlayer()->HasAuraType(SPELL_AURA_FEATHER_FALL))
                     if (sWorld.GetMvAnticheatFlyCheck())
                         Anti__CheatOccurred(CurTime,"Fly hack",
                             ((uint8)(GetPlayer()->HasAuraType(SPELL_AURA_FLY))) +
