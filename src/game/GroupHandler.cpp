@@ -632,7 +632,7 @@ void WorldSession::HandleRaidReadyCheckFinishedOpcode( WorldPacket & /*recv_data
     // Is any reaction need?
 }
 
-bool WorldSession::BuildPartyMemberStatsChangedPacket(Player *player, WorldPacket *data)
+void WorldSession::BuildPartyMemberStatsChangedPacket(Player *player, WorldPacket *data)
 {
     uint32 mask = player->GetGroupUpdateFlag();
 
@@ -786,8 +786,6 @@ bool WorldSession::BuildPartyMemberStatsChangedPacket(Player *player, WorldPacke
         else
             *data << uint64(0);
     }
-
-    return true;
 }
 
 /*this procedure handles clients CMSG_REQUEST_PARTY_MEMBER_STATS request*/
