@@ -217,7 +217,9 @@ bool MapManager::CanPlayerEnter(uint32 mapid, Player* player)
 
                 if (!instance_map)
                 {
-                    player->GetSession()->SendAreaTriggerMessage("You cannot enter %s while in a ghost mode", mapName);
+                    WorldPacket data(SMSG_CORPSE_IS_NOT_IN_INSTANCE);
+                    player->GetSession()->SendPacket(&data);
+
                     DEBUG_LOG("MAP: Player '%s' doesn't has a corpse in instance '%s' and can't enter", player->GetName(), mapName);
                     return false;
                 }
