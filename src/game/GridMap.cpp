@@ -23,6 +23,7 @@
 #include "Map.h"
 #include "Config/ConfigEnv.h"
 #include "DBCEnums.h"
+#include "DBCStores.h"
 #include "GridMap.h"
 #include "VMapFactory.h"
 #include "World.h"
