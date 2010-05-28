@@ -132,6 +132,8 @@ libmangosgame_a_SOURCES = \
 	GossipDef.cpp \
 	GossipDef.h \
 	GridDefines.h \
+	GridMap.cpp \
+	GridMap.h \
 	GridNotifiers.cpp \
 	GridNotifiers.h \
 	GridNotifiersImpl.h \

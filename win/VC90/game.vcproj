@@ -747,6 +747,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\game\GridMap.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\GridMap.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\game\GridNotifiers.cpp"
 				>
 			</File>
