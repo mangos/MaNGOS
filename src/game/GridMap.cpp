@@ -26,7 +26,6 @@
 #include "GridMap.h"
 #include "VMapFactory.h"
 #include "World.h"
-#include "DBCStores.h"
 
 char const* MAP_MAGIC         = "MAPS";
 char const* MAP_VERSION_MAGIC = "v1.1";
