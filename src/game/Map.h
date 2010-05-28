@@ -30,6 +30,7 @@
 #include "Object.h"
 #include "Timer.h"
 #include "SharedDefines.h"
+#include "GridMap.h"
 #include "GameSystem/GridRefManager.h"
 #include "MapRefManager.h"
 #include "Utilities/TypeList.h"
@@ -46,139 +47,7 @@ class InstanceSave;
 struct ScriptInfo;
 struct ScriptAction;
 class BattleGround;
-
-//******************************************
-// Map file format defines
-//******************************************
-struct map_fileheader
-{
-    uint32 mapMagic;
-    uint32 versionMagic;
-    uint32 buildMagic;
-    uint32 areaMapOffset;
-    uint32 areaMapSize;
-    uint32 heightMapOffset;
-    uint32 heightMapSize;
-    uint32 liquidMapOffset;
-    uint32 liquidMapSize;
-};
-
-#define MAP_AREA_NO_AREA      0x0001
-
-struct map_areaHeader
-{
-    uint32 fourcc;
-    uint16 flags;
-    uint16 gridArea;
-};
-
-#define MAP_HEIGHT_NO_HEIGHT  0x0001
-#define MAP_HEIGHT_AS_INT16   0x0002
-#define MAP_HEIGHT_AS_INT8    0x0004
-
-struct map_heightHeader
-{
-    uint32 fourcc;
-    uint32 flags;
-    float  gridHeight;
-    float  gridMaxHeight;
-};
-
-#define MAP_LIQUID_NO_TYPE    0x0001
-#define MAP_LIQUID_NO_HEIGHT  0x0002
-
-struct map_liquidHeader
-{
-    uint32 fourcc;
-    uint16 flags;
-    uint16 liquidType;
-    uint8  offsetX;
-    uint8  offsetY;
-    uint8  width;
-    uint8  height;
-    float  liquidLevel;
-};
-
-enum ZLiquidStatus
-{
-    LIQUID_MAP_NO_WATER     = 0x00000000,
-    LIQUID_MAP_ABOVE_WATER  = 0x00000001,
-    LIQUID_MAP_WATER_WALK   = 0x00000002,
-    LIQUID_MAP_IN_WATER     = 0x00000004,
-    LIQUID_MAP_UNDER_WATER  = 0x00000008
-};
-
-#define MAP_LIQUID_TYPE_NO_WATER    0x00
-#define MAP_LIQUID_TYPE_WATER       0x01
-#define MAP_LIQUID_TYPE_OCEAN       0x02
-#define MAP_LIQUID_TYPE_MAGMA       0x04
-#define MAP_LIQUID_TYPE_SLIME       0x08
-
-#define MAP_ALL_LIQUIDS   (MAP_LIQUID_TYPE_WATER | MAP_LIQUID_TYPE_OCEAN | MAP_LIQUID_TYPE_MAGMA | MAP_LIQUID_TYPE_SLIME)
-
-#define MAP_LIQUID_TYPE_DARK_WATER  0x10
-#define MAP_LIQUID_TYPE_WMO_WATER   0x20
-
-struct LiquidData
-{
-    uint32 type;
-    float  level;
-    float  depth_level;
-};
-
-class GridMap
-{
-    uint32  m_flags;
-    // Area data
-    uint16  m_gridArea;
-    uint16 *m_area_map;
-    // Height level data
-    float   m_gridHeight;
-    float   m_gridIntHeightMultiplier;
-    union{
-        float  *m_V9;
-        uint16 *m_uint16_V9;
-        uint8  *m_uint8_V9;
-    };
-    union{
-        float  *m_V8;
-        uint16 *m_uint16_V8;
-        uint8  *m_uint8_V8;
-    };
-    // Liquid data
-    uint16  m_liquidType;
-    uint8   m_liquid_offX;
-    uint8   m_liquid_offY;
-    uint8   m_liquid_width;
-    uint8   m_liquid_height;
-    float   m_liquidLevel;
-    uint8  *m_liquid_type;
-    float  *m_liquid_map;
-
-    bool  loadAreaData(FILE *in, uint32 offset, uint32 size);
-    bool  loadHeightData(FILE *in, uint32 offset, uint32 size);
-    bool  loadLiquidData(FILE *in, uint32 offset, uint32 size);
-
-    // Get height functions and pointers
-    typedef float (GridMap::*pGetHeightPtr) (float x, float y) const;
-    pGetHeightPtr m_gridGetHeight;
-    float  getHeightFromFloat(float x, float y) const;
-    float  getHeightFromUint16(float x, float y) const;
-    float  getHeightFromUint8(float x, float y) const;
-    float  getHeightFromFlat(float x, float y) const;
-
-public:
-    GridMap();
-    ~GridMap();
-    bool  loadData(char *filaname);
-    void  unloadData();
-
-    uint16 getArea(float x, float y);
-    inline float getHeight(float x, float y) {return (this->*m_gridGetHeight)(x, y);}
-    float  getLiquidLevel(float x, float y);
-    uint8  getTerrainType(float x, float y);
-    ZLiquidStatus getLiquidStatus(float x, float y, float z, uint8 ReqLiquidType, LiquidData *data = 0);
-};
+class GridMap;
 
 // GCC have alternative #pragma pack(N) syntax and old gcc version not support pack(push,N), also any gcc version not support it at some platform
 #if defined( __GNUC__ )
@@ -275,12 +144,6 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         time_t GetGridExpiry(void) const { return i_gridExpiry; }
         uint32 GetId(void) const { return i_id; }
 
-        static bool ExistMap(uint32 mapid, int gx, int gy);
-        static bool ExistVMap(uint32 mapid, int gx, int gy);
-
-        static void InitStateMachine();
-        static void DeleteStateMachine();
-
         Map const * GetParent() const { return m_parentMap; }
 
         // some calls like isInWater should not use vmaps due to processor power
@@ -288,7 +151,7 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         float GetHeight(float x, float y, float z, bool pCheckVMap=true) const;
         bool IsInWater(float x, float y, float z) const;    // does not use z pos. This is for future use
 
-        ZLiquidStatus getLiquidStatus(float x, float y, float z, uint8 ReqLiquidType, LiquidData *data = 0) const;
+        GridMapLiquidStatus getLiquidStatus(float x, float y, float z, uint8 ReqLiquidType, GridMapLiquidData *data = 0) const;
 
         uint16 GetAreaFlag(float x, float y, float z) const;
         uint8 GetTerrainType(float x, float y ) const;
@@ -573,16 +436,6 @@ class MANGOS_DLL_SPEC BattleGroundMap : public Map
     private:
         BattleGround* m_bg;
 };
-
-/*inline
-uint64
-Map::CalculateGridMask(const uint32 &y) const
-{
-    uint64 mask = 1;
-    mask <<= y;
-    return mask;
-}
-*/
 
 template<class T, class CONTAINER>
 inline void
