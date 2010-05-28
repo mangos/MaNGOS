@@ -40,8 +40,6 @@
 #include "VMapFactory.h"
 #include "BattleGroundMgr.h"
 
-GridState* si_GridStates[MAX_GRID_STATE];
-
 struct ScriptAction
 {
     uint64 sourceGUID;
@@ -124,22 +122,6 @@ void Map::LoadMapAndVMap(int gx,int gy)
     LoadMap(gx,gy);
     if(i_InstanceId == 0)
         LoadVMap(gx, gy);                                   // Only load the data for the base map
-}
-
-void Map::InitStateMachine()
-{
-    si_GridStates[GRID_STATE_INVALID] = new InvalidState;
-    si_GridStates[GRID_STATE_ACTIVE] = new ActiveState;
-    si_GridStates[GRID_STATE_IDLE] = new IdleState;
-    si_GridStates[GRID_STATE_REMOVAL] = new RemovalState;
-}
-
-void Map::DeleteStateMachine()
-{
-    delete si_GridStates[GRID_STATE_INVALID];
-    delete si_GridStates[GRID_STATE_ACTIVE];
-    delete si_GridStates[GRID_STATE_IDLE];
-    delete si_GridStates[GRID_STATE_REMOVAL];
 }
 
 Map::Map(uint32 id, time_t expiry, uint32 InstanceId, uint8 SpawnMode, Map* _parent)
@@ -648,7 +630,7 @@ void Map::Update(const uint32 &t_diff)
             GridInfo *info = i->getSource()->getGridInfoRef();
             ++i;                                                // The update might delete the map and we need the next map before the iterator gets invalid
             ASSERT(grid->GetGridState() >= 0 && grid->GetGridState() < MAX_GRID_STATE);
-            si_GridStates[grid->GetGridState()]->Update(*this, *grid, *info, grid->getX(), grid->getY(), t_diff);
+            sMapMgr.UpdateGridState(grid->GetGridState(), *this, *grid, *info, grid->getX(), grid->getY(), t_diff);
         }
     }
 

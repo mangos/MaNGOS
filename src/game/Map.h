@@ -144,9 +144,6 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         time_t GetGridExpiry(void) const { return i_gridExpiry; }
         uint32 GetId(void) const { return i_id; }
 
-        static void InitStateMachine();
-        static void DeleteStateMachine();
-
         Map const * GetParent() const { return m_parentMap; }
 
         // some calls like isInWater should not use vmaps due to processor power
