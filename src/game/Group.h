@@ -286,6 +286,9 @@ class MANGOS_DLL_SPEC Group
         void ChangeMembersGroup(const uint64 &guid, uint8 group);
         void ChangeMembersGroup(Player *player, uint8 group);
 
+        uint64 const& GetMainTank() const { return m_mainTank; }
+        uint64 const& GetMainAssistant() const { return m_mainAssistant; }
+
         void SetAssistant(uint64 guid, bool state)
         {
             if(!isRaidGroup())
