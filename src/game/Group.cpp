@@ -1298,29 +1298,47 @@ bool Group::_setAssistantFlag(const uint64 &guid, const bool &state)
 
 bool Group::_setMainTank(const uint64 &guid)
 {
-    member_citerator slot = _getMemberCSlot(guid);
-    if(slot == m_memberSlots.end())
+    if (m_mainTank == guid)
         return false;
 
-    if(m_mainAssistant == guid)
-        _setMainAssistant(0);
+    if (guid)
+    {
+        member_citerator slot = _getMemberCSlot(guid);
+        if(slot == m_memberSlots.end())
+            return false;
+
+        if(m_mainAssistant == guid)
+            _setMainAssistant(0);
+    }
+
     m_mainTank = guid;
+
     if(!isBGGroup())
         CharacterDatabase.PExecute("UPDATE groups SET mainTank='%u' WHERE groupId='%u'", GUID_LOPART(m_mainTank), m_Id);
+
     return true;
 }
 
 bool Group::_setMainAssistant(const uint64 &guid)
 {
-    member_witerator slot = _getMemberWSlot(guid);
-    if(slot == m_memberSlots.end())
+    if (m_mainAssistant == guid)
         return false;
 
-    if(m_mainTank == guid)
-        _setMainTank(0);
+    if (guid)
+    {
+        member_witerator slot = _getMemberWSlot(guid);
+        if(slot == m_memberSlots.end())
+            return false;
+
+        if(m_mainTank == guid)
+            _setMainTank(0);
+    }
+
     m_mainAssistant = guid;
+
     if(!isBGGroup())
         CharacterDatabase.PExecute("UPDATE groups SET mainAssistant='%u' WHERE groupId='%u'", GUID_LOPART(m_mainAssistant), m_Id);
+
     return true;
 }
 
