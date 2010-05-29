@@ -1584,6 +1584,16 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
         case SPELLFAMILY_GENERIC:
             if (spellInfo_2->SpellFamilyName == SPELLFAMILY_GENERIC)
             {
+                // Dark Essence & Light Essence
+                if ((spellInfo_1->Id == 65684 && spellInfo_2->Id == 65686) ||
+                    (spellInfo_2->Id == 65684 && spellInfo_1->Id == 65686))
+                    return true;
+
+                //Potent Fungus and Mini must remove each other (Amanitar encounter, Ahn'kahet)
+                if ((spellInfo_1->Id == 57055 && spellInfo_2->Id == 56648) ||
+                    (spellInfo_2->Id == 57055 && spellInfo_1->Id == 56648))
+                    return true;
+
                 // Thunderfury
                 if ((spellInfo_1->Id == 21992 && spellInfo_2->Id == 27648) ||
                     (spellInfo_2->Id == 21992 && spellInfo_1->Id == 27648))
