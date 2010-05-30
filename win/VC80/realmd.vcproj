@@ -622,7 +622,23 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\src\realmd\BufferedSocket.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\src\realmd\BufferedSocket.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\src\realmd\Main.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\src\realmd\PatchHandler.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\src\realmd\PatchHandler.h"
 			>
 		</File>
 		<File

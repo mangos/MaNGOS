@@ -34,9 +34,8 @@
 INSTANTIATE_SINGLETON_2(MapManager, CLASS_LOCK);
 INSTANTIATE_CLASS_MUTEX(MapManager, ACE_Thread_Mutex);
 
-extern GridState* si_GridStates[];                          // debugging code, should be deleted some day
-
-MapManager::MapManager() : i_gridCleanUpDelay(sWorld.getConfig(CONFIG_UINT32_INTERVAL_GRIDCLEAN))
+MapManager::MapManager()
+    : i_gridCleanUpDelay(sWorld.getConfig(CONFIG_UINT32_INTERVAL_GRIDCLEAN))
 {
     i_timer.SetInterval(sWorld.getConfig(CONFIG_UINT32_INTERVAL_MAPUPDATE));
 }
@@ -49,57 +48,45 @@ MapManager::~MapManager()
     for(TransportSet::iterator i = m_Transports.begin(); i != m_Transports.end(); ++i)
         delete *i;
 
-    Map::DeleteStateMachine();
+    DeleteStateMachine();
 }
 
 void
 MapManager::Initialize()
 {
-    Map::InitStateMachine();
-
-    // debugging code, should be deleted some day
-    {
-        for(int i=0;i<MAX_GRID_STATE; i++)
-        {
-            i_GridStates[i] = si_GridStates[i];
-        }
-        i_GridStateErrorCount = 0;
-    }
-
+    InitStateMachine();
     InitMaxInstanceId();
+}
+
+void MapManager::InitStateMachine()
+{
+    si_GridStates[GRID_STATE_INVALID] = new InvalidState;
+    si_GridStates[GRID_STATE_ACTIVE] = new ActiveState;
+    si_GridStates[GRID_STATE_IDLE] = new IdleState;
+    si_GridStates[GRID_STATE_REMOVAL] = new RemovalState;
+}
+
+void MapManager::DeleteStateMachine()
+{
+    delete si_GridStates[GRID_STATE_INVALID];
+    delete si_GridStates[GRID_STATE_ACTIVE];
+    delete si_GridStates[GRID_STATE_IDLE];
+    delete si_GridStates[GRID_STATE_REMOVAL];
+}
+
+void MapManager::UpdateGridState(grid_state_t state, Map& map, NGridType& ngrid, GridInfo& ginfo, const uint32 &x, const uint32 &y, const uint32 &t_diff)
+{
+    // TODO: The grid state array itself is static and therefore 100% safe, however, the data
+    // the state classes in it accesses is not, since grids are shared across maps (for example
+    // in instances), so some sort of locking will be necessary later.
+
+    si_GridStates[state]->Update(map, ngrid, ginfo, x, y, t_diff);
 }
 
 void MapManager::InitializeVisibilityDistanceInfo()
 {
     for(MapMapType::iterator iter=i_maps.begin(); iter != i_maps.end(); ++iter)
         (*iter).second->InitVisibilityDistance();
-}
-
-// debugging code, should be deleted some day
-void MapManager::checkAndCorrectGridStatesArray()
-{
-    bool ok = true;
-    for(int i=0;i<MAX_GRID_STATE; i++)
-    {
-        if(i_GridStates[i] != si_GridStates[i])
-        {
-            sLog.outError("MapManager::checkGridStates(), GridState: si_GridStates is currupt !!!");
-            ok = false;
-            si_GridStates[i] = i_GridStates[i];
-        }
-        #ifdef MANGOS_DEBUG
-        // inner class checking only when compiled with debug
-        if(!si_GridStates[i]->checkMagic())
-        {
-            ok = false;
-            si_GridStates[i]->setMagic();
-        }
-        #endif
-    }
-    if(!ok)
-        ++i_GridStateErrorCount;
-    if(i_GridStateErrorCount > 2)
-        ASSERT(false);                                      // force a crash. Too many errors
 }
 
 Map*
@@ -217,7 +204,9 @@ bool MapManager::CanPlayerEnter(uint32 mapid, Player* player)
 
                 if (!instance_map)
                 {
-                    player->GetSession()->SendAreaTriggerMessage("You cannot enter %s while in a ghost mode", mapName);
+                    WorldPacket data(SMSG_CORPSE_IS_NOT_IN_INSTANCE);
+                    player->GetSession()->SendPacket(&data);
+
                     DEBUG_LOG("MAP: Player '%s' doesn't has a corpse in instance '%s' and can't enter", player->GetName(), mapName);
                     return false;
                 }
@@ -257,10 +246,7 @@ MapManager::Update(uint32 diff)
         return;
 
     for(MapMapType::iterator iter=i_maps.begin(); iter != i_maps.end(); ++iter)
-    {
-        checkAndCorrectGridStatesArray();                   // debugging code, should be deleted some day
         iter->second->Update((uint32)i_timer.GetCurrent());
-    }
 
     for (TransportSet::iterator iter = m_Transports.begin(); iter != m_Transports.end(); ++iter)
         (*iter)->Update(i_timer.GetCurrent());
@@ -281,7 +267,7 @@ bool MapManager::ExistMapAndVMap(uint32 mapid, float x,float y)
     int gx=63-p.x_coord;
     int gy=63-p.y_coord;
 
-    return Map::ExistMap(mapid,gx,gy) && Map::ExistVMap(mapid,gx,gy);
+    return GridMap::ExistMap(mapid,gx,gy) && GridMap::ExistVMap(mapid,gx,gy);
 }
 
 bool MapManager::IsValidMAP(uint32 mapid)

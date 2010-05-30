@@ -33,7 +33,7 @@ enum LogLevel
     LOG_LVL_DEBUG   = 3
 };
 
-// bitmask
+// bitmask (not forgot update logFilterData content)
 enum LogFilters
 {
     LOG_FILTER_TRANSPORT_MOVES    = 0x0001,                 // any related to transport moves
@@ -46,7 +46,21 @@ enum LogFilters
     LOG_FILTER_PLAYER_MOVES       = 0x0080,                 // player moves by grid/cell
     LOG_FILTER_PERIODIC_AFFECTS   = 0x0100,                 // DoT/HoT apply trace
     LOG_FILTER_AI_AND_MOVEGENSS   = 0x0200,                 // DoT/HoT apply trace
+    LOG_FILTER_DAMAGE             = 0x0400,                 // Direct/Area damage trace
+    LOG_FILTER_COMBAT             = 0x0800,                 // attack states/roll attack results/etc
+    LOG_FILTER_SPELL_CAST         = 0x1000,                 // spell cast/aura apply/spell proc events
 };
+
+#define LOG_FILTER_COUNT            13
+
+struct LogFilterData
+{
+    char const* name;
+    char const* configName;
+    bool defaultState;
+};
+
+extern LogFilterData logFilterData[LOG_FILTER_COUNT];
 
 enum Color
 {
@@ -129,6 +143,7 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, ACE_Th
         // any log level
         void outCharDump( const char * str, uint32 account_id, uint32 guid, const char * name );
         void outRALog( const char * str, ... )       ATTR_PRINTF(2,3);
+        uint32 GetLogLevel() const { return m_logLevel; }
         void SetLogLevel(char * Level);
         void SetLogFileLevel(char * Level);
         void SetColor(bool stdout_stream, Color color);
@@ -137,6 +152,7 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, ACE_Th
         static void outTimestamp(FILE* file);
         static std::string GetTimestampStr();
         uint32 getLogFilter() const { return m_logFilter; }
+        void SetLogFilter(LogFilters filter, bool on) { if (on) m_logFilter |= filter; else m_logFilter &= ~filter; }
         bool HasLogLevelOrHigher(LogLevel loglvl) const { return m_logLevel >= loglvl || (m_logFileLevel >= loglvl && logfile); }
         bool IsOutCharDump() const { return m_charLog_Dump; }
         bool IsIncludeTime() const { return m_includeTime; }

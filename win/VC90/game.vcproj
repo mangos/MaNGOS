@@ -699,14 +699,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\game\CharacterDatabaseCleaner.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\game\CharacterDatabaseCleaner.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\src\game\CharacterHandler.cpp"
 				>
 			</File>
@@ -752,6 +744,14 @@
 			</File>
 			<File
 				RelativePath="..\..\src\game\GridDefines.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\GridMap.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\GridMap.h"
 				>
 			</File>
 			<File
@@ -1542,6 +1542,14 @@
 		<Filter
 			Name="Tool"
 			>
+			<File
+				RelativePath="..\..\src\game\CharacterDatabaseCleaner.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\CharacterDatabaseCleaner.h"
+				>
+			</File>
 			<File
 				RelativePath="..\..\src\game\Language.h"
 				>

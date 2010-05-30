@@ -607,7 +607,7 @@ bool ChatHandler::HandleGameObjectTurnCommand(const char* args)
     obj->SaveToDB();
     obj->Refresh();
 
-    PSendSysMessage(LANG_COMMAND_TURNOBJMESSAGE, obj->GetGUIDLow(), obj->GetGOInfo()->name, obj->GetGUIDLow(), o);
+    PSendSysMessage(LANG_COMMAND_TURNOBJMESSAGE, obj->GetGUIDLow(), obj->GetGOInfo()->name, obj->GetGUIDLow());
 
     return true;
 }
@@ -1129,7 +1129,7 @@ bool ChatHandler::HandleNpcAddVendorItemCommand(const char* args)
         incrtime = atol(fincrtime);
 
     char* fextendedcost = strtok(NULL, " ");                //add ExtendedCost, default: 0
-    uint32 extendedcost = fextendedcost ? atol(fextendedcost) : 0;
+    int32 extendedcost = fextendedcost ? atol(fextendedcost) : 0;
 
     Creature* vendor = getSelectedCreature();
 
