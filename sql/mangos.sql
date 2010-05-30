@@ -15841,7 +15841,7 @@ INSERT INTO spell_chain VALUES
 /*Dalaran Intellect*/
 (61024,0,61024,1,27126),
 /*Dalaran Brilliance*/
-(61316,0,61316,1,27127);
+(61316,0,61316,1,27127),
 /*DampenMagic*/
 (604,0,604,1,0),
 (8450,604,604,2,0),
