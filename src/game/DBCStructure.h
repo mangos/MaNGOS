@@ -604,6 +604,8 @@ struct CharStartOutfitEntry
     //uint32 Unknown1;                                      // 74, unique values (index-like with gaps ordered in other way as ids)
     //uint32 Unknown2;                                      // 75
     //uint32 Unknown3;                                      // 76
+    //uint32 Unknown4;                                      // 77
+    //uint32 Unknown5;                                      // 78
 };
 
 struct CharTitlesEntry
@@ -754,6 +756,7 @@ struct CurrencyTypesEntry
     //uint32                                                // 7
     //uint32                                                // 8
     //uint32                                                // 9
+    //uint32                                                // 10
 };
 
 struct DurabilityCostsEntry
@@ -1461,9 +1464,10 @@ struct SpellEntry
     //uint32  PowerDisplayId;                               // 228 PowerDisplay.dbc, new in 3.1
     //float   unk_320_4[3];                                 // 229-231  3.2.0
     //uint32  spellDescriptionVariableID;                   // 232      3.2.0
-    uint32  SpellDifficultyId;                              // 233      m_spellDifficultyID - id from SpellDifficulty.dbc
-    //uint32                                                // 174 SpellScaling.dbc?
-    //uint32 unk2[3];                                       // 175-177
+    uint32  SpellDifficultyId;                              // 173      m_spellDifficultyID - id from SpellDifficulty.dbc
+    //float unk_f1;                                         // 174
+    //uint32                                                // 175 SpellScaling.dbc?
+    //uint32 unk2[3];                                       // 176-178
 
     // helpers
     int32 CalculateSimpleValue(SpellEffectIndex eff) const { return EffectBasePoints[eff]; }
