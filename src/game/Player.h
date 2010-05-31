@@ -1410,7 +1410,6 @@ class MANGOS_DLL_SPEC Player : public Unit
         void ReputationChanged(FactionEntry const* factionEntry );
         bool HasQuestForItem( uint32 itemid ) const;
         bool HasQuestForGO(int32 GOId) const;
-        bool HasQuestObjectiveForTarget(int32 creatureOrGOId, bool incomplete = true) const;
         void UpdateForQuestWorldObjects();
         bool CanShareQuest(uint32 quest_id) const;
 
