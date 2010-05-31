@@ -19842,6 +19842,44 @@ bool Player::HasQuestForGO(int32 GOId) const
     return false;
 }
 
+bool Player::HasQuestObjectiveForTarget(int32 creatureOrGOId, bool incomplete /*= true*/) const
+{
+    for( int i = 0; i < MAX_QUEST_LOG_SIZE; ++i )
+    {
+        uint32 questid = GetQuestSlotQuestId(i);
+        if ( questid == 0 )
+            continue;
+
+        QuestStatusMap::const_iterator qs_itr = mQuestStatus.find(questid);
+        if(qs_itr == mQuestStatus.end())
+            continue;
+
+        QuestStatusData const& qs = qs_itr->second;
+
+        // for incopmplete objective we need incomplete quests, for complete objective it can be complete/incomplete
+        if (qs.m_status == QUEST_STATUS_INCOMPLETE || !incomplete && qs.m_status == QUEST_STATUS_COMPLETE)
+        {
+            Quest const* qinfo = sObjectMgr.GetQuestTemplate(questid);
+            if (!qinfo)
+                continue;
+
+            if (GetGroup() && GetGroup()->isRaidGroup() && qinfo->IsAllowedInRaid())
+                continue;
+
+            for (int j = 0; j < QUEST_OBJECTIVES_COUNT; ++j)
+            {
+                // creatureOrGOId have expected signs for creature/go cases, comparison signed
+                if (qinfo->ReqCreatureOrGOId[j] != creatureOrGOId)
+                    continue;
+
+                if (incomplete == (qs.m_creatureOrGOcount[j] < qinfo->ReqCreatureOrGOCount[j]))
+                    return true;
+            }
+        }
+    }
+    return false;
+}
+
 void Player::UpdateForQuestWorldObjects()
 {
     if(m_clientGUIDs.empty())

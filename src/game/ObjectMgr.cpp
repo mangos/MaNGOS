@@ -7409,6 +7409,10 @@ bool PlayerCondition::Meets(Player const * player) const
                 return data->CheckConditionCriteriaMeet(player, value1, value2);
             return false;
         }
+        case CONDITION_QUESTTARGET:
+        {
+            return player->HasQuestObjectiveForTarget(int32(value1), !bool(value2));
+        }
         default:
             return false;
     }
@@ -7631,6 +7635,31 @@ bool PlayerCondition::IsValid(ConditionType condition, uint32 value1, uint32 val
                 return false;
             }
 
+            break;
+        }
+        case CONDITION_QUESTTARGET:
+        {
+            if (int32(value1) > 0)
+            {
+                if (!sObjectMgr.GetCreatureTemplate(value1))
+                {
+                    sLog.outErrorDb("Quest target condition has not existed creature entry %u as first arg, skipped", value1);
+                    return false;
+                }
+            }
+            else if (int32(value1) < 0)
+            {
+                if (!sObjectMgr.GetGameObjectInfo(-int32(value1)))
+                {
+                    sLog.outErrorDb("Quest target condition has not existed gameobject entry %u as first arg, skipped", -int32(value1));
+                    return false;
+                }
+            }
+            else
+            {
+                sLog.outErrorDb("Quest target condition has not existed entry 0 as first arg, skipped");
+                return false;
+            }
             break;
         }
         case CONDITION_NONE:
