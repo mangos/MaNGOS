@@ -6391,6 +6391,15 @@ void Aura::HandleSpellSpecificBoosts(bool apply)
             }
             break;
         }
+        case SPELLFAMILY_DRUID:
+        {
+            // Barkskin
+            if (GetId()==22812 && m_target->HasAura(63057)) // Glyph of Barkskin
+                spellId1 = 63058;                           // Glyph - Barkskin 01
+            else
+                return;
+            break;
+        }
         case SPELLFAMILY_ROGUE:
             // Sprint (skip non player casted spells by category)
             if (GetSpellProto()->SpellFamilyFlags & UI64LIT(0x0000000000000040) && GetSpellProto()->Category == 44)
