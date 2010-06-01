@@ -1070,6 +1070,8 @@ void SpellMgr::LoadSpellProcEvents()
 
         mSpellProcEventMap[entry] = spe;
 
+        bool isCustom = false;
+
         // also add to high ranks
         DoSpellProcEvent worker(spe);
         doForHighRanks(entry,worker);
@@ -1077,22 +1079,42 @@ void SpellMgr::LoadSpellProcEvents()
         if (spe.procFlags == 0)
         {
             if (spell->procFlags==0)
-            {
-                sLog.outErrorDb("Spell %u listed in `spell_proc_event` probally not triggered spell", entry);
-                continue;
-            }
-            customProc++;
+                sLog.outErrorDb("Spell %u listed in `spell_proc_event` probally not triggered spell (no proc flags)", entry);
         }
         else
         {
             if (spell->procFlags==spe.procFlags)
-            {
                 sLog.outErrorDb("Spell %u listed in `spell_proc_event` have exactly same proc flags as in spell.dbc, field value redundent", entry);
-                continue;
-            }
+            else
+                isCustom = true;
         }
 
-        ++count;
+        if (spe.customChance == 0)
+        {
+            /* enable for re-check cases, 0 chance ok for some cases because in some cases it set by another spell/talent spellmod)
+            if (spell->procChance==0 && !spe.ppmRate)
+                sLog.outErrorDb("Spell %u listed in `spell_proc_event` probally not triggered spell (no chance or ppm)", entry);
+            */
+        }
+        else
+        {
+            if (spell->procChance==spe.customChance)
+                sLog.outErrorDb("Spell %u listed in `spell_proc_event` have exactly same custom chance as in spell.dbc, field value redundent", entry);
+            else
+                isCustom = true;
+        }
+
+        // totally redundant record
+        if (!spe.schoolMask && !spe.spellFamilyMask && !spe.spellFamilyMask2 && !spe.procFlags &&
+            !spe.procEx && !spe.ppmRate && !spe.customChance && !spe.cooldown)
+        {
+            sLog.outErrorDb("Spell %u listed in `spell_proc_event` not have any useful data", entry);
+        }
+
+        if (isCustom)
+            ++customProc;
+        else
+            ++count;
     } while( result->NextRow() );
 
     delete result;
