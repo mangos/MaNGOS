@@ -1904,7 +1904,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void InitDisplayIds();
 
         bool IsAtGroupRewardDistance(WorldObject const* pRewardSource) const;
-        bool RewardSinglePlayerAtKill(Unit* pVictim);
+        void RewardSinglePlayerAtKill(Unit* pVictim);
         void RewardPlayerAndGroupAtEvent(uint32 creature_id,WorldObject* pRewardSource);
         bool isHonorOrXPTarget(Unit* pVictim) const;
 
