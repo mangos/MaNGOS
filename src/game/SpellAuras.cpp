@@ -6629,6 +6629,15 @@ void Aura::HandleSpellSpecificBoosts(bool apply)
             }
             break;
         }
+        case SPELLFAMILY_DRUID:
+        {
+            // Barkskin
+            if (GetId()==22812 && m_target->HasAura(63057)) // Glyph of Barkskin
+                spellId1 = 63058;                           // Glyph - Barkskin 01
+            else
+                return;
+            break;
+        }
         case SPELLFAMILY_ROGUE:
             // Sprint (skip non player casted spells by category)
             if (GetSpellProto()->SpellFamilyFlags & UI64LIT(0x0000000000000040) && GetSpellProto()->Category == 44)
@@ -8399,9 +8408,6 @@ void Aura::PeriodicDummyTick()
             // Summon Gargoyle
 //            if (spell->SpellFamilyFlags & UI64LIT(0x0000008000000000))
 //                return;
-            // Death Rune Mastery
-//            if (spell->SpellFamilyFlags & UI64LIT(0x0000000000004000))
-//                return;
             // Bladed Armor
             if (spell->SpellIconID == 2653)
             {
@@ -8411,12 +8417,46 @@ void Aura::PeriodicDummyTick()
                 m_target->CastCustomSpell(m_target, 61217, &apBonus, &apBonus, NULL, true, NULL, this);
                 return;
             }
-            // Reaping
-//            if (spell->SpellIconID == 22)
-//                return;
-            // Blood of the North
-//            if (spell->SpellIconID == 30412)
-//                return;
+            // Death Rune Mastery
+            if (spell->SpellIconID == 2622)
+            {
+                if (m_target->GetTypeId() != TYPEID_PLAYER || m_target->isInCombat())
+                    return;
+
+                Player *player = (Player*)m_target;
+                for (uint32 i = 0; i < MAX_RUNES; ++i)
+                {
+                    if (!player->GetRuneCooldown(i))
+                    {
+                        RuneType type = player->GetBaseRune(i);
+                        if (player->GetCurrentRune(i) == RUNE_DEATH && (type == RUNE_FROST || type == RUNE_UNHOLY) && player->IsRuneConvertedBy(i, spell->Id))
+                        {
+                            player->ConvertRune(i, type);
+                            player->ClearConvertedBy(i);
+                        }
+                    }
+                }
+            }
+            // Blood of the North and Reaping
+            if (spell->SpellIconID == 3041 || spell->SpellIconID == 22)
+            {
+                if (m_target->GetTypeId() != TYPEID_PLAYER || m_target->isInCombat())
+                    return;
+
+                Player *player = (Player*)m_target;
+                for (uint32 i = 0; i < MAX_RUNES; ++i)
+                {
+                    if (!player->GetRuneCooldown(i) && player->IsRuneConvertedBy(i, spell->Id))
+                    {
+                        RuneType type = player->GetBaseRune(i);
+                        if (player->GetCurrentRune(i) == RUNE_DEATH && type == RUNE_BLOOD)
+                        {
+                            player->ConvertRune(i, type);
+                            player->ClearConvertedBy(i);
+                        }
+                    }
+                }
+            }
             break;
         }
         default:
@@ -8536,7 +8576,7 @@ void Aura::HandleAuraConvertRune(bool apply, bool Real)
         {
             if (plr->GetCurrentRune(i) == runeFrom && !plr->GetRuneCooldown(i))
             {
-                plr->ConvertRune(i, runeTo);
+                plr->ConvertRune(i, runeTo, GetId());
                 break;
             }
         }
@@ -8548,6 +8588,7 @@ void Aura::HandleAuraConvertRune(bool apply, bool Real)
             if(plr->GetCurrentRune(i) == runeTo && plr->GetBaseRune(i) == runeFrom)
             {
                 plr->ConvertRune(i, runeFrom);
+                plr->ClearConvertedBy(i);
                 break;
             }
         }
