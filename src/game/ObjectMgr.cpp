@@ -166,15 +166,15 @@ ObjectMgr::~ObjectMgr()
         delete i->second;
 
     for(PetLevelInfoMap::iterator i = petInfo.begin( ); i != petInfo.end( ); ++i )
-        delete i->second;
+        delete [] i->second;
 
     // free only if loaded
     for (int class_ = 0; class_ < MAX_CLASSES; ++class_)
-        delete playerClassInfo[class_].levelInfo;
+        delete [] playerClassInfo[class_].levelInfo;
 
     for (int race = 0; race < MAX_RACES; ++race)
         for (int class_ = 0; class_ < MAX_CLASSES; ++class_)
-        delete playerInfo[race][class_].levelInfo;
+        delete [] playerInfo[race][class_].levelInfo;
 
     // free group and guild objects
     for (GroupMap::iterator itr = mGroupMap.begin(); itr != mGroupMap.end(); ++itr)
