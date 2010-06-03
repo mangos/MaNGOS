@@ -192,30 +192,47 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, ACE_Th
 
 #define sLog MaNGOS::Singleton<Log>::Instance()
 
-#define BASIC_LOG(...) \
-    if (sLog.HasLogLevelOrHigher(LOG_LVL_BASIC)) \
-        sLog.outBasic(__VA_ARGS__)
-#define BASIC_FILTER_LOG(F,...) \
-    if (sLog.HasLogLevelOrHigher(LOG_LVL_BASIC) && (sLog.getLogFilter() & (F))==0) \
-        sLog.outBasic(__VA_ARGS__)
+#define BASIC_LOG(...)                                  \
+    do {                                                \
+        if (sLog.HasLogLevelOrHigher(LOG_LVL_BASIC))    \
+            sLog.outBasic(__VA_ARGS__);                 \
+    } while(0)
 
-#define DETAIL_LOG(...) \
-    if (sLog.HasLogLevelOrHigher(LOG_LVL_DETAIL)) \
-        sLog.outDetail(__VA_ARGS__)
-#define DETAIL_FILTER_LOG(F,...) \
-    if (sLog.HasLogLevelOrHigher(LOG_LVL_DETAIL) && (sLog.getLogFilter() & (F))==0) \
-        sLog.outDetail(__VA_ARGS__)
+#define BASIC_FILTER_LOG(F,...)                         \
+    do {                                                \
+        if (sLog.HasLogLevelOrHigher(LOG_LVL_BASIC) && (sLog.getLogFilter() & (F))==0) \
+            sLog.outBasic(__VA_ARGS__);                 \
+    } while(0)
 
-#define DEBUG_LOG(...) \
-    if (sLog.HasLogLevelOrHigher(LOG_LVL_DEBUG)) \
-        sLog.outDebug(__VA_ARGS__)
-#define DEBUG_FILTER_LOG(F,...) \
-    if (sLog.HasLogLevelOrHigher(LOG_LVL_DEBUG) && (sLog.getLogFilter() & (F))==0) \
-        sLog.outDebug(__VA_ARGS__)
+#define DETAIL_LOG(...)                                 \
+    do {                                                \
+        if (sLog.HasLogLevelOrHigher(LOG_LVL_DETAIL))   \
+            sLog.outDetail(__VA_ARGS__);                \
+    } while(0)
 
-#define ERROR_DB_FILTER_LOG(F,...) \
-    if ((sLog.getLogFilter() & (F))==0) \
-        sLog.outErrorDb(__VA_ARGS__)
+#define DETAIL_FILTER_LOG(F,...)                        \
+    do {                                                \
+        if (sLog.HasLogLevelOrHigher(LOG_LVL_DETAIL) && (sLog.getLogFilter() & (F))==0) \
+            sLog.outDetail(__VA_ARGS__);                \
+    } while(0)
+
+#define DEBUG_LOG(...)                                  \
+    do {                                                \
+        if (sLog.HasLogLevelOrHigher(LOG_LVL_DEBUG))    \
+            sLog.outDebug(__VA_ARGS__);                 \
+    } while(0)
+
+#define DEBUG_FILTER_LOG(F,...)                         \
+    do {                                                \
+        if (sLog.HasLogLevelOrHigher(LOG_LVL_DEBUG) && (sLog.getLogFilter() & (F))==0) \
+            sLog.outDebug(__VA_ARGS__);                 \
+    } while(0)
+
+#define ERROR_DB_FILTER_LOG(F,...)                      \
+    do {                                                \
+        if ((sLog.getLogFilter() & (F))==0)             \
+            sLog.outErrorDb(__VA_ARGS__);               \
+    } while(0)
 
 #define ERROR_DB_STRICT_LOG(...) \
     ERROR_DB_FILTER_LOG(LOG_FILTER_DB_STRICTED_CHECK, __VA_ARGS__)
