@@ -49,9 +49,10 @@ enum LogFilters
     LOG_FILTER_DAMAGE             = 0x0400,                 // Direct/Area damage trace
     LOG_FILTER_COMBAT             = 0x0800,                 // attack states/roll attack results/etc
     LOG_FILTER_SPELL_CAST         = 0x1000,                 // spell cast/aura apply/spell proc events
+    LOG_FILTER_DB_STRICTED_CHECK  = 0x2000,                 // stricted DB data checks output (with possible false reports) for DB devs
 };
 
-#define LOG_FILTER_COUNT            13
+#define LOG_FILTER_COUNT            14
 
 struct LogFilterData
 {
@@ -211,6 +212,13 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, ACE_Th
 #define DEBUG_FILTER_LOG(F,...) \
     if (sLog.HasLogLevelOrHigher(LOG_LVL_DEBUG) && (sLog.getLogFilter() & (F))==0) \
         sLog.outDebug(__VA_ARGS__)
+
+#define ERROR_DB_FILTER_LOG(F,...) \
+    if ((sLog.getLogFilter() & (F))==0) \
+        sLog.outErrorDb(__VA_ARGS__)
+
+#define ERROR_DB_STRICT_LOG(...) \
+    ERROR_DB_FILTER_LOG(LOG_FILTER_DB_STRICTED_CHECK, __VA_ARGS__)
 
 // primary for script library
 void MANGOS_DLL_SPEC outstring_log(const char * str, ...) ATTR_PRINTF(1,2);
