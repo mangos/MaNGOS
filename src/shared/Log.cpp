@@ -47,6 +47,7 @@ LogFilterData logFilterData[LOG_FILTER_COUNT] =
     { "damage",              "LogFilter_Damage",             false },
     { "combat",              "LogFilter_Combat",             false },
     { "spell_cast",          "LogFilter_SpellCast",          false },
+    { "db_stricted_check",   "LogFilter_DbStrictedCheck",    true  },
 };
 
 enum LogType

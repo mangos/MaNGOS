@@ -39,6 +39,7 @@ class Field
         ~Field();
 
         enum DataTypes GetType() const { return mType; }
+        bool IsNULL() const { return mValue == NULL; }
 
         const char *GetString() const { return mValue; }
         std::string GetCppString() const
