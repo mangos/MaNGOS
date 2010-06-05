@@ -2769,17 +2769,6 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
         }
         case SPELLFAMILY_PRIEST:
         {
-            // Penance
-            if (m_spellProto->SpellIconID == 2818)
-            {
-                Unit* caster = GetCaster();
-                if (!caster || caster->GetTypeId() != TYPEID_PLAYER)
-                    return;
-
-                if (apply && m_target)
-                    ((Player*)caster)->SetSelection(m_target->GetGUID());
-                return;
-            }
             // Pain and Suffering
             if (m_spellProto->SpellIconID == 2874 && m_target->GetTypeId()==TYPEID_PLAYER)
             {
