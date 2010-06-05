@@ -3946,6 +3946,9 @@ void Aura::HandleAuraModStun(bool apply, bool Real)
 
     Unit *target = GetTarget();
 
+    if(target->isInFlight())
+        return;
+
     if (apply)
     {
         // Frost stun aura -> freeze/unfreeze target
