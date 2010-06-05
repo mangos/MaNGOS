@@ -1494,6 +1494,15 @@ void Aura::HandleAddModifier(bool apply, bool Real)
     ((Player*)GetTarget())->AddSpellMod(m_spellmod, apply);
 
     ReapplyAffectedPassiveAuras();
+
+    if(GetSpellProto()->SpellFamilyName == SPELLFAMILY_DRUID && (m_spellmod->mask2 & UI64LIT(0x20000)))
+    {
+        GetTarget()->RemoveAurasDueToSpell(66530);
+
+        // Aura 66530 is immediately applied ONLY when "Improved Barkskin" is learned in Caster/Travel Form
+        if(apply && (GetTarget()->m_form == FORM_NONE || GetTarget()->m_form == FORM_TRAVEL))
+            GetTarget()->CastSpell(GetTarget(),66530,true);
+    }
 }
 
 void Aura::TriggerSpell()
@@ -6217,6 +6226,18 @@ void Aura::HandleShapeshiftBoosts(bool apply)
                 }
             }
 
+            // Improved Barkskin - apply/remove armor bonus due to shapeshift remove
+            if (((Player*)target)->HasSpell(63410) || ((Player*)target)->HasSpell(63411))
+            {
+                if (form == FORM_TRAVEL)
+                {
+                    target->RemoveAurasDueToSpell(66530);
+                    target->CastSpell(target,66530,true);
+                }
+                else
+                    target->RemoveAurasDueToSpell(66530);
+            }
+
             // Heart of the Wild
             if (HotWSpellId)
             {
@@ -6255,6 +6276,12 @@ void Aura::HandleShapeshiftBoosts(bool apply)
             }
             else
                 ++itr;
+        }
+        // Improved Barkskin - apply/remove armor bonus due to shapeshift
+        if (((Player*)target)->HasSpell(63410) || ((Player*)target)->HasSpell(63411))
+        {
+            target->RemoveAurasDueToSpell(66530);
+            target->CastSpell(target,66530,true);
         }
     }
 }
