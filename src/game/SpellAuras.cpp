@@ -2163,28 +2163,6 @@ void Aura::TriggerSpell()
 
                 break;
             }
-            // Earthen Power (from Earthbind Totem Passive)
-            case 6474:
-            {
-                Unit *owner = target->GetOwner();
-
-                if (!owner)
-                    break;
-
-                Unit::AuraList const& dummyAuras = owner->GetAurasByType(SPELL_AURA_DUMMY);
-                for(Unit::AuraList::const_iterator itr = dummyAuras.begin(); itr != dummyAuras.end(); ++itr)
-                {
-                    if ((*itr)->GetSpellProto()->SpellIconID == 2289 && (*itr)->GetSpellProto()->SpellFamilyName == SPELLFAMILY_SHAMAN)
-                    {
-                        if (!roll_chance_i((*itr)->GetModifier()->m_amount))
-                            break;
-
-                        target->CastSpell(target, 59566, true, NULL, this);
-                        break;
-                    }
-                 }
-                break;
-             }
             // Mana Tide
             case 16191:
             {
