@@ -38,9 +38,10 @@ void WorldSession::HandleQuestgiverStatusQueryOpcode( WorldPacket & recv_data )
     uint8 defstatus = DIALOG_STATUS_NONE;
 
     Object* questgiver = _player->GetObjectByTypeMask(guid, TYPEMASK_CREATURE_OR_GAMEOBJECT);
-    if(!questgiver)
+
+    if (!questgiver)
     {
-        DETAIL_LOG("Error in CMSG_QUESTGIVER_STATUS_QUERY, called for not found questgiver (Typeid: %u GUID: %u)",GuidHigh2TypeId(GUID_HIPART(guid)),GUID_LOPART(guid));
+        DETAIL_LOG("Error in CMSG_QUESTGIVER_STATUS_QUERY, called for not found questgiver (Typeid: %u GUID: %u)", GuidHigh2TypeId(GUID_HIPART(guid)), GUID_LOPART(guid));
         return;
     }
 
@@ -48,23 +49,29 @@ void WorldSession::HandleQuestgiverStatusQueryOpcode( WorldPacket & recv_data )
     {
         case TYPEID_UNIT:
         {
-            DEBUG_LOG( "WORLD: Received CMSG_QUESTGIVER_STATUS_QUERY for npc, guid = %u",uint32(GUID_LOPART(guid)) );
-            Creature* cr_questgiver=(Creature*)questgiver;
-            if( !cr_questgiver->IsHostileTo(_player))       // not show quest status to enemies
+            DEBUG_LOG("WORLD: Received CMSG_QUESTGIVER_STATUS_QUERY for npc, guid = %u", uint32(GUID_LOPART(guid)));
+
+            Creature* cr_questgiver = (Creature*)questgiver;
+
+            if (!cr_questgiver->IsHostileTo(_player))       // not show quest status to enemies
             {
                 questStatus = Script->NPCDialogStatus(_player, cr_questgiver);
-                if( questStatus > 6 )
+
+                if (questStatus > DIALOG_STATUS_REWARD_REP)
                     questStatus = getDialogStatus(_player, cr_questgiver, defstatus);
             }
             break;
         }
         case TYPEID_GAMEOBJECT:
         {
-            DEBUG_LOG( "WORLD: Received CMSG_QUESTGIVER_STATUS_QUERY for GameObject guid = %u",uint32(GUID_LOPART(guid)) );
-            GameObject* go_questgiver=(GameObject*)questgiver;
+            DEBUG_LOG("WORLD: Received CMSG_QUESTGIVER_STATUS_QUERY for GameObject guid = %u", uint32(GUID_LOPART(guid)));
+
+            GameObject* go_questgiver = (GameObject*)questgiver;
             questStatus = Script->GODialogStatus(_player, go_questgiver);
-            if( questStatus > 6 )
+
+            if (questStatus > DIALOG_STATUS_REWARD_REP)
                 questStatus = getDialogStatus(_player, go_questgiver, defstatus);
+
             break;
         }
         default:
@@ -648,12 +655,16 @@ void WorldSession::HandleQuestgiverStatusMultipleQuery(WorldPacket& /*recvPacket
         {
             // need also pet quests case support
             Creature *questgiver = GetPlayer()->GetMap()->GetCreatureOrPetOrVehicle(*itr);
-            if(!questgiver || questgiver->IsHostileTo(_player))
+
+            if (!questgiver || questgiver->IsHostileTo(_player))
                 continue;
-            if(!questgiver->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER))
+
+            if (!questgiver->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER))
                 continue;
+
             questStatus = Script->NPCDialogStatus(_player, questgiver);
-            if( questStatus > 6 )
+
+            if (questStatus > DIALOG_STATUS_REWARD_REP)
                 questStatus = getDialogStatus(_player, questgiver, defstatus);
 
             data << uint64(questgiver->GetGUID());
@@ -663,12 +674,16 @@ void WorldSession::HandleQuestgiverStatusMultipleQuery(WorldPacket& /*recvPacket
         else if (itr->IsGameobject())
         {
             GameObject *questgiver = GetPlayer()->GetMap()->GetGameObject(*itr);
-            if(!questgiver)
+
+            if (!questgiver)
                 continue;
-            if(questgiver->GetGoType() != GAMEOBJECT_TYPE_QUESTGIVER)
+
+            if (questgiver->GetGoType() != GAMEOBJECT_TYPE_QUESTGIVER)
                 continue;
+
             questStatus = Script->GODialogStatus(_player, questgiver);
-            if( questStatus > 6 )
+
+            if (questStatus > DIALOG_STATUS_REWARD_REP)
                 questStatus = getDialogStatus(_player, questgiver, defstatus);
 
             data << uint64(questgiver->GetGUID());
