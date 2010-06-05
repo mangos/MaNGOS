@@ -2186,7 +2186,7 @@ void Unit::CalculateAbsorbAndResist(Unit *pCaster, SpellSchoolMask schoolMask, D
         {
             if ((*i)->GetModifier()->m_amount<=0)
             {
-                RemoveAurasDueToSpell((*i)->GetId());
+                RemoveAurasDueToSpell((*i)->GetId(), NULL, AURA_REMOVE_BY_SHIELD_BREAK);
                 i = vSchoolAbsorb.begin();
             }
             else
@@ -3428,7 +3428,7 @@ void Unit::_UpdateSpells( uint32 time )
         if ((*i).second)
         {
             if ( !(*i).second->GetAuraDuration() && !((*i).second->IsPermanent() || ((*i).second->IsPassive())) )
-                RemoveAura(i);
+                RemoveAura(i, AURA_REMOVE_BY_EXPIRE);
             else
                 ++i;
         }
@@ -4261,14 +4261,14 @@ bool Unit::RemoveNoStackAurasDueToAura(Aura *Aur)
     return true;
 }
 
-void Unit::RemoveAura(uint32 spellId, SpellEffectIndex effindex, Aura* except)
+void Unit::RemoveAura(uint32 spellId, SpellEffectIndex effindex, Aura* except, AuraRemoveMode mode)
 {
     spellEffectPair spair = spellEffectPair(spellId, effindex);
     for(AuraMap::iterator iter = m_Auras.lower_bound(spair); iter != m_Auras.upper_bound(spair);)
     {
         if(iter->second!=except)
         {
-            RemoveAura(iter);
+            RemoveAura(iter, mode);
             iter = m_Auras.lower_bound(spair);
         }
         else
@@ -4495,10 +4495,10 @@ void Unit::RemoveSingleAuraByCasterSpell(uint32 spellId, SpellEffectIndex effind
 }
 
 
-void Unit::RemoveAurasDueToSpell(uint32 spellId, Aura* except)
+void Unit::RemoveAurasDueToSpell(uint32 spellId, Aura* except, AuraRemoveMode mode)
 {
     for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
-        RemoveAura(spellId,SpellEffectIndex(i),except);
+        RemoveAura(spellId,SpellEffectIndex(i),except, mode);
 }
 
 void Unit::RemoveAurasDueToItemSpell(Item* castItem,uint32 spellId)
