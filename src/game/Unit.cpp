@@ -7294,72 +7294,6 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                 triggered_spell_id = 50526;
                 break;
             }
-            // Blood of the North and Reaping
-            if (dummySpell->SpellIconID == 3041 || dummySpell->SpellIconID == 22)
-            {
-                if(GetTypeId()!=TYPEID_PLAYER)
-                    return false;
-                
-                Player *player = (Player*)this;
-                for (uint32 i = 0; i < MAX_RUNES; ++i)
-                {
-                    if (player->GetCurrentRune(i) == RUNE_BLOOD)
-                    {
-                        if(!player->GetRuneCooldown(i))
-                            player->ConvertRune(i, RUNE_DEATH, dummySpell->Id);
-                        else
-                        {
-                            // search for another rune that might be available
-                            for (uint32 iter = i; iter < MAX_RUNES; ++iter)
-                            {
-                                if(player->GetCurrentRune(iter) == RUNE_BLOOD && !player->GetRuneCooldown(iter))
-                                {
-                                    player->ConvertRune(iter, RUNE_DEATH, dummySpell->Id);
-                                    triggeredByAura->SetAuraPeriodicTimer(0);
-                                    return true;
-                                }
-                            }
-                            player->SetNeedConvertRune(i, true, dummySpell->Id);
-                        }
-                        triggeredByAura->SetAuraPeriodicTimer(0);
-                        return true;
-                    }
-                }
-                return false;
-            }
-            // Death Rune Mastery
-            if (dummySpell->SpellIconID == 2622)
-            {
-                if(GetTypeId()!=TYPEID_PLAYER)
-                    return false;
-                
-                Player *player = (Player*)this;
-                for (uint32 i = 0; i < MAX_RUNES; ++i)
-                {
-                    RuneType currRune = player->GetCurrentRune(i);
-                    if (currRune == RUNE_UNHOLY || currRune == RUNE_FROST)
-                    {
-                        uint16 cd = player->GetRuneCooldown(i);
-                        if(!cd)
-                            player->ConvertRune(i, RUNE_DEATH, dummySpell->Id);
-                        else // there is a cd
-                            player->SetNeedConvertRune(i, true, dummySpell->Id);
-                        // no break because it converts all
-                    }
-                }
-                triggeredByAura->SetAuraPeriodicTimer(0);
-                return true;
-            }
-            // Blood-Caked Blade
-            if (dummySpell->SpellIconID == 138)
-            {
-                // only melee auto attack affected
-                if (!(procFlag & PROC_FLAG_SUCCESSFUL_MELEE_HIT) && procSpell->Id != 56815)
-                    return false;
-
-                triggered_spell_id = dummySpell->EffectTriggerSpell[effIndex];
-                break;
-            }
             break;
         }
         default:
@@ -12854,7 +12788,6 @@ void Unit::ProcDamageAndSpellFor( bool isVictim, Unit * pTarget, uint32 procFlag
             case SPELL_AURA_MANA_SHIELD:
             case SPELL_AURA_OBS_MOD_MANA:
             case SPELL_AURA_ADD_PCT_MODIFIER:
-            case SPELL_AURA_PERIODIC_DUMMY:
             case SPELL_AURA_DUMMY:
             {
                 DEBUG_FILTER_LOG(LOG_FILTER_SPELL_CAST, "ProcDamageAndSpell: casting spell id %u (triggered by %s dummy aura of spell %u)", spellInfo->Id,(isVictim?"a victim's":"an attacker's"), triggeredByAura->GetId());
