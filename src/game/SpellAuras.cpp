@@ -1493,15 +1493,6 @@ void Aura::HandleAddModifier(bool apply, bool Real)
     ((Player*)m_target)->AddSpellMod(m_spellmod, apply);
 
     ReapplyAffectedPassiveAuras();
-
-    if(m_spellProto->SpellFamilyName == SPELLFAMILY_DRUID && (m_spellmod->mask2 & UI64LIT(0x20000)))
-    {
-        m_target->RemoveAurasDueToSpell(66530);
-
-        // Aura 66530 is immediately applied ONLY when "Improved Barkskin" is learned in Caster/Travel Form
-        if(apply && (m_target->m_form == FORM_NONE || m_target->m_form == FORM_TRAVEL))
-            m_target->CastSpell(m_target,66530,true);
-    }
 }
 
 void Aura::TriggerSpell()
@@ -6281,18 +6272,6 @@ void Aura::HandleShapeshiftBoosts(bool apply)
                 }
             }
 
-            // Improved Barkskin - apply/remove armor bonus due to shapeshift remove
-            if (((Player*)m_target)->HasSpell(63410) || ((Player*)m_target)->HasSpell(63411))
-            {
-                if (form == FORM_TRAVEL)
-                {
-                    m_target->RemoveAurasDueToSpell(66530);
-                    m_target->CastSpell(m_target,66530,true);
-                }
-                else
-                    m_target->RemoveAurasDueToSpell(66530);
-            }
-
             // Survival of the Fittest (Armor part)
             if (form == FORM_BEAR || form == FORM_DIREBEAR)
             {
@@ -6348,12 +6327,6 @@ void Aura::HandleShapeshiftBoosts(bool apply)
             }
             else
                 ++itr;
-        }
-        // Improved Barkskin - apply/remove armor bonus due to shapeshift
-        if (((Player*)m_target)->HasSpell(63410) || ((Player*)m_target)->HasSpell(63411))
-        {
-            m_target->RemoveAurasDueToSpell(66530);
-            m_target->CastSpell(m_target,66530,true);
         }
     }
 }
