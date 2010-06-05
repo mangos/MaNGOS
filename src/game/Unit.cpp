@@ -6144,6 +6144,20 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     triggered_spell_id = 39373;
                     break;
                 }
+                // Item - Priest T10 Healer 4P Bonus
+                case 70799:
+                {
+                    if (GetTypeId() != TYPEID_PLAYER)
+                        return false;
+                    
+                    // Circle of Healing
+                    ((Player*)this)->RemoveSpellCategoryCooldown(1204, true);
+
+                    // Penance
+                    ((Player*)this)->RemoveSpellCategoryCooldown(1230, true);
+
+                    return true;
+                }
                 // Greater Heal (Vestments of Faith (Priest Tier 3) - 4 pieces bonus)
                 case 28809:
                 {
@@ -6297,6 +6311,14 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     pVictim->CastSpell(second, procSpell, true, NULL, triggeredByAura, GetGUID());
                     return true;
                 }
+                // Item - Druid T10 Balance 4P Bonus
+                case 70723:
+                {
+                    basepoints[0] = int32( triggerAmount * damage / 100 );
+                    basepoints[0] = int32( basepoints[0] / 2);
+                    triggered_spell_id = 71023;
+                    break;
+                }				
             }
             // King of the Jungle
             if (dummySpell->SpellIconID == 2850)
@@ -6991,6 +7013,26 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     triggered_spell_id = 71824;
                     break;
                 }
+                // Item - Shaman T10 Restoration 4P Bonus
+                case 70808:
+                {
+                    basepoints[0] = int32( triggerAmount * damage / 100 );
+                    basepoints[0] = int32( basepoints[0] / 3); // basepoints is for 1 tick, not all DoT amount
+                    triggered_spell_id = 70809;
+                    break;
+                }
+                // Item - Shaman T10 Elemental 4P Bonus
+                case 70817:
+                {
+                    if (Aura *aur = pVictim->GetAura(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_SHAMAN, UI64LIT(0x0000000010000000), 0, GetGUID()))
+                    {
+                        int32 amount = aur->GetAuraDuration() + triggerAmount * IN_MILLISECONDS;
+                        aur->SetAuraDuration(amount);
+                        aur->SendAuraUpdate(false);
+                        return true;
+                    }
+                    return false;
+                }				
             }
             // Storm, Earth and Fire
             if (dummySpell->SpellIconID == 3063)
@@ -7873,6 +7915,14 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
             }
             break;
         }
+        case SPELLFAMILY_ROGUE:
+            // Item - Rogue T10 2P Bonus
+            if (auraSpellInfo->Id == 70805)
+            {
+                if (pVictim != this)
+                    return false;
+            }
+            break;
         case SPELLFAMILY_HUNTER:
             // Piercing Shots
             if (auraSpellInfo->SpellIconID == 3247 && auraSpellInfo->SpellVisual[0] == 0)
