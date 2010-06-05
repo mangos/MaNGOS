@@ -2180,10 +2180,6 @@ void Aura::TriggerSpell()
                     caster->CastSpell(target, trigger_spell_id, true, NULL, this);
                 return;
             }
-            // Intense Cold
-            case 48094:
-                target->CastSpell(target, trigger_spell_id, true, NULL, this);
-                return;
             // Beacon of Light
             case 53563:
                 // original caster must be target (beacon)
