@@ -314,6 +314,7 @@ void FlightPathMovementGenerator::Finalize(Player & player)
 
     float x, y, z;
     i_destinationHolder.GetLocationNow(player.GetBaseMap(), x, y, z);
+    player.Anti__SetLastTeleTime(time(NULL));
     player.SetPosition(x, y, z, player.GetOrientation());
 
     player.Unmount();
