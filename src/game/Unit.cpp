@@ -7248,7 +7248,7 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
             if (dummySpell->SpellIconID == 2709)
             {
                 // only melee auto attack affected
-                if (!(procFlag & PROC_FLAG_SUCCESSFUL_MELEE_HIT) && procSpell->Id != 56815)
+                if (!(procFlag & PROC_FLAG_SUCCESSFUL_MELEE_HIT))
                     return false;
 
                 basepoints[0] = triggerAmount * damage / 100;
@@ -7435,6 +7435,12 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     return false;
                 basepoints[0] = triggerAmount * damage / 100;
                 triggered_spell_id = 50526;
+                break;
+            }
+            // Blood-Caked Blade
+            if (dummySpell->SpellIconID == 138)
+            {
+                triggered_spell_id = dummySpell->EffectTriggerSpell[effIndex];
                 break;
             }
             // Hungering Cold - not break from diseases
