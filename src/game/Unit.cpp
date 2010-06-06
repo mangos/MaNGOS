@@ -6054,10 +6054,7 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     if (!procSpell)
                         return false;
 
-                    if (triggeredByAura->GetEffIndex() != EFFECT_INDEX_1)
-                        return false;
-
-                    Aura* healingAura = pVictim->GetAura(SPELL_AURA_PERIODIC_HEAL, SPELLFAMILY_PRIEST, UI64LIT(0x40), 0, GetGUID());
+                    Aura* healingAura = pVictim->GetAura(procSpell->Id, EFFECT_INDEX_0);
                     if (!healingAura)
                         return false;
 
