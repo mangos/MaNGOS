@@ -1066,7 +1066,10 @@ void Unit::CastSpell(Unit* Victim, uint32 spellId, bool triggered, Item *castIte
 
     if(!spellInfo)
     {
-        sLog.outError("CastSpell: unknown spell id %i by caster: %s", spellId, GetObjectGuid().GetString().c_str());
+        if (triggeredByAura)
+            sLog.outError("CastSpell: unknown spell id %i by caster: %s triggered by aura %u (eff %u)", spellId, GetObjectGuid().GetString().c_str(), triggeredByAura->GetId(), triggeredByAura->GetEffIndex());
+        else
+            sLog.outError("CastSpell: unknown spell id %i by caster: %s", spellId, GetObjectGuid().GetString().c_str());
         return;
     }
 
@@ -1077,7 +1080,10 @@ void Unit::CastSpell(Unit* Victim, SpellEntry const *spellInfo, bool triggered, 
 {
     if(!spellInfo)
     {
-        sLog.outError("CastSpell: unknown spell by caster: %s", GetObjectGuid().GetString().c_str());
+        if (triggeredByAura)
+            sLog.outError("CastSpell: unknown spell by caster: %s triggered by aura %u (eff %u)", GetObjectGuid().GetString().c_str(), triggeredByAura->GetId(), triggeredByAura->GetEffIndex());
+        else
+            sLog.outError("CastSpell: unknown spell by caster: %s", GetObjectGuid().GetString().c_str());
         return;
     }
 
@@ -1101,7 +1107,10 @@ void Unit::CastCustomSpell(Unit* Victim,uint32 spellId, int32 const* bp0, int32 
 
     if(!spellInfo)
     {
-        sLog.outError("CastCustomSpell: unknown spell id %i by caster: %s", spellId, GetObjectGuid().GetString().c_str());
+        if (triggeredByAura)
+            sLog.outError("CastCustomSpell: unknown spell id %i by caster: %s triggered by aura %u (eff %u)", spellId, GetObjectGuid().GetString().c_str(), triggeredByAura->GetId(), triggeredByAura->GetEffIndex());
+        else
+            sLog.outError("CastCustomSpell: unknown spell id %i by caster: %s", spellId, GetObjectGuid().GetString().c_str());
         return;
     }
 
@@ -1112,7 +1121,10 @@ void Unit::CastCustomSpell(Unit* Victim, SpellEntry const *spellInfo, int32 cons
 {
     if(!spellInfo)
     {
-        sLog.outError("CastCustomSpell: unknown spell by caster: %s", GetObjectGuid().GetString().c_str());
+        if (triggeredByAura)
+            sLog.outError("CastCustomSpell: unknown spell by caster: %s triggered by aura %u (eff %u)", GetObjectGuid().GetString().c_str(), triggeredByAura->GetId(), triggeredByAura->GetEffIndex());
+        else
+            sLog.outError("CastCustomSpell: unknown spell by caster: %s", GetObjectGuid().GetString().c_str());
         return;
     }
 
@@ -1146,7 +1158,10 @@ void Unit::CastSpell(float x, float y, float z, uint32 spellId, bool triggered, 
 
     if(!spellInfo)
     {
-        sLog.outError("CastSpell(x,y,z): unknown spell id %i by caster: %s", spellId, GetObjectGuid().GetString().c_str());
+        if (triggeredByAura)
+            sLog.outError("CastSpell(x,y,z): unknown spell id %i by caster: %s triggered by aura %u (eff %u)", spellId, GetObjectGuid().GetString().c_str(), triggeredByAura->GetId(), triggeredByAura->GetEffIndex());
+        else
+            sLog.outError("CastSpell(x,y,z): unknown spell id %i by caster: %s", spellId, GetObjectGuid().GetString().c_str());
         return;
     }
 
@@ -1158,7 +1173,10 @@ void Unit::CastSpell(float x, float y, float z, SpellEntry const *spellInfo, boo
 {
     if(!spellInfo)
     {
-        sLog.outError("CastSpell(x,y,z): unknown spell by caster: %s", GetObjectGuid().GetString().c_str());
+        if (triggeredByAura)
+            sLog.outError("CastSpell(x,y,z): unknown spell by caster: %s triggered by aura %u (eff %u)", GetObjectGuid().GetString().c_str(), triggeredByAura->GetId(), triggeredByAura->GetEffIndex());
+        else
+            sLog.outError("CastSpell(x,y,z): unknown spell by caster: %s", GetObjectGuid().GetString().c_str());
         return;
     }
 
@@ -2258,12 +2276,14 @@ void Unit::CalculateAbsorbAndResist(Unit *pCaster, SpellSchoolMask schoolMask, D
 
                 int32 amount = int32(incanterAbsorption * (*itr)->GetModifier()->m_amount / 100);
 
+                uint32 triggered_id = itr_spellProto->EffectTriggerSpell[(*itr)->GetEffIndex()];
+
                 // apply normalized part of already accumulated amount in aura
-                if (Aura* spdAura = GetAura(44413, EFFECT_INDEX_0))
+                if (Aura* spdAura = GetAura(triggered_id, EFFECT_INDEX_0))
                     amount += spdAura->GetModifier()->m_amount * spdAura->GetAuraDuration() / spdAura->GetAuraMaxDuration();
 
                 // Incanter's Absorption (triggered absorb based spell power, will replace existed if any)
-                CastCustomSpell(this, 44413, &amount, NULL, NULL, true);
+                CastCustomSpell(this, triggered_id, &amount, NULL, NULL, true, NULL, *itr);
                 break;
             }
         }
@@ -5236,7 +5256,8 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
     Item* castItem = triggeredByAura->GetCastItemGUID() && GetTypeId()==TYPEID_PLAYER
         ? ((Player*)this)->GetItemByGuid(triggeredByAura->GetCastItemGUID()) : NULL;
 
-    uint32 triggered_spell_id = 0;
+    // some dummy spells have trigger spell in spell data already (from 3.0.3)
+    uint32 triggered_spell_id = dummySpell->EffectApplyAuraName[effIndex] == SPELL_AURA_DUMMY ? dummySpell->EffectTriggerSpell[effIndex] : 0;
     Unit* target = pVictim;
     int32  basepoints[MAX_EFFECT_INDEX] = {0, 0, 0};
 
@@ -5814,12 +5835,6 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                 triggered_spell_id = 22858;
                 break;
             }
-            // Gag Order
-            if (dummySpell->SpellIconID == 280)
-            {
-                triggered_spell_id = 18498;                 // Silenced - Gag Order
-                break;
-            }
             // Second Wind
             if (dummySpell->SpellIconID == 1697)
             {
@@ -6136,7 +6151,7 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                         return false;
 
                     basepoints[0] = int32(target->GetMaxHealth() * triggerAmount / 100);
-                    triggered_spell_id = 56131;
+                    // triggered_spell_id in spell data
                     break;
                 }
                 // Glyph of Prayer of Healing
@@ -6758,7 +6773,7 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                 // Sacred Shield (talent rank)
                 case 53601:
                 {
-                    triggered_spell_id = 58597;
+                    // triggered_spell_id in spell data
                     target = this;
                     break;
                 }
@@ -7247,8 +7262,8 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
             // Necrosis
             if (dummySpell->SpellIconID == 2709)
             {
-                // only melee auto attack affected
-                if (!(procFlag & PROC_FLAG_SUCCESSFUL_MELEE_HIT))
+                // only melee auto attack affected and Rune Strike
+                if (!(procFlag & PROC_FLAG_SUCCESSFUL_MELEE_HIT) && procSpell->Id != 56815)
                     return false;
 
                 basepoints[0] = triggerAmount * damage / 100;
@@ -7440,7 +7455,12 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
             // Blood-Caked Blade
             if (dummySpell->SpellIconID == 138)
             {
-                triggered_spell_id = dummySpell->EffectTriggerSpell[effIndex];
+                // only main hand melee auto attack affected and Rune Strike
+                if ((procFlag & PROC_FLAG_SUCCESSFUL_OFFHAND_HIT) ||
+                    !(procFlag & PROC_FLAG_SUCCESSFUL_MELEE_HIT) && procSpell->Id != 56815)
+                    return false;
+
+                // triggered_spell_id in spell data
                 break;
             }
             // Hungering Cold - not break from diseases
