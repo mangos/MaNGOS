@@ -1985,7 +1985,7 @@ void Unit::CalculateAbsorbAndResist(Unit *pCaster, SpellSchoolMask schoolMask, D
                 if (spellProto->SpellIconID == 3006)
                 {
                     // You have a chance equal to your Parry chance
-                    if (damagetype == DIRECT_DAMAGE &&                   // Only for direct damage
+                    if (damagetype == SPELL_DIRECT_DAMAGE &&             // Only for direct spell damage
                         roll_chance_f(GetUnitParryChance()))             // Roll chance
                         RemainingDamage -= RemainingDamage * currentAbsorb / 100;
                     continue;
@@ -2276,14 +2276,12 @@ void Unit::CalculateAbsorbAndResist(Unit *pCaster, SpellSchoolMask schoolMask, D
 
                 int32 amount = int32(incanterAbsorption * (*itr)->GetModifier()->m_amount / 100);
 
-                uint32 triggered_id = itr_spellProto->EffectTriggerSpell[(*itr)->GetEffIndex()];
-
                 // apply normalized part of already accumulated amount in aura
-                if (Aura* spdAura = GetAura(triggered_id, EFFECT_INDEX_0))
+                if (Aura* spdAura = GetAura(44413, EFFECT_INDEX_0))
                     amount += spdAura->GetModifier()->m_amount * spdAura->GetAuraDuration() / spdAura->GetAuraMaxDuration();
 
                 // Incanter's Absorption (triggered absorb based spell power, will replace existed if any)
-                CastCustomSpell(this, triggered_id, &amount, NULL, NULL, true, NULL, *itr);
+                CastCustomSpell(this, 44413, &amount, NULL, NULL, true);
                 break;
             }
         }
@@ -6054,7 +6052,13 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     if (!procSpell)
                         return false;
 
-                    Aura* healingAura = pVictim->GetAura(procSpell->Id, EFFECT_INDEX_0);
+                    // avoid double triggering from 2 auras
+                    if (triggeredByAura->GetEffIndex() != EFFECT_INDEX_1)
+                        return false;
+
+
+                    // Renew
+                    Aura* healingAura = pVictim->GetAura(SPELL_AURA_PERIODIC_HEAL, SPELLFAMILY_PRIEST, UI64LIT(0x40), 0, GetGUID());
                     if (!healingAura)
                         return false;
 
@@ -7260,7 +7264,7 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
             if (dummySpell->SpellIconID == 2709)
             {
                 // only melee auto attack affected and Rune Strike
-                if (!(procFlag & PROC_FLAG_SUCCESSFUL_MELEE_HIT) && procSpell->Id != 56815)
+                if (procSpell && procSpell->Id != 56815)
                     return false;
 
                 basepoints[0] = triggerAmount * damage / 100;
@@ -7453,8 +7457,7 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
             if (dummySpell->SpellIconID == 138)
             {
                 // only main hand melee auto attack affected and Rune Strike
-                if ((procFlag & PROC_FLAG_SUCCESSFUL_OFFHAND_HIT) ||
-                    !(procFlag & PROC_FLAG_SUCCESSFUL_MELEE_HIT) && procSpell->Id != 56815)
+                if ((procFlag & PROC_FLAG_SUCCESSFUL_OFFHAND_HIT) || procSpell && procSpell->Id != 56815)
                     return false;
 
                 // triggered_spell_id in spell data
