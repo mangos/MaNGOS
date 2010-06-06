@@ -2222,14 +2222,12 @@ void Unit::CalculateAbsorbAndResist(Unit *pCaster, SpellSchoolMask schoolMask, D
 
                 int32 amount = int32(incanterAbsorption * (*itr)->GetModifier()->m_amount / 100);
 
-                uint32 triggered_id = itr_spellProto->EffectTriggerSpell[(*itr)->GetEffIndex()];
-
                 // apply normalized part of already accumulated amount in aura
-                if (Aura* spdAura = GetAura(triggered_id, EFFECT_INDEX_0))
+                if (Aura* spdAura = GetAura(44413, EFFECT_INDEX_0))
                     amount += spdAura->GetModifier()->m_amount * spdAura->GetAuraDuration() / spdAura->GetAuraMaxDuration();
 
                 // Incanter's Absorption (triggered absorb based spell power, will replace existed if any)
-                CastCustomSpell(this, triggered_id, &amount, NULL, NULL, true, NULL, *itr);
+                CastCustomSpell(this, 44413, &amount, NULL, NULL, true);
                 break;
             }
         }
