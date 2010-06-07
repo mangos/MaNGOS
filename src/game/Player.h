@@ -1259,7 +1259,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         Item* GetItemFromBuyBackSlot( uint32 slot );
         void RemoveItemFromBuyBackSlot( uint32 slot, bool del );
         uint32 GetMaxKeyringSize() const { return KEYRING_SLOT_END-KEYRING_SLOT_START; }
-        void SendEquipError( uint8 msg, Item* pItem, Item *pItem2 = NULL, uint32 itemid = 0 );
+        void SendEquipError( uint8 msg, Item* pItem, Item *pItem2 = NULL, uint32 itemid = 0 ) const;
         void SendBuyError( uint8 msg, Creature* pCreature, uint32 item, uint32 param );
         void SendSellError( uint8 msg, Creature* pCreature, uint64 guid, uint32 param );
         void AddWeaponProficiency(uint32 newflag) { m_WeaponProficiency |= newflag; }
@@ -1326,32 +1326,32 @@ class MANGOS_DLL_SPEC Player : public Unit
         void SendPreparedQuest( uint64 guid );
         bool IsActiveQuest( uint32 quest_id ) const;
         Quest const *GetNextQuest( uint64 guid, Quest const *pQuest );
-        bool CanSeeStartQuest( Quest const *pQuest );
-        bool CanTakeQuest( Quest const *pQuest, bool msg );
-        bool CanAddQuest( Quest const *pQuest, bool msg );
-        bool CanCompleteQuest( uint32 quest_id );
-        bool CanCompleteRepeatableQuest(Quest const *pQuest);
-        bool CanRewardQuest( Quest const *pQuest, bool msg );
-        bool CanRewardQuest( Quest const *pQuest, uint32 reward, bool msg );
+        bool CanSeeStartQuest( Quest const *pQuest ) const;
+        bool CanTakeQuest( Quest const *pQuest, bool msg ) const;
+        bool CanAddQuest( Quest const *pQuest, bool msg ) const;
+        bool CanCompleteQuest( uint32 quest_id ) const;
+        bool CanCompleteRepeatableQuest(Quest const *pQuest) const;
+        bool CanRewardQuest( Quest const *pQuest, bool msg ) const;
+        bool CanRewardQuest( Quest const *pQuest, uint32 reward, bool msg ) const;
         void AddQuest( Quest const *pQuest, Object *questGiver );
         void CompleteQuest( uint32 quest_id );
         void IncompleteQuest( uint32 quest_id );
         void RewardQuest( Quest const *pQuest, uint32 reward, Object* questGiver, bool announce = true );
 
         void FailQuest( uint32 quest_id );
-        bool SatisfyQuestSkillOrClass( Quest const* qInfo, bool msg );
-        bool SatisfyQuestLevel( Quest const* qInfo, bool msg );
-        bool SatisfyQuestLog( bool msg );
-        bool SatisfyQuestPreviousQuest( Quest const* qInfo, bool msg );
-        bool SatisfyQuestRace( Quest const* qInfo, bool msg );
-        bool SatisfyQuestReputation( Quest const* qInfo, bool msg );
-        bool SatisfyQuestStatus( Quest const* qInfo, bool msg );
-        bool SatisfyQuestTimed( Quest const* qInfo, bool msg );
-        bool SatisfyQuestExclusiveGroup( Quest const* qInfo, bool msg );
-        bool SatisfyQuestNextChain( Quest const* qInfo, bool msg );
-        bool SatisfyQuestPrevChain( Quest const* qInfo, bool msg );
-        bool SatisfyQuestDay( Quest const* qInfo, bool msg );
-        bool SatisfyQuestWeek( Quest const* qInfo, bool msg );
+        bool SatisfyQuestSkillOrClass( Quest const* qInfo, bool msg ) const;
+        bool SatisfyQuestLevel( Quest const* qInfo, bool msg ) const;
+        bool SatisfyQuestLog( bool msg ) const;
+        bool SatisfyQuestPreviousQuest( Quest const* qInfo, bool msg ) const;
+        bool SatisfyQuestRace( Quest const* qInfo, bool msg ) const;
+        bool SatisfyQuestReputation( Quest const* qInfo, bool msg ) const;
+        bool SatisfyQuestStatus( Quest const* qInfo, bool msg ) const;
+        bool SatisfyQuestTimed( Quest const* qInfo, bool msg ) const;
+        bool SatisfyQuestExclusiveGroup( Quest const* qInfo, bool msg ) const;
+        bool SatisfyQuestNextChain( Quest const* qInfo, bool msg ) const;
+        bool SatisfyQuestPrevChain( Quest const* qInfo, bool msg ) const;
+        bool SatisfyQuestDay( Quest const* qInfo, bool msg ) const;
+        bool SatisfyQuestWeek( Quest const* qInfo, bool msg ) const;
         bool GiveQuestSourceItem( Quest const *pQuest );
         bool TakeQuestSourceItem( uint32 quest_id, bool msg );
         bool GetQuestRewardStatus( uint32 quest_id ) const;
@@ -1417,7 +1417,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void SendQuestReward( Quest const *pQuest, uint32 XP, Object* questGiver );
         void SendQuestFailed( uint32 quest_id );
         void SendQuestTimerFailed( uint32 quest_id );
-        void SendCanTakeQuestResponse( uint32 msg );
+        void SendCanTakeQuestResponse( uint32 msg ) const;
         void SendQuestConfirmAccept(Quest const* pQuest, Player* pReceiver);
         void SendPushToPartyResponse( Player *pPlayer, uint32 msg );
         void SendQuestUpdateAddItem( Quest const* pQuest, uint32 item_idx, uint32 count );
@@ -1474,7 +1474,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void setRegenTimer(uint32 time) {m_regenTimer = time;}
         void setWeaponChangeTimer(uint32 time) {m_weaponChangeTimer = time;}
 
-        uint32 GetMoney() { return GetUInt32Value (PLAYER_FIELD_COINAGE); }
+        uint32 GetMoney() const { return GetUInt32Value (PLAYER_FIELD_COINAGE); }
         void ModifyMoney( int32 d )
         {
             if(d < 0)

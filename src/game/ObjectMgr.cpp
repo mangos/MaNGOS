@@ -7455,6 +7455,13 @@ bool PlayerCondition::Meets(Player const * player) const
                 return data->CheckConditionCriteriaMeet(player, value1, value2);
             return false;
         }
+        case CONDITION_QUESTAVAILABLE:
+        {
+            if (Quest const* quest = sObjectMgr.GetQuestTemplate(value1))
+                return player->CanTakeQuest(quest, false);
+            else
+                false;
+        }
         default:
             return false;
     }
@@ -7563,6 +7570,7 @@ bool PlayerCondition::IsValid(ConditionType condition, uint32 value1, uint32 val
         }
         case CONDITION_QUESTREWARDED:
         case CONDITION_QUESTTAKEN:
+        case CONDITION_QUESTAVAILABLE:
         {
             Quest const *Quest = sObjectMgr.GetQuestTemplate(value1);
             if (!Quest)
