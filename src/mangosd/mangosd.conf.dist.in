@@ -1613,7 +1613,6 @@ AuctionHouseBot.Bind_Quest_Item = 0
 AuctionHouseBot.ItemsPerCycle = 200
 AuctionHouseBot.UseBuyPriceForSeller = 0
 AuctionHouseBot.UseBuyPriceForBuyer = 0
-AuctionHouseBot.MaxItemLevel = 200
 
 ###################################################################################################################
 # CONSOLE, REMOTE ACCESS AND SOAP
