@@ -381,8 +381,7 @@ Player::Player (WorldSession *session): Unit(), m_achievementMgr(this), m_reputa
     m_bHasDelayedTeleport = false;
     m_teleport_options = 0;
 
-    pTrader = 0;
-    ClearTrade();
+    m_trade = NULL;
 
     m_cinematic = 0;
 
@@ -11989,33 +11988,23 @@ void Player::SendSellError( uint8 msg, Creature* pCreature, uint64 guid, uint32 
     GetSession()->SendPacket(&data);
 }
 
-void Player::ClearTrade()
-{
-    tradeGold = 0;
-    acceptTrade = false;
-    for(int i = 0; i < TRADE_SLOT_COUNT; ++i)
-        m_tradeItems[i].Clear();
-}
-
 void Player::TradeCancel(bool sendback)
 {
-    if (pTrader)
+    if (m_trade)
     {
+        Player* trader = m_trade->m_tradeWith;
+
         // send yellow "Trade canceled" message to both traders
-        WorldSession* ws;
-        ws = GetSession();
         if (sendback)
-            ws->SendCancelTrade();
-        ws = pTrader->GetSession();
-        if (!ws->PlayerLogout())
-            ws->SendCancelTrade();
+            GetSession()->SendCancelTrade();
+
+        trader->GetSession()->SendCancelTrade();
 
         // cleanup
-        ClearTrade();
-        pTrader->ClearTrade();
-        // prevent loss of reference
-        pTrader->pTrader = NULL;
-        pTrader = NULL;
+        delete m_trade;
+        m_trade = NULL;
+        delete trader->m_trade;
+        trader->m_trade = NULL;
     }
 }
 

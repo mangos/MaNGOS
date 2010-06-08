@@ -1019,6 +1019,26 @@ struct BGData
     bool HasTaxiPath() const { return taxiPath[0] && taxiPath[1]; }
 };
 
+struct TradeData
+{
+    explicit TradeData(Player* tradeWith)
+        : m_tradeWith(tradeWith), m_acceptedTrade(false), m_tradeGold(0), m_tradeSpell(0) {}
+
+    Player*    m_tradeWith;
+    bool       m_acceptedTrade;
+    uint32     m_tradeGold;
+    uint32     m_tradeSpell;
+    ObjectGuid m_tradeItems[TRADE_SLOT_COUNT];
+
+    bool HasItem(ObjectGuid item_guid) const
+    {
+        for(int i = 0; i < TRADE_SLOT_COUNT; ++i)
+            if (m_tradeItems[i] == item_guid)
+                return true;
+        return false;
+    }
+};
+
 class MANGOS_DLL_SPEC Player : public Unit
 {
     friend class WorldSession;
@@ -1280,10 +1300,9 @@ class MANGOS_DLL_SPEC Player : public Unit
         bool BuyItemFromVendorSlot(uint64 vendorguid, uint32 vendorslot, uint32 item, uint8 count, uint8 bag, uint8 slot);
 
         float GetReputationPriceDiscount( Creature const* pCreature ) const;
-        Player* GetTrader() const { return pTrader; }
-        void ClearTrade();
+        Player* GetTrader() const { return m_trade ? m_trade->m_tradeWith : NULL; }
         void TradeCancel(bool sendback);
-        Item* GetItemByTradeSlot(uint32 slot) const { return !m_tradeItems[slot].IsEmpty() ? GetItemByGuid(m_tradeItems[slot]) : NULL; }
+        Item* GetItemByTradeSlot(uint32 slot) const { return m_trade && !m_trade->m_tradeItems[slot].IsEmpty() ? GetItemByGuid(m_trade->m_tradeItems[slot]) : NULL; }
 
         void UpdateEnchantTime(uint32 time);
         void UpdateItemDuration(uint32 time, bool realtimeonly=false);
@@ -2463,10 +2482,7 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         int m_cinematic;
 
-        Player *pTrader;
-        bool acceptTrade;
-        ObjectGuid m_tradeItems[TRADE_SLOT_COUNT];
-        uint32 tradeGold;
+        TradeData* m_trade;
 
         bool   m_DailyQuestChanged;
         bool   m_WeeklyQuestChanged;
