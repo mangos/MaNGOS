@@ -197,7 +197,7 @@ void SpellCastTargets::Update(Unit* caster)
         {
             Player* pTrader = ((Player*)caster)->GetTrader();
             if(pTrader && m_itemTargetGUID.GetRawValue() < TRADE_SLOT_COUNT)
-                m_itemTarget = pTrader->GetItemByPos(pTrader->GetItemPosByTradeSlot(uint32(m_itemTargetGUID.GetRawValue())));
+                m_itemTarget = pTrader->GetItemByTradeSlot(uint32(m_itemTargetGUID.GetRawValue()));
         }
         if(m_itemTarget)
             m_itemTargetEntry = m_itemTarget->GetEntry();
