@@ -1336,12 +1336,16 @@ enum Opcodes
     UMSG_UNKNOWN_1299                               = 0x513, // not found
     SMSG_COMBAT_LOG_MULTIPLE                        = 0x514, // SMSG, multi combatlog
     SMSG_LFG_OPEN_FROM_GOSSIP                       = 0x515, // event EVENT_LFG_OPEN_FROM_GOSSIP (opens dungeon finder, probably for outdoor bosses)
-    SMSG_UNKNOWN_1302                               = 0x516, // something with player movement (move event 58?)
-    CMSG_UNKNOWN_1303                               = 0x517, // something with player movement (move event 58?)
-    SMSG_UNKNOWN_1304                               = 0x518, // something with player movement (move event 58?), speed packet
+    SMSG_UNKNOWN_1302                               = 0x516, // something with player movement (move event 58)
+    CMSG_UNKNOWN_1303                               = 0x517, // something with player movement (move event 58)
+    SMSG_UNKNOWN_1304                               = 0x518, // something with player movement (move event 58), speed packet
     UMSG_UNKNOWN_1305                               = 0x519, // not found
     UMSG_UNKNOWN_1306                               = 0x51A, // not found
-    NUM_MSG_TYPES                                   = 0x51B
+    CMSG_COMMENTATOR_SKIRMISH_QUEUE_COMMAND         = 0x51B, // lua: CommentatorSetSkirmishMatchmakingMode/CommentatorRequestSkirmishQueueData/CommentatorRequestSkirmishMode/CommentatorStartSkirmishMatch
+    SMSG_UNKNOWN_1308                               = 0x51C, // event EVENT_COMMENTATOR_SKIRMISH_QUEUE_REQUEST, CGCommentator::QueueNode
+    SMSG_UNKNOWN_1309                               = 0x51D, // event EVENT_COMMENTATOR_SKIRMISH_QUEUE_REQUEST
+    SMSG_UNKNOWN_1310                               = 0x51E, // some compressed packet?
+    NUM_MSG_TYPES                                   = 0x51F
 };
 
 /// Player state
