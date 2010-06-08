@@ -1022,7 +1022,7 @@ void GameObject::Use(Unit* user)
 
                 if (info->goober.eventId)
                 {
-                    DEBUG_LOG("Goober ScriptStart id %u for GO entry %u (GUID %u).", info->goober.eventId, GetEntry(), GetDBTableGUIDLow());
+                    DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "Goober ScriptStart id %u for GO entry %u (GUID %u).", info->goober.eventId, GetEntry(), GetDBTableGUIDLow());
                     GetMap()->ScriptsStart(sEventScripts, info->goober.eventId, player, this);
                 }
 
@@ -1034,7 +1034,8 @@ void GameObject::Use(Unit* user)
                         break;
                 }
 
-                player->CastedCreatureOrGO(info->id, GetObjectGuid(), 0);
+                player->RewardPlayerAndGroupAtCast(this);
+
             }
 
             if (uint32 trapEntry = info->goober.linkedTrapId)

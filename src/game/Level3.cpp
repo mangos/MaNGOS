@@ -579,7 +579,7 @@ bool ChatHandler::HandleReloadSpellProcEventCommand(const char*)
 bool ChatHandler::HandleReloadSpellBonusesCommand(const char*)
 {
     sLog.outString( "Re-Loading Spell Bonus Data..." );
-    sSpellMgr.LoadSpellBonusess();
+    sSpellMgr.LoadSpellBonuses();
     SendGlobalSysMessage("DB table `spell_bonus_data` (spell damage/healing coefficients) reloaded.");
     return true;
 }
@@ -1832,9 +1832,13 @@ bool ChatHandler::HandleLearnAllMySpellsCommand(const char* /*args*/)
         return true;
     uint32 family = clsEntry->spellfamily;
 
-    for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)
+    for (uint32 i = 0; i < sSkillLineAbilityStore.GetNumRows(); ++i)
     {
-        SpellEntry const *spellInfo = sSpellStore.LookupEntry(i);
+        SkillLineAbilityEntry const *entry = sSkillLineAbilityStore.LookupEntry(i);
+        if (!entry)
+            continue;
+
+        SpellEntry const *spellInfo = sSpellStore.LookupEntry(entry->spellId);
         if(!spellInfo)
             continue;
 
@@ -1859,7 +1863,7 @@ bool ChatHandler::HandleLearnAllMySpellsCommand(const char* /*args*/)
         if(!SpellMgr::IsSpellValid(spellInfo,m_session->GetPlayer(),false))
             continue;
 
-        m_session->GetPlayer()->learnSpell(i, false);
+        m_session->GetPlayer()->learnSpell(spellInfo->Id, false);
     }
 
     SendSysMessage(LANG_COMMAND_LEARN_CLASS_SPELLS);
@@ -6136,24 +6140,23 @@ bool ChatHandler::HandleServerSetMotdCommand(const char* args)
     return true;
 }
 
-/// Output list of character for account
-bool ChatHandler::HandleAccountCharactersCommand(const char* args)
+bool ChatHandler::ShowPlayerListHelper(QueryResult* result, uint32* limit, bool title, bool error)
 {
-    ///- Get the command line arguments
-    std::string account_name;
-    Player* target = NULL;                                  // only for triggering use targeted player account
-    uint32 account_id = extractAccountId((char*)args, &account_name, &target);
-    if (!account_id )
-        return false;
-
-    ///- Get the characters for account id
-    QueryResult *result = CharacterDatabase.PQuery( "SELECT guid, name, race, class, level FROM characters WHERE account = %u", account_id);
-
-    if (!m_session)
+    if (!result)
     {
-        SendSysMessage(LANG_ACCOUNT_CHARACTERS_LIST_BAR);
-        SendSysMessage(LANG_ACCOUNT_CHARACTERS_LIST_HEADER);
-        SendSysMessage(LANG_ACCOUNT_CHARACTERS_LIST_BAR);
+        if (error)
+        {
+            PSendSysMessage(LANG_NO_PLAYERS_FOUND);
+            SetSentErrorMessage(true);
+        }
+        return false;
+    }
+
+    if (!m_session && title)
+    {
+        SendSysMessage(LANG_CHARACTERS_LIST_BAR);
+        SendSysMessage(LANG_CHARACTERS_LIST_HEADER);
+        SendSysMessage(LANG_CHARACTERS_LIST_BAR);
     }
 
     if (result)
@@ -6161,6 +6164,14 @@ bool ChatHandler::HandleAccountCharactersCommand(const char* args)
         ///- Circle through them. Display username and GM level
         do
         {
+            // check limit
+            if (limit)
+            {
+                if(*limit == 0)
+                    break;
+                --*limit;
+            }
+
             Field *fields = result->Fetch();
             uint32 guid      = fields[0].GetUInt32();
             std::string name = fields[1].GetCppString();
@@ -6175,9 +6186,9 @@ bool ChatHandler::HandleAccountCharactersCommand(const char* args)
             char const* class_name = classEntry ? classEntry->name[GetSessionDbcLocale()] : "<?>";
 
             if (!m_session)
-                PSendSysMessage(LANG_ACCOUNT_CHARACTERS_LIST_LINE_CONSOLE, guid, name.c_str(), race_name, class_name, level);
+                PSendSysMessage(LANG_CHARACTERS_LIST_LINE_CONSOLE, guid, name.c_str(), race_name, class_name, level);
             else
-                PSendSysMessage(LANG_ACCOUNT_CHARACTERS_LIST_LINE_CHAT, guid, name.c_str(), name.c_str(), race_name, class_name, level);
+                PSendSysMessage(LANG_CHARACTERS_LIST_LINE_CHAT, guid, name.c_str(), name.c_str(), race_name, class_name, level);
 
         }while( result->NextRow() );
 
@@ -6185,9 +6196,26 @@ bool ChatHandler::HandleAccountCharactersCommand(const char* args)
     }
 
     if (!m_session)
-        SendSysMessage(LANG_ACCOUNT_CHARACTERS_LIST_BAR);
+        SendSysMessage(LANG_CHARACTERS_LIST_BAR);
 
     return true;
+}
+
+
+/// Output list of character for account
+bool ChatHandler::HandleAccountCharactersCommand(const char* args)
+{
+    ///- Get the command line arguments
+    std::string account_name;
+    Player* target = NULL;                                  // only for triggering use targeted player account
+    uint32 account_id = extractAccountId((char*)args, &account_name, &target);
+    if (!account_id )
+        return false;
+
+    ///- Get the characters for account id
+    QueryResult *result = CharacterDatabase.PQuery( "SELECT guid, name, race, class, level FROM characters WHERE account = %u", account_id);
+
+    return ShowPlayerListHelper(result);
 }
 
 /// Set/Unset the expansion level for an account

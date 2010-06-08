@@ -193,7 +193,7 @@ class BattleGroundAB : public BattleGround
         /* Scorekeeping */
         virtual void UpdatePlayerScore(Player *Source, uint32 type, uint32 value);
 
-        virtual void FillInitialWorldStates(WorldPacket& data);
+        virtual void FillInitialWorldStates(WorldPacket& data, uint32& count);
 
         /* Nodes occupying */
         virtual void EventPlayerClickedOnFlag(Player *source, GameObject* target_obj);

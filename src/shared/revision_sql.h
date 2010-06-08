@@ -1,6 +1,6 @@
 #ifndef __REVISION_SQL_H__
 #define __REVISION_SQL_H__
- #define REVISION_DB_CHARACTERS "required_9849_01_characters_saved_variables"
- #define REVISION_DB_MANGOS "required_9854_01_mangos_spell_bonus_data"
- #define REVISION_DB_REALMD "required_9748_01_realmd_realmlist"
+ #define REVISION_DB_CHARACTERS "required_10007_01_characters_pet_aura"
+ #define REVISION_DB_MANGOS "required_10044_02_mangos_spell_proc_event"
+ #define REVISION_DB_REALMD "required_10008_01_realmd_realmd_db_version"
 #endif // __REVISION_SQL_H__

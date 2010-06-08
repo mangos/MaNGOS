@@ -1,7 +1,7 @@
 #####################################
 # MaNGOS Configuration file         #
 #####################################
-ConfVersion=2010040601
+ConfVersion=2010051901
 
 ###################################################################################################################
 # CONNECTIONS AND DIRECTORIES
@@ -246,6 +246,7 @@ CleanCharacterDB = 1
 #    LogFilter_TransportMoves
 #    LogFilter_VisibilityChanges
 #    LogFilter_Weather
+#    LogFilter_DbStrictedCheck
 #        Log filters (active by default)
 #        Default: 1 - not include with any log level
 #                 0 - include in log if log level permit
@@ -255,6 +256,9 @@ CleanCharacterDB = 1
 #    LogFilter_SQLText
 #    LogFilter_AIAndMovegens
 #    LogFilter_PlayerStats
+#    LogFilter_Damage
+#    LogFilter_Combat
+#    LogFilter_SpellCast
 #        Log filters (disabled by default, mostly debug only output affected cases)
 #        Default: 0 - include in log if log level permit
 #                 1 - not include with any log level
@@ -330,6 +334,16 @@ LogFilter_AchievementUpdates = 1
 LogFilter_CreatureMoves = 1
 LogFilter_TransportMoves = 1
 LogFilter_VisibilityChanges = 1
+LogFilter_Weather = 1
+LogFilter_DbStrictedCheck = 1
+LogFilter_PeriodicAffects = 0
+LogFilter_PlayerMoves = 0
+LogFilter_SQLText = 0
+LogFilter_AIAndMovegens = 0
+LogFilter_PlayerStats = 0
+LogFilter_Damage = 0
+LogFilter_Combat = 0
+LogFilter_SpellCast = 0
 WorldLogFile = ""
 WorldLogTimestamp = 0
 DBErrorLogFile = "DBErrors.log"
@@ -669,6 +683,12 @@ LogColors = ""
 #        Default: 1 (true)
 #                 0 (false)
 #
+#    WaitAtStartupError
+#        After startup error report wait <Enter> or some time before continue (and possible close console window)
+#                 -1 (wait until <Enter> press)
+#        Default:  0 (not wait)
+#                  N (>0, wait N secs)
+#
 #    Motd
 #        Message of the Day. Displayed at worldlogin for every user ('@' for a newline).
 #
@@ -733,6 +753,7 @@ OffhandCheckAtTalentsReset = 0
 ClientCacheVersion = 0
 Event.Announce = 0
 BeepAtStart = 1
+WaitAtStartupError = 0
 Motd = "Welcome to the Massive Network Game Object Server."
 
 ###################################################################################################################
@@ -740,8 +761,8 @@ Motd = "Welcome to the Massive Network Game Object Server."
 #
 #    AllowTwoSide.Accounts
 #        Allow or not accounts to create characters in the 2 teams in any game type.
-#        Default: 0 (Not allowed)
-#                 1 (Allowed)
+#                 0 (Not allowed)
+#        Default: 1 (Allowed)
 #
 #    AllowTwoSide.Interaction.Chat
 #    AllowTwoSide.Interaction.Channel
@@ -772,7 +793,7 @@ Motd = "Welcome to the Massive Network Game Object Server."
 #
 ###################################################################################################################
 
-AllowTwoSide.Accounts = 0
+AllowTwoSide.Accounts = 1
 AllowTwoSide.Interaction.Chat = 0
 AllowTwoSide.Interaction.Channel = 0
 AllowTwoSide.Interaction.Group = 0
@@ -818,6 +839,11 @@ TalentsInspecting = 1
 #    WorldBossLevelDiff
 #        Difference for boss dynamic level with target
 #        Default: 3
+#
+#    Corpse.EmptyLootShow
+#        If target can have loot (or can be skining after loot) but no loot generated still show loot window
+#        Default: 1 (show)
+#                 0 (not show)
 #
 #    Corpse.Decay.NORMAL
 #    Corpse.Decay.RARE
@@ -876,6 +902,7 @@ CreatureFamilyAssistanceRadius = 10
 CreatureFamilyAssistanceDelay = 1500
 CreatureFamilyFleeDelay = 7000
 WorldBossLevelDiff = 3
+Corpse.EmptyLootShow = 1
 Corpse.Decay.NORMAL = 60
 Corpse.Decay.RARE = 300
 Corpse.Decay.ELITE = 300

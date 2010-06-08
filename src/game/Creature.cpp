@@ -74,7 +74,7 @@ bool VendorItemData::RemoveItem( uint32 item_id )
     return found;
 }
 
-VendorItem const* VendorItemData::FindItemCostPair(uint32 item_id, uint32 extendedCost) const
+VendorItem const* VendorItemData::FindItemCostPair(uint32 item_id, int32 extendedCost) const
 {
     for(VendorItemList::const_iterator i = m_items.begin(); i != m_items.end(); ++i )
         if((*i)->item == item_id && (*i)->ExtendedCost == extendedCost)
@@ -110,8 +110,8 @@ bool ForcedDespawnDelayEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
 
 Creature::Creature(CreatureSubtype subtype) :
 Unit(), i_AI(NULL),
-lootForPickPocketed(false), lootForBody(false), m_groupLootTimer(0), m_groupLootId(0),
-m_lootMoney(0), m_lootRecipient(0),
+lootForPickPocketed(false), lootForBody(false), lootForSkin(false), m_groupLootTimer(0), m_groupLootId(0),
+m_lootMoney(0), m_lootGroupRecipientId(0),
 m_deathTimer(0), m_respawnTime(0), m_respawnDelay(25), m_corpseDelay(60), m_respawnradius(5.0f),
 m_subtype(subtype), m_defaultMovementType(IDLE_MOTION_TYPE), m_DBTableGuid(0), m_equipmentId(0),
 m_AlreadyCallAssistance(false), m_AlreadySearchedAssistance(false),
@@ -168,6 +168,10 @@ void Creature::RemoveCorpse()
     m_deathTimer = 0;
     setDeathState(DEAD);
     UpdateObjectVisibility();
+
+    // stop loot rolling before loot clear and for close client dialogs
+    StopGroupLoot();
+
     loot.clear();
     uint32 respawnDelay = m_respawnDelay;
     if (AI())
@@ -362,10 +366,11 @@ void Creature::Update(uint32 diff)
         {
             if( m_respawnTime <= time(NULL) )
             {
-                DEBUG_LOG("Respawning...");
+                DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "Respawning...");
                 m_respawnTime = 0;
                 lootForPickPocketed = false;
                 lootForBody         = false;
+                lootForSkin         = false;
 
                 if(m_originalEntry != GetEntry())
                     UpdateEntry(m_originalEntry);
@@ -407,25 +412,18 @@ void Creature::Update(uint32 diff)
                 if (IsInWorld())                            // can be despawned by update pool
                 {
                     RemoveCorpse();
-                    DEBUG_LOG("Removing corpse... %u ", GetEntry());
+                    DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "Removing corpse... %u ", GetEntry());
                 }
             }
             else
             {
                 m_deathTimer -= diff;
-                if (m_groupLootTimer && m_groupLootId)
+                if (m_groupLootId)
                 {
-                    if(diff <= m_groupLootTimer)
-                    {
+                    if(diff < m_groupLootTimer)
                         m_groupLootTimer -= diff;
-                    }
                     else
-                    {
-                        if (Group* group = sObjectMgr.GetGroupById(m_groupLootId))
-                            group->EndRoll();
-                        m_groupLootTimer = 0;
-                        m_groupLootId = 0;
-                    }
+                        StopGroupLoot();
                 }
             }
 
@@ -446,7 +444,7 @@ void Creature::Update(uint32 diff)
                     if (IsInWorld())                        // can be despawned by update pool
                     {
                         RemoveCorpse();
-                        DEBUG_LOG("Removing alive corpse... %u ", GetEntry());
+                        DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "Removing alive corpse... %u ", GetEntry());
                     }
                     else
                         return;
@@ -502,6 +500,25 @@ void Creature::Update(uint32 diff)
         default:
             break;
     }
+}
+
+
+void Creature::StartGroupLoot( Group* group, uint32 timer )
+{
+    m_groupLootId = group->GetId();
+    m_groupLootTimer = timer;
+}
+
+void Creature::StopGroupLoot()
+{
+    if (!m_groupLootId)
+        return;
+
+    if (Group* group = sObjectMgr.GetGroupById(m_groupLootId))
+        group->EndRoll();
+
+    m_groupLootTimer = 0;
+    m_groupLootId = 0;
 }
 
 void Creature::RegenerateMana()
@@ -590,7 +607,7 @@ bool Creature::AIM_Initialize()
     // make sure nothing can change the AI during AI update
     if(m_AI_locked)
     {
-        DEBUG_LOG("AIM_Initialize: failed to init, locked.");
+        DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "AIM_Initialize: failed to init, locked.");
         return false;
     }
 
@@ -794,13 +811,91 @@ void Creature::AI_SendMoveToPacket(float x, float y, float z, uint32 time, Splin
     SendMonsterMove(x, y, z, type, flags, time);
 }
 
-Player *Creature::GetLootRecipient() const
+void Creature::PrepareBodyLootState()
 {
-    if (!m_lootRecipient)
-        return NULL;
-    else return ObjectAccessor::FindPlayer(m_lootRecipient);
+    loot.clear();
+
+    // if have normal loot then prepare it access
+    if (!isAlive() && !lootForBody)
+    {
+        // have normal loot
+        if (GetCreatureInfo()->maxgold > 0 || GetCreatureInfo()->lootid ||
+            // ... or can have skinning after
+            GetCreatureInfo()->SkinLootId && sWorld.getConfig(CONFIG_BOOL_CORPSE_EMPTY_LOOT_SHOW))
+        {
+            SetUInt32Value(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
+            return;
+        }
+    }
+
+    // if not have normal loot allow skinning if need
+    if (!isAlive() && !lootForSkin && GetCreatureInfo()->SkinLootId)
+    {
+        lootForBody = true;                                 // pass this loot mode
+
+        RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
+        SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
+        return;
+    }
+
+    RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
+    RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
 }
 
+
+/**
+ * Return original player who tap creature, it can be different from player/group allowed to loot so not use it for loot code
+ */
+Player* Creature::GetOriginalLootRecipient() const
+{
+    return !m_lootRecipientGuid.IsEmpty() ? ObjectAccessor::FindPlayer(m_lootRecipientGuid) : NULL;
+}
+
+/**
+ * Return group if player tap creature as group member, independent is player after leave group or stil be group member
+ */
+Group* Creature::GetGroupLootRecipient() const
+{
+    // original recipient group if set and not disbanded
+    return m_lootGroupRecipientId ? sObjectMgr.GetGroupById(m_lootGroupRecipientId) : NULL;
+}
+
+/**
+ * Return player who can loot tapped creature (member of group or single player)
+ *
+ * In case when original player tap creature as group member then group tap prefered.
+ * This is for example important if player after tap leave group.
+ * If group not exist or disbanded or player tap creature not as group member return player
+ */
+Player* Creature::GetLootRecipient() const
+{
+    // original recipient group if set and not disbanded
+    Group* group = GetGroupLootRecipient();
+
+    // original recipient player if online
+    Player* player = GetOriginalLootRecipient();
+
+    // if group not set or disbanded return original recipient player if any
+    if (!group)
+        return player;
+
+    // group case
+
+    // return player if it still be in original recipient group
+    if (player && player->GetGroup() == group)
+        return player;
+
+    // find any in group
+    for(GroupReference *itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
+        if (Player *p = itr->getSource())
+            return p;
+
+    return NULL;
+}
+
+/**
+ * Set player and group (if player group member) who tap creature
+ */
 void Creature::SetLootRecipient(Unit *unit)
 {
     // set the player whose group should receive the right
@@ -809,7 +904,8 @@ void Creature::SetLootRecipient(Unit *unit)
 
     if (!unit)
     {
-        m_lootRecipient = 0;
+        m_lootRecipientGuid.Clear();
+        m_lootGroupRecipientId = 0;
         RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_TAPPED);
         return;
     }
@@ -818,7 +914,13 @@ void Creature::SetLootRecipient(Unit *unit)
     if(!player)                                             // normal creature, no player involved
         return;
 
-    m_lootRecipient = player->GetGUID();
+    // set player for non group case or if group will disbanded
+    m_lootRecipientGuid = player->GetObjectGuid();
+
+    // set group for group existed case including if player will leave group at loot time
+    if (Group* group = player->GetGroup())
+        m_lootGroupRecipientId = group->GetId();
+
     SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_TAPPED);
 }
 
@@ -1261,10 +1363,6 @@ void Creature::setDeathState(DeathState s)
         SetTargetGUID(0);                                   // remove target selection in any cases (can be set at aura remove in Unit::setDeathState)
         SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
 
-        if (!isPet() && GetCreatureInfo()->SkinLootId)
-            if (LootTemplates_Skinning.HaveLootFor(GetCreatureInfo()->SkinLootId))
-                SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
-
         if (canFly() && FallGround())
             return;
 
@@ -1526,7 +1624,7 @@ void Creature::SendAIReaction(AiReaction reactionType)
 
     ((WorldObject*)this)->SendMessageToSet(&data, true);
 
-    DEBUG_LOG("WORLD: Sent SMSG_AI_REACTION, type %u.", reactionType);
+    DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "WORLD: Sent SMSG_AI_REACTION, type %u.", reactionType);
 }
 
 void Creature::CallAssistance()
@@ -1740,7 +1838,7 @@ bool Creature::LoadCreaturesAddon(bool reload)
 
             Aura* AdditionalAura = CreateAura(AdditionalSpellInfo, cAura->effect_idx, NULL, this, this, 0);
             AddAura(AdditionalAura);
-            DEBUG_LOG("Spell: %u with Aura %u added to creature (GUIDLow: %u Entry: %u )", cAura->spell_id, AdditionalSpellInfo->EffectApplyAuraName[EFFECT_INDEX_0],GetGUIDLow(),GetEntry());
+            DEBUG_FILTER_LOG(LOG_FILTER_SPELL_CAST, "Spell: %u with Aura %u added to creature (GUIDLow: %u Entry: %u )", cAura->spell_id, AdditionalSpellInfo->EffectApplyAuraName[EFFECT_INDEX_0],GetGUIDLow(),GetEntry());
         }
     }
     return true;
@@ -1933,16 +2031,16 @@ void Creature::GetRespawnCoord( float &x, float &y, float &z, float* ori, float*
 
 void Creature::AllLootRemovedFromCorpse()
 {
-    if (!HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE))
+    if (lootForBody && !HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE))
     {
         uint32 nDeathTimer;
 
         CreatureInfo const *cinfo = GetCreatureInfo();
 
-        // corpse was not skinnable -> apply corpse looted timer
-        if (!cinfo || !cinfo->SkinLootId)
+        // corpse was not skinned -> apply corpse looted timer
+        if (!lootForSkin)
             nDeathTimer = (uint32)((m_corpseDelay * IN_MILLISECONDS) * sWorld.getConfig(CONFIG_FLOAT_RATE_CORPSE_DECAY_LOOTED));
-        // corpse skinnable, but without skinning flag, and then skinned, corpse will despawn next update
+        // corpse was skinned, corpse will despawn next update
         else
             nDeathTimer = 0;
 

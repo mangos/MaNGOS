@@ -398,6 +398,7 @@
     <ClCompile Include="..\..\src\game\GMTicketHandler.cpp" />
     <ClCompile Include="..\..\src\game\GMTicketMgr.cpp" />
     <ClCompile Include="..\..\src\game\GossipDef.cpp" />
+    <ClCompile Include="..\..\src\game\GridMap.cpp" />
     <ClCompile Include="..\..\src\game\GridNotifiers.cpp" />
     <ClCompile Include="..\..\src\game\GridStates.cpp" />
     <ClCompile Include="..\..\src\game\Group.cpp" />
@@ -547,6 +548,7 @@
     <ClInclude Include="..\..\src\game\GMTicketMgr.h" />
     <ClInclude Include="..\..\src\game\GossipDef.h" />
     <ClInclude Include="..\..\src\game\GridDefines.h" />
+    <ClInclude Include="..\..\src\game\GridMap.h" />
     <ClInclude Include="..\..\src\game\GridNotifiers.h" />
     <ClInclude Include="..\..\src\game\GridNotifiersImpl.h" />
     <ClInclude Include="..\..\src\game\GridStates.h" />

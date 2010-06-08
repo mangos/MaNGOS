@@ -476,50 +476,16 @@ bool ChatHandler::HandleServerExitCommand(const char* /*args*/)
 }
 
 /// Display info on users currently in the realm
-bool ChatHandler::HandleAccountOnlineListCommand(const char* /*args*/)
+bool ChatHandler::HandleAccountOnlineListCommand(const char* args)
 {
+    char* limit_str = *args ? strtok((char*)args, " ") : NULL;
+    uint32 limit = limit_str ? atoi (limit_str) : 100;
+
     ///- Get the list of accounts ID logged to the realm
-    QueryResult *resultDB = CharacterDatabase.Query("SELECT name,account FROM characters WHERE online > 0");
-    if (!resultDB)
-    {
-        SendSysMessage(LANG_ACCOUNT_LIST_EMPTY);
-        return true;
-    }
+    //                                                 0   1         2        3        4
+    QueryResult *result = loginDatabase.PQuery("SELECT id, username, last_ip, gmlevel, expansion FROM account WHERE active_realm_id = %u", realmID);
 
-    ///- Display the list of account/characters online
-    SendSysMessage(LANG_ACCOUNT_LIST_BAR);
-    SendSysMessage(LANG_ACCOUNT_LIST_HEADER);
-    SendSysMessage(LANG_ACCOUNT_LIST_BAR);
-
-    ///- Circle through accounts
-    do
-    {
-        Field *fieldsDB = resultDB->Fetch();
-        std::string name = fieldsDB[0].GetCppString();
-        uint32 account = fieldsDB[1].GetUInt32();
-
-        ///- Get the username, last IP and GM level of each account
-        // No SQL injection. account is uint32.
-        //                                                      0         1        2        3
-        QueryResult *resultLogin = loginDatabase.PQuery("SELECT username, last_ip, gmlevel, expansion FROM account WHERE id = '%u'",account);
-
-        if(resultLogin)
-        {
-            Field *fieldsLogin = resultLogin->Fetch();
-            PSendSysMessage(LANG_ACCOUNT_LIST_LINE,
-                fieldsLogin[0].GetString(),name.c_str(),fieldsLogin[1].GetString(),fieldsLogin[2].GetUInt32(),fieldsLogin[3].GetUInt32());
-
-            delete resultLogin;
-        }
-        else
-            PSendSysMessage(LANG_ACCOUNT_LIST_ERROR,name.c_str());
-
-    }while(resultDB->NextRow());
-
-    delete resultDB;
-
-    SendSysMessage(LANG_ACCOUNT_LIST_BAR);
-    return true;
+    return ShowAccountListHelper(result,&limit);
 }
 
 /// Create an account
@@ -565,17 +531,73 @@ bool ChatHandler::HandleAccountCreateCommand(const char* args)
     return true;
 }
 
-/// Set the level of logging
-bool ChatHandler::HandleServerSetLogLevelCommand(const char *args)
+/// Set the filters of logging
+bool ChatHandler::HandleServerLogFilterCommand(const char* args)
 {
     if(!*args)
+    {
+        uint32 logfiler = sLog.getLogFilter();
+
+        SendSysMessage(LANG_LOG_FILTERS_STATE_HEADER);
+        for(int i = 0; i < LOG_FILTER_COUNT; ++i)
+            if (*logFilterData[i].name)
+                PSendSysMessage("  %-20s = %s",logFilterData[i].name,(logfiler & (1 << i)) !=0 ? GetMangosString(LANG_ON) : GetMangosString(LANG_OFF));
+        return true;
+    }
+
+    char *filtername = strtok((char*)args, " ");
+    if (!filtername)
         return false;
 
-    char *NewLevel = strtok((char*)args, " ");
-    if (!NewLevel)
+    char *value_str = strtok(NULL, " ");
+    if (!value_str)
         return false;
 
-    sLog.SetLogLevel(NewLevel);
+    bool value;
+    if (strncmp(value_str, "on", 3) == 0)
+        value = true;
+    else if (strncmp(value_str, "off", 4) == 0)
+        value = false;
+    else
+    {
+        SendSysMessage(LANG_USE_BOL);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    if (strncmp(filtername, "all", 4) == 0)
+    {
+        sLog.SetLogFilter(LogFilters(0xFFFFFFFF),value);
+        PSendSysMessage(LANG_ALL_LOG_FILTERS_SET_TO_S, value ? GetMangosString(LANG_ON) : GetMangosString(LANG_OFF));
+        return true;
+    }
+
+    for(int i = 0; i < LOG_FILTER_COUNT; ++i)
+    {
+        if (!*logFilterData[i].name)
+            continue;
+
+        if (!strncmp(filtername,logFilterData[i].name,strlen(filtername)))
+        {
+            sLog.SetLogFilter(LogFilters(1 << i),value);
+            PSendSysMessage("  %-20s = %s",logFilterData[i].name,value ? GetMangosString(LANG_ON) : GetMangosString(LANG_OFF));
+            return true;
+        }
+    }
+
+    return false;
+}
+
+/// Set the level of logging
+bool ChatHandler::HandleServerLogLevelCommand(const char *args)
+{
+    if(!*args)
+    {
+        PSendSysMessage("Log level: %u");
+        return true;
+    }
+
+    sLog.SetLogLevel((char*)args);
     return true;
 }
 

@@ -22,10 +22,33 @@
 #include "Config/ConfigEnv.h"
 #include "Util.h"
 #include "ByteBuffer.h"
+#include "ProgressBar.h"
 
 #include <stdarg.h>
+#include <fstream>
+#include <iostream>
+
+#include "ace/OS_NS_unistd.h"
 
 INSTANTIATE_SINGLETON_1( Log );
+
+LogFilterData logFilterData[LOG_FILTER_COUNT] =
+{
+    { "transport_moves",     "LogFilter_TransportMoves",     true  },
+    { "creature_moves",      "LogFilter_CreatureMoves",      true  },
+    { "visibility_changes",  "LogFilter_VisibilityChanges",  true  },
+    { "achievement_updates", "LogFilter_AchievementUpdates", true  },
+    { "weather",             "LogFilter_Weather",            true  },
+    { "player_stats",        "LogFilter_PlayerStats",        false },
+    { "sql_text",            "LogFilter_SQLText",            false },
+    { "player_moves",        "LogFilter_PlayerMoves",        false },
+    { "periodic_effects",    "LogFilter_PeriodicAffects",    false },
+    { "ai_and_movegens",     "LogFilter_AIAndMovegens",      false },
+    { "damage",              "LogFilter_Damage",             false },
+    { "combat",              "LogFilter_Combat",             false },
+    { "spell_cast",          "LogFilter_SpellCast",          false },
+    { "db_stricted_check",   "LogFilter_DbStrictedCheck",    true  },
+};
 
 enum LogType
 {
@@ -245,26 +268,10 @@ void Log::Initialize()
     InitColors(sConfig.GetStringDefault("LogColors", ""));
 
     m_logFilter = 0;
-
-    if (sConfig.GetBoolDefault("LogFilter_TransportMoves",     true))
-        m_logFilter |= LOG_FILTER_TRANSPORT_MOVES;
-    if (sConfig.GetBoolDefault("LogFilter_CreatureMoves",      true))
-        m_logFilter |= LOG_FILTER_CREATURE_MOVES;
-    if (sConfig.GetBoolDefault("LogFilter_VisibilityChanges",  true))
-        m_logFilter |= LOG_FILTER_VISIBILITY_CHANGES;
-    if (sConfig.GetBoolDefault("LogFilter_AchievementUpdates", true))
-        m_logFilter |= LOG_FILTER_ACHIEVEMENT_UPDATES;
-    if (sConfig.GetBoolDefault("LogFilter_Weather",            true))
-        m_logFilter |= LOG_FILTER_WEATHER;
-
-    if (sConfig.GetBoolDefault("LogFilter_SQLText",            false))
-        m_logFilter |= LOG_FILTER_SQL_TEXT;
-    if (sConfig.GetBoolDefault("LogFilter_PlayerMoves",        false))
-        m_logFilter |= LOG_FILTER_PLAYER_MOVES;
-    if (sConfig.GetBoolDefault("LogFilter_PeriodicAffects",    false))
-        m_logFilter |= LOG_FILTER_PERIODIC_AFFECTS;
-    if (sConfig.GetBoolDefault("LogFilter_AIAndMovegens",      false))
-        m_logFilter |= LOG_FILTER_AI_AND_MOVEGENSS;
+    for(int i = 0; i < LOG_FILTER_COUNT; ++i)
+        if (*logFilterData[i].name)
+            if (sConfig.GetBoolDefault(logFilterData[i].configName, logFilterData[i].defaultState))
+                m_logFilter |= (1 << i);
 
     // Char log settings
     m_charLog_Dump = sConfig.GetBoolDefault("CharLogDump", false);
@@ -813,6 +820,29 @@ void Log::outRALog(    const char * str, ... )
     }
 
     fflush(stdout);
+}
+
+void Log::WaitBeforeContinueIfNeed()
+{
+    int mode = sConfig.GetIntDefault("WaitAtStartupError",0);
+
+    if (mode < 0)
+    {
+        printf("\nPress <Enter> for continue\n");
+
+        std::string line;
+        std::getline (std::cin, line);
+    }
+    else if (mode > 0)
+    {
+        printf("\nWait %u secs for continue.\n",mode);
+        barGoLink bar(mode);
+        for(int i = 0; i < mode; ++i)
+        {
+            bar.step();
+            ACE_OS::sleep(1);
+        }
+    }
 }
 
 void outstring_log(const char * str, ...)

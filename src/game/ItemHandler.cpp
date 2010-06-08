@@ -414,13 +414,13 @@ void WorldSession::HandleItemQuerySingleOpcode( WorldPacket & recv_data )
             data << pProto->Socket[s].Color;
             data << pProto->Socket[s].Content;
         }
-        data << pProto->socketBonus;
-        data << pProto->GemProperties;
-        data << pProto->RequiredDisenchantSkill;
-        data << pProto->ArmorDamageModifier;
-        data << pProto->Duration;                           // added in 2.4.2.8209, duration (seconds)
-        data << pProto->ItemLimitCategory;                  // WotLK, ItemLimitCategory
-        data << pProto->HolidayId;                          // Holiday.dbc?
+        data << uint32(pProto->socketBonus);
+        data << uint32(pProto->GemProperties);
+        data << int32(pProto->RequiredDisenchantSkill);
+        data << float(pProto->ArmorDamageModifier);
+        data << uint32(pProto->Duration);                   // added in 2.4.2.8209, duration (seconds)
+        data << uint32(pProto->ItemLimitCategory);          // WotLK, ItemLimitCategory
+        data << uint32(pProto->HolidayId);                  // Holiday.dbc?
         SendPacket( &data );
     }
     else
@@ -760,7 +760,7 @@ void WorldSession::SendListInventory(uint64 vendorguid)
                 ++count;
 
                 // reputation discount
-                uint32 price = uint32(floor(pProto->BuyPrice * discountMod));
+                uint32 price = crItem->IsExcludeMoneyPrice() ? 0 : uint32(floor(pProto->BuyPrice * discountMod));
 
                 data << uint32(vendorslot +1);              // client size expected counting from 1
                 data << uint32(crItem->item);
@@ -769,7 +769,7 @@ void WorldSession::SendListInventory(uint64 vendorguid)
                 data << uint32(price);
                 data << uint32(pProto->MaxDurability);
                 data << uint32(pProto->BuyCount);
-                data << uint32(crItem->ExtendedCost);
+                data << uint32(crItem->GetExtendedCostId());
             }
         }
     }
@@ -902,6 +902,14 @@ void WorldSession::HandleAutoBankItemOpcode(WorldPacket& recvPacket)
     if( msg != EQUIP_ERR_OK )
     {
         _player->SendEquipError( msg, pItem, NULL );
+        return;
+    }
+
+    // no-op: placed in same slot
+    if(dest.size() == 1 && dest[0].pos == pItem->GetPos())
+    {
+        // just remove gray item state
+        _player->SendEquipError( EQUIP_ERR_NONE, pItem, NULL );
         return;
     }
 

@@ -35,19 +35,10 @@
 #include "Group.h"
 #include "MapRefManager.h"
 #include "DBCEnums.h"
-
 #include "MapInstanced.h"
 #include "InstanceSaveMgr.h"
 #include "VMapFactory.h"
 #include "BattleGroundMgr.h"
-
-GridState* si_GridStates[MAX_GRID_STATE];
-
-static char const* MAP_MAGIC         = "MAPS";
-static char const* MAP_VERSION_MAGIC = "v1.1";
-static char const* MAP_AREA_MAGIC    = "AREA";
-static char const* MAP_HEIGHT_MAGIC  = "MHGT";
-static char const* MAP_LIQUID_MAGIC  = "MLIQ";
 
 struct ScriptAction
 {
@@ -64,58 +55,6 @@ Map::~Map()
 
     if(!m_scriptSchedule.empty())
         sWorld.DecreaseScheduledScriptCount(m_scriptSchedule.size());
-}
-
-bool Map::ExistMap(uint32 mapid,int gx,int gy)
-{
-    int len = sWorld.GetDataPath().length()+strlen("maps/%03u%02u%02u.map")+1;
-    char* tmp = new char[len];
-    snprintf(tmp, len, (char *)(sWorld.GetDataPath()+"maps/%03u%02u%02u.map").c_str(),mapid,gx,gy);
-
-    FILE *pf=fopen(tmp,"rb");
-
-    if(!pf)
-    {
-        sLog.outError("Check existing of map file '%s': not exist!",tmp);
-        delete[] tmp;
-        return false;
-    }
-
-    map_fileheader header;
-    fread(&header, sizeof(header), 1, pf);
-    if (header.mapMagic     != *((uint32 const*)(MAP_MAGIC)) ||
-        header.versionMagic != *((uint32 const*)(MAP_VERSION_MAGIC)) ||
-        !IsAcceptableClientBuild(header.buildMagic))
-    {
-        sLog.outError("Map file '%s' is non-compatible version (outdated?). Please, create new using ad.exe program.",tmp);
-        delete [] tmp;
-        fclose(pf);                                         //close file before return
-        return false;
-    }
-
-    delete [] tmp;
-    fclose(pf);
-    return true;
-}
-
-bool Map::ExistVMap(uint32 mapid,int gx,int gy)
-{
-    if(VMAP::IVMapManager* vmgr = VMAP::VMapFactory::createOrGetVMapManager())
-    {
-        if(vmgr->isMapLoadingEnabled())
-        {
-                                                            // x and y are swapped !! => fixed now
-            bool exists = vmgr->existsMap((sWorld.GetDataPath()+ "vmaps").c_str(),  mapid, gx,gy);
-            if(!exists)
-            {
-                std::string name = vmgr->getDirFileName(mapid,gx,gy);
-                sLog.outError("VMap file '%s' is missing or point to wrong version vmap file, redo vmaps with latest vmap_assembler.exe program", (sWorld.GetDataPath()+"vmaps/"+name).c_str());
-                return false;
-            }
-        }
-    }
-
-    return true;
 }
 
 void Map::LoadVMap(int gx,int gy)
@@ -183,22 +122,6 @@ void Map::LoadMapAndVMap(int gx,int gy)
     LoadMap(gx,gy);
     if(i_InstanceId == 0)
         LoadVMap(gx, gy);                                   // Only load the data for the base map
-}
-
-void Map::InitStateMachine()
-{
-    si_GridStates[GRID_STATE_INVALID] = new InvalidState;
-    si_GridStates[GRID_STATE_ACTIVE] = new ActiveState;
-    si_GridStates[GRID_STATE_IDLE] = new IdleState;
-    si_GridStates[GRID_STATE_REMOVAL] = new RemovalState;
-}
-
-void Map::DeleteStateMachine()
-{
-    delete si_GridStates[GRID_STATE_INVALID];
-    delete si_GridStates[GRID_STATE_ACTIVE];
-    delete si_GridStates[GRID_STATE_IDLE];
-    delete si_GridStates[GRID_STATE_REMOVAL];
 }
 
 Map::Map(uint32 id, time_t expiry, uint32 InstanceId, uint8 SpawnMode, Map* _parent)
@@ -707,7 +630,7 @@ void Map::Update(const uint32 &t_diff)
             GridInfo *info = i->getSource()->getGridInfoRef();
             ++i;                                                // The update might delete the map and we need the next map before the iterator gets invalid
             ASSERT(grid->GetGridState() >= 0 && grid->GetGridState() < MAX_GRID_STATE);
-            si_GridStates[grid->GetGridState()]->Update(*this, *grid, *info, grid->getX(), grid->getY(), t_diff);
+            sMapMgr.UpdateGridState(grid->GetGridState(), *this, *grid, *info, grid->getX(), grid->getY(), t_diff);
         }
     }
 
@@ -1066,510 +989,6 @@ uint32 Map::GetMaxResetDelay() const
     return mapDiff ? mapDiff->resetTime : 0;
 }
 
-//*****************************
-// Grid function
-//*****************************
-GridMap::GridMap()
-{
-    m_flags = 0;
-    // Area data
-    m_gridArea = 0;
-    m_area_map = NULL;
-    // Height level data
-    m_gridHeight = INVALID_HEIGHT;
-    m_gridGetHeight = &GridMap::getHeightFromFlat;
-    m_V9 = NULL;
-    m_V8 = NULL;
-    // Liquid data
-    m_liquidType    = 0;
-    m_liquid_offX   = 0;
-    m_liquid_offY   = 0;
-    m_liquid_width  = 0;
-    m_liquid_height = 0;
-    m_liquidLevel = INVALID_HEIGHT;
-    m_liquid_type = NULL;
-    m_liquid_map  = NULL;
-}
-
-GridMap::~GridMap()
-{
-    unloadData();
-}
-
-bool GridMap::loadData(char *filename)
-{
-    // Unload old data if exist
-    unloadData();
-
-    map_fileheader header;
-    // Not return error if file not found
-    FILE *in = fopen(filename, "rb");
-    if (!in)
-        return true;
-    fread(&header, sizeof(header),1,in);
-    if (header.mapMagic     == *((uint32 const*)(MAP_MAGIC)) &&
-        header.versionMagic == *((uint32 const*)(MAP_VERSION_MAGIC)) ||
-        !IsAcceptableClientBuild(header.buildMagic))
-    {
-        // loadup area data
-        if (header.areaMapOffset && !loadAreaData(in, header.areaMapOffset, header.areaMapSize))
-        {
-            sLog.outError("Error loading map area data\n");
-            fclose(in);
-            return false;
-        }
-        // loadup height data
-        if (header.heightMapOffset && !loadHeightData(in, header.heightMapOffset, header.heightMapSize))
-        {
-            sLog.outError("Error loading map height data\n");
-            fclose(in);
-            return false;
-        }
-        // loadup liquid data
-        if (header.liquidMapOffset && !loadLiquidData(in, header.liquidMapOffset, header.liquidMapSize))
-        {
-            sLog.outError("Error loading map liquids data\n");
-            fclose(in);
-            return false;
-        }
-        fclose(in);
-        return true;
-    }
-    sLog.outError("Map file '%s' is non-compatible version (outdated?). Please, create new using ad.exe program.", filename);
-    fclose(in);
-    return false;
-}
-
-void GridMap::unloadData()
-{
-    if (m_area_map) delete[] m_area_map;
-    if (m_V9) delete[] m_V9;
-    if (m_V8) delete[] m_V8;
-    if (m_liquid_type) delete[] m_liquid_type;
-    if (m_liquid_map) delete[] m_liquid_map;
-    m_area_map = NULL;
-    m_V9 = NULL;
-    m_V8 = NULL;
-    m_liquid_type = NULL;
-    m_liquid_map  = NULL;
-    m_gridGetHeight = &GridMap::getHeightFromFlat;
-}
-
-bool GridMap::loadAreaData(FILE *in, uint32 offset, uint32 /*size*/)
-{
-    map_areaHeader header;
-    fseek(in, offset, SEEK_SET);
-    fread(&header, sizeof(header), 1, in);
-    if (header.fourcc != *((uint32 const*)(MAP_AREA_MAGIC)))
-        return false;
-
-    m_gridArea = header.gridArea;
-    if (!(header.flags & MAP_AREA_NO_AREA))
-    {
-        m_area_map = new uint16 [16*16];
-        fread(m_area_map, sizeof(uint16), 16*16, in);
-    }
-    return true;
-}
-
-bool  GridMap::loadHeightData(FILE *in, uint32 offset, uint32 /*size*/)
-{
-    map_heightHeader header;
-    fseek(in, offset, SEEK_SET);
-    fread(&header, sizeof(header), 1, in);
-    if (header.fourcc != *((uint32 const*)(MAP_HEIGHT_MAGIC)))
-        return false;
-
-    m_gridHeight = header.gridHeight;
-    if (!(header.flags & MAP_HEIGHT_NO_HEIGHT))
-    {
-        if ((header.flags & MAP_HEIGHT_AS_INT16))
-        {
-            m_uint16_V9 = new uint16 [129*129];
-            m_uint16_V8 = new uint16 [128*128];
-            fread(m_uint16_V9, sizeof(uint16), 129*129, in);
-            fread(m_uint16_V8, sizeof(uint16), 128*128, in);
-            m_gridIntHeightMultiplier = (header.gridMaxHeight - header.gridHeight) / 65535;
-            m_gridGetHeight = &GridMap::getHeightFromUint16;
-        }
-        else if ((header.flags & MAP_HEIGHT_AS_INT8))
-        {
-            m_uint8_V9 = new uint8 [129*129];
-            m_uint8_V8 = new uint8 [128*128];
-            fread(m_uint8_V9, sizeof(uint8), 129*129, in);
-            fread(m_uint8_V8, sizeof(uint8), 128*128, in);
-            m_gridIntHeightMultiplier = (header.gridMaxHeight - header.gridHeight) / 255;
-            m_gridGetHeight = &GridMap::getHeightFromUint8;
-        }
-        else
-        {
-            m_V9 = new float [129*129];
-            m_V8 = new float [128*128];
-            fread(m_V9, sizeof(float), 129*129, in);
-            fread(m_V8, sizeof(float), 128*128, in);
-            m_gridGetHeight = &GridMap::getHeightFromFloat;
-        }
-    }
-    else
-        m_gridGetHeight = &GridMap::getHeightFromFlat;
-    return true;
-}
-
-bool  GridMap::loadLiquidData(FILE *in, uint32 offset, uint32 /*size*/)
-{
-    map_liquidHeader header;
-    fseek(in, offset, SEEK_SET);
-    fread(&header, sizeof(header), 1, in);
-    if (header.fourcc != *((uint32 const*)(MAP_LIQUID_MAGIC)))
-        return false;
-
-    m_liquidType   = header.liquidType;
-    m_liquid_offX  = header.offsetX;
-    m_liquid_offY  = header.offsetY;
-    m_liquid_width = header.width;
-    m_liquid_height= header.height;
-    m_liquidLevel  = header.liquidLevel;
-
-    if (!(header.flags & MAP_LIQUID_NO_TYPE))
-    {
-        m_liquid_type = new uint8 [16*16];
-        fread(m_liquid_type, sizeof(uint8), 16*16, in);
-    }
-    if (!(header.flags & MAP_LIQUID_NO_HEIGHT))
-    {
-        m_liquid_map = new float [m_liquid_width*m_liquid_height];
-        fread(m_liquid_map, sizeof(float), m_liquid_width*m_liquid_height, in);
-    }
-    return true;
-}
-
-uint16 GridMap::getArea(float x, float y)
-{
-    if (!m_area_map)
-        return m_gridArea;
-
-    x = 16 * (32 - x/SIZE_OF_GRIDS);
-    y = 16 * (32 - y/SIZE_OF_GRIDS);
-    int lx = (int)x & 15;
-    int ly = (int)y & 15;
-    return m_area_map[lx*16 + ly];
-}
-
-float  GridMap::getHeightFromFlat(float /*x*/, float /*y*/) const
-{
-    return m_gridHeight;
-}
-
-float  GridMap::getHeightFromFloat(float x, float y) const
-{
-    if (!m_V8 || !m_V9)
-        return m_gridHeight;
-
-    x = MAP_RESOLUTION * (32 - x/SIZE_OF_GRIDS);
-    y = MAP_RESOLUTION * (32 - y/SIZE_OF_GRIDS);
-
-    int x_int = (int)x;
-    int y_int = (int)y;
-    x -= x_int;
-    y -= y_int;
-    x_int&=(MAP_RESOLUTION - 1);
-    y_int&=(MAP_RESOLUTION - 1);
-
-    // Height stored as: h5 - its v8 grid, h1-h4 - its v9 grid
-    // +--------------> X
-    // | h1-------h2     Coordinates is:
-    // | | \  1  / |     h1 0,0
-    // | |  \   /  |     h2 0,1
-    // | | 2  h5 3 |     h3 1,0
-    // | |  /   \  |     h4 1,1
-    // | | /  4  \ |     h5 1/2,1/2
-    // | h3-------h4
-    // V Y
-    // For find height need
-    // 1 - detect triangle
-    // 2 - solve linear equation from triangle points
-    // Calculate coefficients for solve h = a*x + b*y + c
-
-    float a,b,c;
-    // Select triangle:
-    if (x+y < 1)
-    {
-        if (x > y)
-        {
-            // 1 triangle (h1, h2, h5 points)
-            float h1 = m_V9[(x_int  )*129 + y_int];
-            float h2 = m_V9[(x_int+1)*129 + y_int];
-            float h5 = 2 * m_V8[x_int*128 + y_int];
-            a = h2-h1;
-            b = h5-h1-h2;
-            c = h1;
-        }
-        else
-        {
-            // 2 triangle (h1, h3, h5 points)
-            float h1 = m_V9[x_int*129 + y_int  ];
-            float h3 = m_V9[x_int*129 + y_int+1];
-            float h5 = 2 * m_V8[x_int*128 + y_int];
-            a = h5 - h1 - h3;
-            b = h3 - h1;
-            c = h1;
-        }
-    }
-    else
-    {
-        if (x > y)
-        {
-            // 3 triangle (h2, h4, h5 points)
-            float h2 = m_V9[(x_int+1)*129 + y_int  ];
-            float h4 = m_V9[(x_int+1)*129 + y_int+1];
-            float h5 = 2 * m_V8[x_int*128 + y_int];
-            a = h2 + h4 - h5;
-            b = h4 - h2;
-            c = h5 - h4;
-        }
-        else
-        {
-            // 4 triangle (h3, h4, h5 points)
-            float h3 = m_V9[(x_int  )*129 + y_int+1];
-            float h4 = m_V9[(x_int+1)*129 + y_int+1];
-            float h5 = 2 * m_V8[x_int*128 + y_int];
-            a = h4 - h3;
-            b = h3 + h4 - h5;
-            c = h5 - h4;
-        }
-    }
-    // Calculate height
-    return a * x + b * y + c;
-}
-
-float  GridMap::getHeightFromUint8(float x, float y) const
-{
-    if (!m_uint8_V8 || !m_uint8_V9)
-        return m_gridHeight;
-
-    x = MAP_RESOLUTION * (32 - x/SIZE_OF_GRIDS);
-    y = MAP_RESOLUTION * (32 - y/SIZE_OF_GRIDS);
-
-    int x_int = (int)x;
-    int y_int = (int)y;
-    x -= x_int;
-    y -= y_int;
-    x_int&=(MAP_RESOLUTION - 1);
-    y_int&=(MAP_RESOLUTION - 1);
-
-    int32 a, b, c;
-    uint8 *V9_h1_ptr = &m_uint8_V9[x_int*128 + x_int + y_int];
-    if (x+y < 1)
-    {
-        if (x > y)
-        {
-            // 1 triangle (h1, h2, h5 points)
-            int32 h1 = V9_h1_ptr[  0];
-            int32 h2 = V9_h1_ptr[129];
-            int32 h5 = 2 * m_uint8_V8[x_int*128 + y_int];
-            a = h2-h1;
-            b = h5-h1-h2;
-            c = h1;
-        }
-        else
-        {
-            // 2 triangle (h1, h3, h5 points)
-            int32 h1 = V9_h1_ptr[0];
-            int32 h3 = V9_h1_ptr[1];
-            int32 h5 = 2 * m_uint8_V8[x_int*128 + y_int];
-            a = h5 - h1 - h3;
-            b = h3 - h1;
-            c = h1;
-        }
-    }
-    else
-    {
-        if (x > y)
-        {
-            // 3 triangle (h2, h4, h5 points)
-            int32 h2 = V9_h1_ptr[129];
-            int32 h4 = V9_h1_ptr[130];
-            int32 h5 = 2 * m_uint8_V8[x_int*128 + y_int];
-            a = h2 + h4 - h5;
-            b = h4 - h2;
-            c = h5 - h4;
-        }
-        else
-        {
-            // 4 triangle (h3, h4, h5 points)
-            int32 h3 = V9_h1_ptr[  1];
-            int32 h4 = V9_h1_ptr[130];
-            int32 h5 = 2 * m_uint8_V8[x_int*128 + y_int];
-            a = h4 - h3;
-            b = h3 + h4 - h5;
-            c = h5 - h4;
-        }
-    }
-    // Calculate height
-    return (float)((a * x) + (b * y) + c)*m_gridIntHeightMultiplier + m_gridHeight;
-}
-
-float  GridMap::getHeightFromUint16(float x, float y) const
-{
-    if (!m_uint16_V8 || !m_uint16_V9)
-        return m_gridHeight;
-
-    x = MAP_RESOLUTION * (32 - x/SIZE_OF_GRIDS);
-    y = MAP_RESOLUTION * (32 - y/SIZE_OF_GRIDS);
-
-    int x_int = (int)x;
-    int y_int = (int)y;
-    x -= x_int;
-    y -= y_int;
-    x_int&=(MAP_RESOLUTION - 1);
-    y_int&=(MAP_RESOLUTION - 1);
-
-    int32 a, b, c;
-    uint16 *V9_h1_ptr = &m_uint16_V9[x_int*128 + x_int + y_int];
-    if (x+y < 1)
-    {
-        if (x > y)
-        {
-            // 1 triangle (h1, h2, h5 points)
-            int32 h1 = V9_h1_ptr[  0];
-            int32 h2 = V9_h1_ptr[129];
-            int32 h5 = 2 * m_uint16_V8[x_int*128 + y_int];
-            a = h2-h1;
-            b = h5-h1-h2;
-            c = h1;
-        }
-        else
-        {
-            // 2 triangle (h1, h3, h5 points)
-            int32 h1 = V9_h1_ptr[0];
-            int32 h3 = V9_h1_ptr[1];
-            int32 h5 = 2 * m_uint16_V8[x_int*128 + y_int];
-            a = h5 - h1 - h3;
-            b = h3 - h1;
-            c = h1;
-        }
-    }
-    else
-    {
-        if (x > y)
-        {
-            // 3 triangle (h2, h4, h5 points)
-            int32 h2 = V9_h1_ptr[129];
-            int32 h4 = V9_h1_ptr[130];
-            int32 h5 = 2 * m_uint16_V8[x_int*128 + y_int];
-            a = h2 + h4 - h5;
-            b = h4 - h2;
-            c = h5 - h4;
-        }
-        else
-        {
-            // 4 triangle (h3, h4, h5 points)
-            int32 h3 = V9_h1_ptr[  1];
-            int32 h4 = V9_h1_ptr[130];
-            int32 h5 = 2 * m_uint16_V8[x_int*128 + y_int];
-            a = h4 - h3;
-            b = h3 + h4 - h5;
-            c = h5 - h4;
-        }
-    }
-    // Calculate height
-    return (float)((a * x) + (b * y) + c)*m_gridIntHeightMultiplier + m_gridHeight;
-}
-
-float  GridMap::getLiquidLevel(float x, float y)
-{
-    if (!m_liquid_map)
-        return m_liquidLevel;
-
-    x = MAP_RESOLUTION * (32 - x/SIZE_OF_GRIDS);
-    y = MAP_RESOLUTION * (32 - y/SIZE_OF_GRIDS);
-
-    int cx_int = ((int)x & (MAP_RESOLUTION-1)) - m_liquid_offY;
-    int cy_int = ((int)y & (MAP_RESOLUTION-1)) - m_liquid_offX;
-
-    if (cx_int < 0 || cx_int >=m_liquid_height)
-        return INVALID_HEIGHT;
-    if (cy_int < 0 || cy_int >=m_liquid_width )
-        return INVALID_HEIGHT;
-
-    return m_liquid_map[cx_int*m_liquid_width + cy_int];
-}
-
-uint8  GridMap::getTerrainType(float x, float y)
-{
-    if (!m_liquid_type)
-        return (uint8)m_liquidType;
-
-    x = 16 * (32 - x/SIZE_OF_GRIDS);
-    y = 16 * (32 - y/SIZE_OF_GRIDS);
-    int lx = (int)x & 15;
-    int ly = (int)y & 15;
-    return m_liquid_type[lx*16 + ly];
-}
-
-// Get water state on map
-inline ZLiquidStatus GridMap::getLiquidStatus(float x, float y, float z, uint8 ReqLiquidType, LiquidData *data)
-{
-    // Check water type (if no water return)
-    if (!m_liquid_type && !m_liquidType)
-        return LIQUID_MAP_NO_WATER;
-
-    // Get cell
-    float cx = MAP_RESOLUTION * (32 - x/SIZE_OF_GRIDS);
-    float cy = MAP_RESOLUTION * (32 - y/SIZE_OF_GRIDS);
-
-    int x_int = (int)cx & (MAP_RESOLUTION-1);
-    int y_int = (int)cy & (MAP_RESOLUTION-1);
-
-    // Check water type in cell
-    uint8 type = m_liquid_type ? m_liquid_type[(x_int>>3)*16 + (y_int>>3)] : m_liquidType;
-    if (type == 0)
-        return LIQUID_MAP_NO_WATER;
-
-    // Check req liquid type mask
-    if (ReqLiquidType && !(ReqLiquidType&type))
-        return LIQUID_MAP_NO_WATER;
-
-    // Check water level:
-    // Check water height map
-    int lx_int = x_int - m_liquid_offY;
-    int ly_int = y_int - m_liquid_offX;
-    if (lx_int < 0 || lx_int >=m_liquid_height)
-        return LIQUID_MAP_NO_WATER;
-    if (ly_int < 0 || ly_int >=m_liquid_width )
-        return LIQUID_MAP_NO_WATER;
-
-    // Get water level
-    float liquid_level = m_liquid_map ? m_liquid_map[lx_int*m_liquid_width + ly_int] : m_liquidLevel;
-    // Get ground level (sub 0.2 for fix some errors)
-    float ground_level = getHeight(x, y);
-
-    // Check water level and ground level
-    if (liquid_level < ground_level || z < ground_level - 2)
-        return LIQUID_MAP_NO_WATER;
-
-    // All ok in water -> store data
-    if (data)
-    {
-        data->type  = type;
-        data->level = liquid_level;
-        data->depth_level = ground_level;
-    }
-
-    // For speed check as int values
-    int delta = int((liquid_level - z) * 10);
-
-    // Get position delta
-    if (delta > 20)                                         // Under water
-        return LIQUID_MAP_UNDER_WATER;
-    if (delta > 0 )                                         // In water
-        return LIQUID_MAP_IN_WATER;
-    if (delta > -1)                                         // Walk on water
-        return LIQUID_MAP_WATER_WALK;
-                                                            // Above water
-    return LIQUID_MAP_ABOVE_WATER;
-}
-
 inline GridMap *Map::GetGrid(float x, float y)
 {
     // half opt method
@@ -1899,7 +1318,7 @@ uint8 Map::GetTerrainType(float x, float y ) const
         return 0;
 }
 
-ZLiquidStatus Map::getLiquidStatus(float x, float y, float z, uint8 ReqLiquidType, LiquidData *data) const
+GridMapLiquidStatus Map::getLiquidStatus(float x, float y, float z, uint8 ReqLiquidType, GridMapLiquidData *data) const
 {
     if(GridMap* gmap = const_cast<Map*>(this)->GetGrid(x, y))
         return gmap->getLiquidStatus(x, y, z, ReqLiquidType, data);
@@ -1948,7 +1367,7 @@ bool Map::IsInWater(float x, float y, float pZ) const
     // Check surface in x, y point for liquid
     if (const_cast<Map*>(this)->GetGrid(x, y))
     {
-        LiquidData liquid_status;
+        GridMapLiquidData liquid_status;
         if (getLiquidStatus(x, y, pZ, MAP_ALL_LIQUIDS, &liquid_status))
         {
             if (liquid_status.level - liquid_status.depth_level > 2)
@@ -2856,37 +2275,94 @@ void Map::ScriptsProcess()
             {
                 if (!source)
                 {
-                    sLog.outError("SCRIPT_COMMAND_TALK (script id %u) call for NULL creature.", step.script->id);
+                    sLog.outError("SCRIPT_COMMAND_TALK (script id %u) call for NULL source.", step.script->id);
                     break;
                 }
 
-                if (source->GetTypeId()!=TYPEID_UNIT)
+                if (!source->isType(TYPEMASK_WORLDOBJECT))
                 {
-                    sLog.outError("SCRIPT_COMMAND_TALK (script id %u) call for non-creature (TypeId: %u), skipping.", step.script->id, source->GetTypeId());
+                    sLog.outError("SCRIPT_COMMAND_TALK (script id %u) call for unsupported non-worldobject (TypeId: %u), skipping.", step.script->id, source->GetTypeId());
                     break;
                 }
+
+                WorldObject* pSource = (WorldObject*)source;
+                Creature* pBuddy = NULL;
+
+                // flag_target_player_as_source     0x01
+                // flag_original_source_as_target   0x02
+                // flag_buddy_as_target             0x04
+
+                // If target is player (and not already the source) but should be the source
+                if (target && target->GetTypeId() == TYPEID_PLAYER && step.script->data_flags & 0x01)
+                {
+                    if (source->GetTypeId() != TYPEID_PLAYER)
+                        pSource = (WorldObject*)target;
+                }
+
+                // If step has a buddy entry defined, search for it.
+                if (step.script->datalong2)
+                {
+                    MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck u_check(*pSource, step.script->datalong2, true, step.script->datalong3);
+                    MaNGOS::CreatureLastSearcher<MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck> searcher(pSource, pBuddy, u_check);
+
+                    Cell::VisitGridObjects(pSource, searcher, step.script->datalong3);
+                }
+
+                // If buddy found, then use it
+                if (pBuddy)
+                {
+                    // pBuddy can be target of talk
+                    if (step.script->data_flags & 0x04)
+                    {
+                        target = (Object*)pBuddy;
+                    }
+                    else
+                    {
+                        // If not target of talk, then set pBuddy as source
+                        // Useless when source is already flagged to be player, and should maybe produce error.
+                        if (!(step.script->data_flags & 0x01))
+                            pSource = (WorldObject*)pBuddy;
+                    }
+                }
+
+                // If we should talk to the original source instead of target
+                if (step.script->data_flags & 0x02)
+                    target = source;
 
                 uint64 unit_target = target ? target->GetGUID() : 0;
 
-                //datalong 0=normal say, 1=whisper, 2=yell, 3=emote text
                 switch(step.script->datalong)
                 {
-                    case 0:                                 // Say
-                        ((Creature *)source)->Say(step.script->dataint, LANG_UNIVERSAL, unit_target);
+                    case CHAT_TYPE_SAY:
+                        pSource->MonsterSay(step.script->dataint, LANG_UNIVERSAL, unit_target);
                         break;
-                    case 1:                                 // Whisper
-                        if (!unit_target)
+                    case CHAT_TYPE_YELL:
+                        pSource->MonsterYell(step.script->dataint, LANG_UNIVERSAL, unit_target);
+                        break;
+                    case CHAT_TYPE_TEXT_EMOTE:
+                        pSource->MonsterTextEmote(step.script->dataint, unit_target);
+                        break;
+                    case CHAT_TYPE_BOSS_EMOTE:
+                        pSource->MonsterTextEmote(step.script->dataint, unit_target, true);
+                        break;
+                    case CHAT_TYPE_WHISPER:
+                        if (!unit_target || !IS_PLAYER_GUID(unit_target))
                         {
-                            sLog.outError("SCRIPT_COMMAND_TALK (script id %u) attempt to whisper (%u) NULL, skipping.", step.script->id, step.script->datalong);
+                            sLog.outError("SCRIPT_COMMAND_TALK (script id %u) attempt to whisper (%u) 0-guid or non-player, skipping.", step.script->id, step.script->datalong);
                             break;
                         }
-                        ((Creature *)source)->Whisper(step.script->dataint, unit_target);
+                        pSource->MonsterWhisper(step.script->dataint, unit_target);
                         break;
-                    case 2:                                 // Yell
-                        ((Creature *)source)->Yell(step.script->dataint, LANG_UNIVERSAL, unit_target);
+                    case CHAT_TYPE_BOSS_WHISPER:
+                        if (!unit_target || !IS_PLAYER_GUID(unit_target))
+                        {
+                            sLog.outError("SCRIPT_COMMAND_TALK (script id %u) attempt to whisper (%u) 0-guid or non-player, skipping.", step.script->id, step.script->datalong);
+                            break;
+                        }
+                        pSource->MonsterWhisper(step.script->dataint, unit_target, true);
                         break;
-                    case 3:                                 // Emote text
-                        ((Creature *)source)->TextEmote(step.script->dataint, unit_target);
+                    case CHAT_TYPE_ZONE_YELL:
+                        pSource->MonsterYellToZone(step.script->dataint, LANG_UNIVERSAL, unit_target);
                         break;
                     default:
                         break;                              // must be already checked at load
@@ -3033,13 +2509,13 @@ void Map::ScriptsProcess()
                     break;
                 }
 
-                WorldObject* summoner = dynamic_cast<WorldObject*>(source);
-
-                if (!summoner)
+                if (!source->isType(TYPEMASK_WORLDOBJECT))
                 {
                     sLog.outError("SCRIPT_COMMAND_TEMP_SUMMON_CREATURE (script id %u) call for non-WorldObject (TypeId: %u), skipping.", step.script->id, source->GetTypeId());
                     break;
                 }
+
+                WorldObject* summoner = (WorldObject*)source;
 
                 float x = step.script->x;
                 float y = step.script->y;
@@ -3069,13 +2545,13 @@ void Map::ScriptsProcess()
                     break;
                 }
 
-                WorldObject* summoner = dynamic_cast<WorldObject*>(source);
-
-                if (!summoner)
+                if (!source->isType(TYPEMASK_WORLDOBJECT))
                 {
                     sLog.outError("SCRIPT_COMMAND_RESPAWN_GAMEOBJECT (script id %u) call for non-WorldObject (TypeId: %u), skipping.", step.script->id, source->GetTypeId());
                     break;
                 }
+
+                WorldObject* summoner = (WorldObject*)source;
 
                 GameObject *go = NULL;
                 int32 time_to_despawn = step.script->datalong2<5 ? 5 : (int32)step.script->datalong2;
@@ -3370,13 +2846,13 @@ void Map::ScriptsProcess()
                     break;
                 }
 
-                WorldObject* pSource = dynamic_cast<WorldObject*>(source);
-
-                if (!pSource)
+                if (!source->isType(TYPEMASK_WORLDOBJECT))
                 {
                     sLog.outError("SCRIPT_COMMAND_PLAY_SOUND (script id %u) call for non-world object (TypeId: %u), skipping.", step.script->id, source->GetTypeId());
                     break;
                 }
+
+                WorldObject* pSource = (WorldObject*)source;
 
                 // bitmask: 0/1=anyone/target, 0/2=with distance dependent
                 Player* pTarget = NULL;

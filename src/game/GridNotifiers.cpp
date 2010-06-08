@@ -53,7 +53,7 @@ VisibleNotifier::Notify()
             {
                 // ignore far sight case
                 (*itr)->UpdateVisibilityOf((*itr),&i_player);
-                i_player.UpdateVisibilityOf(&i_player,(*itr),i_data,i_data_updates,i_visibleNow);
+                i_player.UpdateVisibilityOf(&i_player,(*itr),i_data,i_visibleNow);
                 i_clientGUIDs.erase((*itr)->GetGUID());
             }
         }
@@ -66,17 +66,6 @@ VisibleNotifier::Notify()
         i_player.m_clientGUIDs.erase(*itr);
 
         DEBUG_FILTER_LOG(LOG_FILTER_VISIBILITY_CHANGES, "%s is out of range (no in active cells set) now for player %u",itr->GetString().c_str(),i_player.GetGUIDLow());
-    }
-
-    // send update to other players (except player updates that already sent using SendUpdateToPlayer)
-    for(UpdateDataMapType::iterator iter = i_data_updates.begin(); iter != i_data_updates.end(); ++iter)
-    {
-        if(iter->first==&i_player)
-            continue;
-
-        WorldPacket packet;
-        iter->second.BuildPacket(&packet);
-        iter->first->GetSession()->SendPacket(&packet);
     }
 
     if( i_data.HasData() )

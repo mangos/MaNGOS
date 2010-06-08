@@ -16,6 +16,7 @@ http://mangos.lighthouseapp.com/
 Version 0.16
  * Under discussion.
  * OpenSSL lib upgrade to OpenSSL 1.0.0.
+ * Sockets lib use dropped.
  * Upgrade to client version 3.3.3a (build 11723).
 
 Version 0.15

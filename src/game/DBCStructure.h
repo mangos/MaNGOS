@@ -574,7 +574,7 @@ struct BattlemasterListEntry
     char*   name[16];                                       // 11-26
     //uint32 nameFlags                                      // 27 string flag, unused
     uint32 maxGroupSize;                                    // 28 maxGroupSize, used for checking if queue as group
-    //uint32 HolidayWorldStateId;                           // 29 new 3.1
+    uint32 HolidayWorldStateId;                             // 29 new 3.1
     uint32 minLevel;                                        // 30, min level (sync with PvPDifficulty.dbc content)
     uint32 maxLevel;                                        // 31, max level (sync with PvPDifficulty.dbc content)
 };
