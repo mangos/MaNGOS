@@ -7440,6 +7440,15 @@ void Aura::PeriodicTick()
                         }
                         break;
                     }
+                    case 70541:
+                    {
+                        if(target->GetHealth() >= target->GetMaxHealth() * 0.9 )
+                        {
+                            target->RemoveAurasDueToSpell(GetId());
+                            return;
+                        }
+                        break;
+                    }
                     default:
                         break;
                 }
