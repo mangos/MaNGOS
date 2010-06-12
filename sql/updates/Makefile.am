@@ -87,6 +87,7 @@ pkgdata_DATA = \
 	10044_01_mangos_spell_chain.sql \
 	10044_02_mangos_spell_proc_event.sql \
 	10045_01_mangos_spell_proc_event.sql \
+	10051_01_characters_character_aura.sql \
 	README
 
 ## Additional files to include when running 'make dist'
@@ -154,4 +155,5 @@ EXTRA_DIST = \
 	10044_01_mangos_spell_chain.sql \
 	10044_02_mangos_spell_proc_event.sql \
 	10045_01_mangos_spell_proc_event.sql \
+	10051_01_characters_character_aura.sql \
 	README
