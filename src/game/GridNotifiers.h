@@ -38,13 +38,14 @@ namespace MaNGOS
 {
     struct MANGOS_DLL_DECL VisibleNotifier
     {
-        Player &i_player;
+        Camera& i_camera;
         UpdateData i_data;
         ObjectGuidSet i_clientGUIDs;
         std::set<WorldObject*> i_visibleNow;
 
-        explicit VisibleNotifier(Player &player) : i_player(player),i_clientGUIDs(player.m_clientGUIDs) {}
+        explicit VisibleNotifier(Camera &c) : i_camera(c), i_clientGUIDs(c.GetOwner()->m_clientGUIDs) {}
         template<class T> void Visit(GridRefManager<T> &m);
+        void Visit(CameraMapType &m) {}
         void Notify(void);
     };
 
@@ -54,7 +55,7 @@ namespace MaNGOS
 
         explicit VisibleChangesNotifier(WorldObject &object) : i_object(object) {}
         template<class T> void Visit(GridRefManager<T> &) {}
-        void Visit(PlayerMapType &);
+        void Visit(CameraMapType &);
     };
 
     struct MANGOS_DLL_DECL GridUpdater
@@ -82,7 +83,7 @@ namespace MaNGOS
         WorldPacket *i_message;
         bool i_toSelf;
         MessageDeliverer(Player &pl, WorldPacket *msg, bool to_self) : i_player(pl), i_message(msg), i_toSelf(to_self) {}
-        void Visit(PlayerMapType &m);
+        void Visit(CameraMapType &m);
         template<class SKIP> void Visit(GridRefManager<SKIP> &) {}
     };
 
@@ -95,7 +96,7 @@ namespace MaNGOS
         MessageDelivererExcept(WorldObject const* obj, WorldPacket *msg, Player const* skipped)
             : i_phaseMask(obj->GetPhaseMask()), i_message(msg), i_skipped_receiver(skipped) {}
 
-        void Visit(PlayerMapType &m);
+        void Visit(CameraMapType &m);
         template<class SKIP> void Visit(GridRefManager<SKIP> &) {}
     };
 
@@ -105,7 +106,7 @@ namespace MaNGOS
         WorldPacket *i_message;
         explicit ObjectMessageDeliverer(WorldObject& obj, WorldPacket *msg)
             : i_phaseMask(obj.GetPhaseMask()), i_message(msg) {}
-        void Visit(PlayerMapType &m);
+        void Visit(CameraMapType &m);
         template<class SKIP> void Visit(GridRefManager<SKIP> &) {}
     };
 
@@ -119,7 +120,7 @@ namespace MaNGOS
 
         MessageDistDeliverer(Player &pl, WorldPacket *msg, float dist, bool to_self, bool ownTeamOnly)
             : i_player(pl), i_message(msg), i_toSelf(to_self), i_ownTeamOnly(ownTeamOnly), i_dist(dist) {}
-        void Visit(PlayerMapType &m);
+        void Visit(CameraMapType &m);
         template<class SKIP> void Visit(GridRefManager<SKIP> &) {}
     };
 
@@ -129,7 +130,7 @@ namespace MaNGOS
         WorldPacket *i_message;
         float i_dist;
         ObjectMessageDistDeliverer(WorldObject &obj, WorldPacket *msg, float dist) : i_object(obj), i_message(msg), i_dist(dist) {}
-        void Visit(PlayerMapType &m);
+        void Visit(CameraMapType &m);
         template<class SKIP> void Visit(GridRefManager<SKIP> &) {}
     };
 
@@ -140,6 +141,7 @@ namespace MaNGOS
         template<class T> void Visit(GridRefManager<T> &m);
         void Visit(PlayerMapType &) {}
         void Visit(CorpseMapType &) {}
+        void Visit(CameraMapType &) {}
         void Visit(CreatureMapType &);
     };
 
@@ -476,22 +478,21 @@ namespace MaNGOS
     };
 
     template<class Do>
-    struct MANGOS_DLL_DECL PlayerDistWorker
+    struct MANGOS_DLL_DECL CameraDistWorker
     {
         WorldObject const* i_searcher;
         float i_dist;
         Do& i_do;
 
-        PlayerDistWorker(WorldObject const* searcher, float _dist, Do& _do)
+        CameraDistWorker(WorldObject const* searcher, float _dist, Do& _do)
             : i_searcher(searcher), i_dist(_dist), i_do(_do) {}
 
-        void Visit(PlayerMapType &m)
+        void Visit(CameraMapType &m)
         {
-            for(PlayerMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
-                if (itr->getSource()->InSamePhase(i_searcher) && itr->getSource()->IsWithinDist(i_searcher,i_dist))
-                    i_do(itr->getSource());
+            for(CameraMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
+                if (itr->getSource()->GetBody()->InSamePhase(i_searcher) && itr->getSource()->GetBody()->IsWithinDist(i_searcher,i_dist))
+                    i_do(itr->getSource()->GetOwner());
         }
-
         template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED> &) {}
     };
 

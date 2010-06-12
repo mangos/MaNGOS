@@ -28,32 +28,29 @@
 using namespace MaNGOS;
 
 void
-VisibleChangesNotifier::Visit(PlayerMapType &m)
+VisibleChangesNotifier::Visit(CameraMapType &m)
 {
-    for(PlayerMapType::iterator iter=m.begin(); iter != m.end(); ++iter)
+    for(CameraMapType::iterator iter=m.begin(); iter != m.end(); ++iter)
     {
-        Player* player = iter->getSource();
-        if(player == &i_object)
-            continue;
-
-        player->UpdateVisibilityOf(player->GetViewPoint(),&i_object);
+        iter->getSource()->UpdateVisibilityOf(&i_object);
     }
 }
 
 void
 VisibleNotifier::Notify()
 {
+    Player& player = *i_camera.GetOwner();
     // at this moment i_clientGUIDs have guids that not iterate at grid level checks
     // but exist one case when this possible and object not out of range: transports
-    if(Transport* transport = i_player.GetTransport())
+    if(Transport* transport = player.GetTransport())
     {
         for(Transport::PlayerSet::const_iterator itr = transport->GetPassengers().begin();itr!=transport->GetPassengers().end();++itr)
         {
-            if(i_clientGUIDs.find((*itr)->GetGUID())!=i_clientGUIDs.end())
+            if (i_clientGUIDs.find((*itr)->GetGUID()) != i_clientGUIDs.end())
             {
                 // ignore far sight case
-                (*itr)->UpdateVisibilityOf((*itr),&i_player);
-                i_player.UpdateVisibilityOf(&i_player,(*itr),i_data,i_visibleNow);
+                (*itr)->UpdateVisibilityOf(*itr, &player);
+                player.UpdateVisibilityOf(&player, *itr, i_data, i_visibleNow);
                 i_clientGUIDs.erase((*itr)->GetGUID());
             }
         }
@@ -63,27 +60,28 @@ VisibleNotifier::Notify()
     i_data.AddOutOfRangeGUID(i_clientGUIDs);
     for(ObjectGuidSet::iterator itr = i_clientGUIDs.begin();itr!=i_clientGUIDs.end();++itr)
     {
-        i_player.m_clientGUIDs.erase(*itr);
+        player.m_clientGUIDs.erase(*itr);
 
-        DEBUG_FILTER_LOG(LOG_FILTER_VISIBILITY_CHANGES, "%s is out of range (no in active cells set) now for player %u",itr->GetString().c_str(),i_player.GetGUIDLow());
+        DEBUG_FILTER_LOG(LOG_FILTER_VISIBILITY_CHANGES, "%s is out of range (no in active cells set) now for %s",
+            itr->GetString().c_str(), player.GetObjectGuid().GetString().c_str());
     }
 
-    if( i_data.HasData() )
+    if (i_data.HasData())
     {
         // send create/outofrange packet to player (except player create updates that already sent using SendUpdateToPlayer)
         WorldPacket packet;
         i_data.BuildPacket(&packet);
-        i_player.GetSession()->SendPacket(&packet);
+        player.GetSession()->SendPacket(&packet);
 
         // send out of range to other players if need
         ObjectGuidSet const& oor = i_data.GetOutOfRangeGUIDs();
         for(ObjectGuidSet::const_iterator iter = oor.begin(); iter != oor.end(); ++iter)
         {
-            if(!iter->IsPlayer())
+            if (!iter->IsPlayer())
                 continue;
 
             if (Player* plr = ObjectAccessor::FindPlayer(*iter))
-                plr->UpdateVisibilityOf(plr->GetViewPoint(),&i_player);
+                plr->UpdateVisibilityOf(plr->GetCamera().GetBody(), &player);
         }
     }
 
@@ -93,87 +91,92 @@ VisibleNotifier::Notify()
     for(std::set<WorldObject*>::const_iterator vItr = i_visibleNow.begin(); vItr != i_visibleNow.end(); ++vItr)
     {
         // target aura duration for caster show only if target exist at caster client
-        if((*vItr)!=&i_player && (*vItr)->isType(TYPEMASK_UNIT))
-            i_player.SendAurasForTarget((Unit*)(*vItr));
+        if ((*vItr) != &player && (*vItr)->isType(TYPEMASK_UNIT))
+            player.SendAurasForTarget((Unit*)(*vItr));
 
         // non finished movements show to player
-        if((*vItr)->GetTypeId()==TYPEID_UNIT && ((Creature*)(*vItr))->isAlive())
-            ((Creature*)(*vItr))->SendMonsterMoveWithSpeedToCurrentDestination(&i_player);
+        if ((*vItr)->GetTypeId()==TYPEID_UNIT && ((Creature*)(*vItr))->isAlive())
+            ((Creature*)(*vItr))->SendMonsterMoveWithSpeedToCurrentDestination(&player);
     }
 }
 
 void
-MessageDeliverer::Visit(PlayerMapType &m)
+MessageDeliverer::Visit(CameraMapType &m)
 {
-    for(PlayerMapType::iterator iter=m.begin(); iter != m.end(); ++iter)
+    for(CameraMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
     {
-        if (i_toSelf || iter->getSource() != &i_player)
+        Player* owner = iter->getSource()->GetOwner();
+
+        if (i_toSelf || owner != &i_player)
         {
-            if (!i_player.InSamePhase(iter->getSource()))
+            if (!i_player.InSamePhase(iter->getSource()->GetBody()))
                 continue;
 
-            if(WorldSession* session = iter->getSource()->GetSession())
+            if (WorldSession* session = owner->GetSession())
                 session->SendPacket(i_message);
         }
     }
 }
 
-void MessageDelivererExcept::Visit(PlayerMapType &m)
+void MessageDelivererExcept::Visit(CameraMapType &m)
 {
-    for(PlayerMapType::iterator it = m.begin(); it!= m.end(); ++it)
+    for(CameraMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
     {
-        Player* player = it->getSource();
-        if(!player->InSamePhase(i_phaseMask) || player == i_skipped_receiver)
+        Player* owner = iter->getSource()->GetOwner();
+
+        if (!owner->InSamePhase(i_phaseMask) || owner == i_skipped_receiver)
             continue;
 
-        if (WorldSession* session = player->GetSession())
+        if (WorldSession* session = owner->GetSession())
             session->SendPacket(i_message);
     }
 }
 
 
 void
-ObjectMessageDeliverer::Visit(PlayerMapType &m)
+ObjectMessageDeliverer::Visit(CameraMapType &m)
 {
-    for(PlayerMapType::iterator iter=m.begin(); iter != m.end(); ++iter)
+    for(CameraMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
     {
-        if(!iter->getSource()->InSamePhase(i_phaseMask))
+        if(!iter->getSource()->GetBody()->InSamePhase(i_phaseMask))
             continue;
 
-        if(WorldSession* session = iter->getSource()->GetSession())
+        if(WorldSession* session = iter->getSource()->GetOwner()->GetSession())
             session->SendPacket(i_message);
     }
 }
 
 void
-MessageDistDeliverer::Visit(PlayerMapType &m)
+MessageDistDeliverer::Visit(CameraMapType &m)
 {
-    for(PlayerMapType::iterator iter=m.begin(); iter != m.end(); ++iter)
+    for(CameraMapType::iterator iter=m.begin(); iter != m.end(); ++iter)
     {
-        if ((i_toSelf || iter->getSource() != &i_player ) &&
-            (!i_ownTeamOnly || iter->getSource()->GetTeam() == i_player.GetTeam() ) &&
-            (!i_dist || iter->getSource()->IsWithinDist(&i_player,i_dist)))
+        Player * owner = iter->getSource()->GetOwner();
+
+        if ((i_toSelf || owner != &i_player) &&
+            (!i_ownTeamOnly || owner->GetTeam() == i_player.GetTeam()) &&
+            (!i_dist || iter->getSource()->GetBody()->IsWithinDist(&i_player,i_dist)))
         {
-            if (!i_player.InSamePhase(iter->getSource()))
+            if (!i_player.InSamePhase(iter->getSource()->GetBody()))
                 continue;
 
-            if (WorldSession* session = iter->getSource()->GetSession())
+            if (WorldSession* session = owner->GetSession())
                 session->SendPacket(i_message);
         }
     }
 }
 
 void
-ObjectMessageDistDeliverer::Visit(PlayerMapType &m)
+ObjectMessageDistDeliverer::Visit(CameraMapType &m)
 {
-    for(PlayerMapType::iterator iter=m.begin(); iter != m.end(); ++iter)
+    for(CameraMapType::iterator iter=m.begin(); iter != m.end(); ++iter)
     {
-        if (!i_dist || iter->getSource()->IsWithinDist(&i_object,i_dist))
+        if (!i_dist || iter->getSource()->GetBody()->IsWithinDist(&i_object,i_dist))
         {
-            if (!i_object.InSamePhase(iter->getSource()))
+            if (!i_object.InSamePhase(iter->getSource()->GetBody()))
                 continue;
 
-            if (WorldSession* session = iter->getSource()->GetSession())
+            if (WorldSession* session = iter->getSource()->GetOwner()->GetSession())
                 session->SendPacket(i_message);
         }
     }
