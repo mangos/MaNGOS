@@ -2390,6 +2390,11 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                     case 75614:                             // Celestial Steed
                         Spell::SelectMountByAreaAndSkill(target, 75619, 75620, 75617, 75618, 76153);
                         return;
+                    case 72350:                             // Fury of Frostmourne
+                         if (GetEffIndex() == EFFECT_INDEX_0)
+                             if (Unit* caster = GetCaster())
+                                 caster->CastSpell(caster, 72351, true);
+                        return;
                 }
                 break;
             }
