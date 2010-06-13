@@ -744,7 +744,7 @@ void WorldSession::SendListInventory(uint64 vendorguid)
     data << uint64(vendorguid);
 
     size_t count_pos = data.wpos();
-    data << uint8(count);                                   // placeholder
+    data << uint8(count);                                   // placeholder, client limit 150 items (as of 3.3.3)
 
     float discountMod = _player->GetReputationPriceDiscount(pCreature);
 
