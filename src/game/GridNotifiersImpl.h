@@ -67,7 +67,7 @@ inline void PlayerCreatureRelocationWorker(Player* pl, WorldObject const* viewPo
     pl->UpdateVisibilityOf(viewPoint,c);
 
     // Creature AI reaction
-    if (!c->hasUnitState(UNIT_STAT_FLEEING))
+    if (!c->hasUnitState(UNIT_STAT_LOST_CONTROL))
     {
         if (c->AI() && c->AI()->IsVisible(pl) && !c->IsInEvadeMode())
             c->AI()->MoveInLineOfSight(pl);
@@ -76,13 +76,13 @@ inline void PlayerCreatureRelocationWorker(Player* pl, WorldObject const* viewPo
 
 inline void CreatureCreatureRelocationWorker(Creature* c1, Creature* c2)
 {
-    if (!c1->hasUnitState(UNIT_STAT_FLEEING))
+    if (!c1->hasUnitState(UNIT_STAT_LOST_CONTROL))
     {
         if (c1->AI() && c1->AI()->IsVisible(c2) && !c1->IsInEvadeMode())
             c1->AI()->MoveInLineOfSight(c2);
     }
 
-    if (!c2->hasUnitState(UNIT_STAT_FLEEING))
+    if (!c2->hasUnitState(UNIT_STAT_LOST_CONTROL))
     {
         if (c2->AI() && c2->AI()->IsVisible(c1) && !c2->IsInEvadeMode())
             c2->AI()->MoveInLineOfSight(c1);

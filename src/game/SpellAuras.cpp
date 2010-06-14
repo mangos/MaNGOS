@@ -3619,6 +3619,8 @@ void Aura::HandleModPossess(bool apply, bool Real)
 
     if( apply )
     {
+        target->addUnitState(UNIT_STAT_CONTROLED);
+
         target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
 
         target->SetCharmerGUID(p_caster->GetGUID());
@@ -3630,24 +3632,28 @@ void Aura::HandleModPossess(bool apply, bool Real)
         p_caster->SetClientControl(target, 1);
         p_caster->SetMover(target);
 
-        target->CombatStop();
+        target->CombatStop(true);
         target->DeleteThreatList();
+        target->getHostileRefManager().deleteReferences();
+
+        if(CharmInfo *charmInfo = target->InitCharmInfo(target))
+        {
+            charmInfo->InitPossessCreateSpells();
+            charmInfo->SetReactState(REACT_PASSIVE);
+            charmInfo->SetCommandState(COMMAND_STAY);
+        }
+
+        p_caster->PossessSpellInitialize();
 
         if(target->GetTypeId() == TYPEID_UNIT)
         {
-            target->StopMoving();
-            target->GetMotionMaster()->Clear();
-            target->GetMotionMaster()->MoveIdle();
+            ((Creature*)target)->AIM_Initialize();
         }
         else if(target->GetTypeId() == TYPEID_PLAYER)
         {
             ((Player*)target)->SetClientControl(target, 0);
         }
 
-        if(CharmInfo *charmInfo = target->InitCharmInfo(target))
-            charmInfo->InitPossessCreateSpells();
-
-        p_caster->PossessSpellInitialize();
     }
     else
     {
@@ -3663,6 +3669,12 @@ void Aura::HandleModPossess(bool apply, bool Real)
         // on delete only do caster related effects
         if(m_removeMode == AURA_REMOVE_BY_DELETE)
             return;
+
+        target->clearUnitState(UNIT_STAT_CONTROLED);
+
+        target->CombatStop(true);
+        target->DeleteThreatList();
+        target->getHostileRefManager().deleteReferences();
 
         target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
 
@@ -3772,8 +3784,9 @@ void Aura::HandleModCharm(bool apply, bool Real)
         target->CastStop(target == caster ? GetId() : 0);
         caster->SetCharm(target);
 
-        target->CombatStop();
+        target->CombatStop(true);
         target->DeleteThreatList();
+        target->getHostileRefManager().deleteReferences();
 
         if(target->GetTypeId() == TYPEID_UNIT)
         {
@@ -3847,6 +3860,10 @@ void Aura::HandleModCharm(bool apply, bool Real)
 
         if(caster->GetTypeId() == TYPEID_PLAYER)
             ((Player*)caster)->RemovePetActionBar();
+
+        target->CombatStop(true);
+        target->DeleteThreatList();
+        target->getHostileRefManager().deleteReferences();
 
         if(target->GetTypeId() == TYPEID_UNIT)
         {
