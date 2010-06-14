@@ -1179,6 +1179,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\game\Camera.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\Camera.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\game\Corpse.cpp"
 				>
 			</File>

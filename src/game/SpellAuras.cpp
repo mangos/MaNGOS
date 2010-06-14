@@ -2495,7 +2495,7 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
             (GetSpellProto()->EffectApplyAuraName[EFFECT_INDEX_0] == 1 || GetSpellProto()->EffectApplyAuraName[EFFECT_INDEX_0] == 128)))
         {
             // spells with SpellEffect=72 and aura=4: 6196, 6197, 21171, 21425
-            ((Player*)target)->SetFarSightGUID(0);
+            ((Player*)target)->GetCamera().ResetView();
             WorldPacket data(SMSG_CLEAR_FAR_SIGHT_IMMEDIATE, 0);
             ((Player*)target)->GetSession()->SendPacket(&data);
             return;
@@ -3687,7 +3687,11 @@ void Aura::HandleBindSight(bool apply, bool /*Real*/)
     if(!caster || caster->GetTypeId() != TYPEID_PLAYER)
         return;
 
-    ((Player*)caster)->SetFarSightGUID(apply ? GetTarget()->GetGUID() : 0);
+    Camera& camera = ((Player*)caster)->GetCamera();
+    if (apply)
+        camera.SetView(m_target);
+    else
+        camera.ResetView();
 }
 
 void Aura::HandleFarSight(bool apply, bool /*Real*/)
@@ -3696,7 +3700,11 @@ void Aura::HandleFarSight(bool apply, bool /*Real*/)
     if(!caster || caster->GetTypeId() != TYPEID_PLAYER)
         return;
 
-    ((Player*)caster)->SetFarSightGUID(apply ? GetTarget()->GetGUID() : 0);
+    Camera& camera = ((Player*)caster)->GetCamera();
+    if (apply)
+        camera.SetView(GetTarget());
+    else
+        camera.ResetView();
 }
 
 void Aura::HandleAuraTrackCreatures(bool apply, bool /*Real*/)
@@ -3751,10 +3759,12 @@ void Aura::HandleModPossess(bool apply, bool Real)
         return;
 
     Player* p_caster = (Player*)caster;
-
+    Camera& camera = p_caster->GetCamera();
 
     if( apply )
     {
+        target->addUnitState(UNIT_STAT_CONTROLED);
+
         target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
 
         target->SetCharmerGUID(p_caster->GetGUID());
@@ -3762,35 +3772,39 @@ void Aura::HandleModPossess(bool apply, bool Real)
 
         p_caster->SetCharm(target);
 
-        p_caster->SetFarSightGUID(target->GetGUID());
+        camera.SetView(target);
         p_caster->SetClientControl(target, 1);
         p_caster->SetMover(target);
 
-        target->CombatStop();
+        target->CombatStop(true);
         target->DeleteThreatList();
+        target->getHostileRefManager().deleteReferences();
+
+        if(CharmInfo *charmInfo = target->InitCharmInfo(target))
+        {
+            charmInfo->InitPossessCreateSpells();
+            charmInfo->SetReactState(REACT_PASSIVE);
+            charmInfo->SetCommandState(COMMAND_STAY);
+        }
+
+        p_caster->PossessSpellInitialize();
 
         if(target->GetTypeId() == TYPEID_UNIT)
         {
-            target->StopMoving();
-            target->GetMotionMaster()->Clear();
-            target->GetMotionMaster()->MoveIdle();
+            ((Creature*)target)->AIM_Initialize();
         }
         else if(target->GetTypeId() == TYPEID_PLAYER)
         {
             ((Player*)target)->SetClientControl(target, 0);
         }
 
-        if(CharmInfo *charmInfo = target->InitCharmInfo(target))
-            charmInfo->InitPossessCreateSpells();
-
-        p_caster->PossessSpellInitialize();
     }
     else
     {
         p_caster->InterruptSpell(CURRENT_CHANNELED_SPELL);  // the spell is not automatically canceled when interrupted, do it now
         p_caster->SetCharm(NULL);
 
-        p_caster->SetFarSightGUID(0);
+        camera.ResetView();
         p_caster->SetClientControl(target, 0);
         p_caster->SetMover(NULL);
 
@@ -3799,6 +3813,12 @@ void Aura::HandleModPossess(bool apply, bool Real)
         // on delete only do caster related effects
         if(m_removeMode == AURA_REMOVE_BY_DELETE)
             return;
+
+        target->clearUnitState(UNIT_STAT_CONTROLED);
+
+        target->CombatStop(true);
+        target->DeleteThreatList();
+        target->getHostileRefManager().deleteReferences();
 
         target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
 
@@ -3839,13 +3859,19 @@ void Aura::HandleModPossessPet(bool apply, bool Real)
         return;
 
     Player* p_caster = (Player*)caster;
+    Camera& camera = p_caster->GetCamera();
 
     if(apply)
+    {
         pet->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+        camera.SetView(pet);
+    }
     else
+    {
         pet->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+        camera.ResetView();
+    }
 
-    p_caster->SetFarSightGUID(apply ? pet->GetGUID() : 0);
     p_caster->SetCharm(apply ? pet : NULL);
     p_caster->SetClientControl(pet, apply ? 1 : 0);
     ((Player*)caster)->SetMover(apply ? pet : NULL);
@@ -3902,8 +3928,9 @@ void Aura::HandleModCharm(bool apply, bool Real)
         target->CastStop(target == caster ? GetId() : 0);
         caster->SetCharm(target);
 
-        target->CombatStop();
+        target->CombatStop(true);
         target->DeleteThreatList();
+        target->getHostileRefManager().deleteReferences();
 
         if(target->GetTypeId() == TYPEID_UNIT)
         {
@@ -3977,6 +4004,10 @@ void Aura::HandleModCharm(bool apply, bool Real)
 
         if(caster->GetTypeId() == TYPEID_PLAYER)
             ((Player*)caster)->RemovePetActionBar();
+
+        target->CombatStop(true);
+        target->DeleteThreatList();
+        target->getHostileRefManager().deleteReferences();
 
         if(target->GetTypeId() == TYPEID_UNIT)
         {
@@ -4329,7 +4360,7 @@ void Aura::HandleInvisibilityDetect(bool apply, bool Real)
             target->m_detectInvisibilityMask |= (1 << m_modifier.m_miscvalue);
     }
     if(Real && target->GetTypeId()==TYPEID_PLAYER)
-        ((Player*)target)->UpdateVisibilityForPlayer();
+        ((Player*)target)->GetCamera().UpdateVisibilityForOwner();
 }
 
 void Aura::HandleAuraModRoot(bool apply, bool Real)
