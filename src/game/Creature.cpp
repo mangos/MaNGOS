@@ -248,11 +248,14 @@ bool Creature::InitEntry(uint32 Entry, uint32 team, const CreatureData *data )
     SetByteValue(UNIT_FIELD_BYTES_0, 2, minfo->gender);
 
     // Load creature equipment
-    if(!data || data->equipmentId == 0)
-    {                                                       // use default from the template
-        LoadEquipment(cinfo->equipmentId);
+    if (!data || data->equipmentId == 0)
+    {
+        if (cinfo->equipmentId == 0)
+            LoadEquipment(normalInfo->equipmentId);         // use default from normal template if diff does not have any
+        else
+            LoadEquipment(cinfo->equipmentId);              // else use from diff template
     }
-    else if(data && data->equipmentId != -1)
+    else if (data && data->equipmentId != -1)
     {                                                       // override, -1 means no equipment
         LoadEquipment(data->equipmentId);
     }
