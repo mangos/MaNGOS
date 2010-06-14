@@ -181,7 +181,7 @@ void WorldSession::HandleMoveTeleportAck(WorldPacket& recv_data)
     DEBUG_LOG("Guid: %s", guid.GetString().c_str());
     DEBUG_LOG("Flags %u, time %u", flags, time/IN_MILLISECONDS);
 
-    Unit *mover = _player->m_mover;
+    Unit *mover = _player->GetMover();
     Player *plMover = mover->GetTypeId() == TYPEID_PLAYER ? (Player*)mover : NULL;
 
     if(!plMover || !plMover->IsBeingTeleportedNear())
@@ -223,7 +223,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
     DEBUG_LOG("WORLD: Recvd %s (%u, 0x%X) opcode", LookupOpcodeName(opcode), opcode, opcode);
     recv_data.hexlike();
 
-    Unit *mover = _player->m_mover;
+    Unit *mover = _player->GetMover();
     Player *plMover = mover->GetTypeId() == TYPEID_PLAYER ? (Player*)mover : NULL;
 
     // ignore, waiting processing in WorldSession::HandleMoveWorldportAckOpcode and WorldSession::HandleMoveTeleportAck
@@ -335,7 +335,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
                 // TODO: discard movement packets after the player is rooted
                 if(plMover->isAlive())
                 {
-                    plMover->EnvironmentalDamage(DAMAGE_FALL_TO_VOID, GetPlayer()->GetMaxHealth());
+                    plMover->EnvironmentalDamage(DAMAGE_FALL_TO_VOID, plMover->GetMaxHealth());
                     // pl can be alive if GM/etc
                     if(!plMover->isAlive())
                     {
@@ -434,12 +434,13 @@ void WorldSession::HandleSetActiveMoverOpcode(WorldPacket &recv_data)
     DEBUG_LOG("WORLD: Recvd CMSG_SET_ACTIVE_MOVER");
     recv_data.hexlike();
 
-    uint64 guid;
+    ObjectGuid guid;
     recv_data >> guid;
 
-    if(_player->m_mover->GetGUID() != guid)
+    if(_player->GetMover()->GetObjectGuid() != guid)
     {
-        sLog.outError("HandleSetActiveMoverOpcode: incorrect mover guid: mover is " I64FMT " and should be " I64FMT, _player->m_mover->GetGUID(), guid);
+        sLog.outError("HandleSetActiveMoverOpcode: incorrect mover guid: mover is %s and should be %s",
+            _player->GetMover()->GetObjectGuid().GetString().c_str(), guid.GetString().c_str());
         return;
     }
 }
@@ -455,9 +456,12 @@ void WorldSession::HandleMoveNotActiveMover(WorldPacket &recv_data)
     recv_data >> old_mover_guid.ReadAsPacked();
     recv_data >> mi;
 
-    if(_player->m_mover->GetObjectGuid() == old_mover_guid)
+    if(_player->GetMover()->GetObjectGuid() == old_mover_guid)
     {
-        sLog.outError("HandleMoveNotActiveMover: incorrect mover guid: mover is " I64FMT " and should be " I64FMT " instead of " UI64FMTD, _player->m_mover->GetGUID(), _player->GetGUID(), old_mover_guid.GetRawValue());
+        sLog.outError("HandleMoveNotActiveMover: incorrect mover guid: mover is %s and should be %s instead of %s",
+            _player->GetMover()->GetObjectGuid().GetString().c_str(),
+            _player->GetObjectGuid().GetString().c_str(),
+            old_mover_guid.GetString().c_str());
         recv_data.rpos(recv_data.wpos());                   // prevent warnings spam
         return;
     }

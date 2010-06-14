@@ -405,7 +405,7 @@ void TradeData::SetAccepted(bool state, bool crosssend /*= false*/)
 
 UpdateMask Player::updateVisualBits;
 
-Player::Player (WorldSession *session): Unit(), m_achievementMgr(this), m_reputationMgr(this), m_camera(this)
+Player::Player (WorldSession *session): Unit(), m_achievementMgr(this), m_reputationMgr(this), m_mover(this), m_camera(this)
 {
     m_transport = 0;
 
@@ -583,8 +583,6 @@ Player::Player (WorldSession *session): Unit(), m_achievementMgr(this), m_reputa
     m_summon_x = 0.0f;
     m_summon_y = 0.0f;
     m_summon_z = 0.0f;
-
-    m_mover = this;
 
     m_miniPet = 0;
     m_contestedPvPTimer = 0;
@@ -19442,7 +19440,7 @@ void Player::SendInitialPacketsBeforeAddToMap()
     if(HasAuraType(SPELL_AURA_MOD_FLIGHT_SPEED_MOUNTED) || HasAuraType(SPELL_AURA_FLY) || isInFlight())
         m_movementInfo.AddMovementFlag(MOVEFLAG_FLYING);
 
-    m_mover = this;
+    SetMover(this);
 }
 
 void Player::SendInitialPacketsAfterAddToMap()
