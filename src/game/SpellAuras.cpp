@@ -7449,6 +7449,9 @@ void Aura::PeriodicTick()
                         break;
                     }
                     case 70541:
+                    case 73779:
+                    case 73780:
+                    case 73781:
                     {
                         if(target->GetHealth() >= target->GetMaxHealth() * 0.9 )
                         {
