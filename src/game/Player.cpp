@@ -21215,7 +21215,7 @@ PlayerTalent const* Player::GetTalentById(int32 talentId) const
     if (itr != m_talents[m_activeSpec].end())
         return &itr->second;
     else
-        NULL;
+        return NULL;
 }
 
 void Player::LearnTalent(uint32 talentId, uint32 talentRank)
