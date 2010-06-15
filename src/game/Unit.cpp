@@ -8931,13 +8931,8 @@ int32 Unit::SpellBonusWithCoeffs(SpellEntry const *spellProto, int32 total, int3
             // Impurity
             if (GetTypeId() == TYPEID_PLAYER && spellProto->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT)
             {
-                PlayerTalent const* talent = ((Player*)this)->GetTalentById(2005);
-                if (talent && talent->state != PLAYERSPELL_REMOVED)
-                {
-                    SpellEntry const* spell = sSpellStore.LookupEntry(talent->m_talentEntry->RankID[talent->currentRank]);
-                    if (spell)
-                        ap_bonus += ((spell->CalculateSimpleValue(EFFECT_INDEX_0) * ap_bonus) / 100.0f);
-                }
+                if (SpellEntry const* spell = ((Player*)this)->GetKnownTalentRankById(2005))
+                    ap_bonus += ((spell->CalculateSimpleValue(EFFECT_INDEX_0) * ap_bonus) / 100.0f);
             }
 
             total += int32(ap_bonus * (GetTotalAttackPowerValue(BASE_ATTACK) + ap_benefit));
