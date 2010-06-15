@@ -31,13 +31,6 @@
 
 void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 {
-    // TODO: add targets.read() check
-    Player* pUser = _player;
-
-    // ignore for remote control state
-    if(pUser->m_mover != pUser)
-        return;
-
     uint8 bagIndex, slot;
     uint8 unk_flags;                                        // flags (if 0x02 - some additional data are received)
     uint8 cast_count;                                       // next cast if exists (single or not)
@@ -47,9 +40,20 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 
     recvPacket >> bagIndex >> slot >> cast_count >> spellid >> item_guid >> glyphIndex >> unk_flags;
 
+    // TODO: add targets.read() check
+    Player* pUser = _player;
+
+    // ignore for remote control state
+    if (!pUser->IsSelfMover())
+    {
+        recvPacket.rpos(recvPacket.wpos());                 // prevent spam at not read packet tail
+        return;
+    }
+
     // reject fake data
     if (glyphIndex >= MAX_GLYPH_SLOT_INDEX)
     {
+        recvPacket.rpos(recvPacket.wpos());                 // prevent spam at not read packet tail
         pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, NULL, NULL );
         return;
     }
@@ -57,12 +61,14 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
     Item *pItem = pUser->GetItemByPos(bagIndex, slot);
     if (!pItem)
     {
+        recvPacket.rpos(recvPacket.wpos());                 // prevent spam at not read packet tail
         pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, NULL, NULL );
         return;
     }
 
     if (pItem->GetGUID() != item_guid)
     {
+        recvPacket.rpos(recvPacket.wpos());                 // prevent spam at not read packet tail
         pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, NULL, NULL );
         return;
     }
@@ -72,6 +78,7 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
     ItemPrototype const *proto = pItem->GetProto();
     if (!proto)
     {
+        recvPacket.rpos(recvPacket.wpos());                 // prevent spam at not read packet tail
         pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, pItem, NULL );
         return;
     }
@@ -79,6 +86,7 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
     // some item classes can be used only in equipped state
     if (proto->InventoryType != INVTYPE_NON_EQUIP && !pItem->IsEquipped())
     {
+        recvPacket.rpos(recvPacket.wpos());                 // prevent spam at not read packet tail
         pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, pItem, NULL );
         return;
     }
@@ -86,6 +94,7 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
     uint8 msg = pUser->CanUseItem(pItem);
     if (msg != EQUIP_ERR_OK)
     {
+        recvPacket.rpos(recvPacket.wpos());                 // prevent spam at not read packet tail
         pUser->SendEquipError( msg, pItem, NULL );
         return;
     }
@@ -95,6 +104,7 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
         !(proto->Flags & ITEM_FLAGS_USEABLE_IN_ARENA) &&
         pUser->InArena())
     {
+        recvPacket.rpos(recvPacket.wpos());                 // prevent spam at not read packet tail
         pUser->SendEquipError(EQUIP_ERR_NOT_DURING_ARENA_MATCH,pItem,NULL);
         return;
     }
@@ -107,6 +117,7 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
             {
                 if (IsNonCombatSpell(spellInfo))
                 {
+                    recvPacket.rpos(recvPacket.wpos());     // prevent spam at not read packet tail
                     pUser->SendEquipError(EQUIP_ERR_NOT_IN_COMBAT,pItem,NULL);
                     return;
                 }
@@ -116,6 +127,7 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
         // Prevent potion drink if another potion in processing (client have potions disabled in like case)
         if (pItem->IsPotion() && pUser->GetLastPotionId())
         {
+            recvPacket.rpos(recvPacket.wpos());             // prevent spam at not read packet tail
             pUser->SendEquipError(EQUIP_ERR_OBJECT_IS_BUSY,pItem,NULL);
             return;
         }
@@ -174,17 +186,17 @@ void WorldSession::HandleOpenItemOpcode(WorldPacket& recvPacket)
 {
     DETAIL_LOG("WORLD: CMSG_OPEN_ITEM packet, data length = %i",(uint32)recvPacket.size());
 
-    Player* pUser = _player;
-
-    // ignore for remote control state
-    if(pUser->m_mover != pUser)
-        return;
-
     uint8 bagIndex, slot;
 
     recvPacket >> bagIndex >> slot;
 
     DETAIL_LOG("bagIndex: %u, slot: %u",bagIndex,slot);
+
+    Player* pUser = _player;
+
+    // ignore for remote control state
+    if (!pUser->IsSelfMover())
+        return;
 
     Item *pItem = pUser->GetItemByPos(bagIndex, slot);
     if(!pItem)
@@ -257,7 +269,7 @@ void WorldSession::HandleGameObjectUseOpcode( WorldPacket & recv_data )
     DEBUG_LOG( "WORLD: Recvd CMSG_GAMEOBJ_USE Message [guid=%u]", GUID_LOPART(guid));
 
     // ignore for remote control state
-    if(_player->m_mover != _player)
+    if (!_player->IsSelfMover())
         return;
 
     GameObject *obj = GetPlayer()->GetMap()->GetGameObject(guid);
@@ -276,7 +288,7 @@ void WorldSession::HandleGameobjectReportUse(WorldPacket& recvPacket)
     DEBUG_LOG( "WORLD: Recvd CMSG_GAMEOBJ_REPORT_USE Message [in game guid: %u]", GUID_LOPART(guid));
 
     // ignore for remote control state
-    if(_player->m_mover != _player)
+    if (!_player->IsSelfMover())
         return;
 
     GameObject* go = GetPlayer()->GetMap()->GetGameObject(guid);
@@ -298,8 +310,8 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
     recvPacket >> unk_flags;                                // flags (if 0x02 - some additional data are received)
 
     // ignore for remote control state (for player case)
-    Unit* mover = _player->m_mover;
-    if(mover != _player && mover->GetTypeId()==TYPEID_PLAYER)
+    Unit* mover = _player->GetMover();
+    if (mover != _player && mover->GetTypeId()==TYPEID_PLAYER)
     {
         recvPacket.rpos(recvPacket.wpos());                 // prevent spam at ignore packet
         return;
@@ -317,7 +329,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    if(mover->GetTypeId()==TYPEID_PLAYER)
+    if (mover->GetTypeId()==TYPEID_PLAYER)
     {
         // not have spell in spellbook or spell passive and not casted by client
         if (!((Player*)mover)->HasActiveSpell (spellId) || IsPassiveSpell(spellId) )
@@ -364,7 +376,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
     }
 
     // auto-selection buff level base at target level (in spellInfo)
-    if(targets.getUnitTarget())
+    if (targets.getUnitTarget())
     {
         SpellEntry const *actualSpellInfo = sSpellMgr.SelectAuraRankForPlayerLevel(spellInfo,targets.getUnitTarget()->getLevel());
 
@@ -380,15 +392,15 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
 
 void WorldSession::HandleCancelCastOpcode(WorldPacket& recvPacket)
 {
-    // ignore for remote control state (for player case)
-    Unit* mover = _player->m_mover;
-    if(mover != _player && mover->GetTypeId()==TYPEID_PLAYER)
-        return;
-
     uint32 spellId;
 
     recvPacket.read_skip<uint8>();                          // counter, increments with every CANCEL packet, don't use for now
     recvPacket >> spellId;
+
+    // ignore for remote control state (for player case)
+    Unit* mover = _player->GetMover();
+    if (mover != _player && mover->GetTypeId()==TYPEID_PLAYER)
+        return;
 
     //FIXME: hack, ignore unexpected client cancel Deadly Throw cast
     if(spellId==26679)
@@ -410,10 +422,10 @@ void WorldSession::HandleCancelAuraOpcode( WorldPacket& recvPacket)
     if (spellInfo->Attributes & SPELL_ATTR_CANT_CANCEL)
         return;
 
-    if(!IsPositiveSpell(spellId))
+    if (!IsPositiveSpell(spellId))
     {
         // ignore for remote control state
-        if (_player->m_mover != _player)
+        if (!_player->IsSelfMover())
         {
             // except own aura spells
             bool allow = false;
@@ -450,15 +462,15 @@ void WorldSession::HandleCancelAuraOpcode( WorldPacket& recvPacket)
 
 void WorldSession::HandlePetCancelAuraOpcode( WorldPacket& recvPacket)
 {
-    // ignore for remote control state
-    if(_player->m_mover != _player)
-        return;
-
     uint64 guid;
     uint32 spellId;
 
     recvPacket >> guid;
     recvPacket >> spellId;
+
+    // ignore for remote control state
+    if (!_player->IsSelfMover())
+        return;
 
     SpellEntry const *spellInfo = sSpellStore.LookupEntry(spellId );
     if(!spellInfo)
@@ -501,7 +513,7 @@ void WorldSession::HandleCancelAutoRepeatSpellOpcode( WorldPacket& /*recvPacket*
 {
     // cancel and prepare for deleting
     // do not send SMSG_CANCEL_AUTO_REPEAT! client will send this Opcode again (loop)
-    _player->m_mover->InterruptSpell(CURRENT_AUTOREPEAT_SPELL, true, false);
+    _player->GetMover()->InterruptSpell(CURRENT_AUTOREPEAT_SPELL, true, false);
 }
 
 void WorldSession::HandleCancelChanneling( WorldPacket & recv_data)
@@ -509,8 +521,8 @@ void WorldSession::HandleCancelChanneling( WorldPacket & recv_data)
     recv_data.read_skip<uint32>();                          // spellid, not used
 
     // ignore for remote control state (for player case)
-    Unit* mover = _player->m_mover;
-    if(mover != _player && mover->GetTypeId()==TYPEID_PLAYER)
+    Unit* mover = _player->GetMover();
+    if (mover != _player && mover->GetTypeId()==TYPEID_PLAYER)
         return;
 
     mover->InterruptSpell(CURRENT_CHANNELED_SPELL);
@@ -518,13 +530,13 @@ void WorldSession::HandleCancelChanneling( WorldPacket & recv_data)
 
 void WorldSession::HandleTotemDestroyed( WorldPacket& recvPacket)
 {
-    // ignore for remote control state
-    if(_player->m_mover != _player)
-        return;
-
     uint8 slotId;
 
     recvPacket >> slotId;
+
+    // ignore for remote control state
+    if (!_player->IsSelfMover())
+        return;
 
     if (int(slotId) >= MAX_TOTEM_SLOT)
         return;
