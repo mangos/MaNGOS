@@ -3155,7 +3155,7 @@ void Spell::update(uint32 difftime)
         {
             if(m_timer)
             {
-                if (m_targets.getUnitTarget() && m_targets.getUnitTarget()->IsAlive() && !m_targets.getUnitTarget()->isVisibleForOrDetect(m_caster, m_caster, false))
+                if (m_targets.getUnitTarget() && m_targets.getUnitTarget()->isAlive() && !m_targets.getUnitTarget()->isVisibleForOrDetect(m_caster, m_caster, false))
                     cancel();
 
                 if(difftime >= m_timer)
