@@ -1664,6 +1664,8 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         SpellCooldowns const& GetSpellCooldownMap() const { return m_spellCooldowns; }
 
+        PlayerTalent const* GetTalentById(int32 talentId) const;
+
         void AddSpellMod(SpellModifier* mod, bool apply);
         bool IsAffectedBySpellmod(SpellEntry const *spellInfo, SpellModifier *mod, Spell const* spell = NULL);
         template <class T> T ApplySpellMod(uint32 spellId, SpellModOp op, T &basevalue, Spell const* spell = NULL);
