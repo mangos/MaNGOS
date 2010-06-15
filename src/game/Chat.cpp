@@ -2058,7 +2058,7 @@ GameTele const* ChatHandler::extractGameTeleFromLink(char* text)
     // id, or string, or [name] Shift-click form |color|Htele:id|h[name]|h|r
     char* cId = extractKeyFromLink(text,"Htele");
     if(!cId)
-        return false;
+        return NULL;
 
     // id case (explicit or from shift link)
     if(cId[0] >= '0' || cId[0] >= '9')
@@ -2080,7 +2080,7 @@ static char const* const guidKeys[] =
     "Hplayer",
     "Hcreature",
     "Hgameobject",
-    0
+    NULL
 };
 
 uint64 ChatHandler::extractGuidFromLink(char* text)
@@ -2230,7 +2230,7 @@ char* ChatHandler::extractQuotedArg( char* args )
     {
         char* space = strtok(args, "\"");
         if(!space)
-            return false;
+            return NULL;
         return strtok(NULL, "\"");
     }
 }

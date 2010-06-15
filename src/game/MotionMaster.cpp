@@ -40,8 +40,11 @@ inline bool isStatic(MovementGenerator *mv)
 void
 MotionMaster::Initialize()
 {
+    // stop current move
+    if (!i_owner->IsStopped())
+        i_owner->StopMoving();
+
     // clear ALL movement generators (including default)
-    i_owner->StopMoving();
     Clear(false,true);
 
     // set new default movement generator

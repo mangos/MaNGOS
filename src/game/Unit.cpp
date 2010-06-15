@@ -9262,7 +9262,18 @@ int32 Unit::SpellBonusWithCoeffs(SpellEntry const *spellProto, int32 total, int3
 
         // apply ap bonus at done part calculation only (it flat total mod so common with taken)
         if (donePart && bonus->ap_bonus)
-            total += int32(bonus->ap_bonus * (GetTotalAttackPowerValue(BASE_ATTACK) + ap_benefit));
+        {
+            float ap_bonus = bonus->ap_bonus;
+
+            // Impurity
+            if (GetTypeId() == TYPEID_PLAYER && spellProto->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT)
+            {
+                if (SpellEntry const* spell = ((Player*)this)->GetKnownTalentRankById(2005))
+                    ap_bonus += ((spell->CalculateSimpleValue(EFFECT_INDEX_0) * ap_bonus) / 100.0f);
+            }
+
+            total += int32(ap_bonus * (GetTotalAttackPowerValue(BASE_ATTACK) + ap_benefit));
+        }
     }
     // Default calculation
     else if (benefit)
@@ -13220,6 +13231,10 @@ void Unit::SendPetAIReaction(uint64 guid)
 void Unit::StopMoving()
 {
     clearUnitState(UNIT_STAT_MOVING);
+
+    // not need send any packets if not in world
+    if (!IsInWorld())
+        return;
 
     // send explicit stop packet
     // player expected for correct work SPLINEFLAG_WALKMODE
