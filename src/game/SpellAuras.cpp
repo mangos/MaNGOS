@@ -8870,6 +8870,17 @@ bool Aura::IsCritFromAbilityAura(Unit* caster, uint32& damage)
         damage = caster->SpellCriticalDamageBonus(GetSpellProto(), damage, GetTarget());
         return true;
     }
+
+    // Special exception for Rupture spell, damage can crit after patch 3.3.3
+    if (m_spellProto->SpellFamilyName == SPELLFAMILY_ROGUE && m_spellProto->SpellFamilyFlags & UI64LIT(0x000000000000100000))
+    {
+        if(caster->IsSpellCrit(m_target, m_spellProto, GetSpellSchoolMask(m_spellProto)))
+        {
+            damage = caster->SpellCriticalDamageBonus(m_spellProto, damage, m_target);
+            return true;
+        }
+    }
+
     return false;
 }
 
