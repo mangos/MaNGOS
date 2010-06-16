@@ -448,7 +448,7 @@ WorldObject* Spell::FindCorpseUsing()
     return result;
 }
 
-void Spell::FillCustomTargetMap(uint32 i, UnitList &targetUnitMap)
+bool Spell::FillCustomTargetMap(uint32 i, UnitList &targetUnitMap)
 {
     float radius;
 
@@ -456,11 +456,12 @@ void Spell::FillCustomTargetMap(uint32 i, UnitList &targetUnitMap)
         radius = GetSpellRadius(sSpellRadiusStore.LookupEntry(m_spellInfo->EffectRadiusIndex[i]));
     else
         radius = GetSpellMaxRange(sSpellRangeStore.LookupEntry(m_spellInfo->rangeIndex));
+
     // Resulting effect depends on spell that we want to cast
     switch (m_spellInfo->Id)
     {
         case 46584: // Raise Dead
-        {
+            {
             WorldObject* result = FindCorpseUsing <MaNGOS::RaiseDeadObjectCheck>  ();
 
             if(result)
@@ -472,17 +473,24 @@ void Spell::FillCustomTargetMap(uint32 i, UnitList &targetUnitMap)
                         break;
                     default:
                         break;
-                }
+                };
+            };
+            break;
             }
-            break;
-        }
+        break;
+
         case 47496: // Ghoul's explode
-        {
-            FillAreaTargets(targetUnitMap,m_targets.m_destX, m_targets.m_destY,radius,PUSH_DEST_CENTER,SPELL_TARGETS_AOE_DAMAGE);
-            break;
-        }
+            {
+                FillAreaTargets(targetUnitMap,m_targets.m_destX, m_targets.m_destY,radius,PUSH_DEST_CENTER,SPELL_TARGETS_AOE_DAMAGE);
+                break;
+            }
+        break;
+
+        default:
+            return false;
         break;
     }
+    return true;
 }
 
 void Spell::FillTargetMap()
@@ -557,8 +565,7 @@ void Spell::FillTargetMap()
                         break;
                     case TARGET_AREAEFFECT_CUSTOM:
                     case TARGET_ALL_ENEMY_IN_AREA_INSTANT:
-                        FillCustomTargetMap(i,tmpUnitMap);
-                        break;
+                        if (FillCustomTargetMap(i,tmpUnitMap)) break;
                     case TARGET_INNKEEPER_COORDINATES:
                     case TARGET_TABLE_X_Y_Z_COORDINATES:
                     case TARGET_CASTER_COORDINATES:
