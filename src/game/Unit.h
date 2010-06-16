@@ -341,6 +341,9 @@ enum AuraRemoveMode
     AURA_REMOVE_BY_DISPEL,
     AURA_REMOVE_BY_DEATH,
     AURA_REMOVE_BY_DELETE,                                  // use for speedup and prevent unexpected effects at player logout/pet unsummon (must be used _only_ after save), delete.
+    AURA_REMOVE_BY_SHIELD_BREAK,                            // when absorb shield is removed by damage
+    AURA_REMOVE_BY_EXPIRE,                                  // at duration end
+
 };
 
 enum UnitMods
@@ -417,24 +420,25 @@ enum UnitState
     UNIT_STAT_STUNNED         = 0x00000008,                     // Aura::HandleAuraModStun
     UNIT_STAT_ROOT            = 0x00000010,                     // Aura::HandleAuraModRoot
     UNIT_STAT_ISOLATED        = 0x00000020,                     // area auras do not affect other players, Aura::HandleAuraModSchoolImmunity
+    UNIT_STAT_CONTROLLED      = 0x00000040,                     // Aura::HandleAuraModPossess
 
     // persistent movement generator state (all time while movement generator applied to unit (independent from top state of movegen)
-    UNIT_STAT_IN_FLIGHT       = 0x00000040,                     // player is in flight mode (in fact interrupted at far teleport until next map telport landing)
-    UNIT_STAT_DISTRACTED      = 0x00000080,                     // DistractedMovementGenerator active
+    UNIT_STAT_IN_FLIGHT       = 0x00000080,                     // player is in flight mode (in fact interrupted at far teleport until next map telport landing)
+    UNIT_STAT_DISTRACTED      = 0x00000100,                     // DistractedMovementGenerator active
 
     // persistent movement generator state with non-persistent mirror states for stop support
     // (can be removed temporary by stop command or another movement generator apply)
     // not use _MOVE versions for generic movegen state, it can be removed temporary for unit stop and etc
-    UNIT_STAT_CONFUSED        = 0x00000100,                     // ConfusedMovementGenerator active/onstack
-    UNIT_STAT_CONFUSED_MOVE   = 0x00000200,
-    UNIT_STAT_ROAMING         = 0x00000400,                     // RandomMovementGenerator/PointMovementGenerator/WaypointMovementGenerator active (now always set)
-    UNIT_STAT_ROAMING_MOVE    = 0x00000800,
-    UNIT_STAT_CHASE           = 0x00001000,                     // ChaseMovementGenerator active
-    UNIT_STAT_CHASE_MOVE      = 0x00002000,
-    UNIT_STAT_FOLLOW          = 0x00004000,                     // FollowMovementGenerator active
-    UNIT_STAT_FOLLOW_MOVE     = 0x00008000,
-    UNIT_STAT_FLEEING         = 0x00010000,                     // FleeMovementGenerator/TimedFleeingMovementGenerator active/onstack
-    UNIT_STAT_FLEEING_MOVE    = 0x00020000,
+    UNIT_STAT_CONFUSED        = 0x00000200,                     // ConfusedMovementGenerator active/onstack
+    UNIT_STAT_CONFUSED_MOVE   = 0x00000400,
+    UNIT_STAT_ROAMING         = 0x00000800,                     // RandomMovementGenerator/PointMovementGenerator/WaypointMovementGenerator active (now always set)
+    UNIT_STAT_ROAMING_MOVE    = 0x00001000,
+    UNIT_STAT_CHASE           = 0x00002000,                     // ChaseMovementGenerator active
+    UNIT_STAT_CHASE_MOVE      = 0x00004000,
+    UNIT_STAT_FOLLOW          = 0x00008000,                     // FollowMovementGenerator active
+    UNIT_STAT_FOLLOW_MOVE     = 0x00010000,
+    UNIT_STAT_FLEEING         = 0x00020000,                     // FleeMovementGenerator/TimedFleeingMovementGenerator active/onstack
+    UNIT_STAT_FLEEING_MOVE    = 0x00040000,
 
     // masks (only for check)
 
@@ -453,6 +457,12 @@ enum UnitState
     // not react at move in sight or other
     UNIT_STAT_CAN_NOT_REACT   = UNIT_STAT_STUNNED | UNIT_STAT_DIED |
                                 UNIT_STAT_CONFUSED | UNIT_STAT_FLEEING,
+
+    // AI disabled by some reason
+    UNIT_STAT_LOST_CONTROL    = UNIT_STAT_FLEEING | UNIT_STAT_CONTROLLED,
+
+    // above 2 state cases
+    UNIT_STAT_CAN_NOT_REACT_OR_LOST_CONTROL  = UNIT_STAT_CAN_NOT_REACT | UNIT_STAT_LOST_CONTROL,
 
     // masks (for check or reset)
 
@@ -841,10 +851,18 @@ struct DiminishingReturn
     uint32                  hitCount;
 };
 
+// At least some values expected fixed and used in auras field, other custom
 enum MeleeHitOutcome
 {
-    MELEE_HIT_EVADE, MELEE_HIT_MISS, MELEE_HIT_DODGE, MELEE_HIT_BLOCK, MELEE_HIT_PARRY,
-    MELEE_HIT_GLANCING, MELEE_HIT_CRIT, MELEE_HIT_CRUSHING, MELEE_HIT_NORMAL
+    MELEE_HIT_EVADE     = 0,
+    MELEE_HIT_MISS      = 1,
+    MELEE_HIT_DODGE     = 2,                                // used as misc in SPELL_AURA_IGNORE_COMBAT_RESULT
+    MELEE_HIT_BLOCK     = 3,                                // used as misc in SPELL_AURA_IGNORE_COMBAT_RESULT
+    MELEE_HIT_PARRY     = 4,                                // used as misc in SPELL_AURA_IGNORE_COMBAT_RESULT
+    MELEE_HIT_GLANCING  = 5,
+    MELEE_HIT_CRIT      = 6,
+    MELEE_HIT_CRUSHING  = 7,
+    MELEE_HIT_NORMAL    = 8,
 };
 
 struct CleanDamage
@@ -881,7 +899,7 @@ struct CalcDamageInfo
 
 // Spell damage info structure based on structure sending in SMSG_SPELLNONMELEEDAMAGELOG opcode
 struct SpellNonMeleeDamage{
-    SpellNonMeleeDamage(Unit *_attacker, Unit *_target, uint32 _SpellID, uint32 _schoolMask)
+    SpellNonMeleeDamage(Unit *_attacker, Unit *_target, uint32 _SpellID, SpellSchoolMask _schoolMask)
         : target(_target), attacker(_attacker), SpellID(_SpellID), damage(0), overkill(0), schoolMask(_schoolMask),
         absorb(0), resist(0), physicalLog(false), unused(false), blocked(0), HitInfo(0)
     {}
@@ -891,7 +909,7 @@ struct SpellNonMeleeDamage{
     uint32 SpellID;
     uint32 damage;
     uint32 overkill;
-    uint32 schoolMask;
+    SpellSchoolMask schoolMask;
     uint32 absorb;
     uint32 resist;
     bool   physicalLog;
@@ -1478,10 +1496,10 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         // removing specific aura stack
         void RemoveAura(Aura* aura, AuraRemoveMode mode = AURA_REMOVE_BY_DEFAULT);
         void RemoveAura(AuraMap::iterator &i, AuraRemoveMode mode = AURA_REMOVE_BY_DEFAULT);
-        void RemoveAura(uint32 spellId, SpellEffectIndex effindex, Aura* except = NULL);
+        void RemoveAura(uint32 spellId, SpellEffectIndex effindex, Aura* except = NULL, AuraRemoveMode mode = AURA_REMOVE_BY_DEFAULT);
 
         // removing specific aura stacks by diff reasons and selections
-        void RemoveAurasDueToSpell(uint32 spellId, Aura* except = NULL);
+        void RemoveAurasDueToSpell(uint32 spellId, Aura* except = NULL, AuraRemoveMode mode = AURA_REMOVE_BY_DEFAULT);
         void RemoveAurasDueToItemSpell(Item* castItem,uint32 spellId);
         void RemoveAurasByCasterSpell(uint32 spellId, uint64 casterGUID);
         void RemoveAurasByCasterSpell(uint32 spellId, SpellEffectIndex effindex, uint64 casterGUID);

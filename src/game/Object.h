@@ -23,8 +23,8 @@
 #include "ByteBuffer.h"
 #include "UpdateFields.h"
 #include "UpdateData.h"
-#include "GameSystem/GridReference.h"
 #include "ObjectGuid.h"
+#include "Camera.h"
 
 #include <set>
 #include <string>
@@ -476,6 +476,8 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         void BuildUpdateData(UpdateDataMapType &);
 
         Creature* SummonCreature(uint32 id, float x, float y, float z, float ang,TempSummonType spwtype,uint32 despwtime);
+
+        ViewPoint& GetViewPoint() { return m_viewPoint; }
     protected:
         explicit WorldObject();
 
@@ -498,6 +500,8 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         float m_positionY;
         float m_positionZ;
         float m_orientation;
+
+        ViewPoint m_viewPoint;
 };
 
 #endif

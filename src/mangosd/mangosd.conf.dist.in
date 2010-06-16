@@ -246,6 +246,7 @@ CleanCharacterDB = 1
 #    LogFilter_TransportMoves
 #    LogFilter_VisibilityChanges
 #    LogFilter_Weather
+#    LogFilter_DbStrictedCheck
 #        Log filters (active by default)
 #        Default: 1 - not include with any log level
 #                 0 - include in log if log level permit
@@ -333,6 +334,16 @@ LogFilter_AchievementUpdates = 1
 LogFilter_CreatureMoves = 1
 LogFilter_TransportMoves = 1
 LogFilter_VisibilityChanges = 1
+LogFilter_Weather = 1
+LogFilter_DbStrictedCheck = 1
+LogFilter_PeriodicAffects = 0
+LogFilter_PlayerMoves = 0
+LogFilter_SQLText = 0
+LogFilter_AIAndMovegens = 0
+LogFilter_PlayerStats = 0
+LogFilter_Damage = 0
+LogFilter_Combat = 0
+LogFilter_SpellCast = 0
 WorldLogFile = ""
 WorldLogTimestamp = 0
 DBErrorLogFile = "DBErrors.log"
