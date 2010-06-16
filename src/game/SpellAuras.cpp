@@ -3165,7 +3165,7 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
             // to hair color for druids and skin tone for tauren introduced in patch 3.2
             if (form == FORM_CAT || form == FORM_BEAR || form == FORM_DIREBEAR)
             {
-                if (target->GetTeam() == ALLIANCE)
+                if (Player::TeamForRace(target->getRace()) == ALLIANCE)
                 {
                     uint8 hairColour = target->GetByteValue(PLAYER_BYTES, 3);
                     if (form == FORM_CAT)
@@ -3185,7 +3185,7 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
                         else if (hairColour == 4) modelid = 29416;
                     }
                 } 
-                else if (target->GetTeam() == HORDE)
+                else if (Player::TeamForRace(target->getRace()) == HORDE)
                 {
                     uint8 skinColour = target->GetByteValue(PLAYER_BYTES, 0);
                     if (target->getGender() == GENDER_MALE)
@@ -3230,8 +3230,8 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
             }
             else
             {
-                if (target->GetTeam() == ALLIANCE) modelid = ssEntry->modelID_A;
-                if (target->GetTeam() == HORDE) modelid = ssEntry->modelID_H;
+                if (Player::TeamForRace(target->getRace()) == ALLIANCE) modelid = ssEntry->modelID_A;
+                if (Player::TeamForRace(target->getRace()) == HORDE) modelid = ssEntry->modelID_H;
             }
             // no model found, if player is horde we look here for our hardcoded modelids
             if (!modelid && Player::TeamForRace(target->getRace()) == HORDE)
