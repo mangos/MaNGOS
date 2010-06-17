@@ -1541,7 +1541,8 @@ void Map::AddObjectToRemoveList(WorldObject *obj)
 {
     ASSERT(obj->GetMapId()==GetId() && obj->GetInstanceId()==GetInstanceId());
 
-    obj->CleanupsBeforeDelete();                            // remove or simplify at least cross referenced links
+    // need clean references at end of update cycle, NOT during it! called at Map::Remove
+    // obj->CleanupsBeforeDelete();                            // remove or simplify at least cross referenced links
 
     i_objectsToRemove.insert(obj);
     //DEBUG_LOG("Object (GUID: %u TypeId: %u ) added to removing list.",obj->GetGUIDLow(),obj->GetTypeId());
