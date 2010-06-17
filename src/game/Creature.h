@@ -444,7 +444,6 @@ class MANGOS_DLL_SPEC Creature : public Unit
 
         bool AIM_Initialize();
 
-        void AI_SendMoveToPacket(float x, float y, float z, uint32 time, SplineFlags MovementFlags, SplineType type);
         CreatureAI* AI() { return i_AI; }
 
         void AddSplineFlag(SplineFlags f)
