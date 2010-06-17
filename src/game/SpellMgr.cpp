@@ -1378,7 +1378,7 @@ void SpellMgr::LoadSpellBonuses()
             need_direct = true;
 
         // Check if direct_bonus is needed in `spell_bonus_data`
-        float direct_calc = 0;
+        float direct_calc;
         float direct_diff = 1000.0f;                        // for have big diff if no DB field value
         if (sbe.direct_damage)
         {
@@ -1398,7 +1398,7 @@ void SpellMgr::LoadSpellBonuses()
         }
 
         // Check if dot_bonus is needed in `spell_bonus_data`
-        float dot_calc =0;
+        float dot_calc;
         float dot_diff = 1000.0f;                           // for have big diff if no DB field value
         if (sbe.dot_damage)
         {

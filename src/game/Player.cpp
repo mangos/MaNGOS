@@ -11964,7 +11964,7 @@ if(pSrcItem->GetCount() > pSrcItem->GetProto()->GetMaxStackSize() || pDstItem->G
     }
 
     // impossible merge/fill, do real swap
-    uint8 msg = EQUIP_ERR_OK;
+    uint8 msg;
 
     // check src->dest move possibility
     ItemPosCountVec sDest;

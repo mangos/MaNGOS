@@ -5397,12 +5397,12 @@ WorldSafeLocsEntry const *ObjectMgr::GetClosestGraveYard(float x, float y, float
 
     // at corpse map
     bool foundNear = false;
-    float distNear = 0;
+    float distNear;
     WorldSafeLocsEntry const* entryNear = NULL;
 
     // at entrance map for corpse map
     bool foundEntr = false;
-    float distEntr = 0;
+    float distEntr;
     WorldSafeLocsEntry const* entryEntr = NULL;
 
     // some where other
