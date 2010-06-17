@@ -90,8 +90,6 @@ class Corpse : public WorldObject
 
         GridReference<Corpse> &GetGridRef() { return m_gridRef; }
 
-        bool isActiveObject() const { return false; }
-
         bool IsExpired(time_t t) const;
     private:
         GridReference<Corpse> m_gridRef;

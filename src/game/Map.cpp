@@ -1640,44 +1640,63 @@ bool Map::ActiveObjectsNearGrid(uint32 x, uint32 y) const
     return false;
 }
 
-void Map::AddToActive( Creature* c )
+void Map::AddToActive( WorldObject* obj )
 {
-    AddToActiveHelper(c);
+    m_activeNonPlayers.insert(obj);
 
     // also not allow unloading spawn grid to prevent creating creature clone at load
-    if(!c->isPet() && c->GetDBTableGUIDLow())
+    if (obj->GetTypeId()==TYPEID_UNIT)
     {
-        float x,y,z;
-        c->GetRespawnCoord(x,y,z);
-        GridPair p = MaNGOS::ComputeGridPair(x, y);
-        if(getNGrid(p.x_coord, p.y_coord))
-            getNGrid(p.x_coord, p.y_coord)->incUnloadActiveLock();
-        else
+        Creature* c= (Creature*)obj;
+
+        if (!c->isPet() && c->GetDBTableGUIDLow())
         {
-            GridPair p2 = MaNGOS::ComputeGridPair(c->GetPositionX(), c->GetPositionY());
-            sLog.outError("Active creature (GUID: %u Entry: %u) added to grid[%u,%u] but spawn grid[%u,%u] not loaded.",
-                c->GetGUIDLow(), c->GetEntry(), p.x_coord, p.y_coord, p2.x_coord, p2.y_coord);
+            float x,y,z;
+            c->GetRespawnCoord(x,y,z);
+            GridPair p = MaNGOS::ComputeGridPair(x, y);
+            if(getNGrid(p.x_coord, p.y_coord))
+                getNGrid(p.x_coord, p.y_coord)->incUnloadActiveLock();
+            else
+            {
+                GridPair p2 = MaNGOS::ComputeGridPair(c->GetPositionX(), c->GetPositionY());
+                sLog.outError("Active creature (GUID: %u Entry: %u) added to grid[%u,%u] but spawn grid[%u,%u] not loaded.",
+                    c->GetGUIDLow(), c->GetEntry(), p.x_coord, p.y_coord, p2.x_coord, p2.y_coord);
+            }
         }
     }
 }
 
-void Map::RemoveFromActive( Creature* c )
+void Map::RemoveFromActive( WorldObject* obj )
 {
-    RemoveFromActiveHelper(c);
+    // Map::Update for active object in proccess
+    if(m_activeNonPlayersIter != m_activeNonPlayers.end())
+    {
+        ActiveNonPlayers::iterator itr = m_activeNonPlayers.find(obj);
+        if(itr==m_activeNonPlayersIter)
+            ++m_activeNonPlayersIter;
+        m_activeNonPlayers.erase(itr);
+    }
+    else
+        m_activeNonPlayers.erase(obj);
 
     // also allow unloading spawn grid
-    if(!c->isPet() && c->GetDBTableGUIDLow())
+    if (obj->GetTypeId()==TYPEID_UNIT)
     {
-        float x,y,z;
-        c->GetRespawnCoord(x,y,z);
-        GridPair p = MaNGOS::ComputeGridPair(x, y);
-        if(getNGrid(p.x_coord, p.y_coord))
-            getNGrid(p.x_coord, p.y_coord)->decUnloadActiveLock();
-        else
+        Creature* c= (Creature*)obj;
+
+        if(!c->isPet() && c->GetDBTableGUIDLow())
         {
-            GridPair p2 = MaNGOS::ComputeGridPair(c->GetPositionX(), c->GetPositionY());
-            sLog.outError("Active creature (GUID: %u Entry: %u) removed from grid[%u,%u] but spawn grid[%u,%u] not loaded.",
-                c->GetGUIDLow(), c->GetEntry(), p.x_coord, p.y_coord, p2.x_coord, p2.y_coord);
+            float x,y,z;
+            c->GetRespawnCoord(x,y,z);
+            GridPair p = MaNGOS::ComputeGridPair(x, y);
+            if(getNGrid(p.x_coord, p.y_coord))
+                getNGrid(p.x_coord, p.y_coord)->decUnloadActiveLock();
+            else
+            {
+                GridPair p2 = MaNGOS::ComputeGridPair(c->GetPositionX(), c->GetPositionY());
+                sLog.outError("Active creature (GUID: %u Entry: %u) removed from grid[%u,%u] but spawn grid[%u,%u] not loaded.",
+                    c->GetGUIDLow(), c->GetEntry(), p.x_coord, p.y_coord, p2.x_coord, p2.y_coord);
+            }
         }
     }
 }

@@ -232,16 +232,9 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         void ScriptCommandStart(ScriptInfo const& script, uint32 delay, Object* source, Object* target);
 
         // must called with AddToWorld
-        template<class T>
-        void AddToActive(T* obj) { AddToActiveHelper(obj); }
-
-        void AddToActive(Creature* obj);
-
+        void AddToActive(WorldObject* obj);
         // must called with RemoveFromWorld
-        template<class T>
-        void RemoveFromActive(T* obj) { RemoveFromActiveHelper(obj); }
-
-        void RemoveFromActive(Creature* obj);
+        void RemoveFromActive(WorldObject* obj);
 
         Creature* GetCreature(ObjectGuid guid);
         Vehicle* GetVehicle(ObjectGuid guid);
@@ -358,27 +351,6 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
 
         template<class T>
             void DeleteFromWorld(T*);
-
-        template<class T>
-        void AddToActiveHelper(T* obj)
-        {
-            m_activeNonPlayers.insert(obj);
-        }
-
-        template<class T>
-        void RemoveFromActiveHelper(T* obj)
-        {
-            // Map::Update for active object in proccess
-            if(m_activeNonPlayersIter != m_activeNonPlayers.end())
-            {
-                ActiveNonPlayers::iterator itr = m_activeNonPlayers.find(obj);
-                if(itr==m_activeNonPlayersIter)
-                    ++m_activeNonPlayersIter;
-                m_activeNonPlayers.erase(itr);
-            }
-            else
-                m_activeNonPlayers.erase(obj);
-        }
 };
 
 enum InstanceResetMethod
