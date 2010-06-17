@@ -108,11 +108,11 @@ class MANGOS_DLL_SPEC Object
             m_inWorld = false;
         }
 
-        ObjectGuid const& GetObjectGuid() const { return *reinterpret_cast<ObjectGuid const*>(&GetUInt64Value(0)); }
-
-        const uint64& GetGUID() const { return GetUInt64Value(0); }
-        uint32 GetGUIDLow() const { return GUID_LOPART(GetUInt64Value(0)); }
+        ObjectGuid const& GetObjectGuid() const { return GetGuidValue(OBJECT_FIELD_GUID); }
+        const uint64& GetGUID() const { return GetUInt64Value(OBJECT_FIELD_GUID); }
+        uint32 GetGUIDLow() const { return GUID_LOPART(GetUInt64Value(OBJECT_FIELD_GUID)); }
         PackedGuid const& GetPackGUID() const { return m_PackGUID; }
+
         uint32 GetEntry() const { return GetUInt32Value(OBJECT_FIELD_ENTRY); }
         void SetEntry(uint32 entry) { SetUInt32Value(OBJECT_FIELD_ENTRY, entry); }
 
@@ -171,6 +171,8 @@ class MANGOS_DLL_SPEC Object
             return *(((uint16*)&m_uint32Values[ index ])+offset);
         }
 
+        ObjectGuid const& GetGuidValue( uint16 index ) const { return *reinterpret_cast<ObjectGuid const*>(&GetUInt64Value(index)); }
+
         void SetInt32Value(  uint16 index,        int32  value );
         void SetUInt32Value( uint16 index,       uint32  value );
         void SetUInt64Value( uint16 index, const uint64 &value );
@@ -178,6 +180,7 @@ class MANGOS_DLL_SPEC Object
         void SetByteValue(   uint16 index, uint8 offset, uint8 value );
         void SetUInt16Value( uint16 index, uint8 offset, uint16 value );
         void SetInt16Value(  uint16 index, uint8 offset, int16 value ) { SetUInt16Value(index,offset,(uint16)value); }
+        void SetGuidValue( uint16 index, ObjectGuid const& value ) { SetUInt64Value(index, value.GetRawValue()); }
         void SetStatFloatValue( uint16 index, float value);
         void SetStatInt32Value( uint16 index, int32 value);
 
