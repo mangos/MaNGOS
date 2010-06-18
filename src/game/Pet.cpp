@@ -1313,7 +1313,7 @@ bool Pet::addSpell(uint32 spell_id,ActiveStates active /*= ACT_DECIDE*/, PetSpel
 
     if(active == ACT_DECIDE)                                //active was not used before, so we save it's autocast/passive state here
     {
-        if(IsPassiveSpell(spell_id))
+        if(IsPassiveSpell(spellInfo))
             newspell.active = ACT_PASSIVE;
         else
             newspell.active = ACT_DISABLED;
@@ -1369,7 +1369,7 @@ bool Pet::addSpell(uint32 spell_id,ActiveStates active /*= ACT_DECIDE*/, PetSpel
 
     m_spells[spell_id] = newspell;
 
-    if (IsPassiveSpell(spell_id))
+    if (IsPassiveSpell(spellInfo))
         CastSpell(this, spell_id, true);
     else
         m_charmInfo->AddSpellToActionBar(spell_id, ActiveStates(newspell.active));
