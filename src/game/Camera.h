@@ -89,6 +89,8 @@ public:
     ViewPoint() : m_grid(0), m_camera_iter(m_cameras.end()) {}
     ~ViewPoint();
 
+    bool hasViewers() const { return !m_cameras.empty(); }
+
     // these events are called when viewpoint changes visibility state
     void Event_AddedToWorld(GridType *grid)
     {

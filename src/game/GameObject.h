@@ -704,7 +704,6 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
 
         GridReference<GameObject> &GetGridRef() { return m_gridRef; }
 
-        bool isActiveObject() const { return false; }
         uint64 GetRotation() const { return m_rotation; }
     protected:
         uint32      m_spellId;

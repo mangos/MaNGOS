@@ -211,10 +211,11 @@ bool IsSingleFromSpellSpecificSpellRanksPerTarget(SpellSpecific spellSpec1,Spell
 bool IsSingleFromSpellSpecificPerTarget(SpellSpecific spellSpec1,SpellSpecific spellSpec2);
 
 bool IsPassiveSpell(uint32 spellId);
+bool IsPassiveSpell(SpellEntry const* spellProto);
 
 inline bool IsPassiveSpellStackableWithRanks(SpellEntry const* spellProto)
 {
-    if(!IsPassiveSpell(spellProto->Id))
+    if(!IsPassiveSpell(spellProto))
         return false;
 
     return !IsSpellHaveEffect(spellProto,SPELL_EFFECT_APPLY_AURA);
@@ -320,6 +321,25 @@ inline bool IsPointEffectTarget( Targets target )
     return false;
 }
 
+inline bool IsAreaEffectPossitiveTarget( Targets target )
+{
+    switch (target )
+    {
+        case TARGET_ALL_PARTY_AROUND_CASTER:
+        case TARGET_ALL_FRIENDLY_UNITS_AROUND_CASTER:
+        case TARGET_ALL_FRIENDLY_UNITS_IN_AREA:
+        case TARGET_ALL_PARTY:
+        case TARGET_ALL_PARTY_AROUND_CASTER_2:
+        case TARGET_AREAEFFECT_PARTY:
+        case TARGET_ALL_RAID_AROUND_CASTER:
+        case TARGET_AREAEFFECT_PARTY_AND_CLASS:
+            return true;
+        default:
+            break;
+    }
+    return false;
+}
+
 inline bool IsAreaEffectTarget( Targets target )
 {
     switch (target )
@@ -372,12 +392,9 @@ inline bool IsAreaAuraEffect(uint32 effect)
 
 inline bool IsDispelSpell(SpellEntry const *spellInfo)
 {
-    if (spellInfo->Effect[EFFECT_INDEX_0] == SPELL_EFFECT_DISPEL ||
-        spellInfo->Effect[EFFECT_INDEX_1] == SPELL_EFFECT_DISPEL ||
-        spellInfo->Effect[EFFECT_INDEX_2] == SPELL_EFFECT_DISPEL )
-        return true;
-    return false;
+    return IsSpellHaveEffect(spellInfo, SPELL_EFFECT_DISPEL);
 }
+
 inline bool isSpellBreakStealth(SpellEntry const* spellInfo)
 {
     return !(spellInfo->AttributesEx & SPELL_ATTR_EX_NOT_BREAK_STEALTH);
@@ -917,7 +934,7 @@ class SpellMgr
         static bool canStackSpellRanks(SpellEntry const *spellInfo);
         bool IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) const;
 
-        SpellEntry const* SelectAuraRankForPlayerLevel(SpellEntry const* spellInfo, uint32 playerLevel) const;
+        SpellEntry const* SelectAuraRankForLevel(SpellEntry const* spellInfo, uint32 Level) const;
 
         // Spell learning
         SpellLearnSkillNode const* GetSpellLearnSkill(uint32 spell_id) const
