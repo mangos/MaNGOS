@@ -27,7 +27,7 @@
 #include "GridNotifiersImpl.h"
 #include "SpellMgr.h"
 
-DynamicObject::DynamicObject() : WorldObject(), m_isActiveObject(false)
+DynamicObject::DynamicObject() : WorldObject()
 {
     m_objectType |= TYPEMASK_DYNAMICOBJECT;
     m_objectTypeId = TYPEID_DYNAMICOBJECT;
@@ -82,10 +82,6 @@ bool DynamicObject::Create( uint32 guidlow, Unit *caster, uint32 spellId, SpellE
     m_radius = radius;
     m_effIndex = effIndex;
     m_spellId = spellId;
-
-    // set to active for far sight case
-    if(SpellEntry const* spellEntry = sSpellStore.LookupEntry(spellId))
-        m_isActiveObject = IsSpellHaveEffect(spellEntry,SPELL_EFFECT_ADD_FARSIGHT);
 
     return true;
 }
