@@ -986,7 +986,7 @@ void MailDraft::SendMailTo(MailReceiver const& receiver, MailSender const& sende
     {
         if (!m_items.empty())
         {
-            deleteIncludedItems();
+            deleteIncludedItems(true);
         }
         return;
     }
