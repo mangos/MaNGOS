@@ -1899,37 +1899,13 @@ void Pet::CastPetAura(PetAura const* aura)
     if(!auraId)
         return;
 
-    switch (auraId)
+    if(auraId == 35696)                                       // Demonic Knowledge
     {
-        case 35696:                                       // Demonic Knowledge
-        {
-            int32 basePoints = int32(aura->GetDamage() * (GetStat(STAT_STAMINA) + GetStat(STAT_INTELLECT)) / 100);
-            CastCustomSpell(this, auraId, &basePoints, NULL, NULL, true);
-            break;
-        }
-        case 54566: // Ravenous Dead
-        {
-            Unit* owner = GetOwner();
-            if (owner)
-            {
-                    // We must give x% bonus to base bonus from owner's stamina to ghoul stamina
-                    int32 basePoints0 =
-                        int32(owner->GetStat(STAT_STAMINA)*0.3f*(aura->GetDamage()+100.0f)/100.0f
-                        - (GetStat(STAT_STAMINA)-GetCreateStat(STAT_STAMINA)));
-                    // We must give x% bonus to base bonus from owner's strength to ghoul strength
-                    int32 basePoints1 =
-                        int32(owner->GetStat(STAT_STRENGTH)*0.3f*(aura->GetDamage()+100.0f)/100.0f
-                        - (GetStat(STAT_STRENGTH)-GetCreateStat(STAT_STRENGTH)));
-                    CastCustomSpell(this, auraId, &basePoints0, &basePoints1, NULL, true);
-            }
-            break;
-        }
-        default:
-        {
-            CastSpell(this, auraId, true);
-            break;
-        }
-     }
+        int32 basePoints = int32(aura->GetDamage() * (GetStat(STAT_STAMINA) + GetStat(STAT_INTELLECT)) / 100);
+        CastCustomSpell(this, auraId, &basePoints, NULL, NULL, true);
+    }
+    else
+        CastSpell(this, auraId, true);
 }
 
 struct DoPetLearnSpell
