@@ -22,7 +22,7 @@
 
 #include "Common.h"
 #include "Database/DatabaseEnv.h"
-#include "Config/ConfigEnv.h"
+#include "Config/Config.h"
 #include "Log.h"
 #include "Master.h"
 #include "SystemConfig.h"
@@ -78,11 +78,11 @@ extern int main(int argc, char **argv)
     ///- Command line parsing to get the configuration file name
     char const* cfg_file = _MANGOSD_CONFIG;
     int c=1;
-    while( c < argc )
+    while(c < argc)
     {
-        if( strcmp(argv[c],"-c") == 0)
+        if (strcmp(argv[c],"-c") == 0)
         {
-            if( ++c >= argc )
+            if (++c >= argc)
             {
                 sLog.outError("Runtime-Error: -c option requires an input argument");
                 usage(argv[0]);
@@ -92,7 +92,7 @@ extern int main(int argc, char **argv)
                 cfg_file = argv[c];
         }
 
-        if( strcmp(argv[c],"--version") == 0)
+        if (strcmp(argv[c],"--version") == 0)
         {
             printf("%s\n", _FULLVERSION(REVISION_DATE,REVISION_TIME,REVISION_NR,REVISION_ID));
             return 0;
@@ -102,22 +102,22 @@ extern int main(int argc, char **argv)
         ////////////
         //Services//
         ////////////
-        if( strcmp(argv[c],"-s") == 0)
+        if (strcmp(argv[c],"-s") == 0)
         {
-            if( ++c >= argc )
+            if (++c >= argc)
             {
                 sLog.outError("Runtime-Error: -s option requires an input argument");
                 usage(argv[0]);
                 Log::WaitBeforeContinueIfNeed();
                 return 1;
             }
-            if( strcmp(argv[c],"install") == 0)
+            else if (strcmp(argv[c],"install") == 0)
             {
                 if (WinServiceInstall())
                     sLog.outString("Installing service");
                 return 1;
             }
-            else if( strcmp(argv[c],"uninstall") == 0)
+            else if ( strcmp(argv[c],"uninstall") == 0)
             {
                 if(WinServiceUninstall())
                     sLog.outString("Uninstalling service");
@@ -131,7 +131,7 @@ extern int main(int argc, char **argv)
                 return 1;
             }
         }
-        if( strcmp(argv[c],"--service") == 0)
+        if (strcmp(argv[c],"--service") == 0)
         {
             WinServiceRun();
         }

@@ -19,6 +19,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#include "Common.h"
 #include <Policies/Singleton.h>
 #include "Platform/Define.h"
 
