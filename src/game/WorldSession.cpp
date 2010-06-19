@@ -171,7 +171,7 @@ bool WorldSession::Update(uint32 /*diff*/)
                         packet->GetOpcode());
         #endif*/
 
-        OpcodeHandler& opHandle = opcodeTable[packet->GetOpcode()];
+        OpcodeHandler const& opHandle = opcodeTable[packet->GetOpcode()];
         try
         {
             switch (opHandle.status)
@@ -860,7 +860,7 @@ void WorldSession::SendRedirectClient(std::string& ip, uint16 port)
     SendPacket(&pkt);
 }
 
-void WorldSession::ExecuteOpcode( OpcodeHandler& opHandle, WorldPacket* packet )
+void WorldSession::ExecuteOpcode( OpcodeHandler const& opHandle, WorldPacket* packet )
 {
     // need prevent do internal far teleports in handlers because some handlers do lot steps
     // or call code that can do far teleports in some conditions unexpectedly for generic way work code

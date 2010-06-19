@@ -775,7 +775,7 @@ class MANGOS_DLL_SPEC WorldSession
         // private trade methods
         void moveItems(Item* myItems[], Item* hisItems[]);
 
-        void ExecuteOpcode( OpcodeHandler& opHandle, WorldPacket* packet );
+        void ExecuteOpcode( OpcodeHandler const& opHandle, WorldPacket* packet );
 
         // logging helper
         void LogUnexpectedOpcode(WorldPacket *packet, const char * reason);
