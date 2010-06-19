@@ -2005,6 +2005,13 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                     // target amount stored in parent spell dummy effect but hard to access
                     FillRaidOrPartyManaPriorityTargets(targetUnitMap, m_caster, m_caster, radius, 3, true, false, false);
                     break;
+                case 71447:                                 // Bloodbolt Splash 10N
+                case 71481:                                 // Bloodbolt Splash 25N
+                case 71482:                                 // Bloodbolt Splash 10H
+                case 71483:                                 // Bloodbolt Splash 25H
+                    FillAreaTargets(targetUnitMap, m_targets.m_destX, m_targets.m_destY, radius, PUSH_SELF_CENTER, SPELL_TARGETS_FRIENDLY);
+                    targetUnitMap.remove(m_caster);
+                    break;
                 default:
                     // selected friendly units (for casting objects) around casting object
                     FillAreaTargets(targetUnitMap, m_targets.m_destX, m_targets.m_destY, radius, PUSH_SELF_CENTER, SPELL_TARGETS_FRIENDLY, GetCastingObject());
