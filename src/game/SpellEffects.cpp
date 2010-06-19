@@ -6444,6 +6444,70 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     m_caster->CastSpell(unitTarget, 72588, true);
                     return;
                 }
+                case 71446:                                 // Twilight Bloodbolt 10N
+                {
+                    if (!unitTarget)
+                        return;
+
+                    unitTarget->CastSpell(unitTarget, 71447, true);
+                    return;
+                }
+                case 71478:                                 // Twilight Bloodbolt 25N
+                {
+                    if (!unitTarget)
+                        return;
+
+                    unitTarget->CastSpell(unitTarget, 71481, true);
+                    return;
+                }
+                case 71479:                                 // Twilight Bloodbolt 10H
+                {
+                    if (!unitTarget)
+                        return;
+
+                    unitTarget->CastSpell(unitTarget, 71482, true);
+                    return;
+                }
+                case 71480:                                 // Twilight Bloodbolt 25H
+                {
+                    if (!unitTarget)
+                        return;
+
+                    unitTarget->CastSpell(unitTarget, 71483, true);
+                    return;
+                }
+                case 71899:                                 // Bloodbolt Whirl 10N
+                {
+                    if (!unitTarget)
+                        return;
+
+                    m_caster->CastSpell(unitTarget, 71446, true);
+                    return;
+                }
+                case 71900:                                 // Bloodbolt Whirl 25N
+                {
+                    if (!unitTarget)
+                        return;
+
+                    m_caster->CastSpell(unitTarget, 71478, true);
+                    return;
+                }
+                case 71901:                                 // Bloodbolt Whirl 10H
+                {
+                    if (!unitTarget)
+                        return;
+
+                    m_caster->CastSpell(unitTarget, 71479, true);
+                    return;
+                }
+                case 71902:                                 // Bloodbolt Whirl 25H
+                {
+                    if (!unitTarget)
+                        return;
+
+                    m_caster->CastSpell(unitTarget, 71480, true);
+                    return;
+                }
             }
             break;
         }
