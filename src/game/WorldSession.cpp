@@ -171,7 +171,7 @@ bool WorldSession::Update(uint32 /*diff*/)
                         packet->GetOpcode());
         #endif*/
 
-        OpcodeHandler& opHandle = opcodeTable[packet->GetOpcode()];
+        OpcodeHandler const& opHandle = opcodeTable[packet->GetOpcode()];
         try
         {
             switch (opHandle.status)
@@ -184,11 +184,8 @@ bool WorldSession::Update(uint32 /*diff*/)
                             LogUnexpectedOpcode(packet, "the player has not logged in yet");
                     }
                     else if(_player->IsInWorld())
-                    {
-                        (this->*opHandle.handler)(*packet);
-                        if (packet->rpos() < packet->wpos() && sLog.HasLogLevelOrHigher(LOG_LVL_DEBUG))
-                            LogUnprocessedTail(packet);
-                    }
+                        ExecuteOpcode(opHandle, packet);
+
                     // lag can cause STATUS_LOGGEDIN opcodes to arrive after the player started a transfer
                     break;
                 case STATUS_LOGGEDIN_OR_RECENTLY_LOGGEDOUT:
@@ -197,12 +194,8 @@ bool WorldSession::Update(uint32 /*diff*/)
                         LogUnexpectedOpcode(packet, "the player has not logged in yet and not recently logout");
                     }
                     else
-                    {
                         // not expected _player or must checked in packet hanlder
-                        (this->*opHandle.handler)(*packet);
-                        if (packet->rpos() < packet->wpos() && sLog.HasLogLevelOrHigher(LOG_LVL_DEBUG))
-                            LogUnprocessedTail(packet);
-                    }
+                        ExecuteOpcode(opHandle, packet);
                     break;
                 case STATUS_TRANSFER:
                     if(!_player)
@@ -210,11 +203,7 @@ bool WorldSession::Update(uint32 /*diff*/)
                     else if(_player->IsInWorld())
                         LogUnexpectedOpcode(packet, "the player is still in world");
                     else
-                    {
-                        (this->*opHandle.handler)(*packet);
-                        if (packet->rpos() < packet->wpos() && sLog.HasLogLevelOrHigher(LOG_LVL_DEBUG))
-                            LogUnprocessedTail(packet);
-                    }
+                        ExecuteOpcode(opHandle, packet);
                     break;
                 case STATUS_AUTHED:
                     // prevent cheating with skip queue wait
@@ -229,9 +218,7 @@ bool WorldSession::Update(uint32 /*diff*/)
                     if (packet->GetOpcode() != CMSG_SET_ACTIVE_VOICE_CHANNEL)
                         m_playerRecentlyLogout = false;
 
-                    (this->*opHandle.handler)(*packet);
-                    if (packet->rpos() < packet->wpos() && sLog.HasLogLevelOrHigher(LOG_LVL_DEBUG))
-                        LogUnprocessedTail(packet);
+                    ExecuteOpcode(opHandle, packet);
                     break;
                 case STATUS_NEVER:
                     sLog.outError( "SESSION: received not allowed opcode %s (0x%.4X)",
@@ -872,4 +859,28 @@ void WorldSession::SendRedirectClient(std::string& ip, uint16 port)
     pkt.append(sha1.GetDigest(), 20);                       // hmacsha1(ip+port) w/ sessionkey as seed
 
     SendPacket(&pkt);
+}
+
+void WorldSession::ExecuteOpcode( OpcodeHandler const& opHandle, WorldPacket* packet )
+{
+    // need prevent do internal far teleports in handlers because some handlers do lot steps
+    // or call code that can do far teleports in some conditions unexpectedly for generic way work code
+    if (_player)
+        _player->SetCanDelayTeleport(true);
+
+    (this->*opHandle.handler)(*packet);
+
+    if (_player)
+    {
+        // can be not set in fact for login opcode, but this not create porblems.
+        _player->SetCanDelayTeleport(false);
+
+        //we should execute delayed teleports only for alive(!) players
+        //because we don't want player's ghost teleported from graveyard
+        if (_player->IsHasDelayedTeleport() && _player->isAlive())
+            _player->TeleportTo(_player->m_teleport_dest, _player->m_teleport_options);
+    }
+
+    if (packet->rpos() < packet->wpos() && sLog.HasLogLevelOrHigher(LOG_LVL_DEBUG))
+        LogUnprocessedTail(packet);
 }
