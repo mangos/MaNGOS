@@ -1559,6 +1559,23 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                 case 25991:                                 // Poison Bolt Volley (Pincess Huhuran)
                     unMaxTargets = 15;
                     break;
+                case 69075:                                 // Bone Storm
+                case 70834:                                 // Bone Storm
+                case 70835:                                 // Bone Storm
+                case 70836:                                 // Bone Storm
+                    radius = ATTACK_DISTANCE + 1;
+                    break;
+                case 72350:                                 // Fury of Frostmourne
+                case 72351:                                 // Fury of Frostmourne 
+                    radius = 300;
+                    break;
+                case 72754:                                 // Defile. Radius depended from scale.
+                case 73708:                                 // Defile 25
+                case 73709:                                 // Defile 10H
+                case 73710:                                 // Defile 25H
+                    if (Unit* realCaster = GetAffectiveCaster())
+                        radius = realCaster->GetFloatValue(OBJECT_FIELD_SCALE_X) * 6;
+                    break;
             }
             break;
         }
