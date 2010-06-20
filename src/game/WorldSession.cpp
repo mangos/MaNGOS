@@ -877,7 +877,7 @@ void WorldSession::ExecuteOpcode( OpcodeHandler const& opHandle, WorldPacket* pa
 
         //we should execute delayed teleports only for alive(!) players
         //because we don't want player's ghost teleported from graveyard
-        if (_player->IsHasDelayedTeleport() && _player->isAlive())
+        if (_player->IsHasDelayedTeleport())
             _player->TeleportTo(_player->m_teleport_dest, _player->m_teleport_options);
     }
 

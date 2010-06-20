@@ -1077,7 +1077,7 @@ void WorldSession::HandleAlterAppearance( WorldPacket & recv_data )
 {
     DEBUG_LOG("CMSG_ALTER_APPEARANCE");
 
-    uint32 skinTone_id = -1;
+    uint32 skinTone_id = 0;
 
     uint32 Hair, Color, FacialHair, SkinTone;
     if(_player->getRace() != RACE_TAUREN) recv_data >> Hair >> Color >> FacialHair;
