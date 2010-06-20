@@ -19,7 +19,7 @@
 ## Sub-directories to parse
 
 ## CPP flags for includes, defines, etc.
-AM_CPPFLAGS = $(MANGOS_INCLUDES) -I$(top_builddir)/src/shared -I$(srcdir) -I$(srcdir)/../../../dep/include -I$(srcdir)/../../framework -I$(srcdir)/../../shared -I$(srcdir)/../../../dep/include/g3dlite
+AM_CPPFLAGS = $(MANGOS_INCLUDES) -I$(top_builddir)/src/shared -I$(srcdir) -I$(srcdir)/../../../dep/include -I$(srcdir)/../../framework -I$(srcdir)/../../shared
 
 ## Build MaNGOS shared library and its parts as convenience library.
 #  All libraries will be convenience libraries. Might be changed to shared
@@ -27,14 +27,5 @@ AM_CPPFLAGS = $(MANGOS_INCLUDES) -I$(top_builddir)/src/shared -I$(srcdir) -I$(sr
 noinst_LIBRARIES = libmangosconfig.a
 
 libmangosconfig_a_SOURCES = \
-	dotconfpp/dotconfpp.cpp \
-	dotconfpp/dotconfpp.h \
-	dotconfpp/mempool.cpp \
-	dotconfpp/mempool.h \
 	Config.cpp \
-	Config.h \
-	ConfigEnv.h
-
-#  VC++ project workspace for dotconfpp
-EXTRA_DIST = \
-	ConfigLibrary.vcproj
+	Config.h
