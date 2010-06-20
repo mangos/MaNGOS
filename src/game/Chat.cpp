@@ -216,7 +216,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { "zonexy",         SEC_MODERATOR,      false, &ChatHandler::HandleGoZoneXYCommand,            "", NULL },
         { "xy",             SEC_MODERATOR,      false, &ChatHandler::HandleGoXYCommand,                "", NULL },
         { "xyz",            SEC_MODERATOR,      false, &ChatHandler::HandleGoXYZCommand,               "", NULL },
-        { "",               SEC_MODERATOR,      false, &ChatHandler::HandleGoXYZCommand,               "", NULL },
+        { "",               SEC_MODERATOR,      false, &ChatHandler::HandleGoCommand,                  "", NULL },
         { NULL,             0,                  false, NULL,                                           "", NULL }
     };
 
@@ -2132,6 +2132,130 @@ uint64 ChatHandler::extractGuidFromLink(char* text)
 
     // unknown type?
     return 0;
+}
+
+enum LocationLinkType
+{
+    LOCATION_LINK_PLAYER     = 0,                           // must be first for selection in not link case
+    LOCATION_LINK_TELE       = 1,
+    LOCATION_LINK_TAXINODE   = 2,
+    LOCATION_LINK_CREATURE   = 3,
+    LOCATION_LINK_GAMEOBJECT = 4
+};
+
+static char const* const locationKeys[] =
+{
+    "Htele",
+    "Htaxinode",
+    "Hplayer",
+    "Hcreature",
+    "Hgameobject",
+    NULL
+};
+
+bool ChatHandler::extractLocationFromLink(char* text, uint32& mapid, float& x, float& y, float& z)
+{
+    int type = 0;
+
+    // |color|Hplayer:name|h[name]|h|r
+    // |color|Htele:id|h[name]|h|r
+    // |color|Htaxinode:id|h[name]|h|r
+    // |color|Hcreature:creature_guid|h[name]|h|r
+    // |color|Hgameobject:go_guid|h[name]|h|r
+    char* idS = extractKeyFromLink(text,locationKeys,&type);
+    if(!idS)
+        return false;
+
+    switch(type)
+    {
+        // it also fail case
+        case LOCATION_LINK_PLAYER:
+        {
+            // not link and not name, possible coordinates/etc
+            if (isNumeric(idS[0]))
+                return false;
+
+            std::string name = idS;
+            if(!normalizePlayerName(name))
+                return false;
+
+            if(Player* player = sObjectMgr.GetPlayer(name.c_str()))
+            {
+                mapid = player->GetMapId();
+                x = player->GetPositionX();
+                y = player->GetPositionY();
+                z = player->GetPositionZ();
+                return true;
+            }
+
+            if(uint64 guid = sObjectMgr.GetPlayerGUIDByName(name))
+            {
+                // to point where player stay (if loaded)
+                float o;
+                bool in_flight;
+                return Player::LoadPositionFromDB(mapid, x, y, z, o, in_flight, guid);
+            }
+
+            return false;
+        }
+        case LOCATION_LINK_TELE:
+        {
+            uint32 id = (uint32)atol(idS);
+            GameTele const* tele = sObjectMgr.GetGameTele(id);
+            if (!tele)
+                return false;
+            mapid = tele->mapId;
+            x = tele->position_x;
+            y = tele->position_y;
+            z = tele->position_z;
+            return true;
+        }
+        case LOCATION_LINK_TAXINODE:
+        {
+            uint32 id = (uint32)atol(idS);
+            TaxiNodesEntry const* node = sTaxiNodesStore.LookupEntry(id);
+            if (!node)
+                return false;
+            mapid = node->map_id;
+            x = node->x;
+            y = node->y;
+            z = node->z;
+            return true;
+        }
+        case LOCATION_LINK_CREATURE:
+        {
+            uint32 lowguid = (uint32)atol(idS);
+
+            if(CreatureData const* data = sObjectMgr.GetCreatureData(lowguid) )
+            {
+                mapid = data->mapid;
+                x = data->posX;
+                y = data->posY;
+                z = data->posZ;
+                return true;
+            }
+            else
+                return false;
+        }
+        case LOCATION_LINK_GAMEOBJECT:
+        {
+            uint32 lowguid = (uint32)atol(idS);
+
+            if(GameObjectData const* data = sObjectMgr.GetGOData(lowguid) )
+            {
+                mapid = data->mapid;
+                x = data->posX;
+                y = data->posY;
+                z = data->posZ;
+                return true;
+            }
+            else
+                return false;
+        }
+    }
+
+    // unknown type?
+    return false;
 }
 
 std::string ChatHandler::extractPlayerNameFromLink(char* text)
