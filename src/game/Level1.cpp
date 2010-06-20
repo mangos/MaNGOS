@@ -2226,6 +2226,51 @@ bool ChatHandler::HandleGroupgoCommand(const char* args)
     return true;
 }
 
+bool ChatHandler::HandleGoHelper( Player* player, uint32 mapid, float x, float y, float const* zPtr )
+{
+    float z;
+
+    if (zPtr)
+    {
+        z = *zPtr;
+
+        // check full provided coordinates
+        if(!MapManager::IsValidMapCoord(mapid,x,y,z))
+        {
+            PSendSysMessage(LANG_INVALID_TARGET_COORD,x,y,mapid);
+            SetSentErrorMessage(true);
+            return false;
+        }
+    }
+    else
+    {
+        // we need check x,y before ask Z or can crash at invalide coordinates
+        if(!MapManager::IsValidMapCoord(mapid,x,y))
+        {
+            PSendSysMessage(LANG_INVALID_TARGET_COORD,x,y,mapid);
+            SetSentErrorMessage(true);
+            return false;
+        }
+
+        Map const *map = sMapMgr.CreateBaseMap(mapid);
+        z = std::max(map->GetHeight(x, y, MAX_HEIGHT), map->GetWaterLevel(x, y));
+    }
+
+    // stop flight if need
+    if(player->isInFlight())
+    {
+        player->GetMotionMaster()->MovementExpired();
+        player->m_taxi.ClearTaxiDestinations();
+    }
+    // save only in non-flight case
+    else
+        player->SaveRecallPosition();
+
+    player->TeleportTo(mapid, x, y, z, player->GetOrientation());
+
+    return true;
+}
+
 bool ChatHandler::HandleGoTaxinodeCommand(const char* args)
 {
     Player* _player = m_session->GetPlayer();
@@ -2249,27 +2294,54 @@ bool ChatHandler::HandleGoTaxinodeCommand(const char* args)
         return false;
     }
 
-    if ((node->x == 0.0f && node->y == 0.0f && node->z == 0.0f) ||
-        !MapManager::IsValidMapCoord(node->map_id,node->x,node->y,node->z))
+    if (node->x == 0.0f && node->y == 0.0f && node->z == 0.0f)
     {
         PSendSysMessage(LANG_INVALID_TARGET_COORD,node->x,node->y,node->map_id);
         SetSentErrorMessage(true);
         return false;
     }
 
-    // stop flight if need
-    if (_player->isInFlight())
-    {
-        _player->GetMotionMaster()->MovementExpired();
-        _player->m_taxi.ClearTaxiDestinations();
-    }
-    // save only in non-flight case
-    else
-        _player->SaveRecallPosition();
-
-    _player->TeleportTo(node->map_id, node->x, node->y, node->z, _player->GetOrientation());
-    return true;
+    return HandleGoHelper(_player, node->map_id, node->x, node->y, &node->z);
 }
+
+bool ChatHandler::HandleGoCommand(const char* args)
+{
+    if(!*args)
+        return false;
+
+    Player* _player = m_session->GetPlayer();
+
+    uint32 mapid;
+    float x, y, z;
+
+    // raw coordinates case
+    if (isNumeric(args[0]))
+    {
+        char* px = strtok((char*)args, " ");
+        char* py = strtok(NULL, " ");
+        char* pz = strtok(NULL, " ");
+        char* pmapid = strtok(NULL, " ");
+
+        if (!px || !py || !pz)
+            return false;
+
+        x = (float)atof(px);
+        y = (float)atof(py);
+        z = (float)atof(pz);
+        if (pmapid)
+            mapid = (uint32)atoi(pmapid);
+        else
+            mapid = _player->GetMapId();
+
+    }
+    // link case
+    else if (!extractLocationFromLink((char*)args, mapid, x, y, z))
+        return false;
+
+    return HandleGoHelper(_player, mapid, x, y, &z);
+}
+
+
 
 //teleport at coordinates
 bool ChatHandler::HandleGoXYCommand(const char* args)
@@ -2293,29 +2365,7 @@ bool ChatHandler::HandleGoXYCommand(const char* args)
         mapid = (uint32)atoi(pmapid);
     else mapid = _player->GetMapId();
 
-    if(!MapManager::IsValidMapCoord(mapid,x,y))
-    {
-        PSendSysMessage(LANG_INVALID_TARGET_COORD,x,y,mapid);
-        SetSentErrorMessage(true);
-        return false;
-    }
-
-    // stop flight if need
-    if(_player->isInFlight())
-    {
-        _player->GetMotionMaster()->MovementExpired();
-        _player->m_taxi.ClearTaxiDestinations();
-    }
-    // save only in non-flight case
-    else
-        _player->SaveRecallPosition();
-
-    Map const *map = sMapMgr.CreateBaseMap(mapid);
-    float z = std::max(map->GetHeight(x, y, MAX_HEIGHT), map->GetWaterLevel(x, y));
-
-    _player->TeleportTo(mapid, x, y, z, _player->GetOrientation());
-
-    return true;
+    return HandleGoHelper(_player, mapid, x, y);
 }
 
 //teleport at coordinates, including Z
@@ -2343,26 +2393,7 @@ bool ChatHandler::HandleGoXYZCommand(const char* args)
     else
         mapid = _player->GetMapId();
 
-    if(!MapManager::IsValidMapCoord(mapid,x,y,z))
-    {
-        PSendSysMessage(LANG_INVALID_TARGET_COORD,x,y,mapid);
-        SetSentErrorMessage(true);
-        return false;
-    }
-
-    // stop flight if need
-    if(_player->isInFlight())
-    {
-        _player->GetMotionMaster()->MovementExpired();
-        _player->m_taxi.ClearTaxiDestinations();
-    }
-    // save only in non-flight case
-    else
-        _player->SaveRecallPosition();
-
-    _player->TeleportTo(mapid, x, y, z, _player->GetOrientation());
-
-    return true;
+    return HandleGoHelper(_player, mapid, x, y, &z);
 }
 
 //teleport at coordinates
@@ -2403,49 +2434,33 @@ bool ChatHandler::HandleGoZoneXYCommand(const char* args)
     // update to parent zone if exist (client map show only zones without parents)
     AreaTableEntry const* zoneEntry = areaEntry->zone ? GetAreaEntryByAreaID(areaEntry->zone) : areaEntry;
 
-    Map const *map = sMapMgr.CreateBaseMap(zoneEntry->mapid);
+    MapEntry const *mapEntry = sMapStore.LookupEntry(zoneEntry->mapid);
 
-    if(map->Instanceable())
+    if (mapEntry->Instanceable())
     {
-        PSendSysMessage(LANG_INVALID_ZONE_MAP,areaEntry->ID,areaEntry->area_name[GetSessionDbcLocale()],map->GetId(),map->GetMapName());
+        PSendSysMessage(LANG_INVALID_ZONE_MAP, areaEntry->ID, areaEntry->area_name[GetSessionDbcLocale()],
+            mapEntry->MapID, mapEntry->name[GetSessionDbcLocale()]);
         SetSentErrorMessage(true);
         return false;
     }
 
     if (!Zone2MapCoordinates(x,y,zoneEntry->ID))
     {
-        PSendSysMessage(LANG_INVALID_ZONE_MAP,areaEntry->ID,areaEntry->area_name[GetSessionDbcLocale()],map->GetId(),map->GetMapName());
+        PSendSysMessage(LANG_INVALID_ZONE_MAP, areaEntry->ID, areaEntry->area_name[GetSessionDbcLocale()],
+            mapEntry->MapID, mapEntry->name[GetSessionDbcLocale()]);
         SetSentErrorMessage(true);
         return false;
     }
 
-    if(!MapManager::IsValidMapCoord(zoneEntry->mapid,x,y))
-    {
-        PSendSysMessage(LANG_INVALID_TARGET_COORD,x,y,zoneEntry->mapid);
-        SetSentErrorMessage(true);
-        return false;
-    }
-
-    // stop flight if need
-    if(_player->isInFlight())
-    {
-        _player->GetMotionMaster()->MovementExpired();
-        _player->m_taxi.ClearTaxiDestinations();
-    }
-    // save only in non-flight case
-    else
-        _player->SaveRecallPosition();
-
-    float z = std::max(map->GetHeight(x, y, MAX_HEIGHT), map->GetWaterLevel(x, y));
-    _player->TeleportTo(zoneEntry->mapid, x, y, z, _player->GetOrientation());
-
-    return true;
+    return HandleGoHelper(_player, mapEntry->MapID, x, y);
 }
 
 //teleport to grid
 bool ChatHandler::HandleGoGridCommand(const char* args)
 {
-    if(!*args)    return false;
+    if (!*args)
+        return false;
+
     Player* _player = m_session->GetPlayer();
 
     char* px = strtok((char*)args, " ");
@@ -2457,37 +2472,13 @@ bool ChatHandler::HandleGoGridCommand(const char* args)
 
     float grid_x = (float)atof(px);
     float grid_y = (float)atof(py);
-    uint32 mapid;
-    if (pmapid)
-        mapid = (uint32)atoi(pmapid);
-    else mapid = _player->GetMapId();
+    uint32 mapid = pmapid ? (uint32)atoi(pmapid) : _player->GetMapId();
 
     // center of grid
     float x = (grid_x-CENTER_GRID_ID+0.5f)*SIZE_OF_GRIDS;
     float y = (grid_y-CENTER_GRID_ID+0.5f)*SIZE_OF_GRIDS;
 
-    if(!MapManager::IsValidMapCoord(mapid,x,y))
-    {
-        PSendSysMessage(LANG_INVALID_TARGET_COORD,x,y,mapid);
-        SetSentErrorMessage(true);
-        return false;
-    }
-
-    // stop flight if need
-    if(_player->isInFlight())
-    {
-        _player->GetMotionMaster()->MovementExpired();
-        _player->m_taxi.ClearTaxiDestinations();
-    }
-    // save only in non-flight case
-    else
-        _player->SaveRecallPosition();
-
-    Map const *map = sMapMgr.CreateBaseMap(mapid);
-    float z = std::max(map->GetHeight(x, y, MAX_HEIGHT), map->GetWaterLevel(x, y));
-    _player->TeleportTo(mapid, x, y, z, _player->GetOrientation());
-
-    return true;
+    return HandleGoHelper(_player, mapid, x, y);
 }
 
 bool ChatHandler::HandleModifyDrunkCommand(const char* args)
