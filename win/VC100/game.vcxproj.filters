@@ -442,6 +442,9 @@
     <ClCompile Include="..\..\src\game\CharacterDatabaseCleaner.cpp">
       <Filter>Tool</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\game\Camera.cpp">
+      <Filter>Object</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\game\AccountMgr.h">
@@ -831,6 +834,9 @@
     <ClInclude Include="..\..\src\game\pchdef.h" />
     <ClInclude Include="..\..\src\game\CharacterDatabaseCleaner.h">
       <Filter>Tool</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\game\Camera.h">
+      <Filter>Object</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

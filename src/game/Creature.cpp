@@ -117,7 +117,7 @@ m_subtype(subtype), m_defaultMovementType(IDLE_MOTION_TYPE), m_DBTableGuid(0), m
 m_AlreadyCallAssistance(false), m_AlreadySearchedAssistance(false),
 m_regenHealth(true), m_AI_locked(false), m_isDeadByDefault(false), m_needNotify(false),
 m_meleeDamageSchoolMask(SPELL_SCHOOL_MASK_NORMAL),
-m_creatureInfo(NULL), m_isActiveObject(false), m_splineFlags(SPLINEFLAG_WALKMODE)
+m_creatureInfo(NULL), m_splineFlags(SPLINEFLAG_WALKMODE)
 {
     m_regenTimer = 200;
     m_valuesCount = UNIT_END;
@@ -248,11 +248,14 @@ bool Creature::InitEntry(uint32 Entry, uint32 team, const CreatureData *data )
     SetByteValue(UNIT_FIELD_BYTES_0, 2, minfo->gender);
 
     // Load creature equipment
-    if(!data || data->equipmentId == 0)
-    {                                                       // use default from the template
-        LoadEquipment(cinfo->equipmentId);
+    if (!data || data->equipmentId == 0)
+    {
+        if (cinfo->equipmentId == 0)
+            LoadEquipment(normalInfo->equipmentId);         // use default from normal template if diff does not have any
+        else
+            LoadEquipment(cinfo->equipmentId);              // else use from diff template
     }
-    else if(data && data->equipmentId != -1)
+    else if (data && data->equipmentId != -1)
     {                                                       // override, -1 means no equipment
         LoadEquipment(data->equipmentId);
     }
@@ -786,29 +789,6 @@ bool Creature::isCanTrainingAndResetTalentsOf(Player* pPlayer) const
     return pPlayer->getLevel() >= 10
         && GetCreatureInfo()->trainer_type == TRAINER_TYPE_CLASS
         && pPlayer->getClass() == GetCreatureInfo()->trainer_class;
-}
-
-void Creature::AI_SendMoveToPacket(float x, float y, float z, uint32 time, SplineFlags flags, SplineType type)
-{
-    /*    uint32 timeElap = getMSTime();
-        if ((timeElap - m_startMove) < m_moveTime)
-        {
-            oX = (dX - oX) * ( (timeElap - m_startMove) / m_moveTime );
-            oY = (dY - oY) * ( (timeElap - m_startMove) / m_moveTime );
-        }
-        else
-        {
-            oX = dX;
-            oY = dY;
-        }
-
-        dX = x;
-        dY = y;
-        m_orientation = atan2((oY - dY), (oX - dX));
-
-        m_startMove = getMSTime();
-        m_moveTime = time;*/
-    SendMonsterMove(x, y, z, type, flags, time);
 }
 
 void Creature::PrepareBodyLootState()

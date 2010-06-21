@@ -22,7 +22,7 @@
 
 #include "Common.h"
 #include "Database/DatabaseEnv.h"
-#include "Config/ConfigEnv.h"
+#include "Config/Config.h"
 #include "Log.h"
 #include "RealmList.h"
 #include "AuthSocket.h"

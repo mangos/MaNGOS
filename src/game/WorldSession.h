@@ -43,6 +43,8 @@ class LoginQueryHolder;
 class CharacterHandler;
 class GMTicket;
 
+struct OpcodeHandler;
+
 enum AccountDataType
 {
     GLOBAL_CONFIG_CACHE             = 0,                    // 0x01 g
@@ -772,6 +774,8 @@ class MANGOS_DLL_SPEC WorldSession
     private:
         // private trade methods
         void moveItems(Item* myItems[], Item* hisItems[]);
+
+        void ExecuteOpcode( OpcodeHandler const& opHandle, WorldPacket* packet );
 
         // logging helper
         void LogUnexpectedOpcode(WorldPacket *packet, const char * reason);

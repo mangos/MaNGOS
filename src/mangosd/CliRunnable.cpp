@@ -27,7 +27,7 @@
 #include "ScriptCalls.h"
 #include "ObjectMgr.h"
 #include "WorldSession.h"
-#include "Config/ConfigEnv.h"
+#include "Config/Config.h"
 #include "Util.h"
 #include "AccountMgr.h"
 #include "CliRunnable.h"
@@ -593,7 +593,7 @@ bool ChatHandler::HandleServerLogLevelCommand(const char *args)
 {
     if(!*args)
     {
-        PSendSysMessage("Log level: %u");
+        PSendSysMessage("Log level: %u", sLog.GetLogLevel());
         return true;
     }
 
@@ -629,7 +629,7 @@ void CliRunnable::run()
     ///- Display the list of available CLI functions then beep
     sLog.outString();
 
-    if(sConfig.GetBoolDefault("BeepAtStart", true))
+    if (sConfig.GetBoolDefault("BeepAtStart", true))
         printf("\a");                                       // \a = Alert
 
     // print this here the first time

@@ -19,7 +19,7 @@
 #include "Common.h"
 #include "Log.h"
 #include "Policies/SingletonImp.h"
-#include "Config/ConfigEnv.h"
+#include "Config/Config.h"
 #include "Util.h"
 #include "ByteBuffer.h"
 #include "ProgressBar.h"

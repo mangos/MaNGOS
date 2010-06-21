@@ -22,7 +22,7 @@
 
 #include "Common.h"
 #include "Database/DatabaseEnv.h"
-#include "Config/ConfigEnv.h"
+#include "Config/Config.h"
 #include "SystemConfig.h"
 #include "Log.h"
 #include "Opcodes.h"
@@ -402,9 +402,9 @@ Weather* World::AddWeather(uint32 zone_id)
 /// Initialize config values
 void World::LoadConfigSettings(bool reload)
 {
-    if(reload)
+    if (reload)
     {
-        if(!sConfig.Reload())
+        if (!sConfig.Reload())
         {
             sLog.outError("World settings reload fail: can't read settings from %s.",sConfig.GetFilename().c_str());
             return;
@@ -413,7 +413,7 @@ void World::LoadConfigSettings(bool reload)
 
     ///- Read the version of the configuration file and warn the user in case of emptiness or mismatch
     uint32 confVersion = sConfig.GetIntDefault("ConfVersion", 0);
-    if(!confVersion)
+    if (!confVersion)
     {
         sLog.outError("*****************************************************************************");
         sLog.outError(" WARNING: mangosd.conf does not include a ConfVersion variable.");
@@ -1032,7 +1032,7 @@ void World::SetInitialWorldSettings()
     sLog.outString( "Loading Objects Pooling Data...");
     sPoolMgr.LoadFromDB();
 
-    sLog.outString( "Loading Game Event Data...");
+    sLog.outString( "Loading Game Event Data...");          // must be after sPoolMgr.LoadFromDB for proper load pool events
     sLog.outString();
     sGameEventMgr.LoadFromDB();
     sLog.outString( ">>> Game Event Data loaded" );

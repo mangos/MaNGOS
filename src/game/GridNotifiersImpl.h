@@ -31,11 +31,9 @@
 template<class T>
 inline void MaNGOS::VisibleNotifier::Visit(GridRefManager<T> &m)
 {
-    WorldObject const* viewPoint = i_player.GetViewPoint();
-
     for(typename GridRefManager<T>::iterator iter = m.begin(); iter != m.end(); ++iter)
     {
-        i_player.UpdateVisibilityOf(viewPoint,iter->getSource(), i_data, i_visibleNow);
+        i_camera.UpdateVisibilityOf(iter->getSource(), i_data, i_visibleNow);
         i_clientGUIDs.erase(iter->getSource()->GetGUID());
     }
 }
@@ -69,7 +67,7 @@ inline void PlayerCreatureRelocationWorker(Player* pl, WorldObject const* viewPo
     pl->UpdateVisibilityOf(viewPoint,c);
 
     // Creature AI reaction
-    if (!c->hasUnitState(UNIT_STAT_FLEEING))
+    if (!c->hasUnitState(UNIT_STAT_LOST_CONTROL))
     {
         if (c->AI() && c->AI()->IsVisible(pl) && !c->IsInEvadeMode())
             c->AI()->MoveInLineOfSight(pl);
@@ -78,13 +76,13 @@ inline void PlayerCreatureRelocationWorker(Player* pl, WorldObject const* viewPo
 
 inline void CreatureCreatureRelocationWorker(Creature* c1, Creature* c2)
 {
-    if (!c1->hasUnitState(UNIT_STAT_FLEEING))
+    if (!c1->hasUnitState(UNIT_STAT_LOST_CONTROL))
     {
         if (c1->AI() && c1->AI()->IsVisible(c2) && !c1->IsInEvadeMode())
             c1->AI()->MoveInLineOfSight(c2);
     }
 
-    if (!c2->hasUnitState(UNIT_STAT_FLEEING))
+    if (!c2->hasUnitState(UNIT_STAT_LOST_CONTROL))
     {
         if (c2->AI() && c2->AI()->IsVisible(c1) && !c2->IsInEvadeMode())
             c2->AI()->MoveInLineOfSight(c1);
@@ -96,7 +94,7 @@ inline void MaNGOS::PlayerRelocationNotifier::Visit(CreatureMapType &m)
     if (!i_player.isAlive() || i_player.isInFlight())
         return;
 
-    WorldObject const* viewPoint = i_player.GetViewPoint();
+    WorldObject const* viewPoint = i_player.GetCamera().GetBody();
 
     for(CreatureMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
         if (iter->getSource()->isAlive())
@@ -106,13 +104,13 @@ inline void MaNGOS::PlayerRelocationNotifier::Visit(CreatureMapType &m)
 template<>
 inline void MaNGOS::CreatureRelocationNotifier::Visit(PlayerMapType &m)
 {
-    if(!i_creature.isAlive())
+    if (!i_creature.isAlive())
         return;
 
     for(PlayerMapType::iterator iter=m.begin(); iter != m.end(); ++iter)
         if (Player* player = iter->getSource())
             if (player->isAlive() && !player->isInFlight())
-                PlayerCreatureRelocationWorker(player, player->GetViewPoint(), &i_creature);
+                PlayerCreatureRelocationWorker(player, player->GetCamera().GetBody(), &i_creature);
 }
 
 template<>

@@ -27,13 +27,19 @@
 struct PoolTemplateData
 {
     uint32  MaxLimit;
+    bool AutoSpawn;                                         // spawn at pool system start (not part of another pool and not part of event spawn)
 };
 
 struct PoolObject
 {
     uint32  guid;
     float   chance;
-    PoolObject(uint32 _guid, float _chance): guid(_guid), chance(fabs(_chance)) {}
+    bool exclude;
+
+    PoolObject(uint32 _guid, float _chance): guid(_guid), chance(fabs(_chance)), exclude(false) {}
+
+    template<typename T>
+    void CheckEventLinkAndReport(uint32 poolId, int16 event_id, std::map<uint32, int16> const& creature2event, std::map<uint32, int16> const& go2event) const;
 };
 
 class Pool                                                  // for Pool of Pool case
@@ -73,10 +79,12 @@ class PoolGroup
         bool isEmpty() const { return ExplicitlyChanced.empty() && EqualChanced.empty(); }
         void AddEntry(PoolObject& poolitem, uint32 maxentries);
         bool CheckPool() const;
+        void CheckEventLinkAndReport(int16 event_id, std::map<uint32, int16> const& creature2event, std::map<uint32, int16> const& go2event) const;
         PoolObject* RollOne(SpawnedPoolData& spawns, uint32 triggerFrom);
         void DespawnObject(SpawnedPoolData& spawns, uint32 guid=0);
         void Despawn1Object(uint32 guid);
         void SpawnObject(SpawnedPoolData& spawns, uint32 limit, uint32 triggerFrom, bool instantly);
+        void SetExcludeObject(uint32 guid, bool state);
 
         void Spawn1Object(PoolObject* obj, bool instantly);
         void ReSpawn1Object(PoolObject* obj);
@@ -99,17 +107,37 @@ class PoolManager
         template<typename T>
         uint16 IsPartOfAPool(uint32 db_guid_or_pool_id) const;
 
+        // Method that tell if the creature/gameobject/pool is part of top level pool and return the pool id if yes
+        template<typename T>
+        uint16 IsPartOfTopPool(uint32 db_guid_or_pool_id) const
+        {
+            if (uint16 pool_id = IsPartOfAPool<T>(db_guid_or_pool_id))
+            {
+                if (uint16 top_pool_id = IsPartOfTopPool<Pool>(pool_id))
+                    return top_pool_id;
+
+                return pool_id;
+            }
+
+            return 0;
+        }
+
         template<typename T>
         bool IsSpawnedObject(uint32 db_guid_or_pool_id) const { return mSpawnedData.IsSpawnedObject<T>(db_guid_or_pool_id); }
 
+        template<typename T>
+        void SetExcludeObject(uint16 pool_id, uint32 db_guid_or_pool_id, bool state);
+
         bool CheckPool(uint16 pool_id) const;
+        void CheckEventLinkAndReport(uint16 pool_id, int16 event_id, std::map<uint32, int16> const& creature2event, std::map<uint32, int16> const& go2event) const;
 
         void SpawnPool(uint16 pool_id, bool instantly);
         void DespawnPool(uint16 pool_id);
 
         template<typename T>
-        void UpdatePool(uint16 pool_id, uint32 db_guid_or_pool_id);
+        void UpdatePool(uint16 pool_id, uint32 db_guid_or_pool_id = 0);
 
+        void RemoveAutoSpawnForPool(uint16 pool_id) { mPoolTemplate[pool_id].AutoSpawn = false; }
     protected:
         template<typename T>
         void SpawnPoolGroup(uint16 pool_id, uint32 db_guid_or_pool_id, bool instantly);

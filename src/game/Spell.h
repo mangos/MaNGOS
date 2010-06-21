@@ -23,11 +23,14 @@
 #include "SharedDefines.h"
 #include "DBCEnums.h"
 #include "ObjectGuid.h"
+#include "LootMgr.h"
+#include "Unit.h"
+#include "Player.h"
 
 class WorldSession;
-class Unit;
+class WorldPacket;
 class DynamicObj;
-class Player;
+class Item;
 class GameObject;
 class Group;
 class Aura;
@@ -808,6 +811,7 @@ namespace MaNGOS
         template<> inline void Visit(CorpseMapType & ) {}
         template<> inline void Visit(GameObjectMapType & ) {}
         template<> inline void Visit(DynamicObjectMapType & ) {}
+        template<> inline void Visit(CameraMapType & ) {}
         #endif
     };
 
@@ -815,6 +819,7 @@ namespace MaNGOS
     template<> inline void SpellNotifierCreatureAndPlayer::Visit(CorpseMapType& ) {}
     template<> inline void SpellNotifierCreatureAndPlayer::Visit(GameObjectMapType& ) {}
     template<> inline void SpellNotifierCreatureAndPlayer::Visit(DynamicObjectMapType& ) {}
+    template<> inline void SpellNotifierCreatureAndPlayer::Visit(CameraMapType& ) {}
     #endif
 }
 

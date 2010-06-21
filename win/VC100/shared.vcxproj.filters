@@ -16,9 +16,6 @@
     <Filter Include="Config">
       <UniqueIdentifier>{adb98dec-d22a-40b3-84be-51eaf2974a15}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Config\dotconfpp">
-      <UniqueIdentifier>{dff0e90b-cab5-4d0b-bd5d-3cacbb638630}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Auth">
       <UniqueIdentifier>{e35fd108-bd39-46ae-83f9-09cf1ebf4ea8}</UniqueIdentifier>
     </Filter>
@@ -65,12 +62,6 @@
     </ClCompile>
     <ClCompile Include="..\..\src\shared\Config\Config.cpp">
       <Filter>Config</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\shared\Config\dotconfpp\dotconfpp.cpp">
-      <Filter>Config\dotconfpp</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\shared\Config\dotconfpp\mempool.cpp">
-      <Filter>Config\dotconfpp</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\shared\Auth\AuthCrypt.cpp">
       <Filter>Auth</Filter>
@@ -193,15 +184,6 @@
     </ClInclude>
     <ClInclude Include="..\..\src\shared\Config\Config.h">
       <Filter>Config</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\shared\Config\ConfigEnv.h">
-      <Filter>Config</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\shared\Config\dotconfpp\dotconfpp.h">
-      <Filter>Config\dotconfpp</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\shared\Config\dotconfpp\mempool.h">
-      <Filter>Config\dotconfpp</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\shared\Auth\AuthCrypt.h">
       <Filter>Auth</Filter>

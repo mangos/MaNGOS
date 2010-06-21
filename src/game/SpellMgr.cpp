@@ -283,6 +283,11 @@ bool IsPassiveSpell(uint32 spellId)
     SpellEntry const *spellInfo = sSpellStore.LookupEntry(spellId);
     if (!spellInfo)
         return false;
+    return IsPassiveSpell(spellInfo);
+}
+
+bool IsPassiveSpell(SpellEntry const *spellInfo)
+{
     return (spellInfo->Attributes & SPELL_ATTR_PASSIVE) != 0;
 }
 
@@ -1607,7 +1612,7 @@ bool SpellMgr::IsRankSpellDueToSpell(SpellEntry const *spellInfo_1,uint32 spellI
 
 bool SpellMgr::canStackSpellRanks(SpellEntry const *spellInfo)
 {
-    if(IsPassiveSpell(spellInfo->Id))                       // ranked passive spell
+    if(IsPassiveSpell(spellInfo))                           // ranked passive spell
         return false;
     if(spellInfo->powerType != POWER_MANA && spellInfo->powerType != POWER_HEALTH)
         return false;
@@ -2211,37 +2216,44 @@ bool SpellMgr::IsSkillBonusSpell(uint32 spellId) const
     return false;
 }
 
-SpellEntry const* SpellMgr::SelectAuraRankForPlayerLevel(SpellEntry const* spellInfo, uint32 playerLevel) const
+SpellEntry const* SpellMgr::SelectAuraRankForLevel(SpellEntry const* spellInfo, uint32 level) const
 {
-    // ignore passive spells
-    if(IsPassiveSpell(spellInfo->Id))
+    // fast case
+    if (level + 10 >= spellInfo->spellLevel)
+        return spellInfo;
+
+    // ignore selection for passive spells
+    if (IsPassiveSpell(spellInfo))
         return spellInfo;
 
     bool needRankSelection = false;
     for(int i = 0; i < MAX_EFFECT_INDEX; ++i)
     {
-        if (IsPositiveEffect(spellInfo->Id, SpellEffectIndex(i)) && (
-            spellInfo->Effect[i] == SPELL_EFFECT_APPLY_AURA ||
+        // for simple aura in check apply to any non caster based targets, in rank search mode to any explicit targets
+        if (((spellInfo->Effect[i] == SPELL_EFFECT_APPLY_AURA && 
+            (IsExplicitPositiveTarget(spellInfo->EffectImplicitTargetA[i]) ||
+            IsAreaEffectPossitiveTarget(Targets(spellInfo->EffectImplicitTargetA[i])))) ||
             spellInfo->Effect[i] == SPELL_EFFECT_APPLY_AREA_AURA_PARTY ||
-            spellInfo->Effect[i] == SPELL_EFFECT_APPLY_AREA_AURA_RAID))
+            spellInfo->Effect[i] == SPELL_EFFECT_APPLY_AREA_AURA_RAID) &&
+            IsPositiveEffect(spellInfo->Id, SpellEffectIndex(i)))
         {
             needRankSelection = true;
             break;
         }
     }
 
-    // not required
-    if(!needRankSelection)
+    // not required (rank check more slow so check it here)
+    if (!needRankSelection || GetSpellRank(spellInfo->Id) == 0)
         return spellInfo;
 
     for(uint32 nextSpellId = spellInfo->Id; nextSpellId != 0; nextSpellId = GetPrevSpellInChain(nextSpellId))
     {
         SpellEntry const *nextSpellInfo = sSpellStore.LookupEntry(nextSpellId);
-        if(!nextSpellInfo)
+        if (!nextSpellInfo)
             break;
 
         // if found appropriate level
-        if(playerLevel + 10 >= nextSpellInfo->spellLevel)
+        if (level + 10 >= spellInfo->spellLevel)
             return nextSpellInfo;
 
         // one rank less then
@@ -2588,7 +2600,7 @@ void SpellMgr::LoadSpellLearnSpells()
                 // talent or passive spells or skill-step spells auto-casted and not need dependent learning,
                 // pet teaching spells don't must be dependent learning (casted)
                 // other required explicit dependent learning
-                dbc_node.autoLearned = entry->EffectImplicitTargetA[i]==TARGET_PET || GetTalentSpellCost(spell) > 0 || IsPassiveSpell(spell) || IsSpellHaveEffect(entry,SPELL_EFFECT_SKILL_STEP);
+                dbc_node.autoLearned = entry->EffectImplicitTargetA[i]==TARGET_PET || GetTalentSpellCost(spell) > 0 || IsPassiveSpell(entry) || IsSpellHaveEffect(entry,SPELL_EFFECT_SKILL_STEP);
 
                 SpellLearnSpellMapBounds db_node_bounds = GetSpellLearnSpellMapBounds(spell);
 
