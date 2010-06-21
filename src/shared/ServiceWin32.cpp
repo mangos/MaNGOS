@@ -57,7 +57,7 @@ bool WinServiceInstall()
         if (GetModuleFileName( 0, path, sizeof(path)/sizeof(path[0]) ) > 0)
         {
             SC_HANDLE service;
-            std::strcat(path, " --service");
+            std::strcat(path, " -s run");
             service = CreateService(serviceControlManager,
                 serviceName,                                // name of service
                 serviceLongName,                            // service name to display
