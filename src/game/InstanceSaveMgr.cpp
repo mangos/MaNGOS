@@ -39,6 +39,92 @@
 
 INSTANTIATE_SINGLETON_1( InstanceSaveManager );
 
+//== InstanceSave functions ================================
+
+InstanceSave::InstanceSave(uint16 MapId, uint32 InstanceId, Difficulty difficulty, time_t resetTime, bool canReset)
+: m_resetTime(resetTime), m_instanceid(InstanceId), m_mapid(MapId),
+  m_difficulty(difficulty), m_canReset(canReset)
+{
+}
+
+InstanceSave::~InstanceSave()
+{
+    while(!m_playerList.empty())
+    {
+        Player *player = *(m_playerList.begin());
+        player->UnbindInstance(GetMapId(), GetDifficulty(), true);
+    }
+    while(!m_groupList.empty())
+    {
+        Group *group = *(m_groupList.begin());
+        group->UnbindInstance(GetMapId(), GetDifficulty(), true);
+    }
+}
+
+/*
+    Called from AddInstanceSave
+*/
+void InstanceSave::SaveToDB()
+{
+    // save instance data too
+    std::string data;
+
+    Map *map = sMapMgr.FindMap(GetMapId(),m_instanceid);
+    if(map)
+    {
+        ASSERT(map->IsDungeon());
+        InstanceData *iData = ((InstanceMap *)map)->GetInstanceData();
+        if(iData && iData->Save())
+        {
+            data = iData->Save();
+            CharacterDatabase.escape_string(data);
+        }
+    }
+
+    CharacterDatabase.PExecute("INSERT INTO instance VALUES ('%u', '%u', '"UI64FMTD"', '%u', '%s')", m_instanceid, GetMapId(), (uint64)GetResetTimeForDB(), GetDifficulty(), data.c_str());
+}
+
+time_t InstanceSave::GetResetTimeForDB()
+{
+    // only save the reset time for normal instances
+    const MapEntry *entry = sMapStore.LookupEntry(GetMapId());
+    if(!entry || entry->map_type == MAP_RAID || GetDifficulty() == DUNGEON_DIFFICULTY_HEROIC)
+        return 0;
+    else
+        return GetResetTime();
+}
+
+// to cache or not to cache, that is the question
+InstanceTemplate const* InstanceSave::GetTemplate()
+{
+    return ObjectMgr::GetInstanceTemplate(m_mapid);
+}
+
+MapEntry const* InstanceSave::GetMapEntry()
+{
+    return sMapStore.LookupEntry(m_mapid);
+}
+
+void InstanceSave::DeleteFromDB()
+{
+    InstanceSaveManager::DeleteInstanceFromDB(GetInstanceId());
+}
+
+/* true if the instance save is still valid */
+bool InstanceSave::UnloadIfEmpty()
+{
+    if(m_playerList.empty() && m_groupList.empty())
+    {
+        if(!sInstanceSaveMgr.lock_instLists)
+            sInstanceSaveMgr.RemoveInstanceSave(GetInstanceId());
+        return false;
+    }
+    else
+        return true;
+}
+
+//== InstanceSaveManager functions =========================
+
 InstanceSaveManager::InstanceSaveManager() : lock_instLists(false)
 {
 }
@@ -49,22 +135,7 @@ InstanceSaveManager::~InstanceSaveManager()
     // so we must be prepared for both cases
     lock_instLists = true;
     for (InstanceSaveHashMap::iterator itr = m_instanceSaveById.begin(); itr != m_instanceSaveById.end(); ++itr)
-    {
-        InstanceSave *save = itr->second;
-        for(InstanceSave::PlayerListType::iterator itr2 = save->m_playerList.begin(), next = itr2; itr2 != save->m_playerList.end(); itr2 = next)
-        {
-            ++next;
-            (*itr2)->UnbindInstance(save->GetMapId(), save->GetDifficulty(), true);
-        }
-        save->m_playerList.clear();
-        for(InstanceSave::GroupListType::iterator itr2 = save->m_groupList.begin(), next = itr2; itr2 != save->m_groupList.end(); itr2 = next)
-        {
-            ++next;
-            (*itr2)->UnbindInstance(save->GetMapId(), save->GetDifficulty(), true);
-        }
-        save->m_groupList.clear();
-        delete save;
-    }
+        delete  itr->second;
 }
 
 /*
@@ -145,80 +216,6 @@ void InstanceSaveManager::RemoveInstanceSave(uint32 InstanceId)
         delete itr->second;
         m_instanceSaveById.erase(itr);
     }
-}
-
-InstanceSave::InstanceSave(uint16 MapId, uint32 InstanceId, Difficulty difficulty, time_t resetTime, bool canReset)
-: m_resetTime(resetTime), m_instanceid(InstanceId), m_mapid(MapId),
-  m_difficulty(difficulty), m_canReset(canReset)
-{
-}
-
-InstanceSave::~InstanceSave()
-{
-    // the players and groups must be unbound before deleting the save
-    ASSERT(m_playerList.empty() && m_groupList.empty());
-}
-
-/*
-    Called from AddInstanceSave
-*/
-void InstanceSave::SaveToDB()
-{
-    // save instance data too
-    std::string data;
-
-    Map *map = sMapMgr.FindMap(GetMapId(),m_instanceid);
-    if(map)
-    {
-        ASSERT(map->IsDungeon());
-        InstanceData *iData = ((InstanceMap *)map)->GetInstanceData();
-        if(iData && iData->Save())
-        {
-            data = iData->Save();
-            CharacterDatabase.escape_string(data);
-        }
-    }
-
-    CharacterDatabase.PExecute("INSERT INTO instance VALUES ('%u', '%u', '"UI64FMTD"', '%u', '%s')", m_instanceid, GetMapId(), (uint64)GetResetTimeForDB(), GetDifficulty(), data.c_str());
-}
-
-time_t InstanceSave::GetResetTimeForDB()
-{
-    // only save the reset time for normal instances
-    const MapEntry *entry = sMapStore.LookupEntry(GetMapId());
-    if(!entry || entry->map_type == MAP_RAID || GetDifficulty() == DUNGEON_DIFFICULTY_HEROIC)
-        return 0;
-    else
-        return GetResetTime();
-}
-
-// to cache or not to cache, that is the question
-InstanceTemplate const* InstanceSave::GetTemplate()
-{
-    return ObjectMgr::GetInstanceTemplate(m_mapid);
-}
-
-MapEntry const* InstanceSave::GetMapEntry()
-{
-    return sMapStore.LookupEntry(m_mapid);
-}
-
-void InstanceSave::DeleteFromDB()
-{
-    InstanceSaveManager::DeleteInstanceFromDB(GetInstanceId());
-}
-
-/* true if the instance save is still valid */
-bool InstanceSave::UnloadIfEmpty()
-{
-    if(m_playerList.empty() && m_groupList.empty())
-    {
-        if(!sInstanceSaveMgr.lock_instLists)
-            sInstanceSaveMgr.RemoveInstanceSave(GetInstanceId());
-        return false;
-    }
-    else
-        return true;
 }
 
 void InstanceSaveManager::_DelHelper(DatabaseType &db, const char *fields, const char *table, const char *queryTail,...)
@@ -568,18 +565,6 @@ void InstanceSaveManager::_ResetSave(InstanceSaveHashMap::iterator &itr)
     // unbind all players bound to the instance
     // do not allow UnbindInstance to automatically unload the InstanceSaves
     lock_instLists = true;
-    InstanceSave::PlayerListType &pList = itr->second->m_playerList;
-    while(!pList.empty())
-    {
-        Player *player = *(pList.begin());
-        player->UnbindInstance(itr->second->GetMapId(), itr->second->GetDifficulty(), true);
-    }
-    InstanceSave::GroupListType &gList = itr->second->m_groupList;
-    while(!gList.empty())
-    {
-        Group *group = *(gList.begin());
-        group->UnbindInstance(itr->second->GetMapId(), itr->second->GetDifficulty(), true);
-    }
     delete itr->second;
     m_instanceSaveById.erase(itr++);
     lock_instLists = false;
