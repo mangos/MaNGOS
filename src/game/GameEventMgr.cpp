@@ -171,6 +171,13 @@ void GameEventMgr::LoadFromDB()
         sLog.outString( ">> Loaded %u game events", count );
     }
 
+    std::map<uint16,int16> pool2event;                      // for check unique spawn event associated with pool 
+    std::map<uint32,int16> creature2event;                  // for check unique spawn event associated with creature 
+    std::map<uint32,int16> go2event;                        // for check unique spawn event associated with gameobject
+
+    // list only positive event top pools, filled at creature/gameobject loading
+    mGameEventSpawnPoolIds.resize(mGameEvent.size());
+
     mGameEventCreatureGuids.resize(mGameEvent.size()*2-1);
     //                                   1              2
     result = WorldDatabase.Query("SELECT creature.guid, game_event_creature.event "
@@ -198,6 +205,12 @@ void GameEventMgr::LoadFromDB()
             uint32 guid    = fields[0].GetUInt32();
             int16 event_id = fields[1].GetInt16();
 
+            if (event_id == 0)
+            {
+                sLog.outErrorDb("`game_event_creature` game event id (%i) not allowed",event_id);
+                continue;
+            }
+
             int32 internal_event_id = mGameEvent.size() + event_id - 1;
 
             if(internal_event_id < 0 || (size_t)internal_event_id >= mGameEventCreatureGuids.size())
@@ -207,6 +220,32 @@ void GameEventMgr::LoadFromDB()
             }
 
             ++count;
+
+            // spawn objects at event can be grouped in pools and then affected pools have stricter requirements for this case
+            if (event_id > 0)                   
+            {
+                creature2event[guid] = event_id;
+
+                // not list explicitly creatures from pools in event creature list
+                if (uint16 topPoolId =  sPoolMgr.IsPartOfTopPool<Creature>(guid))
+                {
+                    int16& eventRef = pool2event[topPoolId];
+                    if (eventRef != 0)
+                    {
+                        if (eventRef != event_id)
+                            sLog.outErrorDb("`game_event_creature` have creature (GUID: %u) for event %i from pool or subpool of pool (ID: %u) but pool have already content from event %i. Pool don't must have content for different events!", guid, event_id, topPoolId, eventRef);
+                    }
+                    else
+                    {
+                        eventRef = event_id;
+                        mGameEventSpawnPoolIds[event_id].push_back(topPoolId);
+                        sPoolMgr.RemoveAutoSpawnForPool(topPoolId);
+                    }
+
+                    continue;
+                }
+            }
+
             GuidList& crelist = mGameEventCreatureGuids[internal_event_id];
             crelist.push_back(guid);
 
@@ -244,6 +283,12 @@ void GameEventMgr::LoadFromDB()
             uint32 guid    = fields[0].GetUInt32();
             int16 event_id = fields[1].GetInt16();
 
+            if (event_id == 0)
+            {
+                sLog.outErrorDb("`game_event_gameobject` game event id (%i) not allowed",event_id);
+                continue;
+            }
+
             int32 internal_event_id = mGameEvent.size() + event_id - 1;
 
             if(internal_event_id < 0 || (size_t)internal_event_id >= mGameEventGameobjectGuids.size())
@@ -253,6 +298,32 @@ void GameEventMgr::LoadFromDB()
             }
 
             ++count;
+
+            // spawn objects at event can be grouped in pools and then affected pools have stricter requirements for this case
+            if (event_id > 0)                   
+            {
+                go2event[guid] = event_id;
+
+                // not list explicitly gameobjects from pools in event gameobject list
+                if (uint16 topPoolId =  sPoolMgr.IsPartOfTopPool<GameObject>(guid))
+                {
+                    int16& eventRef = pool2event[topPoolId];
+                    if (eventRef != 0)
+                    {
+                        if (eventRef != event_id)
+                            sLog.outErrorDb("`game_event_gameobject` have gameobject (GUID: %u) for event %i from pool or subpool of pool (ID: %u) but pool have already content from event %i. Pool don't must have content for different events!", guid, event_id, topPoolId, eventRef);
+                    }
+                    else
+                    {
+                        eventRef = event_id;
+                        mGameEventSpawnPoolIds[event_id].push_back(topPoolId);
+                        sPoolMgr.RemoveAutoSpawnForPool(topPoolId);
+                    }
+
+                    continue;
+                }
+            }
+
             GuidList& golist = mGameEventGameobjectGuids[internal_event_id];
             golist.push_back(guid);
 
@@ -261,6 +332,15 @@ void GameEventMgr::LoadFromDB()
 
         sLog.outString();
         sLog.outString( ">> Loaded %u gameobjects in game events", count );
+    }
+
+    // now recheck that all eventPools linked with events after our skip pools with parents
+    for(std::map<uint16,int16>::const_iterator itr = pool2event.begin(); itr != pool2event.end();  ++itr)
+    {
+        uint16 pool_id = itr->first;
+        int16 event_id = itr->second;
+
+        sPoolMgr.CheckEventLinkAndReport(pool_id, event_id, creature2event, go2event);
     }
 
     mGameEventModelEquip.resize(mGameEvent.size());
@@ -365,57 +445,6 @@ void GameEventMgr::LoadFromDB()
         sLog.outString();
         sLog.outString( ">> Loaded %u quests additions in game events", count );
     }
-
-    mGameEventPoolIds.resize(mGameEvent.size()*2-1);
-    //                                   1                    2
-    result = WorldDatabase.Query("SELECT pool_template.entry, game_event_pool.event "
-        "FROM pool_template JOIN game_event_pool ON pool_template.entry = game_event_pool.pool_entry");
-
-    count = 0;
-    if( !result )
-    {
-        barGoLink bar2(1);
-        bar2.step();
-
-        sLog.outString();
-        sLog.outString(">> Loaded %u pools in game events", count );
-    }
-    else
-    {
-
-        barGoLink bar2( (int)result->GetRowCount() );
-        do
-        {
-            Field *fields = result->Fetch();
-
-            bar2.step();
-
-            uint32 entry   = fields[0].GetUInt16();
-            int16 event_id = fields[1].GetInt16();
-
-            int32 internal_event_id = mGameEvent.size() + event_id - 1;
-
-            if (internal_event_id < 0 || (size_t)internal_event_id >= mGameEventPoolIds.size())
-            {
-                sLog.outErrorDb("`game_event_pool` game event id (%i) is out of range compared to max event id in `game_event`",event_id);
-                continue;
-            }
-
-            if (!sPoolMgr.CheckPool(entry))
-            {
-                sLog.outErrorDb("Pool Id (%u) has all creatures or gameobjects with explicit chance sum <>100 and no equal chance defined. The pool system cannot pick one to spawn.", entry);
-                continue;
-            }
-
-            ++count;
-            IdList& poollist = mGameEventPoolIds[internal_event_id];
-            poollist.push_back(entry);
-
-        } while( result->NextRow() );
-        sLog.outString();
-        sLog.outString( ">> Loaded %u pools in game events", count );
-        delete result;
-    }
 }
 
 uint32 GameEventMgr::Initialize()                           // return the next event delay in ms
@@ -516,6 +545,18 @@ void GameEventMgr::GameEventSpawn(int16 event_id)
         CreatureData const* data = sObjectMgr.GetCreatureData(*itr);
         if (data)
         {
+            // negative event id for pool element meaning allow be used in next pool spawn 
+            if (event_id < 0)
+            {
+                if (uint16 pool_id = sPoolMgr.IsPartOfAPool<Creature>(*itr))
+                {
+                    // will have chance at next pool update
+                    sPoolMgr.SetExcludeObject<Creature>(pool_id, *itr, false);
+                    sPoolMgr.UpdatePool<Creature>(pool_id);
+                    continue;
+                }
+            }
+
             sObjectMgr.AddCreatureToGrid(*itr, data);
 
             // Spawn if necessary (loaded grids only)
@@ -549,7 +590,20 @@ void GameEventMgr::GameEventSpawn(int16 event_id)
         GameObjectData const* data = sObjectMgr.GetGOData(*itr);
         if (data)
         {
+            // negative event id for pool element meaning allow be used in next pool spawn 
+            if (event_id < 0)
+            {
+                if (uint16 pool_id = sPoolMgr.IsPartOfAPool<GameObject>(*itr))
+                {
+                    // will have chance at next pool update
+                    sPoolMgr.SetExcludeObject<GameObject>(pool_id, *itr, false);
+                    sPoolMgr.UpdatePool<GameObject>(pool_id);
+                    continue;
+                }
+            }
+
             sObjectMgr.AddGameobjectToGrid(*itr, data);
+
             // Spawn if necessary (loaded grids only)
             // this base map checked as non-instanced and then only existed
             Map* map = const_cast<Map*>(sMapMgr.CreateBaseMap(data->mapid));
@@ -571,14 +625,17 @@ void GameEventMgr::GameEventSpawn(int16 event_id)
         }
     }
 
-    if (internal_event_id < 0 || (size_t)internal_event_id >= mGameEventPoolIds.size())
+    if (event_id > 0)
     {
-        sLog.outError("GameEventMgr::GameEventSpawn attempt access to out of range mGameEventPoolIds element %i (size: " SIZEFMTD ")",internal_event_id,mGameEventPoolIds.size());
-        return;
-    }
+        if((size_t)event_id >= mGameEventSpawnPoolIds.size())
+        {
+            sLog.outError("GameEventMgr::GameEventSpawn attempt access to out of range mGameEventSpawnPoolIds element %i (size: " SIZEFMTD ")", event_id, mGameEventSpawnPoolIds.size());
+            return;
+        }
 
-    for (IdList::iterator itr = mGameEventPoolIds[internal_event_id].begin();itr != mGameEventPoolIds[internal_event_id].end();++itr)
-        sPoolMgr.SpawnPool(*itr, true);
+        for (IdList::iterator itr = mGameEventSpawnPoolIds[event_id].begin();itr != mGameEventSpawnPoolIds[event_id].end();++itr)
+            sPoolMgr.SpawnPool(*itr, true);
+    }
 }
 
 void GameEventMgr::GameEventUnspawn(int16 event_id)
@@ -596,6 +653,17 @@ void GameEventMgr::GameEventUnspawn(int16 event_id)
         // Remove the creature from grid
         if( CreatureData const* data = sObjectMgr.GetCreatureData(*itr) )
         {
+            // negative event id for pool element meaning unspawn in pool and exclude for next spawns
+            if (event_id < 0)
+            {
+                if (uint16 poolid = sPoolMgr.IsPartOfAPool<Creature>(*itr))
+                {
+                    sPoolMgr.SetExcludeObject<Creature>(poolid, *itr, true);
+                    sPoolMgr.UpdatePool<Creature>(poolid, *itr);
+                    continue;
+                }
+            }
+
             sObjectMgr.RemoveCreatureFromGrid(*itr, data);
 
             if (Creature* pCreature = ObjectAccessor::GetCreatureInWorld(ObjectGuid(HIGHGUID_UNIT, data->id, *itr)))
@@ -614,21 +682,36 @@ void GameEventMgr::GameEventUnspawn(int16 event_id)
         // Remove the gameobject from grid
         if(GameObjectData const* data = sObjectMgr.GetGOData(*itr))
         {
+            // negative event id for pool element meaning unspawn in pool and exclude for next spawns
+            if (event_id < 0)
+            {
+                if (uint16 poolid = sPoolMgr.IsPartOfAPool<GameObject>(*itr))
+                {
+                    sPoolMgr.SetExcludeObject<GameObject>(poolid, *itr, true);
+                    sPoolMgr.UpdatePool<GameObject>(poolid, *itr);
+                    continue;
+                }
+            }
+
             sObjectMgr.RemoveGameobjectFromGrid(*itr, data);
 
             if( GameObject* pGameobject = ObjectAccessor::GetGameObjectInWorld(ObjectGuid(HIGHGUID_GAMEOBJECT, data->id, *itr)) )
                 pGameobject->AddObjectToRemoveList();
         }
     }
-    if (internal_event_id < 0 || (size_t)internal_event_id >= mGameEventPoolIds.size())
-    {
-        sLog.outError("GameEventMgr::GameEventUnspawn attempt access to out of range mGameEventPoolIds element %i (size: " SIZEFMTD ")",internal_event_id,mGameEventPoolIds.size());
-        return;
-    }
 
-    for (IdList::iterator itr = mGameEventPoolIds[internal_event_id].begin();itr != mGameEventPoolIds[internal_event_id].end();++itr)
+    if (event_id > 0)
     {
-        sPoolMgr.DespawnPool(*itr);
+        if ((size_t)event_id >= mGameEventSpawnPoolIds.size())
+        {
+            sLog.outError("GameEventMgr::GameEventUnspawn attempt access to out of range mGameEventSpawnPoolIds element %i (size: " SIZEFMTD ")", event_id, mGameEventSpawnPoolIds.size());
+            return;
+        }
+
+        for (IdList::iterator itr = mGameEventSpawnPoolIds[event_id].begin();itr != mGameEventSpawnPoolIds[event_id].end();++itr)
+        {
+            sPoolMgr.DespawnPool(*itr);
+        }
     }
 }
 
