@@ -107,6 +107,30 @@ void SpawnedPoolData::RemoveSpawn<Pool>(uint32 sub_pool_id, uint32 pool_id)
 }
 
 ////////////////////////////////////////////////////////////
+// Methods of class PoolObject
+template<>
+void PoolObject::CheckEventLinkAndReport<Creature>(uint32 poolId, int16 event_id, std::map<uint32, int16> const& creature2event, std::map<uint32, int16> const& /*go2event*/) const
+{
+    std::map<uint32, int16>::const_iterator itr = creature2event.find(guid);
+    if (itr == creature2event.end() || itr->second != event_id)
+        sLog.outErrorDb("Creature (GUID: %u) expected to be listed in `game_event_creature` for event %u as part pool %u", guid, event_id, poolId);
+}
+
+template<>
+void PoolObject::CheckEventLinkAndReport<GameObject>(uint32 poolId, int16 event_id, std::map<uint32, int16> const& /*creature2event*/, std::map<uint32, int16> const& go2event) const
+{
+    std::map<uint32, int16>::const_iterator itr = go2event.find(guid);
+    if (itr == go2event.end() || itr->second != event_id)
+        sLog.outErrorDb("Gameobject (GUID: %u) expected to be listed in `game_event_gameobject` for event %u as part pool %u", guid, event_id, poolId);
+}
+
+template<>
+void PoolObject::CheckEventLinkAndReport<Pool>(uint32 poolId, int16 event_id, std::map<uint32, int16> const& creature2event, std::map<uint32, int16> const& go2event) const
+{
+    sPoolMgr.CheckEventLinkAndReport(guid, event_id, creature2event, go2event);
+}
+
+////////////////////////////////////////////////////////////
 // Methods of template class PoolGroup
 
 // Method to add a gameobject/creature guid to the proper list depending on pool type and chance value
@@ -134,6 +158,40 @@ bool PoolGroup<T>::CheckPool() const
     return true;
 }
 
+// Method to check event linking 
+template <class T>
+void PoolGroup<T>::CheckEventLinkAndReport(int16 event_id, std::map<uint32, int16> const& creature2event, std::map<uint32, int16> const& go2event) const
+{
+    for (uint32 i=0; i < EqualChanced.size(); ++i)
+        EqualChanced[i].CheckEventLinkAndReport<T>(poolId, event_id, creature2event, go2event);
+
+    for (uint32 i=0; i<ExplicitlyChanced.size(); ++i)
+        ExplicitlyChanced[i].CheckEventLinkAndReport<T>(poolId, event_id, creature2event, go2event);
+}
+
+template <class T>
+void PoolGroup<T>::SetExcludeObject(uint32 guid, bool state)
+{
+    for (uint32 i=0; i < EqualChanced.size(); ++i)
+    {
+        if (EqualChanced[i].guid == guid)
+        {
+            EqualChanced[i].exclude = state;
+            return;
+        }
+    }
+
+    for (uint32 i=0; i<ExplicitlyChanced.size(); ++i)
+    {
+        if (ExplicitlyChanced[i].guid == guid)
+        {
+            ExplicitlyChanced[i].exclude = state;
+            return;
+        }
+    }
+}
+
+
 template <class T>
 PoolObject* PoolGroup<T>::RollOne(SpawnedPoolData& spawns, uint32 triggerFrom)
 {
@@ -146,7 +204,7 @@ PoolObject* PoolGroup<T>::RollOne(SpawnedPoolData& spawns, uint32 triggerFrom)
             roll -= ExplicitlyChanced[i].chance;
             // Triggering object is marked as spawned at this time and can be also rolled (respawn case)
             // so this need explicit check for this case
-            if (roll < 0 && (ExplicitlyChanced[i].guid == triggerFrom || !spawns.IsSpawnedObject<T>(ExplicitlyChanced[i].guid)))
+            if (roll < 0 && !ExplicitlyChanced[i].exclude && (ExplicitlyChanced[i].guid == triggerFrom || !spawns.IsSpawnedObject<T>(ExplicitlyChanced[i].guid)))
                 return &ExplicitlyChanced[i];
         }
     }
@@ -156,7 +214,7 @@ PoolObject* PoolGroup<T>::RollOne(SpawnedPoolData& spawns, uint32 triggerFrom)
         int32 index = irand(0, EqualChanced.size()-1);
         // Triggering object is marked as spawned at this time and can be also rolled (respawn case)
         // so this need explicit check for this case
-        if (EqualChanced[index].guid == triggerFrom || !spawns.IsSpawnedObject<T>(EqualChanced[index].guid))
+        if (!EqualChanced[index].exclude && (EqualChanced[index].guid == triggerFrom || !spawns.IsSpawnedObject<T>(EqualChanced[index].guid)))
             return &EqualChanced[index];
     }
 
@@ -263,7 +321,12 @@ void PoolGroup<T>::SpawnObject(SpawnedPoolData& spawns, uint32 limit, uint32 tri
     // and also counted into m_SpawnedPoolAmount so we need increase count to be
     // spawned by 1
     if (triggerFrom)
-        ++count;
+    {
+        if (spawns.IsSpawnedObject<T>(triggerFrom))
+            ++count;
+        else
+            triggerFrom = 0;
+    }
 
     // This will try to spawn the rest of pool, not guaranteed
     for (int i = 0; i < count; ++i)
@@ -462,6 +525,7 @@ void PoolManager::LoadFromDB()
 
         PoolTemplateData& pPoolTemplate = mPoolTemplate[pool_id];
         pPoolTemplate.MaxLimit  = fields[1].GetUInt32();
+        pPoolTemplate.AutoSpawn = true;          // will update and later data loading
 
     } while (result->NextRow());
 
@@ -661,6 +725,9 @@ void PoolManager::LoadFromDB()
             SearchPair p(child_pool_id, mother_pool_id);
             mPoolSearchMap.insert(p);
 
+            // update top independent pool flag
+            mPoolTemplate[child_pool_id].AutoSpawn = false;
+
         } while( result->NextRow() );
 
         // Now check for circular reference
@@ -692,17 +759,15 @@ void PoolManager::LoadFromDB()
     }
 }
 
-// The initialize method will spawn all pools not in an event and not in another pool, this is why there is 2 left joins with 2 null checks
+// The initialize method will spawn all pools not in an event and not in another pool
 void PoolManager::Initialize()
 {
-    QueryResult *result = WorldDatabase.Query("SELECT DISTINCT pool_template.entry FROM pool_template LEFT JOIN game_event_pool ON pool_template.entry=game_event_pool.pool_entry LEFT JOIN pool_pool ON pool_template.entry=pool_pool.pool_id WHERE game_event_pool.pool_entry IS NULL AND pool_pool.pool_id IS NULL");
-    uint32 count=0;
-    if (result)
+    uint32 count = 0;
+
+    for(uint16 pool_entry = 0; pool_entry < mPoolTemplate.size(); ++pool_entry)
     {
-        do
+        if (mPoolTemplate[pool_entry].AutoSpawn)
         {
-            Field *fields = result->Fetch();
-            uint16 pool_entry = fields[0].GetUInt16();
             if (!CheckPool(pool_entry))
             {
                 sLog.outErrorDb("Pool Id (%u) has all creatures or gameobjects with explicit chance sum <>100 and no equal chance defined. The pool system cannot pick one to spawn.", pool_entry);
@@ -710,8 +775,7 @@ void PoolManager::Initialize()
             }
             SpawnPool(pool_entry, true);
             count++;
-        } while (result->NextRow());
-        delete result;
+        }
     }
 
     BASIC_LOG("Pool handling system initialized, %u pools spawned.", count);
@@ -773,6 +837,27 @@ bool PoolManager::CheckPool(uint16 pool_id) const
         mPoolGameobjectGroups[pool_id].CheckPool() &&
         mPoolCreatureGroups[pool_id].CheckPool() &&
         mPoolPoolGroups[pool_id].CheckPool();
+}
+
+// Method that check linking all elements to event
+void PoolManager::CheckEventLinkAndReport(uint16 pool_id, int16 event_id, std::map<uint32, int16> const& creature2event, std::map<uint32, int16> const& go2event) const
+{
+    mPoolGameobjectGroups[pool_id].CheckEventLinkAndReport(event_id, creature2event, go2event);
+    mPoolCreatureGroups[pool_id].CheckEventLinkAndReport(event_id, creature2event, go2event);
+    mPoolPoolGroups[pool_id].CheckEventLinkAndReport(event_id, creature2event, go2event);
+}
+
+// Method that exclude some elements from next spawn
+template<>
+void PoolManager::SetExcludeObject<Creature>(uint16 pool_id, uint32 db_guid_or_pool_id, bool state)
+{
+    mPoolCreatureGroups[pool_id].SetExcludeObject(db_guid_or_pool_id, state);
+}
+
+template<>
+void PoolManager::SetExcludeObject<GameObject>(uint16 pool_id, uint32 db_guid_or_pool_id, bool state)
+{
+    mPoolGameobjectGroups[pool_id].SetExcludeObject(db_guid_or_pool_id, state);
 }
 
 // Call to update the pool when a gameobject/creature part of pool [pool_id] is ready to respawn

@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_10086_01_mangos_command` bit(1) default NULL
+  `required_10089_01_mangos_game_event_pool` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -1572,7 +1572,7 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `game_event_creature`;
 CREATE TABLE `game_event_creature` (
   `guid` int(10) unsigned NOT NULL,
-  `event` smallint(6) NOT NULL default '0' COMMENT 'Put negatives values to remove during event',
+  `event` smallint(6) NOT NULL default '0' COMMENT 'Negatives value to remove during event and ignore pool grouping, positive value for spawn during event and if guid is part of pool then al pool memebers must be listed as part of event spawn.',
   PRIMARY KEY  (`guid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
@@ -1613,7 +1613,7 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `game_event_gameobject`;
 CREATE TABLE `game_event_gameobject` (
   `guid` int(10) unsigned NOT NULL,
-  `event` smallint(6) NOT NULL default '0' COMMENT 'Put negatives values to remove during event',
+  `event` smallint(6) NOT NULL default '0' COMMENT 'Negatives value to remove during event and ignore pool grouping, positive value for spawn during event and if guid is part of pool then al pool memebers must be listed as part of event spawn.',
   PRIMARY KEY  (`guid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
@@ -13703,26 +13703,6 @@ CREATE TABLE `pool_template` (
 LOCK TABLES `pool_template` WRITE;
 /*!40000 ALTER TABLE `pool_template` DISABLE KEYS */;
 /*!40000 ALTER TABLE `pool_template` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `game_event_pool`
---
-
-DROP TABLE IF EXISTS `game_event_pool`;
-CREATE TABLE `game_event_pool` (
-  `pool_entry` mediumint(8) unsigned NOT NULL default '0' COMMENT 'Id of the pool',
-  `event` smallint(6) NOT NULL default '0' COMMENT 'Put negatives values to remove during event',
-  PRIMARY KEY  (`pool_entry`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
---
--- Dumping data for table `game_event_pool`
---
-
-LOCK TABLES `game_event_pool` WRITE;
-/*!40000 ALTER TABLE `game_event_pool` DISABLE KEYS */;
-/*!40000 ALTER TABLE `game_event_pool` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --

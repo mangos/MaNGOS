@@ -1056,7 +1056,7 @@ void World::SetInitialWorldSettings()
     sLog.outString( "Loading Objects Pooling Data...");
     sPoolMgr.LoadFromDB();
 
-    sLog.outString( "Loading Game Event Data...");
+    sLog.outString( "Loading Game Event Data...");          // must be after sPoolMgr.LoadFromDB for proper load pool events
     sLog.outString();
     sGameEventMgr.LoadFromDB();
     sLog.outString( ">>> Game Event Data loaded" );
