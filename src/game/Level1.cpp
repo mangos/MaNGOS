@@ -2315,7 +2315,7 @@ bool ChatHandler::HandleGoCommand(const char* args)
     float x, y, z;
 
     // raw coordinates case
-    if (isNumeric(args[0]))
+    if (isNumeric(args[0]) || args[0] == '-')
     {
         char* px = strtok((char*)args, " ");
         char* py = strtok(NULL, " ");
