@@ -218,7 +218,7 @@ void InstanceResetScheduler::LoadResetTimes()
 
     // clean expired instances, references to them will be deleted in CleanupInstances
     // must be done before calculating new reset times
-    m_InstanceSaves._CleanupExiredInstancesAtTime(now);
+    m_InstanceSaves._CleanupExpiredInstancesAtTime(now);
 
     // calculate new global reset times for expired instances and those that have never been reset yet
     // add the global reset times to the priority queue
@@ -683,7 +683,7 @@ uint32 InstanceSaveManager::GetNumBoundGroupsTotal()
     return ret;
 }
 
-void InstanceSaveManager::_CleanupExiredInstancesAtTime( time_t t )
+void InstanceSaveManager::_CleanupExpiredInstancesAtTime( time_t t )
 {
     _DelHelper(CharacterDatabase, "id, map, instance.difficulty", "instance", "LEFT JOIN instance_reset ON mapid = map AND instance.difficulty =  instance_reset.difficulty WHERE (instance.resettime < '"UI64FMTD"' AND instance.resettime > '0') OR (NOT instance_reset.resettime IS NULL AND instance_reset.resettime < '"UI64FMTD"')",  (uint64)t, (uint64)t);
 }
