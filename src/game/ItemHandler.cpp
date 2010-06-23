@@ -1052,13 +1052,13 @@ void WorldSession::HandleWrapItemOpcode(WorldPacket& recv_data)
     DEBUG_LOG("WRAP: receive gift_bag = %u, gift_slot = %u, item_bag = %u, item_slot = %u", gift_bag, gift_slot, item_bag, item_slot);
 
     Item *gift = _player->GetItemByPos( gift_bag, gift_slot );
-    if(!gift)
+    if (!gift)
     {
         _player->SendEquipError( EQUIP_ERR_ITEM_NOT_FOUND, gift, NULL );
         return;
     }
 
-    if(!gift->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAGS_WRAPPER))// cheating: non-wrapper wrapper
+    if (!gift->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAGS_WRAPPER))// cheating: non-wrapper wrapper
     {
         _player->SendEquipError( EQUIP_ERR_ITEM_NOT_FOUND, gift, NULL );
         return;
@@ -1066,50 +1066,50 @@ void WorldSession::HandleWrapItemOpcode(WorldPacket& recv_data)
 
     Item *item = _player->GetItemByPos( item_bag, item_slot );
 
-    if( !item )
+    if (!item)
     {
         _player->SendEquipError( EQUIP_ERR_ITEM_NOT_FOUND, item, NULL );
         return;
     }
 
-    if(item == gift)                                        // not possible with packet from real client
+    if (item == gift)                                       // not possible with packet from real client
     {
         _player->SendEquipError( EQUIP_ERR_WRAPPED_CANT_BE_WRAPPED, item, NULL );
         return;
     }
 
-    if(item->IsEquipped())
+    if (item->IsEquipped())
     {
         _player->SendEquipError( EQUIP_ERR_EQUIPPED_CANT_BE_WRAPPED, item, NULL );
         return;
     }
 
-    if(item->GetUInt64Value(ITEM_FIELD_GIFTCREATOR))        // HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAGS_WRAPPED);
+    if (!item->GetGuidValue(ITEM_FIELD_GIFTCREATOR).IsEmpty())// HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAGS_WRAPPED);
     {
         _player->SendEquipError( EQUIP_ERR_WRAPPED_CANT_BE_WRAPPED, item, NULL );
         return;
     }
 
-    if(item->IsBag())
+    if (item->IsBag())
     {
         _player->SendEquipError( EQUIP_ERR_BAGS_CANT_BE_WRAPPED, item, NULL );
         return;
     }
 
-    if(item->IsSoulBound())
+    if (item->IsSoulBound())
     {
         _player->SendEquipError( EQUIP_ERR_BOUND_CANT_BE_WRAPPED, item, NULL );
         return;
     }
 
-    if(item->GetMaxStackCount() != 1)
+    if (item->GetMaxStackCount() != 1)
     {
         _player->SendEquipError( EQUIP_ERR_STACKABLE_CANT_BE_WRAPPED, item, NULL );
         return;
     }
 
     // maybe not correct check  (it is better than nothing)
-    if(item->GetProto()->MaxCount > 0)
+    if (item->GetProto()->MaxCount > 0)
     {
         _player->SendEquipError( EQUIP_ERR_UNIQUE_CANT_BE_WRAPPED, item, NULL );
         return;
@@ -1128,7 +1128,7 @@ void WorldSession::HandleWrapItemOpcode(WorldPacket& recv_data)
         case 17307: item->SetEntry(17308); break;
         case 21830: item->SetEntry(21831); break;
     }
-    item->SetUInt64Value(ITEM_FIELD_GIFTCREATOR, _player->GetGUID());
+    item->SetGuidValue(ITEM_FIELD_GIFTCREATOR, _player->GetObjectGuid());
     item->SetUInt32Value(ITEM_FIELD_FLAGS, ITEM_FLAGS_WRAPPED);
     item->SetState(ITEM_CHANGED, _player);
 
