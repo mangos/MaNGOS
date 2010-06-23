@@ -1,4 +1,5 @@
-﻿<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug_NoPCH|Win32">
       <Configuration>Debug_NoPCH</Configuration>
@@ -135,7 +136,7 @@
     <ClCompile>
       <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\dep\include\g3dlite;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\dep\include\g3dlite;..\..\dep\include\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -162,7 +163,7 @@
     <ClCompile>
       <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\dep\include\g3dlite;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\dep\include\g3dlite;..\..\dep\include\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -185,7 +186,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>..\..\dep\include\g3dlite;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\dep\include\g3dlite;..\..\dep\include\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions</EnableEnhancedInstructionSet>
@@ -208,7 +209,7 @@
     </Midl>
     <ClCompile>
       <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>..\..\dep\include\g3dlite;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\dep\include\g3dlite;..\..\dep\include\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
@@ -229,7 +230,7 @@
     <ClCompile>
       <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\dep\include\g3dlite;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\dep\include\g3dlite;..\..\dep\include\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -256,7 +257,7 @@
     <ClCompile>
       <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\dep\include\g3dlite;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\dep\include\g3dlite;..\..\dep\include\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -283,10 +284,39 @@
     <ClCompile Include="..\..\dep\src\g3dlite\format.cpp" />
     <ClCompile Include="..\..\dep\src\g3dlite\Matrix3.cpp" />
     <ClCompile Include="..\..\dep\src\g3dlite\Plane.cpp" />
+    <ClCompile Include="..\..\dep\src\g3dlite\RegistryUtil.cpp" />
     <ClCompile Include="..\..\dep\src\g3dlite\System.cpp" />
     <ClCompile Include="..\..\dep\src\g3dlite\Triangle.cpp" />
     <ClCompile Include="..\..\dep\src\g3dlite\Vector3.cpp" />
     <ClCompile Include="..\..\dep\src\g3dlite\Vector4.cpp" />
+    <ClCompile Include="..\..\dep\src\g3dlite\debugAssert.cpp" />
+    <ClCompile Include="..\..\dep\src\g3dlite\fileutils.cpp" />
+    <ClCompile Include="..\..\dep\src\g3dlite\g3dmath.cpp" />
+    <ClCompile Include="..\..\dep\src\g3dlite\g3dfnmatch.cpp" />
+    <ClCompile Include="..\..\dep\src\g3dlite\prompt.cpp" />
+    <ClCompile Include="..\..\dep\src\g3dlite\stringutils.cpp" />
+    <ClCompile Include="..\..\dep\src\g3dlite\Any.cpp" />
+    <ClCompile Include="..\..\dep\src\g3dlite\BinaryFormat.cpp" />
+    <ClCompile Include="..\..\dep\src\g3dlite\BinaryInput.cpp" />
+    <ClCompile Include="..\..\dep\src\g3dlite\BinaryOutput.cpp" />
+    <ClCompile Include="..\..\dep\src\g3dlite\Capsule.cpp" />
+    <ClCompile Include="..\..\dep\src\g3dlite\CollisionDetection.cpp" />
+    <ClCompile Include="..\..\dep\src\g3dlite\CoordinateFrame.cpp" />
+    <ClCompile Include="..\..\dep\src\g3dlite\Cylinder.cpp" />
+    <ClCompile Include="..\..\dep\src\g3dlite\Line.cpp" />
+    <ClCompile Include="..\..\dep\src\g3dlite\LineSegment.cpp" />
+    <ClCompile Include="..\..\dep\src\g3dlite\Log.cpp" />
+    <ClCompile Include="..\..\dep\src\g3dlite\Matrix4.cpp" />
+    <ClCompile Include="..\..\dep\src\g3dlite\MemoryManager.cpp" />
+    <ClCompile Include="..\..\dep\src\g3dlite\Quat.cpp" />
+    <ClCompile Include="..\..\dep\src\g3dlite\Random.cpp" />
+    <ClCompile Include="..\..\dep\src\g3dlite\Ray.cpp" />
+    <ClCompile Include="..\..\dep\src\g3dlite\ReferenceCount.cpp" />
+    <ClCompile Include="..\..\dep\src\g3dlite\Sphere.cpp" />
+    <ClCompile Include="..\..\dep\src\g3dlite\TextInput.cpp" />
+    <ClCompile Include="..\..\dep\src\g3dlite\TextOutput.cpp" />
+    <ClCompile Include="..\..\dep\src\g3dlite\UprightFrame.cpp" />
+    <ClCompile Include="..\..\dep\src\g3dlite\Vector2.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dep\include\g3dlite\G3D\AABox.h" />
@@ -316,13 +346,6 @@
     <ClInclude Include="..\..\dep\include\g3dlite\G3D\Vector3.h" />
     <ClInclude Include="..\..\dep\include\g3dlite\G3D\Vector3int16.h" />
     <ClInclude Include="..\..\dep\include\g3dlite\G3D\Vector4.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\dep\include\g3dlite\G3D\g3dmath.inl" />
-    <None Include="..\..\dep\include\g3dlite\G3D\Quat.inl" />
-    <None Include="..\..\dep\include\g3dlite\G3D\Vector2.inl" />
-    <None Include="..\..\dep\include\g3dlite\G3D\Vector3.inl" />
-    <None Include="..\..\dep\include\g3dlite\G3D\Vector4.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

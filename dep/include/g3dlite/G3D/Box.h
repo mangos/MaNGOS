@@ -3,11 +3,11 @@
  
   Box class
  
-  @maintainer Morgan McGuire, matrix@graphics3d.com
+  @maintainer Morgan McGuire, http://graphics.cs.williams.edu
  
   @cite Portions based on Dave Eberly's Magic Software Library at <A HREF="http://www.magic-software.com">http://www.magic-software.com</A>
   @created 2001-06-02
-  @edited  2006-01-05
+  @edited  2007-06-05
 
   Copyright 2000-2006, Morgan McGuire.
   All rights reserved.
@@ -84,8 +84,14 @@ public:
         const Vector3&      min,
         const Vector3&      max);
 
+    static Box inf();
+
+	Box(class BinaryInput& b);
+
     Box(const class AABox& b);
 
+	void serialize(class BinaryOutput& b) const;
+	void deserialize(class BinaryInput& b);
 
     /**
      Returns the object to world transformation for 
@@ -105,18 +111,6 @@ public:
         return _center;
     }
 
-    inline Vector3 getCenter() const {
-        return center();
-    }
-
-    /**
-     Returns a corner (0 <= i < 8)
-     @deprecated
-     */
-    inline Vector3 getCorner(int i) const {
-        debugAssert(i < 8);
-        return _corner[i];
-    }
 
     inline Vector3 corner(int i) const {
         debugAssert(i < 8);
@@ -155,65 +149,34 @@ public:
         Vector3&            v2,
         Vector3&            v3) const;
 
-/**
-	 @deprecated Use culledBy(Array<Plane>&)
-     */
-    bool culledBy(
-        const class Plane*  plane,
-        int                 numPlanes,
-	int32&              cullingPlaneIndex,
-	const uint32        testMask,
-        uint32&             childMask) const;
-
-    /**
-	 @deprecated Use culledBy(Array<Plane>&)
-     */
-    bool culledBy(
-        const class Plane*  plane,
-        int                 numPlanes,
-	int32&		cullingPlaneIndex = dummy,
-	const uint32  	testMask = -1) const;
 
 	/**
       See AABox::culledBy
 	 */
-	bool culledBy(
-		const Array<Plane>&		plane,
-		int32&					cullingPlaneIndex,
-		const uint32  			testMask,
-        uint32&                 childMask) const;
+    bool culledBy
+    (
+     const Array<Plane>&		plane,
+     int32&                             cullingPlaneIndex,
+     const uint32  			testMask,
+     uint32&                            childMask) const;
 
     /**
      Conservative culling test that does not produce a mask for children.
      */
-	bool culledBy(
-		const Array<Plane>&		plane,
-		int32&					cullingPlaneIndex = dummy,
-		const uint32  			testMask		  = -1) const;
+    bool culledBy
+    (
+     const Array<Plane>&		plane,
+     int32&                             cullingPlaneIndex = dummy,
+     const uint32  			testMask	  = -1) const;
 
     bool contains(
         const Vector3&      point) const;
 
-    /** @deprecated */
-    float surfaceArea() const;
-
-    inline float area() const {
-        return surfaceArea();
-    }
+    float area() const;
 
     float volume() const;
 
-    void getRandomSurfacePoint(Vector3& P, Vector3& N = Vector3::dummy) const;
-
-    /**
-      @deprecated
-     Uniformly distributed on the surface.
-     */
-    inline Vector3 randomSurfacePoint() const {
-        Vector3 V;
-        getRandomSurfacePoint(V);
-        return V;
-    }
+    void getRandomSurfacePoint(Vector3& P, Vector3& N = Vector3::ignore()) const;
 
     /**
      Uniformly distributed on the interior (includes surface)
@@ -221,6 +184,10 @@ public:
     Vector3 randomInteriorPoint() const;
 
     void getBounds(class AABox&) const;
+
+    bool isFinite() const {
+        return G3D::isFinite(_volume);
+    }
 };
 
 }

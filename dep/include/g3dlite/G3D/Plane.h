@@ -3,7 +3,7 @@
 
  Plane class
 
- @maintainer Morgan McGuire, matrix@graphics3d.com
+ @maintainer Morgan McGuire, http://graphics.cs.williams.edu
 
  @created 2001-06-02
  @edited  2004-07-18
@@ -15,6 +15,7 @@
 #include "G3D/platform.h"
 #include "G3D/Vector3.h"
 #include "G3D/Vector4.h"
+#include "G3D/debugAssert.h"
 
 namespace G3D {
 
@@ -64,6 +65,10 @@ public:
         const Vector3&      point);
 
     static Plane fromEquation(float a, float b, float c, float d);
+
+	Plane(class BinaryInput& b);
+	void serialize(class BinaryOutput& b) const;
+	void deserialize(class BinaryInput& b);
 
     virtual ~Plane() {}
 

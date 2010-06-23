@@ -5,18 +5,19 @@
   @cite Portions written by Aaron Orenstein, a@orenstein.name
  
   @created 2001-03-11
-  @edited  2007-05-12
+  @edited  2009-05-29
 
-  Copyright 2000-2007, Morgan McGuire.
+  Copyright 2000-2009, Morgan McGuire, http://graphics.cs.williams.edu
   All rights reserved.
  */
 
-#ifndef G3D_ARRAY_H
-#define G3D_ARRAY_H
+#ifndef G3D_Array_h
+#define G3D_Array_h
 
 #include "G3D/platform.h"
 #include "G3D/debug.h"
 #include "G3D/System.h"
+#include "G3D/MemoryManager.h"
 #ifdef G3D_DEBUG
 //   For formatting error messages
 #    include "G3D/format.h"
@@ -24,7 +25,7 @@
 #include <vector>
 #include <algorithm>
 
-#ifdef G3D_WIN32
+#ifdef _MSC_VER
 #   include <new>
     
 #   pragma warning (push)
@@ -47,7 +48,7 @@ const int SORT_INCREASING = 1;
 const int SORT_DECREASING = -1;
 
 /**
- Dynamic 1D array.  
+ \brief Dynamic 1D array tuned for performance.
 
  Objects must have a default constructor (constructor that
  takes no arguments) in order to be used with this template.
@@ -57,20 +58,15 @@ const int SORT_DECREASING = -1;
  Do not use with objects that overload placement <code>operator new</code>,
  since the speed of Array is partly due to pooled allocation.
 
- If SSE is defined Arrays allocate the first element aligned to
- 16 bytes.
-
-
  Array is highly optimized compared to std::vector.  
  Array operations are less expensive than on std::vector and for large
  amounts of data, Array consumes only 1.5x the total size of the 
  data, while std::vector consumes 2.0x.  The default
  array takes up zero heap space.  The first resize (or append)
  operation grows it to a reasonable internal size so it is efficient
- to append to small arrays.  Memory is allocated using
- System::alignedMalloc, which produces pointers aligned to 16-byte
- boundaries for use with SSE instructions and uses pooled storage for
- fast allocation.  When Array needs to copy
+ to append to small arrays. 
+ 
+ Then Array needs to copy
  data internally on a resize operation it correctly invokes copy
  constructors of the elements (the MSVC6 implementation of
  std::vector uses realloc, which can create memory leaks for classes
@@ -81,24 +77,38 @@ const int SORT_DECREASING = -1;
 
  To serialize an array, see G3D::serialize.
 
+ The template parameter MIN_ELEMENTS indicates the smallest number of 
+ elements that will be allocated.  The default of 10 is designed to avoid 
+ the overhead of repeatedly allocating the array as it grows from 1, to 2, and so on.
+ If you are creating a lot of small Arrays, however, you may want to set this smaller
+ to reduce the memory cost. Once the array has been allocated, it will never
+ deallocate the underlying array unless MIN_ELEMENTS is set to 0, MIN_BYTES is 0, and the array
+ is empty.
+
  Do not subclass an Array.
+
+ \sa G3D::SmallArray
  */
-template <class T>
+template <class T, int MIN_ELEMENTS = 10, size_t MIN_BYTES = 32>
 class Array {
 private:
     /** 0...num-1 are initialized elements, num...numAllocated-1 are not */
-    T*              data;
+    T*                  data;
 
-    int             num;
-    int             numAllocated;
+    int                 num;
+    int                 numAllocated;
 
-    void init(int n, int a) {
-        debugAssert(n <= a);
+    MemoryManager::Ref  m_memoryManager;
+
+    /** \param n Number of elements
+    */
+    void init(int n, const MemoryManager::Ref& m) {
+        m_memoryManager = m;
         debugAssert(n >= 0);
         this->num = 0;
         this->numAllocated = 0;
         data = NULL;
-        if (a > 0) {
+        if (n > 0) {
             resize(n);
         } else {
             data = NULL;
@@ -106,7 +116,7 @@ private:
     }
 
     void _copy(const Array &other) {
-        init(other.num, other.num);
+        init(other.num, MemoryManager::create());
         for (int i = 0; i < num; i++) {
             data[i] = other.data[i];
         }
@@ -140,10 +150,11 @@ private:
          // elements are actually revealed to the application.  They 
          // will be constructed in the resize() method.
 
-         data = (T*)System::alignedMalloc(sizeof(T) * numAllocated, 16);
+         data = (T*)m_memoryManager->alloc(sizeof(T) * numAllocated);
+         alwaysAssertM(data, "Memory manager returned NULL: out of memory?");
 
          // Call the copy constructors
-         {const int N = iMin(oldNum, numAllocated);
+         {const int N = G3D::min(oldNum, numAllocated);
           const T* end = data + N;
           T* oldPtr = oldData;
           for (T* ptr = data; ptr < end; ++ptr, ++oldPtr) {
@@ -163,19 +174,30 @@ private:
               ptr->~T();
          }}
 
-
-         System::alignedFree(oldData);
+         m_memoryManager->free(oldData);
     }
 
 public:
 
     /**
-     C++ STL style iterator variable.  Call begin() to get 
+     G3D C++ STL style iterator variable.  Call begin() to get 
      the first iterator, pre-increment (++i) the iterator to get to
      the next value.  Use dereference (*i) to access the element.
      */
     typedef T* Iterator;
+    /** G3D C++ STL style const iterator in same style as Iterator. */
     typedef const T* ConstIterator;
+
+    /** stl porting compatibility helper */
+    typedef Iterator iterator;
+    /** stl porting compatibility helper */
+    typedef ConstIterator const_iterator;
+    /** stl porting compatibility helper */
+    typedef T value_type;
+    /** stl porting compatibility helper */
+    typedef int size_type;
+    /** stl porting compatibility helper */
+    typedef int difference_type;
 
     /**
      C++ STL style iterator method.  Returns the first iterator element.
@@ -216,23 +238,60 @@ public:
        return data;
    }
 
-   /** Creates a zero length array (no heap allocation occurs until resize). */
-   Array() {
-       init(0, 0);
-   }
+    /** Creates a zero length array (no heap allocation occurs until resize). */
+    Array() : num(0) {
+        init(0, MemoryManager::create());
+        debugAssert(num >= 0);
+    }
+    
 
-   /**
-    Creates an array of size.
-    */
-   Array(int size) {
-       init(size, size);
-   }
+    /**  Creates an array containing v0. */
+    Array(const T& v0) {
+        init(1, MemoryManager::create());
+        (*this)[0] = v0;
+    }
+    
+    /**  Creates an array containing v0 and v1. */
+    Array(const T& v0, const T& v1) {
+        init(2, MemoryManager::create());
+        (*this)[0] = v0;
+        (*this)[1] = v1;
+    }
+    
+    /**  Creates an array containing v0...v2. */
+    Array(const T& v0, const T& v1, const T& v2) {
+       init(3, MemoryManager::create());
+       (*this)[0] = v0;
+       (*this)[1] = v1;
+       (*this)[2] = v2;
+    }
+
+    /** Creates an array containing v0...v3. */
+    Array(const T& v0, const T& v1, const T& v2, const T& v3) {
+       init(4, MemoryManager::create());
+       (*this)[0] = v0;
+       (*this)[1] = v1;
+       (*this)[2] = v2;
+       (*this)[3] = v3;
+    }
+
+    /** Creates an array containing v0...v4. */
+    Array(const T& v0, const T& v1, const T& v2, const T& v3, const T& v4) {
+       init(5, MemoryManager::create());
+       (*this)[0] = v0;
+       (*this)[1] = v1;
+       (*this)[2] = v2;
+       (*this)[3] = v3;
+       (*this)[4] = v4;
+    }
+
 
    /**
     Copy constructor
     */
-   Array(const Array& other) {
+    Array(const Array& other) : num(0) {
        _copy(other);
+       debugAssert(num >= 0);
    }
 
    /**
@@ -248,36 +307,43 @@ public:
            (data + i)->~T();
        }
        
-       System::alignedFree(data);
+       m_memoryManager->free(data);
        // Set to 0 in case this Array is global and gets referenced during app exit
        data = NULL;
 	   num = 0;
        numAllocated = 0;
    }
 
-
    /**
     Removes all elements.  Use resize(0, false) or fastClear if you want to 
     remove all elements without deallocating the underlying array
     so that future append() calls will be faster.
     */
-   void clear() {
-       resize(0);
+   void clear(bool shrink = true) {
+       resize(0, shrink);
    }
 
-   /** resize(0, false) */
+   void clearAndSetMemoryManager(const MemoryManager::Ref& m) {
+       clear();
+       debugAssert(data == NULL);
+       m_memoryManager = m;
+   }
+
+   /** resize(0, false) 
+      @deprecated*/
    void fastClear() {
-       resize(0, false);
+       clear(false);
    }
 
    /**
     Assignment operator.
     */
    Array& operator=(const Array& other) {
-       resize(other.num);
-       for (int i = 0; i < num; ++i) {
+       debugAssert(num >= 0);
+       resize(other.num);       for (int i = 0; i < num; ++i) {
            data[i] = other[i];
        }
+       debugAssert(num >= 0);
        return *this;
    }
 
@@ -287,6 +353,10 @@ public:
            data[i] = other[i];
        }
        return *this;
+   }
+
+   inline MemoryManager::Ref memoryManager() const {
+       return m_memoryManager;
    }
 
    /**
@@ -308,25 +378,11 @@ public:
     Swaps element index with the last element in the array then
     shrinks the array by one.
     */
-   void fastRemove(int index) {
+   void fastRemove(int index, bool shrinkIfNecessary = false) {
        debugAssert(index >= 0);
        debugAssert(index < num);
        data[index] = data[num - 1];
-       resize(size() - 1);
-   }
-
-   /**
-    Resizes, calling the default constructor for 
-    newly created objects and shrinking the underlying
-    array as needed (and calling destructors as needed).
-    */
-   void resize(int n) {
-      resize(n, true);
-   }
-
-   /** Resizes without shrinking the underlying array */
-   void fastResize(int n) {
-      resize(n, false);
+       resize(size() - 1, shrinkIfNecessary);
    }
 
 
@@ -345,20 +401,34 @@ public:
 
     /** @param shrinkIfNecessary if false, memory will never be
       reallocated when the array shrinks.  This makes resizing much
-      faster but can waste memory. */
-   void resize(int n, bool shrinkIfNecessary) {
-      int oldNum = num;
-      num = n;
+      faster but can waste memory. 
+    */
+    void resize(int n, bool shrinkIfNecessary = true) {
+        debugAssert(n >= 0);
+        if (num == n) {
+            return;
+        }
 
-      // Call the destructors on newly hidden elements if there are any
-      for (int i = num; i < oldNum; ++i) {
-          (data + i)->~T();
-      }
+        int oldNum = num;
+        num = n;
 
-      // Once allocated, always maintain 10 elements or 32 bytes, whichever is higher.
-      static const int minSize = iMax(10, 32 / sizeof(T));
+        // Call the destructors on newly hidden elements if there are any
+        for (int i = num; i < oldNum; ++i) {
+            (data + i)->~T();
+        }
+        
+        // Once allocated, always maintain MIN_ELEMENTS elements or 32 bytes, whichever is higher.
+        const int minSize = std::max(MIN_ELEMENTS, (int)(MIN_BYTES / sizeof(T)));
 
-      if (num > numAllocated) {
+        if ((MIN_ELEMENTS == 0) && (MIN_BYTES == 0) && (n == 0) && shrinkIfNecessary) {
+            // Deallocate the array completely
+            numAllocated = 0;
+            m_memoryManager->free(data);
+            data = NULL;
+            return;
+        }
+        
+        if (num > numAllocated) {
           // Grow the underlying array
 
           if (numAllocated == 0) {
@@ -382,7 +452,7 @@ public:
 
                   float growFactor = 3.0;
 
-                  size_t oldSizeBytes = numAllocated * sizeof(T);
+                  int oldSizeBytes = numAllocated * sizeof(T);
                   if (oldSizeBytes > 400000) {
                       // Avoid bloat
                       growFactor = 1.5;
@@ -447,6 +517,8 @@ public:
 
     inline void append(const T& v1, const T& v2) {
         if (inArray(&v1) || inArray(&v2)) {
+            // Copy into temporaries so that the references won't break when
+            // the array resizes.
             T t1 = v1;
             T t2 = v2;
             append(t1, t2);
@@ -457,6 +529,7 @@ public:
             new (data + num + 1) T(v2);
             num += 2;
         } else {
+            // Resize the array.  Note that neither value is already in the array.
             resize(num + 2, DONT_SHRINK_UNDERLYING_ARRAY);
             data[num - 2] = v1;
             data[num - 1] = v2;
@@ -597,6 +670,24 @@ public:
        return (*this)[0];
    }
 
+   /** 
+      "The member function returns a reference to the last element of the controlled sequence, 
+       which must be non-empty." 
+       For compatibility with std::vector.
+   */
+   T& back() {
+       return (*this)[size()-1];
+   }
+
+   /** 
+      "The member function returns a reference to the last element of the controlled sequence, 
+       which must be non-empty." 
+       For compatibility with std::vector.
+   */
+   const T& back() const {
+       return (*this)[size()-1];
+   }
+
    /**
     Removes the last element and returns it.  By default, shrinks the underlying array.
     */
@@ -638,7 +729,7 @@ public:
    }
 
    inline T& operator[](unsigned int n) {
-        debugAssertM(((int)n < num), format("Array index out of bounds. n = %d, size() = %d", n, num));
+        debugAssertM(n < (unsigned int)num, format("Array index out of bounds. n = %d, size() = %d", n, num));
         return data[n];
    }
 
@@ -739,6 +830,19 @@ public:
 
     /**
      Returns the index of (the first occurance of) an index or -1 if
+     not found.  Searches from the right.
+     */
+    int rfindIndex(const T& value) const {
+        for (int i = num -1 ; i >= 0; --i) {
+            if (data[i] == value) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    /**
+     Returns the index of (the first occurance of) an index or -1 if
      not found.
      */
     int findIndex(const T& value) const {
@@ -827,11 +931,25 @@ public:
         return elem1->x < elem2->x;
     }
     </PRE>
+
+    or a functor, e.g.,
+    <pre>
+bool
+less_than_functor::operator()( const double& lhs, const double& rhs ) const
+{
+return( lhs < rhs? true : false );
+}
+</pre>
      */
-    void sort(bool (__cdecl *lessThan)(const T& elem1, const T& elem2)) {
+    //    void sort(bool (__cdecl *lessThan)(const T& elem1, const T& elem2)) {
+    //    std::sort(data, data + num, lessThan);
+    //}
+    template<class LessThan>
+    void sort(const LessThan& lessThan) {
+        // Using std::sort, which according to http://www.open-std.org/JTC1/SC22/WG21/docs/D_4.cpp
+        // was 2x faster than qsort for arrays around size 2000 on intel core2 with gcc
         std::sort(data, data + num, lessThan);
     }
-
 
     /**
      Sorts the array in increasing order using the > or < operator.  To 
@@ -1149,8 +1267,8 @@ template<class T> bool contains(const T* array, int len, const T& e) {
 
 } // namespace
 
+#ifdef _MSC_VER
+#   pragma warning (pop)
 #endif
 
-#ifdef G3D_WIN32
-#   pragma warning (push)
 #endif

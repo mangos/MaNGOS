@@ -1,7 +1,7 @@
 /**
  @file format.h
  
- @maintainer Morgan McGuire, matrix@graphics3d.com
+ @maintainer Morgan McGuire, http://graphics.cs.williams.edu
  
  @author  2000-09-09
  @edited  2005-11-03
@@ -17,19 +17,6 @@
 #include <string>
 #include <stdio.h>
 #include <cstdarg>
-#include <assert.h>
-#ifndef G3D_WIN32
-    // Don't include varargs.h for some random
-    // gcc reason
-    //#include <varargs.h>
-    #include <stdarg.h>
-#endif
-
-#ifndef _MSC_VER
-    #ifndef __cdecl
-        #define __cdecl __attribute__((cdecl))
-    #endif
-#endif
 
 namespace G3D {
 
@@ -40,7 +27,7 @@ namespace G3D {
   string is under 160 characters (not including terminator) and slower
   when the string is longer.
  */
-std::string format(
+std::string   __cdecl format(
     const char*                 fmt
     ...) G3D_CHECK_PRINTF_ARGS;
 
@@ -52,6 +39,6 @@ std::string vformat(
     va_list                     argPtr) G3D_CHECK_VPRINTF_ARGS;
 
 
-}; // namespace
+} // namespace
 
 #endif

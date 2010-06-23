@@ -337,7 +337,7 @@ namespace VMAP
     {
         IntersectionCallBack<SubModel> intersectCallback;
         NodeValueAccess<TreeNode, SubModel> vna = NodeValueAccess<TreeNode, SubModel>(getTreeNodes(), iSubModel);
-        Ray relativeRay = Ray::fromOriginAndDirection(pRay.origin - getBasePosition(), pRay.direction);
+        Ray relativeRay = Ray::fromOriginAndDirection(pRay.origin() - getBasePosition(), pRay.direction());
         iTreeNodes[0].intersectRay(pRay, intersectCallback, pMaxDist, vna, pStopAtFirstHit, false);
     }
 

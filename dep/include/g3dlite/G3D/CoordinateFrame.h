@@ -1,17 +1,17 @@
 /**
  @file CoordinateFrame.h
 
- @maintainer Morgan McGuire, matrix@graphics3d.com
+ @maintainer Morgan McGuire, http://graphics.cs.williams.edu
  
  @created 2001-03-04
- @edited  2006-04-07
+ @edited  2009-04-29
 
- Copyright 2000-2006, Morgan McGuire.
+ Copyright 2000-2009, Morgan McGuire.
  All rights reserved.
 */
 
-#ifndef G3D_COORDINATEFRAME_H
-#define G3D_COORDINATEFRAME_H
+#ifndef G3D_CFrame_h
+#define G3D_CFrame_h
 
 #include "G3D/platform.h"
 #include "G3D/Vector3.h"
@@ -24,7 +24,15 @@
 #include <cstdarg>
 #include <assert.h>
 
+#ifdef _MSC_VER
+// Turn off "conditional expression is constant" warning; MSVC generates this
+// for debug assertions in inlined methods.
+#   pragma warning (disable : 4127)
+#endif
+
+
 namespace G3D {
+class Any;
 
 /**
  A rigid body RT (rotation-translation) transformation.
@@ -45,26 +53,26 @@ Convert to Matrix4 using CoordinateFrame::toMatrix4.  You <I>can</I> construct a
 from a Matrix4 using Matrix4::approxCoordinateFrame, however, because a Matrix4 is more 
 general than a CoordinateFrame, some information may be lost.
 
-See also: G3D::Matrix4, G3D::Quat
+@sa G3D::UprightFrame, G3D::PhysicsFrame, G3D::Matrix4, G3D::Quat
 */
 class CoordinateFrame {
 public:
 
-    /**
-     Takes object space points to world space.
-     */
+    /**  Takes object space points to world space.  */
     Matrix3							rotation;
 
-    /**
-     Takes object space points to world space.
-     */
+    /** Takes object space points to world space. */
     Vector3							translation;
 
-    /**
-     The direction an object "looks" relative to its own axes.
-     @deprecated This is always -1 and will be fixed at that value in future releases.
-     */
-    static const float				zLookDirection;
+    /** \param any Must be in one of the following forms: 
+        - CFrame((matrix3 expr), (vector3 expr))
+        - CFrame::fromXYZYPRDegrees(#, #, #, #, #, #)
+        - CFrame {  rotation = (matrix3 expr), translation = (vector3 expr) }
+        */
+    CoordinateFrame(const Any& any);
+    
+    /** Converts the CFrame to an Any. */
+    operator Any() const;
 
     inline bool operator==(const CoordinateFrame& other) const {
         return (translation == other.translation) && (rotation == other.rotation);
@@ -83,14 +91,12 @@ public:
     /**
      Initializes to the identity coordinate frame.
      */
-    inline CoordinateFrame() : 
-        rotation(Matrix3::identity()), translation(Vector3::zero()) {
-    }
+    CoordinateFrame();
 
-	CoordinateFrame(const Vector3& _translation) :
+    CoordinateFrame(const Vector3& _translation) :
         rotation(Matrix3::identity()), translation(_translation) {
-	}
-
+    }
+    
     CoordinateFrame(const Matrix3 &rotation, const Vector3 &translation) :
         rotation(rotation), translation(translation) {
     }
@@ -98,6 +104,23 @@ public:
     CoordinateFrame(const Matrix3 &rotation) :
         rotation(rotation), translation(Vector3::zero()) {
     }
+
+    CoordinateFrame(const class UprightFrame& f);
+
+    static CoordinateFrame fromXYZYPRRadians(float x, float y, float z, float yaw = 0.0f, float pitch = 0.0f, float roll = 0.0f);
+
+    /** Construct a coordinate frame from translation = (x,y,z) and
+     rotations (in that order) about Y, object space X, object space
+     Z.  Note that because object-space axes are used, these are not
+     equivalent to Euler angles; they are known as Tait-Bryan
+     rotations and are more convenient for intuitive positioning.*/
+    static CoordinateFrame fromXYZYPRDegrees(float x, float y, float z, float yaw = 0.0f, float pitch = 0.0f, float roll = 0.0f);
+    
+    CoordinateFrame(class BinaryInput& b);
+
+    void deserialize(class BinaryInput& b);
+
+    void serialize(class BinaryOutput& b) const;
 
     CoordinateFrame(const CoordinateFrame &other) :
         rotation(other.rotation), translation(other.translation) {}
@@ -117,8 +140,13 @@ public:
     /** See also Matrix4::approxCoordinateFrame */
     class Matrix4 toMatrix4() const;
 
+    void getXYZYPRRadians(float& x, float& y, float& z, float& yaw, float& pitch, float& roll) const;
+    void getXYZYPRDegrees(float& x, float& y, float& z, float& yaw, float& pitch, float& roll) const;
+
+
     /**
      Produces an XML serialization of this coordinate frame.
+     @deprecated
      */
     std::string toXML() const;
 
@@ -131,7 +159,7 @@ public:
      object has an inverted heading.
      */
     inline float getHeading() const {
-        Vector3 look = rotation.getColumn(2);
+        Vector3 look = rotation.column(2);
         float angle = -(float) atan2(-look.x, look.z);
         return angle;
     }
@@ -163,17 +191,18 @@ public:
     }
 
     /**
-     Transforms the point into object space.
+     Transforms the point into object space.  Assumes that the rotation matrix is orthonormal.
      */
-	inline Vector3 pointToObjectSpace(const Vector3& v) const {
-		float p[3];
-		p[0] = v[0] - translation[0];
-		p[1] = v[1] - translation[1];
-		p[2] = v[2] - translation[2];
-		return Vector3(
-			rotation[0][0] * p[0] + rotation[1][0] * p[1] + rotation[2][0] * p[2],
-			rotation[0][1] * p[0] + rotation[1][1] * p[1] + rotation[2][1] * p[2],
-			rotation[0][2] * p[0] + rotation[1][2] * p[1] + rotation[2][2] * p[2]);
+    inline Vector3 pointToObjectSpace(const Vector3& v) const {
+        float p[3];
+        p[0] = v[0] - translation[0];
+        p[1] = v[1] - translation[1];
+        p[2] = v[2] - translation[2];
+        debugAssert(G3D::fuzzyEq(rotation.determinant(), 1.0f));
+        return Vector3(
+                       rotation[0][0] * p[0] + rotation[1][0] * p[1] + rotation[2][0] * p[2],
+                       rotation[0][1] * p[0] + rotation[1][1] * p[1] + rotation[2][1] * p[2],
+                       rotation[0][2] * p[0] + rotation[1][2] * p[1] + rotation[2][2] * p[2]);
     }
 
     /**
@@ -260,14 +289,9 @@ public:
         const Vector3&  target,
         Vector3         up);
 
-    /** @deprecated See lookVector */
-	inline Vector3 getLookVector() const {
-		return rotation.getColumn(2) * zLookDirection;
-	}
-
     /** The direction this camera is looking (its negative z axis)*/
 	inline Vector3 lookVector() const {
-		return rotation.getColumn(2) * zLookDirection;
+		return -rotation.column(2);
 	}
 
     /** Returns the ray starting at the camera origin travelling in direction CoordinateFrame::lookVector. */
@@ -275,20 +299,11 @@ public:
 
     /** Up direction for this camera (its y axis). */
     inline Vector3 upVector() const {
-        return rotation.getColumn(1);
+        return rotation.column(1);
     }
 
-    /**
-     If a viewer looks along the look vector, this is the viewer's "left"
-     @deprecated leftVector
-     */
-    inline Vector3 getLeftVector() const {
-		return -rotation.getColumn(0);
-	}
-
-    /** @deprecated See rightVector */
-    inline Vector3 getRightVector() const {
-		return rotation.getColumn(0);
+    inline Vector3 rightVector() const {
+		return rotation.column(0);
 	}
 
     /**
@@ -296,11 +311,7 @@ public:
      Useful for strafing motions and building alternative coordinate frames.
      */
     inline Vector3 leftVector() const {
-		return -rotation.getColumn(0);
-    }
-
-    inline Vector3 rightVector() const {
-		return rotation.getColumn(0);
+		return -rotation.column(0);
     }
 
     /**
@@ -312,6 +323,8 @@ public:
         float                   alpha) const;
 
 };
+
+typedef CoordinateFrame CFrame;
 
 } // namespace
 
