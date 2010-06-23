@@ -1,18 +1,36 @@
 /**
  @file Plane.cpp
  
- @maintainer Morgan McGuire, matrix@graphics3d.com
+ @maintainer Morgan McGuire, http://graphics.cs.williams.edu
  
  @created 2003-02-06
  @edited  2006-01-29
  */
 
 #include "G3D/platform.h"
-#include "G3D/format.h"
 #include "G3D/Plane.h"
+#include "G3D/BinaryOutput.h"
+#include "G3D/BinaryInput.h"
 #include "G3D/stringutils.h"
 
 namespace G3D {
+
+Plane::Plane(class BinaryInput& b) {
+	deserialize(b);
+}
+
+
+void Plane::serialize(class BinaryOutput& b) const {
+	_normal.serialize(b);
+	b.writeFloat64(_distance);
+}
+
+
+void Plane::deserialize(class BinaryInput& b) {
+	_normal.deserialize(b);
+	_distance = (float)b.readFloat64();
+}
+
 
 Plane::Plane(
     Vector4      point0,
@@ -75,7 +93,7 @@ Plane::Plane(
     const Vector3&      __normal,
     const Vector3&      point) {
 
-    _normal   = __normal.direction();
+    _normal    = __normal.direction();
     _distance  = _normal.dot(point);
 }
 

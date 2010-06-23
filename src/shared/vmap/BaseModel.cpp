@@ -66,7 +66,7 @@ namespace VMAP
         bool isInside = false;
 
         float d = MyCollisionDetection::collisionLocationForMovingPointFixedAABox(
-            pRay.origin, pRay.direction,
+            pRay.origin(), pRay.direction(),
             pBox,
             pOutLocation, isInside);
         if (!isInside && ((d > 0) && (d < pMaxDist)))
@@ -84,10 +84,10 @@ namespace VMAP
         bool alreadyInsideBounds = false;
         bool rayWillHitBounds =
             MyCollisionDetection::collisionLocationForMovingPointFixedAABox(
-            pRay.origin, pRay.direction, pBox, location, alreadyInsideBounds);
+            pRay.origin(), pRay.direction(), pBox, location, alreadyInsideBounds);
 
         bool canHitThisNode = (alreadyInsideBounds ||
-            (rayWillHitBounds && ((location - pRay.origin).squaredLength() < (pMaxDist * pMaxDist))));
+            (rayWillHitBounds && ((location - pRay.origin()).squaredLength() < (pMaxDist * pMaxDist))));
 
         return canHitThisNode;
     }

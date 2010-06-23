@@ -411,6 +411,13 @@ ACE_Ini_ImpExp::import_config (const ACE_TCHAR* filename)
   if (!in)
     return -1;
 
+  // MaNGOS addition: Try read utf8 header and skip it if exist for support utf8 format file
+  ACE_UINT32 utf8header = 0;
+  fgets((char*)&utf8header, 4, in);                         // Try read header
+  if (utf8header != ACE_UINT32(0x00BFBBEF))                 // If not found
+      fseek(in, 0, SEEK_SET);                               // Reset read position
+  // MaNGOS addition - end
+
   // @@ Make this a dynamic size!
   ACE_TCHAR buffer[4096];
   ACE_Configuration_Section_Key section;
