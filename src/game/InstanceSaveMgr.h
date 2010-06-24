@@ -43,7 +43,6 @@ class Group;
 */
 class InstanceSave
 {
-    friend class InstanceSaveManager;
     public:
         /* Created either when:
            - any new instance is being generated
@@ -166,7 +165,6 @@ class InstanceResetScheduler
 
 class MANGOS_DLL_DECL InstanceSaveManager : public MaNGOS::Singleton<InstanceSaveManager, MaNGOS::ClassLevelLockable<InstanceSaveManager, ACE_Thread_Mutex> >
 {
-    friend class InstanceSave;
     friend class InstanceResetScheduler;
     public:
         InstanceSaveManager();
