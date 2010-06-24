@@ -205,6 +205,9 @@ bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool 
             SetUInt32Value(UNIT_FIELD_BYTES_0, 2048);
             SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
                                                             // this enables popup window (pet dismiss, cancel)
+            // DK ghouls have energy
+            if (cinfo->family == CREATURE_FAMILY_GHOUL)
+                setPowerType(POWER_ENERGY);
             break;
         case HUNTER_PET:
             SetUInt32Value(UNIT_FIELD_BYTES_0, 0x02020100);
@@ -472,6 +475,17 @@ void Pet::setDeathState(DeathState s)                       // overwrite virtual
                 ModifyPower(POWER_HAPPINESS, -HAPPINESS_LEVEL_SIZE);
 
             SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
+        }
+        // send cooldown for summon spell if necessary
+        if (Player* p_owner = GetCharmerOrOwnerPlayerOrPlayerItself())
+        {
+            SpellEntry const *spellInfo = sSpellStore.LookupEntry(GetUInt32Value(UNIT_CREATED_BY_SPELL));
+            if (spellInfo && spellInfo->Attributes & SPELL_ATTR_DISABLED_WHILE_ACTIVE)
+                p_owner->SendCooldownEvent(spellInfo);
+            // Raise Dead hack
+            if (spellInfo->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT && spellInfo->SpellFamilyFlags & 0x1000)
+                if (spellInfo = sSpellStore.LookupEntry(46584))
+                    p_owner->SendCooldownEvent(spellInfo);
         }
     }
     else if(getDeathState()==ALIVE)
@@ -1918,13 +1932,37 @@ void Pet::CastPetAura(PetAura const* aura)
     if(!auraId)
         return;
 
-    if(auraId == 35696)                                       // Demonic Knowledge
+    switch (auraId)
     {
-        int32 basePoints = int32(aura->GetDamage() * (GetStat(STAT_STAMINA) + GetStat(STAT_INTELLECT)) / 100);
-        CastCustomSpell(this, auraId, &basePoints, NULL, NULL, true);
+        case 35696: // Demonic Knowledge
+        {
+            int32 basePoints = int32(aura->GetDamage() * (GetStat(STAT_STAMINA) + GetStat(STAT_INTELLECT)) / 100);
+            CastCustomSpell(this, auraId, &basePoints, NULL, NULL, true);
+            break;
+        }
+        case 54566: // Ravenous Dead
+        {
+            Unit* owner = GetOwner();
+            if (owner)
+            {
+                // We must give x% bonus to base bonus from owner's stamina to ghoul stamina
+                int32 basePoints0 =
+                    int32(owner->GetStat(STAT_STAMINA)*0.3f*(aura->GetDamage()+100.0f)/100.0f
+                    - (GetStat(STAT_STAMINA)-GetCreateStat(STAT_STAMINA)));
+                // We must give x% bonus to base bonus from owner's strength to ghoul strength
+                int32 basePoints1 =
+                    int32(owner->GetStat(STAT_STRENGTH)*0.3f*(aura->GetDamage()+100.0f)/100.0f
+                    - (GetStat(STAT_STRENGTH)-GetCreateStat(STAT_STRENGTH)));
+                CastCustomSpell(this, auraId, &basePoints0, &basePoints1, NULL, true);
+            }
+            break;
+        }
+        default:
+        {
+            CastSpell(this, auraId, true);
+            break;
+        }
     }
-    else
-        CastSpell(this, auraId, true);
 }
 
 struct DoPetLearnSpell
