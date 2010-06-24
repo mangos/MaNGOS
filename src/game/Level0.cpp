@@ -249,14 +249,14 @@ bool ChatHandler::HandleAccountLockCommand(const char* args)
     std::string argstr = (char*)args;
     if (argstr == "on")
     {
-        loginDatabase.PExecute( "UPDATE account SET locked = '1' WHERE id = '%d'",GetAccountId());
+        LoginDatabase.PExecute( "UPDATE account SET locked = '1' WHERE id = '%d'",GetAccountId());
         PSendSysMessage(LANG_COMMAND_ACCLOCKLOCKED);
         return true;
     }
 
     if (argstr == "off")
     {
-        loginDatabase.PExecute( "UPDATE account SET locked = '0' WHERE id = '%d'",GetAccountId());
+        LoginDatabase.PExecute( "UPDATE account SET locked = '0' WHERE id = '%d'",GetAccountId());
         PSendSysMessage(LANG_COMMAND_ACCLOCKUNLOCKED);
         return true;
     }

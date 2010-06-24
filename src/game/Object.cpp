@@ -1361,19 +1361,15 @@ bool WorldObject::HasInArc(const float arcangle, const WorldObject* obj) const
     float arc = arcangle;
 
     // move arc to range 0.. 2*pi
-    while( arc >= 2.0f * M_PI_F )
-        arc -=  2.0f * M_PI_F;
-    while( arc < 0 )
-        arc +=  2.0f * M_PI_F;
+    arc = MapManager::NormalizeOrientation(arc);
 
     float angle = GetAngle( obj );
     angle -= m_orientation;
 
     // move angle to range -pi ... +pi
-    while( angle > M_PI_F)
-        angle -= 2.0f * M_PI_F;
-    while(angle < -M_PI_F)
-        angle += 2.0f * M_PI_F;
+    angle = MapManager::NormalizeOrientation(angle);
+    if(angle > M_PI_F)
+        angle -= 2.0f*M_PI_F;
 
     float lborder =  -1 * (arc/2.0f);                       // in range -pi..0
     float rborder = (arc/2.0f);                             // in range 0..pi
@@ -1959,3 +1955,4 @@ bool WorldObject::IsControlledByPlayer() const
             return false;
     }
 }
+

@@ -80,8 +80,16 @@ class MANGOS_DLL_SPEC ViewPoint
     void CameraCall(void (Camera::*handler)())
     {
         if (!m_cameras.empty())
-            for(m_camera_iter = m_cameras.begin(); m_camera_iter!=m_cameras.end(); ++m_camera_iter)
+        {
+            for(m_camera_iter = m_cameras.begin(); m_camera_iter != m_cameras.end(); ++m_camera_iter)
+            {
                 ((*m_camera_iter)->*handler)();
+
+                // can be end() after handler
+                if (m_camera_iter == m_cameras.end())
+                    break;
+            }
+        }
     }
 
 public:

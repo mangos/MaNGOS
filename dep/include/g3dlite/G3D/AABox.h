@@ -3,12 +3,12 @@
  
   Axis-aligned box class
  
-  @maintainer Morgan McGuire, matrix@graphics3d.com
+  @maintainer Morgan McGuire, http://graphics.cs.williams.edu
  
   @created 2004-01-10
-  @edited  2006-02-10
+  @edited  2009-02-10
 
-  Copyright 2000-2006, Morgan McGuire.
+  Copyright 2000-2009, Morgan McGuire.
   All rights reserved.
  */
 
@@ -19,6 +19,7 @@
 #include "G3D/Vector3.h"
 #include "G3D/debug.h"
 #include "G3D/Array.h"
+#include "G3D/Plane.h"
 
 namespace G3D {
 
@@ -27,6 +28,7 @@ namespace G3D {
  */
 class AABox {
 private:
+    friend class Intersect;
 
     /** Optional argument placeholder */
     static int dummy;
@@ -42,7 +44,7 @@ public:
     /**
      Constructs a zero-area AABox at v.
      */
-    inline AABox(const Vector3& v) {
+    inline explicit AABox(const Vector3& v) {
         lo = hi = v;
     }
 
@@ -65,6 +67,26 @@ public:
         hi = high;
     }
 
+    /**
+     Grows to include the bounds of a
+     */
+    inline void merge(const AABox& a) {
+        lo = lo.min(a.lo);
+        hi = hi.max(a.hi);
+    }
+
+    inline void merge(const Vector3& a) {
+        lo = lo.min(a);
+        hi = hi.max(a);
+    }
+
+    void serialize(class BinaryOutput& b) const;
+    
+    void deserialize(class BinaryInput& b);
+
+    inline bool isFinite() const {
+        return lo.isFinite() && hi.isFinite();
+    }
 
     inline const Vector3& low() const {
         return lo;
@@ -77,20 +99,15 @@ public:
     /**
      The largest possible finite box.
      */
-    static inline const AABox& maxFinite() {
-        static const AABox b = AABox(Vector3::minFinite(), Vector3::maxFinite());
-        return b;
-    }
+    static const AABox& maxFinite();
 
-    static inline const AABox& inf() {
-        static const AABox b = AABox(-Vector3::inf(), Vector3::inf());
-        return b;
-    }
+    /** A large finite box. This is smaller than FLT_MAX
+        because it leaves room to add boxes together. */
+    static const AABox& large();
 
-    static inline const AABox& zero() {
-        static const AABox b = AABox(Vector3::zero(), Vector3::zero());
-        return b;
-    }
+    static const AABox& inf();
+
+    static const AABox& zero();
 
     /**
       Returns the centroid of the box.
@@ -99,36 +116,21 @@ public:
         return (lo + hi) * 0.5;
     }
 
+    Vector3 corner(int index) const;
+
     /**
      Distance from corner(0) to the next corner along axis a.
      */
-    inline double extent(int a) const {
+    inline float extent(int a) const {
         debugAssert(a < 3);
         return hi[a] - lo[a];
     }
+
 
     inline Vector3 extent() const {
         return hi - lo;
     }
 
-    /**
-	 @deprecated Use culledBy(Array<Plane>&)
-     */
-    bool culledBy(
-        const class Plane*  plane,
-        int                 numPlanes,
-		int32&				cullingPlaneIndex,
-		const uint32  		testMask,
-        uint32&             childMask) const;
-
-    /**
-	 @deprecated Use culledBy(Array<Plane>&)
-     */
-    bool culledBy(
-        const class Plane*  plane,
-        int                 numPlanes,
-		int32&				cullingPlaneIndex = dummy,
-		const uint32  		testMask = 0xFFFFFF) const;
 
     /**
      Splits the box into two AABoxes along the specified axis.  low contains
@@ -176,7 +178,18 @@ public:
 	bool culledBy(
 		const Array<Plane>&		plane,
 		int32&					cullingPlaneIndex = dummy,
-		const uint32  			testMask		  = -1) const;
+		const uint32  			testMask		  = 0xFFFFFFFF) const;
+
+    /** less than or equal to containment */
+    inline bool contains(const AABox& other) const {
+        return 
+            (other.hi.x <= hi.x) &&
+            (other.hi.y <= hi.y) &&
+            (other.hi.z <= hi.z) &&
+            (other.lo.x >= lo.x) &&
+            (other.lo.y >= lo.y) &&
+            (other.lo.z >= lo.z);
+    }
 
     inline bool contains(
         const Vector3&      point) const {
@@ -189,14 +202,9 @@ public:
             (point.z <= hi.z);
     }
 
-    /** @deprecated */
-    inline float surfaceArea() const {
+    inline float area() const {
         Vector3 diag = hi - lo;
         return 2.0f * (diag.x * diag.y + diag.y * diag.z + diag.x * diag.z);
-    }
-
-    inline float area() const {
-        return surfaceArea();
     }
 
     inline float volume() const {
@@ -207,9 +215,6 @@ public:
     Vector3 randomInteriorPoint() const;
 
     Vector3 randomSurfacePoint() const;
-
-    /** @deprecated use Box constructor */
-    class Box toBox() const;
 
     /** Returns true if there is any overlap */
     bool intersects(const AABox& other) const;
@@ -225,7 +230,7 @@ public:
         return AABox(L, H);
     }
 
-    inline unsigned int hashCode() const {
+    inline size_t hashCode() const {
         return lo.hashCode() + hi.hashCode();
     }
 
@@ -237,6 +242,20 @@ public:
         return !((lo == b.lo) && (hi == b.hi));
     }
 
+    inline AABox operator+(const Vector3& v) const {
+        AABox out;
+        out.lo = lo + v;
+        out.hi = hi + v;
+        return out;
+    }
+
+    inline AABox operator-(const Vector3& v) const {
+        AABox out;
+        out.lo = lo - v;
+        out.hi = hi - v;
+        return out;
+    }
+
     void getBounds(AABox& out) const {
         out = *this;
     }
@@ -244,12 +263,10 @@ public:
 
 }
 
-/**
- Hashing function for use with Table.
- */
-inline unsigned int hashCode(const G3D::AABox& b) {
-	return b.hashCode();
-}
+template <> struct HashTrait<G3D::AABox> {
+    static size_t hashCode(const G3D::AABox& key) { return key.hashCode(); }
+};
+
 
 
 #endif

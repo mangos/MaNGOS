@@ -112,6 +112,21 @@ class MANGOS_DLL_DECL MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::
             return IsValidMapCoord(loc.mapid,loc.coord_x,loc.coord_y,loc.coord_z,loc.orientation);
         }
 
+        // modulos a radian orientation to the range of 0..2PI
+        static float NormalizeOrientation(float o)
+        {
+            // fmod only supports positive numbers. Thus we have
+            // to emulate negative numbers
+            if(o < 0)
+            {
+                float mod = o *-1;
+                mod = fmod(mod, 2.0f*M_PI_F);
+                mod = -mod+2.0f*M_PI_F;
+                return mod;
+            }
+            return fmod(o, 2.0f*M_PI_F);
+        }
+
         void RemoveAllObjectsInRemoveList();
 
         void LoadTransports();

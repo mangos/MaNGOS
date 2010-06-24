@@ -109,10 +109,10 @@ namespace VMAP
             bool alreadyInsideBounds = false;
             bool rayWillHitBounds =
                 MyCollisionDetection::collisionLocationForMovingPointFixedAABox(
-                ray.origin, ray.direction, iBounds, location, alreadyInsideBounds);
+                ray.origin(), ray.direction(), iBounds, location, alreadyInsideBounds);
 
             bool canHitThisNode = (alreadyInsideBounds ||
-                (rayWillHitBounds && ((location - ray.origin).squaredLength() < (distance*distance))));
+                (rayWillHitBounds && ((location - ray.origin()).squaredLength() < (distance*distance))));
 
             return canHitThisNode;
         }
@@ -142,10 +142,10 @@ namespace VMAP
                         bool alreadyInsideBounds = false;
                         bool rayWillHitBounds =
                             MyCollisionDetection::collisionLocationForMovingPointFixedAABox(
-                            ray.origin, ray.direction, bounds, location, alreadyInsideBounds);
+                            ray.origin(), ray.direction(), bounds, location, alreadyInsideBounds);
 
                         canHitThisObject = (alreadyInsideBounds ||
-                            (rayWillHitBounds && ((location - ray.origin).squaredLength() < (distance*distance))));
+                            (rayWillHitBounds && ((location - ray.origin()).squaredLength() < (distance*distance))));
                     }
 
                     if (canHitThisObject) {
@@ -167,30 +167,30 @@ namespace VMAP
                 int firstChild = NONE;
                 int secondChild = NONE;
 
-                if (ray.origin[iSplitAxis] < iSplitLocation) {
+                if (ray.origin()[iSplitAxis] < iSplitLocation) {
 
                     // The ray starts on the small side
                     firstChild = 0;
 
-                    if (ray.direction[iSplitAxis] > 0) {
+                    if (ray.direction()[iSplitAxis] > 0) {
                         // The ray will eventually reach the other side
                         secondChild = 1;
                     }
 
-                } else if (ray.origin[iSplitAxis] > iSplitLocation) {
+                } else if (ray.origin()[iSplitAxis] > iSplitLocation) {
 
                     // The ray starts on the large side
                     firstChild = 1;
 
-                    if (ray.direction[iSplitAxis] < 0) {
+                    if (ray.direction()[iSplitAxis] < 0) {
                         secondChild = 0;
                     }
                 } else {
                     // The ray starts on the splitting plane
-                    if (ray.direction[iSplitAxis] < 0) {
+                    if (ray.direction()[iSplitAxis] < 0) {
                         // ...and goes to the small side
                         firstChild = 0;
-                    } else if (ray.direction[iSplitAxis] > 0) {
+                    } else if (ray.direction()[iSplitAxis] > 0) {
                         // ...and goes to the large side
                         firstChild = 1;
                     }
@@ -202,10 +202,10 @@ namespace VMAP
                     if(pStopAtFirstHit && distance < enterDistance)
                         return;
                 }
-                if (ray.direction[iSplitAxis] != 0) {
+                if (ray.direction()[iSplitAxis] != 0) {
                     // See if there was an intersection before hitting the splitting plane.
                     // If so, there is no need to look on the far side and recursion terminates.
-                    float distanceToSplittingPlane = (iSplitLocation - ray.origin[iSplitAxis]) / ray.direction[iSplitAxis];
+                    float distanceToSplittingPlane = (iSplitLocation - ray.origin()[iSplitAxis]) / ray.direction()[iSplitAxis];
                     if (distanceToSplittingPlane > distance) {
                         // We aren't going to hit anything else before hitting the splitting plane,
                         // so don't bother looking on the far side of the splitting plane at the other

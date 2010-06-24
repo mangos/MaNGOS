@@ -26,7 +26,6 @@
 #include "InstanceData.h"
 #include "Map.h"
 #include "GridNotifiersImpl.h"
-#include "Config/ConfigEnv.h"
 #include "Transports.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
@@ -2055,8 +2054,10 @@ void InstanceMap::SetResetSchedule(bool on)
     if(IsDungeon() && !HavePlayers() && !IsRaidOrHeroicDungeon())
     {
         InstanceSave *save = sInstanceSaveMgr.GetInstanceSave(GetInstanceId());
-        if(!save) sLog.outError("InstanceMap::SetResetSchedule: cannot turn schedule %s, no save available for instance %d of %d", on ? "on" : "off", GetInstanceId(), GetId());
-        else sInstanceSaveMgr.ScheduleReset(on, save->GetResetTime(), InstanceSaveManager::InstResetEvent(0, GetId(), Difficulty(GetSpawnMode()), GetInstanceId()));
+        if (!save)
+            sLog.outError("InstanceMap::SetResetSchedule: cannot turn schedule %s, no save available for instance %d of %d", on ? "on" : "off", GetInstanceId(), GetId());
+        else
+            sInstanceSaveMgr.GetScheduler().ScheduleReset(on, save->GetResetTime(), InstanceResetEvent(0, GetId(), Difficulty(GetSpawnMode()), GetInstanceId()));
     }
 }
 

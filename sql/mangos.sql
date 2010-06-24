@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_10056_01_mangos_spell_proc_event` bit(1) default NULL
+  `required_10089_01_mangos_game_event_pool` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -577,6 +577,7 @@ INSERT INTO `command` VALUES
 ('gm ingame',0,'Syntax: .gm ingame\r\n\r\nDisplay a list of available in game Game Masters.'),
 ('gm list',3,'Syntax: .gm list\r\n\r\nDisplay a list of all Game Masters accounts and security levels.'),
 ('gm visible',1,'Syntax: .gm visible on/off\r\n\r\nOutput current visibility state or make GM visible(on) and invisible(off) for other players.'),
+('go',1,'Syntax: .go  [$playername|pointlink|#x #y #z [#mapid]]\r\nTeleport your character to point with coordinates of player $playername, or coordinates of one from shift-link types: player, tele, taxinode, creature, gameobject, or explicit #x #y #z #mapid coordinates.'),
 ('go creature',1,'Syntax: .go creature #creature_guid\r\nTeleport your character to creature with guid #creature_guid.\r\n.gocreature #creature_name\r\nTeleport your character to creature with this name.\r\n.gocreature id #creature_id\r\nTeleport your character to a creature that was spawned from the template with this entry.\r\n*If* more than one creature is found, then you are teleported to the first that is found inside the database.'),
 ('go graveyard',1,'Syntax: .go graveyard #graveyardId\r\n Teleport to graveyard with the graveyardId specified.'),
 ('go grid',1,'Syntax: .go grid #gridX #gridY [#mapId]\r\n\r\nTeleport the gm to center of grid with provided indexes at map #mapId (or current map if it not provided).'),
@@ -1571,7 +1572,7 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `game_event_creature`;
 CREATE TABLE `game_event_creature` (
   `guid` int(10) unsigned NOT NULL,
-  `event` smallint(6) NOT NULL default '0' COMMENT 'Put negatives values to remove during event',
+  `event` smallint(6) NOT NULL default '0' COMMENT 'Negatives value to remove during event and ignore pool grouping, positive value for spawn during event and if guid is part of pool then al pool memebers must be listed as part of event spawn.',
   PRIMARY KEY  (`guid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
@@ -1612,7 +1613,7 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `game_event_gameobject`;
 CREATE TABLE `game_event_gameobject` (
   `guid` int(10) unsigned NOT NULL,
-  `event` smallint(6) NOT NULL default '0' COMMENT 'Put negatives values to remove during event',
+  `event` smallint(6) NOT NULL default '0' COMMENT 'Negatives value to remove during event and ignore pool grouping, positive value for spawn during event and if guid is part of pool then al pool memebers must be listed as part of event spawn.',
   PRIMARY KEY  (`guid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
@@ -13702,26 +13703,6 @@ CREATE TABLE `pool_template` (
 LOCK TABLES `pool_template` WRITE;
 /*!40000 ALTER TABLE `pool_template` DISABLE KEYS */;
 /*!40000 ALTER TABLE `pool_template` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `game_event_pool`
---
-
-DROP TABLE IF EXISTS `game_event_pool`;
-CREATE TABLE `game_event_pool` (
-  `pool_entry` mediumint(8) unsigned NOT NULL default '0' COMMENT 'Id of the pool',
-  `event` smallint(6) NOT NULL default '0' COMMENT 'Put negatives values to remove during event',
-  PRIMARY KEY  (`pool_entry`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
---
--- Dumping data for table `game_event_pool`
---
-
-LOCK TABLES `game_event_pool` WRITE;
-/*!40000 ALTER TABLE `game_event_pool` DISABLE KEYS */;
-/*!40000 ALTER TABLE `game_event_pool` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --

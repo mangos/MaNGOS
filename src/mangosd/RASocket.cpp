@@ -25,7 +25,7 @@
 #include "Log.h"
 #include "RASocket.h"
 #include "World.h"
-#include "Config/ConfigEnv.h"
+#include "Config/Config.h"
 #include "Util.h"
 #include "AccountMgr.h"
 #include "Language.h"

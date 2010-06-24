@@ -24,7 +24,7 @@
 #include "Database/DatabaseEnv.h"
 #include "RealmList.h"
 
-#include "Config/ConfigEnv.h"
+#include "Config/Config.h"
 #include "Log.h"
 #include "AuthSocket.h"
 #include "SystemConfig.h"
@@ -35,6 +35,7 @@
 #include <openssl/opensslv.h>
 #include <openssl/crypto.h>
 
+#include <ace/Get_Opt.h>
 #include <ace/Dev_Poll_Reactor.h>
 #include <ace/TP_Reactor.h>
 #include <ace/ACE.h>
@@ -61,17 +62,17 @@ void HookSignals();
 
 bool stopEvent = false;                                     ///< Setting it to true stops the server
 
-DatabaseType loginDatabase;                                 ///< Accessor to the realm server database
+DatabaseType LoginDatabase;                                 ///< Accessor to the realm server database
 
 /// Print out the usage string for this program on the console.
 void usage(const char *prog)
 {
     sLog.outString("Usage: \n %s [<options>]\n"
-        "    --version                print version and exist\n\r"
+        "    -v, --version            print version and exist\n\r"
         "    -c config_file           use config_file as configuration file\n\r"
         #ifdef WIN32
         "    Running as service functions:\n\r"
-        "    --service                run as service\n\r"
+        "    -s run                   run as service\n\r"
         "    -s install               install service\n\r"
         "    -s uninstall             uninstall service\n\r"
         #endif
@@ -81,70 +82,69 @@ void usage(const char *prog)
 /// Launch the realm server
 extern int main(int argc, char **argv)
 {
-    ///- Command line parsing to get the configuration file name
+    ///- Command line parsing
     char const* cfg_file = _REALMD_CONFIG;
-    int c=1;
-    while( c < argc )
+
+#ifdef WIN32
+    char const *options = ":c:s:";
+#else
+    char const *options = ":c:";
+#endif
+
+    ACE_Get_Opt cmd_opts(argc, argv, options);
+    cmd_opts.long_option("version", 'v');
+
+    int option;
+    while ((option = cmd_opts()) != EOF)
     {
-        if( strcmp(argv[c],"-c") == 0)
+        switch (option)
         {
-            if( ++c >= argc )
+            case 'c':
+                cfg_file = cmd_opts.opt_arg();
+                break;
+            case 'v':
+                printf("%s\n", _FULLVERSION(REVISION_DATE,REVISION_TIME,REVISION_NR,REVISION_ID));
+                return 0;
+#ifdef WIN32
+            case 's':
             {
-                sLog.outError("Runtime-Error: -c option requires an input argument");
-                usage(argv[0]);
-                Log::WaitBeforeContinueIfNeed();
-                return 1;
-            }
-            else
-                cfg_file = argv[c];
-        }
+                const char *mode = cmd_opts.opt_arg();
 
-        if( strcmp(argv[c],"--version") == 0)
-        {
-            printf("%s\n", _FULLVERSION(REVISION_DATE,REVISION_TIME,REVISION_NR,REVISION_ID));
-            return 0;
-        }
-
-        #ifdef WIN32
-        ////////////
-        //Services//
-        ////////////
-        if( strcmp(argv[c],"-s") == 0)
-        {
-            if( ++c >= argc )
-            {
-                sLog.outError("Runtime-Error: -s option requires an input argument");
+                if (!strcmp(mode, "install"))
+                {
+                    if (WinServiceInstall())
+                        sLog.outString("Installing service");
+                    return 1;
+                }
+                else if (!strcmp(mode, "uninstall"))
+                {
+                    if (WinServiceUninstall())
+                        sLog.outString("Uninstalling service");
+                    return 1;
+                }
+                else if (!strcmp(mode, "run"))
+                    WinServiceRun();
+                else
+                {
+                    sLog.outError("Runtime-Error: -%c unsupported argument %s", cmd_opts.opt_opt(), mode);
+                    usage(argv[0]);
+                    Log::WaitBeforeContinueIfNeed();
+                    return 1;
+                }
+                break;
+            }
+#endif
+            case ':':
+                sLog.outError("Runtime-Error: -%c option requires an input argument", cmd_opts.opt_opt());
                 usage(argv[0]);
                 Log::WaitBeforeContinueIfNeed();
                 return 1;
-            }
-            if( strcmp(argv[c],"install") == 0)
-            {
-                if (WinServiceInstall())
-                    sLog.outString("Installing service");
-                return 1;
-            }
-            else if( strcmp(argv[c],"uninstall") == 0)
-            {
-                if(WinServiceUninstall())
-                    sLog.outString("Uninstalling service");
-                return 1;
-            }
-            else
-            {
-                sLog.outError("Runtime-Error: unsupported option %s",argv[c]);
+            default:
+                sLog.outError("Runtime-Error: bad format of commandline arguments");
                 usage(argv[0]);
                 Log::WaitBeforeContinueIfNeed();
                 return 1;
-            }
         }
-        if( strcmp(argv[c],"--service") == 0)
-        {
-            WinServiceRun();
-        }
-        ////
-        #endif
-        ++c;
     }
 
     if (!sConfig.SetSource(cfg_file))
@@ -221,8 +221,8 @@ extern int main(int argc, char **argv)
 
     // cleanup query
     // set expired bans to inactive
-    loginDatabase.Execute("UPDATE account_banned SET active = 0 WHERE unbandate<=UNIX_TIMESTAMP() AND unbandate<>bandate");
-    loginDatabase.Execute("DELETE FROM ip_banned WHERE unbandate<=UNIX_TIMESTAMP() AND unbandate<>bandate");
+    LoginDatabase.Execute("UPDATE account_banned SET active = 0 WHERE unbandate<=UNIX_TIMESTAMP() AND unbandate<>bandate");
+    LoginDatabase.Execute("DELETE FROM ip_banned WHERE unbandate<=UNIX_TIMESTAMP() AND unbandate<>bandate");
 
     ///- Launch the listening network socket
     ACE_Acceptor<AuthSocket, ACE_SOCK_Acceptor> acceptor;
@@ -302,7 +302,7 @@ extern int main(int argc, char **argv)
         {
             loopCounter = 0;
             DETAIL_LOG("Ping MySQL to keep connection alive");
-            delete loginDatabase.Query("SELECT 1 FROM realmlist LIMIT 1");
+            delete LoginDatabase.Query("SELECT 1 FROM realmlist LIMIT 1");
         }
 #ifdef WIN32
         if (m_ServiceStatus == 0) stopEvent = true;
@@ -311,7 +311,7 @@ extern int main(int argc, char **argv)
     }
 
     ///- Wait for the delay thread to exit
-    loginDatabase.HaltDelayThread();
+    LoginDatabase.HaltDelayThread();
 
     ///- Remove signal handling before leaving
     UnhookSignals();
@@ -351,16 +351,16 @@ bool StartDB()
     }
 
     sLog.outString("Database: %s", dbstring.c_str() );
-    if(!loginDatabase.Initialize(dbstring.c_str()))
+    if(!LoginDatabase.Initialize(dbstring.c_str()))
     {
         sLog.outError("Cannot connect to database");
         return false;
     }
 
-    if(!loginDatabase.CheckRequiredField("realmd_db_version",REVISION_DB_REALMD))
+    if(!LoginDatabase.CheckRequiredField("realmd_db_version",REVISION_DB_REALMD))
     {
         ///- Wait for already started DB delay threads to end
-        loginDatabase.HaltDelayThread();
+        LoginDatabase.HaltDelayThread();
         return false;
     }
 

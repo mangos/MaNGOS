@@ -17,7 +17,7 @@
  */
 
 #include "DatabaseEnv.h"
-#include "Config/ConfigEnv.h"
+#include "Config/Config.h"
 
 #include <ctime>
 #include <iostream>

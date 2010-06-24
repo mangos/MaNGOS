@@ -15,8 +15,10 @@ http://mangos.lighthouseapp.com/
 
 Version 0.16
  * Under discussion.
+ * G3DLite lib upgrade to G3DLite 8.0b4
  * OpenSSL lib upgrade to OpenSSL 1.0.0.
  * Sockets lib use dropped.
+ * dotconfpp lib use dropped.
  * Upgrade to client version 3.3.3a (build 11723).
 
 Version 0.15
