@@ -29,7 +29,7 @@
 
 INSTANTIATE_SINGLETON_1( RealmList );
 
-extern DatabaseType loginDatabase;
+extern DatabaseType LoginDatabase;
 
 // will only support WoW 1.12.1/1.12.2 , WoW:TBC 2.4.3 and official release for WoW:WotLK and later, client builds 10505, 8606, 6005, 5875
 // if you need more from old build then add it in cases in realmd sources code
@@ -140,7 +140,7 @@ void RealmList::UpdateRealms(bool init)
     DETAIL_LOG("Updating Realm List...");
 
     ////                                               0   1     2        3     4     5           6         7                     8           9
-    QueryResult *result = loginDatabase.Query( "SELECT id, name, address, port, icon, realmflags, timezone, allowedSecurityLevel, population, realmbuilds FROM realmlist WHERE (realmflags & 1) = 0 ORDER BY name" );
+    QueryResult *result = LoginDatabase.Query( "SELECT id, name, address, port, icon, realmflags, timezone, allowedSecurityLevel, population, realmbuilds FROM realmlist WHERE (realmflags & 1) = 0 ORDER BY name" );
 
     ///- Circle through results and add them to the realm map
     if(result)
