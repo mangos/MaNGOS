@@ -17768,27 +17768,39 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
     if (pet && m_temporaryUnsummonedPetNumber && m_temporaryUnsummonedPetNumber != pet->GetCharmInfo()->GetPetNumber() && mode == PET_SAVE_AS_CURRENT)
         mode = PET_SAVE_NOT_IN_SLOT;
 
-    if (returnreagent && pet && mode != PET_SAVE_AS_CURRENT && !InBattleGround())
+    if(mode != PET_SAVE_AS_CURRENT && !InBattleGround())
     {
         //returning of reagents only for players, so best done here
-        uint32 spellId = pet ? pet->GetUInt32Value(UNIT_CREATED_BY_SPELL) : m_oldpetspell;
-        SpellEntry const *spellInfo = sSpellStore.LookupEntry(spellId);
+        uint32 spellId = pet ? pet->GetUInt32Value(UNIT_CREATED_BY_SPELL) : m_oldpetspell;      // this is nonsense, pet will always be != NULL here
 
-        if(spellInfo)
+        if(SpellEntry const *spellInfo = sSpellStore.LookupEntry(spellId))
         {
-            for(uint32 i = 0; i < MAX_SPELL_REAGENTS; ++i)
+            // returning of reagents
+            if (returnreagent)
             {
-                if(spellInfo->Reagent[i] > 0)
+                for(uint32 i = 0; i < MAX_SPELL_REAGENTS; ++i)
                 {
-                    ItemPosCountVec dest;                   //for succubus, voidwalker, felhunter and felguard credit soulshard when despawn reason other than death (out of range, logout)
-                    uint8 msg = CanStoreNewItem( NULL_BAG, NULL_SLOT, dest, spellInfo->Reagent[i], spellInfo->ReagentCount[i] );
-                    if( msg == EQUIP_ERR_OK )
+                    if(spellInfo->Reagent[i] > 0)
                     {
-                        Item* item = StoreNewItem( dest, spellInfo->Reagent[i], true);
-                        if(IsInWorld())
-                            SendNewItem(item,spellInfo->ReagentCount[i],true,false);
+                        ItemPosCountVec dest;                   //for succubus, voidwalker, felhunter and felguard credit soulshard when despawn reason other than death (out of range, logout)
+                        uint8 msg = CanStoreNewItem( NULL_BAG, NULL_SLOT, dest, spellInfo->Reagent[i], spellInfo->ReagentCount[i] );
+                        if( msg == EQUIP_ERR_OK )
+                        {
+                            Item* item = StoreNewItem( dest, spellInfo->Reagent[i], true);
+                            if(IsInWorld())
+                                SendNewItem(item,spellInfo->ReagentCount[i],true,false);
+                        }
                     }
                 }
+            }
+            // cooldown, only if pet is not death already (corpse)
+            if (spellInfo->Attributes & SPELL_ATTR_DISABLED_WHILE_ACTIVE && pet->getDeathState() != CORPSE)
+            {
+                SendCooldownEvent(spellInfo);
+                // Raise Dead hack
+                if (spellInfo->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT && spellInfo->SpellFamilyFlags & 0x1000)
+                    if (spellInfo = sSpellStore.LookupEntry(46584))
+                        SendCooldownEvent(spellInfo);
             }
         }
     }

@@ -407,7 +407,8 @@ enum DeathState
     CORPSE      = 2,
     DEAD        = 3,
     JUST_ALIVED = 4,
-    DEAD_FALLING= 5
+    DEAD_FALLING= 5,
+    GHOULED     = 6
 };
 
 // internal state flags for some auras and movement generators, other.
@@ -1470,6 +1471,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void RemoveGuardian(Pet* pet);
         void RemoveGuardians();
         Pet* FindGuardianWithEntry(uint32 entry);
+        GuardianPetList const& GetGuardians() const { return m_guardianPets; }
 
         bool isCharmed() const { return GetCharmerGUID() != 0; }
 
