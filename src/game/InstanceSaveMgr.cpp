@@ -115,8 +115,7 @@ bool InstanceSave::UnloadIfEmpty()
 {
     if(m_playerList.empty() && m_groupList.empty())
     {
-        if(!sInstanceSaveMgr.lock_instLists)
-            sInstanceSaveMgr.RemoveInstanceSave(GetInstanceId());
+        sInstanceSaveMgr.RemoveInstanceSave(GetInstanceId());
         return false;
     }
     else
@@ -421,14 +420,17 @@ void InstanceSaveManager::DeleteInstanceFromDB(uint32 instanceid)
 
 void InstanceSaveManager::RemoveInstanceSave(uint32 InstanceId)
 {
+    if (lock_instLists)
+        return;
+
     InstanceSaveHashMap::iterator itr = m_instanceSaveById.find( InstanceId );
     if(itr != m_instanceSaveById.end())
     {
         // save the resettime for normal instances only when they get unloaded
         if(time_t resettime = itr->second->GetResetTimeForDB())
             CharacterDatabase.PExecute("UPDATE instance SET resettime = '"UI64FMTD"' WHERE id = '%u'", (uint64)resettime, InstanceId);
-        delete itr->second;
-        m_instanceSaveById.erase(itr);
+
+        _ResetSave(itr);
     }
 }
 

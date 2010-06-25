@@ -25,7 +25,7 @@
 #include "Util.h"
 #include "Auth/Sha1.h"
 
-extern DatabaseType loginDatabase;
+extern DatabaseType LoginDatabase;
 
 INSTANTIATE_SINGLETON_1(AccountMgr);
 
@@ -48,16 +48,16 @@ AccountOpResult AccountMgr::CreateAccount(std::string username, std::string pass
         return AOR_NAME_ALREDY_EXIST;                       // username does already exist
     }
 
-    if(!loginDatabase.PExecute("INSERT INTO account(username,sha_pass_hash,joindate) VALUES('%s','%s',NOW())", username.c_str(), CalculateShaPassHash(username, password).c_str()))
+    if(!LoginDatabase.PExecute("INSERT INTO account(username,sha_pass_hash,joindate) VALUES('%s','%s',NOW())", username.c_str(), CalculateShaPassHash(username, password).c_str()))
         return AOR_DB_INTERNAL_ERROR;                       // unexpected error
-    loginDatabase.Execute("INSERT INTO realmcharacters (realmid, acctid, numchars) SELECT realmlist.id, account.id, 0 FROM realmlist,account LEFT JOIN realmcharacters ON acctid=account.id WHERE acctid IS NULL");
+    LoginDatabase.Execute("INSERT INTO realmcharacters (realmid, acctid, numchars) SELECT realmlist.id, account.id, 0 FROM realmlist,account LEFT JOIN realmcharacters ON acctid=account.id WHERE acctid IS NULL");
 
     return AOR_OK;                                          // everything's fine
 }
 
 AccountOpResult AccountMgr::DeleteAccount(uint32 accid)
 {
-    QueryResult *result = loginDatabase.PQuery("SELECT 1 FROM account WHERE id='%d'", accid);
+    QueryResult *result = LoginDatabase.PQuery("SELECT 1 FROM account WHERE id='%d'", accid);
     if(!result)
         return AOR_NAME_NOT_EXIST;                          // account doesn't exist
     delete result;
@@ -83,13 +83,13 @@ AccountOpResult AccountMgr::DeleteAccount(uint32 accid)
     // table realm specific but common for all characters of account for realm
     CharacterDatabase.PExecute("DELETE FROM character_tutorial WHERE account = '%u'",accid);
 
-    loginDatabase.BeginTransaction();
+    LoginDatabase.BeginTransaction();
 
     bool res =
-        loginDatabase.PExecute("DELETE FROM account WHERE id='%d'", accid) &&
-        loginDatabase.PExecute("DELETE FROM realmcharacters WHERE acctid='%d'", accid);
+        LoginDatabase.PExecute("DELETE FROM account WHERE id='%d'", accid) &&
+        LoginDatabase.PExecute("DELETE FROM realmcharacters WHERE acctid='%d'", accid);
 
-    loginDatabase.CommitTransaction();
+    LoginDatabase.CommitTransaction();
 
     if(!res)
         return AOR_DB_INTERNAL_ERROR;                       // unexpected error;
@@ -99,7 +99,7 @@ AccountOpResult AccountMgr::DeleteAccount(uint32 accid)
 
 AccountOpResult AccountMgr::ChangeUsername(uint32 accid, std::string new_uname, std::string new_passwd)
 {
-    QueryResult *result = loginDatabase.PQuery("SELECT 1 FROM account WHERE id='%d'", accid);
+    QueryResult *result = LoginDatabase.PQuery("SELECT 1 FROM account WHERE id='%d'", accid);
     if(!result)
         return AOR_NAME_NOT_EXIST;                          // account doesn't exist
     delete result;
@@ -114,9 +114,9 @@ AccountOpResult AccountMgr::ChangeUsername(uint32 accid, std::string new_uname, 
     normalizeString(new_passwd);
 
     std::string safe_new_uname = new_uname;
-    loginDatabase.escape_string(safe_new_uname);
+    LoginDatabase.escape_string(safe_new_uname);
 
-    if(!loginDatabase.PExecute("UPDATE account SET v='0',s='0',username='%s',sha_pass_hash='%s' WHERE id='%d'", safe_new_uname.c_str(),
+    if(!LoginDatabase.PExecute("UPDATE account SET v='0',s='0',username='%s',sha_pass_hash='%s' WHERE id='%d'", safe_new_uname.c_str(),
                 CalculateShaPassHash(new_uname, new_passwd).c_str(), accid))
         return AOR_DB_INTERNAL_ERROR;                       // unexpected error
 
@@ -136,7 +136,7 @@ AccountOpResult AccountMgr::ChangePassword(uint32 accid, std::string new_passwd)
     normalizeString(new_passwd);
 
     // also reset s and v to force update at next realmd login
-    if(!loginDatabase.PExecute("UPDATE account SET v='0', s='0', sha_pass_hash='%s' WHERE id='%d'",
+    if(!LoginDatabase.PExecute("UPDATE account SET v='0', s='0', sha_pass_hash='%s' WHERE id='%d'",
                 CalculateShaPassHash(username, new_passwd).c_str(), accid))
         return AOR_DB_INTERNAL_ERROR;                       // unexpected error
 
@@ -145,8 +145,8 @@ AccountOpResult AccountMgr::ChangePassword(uint32 accid, std::string new_passwd)
 
 uint32 AccountMgr::GetId(std::string username)
 {
-    loginDatabase.escape_string(username);
-    QueryResult *result = loginDatabase.PQuery("SELECT id FROM account WHERE username = '%s'", username.c_str());
+    LoginDatabase.escape_string(username);
+    QueryResult *result = LoginDatabase.PQuery("SELECT id FROM account WHERE username = '%s'", username.c_str());
     if(!result)
         return 0;
     else
@@ -159,7 +159,7 @@ uint32 AccountMgr::GetId(std::string username)
 
 AccountTypes AccountMgr::GetSecurity(uint32 acc_id)
 {
-    QueryResult *result = loginDatabase.PQuery("SELECT gmlevel FROM account WHERE id = '%u'", acc_id);
+    QueryResult *result = LoginDatabase.PQuery("SELECT gmlevel FROM account WHERE id = '%u'", acc_id);
     if(result)
     {
         AccountTypes sec = AccountTypes((*result)[0].GetInt32());
@@ -172,7 +172,7 @@ AccountTypes AccountMgr::GetSecurity(uint32 acc_id)
 
 bool AccountMgr::GetName(uint32 acc_id, std::string &name)
 {
-    QueryResult *result = loginDatabase.PQuery("SELECT username FROM account WHERE id = '%u'", acc_id);
+    QueryResult *result = LoginDatabase.PQuery("SELECT username FROM account WHERE id = '%u'", acc_id);
     if(result)
     {
         name = (*result)[0].GetCppString();
@@ -206,7 +206,7 @@ bool AccountMgr::CheckPassword(uint32 accid, std::string passwd)
 
     normalizeString(passwd);
 
-    QueryResult *result = loginDatabase.PQuery("SELECT 1 FROM account WHERE id='%d' AND sha_pass_hash='%s'", accid, CalculateShaPassHash(username, passwd).c_str());
+    QueryResult *result = LoginDatabase.PQuery("SELECT 1 FROM account WHERE id='%d' AND sha_pass_hash='%s'", accid, CalculateShaPassHash(username, passwd).c_str());
     if (result)
     {
         delete result;
