@@ -49,6 +49,7 @@
 #include "CreatureAIRegistry.h"
 #include "Policies/SingletonImp.h"
 #include "BattleGroundMgr.h"
+#include "Language.h"
 #include "TemporarySummon.h"
 #include "VMapFactory.h"
 #include "GameEventMgr.h"
@@ -1272,8 +1273,10 @@ void World::SetInitialWorldSettings()
     sprintf( isoDate, "%04d-%02d-%02d %02d:%02d:%02d",
         local.tm_year+1900, local.tm_mon+1, local.tm_mday, local.tm_hour, local.tm_min, local.tm_sec);
 
-    LoginDatabase.PExecute("INSERT INTO uptime (realmid, starttime, startstring, uptime) VALUES('%u', " UI64FMTD ", '%s', 0)",
-        realmID, uint64(m_startTime), isoDate);
+    LoginDatabase.PExecute("INSERT INTO uptime (realmid, starttime, startstring, uptime) VALUES('%u', " UI64FMTD ", '%s', 0)", realmID, uint64(m_startTime), isoDate);
+
+    static uint32 abtimer = 0;
+    abtimer = sConfig.GetIntDefault("AutoBroadcast.Timer", 60000);
 
     m_timers[WUPDATE_OBJECTS].SetInterval(0);
     m_timers[WUPDATE_SESSIONS].SetInterval(0);
@@ -1283,6 +1286,7 @@ void World::SetInitialWorldSettings()
                                                             //Update "uptime" table based on configuration entry in minutes.
     m_timers[WUPDATE_CORPSES].SetInterval(3*HOUR*IN_MILLISECONDS);
     m_timers[WUPDATE_DELETECHARS].SetInterval(DAY*IN_MILLISECONDS); // check for chars to delete every day
+    m_timers[WUPDATE_AUTOBROADCAST].SetInterval(abtimer);
 
     //to set mailtimer to return mails every day between 4 and 5 am
     //mailtimer is increased when updating auctions
@@ -1330,6 +1334,8 @@ void World::SetInitialWorldSettings()
 
     sLog.outString("Initialize AuctionHouseBot...");
     auctionbot.Initialize();
+
+    sLog.outString("Starting Autobroadcast system by Xeross..." );
 
     sLog.outString( "WORLD: World initialized" );
 
@@ -1497,6 +1503,16 @@ void World::Update(uint32 diff)
         uint32 nextGameEvent = sGameEventMgr.Update();
         m_timers[WUPDATE_EVENTS].SetInterval(nextGameEvent);
         m_timers[WUPDATE_EVENTS].Reset();
+    }
+    static uint32 autobroadcaston = 0;
+    autobroadcaston = sConfig.GetIntDefault("AutoBroadcast.On", 0);
+    if(autobroadcaston == 1)
+    {
+        if (m_timers[WUPDATE_AUTOBROADCAST].Passed())
+        {
+            m_timers[WUPDATE_AUTOBROADCAST].Reset();
+            SendBroadcast();
+        }
     }
 
     /// </ul>
@@ -1910,6 +1926,57 @@ void World::ProcessCliCommands()
 
         delete command;
     }
+}
+
+void World::SendBroadcast()
+{
+    std::string msg;
+    static int nextid;
+
+    QueryResult *result;
+    if(nextid != 0)
+    {
+        result = LoginDatabase.PQuery("SELECT `text`, `next` FROM `autobroadcast` WHERE `id` = %u", nextid);
+    }
+    else
+    {
+        result = LoginDatabase.PQuery("SELECT `text`, `next` FROM `autobroadcast` ORDER BY RAND() LIMIT 1");
+    }
+
+    if(!result)
+        return;
+
+    Field *fields = result->Fetch();
+    nextid  = fields[1].GetUInt32();
+    msg = fields[0].GetString();
+    delete result;
+
+    static uint32 abcenter = 0;
+    abcenter = sConfig.GetIntDefault("AutoBroadcast.Center", 0);
+    if(abcenter == 0)
+    {
+        sWorld.SendWorldText(LANG_AUTO_BROADCAST, msg.c_str());
+
+        sLog.outString("AutoBroadcast: '%s'",msg.c_str());
+    }
+    if(abcenter == 1)
+    {
+        WorldPacket data(SMSG_NOTIFICATION, (msg.size()+1));
+        data << msg;
+        sWorld.SendGlobalMessage(&data);
+
+        sLog.outString("AutoBroadcast: '%s'",msg.c_str());
+    }
+    if(abcenter == 2)
+    {
+        sWorld.SendWorldText(LANG_AUTO_BROADCAST, msg.c_str());
+
+        WorldPacket data(SMSG_NOTIFICATION, (msg.size()+1));
+        data << msg;
+        sWorld.SendGlobalMessage(&data);
+
+        sLog.outString("AutoBroadcast: '%s'",msg.c_str());
+   }
 }
 
 void World::InitResultQueue()
