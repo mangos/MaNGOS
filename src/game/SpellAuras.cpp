@@ -8619,46 +8619,6 @@ void Aura::PeriodicDummyTick()
                     }
                 }
             }
-            // Death Rune Mastery
-            if (spell->SpellIconID == 2622)
-            {
-                if (target->GetTypeId() != TYPEID_PLAYER || target->isInCombat())
-                    return;
-
-                Player *player = (Player*)target;
-                for (uint32 i = 0; i < MAX_RUNES; ++i)
-                {
-                    if (!player->GetRuneCooldown(i))
-                    {
-                        RuneType type = player->GetBaseRune(i);
-                        if (player->GetCurrentRune(i) == RUNE_DEATH && (type == RUNE_FROST || type == RUNE_UNHOLY) && player->IsRuneConvertedBy(i, spell->Id))
-                        {
-                            player->ConvertRune(i, type);
-                            player->ClearConvertedBy(i);
-                        }
-                    }
-                }
-            }
-            // Blood of the North and Reaping
-            if (spell->SpellIconID == 3041 || spell->SpellIconID == 22)
-            {
-                if (target->GetTypeId() != TYPEID_PLAYER || target->isInCombat())
-                    return;
-
-                Player *player = (Player*)target;
-                for (uint32 i = 0; i < MAX_RUNES; ++i)
-                {
-                    if (!player->GetRuneCooldown(i) && player->IsRuneConvertedBy(i, spell->Id))
-                    {
-                        RuneType type = player->GetBaseRune(i);
-                        if (player->GetCurrentRune(i) == RUNE_DEATH && type == RUNE_BLOOD)
-                        {
-                            player->ConvertRune(i, type);
-                            player->ClearConvertedBy(i);
-                        }
-                    }
-                }
-            }
             break;
         }
         default:

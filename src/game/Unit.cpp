@@ -7414,7 +7414,7 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
             {
                 if(GetTypeId()!=TYPEID_PLAYER)
                     return false;
-                
+
                 Player *player = (Player*)this;
                 for (uint32 i = 0; i < MAX_RUNES; ++i)
                 {
