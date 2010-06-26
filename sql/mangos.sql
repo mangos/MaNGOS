@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_10107_01_mangos_mangos_string` bit(1) default NULL
+  `required_10109_01_mangos_creature_model_info` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -970,7 +970,25 @@ CREATE TABLE `creature_model_info` (
 LOCK TABLES `creature_model_info` WRITE;
 /*!40000 ALTER TABLE `creature_model_info` DISABLE KEYS */;
 INSERT INTO `creature_model_info` VALUES
-(10045, 1, 1.5, 2, 0);
+(49, 0.3060, 1.5, 0, 50),
+(50, 0.2080, 1.5, 1, 49),
+(51, 0.3720, 1.5, 0, 52),
+(52, 0.2360, 1.5, 1, 51),
+(53, 0.3470, 1.5, 0, 54),
+(54, 0.3470, 1.5, 1, 53),
+(55, 0.3890, 1.5, 0, 56),
+(56, 0.3060, 1.5, 1, 55),
+(59, 0.9747, 1.5, 0, 60),
+(60, 0.8725, 1.5, 1, 59),
+(1478, 0.3060, 1.5, 0, 1479),
+(1479, 0.3060, 1.5, 1, 1478),
+(1563, 0.3519, 1.5, 0, 1564),
+(1564, 0.3519, 1.5, 1, 1563),
+(10045, 1.0000, 1.5, 2, 0),
+(15475, 0.3830, 1.5, 1, 15476),
+(15476, 0.3830, 1.5, 0, 15475),
+(16125, 1.0000, 1.5, 0, 16126),
+(16126, 1.0000, 1.5, 1, 16125);
 /*!40000 ALTER TABLE `creature_model_info` ENABLE KEYS */;
 UNLOCK TABLES;
 
