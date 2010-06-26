@@ -560,7 +560,8 @@ class ChatHandler
         void HandleLearnSkillRecipesHelper(Player* player,uint32 skill_id);
         void ShowSpellListHelper(Player* target, SpellEntry const* spellInfo, LocaleConstant loc);
         bool HandleGoHelper(Player* _player, uint32 mapid, float x, float y, float const* zPtr = NULL, float const* ortPtr = NULL);
-
+        template<typename T>
+        void ShowNpcOrGoSpawnInformation(uint32 guid);
 
         /**
          * Stores informations about a deleted character

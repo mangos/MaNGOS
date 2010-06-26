@@ -33,6 +33,8 @@
 #include "CellImpl.h"
 #include "AccountMgr.h"
 #include "SpellMgr.h"
+#include "PoolManager.h"
+#include "GameEventMgr.h"
 
 // Supported shift-links (client generated and server side)
 // |color|Hachievement:achievement_id:player_guid:0:0:0:0:0:0:0:0|h[name]|h|r
@@ -2523,3 +2525,42 @@ int CliHandler::GetSessionDbLocaleIndex() const
 {
     return sObjectMgr.GetDBCLocaleIndex();
 }
+
+// Check/ Output if a NPC or GO (by guid) is part of a pool or game event
+template <typename T>
+void ChatHandler::ShowNpcOrGoSpawnInformation(uint32 guid)
+{
+    if (uint16 pool_id = sPoolMgr.IsPartOfAPool<T>(guid))
+    {
+        uint16 top_pool_id = sPoolMgr.IsPartOfTopPool<Pool>(pool_id);
+        if (!top_pool_id || top_pool_id == pool_id)
+            PSendSysMessage(LANG_NPC_GO_INFO_POOL, pool_id);
+        else
+            PSendSysMessage(LANG_NPC_GO_INFO_TOP_POOL, pool_id, top_pool_id);
+
+        if (int16 event_id = sGameEventMgr.GetGameEventId<Pool>(top_pool_id))
+        {
+            GameEventMgr::GameEventDataMap const& events = sGameEventMgr.GetEventMap();
+            GameEventData const& eventData = events[std::abs(event_id)];
+
+            if (event_id > 0)
+                PSendSysMessage(LANG_NPC_GO_INFO_POOL_GAME_EVENT_S, top_pool_id, std::abs(event_id), eventData.description.c_str());
+            else
+                PSendSysMessage(LANG_NPC_GO_INFO_POOL_GAME_EVENT_D, top_pool_id, std::abs(event_id), eventData.description.c_str());
+        }
+    }
+    else if (int16 event_id = sGameEventMgr.GetGameEventId<T>(guid))
+    {
+        GameEventMgr::GameEventDataMap const& events = sGameEventMgr.GetEventMap();
+        GameEventData const& eventData = events[std::abs(event_id)];
+
+        if (event_id > 0)
+            PSendSysMessage(LANG_NPC_GO_INFO_GAME_EVENT_S, std::abs(event_id), eventData.description.c_str());
+        else
+            PSendSysMessage(LANG_NPC_GO_INFO_GAME_EVENT_D, std::abs(event_id), eventData.description.c_str());
+    }
+}
+
+// Instantiate template for helper function
+template void ChatHandler::ShowNpcOrGoSpawnInformation<Creature>(uint32 guid);
+template void ChatHandler::ShowNpcOrGoSpawnInformation<GameObject>(uint32 guid);
