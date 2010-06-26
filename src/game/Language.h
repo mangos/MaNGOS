@@ -253,7 +253,7 @@ enum MangosStrings
     LANG_COMMAND_TARGETOBJNOTFOUND      = 266,
     LANG_COMMAND_GOOBJNOTFOUND          = 267,
     LANG_COMMAND_GOCREATNOTFOUND        = 268,
-    LANG_COMMAND_GOCREATMULTIPLE        = 269,
+    //                                    269, not used
     LANG_COMMAND_DELCREATMESSAGE        = 270,
     LANG_COMMAND_CREATUREMOVED          = 271,
     LANG_COMMAND_CREATUREATSAMEMAP      = 272,

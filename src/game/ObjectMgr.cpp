@@ -35,6 +35,7 @@
 #include "Transports.h"
 #include "ProgressBar.h"
 #include "Language.h"
+#include "PoolManager.h"
 #include "GameEventMgr.h"
 #include "Spell.h"
 #include "Chat.h"
@@ -8623,4 +8624,104 @@ CreatureInfo const* GetCreatureTemplateStore(uint32 entry)
 Quest const* GetQuestTemplateStore(uint32 entry)
 {
     return sObjectMgr.GetQuestTemplate(entry);
+}
+
+bool FindCreatureData::operator()( CreatureDataPair const& dataPair )
+{
+    // skip wrong entry ids
+    if (i_id && dataPair.second.id != i_id)
+        return false;
+
+    if (!i_anyData)
+        i_anyData = &dataPair;
+
+    // without player we can't find more stricted cases, so use fouded
+    if (!i_player)
+        return true;
+
+    // skip diff. map cases
+    if (dataPair.second.mapid != i_player->GetMapId())
+        return false;
+
+    float new_dist = i_player->GetDistance2d(dataPair.second.posX, dataPair.second.posY);
+
+    if (!i_mapData || new_dist < i_mapDist)
+    {
+        i_mapData = &dataPair;
+        i_mapDist = new_dist;
+    }
+
+    // skip not spawned (in any state), 
+    uint16 pool_id = sPoolMgr.IsPartOfAPool<Creature>(dataPair.first);
+    if (pool_id && !sPoolMgr.IsSpawnedObject<Creature>(dataPair.first))
+        return false;
+
+    if (!i_spawnedData || new_dist < i_spawnedDist)
+    {
+        i_spawnedData = &dataPair;
+        i_spawnedDist = new_dist;
+    }
+
+    return false;
+}
+
+CreatureDataPair const* FindCreatureData::GetResult() const
+{
+    if (i_spawnedData)
+        return i_spawnedData;
+
+    if (i_mapData)
+        return i_mapData;
+
+    return i_anyData;
+}
+
+bool FindGOData::operator()( GameObjectDataPair const& dataPair )
+{
+    // skip wrong entry ids
+    if (i_id && dataPair.second.id != i_id)
+        return false;
+
+    if (!i_anyData)
+        i_anyData = &dataPair;
+
+    // without player we can't find more stricted cases, so use fouded
+    if (!i_player)
+        return true;
+
+    // skip diff. map cases
+    if (dataPair.second.mapid != i_player->GetMapId())
+        return false;
+
+    float new_dist = i_player->GetDistance2d(dataPair.second.posX, dataPair.second.posY);
+
+    if (!i_mapData || new_dist < i_mapDist)
+    {
+        i_mapData = &dataPair;
+        i_mapDist = new_dist;
+    }
+
+    // skip not spawned (in any state)
+    uint16 pool_id = sPoolMgr.IsPartOfAPool<GameObject>(dataPair.first);
+    if (pool_id && !sPoolMgr.IsSpawnedObject<GameObject>(dataPair.first))
+        return false;
+
+    if (!i_spawnedData || new_dist < i_spawnedDist)
+    {
+        i_spawnedData = &dataPair;
+        i_spawnedDist = new_dist;
+    }
+
+    return false;
+}
+
+GameObjectDataPair const* FindGOData::GetResult() const
+{
+    if (i_mapData)
+        return i_mapData;
+
+    if (i_spawnedData)
+        return i_spawnedData;
+
+    return i_anyData;
 }
