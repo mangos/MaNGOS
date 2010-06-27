@@ -221,6 +221,8 @@ bool Creature::InitEntry(uint32 Entry, uint32 team, const CreatureData *data )
     SetEntry(Entry);                                        // normal entry always
     m_creatureInfo = cinfo;                                 // map mode related always
 
+    SetObjectScale(cinfo->scale);
+
     // equal to player Race field, but creature does not have race
     SetByteValue(UNIT_FIELD_BYTES_0, 0, 0);
 
@@ -271,8 +273,6 @@ bool Creature::InitEntry(uint32 Entry, uint32 team, const CreatureData *data )
     SetSpeedRate(MOVE_RUN,  cinfo->speed_run);
     SetSpeedRate(MOVE_SWIM, 1.0f);                          // using 1.0 rate
     SetSpeedRate(MOVE_FLIGHT, 1.0f);                        // using 1.0 rate
-
-    SetFloatValue(OBJECT_FIELD_SCALE_X, cinfo->scale);
 
     // checked at loading
     m_defaultMovementType = MovementGeneratorType(cinfo->MovementType);

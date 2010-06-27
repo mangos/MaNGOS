@@ -155,7 +155,51 @@ struct MangosStringLocale
 };
 
 typedef UNORDERED_MAP<uint32,CreatureData> CreatureDataMap;
+typedef CreatureDataMap::value_type CreatureDataPair;
+
+class FindCreatureData
+{
+    public:
+        FindCreatureData(uint32 id, Player* player) : i_id(id), i_player(player),
+            i_anyData(NULL), i_mapData(NULL), i_mapDist(0.0f), i_spawnedData(NULL), i_spawnedDist(0.0f) {}
+
+        bool operator() (CreatureDataPair const& dataPair);
+        CreatureDataPair const* GetResult() const;
+
+    private:
+        uint32 i_id;
+        Player* i_player;
+
+        CreatureDataPair const* i_anyData;
+        CreatureDataPair const* i_mapData;
+        float i_mapDist;
+        CreatureDataPair const* i_spawnedData;
+        float i_spawnedDist;
+};
+
 typedef UNORDERED_MAP<uint32,GameObjectData> GameObjectDataMap;
+typedef GameObjectDataMap::value_type GameObjectDataPair;
+
+class FindGOData
+{
+    public:
+        FindGOData(uint32 id, Player* player) : i_id(id), i_player(player),
+            i_anyData(NULL), i_mapData(NULL), i_mapDist(0.0f), i_spawnedData(NULL), i_spawnedDist(0.0f) {}
+
+        bool operator() (GameObjectDataPair const& dataPair);
+        GameObjectDataPair const* GetResult() const;
+
+    private:
+        uint32 i_id;
+        Player* i_player;
+
+        GameObjectDataPair const* i_anyData;
+        GameObjectDataPair const* i_mapData;
+        float i_mapDist;
+        GameObjectDataPair const* i_spawnedData;
+        float i_spawnedDist;
+};
+
 typedef UNORDERED_MAP<uint32,CreatureLocale> CreatureLocaleMap;
 typedef UNORDERED_MAP<uint32,GameObjectLocale> GameObjectLocaleMap;
 typedef UNORDERED_MAP<uint32,ItemLocale> ItemLocaleMap;
@@ -302,7 +346,7 @@ enum ConditionType
     CONDITION_AURA                  = 1,                    // spell_id     effindex
     CONDITION_ITEM                  = 2,                    // item_id      count
     CONDITION_ITEM_EQUIPPED         = 3,                    // item_id      0
-    CONDITION_ZONEID                = 4,                    // zone_id      0
+    CONDITION_AREAID                = 4,                    // area_id      0, 1 (0: in (sub)area, 1: not in (sub)area)
     CONDITION_REPUTATION_RANK       = 5,                    // faction_id   min_rank
     CONDITION_TEAM                  = 6,                    // player_team  0,      (469 - Alliance 67 - Horde)
     CONDITION_SKILL                 = 7,                    // skill_id     skill_value
@@ -712,14 +756,30 @@ class ObjectMgr
             return mMapObjectGuids[MAKE_PAIR32(mapid,spawnMode)][cell_id];
         }
 
-        CreatureData const* GetCreatureData(uint32 guid) const
+        CreatureDataPair const* GetCreatureDataPair(uint32 guid) const
         {
             CreatureDataMap::const_iterator itr = mCreatureDataMap.find(guid);
             if(itr==mCreatureDataMap.end()) return NULL;
-            return &itr->second;
+            return &*itr;
         }
+
+        CreatureData const* GetCreatureData(uint32 guid) const
+        {
+            CreatureDataPair const* dataPair = GetCreatureDataPair(guid);
+            return dataPair ? &dataPair->second : NULL;
+        }
+
         CreatureData& NewOrExistCreatureData(uint32 guid) { return mCreatureDataMap[guid]; }
         void DeleteCreatureData(uint32 guid);
+
+        template<typename Worker>
+        void DoCreatureData(Worker& worker) const
+        {
+            for (CreatureDataMap::const_iterator itr = mCreatureDataMap.begin(); itr != mCreatureDataMap.end(); ++itr)
+                if (worker(*itr))
+                    break;
+        }
+
         CreatureLocale const* GetCreatureLocale(uint32 entry) const
         {
             CreatureLocaleMap::const_iterator itr = mCreatureLocaleMap.find(entry);
@@ -769,14 +829,29 @@ class ObjectMgr
             return &itr->second;
         }
 
-        GameObjectData const* GetGOData(uint32 guid) const
+        GameObjectDataPair const* GetGODataPair(uint32 guid) const
         {
             GameObjectDataMap::const_iterator itr = mGameObjectDataMap.find(guid);
             if(itr==mGameObjectDataMap.end()) return NULL;
-            return &itr->second;
+            return &*itr;
         }
+
+        GameObjectData const* GetGOData(uint32 guid) const
+        {
+            GameObjectDataPair const* dataPair = GetGODataPair(guid);
+            return dataPair ? &dataPair->second : NULL;
+        }
+
         GameObjectData& NewGOData(uint32 guid) { return mGameObjectDataMap[guid]; }
         void DeleteGOData(uint32 guid);
+
+        template<typename Worker>
+        void DoGOData(Worker& worker) const
+        {
+            for (GameObjectDataMap::const_iterator itr = mGameObjectDataMap.begin(); itr != mGameObjectDataMap.end(); ++itr)
+                if (worker(*itr))                           // arg = GameObjectDataPair
+                    break;
+        }
 
         MangosStringLocale const* GetMangosStringLocale(int32 entry) const
         {

@@ -643,7 +643,7 @@ bool ChatHandler::HandleDebugSpawnVehicle(const char* args)
     }
 
     float px, py, pz;
-    m_session->GetPlayer()->GetClosePoint(px, py, pz, m_session->GetPlayer()->GetObjectSize());
+    m_session->GetPlayer()->GetClosePoint(px, py, pz, m_session->GetPlayer()->GetObjectBoundingRadius());
 
     v->Relocate(px, py, pz, m_session->GetPlayer()->GetOrientation());
 
