@@ -820,7 +820,8 @@ void ObjectMgr::ConvertCreatureAddonAuras(CreatureDataAddon* addon, char const* 
             continue;
         }
 
-        if (!AdditionalSpellInfo->Effect[cAura.effect_idx] || !AdditionalSpellInfo->EffectApplyAuraName[cAura.effect_idx])
+        SpellEffectEntry const* spellEffect = AdditionalSpellInfo->GetSpellEffect(cAura.effect_idx);
+        if (spellEffect && (!spellEffect->Effect || !spellEffect->EffectApplyAuraName))
         {
             sLog.outErrorDb("Creature (%s: %u) has not aura effect %u of spell %u defined in `auras` field in `%s`.",guidEntryStr,addon->guidOrEntry,cAura.effect_idx,cAura.spell_id,table);
             continue;
@@ -2239,10 +2240,13 @@ void ObjectMgr::LoadItemRequiredTarget()
 
                     for (int j = 0; j < MAX_EFFECT_INDEX; ++j)
                     {
-                        if (pSpellInfo->EffectImplicitTargetA[j] == TARGET_CHAIN_DAMAGE ||
-                            pSpellInfo->EffectImplicitTargetB[j] == TARGET_CHAIN_DAMAGE ||
-                            pSpellInfo->EffectImplicitTargetA[j] == TARGET_DUELVSPLAYER ||
-                            pSpellInfo->EffectImplicitTargetB[j] == TARGET_DUELVSPLAYER)
+                        SpellEffectEntry const* spellEffect = pSpellInfo->GetSpellEffect(SpellEffectIndex(j));
+                        if(!pSpellInfo)
+                            continue;
+                        if (spellEffect->EffectImplicitTargetA == TARGET_CHAIN_DAMAGE ||
+                            spellEffect->EffectImplicitTargetB == TARGET_CHAIN_DAMAGE ||
+                            spellEffect->EffectImplicitTargetA == TARGET_DUELVSPLAYER ||
+                            spellEffect->EffectImplicitTargetB == TARGET_DUELVSPLAYER)
                         {
                             bIsItemSpellValid = true;
                             break;
@@ -3761,8 +3765,11 @@ void ObjectMgr::LoadQuests()
                     bool found = false;
                     for(int k = 0; k < MAX_EFFECT_INDEX; ++k)
                     {
-                        if ((spellInfo->Effect[k] == SPELL_EFFECT_QUEST_COMPLETE && uint32(spellInfo->EffectMiscValue[k]) == qinfo->QuestId) ||
-                            spellInfo->Effect[k] == SPELL_EFFECT_SEND_EVENT)
+                        SpellEffectEntry const* spellEffect = spellInfo->GetSpellEffect(SpellEffectIndex(k));
+                        if(!spellEffect)
+                            continue;
+                        if ((spellEffect->Effect == SPELL_EFFECT_QUEST_COMPLETE && uint32(spellEffect->EffectMiscValue) == qinfo->QuestId) ||
+                            spellEffect->Effect == SPELL_EFFECT_SEND_EVENT)
                         {
                             found = true;
                             break;
@@ -4025,10 +4032,13 @@ void ObjectMgr::LoadQuests()
 
         for(int j = 0; j < MAX_EFFECT_INDEX; ++j)
         {
-            if (spellInfo->Effect[j] != SPELL_EFFECT_QUEST_COMPLETE)
+            SpellEffectEntry const* spellEffect = spellInfo->GetSpellEffect(SpellEffectIndex(j));
+            if(!spellEffect)
+                continue;
+            if (spellEffect->Effect != SPELL_EFFECT_QUEST_COMPLETE)
                 continue;
 
-            uint32 quest_id = spellInfo->EffectMiscValue[j];
+            uint32 quest_id = spellEffect->EffectMiscValue;
 
             Quest const* quest = GetQuestTemplate(quest_id);
 
@@ -4554,11 +4564,14 @@ void ObjectMgr::LoadSpellScripts()
         bool found = false;
         for(int i = 0; i < MAX_EFFECT_INDEX; ++i)
         {
+            SpellEffectEntry const* spellEffect = spellInfo->GetSpellEffect(SpellEffectIndex(i));
+            if(!spellEffect)
+                continue;
             // skip empty effects
-            if (!spellInfo->Effect[i])
+            if (!spellEffect->Effect)
                 continue;
 
-            if (spellInfo->Effect[i] == SPELL_EFFECT_SCRIPT_EFFECT)
+            if (spellEffect->Effect == SPELL_EFFECT_SCRIPT_EFFECT)
             {
                 found =  true;
                 break;
@@ -4585,16 +4598,14 @@ void ObjectMgr::LoadEventScripts()
     // Load all possible script entries from spells
     for(uint32 i = 1; i < sSpellStore.GetNumRows(); ++i)
     {
-        SpellEntry const * spell = sSpellStore.LookupEntry(i);
-        if (spell)
+        if (SpellEntry const * spell = sSpellStore.LookupEntry(i))
         {
             for(int j = 0; j < MAX_EFFECT_INDEX; ++j)
             {
-                if( spell->Effect[j] == SPELL_EFFECT_SEND_EVENT )
-                {
-                    if (spell->EffectMiscValue[j])
-                        evt_scripts.insert(spell->EffectMiscValue[j]);
-                }
+                if(SpellEffectEntry const* spellEffect = spell->GetSpellEffect(SpellEffectIndex(j)))
+                    if( spellEffect->Effect == SPELL_EFFECT_SEND_EVENT )
+                        if (spellEffect->EffectMiscValue)
+                            evt_scripts.insert(spellEffect->EffectMiscValue);
             }
         }
     }
@@ -8008,18 +8019,21 @@ void ObjectMgr::LoadTrainerSpell()
         trainerSpell.reqLevel      = fields[5].GetUInt32();
 
         if(!trainerSpell.reqLevel)
-            trainerSpell.reqLevel = spellinfo->spellLevel;
+            trainerSpell.reqLevel = spellinfo->GetSpellLevel();
 
         // calculate learned spell for profession case when stored cast-spell
         trainerSpell.learnedSpell = spell;
         for(int i = 0; i < MAX_EFFECT_INDEX; ++i)
         {
-            if (spellinfo->Effect[i] != SPELL_EFFECT_LEARN_SPELL)
-                continue;
-            if (SpellMgr::IsProfessionOrRidingSpell(spellinfo->EffectTriggerSpell[i]))
+            if(SpellEffectEntry const* spellEffect = spellinfo->GetSpellEffect(SpellEffectIndex(i)))
             {
-                trainerSpell.learnedSpell = spellinfo->EffectTriggerSpell[i];
-                break;
+                if (spellEffect->Effect != SPELL_EFFECT_LEARN_SPELL)
+                    continue;
+                if (SpellMgr::IsProfessionOrRidingSpell(spellEffect->EffectTriggerSpell))
+                {
+                    trainerSpell.learnedSpell = spellEffect->EffectTriggerSpell;
+                    break;
+                }
             }
         }
 

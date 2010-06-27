@@ -645,7 +645,7 @@ void Player::UpdateExpertise(WeaponAttackType attack)
     for(AuraList::const_iterator itr = expAuras.begin(); itr != expAuras.end(); ++itr)
     {
         // item neutral spell
-        if((*itr)->GetSpellProto()->EquippedItemClass == -1)
+        if((*itr)->GetSpellProto()->GetEquippedItemClass() == -1)
             expertise += (*itr)->GetModifier()->m_amount;
         // item dependent spell
         else if(weapon && weapon->IsFitToSpellRequirements((*itr)->GetSpellProto()))
@@ -671,7 +671,7 @@ void Player::UpdateArmorPenetration()
     for(AuraList::const_iterator itr = armorAuras.begin(); itr != armorAuras.end(); ++itr)
     {
         // affects all weapons
-        if((*itr)->GetSpellProto()->EquippedItemClass == -1)
+        if((*itr)->GetSpellProto()->GetEquippedItemClass() == -1)
         {
             m_armorPenetrationPct += (*itr)->GetModifier()->m_amount;
             continue;

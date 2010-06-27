@@ -758,21 +758,25 @@ bool Item::IsFitToSpellRequirements(SpellEntry const* spellInfo) const
 {
     ItemPrototype const* proto = GetProto();
 
-    if (spellInfo->EquippedItemClass != -1)                 // -1 == any item class
+    SpellEquippedItemsEntry const* equippedItems = spellInfo->GetSpellEquippedItems();
+    if(!equippedItems)
+        return true;
+
+    if (equippedItems->EquippedItemClass != -1)             // -1 == any item class
     {
-        if(spellInfo->EquippedItemClass != int32(proto->Class))
+        if(equippedItems->EquippedItemClass != int32(proto->Class))
             return false;                                   //  wrong item class
 
-        if(spellInfo->EquippedItemSubClassMask != 0)        // 0 == any subclass
+        if(equippedItems->EquippedItemSubClassMask != 0)    // 0 == any subclass
         {
-            if((spellInfo->EquippedItemSubClassMask & (1 << proto->SubClass)) == 0)
+            if((equippedItems->EquippedItemSubClassMask & (1 << proto->SubClass)) == 0)
                 return false;                               // subclass not present in mask
         }
     }
 
-    if(spellInfo->EquippedItemInventoryTypeMask != 0)       // 0 == any inventory type
+    if(equippedItems->EquippedItemInventoryTypeMask != 0)   // 0 == any inventory type
     {
-        if((spellInfo->EquippedItemInventoryTypeMask  & (1 << proto->InventoryType)) == 0)
+        if((equippedItems->EquippedItemInventoryTypeMask  & (1 << proto->InventoryType)) == 0)
             return false;                                   // inventory type not present in mask
     }
 
@@ -929,12 +933,13 @@ bool Item::IsLimitedToAnotherMapOrZone( uint32 cur_mapId, uint32 cur_zoneId) con
 // time.
 void Item::SendTimeUpdate(Player* owner)
 {
-    if (!GetUInt32Value(ITEM_FIELD_DURATION))
+    uint32 duration = GetUInt32Value(ITEM_FIELD_DURATION);
+    if (!duration)
         return;
 
     WorldPacket data(SMSG_ITEM_TIME_UPDATE, (8+4));
-    data << (uint64)GetGUID();
-    data << (uint32)GetUInt32Value(ITEM_FIELD_DURATION);
+    data << uint64(GetGUID());
+    data << uint32(duration);
     owner->GetSession()->SendPacket(&data);
 }
 
