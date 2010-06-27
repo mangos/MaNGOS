@@ -297,7 +297,8 @@ bool Utf8toWStr(const std::string& utf8str, std::wstring& wstr)
         size_t len = utf8::distance(utf8str.c_str(),utf8str.c_str()+utf8str.size());
         wstr.resize(len);
 
-        utf8::utf8to16(utf8str.c_str(),utf8str.c_str()+utf8str.size(),&wstr[0]);
+        if (len)
+            utf8::utf8to16(utf8str.c_str(),utf8str.c_str()+utf8str.size(),&wstr[0]);
     }
     catch(std::exception)
     {
