@@ -90,7 +90,7 @@ bool Corpse::Create( uint32 guidlow, Player *owner)
         return false;
     }
 
-    SetFloatValue( OBJECT_FIELD_SCALE_X, 1 );
+    SetObjectScale(DEFAULT_OBJECT_SCALE);
     SetUInt64Value( CORPSE_FIELD_OWNER, owner->GetGUID() );
 
     m_grid = MaNGOS::ComputeGridPair(GetPositionX(), GetPositionY());
@@ -185,7 +185,7 @@ bool Corpse::LoadFromDB(uint32 guid, Field *fields)
     SetUInt64Value(OBJECT_FIELD_GUID, MAKE_NEW_GUID(guid, 0, HIGHGUID_CORPSE));
     SetUInt64Value(CORPSE_FIELD_OWNER, MAKE_NEW_GUID(playerGuid, 0, HIGHGUID_PLAYER));
 
-    SetFloatValue( OBJECT_FIELD_SCALE_X, 1.0f );
+    SetObjectScale(DEFAULT_OBJECT_SCALE);
 
     PlayerInfo const *info = sObjectMgr.GetPlayerInfo(race, _class);
     if(!info)
