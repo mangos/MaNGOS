@@ -67,6 +67,8 @@ class GameEventMgr
         uint32 Initialize();
         void StartEvent(uint16 event_id, bool overwrite = false);
         void StopEvent(uint16 event_id, bool overwrite = false);
+        template<typename T>
+        int16 GetGameEventId(uint32 guid_or_poolid);
     private:
         void AddActiveEvent(uint16 event_id) { m_ActiveEvents.insert(event_id); }
         void RemoveActiveEvent(uint16 event_id) { m_ActiveEvents.erase(event_id); }
