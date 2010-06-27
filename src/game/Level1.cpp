@@ -440,7 +440,7 @@ bool ChatHandler::HandleNamegoCommand(const char* args)
 
         // before GM
         float x,y,z;
-        m_session->GetPlayer()->GetClosePoint(x,y,z,target->GetObjectSize());
+        m_session->GetPlayer()->GetClosePoint(x, y, z, target->GetObjectBoundingRadius());
         target->TeleportTo(m_session->GetPlayer()->GetMapId(),x,y,z,target->GetOrientation());
     }
     else
@@ -2180,7 +2180,7 @@ bool ChatHandler::HandleGroupgoCommand(const char* args)
 
         // before GM
         float x,y,z;
-        m_session->GetPlayer()->GetClosePoint(x,y,z,pl->GetObjectSize());
+        m_session->GetPlayer()->GetClosePoint(x, y, z, pl->GetObjectBoundingRadius());
         pl->TeleportTo(m_session->GetPlayer()->GetMapId(),x,y,z,pl->GetOrientation());
     }
 
