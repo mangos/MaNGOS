@@ -1335,7 +1335,7 @@ bool ChatHandler::HandleModifyScaleCommand(const char* args)
             ChatHandler((Player*)target).PSendSysMessage(LANG_YOURS_SIZE_CHANGED, GetNameLink().c_str(), Scale);
     }
 
-    target->SetFloatValue(OBJECT_FIELD_SCALE_X, Scale);
+    target->SetObjectScale(Scale);
 
     return true;
 }

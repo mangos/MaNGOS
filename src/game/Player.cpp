@@ -2704,8 +2704,8 @@ void Player::InitStatsForLevel(bool reapplyMods)
     // set default cast time multiplier
     SetFloatValue(UNIT_MOD_CAST_SPEED, 1.0f);
 
-    // reset size before reapply auras
-    SetFloatValue(OBJECT_FIELD_SCALE_X,1.0f);
+    // reset scale before reapply auras
+    SetObjectScale(DEFAULT_OBJECT_SCALE);
 
     // save base values (bonuses already included in stored stats
     for(int i = STAT_STRENGTH; i < MAX_STATS; ++i)

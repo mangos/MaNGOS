@@ -122,6 +122,14 @@ void Object::_Create( uint32 guidlow, uint32 entry, HighGuid guidhigh )
     m_PackGUID.Set(guid);
 }
 
+void Object::SetObjectScale(float newScale)
+{
+    if (newScale <= 0.0f)
+        newScale = DEFAULT_OBJECT_SCALE;
+
+    SetFloatValue(OBJECT_FIELD_SCALE_X, newScale);
+}
+
 void Object::BuildMovementUpdateBlock(UpdateData * data, uint16 flags ) const
 {
     ByteBuffer buf(500);

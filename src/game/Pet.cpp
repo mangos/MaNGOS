@@ -834,7 +834,7 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
         else
             scale = cFamily->minScale + float(getLevel() - cFamily->minScaleLevel) / cFamily->maxScaleLevel * (cFamily->maxScale - cFamily->minScale);
 
-        SetFloatValue(OBJECT_FIELD_SCALE_X, scale);
+        SetObjectScale(scale);
     }
     m_bonusdamage = 0;
 
