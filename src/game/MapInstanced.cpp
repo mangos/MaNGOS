@@ -94,13 +94,10 @@ void MapInstanced::UnloadAll(bool pForce)
 
 /// returns a new or existing Instance
 /// in case of battlegrounds it will only return an existing map, those maps are created by bg-system
-Map* MapInstanced::CreateInstance(const uint32 mapId, Player * player)
+Map* MapInstanced::CreateInstance(Player * player)
 {
-    if(GetId() != mapId || !player)
-        return NULL;
-
-    Map* map = NULL;
-    uint32 NewInstanceId = 0;                       // instanceId of the resulting map
+    Map* map;
+    uint32 NewInstanceId;                                   // instanceId of the resulting map
 
     if(IsBattleGroundOrArena())
     {
@@ -110,46 +107,29 @@ Map* MapInstanced::CreateInstance(const uint32 mapId, Player * player)
         map = _FindMap(NewInstanceId);
         ASSERT(map);
     }
+    else if (InstanceSave* pSave = player->GetBoundInstanceSaveForSelfOrGroup(GetId()))
+    {
+        // solo/perm/group
+        NewInstanceId = pSave->GetInstanceId();
+        map = _FindMap(NewInstanceId);
+        // it is possible that the save exists but the map doesn't
+        if (!map)
+            map = CreateInstanceMap(NewInstanceId, pSave->GetDifficulty(), pSave);
+    }
     else
     {
-        InstancePlayerBind *pBind = player->GetBoundInstance(GetId(), player->GetDifficulty(IsRaid()));
-        InstanceSave *pSave = pBind ? pBind->save : NULL;
+        // if no instanceId via group members or instance saves is found
+        // the instance will be created for the first time
+        NewInstanceId = sMapMgr.GenerateInstanceId();
 
-        // the player's permanent player bind is taken into consideration first
-        // then the player's group bind and finally the solo bind.
-        if(!pBind || !pBind->perm)
-        {
-            InstanceGroupBind *groupBind = NULL;
-            Group *group = player->GetGroup();
-            // use the player's difficulty setting (it may not be the same as the group's)
-            if(group && (groupBind = group->GetBoundInstance(this,player->GetDifficulty(IsRaid()))))
-                pSave = groupBind->save;
-        }
-
-        if(pSave)
-        {
-            // solo/perm/group
-            NewInstanceId = pSave->GetInstanceId();
-            map = _FindMap(NewInstanceId);
-            // it is possible that the save exists but the map doesn't
-            if(!map)
-                map = CreateInstance(NewInstanceId, pSave, pSave->GetDifficulty());
-        }
-        else
-        {
-            // if no instanceId via group members or instance saves is found
-            // the instance will be created for the first time
-            NewInstanceId = sMapMgr.GenerateInstanceId();
-
-            Difficulty diff = player->GetGroup() ? player->GetGroup()->GetDifficulty(IsRaid()) : player->GetDifficulty(IsRaid());
-            map = CreateInstance(NewInstanceId, NULL, diff);
-        }
+        Difficulty diff = player->GetGroup() ? player->GetGroup()->GetDifficulty(IsRaid()) : player->GetDifficulty(IsRaid());
+        map = CreateInstanceMap(NewInstanceId, diff);
     }
 
     return map;
 }
 
-InstanceMap* MapInstanced::CreateInstance(uint32 InstanceId, InstanceSave *save, Difficulty difficulty)
+InstanceMap* MapInstanced::CreateInstanceMap(uint32 InstanceId, Difficulty difficulty, InstanceSave *save)
 {
     // load/create a map
     Guard guard(*this);
@@ -157,12 +137,12 @@ InstanceMap* MapInstanced::CreateInstance(uint32 InstanceId, InstanceSave *save,
     // make sure we have a valid map id
     if (!sMapStore.LookupEntry(GetId()))
     {
-        sLog.outError("CreateInstance: no entry for map %d", GetId());
+        sLog.outError("CreateInstanceMap: no entry for map %d", GetId());
         ASSERT(false);
     }
     if (!ObjectMgr::GetInstanceTemplate(GetId()))
     {
-        sLog.outError("CreateInstance: no instance template for map %d", GetId());
+        sLog.outError("CreateInstanceMap: no instance template for map %d", GetId());
         ASSERT(false);
     }
 
@@ -170,7 +150,7 @@ InstanceMap* MapInstanced::CreateInstance(uint32 InstanceId, InstanceSave *save,
     if (!GetMapDifficultyData(GetId(),difficulty))
         difficulty = DUNGEON_DIFFICULTY_NORMAL;
 
-    DEBUG_LOG("MapInstanced::CreateInstance: %s map instance %d for %d created with difficulty %s", save?"":"new ", InstanceId, GetId(), difficulty?"heroic":"normal");
+    DEBUG_LOG("MapInstanced::CreateInstanceMap: %s map instance %d for %d created with difficulty %d", save?"":"new ", InstanceId, GetId(), difficulty);
 
     InstanceMap *map = new InstanceMap(GetId(), GetGridExpiry(), InstanceId, difficulty, this);
     ASSERT(map->IsDungeon());
