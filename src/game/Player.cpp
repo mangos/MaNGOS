@@ -714,19 +714,7 @@ bool Player::Create( uint32 guidlow, const std::string& name, uint8 race, uint8 
 
     SetUInt32Value(UNIT_FIELD_BYTES_0, ( RaceClassGender | ( powertype << 24 ) ) );
 
-    InitDisplayIds();
-
-    if (CreatureModelInfo const* modelInfo = sObjectMgr.GetCreatureModelInfo(GetDisplayId()))
-    {
-        // bounding_radius and combat_reach is normally modified by scale, but player is always 1.0 scale by default so no need to modify values here.
-        SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, modelInfo->bounding_radius);
-        SetFloatValue(UNIT_FIELD_COMBATREACH, modelInfo->combat_reach);
-    }
-    else
-    {
-        SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, DEFAULT_WORLD_OBJECT_SIZE);
-        SetFloatValue(UNIT_FIELD_COMBATREACH, 1.5f);
-    }
+    InitDisplayIds();                                       // model, scale and model data
 
     SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_PVP );
     SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE );
@@ -2769,9 +2757,6 @@ void Player::InitStatsForLevel(bool reapplyMods)
 
     // set default cast time multiplier
     SetFloatValue(UNIT_MOD_CAST_SPEED, 1.0f);
-
-    // reset scale before reapply auras
-    SetObjectScale(DEFAULT_OBJECT_SCALE);
 
     // save base values (bonuses already included in stored stats
     for(int i = STAT_STRENGTH; i < MAX_STATS; ++i)
@@ -15244,19 +15229,7 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
     _LoadIntoDataField(fields[60].GetString(), PLAYER_EXPLORED_ZONES_1, PLAYER_EXPLORED_ZONES_SIZE);
     _LoadIntoDataField(fields[63].GetString(), PLAYER__FIELD_KNOWN_TITLES, KNOWN_TITLES_SIZE*2);
 
-    InitDisplayIds();
-
-    if (CreatureModelInfo const* modelInfo = sObjectMgr.GetCreatureModelInfo(GetDisplayId()))
-    {
-        // bounding_radius and combat_reach is normally modified by scale, but player is always 1.0 scale by default so no need to modify values here.
-        SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, modelInfo->bounding_radius);
-        SetFloatValue(UNIT_FIELD_COMBATREACH, modelInfo->combat_reach);
-    }
-    else
-    {
-        SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, DEFAULT_WORLD_OBJECT_SIZE);
-        SetFloatValue(UNIT_FIELD_COMBATREACH, 1.5f);
-    }
+    InitDisplayIds();                                       // model, scale and model data
 
     SetFloatValue(UNIT_FIELD_HOVERHEIGHT, 1.0f);
 
@@ -15480,12 +15453,14 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
         }
     }
 
-    // NOW player must have valid map
+    // player bounded instance saves loaded in _LoadBoundInstances, group versions at group loading
+    InstanceSave* instanceSave = GetBoundInstanceSaveForSelfOrGroup(GetMapId());
+
     // load the player's map here if it's not already loaded
     SetMap(sMapMgr.CreateMap(GetMapId(), this));
 
     // if the player is in an instance and it has been reset in the meantime teleport him to the entrance
-    if(GetInstanceId() && !sInstanceSaveMgr.GetInstanceSave(GetInstanceId()))
+    if(GetInstanceId() && !instanceSave)
     {
         AreaTrigger const* at = sObjectMgr.GetMapEntranceTrigger(GetMapId());
         if(at)
@@ -16694,6 +16669,29 @@ InstancePlayerBind* Player::BindToInstance(InstanceSave *save, bool permanent, b
     }
     else
         return NULL;
+}
+
+InstanceSave* Player::GetBoundInstanceSaveForSelfOrGroup(uint32 mapid)
+{
+    MapEntry const* mapEntry = sMapStore.LookupEntry(mapid);
+    if(!mapEntry)
+        return NULL;
+
+    InstancePlayerBind *pBind = GetBoundInstance(mapid, GetDifficulty(mapEntry->IsRaid()));
+    InstanceSave *pSave = pBind ? pBind->save : NULL;
+
+    // the player's permanent player bind is taken into consideration first
+    // then the player's group bind and finally the solo bind.
+    if(!pBind || !pBind->perm)
+    {
+        InstanceGroupBind *groupBind = NULL;
+        Group *group = GetGroup();
+        // use the player's difficulty setting (it may not be the same as the group's)
+        if(group && (groupBind = group->GetBoundInstance(this)))
+            pSave = groupBind->save;
+    }
+
+    return pSave;
 }
 
 void Player::SendRaidInfo()
@@ -18715,6 +18713,21 @@ void Player::InitDisplayIds()
         default:
             sLog.outError("Invalid gender %u for player",gender);
             return;
+    }
+
+    // reset scale before reapply auras
+    SetObjectScale(DEFAULT_OBJECT_SCALE);
+
+    if (CreatureModelInfo const* modelInfo = sObjectMgr.GetCreatureModelInfo(GetDisplayId()))
+    {
+        // bounding_radius and combat_reach is normally modified by scale, but player is always 1.0 scale by default so no need to modify values here.
+        SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, modelInfo->bounding_radius);
+        SetFloatValue(UNIT_FIELD_COMBATREACH, modelInfo->combat_reach);
+    }
+    else
+    {
+        SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, DEFAULT_WORLD_OBJECT_SIZE);
+        SetFloatValue(UNIT_FIELD_COMBATREACH, 1.5f);
     }
 }
 
