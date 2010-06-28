@@ -43,7 +43,7 @@ INSTANTIATE_SINGLETON_1( InstanceSaveManager );
 
 InstanceSave::InstanceSave(uint16 MapId, uint32 InstanceId, Difficulty difficulty, time_t resetTime, bool canReset)
 : m_resetTime(resetTime), m_instanceid(InstanceId), m_mapid(MapId),
-  m_difficulty(difficulty), m_canReset(canReset)
+  m_difficulty(difficulty), m_canReset(canReset), m_usedByMap(false)
 {
 }
 
@@ -113,7 +113,7 @@ void InstanceSave::DeleteFromDB()
 /* true if the instance save is still valid */
 bool InstanceSave::UnloadIfEmpty()
 {
-    if(m_playerList.empty() && m_groupList.empty())
+    if (m_playerList.empty() && m_groupList.empty() && !m_usedByMap)
     {
         sInstanceSaveMgr.RemoveInstanceSave(GetInstanceId());
         return false;

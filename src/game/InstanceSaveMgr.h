@@ -95,9 +95,17 @@ class InstanceSave
            but that would depend on a lot of things that can easily change in future */
         Difficulty GetDifficulty() { return m_difficulty; }
 
+        void SetUsedByMapState(bool state)
+        {
+            m_usedByMap = state;
+            if (!state)
+                UnloadIfEmpty();
+        }
+
+    private:
         typedef std::list<Player*> PlayerListType;
         typedef std::list<Group*> GroupListType;
-    private:
+
         bool UnloadIfEmpty();
         /* the only reason the instSave-object links are kept is because
            the object-instSave links need to be broken at reset time
@@ -109,6 +117,7 @@ class InstanceSave
         uint32 m_mapid;
         Difficulty m_difficulty;
         bool m_canReset;
+        bool m_usedByMap;                                   // true when instance map loaded
 };
 
 /* resetTime is a global propery of each (raid/heroic) map
@@ -170,9 +179,6 @@ class MANGOS_DLL_DECL InstanceSaveManager : public MaNGOS::Singleton<InstanceSav
         InstanceSaveManager();
         ~InstanceSaveManager();
 
-        typedef UNORDERED_MAP<uint32 /*InstanceId*/, InstanceSave*> InstanceSaveHashMap;
-        typedef UNORDERED_MAP<uint32 /*mapId*/, InstanceSaveHashMap> InstanceSaveMapMap;
-
         void CleanupInstances();
         void PackInstances();
 
@@ -182,8 +188,6 @@ class MANGOS_DLL_DECL InstanceSaveManager : public MaNGOS::Singleton<InstanceSav
         void RemoveInstanceSave(uint32 InstanceId);
         static void DeleteInstanceFromDB(uint32 instanceid);
 
-        InstanceSave *GetInstanceSave(uint32 InstanceId);
-
         /* statistics */
         uint32 GetNumInstanceSaves() { return m_instanceSaveById.size(); }
         uint32 GetNumBoundPlayersTotal();
@@ -191,6 +195,11 @@ class MANGOS_DLL_DECL InstanceSaveManager : public MaNGOS::Singleton<InstanceSav
 
         void Update() { m_Scheduler.Update(); }
     private:
+        typedef UNORDERED_MAP<uint32 /*InstanceId*/, InstanceSave*> InstanceSaveHashMap;
+        typedef UNORDERED_MAP<uint32 /*mapId*/, InstanceSaveHashMap> InstanceSaveMapMap;
+
+        InstanceSave *GetInstanceSave(uint32 InstanceId);
+
         //  called by scheduler
         void _ResetOrWarnAll(uint32 mapid, Difficulty difficulty, bool warn, uint32 timeleft);
         void _ResetInstance(uint32 mapid, uint32 instanceId);
