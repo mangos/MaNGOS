@@ -7199,78 +7199,24 @@ void Spell::EffectLeapForward(SpellEffectIndex eff_idx)
 
     if( m_spellInfo->rangeIndex == 1)                       //self range
     {
-        uint32 mapid = m_caster->GetMapId();
         float dis = GetSpellRadius(sSpellRadiusStore.LookupEntry(m_spellInfo->EffectRadiusIndex[eff_idx]));
-        //For glyph of blink
-        if(m_caster->GetTypeId() == TYPEID_PLAYER)
-            ((Player*)m_caster)->ApplySpellMod(m_spellInfo->Id, SPELLMOD_RADIUS, dis, this);
 
-        // Start Info //
-        float cx,cy,cz;
-        float dx,dy,dz;
-        float angle = unitTarget->GetOrientation();
-        unitTarget->GetPosition(cx,cy,cz);
-          
-        //Check use of vmaps//
-        bool useVmap = false;
-        bool swapZone = true;
+        // before caster
+        float fx, fy, fz;
+        unitTarget->GetClosePoint(fx, fy, fz, unitTarget->GetObjectSize(), dis);
+        float ox, oy, oz;
+        unitTarget->GetPosition(ox, oy, oz);
 
-        if( unitTarget->GetMap()->GetHeight(cx, cy, cz, false) <  unitTarget->GetMap()->GetHeight(cx, cy, cz, true) )
-            useVmap = true;
-
-        const int itr = int(dis/0.5f);
-        const float _dx = 0.5f * cos(angle);
-        const float _dy = 0.5f * sin(angle);
-        dx = cx;
-        dy = cy;
-
-        //Going foward 0.5f until max distance
-        for(float i=0.5f; i<dis; i+=0.5f)
+        float fx2, fy2, fz2;                                // getObjectHitPos overwrite last args in any result case
+        if(VMAP::VMapFactory::createOrGetVMapManager()->getObjectHitPos(unitTarget->GetMapId(), ox,oy,oz+0.5f, fx,fy,oz+0.5f,fx2,fy2,fz2, -0.5f))
         {
-            //unitTarget->GetNearPoint2D(dx,dy,i,angle);
-            dx += _dx;
-            dy += _dy;
-            MaNGOS::NormalizeMapCoord(dx);
-            MaNGOS::NormalizeMapCoord(dy);
-            dz = cz;
-             
-            //Prevent climbing and go around object maybe 2.0f is to small? use 3.0f?
-            if( unitTarget->GetMap()->IsNextZcoordOK(dx, dy, dz, 3.0f) && (unitTarget->IsWithinLOS(dx, dy, dz)))
-            {
-                //No climb, the z differenze between this and prev step is ok. Store this destination for future use or check.
-                cx = dx;
-                cy = dy;
-                unitTarget->UpdateGroundPositionZ(cx, cy, cz, 3.0f);
-            }
-            else
-            {
-                //Something wrong with los or z differenze... maybe we are going from outer world inside a building or viceversa
-                if(swapZone)
-                {
-                    //so... change use of vamp and go back 1 step backward and recheck again.
-                    swapZone = false;
-                    useVmap = !useVmap;
-                    //i-=0.5f;
-                    --i;
-                    dx -= _dx;
-                    dy -= _dy;
-                }
-                else
-                {
-                    //bad recheck result... so break this and use last good coord for teleport player...
-                    dz += 0.5f;
-                    break;
-                }
-            }
+            fx = fx2;
+            fy = fy2;
+            fz = fz2;
+            unitTarget->UpdateGroundPositionZ(fx, fy, fz);
         }
-            
-        //Prevent Falling during swap building/outerspace
-        unitTarget->UpdateGroundPositionZ(cx, cy, cz);
 
-        if(unitTarget->GetTypeId() == TYPEID_PLAYER)
-            ((Player*)unitTarget)->TeleportTo(mapid, cx, cy, cz, unitTarget->GetOrientation(), TELE_TO_NOT_LEAVE_COMBAT | TELE_TO_NOT_UNSUMMON_PET | (unitTarget==m_caster ? TELE_TO_SPELL : 0));
-        else
-            unitTarget->GetMap()->CreatureRelocation((Creature*)unitTarget, cx, cy, cz, unitTarget->GetOrientation());
+        unitTarget->NearTeleportTo(fx, fy, fz, unitTarget->GetOrientation(), unitTarget == m_caster);
     }
 }
 
@@ -7380,10 +7326,7 @@ void Spell::EffectCharge(SpellEffectIndex /*eff_idx*/)
     //TODO: research more ContactPoint/attack distance.
     //3.666666 instead of ATTACK_DISTANCE(5.0f) in below seem to give more accurate result.
     float x, y, z;
-    unitTarget->GetContactPoint(m_caster, x, y, z, 3.6f);
-
-    // Try to normalize Z coord cuz GetContactPoint do nothing with Z axis
-    unitTarget->UpdateGroundPositionZ(x, y, z, 5.0f);
+    unitTarget->GetContactPoint(m_caster, x, y, z, 3.666666f);
 
     if (unitTarget->GetTypeId() != TYPEID_PLAYER)
         ((Creature *)unitTarget)->StopMoving();
@@ -7409,12 +7352,9 @@ void Spell::EffectCharge2(SpellEffectIndex /*eff_idx*/)
             ((Creature *)unitTarget)->StopMoving();
     }
     else if (unitTarget && unitTarget != m_caster)
-        unitTarget->GetContactPoint(m_caster, x, y, z, 3.6f);
+        unitTarget->GetContactPoint(m_caster, x, y, z, 3.666666f);
     else
         return;
-
-    // Try to normalize Z coord cuz GetContactPoint do nothing with Z axis
-    unitTarget->UpdateGroundPositionZ(x, y, z, 5.0f);
 
     // Only send MOVEMENTFLAG_WALK_MODE, client has strange issues with other move flags
     m_caster->MonsterMove(x, y, z, 1);
