@@ -68,9 +68,16 @@ AuctionHouseObject * AuctionHouseMgr::GetAuctionsMap( uint32 factionTemplateId )
 
 uint32 AuctionHouseMgr::GetAuctionDeposit(AuctionHouseEntry const* entry, uint32 time, Item *pItem)
 {
-    uint32 deposit = pItem->GetProto()->SellPrice * pItem->GetCount() * (time / MIN_AUCTION_TIME );
+    float deposit = float(pItem->GetProto()->SellPrice * pItem->GetCount() * (time / MIN_AUCTION_TIME ));
 
-    return uint32(deposit * entry->depositPercent * 3 * sWorld.getConfig(CONFIG_FLOAT_RATE_AUCTION_DEPOSIT) / 100.0f );
+    deposit = deposit * entry->depositPercent * 3.0f / 100.0f;
+
+    float min_deposit = float(sWorld.getConfig(CONFIG_UINT32_AUCTION_DEPOSIT_MIN));
+
+    if (deposit < min_deposit)
+        deposit = min_deposit;
+
+    return uint32(deposit * sWorld.getConfig(CONFIG_FLOAT_RATE_AUCTION_DEPOSIT));
 }
 
 //does not clear ram
