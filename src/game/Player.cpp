@@ -4439,8 +4439,6 @@ void Player::BuildPlayerRepop()
 
     StopMirrorTimers();                                     //disable timers(bars)
 
-    SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, (float)1.0);   //see radius of death player?
-
     // set and clear other
     SetByteValue(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND);
 }
@@ -18441,6 +18439,9 @@ void Player::InitDisplayIds()
         return;
     }
 
+    // reset scale before reapply auras
+    SetObjectScale(DEFAULT_OBJECT_SCALE);
+
     uint8 gender = getGender();
     switch(gender)
     {
@@ -18455,21 +18456,6 @@ void Player::InitDisplayIds()
         default:
             sLog.outError("Invalid gender %u for player",gender);
             return;
-    }
-
-    // reset scale before reapply auras
-    SetObjectScale(DEFAULT_OBJECT_SCALE);
-
-    if (CreatureModelInfo const* modelInfo = sObjectMgr.GetCreatureModelInfo(GetDisplayId()))
-    {
-        // bounding_radius and combat_reach is normally modified by scale, but player is always 1.0 scale by default so no need to modify values here.
-        SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, modelInfo->bounding_radius);
-        SetFloatValue(UNIT_FIELD_COMBATREACH, modelInfo->combat_reach);
-    }
-    else
-    {
-        SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, DEFAULT_WORLD_OBJECT_SIZE);
-        SetFloatValue(UNIT_FIELD_COMBATREACH, 1.5f);
     }
 }
 
