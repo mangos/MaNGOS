@@ -552,7 +552,7 @@ bool ChatHandler::HandleGonameCommand(const char* args)
                 InstanceGroupBind *gBind = group ? group->GetBoundInstance(target) : NULL;
                 // if no bind exists, create a solo bind
                 if (!gBind)
-                    if (InstanceSave *save = sInstanceSaveMgr.GetInstanceSave(target->GetInstanceId()))
+                    if (InstanceSave *save = target->GetMap()->GetInstanceSave())
                         _player->BindToInstance(save, !save->CanReset());
             }
 

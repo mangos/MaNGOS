@@ -4467,8 +4467,6 @@ void Player::BuildPlayerRepop()
 
     StopMirrorTimers();                                     //disable timers(bars)
 
-    SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, (float)1.0);   //see radius of death player?
-
     // set and clear other
     SetByteValue(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND);
 }
@@ -15241,12 +15239,14 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
         }
     }
 
-    // NOW player must have valid map
+    // player bounded instance saves loaded in _LoadBoundInstances, group versions at group loading
+    InstanceSave* instanceSave = GetBoundInstanceSaveForSelfOrGroup(GetMapId());
+
     // load the player's map here if it's not already loaded
     SetMap(sMapMgr.CreateMap(GetMapId(), this));
 
     // if the player is in an instance and it has been reset in the meantime teleport him to the entrance
-    if(GetInstanceId() && !sInstanceSaveMgr.GetInstanceSave(GetInstanceId()))
+    if(GetInstanceId() && !instanceSave)
     {
         AreaTrigger const* at = sObjectMgr.GetMapEntranceTrigger(GetMapId());
         if(at)
@@ -16449,6 +16449,29 @@ InstancePlayerBind* Player::BindToInstance(InstanceSave *save, bool permanent, b
     }
     else
         return NULL;
+}
+
+InstanceSave* Player::GetBoundInstanceSaveForSelfOrGroup(uint32 mapid)
+{
+    MapEntry const* mapEntry = sMapStore.LookupEntry(mapid);
+    if(!mapEntry)
+        return NULL;
+
+    InstancePlayerBind *pBind = GetBoundInstance(mapid, GetDifficulty(mapEntry->IsRaid()));
+    InstanceSave *pSave = pBind ? pBind->save : NULL;
+
+    // the player's permanent player bind is taken into consideration first
+    // then the player's group bind and finally the solo bind.
+    if(!pBind || !pBind->perm)
+    {
+        InstanceGroupBind *groupBind = NULL;
+        Group *group = GetGroup();
+        // use the player's difficulty setting (it may not be the same as the group's)
+        if(group && (groupBind = group->GetBoundInstance(this)))
+            pSave = groupBind->save;
+    }
+
+    return pSave;
 }
 
 void Player::SendRaidInfo()
@@ -18445,6 +18468,9 @@ void Player::InitDisplayIds()
         return;
     }
 
+    // reset scale before reapply auras
+    SetObjectScale(DEFAULT_OBJECT_SCALE);
+
     uint8 gender = getGender();
     switch(gender)
     {
@@ -18459,21 +18485,6 @@ void Player::InitDisplayIds()
         default:
             sLog.outError("Invalid gender %u for player",gender);
             return;
-    }
-
-    // reset scale before reapply auras
-    SetObjectScale(DEFAULT_OBJECT_SCALE);
-
-    if (CreatureModelInfo const* modelInfo = sObjectMgr.GetCreatureModelInfo(GetDisplayId()))
-    {
-        // bounding_radius and combat_reach is normally modified by scale, but player is always 1.0 scale by default so no need to modify values here.
-        SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, modelInfo->bounding_radius);
-        SetFloatValue(UNIT_FIELD_COMBATREACH, modelInfo->combat_reach);
-    }
-    else
-    {
-        SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, DEFAULT_WORLD_OBJECT_SIZE);
-        SetFloatValue(UNIT_FIELD_COMBATREACH, 1.5f);
     }
 }
 

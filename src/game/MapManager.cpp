@@ -120,7 +120,8 @@ Map* MapManager::CreateMap(uint32 id, const WorldObject* obj)
     //if(!obj->IsInWorld()) sLog.outError("GetMap: called for map %d with object (typeid %d, guid %d, mapid %d, instanceid %d) who is not in world!", id, obj->GetTypeId(), obj->GetGUIDLow(), obj->GetMapId(), obj->GetInstanceId());
     Map *m = _createBaseMap(id);
 
-    if (m && (obj->GetTypeId() == TYPEID_PLAYER) && m->Instanceable()) m = ((MapInstanced*)m)->CreateInstance(id, (Player*)obj);
+    if (m && (obj->GetTypeId() == TYPEID_PLAYER) && m->Instanceable())
+        m = ((MapInstanced*)m)->CreateInstance((Player*)obj);
 
     return m;
 }
