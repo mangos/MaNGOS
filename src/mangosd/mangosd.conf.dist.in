@@ -1163,6 +1163,10 @@ Visibility.Distance.Grey.Object = 10
 #    Rate.Auction.Cut
 #        Auction rates (auction time, deposit get at auction start, auction cut from price at auction end)
 #
+#    Auction.Deposit.Min
+#        Mininumum auction deposit size in copper
+#        Default: 0
+#
 #    Rate.Honor
 #        Honor gain rate
 #
@@ -1274,6 +1278,7 @@ Rate.Damage.Fall = 1
 Rate.Auction.Time = 1
 Rate.Auction.Deposit = 1
 Rate.Auction.Cut = 1
+Auction.Deposit.Min = 0
 Rate.Honor = 1
 Rate.Mining.Amount = 1
 Rate.Mining.Next   = 1
