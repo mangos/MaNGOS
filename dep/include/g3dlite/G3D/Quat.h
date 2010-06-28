@@ -3,14 +3,14 @@
  
   Quaternion
   
-  @maintainer Morgan McGuire, matrix@graphics3d.com
+  @maintainer Morgan McGuire, http://graphics.cs.williams.edu
   
   @created 2002-01-23
-  @edited  2006-05-10
+  @edited  2009-05-10
  */
 
-#ifndef G3D_QUAT_H
-#define G3D_QUAT_H
+#ifndef G3D_Quat_h
+#define G3D_Quat_h
 
 #include "G3D/platform.h"
 #include "G3D/g3dmath.h"
@@ -89,10 +89,10 @@ public:
     }
 
     /** Note: two quats can represent the Quat::sameRotation and not be equal. */
-	bool fuzzyEq(const Quat& q) {
-		return G3D::fuzzyEq(x, q.x) && G3D::fuzzyEq(y, q.y) && G3D::fuzzyEq(z, q.z) && G3D::fuzzyEq(w, q.w);
-	}
-
+    bool fuzzyEq(const Quat& q) {
+      return G3D::fuzzyEq(x, q.x) && G3D::fuzzyEq(y, q.y) && G3D::fuzzyEq(z, q.z) && G3D::fuzzyEq(w, q.w);
+    }
+    
     /** True if these quaternions represent the same rotation (note that every rotation is 
         represented by two values; q and -q).
       */
@@ -177,6 +177,14 @@ public:
         return Quat(x * s, y * s, z * s, w * s);
     }
 
+    inline Quat& operator*=(float s) {
+        x *= s;
+        y *= s;
+        z *= s;
+        w *= s;
+        return *this;
+    }
+
 	/** @cite Based on Watt & Watt, page 360 */
     friend Quat operator* (float s, const Quat& q);
 
@@ -227,7 +235,7 @@ public:
             } else if (w < 0) {
                 // Log of a negative number.  Multivalued, any number of the form
                 // (PI * v, ln(-q.w))
-                return Quat((float)G3D_PI, 0, 0, ::logf(-w));
+                return Quat((float)pi(), 0, 0, ::logf(-w));
             } else {
                  // log of zero!
                  return Quat((float)nan(), (float)nan(), (float)nan(), (float)nan());
@@ -281,17 +289,10 @@ public:
         return (log() * x).exp();
     }
 
-
-    /**
-     @deprecated
-     Use toUnit()
-     */
-    inline Quat unitize() const {
+    inline void unitize() {
         float mag2 = dot(*this);
-        if (G3D::fuzzyEq(mag2, 1.0f)) {
-            return *this;
-        } else {
-            return *this / sqrtf(mag2);
+        if (! G3D::fuzzyEq(mag2, 1.0f)) {
+            *this *= rsq(mag2);
         }
     }
 
@@ -300,7 +301,9 @@ public:
      the magnitude.
      */
     inline Quat toUnit() const {
-        return unitize();
+        Quat x = *this;
+        x.unitize();
+        return x;
     }
 
     /**
@@ -325,6 +328,9 @@ public:
 	@cite From "Uniform Random Rotations", Ken Shoemake, Graphics Gems III.
    */
     static Quat unitRandom();
+
+    void deserialize(class BinaryInput& b);
+    void serialize(class BinaryOutput& b) const;
 
     // 2-char swizzles
 
@@ -688,6 +694,26 @@ inline G3D::Quat operator*(float s, const G3D::Quat& q) {
     return q * s;
 }
 
+inline float& Quat::operator[] (int i) {
+    debugAssert(i >= 0);
+    debugAssert(i < 4);
+    return ((float*)this)[i];
+}
+
+inline const float& Quat::operator[] (int i) const {
+    debugAssert(i >= 0);
+    debugAssert(i < 4);
+    return ((float*)this)[i];
+}
+
+inline Quat Quat::operator-(const Quat& other) const {
+    return Quat(x - other.x, y - other.y, z - other.z, w - other.w);
+}
+
+inline Quat Quat::operator+(const Quat& other) const {
+    return Quat(x + other.x, y + other.y, z + other.z, w + other.w);
+}
+
 } // Namespace G3D
 
 // Outside the namespace to avoid overloading confusion for C++
@@ -695,8 +721,5 @@ inline G3D::Quat pow(const G3D::Quat& q, double x) {
     return q.pow((float)x);
 }
 
-
-
-#include "Quat.inl"
 
 #endif

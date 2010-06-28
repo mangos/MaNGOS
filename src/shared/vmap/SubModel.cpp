@@ -216,7 +216,7 @@ namespace VMAP
     {
             NodeValueAccess<TreeNode, TriangleBox> vna = NodeValueAccess<TreeNode, TriangleBox>(getTreeNodes(), getTriangles());
             IntersectionCallBack<TriangleBox> intersectCallback;
-            Ray relativeRay = Ray::fromOriginAndDirection(pRay.origin - getBasePosition(), pRay.direction);
+            Ray relativeRay = Ray::fromOriginAndDirection(pRay.origin() - getBasePosition(), pRay.direction());
 #ifdef _DEBUG_VMAPS
             //p6=getBasePosition();
             //gBoxArray.push_back(getAABoxBounds());

@@ -102,7 +102,7 @@ namespace G3D {
         inline Indirector() : handle(NULL) {}
 
         /** Returns true iff the values referenced by the handles are equivalent. */
-        inline bool operator==(const Indirector& m) {
+        inline bool operator==(const Indirector& m) const {
             return *handle == *(m.handle);
         }
 
@@ -117,10 +117,13 @@ namespace G3D {
  } // namespace internal
 } // namespace G3D
 
-template <class Handle>
+/* template <class Handle>
 struct GHashCode< G3D::_internal::Indirector<Handle> >
 {
     size_t operator()(const G3D::_internal::Indirector<Handle>& key) const { return key.hashCode(); }
+}; */
+template <class Handle> struct HashTrait<typename G3D::_internal::Indirector<Handle> > {
+    static size_t hashCode(const G3D::_internal::Indirector<Handle>& key) { return key.hashCode(); }
 };
 
 namespace G3D {
@@ -330,7 +333,6 @@ public:
 
         inline int operator()(_AABSPTree::Handle<T>* /*ignore*/, const _AABSPTree::Handle<T>* handle) const {
             const AABox& box = handle->bounds;
-            debugAssert(ignore == NULL);
 
             if (box.high()[sortAxis] < sortLocation) {
                 // Box is strictly below the sort location
@@ -606,10 +608,10 @@ public:
             bool alreadyInsideBounds = false;
             bool rayWillHitBounds =
                 VMAP::MyCollisionDetection::collisionLocationForMovingPointFixedAABox(
-                    ray.origin, ray.direction, splitBounds, location, alreadyInsideBounds);
+                    ray.origin(), ray.direction(), splitBounds, location, alreadyInsideBounds);
 
             bool canHitThisNode = (alreadyInsideBounds ||
-                (rayWillHitBounds && ((location - ray.origin).squaredLength() < square(distance))));
+                (rayWillHitBounds && ((location - ray.origin()).squaredLength() < square(distance))));
 
             return canHitThisNode;
         }
@@ -639,10 +641,10 @@ public:
                     bool alreadyInsideBounds = false;
                     bool rayWillHitBounds =
                         VMAP::MyCollisionDetection::collisionLocationForMovingPointFixedAABox(
-                            ray.origin, ray.direction, bounds, location, alreadyInsideBounds);
+                            ray.origin(), ray.direction(), bounds, location, alreadyInsideBounds);
 
                     canHitThisObject = (alreadyInsideBounds ||
-                        (rayWillHitBounds && ((location - ray.origin).squaredLength() < square(distance))));
+                        (rayWillHitBounds && ((location - ray.origin()).squaredLength() < square(distance))));
                 }
 
                 if (canHitThisObject) {
@@ -665,30 +667,30 @@ public:
             int firstChild = NONE;
             int secondChild = NONE;
 
-            if (ray.origin[splitAxis] < splitLocation) {
+            if (ray.origin()[splitAxis] < splitLocation) {
 
                 // The ray starts on the small side
                 firstChild = 0;
 
-                if (ray.direction[splitAxis] > 0) {
+                if (ray.direction()[splitAxis] > 0) {
                     // The ray will eventually reach the other side
                     secondChild = 1;
                 }
 
-            } else if (ray.origin[splitAxis] > splitLocation) {
+            } else if (ray.origin()[splitAxis] > splitLocation) {
 
                 // The ray starts on the large side
                 firstChild = 1;
 
-                if (ray.direction[splitAxis] < 0) {
+                if (ray.direction()[splitAxis] < 0) {
                     secondChild = 0;
                 }
             } else {
                 // The ray starts on the splitting plane
-                if (ray.direction[splitAxis] < 0) {
+                if (ray.direction()[splitAxis] < 0) {
                     // ...and goes to the small side
                     firstChild = 0;
-                } else if (ray.direction[splitAxis] > 0) {
+                } else if (ray.direction()[splitAxis] > 0) {
                     // ...and goes to the large side
                     firstChild = 1;
                 }
@@ -701,10 +703,10 @@ public:
                     return;
             }
 
-            if (ray.direction[splitAxis] != 0) {
+            if (ray.direction()[splitAxis] != 0) {
                 // See if there was an intersection before hitting the splitting plane.
                 // If so, there is no need to look on the far side and recursion terminates.
-                float distanceToSplittingPlane = (splitLocation - ray.origin[splitAxis]) / ray.direction[splitAxis];
+                float distanceToSplittingPlane = (splitLocation - ray.origin()[splitAxis]) / ray.direction()[splitAxis];
                 if (distanceToSplittingPlane > distance) {
                     // We aren't going to hit anything else before hitting the splitting plane,
                     // so don't bother looking on the far side of the splitting plane at the other

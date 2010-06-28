@@ -739,8 +739,6 @@ void GameEventMgr::ChangeEquipOrModel(int16 event_id, bool activate)
                     {
                         pCreature->SetDisplayId(itr->second.modelid);
                         pCreature->SetNativeDisplayId(itr->second.modelid);
-                        pCreature->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS,minfo->bounding_radius);
-                        pCreature->SetFloatValue(UNIT_FIELD_COMBATREACH,minfo->combat_reach );
                     }
                 }
             }
@@ -754,8 +752,6 @@ void GameEventMgr::ChangeEquipOrModel(int16 event_id, bool activate)
                     {
                         pCreature->SetDisplayId(itr->second.modelid_prev);
                         pCreature->SetNativeDisplayId(itr->second.modelid_prev);
-                        pCreature->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS,minfo->bounding_radius);
-                        pCreature->SetFloatValue(UNIT_FIELD_COMBATREACH,minfo->combat_reach );
                     }
                 }
             }
@@ -837,6 +833,39 @@ void GameEventMgr::UpdateWorldStates(uint16 event_id, bool Activate)
             }
         }
     }
+}
+
+// Get the Game Event ID for Creature by guid
+template <>
+int16 GameEventMgr::GetGameEventId<Creature>(uint32 guid_or_poolid)
+{
+    for (uint16 i = 0; i < mGameEventCreatureGuids.size(); i++) // 0 <= i <= 2*(S := mGameEvent.size()) - 2
+        for (GuidList::const_iterator itr = mGameEventCreatureGuids[i].begin(); itr != mGameEventCreatureGuids[i].end(); itr++)
+            if (*itr == guid_or_poolid)
+                    return i + 1 - mGameEvent.size();       // -S *1 + 1 <= . <= 1*S - 1
+    return 0;
+}
+
+// Get the Game Event ID for GameObject by guid
+template <>
+int16 GameEventMgr::GetGameEventId<GameObject>(uint32 guid_or_poolid)
+{
+    for (uint16 i = 0; i < mGameEventGameobjectGuids.size(); i++)
+        for (GuidList::const_iterator itr = mGameEventGameobjectGuids[i].begin(); itr != mGameEventGameobjectGuids[i].end(); itr++)
+            if (*itr == guid_or_poolid)
+                return i + 1 - mGameEvent.size();       // -S *1 + 1 <= . <= 1*S - 1
+    return 0;
+}
+
+// Get the Game Event ID for Pool by pool ID
+template <>
+int16 GameEventMgr::GetGameEventId<Pool>(uint32 guid_or_poolid)
+{
+    for (uint16 i = 0; i < mGameEventSpawnPoolIds.size(); i++)
+        for (IdList::const_iterator itr = mGameEventSpawnPoolIds[i].begin(); itr != mGameEventSpawnPoolIds[i].end(); itr++)
+            if (*itr == guid_or_poolid)
+                return i;
+    return 0;
 }
 
 GameEventMgr::GameEventMgr()

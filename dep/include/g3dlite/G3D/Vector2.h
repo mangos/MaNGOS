@@ -3,27 +3,33 @@
  
   2D vector class
  
-  @maintainer Morgan McGuire, matrix@graphics3d.com
+  @maintainer Morgan McGuire, http://graphics.cs.williams.edu
   
   @created 2001-06-02
-  @edited  2006-01-14
-  Copyright 2000-2006, Morgan McGuire.
+  @edited  2008-11-30
+
+  Copyright 2000-2009, Morgan McGuire.
   All rights reserved.
 */
 
 #ifndef G3D_VECTOR2_H
 #define G3D_VECTOR2_H
 
+#include <string>
+
 #include "G3D/platform.h"
 #include "G3D/g3dmath.h"
-#include "Vector2int16.h"
-#include <string>
+#include "G3D/Table.h"
+#include "G3D/HashTrait.h"
+#include "G3D/Vector2int16.h"
+#include "G3D/Random.h"
 
 namespace G3D {
 
 class Vector2;    
 class Vector3;
 class Vector4;
+class Any;
 
 /**
  Do not subclass-- this implementation makes assumptions about the
@@ -38,29 +44,42 @@ private:
     bool operator>=(const Vector2&) const;
 
 public:
-    // coordinates
-    float x, y;
+    float x;
+    float y;
 
-    // construction
+    /** \param any Must either Vector2(#, #) or Vector2 {x = #, y = #}*/
+    Vector2(const Any& any);
+    
+    /** Converts the Vector2 to an Any. */
+    operator Any() const;
+
+    /** Creates the zero vector */
     Vector2();
+    Vector2(class TextInput& t);
+    Vector2(class BinaryInput& b);
     Vector2(float x, float y);
     Vector2(float coordinate[2]);
     Vector2(double coordinate[2]);
-    Vector2(const Vector2& rkVector);
-    Vector2(const class Vector2int16& v); 
+    Vector2(const Vector2& other);
+    Vector2(const Vector2int16& other); 
 
-    float& operator[] (int i);
-    const float& operator[] (int i) const;
-    operator float* ();
-    operator const float* () const;
+    void serialize(class BinaryOutput& b) const;
+    void deserialize(class BinaryInput& b);
+
+    void serialize(class TextOutput& t) const;
+    void deserialize(class TextInput& t);
+
+    float& operator[](int i);
+    const float& operator[](int i) const;
 
     // assignment and comparison
-    Vector2& operator= (const Vector2& rkVector);
-    bool operator== (const Vector2& rkVector) const;
-    bool operator!= (const Vector2& rkVector) const;
-    unsigned int hashCode() const;
+    Vector2& operator=(const Vector2& other);
+    bool operator==(const Vector2& other) const;
+    bool operator!=(const Vector2& other) const;
+    size_t hashCode() const;
     bool fuzzyEq(const Vector2& other) const;
     bool fuzzyNe(const Vector2& other) const;
+
     /** Returns true if this vector has finite length */
     bool isFinite() const;
 
@@ -71,14 +90,21 @@ public:
     bool isUnit() const;
 
     // arithmetic operations
-    Vector2 operator+ (const Vector2& rkVector) const;
-    Vector2 operator- (const Vector2& rkVector) const;
-    Vector2 operator* (float fScalar) const;
-    Vector2 operator* (const Vector2& rkVector) const;
-    Vector2 operator/ (const Vector2& rkVector) const;
-    Vector2 operator/ (float fScalar) const;
-    Vector2 operator- () const;
+    Vector2 operator+(const Vector2& v) const;
+    Vector2 operator-(const Vector2& v) const;
+    Vector2 operator*(float s) const;
 
+    /** Array (pointwise) multiplication */
+    Vector2 operator*(const Vector2& v) const;
+
+    /** Array division */
+    Vector2 operator/(const Vector2& v) const;
+    Vector2 operator/(float s) const;
+
+    /** Unary minus */
+    Vector2 operator-() const;
+
+    /** x + y */
     inline float sum() const {
         return x + y;
     }
@@ -103,16 +129,21 @@ public:
     }
 
     // arithmetic updates
-    Vector2& operator+= (const Vector2& rkVector);
-    Vector2& operator-= (const Vector2& rkVector);
-    Vector2& operator*= (float fScalar);
-    Vector2& operator/= (float fScalar);
-    Vector2& operator*= (const Vector2& rkVector);
-    Vector2& operator/= (const Vector2& rkVector);
+    Vector2& operator+=(const Vector2&);
+    Vector2& operator-=(const Vector2&);
+    Vector2& operator*=(float);
+    Vector2& operator/=(float);
+    Vector2& operator*=(const Vector2&);
+    Vector2& operator/=(const Vector2&);
 
     // vector operations
+
+    /**  */
     float length() const;
+    
+    /** Returns a unit-length vector */
     Vector2 direction() const;
+
     /**
      Potentially less accurate but faster than direction().
      Only works if System::hasSSE is true.
@@ -121,20 +152,25 @@ public:
         return direction();
     }
 
-    float squaredLength () const;
-    float dot (const Vector2& rkVector) const;
-    float unitize (float fTolerance = 1e-06);
+    float squaredLength() const;
+    float dot(const Vector2& s) const;
 
-    Vector2 min(const Vector2 &v) const;
-    Vector2 max(const Vector2 &v) const;
+    /**
+     Make this vector have unit length and return the old length.
+     If the vector length was less than tolerance, do not normalize.
+     */
+    float unitize(float fTolerance = 1e-06);
 
-    // Random unit vector
-    static Vector2 random();
+    Vector2 min(const Vector2& v) const;
+    Vector2 max(const Vector2& v) const;
+
+    /** Uniformly distributed random vector on the unit sphere */
+    static Vector2 random(Random& r = Random::common());
 
     // Special values.
     // Intentionally not inlined: see Matrix3::identity() for details.
     static const Vector2& zero();
-    inline static const Vector2& one() { static const Vector2 v(1, 1); return v; }
+    static const Vector2& one();
     static const Vector2& unitX();
     static const Vector2& unitY();
     static const Vector2& inf(); 
@@ -143,16 +179,6 @@ public:
     static const Vector2& minFinite(); 
     /** Largest representable vector */
     static const Vector2& maxFinite();
-
-
-
-    // Deprecated. See Matrix3::identity() for details.
-    /** @deprecated Use Vector2::zero() */
-    static const Vector2 ZERO;
-    /** @deprecated Use Vector2::unitX() */
-    static const Vector2 UNIT_S;
-    /** @deprecated Use Vector2::unitY() */
-    static const Vector2 UNIT_T;
 
     std::string toString() const;
 
@@ -208,11 +234,6 @@ inline Vector2 operator*(int s, const Vector2& v) {
 }
 
 
-inline unsigned int hashCode(const G3D::Vector2& v) {
-     return v.hashCode();
-}
-
-
 inline Vector2::Vector2 () : x(0.0f), y(0.0f) {
 }
 
@@ -251,15 +272,6 @@ inline float& Vector2::operator[] (int i) {
 
 inline const float& Vector2::operator[] (int i) const {
     return ((float*)this)[i];
-}
-
-
-inline Vector2::operator float* () {
-    return (float*)this;
-}
-
-inline Vector2::operator const float* () const {
-    return (float*)this;
 }
 
 
@@ -421,7 +433,15 @@ inline bool Vector2::isUnit() const {
     return squaredLength() == 1.0f;
 }
 
-}
+} // namespace G3D
+
+template <>
+struct HashTrait<G3D::Vector2> {
+    static size_t hashCode(const G3D::Vector2& key) {
+        return key.hashCode();
+    }
+};
+
 
 // Intentionally outside namespace to avoid operator overloading confusion
 inline G3D::Vector2 operator*(double s, const G3D::Vector2& v) {
@@ -430,9 +450,5 @@ inline G3D::Vector2 operator*(double s, const G3D::Vector2& v) {
 inline G3D::Vector2 operator*(int s, const G3D::Vector2& v) {
     return v * (float)s;
 }
-
-
-inline unsigned int hashCode(const G3D::Vector2& v);
-
 
 #endif
