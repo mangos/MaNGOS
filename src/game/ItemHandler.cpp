@@ -353,8 +353,9 @@ void WorldSession::HandleItemQuerySingleOpcode( WorldPacket & recv_data )
         //data << pProto->ShadowRes;
         //data << pProto->ArcaneRes;
 
-        data << pProto->AmmoType;                           // swapped with Delay
-        data << pProto->Delay;                              // swapped with AmmoType
+        data << uint32(0);                                  // DamageType
+        //data << pProto->AmmoType;
+        data << pProto->Delay;
         data << pProto->RangedModRange;
 
         for(int s = 0; s < MAX_ITEM_PROTO_SPELLS; ++s)

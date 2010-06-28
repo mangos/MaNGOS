@@ -570,7 +570,7 @@ struct ItemPrototype
     uint32 ShadowRes;                                       // TODO: remove it
     uint32 ArcaneRes;                                       // TODO: remove it
     uint32 Delay;
-    uint32 AmmoType;
+    uint32 AmmoType;                                        // TODO: remove it
     float  RangedModRange;
     _Spell Spells[MAX_ITEM_PROTO_SPELLS];
     uint32 Bonding;
