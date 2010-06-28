@@ -309,7 +309,7 @@ void WorldSession::HandleItemQuerySingleOpcode( WorldPacket & recv_data )
         data << pProto->DisplayInfoID;
         data << pProto->Quality;
         data << pProto->Flags;
-        data << pProto->Faction;                            // 3.2 faction?
+        data << pProto->Faction;                            // 3.2 Flags2
         data << pProto->BuyPrice;
         data << pProto->SellPrice;
         data << pProto->InventoryType;
@@ -332,8 +332,8 @@ void WorldSession::HandleItemQuerySingleOpcode( WorldPacket & recv_data )
         {
             data << pProto->ItemStat[i].ItemStatType;
             data << pProto->ItemStat[i].ItemStatValue;
-            data << uint32(0);
-            data << uint32(0);
+            data << uint32(0);                              // 4.0.0
+            data << uint32(0);                              // 4.0.0
         }
         data << pProto->ScalingStatDistribution;            // scaling stats distribution
         data << pProto->ScalingStatValue;                   // some kind of flags used to determine stat values column
@@ -353,8 +353,8 @@ void WorldSession::HandleItemQuerySingleOpcode( WorldPacket & recv_data )
         //data << pProto->ShadowRes;
         //data << pProto->ArcaneRes;
 
-        data << pProto->Delay;
-        data << pProto->AmmoType;
+        data << pProto->AmmoType;                           // swapped with Delay
+        data << pProto->Delay;                              // swapped with AmmoType
         data << pProto->RangedModRange;
 
         for(int s = 0; s < MAX_ITEM_PROTO_SPELLS; ++s)
@@ -424,6 +424,8 @@ void WorldSession::HandleItemQuerySingleOpcode( WorldPacket & recv_data )
         data << uint32(pProto->ItemLimitCategory);          // WotLK, ItemLimitCategory
         data << uint32(pProto->HolidayId);                  // Holiday.dbc?
         data << float(0);                                   // damage/armor scaling factor
+        data << uint32(0);                                  // 4.0.0
+        data << uint32(0);                                  // 4.0.0
         SendPacket( &data );
     }
     else

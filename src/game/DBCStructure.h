@@ -536,6 +536,12 @@ struct AreaTriggerEntry
     float   box_orientation;                                // 12       m_box_yaw
 };
 
+struct ArmorLocationEntry
+{
+  uint32    InventoryType;                                  // 0
+  float     Value[5];                                       // 1-5 multiplier for armor types (cloth...plate, no armor?)
+};
+
 struct AuctionHouseEntry
 {
     uint32    houseId;                                      // 0 index
@@ -995,6 +1001,27 @@ struct ItemEntry
    uint32   Sheath;                                         // 7
 };
 
+struct ItemArmorQualityEntry
+{
+  uint32    Id;                                             // 0 item level
+  float     Value[7];                                       // 1-7 multiplier for item quality
+  uint32    Id2;                                            // 8 item level
+};
+
+struct ItemArmorShieldEntry
+{
+  uint32    Id;                                             // 0 item level
+  uint32    Id2;                                            // 1 item level
+  float     Value[7];                                       // 2-8 multiplier for item quality
+};
+
+struct ItemArmorTotalEntry
+{
+  uint32    Id;                                             // 0 item level
+  uint32    Id2;                                            // 1 item level
+  float     Value[4];                                       // 2-5 multiplier for armor types (cloth...plate)
+};
+
 struct ItemBagFamilyEntry
 {
     uint32   ID;                                            // 0
@@ -1024,6 +1051,22 @@ struct ItemDisplayInfoEntry
 //    uint32      itemextendedcostentry;                    // ItemPrototype::ExtendedCost
 //    uint32      arenaseason;                              // arena season number(1-4)
 //};
+
+// common struct for:
+// ItemDamageAmmo.dbc
+// ItemDamageOneHand.dbc
+// ItemDamageOneHandCaster.dbc
+// ItemDamageRanged.dbc
+// ItemDamageThrown.dbc
+// ItemDamageTwoHand.dbc
+// ItemDamageTwoHandCaster.dbc
+// ItemDamageWand.dbc
+struct ItemDamageEntry
+{
+  uint32    Id;                                             // 0 item level
+  float     Value[7];                                       // 1-7 multiplier for item quality
+  uint32    Id2;                                            // 8 item level
+};
 
 struct ItemExtendedCostEntry
 {

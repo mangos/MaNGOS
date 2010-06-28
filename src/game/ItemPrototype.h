@@ -538,7 +538,7 @@ struct ItemPrototype
     uint32 DisplayInfoID;                                   // id from ItemDisplayInfo.dbc
     uint32 Quality;
     uint32 Flags;
-    uint32 Faction;
+    uint32 Faction;                                         // TODO: rename it
     uint32 BuyCount;
     uint32 BuyPrice;
     uint32 SellPrice;
@@ -561,14 +561,14 @@ struct ItemPrototype
     _ItemStat ItemStat[MAX_ITEM_PROTO_STATS];
     uint32 ScalingStatDistribution;                         // id from ScalingStatDistribution.dbc
     uint32 ScalingStatValue;                                // mask for selecting column in ScalingStatValues.dbc
-    _Damage Damage[MAX_ITEM_PROTO_DAMAGES];
-    uint32 Armor;
-    uint32 HolyRes;
-    uint32 FireRes;
-    uint32 NatureRes;
-    uint32 FrostRes;
-    uint32 ShadowRes;
-    uint32 ArcaneRes;
+    _Damage Damage[MAX_ITEM_PROTO_DAMAGES];                 // TODO: remove it
+    uint32 Armor;                                           // TODO: remove it
+    uint32 HolyRes;                                         // TODO: remove it
+    uint32 FireRes;                                         // TODO: remove it
+    uint32 NatureRes;                                       // TODO: remove it
+    uint32 FrostRes;                                        // TODO: remove it
+    uint32 ShadowRes;                                       // TODO: remove it
+    uint32 ArcaneRes;                                       // TODO: remove it
     uint32 Delay;
     uint32 AmmoType;
     float  RangedModRange;
@@ -629,15 +629,7 @@ struct ItemPrototype
 
     uint32 GetMaxStackSize() const { return Stackable > 0 ? uint32(Stackable) : uint32(0x7FFFFFFF-1); }
 
-    float getDPS() const
-    {
-        if (Delay == 0)
-            return 0;
-        float temp = 0;
-        for (int i = 0; i < MAX_ITEM_PROTO_DAMAGES; ++i)
-            temp+=Damage[i].DamageMin + Damage[i].DamageMax;
-        return temp*500/Delay;
-    }
+    float getDPS() const;
 
     int32 getFeralBonus(int32 extraDPS = 0) const
     {
@@ -651,6 +643,10 @@ struct ItemPrototype
         }
         return 0;
     }
+
+    uint32 GetArmor() const;
+    float GetMinDamage() const { return floor(getDPS() * float(Delay) / 1000.0f * 0.8f + 0.5f); }
+    float GetMaxDamage() const { return floor(getDPS() * float(Delay) / 1000.0f * 1.2f + 0.5f); }
 
     bool IsPotion() const { return Class==ITEM_CLASS_CONSUMABLE && SubClass==ITEM_SUBCLASS_POTION; }
     bool IsConjuredConsumable() const { return Class == ITEM_CLASS_CONSUMABLE && (Flags & ITEM_FLAGS_CONJURED); }

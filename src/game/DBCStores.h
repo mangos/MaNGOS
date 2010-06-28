@@ -75,6 +75,7 @@ extern DBCStorage <AchievementCriteriaEntry>     sAchievementCriteriaStore;
 extern DBCStorage <AreaTableEntry>               sAreaStore;// recommend access using functions
 extern DBCStorage <AreaGroupEntry>               sAreaGroupStore;
 extern DBCStorage <AreaTriggerEntry>             sAreaTriggerStore;
+extern DBCStorage <ArmorLocationEntry>           sArmorLocationStore;
 extern DBCStorage <AuctionHouseEntry>            sAuctionHouseStore;
 extern DBCStorage <BankBagSlotPricesEntry>       sBankBagSlotPricesStore;
 extern DBCStorage <BarberShopStyleEntry>         sBarberShopStyleStore;
@@ -113,7 +114,18 @@ extern DBCStorage <GtRegenHPPerSptEntry>         sGtRegenHPPerSptStore;
 extern DBCStorage <GtRegenMPPerSptEntry>         sGtRegenMPPerSptStore;
 extern DBCStorage <HolidaysEntry>                sHolidaysStore;
 extern DBCStorage <ItemEntry>                    sItemStore;
+extern DBCStorage <ItemArmorQualityEntry>        sItemArmorQualityStore;
+extern DBCStorage <ItemArmorShieldEntry>         sItemArmorShieldStore;
+extern DBCStorage <ItemArmorTotalEntry>          sItemArmorTotalStore;
 extern DBCStorage <ItemBagFamilyEntry>           sItemBagFamilyStore;
+extern DBCStorage <ItemDamageEntry>              sItemDamageAmmoStore;
+extern DBCStorage <ItemDamageEntry>              sItemDamageOneHandStore;
+extern DBCStorage <ItemDamageEntry>              sItemDamageOneHandCasterStore;
+extern DBCStorage <ItemDamageEntry>              sItemDamageRangedStore;
+extern DBCStorage <ItemDamageEntry>              sItemDamageThrownStore;
+extern DBCStorage <ItemDamageEntry>              sItemDamageTwoHandStore;
+extern DBCStorage <ItemDamageEntry>              sItemDamageTwoHandCasterStore;
+extern DBCStorage <ItemDamageEntry>              sItemDamageWandStore;
 //extern DBCStorage <ItemDisplayInfoEntry>      sItemDisplayInfoStore; -- not used currently
 extern DBCStorage <ItemExtendedCostEntry>        sItemExtendedCostStore;
 extern DBCStorage <ItemLimitCategoryEntry>       sItemLimitCategoryStore;
