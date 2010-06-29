@@ -16439,7 +16439,7 @@ InstanceSave* Player::GetBoundInstanceSaveForSelfOrGroup(uint32 mapid)
         InstanceGroupBind *groupBind = NULL;
         Group *group = GetGroup();
         // use the player's difficulty setting (it may not be the same as the group's)
-        if(group && (groupBind = group->GetBoundInstance(this)))
+        if(group && (groupBind = group->GetBoundInstance(mapid, this)))
             pSave = groupBind->save;
     }
 
