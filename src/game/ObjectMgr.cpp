@@ -6000,6 +6000,14 @@ void ObjectMgr::LoadGameobjectInfo()
         if (!goInfo)
             continue;
 
+
+        if (goInfo->size <= 0.0f)                           // prevent use too small scales
+        {
+            ERROR_DB_STRICT_LOG("Gameobject (Entry: %u GoType: %u) have too small size=%f",
+                goInfo->id, goInfo->type, goInfo->size);
+            const_cast<GameObjectInfo*>(goInfo)->size =  DEFAULT_OBJECT_SCALE;
+        }
+
         // some GO types have unused go template, check goInfo->displayId at GO spawn data loading or ignore
 
         switch(goInfo->type)
