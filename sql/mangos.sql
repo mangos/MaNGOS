@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_10109_01_mangos_creature_model_info` bit(1) default NULL
+  `required_10119_01_mangos_creature_model_info` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -978,6 +978,8 @@ INSERT INTO `creature_model_info` VALUES
 (54, 0.3470, 1.5, 1, 53),
 (55, 0.3890, 1.5, 0, 56),
 (56, 0.3060, 1.5, 1, 55),
+(57, 0.3830, 1.5, 0, 58),
+(58, 0.3830, 1.5, 1, 57),
 (59, 0.9747, 1.5, 0, 60),
 (60, 0.8725, 1.5, 1, 59),
 (1478, 0.3060, 1.5, 0, 1479),
