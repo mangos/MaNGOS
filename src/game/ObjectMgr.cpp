@@ -1030,6 +1030,64 @@ void ObjectMgr::LoadCreatureModelInfo()
         }
     }
 
+    // character races expected have model info data in table
+    for(uint32 race = 1; race < sChrRacesStore.GetNumRows(); ++race)
+    {
+        ChrRacesEntry const* raceEntry = sChrRacesStore.LookupEntry(race);
+        if (!raceEntry)
+            continue;
+
+        if (!((1 << (race-1)) & RACEMASK_ALL_PLAYABLE))
+            continue;
+
+        if (CreatureModelInfo const *minfo = GetCreatureModelInfo(raceEntry->model_f))
+        {
+            if (minfo->gender != GENDER_FEMALE)
+                sLog.outErrorDb("Table `creature_model_info` have wrong gender %u for character race %u female model id %u", minfo->gender, race, raceEntry->model_f);
+
+            if (minfo->modelid_other_gender != raceEntry->model_m)
+                sLog.outErrorDb("Table `creature_model_info` have wrong other gender model id %u for character race %u female model id %u", minfo->modelid_other_gender, race, raceEntry->model_f);
+
+            if (minfo->bounding_radius <= 0.0f)
+            {
+                sLog.outErrorDb("Table `creature_model_info` have wrong bounding_radius %f for character race %u female model id %u, use %f instead", minfo->bounding_radius, race, raceEntry->model_f, DEFAULT_WORLD_OBJECT_SIZE);
+                const_cast<CreatureModelInfo*>(minfo)->bounding_radius = DEFAULT_WORLD_OBJECT_SIZE;
+            }
+
+            if (minfo->combat_reach != 1.5f)
+            {
+                sLog.outErrorDb("Table `creature_model_info` have wrong combat_reach %f for character race %u female model id %u, expected always 1.5f", minfo->combat_reach, race, raceEntry->model_f);
+                const_cast<CreatureModelInfo*>(minfo)->combat_reach = 1.5f;
+            }
+        }
+        else
+            sLog.outErrorDb("Table `creature_model_info` expect have data for character race %u female model id %u", race, raceEntry->model_f);
+
+        if (CreatureModelInfo const *minfo = GetCreatureModelInfo(raceEntry->model_m))
+        {
+            if (minfo->gender != GENDER_MALE)
+                sLog.outErrorDb("Table `creature_model_info` have wrong gender %u for character race %u male model id %u", minfo->gender, race, raceEntry->model_m);
+
+            if (minfo->modelid_other_gender != raceEntry->model_f)
+                sLog.outErrorDb("Table `creature_model_info` have wrong other gender model id %u for character race %u male model id %u", minfo->modelid_other_gender, race, raceEntry->model_m);
+
+            if (minfo->bounding_radius <= 0.0f)
+            {
+                sLog.outErrorDb("Table `creature_model_info` have wrong bounding_radius %f for character race %u male model id %u, use %f instead", minfo->bounding_radius, race, raceEntry->model_f, DEFAULT_WORLD_OBJECT_SIZE);
+                const_cast<CreatureModelInfo*>(minfo)->bounding_radius = DEFAULT_WORLD_OBJECT_SIZE;
+            }
+
+            if (minfo->combat_reach != 1.5f)
+            {
+                sLog.outErrorDb("Table `creature_model_info` have wrong combat_reach %f for character race %u male model id %u, expected always 1.5f", minfo->combat_reach, race, raceEntry->model_m);
+                const_cast<CreatureModelInfo*>(minfo)->combat_reach = 1.5f;
+            }
+        }
+        else
+            sLog.outErrorDb("Table `creature_model_info` expect have data for character race %u male model id %u", race, raceEntry->model_m);
+
+    }
+
     sLog.outString( ">> Loaded %u creature model based info", sCreatureModelStorage.RecordCount );
     sLog.outString();
 }
@@ -5999,6 +6057,14 @@ void ObjectMgr::LoadGameobjectInfo()
         GameObjectInfo const* goInfo = sGOStorage.LookupEntry<GameObjectInfo>(id);
         if (!goInfo)
             continue;
+
+
+        if (goInfo->size <= 0.0f)                           // prevent use too small scales
+        {
+            ERROR_DB_STRICT_LOG("Gameobject (Entry: %u GoType: %u) have too small size=%f",
+                goInfo->id, goInfo->type, goInfo->size);
+            const_cast<GameObjectInfo*>(goInfo)->size =  DEFAULT_OBJECT_SCALE;
+        }
 
         // some GO types have unused go template, check goInfo->displayId at GO spawn data loading or ignore
 

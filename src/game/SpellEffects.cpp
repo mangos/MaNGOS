@@ -4239,7 +4239,7 @@ void Spell::EffectAddFarsight(SpellEffectIndex eff_idx)
         return;
     }
 
-    // DYNAMICOBJECT_BYTES is appareltly different from the default bytes set in ::Create
+    // DYNAMICOBJECT_BYTES is apparently different from the default bytes set in ::Create
     dynObj->SetUInt32Value(DYNAMICOBJECT_BYTES, 0x80000002);
 
     m_caster->AddDynObject(dynObj);
