@@ -2799,6 +2799,13 @@ void Spell::cast(bool skipCheck)
                 AddTriggeredSpell(52874);                   // Fan of Knives (offhand)
             }
             break;
+        case SPELLFAMILY_HUNTER:
+        {
+            // Lock and Load
+            if (m_spellInfo->Id == 56453)
+                AddPrecastSpell(67544);                     // Lock and Load Marker
+            break;
+        }
         case SPELLFAMILY_PALADIN:
         {
             // Hand of Reckoning

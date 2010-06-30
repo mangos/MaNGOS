@@ -7567,6 +7567,13 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
                 if (!(procSpell->SpellFamilyFlags & UI64LIT(0x0000000000000020)))
                     return false;
             }
+            // Lock and Load
+            else if (auraSpellInfo->SpellIconID == 3579)
+            {
+                // Check for Lock and Load Marker
+                if (HasAura(67544))
+                    return false;
+            }
             break;
         case SPELLFAMILY_PALADIN:
         {
