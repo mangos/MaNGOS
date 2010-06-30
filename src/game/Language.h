@@ -846,7 +846,10 @@ enum MangosStrings
     LANG_NPC_GO_INFO_TOP_POOL           = 1146,
     LANG_NPC_GO_INFO_POOL_GAME_EVENT_S  = 1147,
     LANG_NPC_GO_INFO_POOL_GAME_EVENT_D  = 1148,
-    // Room for more level 3              1149-1199 not used
+    LANG_NPC_GO_INFO_POOL_STRING        = 1149,
+    LANG_NPC_GO_INFO_EVENT_STRING       = 1150,
+    LANG_NPC_GO_INFO_POOL_EVENT_STRING  = 1151,
+    // Room for more level 3              1152-1199 not used
 
     // Debug commands
     LANG_CINEMATIC_NOT_EXIST            = 1200,

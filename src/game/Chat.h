@@ -563,6 +563,8 @@ class ChatHandler
         bool HandleGoHelper(Player* _player, uint32 mapid, float x, float y, float const* zPtr = NULL, float const* ortPtr = NULL);
         template<typename T>
         void ShowNpcOrGoSpawnInformation(uint32 guid);
+        template <typename T>
+        std::string PrepareStringNpcOrGoSpawnInformation(uint32 guid);
 
         /**
          * Stores informations about a deleted character
@@ -615,5 +617,8 @@ class CliHandler : public ChatHandler
         void* m_callbackArg;
         Print* m_print;
 };
+
+
+
 
 #endif
