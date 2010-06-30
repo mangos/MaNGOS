@@ -3380,6 +3380,9 @@ SpellCastResult SpellMgr::GetSpellAllowedInLocationError(SpellEntry const *spell
             return bg && bg->GetStatus()==STATUS_WAIT_JOIN ? SPELL_CAST_OK : SPELL_FAILED_ONLY_IN_ARENA;
         }
         case 69065:                                         // Impaled
+        case 69126:                                         // Pungent blight - first aura
+        case 69157:                                         // Pungent blight - second aura
+        case 69195:                                         // Pungent blight
         case 72293:                                         // Mark of the Fallen Champion
             return map_id == 631 ? SPELL_CAST_OK : SPELL_FAILED_INCORRECT_AREA;
     }
