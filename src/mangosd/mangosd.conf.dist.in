@@ -1164,7 +1164,7 @@ Visibility.Distance.Grey.Object = 10
 #        Auction rates (auction time, deposit get at auction start, auction cut from price at auction end)
 #
 #    Auction.Deposit.Min
-#        Mininumum auction deposit size in copper
+#        Minimum auction deposit size in copper
 #        Default: 0
 #
 #    Rate.Honor
