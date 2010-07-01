@@ -2480,16 +2480,16 @@ bool ChatHandler::HandleListItemCommand(const char* args)
 
 bool ChatHandler::HandleListObjectCommand(const char* args)
 {
-    if(!*args)
+    if (!*args)
         return false;
 
     // number or [name] Shift-click form |color|Hgameobject_entry:go_id|h[name]|h|r
-    char* cId = extractKeyFromLink((char*)args,"Hgameobject_entry");
-    if(!cId)
+    char* cId = extractKeyFromLink((char*)args, "Hgameobject_entry");
+    if (!cId)
         return false;
 
     uint32 go_id = atol(cId);
-    if(!go_id)
+    if (!go_id)
     {
         PSendSysMessage(LANG_COMMAND_LISTOBJINVALIDID, go_id);
         SetSentErrorMessage(true);
@@ -2497,7 +2497,7 @@ bool ChatHandler::HandleListObjectCommand(const char* args)
     }
 
     GameObjectInfo const * gInfo = ObjectMgr::GetGameObjectInfo(go_id);
-    if(!gInfo)
+    if (!gInfo)
     {
         PSendSysMessage(LANG_COMMAND_LISTOBJINVALIDID, go_id);
         SetSentErrorMessage(true);
@@ -2507,20 +2507,20 @@ bool ChatHandler::HandleListObjectCommand(const char* args)
     char* c_count = strtok(NULL, " ");
     int count = c_count ? atol(c_count) : 10;
 
-    if(count < 0)
+    if (count < 0)
         return false;
 
     QueryResult *result;
 
     uint32 obj_count = 0;
-    result=WorldDatabase.PQuery("SELECT COUNT(guid) FROM gameobject WHERE id='%u'",go_id);
-    if(result)
+    result = WorldDatabase.PQuery("SELECT COUNT(guid) FROM gameobject WHERE id='%u'", go_id);
+    if (result)
     {
         obj_count = (*result)[0].GetUInt32();
         delete result;
     }
 
-    if(m_session)
+    if (m_session)
     {
         Player* pl = m_session->GetPlayer();
         result = WorldDatabase.PQuery("SELECT guid, position_x, position_y, position_z, map, (POW(position_x - '%f', 2) + POW(position_y - '%f', 2) + POW(position_z - '%f', 2)) AS order_ FROM gameobject WHERE id = '%u' ORDER BY order_ ASC LIMIT %u",
@@ -2542,30 +2542,30 @@ bool ChatHandler::HandleListObjectCommand(const char* args)
             int mapid = fields[4].GetUInt16();
 
             if (m_session)
-                PSendSysMessage(LANG_GO_LIST_CHAT, guid, guid, gInfo->name, x, y, z, mapid);
+                PSendSysMessage(LANG_GO_LIST_CHAT, guid, PrepareStringNpcOrGoSpawnInformation<GameObject>(guid).c_str(), guid, gInfo->name, x, y, z, mapid);
             else
-                PSendSysMessage(LANG_GO_LIST_CONSOLE, guid, gInfo->name, x, y, z, mapid);
+                PSendSysMessage(LANG_GO_LIST_CONSOLE, guid, PrepareStringNpcOrGoSpawnInformation<GameObject>(guid).c_str(), gInfo->name, x, y, z, mapid);
         } while (result->NextRow());
 
         delete result;
     }
 
-    PSendSysMessage(LANG_COMMAND_LISTOBJMESSAGE,go_id,obj_count);
+    PSendSysMessage(LANG_COMMAND_LISTOBJMESSAGE, go_id, obj_count);
     return true;
 }
 
 bool ChatHandler::HandleListCreatureCommand(const char* args)
 {
-    if(!*args)
+    if (!*args)
         return false;
 
     // number or [name] Shift-click form |color|Hcreature_entry:creature_id|h[name]|h|r
-    char* cId = extractKeyFromLink((char*)args,"Hcreature_entry");
-    if(!cId)
+    char* cId = extractKeyFromLink((char*)args, "Hcreature_entry");
+    if (!cId)
         return false;
 
     uint32 cr_id = atol(cId);
-    if(!cr_id)
+    if (!cr_id)
     {
         PSendSysMessage(LANG_COMMAND_INVALIDCREATUREID, cr_id);
         SetSentErrorMessage(true);
@@ -2573,7 +2573,7 @@ bool ChatHandler::HandleListCreatureCommand(const char* args)
     }
 
     CreatureInfo const* cInfo = ObjectMgr::GetCreatureTemplate(cr_id);
-    if(!cInfo)
+    if (!cInfo)
     {
         PSendSysMessage(LANG_COMMAND_INVALIDCREATUREID, cr_id);
         SetSentErrorMessage(true);
@@ -2583,20 +2583,20 @@ bool ChatHandler::HandleListCreatureCommand(const char* args)
     char* c_count = strtok(NULL, " ");
     int count = c_count ? atol(c_count) : 10;
 
-    if(count < 0)
+    if (count < 0)
         return false;
 
     QueryResult *result;
 
     uint32 cr_count = 0;
-    result=WorldDatabase.PQuery("SELECT COUNT(guid) FROM creature WHERE id='%u'",cr_id);
-    if(result)
+    result = WorldDatabase.PQuery("SELECT COUNT(guid) FROM creature WHERE id='%u'",cr_id);
+    if (result)
     {
         cr_count = (*result)[0].GetUInt32();
         delete result;
     }
 
-    if(m_session)
+    if (m_session)
     {
         Player* pl = m_session->GetPlayer();
         result = WorldDatabase.PQuery("SELECT guid, position_x, position_y, position_z, map, (POW(position_x - '%f', 2) + POW(position_y - '%f', 2) + POW(position_z - '%f', 2)) AS order_ FROM creature WHERE id = '%u' ORDER BY order_ ASC LIMIT %u",
@@ -2617,16 +2617,16 @@ bool ChatHandler::HandleListCreatureCommand(const char* args)
             float z = fields[3].GetFloat();
             int mapid = fields[4].GetUInt16();
 
-            if  (m_session)
-                PSendSysMessage(LANG_CREATURE_LIST_CHAT, guid, guid, cInfo->Name, x, y, z, mapid);
+            if (m_session)
+                PSendSysMessage(LANG_CREATURE_LIST_CHAT, guid, PrepareStringNpcOrGoSpawnInformation<Creature>(guid).c_str(), guid, cInfo->Name, x, y, z, mapid);
             else
-                PSendSysMessage(LANG_CREATURE_LIST_CONSOLE, guid, cInfo->Name, x, y, z, mapid);
+                PSendSysMessage(LANG_CREATURE_LIST_CONSOLE, guid, PrepareStringNpcOrGoSpawnInformation<Creature>(guid).c_str(), cInfo->Name, x, y, z, mapid);
         } while (result->NextRow());
 
         delete result;
     }
 
-    PSendSysMessage(LANG_COMMAND_LISTCREATUREMESSAGE,cr_id,cr_count);
+    PSendSysMessage(LANG_COMMAND_LISTCREATUREMESSAGE, cr_id, cr_count);
     return true;
 }
 

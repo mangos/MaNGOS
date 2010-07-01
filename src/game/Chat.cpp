@@ -2562,6 +2562,43 @@ void ChatHandler::ShowNpcOrGoSpawnInformation(uint32 guid)
     }
 }
 
+// Prepare ShortString for a NPC or GO (by guid) with pool or game event IDs
+template <typename T>
+std::string ChatHandler::PrepareStringNpcOrGoSpawnInformation(uint32 guid)
+{
+    std::string str = "";
+    if (uint16 pool_id = sPoolMgr.IsPartOfAPool<T>(guid))
+    {
+        uint16 top_pool_id = sPoolMgr.IsPartOfTopPool<T>(guid);
+        if (int16 event_id = sGameEventMgr.GetGameEventId<Pool>(top_pool_id))
+        {
+            char buffer[100];
+            const char* format = GetMangosString(LANG_NPC_GO_INFO_POOL_EVENT_STRING);
+            sprintf(buffer, format, pool_id, event_id);
+            str = buffer;
+        }
+        else
+        {
+            char buffer[100];
+            const char* format = GetMangosString(LANG_NPC_GO_INFO_POOL_STRING);
+            sprintf(buffer, format, pool_id);
+            str = buffer;
+        }
+    }
+    else if (int16 event_id = sGameEventMgr.GetGameEventId<T>(guid))
+    {
+        char buffer[100];
+        const char* format = GetMangosString(LANG_NPC_GO_INFO_EVENT_STRING);
+        sprintf(buffer, format, event_id);
+        str = buffer;
+    }
+
+    return str;
+}
+
 // Instantiate template for helper function
 template void ChatHandler::ShowNpcOrGoSpawnInformation<Creature>(uint32 guid);
 template void ChatHandler::ShowNpcOrGoSpawnInformation<GameObject>(uint32 guid);
+
+template std::string ChatHandler::PrepareStringNpcOrGoSpawnInformation<Creature>(uint32 guid);
+template std::string ChatHandler::PrepareStringNpcOrGoSpawnInformation<GameObject>(uint32 guid);
