@@ -2630,7 +2630,7 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst (const Unit *pVictim, WeaponAttack
     // parry & block chances
 
     // check if attack comes from behind, nobody can parry or block if attacker is behind
-    if (!pVictim->HasInArc(M_PI_F,this) && !pVictim->HasAura(19263))
+    if (!pVictim->HasInArc(M_PI_F,this))
     {
         DEBUG_FILTER_LOG(LOG_FILTER_COMBAT, "RollMeleeOutcomeAgainst: attack came from behind.");
     }
@@ -2934,13 +2934,23 @@ SpellMissInfo Unit::MeleeSpellHitResult(Unit *pVictim, SpellEntry const *spell, 
     bool canDodge = true;
     bool canParry = true;
 
-    // Some spells cannot be parry/dodge
+    // Same spells cannot be parry/dodge
     if (spell->Attributes & SPELL_ATTR_IMPOSSIBLE_DODGE_PARRY_BLOCK)
         return SPELL_MISS_NONE;
 
-    // Ranged attack cannot be parry/dodge only miss
+    // Ranged attack cannot be parry/dodge only deflect
     if (attType == RANGED_ATTACK)
+    {
+        // only if in front
+        if (pVictim->HasInArc(M_PI_F,this))
+        {
+            int32 deflect_chance = pVictim->GetTotalAuraModifier(SPELL_AURA_DEFLECT_SPELLS)*100;
+            tmp+=deflect_chance;
+            if (roll < tmp)
+                return SPELL_MISS_DEFLECT;
+        }
         return SPELL_MISS_NONE;
+    }
 
     // Check for attack from behind
     if (!pVictim->HasInArc(M_PI_F,this))
@@ -2949,8 +2959,7 @@ SpellMissInfo Unit::MeleeSpellHitResult(Unit *pVictim, SpellEntry const *spell, 
         if (GetTypeId() == TYPEID_PLAYER && pVictim->GetTypeId() == TYPEID_PLAYER)
             canDodge = false;
         // Can`t parry
-        if (!pVictim->HasAura(19263))
-            canParry = false;
+        canParry = false;
     }
     // Check creatures flags_extra for disable parry
     if(pVictim->GetTypeId()==TYPEID_UNIT)
@@ -3084,10 +3093,14 @@ SpellMissInfo Unit::MagicSpellHitResult(Unit *pVictim, SpellEntry const *spell)
     if (rand < tmp)
         return SPELL_MISS_MISS;
 
-    int32 deflect_chance = pVictim->GetTotalAuraModifier(SPELL_AURA_DEFLECT_SPELLS)*100;
-    tmp+=deflect_chance;
-    if (rand < tmp)
-        return SPELL_MISS_DEFLECT;
+    // cast by caster in front of victim
+    if (pVictim->HasInArc(M_PI_F,this))
+    {
+        int32 deflect_chance = pVictim->GetTotalAuraModifier(SPELL_AURA_DEFLECT_SPELLS)*100;
+        tmp+=deflect_chance;
+        if (rand < tmp)
+            return SPELL_MISS_DEFLECT;
+    }
 
     return SPELL_MISS_NONE;
 }
