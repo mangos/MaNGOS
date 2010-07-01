@@ -1122,7 +1122,7 @@ bool Group::_addMember(const uint64 &guid, const char* name, bool isAssistant, u
         else
             player->SetGroup(this, group);
         // if the same group invites the player back, cancel the homebind timer
-        InstanceGroupBind *bind = GetBoundInstance(player);
+        InstanceGroupBind *bind = GetBoundInstance(player->GetMapId(), player);
         if(bind && bind->save->GetInstanceId() == player->GetInstanceId())
             player->m_InstanceValid = true;
     }
@@ -1651,9 +1651,8 @@ void Group::ResetInstances(uint8 method, bool isRaid, Player* SendMsgTo)
     }
 }
 
-InstanceGroupBind* Group::GetBoundInstance(Player* player)
+InstanceGroupBind* Group::GetBoundInstance(uint32 mapid, Player* player)
 {
-    uint32 mapid = player->GetMapId();
     MapEntry const* mapEntry = sMapStore.LookupEntry(mapid);
     if(!mapEntry)
         return NULL;
