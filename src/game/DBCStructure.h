@@ -510,6 +510,9 @@ struct AreaTableEntry
     uint32  team;                                           // 12
                                                             // 13-19 unknown
     //uint32 unk20;                                         // 20 4.0.0
+    //uint32 unk21;                                         // 21 4.0.0
+    //uint32 unk22;                                         // 22 4.0.0
+    //uint32 unk23;                                         // 23 4.0.0
 };
 
 struct AreaGroupEntry
