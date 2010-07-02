@@ -13,12 +13,16 @@ http://getmangos.com/community/
 Please submit bug reports at:
 http://mangos.lighthouseapp.com/
 
-Version 0.16
+Version 0.17
  * Under discussion.
+ * Upgrade to client version 3.3.5a (build 12340).
+
+Version 0.16
  * G3DLite lib upgrade to G3DLite 8.0b4
  * OpenSSL lib upgrade to OpenSSL 1.0.0.
  * Sockets lib use dropped.
  * dotconfpp lib use dropped.
+ * Implemented SOAP in MaNGOS.
  * Upgrade to client version 3.3.3a (build 11723).
 
 Version 0.15

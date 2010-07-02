@@ -1242,7 +1242,7 @@ enum Opcodes
     SMSG_ITEM_REFUND_RESULT                         = 0x4B5, // refund item result
     CMSG_CORPSE_MAP_POSITION_QUERY                  = 0x4B6, // CMSG, uint32
     SMSG_CORPSE_MAP_POSITION_QUERY_RESPONSE         = 0x4B7, // SMSG, 3*float+float
-    CMSG_LFG_SET_ROLES_2                            = 0x4B8, // not found
+    UMSG_UNKNOWN_1208                               = 0x4B8, // not found
     UMSG_UNKNOWN_1209                               = 0x4B9, // not found
     CMSG_CALENDAR_CONTEXT_EVENT_SIGNUP              = 0x4BA, // CMSG, uint64, lua: CalendarContextEventSignUp
     SMSG_CALENDAR_ACTION_PENDING                    = 0x4BB, // SMSG, calendar related EVENT_CALENDAR_ACTION_PENDING
@@ -1336,12 +1336,12 @@ enum Opcodes
     UMSG_UNKNOWN_1299                               = 0x513, // not found
     SMSG_COMBAT_LOG_MULTIPLE                        = 0x514, // SMSG, multi combatlog
     SMSG_LFG_OPEN_FROM_GOSSIP                       = 0x515, // event EVENT_LFG_OPEN_FROM_GOSSIP (opens dungeon finder, probably for outdoor bosses)
-    SMSG_UNKNOWN_1302                               = 0x516, // something with player movement (move event 58?)
-    CMSG_UNKNOWN_1303                               = 0x517, // something with player movement (move event 58?)
-    SMSG_UNKNOWN_1304                               = 0x518, // something with player movement (move event 58?), speed packet
+    SMSG_UNKNOWN_1302                               = 0x516, // something with player movement (move event 58)
+    CMSG_UNKNOWN_1303                               = 0x517, // something with player movement (move event 58)
+    SMSG_UNKNOWN_1304                               = 0x518, // something with player movement (move event 58), speed packet
     UMSG_UNKNOWN_1305                               = 0x519, // not found
     UMSG_UNKNOWN_1306                               = 0x51A, // not found
-    CMSG_UNKNOWN_1307                               = 0x51B, // Lua_CommentatorSetSkirmishMatchmakingMode and Lua_CommentatorRequestSkirmishQueueData
+    CMSG_COMMENTATOR_SKIRMISH_QUEUE_COMMAND         = 0x51B, // Lua_CommentatorSetSkirmishMatchmakingMode and Lua_CommentatorRequestSkirmishQueueData
     SMSG_UNKNOWN_1308                               = 0x51C, // EVENT_COMMENTATOR_SKIRMISH_QUEUE_REQUEST
     CMSG_UNKNOWN_1309                               = 0x51D, // Lua_Transform
     SMSG_UNKNOWN_1310                               = 0x51E, // ERR_ALTERED_FORM_CANT_TRANSFORM_RIGHT_NOW or ERR_ALTERED_FORM_CAN_NEVER_TRANSFORM
