@@ -14,9 +14,9 @@
 
 ## Prelude, basic settings for Autoconf
 #  PACKAGE:            mangos
-#  VERSION:            0.16.1
+#  VERSION:            0.17.0 (trunk)
 #  BUG-REPORT-ADDRESS: mangos-devs@lists.sourceforge.net
-AC_INIT( [mangos], [0.16.1], [mangos-devs@lists.sourceforge.net])
+AC_INIT( [mangos], [0.17.0], [mangos-devs@lists.sourceforge.net])
 AC_CONFIG_SRCDIR([src/shared/Common.h])
 AC_CONFIG_MACRO_DIR([m4])
 
