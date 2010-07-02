@@ -1684,30 +1684,6 @@ SOAP.IP = 127.0.0.1
 SOAP.Port = 7878
 
 ###################################################################################################################
-# MOVEMENT ANTICHEAT
-#
-#    Anticheat.Movement.Enable
-#        Enable Movement Anticheat
-#        Default: 1 - on
-#                 0 - off
-#
-#    Anticheat.Movement.TeleportToPlaneAlarms
-#        maximum alarms before player will be kicked (default 50, allowed 20 - 100)
-#
-#    Anticheat.Movement.MistimingDelta
-#        mistiming intelval between client and serverside (default 10000 ms, allowed 1000 - 15000 ms)
-#
-#    Anticheat.Movement.MistimingAlarms
-#        mistiming alarms before player will be kicked (default 20, allowed 10 - 50)
-#
-###################################################################################################################
-
-Anticheat.Movement.Enable = 1
-Anticheat.Movement.TeleportToPlaneAlarms = 50
-Anticheat.Movement.MistimingDelta = 10000
-Anticheat.Movement.MistimingAlarms = 20
-
-###################################################################################################################
 #    CharDelete.Method
 #        Character deletion behavior
 #        Default: 0  - Completely remove the character from the database

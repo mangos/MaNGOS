@@ -79,12 +79,6 @@ float World::m_MaxVisibleDistanceInFlight     = DEFAULT_VISIBILITY_DISTANCE;
 float World::m_VisibleUnitGreyDistance        = 0;
 float World::m_VisibleObjectGreyDistance      = 0;
 
-//movement anticheat
-bool World::m_EnableMvAnticheat = true;
-uint32 World::m_TeleportToPlaneAlarms = 50;
-uint32 World::m_MistimingAlarms = 20;
-uint32 World::m_MistimingDelta = 10000;
-
 /// World constructor
 World::World()
 {
@@ -518,20 +512,6 @@ void World::LoadConfigSettings(bool reload)
 
     setConfigPos(CONFIG_FLOAT_CREATURE_FAMILY_ASSISTANCE_RADIUS,      "CreatureFamilyAssistanceRadius",     10.0f);
     setConfigPos(CONFIG_FLOAT_CREATURE_FAMILY_FLEE_ASSISTANCE_RADIUS, "CreatureFamilyFleeAssistanceRadius", 30.0f);
-
-    ///- Read movement anticheat from the config file
-    setConfigMinMax(CONFIG_UINT32_ANTICHEAT_TELEPORTTOPLANE_ALARMS, "Anticheat.Movement.TeleportToPlaneAlarms", 50, 20, 100);
-    setConfigMinMax(CONFIG_UINT32_ANTICHEAT_MISTIMING_DELTA, "Anticheat.Movement.MistimingDelta", 10000, 1000, 15000);
-    setConfigMinMax(CONFIG_UINT32_ANTICHEAT_MISTIMING_ALARMS, "Anticheat.Movement.MistimingAlarms", 20, 10, 50);
-    setConfig(CONFIG_BOOL_ANTICHEAT_ENABLE, "Anticheat.Movement.Enable", true);
-
-    m_EnableMvAnticheat = sConfig.GetBoolDefault("Anticheat.Movement.Enable",true);
-    if (m_EnableMvAnticheat) {
-    m_TeleportToPlaneAlarms = sConfig.GetIntDefault("Anticheat.Movement.TeleportToPlaneAlarms",50);
-    m_MistimingDelta = sConfig.GetIntDefault("Anticheat.Movement.MistimingDelta",10000);
-    m_MistimingAlarms = sConfig.GetIntDefault("Anticheat.Movement.MistimingAlarms",20);
-    sLog.outDebug("Anticheat parameters %i, %i, %i",m_TeleportToPlaneAlarms,m_MistimingAlarms,m_MistimingDelta);
-    } else sLog.outError("Anticheat movement disabled");
 
     ///- Read other configuration items from the config file
     setConfigMinMax(CONFIG_UINT32_COMPRESSION, "Compression", 1, 1, 9);
