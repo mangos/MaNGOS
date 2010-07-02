@@ -1,6 +1,6 @@
-MaNGOS 0.16   (??? ??? 2010)
+MaNGOS 0.17   (??? ??? 2010)
 
- MaNGOS 0.16 - adds further improvements to the
+ MaNGOS 0.17 - adds further improvements to the
  server core as well as to the majority of game classes and the game content
  database.
 
@@ -11,6 +11,50 @@ MaNGOS 0.16   (??? ??? 2010)
  ==== Statistics ====
  * Fixed Bugs: ??? tickets and many bugs reported at forum resolved
  * Total number of changes: ??? revisions (??? commits)
+
+
+MaNGOS 0.16   (2 July 2010)
+
+ MaNGOS 0.16 - adds further improvements to the
+ server core as well as to the majority of game classes and the game content
+ database.
+
+ ==== Game Features ====
+
+ * Added: Implemented support dual talents spec work.
+ * Added: Implemented support weekly quests cooldowns.
+ * Added: player/group tap of attacked creature, and other loot related changes and fixes.
+ * Added: Implemented proper way enchanting in trade slot.
+ * Improved: Pool system work, especially with pool creatures/gameobjects as event parts.
+ * Improved: Pets speed and movement flags at attack/follow mode switches.
+ * Improved: Better work gameobjects at use.
+ * Improved: Fixed problem with non-attackable pets/totems at arenas.
+ * Improved: Fixed long time existed problem with "partly-resurrection" character with periodic HoT auras in some cases.
+ * Improved: More achievement types support added.
+ * Improved: More proper use movement/spline flags and movement packets let more correct show creature movement in some cases.
+ * Improved: shareable quest work and related quest objective complete events.
+ * Improved: Recalculate bounding radius and combat reach distance at model scale.
+ * plus lots of fixes for auras, effects, spells, talents, glyphs and more.
+
+ ==== Server Features ====
+
+ * Added: Implemented SOAP in MaNGOS 
+ * Added: Camera framework for proper mind vision like spells use and grid code cleanups including remove unused cell-level thread locking. 
+ * Added: New table character_stats for external tools.
+ * Added: More user friendly output at DB version check fail.
+ * Improved: Update used utf8 cpp library version up to 2.2.4
+ * Improved: Character `data` field values finally replaced by normal table fields.
+ * Improved: Increase reserved stack size for mangosd up to 4Mb at Windows 
+ * Improved: Rewritten realmd and mangosd RA code use ACE network classes and drop Sockets lib.
+ * Improved: OpenSSL lib upgrade to OpenSSL 1.0.0.
+ * Improved: Use ACE config library instead dropped dotconfpp.
+ * Improved: G3DLite lib upgrade to G3DLite 8.0b4
+ * plus lots of improvements in chat/console commands, server startup DB integrity checks.
+
+ ==== Statistics ====
+ * Fixed Bugs: 130 tickets and many bugs reported at forum resolved
+ * Total number of changes: 1000 revisions (1010 commits)
+
 
 MaNGOS 0.15   (10 January 2010)
 
