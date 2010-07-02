@@ -50,6 +50,7 @@ DatabaseMysql::DatabaseMysql() : Database(), mMysql(0)
         if (!mysql_thread_safe())
         {
             sLog.outError("FATAL ERROR: Used MySQL library isn't thread-safe.");
+            Log::WaitBeforeContinueIfNeed();
             exit(1);
         }
     }

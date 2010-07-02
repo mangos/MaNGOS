@@ -2704,7 +2704,7 @@ enum TradeStatus
 
 // we need to stick to 1 version or half of the stuff will work for someone
 // others will not and opposite
-// will only support WoW, WoW:TBC and WoW:WotLK 3.3.5 client build 12340...
+// will only support WoW, WoW:TBC and WoW:WotLK 3.3.5a client build 12340...
 
 #define EXPECTED_MANGOSD_CLIENT_BUILD        {12340, 0}
 

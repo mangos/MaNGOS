@@ -2434,6 +2434,7 @@ void ObjectMgr::LoadPetLevelInfo()
         if(!pInfo || pInfo[0].health == 0 )
         {
             sLog.outErrorDb("Creature %u does not have pet stats data for Level 1!",itr->first);
+            Log::WaitBeforeContinueIfNeed();
             exit(1);
         }
 
@@ -2477,6 +2478,7 @@ void ObjectMgr::LoadPlayerInfo()
             sLog.outString();
             sLog.outString( ">> Loaded %u player create definitions", count );
             sLog.outErrorDb( "Error loading `playercreateinfo` table or empty table.");
+            Log::WaitBeforeContinueIfNeed();
             exit(1);
         }
 
@@ -2756,6 +2758,7 @@ void ObjectMgr::LoadPlayerInfo()
             sLog.outString();
             sLog.outString( ">> Loaded %u level health/mana definitions", count );
             sLog.outErrorDb( "Error loading `player_classlevelstats` table or empty table.");
+            Log::WaitBeforeContinueIfNeed();
             exit(1);
         }
 
@@ -2824,6 +2827,7 @@ void ObjectMgr::LoadPlayerInfo()
         if(!pClassInfo->levelInfo || pClassInfo->levelInfo[0].basehealth == 0 )
         {
             sLog.outErrorDb("Class %i Level 1 does not have health/mana data!",class_);
+            Log::WaitBeforeContinueIfNeed();
             exit(1);
         }
 
@@ -2852,6 +2856,7 @@ void ObjectMgr::LoadPlayerInfo()
             sLog.outString();
             sLog.outString( ">> Loaded %u level stats definitions", count );
             sLog.outErrorDb( "Error loading `player_levelstats` table or empty table.");
+            Log::WaitBeforeContinueIfNeed();
             exit(1);
         }
 
@@ -2942,6 +2947,7 @@ void ObjectMgr::LoadPlayerInfo()
             if(!pInfo->levelInfo || pInfo->levelInfo[0].stats[0] == 0 )
             {
                 sLog.outErrorDb("Race %i Class %i Level 1 does not have stats data!",race,class_);
+                Log::WaitBeforeContinueIfNeed();
                 exit(1);
             }
 
@@ -2975,6 +2981,7 @@ void ObjectMgr::LoadPlayerInfo()
             sLog.outString();
             sLog.outString( ">> Loaded %u xp for level definitions", count );
             sLog.outErrorDb( "Error loading `player_xp_for_level` table or empty table.");
+            Log::WaitBeforeContinueIfNeed();
             exit(1);
         }
 
