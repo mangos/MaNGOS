@@ -1518,11 +1518,14 @@ struct SpellRadiusEntry
 
 struct SpellRangeEntry
 {
-    uint32    ID;
-    float     minRange;
-    float     minRangeFriendly;
-    float     maxRange;
-    float     maxRangeFriendly;
+    uint32    ID;                                           // 0
+    float     minRange;                                     // 1
+    float     minRangeFriendly;                             // 2
+    float     maxRange;                                     // 3
+    float     maxRangeFriendly;                             // 4
+    //uint32     Flags;                                       // 5
+    //char*     range1;                                       // 6
+    //char*     range2;                                       // 7
 };
 
 struct SpellRuneCostEntry
