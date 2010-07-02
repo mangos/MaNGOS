@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_10125_01_mangos_mangos_string` bit(1) default NULL
+  `required_10131_01_mangos_spell_bonus_data` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -14317,6 +14317,7 @@ INSERT INTO `spell_bonus_data` VALUES
 (1120,  0,      0.4286,  0,     'Warlock - Drain Soul'),
 (28176, 0,      0,       0,     'Warlock - Fel Armor'),
 (18790, 0,      0,       0,     'Warlock - Fel Stamina'),
+(54181, 0,      0,       0,     'Warlock - Fel Synergy'),
 (48181, 0.4729, 0,       0,     'Warlock - Haunt'),
 (755 ,  0,      0.4485,  0,     'Warlock - Health Funnel'),
 (1949,  0,      0.0946,  0,     'Warlock - Hellfire'),
