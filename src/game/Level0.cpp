@@ -151,7 +151,7 @@ bool ChatHandler::HandleSaveCommand(const char* /*args*/)
 
 bool ChatHandler::HandleGMListIngameCommand(const char* /*args*/)
 {
-    bool first = true;
+    std::list< std::pair<std::string, bool> > names;
 
     {
         HashMapHolder<Player>::ReadGuard g(HashMapHolder<Player>::GetLock());
@@ -161,19 +161,20 @@ bool ChatHandler::HandleGMListIngameCommand(const char* /*args*/)
             AccountTypes itr_sec = itr->second->GetSession()->GetSecurity();
             if ((itr->second->isGameMaster() || (itr_sec > SEC_PLAYER && itr_sec <= (AccountTypes)sWorld.getConfig(CONFIG_UINT32_GM_LEVEL_IN_GM_LIST))) &&
                 (!m_session || itr->second->IsVisibleGloballyFor(m_session->GetPlayer())))
-            {
-                if(first)
-                {
-                    SendSysMessage(LANG_GMS_ON_SRV);
-                    first = false;
-                }
-
-                SendSysMessage(GetNameLink(itr->second).c_str());
-            }
+                names.push_back(std::make_pair<std::string, bool>(GetNameLink(itr->second), itr->second->isAcceptWhispers()));
         }
     }
 
-    if(first)
+    if (!names.empty())
+    {
+        SendSysMessage(LANG_GMS_ON_SRV);
+
+        std::string accepts = GetMangosString(LANG_GM_ACCEPTS_WHISPER);
+        std::string not_accept = GetMangosString(LANG_GM_NO_WHISPER);
+        for(std::list<std::pair< std::string, bool> >::const_iterator iter = names.begin(); iter != names.end(); ++iter)
+            PSendSysMessage("%s - %s", iter->first.c_str(), iter->second ? accepts.c_str() : not_accept.c_str());
+    }
+    else
         SendSysMessage(LANG_GMS_NOT_LOGGED);
 
     return true;
