@@ -64,37 +64,26 @@ class MANGOS_DLL_SPEC ViewPoint
     friend class Camera;
 
     std::list<Camera*> m_cameras;
-    std::list<Camera*>::iterator m_camera_iter;
     GridType * m_grid;
 
     void Attach(Camera* c) { m_cameras.push_back(c); }
-
-    void Detach(Camera* c)
-    {
-        if (m_camera_iter != m_cameras.end() && *m_camera_iter == c)     // detach called during the loop
-            m_camera_iter = m_cameras.erase(m_camera_iter);
-        else
-            m_cameras.remove(c);
-    }
+    void Detach(Camera* c) { m_cameras.remove(c); }
 
     void CameraCall(void (Camera::*handler)())
     {
         if (!m_cameras.empty())
         {
-            for(m_camera_iter = m_cameras.begin(); m_camera_iter != m_cameras.end(); ++m_camera_iter)
+            for(std::list<Camera*>::iterator itr = m_cameras.begin(); itr != m_cameras.end();)
             {
-                ((*m_camera_iter)->*handler)();
-
-                // can be end() after handler
-                if (m_camera_iter == m_cameras.end())
-                    break;
+                Camera *c = *(itr++);
+                (c->*handler)();
             }
         }
     }
 
 public:
 
-    ViewPoint() : m_grid(0), m_camera_iter(m_cameras.end()) {}
+    ViewPoint() : m_grid(0) {}
     ~ViewPoint();
 
     bool hasViewers() const { return !m_cameras.empty(); }

@@ -606,7 +606,7 @@ void WorldSession::LoadAccountData(QueryResult* result, uint32 mask)
             continue;
         }
 
-        m_accountData[type].Time = fields[1].GetUInt32();
+        m_accountData[type].Time = time_t(fields[1].GetUInt64());
         m_accountData[type].Data = fields[2].GetCppString();
 
     } while (result->NextRow());
@@ -624,7 +624,7 @@ void WorldSession::SetAccountData(AccountDataType type, time_t time_, std::strin
         CharacterDatabase.PExecute("DELETE FROM account_data WHERE account='%u' AND type='%u'", acc, type);
         std::string safe_data = data;
         CharacterDatabase.escape_string(safe_data);
-        CharacterDatabase.PExecute("INSERT INTO account_data VALUES ('%u','%u','%u','%s')", acc, type, (uint32)time_, safe_data.c_str());
+        CharacterDatabase.PExecute("INSERT INTO account_data VALUES ('%u','%u','" UI64FMTD "','%s')", acc, type, uint64(time_), safe_data.c_str());
         CharacterDatabase.CommitTransaction ();
     }
     else
@@ -637,7 +637,7 @@ void WorldSession::SetAccountData(AccountDataType type, time_t time_, std::strin
         CharacterDatabase.PExecute("DELETE FROM character_account_data WHERE guid='%u' AND type='%u'", m_GUIDLow, type);
         std::string safe_data = data;
         CharacterDatabase.escape_string(safe_data);
-        CharacterDatabase.PExecute("INSERT INTO character_account_data VALUES ('%u','%u','%u','%s')", m_GUIDLow, type, (uint32)time_, safe_data.c_str());
+        CharacterDatabase.PExecute("INSERT INTO character_account_data VALUES ('%u','%u','" UI64FMTD "','%s')", m_GUIDLow, type, uint64(time_), safe_data.c_str());
         CharacterDatabase.CommitTransaction ();
     }
 
