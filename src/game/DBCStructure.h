@@ -1523,9 +1523,11 @@ struct SpellRangeEntry
     float     minRangeFriendly;                             // 2
     float     maxRange;                                     // 3
     float     maxRangeFriendly;                             // 4
-    //uint32     Flags;                                       // 5
-    //char*     range1;                                       // 6
-    //char*     range2;                                       // 7
+    //uint32  Flags;                                        // 5
+    //char*   Name[16];                                     // 6-21 unused
+    //uint32  NameFlags;                                    // 22 unused
+    //char*   ShortName[16];                                // 23-38 unused
+    //uint32  NameFlags;                                    // 39 unused
 };
 
 struct SpellRuneCostEntry
