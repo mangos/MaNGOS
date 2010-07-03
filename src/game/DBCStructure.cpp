@@ -329,3 +329,9 @@ uint32 SpellEntry::GetCasterAuraState() const
     SpellAuraRestrictionsEntry const* aura = GetSpellAuraRestrictions();
     return aura ? aura->CasterAuraState : 0;
 }
+
+uint32 SpellEntry::GetTargets() const
+{
+    SpellTargetRestrictionsEntry const* target = GetSpellTargetRestrictions();
+    return target ? target->Targets : 0;
+}

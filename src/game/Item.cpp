@@ -903,7 +903,7 @@ bool Item::IsFitToSpellRequirements(SpellEntry const* spellInfo) const
     // Only check for item enchantments (TARGET_FLAG_ITEM), all other spells are either NPC spells
     // or spells where slot requirements are already handled with AttributesEx3 fields
     // and special code (Titan's Grip, Windfury Attack). Check clearly not applicable for Lava Lash.
-    if(equippedItems->EquippedItemInventoryTypeMask != 0 && (spellInfo->Targets & TARGET_FLAG_ITEM))    // 0 == any inventory type
+    if(equippedItems->EquippedItemInventoryTypeMask != 0 && (spellInfo->GetTargets() & TARGET_FLAG_ITEM))    // 0 == any inventory type
     {
         if((equippedItems->EquippedItemInventoryTypeMask  & (1 << proto->InventoryType)) == 0)
             return false;                                   // inventory type not present in mask

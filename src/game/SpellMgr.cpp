@@ -424,7 +424,7 @@ SpellSpecific GetSpellSpecific(uint32 spellId)
                 return SPELL_WARLOCK_ARMOR;
 
             // Unstable Affliction | Immolate
-            if (spellInfo->SpellFamilyFlags & UI64LIT(0x10000000004))
+            if (classOpt && classOpt->SpellFamilyFlags & UI64LIT(0x10000000004))
                 return SPELL_UA_IMMOLATE;
             break;
         }
