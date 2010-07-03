@@ -51,6 +51,11 @@ class DynamicObject : public WorldObject
         bool IsHostileTo(Unit const* unit) const;
         bool IsFriendlyTo(Unit const* unit) const;
 
+        float GetObjectBoundingRadius() const               // overwrite WorldObject version
+        {
+            return 0.0f;                                    // dynamic object not have real interact size
+        }
+
         bool isVisibleForInState(Player const* u, WorldObject const* viewPoint, bool inVisibleList) const;
 
         void Say(int32 textId, uint32 language, uint64 TargetGuid) { MonsterSay(textId,language,TargetGuid); }
