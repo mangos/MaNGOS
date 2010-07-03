@@ -230,6 +230,24 @@ bool ItemCanGoIntoBag(ItemPrototype const *pProto, ItemPrototype const *pBagProt
     return false;
 }
 
+bool IsTitanGripWeapon(ItemPrototype const* proto)
+{
+    switch(proto->SubClass)
+    {
+        case ITEM_SUBCLASS_WEAPON_AXE:
+        case ITEM_SUBCLASS_WEAPON_AXE2:
+        case ITEM_SUBCLASS_WEAPON_MACE:
+        case ITEM_SUBCLASS_WEAPON_MACE2:
+        case ITEM_SUBCLASS_WEAPON_SWORD:
+        case ITEM_SUBCLASS_WEAPON_SWORD2:
+        case ITEM_SUBCLASS_WEAPON_FIST:
+        case ITEM_SUBCLASS_WEAPON_DAGGER:
+            return true;
+        default:
+            return false;
+    }
+}
+
 Item::Item( )
 {
     m_objectType |= TYPEMASK_ITEM;
