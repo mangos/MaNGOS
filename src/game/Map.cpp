@@ -2955,6 +2955,27 @@ void Map::ScriptsProcess()
 
                 break;
             }
+            case SCRIPT_COMMAND_PLAY_MOVIE:
+            {
+                if (!target && !source)
+                {
+                    sLog.outError("SCRIPT_COMMAND_PLAY_MOVIE (script id %u) call for NULL object.", step.script->id);
+                    break;
+                }
+
+                // only Player
+                if ((!target || target->GetTypeId() != TYPEID_PLAYER) && (!source || source->GetTypeId() != TYPEID_PLAYER))
+                {
+                    sLog.outError("SCRIPT_COMMAND_PLAY_MOVIE (script id %u) call for non-player (TypeIdSource: %u)(TypeIdTarget: %u), skipping.", step.script->id, source ? source->GetTypeId() : 0, target ? target->GetTypeId() : 0);
+                    break;
+                }
+
+                Player* pReceiver = target && target->GetTypeId() == TYPEID_PLAYER ? (Player*)target : (Player*)source;
+
+                pReceiver->SendMovieStart(step.script->datalong);
+
+                break;
+            }
             default:
                 sLog.outError("Unknown SCRIPT_COMMAND_ %u called for script id %u.",step.script->command, step.script->id);
                 break;
