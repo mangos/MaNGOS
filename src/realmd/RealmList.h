@@ -31,7 +31,6 @@ struct RealmBuildInfo
     int major_version;
     int minor_version;
     int bugfix_version;
-    int hotfix_version;
 };
 
 RealmBuildInfo const* FindBuildInfo(uint16 _build);
