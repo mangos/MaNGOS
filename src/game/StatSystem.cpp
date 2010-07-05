@@ -881,28 +881,36 @@ bool Pet::UpdateStats(Stats stat)
 
     Unit *owner = GetOwner();
 
-    // chained, use original owner instead
     if (owner && owner->GetTypeId() == TYPEID_UNIT && ((Creature*)owner)->GetEntry() == GetEntry())
         if (Unit *creator = GetCreator())
             owner = creator;
 
-    if ( stat == STAT_STAMINA )
+    if (owner)
     {
-        if(owner)
-            value += float(owner->GetStat(stat)) * 0.3f;
-    }
-    else if ( stat == STAT_STRENGTH && getPetType() == SUMMON_PET )
-    {
-        if (owner && (owner->getClass() == CLASS_DEATH_KNIGHT))
+        switch(stat)
         {
-            value += float(owner->GetStat(stat)) * 1.0f;
-        }
-    }
-                                                            //warlock's and mage's pets gain 30% of owner's intellect
-    else if ( stat == STAT_INTELLECT && getPetType() == SUMMON_PET )
-    {
-        if(owner && (owner->getClass() == CLASS_WARLOCK || owner->getClass() == CLASS_MAGE) )
-            value += float(owner->GetStat(stat)) * 0.3f;
+            case STAT_STAMINA:
+                // warlock's pets gain 75% of owner's stamina
+                if (getPetType() == SUMMON_PET && owner->getClass() == CLASS_WARLOCK)
+                    value += owner->GetStat(stat) * 0.75f;
+                else
+                {
+                    if (getPetType() == SUMMON_PET || getPetType() == HUNTER_PET)
+                        value += owner->GetStat(stat) * 0.3f;
+                }
+                break;
+            case STAT_INTELLECT:
+                // warlock's and mage's pets gain 30% of owner's intellect
+                if (getPetType() == SUMMON_PET && (owner->getClass() == CLASS_WARLOCK || owner->getClass() == CLASS_MAGE))
+                    value += owner->GetStat(stat) * 0.3f;
+                break;
+            case STAT_STRENGHT:
+                {
+                if (getPetType() == SUMMON_PET  && (owner->getClass() == CLASS_DEATH_KNIGHT))
+                    value += float(owner->GetStat(stat)) * 1.0f;
+                }
+                break;
+        };
     }
 
     SetStat(stat, int32(value));
