@@ -9926,7 +9926,7 @@ uint8 Player::_CanStoreItem( uint8 bag, uint8 slot, ItemPosCountVec &dest, uint3
     }
 
     // Normally it would be impossible to autostore not empty bags
-    if(pItem->IsBag() && !((Bag*)pItem)->IsEmpty())
+    if (pItem && pItem->IsBag() && !((Bag*)pItem)->IsEmpty())
         return EQUIP_ERR_NONEMPTY_BAG_OVER_OTHER_BAG;
 
     // search free slot
