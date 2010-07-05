@@ -64,6 +64,16 @@ enum GossipOptionIcon
     GOSSIP_ICON_TABARD              = 8,                    //tabard
     GOSSIP_ICON_BATTLE              = 9,                    //two swords
     GOSSIP_ICON_DOT                 = 10,                   //yellow dot
+    GOSSIP_ICON_CHAT_11             = 11,                   //This and below are most the same visual as GOSSIP_ICON_CHAT
+    GOSSIP_ICON_CHAT_12             = 12,                   //but are still used for unknown reasons.
+    GOSSIP_ICON_CHAT_13             = 13,
+    GOSSIP_ICON_CHAT_14             = 14,                   // probably invalid
+    GOSSIP_ICON_CHAT_15             = 15,                   // probably invalid
+    GOSSIP_ICON_CHAT_16             = 16,
+    GOSSIP_ICON_CHAT_17             = 17,
+    GOSSIP_ICON_CHAT_18             = 18,
+    GOSSIP_ICON_CHAT_19             = 19,
+    GOSSIP_ICON_CHAT_20             = 20,
     GOSSIP_ICON_MAX
 };
 
