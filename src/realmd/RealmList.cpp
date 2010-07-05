@@ -109,7 +109,6 @@ void RealmList::UpdateRealm( uint32 ID, const std::string& name, const std::stri
     realm.realmBuildInfo.major_version = 0;
     realm.realmBuildInfo.minor_version = 0;
     realm.realmBuildInfo.bugfix_version = 0;
-    realm.realmBuildInfo.hotfix_version = ' ';
 
     if (first_build)
         if (RealmBuildInfo const* bInfo = FindBuildInfo(first_build))
