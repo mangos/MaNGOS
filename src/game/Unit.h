@@ -1110,6 +1110,11 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         void CleanupsBeforeDelete();                        // used in ~Creature/~Player (or before mass creature delete to remove cross-references to already deleted units)
 
+        float GetObjectBoundingRadius() const               // overwrite WorldObject version
+        {
+            return m_floatValues[UNIT_FIELD_BOUNDINGRADIUS];
+        }
+
         DiminishingLevels GetDiminishing(DiminishingGroup  group);
         void IncrDiminishing(DiminishingGroup group);
         void ApplyDiminishingToDuration(DiminishingGroup  group, int32 &duration,Unit* caster, DiminishingLevels Level, int32 limitduration);

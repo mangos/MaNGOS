@@ -4545,6 +4545,16 @@ void ObjectMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
                 // for later, we might consider despawn by database guid, and define in datalong2 as option to despawn self.
                 break;
             }
+            case SCRIPT_COMMAND_PLAY_MOVIE:
+            {
+                if (!sMovieStore.LookupEntry(tmp.datalong))
+                {
+                    sLog.outErrorDb("Table `%s` use non-existing movie_id (id: %u) in SCRIPT_COMMAND_PLAY_MOVIE for script id %u",
+                        tablename, tmp.datalong, tmp.id);
+                    continue;
+                }
+                break;
+           }
         }
 
         if (scripts.find(tmp.id) == scripts.end())
