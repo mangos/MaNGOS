@@ -169,10 +169,10 @@ bool ChatHandler::HandleGMListIngameCommand(const char* /*args*/)
     {
         SendSysMessage(LANG_GMS_ON_SRV);
 
-        std::string accepts = GetMangosString(LANG_GM_ACCEPTS_WHISPER);
-        std::string not_accept = GetMangosString(LANG_GM_NO_WHISPER);
+        char const* accepts = GetMangosString(LANG_GM_ACCEPTS_WHISPER);
+        char const* not_accept = GetMangosString(LANG_GM_NO_WHISPER);
         for(std::list<std::pair< std::string, bool> >::const_iterator iter = names.begin(); iter != names.end(); ++iter)
-            PSendSysMessage("%s - %s", iter->first.c_str(), iter->second ? accepts.c_str() : not_accept.c_str());
+            PSendSysMessage("%s - %s", iter->first.c_str(), iter->second ? accepts : not_accept);
     }
     else
         SendSysMessage(LANG_GMS_NOT_LOGGED);

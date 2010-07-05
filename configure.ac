@@ -156,6 +156,7 @@ fi
 #  Use libc-malloc or libtbb-malloc?
 AC_MSG_CHECKING(whether to use libc malloc)
 MANGOSD_STD_MALLOC=no
+TBB_LIBS="-L\$(top_builddir)/dep/tbb -ltbb -ltbbmalloc"
 AC_ARG_WITH(std-malloc,
 [
 Memory allocation options:
@@ -166,6 +167,7 @@ Memory allocation options:
         CFLAGS="-DUSE_STANDARD_MALLOC $CFLAGS"
         CXXFLAGS="-DUSE_STANDARD_MALLOC $CXXFLAGS"
         MANGOSD_STD_MALLOC=yes
+        TBB_LIBS=""
     elif test "$withval" != "no" ; then
         AC_MSG_ERROR(Please choose yes or no)
     fi
@@ -253,8 +255,8 @@ AM_CONDITIONAL([MANGOS_BUILD_ACE], [test X$enable_builtin_ace_support = Xyes])
 
 ## Unify all additional includes/libs in one variable.
 # TODO this looks kinda ugly, but when we add m4 folder I will make it look very pritey ( by Derex ).
-MANGOS_INCLUDES="$ACE_INCLUDES $POSTGRE_INCLUDES $MYSQL_INCLUDES $OPENSSL_INCLUDES $MANGOS_INCLUDES"
-MANGOS_LIBS="$ACE_LIBS $POSTGRE_LIBS $MYSQL_LIBS $ZLIB $COMPATLIB $OPENSSL_LDFLAGS $OPENSSL_LIBS $MANGOS_LIBS"
+MANGOS_INCLUDES="$ACE_INCLUDES $POSTGRE_INCLUDES $MYSQL_INCLUDES $OPENSSL_INCLUDES"
+MANGOS_LIBS="$ACE_LIBS $POSTGRE_LIBS $MYSQL_LIBS $ZLIB $COMPATLIB $OPENSSL_LDFLAGS $OPENSSL_LIBS $TBB_LIBS"
 
 ## Export defined variables
 AC_SUBST(DOXYGEN)

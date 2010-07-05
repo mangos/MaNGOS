@@ -1925,7 +1925,7 @@ enum CreatureTypeFlags
     CREATURE_TYPEFLAGS_MININGLOOT       = 0x00000200,       // Can be looted by miner
     CREATURE_TYPEFLAGS_UNK11            = 0x00000400,       // no idea, but it used by client
     CREATURE_TYPEFLAGS_UNK12            = 0x00000800,       // related to possibility to cast spells while mounted
-    CREATURE_TYPEFLAGS_UNK13            = 0x00001000,       // ? Can aid any player in combat if in range?
+    CREATURE_TYPEFLAGS_CAN_ASSIST       = 0x00001000,       // Can aid any player (and group) in combat. Typically seen for escorting NPC's
     CREATURE_TYPEFLAGS_UNK14            = 0x00002000,       // checked from calls in Lua_PetHasActionBar
     CREATURE_TYPEFLAGS_UNK15            = 0x00004000,       // Lua_UnitGUID, client does guid_low &= 0xFF000000 if this flag is set
     CREATURE_TYPEFLAGS_ENGINEERLOOT     = 0x00008000,       // Can be looted by engineer
