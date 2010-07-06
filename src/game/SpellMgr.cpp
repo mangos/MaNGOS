@@ -515,7 +515,6 @@ bool IsSingleFromSpellSpecificSpellRanksPerTarget(SpellSpecific spellSpec1,Spell
 {
     switch(spellSpec1)
     {
-        case SPELL_BLESSING:
         case SPELL_AURA:
         case SPELL_CURSE:
         case SPELL_ASPECT:
@@ -531,6 +530,7 @@ bool IsSingleFromSpellSpecificPerTarget(SpellSpecific spellSpec1,SpellSpecific s
 {
     switch(spellSpec1)
     {
+        case SPELL_BLESSING:
         case SPELL_SEAL:
         case SPELL_TRACKER:
         case SPELL_WARLOCK_ARMOR:
