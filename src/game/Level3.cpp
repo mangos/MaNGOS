@@ -3563,6 +3563,10 @@ bool ChatHandler::HandleAuraCommand(const char* args)
     SpellEntry const *spellInfo = sSpellStore.LookupEntry( spellID );
     if(spellInfo)
     {
+        SpellAuraHolder *holder = NULL;
+        if (IsSpellAppliesAura(spellInfo, (1 << EFFECT_INDEX_0) | (1 << EFFECT_INDEX_1) | (1 << EFFECT_INDEX_2)) || IsSpellHaveEffect(spellInfo, SPELL_EFFECT_PERSISTENT_AREA_AURA))
+            holder = CreateSpellAuraHolder(spellInfo, target, m_session->GetPlayer());
+
         for(uint32 i = 0; i < MAX_EFFECT_INDEX; ++i)
         {
             uint8 eff = spellInfo->Effect[i];
@@ -3572,10 +3576,11 @@ bool ChatHandler::HandleAuraCommand(const char* args)
                 eff == SPELL_EFFECT_APPLY_AURA  ||
                 eff == SPELL_EFFECT_PERSISTENT_AREA_AURA )
             {
-                Aura *Aur = CreateAura(spellInfo, SpellEffectIndex(i), NULL, target);
-                target->AddAura(Aur);
+                Aura *aur = CreateAura(spellInfo, SpellEffectIndex(i), NULL, holder, target);
+                holder->AddAura(aur, SpellEffectIndex(i));
             }
         }
+        target->AddSpellAuraHolder(holder);
     }
 
     return true;
@@ -4252,32 +4257,40 @@ bool ChatHandler::HandleListAurasCommand (const char * /*args*/)
     char const* talentStr = GetMangosString(LANG_TALENT);
     char const* passiveStr = GetMangosString(LANG_PASSIVE);
 
-    Unit::AuraMap const& uAuras = unit->GetAuras();
+    Unit::SpellAuraHolderMap const& uAuras = unit->GetSpellAuraHolderMap();
     PSendSysMessage(LANG_COMMAND_TARGET_LISTAURAS, uAuras.size());
-    for (Unit::AuraMap::const_iterator itr = uAuras.begin(); itr != uAuras.end(); ++itr)
+    for (Unit::SpellAuraHolderMap::const_iterator itr = uAuras.begin(); itr != uAuras.end(); ++itr)
     {
         bool talent = GetTalentSpellCost(itr->second->GetId()) > 0;
+        
+        SpellAuraHolder *holder = itr->second;
+        char const* name = holder->GetSpellProto()->SpellName[GetSessionDbcLocale()];
 
-        char const* name = itr->second->GetSpellProto()->SpellName[GetSessionDbcLocale()];
-
-        if (m_session)
+        for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
         {
-            std::ostringstream ss_name;
-            ss_name << "|cffffffff|Hspell:" << itr->second->GetId() << "|h[" << name << "]|h|r";
+            Aura *aur = holder->GetAuraByEffectIndex(SpellEffectIndex(i));
+            if (!aur)
+                continue;
+            
+            if (m_session)
+            {
+                std::ostringstream ss_name;
+                ss_name << "|cffffffff|Hspell:" << itr->second->GetId() << "|h[" << name << "]|h|r";
 
-            PSendSysMessage(LANG_COMMAND_TARGET_AURADETAIL, itr->second->GetId(), itr->second->GetEffIndex(),
-                itr->second->GetModifier()->m_auraname, itr->second->GetAuraDuration(), itr->second->GetAuraMaxDuration(),
-                ss_name.str().c_str(),
-                (itr->second->IsPassive() ? passiveStr : ""),(talent ? talentStr : ""),
-                IS_PLAYER_GUID(itr->second->GetCasterGUID()) ? "player" : "creature",GUID_LOPART(itr->second->GetCasterGUID()));
-        }
-        else
-        {
-            PSendSysMessage(LANG_COMMAND_TARGET_AURADETAIL, itr->second->GetId(), itr->second->GetEffIndex(),
-                itr->second->GetModifier()->m_auraname, itr->second->GetAuraDuration(), itr->second->GetAuraMaxDuration(),
-                name,
-                (itr->second->IsPassive() ? passiveStr : ""),(talent ? talentStr : ""),
-                IS_PLAYER_GUID(itr->second->GetCasterGUID()) ? "player" : "creature",GUID_LOPART(itr->second->GetCasterGUID()));
+                PSendSysMessage(LANG_COMMAND_TARGET_AURADETAIL, holder->GetId(), aur->GetEffIndex(),
+                    aur->GetModifier()->m_auraname, aur->GetAuraDuration(), aur->GetAuraMaxDuration(),
+                    ss_name.str().c_str(),
+                    (holder->IsPassive() ? passiveStr : ""),(talent ? talentStr : ""),
+                    IS_PLAYER_GUID(holder->GetCasterGUID()) ? "player" : "creature",GUID_LOPART(holder->GetCasterGUID()));
+            }
+            else
+            {
+                PSendSysMessage(LANG_COMMAND_TARGET_AURADETAIL, holder->GetId(), aur->GetEffIndex(),
+                    aur->GetModifier()->m_auraname, aur->GetAuraDuration(), aur->GetAuraMaxDuration(),
+                    name,
+                    (holder->IsPassive() ? passiveStr : ""),(talent ? talentStr : ""),
+                    IS_PLAYER_GUID(holder->GetCasterGUID()) ? "player" : "creature",GUID_LOPART(holder->GetCasterGUID()));
+            }
         }
     }
     for (int i = 0; i < TOTAL_AURAS; ++i)
@@ -4297,13 +4310,13 @@ bool ChatHandler::HandleListAurasCommand (const char * /*args*/)
                 ss_name << "|cffffffff|Hspell:" << (*itr)->GetId() << "|h[" << name << "]|h|r";
 
                 PSendSysMessage(LANG_COMMAND_TARGET_AURASIMPLE, (*itr)->GetId(), (*itr)->GetEffIndex(),
-                    ss_name.str().c_str(),((*itr)->IsPassive() ? passiveStr : ""),(talent ? talentStr : ""),
+                    ss_name.str().c_str(),((*itr)->GetHolder()->IsPassive() ? passiveStr : ""),(talent ? talentStr : ""),
                     IS_PLAYER_GUID((*itr)->GetCasterGUID()) ? "player" : "creature",GUID_LOPART((*itr)->GetCasterGUID()));
             }
             else
             {
                 PSendSysMessage(LANG_COMMAND_TARGET_AURASIMPLE, (*itr)->GetId(), (*itr)->GetEffIndex(),
-                    name,((*itr)->IsPassive() ? passiveStr : ""),(talent ? talentStr : ""),
+                    name,((*itr)->GetHolder()->IsPassive() ? passiveStr : ""),(talent ? talentStr : ""),
                     IS_PLAYER_GUID((*itr)->GetCasterGUID()) ? "player" : "creature",GUID_LOPART((*itr)->GetCasterGUID()));
             }
         }

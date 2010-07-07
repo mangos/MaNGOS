@@ -445,6 +445,9 @@
     <ClCompile Include="..\..\src\game\Camera.cpp">
       <Filter>Object</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\game\UnitAuraProcHandler.cpp">
+      <Filter>World/Handlers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\game\AccountMgr.h">
