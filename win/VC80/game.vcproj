@@ -966,6 +966,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\game\UnitAuraProcHandler.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\game\SpellEffects.cpp"
 				>
 			</File>
