@@ -15675,7 +15675,7 @@ void Player::_LoadAuras(QueryResult *result, uint32 timediff)
 
                 holder->SetLoadedState(caster_guid, stackcount, remaincharges);
                 AddSpellAuraHolder(holder);
-                DETAIL_LOG("Added auras from spellid %u, effect %u", spellproto->Id);
+                DETAIL_LOG("Added auras from spellid %u", spellproto->Id);
             }
             else
                 delete holder;
