@@ -389,8 +389,18 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                     case 73708:
                     case 73709:
                     case 73710:
-                        damage = damage * m_caster->GetFloatValue(OBJECT_FIELD_SCALE_X);
+                        damage = damage * m_caster->GetObjectScale();
                         break;
+                    // Growling ooze puddle
+                    case 70346:
+                    case 72456:
+                    case 72868:
+                    case 72869:
+                    {
+                        float distance = unitTarget->GetDistance2d(m_caster); 
+                        damage *= exp(-distance/(5.0f*m_caster->GetObjectScale()));
+                        break;
+                    }
                 }
                 break;
             }
