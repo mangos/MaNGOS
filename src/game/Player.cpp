@@ -15662,16 +15662,16 @@ void Player::_LoadAuras(QueryResult *result, uint32 timediff)
             }
 
             // prevent wrong values of remaincharges
-            if(spellproto->procCharges)
+            if(spellproto->GetProcCharges())
             {
-                if(remaincharges <= 0 || remaincharges > (int32)spellproto->procCharges)
-                    remaincharges = spellproto->procCharges;
+                if(remaincharges <= 0 || remaincharges > (int32)spellproto->GetProcCharges())
+                    remaincharges = spellproto->GetProcCharges();
             }
             else
                 remaincharges = 0;
 
-            if (spellproto->StackAmount < stackcount)
-                stackcount = spellproto->StackAmount;
+            if (spellproto->GetStackAmount() < stackcount)
+                stackcount = spellproto->GetStackAmount();
 
             SpellAuraHolder *holder = CreateSpellAuraHolder(spellproto, this, NULL);
             for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)

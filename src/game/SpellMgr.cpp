@@ -316,10 +316,15 @@ bool IsNoStackAuraDueToAura(uint32 spellId_1, uint32 spellId_2)
     {
         for (int32 j = 0; i < MAX_EFFECT_INDEX; ++j)
         {
-            if (spellInfo_1->Effect[i] == spellInfo_2->Effect[j] 
-                && spellInfo_1->EffectApplyAuraName[i] == spellInfo_2->EffectApplyAuraName[j]
-                && spellInfo_1->EffectMiscValue[i] == spellInfo_2->EffectMiscValue[j]
-                && spellInfo_1->EffectItemType[i] == spellInfo_2->EffectItemType[j])
+            SpellEffectEntry const* spellEffect_1 = spellInfo_1->GetSpellEffect(SpellEffectIndex(i));
+            SpellEffectEntry const* spellEffect_2 = spellInfo_2->GetSpellEffect(SpellEffectIndex(j));
+            if(!spellEffect_1 || !spellEffect_2)
+                continue;
+
+            if (spellEffect_1->Effect == spellEffect_2->Effect
+                && spellEffect_1->EffectApplyAuraName == spellEffect_2->EffectApplyAuraName
+                && spellEffect_1->EffectMiscValue == spellEffect_2->EffectMiscValue
+                && spellEffect_1->EffectItemType == spellEffect_2->EffectItemType)
                 return true;
         }
     }
@@ -336,9 +341,14 @@ int32 CompareAuraRanks(uint32 spellId_1, uint32 spellId_2)
 
     for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
     {
-        if (spellInfo_1->Effect[i] != 0 && spellInfo_2->Effect[i] != 0 && spellInfo_1->Effect[i] == spellInfo_2->Effect[i])
+        SpellEffectEntry const* spellEffect_1 = spellInfo_1->GetSpellEffect(SpellEffectIndex(i));
+        SpellEffectEntry const* spellEffect_2 = spellInfo_2->GetSpellEffect(SpellEffectIndex(i));
+        if(!spellEffect_1 || !spellEffect_2)
+            continue;
+
+        if (spellEffect_1->Effect != 0 && spellEffect_2->Effect != 0 && spellEffect_1->Effect == spellEffect_2->Effect)
         {
-            int32 diff = spellInfo_1->EffectBasePoints[i] - spellInfo_2->EffectBasePoints[i];
+            int32 diff = spellEffect_1->EffectBasePoints - spellEffect_2->EffectBasePoints;
             if (spellInfo_1->CalculateSimpleValue(SpellEffectIndex(i)) < 0 && spellInfo_2->CalculateSimpleValue(SpellEffectIndex(i)) < 0)
                 return -diff;
             else return diff;

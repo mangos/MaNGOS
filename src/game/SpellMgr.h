@@ -153,7 +153,11 @@ inline bool IsSpellAppliesAura(SpellEntry const *spellInfo, uint32 effectMask)
     {
         if (effectMask & (1 << i))
         {
-            switch (spellInfo->Effect[i])
+            SpellEffectEntry const* effectEntry = spellInfo->GetSpellEffect(SpellEffectIndex(i));
+            if(!effectEntry)
+                continue;
+
+            switch (effectEntry->Effect)
             {
                 case SPELL_EFFECT_APPLY_AURA:
                 case SPELL_EFFECT_APPLY_AREA_AURA_PARTY:
@@ -446,8 +450,13 @@ inline bool IsAreaAuraEffect(uint32 effect)
 inline bool HasAreaAuraEffect(SpellEntry const *spellInfo)
 {
     for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
-        if (IsAreaAuraEffect(spellInfo->Effect[i]))
+    {
+        SpellEffectEntry const* effectEntry = spellInfo->GetSpellEffect(SpellEffectIndex(i));
+        if(!effectEntry)
+            continue;
+        if (IsAreaAuraEffect(effectEntry->Effect))
             return true;
+    }
     return false;
 }
 
@@ -455,7 +464,11 @@ inline bool HasAuraWithTriggerEffect(SpellEntry const *spellInfo)
 {
     for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
     {
-        switch(spellInfo->Effect[i])
+        SpellEffectEntry const* effectEntry = spellInfo->GetSpellEffect(SpellEffectIndex(i));
+        if(!effectEntry)
+            continue;
+
+        switch(effectEntry->Effect)
         {
             case SPELL_AURA_PERIODIC_TRIGGER_SPELL:
             case SPELL_AURA_PROC_TRIGGER_SPELL:

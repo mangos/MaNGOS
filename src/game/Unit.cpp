@@ -3872,7 +3872,8 @@ bool Unit::AddSpellAuraHolder(SpellAuraHolder *holder)
                         if (Aura *aur = holder->GetAuraByEffectIndex(SpellEffectIndex(i)))
                         {
                             // m_auraname can be modified to SPELL_AURA_NONE for area auras, use original
-                            AuraType aurNameReal = AuraType(aurSpellInfo->EffectApplyAuraName[i]);
+                            SpellEffectEntry const* spellEffect = aurSpellInfo->GetSpellEffect(SpellEffectIndex(i));
+                            AuraType aurNameReal = AuraType(spellEffect ? spellEffect->EffectApplyAuraName : 0);
 
                             if (aurNameReal == SPELL_AURA_PERIODIC_DAMAGE && aur->GetAuraDuration() > 0)
                             {
@@ -3904,7 +3905,7 @@ bool Unit::AddSpellAuraHolder(SpellAuraHolder *holder)
                     continue;
 
                 // m_auraname can be modified to SPELL_AURA_NONE for area auras, use original
-                SpellEffectEntry const* spellEffect = aurSpellInfo->GetSpellEffect(Aur->GetEffIndex());
+                SpellEffectEntry const* spellEffect = aurSpellInfo->GetSpellEffect(SpellEffectIndex(i));
                 AuraType aurNameReal = AuraType(spellEffect ? spellEffect->EffectApplyAuraName : SPELL_AURA_NONE);
 
                 switch(aurNameReal)
@@ -3935,7 +3936,7 @@ bool Unit::AddSpellAuraHolder(SpellAuraHolder *holder)
         }
     }
 
-    // passive auras not stacable with other ranks
+    // passive auras not stackable with other ranks
     if (!IsPassiveSpellStackableWithRanks(aurSpellInfo))
     {
         if (!RemoveNoStackAurasDueToAuraHolder(holder))
@@ -9524,8 +9525,11 @@ void Unit::ProcDamageAndSpellFor( bool isVictim, Unit * pTarget, uint32 procFlag
                 {
                     if (spellProcEvent->spellFamilyMask[i] || spellProcEvent->spellFamilyMask2[i])
                     {
-                        if ((spellProcEvent->spellFamilyMask[i]  & procSpell->SpellFamilyFlags ) == 0 &&
-                            (spellProcEvent->spellFamilyMask2[i] & procSpell->SpellFamilyFlags2) == 0)
+                        SpellClassOptionsEntry const* classOptions = procSpell->GetSpellClassOptions();
+                        if(!classOptions)
+                            continue;
+                        if ((spellProcEvent->spellFamilyMask[i]  & classOptions->SpellFamilyFlags ) == 0 &&
+                            (spellProcEvent->spellFamilyMask2[i] & classOptions->SpellFamilyFlags2) == 0)
                             continue;
                     }
                     else if (!spellProcEvent->schoolMask && !triggeredByAura->isAffectedOnSpell(procSpell))

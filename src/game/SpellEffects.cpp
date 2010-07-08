@@ -3025,7 +3025,7 @@ void Spell::EffectApplyAura(SpellEffectEntry const* effect)
         Aur->SetAuraDuration(duration);
     }
 
-    spellAuraHolder->AddAura(Aur, eff_idx);
+    spellAuraHolder->AddAura(Aur, SpellEffectIndex(effect->EffectIndex));
 }
 
 void Spell::EffectUnlearnSpecialization(SpellEffectEntry const* effect)
@@ -3839,7 +3839,7 @@ void Spell::EffectApplyAreaAura(SpellEffectEntry const* effect)
         return;
 
     AreaAura* Aur = new AreaAura(m_spellInfo, SpellEffectIndex(effect->EffectIndex), &m_currentBasePoints[effect->EffectIndex], spellAuraHolder, unitTarget, m_caster, m_CastItem);
-    spellAuraHolder->AddAura(Aur, eff_idx);
+    spellAuraHolder->AddAura(Aur, SpellEffectIndex(effect->EffectIndex));
 }
 
 void Spell::EffectSummonType(SpellEffectEntry const* effect)
