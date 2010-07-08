@@ -139,6 +139,28 @@ inline bool IsSpellHaveEffect(SpellEntry const *spellInfo, SpellEffects effect)
     return false;
 }
 
+inline bool IsSpellAppliesAura(SpellEntry const *spellInfo, uint32 effectMask)
+{
+    for(int i = 0; i < MAX_EFFECT_INDEX; ++i)
+    {
+        if (effectMask & (1 << i))
+        {
+            switch (spellInfo->Effect[i])
+            {
+                case SPELL_EFFECT_APPLY_AURA:
+                case SPELL_EFFECT_APPLY_AREA_AURA_PARTY:
+                case SPELL_EFFECT_APPLY_AREA_AURA_RAID:
+                case SPELL_EFFECT_APPLY_AREA_AURA_PET:
+                case SPELL_EFFECT_APPLY_AREA_AURA_FRIEND:
+                case SPELL_EFFECT_APPLY_AREA_AURA_ENEMY:
+                case SPELL_EFFECT_APPLY_AREA_AURA_OWNER:
+                    return true;
+            }
+        }
+    }
+    return false;
+}
+
 inline bool IsEffectHandledOnDelayedSpellLaunch(SpellEntry const *spellInfo, SpellEffectIndex effecIdx)
 {
     switch (spellInfo->Effect[effecIdx])
@@ -170,7 +192,7 @@ inline bool IsSpellLastAuraEffect(SpellEntry const *spellInfo, SpellEffectIndex 
     return true;
 }
 
-bool IsNoStackAuraDueToAura(uint32 spellId_1, SpellEffectIndex effIndex_1, uint32 spellId_2, SpellEffectIndex effIndex_2);
+bool IsNoStackAuraDueToAura(uint32 spellId_1, uint32 spellId_2);
 
 inline bool IsSealSpell(SpellEntry const *spellInfo)
 {
@@ -203,7 +225,7 @@ inline bool IsLootCraftingSpell(SpellEntry const *spellInfo)
         (spellInfo->TotemCategory[0] != 0 || spellInfo->EffectItemType[0]==0)));
 }
 
-int32 CompareAuraRanks(uint32 spellId_1, SpellEffectIndex effIndex_1, uint32 spellId_2, SpellEffectIndex effIndex_2);
+int32 CompareAuraRanks(uint32 spellId_1, uint32 spellId_2);
 
 // order from less to more strict
 bool IsSingleFromSpellSpecificPerTargetPerCaster(SpellSpecific spellSpec1,SpellSpecific spellSpec2);
@@ -390,6 +412,30 @@ inline bool IsAreaAuraEffect(uint32 effect)
     return false;
 }
 
+inline bool HasAreaAuraEffect(SpellEntry const *spellInfo)
+{
+    for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
+        if (IsAreaAuraEffect(spellInfo->Effect[i]))
+            return true;
+    return false;
+}
+
+inline bool HasAuraWithTriggerEffect(SpellEntry const *spellInfo)
+{
+    for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
+    {
+        switch(spellInfo->Effect[i])
+        {
+            case SPELL_AURA_PERIODIC_TRIGGER_SPELL:
+            case SPELL_AURA_PROC_TRIGGER_SPELL:
+            case SPELL_AURA_PROC_TRIGGER_DAMAGE:
+            case SPELL_AURA_PROC_TRIGGER_SPELL_WITH_VALUE:
+                return true;
+        }
+    }
+    return false;
+}
+
 inline bool IsDispelSpell(SpellEntry const *spellInfo)
 {
     return IsSpellHaveEffect(spellInfo, SPELL_EFFECT_DISPEL);
@@ -553,8 +599,8 @@ struct SpellProcEventEntry
 {
     uint32      schoolMask;                                 // if nonzero - bit mask for matching proc condition based on spell candidate's school: Fire=2, Mask=1<<(2-1)=2
     uint32      spellFamilyName;                            // if nonzero - for matching proc condition based on candidate spell's SpellFamilyNamer value
-    uint64      spellFamilyMask;                            // if nonzero - for matching proc condition based on candidate spell's SpellFamilyFlags  (like auras 107 and 108 do)
-    uint32      spellFamilyMask2;                           // if nonzero - for matching proc condition based on candidate spell's SpellFamilyFlags2 (like auras 107 and 108 do)
+    uint64      spellFamilyMask[MAX_EFFECT_INDEX];          // if nonzero - for matching proc condition based on candidate spell's SpellFamilyFlags  (like auras 107 and 108 do)
+    uint32      spellFamilyMask2[MAX_EFFECT_INDEX];         // if nonzero - for matching proc condition based on candidate spell's SpellFamilyFlags2 (like auras 107 and 108 do)
     uint32      procFlags;                                  // bitmask for matching proc event
     uint32      procEx;                                     // proc Extend info (see ProcFlagsEx)
     float       ppmRate;                                    // for melee (ranged?) damage spells - proc rate per minute. if zero, falls back to flat chance from Spell.dbc
@@ -831,7 +877,7 @@ class SpellMgr
             return itr->second;
         }
 
-        static bool IsSpellProcEventCanTriggeredBy( SpellProcEventEntry const * spellProcEvent, uint32 EventProcFlag, SpellEntry const * procSpell, uint32 procFlags, uint32 procExtra, bool active);
+        static bool IsSpellProcEventCanTriggeredBy( SpellProcEventEntry const * spellProcEvent, uint32 EventProcFlag, SpellEntry const * procSpell, uint32 procFlags, uint32 procExtra);
 
         // Spell bonus data
         SpellBonusEntry const* GetSpellBonusData(uint32 spellId) const
