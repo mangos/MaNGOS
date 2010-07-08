@@ -273,6 +273,7 @@ libmangosgame_a_SOURCES = \
 	Traveller.h \
 	Unit.cpp \
 	Unit.h \
+	UnitAuraProcHandler.cpp \
 	UnitEvents.h \
 	UpdateData.cpp \
 	UpdateData.h \

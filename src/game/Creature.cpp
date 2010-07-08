@@ -1814,9 +1814,27 @@ bool Creature::LoadCreaturesAddon(bool reload)
                 continue;
             }
 
-            Aura* AdditionalAura = CreateAura(AdditionalSpellInfo, cAura->effect_idx, NULL, this, this, 0);
-            AddAura(AdditionalAura);
-            DEBUG_FILTER_LOG(LOG_FILTER_SPELL_CAST, "Spell: %u with Aura %u added to creature (GUIDLow: %u Entry: %u )", cAura->spell_id, AdditionalSpellInfo->EffectApplyAuraName[EFFECT_INDEX_0],GetGUIDLow(),GetEntry());
+            SpellAuraHolder *holder = GetSpellAuraHolder(cAura->spell_id, GetGUID());
+                   
+            bool addedToExisting = true;
+            if (!holder)
+            {
+                holder = CreateSpellAuraHolder(AdditionalSpellInfo, this, this);
+                addedToExisting = false;
+            }
+            Aura* AdditionalAura = CreateAura(AdditionalSpellInfo, cAura->effect_idx, NULL, holder, this, this, 0);
+            holder->AddAura(AdditionalAura, cAura->effect_idx);
+
+            if (addedToExisting)
+            {
+                holder->SetInUse(true);
+                AdditionalAura->ApplyModifier(true,true);
+                holder->SetInUse(false);
+            }
+            else
+                AddSpellAuraHolder(holder);
+         
+            DEBUG_FILTER_LOG(LOG_FILTER_SPELL_CAST, "Spell: %u - Aura %u added to creature (GUIDLow: %u Entry: %u )", cAura->spell_id, AdditionalSpellInfo->EffectApplyAuraName[EFFECT_INDEX_0],GetGUIDLow(),GetEntry());
         }
     }
     return true;

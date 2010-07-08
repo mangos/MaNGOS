@@ -7490,8 +7490,8 @@ bool PlayerCondition::Meets(Player const * player) const
         }
         case CONDITION_AD_COMMISSION_AURA:
         {
-            Unit::AuraMap const& auras = player->GetAuras();
-            for(Unit::AuraMap::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
+            Unit::SpellAuraHolderMap const& auras = player->GetSpellAuraHolderMap();
+            for (Unit::SpellAuraHolderMap::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
                 if ((itr->second->GetSpellProto()->Attributes & 0x1000010) && itr->second->GetSpellProto()->SpellVisual[0]==3580)
                     return true;
             return false;

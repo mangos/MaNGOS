@@ -291,33 +291,46 @@ bool IsPassiveSpell(SpellEntry const *spellInfo)
     return (spellInfo->Attributes & SPELL_ATTR_PASSIVE) != 0;
 }
 
-bool IsNoStackAuraDueToAura(uint32 spellId_1, SpellEffectIndex effIndex_1, uint32 spellId_2, SpellEffectIndex effIndex_2)
+bool IsNoStackAuraDueToAura(uint32 spellId_1, uint32 spellId_2)
 {
     SpellEntry const *spellInfo_1 = sSpellStore.LookupEntry(spellId_1);
     SpellEntry const *spellInfo_2 = sSpellStore.LookupEntry(spellId_2);
     if(!spellInfo_1 || !spellInfo_2) return false;
     if(spellInfo_1->Id == spellId_2) return false;
 
-    if (spellInfo_1->Effect[effIndex_1] != spellInfo_2->Effect[effIndex_2] ||
-        spellInfo_1->EffectItemType[effIndex_1] != spellInfo_2->EffectItemType[effIndex_2] ||
-        spellInfo_1->EffectMiscValue[effIndex_1] != spellInfo_2->EffectMiscValue[effIndex_2] ||
-        spellInfo_1->EffectApplyAuraName[effIndex_1] != spellInfo_2->EffectApplyAuraName[effIndex_2])
-        return false;
+    for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
+    {
+        for (int32 j = 0; i < MAX_EFFECT_INDEX; ++j)
+        {
+            if (spellInfo_1->Effect[i] == spellInfo_2->Effect[j] 
+                && spellInfo_1->EffectApplyAuraName[i] == spellInfo_2->EffectApplyAuraName[j]
+                && spellInfo_1->EffectMiscValue[i] == spellInfo_2->EffectMiscValue[j]
+                && spellInfo_1->EffectItemType[i] == spellInfo_2->EffectItemType[j])
+                return true;
+        }
+    }
 
-    return true;
+    return false;
 }
 
-int32 CompareAuraRanks(uint32 spellId_1, SpellEffectIndex effIndex_1, uint32 spellId_2, SpellEffectIndex effIndex_2)
+int32 CompareAuraRanks(uint32 spellId_1, uint32 spellId_2)
 {
     SpellEntry const*spellInfo_1 = sSpellStore.LookupEntry(spellId_1);
     SpellEntry const*spellInfo_2 = sSpellStore.LookupEntry(spellId_2);
     if(!spellInfo_1 || !spellInfo_2) return 0;
     if (spellId_1 == spellId_2) return 0;
 
-    int32 diff = spellInfo_1->EffectBasePoints[effIndex_1] - spellInfo_2->EffectBasePoints[effIndex_2];
-    if (spellInfo_1->CalculateSimpleValue(effIndex_1) < 0 && spellInfo_2->CalculateSimpleValue(effIndex_2) < 0)
-        return -diff;
-    else return diff;
+    for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
+    {
+        if (spellInfo_1->Effect[i] != 0 && spellInfo_2->Effect[i] != 0 && spellInfo_1->Effect[i] == spellInfo_2->Effect[i])
+        {
+            int32 diff = spellInfo_1->EffectBasePoints[i] - spellInfo_2->EffectBasePoints[i];
+            if (spellInfo_1->CalculateSimpleValue(SpellEffectIndex(i)) < 0 && spellInfo_2->CalculateSimpleValue(SpellEffectIndex(i)) < 0)
+                return -diff;
+            else return diff;
+        }
+    }
+    return 0;
 }
 
 SpellSpecific GetSpellSpecific(uint32 spellId)
@@ -1044,11 +1057,20 @@ struct DoSpellProcEvent
             if (spe.spellFamilyName != r_spe.spellFamilyName)
                 sLog.outErrorDb("Spell %u listed in `spell_proc_event` as custom rank have different spellFamilyName from first rank in chain", spell_id);
 
-            if (spe.spellFamilyMask != r_spe.spellFamilyMask)
-                sLog.outErrorDb("Spell %u listed in `spell_proc_event` as custom rank have different spellFamilyMask from first rank in chain", spell_id);
+            for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
+            {
+                if (spe.spellFamilyMask[i] != r_spe.spellFamilyMask[i])
+                {
+                    sLog.outErrorDb("Spell %u listed in `spell_proc_event` as custom rank have different spellFamilyMask from first rank in chain", spell_id);
+                    break;
+                }
 
-            if (spe.spellFamilyMask2 != r_spe.spellFamilyMask2)
-                sLog.outErrorDb("Spell %u listed in `spell_proc_event` as custom rank have different spellFamilyMask2 from first rank in chain", spell_id);
+                if (spe.spellFamilyMask2[i] != r_spe.spellFamilyMask2[i])
+                {
+                    sLog.outErrorDb("Spell %u listed in `spell_proc_event` as custom rank have different spellFamilyMask2 from first rank in chain", spell_id);
+                    break;
+                }
+            }
 
             if (spe.procFlags != r_spe.procFlags)
                 sLog.outErrorDb("Spell %u listed in `spell_proc_event` as custom rank have different procFlags from first rank in chain", spell_id);
@@ -1076,8 +1098,8 @@ void SpellMgr::LoadSpellProcEvents()
 
     uint32 count = 0;
 
-    //                                                0      1           2                3                 4                 5                 6          7       8        9             10
-    QueryResult *result = WorldDatabase.Query("SELECT entry, SchoolMask, SpellFamilyName, SpellFamilyMask0, SpellFamilyMask1, SpellFamilyMask2, procFlags, procEx, ppmRate, CustomChance, Cooldown FROM spell_proc_event");
+    //                                                0      1           2                3                  4                  5                  6                  7                  8                  9                  10                 11                 12         13      14       15            16
+    QueryResult *result = WorldDatabase.Query("SELECT entry, SchoolMask, SpellFamilyName, SpellFamilyMaskA0, SpellFamilyMaskA1, SpellFamilyMaskA2, SpellFamilyMaskB0, SpellFamilyMaskB1, SpellFamilyMaskB2, SpellFamilyMaskC0, SpellFamilyMaskC1, SpellFamilyMaskC2, procFlags, procEx, ppmRate, CustomChance, Cooldown FROM spell_proc_event");
     if( !result )
     {
         barGoLink bar( 1 );
@@ -1112,13 +1134,17 @@ void SpellMgr::LoadSpellProcEvents()
 
         spe.schoolMask      = fields[1].GetUInt32();
         spe.spellFamilyName = fields[2].GetUInt32();
-        spe.spellFamilyMask = (uint64)fields[3].GetUInt32()|((uint64)fields[4].GetUInt32()<<32);
-        spe.spellFamilyMask2= fields[5].GetUInt32();
-        spe.procFlags       = fields[6].GetUInt32();
-        spe.procEx          = fields[7].GetUInt32();
-        spe.ppmRate         = fields[8].GetFloat();
-        spe.customChance    = fields[9].GetFloat();
-        spe.cooldown        = fields[10].GetUInt32();
+
+        for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
+        {
+            spe.spellFamilyMask[i] = (uint64)fields[i+3].GetUInt32()|((uint64)fields[i+6].GetUInt32()<<32);
+            spe.spellFamilyMask2[i] = fields[i+9].GetUInt32();
+        }
+        spe.procFlags       = fields[12].GetUInt32();
+        spe.procEx          = fields[13].GetUInt32();
+        spe.ppmRate         = fields[14].GetFloat();
+        spe.customChance    = fields[15].GetFloat();
+        spe.cooldown        = fields[16].GetUInt32();
 
         uint32 first_id = GetFirstSpellInChain(entry);
 
@@ -1178,10 +1204,22 @@ void SpellMgr::LoadSpellProcEvents()
         }
 
         // totally redundant record
-        if (!spe.schoolMask && !spe.spellFamilyMask && !spe.spellFamilyMask2 && !spe.procFlags &&
+        if (!spe.schoolMask && !spe.procFlags &&
             !spe.procEx && !spe.ppmRate && !spe.customChance && !spe.cooldown)
         {
-            sLog.outErrorDb("Spell %u listed in `spell_proc_event` not have any useful data", entry);
+            bool empty = !spe.spellFamilyName ? true : false;
+            for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
+            {
+                if (spe.spellFamilyMask[i] || spe.spellFamilyMask2[i])
+                {
+                    empty = false;
+                    uint32 const* ptr = spell->GetEffectSpellClassMask(SpellEffectIndex(i));
+                    if ((((uint64*)ptr)[0] != 0 && spe.spellFamilyMask[i] == ((uint64*)ptr)[0]) && (ptr[2] == 0 || spe.spellFamilyMask2[i] == ptr[2]))
+                        sLog.outErrorDb("Spell %u listed in `spell_proc_event` have same class mask as in Spell.dbc (EffectIndex %u) and doesn't have any other data", entry, i);
+                }
+            }
+            if (empty)
+                sLog.outErrorDb("Spell %u listed in `spell_proc_event` not have any useful data", entry);
         }
 
         if (isCustom)
@@ -1440,7 +1478,7 @@ void SpellMgr::LoadSpellBonuses()
     sLog.outString( ">> Loaded %u extra spell bonus data",  count);
 }
 
-bool SpellMgr::IsSpellProcEventCanTriggeredBy(SpellProcEventEntry const * spellProcEvent, uint32 EventProcFlag, SpellEntry const * procSpell, uint32 procFlags, uint32 procExtra, bool active)
+bool SpellMgr::IsSpellProcEventCanTriggeredBy(SpellProcEventEntry const * spellProcEvent, uint32 EventProcFlag, SpellEntry const * procSpell, uint32 procFlags, uint32 procExtra)
 {
     // No extra req need
     uint32 procEvent_procEx = PROC_EX_NONE;
@@ -1474,32 +1512,20 @@ bool SpellMgr::IsSpellProcEventCanTriggeredBy(SpellProcEventEntry const * spellP
             // Check (if set) for spellFamilyName
             if(spellProcEvent->spellFamilyName && (spellProcEvent->spellFamilyName != procSpell->SpellFamilyName))
                 return false;
-
-            // spellFamilyName is Ok need check for spellFamilyMask if present
-            if(spellProcEvent->spellFamilyMask || spellProcEvent->spellFamilyMask2)
-            {
-                if ((spellProcEvent->spellFamilyMask  & procSpell->SpellFamilyFlags ) == 0 &&
-                    (spellProcEvent->spellFamilyMask2 & procSpell->SpellFamilyFlags2) == 0)
-                    return false;
-                active = true; // Spell added manualy -> so its active spell
-            }
         }
     }
     // Check for extra req (if none) and hit/crit
     if (procEvent_procEx == PROC_EX_NONE)
     {
-        // No extra req, so can trigger only for active (damage/healing present) and hit/crit
-        if((procExtra & (PROC_EX_NORMAL_HIT|PROC_EX_CRITICAL_HIT)) && active)
+        // No extra req, so can trigger for (damage/healing present) and hit/crit
+        if(procExtra & (PROC_EX_NORMAL_HIT|PROC_EX_CRITICAL_HIT))
             return true;
     }
-    else // Passive spells hits here only if resist/reflect/immune/evade
+    else // all spells hits here only if resist/reflect/immune/evade
     {
         // Exist req for PROC_EX_EX_TRIGGER_ALWAYS
         if (procEvent_procEx & PROC_EX_EX_TRIGGER_ALWAYS)
             return true;
-        // Passive spells can`t trigger if need hit (exclude cases when procExtra include non-active flags)
-        if ((procEvent_procEx & PROC_EX_NORMAL_HIT & procExtra) && !active)
-            return false;
         // Check Extra Requirement like (hit/crit/miss/resist/parry/dodge/block/immune/reflect/absorb and other)
         if (procEvent_procEx & procExtra)
             return true;
