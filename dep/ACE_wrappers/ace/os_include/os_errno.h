@@ -6,7 +6,7 @@
  *
  *  system error numbers
  *
- *  $Id: os_errno.h 83891 2008-11-28 11:01:50Z johnnyw $
+ *  $Id: os_errno.h 80826 2008-03-04 14:51:23Z wotte $
  *
  *  @author Don Hinton <dhinton@dresystems.com>
  *  @author This code was originally in various places including ace/OS.h.
@@ -92,9 +92,9 @@ extern "C"
 void herror (const char *str);
 #endif /* ACE_HAS_H_ERRNO */
 
-#if defined (ACE_LACKS_T_ERRNO)
+#if !defined (ACE_WIN32) && defined (ACE_LACKS_T_ERRNO)
 extern int t_errno;
-#endif /* ACE_LACKS_T_ERRNO */
+#endif /* ACE_WIN32 && ACE_LACKS_T_ERRNO */
 
 #if !defined (ENOSYS)
 # define ENOSYS EFAULT /* Operation not supported or unknown error. */

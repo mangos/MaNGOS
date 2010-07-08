@@ -49,7 +49,6 @@
 #include "CreatureAIRegistry.h"
 #include "Policies/SingletonImp.h"
 #include "BattleGroundMgr.h"
-#include "Language.h"
 #include "TemporarySummon.h"
 #include "VMapFactory.h"
 #include "GameEventMgr.h"
@@ -61,7 +60,6 @@
 #include "WaypointManager.h"
 #include "GMTicketMgr.h"
 #include "Util.h"
-#include "AuctionHouseBot.h"
 #include "CharacterDatabaseCleaner.h"
 
 INSTANTIATE_SINGLETON_1( World );
@@ -514,28 +512,6 @@ void World::LoadConfigSettings(bool reload)
     setConfigPos(CONFIG_FLOAT_CREATURE_FAMILY_FLEE_ASSISTANCE_RADIUS, "CreatureFamilyFleeAssistanceRadius", 30.0f);
 
     ///- Read other configuration items from the config file
-
-    // movement anticheat
-    m_MvAnticheatEnable                     = sConfig.GetBoolDefault("Anticheat.Movement.Enable",false);
-    m_MvAnticheatKick                       = sConfig.GetBoolDefault("Anticheat.Movement.Kick",false);
-    m_MvAnticheatAnnounce                   = sConfig.GetBoolDefault("Anticheat.Movement.Announce",false);
-    m_MvAnticheatAlarmCount                 = (uint32)sConfig.GetIntDefault("Anticheat.Movement.AlarmCount", 5);
-    m_MvAnticheatAlarmPeriod                = (uint32)sConfig.GetIntDefault("Anticheat.Movement.AlarmTime", 5000);
-    m_MvAntiCheatBan                        = (unsigned char)sConfig.GetIntDefault("Anticheat.Movement.BanType",0);
-    m_MvAnticheatBanTime                    = sConfig.GetStringDefault("Anticheat.Movement.BanTime","1m");
-    m_MvAnticheatGmLevel                    = (unsigned char)sConfig.GetIntDefault("Anticheat.Movement.GmLevel",0);
-    m_MvAnticheatKill                       = sConfig.GetBoolDefault("Anticheat.Movement.Kill",false);
-    m_MvAnticheatMaxXYT                     = sConfig.GetFloatDefault("Anticheat.Movement.MaxXYT",0.04f);
-    m_MvAnticheatIgnoreAfterTeleport        = (uint16)sConfig.GetIntDefault("Anticheat.Movement.IgnoreSecAfterTeleport",10);
-
-    m_MvAnticheatSpeedCheck                 = sConfig.GetBoolDefault("Anticheat.Movement.DetectSpeedHack",1);
-    m_MvAnticheatWaterCheck                 = sConfig.GetBoolDefault("Anticheat.Movement.DetectWaterWalk",1);
-    m_MvAnticheatFlyCheck                   = sConfig.GetBoolDefault("Anticheat.Movement.DetectFlyHack",1);
-    m_MvAnticheatMountainCheck              = sConfig.GetBoolDefault("Anticheat.Movement.DetectMountainHack",1);
-    m_MvAnticheatJumpCheck                  = sConfig.GetBoolDefault("Anticheat.Movement.DetectAirJumpHack",1);
-    m_MvAnticheatTeleportCheck              = sConfig.GetBoolDefault("Anticheat.Movement.DetectTeleportHack",1);
-    m_MvAnticheatTeleport2PlaneCheck        = sConfig.GetBoolDefault("Anticheat.Movement.DetectTeleport2PlaneHack",0);
-
     setConfigMinMax(CONFIG_UINT32_COMPRESSION, "Compression", 1, 1, 9);
     setConfig(CONFIG_BOOL_ADDON_CHANNEL, "AddonChannel", true);
     setConfig(CONFIG_BOOL_CLEAN_CHARACTER_DB, "CleanCharacterDB", true);
@@ -746,7 +722,6 @@ void World::LoadConfigSettings(bool reload)
     setConfig(CONFIG_UINT32_BATTLEGROUND_INVITATION_TYPE,              "Battleground.InvitationType", 0);
     setConfig(CONFIG_UINT32_BATTLEGROUND_PREMATURE_FINISH_TIMER,       "BattleGround.PrematureFinishTimer", 5 * MINUTE * IN_MILLISECONDS);
     setConfig(CONFIG_UINT32_BATTLEGROUND_PREMADE_GROUP_WAIT_FOR_MATCH, "BattleGround.PremadeGroupWaitForMatch", 30 * MINUTE * IN_MILLISECONDS);
-    setConfigMinMax(CONFIG_UINT32_RANDOM_BG_RESET_HOUR,                "BattleGround.Random.ResetHour", 6, 0, 23);
     setConfig(CONFIG_UINT32_ARENA_MAX_RATING_DIFFERENCE,               "Arena.MaxRatingDifference", 150);
     setConfig(CONFIG_UINT32_ARENA_RATING_DISCARD_TIMER,                "Arena.RatingDiscardTimer", 10 * MINUTE * IN_MILLISECONDS);
     setConfig(CONFIG_BOOL_ARENA_AUTO_DISTRIBUTE_POINTS,                "Arena.AutoDistributePoints", false);
@@ -1138,9 +1113,6 @@ void World::SetInitialWorldSettings()
     sLog.outString( "Loading Player level dependent mail rewards..." );
     sObjectMgr.LoadMailLevelRewards();
 
-    sLog.outString( "Loading Spell disabled..." );
-    sObjectMgr.LoadSpellDisabledEntrys();
-
     sLog.outString( "Loading Loot Tables..." );
     sLog.outString();
     LoadLootTables();
@@ -1277,9 +1249,6 @@ void World::SetInitialWorldSettings()
     LoginDatabase.PExecute("INSERT INTO uptime (realmid, starttime, startstring, uptime) VALUES('%u', " UI64FMTD ", '%s', 0)",
         realmID, uint64(m_startTime), isoDate);
 
-    static uint32 abtimer = 0;
-    abtimer = sConfig.GetIntDefault("AutoBroadcast.Timer", 60000);
-
     m_timers[WUPDATE_OBJECTS].SetInterval(0);
     m_timers[WUPDATE_SESSIONS].SetInterval(0);
     m_timers[WUPDATE_WEATHERS].SetInterval(1*IN_MILLISECONDS);
@@ -1288,7 +1257,6 @@ void World::SetInitialWorldSettings()
                                                             //Update "uptime" table based on configuration entry in minutes.
     m_timers[WUPDATE_CORPSES].SetInterval(3*HOUR*IN_MILLISECONDS);
     m_timers[WUPDATE_DELETECHARS].SetInterval(DAY*IN_MILLISECONDS); // check for chars to delete every day
-    m_timers[WUPDATE_AUTOBROADCAST].SetInterval(abtimer);
 
     //to set mailtimer to return mails every day between 4 and 5 am
     //mailtimer is increased when updating auctions
@@ -1324,9 +1292,6 @@ void World::SetInitialWorldSettings()
     sLog.outString("Calculate next weekly quest reset time..." );
     InitWeeklyQuestResetTime();
 
-    sLog.outString("Calculate random battleground reset time..." );
-    InitRandomBGResetTime();
-
     sLog.outString("Starting objects Pooling system..." );
     sPoolMgr.Initialize();
 
@@ -1334,13 +1299,8 @@ void World::SetInitialWorldSettings()
     uint32 nextGameEvent = sGameEventMgr.Initialize();
     m_timers[WUPDATE_EVENTS].SetInterval(nextGameEvent);    //depend on next event
 
-    sLog.outString("Initialize AuctionHouseBot...");
-    auctionbot.Initialize();
-
     // Delete all characters which have been deleted X days before
     Player::DeleteOldCharacters();
-
-    sLog.outString("Starting Autobroadcast system by Xeross..." );
 
     sLog.outString( "WORLD: World initialized" );
 
@@ -1416,13 +1376,9 @@ void World::Update(uint32 diff)
     if (m_gameTime > m_NextWeeklyQuestReset)
         ResetWeeklyQuests();
 
-    if (m_gameTime > m_NextRandomBGReset)
-        ResetRandomBG();
-
     /// <ul><li> Handle auctions when the timer has passed
     if (m_timers[WUPDATE_AUCTIONS].Passed())
     {
-        auctionbot.Update();
         m_timers[WUPDATE_AUCTIONS].Reset();
 
         ///- Update mails (return old mails with item, or delete them)
@@ -1511,16 +1467,6 @@ void World::Update(uint32 diff)
         uint32 nextGameEvent = sGameEventMgr.Update();
         m_timers[WUPDATE_EVENTS].SetInterval(nextGameEvent);
         m_timers[WUPDATE_EVENTS].Reset();
-    }
-    static uint32 autobroadcaston = 0;
-    autobroadcaston = sConfig.GetIntDefault("AutoBroadcast.On", 0);
-    if(autobroadcaston == 1)
-    {
-        if (m_timers[WUPDATE_AUTOBROADCAST].Passed())
-        {
-            m_timers[WUPDATE_AUTOBROADCAST].Reset();
-            SendBroadcast();
-        }
     }
 
     /// </ul>
@@ -1936,57 +1882,6 @@ void World::ProcessCliCommands()
     }
 }
 
-void World::SendBroadcast()
-{
-    std::string msg;
-    static int nextid;
-
-    QueryResult *result;
-    if(nextid != 0)
-    {
-        result = LoginDatabase.PQuery("SELECT `text`, `next` FROM `autobroadcast` WHERE `id` = %u", nextid);
-    }
-    else
-    {
-        result = LoginDatabase.PQuery("SELECT `text`, `next` FROM `autobroadcast` ORDER BY RAND() LIMIT 1");
-    }
-
-    if(!result)
-        return;
-
-    Field *fields = result->Fetch();
-    nextid  = fields[1].GetUInt32();
-    msg = fields[0].GetString();
-    delete result;
-
-    static uint32 abcenter = 0;
-    abcenter = sConfig.GetIntDefault("AutoBroadcast.Center", 0);
-    if(abcenter == 0)
-    {
-        sWorld.SendWorldText(LANG_AUTO_BROADCAST, msg.c_str());
-
-        sLog.outString("AutoBroadcast: '%s'",msg.c_str());
-    }
-    if(abcenter == 1)
-    {
-        WorldPacket data(SMSG_NOTIFICATION, (msg.size()+1));
-        data << msg;
-        sWorld.SendGlobalMessage(&data);
-
-        sLog.outString("AutoBroadcast: '%s'",msg.c_str());
-    }
-    if(abcenter == 2)
-    {
-        sWorld.SendWorldText(LANG_AUTO_BROADCAST, msg.c_str());
-
-        WorldPacket data(SMSG_NOTIFICATION, (msg.size()+1));
-        data << msg;
-        sWorld.SendGlobalMessage(&data);
-
-        sLog.outString("AutoBroadcast: '%s'",msg.c_str());
-   }
-}
-
 void World::InitResultQueue()
 {
     m_resultQueue = new SqlResultQueue;
@@ -2081,37 +1976,6 @@ void World::InitDailyQuestResetTime()
         delete result;
 }
 
-void World::InitRandomBGResetTime()
-{
-    QueryResult * result = CharacterDatabase.Query("SELECT NextRandomBGResetTime FROM saved_variables");
-    if (!result)
-        m_NextRandomBGReset = time_t(time(NULL));         // game time not yet init
-    else
-        m_NextRandomBGReset = time_t((*result)[0].GetUInt64());
-
-    // generate time by config
-    time_t curTime = time(NULL);
-    tm localTm = *localtime(&curTime);
-    localTm.tm_hour = getConfig(CONFIG_UINT32_RANDOM_BG_RESET_HOUR);
-    localTm.tm_min  = 0;
-    localTm.tm_sec  = 0;
-
-    // current day reset time
-    time_t nextDayResetTime = mktime(&localTm);
-
-    // next reset time before current moment
-    if (curTime >= nextDayResetTime)
-        nextDayResetTime += DAY;
-
-    // normalize reset time
-    m_NextRandomBGReset = m_NextRandomBGReset < curTime ? nextDayResetTime - DAY : nextDayResetTime;
-
-    if (!result)
-        CharacterDatabase.PExecute("INSERT INTO saved_variables (NextRandomBGResetTime) VALUES ('"UI64FMTD"')", uint64(m_NextRandomBGReset));
-    else
-        delete result;
-}
-
 void World::ResetDailyQuests()
 {
     DETAIL_LOG("Daily quests reset for all characters.");
@@ -2134,18 +1998,6 @@ void World::ResetWeeklyQuests()
 
     m_NextWeeklyQuestReset = time_t(m_NextWeeklyQuestReset + WEEK);
     CharacterDatabase.PExecute("UPDATE saved_variables SET NextWeeklyQuestResetTime = '"UI64FMTD"'", uint64(m_NextWeeklyQuestReset));
-}
-
-void World::ResetRandomBG()
-{
-    sLog.outDetail("Random BG status reset for all characters.");
-    CharacterDatabase.Execute("DELETE FROM character_battleground_random");
-    for(SessionMap::const_iterator itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
-        if (itr->second->GetPlayer())
-            itr->second->GetPlayer()->SetRandomWinner(false);
-
-    m_NextRandomBGReset = time_t(m_NextRandomBGReset + DAY);
-    CharacterDatabase.PExecute("UPDATE saved_variables SET NextRandomBGResetTime = '"UI64FMTD"'", uint64(m_NextRandomBGReset));
 }
 
 void World::SetPlayerLimit( int32 limit, bool needUpdate )

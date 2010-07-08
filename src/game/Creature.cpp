@@ -110,7 +110,7 @@ bool ForcedDespawnDelayEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
 
 Creature::Creature(CreatureSubtype subtype) :
 Unit(), i_AI(NULL),
-lootForPickPocketed(false), lootForBody(false), lootForSkin(false),
+lootForPickPocketed(false), lootForBody(false), lootForSkin(false), m_groupLootTimer(0), m_groupLootId(0),
 m_lootMoney(0), m_lootGroupRecipientId(0),
 m_deathTimer(0), m_respawnTime(0), m_respawnDelay(25), m_corpseDelay(60), m_respawnradius(5.0f),
 m_subtype(subtype), m_defaultMovementType(IDLE_MOTION_TYPE), m_DBTableGuid(0), m_equipmentId(0),
@@ -162,7 +162,7 @@ void Creature::RemoveFromWorld()
 
 void Creature::RemoveCorpse()
 {
-    if (((getDeathState() != CORPSE && getDeathState() != GHOULED) && !m_isDeadByDefault) || (getDeathState() != ALIVE && m_isDeadByDefault))
+    if ((getDeathState() != CORPSE && !m_isDeadByDefault) || (getDeathState() != ALIVE && m_isDeadByDefault))
         return;
 
     m_deathTimer = 0;
@@ -501,6 +501,25 @@ void Creature::Update(uint32 diff)
         default:
             break;
     }
+}
+
+
+void Creature::StartGroupLoot( Group* group, uint32 timer )
+{
+    m_groupLootId = group->GetId();
+    m_groupLootTimer = timer;
+}
+
+void Creature::StopGroupLoot()
+{
+    if (!m_groupLootId)
+        return;
+
+    if (Group* group = sObjectMgr.GetGroupById(m_groupLootId))
+        group->EndRoll();
+
+    m_groupLootTimer = 0;
+    m_groupLootId = 0;
 }
 
 void Creature::RegenerateMana()

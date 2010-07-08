@@ -198,7 +198,7 @@ class MANGOS_DLL_SPEC Group
         void   ChangeLeader(const uint64 &guid);
         void   SetLootMethod(LootMethod method) { m_lootMethod = method; }
         void   SetLooterGuid(const uint64 &guid) { m_looterGuid = guid; }
-        void   UpdateLooterGuid( WorldObject* object, bool ifneed = false );
+        void   UpdateLooterGuid( Creature* creature, bool ifneed = false );
         void   SetLootThreshold(ItemQualities threshold) { m_lootThreshold = threshold; }
         void   Disband(bool hideDestroy=false);
 
@@ -209,7 +209,6 @@ class MANGOS_DLL_SPEC Group
         bool isBGGroup()   const { return m_bgGroup != NULL; }
         bool IsCreated()   const { return GetMembersCount() > 0; }
         const uint64& GetLeaderGUID() const { return m_leaderGuid; }
-        const uint8& GetCreatorRace() const { return m_creatorRace; }
         const char * GetLeaderName() const { return m_leaderName.c_str(); }
         LootMethod    GetLootMethod() const { return m_lootMethod; }
         const uint64& GetLooterGuid() const { return m_looterGuid; }
@@ -343,11 +342,11 @@ class MANGOS_DLL_SPEC Group
         void SendLootRoll(ObjectGuid const& targetGuid, uint8 rollNumber, uint8 rollType, const Roll &r);
         void SendLootRollWon(ObjectGuid const& targetGuid, uint8 rollNumber, RollVote rollType, const Roll &r);
         void SendLootAllPassed(const Roll &r);
-        void GroupLoot(WorldObject* object, Loot *loot);
-        void NeedBeforeGreed(WorldObject* object, Loot *loot);
-        void MasterLoot(WorldObject* object, Loot *loot);
+        void GroupLoot(Creature *creature, Loot *loot);
+        void NeedBeforeGreed(Creature *creature, Loot *loot);
+        void MasterLoot(Creature *creature, Loot *loot);
         void CountRollVote(ObjectGuid const& playerGUID, ObjectGuid const& lootedTarget, uint32 itemSlot, RollVote choise);
-        void StartLootRool(WorldObject* lootTarget, Loot* loot, uint8 itemSlot, bool skipIfCanNotUse);
+        void StartLootRool(Creature* lootTarget, Loot* loot, uint8 itemSlot, bool skipIfCanNotUse);
         void EndRoll();
 
         void LinkMember(GroupReference *pRef) { m_memberMgr.insertFirst(pRef); }
@@ -438,7 +437,6 @@ class MANGOS_DLL_SPEC Group
         GroupRefManager     m_memberMgr;
         InvitesList         m_invitees;
         uint64              m_leaderGuid;
-        uint8               m_creatorRace;
         std::string         m_leaderName;
         uint64              m_mainTank;
         uint64              m_mainAssistant;

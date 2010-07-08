@@ -6,7 +6,7 @@
  *
  *  standard symbolic constants and types
  *
- *  $Id: os_unistd.h 83306 2008-10-17 12:19:53Z johnnyw $
+ *  $Id: os_unistd.h 81697 2008-05-14 18:33:11Z johnnyw $
  *
  *  @author Don Hinton <dhinton@dresystems.com>
  *  @author This code was originally in various places including ace/OS.h.
@@ -27,13 +27,14 @@
 #include "ace/os_include/sys/os_types.h"
 #include "ace/os_include/os_inttypes.h"
 
-#if defined (ACE_HAS_PROCESS_H)
-#  include /**/ <process.h>
-#endif /* ACE_HAS_PROCESS_H */
+#if defined (__BORLANDC__)
+#  include "ace/os_include/os_fcntl.h"
+#endif /* __BORLANDC */
 
-#if defined (ACE_HAS_IO_H)
+#if defined (ACE_WIN32) && !defined (ACE_HAS_WINCE)
+#  include /**/ <process.h>
 #  include /**/ <io.h>
-#endif /* ACE_HAS_IO_H */
+#endif /* ACE_WIN32 && !ACE_HAS_WINCE */
 
 #if defined (ACE_HAS_SYS_SYSTEMINFO_H)
 #  include /**/ <sys/systeminfo.h>
@@ -163,6 +164,12 @@ extern "C"
 #endif  /* _LARGEFILE64_SOURCE */
 
 #if defined (__BORLANDC__)
+#  if (__BORLANDC__ <= 0x540)
+#    define _getcwd getcwd
+#    define _chdir chdir
+#    undef _access
+#    define _access access
+#  endif
 #  define _isatty isatty
 #endif /* __BORLANDC__ */
 

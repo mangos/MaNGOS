@@ -358,78 +358,6 @@ GmLogPerAccount = 0
 RaLogFile = ""
 LogColors = ""
 
-# Chat log parameters
-ChatLogEnable = 0
-
-# If this is enabled, all $d in file names are replaced with current date
-# This does include innormative lexics log
-ChatLogDateSplit = 1
-
-# If this is enabled, UTF8 header is written into new files
-ChatLogUTFHeader = 1
-
-# If this is enabled, chat log will ignore messages with unprintable chars
-ChatLogIgnoreUnprintable = 1
-
-# Chat log files
-ChatLogChatFile = main_chat-$d.log
-ChatLogPartyFile = party_chat-$d.log
-ChatLogGuildFile = guild_chat-$d.log
-ChatLogWhisperFile = whisper_chat-$d.log
-ChatLogChannelFile = channel_chat-$d.log
-ChatLogRaidFile = raid_chat-$d.log
-ChatLogBattleGroundFile = bg_chat-$d.log
-
-# Chat log screen logging
-ChatLogChatScreen = 0
-ChatLogPartyScreen = 0
-ChatLogGuildScreen = 0
-ChatLogWhisperScreen = 0
-ChatLogChannelScreen = 0
-ChatLogRaidScreen = 0
-ChatLogBattleGroundScreen = 0
-
-# Lexics cutter parameters
-LexicsCutterEnable = 1
-
-LexicsCutterInnormativeCut = 1
-LexicsCutterCutReplacement = &!@^%!^&*!!!
-LexicsCutterLogFile = innormative-$d.log
-LexicsCutterScreenLog = 0
-LexicsCutterAnalogsFile = letter_analogs.txt
-LexicsCutterWordsFile = innormative_words.txt
-
-# Where to cut lexics
-LexicsCutInChat = 1
-LexicsCutInParty = 1
-LexicsCutInGuild = 1
-LexicsCutInWhisper = 1
-LexicsCutInChannel = 1
-LexicsCutInRaid = 1
-LexicsCutInBattleGround = 1
-
-# Ignore word spaces like: W O R D
-LexicsCutterIgnoreSpaces = 1
-
-# Ignore repeats like: WWOOOORRRRRD
-LexicsCutterIgnoreRepeats = 1
-
-# --- Action:
-# ---   0: log only
-# ---   1: sheep
-# ---   2: stun
-# ---   3: kill
-# ---   4: leave 5 health
-# ---   5: disable chat
-# ---   6: stuck (works as stun + 50% health)
-# ---   7: resurrection sickness
-# ---   8: shear
-LexicsCutterAction = 0
-LexicsCutterActionDuration = 60000
-
-# Do not perform action on GM if this is enabled
-LexicsCutterNoActionOnGM = 1
-
 ###################################################################################################################
 # SERVER SETTINGS
 #
@@ -878,29 +806,6 @@ AllowTwoSide.Interaction.Mail = 0
 AllowTwoSide.WhoList = 0
 AllowTwoSide.AddFriend = 0
 TalentsInspecting = 1
-
-###################################################################################################################
-# AUTO BROADCAST
-#
-#    AutoBroadcast.On
-#        Enable auto broadcast
-#        Default: 0 - off
-#                 1 - on
-#
-#    AutoBroadcast.Center
-#        Display method
-#        Default: 0 - announce
-#                 1 - notify
-#                 2 - both
-#
-#    AutoBroadcast.Timer
-#        Timer for auto broadcast
-#
-###################################################################################################################
-
-AutoBroadcast.On = 0
-AutoBroadcast.Center = 0
-AutoBroadcast.Timer = 30000
 
 ###################################################################################################################
 # CREATURE SETTINGS
@@ -1437,10 +1342,6 @@ Death.Bones.BattlegroundOrArena = 1
 #        Default: 1800000 (30 minutes)
 #                 0 - disable (not recommended)
 #
-#    BattleGround.Random.ResetHour
-#        Hour when random bg reset (0..23)
-#        Default: 6
-#
 ###################################################################################################################
 
 Battleground.CastDeserter = 1
@@ -1449,7 +1350,6 @@ Battleground.QueueAnnouncer.Start = 0
 Battleground.InvitationType = 0
 BattleGround.PrematureFinishTimer = 300000
 BattleGround.PremadeGroupWaitForMatch = 1800000
-BattleGround.Random.ResetHour = 6
 
 ###################################################################################################################
 # ARENA CONFIG
@@ -1540,88 +1440,6 @@ Network.TcpNodelay = 1
 Network.KickOnBadPacket = 0
 
 ###################################################################################################################
-# AUCTION HOUSE BOT SETTINGS
-#
-#    AuctionHouseBot.EnableSeller
-#        Enable/Disable the part of AHBot that puts items up for auction
-#    Default 0 (disabled)
-#
-#    AuctionHouseBot.EnableBuyer
-#        Enable/Disable the part of AHBot that buys items from players
-#    Default 0 (disabled)
-#
-#    Auction House Bot character data
-#        AuctionHouseBot.Account is the account number (in realmd->account table) of the player you want to run as the auction bot.
-#       AuctionHouseBot.GUID is the GUID (in characters->characters table) of the player you want to run as the auction bot.
-#    Default: 0 (Auction House Bot disabled)
-#
-#    AuctionHouseBot.VendorItems
-#        Include items that can be bought from vendors.
-#    Default 0
-#
-#    AuctionHouseBot.LootItems
-#        Include items that can be looted or fished for.
-#    Default 1
-#
-#    AuctionHouseBot.OtherItems
-#        Include misc. items.
-#    Default 0
-#
-#    AuctionHouseBot.Bonding_types
-#        Indicates which bonding types to allow seller to put up for auction
-#            No_Bind
-#             Default 1
-#            Bind_When_Picked_Up
-#             Default 0
-#            Bind_When_Equipped
-#             Default 1
-#            Bind_When_Use
-#             Default 1
-#            Bind_Quest_Item
-#             Default 0
-# /dev/rsa modify: values of this (AuctionHouseBot.Bonding_types) is integer
-# 0 - disable this type item
-# (1 - 65535) - is koefficient to SellPrice for this type item
-#
-#    AuctionHouseBot.ItemsPerCycle
-#        Number of Items to Add/Remove from the AH during mass operations
-#    Default 200
-#
-#    AuctionHouseBot.UseBuyPriceForSeller
-#        Should the Seller use BuyPrice or SellPrice to determine Bid Prices
-#    Default 0 (use SellPrice)
-#
-#    AuctionHouseBot.MaxItemLevel
-#    /dev/rsa modify:  Maximum item level for auction bot sell
-#    Default 200
-#
-#    AuctionHouseBot.UseBuyPriceForBuyer
-#        Should the Buyer use BuyPrice or SellPrice to determine Bid Prices
-#    Default 0 (use SellPrice)
-#
-#    All other settings have been moved to sql
-#
-#
-###################################################################################################################
-
-AuctionHouseBot.EnableSeller = 0
-AuctionHouseBot.EnableBuyer = 0
-AuctionHouseBot.Account = 0
-AuctionHouseBot.GUID = 0
-AuctionHouseBot.VendorItems = 0
-AuctionHouseBot.LootItems = 1
-AuctionHouseBot.OtherItems = 0
-AuctionHouseBot.No_Bind = 1
-AuctionHouseBot.MaxItemLevel = 200
-AuctionHouseBot.Bind_When_Picked_Up = 0
-AuctionHouseBot.Bind_When_Equipped = 1
-AuctionHouseBot.Bind_When_Use = 1
-AuctionHouseBot.Bind_Quest_Item = 0
-AuctionHouseBot.ItemsPerCycle = 200
-AuctionHouseBot.UseBuyPriceForSeller = 0
-AuctionHouseBot.UseBuyPriceForBuyer = 0
-
-###################################################################################################################
 # CONSOLE, REMOTE ACCESS AND SOAP
 #
 #    Console.Enable
@@ -1682,106 +1500,6 @@ Ra.Stricted = 1
 SOAP.Enabled = 0
 SOAP.IP = 127.0.0.1
 SOAP.Port = 7878
-
-###################################################################################################################
-# MOVEMENT ANTICHEAT
-#
-#    Anticheat.Movement.Enable
-#        Enable Movement Anticheat
-#        Default: 0 - off
-#                 1 - on
-#
-#    Anticheat.Movement.AlarmCount
-#        Count alarms. After AlarmCount is exceeded, actions are taken against the player. (default 5)
-#
-#    Anticheat.Movement.AlarmTime
-#        Reset alarm-count after this milliseconds. (default 5000)
-#
-#    Anticheat.Movement.Kill
-#        Enable Kill cheater
-#        Default: 0 - off
-#                 1 - on
-#
-#    Anticheat.Movement.Kick
-#        Enable Kick cheater
-#        Default: 0 - off
-#                 1 - on
-#
-#    Anticheat.Movement.BanType
-#        Enable Ban cheater
-#        Default: 0 - off
-#                 1 - Ban Account
-#                 2 - Ban IP
-#                 3 - Ban Account + IP
-#
-#    Anticheat.Movement.Announce
-#        Enable Announce cheater
-#        Default: 0 - off
-#                 1 - on
-#
-#    Anticheat.Movement.DetectSpeedHack
-#        Turn Speed Check on/off
-#        Default: 1 (on)
-#
-#    Anticheat.Movement.DetectWaterWalk
-#        Turn WaterWalk Check on/off
-#        Default: 1 (on)
-#
-#    Anticheat.Movement.DetectFlyHack
-#        Turn Fly Hack Check on/off
-#        Default: 1 (on)
-#
-#    Anticheat.Movement.DetectMountainHack
-#        Turn Speed Check on/off
-#        Default: 1 (on)
-#    Anticheat.Movement.DetectAirJumpHack
-#        Turn Air/Graviti Jump Check on/off
-#        Default: 1 (on)
-#
-#    Anticheat.Movement.DetectTeleportHack
-#        Turn Teleport Check on/off
-#        Default: 1 (on)
-#
-#    Anticheat.Movement.DetectTeleport2PlaneHack
-#        Turn Teleport2Plane Check on/off
-#        Default: 1 (on)
-#
-#    Anticheat.Movement.BanTime
-#        How long the ban should last.
-#        Default: 1 Minute - 1m
-#
-#    Anticheat.Movement.MaxXYT
-#        Max units a player is allowed to travel per millisecond.
-#        Default: 0.04 (This is ~400% Speed, 0.007 is walk-speed, 310% is 0.0287)
-#
-#    Anticheat.Movement.IgnoreSecAfterTeleport
-#        After being teleported this number of seconds no cheat is reported.
-#        Default: 10 seconds - 10
-#
-#    Anticheat.Movement.GmLevel
-#        Only accounts that are below this gm-level or exact at the same, are reported for cheating.
-#        Default: Only normal Players - 0
-#
-###################################################################################################################
-
-Anticheat.Movement.Enable = 1
-Anticheat.Movement.AlarmCount = 5
-Anticheat.Movement.AlarmTime = 5000
-Anticheat.Movement.Kill = 0
-Anticheat.Movement.Kick = 0
-Anticheat.Movement.Announce = 0
-Anticheat.Movement.DetectSpeedHack = 1
-Anticheat.Movement.DetectWaterWalk = 1
-Anticheat.Movement.DetectFlyHack = 1
-Anticheat.Movement.DetectMountainHack = 1
-Anticheat.Movement.DetectAirJumpHack = 1
-Anticheat.Movement.DetectTeleportHack = 1
-Anticheat.Movement.DetectTeleport2PlaneHack = 0
-Anticheat.Movement.BanType = 0
-Anticheat.Movement.BanTime = "1m"
-Anticheat.Movement.MaxXYT = 0.04
-Anticheat.Movement.IgnoreSecAfterTeleport = 10
-Anticheat.Movement.GmLevel = 0
 
 ###################################################################################################################
 #    CharDelete.Method

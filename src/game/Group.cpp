@@ -28,7 +28,6 @@
 #include "Formulas.h"
 #include "ObjectAccessor.h"
 #include "BattleGround.h"
-#include "BattleGroundMgr.h"
 #include "MapManager.h"
 #include "InstanceSaveMgr.h"
 #include "MapInstanced.h"
@@ -104,7 +103,6 @@ bool Group::Create(const uint64 &guid, const char * name)
         {
             m_dungeonDifficulty = leader->GetDungeonDifficulty();
             m_raidDifficulty = leader->GetRaidDifficulty();
-            m_creatorRace = leader->getRace();
         }
 
         Player::ConvertInstancesToGroup(leader, this, guid);
@@ -139,10 +137,6 @@ bool Group::LoadGroupFromDB(Field* fields)
     // group leader not exist
     if(!sObjectMgr.GetPlayerNameByGUID(m_leaderGuid, m_leaderName))
         return false;
-
-    if (Player *leader = sObjectMgr.GetPlayer(m_leaderGuid))
-        m_creatorRace = leader->getRace();
-        else m_creatorRace = 0;
 
     m_groupType  = GroupType(fields[13].GetUInt8());
 
@@ -300,17 +294,6 @@ bool Group::AddMember(const uint64 &guid, const char* name)
                     player->SendRaidDifficulty(true);
                 }
             }
-            // Group Interfactions interactions (test)
-             if(sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_GROUP))
-             {
-                 Group *group = player->GetGroup();
-                 if(group->GetCreatorRace())
-                 {
-                     player->setFactionForRace(group->GetCreatorRace());
-                     sLog.outDebug( "WORLD: Group Interfaction Interactions - Faction changed (AddMember)" );
-                 } else sLog.outDebug( "WORLD: Group Interfaction Interactions - Faction NOT changed (CreatorRace is NULL)" );
-             }
-
         }
         player->SetGroupUpdateFlag(GROUP_UPDATE_FULL);
         UpdatePlayerOutOfRange(player);
@@ -355,13 +338,6 @@ uint32 Group::RemoveMember(const uint64 &guid, const uint8 &method)
                 data << uint8(0x10) << uint8(0) << uint8(0) << uint8(0);
                 data << uint64(0) << uint32(0) << uint32(0) << uint64(0);
                 player->GetSession()->SendPacket(&data);
-            }
-
-          // Restore original faction if needed
-          if(sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_GROUP))
-            {
-                player->setFactionForRace(player->getRace());
-                sLog.outDebug( "WORLD: Group Interfaction Interactions - Restore original faction (RemoveMember)" );
             }
 
             _homebindIfInstance(player);
@@ -420,13 +396,6 @@ void Group::Disband(bool hideDestroy)
             else
                 player->SetGroup(NULL);
         }
-
-          // Restore original faction if needed
-          if(sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_GROUP))
-            {
-                player->setFactionForRace(player->getRace());
-                sLog.outDebug( "WORLD: Group Interfaction Interactions - Restore original faction (RemoveMember)" );
-            }
 
         // quest related GO state dependent from raid membership
         if(isRaidGroup())
@@ -571,7 +540,7 @@ void Group::SendLootAllPassed(Roll const& r)
     }
 }
 
-void Group::GroupLoot(WorldObject* object, Loot *loot)
+void Group::GroupLoot(Creature *creature, Loot *loot)
 {
     for(uint8 itemSlot = 0; itemSlot < loot->items.size(); ++itemSlot)
     {
@@ -585,13 +554,13 @@ void Group::GroupLoot(WorldObject* object, Loot *loot)
 
         //roll for over-threshold item if it's one-player loot
         if (itemProto->Quality >= uint32(m_lootThreshold) && !lootItem.freeforall)
-            StartLootRool(object,loot,itemSlot,false);
+            StartLootRool(creature,loot,itemSlot,false);
         else
             lootItem.is_underthreshold = 1;
     }
 }
 
-void Group::NeedBeforeGreed(WorldObject* object, Loot *loot)
+void Group::NeedBeforeGreed(Creature *creature, Loot *loot)
 {
     for(uint8 itemSlot = 0; itemSlot < loot->items.size(); ++itemSlot)
     {
@@ -605,13 +574,13 @@ void Group::NeedBeforeGreed(WorldObject* object, Loot *loot)
 
         //only roll for one-player items, not for ones everyone can get
         if (itemProto->Quality >= uint32(m_lootThreshold) && !lootItem.freeforall)
-            StartLootRool(object, loot, itemSlot, true);
+            StartLootRool(creature, loot, itemSlot, true);
         else
             lootItem.is_underthreshold = 1;
     }
 }
 
-void Group::MasterLoot(WorldObject* object, Loot* loot)
+void Group::MasterLoot(Creature *creature, Loot* loot)
 {
     for (LootItemList::iterator i=loot->items.begin(); i != loot->items.end(); ++i)
     {
@@ -633,7 +602,7 @@ void Group::MasterLoot(WorldObject* object, Loot* loot)
         if (!looter->IsInWorld())
             continue;
 
-        if (looter->IsWithinDist(object, sWorld.getConfig(CONFIG_FLOAT_GROUP_XP_DISTANCE), false))
+        if (looter->IsWithinDist(creature, sWorld.getConfig(CONFIG_FLOAT_GROUP_XP_DISTANCE), false))
         {
             data << uint64(looter->GetGUID());
             ++real_count;
@@ -645,7 +614,7 @@ void Group::MasterLoot(WorldObject* object, Loot* loot)
     for(GroupReference *itr = GetFirstMember(); itr != NULL; itr = itr->next())
     {
         Player *looter = itr->getSource();
-        if (looter->IsWithinDist(object, sWorld.getConfig(CONFIG_FLOAT_GROUP_XP_DISTANCE), false))
+        if (looter->IsWithinDist(creature, sWorld.getConfig(CONFIG_FLOAT_GROUP_XP_DISTANCE), false))
             looter->GetSession()->SendPacket(&data);
     }
 }
@@ -719,7 +688,7 @@ bool Group::CountRollVote(ObjectGuid const& playerGUID, Rolls::iterator& rollI, 
     return false;
 }
 
-void Group::StartLootRool(WorldObject* lootTarget, Loot* loot, uint8 itemSlot, bool skipIfCanNotUse)
+void Group::StartLootRool(Creature* lootTarget, Loot* loot, uint8 itemSlot, bool skipIfCanNotUse)
 {
     if (itemSlot >= loot->items.size())
         return;
@@ -1001,7 +970,6 @@ void Group::SendUpdate()
                                                             // guess size
         WorldPacket data(SMSG_GROUP_LIST, (1+1+1+1+8+4+GetMembersCount()*20));
         data << uint8(m_groupType);                         // group type (flags in 3.3)
-//        data << uint8(isBGGroup() ? 1 : 0);                 // 2.0.x, isBattleGroundGroup?
         data << uint8(citr->group);                         // groupid
         data << uint8(GetFlags(*citr));                     // group flags
         data << uint8(isBGGroup() ? 1 : 0);                 // 2.0.x, isBattleGroundGroup?
@@ -1435,7 +1403,7 @@ void Group::ChangeMembersGroup(Player *player, uint8 group)
     }
 }
 
-void Group::UpdateLooterGuid( WorldObject* object, bool ifneed )
+void Group::UpdateLooterGuid( Creature* creature, bool ifneed )
 {
     switch (GetLootMethod())
     {
@@ -1455,7 +1423,7 @@ void Group::UpdateLooterGuid( WorldObject* object, bool ifneed )
         {
             // not update if only update if need and ok
             Player* looter = ObjectAccessor::FindPlayer(guid_itr->guid);
-            if(looter && looter->IsWithinDist(object, sWorld.getConfig(CONFIG_FLOAT_GROUP_XP_DISTANCE), false))
+            if(looter && looter->IsWithinDist(creature, sWorld.getConfig(CONFIG_FLOAT_GROUP_XP_DISTANCE), false))
                 return;
         }
         ++guid_itr;
@@ -1468,16 +1436,16 @@ void Group::UpdateLooterGuid( WorldObject* object, bool ifneed )
         {
             if(Player* pl = ObjectAccessor::FindPlayer(itr->guid))
             {
-                if (pl->IsWithinDist(object, sWorld.getConfig(CONFIG_FLOAT_GROUP_XP_DISTANCE), false))
+                if (pl->IsWithinDist(creature, sWorld.getConfig(CONFIG_FLOAT_GROUP_XP_DISTANCE), false))
                 {
-                    bool refresh = pl->GetLootGUID() == object->GetGUID();
+                    bool refresh = pl->GetLootGUID() == creature->GetGUID();
 
                     //if(refresh)                             // update loot for new looter
                     //    pl->GetSession()->DoLootRelease(pl->GetLootGUID());
                     SetLooterGuid(pl->GetGUID());
                     SendUpdate();
                     if(refresh)                             // update loot for new looter
-                        pl->SendLoot(object->GetGUID(), LOOT_CORPSE);
+                        pl->SendLoot(creature->GetGUID(), LOOT_CORPSE);
                     return;
                 }
             }
@@ -1489,16 +1457,16 @@ void Group::UpdateLooterGuid( WorldObject* object, bool ifneed )
     {
         if(Player* pl = ObjectAccessor::FindPlayer(itr->guid))
         {
-            if (pl->IsWithinDist(object, sWorld.getConfig(CONFIG_FLOAT_GROUP_XP_DISTANCE), false))
+            if (pl->IsWithinDist(creature, sWorld.getConfig(CONFIG_FLOAT_GROUP_XP_DISTANCE), false))
             {
-                bool refresh = pl->GetLootGUID()==object->GetGUID();
+                bool refresh = pl->GetLootGUID()==creature->GetGUID();
 
                 //if(refresh)                               // update loot for new looter
                 //    pl->GetSession()->DoLootRelease(pl->GetLootGUID());
                 SetLooterGuid(pl->GetGUID());
                 SendUpdate();
                 if(refresh)                                 // update loot for new looter
-                    pl->SendLoot(object->GetGUID(), LOOT_CORPSE);
+                    pl->SendLoot(creature->GetGUID(), LOOT_CORPSE);
                 return;
             }
         }
@@ -1537,10 +1505,6 @@ GroupJoinBattlegroundResult Group::CanJoinBattleGroundQueue(BattleGround const* 
     uint32 arenaTeamId = reference->GetArenaTeamId(arenaSlot);
     uint32 team = reference->GetTeam();
 
-    uint32 allowedPlayerCount = 0;
-
-    BattleGroundQueueTypeId bgQueueTypeIdRandom = BattleGroundMgr::BGQueueTypeId(BATTLEGROUND_RB, 0);
-
     // check every member of the group to be able to join
     for(GroupReference *itr = GetFirstMember(); itr != NULL; itr = itr->next())
     {
@@ -1561,26 +1525,13 @@ GroupJoinBattlegroundResult Group::CanJoinBattleGroundQueue(BattleGround const* 
         // don't let join if someone from the group is already in that bg queue
         if(member->InBattleGroundQueueForBattleGroundQueueType(bgQueueTypeId))
             return ERR_BATTLEGROUND_JOIN_FAILED;            // not blizz-like
-        // don't let join if someone from the group is in bg queue random
-        if(member->InBattleGroundQueueForBattleGroundQueueType(bgQueueTypeIdRandom))
-            return ERR_IN_RANDOM_BG;
-        // don't let join to bg queue random if someone from the group is already in bg queue
-        if(bgOrTemplate->GetTypeID() == BATTLEGROUND_RB && member->InBattleGroundQueue())
-            return ERR_IN_NON_RANDOM_BG;
         // check for deserter debuff in case not arena queue
         if(bgOrTemplate->GetTypeID() != BATTLEGROUND_AA && !member->CanJoinToBattleground())
             return ERR_GROUP_JOIN_BATTLEGROUND_DESERTERS;
         // check if member can join any more battleground queues
         if(!member->HasFreeBattleGroundQueueId())
             return ERR_BATTLEGROUND_TOO_MANY_QUEUES;        // not blizz-like
-
-        ++allowedPlayerCount;
     }
-
-    if(bgOrTemplate->GetTypeID() == BATTLEGROUND_AA)
-        if(allowedPlayerCount < MinPlayerCount || allowedPlayerCount > MaxPlayerCount)
-            return ERR_ARENA_TEAM_PARTY_SIZE;
-
     return GroupJoinBattlegroundResult(bgOrTemplate->GetTypeID());
 }
 

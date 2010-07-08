@@ -508,9 +508,7 @@ enum ProcFlags
     PROC_FLAG_ON_TRAP_ACTIVATION            = 0x00200000,   // 21 On trap activation
 
     PROC_FLAG_TAKEN_OFFHAND_HIT             = 0x00400000,   // 22 Taken off-hand melee attacks(not used)
-    PROC_FLAG_SUCCESSFUL_OFFHAND_HIT        = 0x00800000,   // 23 Successful off-hand melee attacks
-
-    PROC_FLAG_ON_DEATH                      = 0x01000000    // 24 On caster's death
+    PROC_FLAG_SUCCESSFUL_OFFHAND_HIT        = 0x00800000    // 23 Successful off-hand melee attacks
 };
 
 #define MELEE_BASED_TRIGGER_MASK (PROC_FLAG_SUCCESSFUL_MELEE_HIT        | \
@@ -920,16 +918,6 @@ class SpellMgr
                     return true;
 
             return false;
-        }
-
-        uint8 IsHighestRankOfSpell(uint32 spell) const
-        {
-            SpellChainMapNext::const_iterator itr = mSpellChainsNext.find(spell);
-
-            if (!(itr == mSpellChainsNext.end()) && (itr->second)) // the spell is in the chain list and a higher-rank spell is available
-                return false;
-            else
-                return true;
         }
 
         bool IsRankSpellDueToSpell(SpellEntry const *spellInfo_1,uint32 spellId_2) const;

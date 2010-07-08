@@ -198,7 +198,6 @@ void WorldSession::HandleMoveSplineDoneOpcode(WorldPacket& recv_data)
     // 1) end taxi path in far (multi-node) flight
     // 2) switch from one map to other in case multi-map taxi path
     // we need process only (1)
-
     uint32 curDest = GetPlayer()->m_taxi.GetTaxiDestination();
     if(!curDest)
         return;

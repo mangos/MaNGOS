@@ -21,7 +21,6 @@
 
 #include "Platform/Define.h"
 #include "Database/DatabaseEnv.h"
-#include "SharedDefines.h"
 
 #include <string>
 #include <vector>

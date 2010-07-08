@@ -78,8 +78,7 @@ enum WorldTimers
     WUPDATE_CORPSES     = 5,
     WUPDATE_EVENTS      = 6,
     WUPDATE_DELETECHARS = 7,
-    WUPDATE_AUTOBROADCAST = 8,
-    WUPDATE_COUNT       = 9
+    WUPDATE_COUNT       = 8
 };
 
 /// Configuration elements
@@ -451,7 +450,6 @@ class World
 
         WorldSession* FindSession(uint32 id) const;
         void AddSession(WorldSession *s);
-        void SendBroadcast();
         bool RemoveSession(uint32 id);
         /// Get the number of current active sessions
         void UpdateMaxSessionCounters();
@@ -506,7 +504,6 @@ class World
         /// Next daily quests reset time
         time_t GetNextDailyQuestsResetTime() const { return m_NextDailyQuestReset; }
         time_t GetNextWeeklyQuestsResetTime() const { return m_NextWeeklyQuestReset; }
-        time_t GetNextRandomBGResetTime() const { return m_NextRandomBGReset; }
 
         /// Get the maximum skill level a player can reach
         uint16 GetConfigMaxSkillValue() const
@@ -582,28 +579,6 @@ class World
         static float GetVisibleUnitGreyDistance()           { return m_VisibleUnitGreyDistance;       }
         static float GetVisibleObjectGreyDistance()         { return m_VisibleObjectGreyDistance;     }
 
-        //movement anticheat enable flag
-        inline bool GetMvAnticheatEnable()             {return m_MvAnticheatEnable;}
-        inline bool GetMvAnticheatKick()               {return m_MvAnticheatKick;}
-        inline bool GetMvAnticheatAnnounce()           {return m_MvAnticheatAnnounce;}
-        inline uint32 GetMvAnticheatAlarmCount()       {return m_MvAnticheatAlarmCount;}
-        inline uint32 GetMvAnticheatAlarmPeriod()      {return m_MvAnticheatAlarmPeriod;}
-        inline unsigned char GetMvAnticheatBan()       {return m_MvAntiCheatBan;}
-        inline std::string GetMvAnticheatBanTime()     {return m_MvAnticheatBanTime;}
-        inline unsigned char GetMvAnticheatGmLevel()   {return m_MvAnticheatGmLevel;}
-        inline bool GetMvAnticheatKill()               {return m_MvAnticheatKill;}
-        inline float GetMvAnticheatMaxXYT()            {return m_MvAnticheatMaxXYT;}
-        inline uint16 GetMvAnticheatIgnoreAfterTeleport()   {return m_MvAnticheatIgnoreAfterTeleport;}
-
-        inline bool GetMvAnticheatSpeedCheck()         {return m_MvAnticheatSpeedCheck;}
-        inline bool GetMvAnticheatWaterCheck()         {return m_MvAnticheatWaterCheck;}
-        inline bool GetMvAnticheatFlyCheck()           {return m_MvAnticheatFlyCheck;}
-        inline bool GetMvAnticheatMountainCheck()      {return m_MvAnticheatMountainCheck;}
-        inline bool GetMvAnticheatJumpCheck()          {return m_MvAnticheatJumpCheck;}
-        inline bool GetMvAnticheatTeleportCheck()      {return m_MvAnticheatTeleportCheck;}
-        inline bool GetMvAnticheatTeleport2PlaneCheck()  {return m_MvAnticheatTeleport2PlaneCheck;}
-
-
         void ProcessCliCommands();
         void QueueCliCommand(CliCommandHolder* commandHolder) { cliCmdQueue.add(commandHolder); }
 
@@ -630,10 +605,8 @@ class World
 
         void InitDailyQuestResetTime();
         void InitWeeklyQuestResetTime();
-        void InitRandomBGResetTime();
         void ResetDailyQuests();
         void ResetWeeklyQuests();
-        void ResetRandomBG();
     private:
         void setConfig(eConfigUInt32Values index, char const* fieldname, uint32 defvalue);
         void setConfig(eConfigInt32Values index, char const* fieldname, int32 defvalue);
@@ -697,26 +670,6 @@ class World
         static float m_VisibleUnitGreyDistance;
         static float m_VisibleObjectGreyDistance;
 
-        //movement anticheat enable flag
-        bool m_MvAnticheatEnable;
-        bool m_MvAnticheatKick;
-        bool m_MvAnticheatAnnounce;
-        uint32 m_MvAnticheatAlarmCount;
-        uint32 m_MvAnticheatAlarmPeriod;
-        unsigned char m_MvAntiCheatBan;
-        std::string m_MvAnticheatBanTime;
-        unsigned char m_MvAnticheatGmLevel;
-        bool m_MvAnticheatKill;
-        float m_MvAnticheatMaxXYT;
-        uint16 m_MvAnticheatIgnoreAfterTeleport;
-        bool m_MvAnticheatSpeedCheck;
-        bool m_MvAnticheatWaterCheck;
-        bool m_MvAnticheatFlyCheck;
-        bool m_MvAnticheatMountainCheck;
-        bool m_MvAnticheatJumpCheck;
-        bool m_MvAnticheatTeleportCheck;
-        bool m_MvAnticheatTeleport2PlaneCheck;
-
         // CLI command holder to be thread safe
         ACE_Based::LockedQueue<CliCommandHolder*,ACE_Thread_Mutex> cliCmdQueue;
         SqlResultQueue *m_resultQueue;
@@ -724,7 +677,6 @@ class World
         // next daily quests reset time
         time_t m_NextDailyQuestReset;
         time_t m_NextWeeklyQuestReset;
-        time_t m_NextRandomBGReset;
 
         //Player Queue
         Queue m_QueuedPlayer;

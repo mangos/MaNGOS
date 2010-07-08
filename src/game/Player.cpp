@@ -530,7 +530,6 @@ Player::Player (WorldSession *session): Unit(), m_achievementMgr(this), m_reputa
     //returning reagents for temporarily removed pets
     //when dying/logging out
     m_oldpetspell = 0;
-    m_lastpetnumber = 0;
 
     ////////////////////Rest System/////////////////////
     time_inn_enter=0;
@@ -538,17 +537,6 @@ Player::Player (WorldSession *session): Unit(), m_achievementMgr(this), m_reputa
     m_rest_bonus=0;
     rest_type=REST_TYPE_NO;
     ////////////////////Rest System/////////////////////
-
-    //movement anticheat
-    m_anti_lastmovetime = 0;   //last movement time
-    m_anti_NextLenCheck = 0;
-    m_anti_MovedLen = 0.0f;
-    m_anti_BeginFallZ = INVALID_HEIGHT;
-    m_anti_lastalarmtime = 0;    //last time when alarm generated
-    m_anti_alarmcount = 0;       //alarm counter
-    m_anti_TeleTime = 0;
-    m_CanFly=false;
-    /////////////////////////////////
 
     m_mailsUpdated = false;
     unReadMails = 0;
@@ -591,8 +579,6 @@ Player::Player (WorldSession *session): Unit(), m_achievementMgr(this), m_reputa
 
     // Honor System
     m_lastHonorUpdateTime = time(NULL);
-
-    m_IsBGRandomWinner = false;
 
     // Player summoning
     m_summon_expire = 0;
@@ -1415,9 +1401,6 @@ void Player::Update( uint32 p_time )
             RegenerateAll();
     }
 
-    if (!isAlive() && !HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))
-        SetHealth(0);
-
     if (m_deathState == JUST_DIED)
         KillPlayer();
 
@@ -1940,7 +1923,6 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
 
             m_teleport_dest = WorldLocation(mapid, final_x, final_y, final_z, final_o);
             SetFallInformation(0, final_z);
-
             // if the player is saved before worldport ack (at logout for example)
             // this will be used instead of the current location in SaveToDB
 
@@ -2162,22 +2144,6 @@ void Player::Regenerate(Powers power, uint32 diff)
                             cd_diff = cd_diff * ((*i)->GetModifier()->m_amount + 100) / 100;
 
                     SetRuneCooldown(rune, (cd < cd_diff) ? 0 : cd - cd_diff);
-
-                    // check if we don't have cooldown, need convert and that our rune wasn't already converted
-                    if (cd < cd_diff && m_runes->IsRuneNeedsConvert(rune) && GetBaseRune(rune) == GetCurrentRune(rune))
-                    {
-                        // currently all delayed rune converts happen with rune death
-                        // ConvertedBy was initialized at proc
-                        ConvertRune(rune, RUNE_DEATH);
-                        SetNeedConvertRune(rune, false);
-                    }
-                }
-                else if (m_runes->IsRuneNeedsConvert(rune) && GetBaseRune(rune) == GetCurrentRune(rune))
-                {
-                    // currently all delayed rune converts happen with rune death
-                    // ConvertedBy was initialized at proc
-                    ConvertRune(rune, RUNE_DEATH);
-                    SetNeedConvertRune(rune, false);
                 }
             }
         }   break;
@@ -2267,10 +2233,6 @@ Creature* Player::GetNPCIfCanInteractWith(ObjectGuid guid, uint32 npcflagmask)
     // not in interactive state
     if (hasUnitState(UNIT_STAT_CAN_NOT_REACT_OR_LOST_CONTROL))
         return NULL;
-
-    // needed by Aura 292
-    if (GetGUID() == guid.GetRawValue())
-        return ((Creature*)this);
 
     // exist (we need look pets also for some interaction (quest/etc)
     Creature *unit = GetMap()->GetCreatureOrPetOrVehicle(guid);
@@ -4454,8 +4416,7 @@ void Player::BuildPlayerRepop()
     if(GetCorpse())
     {
         sLog.outError("BuildPlayerRepop: player %s(%d) already has a corpse", GetName(), GetGUIDLow());
-        sLog.outError("Removing player %s(%d) corpse from DB", GetName(), GetGUIDLow());
-        CharacterDatabase.PExecute("DELETE FROM corpse WHERE player = '%d'",GetGUIDLow());
+        ASSERT(false);
     }
 
     // create a corpse and place it at the player's location
@@ -4890,7 +4851,7 @@ void Player::RepopAtGraveyard()
     AreaTableEntry const *zone = GetAreaEntryByAreaID(GetAreaId());
 
     // Such zones are considered unreachable as a ghost and the player must be automatically revived
-    if ((!isAlive() && zone && zone->flags & AREA_FLAG_NEED_FLY) || GetTransport() || GetPositionZ() < -500.0f)
+    if ((!isAlive() && zone && zone->flags & AREA_FLAG_NEED_FLY) || GetTransport())
     {
         ResurrectPlayer(0.5f);
         SpawnCorpseBones();
@@ -6305,28 +6266,11 @@ void Player::RewardReputation(Unit *pVictim, float rate)
     if(!Rep)
         return;
 
-    uint32 Repfaction1 = Rep->repfaction1;
-    uint32 Repfaction2 = Rep->repfaction2;
-    uint32 tabardFactionID = 0;
-    
-    // Championning tabard reputation system
-    if(HasAura(Rep->championingAura))
-    {
-        if( Item* pItem = GetItemByPos( INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_TABARD ) )
-        {                 
-            if ( tabardFactionID = pItem->GetProto()->RequiredReputationFaction ) 
-            {
-                Repfaction1 = tabardFactionID;
-                Repfaction2 = tabardFactionID;
-            }
-        }
-    }
-
     if(Rep->repfaction1 && (!Rep->team_dependent || GetTeam()==ALLIANCE))
     {
-        int32 donerep1 = CalculateReputationGain(pVictim->getLevel(), Rep->repvalue1, Repfaction1, false);
+        int32 donerep1 = CalculateReputationGain(pVictim->getLevel(), Rep->repvalue1, Rep->repfaction1, false);
         donerep1 = int32(donerep1*rate);
-        FactionEntry const *factionEntry1 = sFactionStore.LookupEntry(Repfaction1);
+        FactionEntry const *factionEntry1 = sFactionStore.LookupEntry(Rep->repfaction1);
         uint32 current_reputation_rank1 = GetReputationMgr().GetRank(factionEntry1);
         if (factionEntry1 && current_reputation_rank1 <= Rep->reputation_max_cap1)
             GetReputationMgr().ModifyReputation(factionEntry1, donerep1);
@@ -6342,9 +6286,9 @@ void Player::RewardReputation(Unit *pVictim, float rate)
 
     if(Rep->repfaction2 && (!Rep->team_dependent || GetTeam()==HORDE))
     {
-        int32 donerep2 = CalculateReputationGain(pVictim->getLevel(), Rep->repvalue2, Repfaction2, false);
+        int32 donerep2 = CalculateReputationGain(pVictim->getLevel(), Rep->repvalue2, Rep->repfaction2, false);
         donerep2 = int32(donerep2*rate);
-        FactionEntry const *factionEntry2 = sFactionStore.LookupEntry(Repfaction2);
+        FactionEntry const *factionEntry2 = sFactionStore.LookupEntry(Rep->repfaction2);
         uint32 current_reputation_rank2 = GetReputationMgr().GetRank(factionEntry2);
         if (factionEntry2 && current_reputation_rank2 <= Rep->reputation_max_cap2)
             GetReputationMgr().ModifyReputation(factionEntry2, donerep2);
@@ -6533,7 +6477,7 @@ bool Player::RewardHonor(Unit *uVictim, uint32 groupsize, float honor)
             if (!cVictim->isRacialLeader())
                 return false;
 
-            honor = 2000;                                    // ??? need more info
+            honor = 100;                                    // ??? need more info
             victim_rank = 19;                               // HK: Leader
         }
     }
@@ -7855,7 +7799,7 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
                 uint32 lootid =  go->GetGOInfo()->GetLootId();
                 if ((go->GetEntry() == BG_AV_OBJECTID_MINE_N || go->GetEntry() == BG_AV_OBJECTID_MINE_S))
                     if (BattleGround *bg = GetBattleGround())
-                        if (bg->GetTypeID(true) == BATTLEGROUND_AV)
+                        if (bg->GetTypeID() == BATTLEGROUND_AV)
                             if (!(((BattleGroundAV*)bg)->PlayerCanDoMineQuest(go->GetEntry(), GetTeam())))
                             {
                                 SendLootRelease(guid);
@@ -7868,67 +7812,12 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
                     loot->clear();
                     loot->FillLoot(lootid, LootTemplates_Gameobject, this, false);
                     loot->generateMoneyLoot(go->GetGOInfo()->MinMoneyLoot, go->GetGOInfo()->MaxMoneyLoot);
-
-                    if (Group* group = this->GetGroup())
-                    {
-                            if (go->GetGoType() == GAMEOBJECT_TYPE_CHEST)
-                            {
-                                if (go->GetGOInfo()->chest.groupLootRules == 1)
-                                {
-                                    group->UpdateLooterGuid(go,true);
-
-                                    switch (group->GetLootMethod())
-                                    {
-                                    case GROUP_LOOT:
-                                        // GroupLoot delete items over threshold (threshold even not implemented), and roll them. Items with quality<threshold, round robin
-                                        group->GroupLoot(go, loot);
-                                        permission = GROUP_PERMISSION;
-                                        break;
-                                    case NEED_BEFORE_GREED:
-                                        group->NeedBeforeGreed(go, loot);
-                                        permission = GROUP_PERMISSION;
-                                        break;
-                                    case MASTER_LOOT:
-                                        group->MasterLoot(go, loot);
-                                        permission = MASTER_PERMISSION;
-                                        break;
-                                    default:
-                                        break;
-                                    }
-                                }
-                            }
-                        }
                 }
 
                 if (loot_type == LOOT_FISHING)
                     go->getFishLoot(loot,this);
 
                 go->SetLootState(GO_ACTIVATED);
-            }
-            if ((go->getLootState() == GO_ACTIVATED) && (go->GetGoType() == GAMEOBJECT_TYPE_CHEST))
-            {
-                if (go->GetGOInfo()->chest.groupLootRules == 1)
-                {
-                    if(Group* group = GetGroup())
-                    {
-                        if (group == this->GetGroup())
-                        {
-                            if (group->GetLootMethod() == FREE_FOR_ALL)
-                                permission = ALL_PERMISSION;
-                            else if (group->GetLooterGuid() == GetGUID())
-                            {
-                                if (group->GetLootMethod() == MASTER_LOOT)
-                                    permission = MASTER_PERMISSION;
-                                else
-                                    permission = ALL_PERMISSION;
-                            }
-                            else
-                                permission = GROUP_PERMISSION;
-                        }
-                        else
-                            permission = NONE_PERMISSION;
-                    }
-                }
             }
             break;
         }
@@ -7985,7 +7874,7 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
                 bones->lootForBody = true;
                 uint32 pLevel = bones->loot.gold;
                 bones->loot.clear();
-                if (GetBattleGround() && GetBattleGround()->GetTypeID(true) == BATTLEGROUND_AV)
+                if (GetBattleGround()->GetTypeID() == BATTLEGROUND_AV)
                     loot->FillLoot(0, LootTemplates_Creature, this, false);
                 // It may need a better formula
                 // Now it works like this: lvl10: ~6copper, lvl70: ~9silver
@@ -8479,25 +8368,25 @@ void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
         case 2257:
             break;
         case 2597:                                          // AV
-            if (bg && bg->GetTypeID(true) == BATTLEGROUND_AV)
+            if (bg && bg->GetTypeID() == BATTLEGROUND_AV)
                 bg->FillInitialWorldStates(data, count);
             else
                 FillInitialWorldState(data,count, AV_world_states);
             break;
         case 3277:                                          // WS
-            if (bg && bg->GetTypeID(true) == BATTLEGROUND_WS)
+            if (bg && bg->GetTypeID() == BATTLEGROUND_WS)
                 bg->FillInitialWorldStates(data, count);
             else
                 FillInitialWorldState(data,count, WS_world_states);
             break;
         case 3358:                                          // AB
-            if (bg && bg->GetTypeID(true) == BATTLEGROUND_AB)
+            if (bg && bg->GetTypeID() == BATTLEGROUND_AB)
                 bg->FillInitialWorldStates(data, count);
             else
                 FillInitialWorldState(data,count, AB_world_states);
             break;
         case 3820:                                          // EY
-            if (bg && bg->GetTypeID(true) == BATTLEGROUND_EY)
+            if (bg && bg->GetTypeID() == BATTLEGROUND_EY)
                 bg->FillInitialWorldStates(data, count);
             else
                 FillInitialWorldState(data,count, EY_world_states);
@@ -8512,7 +8401,7 @@ void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
             FillInitialWorldState(data,count, ZM_world_states);
             break;
         case 3698:                                          // Nagrand Arena
-            if (bg && bg->GetTypeID(true) == BATTLEGROUND_NA)
+            if (bg && bg->GetTypeID() == BATTLEGROUND_NA)
                 bg->FillInitialWorldStates(data, count);
             else
             {
@@ -8522,7 +8411,7 @@ void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
             }
             break;
         case 3702:                                          // Blade's Edge Arena
-            if (bg && bg->GetTypeID(true) == BATTLEGROUND_BE)
+            if (bg && bg->GetTypeID() == BATTLEGROUND_BE)
                 bg->FillInitialWorldStates(data, count);
             else
             {
@@ -8532,33 +8421,13 @@ void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
             }
             break;
         case 3968:                                          // Ruins of Lordaeron
-            if (bg && bg->GetTypeID(true) == BATTLEGROUND_RL)
+            if (bg && bg->GetTypeID() == BATTLEGROUND_RL)
                 bg->FillInitialWorldStates(data, count);
             else
             {
                 FillInitialWorldState(data,count,0xbb8,0x0);// 7 gold
                 FillInitialWorldState(data,count,0xbb9,0x0);// 8 green
                 FillInitialWorldState(data,count,0xbba,0x0);// 9 show
-            }
-            break;
-        case 4378:                                          // Dalaran Severs
-            if (bg && bg->GetTypeID(true) == BATTLEGROUND_DS)
-                bg->FillInitialWorldStates(data, count);
-            else
-            {
-                FillInitialWorldState(data,count,0xe11,0x0);// 7 gold
-                FillInitialWorldState(data,count,0xe10,0x0);// 8 green
-                FillInitialWorldState(data,count,0xe1a,0x0);// 9 show
-            }
-            break;
-        case 4406:                                          // Ring of Valor
-            if (bg && bg->GetTypeID(true) == BATTLEGROUND_RV)
-                bg->FillInitialWorldStates(data, count);
-            else
-            {
-                FillInitialWorldState(data,count,0xe11,0x0);// 7 gold
-                FillInitialWorldState(data,count,0xe10,0x0);// 8 green
-                FillInitialWorldState(data,count,0xe1a,0x0);// 9 show
             }
             break;
         case 3703:                                          // Shattrath City
@@ -11898,16 +11767,10 @@ void Player::SwapItem( uint16 src, uint16 dst )
         else
             return;
 
-if(pSrcItem->GetCount() > pSrcItem->GetProto()->GetMaxStackSize() || pDstItem->GetCount() > pDstItem->GetProto()->GetMaxStackSize())
-    {
-        SendEquipError( EQUIP_ERR_TRIED_TO_SPLIT_MORE_THAN_COUNT, pSrcItem, NULL );
-        return;
-    }
-
         // can be merge/fill
         if(msg == EQUIP_ERR_OK)
         {
-            if( pSrcItem->GetCount() + pDstItem->GetCount() <= pSrcItem->GetProto()->GetMaxStackSize() && pSrcItem->GetCount() + pDstItem->GetCount() <= pDstItem->GetProto()->GetMaxStackSize() )
+            if( pSrcItem->GetCount() + pDstItem->GetCount() <= pSrcItem->GetProto()->GetMaxStackSize())
             {
                 RemoveItem(srcbag, srcslot, true);
 
@@ -12402,15 +12265,6 @@ void Player::ApplyEnchantment(Item *item, EnchantmentSlot slot, bool apply, bool
 
     if (!ignore_condition && pEnchant->EnchantmentCondition && !((Player*)this)->EnchantmentFitsRequirements(pEnchant->EnchantmentCondition, -1))
         return;
-
-    if ((pEnchant->requiredLevel) > ((Player*)this)->getLevel())
-        return;
-
-    if ((pEnchant->requiredSkill) > 0)
-    {
-       if ((pEnchant->requiredSkillValue) > (((Player*)this)->GetSkillValue(pEnchant->requiredSkill)))
-        return;
-    }
 
     if (!item->IsBroken())
     {
@@ -13698,7 +13552,7 @@ void Player::RewardQuest( Quest const *pQuest, uint32 reward, Object* questGiver
     RemoveTimedQuest(quest_id);
 
     if (BattleGround* bg = GetBattleGround())
-        if (bg->GetTypeID(true) == BATTLEGROUND_AV)
+        if (bg->GetTypeID() == BATTLEGROUND_AV)
             ((BattleGroundAV*)bg)->HandleQuestComplete(pQuest->GetQuestId(), this);
 
     if (pQuest->GetRewChoiceItemsCount() > 0)
@@ -14959,57 +14813,6 @@ void Player::SendQuestUpdateAddCreatureOrGo( Quest const* pQuest, ObjectGuid gui
 /***                   LOAD SYSTEM                     ***/
 /*********************************************************/
 
-bool Player::MinimalLoadFromDB( QueryResult *result, uint32 guid )
-{
-    bool delete_result = true;
-    if (!result)
-    {
-        //                                        0     1     2           3           4           5    6          7          8          9    10     11    12
-        result = CharacterDatabase.PQuery("SELECT guid, name, position_x, position_y, position_z, map, totaltime, leveltime, at_login, zone, level, race, class FROM characters WHERE guid = '%u'",guid);
-        if (!result)
-            return false;
-    }
-    else
-        delete_result = false;
-
-    sLog.outDebug("Player #%d minimal data loaded",GUID_LOPART(guid));
-
-    Field *fields = result->Fetch();
-
-    Object::_Create( guid, 0, HIGHGUID_PLAYER );
-
-    m_name = fields[1].GetCppString();
-
-    uint8 m_race  = fields[11].GetUInt8();
-    uint8 m_class = fields[12].GetUInt8();
-
-    Relocate(fields[2].GetFloat(),fields[3].GetFloat(),fields[4].GetFloat());
-    SetLocationMapId(fields[5].GetUInt32());
-
-    // the instance id is not needed at character enum
-
-    m_Played_time[PLAYED_TIME_TOTAL] = fields[6].GetUInt32();
-    m_Played_time[PLAYED_TIME_LEVEL] = fields[7].GetUInt32();
-
-    m_atLoginFlags = fields[8].GetUInt32();
-
-    // I don't see these used anywhere ..
-    //_LoadGroup();
-
-    //_LoadBoundInstances();
-
-    if (delete_result)
-        delete result;
-
-    for (int i = 0; i < PLAYER_SLOTS_COUNT; ++i)
-        m_items[i] = NULL;
-
-    if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))
-        m_deathState = DEAD;
-
-    return true;
-}
-
 void Player::_LoadDeclinedNames(QueryResult* result)
 {
     if(!result)
@@ -15590,7 +15393,6 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
     _LoadQuestStatus(holder->GetResult(PLAYER_LOGIN_QUERY_LOADQUESTSTATUS));
     _LoadDailyQuestStatus(holder->GetResult(PLAYER_LOGIN_QUERY_LOADDAILYQUESTSTATUS));
     _LoadWeeklyQuestStatus(holder->GetResult(PLAYER_LOGIN_QUERY_LOADWEEKLYQUESTSTATUS));
-    _LoadRandomBGStatus(holder->GetResult(PLAYER_LOGIN_QUERY_LOADRANDOMBG));
 
     _LoadTalents(holder->GetResult(PLAYER_LOGIN_QUERY_LOADTALENTS));
 
@@ -16525,15 +16327,6 @@ void Player::_LoadGroup(QueryResult *result)
                 // the group leader may change the instance difficulty while the player is offline
                 SetDungeonDifficulty(group->GetDungeonDifficulty());
                 SetRaidDifficulty(group->GetRaidDifficulty());
-            }
-            // Group Interfactions interactions (test)
-            if (sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_GROUP))
-            {
-                if (group->GetCreatorRace())
-                {
-                    setFactionForRace(group->GetCreatorRace());
-                    sLog.outDebug( "PLAYER LOAD: Group Interfaction Interactions - Faction changed (LoadPlayer)" );
-                } else sLog.outDebug( "PLAYER LOAD: Group Interfaction Interactions - cannot change faction, CreatorRace is NULL" );
             }
         }
     }
@@ -17778,39 +17571,27 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
     if (pet && m_temporaryUnsummonedPetNumber && m_temporaryUnsummonedPetNumber != pet->GetCharmInfo()->GetPetNumber() && mode == PET_SAVE_AS_CURRENT)
         mode = PET_SAVE_NOT_IN_SLOT;
 
-    if(mode != PET_SAVE_AS_CURRENT && !InBattleGround())
+    if (returnreagent && pet && mode != PET_SAVE_AS_CURRENT)
     {
         //returning of reagents only for players, so best done here
-        uint32 spellId = pet ? pet->GetUInt32Value(UNIT_CREATED_BY_SPELL) : m_oldpetspell;      // this is nonsense, pet will always be != NULL here
+        uint32 spellId = pet ? pet->GetUInt32Value(UNIT_CREATED_BY_SPELL) : m_oldpetspell;
+        SpellEntry const *spellInfo = sSpellStore.LookupEntry(spellId);
 
-        if(SpellEntry const *spellInfo = sSpellStore.LookupEntry(spellId))
+        if(spellInfo)
         {
-            // returning of reagents
-            if (returnreagent)
+            for(uint32 i = 0; i < MAX_SPELL_REAGENTS; ++i)
             {
-                for(uint32 i = 0; i < MAX_SPELL_REAGENTS; ++i)
+                if(spellInfo->Reagent[i] > 0)
                 {
-                    if(spellInfo->Reagent[i] > 0)
+                    ItemPosCountVec dest;                   //for succubus, voidwalker, felhunter and felguard credit soulshard when despawn reason other than death (out of range, logout)
+                    uint8 msg = CanStoreNewItem( NULL_BAG, NULL_SLOT, dest, spellInfo->Reagent[i], spellInfo->ReagentCount[i] );
+                    if( msg == EQUIP_ERR_OK )
                     {
-                        ItemPosCountVec dest;                   //for succubus, voidwalker, felhunter and felguard credit soulshard when despawn reason other than death (out of range, logout)
-                        uint8 msg = CanStoreNewItem( NULL_BAG, NULL_SLOT, dest, spellInfo->Reagent[i], spellInfo->ReagentCount[i] );
-                        if( msg == EQUIP_ERR_OK )
-                        {
-                            Item* item = StoreNewItem( dest, spellInfo->Reagent[i], true);
-                            if(IsInWorld())
-                                SendNewItem(item,spellInfo->ReagentCount[i],true,false);
-                        }
+                        Item* item = StoreNewItem( dest, spellInfo->Reagent[i], true);
+                        if(IsInWorld())
+                            SendNewItem(item,spellInfo->ReagentCount[i],true,false);
                     }
                 }
-            }
-            // cooldown, only if pet is not death already (corpse)
-            if (spellInfo->Attributes & SPELL_ATTR_DISABLED_WHILE_ACTIVE && pet->getDeathState() != CORPSE)
-            {
-                SendCooldownEvent(spellInfo);
-                // Raise Dead hack
-                if (spellInfo->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT && spellInfo->SpellFamilyFlags & 0x1000)
-                    if (spellInfo = sSpellStore.LookupEntry(46584))
-                        SendCooldownEvent(spellInfo);
             }
         }
     }
@@ -20878,7 +20659,7 @@ bool Player::CanCaptureTowerPoint()
            );
 }
 
-uint32 Player::GetBarberShopCost(uint8 newhairstyle, uint8 newhaircolor, uint8 newfacialhair, uint8 newskintone)
+uint32 Player::GetBarberShopCost(uint8 newhairstyle, uint8 newhaircolor, uint8 newfacialhair)
 {
     uint32 level = getLevel();
 
@@ -20888,10 +20669,8 @@ uint32 Player::GetBarberShopCost(uint8 newhairstyle, uint8 newhaircolor, uint8 n
     uint8 hairstyle = GetByteValue(PLAYER_BYTES, 2);
     uint8 haircolor = GetByteValue(PLAYER_BYTES, 3);
     uint8 facialhair = GetByteValue(PLAYER_BYTES_2, 0);
-    uint8 skintone = GetByteValue(PLAYER_BYTES, 0);
 
-    if((hairstyle == newhairstyle) && (haircolor == newhaircolor) && (facialhair == newfacialhair) &&
-        ((skintone == newskintone) || (newskintone == 0)))
+    if((hairstyle == newhairstyle) && (haircolor == newhaircolor) && (facialhair == newfacialhair))
         return 0;
 
     GtBarberShopCostBaseEntry const *bsc = sGtBarberShopCostBaseStore.LookupEntry(level - 1);
@@ -20909,9 +20688,6 @@ uint32 Player::GetBarberShopCost(uint8 newhairstyle, uint8 newhaircolor, uint8 n
 
     if(facialhair != newfacialhair)
         cost += bsc->cost * 0.75f;                          // +3/4 of price
-
-    if(skintone != newskintone && newskintone != 0)         // +1/2 of price
-        cost += bsc->cost * 0.5f;
 
     return uint32(cost);
 }
@@ -21109,12 +20885,9 @@ void Player::SetTitle(CharTitlesEntry const* title, bool lost)
     GetSession()->SendPacket(&data);
 }
 
-void Player::ConvertRune(uint8 index, RuneType newType, uint32 spellid)
+void Player::ConvertRune(uint8 index, RuneType newType)
 {
     SetCurrentRune(index, newType);
-
-    if (spellid != 0)
-        SetConvertedBy(index, spellid);
 
     WorldPacket data(SMSG_CONVERT_RUNE, 2);
     data << uint8(index);
@@ -21157,14 +20930,12 @@ void Player::InitRunes()
     m_runes = new Runes;
 
     m_runes->runeState = 0;
-    m_runes->needConvert = 0;
 
     for(uint32 i = 0; i < MAX_RUNES; ++i)
     {
         SetBaseRune(i, runeSlotTypes[i]);                   // init base types
         SetCurrentRune(i, runeSlotTypes[i]);                // init current types
         SetRuneCooldown(i, 0);                              // reset cooldowns
-        SetConvertedBy(i, 0);                               // init spellid
         m_runes->SetRuneState(i);
     }
 
@@ -21432,9 +21203,7 @@ uint8 Player::CanEquipUniqueItem( ItemPrototype const* itemProto, uint8 except_s
 void Player::HandleFall(MovementInfo const& movementInfo)
 {
     // calculate total z distance of the fall
-    float z_diff = (m_lastFallZ >= m_anti_BeginFallZ ? m_lastFallZ : m_anti_BeginFallZ) - movementInfo.GetPos()->z;
-
-    m_anti_BeginFallZ=INVALID_HEIGHT;
+    float z_diff = m_lastFallZ - movementInfo.GetPos()->z;
     DEBUG_LOG("zDiff = %f", z_diff);
 
     //Players with low fall distance, Feather Fall or physical immunity (charges used) are ignored
@@ -21744,12 +21513,6 @@ void Player::UnsummonPetTemporaryIfAny()
     if(!pet)
         return;
 
-    if (((Player*)this)->InArena())
-    {
-        RemovePet(pet, PET_SAVE_NOT_IN_SLOT); // remove pet while is player teleported to arena
-        return;
-    }
- 
     if(!m_temporaryUnsummonedPetNumber && pet->isControlled() && !pet->isTemporarySummoned() )
     {
         m_temporaryUnsummonedPetNumber = pet->GetCharmInfo()->GetPetNumber();
@@ -22428,23 +22191,5 @@ void Player::SetRestType( RestType n_r_type, uint32 areaTriggerId /*= 0*/)
 
         if(sWorld.IsFFAPvPRealm())
             SetFFAPvP(false);
-    }
-}
-
-void Player::SetRandomWinner(bool isWinner)
-{
-    m_IsBGRandomWinner = isWinner;
-    if(m_IsBGRandomWinner)
-        CharacterDatabase.PExecute("INSERT INTO character_battleground_random (guid) VALUES ('%u')", GetGUIDLow());
-}
-
-void Player::_LoadRandomBGStatus(QueryResult *result)
-{
-    //QueryResult *result = CharacterDatabase.PQuery("SELECT guid FROM character_battleground_random WHERE guid = '%u'", GetGUIDLow());
-
-    if (result)
-    {
-        m_IsBGRandomWinner = true;
-        delete result;
     }
 }

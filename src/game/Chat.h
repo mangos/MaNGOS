@@ -108,7 +108,7 @@ class ChatHandler
         bool HandleAccountSetAddonCommand(const char* args);
         bool HandleAccountSetGmLevelCommand(const char* args);
         bool HandleAccountSetPasswordCommand(const char* args);
-        bool HandleAHBotOptionsCommand(const char* args);
+
         bool HandleBanAccountCommand(const char* args);
         bool HandleBanCharacterCommand(const char* args);
         bool HandleBanIPCommand(const char* args);
@@ -405,7 +405,6 @@ class ChatHandler
         bool HandleReloadSpellTargetPositionCommand(const char* args);
         bool HandleReloadSpellThreatsCommand(const char* args);
         bool HandleReloadSpellPetAurasCommand(const char* args);
-        bool HandleReloadSpellDisabledCommand(const char* args);
 
         bool HandleResetAchievementsCommand(const char * args);
         bool HandleResetAllCommand(const char * args);

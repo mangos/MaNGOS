@@ -546,7 +546,7 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask *
     bool IsPerCasterAuraState = false;
     if (updatetype == UPDATETYPE_CREATE_OBJECT || updatetype == UPDATETYPE_CREATE_OBJECT2)
     {
-        if (isType(TYPEMASK_GAMEOBJECT) && !((GameObject*)this)->IsDynTransport())
+        if (isType(TYPEMASK_GAMEOBJECT) && !((GameObject*)this)->IsTransport())
         {
             if ( ((GameObject*)this)->ActivateToQuest(target) || target->isGameMaster())
                 IsActivateToQuest = true;
@@ -564,7 +564,7 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask *
     }
     else                                                    // case UPDATETYPE_VALUES
     {
-        if (isType(TYPEMASK_GAMEOBJECT) && !((GameObject*)this)->IsDynTransport())
+        if (isType(TYPEMASK_GAMEOBJECT) && !((GameObject*)this)->IsTransport())
         {
             if ( ((GameObject*)this)->ActivateToQuest(target) || target->isGameMaster())
             {
@@ -1089,7 +1089,7 @@ void Object::BuildUpdateData( UpdateDataMapType& /*update_players */)
 }
 
 WorldObject::WorldObject()
-    : m_isActiveObject(false), m_currMap(NULL), m_mapId(0), m_InstanceId(0), m_phaseMask(PHASEMASK_NORMAL), m_groupLootTimer(0), m_groupLootId(0),
+    : m_isActiveObject(false), m_currMap(NULL), m_mapId(0), m_InstanceId(0), m_phaseMask(PHASEMASK_NORMAL),
     m_positionX(0.0f), m_positionY(0.0f), m_positionZ(0.0f), m_orientation(0.0f)
 {
 }
@@ -1247,32 +1247,8 @@ bool WorldObject::IsWithinLOS(float ox, float oy, float oz) const
 {
     float x,y,z;
     GetPosition(x,y,z);
-    z += 2.0f;
-    oz += 2.0f;
-
-    // check for line of sight because of terrain height differences
-    Map const *map = GetBaseMap();
-    float dx = ox - x, dy = oy - y, dz = oz - z;
-    float dist = sqrt(dx*dx + dy*dy + dz*dz);
-    if (dist > ATTACK_DISTANCE && dist < MAX_VISIBILITY_DISTANCE)
-    {
-        uint32 steps = uint32(dist / TERRAIN_LOS_STEP_DISTANCE);
-        float step_dist = dist / (float)steps;  // to make sampling intervals symmetric in both directions
-        float inc_factor = step_dist / dist;
-        float incx = dx*inc_factor, incy = dy*inc_factor, incz = dz*inc_factor;
-        float px = x, py = y, pz = z;
-        for (; steps; --steps)
-        {
-            if (map->GetHeight(px, py, pz, false) > pz)
-                return false;  // found intersection with ground
-            px += incx;
-            py += incy;
-            pz += incz;
-        }
-    }
-
     VMAP::IVMapManager *vMapManager = VMAP::VMapFactory::createOrGetVMapManager();
-    return vMapManager->isInLineOfSight(GetMapId(), x, y, z, ox, oy, oz);
+    return vMapManager->isInLineOfSight(GetMapId(), x, y, z+2.0f, ox, oy, oz+2.0f);
 }
 
 bool WorldObject::GetDistanceOrder(WorldObject const* obj1, WorldObject const* obj2, bool is3D /* = true */) const
@@ -1448,23 +1424,11 @@ void WorldObject::GetRandomPoint( float x, float y, float z, float distance, flo
     UpdateGroundPositionZ(rand_x,rand_y,rand_z);            // update to LOS height if available
 }
 
-void WorldObject::UpdateGroundPositionZ(float x, float y, float &z, float maxDiff) const
+void WorldObject::UpdateGroundPositionZ(float x, float y, float &z) const
 {
-    maxDiff = maxDiff >= 100.0f ? 10.0f : sqrtf(maxDiff);
-    bool useVmaps = false;
-    if( GetBaseMap()->GetHeight(x, y, z, false) <  GetBaseMap()->GetHeight(x, y, z, true) ) // check use of vmaps
-        useVmaps = true;
-
-    float normalizedZ = GetBaseMap()->GetHeight(x, y, z, useVmaps);
-    // check if its reacheable
-    if(normalizedZ <= INVALID_HEIGHT || fabs(normalizedZ-z) > maxDiff)
-    {
-        useVmaps = !useVmaps;                                // try change vmap use
-        normalizedZ = GetBaseMap()->GetHeight(x, y, z, useVmaps);
-        if(normalizedZ <= INVALID_HEIGHT || fabs(normalizedZ-z) > maxDiff)
-            return;                                        // Do nothing in case of another bad result 
-    }
-    z = normalizedZ + 0.1f;                                // just to be sure that we are not a few pixel under the surface
+    float new_z = GetBaseMap()->GetHeight(x,y,z,true);
+    if(new_z > INVALID_HEIGHT)
+        z = new_z+ 0.05f;                                   // just to be sure that we are not a few pixel under the surface
 }
 
 bool WorldObject::IsPositionValid() const
@@ -1699,26 +1663,6 @@ Creature* WorldObject::SummonCreature(uint32 id, float x, float y, float z, floa
 
     // return the creature therewith the summoner has access to it
     return pCreature;
-}
-
-GameObject* WorldObject::SummonGameobject(uint32 id, float x, float y, float z, float angle, uint32 despwtime)
-{
-    GameObject* pGameObj = new GameObject;
-
-    Map *map = GetMap();
-
-    if(!pGameObj->Create(sObjectMgr.GenerateLowGuid(HIGHGUID_GAMEOBJECT), id, map,
-        GetPhaseMask(), x, y, z, angle, 0.0f, 0.0f, 0.0f, 0.0f, 100, GO_STATE_READY))
-    {
-        delete pGameObj;
-        return NULL;
-    }
-
-    pGameObj->SetRespawnTime(despwtime/IN_MILLISECONDS);
-
-    map->Add(pGameObj);
-
-    return pGameObj;
 }
 
 namespace MaNGOS
@@ -1997,24 +1941,6 @@ void WorldObject::BuildUpdateData( UpdateDataMapType & update_players)
     Cell::VisitWorldObjects(this, notifier, GetMap()->GetVisibilityDistance());
 
     ClearUpdateMask(false);
-}
-
-void WorldObject::StartGroupLoot( Group* group, uint32 timer )
-{
-    m_groupLootId = group->GetId();
-    m_groupLootTimer = timer;
-}
-
-void WorldObject::StopGroupLoot()
-{
-    if (!m_groupLootId)
-        return;
-
-    if (Group* group = sObjectMgr.GetGroupById(m_groupLootId))
-        group->EndRoll();
-
-    m_groupLootTimer = 0;
-    m_groupLootId = 0;
 }
 
 bool WorldObject::IsControlledByPlayer() const

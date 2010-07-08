@@ -715,9 +715,6 @@ bool Item::CanBeTraded(bool mail) const
     if (m_lootGenerated)
         return false;
 
-    if(!mail && IsBoundAccountWide()) // Dirty hack, because trade window is closing
-        return false;
-
     if ((!mail || !IsBoundAccountWide()) && IsSoulBound())
         return false;
 
@@ -877,7 +874,6 @@ bool Item::GemsFitSockets() const
             }
         }
 
-        SocketColor = SocketColor ? SocketColor : PRISMATIC_SOCKET;
         fits &= (GemColor & SocketColor) ? true : false;
     }
     return fits;

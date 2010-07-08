@@ -272,7 +272,6 @@ ObjectGridUnloader::Visit(GridRefManager<T> &m)
     while(!m.isEmpty())
     {
         T *obj = m.getFirst()->getSource();
-        if (obj) {
         // if option set then object already saved at this moment
         if(!sWorld.getConfig(CONFIG_BOOL_SAVE_RESPAWN_TIME_IMMEDIATLY))
             obj->SaveRespawnTime();
@@ -280,8 +279,6 @@ ObjectGridUnloader::Visit(GridRefManager<T> &m)
         obj->RemoveFromWorld();
         ///- object will get delinked from the manager when deleted
         delete obj;
-        }
-        else sLog.outError("ERROR: Attempt to delete non-existed object!");
     }
 }
 

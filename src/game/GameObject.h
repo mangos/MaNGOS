@@ -590,7 +590,6 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
         GameObjectInfo const* GetGOInfo() const;
 
         bool IsTransport() const;
-        bool IsDynTransport() const;
 
         uint32 GetDBTableGUIDLow() const { return m_DBTableGuid; }
 

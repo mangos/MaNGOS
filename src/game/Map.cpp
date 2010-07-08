@@ -1121,13 +1121,10 @@ uint16 Map::GetAreaFlag(float x, float y, float z) const
             if (x > 5568.0f && x < 6116.0f && y > 282.0f && y < 982.0f && z > 563.0f)
             {
                 // Krasus' Landing (Dalaran), fast check
-                if (x > 5758.77f && x < 5869.03f && y < 555.75f)
+                if (x > 5758.77f && x < 5869.03f && y < 510.46f)
                 {
                     // Krasus' Landing (Dalaran), with open east side
-                    if (y < 449.33f ||
-                       (x-5813.90f)*(x-5813.90f)+(y-449.33f)*(y-449.33f) < 1864.0f ||
-                       (x-5824.10f)*(x-5824.10f)+(y-532.27f)*(y-532.27f) < 600.00f ||
-                       (x-5825.84f)*(x-5825.84f)+(y-493.00f)*(y-493.00f) < 462.00f)
+                    if (y < 449.33f || (x-5813.9f)*(x-5813.9f)+(y-449.33f)*(y-449.33f) < 1864.0f)
                     {
                         areaflag = 2531;                    // Note: also 2633, possible one flight allowed and other not allowed case
                         break;
@@ -1544,8 +1541,7 @@ void Map::AddObjectToRemoveList(WorldObject *obj)
 {
     ASSERT(obj->GetMapId()==GetId() && obj->GetInstanceId()==GetInstanceId());
 
-    // need clean references at end of update cycle, NOT during it! called at Map::Remove
-    //obj->CleanupsBeforeDelete();                            // remove or simplify at least cross referenced links
+    obj->CleanupsBeforeDelete();                            // remove or simplify at least cross referenced links
 
     i_objectsToRemove.insert(obj);
     //DEBUG_LOG("Object (GUID: %u TypeId: %u ) added to removing list.",obj->GetGUIDLow(),obj->GetTypeId());
@@ -3073,28 +3069,6 @@ void Map::SendObjectUpdates()
         iter->first->GetSession()->SendPacket(&packet);
         packet.clear();                                     // clean the string
     }
-}
-
-bool Map::IsNextZcoordOK(float x, float y, float oldZ, float maxDiff) const
-{
-    // The fastest way to get an accurate result 90% of the time.
-    // Better result can be obtained like 99% accuracy with a ray light, but the cost is too high and the code is too long.
-    maxDiff = maxDiff >= 100.0f ? 10.0f : sqrtf(maxDiff);
-    bool useVmaps = false;
-    if( GetHeight(x, y, oldZ, false) <  GetHeight(x, y, oldZ, true) ) // check use of vmaps
-        useVmaps = true;
-
-    float newZ = GetHeight(x, y, oldZ+maxDiff-2.0f, useVmaps);
-
-    if (fabs(newZ-oldZ) > maxDiff)                              // bad...
-    {
-        useVmaps = !useVmaps;                                     // try change vmap use
-        newZ = GetHeight(x, y, oldZ+maxDiff-2.0f, useVmaps);
-
-        if (fabs(newZ-oldZ) > maxDiff)
-            return false;
-    }
-    return true;
 }
 
 uint32 Map::GenerateLocalLowGuid(HighGuid guidhigh)

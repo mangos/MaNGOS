@@ -311,7 +311,6 @@ class Spell
         void EffectDispelMechanic(SpellEffectIndex eff_idx);
         void EffectSummonDeadPet(SpellEffectIndex eff_idx);
         void EffectSummonAllTotems(SpellEffectIndex eff_idx);
-        void EffectSummonPhantasm (SpellEffectIndex eff_idx);
         void EffectBreakPlayerTargeting (SpellEffectIndex eff_idx);
         void EffectDestroyAllTotems(SpellEffectIndex eff_idx);
         void EffectDurabilityDamage(SpellEffectIndex eff_idx);
@@ -383,14 +382,12 @@ class Spell
         void DoSummonGuardian(SpellEffectIndex eff_idx, uint32 forceFaction = 0);
         void DoSummonTotem(SpellEffectIndex eff_idx, uint8 slot_dbc = 0);
         void DoSummonCritter(SpellEffectIndex eff_idx, uint32 forceFaction = 0);
-        void DoSummonSnakes(SpellEffectIndex eff_idx);
 
         void WriteSpellGoTargets( WorldPacket * data );
         void WriteAmmoToPacket( WorldPacket * data );
 
         typedef std::list<Unit*> UnitList;
         void FillTargetMap();
-        bool FillCustomTargetMap(uint32 i, UnitList &targetUnitMap); 
         void SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList &targetUnitMap);
 
         void FillAreaTargets(UnitList &targetUnitMap, float x, float y, float radius, SpellNotifyPushType pushType, SpellTargets spellTargets, WorldObject* originalCaster = NULL);

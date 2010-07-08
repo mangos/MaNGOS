@@ -174,7 +174,7 @@ enum EnchantmentSlot
 };
 
 #define MAX_VISIBLE_ITEM_OFFSET       2                     // 2 fields per visible item (entry+enchantment)
-#define PRISMATIC_SOCKET              14                    // 1110 mask = blue(1) yellow(1) red(1) meta(0)
+
 #define MAX_GEM_SOCKETS               MAX_ITEM_PROTO_SOCKETS// (BONUS_ENCHANTMENT_SLOT-SOCK_ENCHANTMENT_SLOT) and item proto size, equal value expected
 
 enum EnchantmentOffset
