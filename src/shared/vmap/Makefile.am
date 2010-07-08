@@ -27,30 +27,20 @@ AM_CPPFLAGS = $(MANGOS_INCLUDES) -I$(top_builddir)/src/shared -I$(srcdir) -I$(sr
 noinst_LIBRARIES = libmangosvmaps.a
 
 libmangosvmaps_a_SOURCES = \
-	AABSPTree.h \
-	BaseModel.cpp \
-	BaseModel.h \
-	CoordModelMapping.cpp \
-	CoordModelMapping.h \
-	DebugCmdLogger.cpp \
-	DebugCmdLogger.h \
+	BIH.h \
+	BIH.cpp \
 	IVMapManager.h \
-	ManagedModelContainer.cpp \
-	ManagedModelContainer.h \
-	ModelContainer.cpp \
-	ModelContainer.h \
-	NodeValueAccess.h \
-	ShortBox.h \
-	ShortVector.h \
-	SubModel.cpp \
-	SubModel.h \
+	MapTree.cpp \
+	MapTree.h \
+	ModelInstance.cpp \
+	ModelInstance.h \
 	TileAssembler.cpp \
 	TileAssembler.h \
-	TreeNode.cpp \
-	TreeNode.h \
 	VMapDefinitions.h \
 	VMapFactory.cpp \
 	VMapFactory.h \
-	VMapManager.cpp \
-	VMapManager.h \
-	VMapTools.h
+	VMapManager2.cpp \
+	VMapManager2.h \
+	VMapTools.h \
+	WorldModel.cpp \
+	WorldModel.h

@@ -37,7 +37,7 @@ pAuraProcHandler AuraProcHandler[TOTAL_AURAS]=
     &Unit::HandleNULLProc,                                      //  1 SPELL_AURA_BIND_SIGHT
     &Unit::HandleNULLProc,                                      //  2 SPELL_AURA_MOD_POSSESS
     &Unit::HandleNULLProc,                                      //  3 SPELL_AURA_PERIODIC_DAMAGE
-    &Unit::HandleDummyAuraProc,                             //  4 SPELL_AURA_DUMMY
+    &Unit::HandleDummyAuraProc,                                 //  4 SPELL_AURA_DUMMY
     &Unit::HandleNULLProc,                                      //  5 SPELL_AURA_MOD_CONFUSE
     &Unit::HandleNULLProc,                                      //  6 SPELL_AURA_MOD_CHARM
     &Unit::HandleNULLProc,                                      //  7 SPELL_AURA_MOD_FEAR
@@ -75,8 +75,8 @@ pAuraProcHandler AuraProcHandler[TOTAL_AURAS]=
     &Unit::HandleNULLProc,                                      // 39 SPELL_AURA_SCHOOL_IMMUNITY
     &Unit::HandleNULLProc,                                      // 40 SPELL_AURA_DAMAGE_IMMUNITY
     &Unit::HandleNULLProc,                                      // 41 SPELL_AURA_DISPEL_IMMUNITY
-    &Unit::HandleProcTriggerSpellAuraProc,                  // 42 SPELL_AURA_PROC_TRIGGER_SPELL  
-    &Unit::HandleProcTriggerDamageAuraProc,                 // 43 SPELL_AURA_PROC_TRIGGER_DAMAGE 
+    &Unit::HandleProcTriggerSpellAuraProc,                      // 42 SPELL_AURA_PROC_TRIGGER_SPELL  
+    &Unit::HandleProcTriggerDamageAuraProc,                     // 43 SPELL_AURA_PROC_TRIGGER_DAMAGE 
     &Unit::HandleNULLProc,                                      // 44 SPELL_AURA_TRACK_CREATURES
     &Unit::HandleNULLProc,                                      // 45 SPELL_AURA_TRACK_RESOURCES
     &Unit::HandleNULLProc,                                      // 46 SPELL_AURA_46 (used in test spells 54054 and 54058, and spell 48050) (3.0.8a-3.2.2a)
@@ -90,7 +90,7 @@ pAuraProcHandler AuraProcHandler[TOTAL_AURAS]=
     &Unit::HandleNULLProc,                                      // 54 SPELL_AURA_MOD_HIT_CHANCE
     &Unit::HandleNULLProc,                                      // 55 SPELL_AURA_MOD_SPELL_HIT_CHANCE
     &Unit::HandleNULLProc,                                      // 56 SPELL_AURA_TRANSFORM
-    &Unit::HandleSpellCritChanceAuraProc,                   // 57 SPELL_AURA_MOD_SPELL_CRIT_CHANCE
+    &Unit::HandleSpellCritChanceAuraProc,                       // 57 SPELL_AURA_MOD_SPELL_CRIT_CHANCE
     &Unit::HandleNULLProc,                                      // 58 SPELL_AURA_MOD_INCREASE_SWIM_SPEED
     &Unit::HandleNULLProc,                                      // 59 SPELL_AURA_MOD_DAMAGE_DONE_CREATURE 
     &Unit::HandleNULLProc,                                      // 60 SPELL_AURA_MOD_PACIFY_SILENCE
@@ -98,27 +98,27 @@ pAuraProcHandler AuraProcHandler[TOTAL_AURAS]=
     &Unit::HandleNULLProc,                                      // 62 SPELL_AURA_PERIODIC_HEALTH_FUNNEL
     &Unit::HandleNULLProc,                                      // 63 unused (3.0.8a-3.2.2a) old SPELL_AURA_PERIODIC_MANA_FUNNEL
     &Unit::HandleNULLProc,                                      // 64 SPELL_AURA_PERIODIC_MANA_LEECH
-    &Unit::HandleModCastingSpeedNotStackAuraProc,           // 65 SPELL_AURA_MOD_CASTING_SPEED_NOT_STACK
+    &Unit::HandleModCastingSpeedNotStackAuraProc,               // 65 SPELL_AURA_MOD_CASTING_SPEED_NOT_STACK
     &Unit::HandleNULLProc,                                      // 66 SPELL_AURA_FEIGN_DEATH
     &Unit::HandleNULLProc,                                      // 67 SPELL_AURA_MOD_DISARM
     &Unit::HandleNULLProc,                                      // 68 SPELL_AURA_MOD_STALKED
     &Unit::HandleNULLProc,                                      // 69 SPELL_AURA_SCHOOL_ABSORB 
     &Unit::HandleNULLProc,                                      // 70 SPELL_AURA_EXTRA_ATTACKS      Useless, used by only one spell 41560 that has only visual effect (3.2.2a)
     &Unit::HandleNULLProc,                                      // 71 SPELL_AURA_MOD_SPELL_CRIT_CHANCE_SCHOOL
-    &Unit::HandleModPowerCostSchoolAuraProc,                // 72 SPELL_AURA_MOD_POWER_COST_SCHOOL_PCT
-    &Unit::HandleModPowerCostSchoolAuraProc,                // 73 SPELL_AURA_MOD_POWER_COST_SCHOOL
-    &Unit::HandleReflectSpellsSchoolAuraProc,               // 74 SPELL_AURA_REFLECT_SPELLS_SCHOOL  
+    &Unit::HandleModPowerCostSchoolAuraProc,                    // 72 SPELL_AURA_MOD_POWER_COST_SCHOOL_PCT
+    &Unit::HandleModPowerCostSchoolAuraProc,                    // 73 SPELL_AURA_MOD_POWER_COST_SCHOOL
+    &Unit::HandleReflectSpellsSchoolAuraProc,                   // 74 SPELL_AURA_REFLECT_SPELLS_SCHOOL  
     &Unit::HandleNULLProc,                                      // 75 SPELL_AURA_MOD_LANGUAGE           
     &Unit::HandleNULLProc,                                      // 76 SPELL_AURA_FAR_SIGHT
-    &Unit::HandleMechanicImmuneResistanceAuraProc,          // 77 SPELL_AURA_MECHANIC_IMMUNITY
+    &Unit::HandleMechanicImmuneResistanceAuraProc,              // 77 SPELL_AURA_MECHANIC_IMMUNITY
     &Unit::HandleNULLProc,                                      // 78 SPELL_AURA_MOUNTED
-    &Unit::HandleModDamagePercentDoneAuraProc,              // 79 SPELL_AURA_MOD_DAMAGE_PERCENT_DONE
+    &Unit::HandleModDamagePercentDoneAuraProc,                  // 79 SPELL_AURA_MOD_DAMAGE_PERCENT_DONE
     &Unit::HandleNULLProc,                                      // 80 SPELL_AURA_MOD_PERCENT_STAT
     &Unit::HandleNULLProc,                                      // 81 SPELL_AURA_SPLIT_DAMAGE_PCT       
     &Unit::HandleNULLProc,                                      // 82 SPELL_AURA_WATER_BREATHING
     &Unit::HandleNULLProc,                                      // 83 SPELL_AURA_MOD_BASE_RESISTANCE
     &Unit::HandleNULLProc,                                      // 84 SPELL_AURA_MOD_REGEN
-    &Unit::HandleCantTrigger,                               // 85 SPELL_AURA_MOD_POWER_REGEN
+    &Unit::HandleCantTrigger,                                   // 85 SPELL_AURA_MOD_POWER_REGEN
     &Unit::HandleNULLProc,                                      // 86 SPELL_AURA_CHANNEL_DEATH_ITEM
     &Unit::HandleNULLProc,                                      // 87 SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN 
     &Unit::HandleNULLProc,                                      // 88 SPELL_AURA_MOD_HEALTH_REGEN_PERCENT 
@@ -141,16 +141,16 @@ pAuraProcHandler AuraProcHandler[TOTAL_AURAS]=
     &Unit::HandleNULLProc,                                      //105 SPELL_AURA_FEATHER_FALL
     &Unit::HandleNULLProc,                                      //106 SPELL_AURA_HOVER
     &Unit::HandleNULLProc,                                      //107 SPELL_AURA_ADD_FLAT_MODIFIER
-    &Unit::HandleAddPctModifierAuraProc,                    //108 SPELL_AURA_ADD_PCT_MODIFIER
+    &Unit::HandleAddPctModifierAuraProc,                        //108 SPELL_AURA_ADD_PCT_MODIFIER
     &Unit::HandleNULLProc,                                      //109 SPELL_AURA_ADD_TARGET_TRIGGER
     &Unit::HandleNULLProc,                                      //110 SPELL_AURA_MOD_POWER_REGEN_PERCENT
     &Unit::HandleNULLProc,                                      //111 SPELL_AURA_ADD_CASTER_HIT_TRIGGER
-    &Unit::HandleOverrideClassScriptAuraProc,               //112 SPELL_AURA_OVERRIDE_CLASS_SCRIPTS
+    &Unit::HandleOverrideClassScriptAuraProc,                   //112 SPELL_AURA_OVERRIDE_CLASS_SCRIPTS
     &Unit::HandleNULLProc,                                      //113 SPELL_AURA_MOD_RANGED_DAMAGE_TAKEN
     &Unit::HandleNULLProc,                                      //114 SPELL_AURA_MOD_RANGED_DAMAGE_TAKEN_PCT
     &Unit::HandleNULLProc,                                      //115 SPELL_AURA_MOD_HEALING
     &Unit::HandleNULLProc,                                      //116 SPELL_AURA_MOD_REGEN_DURING_COMBAT
-    &Unit::HandleMechanicImmuneResistanceAuraProc,          //117 SPELL_AURA_MOD_MECHANIC_RESISTANCE
+    &Unit::HandleMechanicImmuneResistanceAuraProc,              //117 SPELL_AURA_MOD_MECHANIC_RESISTANCE
     &Unit::HandleNULLProc,                                      //118 SPELL_AURA_MOD_HEALING_PCT   
     &Unit::HandleNULLProc,                                      //119 unused (3.0.8a-3.2.2a) old SPELL_AURA_SHARE_PET_TRACKING
     &Unit::HandleNULLProc,                                      //120 SPELL_AURA_UNTRACKABLE
@@ -171,7 +171,7 @@ pAuraProcHandler AuraProcHandler[TOTAL_AURAS]=
     &Unit::HandleNULLProc,                                      //135 SPELL_AURA_MOD_HEALING_DONE
     &Unit::HandleNULLProc,                                      //136 SPELL_AURA_MOD_HEALING_DONE_PERCENT
     &Unit::HandleNULLProc,                                      //137 SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE
-    &Unit::HandleHasteAuraProc,                             //138 SPELL_AURA_MOD_HASTE
+    &Unit::HandleHasteAuraProc,                                 //138 SPELL_AURA_MOD_HASTE
     &Unit::HandleNULLProc,                                      //139 SPELL_AURA_FORCE_REACTION
     &Unit::HandleNULLProc,                                      //140 SPELL_AURA_MOD_RANGED_HASTE
     &Unit::HandleNULLProc,                                      //141 SPELL_AURA_MOD_RANGED_AMMO_HASTE
@@ -182,7 +182,7 @@ pAuraProcHandler AuraProcHandler[TOTAL_AURAS]=
     &Unit::HandleNULLProc,                                      //146 SPELL_AURA_ALLOW_TAME_PET_TYPE
     &Unit::HandleNULLProc,                                      //147 SPELL_AURA_MECHANIC_IMMUNITY_MASK
     &Unit::HandleNULLProc,                                      //148 SPELL_AURA_RETAIN_COMBO_POINTS
-    &Unit::HandleCantTrigger,                               //149 SPELL_AURA_REDUCE_PUSHBACK
+    &Unit::HandleCantTrigger,                                   //149 SPELL_AURA_REDUCE_PUSHBACK
     &Unit::HandleNULLProc,                                      //150 SPELL_AURA_MOD_SHIELD_BLOCKVALUE_PCT
     &Unit::HandleNULLProc,                                      //151 SPELL_AURA_TRACK_STEALTHED
     &Unit::HandleNULLProc,                                      //152 SPELL_AURA_MOD_DETECTED_RANGE
@@ -258,13 +258,13 @@ pAuraProcHandler AuraProcHandler[TOTAL_AURAS]=
     &Unit::HandleNULLProc,                                      //222 unused (3.0.8a-3.2.2a) only for spell 44586 that not used in real spell cast
     &Unit::HandleNULLProc,                                      //223 dummy code (cast damage spell to attacker) and another dymmy (jump to another nearby raid member)
     &Unit::HandleNULLProc,                                      //224 unused (3.0.8a-3.2.2a)
-    &Unit::HandleMendingAuraProc,                           //225 SPELL_AURA_PRAYER_OF_MENDING
+    &Unit::HandleMendingAuraProc,                               //225 SPELL_AURA_PRAYER_OF_MENDING
     &Unit::HandleNULLProc,                                      //226 SPELL_AURA_PERIODIC_DUMMY
     &Unit::HandleNULLProc,                                      //227 SPELL_AURA_PERIODIC_TRIGGER_SPELL_WITH_VALUE
     &Unit::HandleNULLProc,                                      //228 SPELL_AURA_DETECT_STEALTH
     &Unit::HandleNULLProc,                                      //229 SPELL_AURA_MOD_AOE_DAMAGE_AVOIDANCE
     &Unit::HandleNULLProc,                                      //230 Commanding Shout
-    &Unit::HandleProcTriggerSpellAuraProc,                  //231 SPELL_AURA_PROC_TRIGGER_SPELL_WITH_VALUE
+    &Unit::HandleProcTriggerSpellAuraProc,                      //231 SPELL_AURA_PROC_TRIGGER_SPELL_WITH_VALUE
     &Unit::HandleNULLProc,                                      //232 SPELL_AURA_MECHANIC_DURATION_MOD
     &Unit::HandleNULLProc,                                      //233 set model id to the one of the creature with id m_modifier.m_miscvalue
     &Unit::HandleNULLProc,                                      //234 SPELL_AURA_MECHANIC_DURATION_MOD_NOT_STACK
@@ -304,8 +304,8 @@ pAuraProcHandler AuraProcHandler[TOTAL_AURAS]=
     &Unit::HandleNULLProc,                                      //268 SPELL_AURA_MOD_ATTACK_POWER_OF_STAT_PERCENT
     &Unit::HandleNULLProc,                                      //269 SPELL_AURA_MOD_IGNORE_DAMAGE_REDUCTION_SCHOOL
     &Unit::HandleNULLProc,                                      //270 SPELL_AURA_MOD_IGNORE_TARGET_RESIST (unused in 3.2.2a)
-    &Unit::HandleModDamageFromCasterAuraProc,               //271 SPELL_AURA_MOD_DAMAGE_FROM_CASTER
-    &Unit::HandleMaelstromWeaponAuraProc,                   //272 SPELL_AURA_MAELSTROM_WEAPON (unclear use for aura, it used in (3.2.2a...3.3.0) in single spell 53817 that spellmode stacked and charged spell expected to be drop as stack
+    &Unit::HandleModDamageFromCasterAuraProc,                   //271 SPELL_AURA_MOD_DAMAGE_FROM_CASTER
+    &Unit::HandleMaelstromWeaponAuraProc,                       //272 SPELL_AURA_MAELSTROM_WEAPON (unclear use for aura, it used in (3.2.2a...3.3.0) in single spell 53817 that spellmode stacked and charged spell expected to be drop as stack
     &Unit::HandleNULLProc,                                      //273 SPELL_AURA_X_RAY (client side implementation)
     &Unit::HandleNULLProc,                                      //274 proc free shot?
     &Unit::HandleNULLProc,                                      //275 SPELL_AURA_MOD_IGNORE_SHAPESHIFT Use SpellClassMask for spell select
@@ -1291,9 +1291,6 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                 // Siphon Life
                 case 63108:
                 {
-                    if (triggeredByAura->GetEffIndex() != EFFECT_INDEX_0)
-                        return false;
-
                     // Glyph of Siphon Life
                     if (Aura *aur = GetAura(56216, EFFECT_INDEX_0))
                         triggerAmount += triggerAmount * aur->GetModifier()->m_amount / 100;
@@ -1347,11 +1344,6 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     if (!procSpell)
                         return false;
 
-                    // avoid double triggering from 2 auras
-                    if (triggeredByAura->GetEffIndex() != EFFECT_INDEX_1)
-                        return false;
-
-
                     // Renew
                     Aura* healingAura = pVictim->GetAura(SPELL_AURA_PERIODIC_HEAL, SPELLFAMILY_PRIEST, UI64LIT(0x40), 0, GetGUID());
                     if (!healingAura)
@@ -1367,9 +1359,6 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                 case 3790:
                 {
                     if (!procSpell)
-                        return false;
-
-                    if (triggeredByAura->GetEffIndex() != EFFECT_INDEX_1)
                         return false;
 
                     Aura* leachAura = pVictim->GetAura(SPELL_AURA_PERIODIC_LEECH, SPELLFAMILY_PRIEST, UI64LIT(0x02000000), NULL, GetGUID());
@@ -1586,9 +1575,7 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
             {
                 if (!procSpell)
                     return false;
-                // Only 0 aura can proc
-                if (effIndex != EFFECT_INDEX_0)
-                    return true;
+
                 // Wrath crit
                 if (procSpell->SpellFamilyFlags & UI64LIT(0x0000000000000001))
                 {

@@ -10,7 +10,11 @@
 # MaNGOS generated files at Windows build
 #
 
-*.ncb
-*.suo
-*.user
 bin
+
+# CMake files
+
+CMakeFiles
+CMakeCache.txt
+cmake_install.cmake
+
