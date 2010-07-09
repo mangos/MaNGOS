@@ -12,5 +12,13 @@
 
 *.ncb
 *.suo
-Release
-Debug
+*.sdf
+*.opensdf
+bin
+
+# CMake files
+
+CMakeFiles
+CMakeCache.txt
+cmake_install.cmake
+
