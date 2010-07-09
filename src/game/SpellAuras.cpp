@@ -8314,7 +8314,7 @@ void SpellAuraHolder::HandleSpellSpecificBoosts(bool apply)
                 {
                     int32 percent = 0;
                     Unit::AuraList const& dummyAuras = m_target->GetAurasByType(SPELL_AURA_DUMMY);
-                    for(Unit::AuraList::const_iterator itr = dummyAuras.begin(); itr != dummyAuras.end(); itr)
+                    for(Unit::AuraList::const_iterator itr = dummyAuras.begin(); itr != dummyAuras.end(); ++itr)
                     {
                         if ((*itr)->GetSpellProto()->SpellIconID == 3029)
                         {
