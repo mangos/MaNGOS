@@ -262,3 +262,11 @@ int32  Quest::GetRewOrReqMoney() const
 
     return int32(RewOrReqMoney * sWorld.getConfig(CONFIG_FLOAT_RATE_DROP_MONEY));
 }
+
+bool Quest::IsAllowedInRaid() const
+{
+    if (Type == QUEST_TYPE_RAID || Type == QUEST_TYPE_RAID_10 || Type == QUEST_TYPE_RAID_25)
+        return true;
+
+    return sWorld.getConfig(CONFIG_BOOL_QUEST_IGNORE_RAID);
+}
