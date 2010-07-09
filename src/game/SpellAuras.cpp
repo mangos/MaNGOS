@@ -1803,6 +1803,16 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         if (Unit* caster = GetCaster())
                             caster->CastSpell(caster, 13138, true, NULL, this);
                         return;
+                    case 32045:                             // Soul Charge
+                    case 32051:
+                    case 32052:
+                    {
+                        // max duration is 2 minutes, but expected to be random duration
+                        // real time randomness is unclear, using max 30 seconds here
+                        // see further down for expire of this aura
+                        SetAuraDuration(rand()%30*IN_MILLISECONDS);
+                        return;
+                    }
                     case 39850:                             // Rocket Blast
                         if (roll_chance_i(20))              // backfire stun
                             target->CastSpell(target, 51581, true, NULL, this);
@@ -1992,6 +2002,27 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                 target->CastSpell(target, 28206, true, NULL, this);
                 // Poison Cloud
                 target->CastSpell(target, 28240, true, NULL, this);
+                return;
+            }
+            case 32045:                                     // Soul Charge
+            {
+                if (m_removeMode == AURA_REMOVE_BY_EXPIRE)
+                    target->CastSpell(target, 32054, true, NULL, this);
+
+                return;
+            }
+            case 32051:                                     // Soul Charge
+            {
+                if (m_removeMode == AURA_REMOVE_BY_EXPIRE)
+                    target->CastSpell(target, 32057, true, NULL, this);
+
+                return;
+            }
+            case 32052:                                     // Soul Charge
+            {
+                if (m_removeMode == AURA_REMOVE_BY_EXPIRE)
+                    target->CastSpell(target, 32053, true, NULL, this);
+
                 return;
             }
             case 32286:                                     // Focus Target Visual

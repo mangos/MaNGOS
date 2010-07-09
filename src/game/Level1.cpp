@@ -313,6 +313,15 @@ bool ChatHandler::HandleGPSCommand(const char* args)
     uint32 have_map = GridMap::ExistMap(obj->GetMapId(),gx,gy) ? 1 : 0;
     uint32 have_vmap = GridMap::ExistVMap(obj->GetMapId(),gx,gy) ? 1 : 0;
 
+    if(have_vmap)
+    {
+        if(map->IsOutdoors(obj->GetPositionX(), obj->GetPositionY(), obj->GetPositionZ()))
+            PSendSysMessage("You are OUTdoor");
+        else
+            PSendSysMessage("You are INdoor");
+    }
+    else PSendSysMessage("no VMAP available for area info");
+
     PSendSysMessage(LANG_MAP_POSITION,
         obj->GetMapId(), (mapEntry ? mapEntry->name[GetSessionDbcLocale()] : "<unknown>" ),
         zone_id, (zoneEntry ? zoneEntry->area_name[GetSessionDbcLocale()] : "<unknown>" ),

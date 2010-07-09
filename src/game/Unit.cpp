@@ -3331,7 +3331,7 @@ void Unit::_UpdateSpells( uint32 time )
                         }
                     }
                 }
-                
+
                 if (!removedAura)
                     ++iter;
                 else
@@ -3924,7 +3924,7 @@ bool Unit::AddSpellAuraHolder(SpellAuraHolder *holder)
 
             if(stop)
                 break;
-            
+
         }
     }
 
@@ -4356,7 +4356,7 @@ void Unit::RemoveAurasDueToSpellBySteal(uint32 spellId, uint64 casterGUID, Unit 
 }
 
 void Unit::RemoveAurasDueToSpellByCancel(uint32 spellId)
-{  
+{
     SpellAuraHolderBounds spair = GetSpellAuraHolderBounds(spellId);
     for(SpellAuraHolderMap::iterator iter = spair.first; iter != spair.second;)
     {
@@ -4439,6 +4439,20 @@ void Unit::RemoveAurasWithInterruptFlags(uint32 flags)
     for (SpellAuraHolderMap::iterator iter = m_spellAuraHolders.begin(); iter != m_spellAuraHolders.end(); )
     {
         if (iter->second->GetSpellProto()->AuraInterruptFlags & flags)
+        {
+            RemoveSpellAuraHolder(iter->second);
+            iter = m_spellAuraHolders.begin();
+        }
+        else
+            ++iter;
+    }
+}
+
+void Unit::RemoveAurasWithAttribute(uint32 flags)
+{
+    for (SpellAuraHolderMap::iterator iter = m_spellAuraHolders.begin(); iter != m_spellAuraHolders.end(); )
+    {
+        if (iter->second->GetSpellProto()->Attributes & flags)
         {
             RemoveSpellAuraHolder(iter->second);
             iter = m_spellAuraHolders.begin();
@@ -4717,7 +4731,7 @@ Aura* Unit::GetAura(AuraType type, uint32 family, uint64 familyFlag, uint32 fami
 }
 
 bool Unit::HasAura(uint32 spellId, SpellEffectIndex effIndex) const
-{   
+{
     for(SpellAuraHolderMap::const_iterator i_holder = m_spellAuraHolders.lower_bound(spellId); i_holder != m_spellAuraHolders.upper_bound(spellId); ++i_holder)
         if (i_holder->second->GetAuraByEffectIndex(effIndex))
             return true;
@@ -6151,9 +6165,9 @@ uint32 Unit::SpellDamageBonusDone(Unit *pVictim, SpellEntry const *spellProto, u
         case SPELLFAMILY_WARLOCK:
         {
             // Drain Soul
-            if (spellProto->SpellFamilyFlags & UI64LIT(0x0000000000004000))	
+            if (spellProto->SpellFamilyFlags & UI64LIT(0x0000000000004000))
             {
-                if (pVictim->GetHealth() * 100 / pVictim->GetMaxHealth() <= 25) 	  	
+                if (pVictim->GetHealth() * 100 / pVictim->GetMaxHealth() <= 25)
                     DoneTotalMod *= 4;
             }
             break;
@@ -7778,7 +7792,7 @@ void Unit::SetVisibility(UnitVisibility x)
     {
         // some auras requires visible target
         if(m_Visibility == VISIBILITY_GROUP_NO_DETECT || m_Visibility == VISIBILITY_OFF)
-        {   
+        {
             static const AuraType auratypes[] = {SPELL_AURA_BIND_SIGHT, SPELL_AURA_FAR_SIGHT, SPELL_AURA_NONE};
             for (AuraType const* type = &auratypes[0]; *type != SPELL_AURA_NONE; ++type)
             {
