@@ -36,16 +36,16 @@ extern DatabaseType LoginDatabase;
 // list sorted from high to low build and first build used as low bound for accepted by default range (any > it will accepted by realmd at least)
 
 static RealmBuildInfo ExpectedRealmdClientBuilds[] = {
-    {12340, 3, 3, 5},                                       // highest supported build, also auto accept all above for simplify future supported builds testing
-    {12319, 4, 0, 0},                                       // temp, remove when beta build will be > live build...
-    {11723, 3, 3, 3},
-    {11403, 3, 3, 2},
-    {11159, 3, 3, 0},
-    {10505, 3, 2, 2},
-    {8606,  2, 4, 3},
-    {6005,  1,12, 2},
-    {5875,  1,12, 1},
-    {0,     0, 0, 0}                                        // terminator
+    {12340, 3, 3, 5, 'a'},                                  // highest supported build, also auto accept all above for simplify future supported builds testing
+    {12319, 4, 0, 0, ' '},                                  // temp, remove when beta build will be > live build...
+    {11723, 3, 3, 3, 'a'},
+    {11403, 3, 3, 2, ' '},
+    {11159, 3, 3, 0, 'a'},
+    {10505, 3, 2, 2, 'a'},
+    {8606,  2, 4, 3, ' '},
+    {6005,  1,12, 2, ' '},
+    {5875,  1,12, 1, ' '},
+    {0,     0, 0, 0, ' '}                                   // terminator
 };
 
 RealmBuildInfo const* FindBuildInfo(uint16 _build)
@@ -109,6 +109,7 @@ void RealmList::UpdateRealm( uint32 ID, const std::string& name, const std::stri
     realm.realmBuildInfo.major_version = 0;
     realm.realmBuildInfo.minor_version = 0;
     realm.realmBuildInfo.bugfix_version = 0;
+    realm.realmBuildInfo.hotfix_version = ' ';
 
     if (first_build)
         if (RealmBuildInfo const* bInfo = FindBuildInfo(first_build))
