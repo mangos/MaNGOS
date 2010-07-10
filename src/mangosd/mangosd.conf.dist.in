@@ -609,6 +609,11 @@ LogColors = ""
 #        Hour in one from weekly days when weekly quests reset (0..23)
 #        Default: 6
 #
+#    Quests.IgnoreRaid
+#        Non-raid quests allowed in raids
+#        Default: 0 (not allowed)
+#                 1 (allowed)
+#
 #    Guild.EventLogRecordsCount
 #        Count of guild event log records stored in guild_eventlog table
 #        Increase to store more guild events in table, minimum is 100
@@ -745,6 +750,7 @@ Quests.HighLevelHideDiff = 7
 Quests.Daily.ResetHour = 6
 Quests.Weekly.ResetWeekDay = 3
 Quests.Weekly.ResetHour = 6
+Quests.IgnoreRaid = 0
 Guild.EventLogRecordsCount = 100
 Guild.BankEventLogRecordsCount = 25
 TimerBar.Fatigue.GMLevel = 4
