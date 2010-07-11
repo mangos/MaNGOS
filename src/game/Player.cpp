@@ -2541,7 +2541,14 @@ void Player::GiveXP(uint32 xp, Unit* victim)
     if(!isAlive())
         return;
 
+    if(HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_XP_USER_DISABLED))
+        return;
+
     uint32 level = getLevel();
+
+    //prevent Northrend Level Leeching :P
+    if(level < 66 && GetMapId() == 571)
+        return;
 
     // XP to money conversion processed in Player::RewardQuest
     if(level >= sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
@@ -3821,6 +3828,8 @@ bool Player::resetTalents(bool no_cost, bool all_specs)
             return false;
         }
     }
+
+    RemoveAllEnchantments(TEMP_ENCHANTMENT_SLOT);
 
     for (PlayerTalentMap::iterator iter = m_talents[m_activeSpec].begin(); iter != m_talents[m_activeSpec].end();)
     {
@@ -6540,7 +6549,7 @@ bool Player::RewardHonor(Unit *uVictim, uint32 groupsize, float honor)
             if (!cVictim->isRacialLeader())
                 return false;
 
-            honor = 100;                                    // ??? need more info
+            honor = 2000;                                    // ??? need more info
             victim_rank = 19;                               // HK: Leader
         }
     }
@@ -7288,7 +7297,7 @@ void Player::_ApplyWeaponDependentAuraCritMod(Item *item, WeaponAttackType attac
         default: return;
     }
 
-    if (item->IsFitToSpellRequirements(aura->GetSpellProto()))
+    if (!item->IsBroken()&&item->IsFitToSpellRequirements(aura->GetSpellProto()))
     {
         HandleBaseModValue(mod, FLAT_MOD, float (aura->GetModifier()->m_amount), apply);
     }
@@ -7322,7 +7331,7 @@ void Player::_ApplyWeaponDependentAuraDamageMod(Item *item, WeaponAttackType att
         default: return;
     }
 
-    if (item->IsFitToSpellRequirements(aura->GetSpellProto()))
+    if (!item->IsBroken()&&item->IsFitToSpellRequirements(aura->GetSpellProto()))
     {
         HandleStatModifier(unitMod, unitModType, float(modifier->m_amount),apply);
     }
@@ -18952,7 +18961,7 @@ void Player::UpdateHomebindTime(uint32 time)
     else
     {
         // instance is invalid, start homebind timer
-        m_HomebindTimer = 60000;
+        m_HomebindTimer = 15000;
         // send message to player
         WorldPacket data(SMSG_RAID_GROUP_ONLY, 4+4);
         data << uint32(m_HomebindTimer);
