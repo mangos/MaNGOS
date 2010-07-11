@@ -30,7 +30,7 @@ Windows:
 
 1. Building
 
-	Just buid the solution in contrib\vmap_extractor_v2\win
+	Just build the solution in contrib\vmap_extractor_v2\win
 	Resulting binaries will be in contrib\vmap_extractor_v2\bin\$(PlatformName)_$(ConfigurationName)
 
 2. Extracting
