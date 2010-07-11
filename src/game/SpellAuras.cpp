@@ -1488,6 +1488,90 @@ void Aura::TriggerSpell()
 //                    case 47015: break;
 //                    // Party G.R.E.N.A.D.E.
 //                    case 51510: break;
+//                    // Horseman Abilities
+//                    case 52347: break;
+//                    // GPS (Greater drake Positioning System)
+//                    case 53389: break;
+//                    // WotLK Prologue Frozen Shade Summon Aura
+//                    case 53459: break;
+//                    // WotLK Prologue Frozen Shade Speech
+//                    case 53460: break;
+//                    // WotLK Prologue Dual-plagued Brain Summon Aura
+//                    case 54295: break;
+//                    // WotLK Prologue Dual-plagued Brain Speech
+//                    case 54299: break;
+//                    // Rotate 360 (Fast)
+//                    case 55861: break;
+//                    // Shadow Sickle
+//                    case 56702: break;
+//                    // Portal Periodic
+//                    case 58008: break;
+//                    // Destroy Door Seal
+//                    case 58040: break;
+//                    // Draw Magic
+//                    case 58185: break;
+//                    // Food
+//                    case 58886: break;
+//                    // Shadow Sickle
+//                    case 59103: break;
+//                    // Time Bomb
+//                    case 59376: break;
+//                    // Whirlwind Visual
+//                    case 59551: break;
+//                    // Hearstrike
+//                    case 59783: break;
+//                    // Z Check
+//                    case 61678: break;
+//                    // isDead Check
+//                    case 61976: break;
+//                    // Start the Engine
+//                    case 62432: break;
+//                    // Enchanted Broom
+//                    case 62571: break;
+//                    // Mulgore Hatchling
+//                    case 62586: break;
+//                    // Durotar Scorpion
+//                    case 62679: break;
+//                    // Fighting Fish
+//                    case 62833: break;
+//                    // Shield Level 1
+//                    case 63130: break;
+//                    // Shield Level 2
+//                    case 63131: break;
+//                    // Shield Level 3
+//                    case 63132: break;
+//                    // Food
+//                    case 64345: break;
+//                    // Remove Player from Phase
+//                    case 64445: break;
+//                    // Food
+//                    case 65418: break;
+//                    // Food
+//                    case 65419: break;
+//                    // Food
+//                    case 65420: break;
+//                    // Food
+//                    case 65421: break;
+//                    // Food
+//                    case 65422: break;
+//                    // Rolling Throw
+//                    case 67546: break;
+//                    // Gunship Cannon Fire
+//                    case 70017: break;
+//                    // Ice Tomb
+//                    case 70157: break;
+//                    // Mana Barrier
+//                    case 70842: break;
+//                    // Summon Timer: Suppresser
+//                    case 70912: break;
+//                    // Aura of Darkness
+//                    case 71110: break;
+//                    // Aura of Darkness
+//                    case 71111: break;
+//                    // Ball of Flames Visual
+//                    case 71706: break;
+//                    // Summon Broken Frostmourne
+//                    case 74081: break;
                     default:
                         break;
                 }
