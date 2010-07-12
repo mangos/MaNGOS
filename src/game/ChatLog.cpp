@@ -25,7 +25,7 @@
 #include "ObjectMgr.h"
 #include "SpellAuras.h"
 #include "Policies/SingletonImp.h"
-#include "Config/ConfigEnv.h"
+#include "Config/Config.h"
 
 INSTANTIATE_SINGLETON_1( ChatLog );
 
@@ -733,38 +733,14 @@ void ChatLog::ChatBadLexicsAction(Player* player, std::string& msg)
         case LEXICS_ACTION_SHEEP:
         {
             // sheep me, yeah, yeah, sheep me
-            sl = sSpellStore.LookupEntry(118);
-            if (sl)
-            {
-                for (int i = 0; i < MAX_EFFECT_INDEX; i++)
-                {
-                    Aura* Aur = CreateAura(sl, SpellEffectIndex(i), NULL, player);
-                    if (Aur)
-                    {
-                        Aur->SetAuraDuration(LexicsCutterActionDuration);
-                        player->AddAura(Aur);
-                    }
-                }
-            }
+            player->_AddAura(118,LexicsCutterActionDuration);
         }
         break;
 
         case LEXICS_ACTION_STUN:
         {
             // stunned surprised
-            sl = sSpellStore.LookupEntry(13005);
-            if (sl)
-            {
-                for (int i = 0; i < MAX_EFFECT_INDEX; i++)
-                {
-                    Aura* Aur = CreateAura(sl, SpellEffectIndex(i), NULL, player);
-                    if (Aur)
-                    {
-                        Aur->SetAuraDuration(LexicsCutterActionDuration);
-                        player->AddAura(Aur);
-                    }
-                }
-            }
+            player->_AddAura(13005,LexicsCutterActionDuration);
         }
         break;
 
@@ -793,57 +769,21 @@ void ChatLog::ChatBadLexicsAction(Player* player, std::string& msg)
         case LEXICS_ACTION_STUCK:
         {
             // yo, the Matrix has had you :) [by KAPATEJIb]
-            sl = sSpellStore.LookupEntry(23312);
-            if (sl)
-            {
-                for (int i = 0; i < MAX_EFFECT_INDEX; i++)
-                {
-                    Aura* Aur = CreateAura(sl, SpellEffectIndex(i), NULL, player);
-                    if (Aur)
-                    {
-                        Aur->SetAuraDuration(LexicsCutterActionDuration);
-                        player->AddAura(Aur);
-                    }
-                }
-            }
+            player->_AddAura(23312,LexicsCutterActionDuration);
         }
         break;
 
         case LEXICS_ACTION_SICKNESS:
         {
             // for absence of censorship, there is punishment [by Koshei]
-            sl = sSpellStore.LookupEntry(15007);
-            if (sl)
-            {
-                for (int i = 0; i < MAX_EFFECT_INDEX; i++)
-                {
-                    Aura* Aur = CreateAura(sl, SpellEffectIndex(i), NULL, player);
-                    if (Aur)
-                    {
-                        Aur->SetAuraDuration(LexicsCutterActionDuration);
-                        player->AddAura(Aur);
-                    }
-                }
-            }
+            player->_AddAura(15007,LexicsCutterActionDuration);
         }
         break;
 
         case LEXICS_ACTION_SHEAR:
         {
             // Lord Illidan to watch you [by Koshei]
-            sl = sSpellStore.LookupEntry(41032);
-            if (sl)
-            {
-                for (int i = 0; i < MAX_EFFECT_INDEX; i++)
-                {
-                    Aura* Aur = CreateAura(sl, SpellEffectIndex(i), NULL, player);
-                    if (Aur)
-                    {
-                        Aur->SetAuraDuration(LexicsCutterActionDuration);
-                        player->AddAura(Aur);
-                    }
-                }
-            }
+            player->_AddAura(41032,LexicsCutterActionDuration);
         }
         break;
 
