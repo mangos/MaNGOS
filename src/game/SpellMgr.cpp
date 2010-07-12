@@ -344,7 +344,7 @@ SpellSpecific GetSpellSpecific(uint32 spellId)
         case SPELLFAMILY_GENERIC:
         {
             // Food / Drinks (mostly)
-            if(spellInfo->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_SEATED)
+            if (spellInfo->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_SEATED)
             {
                 bool food = false;
                 bool drink = false;
@@ -367,11 +367,11 @@ SpellSpecific GetSpellSpecific(uint32 spellId)
                     }
                 }
 
-                if(food && drink)
+                if (food && drink)
                     return SPELL_FOOD_AND_DRINK;
-                else if(food)
+                else if (food)
                     return SPELL_FOOD;
-                else if(drink)
+                else if (drink)
                     return SPELL_DRINK;
             }
             else
@@ -431,7 +431,7 @@ SpellSpecific GetSpellSpecific(uint32 spellId)
             if (spellInfo->Dispel == DISPEL_POISON)
                 return SPELL_STING;
 
-            // only hunter aspects have this (but not all aspects in hunter family)
+            // only hunter aspects have this
             if( spellInfo->SpellFamilyFlags & UI64LIT(0x0044000000380000) || spellInfo->SpellFamilyFlags2 & 0x00001010)
                 return SPELL_ASPECT;
 
@@ -475,12 +475,15 @@ SpellSpecific GetSpellSpecific(uint32 spellId)
             break;
     }
 
-    // Tracking spells
-    if(IsSpellHaveAura(spellInfo, SPELL_AURA_TRACK_CREATURES) || IsSpellHaveAura(spellInfo, SPELL_AURA_TRACK_RESOURCES))
+    // Tracking spells (exclude Well Fed, some other always allowed cases)
+    if ((IsSpellHaveAura(spellInfo, SPELL_AURA_TRACK_CREATURES) ||
+        IsSpellHaveAura(spellInfo, SPELL_AURA_TRACK_RESOURCES)  ||
+        IsSpellHaveAura(spellInfo, SPELL_AURA_TRACK_STEALTHED)) &&
+        (spellInfo->AttributesEx6 & (SPELL_ATTR_EX6_UNK12|SPELL_ATTR_EX6_UNK6)))
         return SPELL_TRACKER;
 
     // elixirs can have different families, but potion most ofc.
-    if(SpellSpecific sp = sSpellMgr.GetSpellElixirSpecific(spellInfo->Id))
+    if (SpellSpecific sp = sSpellMgr.GetSpellElixirSpecific(spellInfo->Id))
         return sp;
 
     return SPELL_NORMAL;
