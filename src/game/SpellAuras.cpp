@@ -3425,6 +3425,8 @@ void Aura::HandleModPossessPet(bool apply, bool Real)
 
     if (apply)
     {
+        target->addUnitState(UNIT_STAT_CONTROLLED);
+
         camera.SetView(pet);
         p_caster->SetCharm(pet);
         p_caster->SetClientControl(pet, 1);
@@ -3446,6 +3448,8 @@ void Aura::HandleModPossessPet(bool apply, bool Real)
         // on delete only do caster related effects
         if(m_removeMode == AURA_REMOVE_BY_DELETE)
             return;
+
+        pet->clearUnitState(UNIT_STAT_CONTROLLED);
 
         pet->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
 
