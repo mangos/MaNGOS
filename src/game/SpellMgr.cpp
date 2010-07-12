@@ -479,7 +479,7 @@ SpellSpecific GetSpellSpecific(uint32 spellId)
     if ((IsSpellHaveAura(spellInfo, SPELL_AURA_TRACK_CREATURES) ||
         IsSpellHaveAura(spellInfo, SPELL_AURA_TRACK_RESOURCES)  ||
         IsSpellHaveAura(spellInfo, SPELL_AURA_TRACK_STEALTHED)) &&
-        (spellInfo->AttributesEx6 & (SPELL_ATTR_EX6_UNK12|SPELL_ATTR_EX6_UNK6)))
+        ((spellInfo->AttributesEx & SPELL_ATTR_EX_UNK17) || (spellInfo->AttributesEx6 & SPELL_ATTR_EX6_UNK12)))
         return SPELL_TRACKER;
 
     // elixirs can have different families, but potion most ofc.

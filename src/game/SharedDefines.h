@@ -270,7 +270,7 @@ const uint32 ItemQualityColors[MAX_ITEM_QUALITY] = {
 #define SPELL_ATTR_EX_UNK14                       0x00004000            // 14
 #define SPELL_ATTR_EX_DISPEL_AURAS_ON_IMMUNITY    0x00008000            // 15 remove auras on immunity
 #define SPELL_ATTR_EX_UNAFFECTED_BY_SCHOOL_IMMUNE 0x00010000            // 16 unaffected by school immunity
-#define SPELL_ATTR_EX_UNK17                       0x00020000            // 17
+#define SPELL_ATTR_EX_UNK17                       0x00020000            // 17 for auras SPELL_AURA_TRACK_CREATURES, SPELL_AURA_TRACK_RESOURCES and SPELL_AURA_TRACK_STEALTHED select non-stacking tracking spells
 #define SPELL_ATTR_EX_UNK18                       0x00040000            // 18
 #define SPELL_ATTR_EX_UNK19                       0x00080000            // 19
 #define SPELL_ATTR_EX_REQ_COMBO_POINTS1           0x00100000            // 20 Req combo points on target
@@ -424,7 +424,7 @@ const uint32 ItemQualityColors[MAX_ITEM_QUALITY] = {
 #define SPELL_ATTR_EX6_UNK3                       0x00000008            // 3
 #define SPELL_ATTR_EX6_UNK4                       0x00000010            // 4
 #define SPELL_ATTR_EX6_UNK5                       0x00000020            // 5
-#define SPELL_ATTR_EX6_UNK6                       0x00000040            // 6 for auras SPELL_AURA_TRACK_CREATURES, SPELL_AURA_TRACK_RESOURCES and SPELL_AURA_TRACK_STEALTHED select non-stacking tracking spells
+#define SPELL_ATTR_EX6_UNK6                       0x00000040            // 6
 #define SPELL_ATTR_EX6_UNK7                       0x00000080            // 7
 #define SPELL_ATTR_EX6_UNK8                       0x00000100            // 8
 #define SPELL_ATTR_EX6_UNK9                       0x00000200            // 9

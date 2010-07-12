@@ -187,6 +187,7 @@ inline void MaNGOS::DynamicObjectUpdater::VisitHelper(Unit* target)
 
     if (addedToExisting)
     {
+        target->AddAuraToModList(Aur);
         holder->SetInUse(true);
         Aur->ApplyModifier(true,true);
         holder->SetInUse(false);

@@ -783,6 +783,7 @@ void AreaAura::Update(uint32 diff)
 
                     if (addedToExisting)
                     {
+                        (*tIter)->AddAuraToModList(aur);
                         holder->SetInUse(true);
                         aur->ApplyModifier(true,true);
                         holder->SetInUse(false);
@@ -3342,9 +3343,9 @@ void Aura::HandleAuraTrackResources(bool apply, bool /*Real*/)
         GetTarget()->RemoveNoStackAurasDueToAuraHolder(GetHolder());
 
     if (apply)
-        GetTarget()->SetFlag(PLAYER_TRACK_CREATURES, uint32(1) << (m_modifier.m_miscvalue-1));
+        GetTarget()->SetFlag(PLAYER_TRACK_RESOURCES, uint32(1) << (m_modifier.m_miscvalue-1));
     else
-        GetTarget()->RemoveFlag(PLAYER_TRACK_CREATURES, uint32(1) << (m_modifier.m_miscvalue-1));
+        GetTarget()->RemoveFlag(PLAYER_TRACK_RESOURCES, uint32(1) << (m_modifier.m_miscvalue-1));
 }
 
 void Aura::HandleAuraTrackStealthed(bool apply, bool /*Real*/)
