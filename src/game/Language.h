@@ -796,7 +796,8 @@ enum MangosStrings
     LANG_CHARACTER_DELETED_LIST_LINE_CHAT = 1026,
     LANG_LOG_FILTERS_STATE_HEADER       = 1027,
     LANG_ALL_LOG_FILTERS_SET_TO_S       = 1028,
-    // Room for more level 4              1029-1099 not used
+    LANG_RA_ONLY_COMMAND                = 1029,
+    // Room for more level 4              1030-1099 not used
 
     // Level 3 (continue)
     LANG_ACCOUNT_SETADDON               = 1100,
