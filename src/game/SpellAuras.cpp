@@ -783,6 +783,7 @@ void AreaAura::Update(uint32 diff)
 
                     if (addedToExisting)
                     {
+                        (*tIter)->AddAuraToModList(aur);
                         holder->SetInUse(true);
                         aur->ApplyModifier(true,true);
                         holder->SetInUse(false);
