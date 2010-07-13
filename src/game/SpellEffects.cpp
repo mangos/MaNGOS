@@ -7541,7 +7541,7 @@ void Spell::EffectPlayerPull(SpellEffectIndex eff_idx)
 
 void Spell::EffectDispelMechanic(SpellEffectIndex eff_idx)
 {
-    if(!unitTarget)
+    if (!unitTarget)
         return;
 
     uint32 mechanic = m_spellInfo->EffectMiscValue[eff_idx];
@@ -7551,17 +7551,16 @@ void Spell::EffectDispelMechanic(SpellEffectIndex eff_idx)
     {
         next = iter;
         ++next;
-        SpellEntry const *spell = sSpellStore.LookupEntry(iter->second->GetSpellProto()->Id);
-        if(spell->Mechanic == mechanic || iter->second->HasAuraAndMechanicEffect(mechanic))
+        SpellEntry const *spell = iter->second->GetSpellProto();
+        if (spell->Mechanic == mechanic || iter->second->HasAuraAndMechanicEffect(mechanic))
         {
             unitTarget->RemoveAurasDueToSpell(spell->Id);
-            if(Auras.empty())
+            if (Auras.empty())
                 break;
             else
                 next = Auras.begin();
         }
     }
-    return;
 }
 
 void Spell::EffectSummonDeadPet(SpellEffectIndex /*eff_idx*/)
