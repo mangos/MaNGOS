@@ -107,7 +107,7 @@ int PatchHandler::svc(void)
     int flags = MSG_NOSIGNAL;
 
     Chunk data;
-    data.cmd = XFER_DATA;
+    data.cmd = CMD_XFER_DATA;
 
     ssize_t r;
 
