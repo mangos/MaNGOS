@@ -783,6 +783,7 @@ void AreaAura::Update(uint32 diff)
 
                     if (addedToExisting)
                     {
+                        (*tIter)->AddAuraToModList(aur);
                         holder->SetInUse(true);
                         aur->ApplyModifier(true,true);
                         holder->SetInUse(false);
@@ -3260,22 +3261,30 @@ void Aura::HandleFarSight(bool apply, bool /*Real*/)
 
 void Aura::HandleAuraTrackCreatures(bool apply, bool /*Real*/)
 {
-    if(GetTarget()->GetTypeId()!=TYPEID_PLAYER)
+    if (GetTarget()->GetTypeId()!=TYPEID_PLAYER)
         return;
 
-    if(apply)
+    if (apply)
         GetTarget()->RemoveNoStackAurasDueToAuraHolder(GetHolder());
-    GetTarget()->SetUInt32Value(PLAYER_TRACK_CREATURES, apply ? ((uint32)1)<<(m_modifier.m_miscvalue-1) : 0 );
+
+    if (apply)
+        GetTarget()->SetFlag(PLAYER_TRACK_CREATURES, uint32(1) << (m_modifier.m_miscvalue-1));
+    else
+        GetTarget()->RemoveFlag(PLAYER_TRACK_CREATURES, uint32(1) << (m_modifier.m_miscvalue-1));
 }
 
 void Aura::HandleAuraTrackResources(bool apply, bool /*Real*/)
 {
-    if(GetTarget()->GetTypeId()!=TYPEID_PLAYER)
+    if (GetTarget()->GetTypeId()!=TYPEID_PLAYER)
         return;
 
-    if(apply)
+    if (apply)
         GetTarget()->RemoveNoStackAurasDueToAuraHolder(GetHolder());
-    GetTarget()->SetUInt32Value(PLAYER_TRACK_RESOURCES, apply ? ((uint32)1)<<(m_modifier.m_miscvalue-1): 0 );
+
+    if (apply)
+        GetTarget()->SetFlag(PLAYER_TRACK_RESOURCES, uint32(1) << (m_modifier.m_miscvalue-1));
+    else
+        GetTarget()->RemoveFlag(PLAYER_TRACK_RESOURCES, uint32(1) << (m_modifier.m_miscvalue-1));
 }
 
 void Aura::HandleAuraTrackStealthed(bool apply, bool /*Real*/)
@@ -3416,6 +3425,8 @@ void Aura::HandleModPossessPet(bool apply, bool Real)
 
     if (apply)
     {
+        target->addUnitState(UNIT_STAT_CONTROLLED);
+
         camera.SetView(pet);
         p_caster->SetCharm(pet);
         p_caster->SetClientControl(pet, 1);
@@ -3437,6 +3448,8 @@ void Aura::HandleModPossessPet(bool apply, bool Real)
         // on delete only do caster related effects
         if(m_removeMode == AURA_REMOVE_BY_DELETE)
             return;
+
+        pet->clearUnitState(UNIT_STAT_CONTROLLED);
 
         pet->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
 

@@ -1827,6 +1827,7 @@ bool Creature::LoadCreaturesAddon(bool reload)
 
             if (addedToExisting)
             {
+                AddAuraToModList(AdditionalAura);
                 holder->SetInUse(true);
                 AdditionalAura->ApplyModifier(true,true);
                 holder->SetInUse(false);
