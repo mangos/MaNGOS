@@ -116,8 +116,8 @@ MotionMaster::DirectClean(bool reset, bool all)
 
     if (!all && reset)
     {
-        ASSERT( !empty() );
-        top()->Reset(*i_owner);
+        if (!empty())
+            top()->Reset(*i_owner);
     }
 }
 
