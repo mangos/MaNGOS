@@ -888,10 +888,12 @@ void Aura::ApplyModifier(bool apply, bool Real)
 {
     AuraType aura = m_modifier.m_auraname;
 
+    GetHolder()->SetInUse(true);
     SetInUse(true);
     if(aura < TOTAL_AURAS)
         (*this.*AuraHandler [aura])(apply, Real);
     SetInUse(false);
+    GetHolder()->SetInUse(false);
 }
 
 bool Aura::isAffectedOnSpell(SpellEntry const *spell) const
@@ -2195,18 +2197,6 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
 
             return;
         }
-
-        if (m_removeMode == AURA_REMOVE_BY_DEATH)
-        {
-            // Stop caster Arcane Missle chanelling on death
-            if (GetSpellProto()->SpellFamilyName == SPELLFAMILY_MAGE && (GetSpellProto()->SpellFamilyFlags & UI64LIT(0x0000000000000800)))
-            {
-                if (Unit* caster = GetCaster())
-                    caster->InterruptSpell(CURRENT_CHANNELED_SPELL);
-
-                return;
-            }
-        }
     }
 
     // AT APPLY & REMOVE
@@ -3362,7 +3352,6 @@ void Aura::HandleModPossess(bool apply, bool Real)
     }
     else
     {
-        p_caster->InterruptSpell(CURRENT_CHANNELED_SPELL);  // the spell is not automatically canceled when interrupted, do it now
         p_caster->SetCharm(NULL);
 
         camera.ResetView();
@@ -7685,14 +7674,12 @@ void SpellAuraHolder::RemoveAura(SpellEffectIndex index)
 
 void SpellAuraHolder::ApplyAuraModifiers(bool apply, bool real)
 {
-    SetInUse(true);
     for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
     {
         Aura *aur = GetAuraByEffectIndex(SpellEffectIndex(i));
         if (aur)
             aur->ApplyModifier(apply, real);
     }
-    SetInUse(false);
 }
 
 void SpellAuraHolder::_AddSpellAuraHolder()
@@ -8725,7 +8712,7 @@ void SpellAuraHolder::Update(uint32 diff)
 
             if(!caster->IsWithinDistInMap(m_target, max_range))
             {
-                m_target->RemoveAurasByCasterSpell(GetId(), GetCasterGUID());
+                caster->InterruptSpell(CURRENT_CHANNELED_SPELL);
                 return;
             }
         }
