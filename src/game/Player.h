@@ -1626,8 +1626,8 @@ class MANGOS_DLL_SPEC Player : public Unit
         void learnQuestRewardedSpells(Quest const* quest);
         void learnSpellHighRank(uint32 spellid);
 
-        uint32 GetFreeTalentPoints() const { return GetUInt32Value(PLAYER_CHARACTER_POINTS1); }
-        void SetFreeTalentPoints(uint32 points) { SetUInt32Value(PLAYER_CHARACTER_POINTS1,points); }
+        uint32 GetFreeTalentPoints() const { return 0/*GetUInt32Value(PLAYER_CHARACTER_POINTS1)*/; }
+        void SetFreeTalentPoints(uint32 points) { 0/*SetUInt32Value(PLAYER_CHARACTER_POINTS1,points)*/; }
         void UpdateFreeTalentPoints(bool resetIfNeed = true);
         bool resetTalents(bool no_cost = false, bool all_specs = false);
         uint32 resetTalentsCost() const;
@@ -1656,8 +1656,8 @@ class MANGOS_DLL_SPEC Player : public Unit
         void ApplyGlyph(uint8 slot, bool apply);
         void ApplyGlyphs(bool apply);
 
-        uint32 GetFreePrimaryProfessionPoints() const { return GetUInt32Value(PLAYER_CHARACTER_POINTS2); }
-        void SetFreePrimaryProfessions(uint16 profs) { SetUInt32Value(PLAYER_CHARACTER_POINTS2, profs); }
+        uint32 GetFreePrimaryProfessionPoints() const { return GetUInt32Value(PLAYER_CHARACTER_POINTS); }
+        void SetFreePrimaryProfessions(uint16 profs) { SetUInt32Value(PLAYER_CHARACTER_POINTS, profs); }
         void InitPrimaryProfessions();
 
         PlayerSpellMap const& GetSpellMap() const { return m_spells; }
