@@ -120,17 +120,28 @@ class InstanceSave
         bool m_usedByMap;                                   // true when instance map loaded
 };
 
+enum ResetEventType
+{
+    RESET_EVENT_DENGEON      = 0,                           // no fixed reset time
+    RESET_EVENT_INFORM_1     = 1,                           // raid/heroic warnings
+    RESET_EVENT_INFORM_2     = 2,
+    RESET_EVENT_INFORM_3     = 3,
+    RESET_EVENT_INFORM_LAST  = 4,
+};
+
+#define MAX_RESET_EVENT_TYPE   5
+
 /* resetTime is a global propery of each (raid/heroic) map
     all instances of that map reset at the same time */
 struct InstanceResetEvent
 {
-    uint8 type;
-    Difficulty difficulty:8;
+    ResetEventType type   :8;
+    Difficulty difficulty :8;
     uint16 mapid;
-    uint16 instanceId;
+    uint32 instanceId;
 
-    InstanceResetEvent() : type(0), difficulty(DUNGEON_DIFFICULTY_NORMAL), mapid(0), instanceId(0) {}
-    InstanceResetEvent(uint8 t, uint32 _mapid, Difficulty d, uint16 _instanceid)
+    InstanceResetEvent() : type(RESET_EVENT_DENGEON), difficulty(DUNGEON_DIFFICULTY_NORMAL), mapid(0), instanceId(0) {}
+    InstanceResetEvent(ResetEventType t, uint32 _mapid, Difficulty d, uint32 _instanceid)
         : type(t), difficulty(d), mapid(_mapid), instanceId(_instanceid) {}
     bool operator == (const InstanceResetEvent& e) { return e.instanceId == instanceId; }
 };
