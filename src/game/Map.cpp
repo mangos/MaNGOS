@@ -1968,7 +1968,7 @@ void InstanceMap::SetResetSchedule(bool on)
     // the reset time is only scheduled when there are no payers inside
     // it is assumed that the reset time will rarely (if ever) change while the reset is scheduled
     if(IsDungeon() && !HavePlayers() && !IsRaidOrHeroicDungeon())
-        sInstanceSaveMgr.GetScheduler().ScheduleReset(on, GetInstanceSave()->GetResetTime(), InstanceResetEvent(0, GetId(), Difficulty(GetSpawnMode()), GetInstanceId()));
+        sInstanceSaveMgr.GetScheduler().ScheduleReset(on, GetInstanceSave()->GetResetTime(), InstanceResetEvent(RESET_EVENT_DENGEON, GetId(), Difficulty(GetSpawnMode()), GetInstanceId()));
 }
 
 /* ******* Battleground Instance Maps ******* */
