@@ -3618,11 +3618,11 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuildStep Include="..\..\dep\ACE_wrappers\README">
+    <CustomBuild Include="..\..\dep\ACE_wrappers\README">
       <Filter>Documentation</Filter>
-    </CustomBuildStep>
-    <CustomBuildStep Include="..\..\dep\ACE_wrappers\VERSION">
+    </CustomBuild>
+    <CustomBuild Include="..\..\dep\ACE_wrappers\VERSION">
       <Filter>Documentation</Filter>
-    </CustomBuildStep>
+    </CustomBuild>
   </ItemGroup>
 </Project>
