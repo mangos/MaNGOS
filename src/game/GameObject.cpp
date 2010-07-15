@@ -311,7 +311,7 @@ void GameObject::Update(uint32 diff)
                         ok = p_ok;
                     }
 
-                    if (ok)
+                    if (ok && isSpawned())
                     {
                         Unit *caster =  owner ? owner : ok;
 
