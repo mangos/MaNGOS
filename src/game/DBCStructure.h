@@ -495,6 +495,8 @@ struct AchievementCriteriaEntry
                                                             // timed kills it is creature id
     uint32  timeLimit;                                      // 13 time limit in seconds
     //uint32 showOrder;                                     // 14 show order
+    //uint32 unk1;                                          // 15 all zeros
+    //uint32 unk2;                                          // 16 all zeros
 };
 
 struct AreaTableEntry
@@ -758,16 +760,15 @@ struct CurrencyTypesEntry
 {
     //uint32    ID;                                         // 0        not used
     //uint32    Category;                                   // 1        may be category
-    uint32    BitIndex;                                     // 2        bit index in PLAYER_FIELD_KNOWN_CURRENCIES (1 << (index-1))
-    //char *name;                                           // 3
-    //char *iconName;                                       // 4
+    //char *name;                                           // 2
+    //char *iconName;                                       // 3
+    //uint32                                                // 4
     //uint32                                                // 5
     //uint32                                                // 6
     //uint32                                                // 7
     //uint32                                                // 8
     //uint32                                                // 9
-    //uint32                                                // 10
-    //char* description;                                    // 11
+    //char* description;                                    // 10
 };
 
 struct DurabilityCostsEntry
@@ -1261,25 +1262,24 @@ struct ScalingStatValuesEntry
 {
     uint32  Id;                                             // 0
     uint32  Level;                                          // 1
-    uint32  ssdMultiplier[4];                               // 2-5 Multiplier for ScalingStatDistribution
-    uint32  armorMod[4];                                    // 6-9 Armor for level
-    uint32  dpsMod[6];                                      // 10-15 DPS mod for level
-    uint32  spellBonus;                                     // 16 spell power for level
-    uint32  ssdMultiplier2;                                 // 17 there's data from 3.1 dbc ssdMultiplier[3]
-    uint32  ssdMultiplier3;                                 // 18 3.3
-    //uint32 unk2;                                          // 19 unk, probably also Armor for level (flag 0x80000?)
-    uint32  armorMod2[4];                                   // 20-23 Armor for level
+    uint32  dpsMod[6];                                      // 2-7 DPS mod for level
+    uint32  spellBonus;                                     // 8 spell power for level
+    uint32  ssdMultiplier[5];                               // 9-13 Multiplier for ScalingStatDistribution
+    uint32  armorMod[4];                                    // 14-17 Armor for level
+    uint32  armorMod2[4];                                   // 18-21 Armor for level
+    //uint32 trash[24];                                     // 22-45
+    //uint32 unk2;                                          // 46 unk, probably also Armor for level (flag 0x80000?)
 
     uint32  getssdMultiplier(uint32 mask) const
     {
         if (mask & 0x4001F)
         {
-            if(mask & 0x00000001) return ssdMultiplier[0];
-            if(mask & 0x00000002) return ssdMultiplier[1];
-            if(mask & 0x00000004) return ssdMultiplier[2];
-            if(mask & 0x00000008) return ssdMultiplier2;
-            if(mask & 0x00000010) return ssdMultiplier[3];
-            if(mask & 0x00040000) return ssdMultiplier3;
+            if(mask & 0x00000001) return ssdMultiplier[1];
+            if(mask & 0x00000002) return ssdMultiplier[2]; // 0 and 1 were duplicated
+            if(mask & 0x00000004) return ssdMultiplier[3];
+            if(mask & 0x00000008) return ssdMultiplier[0];
+            if(mask & 0x00000010) return ssdMultiplier[4];
+            if(mask & 0x00040000) return ssdMultiplier[2]; // 4.0.0
         }
         return 0;
     }
@@ -1379,9 +1379,8 @@ struct SkillLineAbilityEntry
     uint32    learnOnGetSkill;                              // 9        m_acquireMethod
     uint32    max_value;                                    // 10       m_trivialSkillLineRankHigh
     uint32    min_value;                                    // 11       m_trivialSkillLineRankLow
-    //uint32    characterPoints[2];                         // 12-13    m_characterPoints[2]
-    //uint32                                                // 14
-    //uint32                                                // 15       4.0.0
+    //uint32                                                // 12
+    //uint32                                                // 13       4.0.0
 };
 
 struct SoundEntriesEntry
@@ -1649,7 +1648,7 @@ struct MANGOS_DLL_SPEC SpellEntry
     uint32 SpellShapeshiftId;                               // 42       SpellShapeshift.dbc
     uint32 SpellTargetRestrictionsId;                       // 43       SpellTargetRestrictions.dbc
     uint32 SpellTotemsId;                                   // 44       SpellTotems.dbc
-    //uint32 unk2[3];                                       // 45-47
+    //uint32 unk2;                                          // 45
 
     // helpers
     int32 CalculateSimpleValue(SpellEffectIndex eff) const;
@@ -1823,11 +1822,11 @@ struct SpellItemEnchantmentConditionEntry
     //uint8   Logic[5]                                      // 25-30    m_logic[5]
 };
 
-struct StableSlotPricesEntry
+/*struct StableSlotPricesEntry                              // removed in 4.0.0.12479
 {
     uint32 Slot;
     uint32 Price;
-};
+};*/
 
 struct SummonPropertiesEntry
 {
@@ -1849,14 +1848,13 @@ struct TalentEntry
     uint32    Row;                                          // 2
     uint32    Col;                                          // 3
     uint32    RankID[MAX_TALENT_RANK];                      // 4-8
-                                                            // 9-12 not used, always 0, maybe not used high ranks
-    uint32    DependsOn;                                    // 13 index in Talent.dbc (TalentEntry)
-                                                            // 14-15 not used
-    uint32    DependsOnRank;                                // 16
-                                                            // 17-18 not used
-    //uint32  needAddInSpellBook;                           // 19  also need disable higest ranks on reset talent tree
-    //uint32  unk2;                                         // 20, all 0
-    //uint64  allowForPet;                                  // 21 its a 64 bit mask for pet 1<<m_categoryEnumID in CreatureFamily.dbc
+    uint32    DependsOn;                                    // 9 index in Talent.dbc (TalentEntry)
+                                                            // 10-11 not used
+    uint32    DependsOnRank;                                // 12
+                                                            // 13-14 not used
+    //uint32  needAddInSpellBook;                           // 15  also need disable higest ranks on reset talent tree
+    //uint32  unk2;                                         // 16, all 0
+    //uint64  allowForPet;                                  // 17 its a 64 bit mask for pet 1<<m_categoryEnumID in CreatureFamily.dbc
 };
 
 struct TalentTabEntry
@@ -1868,6 +1866,7 @@ struct TalentTabEntry
     uint32  petTalentMask;                                  // 4
     uint32  tabpage;                                        // 5
     //char* internalname;                                   // 6
+    //char* description;                                    // 7
 };
 
 struct TaxiNodesEntry
@@ -2008,14 +2007,17 @@ struct WMOAreaTableEntry
     int32 rootId;                                           // 1 used in root WMO
     int32 adtId;                                            // 2 used in adt file
     int32 groupId;                                          // 3 used in group WMO
-    //uint32 field4;
-    //uint32 field5;
-    //uint32 field6;
-    //uint32 field7;
-    //uint32 field8;
+    //uint32 field4;                                        // 4
+    //uint32 field5;                                        // 5
+    //uint32 field6;                                        // 6
+    //uint32 field7;                                        // 7
+    //uint32 field8;                                        // 8
     uint32 Flags;                                           // 9 used for indoor/outdoor determination
     uint32 areaId;                                          // 10 link to AreaTableEntry.ID
-    //char *Name;
+    //char *Name;                                           // 11
+    //uint32 field12;                                       // 12
+    //uint32 field13;                                       // 13
+    //uint32 field14;                                       // 14
 };
 
 struct WorldMapAreaEntry
