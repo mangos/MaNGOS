@@ -184,7 +184,7 @@ void InstanceResetScheduler::LoadResetTimes()
         // schedule the reset times
         for(InstResetTimeMapDiffType::iterator itr = instResetTime.begin(); itr != instResetTime.end(); ++itr)
             if(itr->second.second > now)
-                ScheduleReset(true, itr->second.second, InstanceResetEvent(RESET_EVENT_DENGEON, PAIR32_LOPART(itr->second.first),Difficulty(PAIR32_HIPART(itr->second.first)),itr->first));
+                ScheduleReset(true, itr->second.second, InstanceResetEvent(RESET_EVENT_DUNGEON, PAIR32_LOPART(itr->second.first),Difficulty(PAIR32_HIPART(itr->second.first)),itr->first));
     }
 
     // load the global respawn times for raid/heroic instances
@@ -387,7 +387,7 @@ InstanceSave* InstanceSaveManager::AddInstanceSave(uint32 mapId, uint32 instance
         {
             resetTime = time(NULL) + 2 * HOUR;
             // normally this will be removed soon after in InstanceMap::Add, prevent error
-            m_Scheduler.ScheduleReset(true, resetTime, InstanceResetEvent(RESET_EVENT_DENGEON, mapId, difficulty, instanceId));
+            m_Scheduler.ScheduleReset(true, resetTime, InstanceResetEvent(RESET_EVENT_DUNGEON, mapId, difficulty, instanceId));
         }
     }
 

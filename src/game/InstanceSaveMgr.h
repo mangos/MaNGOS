@@ -122,7 +122,7 @@ class InstanceSave
 
 enum ResetEventType
 {
-    RESET_EVENT_DENGEON      = 0,                           // no fixed reset time
+    RESET_EVENT_DUNGEON      = 0,                           // no fixed reset time
     RESET_EVENT_INFORM_1     = 1,                           // raid/heroic warnings
     RESET_EVENT_INFORM_2     = 2,
     RESET_EVENT_INFORM_3     = 3,
@@ -140,7 +140,7 @@ struct InstanceResetEvent
     uint16 mapid;
     uint32 instanceId;
 
-    InstanceResetEvent() : type(RESET_EVENT_DENGEON), difficulty(DUNGEON_DIFFICULTY_NORMAL), mapid(0), instanceId(0) {}
+    InstanceResetEvent() : type(RESET_EVENT_DUNGEON), difficulty(DUNGEON_DIFFICULTY_NORMAL), mapid(0), instanceId(0) {}
     InstanceResetEvent(ResetEventType t, uint32 _mapid, Difficulty d, uint32 _instanceid)
         : type(t), difficulty(d), mapid(_mapid), instanceId(_instanceid) {}
     bool operator == (const InstanceResetEvent& e) { return e.instanceId == instanceId; }
