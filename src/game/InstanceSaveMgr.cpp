@@ -140,10 +140,6 @@ void InstanceResetScheduler::LoadResetTimes()
     typedef std::map<uint32, ResetTimeMapDiffType> InstResetTimeMapDiffType;
     InstResetTimeMapDiffType instResetTime;
 
-    // index instance ids by map/difficulty pairs for fast reset warning send
-    typedef std::multimap<uint32 /*PAIR32(map,difficulty)*/, uint32 /*instanceid*/ > ResetTimeMapDiffInstances;
-    ResetTimeMapDiffInstances mapDiffResetInstances;
-
     QueryResult *result = CharacterDatabase.Query("SELECT id, map, difficulty, resettime FROM instance WHERE resettime > 0");
     if( result )
     {
@@ -155,7 +151,6 @@ void InstanceResetScheduler::LoadResetTimes()
                 uint32 mapid = (*result)[1].GetUInt32();
                 uint32 difficulty = (*result)[2].GetUInt32();
                 instResetTime[id] = ResetTimeMapDiffType(MAKE_PAIR32(mapid,difficulty), resettime);
-                mapDiffResetInstances.insert(ResetTimeMapDiffInstances::value_type(MAKE_PAIR32(mapid,difficulty),id));
             }
         }
         while (result->NextRow());
@@ -229,6 +224,8 @@ void InstanceResetScheduler::LoadResetTimes()
         uint32 mapid = PAIR32_LOPART(map_diff_pair);
         Difficulty difficulty = Difficulty(PAIR32_HIPART(map_diff_pair));
         MapDifficulty const* mapDiff = &itr->second;
+
+        // skip mapDiff without global reset time
         if (!mapDiff->resetTime)
             continue;
 
@@ -262,11 +259,7 @@ void InstanceResetScheduler::LoadResetTimes()
             if(t - resetEventTypeDelay[type] > now)
                 break;
 
-        for(ResetTimeMapDiffInstances::const_iterator in_itr = mapDiffResetInstances.lower_bound(map_diff_pair);
-            in_itr != mapDiffResetInstances.upper_bound(map_diff_pair); ++in_itr)
-        {
-            ScheduleReset(true, t - resetEventTypeDelay[type], InstanceResetEvent(type, mapid, difficulty, in_itr->second));
-        }
+        ScheduleReset(true, t - resetEventTypeDelay[type], InstanceResetEvent(type, mapid, difficulty, 0));
     }
 }
 
@@ -312,7 +305,7 @@ void InstanceResetScheduler::Update()
     while(!m_resetTimeQueue.empty() && (t = m_resetTimeQueue.begin()->first) < now)
     {
         InstanceResetEvent &event = m_resetTimeQueue.begin()->second;
-        if(event.type == 0)
+        if(event.type == RESET_EVENT_DUNGEON)
         {
             // for individual normal instances, max creature respawn + X hours
             m_InstanceSaves._ResetInstance(event.mapid, event.instanceId);

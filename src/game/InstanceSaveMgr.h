@@ -135,15 +135,15 @@ enum ResetEventType
     all instances of that map reset at the same time */
 struct InstanceResetEvent
 {
-    ResetEventType type   :8;
-    Difficulty difficulty :8;
+    ResetEventType type   :8;                               // if RESET_EVENT_DUNGEON then InstanceID == 0 and applied to all instances for pair (map,diff)
+    Difficulty difficulty :8;                               // used with mapid used as for select reset for global cooldown instances (instamceid==0 for event)
     uint16 mapid;
-    uint32 instanceId;
+    uint32 instanceId;                                      // used for select reset for normal dungeons
 
     InstanceResetEvent() : type(RESET_EVENT_DUNGEON), difficulty(DUNGEON_DIFFICULTY_NORMAL), mapid(0), instanceId(0) {}
     InstanceResetEvent(ResetEventType t, uint32 _mapid, Difficulty d, uint32 _instanceid)
         : type(t), difficulty(d), mapid(_mapid), instanceId(_instanceid) {}
-    bool operator == (const InstanceResetEvent& e) { return e.instanceId == instanceId; }
+    bool operator == (const InstanceResetEvent& e) { return e.mapid == mapid && e.difficulty == difficulty && e.instanceId == instanceId; }
 };
 
 class InstanceSaveManager;
