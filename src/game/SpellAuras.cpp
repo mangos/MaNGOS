@@ -898,10 +898,12 @@ void Aura::ApplyModifier(bool apply, bool Real)
 {
     AuraType aura = m_modifier.m_auraname;
 
+    GetHolder()->SetInUse(true);
     SetInUse(true);
     if(aura < TOTAL_AURAS)
         (*this.*AuraHandler [aura])(apply, Real);
     SetInUse(false);
+    GetHolder()->SetInUse(false);
 }
 
 bool Aura::isAffectedOnSpell(SpellEntry const *spell) const
@@ -1936,28 +1938,29 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         SetAuraDuration(rand()%30*IN_MILLISECONDS);
                         return;
                     }
+                    // Gender spells
+                    case 38224:                             // Illidari Agent Illusion
+                    case 37096:                             // Blood Elf Illusion
+                    case 46354:                             // Blood Elf Illusion
+                    {
+                        uint8 gender = target->getGender();
+                        uint32 spellId;
+                        switch (GetId())
+                        {
+                            case 38224: spellId = (gender == GENDER_MALE ? 38225 : 38227); break;
+                            case 37096: spellId = (gender == GENDER_MALE ? 37092 : 37094); break;
+                            case 46354: spellId = (gender == GENDER_MALE ? 46355 : 46356); break;
+                            default: return;
+                        }
+                        target->CastSpell(target, spellId, true, NULL, this);
+                        return;
+                    }
                     case 39850:                             // Rocket Blast
                         if (roll_chance_i(20))              // backfire stun
                             target->CastSpell(target, 51581, true, NULL, this);
                         return;
                     case 43873:                             // Headless Horseman Laugh
                         target->PlayDistanceSound(11965);
-                        return;
-                    case 46354:                             // Blood Elf Illusion
-                        if (Unit* caster = GetCaster())
-                        {
-                            switch(caster->getGender())
-                            {
-                                case GENDER_FEMALE:
-                                    caster->CastSpell(target, 46356, true, NULL, this);
-                                    break;
-                                case GENDER_MALE:
-                                    caster->CastSpell(target, 46355, true, NULL, this);
-                                    break;
-                                default:
-                                    break;
-                            }
-                        }
                         return;
                     case 46699:                             // Requires No Ammo
                         if (target->GetTypeId() == TYPEID_PLAYER)
@@ -2213,18 +2216,6 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                 target->CastSpell(target,m_modifier.m_amount,true,NULL,this);
 
             return;
-        }
-
-        if (m_removeMode == AURA_REMOVE_BY_DEATH)
-        {
-            // Stop caster Arcane Missle chanelling on death
-            if (classOptions && classOptions->SpellFamilyName == SPELLFAMILY_MAGE && (classOptions->SpellFamilyFlags & UI64LIT(0x0000000000000800)))
-            {
-                if (Unit* caster = GetCaster())
-                    caster->InterruptSpell(CURRENT_CHANNELED_SPELL);
-
-                return;
-            }
         }
     }
 
@@ -3382,7 +3373,6 @@ void Aura::HandleModPossess(bool apply, bool Real)
     }
     else
     {
-        p_caster->InterruptSpell(CURRENT_CHANNELED_SPELL);  // the spell is not automatically canceled when interrupted, do it now
         p_caster->SetCharm(NULL);
 
         camera.ResetView();
@@ -3445,6 +3435,8 @@ void Aura::HandleModPossessPet(bool apply, bool Real)
 
     if (apply)
     {
+        target->addUnitState(UNIT_STAT_CONTROLLED);
+
         camera.SetView(pet);
         p_caster->SetCharm(pet);
         p_caster->SetClientControl(pet, 1);
@@ -3466,6 +3458,8 @@ void Aura::HandleModPossessPet(bool apply, bool Real)
         // on delete only do caster related effects
         if(m_removeMode == AURA_REMOVE_BY_DELETE)
             return;
+
+        pet->clearUnitState(UNIT_STAT_CONTROLLED);
 
         pet->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
 
@@ -7722,14 +7716,12 @@ void SpellAuraHolder::RemoveAura(SpellEffectIndex index)
 
 void SpellAuraHolder::ApplyAuraModifiers(bool apply, bool real)
 {
-    SetInUse(true);
     for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
     {
         Aura *aur = GetAuraByEffectIndex(SpellEffectIndex(i));
         if (aur)
             aur->ApplyModifier(apply, real);
     }
-    SetInUse(false);
 }
 
 void SpellAuraHolder::_AddSpellAuraHolder()
@@ -8761,7 +8753,7 @@ void SpellAuraHolder::Update(uint32 diff)
 
             if(!caster->IsWithinDistInMap(m_target, max_range))
             {
-                m_target->RemoveAurasByCasterSpell(GetId(), GetCasterGUID());
+                caster->InterruptSpell(CURRENT_CHANNELED_SPELL);
                 return;
             }
         }

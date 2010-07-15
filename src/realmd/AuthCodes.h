@@ -25,17 +25,33 @@
 
 enum eAuthCmd
 {
-    AUTH_LOGON_CHALLENGE        = 0x00,
-    AUTH_LOGON_PROOF            = 0x01,
-    AUTH_RECONNECT_CHALLENGE    = 0x02,
-    AUTH_RECONNECT_PROOF        = 0x03,
-    //update srv =4
-    REALM_LIST                  = 0x10,
-    XFER_INITIATE               = 0x30,
-    XFER_DATA                   = 0x31,
-    XFER_ACCEPT                 = 0x32,
-    XFER_RESUME                 = 0x33,
-    XFER_CANCEL                 = 0x34
+    CMD_AUTH_LOGON_CHALLENGE        = 0x00,
+    CMD_AUTH_LOGON_PROOF            = 0x01,
+    CMD_AUTH_RECONNECT_CHALLENGE    = 0x02,
+    CMD_AUTH_RECONNECT_PROOF        = 0x03,
+    CMD_REALM_LIST                  = 0x10,
+    CMD_XFER_INITIATE               = 0x30,
+    CMD_XFER_DATA                   = 0x31,
+    // these opcodes no longer exist in currently supported client
+    CMD_XFER_ACCEPT                 = 0x32,
+    CMD_XFER_RESUME                 = 0x33,
+    CMD_XFER_CANCEL                 = 0x34
+};
+
+// not used by us currently
+enum eAuthSrvCmd
+{
+    CMD_GRUNT_AUTH_CHALLENGE        = 0x0,
+    CMD_GRUNT_AUTH_VERIFY           = 0x2,
+    CMD_GRUNT_CONN_PING             = 0x10,
+    CMD_GRUNT_CONN_PONG             = 0x11,
+    CMD_GRUNT_HELLO                 = 0x20,
+    CMD_GRUNT_PROVESESSION          = 0x21,
+    CMD_GRUNT_KICK                  = 0x24,
+    CMD_GRUNT_PCWARNING             = 0x29,
+    CMD_GRUNT_STRINGS               = 0x41,
+    CMD_GRUNT_SUNKENUPDATE          = 0x44,
+    CMD_GRUNT_SUNKEN_ONLINE         = 0x46
 };
 
 enum AuthResult
