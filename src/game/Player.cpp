@@ -668,7 +668,7 @@ bool Player::Create( uint32 guidlow, const std::string& name, uint8 race, uint8 
         m_items[i] = NULL;
 
     SetLocationMapId(info->mapId);
-    Relocate(info->positionX,info->positionY,info->positionZ);
+    Relocate(info->positionX,info->positionY,info->positionZ, info->orientation);
 
     ChrClassesEntry const* cEntry = sChrClassesStore.LookupEntry(class_);
     if(!cEntry)
