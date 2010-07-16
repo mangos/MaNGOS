@@ -303,7 +303,7 @@ void Object::BuildMovementUpdate(ByteBuffer * data, uint16 updateFlags) const
                 // remove unknown, unused etc flags for now
                 player->m_movementInfo.RemoveMovementFlag(MOVEFLAG_SPLINE_ENABLED);
 
-                if(player->isInFlight())
+                if(player->IsTaxiFlying())
                 {
                     ASSERT(player->GetMotionMaster()->GetCurrentMovementGeneratorType() == FLIGHT_MOTION_TYPE);
                     player->m_movementInfo.AddMovementFlag(MOVEFLAG_FORWARD);
@@ -340,7 +340,7 @@ void Object::BuildMovementUpdate(ByteBuffer * data, uint16 updateFlags) const
 
             Player *player = ((Player*)unit);
 
-            if(!player->isInFlight())
+            if(!player->IsTaxiFlying())
             {
                 DEBUG_LOG("_BuildMovementUpdate: MOVEFLAG_SPLINE_ENABLED but not in flight");
                 return;

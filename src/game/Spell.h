@@ -655,7 +655,7 @@ namespace MaNGOS
             for(PlayerMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
             {
                 Player * pPlayer = itr->getSource();
-                if( !pPlayer->isAlive() || pPlayer->isInFlight())
+                if( !pPlayer->isAlive() || pPlayer->IsTaxiFlying())
                     continue;
 
                 if( i_originalCaster->IsFriendlyTo(pPlayer) )
