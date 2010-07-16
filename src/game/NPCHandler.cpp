@@ -686,22 +686,22 @@ void WorldSession::HandleBuyStableSlot( WorldPacket & recv_data )
     if(GetPlayer()->hasUnitState(UNIT_STAT_DIED))
         GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 
-    WorldPacket data(SMSG_STABLE_RESULT, 200);
-
-    if(GetPlayer()->m_stableSlots < MAX_PET_STABLES)
-    {
-        StableSlotPricesEntry const *SlotPrice = sStableSlotPricesStore.LookupEntry(GetPlayer()->m_stableSlots+1);
-        if(_player->GetMoney() >= SlotPrice->Price)
-        {
-            ++GetPlayer()->m_stableSlots;
-            _player->ModifyMoney(-int32(SlotPrice->Price));
-            data << uint8(0x0A);                            // success buy
-        }
-        else
-            data << uint8(0x06);
-    }
-    else
-        data << uint8(0x06);
+    WorldPacket data(SMSG_STABLE_RESULT, 1);
+    data << uint8(0x0A);                                    // success buy
+    //if(GetPlayer()->m_stableSlots < MAX_PET_STABLES)
+    //{
+    //    StableSlotPricesEntry const *SlotPrice = sStableSlotPricesStore.LookupEntry(GetPlayer()->m_stableSlots+1);
+    //    if(_player->GetMoney() >= SlotPrice->Price)
+    //    {
+    //        ++GetPlayer()->m_stableSlots;
+    //        _player->ModifyMoney(-int32(SlotPrice->Price));
+    //        data << uint8(0x0A);                            // success buy
+    //    }
+    //    else
+    //        data << uint8(0x06);
+    //}
+    //else
+    //    data << uint8(0x06);
 
     SendPacket(&data);
 }
