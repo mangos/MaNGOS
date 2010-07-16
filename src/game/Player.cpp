@@ -6068,8 +6068,8 @@ void Player::SaveRecallPosition()
 
 void Player::SendMessageToSet(WorldPacket *data, bool self)
 {
-    if (Map * _map = IsInWorld() ? GetMap() : sMapMgr.FindMap(GetMapId(), GetInstanceId()))
-        _map->MessageBroadcast(this, data, false);
+    if (IsInWorld())
+        GetMap()->MessageBroadcast(this, data, false);
 
     //if player is not in world and map in not created/already destroyed
     //no need to create one, just send packet for itself!
@@ -6079,8 +6079,8 @@ void Player::SendMessageToSet(WorldPacket *data, bool self)
 
 void Player::SendMessageToSetInRange(WorldPacket *data, float dist, bool self)
 {
-    if (Map * _map = IsInWorld() ? GetMap() : sMapMgr.FindMap(GetMapId(), GetInstanceId()))
-        _map->MessageDistBroadcast(this, data, dist, false);
+    if (IsInWorld())
+        GetMap()->MessageDistBroadcast(this, data, dist, false);
 
     if (self)
         GetSession()->SendPacket(data);
@@ -6088,8 +6088,8 @@ void Player::SendMessageToSetInRange(WorldPacket *data, float dist, bool self)
 
 void Player::SendMessageToSetInRange(WorldPacket *data, float dist, bool self, bool own_team_only)
 {
-    if (Map * _map = IsInWorld() ? GetMap() : sMapMgr.FindMap(GetMapId(), GetInstanceId()))
-        _map->MessageDistBroadcast(this, data, dist, false, own_team_only);
+    if (IsInWorld())
+        GetMap()->MessageDistBroadcast(this, data, dist, false, own_team_only);
 
     if (self)
         GetSession()->SendPacket(data);

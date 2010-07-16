@@ -1572,25 +1572,24 @@ void WorldObject::BuildMonsterChat(WorldPacket *data, uint8 msgtype, char const*
 void WorldObject::SendMessageToSet(WorldPacket *data, bool /*bToSelf*/)
 {
     //if object is in world, map for it already created!
-    Map * _map = IsInWorld() ? GetMap() : sMapMgr.FindMap(GetMapId(), GetInstanceId());
-    if(_map)
-        _map->MessageBroadcast(this, data);
+    if (IsInWorld())
+        GetMap()->MessageBroadcast(this, data);
 }
 
 void WorldObject::SendMessageToSetInRange(WorldPacket *data, float dist, bool /*bToSelf*/)
 {
     //if object is in world, map for it already created!
-    if (Map * _map = IsInWorld() ? GetMap() : sMapMgr.FindMap(GetMapId(), GetInstanceId()))
-        _map->MessageDistBroadcast(this, data, dist);
+    if (IsInWorld())
+        GetMap()->MessageDistBroadcast(this, data, dist);
 }
 
 void WorldObject::SendMessageToSetExcept(WorldPacket *data, Player const* skipped_receiver)
 {
     //if object is in world, map for it already created!
-    if (Map * _map = IsInWorld() ? GetMap() : sMapMgr.FindMap(GetMapId(), GetInstanceId()))
+    if (IsInWorld())
     {
         MaNGOS::MessageDelivererExcept notifier(this, data, skipped_receiver);
-        Cell::VisitWorldObjects(this, notifier, _map->GetVisibilityDistance());
+        Cell::VisitWorldObjects(this, notifier, GetMap()->GetVisibilityDistance());
     }
 }
 
