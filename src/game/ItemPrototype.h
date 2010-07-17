@@ -102,7 +102,7 @@ enum ItemBondingType
 #define MAX_BIND_TYPE                             6
 
 // masks for ITEM_FIELD_FLAGS field
-enum ITEM_FLAGS
+enum ItemFlags
 {
     ITEM_FLAGS_BINDED                         = 0x00000001, // set in game at binding, not set in template
     ITEM_FLAGS_CONJURED                       = 0x00000002,
@@ -130,6 +130,13 @@ enum ITEM_FLAGS
     ITEM_FLAGS_ENCHANT_SCROLL                 = 0x10000000, // for enchant scrolls
     ITEM_FLAGS_MILLABLE                       = 0x20000000,
     ITEM_FLAGS_BOP_TRADEABLE                  = 0x80000000
+};
+
+enum ItemFlags2
+{
+    ITEM_FLAGS2_HORDE_ONLY                    = 0x00000001, // drop in loot, sell by vendor and equipping only for horde
+    ITEM_FLAGS2_ALLIANCE_ONLY                 = 0x00000002, // drop in loot, sell by vendor and equipping only for alliance
+    ITEM_FLAGS2_EXT_COST_REQUIRES_GOLD        = 0x00000004, // item cost include gold part in case extended cost use also
 };
 
 enum BAG_FAMILY_MASK
@@ -530,7 +537,7 @@ struct ItemPrototype
     uint32 DisplayInfoID;                                   // id from ItemDisplayInfo.dbc
     uint32 Quality;
     uint32 Flags;
-    uint32 Faction;
+    uint32 Flags2;
     uint32 BuyCount;
     uint32 BuyPrice;
     uint32 SellPrice;

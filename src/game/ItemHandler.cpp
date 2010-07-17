@@ -316,7 +316,7 @@ void WorldSession::HandleItemQuerySingleOpcode( WorldPacket & recv_data )
         data << pProto->DisplayInfoID;
         data << pProto->Quality;
         data << pProto->Flags;
-        data << pProto->Faction;                            // 3.2 faction?
+        data << pProto->Flags2;                             // new in 3.2
         data << pProto->BuyPrice;
         data << pProto->SellPrice;
         data << pProto->InventoryType;
