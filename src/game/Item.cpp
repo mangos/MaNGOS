@@ -309,13 +309,13 @@ float ItemPrototype::getDPS() const
             case INVTYPE_WEAPON:
             case INVTYPE_WEAPONMAINHAND:
             case INVTYPE_WEAPONOFFHAND:
-                if(Faction & 0x200)                         // caster weapon flag
+                if(Flags2 & ITEM_FLAGS2_CASTER_WEAPON)      // caster weapon flag
                     id = sItemDamageOneHandCasterStore.LookupEntry(ItemLevel);
                 else
                     id = sItemDamageOneHandStore.LookupEntry(ItemLevel);
                 break;
             case INVTYPE_2HWEAPON:
-                if(Faction & 0x200)                         // caster weapon flag
+                if(Flags2 & ITEM_FLAGS2_CASTER_WEAPON)      // caster weapon flag
                     id = sItemDamageTwoHandCasterStore.LookupEntry(ItemLevel);
                 else
                     id = sItemDamageTwoHandStore.LookupEntry(ItemLevel);
