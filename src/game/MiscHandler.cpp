@@ -279,7 +279,7 @@ void WorldSession::HandleLogoutRequestOpcode( WorldPacket & /*recv_data*/ )
     }
 
     //instant logout in taverns/cities or on taxi or for admins, gm's, mod's if its enabled in mangosd.conf
-    if (GetPlayer()->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING) || GetPlayer()->isInFlight() ||
+    if (GetPlayer()->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING) || GetPlayer()->IsTaxiFlying() ||
         GetSecurity() >= (AccountTypes)sWorld.getConfig(CONFIG_UINT32_INSTANT_LOGOUT))
     {
         LogoutPlayer(true);
@@ -683,7 +683,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
     recv_data >> Trigger_ID;
     DEBUG_LOG("Trigger ID: %u", Trigger_ID);
 
-    if(GetPlayer()->isInFlight())
+    if(GetPlayer()->IsTaxiFlying())
     {
         DEBUG_LOG("Player '%s' (GUID: %u) in flight, ignore Area Trigger ID: %u", GetPlayer()->GetName(), GetPlayer()->GetGUIDLow(), Trigger_ID);
         return;
@@ -1146,7 +1146,7 @@ void WorldSession::HandleWorldTeleportOpcode(WorldPacket& recv_data)
 
     //DEBUG_LOG("Received opcode CMSG_WORLD_TELEPORT");
 
-    if(GetPlayer()->isInFlight())
+    if(GetPlayer()->IsTaxiFlying())
     {
         DEBUG_LOG("Player '%s' (GUID: %u) in flight, ignore worldport command.",GetPlayer()->GetName(),GetPlayer()->GetGUIDLow());
         return;
@@ -1458,7 +1458,7 @@ void WorldSession::HandleCancelMountAuraOpcode( WorldPacket & /*recv_data*/ )
         return;
     }
 
-    if(_player->isInFlight())                               // not blizz like; no any messages on blizz
+    if(_player->IsTaxiFlying())                             // not blizz like; no any messages on blizz
     {
         ChatHandler(this).SendSysMessage(LANG_YOU_IN_FLIGHT);
         return;
@@ -1538,7 +1538,7 @@ void WorldSession::HandleHearthandResurrect(WorldPacket & /*recv_data*/)
         return;
 
     // Can't use in flight
-    if (_player->isInFlight())
+    if (_player->IsTaxiFlying())
         return;
 
     // Send Everytime

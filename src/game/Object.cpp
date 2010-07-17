@@ -303,7 +303,7 @@ void Object::BuildMovementUpdate(ByteBuffer * data, uint16 updateFlags) const
                 // remove unknown, unused etc flags for now
                 player->m_movementInfo.RemoveMovementFlag(MOVEFLAG_SPLINE_ENABLED);
 
-                if(player->isInFlight())
+                if(player->IsTaxiFlying())
                 {
                     ASSERT(player->GetMotionMaster()->GetCurrentMovementGeneratorType() == FLIGHT_MOTION_TYPE);
                     player->m_movementInfo.AddMovementFlag(MOVEFLAG_FORWARD);
@@ -340,7 +340,7 @@ void Object::BuildMovementUpdate(ByteBuffer * data, uint16 updateFlags) const
 
             Player *player = ((Player*)unit);
 
-            if(!player->isInFlight())
+            if(!player->IsTaxiFlying())
             {
                 DEBUG_LOG("_BuildMovementUpdate: MOVEFLAG_SPLINE_ENABLED but not in flight");
                 return;
@@ -1572,25 +1572,24 @@ void WorldObject::BuildMonsterChat(WorldPacket *data, uint8 msgtype, char const*
 void WorldObject::SendMessageToSet(WorldPacket *data, bool /*bToSelf*/)
 {
     //if object is in world, map for it already created!
-    Map * _map = IsInWorld() ? GetMap() : sMapMgr.FindMap(GetMapId(), GetInstanceId());
-    if(_map)
-        _map->MessageBroadcast(this, data);
+    if (IsInWorld())
+        GetMap()->MessageBroadcast(this, data);
 }
 
 void WorldObject::SendMessageToSetInRange(WorldPacket *data, float dist, bool /*bToSelf*/)
 {
     //if object is in world, map for it already created!
-    if (Map * _map = IsInWorld() ? GetMap() : sMapMgr.FindMap(GetMapId(), GetInstanceId()))
-        _map->MessageDistBroadcast(this, data, dist);
+    if (IsInWorld())
+        GetMap()->MessageDistBroadcast(this, data, dist);
 }
 
 void WorldObject::SendMessageToSetExcept(WorldPacket *data, Player const* skipped_receiver)
 {
     //if object is in world, map for it already created!
-    if (Map * _map = IsInWorld() ? GetMap() : sMapMgr.FindMap(GetMapId(), GetInstanceId()))
+    if (IsInWorld())
     {
         MaNGOS::MessageDelivererExcept notifier(this, data, skipped_receiver);
-        Cell::VisitWorldObjects(this, notifier, _map->GetVisibilityDistance());
+        Cell::VisitWorldObjects(this, notifier, GetMap()->GetVisibilityDistance());
     }
 }
 

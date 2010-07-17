@@ -618,14 +618,14 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     if (!procSpell || procSpell->Id == 24659)
                         return false;
                     // Need remove one 24659 aura
-                    RemoveSingleAuraHolderFromStack(24659);
+                    RemoveAuraHolderFromStack(24659);
                     return true;
                 }
                 // Restless Strength
                 case 24661:
                 {
                     // Need remove one 24662 aura
-                    RemoveSingleAuraHolderFromStack(24662);
+                    RemoveAuraHolderFromStack(24662);
                     return true;
                 }
                 // Adaptive Warding (Frostfire Regalia set)
@@ -2356,7 +2356,7 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                         }
                         CastSpell(target, spell, true, castItem, triggeredByAura);
                         if ((*itr)->GetHolder()->DropAuraCharge())
-                            RemoveSingleAuraHolderFromStack((*itr)->GetId());
+                            RemoveAuraHolderFromStack((*itr)->GetId());
                         return true;
                     }
                 }

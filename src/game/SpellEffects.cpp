@@ -597,8 +597,7 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                             }
 
                             if (needConsume)
-                                for (uint32 i = 0; i < doses; ++i)
-                                    unitTarget->RemoveSingleAuraHolderFromStack(spellId, m_caster->GetGUID());
+                                unitTarget->RemoveAuraHolderFromStack(spellId, doses, m_caster->GetGUID());
 
                             damage *= doses;
                             damage += int32(((Player*)m_caster)->GetTotalAttackPowerValue(BASE_ATTACK) * 0.09f * doses);
@@ -2732,7 +2731,7 @@ void Spell::EffectTriggerMissileSpell(SpellEffectIndex effect_idx)
 
 void Spell::EffectJump(SpellEffectIndex eff_idx)
 {
-    if(m_caster->isInFlight())
+    if(m_caster->IsTaxiFlying())
         return;
 
     // Init dest coordinates
@@ -2781,7 +2780,7 @@ void Spell::EffectJump(SpellEffectIndex eff_idx)
 
 void Spell::EffectTeleportUnits(SpellEffectIndex eff_idx)
 {
-    if(!unitTarget || unitTarget->isInFlight())
+    if(!unitTarget || unitTarget->IsTaxiFlying())
         return;
 
     switch (m_spellInfo->EffectImplicitTargetB[eff_idx])
@@ -4073,7 +4072,7 @@ void Spell::EffectDispel(SpellEffectIndex eff_idx)
     // Ok if exist some buffs for dispel try dispel it
     if (!dispel_list.empty())
     {
-        std::list < std::pair<uint32,uint64> > success_list;// (spell_id,casterGuid)
+        std::list<std::pair<SpellAuraHolder* ,uint32> > success_list;// (spell_id,casterGuid)
         std::list < uint32 > fail_list;                     // spell_id
 
         // some spells have effect value = 0 and all from its by meaning expect 1
@@ -4109,7 +4108,20 @@ void Spell::EffectDispel(SpellEffectIndex eff_idx)
             if (roll_chance_i(miss_chance))
                 fail_list.push_back(spellInfo->Id);
             else
-                success_list.push_back(std::pair<uint32,uint64>(holder->GetId(),holder->GetCasterGUID()));
+            {
+                bool foundDispelled = false;
+                for (std::list<std::pair<SpellAuraHolder* ,uint32> >::iterator success_iter = success_list.begin(); success_iter != success_list.end(); ++success_iter)
+                {
+                    if (success_iter->first->GetId() == holder->GetId() && success_iter->first->GetCasterGUID() == holder->GetCasterGUID())
+                    {
+                        success_iter->second += 1;
+                        foundDispelled = true;
+                        break;
+                    }
+                }
+                if (!foundDispelled)
+                    success_list.push_back(std::pair<SpellAuraHolder* ,uint32>(holder, 1));
+            }
         }
         // Send success log and really remove auras
         if (!success_list.empty())
@@ -4121,12 +4133,12 @@ void Spell::EffectDispel(SpellEffectIndex eff_idx)
             data << uint32(m_spellInfo->Id);                // Dispel spell id
             data << uint8(0);                               // not used
             data << uint32(count);                          // count
-            for (std::list<std::pair<uint32,uint64> >::iterator j = success_list.begin(); j != success_list.end(); ++j)
+            for (std::list<std::pair<SpellAuraHolder* ,uint32> >::iterator j = success_list.begin(); j != success_list.end(); ++j)
             {
-                SpellEntry const* spellInfo = sSpellStore.LookupEntry(j->first);
-                data << uint32(spellInfo->Id);              // Spell Id
+                SpellAuraHolder* dispelledHolder = j->first;
+                data << uint32(dispelledHolder->GetId());   // Spell Id
                 data << uint8(0);                           // 0 - dispeled !=0 cleansed
-                unitTarget->RemoveSingleAuraHolderDueToSpellByDispel(spellInfo->Id, j->second, m_caster);
+                unitTarget->RemoveAuraHolderDueToSpellByDispel(dispelledHolder->GetId(), j->second, dispelledHolder->GetCasterGUID(), m_caster);
             }
             m_caster->SendMessageToSet(&data, true);
 
@@ -4419,7 +4431,7 @@ void Spell::EffectTeleUnitsFaceCaster(SpellEffectIndex eff_idx)
     if (!unitTarget)
         return;
 
-    if (unitTarget->isInFlight())
+    if (unitTarget->IsTaxiFlying())
         return;
 
     float dis = GetSpellRadius(sSpellRadiusStore.LookupEntry(m_spellInfo->EffectRadiusIndex[eff_idx]));
@@ -5434,7 +5446,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     return;
                 }
                 case 24590:                                 // Brittle Armor - need remove one 24575 Brittle Armor aura
-                    unitTarget->RemoveSingleAuraHolderFromStack(24575);
+                    unitTarget->RemoveAuraHolderFromStack(24575);
                     return;
                 case 26275:                                 // PX-238 Winter Wondervolt TRAP
                 {
@@ -5453,7 +5465,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     return;
                 }
                 case 26465:                                 // Mercurial Shield - need remove one 26464 Mercurial Shield aura
-                    unitTarget->RemoveSingleAuraHolderFromStack(26464);
+                    unitTarget->RemoveAuraHolderFromStack(26464);
                     return;
                 case 25140:                                 // Orb teleport spells
                 case 25143:
@@ -6652,7 +6664,7 @@ void Spell::EffectStuck(SpellEffectIndex /*eff_idx*/)
     DEBUG_LOG("Spell Effect: Stuck");
     DETAIL_LOG("Player %s (guid %u) used auto-unstuck future at map %u (%f, %f, %f)", pTarget->GetName(), pTarget->GetGUIDLow(), m_caster->GetMapId(), m_caster->GetPositionX(), pTarget->GetPositionY(), pTarget->GetPositionZ());
 
-    if(pTarget->isInFlight())
+    if(pTarget->IsTaxiFlying())
         return;
 
     // homebind location is loaded always
@@ -7055,7 +7067,7 @@ void Spell::EffectBlock(SpellEffectIndex /*eff_idx*/)
 
 void Spell::EffectLeapForward(SpellEffectIndex eff_idx)
 {
-    if(unitTarget->isInFlight())
+    if(unitTarget->IsTaxiFlying())
         return;
 
     if( m_spellInfo->rangeIndex == 1)                       //self range
@@ -7083,7 +7095,7 @@ void Spell::EffectLeapForward(SpellEffectIndex eff_idx)
 
 void Spell::EffectLeapBack(SpellEffectIndex eff_idx)
 {
-    if(unitTarget->isInFlight())
+    if(unitTarget->IsTaxiFlying())
         return;
 
     m_caster->KnockBackFrom(unitTarget,float(m_spellInfo->EffectMiscValue[eff_idx])/10,float(damage)/10);
