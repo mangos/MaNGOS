@@ -1812,6 +1812,25 @@ void ObjectMgr::LoadItemPrototypes()
             const_cast<ItemPrototype*>(proto)->Quality = ITEM_QUALITY_NORMAL;
         }
 
+        if (proto->Flags2 & ITEM_FLAGS2_HORDE_ONLY)
+        {
+            if (FactionEntry const* faction = sFactionStore.LookupEntry(HORDE))
+                if ((proto->AllowableRace & faction->BaseRepRaceMask[0]) == 0)
+                    sLog.outErrorDb("Item (Entry: %u) have in `AllowableRace` races (%u) only not compatible with ITEM_FLAGS2_HORDE_ONLY (%u) in Flags field, item any way will can't be equipped or use by this races.",
+                        i, proto->AllowableRace, ITEM_FLAGS2_HORDE_ONLY);
+
+            if (proto->Flags2 & ITEM_FLAGS2_ALLIANCE_ONLY)
+                sLog.outErrorDb("Item (Entry: %u) have in `Flags2` flags ITEM_FLAGS2_ALLIANCE_ONLY (%u) and ITEM_FLAGS2_HORDE_ONLY (%u) in Flags field, this is wrong combination.",
+                    i, ITEM_FLAGS2_ALLIANCE_ONLY, ITEM_FLAGS2_HORDE_ONLY);
+        }
+        else if (proto->Flags2 & ITEM_FLAGS2_ALLIANCE_ONLY)
+        {
+            if (FactionEntry const* faction = sFactionStore.LookupEntry(ALLIANCE))
+                if ((proto->AllowableRace & faction->BaseRepRaceMask[0]) == 0)
+                    sLog.outErrorDb("Item (Entry: %u) have in `AllowableRace` races (%u) only not compatible with ITEM_FLAGS2_ALLIANCE_ONLY (%u) in Flags field, item any way will can't be equipped or use by this races.",
+                        i, proto->AllowableRace, ITEM_FLAGS2_ALLIANCE_ONLY);
+        }
+
         if(proto->BuyCount <= 0)
         {
             sLog.outErrorDb("Item (Entry: %u) has wrong BuyCount value (%u), set to default(1).",i,proto->BuyCount);
@@ -2473,7 +2492,7 @@ void ObjectMgr::LoadPlayerInfo()
     // Load playercreate
     {
         //                                                0     1      2    3     4           5           6
-        QueryResult *result = WorldDatabase.Query("SELECT race, class, map, zone, position_x, position_y, position_z FROM playercreateinfo");
+        QueryResult *result = WorldDatabase.Query("SELECT race, class, map, zone, position_x, position_y, position_z, orientation FROM playercreateinfo");
 
         uint32 count = 0;
 
@@ -2494,13 +2513,14 @@ void ObjectMgr::LoadPlayerInfo()
         {
             Field* fields = result->Fetch();
 
-            uint32 current_race = fields[0].GetUInt32();
+            uint32 current_race  = fields[0].GetUInt32();
             uint32 current_class = fields[1].GetUInt32();
-            uint32 mapId     = fields[2].GetUInt32();
-            uint32 areaId    = fields[3].GetUInt32();
-            float  positionX = fields[4].GetFloat();
-            float  positionY = fields[5].GetFloat();
-            float  positionZ = fields[6].GetFloat();
+            uint32 mapId         = fields[2].GetUInt32();
+            uint32 areaId        = fields[3].GetUInt32();
+            float  positionX     = fields[4].GetFloat();
+            float  positionY     = fields[5].GetFloat();
+            float  positionZ     = fields[6].GetFloat();
+            float  orientation   = fields[7].GetFloat();
 
             if(current_race >= MAX_RACES)
             {
@@ -2528,7 +2548,7 @@ void ObjectMgr::LoadPlayerInfo()
             }
 
             // accept DB data only for valid position (and non instanceable)
-            if( !MapManager::IsValidMapCoord(mapId,positionX,positionY,positionZ) )
+            if( !MapManager::IsValidMapCoord(mapId,positionX,positionY,positionZ, orientation) )
             {
                 sLog.outErrorDb("Wrong home position for class %u race %u pair in `playercreateinfo` table, ignoring.",current_class,current_race);
                 continue;
@@ -2542,11 +2562,12 @@ void ObjectMgr::LoadPlayerInfo()
 
             PlayerInfo* pInfo = &playerInfo[current_race][current_class];
 
-            pInfo->mapId     = mapId;
-            pInfo->areaId    = areaId;
-            pInfo->positionX = positionX;
-            pInfo->positionY = positionY;
-            pInfo->positionZ = positionZ;
+            pInfo->mapId       = mapId;
+            pInfo->areaId      = areaId;
+            pInfo->positionX   = positionX;
+            pInfo->positionY   = positionY;
+            pInfo->positionZ   = positionZ;
+            pInfo->orientation = orientation;
 
             pInfo->displayId_m = rEntry->model_m;
             pInfo->displayId_f = rEntry->model_f;
@@ -8173,7 +8194,7 @@ void ObjectMgr::LoadVendors()
         uint32 item_id      = fields[1].GetUInt32();
         uint32 maxcount     = fields[2].GetUInt32();
         uint32 incrtime     = fields[3].GetUInt32();
-        int32  ExtendedCost = fields[4].GetInt32();
+        uint32 ExtendedCost = fields[4].GetUInt32();
 
         if(!IsVendorItemValid(entry,item_id,maxcount,incrtime,ExtendedCost,NULL,&skip_vendors))
             continue;
@@ -8451,12 +8472,12 @@ void ObjectMgr::LoadGossipMenuItems()
     sLog.outString(">> Loaded %u gossip_menu_option entries", count);
 }
 
-void ObjectMgr::AddVendorItem( uint32 entry,uint32 item, uint32 maxcount, uint32 incrtime, int32 extendedcost )
+void ObjectMgr::AddVendorItem( uint32 entry,uint32 item, uint32 maxcount, uint32 incrtime, uint32 extendedcost )
 {
     VendorItemData& vList = m_mCacheVendorItemMap[entry];
     vList.AddItem(item,maxcount,incrtime,extendedcost);
 
-    WorldDatabase.PExecuteLog("INSERT INTO npc_vendor (entry,item,maxcount,incrtime,extendedcost) VALUES('%u','%u','%u','%u','%i')",entry, item, maxcount,incrtime,extendedcost);
+    WorldDatabase.PExecuteLog("INSERT INTO npc_vendor (entry,item,maxcount,incrtime,extendedcost) VALUES('%u','%u','%u','%u','%u')",entry, item, maxcount,incrtime,extendedcost);
 }
 
 bool ObjectMgr::RemoveVendorItem( uint32 entry,uint32 item )
@@ -8472,7 +8493,7 @@ bool ObjectMgr::RemoveVendorItem( uint32 entry,uint32 item )
     return true;
 }
 
-bool ObjectMgr::IsVendorItemValid( uint32 vendor_entry, uint32 item_id, uint32 maxcount, uint32 incrtime, int32 ExtendedCost, Player* pl, std::set<uint32>* skip_vendors ) const
+bool ObjectMgr::IsVendorItemValid( uint32 vendor_entry, uint32 item_id, uint32 maxcount, uint32 incrtime, uint32 ExtendedCost, Player* pl, std::set<uint32>* skip_vendors ) const
 {
     CreatureInfo const* cInfo = GetCreatureTemplate(vendor_entry);
     if(!cInfo)
@@ -8504,18 +8525,18 @@ bool ObjectMgr::IsVendorItemValid( uint32 vendor_entry, uint32 item_id, uint32 m
         if(pl)
             ChatHandler(pl).PSendSysMessage(LANG_ITEM_NOT_FOUND, item_id);
         else
-            sLog.outErrorDb("Table `npc_vendor` for vendor (Entry: %u) contain nonexistent item (%u), ignoring",vendor_entry,item_id);
+            sLog.outErrorDb("Table `npc_vendor` for vendor (Entry: %u) contain nonexistent item (%u), ignoring",
+                vendor_entry, item_id);
         return false;
     }
 
-    uint32 extCostId = std::abs(ExtendedCost);              // negative exclude for vendor price money part
-
-    if(extCostId && !sItemExtendedCostStore.LookupEntry(extCostId))
+    if(ExtendedCost && !sItemExtendedCostStore.LookupEntry(ExtendedCost))
     {
         if(pl)
-            ChatHandler(pl).PSendSysMessage(LANG_EXTENDED_COST_NOT_EXIST,extCostId);
+            ChatHandler(pl).PSendSysMessage(LANG_EXTENDED_COST_NOT_EXIST,ExtendedCost);
         else
-            sLog.outErrorDb("Table `npc_vendor` contain item (Entry: %u) with wrong ExtendedCost (%u) for vendor (%u), ignoring",item_id,extCostId,vendor_entry);
+            sLog.outErrorDb("Table `npc_vendor` contain item (Entry: %u) with wrong ExtendedCost (%u) for vendor (%u), ignoring",
+                item_id, ExtendedCost, vendor_entry);
         return false;
     }
 
@@ -8524,7 +8545,8 @@ bool ObjectMgr::IsVendorItemValid( uint32 vendor_entry, uint32 item_id, uint32 m
         if(pl)
             ChatHandler(pl).PSendSysMessage("MaxCount!=0 (%u) but IncrTime==0", maxcount);
         else
-            sLog.outErrorDb( "Table `npc_vendor` has `maxcount` (%u) for item %u of vendor (Entry: %u) but `incrtime`=0, ignoring", maxcount, item_id, vendor_entry);
+            sLog.outErrorDb( "Table `npc_vendor` has `maxcount` (%u) for item %u of vendor (Entry: %u) but `incrtime`=0, ignoring",
+                maxcount, item_id, vendor_entry);
         return false;
     }
     else if(maxcount==0 && incrtime > 0)
@@ -8532,7 +8554,8 @@ bool ObjectMgr::IsVendorItemValid( uint32 vendor_entry, uint32 item_id, uint32 m
         if(pl)
             ChatHandler(pl).PSendSysMessage("MaxCount==0 but IncrTime<>=0");
         else
-            sLog.outErrorDb( "Table `npc_vendor` has `maxcount`=0 for item %u of vendor (Entry: %u) but `incrtime`<>0, ignoring", item_id, vendor_entry);
+            sLog.outErrorDb( "Table `npc_vendor` has `maxcount`=0 for item %u of vendor (Entry: %u) but `incrtime`<>0, ignoring",
+                item_id, vendor_entry);
         return false;
     }
 

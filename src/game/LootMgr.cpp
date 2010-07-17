@@ -337,7 +337,18 @@ LootItem::LootItem(LootStoreItem const& li)
 bool LootItem::AllowedForPlayer(Player const * player) const
 {
     // DB conditions check
-    if ( !sObjectMgr.IsPlayerMeetToCondition(player,conditionId) )
+    if (!sObjectMgr.IsPlayerMeetToCondition(player,conditionId))
+        return false;
+
+    ItemPrototype const *pProto = ObjectMgr::GetItemPrototype(itemid);
+    if (!pProto)
+        return false;
+
+    // not show loot for not own team
+    if ((pProto->Flags2 & ITEM_FLAGS2_HORDE_ONLY) && player->GetTeam() != HORDE)
+        return false;
+
+    if ((pProto->Flags2 & ITEM_FLAGS2_ALLIANCE_ONLY) && player->GetTeam() != ALLIANCE)
         return false;
 
     if ( needs_quest )
@@ -349,8 +360,7 @@ bool LootItem::AllowedForPlayer(Player const * player) const
     else
     {
         // Not quest only drop (check quest starting items for already accepted non-repeatable quests)
-        ItemPrototype const *pProto = ObjectMgr::GetItemPrototype(itemid);
-        if (pProto && pProto->StartQuest && player->GetQuestStatus(pProto->StartQuest) != QUEST_STATUS_NONE && !player->HasQuestForItem(itemid))
+        if (pProto->StartQuest && player->GetQuestStatus(pProto->StartQuest) != QUEST_STATUS_NONE && !player->HasQuestForItem(itemid))
             return false;
     }
 

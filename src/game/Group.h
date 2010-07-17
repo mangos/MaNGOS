@@ -42,8 +42,6 @@ enum LootMethod
     NEED_BEFORE_GREED = 4
 };
 
-#define ALL_ROLL_VOTE_MASK 0x0F                             // set what votes allowed
-
 enum RollVote
 {
     ROLL_PASS              = 0,
@@ -57,6 +55,20 @@ enum RollVote
     ROLL_NOT_EMITED_YET    = 4,                             // send to client
     ROLL_NOT_VALID         = 5                              // not send to client
 };
+
+// set what votes allowed
+enum RollVoteMask
+{
+    ROLL_VOTE_MASK_PASS       = 0x01,
+    ROLL_VOTE_MASK_NEED       = 0x02,
+    ROLL_VOTE_MASK_GREED      = 0x04,
+    ROLL_VOTE_MASK_DISENCHANT = 0x08,
+
+    ROLL_VOTE_MASK_ALL        = 0x0F,
+
+    ROLL_VOTE_MASK_NO_NEED    = ROLL_VOTE_MASK_ALL & ~ROLL_VOTE_MASK_NEED,
+};
+
 
 enum GroupMemberOnlineStatus
 {
@@ -345,7 +357,7 @@ class MANGOS_DLL_SPEC Group
         void GroupLoot(Creature *creature, Loot *loot);
         void NeedBeforeGreed(Creature *creature, Loot *loot);
         void MasterLoot(Creature *creature, Loot *loot);
-        void CountRollVote(ObjectGuid const& playerGUID, ObjectGuid const& lootedTarget, uint32 itemSlot, RollVote choise);
+        bool CountRollVote(ObjectGuid const& playerGUID, ObjectGuid const& lootedTarget, uint32 itemSlot, RollVote vote);
         void StartLootRool(Creature* lootTarget, Loot* loot, uint8 itemSlot, bool skipIfCanNotUse);
         void EndRoll();
 
@@ -418,7 +430,7 @@ class MANGOS_DLL_SPEC Group
         }
 
         void CountTheRoll(Rolls::iterator& roll);           // iterator update to next, in CountRollVote if true
-        bool CountRollVote(ObjectGuid const& playerGUID, Rolls::iterator& roll, RollVote choise);
+        bool CountRollVote(ObjectGuid const& playerGUID, Rolls::iterator& roll, RollVote vote);
 
         GroupFlagMask GetFlags(MemberSlot const& slot) const
         {

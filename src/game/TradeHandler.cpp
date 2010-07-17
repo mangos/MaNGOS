@@ -554,7 +554,7 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    if (GetPlayer()->isInFlight())
+    if (GetPlayer()->IsTaxiFlying())
     {
         SendTradeStatus(TRADE_STATUS_TARGET_TO_FAR);
         return;
@@ -580,7 +580,7 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    if (pOther->isInFlight())
+    if (pOther->IsTaxiFlying())
     {
         SendTradeStatus(TRADE_STATUS_TARGET_TO_FAR);
         return;

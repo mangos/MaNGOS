@@ -392,8 +392,9 @@ void WorldSession::HandleLootRoll( WorldPacket &recv_data )
     if (rollType >= MAX_ROLL_FROM_CLIENT)
         return;
 
-    // everything is fine, do it
-    group->CountRollVote(GetPlayer()->GetObjectGuid(), lootedTarget, itemSlot, RollVote(rollType));
+    // everything is fine, do it, if false then some cheating problem found
+    if(!group->CountRollVote(GetPlayer()->GetObjectGuid(), lootedTarget, itemSlot, RollVote(rollType)))
+        return;
 
     switch (rollType)
     {

@@ -110,7 +110,7 @@ enum ItemBondingType
 #define MAX_BIND_TYPE                             6
 
 // masks for ITEM_FIELD_FLAGS field
-enum ITEM_FLAGS
+enum ItemFlags
 {
     ITEM_FLAGS_BINDED                         = 0x00000001, // set in game at binding, not set in template
     ITEM_FLAGS_CONJURED                       = 0x00000002,
@@ -138,6 +138,14 @@ enum ITEM_FLAGS
     ITEM_FLAGS_ENCHANT_SCROLL                 = 0x10000000, // for enchant scrolls
     ITEM_FLAGS_MILLABLE                       = 0x20000000,
     ITEM_FLAGS_BOP_TRADEABLE                  = 0x80000000
+};
+
+enum ItemFlags2
+{
+    ITEM_FLAGS2_HORDE_ONLY                    = 0x00000001, // drop in loot, sell by vendor and equipping only for horde
+    ITEM_FLAGS2_ALLIANCE_ONLY                 = 0x00000002, // drop in loot, sell by vendor and equipping only for alliance
+    ITEM_FLAGS2_EXT_COST_REQUIRES_GOLD        = 0x00000004, // item cost include gold part in case extended cost use also
+    ITEM_FLAGS2_NEED_ROLL_DISABLED            = 0x00000100, // need roll during looting is not allowed for this item
 };
 
 enum BAG_FAMILY_MASK
@@ -484,7 +492,7 @@ enum ItemExtraFlags
     ITEM_EXTRA_NON_CONSUMABLE     = 0x01,                   // use as additional flag to spellcharges_N negative values, item not expire at no chanrges
     ITEM_EXTRA_REAL_TIME_DURATION = 0x02,                   // if set and have Duration time, then offline time included in counting, if not set then counted only in game time
 
-    ITEM_EXTRA_ALL                                          // all used flags, used for check DB data
+    ITEM_EXTRA_ALL                = 0x03                    // all used flags, used for check DB data (mask all above flags)
 };
 
 // GCC have alternative #pragma pack(N) syntax and old gcc version not support pack(push,N), also any gcc version not support it at some platform
@@ -538,7 +546,7 @@ struct ItemPrototype
     uint32 DisplayInfoID;                                   // id from ItemDisplayInfo.dbc
     uint32 Quality;
     uint32 Flags;
-    uint32 Faction;                                         // TODO: rename it
+    uint32 Flags2;
     uint32 BuyCount;
     uint32 BuyPrice;
     uint32 SellPrice;

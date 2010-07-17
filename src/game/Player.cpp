@@ -671,7 +671,7 @@ bool Player::Create( uint32 guidlow, const std::string& name, uint8 race, uint8 
         m_items[i] = NULL;
 
     SetLocationMapId(info->mapId);
-    Relocate(info->positionX,info->positionY,info->positionZ);
+    Relocate(info->positionX,info->positionY,info->positionZ, info->orientation);
 
     ChrClassesEntry const* cEntry = sChrClassesStore.LookupEntry(class_);
     if(!cEntry)
@@ -2250,7 +2250,7 @@ void Player::RegenerateHealth(uint32 diff)
 Creature* Player::GetNPCIfCanInteractWith(ObjectGuid guid, uint32 npcflagmask)
 {
     // some basic checks
-    if (guid.IsEmpty() || !IsInWorld() || isInFlight())
+    if (guid.IsEmpty() || !IsInWorld() || IsTaxiFlying())
         return NULL;
 
     // not in interactive state
@@ -2304,7 +2304,7 @@ Creature* Player::GetNPCIfCanInteractWith(ObjectGuid guid, uint32 npcflagmask)
 GameObject* Player::GetGameObjectIfCanInteractWith(ObjectGuid guid, uint32 gameobject_type) const
 {
     // some basic checks
-    if (guid.IsEmpty() || !IsInWorld() || isInFlight())
+    if (guid.IsEmpty() || !IsInWorld() || IsTaxiFlying())
         return NULL;
 
     // not in interactive state
@@ -3387,6 +3387,15 @@ void Player::learnSpell(uint32 spell_id, bool dependent)
 
     bool learning = addSpell(spell_id, active, true, dependent, false);
 
+    // prevent duplicated entires in spell book, also not send if not in world (loading)
+    if (learning && IsInWorld())
+    {
+        WorldPacket data(SMSG_LEARNED_SPELL, 6);
+        data << uint32(spell_id);
+        data << uint16(0);                                  // 3.3.3 unk
+        GetSession()->SendPacket(&data);
+    }
+
     // learn all disabled higher ranks (recursive)
     if(disabled)
     {
@@ -3398,15 +3407,6 @@ void Player::learnSpell(uint32 spell_id, bool dependent)
                 learnSpell(i->second, false);
         }
     }
-
-    // prevent duplicated entires in spell book, also not send if not in world (loading)
-    if(!learning || !IsInWorld ())
-        return;
-
-    WorldPacket data(SMSG_LEARNED_SPELL, 6);
-    data << uint32(spell_id);
-    data << uint16(0);                                      // 3.3.3 unk
-    GetSession()->SendPacket(&data);
 }
 
 void Player::removeSpell(uint32 spell_id, bool disabled, bool learn_low_rank, bool sendUpdate)
@@ -6096,8 +6096,8 @@ void Player::SaveRecallPosition()
 
 void Player::SendMessageToSet(WorldPacket *data, bool self)
 {
-    if (Map * _map = IsInWorld() ? GetMap() : sMapMgr.FindMap(GetMapId(), GetInstanceId()))
-        _map->MessageBroadcast(this, data, false);
+    if (IsInWorld())
+        GetMap()->MessageBroadcast(this, data, false);
 
     //if player is not in world and map in not created/already destroyed
     //no need to create one, just send packet for itself!
@@ -6107,8 +6107,8 @@ void Player::SendMessageToSet(WorldPacket *data, bool self)
 
 void Player::SendMessageToSetInRange(WorldPacket *data, float dist, bool self)
 {
-    if (Map * _map = IsInWorld() ? GetMap() : sMapMgr.FindMap(GetMapId(), GetInstanceId()))
-        _map->MessageDistBroadcast(this, data, dist, false);
+    if (IsInWorld())
+        GetMap()->MessageDistBroadcast(this, data, dist, false);
 
     if (self)
         GetSession()->SendPacket(data);
@@ -6116,8 +6116,8 @@ void Player::SendMessageToSetInRange(WorldPacket *data, float dist, bool self)
 
 void Player::SendMessageToSetInRange(WorldPacket *data, float dist, bool self, bool own_team_only)
 {
-    if (Map * _map = IsInWorld() ? GetMap() : sMapMgr.FindMap(GetMapId(), GetInstanceId()))
-        _map->MessageDistBroadcast(this, data, dist, false, own_team_only);
+    if (IsInWorld())
+        GetMap()->MessageDistBroadcast(this, data, dist, false, own_team_only);
 
     if (self)
         GetSession()->SendPacket(data);
@@ -6147,7 +6147,7 @@ void Player::CheckAreaExploreAndOutdoor()
     if (!isAlive())
         return;
 
-    if (isInFlight())
+    if (IsTaxiFlying())
         return;
 
     bool isOutdoor;
@@ -6649,15 +6649,15 @@ uint32 Player::GetLevelFromDB(uint64 guid)
 
 void Player::UpdateArea(uint32 newArea)
 {
-    // FFA_PVP flags are area and not zone id dependent
-    // so apply them accordingly
     m_areaUpdateId    = newArea;
 
     AreaTableEntry const* area = GetAreaEntryByAreaID(newArea);
 
-    if(area && (area->flags & AREA_FLAG_ARENA))
+    // FFA_PVP flags are area and not zone id dependent
+    // so apply them accordingly
+    if (area && (area->flags & AREA_FLAG_ARENA))
     {
-        if(!isGameMaster())
+        if (!isGameMaster())
             SetFFAPvP(true);
     }
     else
@@ -6666,6 +6666,17 @@ void Player::UpdateArea(uint32 newArea)
         // removal in sanctuaries and capitals is handled in zone update
         if(IsFFAPvP() && !sWorld.IsFFAPvPRealm())
             SetFFAPvP(false);
+    }
+
+    if (area)
+    {
+        // Dalaran restricted flight zone
+        if ((area->flags & AREA_FLAG_CANNOT_FLY) && IsFreeFlying() && !isGameMaster())
+            CastSpell(this, 58600, true);
+
+        // TODO: implement wintergrasp parachute when battle in progress
+        /* if ((area->flags & AREA_FLAG_OUTDOOR_PVP) && IsFreeFlying() && <WINTERGRASP_BATTLE_IN_PROGRESS> && !isGameMaster())
+            CastSpell(this, 58730, true); */
     }
 
     UpdateAreaDependentAuras(newArea);
@@ -10494,8 +10505,9 @@ uint8 Player::CanBankItem( uint8 bag, uint8 slot, ItemPosCountVec &dest, Item *p
             if (slot - BANK_SLOT_BAG_START >= GetBankBagSlotCount())
                 return EQUIP_ERR_MUST_PURCHASE_THAT_BAG_SLOT;
 
-            if (uint8 cantuse = CanUseItem( pItem, not_loading ) != EQUIP_ERR_OK)
-                return cantuse;
+            res = CanUseItem( pItem, not_loading );
+            if (res != EQUIP_ERR_OK)
+                return res;
         }
 
         res = _CanStoreItem_InSpecificSlot(bag,slot,dest,pProto,count,swap,pItem);
@@ -10658,8 +10670,9 @@ uint8 Player::CanUseItem( Item *pItem, bool not_loading ) const
             if (pItem->IsBindedNotWith(this))
                 return EQUIP_ERR_DONT_OWN_THAT_ITEM;
 
-            if ((pProto->AllowableClass & getClassMask()) == 0 || (pProto->AllowableRace & getRaceMask()) == 0)
-                return EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
+            uint8 msg = CanUseItem(pProto);
+            if (msg != EQUIP_ERR_OK)
+                return msg;
 
             if (uint32 item_use_skill = pItem->GetSkill())
             {
@@ -10699,23 +10712,8 @@ uint8 Player::CanUseItem( Item *pItem, bool not_loading ) const
                 }
             }
 
-            if (pProto->RequiredSkill != 0)
-            {
-                if (GetSkillValue( pProto->RequiredSkill ) == 0)
-                    return EQUIP_ERR_NO_REQUIRED_PROFICIENCY;
-
-                if (GetSkillValue( pProto->RequiredSkill ) < pProto->RequiredSkillRank)
-                    return EQUIP_ERR_CANT_EQUIP_SKILL;
-            }
-
-            if (pProto->RequiredSpell != 0 && !HasSpell(pProto->RequiredSpell))
-                return EQUIP_ERR_NO_REQUIRED_PROFICIENCY;
-
             if (pProto->RequiredReputationFaction && uint32(GetReputationRank(pProto->RequiredReputationFaction)) < pProto->RequiredReputationRank)
                 return EQUIP_ERR_CANT_EQUIP_REPUTATION;
-
-            if (getLevel() < pProto->RequiredLevel)
-                return EQUIP_ERR_CANT_EQUIP_LEVEL_I;
 
             return EQUIP_ERR_OK;
         }
@@ -10723,28 +10721,38 @@ uint8 Player::CanUseItem( Item *pItem, bool not_loading ) const
     return EQUIP_ERR_ITEM_NOT_FOUND;
 }
 
-bool Player::CanUseItem( ItemPrototype const *pProto )
+uint8 Player::CanUseItem( ItemPrototype const *pProto ) const
 {
     // Used by group, function NeedBeforeGreed, to know if a prototype can be used by a player
 
     if( pProto )
     {
-        if( (pProto->AllowableClass & getClassMask()) == 0 || (pProto->AllowableRace & getRaceMask()) == 0 )
-            return false;
+        if ((pProto->Flags2 & ITEM_FLAGS2_HORDE_ONLY) && GetTeam() != HORDE)
+            return EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
+
+        if ((pProto->Flags2 & ITEM_FLAGS2_ALLIANCE_ONLY) && GetTeam() != ALLIANCE)
+            return EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
+
+        if ((pProto->AllowableClass & getClassMask()) == 0 || (pProto->AllowableRace & getRaceMask()) == 0)
+            return EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
+
         if( pProto->RequiredSkill != 0  )
         {
             if( GetSkillValue( pProto->RequiredSkill ) == 0 )
-                return false;
+                return EQUIP_ERR_NO_REQUIRED_PROFICIENCY;
             else if( GetSkillValue( pProto->RequiredSkill ) < pProto->RequiredSkillRank )
-                return false;
+                return EQUIP_ERR_CANT_EQUIP_SKILL;
         }
+
         if( pProto->RequiredSpell != 0 && !HasSpell( pProto->RequiredSpell ) )
-            return false;
+            return EQUIP_ERR_NO_REQUIRED_PROFICIENCY;
+
         if( getLevel() < pProto->RequiredLevel )
-            return false;
-        return true;
+            return EQUIP_ERR_CANT_EQUIP_LEVEL_I;
+
+        return EQUIP_ERR_OK;
     }
-    return false;
+    return EQUIP_ERR_ITEM_NOT_FOUND;
 }
 
 uint8 Player::CanUseAmmo( uint32 item ) const
@@ -10759,22 +10767,14 @@ uint8 Player::CanUseAmmo( uint32 item ) const
     {
         if( pProto->InventoryType!= INVTYPE_AMMO )
             return EQUIP_ERR_ONLY_AMMO_CAN_GO_HERE;
-        if( (pProto->AllowableClass & getClassMask()) == 0 || (pProto->AllowableRace & getRaceMask()) == 0 )
-            return EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
-        if( pProto->RequiredSkill != 0  )
-        {
-            if( GetSkillValue( pProto->RequiredSkill ) == 0 )
-                return EQUIP_ERR_NO_REQUIRED_PROFICIENCY;
-            else if( GetSkillValue( pProto->RequiredSkill ) < pProto->RequiredSkillRank )
-                return EQUIP_ERR_CANT_EQUIP_SKILL;
-        }
-        if( pProto->RequiredSpell != 0 && !HasSpell( pProto->RequiredSpell ) )
-            return EQUIP_ERR_NO_REQUIRED_PROFICIENCY;
-        /*if( GetReputationMgr().GetReputation() < pProto->RequiredReputation )
+
+        uint8 msg = CanUseItem(pProto);
+        if (msg != EQUIP_ERR_OK)
+            return msg;
+
+        /*if ( GetReputationMgr().GetReputation() < pProto->RequiredReputation )
         return EQUIP_ERR_CANT_EQUIP_REPUTATION;
         */
-        if( getLevel() < pProto->RequiredLevel )
-            return EQUIP_ERR_CANT_EQUIP_LEVEL_I;
 
         // Requires No Ammo
         if(GetDummyAura(46699))
@@ -13993,7 +13993,7 @@ bool Player::SatisfyQuestExclusiveGroup( Quest const* qInfo, bool msg ) const
         if (i_exstatus != mQuestStatus.end()
             && (i_exstatus->second.m_status == QUEST_STATUS_COMPLETE || i_exstatus->second.m_status == QUEST_STATUS_INCOMPLETE))
         {
-            if (msg) 
+            if (msg)
                 SendCanTakeQuestResponse( INVALIDREASON_DONT_HAVE_REQ );
             return false;
         }
@@ -15701,7 +15701,7 @@ void Player::_LoadAuras(QueryResult *result, uint32 timediff)
                 aura->SetLoadedState(damage[i], maxduration[i], remaintime[i]);
                 holder->AddAura(aura, SpellEffectIndex(i));
             }
-            
+
             if (!holder->IsEmptyHolder())
             {
                 // reset stolen single target auras
@@ -15720,7 +15720,7 @@ void Player::_LoadAuras(QueryResult *result, uint32 timediff)
     }
 
     if(getClass() == CLASS_WARRIOR && !HasAuraType(SPELL_AURA_MOD_SHAPESHIFT))
-        CastSpell(this,SPELL_ID_PASSIVE_BATTLE_STANCE,true); 
+        CastSpell(this,SPELL_ID_PASSIVE_BATTLE_STANCE,true);
 }
 
 void Player::_LoadGlyphs(QueryResult *result)
@@ -16923,7 +16923,7 @@ void Player::_SaveAuras()
 
     for(SpellAuraHolderMap::const_iterator itr = auraHolders.begin(); itr != auraHolders.end(); ++itr)
     {
-        SpellAuraHolder *holder = itr->second; 
+        SpellAuraHolder *holder = itr->second;
         //skip all holders from spells that are passive
         //do not save single target holders (unless they were cast by the player)
         if (!holder->IsPassive() && (holder->GetCasterGUID() == GetGUID() || !holder->IsSingleTarget()))
@@ -16951,7 +16951,7 @@ void Player::_SaveAuras()
                     effIndexMask |= (1 << i);
                 }
             }
-            
+
             if (!effIndexMask)
                 continue;
 
@@ -18568,7 +18568,7 @@ bool Player::BuyItemFromVendorSlot(uint64 vendorguid, uint32 vendorslot, uint32 
         return false;
     }
 
-    if (uint32 extendedCostId = crItem->GetExtendedCostId())
+    if (uint32 extendedCostId = crItem->ExtendedCost)
     {
         ItemExtendedCostEntry const* iece = sItemExtendedCostStore.LookupEntry(extendedCostId);
         if (!iece)
@@ -18610,7 +18610,7 @@ bool Player::BuyItemFromVendorSlot(uint64 vendorguid, uint32 vendorslot, uint32 
         }
     }
 
-    uint32 price  = crItem->IsExcludeMoneyPrice() ? 0 : pProto->BuyPrice * count;
+    uint32 price  = (crItem->ExtendedCost == 0 || pProto->Flags2 & ITEM_FLAGS2_EXT_COST_REQUIRES_GOLD) ? pProto->BuyPrice * count : 0;
 
     // reputation discount
     if (price)
@@ -18633,7 +18633,7 @@ bool Player::BuyItemFromVendorSlot(uint64 vendorguid, uint32 vendorslot, uint32 
         }
 
         ModifyMoney( -(int32)price );
-        if (uint32 extendedCostId = crItem->GetExtendedCostId())
+        if (uint32 extendedCostId = crItem->ExtendedCost)
         {
             ItemExtendedCostEntry const* iece = sItemExtendedCostStore.LookupEntry(extendedCostId);
             if (iece->reqhonorpoints)
@@ -18678,7 +18678,7 @@ bool Player::BuyItemFromVendorSlot(uint64 vendorguid, uint32 vendorslot, uint32 
         }
 
         ModifyMoney( -(int32)price );
-        if (uint32 extendedCostId = crItem->GetExtendedCostId())
+        if (uint32 extendedCostId = crItem->ExtendedCost)
         {
             ItemExtendedCostEntry const* iece = sItemExtendedCostStore.LookupEntry(extendedCostId);
             if (iece->reqhonorpoints)
@@ -19497,7 +19497,7 @@ void Player::SendInitialPacketsBeforeAddToMap()
     // SMSG_POWER_UPDATE
 
     // set fly flag if in fly form or taxi flight to prevent visually drop at ground in showup moment
-    if(HasAuraType(SPELL_AURA_MOD_FLIGHT_SPEED_MOUNTED) || HasAuraType(SPELL_AURA_FLY) || isInFlight())
+    if(HasAuraType(SPELL_AURA_MOD_FLIGHT_SPEED_MOUNTED) || HasAuraType(SPELL_AURA_FLY) || IsTaxiFlying())
         m_movementInfo.AddMovementFlag(MOVEFLAG_FLYING);
 
     SetMover(this);
@@ -20049,7 +20049,7 @@ void Player::SummonIfPossible(bool agree)
         return;
 
     // stop taxi flight at summon
-    if(isInFlight())
+    if(IsTaxiFlying())
     {
         GetMotionMaster()->MovementExpired();
         m_taxi.ClearTaxiDestinations();
@@ -20631,7 +20631,7 @@ void Player::UpdateUnderwaterState( Map* m, float x, float y, float z )
     }
 
     // Allow travel in dark water on taxi or transport
-    if ((liquid_status.type & MAP_LIQUID_TYPE_DARK_WATER) && !isInFlight() && !GetTransport())
+    if ((liquid_status.type & MAP_LIQUID_TYPE_DARK_WATER) && !IsTaxiFlying() && !GetTransport())
         m_MirrorTimerFlags |= UNDERWATER_INDARKWATER;
     else
         m_MirrorTimerFlags &= ~UNDERWATER_INDARKWATER;
@@ -21043,13 +21043,24 @@ uint32 Player::CalculateTalentsPoints() const
     return uint32(talentPointsForLevel * sWorld.getConfig(CONFIG_FLOAT_RATE_TALENT));
 }
 
-bool Player::IsKnowHowFlyIn(uint32 mapid, uint32 zone, uint32 area) const
+bool Player::CanStartFlyInArea(uint32 mapid, uint32 zone, uint32 area) const
 {
+    if (isGameMaster())
+        return true;
     // continent checked in SpellMgr::GetSpellAllowedInLocationError at cast and area update
     uint32 v_map = GetVirtualMapForMapAndZone(mapid, zone);
 
-    // don't allow flying in Dalaran except Krasus' Landing
-    return (v_map != 571 || HasSpell(54197)) && (zone != 4395 || area == 4564);                 // Cold Weather Flying
+    if (v_map == 571 && !HasSpell(54197))   // Cold Weather Flying
+        return false;
+
+    // don't allow flying in Dalaran restricted areas
+    // (no other zones currently has areas with AREA_FLAG_CANNOT_FLY)
+    if (AreaTableEntry const* atEntry = GetAreaEntryByAreaID(area))
+        return (!(atEntry->flags & AREA_FLAG_CANNOT_FLY));
+
+    // TODO: disallow mounting in wintergrasp too when battle is in progress
+    // forced dismount part in Player::UpdateArea()
+    return true;
 }
 
 struct DoPlayerLearnSpell

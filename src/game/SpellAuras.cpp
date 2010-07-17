@@ -2071,18 +2071,6 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
     // AT REMOVE
     else
     {
-        SpellEffectEntry const* spellEffect = GetSpellProto()->GetSpellEffect(EFFECT_INDEX_0);
-        if (target->GetTypeId() == TYPEID_PLAYER && spellEffect &&
-            (spellEffect->Effect == 72 || spellEffect->Effect == 6 &&
-            (spellEffect->EffectApplyAuraName == 1 || spellEffect->EffectApplyAuraName == 128)))
-        {
-            // spells with SpellEffect=72 and aura=4: 6196, 6197, 21171, 21425
-            ((Player*)target)->GetCamera().ResetView();
-            WorldPacket data(SMSG_CLEAR_FAR_SIGHT_IMMEDIATE, 0);
-            ((Player*)target)->GetSession()->SendPacket(&data);
-            return;
-        }
-
         if (IsQuestTameSpell(GetId()) && target->isAlive())
         {
             Unit* caster = GetCaster();
@@ -2199,10 +2187,17 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
             }
             case 58600:                                     // Restricted Flight Area
             {
-                // Remove Flight Auras
-                target->CastSpell(target, 58601, true);
-                // Parachute
-                target->CastSpell(target, 45472, true);
+                AreaTableEntry const* area = GetAreaEntryByAreaID(target->GetAreaId());
+
+                // Dalaran restricted flight zone (recheck before apply unmount)
+                if (area && target->GetTargetGUID() == TYPEID_PLAYER && (area->flags & AREA_FLAG_CANNOT_FLY) &&
+                    ((Player*)target)->IsFreeFlying() && !((Player*)target)->isGameMaster())
+                {
+                    // Remove Flight Auras
+                    target->CastSpell(target, 58601, true);
+                    // Parachute
+                    target->CastSpell(target, 45472, true);
+                }
                 return;
             }
         }
@@ -2496,23 +2491,14 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                 }
                 else
                 {
-                    // Final heal only on dispelled or duration end
-                    if (!(GetAuraDuration() <= 0 || m_removeMode == AURA_REMOVE_BY_DISPEL))
+                    // Final heal on duration end
+                    if (m_removeMode != AURA_REMOVE_BY_EXPIRE)
                         return;
 
-                    // have a look if there is still some other Lifebloom dummy aura
-                    Unit::AuraList const& auras = target->GetAurasByType(SPELL_AURA_DUMMY);
-                    for(Unit::AuraList::const_iterator itr = auras.begin(); itr!=auras.end(); ++itr)
-                    {
-                        SpellClassOptionsEntry const* aurClassOpt = (*itr)->GetSpellProto()->GetSpellClassOptions();
-                        if (aurClassOpt && aurClassOpt->SpellFamilyName == SPELLFAMILY_DRUID &&
-                            (aurClassOpt->SpellFamilyFlags & UI64LIT(0x1000000000)))
-                            return;
-                    }
                     // final heal
                     if (target->IsInWorld() && GetStackAmount() > 0)
                     {
-                        int32 amount = m_modifier.m_amount / GetStackAmount();
+                        int32 amount = m_modifier.m_amount;
                         target->CastCustomSpell(target, 33778, &amount, NULL, NULL, true, NULL, this, GetCasterGUID());
 
                         if (Unit* caster = GetCaster())
@@ -3338,13 +3324,14 @@ void Aura::HandleModPossess(bool apply, bool Real)
         target->addUnitState(UNIT_STAT_CONTROLLED);
 
         target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
-
         target->SetCharmerGUID(p_caster->GetGUID());
         target->setFaction(p_caster->getFaction());
 
-        p_caster->SetCharm(target);
-
+        // target should became visible at SetView call(if not visible before):
+        // otherwise client\p_caster will ignore packets from the target(SetClientControl for example)
         camera.SetView(target);
+
+        p_caster->SetCharm(target);
         p_caster->SetClientControl(target, 1);
         p_caster->SetMover(target);
 
@@ -3375,9 +3362,12 @@ void Aura::HandleModPossess(bool apply, bool Real)
     {
         p_caster->SetCharm(NULL);
 
-        camera.ResetView();
         p_caster->SetClientControl(target, 0);
         p_caster->SetMover(NULL);
+
+        // there is a possibility that target became invisible for client\p_caster at ResetView call:
+        // it must be called after movement control unapplying, not before! the reason is same as at aura applying
+        camera.ResetView();
 
         p_caster->RemovePetActionBar();
 
@@ -3437,7 +3427,10 @@ void Aura::HandleModPossessPet(bool apply, bool Real)
     {
         target->addUnitState(UNIT_STAT_CONTROLLED);
 
+        // target should became visible at SetView call(if not visible before):
+        // otherwise client\p_caster will ignore packets from the target(SetClientControl for example)
         camera.SetView(pet);
+
         p_caster->SetCharm(pet);
         p_caster->SetClientControl(pet, 1);
         ((Player*)caster)->SetMover(pet);
@@ -3450,10 +3443,13 @@ void Aura::HandleModPossessPet(bool apply, bool Real)
     }
     else
     {
-        camera.ResetView();
         p_caster->SetCharm(NULL);
         p_caster->SetClientControl(pet, 0);
         p_caster->SetMover(NULL);
+
+        // there is a possibility that target became invisible for client\p_caster at ResetView call:
+        // it must be called after movement control unapplying, not before! the reason is same as at aura applying
+        camera.ResetView();
 
         // on delete only do caster related effects
         if(m_removeMode == AURA_REMOVE_BY_DELETE)

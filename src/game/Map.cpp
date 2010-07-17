@@ -752,7 +752,7 @@ Map::PlayerRelocation(Player *player, float x, float y, float z, float orientati
         DEBUG_FILTER_LOG(LOG_FILTER_PLAYER_MOVES, "Player %s relocation grid[%u,%u]cell[%u,%u]->grid[%u,%u]cell[%u,%u]", player->GetName(), old_cell.GridX(), old_cell.GridY(), old_cell.CellX(), old_cell.CellY(), new_cell.GridX(), new_cell.GridY(), new_cell.CellX(), new_cell.CellY());
 
         // update player position for group at taxi flight
-        if(player->GetGroup() && player->isInFlight())
+        if(player->GetGroup() && player->IsTaxiFlying())
             player->SetGroupUpdateFlag(GROUP_UPDATE_FLAG_POSITION);
 
         NGridType* oldGrid = getNGrid(old_cell.GridX(), old_cell.GridY());
@@ -1968,7 +1968,7 @@ void InstanceMap::SetResetSchedule(bool on)
     // the reset time is only scheduled when there are no payers inside
     // it is assumed that the reset time will rarely (if ever) change while the reset is scheduled
     if(IsDungeon() && !HavePlayers() && !IsRaidOrHeroicDungeon())
-        sInstanceSaveMgr.GetScheduler().ScheduleReset(on, GetInstanceSave()->GetResetTime(), InstanceResetEvent(RESET_EVENT_DENGEON, GetId(), Difficulty(GetSpawnMode()), GetInstanceId()));
+        sInstanceSaveMgr.GetScheduler().ScheduleReset(on, GetInstanceSave()->GetResetTime(), InstanceResetEvent(RESET_EVENT_DUNGEON, GetId(), Difficulty(GetSpawnMode()), GetInstanceId()));
 }
 
 /* ******* Battleground Instance Maps ******* */
