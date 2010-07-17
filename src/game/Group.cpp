@@ -452,7 +452,6 @@ void Group::Disband(bool hideDestroy)
 void Group::SendLootStartRoll(uint32 CountDown, uint32 mapid, const Roll &r)
 {
     ItemPrototype const* pProto = ObjectMgr::GetItemPrototype(r.itemid);
-    uint8 voteMask = pProto->Flags2 & ITEM_FLAGS2_NEED_ROLL_DISABLED ? ROLL_VOTE_MASK_NO_NEED : ROLL_VOTE_MASK_ALL;
 
     WorldPacket data(SMSG_LOOT_START_ROLL, (8+4+4+4+4+4+4+1));
     data << r.lootedTargetGUID;                             // creature guid what we're looting
@@ -463,7 +462,9 @@ void Group::SendLootStartRoll(uint32 CountDown, uint32 mapid, const Roll &r)
     data << uint32(r.itemRandomPropId);                     // item random property ID
     data << uint32(r.itemCount);                            // items in stack
     data << uint32(CountDown);                              // the countdown time to choose "need" or "greed"
-    data << uint8(voteMask);                                // roll type mask, allowed choices
+
+    size_t voteMaskPos = data.wpos();
+    data << uint8(0);                                       // roll type mask, allowed choices (placeholder)
 
     for (Roll::PlayerVote::const_iterator itr = r.playerVote.begin(); itr != r.playerVote.end(); ++itr)
     {
@@ -471,8 +472,14 @@ void Group::SendLootStartRoll(uint32 CountDown, uint32 mapid, const Roll &r)
         if(!p || !p->GetSession())
             continue;
 
-        if(itr->second != ROLL_NOT_VALID)
-            p->GetSession()->SendPacket( &data );
+        if(itr->second == ROLL_NOT_VALID)
+            continue;
+
+        // dependent from player
+        RollVoteMask voteMask = GetVoteMaskFor(pProto, p);
+        data.put<uint8>(voteMaskPos,uint8(voteMask));
+
+        p->GetSession()->SendPacket( &data );
     }
 }
 
@@ -622,7 +629,20 @@ void Group::MasterLoot(Creature *creature, Loot* loot)
     }
 }
 
-bool Group::CountRollVote(ObjectGuid const& playerGUID, ObjectGuid const& lootedTarget, uint32 itemSlot, RollVote vote)
+RollVoteMask Group::GetVoteMaskFor( ItemPrototype const* itemProto, Player* player )
+{
+    RollVoteMask mask = ROLL_VOTE_MASK_ALL;
+
+    if (itemProto->Flags2 & ITEM_FLAGS2_NEED_ROLL_DISABLED)
+        mask = RollVoteMask(mask & ~ROLL_VOTE_MASK_NEED);
+
+    if (!itemProto->DisenchantID || uint32(itemProto->RequiredDisenchantSkill) > player->GetSkillValue(SKILL_ENCHANTING))
+        mask = RollVoteMask(mask & ~ROLL_VOTE_MASK_DISENCHANT);
+
+    return mask;
+}
+
+bool Group::CountRollVote(Player* player, ObjectGuid const& lootedTarget, uint32 itemSlot, RollVote vote)
 {
     Rolls::iterator rollI = RollId.begin();
     for (; rollI != RollId.end(); ++rollI)
@@ -634,10 +654,11 @@ bool Group::CountRollVote(ObjectGuid const& playerGUID, ObjectGuid const& looted
 
     // possible cheating
     ItemPrototype const* pProto = ObjectMgr::GetItemPrototype((*rollI)->itemid);
-    if ((pProto->Flags2 & ITEM_FLAGS2_NEED_ROLL_DISABLED) && vote == ROLL_NEED)
+    RollVoteMask voteMask = GetVoteMaskFor(pProto, player);
+    if ((voteMask & (1 << vote)) == 0)
         return false;
 
-    CountRollVote(playerGUID, rollI, vote);                 // result not related this function result meaning, ignore
+    CountRollVote(player->GetObjectGuid(), rollI, vote);    // result not related this function result meaning, ignore
     return true;
 }
 

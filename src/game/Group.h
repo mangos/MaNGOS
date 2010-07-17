@@ -28,6 +28,10 @@
 #include <map>
 #include <vector>
 
+struct ItemPrototype;
+class BattleGround;
+class InstanceSave;
+
 #define MAX_GROUP_SIZE 5
 #define MAX_RAID_SIZE 40
 #define MAX_RAID_SUBGROUPS (MAX_RAID_SIZE / MAX_GROUP_SIZE)
@@ -65,8 +69,6 @@ enum RollVoteMask
     ROLL_VOTE_MASK_DISENCHANT = 0x08,
 
     ROLL_VOTE_MASK_ALL        = 0x0F,
-
-    ROLL_VOTE_MASK_NO_NEED    = ROLL_VOTE_MASK_ALL & ~ROLL_VOTE_MASK_NEED,
 };
 
 
@@ -101,8 +103,6 @@ enum GroupFlagMask
     GROUP_MAIN_TANK      = 0x04,
 };
 
-class BattleGround;
-
 enum GroupUpdateFlags
 {
     GROUP_UPDATE_FLAG_NONE              = 0x00000000,       // nothing
@@ -133,8 +133,6 @@ enum GroupUpdateFlags
 #define GROUP_UPDATE_FLAGS_COUNT          20
                                                                 // 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,11,12,13,14,15,16,17,18,19
 static const uint8 GroupUpdateLength[GROUP_UPDATE_FLAGS_COUNT] = { 0, 2, 2, 2, 1, 2, 2, 2, 2, 4, 8, 8, 1, 2, 2, 2, 1, 2, 2, 8};
-
-class InstanceSave;
 
 class Roll : public LootValidatorRef
 {
@@ -357,7 +355,7 @@ class MANGOS_DLL_SPEC Group
         void GroupLoot(Creature *creature, Loot *loot);
         void NeedBeforeGreed(Creature *creature, Loot *loot);
         void MasterLoot(Creature *creature, Loot *loot);
-        bool CountRollVote(ObjectGuid const& playerGUID, ObjectGuid const& lootedTarget, uint32 itemSlot, RollVote vote);
+        bool CountRollVote(Player* player, ObjectGuid const& lootedTarget, uint32 itemSlot, RollVote vote);
         void StartLootRool(Creature* lootTarget, Loot* loot, uint8 itemSlot, bool skipIfCanNotUse);
         void EndRoll();
 
@@ -431,6 +429,7 @@ class MANGOS_DLL_SPEC Group
 
         void CountTheRoll(Rolls::iterator& roll);           // iterator update to next, in CountRollVote if true
         bool CountRollVote(ObjectGuid const& playerGUID, Rolls::iterator& roll, RollVote vote);
+        static RollVoteMask GetVoteMaskFor(ItemPrototype const* itemProto, Player* player);
 
         GroupFlagMask GetFlags(MemberSlot const& slot) const
         {
