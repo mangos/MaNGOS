@@ -18539,7 +18539,7 @@ bool Player::BuyItemFromVendorSlot(uint64 vendorguid, uint32 vendorslot, uint32 
         return false;
     }
 
-    if (uint32 extendedCostId = crItem->GetExtendedCostId())
+    if (uint32 extendedCostId = crItem->ExtendedCost)
     {
         ItemExtendedCostEntry const* iece = sItemExtendedCostStore.LookupEntry(extendedCostId);
         if (!iece)
@@ -18581,7 +18581,7 @@ bool Player::BuyItemFromVendorSlot(uint64 vendorguid, uint32 vendorslot, uint32 
         }
     }
 
-    uint32 price  = crItem->IsExcludeMoneyPrice() ? 0 : pProto->BuyPrice * count;
+    uint32 price  = (crItem->ExtendedCost == 0 || pProto->Flags2 & ITEM_FLAGS2_EXT_COST_REQUIRES_GOLD) ? pProto->BuyPrice * count : 0;
 
     // reputation discount
     if (price)
@@ -18604,7 +18604,7 @@ bool Player::BuyItemFromVendorSlot(uint64 vendorguid, uint32 vendorslot, uint32 
         }
 
         ModifyMoney( -(int32)price );
-        if (uint32 extendedCostId = crItem->GetExtendedCostId())
+        if (uint32 extendedCostId = crItem->ExtendedCost)
         {
             ItemExtendedCostEntry const* iece = sItemExtendedCostStore.LookupEntry(extendedCostId);
             if (iece->reqhonorpoints)
@@ -18649,7 +18649,7 @@ bool Player::BuyItemFromVendorSlot(uint64 vendorguid, uint32 vendorslot, uint32 
         }
 
         ModifyMoney( -(int32)price );
-        if (uint32 extendedCostId = crItem->GetExtendedCostId())
+        if (uint32 extendedCostId = crItem->ExtendedCost)
         {
             ItemExtendedCostEntry const* iece = sItemExtendedCostStore.LookupEntry(extendedCostId);
             if (iece->reqhonorpoints)

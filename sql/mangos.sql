@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_10205_01_mangos_spell_area` bit(1) default NULL
+  `required_10207_01_mangos_npc_vendor` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -3921,7 +3921,7 @@ CREATE TABLE `npc_vendor` (
   `item` mediumint(8) unsigned NOT NULL default '0',
   `maxcount` tinyint(3) unsigned NOT NULL default '0',
   `incrtime` int(10) unsigned NOT NULL default '0',
-  `ExtendedCost` mediumint(8) NOT NULL default '0' COMMENT 'negative if cost must exclude normal money cost',
+  `ExtendedCost` mediumint(8) unsigned NOT NULL default '0',
   PRIMARY KEY  (`entry`,`item`,`ExtendedCost`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Npc System';
 

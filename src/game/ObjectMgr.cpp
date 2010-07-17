@@ -8178,7 +8178,7 @@ void ObjectMgr::LoadVendors()
         uint32 item_id      = fields[1].GetUInt32();
         uint32 maxcount     = fields[2].GetUInt32();
         uint32 incrtime     = fields[3].GetUInt32();
-        int32  ExtendedCost = fields[4].GetInt32();
+        uint32 ExtendedCost = fields[4].GetUInt32();
 
         if(!IsVendorItemValid(entry,item_id,maxcount,incrtime,ExtendedCost,NULL,&skip_vendors))
             continue;
@@ -8456,12 +8456,12 @@ void ObjectMgr::LoadGossipMenuItems()
     sLog.outString(">> Loaded %u gossip_menu_option entries", count);
 }
 
-void ObjectMgr::AddVendorItem( uint32 entry,uint32 item, uint32 maxcount, uint32 incrtime, int32 extendedcost )
+void ObjectMgr::AddVendorItem( uint32 entry,uint32 item, uint32 maxcount, uint32 incrtime, uint32 extendedcost )
 {
     VendorItemData& vList = m_mCacheVendorItemMap[entry];
     vList.AddItem(item,maxcount,incrtime,extendedcost);
 
-    WorldDatabase.PExecuteLog("INSERT INTO npc_vendor (entry,item,maxcount,incrtime,extendedcost) VALUES('%u','%u','%u','%u','%i')",entry, item, maxcount,incrtime,extendedcost);
+    WorldDatabase.PExecuteLog("INSERT INTO npc_vendor (entry,item,maxcount,incrtime,extendedcost) VALUES('%u','%u','%u','%u','%u')",entry, item, maxcount,incrtime,extendedcost);
 }
 
 bool ObjectMgr::RemoveVendorItem( uint32 entry,uint32 item )
@@ -8477,7 +8477,7 @@ bool ObjectMgr::RemoveVendorItem( uint32 entry,uint32 item )
     return true;
 }
 
-bool ObjectMgr::IsVendorItemValid( uint32 vendor_entry, uint32 item_id, uint32 maxcount, uint32 incrtime, int32 ExtendedCost, Player* pl, std::set<uint32>* skip_vendors ) const
+bool ObjectMgr::IsVendorItemValid( uint32 vendor_entry, uint32 item_id, uint32 maxcount, uint32 incrtime, uint32 ExtendedCost, Player* pl, std::set<uint32>* skip_vendors ) const
 {
     CreatureInfo const* cInfo = GetCreatureTemplate(vendor_entry);
     if(!cInfo)
@@ -8509,18 +8509,18 @@ bool ObjectMgr::IsVendorItemValid( uint32 vendor_entry, uint32 item_id, uint32 m
         if(pl)
             ChatHandler(pl).PSendSysMessage(LANG_ITEM_NOT_FOUND, item_id);
         else
-            sLog.outErrorDb("Table `npc_vendor` for vendor (Entry: %u) contain nonexistent item (%u), ignoring",vendor_entry,item_id);
+            sLog.outErrorDb("Table `npc_vendor` for vendor (Entry: %u) contain nonexistent item (%u), ignoring",
+                vendor_entry, item_id);
         return false;
     }
 
-    uint32 extCostId = std::abs(ExtendedCost);              // negative exclude for vendor price money part
-
-    if(extCostId && !sItemExtendedCostStore.LookupEntry(extCostId))
+    if(ExtendedCost && !sItemExtendedCostStore.LookupEntry(ExtendedCost))
     {
         if(pl)
-            ChatHandler(pl).PSendSysMessage(LANG_EXTENDED_COST_NOT_EXIST,extCostId);
+            ChatHandler(pl).PSendSysMessage(LANG_EXTENDED_COST_NOT_EXIST,ExtendedCost);
         else
-            sLog.outErrorDb("Table `npc_vendor` contain item (Entry: %u) with wrong ExtendedCost (%u) for vendor (%u), ignoring",item_id,extCostId,vendor_entry);
+            sLog.outErrorDb("Table `npc_vendor` contain item (Entry: %u) with wrong ExtendedCost (%u) for vendor (%u), ignoring",
+                item_id, ExtendedCost, vendor_entry);
         return false;
     }
 
@@ -8529,7 +8529,8 @@ bool ObjectMgr::IsVendorItemValid( uint32 vendor_entry, uint32 item_id, uint32 m
         if(pl)
             ChatHandler(pl).PSendSysMessage("MaxCount!=0 (%u) but IncrTime==0", maxcount);
         else
-            sLog.outErrorDb( "Table `npc_vendor` has `maxcount` (%u) for item %u of vendor (Entry: %u) but `incrtime`=0, ignoring", maxcount, item_id, vendor_entry);
+            sLog.outErrorDb( "Table `npc_vendor` has `maxcount` (%u) for item %u of vendor (Entry: %u) but `incrtime`=0, ignoring",
+                maxcount, item_id, vendor_entry);
         return false;
     }
     else if(maxcount==0 && incrtime > 0)
@@ -8537,7 +8538,8 @@ bool ObjectMgr::IsVendorItemValid( uint32 vendor_entry, uint32 item_id, uint32 m
         if(pl)
             ChatHandler(pl).PSendSysMessage("MaxCount==0 but IncrTime<>=0");
         else
-            sLog.outErrorDb( "Table `npc_vendor` has `maxcount`=0 for item %u of vendor (Entry: %u) but `incrtime`<>0, ignoring", item_id, vendor_entry);
+            sLog.outErrorDb( "Table `npc_vendor` has `maxcount`=0 for item %u of vendor (Entry: %u) but `incrtime`<>0, ignoring",
+                item_id, vendor_entry);
         return false;
     }
 
