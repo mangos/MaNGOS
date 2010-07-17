@@ -36,6 +36,44 @@
 
 #define LOOT_ROLL_TIMEOUT  (1*MINUTE*IN_MILLISECONDS)
 
+//===================================================
+//============== Roll ===============================
+//===================================================
+
+void Roll::targetObjectBuildLink()
+{
+    // called from link()
+    getTarget()->addLootValidatorRef(this);
+}
+
+void Roll::CalculateCommonVoteMask(uint32 max_enchanting_skill)
+{
+    m_commonVoteMask = ROLL_VOTE_MASK_ALL;
+
+    ItemPrototype const* itemProto = ObjectMgr::GetItemPrototype(itemid);
+
+    if (itemProto->Flags2 & ITEM_FLAGS2_NEED_ROLL_DISABLED)
+        m_commonVoteMask = RollVoteMask(m_commonVoteMask & ~ROLL_VOTE_MASK_NEED);
+
+    if (!itemProto->DisenchantID || uint32(itemProto->RequiredDisenchantSkill) > max_enchanting_skill)
+        m_commonVoteMask = RollVoteMask(m_commonVoteMask & ~ROLL_VOTE_MASK_DISENCHANT);
+}
+
+RollVoteMask Roll::GetVoteMaskFor(Player* player) const
+{
+    ItemPrototype const* itemProto = ObjectMgr::GetItemPrototype(itemid);
+
+    // In NEED_BEFORE_GREED need disabled for non-usable item for player
+    if (m_method != NEED_BEFORE_GREED || player->CanUseItem(itemProto) == EQUIP_ERR_OK)
+        return m_commonVoteMask;
+    else
+        return RollVoteMask(m_commonVoteMask & ~ROLL_VOTE_MASK_NEED);
+}
+
+//===================================================
+//============== Group ==============================
+//===================================================
+
 Group::Group() : m_Id(0), m_leaderGuid(0), m_mainTank(0), m_mainAssistant(0),  m_groupType(GROUPTYPE_NORMAL),
     m_dungeonDifficulty(REGULAR_DIFFICULTY), m_raidDifficulty(REGULAR_DIFFICULTY),
     m_bgGroup(NULL), m_lootMethod(FREE_FOR_ALL), m_looterGuid(0), m_lootThreshold(ITEM_QUALITY_UNCOMMON),
@@ -451,8 +489,6 @@ void Group::Disband(bool hideDestroy)
 
 void Group::SendLootStartRoll(uint32 CountDown, uint32 mapid, const Roll &r)
 {
-    ItemPrototype const* pProto = ObjectMgr::GetItemPrototype(r.itemid);
-
     WorldPacket data(SMSG_LOOT_START_ROLL, (8+4+4+4+4+4+4+1));
     data << r.lootedTargetGUID;                             // creature guid what we're looting
     data << uint32(mapid);                                  // 3.3.3 mapid
@@ -476,8 +512,8 @@ void Group::SendLootStartRoll(uint32 CountDown, uint32 mapid, const Roll &r)
             continue;
 
         // dependent from player
-        RollVoteMask voteMask = GetVoteMaskFor(pProto, p);
-        data.put<uint8>(voteMaskPos,uint8(voteMask));
+        RollVoteMask mask = r.GetVoteMaskFor(p);
+        data.put<uint8>(voteMaskPos,uint8(mask));
 
         p->GetSession()->SendPacket( &data );
     }
@@ -552,6 +588,8 @@ void Group::SendLootAllPassed(Roll const& r)
 
 void Group::GroupLoot(Creature *creature, Loot *loot)
 {
+    uint32 maxEnchantingSkill = GetMaxSkillValueForGroup(SKILL_ENCHANTING);
+
     for(uint8 itemSlot = 0; itemSlot < loot->items.size(); ++itemSlot)
     {
         LootItem& lootItem = loot->items[itemSlot];
@@ -564,7 +602,7 @@ void Group::GroupLoot(Creature *creature, Loot *loot)
 
         //roll for over-threshold item if it's one-player loot
         if (itemProto->Quality >= uint32(m_lootThreshold) && !lootItem.freeforall)
-            StartLootRool(creature,loot,itemSlot,false);
+            StartLootRool(creature, GROUP_LOOT, loot, itemSlot, maxEnchantingSkill);
         else
             lootItem.is_underthreshold = 1;
     }
@@ -572,6 +610,8 @@ void Group::GroupLoot(Creature *creature, Loot *loot)
 
 void Group::NeedBeforeGreed(Creature *creature, Loot *loot)
 {
+    uint32 maxEnchantingSkill = GetMaxSkillValueForGroup(SKILL_ENCHANTING);
+
     for(uint8 itemSlot = 0; itemSlot < loot->items.size(); ++itemSlot)
     {
         LootItem& lootItem = loot->items[itemSlot];
@@ -584,7 +624,7 @@ void Group::NeedBeforeGreed(Creature *creature, Loot *loot)
 
         //only roll for one-player items, not for ones everyone can get
         if (itemProto->Quality >= uint32(m_lootThreshold) && !lootItem.freeforall)
-            StartLootRool(creature, loot, itemSlot, true);
+            StartLootRool(creature, NEED_BEFORE_GREED, loot, itemSlot, maxEnchantingSkill);
         else
             lootItem.is_underthreshold = 1;
     }
@@ -629,19 +669,6 @@ void Group::MasterLoot(Creature *creature, Loot* loot)
     }
 }
 
-RollVoteMask Group::GetVoteMaskFor( ItemPrototype const* itemProto, Player* player )
-{
-    RollVoteMask mask = ROLL_VOTE_MASK_ALL;
-
-    if (itemProto->Flags2 & ITEM_FLAGS2_NEED_ROLL_DISABLED)
-        mask = RollVoteMask(mask & ~ROLL_VOTE_MASK_NEED);
-
-    if (!itemProto->DisenchantID || uint32(itemProto->RequiredDisenchantSkill) > player->GetSkillValue(SKILL_ENCHANTING))
-        mask = RollVoteMask(mask & ~ROLL_VOTE_MASK_DISENCHANT);
-
-    return mask;
-}
-
 bool Group::CountRollVote(Player* player, ObjectGuid const& lootedTarget, uint32 itemSlot, RollVote vote)
 {
     Rolls::iterator rollI = RollId.begin();
@@ -653,8 +680,7 @@ bool Group::CountRollVote(Player* player, ObjectGuid const& lootedTarget, uint32
         return false;
 
     // possible cheating
-    ItemPrototype const* pProto = ObjectMgr::GetItemPrototype((*rollI)->itemid);
-    RollVoteMask voteMask = GetVoteMaskFor(pProto, player);
+    RollVoteMask voteMask = (*rollI)->GetVoteMaskFor(player);
     if ((voteMask & (1 << vote)) == 0)
         return false;
 
@@ -718,7 +744,7 @@ bool Group::CountRollVote(ObjectGuid const& playerGUID, Rolls::iterator& rollI, 
     return false;
 }
 
-void Group::StartLootRool(Creature* lootTarget, Loot* loot, uint8 itemSlot, bool skipIfCanNotUse)
+void Group::StartLootRool(Creature* lootTarget, LootMethod method, Loot* loot, uint8 itemSlot, uint32 maxEnchantingSkill)
 {
     if (itemSlot >= loot->items.size())
         return;
@@ -727,7 +753,7 @@ void Group::StartLootRool(Creature* lootTarget, Loot* loot, uint8 itemSlot, bool
 
     ItemPrototype const* item = ObjectMgr::GetItemPrototype(lootItem.itemid);
 
-    Roll* r = new Roll(lootTarget->GetGUID(), lootItem);
+    Roll* r = new Roll(lootTarget->GetGUID(), method, lootItem);
 
     //a vector is filled with only near party members
     for(GroupReference *itr = GetFirstMember(); itr != NULL; itr = itr->next())
@@ -736,7 +762,7 @@ void Group::StartLootRool(Creature* lootTarget, Loot* loot, uint8 itemSlot, bool
         if(!playerToRoll || !playerToRoll->GetSession())
             continue;
 
-        if ((!skipIfCanNotUse || playerToRoll->CanUseItem(item)==EQUIP_ERR_OK) && lootItem.AllowedForPlayer(playerToRoll) )
+        if (lootItem.AllowedForPlayer(playerToRoll))
         {
             if (playerToRoll->IsWithinDist(lootTarget, sWorld.getConfig(CONFIG_FLOAT_GROUP_XP_DISTANCE), false))
             {
@@ -746,15 +772,17 @@ void Group::StartLootRool(Creature* lootTarget, Loot* loot, uint8 itemSlot, bool
         }
     }
 
-    if (r->totalPlayersRolling > 0)                 // has looters
+    if (r->totalPlayersRolling > 0)                         // has looters
     {
         r->setLoot(loot);
         r->itemSlot = itemSlot;
 
-        if (r->totalPlayersRolling == 1)            // single looter
+        if (r->totalPlayersRolling == 1)                    // single looter
             r->playerVote.begin()->second = ROLL_NEED;
         else
         {
+            r->CalculateCommonVoteMask(maxEnchantingSkill); // dependent from item and possible skill
+
             SendLootStartRoll(LOOT_ROLL_TIMEOUT, lootTarget->GetMapId(), *r);
             loot->items[itemSlot].is_blocked = true;
             lootTarget->StartGroupLoot(this,LOOT_ROLL_TIMEOUT);
@@ -1433,6 +1461,24 @@ void Group::ChangeMembersGroup(Player *player, uint8 group)
     }
 }
 
+uint32 Group::GetMaxSkillValueForGroup( SkillType skill )
+{
+    uint32 maxvalue = 0;
+
+    for(GroupReference *itr = GetFirstMember(); itr != NULL; itr = itr->next())
+    {
+        Player *member = itr->getSource();
+        if (!member)
+            continue;
+
+        uint32 value = member->GetSkillValue(skill);
+        if (maxvalue < value)
+            maxvalue = value;
+    }
+
+    return maxvalue;
+}
+
 void Group::UpdateLooterGuid( Creature* creature, bool ifneed )
 {
     switch (GetLootMethod())
@@ -1563,16 +1609,6 @@ GroupJoinBattlegroundResult Group::CanJoinBattleGroundQueue(BattleGround const* 
             return ERR_BATTLEGROUND_TOO_MANY_QUEUES;        // not blizz-like
     }
     return GroupJoinBattlegroundResult(bgOrTemplate->GetTypeID());
-}
-
-//===================================================
-//============== Roll ===============================
-//===================================================
-
-void Roll::targetObjectBuildLink()
-{
-    // called from link()
-    getTarget()->addLootValidatorRef(this);
 }
 
 void Group::SetDungeonDifficulty(Difficulty difficulty)

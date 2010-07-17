@@ -137,13 +137,17 @@ static const uint8 GroupUpdateLength[GROUP_UPDATE_FLAGS_COUNT] = { 0, 2, 2, 2, 1
 class Roll : public LootValidatorRef
 {
     public:
-        Roll(ObjectGuid _lootedTragetGuid, LootItem const& li)
+        Roll(ObjectGuid _lootedTragetGuid, LootMethod method, LootItem const& li)
             : lootedTargetGUID(_lootedTragetGuid), itemid(li.itemid), itemRandomPropId(li.randomPropertyId), itemRandomSuffix(li.randomSuffix),
-            itemCount(li.count), totalPlayersRolling(0), totalNeed(0), totalGreed(0), totalPass(0), itemSlot(0) {}
+            itemCount(li.count), totalPlayersRolling(0), totalNeed(0), totalGreed(0), totalPass(0), itemSlot(0),
+            m_method(method), m_commonVoteMask(ROLL_VOTE_MASK_ALL) {}
         ~Roll() { }
         void setLoot(Loot *pLoot) { link(pLoot, this); }
         Loot *getLoot() { return getTarget(); }
         void targetObjectBuildLink();
+
+        void CalculateCommonVoteMask(uint32 max_enchanting_skill);
+        RollVoteMask GetVoteMaskFor(Player* player) const;
 
         ObjectGuid lootedTargetGUID;
         uint32 itemid;
@@ -157,6 +161,10 @@ class Roll : public LootValidatorRef
         uint8 totalGreed;
         uint8 totalPass;
         uint8 itemSlot;
+
+    private:
+        LootMethod m_method;
+        RollVoteMask m_commonVoteMask;
 };
 
 struct InstanceGroupBind
@@ -356,7 +364,7 @@ class MANGOS_DLL_SPEC Group
         void NeedBeforeGreed(Creature *creature, Loot *loot);
         void MasterLoot(Creature *creature, Loot *loot);
         bool CountRollVote(Player* player, ObjectGuid const& lootedTarget, uint32 itemSlot, RollVote vote);
-        void StartLootRool(Creature* lootTarget, Loot* loot, uint8 itemSlot, bool skipIfCanNotUse);
+        void StartLootRool(Creature* lootTarget, LootMethod method, Loot* loot, uint8 itemSlot, uint32 maxEnchantingSkill);
         void EndRoll();
 
         void LinkMember(GroupReference *pRef) { m_memberMgr.insertFirst(pRef); }
@@ -427,9 +435,10 @@ class MANGOS_DLL_SPEC Group
                 --m_subGroupsCounts[subgroup];
         }
 
+        uint32 GetMaxSkillValueForGroup(SkillType skill);
+
         void CountTheRoll(Rolls::iterator& roll);           // iterator update to next, in CountRollVote if true
         bool CountRollVote(ObjectGuid const& playerGUID, Rolls::iterator& roll, RollVote vote);
-        static RollVoteMask GetVoteMaskFor(ItemPrototype const* itemProto, Player* player);
 
         GroupFlagMask GetFlags(MemberSlot const& slot) const
         {
