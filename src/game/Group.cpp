@@ -451,6 +451,9 @@ void Group::Disband(bool hideDestroy)
 
 void Group::SendLootStartRoll(uint32 CountDown, uint32 mapid, const Roll &r)
 {
+    ItemPrototype const* pProto = ObjectMgr::GetItemPrototype(r.itemid);
+    uint8 voteMask = pProto->Flags2 & ITEM_FLAGS2_NEED_ROLL_DISABLED ? ROLL_VOTE_MASK_NO_NEED : ROLL_VOTE_MASK_ALL;
+
     WorldPacket data(SMSG_LOOT_START_ROLL, (8+4+4+4+4+4+4+1));
     data << r.lootedTargetGUID;                             // creature guid what we're looting
     data << uint32(mapid);                                  // 3.3.3 mapid
@@ -460,7 +463,7 @@ void Group::SendLootStartRoll(uint32 CountDown, uint32 mapid, const Roll &r)
     data << uint32(r.itemRandomPropId);                     // item random property ID
     data << uint32(r.itemCount);                            // items in stack
     data << uint32(CountDown);                              // the countdown time to choose "need" or "greed"
-    data << uint8(ALL_ROLL_VOTE_MASK);                      // roll type mask, allowed choises
+    data << uint8(voteMask);                                // roll type mask, allowed choices
 
     for (Roll::PlayerVote::const_iterator itr = r.playerVote.begin(); itr != r.playerVote.end(); ++itr)
     {
@@ -619,7 +622,7 @@ void Group::MasterLoot(Creature *creature, Loot* loot)
     }
 }
 
-void Group::CountRollVote(ObjectGuid const& playerGUID, ObjectGuid const& lootedTarget, uint32 itemSlot, RollVote choise)
+bool Group::CountRollVote(ObjectGuid const& playerGUID, ObjectGuid const& lootedTarget, uint32 itemSlot, RollVote vote)
 {
     Rolls::iterator rollI = RollId.begin();
     for (; rollI != RollId.end(); ++rollI)
@@ -627,12 +630,18 @@ void Group::CountRollVote(ObjectGuid const& playerGUID, ObjectGuid const& looted
             break;
 
     if (rollI == RollId.end())
-        return;
+        return false;
 
-    CountRollVote(playerGUID, rollI, choise);
+    // possible cheating
+    ItemPrototype const* pProto = ObjectMgr::GetItemPrototype((*rollI)->itemid);
+    if ((pProto->Flags2 & ITEM_FLAGS2_NEED_ROLL_DISABLED) && vote == ROLL_NEED)
+        return false;
+
+    CountRollVote(playerGUID, rollI, vote);                 // result not related this function result meaning, ignore
+    return true;
 }
 
-bool Group::CountRollVote(ObjectGuid const& playerGUID, Rolls::iterator& rollI, RollVote choise)
+bool Group::CountRollVote(ObjectGuid const& playerGUID, Rolls::iterator& rollI, RollVote vote)
 {
     Roll* roll = *rollI;
 
@@ -645,7 +654,7 @@ bool Group::CountRollVote(ObjectGuid const& playerGUID, Rolls::iterator& rollI, 
         if (roll->getLoot()->items.empty())
             return false;
 
-    switch (choise)
+    switch (vote)
     {
         case ROLL_PASS:                                     // Player choose pass
         {
