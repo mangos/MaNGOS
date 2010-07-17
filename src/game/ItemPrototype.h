@@ -137,6 +137,7 @@ enum ItemFlags2
     ITEM_FLAGS2_HORDE_ONLY                    = 0x00000001, // drop in loot, sell by vendor and equipping only for horde
     ITEM_FLAGS2_ALLIANCE_ONLY                 = 0x00000002, // drop in loot, sell by vendor and equipping only for alliance
     ITEM_FLAGS2_EXT_COST_REQUIRES_GOLD        = 0x00000004, // item cost include gold part in case extended cost use also
+    ITEM_FLAGS2_NEED_ROLL_DISABLED            = 0x00000100, // need roll during looting is not allowed for this item
 };
 
 enum BAG_FAMILY_MASK
