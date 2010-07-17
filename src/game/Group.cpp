@@ -706,7 +706,7 @@ void Group::StartLootRool(Creature* lootTarget, Loot* loot, uint8 itemSlot, bool
         if(!playerToRoll || !playerToRoll->GetSession())
             continue;
 
-        if ((!skipIfCanNotUse || playerToRoll->CanUseItem(item)) && lootItem.AllowedForPlayer(playerToRoll) )
+        if ((!skipIfCanNotUse || playerToRoll->CanUseItem(item)==EQUIP_ERR_OK) && lootItem.AllowedForPlayer(playerToRoll) )
         {
             if (playerToRoll->IsWithinDist(lootTarget, sWorld.getConfig(CONFIG_FLOAT_GROUP_XP_DISTANCE), false))
             {
