@@ -110,6 +110,7 @@ pkgdata_DATA = \
 	10203_01_mangos_item_template.sql \
 	10205_01_mangos_spell_area.sql \
 	10207_01_mangos_npc_vendor.sql \
+	10208_01_mangos_playercreateinfo.sql \
 	README
 
 ## Additional files to include when running 'make dist'
@@ -200,4 +201,5 @@ EXTRA_DIST = \
 	10203_01_mangos_item_template.sql \
 	10205_01_mangos_spell_area.sql \
 	10207_01_mangos_npc_vendor.sql \
+	10208_01_mangos_playercreateinfo.sql \
 	README
