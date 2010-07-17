@@ -2548,7 +2548,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
             if (dummySpell->SpellIconID == 3041 || dummySpell->SpellIconID == 22)
             {
                 if(GetTypeId()!=TYPEID_PLAYER)
-                    return false;
+                    return SPELL_AURA_PROC_FAILED;
 
                 Player *player = (Player*)this;
                 for (uint32 i = 0; i < MAX_RUNES; ++i)
@@ -2566,22 +2566,22 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                                 {
                                     player->ConvertRune(iter, RUNE_DEATH, dummySpell->Id);
                                     triggeredByAura->SetAuraPeriodicTimer(0);
-                                    return true;
+                                    return SPELL_AURA_PROC_OK;
                                 }
                             }
                             player->SetNeedConvertRune(i, true, dummySpell->Id);
                         }
                         triggeredByAura->SetAuraPeriodicTimer(0);
-                        return true;
+                        return SPELL_AURA_PROC_OK;
                     }
                 }
-                return false;
+                return SPELL_AURA_PROC_FAILED;
             }
             // Death Rune Mastery
             if (dummySpell->SpellIconID == 2622)
             {
                 if(GetTypeId()!=TYPEID_PLAYER)
-                    return false;
+                    return SPELL_AURA_PROC_FAILED;
 
                 Player *player = (Player*)this;
                 for (uint32 i = 0; i < MAX_RUNES; ++i)
@@ -2598,7 +2598,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                     }
                 }
                 triggeredByAura->SetAuraPeriodicTimer(0);
-                return true;
+                return SPELL_AURA_PROC_OK;
             }
             // Blood-Caked Blade
             if (dummySpell->SpellIconID == 138)
