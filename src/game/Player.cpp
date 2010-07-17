@@ -17941,7 +17941,8 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
 
     pet->CombatStop();
 
-    pet->SavePetToDB(mode);
+    if (pet->GetNeedSave())
+        pet->SavePetToDB(mode);
 
     pet->AddObjectToRemoveList();
     pet->m_removed = true;

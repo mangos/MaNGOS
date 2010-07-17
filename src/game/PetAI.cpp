@@ -121,7 +121,7 @@ void PetAI::_stopAttack()
 
     if(owner && m_creature->GetCharmInfo() && m_creature->GetCharmInfo()->HasCommandState(COMMAND_FOLLOW))
     {
-        m_creature->GetMotionMaster()->MoveFollow(owner,PET_FOLLOW_DIST,PET_FOLLOW_ANGLE);
+        m_creature->GetMotionMaster()->MoveFollow(owner,PET_FOLLOW_DIST, m_creature->isPet() ? ((Pet*)m_creature)->GetPetFollowAngle() : PET_DEFAULT_FOLLOW_ANGLE);
     }
     else
     {
@@ -137,6 +137,11 @@ void PetAI::UpdateAI(const uint32 diff)
         return;
 
     Unit* owner = m_creature->GetCharmerOrOwner();
+
+    // chained, use original owner instead
+    if (owner && owner->GetTypeId() == TYPEID_UNIT && ((Creature*)owner)->GetEntry() == m_creature->GetEntry())
+        if (Unit *creator = m_creature->GetCreator())
+            owner = creator;
 
     if(m_updateAlliesTimer <= diff)
         // UpdateAllies self set update timer
@@ -194,7 +199,7 @@ void PetAI::UpdateAI(const uint32 diff)
         {
             if (!m_creature->hasUnitState(UNIT_STAT_FOLLOW) )
             {
-                m_creature->GetMotionMaster()->MoveFollow(owner,PET_FOLLOW_DIST,PET_FOLLOW_ANGLE);
+                m_creature->GetMotionMaster()->MoveFollow(owner,PET_FOLLOW_DIST, m_creature->isPet() ? ((Pet*)m_creature)->GetPetFollowAngle() : PET_DEFAULT_FOLLOW_ANGLE);
             }
         }
     }

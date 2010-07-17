@@ -248,7 +248,7 @@ MotionMaster::MoveTargetedHome()
         if (Unit *target = ((Creature*)i_owner)->GetCharmerOrOwner())
         {
             DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "%s follow to %s", i_owner->GetObjectGuid().GetString().c_str(), target->GetObjectGuid().GetString().c_str());
-            Mutate(new FollowMovementGenerator<Creature>(*target,PET_FOLLOW_DIST,PET_FOLLOW_ANGLE));
+            Mutate(new FollowMovementGenerator<Creature>(*target,PET_FOLLOW_DIST,((Creature*)i_owner)->isPet() ? ((Pet*)i_owner)->GetPetFollowAngle() : PET_DEFAULT_FOLLOW_ANGLE));
         }
         else
         {

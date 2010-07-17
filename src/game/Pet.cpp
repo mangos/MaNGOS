@@ -40,7 +40,7 @@ char const* petTypeSuffix[MAX_PET_TYPE] =
 Pet::Pet(PetType type) :
 Creature(CREATURE_SUBTYPE_PET), m_removed(false), m_petType(type), m_happinessTimer(7500), m_duration(0), m_resetTalentsCost(0),
 m_bonusdamage(0), m_resetTalentsTime(0), m_usedTalentCount(0), m_auraUpdateMask(0), m_loading(false),
-m_declinedname(NULL), m_petModeFlags(PET_MODE_DEFAULT)
+m_declinedname(NULL), m_petModeFlags(PET_MODE_DEFAULT),m_petFollowAngle(PET_DEFAULT_FOLLOW_ANGLE), m_needSave(true)
 {
     m_name = "Pet";
     m_regenTimer = 4000;
@@ -163,7 +163,7 @@ bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool 
     }
 
     float px, py, pz;
-    owner->GetClosePoint(px, py, pz, GetObjectBoundingRadius(), PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
+    owner->GetClosePoint(px, py, pz, GetObjectBoundingRadius(), PET_FOLLOW_DIST, PET_DEFAULT_FOLLOW_ANGLE);
 
     Relocate(px, py, pz, owner->GetOrientation());
 
@@ -524,7 +524,7 @@ void Pet::Update(uint32 diff)
 
             if(isControlled())
             {
-                if( owner->GetPetGUID() != GetGUID() )
+                if( owner->GetPetGUID() != GetGUID())
                 {
                     Remove(getPetType()==HUNTER_PET?PET_SAVE_AS_DELETED:PET_SAVE_NOT_IN_SLOT);
                     return;
@@ -684,6 +684,22 @@ void Pet::Remove(PetSaveMode mode, bool returnreagent)
         if(owner->GetTypeId()==TYPEID_PLAYER)
         {
             ((Player*)owner)->RemovePet(this,mode,returnreagent);
+
+            // replace pet by next in chain only in case of death
+            if (Pet *pet = GetPet())
+            {
+                // can't use isAlive because of dismiss and maybe other cases
+                // pet needs to be replaced with chained only if original was killed through DealDamage
+                if (pet->GetEntry() == GetEntry() && mode != PET_SAVE_AS_DELETED)
+                {
+                    pet->SetOwnerGUID(owner->GetGUID());
+                    owner->SetPet(pet);
+                    if (owner->GetTypeId()==TYPEID_PLAYER)
+                        ((Player*)owner)->PetSpellInitialize();
+
+                    SetPet(0);
+                }
+            }
             return;
         }
 
@@ -905,7 +921,20 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
             //SetModifierValue(UNIT_MOD_ATTACK_POWER, BASE_VALUE, float(cinfo->attackpower));
 
             PetLevelInfo const* pInfo = sObjectMgr.GetPetLevelInfo(creature_ID, petlevel);
-            if(pInfo)                                       // exist in DB
+            if(cinfo->Entry == 29264) // Feral Spirit
+                {
+                    SetCreateHealth(30*petlevel);
+                    float dmg_multiplier = 0.3f;
+                    if (owner->HasAura(63271)) // Glyph of Feral Spirit
+                        dmg_multiplier = 0.6f;
+                    SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE,float((petlevel * 4 - petlevel) + (owner->GetTotalAttackPowerValue(BASE_ATTACK) * dmg_multiplier)));
+                    SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE,float((petlevel * 4 + petlevel) + (owner->GetTotalAttackPowerValue(BASE_ATTACK) * dmg_multiplier)));
+
+                    SetModifierValue(UNIT_MOD_ARMOR, BASE_VALUE, float(owner->GetArmor()) * 0.35f);  //  Bonus Armor (35% of player armor)
+                    SetModifierValue(UNIT_MOD_STAT_STAMINA, BASE_VALUE,float(owner->GetStat(STAT_STAMINA)) * 0.3f);  //  Bonus Stamina (30% of player stamina)
+
+                }
+            else if(pInfo)                                       // exist in DB
             {
                 SetCreateHealth(pInfo->health);
                 SetCreateMana(pInfo->mana);
@@ -1801,6 +1830,11 @@ void Pet::ToggleAutocast(uint32 spellid, bool apply)
     if(IsPassiveSpell(spellid))
         return;
 
+    // chained pets
+    if (Pet *chainedPet = GetPet())
+        if (GetEntry() == chainedPet->GetEntry())
+            chainedPet->ToggleAutocast(spellid, apply);
+
     PetSpellMap::iterator itr = m_spells.find(spellid);
 
     uint32 i;
@@ -1911,6 +1945,12 @@ void Pet::LearnPetPassives()
 void Pet::CastPetAuras(bool current)
 {
     Unit* owner = GetOwner();
+
+    // chained, use original owner instead
+    if (owner && owner->GetTypeId() == TYPEID_UNIT && ((Creature*)owner)->GetEntry() == GetEntry())
+        if (Unit *creator = GetCreator())
+            owner = creator;
+
     if(!owner || owner->GetTypeId()!=TYPEID_PLAYER)
         return;
 
