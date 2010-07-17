@@ -92,7 +92,7 @@ void AggressorAI::EnterEvadeMode()
     {
         DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "Creature stopped attacking, victim is in stealth [guid=%u]", m_creature->GetGUIDLow());
     }
-    else if (victim->isInFlight())
+    else if (victim->IsTaxiFlying())
     {
         DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "Creature stopped attacking, victim is in flight [guid=%u]", m_creature->GetGUIDLow());
     }
