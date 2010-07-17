@@ -2169,10 +2169,17 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
             }
             case 58600:                                     // Restricted Flight Area
             {
-                // Remove Flight Auras
-                target->CastSpell(target, 58601, true);
-                // Parachute
-                target->CastSpell(target, 45472, true);
+                AreaTableEntry const* area = GetAreaEntryByAreaID(target->GetAreaId());
+
+                // Dalaran restricted flight zone (recheck before apply unmount)
+                if (area && target->GetTargetGUID() == TYPEID_PLAYER && (area->flags & AREA_FLAG_CANNOT_FLY) &&
+                    ((Player*)target)->IsFreeFlying() && !((Player*)target)->isGameMaster())
+                {
+                    // Remove Flight Auras
+                    target->CastSpell(target, 58601, true);
+                    // Parachute
+                    target->CastSpell(target, 45472, true);
+                }
                 return;
             }
         }
