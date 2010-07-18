@@ -38,6 +38,7 @@
 #include "Creature.h"
 #include "Formulas.h"
 #include "BattleGround.h"
+#include "OutdoorPvPMgr.h"
 #include "CreatureAI.h"
 #include "ScriptCalls.h"
 #include "Util.h"
@@ -4404,6 +4405,8 @@ void Aura::HandleAuraModEffectImmunity(bool apply, bool /*Real*/)
     {
         if( BattleGround *bg = ((Player*)target)->GetBattleGround() )
             bg->EventPlayerDroppedFlag(((Player*)target));
+        else
+            sOutdoorPvPMgr.HandleDropFlag((Player*)target,GetSpellProto()->Id);
     }
 
     target->ApplySpellImmune(GetId(), IMMUNITY_EFFECT, m_modifier.m_miscvalue, apply);
