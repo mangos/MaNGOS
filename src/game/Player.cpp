@@ -19752,59 +19752,59 @@ void Player::learnSkillRewardedSpells(uint32 skill_id, uint32 skill_value )
 
 void Player::SendAurasForTarget(Unit *target)
 {
-    if(target->GetVisibleAuras()->empty())                  // speedup things
-        return;
-
     WorldPacket data(SMSG_AURA_UPDATE_ALL);
     data << target->GetPackGUID();
 
-    Unit::VisibleAuraMap const *visibleAuras = target->GetVisibleAuras();
-    for(Unit::VisibleAuraMap::const_iterator itr = visibleAuras->begin(); itr != visibleAuras->end(); ++itr)
+    if(!target->GetVisibleAuras()->empty())                  // speedup things
     {
-        SpellAuraHolderBounds bounds = target->GetSpellAuraHolderBounds(itr->second);
-        for (SpellAuraHolderMap::const_iterator iter = bounds.first; iter != bounds.second; ++iter)
+        Unit::VisibleAuraMap const *visibleAuras = target->GetVisibleAuras();
+        for(Unit::VisibleAuraMap::const_iterator itr = visibleAuras->begin(); itr != visibleAuras->end(); ++itr)
         {
-            SpellAuraHolder *holder = iter->second;
-            data << uint8(holder->GetAuraSlot());
-            data << uint32(holder->GetId());
-
-            if(holder->GetId())
+            SpellAuraHolderBounds bounds = target->GetSpellAuraHolderBounds(itr->second);
+            for (SpellAuraHolderMap::const_iterator iter = bounds.first; iter != bounds.second; ++iter)
             {
-                uint8 auraFlags = holder->GetAuraFlags();
-                // flags
-                data << uint8(auraFlags);
-                // level
-                data << uint8(holder->GetAuraLevel());
-                // charges
-                if (holder->GetAuraCharges())
-                    data << uint8(holder->GetAuraCharges() * holder->GetStackAmount());
-                else
-                    data << uint8(holder->GetStackAmount());
+                SpellAuraHolder *holder = iter->second;
+                data << uint8(holder->GetAuraSlot());
+                data << uint32(holder->GetId());
 
-                if(!(auraFlags & AFLAG_NOT_CASTER))     // packed GUID of caster
+                if(holder->GetId())
                 {
-                    data.appendPackGUID(holder->GetCasterGUID());
-                }
+                    uint8 auraFlags = holder->GetAuraFlags();
+                    // flags
+                    data << uint8(auraFlags);
+                    // level
+                    data << uint8(holder->GetAuraLevel());
+                    // charges
+                    if (holder->GetAuraCharges())
+                        data << uint8(holder->GetAuraCharges() * holder->GetStackAmount());
+                    else
+                        data << uint8(holder->GetStackAmount());
 
-                if(auraFlags & AFLAG_DURATION)          // include aura duration
-                {
-                    // take highest - to display icon even if stun fades
-                    uint32 max_duration = 0;
-                    uint32 duration = 0;
-                    for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
+                    if(!(auraFlags & AFLAG_NOT_CASTER))     // packed GUID of caster
                     {
-                        if (Aura *aura = holder->GetAuraByEffectIndex(SpellEffectIndex(i)))
-                        {
-                            if (uint32(aura->GetAuraMaxDuration()) > max_duration)
-                            {
-                                max_duration = aura->GetAuraMaxDuration();
-                                duration = aura->GetAuraDuration();
-                            }
-                        }
+                        data.appendPackGUID(holder->GetCasterGUID());
                     }
 
-                    data << uint32(max_duration);
-                    data << uint32(duration);
+                    if(auraFlags & AFLAG_DURATION)          // include aura duration
+                    {
+                        // take highest - to display icon even if stun fades
+                        uint32 max_duration = 0;
+                        uint32 duration = 0;
+                        for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
+                        {
+                            if (Aura *aura = holder->GetAuraByEffectIndex(SpellEffectIndex(i)))
+                            {
+                                if (uint32(aura->GetAuraMaxDuration()) > max_duration)
+                                {
+                                    max_duration = aura->GetAuraMaxDuration();
+                                    duration = aura->GetAuraDuration();
+                                }
+                            }
+                        }
+
+                        data << uint32(max_duration);
+                        data << uint32(duration);
+                    }
                 }
             }
         }
