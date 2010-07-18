@@ -517,6 +517,13 @@ enum Language
 
 #define LANGUAGES_COUNT   19
 
+enum TeamId
+{
+    TEAM_ALLIANCE = 0,
+    TEAM_HORDE,
+    TEAM_NEUTRAL,
+};
+
 enum Team
 {
     HORDE               = 67,
@@ -526,8 +533,9 @@ enum Team
     //TEAM_HORDE_FORCES        = 892,
     //TEAM_SANCTUARY           = 936,
     //TEAM_OUTLAND             = 980,
-    //TEAM_OTHER               = 0,                         // if ReputationListId > 0 && Flags != FACTION_FLAG_TEAM_HEADER
+    TEAM_OTHER               = 0,                         // if ReputationListId > 0 && Flags != FACTION_FLAG_TEAM_HEADER
 };
+const Team TeamId2Team[3] = {ALLIANCE, HORDE, TEAM_OTHER};
 
 enum SpellEffects
 {
