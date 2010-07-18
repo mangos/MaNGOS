@@ -41,7 +41,6 @@
 #include "Util.h"
 #include "Totem.h"
 #include "BattleGround.h"
-#include "OutdoorPvP.h"
 #include "InstanceSaveMgr.h"
 #include "GridNotifiersImpl.h"
 #include "CellImpl.h"
@@ -855,10 +854,6 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
 
             he->DuelComplete(DUEL_INTERUPTED);
         }
-
-        if (player_tap && this != pVictim)
-            if (OutdoorPvP * pvp = player_tap->GetOutdoorPvP())
-                pvp->HandleKill(player_tap, pVictim);
 
         // battleground things (do this at the end, so the death state flag will be properly set to handle in the bg->handlekill)
         if(pVictim->GetTypeId() == TYPEID_PLAYER && ((Player*)pVictim)->InBattleGround())
