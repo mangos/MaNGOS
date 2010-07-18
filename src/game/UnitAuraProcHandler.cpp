@@ -3651,5 +3651,10 @@ SpellAuraProcResult Unit::HandleModDamagePercentDoneAuraProc(Unit* /*pVictim*/, 
 
         CastCustomSpell(this, 34075, &bp, NULL, NULL, true, castItem, triggeredByAura);
     }
+    // Arcane Blast
+    else if (spellInfo->Id == 36032 && procSpell->SpellFamilyName == SPELLFAMILY_MAGE && procSpell->SpellIconID == 2294)
+        // prevent proc from self(spell that triggered this aura)
+        return SPELL_AURA_PROC_FAILED;
+
     return SPELL_AURA_PROC_OK;
 }

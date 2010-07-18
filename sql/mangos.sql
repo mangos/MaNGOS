@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_10217_05_mangos_spell_proc_event` bit(1) default NULL
+  `required_10219_01_mangos_spell_proc_event` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -2200,7 +2200,7 @@ CREATE TABLE `item_template` (
   `displayid` mediumint(8) unsigned NOT NULL default '0',
   `Quality` tinyint(3) unsigned NOT NULL default '0',
   `Flags` int(10) unsigned NOT NULL default '0',
-  `Faction` int(11) UNSIGNED NOT NULL default '0',
+  `Flags2` int(11) unsigned NOT NULL default '0',
   `BuyCount` tinyint(3) unsigned NOT NULL default '1',
   `BuyPrice` int(10) unsigned NOT NULL default '0',
   `SellPrice` int(10) unsigned NOT NULL default '0',
@@ -10333,7 +10333,7 @@ INSERT INTO `playercreateinfo_action` VALUES
 (1,4,3,2764,0),
 (1,4,10,59752,0),
 (1,5,0,585,0),
-(1,5,1,2050,,0),
+(1,5,1,2050,0),
 (1,5,9,59752,0),
 (1,6,0,6603,0),
 (1,6,1,49576,0),
@@ -10413,7 +10413,7 @@ INSERT INTO `playercreateinfo_action` VALUES
 (3,5,0,585,0),
 (3,5,1,2050,0),
 (3,5,2,20594,0),
-(3,5,3,2481,0);
+(3,5,3,2481,0),
 (3,6,0,6603,0),
 (3,6,1,49576,0),
 (3,6,2,45477,0),
@@ -10802,7 +10802,7 @@ INSERT INTO `playercreateinfo_spell` VALUES
 (1,2,58985,'Perception'),
 (1,2,59752,'Every Man for Himself'),
 (1,2,61437,'Opening'),
-(1 2,68398, 'Opening'),
+(1,2,68398,'Opening'),
 (1,4,81,'Dodge'),
 (1,4,203,'Unarmed'),
 (1,4,204,'Defense'),
@@ -17964,6 +17964,7 @@ INSERT INTO `spell_proc_event` VALUES
 (35086, 0x7F,  0, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0.000000, 0.000000, 60),
 (35100, 0x00,  9, 0x00001000, 0x00001000, 0x00001000, 0x00000000, 0x00000000, 0x00000000, 0x00000001, 0x00000001, 0x00000001, 0x00000100, 0x00000000, 0.000000, 0.000000,  0),
 (35121, 0x7F,  0, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000002, 0.000000, 0.000000,  0),
+(36032, 0x40,  0, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0.000000, 0.000000,  0),
 (36096, 0x7F,  0, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000800, 0.000000, 0.000000,  0),
 (36541, 0x04,  0, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0.000000, 0.000000,  0),
 (37165, 0x00,  8, 0x00200400, 0x00200400, 0x00200400, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0.000000, 0.000000,  0),
