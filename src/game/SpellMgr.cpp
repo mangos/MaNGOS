@@ -1664,6 +1664,9 @@ bool SpellMgr::canStackSpellRanks(SpellEntry const *spellInfo)
                 // Paladin aura Spell
                 if (spellInfo->Effect[i]==SPELL_EFFECT_APPLY_AREA_AURA_RAID)
                     return false;
+                // Seal of Righteousness, 2 version of same rank
+                if ((spellInfo->SpellFamilyFlags & UI64LIT(0x0000000008000000)) && spellInfo->SpellIconID == 25)
+                    return false;
                 break;
             case SPELLFAMILY_DRUID:
                 // Druid form Spell
