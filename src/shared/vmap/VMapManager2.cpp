@@ -120,9 +120,9 @@ namespace VMAP
 
     //=========================================================
 
-    int VMapManager2::loadMap(const char* pBasePath, unsigned int pMapId, int x, int y)
+    VMAPLoadResult VMapManager2::loadMap(const char* pBasePath, unsigned int pMapId, int x, int y)
     {
-        int result = VMAP_LOAD_RESULT_IGNORED;
+        VMAPLoadResult result = VMAP_LOAD_RESULT_IGNORED;
         if (isMapLoadingEnabled() && !iIgnoreMapIds.count(pMapId))
         {
             if (_loadMap(pMapId, pBasePath, x, y))
