@@ -740,7 +740,10 @@ void WorldSession::SendListInventory(uint64 vendorguid)
 
     if (!vItems)
     {
-        _player->SendSellError(SELL_ERR_CANT_FIND_VENDOR, NULL, 0, 0);
+        WorldPacket data( SMSG_LIST_INVENTORY, (8+1+1) );
+        data << uint64(vendorguid);
+        data << uint8(0);                                   // count==0, next will be error code
+        data << uint8(0);                                   // "Vendor has no inventory"
         return;
     }
 
@@ -795,11 +798,15 @@ void WorldSession::SendListInventory(uint64 vendorguid)
         }
     }
 
-    if ( count == 0 || data.size() != 8 + 1 + size_t(count) * 8 * 4 )
+    if (count == 0)
+    {
+        data << uint8(0);                                   // "Vendor has no inventory"
+        SendPacket(&data);
         return;
+    }
 
     data.put<uint8>(count_pos, count);
-    SendPacket( &data );
+    SendPacket(&data);
 }
 
 void WorldSession::HandleAutoStoreBagItemOpcode( WorldPacket & recv_data )
