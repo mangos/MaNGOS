@@ -19469,7 +19469,7 @@ void Player::SendInitialPacketsBeforeAddToMap()
     // SMSG_POWER_UPDATE
 
     // set fly flag if in fly form or taxi flight to prevent visually drop at ground in showup moment
-    if(HasAuraType(SPELL_AURA_MOD_FLIGHT_SPEED_MOUNTED) || HasAuraType(SPELL_AURA_FLY) || IsTaxiFlying())
+    if (IsFreeFlying() || IsTaxiFlying())
         m_movementInfo.AddMovementFlag(MOVEFLAG_FLYING);
 
     SetMover(this);
