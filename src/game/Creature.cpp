@@ -111,8 +111,7 @@ bool ForcedDespawnDelayEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
 
 Creature::Creature(CreatureSubtype subtype) :
 Unit(), i_AI(NULL),
-lootForPickPocketed(false), lootForBody(false), lootForSkin(false), m_groupLootTimer(0), m_groupLootId(0),
-m_lootMoney(0), m_lootGroupRecipientId(0),
+lootForPickPocketed(false), lootForBody(false), lootForSkin(false),m_lootMoney(0),
 m_deathTimer(0), m_respawnTime(0), m_respawnDelay(25), m_corpseDelay(60), m_respawnradius(5.0f),
 m_subtype(subtype), m_defaultMovementType(IDLE_MOTION_TYPE), m_DBTableGuid(0), m_equipmentId(0),
 m_AlreadyCallAssistance(false), m_AlreadySearchedAssistance(false),
@@ -514,25 +513,6 @@ void Creature::Update(uint32 diff)
     }
 }
 
-
-void Creature::StartGroupLoot( Group* group, uint32 timer )
-{
-    m_groupLootId = group->GetId();
-    m_groupLootTimer = timer;
-}
-
-void Creature::StopGroupLoot()
-{
-    if (!m_groupLootId)
-        return;
-
-    if (Group* group = sObjectMgr.GetGroupById(m_groupLootId))
-        group->EndRoll();
-
-    m_groupLootTimer = 0;
-    m_groupLootId = 0;
-}
-
 void Creature::RegenerateMana()
 {
     uint32 curValue = GetPower(POWER_MANA);
@@ -829,57 +809,6 @@ void Creature::PrepareBodyLootState()
 
     RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
     RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
-}
-
-
-/**
- * Return original player who tap creature, it can be different from player/group allowed to loot so not use it for loot code
- */
-Player* Creature::GetOriginalLootRecipient() const
-{
-    return !m_lootRecipientGuid.IsEmpty() ? ObjectAccessor::FindPlayer(m_lootRecipientGuid) : NULL;
-}
-
-/**
- * Return group if player tap creature as group member, independent is player after leave group or stil be group member
- */
-Group* Creature::GetGroupLootRecipient() const
-{
-    // original recipient group if set and not disbanded
-    return m_lootGroupRecipientId ? sObjectMgr.GetGroupById(m_lootGroupRecipientId) : NULL;
-}
-
-/**
- * Return player who can loot tapped creature (member of group or single player)
- *
- * In case when original player tap creature as group member then group tap prefered.
- * This is for example important if player after tap leave group.
- * If group not exist or disbanded or player tap creature not as group member return player
- */
-Player* Creature::GetLootRecipient() const
-{
-    // original recipient group if set and not disbanded
-    Group* group = GetGroupLootRecipient();
-
-    // original recipient player if online
-    Player* player = GetOriginalLootRecipient();
-
-    // if group not set or disbanded return original recipient player if any
-    if (!group)
-        return player;
-
-    // group case
-
-    // return player if it still be in original recipient group
-    if (player && player->GetGroup() == group)
-        return player;
-
-    // find any in group
-    for(GroupReference *itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
-        if (Player *p = itr->getSource())
-            return p;
-
-    return NULL;
 }
 
 /**

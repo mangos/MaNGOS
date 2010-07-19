@@ -8011,10 +8011,62 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
                     loot->generateMoneyLoot(go->GetGOInfo()->MinMoneyLoot, go->GetGOInfo()->MaxMoneyLoot);
                 }
 
+                if (Group* group = this->GetGroup())
+                {
+                    if (go->GetGoType() == GAMEOBJECT_TYPE_CHEST)
+                    {
+                        if (go->GetGOInfo()->chest.groupLootRules == 1)
+                        {
+                            group->UpdateLooterGuid(go,true);
+                            switch (group->GetLootMethod())
+                            {
+                                case GROUP_LOOT:
+                                // GroupLoot delete items over threshold (threshold even not implemented), and roll them. Items with quality<threshold, round robin
+                                     group->GroupLoot(go, loot);
+                                     permission = GROUP_PERMISSION;
+                                     break;
+                                case NEED_BEFORE_GREED:
+                                     group->NeedBeforeGreed(go, loot);
+                                     permission = GROUP_PERMISSION;
+                                     break;
+                                case MASTER_LOOT:
+                                     group->MasterLoot(go, loot);
+                                     permission = MASTER_PERMISSION;
+                                     break;
+                                default:
+                                     break;
+                             }
+                         }
+                     }
+                 }
+
                 if (loot_type == LOOT_FISHING)
                     go->getFishLoot(loot,this);
 
                 go->SetLootState(GO_ACTIVATED);
+            }
+
+            if ((go->getLootState() == GO_ACTIVATED) && (go->GetGoType() == GAMEOBJECT_TYPE_CHEST))
+            {
+//                if (go->GetGOInfo()->chest.groupLootRules == 1)
+//                {
+                    if(Group* group = GetGroup())
+                    {
+                        if (group->GetLootMethod() == FREE_FOR_ALL)
+                            permission = ALL_PERMISSION;
+                        else if (group->GetLooterGuid() == GetGUID())
+                        {
+                            if (group->GetLootMethod() == MASTER_LOOT)
+                                permission = MASTER_PERMISSION;
+                            else
+                                permission = ALL_PERMISSION;
+                        }
+                        else
+                            permission = GROUP_PERMISSION;
+                    }
+                    else
+                        permission = NONE_PERMISSION;
+//                }
             }
             break;
         }
