@@ -261,9 +261,9 @@ void GameObject::Update(uint32 /*p_time*/)
             {
                 // traps can have time and can not have
                 GameObjectInfo const* goInfo = GetGOInfo();
-                if(goInfo->type == GAMEOBJECT_TYPE_TRAP)
+                if (goInfo->type == GAMEOBJECT_TYPE_TRAP)
                 {
-                    if(m_cooldownTime >= time(NULL))
+                    if (m_cooldownTime >= time(NULL))
                         return;
 
                     // traps
@@ -274,13 +274,13 @@ void GameObject::Update(uint32 /*p_time*/)
                     //FIXME: this is activation radius (in different casting radius that must be selected from spell data)
                     //TODO: move activated state code (cast itself) to GO_ACTIVATED, in this place only check activating and set state
                     float radius = float(goInfo->trap.radius);
-                    if(!radius)
+                    if (!radius)
                     {
-                        if(goInfo->trap.cooldown != 3)      // cast in other case (at some triggering/linked go/etc explicit call)
+                        if (goInfo->trap.cooldown != 3)     // cast in other case (at some triggering/linked go/etc explicit call)
                             return;
                         else
                         {
-                            if(m_respawnTime > 0)
+                            if (m_respawnTime > 0)
                                 break;
 
                             // battlegrounds gameobjects has data2 == 0 && data5 == 3
@@ -291,7 +291,7 @@ void GameObject::Update(uint32 /*p_time*/)
 
                     // Note: this hack with search required until GO casting not implemented
                     // search unfriendly creature
-                    if(owner && goInfo->trap.charges > 0)       // hunter trap
+                    if (owner && goInfo->trap.charges > 0)  // hunter trap
                     {
                         MaNGOS::AnyUnfriendlyUnitInObjectRangeCheck u_check(this, owner, radius);
                         MaNGOS::UnitSearcher<MaNGOS::AnyUnfriendlyUnitInObjectRangeCheck> checker(this,ok, u_check);
@@ -299,7 +299,7 @@ void GameObject::Update(uint32 /*p_time*/)
                         if(!ok)
                             Cell::VisitWorldObjects(this,checker, radius);
                     }
-                    else                                        // environmental trap
+                    else                                    // environmental trap
                     {
                         // environmental damage spells already have around enemies targeting but this not help in case not existed GO casting support
 
@@ -320,29 +320,28 @@ void GameObject::Update(uint32 /*p_time*/)
                         m_cooldownTime = time(NULL) + (goInfo->trap.cooldown ? goInfo->trap.cooldown : uint32(4));
 
                         // count charges
-                        if(goInfo->trap.charges > 0)
+                        if (goInfo->trap.charges > 0)
                             AddUse();
 
-                        if(IsBattleGroundTrap && ok->GetTypeId() == TYPEID_PLAYER)
+                        if (IsBattleGroundTrap && ok->GetTypeId() == TYPEID_PLAYER)
                         {
                             //BattleGround gameobjects case
-                            if(((Player*)ok)->InBattleGround())
-                                if(BattleGround *bg = ((Player*)ok)->GetBattleGround())
+                            if (((Player*)ok)->InBattleGround())
+                                if (BattleGround *bg = ((Player*)ok)->GetBattleGround())
                                     bg->HandleTriggerBuff(GetGUID());
                         }
                     }
                 }
 
-                if(uint32 max_charges = goInfo->GetCharges())
+                if (uint32 max_charges = goInfo->GetCharges())
                 {
                     if (m_usetimes >= max_charges)
                     {
                         m_usetimes = 0;
-                        SetLootState(GO_JUST_DEACTIVATED);      // can be despawned or destroyed
+                        SetLootState(GO_JUST_DEACTIVATED);  // can be despawned or destroyed
                     }
                 }
             }
-
             break;
         }
         case GO_ACTIVATED:
