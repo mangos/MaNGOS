@@ -68,7 +68,6 @@ class WorldSession;
 class Creature;
 class GameObject;
 class Player;
-class Group;
 class Unit;
 class Map;
 class UpdateMask;
@@ -491,11 +490,6 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         void AddToClientUpdateList();
         void RemoveFromClientUpdateList();
         void BuildUpdateData(UpdateDataMapType &);
-
-        uint32 m_groupLootTimer;                            // (msecs)timer used for group loot
-        uint32 m_groupLootId;                               // used to find group which is looting corpse
-        void StopGroupLoot();
-        void StartGroupLoot(Group* group, uint32 timer);
 
         Creature* SummonCreature(uint32 id, float x, float y, float z, float ang,TempSummonType spwtype,uint32 despwtime);
         GameObject* SummonGameobject(uint32 id, float x, float y, float z, float angle, uint32 despwtime);
