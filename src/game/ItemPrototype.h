@@ -140,7 +140,7 @@ enum ItemFlags2
     ITEM_FLAGS2_NEED_ROLL_DISABLED            = 0x00000100, // need roll during looting is not allowed for this item
 };
 
-enum BAG_FAMILY_MASK
+enum BagFamilyMask
 {
     BAG_FAMILY_MASK_NONE                      = 0x00000000,
     BAG_FAMILY_MASK_ARROWS                    = 0x00000001,

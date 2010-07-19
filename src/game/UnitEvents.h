@@ -28,7 +28,7 @@ class HostileReference;
 //==============================================================
 //==============================================================
 
-enum UNIT_EVENT_TYPE
+enum UnitThreatEventType
 {
     // Player/Pet changed on/offline status
     UEV_THREAT_REF_ONLINE_STATUS        = 1<<0,
@@ -50,12 +50,6 @@ enum UNIT_EVENT_TYPE
 
     // A new victim (target) was set. Could be NULL
     UEV_THREAT_VICTIM_CHANGED           = 1<<6,
-
-    // Future use
-    //UEV_UNIT_KILLED                   = 1<<7,
-
-    //Future use
-    //UEV_UNIT_HEALTH_CHANGE            = 1<<8,
 };
 
 #define UEV_THREAT_REF_EVENT_MASK ( UEV_THREAT_REF_ONLINE_STATUS | UEV_THREAT_REF_THREAT_CHANGE | UEV_THREAT_REF_REMOVE_FROM_LIST | UEV_THREAT_REF_ASSECCIBLE_STATUS)
