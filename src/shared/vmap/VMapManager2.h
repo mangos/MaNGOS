@@ -82,7 +82,7 @@ namespace VMAP
             VMapManager2();
             ~VMapManager2(void);
 
-            int loadMap(const char* pBasePath, unsigned int pMapId, int x, int y);
+            VMAPLoadResult loadMap(const char* pBasePath, unsigned int pMapId, int x, int y);
 
             void unloadMap(unsigned int pMapId, int x, int y);
             void unloadMap(unsigned int pMapId);
