@@ -153,8 +153,8 @@ class MANGOS_DLL_SPEC SpellAuraHolder
             m_stackAmount = stackAmount;
         }
 
-        bool HasAuraAndMechanicEffect(uint32 mechanic) const;
-        bool HasAuraAndMechanicEffectMask(uint32 mechanicMask) const;
+        bool HasMechanic(uint32 mechanic) const;
+        bool HasMechanicMask(uint32 mechanicMask) const;
 
         ~SpellAuraHolder();
     private:

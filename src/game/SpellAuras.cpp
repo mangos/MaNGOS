@@ -8748,18 +8748,24 @@ void SpellAuraHolder::RefreshHolder()
     SendAuraUpdate(false);
 }
 
-bool SpellAuraHolder::HasAuraAndMechanicEffect(uint32 mechanic) const
+bool SpellAuraHolder::HasMechanic(uint32 mechanic) const
 {
+    if (mechanic == m_spellProto->Mechanic)
+        return true;
+
     for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
         if (m_auras[i] && m_spellProto->EffectMechanic[i] == mechanic)
             return true;
     return false;
 }
 
-bool SpellAuraHolder::HasAuraAndMechanicEffectMask(uint32 mechanicMask) const
+bool SpellAuraHolder::HasMechanicMask(uint32 mechanicMask) const
 {
+    if (mechanicMask & (1 << (m_spellProto->Mechanic - 1)))
+        return true;
+
     for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
-        if (m_auras[i] && m_spellProto->EffectMechanic[i] & mechanicMask)
+        if (m_auras[i] && m_spellProto->EffectMechanic[i] && ((1 << (m_spellProto->EffectMechanic[i] -1)) & mechanicMask))
             return true;
     return false;
 }

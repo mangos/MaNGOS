@@ -31,7 +31,7 @@ This is the minimum interface to the VMapMamager.
 namespace VMAP
 {
 
-    enum VMAP_LOAD_RESULT
+    enum VMAPLoadResult
     {
         VMAP_LOAD_RESULT_ERROR,
         VMAP_LOAD_RESULT_OK,
@@ -53,7 +53,7 @@ namespace VMAP
 
             virtual ~IVMapManager(void) {}
 
-            virtual int loadMap(const char* pBasePath, unsigned int pMapId, int x, int y) = 0;
+            virtual VMAPLoadResult loadMap(const char* pBasePath, unsigned int pMapId, int x, int y) = 0;
 
             virtual bool existsMap(const char* pBasePath, unsigned int pMapId, int x, int y) = 0;
 
