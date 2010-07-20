@@ -717,7 +717,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                         SpellEntry const *spell = iter->second->GetSpellProto();
 
                         if( spell->Mechanic == MECHANIC_STUN ||
-                            iter->second->HasAuraAndMechanicEffect(MECHANIC_STUN))
+                            iter->second->HasMechanic(MECHANIC_STUN))
                         {
                             pVictim->RemoveAurasDueToSpell(spell->Id);
                             iter = Auras.begin();
