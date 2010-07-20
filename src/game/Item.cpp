@@ -300,7 +300,21 @@ void Item::UpdateDuration(Player* owner, uint32 diff)
 
     if (GetUInt32Value(ITEM_FIELD_DURATION)<=diff)
     {
+        uint32 itemId = this->GetEntry();
+
         owner->DestroyItem(GetBagSlot(), GetSlot(), true);
+
+        if (itemId == 39878) //Mysterious Egg
+        {
+            if (Item* Item = owner->StoreNewItemInInventorySlot(39883, 1))
+                owner->SendNewItem(Item, 1, true, false);
+        }
+
+        if (itemId == 44717) //Disgusting Jar
+        {
+            if (Item* Item = owner->StoreNewItemInInventorySlot(44718, 1))
+                owner->SendNewItem(Item, 1, true, false);
+        }
         return;
     }
 
