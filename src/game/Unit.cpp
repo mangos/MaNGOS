@@ -7290,8 +7290,10 @@ uint32 Unit::MeleeDamageBonusTaken(Unit *pCaster, uint32 pdamage,WeaponAttackTyp
 
     // .. taken (dummy auras)
     AuraList const& mDummyAuras = GetAurasByType(SPELL_AURA_DUMMY);
+    if (!mDummyAuras.empty())
     for(AuraList::const_iterator i = mDummyAuras.begin(); i != mDummyAuras.end(); ++i)
     {
+      if ((*i)->GetId())
         switch((*i)->GetSpellProto()->SpellIconID)
         {
             //Cheat Death
