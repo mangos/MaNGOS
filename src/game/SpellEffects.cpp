@@ -4547,6 +4547,19 @@ void Spell::DoSummonGuardian(SpellEffectIndex eff_idx, uint32 forceFaction)
 
     int32 amount = damage > 0 ? damage : 1;
 
+    switch(m_spellInfo->EffectMiscValueB[eff_idx])
+    {
+        case 2081: // Engineering Dragonlings
+        case 2141: // Winterfin Horn of Distress
+        {
+            if (level > m_spellInfo->maxLevel)
+                level = m_spellInfo->maxLevel;
+
+            amount = 1;
+            break;
+        }
+    }
+
     for(int32 count = 0; count < amount; ++count)
     {
         Pet* spawnCreature = new Pet(GUARDIAN_PET);
