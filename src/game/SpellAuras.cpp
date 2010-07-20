@@ -4256,11 +4256,11 @@ void Aura::HandleAuraModIncreaseSpeed(bool apply, bool Real)
     // all applied/removed only at real aura add/remove
     if(!Real)
         return;
-		
-	Unit *target = GetTarget();
+        
+    Unit *target = GetTarget();
 
     GetTarget()->UpdateSpeed(MOVE_RUN, true);
-	
+    
     if (apply && GetSpellProto()->Id == 58875)
         target->CastSpell(target, 58876, true);
 }
@@ -4678,6 +4678,18 @@ void Aura::HandlePeriodicEnergize(bool apply, bool Real)
             case 57669:                                     // Replenishment (0.2% from max)
             case 61782:                                     // Infinite Replenishment
                 m_modifier.m_amount = target->GetMaxPower(POWER_MANA) * 2 / 1000;
+                break;
+            default:
+                break;
+        }
+    }
+    if (!apply && !loading)
+    {
+        switch (GetId())
+        {
+            case 5229:                                      // Druid Bear Enrage
+                if (target->HasAura(51185))               // King of the Jungle self Enrage bonus with infinity duration
+                    target->RemoveAurasDueToSpell(51185);
                 break;
             default:
                 break;
