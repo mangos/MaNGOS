@@ -251,6 +251,7 @@ class AchievementMgr
         void UpdateAchievementCriteria(AchievementCriteriaTypes type, uint32 miscvalue1=0, uint32 miscvalue2=0, Unit *unit=NULL, uint32 time=0);
         void CheckAllAchievementCriteria();
         void SendAllAchievementData();
+        void CompletedAchievement(AchievementEntry const* entry);
         void SendRespondInspectAchievements(Player* player);
         Player* GetPlayer() { return m_player;}
 
@@ -260,7 +261,6 @@ class AchievementMgr
         void SendCriteriaUpdate(uint32 id, CriteriaProgress const* progress);
         void SetCriteriaProgress(AchievementCriteriaEntry const* entry, uint32 changeValue, ProgressType ptype = PROGRESS_SET);
         void CompletedCriteriaFor(AchievementEntry const* achievement);
-        void CompletedAchievement(AchievementEntry const* entry);
         bool IsCompletedCriteria(AchievementCriteriaEntry const* criteria, AchievementEntry const* achievement);
         bool IsCompletedAchievement(AchievementEntry const* entry);
         void CompleteAchievementsWithRefs(AchievementEntry const* entry);
