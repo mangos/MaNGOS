@@ -377,10 +377,52 @@ void Unit::SendMonsterMove(float NewPosX, float NewPosY, float NewPosZ, SplineTy
 
     data << uint32(flags);                                  // splineflags
     data << uint32(moveTime);                               // Time in between points
+
+    if(flags & SPLINEFLAG_TRAJECTORY)
+    {
+        data << float(0);
+        data << uint32(0);
+    }
+
     data << uint32(1);                                      // 1 single waypoint
     data << NewPosX << NewPosY << NewPosZ;                  // the single waypoint Point B
 
     va_end(vargs);
+
+    if(player)
+        player->GetSession()->SendPacket(&data);
+    else
+        SendMessageToSet( &data, true );
+}
+
+void Unit::SendMonsterMoveJump(float NewPosX, float NewPosY, float NewPosZ, float vert_speed, uint32 flags, uint32 Time, Player* player)
+{
+    float moveTime = Time;
+    flags |= SPLINEFLAG_TRAJECTORY;
+
+    WorldPacket data( SMSG_MONSTER_MOVE, (49 + GetPackGUID().size()) );
+    data << GetPackGUID();
+    data << uint8(0);                                       // new in 3.1
+    data << GetPositionX() << GetPositionY() << GetPositionZ();
+    data << uint32(getMSTime());
+
+    data << uint8(0);                                    // unknown
+
+    data << uint32(flags);
+
+    if(flags & SPLINEFLAG_WALKMODE)
+        moveTime *= 1.05f;
+
+    data << uint32(moveTime);                               // Time in between points
+
+    if(flags & SPLINEFLAG_TRAJECTORY)
+    {
+        data << float(vert_speed);
+        data << uint32(0);
+    }
+
+    data << uint32(1);                                      // 1 single waypoint
+    data << NewPosX << NewPosY << NewPosZ;                  // the single waypoint Point B
 
     if(player)
         player->GetSession()->SendPacket(&data);
@@ -10625,7 +10667,10 @@ void Unit::KnockBackFrom(Unit* target, float horizontalSpeed, float verticalSpee
     }
     else
     {
-        float dis = horizontalSpeed;
+        float dh = verticalSpeed*verticalSpeed / (2*19.23f); // maximum parabola height
+        float time = (verticalSpeed) ? sqrtf(dh/(0.124976 * verticalSpeed)) : 0.0f;  //full move time in seconds
+ 
+        float dis = time * horizontalSpeed;
 
         float ox, oy, oz;
         GetPosition(ox, oy, oz);
@@ -10644,9 +10689,8 @@ void Unit::KnockBackFrom(Unit* target, float horizontalSpeed, float verticalSpee
 
         UpdateGroundPositionZ(fx, fy, fz);
 
-        //FIXME: this mostly hack, must exist some packet for proper creature move at client side
-        //       with CreatureRelocation at server side
-        NearTeleportTo(fx, fy, fz, GetOrientation(), this == target);
+        GetMap()->CreatureRelocation((Creature*)this, fx, fy, fz, GetOrientation());//it's a hack, need motion master support
+        SendMonsterMoveJump(fx, fy, fz, verticalSpeed, SPLINEFLAG_WALKMODE, uint32(time * 1000.0f));
     }
 }
 
