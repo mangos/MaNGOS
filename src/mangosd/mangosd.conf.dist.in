@@ -698,6 +698,10 @@ LexicsCutterNoActionOnGM = 1
 #        Useful when you don't want old log events to be overwritten by new, but increasing can slow down performance
 #        Default: 25
 #
+#    Loot.IgnoreChestGroupRulesFromDB
+#        Ignore database setting for loot rules for chests
+#        Default: 0 (disable)
+#
 #    TimerBar.Fatigue.GMLevel
 #        Disable/enable fatigue for security level (0..4) or high
 #        Default: 4 (None)
@@ -826,6 +830,7 @@ Quests.Weekly.ResetHour = 6
 Quests.IgnoreRaid = 0
 Guild.EventLogRecordsCount = 100
 Guild.BankEventLogRecordsCount = 25
+Loot.IgnoreChestGroupRulesFromDB = 1
 TimerBar.Fatigue.GMLevel = 4
 TimerBar.Fatigue.Max = 60
 TimerBar.Breath.GMLevel = 4
