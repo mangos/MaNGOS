@@ -86,6 +86,29 @@ void BattleGroundWS::Update(uint32 diff)
                 RespawnFlagAfterDrop(HORDE);
             }
         }
+        if (m_FlagState[BG_TEAM_ALLIANCE] >= BG_WS_FLAG_STATE_ON_PLAYER && m_FlagState[BG_TEAM_HORDE] >= BG_WS_FLAG_STATE_ON_PLAYER)
+        {
+            if (m_FocusedAssault < BG_WS_FIVE_MINUTES)
+            {
+                for(uint8 i = 0; i < BG_TEAMS_COUNT; i++)
+                {
+                    Player* carrier = sObjectMgr.GetPlayer(m_FlagKeepers[i]);
+                    if(!carrier)
+                        continue;
+
+                    if((!carrier->HasAura(BG_WS_SPELL_FOCUSED_ASSAULT) && !carrier->HasAura(BG_WS_SPELL_BRUTAL_ASSAULT)) || 
+                        (m_FocusedAssaultExtra && m_FocusedAssault < diff))
+                        carrier->CastSpell(carrier, (m_FocusedAssault < diff) ? BG_WS_SPELL_BRUTAL_ASSAULT : BG_WS_SPELL_FOCUSED_ASSAULT, true);
+                }
+                if(m_FocusedAssault < BG_WS_FIVE_MINUTES && m_FocusedAssaultExtra)
+                    m_FocusedAssaultExtra = false;
+
+            }else m_FocusedAssault -= diff;
+        }else
+        {
+            m_FocusedAssault = BG_WS_CARRIER_DEBUFF;
+            m_FocusedAssaultExtra = true;
+        }
 
         if (m_EndTimer <= diff)
         {
@@ -552,6 +575,9 @@ void BattleGroundWS::Reset()
     m_ReputationCapture = (isBGWeekend) ? 45 : 35;
     m_HonorWinKills = (isBGWeekend) ? 3 : 1;
     m_HonorEndKills = (isBGWeekend) ? 4 : 2;
+
+    m_FocusedAssault = BG_WS_CARRIER_DEBUFF;
+    m_FocusedAssaultExtra = true;
 
     m_EndTimer = BG_WS_TIME_LIMIT;
     m_LastCapturedFlagTeam = 0;
