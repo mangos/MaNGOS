@@ -6447,6 +6447,28 @@ void Aura::HandleSchoolAbsorb(bool apply, bool Real)
                 }
             }
         }
+        //Glyph of Guardian Spirit
+        if (spellProto->Id == 47788)
+        {
+            if (!(m_removeMode == AURA_REMOVE_BY_EXPIRE))
+                return;
+            if (target->IsInWorld() && GetStackAmount()>0)
+            {
+                if (caster)
+                    if (caster->HasAura(63231))
+                    {
+                        ((Player*)caster)->RemoveSpellCooldown(47788,true); //server CD set
+                        ((Player*)caster)->AddSpellCooldown(47788,0,time(NULL)+60);
+                        WorldPacket data(SMSG_SPELL_COOLDOWN,8+1+4+4); //client CD set
+                        data << caster->GetGUID();
+                        data << uint8(0x0);
+                        data << spellProto->Id;
+                        data << uint32(60000);
+                        ((Player*)caster)->GetSession()->SendPacket(&data);
+                    }
+                        
+            }
+        }
     }
 }
 
