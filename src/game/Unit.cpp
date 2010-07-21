@@ -4575,7 +4575,7 @@ void Unit::RemoveSpellAuraHolder(SpellAuraHolder *holder, AuraRemoveMode mode)
     else
         delete holder;
 
-    if (IsChanneledSpell(AurSpellInfo) && caster && caster->GetGUID() != GetGUID())
+    if (mode != AURA_REMOVE_BY_EXPIRE && IsChanneledSpell(AurSpellInfo) && caster && caster->GetGUID() != GetGUID())
         caster->InterruptSpell(CURRENT_CHANNELED_SPELL);
 }
 
