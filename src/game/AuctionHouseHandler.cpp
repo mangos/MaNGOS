@@ -274,7 +274,6 @@ void WorldSession::HandleAuctionSellItem( WorldPacket & recv_data )
     DETAIL_LOG("selling item %u to auctioneer %u with initial bid %u with buyout %u and with time %u (in sec) in auctionhouse %u", GUID_LOPART(item), GUID_LOPART(auctioneer), bid, buyout, auction_time, AH->GetHouseId());
     auctionHouse->AddAuction(AH);
 
-    auctionHouse->AddAuction(AH);
     sAuctionMgr.AddAItem(it);
     pl->MoveItemFromInventory( it->GetBagSlot(), it->GetSlot(), true);
 
