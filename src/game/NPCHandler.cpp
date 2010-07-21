@@ -540,10 +540,34 @@ void WorldSession::SendStableResult(uint8 res)
     SendPacket(&data);
 }
 
+bool WorldSession::CheckStableMaster(ObjectGuid guid)
+{
+    // spell case or GM
+    if (guid == GetPlayer()->GetObjectGuid())
+    {
+        if (!GetPlayer()->isGameMaster() && !GetPlayer()->HasAuraType(SPELL_AURA_OPEN_STABLE))
+        {
+            DEBUG_LOG("%s attempt open stable in cheating way.", guid.GetString().c_str());
+            return false;
+        }
+    }
+    // stable master case
+    else
+    {
+        if (!GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_STABLEMASTER))
+        {
+            DEBUG_LOG("Stablemaster %s not found or you can't interact with him.", guid.GetString().c_str());
+            return false;
+        }
+    }
+
+    return true;
+}
+
 void WorldSession::HandleStablePet( WorldPacket & recv_data )
 {
     DEBUG_LOG("WORLD: Recv CMSG_STABLE_PET");
-    uint64 npcGUID;
+    ObjectGuid npcGUID;
 
     recv_data >> npcGUID;
 
@@ -553,10 +577,8 @@ void WorldSession::HandleStablePet( WorldPacket & recv_data )
         return;
     }
 
-    Creature *unit = GetPlayer()->GetNPCIfCanInteractWith(npcGUID, UNIT_NPC_FLAG_STABLEMASTER);
-    if (!unit)
+    if (!CheckStableMaster(npcGUID))
     {
-        DEBUG_LOG( "WORLD: HandleStablePet - Unit (GUID: %u) not found or you can't interact with him.", uint32(GUID_LOPART(npcGUID)) );
         SendStableResult(STABLE_ERR_STABLE);
         return;
     }
@@ -609,15 +631,13 @@ void WorldSession::HandleStablePet( WorldPacket & recv_data )
 void WorldSession::HandleUnstablePet( WorldPacket & recv_data )
 {
     DEBUG_LOG("WORLD: Recv CMSG_UNSTABLE_PET.");
-    uint64 npcGUID;
+    ObjectGuid npcGUID;
     uint32 petnumber;
 
     recv_data >> npcGUID >> petnumber;
 
-    Creature *unit = GetPlayer()->GetNPCIfCanInteractWith(npcGUID, UNIT_NPC_FLAG_STABLEMASTER);
-    if (!unit)
+    if (!CheckStableMaster(npcGUID))
     {
-        DEBUG_LOG( "WORLD: HandleUnstablePet - Unit (GUID: %u) not found or you can't interact with him.", uint32(GUID_LOPART(npcGUID)) );
         SendStableResult(STABLE_ERR_STABLE);
         return;
     }
@@ -682,14 +702,12 @@ void WorldSession::HandleUnstablePet( WorldPacket & recv_data )
 void WorldSession::HandleBuyStableSlot( WorldPacket & recv_data )
 {
     DEBUG_LOG("WORLD: Recv CMSG_BUY_STABLE_SLOT.");
-    uint64 npcGUID;
+    ObjectGuid npcGUID;
 
     recv_data >> npcGUID;
 
-    Creature *unit = GetPlayer()->GetNPCIfCanInteractWith(npcGUID, UNIT_NPC_FLAG_STABLEMASTER);
-    if (!unit)
+    if (!CheckStableMaster(npcGUID))
     {
-        DEBUG_LOG( "WORLD: HandleBuyStableSlot - Unit (GUID: %u) not found or you can't interact with him.", uint32(GUID_LOPART(npcGUID)) );
         SendStableResult(STABLE_ERR_STABLE);
         return;
     }
@@ -722,15 +740,13 @@ void WorldSession::HandleStableRevivePet( WorldPacket &/* recv_data */)
 void WorldSession::HandleStableSwapPet( WorldPacket & recv_data )
 {
     DEBUG_LOG("WORLD: Recv CMSG_STABLE_SWAP_PET.");
-    uint64 npcGUID;
+    ObjectGuid npcGUID;
     uint32 pet_number;
 
     recv_data >> npcGUID >> pet_number;
 
-    Creature *unit = GetPlayer()->GetNPCIfCanInteractWith(npcGUID, UNIT_NPC_FLAG_STABLEMASTER);
-    if (!unit)
+    if (!CheckStableMaster(npcGUID))
     {
-        DEBUG_LOG( "WORLD: HandleStableSwapPet - Unit (GUID: %u) not found or you can't interact with him.", uint32(GUID_LOPART(npcGUID)) );
         SendStableResult(STABLE_ERR_STABLE);
         return;
     }

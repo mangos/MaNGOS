@@ -234,6 +234,7 @@ class MANGOS_DLL_SPEC WorldSession
         void SendPetNameQuery(uint64 guid, uint32 petnumber);
         void SendStablePet(ObjectGuid guid );
         void SendStableResult(uint8 res);
+        bool CheckStableMaster(ObjectGuid guid);
 
         // Account Data
         AccountData *GetAccountData(AccountDataType type) { return &m_accountData[type]; }
