@@ -1173,7 +1173,8 @@ void Spell::DoSpellHitOnUnit(Unit *unit, const uint32 effectMask)
     // Recheck immune (only for delayed spells)
     if (m_spellInfo->speed && (
         unit->IsImmunedToDamage(GetSpellSchoolMask(m_spellInfo)) ||
-        unit->IsImmunedToSpell(m_spellInfo)))
+        unit->IsImmunedToSpell(m_spellInfo)) &&
+        !(m_spellInfo->Attributes & SPELL_ATTR_UNAFFECTED_BY_INVULNERABILITY))
     {
         if (realCaster)
             realCaster->SendSpellMiss(unit, m_spellInfo->Id, SPELL_MISS_IMMUNE);
@@ -2882,6 +2883,10 @@ void Spell::cast(bool skipCheck)
             return;
         }
     }
+	
+    if (m_spellInfo->Id == 32592)
+        if(const SpellEntry* spellInfo = sSpellStore.LookupEntry(m_spellInfo->Id))
+            const_cast<SpellEntry*>(spellInfo)->Attributes |= SPELL_ATTR_UNAFFECTED_BY_INVULNERABILITY;
 
     // different triggred (for caster) and precast (casted before apply effect to target) cases
     switch(m_spellInfo->SpellFamilyName)
@@ -2998,6 +3003,13 @@ void Spell::cast(bool skipCheck)
             // Chains of Ice
             if (m_spellInfo->Id == 45524)
                 AddTriggeredSpell(55095);                   // Frost Fever
+            break;
+        }
+        case SPELLFAMILY_WARRIOR:
+        {
+            // Shattering Throw
+            if (m_spellInfo->Id == 64382)
+                AddTriggeredSpell(64380);                     // Shattering Throw
             break;
         }
         default:
