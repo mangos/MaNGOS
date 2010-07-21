@@ -74,7 +74,7 @@ ChatCommand * ChatHandler::getCommandTable()
 
     static ChatCommand accountCommandTable[] =
     {
-        { "characters",     SEC_CONSOLE,        true,  &ChatHandler::HandleAccountCharactersCommand,   "", NULL },
+        { "characters",     SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleAccountCharactersCommand,   "", NULL },
         { "create",         SEC_CONSOLE,        true,  &ChatHandler::HandleAccountCreateCommand,       "", NULL },
         { "delete",         SEC_CONSOLE,        true,  &ChatHandler::HandleAccountDeleteCommand,       "", NULL },
         { "onlinelist",     SEC_CONSOLE,        true,  &ChatHandler::HandleAccountOnlineListCommand,   "", NULL },
@@ -624,22 +624,22 @@ ChatCommand * ChatHandler::getCommandTable()
         { "character",      SEC_GAMEMASTER,     true,  NULL,                                           "", characterCommandTable},
         { "debug",          SEC_MODERATOR,      true,  NULL,                                           "", debugCommandTable    },
         { "event",          SEC_GAMEMASTER,     false, NULL,                                           "", eventCommandTable    },
-        { "gm",             SEC_MODERATOR,      true,  NULL,                                           "", gmCommandTable       },
+        { "gm",             SEC_PLAYER,         true,  NULL,                                           "", gmCommandTable       },
         { "honor",          SEC_GAMEMASTER,     false, NULL,                                           "", honorCommandTable    },
         { "go",             SEC_MODERATOR,      false, NULL,                                           "", goCommandTable       },
         { "gobject",        SEC_GAMEMASTER,     false, NULL,                                           "", gobjectCommandTable  },
-        { "guild",          SEC_ADMINISTRATOR,  true,  NULL,                                           "", guildCommandTable    },
+        { "guild",          SEC_GAMEMASTER,     true,  NULL,                                           "", guildCommandTable    },
         { "instance",       SEC_ADMINISTRATOR,  true,  NULL,                                           "", instanceCommandTable },
         { "learn",          SEC_MODERATOR,      false, NULL,                                           "", learnCommandTable    },
         { "list",           SEC_ADMINISTRATOR,  true,  NULL,                                           "", listCommandTable     },
-        { "lookup",         SEC_ADMINISTRATOR,  true,  NULL,                                           "", lookupCommandTable   },
+        { "lookup",         SEC_MODERATOR,      true,  NULL,                                           "", lookupCommandTable   },
         { "modify",         SEC_MODERATOR,      false, NULL,                                           "", modifyCommandTable   },
         { "npc",            SEC_MODERATOR,      false, NULL,                                           "", npcCommandTable      },
         { "pdump",          SEC_ADMINISTRATOR,  true,  NULL,                                           "", pdumpCommandTable    },
         { "quest",          SEC_ADMINISTRATOR,  false, NULL,                                           "", questCommandTable    },
         { "reload",         SEC_ADMINISTRATOR,  true,  NULL,                                           "", reloadCommandTable   },
         { "reset",          SEC_ADMINISTRATOR,  true,  NULL,                                           "", resetCommandTable    },
-        { "server",         SEC_ADMINISTRATOR,  true,  NULL,                                           "", serverCommandTable   },
+        { "server",         SEC_PLAYER,         true,  NULL,                                           "", serverCommandTable   },
         { "tele",           SEC_MODERATOR,      true,  NULL,                                           "", teleCommandTable     },
         { "titles",         SEC_GAMEMASTER,     false, NULL,                                           "", titlesCommandTable   },
         { "wp",             SEC_GAMEMASTER,     false, NULL,                                           "", wpCommandTable       },
@@ -711,6 +711,9 @@ ChatCommand * ChatHandler::getCommandTable()
     {
         load_command_table = false;
 
+        // check hardcoded part integrity
+        CheckIntergrity(commandTable, NULL);
+
         QueryResult *result = WorldDatabase.Query("SELECT name,security,help FROM command");
         if (result)
         {
@@ -719,7 +722,7 @@ ChatCommand * ChatHandler::getCommandTable()
                 Field *fields = result->Fetch();
                 std::string name = fields[0].GetCppString();
 
-                SetDataForCommandInTable(commandTable, name.c_str(), fields[1].GetUInt16(), fields[2].GetCppString(), name);
+                SetDataForCommandInTable(commandTable, name.c_str(), fields[1].GetUInt16(), fields[2].GetCppString());
 
             } while(result->NextRow());
             delete result;
@@ -881,11 +884,78 @@ void ChatHandler::PSendSysMessage(const char *format, ...)
     SendSysMessage(str);
 }
 
-bool ChatHandler::ExecuteCommandInTable(ChatCommand *table, const char* text, const std::string& fullcmd)
+void ChatHandler::CheckIntergrity( ChatCommand *table, ChatCommand *parentCommand )
 {
-    char const* oldtext = text;
+    for(uint32 i = 0; table[i].Name != NULL; ++i)
+    {
+        ChatCommand* command = &table[i];
+
+        if (parentCommand && command->SecurityLevel < parentCommand->SecurityLevel)
+            sLog.outError("Subcommand '%s' of command '%s' have less access level (%u) that parent (%u)",
+                command->Name, parentCommand->Name, command->SecurityLevel, parentCommand->SecurityLevel);
+
+        if (!parentCommand && strlen(command->Name)==0)
+            sLog.outError("Subcommand '' at top level");
+
+        if (command->ChildCommands)
+        {
+            if (parentCommand && strlen(command->Name)==0)
+                sLog.outError("Subcommand '' of command '%s' have subcommands", parentCommand->Name);
+
+            CheckIntergrity(command->ChildCommands, command);
+        }
+    }
+}
+
+/**
+ * Search (sub)command for command line available for chat handler access level
+ *
+ * @param text  Command line string that will parsed for (sub)command search
+ *
+ * @return Pointer to found command structure or NULL if appropriate command not found
+ */
+ChatCommand const* ChatHandler::FindCommand(char const* text)
+{
+    ChatCommand* command = NULL;
+    char const* textPtr = text;
+
+    return FindCommand(getCommandTable(), textPtr, command) == CHAT_COMMAND_OK ? command : NULL;
+}
+
+/**
+ * Search (sub)command for command line available for chat handler access level with options and fail case additional info
+ *
+ * @param table         Pointer to command C-style array first level command where will be searched
+ * @param text          Command line string that will parsed for (sub)command search,
+ *                      it modified at return from function and pointed to not parsed tail
+ * @param command       At success this is found command, at other cases this is last found parent command
+ *                      before subcommand search fail
+ * @param parentCommand Output arg for optional return parent command for command arg.
+ * @param cmdNamePtr    Output arg for optional return last parsed command name.
+ * @param allAvailable  Optional arg (with false default value) control use command access level checks while command search.
+ *
+ * @return one from enum value of ChatCommandSearchResult. Output args return values highly dependent from this return result:
+ *
+ *      CHAT_COMMAND_OK       - Command found!
+ *                              text point to non parsed tail with possible command specific data, command store found command pointer,
+ *                              parentCommand have parent of found command or NULL if command found in table array directly
+ *                              cmdNamePtr store found command name in original form from command line
+ *      CHAT_COMMAND_UNKNOWN  - Command not found in table directly
+ *                              text only skip possible whitespaces,
+ *                              command is NULL
+ *                              parentCommand is NULL
+ *                              cmdNamePtr store command name that not found as it extracted from command line
+ *      CHAT_COMMAND_UNKNOWN_SUBCOMMAND - Subcommand not found in some deed subcomand lists
+ *                              text point to non parsed tail including not found command name in command line,
+ *                              command store last found parent command if any
+ *                              parentCommand have parent of command in command arg or NULL
+ *                              cmdNamePtr store command name that not found as it extracted from command line
+ */
+ChatCommandSearchResult ChatHandler::FindCommand(ChatCommand* table, char const* &text, ChatCommand*& command, ChatCommand** parentCommand /*= NULL*/, std::string* cmdNamePtr /*= NULL*/, bool allAvailable /*= false*/)
+{
     std::string cmd = "";
 
+    // skip whitespaces
     while (*text != ' ' && *text != '\0')
     {
         cmd += *text;
@@ -894,161 +964,323 @@ bool ChatHandler::ExecuteCommandInTable(ChatCommand *table, const char* text, co
 
     while (*text == ' ') ++text;
 
+    // search first level command in table
     for(uint32 i = 0; table[i].Name != NULL; ++i)
     {
-        if( !hasStringAbbr(table[i].Name, cmd.c_str()) )
+        if (!hasStringAbbr(table[i].Name, cmd.c_str()))
             continue;
 
         // select subcommand from child commands list
-        if(table[i].ChildCommands != NULL)
+        if (table[i].ChildCommands != NULL)
         {
-            if(!ExecuteCommandInTable(table[i].ChildCommands, text, fullcmd))
+            char const* oldchildtext = text;
+            ChatCommand* parentSubcommand = NULL;
+            ChatCommandSearchResult res = FindCommand(table[i].ChildCommands, text, command, &parentSubcommand, cmdNamePtr, allAvailable);
+
+            switch(res)
             {
-                if(text && text[0] != '\0')
-                    SendSysMessage(LANG_NO_SUBCMD);
+                case CHAT_COMMAND_OK:
+                {
+                    // if subcommand success search not return parent command, then this parent command is owner of child commands
+                    if (parentCommand)
+                        *parentCommand = parentSubcommand ? parentSubcommand : &table[i];
+
+                    // Name == "" is special case: restore original command text for next level "" (where parentSubcommand==NULL)
+                    if (strlen(command->Name)==0 && !parentSubcommand)
+                        text = oldchildtext;
+
+                    return CHAT_COMMAND_OK;
+                }
+                case CHAT_COMMAND_UNKNOWN:
+                {
+                    // command not found directly in child command list, return child command list owner
+                    command = &table[i];
+                    *parentCommand = NULL;                  // we don't known parent of table list at this point
+
+                    text = oldchildtext;                    // restore text to stated just after parse found parent command
+                    return CHAT_COMMAND_UNKNOWN_SUBCOMMAND; // we not found subcommand for table[i]
+                }
+                case CHAT_COMMAND_UNKNOWN_SUBCOMMAND:
+                default:
+                {
+                    // some deep subcommand not found, if this second level subcommand then parentCommand can be NULL, use known value for it
+                    if (parentCommand)
+                        *parentCommand = parentSubcommand ? parentSubcommand : &table[i];
+                    return res;
+                }
+            }
+        }
+
+        // must be available (not checked for subcommands case because parent command expected have most low access that all subcommands always
+        if (!allAvailable && !isAvailable(table[i]))
+            continue;
+
+        // must be have handler is explicitly selected
+        if (!table[i].Handler)
+            continue;
+
+        // command found directly in to table
+        command = &table[i];
+
+        // unknown table owner at this point
+        if (parentCommand)
+            *parentCommand = NULL;
+
+        if (cmdNamePtr)
+            *cmdNamePtr = cmd;
+
+        return CHAT_COMMAND_OK;
+    }
+
+    // command not found in table directly
+    command = NULL;
+
+    // unknown table owner at this point
+    if (parentCommand)
+        *parentCommand = NULL;
+
+    if (cmdNamePtr)
+        *cmdNamePtr = cmd;
+
+    return CHAT_COMMAND_UNKNOWN;
+}
+
+/**
+ * Execute (sub)command available for chat handler access level with options in command line string
+ *
+ * @param text  Command line string that will parsed for (sub)command search and command specific data
+ *
+ * Command output and errors in command execution will send to chat handler.
+ */
+void ChatHandler::ExecuteCommand(const char* text)
+{
+    std::string fullcmd = text;                             // original `text` can't be used. It content destroyed in command code processing.
+
+    ChatCommand* command = NULL;
+    ChatCommand* parentCommand = NULL;
+
+    ChatCommandSearchResult res = FindCommand(getCommandTable(), text, command, &parentCommand);
+
+    switch(res)
+    {
+        case CHAT_COMMAND_OK:
+        {
+            SetSentErrorMessage(false);
+            if ((this->*(command->Handler))(text))
+            {
+                if (command->SecurityLevel > SEC_PLAYER)
+                {
+                    // chat case
+                    if (m_session)
+                    {
+                        Player* p = m_session->GetPlayer();
+                        ObjectGuid sel_guid = p->GetSelection();
+                        sLog.outCommand(GetAccountId(),"Command: %s [Player: %s (Account: %u) X: %f Y: %f Z: %f Map: %u Selected: %s]",
+                            fullcmd.c_str(),p->GetName(),GetAccountId(),p->GetPositionX(),p->GetPositionY(),p->GetPositionZ(),p->GetMapId(),
+                            sel_guid.GetString().c_str());
+                    }
+                    else                                        // 0 account -> console
+                    {
+                        sLog.outCommand(GetAccountId(),"Command: %s [Account: %u from %s]",
+                            fullcmd.c_str(),GetAccountId(),GetAccountId() ? "RA-connection" : "Console");
+                    }
+                }
+            }
+            // some commands have custom error messages. Don't send the default one in these cases.
+            else if (!HasSentErrorMessage())
+            {
+                if (!command->Help.empty())
+                    SendSysMessage(command->Help.c_str());
                 else
                     SendSysMessage(LANG_CMD_SYNTAX);
 
-                ShowHelpForCommand(table[i].ChildCommands,text);
+                if (ChatCommand* showCommand = (strlen(command->Name)==0 && parentCommand ? parentCommand : command))
+                    if (ChatCommand* childs = showCommand->ChildCommands)
+                        ShowHelpForSubCommands(childs, showCommand->Name);
+
                 SetSentErrorMessage(true);
             }
+            break;
+        }
+        case CHAT_COMMAND_UNKNOWN_SUBCOMMAND:
+        {
+            SendSysMessage(LANG_NO_SUBCMD);
+            ShowHelpForCommand(command->ChildCommands,text);
+            SetSentErrorMessage(true);
+            break;
+        }
+        case CHAT_COMMAND_UNKNOWN:
+        {
+            SendSysMessage(LANG_NO_CMD);
+            SetSentErrorMessage(true);
+            break;
+        }
+    }
+}
 
+/**
+ * Function find appropriate command and update command security level and help text
+ *
+ * @param commandTable  Table for first level command search
+ * @param text          Command line string that will parsed for (sub)command search
+ * @param security      New security level for command
+ * @param help          New help text  for command
+ *
+ * @return true if command has been found, and false in other case
+ *
+ * All problems found while command search and updated output as to DB errors log
+ */
+bool ChatHandler::SetDataForCommandInTable(ChatCommand *commandTable, const char* text, uint32 security, std::string const& help)
+{
+    std::string fullcommand = text;                         // original `text` can't be used. It content destroyed in command code processing.
+
+    ChatCommand* command = NULL;
+    std::string cmdName;
+
+    ChatCommandSearchResult res = FindCommand(commandTable, text, command, NULL, &cmdName, true);
+
+    switch(res)
+    {
+        case CHAT_COMMAND_OK:
+        {
+            if (command->SecurityLevel != security)
+                DETAIL_LOG("Table `command` overwrite for command '%s' default security (%u) by %u",
+                    fullcommand.c_str(),command->SecurityLevel,security);
+
+            command->SecurityLevel = security;
+            command->Help          = help;
             return true;
         }
-
-        // must be available and have handler
-        if(!table[i].Handler || !isAvailable(table[i]))
-            continue;
-
-        SetSentErrorMessage(false);
-        // table[i].Name == "" is special case: send original command to handler
-        if((this->*(table[i].Handler))(strlen(table[i].Name)!=0 ? text : oldtext))
+        case CHAT_COMMAND_UNKNOWN_SUBCOMMAND:
         {
-            if(table[i].SecurityLevel > SEC_PLAYER)
-            {
-                // chat case
-                if (m_session)
-                {
-                    Player* p = m_session->GetPlayer();
-                    ObjectGuid sel_guid = p->GetSelection();
-                    sLog.outCommand(GetAccountId(),"Command: %s [Player: %s (Account: %u) X: %f Y: %f Z: %f Map: %u Selected: %s]",
-                        fullcmd.c_str(),p->GetName(),GetAccountId(),p->GetPositionX(),p->GetPositionY(),p->GetPositionZ(),p->GetMapId(),
-                        sel_guid.GetString().c_str());
-                }
-                else                                        // 0 account -> console
-                {
-                    sLog.outCommand(GetAccountId(),"Command: %s [Account: %u from %s]",
-                        fullcmd.c_str(),GetAccountId(),GetAccountId() ? "RA-connection" : "Console");
-                }
-            }
-        }
-        // some commands have custom error messages. Don't send the default one in these cases.
-        else if(!HasSentErrorMessage())
-        {
-            if(!table[i].Help.empty())
-                SendSysMessage(table[i].Help.c_str());
-            else
-                SendSysMessage(LANG_CMD_SYNTAX);
-            SetSentErrorMessage(true);
-        }
-
-        return true;
-    }
-
-    return false;
-}
-
-bool ChatHandler::SetDataForCommandInTable(ChatCommand *table, const char* text, uint32 security, std::string const& help, std::string const& fullcommand )
-{
-    std::string cmd = "";
-
-    while (*text != ' ' && *text != '\0')
-    {
-        cmd += *text;
-        ++text;
-    }
-
-    while (*text == ' ') ++text;
-
-    for(uint32 i = 0; table[i].Name != NULL; i++)
-    {
-        // for data fill use full explicit command names
-        if( table[i].Name != cmd )
-            continue;
-
-        // select subcommand from child commands list (including "")
-        if(table[i].ChildCommands != NULL)
-        {
-            if(SetDataForCommandInTable(table[i].ChildCommands, text, security, help, fullcommand))
-                return true;
-            else if(*text)
-                return false;
-
-            // fail with "" subcommands, then use normal level up command instead
-        }
-        // expected subcommand by full name DB content
-        else if(*text)
-        {
-            sLog.outErrorDb("Table `command` have unexpected subcommand '%s' in command '%s', skip.",text,fullcommand.c_str());
+            sLog.outErrorDb("Table `command` have unexpected subcommand '%s' in command '%s', skip.", cmdName.c_str(), fullcommand.c_str());
             return false;
         }
-
-        if(table[i].SecurityLevel != security)
-            DETAIL_LOG("Table `command` overwrite for command '%s' default security (%u) by %u",fullcommand.c_str(),table[i].SecurityLevel,security);
-
-        table[i].SecurityLevel = security;
-        table[i].Help          = help;
-        return true;
-    }
-
-    // in case "" command let process by caller
-    if(!cmd.empty())
-    {
-        if(table==getCommandTable())
-            sLog.outErrorDb("Table `command` have not existed command '%s', skip.",cmd.c_str());
-        else
-            sLog.outErrorDb("Table `command` have not existed subcommand '%s' in command '%s', skip.",cmd.c_str(),fullcommand.c_str());
+        case CHAT_COMMAND_UNKNOWN:
+        {
+            sLog.outErrorDb("Table `command` have not existed command '%s', skip.", cmdName.c_str());
+            return false;
+        }
     }
 
     return false;
 }
 
-int ChatHandler::ParseCommands(const char* text)
+bool ChatHandler::ParseCommands(const char* text)
 {
     ASSERT(text);
     ASSERT(*text);
 
-    //if(m_session->GetSecurity() == 0)
-    //    return 0;
+    //if(m_session->GetSecurity() == SEC_PLAYER)
+    //    return false;
 
     /// chat case (.command or !command format)
     if (m_session)
     {
         if(text[0] != '!' && text[0] != '.')
-            return 0;
-    }
+            return false;
 
-    /// ignore single . and ! in line
-    if (strlen(text) < 2)
-        return 0;
+        /// ignore single . and ! in line
+        if (strlen(text) < 2)
+            return false;
+    }
 
     /// ignore messages staring from many dots.
     if ((text[0] == '.' && text[1] == '.') || (text[0] == '!' && text[1] == '!'))
-        return 0;
+        return false;
 
     /// skip first . or ! (in console allowed use command with . and ! and without its)
     if (text[0] == '!' || text[0] == '.')
         ++text;
 
-    std::string fullcmd = text;                             // original `text` can't be used. It content destroyed in command code processing.
+    ExecuteCommand(text);
 
-    if (!ExecuteCommandInTable(getCommandTable(), text, fullcmd))
+    return true;
+}
+
+bool ChatHandler::ShowHelpForSubCommands(ChatCommand *table, char const* cmd)
+{
+    std::string list;
+    for(uint32 i = 0; table[i].Name != NULL; ++i)
     {
-        SendSysMessage(LANG_NO_CMD);
-        SetSentErrorMessage(true);
+        // must be available (ignore handler existence for show command with possible available subcommands
+        if (!isAvailable(table[i]))
+            continue;
+
+        if (m_session)
+            list += "\n    ";
+        else
+            list += "\n\r    ";
+
+        list += table[i].Name;
+
+        if (table[i].ChildCommands)
+            list += " ...";
     }
 
-    return 1;
+    if (list.empty())
+        return false;
+
+    if (table==getCommandTable())
+    {
+        SendSysMessage(LANG_AVIABLE_CMD);
+        PSendSysMessage("%s",list.c_str());
+    }
+    else
+        PSendSysMessage(LANG_SUBCMDS_LIST,cmd,list.c_str());
+
+    return true;
+}
+
+bool ChatHandler::ShowHelpForCommand(ChatCommand *table, const char* cmd)
+{
+    char const* oldCmd = cmd;
+    ChatCommand* command = NULL;
+    ChatCommand* parentCommand = NULL;
+
+    ChatCommand* showCommand = NULL;
+    ChatCommand* childCommands = NULL;
+
+    ChatCommandSearchResult res = FindCommand(table, cmd, command, &parentCommand);
+
+    switch(res)
+    {
+        case CHAT_COMMAND_OK:
+        {
+            // for "" subcommand use parent command if any for subcommands list output
+            if (strlen(command->Name) == 0 && parentCommand)
+            {
+                showCommand = parentCommand;
+                cmd = "";
+            }
+            else
+                showCommand = command;
+
+            childCommands = showCommand->ChildCommands;
+            break;
+        }
+        case CHAT_COMMAND_UNKNOWN_SUBCOMMAND:
+            showCommand = command;
+            childCommands = showCommand->ChildCommands;
+            break;
+        case CHAT_COMMAND_UNKNOWN:
+            // not show command list at error in first level command find fail
+            childCommands = table != getCommandTable() || strlen(oldCmd) == 0 ? table : NULL;
+            command = NULL;
+            break;
+    }
+
+    if (command && !command->Help.empty())
+        SendSysMessage(command->Help.c_str());
+
+    if (childCommands)
+        if (ShowHelpForSubCommands(childCommands, showCommand ? showCommand->Name : ""))
+            return true;
+
+    if (command && command->Help.empty())
+        SendSysMessage(LANG_NO_HELP_CMD);
+
+    return command || childCommands;
 }
 
 bool ChatHandler::isValidChatMessage(const char* message)
@@ -1606,101 +1838,6 @@ valid examples:
         DEBUG_LOG("ChatHandler::isValidChatMessage EOF in active sequence");
 
     return validSequence == validSequenceIterator;
-}
-
-bool ChatHandler::ShowHelpForSubCommands(ChatCommand *table, char const* cmd, char const* subcmd)
-{
-    std::string list;
-    for(uint32 i = 0; table[i].Name != NULL; ++i)
-    {
-        // must be available (ignore handler existence for show command with possibe avalable subcomands
-        if(!isAvailable(table[i]))
-            continue;
-
-        /// for empty subcmd show all available
-        if( *subcmd && !hasStringAbbr(table[i].Name, subcmd))
-            continue;
-
-        if(m_session)
-            list += "\n    ";
-        else
-            list += "\n\r    ";
-
-        list += table[i].Name;
-
-        if(table[i].ChildCommands)
-            list += " ...";
-    }
-
-    if(list.empty())
-        return false;
-
-    if(table==getCommandTable())
-    {
-        SendSysMessage(LANG_AVIABLE_CMD);
-        PSendSysMessage("%s",list.c_str());
-    }
-    else
-        PSendSysMessage(LANG_SUBCMDS_LIST,cmd,list.c_str());
-
-    return true;
-}
-
-bool ChatHandler::ShowHelpForCommand(ChatCommand *table, const char* cmd)
-{
-    if(*cmd)
-    {
-        for(uint32 i = 0; table[i].Name != NULL; ++i)
-        {
-            // must be available (ignore handler existence for show command with possibe avalable subcomands
-            if(!isAvailable(table[i]))
-                continue;
-
-            if( !hasStringAbbr(table[i].Name, cmd) )
-                continue;
-
-            // have subcommand
-            char const* subcmd = (*cmd) ? strtok(NULL, " ") : "";
-
-            if(table[i].ChildCommands && subcmd && *subcmd)
-            {
-                if(ShowHelpForCommand(table[i].ChildCommands, subcmd))
-                    return true;
-            }
-
-            if(!table[i].Help.empty())
-                SendSysMessage(table[i].Help.c_str());
-
-            if(table[i].ChildCommands)
-                if(ShowHelpForSubCommands(table[i].ChildCommands,table[i].Name,subcmd ? subcmd : ""))
-                    return true;
-
-            return !table[i].Help.empty();
-        }
-    }
-    else
-    {
-        for(uint32 i = 0; table[i].Name != NULL; ++i)
-        {
-            // must be available (ignore handler existence for show command with possibe avalable subcomands
-            if(!isAvailable(table[i]))
-                continue;
-
-            if(strlen(table[i].Name))
-                continue;
-
-            if(!table[i].Help.empty())
-                SendSysMessage(table[i].Help.c_str());
-
-            if(table[i].ChildCommands)
-                if(ShowHelpForSubCommands(table[i].ChildCommands,"",""))
-                    return true;
-
-            return !table[i].Help.empty();
-        }
-    }
-
-    return ShowHelpForSubCommands(table,"",cmd);
 }
 
 //Note: target_guid used only in CHAT_MSG_WHISPER_INFORM mode (in this case channelName ignored)

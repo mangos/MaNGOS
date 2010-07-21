@@ -39,6 +39,13 @@ class ChatCommand
         ChatCommand *      ChildCommands;
 };
 
+enum ChatCommandSearchResult
+{
+    CHAT_COMMAND_OK,                                        // found accessible command by command string
+    CHAT_COMMAND_UNKNOWN,                                   // first level command not found
+    CHAT_COMMAND_UNKNOWN_SUBCOMMAND,                        // command found but some level subcommand not find in subcommand list
+};
+
 class ChatHandler
 {
     public:
@@ -68,7 +75,8 @@ class ChatHandler
         void PSendSysMessage(         const char *format, ...) ATTR_PRINTF(2,3);
         void PSendSysMessage(         int32     entry, ...  );
 
-        int ParseCommands(const char* text);
+        bool ParseCommands(const char* text);
+        ChatCommand const* FindCommand(char const* text);
 
         bool isValidChatMessage(const char* msg);
         bool HasSentErrorMessage() { return sentErrorMessage;}
@@ -91,11 +99,13 @@ class ChatHandler
 
         void SendGlobalSysMessage(const char *str);
 
-        bool SetDataForCommandInTable(ChatCommand *table, const char* text, uint32 security, std::string const& help, std::string const& fullcommand );
-        bool ExecuteCommandInTable(ChatCommand *table, const char* text, const std::string& fullcommand);
+        bool SetDataForCommandInTable(ChatCommand *table, const char* text, uint32 security, std::string const& help);
+        void ExecuteCommand(const char* text);
         bool ShowHelpForCommand(ChatCommand *table, const char* cmd);
-        bool ShowHelpForSubCommands(ChatCommand *table, char const* cmd, char const* subcmd);
+        bool ShowHelpForSubCommands(ChatCommand *table, char const* cmd);
+        ChatCommandSearchResult FindCommand(ChatCommand* table, char const*& text, ChatCommand*& command, ChatCommand** parentCommand = NULL, std::string* cmdNamePtr = NULL, bool allAvailable = false);
 
+        void CheckIntergrity(ChatCommand *table, ChatCommand *parentCommand);
         ChatCommand* getCommandTable();
 
         bool HandleAccountCommand(const char* args);
