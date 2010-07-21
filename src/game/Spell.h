@@ -274,6 +274,7 @@ class Spell
         void EffectTriggerMissileSpell(SpellEffectIndex eff_idx);
         void EffectThreat(SpellEffectIndex eff_idx);
         void EffectRestoreItemCharges(SpellEffectIndex eff_idx);
+        void EffectRemoveAura(SpellEffectIndex eff_idx);
         void EffectHealMaxHealth(SpellEffectIndex eff_idx);
         void EffectInterruptCast(SpellEffectIndex eff_idx);
         void EffectSummonObjectWild(SpellEffectIndex eff_idx);
