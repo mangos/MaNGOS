@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_10223_01_mangos_spell_proc_event` bit(1) default NULL
+  `required_10237_01_mangos_spell_bonus_data` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -14258,6 +14258,7 @@ INSERT INTO `spell_bonus_data` VALUES
 (8188,  0.1,    0,       0,     'Shaman - Magma Totam Passive'),
 (61295, 0.4,    0.18,    0,     'Shaman - Riptide'),
 (3606,  0.1667, 0,       0,     'Shaman - Searing Totem Attack'),
+(10444, 0,      0,       0,     'Shaman - Flametongue Attack'),
 /* Warlock */
 (17962, 0,      0,       0,     'Warlock - Conflagrate'),
 (172,   0,      0.2,     0,     'Warlock - Corruption'),

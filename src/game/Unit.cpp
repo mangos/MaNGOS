@@ -9519,10 +9519,10 @@ void Unit::ProcDamageAndSpellFor( bool isVictim, Unit * pTarget, uint32 procFlag
                             (spellProcEvent->spellFamilyMask2[i] & procSpell->SpellFamilyFlags2) == 0)
                             continue;
                     }
-                    else if (!spellProcEvent->schoolMask && !triggeredByAura->CanProcFrom(procSpell))
+                    else if (!triggeredByAura->CanProcFrom(procSpell, spellProcEvent->procEx, procExtra, damage != 0))
                         continue;
                 }
-                else if (!triggeredByAura->CanProcFrom(procSpell))
+                else if (!triggeredByAura->CanProcFrom(procSpell, PROC_EX_NONE, procExtra, damage != 0))
                     continue;
             }
 
