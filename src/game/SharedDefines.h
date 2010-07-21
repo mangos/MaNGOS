@@ -688,7 +688,7 @@ enum SpellEffects
     SPELL_EFFECT_QUEST_FAIL                = 147,
     SPELL_EFFECT_148                       = 148,
     SPELL_EFFECT_149                       = 149,
-    SPELL_EFFECT_150                       = 150,
+    SPELL_EFFECT_QUEST_START               = 150,
     SPELL_EFFECT_TRIGGER_SPELL_2           = 151,
     SPELL_EFFECT_152                       = 152,
     SPELL_EFFECT_153                       = 153,
