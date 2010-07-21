@@ -2028,6 +2028,10 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
             if( spellInfo_1->SpellIconID == 2285 && spellInfo_2->SpellIconID == 2285 )
                 return false;
 
+            //Tricks of Trade
+            if( spellInfo_1->SpellIconID == 3413 && spellInfo_2->SpellIconID == 3413 )
+                return false;
+
             // Garrote -> Garrote-Silence (multi-family check)
             if( spellInfo_1->SpellIconID == 498 && spellInfo_2->SpellIconID == 498 && spellInfo_2->SpellVisual[0] == 0 )
                 return false;

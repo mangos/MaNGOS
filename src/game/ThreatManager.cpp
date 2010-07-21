@@ -392,6 +392,14 @@ void ThreatManager::addThreat(Unit* pVictim, float pThreat, bool crit, SpellScho
 
     float threat = ThreatCalcHelper::calcThreat(pVictim, iOwner, pThreat, crit, schoolMask, pThreatSpell);
 
+    if( pVictim->GetThreatRedirectionPercent() && threat > 0.0f )
+    {
+        float redirectedThreat = threat * pVictim->GetThreatRedirectionPercent() / 100;
+        threat -= redirectedThreat;
+        if(Unit *unit = pVictim->GetMisdirectionTarget())
+            iThreatContainer.addThreat(unit, redirectedThreat);
+    }
+
     HostileReference* ref = iThreatContainer.addThreat(pVictim, threat);
     // Ref is online
     if (ref)
