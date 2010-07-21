@@ -904,7 +904,7 @@ bool Pet::UpdateStats(Stats stat)
                 if (getPetType() == SUMMON_PET && (owner->getClass() == CLASS_WARLOCK || owner->getClass() == CLASS_MAGE))
                     value += owner->GetStat(stat) * 0.3f;
                 break;
-            case STAT_STRENGHT:
+            case STAT_STRENGTH:
                 {
                 if (getPetType() == SUMMON_PET  && (owner->getClass() == CLASS_DEATH_KNIGHT))
                     value += float(owner->GetStat(stat)) * 1.0f;
