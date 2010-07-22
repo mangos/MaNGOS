@@ -232,7 +232,7 @@ class MANGOS_DLL_SPEC WorldSession
 
         //pet
         void SendPetNameQuery(uint64 guid, uint32 petnumber);
-        void SendStablePet(ObjectGuid guid );
+        void SendStablePet(ObjectGuid guid);
         void SendStableResult(uint8 res);
         bool CheckStableMaster(ObjectGuid guid);
 
