@@ -703,6 +703,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { "ahbotoptions",   SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleAHBotOptionsCommand,        "", NULL },
         { "flusharenapoints",SEC_ADMINISTRATOR, false, &ChatHandler::HandleFlushArenaPointsCommand,    "", NULL },
         { "repairitems",    SEC_GAMEMASTER,     true,  &ChatHandler::HandleRepairitemsCommand,         "", NULL },
+        { "stable",         SEC_ADMINISTRATOR,  false, &ChatHandler::HandleStableCommand,              "", NULL },
         { "waterwalk",      SEC_GAMEMASTER,     false, &ChatHandler::HandleWaterwalkCommand,           "", NULL },
         { "quit",           SEC_CONSOLE,        true,  &ChatHandler::HandleQuitCommand,                "", NULL },
 
@@ -997,7 +998,8 @@ ChatCommandSearchResult ChatHandler::FindCommand(ChatCommand* table, char const*
                 {
                     // command not found directly in child command list, return child command list owner
                     command = &table[i];
-                    *parentCommand = NULL;                  // we don't known parent of table list at this point
+                    if (parentCommand)
+                        *parentCommand = NULL;              // we don't known parent of table list at this point
 
                     text = oldchildtext;                    // restore text to stated just after parse found parent command
                     return CHAT_COMMAND_UNKNOWN_SUBCOMMAND; // we not found subcommand for table[i]

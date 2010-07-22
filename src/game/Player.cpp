@@ -6409,6 +6409,7 @@ void Player::RewardReputation(Unit *pVictim, float rate)
     if(!pVictim || pVictim->GetTypeId() == TYPEID_PLAYER)
         return;
 
+    // used current difficulty creature entry instead normal version (GetEntry())
     ReputationOnKillEntry const* Rep = sObjectMgr.GetReputationOnKilEntry(((Creature*)pVictim)->GetCreatureInfo()->Entry);
 
     if(!Rep)
@@ -20768,7 +20769,8 @@ void Player::RewardSinglePlayerAtKill(Unit* pVictim)
 
         // normal creature (not pet/etc) can be only in !PvP case
         if(pVictim->GetTypeId()==TYPEID_UNIT)
-            KilledMonster(((Creature*)pVictim)->GetCreatureInfo(), pVictim->GetObjectGuid());
+            if(CreatureInfo const* normalInfo = ObjectMgr::GetCreatureTemplate(pVictim->GetEntry()))
+                KilledMonster(normalInfo, pVictim->GetObjectGuid());
     }
 }
 
