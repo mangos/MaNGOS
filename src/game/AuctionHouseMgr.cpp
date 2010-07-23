@@ -284,7 +284,7 @@ void AuctionHouseMgr::SendAuctionExpiredMail( AuctionEntry * auction )
 void AuctionHouseMgr::LoadAuctionItems()
 {
     // data needs to be at first place for Item::LoadFromDB 0   1    2        3
-    QueryResult *result = CharacterDatabase.Query( "SELECT data,text,itemguid,item_template FROM auctionhouse JOIN item_instance ON itemguid = guid" );
+    QueryResult *result = CharacterDatabase.Query( "SELECT data,text,itemguid,item_template FROM auction JOIN item_instance ON itemguid = guid" );
 
     if( !result )
     {
@@ -336,13 +336,13 @@ void AuctionHouseMgr::LoadAuctionItems()
 
 void AuctionHouseMgr::LoadAuctions()
 {
-    QueryResult *result = CharacterDatabase.Query("SELECT COUNT(*) FROM auctionhouse");
+    QueryResult *result = CharacterDatabase.Query("SELECT COUNT(*) FROM auction");
     if( !result )
     {
         barGoLink bar(1);
         bar.step();
         sLog.outString();
-        sLog.outString(">> Loaded 0 auctions. DB table `auctionhouse` is empty.");
+        sLog.outString(">> Loaded 0 auctions. DB table `auction` is empty.");
         return;
     }
 
@@ -355,17 +355,17 @@ void AuctionHouseMgr::LoadAuctions()
         barGoLink bar(1);
         bar.step();
         sLog.outString();
-        sLog.outString(">> Loaded 0 auctions. DB table `auctionhouse` is empty.");
+        sLog.outString(">> Loaded 0 auctions. DB table `auction` is empty.");
         return;
     }
 
-    result = CharacterDatabase.Query( "SELECT id,auctioneerguid,itemguid,item_template,itemowner,buyoutprice,time,buyguid,lastbid,startbid,deposit FROM auctionhouse" );
+    result = CharacterDatabase.Query( "SELECT id,houseid,itemguid,item_template,itemowner,buyoutprice,time,buyguid,lastbid,startbid,deposit FROM auction" );
     if( !result )
     {
         barGoLink bar(1);
         bar.step();
         sLog.outString();
-        sLog.outString(">> Loaded 0 auctions. DB table `auctionhouse` is empty.");
+        sLog.outString(">> Loaded 0 auctions. DB table `auction` is empty.");
         return;
     }
 
@@ -381,7 +381,7 @@ void AuctionHouseMgr::LoadAuctions()
 
         auction = new AuctionEntry;
         auction->Id = fields[0].GetUInt32();
-        auction->auctioneer = fields[1].GetUInt32();
+        uint32 houseid  = fields[1].GetUInt32();
         auction->item_guidlow = fields[2].GetUInt32();
         auction->item_template = fields[3].GetUInt32();
         auction->owner = fields[4].GetUInt32();
@@ -404,21 +404,9 @@ void AuctionHouseMgr::LoadAuctions()
             continue;
         }
 
-        CreatureData const* auctioneerData = sObjectMgr.GetCreatureData(auction->auctioneer);
-        if(!auctioneerData)
-        {
-            sLog.outError("Auction %u has not a existing auctioneer (GUID : %u), will mail to owner (GUID: %u)",
-                auction->Id, auction->auctioneer, auction->owner);
-        }
+        auction->auctionHouseEntry = sAuctionHouseStore.LookupEntry(houseid);
 
-        CreatureInfo const* auctioneerInfo = auctioneerData ? ObjectMgr::GetCreatureTemplate(auctioneerData->id) : NULL;
-        if(auctioneerData && !auctioneerInfo)
-        {
-            sLog.outError("Auction %u has not a existing auctioneer (GUID : %u Entry: %u), will mail to owner (GUID: %u)",
-                auction->Id, auction->auctioneer,auctioneerData->id, auction->owner);
-        }
-
-        if (!auctioneerInfo)
+        if (!houseid)
         {
             // need for send mail, use goblin auctionhouse
             auction->auctionHouseEntry = sAuctionHouseStore.LookupEntry(7);
@@ -438,9 +426,6 @@ void AuctionHouseMgr::LoadAuctions()
 
             continue;
         }
-
-        // always return pointer
-        auction->auctionHouseEntry = AuctionHouseMgr::GetAuctionHouseEntry(auctioneerInfo->faction_A);
 
         GetAuctionsMap(auction->auctionHouseEntry)->AddAuction(auction);
 
@@ -711,13 +696,13 @@ uint32 AuctionEntry::GetAuctionOutBid() const
 void AuctionEntry::DeleteFromDB() const
 {
     //No SQL injection (Id is integer)
-    CharacterDatabase.PExecute("DELETE FROM auctionhouse WHERE id = '%u'",Id);
+    CharacterDatabase.PExecute("DELETE FROM auction WHERE id = '%u'",Id);
 }
 
 void AuctionEntry::SaveToDB() const
 {
     //No SQL injection (no strings)
-    CharacterDatabase.PExecute("INSERT INTO auctionhouse (id,auctioneerguid,itemguid,item_template,itemowner,buyoutprice,time,buyguid,lastbid,startbid,deposit) "
+    CharacterDatabase.PExecute("INSERT INTO auction (id,houseid,itemguid,item_template,itemowner,buyoutprice,time,buyguid,lastbid,startbid,deposit) "
         "VALUES ('%u', '%u', '%u', '%u', '%u', '%u', '" UI64FMTD "', '%u', '%u', '%u', '%u')",
-        Id, auctioneer, item_guidlow, item_template, owner, buyout, (uint64)expire_time, bidder, bid, startbid, deposit);
+        Id, auctionHouseEntry->houseId, item_guidlow, item_template, owner, buyout, (uint64)expire_time, bidder, bid, startbid, deposit);
 }

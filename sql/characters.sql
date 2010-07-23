@@ -21,7 +21,7 @@
 
 DROP TABLE IF EXISTS `character_db_version`;
 CREATE TABLE `character_db_version` (
-  `required_10160_02_characters_pet_aura` bit(1) default NULL
+  `required_10254_01_characters_auctionhouse` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Last applied sql update to DB';
 
 --
@@ -141,7 +141,7 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `auctionhouse`;
 CREATE TABLE `auctionhouse` (
   `id` int(11) unsigned NOT NULL default '0',
-  `auctioneerguid` int(11) unsigned NOT NULL default '0',
+  `houseid` int(11) unsigned NOT NULL default '0',
   `itemguid` int(11) unsigned NOT NULL default '0',
   `item_template` int(11) unsigned NOT NULL default '0' COMMENT 'Item Identifier',
   `itemowner` int(11) unsigned NOT NULL default '0',
