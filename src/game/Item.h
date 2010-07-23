@@ -221,7 +221,6 @@ struct ItemRequiredTarget
 };
 
 bool ItemCanGoIntoBag(ItemPrototype const *proto, ItemPrototype const *pBagProto);
-bool IsTitanGripWeapon(ItemPrototype const* proto);
 
 class MANGOS_DLL_SPEC Item : public Object
 {

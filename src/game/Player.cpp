@@ -3631,7 +3631,6 @@ void Player::removeSpell(uint32 spell_id, bool disabled, bool learn_low_rank, bo
         if (IsSpellHaveEffect(spellInfo, SPELL_EFFECT_TITAN_GRIP))
         {
             m_canTitanGrip = false;
-            RemoveAurasDueToSpell(49152);
             if(sWorld.getConfig(CONFIG_BOOL_OFFHAND_CHECK_AT_TALENTS_RESET))
                 AutoUnequipOffhandIfNeed();
         }
@@ -6925,9 +6924,6 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea)
     // check some item equip limitations (in result lost CanTitanGrip at talent reset, for example)
     AutoUnequipOffhandIfNeed();
 
-    if (IsTwoHandUsedInDualWield() && !HasAura(49152))
-        CastSpell(this, 49152, true);
-
     // recent client version not send leave/join channel packets for built-in local channels
     UpdateLocalChannels( newZone );
 
@@ -9036,7 +9032,7 @@ uint8 Player::FindEquipSlot( ItemPrototype const* proto, uint32 slot, bool swap 
             break;
         case INVTYPE_2HWEAPON:
             slots[0] = EQUIPMENT_SLOT_MAINHAND;
-            if (CanDualWield() && CanTitanGrip() && IsTitanGripWeapon(proto))
+            if (CanDualWield() && CanTitanGrip())
                 slots[1] = EQUIPMENT_SLOT_OFFHAND;
             break;
         case INVTYPE_TABARD:
@@ -11449,13 +11445,6 @@ Item* Player::EquipItem( uint16 pos, Item *pItem, bool update )
     GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM, pItem->GetEntry());
     GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_EPIC_ITEM, slot+1);
 
-    // Titan's Grip damage penalty for 2H weapons
-    if (slot == EQUIPMENT_SLOT_MAINHAND || slot == EQUIPMENT_SLOT_OFFHAND)
-    {
-        if (IsTwoHandUsedInDualWield() && !HasAura(49152))
-            CastSpell(this, 49152, true);
-    }
-
     return pItem;
 }
 
@@ -11596,15 +11585,6 @@ void Player::RemoveItem( uint8 bag, uint8 slot, bool update )
         pItem->SetSlot( NULL_SLOT );
         if( IsInWorld() && update )
             pItem->SendCreateUpdateToPlayer( this );
-
-        ItemPrototype const* pProto = pItem->GetProto();
-
-        // Titan's Grip damage penalty for 2H weapons removed if player does not have any
-        if (pProto && pProto->InventoryType == INVTYPE_2HWEAPON)
-        {
-            if (!IsTwoHandUsedInDualWield())
-                RemoveAurasDueToSpell(49152);
-        }
     }
 }
 
@@ -20571,7 +20551,7 @@ void Player::AutoUnequipOffhandIfNeed()
         return;
 
     // need unequip offhand for 2h-weapon without TitanGrip (in any from hands)
-    if (CanTitanGrip() || !IsTwoHandUsedInDualWield())
+    if (CanTitanGrip() || (offItem->GetProto()->InventoryType != INVTYPE_2HWEAPON && !IsTwoHandUsed()))
         return;
 
     ItemPosCountVec off_dest;
@@ -22741,30 +22721,6 @@ void Player::SetRestType( RestType n_r_type, uint32 areaTriggerId /*= 0*/)
         if(sWorld.IsFFAPvPRealm())
             SetFFAPvP(false);
     }
-}
-
-bool Player::CanTitanGrip() const
-{
-    Item *mainItem = GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
-
-    if (mainItem && !IsTitanGripWeapon(mainItem->GetProto()))
-        return false;
-
-    return m_canTitanGrip;
-}
-
-bool Player::IsTwoHandUsedInDualWield() const
-{
-    Item* offItem = GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
-
-    if (!offItem)
-        return false;
-
-    if (offItem->GetProto()->InventoryType == INVTYPE_2HWEAPON)
-        return true;
-
-    Item* mainItem = GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
-    return mainItem && mainItem->GetProto()->InventoryType == INVTYPE_2HWEAPON;
 }
 
 void Player::SetRandomWinner(bool isWinner)
