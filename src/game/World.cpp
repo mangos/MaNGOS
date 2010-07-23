@@ -63,7 +63,6 @@
 #include "GMTicketMgr.h"
 #include "Util.h"
 #include "CharacterDatabaseCleaner.h"
-#include "AuctionHouseBot.h"
 
 INSTANTIATE_SINGLETON_1( World );
 
@@ -1344,9 +1343,6 @@ void World::SetInitialWorldSettings()
     // Delete all characters which have been deleted X days before
     Player::DeleteOldCharacters();
 
-    sLog.outString("Initialize AuctionHouseBot...");
-    auctionbot.Initialize();
-
     sLog.outString("Starting Autobroadcast system by Xeross..." );
 
     sLog.outString( "WORLD: World initialized" );
@@ -1426,7 +1422,6 @@ void World::Update(uint32 diff)
     /// <ul><li> Handle auctions when the timer has passed
     if (m_timers[WUPDATE_AUCTIONS].Passed())
     {
-        auctionbot.Update();
         m_timers[WUPDATE_AUCTIONS].Reset();
 
         ///- Update mails (return old mails with item, or delete them)
