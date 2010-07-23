@@ -7825,10 +7825,18 @@ void Spell::EffectActivateRune(SpellEffectIndex eff_idx)
     }
 }
 
-void Spell::EffectTitanGrip(SpellEffectIndex /*eff_idx*/)
+void Spell::EffectTitanGrip(SpellEffectIndex eff_idx)
 {
+    // Make sure "Titan's Grip" (49152) penalty spell does not silently change
+    if (m_spellInfo->EffectMiscValue[eff_idx] != 49152)
+        sLog.outError("Spell::EffectTitanGrip: Spell %u has unexpected EffectMiscValue '%u'", m_spellInfo->Id, m_spellInfo->EffectMiscValue[eff_idx]);
     if (unitTarget && unitTarget->GetTypeId() == TYPEID_PLAYER)
-        ((Player*)unitTarget)->SetCanTitanGrip(true);
+    {
+        Player *plr = (Player*)m_caster;
+        plr->SetCanTitanGrip(true);
+        if (plr->HasTwoHandWeaponInOneHand() && !plr->HasAura(49152))
+            plr->CastSpell(plr, 49152, true);
+    }
 }
 
 void Spell::EffectRenamePet(SpellEffectIndex /*eff_idx*/)

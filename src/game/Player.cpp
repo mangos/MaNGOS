@@ -3577,12 +3577,14 @@ void Player::removeSpell(uint32 spell_id, bool disabled, bool learn_low_rank, bo
         }
     }
 
-    if (m_canTitanGrip)
+    if (CanTitanGrip())
     {
         SpellEntry const *spellInfo = sSpellStore.LookupEntry(spell_id);
         if (IsSpellHaveEffect(spellInfo, SPELL_EFFECT_TITAN_GRIP))
         {
-            m_canTitanGrip = false;
+            SetCanTitanGrip(false);
+            // Remove Titan's Grip damage penalty now
+            RemoveAurasDueToSpell(49152);
             if(sWorld.getConfig(CONFIG_BOOL_OFFHAND_CHECK_AT_TALENTS_RESET))
                 AutoUnequipOffhandIfNeed();
         }
@@ -11047,6 +11049,9 @@ Item* Player::EquipItem( uint16 pos, Item *pItem, bool update )
 
         return pItem2;
     }
+    // Apply Titan's Grip damage penalty if necessary
+    if ((slot == EQUIPMENT_SLOT_MAINHAND || slot == EQUIPMENT_SLOT_OFFHAND) && CanTitanGrip() && HasTwoHandWeaponInOneHand() && !HasAura(49152))
+        CastSpell(this, 49152, true);
 
     // only for full equip instead adding to stack
     GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM, pItem->GetEntry());
@@ -11070,6 +11075,9 @@ void Player::QuickEquipItem( uint16 pos, Item *pItem)
             pItem->AddToWorld();
             pItem->SendCreateUpdateToPlayer( this );
         }
+        // Apply Titan's Grip damage penalty if necessary
+        if ((slot == EQUIPMENT_SLOT_MAINHAND || slot == EQUIPMENT_SLOT_OFFHAND) && CanTitanGrip() && HasTwoHandWeaponInOneHand() && !HasAura(49152))
+            CastSpell(this, 49152, true);
 
         GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM, pItem->GetEntry());
         GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_EPIC_ITEM, slot+1);
@@ -11179,7 +11187,12 @@ void Player::RemoveItem( uint8 bag, uint8 slot, bool update )
             SetUInt64Value(PLAYER_FIELD_INV_SLOT_HEAD + (slot * 2), 0);
 
             if ( slot < EQUIPMENT_SLOT_END )
+            {
                 SetVisibleItemSlot(slot, NULL);
+                // Remove Titan's Grip damage penalty if necessary
+                if ((slot == EQUIPMENT_SLOT_MAINHAND || slot == EQUIPMENT_SLOT_OFFHAND) && CanTitanGrip() && !HasTwoHandWeaponInOneHand())
+                    RemoveAurasDueToSpell(49152);
+            }
         }
         else
         {
