@@ -1109,6 +1109,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         typedef std::set<Unit*> AttackerSet;
         typedef std::multimap< uint32, SpellAuraHolder*> SpellAuraHolderMap;
         typedef std::pair<SpellAuraHolderMap::iterator, SpellAuraHolderMap::iterator> SpellAuraHolderBounds;
+        typedef std::pair<SpellAuraHolderMap::const_iterator, SpellAuraHolderMap::const_iterator> SpellAuraHolderConstBounds;
         typedef std::list<SpellAuraHolder *> SpellAuraHolderList;
         typedef std::list<Aura *> AuraList;
         typedef std::list<DiminishingReturn> Diminishing;
@@ -1363,6 +1364,10 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         SpellAuraHolderBounds GetSpellAuraHolderBounds(uint32 spell_id)
         {
             return SpellAuraHolderBounds(m_spellAuraHolders.lower_bound(spell_id), m_spellAuraHolders.upper_bound(spell_id));
+        }
+        SpellAuraHolderConstBounds GetSpellAuraHolderBounds(uint32 spell_id) const
+        {
+            return SpellAuraHolderConstBounds(m_spellAuraHolders.lower_bound(spell_id), m_spellAuraHolders.upper_bound(spell_id));
         }
 
         bool HasAuraType(AuraType auraType) const;
