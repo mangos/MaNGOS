@@ -1408,6 +1408,14 @@ BattleGround.PremadeGroupWaitForMatch = 1800000
 #        Default: 1 (active)
 #                 0 (finished)
 #
+#    Arena.StartRating
+#        Default Rating at team creation
+#        Default: -1 (use season dependent default value)
+#
+#    Arena.StartPersonalRating
+#        Default Personal Rating at team creation
+#        Default: -1 (use season dependent default value)
+#
 ###################################################################################################################
 
 Arena.MaxRatingDifference = 150
@@ -1418,6 +1426,8 @@ Arena.QueueAnnouncer.Join = 0
 Arena.QueueAnnouncer.Exit = 0
 Arena.ArenaSeason.ID = 1
 Arena.ArenaSeason.InProgress = 1
+Arena.StartRating = -1
+Arena.StartPersonalRating = -1
 
 ###################################################################################################################
 # NETWORK CONFIG

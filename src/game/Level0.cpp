@@ -32,16 +32,15 @@
 
 bool ChatHandler::HandleHelpCommand(const char* args)
 {
-    char* cmd = strtok((char*)args, " ");
-    if(!cmd)
+    if(!*args)
     {
         ShowHelpForCommand(getCommandTable(), "help");
         ShowHelpForCommand(getCommandTable(), "");
     }
     else
     {
-        if(!ShowHelpForCommand(getCommandTable(), cmd))
-            SendSysMessage(LANG_NO_HELP_CMD);
+        if (!ShowHelpForCommand(getCommandTable(), args))
+            SendSysMessage(LANG_NO_CMD);
     }
 
     return true;
@@ -53,8 +52,12 @@ bool ChatHandler::HandleCommandsCommand(const char* /*args*/)
     return true;
 }
 
-bool ChatHandler::HandleAccountCommand(const char* /*args*/)
+bool ChatHandler::HandleAccountCommand(const char* args)
 {
+    // let show subcommands at unexpected data in args
+    if (*args)
+        return false;
+
     AccountTypes gmlevel = GetAccessLevel();
     PSendSysMessage(LANG_ACCOUNT_LEVEL, uint32(gmlevel));
     return true;

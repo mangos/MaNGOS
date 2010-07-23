@@ -512,6 +512,14 @@ bool ChatHandler::HandleReloadReservedNameCommand(const char*)
     return true;
 }
 
+bool ChatHandler::HandleReloadReputationRewardRateCommand(const char*)
+{
+    sLog.outString( "Re-Loading `reputation_reward_rate` Table!" );
+    sObjectMgr.LoadReputationRewardRate();
+    SendGlobalSysMessage("DB table `reputation_reward_rate` reloaded.");
+    return true;
+}
+
 bool ChatHandler::HandleReloadSkillDiscoveryTemplateCommand(const char* /*args*/)
 {
     sLog.outString( "Re-Loading Skill Discovery Table..." );
@@ -4140,6 +4148,13 @@ bool ChatHandler::HandleHideAreaCommand(const char* args)
 bool ChatHandler::HandleBankCommand(const char* /*args*/)
 {
     m_session->SendShowBank( m_session->GetPlayer()->GetGUID() );
+
+    return true;
+}
+
+bool ChatHandler::HandleStableCommand(const char* /*args*/)
+{
+    m_session->SendStablePet(m_session->GetPlayer()->GetGUID());
 
     return true;
 }
