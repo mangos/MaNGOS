@@ -4594,7 +4594,7 @@ void Unit::RemoveSpellAuraHolder(SpellAuraHolder *holder, AuraRemoveMode mode)
     else
         delete holder;
 
-    if (IsChanneledSpell(AurSpellInfo) && caster && caster->GetGUID() != GetGUID())
+    if (mode != AURA_REMOVE_BY_EXPIRE && IsChanneledSpell(AurSpellInfo) && !IsAreaOfEffectSpell(AurSpellInfo) && caster && caster->GetGUID() != GetGUID())
         caster->InterruptSpell(CURRENT_CHANNELED_SPELL);
 }
 
@@ -9569,10 +9569,10 @@ void Unit::ProcDamageAndSpellFor( bool isVictim, Unit * pTarget, uint32 procFlag
                             (spellProcEvent->spellFamilyMask2[i] & classOptions->SpellFamilyFlags2) == 0)
                             continue;
                     }
-                    else if (!spellProcEvent->schoolMask && !triggeredByAura->isAffectedOnSpell(procSpell))
+                    else if (!triggeredByAura->CanProcFrom(procSpell, spellProcEvent->procEx, procExtra, damage != 0))
                         continue;
                 }
-                else if (!triggeredByAura->isAffectedOnSpell(procSpell))
+                else if (!triggeredByAura->CanProcFrom(procSpell, PROC_EX_NONE, procExtra, damage != 0))
                     continue;
             }
 
@@ -10230,7 +10230,7 @@ void Unit::RemoveAurasAtMechanicImmunity(uint32 mechMask, uint32 exceptSpellId, 
             ++iter;
         else if (spell->Attributes & SPELL_ATTR_UNAFFECTED_BY_INVULNERABILITY)
             ++iter;
-        else if (iter->second->HasAuraAndMechanicEffectMask(mechMask))
+        else if (iter->second->HasMechanicMask(mechMask))
         {
             RemoveAurasDueToSpell(spell->Id);
 

@@ -149,7 +149,7 @@ enum ItemFlags2
     ITEM_FLAGS2_CASTER_WEAPON                 = 0x00000200, // uses caster specific dbc file for DPS calculations
 };
 
-enum BAG_FAMILY_MASK
+enum BagFamilyMask
 {
     BAG_FAMILY_MASK_NONE                      = 0x00000000,
     BAG_FAMILY_MASK_ARROWS                    = 0x00000001,

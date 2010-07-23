@@ -342,7 +342,7 @@ pAuraHandler AuraHandler[TOTAL_AURAS]=
     &Aura::HandleUnused,                                    //289 unused (3.2.2a)
     &Aura::HandleAuraModAllCritChance,                      //290 SPELL_AURA_MOD_ALL_CRIT_CHANCE
     &Aura::HandleNoImmediateEffect,                         //291 SPELL_AURA_MOD_QUEST_XP_PCT           implemented in Player::GiveXP
-    &Aura::HandleNULL,                                      //292 call stabled pet
+    &Aura::HandleAuraOpenStable,                            //292 call stabled pet
     &Aura::HandleNULL,                                      //293 3 spells
     &Aura::HandleNULL,                                      //294 2 spells, possible prevent mana regen
     &Aura::HandleUnused,                                    //295 unused (3.2.2a)
@@ -922,6 +922,49 @@ bool Aura::isAffectedOnSpell(SpellEntry const *spell) const
         return true;
     if (ptr[2] & classOpt->SpellFamilyFlags2)
         return true;
+    return false;
+}
+
+bool Aura::CanProcFrom(SpellEntry const *spell, uint32 EventProcEx, uint32 procEx, bool active) const
+{
+    // Check EffectClassMask
+    uint32 const *ptr = getAuraSpellClassMask();
+
+    // if no class mask defined - allow proc
+    if (!((uint64*)ptr)[0] && !ptr[2])
+    {
+        if (IsPassiveSpell(GetSpellProto()) && !(EventProcEx & PROC_EX_EX_TRIGGER_ALWAYS))
+        {
+            // Check for extra req (if none) and hit/crit
+            if (EventProcEx == PROC_EX_NONE)
+            {
+                // No extra req, so can trigger only for active (damage/healing present) and hit/crit
+                if((procEx & (PROC_EX_NORMAL_HIT|PROC_EX_CRITICAL_HIT)) && active)
+                    return true;
+                else
+                    return false;
+            }
+            else // Passive spells hits here only if resist/reflect/immune/evade
+            {
+                // Passive spells can`t trigger if need hit (exclude cases when procExtra include non-active flags)
+                if ((EventProcEx & PROC_EX_NORMAL_HIT & procEx) && !active)
+                    return false;
+            }
+        }
+        return true;
+    }
+    else
+    {
+        // Check family name
+        if (spell->SpellFamilyName != GetSpellProto()->SpellFamilyName)
+            return false;
+
+        if (((uint64*)ptr)[0] & spell->SpellFamilyFlags)
+            return true;
+
+        if (ptr[2] & spell->SpellFamilyFlags2)
+            return true;
+    }
     return false;
 }
 
@@ -7446,6 +7489,19 @@ void Aura::HandleAuraControlVehicle(bool apply, bool Real)
     }
 }
 
+void Aura::HandleAuraOpenStable(bool apply, bool Real)
+{
+    if(!Real || GetTarget()->GetTypeId() != TYPEID_PLAYER || !GetTarget()->IsInWorld())
+        return;
+
+    Player* player = (Player*)GetTarget();
+
+    if (apply)
+        player->GetSession()->SendStablePet(player->GetObjectGuid());
+
+    // client auto close stable dialog at !apply aura
+}
+
 void Aura::HandleAuraConvertRune(bool apply, bool Real)
 {
     if(!Real)
@@ -8774,8 +8830,11 @@ void SpellAuraHolder::RefreshHolder()
     SendAuraUpdate(false);
 }
 
-bool SpellAuraHolder::HasAuraAndMechanicEffect(uint32 mechanic) const
+bool SpellAuraHolder::HasMechanic(uint32 mechanic) const
 {
+    if (mechanic == m_spellProto->Mechanic)
+        return true;
+
     for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
     {
         SpellEffectEntry const* spellEffect = m_spellProto->GetSpellEffect(SpellEffectIndex(i));
@@ -8787,14 +8846,17 @@ bool SpellAuraHolder::HasAuraAndMechanicEffect(uint32 mechanic) const
     return false;
 }
 
-bool SpellAuraHolder::HasAuraAndMechanicEffectMask(uint32 mechanicMask) const
+bool SpellAuraHolder::HasMechanicMask(uint32 mechanicMask) const
 {
+    if (mechanicMask & (1 << (m_spellProto->Mechanic - 1)))
+        return true;
+
     for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
     {
         SpellEffectEntry const* spellEffect = m_spellProto->GetSpellEffect(SpellEffectIndex(i));
         if(!spellEffect)
             continue;
-        if (m_auras[i] && spellEffect->EffectMechanic & mechanicMask)
+        if (m_auras[i] && spellEffect->EffectMechanic && ((1 << (spellEffect->EffectMechanic - 1)) & mechanicMask))
             return true;
     }
     return false;

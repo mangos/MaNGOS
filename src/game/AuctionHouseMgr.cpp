@@ -374,7 +374,7 @@ void AuctionHouseMgr::LoadAuctions()
 
     barGoLink bar( AuctionCount );
 
-    AuctionEntry *aItem;
+    AuctionEntry *auction;
 
     do
     {
@@ -382,58 +382,86 @@ void AuctionHouseMgr::LoadAuctions()
 
         bar.step();
 
-        aItem = new AuctionEntry;
-        aItem->Id = fields[0].GetUInt32();
-        aItem->auctioneer = fields[1].GetUInt32();
-        aItem->item_guidlow = fields[2].GetUInt32();
-        aItem->item_template = fields[3].GetUInt32();
-        aItem->owner = fields[4].GetUInt32();
-        aItem->buyout = fields[5].GetUInt32();
-        aItem->expire_time = fields[6].GetUInt32();
-        aItem->bidder = fields[7].GetUInt32();
-        aItem->bid = fields[8].GetUInt32();
-        aItem->startbid = fields[9].GetUInt32();
-        aItem->deposit = fields[10].GetUInt32();
-
-        CreatureData const* auctioneerData = sObjectMgr.GetCreatureData(aItem->auctioneer);
-        if(!auctioneerData)
-        {
-            aItem->DeleteFromDB();
-            sLog.outError("Auction %u has not a existing auctioneer (GUID : %u)", aItem->Id, aItem->auctioneer);
-            delete aItem;
-            continue;
-        }
-
-        CreatureInfo const* auctioneerInfo = ObjectMgr::GetCreatureTemplate(auctioneerData->id);
-        if(!auctioneerInfo)
-        {
-            aItem->DeleteFromDB();
-            sLog.outError("Auction %u has not a existing auctioneer (GUID : %u Entry: %u)", aItem->Id, aItem->auctioneer,auctioneerData->id);
-            delete aItem;
-            continue;
-        }
-
-        aItem->auctionHouseEntry = AuctionHouseMgr::GetAuctionHouseEntry(auctioneerInfo->faction_A);
-        if(!aItem->auctionHouseEntry)
-        {
-            aItem->DeleteFromDB();
-            sLog.outError("Auction %u has auctioneer (GUID : %u Entry: %u) with wrong faction %u",
-                aItem->Id, aItem->auctioneer,auctioneerData->id,auctioneerInfo->faction_A);
-            delete aItem;
-            continue;
-        }
+        auction = new AuctionEntry;
+        auction->Id = fields[0].GetUInt32();
+        auction->auctioneer = fields[1].GetUInt32();
+        auction->item_guidlow = fields[2].GetUInt32();
+        auction->item_template = fields[3].GetUInt32();
+        auction->owner = fields[4].GetUInt32();
+        auction->buyout = fields[5].GetUInt32();
+        auction->expire_time = fields[6].GetUInt32();
+        auction->bidder = fields[7].GetUInt32();
+        auction->bid = fields[8].GetUInt32();
+        auction->startbid = fields[9].GetUInt32();
+        auction->deposit = fields[10].GetUInt32();
+        auction->auctionHouseEntry = NULL;                  // init later
 
         // check if sold item exists for guid
         // and item_template in fact (GetAItem will fail if problematic in result check in AuctionHouseMgr::LoadAuctionItems)
-        if ( !GetAItem( aItem->item_guidlow ) )
+        Item* pItem = GetAItem(auction->item_guidlow);
+        if (!pItem)
         {
-            aItem->DeleteFromDB();
-            sLog.outError("Auction %u has not a existing item : %u", aItem->Id, aItem->item_guidlow);
-            delete aItem;
+            auction->DeleteFromDB();
+            sLog.outError("Auction %u has not a existing item : %u, deleted", auction->Id, auction->item_guidlow);
+            delete auction;
             continue;
         }
 
-        GetAuctionsMap( auctioneerInfo->faction_A )->AddAuction(aItem);
+        bool success = true;
+
+        CreatureData const* auctioneerData = sObjectMgr.GetCreatureData(auction->auctioneer);
+        if(!auctioneerData)
+        {
+            success = false;
+            sLog.outError("Auction %u has not a existing auctioneer (GUID : %u), will mail to owner (GUID: %u)",
+                auction->Id, auction->auctioneer, auction->owner);
+        }
+
+        CreatureInfo const* auctioneerInfo;
+        if (success)
+        {
+            auctioneerInfo = ObjectMgr::GetCreatureTemplate(auctioneerData->id);
+            if(!auctioneerInfo)
+            {
+                success = false;
+                sLog.outError("Auction %u has not a existing auctioneer (GUID : %u Entry: %u), will mail to owner (GUID: %u)",
+                    auction->Id, auction->auctioneer,auctioneerData->id, auction->owner);
+            }
+        }
+
+        if (success)
+        {
+            auction->auctionHouseEntry = AuctionHouseMgr::GetAuctionHouseEntry(auctioneerInfo->faction_A);
+            if(!auction->auctionHouseEntry)
+            {
+                success = false;
+                sLog.outError("Auction %u has auctioneer (GUID : %u Entry: %u) with wrong faction %u, will mail to owner (GUID: %u)",
+                    auction->Id, auction->auctioneer, auctioneerData->id, auctioneerInfo->faction_A, auction->owner);
+            }
+        }
+
+        if(!success)
+        {
+            // need for send mail, use goblin auctionhouse
+            if (!auction->auctionHouseEntry)
+                auction->auctionHouseEntry = sAuctionHouseStore.LookupEntry(7);
+
+            // Attempt send item back to owner
+            std::ostringstream msgAuctionCanceledOwner;
+            msgAuctionCanceledOwner << auction->item_template << ":0:" << AUCTION_CANCELED << ":0:0";
+
+            // item will deleted or added to received mail list
+            MailDraft(msgAuctionCanceledOwner.str(), "")    // TODO: fix body
+                .AddItem(pItem)
+                .SendMailTo(MailReceiver(auction->owner), auction, MAIL_CHECK_MASK_COPIED);
+
+            RemoveAItem(auction->item_guidlow);
+            auction->DeleteFromDB();
+            delete auction;
+            continue;
+        }
+
+        GetAuctionsMap( auctioneerInfo->faction_A )->AddAuction(auction);
 
     } while (result->NextRow());
     delete result;

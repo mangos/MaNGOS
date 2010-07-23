@@ -20,7 +20,7 @@
 
 #define MAX_AURAS 64                                        // client support up to 255, but it will cause problems with group auras updating
 
-enum AURA_FLAGS
+enum AuraFlags
 {
     AFLAG_NONE              = 0x00,
     AFLAG_EFF_INDEX_0       = 0x01,
@@ -31,13 +31,6 @@ enum AURA_FLAGS
     AFLAG_DURATION          = 0x20,
     AFLAG_UNK2              = 0x40,
     AFLAG_NEGATIVE          = 0x80
-};
-
-//m_schoolAbsorb
-enum DAMAGE_ABSORB_TYPE
-{
-    ALL_DAMAGE_ABSORB       = -2,
-    ONLY_MAGIC_ABSORB       = -1,
 };
 
 enum AuraType
@@ -334,7 +327,7 @@ enum AuraType
     SPELL_AURA_289 = 289,
     SPELL_AURA_MOD_ALL_CRIT_CHANCE = 290,
     SPELL_AURA_MOD_QUEST_XP_PCT = 291,
-    SPELL_AURA_292 = 292,
+    SPELL_AURA_OPEN_STABLE = 292,
     SPELL_AURA_293 = 293,
     SPELL_AURA_294 = 294,
     SPELL_AURA_295 = 295,

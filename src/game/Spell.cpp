@@ -751,6 +751,8 @@ void Spell::prepareDataForTriggerSystem()
     {
         case SPELL_DAMAGE_CLASS_MELEE:
             m_procAttacker = PROC_FLAG_SUCCESSFUL_MELEE_SPELL_HIT;
+            if (m_attackType == OFF_ATTACK)
+                m_procAttacker |= PROC_FLAG_SUCCESSFUL_OFFHAND_HIT;
             m_procVictim   = PROC_FLAG_TAKEN_MELEE_SPELL_HIT;
             break;
         case SPELL_DAMAGE_CLASS_RANGED:
@@ -986,8 +988,10 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
     uint32 procEx       = PROC_EX_NONE;
 
     // drop proc flags in case target not affected negative effects in negative spell
-    // for example caster bonus or animation
-    if (((procAttacker | procVictim) & NEGATIVE_TRIGGER_MASK) && !(target->effectMask & m_negativeEffectMask))
+    // for example caster bonus or animation,
+    // except miss case where will assigned PROC_EX_* flags later
+    if (((procAttacker | procVictim) & NEGATIVE_TRIGGER_MASK) &&
+        !(target->effectMask & m_negativeEffectMask) && missInfo == SPELL_MISS_NONE)
     {
         procAttacker = PROC_FLAG_NONE;
         procVictim   = PROC_FLAG_NONE;
@@ -3659,7 +3663,7 @@ void Spell::WriteSpellGoTargets( WorldPacket * data )
     uint32 miss = 0;
     for(std::list<TargetInfo>::iterator ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
     {
-        if ((*ihit).effectMask == 0)                  // No effect apply - all immuned add state
+        if ((*ihit).effectMask == 0)                        // No effect apply - all immuned add state
         {
             // possibly SPELL_MISS_IMMUNE2 for this??
             ihit->missCondition = SPELL_MISS_IMMUNE2;

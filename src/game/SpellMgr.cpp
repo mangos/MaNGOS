@@ -314,7 +314,7 @@ bool IsNoStackAuraDueToAura(uint32 spellId_1, uint32 spellId_2)
 
     for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
     {
-        for (int32 j = 0; i < MAX_EFFECT_INDEX; ++j)
+        for (int32 j = 0; j < MAX_EFFECT_INDEX; ++j)
         {
             SpellEffectEntry const* spellEffect_1 = spellInfo_1->GetSpellEffect(SpellEffectIndex(i));
             SpellEffectEntry const* spellEffect_2 = spellInfo_2->GetSpellEffect(SpellEffectIndex(j));
@@ -1720,6 +1720,9 @@ bool SpellMgr::canStackSpellRanks(SpellEntry const *spellInfo)
                 // Paladin aura Spell
                 if (spellEffect->Effect == SPELL_EFFECT_APPLY_AREA_AURA_RAID)
                     return false;
+                // Seal of Righteousness, 2 version of same rank
+                if ((spellInfo->SpellFamilyFlags & UI64LIT(0x0000000008000000)) && spellInfo->SpellIconID == 25)
+                    return false;
                 break;
             case SPELLFAMILY_DRUID:
                 // Druid form Spell
@@ -2333,7 +2336,7 @@ SpellEntry const* SpellMgr::SelectAuraRankForLevel(SpellEntry const* spellInfo, 
         if(!spellEffect)
             continue;
         // for simple aura in check apply to any non caster based targets, in rank search mode to any explicit targets
-        if (((spellEffect->Effect == SPELL_EFFECT_APPLY_AURA && 
+        if (((spellEffect->Effect == SPELL_EFFECT_APPLY_AURA &&
             (IsExplicitPositiveTarget(spellEffect->EffectImplicitTargetA) ||
             IsAreaEffectPossitiveTarget(Targets(spellEffect->EffectImplicitTargetA)))) ||
             spellEffect->Effect == SPELL_EFFECT_APPLY_AREA_AURA_PARTY ||
