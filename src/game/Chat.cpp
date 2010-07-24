@@ -87,7 +87,7 @@ ChatCommand * ChatHandler::getCommandTable()
 
     static ChatCommand auctionCommandTable[] =
     {
-        { "aliance",        SEC_ADMINISTRATOR,  false, &ChatHandler::HandleAuctionAlianceCommand,      "", NULL },
+        { "alliance",       SEC_ADMINISTRATOR,  false, &ChatHandler::HandleAuctionAllianceCommand,     "", NULL },
         { "goblin",         SEC_ADMINISTRATOR,  false, &ChatHandler::HandleAuctionGoblinCommand,       "", NULL },
         { "horde",          SEC_ADMINISTRATOR,  false, &ChatHandler::HandleAuctionHordeCommand,        "", NULL },
         { "",               SEC_ADMINISTRATOR,  false, &ChatHandler::HandleAuctionCommand,             "", NULL },

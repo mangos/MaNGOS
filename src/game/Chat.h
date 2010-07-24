@@ -119,7 +119,7 @@ class ChatHandler
         bool HandleAccountSetGmLevelCommand(const char* args);
         bool HandleAccountSetPasswordCommand(const char* args);
 
-        bool HandleAuctionAlianceCommand(const char* args);
+        bool HandleAuctionAllianceCommand(const char* args);
         bool HandleAuctionGoblinCommand(const char* args);
         bool HandleAuctionHordeCommand(const char* args);
         bool HandleAuctionCommand(const char* args);

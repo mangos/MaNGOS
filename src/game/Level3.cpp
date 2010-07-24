@@ -4145,7 +4145,7 @@ bool ChatHandler::HandleHideAreaCommand(const char* args)
     return true;
 }
 
-bool ChatHandler::HandleAuctionAlianceCommand(const char* /*args*/)
+bool ChatHandler::HandleAuctionAllianceCommand(const char* /*args*/)
 {
     m_session->GetPlayer()->SetAuctionAccessMode(m_session->GetPlayer()->GetTeam() != ALLIANCE ? -1 : 0);
     m_session->SendAuctionHello(m_session->GetPlayer());
