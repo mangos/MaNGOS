@@ -119,6 +119,11 @@ class ChatHandler
         bool HandleAccountSetGmLevelCommand(const char* args);
         bool HandleAccountSetPasswordCommand(const char* args);
 
+        bool HandleAuctionAllianceCommand(const char* args);
+        bool HandleAuctionGoblinCommand(const char* args);
+        bool HandleAuctionHordeCommand(const char* args);
+        bool HandleAuctionCommand(const char* args);
+
         bool HandleBanAccountCommand(const char* args);
         bool HandleBanCharacterCommand(const char* args);
         bool HandleBanIPCommand(const char* args);
@@ -400,6 +405,7 @@ class ChatHandler
         bool HandleReloadQuestStartScriptsCommand(const char* args);
         bool HandleReloadQuestTemplateCommand(const char* args);
         bool HandleReloadReservedNameCommand(const char*);
+        bool HandleReloadReputationRewardRateCommand(const char* args);
         bool HandleReloadSkillDiscoveryTemplateCommand(const char* args);
         bool HandleReloadSkillExtraItemTemplateCommand(const char* args);
         bool HandleReloadSkillFishingBaseLevelCommand(const char* args);
