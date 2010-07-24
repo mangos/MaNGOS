@@ -3381,11 +3381,8 @@ void Unit::_UpdateSpells( uint32 time )
                     {
                         if (!aura->GetAuraDuration())
                         {
-                            bool last = aura->IsLastAuraOnHolder();
                             RemoveSingleAuraFromSpellAuraHolder(holder, aura->GetEffIndex(), AURA_REMOVE_BY_EXPIRE);
                             removedAura = true;
-                            if (last)
-                                break;
                         }
                     }
                 }
