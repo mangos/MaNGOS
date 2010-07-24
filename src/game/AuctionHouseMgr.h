@@ -47,7 +47,6 @@ enum AuctionAction
 struct AuctionEntry
 {
     uint32 Id;
-    uint32 auctioneer;                                      // creature low guid
     uint32 item_guidlow;
     uint32 item_template;
     uint32 owner;
