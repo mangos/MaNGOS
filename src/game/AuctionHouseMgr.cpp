@@ -486,8 +486,8 @@ AuctionHouseEntry const* AuctionHouseMgr::GetAuctionHouseEntry(Unit* unit)
     {
         if (unit->GetTypeId() == TYPEID_UNIT)
         {
-            //FIXME: found way for proper auctionhouse selection by another way
-            // AuctionHo use.dbc have faction field with _player_ factions associated with auction house races.
+            // FIXME: found way for proper auctionhouse selection by another way
+            // AuctionHouse.dbc have faction field with _player_ factions associated with auction house races.
             // but no easy way convert creature faction to player race faction for specific city
             uint32 factionTemplateId = unit->getFaction();
             switch(factionTemplateId)
