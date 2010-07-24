@@ -15245,6 +15245,60 @@ void Player::SendQuestUpdateAddCreatureOrGo( Quest const* pQuest, ObjectGuid gui
 /***                   LOAD SYSTEM                     ***/
 /*********************************************************/
 
+bool Player::MinimalLoadFromDB( QueryResult *result, uint32 guid )
+{
+    if (!guid) return;
+
+    bool delete_result = true;
+    if (!result)
+    {
+        //                                        0     1     2           3           4           5    6          7          8          9    10     11    12
+        result = CharacterDatabase.PQuery("SELECT guid, name, position_x, position_y, position_z, map, totaltime, leveltime, at_login, zone, level, race, class FROM characters WHERE guid = '%u'",guid);
+        if (!result)
+            return false;
+    }
+    else
+        delete_result = false;
+
+    sLog.outDebug("Player #%d minimal data loaded",GUID_LOPART(guid));
+
+    Field *fields = result->Fetch();
+
+    Object::_Create( guid, 0, HIGHGUID_PLAYER );
+
+    m_name = fields[1].GetCppString();
+
+    uint8 m_race  = fields[11].GetUInt8();
+    uint8 m_class = fields[12].GetUInt8();
+
+    Relocate(fields[2].GetFloat(),fields[3].GetFloat(),fields[4].GetFloat());
+
+    SetLocationMapId(fields[5].GetUInt32());
+
+    // the instance id is not needed at character enum
+
+    m_Played_time[PLAYED_TIME_TOTAL] = fields[6].GetUInt32();
+    m_Played_time[PLAYED_TIME_LEVEL] = fields[7].GetUInt32();
+
+    m_atLoginFlags = fields[8].GetUInt32();
+
+    // I don't see these used anywhere ..
+    //_LoadGroup();
+
+    //_LoadBoundInstances();
+
+    if (delete_result)
+        delete result;
+
+    for (int i = 0; i < PLAYER_SLOTS_COUNT; ++i)
+        m_items[i] = NULL;
+
+    if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))
+        m_deathState = DEAD;
+
+    return true;
+}
+
 void Player::_LoadDeclinedNames(QueryResult* result)
 {
     if(!result)

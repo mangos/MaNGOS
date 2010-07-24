@@ -37,6 +37,7 @@
 #include "UpdateMask.h"
 #include "Unit.h"
 #include "Language.h"
+#include "AuctionHouseBot.h"
 #include "DBCStores.h"
 #include "BattleGroundMgr.h"
 #include "Item.h"
@@ -959,7 +960,15 @@ void MailDraft::SendReturnToSender(uint32 sender_acc, uint32 sender_guid, uint32
     uint32 deliver_delay = needItemDelay ? sWorld.getConfig(CONFIG_UINT32_MAIL_DELIVERY_DELAY) : 0;
 
     // will delete item or place to receiver mail list
-    SendMailTo(MailReceiver(receiver,receiver_guid), MailSender(MAIL_NORMAL, sender_guid), MAIL_CHECK_MASK_RETURNED, deliver_delay);
+    if (sender_guid == auctionbot.GetAHBplayerGUID())
+    {
+        SendMailTo(MailReceiver(receiver,receiver_guid), MailSender(MAIL_CREATURE, sender_guid), MAIL_CHECK_MASK_RETURNED, deliver_delay);
+    }
+    else
+    {
+        SendMailTo(MailReceiver(receiver,receiver_guid), MailSender(MAIL_NORMAL, sender_guid), MAIL_CHECK_MASK_RETURNED, deliver_delay);
+    }
+
 }
 /**
  * Sends a mail.
@@ -972,6 +981,15 @@ void MailDraft::SendReturnToSender(uint32 sender_acc, uint32 sender_guid, uint32
 void MailDraft::SendMailTo(MailReceiver const& receiver, MailSender const& sender, MailCheckMask checked, uint32 deliver_delay)
 {
     Player* pReceiver = receiver.GetPlayer();               // can be NULL
+
+    if (receiver.GetPlayerGUIDLow() == auctionbot.GetAHBplayerGUID())
+    {
+        if (!m_items.empty())
+        {
+            deleteIncludedItems(true);
+        }
+        return;
+    }
 
     if (pReceiver)
         prepareItems(pReceiver);                            // generate mail template items

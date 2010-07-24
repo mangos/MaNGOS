@@ -123,6 +123,7 @@ class ChatHandler
         bool HandleAuctionGoblinCommand(const char* args);
         bool HandleAuctionHordeCommand(const char* args);
         bool HandleAuctionCommand(const char* args);
+        bool HandleAHBotOptionsCommand(const char* args);
 
         bool HandleBanAccountCommand(const char* args);
         bool HandleBanCharacterCommand(const char* args);
