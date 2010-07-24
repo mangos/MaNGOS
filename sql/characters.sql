@@ -135,11 +135,11 @@ LOCK TABLES `arena_team_stats` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `auctionhouse`
+-- Table structure for table `auction`
 --
 
-DROP TABLE IF EXISTS `auctionhouse`;
-CREATE TABLE `auctionhouse` (
+DROP TABLE IF EXISTS `auction`;
+CREATE TABLE `auction` (
   `id` int(11) unsigned NOT NULL default '0',
   `houseid` int(11) unsigned NOT NULL default '0',
   `itemguid` int(11) unsigned NOT NULL default '0',
@@ -156,12 +156,12 @@ CREATE TABLE `auctionhouse` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `auctionhouse`
+-- Dumping data for table `auction`
 --
 
-LOCK TABLES `auctionhouse` WRITE;
-/*!40000 ALTER TABLE `auctionhouse` DISABLE KEYS */;
-/*!40000 ALTER TABLE `auctionhouse` ENABLE KEYS */;
+LOCK TABLES `auction` WRITE;
+/*!40000 ALTER TABLE `auction` DISABLE KEYS */;
+/*!40000 ALTER TABLE `auction` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
