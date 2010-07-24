@@ -3328,6 +3328,7 @@ void Unit::_UpdateSpells( uint32 time )
                         {
                             RemoveSingleAuraFromSpellAuraHolder(holder, aura->GetEffIndex(), AURA_REMOVE_BY_EXPIRE);
                             removedAura = true;
+                            break;
                         }
                     }
                 }

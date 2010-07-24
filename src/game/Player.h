@@ -620,6 +620,8 @@ enum PlayerExtraFlags
     PLAYER_EXTRA_TAXICHEAT          = 0x0008,
     PLAYER_EXTRA_GM_INVISIBLE       = 0x0010,
     PLAYER_EXTRA_GM_CHAT            = 0x0020,               // Show GM badge in chat messages
+    PLAYER_EXTRA_AUCTION_NEUTRAL    = 0x0040,
+    PLAYER_EXTRA_AUCTION_ENEMY      = 0x0080,               // overwrite PLAYER_EXTRA_AUCTION_NEUTRAL
 
     // other states
     PLAYER_EXTRA_PVP_DEATH          = 0x0100                // store PvP death status until corpse creating.
@@ -1160,6 +1162,19 @@ class MANGOS_DLL_SPEC Player : public Unit
         bool isGMVisible() const { return !(m_ExtraFlags & PLAYER_EXTRA_GM_INVISIBLE); }
         void SetGMVisible(bool on);
         void SetPvPDeath(bool on) { if(on) m_ExtraFlags |= PLAYER_EXTRA_PVP_DEATH; else m_ExtraFlags &= ~PLAYER_EXTRA_PVP_DEATH; }
+
+        // 0 = own auction, -1 = enemy auction, 1 = goblin auction
+        int GetAuctionAccessMode() const { return m_ExtraFlags & PLAYER_EXTRA_AUCTION_ENEMY ? -1 : (m_ExtraFlags & PLAYER_EXTRA_AUCTION_NEUTRAL ? 1 : 0); }
+        void SetAuctionAccessMode(int state)
+        {
+            m_ExtraFlags &= ~ (PLAYER_EXTRA_AUCTION_ENEMY|PLAYER_EXTRA_AUCTION_NEUTRAL);
+
+            if(state < 0)
+                m_ExtraFlags |= PLAYER_EXTRA_AUCTION_ENEMY;
+            else if( state > 0)
+                m_ExtraFlags |= PLAYER_EXTRA_AUCTION_NEUTRAL;
+        }
+
 
         void GiveXP(uint32 xp, Unit* victim);
         void GiveLevel(uint32 level);

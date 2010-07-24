@@ -123,6 +123,8 @@ pkgdata_DATA = \
 	10251_01_mangos_command.sql \
 	10252_01_mangos_reputation_reward_rate.sql \
 	10254_01_characters_auctionhouse.sql \
+	10256_01_mangos_command.sql \
+	10257_01_mangos_command.sql \
 	README
 
 ## Additional files to include when running 'make dist'
@@ -226,4 +228,6 @@ EXTRA_DIST = \
 	10251_01_mangos_command.sql \
 	10252_01_mangos_reputation_reward_rate.sql \
 	10254_01_characters_auctionhouse.sql \
+	10256_01_mangos_command.sql \
+	10257_01_mangos_command.sql \
 	README
