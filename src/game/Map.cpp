@@ -661,11 +661,11 @@ void Map::Remove(Player *player, bool remove)
     CellPair p = MaNGOS::ComputeCellPair(player->GetPositionX(), player->GetPositionY());
     if(p.x_coord >= TOTAL_NUMBER_OF_CELLS_PER_MAP || p.y_coord >= TOTAL_NUMBER_OF_CELLS_PER_MAP)
     {
-
         // invalid coordinates
+        player->ResetMap();
+
         if( remove )
             DeleteFromWorld(player);
-        else player->ResetMap();
 
         return;
     }
@@ -687,9 +687,9 @@ void Map::Remove(Player *player, bool remove)
     SendRemoveTransports(player);
     UpdateObjectVisibility(player,cell,p);
 
+    player->ResetMap();
     if( remove )
         DeleteFromWorld(player);
-    else player->ResetMap();
 }
 
 template<class T>
