@@ -478,41 +478,59 @@ uint32 AuctionHouseMgr::GetAuctionHouseTeam(AuctionHouseEntry const* house)
     }
 }
 
-AuctionHouseEntry const* AuctionHouseMgr::GetAuctionHouseEntry(uint32 factionTemplateId)
+AuctionHouseEntry const* AuctionHouseMgr::GetAuctionHouseEntry(Unit* unit)
 {
     uint32 houseid = 1;                                     // dwarf auction house (used for normal cut/etc percents)
 
     if(!sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_AUCTION))
     {
-        //FIXME: found way for proper auctionhouse selection by another way
-        // AuctionHo use.dbc have faction field with _player_ factions associated with auction house races.
-        // but no easy way convert creature faction to player race faction for specific city
-        switch(factionTemplateId)
+        if (unit->GetTypeId() == TYPEID_UNIT)
         {
-            case   12: houseid = 1; break;                  // human
-            case   29: houseid = 6; break;                  // orc, and generic for horde
-            case   55: houseid = 2; break;                  // dwarf/gnome, and generic for alliance
-            case   68: houseid = 4; break;                  // undead
-            case   80: houseid = 3; break;                  // n-elf
-            case  104: houseid = 5; break;                  // trolls
-            case  120: houseid = 7; break;                  // booty bay, neutral
-            case  474: houseid = 7; break;                  // gadgetzan, neutral
-            case  534: houseid = 2; break;                  // Alliance Generic
-            case  855: houseid = 7; break;                  // everlook, neutral
-            case 1604: houseid = 6; break;                  // b-elfs,
-            case 1638: houseid = 2; break;                  // exodar, alliance
-            default:                                        // for unknown case
+            //FIXME: found way for proper auctionhouse selection by another way
+            // AuctionHo use.dbc have faction field with _player_ factions associated with auction house races.
+            // but no easy way convert creature faction to player race faction for specific city
+            uint32 factionTemplateId = unit->getFaction();
+            switch(factionTemplateId)
             {
-                FactionTemplateEntry const* u_entry = sFactionTemplateStore.LookupEntry(factionTemplateId);
-                if(!u_entry)
-                    houseid = 7;                            // goblin auction house
-                else if(u_entry->ourMask & FACTION_MASK_ALLIANCE)
-                    houseid = 1;                            // human auction house
-                else if(u_entry->ourMask & FACTION_MASK_HORDE)
-                    houseid = 6;                            // orc auction house
-                else
-                    houseid = 7;                            // goblin auction house
-                break;
+                case   12: houseid = 1; break;              // human
+                case   29: houseid = 6; break;              // orc, and generic for horde
+                case   55: houseid = 2; break;              // dwarf/gnome, and generic for alliance
+                case   68: houseid = 4; break;              // undead
+                case   80: houseid = 3; break;              // n-elf
+                case  104: houseid = 5; break;              // trolls
+                case  120: houseid = 7; break;              // booty bay, neutral
+                case  474: houseid = 7; break;              // gadgetzan, neutral
+                case  534: houseid = 2; break;              // Alliance Generic
+                case  855: houseid = 7; break;              // everlook, neutral
+                case 1604: houseid = 6; break;              // b-elfs,
+                case 1638: houseid = 2; break;              // exodar, alliance
+                default:                                    // for unknown case
+                {
+                    FactionTemplateEntry const* u_entry = sFactionTemplateStore.LookupEntry(factionTemplateId);
+                    if(!u_entry)
+                        houseid = 7;                        // goblin auction house
+                    else if(u_entry->ourMask & FACTION_MASK_ALLIANCE)
+                        houseid = 1;                        // human auction house
+                    else if(u_entry->ourMask & FACTION_MASK_HORDE)
+                        houseid = 6;                        // orc auction house
+                    else
+                        houseid = 7;                        // goblin auction house
+                    break;
+                }
+            }
+        }
+        else
+        {
+            Player* player = (Player*)unit;
+            if (player->GetAuctionAccessMode() > 0)
+                houseid = 7;
+            else
+            {
+                switch (((Player*)unit)->GetTeam())
+                {
+                    case ALLIANCE: houseid = player->GetAuctionAccessMode() == 0 ? 1 : 6; break;
+                    case HORDE:    houseid = player->GetAuctionAccessMode() == 0 ? 6 : 1; break;
+                }
             }
         }
     }

@@ -28,6 +28,7 @@
 #include "AuctionHouseMgr.h"
 #include "Mail.h"
 #include "Util.h"
+#include "Chat.h"
 
 // please DO NOT use iterator++, because it is slower than ++iterator!!!
 // post-incrementation is always slower than pre-incrementation !
@@ -53,10 +54,10 @@ void WorldSession::HandleAuctionHelloOpcode( WorldPacket & recv_data )
 }
 
 // this void causes that auction window is opened
-void WorldSession::SendAuctionHello(Creature* unit)
+void WorldSession::SendAuctionHello(Unit* unit)
 {
     // always return pointer
-    AuctionHouseEntry const* ahEntry = AuctionHouseMgr::GetAuctionHouseEntry(unit->getFaction());
+    AuctionHouseEntry const* ahEntry = AuctionHouseMgr::GetAuctionHouseEntry(unit);
 
     WorldPacket data( MSG_AUCTION_HELLO, 12 );
     data << unit->GetObjectGuid();
@@ -154,15 +155,34 @@ void WorldSession::SendAuctionCancelledToBidderMail( AuctionEntry* auction )
 
 AuctionHouseEntry const* WorldSession::GetCheckedAuctionHouseForAuctioneer(ObjectGuid guid)
 {
-    Creature *pCreature = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_AUCTIONEER);
-    if (!pCreature)
+    Unit* auctioneer = NULL;
+
+    // GM case
+    if (guid == GetPlayer()->GetObjectGuid())
     {
-        DEBUG_LOG("Auctioneeer %s accessed in cheating way.", guid.GetString().c_str());
-        return NULL;
+        // command case will return only if player have real access to command
+        // using special access modes (1,-1) done at mode set in command, so not need recheck
+        if (GetPlayer()->GetAuctionAccessMode()==0 && !ChatHandler(GetPlayer()).FindCommand("auction"))
+        {
+            DEBUG_LOG("%s attempt open auction in cheating way.", guid.GetString().c_str());
+            return NULL;
+        }
+
+        auctioneer = GetPlayer();
+    }
+    // auctioneer case
+    else
+    {
+        auctioneer = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_AUCTIONEER);
+        if (!auctioneer)
+        {
+            DEBUG_LOG("Auctioneeer %s accessed in cheating way.", guid.GetString().c_str());
+            return NULL;
+        }
     }
 
     // always return pointer
-    return AuctionHouseMgr::GetAuctionHouseEntry(pCreature->getFaction());
+    return AuctionHouseMgr::GetAuctionHouseEntry(auctioneer);
 }
 
 // this void creates new auction and adds auction to some auctionhouse

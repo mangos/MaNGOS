@@ -141,7 +141,7 @@ class AuctionHouseMgr
         static uint32 GetAuctionDeposit(AuctionHouseEntry const* entry, uint32 time, Item *pItem);
 
         static uint32 GetAuctionHouseTeam(AuctionHouseEntry const* house);
-        static AuctionHouseEntry const* GetAuctionHouseEntry(uint32 factionTemplateId);
+        static AuctionHouseEntry const* GetAuctionHouseEntry(Unit* unit);
 
     public:
         //load first auction items, because of check if item exists, when loading
