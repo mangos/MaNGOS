@@ -8807,12 +8807,6 @@ void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
                 FillInitialWorldState(data,count,0x9f3,0x0);// 9 show
             }
             break;
-        case 3820:                                          // EY
-            if (bg && bg->GetTypeID(true) == BATTLEGROUND_EY)
-                bg->FillInitialWorldStates(data, count);
-            else
-                FillInitialWorldState(data,count, EY_world_states);
-            break;
         case 3968:                                          // Ruins of Lordaeron
             if (bg && bg->GetTypeID() == BATTLEGROUND_RL)
                 bg->FillInitialWorldStates(data, count);
@@ -8824,7 +8818,7 @@ void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
             }
             break;
         case 4378:                                          // Dalaran Severs
-            if (bg && bg->GetTypeID(true) == BATTLEGROUND_DS)
+            if (bg && bg->GetTypeID() == BATTLEGROUND_DS)
                 bg->FillInitialWorldStates(data, count);
             else
             {
@@ -8834,7 +8828,7 @@ void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
             }
             break;
         case 4406:                                          // Ring of Valor
-            if (bg && bg->GetTypeID(true) == BATTLEGROUND_RV)
+            if (bg && bg->GetTypeID() == BATTLEGROUND_RV)
                 bg->FillInitialWorldStates(data, count);
             else
             {
@@ -15247,7 +15241,7 @@ void Player::SendQuestUpdateAddCreatureOrGo( Quest const* pQuest, ObjectGuid gui
 
 bool Player::MinimalLoadFromDB( QueryResult *result, uint32 guid )
 {
-    if (!guid) return;
+    if (!guid) return false;
 
     bool delete_result = true;
     if (!result)
