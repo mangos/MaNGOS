@@ -252,7 +252,10 @@ class AchievementMgr
         void CheckAllAchievementCriteria();
         void SendAllAchievementData();
         void SendRespondInspectAchievements(Player* player);
+
         Player* GetPlayer() { return m_player;}
+
+        bool HasAchievement(uint32 achievement_id) const { return m_completedAchievements.find(achievement_id) != m_completedAchievements.end(); }
 
     private:
         enum ProgressType { PROGRESS_SET, PROGRESS_ACCUMULATE, PROGRESS_HIGHEST };
