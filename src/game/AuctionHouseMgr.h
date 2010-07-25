@@ -24,6 +24,7 @@
 
 class Item;
 class Player;
+class Unit;
 class WorldPacket;
 
 #define MIN_AUCTION_TIME (12*HOUR)
