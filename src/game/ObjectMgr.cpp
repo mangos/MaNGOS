@@ -7640,7 +7640,7 @@ bool PlayerCondition::Meets(Player const * player) const
             if (Quest const* quest = sObjectMgr.GetQuestTemplate(value1))
                 return player->CanTakeQuest(quest, false);
             else
-                false;
+                return false;
         }
         case CONDITION_ACHIEVEMENT:
         {
