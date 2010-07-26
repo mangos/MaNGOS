@@ -1323,8 +1323,8 @@ bool Creature::FallGround()
     if (getDeathState() == DEAD_FALLING)
         return false;
 
-    // Let's do with no vmap because no way to get far distance with vmap high call
-    float tz = GetMap()->GetHeight(GetPositionX(), GetPositionY(), GetPositionZ(), false);
+    // use larger distance for vmap height search than in most other cases
+    float tz = GetMap()->GetHeight(GetPositionX(), GetPositionY(), GetPositionZ(), true, MAX_FALL_DISTANCE);
 
     // Abort too if the ground is very near
     if (fabs(GetPositionZ() - tz) < 0.1f)
@@ -1763,7 +1763,7 @@ bool Creature::LoadCreaturesAddon(bool reload)
             }
 
             SpellAuraHolder *holder = GetSpellAuraHolder(cAura->spell_id, GetGUID());
-                   
+
             bool addedToExisting = true;
             if (!holder)
             {
@@ -1782,7 +1782,7 @@ bool Creature::LoadCreaturesAddon(bool reload)
             }
             else
                 AddSpellAuraHolder(holder);
-         
+
             DEBUG_FILTER_LOG(LOG_FILTER_SPELL_CAST, "Spell: %u - Aura %u added to creature (GUIDLow: %u Entry: %u )", cAura->spell_id, AdditionalSpellInfo->EffectApplyAuraName[EFFECT_INDEX_0],GetGUIDLow(),GetEntry());
         }
     }
