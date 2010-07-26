@@ -34,6 +34,7 @@
 
 class Player;
 class Spell;
+struct CreatureInfo;
 struct SpellModifier;
 
 // only used in code
