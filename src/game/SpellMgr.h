@@ -967,8 +967,12 @@ class SpellMgr
         }
 
         bool IsRankSpellDueToSpell(SpellEntry const *spellInfo_1,uint32 spellId_2) const;
-        static bool canStackSpellRanks(SpellEntry const *spellInfo);
         bool IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) const;
+        bool canStackSpellRanksInSpellBook(SpellEntry const *spellInfo) const;
+        bool IsRankedSpellNonStackableInSpellBook(SpellEntry const *spellInfo) const
+        {
+            return !canStackSpellRanksInSpellBook(spellInfo) && GetSpellRank(spellInfo->Id) != 0;
+        }
 
         SpellEntry const* SelectAuraRankForLevel(SpellEntry const* spellInfo, uint32 Level) const;
 
@@ -1104,6 +1108,8 @@ class SpellMgr
         void LoadSpellAreas();
 
     private:
+        bool LoadPetDefaultSpells_helper(CreatureInfo const* cInfo, PetDefaultSpellsEntry& petDefSpells);
+
         SpellScriptTarget  mSpellScriptTarget;
         SpellChainMap      mSpellChains;
         SpellChainMapNext  mSpellChainsNext;

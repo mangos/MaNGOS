@@ -3011,7 +3011,7 @@ bool Player::addSpell(uint32 spell_id, bool active, bool learning, bool dependen
     {
         uint32 next_active_spell_id = 0;
         // fix activate state for non-stackable low rank (and find next spell for !active case)
-        if(!SpellMgr::canStackSpellRanks(spellInfo) && sSpellMgr.GetSpellRank(spellInfo->Id) != 0)
+        if(sSpellMgr.IsRankedSpellNonStackableInSpellBook(spellInfo))
         {
             SpellChainMapNext const& nextMap = sSpellMgr.GetSpellChainNext();
             for(SpellChainMapNext::const_iterator next_itr = nextMap.lower_bound(spell_id); next_itr != nextMap.upper_bound(spell_id); ++next_itr)
@@ -3149,7 +3149,7 @@ bool Player::addSpell(uint32 spell_id, bool active, bool learning, bool dependen
         newspell.disabled  = disabled;
 
         // replace spells in action bars and spellbook to bigger rank if only one spell rank must be accessible
-        if(newspell.active && !newspell.disabled && !SpellMgr::canStackSpellRanks(spellInfo) && sSpellMgr.GetSpellRank(spellInfo->Id) != 0)
+        if(newspell.active && !newspell.disabled && sSpellMgr.IsRankedSpellNonStackableInSpellBook(spellInfo))
         {
             for( PlayerSpellMap::iterator itr2 = m_spells.begin(); itr2 != m_spells.end(); ++itr2 )
             {
@@ -3546,8 +3546,8 @@ void Player::removeSpell(uint32 spell_id, bool disabled, bool learn_low_rank, bo
             if(learn_low_rank)
                 learnSpell(prev_id, false);
         }
-        // if ranked non-stackable spell: need activate lesser rank and update dendence state
-        else if (cur_active && !SpellMgr::canStackSpellRanks(spellInfo) && sSpellMgr.GetSpellRank(spellInfo->Id) != 0)
+        // if ranked non-stackable spell: need activate lesser rank and update dependence state
+        else if (cur_active && sSpellMgr.IsRankedSpellNonStackableInSpellBook(spellInfo))
         {
             // need manually update dependence state (learn spell ignore like attempts)
             PlayerSpellMap::iterator prev_itr = m_spells.find(prev_id);
