@@ -234,12 +234,17 @@ void InstanceResetScheduler::LoadResetTimes()
         if (period < DAY)
             period = DAY;
 
+        // the reset_delay must be not more 7 days
+        if (period > 7*DAY)
+            period = 7*DAY;
+
         time_t t = GetResetTimeFor(mapid,difficulty);
         if(!t)
         {
             // initialize the reset time
             t = today + period + diff;
             CharacterDatabase.DirectPExecute("INSERT INTO instance_reset VALUES ('%u','%u','"UI64FMTD"')", mapid, difficulty, (uint64)t);
+
         }
 
         if(t < now)
