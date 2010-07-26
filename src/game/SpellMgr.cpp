@@ -1327,7 +1327,7 @@ void SpellMgr::LoadSpellProcItemEnchant()
 
 struct DoSpellBonuses
 {
-    DoSpellBonuses(SpellBonusMap& _spellBonusMap, SpellBonusEntry const& _spellBonus) : spellBonusMap(spellBonusMap), spellBonus(_spellBonus) {}
+    DoSpellBonuses(SpellBonusMap& _spellBonusMap, SpellBonusEntry const& _spellBonus) : spellBonusMap(_spellBonusMap), spellBonus(_spellBonus) {}
     void operator() (uint32 spell_id) { spellBonusMap[spell_id] = spellBonus; }
 
     SpellBonusMap& spellBonusMap;
