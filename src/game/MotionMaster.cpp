@@ -112,7 +112,8 @@ MotionMaster::DirectClean(bool reset, bool all)
     {
         MovementGenerator *curr = top();
         pop();
-        curr->Finalize(*i_owner);
+        if (i_owner && i_owner->IsInWorld())
+            curr->Finalize(*i_owner);
         if (!isStatic( curr ))
             delete curr;
     }
