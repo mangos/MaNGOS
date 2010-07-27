@@ -58,9 +58,9 @@ CreatureEventAI::CreatureEventAI(Creature *c ) : CreatureAI(c)
     CreatureEventAI_Event_Map::const_iterator creatureEventsItr = sEventAIMgr.GetCreatureEventAIMap().find(m_creature->GetEntry());
     if (creatureEventsItr != sEventAIMgr.GetCreatureEventAIMap().end())
     {
+        uint32 events_count = 0;
         for (CreatureEventAI_Event_Vec::const_iterator i = (*creatureEventsItr).second.begin(); i != (*creatureEventsItr).second.end(); ++i)
         {
-
             //Debug check
             #ifndef MANGOS_DEBUG
             if ((*i).event_flags & EFLAG_DEBUG_ONLY)
@@ -70,16 +70,38 @@ CreatureEventAI::CreatureEventAI(Creature *c ) : CreatureAI(c)
             {
                 if ((1 << (m_creature->GetMap()->GetSpawnMode()+1)) & (*i).event_flags)
                 {
-                    //event flagged for instance mode
-                    m_CreatureEventAIList.push_back(CreatureEventAIHolder(*i));
+                    ++events_count;
                 }
             }
             else
-                m_CreatureEventAIList.push_back(CreatureEventAIHolder(*i));
+                ++events_count;
         }
         //EventMap had events but they were not added because they must be for instance
-        if (m_CreatureEventAIList.empty())
+        if (events_count == 0)
             sLog.outError("CreatureEventAI: Creature %u has events but no events added to list because of instance flags.", m_creature->GetEntry());
+        else
+        {
+            m_CreatureEventAIList.reserve(events_count);
+            for (CreatureEventAI_Event_Vec::const_iterator i = (*creatureEventsItr).second.begin(); i != (*creatureEventsItr).second.end(); ++i)
+            {
+
+                //Debug check
+                #ifndef MANGOS_DEBUG
+                if ((*i).event_flags & EFLAG_DEBUG_ONLY)
+                    continue;
+                #endif
+                if (m_creature->GetMap()->IsDungeon())
+                {
+                    if ((1 << (m_creature->GetMap()->GetSpawnMode()+1)) & (*i).event_flags)
+                    {
+                        //event flagged for instance mode
+                        m_CreatureEventAIList.push_back(CreatureEventAIHolder(*i));
+                    }
+                }
+                else
+                    m_CreatureEventAIList.push_back(CreatureEventAIHolder(*i));
+            }
+        }
     }
     else
         sLog.outError("CreatureEventAI: EventMap for Creature %u is empty but creature is using CreatureEventAI.", m_creature->GetEntry());
