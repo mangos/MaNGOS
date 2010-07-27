@@ -97,7 +97,7 @@ CreatureEventAI::CreatureEventAI(Creature *c ) : CreatureAI(c)
     //Handle Spawned Events
     if (!bEmptyList)
     {
-        for (std::list<CreatureEventAIHolder>::iterator i = CreatureEventAIList.begin(); i != CreatureEventAIList.end(); ++i)
+        for (std::vector<CreatureEventAIHolder>::iterator i = CreatureEventAIList.begin(); i != CreatureEventAIList.end(); ++i)
             if (SpawnedEventConditionsCheck((*i).Event))
                 ProcessEvent(*i);
     }
@@ -794,7 +794,7 @@ void CreatureEventAI::JustRespawned()
         return;
 
     //Handle Spawned Events
-    for (std::list<CreatureEventAIHolder>::iterator i = CreatureEventAIList.begin(); i != CreatureEventAIList.end(); ++i)
+    for (std::vector<CreatureEventAIHolder>::iterator i = CreatureEventAIList.begin(); i != CreatureEventAIList.end(); ++i)
         if (SpawnedEventConditionsCheck((*i).Event))
             ProcessEvent(*i);
 }
@@ -808,7 +808,7 @@ void CreatureEventAI::Reset()
         return;
 
     //Reset all events to enabled
-    for (std::list<CreatureEventAIHolder>::iterator i = CreatureEventAIList.begin(); i != CreatureEventAIList.end(); ++i)
+    for (std::vector<CreatureEventAIHolder>::iterator i = CreatureEventAIList.begin(); i != CreatureEventAIList.end(); ++i)
     {
         CreatureEventAI_Event const& event = (*i).Event;
         switch (event.event_type)
@@ -835,7 +835,7 @@ void CreatureEventAI::JustReachedHome()
 
     if (!bEmptyList)
     {
-        for (std::list<CreatureEventAIHolder>::iterator i = CreatureEventAIList.begin(); i != CreatureEventAIList.end(); ++i)
+        for (std::vector<CreatureEventAIHolder>::iterator i = CreatureEventAIList.begin(); i != CreatureEventAIList.end(); ++i)
         {
             if ((*i).Event.event_type == EVENT_T_REACHED_HOME)
                 ProcessEvent(*i);
@@ -860,7 +860,7 @@ void CreatureEventAI::EnterEvadeMode()
         return;
 
     //Handle Evade events
-    for (std::list<CreatureEventAIHolder>::iterator i = CreatureEventAIList.begin(); i != CreatureEventAIList.end(); ++i)
+    for (std::vector<CreatureEventAIHolder>::iterator i = CreatureEventAIList.begin(); i != CreatureEventAIList.end(); ++i)
     {
         if ((*i).Event.event_type == EVENT_T_EVADE)
             ProcessEvent(*i);
@@ -882,7 +882,7 @@ void CreatureEventAI::JustDied(Unit* killer)
         return;
 
     //Handle Evade events
-    for (std::list<CreatureEventAIHolder>::iterator i = CreatureEventAIList.begin(); i != CreatureEventAIList.end(); ++i)
+    for (std::vector<CreatureEventAIHolder>::iterator i = CreatureEventAIList.begin(); i != CreatureEventAIList.end(); ++i)
     {
         if ((*i).Event.event_type == EVENT_T_DEATH)
             ProcessEvent(*i, killer);
@@ -897,7 +897,7 @@ void CreatureEventAI::KilledUnit(Unit* victim)
     if (bEmptyList || victim->GetTypeId() != TYPEID_PLAYER)
         return;
 
-    for (std::list<CreatureEventAIHolder>::iterator i = CreatureEventAIList.begin(); i != CreatureEventAIList.end(); ++i)
+    for (std::vector<CreatureEventAIHolder>::iterator i = CreatureEventAIList.begin(); i != CreatureEventAIList.end(); ++i)
     {
         if ((*i).Event.event_type == EVENT_T_KILL)
             ProcessEvent(*i, victim);
@@ -909,7 +909,7 @@ void CreatureEventAI::JustSummoned(Creature* pUnit)
     if (bEmptyList || !pUnit)
         return;
 
-    for (std::list<CreatureEventAIHolder>::iterator i = CreatureEventAIList.begin(); i != CreatureEventAIList.end(); ++i)
+    for (std::vector<CreatureEventAIHolder>::iterator i = CreatureEventAIList.begin(); i != CreatureEventAIList.end(); ++i)
     {
         if ((*i).Event.event_type == EVENT_T_SUMMONED_UNIT)
             ProcessEvent(*i, pUnit);
@@ -921,7 +921,7 @@ void CreatureEventAI::SummonedCreatureJustDied(Creature* pUnit)
     if (bEmptyList || !pUnit)
         return;
 
-    for (std::list<CreatureEventAIHolder>::iterator i = CreatureEventAIList.begin(); i != CreatureEventAIList.end(); ++i)
+    for (std::vector<CreatureEventAIHolder>::iterator i = CreatureEventAIList.begin(); i != CreatureEventAIList.end(); ++i)
     {
         if ((*i).Event.event_type == EVENT_T_SUMMONED_JUST_DIED)
             ProcessEvent(*i, pUnit);
@@ -933,7 +933,7 @@ void CreatureEventAI::SummonedCreatureDespawn(Creature* pUnit)
     if (bEmptyList || !pUnit)
         return;
 
-    for (std::list<CreatureEventAIHolder>::iterator i = CreatureEventAIList.begin(); i != CreatureEventAIList.end(); ++i)
+    for (std::vector<CreatureEventAIHolder>::iterator i = CreatureEventAIList.begin(); i != CreatureEventAIList.end(); ++i)
     {
         if ((*i).Event.event_type == EVENT_T_SUMMONED_JUST_DESPAWN)
             ProcessEvent(*i, pUnit);
@@ -945,7 +945,7 @@ void CreatureEventAI::EnterCombat(Unit *enemy)
     //Check for on combat start events
     if (!bEmptyList)
     {
-        for (std::list<CreatureEventAIHolder>::iterator i = CreatureEventAIList.begin(); i != CreatureEventAIList.end(); ++i)
+        for (std::vector<CreatureEventAIHolder>::iterator i = CreatureEventAIList.begin(); i != CreatureEventAIList.end(); ++i)
         {
             CreatureEventAI_Event const& event = (*i).Event;
             switch (event.event_type)
@@ -1003,7 +1003,7 @@ void CreatureEventAI::MoveInLineOfSight(Unit *who)
     //Check for OOC LOS Event
     if (!bEmptyList && !m_creature->getVictim())
     {
-        for (std::list<CreatureEventAIHolder>::iterator itr = CreatureEventAIList.begin(); itr != CreatureEventAIList.end(); ++itr)
+        for (std::vector<CreatureEventAIHolder>::iterator itr = CreatureEventAIList.begin(); itr != CreatureEventAIList.end(); ++itr)
         {
             if ((*itr).Event.event_type == EVENT_T_OOC_LOS)
             {
@@ -1054,7 +1054,7 @@ void CreatureEventAI::SpellHit(Unit* pUnit, const SpellEntry* pSpell)
     if (bEmptyList)
         return;
 
-    for (std::list<CreatureEventAIHolder>::iterator i = CreatureEventAIList.begin(); i != CreatureEventAIList.end(); ++i)
+    for (std::vector<CreatureEventAIHolder>::iterator i = CreatureEventAIList.begin(); i != CreatureEventAIList.end(); ++i)
         if ((*i).Event.event_type == EVENT_T_SPELLHIT)
             //If spell id matches (or no spell id) & if spell school matches (or no spell school)
             if (!(*i).Event.spell_hit.spellId || pSpell->Id == (*i).Event.spell_hit.spellId)
@@ -1079,7 +1079,7 @@ void CreatureEventAI::UpdateAI(const uint32 diff)
             EventDiff += diff;
 
             //Check for time based events
-            for (std::list<CreatureEventAIHolder>::iterator i = CreatureEventAIList.begin(); i != CreatureEventAIList.end(); ++i)
+            for (std::vector<CreatureEventAIHolder>::iterator i = CreatureEventAIList.begin(); i != CreatureEventAIList.end(); ++i)
             {
                 //Decrement Timers
                 if ((*i).Time)
@@ -1343,7 +1343,7 @@ void CreatureEventAI::ReceiveEmote(Player* pPlayer, uint32 text_emote)
     if (bEmptyList)
         return;
 
-    for (std::list<CreatureEventAIHolder>::iterator itr = CreatureEventAIList.begin(); itr != CreatureEventAIList.end(); ++itr)
+    for (std::vector<CreatureEventAIHolder>::iterator itr = CreatureEventAIList.begin(); itr != CreatureEventAIList.end(); ++itr)
     {
         if ((*itr).Event.event_type == EVENT_T_RECEIVE_EMOTE)
         {

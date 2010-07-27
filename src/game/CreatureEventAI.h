@@ -608,7 +608,7 @@ class MANGOS_DLL_SPEC CreatureEventAI : public CreatureAI
         void DoFindFriendlyCC(std::list<Creature*>& _list, float range);
 
                                                             //Holder for events (stores enabled, time, and eventid)
-        std::list<CreatureEventAIHolder> CreatureEventAIList;
+        std::vector<CreatureEventAIHolder> CreatureEventAIList;
         uint32 EventUpdateTime;                             //Time between event updates
         uint32 EventDiff;                                   //Time between the last event call
         bool bEmptyList;
