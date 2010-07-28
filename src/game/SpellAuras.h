@@ -486,8 +486,6 @@ class MANGOS_DLL_SPEC Aura
 
         SpellAuraHolder* const m_spellAuraHolder;
     private:
-        void CleanupTriggeredSpells();
-        bool IsNeedVisibleSlot(Unit const* caster) const;   // helper for check req. visibility slot
         void ReapplyAffectedPassiveAuras(Unit* target, bool owner_mode);
 };
 
