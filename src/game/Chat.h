@@ -105,7 +105,7 @@ class ChatHandler
         bool ShowHelpForSubCommands(ChatCommand *table, char const* cmd);
         ChatCommandSearchResult FindCommand(ChatCommand* table, char const*& text, ChatCommand*& command, ChatCommand** parentCommand = NULL, std::string* cmdNamePtr = NULL, bool allAvailable = false);
 
-        void CheckIntergrity(ChatCommand *table, ChatCommand *parentCommand);
+        void CheckIntegrity(ChatCommand *table, ChatCommand *parentCommand);
         ChatCommand* getCommandTable();
 
         bool HandleAccountCommand(const char* args);
