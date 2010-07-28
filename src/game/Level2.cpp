@@ -982,6 +982,33 @@ bool ChatHandler::HandleLookupFactionCommand(const char* args)
     return true;
 }
 
+bool ChatHandler::HandleModifyPowerTypeCommand(const char* args)
+{
+    if(!*args)
+        return false;
+
+    int32 type = atoi((char*)args);
+
+    if (type < 0 || type >= MAX_POWERS)
+    {
+        SendSysMessage(LANG_BAD_VALUE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    Unit* target = getSelectedUnit();
+    if (!target)
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    target->setPowerType(Powers(type));
+
+    return true;
+}
+
 bool ChatHandler::HandleModifyRepCommand(const char * args)
 {
     if (!*args) return false;

@@ -1693,6 +1693,8 @@ struct TotemCategoryEntry
     uint32    categoryMask;                                 // 19 (compatibility mask for same type: different for totems, compatible from high to low for rods)
 };
 
+#define MAX_VEHICLE_SEAT 8
+
 struct VehicleEntry
 {
     uint32  m_ID;                                           // 0
@@ -1701,7 +1703,7 @@ struct VehicleEntry
     float   m_pitchSpeed;                                   // 3
     float   m_pitchMin;                                     // 4
     float   m_pitchMax;                                     // 5
-    uint32  m_seatID[8];                                    // 6-13
+    uint32  m_seatID[MAX_VEHICLE_SEAT];                     // 6-13
     float   m_mouseLookOffsetPitch;                         // 14
     float   m_cameraFadeDistScalarMin;                      // 15
     float   m_cameraFadeDistScalarMax;                      // 16
@@ -1779,6 +1781,7 @@ struct VehicleSeatEntry
     int32   m_uiSkin;                                       // 44
     uint32  m_flagsB;                                       // 45
                                                             // 46-57 added in 3.1, floats mostly
+    bool IsUsable() const { return m_flags & SEAT_FLAG_USABLE; }
 };
 
 struct WMOAreaTableEntry
@@ -1796,6 +1799,7 @@ struct WMOAreaTableEntry
     uint32 areaId;                                          // 10 link to AreaTableEntry.ID
     //char *Name[16];
     //uint32 nameFlags;
+	
 };
 
 struct WorldMapAreaEntry

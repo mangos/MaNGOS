@@ -671,6 +671,12 @@ void ObjectMgr::LoadCreatureTemplates()
             }
         }
 
+        if (cInfo->powerType >= MAX_POWERS)
+        {
+            sLog.outErrorDb("Creature (Entry: %u) has invalid power type (%u)", cInfo->Entry, cInfo->powerType);
+            const_cast<CreatureInfo*>(cInfo)->powerType = POWER_MANA;
+        }
+
         // use below code for 0-checks for unit_class
         if (!cInfo->unit_class)
             ERROR_DB_STRICT_LOG("Creature (Entry: %u) not has proper unit_class(%u) for creature_template", cInfo->Entry, cInfo->unit_class);
@@ -730,6 +736,17 @@ void ObjectMgr::LoadCreatureTemplates()
             {
                 sLog.outErrorDb("Creature (Entry: %u) has non-existing Spell%d (%u), set to 0", cInfo->Entry, j+1,cInfo->spells[j]);
                 const_cast<CreatureInfo*>(cInfo)->spells[j] = 0;
+            }
+        }
+
+        if (cInfo->VehicleId)
+        {
+            VehicleEntry const* pVehicleEntry = sVehicleStore.LookupEntry(cInfo->VehicleId);
+
+            if (!pVehicleEntry)
+            {
+                sLog.outErrorDb("Creature (Entry: %u) has non-existing VehicleId (%u)", cInfo->Entry, cInfo->VehicleId);
+                const_cast<CreatureInfo*>(cInfo)->VehicleId = 0;
             }
         }
 

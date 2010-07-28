@@ -2681,7 +2681,7 @@ void Aura::HandleAuraMounted(bool apply, bool Real)
         if (minfo)
             display_id = minfo->modelid;
 
-        target->Mount(display_id, GetId());
+        target->Mount(display_id, GetId(), ci->VehicleId);
     }
     else
     {
@@ -3476,7 +3476,7 @@ void Aura::HandleModPossess(bool apply, bool Real)
         {
             ((Creature*)target)->AIM_Initialize();
         }
-        else if(target->GetTypeId() == TYPEID_PLAYER)
+        else if(target->GetTypeId() == TYPEID_PLAYER && !target->GetVehicle())
         {
             ((Player*)target)->SetClientControl(target, 0);
         }
@@ -3509,7 +3509,7 @@ void Aura::HandleModPossess(bool apply, bool Real)
 
         target->SetCharmerGUID(0);
 
-        if(target->GetTypeId() == TYPEID_PLAYER)
+        if(target->GetTypeId() == TYPEID_PLAYER && !target->GetVehicle())
         {
             ((Player*)target)->setFactionForRace(target->getRace());
             ((Player*)target)->SetClientControl(target, 1);
@@ -3854,7 +3854,7 @@ void Aura::HandleAuraModStun(bool apply, bool Real)
         target->clearUnitState(UNIT_STAT_STUNNED);
         target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
 
-        if(!target->hasUnitState(UNIT_STAT_ROOT))         // prevent allow move if have also root effect
+        if(!target->hasUnitState(UNIT_STAT_ROOT | UNIT_STAT_ON_VEHICLE))       // prevent allow move if have also root effect
         {
             if(target->getVictim() && target->isAlive())
                 target->SetTargetGUID(target->getVictim()->GetGUID());
@@ -4082,10 +4082,13 @@ void Aura::HandleAuraModRoot(bool apply, bool Real)
 
         if(target->GetTypeId() == TYPEID_PLAYER)
         {
-            WorldPacket data(SMSG_FORCE_MOVE_ROOT, 10);
-            data << target->GetPackGUID();
-            data << (uint32)2;
-            target->SendMessageToSet(&data, true);
+            if(!target->hasUnitState(UNIT_STAT_ON_VEHICLE))
+            {
+                WorldPacket data(SMSG_FORCE_MOVE_ROOT, 10);
+                data << target->GetPackGUID();
+                data << uint32(2);
+                target->SendMessageToSet(&data, true);
+            }
 
             //Clear unit movement flags
             ((Player*)target)->m_movementInfo.SetMovementFlags(MOVEFLAG_NONE);
@@ -4124,7 +4127,7 @@ void Aura::HandleAuraModRoot(bool apply, bool Real)
 
         target->clearUnitState(UNIT_STAT_ROOT);
 
-        if(!target->hasUnitState(UNIT_STAT_STUNNED))      // prevent allow move if have also stun effect
+        if(!target->hasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_ON_VEHICLE))      // prevent allow move if have also stun effect
         {
             if(target->getVictim() && target->isAlive())
                 target->SetTargetGUID(target->getVictim()->GetGUID());
@@ -6229,7 +6232,7 @@ void Aura::HandleModRatingFromStat(bool apply, bool Real)
 
 void Aura::HandleForceMoveForward(bool apply, bool Real)
 {
-    if(!Real || GetTarget()->GetTypeId() != TYPEID_PLAYER)
+    if(!Real)
         return;
     if(apply)
         GetTarget()->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FORCE_MOVE);
@@ -7686,7 +7689,7 @@ void Aura::HandleAuraControlVehicle(bool apply, bool Real)
     {
         if(Pet *pet = player->GetPet())
             pet->Remove(PET_SAVE_AS_CURRENT);
-        ((Player*)player)->EnterVehicle(vehicle);
+        //((Player*)player)->EnterVehicle(vehicle);
     }
     else
     {
@@ -7695,7 +7698,7 @@ void Aura::HandleAuraControlVehicle(bool apply, bool Real)
         // some SPELL_AURA_CONTROL_VEHICLE auras have a dummy effect on the player - remove them
         player->RemoveAurasDueToSpell(spell->Id);
 
-        ((Player*)player)->ExitVehicle(vehicle);
+        //((Player*)player)->ExitVehicle(vehicle);
     }
 }
 

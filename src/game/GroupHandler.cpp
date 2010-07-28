@@ -796,6 +796,9 @@ void WorldSession::BuildPartyMemberStatsChangedPacket(Player *player, WorldPacke
         else
             *data << uint64(0);
     }
+
+    if (mask & GROUP_UPDATE_FLAG_VEHICLE_SEAT)
+        *data << uint32(player->m_movementInfo.GetTransportDBCSeat());
 }
 
 /*this procedure handles clients CMSG_REQUEST_PARTY_MEMBER_STATS request*/

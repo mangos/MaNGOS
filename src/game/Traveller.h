@@ -83,7 +83,7 @@ inline float Traveller<Creature>::Speed()
 template<>
 inline void Traveller<Creature>::Relocation(float x, float y, float z, float orientation)
 {
-    i_traveller.GetMap()->CreatureRelocation(&i_traveller, x, y, z, orientation);
+    i_traveller.SetPosition(x, y, z, orientation);
 }
 
 template<>
@@ -140,7 +140,7 @@ inline float Traveller<Player>::GetMoveDestinationTo(float x, float y, float z)
 template<>
 inline void Traveller<Player>::Relocation(float x, float y, float z, float orientation)
 {
-    i_traveller.GetMap()->PlayerRelocation(&i_traveller, x, y, z, orientation);
+    i_traveller.SetPosition(x, y, z, orientation);
 }
 
 template<>

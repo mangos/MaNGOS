@@ -3001,7 +3001,7 @@ bool SpellMgr::LoadPetDefaultSpells_helper(CreatureInfo const* cInfo, PetDefault
 
 void SpellMgr::LoadPetDefaultSpells()
 {
-    ASSERT(MAX_CREATURE_SPELL_DATA_SLOT==CREATURE_MAX_SPELLS);
+    ASSERT(MAX_CREATURE_SPELL_DATA_SLOT <= CREATURE_MAX_SPELLS);
 
     mPetDefaultSpellsMap.clear();
 
