@@ -327,7 +327,7 @@ class Guild
         void SetEmblem(uint32 emblemStyle, uint32 emblemColor, uint32 borderStyle, uint32 borderColor, uint32 backgroundColor);
 
         uint32 GetMemberSize() const { return members.size(); }
-        uint32 GetAccountsNumber() const { return m_accountsNumber; }
+        uint32 GetAccountsNumber();
 
         bool LoadGuildFromDB(QueryResult *guildDataResult);
         bool CheckGuildStructure();
@@ -447,7 +447,7 @@ class Guild
         uint32 m_BorderStyle;
         uint32 m_BorderColor;
         uint32 m_BackgroundColor;
-        uint32 m_accountsNumber;
+        uint32 m_accountsNumber;                            // 0 used as marker for need lazy calculation at request
 
         RankList m_Ranks;
 
@@ -470,7 +470,8 @@ class Guild
         uint64 m_GuildBankMoney;
 
     private:
-        void UpdateAccountsNumber();
+        void UpdateAccountsNumber() { m_accountsNumber = 0;}// mark for lazy calculation at request in GetAccountsNumber
+
         // used only from high level Swap/Move functions
         Item*  GetItem(uint8 TabId, uint8 SlotId);
         uint8  CanStoreItem( uint8 tab, uint8 slot, GuildItemPosCountVec& dest, uint32 count, Item *pItem, bool swap = false) const;

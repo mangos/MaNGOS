@@ -822,17 +822,23 @@ void Guild::UpdateLogoutTime(uint64 guid)
 }
 
 /**
- * Updates the number of accounts that are in the guild
+ * Return the number of accounts that are in the guild after possible update if required
  * A player may have many characters in the guild, but with the same account
  */
-void Guild::UpdateAccountsNumber()
+uint32 Guild::GetAccountsNumber()
 {
+    // not need recalculation
+    if (m_accountsNumber)
+        return m_accountsNumber;
+
     //We use a set to be sure each element will be unique
     std::set<uint32> accountsIdSet;
     for (MemberList::const_iterator itr = members.begin(); itr != members.end(); ++itr)
         accountsIdSet.insert(itr->second.accountId);
 
     m_accountsNumber = accountsIdSet.size();
+
+    return m_accountsNumber;
 }
 
 // *************************************************
