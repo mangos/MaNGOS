@@ -129,6 +129,7 @@ typedef std::vector<uint32> AutoSpellList;
 
 #define PET_FOLLOW_DIST  1.0f
 #define PET_DEFAULT_FOLLOW_ANGLE M_PI_F/2
+#define PET_FOLLOW_ANGLE M_PI_F/2
 
 class Player;
 
