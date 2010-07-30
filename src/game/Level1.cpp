@@ -1956,7 +1956,7 @@ bool ChatHandler::HandleSendMailCommand(const char* args)
     std::string subject = msgSubject;
     std::string text    = msgText;
 
-    // from console show not existed sender
+    // from console show nonexistent sender
     MailSender sender(MAIL_NORMAL,m_session ? m_session->GetPlayer()->GetGUIDLow() : 0, MAIL_STATIONERY_GM);
 
     MailDraft(subject, text)

@@ -650,7 +650,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
         pCurrChar->SetRank(fields[1].GetUInt32());
         delete resultGuild;
     }
-    else if(pCurrChar->GetGuildId())                        // clear guild related fields in case wrong data about non existed membership
+    else if(pCurrChar->GetGuildId())                        // clear guild related fields in case wrong data about nonexistent membership
     {
         pCurrChar->SetInGuild(0);
         pCurrChar->SetRank(0);
@@ -675,7 +675,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
         else
         {
             // remove wrong guild data
-            sLog.outError("Player %s (GUID: %u) marked as member not existed guild (id: %u), removing guild membership for player.",pCurrChar->GetName(),pCurrChar->GetGUIDLow(),pCurrChar->GetGuildId());
+            sLog.outError("Player %s (GUID: %u) marked as member of nonexistent guild (id: %u), removing guild membership for player.",pCurrChar->GetName(),pCurrChar->GetGUIDLow(),pCurrChar->GetGuildId());
             pCurrChar->SetInGuild(0);
         }
     }

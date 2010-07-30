@@ -904,7 +904,7 @@ void Creature::SetLootRecipient(Unit *unit)
     // set player for non group case or if group will disbanded
     m_lootRecipientGuid = player->GetObjectGuid();
 
-    // set group for group existed case including if player will leave group at loot time
+    // set group for group existing case including if player will leave group at loot time
     if (Group* group = player->GetGroup())
         m_lootGroupRecipientId = group->GetId();
 

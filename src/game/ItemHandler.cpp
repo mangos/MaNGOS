@@ -1316,7 +1316,7 @@ void WorldSession::HandleSocketOpcode(WorldPacket& recv_data)
                         if (iGemProto->ItemLimitCategory == Gems[j]->GetProto()->ItemLimitCategory)
                             ++limit_newcount;
                     }
-                    // existed gem
+                    // existing gem
                     else if(OldEnchants[j])
                     {
                         if(SpellItemEnchantmentEntry const* enchantEntry = sSpellItemEnchantmentStore.LookupEntry(OldEnchants[j]))

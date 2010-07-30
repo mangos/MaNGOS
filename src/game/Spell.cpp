@@ -547,7 +547,7 @@ void Spell::FillTargetMap()
                 {
                     case TARGET_ALL_ENEMY_IN_AREA:
                         // Note: this hack with search required until GO casting not implemented
-                        // environment damage spells already have around enemies targeting but this not help in case not existed GO casting support
+                        // environment damage spells already have around enemies targeting but this not help in case nonexistent GO casting support
                         // currently each enemy selected explicitly and self cast damage
                         if (m_spellInfo->Effect[i] == SPELL_EFFECT_ENVIRONMENTAL_DAMAGE)
                         {
@@ -2741,7 +2741,7 @@ void Spell::cast(bool skipCheck)
         return;
     }
 
-    // update pointers base at GUIDs to prevent access to non-existed already object
+    // update pointers base at GUIDs to prevent access to already nonexistent object
     UpdatePointers();
 
     // cancel at lost main target unit

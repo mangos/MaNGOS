@@ -375,7 +375,7 @@ MotionMaster::MoveTaxiFlight(uint32 path, uint32 pathnode)
         }
         else
         {
-            sLog.outError("%s attempt taxi to (not existed Path %u node %u)",
+            sLog.outError("%s attempt taxi to (nonexistent Path %u node %u)",
                 i_owner->GetObjectGuid().GetString().c_str(), path, pathnode );
         }
     }

@@ -186,7 +186,7 @@ void PlayerTaxi::LoadTaxiMask(const char* data)
     for (iter = tokens.begin(), index = 0;
         (index < TaxiMaskSize) && (iter != tokens.end()); ++iter, ++index)
     {
-        // load and set bits only for existed taxi nodes
+        // load and set bits only for existing taxi nodes
         m_taximask[index] = sTaxiNodesMask[index] & uint32(atol((*iter).c_str()));
     }
 }
@@ -196,7 +196,7 @@ void PlayerTaxi::AppendTaximaskTo( ByteBuffer& data, bool all )
     if(all)
     {
         for (uint8 i=0; i<TaxiMaskSize; ++i)
-            data << uint32(sTaxiNodesMask[i]);              // all existed nodes
+            data << uint32(sTaxiNodesMask[i]);              // all existing nodes
     }
     else
     {
@@ -2977,11 +2977,11 @@ bool Player::addSpell(uint32 spell_id, bool active, bool learning, bool dependen
         // do character spell book cleanup (all characters)
         if(!IsInWorld() && !learning)                       // spell load case
         {
-            sLog.outError("Player::addSpell: Non-existed in SpellStore spell #%u request, deleting for all characters in `character_spell`.",spell_id);
+            sLog.outError("Player::addSpell: nonexistent in SpellStore spell #%u request, deleting for all characters in `character_spell`.",spell_id);
             CharacterDatabase.PExecute("DELETE FROM character_spell WHERE spell = '%u'",spell_id);
         }
         else
-            sLog.outError("Player::addSpell: Non-existed in SpellStore spell #%u request.",spell_id);
+            sLog.outError("Player::addSpell: nonexistent in SpellStore spell #%u request.",spell_id);
 
         return false;
     }
@@ -4149,7 +4149,7 @@ TrainerSpellState Player::GetTrainerSpellState(TrainerSpell const* trainer_spell
  */
 void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmChars, bool deleteFinally)
 {
-    // for not existed account avoid update realm
+    // for nonexistent account avoid update realm
     if (accountId == 0)
         updateRealmChars = false;
 
@@ -4983,7 +4983,7 @@ void Player::HandleBaseModValue(BaseModGroup modGroup, BaseModType modType, floa
 {
     if(modGroup >= BASEMOD_END || modType >= MOD_END)
     {
-        sLog.outError("ERROR in HandleBaseModValue(): non existed BaseModGroup of wrong BaseModType!");
+        sLog.outError("ERROR in HandleBaseModValue(): nonexistent BaseModGroup of wrong BaseModType!");
         return;
     }
 
@@ -5020,7 +5020,7 @@ float Player::GetBaseModValue(BaseModGroup modGroup, BaseModType modType) const
 {
     if(modGroup >= BASEMOD_END || modType > MOD_END)
     {
-        sLog.outError("trial to access non existed BaseModGroup or wrong BaseModType!");
+        sLog.outError("trial to access nonexistent BaseModGroup or wrong BaseModType!");
         return 0.0f;
     }
 
@@ -5979,7 +5979,7 @@ ActionButton* Player::addActionButton(uint8 spec, uint8 button, uint32 action, u
     if (spec == GetActiveSpec() && !IsActionButtonDataValid(button,action,type,this))
         return NULL;
 
-    // it create new button (NEW state) if need or return existed
+    // it create new button (NEW state) if need or return existing
     ActionButton& ab = m_actionButtons[spec][button];
 
     // set data and update to CHANGED if not NEW
@@ -9462,7 +9462,7 @@ uint8 Player::_CanStoreItem_InBag( uint8 bag, ItemPosCountVec &dest, ItemPrototy
     if (bag==skip_bag)
         return EQUIP_ERR_ITEM_DOESNT_GO_INTO_BAG;
 
-    // skip not existed bag or self targeted bag
+    // skip nonexistent bag or self targeted bag
     Bag* pBag = (Bag*)GetItemByPos( INVENTORY_SLOT_BAG_0, bag );
     if (!pBag || pBag==pSrcItem)
         return EQUIP_ERR_ITEM_DOESNT_GO_INTO_BAG;
@@ -10423,7 +10423,7 @@ uint8 Player::CanUnequipItem( uint16 pos, bool swap ) const
 
     Item* pItem = GetItemByPos(pos);
 
-    // Applied only to existed equipped item
+    // Applied only to existing equipped item
     if( !pItem )
         return EQUIP_ERR_OK;
 
@@ -11244,7 +11244,7 @@ void Player::MoveItemToInventory(ItemPosCountVec const& dest, Item* pItem, bool 
     // store item
     Item* pLastItem = StoreItem(dest, pItem, update);
 
-    // only set if not merged to existed stack (pItem can be deleted already but we can compare pointers any way)
+    // only set if not merged to existing stack (pItem can be deleted already but we can compare pointers any way)
     if(pLastItem == pItem)
     {
         // update owner for last item (this can be original item with wrong owner
@@ -11576,7 +11576,7 @@ void Player::SplitItem( uint16 src, uint16 dst, uint32 count )
         return;
     }
 
-    // not let split more existed items (can be only at cheating)
+    // not let split more existing items (can be only at cheating)
     if(pSrcItem->GetCount() < count)
     {
         SendEquipError( EQUIP_ERR_TRIED_TO_SPLIT_MORE_THAN_COUNT, pSrcItem, NULL );
@@ -16026,7 +16026,7 @@ void Player::_LoadMails(QueryResult *result)
 
         if(m->mailTemplateId && !sMailTemplateStore.LookupEntry(m->mailTemplateId))
         {
-            sLog.outError( "Player::_LoadMail - Mail (%u) have not existed MailTemplateId (%u), remove at load", m->messageID, m->mailTemplateId);
+            sLog.outError( "Player::_LoadMail - Mail (%u) have nonexistent MailTemplateId (%u), remove at load", m->messageID, m->mailTemplateId);
             m->mailTemplateId = 0;
         }
 
@@ -16381,14 +16381,14 @@ void Player::_LoadBoundInstances(QueryResult *result)
             MapEntry const* mapEntry = sMapStore.LookupEntry(mapId);
             if(!mapEntry || !mapEntry->IsDungeon())
             {
-                sLog.outError("_LoadBoundInstances: player %s(%d) has bind to not existed or not dungeon map %d", GetName(), GetGUIDLow(), mapId);
+                sLog.outError("_LoadBoundInstances: player %s(%d) has bind to nonexistent or not dungeon map %d", GetName(), GetGUIDLow(), mapId);
                 CharacterDatabase.PExecute("DELETE FROM character_instance WHERE guid = '%d' AND instance = '%d'", GetGUIDLow(), instanceId);
                 continue;
             }
 
             if(difficulty >= MAX_DIFFICULTY)
             {
-                sLog.outError("_LoadBoundInstances: player %s(%d) has bind to not existed difficulty %d instance for map %u", GetName(), GetGUIDLow(), difficulty, mapId);
+                sLog.outError("_LoadBoundInstances: player %s(%d) has bind to nonexistent difficulty %d instance for map %u", GetName(), GetGUIDLow(), difficulty, mapId);
                 CharacterDatabase.PExecute("DELETE FROM character_instance WHERE guid = '%d' AND instance = '%d'", GetGUIDLow(), instanceId);
                 continue;
             }
@@ -16396,7 +16396,7 @@ void Player::_LoadBoundInstances(QueryResult *result)
             MapDifficulty const* mapDiff = GetMapDifficultyData(mapId,Difficulty(difficulty));
             if(!mapDiff)
             {
-                sLog.outError("_LoadBoundInstances: player %s(%d) has bind to not existed difficulty %d instance for map %u", GetName(), GetGUIDLow(), difficulty, mapId);
+                sLog.outError("_LoadBoundInstances: player %s(%d) has bind to nonexistent difficulty %d instance for map %u", GetName(), GetGUIDLow(), difficulty, mapId);
                 CharacterDatabase.PExecute("DELETE FROM character_instance WHERE guid = '%d' AND instance = '%d'", GetGUIDLow(), instanceId);
                 continue;
             }
@@ -18913,7 +18913,7 @@ void Player::UpdatePotionCooldown(Spell* spell)
     // Call not from spell cast, send cooldown event for item spells if no in combat
     if(!spell)
     {
-        // spell/item pair let set proper cooldown (except not existed charged spell cooldown spellmods for potions)
+        // spell/item pair let set proper cooldown (except nonexistent charged spell cooldown spellmods for potions)
         if(ItemPrototype const* proto = ObjectMgr::GetItemPrototype(m_lastPotionId))
             for(int idx = 0; idx < 5; ++idx)
                 if(proto->Spells[idx].SpellId && proto->Spells[idx].SpellTrigger == ITEM_SPELLTRIGGER_ON_USE)

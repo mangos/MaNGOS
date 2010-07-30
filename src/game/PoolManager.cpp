@@ -407,7 +407,7 @@ void PoolGroup<GameObject>::Spawn1Object(PoolObject* obj, bool instantly)
     {
         sObjectMgr.AddGameobjectToGrid(obj->guid, data);
         // Spawn if necessary (loaded grids only)
-        // this base map checked as non-instanced and then only existed
+        // this base map checked as non-instanced and then only existing
         Map* map = const_cast<Map*>(sMapMgr.CreateBaseMap(data->mapid));
         // We use current coords to unspawn, not spawn coords since creature can have changed grid
         // (avoid work for instances until implemented support)

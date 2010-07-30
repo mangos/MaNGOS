@@ -486,7 +486,7 @@ void WorldSession::HandleAuctionRemoveItem( WorldPacket & recv_data )
         }
         else
         {
-            sLog.outError("Auction id: %u has non-existed item (item guid : %u)!!!", auction->Id, auction->item_guidlow);
+            sLog.outError("Auction id: %u has nonexistent item (item guid : %u)!!!", auction->Id, auction->item_guidlow);
             SendAuctionCommandResult( 0, AUCTION_CANCEL, AUCTION_INTERNAL_ERROR );
             return;
         }
