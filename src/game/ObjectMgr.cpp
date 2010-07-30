@@ -589,76 +589,6 @@ void ObjectMgr::LoadCreatureTemplates()
         if (!factionTemplate)
             sLog.outErrorDb("Creature (Entry: %u) has nonexistent faction_H template (%u)", cInfo->Entry, cInfo->faction_H);
 
-        // used later for scale
-        CreatureDisplayInfoEntry const* displayScaleEntry = NULL;
-
-        if (cInfo->ModelId[0])
-        {
-            CreatureDisplayInfoEntry const* displayEntry = sCreatureDisplayInfoStore.LookupEntry(cInfo->ModelId[0]);
-            if(!displayEntry)
-            {
-                sLog.outErrorDb("Creature (Entry: %u) has nonexistent modelid_1 (%u), can crash client", cInfo->Entry, cInfo->ModelId[0]);
-                const_cast<CreatureInfo*>(cInfo)->ModelId[0] = 0;
-            }
-            else if(!displayScaleEntry)
-                displayScaleEntry = displayEntry;
-
-            CreatureModelInfo const* minfo = sCreatureModelStorage.LookupEntry<CreatureModelInfo>(cInfo->ModelId[0]);
-            if (!minfo)
-                sLog.outErrorDb("Creature (Entry: %u) are using modelid_1 (%u), but creature_model_info are missing for this model.", cInfo->Entry, cInfo->ModelId[0]);
-        }
-
-        if (cInfo->ModelId[1])
-        {
-            CreatureDisplayInfoEntry const* displayEntry = sCreatureDisplayInfoStore.LookupEntry(cInfo->ModelId[1]);
-            if(!displayEntry)
-            {
-                sLog.outErrorDb("Creature (Entry: %u) has nonexistent modelid_2 (%u), can crash client", cInfo->Entry, cInfo->ModelId[1]);
-                const_cast<CreatureInfo*>(cInfo)->ModelId[1] = 0;
-            }
-            else if(!displayScaleEntry)
-                displayScaleEntry = displayEntry;
-
-            CreatureModelInfo const* minfo = sCreatureModelStorage.LookupEntry<CreatureModelInfo>(cInfo->ModelId[1]);
-            if (!minfo)
-                sLog.outErrorDb("Creature (Entry: %u) are using modelid_2 (%u), but creature_model_info are missing for this model.", cInfo->Entry, cInfo->ModelId[1]);
-        }
-
-        if (cInfo->ModelId[2])
-        {
-            CreatureDisplayInfoEntry const* displayEntry = sCreatureDisplayInfoStore.LookupEntry(cInfo->ModelId[2]);
-            if(!displayEntry)
-            {
-                sLog.outErrorDb("Creature (Entry: %u) has nonexistent modelid_3 (%u), can crash client", cInfo->Entry, cInfo->ModelId[2]);
-                const_cast<CreatureInfo*>(cInfo)->ModelId[2] = 0;
-            }
-            else if(!displayScaleEntry)
-                displayScaleEntry = displayEntry;
-
-            CreatureModelInfo const* minfo = sCreatureModelStorage.LookupEntry<CreatureModelInfo>(cInfo->ModelId[2]);
-            if (!minfo)
-                sLog.outErrorDb("Creature (Entry: %u) are using modelid_3 (%u), but creature_model_info are missing for this model.", cInfo->Entry, cInfo->ModelId[2]);
-        }
-
-        if (cInfo->ModelId[3])
-        {
-            CreatureDisplayInfoEntry const* displayEntry = sCreatureDisplayInfoStore.LookupEntry(cInfo->ModelId[3]);
-            if(!displayEntry)
-            {
-                sLog.outErrorDb("Creature (Entry: %u) has nonexistent modelid_4 (%u), can crash client", cInfo->Entry, cInfo->ModelId[3]);
-                const_cast<CreatureInfo*>(cInfo)->ModelId[3] = 0;
-            }
-            else if(!displayScaleEntry)
-                displayScaleEntry = displayEntry;
-
-            CreatureModelInfo const* minfo = sCreatureModelStorage.LookupEntry<CreatureModelInfo>(cInfo->ModelId[3]);
-            if (!minfo)
-                sLog.outErrorDb("Creature (Entry: %u) are using modelid_4 (%u), but creature_model_info are missing for this model.", cInfo->Entry, cInfo->ModelId[3]);
-        }
-
-        if (!displayScaleEntry)
-            sLog.outErrorDb("Creature (Entry: %u) has nonexistent modelid in modelid_1/modelid_2/modelid_3/modelid_4", cInfo->Entry);
-
         for(int k = 0; k < MAX_KILL_CREDIT; ++k)
         {
             if(cInfo->KillCredit[k])
@@ -670,6 +600,31 @@ void ObjectMgr::LoadCreatureTemplates()
                 }
             }
         }
+
+        // used later for scale
+        CreatureDisplayInfoEntry const* displayScaleEntry = NULL;
+
+        for(int i = 0; i < MAX_CREATURE_MODEL; ++i)
+        {
+            if (cInfo->ModelId[i])
+            {
+                CreatureDisplayInfoEntry const* displayEntry = sCreatureDisplayInfoStore.LookupEntry(cInfo->ModelId[i]);
+                if(!displayEntry)
+                {
+                    sLog.outErrorDb("Creature (Entry: %u) has nonexistent modelid_%d (%u), can crash client", cInfo->Entry, i+1, cInfo->ModelId[i]);
+                    const_cast<CreatureInfo*>(cInfo)->ModelId[i] = 0;
+                }
+                else if(!displayScaleEntry)
+                    displayScaleEntry = displayEntry;
+
+                CreatureModelInfo const* minfo = sCreatureModelStorage.LookupEntry<CreatureModelInfo>(cInfo->ModelId[i]);
+                if (!minfo)
+                    sLog.outErrorDb("Creature (Entry: %u) are using modelid_%d (%u), but creature_model_info are missing for this model.", cInfo->Entry, i+1, cInfo->ModelId[i]);
+            }
+        }
+
+        if (!displayScaleEntry)
+            sLog.outErrorDb("Creature (Entry: %u) has nonexistent modelid in modelid_1/modelid_2/modelid_3/modelid_4", cInfo->Entry);
 
         // use below code for 0-checks for unit_class
         if (!cInfo->unit_class)

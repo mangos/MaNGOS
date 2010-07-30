@@ -184,12 +184,12 @@ void WorldSession::HandleCreatureQueryOpcode( WorldPacket & recv_data )
         data << uint32(ci->rank);                           // Creature Rank (elite, boss, etc)
         data << uint32(ci->KillCredit[0]);                  // new in 3.1, kill credit
         data << uint32(ci->KillCredit[1]);                  // new in 3.1, kill credit
-        data << uint32(ci->ModelId[0]);                     //
-        data << uint32(ci->ModelId[1]);                     //
-        data << uint32(ci->ModelId[2]);                     //
-        data << uint32(ci->ModelId[3]);                     //
-        data << float(ci->unk16);                           // unk
-        data << float(ci->unk17);                           // unk
+
+        for(int i = 0; i < MAX_CREATURE_MODEL; ++i)
+            data << uint32(ci->ModelId[i]);
+
+        data << float(ci->unk16);                           // health modifier
+        data << float(ci->unk17);                           // power modifier
         data << uint8(ci->RacialLeader);
         for(uint32 i = 0; i < 6; ++i)
             data << uint32(ci->questItems[i]);              // itemId[6], quest drop

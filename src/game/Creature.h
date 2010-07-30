@@ -59,6 +59,7 @@ enum CreatureFlagsExtra
 #endif
 
 #define MAX_KILL_CREDIT 2
+#define MAX_CREATURE_MODEL 4
 
 // from `creature_template` table
 struct CreatureInfo
@@ -66,7 +67,7 @@ struct CreatureInfo
     uint32  Entry;
     uint32  DifficultyEntry[MAX_DIFFICULTY - 1];
     uint32  KillCredit[MAX_KILL_CREDIT];
-    uint32  ModelId[4];
+    uint32  ModelId[MAX_CREATURE_MODEL];
     char*   Name;
     char*   SubName;
     char*   IconName;
