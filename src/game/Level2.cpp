@@ -1591,7 +1591,7 @@ bool ChatHandler::HandleNpcSetMoveTypeCommand(const char* args)
         }
     }
 
-    // now lowguid is low guid really existed creature
+    // now lowguid is low guid really existing creature
     // and pCreature point (maybe) to this creature or NULL
 
     MovementGeneratorType move_type;
@@ -4626,7 +4626,7 @@ bool ChatHandler::HandleTitlesSetMaskCommand(const char* args)
         if (CharTitlesEntry const* tEntry = sCharTitlesStore.LookupEntry(i))
             titles2 &= ~(uint64(1) << tEntry->bit_index);
 
-    titles &= ~titles2;                                     // remove not existed titles
+    titles &= ~titles2;                                     // remove nonexistent titles
 
     target->SetUInt64Value(PLAYER__FIELD_KNOWN_TITLES, titles);
     SendSysMessage(LANG_DONE);

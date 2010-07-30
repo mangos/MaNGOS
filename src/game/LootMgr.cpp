@@ -153,7 +153,7 @@ void LootStore::LoadLootTable()
                 }
             }
             // else is empty - template Id and iter are the same
-            // finally iter refers to already existed or just created <entry, LootTemplate>
+            // finally iter refers to already existing or just created <entry, LootTemplate>
 
             // Adds current row to the template
             tab->second->AddEntry(storeitem);

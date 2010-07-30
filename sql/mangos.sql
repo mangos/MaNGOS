@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_10286_01_mangos_creature_addon` bit(1) default NULL
+  `required_10289_02_mangos_creature_model_info` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -964,6 +964,8 @@ CREATE TABLE `creature_model_info` (
   `combat_reach` float NOT NULL default '0',
   `gender` tinyint(3) unsigned NOT NULL default '2',
   `modelid_other_gender` mediumint(8) unsigned NOT NULL default '0',
+  `modelid_alternative` mediumint(8) unsigned NOT NULL default '0',
+  `modelid_other_team` mediumint(8) unsigned NOT NULL default '0',
   PRIMARY KEY  (`modelid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Creature System (Model related info)';
 
@@ -974,27 +976,27 @@ CREATE TABLE `creature_model_info` (
 LOCK TABLES `creature_model_info` WRITE;
 /*!40000 ALTER TABLE `creature_model_info` DISABLE KEYS */;
 INSERT INTO `creature_model_info` VALUES
-(49, 0.3060, 1.5, 0, 50),
-(50, 0.2080, 1.5, 1, 49),
-(51, 0.3720, 1.5, 0, 52),
-(52, 0.2360, 1.5, 1, 51),
-(53, 0.3470, 1.5, 0, 54),
-(54, 0.3470, 1.5, 1, 53),
-(55, 0.3890, 1.5, 0, 56),
-(56, 0.3060, 1.5, 1, 55),
-(57, 0.3830, 1.5, 0, 58),
-(58, 0.3830, 1.5, 1, 57),
-(59, 0.9747, 1.5, 0, 60),
-(60, 0.8725, 1.5, 1, 59),
-(1478, 0.3060, 1.5, 0, 1479),
-(1479, 0.3060, 1.5, 1, 1478),
-(1563, 0.3519, 1.5, 0, 1564),
-(1564, 0.3519, 1.5, 1, 1563),
-(10045, 1.0000, 1.5, 2, 0),
-(15475, 0.3830, 1.5, 1, 15476),
-(15476, 0.3830, 1.5, 0, 15475),
-(16125, 1.0000, 1.5, 0, 16126),
-(16126, 1.0000, 1.5, 1, 16125);
+(49, 0.3060, 1.5, 0, 50, 0, 0),
+(50, 0.2080, 1.5, 1, 49, 0, 0),
+(51, 0.3720, 1.5, 0, 52, 0, 0),
+(52, 0.2360, 1.5, 1, 51, 0, 0),
+(53, 0.3470, 1.5, 0, 54, 0, 0),
+(54, 0.3470, 1.5, 1, 53, 0, 0),
+(55, 0.3890, 1.5, 0, 56, 0, 0),
+(56, 0.3060, 1.5, 1, 55, 0, 0),
+(57, 0.3830, 1.5, 0, 58, 0, 0),
+(58, 0.3830, 1.5, 1, 57, 0, 0),
+(59, 0.9747, 1.5, 0, 60, 0, 0),
+(60, 0.8725, 1.5, 1, 59, 0, 0),
+(1478, 0.3060, 1.5, 0, 1479, 0, 0),
+(1479, 0.3060, 1.5, 1, 1478, 0, 0),
+(1563, 0.3519, 1.5, 0, 1564, 0, 0),
+(1564, 0.3519, 1.5, 1, 1563, 0, 0),
+(10045, 1.0000, 1.5, 2, 0, 0, 0),
+(15475, 0.3830, 1.5, 1, 15476, 0, 0),
+(15476, 0.3830, 1.5, 0, 15475, 0, 0),
+(16125, 1.0000, 1.5, 0, 16126, 0, 0),
+(16126, 1.0000, 1.5, 1, 16125, 0, 0);
 /*!40000 ALTER TABLE `creature_model_info` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1146,10 +1148,10 @@ CREATE TABLE `creature_template` (
   `difficulty_entry_3` mediumint(8) unsigned NOT NULL default '0',
   `KillCredit1` int(11) unsigned NOT NULL default '0',
   `KillCredit2` int(11) unsigned NOT NULL default '0',
-  `modelid_A` mediumint(8) unsigned NOT NULL default '0',
-  `modelid_A2` mediumint(8) unsigned NOT NULL default '0',
-  `modelid_H` mediumint(8) unsigned NOT NULL default '0',
-  `modelid_H2` mediumint(8) unsigned NOT NULL default '0',
+  `modelid_1` mediumint(8) unsigned NOT NULL default '0',
+  `modelid_2` mediumint(8) unsigned NOT NULL default '0',
+  `modelid_3` mediumint(8) unsigned NOT NULL default '0',
+  `modelid_4` mediumint(8) unsigned NOT NULL default '0',
   `name` char(100) NOT NULL default '0',
   `subname` char(100) default NULL,
   `IconName` char(100) default NULL,
@@ -1232,7 +1234,7 @@ CREATE TABLE `creature_template` (
 LOCK TABLES `creature_template` WRITE;
 /*!40000 ALTER TABLE `creature_template` DISABLE KEYS */;
 INSERT INTO `creature_template` VALUES
-(1,0,0,0,0,0,10045,0,10045,0,'Waypoint(Only GM can see it)','Visual',NULL,0,1,1,64,64,0,0,5,35,35,0,0.91,1.14286,1,0,2,3,0,10,1,2000,2200,8,4096,0,0,0,0,0,0,1,2,100,8,5242886,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,'',0,3,1,1,0,0,0,0,0,0,0,0,1,0,0,130,'');
+(1,0,0,0,0,0,10045,0,0,0,'Waypoint(Only GM can see it)','Visual',NULL,0,1,1,64,64,0,0,5,35,35,0,0.91,1.14286,1,0,2,3,0,10,1,2000,2200,8,4096,0,0,0,0,0,0,1,2,100,8,5242886,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,'',0,3,1,1,0,0,0,0,0,0,0,0,1,0,0,130,'');
 /*!40000 ALTER TABLE `creature_template` ENABLE KEYS */;
 UNLOCK TABLES;
 

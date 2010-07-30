@@ -121,9 +121,9 @@ class MANGOS_DLL_SPEC Database
         virtual unsigned long escape_string(char *to, const char *from, unsigned long length) { strncpy(to,from,length); return length; }
         void escape_string(std::string& str);
 
-        // must be called before first query in thread (one time for thread using one from existed Database objects)
+        // must be called before first query in thread (one time for thread using one from existing Database objects)
         virtual void ThreadStart();
-        // must be called before finish thread run (one time for thread using one from existed Database objects)
+        // must be called before finish thread run (one time for thread using one from existing Database objects)
         virtual void ThreadEnd();
 
         // sets the result queue of the current thread, be careful what thread you call this from

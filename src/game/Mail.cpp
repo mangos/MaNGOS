@@ -114,7 +114,7 @@ void WorldSession::HandleSendMail(WorldPacket & recv_data )
 
     if (!rc)
     {
-        DETAIL_LOG("Player %u is sending mail to %s (GUID: not existed!) with subject %s and body %s includes %u items, %u copper and %u COD copper with unk1 = %u, unk2 = %u",
+        DETAIL_LOG("Player %u is sending mail to %s (GUID: nonexistent!) with subject %s and body %s includes %u items, %u copper and %u COD copper with unk1 = %u, unk2 = %u",
             pl->GetGUIDLow(), receiver.c_str(), subject.c_str(), body.c_str(), items_count, money, COD, unk1, unk2);
         pl->SendMailResult(0, MAIL_SEND, MAIL_ERR_RECIPIENT_NOT_FOUND);
         return;
@@ -386,7 +386,7 @@ void WorldSession::HandleMailReturnToSender(WorldPacket & recv_data )
     CharacterDatabase.CommitTransaction();
     pl->RemoveMail(mailId);
 
-    // send back only to existed players and simple drop for other cases
+    // send back only to existing players and simple drop for other cases
     if (m->messageType == MAIL_NORMAL && m->sender)
     {
         MailDraft draft(m->subject, m->body);
@@ -824,7 +824,7 @@ MailSender::MailSender( Object* sender, MailStationery stationery ) : m_statione
             break;
         default:
             m_messageType = MAIL_NORMAL;
-            m_senderId = 0;                                 // will show mail from not existed player
+            m_senderId = 0;                                 // will show mail from nonexistent player
             sLog.outError( "MailSender::MailSender - Mail have unexpected sender typeid (%u)", sender->GetTypeId());
             break;
     }
