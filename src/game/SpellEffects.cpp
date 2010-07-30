@@ -1012,6 +1012,21 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     m_caster->CastSpell(m_caster, 23782, true);
                     m_caster->CastSpell(m_caster, 23783, true);
                     return;
+                case 24930:                                 // Hallow's End Treat
+                {
+                    uint32 spell_id = 0;
+
+                    switch(urand(1,4))
+                    {
+                        case 1: spell_id = 24924; break;    // Larger and Orange
+                        case 2: spell_id = 24925; break;    // Skeleton
+                        case 3: spell_id = 24926; break;    // Pirate
+                        case 4: spell_id = 24927; break;    // Ghost
+                    }
+
+                    m_caster->CastSpell(m_caster, spell_id, true);
+                    return;
+                }
                 case 25860:                                 // Reindeer Transformation
                 {
                     if (!m_caster->HasAuraType(SPELL_AURA_MOUNTED))
