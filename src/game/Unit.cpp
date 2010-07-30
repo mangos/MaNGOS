@@ -4611,6 +4611,11 @@ void Unit::RemoveAura(Aura *Aur, AuraRemoveMode mode)
 
     DEBUG_FILTER_LOG(LOG_FILTER_SPELL_CAST, "Aura %u now is remove mode %d",Aur->GetModifier()->m_auraname, mode);
 
+    // aura _MUST_ be remove from holder before unapply.
+    // un-apply code expected that aura not find by diff searches
+    // in another case it can be double removed for example, if target die/etc in un-apply process.
+    Aur->GetHolder()->RemoveAura(Aur->GetEffIndex());
+
     // some auras also need to apply modifier (on caster) on remove
     if (mode == AURA_REMOVE_BY_DELETE)
     {
@@ -4628,22 +4633,12 @@ void Unit::RemoveAura(Aura *Aur, AuraRemoveMode mode)
     else
         Aur->ApplyModifier(false,true);
 
-    Aur->GetHolder()->RemoveAura(Aur->GetEffIndex());
-
     // If aura in use (removed from code that plan access to it data after return)
     // store it in aura list with delayed deletion
     if (Aur->IsInUse())
         m_deletedAuras.push_back(Aur);
     else
         delete Aur;
-
-
-    // only way correctly remove all auras from list
-    /*if( m_Auras.empty() )
-        i = m_Auras.end();
-    else
-        i = m_Auras.begin();*/
-
 }
 
 void Unit::RemoveAllAuras(AuraRemoveMode mode /*= AURA_REMOVE_BY_DEFAULT*/)
