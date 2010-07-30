@@ -1383,7 +1383,7 @@ uint32 ObjectMgr::AddCreData(uint32 entry, uint32 team, uint32 mapId, float x, f
     CreatureData& data = NewOrExistCreatureData(guid);
     data.id = entry;
     data.mapid = mapId;
-    data.displayid = 0;
+    data.modelid_override = 0;
     data.equipmentId = cInfo->equipmentId;
     data.posX = x;
     data.posY = y;
