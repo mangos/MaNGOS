@@ -779,12 +779,12 @@ void GameEventMgr::ChangeEquipOrModel(int16 event_id, bool activate)
         CreatureData& data2 = sObjectMgr.NewOrExistCreatureData(itr->first);
         if (activate)
         {
-            data2.displayid = itr->second.modelid;
+            data2.modelid_override = itr->second.modelid;
             data2.equipmentId = itr->second.equipment_id;
         }
         else
         {
-            data2.displayid = itr->second.modelid_prev;
+            data2.modelid_override = itr->second.modelid_prev;
             data2.equipmentId = itr->second.equipement_id_prev;
         }
     }

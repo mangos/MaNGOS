@@ -245,8 +245,17 @@ bool Creature::InitEntry(uint32 Entry, uint32 team, const CreatureData *data )
 
     display_id = minfo->modelid;                            // it can be different (for another gender)
 
-    SetDisplayId(display_id);
     SetNativeDisplayId(display_id);
+
+    // special case for totems (model for team==HORDE is stored in creature_template as the default)
+    if (team == ALLIANCE && cinfo->type == CREATURE_TYPE_TOTEM)
+    {
+        uint32 modelid_tmp = sObjectMgr.GetCreatureModelOtherTeamModel(display_id);
+        display_id = modelid_tmp ? modelid_tmp : display_id;
+    }
+
+    // normally the same as native, see above for the exeption
+    SetDisplayId(display_id);
 
     SetByteValue(UNIT_FIELD_BYTES_0, 2, minfo->gender);
 
@@ -929,27 +938,27 @@ void Creature::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask)
     CreatureInfo const *cinfo = GetCreatureInfo();
     if (cinfo)
     {
-        if (displayId != cinfo->DisplayID_A[0] && displayId != cinfo->DisplayID_A[1] &&
-            displayId != cinfo->DisplayID_H[0] && displayId != cinfo->DisplayID_H[1])
+        if (displayId != cinfo->ModelId[0] && displayId != cinfo->ModelId[1] &&
+            displayId != cinfo->ModelId[2] && displayId != cinfo->ModelId[3])
         {
-            if (cinfo->DisplayID_A[0])
-                if (CreatureModelInfo const *minfo = sObjectMgr.GetCreatureModelInfo(cinfo->DisplayID_A[0]))
-                    if(displayId == minfo->modelid_other_gender)
+            if (cinfo->ModelId[0])
+                if (CreatureModelInfo const *minfo = sObjectMgr.GetCreatureModelInfo(cinfo->ModelId[0]))
+                    if (displayId == minfo->modelid_other_gender)
                         displayId = 0;
 
-            if (displayId && cinfo->DisplayID_A[1])
-                if (CreatureModelInfo const *minfo = sObjectMgr.GetCreatureModelInfo(cinfo->DisplayID_A[1]))
-                    if(displayId == minfo->modelid_other_gender)
+            if (displayId && cinfo->ModelId[1])
+                if (CreatureModelInfo const *minfo = sObjectMgr.GetCreatureModelInfo(cinfo->ModelId[1]))
+                    if (displayId == minfo->modelid_other_gender)
                         displayId = 0;
 
-            if (displayId && cinfo->DisplayID_H[0])
-                if (CreatureModelInfo const *minfo = sObjectMgr.GetCreatureModelInfo(cinfo->DisplayID_H[0]))
-                    if(displayId == minfo->modelid_other_gender)
+            if (displayId && cinfo->ModelId[2])
+                if (CreatureModelInfo const *minfo = sObjectMgr.GetCreatureModelInfo(cinfo->ModelId[2]))
+                    if (displayId == minfo->modelid_other_gender)
                         displayId = 0;
 
-            if (displayId && cinfo->DisplayID_H[1])
-                if (CreatureModelInfo const *minfo = sObjectMgr.GetCreatureModelInfo(cinfo->DisplayID_H[1]))
-                    if(displayId == minfo->modelid_other_gender)
+            if (displayId && cinfo->ModelId[3])
+                if (CreatureModelInfo const *minfo = sObjectMgr.GetCreatureModelInfo(cinfo->ModelId[3]))
+                    if (displayId == minfo->modelid_other_gender)
                         displayId = 0;
         }
         else
@@ -960,7 +969,7 @@ void Creature::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask)
     data.id = GetEntry();
     data.mapid = mapid;
     data.phaseMask = phaseMask;
-    data.displayid = displayId;
+    data.modelid_override = displayId;
     data.equipmentId = GetEquipmentId();
     data.posX = GetPositionX();
     data.posY = GetPositionY();

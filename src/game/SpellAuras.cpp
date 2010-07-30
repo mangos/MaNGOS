@@ -3076,7 +3076,7 @@ void Aura::HandleAuraTransform(bool apply, bool Real)
                 sLog.outError("Auras: unknown creature id = %d (only need its modelid) Form Spell Aura Transform in Spell ID = %d", m_modifier.m_miscvalue, GetId());
             }
             else
-                model_id = ci->DisplayID_A[0];              // Will use the default model here
+                model_id = sObjectMgr.ChooseDisplayId(0,ci);// Will use the default model here
 
             // Polymorph (sheep/penguin case)
             if (GetSpellProto()->SpellFamilyName == SPELLFAMILY_MAGE && GetSpellProto()->SpellIconID == 82)

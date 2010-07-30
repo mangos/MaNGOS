@@ -184,10 +184,10 @@ void WorldSession::HandleCreatureQueryOpcode( WorldPacket & recv_data )
         data << uint32(ci->rank);                           // Creature Rank (elite, boss, etc)
         data << uint32(ci->KillCredit[0]);                  // new in 3.1, kill credit
         data << uint32(ci->KillCredit[1]);                  // new in 3.1, kill credit
-        data << uint32(ci->DisplayID_A[0]);                 // modelid_male1
-        data << uint32(ci->DisplayID_H[0]);                 // modelid_female1 ?
-        data << uint32(ci->DisplayID_A[1]);                 // modelid_male2 ?
-        data << uint32(ci->DisplayID_H[1]);                 // modelid_femmale2 ?
+        data << uint32(ci->ModelId[0]);                     //
+        data << uint32(ci->ModelId[1]);                     //
+        data << uint32(ci->ModelId[2]);                     //
+        data << uint32(ci->ModelId[3]);                     //
         data << float(ci->unk16);                           // unk
         data << float(ci->unk17);                           // unk
         data << uint8(ci->RacialLeader);
