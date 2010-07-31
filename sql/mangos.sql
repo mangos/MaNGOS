@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_10289_02_mangos_creature_model_info` bit(1) default NULL
+  `required_10299_01_mangos_event_id_scripts` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -1415,6 +1415,26 @@ CREATE TABLE `creature_ai_texts` (
 LOCK TABLES `creature_ai_texts` WRITE;
 /*!40000 ALTER TABLE `creature_ai_texts` DISABLE KEYS */;
 /*!40000 ALTER TABLE `creature_ai_texts` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `event_id_scripts`
+--
+
+DROP TABLE IF EXISTS `event_id_scripts`;
+CREATE TABLE `event_id_scripts` (
+  `id` mediumint(8) NOT NULL,
+  `ScriptName` char(64) NOT NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Script library scripted events';
+
+--
+-- Dumping data for table `event_id_scripts`
+--
+
+LOCK TABLES `event_id_scripts` WRITE;
+/*!40000 ALTER TABLE `event_id_scripts` DISABLE KEYS */;
+/*!40000 ALTER TABLE `event_id_scripts` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
