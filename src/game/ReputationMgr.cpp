@@ -194,12 +194,6 @@ void ReputationMgr::SendInitialReputations()
     m_player->SendDirectMessage(&data);
 }
 
-void ReputationMgr::SendStates() const
-{
-    for(FactionStateList::const_iterator itr = m_factions.begin(); itr != m_factions.end(); ++itr)
-        SendState(&(itr->second));
-}
-
 void ReputationMgr::SendVisible(FactionState const* faction) const
 {
     if(m_player->GetSession()->PlayerLoading())
