@@ -402,7 +402,6 @@ class MANGOS_DLL_SPEC WorldSession
         void HandleAreaTriggerOpcode(WorldPacket& recvPacket);
 
         void HandleSetFactionAtWar( WorldPacket & recv_data );
-        void HandleSetFactionCheat( WorldPacket & recv_data );
         void HandleSetWatchedFactionOpcode(WorldPacket & recv_data);
         void HandleSetFactionInactiveOpcode(WorldPacket & recv_data);
 

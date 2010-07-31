@@ -121,7 +121,6 @@ class ReputationMgr
         void SendInitialReputations();
         void SendForceReactions();
         void SendState(FactionState const* faction) const;
-        void SendStates() const;
 
     private:                                                // internal helper functions
         void Initialize();
