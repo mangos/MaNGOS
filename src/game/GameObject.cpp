@@ -912,7 +912,9 @@ void GameObject::Use(Unit* user)
             if (GetGOInfo()->chest.eventId)
             {
                 DEBUG_LOG("Chest ScriptStart id %u for GO %u", GetGOInfo()->chest.eventId, GetDBTableGUIDLow());
-                GetMap()->ScriptsStart(sEventScripts, GetGOInfo()->chest.eventId, user, this);
+
+                if (!Script->ProcessEventId(GetGOInfo()->chest.eventId, user, this, false))
+                    GetMap()->ScriptsStart(sEventScripts, GetGOInfo()->chest.eventId, user, this);
             }
 
             // triggering linked GO
@@ -1016,7 +1018,9 @@ void GameObject::Use(Unit* user)
                 if (info->goober.eventId)
                 {
                     DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "Goober ScriptStart id %u for GO entry %u (GUID %u).", info->goober.eventId, GetEntry(), GetDBTableGUIDLow());
-                    GetMap()->ScriptsStart(sEventScripts, info->goober.eventId, player, this);
+
+                    if (!Script->ProcessEventId(info->goober.eventId, player, this, false))
+                        GetMap()->ScriptsStart(sEventScripts, info->goober.eventId, player, this);
                 }
 
                 // possible quest objective for active quests
@@ -1077,7 +1081,10 @@ void GameObject::Use(Unit* user)
                 player->SendCinematicStart(info->camera.cinematicId);
 
             if (info->camera.eventID)
-                GetMap()->ScriptsStart(sEventScripts, info->camera.eventID, player, this);
+            {
+                if (!Script->ProcessEventId(info->camera.eventID, player, this, false))
+                    GetMap()->ScriptsStart(sEventScripts, info->camera.eventID, player, this);
+            }
 
             return;
         }
