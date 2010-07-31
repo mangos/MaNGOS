@@ -320,7 +320,7 @@ OpcodeHandler opcodeTable[NUM_MSG_TYPES] =
     /*0x123*/ { "SMSG_SET_FACTION_VISIBLE",                     STATUS_NEVER,    &WorldSession::Handle_ServerSide               },
     /*0x124*/ { "SMSG_SET_FACTION_STANDING",                    STATUS_NEVER,    &WorldSession::Handle_ServerSide               },
     /*0x125*/ { "CMSG_SET_FACTION_ATWAR",                       STATUS_LOGGEDIN, &WorldSession::HandleSetFactionAtWar           },
-    /*0x126*/ { "CMSG_SET_FACTION_CHEAT",                       STATUS_LOGGEDIN, &WorldSession::HandleSetFactionCheat           },
+    /*0x126*/ { "CMSG_SET_FACTION_CHEAT",                       STATUS_NEVER,    &WorldSession::Handle_Deprecated               },
     /*0x127*/ { "SMSG_SET_PROFICIENCY",                         STATUS_NEVER,    &WorldSession::Handle_ServerSide               },
     /*0x128*/ { "CMSG_SET_ACTION_BUTTON",                       STATUS_LOGGEDIN, &WorldSession::HandleSetActionButtonOpcode     },
     /*0x129*/ { "SMSG_ACTION_BUTTONS",                          STATUS_NEVER,    &WorldSession::Handle_ServerSide               },
