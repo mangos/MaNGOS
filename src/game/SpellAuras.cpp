@@ -1948,6 +1948,16 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         m_modifier.periodictime = 30*IN_MILLISECONDS;
                         m_periodicTimer = m_modifier.periodictime;
                         return;
+                    case 31606:                             // Stormcrow Amulet
+                    {
+                        CreatureInfo const * cInfo = ObjectMgr::GetCreatureTemplate(17970);
+
+                        // we must assume db or script set display id to native at ending flight (if not, target is stuck with this model)
+                        if (cInfo)
+                            target->SetDisplayId(Creature::ChooseDisplayId(0, cInfo));
+
+                        return;
+                    }
                     case 13139:                             // net-o-matic
                         // root to self part of (root_target->charge->root_self sequence
                         if (Unit* caster = GetCaster())
