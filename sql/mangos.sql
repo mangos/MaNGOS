@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_10299_01_mangos_event_id_scripts` bit(1) default NULL
+  `required_10307_03_mangos_scripted_event_id` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -104,26 +104,6 @@ CREATE TABLE `areatrigger_involvedrelation` (
 LOCK TABLES `areatrigger_involvedrelation` WRITE;
 /*!40000 ALTER TABLE `areatrigger_involvedrelation` DISABLE KEYS */;
 /*!40000 ALTER TABLE `areatrigger_involvedrelation` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `areatrigger_scripts`
---
-
-DROP TABLE IF EXISTS `areatrigger_scripts`;
-CREATE TABLE `areatrigger_scripts` (
-    `entry` MEDIUMINT( 8 ) NOT NULL ,
-    `ScriptName` CHAR( 64 ) NOT NULL ,
-    PRIMARY KEY ( `entry` )
-) ENGINE = MYISAM DEFAULT CHARSET=utf8;
-
---
--- Dumping data for table `areatrigger_scripts`
---
-
-LOCK TABLES `areatrigger_scripts` WRITE;
-/*!40000 ALTER TABLE `areatrigger_scripts` DISABLE KEYS */;
-/*!40000 ALTER TABLE `areatrigger_scripts` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -1418,26 +1398,6 @@ LOCK TABLES `creature_ai_texts` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `event_id_scripts`
---
-
-DROP TABLE IF EXISTS `event_id_scripts`;
-CREATE TABLE `event_id_scripts` (
-  `id` mediumint(8) NOT NULL,
-  `ScriptName` char(64) NOT NULL,
-  PRIMARY KEY  (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Script library scripted events';
-
---
--- Dumping data for table `event_id_scripts`
---
-
-LOCK TABLES `event_id_scripts` WRITE;
-/*!40000 ALTER TABLE `event_id_scripts` DISABLE KEYS */;
-/*!40000 ALTER TABLE `event_id_scripts` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `event_scripts`
 --
 
@@ -2130,7 +2090,7 @@ CREATE TABLE `instance_template` (
   `parent` smallint(5) unsigned NOT NULL default '0',
   `levelMin` tinyint(3) unsigned NOT NULL default '0',
   `levelMax` tinyint(3) unsigned NOT NULL default '0',
-  `script` varchar(128) NOT NULL default '',
+  `ScriptName` varchar(128) NOT NULL default '',
   PRIMARY KEY  (`map`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
@@ -14101,6 +14061,46 @@ CREATE TABLE `reserved_name` (
 LOCK TABLES `reserved_name` WRITE;
 /*!40000 ALTER TABLE `reserved_name` DISABLE KEYS */;
 /*!40000 ALTER TABLE `reserved_name` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `scripted_areatrigger`
+--
+
+DROP TABLE IF EXISTS `scripted_areatrigger`;
+CREATE TABLE `scripted_areatrigger` (
+  `entry` MEDIUMINT( 8 ) NOT NULL ,
+  `ScriptName` CHAR( 64 ) NOT NULL ,
+  PRIMARY KEY ( `entry` )
+) ENGINE = MYISAM DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `scripted_areatrigger`
+--
+
+LOCK TABLES `scripted_areatrigger` WRITE;
+/*!40000 ALTER TABLE `scripted_areatrigger` DISABLE KEYS */;
+/*!40000 ALTER TABLE `scripted_areatrigger` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `scripted_event_id`
+--
+
+DROP TABLE IF EXISTS `scripted_event_id`;
+CREATE TABLE `event_id_scripts` (
+  `id` mediumint(8) NOT NULL,
+  `ScriptName` char(64) NOT NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Script library scripted events';
+
+--
+-- Dumping data for table `scripted_event_id`
+--
+
+LOCK TABLES `scripted_event_id` WRITE;
+/*!40000 ALTER TABLE `scripted_event_id` DISABLE KEYS */;
+/*!40000 ALTER TABLE `scripted_event_id` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --

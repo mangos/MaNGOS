@@ -5200,7 +5200,7 @@ void ObjectMgr::LoadTavernAreaTriggers()
 void ObjectMgr::LoadAreaTriggerScripts()
 {
     mAreaTriggerScripts.clear();                            // need for reload case
-    QueryResult *result = WorldDatabase.Query("SELECT entry, ScriptName FROM areatrigger_scripts");
+    QueryResult *result = WorldDatabase.Query("SELECT entry, ScriptName FROM scripted_areatrigger");
 
     uint32 count = 0;
 
@@ -5210,7 +5210,7 @@ void ObjectMgr::LoadAreaTriggerScripts()
         bar.step();
 
         sLog.outString();
-        sLog.outString( ">> Loaded %u areatrigger scripts", count );
+        sLog.outString( ">> Loaded %u scripted areatrigger", count );
         return;
     }
 
@@ -5229,7 +5229,7 @@ void ObjectMgr::LoadAreaTriggerScripts()
         AreaTriggerEntry const* atEntry = sAreaTriggerStore.LookupEntry(Trigger_ID);
         if (!atEntry)
         {
-            sLog.outErrorDb("Table `areatrigger_scripts` has area trigger (ID:%u) not listed in `AreaTrigger.dbc`.", Trigger_ID);
+            sLog.outErrorDb("Table `scripted_areatrigger` has area trigger (ID:%u) not listed in `AreaTrigger.dbc`.", Trigger_ID);
             continue;
         }
 
@@ -5245,7 +5245,7 @@ void ObjectMgr::LoadAreaTriggerScripts()
 void ObjectMgr::LoadEventIdScripts()
 {
     mEventIdScripts.clear();                            // need for reload case
-    QueryResult *result = WorldDatabase.Query("SELECT id, ScriptName FROM event_id_scripts");
+    QueryResult *result = WorldDatabase.Query("SELECT id, ScriptName FROM scripted_event_id");
 
     uint32 count = 0;
 
@@ -5255,7 +5255,7 @@ void ObjectMgr::LoadEventIdScripts()
         bar.step();
 
         sLog.outString();
-        sLog.outString( ">> Loaded %u event id scripts", count );
+        sLog.outString( ">> Loaded %u scripted event id", count );
         return;
     }
 
@@ -5314,7 +5314,7 @@ void ObjectMgr::LoadEventIdScripts()
 
         std::set<uint32>::const_iterator itr = evt_scripts.find(eventId);
         if (itr == evt_scripts.end())
-            sLog.outErrorDb("Table `event_id_scripts` has id %u not referring to any gameobject_template type 10 data2 field, type 3 data6 field, type 13 data 2 field or any spell effect %u or path taxi node data",
+            sLog.outErrorDb("Table `scripted_event_id` has id %u not referring to any gameobject_template type 10 data2 field, type 3 data6 field, type 13 data 2 field or any spell effect %u or path taxi node data",
                 eventId, SPELL_EFFECT_SEND_EVENT);
 
         mEventIdScripts[eventId] = GetScriptId(scriptName);
@@ -5323,7 +5323,7 @@ void ObjectMgr::LoadEventIdScripts()
     delete result;
 
     sLog.outString();
-    sLog.outString( ">> Loaded %u event id scripts", count );
+    sLog.outString( ">> Loaded %u scripted event id", count );
 }
 
 uint32 ObjectMgr::GetNearestTaxiNode( float x, float y, float z, uint32 mapid, uint32 team )
@@ -8859,11 +8859,11 @@ void ObjectMgr::LoadScriptNames()
       "UNION "
       "SELECT DISTINCT(ScriptName) FROM item_template WHERE ScriptName <> '' "
       "UNION "
-      "SELECT DISTINCT(ScriptName) FROM areatrigger_scripts WHERE ScriptName <> '' "
+      "SELECT DISTINCT(ScriptName) FROM scripted_areatrigger WHERE ScriptName <> '' "
       "UNION "
-      "SELECT DISTINCT(ScriptName) FROM event_id_scripts WHERE ScriptName <> '' "
+      "SELECT DISTINCT(ScriptName) FROM scripted_event_id WHERE ScriptName <> '' "
       "UNION "
-      "SELECT DISTINCT(script) FROM instance_template WHERE script <> ''");
+      "SELECT DISTINCT(ScriptName) FROM instance_template WHERE ScriptName <> ''");
 
     if( !result )
     {
