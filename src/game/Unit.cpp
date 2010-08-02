@@ -6198,7 +6198,7 @@ uint32 Unit::SpellDamageBonusDone(Unit *pVictim, SpellEntry const *spellProto, u
             if (spellProto->SpellFamilyFlags & UI64LIT(0x00000080))
             {
                 // Holy Fire
-                if (pVictim->GetAura(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_PRIEST, UI64LIT(0x00100000), NULL))
+                if (pVictim->GetAura(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_PRIEST, UI64LIT(0x00100000)))
                     if (Aura *aur = GetAura(55692, EFFECT_INDEX_0))
                         DoneTotalMod *= (aur->GetModifier()->m_amount+100.0f) / 100.0f;
             }

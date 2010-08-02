@@ -88,7 +88,7 @@ bool GOChooseReward_default(Player* /*player*/, GameObject* /*_GO*/, Quest const
     return false;
 }
 
-bool AreaTrigger_default(Player* /*player*/, AreaTriggerEntry* /*atEntry*/ )
+bool AreaTrigger_default(Player* /*player*/, AreaTriggerEntry const* /*atEntry*/ )
 {
     return false;
 }

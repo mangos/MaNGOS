@@ -1087,6 +1087,9 @@ void World::SetInitialWorldSettings()
     sLog.outString( "Loading AreaTrigger script names..." );
     sObjectMgr.LoadAreaTriggerScripts();
 
+    sLog.outString( "Loading event id script names..." );
+    sObjectMgr.LoadEventIdScripts();
+
     sLog.outString( "Loading Graveyard-zone links...");
     sObjectMgr.LoadGraveyardZones();
 

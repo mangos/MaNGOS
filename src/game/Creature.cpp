@@ -992,25 +992,11 @@ void Creature::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask)
         if (displayId != cinfo->ModelId[0] && displayId != cinfo->ModelId[1] &&
             displayId != cinfo->ModelId[2] && displayId != cinfo->ModelId[3])
         {
-            if (cinfo->ModelId[0])
-                if (CreatureModelInfo const *minfo = sObjectMgr.GetCreatureModelInfo(cinfo->ModelId[0]))
-                    if (displayId == minfo->modelid_other_gender)
-                        displayId = 0;
-
-            if (displayId && cinfo->ModelId[1])
-                if (CreatureModelInfo const *minfo = sObjectMgr.GetCreatureModelInfo(cinfo->ModelId[1]))
-                    if (displayId == minfo->modelid_other_gender)
-                        displayId = 0;
-
-            if (displayId && cinfo->ModelId[2])
-                if (CreatureModelInfo const *minfo = sObjectMgr.GetCreatureModelInfo(cinfo->ModelId[2]))
-                    if (displayId == minfo->modelid_other_gender)
-                        displayId = 0;
-
-            if (displayId && cinfo->ModelId[3])
-                if (CreatureModelInfo const *minfo = sObjectMgr.GetCreatureModelInfo(cinfo->ModelId[3]))
-                    if (displayId == minfo->modelid_other_gender)
-                        displayId = 0;
+            for(int i = 0; i < MAX_CREATURE_MODEL && displayId; ++i)
+                if (cinfo->ModelId[i])
+                    if (CreatureModelInfo const *minfo = sObjectMgr.GetCreatureModelInfo(cinfo->ModelId[i]))
+                        if (displayId == minfo->modelid_other_gender)
+                            displayId = 0;
         }
         else
             displayId = 0;

@@ -42,7 +42,7 @@ struct Script
         pGossipHello(NULL), pGOGossipHello(NULL), pQuestAccept(NULL), pGossipSelect(NULL), pGOGossipSelect(NULL),
         pGossipSelectWithCode(NULL), pGOGossipSelectWithCode(NULL),
         pQuestSelect(NULL), pQuestComplete(NULL), pNPCDialogStatus(NULL), pGODialogStatus(NULL), pChooseReward(NULL),
-        pItemHello(NULL), pGOHello(NULL), pAreaTrigger(NULL), pItemQuestAccept(NULL), pGOQuestAccept(NULL),
+        pItemHello(NULL), pGOHello(NULL), pProcessEventId(NULL), pAreaTrigger(NULL), pItemQuestAccept(NULL), pGOQuestAccept(NULL),
         pGOChooseReward(NULL), pItemUse(NULL), pEffectDummyGameObj(NULL), pEffectDummyCreature(NULL),
         pEffectDummyItem(NULL), pEffectAuraDummy(NULL), GetAI(NULL)
     {}
@@ -64,7 +64,8 @@ struct Script
     bool (*pChooseReward        )(Player *player, Creature *_Creature, Quest const*_Quest, uint32 opt );
     bool (*pItemHello           )(Player *player, Item *_Item, Quest const*_Quest );
     bool (*pGOHello             )(Player *player, GameObject *_GO );
-    bool (*pAreaTrigger         )(Player *player, AreaTriggerEntry* at);
+    bool (*pAreaTrigger         )(Player *player, AreaTriggerEntry const* at);
+    bool (*pProcessEventId      )(uint32 eventId, Object* source, Object* target, bool isStart);
     bool (*pItemQuestAccept     )(Player *player, Item *_Item, Quest const*_Quest );
     bool (*pGOQuestAccept       )(Player *player, GameObject *_GO, Quest const*_Quest );
     bool (*pGOChooseReward      )(Player *player, GameObject *_GO, Quest const*_Quest, uint32 opt );

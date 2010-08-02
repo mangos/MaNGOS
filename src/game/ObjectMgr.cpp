@@ -5200,7 +5200,7 @@ void ObjectMgr::LoadTavernAreaTriggers()
 void ObjectMgr::LoadAreaTriggerScripts()
 {
     mAreaTriggerScripts.clear();                            // need for reload case
-    QueryResult *result = WorldDatabase.Query("SELECT entry, ScriptName FROM areatrigger_scripts");
+    QueryResult *result = WorldDatabase.Query("SELECT entry, ScriptName FROM scripted_areatrigger");
 
     uint32 count = 0;
 
@@ -5210,7 +5210,7 @@ void ObjectMgr::LoadAreaTriggerScripts()
         bar.step();
 
         sLog.outString();
-        sLog.outString( ">> Loaded %u areatrigger scripts", count );
+        sLog.outString( ">> Loaded %u scripted areatrigger", count );
         return;
     }
 
@@ -5229,7 +5229,7 @@ void ObjectMgr::LoadAreaTriggerScripts()
         AreaTriggerEntry const* atEntry = sAreaTriggerStore.LookupEntry(Trigger_ID);
         if (!atEntry)
         {
-            sLog.outErrorDb("Table `areatrigger_scripts` has area trigger (ID:%u) not listed in `AreaTrigger.dbc`.", Trigger_ID);
+            sLog.outErrorDb("Table `scripted_areatrigger` has area trigger (ID:%u) not listed in `AreaTrigger.dbc`.", Trigger_ID);
             continue;
         }
 
@@ -5240,6 +5240,90 @@ void ObjectMgr::LoadAreaTriggerScripts()
 
     sLog.outString();
     sLog.outString( ">> Loaded %u areatrigger scripts", count );
+}
+
+void ObjectMgr::LoadEventIdScripts()
+{
+    mEventIdScripts.clear();                            // need for reload case
+    QueryResult *result = WorldDatabase.Query("SELECT id, ScriptName FROM scripted_event_id");
+
+    uint32 count = 0;
+
+    if (!result)
+    {
+        barGoLink bar( 1 );
+        bar.step();
+
+        sLog.outString();
+        sLog.outString( ">> Loaded %u scripted event id", count );
+        return;
+    }
+
+    barGoLink bar( (int)result->GetRowCount() );
+
+    // TODO: remove duplicate code below, same way to collect event id's used in LoadEventScripts()
+    std::set<uint32> evt_scripts;
+
+    // Load all possible event entries from gameobjects
+    for(uint32 i = 1; i < sGOStorage.MaxEntry; ++i)
+        if (GameObjectInfo const * goInfo = sGOStorage.LookupEntry<GameObjectInfo>(i))
+            if (uint32 eventId = goInfo->GetEventScriptId())
+                evt_scripts.insert(eventId);
+
+    // Load all possible event entries from spells
+    for(uint32 i = 1; i < sSpellStore.GetNumRows(); ++i)
+    {
+        SpellEntry const * spell = sSpellStore.LookupEntry(i);
+        if (spell)
+        {
+            for(int j = 0; j < MAX_EFFECT_INDEX; ++j)
+            {
+                if( spell->Effect[j] == SPELL_EFFECT_SEND_EVENT )
+                {
+                    if (spell->EffectMiscValue[j])
+                        evt_scripts.insert(spell->EffectMiscValue[j]);
+                }
+            }
+        }
+    }
+
+    // Load all possible event entries from taxi path nodes
+    for(size_t path_idx = 0; path_idx < sTaxiPathNodesByPath.size(); ++path_idx)
+    {
+        for(size_t node_idx = 0; node_idx < sTaxiPathNodesByPath[path_idx].size(); ++node_idx)
+        {
+            TaxiPathNodeEntry const& node = sTaxiPathNodesByPath[path_idx][node_idx];
+
+            if (node.arrivalEventID)
+                evt_scripts.insert(node.arrivalEventID);
+
+            if (node.departureEventID)
+                evt_scripts.insert(node.departureEventID);
+        }
+    }
+
+    do
+    {
+        ++count;
+        bar.step();
+
+        Field *fields = result->Fetch();
+
+        uint32 eventId          = fields[0].GetUInt32();
+        const char *scriptName  = fields[1].GetString();
+
+        std::set<uint32>::const_iterator itr = evt_scripts.find(eventId);
+        if (itr == evt_scripts.end())
+            sLog.outErrorDb("Table `scripted_event_id` has id %u not referring to any gameobject_template type 10 data2 field, type 3 data6 field, type 13 data 2 field or any spell effect %u or path taxi node data",
+                eventId, SPELL_EFFECT_SEND_EVENT);
+
+        mEventIdScripts[eventId] = GetScriptId(scriptName);
+    } while( result->NextRow() );
+
+    delete result;
+
+    sLog.outString();
+    sLog.outString( ">> Loaded %u scripted event id", count );
 }
 
 uint32 ObjectMgr::GetNearestTaxiNode( float x, float y, float z, uint32 mapid, uint32 team )
@@ -7624,6 +7708,15 @@ uint32 ObjectMgr::GetAreaTriggerScriptId(uint32 trigger_id)
     return 0;
 }
 
+uint32 ObjectMgr::GetEventIdScriptId(uint32 eventId)
+{
+    EventIdScriptMap::const_iterator i = mEventIdScripts.find(eventId);
+    if (i!= mEventIdScripts.end())
+        return i->second;
+
+    return 0;
+}
+
 // Checks if player meets the condition
 bool PlayerCondition::Meets(Player const * player) const
 {
@@ -8766,9 +8859,11 @@ void ObjectMgr::LoadScriptNames()
       "UNION "
       "SELECT DISTINCT(ScriptName) FROM item_template WHERE ScriptName <> '' "
       "UNION "
-      "SELECT DISTINCT(ScriptName) FROM areatrigger_scripts WHERE ScriptName <> '' "
+      "SELECT DISTINCT(ScriptName) FROM scripted_areatrigger WHERE ScriptName <> '' "
       "UNION "
-      "SELECT DISTINCT(script) FROM instance_template WHERE script <> ''");
+      "SELECT DISTINCT(ScriptName) FROM scripted_event_id WHERE ScriptName <> '' "
+      "UNION "
+      "SELECT DISTINCT(ScriptName) FROM instance_template WHERE ScriptName <> ''");
 
     if( !result )
     {
@@ -8885,6 +8980,11 @@ void ObjectMgr::RemoveArenaTeam( uint32 Id )
 uint32 GetAreaTriggerScriptId(uint32 trigger_id)
 {
     return sObjectMgr.GetAreaTriggerScriptId(trigger_id);
+}
+
+uint32 GetEventIdScriptId(uint32 eventId)
+{
+    return sObjectMgr.GetEventIdScriptId(eventId);
 }
 
 bool LoadMangosStrings(DatabaseType& db, char const* table,int32 start_value, int32 end_value)

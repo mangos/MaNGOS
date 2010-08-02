@@ -6127,7 +6127,19 @@ void Player::CheckAreaExploreAndOutdoor()
     bool isOutdoor;
     uint16 areaFlag = GetBaseMap()->GetAreaFlag(GetPositionX(),GetPositionY(),GetPositionZ(), &isOutdoor);
 
-    if (sWorld.getConfig(CONFIG_BOOL_VMAP_INDOOR_CHECK) && !isOutdoor)
+    if (isOutdoor)
+    {
+        if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING) && GetRestType() == REST_TYPE_IN_TAVERN)
+        {
+            AreaTriggerEntry const* at = sAreaTriggerStore.LookupEntry(inn_trigger_id);
+            if (!at || !IsPointInAreaTriggerZone(at, GetMapId(), GetPositionX(), GetPositionY(), GetPositionZ()))
+            {
+                // Player left inn (REST_TYPE_IN_CITY overrides REST_TYPE_IN_TAVERN, so just clear rest)
+                SetRestType(REST_TYPE_NO);
+            }
+        }
+    }
+    else if (sWorld.getConfig(CONFIG_BOOL_VMAP_INDOOR_CHECK) && !isGameMaster())
         RemoveAurasWithAttribute(SPELL_ATTR_OUTDOORS_ONLY);
 
     if (areaFlag==0xffff)
@@ -6738,20 +6750,9 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea)
 
     if(zone->flags & AREA_FLAG_CAPITAL)                     // in capital city
         SetRestType(REST_TYPE_IN_CITY);
-    else                                                    // anywhere else
-    {
-        if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING))    // but resting (walk from city or maybe in tavern or leave tavern recently)
-        {
-            if (GetRestType()==REST_TYPE_IN_TAVERN)         // has been in tavern. Is still in?
-            {
-                AreaTriggerEntry const* at = sAreaTriggerStore.LookupEntry(inn_trigger_id);
-                if (!at || !IsPointInAreaTriggerZone(at, GetMapId(), GetPositionX(), GetPositionY(), GetPositionY()))
-                    SetRestType(REST_TYPE_NO);
-            }
-            else                                            // not in tavern (leave city then)
-                SetRestType(REST_TYPE_NO);
-        }
-    }
+    else if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING) && GetRestType() != REST_TYPE_IN_TAVERN)
+        // resting and not in tavern (leave city then); tavern leave handled in CheckAreaExploreAndOutdoor
+        SetRestType(REST_TYPE_NO);
 
     // remove items with area/map limitations (delete only for alive player to allow back in ghost mode)
     // if player resurrected at teleport this will be applied in resurrect code
