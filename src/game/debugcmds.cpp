@@ -751,8 +751,8 @@ bool ChatHandler::HandleDebugAnimCommand(const char* args)
     if (!*args)
         return false;
 
-    uint32 anim_id = atoi((char*)args);
-    m_session->GetPlayer()->HandleEmoteCommand(anim_id);
+    uint32 emote_id = atoi((char*)args);
+    m_session->GetPlayer()->HandleEmoteCommand(emote_id);
     return true;
 }
 
