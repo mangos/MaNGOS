@@ -14088,7 +14088,7 @@ UNLOCK TABLES;
 --
 
 DROP TABLE IF EXISTS `scripted_event_id`;
-CREATE TABLE `event_id_scripts` (
+CREATE TABLE `scripted_event_id` (
   `id` mediumint(8) NOT NULL,
   `ScriptName` char(64) NOT NULL,
   PRIMARY KEY  (`id`)
