@@ -1557,7 +1557,6 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         void SetBindPoint(uint64 guid);
         void SendTalentWipeConfirm(uint64 guid);
-        void LearnDualSpec(uint64 guid);
         void RewardRage( uint32 damage, uint32 weaponSpeedHitFactor, bool attacker );
         void SendPetSkillWipeConfirm();
         void CalcRage( uint32 damage,bool attacker );

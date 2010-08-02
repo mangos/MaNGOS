@@ -2693,7 +2693,7 @@ void Player::UpdateFreeTalentPoints(bool resetIfNeed)
     }
     else
     {
-        if (level < sWorld.getConfig(CONFIG_UINT32_MIN_DUALSPEC_LEVEL) || m_specsCount == 0)
+        if (m_specsCount == 0)
         {
             m_specsCount = 1;
             m_activeSpec = 0;
@@ -8890,13 +8890,6 @@ void Player::SendPetSkillWipeConfirm()
     GetSession()->SendPacket( &data );
 }
 
-void Player::LearnDualSpec(uint64 guid)
-{
-    CastSpell(this, 63680, true, NULL, NULL, guid);
-    CastSpell(this, 63624, true, NULL, NULL, guid);
-    sLog.outDetail("Player (GUID %u) get dual specialization",guid);
-}
-
 /*********************************************************/
 /***                    STORAGE SYSTEM                 ***/
 /*********************************************************/
@@ -13105,10 +13098,6 @@ void Player::PrepareGossipMenu(WorldObject *pSource, uint32 menuId)
                     if (!pCreature->isCanTrainingOf(this, false))
                         hasMenuItem = false;
                     break;
-                case GOSSIP_OPTION_LEARNDUALSPEC:
-                    if(!(GetSpecsCount() == 1 && pCreature->isCanTrainingAndResetTalentsOf(this) && !(getLevel() < sWorld.getConfig(CONFIG_UINT32_MIN_DUALSPEC_LEVEL))))
-                        hasMenuItem = false;
-                    break;
                 case GOSSIP_OPTION_UNLEARNTALENTS:
                     if (!pCreature->isCanTrainingAndResetTalentsOf(this))
                         hasMenuItem = false;
@@ -13331,10 +13320,6 @@ void Player::OnGossipSelect(WorldObject* pSource, uint32 gossipListId, uint32 me
             break;
         case GOSSIP_OPTION_TRAINER:
             GetSession()->SendTrainerList(guid);
-            break;
-        case GOSSIP_OPTION_LEARNDUALSPEC:
-            LearnDualSpec(guid);
-            PlayerTalkClass->CloseGossip();
             break;
         case GOSSIP_OPTION_UNLEARNTALENTS:
             PlayerTalkClass->CloseGossip();

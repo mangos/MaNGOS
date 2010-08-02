@@ -803,7 +803,6 @@ HeroicCharactersPerRealm = 1
 MinLevelForHeroicCharacterCreating = 55
 SkipCinematics = 0
 MaxPlayerLevel = 80
-MinDualSpecLevel = 40
 StartPlayerLevel = 1
 StartHeroicPlayerLevel = 55
 StartPlayerMoney = 0
