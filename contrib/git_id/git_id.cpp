@@ -536,12 +536,13 @@ bool convert_sql_updates()
 
         FILE * fin = fopen( src_file, "r" );
         if(!fin) return false;
-        FILE * fout = fopen( dst_file, "w" );
-        if(!fout) { fclose(fin); return false; }
+
+        std::ostringstream out_buff;
 
         // add the update requirements
-        fprintf(fout, "ALTER TABLE %s CHANGE COLUMN required_%s required_%s bit;\n\n",
-            db_version_table[info.db_idx], last_sql_update[info.db_idx], new_name);
+        out_buff << "ALTER TABLE " << db_version_table[info.db_idx]
+                 << " CHANGE COLUMN required_" << last_sql_update[info.db_idx]
+                 << " required_" << new_name << " bit;\n\n";
 
         // skip the first one or two lines from the input
         // if it already contains update requirements
@@ -551,25 +552,35 @@ bool convert_sql_updates()
             if(sscanf(buffer, "ALTER TABLE %s CHANGE COLUMN required_%s required_%s bit", dummy, dummy, dummy) == 3)
             {
                 if(fgets(buffer, MAX_BUF, fin) && buffer[0] != '\n')
-                    fputs(buffer, fout);
+                    out_buff << buffer;
             }
             else
-                fputs(buffer, fout);
+                out_buff << buffer;
         }
 
         // copy the rest of the file
-        char c;
-        while( (c = getc(fin)) != EOF )
-            putc(c, fout);
+        while(fgets(buffer, MAX_BUF, fin))
+            out_buff << buffer;
 
         fclose(fin);
+
+        FILE * fout = fopen( dst_file, "w" );
+        if(!fout) { fclose(fin); return false; }
+
+        fprintf(fout, "%s",out_buff.str().c_str());
+
         fclose(fout);
 
         // rename the file in git
         snprintf(cmd, MAX_CMD, "git add %s", dst_file);
         system_switch_index(cmd);
-        snprintf(cmd, MAX_CMD, "git rm --quiet %s", src_file);
-        system_switch_index(cmd);
+
+        // delete src file if it different by name from dst file
+        if(strncmp(src_file,dst_file,MAX_PATH))
+        {
+            snprintf(cmd, MAX_CMD, "git rm --quiet %s", src_file);
+            system_switch_index(cmd);
+        }
 
         // update the last sql update for the current database
         strncpy(last_sql_update[info.db_idx], new_name, MAX_PATH);

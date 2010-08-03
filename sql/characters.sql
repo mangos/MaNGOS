@@ -21,7 +21,7 @@
 
 DROP TABLE IF EXISTS `character_db_version`;
 CREATE TABLE `character_db_version` (
-  `required_10254_01_characters_auctionhouse` bit(1) default NULL
+  `required_10312_02_characters_pet_aura` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Last applied sql update to DB';
 
 --
@@ -383,7 +383,7 @@ CREATE TABLE `character_aura` (
   `remaintime1` INT(11) NOT NULL DEFAULT '0',
   `remaintime2` INT(11) NOT NULL DEFAULT '0',
   `effIndexMask` INT(11) NOT NULL DEFAULT '0',
-  PRIMARY KEY  (`guid`,`spell`)
+  PRIMARY KEY (`guid`,`caster_guid`,`spell`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Player System';
 
 --
@@ -1468,7 +1468,7 @@ CREATE TABLE `pet_aura` (
   `remaintime1` INT(11) NOT NULL DEFAULT '0',
   `remaintime2` INT(11) NOT NULL DEFAULT '0',
   `effIndexMask` INT(11) NOT NULL DEFAULT '0',
-  PRIMARY KEY  (`guid`,`spell`)
+  PRIMARY KEY (`guid`,`caster_guid`,`spell`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Pet System';
 
 --
