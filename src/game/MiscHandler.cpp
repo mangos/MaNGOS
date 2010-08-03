@@ -722,10 +722,11 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
     }
 
     // enter to tavern, not overwrite city rest
-    if(sObjectMgr.IsTavernAreaTrigger(Trigger_ID) && pl->GetRestType() != REST_TYPE_IN_CITY)
+    if(sObjectMgr.IsTavernAreaTrigger(Trigger_ID))
     {
         // set resting flag we are in the inn
-        pl->SetRestType(REST_TYPE_IN_TAVERN, Trigger_ID);
+        if (pl->GetRestType() != REST_TYPE_IN_CITY)
+            pl->SetRestType(REST_TYPE_IN_TAVERN, Trigger_ID);
         return;
     }
 

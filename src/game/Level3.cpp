@@ -2634,6 +2634,35 @@ bool ChatHandler::HandleListCreatureCommand(const char* args)
     return true;
 }
 
+
+void ChatHandler::ShowItemListHelper( uint32 itemId, int loc_idx, Player* target /*=NULL*/ )
+{
+    ItemPrototype const *itemProto = sItemStorage.LookupEntry<ItemPrototype >(itemId);
+    if(!itemProto)
+        return;
+
+    std::string name;
+
+    if(ItemLocale const *il = loc_idx >= 0 ? sObjectMgr.GetItemLocale(itemProto->ItemId) : NULL)
+        name = il->Name[loc_idx];
+
+    if (name.empty())
+        name = itemProto->Name1;
+
+    char const* usableStr = "";
+
+    if (target)
+    {
+        if (target->CanUseItem(itemProto))
+            usableStr = GetMangosString(LANG_COMMAND_ITEM_USABLE);
+    }
+
+    if (m_session)
+        PSendSysMessage(LANG_ITEM_LIST_CHAT, itemId, itemId, name.c_str(), usableStr);
+    else
+        PSendSysMessage(LANG_ITEM_LIST_CONSOLE, itemId, name.c_str(), usableStr);
+}
+
 bool ChatHandler::HandleLookupItemCommand(const char* args)
 {
     if(!*args)
@@ -2647,6 +2676,8 @@ bool ChatHandler::HandleLookupItemCommand(const char* args)
         return false;
 
     wstrToLower(wnamepart);
+
+    Player* pl = m_session ? m_session->GetPlayer() : NULL;
 
     uint32 counter = 0;
 
@@ -2669,10 +2700,7 @@ bool ChatHandler::HandleLookupItemCommand(const char* args)
 
                     if (Utf8FitTo(name, wnamepart))
                     {
-                        if (m_session)
-                            PSendSysMessage(LANG_ITEM_LIST_CHAT, id, id, name.c_str());
-                        else
-                            PSendSysMessage(LANG_ITEM_LIST_CONSOLE, id, name.c_str());
+                        ShowItemListHelper(pProto->ItemId, loc_idx, pl);
                         ++counter;
                         continue;
                     }
@@ -2686,10 +2714,7 @@ bool ChatHandler::HandleLookupItemCommand(const char* args)
 
         if (Utf8FitTo(name, wnamepart))
         {
-            if (m_session)
-                PSendSysMessage(LANG_ITEM_LIST_CHAT, id, id, name.c_str());
-            else
-                PSendSysMessage(LANG_ITEM_LIST_CONSOLE, id, name.c_str());
+            ShowItemListHelper(pProto->ItemId, -1, pl);
             ++counter;
         }
     }
@@ -2944,6 +2969,44 @@ bool ChatHandler::HandleLookupSpellCommand(const char* args)
     return true;
 }
 
+
+void ChatHandler::ShowQuestListHelper( uint32 questId, int32 loc_idx, Player* target /*= NULL*/ )
+{
+    Quest const* qinfo = sObjectMgr.GetQuestTemplate(questId);
+    if (!qinfo)
+        return;
+
+    std::string title;
+
+    if (QuestLocale const *il = loc_idx >= 0 ? sObjectMgr.GetQuestLocale(qinfo->GetQuestId()) : NULL)
+        title = il->Title[loc_idx];
+
+    if (title.empty())
+        title = qinfo->GetTitle();
+
+    char const* statusStr = "";
+
+    if (target)
+    {
+        QuestStatus status = target->GetQuestStatus(qinfo->GetQuestId());
+
+        if (status == QUEST_STATUS_COMPLETE)
+        {
+            if (target->GetQuestRewardStatus(qinfo->GetQuestId()))
+                statusStr = GetMangosString(LANG_COMMAND_QUEST_REWARDED);
+            else
+                statusStr = GetMangosString(LANG_COMMAND_QUEST_COMPLETE);
+        }
+        else if (status == QUEST_STATUS_INCOMPLETE)
+            statusStr = GetMangosString(LANG_COMMAND_QUEST_ACTIVE);
+    }
+
+    if (m_session)
+        PSendSysMessage(LANG_QUEST_LIST_CHAT, qinfo->GetQuestId(), qinfo->GetQuestId(), qinfo->GetQuestLevel(), title.c_str(), statusStr);
+    else
+        PSendSysMessage(LANG_QUEST_LIST_CONSOLE, qinfo->GetQuestId(), title.c_str(), statusStr);
+}
+
 bool ChatHandler::HandleLookupQuestCommand(const char* args)
 {
     if(!*args)
@@ -2980,27 +3043,7 @@ bool ChatHandler::HandleLookupQuestCommand(const char* args)
 
                     if (Utf8FitTo(title, wnamepart))
                     {
-                        char const* statusStr = "";
-
-                        if(target)
-                        {
-                            QuestStatus status = target->GetQuestStatus(qinfo->GetQuestId());
-
-                            if(status == QUEST_STATUS_COMPLETE)
-                            {
-                                if(target->GetQuestRewardStatus(qinfo->GetQuestId()))
-                                    statusStr = GetMangosString(LANG_COMMAND_QUEST_REWARDED);
-                                else
-                                    statusStr = GetMangosString(LANG_COMMAND_QUEST_COMPLETE);
-                            }
-                            else if(status == QUEST_STATUS_INCOMPLETE)
-                                statusStr = GetMangosString(LANG_COMMAND_QUEST_ACTIVE);
-                        }
-
-                        if (m_session)
-                            PSendSysMessage(LANG_QUEST_LIST_CHAT,qinfo->GetQuestId(),qinfo->GetQuestId(),qinfo->GetQuestLevel(),title.c_str(),statusStr);
-                        else
-                            PSendSysMessage(LANG_QUEST_LIST_CONSOLE,qinfo->GetQuestId(),title.c_str(),statusStr);
+                        ShowQuestListHelper(qinfo->GetQuestId(), loc_idx, target);
                         ++counter;
                         continue;
                     }
@@ -3014,28 +3057,7 @@ bool ChatHandler::HandleLookupQuestCommand(const char* args)
 
         if (Utf8FitTo(title, wnamepart))
         {
-            char const* statusStr = "";
-
-            if(target)
-            {
-                QuestStatus status = target->GetQuestStatus(qinfo->GetQuestId());
-
-                if(status == QUEST_STATUS_COMPLETE)
-                {
-                    if(target->GetQuestRewardStatus(qinfo->GetQuestId()))
-                        statusStr = GetMangosString(LANG_COMMAND_QUEST_REWARDED);
-                    else
-                        statusStr = GetMangosString(LANG_COMMAND_QUEST_COMPLETE);
-                }
-                else if(status == QUEST_STATUS_INCOMPLETE)
-                    statusStr = GetMangosString(LANG_COMMAND_QUEST_ACTIVE);
-            }
-
-            if (m_session)
-                PSendSysMessage(LANG_QUEST_LIST_CHAT,qinfo->GetQuestId(),qinfo->GetQuestId(),qinfo->GetQuestLevel(),title.c_str(),statusStr);
-            else
-                PSendSysMessage(LANG_QUEST_LIST_CONSOLE,qinfo->GetQuestId(),title.c_str(),statusStr);
-
+            ShowQuestListHelper(qinfo->GetQuestId(), -1, target);
             ++counter;
         }
     }
