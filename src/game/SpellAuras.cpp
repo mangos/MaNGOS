@@ -375,7 +375,7 @@ Aura::Aura(SpellEntry const* spellproto, SpellEffectIndex eff, int32 *currentBas
 m_spellmod(NULL),
 m_timeCla(1000), m_periodicTimer(0), m_periodicTick(0), m_removeMode(AURA_REMOVE_BY_DEFAULT),
 m_effIndex(eff), m_spellAuraHolder(holder), m_isPersistent(false),
-m_positive(false), m_isPeriodic(false), m_isAreaAura(false), m_in_use(0), m_deleted(false)
+m_positive(false), m_isPeriodic(false), m_isAreaAura(false), m_in_use(0)
 {
     ASSERT(target);
 
