@@ -62,13 +62,7 @@ class MANGOS_DLL_SPEC SpellAuraHolder
         void SetStackAmount(uint8 stackAmount);
         bool ModStackAmount(int32 num); // return true if last charge dropped
 
-        Aura* GetAuraByEffectIndex(SpellEffectIndex index) const 
-        { 
-            if (Aura *aur = m_auras[index]) 
-                return aur; 
-            else 
-                return NULL;
-        } 
+        Aura* GetAuraByEffectIndex(SpellEffectIndex index) const { return m_auras[index]; }
 
         uint32 GetId() const { return m_spellProto->Id; }
         SpellEntry const* GetSpellProto() const { return m_spellProto; }
@@ -92,6 +86,8 @@ class MANGOS_DLL_SPEC SpellAuraHolder
         bool IsInUse() const { return m_in_use;}
         bool IsDeleted() const { return m_deleted;}
         bool IsEmptyHolder() const;
+
+        void SetDeleted() { m_deleted = true; }
 
         void SetInUse(bool state)
         {
@@ -407,7 +403,6 @@ class MANGOS_DLL_SPEC Aura
         bool IsAreaAura() const { return m_isAreaAura; }
         bool IsPeriodic() const { return m_isPeriodic; }
         bool IsInUse() const { return m_in_use; }
-        bool IsDeleted() const { return m_deleted; }
 
         void SetInUse(bool state)
         {
@@ -476,7 +471,6 @@ class MANGOS_DLL_SPEC Aura
         bool m_positive:1;
         bool m_isPeriodic:1;
         bool m_isAreaAura:1;
-        bool m_deleted:1;                                   // true if RemoveAura(iterator) called while in Aura::ApplyModifier call (added to Unit::m_deletedAuras)
         bool m_isPersistent:1;
 
         uint32 m_in_use;                                    // > 0 while in Aura::ApplyModifier call/Aura::Update/etc

@@ -4572,7 +4572,10 @@ void Unit::RemoveSpellAuraHolder(SpellAuraHolder *holder, AuraRemoveMode mode)
     // If holder in use (removed from code that plan access to it data after return)
     // store it in holder list with delayed deletion
     if (holder->IsInUse())
+    {
+        holder->SetDeleted();
         m_deletedHolders.push_back(holder);
+    }
     else
         delete holder;
 
