@@ -22,12 +22,15 @@
 #include "SharedDefines.h"
 
 struct AreaTrigger;
+struct FactionEntry;
+struct FactionState;
+struct GameTele;
+
 class ChatHandler;
 class WorldSession;
 class Creature;
 class Player;
 class Unit;
-struct GameTele;
 
 class ChatCommand
 {
@@ -263,8 +266,6 @@ class ChatHandler
         bool HandleLookupPlayerAccountCommand(const char* args);
         bool HandleLookupPlayerEmailCommand(const char* args);
         bool HandleLookupQuestCommand(const char* args);
-
-        void ShowQuestListHelper(uint32 questId, int32 loc_idx, Player* target = NULL);
         bool HandleLookupSkillCommand(const char* args);
         bool HandleLookupSpellCommand(const char* args);
         bool HandleLookupTaxiNodeCommand(const char * args);
@@ -573,10 +574,13 @@ class ChatHandler
         GameObject* GetObjectGlobalyWithGuidOrNearWithDbGuid(uint32 lowguid,uint32 entry);
 
         // Utility methods for commands
-        void ShowTicket(uint64 guid, char const* text, char const* time);
         bool ShowAccountListHelper(QueryResult* result, uint32* limit = NULL, bool title = true, bool error = true);
-        bool ShowPlayerListHelper(QueryResult* result, uint32* limit = NULL, bool title = true, bool error = true);
+        void ShowFactionListHelper(FactionEntry const * factionEntry, LocaleConstant loc, FactionState const* repState = NULL, Player * target = NULL );
         void ShowItemListHelper(uint32 itemId, int loc_idx, Player* target = NULL);
+        void ShowQuestListHelper(uint32 questId, int32 loc_idx, Player* target = NULL);
+        bool ShowPlayerListHelper(QueryResult* result, uint32* limit = NULL, bool title = true, bool error = true);
+        void ShowSpellListHelper(Player* target, SpellEntry const* spellInfo, LocaleConstant loc);
+        void ShowTicket(uint64 guid, char const* text, char const* time);
         void ShowTriggerListHelper(AreaTriggerEntry const * atEntry);
         void ShowTriggerTargetListHelper(uint32 id, AreaTrigger const* at, bool subpart = false);
         bool LookupPlayerSearchCommand(QueryResult* result, uint32* limit = NULL);
@@ -586,7 +590,6 @@ class ChatHandler
         bool HandleUnBanHelper(BanMode mode,char const* args);
         void HandleCharacterLevel(Player* player, uint64 player_guid, uint32 oldlevel, uint32 newlevel);
         void HandleLearnSkillRecipesHelper(Player* player,uint32 skill_id);
-        void ShowSpellListHelper(Player* target, SpellEntry const* spellInfo, LocaleConstant loc);
         bool HandleGoHelper(Player* _player, uint32 mapid, float x, float y, float const* zPtr = NULL, float const* ortPtr = NULL);
         template<typename T>
         void ShowNpcOrGoSpawnInformation(uint32 guid);

@@ -1170,6 +1170,45 @@ bool ChatHandler::HandleGUIDCommand(const char* /*args*/)
     return true;
 }
 
+
+void ChatHandler::ShowFactionListHelper( FactionEntry const * factionEntry, LocaleConstant loc, FactionState const* repState /*= NULL*/, Player * target /*= NULL */ )
+{
+    std::string name = factionEntry->name[loc];
+
+    // send faction in "id - [faction] rank reputation [visible] [at war] [own team] [unknown] [invisible] [inactive]" format
+    // or              "id - [faction] [no reputation]" format
+    std::ostringstream ss;
+    if (m_session)
+        ss << factionEntry->ID << " - |cffffffff|Hfaction:" << factionEntry->ID << "|h[" << name << " " << localeNames[loc] << "]|h|r";
+    else
+        ss << factionEntry->ID << " - " << name << " " << localeNames[loc];
+
+    if (repState)                               // and then target!=NULL also
+    {
+        ReputationRank rank = target->GetReputationMgr().GetRank(factionEntry);
+        std::string rankName = GetMangosString(ReputationRankStrIndex[rank]);
+
+        ss << " " << rankName << "|h|r (" << target->GetReputationMgr().GetReputation(factionEntry) << ")";
+
+        if (repState->Flags & FACTION_FLAG_VISIBLE)
+            ss << GetMangosString(LANG_FACTION_VISIBLE);
+        if (repState->Flags & FACTION_FLAG_AT_WAR)
+            ss << GetMangosString(LANG_FACTION_ATWAR);
+        if (repState->Flags & FACTION_FLAG_PEACE_FORCED)
+            ss << GetMangosString(LANG_FACTION_PEACE_FORCED);
+        if (repState->Flags & FACTION_FLAG_HIDDEN)
+            ss << GetMangosString(LANG_FACTION_HIDDEN);
+        if (repState->Flags & FACTION_FLAG_INVISIBLE_FORCED)
+            ss << GetMangosString(LANG_FACTION_INVISIBLE_FORCED);
+        if (repState->Flags & FACTION_FLAG_INACTIVE)
+            ss << GetMangosString(LANG_FACTION_INACTIVE);
+    }
+    else if (target)
+        ss << GetMangosString(LANG_FACTION_NOREPUTATION);
+
+    SendSysMessage(ss.str().c_str());
+}
+
 bool ChatHandler::HandleLookupFactionCommand(const char* args)
 {
     if (!*args)
@@ -1194,8 +1233,6 @@ bool ChatHandler::HandleLookupFactionCommand(const char* args)
         FactionEntry const *factionEntry = sFactionStore.LookupEntry(id);
         if (factionEntry)
         {
-            FactionState const* repState = target ? target->GetReputationMgr().GetState(factionEntry) : NULL;
-
             int loc = GetSessionDbcLocale();
             std::string name = factionEntry->name[loc];
             if (name.empty())
@@ -1220,38 +1257,8 @@ bool ChatHandler::HandleLookupFactionCommand(const char* args)
 
             if (loc < MAX_LOCALE)
             {
-                // send faction in "id - [faction] rank reputation [visible] [at war] [own team] [unknown] [invisible] [inactive]" format
-                // or              "id - [faction] [no reputation]" format
-                std::ostringstream ss;
-                if (m_session)
-                    ss << id << " - |cffffffff|Hfaction:" << id << "|h[" << name << " " << localeNames[loc] << "]|h|r";
-                else
-                    ss << id << " - " << name << " " << localeNames[loc];
-
-                if (repState)                               // and then target!=NULL also
-                {
-                    ReputationRank rank = target->GetReputationMgr().GetRank(factionEntry);
-                    std::string rankName = GetMangosString(ReputationRankStrIndex[rank]);
-
-                    ss << " " << rankName << "|h|r (" << target->GetReputationMgr().GetReputation(factionEntry) << ")";
-
-                    if (repState->Flags & FACTION_FLAG_VISIBLE)
-                        ss << GetMangosString(LANG_FACTION_VISIBLE);
-                    if (repState->Flags & FACTION_FLAG_AT_WAR)
-                        ss << GetMangosString(LANG_FACTION_ATWAR);
-                    if (repState->Flags & FACTION_FLAG_PEACE_FORCED)
-                        ss << GetMangosString(LANG_FACTION_PEACE_FORCED);
-                    if (repState->Flags & FACTION_FLAG_HIDDEN)
-                        ss << GetMangosString(LANG_FACTION_HIDDEN);
-                    if (repState->Flags & FACTION_FLAG_INVISIBLE_FORCED)
-                        ss << GetMangosString(LANG_FACTION_INVISIBLE_FORCED);
-                    if (repState->Flags & FACTION_FLAG_INACTIVE)
-                        ss << GetMangosString(LANG_FACTION_INACTIVE);
-                }
-                else
-                    ss << GetMangosString(LANG_FACTION_NOREPUTATION);
-
-                SendSysMessage(ss.str().c_str());
+                FactionState const* repState = target ? target->GetReputationMgr().GetState(factionEntry) : NULL;
+                ShowFactionListHelper(factionEntry, LocaleConstant(loc), repState, target);
                 counter++;
             }
         }
@@ -3934,31 +3941,8 @@ bool ChatHandler::HandleCharacterReputationCommand(const char* args)
     for(FactionStateList::const_iterator itr = targetFSL.begin(); itr != targetFSL.end(); ++itr)
     {
         FactionEntry const *factionEntry = sFactionStore.LookupEntry(itr->second.ID);
-        char const* factionName = factionEntry ? factionEntry->name[loc] : "#Not found#";
-        ReputationRank rank = target->GetReputationMgr().GetRank(factionEntry);
-        std::string rankName = GetMangosString(ReputationRankStrIndex[rank]);
-        std::ostringstream ss;
-        if (m_session)
-            ss << itr->second.ID << " - |cffffffff|Hfaction:" << itr->second.ID << "|h[" << factionName << " " << localeNames[loc] << "]|h|r";
-        else
-            ss << itr->second.ID << " - " << factionName << " " << localeNames[loc];
 
-        ss << " " << rankName << " (" << target->GetReputationMgr().GetReputation(factionEntry) << ")";
-
-        if (itr->second.Flags & FACTION_FLAG_VISIBLE)
-            ss << GetMangosString(LANG_FACTION_VISIBLE);
-        if (itr->second.Flags & FACTION_FLAG_AT_WAR)
-            ss << GetMangosString(LANG_FACTION_ATWAR);
-        if (itr->second.Flags & FACTION_FLAG_PEACE_FORCED)
-            ss << GetMangosString(LANG_FACTION_PEACE_FORCED);
-        if (itr->second.Flags & FACTION_FLAG_HIDDEN)
-            ss << GetMangosString(LANG_FACTION_HIDDEN);
-        if (itr->second.Flags & FACTION_FLAG_INVISIBLE_FORCED)
-            ss << GetMangosString(LANG_FACTION_INVISIBLE_FORCED);
-        if (itr->second.Flags & FACTION_FLAG_INACTIVE)
-            ss << GetMangosString(LANG_FACTION_INACTIVE);
-
-        SendSysMessage(ss.str().c_str());
+        ShowFactionListHelper(factionEntry, loc, &itr->second, target);
     }
     return true;
 }
