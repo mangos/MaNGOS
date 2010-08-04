@@ -875,7 +875,11 @@ enum MangosStrings
     LANG_MOVIE_NOT_EXIST                = 1201,
     // Room for more debug                1202-1299 not used
 
-    // FREE IDS                           1300-9999
+    // Reserved for old client release branches specific strings
+    // Room for old clients 2.x           1300-1399 not used
+    // Room for old clients 1.x           1400-1499 not used
+
+    // FREE IDS                           1500-9999
 
     // Use for not-in-offcial-sources patches
     //                                    10000-10999
