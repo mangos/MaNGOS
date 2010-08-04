@@ -21,7 +21,7 @@
 
 #include "SharedDefines.h"
 
-class AreaTrigger;
+struct AreaTrigger;
 class ChatHandler;
 class WorldSession;
 class Creature;
