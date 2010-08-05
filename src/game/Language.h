@@ -360,7 +360,8 @@ enum MangosStrings
     LANG_TRIGGER_REQ_QUEST_NORMAL       = 369,
     LANG_TRIGGER_REQ_KEYS_HEROIC        = 370,
     LANG_TRIGGER_REQ_QUEST_HEROIC       = 371,
-    // Room for more level 2              372-399 not used
+    LANG_COMMAND_ACHIEVEMENT_NOTFOUND   = 372,
+    // Room for more level 2              373-399 not used
 
     // level 3 chat
     LANG_SCRIPTS_RELOADED               = 400,

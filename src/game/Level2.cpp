@@ -1170,6 +1170,136 @@ bool ChatHandler::HandleGUIDCommand(char* /*args*/)
     return true;
 }
 
+void ChatHandler::ShowAchievementListHelper(AchievementEntry const * achEntry, LocaleConstant loc, time_t const* date /*= NULL*/, Player* target /*= NULL */ )
+{
+    std::string name = achEntry->name[loc];
+
+    ObjectGuid guid = target ? target->GetObjectGuid() : ObjectGuid();
+
+    // |color|Hachievement:achievement_id:player_guid_hex:completed_0_1:mm:dd:yy_from_2000:criteriaMask:0:0:0|h[name]|h|r
+    std::ostringstream ss;
+    if (m_session)
+    {
+        ss << achEntry->ID << " - |cffffffff|Hachievement:" << achEntry->ID << ":" << std::hex << guid.GetRawValue() << std::dec;
+        if (date)
+        {
+            // complete date
+            tm* aTm = localtime(date);
+            ss << ":1:" << aTm->tm_mon+1 << ":" << aTm->tm_mday << ":" << (aTm->tm_year+1900-2000) << ":";
+
+            // complete criteria mask (all bits set)
+            ss << uint32(-1) << ":" << uint32(-1) << ":" << uint32(-1) << ":" << uint32(-1) << ":";
+        }
+        else
+        {
+            // complete date
+            ss << ":0:0:0:-1:";
+
+            // complete criteria mask
+            if (target)
+            {
+                uint32 criteriaMask[4] = {0, 0, 0, 0};
+
+                if (AchievementMgr const* mgr = target ? &target->GetAchievementMgr() : NULL)
+                    if (AchievementCriteriaEntryList const* criteriaList = sAchievementMgr.GetAchievementCriteriaByAchievement(achEntry->ID))
+                        for (AchievementCriteriaEntryList::const_iterator itr = criteriaList->begin(); itr != criteriaList->end(); ++itr)
+                            if (mgr->IsCompletedCriteria(*itr, achEntry))
+                                criteriaMask[((*itr)->showOrder - 1) / 32] |= (1 << (((*itr)->showOrder - 1) % 32));
+
+                for (int i = 0; i < 4; ++i)
+                    ss << criteriaMask[i] << ":";
+            }
+            else
+                ss << "0:0:0:0:";
+        }
+
+        ss << "|h[" << name << " " << localeNames[loc] << "]|h|r";
+    }
+    else
+        ss << achEntry->ID << " - " << name << " " << localeNames[loc];
+
+    if (target && date)
+        ss << " [" << TimeToTimestampStr(*date) << "]";
+
+    SendSysMessage(ss.str().c_str());
+}
+
+bool ChatHandler::HandleLookupAchievementCommand(char* args)
+{
+    if (!*args)
+        return false;
+
+    // Can be NULL at console call
+    Player *target = getSelectedPlayer();
+
+    std::string namepart = args;
+    std::wstring wnamepart;
+
+    if (!Utf8toWStr(namepart, wnamepart))
+        return false;
+
+    // converting string that we try to find to lower case
+    wstrToLower(wnamepart);
+
+    uint32 counter = 0;                                     // Counter for figure out that we found smth.
+
+    for (uint32 id = 0; id < sAchievementStore.GetNumRows(); ++id)
+    {
+        AchievementEntry const *achEntry = sAchievementStore.LookupEntry(id);
+        if (!achEntry)
+            continue;
+
+        int loc = GetSessionDbcLocale();
+        std::string name = achEntry->name[loc];
+        if (name.empty())
+            continue;
+
+        if (!Utf8FitTo(name, wnamepart))
+        {
+            loc = 0;
+            for(; loc < MAX_LOCALE; ++loc)
+            {
+                if (loc == GetSessionDbcLocale())
+                    continue;
+
+                name = achEntry->name[loc];
+                if (name.empty())
+                    continue;
+
+                if (Utf8FitTo(name, wnamepart))
+                    break;
+            }
+        }
+
+        if (loc < MAX_LOCALE)
+        {
+            CompletedAchievementData const* completed = target ? target->GetAchievementMgr().GetCompleteData(id) : NULL;
+            ShowAchievementListHelper(achEntry, LocaleConstant(loc), completed ? &completed->date : NULL, target);
+            counter++;
+        }
+    }
+
+    if (counter == 0)                                       // if counter == 0 then we found nth
+        SendSysMessage(LANG_COMMAND_ACHIEVEMENT_NOTFOUND);
+    return true;
+}
+
+bool ChatHandler::HandleCharacterAchievementsCommand(char* args)
+{
+    Player* target;
+    if (!extractPlayerTarget(args, &target))
+        return false;
+
+    LocaleConstant loc = GetSessionDbcLocale();
+
+    CompletedAchievementMap const& complitedList = target->GetAchievementMgr().GetCompletedAchievements();
+    for(CompletedAchievementMap::const_iterator itr = complitedList.begin(); itr != complitedList.end(); ++itr)
+    {
+        AchievementEntry const *achEntry = sAchievementStore.LookupEntry(itr->first);
+        ShowAchievementListHelper(achEntry, loc, &itr->second.date, target);
+    }
+    return true;
+}
 
 void ChatHandler::ShowFactionListHelper( FactionEntry const * factionEntry, LocaleConstant loc, FactionState const* repState /*= NULL*/, Player * target /*= NULL */ )
 {

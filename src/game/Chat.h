@@ -21,6 +21,7 @@
 
 #include "SharedDefines.h"
 
+struct AchievementEntry;
 struct AreaTrigger;
 struct FactionEntry;
 struct FactionState;
@@ -144,6 +145,7 @@ class ChatHandler
         bool HandleCastSelfCommand(char* args);
         bool HandleCastTargetCommand(char* args);
 
+        bool HandleCharacterAchievementsCommand(char* args);
         bool HandleCharacterCustomizeCommand(char* args);
         bool HandleCharacterDeletedDeleteCommand(char* args);
         bool HandleCharacterDeletedListCommand(char* args);
@@ -255,6 +257,7 @@ class ChatHandler
         bool HandleLookupAccountEmailCommand(char* args);
         bool HandleLookupAccountIpCommand(char* args);
         bool HandleLookupAccountNameCommand(char* args);
+        bool HandleLookupAchievementCommand(char* args);
         bool HandleLookupAreaCommand(char* args);
         bool HandleLookupCreatureCommand(char* args);
         bool HandleLookupEventCommand(char* args);
@@ -575,6 +578,7 @@ class ChatHandler
 
         // Utility methods for commands
         bool ShowAccountListHelper(QueryResult* result, uint32* limit = NULL, bool title = true, bool error = true);
+        void ShowAchievementListHelper(AchievementEntry const * achEntry, LocaleConstant loc, time_t const* date = NULL, Player* target = NULL);
         void ShowFactionListHelper(FactionEntry const * factionEntry, LocaleConstant loc, FactionState const* repState = NULL, Player * target = NULL );
         void ShowItemListHelper(uint32 itemId, int loc_idx, Player* target = NULL);
         void ShowQuestListHelper(uint32 questId, int32 loc_idx, Player* target = NULL);
