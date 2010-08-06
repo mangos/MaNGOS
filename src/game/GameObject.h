@@ -281,7 +281,7 @@ struct GameObjectInfo
             uint32 openTextID;                              //6
             uint32 losOK;                                   //7
         } flagstand;
-        //25 GAMEOBJECT_TYPE_FISHINGHOLE                    // not implemented yet
+        //25 GAMEOBJECT_TYPE_FISHINGHOLE
         struct
         {
             uint32 radius;                                  //0 how close bobber must land for sending loot
