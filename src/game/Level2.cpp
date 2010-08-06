@@ -53,16 +53,16 @@ static uint32 ReputationRankStrIndex[MAX_REPUTATION_RANK] =
 //mute player for some times
 bool ChatHandler::HandleMuteCommand(char* args)
 {
-    char* nameStr;
-    char* delayStr;
-    extractOptFirstArg(args, &nameStr, &delayStr);
-    if (!delayStr)
-        return false;
+    char* nameStr = ExtractOptArg(&args);
 
     Player* target;
     uint64 target_guid;
     std::string target_name;
     if (!extractPlayerTarget(nameStr, &target, &target_guid, &target_name))
+        return false;
+
+    uint32 notspeaktime;
+    if (!ExtractUInt32(&args, notspeaktime))
         return false;
 
     uint32 account_id = target ? target->GetSession()->GetAccountId() : sObjectMgr.GetPlayerAccountIdByGUID(target_guid);
@@ -73,8 +73,6 @@ bool ChatHandler::HandleMuteCommand(char* args)
         if (WorldSession* session = sWorld.FindSession(account_id))
             target = session->GetPlayer();
     }
-
-    uint32 notspeaktime = (uint32) atoi(delayStr);
 
     // must have strong lesser security level
     if (HasLowerSecurity(target, target_guid, true))

@@ -1891,19 +1891,15 @@ bool ChatHandler::HandleSendMailCommand(char* args)
     if (!extractPlayerTarget(args, &target, &target_guid, &target_name))
         return false;
 
-    char* tail1 = strtok(NULL, "");
-    if(!tail1)
+    char* tail = strtok(NULL, "");
+    if(!tail)
         return false;
 
-    char* msgSubject = extractQuotedArg(tail1);
+    char* msgSubject = ExtractQuotedArg(&tail);
     if (!msgSubject)
         return false;
 
-    char* tail2 = strtok(NULL, "");
-    if(!tail2)
-        return false;
-
-    char* msgText = extractQuotedArg(tail2);
+    char* msgText = ExtractQuotedArg(&tail);
     if (!msgText)
         return false;
 
@@ -1925,11 +1921,7 @@ bool ChatHandler::HandleSendMailCommand(char* args)
 // teleport player to given game_tele.entry
 bool ChatHandler::HandleTeleNameCommand(char* args)
 {
-    char* nameStr;
-    char* teleStr;
-    extractOptFirstArg(args, &nameStr, &teleStr);
-    if (!teleStr)
-        return false;
+    char* nameStr = ExtractOptArg(&args);
 
     Player* target;
     uint64 target_guid;
@@ -1938,7 +1930,7 @@ bool ChatHandler::HandleTeleNameCommand(char* args)
         return false;
 
     // id, or string, or [name] Shift-click form |color|Htele:id|h[name]|h|r
-    GameTele const* tele = extractGameTeleFromLink(teleStr);
+    GameTele const* tele = extractGameTeleFromLink(args);
     if (!tele)
     {
         SendSysMessage(LANG_COMMAND_TELE_NOTFOUND);

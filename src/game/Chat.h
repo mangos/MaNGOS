@@ -554,12 +554,19 @@ class ChatHandler
         Creature* getSelectedCreature();
         Unit*     getSelectedUnit();
 
+        // extraction different type params from args string, all functions update (char** args) to first unparsed tail symbol at return
+        void  SkipWhiteSpaces(char** args);
+        bool  ExtractInt32(char** args, int32& val);
+        bool  ExtractUInt32(char** args, uint32& val);
+        bool  ExtractFloat(char** args, float& val);
+        char* ExtractLiteralArg(char** args);               // any literal strings (until whitespace and not started from "['|)
+        char* ExtractQuotedArg(char** args);                // string with " or [] or ' around
+        char* ExtractLinkArg(char** args);                  // shift-link like arg
+        char* ExtractArg(char** args);                      // any name/number/quote/shift-link strings
+        char* ExtractOptArg(char** args);                   // extract name/number/quote/shift-link arg only if more data in args for parse
+
         char*     extractKeyFromLink(char* text, char const* linkType, char** something1 = NULL);
         char*     extractKeyFromLink(char* text, char const* const* linkTypes, int* found_idx, char** something1 = NULL);
-
-        // if args have single value then it return in arg2 and arg1 == NULL
-        void      extractOptFirstArg(char* args, char** arg1, char** arg2);
-        char*     extractQuotedArg(char* args);
 
         uint32    extractSpellIdFromLink(char* text);
         uint64    extractGuidFromLink(char* text);
