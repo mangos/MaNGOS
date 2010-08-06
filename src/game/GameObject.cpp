@@ -54,6 +54,7 @@ GameObject::GameObject() : WorldObject()
     m_spellId = 0;
     m_cooldownTime = 0;
     m_goInfo = NULL;
+    m_ritualOwner = NULL;
 
     m_DBTableGuid = 0;
     m_rotation = 0;
@@ -1175,43 +1176,82 @@ void GameObject::Use(Unit* user)
 
             Player* player = (Player*)user;
 
-            Unit* caster = GetOwner();
+            Unit* owner = GetOwner();
 
             GameObjectInfo const* info = GetGOInfo();
 
-            if (!caster || caster->GetTypeId()!=TYPEID_PLAYER)
-                return;
+            // ritual owner is set for GO's without owner (not summoned)
+            if (!m_ritualOwner && !owner)
+                m_ritualOwner = player;
 
-            // accept only use by player from same group for caster except caster itself
-            if (((Player*)caster) == player || !((Player*)caster)->IsInSameRaidWith(player))
-                return;
+            if (owner)
+            {
+                if (owner->GetTypeId() != TYPEID_PLAYER)
+                    return;
+
+                // accept only use by player from same group as owner, excluding owner itself (unique use already added in spell effect)
+                if (player == (Player*)owner || (info->summoningRitual.castersGrouped && !player->IsInSameRaidWith(((Player*)owner))))
+                    return;
+
+                // expect owner to already be channeling, so if not...
+                if (!owner->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
+                    return;
+
+                // in case summoning ritual caster is GO creator
+                spellCaster = owner;
+            }
+            else
+            {
+                if (player != m_ritualOwner && (info->summoningRitual.castersGrouped && !player->IsInSameRaidWith(m_ritualOwner)))
+                    return;
+
+                spellCaster = player;
+            }
 
             AddUniqueUse(player);
 
-            // full amount unique participants including original summoner
-            if (GetUniqueUseCount() < info->summoningRitual.reqParticipants)
-                return;
-
-            // in case summoning ritual caster is GO creator
-            spellCaster = caster;
-
-            if (!caster->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
-                return;
-
-            spellId = info->summoningRitual.spellId;
-            if (spellId == 62330)                           // GO store nonexistent spell, replace by expected
+            if (info->summoningRitual.animSpell)
             {
-                // spell have reagent and mana cost but it not expected use its
-                // it triggered spell in fact casted at currently channeled GO
-                spellId = 61993;
+                player->CastSpell(player, info->summoningRitual.animSpell, true);
+
+                // for this case, summoningRitual.spellId is always triggered
                 triggered = true;
             }
 
-            // finish spell
-            player->FinishSpell(CURRENT_CHANNELED_SPELL);
+            // full amount unique participants including original summoner
+            if (GetUniqueUseCount() == info->summoningRitual.reqParticipants)
+            {
+                spellCaster = m_ritualOwner ? m_ritualOwner : spellCaster;
 
-            // can be deleted now
-            SetLootState(GO_JUST_DEACTIVATED);
+                spellId = info->summoningRitual.spellId;
+
+                if (spellId == 62330)                       // GO store nonexistent spell, replace by expected
+                {
+                    // spell have reagent and mana cost but it not expected use its
+                    // it triggered spell in fact casted at currently channeled GO
+                    spellId = 61993;
+                    triggered = true;
+                }
+
+                // finish owners spell
+                if (owner)
+                    owner->FinishSpell(CURRENT_CHANNELED_SPELL);
+
+                // can be deleted now, if
+                if (!info->summoningRitual.ritualPersistent)
+                    SetLootState(GO_JUST_DEACTIVATED);
+                else
+                {
+                    // reset ritual for this GO
+                    m_ritualOwner = NULL;
+                    m_unique_users.clear();
+                    m_usetimes = 0;
+                }
+            }
+            else
+            {
+                return;
+            }
 
             // go to end function to spell casting
             break;
