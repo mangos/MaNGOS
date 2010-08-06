@@ -21,6 +21,7 @@
 
 #include "SharedDefines.h"
 
+struct AchievementEntry;
 struct AreaTrigger;
 struct FactionEntry;
 struct FactionState;
@@ -144,6 +145,7 @@ class ChatHandler
         bool HandleCastSelfCommand(char* args);
         bool HandleCastTargetCommand(char* args);
 
+        bool HandleCharacterAchievementsCommand(char* args);
         bool HandleCharacterCustomizeCommand(char* args);
         bool HandleCharacterDeletedDeleteCommand(char* args);
         bool HandleCharacterDeletedListCommand(char* args);
@@ -255,6 +257,8 @@ class ChatHandler
         bool HandleLookupAccountEmailCommand(char* args);
         bool HandleLookupAccountIpCommand(char* args);
         bool HandleLookupAccountNameCommand(char* args);
+
+        bool HandleLookupAchievementCommand(char* args);
         bool HandleLookupAreaCommand(char* args);
         bool HandleLookupCreatureCommand(char* args);
         bool HandleLookupEventCommand(char* args);
@@ -557,12 +561,19 @@ class ChatHandler
         Creature* getSelectedCreature();
         Unit*     getSelectedUnit();
 
+        // extraction different type params from args string, all functions update (char** args) to first unparsed tail symbol at return
+        void  SkipWhiteSpaces(char** args);
+        bool  ExtractInt32(char** args, int32& val);
+        bool  ExtractUInt32(char** args, uint32& val);
+        bool  ExtractFloat(char** args, float& val);
+        char* ExtractLiteralArg(char** args);               // any literal strings (until whitespace and not started from "['|)
+        char* ExtractQuotedArg(char** args);                // string with " or [] or ' around
+        char* ExtractLinkArg(char** args);                  // shift-link like arg
+        char* ExtractArg(char** args);                      // any name/number/quote/shift-link strings
+        char* ExtractOptArg(char** args);                   // extract name/number/quote/shift-link arg only if more data in args for parse
+
         char*     extractKeyFromLink(char* text, char const* linkType, char** something1 = NULL);
         char*     extractKeyFromLink(char* text, char const* const* linkTypes, int* found_idx, char** something1 = NULL);
-
-        // if args have single value then it return in arg2 and arg1 == NULL
-        void      extractOptFirstArg(char* args, char** arg1, char** arg2);
-        char*     extractQuotedArg(char* args);
 
         uint32    extractSpellIdFromLink(char* text);
         uint64    extractGuidFromLink(char* text);
@@ -581,6 +592,7 @@ class ChatHandler
 
         // Utility methods for commands
         bool ShowAccountListHelper(QueryResult* result, uint32* limit = NULL, bool title = true, bool error = true);
+        void ShowAchievementListHelper(AchievementEntry const * achEntry, LocaleConstant loc, time_t const* date = NULL, Player* target = NULL);
         void ShowFactionListHelper(FactionEntry const * factionEntry, LocaleConstant loc, FactionState const* repState = NULL, Player * target = NULL );
         void ShowItemListHelper(uint32 itemId, int loc_idx, Player* target = NULL);
         void ShowQuestListHelper(uint32 questId, int32 loc_idx, Player* target = NULL);

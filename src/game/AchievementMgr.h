@@ -254,9 +254,17 @@ class AchievementMgr
         void CompletedAchievement(AchievementEntry const* entry);
         void SendRespondInspectAchievements(Player* player);
 
-        Player* GetPlayer() { return m_player;}
+        Player* GetPlayer() const { return m_player;}
 
-        bool HasAchievement(uint32 achievement_id) const { return m_completedAchievements.find(achievement_id) != m_completedAchievements.end(); }
+        CompletedAchievementData const* GetCompleteData(uint32 achievement_id) const
+        {
+            CompletedAchievementMap::const_iterator itr = m_completedAchievements.find(achievement_id);
+            return itr != m_completedAchievements.end() ? &itr->second : NULL;
+        }
+
+        bool HasAchievement(uint32 achievement_id) const { return GetCompleteData(achievement_id) != NULL; }
+        CompletedAchievementMap const& GetCompletedAchievements() const { return m_completedAchievements; }
+        bool IsCompletedCriteria(AchievementCriteriaEntry const* criteria, AchievementEntry const* achievement) const;
 
     private:
         enum ProgressType { PROGRESS_SET, PROGRESS_ACCUMULATE, PROGRESS_HIGHEST };
