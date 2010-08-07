@@ -6251,35 +6251,58 @@ ReputationRank Player::GetReputationRank(uint32 faction) const
 }
 
 //Calculate total reputation percent player gain with quest/creature level
-int32 Player::CalculateReputationGain(uint32 creatureOrQuestLevel, int32 rep, int32 faction, bool for_quest, bool noQuestBonus)
+int32 Player::CalculateReputationGain(ReputationSource source, int32 rep, int32 faction, uint32 creatureOrQuestLevel, bool noAuraBonus)
 {
     float percent = 100.0f;
 
-    // Get the generic rate first
-    if (const RepRewardRate *repData = sObjectMgr.GetRepRewardRate(faction))
-    {
-        float repRate = for_quest ? repData->quest_rate : repData->creature_rate;
-        percent *= repRate;
+    float repMod = noAuraBonus ? 0.0f : (float)GetTotalAuraModifier(SPELL_AURA_MOD_REPUTATION_GAIN);
 
-        // for custom, a rate of 0.0 will totally disable reputation gain for this faction/type
-        if (repRate <= 0.0f)
-            percent = repRate;
-    }
-
-    float rate = for_quest ? sWorld.getConfig(CONFIG_FLOAT_RATE_REPUTATION_LOWLEVEL_QUEST) : sWorld.getConfig(CONFIG_FLOAT_RATE_REPUTATION_LOWLEVEL_KILL);
-
-    if (rate != 1.0f && creatureOrQuestLevel <= MaNGOS::XP::GetGrayLevel(getLevel()))
-        percent *= rate;
-
-    float repMod = noQuestBonus ? 0.0f : (float)GetTotalAuraModifier(SPELL_AURA_MOD_REPUTATION_GAIN);
-
-    if (!for_quest)
+    // faction specific auras only seem to apply to kills
+    if (source == REPUTATION_SOURCE_KILL)
         repMod += GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_FACTION_REPUTATION_GAIN, faction);
 
     percent += rep > 0 ? repMod : -repMod;
 
+    float rate = 1.0f;
+    switch (source)
+    {
+        case REPUTATION_SOURCE_KILL:
+            rate = sWorld.getConfig(CONFIG_FLOAT_RATE_REPUTATION_LOWLEVEL_KILL);
+            break;
+        case REPUTATION_SOURCE_QUEST:
+            rate = sWorld.getConfig(CONFIG_FLOAT_RATE_REPUTATION_LOWLEVEL_QUEST);
+            break;
+    }
+
+    if (rate != 1.0f && creatureOrQuestLevel <= MaNGOS::XP::GetGrayLevel(getLevel()))
+        percent *= rate;
+
     if (percent <= 0.0f)
         return 0;
+
+    // Multiply result with the faction specific rate
+    if (const RepRewardRate *repData = sObjectMgr.GetRepRewardRate(faction))
+    {
+        float repRate = 0.0f;
+        switch (source)
+        {
+            case REPUTATION_SOURCE_KILL:
+                repRate = repData->creature_rate;
+                break;
+            case REPUTATION_SOURCE_QUEST:
+                repRate = repData->quest_rate;
+                break;
+            case REPUTATION_SOURCE_SPELL:
+                repRate = repData->spell_rate;
+                break;
+        }
+
+        // for custom, a rate of 0.0 will totally disable reputation gain for this faction/type
+        if (repRate <= 0.0f)
+            return 0;
+
+        percent *= repRate;
+    }
 
     return int32(sWorld.getConfig(CONFIG_FLOAT_RATE_REPUTATION_GAIN)*rep*percent/100.0f);
 }
@@ -6298,7 +6321,7 @@ void Player::RewardReputation(Unit *pVictim, float rate)
 
     if(Rep->repfaction1 && (!Rep->team_dependent || GetTeam()==ALLIANCE))
     {
-        int32 donerep1 = CalculateReputationGain(pVictim->getLevel(), Rep->repvalue1, Rep->repfaction1, false);
+        int32 donerep1 = CalculateReputationGain(REPUTATION_SOURCE_KILL, Rep->repvalue1, Rep->repfaction1, pVictim->getLevel());
         donerep1 = int32(donerep1*rate);
         FactionEntry const *factionEntry1 = sFactionStore.LookupEntry(Rep->repfaction1);
         uint32 current_reputation_rank1 = GetReputationMgr().GetRank(factionEntry1);
@@ -6316,7 +6339,7 @@ void Player::RewardReputation(Unit *pVictim, float rate)
 
     if(Rep->repfaction2 && (!Rep->team_dependent || GetTeam()==HORDE))
     {
-        int32 donerep2 = CalculateReputationGain(pVictim->getLevel(), Rep->repvalue2, Rep->repfaction2, false);
+        int32 donerep2 = CalculateReputationGain(REPUTATION_SOURCE_KILL, Rep->repvalue2, Rep->repfaction2, pVictim->getLevel());
         donerep2 = int32(donerep2*rate);
         FactionEntry const *factionEntry2 = sFactionStore.LookupEntry(Rep->repfaction2);
         uint32 current_reputation_rank2 = GetReputationMgr().GetRank(factionEntry2);
@@ -6345,7 +6368,7 @@ void Player::RewardReputation(Quest const *pQuest)
         // No diplomacy mod are applied to the final value (flat). Note the formula (finalValue = DBvalue/100)
         if (pQuest->RewRepValue[i])
         {
-            int32 rep = CalculateReputationGain(GetQuestLevelForPlayer(pQuest), pQuest->RewRepValue[i]/100, pQuest->RewRepFaction[i], true, true);
+            int32 rep = CalculateReputationGain(REPUTATION_SOURCE_QUEST, pQuest->RewRepValue[i]/100, pQuest->RewRepFaction[i], GetQuestLevelForPlayer(pQuest), true);
 
             if (FactionEntry const* factionEntry = sFactionStore.LookupEntry(pQuest->RewRepFaction[i]))
                 GetReputationMgr().ModifyReputation(factionEntry, rep);
@@ -6362,7 +6385,7 @@ void Player::RewardReputation(Quest const *pQuest)
                 if (!repPoints)
                     continue;
 
-                repPoints = CalculateReputationGain(GetQuestLevelForPlayer(pQuest), repPoints, pQuest->RewRepFaction[i], true);
+                repPoints = CalculateReputationGain(REPUTATION_SOURCE_QUEST, repPoints, pQuest->RewRepFaction[i], GetQuestLevelForPlayer(pQuest));
 
                 if (const FactionEntry* factionEntry = sFactionStore.LookupEntry(pQuest->RewRepFaction[i]))
                     GetReputationMgr().ModifyReputation(factionEntry, repPoints);

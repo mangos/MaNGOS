@@ -7143,13 +7143,14 @@ void Spell::EffectReputation(SpellEffectIndex eff_idx)
     Player *_player = (Player*)unitTarget;
 
     int32  rep_change = m_currentBasePoints[eff_idx];
-
     uint32 faction_id = m_spellInfo->EffectMiscValue[eff_idx];
 
     FactionEntry const* factionEntry = sFactionStore.LookupEntry(faction_id);
 
     if(!factionEntry)
         return;
+
+    rep_change = _player->CalculateReputationGain(REPUTATION_SOURCE_SPELL, rep_change, faction_id);
 
     _player->GetReputationMgr().ModifyReputation(factionEntry, rep_change);
 }
