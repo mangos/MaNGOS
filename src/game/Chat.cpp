@@ -184,18 +184,19 @@ ChatCommand * ChatHandler::getCommandTable()
         { "bg",             SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDebugBattlegroundCommand,        "", NULL },
         { "getitemstate",   SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDebugGetItemStateCommand,        "", NULL },
         { "lootrecipient",  SEC_GAMEMASTER,     false, &ChatHandler::HandleDebugGetLootRecipientCommand,    "", NULL },
-        { "getvalue",       SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDebugGetValueCommand,            "", NULL },
         { "getitemvalue",   SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDebugGetItemValueCommand,        "", NULL },
-        { "Mod32Value",     SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDebugMod32ValueCommand,          "", NULL },
+        { "getvalue",       SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDebugGetValueCommand,            "", NULL },
+        { "moditemvalue",   SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDebugModItemValueCommand,        "", NULL },
+        { "modvalue",       SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDebugModValueCommand,            "", NULL },
         { "play",           SEC_MODERATOR,      false, NULL,                                                "", debugPlayCommandTable },
         { "send",           SEC_ADMINISTRATOR,  false, NULL,                                                "", debugSendCommandTable },
         { "setaurastate",   SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDebugSetAuraStateCommand,        "", NULL },
         { "setitemvalue",   SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDebugSetItemValueCommand,        "", NULL },
         { "setvalue",       SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDebugSetValueCommand,            "", NULL },
         { "spellcheck",     SEC_CONSOLE,        true,  &ChatHandler::HandleDebugSpellCheckCommand,          "", NULL },
+        { "spellmods",      SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDebugSpellModsCommand,           "", NULL },
         { "spawnvehicle",   SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDebugSpawnVehicleCommand,        "", NULL },
         { "uws",            SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDebugUpdateWorldStateCommand,    "", NULL },
-        { "update",         SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDebugUpdateCommand,              "", NULL },
         { NULL,             0,                  false, NULL,                                                "", NULL }
     };
 
@@ -318,7 +319,7 @@ ChatCommand * ChatHandler::getCommandTable()
     static ChatCommand lookupCommandTable[] =
     {
         { "account",        SEC_GAMEMASTER,     true,  NULL,                                           "", lookupAccountCommandTable },
-        { "achievement",    SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleLookupAchievementCommand,   "", NULL },
+        { "achievement",    SEC_GAMEMASTER,     true,  &ChatHandler::HandleLookupAchievementCommand,   "", NULL },
         { "area",           SEC_MODERATOR,      true,  &ChatHandler::HandleLookupAreaCommand,          "", NULL },
         { "creature",       SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleLookupCreatureCommand,      "", NULL },
         { "event",          SEC_GAMEMASTER,     true,  &ChatHandler::HandleLookupEventCommand,         "", NULL },
@@ -347,12 +348,10 @@ ChatCommand * ChatHandler::getCommandTable()
         { "speed",          SEC_MODERATOR,      false, &ChatHandler::HandleModifySpeedCommand,         "", NULL },
         { "swim",           SEC_MODERATOR,      false, &ChatHandler::HandleModifySwimCommand,          "", NULL },
         { "scale",          SEC_MODERATOR,      false, &ChatHandler::HandleModifyScaleCommand,         "", NULL },
-        { "bit",            SEC_MODERATOR,      false, &ChatHandler::HandleModifyBitCommand,           "", NULL },
         { "bwalk",          SEC_MODERATOR,      false, &ChatHandler::HandleModifyBWalkCommand,         "", NULL },
         { "fly",            SEC_MODERATOR,      false, &ChatHandler::HandleModifyFlyCommand,           "", NULL },
         { "aspeed",         SEC_MODERATOR,      false, &ChatHandler::HandleModifyASpeedCommand,        "", NULL },
         { "faction",        SEC_MODERATOR,      false, &ChatHandler::HandleModifyFactionCommand,       "", NULL },
-        { "spell",          SEC_MODERATOR,      false, &ChatHandler::HandleModifySpellCommand,         "", NULL },
         { "tp",             SEC_MODERATOR,      false, &ChatHandler::HandleModifyTalentCommand,        "", NULL },
         { "mount",          SEC_MODERATOR,      false, &ChatHandler::HandleModifyMountCommand,         "", NULL },
         { "honor",          SEC_MODERATOR,      false, &ChatHandler::HandleModifyHonorCommand,         "", NULL },
@@ -2051,20 +2050,40 @@ bool  ChatHandler::ExtractInt32(char** args, int32& val)
 }
 
 /**
+ * Function extract to val arg optional signed integer value or use default value. Fail if extracted not signed integer.
+ *
+ * @param args    variable pointer to non parsed args string, updated at function call to new position (with skipped white spaces)
+ * @param val     return extracted value if function success, in fail case original value unmodified
+ * @param defVal  default value used if no data for extraction in args
+ * @return        true if value extraction successful
+ */
+bool  ChatHandler::ExtractOptInt32(char** args, int32& val, int32 defVal)
+{
+    if (!*args || !**args)
+    {
+        val = defVal;
+        return true;
+    }
+
+    return ExtractInt32(args, val);
+}
+
+/**
  * Function extract to val arg unsigned integer value or fail
  *
  * @param args variable pointer to non parsed args string, updated at function call to new position (with skipped white spaces)
  * @param val  return extracted value if function success, in fail case original value unmodified
+ * @param base set used base for extracted value format (10 for decimal, 16 for hex, etc), 0 let auto select by system internal function
  * @return     true if value extraction successful
  */
-bool  ChatHandler::ExtractUInt32(char** args, uint32& val)
+bool  ChatHandler::ExtractUInt32Base(char** args, uint32& val, uint32 base)
 {
     if (!*args || !**args)
         return false;
 
     char* tail = *args;
 
-    unsigned long valRaw = strtoul(*args, &tail, 10);
+    unsigned long valRaw = strtoul(*args, &tail, base);
 
     if (tail != *args && isWhiteSpace(*tail))
         *(tail++) = '\0';
@@ -2078,6 +2097,25 @@ bool  ChatHandler::ExtractUInt32(char** args, uint32& val)
     val = uint32(valRaw);
     *args = tail;
     return true;
+}
+
+/**
+ * Function extract to val arg optional unsigned integer value or use default value. Fail if extracted not unsigned integer.
+ *
+ * @param args    variable pointer to non parsed args string, updated at function call to new position (with skipped white spaces)
+ * @param val     return extracted value if function success, in fail case original value unmodified
+ * @param defVal  default value used if no data for extraction in args
+ * @return        true if value extraction successful
+ */
+bool  ChatHandler::ExtractOptUInt32(char** args, uint32& val, uint32 defVal)
+{
+    if (!*args || !**args)
+    {
+        val = defVal;
+        return true;
+    }
+
+    return ExtractUInt32(args, val);
 }
 
 /**
@@ -2108,23 +2146,83 @@ bool  ChatHandler::ExtractFloat(char** args, float& val)
 }
 
 /**
+ * Function extract to val arg optional float value or use default value. Fail if extracted not float.
+ *
+ * @param args    variable pointer to non parsed args string, updated at function call to new position (with skipped white spaces)
+ * @param val     return extracted value if function success, in fail case original value unmodified
+ * @param defVal  default value used if no data for extraction in args
+ * @return        true if value extraction successful
+ */
+bool  ChatHandler::ExtractOptFloat(char** args, float& val, float defVal)
+{
+    if (!*args || !**args)
+    {
+        val = defVal;
+        return true;
+    }
+
+    return ExtractFloat(args, val);
+}
+
+/**
  * Function extract name-like string (from non-numeric or special symbol until whitespace)
  *
  * @param args variable pointer to non parsed args string, updated at function call to new position (with skipped white spaces)
- * @return     name-like string without whitespaces, or NULL if args empty or not appropriate content.
+ * @param lit  optional explicit literal requirement. function fail if literal is not starting substring of lit. 
+ *             Note: function in same way fail if no any literal or literal not fit in this case. Need additional check for select specific fail case
+ * @return     name/number-like string without whitespaces, or NULL if args empty or not appropriate content.
  */
-char* ChatHandler::ExtractLiteralArg(char** args)
+char* ChatHandler::ExtractLiteralArg(char** args, char const* lit /*= NULL*/)
 {
     if (!*args || !**args)
         return NULL;
 
-    if ((*args)[0] == '[' || (*args)[0] == '\'' || (*args)[0] == '"' || (*args)[0] == '|')
-        return NULL;
+    char* head = *args;
 
-    char* name = strtok(*args, " ");
+    // reject quoted string or link (|-started text)
+    switch (head[0])
+    {
+        // reject quoted string
+        case '[': case '\'': case '"':
+            return NULL;
+        // reject link (|-started text)
+        case '|':
+            // client replace all | by || in raw text
+            if (head[1] != '|')
+                return NULL;
+            ++head;                                         // skip one |
+            break;
+        default: break;
+    }
 
+    if (lit)
+    {
+        int diff = strncmp(head, lit, strlen(lit));
+
+        if (diff > 0)
+            return NULL;
+
+        if (diff < 0 && !head[-diff] && !isWhiteSpace(head[-diff]))
+            return NULL;
+
+        char* arg = head;
+
+        if (head[-diff])
+        {
+            head[-diff] = '\0';
+
+            head += -diff + 1;
+
+            *args = head;
+        }
+        else
+            *args = NULL;
+
+        return arg;
+    }
+
+    char* name = strtok(head, " ");
     *args = strtok(NULL, "");
-
     return name;
 }
 
@@ -2156,6 +2254,43 @@ char* ChatHandler::ExtractQuotedArg( char** args )
     SkipWhiteSpaces(args);
 
     return str;
+}
+
+/**
+ * Function extract quote-like string or literal if quote not detected
+ *
+ * @param args variable pointer to non parsed args string, updated at function call to new position (with skipped white spaces)
+ * @return     quote/literal string, or NULL if args empty or not appropriate content.
+ */
+char* ChatHandler::ExtractQuotedOrLiteralArg(char** args)
+{
+    char *arg = ExtractQuotedArg(args);
+    if (!arg)
+        arg = ExtractLiteralArg(args);
+    return arg;
+}
+
+/**
+ * Function extract on/off literals as boolean values 
+ *
+ * @param args variable pointer to non parsed args string, updated at function call to new position (with skipped white spaces)
+ * @param val  return extracted value if function success, in fail case original value unmodified
+ * @return     true at success
+ */
+bool  ChatHandler::ExtractOnOff(char** args, bool& value)
+{
+    char* arg = ExtractLiteralArg(args);
+    if (!arg)
+        return false;
+
+    if (strncmp(arg, "on", 3) == 0)
+        value = true;
+    else if (strncmp(arg, "off", 4) == 0)
+        value = false;
+    else
+        return false;
+
+    return true;
 }
 
 /**
@@ -2232,10 +2367,10 @@ char* ChatHandler::ExtractLinkArg( char** args )
 }
 
 /**
- * Function extract nmae/number/quote/shift-link-like string
+ * Function extract name/number/quote/shift-link-like string
  *
  * @param args variable pointer to non parsed args string, updated at function call to new position (with skipped white spaces)
- * @return     extaractd arg string, or NULL if args empty or not appropriate content.
+ * @return     extracted arg string, or NULL if args empty or not appropriate content.
  */
 char* ChatHandler::ExtractArg( char** args )
 {
@@ -2263,10 +2398,10 @@ char* ChatHandler::ExtractArg( char** args )
  * Function extract name/quote/number/shift-link-like string, and return it if args have more non-whitespace data
  *
  * @param args variable pointer to non parsed args string, updated at function call to new position (with skipped white spaces)
- *             if args gave only single arg then args still pointing to this arg (unmodified pointer)
+ *             if args have only single arg then args still pointing to this arg (unmodified pointer)
  * @return     extracted string, or NULL if args empty or not appropriate content or have single arg totally.
  */
-char* ChatHandler::ExtractOptArg(char** args)
+char* ChatHandler::ExtractOptNotLastArg(char** args)
 {
     char* arg = ExtractArg(args);
 

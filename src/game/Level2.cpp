@@ -53,7 +53,7 @@ static uint32 ReputationRankStrIndex[MAX_REPUTATION_RANK] =
 //mute player for some times
 bool ChatHandler::HandleMuteCommand(char* args)
 {
-    char* nameStr = ExtractOptArg(&args);
+    char* nameStr = ExtractOptNotLastArg(&args);
 
     Player* target;
     uint64 target_guid;
@@ -450,22 +450,14 @@ bool ChatHandler::HandleGoGraveyardCommand(char* args)
 {
     Player* _player = m_session->GetPlayer();
 
-    if (!*args)
+    uint32 gyId;
+    if (!ExtractUInt32(&args, gyId))
         return false;
 
-    char *gyId = strtok(args, " ");
-    if (!gyId)
-        return false;
-
-    int32 i_gyId = atoi(gyId);
-
-    if (!i_gyId)
-        return false;
-
-    WorldSafeLocsEntry const* gy = sWorldSafeLocsStore.LookupEntry(i_gyId);
+    WorldSafeLocsEntry const* gy = sWorldSafeLocsStore.LookupEntry(gyId);
     if (!gy)
     {
-        PSendSysMessage(LANG_COMMAND_GRAVEYARDNOEXIST,i_gyId);
+        PSendSysMessage(LANG_COMMAND_GRAVEYARDNOEXIST, gyId);
         SetSentErrorMessage(true);
         return false;
     }
@@ -1114,7 +1106,10 @@ bool ChatHandler::HandleGameObjectPhaseCommand(char* args)
 
 bool ChatHandler::HandleGameObjectNearCommand(char* args)
 {
-    float distance = (!*args) ? 10.0f : (float)atof(args);
+    float distance;
+    if (!ExtractOptFloat(&args, distance, 10.0f))
+        return false;
+
     uint32 count = 0;
 
     Player* pl = m_session->GetPlayer();
@@ -1895,9 +1890,6 @@ bool ChatHandler::HandleNpcMoveCommand(char* args)
  */
 bool ChatHandler::HandleNpcSetMoveTypeCommand(char* args)
 {
-    if (!*args)
-        return false;
-
     // 3 arguments:
     // GUID (optional - you can also select the creature)
     // stay|random|way (determines the kind of movement)
@@ -1905,99 +1897,58 @@ bool ChatHandler::HandleNpcSetMoveTypeCommand(char* args)
     //        this is very handy if you want to do waypoints, that are
     //        later switched on/off according to special events (like escort
     //        quests, etc)
-    char* guid_str = strtok(args, " ");
-    char* type_str = strtok(NULL, " ");
-    char* dontdel_str = strtok(NULL, " ");
 
-    bool doNotDelete = false;
-
-    if (!guid_str)
-        return false;
-
-    uint32 lowguid = 0;
-    Creature* pCreature = NULL;
-
-    if (dontdel_str)
+    uint32 lowguid;
+    Creature* pCreature;
+    if (!ExtractUInt32(&args, lowguid))                     // case .setmovetype $move_type (with selected creature)
     {
-        //sLog.outError("DEBUG: All 3 params are set");
-
-        // All 3 params are set
-        // GUID
-        // type
-        // doNotDEL
-        if (stricmp(dontdel_str, "NODEL") == 0)
-        {
-            //sLog.outError("DEBUG: doNotDelete = true;");
-            doNotDelete = true;
-        }
-    }
-    else
-    {
-        // Only 2 params - but maybe NODEL is set
-        if (type_str)
-        {
-            sLog.outError("DEBUG: Only 2 params ");
-            if (stricmp(type_str, "NODEL") == 0)
-            {
-                //sLog.outError("DEBUG: type_str, NODEL ");
-                doNotDelete = true;
-                type_str = NULL;
-            }
-        }
-    }
-
-    if (!type_str)                                           // case .setmovetype $move_type (with selected creature)
-    {
-        type_str = guid_str;
         pCreature = getSelectedCreature();
         if (!pCreature || pCreature->isPet())
             return false;
         lowguid = pCreature->GetDBTableGUIDLow();
     }
-    else                                                    // case .setmovetype #creature_guid $move_type (with selected creature)
+    else                                                    // case .setmovetype #creature_guid $move_type (with guid)
     {
-        lowguid = atoi((char*)guid_str);
-
-        /* impossible without entry
-        if (lowguid)
-            pCreature = ObjectAccessor::GetCreature(*m_session->GetPlayer(),MAKE_GUID(lowguid,HIGHGUID_UNIT));
-        */
-
-        // attempt check creature existence by DB data
-        if (!pCreature)
+        CreatureData const* data = sObjectMgr.GetCreatureData(lowguid);
+        if (!data)
         {
-            CreatureData const* data = sObjectMgr.GetCreatureData(lowguid);
-            if (!data)
-            {
-                PSendSysMessage(LANG_COMMAND_CREATGUIDNOTFOUND, lowguid);
-                SetSentErrorMessage(true);
-                return false;
-            }
+            PSendSysMessage(LANG_COMMAND_CREATGUIDNOTFOUND, lowguid);
+            SetSentErrorMessage(true);
+            return false;
         }
-        else
+
+        Player* player = m_session->GetPlayer();
+
+        if (player->GetMapId() != data->mapid)
         {
-            lowguid = pCreature->GetDBTableGUIDLow();
+            PSendSysMessage(LANG_COMMAND_CREATUREATSAMEMAP, lowguid);
+            SetSentErrorMessage(true);
+            return false;
         }
+
+        pCreature = player->GetMap()->GetCreature(ObjectGuid(HIGHGUID_UNIT, data->id, lowguid));
     }
 
-    // now lowguid is low guid really existing creature
-    // and pCreature point (maybe) to this creature or NULL
-
     MovementGeneratorType move_type;
-
-    std::string type = type_str;
-
-    if (type == "stay")
+    char* type_str = ExtractLiteralArg(&args);
+    if (strncmp(type_str, "stay", strlen(type_str)) == 0)
         move_type = IDLE_MOTION_TYPE;
-    else if (type == "random")
+    else if (strncmp(type_str, "random", strlen(type_str)) == 0)
         move_type = RANDOM_MOTION_TYPE;
-    else if (type == "way")
+    else if (strncmp(type_str, "way", strlen(type_str)) == 0)
         move_type = WAYPOINT_MOTION_TYPE;
     else
         return false;
 
+    bool doNotDelete = ExtractLiteralArg(&args, "NODEL") != NULL;
+    if (!doNotDelete && *args)                              // need fail if false in result wrong literal
+        return false;
+
+    // now lowguid is low guid really existing creature
+    // and pCreature point (maybe) to this creature or NULL
+
     // update movement type
-    if (doNotDelete == false)
+    if (!doNotDelete)
         sWaypointMgr.DeletePath(lowguid);
 
     if (pCreature)
@@ -2011,14 +1962,11 @@ bool ChatHandler::HandleNpcSetMoveTypeCommand(char* args)
         }
         pCreature->SaveToDB();
     }
-    if (doNotDelete == false)
-    {
-        PSendSysMessage(LANG_MOVE_TYPE_SET,type_str);
-    }
-    else
-    {
+
+    if (doNotDelete)
         PSendSysMessage(LANG_MOVE_TYPE_SET_NODEL,type_str);
-    }
+    else
+        PSendSysMessage(LANG_MOVE_TYPE_SET,type_str);
 
     return true;
 }
@@ -2128,34 +2076,23 @@ bool ChatHandler::HandleNpcSpawnDistCommand(char* args)
 //spawn time handling
 bool ChatHandler::HandleNpcSpawnTimeCommand(char* args)
 {
-    if (!*args)
+    uint32 stime;
+    if (!ExtractUInt32(&args, stime))
         return false;
 
-    char* stime = strtok(args, " ");
-
-    if (!stime)
-        return false;
-
-    int i_stime = atoi(stime);
-
-    if (i_stime < 0)
+    Creature *pCreature = getSelectedCreature();
+    if (!pCreature)
     {
-        SendSysMessage(LANG_BAD_VALUE);
+        PSendSysMessage(LANG_SELECT_CREATURE);
         SetSentErrorMessage(true);
         return false;
     }
 
-    Creature *pCreature = getSelectedCreature();
-    uint32 u_guidlow = 0;
+    uint32 u_guidlow = pCreature->GetDBTableGUIDLow();
 
-    if (pCreature)
-        u_guidlow = pCreature->GetDBTableGUIDLow();
-    else
-        return false;
-
-    WorldDatabase.PExecuteLog("UPDATE creature SET spawntimesecs=%i WHERE guid=%u",i_stime,u_guidlow);
-    pCreature->SetRespawnDelay((uint32)i_stime);
-    PSendSysMessage(LANG_COMMAND_SPAWNTIME,i_stime);
+    WorldDatabase.PExecuteLog("UPDATE creature SET spawntimesecs=%i WHERE guid=%u", stime, u_guidlow);
+    pCreature->SetRespawnDelay(stime);
+    PSendSysMessage(LANG_COMMAND_SPAWNTIME, stime);
 
     return true;
 }
@@ -2314,8 +2251,13 @@ bool ChatHandler::HandleNpcSetPhaseCommand(char* args)
 //npc deathstate handling
 bool ChatHandler::HandleNpcSetDeathStateCommand(char* args)
 {
-    if (!*args)
+    bool value;
+    if (!ExtractOnOff(&args, value))
+    {
+        SendSysMessage(LANG_USE_BOL);
+        SetSentErrorMessage(true);
         return false;
+    }
 
     Creature* pCreature = getSelectedCreature();
     if (!pCreature || pCreature->isPet())
@@ -2325,16 +2267,10 @@ bool ChatHandler::HandleNpcSetDeathStateCommand(char* args)
         return false;
     }
 
-    if (strncmp(args, "on", 3) == 0)
+    if (value)
         pCreature->SetDeadByDefault(true);
-    else if (strncmp(args, "off", 4) == 0)
-        pCreature->SetDeadByDefault(false);
     else
-    {
-        SendSysMessage(LANG_USE_BOL);
-        SetSentErrorMessage(true);
-        return false;
-    }
+        pCreature->SetDeadByDefault(false);
 
     pCreature->SaveToDB();
     pCreature->Respawn();
@@ -4079,10 +4015,9 @@ bool ChatHandler::HandleCharacterReputationCommand(char* args)
 //change standstate
 bool ChatHandler::HandleModifyStandStateCommand(char* args)
 {
-    if (!*args)
+    uint32 anim_id;
+    if (!ExtractUInt32(&args, anim_id))
         return false;
-
-    uint32 anim_id = atoi(args);
 
     if (!sEmotesStore.LookupEntry(anim_id))
         return false;
@@ -4752,8 +4687,13 @@ bool ChatHandler::HandleRepairitemsCommand(char* args)
 
 bool ChatHandler::HandleWaterwalkCommand(char* args)
 {
-    if (!*args)
+    bool value;
+    if (!ExtractOnOff(&args, value))
+    {
+        SendSysMessage(LANG_USE_BOL);
+        SetSentErrorMessage(true);
         return false;
+    }
 
     Player *player = getSelectedPlayer();
 
@@ -4768,15 +4708,10 @@ bool ChatHandler::HandleWaterwalkCommand(char* args)
     if (HasLowerSecurity(player, 0))
         return false;
 
-    if (strncmp(args, "on", 3) == 0)
+    if (value)
         player->SetMovement(MOVE_WATER_WALK);               // ON
-    else if (strncmp(args, "off", 4) == 0)
-        player->SetMovement(MOVE_LAND_WALK);                // OFF
     else
-    {
-        SendSysMessage(LANG_USE_BOL);
-        return false;
-    }
+        player->SetMovement(MOVE_LAND_WALK);                // OFF
 
     PSendSysMessage(LANG_YOU_SET_WATERWALK, args, GetNameLink(player).c_str());
     if (needReportToTarget(player))

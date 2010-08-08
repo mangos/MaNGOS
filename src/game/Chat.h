@@ -161,16 +161,17 @@ class ChatHandler
         bool HandleDebugArenaCommand(char* args);
         bool HandleDebugBattlegroundCommand(char* args);
         bool HandleDebugGetItemStateCommand(char* args);
+        bool HandleDebugGetItemValueCommand(char* args);
         bool HandleDebugGetLootRecipientCommand(char* args);
         bool HandleDebugGetValueCommand(char* args);
-        bool HandleDebugGetItemValueCommand(char* args);
-        bool HandleDebugMod32ValueCommand(char* args);
+        bool HandleDebugModItemValueCommand(char* args);
+        bool HandleDebugModValueCommand(char* args);
         bool HandleDebugSetAuraStateCommand(char* args);
         bool HandleDebugSetItemValueCommand(char* args);
         bool HandleDebugSetValueCommand(char* args);
         bool HandleDebugSpawnVehicleCommand(char* args);
         bool HandleDebugSpellCheckCommand(char* args);
-        bool HandleDebugUpdateCommand(char* args);
+        bool HandleDebugSpellModsCommand(char* args);
         bool HandleDebugUpdateWorldStateCommand(char* args);
 
         bool HandleDebugPlayCinematicCommand(char* args);
@@ -288,9 +289,7 @@ class ChatHandler
         bool HandleModifySwimCommand(char* args);
         bool HandleModifyScaleCommand(char* args);
         bool HandleModifyMountCommand(char* args);
-        bool HandleModifyBitCommand(char* args);
         bool HandleModifyFactionCommand(char* args);
-        bool HandleModifySpellCommand(char* args);
         bool HandleModifyTalentCommand(char* args);
         bool HandleModifyHonorCommand(char* args);
         bool HandleModifyRepCommand(char* args);
@@ -557,13 +556,20 @@ class ChatHandler
         // extraction different type params from args string, all functions update (char** args) to first unparsed tail symbol at return
         void  SkipWhiteSpaces(char** args);
         bool  ExtractInt32(char** args, int32& val);
-        bool  ExtractUInt32(char** args, uint32& val);
+        bool  ExtractOptInt32(char** args, int32& val, int32 defVal);
+        bool  ExtractUInt32Base(char** args, uint32& val, uint32 base);
+        bool  ExtractUInt32(char** args, uint32& val) { return ExtractUInt32Base(args,val, 10); }
+        bool  ExtractOptUInt32(char** args, uint32& val, uint32 defVal);
         bool  ExtractFloat(char** args, float& val);
-        char* ExtractLiteralArg(char** args);               // any literal strings (until whitespace and not started from "['|)
+        bool  ExtractOptFloat(char** args, float& val, float defVal);
         char* ExtractQuotedArg(char** args);                // string with " or [] or ' around
         char* ExtractLinkArg(char** args);                  // shift-link like arg
+        char* ExtractLiteralArg(char** args, char const* lit = NULL);
+                                                            // literal string (until whitespace and not started from "['|), any or 'lit' if provided
+        char* ExtractQuotedOrLiteralArg(char** args);
+        bool  ExtractOnOff(char** args, bool& value);
         char* ExtractArg(char** args);                      // any name/number/quote/shift-link strings
-        char* ExtractOptArg(char** args);                   // extract name/number/quote/shift-link arg only if more data in args for parse
+        char* ExtractOptNotLastArg(char** args);                   // extract name/number/quote/shift-link arg only if more data in args for parse
 
         char*     extractKeyFromLink(char* text, char const* linkType, char** something1 = NULL);
         char*     extractKeyFromLink(char* text, char const* const* linkTypes, int* found_idx, char** something1 = NULL);
@@ -602,6 +608,9 @@ class ChatHandler
         void HandleCharacterLevel(Player* player, uint64 player_guid, uint32 oldlevel, uint32 newlevel);
         void HandleLearnSkillRecipesHelper(Player* player,uint32 skill_id);
         bool HandleGoHelper(Player* _player, uint32 mapid, float x, float y, float const* zPtr = NULL, float const* ortPtr = NULL);
+        bool HandleGetValueHelper(Object* target, uint32 field, char* typeStr);
+        bool HandlerDebugModValueHelper(Object* target, uint32 field, char* typeStr, char* valStr);
+        bool HandleSetValueHelper(Object* target, uint32 field, char* typeStr, char* valStr);
         template<typename T>
         void ShowNpcOrGoSpawnInformation(uint32 guid);
         template <typename T>

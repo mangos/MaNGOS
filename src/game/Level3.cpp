@@ -56,40 +56,40 @@
 //reload commands
 bool ChatHandler::HandleReloadAllCommand(char* /*args*/)
 {
-    HandleReloadSkillFishingBaseLevelCommand("");
+    HandleReloadSkillFishingBaseLevelCommand((char*)"");
 
-    HandleReloadAllAchievementCommand("");
-    HandleReloadAllAreaCommand("");
-    HandleReloadAllEventAICommand("");
-    HandleReloadAllLootCommand("");
-    HandleReloadAllNpcCommand("");
-    HandleReloadAllQuestCommand("");
-    HandleReloadAllSpellCommand("");
-    HandleReloadAllItemCommand("");
-    HandleReloadAllGossipsCommand("");
-    HandleReloadAllLocalesCommand("");
+    HandleReloadAllAchievementCommand((char*)"");
+    HandleReloadAllAreaCommand((char*)"");
+    HandleReloadAllEventAICommand((char*)"");
+    HandleReloadAllLootCommand((char*)"");
+    HandleReloadAllNpcCommand((char*)"");
+    HandleReloadAllQuestCommand((char*)"");
+    HandleReloadAllSpellCommand((char*)"");
+    HandleReloadAllItemCommand((char*)"");
+    HandleReloadAllGossipsCommand((char*)"");
+    HandleReloadAllLocalesCommand((char*)"");
 
-    HandleReloadMailLevelRewardCommand("");
-    HandleReloadCommandCommand("");
-    HandleReloadReservedNameCommand("");
-    HandleReloadMangosStringCommand("");
-    HandleReloadGameTeleCommand("");
+    HandleReloadMailLevelRewardCommand((char*)"");
+    HandleReloadCommandCommand((char*)"");
+    HandleReloadReservedNameCommand((char*)"");
+    HandleReloadMangosStringCommand((char*)"");
+    HandleReloadGameTeleCommand((char*)"");
     return true;
 }
 
 bool ChatHandler::HandleReloadAllAchievementCommand(char* /*args*/)
 {
-    HandleReloadAchievementCriteriaRequirementCommand("");
-    HandleReloadAchievementRewardCommand("");
+    HandleReloadAchievementCriteriaRequirementCommand((char*)"");
+    HandleReloadAchievementRewardCommand((char*)"");
     return true;
 }
 
 bool ChatHandler::HandleReloadAllAreaCommand(char* /*args*/)
 {
-    //HandleReloadQuestAreaTriggersCommand(""); -- reloaded in HandleReloadAllQuestCommand
-    HandleReloadAreaTriggerTeleportCommand("");
-    HandleReloadAreaTriggerTavernCommand("");
-    HandleReloadGameGraveyardZoneCommand("");
+    //HandleReloadQuestAreaTriggersCommand((char*)""); -- reloaded in HandleReloadAllQuestCommand
+    HandleReloadAreaTriggerTeleportCommand((char*)"");
+    HandleReloadAreaTriggerTavernCommand((char*)"");
+    HandleReloadGameGraveyardZoneCommand((char*)"");
     return true;
 }
 
@@ -104,19 +104,19 @@ bool ChatHandler::HandleReloadAllLootCommand(char* /*args*/)
 bool ChatHandler::HandleReloadAllNpcCommand(char* args)
 {
     if (*args!='a')                                         // will be reloaded from all_gossips
-        HandleReloadNpcGossipCommand("a");
-    HandleReloadNpcTrainerCommand("a");
-    HandleReloadNpcVendorCommand("a");
-    HandleReloadPointsOfInterestCommand("a");
-    HandleReloadSpellClickSpellsCommand("a");
+        HandleReloadNpcGossipCommand((char*)"a");
+    HandleReloadNpcTrainerCommand((char*)"a");
+    HandleReloadNpcVendorCommand((char*)"a");
+    HandleReloadPointsOfInterestCommand((char*)"a");
+    HandleReloadSpellClickSpellsCommand((char*)"a");
     return true;
 }
 
 bool ChatHandler::HandleReloadAllQuestCommand(char* /*args*/)
 {
-    HandleReloadQuestAreaTriggersCommand("a");
-    HandleReloadQuestPOICommand("a");
-    HandleReloadQuestTemplateCommand("a");
+    HandleReloadQuestAreaTriggersCommand((char*)"a");
+    HandleReloadQuestPOICommand((char*)"a");
+    HandleReloadQuestTemplateCommand((char*)"a");
 
     sLog.outString( "Re-Loading Quests Relations..." );
     sObjectMgr.LoadQuestRelations();
@@ -134,73 +134,73 @@ bool ChatHandler::HandleReloadAllScriptsCommand(char* /*args*/)
     }
 
     sLog.outString( "Re-Loading Scripts..." );
-    HandleReloadGameObjectScriptsCommand("a");
-    HandleReloadGossipScriptsCommand("a");
-    HandleReloadEventScriptsCommand("a");
-    HandleReloadQuestEndScriptsCommand("a");
-    HandleReloadQuestStartScriptsCommand("a");
-    HandleReloadSpellScriptsCommand("a");
+    HandleReloadGameObjectScriptsCommand((char*)"a");
+    HandleReloadGossipScriptsCommand((char*)"a");
+    HandleReloadEventScriptsCommand((char*)"a");
+    HandleReloadQuestEndScriptsCommand((char*)"a");
+    HandleReloadQuestStartScriptsCommand((char*)"a");
+    HandleReloadSpellScriptsCommand((char*)"a");
     SendGlobalSysMessage("DB tables `*_scripts` reloaded.");
-    HandleReloadDbScriptStringCommand("a");
+    HandleReloadDbScriptStringCommand((char*)"a");
     return true;
 }
 
 bool ChatHandler::HandleReloadAllEventAICommand(char* /*args*/)
 {
-    HandleReloadEventAITextsCommand("a");
-    HandleReloadEventAISummonsCommand("a");
-    HandleReloadEventAIScriptsCommand("a");
+    HandleReloadEventAITextsCommand((char*)"a");
+    HandleReloadEventAISummonsCommand((char*)"a");
+    HandleReloadEventAIScriptsCommand((char*)"a");
     return true;
 }
 
 bool ChatHandler::HandleReloadAllSpellCommand(char* /*args*/)
 {
-    HandleReloadSkillDiscoveryTemplateCommand("a");
-    HandleReloadSkillExtraItemTemplateCommand("a");
-    HandleReloadSpellAreaCommand("a");
-    HandleReloadSpellChainCommand("a");
-    HandleReloadSpellElixirCommand("a");
-    HandleReloadSpellLearnSpellCommand("a");
-    HandleReloadSpellProcEventCommand("a");
-    HandleReloadSpellBonusesCommand("a");
-    HandleReloadSpellProcItemEnchantCommand("a");
-    HandleReloadSpellScriptTargetCommand("a");
-    HandleReloadSpellTargetPositionCommand("a");
-    HandleReloadSpellThreatsCommand("a");
-    HandleReloadSpellPetAurasCommand("a");
+    HandleReloadSkillDiscoveryTemplateCommand((char*)"a");
+    HandleReloadSkillExtraItemTemplateCommand((char*)"a");
+    HandleReloadSpellAreaCommand((char*)"a");
+    HandleReloadSpellChainCommand((char*)"a");
+    HandleReloadSpellElixirCommand((char*)"a");
+    HandleReloadSpellLearnSpellCommand((char*)"a");
+    HandleReloadSpellProcEventCommand((char*)"a");
+    HandleReloadSpellBonusesCommand((char*)"a");
+    HandleReloadSpellProcItemEnchantCommand((char*)"a");
+    HandleReloadSpellScriptTargetCommand((char*)"a");
+    HandleReloadSpellTargetPositionCommand((char*)"a");
+    HandleReloadSpellThreatsCommand((char*)"a");
+    HandleReloadSpellPetAurasCommand((char*)"a");
     return true;
 }
 
 bool ChatHandler::HandleReloadAllGossipsCommand(char* args)
 {
-    HandleReloadGossipMenuCommand("a");
-    HandleReloadGossipMenuOptionCommand("a");
+    HandleReloadGossipMenuCommand((char*)"a");
+    HandleReloadGossipMenuOptionCommand((char*)"a");
     if (*args!='a')                                         // already reload from all_scripts
-        HandleReloadGossipScriptsCommand("a");
-    HandleReloadNpcGossipCommand("a");
-    HandleReloadPointsOfInterestCommand("a");
+        HandleReloadGossipScriptsCommand((char*)"a");
+    HandleReloadNpcGossipCommand((char*)"a");
+    HandleReloadPointsOfInterestCommand((char*)"a");
     return true;
 }
 
 bool ChatHandler::HandleReloadAllItemCommand(char* /*args*/)
 {
-    HandleReloadPageTextsCommand("a");
-    HandleReloadItemEnchantementsCommand("a");
-    HandleReloadItemRequiredTragetCommand("a");
+    HandleReloadPageTextsCommand((char*)"a");
+    HandleReloadItemEnchantementsCommand((char*)"a");
+    HandleReloadItemRequiredTragetCommand((char*)"a");
     return true;
 }
 
 bool ChatHandler::HandleReloadAllLocalesCommand(char* /*args*/)
 {
-    HandleReloadLocalesAchievementRewardCommand("a");
-    HandleReloadLocalesCreatureCommand("a");
-    HandleReloadLocalesGameobjectCommand("a");
-    HandleReloadLocalesGossipMenuOptionCommand("a");
-    HandleReloadLocalesItemCommand("a");
-    HandleReloadLocalesNpcTextCommand("a");
-    HandleReloadLocalesPageTextCommand("a");
-    HandleReloadLocalesPointsOfInterestCommand("a");
-    HandleReloadLocalesQuestCommand("a");
+    HandleReloadLocalesAchievementRewardCommand((char*)"a");
+    HandleReloadLocalesCreatureCommand((char*)"a");
+    HandleReloadLocalesGameobjectCommand((char*)"a");
+    HandleReloadLocalesGossipMenuOptionCommand((char*)"a");
+    HandleReloadLocalesItemCommand((char*)"a");
+    HandleReloadLocalesNpcTextCommand((char*)"a");
+    HandleReloadLocalesPageTextCommand((char*)"a");
+    HandleReloadLocalesPointsOfInterestCommand((char*)"a");
+    HandleReloadLocalesQuestCommand((char*)"a");
     return true;
 }
 
@@ -918,7 +918,7 @@ bool ChatHandler::HandleLoadScriptsCommand(char* args)
 
 bool ChatHandler::HandleAccountSetGmLevelCommand(char* args)
 {
-    char* accountStr = ExtractOptArg(&args);
+    char* accountStr = ExtractOptNotLastArg(&args);
 
     std::string targetAccountName;
     Player* targetPlayer = NULL;
@@ -979,8 +979,12 @@ bool ChatHandler::HandleAccountSetPasswordCommand(char* args)
     if (!targetAccountId)
         return false;
 
-    char *szPassword1 =  strtok (NULL," ");
-    char *szPassword2 =  strtok (NULL," ");
+    // FIXME: temporary added until extractAccountId convertion to char** way
+    args = strtok (NULL,"");
+
+    // allow or quoted string with possible spaces or literal without spaces
+    char *szPassword1 = ExtractQuotedOrLiteralArg(&args);
+    char *szPassword2 = ExtractQuotedOrLiteralArg(&args);
     if (!szPassword1 || !szPassword2)
         return false;
 
@@ -1837,8 +1841,8 @@ bool ChatHandler::HandleLearnAllGMCommand(char* /*args*/)
 
 bool ChatHandler::HandleLearnAllMyClassCommand(char* /*args*/)
 {
-    HandleLearnAllMySpellsCommand("");
-    HandleLearnAllMyTalentsCommand("");
+    HandleLearnAllMySpellsCommand((char*)"");
+    HandleLearnAllMyTalentsCommand((char*)"");
     return true;
 }
 
@@ -3359,7 +3363,7 @@ bool ChatHandler::HandleGuildUninviteCommand(char *args)
 
 bool ChatHandler::HandleGuildRankCommand(char *args)
 {
-    char* nameStr = ExtractOptArg(&args);
+    char* nameStr = ExtractOptNotLastArg(&args);
 
     Player* target;
     uint64 target_guid;
@@ -3651,24 +3655,18 @@ bool ChatHandler::HandleUnAuraCommand(char* args)
 
 bool ChatHandler::HandleLinkGraveCommand(char* args)
 {
-    if (!*args)
+    uint32 g_id;
+    if (!ExtractUInt32(&args, g_id))
         return false;
 
-    char* px = strtok(args, " ");
-    if (!px)
-        return false;
-
-    uint32 g_id = (uint32)atoi(px);
+    char* teamStr = ExtractLiteralArg(&args);
 
     uint32 g_team;
-
-    char* px2 = strtok(NULL, " ");
-
-    if (!px2)
+    if (!teamStr)
         g_team = 0;
-    else if (strncmp(px2,"horde",6)==0)
+    else if (strncmp(teamStr, "horde", strlen(teamStr))==0)
         g_team = HORDE;
-    else if (strncmp(px2,"alliance",9)==0)
+    else if (strncmp(teamStr, "alliance", strlen(teamStr))==0)
         g_team = ALLIANCE;
     else
         return false;
@@ -3988,12 +3986,9 @@ bool ChatHandler::HandleExploreCheatCommand(char* args)
 
 bool ChatHandler::HandleHoverCommand(char* args)
 {
-    char* px = strtok(args, " ");
     uint32 flag;
-    if (!px)
-        flag = 1;
-    else
-        flag = atoi(px);
+    if (!ExtractOptUInt32(&args, flag, 1))
+        return false;
 
     m_session->GetPlayer()->SetHover(flag);
 
@@ -4032,7 +4027,7 @@ void ChatHandler::HandleCharacterLevel(Player* player, uint64 player_guid, uint3
 
 bool ChatHandler::HandleCharacterLevelCommand(char* args)
 {
-    char* nameStr = ExtractOptArg(&args);
+    char* nameStr = ExtractOptNotLastArg(&args);
 
     int32 newlevel;
     bool nolevel = false;
@@ -4085,7 +4080,7 @@ bool ChatHandler::HandleLevelUpCommand(char* args)
 
     if (*args)
     {
-        nameStr = ExtractOptArg(&args);
+        nameStr = ExtractOptNotLastArg(&args);
 
         // exception opt second arg: .levelup $name
         if (!ExtractInt32(&args, addlevel))
@@ -5073,17 +5068,19 @@ bool ChatHandler::HandleBanHelper(BanMode mode, char* args)
     if (!*args)
         return false;
 
-    char* cnameOrIP = strtok(args, " ");
+    char* cnameOrIP = ExtractArg(&args);
     if (!cnameOrIP)
         return false;
 
     std::string nameOrIP = cnameOrIP;
 
-    char* duration = strtok (NULL," ");
-    if(!duration || !atoi(duration))
+    char* duration = ExtractArg(&args);                     // time string
+    if(!duration)
         return false;
 
-    char* reason = strtok (NULL,"");
+    uint32 duration_secs = TimeStringToSecs(duration);
+
+    char* reason = ExtractArg(&args);
     if(!reason)
         return false;
 
@@ -5111,13 +5108,13 @@ bool ChatHandler::HandleBanHelper(BanMode mode, char* args)
             break;
     }
 
-    switch(sWorld.BanAccount(mode, nameOrIP, duration, reason,m_session ? m_session->GetPlayerName() : ""))
+    switch(sWorld.BanAccount(mode, nameOrIP, duration_secs, reason,m_session ? m_session->GetPlayerName() : ""))
     {
         case BAN_SUCCESS:
-            if(atoi(duration)>0)
-                PSendSysMessage(LANG_BAN_YOUBANNED,nameOrIP.c_str(),secsToTimeString(TimeStringToSecs(duration),true).c_str(),reason);
+            if (duration_secs > 0)
+                PSendSysMessage(LANG_BAN_YOUBANNED, nameOrIP.c_str(), secsToTimeString(duration_secs,true).c_str(), reason);
             else
-                PSendSysMessage(LANG_BAN_YOUPERMBANNED,nameOrIP.c_str(),reason);
+                PSendSysMessage(LANG_BAN_YOUPERMBANNED, nameOrIP.c_str(), reason);
             break;
         case BAN_SYNTAX_ERROR:
             return false;
@@ -5125,13 +5122,13 @@ bool ChatHandler::HandleBanHelper(BanMode mode, char* args)
             switch(mode)
             {
                 default:
-                    PSendSysMessage(LANG_BAN_NOTFOUND,"account",nameOrIP.c_str());
+                    PSendSysMessage(LANG_BAN_NOTFOUND,"account", nameOrIP.c_str());
                     break;
                 case BAN_CHARACTER:
-                    PSendSysMessage(LANG_BAN_NOTFOUND,"character",nameOrIP.c_str());
+                    PSendSysMessage(LANG_BAN_NOTFOUND,"character", nameOrIP.c_str());
                     break;
                 case BAN_IP:
-                    PSendSysMessage(LANG_BAN_NOTFOUND,"ip",nameOrIP.c_str());
+                    PSendSysMessage(LANG_BAN_NOTFOUND,"ip", nameOrIP.c_str());
                     break;
             }
             SetSentErrorMessage(true);
@@ -5143,17 +5140,17 @@ bool ChatHandler::HandleBanHelper(BanMode mode, char* args)
 
 bool ChatHandler::HandleUnBanAccountCommand(char* args)
 {
-    return HandleUnBanHelper(BAN_ACCOUNT,args);
+    return HandleUnBanHelper(BAN_ACCOUNT, args);
 }
 
 bool ChatHandler::HandleUnBanCharacterCommand(char* args)
 {
-    return HandleUnBanHelper(BAN_CHARACTER,args);
+    return HandleUnBanHelper(BAN_CHARACTER, args);
 }
 
 bool ChatHandler::HandleUnBanIPCommand(char* args)
 {
-    return HandleUnBanHelper(BAN_IP,args);
+    return HandleUnBanHelper(BAN_IP, args);
 }
 
 bool ChatHandler::HandleUnBanHelper(BanMode mode, char* args)
@@ -5161,7 +5158,7 @@ bool ChatHandler::HandleUnBanHelper(BanMode mode, char* args)
     if (!*args)
         return false;
 
-    char* cnameOrIP = strtok(args, " ");
+    char* cnameOrIP = ExtractArg(&args);
     if (!cnameOrIP)
         return false;
 
@@ -5521,23 +5518,20 @@ bool ChatHandler::HandleRespawnCommand(char* /*args*/)
 
 bool ChatHandler::HandleGMFlyCommand(char* args)
 {
-    if (!*args)
+    bool value;
+    if (!ExtractOnOff(&args, value))
+    {
+        SendSysMessage(LANG_USE_BOL);
+        SetSentErrorMessage(true);
         return false;
+    }
 
     Player *target = getSelectedPlayer();
     if (!target)
         target = m_session->GetPlayer();
 
     WorldPacket data(12);
-    if (strncmp(args, "on", 3) == 0)
-        data.SetOpcode(SMSG_MOVE_SET_CAN_FLY);
-    else if (strncmp(args, "off", 4) == 0)
-        data.SetOpcode(SMSG_MOVE_UNSET_CAN_FLY);
-    else
-    {
-        SendSysMessage(LANG_USE_BOL);
-        return false;
-    }
+    data.SetOpcode(value ? SMSG_MOVE_SET_CAN_FLY : SMSG_MOVE_UNSET_CAN_FLY);
     data << target->GetPackGUID();
     data << uint32(0);                                      // unknown
     target->SendMessageToSet(&data, true);
@@ -6306,7 +6300,7 @@ bool ChatHandler::HandleAccountCharactersCommand(char* args)
 bool ChatHandler::HandleAccountSetAddonCommand(char* args)
 {
     ///- Get the command line arguments
-    char* accountStr = ExtractOptArg(&args);
+    char* accountStr = ExtractOptNotLastArg(&args);
 
     std::string account_name;
     uint32 account_id = extractAccountId(accountStr, &account_name);

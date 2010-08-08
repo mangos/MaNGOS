@@ -193,12 +193,10 @@ bool ChatHandler::HandleAccountPasswordCommand(char* args)
         return false;
     }
 
-    if(!*args)
-        return false;
-
-    char *old_pass = strtok (args, " ");
-    char *new_pass = strtok (NULL, " ");
-    char *new_pass_c  = strtok (NULL, " ");
+    // allow or quoted string with possible spaces or literal without spaces
+    char *old_pass = ExtractQuotedOrLiteralArg(&args);
+    char *new_pass = ExtractQuotedOrLiteralArg(&args);
+    char *new_pass_c = ExtractQuotedOrLiteralArg(&args);
 
     if (!old_pass || !new_pass || !new_pass_c)
         return false;
@@ -252,28 +250,25 @@ bool ChatHandler::HandleAccountLockCommand(char* args)
         return false;
     }
 
-    if (!*args)
+    bool value;
+    if (!ExtractOnOff(&args, value))
     {
         SendSysMessage(LANG_USE_BOL);
-        return true;
+        SetSentErrorMessage(true);
+        return false;
     }
 
-    std::string argstr = args;
-    if (argstr == "on")
+    if (value)
     {
         LoginDatabase.PExecute( "UPDATE account SET locked = '1' WHERE id = '%d'",GetAccountId());
         PSendSysMessage(LANG_COMMAND_ACCLOCKLOCKED);
-        return true;
     }
-
-    if (argstr == "off")
+    else
     {
         LoginDatabase.PExecute( "UPDATE account SET locked = '0' WHERE id = '%d'",GetAccountId());
         PSendSysMessage(LANG_COMMAND_ACCLOCKUNLOCKED);
-        return true;
     }
 
-    SendSysMessage(LANG_USE_BOL);
     return true;
 }
 

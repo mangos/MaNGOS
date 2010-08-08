@@ -397,17 +397,10 @@ bool ChatHandler::HandleCharacterDeletedOldCommand(char* args)
 {
     int32 keepDays = sWorld.getConfig(CONFIG_UINT32_CHARDELETE_KEEP_DAYS);
 
-    if (char* px = strtok(args, " "))
-    {
-        if (!isNumeric(px))
-            return false;
+    if (!ExtractOptInt32(&args, keepDays, sWorld.getConfig(CONFIG_UINT32_CHARDELETE_KEEP_DAYS)))
+        return false;
 
-        keepDays = atoi(px);
-        if (keepDays < 0)
-            return false;
-    }
-    // config option value 0 -> disabled and can't be used
-    else if (keepDays <= 0)
+    if (keepDays < 0)
         return false;
 
     Player::DeleteOldCharacters((uint32)keepDays);
@@ -476,8 +469,9 @@ bool ChatHandler::HandleServerExitCommand(char* /*args*/)
 /// Display info on users currently in the realm
 bool ChatHandler::HandleAccountOnlineListCommand(char* args)
 {
-    char* limit_str = *args ? strtok(args, " ") : NULL;
-    uint32 limit = limit_str ? atoi(limit_str) : 100;
+    uint32 limit;
+    if (!ExtractOptUInt32(&args, limit, 100))
+        return false;
 
     ///- Get the list of accounts ID logged to the realm
     //                                                 0   1         2        3        4
@@ -489,12 +483,9 @@ bool ChatHandler::HandleAccountOnlineListCommand(char* args)
 /// Create an account
 bool ChatHandler::HandleAccountCreateCommand(char* args)
 {
-    if (!*args)
-        return false;
-
     ///- %Parse the command line arguments
-    char *szAcc = strtok(args, " ");
-    char *szPassword = strtok(NULL, " ");
+    char *szAcc = ExtractQuotedOrLiteralArg(&args);
+    char *szPassword = ExtractQuotedOrLiteralArg(&args);
     if(!szAcc || !szPassword)
         return false;
 
@@ -543,20 +534,12 @@ bool ChatHandler::HandleServerLogFilterCommand(char* args)
         return true;
     }
 
-    char *filtername = strtok(args, " ");
+    char *filtername = ExtractLiteralArg(&args);
     if (!filtername)
         return false;
 
-    char *value_str = strtok(NULL, " ");
-    if (!value_str)
-        return false;
-
     bool value;
-    if (strncmp(value_str, "on", 3) == 0)
-        value = true;
-    else if (strncmp(value_str, "off", 4) == 0)
-        value = false;
-    else
+    if (!ExtractOnOff(&args, value))
     {
         SendSysMessage(LANG_USE_BOL);
         SetSentErrorMessage(true);
@@ -565,7 +548,7 @@ bool ChatHandler::HandleServerLogFilterCommand(char* args)
 
     if (strncmp(filtername, "all", 4) == 0)
     {
-        sLog.SetLogFilter(LogFilters(0xFFFFFFFF),value);
+        sLog.SetLogFilter(LogFilters(0xFFFFFFFF), value);
         PSendSysMessage(LANG_ALL_LOG_FILTERS_SET_TO_S, value ? GetMangosString(LANG_ON) : GetMangosString(LANG_OFF));
         return true;
     }
