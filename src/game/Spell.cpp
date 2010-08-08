@@ -4545,6 +4545,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                 SpellRangeEntry const* srange = sSpellRangeStore.LookupEntry(m_spellInfo->rangeIndex);
                 float range = GetSpellMaxRange(srange);
 
+                Creature* targetExplicit = NULL;            // used for cases where a target is provided (by script for example)
                 Creature* creatureScriptTarget = NULL;
                 GameObject* goScriptTarget = NULL;
 
@@ -4595,19 +4596,21 @@ SpellCastResult Spell::CheckCast(bool strict)
                                 {
                                     if (i_spellST->second.type == SPELL_TARGET_TYPE_DEAD && pTarget->isDead())
                                     {
-                                        if (pTarget->IsWithinDistInMap(m_caster, range))
-                                            p_Creature = (Creature*)pTarget;
+                                        // always use spellMaxRange, in case GetLastRange returned different in a previous pass
+                                        if (pTarget->IsWithinDistInMap(m_caster, GetSpellMaxRange(srange)))
+                                            targetExplicit = (Creature*)pTarget;
                                     }
                                     else if (i_spellST->second.type == SPELL_TARGET_TYPE_CREATURE && pTarget->isAlive())
                                     {
-                                        if (pTarget->IsWithinDistInMap(m_caster, range))
-                                            p_Creature = (Creature*)pTarget;
+                                        // always use spellMaxRange, in case GetLastRange returned different in a previous pass
+                                        if (pTarget->IsWithinDistInMap(m_caster, GetSpellMaxRange(srange)))
+                                            targetExplicit = (Creature*)pTarget;
                                     }
                                 }
                             }
 
                             // no target provided or it was not valid, so use closest in range
-                            if (!p_Creature)
+                            if (!targetExplicit)
                             {
                                 MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck u_check(*m_caster, i_spellST->second.targetEntry, i_spellST->second.type != SPELL_TARGET_TYPE_DEAD, range);
                                 MaNGOS::CreatureLastSearcher<MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck> searcher(m_caster, p_Creature, u_check);
@@ -4618,11 +4621,14 @@ SpellCastResult Spell::CheckCast(bool strict)
                                 range = u_check.GetLastRange();
                             }
 
-                            if (p_Creature)
-                            {
+                            // always prefer provided target if it's valid
+                            if (targetExplicit)
+                                creatureScriptTarget = targetExplicit;
+                            else if (p_Creature)
                                 creatureScriptTarget = p_Creature;
+
+                            if (creatureScriptTarget)
                                 goScriptTarget = NULL;
-                            }
 
                             break;
                         }
