@@ -65,7 +65,7 @@ bool ChatHandler::HandleAccountDeleteCommand(char* args)
         return false;
 
     std::string account_name;
-    uint32 account_id = extractAccountId(args, &account_name);
+    uint32 account_id = ExtractAccountId(&args, &account_name);
     if (!account_id)
         return false;
 
@@ -409,44 +409,31 @@ bool ChatHandler::HandleCharacterDeletedOldCommand(char* args)
 
 bool ChatHandler::HandleCharacterEraseCommand(char* args)
 {
-    if (!*args)
+    char* nameStr = ExtractLiteralArg(&args);
+    if (!*nameStr)
         return false;
 
-    char *character_name_str = strtok(args," ");
-    if(!character_name_str)
+    Player* target;
+    uint64 target_guid;
+    std::string target_name;
+    if (!ExtractPlayerTarget(&args, &target, &target_guid, &target_name))
         return false;
 
-    std::string character_name = character_name_str;
-    if(!normalizePlayerName(character_name))
-        return false;
-
-    uint64 character_guid;
     uint32 account_id;
 
-    if (Player *player = sObjectMgr.GetPlayer(character_name.c_str()))
+    if (target)
     {
-        character_guid = player->GetGUID();
-        account_id = player->GetSession()->GetAccountId();
-        player->GetSession()->KickPlayer();
+        account_id = target->GetSession()->GetAccountId();
+        target->GetSession()->KickPlayer();
     }
     else
-    {
-        character_guid = sObjectMgr.GetPlayerGUIDByName(character_name);
-        if(!character_guid)
-        {
-            PSendSysMessage(LANG_NO_PLAYER,character_name.c_str());
-            SetSentErrorMessage(true);
-            return false;
-        }
-
-        account_id = sObjectMgr.GetPlayerAccountIdByGUID(character_guid);
-    }
+        account_id = sObjectMgr.GetPlayerAccountIdByGUID(target_guid);
 
     std::string account_name;
     sAccountMgr.GetName (account_id,account_name);
 
-    Player::DeleteFromDB(character_guid, account_id, true, true);
-    PSendSysMessage(LANG_CHARACTER_DELETED,character_name.c_str(),GUID_LOPART(character_guid),account_name.c_str(), account_id);
+    Player::DeleteFromDB(target_guid, account_id, true, true);
+    PSendSysMessage(LANG_CHARACTER_DELETED, target_name.c_str(), GUID_LOPART(target_guid), account_name.c_str(), account_id);
     return true;
 }
 

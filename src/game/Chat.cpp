@@ -56,7 +56,7 @@
 // |color|Hquest:quest_id:quest_level|h[name]|h|r                         - client, quest list name shift-click
 // |color|Hskill:skill_id|h[name]|h|r
 // |color|Hspell:spell_id|h[name]|h|r                                     - client, spellbook spell icon shift-click
-// |color|Htalent:talent_id,rank|h[name]|h|r                              - client, talent icon shift-click
+// |color|Htalent:talent_id,rank|h[name]|h|r                              - client, talent icon shift-click rank==-1 if shift-copy unlearned talent
 // |color|Htaxinode:id|h[name]|h|r
 // |color|Htele:id|h[name]|h|r
 // |color|Htitle:id|h[name]|h|r
@@ -2096,6 +2096,8 @@ bool  ChatHandler::ExtractUInt32Base(char** args, uint32& val, uint32 base)
     // value successfully extracted
     val = uint32(valRaw);
     *args = tail;
+
+    SkipWhiteSpaces(args);
     return true;
 }
 
@@ -2142,6 +2144,8 @@ bool  ChatHandler::ExtractFloat(char** args, float& val)
     // value successfully extracted
     val = float(valRaw);
     *args = tail;
+
+    SkipWhiteSpaces(args);
     return true;
 }
 
@@ -2218,6 +2222,7 @@ char* ChatHandler::ExtractLiteralArg(char** args, char const* lit /*= NULL*/)
         else
             *args = NULL;
 
+        SkipWhiteSpaces(args);
         return arg;
     }
 
@@ -2297,41 +2302,142 @@ bool  ChatHandler::ExtractOnOff(char** args, bool& value)
  * Function extract shift-link-like string (any characters guarded by | and |h|r with some additional internal structure check)
  *
  * @param args variable pointer to non parsed args string, updated at function call to new position (with skipped white spaces)
+ *
+ * @param linkTypes  optional NULL-terminated array of link types, shift-link must fit one from link type from array if provided or extraction fail
+ *
+ * @param found_idx  if not NULL then at return index in linkTypes that fit shift-link type, if extraction fail then non modified
+ *
+ * @param keyPair    if not NULL then pointer to 2-elements array for return start and end pointer for found key
+ *                   if extraction fail then non modified
+ *
+ * @param somethingPair then pointer to 2-elements array for return start and end pointer if found.
+ *                   if not NULL then shift-link must have data field, if extraction fail then non modified
+ *
  * @return     shift-link-like string, or NULL if args empty or not appropriate content.
  */
-char* ChatHandler::ExtractLinkArg( char** args )
+char* ChatHandler::ExtractLinkArg(char** args, char const* const* linkTypes /*= NULL*/, int* foundIdx /*= NULL*/, char** keyPair /*= NULL*/, char** somethingPair /*= NULL*/)
 {
     if (!*args || !**args)
         return NULL;
 
-    if (**args != '|')
+    // skip if not linked started or encoded single | (doubled by client)
+    if ((*args)[0] != '|' || (*args)[1] == '|')
         return NULL;
 
-    // |color|Hkey:data|h[name]|h|r
+    // |color|Hlinktype:key:data...|h[name]|h|r
 
     char* head = *args;
+
+    // [name] Shift-click form |color|linkType:key|h[name]|h|r
+    // or
+    // [name] Shift-click form |color|linkType:key:something1:...:somethingN|h[name]|h|r
+    // or
+    // [name] Shift-click form |linkType:key|h[name]|h|r
+
+    // |color|Hlinktype:key:data...|h[name]|h|r
+
     char* tail = (*args)+1;                                 // skip |
 
-    while (*tail && *tail != '|')                           // skip color part
-        ++tail;
+    if (*tail != 'H')                                       // skip color part, some links can not have color part
+    {
+        while (*tail && *tail != '|')                           
+            ++tail;
 
-    if (!*tail)
-        return NULL;
+        if (!*tail)
+            return NULL;
 
-    // |Hkey:data|h[name]|h|r
+        // |Hlinktype:key:data...|h[name]|h|r
 
-    ++tail;                                                 // skip |
+        ++tail;                                             // skip |
+    }
+
+    // Hlinktype:key:data...|h[name]|h|r
 
     if (*tail != 'H')
         return NULL;
 
-    while (*tail && (*tail != '|' || *(tail+1) != 'h'))     // skip key/data part
+    int linktype_idx = 0;
+
+    if (linkTypes)                                          // check link type if provided
+    {
+        // check linktypes (its include H in name)
+        for (; linkTypes[linktype_idx]; ++linktype_idx)
+        {
+            // exactly string with follow : or |
+            int l = strlen(linkTypes[linktype_idx]);
+            if (strncmp(tail, linkTypes[linktype_idx], l) == 0 &&
+                (tail[l] == ':' || tail[l] == '|'))
+                break;
+        }
+
+        // is search fail?
+        if (!linkTypes[linktype_idx])                       // NULL terminator in last element
+            return NULL;
+
+        tail += strlen(linkTypes[linktype_idx]);            // skip linktype string
+
+        // :key:data...|h[name]|h|r
+
+        if (*tail != ':')
+            return NULL;
+    }
+    else
+    {
+        while (*tail && *tail != ':')                       // skip linktype string
+            ++tail;
+
+        if (!*tail)
+            return NULL;
+    }
+
+    ++tail;
+
+    // key:data...|h[name]|h|r
+    char* keyStart = tail;                                  // remember key start for return
+    char* keyEnd   = tail;                                  // key end for truncate, will updated
+
+    while (*tail && *tail != '|' && *tail != ':')
         ++tail;
 
     if (!*tail)
         return NULL;
 
-    tail += 2;
+    keyEnd = tail;                                          // remember key end for truncate
+
+    // |h[name]|h|r or :something...|h[name]|h|r
+
+    char* somethingStart = tail+1;
+    char* somethingEnd   = tail+1;                          // will updated later if need
+
+    if (*tail == ':' && somethingPair)                      // optional data extraction
+    {
+        // :something...|h[name]|h|r
+
+        if (*tail == ':')
+            ++tail;
+
+        // something|h[name]|h|r or something:something2...|h[name]|h|r
+
+        while (*tail && *tail != '|' && *tail != ':')
+            ++tail;
+
+        if (!*tail)
+            return NULL;
+
+        somethingEnd = tail;                                // remember data end for truncate
+    }
+
+    // |h[name]|h|r or :something2...|h[name]|h|r
+
+    while (*tail && (*tail != '|' || *(tail+1) != 'h'))     // skip ... part if exist
+        ++tail;
+
+    if (!*tail)
+        return NULL;
+
+    // |h[name]|h|r
+
+    tail += 2;                                              // skip |h
 
     // [name]|h|r
     if (!*tail || *tail != '[')
@@ -2340,26 +2446,41 @@ char* ChatHandler::ExtractLinkArg( char** args )
     while (*tail && (*tail != ']' || *(tail+1) != '|'))     // skip name part
         ++tail;
 
-    tail += 2;
+    tail += 2;                                              // skip ]|
 
     // h|r
     if (!*tail || *tail != 'h'  || *(tail+1) != '|')
         return NULL;
 
-    tail += 2;
+    tail += 2;                                              // skip h|
 
     // r
     if (!*tail || *tail != 'r' || *(tail+1) && !isWhiteSpace(*(tail+1)))
         return NULL;
 
-    ++tail;
+    ++tail;                                                 // skip r
 
-    if (*tail)
-    {
+    // success
+
+    if (*tail)                                              // truncate all link string
         *(tail++) = '\0';
+
+    if (foundIdx)
+        *foundIdx = linktype_idx;
+
+    if (keyPair)
+    {
+        keyPair[0] = keyStart;
+        keyPair[1] = keyEnd;
     }
 
-    *args = tail;
+    if (somethingPair)
+    {
+        somethingPair[0] = somethingStart;
+        somethingPair[1] = somethingEnd;
+    }
+
+    *args = tail;                   
 
     SkipWhiteSpaces(args);
 
@@ -2377,21 +2498,11 @@ char* ChatHandler::ExtractArg( char** args )
     if (!*args || !**args)
         return NULL;
 
-    switch (**args)
-    {
-        case '|' :
-            return ExtractLinkArg(args);
-        case '\'' : case '"' : case '[' :
-            return ExtractQuotedArg(args);
-        default:
-        {
-            char* name = strtok(*args, " ");
+    char* arg = ExtractQuotedOrLiteralArg(args);
+    if (!arg)
+        arg = ExtractLinkArg(args);
 
-            *args = strtok(NULL, "");
-
-            return name;
-        }
-    }
+    return arg;
 }
 
 /**
@@ -2415,116 +2526,102 @@ char* ChatHandler::ExtractOptNotLastArg(char** args)
     return NULL;
 }
 
-char* ChatHandler::extractKeyFromLink(char* text, char const* linkType, char** something1)
+/**
+ * Function extract data from shift-link "|color|LINKTYPE:RETURN:SOMETHING1|h[name]|h|r if linkType == LINKTYPE
+ * It also extract literal/quote if not shift-link in args
+ *
+ * @param args       variable pointer to non parsed args string, updated at function call to new position (with skipped white spaces)
+ *                   if args have sift link with linkType != LINKTYPE then args still pointing to this arg (unmodified pointer)
+ *
+ * @param linkType   shift-link must fit by link type to this arg value or extraction fail
+ *
+ * @param something1 if not NULL then shift-link must have data field and it returned into this arg
+ *                   if extraction fail then non modified
+ *
+ * @return           extracted key, or NULL if args empty or not appropriate content or not fit to linkType.
+ */
+char* ChatHandler::ExtractKeyFromLink(char** text, char const* linkType, char** something1 /*= NULL*/)
 {
-    // skip empty
-    if(!text)
-        return NULL;
+    char const* linkTypes[2];
+    linkTypes[0] = linkType;
+    linkTypes[1] = NULL;
 
-    // skip speces
-    while(*text==' '||*text=='\t'||*text=='\b')
-        ++text;
+    int foundIdx;
 
-    if(!*text)
-        return NULL;
-
-    // return non link case
-    if(text[0]!='|')
-        return strtok(text, " ");
-
-    // [name] Shift-click form |color|linkType:key|h[name]|h|r
-    // or
-    // [name] Shift-click form |color|linkType:key:something1:...:somethingN|h[name]|h|r
-
-    char* check = strtok(text, "|");                        // skip color
-    if(!check)
-        return NULL;                                        // end of data
-
-    char* cLinkType = strtok(NULL, ":");                    // linktype
-    if(!cLinkType)
-        return NULL;                                        // end of data
-
-    if(strcmp(cLinkType,linkType) != 0)
-    {
-        strtok(NULL, " ");                                  // skip link tail (to allow continue strtok(NULL,s) use after retturn from function
-        SendSysMessage(LANG_WRONG_LINK_TYPE);
-        return NULL;
-    }
-
-    char* cKeys = strtok(NULL, "|");                        // extract keys and values
-    char* cKeysTail = strtok(NULL, "");
-
-    char* cKey = strtok(cKeys, ":|");                       // extract key
-    if(something1)
-        *something1 = strtok(NULL, ":|");                   // extract something
-
-    strtok(cKeysTail, "]");                                 // restart scan tail and skip name with possible spaces
-    strtok(NULL, " ");                                      // skip link tail (to allow continue strtok(NULL,s) use after return from function
-    return cKey;
+    return ExtractKeyFromLink(text, linkTypes, &foundIdx, something1);
 }
 
-char* ChatHandler::extractKeyFromLink(char* text, char const* const* linkTypes, int* found_idx, char** something1)
+/**
+ * Function extract data from shift-link "|color|LINKTYPE:RETURN:SOMETHING1|h[name]|h|r if LINKTYPE in linkTypes array 
+ * It also extract literal/quote if not shift-link in args
+ *
+ * @param args       variable pointer to non parsed args string, updated at function call to new position (with skipped white spaces)
+ *                   if args have sift link with linkType != LINKTYPE then args still pointing to this arg (unmodified pointer)
+ *
+ * @param linkTypes  NULL-terminated array of link types, shift-link must fit one from link type from array or extraction fail
+ *
+ * @param found_idx  if not NULL then at return index in linkTypes that fit shift-link type, for non-link case return -1
+ *                   if extraction fail then non modified
+ *
+ * @param something1 if not NULL then shift-link must have data field and it returned into this arg
+ *                   if extraction fail then non modified
+ *
+ * @return           extracted key, or NULL if args empty or not appropriate content or not fit to linkType.
+ */
+char* ChatHandler::ExtractKeyFromLink(char** text, char const* const* linkTypes, int* found_idx, char** something1 /*= NULL*/)
 {
     // skip empty
-    if(!text)
-        return NULL;
-
-    // skip speces
-    while(*text==' '||*text=='\t'||*text=='\b')
-        ++text;
-
-    if(!*text)
+    if (!*text || !**text)
         return NULL;
 
     // return non link case
-    if(text[0]!='|')
-        return strtok(text, " ");
-
-    // [name] Shift-click form |color|linkType:key|h[name]|h|r
-    // or
-    // [name] Shift-click form |color|linkType:key:something1:...:somethingN|h[name]|h|r
-    // or
-    // [name] Shift-click form |linkType:key|h[name]|h|r
-
-    char* tail;
-
-    if(text[1]=='c')
+    char* arg = ExtractQuotedOrLiteralArg(text);
+    if (arg)
     {
-        char* check = strtok(text, "|");                    // skip color
-        if(!check)
-            return NULL;                                    // end of data
+        if (found_idx)
+            *found_idx = -1;                                // special index case
 
-        tail = strtok(NULL, "");                            // tail
-    }
-    else
-        tail = text+1;                                      // skip first |
-
-    char* cLinkType = strtok(tail, ":");                    // linktype
-    if(!cLinkType)
-        return NULL;                                        // end of data
-
-    for(int i = 0; linkTypes[i]; ++i)
-    {
-        if(strcmp(cLinkType,linkTypes[i]) == 0)
-        {
-            char* cKeys = strtok(NULL, "|");                // extract keys and values
-            char* cKeysTail = strtok(NULL, "");
-
-            char* cKey = strtok(cKeys, ":|");               // extract key
-            if(something1)
-                *something1 = strtok(NULL, ":|");           // extract something
-
-            strtok(cKeysTail, "]");                         // restart scan tail and skip name with possible spaces
-            strtok(NULL, " ");                              // skip link tail (to allow continue strtok(NULL,s) use after return from function
-            if(found_idx)
-                *found_idx = i;
-            return cKey;
-        }
+        return arg;
     }
 
-    strtok(NULL, " ");                                      // skip link tail (to allow continue strtok(NULL,s) use after return from function
-    SendSysMessage(LANG_WRONG_LINK_TYPE);
-    return NULL;
+    char* keyPair[2];
+    char* somethingPair[2];
+
+    arg = ExtractLinkArg(text, linkTypes, found_idx, keyPair, something1 ? somethingPair : NULL);
+    if (!arg)
+        return NULL;
+
+    *keyPair[1] = '\0';                                     // truncate key string
+
+    if (something1)
+    {
+        *somethingPair[1] = '\0';                           // truncate data string
+        *something1 = somethingPair[0];
+    }
+
+    return keyPair[0];
+}
+
+/**
+ * Function extract uint32 key from shift-link "|color|LINKTYPE:RETURN|h[name]|h|r if linkType == LINKTYPE
+ * It also extract direct number if not shift-link in args
+ *
+ * @param args       variable pointer to non parsed args string, updated at function call to new position (with skipped white spaces)
+ *                   if args have sift link with linkType != LINKTYPE then args still pointing to this arg (unmodified pointer)
+ *
+ * @param linkType   shift-link must fit by link type to this arg value or extraction fail
+ *
+ * @param value      store result value at success return, not modified at fail
+ *
+ * @return           true if extraction succesful
+ */
+bool ChatHandler::ExtractUint32KeyFromLink(char** text, char const* linkType, uint32& value)
+{
+    char* arg = ExtractKeyFromLink(text, linkType);
+    if (!arg)
+        return false;
+
+    return ExtractUInt32(&arg, value);
 }
 
 GameObject* ChatHandler::GetObjectGlobalyWithGuidOrNearWithDbGuid(uint32 lowguid,uint32 entry)
@@ -2548,11 +2645,12 @@ GameObject* ChatHandler::GetObjectGlobalyWithGuidOrNearWithDbGuid(uint32 lowguid
 
 enum SpellLinkType
 {
+    SPELL_LINK_RAW     =-1,                                 // non-link case
     SPELL_LINK_SPELL   = 0,
     SPELL_LINK_TALENT  = 1,
     SPELL_LINK_ENCHANT = 2,
     SPELL_LINK_TRADE   = 3,
-    SPELL_LINK_GLYPH   = 4
+    SPELL_LINK_GLYPH   = 4,
 };
 
 static char const* const spellKeys[] =
@@ -2562,27 +2660,32 @@ static char const* const spellKeys[] =
     "Henchant",                                             // enchanting recipe spell
     "Htrade",                                               // profession/skill spell
     "Hglyph",                                               // glyph
-    0
+    NULL
 };
 
-uint32 ChatHandler::extractSpellIdFromLink(char* text)
+uint32 ChatHandler::ExtractSpellIdFromLink(char** text)
 {
     // number or [name] Shift-click form |color|Henchant:recipe_spell_id|h[prof_name: recipe_name]|h|r
     // number or [name] Shift-click form |color|Hglyph:glyph_slot_id:glyph_prop_id|h[%s]|h|r
     // number or [name] Shift-click form |color|Hspell:spell_id|h[name]|h|r
     // number or [name] Shift-click form |color|Htalent:talent_id,rank|h[name]|h|r
     // number or [name] Shift-click form |color|Htrade:spell_id,skill_id,max_value,cur_value|h[name]|h|r
-    int type = 0;
+    int type;
     char* param1_str = NULL;
-    char* idS = extractKeyFromLink(text,spellKeys,&type,&param1_str);
-    if(!idS)
+    char* idS = ExtractKeyFromLink(text, spellKeys, &type, &param1_str);
+    if (!idS)
         return 0;
 
-    uint32 id = (uint32)atol(idS);
+    uint32 id;
+    if (!ExtractUInt32(&idS, id))
+        return 0;
 
     switch(type)
     {
+        case SPELL_LINK_RAW:
         case SPELL_LINK_SPELL:
+        case SPELL_LINK_ENCHANT:
+        case SPELL_LINK_TRADE:
             return id;
         case SPELL_LINK_TALENT:
         {
@@ -2591,27 +2694,21 @@ uint32 ChatHandler::extractSpellIdFromLink(char* text)
             if(!talentEntry)
                 return 0;
 
-            int32 rank = param1_str ? (uint32)atol(param1_str) : 0;
-            if(rank >= MAX_TALENT_RANK)
+            uint32 rank;
+            if (!ExtractUInt32(&param1_str, rank))
                 return 0;
 
-            if(rank < 0)
-                rank = 0;
-
-            return talentEntry->RankID[rank];
+            return rank < MAX_TALENT_RANK ? talentEntry->RankID[rank] : 0;
         }
-        case SPELL_LINK_ENCHANT:
-        case SPELL_LINK_TRADE:
-            return id;
         case SPELL_LINK_GLYPH:
         {
-            uint32 glyph_prop_id = param1_str ? (uint32)atol(param1_str) : 0;
+            uint32 glyph_prop_id;
 
-            GlyphPropertiesEntry const* glyphPropEntry = sGlyphPropertiesStore.LookupEntry(glyph_prop_id);
-            if(!glyphPropEntry)
+            if (!ExtractUInt32(&param1_str, glyph_prop_id))
                 return 0;
 
-            return glyphPropEntry->SpellId;
+            GlyphPropertiesEntry const* glyphPropEntry = sGlyphPropertiesStore.LookupEntry(glyph_prop_id);
+            return glyphPropEntry ? glyphPropEntry->SpellId : 0;
         }
     }
 
@@ -2619,26 +2716,27 @@ uint32 ChatHandler::extractSpellIdFromLink(char* text)
     return 0;
 }
 
-GameTele const* ChatHandler::extractGameTeleFromLink(char* text)
+GameTele const* ChatHandler::ExtractGameTeleFromLink(char** text)
 {
     // id, or string, or [name] Shift-click form |color|Htele:id|h[name]|h|r
-    char* cId = extractKeyFromLink(text,"Htele");
-    if(!cId)
+    char* cId = ExtractKeyFromLink(text,"Htele");
+    if (!cId)
         return NULL;
 
     // id case (explicit or from shift link)
-    if(cId[0] >= '0' || cId[0] >= '9')
-        if(uint32 id = atoi(cId))
-            return sObjectMgr.GetGameTele(id);
-
-    return sObjectMgr.GetGameTele(cId);
+    uint32 id;
+    if (ExtractUInt32(&cId, id))
+        return sObjectMgr.GetGameTele(id);
+    else
+        return sObjectMgr.GetGameTele(cId);
 }
 
 enum GuidLinkType
 {
-    SPELL_LINK_PLAYER     = 0,                              // must be first for selection in not link case
-    SPELL_LINK_CREATURE   = 1,
-    SPELL_LINK_GAMEOBJECT = 2
+    GUID_LINK_RAW        =-1,                               // non-link case
+    GUID_LINK_PLAYER     = 0,
+    GUID_LINK_CREATURE   = 1,
+    GUID_LINK_GAMEOBJECT = 2,
 };
 
 static char const* const guidKeys[] =
@@ -2649,60 +2747,66 @@ static char const* const guidKeys[] =
     NULL
 };
 
-uint64 ChatHandler::extractGuidFromLink(char* text)
+ObjectGuid ChatHandler::ExtractGuidFromLink(char** text)
 {
     int type = 0;
 
     // |color|Hcreature:creature_guid|h[name]|h|r
     // |color|Hgameobject:go_guid|h[name]|h|r
     // |color|Hplayer:name|h[name]|h|r
-    char* idS = extractKeyFromLink(text,guidKeys,&type);
-    if(!idS)
-        return 0;
+    char* idS = ExtractKeyFromLink(text, guidKeys, &type);
+    if (!idS)
+        return ObjectGuid();
 
     switch(type)
     {
-        case SPELL_LINK_PLAYER:
+        case GUID_LINK_RAW:
+        case GUID_LINK_PLAYER:
         {
             std::string name = idS;
-            if(!normalizePlayerName(name))
-                return 0;
+            if (!normalizePlayerName(name))
+                return ObjectGuid();
 
-            if(Player* player = sObjectMgr.GetPlayer(name.c_str()))
-                return player->GetGUID();
+            if (Player* player = sObjectMgr.GetPlayer(name.c_str()))
+                return player->GetObjectGuid();
 
-            if(uint64 guid = sObjectMgr.GetPlayerGUIDByName(name))
-                return guid;
+            if (uint64 guid = sObjectMgr.GetPlayerGUIDByName(name))
+                return ObjectGuid(guid);
 
-            return 0;
+            return ObjectGuid();
         }
-        case SPELL_LINK_CREATURE:
+        case GUID_LINK_CREATURE:
         {
-            uint32 lowguid = (uint32)atol(idS);
+            uint32 lowguid;
+            if (!ExtractUInt32(&idS, lowguid))
+                return ObjectGuid();
 
-            if(CreatureData const* data = sObjectMgr.GetCreatureData(lowguid) )
-                return MAKE_NEW_GUID(lowguid,data->id,HIGHGUID_UNIT);
+            if (CreatureData const* data = sObjectMgr.GetCreatureData(lowguid))
+                return ObjectGuid(HIGHGUID_UNIT, data->id, lowguid);
             else
-                return 0;
+                return ObjectGuid();
         }
-        case SPELL_LINK_GAMEOBJECT:
+        case GUID_LINK_GAMEOBJECT:
         {
-            uint32 lowguid = (uint32)atol(idS);
+            uint32 lowguid;
+            if (!ExtractUInt32(&idS, lowguid))
+                return ObjectGuid();
 
             if(GameObjectData const* data = sObjectMgr.GetGOData(lowguid) )
-                return MAKE_NEW_GUID(lowguid,data->id,HIGHGUID_GAMEOBJECT);
+                return ObjectGuid(HIGHGUID_GAMEOBJECT, data->id, lowguid);
             else
-                return 0;
+                return ObjectGuid();
         }
     }
 
     // unknown type?
-    return 0;
+    return ObjectGuid();
 }
 
 enum LocationLinkType
 {
-    LOCATION_LINK_PLAYER            = 0,                    // must be first for selection in not link case
+    LOCATION_LINK_RAW               =-1,                    // non-link case
+    LOCATION_LINK_PLAYER            = 0,
     LOCATION_LINK_TELE              = 1,
     LOCATION_LINK_TAXINODE          = 2,
     LOCATION_LINK_CREATURE          = 3,
@@ -2727,7 +2831,7 @@ static char const* const locationKeys[] =
     NULL
 };
 
-bool ChatHandler::extractLocationFromLink(char* text, uint32& mapid, float& x, float& y, float& z)
+bool ChatHandler::ExtractLocationFromLink(char** text, uint32& mapid, float& x, float& y, float& z)
 {
     int type = 0;
 
@@ -2740,24 +2844,20 @@ bool ChatHandler::extractLocationFromLink(char* text, uint32& mapid, float& x, f
     // |color|Hgameobject_entry:go_id|h[name]|h|r
     // |color|Hareatrigger:id|h[name]|h|r
     // |color|Hareatrigger_target:id|h[name]|h|r
-    char* idS = extractKeyFromLink(text,locationKeys,&type);
-    if(!idS)
+    char* idS = ExtractKeyFromLink(text, locationKeys, &type);
+    if (!idS)
         return false;
 
     switch(type)
     {
-        // it also fail case
+        case LOCATION_LINK_RAW:
         case LOCATION_LINK_PLAYER:
         {
-            // not link and not name, possible coordinates/etc
-            if (isNumeric(idS[0]))
-                return false;
-
             std::string name = idS;
-            if(!normalizePlayerName(name))
+            if (!normalizePlayerName(name))
                 return false;
 
-            if(Player* player = sObjectMgr.GetPlayer(name.c_str()))
+            if (Player* player = sObjectMgr.GetPlayer(name.c_str()))
             {
                 mapid = player->GetMapId();
                 x = player->GetPositionX();
@@ -2766,7 +2866,7 @@ bool ChatHandler::extractLocationFromLink(char* text, uint32& mapid, float& x, f
                 return true;
             }
 
-            if(uint64 guid = sObjectMgr.GetPlayerGUIDByName(name))
+            if (uint64 guid = sObjectMgr.GetPlayerGUIDByName(name))
             {
                 // to point where player stay (if loaded)
                 float o;
@@ -2778,7 +2878,10 @@ bool ChatHandler::extractLocationFromLink(char* text, uint32& mapid, float& x, f
         }
         case LOCATION_LINK_TELE:
         {
-            uint32 id = (uint32)atol(idS);
+            uint32 id;
+            if (!ExtractUInt32(&idS, id))
+                return false;
+
             GameTele const* tele = sObjectMgr.GetGameTele(id);
             if (!tele)
                 return false;
@@ -2790,7 +2893,10 @@ bool ChatHandler::extractLocationFromLink(char* text, uint32& mapid, float& x, f
         }
         case LOCATION_LINK_TAXINODE:
         {
-            uint32 id = (uint32)atol(idS);
+            uint32 id;
+            if (!ExtractUInt32(&idS, id))
+                return false;
+
             TaxiNodesEntry const* node = sTaxiNodesStore.LookupEntry(id);
             if (!node)
                 return false;
@@ -2802,7 +2908,9 @@ bool ChatHandler::extractLocationFromLink(char* text, uint32& mapid, float& x, f
         }
         case LOCATION_LINK_CREATURE:
         {
-            uint32 lowguid = (uint32)atol(idS);
+            uint32 lowguid;
+            if (!ExtractUInt32(&idS, lowguid))
+                return false;
 
             if(CreatureData const* data = sObjectMgr.GetCreatureData(lowguid) )
             {
@@ -2817,7 +2925,9 @@ bool ChatHandler::extractLocationFromLink(char* text, uint32& mapid, float& x, f
         }
         case LOCATION_LINK_GAMEOBJECT:
         {
-            uint32 lowguid = (uint32)atol(idS);
+            uint32 lowguid;
+            if (!ExtractUInt32(&idS, lowguid))
+                return false;
 
             if(GameObjectData const* data = sObjectMgr.GetGOData(lowguid) )
             {
@@ -2832,7 +2942,9 @@ bool ChatHandler::extractLocationFromLink(char* text, uint32& mapid, float& x, f
         }
         case LOCATION_LINK_CREATURE_ENTRY:
         {
-            uint32 id = (uint32)atol(idS);
+            uint32 id;
+            if (!ExtractUInt32(&idS, id))
+                return false;
 
             if (sObjectMgr.GetCreatureTemplate(id))
             {
@@ -2856,7 +2968,9 @@ bool ChatHandler::extractLocationFromLink(char* text, uint32& mapid, float& x, f
         }
         case LOCATION_LINK_GAMEOBJECT_ENTRY:
         {
-            uint32 id = (uint32)atol(idS);
+            uint32 id;
+            if (!ExtractUInt32(&idS, id))
+                return false;
 
             if (sObjectMgr.GetGameObjectInfo(id))
             {
@@ -2880,7 +2994,9 @@ bool ChatHandler::extractLocationFromLink(char* text, uint32& mapid, float& x, f
         }
         case LOCATION_LINK_AREATRIGGER:
         {
-            uint32 id = (uint32)atol(idS);
+            uint32 id;
+            if (!ExtractUInt32(&idS, id))
+                return false;
 
             AreaTriggerEntry const* atEntry = sAreaTriggerStore.LookupEntry(id);
             if (!atEntry)
@@ -2898,7 +3014,9 @@ bool ChatHandler::extractLocationFromLink(char* text, uint32& mapid, float& x, f
         }
         case LOCATION_LINK_AREATRIGGER_TARGET:
         {
-            uint32 id = (uint32)atol(idS);
+            uint32 id;
+            if (!ExtractUInt32(&idS, id))
+                return false;
 
             if (!sAreaTriggerStore.LookupEntry(id))
             {
@@ -2927,10 +3045,10 @@ bool ChatHandler::extractLocationFromLink(char* text, uint32& mapid, float& x, f
     return false;
 }
 
-std::string ChatHandler::extractPlayerNameFromLink(char* text)
+std::string ChatHandler::ExtractPlayerNameFromLink(char** text)
 {
     // |color|Hplayer:name|h[name]|h|r
-    char* name_str = extractKeyFromLink(text,"Hplayer");
+    char* name_str = ExtractKeyFromLink(text, "Hplayer");
     if(!name_str)
         return "";
 
@@ -2941,11 +3059,24 @@ std::string ChatHandler::extractPlayerNameFromLink(char* text)
     return name;
 }
 
-bool ChatHandler::extractPlayerTarget(char* args, Player** player, uint64* player_guid /*=NULL*/,std::string* player_name /*= NULL*/)
+/**
+ * Function extract at least one from request player data (pointer/guid/name) from args name/shift-link or selected player if no args
+ *
+ * @param args        variable pointer to non parsed args string, updated at function call to new position (with skipped white spaces)
+ *
+ * @param player      optional arg   One from 3 optional args must be provided at least (or more).
+ * @param player_guid optional arg   For function success only one from provided args need get result
+ * @param player_name optional arg   But if early arg get value then all later args will have its (if requested)
+ *                                   if player_guid requested and not found then name also will not found
+ *                                   So at success can be returned 2 cases: (player/guid/name) or (guid/name)
+ *
+ * @return           true if extraction successful
+ */
+bool ChatHandler::ExtractPlayerTarget(char** args, Player** player /*= NULL*/, uint64* player_guid /*= NULL*/,std::string* player_name /*= NULL*/)
 {
-    if (args && *args)
+    if (*args && **args)
     {
-        std::string name = extractPlayerNameFromLink(args);
+        std::string name = ExtractPlayerNameFromLink(args);
         if (name.empty())
         {
             SendSysMessage(LANG_PLAYER_NOT_FOUND);
@@ -2994,12 +3125,12 @@ bool ChatHandler::extractPlayerTarget(char* args, Player** player, uint64* playe
     return true;
 }
 
-uint32 ChatHandler::extractAccountId(char* args, std::string* accountName /*= NULL*/, Player** targetIfNullArg /*= NULL*/)
+uint32 ChatHandler::ExtractAccountId(char** args, std::string* accountName /*= NULL*/, Player** targetIfNullArg /*= NULL*/)
 {
     uint32 account_id = 0;
 
     ///- Get the account name from the command line
-    char* account_str = args ? strtok (args," ") : NULL;
+    char* account_str = ExtractLiteralArg(args);
 
     if (!account_str)
     {
@@ -3024,18 +3155,8 @@ uint32 ChatHandler::extractAccountId(char* args, std::string* accountName /*= NU
 
     std::string account_name;
 
-    if (isNumeric(account_str))
+    if (ExtractUInt32(&account_str, account_id))
     {
-        long id = atol(account_str);
-        if (id <= 0 || ((unsigned long)id) >= std::numeric_limits<uint32>::max())
-        {
-            PSendSysMessage(LANG_ACCOUNT_NOT_EXIST,account_str);
-            SetSentErrorMessage(true);
-            return 0;
-        }
-
-        account_id = uint32(id);
-
         if (!sAccountMgr.GetName(account_id, account_name))
         {
             PSendSysMessage(LANG_ACCOUNT_NOT_EXIST,account_str);

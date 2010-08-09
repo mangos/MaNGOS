@@ -19,7 +19,9 @@
 #ifndef MANGOSSERVER_CHAT_H
 #define MANGOSSERVER_CHAT_H
 
+#include "Common.h"
 #include "SharedDefines.h"
+#include "ObjectGuid.h"
 
 struct AchievementEntry;
 struct AreaTrigger;
@@ -563,29 +565,30 @@ class ChatHandler
         bool  ExtractFloat(char** args, float& val);
         bool  ExtractOptFloat(char** args, float& val, float defVal);
         char* ExtractQuotedArg(char** args);                // string with " or [] or ' around
-        char* ExtractLinkArg(char** args);                  // shift-link like arg
         char* ExtractLiteralArg(char** args, char const* lit = NULL);
                                                             // literal string (until whitespace and not started from "['|), any or 'lit' if provided
         char* ExtractQuotedOrLiteralArg(char** args);
         bool  ExtractOnOff(char** args, bool& value);
+        char* ExtractLinkArg(char** args, char const* const* linkTypes = NULL, int* foundIdx = NULL, char** keyPair = NULL, char** somethingPair = NULL);
+                                                            // shift-link like arg (with aditional info if need)
         char* ExtractArg(char** args);                      // any name/number/quote/shift-link strings
-        char* ExtractOptNotLastArg(char** args);                   // extract name/number/quote/shift-link arg only if more data in args for parse
+        char* ExtractOptNotLastArg(char** args);            // extract name/number/quote/shift-link arg only if more data in args for parse
 
-        char*     extractKeyFromLink(char* text, char const* linkType, char** something1 = NULL);
-        char*     extractKeyFromLink(char* text, char const* const* linkTypes, int* found_idx, char** something1 = NULL);
+        char* ExtractKeyFromLink(char** text, char const* linkType, char** something1 = NULL);
+        char* ExtractKeyFromLink(char** text, char const* const* linkTypes, int* found_idx = NULL, char** something1 = NULL);
+        bool  ExtractUint32KeyFromLink(char** text, char const* linkType, uint32& value);
 
-        uint32    extractSpellIdFromLink(char* text);
-        uint64    extractGuidFromLink(char* text);
-        GameTele const* extractGameTeleFromLink(char* text);
-        bool      extractLocationFromLink(char* text, uint32& mapid, float& x, float& y, float& z);
-        std::string extractPlayerNameFromLink(char* text);
-        // select by arg (name/link) or in-game selection online/offline player
-        bool extractPlayerTarget(char* args, Player** player, uint64* player_guid = NULL, std::string* player_name = NULL);
+        uint32 ExtractAccountId(char** args, std::string* accountName = NULL, Player** targetIfNullArg = NULL);
+        uint32 ExtractSpellIdFromLink(char** text);
+        ObjectGuid ExtractGuidFromLink(char** text);
+        GameTele const* ExtractGameTeleFromLink(char** text);
+        bool   ExtractLocationFromLink(char** text, uint32& mapid, float& x, float& y, float& z);
+        std::string ExtractPlayerNameFromLink(char** text);
+        bool ExtractPlayerTarget(char** args, Player** player, uint64* player_guid = NULL, std::string* player_name = NULL);
+                                                            // select by arg (name/link) or in-game selection online/offline player
 
         std::string playerLink(std::string const& name) const { return m_session ? "|cffffffff|Hplayer:"+name+"|h["+name+"]|h|r" : name; }
         std::string GetNameLink(Player* chr) const { return playerLink(chr->GetName()); }
-
-        uint32 extractAccountId(char* args, std::string* accountName = NULL, Player** targetIfNullArg = NULL);
 
         GameObject* GetObjectGlobalyWithGuidOrNearWithDbGuid(uint32 lowguid,uint32 entry);
 

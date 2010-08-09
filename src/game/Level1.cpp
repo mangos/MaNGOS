@@ -97,27 +97,24 @@ bool ChatHandler::HandleNpcTextEmoteCommand(char* args)
 // make npc whisper to player
 bool ChatHandler::HandleNpcWhisperCommand(char* args)
 {
-    if(!*args)
+    Player* target;
+    if (!ExtractPlayerTarget(&args, &target))
         return false;
-
-    char* receiver_str = strtok(args, " ");
-    char* text = strtok(NULL, "");
 
     uint64 guid = m_session->GetPlayer()->GetSelection();
+    if (!guid)
+        return false;
+
     Creature* pCreature = m_session->GetPlayer()->GetMap()->GetCreature(guid);
 
-    if(!pCreature || !receiver_str || !text)
-    {
+    if(!pCreature || !target || !*args)
         return false;
-    }
-
-    uint64 receiver_guid= atol(receiver_str);
 
     // check online security
-    if (HasLowerSecurity(sObjectMgr.GetPlayer(receiver_guid), 0))
+    if (HasLowerSecurity(target, 0))
         return false;
 
-    pCreature->MonsterWhisper(text,receiver_guid);
+    pCreature->MonsterWhisper(args, target->GetGUID());
 
     return true;
 }
@@ -255,8 +252,8 @@ bool ChatHandler::HandleGPSCommand(char* args)
     WorldObject *obj = NULL;
     if (*args)
     {
-        uint64 guid = extractGuidFromLink(args);
-        if(guid)
+        ObjectGuid guid = ExtractGuidFromLink(&args);
+        if (!guid.IsEmpty())
             obj = (WorldObject*)m_session->GetPlayer()->GetObjectByTypeMask(guid, TYPEMASK_CREATURE_OR_GAMEOBJECT);
 
         if(!obj)
@@ -355,7 +352,7 @@ bool ChatHandler::HandleNamegoCommand(char* args)
     Player* target;
     uint64 target_guid;
     std::string target_name;
-    if (!extractPlayerTarget(args,&target,&target_guid,&target_name))
+    if (!ExtractPlayerTarget(&args, &target, &target_guid, &target_name))
         return false;
 
     Player* _player = m_session->GetPlayer();
@@ -476,7 +473,7 @@ bool ChatHandler::HandleGonameCommand(char* args)
     Player* target;
     uint64 target_guid;
     std::string target_name;
-    if (!extractPlayerTarget(args,&target,&target_guid,&target_name))
+    if (!ExtractPlayerTarget(&args, &target, &target_guid, &target_name))
         return false;
 
     Player* _player = m_session->GetPlayer();
@@ -613,7 +610,7 @@ bool ChatHandler::HandleGonameCommand(char* args)
 bool ChatHandler::HandleRecallCommand(char* args)
 {
     Player* target;
-    if(!extractPlayerTarget(args,&target))
+    if (!ExtractPlayerTarget(&args, &target))
         return false;
 
     // check online security
@@ -821,11 +818,6 @@ bool ChatHandler::HandleModifyRunicPowerCommand(char* args)
 //Edit Player Faction
 bool ChatHandler::HandleModifyFactionCommand(char* args)
 {
-    if(!*args)
-        return false;
-
-    char* pfactionid = extractKeyFromLink(args,"Hfaction");
-
     Creature* chr = getSelectedCreature();
     if(!chr)
     {
@@ -834,7 +826,7 @@ bool ChatHandler::HandleModifyFactionCommand(char* args)
         return false;
     }
 
-    if(!pfactionid)
+    if (!*args)
     {
         if(chr)
         {
@@ -854,30 +846,9 @@ bool ChatHandler::HandleModifyFactionCommand(char* args)
         return false;
     }
 
-    uint32 factionid = atoi(pfactionid);
-    uint32 flag;
-
-    char *pflag = strtok(NULL, " ");
-    if (!pflag)
-        flag = chr->GetUInt32Value(UNIT_FIELD_FLAGS);
-    else
-        flag = atoi(pflag);
-
-    char* pnpcflag = strtok(NULL, " ");
-
-    uint32 npcflag;
-    if(!pnpcflag)
-        npcflag   = chr->GetUInt32Value(UNIT_NPC_FLAGS);
-    else
-        npcflag = atoi(pnpcflag);
-
-    char* pdyflag = strtok(NULL, " ");
-
-    uint32  dyflag;
-    if(!pdyflag)
-        dyflag   = chr->GetUInt32Value(UNIT_DYNAMIC_FLAGS);
-    else
-        dyflag = atoi(pdyflag);
+    uint32 factionid;
+    if (!ExtractUint32KeyFromLink(&args, "Hfaction", factionid))
+        return false;
 
     if(!sFactionTemplateStore.LookupEntry(factionid))
     {
@@ -886,7 +857,19 @@ bool ChatHandler::HandleModifyFactionCommand(char* args)
         return false;
     }
 
-    PSendSysMessage(LANG_YOU_CHANGE_FACTION, chr->GetGUIDLow(),factionid,flag,npcflag,dyflag);
+    uint32 flag;
+    if (!ExtractOptUInt32(&args, flag, chr->GetUInt32Value(UNIT_FIELD_FLAGS)))
+        return false;
+
+    uint32 npcflag;
+    if (!ExtractOptUInt32(&args, npcflag, chr->GetUInt32Value(UNIT_NPC_FLAGS)))
+        return false;
+
+    uint32  dyflag;
+    if (!ExtractOptUInt32(&args, dyflag, chr->GetUInt32Value(UNIT_DYNAMIC_FLAGS)))
+        return false;
+
+    PSendSysMessage(LANG_YOU_CHANGE_FACTION, chr->GetGUIDLow(), factionid, flag, npcflag, dyflag);
 
     chr->setFaction(factionid);
     chr->SetUInt32Value(UNIT_FIELD_FLAGS,flag);
@@ -1593,7 +1576,7 @@ bool ChatHandler::HandleTeleCommand(char* args)
     Player* _player = m_session->GetPlayer();
 
     // id, or string, or [name] Shift-click form |color|Htele:id|h[name]|h|r
-    GameTele const* tele = extractGameTeleFromLink(args);
+    GameTele const* tele = ExtractGameTeleFromLink(&args);
 
     if (!tele)
     {
@@ -1762,18 +1745,14 @@ bool ChatHandler::HandleSendMailCommand(char* args)
     Player* target;
     uint64 target_guid;
     std::string target_name;
-    if (!extractPlayerTarget(args, &target, &target_guid, &target_name))
+    if (!ExtractPlayerTarget(&args, &target, &target_guid, &target_name))
         return false;
 
-    char* tail = strtok(NULL, "");
-    if(!tail)
-        return false;
-
-    char* msgSubject = ExtractQuotedArg(&tail);
+    char* msgSubject = ExtractQuotedArg(&args);
     if (!msgSubject)
         return false;
 
-    char* msgText = ExtractQuotedArg(&tail);
+    char* msgText = ExtractQuotedArg(&args);
     if (!msgText)
         return false;
 
@@ -1800,11 +1779,11 @@ bool ChatHandler::HandleTeleNameCommand(char* args)
     Player* target;
     uint64 target_guid;
     std::string target_name;
-    if (!extractPlayerTarget(nameStr,&target,&target_guid,&target_name))
+    if (!ExtractPlayerTarget(&nameStr, &target, &target_guid, &target_name))
         return false;
 
     // id, or string, or [name] Shift-click form |color|Htele:id|h[name]|h|r
-    GameTele const* tele = extractGameTeleFromLink(args);
+    GameTele const* tele = ExtractGameTeleFromLink(&args);
     if (!tele)
     {
         SendSysMessage(LANG_COMMAND_TELE_NOTFOUND);
@@ -1868,7 +1847,7 @@ bool ChatHandler::HandleTeleGroupCommand(char * args)
         return false;
 
     // id, or string, or [name] Shift-click form |color|Htele:id|h[name]|h|r
-    GameTele const* tele = extractGameTeleFromLink(args);
+    GameTele const* tele = ExtractGameTeleFromLink(&args);
     if(!tele)
     {
         SendSysMessage(LANG_COMMAND_TELE_NOTFOUND);
@@ -1929,7 +1908,7 @@ bool ChatHandler::HandleTeleGroupCommand(char * args)
 bool ChatHandler::HandleGroupgoCommand(char* args)
 {
     Player* target;
-    if (!extractPlayerTarget(args, &target))
+    if (!ExtractPlayerTarget(&args, &target))
         return false;
 
     // check online security
@@ -2070,21 +2049,14 @@ bool ChatHandler::HandleGoTaxinodeCommand(char* args)
 {
     Player* _player = m_session->GetPlayer();
 
-    if (!*args)
+    uint32 nodeId;
+    if (!ExtractUint32KeyFromLink(&args, "Htaxinode", nodeId))
         return false;
 
-    char* cNodeId = extractKeyFromLink(args, "Htaxinode");
-    if (!cNodeId)
-        return false;
-
-    int32 i_nodeId = atoi(cNodeId);
-    if (!i_nodeId)
-        return false;
-
-    TaxiNodesEntry const* node = sTaxiNodesStore.LookupEntry(i_nodeId);
+    TaxiNodesEntry const* node = sTaxiNodesStore.LookupEntry(nodeId);
     if (!node)
     {
-        PSendSysMessage(LANG_COMMAND_GOTAXINODENOTFOUND,i_nodeId);
+        PSendSysMessage(LANG_COMMAND_GOTAXINODENOTFOUND, nodeId);
         SetSentErrorMessage(true);
         return false;
     }
@@ -2110,27 +2082,19 @@ bool ChatHandler::HandleGoCommand(char* args)
     float x, y, z;
 
     // raw coordinates case
-    if (isNumeric(args[0]) || args[0] == '-')
+    if (ExtractFloat(&args, x))
     {
-        char* px = strtok(args, " ");
-        char* py = strtok(NULL, " ");
-        char* pz = strtok(NULL, " ");
-        char* pmapid = strtok(NULL, " ");
-
-        if (!px || !py || !pz)
+        if (!ExtractFloat(&args, y))
             return false;
 
-        x = (float)atof(px);
-        y = (float)atof(py);
-        z = (float)atof(pz);
-        if (pmapid)
-            mapid = (uint32)atoi(pmapid);
-        else
-            mapid = _player->GetMapId();
+        if (!ExtractFloat(&args, z))
+            return false;
 
+        if (!ExtractOptUInt32(&args, mapid, _player->GetMapId()))
+            return false;
     }
     // link case
-    else if (!extractLocationFromLink(args, mapid, x, y, z))
+    else if (!ExtractLocationFromLink(&args, mapid, x, y, z))
         return false;
 
     return HandleGoHelper(_player, mapid, x, y, &z);
@@ -2185,34 +2149,30 @@ bool ChatHandler::HandleGoXYZCommand(char* args)
 //teleport at coordinates
 bool ChatHandler::HandleGoZoneXYCommand(char* args)
 {
-    if (!*args)
-        return false;
-
     Player* _player = m_session->GetPlayer();
 
-    char* px = strtok(args, " ");
-    char* py = strtok(NULL, " ");
-    char* tail = strtok(NULL,"");
-
-    char* cAreaId = extractKeyFromLink(tail, "Harea");      // string or [name] Shift-click form |color|Harea:area_id|h[name]|h|r
-
-    if (!px || !py)
+    float x;
+    if (!ExtractFloat(&args, x))
         return false;
 
-    float x = (float)atof(px);
-    float y = (float)atof(py);
-
-    // prevent accept wrong numeric args
-    if ((x==0.0f && *px!='0') || (y==0.0f && *py!='0'))
+    float y;
+    if (!ExtractFloat(&args, y))
         return false;
 
-    uint32 areaid = cAreaId ? (uint32)atoi(cAreaId) : _player->GetZoneId();
+    uint32 areaid;
+    if (*args)
+    {
+        if (!ExtractUint32KeyFromLink(&args, "Harea", areaid))
+            return false;
+    }
+    else
+        areaid = _player->GetZoneId();
 
     AreaTableEntry const* areaEntry = GetAreaEntryByAreaID(areaid);
 
-    if( x<0 || x>100 || y<0 || y>100 || !areaEntry )
+    if (x < 0 || x > 100 || y < 0 || y > 100 || !areaEntry)
     {
-        PSendSysMessage(LANG_INVALID_ZONE_COORD,x,y,areaid);
+        PSendSysMessage(LANG_INVALID_ZONE_COORD, x, y, areaid);
         SetSentErrorMessage(true);
         return false;
     }
