@@ -180,7 +180,7 @@ inline void MaNGOS::DynamicObjectUpdater::VisitHelper(Unit* target)
         if (Aura* aura = holder->GetAuraByEffectIndex(eff_index))
         {
             // already exists, refresh duration
-            if (aura->GetAuraDuration() < i_dynobject.GetDuration())
+            if (aura->GetAuraDuration() >=0 && uint32(aura->GetAuraDuration()) < i_dynobject.GetDuration())
             {
                 aura->SetAuraDuration(i_dynobject.GetDuration());
                 holder->SendAuraUpdate(false);
