@@ -2278,7 +2278,7 @@ Creature* Player::GetNPCIfCanInteractWith(ObjectGuid guid, uint32 npcflagmask)
         return NULL;
 
     // exist (we need look pets also for some interaction (quest/etc)
-    Creature *unit = GetMap()->GetCreatureOrPetOrVehicle(guid);
+    Creature *unit = GetMap()->GetAnyTypeCreature(guid);
     if (!unit)
         return NULL;
 
@@ -13446,7 +13446,7 @@ void Player::PrepareQuestMenu( uint64 guid )
     QuestRelations* pObjectQIR;
 
     // pets also can have quests
-    if (Creature *pCreature = GetMap()->GetCreatureOrPetOrVehicle(guid))
+    if (Creature *pCreature = GetMap()->GetAnyTypeCreature(guid))
     {
         pObject = (Object*)pCreature;
         pObjectQR  = &sObjectMgr.mCreatureQuestRelations;
@@ -13540,7 +13540,7 @@ void Player::SendPreparedQuest(uint64 guid)
         std::string title = "";
 
         // need pet case for some quests
-        if (Creature *pCreature = GetMap()->GetCreatureOrPetOrVehicle(guid))
+        if (Creature *pCreature = GetMap()->GetAnyTypeCreature(guid))
         {
             uint32 textid = GetGossipTextId(pCreature);
 
@@ -13613,7 +13613,7 @@ Quest const * Player::GetNextQuest( uint64 guid, Quest const *pQuest )
     QuestRelations* pObjectQR;
     QuestRelations* pObjectQIR;
 
-    if (Creature *pCreature = GetMap()->GetCreatureOrPetOrVehicle(guid))
+    if (Creature *pCreature = GetMap()->GetAnyTypeCreature(guid))
     {
         pObject = (Object*)pCreature;
         pObjectQR  = &sObjectMgr.mCreatureQuestRelations;
@@ -20505,7 +20505,7 @@ void Player::UpdateForQuestWorldObjects()
         }
         else if (itr->IsCreatureOrVehicle())
         {
-            Creature *obj = GetMap()->GetCreatureOrPetOrVehicle(*itr);
+            Creature *obj = GetMap()->GetAnyTypeCreature(*itr);
             if(!obj)
                 continue;
 

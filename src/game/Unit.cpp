@@ -9605,7 +9605,7 @@ void Unit::DoPetAction( Player* owner, uint8 flag, uint32 spellid, uint64 guid1,
                 case COMMAND_ATTACK:                        //spellid=1792  //ATTACK
                 {
                     const uint64& selguid = owner->GetSelection();
-                    Unit *TargetUnit = ObjectAccessor::GetUnit(*owner, selguid);
+                    Unit *TargetUnit = owner->GetMap()->GetUnit(selguid);
                     if(!TargetUnit)
                         return;
 
@@ -9681,7 +9681,7 @@ void Unit::DoPetAction( Player* owner, uint8 flag, uint32 spellid, uint64 guid1,
                 return;
 
             if(guid2)
-                unit_target = ObjectAccessor::GetUnit(*owner,guid2);
+                unit_target = owner->GetMap()->GetUnit(guid2);
 
             // do not cast unknown spells
             SpellEntry const *spellInfo = sSpellStore.LookupEntry(spellid );

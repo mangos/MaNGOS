@@ -1996,7 +1996,8 @@ Unit* ChatHandler::getSelectedUnit()
     if (guid == 0)
         return m_session->GetPlayer();
 
-    return ObjectAccessor::GetUnit(*m_session->GetPlayer(),guid);
+    // can be selected player at another map
+    return ObjectAccessor::GetUnit(*m_session->GetPlayer(), guid);
 }
 
 Creature* ChatHandler::getSelectedCreature()
@@ -2004,7 +2005,7 @@ Creature* ChatHandler::getSelectedCreature()
     if(!m_session)
         return NULL;
 
-    return m_session->GetPlayer()->GetMap()->GetCreatureOrPetOrVehicle(m_session->GetPlayer()->GetSelection());
+    return m_session->GetPlayer()->GetMap()->GetAnyTypeCreature(m_session->GetPlayer()->GetSelection());
 }
 
 /**
