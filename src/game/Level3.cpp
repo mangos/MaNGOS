@@ -4168,9 +4168,6 @@ bool ChatHandler::HandleStableCommand(char* /*args*/)
 
 bool ChatHandler::HandleChangeWeatherCommand(char* args)
 {
-    if (!*args)
-        return false;
-
     //Weather is OFF
     if (!sWorld.getConfig(CONFIG_BOOL_WEATHER))
     {
@@ -4179,15 +4176,21 @@ bool ChatHandler::HandleChangeWeatherCommand(char* args)
         return false;
     }
 
-    //*Change the weather of a cell
-    char* px = strtok(args, " ");
-    char* py = strtok(NULL, " ");
-
-    if (!px || !py)
+    uint32 type;
+    if (!ExtractUInt32(&args, type))
         return false;
 
-    uint32 type = (uint32)atoi(px);                         //0 to 3, 0: fine, 1: rain, 2: snow, 3: sand
-    float grade = (float)atof(py);                          //0 to 1, sending -1 is instand good weather
+    //0 to 3, 0: fine, 1: rain, 2: snow, 3: sand
+    if (type > 3)
+        return false;
+
+    float grade;
+    if (!ExtractFloat(&args, grade))
+        return false;
+
+    //0 to 1, sending -1 is instand good weather
+    if (grade < 0.0f || grade > 1.0f)
+        return false;
 
     Player *player = m_session->GetPlayer();
     uint32 zoneid = player->GetZoneId();
@@ -4659,141 +4662,81 @@ bool ChatHandler::HandleServerShutDownCancelCommand(char* /*args*/)
 
 bool ChatHandler::HandleServerShutDownCommand(char* args)
 {
-    if (!*args)
+    uint32 delay;
+    if (!ExtractUInt32(&args, delay))
         return false;
 
-    char* time_str = strtok(args, " ");
-    char* exitcode_str = strtok(NULL, "");
-
-    int32 time = atoi(time_str);
-
-    ///- Prevent interpret wrong arg value as 0 secs shutdown time
-    if ((time == 0 && (time_str[0]!='0' || time_str[1]!='\0')) || time < 0)
+    uint32 exitcode;
+    if (!ExtractOptUInt32(&args, exitcode, SHUTDOWN_EXIT_CODE))
         return false;
 
-    if (exitcode_str)
-    {
-        int32 exitcode = atoi (exitcode_str);
+    // Exit code should be in range of 0-125, 126-255 is used
+    // in many shells for their own return codes and code > 255
+    // is not supported in many others
+    if (exitcode < 0 || exitcode > 125)
+        return false;
 
-        // Handle atoi() errors
-        if (exitcode == 0 && (exitcode_str[0] != '0' || exitcode_str[1] != '\0'))
-            return false;
-
-        // Exit code should be in range of 0-125, 126-255 is used
-        // in many shells for their own return codes and code > 255
-        // is not supported in many others
-        if (exitcode < 0 || exitcode > 125)
-            return false;
-
-        sWorld.ShutdownServ (time, 0, exitcode);
-    }
-    else
-        sWorld.ShutdownServ(time,0,SHUTDOWN_EXIT_CODE);
+    sWorld.ShutdownServ (delay, 0, exitcode);
     return true;
 }
 
 bool ChatHandler::HandleServerRestartCommand(char* args)
 {
-    if (!*args)
+    uint32 delay;
+    if (!ExtractUInt32(&args, delay))
         return false;
 
-    char* time_str = strtok(args, " ");
-    char* exitcode_str = strtok(NULL, "");
-
-    int32 time = atoi(time_str);
-
-    ///- Prevent interpret wrong arg value as 0 secs shutdown time
-    if ((time == 0 && (time_str[0]!='0' || time_str[1]!='\0')) || time < 0)
+    uint32 exitcode;
+    if (!ExtractOptUInt32(&args, exitcode, RESTART_EXIT_CODE))
         return false;
 
-    if (exitcode_str)
-    {
-        int32 exitcode = atoi(exitcode_str);
+    // Exit code should be in range of 0-125, 126-255 is used
+    // in many shells for their own return codes and code > 255
+    // is not supported in many others
+    if (exitcode < 0 || exitcode > 125)
+        return false;
 
-        // Handle atoi() errors
-        if (exitcode == 0 && (exitcode_str[0] != '0' || exitcode_str[1] != '\0'))
-            return false;
-
-        // Exit code should be in range of 0-125, 126-255 is used
-        // in many shells for their own return codes and code > 255
-        // is not supported in many others
-        if (exitcode < 0 || exitcode > 125)
-            return false;
-
-        sWorld.ShutdownServ(time, SHUTDOWN_MASK_RESTART, exitcode);
-    }
-    else
-        sWorld.ShutdownServ(time, SHUTDOWN_MASK_RESTART, RESTART_EXIT_CODE);
+    sWorld.ShutdownServ(delay, SHUTDOWN_MASK_RESTART, exitcode);
     return true;
 }
 
 bool ChatHandler::HandleServerIdleRestartCommand(char* args)
 {
-    if (!*args)
+    uint32 delay;
+    if (!ExtractUInt32(&args, delay))
         return false;
 
-    char* time_str = strtok(args, " ");
-    char* exitcode_str = strtok(NULL, "");
-
-    int32 time = atoi(time_str);
-
-    ///- Prevent interpret wrong arg value as 0 secs shutdown time
-    if ((time == 0 && (time_str[0]!='0' || time_str[1]!='\0')) || time < 0)
+    uint32 exitcode;
+    if (!ExtractOptUInt32(&args, exitcode, RESTART_EXIT_CODE))
         return false;
 
-    if (exitcode_str)
-    {
-        int32 exitcode = atoi(exitcode_str);
+    // Exit code should be in range of 0-125, 126-255 is used
+    // in many shells for their own return codes and code > 255
+    // is not supported in many others
+    if (exitcode < 0 || exitcode > 125)
+        return false;
 
-        // Handle atoi() errors
-        if (exitcode == 0 && (exitcode_str[0] != '0' || exitcode_str[1] != '\0'))
-            return false;
-
-        // Exit code should be in range of 0-125, 126-255 is used
-        // in many shells for their own return codes and code > 255
-        // is not supported in many others
-        if (exitcode < 0 || exitcode > 125)
-            return false;
-
-        sWorld.ShutdownServ(time, SHUTDOWN_MASK_RESTART|SHUTDOWN_MASK_IDLE, exitcode);
-    }
-    else
-        sWorld.ShutdownServ(time,SHUTDOWN_MASK_RESTART|SHUTDOWN_MASK_IDLE,RESTART_EXIT_CODE);
+    sWorld.ShutdownServ(delay, SHUTDOWN_MASK_RESTART|SHUTDOWN_MASK_IDLE, exitcode);
     return true;
 }
 
 bool ChatHandler::HandleServerIdleShutDownCommand(char* args)
 {
-    if (!*args)
+    uint32 delay;
+    if (!ExtractUInt32(&args, delay))
         return false;
 
-    char* time_str = strtok(args, " ");
-    char* exitcode_str = strtok(NULL, "");
-
-    int32 time = atoi(time_str);
-
-    ///- Prevent interpret wrong arg value as 0 secs shutdown time
-    if ((time == 0 && (time_str[0]!='0' || time_str[1]!='\0')) || time < 0)
+    uint32 exitcode;
+    if (!ExtractOptUInt32(&args, exitcode, SHUTDOWN_EXIT_CODE))
         return false;
 
-    if (exitcode_str)
-    {
-        int32 exitcode = atoi(exitcode_str);
+    // Exit code should be in range of 0-125, 126-255 is used
+    // in many shells for their own return codes and code > 255
+    // is not supported in many others
+    if (exitcode < 0 || exitcode > 125)
+        return false;
 
-        // Handle atoi() errors
-        if (exitcode == 0 && (exitcode_str[0] != '0' || exitcode_str[1] != '\0'))
-            return false;
-
-        // Exit code should be in range of 0-125, 126-255 is used
-        // in many shells for their own return codes and code > 255
-        // is not supported in many others
-        if (exitcode < 0 || exitcode > 125)
-            return false;
-
-        sWorld.ShutdownServ(time, SHUTDOWN_MASK_IDLE, exitcode);
-    }
-    else
-        sWorld.ShutdownServ(time,SHUTDOWN_MASK_IDLE,SHUTDOWN_EXIT_CODE);
+    sWorld.ShutdownServ(delay, SHUTDOWN_MASK_IDLE, exitcode);
     return true;
 }
 
@@ -5197,7 +5140,7 @@ bool ChatHandler::HandleBanInfoIPCommand(char* args)
     if (!*args)
         return false;
 
-    char* cIP = strtok (args, "");
+    char* cIP = ExtractQuotedOrLiteralArg(&args);
     if(!cIP)
         return false;
 
@@ -5227,7 +5170,7 @@ bool ChatHandler::HandleBanListCharacterCommand(char* args)
 {
     LoginDatabase.Execute("DELETE FROM ip_banned WHERE unbandate<=UNIX_TIMESTAMP() AND unbandate<>bandate");
 
-    char* cFilter = strtok (args, " ");
+    char* cFilter = ExtractLiteralArg(&args);
     if(!cFilter)
         return false;
 
@@ -5247,7 +5190,7 @@ bool ChatHandler::HandleBanListAccountCommand(char* args)
 {
     LoginDatabase.Execute("DELETE FROM ip_banned WHERE unbandate<=UNIX_TIMESTAMP() AND unbandate<>bandate");
 
-    char* cFilter = strtok(args, " ");
+    char* cFilter = ExtractLiteralArg(&args);
     std::string filter = cFilter ? cFilter : "";
     LoginDatabase.escape_string(filter);
 
@@ -5356,7 +5299,7 @@ bool ChatHandler::HandleBanListIPCommand(char* args)
 {
     LoginDatabase.Execute("DELETE FROM ip_banned WHERE unbandate<=UNIX_TIMESTAMP() AND unbandate<>bandate");
 
-    char* cFilter = strtok(args, " ");
+    char* cFilter = ExtractLiteralArg(&args);
     std::string filter = cFilter ? cFilter : "";
     LoginDatabase.escape_string(filter);
 
