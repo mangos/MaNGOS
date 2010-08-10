@@ -2883,7 +2883,7 @@ void Map::ScriptsProcess()
 }
 
 /**
- * Function return player that in world at CURRENT map 
+ * Function return player that in world at CURRENT map
  *
  * Note: This is function preferred if you sure that need player only placed at specific map
  *       This is not true for some spell cast targeting and most packet handlers
@@ -2897,7 +2897,7 @@ Player* Map::GetPlayer(ObjectGuid guid)
 }
 
 /**
- * Function return creature (non-pet and then most summoned by spell creatures, and not vehicle) that in world at CURRENT map 
+ * Function return creature (non-pet and then most summoned by spell creatures, and not vehicle) that in world at CURRENT map
  *
  * @param guid must be creature guid (HIGHGUID_UNIT)
  */
@@ -2907,7 +2907,7 @@ Creature* Map::GetCreature(ObjectGuid guid)
 }
 
 /**
- * Function return vehicle that in world at CURRENT map 
+ * Function return vehicle that in world at CURRENT map
  *
  * @param guid must be vehicle guid (HIGHGUID_VEHICLE)
  */
@@ -2917,7 +2917,7 @@ Vehicle* Map::GetVehicle(ObjectGuid guid)
 }
 
 /**
- * Function return pet that in world at CURRENT map 
+ * Function return pet that in world at CURRENT map
  *
  * @param guid must be pet guid (HIGHGUID_PET)
  */
@@ -2927,7 +2927,7 @@ Pet* Map::GetPet(ObjectGuid guid)
 }
 
 /**
- * Function return corpse that at CURRENT map 
+ * Function return corpse that at CURRENT map
  *
  * Note: corpse can be NOT IN WORLD, so can't be used corspe->GetMap() without pre-check corpse->isInWorld()
  *
