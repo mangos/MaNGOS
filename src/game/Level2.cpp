@@ -2699,7 +2699,7 @@ bool ChatHandler::HandleTicketCommand(char* args)
 
     // ticket #num
     uint32 num;
-    if (!ExtractUInt32(&px, num))
+    if (ExtractUInt32(&px, num))
     {
         if (num == 0)
             return false;
