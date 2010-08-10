@@ -2882,32 +2882,69 @@ void Map::ScriptsProcess()
     }
 }
 
+/**
+ * Function return player that in world at CURRENT map 
+ *
+ * Note: This is function preferred if you sure that need player only placed at specific map
+ *       This is not true for some spell cast targeting and most packet handlers
+ *
+ * @param guid must be player guid (HIGHGUID_PLAYER)
+ */
+Player* Map::GetPlayer(ObjectGuid guid)
+{
+    Player* plr = ObjectAccessor::FindPlayer(guid);         // return only in world players
+    return plr && plr->GetMap() == this ? plr : NULL;
+}
+
+/**
+ * Function return creature (non-pet and then most summoned by spell creatures, and not vehicle) that in world at CURRENT map 
+ *
+ * @param guid must be creature guid (HIGHGUID_UNIT)
+ */
 Creature* Map::GetCreature(ObjectGuid guid)
 {
     return m_objectsStore.find<Creature>(guid.GetRawValue(), (Creature*)NULL);
 }
 
+/**
+ * Function return vehicle that in world at CURRENT map 
+ *
+ * @param guid must be vehicle guid (HIGHGUID_VEHICLE)
+ */
 Vehicle* Map::GetVehicle(ObjectGuid guid)
 {
     return m_objectsStore.find<Vehicle>(guid.GetRawValue(), (Vehicle*)NULL);
 }
 
+/**
+ * Function return pet that in world at CURRENT map 
+ *
+ * @param guid must be pet guid (HIGHGUID_PET)
+ */
 Pet* Map::GetPet(ObjectGuid guid)
 {
     return m_objectsStore.find<Pet>(guid.GetRawValue(), (Pet*)NULL);
 }
 
+/**
+ * Function return corpse that at CURRENT map 
+ *
+ * Note: corpse can be NOT IN WORLD, so can't be used corspe->GetMap() without pre-check corpse->isInWorld()
+ *
+ * @param guid must be corpse guid (HIGHGUID_CORPSE)
+ */
 Corpse* Map::GetCorpse(ObjectGuid guid)
 {
     Corpse * ret = ObjectAccessor::GetCorpseInMap(guid,GetId());
-    if (!ret)
-        return NULL;
-    if (ret->GetInstanceId() != GetInstanceId())
-        return NULL;
-    return ret;
+    return ret && ret->GetInstanceId() == GetInstanceId() ? ret : NULL;
 }
 
-Creature* Map::GetCreatureOrPetOrVehicle(ObjectGuid guid)
+/**
+ * Function return non-player unit object that in world at CURRENT map, so creature, or pet, or vehicle
+ *
+ * @param guid must be non-player unit guid (HIGHGUID_PET HIGHGUID_UNIT HIGHGUID_VEHICLE)
+ */
+Creature* Map::GetAnyTypeCreature(ObjectGuid guid)
 {
     switch(guid.GetHigh())
     {
@@ -2920,27 +2957,61 @@ Creature* Map::GetCreatureOrPetOrVehicle(ObjectGuid guid)
     return NULL;
 }
 
+/**
+ * Function return gameobject that in world at CURRENT map
+ *
+ * @param guid must be gameobject guid (HIGHGUID_GAMEOBJECT)
+ */
 GameObject* Map::GetGameObject(ObjectGuid guid)
 {
     return m_objectsStore.find<GameObject>(guid.GetRawValue(), (GameObject*)NULL);
 }
 
+/**
+ * Function return dynamic object that in world at CURRENT map
+ *
+ * @param guid must be dynamic object guid (HIGHGUID_DYNAMICOBJECT)
+ */
 DynamicObject* Map::GetDynamicObject(ObjectGuid guid)
 {
     return m_objectsStore.find<DynamicObject>(guid.GetRawValue(), (DynamicObject*)NULL);
 }
 
+/**
+ * Function return unit in world at CURRENT map
+ *
+ * Note: in case player guid not always expected need player at current map only.
+ *       For example in spell casting can be expected any in world player targeting in some cases
+ *
+ * @param guid must be unit guid (HIGHGUID_PLAYER HIGHGUID_PET HIGHGUID_UNIT HIGHGUID_VEHICLE)
+ */
+Unit* Map::GetUnit(ObjectGuid guid)
+{
+    if (guid.IsPlayer())
+        return GetPlayer(guid);
+
+    return GetAnyTypeCreature(guid);
+}
+
+/**
+ * Function return world object in world at CURRENT map, so any except transports
+ */
 WorldObject* Map::GetWorldObject(ObjectGuid guid)
 {
     switch(guid.GetHigh())
     {
-        case HIGHGUID_PLAYER:       return ObjectAccessor::FindPlayer(guid);
+        case HIGHGUID_PLAYER:       return GetPlayer(guid);
         case HIGHGUID_GAMEOBJECT:   return GetGameObject(guid);
         case HIGHGUID_UNIT:         return GetCreature(guid);
         case HIGHGUID_PET:          return GetPet(guid);
         case HIGHGUID_VEHICLE:      return GetVehicle(guid);
         case HIGHGUID_DYNAMICOBJECT:return GetDynamicObject(guid);
-        case HIGHGUID_CORPSE:       return GetCorpse(guid);
+        case HIGHGUID_CORPSE:
+        {
+            // corpse special case, it can be not in world
+            Corpse* corpse = GetCorpse(guid);
+            return corpse && corpse->IsInWorld() ? corpse : NULL;
+        }
         case HIGHGUID_MO_TRANSPORT:
         case HIGHGUID_TRANSPORT:
         default:                    break;

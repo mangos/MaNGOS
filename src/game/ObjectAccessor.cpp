@@ -65,7 +65,7 @@ ObjectAccessor::GetUnit(WorldObject const &u, ObjectGuid guid)
     if (!u.IsInWorld())
         return NULL;
 
-    return u.GetMap()->GetCreatureOrPetOrVehicle(guid);
+    return u.GetMap()->GetAnyTypeCreature(guid);
 }
 
 Corpse* ObjectAccessor::GetCorpseInMap(ObjectGuid guid, uint32 mapid)

@@ -103,11 +103,12 @@ class MANGOS_DLL_DECL ObjectAccessor : public MaNGOS::Singleton<ObjectAccessor, 
         static Creature*   GetCreatureInWorld(ObjectGuid guid)   { return FindHelper<Creature>(guid); }
         static GameObject* GetGameObjectInWorld(ObjectGuid guid) { return FindHelper<GameObject>(guid); }
 
-        // possible local search for specific object map
-        static Unit* GetUnit(WorldObject const &, ObjectGuid guid);
+        // Search player at any map in world and other objects at same map with `obj`
+        // Note: recommended use Map::GetUnit version if player also expected at same map only
+        static Unit* GetUnit(WorldObject const& obj, ObjectGuid guid);
 
         // Player access
-        static Player* FindPlayer(ObjectGuid guid);
+        static Player* FindPlayer(ObjectGuid guid);         // if need player at specific map better use Map::GetPlayer
         static Player* FindPlayerByName(const char *name);
         static void KickPlayer(uint64 guid);
 
