@@ -273,8 +273,9 @@ class AchievementMgr
 
         static uint32 GetCriteriaProgressMaxCounter(AchievementCriteriaEntry const* entry);
 
+        // Use PROGRESS_SET only for reset/downgrade criteria progress
         enum ProgressType { PROGRESS_SET, PROGRESS_ACCUMULATE, PROGRESS_HIGHEST };
-        void SetCriteriaProgress(AchievementCriteriaEntry const* criteria, AchievementEntry const* achievement, uint32 changeValue, ProgressType ptype = PROGRESS_SET);
+        void SetCriteriaProgress(AchievementCriteriaEntry const* criteria, AchievementEntry const* achievement, uint32 changeValue, ProgressType ptype);
 
     private:
         void SendAchievementEarned(AchievementEntry const* achievement);

@@ -1117,7 +1117,7 @@ bool ChatHandler::HandleAchievementAddCommand(char* args)
                 continue;
 
             uint32 maxValue = AchievementMgr::GetCriteriaProgressMaxCounter(*itr);
-            mgr.SetCriteriaProgress(*itr, achEntry, maxValue);
+            mgr.SetCriteriaProgress(*itr, achEntry, maxValue, AchievementMgr::PROGRESS_SET);
         }
     }
 
@@ -1151,7 +1151,7 @@ bool ChatHandler::HandleAchievementRemoveCommand(char* args)
 
     if (AchievementCriteriaEntryList const* criteriaList = sAchievementMgr.GetAchievementCriteriaByAchievement(achEntry->ID))
         for (AchievementCriteriaEntryList::const_iterator itr = criteriaList->begin(); itr != criteriaList->end(); ++itr)
-            mgr.SetCriteriaProgress(*itr, achEntry, 0);
+            mgr.SetCriteriaProgress(*itr, achEntry, 0, AchievementMgr::PROGRESS_SET);
 
     LocaleConstant loc = GetSessionDbcLocale();
     CompletedAchievementData const* completed = target ? target->GetAchievementMgr().GetCompleteData(achId) : NULL;
@@ -1218,7 +1218,7 @@ bool ChatHandler::HandleAchievementCriteriaAddCommand(char* args)
         new_val = progress < max_int && max_int - progress > val ? progress + val : max_int;
     }
 
-    mgr.SetCriteriaProgress(criEntry, achEntry, new_val);   // value will move to allowed range into function
+    mgr.SetCriteriaProgress(criEntry, achEntry, new_val, AchievementMgr::PROGRESS_SET);
 
     ShowAchievementCriteriaListHelper(criEntry, achEntry, loc, target);
     return true;
@@ -1275,7 +1275,7 @@ bool ChatHandler::HandleAchievementCriteriaRemoveCommand(char* args)
 
     uint32 newval = change < progress ? progress - change : 0;
 
-    mgr.SetCriteriaProgress(criEntry, achEntry, newval);    // value will move to allowed range into function
+    mgr.SetCriteriaProgress(criEntry, achEntry, newval, AchievementMgr::PROGRESS_SET);
 
     ShowAchievementCriteriaListHelper(criEntry, achEntry, loc, target);
     return true;
