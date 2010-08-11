@@ -74,6 +74,8 @@ pkgdata_DATA = \
 	10331_02_mangos_command.sql \
 	10332_01_characters_character_aura.sql \
 	10332_02_characters_pet_aura.sql \
+	10342_01_mangos_mangos_string.sql \
+	10342_02_mangos_command.sql \
 	README
 
 ## Additional files to include when running 'make dist'
@@ -128,4 +130,6 @@ EXTRA_DIST = \
 	10331_02_mangos_command.sql \
 	10332_01_characters_character_aura.sql \
 	10332_02_characters_pet_aura.sql \
+	10342_01_mangos_mangos_string.sql \
+	10342_02_mangos_command.sql \
 	README

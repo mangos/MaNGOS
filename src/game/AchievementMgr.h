@@ -265,13 +265,23 @@ class AchievementMgr
         CompletedAchievementMap const& GetCompletedAchievements() const { return m_completedAchievements; }
         bool IsCompletedCriteria(AchievementCriteriaEntry const* criteria, AchievementEntry const* achievement) const;
 
-    private:
+        uint32 GetCriteriaProgressCounter(AchievementCriteriaEntry const* entry) const
+        {
+            CriteriaProgressMap::const_iterator iter = m_criteriaProgress.find(entry->ID);
+            return iter != m_criteriaProgress.end() ? iter->second.counter : 0;
+        }
+
+        static uint32 GetCriteriaProgressMaxCounter(AchievementCriteriaEntry const* entry);
+
         enum ProgressType { PROGRESS_SET, PROGRESS_ACCUMULATE, PROGRESS_HIGHEST };
+        void SetCriteriaProgress(AchievementCriteriaEntry const* criteria, AchievementEntry const* achievement, uint32 changeValue, ProgressType ptype = PROGRESS_SET);
+
+    private:
         void SendAchievementEarned(AchievementEntry const* achievement);
         void SendCriteriaUpdate(uint32 id, CriteriaProgress const* progress);
-        void SetCriteriaProgress(AchievementCriteriaEntry const* entry, uint32 changeValue, ProgressType ptype = PROGRESS_SET);
         void CompletedCriteriaFor(AchievementEntry const* achievement);
         void CompletedAchievement(AchievementEntry const* entry);
+        void IncompletedAchievement(AchievementEntry const* entry);
         bool IsCompletedAchievement(AchievementEntry const* entry);
         void CompleteAchievementsWithRefs(AchievementEntry const* entry);
         void BuildAllDataPacket(WorldPacket *data);
