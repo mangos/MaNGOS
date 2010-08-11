@@ -6021,17 +6021,20 @@ void Aura::HandleShapeshiftBoosts(bool apply)
         if(MasterShaperSpellId)
             target->RemoveAurasDueToSpell(MasterShaperSpellId);
 
-        // re-apply passive spells that don't need shapeshift but were inactive in current form:
-        const PlayerSpellMap& sp_list = ((Player *)target)->GetSpellMap();
-        for (PlayerSpellMap::const_iterator itr = sp_list.begin(); itr != sp_list.end(); ++itr)
+        if (target->GetTypeId() == TYPEID_PLAYER)
         {
-            if (itr->second.state == PLAYERSPELL_REMOVED) continue;
-            if (itr->first==spellId1 || itr->first==spellId2) continue;
-            SpellEntry const *spellInfo = sSpellStore.LookupEntry(itr->first);
-            if (!spellInfo || !IsPassiveSpell(spellInfo))
-                continue;
-            if ((spellInfo->AttributesEx2 & SPELL_ATTR_EX2_NOT_NEED_SHAPESHIFT) && spellInfo->StancesNot & (1<<(form-1)))
-                target->CastSpell(target, itr->first, true, NULL, this);
+            // re-apply passive spells that don't need shapeshift but were inactive in current form:
+            const PlayerSpellMap& sp_list = ((Player *)target)->GetSpellMap();
+            for (PlayerSpellMap::const_iterator itr = sp_list.begin(); itr != sp_list.end(); ++itr)
+            {
+                if (itr->second.state == PLAYERSPELL_REMOVED) continue;
+                if (itr->first==spellId1 || itr->first==spellId2) continue;
+                SpellEntry const *spellInfo = sSpellStore.LookupEntry(itr->first);
+                if (!spellInfo || !IsPassiveSpell(spellInfo))
+                    continue;
+                if ((spellInfo->AttributesEx2 & SPELL_ATTR_EX2_NOT_NEED_SHAPESHIFT) && spellInfo->StancesNot & (1<<(form-1)))
+                    target->CastSpell(target, itr->first, true, NULL, this);
+            }
         }
 
         Unit::SpellAuraHolderMap& tAuras = target->GetSpellAuraHolderMap();
