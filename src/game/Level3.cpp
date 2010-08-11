@@ -1079,7 +1079,7 @@ bool ChatHandler::HandleAchievementCommand(char* args)
 
     if (AchievementCriteriaEntryList const* criteriaList = sAchievementMgr.GetAchievementCriteriaByAchievement(achEntry->ID))
     {
-        SendSysMessage(LANG_COMMAND_ACHIEVEMENT_CREATERIA);
+        SendSysMessage(LANG_COMMAND_ACHIEVEMENT_CRITERIA);
         for (AchievementCriteriaEntryList::const_iterator itr = criteriaList->begin(); itr != criteriaList->end(); ++itr)
             ShowAchievementCriteriaListHelper(*itr, achEntry, loc, target);
     }
