@@ -88,7 +88,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { NULL,             0,                  false, NULL,                                           "", NULL }
     };
 
-    static ChatCommand achievementCreateriaCommandTable[] =
+    static ChatCommand achievementCriteriaCommandTable[] =
     {
         { "add",            SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleAchievementCriteriaAddCommand,   "", NULL },
         { "remove",         SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleAchievementCriteriaRemoveCommand,"", NULL },
@@ -97,7 +97,7 @@ ChatCommand * ChatHandler::getCommandTable()
 
     static ChatCommand achievementCommandTable[] =
     {
-        { "createria",      SEC_ADMINISTRATOR,  true,  NULL,                                           "", achievementCreateriaCommandTable },
+        { "criteria",       SEC_ADMINISTRATOR,  true,  NULL,                                           "", achievementCriteriaCommandTable },
         { "add",            SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleAchievementAddCommand,      "", NULL },
         { "remove",         SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleAchievementRemoveCommand,   "", NULL },
         { "",               SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleAchievementCommand,         "", NULL },

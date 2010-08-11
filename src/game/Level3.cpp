@@ -6464,8 +6464,8 @@ bool ChatHandler::HandleSendItemsCommand(char* args)
         // parse item str
         uint32 item_id = 0;
         uint32 item_count = 1;
-        if (sscanf(itemStr, "%u:%u", item_id, item_count) != 2)
-            if (sscanf(itemStr, "%u", item_id) != 1)
+        if (sscanf(itemStr, "%u:%u", &item_id, &item_count) != 2)
+            if (sscanf(itemStr, "%u", &item_id) != 1)
                 return false;
 
         if(!item_id)
