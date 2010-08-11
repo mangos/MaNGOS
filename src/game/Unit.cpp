@@ -675,6 +675,16 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
             pVictim->SetStandState(UNIT_STAND_STATE_STAND);
     }
 
+    // Blessed Life talent of Paladin
+    if( pVictim->GetTypeId() == TYPEID_PLAYER )
+    {
+        Unit::AuraList const& BlessedLife = pVictim->GetAurasByType(SPELL_AURA_PROC_TRIGGER_SPELL);
+        for(Unit::AuraList::const_iterator i = BlessedLife.begin(); i != BlessedLife.end(); ++i)
+            if((*i)->GetSpellProto()->SpellFamilyName == SPELLFAMILY_PALADIN && (*i)->GetSpellProto()->SpellIconID == 2137)
+                if( urand(0,100) < (*i)->GetSpellProto()->procChance )
+                    damage *= 0.5;
+    }
+
     if(!damage)
     {
         // Rage from physical damage received .
