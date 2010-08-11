@@ -1960,6 +1960,11 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         }
                         return;
                     }
+                    case 13139:                             // net-o-matic
+                        // root to self part of (root_target->charge->root_self sequence
+                        if (Unit* caster = GetCaster())
+                            caster->CastSpell(caster, 13138, true, NULL, this);
+                        return;
                     case 31606:                             // Stormcrow Amulet
                     {
                         CreatureInfo const * cInfo = ObjectMgr::GetCreatureTemplate(17970);
@@ -1970,11 +1975,6 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
 
                         return;
                     }
-                    case 13139:                             // net-o-matic
-                        // root to self part of (root_target->charge->root_self sequence
-                        if (Unit* caster = GetCaster())
-                            caster->CastSpell(caster, 13138, true, NULL, this);
-                        return;
                     case 32045:                             // Soul Charge
                     case 32051:
                     case 32052:
