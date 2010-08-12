@@ -2015,7 +2015,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                         RemoveAurasDueToSpell(71432);       // Mote of Anger
 
                         // Manifest Anger (main hand/off hand)
-                        CastSpell(pVictim, roll_chance_i(50) ? 71433 : 71434, true);
+                        CastSpell(pVictim, !haveOffhandWeapon() || roll_chance_i(50) ? 71433 : 71434, true);
                         return SPELL_AURA_PROC_OK;
                     }
                     else
