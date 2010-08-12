@@ -31,6 +31,7 @@ struct GameTele;
 
 class ChatHandler;
 class WorldSession;
+class GMTicket;
 class Creature;
 class Player;
 class Unit;
@@ -608,7 +609,7 @@ class ChatHandler
         void ShowQuestListHelper(uint32 questId, int32 loc_idx, Player* target = NULL);
         bool ShowPlayerListHelper(QueryResult* result, uint32* limit = NULL, bool title = true, bool error = true);
         void ShowSpellListHelper(Player* target, SpellEntry const* spellInfo, LocaleConstant loc);
-        void ShowTicket(uint64 guid, char const* text, char const* time);
+        void ShowTicket(GMTicket const* ticket);
         void ShowTriggerListHelper(AreaTriggerEntry const * atEntry);
         void ShowTriggerTargetListHelper(uint32 id, AreaTrigger const* at, bool subpart = false);
         bool LookupPlayerSearchCommand(QueryResult* result, uint32* limit = NULL);
