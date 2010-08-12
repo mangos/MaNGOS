@@ -21331,6 +21331,11 @@ void Player::UpdateAchievementCriteria( AchievementCriteriaTypes type, uint32 mi
     GetAchievementMgr().UpdateAchievementCriteria(type, miscvalue1,miscvalue2,unit,time);
 }
 
+void Player::StartTimedAchievementCriteria(AchievementCriteriaTypes type, uint32 timedRequirementId, time_t startTime /*= 0*/)
+{
+    GetAchievementMgr().StartTimedAchievementCriteria(type, timedRequirementId, startTime);
+}
+
 PlayerTalent const* Player::GetKnownTalentById(int32 talentId) const
 {
     PlayerTalentMap::const_iterator itr = m_talents[m_activeSpec].find(talentId);

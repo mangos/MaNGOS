@@ -189,6 +189,8 @@ void WorldSession::HandleQuestgiverAcceptQuestOpcode( WorldPacket & recv_data )
             if ( _player->CanCompleteQuest( quest ) )
                 _player->CompleteQuest( quest );
 
+            _player->GetAchievementMgr().StartTimedAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST, quest);
+
             switch(pObject->GetTypeId())
             {
                 case TYPEID_UNIT:

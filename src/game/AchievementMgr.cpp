@@ -704,6 +704,70 @@ static const uint32 achievIdByClass[MAX_CLASSES] = { 0, 459, 465 , 462, 458, 464
 static const uint32 achievIdByRace[MAX_RACES]    = { 0, 1408, 1410, 1407, 1409, 1413, 1411, 1404, 1412, 0, 1405, 1406 };
 
 /**
+ * this function will be called whenever the user might have done a timed-criteria relevant action, or by scripting side?
+ */
+void AchievementMgr::StartTimedAchievementCriteria(AchievementCriteriaTypes type, uint32 timedRequirementId, time_t startTime /*= 0*/)
+{
+    DETAIL_FILTER_LOG(LOG_FILTER_ACHIEVEMENT_UPDATES, "AchievementMgr::StartTimedAchievementCriteria(%u, %u)", type, timedRequirementId);
+
+    if (!sWorld.getConfig(CONFIG_BOOL_GM_ALLOW_ACHIEVEMENT_GAINS) && m_player->GetSession()->GetSecurity() > SEC_PLAYER)
+        return;
+
+    AchievementCriteriaEntryList const& achievementCriteriaList = sAchievementMgr.GetAchievementCriteriaByType(type);
+    for(AchievementCriteriaEntryList::const_iterator i = achievementCriteriaList.begin(); i!=achievementCriteriaList.end(); ++i)
+    {
+        AchievementCriteriaEntry const *achievementCriteria = (*i);
+
+        // only apply to specific timedRequirementId related criteria
+        if (achievementCriteria->timedCriteriaMiscId != timedRequirementId)
+            continue;
+
+        if (!achievementCriteria->IsExplicitlyStartedTimedCriteria())
+            continue;
+
+        if (achievementCriteria->groupFlag & ACHIEVEMENT_CRITERIA_GROUP_NOT_IN_GROUP && GetPlayer()->GetGroup())
+            continue;
+
+        AchievementEntry const *achievement = sAchievementStore.LookupEntry(achievementCriteria->referredAchievement);
+        if (!achievement)
+            continue;
+
+        if ((achievement->factionFlag == ACHIEVEMENT_FACTION_FLAG_HORDE    && GetPlayer()->GetTeam() != HORDE) ||
+            (achievement->factionFlag == ACHIEVEMENT_FACTION_FLAG_ALLIANCE && GetPlayer()->GetTeam() != ALLIANCE))
+            continue;
+
+        // don't update already completed criteria
+        if (IsCompletedCriteria(achievementCriteria,achievement))
+            continue;
+
+        // if we have additional DB criteria, they must be met to start the criteria
+        AchievementCriteriaRequirementSet const* data = sAchievementMgr.GetCriteriaRequirementSet(achievementCriteria);
+        if (data && !data->Meets(GetPlayer(), NULL))        // TODO this might need more research, if this could be the player, or we also need to pass an unit
+            continue;
+
+        // do not start already failed timers
+        if (startTime && time_t(startTime + achievementCriteria->timeLimit) < time(NULL))
+            continue;
+
+        CriteriaProgress* progress = NULL;
+
+        CriteriaProgressMap::iterator iter = m_criteriaProgress.find(achievementCriteria->ID);
+        if (iter == m_criteriaProgress.end())
+            progress = &m_criteriaProgress[achievementCriteria->ID];
+        else
+            progress = &iter->second;
+
+        progress->changed = true;
+        progress->counter = 0;
+
+        // Start with given startTime or now
+        progress->date = startTime ? startTime : time(NULL);
+
+        SendCriteriaUpdate(achievementCriteria->ID, progress);
+    }
+}
+
+/**
  * this function will be called whenever the user might have done a criteria relevant action
  */
 void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, uint32 miscvalue1, uint32 miscvalue2, Unit *unit, uint32 time)
@@ -1102,9 +1166,9 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                 switch(achievement->ID)
                 {
                     case 31:
-                    case 1275:
-                    case 1276:
-                    case 1277:
+                    //case 1275: // these timed achievements have to be "started" on Quest Accecpt
+                    //case 1276:
+                    //case 1277:
                     case 1282:
                     case 1789:
                     {
@@ -1812,17 +1876,21 @@ void AchievementMgr::SetCriteriaProgress(AchievementCriteriaEntry const* criteri
 
     CriteriaProgress *progress = NULL;
     uint32 old_value = 0;
+    uint32 newValue = 0;
 
     CriteriaProgressMap::iterator iter = m_criteriaProgress.find(criteria->ID);
-
     if(iter == m_criteriaProgress.end())
     {
         // not create record for 0 counter
         if(changeValue == 0)
             return;
 
+        // not start manually started timed achievements - must be same check as below (ie possible on player logout between start and finish)
+        if (criteria->IsExplicitlyStartedTimedCriteria())
+            return;
+
         progress = &m_criteriaProgress[criteria->ID];
-        progress->counter = changeValue;
+        newValue = changeValue;
         progress->date = time(NULL);
     }
     else
@@ -1830,8 +1898,6 @@ void AchievementMgr::SetCriteriaProgress(AchievementCriteriaEntry const* criteri
         progress = &iter->second;
 
         old_value = progress->counter;
-
-        uint32 newValue = 0;
         switch(ptype)
         {
             case PROGRESS_SET:
@@ -1851,8 +1917,6 @@ void AchievementMgr::SetCriteriaProgress(AchievementCriteriaEntry const* criteri
         // not update (not mark as changed) if counter will have same value
         if(progress->counter == newValue)
             return;
-
-        progress->counter = newValue;
     }
 
     progress->changed = true;
@@ -1860,12 +1924,24 @@ void AchievementMgr::SetCriteriaProgress(AchievementCriteriaEntry const* criteri
     if(criteria->timeLimit)
     {
         time_t now = time(NULL);
-        if(time_t(progress->date + criteria->timeLimit) < now)
-            progress->counter = 1;
 
-        // also it seems illogical, the timeframe will be extended at every criteria update
-        progress->date = now;
+        // too later, need restart from 1 auto-started or just fail explcit started
+        if (time_t(progress->date + criteria->timeLimit) < now)
+        {
+            // Do not reset timer for requirements that are started manually, also reset their counter, same check as above
+            if (criteria->IsExplicitlyStartedTimedCriteria())
+                newValue = 0;
+            else
+            {
+                newValue = 1;
+                // This is used as start time of the achievement, and hence only updated on fail
+                progress->date = now;
+            }
+        }
     }
+
+    progress->counter = newValue;
+    progress->changed = true;
 
     // update client side value
     SendCriteriaUpdate(criteria->ID,progress);
