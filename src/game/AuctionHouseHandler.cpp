@@ -180,7 +180,7 @@ AuctionHouseEntry const* WorldSession::GetCheckedAuctionHouseForAuctioneer(Objec
         auctioneer = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_AUCTIONEER);
         if (!auctioneer)
         {
-            DEBUG_LOG("Auctioneeer %s accessed in cheating way.", guid.GetString().c_str());
+            DEBUG_LOG("Auctioneer %s accessed in cheating way.", guid.GetString().c_str());
             return NULL;
         }
     }

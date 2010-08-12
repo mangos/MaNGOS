@@ -604,6 +604,16 @@ void AchievementMgr::LoadFromDB(QueryResult *achievementResult, QueryResult *cri
             progress.counter = counter;
             progress.date    = date;
             progress.changed = false;
+
+            // check intergiry with max allowed counter value
+            if (uint32 maxcounter = GetCriteriaProgressMaxCounter(criteria))
+            {
+                if (progress.counter > maxcounter)
+                {
+                    progress.counter = maxcounter;
+                    progress.changed = true;
+                }
+            }
         } while(criteriaResult->NextRow());
         delete criteriaResult;
     }
@@ -729,7 +739,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
 
         // init values, real set in switch
         uint32 change = 0;
-        ProgressType progressType = PROGRESS_SET;
+        ProgressType progressType = PROGRESS_HIGHEST;       // when need it will replaced by PROGRESS_ACCUMULATE
 
         switch (type)
         {
@@ -880,7 +890,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                     continue;
 
                 change = GetPlayer()->getLevel();
-                progressType = PROGRESS_SET;
+                progressType = PROGRESS_HIGHEST;
                 break;
             }
             case ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL:
@@ -907,7 +917,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                     continue;
 
                 change = 1;
-                progressType = PROGRESS_SET;
+                progressType = PROGRESS_HIGHEST;
                 break;
             }
             case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST_COUNT:
@@ -917,7 +927,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                     if(itr->second.m_rewarded)
                         counter++;
                 change = counter;
-                progressType = PROGRESS_SET;
+                progressType = PROGRESS_HIGHEST;
                 break;
             }
             case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUESTS_IN_ZONE:
@@ -934,7 +944,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                         counter++;
                 }
                 change = counter;
-                progressType = PROGRESS_SET;
+                progressType = PROGRESS_HIGHEST;
                 break;
             }
             case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_BATTLEGROUND:
@@ -1065,7 +1075,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
 
                 // miscvalue1 is the ingame fallheight*100 as stored in dbc
                 change = miscvalue1;
-                progressType = PROGRESS_SET;
+                progressType = PROGRESS_HIGHEST;
                 break;
             }
             case ACHIEVEMENT_CRITERIA_TYPE_DEATHS_FROM:
@@ -1114,7 +1124,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
 
 
                 change = 1;
-                progressType = PROGRESS_SET;
+                progressType = PROGRESS_HIGHEST;
                 break;
             }
             case ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET:
@@ -1161,7 +1171,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                     continue;
 
                 change = 1;
-                progressType = PROGRESS_SET;
+                progressType = PROGRESS_HIGHEST;
                 break;
             case ACHIEVEMENT_CRITERIA_TYPE_LOOT_TYPE:
             {
@@ -1190,7 +1200,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                 if(miscvalue1 && achievementCriteria->own_item.itemID != miscvalue1)
                     continue;
                 change = GetPlayer()->GetItemCount(achievementCriteria->own_item.itemID, true);
-                progressType = PROGRESS_SET;
+                progressType = PROGRESS_HIGHEST;
                 break;
             case ACHIEVEMENT_CRITERIA_TYPE_WIN_RATED_ARENA:
                 // miscvalue1 contains the personal rating
@@ -1205,7 +1215,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                     if(!data || !data->Meets(GetPlayer(),unit,miscvalue1))
                     {
                         // reset the progress as we have a win without the requirement.
-                        SetCriteriaProgress(achievementCriteria, achievement, 0);
+                        SetCriteriaProgress(achievementCriteria, achievement, 0, PROGRESS_SET);
                         continue;
                     }
                 }
@@ -1262,12 +1272,12 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                     continue;
 
                 change = 1;
-                progressType = PROGRESS_SET;
+                progressType = PROGRESS_HIGHEST;
                 break;
             }
             case ACHIEVEMENT_CRITERIA_TYPE_BUY_BANK_SLOT:
                 change = GetPlayer()->GetBankBagSlotCount();
-                progressType = PROGRESS_SET;
+                progressType = PROGRESS_HIGHEST;
                 break;
             case ACHIEVEMENT_CRITERIA_TYPE_GAIN_REPUTATION:
             {
@@ -1276,17 +1286,17 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                     continue;
 
                 int32 reputation = GetPlayer()->GetReputationMgr().GetReputation(achievementCriteria->gain_reputation.factionID);
-                if (!reputation)
+                if (reputation <= 0)
                     continue;
 
                 change = reputation;
-                progressType = PROGRESS_SET;
+                progressType = PROGRESS_HIGHEST;
                 break;
             }
             case ACHIEVEMENT_CRITERIA_TYPE_GAIN_EXALTED_REPUTATION:
             {
                 change = GetPlayer()->GetReputationMgr().GetExaltedFactionCount();
-                progressType = PROGRESS_SET;
+                progressType = PROGRESS_HIGHEST;
                 break;
             }
             case ACHIEVEMENT_CRITERIA_TYPE_VISIT_BARBER_SHOP:
@@ -1295,7 +1305,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                 if(!miscvalue1)
                     continue;
                 change = 1;
-                progressType = PROGRESS_SET;
+                progressType = PROGRESS_HIGHEST;
                 break;
             }
             case ACHIEVEMENT_CRITERIA_TYPE_EQUIP_EPIC_ITEM:
@@ -1311,7 +1321,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                 if(!data || !data->Meets(GetPlayer(),unit,item_slot))
                     continue;
                 change = 1;
-                progressType = PROGRESS_SET;
+                progressType = PROGRESS_HIGHEST;
                 break;
             }
             case ACHIEVEMENT_CRITERIA_TYPE_ROLL_NEED_ON_LOOT:
@@ -1382,7 +1392,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                     continue;
 
                 change = 1;
-                progressType = PROGRESS_SET;
+                progressType = PROGRESS_HIGHEST;
                 break;
             case ACHIEVEMENT_CRITERIA_TYPE_USE_GAMEOBJECT:
                 // miscvalue1 = go entry
@@ -1439,7 +1449,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                     }
                 }
                 change = spellCount;
-                progressType = PROGRESS_SET;
+                progressType = PROGRESS_HIGHEST;
                 break;
             }
             case ACHIEVEMENT_CRITERIA_TYPE_WIN_DUEL:
@@ -1463,15 +1473,15 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                 break;
             case ACHIEVEMENT_CRITERIA_TYPE_GAIN_REVERED_REPUTATION:
                 change = GetPlayer()->GetReputationMgr().GetReveredFactionCount();
-                progressType = PROGRESS_SET;
+                progressType = PROGRESS_HIGHEST;
                 break;
             case ACHIEVEMENT_CRITERIA_TYPE_GAIN_HONORED_REPUTATION:
                 change = GetPlayer()->GetReputationMgr().GetHonoredFactionCount();
-                progressType = PROGRESS_SET;
+                progressType = PROGRESS_HIGHEST;
                 break;
             case ACHIEVEMENT_CRITERIA_TYPE_KNOWN_FACTIONS:
                 change = GetPlayer()->GetReputationMgr().GetVisibleFactionCount();
-                progressType = PROGRESS_SET;
+                progressType = PROGRESS_HIGHEST;
                 break;
             case ACHIEVEMENT_CRITERIA_TYPE_LOOT_EPIC_ITEM:
             case ACHIEVEMENT_CRITERIA_TYPE_RECEIVE_EPIC_ITEM:
@@ -1502,12 +1512,12 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                             spellCount++;
                 }
                 change = spellCount;
-                progressType = PROGRESS_SET;
+                progressType = PROGRESS_HIGHEST;
                 break;
             }
             case ACHIEVEMENT_CRITERIA_TYPE_EARN_HONORABLE_KILL:
                 change = GetPlayer()->GetUInt32Value(PLAYER_FIELD_LIFETIME_HONORBALE_KILLS);
-                progressType = PROGRESS_SET;
+                progressType = PROGRESS_HIGHEST;
                 break;
             case ACHIEVEMENT_CRITERIA_TYPE_HK_CLASS:
                 if (!miscvalue1 || miscvalue1 != achievementCriteria->hk_class.classID)
