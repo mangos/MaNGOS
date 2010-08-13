@@ -27,13 +27,21 @@
 class GMTicket
 {
     public:
-        explicit GMTicket()
+        explicit GMTicket() : m_guid(0), m_lastUpdate(0)
         {
         }
 
-        GMTicket(uint32 guid, const std::string& text, const std::string& responsetext, time_t update) : m_guid(guid), m_text(text), m_responseText(responsetext), m_lastUpdate(update)
+        void Init(uint32 guid, const std::string& text, const std::string& responsetext, time_t update)
         {
+            m_guid = guid;
+            m_text = text;
+            m_responseText = responsetext;
+            m_lastUpdate =update;
+        }
 
+        uint32 GetPlayerLowGuid() const
+        {
+            return m_guid;
         }
 
         const char* GetText() const
@@ -99,6 +107,7 @@ class GMTicket
         time_t m_lastUpdate;
 };
 typedef std::map<uint32, GMTicket> GMTicketMap;
+typedef std::list<GMTicket*> GMTicketList;                  // for creating order access
 
 class GMTicketMgr
 {
@@ -121,12 +130,26 @@ class GMTicketMgr
             return m_GMTicketMap.size();
         }
 
+        GMTicket* GetGMTicketByOrderPos(uint32 pos)
+        {
+            if (pos >= GetTicketCount())
+                return NULL;
+
+            GMTicketList::iterator itr = m_GMTicketListByCreatingOrder.begin();
+            std::advance(itr, pos);
+            if(itr == m_GMTicketListByCreatingOrder.end())
+                return NULL;
+            return *itr;
+        }
+
+
         void Delete(uint32 guid)
         {
             GMTicketMap::iterator itr = m_GMTicketMap.find(guid);
             if(itr == m_GMTicketMap.end())
                 return;
             itr->second.DeleteFromDB();
+            m_GMTicketListByCreatingOrder.remove(&itr->second);
             m_GMTicketMap.erase(itr);
         }
 
@@ -134,12 +157,20 @@ class GMTicketMgr
 
         void Create(uint32 guid, const char* text)
         {
-            GMTicket t = GMTicket(guid, text, "", time(NULL));
-            t.SaveToDB();
-            m_GMTicketMap[guid] = t;
+            GMTicket& ticket = m_GMTicketMap[guid];
+            if (ticket.GetPlayerLowGuid() != 0)             // overwrite ticket
+            {
+                ticket.DeleteFromDB();
+                m_GMTicketListByCreatingOrder.remove(&ticket);
+            }
+
+            ticket.Init(guid, text, "", time(NULL));
+            ticket.SaveToDB();
+            m_GMTicketListByCreatingOrder.push_back(&ticket);
         }
     private:
         GMTicketMap m_GMTicketMap;
+        GMTicketList m_GMTicketListByCreatingOrder;
 };
 
 #define sTicketMgr MaNGOS::Singleton<GMTicketMgr>::Instance()

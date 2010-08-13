@@ -481,7 +481,7 @@ struct AchievementCriteriaEntry
 
         struct
         {
-            uint32  field3;                                 // 3 main requirement
+            uint32  value;                                  // 3 main requirement
             uint32  count;                                  // 4 main requirement count
             uint32  additionalRequirement1_type;            // 5 additional requirement 1 type
             uint32  additionalRequirement1_value;           // 6 additional requirement 1 value
@@ -493,11 +493,19 @@ struct AchievementCriteriaEntry
     //uint32 name_flags;                                    // 25
     uint32  completionFlag;                                 // 26
     uint32  groupFlag;                                      // 27
-    //uint32 unk1;                                          // 28 Alway appears with timed events
-                                                            // for timed spells it is spell id for
-                                                            // timed kills it is creature id
+    uint32  timedCriteriaMiscId;                            // 28 Alway appears with timed events, used internally to start the achievement, store 
     uint32  timeLimit;                                      // 29 time limit in seconds
     uint32  showOrder;                                      // 30 show order, also used in achievement shift-links as index in state bitmask
+
+    // helpers
+    bool IsExplicitlyStartedTimedCriteria() const
+    {
+        if (!timeLimit)
+            return false;
+
+        // in case raw.value == timedCriteriaMiscId in timedCriteriaMiscId stored spellid/itemids for cast/use, so repeating aura start at first cast/use until fails
+        return requiredType == ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST || raw.value != timedCriteriaMiscId;
+    }
 };
 
 struct AreaTableEntry
