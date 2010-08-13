@@ -37,7 +37,7 @@
 #include <set>
 
 #define FLIGHT_TRAVEL_UPDATE  100
-#define STOP_TIME_FOR_PLAYER  3 * 60 * 1000                         // 3 Minutes
+#define STOP_TIME_FOR_PLAYER  3 * MINUTE * IN_MILLISECONDS  // 3 Minutes
 
 template<class T, class P>
 class MANGOS_DLL_SPEC PathMovementBase
