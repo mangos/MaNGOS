@@ -725,9 +725,6 @@ void AchievementMgr::StartTimedAchievementCriteria(AchievementCriteriaTypes type
         if (!achievementCriteria->IsExplicitlyStartedTimedCriteria())
             continue;
 
-        if (achievementCriteria->groupFlag & ACHIEVEMENT_CRITERIA_GROUP_NOT_IN_GROUP && GetPlayer()->GetGroup())
-            continue;
-
         AchievementEntry const *achievement = sAchievementStore.LookupEntry(achievementCriteria->referredAchievement);
         if (!achievement)
             continue;
@@ -740,9 +737,8 @@ void AchievementMgr::StartTimedAchievementCriteria(AchievementCriteriaTypes type
         if (IsCompletedCriteria(achievementCriteria,achievement))
             continue;
 
-        // if we have additional DB criteria, they must be met to start the criteria
-        AchievementCriteriaRequirementSet const* data = sAchievementMgr.GetCriteriaRequirementSet(achievementCriteria);
-        if (data && !data->Meets(GetPlayer(), NULL))        // TODO this might need more research, if this could be the player, or we also need to pass an unit
+        // Only the Quest-Complete Timed Achievements need the groupcheck, so this check is only needed here
+        if (achievementCriteria->requiredType == ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST && GetPlayer()->GetGroup())
             continue;
 
         // do not start already failed timers
@@ -781,9 +777,6 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
     for(AchievementCriteriaEntryList::const_iterator i = achievementCriteriaList.begin(); i!=achievementCriteriaList.end(); ++i)
     {
         AchievementCriteriaEntry const *achievementCriteria = (*i);
-
-        if (achievementCriteria->groupFlag & ACHIEVEMENT_CRITERIA_GROUP_NOT_IN_GROUP && GetPlayer()->GetGroup())
-            continue;
 
         AchievementEntry const *achievement = sAchievementStore.LookupEntry(achievementCriteria->referredAchievement);
         if (!achievement)
@@ -1182,6 +1175,9 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                         break;
                 }
 
+                // As the groupFlag had wrong meaning, only the Quest-Complete Timed Achievements need the groupcheck, so this check is only needed here
+                if (achievementCriteria->timeLimit > 0 && GetPlayer()->GetGroup())
+                    continue;
 
                 change = 1;
                 progressType = PROGRESS_HIGHEST;
