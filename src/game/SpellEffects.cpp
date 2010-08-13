@@ -6444,6 +6444,50 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     unitTarget->CastSpell(unitTarget, 69201, true);
                     return;
                 }
+                case 60123: // Lightwell
+                {
+                   if (m_caster->GetTypeId() != TYPEID_UNIT)
+                       return;
+
+                    uint32 spellID;
+                    uint32 entry  = m_caster->GetEntry();
+ 
+                    switch(entry)
+                    {
+                        case 31897: spellID = 7001; break;   // Lightwell Renew	Rank 1
+                        case 31896: spellID = 27873; break;  // Lightwell Renew	Rank 2
+                        case 31895: spellID = 27874; break;  // Lightwell Renew	Rank 3
+                        case 31894: spellID = 28276; break;  // Lightwell Renew	Rank 4
+                        case 31893: spellID = 48084; break;  // Lightwell Renew	Rank 5
+                        case 31883: spellID = 48085; break;  // Lightwell Renew	Rank 6
+                        default:
+                            sLog.outError("Unknown Lightwell spell caster %u", m_caster->GetEntry());
+                            return;
+                    }
+
+                    if (SpellAuraHolder* chargesholder = m_caster->GetSpellAuraHolder(59907))
+                    {
+                        if (Unit *owner = m_caster->GetOwner())
+                        {
+                            if (const SpellEntry *pSpell = sSpellStore.LookupEntry(spellID))
+                            {
+                                damage = owner->SpellHealingBonusDone(unitTarget, pSpell, pSpell->EffectBasePoints[EFFECT_INDEX_0], DOT);
+                                damage = unitTarget->SpellHealingBonusTaken(owner, pSpell, damage, DOT);
+
+                                if (Aura *dummy = owner->GetDummyAura(55673))
+                                    damage += damage * dummy->GetModifier()->m_amount /100.0f;
+                            }
+                        }
+
+                        uint8 charges = chargesholder->GetAuraCharges();
+
+                        if (charges >= 1)
+                            m_caster->CastCustomSpell(unitTarget, spellID, &damage, NULL, NULL, true, NULL, NULL, m_originalCasterGUID);
+                        if (charges <= 1)
+                            ((TemporarySummon*)m_caster)->UnSummon();
+                    }
+                    return;
+                }
                 case 66477:                                 // Bountiful Feast
                 {
                     if (!unitTarget)
