@@ -85,7 +85,7 @@ void WaypointMovementGenerator<Creature>::Finalize( Creature &u )
 
 void WaypointMovementGenerator<Creature>::Interrupt( Creature &u )
 {
-    u.addUnitState(UNIT_STAT_ROAMING|UNIT_STAT_ROAMING_MOVE);
+    u.clearUnitState(UNIT_STAT_ROAMING|UNIT_STAT_ROAMING_MOVE);
 }
 
 void WaypointMovementGenerator<Creature>::Reset( Creature &u )
