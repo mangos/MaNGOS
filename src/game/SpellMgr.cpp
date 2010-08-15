@@ -2161,6 +2161,12 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
             break;
     }
 
+    if (spellInfo_1->SpellFamilyName == SPELLFAMILY_GENERIC || spellInfo_2->SpellFamilyName == SPELLFAMILY_GENERIC)
+        return false;
+
+    if (spellInfo_1->SpellFamilyName != spellInfo_2->SpellFamilyName)
+        return false;
+
     // more generic checks
     if (spellInfo_1->SpellIconID == spellInfo_2->SpellIconID &&
         spellInfo_1->SpellIconID != 0 && spellInfo_2->SpellIconID != 0)
@@ -2187,12 +2193,6 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
 
     if (IsRankSpellDueToSpell(spellInfo_1, spellId_2))
         return true;
-
-    if (spellInfo_1->SpellFamilyName == 0 || spellInfo_2->SpellFamilyName == 0)
-        return false;
-
-    if (spellInfo_1->SpellFamilyName != spellInfo_2->SpellFamilyName)
-        return false;
 
     bool dummy_only = true;
     for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
