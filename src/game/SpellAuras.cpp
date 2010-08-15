@@ -8029,7 +8029,7 @@ void SpellAuraHolder::CleanupTriggeredSpells()
 {
     for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
     {
-        if (!m_auras[i])
+        if (!m_spellProto->EffectApplyAuraName[i])
             continue;
 
         uint32 tSpellId = m_spellProto->EffectTriggerSpell[i];
