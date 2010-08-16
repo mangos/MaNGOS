@@ -406,34 +406,6 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                         damage *= exp(-distance/(10.0f));
                         break;
                     }
-                    case 74607:
-                    // SPELL_FIERY_COMBUSTION_EXPLODE - Ruby sanctum boss Halion,
-                    // damage proportional number of mark (74567, dummy), after cast summon NPC 40001
-                    {
-                        if (Aura* aura = m_caster->GetAura(74567, EFFECT_INDEX_0))
-                        {
-                            if (aura->GetStackAmount() > 0)
-                                damage = 1000 * aura->GetStackAmount();
-                             m_caster->RemoveAurasDueToSpell(74567);
-                             m_caster->SummonCreature(40001, 0, 0, 0, 0, TEMPSUMMON_TIMED_DESPAWN, 60000);
-                        }
-                        else damage = 0;
-                        break;
-                    }
-                    case 74799:
-                    // SPELL_SOUL_CONSUMPTION_EXPLODE - Ruby sanctum boss Halion,
-                    // damage proportional number of mark (74795, dummy), after cast summon NPC 40135
-                    {
-                        if (Aura* aura = m_caster->GetAura(74795, EFFECT_INDEX_0))
-                        {
-                            if (aura->GetStackAmount() > 0)
-                                damage = 1000 * aura->GetStackAmount();
-                             m_caster->RemoveAurasDueToSpell(74795);
-                             m_caster->SummonCreature(40135, 0, 0, 0, 0, TEMPSUMMON_TIMED_DESPAWN, 60000);
-                        }
-                        else damage = 0;
-                        break;
-                    }
                 }
                 break;
             }
