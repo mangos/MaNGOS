@@ -2414,7 +2414,7 @@ void Map::ScriptsProcess()
                 }
                 else
                 {
-                    pSource->KilledMonsterCredit(step.script->datalong, 0);
+                    pSource->KilledMonsterCredit(step.script->datalong);
                 }
 
                 break;

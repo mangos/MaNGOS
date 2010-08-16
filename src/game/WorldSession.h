@@ -229,7 +229,7 @@ class MANGOS_DLL_SPEC WorldSession
         void SendUpdateTrade(bool trader_state = true);
         void SendCancelTrade();
 
-        void SendPetitionQueryOpcode( uint64 petitionguid);
+        void SendPetitionQueryOpcode(ObjectGuid petitionguid);
 
         //pet
         void SendPetNameQuery(uint64 guid, uint32 petnumber);
@@ -266,7 +266,7 @@ class MANGOS_DLL_SPEC WorldSession
         //auction
         void SendAuctionHello(Unit * unit);
         void SendAuctionCommandResult( uint32 auctionId, uint32 Action, uint32 ErrorCode, uint32 bidError = 0);
-        void SendAuctionBidderNotification( uint32 location, uint32 auctionId, uint64 bidder, uint32 bidSum, uint32 diff, uint32 item_template);
+        void SendAuctionBidderNotification( uint32 location, uint32 auctionId, ObjectGuid bidderGuid, uint32 bidSum, uint32 diff, uint32 item_template);
         void SendAuctionOwnerNotification( AuctionEntry * auction );
         void SendAuctionOutbiddedMail( AuctionEntry * auction, uint32 newPrice );
         void SendAuctionCancelledToBidderMail( AuctionEntry* auction );

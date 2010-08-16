@@ -149,10 +149,10 @@ void LoadHelper(CellCorpseSet const& cell_corpses, CellPair &cell, CorpseMapType
         if(itr->second != map->GetInstanceId())
             continue;
 
-        uint32 player_guid = itr->first;
+        uint32 player_lowguid = itr->first;
 
-        Corpse *obj = sObjectAccessor.GetCorpseForPlayerGUID(player_guid);
-        if(!obj)
+        Corpse *obj = sObjectAccessor.GetCorpseForPlayerGUID(ObjectGuid(HIGHGUID_PLAYER, player_lowguid));
+        if (!obj)
             continue;
 
         grid.AddWorldObject(obj);
@@ -160,7 +160,7 @@ void LoadHelper(CellCorpseSet const& cell_corpses, CellPair &cell, CorpseMapType
         addUnitState(obj,cell);
         obj->SetMap(map);
         obj->AddToWorld();
-        if(obj->isActiveObject())
+        if (obj->isActiveObject())
             map->AddToActive(obj);
 
         ++count;

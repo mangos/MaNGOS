@@ -1214,7 +1214,7 @@ void Pet::_LoadAuras(uint32 timediff)
             
             if (!holder->IsEmptyHolder())
             {
-                holder->SetLoadedState(caster_guid, item_lowguid ? MAKE_NEW_GUID(item_lowguid, 0, HIGHGUID_ITEM) : 0, stackcount, remaincharges);
+                holder->SetLoadedState(caster_guid, ObjectGuid(HIGHGUID_ITEM, item_lowguid), stackcount, remaincharges);
                 AddSpellAuraHolder(holder);
             }
             else
