@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_10353_02_mangos_command` bit(1) default NULL
+  `required_10362_01_mangos_creature_movement_template` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -1055,6 +1055,42 @@ CREATE TABLE `creature_movement_scripts` (
 LOCK TABLES `creature_movement_scripts` WRITE;
 /*!40000 ALTER TABLE `creature_movement_scripts` DISABLE KEYS */;
 /*!40000 ALTER TABLE `creature_movement_scripts` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `creature_movement_template`
+--
+
+DROP TABLE IF EXISTS `creature_movement_template`;
+CREATE TABLE `creature_movement_template` (
+  `entry` mediumint(8) unsigned NOT NULL COMMENT 'Creature entry',
+  `point` mediumint(8) unsigned NOT NULL default '0',
+  `position_x` float NOT NULL default '0',
+  `position_y` float NOT NULL default '0',
+  `position_z` float NOT NULL default '0',
+  `waittime` int(10) unsigned NOT NULL default '0',
+  `script_id` mediumint(8) unsigned NOT NULL default '0',
+  `textid1` int(11) NOT NULL default '0',
+  `textid2` int(11) NOT NULL default '0',
+  `textid3` int(11) NOT NULL default '0',
+  `textid4` int(11) NOT NULL default '0',
+  `textid5` int(11) NOT NULL default '0',
+  `emote` mediumint(8) unsigned NOT NULL default '0',
+  `spell` mediumint(8) unsigned NOT NULL default '0',
+  `wpguid` int(11) NOT NULL default '0',
+  `orientation` float NOT NULL default '0',
+  `model1` mediumint(9) NOT NULL default '0',
+  `model2` mediumint(9) NOT NULL default '0',
+  PRIMARY KEY  (`entry`,`point`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Creature waypoint system';
+
+--
+-- Dumping data for table `creature_movement_template`
+--
+
+LOCK TABLES `creature_movement_template` WRITE;
+/*!40000 ALTER TABLE `creature_movement_template` DISABLE KEYS */;
+/*!40000 ALTER TABLE `creature_movement_template` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
