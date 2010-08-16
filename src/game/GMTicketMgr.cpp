@@ -33,8 +33,8 @@ void GMTicketMgr::LoadGMTickets()
     m_GMTicketMap.clear();                                  // For reload case
 
     QueryResult *result = CharacterDatabase.Query(
-        //      0     1            2              3
-        "SELECT guid, ticket_text, response_text, UNIX_TIMESTAMP(ticket_lastchange) FROM character_ticket");
+        //      0     1            2              3                                  4
+        "SELECT guid, ticket_text, response_text, UNIX_TIMESTAMP(ticket_lastchange), ticket_id FROM character_ticket ORDER BY ticket_id ASC");
 
     if( !result )
     {
@@ -49,8 +49,6 @@ void GMTicketMgr::LoadGMTickets()
 
     barGoLink bar( (int)result->GetRowCount() );
 
-    uint32 count = 0;
-
     do
     {
         bar.step();
@@ -58,14 +56,25 @@ void GMTicketMgr::LoadGMTickets()
         Field* fields = result->Fetch();
 
         uint32 guid = fields[0].GetUInt32();
-        m_GMTicketMap[guid] = GMTicket(guid, fields[1].GetCppString(), fields[2].GetCppString(), time_t(fields[3].GetUInt64()));
-        ++count;
+        if (!guid)
+            continue;
+
+        GMTicket& ticket = m_GMTicketMap[guid];
+
+        if (ticket.GetPlayerLowGuid() != 0)                 // already exist
+        {
+            CharacterDatabase.PExecute("DELETE FROM character_ticket WHERE ticket_id = '%u'", fields[4].GetUInt32());
+            continue;
+        }
+
+        ticket.Init(guid, fields[1].GetCppString(), fields[2].GetCppString(), time_t(fields[3].GetUInt64()));
+        m_GMTicketListByCreatingOrder.push_back(&ticket);
 
     } while (result->NextRow());
     delete result;
 
     sLog.outString();
-    sLog.outString( ">> Loaded %d GM tickets", count );
+    sLog.outString(">> Loaded %d GM tickets", GetTicketCount());
 }
 
 void GMTicketMgr::DeleteAll()
@@ -76,5 +85,6 @@ void GMTicketMgr::DeleteAll()
             owner->GetSession()->SendGMTicketGetTicket(0x0A, 0);
     }
     CharacterDatabase.Execute("DELETE FROM character_ticket");
+    m_GMTicketListByCreatingOrder.clear();
     m_GMTicketMap.clear();
 }

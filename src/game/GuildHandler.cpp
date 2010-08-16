@@ -230,8 +230,7 @@ void WorldSession::HandleGuildInfoOpcode(WorldPacket& /*recvPacket*/)
     data << guild->GetName();
     data << uint32(secsToTimeBitFields(guild->GetCreatedDate())); // 3.x (prev. day + month + year)
     data << uint32(guild->GetMemberSize());                 // amount of chars
-    data << uint32(guild->GetMemberSize());                 // amount of accounts (TODO: implement)
-
+    data << uint32(guild->GetAccountsNumber());             // amount of accounts
     SendPacket(&data);
 }
 
@@ -700,18 +699,18 @@ void WorldSession::HandleSaveGuildEmblemOpcode(WorldPacket& recvPacket)
 {
     DEBUG_LOG("WORLD: Received MSG_SAVE_GUILD_EMBLEM");
 
-    uint64 vendorGuid;
+    ObjectGuid vendorGuid;
     uint32 EmblemStyle, EmblemColor, BorderStyle, BorderColor, BackgroundColor;
 
     recvPacket >> vendorGuid;
     recvPacket >> EmblemStyle >> EmblemColor >> BorderStyle >> BorderColor >> BackgroundColor;
 
-    Creature *pCreature = GetPlayer()->GetNPCIfCanInteractWith(vendorGuid,UNIT_NPC_FLAG_TABARDDESIGNER);
+    Creature *pCreature = GetPlayer()->GetNPCIfCanInteractWith(vendorGuid, UNIT_NPC_FLAG_TABARDDESIGNER);
     if (!pCreature)
     {
         //"That's not an emblem vendor!"
         SendSaveGuildEmblem(ERR_GUILDEMBLEM_INVALIDVENDOR);
-        DEBUG_LOG("WORLD: HandleSaveGuildEmblemOpcode - Unit (GUID: %u) not found or you can't interact with him.", GUID_LOPART(vendorGuid));
+        DEBUG_LOG("WORLD: HandleSaveGuildEmblemOpcode - %s not found or you can't interact with him.", vendorGuid.GetString().c_str());
         return;
     }
 

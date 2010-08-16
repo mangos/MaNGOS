@@ -143,7 +143,7 @@ void WorldSession::HandleGroupInviteOpcode( WorldPacket & recv_data )
     }
     else
     {
-        // already existed group: if can't add then just leave
+        // already existing group: if can't add then just leave
         if(!group->AddInvite(player))
         {
             return;

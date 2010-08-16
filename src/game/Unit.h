@@ -349,20 +349,20 @@ enum AuraRemoveMode
 
 enum UnitMods
 {
-    UNIT_MOD_STAT_STRENGTH,                                 // UNIT_MOD_STAT_STRENGTH..UNIT_MOD_STAT_SPIRIT must be in existed order, it's accessed by index values of Stats enum.
+    UNIT_MOD_STAT_STRENGTH,                                 // UNIT_MOD_STAT_STRENGTH..UNIT_MOD_STAT_SPIRIT must be in existing order, it's accessed by index values of Stats enum.
     UNIT_MOD_STAT_AGILITY,
     UNIT_MOD_STAT_STAMINA,
     UNIT_MOD_STAT_INTELLECT,
     UNIT_MOD_STAT_SPIRIT,
     UNIT_MOD_HEALTH,
-    UNIT_MOD_MANA,                                          // UNIT_MOD_MANA..UNIT_MOD_RUNIC_POWER must be in existed order, it's accessed by index values of Powers enum.
+    UNIT_MOD_MANA,                                          // UNIT_MOD_MANA..UNIT_MOD_RUNIC_POWER must be in existing order, it's accessed by index values of Powers enum.
     UNIT_MOD_RAGE,
     UNIT_MOD_FOCUS,
     UNIT_MOD_ENERGY,
     UNIT_MOD_HAPPINESS,
     UNIT_MOD_RUNE,
     UNIT_MOD_RUNIC_POWER,
-    UNIT_MOD_ARMOR,                                         // UNIT_MOD_ARMOR..UNIT_MOD_RESISTANCE_ARCANE must be in existed order, it's accessed by index values of SpellSchools enum.
+    UNIT_MOD_ARMOR,                                         // UNIT_MOD_ARMOR..UNIT_MOD_RESISTANCE_ARCANE must be in existing order, it's accessed by index values of SpellSchools enum.
     UNIT_MOD_RESISTANCE_HOLY,
     UNIT_MOD_RESISTANCE_FIRE,
     UNIT_MOD_RESISTANCE_NATURE,
@@ -1112,6 +1112,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         typedef std::set<Unit*> AttackerSet;
         typedef std::multimap< uint32, SpellAuraHolder*> SpellAuraHolderMap;
         typedef std::pair<SpellAuraHolderMap::iterator, SpellAuraHolderMap::iterator> SpellAuraHolderBounds;
+        typedef std::pair<SpellAuraHolderMap::const_iterator, SpellAuraHolderMap::const_iterator> SpellAuraHolderConstBounds;
         typedef std::list<SpellAuraHolder *> SpellAuraHolderList;
         typedef std::list<Aura *> AuraList;
         typedef std::list<DiminishingReturn> Diminishing;
@@ -1280,9 +1281,9 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void ProcDamageAndSpell(Unit *pVictim, uint32 procAttacker, uint32 procVictim, uint32 procEx, uint32 amount, WeaponAttackType attType = BASE_ATTACK, SpellEntry const *procSpell = NULL);
         void ProcDamageAndSpellFor( bool isVictim, Unit * pTarget, uint32 procFlag, uint32 procExtra, WeaponAttackType attType, SpellEntry const * procSpell, uint32 damage );
 
-        void HandleEmote(uint32 anim_id);                   // auto-select command/state
-        void HandleEmoteCommand(uint32 anim_id);
-        void HandleEmoteState(uint32 anim_id);
+        void HandleEmote(uint32 emote_id);                  // auto-select command/state
+        void HandleEmoteCommand(uint32 emote_id);
+        void HandleEmoteState(uint32 emote_id);
         void AttackerStateUpdate (Unit *pVictim, WeaponAttackType attType = BASE_ATTACK, bool extra = false );
 
         float MeleeMissChanceCalc(const Unit *pVictim, WeaponAttackType attType) const;
@@ -1366,6 +1367,10 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         SpellAuraHolderBounds GetSpellAuraHolderBounds(uint32 spell_id)
         {
             return SpellAuraHolderBounds(m_spellAuraHolders.lower_bound(spell_id), m_spellAuraHolders.upper_bound(spell_id));
+        }
+        SpellAuraHolderConstBounds GetSpellAuraHolderBounds(uint32 spell_id) const
+        {
+            return SpellAuraHolderConstBounds(m_spellAuraHolders.lower_bound(spell_id), m_spellAuraHolders.upper_bound(spell_id));
         }
 
         bool HasAuraType(AuraType auraType) const;

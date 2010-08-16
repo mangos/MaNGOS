@@ -1109,7 +1109,7 @@ GM.AllowAchievementGain  = 1
 #    Visibility.Distance.Grey.Unit
 #        Visibility grey distance for creatures/players (fast changing objects)
 #        addition to appropriate object type Visibility.Distance.* use in case visibility removing to
-#        object (except corpse around distences) If � is distance and G is grey distance then object
+#        object (except corpse around distances) If D is distance and G is grey distance then object
 #        make visible if distance to it <= D but make non visible if distance > D+G
 #        Default: 1 (yard)
 #
@@ -1139,6 +1139,7 @@ Visibility.Distance.Grey.Object = 10
 #    Rate.RunicPower.Income
 #    Rate.RunicPower.Loss
 #    Rate.Focus
+#    Rate.Energy (Rogue)
 #        Health and power regeneration and rage income from damage.
 #        Default: 1
 #
@@ -1272,6 +1273,7 @@ Rate.Rage.Loss = 1
 Rate.RunicPower.Income = 1
 Rate.RunicPower.Loss = 1
 Rate.Focus = 1
+Rate.Energy = 1
 Rate.Skill.Discovery = 1
 Rate.Drop.Item.Poor = 1
 Rate.Drop.Item.Normal = 1

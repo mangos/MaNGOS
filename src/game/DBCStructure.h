@@ -479,7 +479,7 @@ struct AchievementCriteriaEntry
 
         struct
         {
-            uint32  field3;                                 // 3 main requirement
+            uint32  value;                                  // 3 main requirement
             uint32  count;                                  // 4 main requirement count
             uint32  additionalRequirement1_type;            // 5 additional requirement 1 type
             uint32  additionalRequirement1_value;           // 6 additional requirement 1 value
@@ -487,16 +487,27 @@ struct AchievementCriteriaEntry
             uint32  additionalRequirement2_value;           // 8 additional requirement 1 value
         } raw;
     };
-    //char*  name;                                          // 9
+    char*  name;                                            // 9
     uint32  completionFlag;                                 // 10
-    uint32  groupFlag;                                      // 11
-    //uint32 unk1;                                          // 12 Alway appears with timed events
-                                                            // for timed spells it is spell id for
-                                                            // timed kills it is creature id
+    //uint32  timedCriteriaStartType;                       // 11 Only appears with timed achievements, seems to be the type of starting a timed Achievement, only type 1 and some of type 6 need manual starting
+                                                            // 1: ByEventId(?) (serverside IDs),    2: ByQuestId,   5: ByCastSpellId(?)
+                                                            // 6: BySpellIdTarget(some of these are unknown spells, some not, some maybe spells)
+                                                            // 7: ByKillNpcId,  9: ByUseItemId
+    uint32  timedCriteriaMiscId;                            // 12 Alway appears with timed events, used internally to start the achievement, store 
     uint32  timeLimit;                                      // 13 time limit in seconds
     //uint32 showOrder;                                     // 14 show order
     //uint32 unk1;                                          // 15 all zeros
     //uint32 unk2;                                          // 16 all zeros
+
+    // helpers
+    bool IsExplicitlyStartedTimedCriteria() const
+    {
+        if (!timeLimit)
+            return false;
+
+        // in case raw.value == timedCriteriaMiscId in timedCriteriaMiscId stored spellid/itemids for cast/use, so repeating aura start at first cast/use until fails
+        return requiredType == ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST || raw.value != timedCriteriaMiscId;
+    }
 };
 
 struct AreaTableEntry
@@ -809,10 +820,10 @@ struct FactionEntry
     int32       BaseRepValue[4];                            // 10-13    m_reputationBase
     uint32      ReputationFlags[4];                         // 14-17    m_reputationFlags
     uint32      team;                                       // 18       m_parentFactionID
-    //float     unk1;                                       // 19
-    //float     unk2;                                       // 20
-    //uint32    unk3                                        // 21
-    //uint32    unk4;                                       // 22
+    //float     spilloverRate1;                             // 19       Members of the team gain (received_rep*rate). If spilloverRate1 is (0.0 || 1.0), spilloverRate2 are used instead...
+    //float     spilloverRate2;                             // 20       ...but only if spilloverRate2 is not (1.0 || 0.0). Faction must be member of a team before spillover are given.
+    //uint32    spilloverMaxRank;                           // 21       The highest rank player will receive spillover at (the cap). Above this rank will not give any spillover for this faction
+    //uint32    spilloverRank_unk;                          // 22
     DBCString name;                                         // 23       m_name_lang
     //char*     description;                                // 24       m_description_lang
     //uint32                                                // 25

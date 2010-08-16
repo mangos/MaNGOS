@@ -72,7 +72,7 @@ class MANGOS_DLL_SPEC InstanceData
         virtual void SetData(uint32 /*Type*/, uint32 /*Data*/) {}
 
         // Achievement criteria additional requirements check
-        // NOTE: not use this if same can be checked existed requirement types from AchievementCriteriaRequirementType
+        // NOTE: not use this if same can be checked existing requirement types from AchievementCriteriaRequirementType
         virtual bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const* source, Unit const* target = NULL, uint32 miscvalue1 = 0);
 
         // Condition criteria additional requirements check

@@ -476,7 +476,7 @@ SpellAuraProcResult Unit::HandleHasteAuraProc(Unit *pVictim, uint32 damage, Aura
 
     if(!triggerEntry)
     {
-        sLog.outError("Unit::HandleHasteAuraProc: Spell %u have not existed triggered spell %u",hasteSpell->Id,triggered_spell_id);
+        sLog.outError("Unit::HandleHasteAuraProc: Spell %u have nonexistent triggered spell %u",hasteSpell->Id,triggered_spell_id);
         return SPELL_AURA_PROC_FAILED;
     }
 
@@ -541,7 +541,7 @@ SpellAuraProcResult Unit::HandleSpellCritChanceAuraProc(Unit *pVictim, uint32 /*
 
     if(!triggerEntry)
     {
-        sLog.outError("Unit::HandleHasteAuraProc: Spell %u have not existed triggered spell %u",triggeredByAuraSpell->Id,triggered_spell_id);
+        sLog.outError("Unit::HandleHasteAuraProc: Spell %u have nonexistent triggered spell %u",triggeredByAuraSpell->Id,triggered_spell_id);
         return SPELL_AURA_PROC_FAILED;
     }
 
@@ -965,8 +965,8 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                     if (!roll_chance_i(triggerAmount))
                         return SPELL_AURA_PROC_FAILED;
 
-                    Aura *aur = GetAura(71905, EFFECT_INDEX_0);
-                    if (aur && uint32(aur->GetStackAmount() + 1) >= aur->GetSpellProto()->GetStackAmount())
+                    SpellAuraHolder *aurHolder = GetSpellAuraHolder(71905);
+                    if (aurHolder && uint32(aurHolder->GetStackAmount() + 1) >= aurHolder->GetSpellProto()->GetStackAmount())
                     {
                         RemoveAurasDueToSpell(71905);
                         CastSpell(this, 71904, true);       // Chaos Bane
@@ -1367,7 +1367,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                     if (!procSpell)
                         return SPELL_AURA_PROC_FAILED;
 
-                    Aura* leachAura = pVictim->GetAura(SPELL_AURA_PERIODIC_LEECH, SPELLFAMILY_PRIEST, UI64LIT(0x02000000), NULL, GetGUID());
+                    Aura* leachAura = pVictim->GetAura(SPELL_AURA_PERIODIC_LEECH, SPELLFAMILY_PRIEST, UI64LIT(0x02000000), 0, GetGUID());
                     if (!leachAura)
                         return SPELL_AURA_PROC_FAILED;
 
@@ -2007,6 +2007,32 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                     target = this;
                     break;
                 }
+                // Anger Capacitor
+                case 71406:                                 // normal
+                case 71545:                                 // heroic
+                {
+                    if (!pVictim)
+                        return SPELL_AURA_PROC_FAILED;
+
+                    SpellEntry const* mote = sSpellStore.LookupEntry(71432);
+                    if (!mote)
+                        return SPELL_AURA_PROC_FAILED;
+                    uint32 maxStack = mote->StackAmount - (dummySpell->Id == 71545 ? 1 : 0);
+
+                    SpellAuraHolder *aurHolder = GetSpellAuraHolder(71432);
+                    if (aurHolder && uint32(aurHolder->GetStackAmount() +1) >= maxStack)
+                    {
+                        RemoveAurasDueToSpell(71432);       // Mote of Anger
+
+                        // Manifest Anger (main hand/off hand)
+                        CastSpell(pVictim, !haveOffhandWeapon() || roll_chance_i(50) ? 71433 : 71434, true);
+                        return SPELL_AURA_PROC_OK;
+                    }
+                    else
+                        triggered_spell_id = 71432;
+
+                    break;
+                }
             }
             break;
         }
@@ -2089,7 +2115,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                     SpellEntry const* windfurySpellEntry = sSpellStore.LookupEntry(spellId);
                     if(!windfurySpellEntry)
                     {
-                        sLog.outError("Unit::HandleDummyAuraProc: non existed spell id: %u (Windfury)",spellId);
+                        sLog.outError("Unit::HandleDummyAuraProc: nonexistent spell id: %u (Windfury)",spellId);
                         return SPELL_AURA_PROC_FAILED;
                     }
 
@@ -2597,7 +2623,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
 
     if(!triggerEntry)
     {
-        sLog.outError("Unit::HandleDummyAuraProc: Spell %u have not existed triggered spell %u",dummySpell->Id,triggered_spell_id);
+        sLog.outError("Unit::HandleDummyAuraProc: Spell %u have nonexistent triggered spell %u",dummySpell->Id,triggered_spell_id);
         return SPELL_AURA_PROC_FAILED;
     }
 

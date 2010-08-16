@@ -37,9 +37,12 @@
 #include "GameEventMgr.h"
 
 // Supported shift-links (client generated and server side)
-// |color|Hachievement:achievement_id:player_guid:0:0:0:0:0:0:0:0|h[name]|h|r
+// |color|Hachievement:achievement_id:player_guid_hex:completed_0_1:mm:dd:yy_from_2000:criteriaMask1:criteriaMask2:criteriaMask3:criteriaMask4|h[name]|h|r
 //                                                                        - client, item icon shift click, not used in server currently
+// |color|Hachievement_criteria:criteria_id|h[name]|h|r
 // |color|Harea:area_id|h[name]|h|r
+// |color|Hareatrigger:id|h[name]|h|r
+// |color|Hareatrigger_target:id|h[name]|h|r                
 // |color|Hcreature:creature_guid|h[name]|h|r
 // |color|Hcreature_entry:creature_id|h[name]|h|r
 // |color|Henchant:recipe_spell_id|h[prof_name: recipe_name]|h|r          - client, at shift click in recipes list dialog
@@ -50,11 +53,11 @@
 // |color|Hitem:item_id:perm_ench_id:gem1:gem2:gem3:0:0:0:0:reporter_level|h[name]|h|r
 //                                                                        - client, item icon shift click
 // |color|Hitemset:itemset_id|h[name]|h|r
-// |color|Hplayer:name|h[name]|h|r                                        - client, in some messages, at click copy only name instead link
+// |color|Hplayer:name|h[name]|h|r                                        - client, in some messages, at click copy only name instead link, so no way generate it in client string send to server
 // |color|Hquest:quest_id:quest_level|h[name]|h|r                         - client, quest list name shift-click
 // |color|Hskill:skill_id|h[name]|h|r
 // |color|Hspell:spell_id|h[name]|h|r                                     - client, spellbook spell icon shift-click
-// |color|Htalent:talent_id,rank|h[name]|h|r                              - client, talent icon shift-click
+// |color|Htalent:talent_id,rank|h[name]|h|r                              - client, talent icon shift-click rank==-1 if shift-copy unlearned talent
 // |color|Htaxinode:id|h[name]|h|r
 // |color|Htele:id|h[name]|h|r
 // |color|Htitle:id|h[name]|h|r
@@ -82,6 +85,31 @@ ChatCommand * ChatHandler::getCommandTable()
         { "set",            SEC_ADMINISTRATOR,  true,  NULL,                                           "", accountSetCommandTable },
         { "password",       SEC_PLAYER,         true,  &ChatHandler::HandleAccountPasswordCommand,     "", NULL },
         { "",               SEC_PLAYER,         true,  &ChatHandler::HandleAccountCommand,             "", NULL },
+        { NULL,             0,                  false, NULL,                                           "", NULL }
+    };
+
+    static ChatCommand achievementCriteriaCommandTable[] =
+    {
+        { "add",            SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleAchievementCriteriaAddCommand,   "", NULL },
+        { "remove",         SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleAchievementCriteriaRemoveCommand,"", NULL },
+        { NULL,             0,                  true,  NULL,                                                "", NULL }
+    };
+
+    static ChatCommand achievementCommandTable[] =
+    {
+        { "criteria",       SEC_ADMINISTRATOR,  true,  NULL,                                           "", achievementCriteriaCommandTable },
+        { "add",            SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleAchievementAddCommand,      "", NULL },
+        { "remove",         SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleAchievementRemoveCommand,   "", NULL },
+        { "",               SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleAchievementCommand,         "", NULL },
+        { NULL,             0,                  true,  NULL,                                           "", NULL }
+    };
+
+    static ChatCommand auctionCommandTable[] =
+    {
+        { "alliance",       SEC_ADMINISTRATOR,  false, &ChatHandler::HandleAuctionAllianceCommand,     "", NULL },
+        { "goblin",         SEC_ADMINISTRATOR,  false, &ChatHandler::HandleAuctionGoblinCommand,       "", NULL },
+        { "horde",          SEC_ADMINISTRATOR,  false, &ChatHandler::HandleAuctionHordeCommand,        "", NULL },
+        { "",               SEC_ADMINISTRATOR,  false, &ChatHandler::HandleAuctionCommand,             "", NULL },
         { NULL,             0,                  false, NULL,                                           "", NULL }
     };
 
@@ -130,6 +158,7 @@ ChatCommand * ChatHandler::getCommandTable()
 
     static ChatCommand characterCommandTable[] =
     {
+        { "achievements",   SEC_GAMEMASTER,     true,  &ChatHandler::HandleCharacterAchievementsCommand,"",NULL },
         { "customize",      SEC_GAMEMASTER,     true,  &ChatHandler::HandleCharacterCustomizeCommand,  "", NULL },
         { "deleted",        SEC_GAMEMASTER,     true,  NULL,                                           "", characterDeletedCommandTable},
         { "erase",          SEC_CONSOLE,        true,  &ChatHandler::HandleCharacterEraseCommand,      "", NULL },
@@ -172,18 +201,19 @@ ChatCommand * ChatHandler::getCommandTable()
         { "bg",             SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDebugBattlegroundCommand,        "", NULL },
         { "getitemstate",   SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDebugGetItemStateCommand,        "", NULL },
         { "lootrecipient",  SEC_GAMEMASTER,     false, &ChatHandler::HandleDebugGetLootRecipientCommand,    "", NULL },
-        { "getvalue",       SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDebugGetValueCommand,            "", NULL },
         { "getitemvalue",   SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDebugGetItemValueCommand,        "", NULL },
-        { "Mod32Value",     SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDebugMod32ValueCommand,          "", NULL },
+        { "getvalue",       SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDebugGetValueCommand,            "", NULL },
+        { "moditemvalue",   SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDebugModItemValueCommand,        "", NULL },
+        { "modvalue",       SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDebugModValueCommand,            "", NULL },
         { "play",           SEC_MODERATOR,      false, NULL,                                                "", debugPlayCommandTable },
         { "send",           SEC_ADMINISTRATOR,  false, NULL,                                                "", debugSendCommandTable },
         { "setaurastate",   SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDebugSetAuraStateCommand,        "", NULL },
         { "setitemvalue",   SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDebugSetItemValueCommand,        "", NULL },
         { "setvalue",       SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDebugSetValueCommand,            "", NULL },
         { "spellcheck",     SEC_CONSOLE,        true,  &ChatHandler::HandleDebugSpellCheckCommand,          "", NULL },
-        { "spawnvehicle",   SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDebugSpawnVehicle,               "", NULL },
+        { "spellmods",      SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDebugSpellModsCommand,           "", NULL },
+        { "spawnvehicle",   SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDebugSpawnVehicleCommand,        "", NULL },
         { "uws",            SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDebugUpdateWorldStateCommand,    "", NULL },
-        { "update",         SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDebugUpdateCommand,              "", NULL },
         { NULL,             0,                  false, NULL,                                                "", NULL }
     };
 
@@ -306,6 +336,7 @@ ChatCommand * ChatHandler::getCommandTable()
     static ChatCommand lookupCommandTable[] =
     {
         { "account",        SEC_GAMEMASTER,     true,  NULL,                                           "", lookupAccountCommandTable },
+        { "achievement",    SEC_GAMEMASTER,     true,  &ChatHandler::HandleLookupAchievementCommand,   "", NULL },
         { "area",           SEC_MODERATOR,      true,  &ChatHandler::HandleLookupAreaCommand,          "", NULL },
         { "creature",       SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleLookupCreatureCommand,      "", NULL },
         { "event",          SEC_GAMEMASTER,     true,  &ChatHandler::HandleLookupEventCommand,         "", NULL },
@@ -334,12 +365,10 @@ ChatCommand * ChatHandler::getCommandTable()
         { "speed",          SEC_MODERATOR,      false, &ChatHandler::HandleModifySpeedCommand,         "", NULL },
         { "swim",           SEC_MODERATOR,      false, &ChatHandler::HandleModifySwimCommand,          "", NULL },
         { "scale",          SEC_MODERATOR,      false, &ChatHandler::HandleModifyScaleCommand,         "", NULL },
-        { "bit",            SEC_MODERATOR,      false, &ChatHandler::HandleModifyBitCommand,           "", NULL },
         { "bwalk",          SEC_MODERATOR,      false, &ChatHandler::HandleModifyBWalkCommand,         "", NULL },
         { "fly",            SEC_MODERATOR,      false, &ChatHandler::HandleModifyFlyCommand,           "", NULL },
         { "aspeed",         SEC_MODERATOR,      false, &ChatHandler::HandleModifyASpeedCommand,        "", NULL },
         { "faction",        SEC_MODERATOR,      false, &ChatHandler::HandleModifyFactionCommand,       "", NULL },
-        { "spell",          SEC_MODERATOR,      false, &ChatHandler::HandleModifySpellCommand,         "", NULL },
         { "tp",             SEC_MODERATOR,      false, &ChatHandler::HandleModifyTalentCommand,        "", NULL },
         { "mount",          SEC_MODERATOR,      false, &ChatHandler::HandleModifyMountCommand,         "", NULL },
         { "honor",          SEC_MODERATOR,      false, &ChatHandler::HandleModifyHonorCommand,         "", NULL },
@@ -400,9 +429,9 @@ ChatCommand * ChatHandler::getCommandTable()
 
     static ChatCommand questCommandTable[] =
     {
-        { "add",            SEC_ADMINISTRATOR,  false, &ChatHandler::HandleQuestAdd,                   "", NULL },
-        { "complete",       SEC_ADMINISTRATOR,  false, &ChatHandler::HandleQuestComplete,              "", NULL },
-        { "remove",         SEC_ADMINISTRATOR,  false, &ChatHandler::HandleQuestRemove,                "", NULL },
+        { "add",            SEC_ADMINISTRATOR,  false, &ChatHandler::HandleQuestAddCommand,            "", NULL },
+        { "complete",       SEC_ADMINISTRATOR,  false, &ChatHandler::HandleQuestCompleteCommand,       "", NULL },
+        { "remove",         SEC_ADMINISTRATOR,  false, &ChatHandler::HandleQuestRemoveCommand,         "", NULL },
         { NULL,             0,                  false, NULL,                                           "", NULL }
     };
 
@@ -480,6 +509,8 @@ ChatCommand * ChatHandler::getCommandTable()
         { "quest_template",              SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadQuestTemplateCommand,           "", NULL },
         { "reference_loot_template",     SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadLootTemplatesReferenceCommand,  "", NULL },
         { "reserved_name",               SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadReservedNameCommand,            "", NULL },
+        { "reputation_reward_rate",      SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadReputationRewardRateCommand,    "", NULL },
+        { "reputation_spillover_template",SEC_ADMINISTRATOR, true, &ChatHandler::HandleReloadReputationSpilloverTemplateCommand,"", NULL },
         { "skill_discovery_template",    SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadSkillDiscoveryTemplateCommand,  "", NULL },
         { "skill_extra_item_template",   SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadSkillExtraItemTemplateCommand,  "", NULL },
         { "skill_fishing_base_level",    SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadSkillFishingBaseLevelCommand,   "", NULL },
@@ -599,6 +630,14 @@ ChatCommand * ChatHandler::getCommandTable()
         { NULL,             0,                  false, NULL,                                           "", NULL }
     };
 
+    static ChatCommand triggerCommandTable[] =
+    {
+        { "active",         SEC_GAMEMASTER,     false, &ChatHandler::HandleTriggerActiveCommand,       "", NULL },
+        { "near",           SEC_GAMEMASTER,     false, &ChatHandler::HandleTriggerNearCommand,         "", NULL },
+        { "",               SEC_GAMEMASTER,     true,  &ChatHandler::HandleTriggerCommand,             "", NULL },
+        { NULL,             0,                  false, NULL,                                           "", NULL }
+    };
+
     static ChatCommand unbanCommandTable[] =
     {
         { "account",        SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleUnBanAccountCommand,      "", NULL },
@@ -620,6 +659,8 @@ ChatCommand * ChatHandler::getCommandTable()
     static ChatCommand commandTable[] =
     {
         { "account",        SEC_PLAYER,         true,  NULL,                                           "", accountCommandTable  },
+        { "achievement",    SEC_ADMINISTRATOR,  true,  NULL,                                           "", achievementCommandTable },
+        { "auction",        SEC_ADMINISTRATOR,  false, NULL,                                           "", auctionCommandTable  },
         { "cast",           SEC_ADMINISTRATOR,  false, NULL,                                           "", castCommandTable     },
         { "character",      SEC_GAMEMASTER,     true,  NULL,                                           "", characterCommandTable},
         { "debug",          SEC_MODERATOR,      true,  NULL,                                           "", debugCommandTable    },
@@ -642,6 +683,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { "server",         SEC_PLAYER,         true,  NULL,                                           "", serverCommandTable   },
         { "tele",           SEC_MODERATOR,      true,  NULL,                                           "", teleCommandTable     },
         { "titles",         SEC_GAMEMASTER,     false, NULL,                                           "", titlesCommandTable   },
+        { "trigger",        SEC_GAMEMASTER,     false, NULL,                                           "", triggerCommandTable  },
         { "wp",             SEC_GAMEMASTER,     false, NULL,                                           "", wpCommandTable       },
 
         { "aura",           SEC_ADMINISTRATOR,  false, &ChatHandler::HandleAuraCommand,                "", NULL },
@@ -683,7 +725,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { "additem",        SEC_ADMINISTRATOR,  false, &ChatHandler::HandleAddItemCommand,             "", NULL },
         { "additemset",     SEC_ADMINISTRATOR,  false, &ChatHandler::HandleAddItemSetCommand,          "", NULL },
         { "bank",           SEC_ADMINISTRATOR,  false, &ChatHandler::HandleBankCommand,                "", NULL },
-        { "wchange",        SEC_ADMINISTRATOR,  false, &ChatHandler::HandleChangeWeather,              "", NULL },
+        { "wchange",        SEC_ADMINISTRATOR,  false, &ChatHandler::HandleChangeWeatherCommand,       "", NULL },
         { "ticket",         SEC_GAMEMASTER,     true,  &ChatHandler::HandleTicketCommand,              "", NULL },
         { "delticket",      SEC_GAMEMASTER,     true,  &ChatHandler::HandleDelTicketCommand,           "", NULL },
         { "maxskill",       SEC_ADMINISTRATOR,  false, &ChatHandler::HandleMaxSkillCommand,            "", NULL },
@@ -713,7 +755,7 @@ ChatCommand * ChatHandler::getCommandTable()
         load_command_table = false;
 
         // check hardcoded part integrity
-        CheckIntergrity(commandTable, NULL);
+        CheckIntegrity(commandTable, NULL);
 
         QueryResult *result = WorldDatabase.Query("SELECT name,security,help FROM command");
         if (result)
@@ -885,7 +927,7 @@ void ChatHandler::PSendSysMessage(const char *format, ...)
     SendSysMessage(str);
 }
 
-void ChatHandler::CheckIntergrity( ChatCommand *table, ChatCommand *parentCommand )
+void ChatHandler::CheckIntegrity( ChatCommand *table, ChatCommand *parentCommand )
 {
     for(uint32 i = 0; table[i].Name != NULL; ++i)
     {
@@ -900,10 +942,29 @@ void ChatHandler::CheckIntergrity( ChatCommand *table, ChatCommand *parentComman
 
         if (command->ChildCommands)
         {
+            if (command->Handler)
+            {
+                if (parentCommand)
+                    sLog.outError("Subcommand '%s' of command '%s' have handler and subcommands in same time, must be used '' subcommand for handler instead.",
+                        command->Name, parentCommand->Name);
+                else
+                    sLog.outError("First level command '%s' have handler and subcommands in same time, must be used '' subcommand for handler instead.",
+                        command->Name);
+            }
+
             if (parentCommand && strlen(command->Name)==0)
                 sLog.outError("Subcommand '' of command '%s' have subcommands", parentCommand->Name);
 
-            CheckIntergrity(command->ChildCommands, command);
+            CheckIntegrity(command->ChildCommands, command);
+        }
+        else if (!command->Handler)
+        {
+            if (parentCommand)
+                sLog.outError("Subcommand '%s' of command '%s' not have handler and subcommands in same time. Must have some from its!",
+                    command->Name, parentCommand->Name);
+            else
+                sLog.outError("First level command '%s' not have handler and subcommands in same time. Must have some from its!",
+                    command->Name);
         }
     }
 }
@@ -1068,7 +1129,7 @@ void ChatHandler::ExecuteCommand(const char* text)
         case CHAT_COMMAND_OK:
         {
             SetSentErrorMessage(false);
-            if ((this->*(command->Handler))(text))
+            if ((this->*(command->Handler))((char*)text))   // text content destroyed at call
             {
                 if (command->SecurityLevel > SEC_PLAYER)
                 {
@@ -1155,12 +1216,16 @@ bool ChatHandler::SetDataForCommandInTable(ChatCommand *commandTable, const char
         }
         case CHAT_COMMAND_UNKNOWN_SUBCOMMAND:
         {
-            sLog.outErrorDb("Table `command` have unexpected subcommand '%s' in command '%s', skip.", cmdName.c_str(), fullcommand.c_str());
+            // command have subcommands, but not '' subcommand and then any data in `command` useless for it.
+            if (cmdName.empty())
+                sLog.outErrorDb("Table `command` have command '%s' that only used with some subcommand selection, it can't have help or overwritten access level, skip.", cmdName.c_str(), fullcommand.c_str());
+            else
+                sLog.outErrorDb("Table `command` have unexpected subcommand '%s' in command '%s', skip.", cmdName.c_str(), fullcommand.c_str());
             return false;
         }
         case CHAT_COMMAND_UNKNOWN:
         {
-            sLog.outErrorDb("Table `command` have not existed command '%s', skip.", cmdName.c_str());
+            sLog.outErrorDb("Table `command` have nonexistent command '%s', skip.", cmdName.c_str());
             return false;
         }
     }
@@ -1946,7 +2011,8 @@ Unit* ChatHandler::getSelectedUnit()
     if (guid == 0)
         return m_session->GetPlayer();
 
-    return ObjectAccessor::GetUnit(*m_session->GetPlayer(),guid);
+    // can be selected player at another map
+    return ObjectAccessor::GetUnit(*m_session->GetPlayer(), guid);
 }
 
 Creature* ChatHandler::getSelectedCreature()
@@ -1954,73 +2020,340 @@ Creature* ChatHandler::getSelectedCreature()
     if(!m_session)
         return NULL;
 
-    return m_session->GetPlayer()->GetMap()->GetCreatureOrPetOrVehicle(m_session->GetPlayer()->GetSelection());
+    return m_session->GetPlayer()->GetMap()->GetAnyTypeCreature(m_session->GetPlayer()->GetSelection());
 }
 
-char* ChatHandler::extractKeyFromLink(char* text, char const* linkType, char** something1)
+/**
+ * Function skip all whitespaces in args string
+ *
+ * @param args variable pointer to non parsed args string, updated at function call to new position (with skipped white spaces)
+ *             allowed NULL string pointer stored in *args
+ */
+void ChatHandler::SkipWhiteSpaces(char** args)
 {
-    // skip empty
-    if(!text)
-        return NULL;
+    if(!*args)
+        return;
 
-    // skip speces
-    while(*text==' '||*text=='\t'||*text=='\b')
-        ++text;
+    while(isWhiteSpace(**args))
+        ++(*args);
+}
 
-    if(!*text)
-        return NULL;
+/**
+ * Function extract to val arg signed integer value or fail
+ *
+ * @param args variable pointer to non parsed args string, updated at function call to new position (with skipped white spaces)
+ * @param val  return extracted value if function success, in fail case original value unmodified
+ * @return     true if value extraction successful
+ */
+bool  ChatHandler::ExtractInt32(char** args, int32& val)
+{
+    if (!*args || !**args)
+        return false;
 
-    // return non link case
-    if(text[0]!='|')
-        return strtok(text, " ");
+    char* tail = *args;
 
-    // [name] Shift-click form |color|linkType:key|h[name]|h|r
-    // or
-    // [name] Shift-click form |color|linkType:key:something1:...:somethingN|h[name]|h|r
+    long valRaw = strtol(*args, &tail, 10);
 
-    char* check = strtok(text, "|");                        // skip color
-    if(!check)
-        return NULL;                                        // end of data
+    if (tail != *args && isWhiteSpace(*tail))
+        *(tail++) = '\0';
+    else if (tail && *tail)                                 // some not whitespace symbol
+        return false;                                       // args not modified and can be re-parsed
 
-    char* cLinkType = strtok(NULL, ":");                    // linktype
-    if(!cLinkType)
-        return NULL;                                        // end of data
+    if (valRaw < std::numeric_limits<int32>::min() || valRaw > std::numeric_limits<int32>::max())
+        return false;
 
-    if(strcmp(cLinkType,linkType) != 0)
+    // value successfully extracted
+    val = int32(valRaw);
+    *args = tail;
+    return true;
+}
+
+/**
+ * Function extract to val arg optional signed integer value or use default value. Fail if extracted not signed integer.
+ *
+ * @param args    variable pointer to non parsed args string, updated at function call to new position (with skipped white spaces)
+ * @param val     return extracted value if function success, in fail case original value unmodified
+ * @param defVal  default value used if no data for extraction in args
+ * @return        true if value extraction successful
+ */
+bool  ChatHandler::ExtractOptInt32(char** args, int32& val, int32 defVal)
+{
+    if (!*args || !**args)
     {
-        strtok(NULL, " ");                                  // skip link tail (to allow continue strtok(NULL,s) use after retturn from function
-        SendSysMessage(LANG_WRONG_LINK_TYPE);
-        return NULL;
+        val = defVal;
+        return true;
     }
 
-    char* cKeys = strtok(NULL, "|");                        // extract keys and values
-    char* cKeysTail = strtok(NULL, "");
-
-    char* cKey = strtok(cKeys, ":|");                       // extract key
-    if(something1)
-        *something1 = strtok(NULL, ":|");                   // extract something
-
-    strtok(cKeysTail, "]");                                 // restart scan tail and skip name with possible spaces
-    strtok(NULL, " ");                                      // skip link tail (to allow continue strtok(NULL,s) use after return from function
-    return cKey;
+    return ExtractInt32(args, val);
 }
 
-char* ChatHandler::extractKeyFromLink(char* text, char const* const* linkTypes, int* found_idx, char** something1)
+/**
+ * Function extract to val arg unsigned integer value or fail
+ *
+ * @param args variable pointer to non parsed args string, updated at function call to new position (with skipped white spaces)
+ * @param val  return extracted value if function success, in fail case original value unmodified
+ * @param base set used base for extracted value format (10 for decimal, 16 for hex, etc), 0 let auto select by system internal function
+ * @return     true if value extraction successful
+ */
+bool  ChatHandler::ExtractUInt32Base(char** args, uint32& val, uint32 base)
 {
-    // skip empty
-    if(!text)
+    if (!*args || !**args)
+        return false;
+
+    char* tail = *args;
+
+    unsigned long valRaw = strtoul(*args, &tail, base);
+
+    if (tail != *args && isWhiteSpace(*tail))
+        *(tail++) = '\0';
+    else if (tail && *tail)                                 // some not whitespace symbol
+        return false;                                       // args not modified and can be re-parsed
+
+    if (valRaw > std::numeric_limits<uint32>::max())
+        return false;
+
+    // value successfully extracted
+    val = uint32(valRaw);
+    *args = tail;
+
+    SkipWhiteSpaces(args);
+    return true;
+}
+
+/**
+ * Function extract to val arg optional unsigned integer value or use default value. Fail if extracted not unsigned integer.
+ *
+ * @param args    variable pointer to non parsed args string, updated at function call to new position (with skipped white spaces)
+ * @param val     return extracted value if function success, in fail case original value unmodified
+ * @param defVal  default value used if no data for extraction in args
+ * @return        true if value extraction successful
+ */
+bool  ChatHandler::ExtractOptUInt32(char** args, uint32& val, uint32 defVal)
+{
+    if (!*args || !**args)
+    {
+        val = defVal;
+        return true;
+    }
+
+    return ExtractUInt32(args, val);
+}
+
+/**
+ * Function extract to val arg float value or fail
+ *
+ * @param args variable pointer to non parsed args string, updated at function call to new position (with skipped white spaces)
+ * @param val  return extracted value if function success, in fail case original value unmodified
+ * @return     true if value extraction successful
+ */
+bool  ChatHandler::ExtractFloat(char** args, float& val)
+{
+    if (!*args || !**args)
+        return false;
+
+    char* tail = *args;
+
+    double valRaw = strtod(*args, &tail);
+
+    if (tail != *args && isWhiteSpace(*tail))
+        *(tail++) = '\0';
+    else if (tail && *tail)                                 // some not whitespace symbol
+        return false;                                       // args not modified and can be re-parsed
+
+    // value successfully extracted
+    val = float(valRaw);
+    *args = tail;
+
+    SkipWhiteSpaces(args);
+    return true;
+}
+
+/**
+ * Function extract to val arg optional float value or use default value. Fail if extracted not float.
+ *
+ * @param args    variable pointer to non parsed args string, updated at function call to new position (with skipped white spaces)
+ * @param val     return extracted value if function success, in fail case original value unmodified
+ * @param defVal  default value used if no data for extraction in args
+ * @return        true if value extraction successful
+ */
+bool  ChatHandler::ExtractOptFloat(char** args, float& val, float defVal)
+{
+    if (!*args || !**args)
+    {
+        val = defVal;
+        return true;
+    }
+
+    return ExtractFloat(args, val);
+}
+
+/**
+ * Function extract name-like string (from non-numeric or special symbol until whitespace)
+ *
+ * @param args variable pointer to non parsed args string, updated at function call to new position (with skipped white spaces)
+ * @param lit  optional explicit literal requirement. function fail if literal is not starting substring of lit. 
+ *             Note: function in same way fail if no any literal or literal not fit in this case. Need additional check for select specific fail case
+ * @return     name/number-like string without whitespaces, or NULL if args empty or not appropriate content.
+ */
+char* ChatHandler::ExtractLiteralArg(char** args, char const* lit /*= NULL*/)
+{
+    if (!*args || !**args)
         return NULL;
 
-    // skip speces
-    while(*text==' '||*text=='\t'||*text=='\b')
-        ++text;
+    char* head = *args;
 
-    if(!*text)
+    // reject quoted string or link (|-started text)
+    switch (head[0])
+    {
+        // reject quoted string
+        case '[': case '\'': case '"':
+            return NULL;
+        // reject link (|-started text)
+        case '|':
+            // client replace all | by || in raw text
+            if (head[1] != '|')
+                return NULL;
+            ++head;                                         // skip one |
+            break;
+        default: break;
+    }
+
+    if (lit)
+    {
+        int l = strlen(lit);
+        int diff = strncmp(head, lit, l);
+
+        if (diff != 0)
+            return NULL;
+
+        if (head[l] && !isWhiteSpace(head[l]))
+            return NULL;
+
+        char* arg = head;
+
+        if (head[l])
+        {
+            head[l] = '\0';
+
+            head += l + 1;
+
+            *args = head;
+        }
+        else
+            *args = head + l;
+
+        SkipWhiteSpaces(args);
+        return arg;
+    }
+
+    char* name = strtok(head, " ");
+
+    char* tail = strtok(NULL, "");
+
+    *args = tail ? tail : (char*)"";                        // *args don't must be NULL
+
+    SkipWhiteSpaces(args);
+
+    return name;
+}
+
+/**
+ * Function extract quote-like string (any characters guarded by some special character, in our cases ['")
+ *
+ * @param args variable pointer to non parsed args string, updated at function call to new position (with skipped white spaces)
+ * @return     quote-like string, or NULL if args empty or not appropriate content.
+ */
+char* ChatHandler::ExtractQuotedArg( char** args )
+{
+    if (!*args || !**args)
         return NULL;
 
-    // return non link case
-    if(text[0]!='|')
-        return strtok(text, " ");
+    if (**args != '\'' && **args != '"' && **args != '[')
+        return NULL;
+
+    char guard[2] = " ";                                    // guard[1] == '\0'
+
+    guard[0] = (*args)[0];
+
+    if (guard[0] == '[')
+        guard[0] = ']';
+
+    char* str = strtok((*args)+1, guard);                   // skip start guard symbol
+
+    char* tail = strtok(NULL, "");
+    *args = tail ? tail : (char*)"";                        // *args don't must be NULL
+
+    SkipWhiteSpaces(args);
+
+    return str;
+}
+
+/**
+ * Function extract quote-like string or literal if quote not detected
+ *
+ * @param args variable pointer to non parsed args string, updated at function call to new position (with skipped white spaces)
+ * @return     quote/literal string, or NULL if args empty or not appropriate content.
+ */
+char* ChatHandler::ExtractQuotedOrLiteralArg(char** args)
+{
+    char *arg = ExtractQuotedArg(args);
+    if (!arg)
+        arg = ExtractLiteralArg(args);
+    return arg;
+}
+
+/**
+ * Function extract on/off literals as boolean values 
+ *
+ * @param args variable pointer to non parsed args string, updated at function call to new position (with skipped white spaces)
+ * @param val  return extracted value if function success, in fail case original value unmodified
+ * @return     true at success
+ */
+bool  ChatHandler::ExtractOnOff(char** args, bool& value)
+{
+    char* arg = ExtractLiteralArg(args);
+    if (!arg)
+        return false;
+
+    if (strncmp(arg, "on", 3) == 0)
+        value = true;
+    else if (strncmp(arg, "off", 4) == 0)
+        value = false;
+    else
+        return false;
+
+    return true;
+}
+
+/**
+ * Function extract shift-link-like string (any characters guarded by | and |h|r with some additional internal structure check)
+ *
+ * @param args variable pointer to non parsed args string, updated at function call to new position (with skipped white spaces)
+ *
+ * @param linkTypes  optional NULL-terminated array of link types, shift-link must fit one from link type from array if provided or extraction fail
+ *
+ * @param found_idx  if not NULL then at return index in linkTypes that fit shift-link type, if extraction fail then non modified
+ *
+ * @param keyPair    if not NULL then pointer to 2-elements array for return start and end pointer for found key
+ *                   if extraction fail then non modified
+ *
+ * @param somethingPair then pointer to 2-elements array for return start and end pointer if found.
+ *                   if not NULL then shift-link must have data field, if extraction fail then non modified
+ *
+ * @return     shift-link-like string, or NULL if args empty or not appropriate content.
+ */
+char* ChatHandler::ExtractLinkArg(char** args, char const* const* linkTypes /*= NULL*/, int* foundIdx /*= NULL*/, char** keyPair /*= NULL*/, char** somethingPair /*= NULL*/)
+{
+    if (!*args || !**args)
+        return NULL;
+
+    // skip if not linked started or encoded single | (doubled by client)
+    if ((*args)[0] != '|' || (*args)[1] == '|')
+        return NULL;
+
+    // |color|Hlinktype:key:data...|h[name]|h|r
+
+    char* head = *args;
 
     // [name] Shift-click form |color|linkType:key|h[name]|h|r
     // or
@@ -2028,45 +2361,294 @@ char* ChatHandler::extractKeyFromLink(char* text, char const* const* linkTypes, 
     // or
     // [name] Shift-click form |linkType:key|h[name]|h|r
 
-    char* tail;
+    // |color|Hlinktype:key:data...|h[name]|h|r
 
-    if(text[1]=='c')
+    char* tail = (*args)+1;                                 // skip |
+
+    if (*tail != 'H')                                       // skip color part, some links can not have color part
     {
-        char* check = strtok(text, "|");                    // skip color
-        if(!check)
-            return NULL;                                    // end of data
+        while (*tail && *tail != '|')                           
+            ++tail;
 
-        tail = strtok(NULL, "");                            // tail
+        if (!*tail)
+            return NULL;
+
+        // |Hlinktype:key:data...|h[name]|h|r
+
+        ++tail;                                             // skip |
+    }
+
+    // Hlinktype:key:data...|h[name]|h|r
+
+    if (*tail != 'H')
+        return NULL;
+
+    int linktype_idx = 0;
+
+    if (linkTypes)                                          // check link type if provided
+    {
+        // check linktypes (its include H in name)
+        for (; linkTypes[linktype_idx]; ++linktype_idx)
+        {
+            // exactly string with follow : or |
+            int l = strlen(linkTypes[linktype_idx]);
+            if (strncmp(tail, linkTypes[linktype_idx], l) == 0 &&
+                (tail[l] == ':' || tail[l] == '|'))
+                break;
+        }
+
+        // is search fail?
+        if (!linkTypes[linktype_idx])                       // NULL terminator in last element
+            return NULL;
+
+        tail += strlen(linkTypes[linktype_idx]);            // skip linktype string
+
+        // :key:data...|h[name]|h|r
+
+        if (*tail != ':')
+            return NULL;
     }
     else
-        tail = text+1;                                      // skip first |
-
-    char* cLinkType = strtok(tail, ":");                    // linktype
-    if(!cLinkType)
-        return NULL;                                        // end of data
-
-    for(int i = 0; linkTypes[i]; ++i)
     {
-        if(strcmp(cLinkType,linkTypes[i]) == 0)
-        {
-            char* cKeys = strtok(NULL, "|");                // extract keys and values
-            char* cKeysTail = strtok(NULL, "");
+        while (*tail && *tail != ':')                       // skip linktype string
+            ++tail;
 
-            char* cKey = strtok(cKeys, ":|");               // extract key
-            if(something1)
-                *something1 = strtok(NULL, ":|");           // extract something
-
-            strtok(cKeysTail, "]");                         // restart scan tail and skip name with possible spaces
-            strtok(NULL, " ");                              // skip link tail (to allow continue strtok(NULL,s) use after return from function
-            if(found_idx)
-                *found_idx = i;
-            return cKey;
-        }
+        if (!*tail)
+            return NULL;
     }
 
-    strtok(NULL, " ");                                      // skip link tail (to allow continue strtok(NULL,s) use after return from function
-    SendSysMessage(LANG_WRONG_LINK_TYPE);
+    ++tail;
+
+    // key:data...|h[name]|h|r
+    char* keyStart = tail;                                  // remember key start for return
+    char* keyEnd   = tail;                                  // key end for truncate, will updated
+
+    while (*tail && *tail != '|' && *tail != ':')
+        ++tail;
+
+    if (!*tail)
+        return NULL;
+
+    keyEnd = tail;                                          // remember key end for truncate
+
+    // |h[name]|h|r or :something...|h[name]|h|r
+
+    char* somethingStart = tail+1;
+    char* somethingEnd   = tail+1;                          // will updated later if need
+
+    if (*tail == ':' && somethingPair)                      // optional data extraction
+    {
+        // :something...|h[name]|h|r
+
+        if (*tail == ':')
+            ++tail;
+
+        // something|h[name]|h|r or something:something2...|h[name]|h|r
+
+        while (*tail && *tail != '|' && *tail != ':')
+            ++tail;
+
+        if (!*tail)
+            return NULL;
+
+        somethingEnd = tail;                                // remember data end for truncate
+    }
+
+    // |h[name]|h|r or :something2...|h[name]|h|r
+
+    while (*tail && (*tail != '|' || *(tail+1) != 'h'))     // skip ... part if exist
+        ++tail;
+
+    if (!*tail)
+        return NULL;
+
+    // |h[name]|h|r
+
+    tail += 2;                                              // skip |h
+
+    // [name]|h|r
+    if (!*tail || *tail != '[')
+        return NULL;
+
+    while (*tail && (*tail != ']' || *(tail+1) != '|'))     // skip name part
+        ++tail;
+
+    tail += 2;                                              // skip ]|
+
+    // h|r
+    if (!*tail || *tail != 'h'  || *(tail+1) != '|')
+        return NULL;
+
+    tail += 2;                                              // skip h|
+
+    // r
+    if (!*tail || *tail != 'r' || *(tail+1) && !isWhiteSpace(*(tail+1)))
+        return NULL;
+
+    ++tail;                                                 // skip r
+
+    // success
+
+    if (*tail)                                              // truncate all link string
+        *(tail++) = '\0';
+
+    if (foundIdx)
+        *foundIdx = linktype_idx;
+
+    if (keyPair)
+    {
+        keyPair[0] = keyStart;
+        keyPair[1] = keyEnd;
+    }
+
+    if (somethingPair)
+    {
+        somethingPair[0] = somethingStart;
+        somethingPair[1] = somethingEnd;
+    }
+
+    *args = tail;                   
+
+    SkipWhiteSpaces(args);
+
+    return head;
+}
+
+/**
+ * Function extract name/number/quote/shift-link-like string
+ *
+ * @param args variable pointer to non parsed args string, updated at function call to new position (with skipped white spaces)
+ * @return     extracted arg string, or NULL if args empty or not appropriate content.
+ */
+char* ChatHandler::ExtractArg( char** args )
+{
+    if (!*args || !**args)
+        return NULL;
+
+    char* arg = ExtractQuotedOrLiteralArg(args);
+    if (!arg)
+        arg = ExtractLinkArg(args);
+
+    return arg;
+}
+
+/**
+ * Function extract name/quote/number/shift-link-like string, and return it if args have more non-whitespace data
+ *
+ * @param args variable pointer to non parsed args string, updated at function call to new position (with skipped white spaces)
+ *             if args have only single arg then args still pointing to this arg (unmodified pointer)
+ * @return     extracted string, or NULL if args empty or not appropriate content or have single arg totally.
+ */
+char* ChatHandler::ExtractOptNotLastArg(char** args)
+{
+    char* arg = ExtractArg(args);
+
+    // have more data
+    if (*args && **args)
+        return arg;
+
+    // optional name not found
+    *args = arg ? arg : (char*)"";                          // *args don't must be NULL
+
     return NULL;
+}
+
+/**
+ * Function extract data from shift-link "|color|LINKTYPE:RETURN:SOMETHING1|h[name]|h|r if linkType == LINKTYPE
+ * It also extract literal/quote if not shift-link in args
+ *
+ * @param args       variable pointer to non parsed args string, updated at function call to new position (with skipped white spaces)
+ *                   if args have sift link with linkType != LINKTYPE then args still pointing to this arg (unmodified pointer)
+ *
+ * @param linkType   shift-link must fit by link type to this arg value or extraction fail
+ *
+ * @param something1 if not NULL then shift-link must have data field and it returned into this arg
+ *                   if extraction fail then non modified
+ *
+ * @return           extracted key, or NULL if args empty or not appropriate content or not fit to linkType.
+ */
+char* ChatHandler::ExtractKeyFromLink(char** text, char const* linkType, char** something1 /*= NULL*/)
+{
+    char const* linkTypes[2];
+    linkTypes[0] = linkType;
+    linkTypes[1] = NULL;
+
+    int foundIdx;
+
+    return ExtractKeyFromLink(text, linkTypes, &foundIdx, something1);
+}
+
+/**
+ * Function extract data from shift-link "|color|LINKTYPE:RETURN:SOMETHING1|h[name]|h|r if LINKTYPE in linkTypes array 
+ * It also extract literal/quote if not shift-link in args
+ *
+ * @param args       variable pointer to non parsed args string, updated at function call to new position (with skipped white spaces)
+ *                   if args have sift link with linkType != LINKTYPE then args still pointing to this arg (unmodified pointer)
+ *
+ * @param linkTypes  NULL-terminated array of link types, shift-link must fit one from link type from array or extraction fail
+ *
+ * @param found_idx  if not NULL then at return index in linkTypes that fit shift-link type, for non-link case return -1
+ *                   if extraction fail then non modified
+ *
+ * @param something1 if not NULL then shift-link must have data field and it returned into this arg
+ *                   if extraction fail then non modified
+ *
+ * @return           extracted key, or NULL if args empty or not appropriate content or not fit to linkType.
+ */
+char* ChatHandler::ExtractKeyFromLink(char** text, char const* const* linkTypes, int* found_idx, char** something1 /*= NULL*/)
+{
+    // skip empty
+    if (!*text || !**text)
+        return NULL;
+
+    // return non link case
+    char* arg = ExtractQuotedOrLiteralArg(text);
+    if (arg)
+    {
+        if (found_idx)
+            *found_idx = -1;                                // special index case
+
+        return arg;
+    }
+
+    char* keyPair[2];
+    char* somethingPair[2];
+
+    arg = ExtractLinkArg(text, linkTypes, found_idx, keyPair, something1 ? somethingPair : NULL);
+    if (!arg)
+        return NULL;
+
+    *keyPair[1] = '\0';                                     // truncate key string
+
+    if (something1)
+    {
+        *somethingPair[1] = '\0';                           // truncate data string
+        *something1 = somethingPair[0];
+    }
+
+    return keyPair[0];
+}
+
+/**
+ * Function extract uint32 key from shift-link "|color|LINKTYPE:RETURN|h[name]|h|r if linkType == LINKTYPE
+ * It also extract direct number if not shift-link in args
+ *
+ * @param args       variable pointer to non parsed args string, updated at function call to new position (with skipped white spaces)
+ *                   if args have sift link with linkType != LINKTYPE then args still pointing to this arg (unmodified pointer)
+ *
+ * @param linkType   shift-link must fit by link type to this arg value or extraction fail
+ *
+ * @param value      store result value at success return, not modified at fail
+ *
+ * @return           true if extraction succesful
+ */
+bool ChatHandler::ExtractUint32KeyFromLink(char** text, char const* linkType, uint32& value)
+{
+    char* arg = ExtractKeyFromLink(text, linkType);
+    if (!arg)
+        return false;
+
+    return ExtractUInt32(&arg, value);
 }
 
 GameObject* ChatHandler::GetObjectGlobalyWithGuidOrNearWithDbGuid(uint32 lowguid,uint32 entry)
@@ -2090,11 +2672,12 @@ GameObject* ChatHandler::GetObjectGlobalyWithGuidOrNearWithDbGuid(uint32 lowguid
 
 enum SpellLinkType
 {
+    SPELL_LINK_RAW     =-1,                                 // non-link case
     SPELL_LINK_SPELL   = 0,
     SPELL_LINK_TALENT  = 1,
     SPELL_LINK_ENCHANT = 2,
     SPELL_LINK_TRADE   = 3,
-    SPELL_LINK_GLYPH   = 4
+    SPELL_LINK_GLYPH   = 4,
 };
 
 static char const* const spellKeys[] =
@@ -2104,27 +2687,32 @@ static char const* const spellKeys[] =
     "Henchant",                                             // enchanting recipe spell
     "Htrade",                                               // profession/skill spell
     "Hglyph",                                               // glyph
-    0
+    NULL
 };
 
-uint32 ChatHandler::extractSpellIdFromLink(char* text)
+uint32 ChatHandler::ExtractSpellIdFromLink(char** text)
 {
     // number or [name] Shift-click form |color|Henchant:recipe_spell_id|h[prof_name: recipe_name]|h|r
     // number or [name] Shift-click form |color|Hglyph:glyph_slot_id:glyph_prop_id|h[%s]|h|r
     // number or [name] Shift-click form |color|Hspell:spell_id|h[name]|h|r
     // number or [name] Shift-click form |color|Htalent:talent_id,rank|h[name]|h|r
     // number or [name] Shift-click form |color|Htrade:spell_id,skill_id,max_value,cur_value|h[name]|h|r
-    int type = 0;
+    int type;
     char* param1_str = NULL;
-    char* idS = extractKeyFromLink(text,spellKeys,&type,&param1_str);
-    if(!idS)
+    char* idS = ExtractKeyFromLink(text, spellKeys, &type, &param1_str);
+    if (!idS)
         return 0;
 
-    uint32 id = (uint32)atol(idS);
+    uint32 id;
+    if (!ExtractUInt32(&idS, id))
+        return 0;
 
     switch(type)
     {
+        case SPELL_LINK_RAW:
         case SPELL_LINK_SPELL:
+        case SPELL_LINK_ENCHANT:
+        case SPELL_LINK_TRADE:
             return id;
         case SPELL_LINK_TALENT:
         {
@@ -2133,27 +2721,21 @@ uint32 ChatHandler::extractSpellIdFromLink(char* text)
             if(!talentEntry)
                 return 0;
 
-            int32 rank = param1_str ? (uint32)atol(param1_str) : 0;
-            if(rank >= MAX_TALENT_RANK)
+            uint32 rank;
+            if (!ExtractUInt32(&param1_str, rank))
                 return 0;
 
-            if(rank < 0)
-                rank = 0;
-
-            return talentEntry->RankID[rank];
+            return rank < MAX_TALENT_RANK ? talentEntry->RankID[rank] : 0;
         }
-        case SPELL_LINK_ENCHANT:
-        case SPELL_LINK_TRADE:
-            return id;
         case SPELL_LINK_GLYPH:
         {
-            uint32 glyph_prop_id = param1_str ? (uint32)atol(param1_str) : 0;
+            uint32 glyph_prop_id;
 
-            GlyphPropertiesEntry const* glyphPropEntry = sGlyphPropertiesStore.LookupEntry(glyph_prop_id);
-            if(!glyphPropEntry)
+            if (!ExtractUInt32(&param1_str, glyph_prop_id))
                 return 0;
 
-            return glyphPropEntry->SpellId;
+            GlyphPropertiesEntry const* glyphPropEntry = sGlyphPropertiesStore.LookupEntry(glyph_prop_id);
+            return glyphPropEntry ? glyphPropEntry->SpellId : 0;
         }
     }
 
@@ -2161,26 +2743,27 @@ uint32 ChatHandler::extractSpellIdFromLink(char* text)
     return 0;
 }
 
-GameTele const* ChatHandler::extractGameTeleFromLink(char* text)
+GameTele const* ChatHandler::ExtractGameTeleFromLink(char** text)
 {
     // id, or string, or [name] Shift-click form |color|Htele:id|h[name]|h|r
-    char* cId = extractKeyFromLink(text,"Htele");
-    if(!cId)
+    char* cId = ExtractKeyFromLink(text,"Htele");
+    if (!cId)
         return NULL;
 
     // id case (explicit or from shift link)
-    if(cId[0] >= '0' || cId[0] >= '9')
-        if(uint32 id = atoi(cId))
-            return sObjectMgr.GetGameTele(id);
-
-    return sObjectMgr.GetGameTele(cId);
+    uint32 id;
+    if (ExtractUInt32(&cId, id))
+        return sObjectMgr.GetGameTele(id);
+    else
+        return sObjectMgr.GetGameTele(cId);
 }
 
 enum GuidLinkType
 {
-    SPELL_LINK_PLAYER     = 0,                              // must be first for selection in not link case
-    SPELL_LINK_CREATURE   = 1,
-    SPELL_LINK_GAMEOBJECT = 2
+    GUID_LINK_RAW        =-1,                               // non-link case
+    GUID_LINK_PLAYER     = 0,
+    GUID_LINK_CREATURE   = 1,
+    GUID_LINK_GAMEOBJECT = 2,
 };
 
 static char const* const guidKeys[] =
@@ -2191,66 +2774,74 @@ static char const* const guidKeys[] =
     NULL
 };
 
-uint64 ChatHandler::extractGuidFromLink(char* text)
+ObjectGuid ChatHandler::ExtractGuidFromLink(char** text)
 {
     int type = 0;
 
     // |color|Hcreature:creature_guid|h[name]|h|r
     // |color|Hgameobject:go_guid|h[name]|h|r
     // |color|Hplayer:name|h[name]|h|r
-    char* idS = extractKeyFromLink(text,guidKeys,&type);
-    if(!idS)
-        return 0;
+    char* idS = ExtractKeyFromLink(text, guidKeys, &type);
+    if (!idS)
+        return ObjectGuid();
 
     switch(type)
     {
-        case SPELL_LINK_PLAYER:
+        case GUID_LINK_RAW:
+        case GUID_LINK_PLAYER:
         {
             std::string name = idS;
-            if(!normalizePlayerName(name))
-                return 0;
+            if (!normalizePlayerName(name))
+                return ObjectGuid();
 
-            if(Player* player = sObjectMgr.GetPlayer(name.c_str()))
-                return player->GetGUID();
+            if (Player* player = sObjectMgr.GetPlayer(name.c_str()))
+                return player->GetObjectGuid();
 
-            if(uint64 guid = sObjectMgr.GetPlayerGUIDByName(name))
-                return guid;
+            if (uint64 guid = sObjectMgr.GetPlayerGUIDByName(name))
+                return ObjectGuid(guid);
 
-            return 0;
+            return ObjectGuid();
         }
-        case SPELL_LINK_CREATURE:
+        case GUID_LINK_CREATURE:
         {
-            uint32 lowguid = (uint32)atol(idS);
+            uint32 lowguid;
+            if (!ExtractUInt32(&idS, lowguid))
+                return ObjectGuid();
 
-            if(CreatureData const* data = sObjectMgr.GetCreatureData(lowguid) )
-                return MAKE_NEW_GUID(lowguid,data->id,HIGHGUID_UNIT);
+            if (CreatureData const* data = sObjectMgr.GetCreatureData(lowguid))
+                return ObjectGuid(HIGHGUID_UNIT, data->id, lowguid);
             else
-                return 0;
+                return ObjectGuid();
         }
-        case SPELL_LINK_GAMEOBJECT:
+        case GUID_LINK_GAMEOBJECT:
         {
-            uint32 lowguid = (uint32)atol(idS);
+            uint32 lowguid;
+            if (!ExtractUInt32(&idS, lowguid))
+                return ObjectGuid();
 
             if(GameObjectData const* data = sObjectMgr.GetGOData(lowguid) )
-                return MAKE_NEW_GUID(lowguid,data->id,HIGHGUID_GAMEOBJECT);
+                return ObjectGuid(HIGHGUID_GAMEOBJECT, data->id, lowguid);
             else
-                return 0;
+                return ObjectGuid();
         }
     }
 
     // unknown type?
-    return 0;
+    return ObjectGuid();
 }
 
 enum LocationLinkType
 {
-    LOCATION_LINK_PLAYER            = 0,                    // must be first for selection in not link case
+    LOCATION_LINK_RAW               =-1,                    // non-link case
+    LOCATION_LINK_PLAYER            = 0,
     LOCATION_LINK_TELE              = 1,
     LOCATION_LINK_TAXINODE          = 2,
     LOCATION_LINK_CREATURE          = 3,
     LOCATION_LINK_GAMEOBJECT        = 4,
     LOCATION_LINK_CREATURE_ENTRY    = 5,
-    LOCATION_LINK_GAMEOBJECT_ENTRY  = 6
+    LOCATION_LINK_GAMEOBJECT_ENTRY  = 6,
+    LOCATION_LINK_AREATRIGGER       = 7,
+    LOCATION_LINK_AREATRIGGER_TARGET= 8,
 };
 
 static char const* const locationKeys[] =
@@ -2262,10 +2853,12 @@ static char const* const locationKeys[] =
     "Hgameobject",
     "Hcreature_entry",
     "Hgameobject_entry",
+    "Hareatrigger",
+    "Hareatrigger_target",
     NULL
 };
 
-bool ChatHandler::extractLocationFromLink(char* text, uint32& mapid, float& x, float& y, float& z)
+bool ChatHandler::ExtractLocationFromLink(char** text, uint32& mapid, float& x, float& y, float& z)
 {
     int type = 0;
 
@@ -2276,24 +2869,22 @@ bool ChatHandler::extractLocationFromLink(char* text, uint32& mapid, float& x, f
     // |color|Hgameobject:go_guid|h[name]|h|r
     // |color|Hcreature_entry:creature_id|h[name]|h|r
     // |color|Hgameobject_entry:go_id|h[name]|h|r
-    char* idS = extractKeyFromLink(text,locationKeys,&type);
-    if(!idS)
+    // |color|Hareatrigger:id|h[name]|h|r
+    // |color|Hareatrigger_target:id|h[name]|h|r
+    char* idS = ExtractKeyFromLink(text, locationKeys, &type);
+    if (!idS)
         return false;
 
     switch(type)
     {
-        // it also fail case
+        case LOCATION_LINK_RAW:
         case LOCATION_LINK_PLAYER:
         {
-            // not link and not name, possible coordinates/etc
-            if (isNumeric(idS[0]))
-                return false;
-
             std::string name = idS;
-            if(!normalizePlayerName(name))
+            if (!normalizePlayerName(name))
                 return false;
 
-            if(Player* player = sObjectMgr.GetPlayer(name.c_str()))
+            if (Player* player = sObjectMgr.GetPlayer(name.c_str()))
             {
                 mapid = player->GetMapId();
                 x = player->GetPositionX();
@@ -2302,7 +2893,7 @@ bool ChatHandler::extractLocationFromLink(char* text, uint32& mapid, float& x, f
                 return true;
             }
 
-            if(uint64 guid = sObjectMgr.GetPlayerGUIDByName(name))
+            if (uint64 guid = sObjectMgr.GetPlayerGUIDByName(name))
             {
                 // to point where player stay (if loaded)
                 float o;
@@ -2314,7 +2905,10 @@ bool ChatHandler::extractLocationFromLink(char* text, uint32& mapid, float& x, f
         }
         case LOCATION_LINK_TELE:
         {
-            uint32 id = (uint32)atol(idS);
+            uint32 id;
+            if (!ExtractUInt32(&idS, id))
+                return false;
+
             GameTele const* tele = sObjectMgr.GetGameTele(id);
             if (!tele)
                 return false;
@@ -2326,7 +2920,10 @@ bool ChatHandler::extractLocationFromLink(char* text, uint32& mapid, float& x, f
         }
         case LOCATION_LINK_TAXINODE:
         {
-            uint32 id = (uint32)atol(idS);
+            uint32 id;
+            if (!ExtractUInt32(&idS, id))
+                return false;
+
             TaxiNodesEntry const* node = sTaxiNodesStore.LookupEntry(id);
             if (!node)
                 return false;
@@ -2338,7 +2935,9 @@ bool ChatHandler::extractLocationFromLink(char* text, uint32& mapid, float& x, f
         }
         case LOCATION_LINK_CREATURE:
         {
-            uint32 lowguid = (uint32)atol(idS);
+            uint32 lowguid;
+            if (!ExtractUInt32(&idS, lowguid))
+                return false;
 
             if(CreatureData const* data = sObjectMgr.GetCreatureData(lowguid) )
             {
@@ -2353,7 +2952,9 @@ bool ChatHandler::extractLocationFromLink(char* text, uint32& mapid, float& x, f
         }
         case LOCATION_LINK_GAMEOBJECT:
         {
-            uint32 lowguid = (uint32)atol(idS);
+            uint32 lowguid;
+            if (!ExtractUInt32(&idS, lowguid))
+                return false;
 
             if(GameObjectData const* data = sObjectMgr.GetGOData(lowguid) )
             {
@@ -2368,7 +2969,9 @@ bool ChatHandler::extractLocationFromLink(char* text, uint32& mapid, float& x, f
         }
         case LOCATION_LINK_CREATURE_ENTRY:
         {
-            uint32 id = (uint32)atol(idS);
+            uint32 id;
+            if (!ExtractUInt32(&idS, id))
+                return false;
 
             if (sObjectMgr.GetCreatureTemplate(id))
             {
@@ -2392,7 +2995,9 @@ bool ChatHandler::extractLocationFromLink(char* text, uint32& mapid, float& x, f
         }
         case LOCATION_LINK_GAMEOBJECT_ENTRY:
         {
-            uint32 id = (uint32)atol(idS);
+            uint32 id;
+            if (!ExtractUInt32(&idS, id))
+                return false;
 
             if (sObjectMgr.GetGameObjectInfo(id))
             {
@@ -2414,16 +3019,63 @@ bool ChatHandler::extractLocationFromLink(char* text, uint32& mapid, float& x, f
             else
                 return false;
         }
+        case LOCATION_LINK_AREATRIGGER:
+        {
+            uint32 id;
+            if (!ExtractUInt32(&idS, id))
+                return false;
+
+            AreaTriggerEntry const* atEntry = sAreaTriggerStore.LookupEntry(id);
+            if (!atEntry)
+            {
+                PSendSysMessage(LANG_COMMAND_GOAREATRNOTFOUND, id);
+                SetSentErrorMessage(true);
+                return false;
+            }
+
+            mapid = atEntry->mapid;
+            x = atEntry->x;
+            y = atEntry->y;
+            z = atEntry->z;
+            return true;
+        }
+        case LOCATION_LINK_AREATRIGGER_TARGET:
+        {
+            uint32 id;
+            if (!ExtractUInt32(&idS, id))
+                return false;
+
+            if (!sAreaTriggerStore.LookupEntry(id))
+            {
+                PSendSysMessage(LANG_COMMAND_GOAREATRNOTFOUND, id);
+                SetSentErrorMessage(true);
+                return false;
+            }
+
+            AreaTrigger const* at = sObjectMgr.GetAreaTrigger(id);
+            if(!at)
+            {
+                PSendSysMessage(LANG_AREATRIGER_NOT_HAS_TARGET, id);
+                SetSentErrorMessage(true);
+                return false;
+            }
+
+            mapid = at->target_mapId;
+            x = at->target_X;
+            y = at->target_Y;
+            z = at->target_Z;
+            return true;
+        }
     }
 
     // unknown type?
     return false;
 }
 
-std::string ChatHandler::extractPlayerNameFromLink(char* text)
+std::string ChatHandler::ExtractPlayerNameFromLink(char** text)
 {
     // |color|Hplayer:name|h[name]|h|r
-    char* name_str = extractKeyFromLink(text,"Hplayer");
+    char* name_str = ExtractKeyFromLink(text, "Hplayer");
     if(!name_str)
         return "";
 
@@ -2434,11 +3086,24 @@ std::string ChatHandler::extractPlayerNameFromLink(char* text)
     return name;
 }
 
-bool ChatHandler::extractPlayerTarget(char* args, Player** player, uint64* player_guid /*=NULL*/,std::string* player_name /*= NULL*/)
+/**
+ * Function extract at least one from request player data (pointer/guid/name) from args name/shift-link or selected player if no args
+ *
+ * @param args        variable pointer to non parsed args string, updated at function call to new position (with skipped white spaces)
+ *
+ * @param player      optional arg   One from 3 optional args must be provided at least (or more).
+ * @param player_guid optional arg   For function success only one from provided args need get result
+ * @param player_name optional arg   But if early arg get value then all later args will have its (if requested)
+ *                                   if player_guid requested and not found then name also will not found
+ *                                   So at success can be returned 2 cases: (player/guid/name) or (guid/name)
+ *
+ * @return           true if extraction successful
+ */
+bool ChatHandler::ExtractPlayerTarget(char** args, Player** player /*= NULL*/, uint64* player_guid /*= NULL*/,std::string* player_name /*= NULL*/)
 {
-    if (args && *args)
+    if (*args && **args)
     {
-        std::string name = extractPlayerNameFromLink(args);
+        std::string name = ExtractPlayerNameFromLink(args);
         if (name.empty())
         {
             SendSysMessage(LANG_PLAYER_NOT_FOUND);
@@ -2487,46 +3152,12 @@ bool ChatHandler::extractPlayerTarget(char* args, Player** player, uint64* playe
     return true;
 }
 
-void ChatHandler::extractOptFirstArg(char* args, char** arg1, char** arg2)
-{
-    char* p1 = strtok(args, " ");
-    char* p2 = strtok(NULL, " ");
-
-    if(!p2)
-    {
-        p2 = p1;
-        p1 = NULL;
-    }
-
-    if(arg1)
-        *arg1 = p1;
-
-    if(arg2)
-        *arg2 = p2;
-}
-
-char* ChatHandler::extractQuotedArg( char* args )
-{
-    if(!*args)
-        return NULL;
-
-    if(*args=='"')
-        return strtok(args+1, "\"");
-    else
-    {
-        char* space = strtok(args, "\"");
-        if(!space)
-            return NULL;
-        return strtok(NULL, "\"");
-    }
-}
-
-uint32 ChatHandler::extractAccountId(char* args, std::string* accountName /*= NULL*/, Player** targetIfNullArg /*= NULL*/)
+uint32 ChatHandler::ExtractAccountId(char** args, std::string* accountName /*= NULL*/, Player** targetIfNullArg /*= NULL*/)
 {
     uint32 account_id = 0;
 
     ///- Get the account name from the command line
-    char* account_str = args ? strtok (args," ") : NULL;
+    char* account_str = ExtractLiteralArg(args);
 
     if (!account_str)
     {
@@ -2551,18 +3182,8 @@ uint32 ChatHandler::extractAccountId(char* args, std::string* accountName /*= NU
 
     std::string account_name;
 
-    if (isNumeric(account_str))
+    if (ExtractUInt32(&account_str, account_id))
     {
-        long id = atol(account_str);
-        if (id <= 0 || ((unsigned long)id) >= std::numeric_limits<uint32>::max())
-        {
-            PSendSysMessage(LANG_ACCOUNT_NOT_EXIST,account_str);
-            SetSentErrorMessage(true);
-            return 0;
-        }
-
-        account_id = uint32(id);
-
         if (!sAccountMgr.GetName(account_id, account_name))
         {
             PSendSysMessage(LANG_ACCOUNT_NOT_EXIST,account_str);

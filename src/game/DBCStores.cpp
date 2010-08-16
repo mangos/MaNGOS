@@ -358,7 +358,7 @@ inline void LoadDBC(LocalData& localeData,barGoLink& bar, StoreProblemList& errl
     }
     else
     {
-        // sort problematic dbc to (1) non compatible and (2) non-existed
+        // sort problematic dbc to (1) non compatible and (2) nonexistent
         FILE * f=fopen(dbc_filename.c_str(),"rb");
         if(f)
         {
@@ -646,7 +646,7 @@ void LoadDBCStores(const std::string& dataPath)
             sTaxiPathNodesByPath[entry->path].set(entry->index, entry);
 
     // Initialize global taxinodes mask
-    // include existed nodes that have at least single not spell base (scripted) path
+    // include existing nodes that have at least single not spell base (scripted) path
     {
         std::set<uint32> spellPaths;
         for(uint32 i = 1; i < sSpellStore.GetNumRows (); ++i)
@@ -939,16 +939,26 @@ MapDifficulty const* GetMapDifficultyData(uint32 mapId, Difficulty difficulty)
 
 PvPDifficultyEntry const* GetBattlegroundBracketByLevel( uint32 mapid, uint32 level )
 {
-    // prevent out-of-range levels for dbc data
-    if (level > DEFAULT_MAX_LEVEL)
-        level = DEFAULT_MAX_LEVEL;
-
+    PvPDifficultyEntry const* maxEntry = NULL;              // used for level > max listed level case
     for(uint32 i = 0; i < sPvPDifficultyStore.GetNumRows(); ++i)
+    {
         if (PvPDifficultyEntry const* entry = sPvPDifficultyStore.LookupEntry(i))
-            if (entry->mapId == mapid && entry->minLevel <= level && entry->maxLevel >= level)
+        {
+            // skip unrelated and too-high brackets
+            if (entry->mapId != mapid || entry->minLevel > level)
+                continue;
+
+            // exactly fit
+            if (entry->maxLevel >= level)
                 return entry;
 
-    return NULL;
+            // remember for possible out-of-range case (search higher from existed)
+            if (!maxEntry || maxEntry->maxLevel < entry->maxLevel)
+                maxEntry = entry;
+        }
+    }
+
+    return maxEntry;
 }
 
 PvPDifficultyEntry const* GetBattlegroundBracketById(uint32 mapid, BattleGroundBracketId id)

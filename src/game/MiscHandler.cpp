@@ -181,6 +181,7 @@ void WorldSession::HandleWhoOpcode( WorldPacket & recv_data )
             continue;
 
         uint32 pzoneid = itr->second->GetZoneId();
+        uint8 gender = itr->second->getGender();
 
         bool z_show = true;
         for(uint32 i = 0; i < zones_count; ++i)
@@ -238,11 +239,11 @@ void WorldSession::HandleWhoOpcode( WorldPacket & recv_data )
 
         data << pname;                                      // player name
         data << gname;                                      // guild name
-        data << uint32( lvl );                              // player level
-        data << uint32( class_ );                           // player class
-        data << uint32( race );                             // player race
-        data << uint8(0);                                   // new 2.4.0
-        data << uint32( pzoneid );                          // player zone id
+        data << uint32(lvl);                                // player level
+        data << uint32(class_);                             // player class
+        data << uint32(race);                               // player race
+        data << uint8(gender);                              // player gender
+        data << uint32(pzoneid);                            // player zone id
 
         // 50 is maximum player count sent to client
         if ((++clientcount) == 50)
@@ -722,10 +723,11 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
     }
 
     // enter to tavern, not overwrite city rest
-    if(sObjectMgr.IsTavernAreaTrigger(Trigger_ID) && pl->GetRestType() != REST_TYPE_IN_CITY)
+    if(sObjectMgr.IsTavernAreaTrigger(Trigger_ID))
     {
         // set resting flag we are in the inn
-        pl->SetRestType(REST_TYPE_IN_TAVERN, Trigger_ID);
+        if (pl->GetRestType() != REST_TYPE_IN_CITY)
+            pl->SetRestType(REST_TYPE_IN_TAVERN, Trigger_ID);
         return;
     }
 

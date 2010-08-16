@@ -281,7 +281,7 @@ void Spell::EffectEnvironmentalDMG(SpellEffectEntry const* effect)
     uint32 resist = 0;
 
     // Note: this hack with damage replace required until GO casting not implemented
-    // environment damage spells already have around enemies targeting but this not help in case not existed GO casting support
+    // environment damage spells already have around enemies targeting but this not help in case nonexistent GO casting support
     // currently each enemy selected explicitly and self cast damage, we prevent apply self casted spell bonuses/etc
     damage = m_spellInfo->CalculateSimpleValue(SpellEffectIndex(effect->EffectIndex));
 
@@ -835,6 +835,16 @@ void Spell::EffectDummy(SpellEffectEntry const* effect)
                     ((Creature*)unitTarget)->setDeathState(JUST_ALIVED);
                     return;
                 }
+                case 10254:                                 // Stone Dwarf Awaken Visual
+                {
+                    if (m_caster->GetTypeId() != TYPEID_UNIT)
+                        return;
+
+                    // see spell 10255 (aura dummy)
+                    m_caster->clearUnitState(UNIT_STAT_ROOT);
+                    m_caster->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    return;
+                }
                 case 13120:                                 // net-o-matic
                 {
                     if (!unitTarget)
@@ -1026,6 +1036,21 @@ void Spell::EffectDummy(SpellEffectEntry const* effect)
                     m_caster->CastSpell(m_caster, 23782, true);
                     m_caster->CastSpell(m_caster, 23783, true);
                     return;
+                case 24930:                                 // Hallow's End Treat
+                {
+                    uint32 spell_id = 0;
+
+                    switch(urand(1,4))
+                    {
+                        case 1: spell_id = 24924; break;    // Larger and Orange
+                        case 2: spell_id = 24925; break;    // Skeleton
+                        case 3: spell_id = 24926; break;    // Pirate
+                        case 4: spell_id = 24927; break;    // Ghost
+                    }
+
+                    m_caster->CastSpell(m_caster, spell_id, true);
+                    return;
+                }
                 case 25860:                                 // Reindeer Transformation
                 {
                     if (!m_caster->HasAuraType(SPELL_AURA_MOUNTED))
@@ -1259,6 +1284,21 @@ void Spell::EffectDummy(SpellEffectEntry const* effect)
                     // Emissary of Hate Credit
                     m_caster->CastSpell(m_caster, 45088, true);
                     return;
+                }
+                case 45449:                                // Arcane Prisoner Rescue
+                {
+                    uint32 spellId=0;
+                    switch(rand() % 2)
+                    {
+                        case 0: spellId = 45446; break;    // Summon Arcane Prisoner - Male
+                        case 1: spellId = 45448; break;    // Summon Arcane Prisoner - Female
+                    }
+                    //Spawn
+                    m_caster->CastSpell(m_caster, spellId, true);
+                    //Arcane Prisoner Kill Credit
+                    unitTarget->CastSpell(m_caster, 45456, true);
+
+                    break;
                 }
                 case 45980:                                 // Re-Cursive Transmatter Injection
                 {
@@ -2524,7 +2564,7 @@ void Spell::EffectDummy(SpellEffectEntry const* effect)
                 SpellEffectEntry const* dsSpellEffect = m_spellInfo->GetSpellEffect(EFFECT_INDEX_0);
                 int32 bp = int32(count * m_caster->GetMaxHealth() * (dsSpellEffect ? dsSpellEffect->DmgMultiplier : 0.0f) / 100);
 
-                // Improved Death Strike (percent stored in not existed EFFECT_INDEX_2 effect base points)
+                // Improved Death Strike (percent stored in nonexistent EFFECT_INDEX_2 effect base points)
                 Unit::AuraList const& auraMod = m_caster->GetAurasByType(SPELL_AURA_ADD_FLAT_MODIFIER);
                 for(Unit::AuraList::const_iterator iter = auraMod.begin(); iter != auraMod.end(); ++iter)
                 {
@@ -2802,7 +2842,7 @@ void Spell::EffectJump(SpellEffectEntry const* effect)
             else if(unitTarget->getVictim())
                 pTarget = m_caster->getVictim();
             else if(m_caster->GetTypeId() == TYPEID_PLAYER)
-                pTarget = ObjectAccessor::GetUnit(*m_caster, ((Player*)m_caster)->GetSelection());
+                pTarget = m_caster->GetMap()->GetUnit(((Player*)m_caster)->GetSelection());
 
             o = pTarget ? pTarget->GetOrientation() : m_caster->GetOrientation();
         }
@@ -2871,7 +2911,7 @@ void Spell::EffectTeleportUnits(SpellEffectEntry const* effect)
             else if(unitTarget->getVictim())
                 pTarget = unitTarget->getVictim();
             else if(unitTarget->GetTypeId() == TYPEID_PLAYER)
-                pTarget = ObjectAccessor::GetUnit(*unitTarget, ((Player*)unitTarget)->GetSelection());
+                pTarget = unitTarget->GetMap()->GetUnit(((Player*)unitTarget)->GetSelection());
 
             // Init dest coordinates
             float x = m_targets.m_destX;
@@ -3114,7 +3154,9 @@ void Spell::EffectSendEvent(SpellEffectEntry const* effect)
     we do not handle a flag dropping or clicking on flag in battleground by sendevent system
     */
     DEBUG_FILTER_LOG(LOG_FILTER_SPELL_CAST, "Spell ScriptStart %u for spellid %u in EffectSendEvent ", effect->EffectMiscValue, m_spellInfo->Id);
-    m_caster->GetMap()->ScriptsStart(sEventScripts, effect->EffectMiscValue, m_caster, focusObject);
+
+    if (!Script->ProcessEventId(effect->EffectMiscValue, m_caster, focusObject, true))
+        m_caster->GetMap()->ScriptsStart(sEventScripts, effect->EffectMiscValue, m_caster, focusObject);
 }
 
 void Spell::EffectPowerBurn(SpellEffectEntry const* effect)
@@ -3248,7 +3290,7 @@ void Spell::EffectHeal(SpellEffectEntry const* /*effect*/)
             if (unitTarget == m_targets.getUnitTarget())
             {
                 // check for Riptide
-                Aura* riptide = unitTarget->GetAura(SPELL_AURA_PERIODIC_HEAL, SPELLFAMILY_SHAMAN, 0, 0x00000010, caster->GetGUID());
+                Aura* riptide = unitTarget->GetAura(SPELL_AURA_PERIODIC_HEAL, SPELLFAMILY_SHAMAN, UI64LIT(0x0), 0x00000010, caster->GetGUID());
                 if (riptide)
                 {
                     addhealth += addhealth/4;
@@ -3393,7 +3435,7 @@ void Spell::DoCreateItem(SpellEffectEntry const* effect, uint32 itemtype)
             num_to_add -= no_space;
         else
         {
-            // ignore mana gem case (next effect will recharge existed example)
+            // ignore mana gem case (next effect will recharge existing example)
             if (effect->EffectIndex == EFFECT_INDEX_0 && m_spellInfo->GetSpellEffectIdByIndex(EFFECT_INDEX_1) == SPELL_EFFECT_DUMMY )
                 return;
 
@@ -3429,7 +3471,7 @@ void Spell::DoCreateItem(SpellEffectEntry const* effect, uint32 itemtype)
     }
 
     // for battleground marks send by mail if not add all expected
-    // FIXME: single existed bg marks for outfield bg and we not have it..
+    // FIXME: single existing bg marks for outfield bg and we not have it..
     /*
     if(no_space > 0 && bg_mark)
     {
@@ -4720,7 +4762,7 @@ void Spell::EffectEnchantItemTmp(SpellEffectEntry const* effect)
     SpellItemEnchantmentEntry const *pEnchant = sSpellItemEnchantmentStore.LookupEntry(enchant_id);
     if(!pEnchant)
     {
-        sLog.outError("Spell %u Effect %u (SPELL_EFFECT_ENCHANT_ITEM_TEMPORARY) have not existed enchanting id %u ",m_spellInfo->Id,effect->EffectIndex,enchant_id);
+        sLog.outError("Spell %u Effect %u (SPELL_EFFECT_ENCHANT_ITEM_TEMPORARY) have nonexistent enchanting id %u ",m_spellInfo->Id,effect->EffectIndex,enchant_id);
         return;
     }
 
@@ -7176,13 +7218,14 @@ void Spell::EffectReputation(SpellEffectEntry const* effect)
     Player *_player = (Player*)unitTarget;
 
     int32  rep_change = m_currentBasePoints[effect->EffectIndex];
-
     uint32 faction_id = effect->EffectMiscValue;
 
     FactionEntry const* factionEntry = sFactionStore.LookupEntry(faction_id);
 
     if(!factionEntry)
         return;
+
+    rep_change = _player->CalculateReputationGain(REPUTATION_SOURCE_SPELL, rep_change, faction_id);
 
     _player->GetReputationMgr().ModifyReputation(factionEntry, rep_change);
 }

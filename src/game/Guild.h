@@ -231,6 +231,8 @@ struct GuildBankEventLogEntry
 
 struct GuildBankTab
 {
+    GuildBankTab() { memset(Slots, 0, GUILD_BANK_MAX_SLOTS * sizeof(Item*)); }
+
     Item* Slots[GUILD_BANK_MAX_SLOTS];
     std::string Name;
     std::string Icon;
@@ -250,6 +252,7 @@ typedef std::vector<GuildItemPosCount> GuildItemPosCountVec;
 
 struct MemberSlot
 {
+    uint32 accountId;
     std::string Name;
     uint32 RankId;
     uint8 Level;
@@ -292,6 +295,7 @@ class Guild
         void CreateDefaultGuildRanks(int locale_idx);
         void Disband();
 
+        void DeleteGuildBankItems(bool alsoInDB = false);
         typedef std::map<uint32, MemberSlot> MemberList;
         typedef std::vector<RankInfo> RankList;
 
@@ -323,6 +327,7 @@ class Guild
         void SetEmblem(uint32 emblemStyle, uint32 emblemColor, uint32 borderStyle, uint32 borderColor, uint32 backgroundColor);
 
         uint32 GetMemberSize() const { return members.size(); }
+        uint32 GetAccountsNumber();
 
         bool LoadGuildFromDB(QueryResult *guildDataResult);
         bool CheckGuildStructure();
@@ -400,7 +405,7 @@ class Guild
         void   SetGuildBankTabText(uint8 TabId, std::string text);
         void   SendGuildBankTabText(WorldSession *session, uint8 TabId);
         void   SetGuildBankTabInfo(uint8 TabId, std::string name, std::string icon);
-        uint8  GetPurchasedTabs() const { return m_PurchasedTabs; }
+        uint8  GetPurchasedTabs() const { return m_TabListMap.size(); }
         uint32 GetBankRights(uint32 rankId, uint8 TabId) const;
         bool   IsMemberHaveRights(uint32 LowGuid, uint8 TabId,uint32 rights) const;
         bool   CanMemberViewTab(uint32 LowGuid, uint8 TabId) const;
@@ -442,6 +447,7 @@ class Guild
         uint32 m_BorderStyle;
         uint32 m_BorderColor;
         uint32 m_BackgroundColor;
+        uint32 m_accountsNumber;                            // 0 used as marker for need lazy calculation at request
 
         RankList m_Ranks;
 
@@ -462,9 +468,10 @@ class Guild
         uint32 m_GuildBankEventLogNextGuid_Item[GUILD_BANK_MAX_TABS];
 
         uint64 m_GuildBankMoney;
-        uint8 m_PurchasedTabs;
 
     private:
+        void UpdateAccountsNumber() { m_accountsNumber = 0;}// mark for lazy calculation at request in GetAccountsNumber
+
         // used only from high level Swap/Move functions
         Item*  GetItem(uint8 TabId, uint8 SlotId);
         uint8  CanStoreItem( uint8 tab, uint8 slot, GuildItemPosCountVec& dest, uint32 count, Item *pItem, bool swap = false) const;

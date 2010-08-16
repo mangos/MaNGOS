@@ -186,7 +186,7 @@ void PlayerTaxi::LoadTaxiMask(const char* data)
     for (iter = tokens.begin(), index = 0;
         (index < TaxiMaskSize) && (iter != tokens.end()); ++iter, ++index)
     {
-        // load and set bits only for existed taxi nodes
+        // load and set bits only for existing taxi nodes
         m_taximask[index] = sTaxiNodesMask[index] & uint32(atol((*iter).c_str()));
     }
 }
@@ -196,7 +196,7 @@ void PlayerTaxi::AppendTaximaskTo( ByteBuffer& data, bool all )
     if(all)
     {
         for (uint8 i=0; i<TaxiMaskSize; ++i)
-            data << uint32(sTaxiNodesMask[i]);              // all existed nodes
+            data << uint32(sTaxiNodesMask[i]);              // all existing nodes
     }
     else
     {
@@ -2145,8 +2145,11 @@ void Player::Regenerate(Powers power, uint32 diff)
             addvalue = 12;
             break;
         case POWER_ENERGY:                                  // Regenerate energy (rogue)
-            addvalue = 20;
+        {
+            float EnergyRate = sWorld.getConfig(CONFIG_FLOAT_RATE_POWER_ENERGY);
+            addvalue = 20 * EnergyRate;
             break;
+        }
         case POWER_RUNIC_POWER:
         {
             float RunicPowerDecreaseRate = sWorld.getConfig(CONFIG_FLOAT_RATE_POWER_RUNICPOWER_LOSS);
@@ -2258,7 +2261,7 @@ Creature* Player::GetNPCIfCanInteractWith(ObjectGuid guid, uint32 npcflagmask)
         return NULL;
 
     // exist (we need look pets also for some interaction (quest/etc)
-    Creature *unit = GetMap()->GetCreatureOrPetOrVehicle(guid);
+    Creature *unit = GetMap()->GetAnyTypeCreature(guid);
     if (!unit)
         return NULL;
 
@@ -2998,11 +3001,11 @@ bool Player::addSpell(uint32 spell_id, bool active, bool learning, bool dependen
         // do character spell book cleanup (all characters)
         if(!IsInWorld() && !learning)                       // spell load case
         {
-            sLog.outError("Player::addSpell: Non-existed in SpellStore spell #%u request, deleting for all characters in `character_spell`.",spell_id);
+            sLog.outError("Player::addSpell: nonexistent in SpellStore spell #%u request, deleting for all characters in `character_spell`.",spell_id);
             CharacterDatabase.PExecute("DELETE FROM character_spell WHERE spell = '%u'",spell_id);
         }
         else
-            sLog.outError("Player::addSpell: Non-existed in SpellStore spell #%u request.",spell_id);
+            sLog.outError("Player::addSpell: nonexistent in SpellStore spell #%u request.",spell_id);
 
         return false;
     }
@@ -3032,7 +3035,7 @@ bool Player::addSpell(uint32 spell_id, bool active, bool learning, bool dependen
     {
         uint32 next_active_spell_id = 0;
         // fix activate state for non-stackable low rank (and find next spell for !active case)
-        if(!SpellMgr::canStackSpellRanks(spellInfo) && sSpellMgr.GetSpellRank(spellInfo->Id) != 0)
+        if(sSpellMgr.IsRankedSpellNonStackableInSpellBook(spellInfo))
         {
             SpellChainMapNext const& nextMap = sSpellMgr.GetSpellChainNext();
             for(SpellChainMapNext::const_iterator next_itr = nextMap.lower_bound(spell_id); next_itr != nextMap.upper_bound(spell_id); ++next_itr)
@@ -3170,7 +3173,7 @@ bool Player::addSpell(uint32 spell_id, bool active, bool learning, bool dependen
         newspell.disabled  = disabled;
 
         // replace spells in action bars and spellbook to bigger rank if only one spell rank must be accessible
-        if(newspell.active && !newspell.disabled && !SpellMgr::canStackSpellRanks(spellInfo) && sSpellMgr.GetSpellRank(spellInfo->Id) != 0)
+        if(newspell.active && !newspell.disabled && sSpellMgr.IsRankedSpellNonStackableInSpellBook(spellInfo))
         {
             for( PlayerSpellMap::iterator itr2 = m_spells.begin(); itr2 != m_spells.end(); ++itr2 )
             {
@@ -3371,7 +3374,8 @@ bool Player::IsNeedCastPassiveSpellAtLearn(SpellEntry const* spellInfo) const
     // note: form passives activated with shapeshift spells be implemented by HandleShapeshiftBoosts instead of spell_learn_spell
     // talent dependent passives activated at form apply have proper stance data
     SpellShapeshiftEntry const* shapeShift = spellInfo->GetSpellShapeshift();
-    bool need_cast = (shapeShift && (!shapeShift->Stances || (m_form != 0 && (shapeShift->Stances & (1<<(m_form-1))))));
+    bool need_cast = (shapeShift && (!shapeShift->Stances || (m_form != 0 && (shapeShift->Stances & (1<<(m_form-1))))) ||
+                      (m_form == 0 && (spellInfo->AttributesEx2 & SPELL_ATTR_EX2_NOT_NEED_SHAPESHIFT)));
 
     // Check CasterAuraStates
     SpellAuraRestrictionsEntry const* auraRestrictions = spellInfo->GetSpellAuraRestrictions();
@@ -3569,8 +3573,8 @@ void Player::removeSpell(uint32 spell_id, bool disabled, bool learn_low_rank, bo
             if(learn_low_rank)
                 learnSpell(prev_id, false);
         }
-        // if ranked non-stackable spell: need activate lesser rank and update dendence state
-        else if (cur_active && !SpellMgr::canStackSpellRanks(spellInfo) && sSpellMgr.GetSpellRank(spellInfo->Id) != 0)
+        // if ranked non-stackable spell: need activate lesser rank and update dependence state
+        else if (cur_active && sSpellMgr.IsRankedSpellNonStackableInSpellBook(spellInfo))
         {
             // need manually update dependence state (learn spell ignore like attempts)
             PlayerSpellMap::iterator prev_itr = m_spells.find(prev_id);
@@ -4177,7 +4181,7 @@ TrainerSpellState Player::GetTrainerSpellState(TrainerSpell const* trainer_spell
  */
 void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmChars, bool deleteFinally)
 {
-    // for not existed account avoid update realm
+    // for nonexistent account avoid update realm
     if (accountId == 0)
         updateRealmChars = false;
 
@@ -5011,7 +5015,7 @@ void Player::HandleBaseModValue(BaseModGroup modGroup, BaseModType modType, floa
 {
     if(modGroup >= BASEMOD_END || modType >= MOD_END)
     {
-        sLog.outError("ERROR in HandleBaseModValue(): non existed BaseModGroup of wrong BaseModType!");
+        sLog.outError("ERROR in HandleBaseModValue(): nonexistent BaseModGroup of wrong BaseModType!");
         return;
     }
 
@@ -5048,7 +5052,7 @@ float Player::GetBaseModValue(BaseModGroup modGroup, BaseModType modType) const
 {
     if(modGroup >= BASEMOD_END || modType > MOD_END)
     {
-        sLog.outError("trial to access non existed BaseModGroup or wrong BaseModType!");
+        sLog.outError("trial to access nonexistent BaseModGroup or wrong BaseModType!");
         return 0.0f;
     }
 
@@ -6007,7 +6011,7 @@ ActionButton* Player::addActionButton(uint8 spec, uint8 button, uint32 action, u
     if (spec == GetActiveSpec() && !IsActionButtonDataValid(button,action,type,this))
         return NULL;
 
-    // it create new button (NEW state) if need or return existed
+    // it create new button (NEW state) if need or return existing
     ActionButton& ab = m_actionButtons[spec][button];
 
     // set data and update to CHANGED if not NEW
@@ -6155,7 +6159,19 @@ void Player::CheckAreaExploreAndOutdoor()
     bool isOutdoor;
     uint16 areaFlag = GetBaseMap()->GetAreaFlag(GetPositionX(),GetPositionY(),GetPositionZ(), &isOutdoor);
 
-    if (sWorld.getConfig(CONFIG_BOOL_VMAP_INDOOR_CHECK) && !isOutdoor)
+    if (isOutdoor)
+    {
+        if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING) && GetRestType() == REST_TYPE_IN_TAVERN)
+        {
+            AreaTriggerEntry const* at = sAreaTriggerStore.LookupEntry(inn_trigger_id);
+            if (!at || !IsPointInAreaTriggerZone(at, GetMapId(), GetPositionX(), GetPositionY(), GetPositionZ()))
+            {
+                // Player left inn (REST_TYPE_IN_CITY overrides REST_TYPE_IN_TAVERN, so just clear rest)
+                SetRestType(REST_TYPE_NO);
+            }
+        }
+    }
+    else if (sWorld.getConfig(CONFIG_BOOL_VMAP_INDOOR_CHECK) && !isGameMaster())
         RemoveAurasWithAttribute(SPELL_ATTR_OUTDOORS_ONLY);
 
     if (areaFlag==0xffff)
@@ -6264,24 +6280,58 @@ ReputationRank Player::GetReputationRank(uint32 faction) const
 }
 
 //Calculate total reputation percent player gain with quest/creature level
-int32 Player::CalculateReputationGain(uint32 creatureOrQuestLevel, int32 rep, int32 faction, bool for_quest)
+int32 Player::CalculateReputationGain(ReputationSource source, int32 rep, int32 faction, uint32 creatureOrQuestLevel, bool noAuraBonus)
 {
     float percent = 100.0f;
 
-    float rate = for_quest ? sWorld.getConfig(CONFIG_FLOAT_RATE_REPUTATION_LOWLEVEL_QUEST) : sWorld.getConfig(CONFIG_FLOAT_RATE_REPUTATION_LOWLEVEL_KILL);
+    float repMod = noAuraBonus ? 0.0f : (float)GetTotalAuraModifier(SPELL_AURA_MOD_REPUTATION_GAIN);
 
-    if (rate != 1.0f && creatureOrQuestLevel <= MaNGOS::XP::GetGrayLevel(getLevel()))
-        percent *= rate;
-
-    float repMod = (float)GetTotalAuraModifier(SPELL_AURA_MOD_REPUTATION_GAIN);
-
-    if (!for_quest)
+    // faction specific auras only seem to apply to kills
+    if (source == REPUTATION_SOURCE_KILL)
         repMod += GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_FACTION_REPUTATION_GAIN, faction);
 
     percent += rep > 0 ? repMod : -repMod;
 
+    float rate = 1.0f;
+    switch (source)
+    {
+        case REPUTATION_SOURCE_KILL:
+            rate = sWorld.getConfig(CONFIG_FLOAT_RATE_REPUTATION_LOWLEVEL_KILL);
+            break;
+        case REPUTATION_SOURCE_QUEST:
+            rate = sWorld.getConfig(CONFIG_FLOAT_RATE_REPUTATION_LOWLEVEL_QUEST);
+            break;
+    }
+
+    if (rate != 1.0f && creatureOrQuestLevel <= MaNGOS::XP::GetGrayLevel(getLevel()))
+        percent *= rate;
+
     if (percent <= 0.0f)
         return 0;
+
+    // Multiply result with the faction specific rate
+    if (const RepRewardRate *repData = sObjectMgr.GetRepRewardRate(faction))
+    {
+        float repRate = 0.0f;
+        switch (source)
+        {
+            case REPUTATION_SOURCE_KILL:
+                repRate = repData->creature_rate;
+                break;
+            case REPUTATION_SOURCE_QUEST:
+                repRate = repData->quest_rate;
+                break;
+            case REPUTATION_SOURCE_SPELL:
+                repRate = repData->spell_rate;
+                break;
+        }
+
+        // for custom, a rate of 0.0 will totally disable reputation gain for this faction/type
+        if (repRate <= 0.0f)
+            return 0;
+
+        percent *= repRate;
+    }
 
     return int32(sWorld.getConfig(CONFIG_FLOAT_RATE_REPUTATION_GAIN)*rep*percent/100.0f);
 }
@@ -6293,14 +6343,14 @@ void Player::RewardReputation(Unit *pVictim, float rate)
         return;
 
     // used current difficulty creature entry instead normal version (GetEntry())
-    ReputationOnKillEntry const* Rep = sObjectMgr.GetReputationOnKilEntry(((Creature*)pVictim)->GetCreatureInfo()->Entry);
+    ReputationOnKillEntry const* Rep = sObjectMgr.GetReputationOnKillEntry(((Creature*)pVictim)->GetCreatureInfo()->Entry);
 
     if(!Rep)
         return;
 
     if(Rep->repfaction1 && (!Rep->team_dependent || GetTeam()==ALLIANCE))
     {
-        int32 donerep1 = CalculateReputationGain(pVictim->getLevel(), Rep->repvalue1, Rep->repfaction1, false);
+        int32 donerep1 = CalculateReputationGain(REPUTATION_SOURCE_KILL, Rep->repvalue1, Rep->repfaction1, pVictim->getLevel());
         donerep1 = int32(donerep1*rate);
         FactionEntry const *factionEntry1 = sFactionStore.LookupEntry(Rep->repfaction1);
         uint32 current_reputation_rank1 = GetReputationMgr().GetRank(factionEntry1);
@@ -6318,7 +6368,7 @@ void Player::RewardReputation(Unit *pVictim, float rate)
 
     if(Rep->repfaction2 && (!Rep->team_dependent || GetTeam()==HORDE))
     {
-        int32 donerep2 = CalculateReputationGain(pVictim->getLevel(), Rep->repvalue2, Rep->repfaction2, false);
+        int32 donerep2 = CalculateReputationGain(REPUTATION_SOURCE_KILL, Rep->repvalue2, Rep->repfaction2, pVictim->getLevel());
         donerep2 = int32(donerep2*rate);
         FactionEntry const *factionEntry2 = sFactionStore.LookupEntry(Rep->repfaction2);
         uint32 current_reputation_rank2 = GetReputationMgr().GetRank(factionEntry2);
@@ -6344,11 +6394,10 @@ void Player::RewardReputation(Quest const *pQuest)
         if (!pQuest->RewRepFaction[i])
             continue;
 
-        // For future, this row should be used as "override". Example quests are 10298 and 10870.
-        // Typically, no diplomacy mod must apply to the final value (flat). Note the formula must be (finalValue = DBvalue/100)
+        // No diplomacy mod are applied to the final value (flat). Note the formula (finalValue = DBvalue/100)
         if (pQuest->RewRepValue[i])
         {
-            int32 rep = CalculateReputationGain(GetQuestLevelForPlayer(pQuest), pQuest->RewRepValue[i], pQuest->RewRepFaction[i], true);
+            int32 rep = CalculateReputationGain(REPUTATION_SOURCE_QUEST, pQuest->RewRepValue[i]/100, pQuest->RewRepFaction[i], GetQuestLevelForPlayer(pQuest), true);
 
             if (FactionEntry const* factionEntry = sFactionStore.LookupEntry(pQuest->RewRepFaction[i]))
                 GetReputationMgr().ModifyReputation(factionEntry, rep);
@@ -6365,7 +6414,7 @@ void Player::RewardReputation(Quest const *pQuest)
                 if (!repPoints)
                     continue;
 
-                repPoints = CalculateReputationGain(GetQuestLevelForPlayer(pQuest), repPoints, pQuest->RewRepFaction[i], true);
+                repPoints = CalculateReputationGain(REPUTATION_SOURCE_QUEST, repPoints, pQuest->RewRepFaction[i], GetQuestLevelForPlayer(pQuest));
 
                 if (const FactionEntry* factionEntry = sFactionStore.LookupEntry(pQuest->RewRepFaction[i]))
                     GetReputationMgr().ModifyReputation(factionEntry, repPoints);
@@ -6756,20 +6805,9 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea)
 
     if(zone->flags & AREA_FLAG_CAPITAL)                     // in capital city
         SetRestType(REST_TYPE_IN_CITY);
-    else                                                    // anywhere else
-    {
-        if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING))    // but resting (walk from city or maybe in tavern or leave tavern recently)
-        {
-            if (GetRestType()==REST_TYPE_IN_TAVERN)         // has been in tavern. Is still in?
-            {
-                AreaTriggerEntry const* at = sAreaTriggerStore.LookupEntry(inn_trigger_id);
-                if (!at || !IsPointInAreaTriggerZone(at, GetMapId(), GetPositionX(), GetPositionY(), GetPositionY()))
-                    SetRestType(REST_TYPE_NO);
-            }
-            else                                            // not in tavern (leave city then)
-                SetRestType(REST_TYPE_NO);
-        }
-    }
+    else if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING) && GetRestType() != REST_TYPE_IN_TAVERN)
+        // resting and not in tavern (leave city then); tavern leave handled in CheckAreaExploreAndOutdoor
+        SetRestType(REST_TYPE_NO);
 
     // remove items with area/map limitations (delete only for alive player to allow back in ghost mode)
     // if player resurrected at teleport this will be applied in resurrect code
@@ -9480,7 +9518,7 @@ uint8 Player::_CanStoreItem_InBag( uint8 bag, ItemPosCountVec &dest, ItemPrototy
     if (bag==skip_bag)
         return EQUIP_ERR_ITEM_DOESNT_GO_INTO_BAG;
 
-    // skip not existed bag or self targeted bag
+    // skip nonexistent bag or self targeted bag
     Bag* pBag = (Bag*)GetItemByPos( INVENTORY_SLOT_BAG_0, bag );
     if (!pBag || pBag==pSrcItem)
         return EQUIP_ERR_ITEM_DOESNT_GO_INTO_BAG;
@@ -10441,7 +10479,7 @@ uint8 Player::CanUnequipItem( uint16 pos, bool swap ) const
 
     Item* pItem = GetItemByPos(pos);
 
-    // Applied only to existed equipped item
+    // Applied only to existing equipped item
     if( !pItem )
         return EQUIP_ERR_OK;
 
@@ -11262,7 +11300,7 @@ void Player::MoveItemToInventory(ItemPosCountVec const& dest, Item* pItem, bool 
     // store item
     Item* pLastItem = StoreItem(dest, pItem, update);
 
-    // only set if not merged to existed stack (pItem can be deleted already but we can compare pointers any way)
+    // only set if not merged to existing stack (pItem can be deleted already but we can compare pointers any way)
     if(pLastItem == pItem)
     {
         // update owner for last item (this can be original item with wrong owner
@@ -11594,7 +11632,7 @@ void Player::SplitItem( uint16 src, uint16 dst, uint32 count )
         return;
     }
 
-    // not let split more existed items (can be only at cheating)
+    // not let split more existing items (can be only at cheating)
     if(pSrcItem->GetCount() < count)
     {
         SendEquipError( EQUIP_ERR_TRIED_TO_SPLIT_MORE_THAN_COUNT, pSrcItem, NULL );
@@ -12985,7 +13023,7 @@ void Player::OnGossipSelect(WorldObject* pSource, uint32 gossipListId, uint32 me
             GetSession()->SendTabardVendorActivate(guid);
             break;
         case GOSSIP_OPTION_AUCTIONEER:
-            GetSession()->SendAuctionHello(guid, ((Creature*)pSource));
+            GetSession()->SendAuctionHello(((Creature*)pSource));
             break;
         case GOSSIP_OPTION_SPIRITGUIDE:
             PrepareGossipMenu(pSource);
@@ -13057,7 +13095,7 @@ void Player::PrepareQuestMenu( uint64 guid )
     QuestRelations* pObjectQIR;
 
     // pets also can have quests
-    if (Creature *pCreature = GetMap()->GetCreatureOrPetOrVehicle(guid))
+    if (Creature *pCreature = GetMap()->GetAnyTypeCreature(guid))
     {
         pObject = (Object*)pCreature;
         pObjectQR  = &sObjectMgr.mCreatureQuestRelations;
@@ -13151,7 +13189,7 @@ void Player::SendPreparedQuest(uint64 guid)
         std::string title = "";
 
         // need pet case for some quests
-        if (Creature *pCreature = GetMap()->GetCreatureOrPetOrVehicle(guid))
+        if (Creature *pCreature = GetMap()->GetAnyTypeCreature(guid))
         {
             uint32 textid = GetGossipTextId(pCreature);
 
@@ -13224,7 +13262,7 @@ Quest const * Player::GetNextQuest( uint64 guid, Quest const *pQuest )
     QuestRelations* pObjectQR;
     QuestRelations* pObjectQIR;
 
-    if (Creature *pCreature = GetMap()->GetCreatureOrPetOrVehicle(guid))
+    if (Creature *pCreature = GetMap()->GetAnyTypeCreature(guid))
     {
         pObject = (Object*)pCreature;
         pObjectQR  = &sObjectMgr.mCreatureQuestRelations;
@@ -15652,9 +15690,9 @@ void Player::_LoadActions(QueryResult *result)
 
 void Player::_LoadAuras(QueryResult *result, uint32 timediff)
 {
-    //RemoveAllAuras(); -- some spells casted before aura load, for example in LoadSkills, aura list explcitly cleaned early
+    //RemoveAllAuras(); -- some spells casted before aura load, for example in LoadSkills, aura list explicitly cleaned early
 
-    //QueryResult *result = CharacterDatabase.PQuery("SELECT caster_guid,spell,stackcount,remaincharges,basepoints0,basepoints1,basepoints2,maxduration0,maxduration1,maxduration2,remaintime0,remaintime1,remaintime2,effIndexMask FROM character_aura WHERE guid = '%u'",GetGUIDLow());
+    //QueryResult *result = CharacterDatabase.PQuery("SELECT caster_guid,item_guid,spell,stackcount,remaincharges,basepoints0,basepoints1,basepoints2,maxduration0,maxduration1,maxduration2,remaintime0,remaintime1,remaintime2,effIndexMask FROM character_aura WHERE guid = '%u'",GetGUIDLow());
 
     if(result)
     {
@@ -15662,19 +15700,20 @@ void Player::_LoadAuras(QueryResult *result, uint32 timediff)
         {
             Field *fields = result->Fetch();
             uint64 caster_guid = fields[0].GetUInt64();
-            uint32 spellid = fields[1].GetUInt32();
-            uint32 stackcount = fields[2].GetUInt32();
-            int32 remaincharges = (int32)fields[3].GetUInt32();
+            uint32 item_lowguid = fields[1].GetUInt64();
+            uint32 spellid = fields[2].GetUInt32();
+            uint32 stackcount = fields[3].GetUInt32();
+            int32 remaincharges = (int32)fields[4].GetUInt32();
             int32 damage[MAX_EFFECT_INDEX];
             int32 maxduration[MAX_EFFECT_INDEX];
             int32 remaintime[MAX_EFFECT_INDEX];
             for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
             {
-                damage[i]  = (int32)fields[i+4].GetUInt32();
-                maxduration[i] = (int32)fields[i+7].GetUInt32();
-                remaintime[i] = (int32)fields[i+10].GetUInt32();
+                damage[i]  = (int32)fields[i+5].GetUInt32();
+                maxduration[i] = (int32)fields[i+8].GetUInt32();
+                remaintime[i] = (int32)fields[i+11].GetUInt32();
             }
-            uint32 effIndexMask = (int32)fields[13].GetUInt32();
+            uint32 effIndexMask = (int32)fields[14].GetUInt32();
 
             SpellEntry const* spellproto = sSpellStore.LookupEntry(spellid);
             if(!spellproto)
@@ -15723,7 +15762,7 @@ void Player::_LoadAuras(QueryResult *result, uint32 timediff)
                 if (caster_guid != GetGUID() && holder->IsSingleTarget())
                     holder->SetIsSingleTarget(false);
 
-                holder->SetLoadedState(caster_guid, stackcount, remaincharges);
+                holder->SetLoadedState(caster_guid, item_lowguid ? MAKE_NEW_GUID(item_lowguid, 0, HIGHGUID_ITEM) : 0, stackcount, remaincharges);
                 AddSpellAuraHolder(holder);
                 DETAIL_LOG("Added auras from spellid %u", spellproto->Id);
             }
@@ -16044,7 +16083,7 @@ void Player::_LoadMails(QueryResult *result)
 
         if(m->mailTemplateId && !sMailTemplateStore.LookupEntry(m->mailTemplateId))
         {
-            sLog.outError( "Player::_LoadMail - Mail (%u) have not existed MailTemplateId (%u), remove at load", m->messageID, m->mailTemplateId);
+            sLog.outError( "Player::_LoadMail - Mail (%u) have nonexistent MailTemplateId (%u), remove at load", m->messageID, m->mailTemplateId);
             m->mailTemplateId = 0;
         }
 
@@ -16399,14 +16438,14 @@ void Player::_LoadBoundInstances(QueryResult *result)
             MapEntry const* mapEntry = sMapStore.LookupEntry(mapId);
             if(!mapEntry || !mapEntry->IsDungeon())
             {
-                sLog.outError("_LoadBoundInstances: player %s(%d) has bind to not existed or not dungeon map %d", GetName(), GetGUIDLow(), mapId);
+                sLog.outError("_LoadBoundInstances: player %s(%d) has bind to nonexistent or not dungeon map %d", GetName(), GetGUIDLow(), mapId);
                 CharacterDatabase.PExecute("DELETE FROM character_instance WHERE guid = '%d' AND instance = '%d'", GetGUIDLow(), instanceId);
                 continue;
             }
 
             if(difficulty >= MAX_DIFFICULTY)
             {
-                sLog.outError("_LoadBoundInstances: player %s(%d) has bind to not existed difficulty %d instance for map %u", GetName(), GetGUIDLow(), difficulty, mapId);
+                sLog.outError("_LoadBoundInstances: player %s(%d) has bind to nonexistent difficulty %d instance for map %u", GetName(), GetGUIDLow(), difficulty, mapId);
                 CharacterDatabase.PExecute("DELETE FROM character_instance WHERE guid = '%d' AND instance = '%d'", GetGUIDLow(), instanceId);
                 continue;
             }
@@ -16414,7 +16453,7 @@ void Player::_LoadBoundInstances(QueryResult *result)
             MapDifficulty const* mapDiff = GetMapDifficultyData(mapId,Difficulty(difficulty));
             if(!mapDiff)
             {
-                sLog.outError("_LoadBoundInstances: player %s(%d) has bind to not existed difficulty %d instance for map %u", GetName(), GetGUIDLow(), difficulty, mapId);
+                sLog.outError("_LoadBoundInstances: player %s(%d) has bind to nonexistent difficulty %d instance for map %u", GetName(), GetGUIDLow(), difficulty, mapId);
                 CharacterDatabase.PExecute("DELETE FROM character_instance WHERE guid = '%d' AND instance = '%d'", GetGUIDLow(), instanceId);
                 continue;
             }
@@ -16970,7 +17009,13 @@ void Player::_SaveAuras()
             if (!effIndexMask)
                 continue;
 
-            CharacterDatabase.PExecute("INSERT INTO character_aura (guid, caster_guid, spell, stackcount, remaincharges, basepoints0, basepoints1, basepoints2, maxduration0, maxduration1, maxduration2, remaintime0, remaintime1, remaintime2, effIndexMask) VALUES ('%u', '" UI64FMTD "', '%u', '%u', '%u', '%d', '%d', '%d', '%d', '%d', '%d', '%d', '%d', '%d', '%u')", GetGUIDLow(), holder->GetCasterGUID(), holder->GetId(), holder->GetStackAmount(), holder->GetAuraCharges(), damage[EFFECT_INDEX_0], damage[EFFECT_INDEX_1], damage[EFFECT_INDEX_2], maxduration[EFFECT_INDEX_0], maxduration[EFFECT_INDEX_1], maxduration[EFFECT_INDEX_2], remaintime[EFFECT_INDEX_0], remaintime[EFFECT_INDEX_1], remaintime[EFFECT_INDEX_2], effIndexMask);
+            CharacterDatabase.PExecute("INSERT INTO character_aura (guid, caster_guid, item_guid, spell, stackcount, remaincharges, basepoints0, basepoints1, basepoints2, maxduration0, maxduration1, maxduration2, remaintime0, remaintime1, remaintime2, effIndexMask) VALUES "
+                "('%u', '" UI64FMTD "', '%u', '%u', '%u', '%u', '%d', '%d', '%d', '%d', '%d', '%d', '%d', '%d', '%d', '%u')",
+                GetGUIDLow(), holder->GetCasterGUID(), GUID_LOPART(holder->GetCastItemGUID()), holder->GetId(), holder->GetStackAmount(), holder->GetAuraCharges(),
+                damage[EFFECT_INDEX_0], damage[EFFECT_INDEX_1], damage[EFFECT_INDEX_2],
+                maxduration[EFFECT_INDEX_0], maxduration[EFFECT_INDEX_1], maxduration[EFFECT_INDEX_2],
+                remaintime[EFFECT_INDEX_0], remaintime[EFFECT_INDEX_1], remaintime[EFFECT_INDEX_2],
+                effIndexMask);
         }
     }
 }
@@ -18932,7 +18977,7 @@ void Player::UpdatePotionCooldown(Spell* spell)
     // Call not from spell cast, send cooldown event for item spells if no in combat
     if(!spell)
     {
-        // spell/item pair let set proper cooldown (except not existed charged spell cooldown spellmods for potions)
+        // spell/item pair let set proper cooldown (except nonexistent charged spell cooldown spellmods for potions)
         if(ItemPrototype const* proto = ObjectMgr::GetItemPrototype(m_lastPotionId))
             for(int idx = 0; idx < 5; ++idx)
                 if(proto->Spells[idx].SpellId && proto->Spells[idx].SpellTrigger == ITEM_SPELLTRIGGER_ON_USE)
@@ -20028,7 +20073,7 @@ void Player::UpdateForQuestWorldObjects()
         }
         else if (itr->IsCreatureOrVehicle())
         {
-            Creature *obj = GetMap()->GetCreatureOrPetOrVehicle(*itr);
+            Creature *obj = GetMap()->GetAnyTypeCreature(*itr);
             if(!obj)
                 continue;
 
@@ -21325,6 +21370,11 @@ void Player::HandleFall(MovementInfo const& movementInfo)
 void Player::UpdateAchievementCriteria( AchievementCriteriaTypes type, uint32 miscvalue1/*=0*/, uint32 miscvalue2/*=0*/, Unit *unit/*=NULL*/, uint32 time/*=0*/ )
 {
     GetAchievementMgr().UpdateAchievementCriteria(type, miscvalue1,miscvalue2,unit,time);
+}
+
+void Player::StartTimedAchievementCriteria(AchievementCriteriaTypes type, uint32 timedRequirementId, time_t startTime /*= 0*/)
+{
+    GetAchievementMgr().StartTimedAchievementCriteria(type, timedRequirementId, startTime);
 }
 
 PlayerTalent const* Player::GetKnownTalentById(int32 talentId) const
