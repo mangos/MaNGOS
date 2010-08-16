@@ -2914,6 +2914,10 @@ void Spell::cast(bool skipCheck)
             // Chaos Bane strength buff
             else if (m_spellInfo->Id == 71904)
                 AddTriggeredSpell(73422);
+            else if (m_spellInfo->Id == 74607)
+                AddTriggeredSpell(74610);                  // Fiery combustion
+            else if (m_spellInfo->Id == 74799)
+                AddTriggeredSpell(74800);                  // Soul consumption
             break;
         }
         case SPELLFAMILY_MAGE:

@@ -406,6 +406,32 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                         damage *= exp(-distance/(10.0f));
                         break;
                     }
+                    case 74607:
+                    // SPELL_FIERY_COMBUSTION_EXPLODE - Ruby sanctum boss Halion,
+                    // damage proportional number of mark (74567, dummy)
+                    {
+                        if (Aura* aura = m_caster->GetAura(74567, EFFECT_INDEX_0))
+                        {
+                            if (aura->GetStackAmount() > 0)
+                                damage = 1000 * aura->GetStackAmount();
+                            m_caster->RemoveAurasDueToSpell(74567);
+                        }
+                        else damage = 0;
+                        break;
+                    }
+                    case 74799:
+                    // SPELL_SOUL_CONSUMPTION_EXPLODE - Ruby sanctum boss Halion,
+                    // damage proportional number of mark (74795, dummy)
+                    {
+                        if (Aura* aura = m_caster->GetAura(74795, EFFECT_INDEX_0))
+                        {
+                            if (aura->GetStackAmount() > 0)
+                                damage = 1000 * aura->GetStackAmount();
+                            m_caster->RemoveAurasDueToSpell(74795);
+                        }
+                        else damage = 0;
+                        break;
+                    }
                 }
                 break;
             }
