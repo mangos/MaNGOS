@@ -71,6 +71,12 @@ class WaypointManager
             return itr != m_pathMap.end() ? &itr->second : NULL;
         }
 
+        WaypointPath *GetPathTemplate(uint32 entry)
+        {
+            WaypointPathTemplateMap::iterator itr = m_pathTemplateMap.find(entry);
+            return itr != m_pathTemplateMap.end() ? &itr->second : NULL;
+        }
+
         void AddLastNode(uint32 id, float x, float y, float z, float o, uint32 delay, uint32 wpGuid);
         void AddAfterNode(uint32 id, uint32 point, float x, float y, float z, float o, uint32 delay, uint32 wpGuid);
         uint32 GetLastPoint(uint32 id, uint32 default_notfound);
@@ -86,6 +92,8 @@ class WaypointManager
 
         typedef UNORDERED_MAP<uint32, WaypointPath> WaypointPathMap;
         WaypointPathMap m_pathMap;
+        typedef UNORDERED_MAP<uint32, WaypointPath> WaypointPathTemplateMap;
+        WaypointPathTemplateMap m_pathTemplateMap;
 };
 
 #define sWaypointMgr MaNGOS::Singleton<WaypointManager>::Instance()

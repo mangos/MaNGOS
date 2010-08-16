@@ -50,11 +50,29 @@ void WaypointMovementGenerator<Creature>::LoadPath(Creature &creature)
 
     i_path = sWaypointMgr.GetPath(creature.GetDBTableGUIDLow());
 
+    // We may LoadPath() for several occasions:
+
+    // 1: When creature.MovementType=2
+    //    1a) Path is selected by creature.guid == creature_movement.id
+    //    1b) Path for 1a) does not exist and then use path from creature.GetEntry() == creature_movement_template.entry
+
+    // 2: When creature_template.MovementType=2
+    //    2a) Creature is summoned and has creature_template.MovementType=2
+    //        Creators need to be sure that creature_movement_template is always valid for summons.
+    //        Mob that can be summoned anywhere should not have creature_movement_template for example.
+
+    // No movement found for guid
     if (!i_path)
     {
-        sLog.outErrorDb("WaypointMovementGenerator::LoadPath: creature %s (Entry: %u GUID: %u) doesn't have waypoint path",
-            creature.GetName(), creature.GetEntry(), creature.GetDBTableGUIDLow());
-        return;
+        i_path = sWaypointMgr.GetPathTemplate(creature.GetEntry());
+
+        // No movement found for entry
+        if (!i_path)
+        {
+            sLog.outErrorDb("WaypointMovementGenerator::LoadPath: creature %s (Entry: %u GUID: %u) doesn't have waypoint path",
+                creature.GetName(), creature.GetEntry(), creature.GetDBTableGUIDLow());
+            return;
+        }
     }
 
     // We have to set the destination here (for the first point), right after Initialize. Without, we may not have valid xyz for GetResetPosition
@@ -266,7 +284,7 @@ bool WaypointMovementGenerator<Creature>::Update(Creature &creature, const uint3
         else
         {
             // If not stopped then stop it
-            creature.StopMoving();
+            creature.clearUnitState(UNIT_STAT_ROAMING_MOVE);
 
             SetStoppedByPlayer(false);
 
