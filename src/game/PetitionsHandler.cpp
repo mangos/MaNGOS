@@ -22,7 +22,6 @@
 #include "WorldSession.h"
 #include "World.h"
 #include "ObjectMgr.h"
-#include "ObjectGuid.h"
 #include "Log.h"
 #include "Opcodes.h"
 #include "Guild.h"
