@@ -460,66 +460,39 @@ void CreatureEventAI::ProcessAction(CreatureEventAI_Action const& action, uint32
         case ACTION_T_CAST:
         {
             Unit* target = GetTargetByType(action.cast.target, pActionInvoker);
-            Unit* caster = m_creature;
 
             if (!target)
+            {
+                sLog.outDebug("CreatureEventAI: NULL target for ACTION_T_CAST creature entry %u casting spell id %u", m_creature->GetEntry(), action.cast.spellId);
                 return;
-
-            if (action.cast.castFlags & CAST_FORCE_TARGET_SELF)
-                caster = target;
-
-            //Allowed to cast only if not casting (unless we interrupt ourself) or if spell is triggered
-            bool canCast = !caster->IsNonMeleeSpellCasted(false) || (action.cast.castFlags & (CAST_TRIGGERED | CAST_INTERRUPT_PREVIOUS));
-
-            // If cast flag CAST_AURA_NOT_PRESENT is active, check if target already has aura on them
-            if(action.cast.castFlags & CAST_AURA_NOT_PRESENT)
-            {
-                for(int i = 0; i < MAX_EFFECT_INDEX; ++i)
-                    if(target->HasAura(action.cast.spellId, SpellEffectIndex(i)))
-                        return;
             }
 
-            if (canCast)
-            {
-                const SpellEntry* tSpell = GetSpellStore()->LookupEntry(action.cast.spellId);
+            CanCastResult castResult = DoCastSpellIfCan(target, action.cast.spellId, action.cast.castFlags);
 
-                //Verify that spell exists
-                if (tSpell)
+            switch(castResult)
+            {
+                case CAST_FAIL_POWER:
+                case CAST_FAIL_TOO_FAR:
                 {
-                    //Check if cannot cast spell
-                    if (!(action.cast.castFlags & (CAST_FORCE_TARGET_SELF | CAST_FORCE_CAST)) &&
-                        !CanCast(target, tSpell, (action.cast.castFlags & CAST_TRIGGERED)))
+                    // Melee current victim if flag not set
+                    if (!(action.cast.castFlags & CAST_NO_MELEE_IF_OOM))
                     {
-                        //Melee current victim if flag not set
-                        if (!(action.cast.castFlags & CAST_NO_MELEE_IF_OOM))
+                        switch(m_creature->GetMotionMaster()->GetCurrentMovementGeneratorType())
                         {
-                            switch(m_creature->GetMotionMaster()->GetCurrentMovementGeneratorType())
-                            {
-                                case CHASE_MOTION_TYPE:
-                                case FOLLOW_MOTION_TYPE:
-                                    m_AttackDistance = 0.0f;
-                                    m_AttackAngle = 0.0f;
+                            case CHASE_MOTION_TYPE:
+                            case FOLLOW_MOTION_TYPE:
+                                m_AttackDistance = 0.0f;
+                                m_AttackAngle = 0.0f;
 
-                                    m_creature->GetMotionMaster()->Clear(false);
-                                    m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim(), m_AttackDistance, m_AttackAngle);
-                                    break;
-                            }
+                                m_creature->GetMotionMaster()->Clear(false);
+                                m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim(), m_AttackDistance, m_AttackAngle);
+                                break;
                         }
-
                     }
-                    else
-                    {
-                        //Interrupt any previous spell
-                        if (caster->IsNonMeleeSpellCasted(false) && action.cast.castFlags & CAST_INTERRUPT_PREVIOUS)
-                            caster->InterruptNonMeleeSpells(false);
-
-                        caster->CastSpell(target, action.cast.spellId, (action.cast.castFlags & CAST_TRIGGERED));
-                    }
-
+                    break;
                 }
-                else
-                    sLog.outErrorDb("CreatureEventAI: event %d creature %d attempt to cast spell that doesn't exist %d", EventId, m_creature->GetEntry(), action.cast.spellId);
             }
+
             break;
         }
         case ACTION_T_SUMMON:
