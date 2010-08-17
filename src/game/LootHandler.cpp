@@ -291,7 +291,7 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
     Player  *player = GetPlayer();
     Loot    *loot;
 
-    player->SetLootGUID(0);
+    player->SetLootGUID(ObjectGuid());
     player->SendLootRelease(lguid);
 
     player->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_LOOTING);

@@ -501,7 +501,7 @@ class ObjectMgr
         void AddGroup(Group* group);
         void RemoveGroup(Group* group);
 
-        Guild* GetGuildByLeader(uint64 const&guid) const;
+        Guild* GetGuildByLeader(ObjectGuid guid) const;
         Guild* GetGuildById(uint32 GuildId) const;
         Guild* GetGuildByName(const std::string& guildname) const;
         std::string GetGuildNameById(uint32 GuildId) const;
@@ -510,7 +510,7 @@ class ObjectMgr
 
         ArenaTeam* GetArenaTeamById(uint32 arenateamid) const;
         ArenaTeam* GetArenaTeamByName(const std::string& arenateamname) const;
-        ArenaTeam* GetArenaTeamByCaptain(uint64 const& guid) const;
+        ArenaTeam* GetArenaTeamByCaptain(ObjectGuid guid) const;
         void AddArenaTeam(ArenaTeam* arenaTeam);
         void RemoveArenaTeam(uint32 Id);
         ArenaTeamMap::iterator GetArenaTeamMapBegin() { return mArenaTeamMap.begin(); }
@@ -560,9 +560,9 @@ class ObjectMgr
         void GetPlayerLevelInfo(uint32 race, uint32 class_,uint32 level, PlayerLevelInfo* info) const;
 
         uint64 GetPlayerGUIDByName(std::string name) const;
-        bool GetPlayerNameByGUID(const uint64 &guid, std::string &name) const;
-        uint32 GetPlayerTeamByGUID(const uint64 &guid) const;
-        uint32 GetPlayerAccountIdByGUID(const uint64 &guid) const;
+        bool GetPlayerNameByGUID(ObjectGuid guid, std::string &name) const;
+        uint32 GetPlayerTeamByGUID(ObjectGuid guid) const;
+        uint32 GetPlayerAccountIdByGUID(ObjectGuid guid) const;
         uint32 GetPlayerAccountIdByPlayerName(const std::string& name) const;
 
         uint32 GetNearestTaxiNode( float x, float y, float z, uint32 mapid, uint32 team );

@@ -230,10 +230,10 @@ std::string ObjectMgr::GetGuildNameById(uint32 GuildId) const
     return "";
 }
 
-Guild* ObjectMgr::GetGuildByLeader(const uint64 &guid) const
+Guild* ObjectMgr::GetGuildByLeader(ObjectGuid guid) const
 {
     for(GuildMap::const_iterator itr = mGuildMap.begin(); itr != mGuildMap.end(); ++itr)
-        if (itr->second->GetLeader() == guid)
+        if (itr->second->GetLeader() == guid.GetRawValue())
             return itr->second;
 
     return NULL;
@@ -257,10 +257,10 @@ ArenaTeam* ObjectMgr::GetArenaTeamByName(const std::string& arenateamname) const
     return NULL;
 }
 
-ArenaTeam* ObjectMgr::GetArenaTeamByCaptain(uint64 const& guid) const
+ArenaTeam* ObjectMgr::GetArenaTeamByCaptain(ObjectGuid guid) const
 {
     for(ArenaTeamMap::const_iterator itr = mArenaTeamMap.begin(); itr != mArenaTeamMap.end(); ++itr)
-        if (itr->second->GetCaptain() == guid)
+        if (itr->second->GetCaptain() == guid.GetRawValue())
             return itr->second;
 
     return NULL;
@@ -1645,7 +1645,7 @@ uint64 ObjectMgr::GetPlayerGUIDByName(std::string name) const
     QueryResult *result = CharacterDatabase.PQuery("SELECT guid FROM characters WHERE name = '%s'", name.c_str());
     if(result)
     {
-        guid = MAKE_NEW_GUID((*result)[0].GetUInt32(), 0, HIGHGUID_PLAYER);
+        guid = ObjectGuid(HIGHGUID_PLAYER, (*result)[0].GetUInt32()).GetRawValue();
 
         delete result;
     }
@@ -1653,7 +1653,7 @@ uint64 ObjectMgr::GetPlayerGUIDByName(std::string name) const
     return guid;
 }
 
-bool ObjectMgr::GetPlayerNameByGUID(const uint64 &guid, std::string &name) const
+bool ObjectMgr::GetPlayerNameByGUID(ObjectGuid guid, std::string &name) const
 {
     // prevent DB access for online player
     if(Player* player = GetPlayer(guid))
@@ -1662,7 +1662,9 @@ bool ObjectMgr::GetPlayerNameByGUID(const uint64 &guid, std::string &name) const
         return true;
     }
 
-    QueryResult *result = CharacterDatabase.PQuery("SELECT name FROM characters WHERE guid = '%u'", GUID_LOPART(guid));
+    uint32 lowguid = guid.GetCounter();
+
+    QueryResult *result = CharacterDatabase.PQuery("SELECT name FROM characters WHERE guid = '%u'", lowguid);
 
     if(result)
     {
@@ -1674,17 +1676,17 @@ bool ObjectMgr::GetPlayerNameByGUID(const uint64 &guid, std::string &name) const
     return false;
 }
 
-uint32 ObjectMgr::GetPlayerTeamByGUID(const uint64 &guid) const
+uint32 ObjectMgr::GetPlayerTeamByGUID(ObjectGuid guid) const
 {
     // prevent DB access for online player
-    if(Player* player = GetPlayer(guid))
-    {
+    if (Player* player = GetPlayer(guid))
         return Player::TeamForRace(player->getRace());
-    }
 
-    QueryResult *result = CharacterDatabase.PQuery("SELECT race FROM characters WHERE guid = '%u'", GUID_LOPART(guid));
+    uint32 lowguid = guid.GetCounter();
 
-    if(result)
+    QueryResult *result = CharacterDatabase.PQuery("SELECT race FROM characters WHERE guid = '%u'", lowguid);
+
+    if (result)
     {
         uint8 race = (*result)[0].GetUInt8();
         delete result;
@@ -1694,16 +1696,16 @@ uint32 ObjectMgr::GetPlayerTeamByGUID(const uint64 &guid) const
     return 0;
 }
 
-uint32 ObjectMgr::GetPlayerAccountIdByGUID(const uint64 &guid) const
+uint32 ObjectMgr::GetPlayerAccountIdByGUID(ObjectGuid guid) const
 {
     // prevent DB access for online player
     if(Player* player = GetPlayer(guid))
-    {
         return player->GetSession()->GetAccountId();
-    }
 
-    QueryResult *result = CharacterDatabase.PQuery("SELECT account FROM characters WHERE guid = '%u'", GUID_LOPART(guid));
-    if(result)
+    uint32 lowguid = guid.GetCounter();
+
+    QueryResult *result = CharacterDatabase.PQuery("SELECT account FROM characters WHERE guid = '%u'", lowguid);
+    if (result)
     {
         uint32 acc = (*result)[0].GetUInt32();
         delete result;

@@ -1757,8 +1757,7 @@ void BattleGroundMgr::DistributeArenaPoints()
         //update to database
         CharacterDatabase.PExecute("UPDATE characters SET arenaPoints = arenaPoints + '%u' WHERE guid = '%u'", plr_itr->second, plr_itr->first);
         //add points if player is online
-        Player* pl = sObjectMgr.GetPlayer(plr_itr->first);
-        if (pl)
+        if (Player* pl = sObjectMgr.GetPlayer(ObjectGuid(HIGHGUID_PLAYER, plr_itr->first)))
             pl->ModifyArenaPoints(plr_itr->second);
     }
 

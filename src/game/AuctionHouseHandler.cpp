@@ -80,12 +80,12 @@ void WorldSession::SendAuctionCommandResult(uint32 auctionId, uint32 Action, uin
 }
 
 // this function sends notification, if bidder is online
-void WorldSession::SendAuctionBidderNotification( uint32 location, uint32 auctionId, uint64 bidder, uint32 bidSum, uint32 diff, uint32 item_template)
+void WorldSession::SendAuctionBidderNotification( uint32 location, uint32 auctionId, ObjectGuid bidderGuid, uint32 bidSum, uint32 diff, uint32 item_template)
 {
     WorldPacket data(SMSG_AUCTION_BIDDER_NOTIFICATION, (8*4));
     data << uint32(location);
     data << uint32(auctionId);
-    data << uint64(bidder);
+    data << bidderGuid;
     data << uint32(bidSum);
     data << uint32(diff);
     data << uint32(item_template);
@@ -110,7 +110,7 @@ void WorldSession::SendAuctionOwnerNotification( AuctionEntry* auction)
 // this function sends mail to old bidder
 void WorldSession::SendAuctionOutbiddedMail(AuctionEntry *auction, uint32 newPrice)
 {
-    uint64 oldBidder_guid = MAKE_NEW_GUID(auction->bidder,0, HIGHGUID_PLAYER);
+    ObjectGuid oldBidder_guid = ObjectGuid(HIGHGUID_PLAYER, auction->bidder);
     Player *oldBidder = sObjectMgr.GetPlayer(oldBidder_guid);
 
     uint32 oldBidder_accId = 0;
@@ -127,7 +127,9 @@ void WorldSession::SendAuctionOutbiddedMail(AuctionEntry *auction, uint32 newPri
             oldBidder->GetSession()->SendAuctionBidderNotification( auction->GetHouseId(), auction->Id, auctionbot.GetAHBplayerGUID(), newPrice, auction->GetAuctionOutBid(), auction->item_template);
 
         if (oldBidder && _player)
-            oldBidder->GetSession()->SendAuctionBidderNotification( auction->GetHouseId(), auction->Id, _player->GetGUID(), newPrice, auction->GetAuctionOutBid(), auction->item_template);
+            oldBidder->GetSession()->SendAuctionBidderNotification(
+                auction->GetHouseId(), auction->Id, _player->GetObjectGuid(),
+                newPrice, auction->GetAuctionOutBid(), auction->item_template);
 
         MailDraft(msgAuctionOutbiddedSubject.str(), "")     // TODO: fix body
             .AddMoney(auction->bid)
@@ -138,7 +140,7 @@ void WorldSession::SendAuctionOutbiddedMail(AuctionEntry *auction, uint32 newPri
 // this function sends mail, when auction is cancelled to old bidder
 void WorldSession::SendAuctionCancelledToBidderMail( AuctionEntry* auction )
 {
-    uint64 bidder_guid = MAKE_NEW_GUID(auction->bidder, 0, HIGHGUID_PLAYER);
+    ObjectGuid bidder_guid = ObjectGuid(HIGHGUID_PLAYER, auction->bidder);
     Player *bidder = sObjectMgr.GetPlayer(bidder_guid);
 
     uint32 bidder_accId = 0;
@@ -348,9 +350,11 @@ void WorldSession::HandleAuctionPlaceBid( WorldPacket & recv_data )
         return;
     }
 
+    ObjectGuid ownerGuid = ObjectGuid(HIGHGUID_PLAYER, auction->owner);
+
     // impossible have online own another character (use this for speedup check in case online owner)
-    Player* auction_owner = sObjectMgr.GetPlayer(MAKE_NEW_GUID(auction->owner, 0, HIGHGUID_PLAYER));
-    if( !auction_owner && sObjectMgr.GetPlayerAccountIdByGUID(MAKE_NEW_GUID(auction->owner, 0, HIGHGUID_PLAYER)) == pl->GetSession()->GetAccountId())
+    Player* auction_owner = sObjectMgr.GetPlayer(ownerGuid);
+    if (!auction_owner && sObjectMgr.GetPlayerAccountIdByGUID(ownerGuid) == pl->GetSession()->GetAccountId())
     {
         // you cannot bid your another character auction:
         SendAuctionCommandResult( 0, AUCTION_PLACE_BID, CANNOT_BID_YOUR_AUCTION_ERROR );
