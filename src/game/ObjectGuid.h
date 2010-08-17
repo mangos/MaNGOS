@@ -22,6 +22,8 @@
 #include "Common.h"
 #include "ByteBuffer.h"
 
+#include <functional>
+
 enum TypeID
 {
     TYPEID_OBJECT        = 0,
@@ -276,5 +278,20 @@ ByteBuffer& operator<< (ByteBuffer& buf, PackedGuid const& guid);
 ByteBuffer& operator>> (ByteBuffer& buf, PackedGuidReader const& guid);
 
 inline PackedGuid ObjectGuid::WriteAsPacked() const { return PackedGuid(*this); }
+
+HASH_NAMESPACE_START
+
+    template<>
+    class hash<ObjectGuid>
+    {
+        public:
+
+            size_t operator() (ObjectGuid const& key) const
+            {
+                return hash<uint64>()(key.GetRawValue());
+            }
+    };
+
+HASH_NAMESPACE_END
 
 #endif

@@ -35,33 +35,64 @@
 #endif
 
 #ifdef _STLPORT_VERSION
-#define UNORDERED_MAP std::hash_map
+#  define UNORDERED_MAP std::hash_map
+#  define HASH_NAMESPACE_START namespace std {
+#  define HASH_NAMESPACE_END }
 using std::hash_map;
 #elif COMPILER == COMPILER_MICROSOFT && _MSC_VER >= 1500 && _HAS_TR1
-#define UNORDERED_MAP std::tr1::unordered_map
+#  define UNORDERED_MAP std::tr1::unordered_map
+#  define HASH_NAMESPACE_START namespace std {
+#  define HASH_NAMESPACE_END }
 #elif COMPILER == COMPILER_MICROSOFT && _MSC_VER >= 1300
-#define UNORDERED_MAP stdext::hash_map
+#  define UNORDERED_MAP stdext::hash_map
+#  define HASH_NAMESPACE_START namespace stdext {
+#  define HASH_NAMESPACE_END }
 using stdext::hash_map;
+
+#if !_HAS_TRADITIONAL_STL
+
+// can be not used by some platforms, so provide fake forward
+HASH_NAMESPACE_START
+
+template<class K>
+class hash
+{
+    public:
+        size_t operator() (K const&);
+};
+
+HASH_NAMESPACE_END
+
+#endif
+
 #elif COMPILER == COMPILER_INTEL
-#define UNORDERED_MAP std::hash_map
+#  define UNORDERED_MAP std::hash_map
+#  define HASH_NAMESPACE_START namespace std {
+#  define HASH_NAMESPACE_END }
 using std::hash_map;
 #elif COMPILER == COMPILER_GNU && (__GNUC__ > 4 || __GNUC__ == 4 && __GNUC_MINOR__ >= 3)
 #define UNORDERED_MAP std::tr1::unordered_map
+#  define HASH_NAMESPACE_START namespace std { namespace tr1 {
+#  define HASH_NAMESPACE_END } }
 #elif COMPILER == COMPILER_GNU && __GNUC__ >= 3
-#define UNORDERED_MAP __gnu_cxx::hash_map
+#  define UNORDERED_MAP __gnu_cxx::hash_map
+#  define HASH_NAMESPACE_START namespace __gnu_cxx {
+#  define HASH_NAMESPACE_END }
 
-namespace __gnu_cxx
-{
+HASH_NAMESPACE_START
+
     template<>
-    struct hash<unsigned long long>
+    class hash<unsigned long long>
     {
-        size_t operator()(const unsigned long long &__x) const { return (size_t)__x; }
+        public:
+            size_t operator()(const unsigned long long &__x) const { return (size_t)__x; }
     };
 
     template<typename T>
-    struct hash<T *>
+    class hash<T *>
     {
-        size_t operator()(T * const &__x) const { return (size_t)__x; }
+        public:
+            size_t operator()(T * const &__x) const { return (size_t)__x; }
     };
 
     template<> struct hash<std::string>
@@ -71,10 +102,14 @@ namespace __gnu_cxx
             return hash<const char *>()(__x.c_str());
         }
     };
-};
+HASH_NAMESPACE_END
 
 #else
-#define UNORDERED_MAP std::hash_map
+#  define UNORDERED_MAP std::hash_map
+#  define HASH_NAMESPACE_START namespace std {
+#  define HASH_NAMESPACE_END }
 using std::hash_map;
+
 #endif
+
 #endif
