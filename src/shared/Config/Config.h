@@ -42,6 +42,8 @@ class MANGOS_DLL_SPEC Config
 
         std::string GetFilename() const { return mFilename; }
 
+        ACE_Thread_Mutex mMtx;
+
     private:
 
         std::string mFilename;
