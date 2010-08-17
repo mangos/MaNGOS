@@ -4,6 +4,7 @@
 #include "World.h"
 #include "Config/Config.h"
 #include "ace/Vector_T.h"
+#include "ObjectGuid.h"
 
 #define AHB_GREY        0
 #define AHB_WHITE       1
@@ -937,7 +938,7 @@ private:
     bool SellMethod;
 
     uint32 AHBplayerAccount;
-    uint32 AHBplayerGUID;
+    ObjectGuid AHBplayerGUID;
     uint32 ItemsPerCycle;
 
     bool debug_Out;
@@ -973,7 +974,7 @@ public:
     void Initialize();
     void LoadValues(AHBConfig*);
     void Commands(uint32, uint32, uint32, char*);
-    uint32 GetAHBplayerGUID() { return AHBplayerGUID; };
+    ObjectGuid GetAHBplayerGUID() { return AHBplayerGUID; };
 };
 
 #define auctionbot MaNGOS::Singleton<AuctionHouseBot>::Instance()

@@ -15236,26 +15236,28 @@ void Player::SendQuestUpdateAddCreatureOrGo( Quest const* pQuest, ObjectGuid gui
 /***                   LOAD SYSTEM                     ***/
 /*********************************************************/
 
-bool Player::MinimalLoadFromDB( QueryResult *result, uint32 guid )
+bool Player::MinimalLoadFromDB( QueryResult *result, ObjectGuid guid )
 {
     if (!guid) return false;
+
+    uint32 lowguid = guid.GetCounter();
 
     bool delete_result = true;
     if (!result)
     {
         //                                        0     1     2           3           4           5    6          7          8          9    10     11    12
-        result = CharacterDatabase.PQuery("SELECT guid, name, position_x, position_y, position_z, map, totaltime, leveltime, at_login, zone, level, race, class FROM characters WHERE guid = '%u'",guid);
+        result = CharacterDatabase.PQuery("SELECT guid, name, position_x, position_y, position_z, map, totaltime, leveltime, at_login, zone, level, race, class FROM characters WHERE guid = '%u'",lowguid);
         if (!result)
             return false;
     }
     else
         delete_result = false;
 
-    sLog.outDebug("Player #%d minimal data loaded",GUID_LOPART(guid));
+    sLog.outDebug("Player #%d minimal data loaded",lowguid);
 
     Field *fields = result->Fetch();
 
-    Object::_Create( guid, 0, HIGHGUID_PLAYER );
+    Object::_Create( lowguid, 0, HIGHGUID_PLAYER );
 
     m_name = fields[1].GetCppString();
 

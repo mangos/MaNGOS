@@ -1,5 +1,6 @@
 #include "AuctionHouseBot.h"
 #include "ObjectMgr.h"
+#include "ObjectGuid.h"
 #include "AuctionHouseMgr.h"
 
 #include "Policies/SingletonImp.h"
@@ -455,12 +456,12 @@ void AuctionHouseBot::addNewAuctionBuyerBotBid(Player *AHBplayer, AHBConfig *con
     {
         // Check if the auction is ours
         // if it is, we skip this iteration.
-        if (itr->second->owner == AHBplayerGUID)
+        if (ObjectGuid(HIGHGUID_PLAYER,itr->second->owner) == AHBplayerGUID)
         {
             continue;
         }
         // Check that we haven't bidded in this auction already.
-        if (itr->second->bidder != AHBplayerGUID)
+        if (ObjectGuid(HIGHGUID_PLAYER,itr->second->bidder) != AHBplayerGUID)
         {
             uint32 tmpdata = itr->second->Id;
             possibleBids.push_back(tmpdata);
@@ -1144,7 +1145,7 @@ void AuctionHouseBot::Commands(uint32 command, uint32 ahMapID, uint32 col, char*
 
             while (itr != auctionHouse->GetAuctionsEnd())
             {
-                if (itr->second->owner == AHBplayerGUID)
+                if (ObjectGuid(HIGHGUID_PLAYER,itr->second->owner) == AHBplayerGUID)
                     itr->second->expire_time = sWorld.GetGameTime();
 
                 ++itr;
