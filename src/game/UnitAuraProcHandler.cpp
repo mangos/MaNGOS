@@ -2017,7 +2017,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                     SpellEntry const* mote = sSpellStore.LookupEntry(71432);
                     if (!mote)
                         return SPELL_AURA_PROC_FAILED;
-                    uint32 maxStack = mote->StackAmount - (dummySpell->Id == 71545 ? 1 : 0);
+                    uint32 maxStack = mote->GetStackAmount() - (dummySpell->Id == 71545 ? 1 : 0);
 
                     SpellAuraHolder *aurHolder = GetSpellAuraHolder(71432);
                     if (aurHolder && uint32(aurHolder->GetStackAmount() +1) >= maxStack)
@@ -2266,7 +2266,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                 break;
             }
             // Flametongue Weapon (Passive), Ranks
-            if (dummySpell->SpellFamilyFlags & UI64LIT(0x0000000000200000))
+            if (dummyClassOptions && dummyClassOptions->SpellFamilyFlags & UI64LIT(0x0000000000200000))
             {
                 if (GetTypeId()!=TYPEID_PLAYER || !castItem)
                     return SPELL_AURA_PROC_FAILED;
@@ -3737,7 +3737,7 @@ SpellAuraProcResult Unit::HandleModDamagePercentDoneAuraProc(Unit* /*pVictim*/, 
         CastCustomSpell(this, 34075, &bp, NULL, NULL, true, castItem, triggeredByAura);
     }
     // Arcane Blast
-    else if (spellInfo->Id == 36032 && procSpell->SpellFamilyName == SPELLFAMILY_MAGE && procSpell->SpellIconID == 2294)
+    else if (spellInfo->Id == 36032 && procSpell->GetSpellFamilyName() == SPELLFAMILY_MAGE && procSpell->SpellIconID == 2294)
         // prevent proc from self(spell that triggered this aura)
         return SPELL_AURA_PROC_FAILED;
 

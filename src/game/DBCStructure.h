@@ -495,7 +495,7 @@ struct AchievementCriteriaEntry
                                                             // 7: ByKillNpcId,  9: ByUseItemId
     uint32  timedCriteriaMiscId;                            // 12 Alway appears with timed events, used internally to start the achievement, store 
     uint32  timeLimit;                                      // 13 time limit in seconds
-    //uint32 showOrder;                                     // 14 show order
+    uint32  showOrder;                                      // 14 show order
     //uint32 unk1;                                          // 15 all zeros
     //uint32 unk2;                                          // 16 all zeros
 
@@ -1716,11 +1716,13 @@ struct MANGOS_DLL_SPEC SpellEntry
     uint32 GetTargetCreatureType() const;
     int32 GetEffectMiscValue(SpellEffectIndex index) const;
     uint32 GetStances() const;
+    uint32 GetStancesNot() const;
     uint32 GetProcFlags() const;
     uint32 GetChannelInterruptFlags() const;
     uint32 GetManaCostPerLevel() const;
     uint32 GetCasterAuraState() const;
     uint32 GetTargets() const;
+    uint32 GetEffectApplyAuraNameByIndex(SpellEffectIndex index) const;
 
 private:
     // prevent creating custom entries (copy data from original in fact)

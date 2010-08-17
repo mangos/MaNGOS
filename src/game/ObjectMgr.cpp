@@ -5291,10 +5291,13 @@ void ObjectMgr::LoadEventIdScripts()
         {
             for(int j = 0; j < MAX_EFFECT_INDEX; ++j)
             {
-                if( spell->Effect[j] == SPELL_EFFECT_SEND_EVENT )
+                SpellEffectEntry const* spellEffect = spell->GetSpellEffect(SpellEffectIndex(j));
+                if(!spellEffect)
+                    continue;
+                if(spellEffect->Effect == SPELL_EFFECT_SEND_EVENT)
                 {
-                    if (spell->EffectMiscValue[j])
-                        evt_scripts.insert(spell->EffectMiscValue[j]);
+                    if (spellEffect->EffectMiscValue)
+                        evt_scripts.insert(spellEffect->EffectMiscValue);
                 }
             }
         }

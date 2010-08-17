@@ -306,6 +306,12 @@ uint32 SpellEntry::GetStances() const
     return ss ? ss->Stances : 0;
 }
 
+uint32 SpellEntry::GetStancesNot() const
+{
+    SpellShapeshiftEntry const* ss = GetSpellShapeshift();
+    return ss ? ss->StancesNot : 0;
+}
+
 uint32 SpellEntry::GetProcFlags() const
 {
     SpellAuraOptionsEntry const* aura = GetSpellAuraOptions();
@@ -334,4 +340,10 @@ uint32 SpellEntry::GetTargets() const
 {
     SpellTargetRestrictionsEntry const* target = GetSpellTargetRestrictions();
     return target ? target->Targets : 0;
+}
+
+uint32 SpellEntry::GetEffectApplyAuraNameByIndex(SpellEffectIndex index) const
+{
+    SpellEffectEntry const* effect = GetSpellEffect(index);
+    return effect ? effect->EffectApplyAuraName : 0;
 }

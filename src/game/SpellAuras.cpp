@@ -955,14 +955,18 @@ bool Aura::CanProcFrom(SpellEntry const *spell, uint32 EventProcEx, uint32 procE
     }
     else
     {
-        // Check family name
-        if (spell->SpellFamilyName != GetSpellProto()->SpellFamilyName)
-            return false;
-
-        if (((uint64*)ptr)[0] & spell->SpellFamilyFlags)
+        SpellClassOptionsEntry const* classOpt = spell->GetSpellClassOptions();
+        if(!classOpt)
             return true;
 
-        if (ptr[2] & spell->SpellFamilyFlags2)
+        // Check family name
+        if (classOpt->SpellFamilyName != GetSpellProto()->GetSpellFamilyName())
+            return false;
+
+        if (((uint64*)ptr)[0] & classOpt->SpellFamilyFlags)
+            return true;
+
+        if (ptr[2] & classOpt->SpellFamilyFlags2)
             return true;
     }
     return false;
@@ -5960,7 +5964,7 @@ void Aura::HandleShapeshiftBoosts(bool apply)
             {
                 SpellEntry const *spellInfo = itr->second->GetSpellProto();
                 if (itr->second->IsPassive() && (spellInfo->AttributesEx2 & SPELL_ATTR_EX2_NOT_NEED_SHAPESHIFT)
-                    && (spellInfo->StancesNot & (1<<(form-1))))
+                    && (spellInfo->GetStancesNot() & (1<<(form-1))))
                 {
                     target->RemoveAurasDueToSpell(itr->second->GetId());
                     itr = tAuras.begin();
@@ -6063,7 +6067,7 @@ void Aura::HandleShapeshiftBoosts(bool apply)
                 SpellEntry const *spellInfo = sSpellStore.LookupEntry(itr->first);
                 if (!spellInfo || !IsPassiveSpell(spellInfo))
                     continue;
-                if ((spellInfo->AttributesEx2 & SPELL_ATTR_EX2_NOT_NEED_SHAPESHIFT) && spellInfo->StancesNot & (1<<(form-1)))
+                if ((spellInfo->AttributesEx2 & SPELL_ATTR_EX2_NOT_NEED_SHAPESHIFT) && spellInfo->GetStancesNot() & (1<<(form-1)))
                     target->CastSpell(target, itr->first, true, NULL, this);
             }
         }
@@ -7256,7 +7260,7 @@ void Aura::PeriodicDummyTick()
             }
 
             // Drink (item drink spells)
-            if (GetEffIndex() > EFFECT_INDEX_0 && spell->EffectApplyAuraName[GetEffIndex()-1] == SPELL_AURA_MOD_POWER_REGEN)
+            if (GetEffIndex() > EFFECT_INDEX_0 && spell->GetEffectApplyAuraNameByIndex(SpellEffectIndex(GetEffIndex()-1)) == SPELL_AURA_MOD_POWER_REGEN)
             {
                 if (target->GetTypeId() != TYPEID_PLAYER)
                     return;
@@ -8070,11 +8074,11 @@ void SpellAuraHolder::CleanupTriggeredSpells()
 {
     for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
     {
-        if (!m_spellProto->EffectApplyAuraName[i])
-            continue;
-
         SpellEffectEntry const* spellEffect = m_spellProto->GetSpellEffect(SpellEffectIndex(i));
         if(!spellEffect)
+            continue;
+
+        if (!spellEffect->EffectApplyAuraName)
             continue;
 
         uint32 tSpellId = spellEffect->EffectTriggerSpell;
@@ -8897,7 +8901,7 @@ void SpellAuraHolder::RefreshHolder()
 
 bool SpellAuraHolder::HasMechanic(uint32 mechanic) const
 {
-    if (mechanic == m_spellProto->Mechanic)
+    if (mechanic == m_spellProto->GetMechanic())
         return true;
 
     for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
@@ -8913,7 +8917,7 @@ bool SpellAuraHolder::HasMechanic(uint32 mechanic) const
 
 bool SpellAuraHolder::HasMechanicMask(uint32 mechanicMask) const
 {
-    if (mechanicMask & (1 << (m_spellProto->Mechanic - 1)))
+    if (mechanicMask & (1 << (m_spellProto->GetMechanic() - 1)))
         return true;
 
     for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)

@@ -2431,7 +2431,7 @@ void Spell::EffectDummy(SpellEffectEntry const* effect)
                 return;
             }
             // Flametongue Weapon Proc, Ranks
-            if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0000000000200000))
+            if (shamClassOptions && shamClassOptions->SpellFamilyFlags & UI64LIT(0x0000000000200000))
             {
                 if (!m_CastItem)
                 {

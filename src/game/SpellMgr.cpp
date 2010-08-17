@@ -1721,12 +1721,15 @@ bool SpellMgr::canStackSpellRanksInSpellBook(SpellEntry const *spellInfo) const
         switch(spellInfo->GetSpellFamilyName())
         {
             case SPELLFAMILY_PALADIN:
-                // Paladin aura Spell
-                if (spellEffect->Effect == SPELL_EFFECT_APPLY_AREA_AURA_RAID)
-                    return false;
-                // Seal of Righteousness, 2 version of same rank
-                if ((spellInfo->SpellFamilyFlags & UI64LIT(0x0000000008000000)) && spellInfo->SpellIconID == 25)
-                    return false;
+                {
+                    // Paladin aura Spell
+                    if (spellEffect->Effect == SPELL_EFFECT_APPLY_AREA_AURA_RAID)
+                        return false;
+                    // Seal of Righteousness, 2 version of same rank
+                    SpellClassOptionsEntry const* classOptions = spellInfo->GetSpellClassOptions();
+                    if (classOptions && (classOptions->SpellFamilyFlags & UI64LIT(0x0000000008000000)) && spellInfo->SpellIconID == 25)
+                        return false;
+                }
                 break;
             case SPELLFAMILY_DRUID:
                 // Druid form Spell
