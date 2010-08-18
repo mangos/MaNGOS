@@ -55,6 +55,6 @@ EXTRA_DIST = \
 	Utilities/ByteConverter.h \
 	Utilities/Callback.h \
 	Utilities/EventProcessor.h \
-	Utilities/UnorderedMap.h \
+	Utilities/UnorderedMapSet.h \
 	Utilities/LinkedList.h \
 	Utilities/TypeList.h

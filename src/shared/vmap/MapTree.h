@@ -20,7 +20,7 @@
 #define _MAPTREE_H
 
 #include "Platform/Define.h"
-#include "Utilities/UnorderedMap.h"
+#include "Utilities/UnorderedMapSet.h"
 #include "BIH.h"
 
 namespace VMAP
