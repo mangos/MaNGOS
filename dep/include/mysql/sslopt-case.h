@@ -13,18 +13,16 @@
    along with this program; if not, write to the Free Software
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
 
-/* Defines that are unique to the embedded version of MySQL */
-
-#ifdef EMBEDDED_LIBRARY
-
-/* Things we don't need in the embedded version of MySQL */
-/* TODO HF add #undef HAVE_VIO if we don't want client in embedded library */
-
-#undef HAVE_PSTACK				/* No stacktrace */
-#undef HAVE_OPENSSL
-#undef HAVE_SMEM				/* No shared memory */
-#undef HAVE_NDBCLUSTER_DB /* No NDB cluster */
-
-#define DONT_USE_RAID
-
-#endif /* EMBEDDED_LIBRARY */
+#ifdef HAVE_OPENSSL
+    case OPT_SSL_KEY:
+    case OPT_SSL_CERT:
+    case OPT_SSL_CA:
+    case OPT_SSL_CAPATH:
+    case OPT_SSL_CIPHER:
+    /*
+      Enable use of SSL if we are using any ssl option
+      One can disable SSL later by using --skip-ssl or --ssl=0
+    */
+      opt_use_ssl= 1;
+      break;
+#endif

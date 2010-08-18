@@ -13,18 +13,19 @@
    along with this program; if not, write to the Free Software
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
 
-/* Defines that are unique to the embedded version of MySQL */
-
-#ifdef EMBEDDED_LIBRARY
-
-/* Things we don't need in the embedded version of MySQL */
-/* TODO HF add #undef HAVE_VIO if we don't want client in embedded library */
-
-#undef HAVE_PSTACK				/* No stacktrace */
-#undef HAVE_OPENSSL
-#undef HAVE_SMEM				/* No shared memory */
-#undef HAVE_NDBCLUSTER_DB /* No NDB cluster */
-
-#define DONT_USE_RAID
-
-#endif /* EMBEDDED_LIBRARY */
+#ifdef HAVE_OPENSSL
+#ifdef SSL_VARS_NOT_STATIC
+#define SSL_STATIC
+#else
+#define SSL_STATIC static
+#endif
+SSL_STATIC my_bool opt_use_ssl  = 0;
+SSL_STATIC char *opt_ssl_ca     = 0;
+SSL_STATIC char *opt_ssl_capath = 0;
+SSL_STATIC char *opt_ssl_cert   = 0;
+SSL_STATIC char *opt_ssl_cipher = 0;
+SSL_STATIC char *opt_ssl_key    = 0;
+#ifdef MYSQL_CLIENT
+SSL_STATIC my_bool opt_ssl_verify_server_cert= 0;
+#endif
+#endif
