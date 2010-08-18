@@ -142,16 +142,15 @@ enum Target
 
 enum EventFlags
 {
-    EFLAG_REPEATABLE            = 0x0001,                   //Event repeats
-    EFLAG_DIFFICULTY_0          = 0x0002,                   //Event only occurs in instance difficulty 0
-    EFLAG_DIFFICULTY_1          = 0x0004,                   //Event only occurs in instance difficulty 1
-    EFLAG_DIFFICULTY_2          = 0x0008,                   //Event only occurs in instance difficulty 2
-    EFLAG_DIFFICULTY_3          = 0x0010,                   //Event only occurs in instance difficulty 3
-    EFLAG_RESERVED_5            = 0x0020,
-    EFLAG_RESERVED_6            = 0x0040,
-    EFLAG_DEBUG_ONLY            = 0x0080,                   //Event only occurs in debug build
-    EFLAG_RANDOM_ACTION         = 0x0100,                   //Event only execute one from existed actions instead each action.
-
+    EFLAG_REPEATABLE            = 0x01,                     //Event repeats
+    EFLAG_DIFFICULTY_0          = 0x02,                     //Event only occurs in instance difficulty 0
+    EFLAG_DIFFICULTY_1          = 0x04,                     //Event only occurs in instance difficulty 1
+    EFLAG_DIFFICULTY_2          = 0x08,                     //Event only occurs in instance difficulty 2
+    EFLAG_DIFFICULTY_3          = 0x10,                     //Event only occurs in instance difficulty 3
+    EFLAG_RANDOM_ACTION         = 0x20,                     //Event only execute one from existed actions instead each action.
+    EFLAG_RESERVED_6            = 0x40,
+    EFLAG_DEBUG_ONLY            = 0x80,                     //Event only occurs in debug build
+    // no free bits, uint8 field
     EFLAG_DIFFICULTY_ALL        = (EFLAG_DIFFICULTY_0|EFLAG_DIFFICULTY_1|EFLAG_DIFFICULTY_2|EFLAG_DIFFICULTY_3)
 };
 

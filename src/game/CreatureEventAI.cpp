@@ -372,9 +372,15 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
 
             // find selected action, skipping not used
             uint32 j = 0;
-            for (; idx; ++j)
+            for (; ; ++j)
+            {
                 if (pHolder.Event.action[j].type != ACTION_T_NONE)
+                {
+                    if (!idx)
+                        break;
                     --idx;
+                }
+            }
 
             ProcessAction(pHolder.Event.action[j], rnd, pHolder.Event.event_id, pActionInvoker);
         }
