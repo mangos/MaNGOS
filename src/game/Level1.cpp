@@ -415,8 +415,8 @@ bool ChatHandler::HandleNamegoCommand(char* args)
 
             // we are in instance, and can summon only player in our group with us as lead
             if (!m_session->GetPlayer()->GetGroup() || !target->GetGroup() ||
-                (target->GetGroup()->GetLeaderGUID() != m_session->GetPlayer()->GetGUID()) ||
-                (m_session->GetPlayer()->GetGroup()->GetLeaderGUID() != m_session->GetPlayer()->GetGUID()))
+                (target->GetGroup()->GetLeaderGuid() != m_session->GetPlayer()->GetObjectGuid()) ||
+                (m_session->GetPlayer()->GetGroup()->GetLeaderGuid() != m_session->GetPlayer()->GetObjectGuid()))
                 // the last check is a bit excessive, but let it be, just in case
             {
                 PSendSysMessage(LANG_CANNOT_SUMMON_TO_INST,nameLink.c_str());
@@ -1931,8 +1931,8 @@ bool ChatHandler::HandleGroupgoCommand(char* args)
 
     // we are in instance, and can summon only player in our group with us as lead
     if ( to_instance && (
-        !m_session->GetPlayer()->GetGroup() || (grp->GetLeaderGUID() != m_session->GetPlayer()->GetGUID()) ||
-        (m_session->GetPlayer()->GetGroup()->GetLeaderGUID() != m_session->GetPlayer()->GetGUID()) ) )
+        !m_session->GetPlayer()->GetGroup() || (grp->GetLeaderGuid() != m_session->GetPlayer()->GetObjectGuid()) ||
+        (m_session->GetPlayer()->GetGroup()->GetLeaderGuid() != m_session->GetPlayer()->GetObjectGuid()) ) )
         // the last check is a bit excessive, but let it be, just in case
     {
         SendSysMessage(LANG_CANNOT_SUMMON_TO_INST);

@@ -27,7 +27,7 @@
 static void AttemptJoin(Player* _player)
 {
     // skip not can autojoin cases and player group case
-    if(!_player->m_lookingForGroup.canAutoJoin() || _player->GetGroup())
+    if (!_player->m_lookingForGroup.canAutoJoin() || _player->GetGroup())
         return;
 
     //TODO: Guard Player Map
@@ -37,26 +37,26 @@ static void AttemptJoin(Player* _player)
         Player *plr = iter->second;
 
         // skip enemies and self
-        if(!plr || plr==_player || plr->GetTeam() != _player->GetTeam())
+        if (!plr || plr==_player || plr->GetTeam() != _player->GetTeam())
             continue;
 
         //skip players not in world
-        if(!plr->IsInWorld())
+        if (!plr->IsInWorld())
             continue;
 
         // skip not auto add, not group leader cases
-        if (!plr->GetSession()->LookingForGroup_auto_add || (plr->GetGroup() && plr->GetGroup()->GetLeaderGUID()!=plr->GetGUID()))
+        if (!plr->GetSession()->LookingForGroup_auto_add || (plr->GetGroup() && plr->GetGroup()->GetLeaderGuid() != plr->GetObjectGuid()))
             continue;
 
         // skip non auto-join or empty slots, or non compatible slots
-        if(!plr->m_lookingForGroup.more.canAutoJoin() || !_player->m_lookingForGroup.HaveInSlot(plr->m_lookingForGroup.more))
+        if (!plr->m_lookingForGroup.more.canAutoJoin() || !_player->m_lookingForGroup.HaveInSlot(plr->m_lookingForGroup.more))
             continue;
 
         // attempt create group, or skip
-        if(!plr->GetGroup())
+        if (!plr->GetGroup())
         {
             Group* group = new Group;
-            if(!group->Create(plr->GetGUID(), plr->GetName()))
+            if (!group->Create(plr->GetObjectGuid(), plr->GetName()))
             {
                 delete group;
                 continue;
@@ -66,7 +66,7 @@ static void AttemptJoin(Player* _player)
         }
 
         // stop at success join
-        if(plr->GetGroup()->AddMember(_player->GetGUID(), _player->GetName()))
+        if(plr->GetGroup()->AddMember(_player->GetObjectGuid(), _player->GetName()))
         {
             if( sWorld.getConfig(CONFIG_BOOL_RESTRICTED_LFG_CHANNEL) && _player->GetSession()->GetSecurity() == SEC_PLAYER )
                 _player->LeaveLFGChannel();
@@ -84,7 +84,7 @@ static void AttemptJoin(Player* _player)
 static void AttemptAddMore(Player* _player)
 {
     // skip not group leader case
-    if(_player->GetGroup() && _player->GetGroup()->GetLeaderGUID()!=_player->GetGUID())
+    if (_player->GetGroup() && _player->GetGroup()->GetLeaderGuid() != _player->GetObjectGuid())
         return;
 
     if(!_player->m_lookingForGroup.more.canAutoJoin())
@@ -97,7 +97,7 @@ static void AttemptAddMore(Player* _player)
         Player *plr = iter->second;
 
         // skip enemies and self
-        if(!plr || plr==_player || plr->GetTeam() != _player->GetTeam())
+        if (!plr || plr==_player || plr->GetTeam() != _player->GetTeam())
             continue;
 
         if(!plr->IsInWorld())
@@ -114,7 +114,7 @@ static void AttemptAddMore(Player* _player)
         if(!_player->GetGroup())
         {
             Group* group = new Group;
-            if(!group->Create(_player->GetGUID(), _player->GetName()))
+            if(!group->Create(_player->GetObjectGuid(), _player->GetName()))
             {
                 delete group;
                 return;                                     // can't create group (??)
@@ -124,7 +124,7 @@ static void AttemptAddMore(Player* _player)
         }
 
         // stop at join fail (full)
-        if(!_player->GetGroup()->AddMember(plr->GetGUID(), plr->GetName()) )
+        if(!_player->GetGroup()->AddMember(plr->GetObjectGuid(), plr->GetName()) )
         {
             if( sWorld.getConfig(CONFIG_BOOL_RESTRICTED_LFG_CHANNEL) && _player->GetSession()->GetSecurity() == SEC_PLAYER )
                 _player->LeaveLFGChannel();

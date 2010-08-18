@@ -23,6 +23,7 @@
 #include "SharedDefines.h"
 #include "Map.h"
 #include "ByteBuffer.h"
+#include "ObjectGuid.h"
 
 // magic event-numbers
 #define BG_EVENT_NONE 255
@@ -481,7 +482,7 @@ class BattleGround
 
         virtual void AddPlayer(Player *plr);                // must be implemented in BG subclass
 
-        void AddOrSetPlayerToCorrectBgGroup(Player *plr, uint64 plr_guid, uint32 team);
+        void AddOrSetPlayerToCorrectBgGroup(Player *plr, ObjectGuid plr_guid, uint32 team);
 
         virtual void RemovePlayerAtLeave(uint64 guid, bool Transport, bool SendPacket);
                                                             // can be extended in in BG subclass

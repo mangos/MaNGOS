@@ -147,7 +147,7 @@ void WorldSession::HandleBattlemasterJoinOpcode( WorldPacket & recv_data )
         // no group found, error
         if (!grp)
             return;
-        if(grp->GetLeaderGUID() != _player->GetGUID())
+        if (grp->GetLeaderGuid() != _player->GetObjectGuid())
             return;
         err = grp->CanJoinBattleGroundQueue(bg, bgQueueTypeId, 0, bg->GetMaxPlayersPerTeam(), false, 0);
         isPremade = (grp->GetMembersCount() >= bg->GetMinPlayersPerTeam());
@@ -670,7 +670,7 @@ void WorldSession::HandleBattlemasterJoinArena( WorldPacket & recv_data )
         // no group found, error
         if (!grp)
             return;
-        if(grp->GetLeaderGUID() != _player->GetGUID())
+        if (grp->GetLeaderGuid() != _player->GetObjectGuid())
             return;
         // may be Group::CanJoinBattleGroundQueue should be moved to player class...
         err = grp->CanJoinBattleGroundQueue(bg, bgQueueTypeId, arenatype, arenatype, (bool)isRated, arenaslot);

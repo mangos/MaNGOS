@@ -2017,13 +2017,13 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                         if( targetOwner->GetTypeId() == TYPEID_PLAYER &&
                             target->GetTypeId() == TYPEID_UNIT && (((Creature*)target)->isPet()) &&
                             target->GetOwnerGUID() == targetOwner->GetGUID() &&
-                            pGroup->IsMember(((Player*)targetOwner)->GetGUID()))
+                            pGroup->IsMember(((Player*)targetOwner)->GetObjectGuid()))
                         {
                             targetUnitMap.push_back(target);
                         }
                     }
                     // 1Our target can be a player who is on our group
-                    else if (target->GetTypeId() == TYPEID_PLAYER && pGroup->IsMember(((Player*)target)->GetGUID()))
+                    else if (target->GetTypeId() == TYPEID_PLAYER && pGroup->IsMember(((Player*)target)->GetObjectGuid()))
                     {
                         targetUnitMap.push_back(target);
                     }
