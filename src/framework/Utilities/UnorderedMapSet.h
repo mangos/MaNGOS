@@ -46,11 +46,16 @@
 #  define HASH_NAMESPACE_END }
 using std::hash_map;
 using std::hash_set;
-#elif COMPILER == COMPILER_MICROSOFT && _MSC_VER >= 1500 && _HAS_TR1
+#elif COMPILER == COMPILER_MICROSOFT && _MSC_VER >= 1600    // VS100
 #  define UNORDERED_MAP std::tr1::unordered_map
 #  define UNORDERED_SET std::tr1::unordered_set
 #  define HASH_NAMESPACE_START namespace std {
 #  define HASH_NAMESPACE_END }
+#elif COMPILER == COMPILER_MICROSOFT && _MSC_VER >= 1500 && _HAS_TR1
+#  define UNORDERED_MAP std::tr1::unordered_map
+#  define UNORDERED_SET std::tr1::unordered_set
+#  define HASH_NAMESPACE_START namespace std { namespace tr1 {
+#  define HASH_NAMESPACE_END } }
 #elif COMPILER == COMPILER_MICROSOFT && _MSC_VER >= 1300
 #  define UNORDERED_MAP stdext::hash_map
 #  define UNORDERED_SET stdext::hash_set
