@@ -292,6 +292,12 @@ HASH_NAMESPACE_START
             }
     };
 
+    // for pre-TR1 Visual Studio versions (VS90 SP1 or early)
+    inline size_t hash_value(ObjectGuid const& key)
+    {
+        return hash_value(key.GetRawValue());
+    }
+
 HASH_NAMESPACE_END
 
 #endif
