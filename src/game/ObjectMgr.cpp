@@ -5421,7 +5421,7 @@ uint32 ObjectMgr::GetTaxiMountDisplayId( uint32 id, uint32 team, bool allowed_al
     if (!mount_info)
         return 0;
 
-    uint16 mount_id = Creature::ChooseDisplayId(team,mount_info);
+    uint16 mount_id = Creature::ChooseDisplayId(mount_info);
     if (!mount_id)
         return 0;
 
