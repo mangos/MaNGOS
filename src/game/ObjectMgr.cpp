@@ -911,15 +911,6 @@ uint32 ObjectMgr::GetCreatureModelAlternativeModel(uint32 modelId)
     return 0;
 }
 
-// generally for models having another model for the other team (totems)
-uint32 ObjectMgr::GetCreatureModelOtherTeamModel(uint32 modelId)
-{
-    if (const CreatureModelInfo *modelInfo = GetCreatureModelInfo(modelId))
-        return modelInfo->modelid_other_team;
-
-    return 0;
-}
-
 CreatureModelInfo const* ObjectMgr::GetCreatureModelRandomGender(uint32 display_id)
 {
     CreatureModelInfo const *minfo = GetCreatureModelInfo(display_id);
@@ -940,6 +931,29 @@ CreatureModelInfo const* ObjectMgr::GetCreatureModelRandomGender(uint32 display_
     }
     else
         return minfo;
+}
+
+uint32 ObjectMgr::GetModelForRace(uint32 sourceModelId, uint32 racemask)
+{
+    uint32 modelId = 0;
+
+    for(CreatureModelRaceMap::const_iterator itr = m_mCreatureModelRaceMap.lower_bound(sourceModelId); itr != m_mCreatureModelRaceMap.upper_bound(sourceModelId); ++itr)
+    {
+        if (!(itr->second.racemask & racemask))
+            continue;
+
+        if (itr->second.creature_entry)
+        {
+            const CreatureInfo *cInfo = sObjectMgr.GetCreatureTemplate(itr->second.creature_entry);
+            modelId = Creature::ChooseDisplayId(cInfo);
+        }
+        else
+        {
+            modelId = itr->second.modelid_racial;
+        }
+    }
+
+    return modelId;
 }
 
 void ObjectMgr::LoadCreatureModelInfo()
@@ -972,12 +986,6 @@ void ObjectMgr::LoadCreatureModelInfo()
         {
             sLog.outErrorDb("Table `creature_model_info` has nonexistent modelid_alternative model (%u) defined for model id %u.", minfo->modelid_alternative, minfo->modelid);
             const_cast<CreatureModelInfo*>(minfo)->modelid_alternative = 0;
-        }
-
-        if (minfo->modelid_other_team && !sCreatureDisplayInfoStore.LookupEntry(minfo->modelid_other_team))
-        {
-            sLog.outErrorDb("Table `creature_model_info` has nonexistent modelid_other_team model (%u) defined for model id %u.", minfo->modelid_other_team, minfo->modelid);
-            const_cast<CreatureModelInfo*>(minfo)->modelid_other_team = 0;
         }
     }
 
@@ -1041,6 +1049,125 @@ void ObjectMgr::LoadCreatureModelInfo()
 
     sLog.outString( ">> Loaded %u creature model based info", sCreatureModelStorage.RecordCount );
     sLog.outString();
+}
+
+void ObjectMgr::LoadCreatureModelRace()
+{
+    m_mCreatureModelRaceMap.clear();                        // can be used for reload
+
+    QueryResult* result = WorldDatabase.Query("SELECT modelid, racemask, creature_entry, modelid_racial FROM creature_model_race");
+
+    if (!result)
+    {
+        barGoLink bar(1);
+
+        bar.step();
+
+        sLog.outString();
+        sLog.outErrorDb(">> Loaded creature_model_race, table is empty!");
+        return;
+    }
+
+    barGoLink bar( (int)result->GetRowCount() );
+
+    uint32 count = 0;
+
+    // model, racemask
+    std::map<uint32, uint32> model2raceMask;
+
+    do
+    {
+        bar.step();
+
+        Field* fields = result->Fetch();
+
+        CreatureModelRace raceData;
+
+        raceData.modelid            = fields[0].GetUInt32();
+        raceData.racemask           = fields[1].GetUInt32();
+        raceData.creature_entry     = fields[2].GetUInt32();
+        raceData.modelid_racial     = fields[3].GetUInt32();
+
+        if (!sCreatureDisplayInfoStore.LookupEntry(raceData.modelid))
+        {
+            sLog.outErrorDb("Table `creature_model_race` has model for nonexistent model id (%u), skipping", raceData.modelid);
+            continue;
+        }
+
+        if (!sCreatureModelStorage.LookupEntry<CreatureModelInfo>(raceData.modelid))
+        {
+            sLog.outErrorDb("Table `creature_model_race` modelid %u does not exist in creature_model_info, skipping", raceData.modelid);
+            continue;
+        }
+
+        if (!raceData.racemask)
+        {
+            sLog.outErrorDb("Table `creature_model_race` modelid %u has no racemask defined, skipping", raceData.modelid);
+            continue;
+        }
+
+        if (!(raceData.racemask & RACEMASK_ALL_PLAYABLE))
+        {
+            sLog.outErrorDb("Table `creature_model_race` modelid %u include invalid racemask, skipping", raceData.modelid);
+            continue;
+        }
+
+        std::map<uint32, uint32>::const_iterator model2Race = model2raceMask.find(raceData.modelid);
+
+        // can't have same mask for same model several times
+        if (model2Race != model2raceMask.end())
+        {
+            if (model2Race->second & raceData.racemask)
+            {
+                sLog.outErrorDb("Table `creature_model_race` modelid %u with racemask %u has mask already included for same modelid, skipping", raceData.modelid, raceData.racemask);
+                continue;
+            }
+        }
+
+        model2raceMask[raceData.modelid] |= raceData.racemask;
+
+        // creature_entry is the prefered way
+        if (raceData.creature_entry)
+        {
+            if (raceData.modelid_racial)
+                sLog.outErrorDb("Table `creature_model_race` modelid %u has modelid_racial for modelid %u but a creature_entry are already defined, modelid_racial will never be used.", raceData.modelid);
+
+            if (!sCreatureStorage.LookupEntry<CreatureInfo>(raceData.creature_entry))
+            {
+                sLog.outErrorDb("Table `creature_model_race` modelid %u has creature_entry for nonexistent creature_template (%u), skipping", raceData.modelid, raceData.creature_entry);
+                continue;
+            }
+        }
+        else if (raceData.modelid_racial)
+        {
+            if (!sCreatureDisplayInfoStore.LookupEntry(raceData.modelid_racial))
+            {
+                sLog.outErrorDb("Table `creature_model_race` modelid %u has modelid_racial for nonexistent model id (%u), skipping", raceData.modelid, raceData.modelid_racial);
+                continue;
+            }
+
+            if (!sCreatureModelStorage.LookupEntry<CreatureModelInfo>(raceData.modelid_racial))
+            {
+                sLog.outErrorDb("Table `creature_model_race` modelid %u has modelid_racial %u, but are not defined in creature_model_info, skipping", raceData.modelid, raceData.modelid_racial);
+                continue;
+            }
+        }
+        else
+        {
+            sLog.outErrorDb("Table `creature_model_race` modelid %u does not have either creature_entry or modelid_racial defined, skipping", raceData.modelid);
+            continue;
+        }
+
+        m_mCreatureModelRaceMap.insert(CreatureModelRaceMap::value_type(raceData.modelid, raceData));
+
+        ++count;
+    }
+    while(result->NextRow());
+
+    delete result;
+
+    sLog.outString();
+    sLog.outString( ">> Loaded %u creature_model_race entries", count);
 }
 
 void ObjectMgr::LoadCreatures()

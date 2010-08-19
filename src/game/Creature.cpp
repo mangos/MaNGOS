@@ -247,14 +247,7 @@ bool Creature::InitEntry(uint32 Entry, uint32 team, const CreatureData *data )
 
     SetNativeDisplayId(display_id);
 
-    // special case for totems (model for team==HORDE is stored in creature_template as the default)
-    if (team == ALLIANCE && cinfo->type == CREATURE_TYPE_TOTEM)
-    {
-        uint32 modelid_tmp = sObjectMgr.GetCreatureModelOtherTeamModel(display_id);
-        display_id = modelid_tmp ? modelid_tmp : display_id;
-    }
-
-    // normally the same as native, see above for the exeption
+    // normally the same as native, but some has exceptions (Spell::DoSummonTotem)
     SetDisplayId(display_id);
 
     SetByteValue(UNIT_FIELD_BYTES_0, 2, minfo->gender);
