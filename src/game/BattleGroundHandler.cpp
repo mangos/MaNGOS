@@ -34,10 +34,10 @@
 
 void WorldSession::HandleBattlemasterHelloOpcode(WorldPacket & recv_data)
 {
-    uint64 guid;
+    ObjectGuid guid;
     recv_data >> guid;
 
-    DEBUG_LOG("WORLD: Recvd CMSG_BATTLEMASTER_HELLO Message from (GUID: %u TypeId:%u)", GUID_LOPART(guid),GuidHigh2TypeId(GUID_HIPART(guid)));
+    DEBUG_LOG("WORLD: Recvd CMSG_BATTLEMASTER_HELLO Message from %s", guid.GetString().c_str());
 
     Creature *pCreature = GetPlayer()->GetMap()->GetCreature(guid);
 
@@ -66,7 +66,7 @@ void WorldSession::HandleBattlemasterHelloOpcode(WorldPacket & recv_data)
     SendBattlegGroundList(guid, bgTypeId);
 }
 
-void WorldSession::SendBattlegGroundList( uint64 guid, BattleGroundTypeId bgTypeId )
+void WorldSession::SendBattlegGroundList( ObjectGuid guid, BattleGroundTypeId bgTypeId )
 {
     WorldPacket data;
     sBattleGroundMgr.BuildBattleGroundListPacket(&data, guid, _player, bgTypeId, 0);
@@ -315,7 +315,7 @@ void WorldSession::HandleBattlefieldListOpcode( WorldPacket &recv_data )
     }
 
     WorldPacket data;
-    sBattleGroundMgr.BuildBattleGroundListPacket(&data, 0, _player, BattleGroundTypeId(bgTypeId), fromWhere);
+    sBattleGroundMgr.BuildBattleGroundListPacket(&data, ObjectGuid(), _player, BattleGroundTypeId(bgTypeId), fromWhere);
     SendPacket( &data );
 }
 

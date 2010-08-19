@@ -223,7 +223,7 @@ class MANGOS_DLL_SPEC WorldSession
 
         void SendAttackStop(Unit const* enemy);
 
-        void SendBattlegGroundList( uint64 guid, BattleGroundTypeId bgTypeId );
+        void SendBattlegGroundList(ObjectGuid guid, BattleGroundTypeId bgTypeId);
 
         void SendTradeStatus(TradeStatus status);
         void SendUpdateTrade(bool trader_state = true);
