@@ -31,14 +31,17 @@ void WorldSession::HandleAttackSwingOpcode( WorldPacket & recv_data )
 
     DEBUG_FILTER_LOG(LOG_FILTER_COMBAT, "WORLD: Recvd CMSG_ATTACKSWING Message %s", guid.GetString().c_str());
 
-    Unit *pEnemy = ObjectAccessor::GetUnit(*_player, guid);
+    if(!guid.IsUnit())
+    {
+        sLog.outError("WORLD: %s isn't unit", guid.GetString().c_str());
+        return;
+    }
+
+    Unit *pEnemy = _player->GetMap()->GetUnit(guid);
 
     if(!pEnemy)
     {
-        if(!guid.IsUnit())
-            sLog.outError("WORLD: %s isn't player, pet or creature", guid.GetString().c_str());
-        else
-            sLog.outError( "WORLD: Enemy %s not found", guid.GetString().c_str());
+        sLog.outError( "WORLD: Enemy %s not found", guid.GetString().c_str());
 
         // stop attack state at client
         SendAttackStop(NULL);

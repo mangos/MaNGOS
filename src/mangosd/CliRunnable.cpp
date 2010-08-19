@@ -59,20 +59,20 @@ void commandFinished(void*, bool sucess)
 
 /// Delete a user account and all associated characters in this realm
 /// \todo This function has to be enhanced to respect the login/realm split (delete char, delete account chars in realm, delete account chars in realm then delete account
-bool ChatHandler::HandleAccountDeleteCommand(const char* args)
+bool ChatHandler::HandleAccountDeleteCommand(char* args)
 {
     if (!*args)
         return false;
 
     std::string account_name;
-    uint32 account_id = extractAccountId((char*)args,&account_name);
+    uint32 account_id = ExtractAccountId(&args, &account_name);
     if (!account_id)
         return false;
 
     /// Commands not recommended call from chat, but support anyway
     /// can delete only for account with less security
     /// This is also reject self apply in fact
-    if(HasLowerSecurityAccount (NULL,account_id,true))
+    if (HasLowerSecurityAccount (NULL, account_id, true))
         return false;
 
     AccountOpResult result = sAccountMgr.DeleteAccount(account_id);
@@ -227,7 +227,7 @@ void ChatHandler::HandleCharacterDeletedListHelper(DeletedInfoList const& foundL
  *
  * @param args the search string which either contains a player GUID or a part fo the character-name
  */
-bool ChatHandler::HandleCharacterDeletedListCommand(const char* args)
+bool ChatHandler::HandleCharacterDeletedListCommand(char* args)
 {
     DeletedInfoList foundList;
     if (!GetDeletedCharacterInfoList(foundList, args))
@@ -291,7 +291,7 @@ void ChatHandler::HandleCharacterDeletedRestoreHelper(DeletedInfo const& delInfo
  *
  * @param args the search string which either contains a player GUID or a part of the character-name
  */
-bool ChatHandler::HandleCharacterDeletedRestoreCommand(const char* args)
+bool ChatHandler::HandleCharacterDeletedRestoreCommand(char* args)
 {
     // It is required to submit at least one argument
     if (!*args)
@@ -356,7 +356,7 @@ bool ChatHandler::HandleCharacterDeletedRestoreCommand(const char* args)
  *
  * @param args the search string which either contains a player GUID or a part fo the character-name
  */
-bool ChatHandler::HandleCharacterDeletedDeleteCommand(const char* args)
+bool ChatHandler::HandleCharacterDeletedDeleteCommand(char* args)
 {
     // It is required to submit at least one argument
     if (!*args)
@@ -377,7 +377,7 @@ bool ChatHandler::HandleCharacterDeletedDeleteCommand(const char* args)
 
     // Call the appropriate function to delete them (current account for deleted characters is 0)
     for(DeletedInfoList::const_iterator itr = foundList.begin(); itr != foundList.end(); ++itr)
-        Player::DeleteFromDB(itr->lowguid, 0, false, true);
+        Player::DeleteFromDB(ObjectGuid(HIGHGUID_PLAYER, itr->lowguid), 0, false, true);
 
     return true;
 }
@@ -393,74 +393,52 @@ bool ChatHandler::HandleCharacterDeletedDeleteCommand(const char* args)
  *
  * @param args the search string which either contains a player GUID or a part fo the character-name
  */
-bool ChatHandler::HandleCharacterDeletedOldCommand(const char* args)
+bool ChatHandler::HandleCharacterDeletedOldCommand(char* args)
 {
     int32 keepDays = sWorld.getConfig(CONFIG_UINT32_CHARDELETE_KEEP_DAYS);
 
-    char* px = strtok((char*)args, " ");
-    if (px)
-    {
-        if (!isNumeric(px))
-            return false;
+    if (!ExtractOptInt32(&args, keepDays, sWorld.getConfig(CONFIG_UINT32_CHARDELETE_KEEP_DAYS)))
+        return false;
 
-        keepDays = atoi(px);
-        if (keepDays < 0)
-            return false;
-    }
-    // config option value 0 -> disabled and can't be used
-    else if (keepDays <= 0)
+    if (keepDays < 0)
         return false;
 
     Player::DeleteOldCharacters((uint32)keepDays);
     return true;
 }
 
-bool ChatHandler::HandleCharacterEraseCommand(const char* args)
+bool ChatHandler::HandleCharacterEraseCommand(char* args)
 {
-    if(!*args)
+    char* nameStr = ExtractLiteralArg(&args);
+    if (!*nameStr)
         return false;
 
-    char *character_name_str = strtok((char*)args," ");
-    if(!character_name_str)
+    Player* target;
+    uint64 target_guid;
+    std::string target_name;
+    if (!ExtractPlayerTarget(&args, &target, &target_guid, &target_name))
         return false;
 
-    std::string character_name = character_name_str;
-    if(!normalizePlayerName(character_name))
-        return false;
-
-    uint64 character_guid;
     uint32 account_id;
 
-    Player *player = sObjectMgr.GetPlayer(character_name.c_str());
-    if(player)
+    if (target)
     {
-        character_guid = player->GetGUID();
-        account_id = player->GetSession()->GetAccountId();
-        player->GetSession()->KickPlayer();
+        account_id = target->GetSession()->GetAccountId();
+        target->GetSession()->KickPlayer();
     }
     else
-    {
-        character_guid = sObjectMgr.GetPlayerGUIDByName(character_name);
-        if(!character_guid)
-        {
-            PSendSysMessage(LANG_NO_PLAYER,character_name.c_str());
-            SetSentErrorMessage(true);
-            return false;
-        }
-
-        account_id = sObjectMgr.GetPlayerAccountIdByGUID(character_guid);
-    }
+        account_id = sObjectMgr.GetPlayerAccountIdByGUID(target_guid);
 
     std::string account_name;
     sAccountMgr.GetName (account_id,account_name);
 
-    Player::DeleteFromDB(character_guid, account_id, true, true);
-    PSendSysMessage(LANG_CHARACTER_DELETED,character_name.c_str(),GUID_LOPART(character_guid),account_name.c_str(), account_id);
+    Player::DeleteFromDB(target_guid, account_id, true, true);
+    PSendSysMessage(LANG_CHARACTER_DELETED, target_name.c_str(), GUID_LOPART(target_guid), account_name.c_str(), account_id);
     return true;
 }
 
 /// Close RA connection
-bool ChatHandler::HandleQuitCommand(const char* /*args*/)
+bool ChatHandler::HandleQuitCommand(char* /*args*/)
 {
     // processed in RASocket
     SendSysMessage(LANG_QUIT_WRONG_USE_ERROR);
@@ -468,7 +446,7 @@ bool ChatHandler::HandleQuitCommand(const char* /*args*/)
 }
 
 /// Exit the realm
-bool ChatHandler::HandleServerExitCommand(const char* /*args*/)
+bool ChatHandler::HandleServerExitCommand(char* /*args*/)
 {
     SendSysMessage(LANG_COMMAND_EXIT);
     World::StopNow(SHUTDOWN_EXIT_CODE);
@@ -476,10 +454,11 @@ bool ChatHandler::HandleServerExitCommand(const char* /*args*/)
 }
 
 /// Display info on users currently in the realm
-bool ChatHandler::HandleAccountOnlineListCommand(const char* args)
+bool ChatHandler::HandleAccountOnlineListCommand(char* args)
 {
-    char* limit_str = *args ? strtok((char*)args, " ") : NULL;
-    uint32 limit = limit_str ? atoi (limit_str) : 100;
+    uint32 limit;
+    if (!ExtractOptUInt32(&args, limit, 100))
+        return false;
 
     ///- Get the list of accounts ID logged to the realm
     //                                                 0   1         2        3        4
@@ -489,14 +468,11 @@ bool ChatHandler::HandleAccountOnlineListCommand(const char* args)
 }
 
 /// Create an account
-bool ChatHandler::HandleAccountCreateCommand(const char* args)
+bool ChatHandler::HandleAccountCreateCommand(char* args)
 {
-    if(!*args)
-        return false;
-
     ///- %Parse the command line arguments
-    char *szAcc = strtok((char*)args, " ");
-    char *szPassword = strtok(NULL, " ");
+    char *szAcc = ExtractQuotedOrLiteralArg(&args);
+    char *szPassword = ExtractQuotedOrLiteralArg(&args);
     if(!szAcc || !szPassword)
         return false;
 
@@ -532,9 +508,9 @@ bool ChatHandler::HandleAccountCreateCommand(const char* args)
 }
 
 /// Set the filters of logging
-bool ChatHandler::HandleServerLogFilterCommand(const char* args)
+bool ChatHandler::HandleServerLogFilterCommand(char* args)
 {
-    if(!*args)
+    if (!*args)
     {
         uint32 logfiler = sLog.getLogFilter();
 
@@ -545,20 +521,12 @@ bool ChatHandler::HandleServerLogFilterCommand(const char* args)
         return true;
     }
 
-    char *filtername = strtok((char*)args, " ");
+    char *filtername = ExtractLiteralArg(&args);
     if (!filtername)
         return false;
 
-    char *value_str = strtok(NULL, " ");
-    if (!value_str)
-        return false;
-
     bool value;
-    if (strncmp(value_str, "on", 3) == 0)
-        value = true;
-    else if (strncmp(value_str, "off", 4) == 0)
-        value = false;
-    else
+    if (!ExtractOnOff(&args, value))
     {
         SendSysMessage(LANG_USE_BOL);
         SetSentErrorMessage(true);
@@ -567,7 +535,7 @@ bool ChatHandler::HandleServerLogFilterCommand(const char* args)
 
     if (strncmp(filtername, "all", 4) == 0)
     {
-        sLog.SetLogFilter(LogFilters(0xFFFFFFFF),value);
+        sLog.SetLogFilter(LogFilters(0xFFFFFFFF), value);
         PSendSysMessage(LANG_ALL_LOG_FILTERS_SET_TO_S, value ? GetMangosString(LANG_ON) : GetMangosString(LANG_OFF));
         return true;
     }
@@ -589,15 +557,15 @@ bool ChatHandler::HandleServerLogFilterCommand(const char* args)
 }
 
 /// Set the level of logging
-bool ChatHandler::HandleServerLogLevelCommand(const char *args)
+bool ChatHandler::HandleServerLogLevelCommand(char *args)
 {
-    if(!*args)
+    if (!*args)
     {
         PSendSysMessage("Log level: %u", sLog.GetLogLevel());
         return true;
     }
 
-    sLog.SetLogLevel((char*)args);
+    sLog.SetLogLevel(args);
     return true;
 }
 

@@ -189,6 +189,8 @@ void WorldSession::HandleQuestgiverAcceptQuestOpcode( WorldPacket & recv_data )
             if ( _player->CanCompleteQuest( quest ) )
                 _player->CompleteQuest( quest );
 
+            _player->GetAchievementMgr().StartTimedAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST, quest);
+
             switch(pObject->GetTypeId())
             {
                 case TYPEID_UNIT:
@@ -659,7 +661,7 @@ void WorldSession::HandleQuestgiverStatusMultipleQuery(WorldPacket& /*recvPacket
         if (itr->IsCreatureOrPet())
         {
             // need also pet quests case support
-            Creature *questgiver = GetPlayer()->GetMap()->GetCreatureOrPetOrVehicle(*itr);
+            Creature *questgiver = GetPlayer()->GetMap()->GetAnyTypeCreature(*itr);
 
             if (!questgiver || questgiver->IsHostileTo(_player))
                 continue;

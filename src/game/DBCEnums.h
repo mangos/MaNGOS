@@ -89,12 +89,6 @@ enum AchievementCriteriaCompletionFlags
     ACHIEVEMENT_CRITERIA_FLAG_MONEY_COUNTER     = 0x00000020,         // Displays counter as money
 };
 
-enum AchievementCriteriaGroupFlags
-{
-    // you mustn't be in a group while fulfilling this achievement
-    ACHIEVEMENT_CRITERIA_GROUP_NOT_IN_GROUP = 2,
-};
-
 enum AchievementCriteriaTypes
 {
     ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE = 0,

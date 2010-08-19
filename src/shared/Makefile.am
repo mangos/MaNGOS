@@ -63,13 +63,8 @@ $(REVISION_FILE) : $(top_builddir)/src/tools/genrevision/genrevision FORCE
 	$(top_builddir)/src/tools/genrevision/genrevision $(top_srcdir)
 
 ## Additional files to include when running 'make dist'
-#  Disabled packet logger
-EXTRA_DIST = \
-	PacketLog.cpp \
-	PacketLog.h
-
 # System configuration
-EXTRA_DIST += \
+EXTRA_DIST = \
 	SystemConfig.h
 
 # System Win32 files

@@ -33,32 +33,30 @@
 #include "ObjectGuid.h"
 #include "SpellMgr.h"
 
-bool ChatHandler::HandleDebugSendSpellFailCommand(const char* args)
+bool ChatHandler::HandleDebugSendSpellFailCommand(char* args)
 {
     if (!*args)
         return false;
 
-    char* px = strtok((char*)args, " ");
-    if (!px)
+    uint32 failnum;
+    if (!ExtractUInt32(&args, failnum) || failnum > 255)
         return false;
 
-    uint8 failnum = (uint8)atoi(px);
-    if (failnum==0 && *px!='0')
+    uint32 failarg1;
+    if (!ExtractOptUInt32(&args, failarg1, 0))
         return false;
 
-    char* p1 = strtok(NULL, " ");
-    uint8 failarg1 = p1 ? (uint8)atoi(p1) : 0;
-
-    char* p2 = strtok(NULL, " ");
-    uint8 failarg2 = p2 ? (uint8)atoi(p2) : 0;
+    uint32 failarg2;
+    if (!ExtractOptUInt32(&args, failarg2, 0))
+        return false;
 
     WorldPacket data(SMSG_CAST_FAILED, 5);
     data << uint8(0);
     data << uint32(133);
     data << uint8(failnum);
-    if (p1 || p2)
+    if (failarg1 || failarg2)
         data << uint32(failarg1);
-    if (p2)
+    if (failarg2)
         data << uint32(failarg2);
 
     m_session->SendPacket(&data);
@@ -66,11 +64,8 @@ bool ChatHandler::HandleDebugSendSpellFailCommand(const char* args)
     return true;
 }
 
-bool ChatHandler::HandleDebugSendPoiCommand(const char* args)
+bool ChatHandler::HandleDebugSendPoiCommand(char* args)
 {
-    if (!*args)
-        return false;
-
     Player *pPlayer = m_session->GetPlayer();
     Unit* target = getSelectedUnit();
     if (!target)
@@ -79,20 +74,20 @@ bool ChatHandler::HandleDebugSendPoiCommand(const char* args)
         return true;
     }
 
-    char* icon_text = strtok((char*)args, " ");
-    char* flags_text = strtok(NULL, " ");
-    if (!icon_text || !flags_text)
+    uint32 icon;
+    if (!ExtractUInt32(&args, icon))
         return false;
 
-    uint32 icon = atol(icon_text);
-    uint32 flags = atol(flags_text);
+    uint32 flags;
+    if (!ExtractUInt32(&args, flags))
+        return false;
 
     DETAIL_LOG("Command : POI, NPC = %u, icon = %u flags = %u", target->GetGUIDLow(), icon,flags);
     pPlayer->PlayerTalkClass->SendPointOfInterest(target->GetPositionX(), target->GetPositionY(), Poi_Icon(icon), flags, 30, "Test POI");
     return true;
 }
 
-bool ChatHandler::HandleDebugSendEquipErrorCommand(const char* args)
+bool ChatHandler::HandleDebugSendEquipErrorCommand(char* args)
 {
     if (!*args)
         return false;
@@ -102,7 +97,7 @@ bool ChatHandler::HandleDebugSendEquipErrorCommand(const char* args)
     return true;
 }
 
-bool ChatHandler::HandleDebugSendSellErrorCommand(const char* args)
+bool ChatHandler::HandleDebugSendSellErrorCommand(char* args)
 {
     if (!*args)
         return false;
@@ -112,7 +107,7 @@ bool ChatHandler::HandleDebugSendSellErrorCommand(const char* args)
     return true;
 }
 
-bool ChatHandler::HandleDebugSendBuyErrorCommand(const char* args)
+bool ChatHandler::HandleDebugSendBuyErrorCommand(char* args)
 {
     if (!*args)
         return false;
@@ -122,7 +117,7 @@ bool ChatHandler::HandleDebugSendBuyErrorCommand(const char* args)
     return true;
 }
 
-bool ChatHandler::HandleDebugSendOpcodeCommand(const char* /*args*/)
+bool ChatHandler::HandleDebugSendOpcodeCommand(char* /*args*/)
 {
     Unit *unit = getSelectedUnit();
     if (!unit || (unit->GetTypeId() != TYPEID_PLAYER))
@@ -199,32 +194,27 @@ bool ChatHandler::HandleDebugSendOpcodeCommand(const char* /*args*/)
     return true;
 }
 
-bool ChatHandler::HandleDebugUpdateWorldStateCommand(const char* args)
+bool ChatHandler::HandleDebugUpdateWorldStateCommand(char* args)
 {
-    char* w = strtok((char*)args, " ");
-    char* s = strtok(NULL, " ");
-
-    if (!w || !s)
+    uint32 world;
+    if (!ExtractUInt32(&args, world))
         return false;
 
-    uint32 world = (uint32)atoi(w);
-    uint32 state = (uint32)atoi(s);
+    uint32 state;
+    if (!ExtractUInt32(&args, state))
+        return false;
+
     m_session->GetPlayer()->SendUpdateWorldState(world, state);
     return true;
 }
 
-bool ChatHandler::HandleDebugPlayCinematicCommand(const char* args)
+bool ChatHandler::HandleDebugPlayCinematicCommand(char* args)
 {
     // USAGE: .debug play cinematic #cinematicid
     // #cinematicid - ID decimal number from CinemaicSequences.dbc (1st column)
-    if (!*args)
-    {
-        SendSysMessage(LANG_BAD_VALUE);
-        SetSentErrorMessage(true);
+    uint32 dwId;
+    if (!ExtractUInt32(&args, dwId))
         return false;
-    }
-
-    uint32 dwId = atoi((char*)args);
 
     if (!sCinematicSequencesStore.LookupEntry(dwId))
     {
@@ -237,18 +227,13 @@ bool ChatHandler::HandleDebugPlayCinematicCommand(const char* args)
     return true;
 }
 
-bool ChatHandler::HandleDebugPlayMovieCommand(const char* args)
+bool ChatHandler::HandleDebugPlayMovieCommand(char* args)
 {
     // USAGE: .debug play movie #movieid
     // #movieid - ID decimal number from Movie.dbc (1st column)
-    if (!*args)
-    {
-        SendSysMessage(LANG_BAD_VALUE);
-        SetSentErrorMessage(true);
+    uint32 dwId;
+    if (!ExtractUInt32(&args, dwId))
         return false;
-    }
-
-    uint32 dwId = atoi((char*)args);
 
     if (!sMovieStore.LookupEntry(dwId))
     {
@@ -262,18 +247,13 @@ bool ChatHandler::HandleDebugPlayMovieCommand(const char* args)
 }
 
 //Play sound
-bool ChatHandler::HandleDebugPlaySoundCommand(const char* args)
+bool ChatHandler::HandleDebugPlaySoundCommand(char* args)
 {
     // USAGE: .debug playsound #soundid
     // #soundid - ID decimal number from SoundEntries.dbc (1st column)
-    if (!*args)
-    {
-        SendSysMessage(LANG_BAD_VALUE);
-        SetSentErrorMessage(true);
+    uint32 dwSoundId;
+    if (!ExtractUInt32(&args, dwSoundId))
         return false;
-    }
-
-    uint32 dwSoundId = atoi((char*)args);
 
     if (!sSoundEntriesStore.LookupEntry(dwSoundId))
     {
@@ -300,16 +280,16 @@ bool ChatHandler::HandleDebugPlaySoundCommand(const char* args)
 }
 
 //Send notification in channel
-bool ChatHandler::HandleDebugSendChannelNotifyCommand(const char* args)
+bool ChatHandler::HandleDebugSendChannelNotifyCommand(char* args)
 {
-    if (!*args)
+    const char *name = "test";
+
+    uint32 code;
+    if (!ExtractUInt32(&args, code) || code > 255)
         return false;
 
-    const char *name = "test";
-    uint8 code = atoi(args);
-
     WorldPacket data(SMSG_CHANNEL_NOTIFY, (1+10));
-    data << code;                                           // notify type
+    data << uint8(code);                                    // notify type
     data << name;                                           // channel name
     data << uint32(0);
     data << uint32(0);
@@ -318,27 +298,31 @@ bool ChatHandler::HandleDebugSendChannelNotifyCommand(const char* args)
 }
 
 //Send notification in chat
-bool ChatHandler::HandleDebugSendChatMsgCommand(const char* args)
+bool ChatHandler::HandleDebugSendChatMsgCommand(char* args)
 {
-    if (!*args)
+    const char *msg = "testtest";
+
+    uint32 type;
+    if (!ExtractUInt32(&args, type) || type > 255)
         return false;
 
-    const char *msg = "testtest";
-    uint8 type = atoi(args);
     WorldPacket data;
     ChatHandler::FillMessageData(&data, m_session, type, 0, "chan", m_session->GetPlayer()->GetGUID(), msg, m_session->GetPlayer());
     m_session->SendPacket(&data);
     return true;
 }
 
-bool ChatHandler::HandleDebugSendQuestPartyMsgCommand(const char* args)
+bool ChatHandler::HandleDebugSendQuestPartyMsgCommand(char* args)
 {
-    uint32 msg = atol((char*)args);
+    uint32 msg;
+    if (!ExtractUInt32(&args, msg))
+        return false;
+
     m_session->GetPlayer()->SendPushToPartyResponse(m_session->GetPlayer(), msg);
     return true;
 }
 
-bool ChatHandler::HandleDebugGetLootRecipientCommand(const char* /*args*/)
+bool ChatHandler::HandleDebugGetLootRecipientCommand(char* /*args*/)
 {
     Creature* target = getSelectedCreature();
     if (!target)
@@ -357,14 +341,14 @@ bool ChatHandler::HandleDebugGetLootRecipientCommand(const char* /*args*/)
     return true;
 }
 
-bool ChatHandler::HandleDebugSendQuestInvalidMsgCommand(const char* args)
+bool ChatHandler::HandleDebugSendQuestInvalidMsgCommand(char* args)
 {
-    uint32 msg = atol((char*)args);
+    uint32 msg = atol(args);
     m_session->GetPlayer()->SendCanTakeQuestResponse(msg);
     return true;
 }
 
-bool ChatHandler::HandleDebugGetItemStateCommand(const char* args)
+bool ChatHandler::HandleDebugGetItemStateCommand(char* args)
 {
     if (!*args)
         return false;
@@ -598,39 +582,33 @@ bool ChatHandler::HandleDebugGetItemStateCommand(const char* args)
     return true;
 }
 
-bool ChatHandler::HandleDebugBattlegroundCommand(const char * /*args*/)
+bool ChatHandler::HandleDebugBattlegroundCommand(char* /*args*/)
 {
     sBattleGroundMgr.ToggleTesting();
     return true;
 }
 
-bool ChatHandler::HandleDebugArenaCommand(const char * /*args*/)
+bool ChatHandler::HandleDebugArenaCommand(char* /*args*/)
 {
     sBattleGroundMgr.ToggleArenaTesting();
     return true;
 }
 
-bool ChatHandler::HandleDebugSpawnVehicle(const char* args)
+bool ChatHandler::HandleDebugSpawnVehicleCommand(char* args)
 {
-    if (!*args)
+    uint32 entry;
+    if (!ExtractUInt32(&args, entry))
         return false;
 
-    char* e = strtok((char*)args, " ");
-    char* i = strtok(NULL, " ");
-
-    if (!e || !i)
+    uint32 id;
+    if (!ExtractUInt32(&args, id))
         return false;
-
-    uint32 entry = (uint32)atoi(e);
-    uint32 id = (uint32)atoi(i);
 
     CreatureInfo const *ci = ObjectMgr::GetCreatureTemplate(entry);
-
     if (!ci)
         return false;
 
     VehicleEntry const *ve = sVehicleStore.LookupEntry(id);
-
     if (!ve)
         return false;
 
@@ -660,14 +638,14 @@ bool ChatHandler::HandleDebugSpawnVehicle(const char* args)
     return true;
 }
 
-bool ChatHandler::HandleDebugSpellCheckCommand(const char* /*args*/)
+bool ChatHandler::HandleDebugSpellCheckCommand(char* /*args*/)
 {
     sLog.outString( "Check expected in code spell properties base at table 'spell_check' content...");
     sSpellMgr.CheckUsedSpells("spell_check");
     return true;
 }
 
-bool ChatHandler::HandleDebugSendLargePacketCommand(const char* /*args*/)
+bool ChatHandler::HandleDebugSendLargePacketCommand(char* /*args*/)
 {
     const char* stuffingString = "This is a dummy string to push the packet's size beyond 128000 bytes. ";
     std::ostringstream ss;
@@ -677,7 +655,7 @@ bool ChatHandler::HandleDebugSendLargePacketCommand(const char* /*args*/)
     return true;
 }
 
-bool ChatHandler::HandleDebugSendSetPhaseShiftCommand(const char* args)
+bool ChatHandler::HandleDebugSendSetPhaseShiftCommand(char* args)
 {
     if (!*args)
         return false;
@@ -687,83 +665,22 @@ bool ChatHandler::HandleDebugSendSetPhaseShiftCommand(const char* args)
     return true;
 }
 
-bool ChatHandler::HandleDebugGetItemValueCommand(const char* args)
-{
-    if (!*args)
-        return false;
-
-    char* e = strtok((char*)args, " ");
-    char* f = strtok(NULL, " ");
-
-    if (!e || !f)
-        return false;
-
-    uint32 guid = (uint32)atoi(e);
-    uint32 index = (uint32)atoi(f);
-
-    Item *i = m_session->GetPlayer()->GetItemByGuid(ObjectGuid(HIGHGUID_ITEM, guid));
-
-    if (!i)
-        return false;
-
-    if (index >= i->GetValuesCount())
-        return false;
-
-    uint32 value = i->GetUInt32Value(index);
-
-    PSendSysMessage("Item %u: value at %u is %u", guid, index, value);
-
-    return true;
-}
-
-bool ChatHandler::HandleDebugSetItemValueCommand(const char* args)
-{
-    if (!*args)
-        return false;
-
-    char* e = strtok((char*)args, " ");
-    char* f = strtok(NULL, " ");
-    char* g = strtok(NULL, " ");
-
-    if (!e || !f || !g)
-        return false;
-
-    uint32 guid = (uint32)atoi(e);
-    uint32 index = (uint32)atoi(f);
-    uint32 value = (uint32)atoi(g);
-
-    Item *i = m_session->GetPlayer()->GetItemByGuid(ObjectGuid(HIGHGUID_ITEM, guid));
-
-    if (!i)
-        return false;
-
-    if (index >= i->GetValuesCount())
-        return false;
-
-    i->SetUInt32Value(index, value);
-
-    return true;
-}
-
 //show animation
-bool ChatHandler::HandleDebugAnimCommand(const char* args)
+bool ChatHandler::HandleDebugAnimCommand(char* args)
 {
-    if (!*args)
+    uint32 emote_id;
+    if (!ExtractUInt32(&args, emote_id))
         return false;
 
-    uint32 emote_id = atoi((char*)args);
     m_session->GetPlayer()->HandleEmoteCommand(emote_id);
     return true;
 }
 
-bool ChatHandler::HandleDebugSetAuraStateCommand(const char* args)
+bool ChatHandler::HandleDebugSetAuraStateCommand(char* args)
 {
-    if (!*args)
-    {
-        SendSysMessage(LANG_BAD_VALUE);
-        SetSentErrorMessage(true);
+    int32 state;
+    if (!ExtractInt32(&args, state))
         return false;
-    }
 
     Unit* unit = getSelectedUnit();
     if (!unit)
@@ -773,7 +690,6 @@ bool ChatHandler::HandleDebugSetAuraStateCommand(const char* args)
         return false;
     }
 
-    int32 state = atoi((char*)args);
     if (!state)
     {
         // reset all states
@@ -786,18 +702,82 @@ bool ChatHandler::HandleDebugSetAuraStateCommand(const char* args)
     return true;
 }
 
-bool ChatHandler::HandleDebugSetValueCommand(const char* args)
+bool ChatHandler::HandleSetValueHelper(Object* target, uint32 field, char* typeStr, char* valStr)
 {
-    if(!*args)
+    ObjectGuid guid = target->GetObjectGuid();
+
+    // not allow access to not existed or critical for work field
+    if (field >= target->GetValuesCount() || field <= OBJECT_FIELD_ENTRY)
+    {
+        PSendSysMessage(LANG_TOO_BIG_INDEX, field, guid.GetString().c_str(), target->GetValuesCount());
+        return false;
+    }
+
+    uint32 base;                                            // 0 -> float
+    if (!typeStr)
+        base = 10;
+    else if (strncmp(typeStr, "int", strlen(typeStr)) == 0)
+        base = 10;
+    else if (strncmp(typeStr, "hex", strlen(typeStr)) == 0)
+        base = 16;
+    else if (strncmp(typeStr, "bit", strlen(typeStr)) == 0)
+        base = 2;
+    else if (strncmp(typeStr, "float", strlen(typeStr)) == 0)
+        base = 0;
+    else
         return false;
 
-    char* px = strtok((char*)args, " ");
-    char* py = strtok(NULL, " ");
-    char* pz = strtok(NULL, " ");
+    if(base)
+    {
+        uint32 iValue;
+        if (!ExtractUInt32Base(&valStr, iValue, base))
+            return false;
 
-    if (!px || !py)
+        DEBUG_LOG(GetMangosString(LANG_SET_UINT), guid.GetString().c_str(), field, iValue);
+        target->SetUInt32Value(field , iValue);
+        PSendSysMessage(LANG_SET_UINT_FIELD, guid.GetString().c_str(), field, iValue);
+    }
+    else
+    {
+        float fValue;
+        if (!ExtractFloat(&valStr, fValue))
+            return false;
+
+        DEBUG_LOG(GetMangosString(LANG_SET_FLOAT), guid.GetString().c_str(), field, fValue);
+        target->SetFloatValue(field , fValue );
+        PSendSysMessage(LANG_SET_FLOAT_FIELD, guid.GetString().c_str(), field, fValue);
+    }
+
+    return true;
+}
+
+bool ChatHandler::HandleDebugSetItemValueCommand(char* args)
+{
+    uint32 guid;
+    if (!ExtractUInt32(&args, guid))
         return false;
 
+    uint32 field;
+    if (!ExtractUInt32(&args, field))
+        return false;
+
+    char* typeStr = ExtractOptNotLastArg(&args);
+    if (!typeStr)
+        return false;
+
+    char* valStr = ExtractLiteralArg(&args);
+    if (!valStr)
+        return false;
+
+    Item *item = m_session->GetPlayer()->GetItemByGuid(ObjectGuid(HIGHGUID_ITEM, guid));
+    if (!item)
+        return false;
+
+    return HandleSetValueHelper(item, field, typeStr, valStr);
+}
+
+bool ChatHandler::HandleDebugSetValueCommand(char* args)
+{
     Unit* target = getSelectedUnit();
     if(!target)
     {
@@ -806,48 +786,106 @@ bool ChatHandler::HandleDebugSetValueCommand(const char* args)
         return false;
     }
 
-    uint64 guid = target->GetGUID();
+    uint32 field;
+    if (!ExtractUInt32(&args, field))
+        return false;
 
-    uint32 Opcode = (uint32)atoi(px);
-    if(Opcode >= target->GetValuesCount())
+    char* typeStr = ExtractOptNotLastArg(&args);
+    if (!typeStr)
+        return false;
+
+    char* valStr = ExtractLiteralArg(&args);
+    if (!valStr)
+        return false;
+
+    return HandleSetValueHelper(target, field, typeStr, valStr);
+}
+
+bool ChatHandler::HandleGetValueHelper(Object* target, uint32 field, char* typeStr)
+{
+    ObjectGuid guid = target->GetObjectGuid();
+
+    if (field >= target->GetValuesCount())
     {
-        PSendSysMessage(LANG_TOO_BIG_INDEX, Opcode, GUID_LOPART(guid), target->GetValuesCount());
+        PSendSysMessage(LANG_TOO_BIG_INDEX, field, guid.GetString().c_str(), target->GetValuesCount());
         return false;
     }
-    uint32 iValue;
-    float fValue;
-    bool isint32 = true;
-    if(pz)
-        isint32 = (bool)atoi(pz);
-    if(isint32)
+
+    uint32 base;                                            // 0 -> float
+    if (!typeStr)
+        base = 10;
+    else if (strncmp(typeStr, "int", strlen(typeStr)) == 0)
+        base = 10;
+    else if (strncmp(typeStr, "hex", strlen(typeStr)) == 0)
+        base = 16;
+    else if (strncmp(typeStr, "bit", strlen(typeStr)) == 0)
+        base = 2;
+    else if (strncmp(typeStr, "float", strlen(typeStr)) == 0)
+        base = 0;
+    else
+        return false;
+
+    if (base)
     {
-        iValue = (uint32)atoi(py);
-        DEBUG_LOG(GetMangosString(LANG_SET_UINT), GUID_LOPART(guid), Opcode, iValue);
-        target->SetUInt32Value( Opcode , iValue );
-        PSendSysMessage(LANG_SET_UINT_FIELD, GUID_LOPART(guid), Opcode,iValue);
+        uint32 iValue = target->GetUInt32Value(field);
+
+        switch(base)
+        {
+            case 2:
+            {
+                // starting 0 if need as required bitstring format
+                std::string res;
+                res.reserve(1+32+1);
+                res = iValue & (1 << (32-1)) ? "0" : " ";
+                for (int i = 32; i > 0; --i)
+                    res += iValue & (1 << (i-1)) ? "1" : "0";
+                DEBUG_LOG(GetMangosString(LANG_GET_BITSTR), guid.GetString().c_str(), field, res.c_str());
+                PSendSysMessage(LANG_GET_BITSTR_FIELD, guid.GetString().c_str(), field, res.c_str());
+                break;
+            }
+            case 16:
+                DEBUG_LOG(GetMangosString(LANG_GET_HEX), guid.GetString().c_str(), field, iValue);
+                PSendSysMessage(LANG_GET_HEX_FIELD, guid.GetString().c_str(), field, iValue);
+                break;
+            case 10:
+            default:
+                DEBUG_LOG(GetMangosString(LANG_GET_UINT), guid.GetString().c_str(), field, iValue);
+                PSendSysMessage(LANG_GET_UINT_FIELD, guid.GetString().c_str(), field, iValue);
+        }
     }
     else
     {
-        fValue = (float)atof(py);
-        DEBUG_LOG(GetMangosString(LANG_SET_FLOAT), GUID_LOPART(guid), Opcode, fValue);
-        target->SetFloatValue( Opcode , fValue );
-        PSendSysMessage(LANG_SET_FLOAT_FIELD, GUID_LOPART(guid), Opcode,fValue);
+        float fValue = target->GetFloatValue(field);
+        DEBUG_LOG(GetMangosString(LANG_GET_FLOAT), guid.GetString().c_str(), field, fValue);
+        PSendSysMessage(LANG_GET_FLOAT_FIELD, guid.GetString().c_str(), field, fValue);
     }
 
     return true;
 }
 
-bool ChatHandler::HandleDebugGetValueCommand(const char* args)
+bool ChatHandler::HandleDebugGetItemValueCommand(char* args)
 {
-    if(!*args)
+    uint32 guid;
+    if (!ExtractUInt32(&args, guid))
         return false;
 
-    char* px = strtok((char*)args, " ");
-    char* pz = strtok(NULL, " ");
-
-    if (!px)
+    uint32 field;
+    if (!ExtractUInt32(&args, field))
         return false;
 
+    char* typeStr = ExtractLiteralArg(&args);
+    if (!typeStr && *args)                                  // optional arg but check format fail case
+        return false;
+
+    Item* item = m_session->GetPlayer()->GetItemByGuid(ObjectGuid(HIGHGUID_ITEM, guid));
+    if (!item)
+        return false;
+
+    return HandleGetValueHelper(item, field, typeStr);
+}
+
+bool ChatHandler::HandleDebugGetValueCommand(char* args)
+{
     Unit* target = getSelectedUnit();
     if(!target)
     {
@@ -856,115 +894,195 @@ bool ChatHandler::HandleDebugGetValueCommand(const char* args)
         return false;
     }
 
-    uint64 guid = target->GetGUID();
+    uint32 field;
+    if (!ExtractUInt32(&args, field))
+        return false;
 
-    uint32 Opcode = (uint32)atoi(px);
-    if(Opcode >= target->GetValuesCount())
+    char* typeStr = ExtractLiteralArg(&args);
+    if (!typeStr && *args)                                  // optional arg but check format fail case
+        return false;
+
+    return HandleGetValueHelper(target, field, typeStr);
+}
+
+bool ChatHandler::HandlerDebugModValueHelper( Object* target, uint32 field, char* typeStr, char* valStr )
+{
+    ObjectGuid guid = target->GetObjectGuid();
+
+    // not allow access to not existed or critical for work field
+    if (field >= target->GetValuesCount() || field <= OBJECT_FIELD_ENTRY)
     {
-        PSendSysMessage(LANG_TOO_BIG_INDEX, Opcode, GUID_LOPART(guid), target->GetValuesCount());
+        PSendSysMessage(LANG_TOO_BIG_INDEX, field, guid.GetString().c_str(), target->GetValuesCount());
         return false;
     }
-    uint32 iValue;
-    float fValue;
-    bool isint32 = true;
-    if(pz)
-        isint32 = (bool)atoi(pz);
 
-    if(isint32)
+    uint32 type;                                            // 0 -> float 1 -> int add 2-> bit or 3 -> bit and  4 -> bit and not
+    if (strncmp(typeStr, "int", strlen(typeStr)) == 0)
+        type = 1;
+    else if (strncmp(typeStr, "float", strlen(typeStr)) == 0)
+        type = 0;
+    else if (strncmp(typeStr, "|=", strlen("|=")+1) == 0)   // exactly copy
+        type = 2;
+    else if (strncmp(typeStr, "&=", strlen("&=")+1) == 0)   // exactly copy
+        type = 3;
+    else if (strncmp(typeStr, "&=~", strlen("&=~")+1) == 0) // exactly copy
+        type = 4;
+    else
+        return false;
+
+    if (type)
     {
-        iValue = target->GetUInt32Value( Opcode );
-        DEBUG_LOG(GetMangosString(LANG_GET_UINT), GUID_LOPART(guid), Opcode, iValue);
-        PSendSysMessage(LANG_GET_UINT_FIELD, GUID_LOPART(guid), Opcode,    iValue);
+        uint32 iValue;
+        if (!ExtractUInt32Base(&valStr, iValue, type == 1 ? 10 : 16))
+            return false;
+
+        uint32 value = target->GetUInt32Value(field);
+
+        switch(type)
+        {
+            default:
+            case 1:                                         // int +
+                value = uint32(int32(value) + int32(iValue));
+                DEBUG_LOG(GetMangosString(LANG_CHANGE_INT32), guid.GetString().c_str(), field, iValue, value, value);
+                PSendSysMessage(LANG_CHANGE_INT32_FIELD, guid.GetString().c_str(), field, iValue, value, value);
+                break;
+            case 2:                                         // |= bit or
+                value |= iValue;
+                DEBUG_LOG(GetMangosString(LANG_CHANGE_HEX), guid.GetString().c_str(), field, typeStr, iValue, value);
+                PSendSysMessage(LANG_CHANGE_HEX_FIELD, guid.GetString().c_str(), field, typeStr, iValue, value);
+                break;
+            case 3:                                         // &= bit and
+                value &= iValue;
+                DEBUG_LOG(GetMangosString(LANG_CHANGE_HEX), guid.GetString().c_str(), field, typeStr, iValue, value);
+                PSendSysMessage(LANG_CHANGE_HEX_FIELD, guid.GetString().c_str(), field, typeStr, iValue, value);
+                break;
+            case 4:                                         // &=~ bit and not
+                value &= ~iValue;
+                DEBUG_LOG(GetMangosString(LANG_CHANGE_HEX), guid.GetString().c_str(), field, typeStr, iValue, value);
+                PSendSysMessage(LANG_CHANGE_HEX_FIELD, guid.GetString().c_str(), field, typeStr, iValue, value);
+                break;
+        }
+
+        target->SetUInt32Value(field, value);
     }
     else
     {
-        fValue = target->GetFloatValue( Opcode );
-        DEBUG_LOG(GetMangosString(LANG_GET_FLOAT), GUID_LOPART(guid), Opcode, fValue);
-        PSendSysMessage(LANG_GET_FLOAT_FIELD, GUID_LOPART(guid), Opcode, fValue);
+        float fValue;
+        if (!ExtractFloat(&valStr, fValue))
+            return false;
+
+        float value = target->GetFloatValue(field);
+
+        value += fValue;
+
+        DEBUG_LOG(GetMangosString(LANG_CHANGE_FLOAT), guid.GetString().c_str(), field, fValue, value);
+        PSendSysMessage(LANG_CHANGE_FLOAT_FIELD, guid.GetString().c_str(), field, fValue, value);
+
+        target->SetFloatValue(field, value);
     }
 
     return true;
 }
 
-bool ChatHandler::HandleDebugMod32ValueCommand(const char* args)
+bool ChatHandler::HandleDebugModItemValueCommand(char* args)
 {
-    if(!*args)
+    uint32 guid;
+    if (!ExtractUInt32(&args, guid))
         return false;
 
-    char* px = strtok((char*)args, " ");
-    char* py = strtok(NULL, " ");
-
-    if (!px || !py)
+    uint32 field;
+    if (!ExtractUInt32(&args, field))
         return false;
 
-    uint32 Opcode = (uint32)atoi(px);
-    int Value = atoi(py);
+    char* typeStr = ExtractLiteralArg(&args);
+    if (!typeStr)
+        return false;
 
-    if(Opcode >= m_session->GetPlayer()->GetValuesCount())
+    char* valStr = ExtractLiteralArg(&args);
+    if (!valStr)
+        return false;
+
+    Item *item = m_session->GetPlayer()->GetItemByGuid(ObjectGuid(HIGHGUID_ITEM, guid));
+    if (!item)
+        return false;
+
+    return HandlerDebugModValueHelper(item, field, typeStr, valStr);
+}
+
+bool ChatHandler::HandleDebugModValueCommand(char* args)
+{
+    Unit* target = getSelectedUnit();
+    if(!target)
     {
-        PSendSysMessage(LANG_TOO_BIG_INDEX, Opcode, m_session->GetPlayer()->GetGUIDLow(), m_session->GetPlayer( )->GetValuesCount());
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
         return false;
     }
 
-    DEBUG_LOG(GetMangosString(LANG_CHANGE_32BIT), Opcode, Value);
-
-    int CurrentValue = (int)m_session->GetPlayer( )->GetUInt32Value( Opcode );
-
-    CurrentValue += Value;
-    m_session->GetPlayer( )->SetUInt32Value( Opcode , (uint32)CurrentValue );
-
-    PSendSysMessage(LANG_CHANGE_32BIT_FIELD, Opcode,CurrentValue);
-
-    return true;
-}
-
-bool ChatHandler::HandleDebugUpdateCommand(const char* args)
-{
-    if(!*args)
+    uint32 field;
+    if (!ExtractUInt32(&args, field))
         return false;
 
-    uint32 updateIndex;
-    uint32 value;
+    char* typeStr = ExtractLiteralArg(&args);
+    if (!typeStr && *args)                                  // optional arg but check format fail case
+        return false;
 
-    char* pUpdateIndex = strtok((char*)args, " ");
+    char* valStr = ExtractLiteralArg(&args);
+    if (!valStr)
+        return false;
 
-    Unit* chr = getSelectedUnit();
+    return HandlerDebugModValueHelper(target, field, typeStr, valStr);
+}
+
+bool ChatHandler::HandleDebugSpellModsCommand(char* args)
+{
+    char* typeStr = ExtractLiteralArg(&args);
+    if (!typeStr)
+        return false;
+
+    uint16 opcode; 
+    if (strncmp(typeStr, "flat", strlen(typeStr)) == 0)
+        opcode = SMSG_SET_FLAT_SPELL_MODIFIER;
+    else if (strncmp(typeStr, "pct", strlen(typeStr)) == 0)
+        opcode = SMSG_SET_PCT_SPELL_MODIFIER;
+    else
+        return false;
+
+    uint32 effidx;
+    if (!ExtractUInt32(&args, effidx) || effidx >= 64+32)
+        return false;
+
+    uint32 spellmodop;
+    if (!ExtractUInt32(&args, spellmodop) || spellmodop >= MAX_SPELLMOD)
+        return false;
+
+    int32 value;
+    if (!ExtractInt32(&args, value))
+        return false;
+
+    Player *chr = getSelectedPlayer();
     if (chr == NULL)
     {
-        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SendSysMessage(LANG_NO_CHAR_SELECTED);
         SetSentErrorMessage(true);
         return false;
     }
 
-    if(!pUpdateIndex)
-    {
-        return true;
-    }
-    updateIndex = atoi(pUpdateIndex);
-    //check updateIndex
-    if(chr->GetTypeId() == TYPEID_PLAYER)
-    {
-        if (updateIndex>=PLAYER_END) return true;
-    }
-    else
-    {
-        if (updateIndex>=UNIT_END) return true;
-    }
+    // check online security
+    if (HasLowerSecurity(chr, 0))
+        return false;
 
-    char*  pvalue = strtok(NULL, " ");
-    if (!pvalue)
-    {
-        value=chr->GetUInt32Value(updateIndex);
+    PSendSysMessage(LANG_YOU_CHANGE_SPELLMODS, opcode == SMSG_SET_FLAT_SPELL_MODIFIER ? "flat" : "pct",
+        spellmodop, value, effidx, GetNameLink(chr).c_str());
+    if (needReportToTarget(chr))
+        ChatHandler(chr).PSendSysMessage(LANG_YOURS_SPELLMODS_CHANGED, GetNameLink().c_str(),
+            opcode == SMSG_SET_FLAT_SPELL_MODIFIER ? "flat" : "pct", spellmodop, value, effidx);
 
-        PSendSysMessage(LANG_UPDATE, chr->GetGUIDLow(),updateIndex,value);
-        return true;
-    }
-
-    value=atoi(pvalue);
-
-    PSendSysMessage(LANG_UPDATE_CHANGE, chr->GetGUIDLow(),updateIndex,value);
-
-    chr->SetUInt32Value(updateIndex,value);
+    WorldPacket data(opcode, (1+1+2+2));
+    data << uint8(effidx);
+    data << uint8(spellmodop);
+    data << int32(value);
+    chr->GetSession()->SendPacket(&data);
 
     return true;
 }

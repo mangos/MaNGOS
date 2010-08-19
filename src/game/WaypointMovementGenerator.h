@@ -37,7 +37,7 @@
 #include <set>
 
 #define FLIGHT_TRAVEL_UPDATE  100
-#define STOP_TIME_FOR_PLAYER  3 * 60 * 1000                         // 3 Minutes
+#define STOP_TIME_FOR_PLAYER  3 * MINUTE * IN_MILLISECONDS  // 3 Minutes
 
 template<class T, class P>
 class MANGOS_DLL_SPEC PathMovementBase
@@ -74,7 +74,7 @@ class MANGOS_DLL_SPEC WaypointMovementGenerator<Creature>
 public PathMovementBase<Creature, WaypointPath const*>
 {
     public:
-        WaypointMovementGenerator(Creature &) : i_nextMoveTime(0), b_StoppedByPlayer(false) {}
+        WaypointMovementGenerator(Creature &) : i_nextMoveTime(0), m_isArrivalDone(false), m_isStoppedByPlayer(false) {}
         ~WaypointMovementGenerator() { i_path = NULL; }
         void Initialize(Creature &u);
         void Interrupt(Creature &);
@@ -90,8 +90,8 @@ public PathMovementBase<Creature, WaypointPath const*>
         void LoadPath(Creature &c);
 
         // Player stoping creature
-        bool IsStoppedByPlayer() { return b_StoppedByPlayer; }
-        void SetStoppedByPlayer(bool val) { b_StoppedByPlayer = val; }
+        bool IsStoppedByPlayer() { return m_isStoppedByPlayer; }
+        void SetStoppedByPlayer(bool val) { m_isStoppedByPlayer = val; }
 
         // allow use for overwrite empty implementation
         bool GetDestination(float& x, float& y, float& z) const { return PathMovementBase<Creature, WaypointPath const*>::GetDestination(x,y,z); }
@@ -99,10 +99,9 @@ public PathMovementBase<Creature, WaypointPath const*>
         bool GetResetPosition(Creature&, float& x, float& y, float& z);
 
     private:
-
         TimeTrackerSmall i_nextMoveTime;
-        std::vector<bool> i_hasDone;
-        bool b_StoppedByPlayer;
+        bool m_isArrivalDone;
+        bool m_isStoppedByPlayer;
 };
 
 /** FlightPathMovementGenerator generates movement of the player for the paths

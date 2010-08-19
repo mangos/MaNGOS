@@ -30,7 +30,7 @@
 #include "revision_nr.h"
 #include "Util.h"
 
-bool ChatHandler::HandleHelpCommand(const char* args)
+bool ChatHandler::HandleHelpCommand(char* args)
 {
     if(!*args)
     {
@@ -46,13 +46,13 @@ bool ChatHandler::HandleHelpCommand(const char* args)
     return true;
 }
 
-bool ChatHandler::HandleCommandsCommand(const char* /*args*/)
+bool ChatHandler::HandleCommandsCommand(char* /*args*/)
 {
     ShowHelpForCommand(getCommandTable(), "");
     return true;
 }
 
-bool ChatHandler::HandleAccountCommand(const char* args)
+bool ChatHandler::HandleAccountCommand(char* args)
 {
     // let show subcommands at unexpected data in args
     if (*args)
@@ -63,7 +63,7 @@ bool ChatHandler::HandleAccountCommand(const char* args)
     return true;
 }
 
-bool ChatHandler::HandleStartCommand(const char* /*args*/)
+bool ChatHandler::HandleStartCommand(char* /*args*/)
 {
     Player *chr = m_session->GetPlayer();
 
@@ -86,7 +86,7 @@ bool ChatHandler::HandleStartCommand(const char* /*args*/)
     return true;
 }
 
-bool ChatHandler::HandleServerInfoCommand(const char* /*args*/)
+bool ChatHandler::HandleServerInfoCommand(char* /*args*/)
 {
     uint32 activeClientsNum = sWorld.GetActiveSessionCount();
     uint32 queuedClientsNum = sWorld.GetQueuedSessionCount();
@@ -110,7 +110,7 @@ bool ChatHandler::HandleServerInfoCommand(const char* /*args*/)
     return true;
 }
 
-bool ChatHandler::HandleDismountCommand(const char* /*args*/)
+bool ChatHandler::HandleDismountCommand(char* /*args*/)
 {
     //If player is not mounted, so go out :)
     if (!m_session->GetPlayer( )->IsMounted())
@@ -132,7 +132,7 @@ bool ChatHandler::HandleDismountCommand(const char* /*args*/)
     return true;
 }
 
-bool ChatHandler::HandleSaveCommand(const char* /*args*/)
+bool ChatHandler::HandleSaveCommand(char* /*args*/)
 {
     Player *player=m_session->GetPlayer();
 
@@ -152,7 +152,7 @@ bool ChatHandler::HandleSaveCommand(const char* /*args*/)
     return true;
 }
 
-bool ChatHandler::HandleGMListIngameCommand(const char* /*args*/)
+bool ChatHandler::HandleGMListIngameCommand(char* /*args*/)
 {
     std::list< std::pair<std::string, bool> > names;
 
@@ -183,7 +183,7 @@ bool ChatHandler::HandleGMListIngameCommand(const char* /*args*/)
     return true;
 }
 
-bool ChatHandler::HandleAccountPasswordCommand(const char* args)
+bool ChatHandler::HandleAccountPasswordCommand(char* args)
 {
     // allow use from RA, but not from console (not have associated account id)
     if (!GetAccountId())
@@ -193,12 +193,10 @@ bool ChatHandler::HandleAccountPasswordCommand(const char* args)
         return false;
     }
 
-    if(!*args)
-        return false;
-
-    char *old_pass = strtok ((char*)args, " ");
-    char *new_pass = strtok (NULL, " ");
-    char *new_pass_c  = strtok (NULL, " ");
+    // allow or quoted string with possible spaces or literal without spaces
+    char *old_pass = ExtractQuotedOrLiteralArg(&args);
+    char *new_pass = ExtractQuotedOrLiteralArg(&args);
+    char *new_pass_c = ExtractQuotedOrLiteralArg(&args);
 
     if (!old_pass || !new_pass || !new_pass_c)
         return false;
@@ -242,7 +240,7 @@ bool ChatHandler::HandleAccountPasswordCommand(const char* args)
     return true;
 }
 
-bool ChatHandler::HandleAccountLockCommand(const char* args)
+bool ChatHandler::HandleAccountLockCommand(char* args)
 {
     // allow use from RA, but not from console (not have associated account id)
     if (!GetAccountId())
@@ -252,33 +250,30 @@ bool ChatHandler::HandleAccountLockCommand(const char* args)
         return false;
     }
 
-    if (!*args)
+    bool value;
+    if (!ExtractOnOff(&args, value))
     {
         SendSysMessage(LANG_USE_BOL);
-        return true;
+        SetSentErrorMessage(true);
+        return false;
     }
 
-    std::string argstr = (char*)args;
-    if (argstr == "on")
+    if (value)
     {
         LoginDatabase.PExecute( "UPDATE account SET locked = '1' WHERE id = '%d'",GetAccountId());
         PSendSysMessage(LANG_COMMAND_ACCLOCKLOCKED);
-        return true;
     }
-
-    if (argstr == "off")
+    else
     {
         LoginDatabase.PExecute( "UPDATE account SET locked = '0' WHERE id = '%d'",GetAccountId());
         PSendSysMessage(LANG_COMMAND_ACCLOCKUNLOCKED);
-        return true;
     }
 
-    SendSysMessage(LANG_USE_BOL);
     return true;
 }
 
 /// Display the 'Message of the day' for the realm
-bool ChatHandler::HandleServerMotdCommand(const char* /*args*/)
+bool ChatHandler::HandleServerMotdCommand(char* /*args*/)
 {
     PSendSysMessage(LANG_MOTD_CURRENT, sWorld.GetMotd());
     return true;

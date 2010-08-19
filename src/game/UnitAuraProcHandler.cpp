@@ -959,8 +959,8 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                     if (!roll_chance_i(triggerAmount))
                         return SPELL_AURA_PROC_FAILED;
 
-                    Aura *aur = GetAura(71905, EFFECT_INDEX_0);
-                    if (aur && uint32(aur->GetStackAmount() + 1) >= aur->GetSpellProto()->StackAmount)
+                    SpellAuraHolder *aurHolder = GetSpellAuraHolder(71905);
+                    if (aurHolder && uint32(aurHolder->GetStackAmount() + 1) >= aurHolder->GetSpellProto()->StackAmount)
                     {
                         RemoveAurasDueToSpell(71905);
                         CastSpell(this, 71904, true);       // Chaos Bane
@@ -1995,6 +1995,32 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                 {
                     // triggered_spell_id in spell data
                     target = this;
+                    break;
+                }
+                // Anger Capacitor
+                case 71406:                                 // normal
+                case 71545:                                 // heroic
+                {
+                    if (!pVictim)
+                        return SPELL_AURA_PROC_FAILED;
+
+                    SpellEntry const* mote = sSpellStore.LookupEntry(71432);
+                    if (!mote)
+                        return SPELL_AURA_PROC_FAILED;
+                    uint32 maxStack = mote->StackAmount - (dummySpell->Id == 71545 ? 1 : 0);
+
+                    SpellAuraHolder *aurHolder = GetSpellAuraHolder(71432);
+                    if (aurHolder && uint32(aurHolder->GetStackAmount() +1) >= maxStack)
+                    {
+                        RemoveAurasDueToSpell(71432);       // Mote of Anger
+
+                        // Manifest Anger (main hand/off hand)
+                        CastSpell(pVictim, !haveOffhandWeapon() || roll_chance_i(50) ? 71433 : 71434, true);
+                        return SPELL_AURA_PROC_OK;
+                    }
+                    else
+                        triggered_spell_id = 71432;
+
                     break;
                 }
             }
