@@ -839,7 +839,12 @@ void WorldSession::HandleTurnInPetitionOpcode(WorldPacket & recv_data)
         for(uint8 i = 0; i < signs; ++i)
         {
             Field* fields = result->Fetch();
-            guild->AddMember(fields[0].GetUInt64(), guild->GetLowestRank());
+
+            ObjectGuid signguid = ObjectGuid(HIGHGUID_PLAYER, fields[0].GetUInt32());
+            if (signguid.IsEmpty())
+                continue;
+
+            guild->AddMember(signguid, guild->GetLowestRank());
             result->NextRow();
         }
     }

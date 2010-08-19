@@ -233,7 +233,7 @@ std::string ObjectMgr::GetGuildNameById(uint32 GuildId) const
 Guild* ObjectMgr::GetGuildByLeader(ObjectGuid guid) const
 {
     for(GuildMap::const_iterator itr = mGuildMap.begin(); itr != mGuildMap.end(); ++itr)
-        if (itr->second->GetLeader() == guid.GetRawValue())
+        if (itr->second->GetLeaderGuid() == guid)
             return itr->second;
 
     return NULL;
