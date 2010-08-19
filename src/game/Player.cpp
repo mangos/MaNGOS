@@ -2514,9 +2514,9 @@ void Player::UninviteFromGroup()
 
 void Player::RemoveFromGroup(Group* group, ObjectGuid guid)
 {
-    if(group)
+    if (group)
     {
-        if (group->RemoveMember(guid.GetRawValue(), 0) <= 1)
+        if (group->RemoveMember(guid, 0) <= 1)
         {
             // group->Disband(); already disbanded in RemoveMember
             sObjectMgr.RemoveGroup(group);
@@ -4223,7 +4223,7 @@ void Player::DeleteFromDB(ObjectGuid playerguid, uint32 accountId, bool updateRe
     // remove from guild
     if (uint32 guildId = GetGuildIdFromDB(playerguid))
         if (Guild* guild = sObjectMgr.GetGuildById(guildId))
-            guild->DelMember(playerguid.GetRawValue());
+            guild->DelMember(playerguid);
 
     // remove from arena teams
     LeaveAllArenaTeams(playerguid);
@@ -6764,10 +6764,10 @@ uint32 Player::GetRankFromDB(uint64 guid)
         return 0;
 }
 
-uint32 Player::GetArenaTeamIdFromDB(uint64 guid, uint8 type)
+uint32 Player::GetArenaTeamIdFromDB(ObjectGuid guid, uint8 type)
 {
-    QueryResult *result = CharacterDatabase.PQuery("SELECT arena_team_member.arenateamid FROM arena_team_member JOIN arena_team ON arena_team_member.arenateamid = arena_team.arenateamid WHERE guid='%u' AND type='%u' LIMIT 1", GUID_LOPART(guid), type);
-    if(!result)
+    QueryResult *result = CharacterDatabase.PQuery("SELECT arena_team_member.arenateamid FROM arena_team_member JOIN arena_team ON arena_team_member.arenateamid = arena_team.arenateamid WHERE guid='%u' AND type='%u' LIMIT 1", guid.GetCounter(), type);
+    if (!result)
         return 0;
 
     uint32 id = (*result)[0].GetUInt32();
@@ -8265,7 +8265,7 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
                         {
                             if (group->GetLootMethod() == FREE_FOR_ALL)
                                 permission = ALL_PERMISSION;
-                            else if (group->GetLooterGuid() == GetGUID())
+                            else if (group->GetLooterGuid() == GetObjectGuid())
                             {
                                 if (group->GetLootMethod() == MASTER_LOOT)
                                     permission = MASTER_PERMISSION;
@@ -15184,7 +15184,7 @@ void Player::_LoadArenaTeamInfo(QueryResult *result)
 
         SetArenaTeamInfoField(arenaSlot, ARENA_TEAM_ID, arenateamid);
         SetArenaTeamInfoField(arenaSlot, ARENA_TEAM_TYPE, aTeam->GetType());
-        SetArenaTeamInfoField(arenaSlot, ARENA_TEAM_MEMBER, (aTeam->GetCaptain() == GetGUID()) ? 0 : 1);
+        SetArenaTeamInfoField(arenaSlot, ARENA_TEAM_MEMBER, (aTeam->GetCaptainGuid() == GetObjectGuid()) ? 0 : 1);
         SetArenaTeamInfoField(arenaSlot, ARENA_TEAM_GAMES_WEEK, played_week);
         SetArenaTeamInfoField(arenaSlot, ARENA_TEAM_GAMES_SEASON, played_season);
         SetArenaTeamInfoField(arenaSlot, ARENA_TEAM_WINS_SEASON, wons_season);
@@ -15421,11 +15421,11 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
     for(uint32 arena_slot = 0; arena_slot < MAX_ARENA_SLOT; ++arena_slot)
     {
         uint32 arena_team_id = GetArenaTeamId(arena_slot);
-        if(!arena_team_id)
+        if (!arena_team_id)
             continue;
 
-        if(ArenaTeam * at = sObjectMgr.GetArenaTeamById(arena_team_id))
-            if(at->HaveMember(GetGUID()))
+        if (ArenaTeam * at = sObjectMgr.GetArenaTeamById(arena_team_id))
+            if (at->HaveMember(GetObjectGuid()))
                 continue;
 
         // arena team not exist or not member, cleanup fields
@@ -15473,7 +15473,7 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
 
             //join player to battleground group
             currentBg->EventPlayerLoggedIn(this, GetGUID());
-            currentBg->AddOrSetPlayerToCorrectBgGroup(this, GetGUID(), m_bgData.bgTeam);
+            currentBg->AddOrSetPlayerToCorrectBgGroup(this, GetObjectGuid(), m_bgData.bgTeam);
 
             SetInviteForBattleGroundQueueType(bgQueueTypeId,currentBg->GetInstanceID());
         }
@@ -16661,7 +16661,7 @@ void Player::_LoadGroup(QueryResult *result)
 
         if (Group* group = sObjectMgr.GetGroupById(groupId))
         {
-            uint8 subgroup = group->GetMemberGroup(GetGUID());
+            uint8 subgroup = group->GetMemberGroup(GetObjectGuid());
             SetGroup(group, subgroup);
             if (getLevel() >= LEVELREQUIREMENT_HEROIC)
             {
@@ -16730,8 +16730,10 @@ void Player::_LoadBoundInstances(QueryResult *result)
 
             if(!perm && group)
             {
-                sLog.outError("_LoadBoundInstances: player %s(%d) is in group %d but has a non-permanent character bind to map %d,%d,%d", GetName(), GetGUIDLow(), GUID_LOPART(group->GetLeaderGUID()), mapId, instanceId, difficulty);
-                CharacterDatabase.PExecute("DELETE FROM character_instance WHERE guid = '%d' AND instance = '%d'", GetGUIDLow(), instanceId);
+                sLog.outError("_LoadBoundInstances: %s is in group (Id: %d) but has a non-permanent character bind to map %d,%d,%d",
+                    GetObjectGuid().GetString().c_str(), group->GetId(), mapId, instanceId, difficulty);
+                CharacterDatabase.PExecute("DELETE FROM character_instance WHERE guid = '%d' AND instance = '%d'",
+                    GetGUIDLow(), instanceId);
                 continue;
             }
 
@@ -16903,13 +16905,19 @@ void Player::SendSavedInstances()
 }
 
 /// convert the player's binds to the group
-void Player::ConvertInstancesToGroup(Player *player, Group *group, uint64 player_guid)
+void Player::ConvertInstancesToGroup(Player *player, Group *group, ObjectGuid player_guid)
 {
     bool has_binds = false;
     bool has_solo = false;
 
-    if(player) { player_guid = player->GetGUID(); if(!group) group = player->GetGroup(); }
-    ASSERT(player_guid);
+    if (player)
+    {
+        player_guid = player->GetGUID();
+        if (!group)
+            group = player->GetGroup();
+    }
+
+    ASSERT(!player_guid.IsEmpty());
 
     // copy all binds to the group, when changing leader it's assumed the character
     // will not have any solo binds
@@ -16935,13 +16943,15 @@ void Player::ConvertInstancesToGroup(Player *player, Group *group, uint64 player
         }
     }
 
+    uint32 player_lowguid = player_guid.GetCounter();
+
     // if the player's not online we don't know what binds it has
     if(!player || !group || has_binds)
-        CharacterDatabase.PExecute("INSERT INTO group_instance SELECT guid, instance, permanent FROM character_instance WHERE guid = '%u'", GUID_LOPART(player_guid));
+        CharacterDatabase.PExecute("INSERT INTO group_instance SELECT guid, instance, permanent FROM character_instance WHERE guid = '%u'", player_lowguid);
 
     // the following should not get executed when changing leaders
     if(!player || has_solo)
-        CharacterDatabase.PExecute("DELETE FROM character_instance WHERE guid = '%d' AND permanent = 0", GUID_LOPART(player_guid));
+        CharacterDatabase.PExecute("DELETE FROM character_instance WHERE guid = '%d' AND permanent = 0", player_lowguid);
 }
 
 bool Player::_LoadHomeBind(QueryResult *result)
@@ -18404,13 +18414,10 @@ void Player::LeaveAllArenaTeams(ObjectGuid guid)
     do
     {
         Field *fields = result->Fetch();
-        uint32 at_id = fields[0].GetUInt32();
-        if(at_id != 0)
-        {
-            ArenaTeam * at = sObjectMgr.GetArenaTeamById(at_id);
-            if(at)
-                at->DelMember(guid.GetRawValue());
-        }
+        if (uint32 at_id = fields[0].GetUInt32())
+            if (ArenaTeam * at = sObjectMgr.GetArenaTeamById(at_id))
+                at->DelMember(guid);
+
     } while (result->NextRow());
 
     delete result;
@@ -20909,13 +20916,13 @@ Player* Player::GetNextRandomRaidMember(float radius)
 PartyResult Player::CanUninviteFromGroup() const
 {
     const Group* grp = GetGroup();
-    if(!grp)
+    if (!grp)
         return ERR_NOT_IN_GROUP;
 
-    if(!grp->IsLeader(GetGUID()) && !grp->IsAssistant(GetGUID()))
+    if (!grp->IsLeader(GetObjectGuid()) && !grp->IsAssistant(GetObjectGuid()))
         return ERR_NOT_LEADER;
 
-    if(InBattleGround())
+    if (InBattleGround())
         return ERR_INVITE_RESTRICTED;
 
     return ERR_PARTY_RESULT_OK;

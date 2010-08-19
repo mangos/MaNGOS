@@ -34,10 +34,10 @@
 
 void WorldSession::HandleBattlemasterHelloOpcode(WorldPacket & recv_data)
 {
-    uint64 guid;
+    ObjectGuid guid;
     recv_data >> guid;
 
-    DEBUG_LOG("WORLD: Recvd CMSG_BATTLEMASTER_HELLO Message from (GUID: %u TypeId:%u)", GUID_LOPART(guid),GuidHigh2TypeId(GUID_HIPART(guid)));
+    DEBUG_LOG("WORLD: Recvd CMSG_BATTLEMASTER_HELLO Message from %s", guid.GetString().c_str());
 
     Creature *pCreature = GetPlayer()->GetMap()->GetCreature(guid);
 
@@ -66,7 +66,7 @@ void WorldSession::HandleBattlemasterHelloOpcode(WorldPacket & recv_data)
     SendBattlegGroundList(guid, bgTypeId);
 }
 
-void WorldSession::SendBattlegGroundList( uint64 guid, BattleGroundTypeId bgTypeId )
+void WorldSession::SendBattlegGroundList( ObjectGuid guid, BattleGroundTypeId bgTypeId )
 {
     WorldPacket data;
     sBattleGroundMgr.BuildBattleGroundListPacket(&data, guid, _player, bgTypeId, 0);
@@ -147,7 +147,7 @@ void WorldSession::HandleBattlemasterJoinOpcode( WorldPacket & recv_data )
         // no group found, error
         if (!grp)
             return;
-        if(grp->GetLeaderGUID() != _player->GetGUID())
+        if (grp->GetLeaderGuid() != _player->GetObjectGuid())
             return;
         err = grp->CanJoinBattleGroundQueue(bg, bgQueueTypeId, 0, bg->GetMaxPlayersPerTeam(), false, 0);
         isPremade = (grp->GetMembersCount() >= bg->GetMinPlayersPerTeam());
@@ -315,7 +315,7 @@ void WorldSession::HandleBattlefieldListOpcode( WorldPacket &recv_data )
     }
 
     WorldPacket data;
-    sBattleGroundMgr.BuildBattleGroundListPacket(&data, 0, _player, BattleGroundTypeId(bgTypeId), fromWhere);
+    sBattleGroundMgr.BuildBattleGroundListPacket(&data, ObjectGuid(), _player, BattleGroundTypeId(bgTypeId), fromWhere);
     SendPacket( &data );
 }
 
@@ -670,7 +670,7 @@ void WorldSession::HandleBattlemasterJoinArena( WorldPacket & recv_data )
         // no group found, error
         if (!grp)
             return;
-        if(grp->GetLeaderGUID() != _player->GetGUID())
+        if (grp->GetLeaderGuid() != _player->GetObjectGuid())
             return;
         // may be Group::CanJoinBattleGroundQueue should be moved to player class...
         err = grp->CanJoinBattleGroundQueue(bg, bgQueueTypeId, arenatype, arenatype, (bool)isRated, arenaslot);

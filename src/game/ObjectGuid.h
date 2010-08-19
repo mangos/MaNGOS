@@ -22,6 +22,8 @@
 #include "Common.h"
 #include "ByteBuffer.h"
 
+#include <functional>
+
 enum TypeID
 {
     TYPEID_OBJECT        = 0,
@@ -75,11 +77,6 @@ enum HighGuid
 //*** Must be replaced by ObjectGuid use ***
 #define IS_PLAYER_GUID(Guid)         ( GUID_HIPART(Guid) == HIGHGUID_PLAYER && Guid!=0 )
                                                             // special case for empty guid need check
-// l - OBJECT_FIELD_GUID
-// e - OBJECT_FIELD_ENTRY for GO (except GAMEOBJECT_TYPE_MO_TRANSPORT) and creatures or UNIT_FIELD_PETNUMBER for pets
-// h - OBJECT_FIELD_GUID + 1
-#define MAKE_NEW_GUID(l, e, h)   uint64( uint64(l) | ( uint64(e) << 24 ) | ( uint64(h) << 48 ) )
-
 #define GUID_HIPART(x)   (uint32)((uint64(x) >> 48) & 0x0000FFFF)
 
 // We have different low and middle part size for different guid types
@@ -276,5 +273,26 @@ ByteBuffer& operator<< (ByteBuffer& buf, PackedGuid const& guid);
 ByteBuffer& operator>> (ByteBuffer& buf, PackedGuidReader const& guid);
 
 inline PackedGuid ObjectGuid::WriteAsPacked() const { return PackedGuid(*this); }
+
+HASH_NAMESPACE_START
+
+    template<>
+    class hash<ObjectGuid>
+    {
+        public:
+
+            size_t operator() (ObjectGuid const& key) const
+            {
+                return hash<uint64>()(key.GetRawValue());
+            }
+    };
+
+    // for pre-TR1 Visual Studio versions (VS90 SP1 or early)
+    inline size_t hash_value(ObjectGuid const& key)
+    {
+        return hash_value(key.GetRawValue());
+    }
+
+HASH_NAMESPACE_END
 
 #endif

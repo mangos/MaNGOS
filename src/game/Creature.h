@@ -233,7 +233,14 @@ struct CreatureModelInfo
     uint8 gender;
     uint32 modelid_other_gender;                            // The oposite gender for this modelid (male/female)
     uint32 modelid_alternative;                             // An alternative model. Generally same gender(2)
-    uint32 modelid_other_team;                              // The oposite team. Generally for alliance totem
+};
+
+struct CreatureModelRace
+{
+    uint32 modelid;                                         // Native model/base model the selection is for
+    uint32 racemask;                                        // Races it applies to (and then a player source must exist for selection)
+    uint32 creature_entry;                                  // Modelid from creature_template.entry will be selected
+    uint32 modelid_racial;                                  // Explicit modelid. Used if creature_template entry is not defined
 };
 
 enum InhabitTypeValues
@@ -508,7 +515,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
         CreatureInfo const *GetCreatureInfo() const { return m_creatureInfo; }
         CreatureDataAddon const* GetCreatureAddon() const;
 
-        static uint32 ChooseDisplayId(uint32 team, const CreatureInfo *cinfo, const CreatureData *data = NULL);
+        static uint32 ChooseDisplayId(const CreatureInfo *cinfo, const CreatureData *data = NULL);
 
         std::string GetAIName() const;
         std::string GetScriptName() const;

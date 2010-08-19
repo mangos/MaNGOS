@@ -8,6 +8,8 @@ MaNGOS 0.17   (??? ??? 2010)
 
  ==== Server Features ====
 
+ * Improved: Updated MySQL client libs to 5.1.49.
+
  ==== Statistics ====
  * Fixed Bugs: ??? tickets and many bugs reported at forum resolved
  * Total number of changes: ??? revisions (??? commits)

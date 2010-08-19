@@ -23,7 +23,7 @@
 #include "Policies/Singleton.h"
 #include <ace/Thread_Mutex.h>
 #include <ace/RW_Thread_Mutex.h>
-#include "Utilities/UnorderedMap.h"
+#include "Utilities/UnorderedMapSet.h"
 #include "Policies/ThreadingModel.h"
 
 #include "UpdateData.h"

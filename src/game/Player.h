@@ -1833,7 +1833,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         }
         uint32 GetArenaTeamId(uint8 slot) { return GetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (slot * ARENA_TEAM_END) + ARENA_TEAM_ID); }
         uint32 GetArenaPersonalRating(uint8 slot) { return GetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (slot * ARENA_TEAM_END) + ARENA_TEAM_PERSONAL_RATING); }
-        static uint32 GetArenaTeamIdFromDB(uint64 guid, uint8 slot);
+        static uint32 GetArenaTeamIdFromDB(ObjectGuid guid, uint8 slot);
         void SetArenaTeamIdInvited(uint32 ArenaTeamId) { m_ArenaTeamIdInvited = ArenaTeamId; }
         uint32 GetArenaTeamIdInvited() { return m_ArenaTeamIdInvited; }
         static void LeaveAllArenaTeams(ObjectGuid guid);
@@ -2350,7 +2350,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         InstancePlayerBind* BindToInstance(InstanceSave *save, bool permanent, bool load = false);
         void SendRaidInfo();
         void SendSavedInstances();
-        static void ConvertInstancesToGroup(Player *player, Group *group = NULL, uint64 player_guid = 0);
+        static void ConvertInstancesToGroup(Player *player, Group *group = NULL, ObjectGuid player_guid = ObjectGuid());
         InstanceSave* GetBoundInstanceSaveForSelfOrGroup(uint32 mapid);
 
         /*********************************************************/
