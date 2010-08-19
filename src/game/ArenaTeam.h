@@ -87,7 +87,7 @@ enum ArenaTeamTypes
 
 struct ArenaTeamMember
 {
-    uint64 guid;
+    ObjectGuid guid;
     std::string name;
     uint8 Class;
     uint32 games_week;
@@ -125,7 +125,7 @@ class ArenaTeam
         ArenaTeam();
         ~ArenaTeam();
 
-        bool Create(uint64 captainGuid, uint32 type, std::string ArenaTeamName);
+        bool Create(ObjectGuid captainGuid, uint32 type, std::string arenaTeamName);
         void Disband(WorldSession *session);
 
         typedef std::list<ArenaTeamMember> MemberList;
@@ -134,7 +134,7 @@ class ArenaTeam
         uint32 GetType() const            { return m_Type; }
         uint8  GetSlot() const            { return GetSlotByType(GetType()); }
         static uint8 GetSlotByType(uint32 type);
-        const uint64& GetCaptain() const  { return m_CaptainGuid; }
+        ObjectGuid GetCaptainGuid() const { return m_CaptainGuid; }
         std::string GetName() const       { return m_Name; }
         const ArenaTeamStats& GetStats() const { return m_stats; }
         void SetStats(uint32 stat_type, uint32 value);
@@ -146,12 +146,9 @@ class ArenaTeam
         uint32 GetBorderColor() const     { return m_BorderColor; }
         uint32 GetBackgroundColor() const { return m_BackgroundColor; }
 
-        void SetCaptain(const uint64& guid);
-        bool AddMember(const uint64& PlayerGuid);
-
-        // Shouldn't be const uint64& ed, because than can reference guid from members on Disband
-        // and this method removes given record from list. So invalid reference can happen.
-        void DelMember(uint64 guid);
+        void SetCaptain(ObjectGuid guid);
+        bool AddMember(ObjectGuid playerGuid);
+        void DelMember(ObjectGuid guid);
 
         void SetEmblem(uint32 backgroundColor, uint32 emblemStyle, uint32 emblemColor, uint32 borderStyle, uint32 borderColor);
 
@@ -159,12 +156,12 @@ class ArenaTeam
         bool   Empty() const                  { return m_members.empty(); }
         MemberList::iterator m_membersBegin() { return m_members.begin(); }
         MemberList::iterator m_membersEnd()   { return m_members.end(); }
-        bool HaveMember(const uint64& guid) const;
+        bool HaveMember(ObjectGuid guid) const;
 
-        ArenaTeamMember* GetMember(const uint64& guid)
+        ArenaTeamMember* GetMember(ObjectGuid guid)
         {
             for (MemberList::iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
-                if(itr->guid == guid)
+                if (itr->guid == guid)
                     return &(*itr);
 
             return NULL;
@@ -173,7 +170,7 @@ class ArenaTeam
         ArenaTeamMember* GetMember(const std::string& name)
         {
             for (MemberList::iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
-                if(itr->name == name)
+                if (itr->name == name)
                     return &(*itr);
 
             return NULL;
@@ -188,12 +185,17 @@ class ArenaTeam
         void SaveToDB();
 
         void BroadcastPacket(WorldPacket *packet);
-        void BroadcastEvent(ArenaTeamEvents event, uint64 guid, uint8 strCount, std::string str1, std::string str2, std::string str3);
+
+        void BroadcastEvent(ArenaTeamEvents event, ObjectGuid guid, char const* str1 = NULL, char const* str2 = NULL, char const* str3 = NULL);
+        void BroadcastEvent(ArenaTeamEvents event, char const* str1 = NULL, char const* str2 = NULL, char const* str3 = NULL)
+        {
+            BroadcastEvent(event, ObjectGuid(), str1, str2, str3);
+        }
 
         void Roster(WorldSession *session);
         void Query(WorldSession *session);
         void Stats(WorldSession *session);
-        void InspectStats(WorldSession *session, uint64 guid);
+        void InspectStats(WorldSession *session, ObjectGuid guid);
 
         uint32 GetPoints(uint32 MemberRating);
         float GetChanceAgainst(uint32 own_rating, uint32 enemy_rating);
@@ -201,7 +203,7 @@ class ArenaTeam
         void MemberWon(Player * plr, uint32 againstRating);
         int32 LostAgainst(uint32 againstRating);
         void MemberLost(Player * plr, uint32 againstRating);
-        void OfflineMemberLost(uint64 guid, uint32 againstRating);
+        void OfflineMemberLost(ObjectGuid guid, uint32 againstRating);
 
         void UpdateArenaPointsHelper(std::map<uint32, uint32> & PlayerPoints);
 
@@ -215,7 +217,7 @@ class ArenaTeam
         uint32 m_TeamId;
         uint32 m_Type;
         std::string m_Name;
-        uint64 m_CaptainGuid;
+        ObjectGuid m_CaptainGuid;
 
         uint32 m_BackgroundColor; // ARGB format
         uint32 m_EmblemStyle;     // icon id

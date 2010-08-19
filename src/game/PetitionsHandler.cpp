@@ -851,7 +851,7 @@ void WorldSession::HandleTurnInPetitionOpcode(WorldPacket & recv_data)
     else                                                    // or arena team
     {
         ArenaTeam* at = new ArenaTeam;
-        if(!at->Create(_player->GetGUID(), type, name))
+        if (!at->Create(_player->GetObjectGuid(), type, name))
         {
             sLog.outError("PetitionsHandler: arena team create failed.");
             delete at;
@@ -872,8 +872,11 @@ void WorldSession::HandleTurnInPetitionOpcode(WorldPacket & recv_data)
         for(uint8 i = 0; i < signs; ++i)
         {
             Field* fields = result->Fetch();
-            uint64 memberGUID = fields[0].GetUInt64();
-            DEBUG_LOG("PetitionsHandler: adding arena member %u", GUID_LOPART(memberGUID));
+            ObjectGuid memberGUID = ObjectGuid(HIGHGUID_PLAYER, fields[0].GetUInt32());
+            if (memberGUID.IsEmpty())
+                continue;
+
+            DEBUG_LOG("PetitionsHandler: adding arena member %s", memberGUID.GetString().c_str());
             at->AddMember(memberGUID);
             result->NextRow();
         }
