@@ -6523,6 +6523,28 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     }
                     return;
                 }
+                case 65917:                                 // Magic Rooster 
+                { 
+                    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER) 
+                        return; 
+ 
+                    // Prevent stacking of mounts 
+                    unitTarget->RemoveSpellsCausingAura(SPELL_AURA_MOUNTED); 
+ 
+                    uint32 spellId = 66122; // common case 
+ 
+                    if (((Player*)unitTarget)->getGender() == GENDER_MALE) 
+                    { 
+                        switch (((Player*)unitTarget)->getRace()) 
+                        { 
+                            case RACE_TAUREN: spellId = 66124; break; 
+                            case RACE_DRAENEI: spellId = 66123; break; 
+                        } 
+                    } 
+ 
+                    unitTarget->CastSpell(unitTarget, spellId, true); 
+                    return; 
+                }
                 case 66477:                                 // Bountiful Feast
                 {
                     if (!unitTarget)
