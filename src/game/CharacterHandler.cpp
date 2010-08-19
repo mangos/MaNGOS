@@ -671,7 +671,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
 
             guild->DisplayGuildBankTabsInfo(this);
 
-            guild->BroadcastEvent(GE_SIGNED_ON, pCurrChar->GetGUID(), 1, pCurrChar->GetName(), "", "");
+            guild->BroadcastEvent(GE_SIGNED_ON, pCurrChar->GetObjectGuid(), pCurrChar->GetName());
         }
         else
         {

@@ -340,7 +340,12 @@ class Guild
         void BroadcastToOfficers(WorldSession *session, const std::string& msg, uint32 language = LANG_UNIVERSAL);
         void BroadcastPacketToRank(WorldPacket *packet, uint32 rankId);
         void BroadcastPacket(WorldPacket *packet);
-        void BroadcastEvent(GuildEvents event, uint64 guid, uint8 strCount, std::string str1, std::string str2, std::string str3);
+
+        void BroadcastEvent(GuildEvents event, ObjectGuid guid, char const* str1 = NULL, char const* str2 = NULL, char const* str3 = NULL);
+        void BroadcastEvent(GuildEvents event, char const* str1 = NULL, char const* str2 = NULL, char const* str3 = NULL)
+        {
+            BroadcastEvent(event, ObjectGuid(), str1, str2, str3);
+        }
 
         template<class Do>
         void BroadcastWorker(Do& _do, Player* except = NULL)

@@ -385,7 +385,7 @@ void WorldSession::LogoutPlayer(bool Save)
             guild->SetMemberStats(_player->GetGUID());
             guild->UpdateLogoutTime(_player->GetGUID());
 
-            guild->BroadcastEvent(GE_SIGNED_OFF, _player->GetGUID(), 1, _player->GetName(), "", "");
+            guild->BroadcastEvent(GE_SIGNED_OFF, _player->GetGUID(), _player->GetName());
         }
 
         ///- Remove pet

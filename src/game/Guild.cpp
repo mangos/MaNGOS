@@ -490,9 +490,8 @@ void Guild::DelMember(uint64 guid, bool isDisbanding)
         // when leader non-exist (at guild load with deleted leader only) not send broadcasts
         if (oldLeader)
         {
-            BroadcastEvent(GE_LEADER_CHANGED, 0, 2, oldLeader->Name, best->Name, "");
-
-            BroadcastEvent(GE_LEFT, guid, 1, oldLeader->Name, "", "");
+            BroadcastEvent(GE_LEADER_CHANGED, oldLeader->Name.c_str(), best->Name.c_str());
+            BroadcastEvent(GE_LEFT, guid, oldLeader->Name.c_str());
         }
     }
 
@@ -697,7 +696,7 @@ int32 Guild::GetRank(uint32 LowGuid)
 
 void Guild::Disband()
 {
-    BroadcastEvent(GE_DISBANDED, 0, 0, "", "", "");
+    BroadcastEvent(GE_DISBANDED);
 
     while (!members.empty())
     {
@@ -2350,32 +2349,30 @@ void Guild::MoveFromCharToBank( Player * pl, uint8 PlayerBag, uint8 PlayerSlot, 
     }
 }
 
-void Guild::BroadcastEvent(GuildEvents event, uint64 guid, uint8 strCount, std::string str1, std::string str2, std::string str3)
+void Guild::BroadcastEvent(GuildEvents event, ObjectGuid guid, char const* str1 /*=NULL*/, char const* str2 /*=NULL*/, char const* str3 /*=NULL*/)
 {
-    WorldPacket data(SMSG_GUILD_EVENT, 1+1+(guid ? 8 : 0));
+    uint8 strCount = !str1 ? 0 : (!str2 ? 1 : (!str3 ? 2 : 3));
+
+    WorldPacket data(SMSG_GUILD_EVENT, 1 + 1 + 1*strCount + (guid.IsEmpty() ? 0 : 8));
     data << uint8(event);
     data << uint8(strCount);
 
-    switch(strCount)
+    if (str3)
     {
-        case 0:
-            break;
-        case 1:
-            data << str1;
-            break;
-        case 2:
-            data << str1 << str2;
-            break;
-        case 3:
-            data << str1 << str2 << str3;
-            break;
-        default:
-            sLog.outError("Guild::BroadcastEvent: incorrect strings count %u!", strCount);
-            break;
+        data << str1;
+        data << str2;
+        data << str3;
     }
+    else if (str2)
+    {
+        data << str1;
+        data << str2;
+    }
+    else if (str1)
+        data << str1;
 
-    if(guid)
-        data << uint64(guid);
+    if (!guid.IsEmpty())
+        data << guid;
 
     BroadcastPacket(&data);
 
