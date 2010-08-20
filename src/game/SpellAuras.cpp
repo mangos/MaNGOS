@@ -8540,6 +8540,13 @@ void SpellAuraHolder::HandleSpellSpecificBoosts(bool apply)
                 spellId1 = 60242;                           // Darkmoon Card: Illusion
             }
             else
+            // SPELL_MUTATED_INFECTION - ICC boss Rotface
+            if (GetId() == 69674 && !apply && m_removeMode == AURA_REMOVE_BY_DISPEL)
+            {
+                cast_at_remove = true;
+                spellId1 = 69706;
+            }
+            else
                 return;
             break;
         }
