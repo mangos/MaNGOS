@@ -147,20 +147,20 @@ void Corpse::DeleteFromDB()
     CharacterDatabase.PExecute("DELETE FROM corpse WHERE player = '%d' AND corpse_type <> '0'",  GUID_LOPART(GetOwnerGUID()));
 }
 
-bool Corpse::LoadFromDB(uint32 guid, Field *fields)
+bool Corpse::LoadFromDB(uint32 lowguid, Field *fields)
 {
     ////                                                    0            1       2                  3                  4                  5                   6
     //QueryResult *result = CharacterDatabase.Query("SELECT corpse.guid, player, corpse.position_x, corpse.position_y, corpse.position_z, corpse.orientation, corpse.map,"
     ////   7     8            9         10         11      12    13     14           15            16              17       18
     //    "time, corpse_type, instance, phaseMask, gender, race, class, playerBytes, playerBytes2, equipmentCache, guildId, playerFlags FROM corpse"
-    uint32 playerGuid   = fields[1].GetUInt32();
+    uint32 playerLowGuid= fields[1].GetUInt32();
     float positionX     = fields[2].GetFloat();
     float positionY     = fields[3].GetFloat();
     float positionZ     = fields[4].GetFloat();
     float orientation   = fields[5].GetFloat();
     uint32 mapid        = fields[6].GetUInt32();
 
-    Object::_Create(guid, 0, HIGHGUID_CORPSE);
+    Object::_Create(lowguid, 0, HIGHGUID_CORPSE);
 
     m_time = time_t(fields[7].GetUInt64());
     m_type = CorpseType(fields[8].GetUInt32());
@@ -181,9 +181,12 @@ bool Corpse::LoadFromDB(uint32 guid, Field *fields)
     uint32 guildId      = fields[17].GetUInt32();
     uint32 playerFlags  = fields[18].GetUInt32();
 
+    ObjectGuid guid = ObjectGuid(HIGHGUID_CORPSE, lowguid);
+    ObjectGuid playerGuid = ObjectGuid(HIGHGUID_PLAYER, playerLowGuid);
+
     // overwrite possible wrong/corrupted guid
-    SetUInt64Value(OBJECT_FIELD_GUID, MAKE_NEW_GUID(guid, 0, HIGHGUID_CORPSE));
-    SetUInt64Value(CORPSE_FIELD_OWNER, MAKE_NEW_GUID(playerGuid, 0, HIGHGUID_PLAYER));
+    SetGuidValue(OBJECT_FIELD_GUID, guid);
+    SetGuidValue(CORPSE_FIELD_OWNER, playerGuid);
 
     SetObjectScale(DEFAULT_OBJECT_SCALE);
 

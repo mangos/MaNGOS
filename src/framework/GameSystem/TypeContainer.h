@@ -28,7 +28,7 @@
 #include <vector>
 #include "Platform/Define.h"
 #include "Utilities/TypeList.h"
-#include "Utilities/UnorderedMap.h"
+#include "Utilities/UnorderedMapSet.h"
 #include "GameSystem/GridRefManager.h"
 
 template<class OBJECT, class KEY_TYPE>

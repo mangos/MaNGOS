@@ -23,7 +23,7 @@
 #include "Policies/Singleton.h"
 #include <ace/Thread_Mutex.h>
 #include <ace/RW_Thread_Mutex.h>
-#include "Utilities/UnorderedMap.h"
+#include "Utilities/UnorderedMapSet.h"
 #include "Policies/ThreadingModel.h"
 
 #include "UpdateData.h"
@@ -110,7 +110,7 @@ class MANGOS_DLL_DECL ObjectAccessor : public MaNGOS::Singleton<ObjectAccessor, 
         // Player access
         static Player* FindPlayer(ObjectGuid guid);         // if need player at specific map better use Map::GetPlayer
         static Player* FindPlayerByName(const char *name);
-        static void KickPlayer(uint64 guid);
+        static void KickPlayer(ObjectGuid guid);
 
         HashMapHolder<Player>::MapType& GetPlayers()
         {

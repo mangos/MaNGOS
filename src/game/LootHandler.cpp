@@ -291,7 +291,7 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
     Player  *player = GetPlayer();
     Loot    *loot;
 
-    player->SetLootGUID(0);
+    player->SetLootGUID(ObjectGuid());
     player->SendLootRelease(lguid);
 
     player->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_LOOTING);
@@ -364,7 +364,7 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
                 }
                 else if (go->GetGoType() == GAMEOBJECT_TYPE_FISHINGHOLE)
                 {                                               // The fishing hole used once more
-                    go->AddUse();                               // if the max usage is reached, will be despawned in next tick
+                    go->AddUse();                               // if the max usage is reached, will be despawned at next tick
                     if (go->GetUseCount() >= urand(go->GetGOInfo()->fishinghole.minSuccessOpens,go->GetGOInfo()->fishinghole.maxSuccessOpens))
                     {
                         go->SetLootState(GO_JUST_DEACTIVATED);
@@ -437,7 +437,7 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
 
             // update next looter
             if(Group* group = pCreature->GetGroupLootRecipient())
-                if (group->GetLooterGuid() == player->GetGUID())
+                if (group->GetLooterGuid() == player->GetObjectGuid())
                     group->UpdateLooterGuid(pCreature);
 
             if (loot->isLooted())
@@ -469,19 +469,19 @@ void WorldSession::HandleLootMasterGiveOpcode( WorldPacket & recv_data )
 
     recv_data >> lootguid >> slotid >> target_playerguid;
 
-    if(!_player->GetGroup() || _player->GetGroup()->GetLooterGuid() != _player->GetGUID())
+    if (!_player->GetGroup() || _player->GetGroup()->GetLooterGuid() != _player->GetObjectGuid())
     {
         _player->SendLootRelease(GetPlayer()->GetLootGUID());
         return;
     }
 
     Player *target = ObjectAccessor::FindPlayer(target_playerguid);
-    if(!target)
+    if (!target)
         return;
 
     DEBUG_LOG("WorldSession::HandleLootMasterGiveOpcode (CMSG_LOOT_MASTER_GIVE, 0x02A3) Target = %s [%s].", target_playerguid.GetString().c_str(), target->GetName());
 
-    if(_player->GetLootGUID() != lootguid.GetRawValue())
+    if (_player->GetLootGUID() != lootguid.GetRawValue())
         return;
 
     Loot *pLoot = NULL;

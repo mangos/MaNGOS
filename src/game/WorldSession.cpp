@@ -379,13 +379,15 @@ void WorldSession::LogoutPlayer(bool Save)
         LoginDatabase.PExecute("UPDATE account SET active_realm_id = 0 WHERE id = '%u'", GetAccountId());
 
         ///- If the player is in a guild, update the guild roster and broadcast a logout message to other guild members
-        Guild *guild = sObjectMgr.GetGuildById(_player->GetGuildId());
-        if(guild)
+        if (Guild *guild = sObjectMgr.GetGuildById(_player->GetGuildId()))
         {
-            guild->SetMemberStats(_player->GetGUID());
-            guild->UpdateLogoutTime(_player->GetGUID());
+            if (MemberSlot* slot = guild->GetMemberSlot(_player->GetObjectGuid()))
+            {
+                slot->SetMemberStats(_player);
+                slot->UpdateLogoutTime();
+            }
 
-            guild->BroadcastEvent(GE_SIGNED_OFF, _player->GetGUID(), 1, _player->GetName(), "", "");
+            guild->BroadcastEvent(GE_SIGNED_OFF, _player->GetGUID(), _player->GetName());
         }
 
         ///- Remove pet

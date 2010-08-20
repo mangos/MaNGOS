@@ -1308,7 +1308,7 @@ void Spell::EffectDummy(SpellEffectEntry const* effect)
                         {
                             m_caster->CastSpell(unitTarget, pSpell, true);
                             SpellEffectEntry const* killSpellEffect = pSpell->GetSpellEffect(EFFECT_INDEX_0);
-                            ((Player*)m_caster)->KilledMonsterCredit(killSpellEffect ? killSpellEffect->EffectMiscValue : 0, 0);
+                            ((Player*)m_caster)->KilledMonsterCredit(killSpellEffect ? killSpellEffect->EffectMiscValue : 0);
                         }
 
                         if (unitTarget->GetTypeId() == TYPEID_UNIT)
@@ -1386,7 +1386,7 @@ void Spell::EffectDummy(SpellEffectEntry const* effect)
                         if(SpellEffectEntry const* pSpellEffect = pSpell->GetSpellEffect(EFFECT_INDEX_0))
                             if (const SpellEntry *pSpellCredit = sSpellStore.LookupEntry(pSpellEffect->EffectMiscValue))
                                 if(SpellEffectEntry const* pSpellCreditEffect = pSpellCredit->GetSpellEffect(EFFECT_INDEX_0))
-                                    ((Player*)m_caster)->KilledMonsterCredit(pSpellCreditEffect->EffectMiscValue, 0);
+                                    ((Player*)m_caster)->KilledMonsterCredit(pSpellCreditEffect->EffectMiscValue);
 
                         ((Creature*)unitTarget)->ForcedDespawn();
                     }
@@ -3768,9 +3768,9 @@ void Spell::EffectOpenLock(SpellEffectEntry const* effect)
             if (gameObjTarget)
             {
                 // Allow one skill-up until respawned
-                if (!gameObjTarget->IsInSkillupList(player->GetGUIDLow()) &&
+                if (!gameObjTarget->IsInSkillupList(player) &&
                     player->UpdateGatherSkill(skillId, pureSkillValue, reqSkillValue))
-                    gameObjTarget->AddToSkillupList(player->GetGUIDLow());
+                    gameObjTarget->AddToSkillupList(player);
             }
             else if (itemTarget)
             {
@@ -6783,7 +6783,7 @@ void Spell::EffectStuck(SpellEffectEntry const* effect /*effect*/)
     SpellEntry const *spellInfo = sSpellStore.LookupEntry(8690);
     if(!spellInfo)
         return;
-    Spell spell(pTarget, spellInfo, true, 0);
+    Spell spell(pTarget, spellInfo, true);
     spell.SendSpellCooldown();
 }
 
@@ -6878,6 +6878,13 @@ void Spell::DoSummonTotem(SpellEffectEntry const* effect, uint8 slot_dbc)
     {
         delete pTotem;
         return;
+    }
+
+    // special model selection case for totems
+    if (m_caster->GetTypeId() == TYPEID_PLAYER)
+    {
+        if (uint32 modelid_race = sObjectMgr.GetModelForRace(pTotem->GetNativeDisplayId(), m_caster->getRaceMask()))
+            pTotem->SetDisplayId(modelid_race);
     }
 
     float angle = slot < MAX_TOTEM_SLOT ? M_PI_F/MAX_TOTEM_SLOT - (slot*2*M_PI_F/MAX_TOTEM_SLOT) : 0;
@@ -7880,7 +7887,7 @@ void Spell::EffectKillCreditPersonal(SpellEffectEntry const* effect)
     if(!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
         return;
 
-    ((Player*)unitTarget)->KilledMonsterCredit(effect->EffectMiscValue, 0);
+    ((Player*)unitTarget)->KilledMonsterCredit(effect->EffectMiscValue);
 }
 
 void Spell::EffectKillCredit(SpellEffectEntry const* effect)

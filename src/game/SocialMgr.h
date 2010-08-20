@@ -21,7 +21,7 @@
 
 #include "Policies/Singleton.h"
 #include "Database/DatabaseEnv.h"
-#include "Common.h"
+#include "ObjectGuid.h"
 
 class SocialMgr;
 class PlayerSocial;
@@ -128,12 +128,11 @@ class PlayerSocial
         // Misc
         bool HasFriend(uint32 friend_guid);
         bool HasIgnore(uint32 ignore_guid);
-        uint32 GetPlayerGUID() { return m_playerGUID; }
-        void SetPlayerGUID(uint32 guid) { m_playerGUID = guid; }
+        void SetPlayerGuid(ObjectGuid guid) { m_playerLowGuid = guid.GetCounter(); }
         uint32 GetNumberOfSocialsWithFlag(SocialFlag flag);
     private:
         PlayerSocialMap m_playerSocialMap;
-        uint32 m_playerGUID;
+        uint32 m_playerLowGuid;
 };
 
 class SocialMgr
@@ -150,7 +149,7 @@ class SocialMgr
         void SendFriendStatus(Player *player, FriendsResult result, uint32 friend_guid, bool broadcast);
         void BroadcastToFriendListers(Player *player, WorldPacket *packet);
         // Loading
-        PlayerSocial *LoadFromDB(QueryResult *result, uint32 guid);
+        PlayerSocial *LoadFromDB(QueryResult *result, ObjectGuid guid);
     private:
         SocialMap m_socialMap;
 };

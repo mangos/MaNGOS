@@ -42,7 +42,6 @@
 #include "CellImpl.h"
 #include "ObjectMgr.h"
 #include "ObjectAccessor.h"
-#include "ObjectGuid.h"
 #include "CreatureAI.h"
 #include "Formulas.h"
 #include "Group.h"
@@ -1568,7 +1567,7 @@ bool Player::BuildEnumData( QueryResult * result, WorldPacket * p_data )
         return false;
     }
 
-    *p_data << uint64(MAKE_NEW_GUID(guid, 0, HIGHGUID_PLAYER));
+    *p_data << ObjectGuid(HIGHGUID_PLAYER, guid);
     *p_data << fields[1].GetString();                       // name
     *p_data << uint8(pRace);                                // race
     *p_data << uint8(pClass);                               // class
@@ -2499,9 +2498,9 @@ void Player::UninviteFromGroup()
     }
 }
 
-void Player::RemoveFromGroup(Group* group, uint64 guid)
+void Player::RemoveFromGroup(Group* group, ObjectGuid guid)
 {
-    if(group)
+    if (group)
     {
         if (group->RemoveMember(guid, 0) <= 1)
         {
@@ -4179,7 +4178,7 @@ TrainerSpellState Player::GetTrainerSpellState(TrainerSpell const* trainer_spell
  * @param updateRealmChars when this flag is set, the amount of characters on that realm will be updated in the realmlist
  * @param deleteFinally    if this flag is set, the config option will be ignored and the character will be permanently removed from the database
  */
-void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmChars, bool deleteFinally)
+void Player::DeleteFromDB(ObjectGuid playerguid, uint32 accountId, bool updateRealmChars, bool deleteFinally)
 {
     // for nonexistent account avoid update realm
     if (accountId == 0)
@@ -4192,7 +4191,7 @@ void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmC
     if (deleteFinally || Player::GetLevelFromDB(playerguid) < charDelete_minLvl)
         charDelete_method = 0;
 
-    uint32 guid = GUID_LOPART(playerguid);
+    uint32 lowguid = playerguid.GetCounter();
 
     // convert corpse to bones if exist (to prevent exiting Corpse in World without DB entry)
     // bones will be deleted by corpse/bones deleting thread shortly
@@ -4201,13 +4200,13 @@ void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmC
     // remove from guild
     if (uint32 guildId = GetGuildIdFromDB(playerguid))
         if (Guild* guild = sObjectMgr.GetGuildById(guildId))
-            guild->DelMember(guid);
+            guild->DelMember(playerguid);
 
     // remove from arena teams
     LeaveAllArenaTeams(playerguid);
 
     // the player was uninvited already on logout so just remove from group
-    QueryResult *resultGroup = CharacterDatabase.PQuery("SELECT groupId FROM group_member WHERE memberGuid='%u'", guid);
+    QueryResult *resultGroup = CharacterDatabase.PQuery("SELECT groupId FROM group_member WHERE memberGuid='%u'", lowguid);
     if (resultGroup)
     {
         uint32 groupId = (*resultGroup)[0].GetUInt32();
@@ -4225,7 +4224,7 @@ void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmC
         case 0:
         {
             // return back all mails with COD and Item                 0  1           2              3      4       5    6     7
-            QueryResult *resultMail = CharacterDatabase.PQuery("SELECT id,messageType,mailTemplateId,sender,subject,body,money,has_items FROM mail WHERE receiver='%u' AND has_items<>0 AND cod<>0", guid);
+            QueryResult *resultMail = CharacterDatabase.PQuery("SELECT id,messageType,mailTemplateId,sender,subject,body,money,has_items FROM mail WHERE receiver='%u' AND has_items<>0 AND cod<>0", lowguid);
             if (resultMail)
             {
                 do
@@ -4279,7 +4278,7 @@ void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmC
                                 }
 
                                 Item *pItem = NewItemOrBag(itemProto);
-                                if (!pItem->LoadFromDB(item_guidlow, MAKE_NEW_GUID(guid, 0, HIGHGUID_PLAYER),resultItems))
+                                if (!pItem->LoadFromDB(item_guidlow, playerguid.GetRawValue(), resultItems))
                                 {
                                     pItem->FSetState(ITEM_REMOVED);
                                     pItem->SaveToDB();              // it also deletes item object !
@@ -4296,9 +4295,9 @@ void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmC
 
                     CharacterDatabase.PExecute("DELETE FROM mail_items WHERE mail_id = '%u'", mail_id);
 
-                    uint32 pl_account = sObjectMgr.GetPlayerAccountIdByGUID(MAKE_NEW_GUID(guid, 0, HIGHGUID_PLAYER));
+                    uint32 pl_account = sObjectMgr.GetPlayerAccountIdByGUID(playerguid);
 
-                    draft.AddMoney(money).SendReturnToSender(pl_account, guid, sender);
+                    draft.AddMoney(money).SendReturnToSender(pl_account, lowguid, sender);
                 }
                 while (resultMail->NextRow());
 
@@ -4307,7 +4306,7 @@ void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmC
 
             // unsummon and delete for pets in world is not required: player deleted from CLI or character list with not loaded pet.
             // Get guids of character's pets, will deleted in transaction
-            QueryResult *resultPets = CharacterDatabase.PQuery("SELECT id FROM character_pet WHERE owner = '%u'",guid);
+            QueryResult *resultPets = CharacterDatabase.PQuery("SELECT id FROM character_pet WHERE owner = '%u'",lowguid);
 
             // NOW we can finally clear other DB data related to character
             CharacterDatabase.BeginTransaction();
@@ -4322,43 +4321,43 @@ void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmC
                 delete resultPets;
             }
 
-            CharacterDatabase.PExecute("DELETE FROM characters WHERE guid = '%u'",guid);
-            CharacterDatabase.PExecute("DELETE FROM character_account_data WHERE guid = '%u'",guid);
-            CharacterDatabase.PExecute("DELETE FROM character_declinedname WHERE guid = '%u'",guid);
-            CharacterDatabase.PExecute("DELETE FROM character_action WHERE guid = '%u'",guid);
-            CharacterDatabase.PExecute("DELETE FROM character_aura WHERE guid = '%u'",guid);
-            CharacterDatabase.PExecute("DELETE FROM character_gifts WHERE guid = '%u'",guid);
-            CharacterDatabase.PExecute("DELETE FROM character_glyphs WHERE guid = '%u'",guid);
-            CharacterDatabase.PExecute("DELETE FROM character_homebind WHERE guid = '%u'",guid);
-            CharacterDatabase.PExecute("DELETE FROM character_instance WHERE guid = '%u'",guid);
-            CharacterDatabase.PExecute("DELETE FROM group_instance WHERE leaderGuid = '%u'",guid);
-            CharacterDatabase.PExecute("DELETE FROM character_inventory WHERE guid = '%u'",guid);
-            CharacterDatabase.PExecute("DELETE FROM character_queststatus WHERE guid = '%u'",guid);
-            CharacterDatabase.PExecute("DELETE FROM character_queststatus_daily WHERE guid = '%u'",guid);
-            CharacterDatabase.PExecute("DELETE FROM character_queststatus_weekly WHERE guid = '%u'",guid);
-            CharacterDatabase.PExecute("DELETE FROM character_reputation WHERE guid = '%u'",guid);
-            CharacterDatabase.PExecute("DELETE FROM character_skills WHERE guid = '%u'",guid);
-            CharacterDatabase.PExecute("DELETE FROM character_spell WHERE guid = '%u'",guid);
-            CharacterDatabase.PExecute("DELETE FROM character_spell_cooldown WHERE guid = '%u'",guid);
-            CharacterDatabase.PExecute("DELETE FROM character_talent WHERE guid = '%u'",guid);
-            CharacterDatabase.PExecute("DELETE FROM character_ticket WHERE guid = '%u'",guid);
-            CharacterDatabase.PExecute("DELETE FROM item_instance WHERE owner_guid = '%u'",guid);
-            CharacterDatabase.PExecute("DELETE FROM character_social WHERE guid = '%u' OR friend='%u'",guid,guid);
-            CharacterDatabase.PExecute("DELETE FROM mail WHERE receiver = '%u'",guid);
-            CharacterDatabase.PExecute("DELETE FROM mail_items WHERE receiver = '%u'",guid);
-            CharacterDatabase.PExecute("DELETE FROM character_pet WHERE owner = '%u'",guid);
-            CharacterDatabase.PExecute("DELETE FROM character_pet_declinedname WHERE owner = '%u'",guid);
-            CharacterDatabase.PExecute("DELETE FROM character_achievement WHERE guid = '%u'",guid);
-            CharacterDatabase.PExecute("DELETE FROM character_achievement_progress WHERE guid = '%u'",guid);
-            CharacterDatabase.PExecute("DELETE FROM character_equipmentsets WHERE guid = '%u'",guid);
-            CharacterDatabase.PExecute("DELETE FROM guild_eventlog WHERE PlayerGuid1 = '%u' OR PlayerGuid2 = '%u'",guid, guid);
-            CharacterDatabase.PExecute("DELETE FROM guild_bank_eventlog WHERE PlayerGuid = '%u'",guid);
+            CharacterDatabase.PExecute("DELETE FROM characters WHERE guid = '%u'",lowguid);
+            CharacterDatabase.PExecute("DELETE FROM character_account_data WHERE guid = '%u'",lowguid);
+            CharacterDatabase.PExecute("DELETE FROM character_declinedname WHERE guid = '%u'",lowguid);
+            CharacterDatabase.PExecute("DELETE FROM character_action WHERE guid = '%u'",lowguid);
+            CharacterDatabase.PExecute("DELETE FROM character_aura WHERE guid = '%u'",lowguid);
+            CharacterDatabase.PExecute("DELETE FROM character_gifts WHERE guid = '%u'",lowguid);
+            CharacterDatabase.PExecute("DELETE FROM character_glyphs WHERE guid = '%u'",lowguid);
+            CharacterDatabase.PExecute("DELETE FROM character_homebind WHERE guid = '%u'",lowguid);
+            CharacterDatabase.PExecute("DELETE FROM character_instance WHERE guid = '%u'",lowguid);
+            CharacterDatabase.PExecute("DELETE FROM group_instance WHERE leaderGuid = '%u'",lowguid);
+            CharacterDatabase.PExecute("DELETE FROM character_inventory WHERE guid = '%u'",lowguid);
+            CharacterDatabase.PExecute("DELETE FROM character_queststatus WHERE guid = '%u'",lowguid);
+            CharacterDatabase.PExecute("DELETE FROM character_queststatus_daily WHERE guid = '%u'",lowguid);
+            CharacterDatabase.PExecute("DELETE FROM character_queststatus_weekly WHERE guid = '%u'",lowguid);
+            CharacterDatabase.PExecute("DELETE FROM character_reputation WHERE guid = '%u'",lowguid);
+            CharacterDatabase.PExecute("DELETE FROM character_skills WHERE guid = '%u'",lowguid);
+            CharacterDatabase.PExecute("DELETE FROM character_spell WHERE guid = '%u'",lowguid);
+            CharacterDatabase.PExecute("DELETE FROM character_spell_cooldown WHERE guid = '%u'",lowguid);
+            CharacterDatabase.PExecute("DELETE FROM character_talent WHERE guid = '%u'",lowguid);
+            CharacterDatabase.PExecute("DELETE FROM character_ticket WHERE guid = '%u'",lowguid);
+            CharacterDatabase.PExecute("DELETE FROM item_instance WHERE owner_guid = '%u'",lowguid);
+            CharacterDatabase.PExecute("DELETE FROM character_social WHERE guid = '%u' OR friend='%u'",lowguid,lowguid);
+            CharacterDatabase.PExecute("DELETE FROM mail WHERE receiver = '%u'",lowguid);
+            CharacterDatabase.PExecute("DELETE FROM mail_items WHERE receiver = '%u'",lowguid);
+            CharacterDatabase.PExecute("DELETE FROM character_pet WHERE owner = '%u'",lowguid);
+            CharacterDatabase.PExecute("DELETE FROM character_pet_declinedname WHERE owner = '%u'",lowguid);
+            CharacterDatabase.PExecute("DELETE FROM character_achievement WHERE guid = '%u'",lowguid);
+            CharacterDatabase.PExecute("DELETE FROM character_achievement_progress WHERE guid = '%u'",lowguid);
+            CharacterDatabase.PExecute("DELETE FROM character_equipmentsets WHERE guid = '%u'",lowguid);
+            CharacterDatabase.PExecute("DELETE FROM guild_eventlog WHERE PlayerGuid1 = '%u' OR PlayerGuid2 = '%u'",lowguid, lowguid);
+            CharacterDatabase.PExecute("DELETE FROM guild_bank_eventlog WHERE PlayerGuid = '%u'",lowguid);
             CharacterDatabase.CommitTransaction();
             break;
         }
         // The character gets unlinked from the account, the name gets freed up and appears as deleted ingame
         case 1:
-            CharacterDatabase.PExecute("UPDATE characters SET deleteInfos_Name=name, deleteInfos_Account=account, deleteDate='" UI64FMTD "', name='', account=0 WHERE guid=%u", uint64(time(NULL)), guid);
+            CharacterDatabase.PExecute("UPDATE characters SET deleteInfos_Name=name, deleteInfos_Account=account, deleteDate='" UI64FMTD "', name='', account=0 WHERE guid=%u", uint64(time(NULL)), lowguid);
             break;
         default:
             sLog.outError("Player::DeleteFromDB: Unsupported delete method: %u.", charDelete_method);
@@ -4400,7 +4399,8 @@ void Player::DeleteOldCharacters(uint32 keepDays)
         do
         {
             Field *charFields = resultChars->Fetch();
-            Player::DeleteFromDB(charFields[0].GetUInt64(), charFields[1].GetUInt32(), true, true);
+            ObjectGuid guid = ObjectGuid(HIGHGUID_PLAYER, charFields[0].GetUInt32());
+            Player::DeleteFromDB(guid, charFields[1].GetUInt32(), true, true);
         } while(resultChars->NextRow());
         delete resultChars;
     }
@@ -4648,7 +4648,7 @@ Corpse* Player::CreateCorpse()
 
 void Player::SpawnCorpseBones()
 {
-    if(sObjectAccessor.ConvertCorpseForPlayer(GetGUID()))
+    if(sObjectAccessor.ConvertCorpseForPlayer(GetObjectGuid()))
         if (!GetSession()->PlayerLogoutWithSave())          // at logout we will already store the player
             SaveToDB();                                     // prevent loading as ghost without corpse
 }
@@ -6619,10 +6619,12 @@ void Player::ModifyArenaPoints( int32 value )
         SetUInt32Value(PLAYER_FIELD_ARENA_CURRENCY, GetArenaPoints() < sWorld.getConfig(CONFIG_UINT32_MAX_ARENA_POINTS) - value ? GetArenaPoints() + value : sWorld.getConfig(CONFIG_UINT32_MAX_ARENA_POINTS));
 }
 
-uint32 Player::GetGuildIdFromDB(uint64 guid)
+uint32 Player::GetGuildIdFromDB(ObjectGuid guid)
 {
-    QueryResult* result = CharacterDatabase.PQuery("SELECT guildid FROM guild_member WHERE guid='%u'", GUID_LOPART(guid));
-    if(!result)
+    uint32 lowguid = guid.GetCounter();
+
+    QueryResult* result = CharacterDatabase.PQuery("SELECT guildid FROM guild_member WHERE guid='%u'", lowguid);
+    if (!result)
         return 0;
 
     uint32 id = result->Fetch()[0].GetUInt32();
@@ -6643,10 +6645,10 @@ uint32 Player::GetRankFromDB(uint64 guid)
         return 0;
 }
 
-uint32 Player::GetArenaTeamIdFromDB(uint64 guid, uint8 type)
+uint32 Player::GetArenaTeamIdFromDB(ObjectGuid guid, uint8 type)
 {
-    QueryResult *result = CharacterDatabase.PQuery("SELECT arena_team_member.arenateamid FROM arena_team_member JOIN arena_team ON arena_team_member.arenateamid = arena_team.arenateamid WHERE guid='%u' AND type='%u' LIMIT 1", GUID_LOPART(guid), type);
-    if(!result)
+    QueryResult *result = CharacterDatabase.PQuery("SELECT arena_team_member.arenateamid FROM arena_team_member JOIN arena_team ON arena_team_member.arenateamid = arena_team.arenateamid WHERE guid='%u' AND type='%u' LIMIT 1", guid.GetCounter(), type);
+    if (!result)
         return 0;
 
     uint32 id = (*result)[0].GetUInt32();
@@ -6654,10 +6656,10 @@ uint32 Player::GetArenaTeamIdFromDB(uint64 guid, uint8 type)
     return id;
 }
 
-uint32 Player::GetZoneIdFromDB(uint64 guid)
+uint32 Player::GetZoneIdFromDB(ObjectGuid guid)
 {
-    uint32 guidLow = GUID_LOPART(guid);
-    QueryResult *result = CharacterDatabase.PQuery( "SELECT zone FROM characters WHERE guid='%u'", guidLow );
+    uint32 lowguid = guid.GetCounter();
+    QueryResult *result = CharacterDatabase.PQuery("SELECT zone FROM characters WHERE guid='%u'", lowguid);
     if (!result)
         return 0;
     Field* fields = result->Fetch();
@@ -6667,7 +6669,7 @@ uint32 Player::GetZoneIdFromDB(uint64 guid)
     if (!zone)
     {
         // stored zone is zero, use generic and slow zone detection
-        result = CharacterDatabase.PQuery("SELECT map,position_x,position_y,position_z FROM characters WHERE guid='%u'", guidLow);
+        result = CharacterDatabase.PQuery("SELECT map,position_x,position_y,position_z FROM characters WHERE guid='%u'", lowguid);
         if( !result )
             return 0;
         fields = result->Fetch();
@@ -6680,15 +6682,17 @@ uint32 Player::GetZoneIdFromDB(uint64 guid)
         zone = sMapMgr.GetZoneId(map,posx,posy,posz);
 
         if (zone > 0)
-            CharacterDatabase.PExecute("UPDATE characters SET zone='%u' WHERE guid='%u'", zone, guidLow);
+            CharacterDatabase.PExecute("UPDATE characters SET zone='%u' WHERE guid='%u'", zone, lowguid);
     }
 
     return zone;
 }
 
-uint32 Player::GetLevelFromDB(uint64 guid)
+uint32 Player::GetLevelFromDB(ObjectGuid guid)
 {
-    QueryResult *result = CharacterDatabase.PQuery( "SELECT level FROM characters WHERE guid='%u'", GUID_LOPART(guid) );
+    uint32 lowguid = guid.GetCounter();
+
+    QueryResult *result = CharacterDatabase.PQuery("SELECT level FROM characters WHERE guid='%u'", lowguid);
     if (!result)
         return 0;
 
@@ -7827,7 +7831,7 @@ void Player::RemovedInsignia(Player* looterPlr)
 
     // We have to convert player corpse to bones, not to be able to resurrect there
     // SpawnCorpseBones isn't handy, 'cos it saves player while he in BG
-    Corpse *bones = sObjectAccessor.ConvertCorpseForPlayer(GetGUID(),true);
+    Corpse *bones = sObjectAccessor.ConvertCorpseForPlayer(GetObjectGuid(), true);
     if (!bones)
         return;
 
@@ -8073,7 +8077,7 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
                         {
                             if (group->GetLootMethod() == FREE_FOR_ALL)
                                 permission = ALL_PERMISSION;
-                            else if (group->GetLooterGuid() == GetGUID())
+                            else if (group->GetLooterGuid() == GetObjectGuid())
                             {
                                 if (group->GetLootMethod() == MASTER_LOOT)
                                     permission = MASTER_PERMISSION;
@@ -14923,7 +14927,7 @@ void Player::_LoadArenaTeamInfo(QueryResult *result)
 
         SetArenaTeamInfoField(arenaSlot, ARENA_TEAM_ID, arenateamid);
         SetArenaTeamInfoField(arenaSlot, ARENA_TEAM_TYPE, aTeam->GetType());
-        SetArenaTeamInfoField(arenaSlot, ARENA_TEAM_MEMBER, (aTeam->GetCaptain() == GetGUID()) ? 0 : 1);
+        SetArenaTeamInfoField(arenaSlot, ARENA_TEAM_MEMBER, (aTeam->GetCaptainGuid() == GetObjectGuid()) ? 0 : 1);
         SetArenaTeamInfoField(arenaSlot, ARENA_TEAM_GAMES_WEEK, played_week);
         SetArenaTeamInfoField(arenaSlot, ARENA_TEAM_GAMES_SEASON, played_season);
         SetArenaTeamInfoField(arenaSlot, ARENA_TEAM_WINS_SEASON, wons_season);
@@ -15071,7 +15075,7 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
     }
 
     // overwrite possible wrong/corrupted guid
-    SetUInt64Value(OBJECT_FIELD_GUID, MAKE_NEW_GUID(guid, 0, HIGHGUID_PLAYER));
+    SetGuidValue(OBJECT_FIELD_GUID, ObjectGuid(HIGHGUID_PLAYER, guid));
 
     // overwrite some data fields
     uint32 bytes0 = 0;
@@ -15160,11 +15164,11 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
     for(uint32 arena_slot = 0; arena_slot < MAX_ARENA_SLOT; ++arena_slot)
     {
         uint32 arena_team_id = GetArenaTeamId(arena_slot);
-        if(!arena_team_id)
+        if (!arena_team_id)
             continue;
 
-        if(ArenaTeam * at = sObjectMgr.GetArenaTeamById(arena_team_id))
-            if(at->HaveMember(GetGUID()))
+        if (ArenaTeam * at = sObjectMgr.GetArenaTeamById(arena_team_id))
+            if (at->HaveMember(GetObjectGuid()))
                 continue;
 
         // arena team not exist or not member, cleanup fields
@@ -15212,7 +15216,7 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
 
             //join player to battleground group
             currentBg->EventPlayerLoggedIn(this, GetGUID());
-            currentBg->AddOrSetPlayerToCorrectBgGroup(this, GetGUID(), m_bgData.bgTeam);
+            currentBg->AddOrSetPlayerToCorrectBgGroup(this, GetObjectGuid(), m_bgData.bgTeam);
 
             SetInviteForBattleGroundQueueType(bgQueueTypeId,currentBg->GetInstanceID());
         }
@@ -15477,7 +15481,7 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
 
     _LoadActions(holder->GetResult(PLAYER_LOGIN_QUERY_LOADACTIONS));
 
-    m_social = sSocialMgr.LoadFromDB(holder->GetResult(PLAYER_LOGIN_QUERY_LOADSOCIALLIST), GetGUIDLow());
+    m_social = sSocialMgr.LoadFromDB(holder->GetResult(PLAYER_LOGIN_QUERY_LOADSOCIALLIST), GetObjectGuid());
 
     // check PLAYER_CHOSEN_TITLE compatibility with PLAYER__FIELD_KNOWN_TITLES
     // note: PLAYER__FIELD_KNOWN_TITLES updated at quest status loaded
@@ -15762,7 +15766,7 @@ void Player::_LoadAuras(QueryResult *result, uint32 timediff)
                 if (caster_guid != GetGUID() && holder->IsSingleTarget())
                     holder->SetIsSingleTarget(false);
 
-                holder->SetLoadedState(caster_guid, item_lowguid ? MAKE_NEW_GUID(item_lowguid, 0, HIGHGUID_ITEM) : 0, stackcount, remaincharges);
+                holder->SetLoadedState(caster_guid, ObjectGuid(HIGHGUID_ITEM, item_lowguid), stackcount, remaincharges);
                 AddSpellAuraHolder(holder);
                 DETAIL_LOG("Added auras from spellid %u", spellproto->Id);
             }
@@ -15825,7 +15829,7 @@ void Player::LoadCorpse()
 {
     if( isAlive() )
     {
-        sObjectAccessor.ConvertCorpseForPlayer(GetGUID());
+        sObjectAccessor.ConvertCorpseForPlayer(GetObjectGuid());
     }
     else
     {
@@ -16400,7 +16404,7 @@ void Player::_LoadGroup(QueryResult *result)
 
         if (Group* group = sObjectMgr.GetGroupById(groupId))
         {
-            uint8 subgroup = group->GetMemberGroup(GetGUID());
+            uint8 subgroup = group->GetMemberGroup(GetObjectGuid());
             SetGroup(group, subgroup);
             if (getLevel() >= LEVELREQUIREMENT_HEROIC)
             {
@@ -16460,8 +16464,10 @@ void Player::_LoadBoundInstances(QueryResult *result)
 
             if(!perm && group)
             {
-                sLog.outError("_LoadBoundInstances: player %s(%d) is in group %d but has a non-permanent character bind to map %d,%d,%d", GetName(), GetGUIDLow(), GUID_LOPART(group->GetLeaderGUID()), mapId, instanceId, difficulty);
-                CharacterDatabase.PExecute("DELETE FROM character_instance WHERE guid = '%d' AND instance = '%d'", GetGUIDLow(), instanceId);
+                sLog.outError("_LoadBoundInstances: %s is in group (Id: %d) but has a non-permanent character bind to map %d,%d,%d",
+                    GetObjectGuid().GetString().c_str(), group->GetId(), mapId, instanceId, difficulty);
+                CharacterDatabase.PExecute("DELETE FROM character_instance WHERE guid = '%d' AND instance = '%d'",
+                    GetGUIDLow(), instanceId);
                 continue;
             }
 
@@ -16633,13 +16639,19 @@ void Player::SendSavedInstances()
 }
 
 /// convert the player's binds to the group
-void Player::ConvertInstancesToGroup(Player *player, Group *group, uint64 player_guid)
+void Player::ConvertInstancesToGroup(Player *player, Group *group, ObjectGuid player_guid)
 {
     bool has_binds = false;
     bool has_solo = false;
 
-    if(player) { player_guid = player->GetGUID(); if(!group) group = player->GetGroup(); }
-    ASSERT(player_guid);
+    if (player)
+    {
+        player_guid = player->GetGUID();
+        if (!group)
+            group = player->GetGroup();
+    }
+
+    ASSERT(!player_guid.IsEmpty());
 
     // copy all binds to the group, when changing leader it's assumed the character
     // will not have any solo binds
@@ -16665,13 +16677,15 @@ void Player::ConvertInstancesToGroup(Player *player, Group *group, uint64 player
         }
     }
 
+    uint32 player_lowguid = player_guid.GetCounter();
+
     // if the player's not online we don't know what binds it has
     if(!player || !group || has_binds)
-        CharacterDatabase.PExecute("INSERT INTO group_instance SELECT guid, instance, permanent FROM character_instance WHERE guid = '%u'", GUID_LOPART(player_guid));
+        CharacterDatabase.PExecute("INSERT INTO group_instance SELECT guid, instance, permanent FROM character_instance WHERE guid = '%u'", player_lowguid);
 
     // the following should not get executed when changing leaders
     if(!player || has_solo)
-        CharacterDatabase.PExecute("DELETE FROM character_instance WHERE guid = '%d' AND permanent = 0", GUID_LOPART(player_guid));
+        CharacterDatabase.PExecute("DELETE FROM character_instance WHERE guid = '%d' AND permanent = 0", player_lowguid);
 }
 
 bool Player::_LoadHomeBind(QueryResult *result)
@@ -18066,20 +18080,22 @@ void Player::SendProficiency(uint8 pr1, uint32 pr2)
     GetSession()->SendPacket (&data);
 }
 
-void Player::RemovePetitionsAndSigns(uint64 guid, uint32 type)
+void Player::RemovePetitionsAndSigns(ObjectGuid guid, uint32 type)
 {
+    uint32 lowguid = guid.GetCounter();
+
     QueryResult *result = NULL;
     if(type == 10)
-        result = CharacterDatabase.PQuery("SELECT ownerguid,petitionguid FROM petition_sign WHERE playerguid = '%u'", GUID_LOPART(guid));
+        result = CharacterDatabase.PQuery("SELECT ownerguid,petitionguid FROM petition_sign WHERE playerguid = '%u'", lowguid);
     else
-        result = CharacterDatabase.PQuery("SELECT ownerguid,petitionguid FROM petition_sign WHERE playerguid = '%u' AND type = '%u'", GUID_LOPART(guid), type);
+        result = CharacterDatabase.PQuery("SELECT ownerguid,petitionguid FROM petition_sign WHERE playerguid = '%u' AND type = '%u'", lowguid, type);
     if(result)
     {
         do                                                  // this part effectively does nothing, since the deletion / modification only takes place _after_ the PetitionQuery. Though I don't know if the result remains intact if I execute the delete query beforehand.
         {                                                   // and SendPetitionQueryOpcode reads data from the DB
             Field *fields = result->Fetch();
-            uint64 ownerguid   = MAKE_NEW_GUID(fields[0].GetUInt32(), 0, HIGHGUID_PLAYER);
-            uint64 petitionguid = MAKE_NEW_GUID(fields[1].GetUInt32(), 0, HIGHGUID_ITEM);
+            ObjectGuid ownerguid   = ObjectGuid(HIGHGUID_PLAYER, fields[0].GetUInt32());
+            ObjectGuid petitionguid = ObjectGuid(HIGHGUID_ITEM, fields[1].GetUInt32());
 
             // send update if charter owner in game
             Player* owner = sObjectMgr.GetPlayer(ownerguid);
@@ -18091,41 +18107,39 @@ void Player::RemovePetitionsAndSigns(uint64 guid, uint32 type)
         delete result;
 
         if(type==10)
-            CharacterDatabase.PExecute("DELETE FROM petition_sign WHERE playerguid = '%u'", GUID_LOPART(guid));
+            CharacterDatabase.PExecute("DELETE FROM petition_sign WHERE playerguid = '%u'", lowguid);
         else
-            CharacterDatabase.PExecute("DELETE FROM petition_sign WHERE playerguid = '%u' AND type = '%u'", GUID_LOPART(guid), type);
+            CharacterDatabase.PExecute("DELETE FROM petition_sign WHERE playerguid = '%u' AND type = '%u'", lowguid, type);
     }
 
     CharacterDatabase.BeginTransaction();
     if(type == 10)
     {
-        CharacterDatabase.PExecute("DELETE FROM petition WHERE ownerguid = '%u'", GUID_LOPART(guid));
-        CharacterDatabase.PExecute("DELETE FROM petition_sign WHERE ownerguid = '%u'", GUID_LOPART(guid));
+        CharacterDatabase.PExecute("DELETE FROM petition WHERE ownerguid = '%u'", lowguid);
+        CharacterDatabase.PExecute("DELETE FROM petition_sign WHERE ownerguid = '%u'", lowguid);
     }
     else
     {
-        CharacterDatabase.PExecute("DELETE FROM petition WHERE ownerguid = '%u' AND type = '%u'", GUID_LOPART(guid), type);
-        CharacterDatabase.PExecute("DELETE FROM petition_sign WHERE ownerguid = '%u' AND type = '%u'", GUID_LOPART(guid), type);
+        CharacterDatabase.PExecute("DELETE FROM petition WHERE ownerguid = '%u' AND type = '%u'", lowguid, type);
+        CharacterDatabase.PExecute("DELETE FROM petition_sign WHERE ownerguid = '%u' AND type = '%u'", lowguid, type);
     }
     CharacterDatabase.CommitTransaction();
 }
 
-void Player::LeaveAllArenaTeams(uint64 guid)
+void Player::LeaveAllArenaTeams(ObjectGuid guid)
 {
-    QueryResult *result = CharacterDatabase.PQuery("SELECT arena_team_member.arenateamid FROM arena_team_member JOIN arena_team ON arena_team_member.arenateamid = arena_team.arenateamid WHERE guid='%u'", GUID_LOPART(guid));
-    if(!result)
+    uint32 lowguid = guid.GetCounter();
+    QueryResult *result = CharacterDatabase.PQuery("SELECT arena_team_member.arenateamid FROM arena_team_member JOIN arena_team ON arena_team_member.arenateamid = arena_team.arenateamid WHERE guid='%u'", lowguid);
+    if (!result)
         return;
 
     do
     {
         Field *fields = result->Fetch();
-        uint32 at_id = fields[0].GetUInt32();
-        if(at_id != 0)
-        {
-            ArenaTeam * at = sObjectMgr.GetArenaTeamById(at_id);
-            if(at)
+        if (uint32 at_id = fields[0].GetUInt32())
+            if (ArenaTeam * at = sObjectMgr.GetArenaTeamById(at_id))
                 at->DelMember(guid);
-        }
+
     } while (result->NextRow());
 
     delete result;
@@ -20622,13 +20636,13 @@ Player* Player::GetNextRandomRaidMember(float radius)
 PartyResult Player::CanUninviteFromGroup() const
 {
     const Group* grp = GetGroup();
-    if(!grp)
+    if (!grp)
         return ERR_NOT_IN_GROUP;
 
-    if(!grp->IsLeader(GetGUID()) && !grp->IsAssistant(GetGUID()))
+    if (!grp->IsLeader(GetObjectGuid()) && !grp->IsAssistant(GetObjectGuid()))
         return ERR_NOT_LEADER;
 
-    if(InBattleGround())
+    if (InBattleGround())
         return ERR_INVITE_RESTRICTED;
 
     return ERR_PARTY_RESULT_OK;
@@ -21869,7 +21883,7 @@ void Player::SendEquipmentSetList()
         data << itr->second.Name;
         data << itr->second.IconName;
         for(uint32 i = 0; i < EQUIPMENT_SLOT_END; ++i)
-            data.appendPackGUID(MAKE_NEW_GUID(itr->second.Items[i], 0, HIGHGUID_ITEM));
+            data << ObjectGuid(HIGHGUID_ITEM, itr->second.Items[i]).WriteAsPacked();
 
         ++count;                                            // client have limit but it checked at loading and set
     }

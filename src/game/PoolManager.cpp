@@ -457,7 +457,7 @@ template <>
 void PoolGroup<Creature>::ReSpawn1Object(PoolObject* obj)
 {
     if (CreatureData const* data = sObjectMgr.GetCreatureData(obj->guid))
-        if (Creature* pCreature = ObjectAccessor::GetCreatureInWorld(MAKE_NEW_GUID(obj->guid, data->id, HIGHGUID_UNIT)))
+        if (Creature* pCreature = ObjectAccessor::GetCreatureInWorld(ObjectGuid(HIGHGUID_UNIT, data->id, obj->guid)))
             pCreature->GetMap()->Add(pCreature);
 }
 

@@ -579,7 +579,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\framework\Utilities\UnorderedMap.h"
+				RelativePath="..\..\src\framework\Utilities\UnorderedMapSet.h"
 				>
 			</File>
 			<Filter

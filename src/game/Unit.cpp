@@ -690,7 +690,7 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
             data << pVictim->GetObjectGuid();              //victim
 
             if (group_tap)
-                group_tap->BroadcastPacket(&data, false, group_tap->GetMemberGroup(player_tap->GetGUID()),player_tap->GetGUID());
+                group_tap->BroadcastPacket(&data, false, group_tap->GetMemberGroup(player_tap->GetObjectGuid()),player_tap->GetObjectGuid());
 
             player_tap->SendDirectMessage(&data);
         }
@@ -3410,7 +3410,7 @@ void Unit::_UpdateAutoRepeatSpell()
         }
 
         // we want to shoot
-        Spell* spell = new Spell(this, m_currentSpells[CURRENT_AUTOREPEAT_SPELL]->m_spellInfo, true, 0);
+        Spell* spell = new Spell(this, m_currentSpells[CURRENT_AUTOREPEAT_SPELL]->m_spellInfo, true);
         spell->prepare(&(m_currentSpells[CURRENT_AUTOREPEAT_SPELL]->m_targets));
 
         // all went good, reset attack
@@ -8683,11 +8683,6 @@ void Unit::ApplyDiminishingAura( DiminishingGroup group, bool apply )
     }
 }
 
-Unit* Unit::GetUnit(WorldObject const& object, uint64 guid)
-{
-    return ObjectAccessor::GetUnit(object,guid);
-}
-
 bool Unit::isVisibleForInState( Player const* u, WorldObject const* viewPoint, bool inVisibleList ) const
 {
     return isVisibleForOrDetect(u, viewPoint, false, inVisibleList, false);
@@ -9714,7 +9709,7 @@ void Unit::SetFeared(bool apply, uint64 const& casterGUID, uint32 spellID, uint3
 {
     if( apply )
     {
-        if(HasAuraType(SPELL_AURA_PREVENTS_FLEEING))
+        if (HasAuraType(SPELL_AURA_PREVENTS_FLEEING))
             return;
 
         SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_FLEEING);
@@ -9722,7 +9717,7 @@ void Unit::SetFeared(bool apply, uint64 const& casterGUID, uint32 spellID, uint3
         GetMotionMaster()->MovementExpired(false);
         CastStop(GetGUID() == casterGUID ? spellID : 0);
 
-        Unit* caster = ObjectAccessor::GetUnit(*this,casterGUID);
+        Unit* caster = IsInWorld() ?  GetMap()->GetUnit(casterGUID) : NULL;
 
         GetMotionMaster()->MoveFleeing(caster, time);       // caster==NULL processed in MoveFleeing
     }
@@ -9732,18 +9727,19 @@ void Unit::SetFeared(bool apply, uint64 const& casterGUID, uint32 spellID, uint3
 
         GetMotionMaster()->MovementExpired(false);
 
-        if( GetTypeId() != TYPEID_PLAYER && isAlive() )
+        if (GetTypeId() != TYPEID_PLAYER && isAlive())
         {
+            Creature* c = ((Creature*)this);
             // restore appropriate movement generator
-            if(getVictim())
+            if (getVictim())
                 GetMotionMaster()->MoveChase(getVictim());
             else
                 GetMotionMaster()->Initialize();
 
             // attack caster if can
-            Unit* caster = Unit::GetUnit(*this, casterGUID);
-            if(caster && ((Creature*)this)->AI())
-                ((Creature*)this)->AI()->AttackedBy(caster);
+            if (Unit* caster = IsInWorld() ? GetMap()->GetUnit(casterGUID) : NULL)
+                if (c->AI())
+                    c->AI()->AttackedBy(caster);
         }
     }
 

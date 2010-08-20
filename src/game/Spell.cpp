@@ -2050,13 +2050,13 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                         if( targetOwner->GetTypeId() == TYPEID_PLAYER &&
                             target->GetTypeId() == TYPEID_UNIT && (((Creature*)target)->isPet()) &&
                             target->GetOwnerGUID() == targetOwner->GetGUID() &&
-                            pGroup->IsMember(((Player*)targetOwner)->GetGUID()))
+                            pGroup->IsMember(((Player*)targetOwner)->GetObjectGuid()))
                         {
                             targetUnitMap.push_back(target);
                         }
                     }
                     // 1Our target can be a player who is on our group
-                    else if (target->GetTypeId() == TYPEID_PLAYER && pGroup->IsMember(((Player*)target)->GetGUID()))
+                    else if (target->GetTypeId() == TYPEID_PLAYER && pGroup->IsMember(((Player*)target)->GetObjectGuid()))
                     {
                         targetUnitMap.push_back(target);
                     }
@@ -4410,8 +4410,7 @@ SpellCastResult Spell::CheckCast(bool strict)
         }
         else if (m_caster == target)
         {
-
-            if (m_caster->GetTypeId() == TYPEID_PLAYER)     // Target - is player caster
+            if (m_caster->GetTypeId() == TYPEID_PLAYER && m_caster->IsInWorld())     
             {
                 // Additional check for some spells
                 // If 0 spell effect empty - client not send target data (need use selection)
@@ -4419,7 +4418,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                 if (m_targets.m_targetMask == TARGET_FLAG_SELF &&
                     m_spellInfo->GetEffectImplicitTargetAByIndex(EFFECT_INDEX_1) == TARGET_CHAIN_DAMAGE)
                 {
-                    if (target = m_caster->GetUnit(*m_caster, ((Player *)m_caster)->GetSelection()))
+                    if (target = m_caster->GetMap()->GetUnit(((Player *)m_caster)->GetSelection()))
                         m_targets.setUnitTarget(target);
                     else
                         return SPELL_FAILED_BAD_TARGETS;

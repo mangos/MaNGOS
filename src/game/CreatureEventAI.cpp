@@ -350,10 +350,41 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
     if (pHolder.Event.event_chance <= rnd % 100)
         return false;
 
-    //Process actions
-    for (uint32 j = 0; j < MAX_ACTIONS; j++)
-        ProcessAction(pHolder.Event.action[j], rnd, pHolder.Event.event_id, pActionInvoker);
+    //Process actions, normal case
+    if (!(pHolder.Event.event_flags & EFLAG_RANDOM_ACTION))
+    {
+        for (uint32 j = 0; j < MAX_ACTIONS; ++j)
+            ProcessAction(pHolder.Event.action[j], rnd, pHolder.Event.event_id, pActionInvoker);
+    }
+    //Process actions, random case
+    else
+    {
+        // amount of real actions
+        uint32 count = 0;
+        for (uint32 j = 0; j < MAX_ACTIONS; j++)
+            if (pHolder.Event.action[j].type != ACTION_T_NONE)
+                ++count;
 
+        if (count)
+        {
+            // select action number from found amount
+            uint32 idx = urand(0,count-1);
+
+            // find selected action, skipping not used
+            uint32 j = 0;
+            for (; ; ++j)
+            {
+                if (pHolder.Event.action[j].type != ACTION_T_NONE)
+                {
+                    if (!idx)
+                        break;
+                    --idx;
+                }
+            }
+
+            ProcessAction(pHolder.Event.action[j], rnd, pHolder.Event.event_id, pActionInvoker);
+        }
+    }
     return true;
 }
 
@@ -425,7 +456,7 @@ void CreatureEventAI::ProcessAction(CreatureEventAI_Action const& action, uint32
                 {
                     if (CreatureInfo const* ci = GetCreatureTemplateStore(action.morph.creatureId))
                     {
-                        uint32 display_id = Creature::ChooseDisplayId(0,ci);
+                        uint32 display_id = Creature::ChooseDisplayId(ci);
                         m_creature->SetDisplayId(display_id);
                     }
                 }
@@ -460,66 +491,39 @@ void CreatureEventAI::ProcessAction(CreatureEventAI_Action const& action, uint32
         case ACTION_T_CAST:
         {
             Unit* target = GetTargetByType(action.cast.target, pActionInvoker);
-            Unit* caster = m_creature;
 
             if (!target)
+            {
+                sLog.outDebug("CreatureEventAI: NULL target for ACTION_T_CAST creature entry %u casting spell id %u", m_creature->GetEntry(), action.cast.spellId);
                 return;
-
-            if (action.cast.castFlags & CAST_FORCE_TARGET_SELF)
-                caster = target;
-
-            //Allowed to cast only if not casting (unless we interrupt ourself) or if spell is triggered
-            bool canCast = !caster->IsNonMeleeSpellCasted(false) || (action.cast.castFlags & (CAST_TRIGGERED | CAST_INTERRUPT_PREVIOUS));
-
-            // If cast flag CAST_AURA_NOT_PRESENT is active, check if target already has aura on them
-            if(action.cast.castFlags & CAST_AURA_NOT_PRESENT)
-            {
-                for(int i = 0; i < MAX_EFFECT_INDEX; ++i)
-                    if(target->HasAura(action.cast.spellId, SpellEffectIndex(i)))
-                        return;
             }
 
-            if (canCast)
-            {
-                const SpellEntry* tSpell = GetSpellStore()->LookupEntry(action.cast.spellId);
+            CanCastResult castResult = DoCastSpellIfCan(target, action.cast.spellId, action.cast.castFlags);
 
-                //Verify that spell exists
-                if (tSpell)
+            switch(castResult)
+            {
+                case CAST_FAIL_POWER:
+                case CAST_FAIL_TOO_FAR:
                 {
-                    //Check if cannot cast spell
-                    if (!(action.cast.castFlags & (CAST_FORCE_TARGET_SELF | CAST_FORCE_CAST)) &&
-                        !CanCast(target, tSpell, (action.cast.castFlags & CAST_TRIGGERED)))
+                    // Melee current victim if flag not set
+                    if (!(action.cast.castFlags & CAST_NO_MELEE_IF_OOM))
                     {
-                        //Melee current victim if flag not set
-                        if (!(action.cast.castFlags & CAST_NO_MELEE_IF_OOM))
+                        switch(m_creature->GetMotionMaster()->GetCurrentMovementGeneratorType())
                         {
-                            switch(m_creature->GetMotionMaster()->GetCurrentMovementGeneratorType())
-                            {
-                                case CHASE_MOTION_TYPE:
-                                case FOLLOW_MOTION_TYPE:
-                                    m_AttackDistance = 0.0f;
-                                    m_AttackAngle = 0.0f;
+                            case CHASE_MOTION_TYPE:
+                            case FOLLOW_MOTION_TYPE:
+                                m_AttackDistance = 0.0f;
+                                m_AttackAngle = 0.0f;
 
-                                    m_creature->GetMotionMaster()->Clear(false);
-                                    m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim(), m_AttackDistance, m_AttackAngle);
-                                    break;
-                            }
+                                m_creature->GetMotionMaster()->Clear(false);
+                                m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim(), m_AttackDistance, m_AttackAngle);
+                                break;
                         }
-
                     }
-                    else
-                    {
-                        //Interrupt any previous spell
-                        if (caster->IsNonMeleeSpellCasted(false) && action.cast.castFlags & CAST_INTERRUPT_PREVIOUS)
-                            caster->InterruptNonMeleeSpells(false);
-
-                        caster->CastSpell(target, action.cast.spellId, (action.cast.castFlags & CAST_TRIGGERED));
-                    }
-
+                    break;
                 }
-                else
-                    sLog.outErrorDb("CreatureEventAI: event %d creature %d attempt to cast spell that doesn't exist %d", EventId, m_creature->GetEntry(), action.cast.spellId);
             }
+
             break;
         }
         case ACTION_T_SUMMON:
@@ -547,7 +551,7 @@ void CreatureEventAI::ProcessAction(CreatureEventAI_Action const& action, uint32
         {
             ThreatList const& threatList = m_creature->getThreatManager().getThreatList();
             for (ThreatList::const_iterator i = threatList.begin(); i != threatList.end(); ++i)
-                if(Unit* Temp = Unit::GetUnit(*m_creature,(*i)->getUnitGuid()))
+                if(Unit* Temp = m_creature->GetMap()->GetUnit((*i)->getUnitGuid()))
                     m_creature->getThreatManager().modifyThreatPercent(Temp, action.threat_all_pct.percent);
             break;
         }
@@ -648,19 +652,14 @@ void CreatureEventAI::ProcessAction(CreatureEventAI_Action const& action, uint32
             break;
         case ACTION_T_QUEST_EVENT_ALL:
             if (pActionInvoker && pActionInvoker->GetTypeId() == TYPEID_PLAYER)
-            {
-                if (Unit* Temp = Unit::GetUnit(*m_creature,pActionInvoker->GetGUID()))
-                    if (Temp->GetTypeId() == TYPEID_PLAYER)
-                        ((Player*)Temp)->GroupEventHappens(action.quest_event_all.questId,m_creature);
-            }
+                ((Player*)pActionInvoker)->GroupEventHappens(action.quest_event_all.questId,m_creature);
             break;
         case ACTION_T_CAST_EVENT_ALL:
         {
             ThreatList const& threatList = m_creature->getThreatManager().getThreatList();
             for (ThreatList::const_iterator i = threatList.begin(); i != threatList.end(); ++i)
-                if (Unit* Temp = Unit::GetUnit(*m_creature,(*i)->getUnitGuid()))
-                    if (Temp->GetTypeId() == TYPEID_PLAYER)
-                        ((Player*)Temp)->CastedCreatureOrGO(action.cast_event_all.creatureId, m_creature->GetObjectGuid(), action.cast_event_all.spellId);
+                if (Player* temp = m_creature->GetMap()->GetPlayer((*i)->getUnitGuid()))
+                        temp->CastedCreatureOrGO(action.cast_event_all.creatureId, m_creature->GetObjectGuid(), action.cast_event_all.spellId);
             break;
         }
         case ACTION_T_REMOVEAURASFROMSPELL:
@@ -804,6 +803,28 @@ void CreatureEventAI::ProcessAction(CreatureEventAI_Action const& action, uint32
                 m_InvinceabilityHpLevel = action.invincibility_hp_level.hp_level;
             break;
         }
+        case ACTION_T_MOUNT_TO_ENTRY_OR_MODEL:
+        {
+            if (action.mount.creatureId || action.mount.modelId)
+            {
+                // set model based on entry from creature_template
+                if (action.mount.creatureId)
+                {
+                    if (CreatureInfo const* cInfo = GetCreatureTemplateStore(action.mount.creatureId))
+                    {
+                        uint32 display_id = Creature::ChooseDisplayId(cInfo);
+                        m_creature->Mount(display_id);
+                    }
+                }
+                //if no param1, then use value from param2 (modelId)
+                else
+                    m_creature->Mount(action.mount.modelId);
+            }
+            else
+                m_creature->Unmount();
+
+            break;
+        }
     }
 }
 
@@ -852,8 +873,6 @@ void CreatureEventAI::Reset()
 
 void CreatureEventAI::JustReachedHome()
 {
-    m_creature->LoadCreaturesAddon();
-
     if (!m_bEmptyList)
     {
         for (CreatureEventAIList::iterator i = m_CreatureEventAIList.begin(); i != m_CreatureEventAIList.end(); ++i)

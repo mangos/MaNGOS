@@ -232,10 +232,10 @@ std::string ObjectMgr::GetGuildNameById(uint32 GuildId) const
     return "";
 }
 
-Guild* ObjectMgr::GetGuildByLeader(const uint64 &guid) const
+Guild* ObjectMgr::GetGuildByLeader(ObjectGuid guid) const
 {
     for(GuildMap::const_iterator itr = mGuildMap.begin(); itr != mGuildMap.end(); ++itr)
-        if (itr->second->GetLeader() == guid)
+        if (itr->second->GetLeaderGuid() == guid)
             return itr->second;
 
     return NULL;
@@ -259,10 +259,10 @@ ArenaTeam* ObjectMgr::GetArenaTeamByName(const std::string& arenateamname) const
     return NULL;
 }
 
-ArenaTeam* ObjectMgr::GetArenaTeamByCaptain(uint64 const& guid) const
+ArenaTeam* ObjectMgr::GetArenaTeamByCaptain(ObjectGuid guid) const
 {
     for(ArenaTeamMap::const_iterator itr = mArenaTeamMap.begin(); itr != mArenaTeamMap.end(); ++itr)
-        if (itr->second->GetCaptain() == guid)
+        if (itr->second->GetCaptainGuid() == guid)
             return itr->second;
 
     return NULL;
@@ -914,15 +914,6 @@ uint32 ObjectMgr::GetCreatureModelAlternativeModel(uint32 modelId)
     return 0;
 }
 
-// generally for models having another model for the other team (totems)
-uint32 ObjectMgr::GetCreatureModelOtherTeamModel(uint32 modelId)
-{
-    if (const CreatureModelInfo *modelInfo = GetCreatureModelInfo(modelId))
-        return modelInfo->modelid_other_team;
-
-    return 0;
-}
-
 CreatureModelInfo const* ObjectMgr::GetCreatureModelRandomGender(uint32 display_id)
 {
     CreatureModelInfo const *minfo = GetCreatureModelInfo(display_id);
@@ -943,6 +934,29 @@ CreatureModelInfo const* ObjectMgr::GetCreatureModelRandomGender(uint32 display_
     }
     else
         return minfo;
+}
+
+uint32 ObjectMgr::GetModelForRace(uint32 sourceModelId, uint32 racemask)
+{
+    uint32 modelId = 0;
+
+    for(CreatureModelRaceMap::const_iterator itr = m_mCreatureModelRaceMap.lower_bound(sourceModelId); itr != m_mCreatureModelRaceMap.upper_bound(sourceModelId); ++itr)
+    {
+        if (!(itr->second.racemask & racemask))
+            continue;
+
+        if (itr->second.creature_entry)
+        {
+            const CreatureInfo *cInfo = sObjectMgr.GetCreatureTemplate(itr->second.creature_entry);
+            modelId = Creature::ChooseDisplayId(cInfo);
+        }
+        else
+        {
+            modelId = itr->second.modelid_racial;
+        }
+    }
+
+    return modelId;
 }
 
 void ObjectMgr::LoadCreatureModelInfo()
@@ -975,12 +989,6 @@ void ObjectMgr::LoadCreatureModelInfo()
         {
             sLog.outErrorDb("Table `creature_model_info` has nonexistent modelid_alternative model (%u) defined for model id %u.", minfo->modelid_alternative, minfo->modelid);
             const_cast<CreatureModelInfo*>(minfo)->modelid_alternative = 0;
-        }
-
-        if (minfo->modelid_other_team && !sCreatureDisplayInfoStore.LookupEntry(minfo->modelid_other_team))
-        {
-            sLog.outErrorDb("Table `creature_model_info` has nonexistent modelid_other_team model (%u) defined for model id %u.", minfo->modelid_other_team, minfo->modelid);
-            const_cast<CreatureModelInfo*>(minfo)->modelid_other_team = 0;
         }
     }
 
@@ -1044,6 +1052,125 @@ void ObjectMgr::LoadCreatureModelInfo()
 
     sLog.outString( ">> Loaded %u creature model based info", sCreatureModelStorage.RecordCount );
     sLog.outString();
+}
+
+void ObjectMgr::LoadCreatureModelRace()
+{
+    m_mCreatureModelRaceMap.clear();                        // can be used for reload
+
+    QueryResult* result = WorldDatabase.Query("SELECT modelid, racemask, creature_entry, modelid_racial FROM creature_model_race");
+
+    if (!result)
+    {
+        barGoLink bar(1);
+
+        bar.step();
+
+        sLog.outString();
+        sLog.outErrorDb(">> Loaded creature_model_race, table is empty!");
+        return;
+    }
+
+    barGoLink bar( (int)result->GetRowCount() );
+
+    uint32 count = 0;
+
+    // model, racemask
+    std::map<uint32, uint32> model2raceMask;
+
+    do
+    {
+        bar.step();
+
+        Field* fields = result->Fetch();
+
+        CreatureModelRace raceData;
+
+        raceData.modelid            = fields[0].GetUInt32();
+        raceData.racemask           = fields[1].GetUInt32();
+        raceData.creature_entry     = fields[2].GetUInt32();
+        raceData.modelid_racial     = fields[3].GetUInt32();
+
+        if (!sCreatureDisplayInfoStore.LookupEntry(raceData.modelid))
+        {
+            sLog.outErrorDb("Table `creature_model_race` has model for nonexistent model id (%u), skipping", raceData.modelid);
+            continue;
+        }
+
+        if (!sCreatureModelStorage.LookupEntry<CreatureModelInfo>(raceData.modelid))
+        {
+            sLog.outErrorDb("Table `creature_model_race` modelid %u does not exist in creature_model_info, skipping", raceData.modelid);
+            continue;
+        }
+
+        if (!raceData.racemask)
+        {
+            sLog.outErrorDb("Table `creature_model_race` modelid %u has no racemask defined, skipping", raceData.modelid);
+            continue;
+        }
+
+        if (!(raceData.racemask & RACEMASK_ALL_PLAYABLE))
+        {
+            sLog.outErrorDb("Table `creature_model_race` modelid %u include invalid racemask, skipping", raceData.modelid);
+            continue;
+        }
+
+        std::map<uint32, uint32>::const_iterator model2Race = model2raceMask.find(raceData.modelid);
+
+        // can't have same mask for same model several times
+        if (model2Race != model2raceMask.end())
+        {
+            if (model2Race->second & raceData.racemask)
+            {
+                sLog.outErrorDb("Table `creature_model_race` modelid %u with racemask %u has mask already included for same modelid, skipping", raceData.modelid, raceData.racemask);
+                continue;
+            }
+        }
+
+        model2raceMask[raceData.modelid] |= raceData.racemask;
+
+        // creature_entry is the prefered way
+        if (raceData.creature_entry)
+        {
+            if (raceData.modelid_racial)
+                sLog.outErrorDb("Table `creature_model_race` modelid %u has modelid_racial for modelid %u but a creature_entry are already defined, modelid_racial will never be used.", raceData.modelid);
+
+            if (!sCreatureStorage.LookupEntry<CreatureInfo>(raceData.creature_entry))
+            {
+                sLog.outErrorDb("Table `creature_model_race` modelid %u has creature_entry for nonexistent creature_template (%u), skipping", raceData.modelid, raceData.creature_entry);
+                continue;
+            }
+        }
+        else if (raceData.modelid_racial)
+        {
+            if (!sCreatureDisplayInfoStore.LookupEntry(raceData.modelid_racial))
+            {
+                sLog.outErrorDb("Table `creature_model_race` modelid %u has modelid_racial for nonexistent model id (%u), skipping", raceData.modelid, raceData.modelid_racial);
+                continue;
+            }
+
+            if (!sCreatureModelStorage.LookupEntry<CreatureModelInfo>(raceData.modelid_racial))
+            {
+                sLog.outErrorDb("Table `creature_model_race` modelid %u has modelid_racial %u, but are not defined in creature_model_info, skipping", raceData.modelid, raceData.modelid_racial);
+                continue;
+            }
+        }
+        else
+        {
+            sLog.outErrorDb("Table `creature_model_race` modelid %u does not have either creature_entry or modelid_racial defined, skipping", raceData.modelid);
+            continue;
+        }
+
+        m_mCreatureModelRaceMap.insert(CreatureModelRaceMap::value_type(raceData.modelid, raceData));
+
+        ++count;
+    }
+    while(result->NextRow());
+
+    delete result;
+
+    sLog.outString();
+    sLog.outString( ">> Loaded %u creature_model_race entries", count);
 }
 
 void ObjectMgr::LoadCreatures()
@@ -1526,7 +1653,7 @@ uint64 ObjectMgr::GetPlayerGUIDByName(std::string name) const
     QueryResult *result = CharacterDatabase.PQuery("SELECT guid FROM characters WHERE name = '%s'", name.c_str());
     if(result)
     {
-        guid = MAKE_NEW_GUID((*result)[0].GetUInt32(), 0, HIGHGUID_PLAYER);
+        guid = ObjectGuid(HIGHGUID_PLAYER, (*result)[0].GetUInt32()).GetRawValue();
 
         delete result;
     }
@@ -1534,7 +1661,7 @@ uint64 ObjectMgr::GetPlayerGUIDByName(std::string name) const
     return guid;
 }
 
-bool ObjectMgr::GetPlayerNameByGUID(const uint64 &guid, std::string &name) const
+bool ObjectMgr::GetPlayerNameByGUID(ObjectGuid guid, std::string &name) const
 {
     // prevent DB access for online player
     if(Player* player = GetPlayer(guid))
@@ -1543,7 +1670,9 @@ bool ObjectMgr::GetPlayerNameByGUID(const uint64 &guid, std::string &name) const
         return true;
     }
 
-    QueryResult *result = CharacterDatabase.PQuery("SELECT name FROM characters WHERE guid = '%u'", GUID_LOPART(guid));
+    uint32 lowguid = guid.GetCounter();
+
+    QueryResult *result = CharacterDatabase.PQuery("SELECT name FROM characters WHERE guid = '%u'", lowguid);
 
     if(result)
     {
@@ -1555,17 +1684,17 @@ bool ObjectMgr::GetPlayerNameByGUID(const uint64 &guid, std::string &name) const
     return false;
 }
 
-uint32 ObjectMgr::GetPlayerTeamByGUID(const uint64 &guid) const
+uint32 ObjectMgr::GetPlayerTeamByGUID(ObjectGuid guid) const
 {
     // prevent DB access for online player
-    if(Player* player = GetPlayer(guid))
-    {
+    if (Player* player = GetPlayer(guid))
         return Player::TeamForRace(player->getRace());
-    }
 
-    QueryResult *result = CharacterDatabase.PQuery("SELECT race FROM characters WHERE guid = '%u'", GUID_LOPART(guid));
+    uint32 lowguid = guid.GetCounter();
 
-    if(result)
+    QueryResult *result = CharacterDatabase.PQuery("SELECT race FROM characters WHERE guid = '%u'", lowguid);
+
+    if (result)
     {
         uint8 race = (*result)[0].GetUInt8();
         delete result;
@@ -1575,16 +1704,16 @@ uint32 ObjectMgr::GetPlayerTeamByGUID(const uint64 &guid) const
     return 0;
 }
 
-uint32 ObjectMgr::GetPlayerAccountIdByGUID(const uint64 &guid) const
+uint32 ObjectMgr::GetPlayerAccountIdByGUID(ObjectGuid guid) const
 {
     // prevent DB access for online player
     if(Player* player = GetPlayer(guid))
-    {
         return player->GetSession()->GetAccountId();
-    }
 
-    QueryResult *result = CharacterDatabase.PQuery("SELECT account FROM characters WHERE guid = '%u'", GUID_LOPART(guid));
-    if(result)
+    uint32 lowguid = guid.GetCounter();
+
+    QueryResult *result = CharacterDatabase.PQuery("SELECT account FROM characters WHERE guid = '%u'", lowguid);
+    if (result)
     {
         uint32 acc = (*result)[0].GetUInt32();
         delete result;
@@ -3314,6 +3443,7 @@ void ObjectMgr::LoadGroups()
             count++;
 
             uint32 memberGuidlow = fields[0].GetUInt32();
+            ObjectGuid memberGuid = ObjectGuid(HIGHGUID_PLAYER, memberGuidlow);
             bool   assistent     = fields[1].GetBool();
             uint8  subgroup      = fields[2].GetUInt8();
             uint32 groupId       = fields[3].GetUInt32();
@@ -3322,7 +3452,8 @@ void ObjectMgr::LoadGroups()
                 group = GetGroupById(groupId);
                 if (!group)
                 {
-                    sLog.outErrorDb("Incorrect entry in group_member table : no group with Id %d for member %d!", groupId, memberGuidlow);
+                    sLog.outErrorDb("Incorrect entry in group_member table : no group with Id %d for member %s!",
+                        groupId, memberGuid.GetString().c_str());
                     CharacterDatabase.PExecute("DELETE FROM group_member WHERE memberGuid = '%d'", memberGuidlow);
                     continue;
                 }
@@ -3330,7 +3461,8 @@ void ObjectMgr::LoadGroups()
 
             if (!group->LoadMemberFromDB(memberGuidlow, subgroup, assistent))
             {
-                sLog.outErrorDb("Incorrect entry in group_member table : member %d cannot be added to player %d's group (Id: %u)!", memberGuidlow, GUID_LOPART(group->GetLeaderGUID()), groupId);
+                sLog.outErrorDb("Incorrect entry in group_member table : member %s cannot be added to group (Id: %u)!",
+                    memberGuid.GetString().c_str(), groupId);
                 CharacterDatabase.PExecute("DELETE FROM group_member WHERE memberGuid = '%d'", memberGuidlow);
             }
         }while( result->NextRow() );
@@ -5432,7 +5564,7 @@ uint32 ObjectMgr::GetTaxiMountDisplayId( uint32 id, uint32 team, bool allowed_al
     if (!mount_info)
         return 0;
 
-    uint16 mount_id = Creature::ChooseDisplayId(team,mount_info);
+    uint16 mount_id = Creature::ChooseDisplayId(mount_info);
     if (!mount_id)
         return 0;
 

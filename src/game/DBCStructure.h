@@ -1207,8 +1207,8 @@ struct MapDifficultyEntry
     uint32      MapId;                                      // 1
     uint32      Difficulty;                                 // 2 (for arenas: arena slot)
     //char*       areaTriggerText;                          // 3 text showed when transfer to map failed (missing requirements)
-    uint32      resetTime;                                  // 4
-    uint32      maxPlayers;                                 // 5
+    uint32      resetTime;                                  // 4, in secs, 0 if no fixed reset time
+    uint32      maxPlayers;                                 // 5, some heroic versions have 0 when expected same amount as in normal version
     //char*       difficultyString;                         // 6
 };
 
@@ -2084,7 +2084,7 @@ struct MapDifficulty
     MapDifficulty() : resetTime(0), maxPlayers(0) {}
     MapDifficulty(uint32 _resetTime, uint32 _maxPlayers) : resetTime(_resetTime), maxPlayers(_maxPlayers) {}
 
-    uint32 resetTime;
+    uint32 resetTime;                                       // in secs, 0 if no fixed reset time
     uint32 maxPlayers;                                      // some heroic dungeons have 0 when expect same value as in normal dificulty case
 };
 

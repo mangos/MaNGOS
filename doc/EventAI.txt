@@ -142,6 +142,7 @@ For all ACTION_T_RANDOM, When a Particular Param is selected for the Event... Th
 40   ACTION_T_SET_SHEATH                    Sheath                          Sets sheath state for a creature (0 = no weapon, 1 = melee weapon, 2 = ranged weapon).
 41   ACTION_T_FORCE_DESPAWN                 Delay                           Despawns the creature, if delay = 0 immediate otherwise will despawn after delay time set in Param1 (in ms).
 42   ACTION_T_SET_INVINCIBILITY_HP_LEVEL    HP_Level, HP_Percent            Set min. health level for creature that can be set at damage as flat value or percent from max health
+43   ACTION_T_MOUNT_TO_ENTRY_OR_MODEL       CreatureEntry, ModelId          Set mount model from creature_template.entry (Param1) OR explicit modelId (Param2). If (Param1) AND (Param2) are both 0, unmount.
 
 * = Use -1 where the param is expected to do nothing. Random constant is generated for each event, so if you have a random yell and a random sound, they will be linked up with each other (ie. param2 with param2).
 
@@ -829,9 +830,9 @@ Below is the list of current Event Flags that EventAI can handle. Event flags ar
 2       4         EFLAG_DIFFICULTY_1             Event occurs in instance difficulty 1 (will not occur if not set)
 3       8         EFLAG_DIFFICULTY_2             Event occurs in instance difficulty 2 (will not occur if not set)
 4       16        EFLAG_DIFFICULTY_3             Event occurs in instance difficulty 3 (will not occur if not set)
-5       32
+8       32        EFLAG_RANDOM_ACTION            At event occur execute one random action from event actions instead all actions.
 6       64
-7       128       EFLAG_DEBUG_ONLY              Prevents events from occuring on Release builds. Useful for testing new features.
+7       128       EFLAG_DEBUG_ONLY               Prevents events from occuring on Release builds. Useful for testing new features.
 
 NOTE: You can add the numbers in the decimal column to combine flags.
 

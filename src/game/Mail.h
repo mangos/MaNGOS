@@ -221,7 +221,7 @@ class MailDraft
          */
         MailDraft& AddCOD(uint32 COD) { m_COD = COD; return *this; }
     public:                                                 // finishers
-        void SendReturnToSender(uint32 sender_acc, uint32 sender_guid, uint32 receiver_guid);
+        void SendReturnToSender(uint32 sender_acc, uint32 sender_lowguid, uint32 receiver_lowguid);
         void SendMailTo(MailReceiver const& receiver, MailSender const& sender, MailCheckMask checked = MAIL_CHECK_MASK_NONE, uint32 deliver_delay = 0);
     private:
         void deleteIncludedItems(bool inDB = false);

@@ -24,7 +24,7 @@
 #include "ace/Thread_Mutex.h"
 #include <list>
 #include <map>
-#include "Utilities/UnorderedMap.h"
+#include "Utilities/UnorderedMapSet.h"
 #include "Database/DatabaseEnv.h"
 #include "DBCEnums.h"
 #include "ObjectGuid.h"
@@ -160,6 +160,8 @@ class InstanceResetScheduler
             ResetTimeByMapDifficultyMap::const_iterator itr  = m_resetTimeByMapDifficulty.find(MAKE_PAIR32(mapid,d));
             return itr != m_resetTimeByMapDifficulty.end() ? itr->second : 0;
         }
+
+        static uint32 GetMaxResetTimeFor(MapDifficulty const* mapDiff);
 
     public:                                                 // modifiers
         void SetResetTimeFor(uint32 mapid, Difficulty d, time_t t)

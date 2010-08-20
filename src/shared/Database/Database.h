@@ -20,7 +20,7 @@
 #define DATABASE_H
 
 #include "Threading.h"
-#include "Utilities/UnorderedMap.h"
+#include "Utilities/UnorderedMapSet.h"
 #include "Database/SqlDelayThread.h"
 
 class SqlTransaction;
