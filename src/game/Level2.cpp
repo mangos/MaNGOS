@@ -1057,7 +1057,7 @@ bool ChatHandler::HandleGameObjectAddCommand(char* args)
         return false;
 
     int32 spawntimeSecs;
-    if (!ExtractInt32(&args, spawntimeSecs))
+    if (!ExtractOptInt32(&args, spawntimeSecs, 0))
         return false;
 
     const GameObjectInfo *gInfo = ObjectMgr::GetGameObjectInfo(id);
