@@ -996,8 +996,7 @@ uint32 Map::GetMaxPlayers() const
 
 uint32 Map::GetMaxResetDelay() const
 {
-    MapDifficulty const* mapDiff = GetMapDifficulty();
-    return mapDiff ? mapDiff->resetTime : 0;
+    return InstanceResetScheduler::GetMaxResetTimFor(GetMapDifficulty());
 }
 
 inline GridMap *Map::GetGrid(float x, float y)

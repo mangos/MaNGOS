@@ -161,6 +161,8 @@ class InstanceResetScheduler
             return itr != m_resetTimeByMapDifficulty.end() ? itr->second : 0;
         }
 
+        static uint32 GetMaxResetTimFor(MapDifficulty const* mapDiff);
+
     public:                                                 // modifiers
         void SetResetTimeFor(uint32 mapid, Difficulty d, time_t t)
         {
