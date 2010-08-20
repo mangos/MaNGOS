@@ -12317,6 +12317,15 @@ void Player::ApplyEnchantment(Item *item, EnchantmentSlot slot, bool apply, bool
     if (!ignore_condition && pEnchant->EnchantmentCondition && !((Player*)this)->EnchantmentFitsRequirements(pEnchant->EnchantmentCondition, -1))
         return;
 
+    if ((pEnchant->requiredLevel) > ((Player*)this)->getLevel())
+        return;
+
+    if ((pEnchant->requiredSkill) > 0)
+    {
+       if ((pEnchant->requiredSkillValue) > (((Player*)this)->GetSkillValue(pEnchant->requiredSkill)))
+        return;
+    }
+
     if (!item->IsBroken())
     {
         for (int s = 0; s < 3; ++s)
