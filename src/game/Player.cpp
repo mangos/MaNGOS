@@ -463,6 +463,7 @@ Player::Player (WorldSession *session): Unit(), m_achievementMgr(this), m_reputa
     memset(m_items, 0, sizeof(Item*)*PLAYER_SLOTS_COUNT);
 
     m_social = NULL;
+    m_guildId = 0;
 
     // group is initialized in the reference constructor
     SetGroupInvite(NULL);
@@ -704,7 +705,7 @@ bool Player::Create( uint32 guidlow, const std::string& name, uint8 race, uint8 
     SetByteValue(PLAYER_BYTES_3, 0, gender);
     SetByteValue(PLAYER_BYTES_3, 3, 0);                     // BattlefieldArenaFaction (0 or 1)
 
-    SetUInt32Value( PLAYER_GUILDID, 0 );
+    SetInGuild( 0 );
     SetUInt32Value( PLAYER_GUILDRANK, 0 );
     SetUInt32Value( PLAYER_GUILD_TIMESTAMP, 0 );
 
@@ -4013,7 +4014,7 @@ void Player::InitVisibleBits()
     updateVisualBits.SetBit(PLAYER_DUEL_ARBITER + 0);
     updateVisualBits.SetBit(PLAYER_DUEL_ARBITER + 1);
     updateVisualBits.SetBit(PLAYER_FLAGS);
-    updateVisualBits.SetBit(PLAYER_GUILDID);
+    //updateVisualBits.SetBit(PLAYER_GUILDID);
     updateVisualBits.SetBit(PLAYER_GUILDRANK);
     updateVisualBits.SetBit(PLAYER_BYTES);
     updateVisualBits.SetBit(PLAYER_BYTES_2);
@@ -4620,7 +4621,7 @@ Corpse* Player::CreateCorpse()
 
     corpse->SetUInt32Value( CORPSE_FIELD_DISPLAY_ID, GetNativeDisplayId() );
 
-    corpse->SetUInt32Value( CORPSE_FIELD_GUILD, GetGuildId() );
+    //corpse->SetUInt32Value( CORPSE_FIELD_GUILD, GetGuildId() );
 
     uint32 iDisplayID;
     uint32 iIventoryType;

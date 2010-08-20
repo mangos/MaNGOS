@@ -1795,10 +1795,10 @@ class MANGOS_DLL_SPEC Player : public Unit
         void RemoveFromGroup() { RemoveFromGroup(GetGroup(), GetObjectGuid()); }
         void SendUpdateToOutOfRangeGroupMembers();
 
-        void SetInGuild(uint32 GuildId) { SetUInt32Value(PLAYER_GUILDID, GuildId); }
+        void SetInGuild(uint32 GuildId) { m_guildId = GuildId; }
         void SetRank(uint32 rankId){ SetUInt32Value(PLAYER_GUILDRANK, rankId); }
         void SetGuildIdInvited(uint32 GuildId) { m_GuildIdInvited = GuildId; }
-        uint32 GetGuildId() { return GetUInt32Value(PLAYER_GUILDID);  }
+        uint32 GetGuildId() { return m_guildId; }
         static uint32 GetGuildIdFromDB(ObjectGuid guid);
         uint32 GetRank(){ return GetUInt32Value(PLAYER_GUILDRANK); }
         static uint32 GetRankFromDB(uint64 guid);
@@ -2599,6 +2599,7 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         // Social
         PlayerSocial *m_social;
+        uint32 m_guildId;
 
         // Groups
         GroupReference m_group;
