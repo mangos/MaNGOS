@@ -1259,6 +1259,8 @@ void SpellMgr::LoadSpellProcEvents()
                 {
                     empty = false;
                     uint32 const* ptr = spell->GetEffectSpellClassMask(SpellEffectIndex(i));
+                    if(!ptr)
+                        continue;
                     if ((((uint64*)ptr)[0] != 0 && spe.spellFamilyMask[i] == ((uint64*)ptr)[0]) && (ptr[2] == 0 || spe.spellFamilyMask2[i] == ptr[2]))
                         sLog.outErrorDb("Spell %u listed in `spell_proc_event` have same class mask as in Spell.dbc (EffectIndex %u) and doesn't have any other data", entry, i);
                 }

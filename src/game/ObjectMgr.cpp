@@ -2201,15 +2201,15 @@ void ObjectMgr::LoadItemPrototypes()
                     continue;
                 }
 
-                if(BAG_FAMILY_MASK_CURRENCY_TOKENS & mask)
-                {
-                    CurrencyTypesEntry const* ctEntry = sCurrencyTypesStore.LookupEntry(proto->ItemId);
-                    if(!ctEntry)
-                    {
-                        sLog.outErrorDb("Item (Entry: %u) has currency bag family bit set in BagFamily but not listed in CurrencyTypes.dbc, remove bit",i);
-                        const_cast<ItemPrototype*>(proto)->BagFamily &= ~mask;
-                    }
-                }
+                //if(BAG_FAMILY_MASK_CURRENCY_TOKENS & mask)
+                //{
+                //    CurrencyTypesEntry const* ctEntry = sCurrencyTypesStore.LookupEntry(proto->ItemId);
+                //    if(!ctEntry)
+                //    {
+                //        sLog.outErrorDb("Item (Entry: %u) has currency bag family bit set in BagFamily but not listed in CurrencyTypes.dbc, remove bit",i);
+                //        const_cast<ItemPrototype*>(proto)->BagFamily &= ~mask;
+                //    }
+                //}
             }
         }
 

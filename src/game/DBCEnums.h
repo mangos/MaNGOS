@@ -205,8 +205,10 @@ enum AchievementCriteriaTypes
     // 121
     // 122
     // 123
-    // 0..123 => 124 criteria types total
-    ACHIEVEMENT_CRITERIA_TYPE_TOTAL = 124,
+    // 124 spend gold on guild repairs
+    // 125 reach guild level
+    // 0..125 => 126 criteria types total
+    ACHIEVEMENT_CRITERIA_TYPE_TOTAL = 126,
 };
 
 enum AreaFlags

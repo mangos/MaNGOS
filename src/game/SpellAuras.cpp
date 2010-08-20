@@ -929,6 +929,8 @@ bool Aura::CanProcFrom(SpellEntry const *spell, uint32 EventProcEx, uint32 procE
 {
     // Check EffectClassMask
     uint32 const *ptr = getAuraSpellClassMask();
+    if(!ptr)
+        return true;
 
     // if no class mask defined - allow proc
     if (!((uint64*)ptr)[0] && !ptr[2])
