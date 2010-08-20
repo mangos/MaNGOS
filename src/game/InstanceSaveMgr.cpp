@@ -126,7 +126,7 @@ bool InstanceSave::UnloadIfEmpty()
 
 //== InstanceResetScheduler functions ======================
 
-uint32 InstanceResetScheduler::GetMaxResetTimFor(MapDifficulty const* mapDiff)
+uint32 InstanceResetScheduler::GetMaxResetTimeFor(MapDifficulty const* mapDiff)
 {
     if (!mapDiff || !mapDiff->resetTime)
         return 0;
@@ -242,7 +242,7 @@ void InstanceResetScheduler::LoadResetTimes()
         if (!mapDiff->resetTime)
             continue;
 
-        uint32 period = GetMaxResetTimFor(mapDiff);
+        uint32 period = GetMaxResetTimeFor(mapDiff);
         time_t t = GetResetTimeFor(mapid,difficulty);
         if(!t)
         {
@@ -646,7 +646,7 @@ void InstanceSaveManager::_ResetOrWarnAll(uint32 mapid, Difficulty difficulty, b
 
         // calculate the next reset time
         uint32 diff = sWorld.getConfig(CONFIG_UINT32_INSTANCE_RESET_TIME_HOUR) * HOUR;
-        uint32 period = InstanceResetScheduler::GetMaxResetTimFor(mapDiff);
+        uint32 period = InstanceResetScheduler::GetMaxResetTimeFor(mapDiff);
         time_t next_reset = ((now + timeLeft + MINUTE) / DAY * DAY) + period + diff;
         // update it in the DB
         CharacterDatabase.PExecute("UPDATE instance_reset SET resettime = '"UI64FMTD"' WHERE mapid = '%d' AND difficulty = '%d'", (uint64)next_reset, mapid, difficulty);
