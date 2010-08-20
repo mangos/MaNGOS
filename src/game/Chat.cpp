@@ -2261,9 +2261,10 @@ char* ChatHandler::ExtractLiteralArg(char** args, char const* lit /*= NULL*/)
  * Function extract quote-like string (any characters guarded by some special character, in our cases ['")
  *
  * @param args variable pointer to non parsed args string, updated at function call to new position (with skipped white spaces)
+ * @param asis control save quote string wrappers
  * @return     quote-like string, or NULL if args empty or not appropriate content.
  */
-char* ChatHandler::ExtractQuotedArg( char** args )
+char* ChatHandler::ExtractQuotedArg( char** args, bool asis /*= false*/ )
 {
     if (!*args || !**args)
         return NULL;
@@ -2271,32 +2272,50 @@ char* ChatHandler::ExtractQuotedArg( char** args )
     if (**args != '\'' && **args != '"' && **args != '[')
         return NULL;
 
-    char guard[2] = " ";                                    // guard[1] == '\0'
+    char guard = (*args)[0];
 
-    guard[0] = (*args)[0];
+    if (guard == '[')
+        guard = ']';
 
-    if (guard[0] == '[')
-        guard[0] = ']';
+    char* tail = (*args)+1;                                 // start scan after first quote symbol
+    char* head = asis ? *args : tail;                       // start arg
 
-    char* str = strtok((*args)+1, guard);                   // skip start guard symbol
+    while (*tail && *tail != guard)
+        ++tail;
 
-    char* tail = strtok(NULL, "");
-    *args = tail ? tail : (char*)"";                        // *args don't must be NULL
+    if (!*tail || tail[1] && !isWhiteSpace(tail[1]))        // fail
+        return NULL;
+
+    if (!tail[1])                                           // quote is last char in string
+    {
+        if (!asis)
+            *tail = '\0';
+    }
+    else                                                    // quote isn't last char
+    {
+        if (asis)
+            ++tail;
+
+        *tail = '\0';
+    }
+
+    *args = tail+1;
 
     SkipWhiteSpaces(args);
 
-    return str;
+    return head;
 }
 
 /**
  * Function extract quote-like string or literal if quote not detected
  *
  * @param args variable pointer to non parsed args string, updated at function call to new position (with skipped white spaces)
+ * @param asis control save quote string wrappers
  * @return     quote/literal string, or NULL if args empty or not appropriate content.
  */
-char* ChatHandler::ExtractQuotedOrLiteralArg(char** args)
+char* ChatHandler::ExtractQuotedOrLiteralArg(char** args, bool asis /*= false*/)
 {
-    char *arg = ExtractQuotedArg(args);
+    char *arg = ExtractQuotedArg(args, asis);
     if (!arg)
         arg = ExtractLiteralArg(args);
     return arg;
@@ -2518,14 +2537,15 @@ char* ChatHandler::ExtractLinkArg(char** args, char const* const* linkTypes /*= 
  * Function extract name/number/quote/shift-link-like string
  *
  * @param args variable pointer to non parsed args string, updated at function call to new position (with skipped white spaces)
+ * @param asis control save quote string wrappers
  * @return     extracted arg string, or NULL if args empty or not appropriate content.
  */
-char* ChatHandler::ExtractArg( char** args )
+char* ChatHandler::ExtractArg( char** args, bool asis /*= false*/ )
 {
     if (!*args || !**args)
         return NULL;
 
-    char* arg = ExtractQuotedOrLiteralArg(args);
+    char* arg = ExtractQuotedOrLiteralArg(args, asis);
     if (!arg)
         arg = ExtractLinkArg(args);
 
@@ -2541,7 +2561,7 @@ char* ChatHandler::ExtractArg( char** args )
  */
 char* ChatHandler::ExtractOptNotLastArg(char** args)
 {
-    char* arg = ExtractArg(args);
+    char* arg = ExtractArg(args, true);
 
     // have more data
     if (*args && **args)

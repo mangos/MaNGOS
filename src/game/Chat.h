@@ -572,14 +572,15 @@ class ChatHandler
         bool  ExtractOptUInt32(char** args, uint32& val, uint32 defVal);
         bool  ExtractFloat(char** args, float& val);
         bool  ExtractOptFloat(char** args, float& val, float defVal);
-        char* ExtractQuotedArg(char** args);                // string with " or [] or ' around
+        char* ExtractQuotedArg(char** args, bool asis = false);
+                                                            // string with " or [] or ' around
         char* ExtractLiteralArg(char** args, char const* lit = NULL);
                                                             // literal string (until whitespace and not started from "['|), any or 'lit' if provided
-        char* ExtractQuotedOrLiteralArg(char** args);
+        char* ExtractQuotedOrLiteralArg(char** args, bool asis = false);
         bool  ExtractOnOff(char** args, bool& value);
         char* ExtractLinkArg(char** args, char const* const* linkTypes = NULL, int* foundIdx = NULL, char** keyPair = NULL, char** somethingPair = NULL);
                                                             // shift-link like arg (with aditional info if need)
-        char* ExtractArg(char** args);                      // any name/number/quote/shift-link strings
+        char* ExtractArg(char** args, bool asis = false);   // any name/number/quote/shift-link strings
         char* ExtractOptNotLastArg(char** args);            // extract name/number/quote/shift-link arg only if more data in args for parse
 
         char* ExtractKeyFromLink(char** text, char const* linkType, char** something1 = NULL);
