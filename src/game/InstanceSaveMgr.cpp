@@ -246,7 +246,6 @@ void InstanceResetScheduler::LoadResetTimes()
         uint32 period = GetMaxResetTimeFor(mapDiff);
 
         // the reset_delay must be at least one day
-        uint32 period =  uint32(mapDiff->resetTime / DAY * sWorld.getConfig(CONFIG_FLOAT_RATE_INSTANCE_RESET_TIME)) * DAY;
         if (period < DAY)
             period = DAY;
 
