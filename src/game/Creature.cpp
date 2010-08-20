@@ -204,26 +204,31 @@ bool Creature::InitEntry(uint32 Entry, uint32 team, const CreatureData *data )
         return false;
     }
 
-    // get difficulty 1 mode entry
-    uint32 actualEntry = Entry;
+    // difficulties for dungeons/battleground ordered in normal way
+    // and if more high version not exist must be used lesser version
+    // for raid order different:
+    // 10 man normal version must be used instead not existed 10 man heroic version
+    // 25 man normal version must be used instead not existed 24 man heroic version
     CreatureInfo const *cinfo = normalInfo;
-    // TODO correctly implement spawnmodes for non-bg maps
-    for (uint32 diff = 0; diff < MAX_DIFFICULTY - 1; ++diff)
+    for (uint8 diff = uint8(GetMap()->GetDifficulty()); diff > 0;)
     {
+        // we already have valid Map pointer for current creature!
         if (normalInfo->DifficultyEntry[diff])
         {
-            // we already have valid Map pointer for current creature!
-            if (GetMap()->GetSpawnMode() > diff)
-            {
-                cinfo = ObjectMgr::GetCreatureTemplate(normalInfo->DifficultyEntry[diff]);
-                if (!cinfo)
-                {
-                    // maybe check such things already at startup
-                    sLog.outErrorDb("Creature::UpdateEntry creature difficulty %u entry %u does not exist.", diff + 1, actualEntry);
-                    return false;
-                }
-            }
+            cinfo = ObjectMgr::GetCreatureTemplate(normalInfo->DifficultyEntry[diff]);
+            if (cinfo)
+                break;                                      // template found
+
+            // check and reported at startup, so just ignore (restore normalInfo)
+            cinfo = normalInfo;
         }
+
+        // for raid heroic to normal, for other to prev in normal order
+        if ((diff == int(RAID_DIFFICULTY_10MAN_HEROIC) || diff == int(RAID_DIFFICULTY_25MAN_HEROIC)) &&
+            GetMap()->IsRaid())
+            diff -= 2;                                      // to normal raid difficulty cases
+        else
+            --diff;
     }
 
     SetEntry(Entry);                                        // normal entry always
