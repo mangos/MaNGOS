@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_10365_01_mangos_creature_ai_scripts` bit(1) default NULL
+  `required_10381_01_mangos_creature_model_race` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -956,7 +956,6 @@ CREATE TABLE `creature_model_info` (
   `gender` tinyint(3) unsigned NOT NULL default '2',
   `modelid_other_gender` mediumint(8) unsigned NOT NULL default '0',
   `modelid_alternative` mediumint(8) unsigned NOT NULL default '0',
-  `modelid_other_team` mediumint(8) unsigned NOT NULL default '0',
   PRIMARY KEY  (`modelid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Creature System (Model related info)';
 
@@ -967,28 +966,50 @@ CREATE TABLE `creature_model_info` (
 LOCK TABLES `creature_model_info` WRITE;
 /*!40000 ALTER TABLE `creature_model_info` DISABLE KEYS */;
 INSERT INTO `creature_model_info` VALUES
-(49, 0.3060, 1.5, 0, 50, 0, 0),
-(50, 0.2080, 1.5, 1, 49, 0, 0),
-(51, 0.3720, 1.5, 0, 52, 0, 0),
-(52, 0.2360, 1.5, 1, 51, 0, 0),
-(53, 0.3470, 1.5, 0, 54, 0, 0),
-(54, 0.3470, 1.5, 1, 53, 0, 0),
-(55, 0.3890, 1.5, 0, 56, 0, 0),
-(56, 0.3060, 1.5, 1, 55, 0, 0),
-(57, 0.3830, 1.5, 0, 58, 0, 0),
-(58, 0.3830, 1.5, 1, 57, 0, 0),
-(59, 0.9747, 1.5, 0, 60, 0, 0),
-(60, 0.8725, 1.5, 1, 59, 0, 0),
-(1478, 0.3060, 1.5, 0, 1479, 0, 0),
-(1479, 0.3060, 1.5, 1, 1478, 0, 0),
-(1563, 0.3519, 1.5, 0, 1564, 0, 0),
-(1564, 0.3519, 1.5, 1, 1563, 0, 0),
-(10045, 1.0000, 1.5, 2, 0, 0, 0),
-(15475, 0.3830, 1.5, 1, 15476, 0, 0),
-(15476, 0.3830, 1.5, 0, 15475, 0, 0),
-(16125, 1.0000, 1.5, 0, 16126, 0, 0),
-(16126, 1.0000, 1.5, 1, 16125, 0, 0);
+(49, 0.3060, 1.5, 0, 50, 0),
+(50, 0.2080, 1.5, 1, 49, 0),
+(51, 0.3720, 1.5, 0, 52, 0),
+(52, 0.2360, 1.5, 1, 51, 0),
+(53, 0.3470, 1.5, 0, 54, 0),
+(54, 0.3470, 1.5, 1, 53, 0),
+(55, 0.3890, 1.5, 0, 56, 0),
+(56, 0.3060, 1.5, 1, 55, 0),
+(57, 0.3830, 1.5, 0, 58, 0),
+(58, 0.3830, 1.5, 1, 57, 0),
+(59, 0.9747, 1.5, 0, 60, 0),
+(60, 0.8725, 1.5, 1, 59, 0),
+(1478, 0.3060, 1.5, 0, 1479, 0),
+(1479, 0.3060, 1.5, 1, 1478, 0),
+(1563, 0.3519, 1.5, 0, 1564, 0),
+(1564, 0.3519, 1.5, 1, 1563, 0),
+(10045, 1.0000, 1.5, 2, 0, 0),
+(15475, 0.3830, 1.5, 1, 15476, 0),
+(15476, 0.3830, 1.5, 0, 15475, 0),
+(16125, 1.0000, 1.5, 0, 16126, 0),
+(16126, 1.0000, 1.5, 1, 16125, 0);
 /*!40000 ALTER TABLE `creature_model_info` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `creature_model_race`
+--
+
+DROP TABLE IF EXISTS `creature_model_race`;
+CREATE TABLE `creature_model_race` (
+  `modelid` mediumint(8) unsigned NOT NULL default '0',
+  `racemask` mediumint(8) unsigned NOT NULL default '0',
+  `creature_entry` mediumint(8) unsigned NOT NULL default '0' COMMENT 'option 1, modelid_N from creature_template',
+  `modelid_racial` mediumint(8) unsigned NOT NULL default '0' COMMENT 'option 2, explicit modelid',
+  PRIMARY KEY  (`modelid`,`racemask`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Model system';
+
+--
+-- Dumping data for table `creature_model_race`
+--
+
+LOCK TABLES `creature_model_race` WRITE;
+/*!40000 ALTER TABLE `creature_model_race` DISABLE KEYS */;
+/*!40000 ALTER TABLE `creature_model_race` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --

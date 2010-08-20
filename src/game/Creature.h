@@ -232,7 +232,14 @@ struct CreatureModelInfo
     uint8 gender;
     uint32 modelid_other_gender;                            // The oposite gender for this modelid (male/female)
     uint32 modelid_alternative;                             // An alternative model. Generally same gender(2)
-    uint32 modelid_other_team;                              // The oposite team. Generally for alliance totem
+};
+
+struct CreatureModelRace
+{
+    uint32 modelid;                                         // Native model/base model the selection is for
+    uint32 racemask;                                        // Races it applies to (and then a player source must exist for selection)
+    uint32 creature_entry;                                  // Modelid from creature_template.entry will be selected
+    uint32 modelid_racial;                                  // Explicit modelid. Used if creature_template entry is not defined
 };
 
 enum InhabitTypeValues
