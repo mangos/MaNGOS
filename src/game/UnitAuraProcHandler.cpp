@@ -2895,6 +2895,19 @@ SpellAuraProcResult Unit::HandleProcTriggerSpellAuraProc(Unit *pVictim, uint32 d
                         return SPELL_AURA_PROC_FAILED;
                     break;
                 }
+                case 64568:                                 // Blood Reserve
+                {
+                    // Check health condition - should drop to less 35%
+                    if (!(10*(int32(GetHealth() - damage)) < 3.5 * GetMaxHealth()))
+                       return SPELL_AURA_PROC_FAILED;
+
+                    if (!roll_chance_f(50))
+                        return SPELL_AURA_PROC_FAILED;
+
+                    trigger_spell_id = 64569;
+                    basepoints[0] = triggerAmount;
+                    break;
+                } 
                 case 67702:                                 // Death's Choice, Item - Coliseum 25 Normal Melee Trinket
                 {
                     float stat = 0.0f;
