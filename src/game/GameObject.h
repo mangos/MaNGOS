@@ -667,20 +667,22 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
         LootState getLootState() const { return m_lootState; }
         void SetLootState(LootState s) { m_lootState = s; }
 
-        void AddToSkillupList(uint32 PlayerGuidLow) { m_SkillupList.push_back(PlayerGuidLow); }
-        bool IsInSkillupList(uint32 PlayerGuidLow) const
+        void AddToSkillupList(Player* player);
+        bool IsInSkillupList(Player* player) const;
+        void ClearSkillupList() { m_SkillupSet.clear(); }
+        void ClearAllUsesData()
         {
-            for (std::list<uint32>::const_iterator i = m_SkillupList.begin(); i != m_SkillupList.end(); ++i)
-                if (*i == PlayerGuidLow) return true;
-            return false;
+            ClearSkillupList();
+            m_useTimes = 0;
+            m_firstUser.Clear();
+            m_UniqueUsers.clear();
         }
-        void ClearSkillupList() { m_SkillupList.clear(); }
 
         void AddUniqueUse(Player* player);
-        void AddUse() { ++m_usetimes; }
+        void AddUse() { ++m_useTimes; }
 
-        uint32 GetUseCount() const { return m_usetimes; }
-        uint32 GetUniqueUseCount() const { return m_unique_users.size(); }
+        uint32 GetUseCount() const { return m_useTimes; }
+        uint32 GetUniqueUseCount() const { return m_UniqueUsers.size(); }
 
         void SaveRespawnTime();
 
@@ -714,11 +716,16 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
         bool        m_spawnedByDefault;
         time_t      m_cooldownTime;                         // used as internal reaction delay time store (not state change reaction).
                                                             // For traps this: spell casting cooldown, for doors/buttons: reset time.
-        std::list<uint32> m_SkillupList;
 
-        Player* m_ritualOwner;                              // used for GAMEOBJECT_TYPE_SUMMONING_RITUAL where GO is not summoned (no owner)
-        std::set<uint32> m_unique_users;
-        uint32 m_usetimes;
+        typedef std::set<ObjectGuid> GuidsSet;
+
+        GuidsSet m_SkillupSet;                              // players that already have skill-up at GO use
+
+        uint32 m_useTimes;                                  // amount uses/charges triggered
+
+        // collected only for GAMEOBJECT_TYPE_SUMMONING_RITUAL
+        ObjectGuid m_firstUser;                             // first GO user, in most used cases owner, but in some cases no, for example non-summoned multi-use GAMEOBJECT_TYPE_SUMMONING_RITUAL
+        GuidsSet m_UniqueUsers;                             // all players who use item, some items activated after specific amount unique uses
 
         uint32 m_DBTableGuid;                               ///< For new or temporary gameobjects is 0 for saved it is lowguid
         GameObjectInfo const* m_goInfo;
