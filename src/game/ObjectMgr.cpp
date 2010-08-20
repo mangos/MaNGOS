@@ -7818,8 +7818,14 @@ uint16 ObjectMgr::GetConditionId( ConditionType condition, uint32 value1, uint32
     return mConditions.size() - 1;
 }
 
-bool ObjectMgr::CheckDeclinedNames( std::wstring mainpart, DeclinedName const& names )
+bool ObjectMgr::CheckDeclinedNames( std::wstring w_ownname, DeclinedName const& names )
 {
+    // get main part of the name
+    std::wstring mainpart = GetMainPartOfName(w_ownname, 0);
+    // prepare flags
+    bool x = true;
+    bool y = true;
+    // check declined names
     for(int i =0; i < MAX_DECLINED_NAME_CASES; ++i)
     {
         std::wstring wname;
@@ -7827,9 +7833,12 @@ bool ObjectMgr::CheckDeclinedNames( std::wstring mainpart, DeclinedName const& n
             return false;
 
         if(mainpart!=GetMainPartOfName(wname,i+1))
-            return false;
+            x = false;
+
+        if(w_ownname!=wname)
+            y = false;
     }
-    return true;
+    return (x||y);
 }
 
 uint32 ObjectMgr::GetAreaTriggerScriptId(uint32 trigger_id)
