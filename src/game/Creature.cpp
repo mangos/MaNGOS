@@ -84,12 +84,12 @@ VendorItem const* VendorItemData::FindItemCostPair(uint32 item_id, uint32 extend
 
 bool AssistDelayEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
 {
-    if(Unit* victim = Unit::GetUnit(m_owner, m_victim))
+    if (Unit* victim = m_owner.GetMap()->GetUnit(m_victimGuid))
     {
-        while (!m_assistants.empty())
+        while (!m_assistantGuids.empty())
         {
-            Creature* assistant = (Creature*)Unit::GetUnit(m_owner, *m_assistants.begin());
-            m_assistants.pop_front();
+            Creature* assistant = m_owner.GetMap()->GetAnyTypeCreature(*m_assistantGuids.rbegin());
+            m_assistantGuids.pop_back();
 
             if (assistant && assistant->CanAssistTo(&m_owner, victim))
             {
@@ -100,6 +100,14 @@ bool AssistDelayEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
         }
     }
     return true;
+}
+
+AssistDelayEvent::AssistDelayEvent( ObjectGuid victim, Unit& owner, std::list<Creature*> const& assistants ) : BasicEvent(), m_victimGuid(victim), m_owner(owner)
+{
+    // Pushing guids because in delay can happen some creature gets despawned => invalid pointer
+    m_assistantGuids.reserve(assistants.size());
+    for (std::list<Creature*>::const_iterator itr = assistants.begin(); itr != assistants.end(); ++itr)
+        m_assistantGuids.push_back((*itr)->GetObjectGuid());
 }
 
 bool ForcedDespawnDelayEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
@@ -1663,13 +1671,7 @@ void Creature::CallAssistance()
 
             if (!assistList.empty())
             {
-                AssistDelayEvent *e = new AssistDelayEvent(getVictim()->GetGUID(), *this);
-                while (!assistList.empty())
-                {
-                    // Pushing guids because in delay can happen some creature gets despawned => invalid pointer
-                    e->AddAssistant((*assistList.begin())->GetGUID());
-                    assistList.pop_front();
-                }
+                AssistDelayEvent *e = new AssistDelayEvent(getVictim()->GetObjectGuid(), *this, assistList);
                 m_Events.AddEvent(e, m_Events.CalculateTime(sWorld.getConfig(CONFIG_UINT32_CREATURE_FAMILY_ASSISTANCE_DELAY)));
             }
         }
@@ -1945,17 +1947,17 @@ Unit* Creature::SelectAttackingTarget(AttackingTarget target, uint32 position) c
         case ATTACKING_TARGET_RANDOM:
         {
             advance(i, position + (rand() % (threatlist.size() - position)));
-            return Unit::GetUnit(*this, (*i)->getUnitGuid());
+            return GetMap()->GetUnit((*i)->getUnitGuid());
         }
         case ATTACKING_TARGET_TOPAGGRO:
         {
             advance(i, position);
-            return Unit::GetUnit(*this, (*i)->getUnitGuid());
+            return GetMap()->GetUnit((*i)->getUnitGuid());
         }
         case ATTACKING_TARGET_BOTTOMAGGRO:
         {
             advance(r, position);
-            return Unit::GetUnit(*this, (*r)->getUnitGuid());
+            return GetMap()->GetUnit((*r)->getUnitGuid());
         }
         // TODO: implement these
         //case ATTACKING_TARGET_RANDOM_PLAYER:

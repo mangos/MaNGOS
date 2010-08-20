@@ -1848,7 +1848,6 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         void addFollower(FollowerReference* pRef) { m_FollowingRefManager.insertFirst(pRef); }
         void removeFollower(FollowerReference* /*pRef*/ ) { /* nothing to do yet */ }
-        static Unit* GetUnit(WorldObject const& object, uint64 guid);
 
         MotionMaster* GetMotionMaster() { return &i_motionMaster; }
 
@@ -1973,13 +1972,13 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 template<typename Func>
 void Unit::CallForAllControlledUnits(Func const& func, bool withTotems, bool withGuardians, bool withCharms)
 {
-    if(Pet* pet = GetPet())
+    if (Pet* pet = GetPet())
         func(pet);
 
     if (withGuardians)
     {
         for(GuardianPetList::const_iterator itr = m_guardianPets.begin(); itr != m_guardianPets.end(); ++itr)
-            if(Unit* guardian = Unit::GetUnit(*this,*itr))
+            if (Pet* guardian = GetMap()->GetPet(*itr))
                 func(guardian);
     }
 
@@ -1991,7 +1990,7 @@ void Unit::CallForAllControlledUnits(Func const& func, bool withTotems, bool wit
     }
 
     if (withCharms)
-        if(Unit* charm = GetCharm())
+        if (Unit* charm = GetCharm())
             func(charm);
 }
 
@@ -2006,7 +2005,7 @@ bool Unit::CheckAllControlledUnits(Func const& func, bool withTotems, bool withG
     if (withGuardians)
     {
         for(GuardianPetList::const_iterator itr = m_guardianPets.begin(); itr != m_guardianPets.end(); ++itr)
-            if (Unit const* guardian = Unit::GetUnit(*this,*itr))
+            if (Pet const* guardian = GetMap()->GetPet(*itr))
                 if (func(guardian))
                     return true;
 
@@ -2021,7 +2020,7 @@ bool Unit::CheckAllControlledUnits(Func const& func, bool withTotems, bool withG
     }
 
     if (withCharms)
-        if(Unit const* charm = GetCharm())
+        if (Unit const* charm = GetCharm())
             if (func(charm))
                 return true;
 
