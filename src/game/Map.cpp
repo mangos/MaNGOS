@@ -996,8 +996,7 @@ uint32 Map::GetMaxPlayers() const
 
 uint32 Map::GetMaxResetDelay() const
 {
-    MapDifficulty const* mapDiff = GetMapDifficulty();
-    return mapDiff ? mapDiff->resetTime : 0;
+    return InstanceResetScheduler::GetMaxResetTimeFor(GetMapDifficulty());
 }
 
 inline GridMap *Map::GetGrid(float x, float y)
@@ -1825,10 +1824,16 @@ void BattleGroundMap::Update(const uint32& diff)
 void InstanceMap::Remove(Player *player, bool remove)
 {
     DETAIL_LOG("MAP: Removing player '%s' from instance '%u' of map '%s' before relocating to other map", player->GetName(), GetInstanceId(), GetMapName());
+
     //if last player set unload timer
     if(!m_unloadTimer && m_mapRefManager.getSize() == 1)
         m_unloadTimer = m_unloadWhenEmpty ? MIN_UNLOAD_DELAY : std::max(sWorld.getConfig(CONFIG_UINT32_INSTANCE_UNLOAD_DELAY), (uint32)MIN_UNLOAD_DELAY);
+
+    if (i_data)
+        i_data->OnPlayerLeave(player);
+
     Map::Remove(player, remove);
+
     // for normal instances schedule the reset after all players have left
     SetResetSchedule(true);
 }

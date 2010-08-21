@@ -84,12 +84,12 @@ VendorItem const* VendorItemData::FindItemCostPair(uint32 item_id, uint32 extend
 
 bool AssistDelayEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
 {
-    if(Unit* victim = Unit::GetUnit(m_owner, m_victim))
+    if (Unit* victim = m_owner.GetMap()->GetUnit(m_victimGuid))
     {
-        while (!m_assistants.empty())
+        while (!m_assistantGuids.empty())
         {
-            Creature* assistant = (Creature*)Unit::GetUnit(m_owner, *m_assistants.begin());
-            m_assistants.pop_front();
+            Creature* assistant = m_owner.GetMap()->GetAnyTypeCreature(*m_assistantGuids.rbegin());
+            m_assistantGuids.pop_back();
 
             if (assistant && assistant->CanAssistTo(&m_owner, victim))
             {
@@ -100,6 +100,14 @@ bool AssistDelayEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
         }
     }
     return true;
+}
+
+AssistDelayEvent::AssistDelayEvent( ObjectGuid victim, Unit& owner, std::list<Creature*> const& assistants ) : BasicEvent(), m_victimGuid(victim), m_owner(owner)
+{
+    // Pushing guids because in delay can happen some creature gets despawned => invalid pointer
+    m_assistantGuids.reserve(assistants.size());
+    for (std::list<Creature*>::const_iterator itr = assistants.begin(); itr != assistants.end(); ++itr)
+        m_assistantGuids.push_back((*itr)->GetObjectGuid());
 }
 
 bool ForcedDespawnDelayEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
@@ -196,26 +204,31 @@ bool Creature::InitEntry(uint32 Entry, uint32 team, const CreatureData *data )
         return false;
     }
 
-    // get difficulty 1 mode entry
-    uint32 actualEntry = Entry;
+    // difficulties for dungeons/battleground ordered in normal way
+    // and if more high version not exist must be used lesser version
+    // for raid order different:
+    // 10 man normal version must be used instead not existed 10 man heroic version
+    // 25 man normal version must be used instead not existed 24 man heroic version
     CreatureInfo const *cinfo = normalInfo;
-    // TODO correctly implement spawnmodes for non-bg maps
-    for (uint32 diff = 0; diff < MAX_DIFFICULTY - 1; ++diff)
+    for (uint8 diff = uint8(GetMap()->GetDifficulty()); diff > 0;)
     {
+        // we already have valid Map pointer for current creature!
         if (normalInfo->DifficultyEntry[diff])
         {
-            // we already have valid Map pointer for current creature!
-            if (GetMap()->GetSpawnMode() > diff)
-            {
-                cinfo = ObjectMgr::GetCreatureTemplate(normalInfo->DifficultyEntry[diff]);
-                if (!cinfo)
-                {
-                    // maybe check such things already at startup
-                    sLog.outErrorDb("Creature::UpdateEntry creature difficulty %u entry %u does not exist.", diff + 1, actualEntry);
-                    return false;
-                }
-            }
+            cinfo = ObjectMgr::GetCreatureTemplate(normalInfo->DifficultyEntry[diff]);
+            if (cinfo)
+                break;                                      // template found
+
+            // check and reported at startup, so just ignore (restore normalInfo)
+            cinfo = normalInfo;
         }
+
+        // for raid heroic to normal, for other to prev in normal order
+        if ((diff == int(RAID_DIFFICULTY_10MAN_HEROIC) || diff == int(RAID_DIFFICULTY_25MAN_HEROIC)) &&
+            GetMap()->IsRaid())
+            diff -= 2;                                      // to normal raid difficulty cases
+        else
+            --diff;
     }
 
     SetEntry(Entry);                                        // normal entry always
@@ -1663,13 +1676,7 @@ void Creature::CallAssistance()
 
             if (!assistList.empty())
             {
-                AssistDelayEvent *e = new AssistDelayEvent(getVictim()->GetGUID(), *this);
-                while (!assistList.empty())
-                {
-                    // Pushing guids because in delay can happen some creature gets despawned => invalid pointer
-                    e->AddAssistant((*assistList.begin())->GetGUID());
-                    assistList.pop_front();
-                }
+                AssistDelayEvent *e = new AssistDelayEvent(getVictim()->GetObjectGuid(), *this, assistList);
                 m_Events.AddEvent(e, m_Events.CalculateTime(sWorld.getConfig(CONFIG_UINT32_CREATURE_FAMILY_ASSISTANCE_DELAY)));
             }
         }
@@ -1945,17 +1952,17 @@ Unit* Creature::SelectAttackingTarget(AttackingTarget target, uint32 position) c
         case ATTACKING_TARGET_RANDOM:
         {
             advance(i, position + (rand() % (threatlist.size() - position)));
-            return Unit::GetUnit(*this, (*i)->getUnitGuid());
+            return GetMap()->GetUnit((*i)->getUnitGuid());
         }
         case ATTACKING_TARGET_TOPAGGRO:
         {
             advance(i, position);
-            return Unit::GetUnit(*this, (*i)->getUnitGuid());
+            return GetMap()->GetUnit((*i)->getUnitGuid());
         }
         case ATTACKING_TARGET_BOTTOMAGGRO:
         {
             advance(r, position);
-            return Unit::GetUnit(*this, (*r)->getUnitGuid());
+            return GetMap()->GetUnit((*r)->getUnitGuid());
         }
         // TODO: implement these
         //case ATTACKING_TARGET_RANDOM_PLAYER:

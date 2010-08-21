@@ -703,16 +703,15 @@ class MANGOS_DLL_SPEC Creature : public Unit
 class AssistDelayEvent : public BasicEvent
 {
     public:
-        AssistDelayEvent(const uint64& victim, Unit& owner) : BasicEvent(), m_victim(victim), m_owner(owner) { }
+        AssistDelayEvent(ObjectGuid victim, Unit& owner, std::list<Creature*> const& assistants);
 
         bool Execute(uint64 e_time, uint32 p_time);
-        void AddAssistant(const uint64& guid) { m_assistants.push_back(guid); }
     private:
         AssistDelayEvent();
 
-        uint64            m_victim;
-        std::list<uint64> m_assistants;
-        Unit&             m_owner;
+        ObjectGuid              m_victimGuid;
+        std::vector<ObjectGuid> m_assistantGuids;
+        Unit&                   m_owner;
 };
 
 class ForcedDespawnDelayEvent : public BasicEvent

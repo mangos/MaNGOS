@@ -884,7 +884,7 @@ enum MangosStrings
     LANG_COUNTER                        = 1162,
     LANG_ACHIEVEMENT_NOT_EXIST          = 1163,
     LANG_ACHIEVEMENT_CRITERIA_NOT_EXIST = 1164,
-    // Room for more level 3              1163-1199 not used
+    // Room for more level 3              1165-1199 not used
 
     // Debug commands
     LANG_CINEMATIC_NOT_EXIST            = 1200,
