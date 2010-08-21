@@ -955,22 +955,22 @@ struct GtChanceToSpellCritEntry
     float    ratio;
 };
 
-struct GtOCTRegenHPEntry
+/*struct GtOCTRegenHPEntry
 {
     //uint32 level;
     float    ratio;
-};
+};*/
 
 //struct GtOCTRegenMPEntry
 //{
 //    float    ratio;
 //};
 
-struct GtRegenHPPerSptEntry
+/*struct GtRegenHPPerSptEntry
 {
     //uint32 level;
     float    ratio;
-};
+};*/
 
 struct GtRegenMPPerSptEntry
 {
