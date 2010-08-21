@@ -8012,6 +8012,21 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced, float ratio)
             return;
     }
 
+    // Remove Druid Dash bonus if not in Cat Form
+    if (m_form != FORM_CAT)
+    {
+        AuraList const& speed_increase_auras = GetAurasByType(SPELL_AURA_MOD_INCREASE_SPEED);
+        for(AuraList::const_iterator itr = speed_increase_auras.begin(); itr != speed_increase_auras.end(); ++itr)
+        {
+            const SpellEntry* aura_proto = (*itr)->GetSpellProto();
+            if (aura_proto->SpellFamilyName == SPELLFAMILY_DRUID && aura_proto->SpellIconID == 959)
+            {
+                main_speed_mod -= (*itr)->GetModifier()->m_amount;
+                break;
+            }
+        }
+    }
+
     float bonus = non_stack_bonus > stack_bonus ? non_stack_bonus : stack_bonus;
     // now we ready for speed calculation
     float speed  = main_speed_mod ? bonus*(100.0f + main_speed_mod)/100.0f : bonus;
