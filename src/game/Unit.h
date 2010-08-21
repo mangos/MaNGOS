@@ -1985,6 +1985,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         uint32 GetCombatRatingDamageReduction(CombatRating cr, float rate, float cap, uint32 damage) const;
 
         Unit* _GetTotem(TotemSlot slot) const;              // for templated function without include need
+        Pet* _GetPet(ObjectGuid guid) const;                // for templated function without include need
 
         uint32 m_state;                                     // Even derived shouldn't modify
         uint32 m_CombatTimer;
@@ -2020,7 +2021,7 @@ void Unit::CallForAllControlledUnits(Func const& func, bool withTotems, bool wit
     if (withGuardians)
     {
         for(GuardianPetList::const_iterator itr = m_guardianPets.begin(); itr != m_guardianPets.end(); ++itr)
-            if (Pet* guardian = GetMap()->GetPet(*itr))
+            if (Pet* guardian = _GetPet(*itr))
                 func(guardian);
     }
 
@@ -2047,7 +2048,7 @@ bool Unit::CheckAllControlledUnits(Func const& func, bool withTotems, bool withG
     if (withGuardians)
     {
         for(GuardianPetList::const_iterator itr = m_guardianPets.begin(); itr != m_guardianPets.end(); ++itr)
-            if (Pet const* guardian = GetMap()->GetPet(*itr))
+            if (Pet const* guardian = _GetPet(*itr))
                 if (func(guardian))
                     return true;
 
