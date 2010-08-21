@@ -1514,7 +1514,7 @@ void Player::setDeathState(DeathState s)
         GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_DEATH, 1);
         GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_DEATH_IN_DUNGEON, 1);
 
-        if (InstanceData* mapInstance = this->GetInstanceData())
+        if (InstanceData* mapInstance = GetInstanceData())
             mapInstance->OnPlayerDeath(this);
     }
 
