@@ -37,6 +37,7 @@
 #include "MapManager.h"
 #include "MapInstanced.h"
 #include "InstanceSaveMgr.h"
+#include "InstanceData.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "CellImpl.h"
@@ -1508,10 +1509,15 @@ void Player::setDeathState(DeathState s)
         // passive spell
         if(!ressSpellId)
             ressSpellId = GetResurrectionSpellId();
+
         GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_DEATH_AT_MAP, 1);
         GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_DEATH, 1);
         GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_DEATH_IN_DUNGEON, 1);
+
+        if (InstanceData* mapInstance = this->GetInstanceData())
+            mapInstance->OnPlayerDeath(this);
     }
+
     Unit::setDeathState(s);
 
     // restore resurrection spell id for player after aura remove
