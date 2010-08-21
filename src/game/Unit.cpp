@@ -7801,7 +7801,7 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy)
         if (((Creature*)this)->AI())
             ((Creature*)this)->AI()->EnterCombat(enemy);
 
-        if (InstanceData* mapInstance = this->GetInstanceData())
+        if (InstanceData* mapInstance = GetInstanceData())
             mapInstance->OnCreatureEnterCombat((Creature*)this);
     }
 }
@@ -8669,7 +8669,7 @@ void Unit::TauntFadeOut(Unit *taunter)
         if(((Creature*)this)->AI())
             ((Creature*)this)->AI()->EnterEvadeMode();
 
-        if (InstanceData* mapInstance = this->GetInstanceData())
+        if (InstanceData* mapInstance = GetInstanceData())
             mapInstance->OnCreatureEvade((Creature*)this);
 
         return;
@@ -8767,7 +8767,7 @@ bool Unit::SelectHostileTarget()
     // enter in evade mode in other case
     ((Creature*)this)->AI()->EnterEvadeMode();
 
-    if (InstanceData* mapInstance = this->GetInstanceData())
+    if (InstanceData* mapInstance = GetInstanceData())
         mapInstance->OnCreatureEvade((Creature*)this);
 
     return false;
