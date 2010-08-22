@@ -208,14 +208,14 @@ bool Creature::InitEntry(uint32 Entry, uint32 team, const CreatureData *data )
     // and if more high version not exist must be used lesser version
     // for raid order different:
     // 10 man normal version must be used instead not existed 10 man heroic version
-    // 25 man normal version must be used instead not existed 24 man heroic version
+    // 25 man normal version must be used instead not existed 25 man heroic version
     CreatureInfo const *cinfo = normalInfo;
     for (uint8 diff = uint8(GetMap()->GetDifficulty()); diff > 0;)
     {
         // we already have valid Map pointer for current creature!
-        if (normalInfo->DifficultyEntry[diff])
+        if (normalInfo->DifficultyEntry[diff - 1])
         {
-            cinfo = ObjectMgr::GetCreatureTemplate(normalInfo->DifficultyEntry[diff]);
+            cinfo = ObjectMgr::GetCreatureTemplate(normalInfo->DifficultyEntry[diff - 1]);
             if (cinfo)
                 break;                                      // template found
 

@@ -218,7 +218,7 @@ class MANGOS_DLL_SPEC WorldSession
         void SendTabardVendorActivate( uint64 guid );
         void SendSpiritResurrect();
         void SendBindPoint(Creature* npc);
-        void SendGMTicketGetTicket(uint32 status, char const* text);
+        void SendGMTicketGetTicket(uint32 status, GMTicket *ticket = NULL);
         void SendGMResponse(GMTicket *ticket);
 
         void SendAttackStop(Unit const* enemy);

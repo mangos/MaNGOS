@@ -82,7 +82,7 @@ void GMTicketMgr::DeleteAll()
     for(GMTicketMap::const_iterator itr = m_GMTicketMap.begin(); itr != m_GMTicketMap.end(); ++itr)
     {
         if(Player* owner = sObjectMgr.GetPlayer(ObjectGuid(HIGHGUID_PLAYER, itr->first)))
-            owner->GetSession()->SendGMTicketGetTicket(0x0A, 0);
+            owner->GetSession()->SendGMTicketGetTicket(0x0A);
     }
     CharacterDatabase.Execute("DELETE FROM character_ticket");
     m_GMTicketListByCreatingOrder.clear();

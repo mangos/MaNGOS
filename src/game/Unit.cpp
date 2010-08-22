@@ -729,9 +729,10 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
             }
         }
 
-        DEBUG_FILTER_LOG(LOG_FILTER_DAMAGE,"SET JUST_DIED");
-        if(!spiritOfRedemtionTalentReady)
+        if (!spiritOfRedemtionTalentReady)
             pVictim->setDeathState(JUST_DIED);
+        else
+            DEBUG_FILTER_LOG(LOG_FILTER_DAMAGE,"SET JUST_DIED");
 
         DEBUG_FILTER_LOG(LOG_FILTER_DAMAGE,"DealDamageHealth1");
 
@@ -7480,7 +7481,7 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy)
         if (((Creature*)this)->AI())
             ((Creature*)this)->AI()->EnterCombat(enemy);
 
-        if (InstanceData* mapInstance = this->GetInstanceData())
+        if (InstanceData* mapInstance = GetInstanceData())
             mapInstance->OnCreatureEnterCombat((Creature*)this);
     }
 }
@@ -8357,7 +8358,7 @@ void Unit::TauntFadeOut(Unit *taunter)
         if(((Creature*)this)->AI())
             ((Creature*)this)->AI()->EnterEvadeMode();
 
-        if (InstanceData* mapInstance = this->GetInstanceData())
+        if (InstanceData* mapInstance = GetInstanceData())
             mapInstance->OnCreatureEvade((Creature*)this);
 
         return;
@@ -8455,7 +8456,7 @@ bool Unit::SelectHostileTarget()
     // enter in evade mode in other case
     ((Creature*)this)->AI()->EnterEvadeMode();
 
-    if (InstanceData* mapInstance = this->GetInstanceData())
+    if (InstanceData* mapInstance = GetInstanceData())
         mapInstance->OnCreatureEvade((Creature*)this);
 
     return false;
