@@ -1735,6 +1735,14 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                     pVictim->CastSpell(second, procSpell, true, NULL, triggeredByAura, GetGUID());
                     return SPELL_AURA_PROC_OK;
                 }
+                // Item - Druid T10 Balance 4P Bonus
+                case 70723:
+                {
+                    basepoints[0] = int32( triggerAmount * damage / 100 );
+                    basepoints[0] = int32( basepoints[0] / 2);
+                    triggered_spell_id = 71023;
+                    break;
+                } 
             }
             // Eclipse
             if (dummySpell->SpellIconID == 2856)
@@ -2396,6 +2404,30 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                     basepoints[0] = int32( triggerAmount * damage / 100 );
                     triggered_spell_id = 71824;
                     break;
+                }
+                // Item - Shaman T10 Restoration 4P Bonus
+                case 70808:
+                {
+                    basepoints[0] = int32( triggerAmount * damage / 100 );
+                    basepoints[0] = int32( basepoints[0] / 3); // basepoints is for 1 tick, not all DoT amount
+                    triggered_spell_id = 70809;
+                    break;
+                }
+                // Item - Shaman T10 Elemental 4P Bonus
+                case 70817:
+                {
+                    if (Aura *aur = pVictim->GetAura(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_SHAMAN, UI64LIT(0x0000000010000000), 0, GetGUID()))
+                    {
+                        SpellAuraHolder *aurHolder = GetSpellAuraHolder(aur->GetId());
+                        if (aurHolder)
+                        {
+                            int32 amount = aur->GetAuraDuration() + triggerAmount * IN_MILLISECONDS;
+                            aur->SetAuraDuration(amount);
+                            aurHolder->SendAuraUpdate(false);
+                            return SPELL_AURA_PROC_OK;
+                        }
+                    }
+                    return SPELL_AURA_PROC_FAILED;
                 }
             }
             // Storm, Earth and Fire
@@ -3250,6 +3282,14 @@ SpellAuraProcResult Unit::HandleProcTriggerSpellAuraProc(Unit *pVictim, uint32 d
             }
             break;
         }
+        case SPELLFAMILY_ROGUE:
+            // Item - Rogue T10 2P Bonus
+            if (auraSpellInfo->Id == 70805)
+            {
+                if (pVictim != this)
+                    return SPELL_AURA_PROC_FAILED;
+            }
+            break;
         case SPELLFAMILY_HUNTER:
             // Piercing Shots
             if (auraSpellInfo->SpellIconID == 3247 && auraSpellInfo->SpellVisual[0] == 0)
