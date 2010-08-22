@@ -830,7 +830,7 @@ Below is the list of current Event Flags that EventAI can handle. Event flags ar
 2       4         EFLAG_DIFFICULTY_1             Event occurs in instance difficulty 1 (will not occur if not set)
 3       8         EFLAG_DIFFICULTY_2             Event occurs in instance difficulty 2 (will not occur if not set)
 4       16        EFLAG_DIFFICULTY_3             Event occurs in instance difficulty 3 (will not occur if not set)
-8       32        EFLAG_RANDOM_ACTION            At event occur execute one random action from event actions instead all actions.
+5       32        EFLAG_RANDOM_ACTION            At event occur execute one random action from event actions instead all actions.
 6       64
 7       128       EFLAG_DEBUG_ONLY               Prevents events from occuring on Release builds. Useful for testing new features.
 
