@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_10381_01_mangos_creature_model_race` bit(1) default NULL
+  `required_10400_01_mangos_mangos_string` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -3797,6 +3797,7 @@ INSERT INTO `mangos_string` VALUES
 (1162,' [counter]',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (1163,'Achievement %u doesn\'t exist.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (1164,'Achievement criteria %u doesn\'t exist.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(1165,'Spell %u not have auras.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (1200,'You try to view cinemitic %u but it doesn\'t exist.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (1201,'You try to view movie %u but it doesn\'t exist.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
 /*!40000 ALTER TABLE `mangos_string` ENABLE KEYS */;
