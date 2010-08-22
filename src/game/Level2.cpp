@@ -2816,7 +2816,7 @@ bool ChatHandler::HandleDelTicketCommand(char *args)
         //notify player
         if (Player* pl = sObjectMgr.GetPlayer(ObjectGuid(HIGHGUID_PLAYER, lowguid)))
         {
-            pl->GetSession()->SendGMTicketGetTicket(0x0A, 0);
+            pl->GetSession()->SendGMTicketGetTicket(0x0A);
             PSendSysMessage(LANG_COMMAND_TICKETPLAYERDEL, GetNameLink(pl).c_str());
         }
         else
@@ -2836,7 +2836,7 @@ bool ChatHandler::HandleDelTicketCommand(char *args)
 
     // notify players about ticket deleting
     if (target)
-        target->GetSession()->SendGMTicketGetTicket(0x0A, 0);
+        target->GetSession()->SendGMTicketGetTicket(0x0A);
 
     std::string nameLink = playerLink(target_name);
 
