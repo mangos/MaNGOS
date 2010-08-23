@@ -7090,19 +7090,14 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                         return;
 
                     // remove immunity effects
-                    unitTarget->RemoveAurasDueToSpell(642); // Divine Shield
-                    unitTarget->RemoveAurasDueToSpell(1022); // Hand of Protection rank 1
-                    unitTarget->RemoveAurasDueToSpell(5599); // Hand of Protection rank 2
-                    unitTarget->RemoveAurasDueToSpell(10278); // Hand of Protection rank 3
-                    unitTarget->RemoveAurasDueToSpell(19753); // Divine Intervention
-                    unitTarget->RemoveAurasDueToSpell(45438); // Ice Block
+                    unitTarget->RemoveAurasBySpellMechanic(MECHANIC_IMMUNE_SHIELD);
                     break;
                 }
             }
             break;
         }
     }
-	
+
 
     // normal DB scripted effect
     if (!unitTarget)
