@@ -674,7 +674,7 @@ void WorldSession::HandleQuestgiverStatusMultipleQuery(WorldPacket& /*recvPacket
             if (dialogStatus > DIALOG_STATUS_REWARD_REP)
                 dialogStatus = getDialogStatus(_player, questgiver, DIALOG_STATUS_NONE);
 
-            data << uint64(questgiver->GetGUID());
+            data << questgiver->GetObjectGuid();
             data << uint8(dialogStatus);
             ++count;
         }
@@ -693,7 +693,7 @@ void WorldSession::HandleQuestgiverStatusMultipleQuery(WorldPacket& /*recvPacket
             if (dialogStatus > DIALOG_STATUS_REWARD_REP)
                 dialogStatus = getDialogStatus(_player, questgiver, DIALOG_STATUS_NONE);
 
-            data << uint64(questgiver->GetGUID());
+            data << questgiver->GetObjectGuid();
             data << uint8(dialogStatus);
             ++count;
         }

@@ -234,7 +234,7 @@ class MANGOS_DLL_SPEC Group
         // member manipulation methods
         bool IsMember(ObjectGuid guid) const { return _getMemberCSlot(guid) != m_memberSlots.end(); }
         bool IsLeader(ObjectGuid guid) const { return GetLeaderGuid() == guid; }
-        ObjectGuid GetMemberGUID(const std::string& name)
+        ObjectGuid GetMemberGuid(const std::string& name)
         {
             for(member_citerator itr = m_memberSlots.begin(); itr != m_memberSlots.end(); ++itr)
                 if (itr->name == name)

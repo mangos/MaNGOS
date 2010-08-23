@@ -1987,7 +1987,7 @@ void Pet::ApplyModeFlags(PetModeFlags mode, bool apply)
         return;
 
     WorldPacket data(SMSG_PET_MODE, 12);
-    data << uint64(GetGUID());
+    data << GetObjectGuid();
     data << uint32(m_petModeFlags);
     ((Player*)owner)->GetSession()->SendPacket(&data);
 }
