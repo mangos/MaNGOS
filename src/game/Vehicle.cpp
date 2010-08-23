@@ -22,6 +22,7 @@
 #include "Vehicle.h"
 #include "Unit.h"
 #include "Util.h"
+#include "WorldPacket.h"
 
 VehicleKit::VehicleKit(Unit* base, VehicleEntry const* vehicleInfo) : m_vehicleInfo(vehicleInfo), m_pBase(base), m_uiNumFreeSeats(0)
 {

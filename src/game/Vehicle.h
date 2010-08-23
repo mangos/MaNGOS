@@ -53,6 +53,8 @@ public:
     VehicleEntry const* GetVehicleInfo() const { return m_vehicleInfo; }
     Unit* GetBase() { return m_pBase; }
 private:
+    void UpdateFreeSeatCount();
+
     SeatMap m_Seats;
     uint32 m_uiNumFreeSeats;
     VehicleEntry const *m_vehicleInfo;

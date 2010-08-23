@@ -249,6 +249,8 @@ Unit::Unit()
     for(int i=0; i < MAX_REACTIVE; ++i)
         m_reactiveTimer[i] = 0;
 
+    m_transport = NULL;
+
     m_pVehicle = NULL;
     m_pVehicleKit = NULL;
 }
@@ -458,6 +460,40 @@ void Unit::SendMonsterMoveWithSpeed(float x, float y, float z, uint32 transitTim
     SendMonsterMove(x, y, z, SPLINETYPE_NORMAL, flags, transitTime, player);
 }
 
+
+bool Unit::SetPosition(float x, float y, float z, float orientation, bool teleport)
+{
+    // prevent crash when a bad coord is sent by the client
+    if (!MaNGOS::IsValidMapCoord(x, y, z, orientation))
+    {
+        DEBUG_LOG("Unit::SetPosition(%f, %f, %f, %f, %d) .. bad coordinates for unit %d!", x, y, z, orientation, teleport, GetGUIDLow());
+        return false;
+    }
+
+    bool turn = GetOrientation() != orientation;
+    bool relocate = (teleport || GetPositionX() != x || GetPositionY() != y || GetPositionZ() != z);
+
+    if (turn)
+        RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TURNING);
+
+    if (relocate)
+    {
+        RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_MOVE);
+
+        if (GetTypeId() == TYPEID_PLAYER)
+            GetMap()->PlayerRelocation((Player*)this, x, y, z, orientation);
+        else
+            GetMap()->CreatureRelocation((Creature*)this, x, y, z, orientation);
+    }
+    else if (turn)
+        SetOrientation(orientation);
+
+    if ((relocate || turn) && GetVehicleKit())
+        GetVehicleKit()->RelocatePassengers(x, y, z, orientation);
+
+    return relocate || turn;
+}
+
 void Unit::SendMonsterMoveTransport(WorldObject *transport, SplineType type, SplineFlags flags, uint32 moveTime, ...)
 {
     va_list vargs;
@@ -508,39 +544,6 @@ void Unit::SendMonsterMoveTransport(WorldObject *transport, SplineType type, Spl
     data << float(m_movementInfo.GetTransportPos()->z);
 
     SendMessageToSet(&data, true);
-}
-
-bool Unit::SetPosition(float x, float y, float z, float orientation, bool teleport)
-{
-    // prevent crash when a bad coord is sent by the client
-    if (!MaNGOS::IsValidMapCoord(x, y, z, orientation))
-    {
-        DEBUG_LOG("Unit::SetPosition(%f, %f, %f, %f, %d) .. bad coordinates for unit %d!", x, y, z, orientation, teleport, GetGUIDLow());
-        return false;
-    }
-
-    bool turn = GetOrientation() != orientation;
-    bool relocate = (teleport || GetPositionX() != x || GetPositionY() != y || GetPositionZ() != z);
-
-    if (turn)
-        RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TURNING);
-
-    if (relocate)
-    {
-        RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_MOVE);
-
-        if (GetTypeId() == TYPEID_PLAYER)
-            GetMap()->PlayerRelocation((Player*)this, x, y, z, orientation);
-        else
-            GetMap()->CreatureRelocation((Creature*)this, x, y, z, orientation);
-    }
-    else if (turn)
-        SetOrientation(orientation);
-
-    if ((relocate || turn) && GetVehicleKit())
-        GetVehicleKit()->RelocatePassengers(x, y, z, orientation);
-
-    return relocate || turn;
 }
 
 void Unit::BuildHeartBeatMsg(WorldPacket *data) const
@@ -10901,19 +10904,14 @@ struct SetPvPHelper
     bool state;
 };
 
-Unit* Unit::GetVehicleBase()
-{
-    return m_pVehicle ? m_pVehicle->GetBase() : NULL;
-}
-
 bool Unit::CreateVehicleKit(uint32 vehicleId)
 {
-    VehicleEntry const *vehInfo = sVehicleStore.LookupEntry(vehicleId);
+    VehicleEntry const *vehicleInfo = sVehicleStore.LookupEntry(vehicleId);
 
-    if (!vehInfo)
+    if (!vehicleInfo)
         return false;
 
-    m_pVehicleKit = new VehicleKit(this, vehInfo);
+    m_pVehicleKit = new VehicleKit(this, vehicleInfo);
     m_updateFlag |= UPDATEFLAG_VEHICLE;
     return true;
 }
@@ -10924,8 +10922,8 @@ void Unit::RemoveVehicleKit()
         return;
 
     m_pVehicleKit->RemoveAllPassengers();
-    delete m_pVehicleKit;
 
+    delete m_pVehicleKit;
     m_pVehicleKit = NULL;
 
     m_updateFlag &= ~UPDATEFLAG_VEHICLE;
@@ -10953,7 +10951,7 @@ void Unit::ChangeSeat(int8 seatId, bool next)
 
 void Unit::EnterVehicle(VehicleKit *vehicle, int8 seatId)
 {
-    if(!isAlive() || GetVehicleKit() == vehicle)
+    if (!isAlive() || GetVehicleKit() == vehicle)
         return;
 
     if (m_pVehicle)
@@ -10990,12 +10988,14 @@ void Unit::EnterVehicle(VehicleKit *vehicle, int8 seatId)
         WorldPacket data(SMSG_BREAK_TARGET, 8);
         data << vehicle->GetBase()->GetPackGUID();
         player->GetSession()->SendPacket(&data);
+    }
 
-        if (Transport* pTransport = player->GetTransport())
-        {
-            pTransport->RemovePassenger(player);
-            player->SetTransport(NULL);
-        }
+    if (Transport* pTransport = GetTransport())
+    {
+        if (GetTypeId() == TYPEID_PLAYER)
+            pTransport->RemovePassenger((Player*)this);
+
+        SetTransport(NULL);
     }
 }
 

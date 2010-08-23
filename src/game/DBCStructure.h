@@ -1810,7 +1810,7 @@ struct WMOAreaTableEntry
     uint32 areaId;                                          // 10 link to AreaTableEntry.ID
     //char *Name[16];
     //uint32 nameFlags;
-	
+
 };
 
 struct WorldMapAreaEntry

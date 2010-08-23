@@ -305,6 +305,7 @@ class Item;
 class Pet;
 class PetAura;
 class Totem;
+class Transport;
 class VehicleKit;
 
 struct SpellImmune
@@ -453,7 +454,7 @@ enum UnitState
 
     // stay by different reasons
     UNIT_STAT_NOT_MOVE        = UNIT_STAT_ROOT | UNIT_STAT_STUNNED | UNIT_STAT_DIED |
-                               UNIT_STAT_DISTRACTED | UNIT_STAT_ON_VEHICLE,
+                                UNIT_STAT_DISTRACTED | UNIT_STAT_ON_VEHICLE,
 
     // stay or scripted movement for effect( = in player case you can't move by client command)
     UNIT_STAT_NO_FREE_MOVE    = UNIT_STAT_ROOT | UNIT_STAT_STUNNED | UNIT_STAT_DIED |
@@ -1917,15 +1918,26 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         // Movement info
         MovementInfo m_movementInfo;
 
-        // vehicle system
+        // Transports
+        Transport* GetTransport() const { return m_transport; }
+        void SetTransport(Transport* pTransport) { m_transport = pTransport; }
+
+        float GetTransOffsetX() const { return m_movementInfo.GetTransportPos()->x; }
+        float GetTransOffsetY() const { return m_movementInfo.GetTransportPos()->y; }
+        float GetTransOffsetZ() const { return m_movementInfo.GetTransportPos()->z; }
+        float GetTransOffsetO() const { return m_movementInfo.GetTransportPos()->o; }
+        uint32 GetTransTime() const { return m_movementInfo.GetTransportTime(); }
+        int8 GetTransSeat() const { return m_movementInfo.GetTransportSeat(); }
+
+        // Vehicle system
         void EnterVehicle(VehicleKit *vehicle, int8 seatId = -1);
         void ExitVehicle();
         void ChangeSeat(int8 seatId, bool next = true);
         VehicleKit* GetVehicle() { return m_pVehicle; }
         VehicleKit* GetVehicleKit() { return m_pVehicleKit; }
-        Unit* GetVehicleBase();
         bool CreateVehicleKit(uint32 vehicleId);
         void RemoveVehicleKit();
+
     protected:
         explicit Unit ();
 
@@ -1974,6 +1986,9 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         uint32 m_reactiveTimer[MAX_REACTIVE];
         uint32 m_regenTimer;
         uint32 m_lastManaUseTimer;
+
+        // Transports
+        Transport* m_transport;
 
         VehicleKit* m_pVehicle;
         VehicleKit* m_pVehicleKit;

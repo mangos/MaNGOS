@@ -433,6 +433,7 @@ enum VehicleSeatFlags
     SEAT_FLAG_HIDE_PASSENGER        = 0x00000200,           // Passenger is hidden
     SEAT_FLAG_MAIN_RIDER            = 0x00000800,           // Can control vehicle
     SEAT_FLAG_USABLE                = 0x02000000,
+    SEAT_FLAG_CAN_SWITCH            = 0x04000000,           // Can switch seats
     SEAT_FLAG_CAN_CAST              = 0x20000000,
 };
 
