@@ -217,7 +217,6 @@ void InstanceResetScheduler::LoadResetTimes()
 
             // update the reset time if the hour in the configs changes
             uint64 newresettime = (oldresettime / DAY) * DAY + diff;
-            newresettime = newresettime >= today + 8*DAY ? today + 6*DAY + diff : newresettime;
             if(oldresettime != newresettime)
                 CharacterDatabase.DirectPExecute("UPDATE instance_reset SET resettime = '"UI64FMTD"' WHERE mapid = '%u' AND difficulty = '%u'", newresettime, mapid, difficulty);
 
@@ -244,22 +243,12 @@ void InstanceResetScheduler::LoadResetTimes()
             continue;
 
         uint32 period = GetMaxResetTimeFor(mapDiff);
-
-        // the reset_delay must be at least one day
-        if (period < DAY)
-            period = DAY;
-
-        // the reset_delay must be not more 7 days
-        if (period > 7*DAY)
-            period = 7*DAY;
-
         time_t t = GetResetTimeFor(mapid,difficulty);
         if(!t)
         {
             // initialize the reset time
             t = today + period + diff;
             CharacterDatabase.DirectPExecute("INSERT INTO instance_reset VALUES ('%u','%u','"UI64FMTD"')", mapid, difficulty, (uint64)t);
-
         }
 
         if(t < now)
