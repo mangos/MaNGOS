@@ -995,6 +995,7 @@ ChatCommand const* ChatHandler::FindCommand(char const* text)
  * @param parentCommand Output arg for optional return parent command for command arg.
  * @param cmdNamePtr    Output arg for optional return last parsed command name.
  * @param allAvailable  Optional arg (with false default value) control use command access level checks while command search.
+ * @param exactlyName   Optional arg (with false default value) control use exactly name in checks while command search.
  *
  * @return one from enum value of ChatCommandSearchResult. Output args return values highly dependent from this return result:
  *
@@ -1013,7 +1014,7 @@ ChatCommand const* ChatHandler::FindCommand(char const* text)
  *                              parentCommand have parent of command in command arg or NULL
  *                              cmdNamePtr store command name that not found as it extracted from command line
  */
-ChatCommandSearchResult ChatHandler::FindCommand(ChatCommand* table, char const* &text, ChatCommand*& command, ChatCommand** parentCommand /*= NULL*/, std::string* cmdNamePtr /*= NULL*/, bool allAvailable /*= false*/)
+ChatCommandSearchResult ChatHandler::FindCommand(ChatCommand* table, char const* &text, ChatCommand*& command, ChatCommand** parentCommand /*= NULL*/, std::string* cmdNamePtr /*= NULL*/, bool allAvailable /*= false*/, bool exactlyName /*= false*/)
 {
     std::string cmd = "";
 
@@ -1029,15 +1030,23 @@ ChatCommandSearchResult ChatHandler::FindCommand(ChatCommand* table, char const*
     // search first level command in table
     for(uint32 i = 0; table[i].Name != NULL; ++i)
     {
-        if (!hasStringAbbr(table[i].Name, cmd.c_str()))
-            continue;
-
+        if (exactlyName)
+        {
+            size_t len = strlen(table[i].Name);
+            if (strncmp(table[i].Name, cmd.c_str(), len+1) != 0)
+                continue;
+        }
+        else
+        {
+            if (!hasStringAbbr(table[i].Name, cmd.c_str()))
+                continue;
+        }
         // select subcommand from child commands list
         if (table[i].ChildCommands != NULL)
         {
             char const* oldchildtext = text;
             ChatCommand* parentSubcommand = NULL;
-            ChatCommandSearchResult res = FindCommand(table[i].ChildCommands, text, command, &parentSubcommand, cmdNamePtr, allAvailable);
+            ChatCommandSearchResult res = FindCommand(table[i].ChildCommands, text, command, &parentSubcommand, cmdNamePtr, allAvailable, exactlyName);
 
             switch(res)
             {
@@ -1200,7 +1209,7 @@ bool ChatHandler::SetDataForCommandInTable(ChatCommand *commandTable, const char
     ChatCommand* command = NULL;
     std::string cmdName;
 
-    ChatCommandSearchResult res = FindCommand(commandTable, text, command, NULL, &cmdName, true);
+    ChatCommandSearchResult res = FindCommand(commandTable, text, command, NULL, &cmdName, true, true);
 
     switch(res)
     {
