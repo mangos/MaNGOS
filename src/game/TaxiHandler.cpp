@@ -103,7 +103,7 @@ void WorldSession::SendTaxiMenu( Creature* unit )
 
     WorldPacket data( SMSG_SHOWTAXINODES, (4+8+4+8*4) );
     data << uint32( 1 );
-    data << uint64( unit->GetGUID() );
+    data << unit->GetObjectGuid();
     data << uint32( curloc );
     GetPlayer()->m_taxi.AppendTaximaskTo(data,GetPlayer()->isTaxiCheater());
     SendPacket( &data );

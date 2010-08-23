@@ -56,9 +56,9 @@ namespace MaNGOS
 
                 data << uint8(i_msgtype);
                 data << uint32(LANG_UNIVERSAL);
-                data << uint64(i_player.GetGUID());
+                data << i_player.GetObjectGuid();
                 data << uint32(5);
-                data << uint64(i_player.GetGUID());
+                data << i_player.GetObjectGuid();
                 data << uint32(strlen(text)+1);
                 data << text;
                 data << uint8(0);
@@ -639,7 +639,7 @@ void AchievementMgr::SendAchievementEarned(AchievementEntry const* achievement)
         // broadcast realm first reached
         WorldPacket data(SMSG_SERVER_FIRST_ACHIEVEMENT, strlen(GetPlayer()->GetName())+1+8+4+4);
         data << GetPlayer()->GetName();
-        data << uint64(GetPlayer()->GetGUID());
+        data << GetPlayer()->GetObjectGuid();
         data << uint32(achievement->ID);
         data << uint32(0);                                  // 1=link supplied string as player name, 0=display plain string
         sWorld.SendGlobalMessage(&data);
