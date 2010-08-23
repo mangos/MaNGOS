@@ -8567,6 +8567,15 @@ void SpellAuraHolder::HandleSpellSpecificBoosts(bool apply)
                 spellId1 = 69706;
             }
             else
+            // SPELL_GAS_SPORE - ICC boss Festergut
+            if (GetId() == 69290 && !apply && m_removeMode == AURA_REMOVE_BY_EXPIRE)
+            {
+                cast_at_remove = true;
+                spellId1 = 69291;
+                // Cast unknown spell - spore explode
+                // spellid2 = ?????;
+            }
+            else
                 return;
             break;
         }
