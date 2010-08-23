@@ -7674,6 +7674,14 @@ void Aura::PeriodicDummyTick()
                 }
                 return;
             }
+            // Hysteria
+            if (spell->SpellFamilyFlags & UI64LIT(0x0000000020000000))
+            {
+                uint32 deal = m_modifier.m_amount * target->GetMaxHealth() / 100;
+                target->DealDamage(target, deal, NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+                target->SendSpellNonMeleeDamageLog(target, spell->Id, deal, SPELL_SCHOOL_MASK_NORMAL, 0, 0, false, 0, false);
+                return;
+            }
             // Summon Gargoyle
 //            if (spell->SpellFamilyFlags & UI64LIT(0x0000008000000000))
 //                return;
