@@ -1877,10 +1877,10 @@ void Aura::TriggerSpell()
 
                         target->CastSpell(target, 59566, true, NULL, this);
                         break;
-						}
+                    }
                  }
                 break;
-			}
+            }
             case 16191:                                     // Mana Tide
             {
                 triggerTarget->CastCustomSpell(triggerTarget, trigger_spell_id, &m_modifier.m_amount, NULL, NULL, true, NULL, this);
@@ -1905,28 +1905,6 @@ void Aura::TriggerSpell()
                 int32 mana = target->GetMaxPower(POWER_MANA) * m_modifier.m_amount / 100;
                 triggerTarget->CastCustomSpell(triggerTarget, trigger_spell_id, &mana, NULL, NULL, true, NULL, this);
                 return;
-            }
-            // Earthen Power (from Earthbind Totem Passive)
-            case 6474:
-            {
-                Unit *owner = triggerTarget->GetOwner();
-
-                if (!owner)
-                    break;
-
-                Unit::AuraList const& dummyAuras = owner->GetAurasByType(SPELL_AURA_DUMMY);
-                for(Unit::AuraList::const_iterator itr = dummyAuras.begin(); itr != dummyAuras.end(); ++itr)
-                {
-                    if ((*itr)->GetSpellProto()->SpellIconID == 2289 && (*itr)->GetSpellProto()->SpellFamilyName == SPELLFAMILY_SHAMAN)
-                    {
-                        if (!roll_chance_i((*itr)->GetModifier()->m_amount))
-                            break;
-
-                        triggerTarget->CastSpell(triggerTarget, 59566, true, NULL, this);
-                        break;
-                    }
-                }
-                break;
             }
         }
     }
