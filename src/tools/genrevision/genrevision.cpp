@@ -204,12 +204,14 @@ int main(int argc, char **argv)
     bool use_url = false;
     bool svn_prefered = false;
     std::string path;
+    std::string outfile = "revision.h";
 
     // Call: tool {options} [path]
     //    -g use git prefered (default)
     //    -s use svn prefered
     //    -r use only revision (without repo URL) (default)
     //    -u include repositire URL as commit URL or "rev at URL"
+    //    -o <file> write header to specified target file
     for(int k = 1; k <= argc; ++k)
     {
         if(!argv[k] || !*argv[k])
@@ -236,6 +238,12 @@ int main(int argc, char **argv)
                 continue;
             case 'u':
                 use_url = true;
+                continue;
+            case 'o':
+                // read next argument as target file, if not available return error
+                if (++k == argc)
+                    return 1;
+                outfile = argv[k];
                 continue;
             default:
                 printf("Unknown option %s",argv[k]);
@@ -281,7 +289,7 @@ int main(int argc, char **argv)
     /// get existed header data for compare
     std::string oldData;
 
-    if(FILE* HeaderFile = fopen("revision.h","rb"))
+    if(FILE* HeaderFile = fopen(outfile.c_str(),"rb"))
     {
         while(!feof(HeaderFile))
         {
@@ -297,11 +305,13 @@ int main(int argc, char **argv)
     /// update header only if different data
     if(newData != oldData)
     {
-        if(FILE* OutputFile = fopen("revision.h","wb"))
+        if(FILE* OutputFile = fopen(outfile.c_str(),"wb"))
         {
             fprintf(OutputFile,"%s",newData.c_str());
             fclose(OutputFile);
         }
+        else
+            return 1;
     }
 
     return 0;
