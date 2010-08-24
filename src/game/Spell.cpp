@@ -2979,9 +2979,8 @@ void Spell::cast(bool skipCheck)
             // Faerie Fire (Feral)
             if (m_spellInfo->Id == 16857 && m_caster->m_form != FORM_CAT)
                 AddTriggeredSpell(60089);
-            // Berserk (Bear/Direbear Mangle affecting up to 3 targets)
-            else if (m_spellInfo->Id == 50334)
-                AddTriggeredSpell(58923);
+            else if (m_spellInfo->SpellIconID == 2852 && (m_spellInfo->AttributesEx & 0x28020)) // Berserk
+                AddPrecastSpell(58923); // Hit 3 targets at once with mangle in dire bear form
             break;
         }
         case SPELLFAMILY_ROGUE:
