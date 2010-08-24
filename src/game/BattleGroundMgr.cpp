@@ -1396,7 +1396,7 @@ void BattleGroundMgr::BuildPlayerLeftBattleGroundPacket(WorldPacket *data, const
 void BattleGroundMgr::BuildPlayerJoinedBattleGroundPacket(WorldPacket *data, Player *plr)
 {
     data->Initialize(SMSG_BATTLEGROUND_PLAYER_JOINED, 8);
-    *data << uint64(plr->GetGUID());
+    *data << plr->GetObjectGuid();
 }
 
 BattleGround * BattleGroundMgr::GetBattleGroundThroughClientInstance(uint32 instanceId, BattleGroundTypeId bgTypeId)

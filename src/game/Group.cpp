@@ -684,7 +684,7 @@ void Group::MasterLoot(WorldObject* object, Loot* loot)
 
         if (looter->IsWithinDist(object, sWorld.getConfig(CONFIG_FLOAT_GROUP_XP_DISTANCE), false))
         {
-            data << uint64(looter->GetGUID());
+            data << looter->GetObjectGuid();
             ++real_count;
         }
     }

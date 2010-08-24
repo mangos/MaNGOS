@@ -1592,7 +1592,7 @@ void Creature::SendAIReaction(AiReaction reactionType)
 {
     WorldPacket data(SMSG_AI_REACTION, 12);
 
-    data << uint64(GetGUID());
+    data << GetObjectGuid();
     data << uint32(reactionType);
 
     ((WorldObject*)this)->SendMessageToSet(&data, true);

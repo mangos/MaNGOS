@@ -339,7 +339,7 @@ void WorldSession::SendLfgResult(uint32 type, uint32 entry, uint8 lfg_type)
 
         ++number;
 
-        data << uint64(plr->GetGUID());                     // guid
+        data << plr->GetObjectGuid();                       // guid
 
         uint32 flags = 0x1FF;
         data << uint32(flags);                              // flags
