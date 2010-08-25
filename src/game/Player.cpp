@@ -12544,6 +12544,11 @@ void Player::ApplyEnchantment(Item *item, EnchantmentSlot slot, bool apply, bool
     if (!item->IsEquipped())
         return;
 
+    // Don't apply ANY enchantment if item is broken! It's offlike and avoid many exploits with broken items.
+    // Not removing enchantments from broken items - not need.
+    if (item->IsBroken())
+        return;
+
     if (slot >= MAX_ENCHANTMENT_SLOT)
         return;
 
