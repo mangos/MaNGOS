@@ -730,9 +730,10 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
         }
 
         if (!spiritOfRedemtionTalentReady)
-            pVictim->setDeathState(JUST_DIED);
-        else
+        {
             DEBUG_FILTER_LOG(LOG_FILTER_DAMAGE,"SET JUST_DIED");
+            pVictim->setDeathState(JUST_DIED);
+        }
 
         DEBUG_FILTER_LOG(LOG_FILTER_DAMAGE,"DealDamageHealth1");
 

@@ -2750,9 +2750,12 @@ uint32 ChatHandler::ExtractSpellIdFromLink(char** text)
             if(!talentEntry)
                 return 0;
 
-            uint32 rank;
-            if (!ExtractUInt32(&param1_str, rank))
+            int32 rank;
+            if (!ExtractInt32(&param1_str, rank))
                 return 0;
+
+            if (rank < 0)                                   // unlearned talent have in shift-link field -1 as rank
+                rank = 0;
 
             return rank < MAX_TALENT_RANK ? talentEntry->RankID[rank] : 0;
         }
