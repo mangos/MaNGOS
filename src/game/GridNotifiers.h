@@ -1016,7 +1016,7 @@ namespace MaNGOS
 
             bool operator()(Creature* u)
             {
-                if(u->GetEntry() == i_entry && u->isAlive()==i_alive && i_obj.IsWithinDistInMap(u, i_range))
+                if(u->GetGUID() != i_obj.GetGUID() && u->GetEntry() == i_entry && u->isAlive()==i_alive && i_obj.IsWithinDistInMap(u, i_range))
                 {
                     i_range = i_obj.GetDistance(u);         // use found unit range as new range limit for next check
                     return true;
