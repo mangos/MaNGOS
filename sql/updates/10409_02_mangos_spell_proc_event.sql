@@ -1,0 +1,2 @@
+ALTER TABLE db_version CHANGE COLUMN required_10409_01_mangos_spell_chain required_10409_02_mangos_spell_proc_event bit;
+
