@@ -45,6 +45,9 @@ ConfVersion=2010062001
 #
 #    BindIP
 #        Bind World Server to IP/hostname
+#        This option is useful for running multiple worldd/realmd instances
+#        on different IP addresses using default ports.
+#        DO NOT CHANGE THIS UNLESS YOU _REALLY_ KNOW WHAT YOU'RE DOING
 #
 ###################################################################################################################
 
