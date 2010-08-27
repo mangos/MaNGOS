@@ -204,3 +204,7 @@ INSERT INTO `spell_proc_event` VALUES ('71892', '0', '0', '0', '0', '0', '0', '0
 /* Item - Paladin T10 Holy 2P Bonus */
 DELETE FROM `spell_proc_event` WHERE `entry` = 70755;
 INSERT INTO `spell_proc_event` VALUES ('70755', '2', '10', '0', '0', '0', '0x80004000', '0x80004000', '0x80004000', '0', '0', '0', '16384', '0', '0', '0', '0');
+
+/* Fel synergy from virusav */
+DELETE FROM `spell_proc_event` WHERE `entry` = 47230;
+INSERT INTO `spell_proc_event` VALUES (47230, 0x7F,  5, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0.000000, 0.000000,  0)
