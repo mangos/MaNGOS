@@ -1421,6 +1421,27 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                     basepoints[0] = int32(damage*triggerAmount/100);
                     target = this;
                     triggered_spell_id = 30294;
+
+                    // check for Improved Soul Leech
+                    AuraList const& pDummyAuras = GetAurasByType(SPELL_AURA_DUMMY);
+                    for (AuraList::const_iterator itr = pDummyAuras.begin(); itr != pDummyAuras.end(); ++itr)
+                    {
+                       SpellEntry const* spellInfo = (*itr)->GetSpellProto();
+                       if (spellInfo->SpellFamilyName != SPELLFAMILY_WARLOCK || (*itr)->GetSpellProto()->SpellIconID != 3176)
+                            continue;
+                       if ((*itr)->GetEffIndex() == SpellEffectIndex(0))
+                       {
+                           // energize Proc pet (implicit target is pet)
+                           CastCustomSpell(this, 59118, &((*itr)->GetModifier()->m_amount), NULL, NULL, true, NULL, (*itr));
+                           // energize Proc master
+                           CastCustomSpell(this, 59117, &((*itr)->GetModifier()->m_amount), NULL, NULL, true, NULL, (*itr));
+                       }
+                       else if (roll_chance_i((*itr)->GetModifier()->m_amount))
+                       {
+                       // Replenishment proc
+                            CastSpell(this, 57669, true, NULL, (*itr));
+                        }
+                    }
                     break;
                 }
                 // Shadowflame (Voidheart Raiment set bonus)
