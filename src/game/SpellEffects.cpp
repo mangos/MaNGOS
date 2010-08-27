@@ -4175,6 +4175,9 @@ void Spell::DoSummon(SpellEffectIndex eff_idx)
             spawnCreature->Relocate(m_targets.m_destX, m_targets.m_destY, m_targets.m_destZ, -m_caster->GetOrientation());
         }
 
+        if (pet_entry == 37994) // Mage: Water Elemental from Glyph
+            duration = DAY*IN_MILLISECONDS;
+
         // set timer for unsummon
         if (duration > 0)
             spawnCreature->SetDuration(duration);
@@ -4185,9 +4188,15 @@ void Spell::DoSummon(SpellEffectIndex eff_idx)
             summoner = spawnCreature;
         }
 
-        if (m_spellInfo->Id == 1122) return;   // Warlock Infernal spell has in DBC flags
+        if (m_spellInfo->Id == 1122)           // Warlock Infernal spell has in DBC flags
                                                // SUMMON_PROP_GROUP_PETS && SUMMON_PROP_TYPE_ARMY
                                                // and value = 50+lvl 8-(---)
+                                               // also need add aura 39007 9thanks for boxa)
+        {
+            spawnCreature->_AddAura(39007,MINUTE*IN_MILLISECONDS);
+            return;
+        }
+
         if (!amount)
             return;
     }

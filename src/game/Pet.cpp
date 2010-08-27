@@ -888,12 +888,26 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
     {
         case SUMMON_PET:
         {
+
+            PetLevelInfo const* pInfo = sObjectMgr.GetPetLevelInfo(creature_ID, petlevel);
+
+            SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel - (petlevel / 4)) );
+            SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel + (petlevel / 4)) );
+
+            //SetModifierValue(UNIT_MOD_ATTACK_POWER, BASE_VALUE, float(cinfo->attackpower));
+
             if(owner->GetTypeId() == TYPEID_PLAYER)
             {
                 switch(owner->getClass())
                 {
                     case CLASS_WARLOCK:
                     {
+
+                        if (cinfo->Entry == 89) // Warlock Infernal
+                        {
+                            SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel - (petlevel / 4)) * 8.4f);
+                            SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel + (petlevel / 4)) * 35.0f);
+                        }
 
                         //the damage bonus used for pets is either fire or shadow damage, whatever is higher
                         uint32 fire  = owner->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + SPELL_SCHOOL_FIRE);
@@ -918,25 +932,19 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
                 }
             }
 
-            SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel - (petlevel / 4)) );
-            SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel + (petlevel / 4)) );
-
-            //SetModifierValue(UNIT_MOD_ATTACK_POWER, BASE_VALUE, float(cinfo->attackpower));
-
-            PetLevelInfo const* pInfo = sObjectMgr.GetPetLevelInfo(creature_ID, petlevel);
             if(cinfo->Entry == 29264) // Feral Spirit
-                {
-                    SetCreateHealth(30*petlevel);
-                    float dmg_multiplier = 0.3f;
-                    if (owner->HasAura(63271)) // Glyph of Feral Spirit
-                        dmg_multiplier = 0.6f;
-                    SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE,float((petlevel * 4 - petlevel) + (owner->GetTotalAttackPowerValue(BASE_ATTACK) * dmg_multiplier)));
-                    SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE,float((petlevel * 4 + petlevel) + (owner->GetTotalAttackPowerValue(BASE_ATTACK) * dmg_multiplier)));
+            {
+                SetCreateHealth(30*petlevel);
+                float dmg_multiplier = 0.3f;
+                if (owner->HasAura(63271)) // Glyph of Feral Spirit
+                    dmg_multiplier = 0.6f;
+                SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE,float((petlevel * 4 - petlevel) + (owner->GetTotalAttackPowerValue(BASE_ATTACK) * dmg_multiplier)));
+                SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE,float((petlevel * 4 + petlevel) + (owner->GetTotalAttackPowerValue(BASE_ATTACK) * dmg_multiplier)));
 
-                    SetModifierValue(UNIT_MOD_ARMOR, BASE_VALUE, float(owner->GetArmor()) * 0.35f);  //  Bonus Armor (35% of player armor)
-                    SetModifierValue(UNIT_MOD_STAT_STAMINA, BASE_VALUE,float(owner->GetStat(STAT_STAMINA)) * 0.3f);  //  Bonus Stamina (30% of player stamina)
+                SetModifierValue(UNIT_MOD_ARMOR, BASE_VALUE, float(owner->GetArmor()) * 0.35f);  //  Bonus Armor (35% of player armor)
+                SetModifierValue(UNIT_MOD_STAT_STAMINA, BASE_VALUE,float(owner->GetStat(STAT_STAMINA)) * 0.3f);  //  Bonus Stamina (30% of player stamina)
 
-                }
+            }
             else if(pInfo)                                       // exist in DB
             {
                 SetCreateHealth(pInfo->health);
