@@ -19,6 +19,14 @@
 #ifndef MANGOSSERVER_ARENATEAM_H
 #define MANGOSSERVER_ARENATEAM_H
 
+#include "Common.h"
+#include "ObjectGuid.h"
+
+class QueryResult;
+class WorldPacket;
+class WorldSession;
+class Player;
+
 enum ArenaTeamCommandTypes
 {
     ERR_ARENA_TEAM_CREATE_S                 = 0x00,
@@ -96,15 +104,7 @@ struct ArenaTeamMember
     uint32 wins_season;
     uint32 personal_rating;
 
-    void ModifyPersonalRating(Player* plr, int32 mod, uint32 slot)
-    {
-        if (int32(personal_rating) + mod < 0)
-            personal_rating = 0;
-        else
-            personal_rating += mod;
-        if(plr)
-            plr->SetArenaTeamInfoField(slot, ARENA_TEAM_PERSONAL_RATING, personal_rating);
-    }
+    void ModifyPersonalRating(Player* plr, int32 mod, uint32 slot);
 };
 
 struct ArenaTeamStats
