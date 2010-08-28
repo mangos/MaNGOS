@@ -940,10 +940,6 @@ bool Aura::CanProcFrom(SpellEntry const *spell, uint32 EventProcEx, uint32 procE
     }
     else
     {
-        // Check family name
-        if (spell->SpellFamilyName != GetSpellProto()->SpellFamilyName)
-            return false;
-
         if (((uint64*)ptr)[0] & spell->SpellFamilyFlags)
             return true;
 
