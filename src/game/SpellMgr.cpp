@@ -305,7 +305,11 @@ bool IsNoStackAuraDueToAura(uint32 spellId_1, uint32 spellId_2)
             if (spellInfo_1->Effect[i] == spellInfo_2->Effect[j]
                 && spellInfo_1->EffectApplyAuraName[i] == spellInfo_2->EffectApplyAuraName[j]
                 && spellInfo_1->EffectMiscValue[i] == spellInfo_2->EffectMiscValue[j]
-                && spellInfo_1->EffectItemType[i] == spellInfo_2->EffectItemType[j])
+                && spellInfo_1->EffectItemType[i] == spellInfo_2->EffectItemType[j]
+                && (spellInfo_1->Effect[i] != 0 || spellInfo_1->EffectApplyAuraName[i] != 0 || 
+                    spellInfo_1->EffectMiscValue[i] != 0 || spellInfo_1->EffectItemType[i] != 0)
+                && (spellInfo_1->Effect[j] != 0 || spellInfo_1->EffectApplyAuraName[j] != 0 || 
+                    spellInfo_1->EffectMiscValue[j] != 0 || spellInfo_1->EffectItemType[j] != 0))
                 return true;
         }
     }
@@ -2522,6 +2526,20 @@ void SpellMgr::LoadSpellChains()
 
         if(node.req)
             mSpellChainsNext.insert(SpellChainMapNext::value_type(node.req,spell_id));
+    }
+
+    // check single rank redundant cases (single rank talents not added by default so this can be only custom cases)
+    for(SpellChainMap::const_iterator i = mSpellChains.begin(); i != mSpellChains.end(); ++i)
+    {
+        // skip non-first ranks, and spells with additional reqs
+        if (i->second.rank > 1 || i->second.req)
+            continue;
+
+        if (mSpellChainsNext.find(i->first) == mSpellChainsNext.end())
+        {
+            sLog.outErrorDb("Spell %u (prev: %u, first: %u, rank: %d, req: %u) listed in `spell_chain` has single rank data, so redundant.",
+                i->first,i->second.prev,i->second.first,i->second.rank,i->second.req);
+        }
     }
 
     sLog.outString();

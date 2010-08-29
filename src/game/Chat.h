@@ -25,13 +25,19 @@
 
 struct AchievementEntry;
 struct AreaTrigger;
+struct AreaTriggerEntry;
 struct FactionEntry;
 struct FactionState;
 struct GameTele;
+struct SpellEntry;
 
+class QueryResult;
 class ChatHandler;
 class WorldSession;
+class WorldPacket;
 class GMTicket;
+class Object;
+class GameObject;
 class Creature;
 class Player;
 class Unit;
@@ -57,9 +63,9 @@ enum ChatCommandSearchResult
 class ChatHandler
 {
     public:
-        explicit ChatHandler(WorldSession* session) : m_session(session) {}
-        explicit ChatHandler(Player* player) : m_session(player->GetSession()) {}
-        ~ChatHandler() {}
+        explicit ChatHandler(WorldSession* session);
+        explicit ChatHandler(Player* player);
+        ~ChatHandler();
 
         static void FillMessageData( WorldPacket *data, WorldSession* session, uint8 type, uint32 language, const char *channelName, uint64 target_guid, const char *message, Unit *speaker);
 
@@ -97,7 +103,7 @@ class ChatHandler
         virtual uint32 GetAccountId() const;
         virtual AccountTypes GetAccessLevel() const;
         virtual bool isAvailable(ChatCommand const& cmd) const;
-        virtual std::string GetNameLink() const { return GetNameLink(m_session->GetPlayer()); }
+        virtual std::string GetNameLink() const;
         virtual bool needReportToTarget(Player* chr) const;
         virtual LocaleConstant GetSessionDbcLocale() const;
         virtual int GetSessionDbLocaleIndex() const;
@@ -597,7 +603,7 @@ class ChatHandler
                                                             // select by arg (name/link) or in-game selection online/offline player
 
         std::string playerLink(std::string const& name) const { return m_session ? "|cffffffff|Hplayer:"+name+"|h["+name+"]|h|r" : name; }
-        std::string GetNameLink(Player* chr) const { return playerLink(chr->GetName()); }
+        std::string GetNameLink(Player* chr) const;
 
         GameObject* GetObjectGlobalyWithGuidOrNearWithDbGuid(uint32 lowguid,uint32 entry);
 
