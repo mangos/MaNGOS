@@ -395,12 +395,12 @@ void Unit::SendMonsterMoveWithSpeed(float x, float y, float z, uint32 transitTim
         if(GetTypeId()==TYPEID_PLAYER)
         {
             Traveller<Player> traveller(*(Player*)this);
-            transitTime = traveller.GetTotalTrevelTimeTo(x, y, z);
+            transitTime = traveller.GetTotalTravelTimeTo(x, y, z);
         }
         else
         {
             Traveller<Creature> traveller(*(Creature*)this);
-            transitTime = traveller.GetTotalTrevelTimeTo(x, y, z);
+            transitTime = traveller.GetTotalTravelTimeTo(x, y, z);
         }
     }
     //float orientation = (float)atan2((double)dy, (double)dx);
