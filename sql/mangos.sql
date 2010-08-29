@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_10416_01_mangos_spell_proc_event` bit(1) default NULL
+  `required_10419_01_mangos_spell_chain` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -16788,8 +16788,6 @@ INSERT INTO spell_chain VALUES
 (9885,9884,1126,7,0),
 (26990,9885,1126,8,0),
 (48469,26990,1126,9,0),
-/*Nourish*/
-(50464,0,50464,1,0),
 /*Rebirth*/
 (20484,0,20484,1,0),
 (20739,20484,20484,2,0),
