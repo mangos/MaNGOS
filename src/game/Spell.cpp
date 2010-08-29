@@ -4398,9 +4398,15 @@ SpellCastResult Spell::CheckCast(bool strict)
                 return SPELL_FAILED_DONT_REPORT;
 
     //Check Caster for combat
-    if(m_caster->isInCombat() && IsNonCombatSpell(m_spellInfo) &&
+    bool bNonCombatSpell = IsNonCombatSpell(m_spellInfo);
+
+    // Warbringer
+    if (m_spellInfo->SpellFamilyName == SPELLFAMILY_WARRIOR && m_spellInfo->Category == 1219 && m_spellInfo->SpellIconID == 457 && (m_caster->HasAura(57499) || m_caster->HasAura(64976)))
+        bNonCombatSpell = false;
+
+    if (m_caster->isInCombat() && bNonCombatSpell &&
         !m_IsTriggeredSpell && !m_caster->isIgnoreUnitState(m_spellInfo))
-        return SPELL_FAILED_AFFECTING_COMBAT;
+        return m_triggeredByAuraSpell ? SPELL_FAILED_DONT_REPORT : SPELL_FAILED_AFFECTING_COMBAT;
 
     if (m_caster->GetTypeId() == TYPEID_PLAYER && !((Player*)m_caster)->isGameMaster() &&
         VMAP::VMapFactory::createOrGetVMapManager()->isLineOfSightCalcEnabled())
