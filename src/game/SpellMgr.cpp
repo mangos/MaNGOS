@@ -307,9 +307,7 @@ bool IsNoStackAuraDueToAura(uint32 spellId_1, uint32 spellId_2)
                 && spellInfo_1->EffectMiscValue[i] == spellInfo_2->EffectMiscValue[j]
                 && spellInfo_1->EffectItemType[i] == spellInfo_2->EffectItemType[j]
                 && (spellInfo_1->Effect[i] != 0 || spellInfo_1->EffectApplyAuraName[i] != 0 || 
-                    spellInfo_1->EffectMiscValue[i] != 0 || spellInfo_1->EffectItemType[i] != 0)
-                && (spellInfo_1->Effect[j] != 0 || spellInfo_1->EffectApplyAuraName[j] != 0 || 
-                    spellInfo_1->EffectMiscValue[j] != 0 || spellInfo_1->EffectItemType[j] != 0))
+                    spellInfo_1->EffectMiscValue[i] != 0 || spellInfo_1->EffectItemType[i] != 0))
                 return true;
         }
     }
@@ -1535,6 +1533,7 @@ bool SpellMgr::IsSpellProcEventCanTriggeredBy(SpellProcEventEntry const * spellP
                 return false;
         }
     }
+
     // Check for extra req (if none) and hit/crit
     if (procEvent_procEx == PROC_EX_NONE)
     {
