@@ -940,6 +940,9 @@ bool Aura::CanProcFrom(SpellEntry const *spell, uint32 EventProcEx, uint32 procE
     }
     else
     {
+        // SpellFamilyName check is performed in SpellMgr::IsSpellProcEventCanTriggeredBy and it is done once for whole holder
+        // note: SpellFamilyName is not checked if no spell_proc_event is defined
+
         if (((uint64*)ptr)[0] & spell->SpellFamilyFlags)
             return true;
 
