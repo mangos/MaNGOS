@@ -2841,6 +2841,9 @@ void Spell::cast(bool skipCheck)
             // Faerie Fire (Feral)
             if (m_spellInfo->Id == 16857 && m_caster->m_form != FORM_CAT)
                 AddTriggeredSpell(60089);
+            // Berserk (Bear Mangle part)
+            else if (m_spellInfo->Id == 50334)
+                AddTriggeredSpell(58923); 
             break;
         }
         case SPELLFAMILY_ROGUE:
