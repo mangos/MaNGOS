@@ -2307,6 +2307,73 @@ SpellEntry const* SpellMgr::SelectAuraRankForLevel(SpellEntry const* spellInfo, 
     return NULL;
 }
 
+typedef UNORDERED_MAP<uint32,uint32> AbilitySpellPrevMap;
+
+static void LoadSpellChains_AbilityHelper(SpellChainMap& chainMap, AbilitySpellPrevMap const& prevRanks, uint32 spell_id, uint32 prev_id, uint32 deep = 30)
+{
+    // spell already listed in chains store
+    SpellChainMap::const_iterator chain_itr = chainMap.find(spell_id);
+    if (chain_itr != chainMap.end())
+    {
+        ASSERT(chain_itr->second.prev == prev_id && "LoadSpellChains_AbilityHelper: Conflicting data in talents or spell abilities dbc");
+        return;
+    }
+
+    // prev rank listed in main chain table (can fill correct data directly)
+    SpellChainMap::const_iterator prev_chain_itr = chainMap.find(prev_id);
+    if (prev_chain_itr != chainMap.end())
+    {
+        SpellChainNode node;
+        node.prev  = prev_id;
+        node.first = prev_chain_itr->second.first;
+        node.rank  = prev_chain_itr->second.rank+1;
+        node.req   = 0;
+        chainMap[spell_id] = node;
+        return;
+    }
+
+    // prev spell not listed in prev ranks store, so it first rank
+    AbilitySpellPrevMap::const_iterator prev_itr = prevRanks.find(prev_id);
+    if (prev_itr == prevRanks.end())
+    {
+        SpellChainNode prev_node;
+        prev_node.prev  = 0;
+        prev_node.first = prev_id;
+        prev_node.rank  = 1;
+        prev_node.req   = 0;
+        chainMap[prev_id] = prev_node;
+
+        SpellChainNode node;
+        node.prev  = prev_id;
+        node.first = prev_id;
+        node.rank  = 2;
+        node.req   = 0;
+        chainMap[spell_id] = node;
+        return;
+    }
+
+    if (deep == 0)
+    {
+        ASSERT(false && "LoadSpellChains_AbilityHelper: Infinity cycle in spell ability data");
+        return;
+    }
+
+    // prev rank listed, so process it first
+    LoadSpellChains_AbilityHelper(chainMap, prevRanks, prev_id, prev_itr->second, deep-1);
+
+    // prev rank must be listed now
+    prev_chain_itr = chainMap.find(prev_id);
+    if (prev_chain_itr == chainMap.end())
+        return;
+
+    SpellChainNode node;
+    node.prev  = prev_id;
+    node.first = prev_chain_itr->second.first;
+    node.rank  = prev_chain_itr->second.rank+1;
+    node.req   = 0;
+    chainMap[spell_id] = node;
+}
+
 void SpellMgr::LoadSpellChains()
 {
     mSpellChains.clear();                                   // need for reload case
@@ -2345,6 +2412,83 @@ void SpellMgr::LoadSpellChains()
         }
     }
 
+    // load known data from spell abilities
+    {
+        // we can calculate ranks only after full data generation
+        AbilitySpellPrevMap prevRanks;
+        for(SkillLineAbilityMap::const_iterator ab_itr = mSkillLineAbilityMap.begin(); ab_itr != mSkillLineAbilityMap.end(); ++ab_itr)
+        {
+            uint32 spell_id = ab_itr->first;
+
+            // skip GM/test/internal spells.begin Its not have ranks anyway
+            if (ab_itr->second->skillId == SKILL_INTERNAL)
+                continue;
+
+            // some forward spells not exist and can be ignored (some outdated data)
+            SpellEntry const* spell_entry = sSpellStore.LookupEntry(spell_id);
+            if (!spell_entry)                                   // no cases
+                continue;
+
+            // ignore spell without forwards (non ranked or missing info in skill abilities)
+            uint32 forward_id = ab_itr->second->forward_spellid;
+            if (!forward_id)
+                continue;
+
+            // some forward spells not exist and can be ignored (some outdated data)
+            SpellEntry const* forward_entry = sSpellStore.LookupEntry(forward_id);
+            if (!forward_entry)
+                continue;
+
+            // some forward spells still exist but excluded from real use as ranks and not listed in skill abilities now
+            SkillLineAbilityMap::const_iterator forward_ab_low = mSkillLineAbilityMap.lower_bound(forward_id);
+            SkillLineAbilityMap::const_iterator forward_ab_up  = mSkillLineAbilityMap.upper_bound(forward_id);
+            if (forward_ab_low == forward_ab_up)
+                continue;
+
+            // spell already listed in chains store
+            SpellChainMap::const_iterator chain_itr = mSpellChains.find(forward_id);
+            if (chain_itr != mSpellChains.end())
+            {
+                ASSERT(chain_itr->second.prev == spell_id && "Conflicting data in talents or spell abilities dbc");
+                continue;
+            }
+
+            // spell already listed in prev ranks store
+            AbilitySpellPrevMap::const_iterator prev_itr = prevRanks.find(forward_id);
+            if (prev_itr != prevRanks.end())
+            {
+                ASSERT(prev_itr->second == spell_id && "Conflicting data in talents or spell abilities dbc");
+                continue;
+            }
+
+            // prev rank listed in main chain table (can fill correct data directly)
+            SpellChainMap::const_iterator prev_chain_itr = mSpellChains.find(spell_id);
+            if (prev_chain_itr != mSpellChains.end())
+            {
+                SpellChainNode node;
+                node.prev  = spell_id;
+                node.first = prev_chain_itr->second.first;
+                node.rank  = prev_chain_itr->second.rank+1;
+                node.req   = 0;
+
+                mSpellChains[forward_id] = node;
+                continue;
+            }
+            
+            // need temporary store for later rank calculation
+            prevRanks[forward_id] = spell_id;
+        }
+
+        while (!prevRanks.empty())
+        {
+            uint32 spell_id = prevRanks.begin()->first;
+            uint32 prev_id  = prevRanks.begin()->second;
+            prevRanks.erase(prevRanks.begin());
+
+            LoadSpellChains_AbilityHelper(mSpellChains, prevRanks, spell_id, prev_id);
+        }
+    }
+
     // load custom case
     QueryResult *result = WorldDatabase.Query("SELECT spell_id, prev_spell, first_spell, rank, req_spell FROM spell_chain");
     if (!result)
@@ -2358,7 +2502,9 @@ void SpellMgr::LoadSpellChains()
         return;
     }
 
-    uint32 count = 0;
+    uint32 dbc_count = mSpellChains.size();
+    uint32 new_count = 0;
+    uint32 req_count = 0;
 
     barGoLink bar( (int)result->GetRowCount() );
     do
@@ -2380,13 +2526,45 @@ void SpellMgr::LoadSpellChains()
             continue;
         }
 
-        if (mSpellChains.find(spell_id) != mSpellChains.end())
+        SpellChainMap::iterator chain_itr = mSpellChains.find(spell_id);
+        if (chain_itr != mSpellChains.end())
         {
-            sLog.outErrorDb("Spell %u already added (talent?) and non need in `spell_chain`",spell_id);
+            if (chain_itr->second.rank != node.rank)
+            {
+                sLog.outErrorDb("Spell %u (prev: %u, first: %u, rank: %d, req: %u) listed in `spell_chain` expected rank %u by DBC data.",
+                    spell_id,node.prev,node.first,node.rank,node.req,chain_itr->second.rank);
+                continue;
+            }
+
+            if (chain_itr->second.prev != node.prev)
+            {
+                sLog.outErrorDb("Spell %u (prev: %u, first: %u, rank: %d, req: %u) listed in `spell_chain` expected prev %u by DBC data.",
+                    spell_id,node.prev,node.first,node.rank,node.req,chain_itr->second.prev);
+                continue;
+            }
+
+            if (chain_itr->second.first != node.first)
+            {
+                sLog.outErrorDb("Spell %u (prev: %u, first: %u, rank: %d, req: %u) listed in `spell_chain` expected first %u by DBC data.",
+                    spell_id,node.prev,node.first,node.rank,node.req,chain_itr->second.first);
+                continue;
+            }
+
+            // update req field by table data
+            if (node.req)
+            {
+                chain_itr->second.req = node.req;
+                ++req_count;
+                continue;
+            }
+
+            // in other case redundant
+            sLog.outErrorDb("Spell %u (prev: %u, first: %u, rank: %d, req: %u) already added (talent or spell ability with forward) and non need in `spell_chain`",
+                spell_id,node.prev,node.first,node.rank,node.req);
             continue;
         }
 
-        if(node.prev!=0 && !sSpellStore.LookupEntry(node.prev))
+        if (node.prev != 0 && !sSpellStore.LookupEntry(node.prev))
         {
             sLog.outErrorDb("Spell %u (prev: %u, first: %u, rank: %d, req: %u) listed in `spell_chain` has nonexistent previous rank spell.",
                 spell_id,node.prev,node.first,node.rank,node.req);
@@ -2417,7 +2595,7 @@ void SpellMgr::LoadSpellChains()
             continue;
         }
 
-        // talents not required data in spell chain for work, but must be checked if present for intergrity
+        // talents not required data in spell chain for work, but must be checked if present for integrity
         if(TalentSpellPos const* pos = GetTalentSpellPos(spell_id))
         {
             if(node.rank!=pos->rank+1)
@@ -2454,7 +2632,7 @@ void SpellMgr::LoadSpellChains()
 
         mSpellChains[spell_id] = node;
 
-        ++count;
+        ++new_count;
     } while( result->NextRow() );
 
     delete result;
@@ -2535,7 +2713,7 @@ void SpellMgr::LoadSpellChains()
     }
 
     sLog.outString();
-    sLog.outString( ">> Loaded %u spell chain records", count );
+    sLog.outString( ">> Loaded %u spell chain records (%u from DBC data with %u req field updates, and %u loaded from table)", dbc_count+new_count, dbc_count, req_count, new_count);
 }
 
 void SpellMgr::LoadSpellLearnSkills()
