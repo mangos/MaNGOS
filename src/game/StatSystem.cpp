@@ -1096,6 +1096,8 @@ void Pet::UpdateDamagePhysical(WeaponAttackType attType)
     if(attType > BASE_ATTACK)
         return;
 
+    Unit* owner = GetOwner();
+
     UnitMods unitMod = UNIT_MOD_DAMAGE_MAINHAND;
 
     float att_speed = float(GetAttackTime(BASE_ATTACK))/1000.0f;
@@ -1131,7 +1133,29 @@ void Pet::UpdateDamagePhysical(WeaponAttackType attType)
                 break;
         }
     }
-
+    else if (getPetType() == SUMMON_PET && attType == BASE_ATTACK)
+    {
+        CreatureInfo const *cinfo = GetCreatureInfo();
+        switch(cinfo->Entry)
+        {
+            case 89:
+            // Infernal
+                mindamage *= 8.4f;
+                maxdamage *= 35.0f;
+                break;
+            case 29264:
+            // Feral spirit
+                float _k;
+                if (owner->HasAura(63271))     // Glyph of Feral Spirit
+                     _k = 0.6f;
+                else _k = 0.3f;
+                mindamage += owner->GetTotalAttackPowerValue(BASE_ATTACK) * _k;
+                maxdamage += owner->GetTotalAttackPowerValue(BASE_ATTACK) * _k;
+                break;
+           default:
+                break;
+        }
+    }
     SetStatFloatValue(UNIT_FIELD_MINDAMAGE, mindamage);
     SetStatFloatValue(UNIT_FIELD_MAXDAMAGE, maxdamage);
 }
