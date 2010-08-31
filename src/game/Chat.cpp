@@ -191,6 +191,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { "sellerror",      SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDebugSendSellErrorCommand,       "", NULL },
         { "setphaseshift",  SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDebugSendSetPhaseShiftCommand,   "", NULL },
         { "spellfail",      SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDebugSendSpellFailCommand,       "", NULL },
+        { "calendarresult", SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDebugSendCalendarResultCommand,  "", NULL },
         { NULL,             0,                  false, NULL,                                                "", NULL }
     };
 

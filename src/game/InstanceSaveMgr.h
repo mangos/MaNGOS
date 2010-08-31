@@ -24,7 +24,6 @@
 #include "ace/Thread_Mutex.h"
 #include <list>
 #include <map>
-#include "Utilities/UnorderedMapSet.h"
 #include "Database/DatabaseEnv.h"
 #include "DBCEnums.h"
 #include "ObjectGuid.h"
@@ -33,6 +32,11 @@ struct InstanceTemplate;
 struct MapEntry;
 class Player;
 class Group;
+
+// Instance Reset Schedule is calculated from this point in time.
+// 2005-12-28 10:00:00 - 10:00:00 = 2005-12-28 00:00:00
+// We will add X hours to this value, taking X from config (10 default).
+#define INSTANCE_RESET_SCHEDULE_START_TIME  1135717200
 
 /*
     Holds the information necessary for creating a new map for an existing instance

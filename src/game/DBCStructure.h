@@ -1127,7 +1127,7 @@ struct MapEntry
     float   ghost_entrance_y;                               // 61 entrance y coordinate in ghost mode  (in most cases = normal entrance)
     //uint32  timeOfDayOverride;                            // 62 time of day override
     uint32  addon;                                          // 63 expansion
-                                                            // 64 some kind of time?
+    uint32  instanceResetOffset;                            // 64 offset used instead of first period while creating reset table
     //uint32 maxPlayers;                                    // 65 max players
 
     // Helpers

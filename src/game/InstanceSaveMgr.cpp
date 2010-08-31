@@ -143,6 +143,7 @@ void InstanceResetScheduler::LoadResetTimes()
 {
     time_t now = time(NULL);
     time_t today = (now / DAY) * DAY;
+    time_t oldest_reset_time = now;
 
     // NOTE: Use DirectPExecute for tables that will be queried later
 
@@ -216,7 +217,9 @@ void InstanceResetScheduler::LoadResetTimes()
             }
 
             // update the reset time if the hour in the configs changes
-            uint64 newresettime = (oldresettime / DAY) * DAY + diff;
+            time_t offset = sMapStore.LookupEntry(mapid)->instanceResetOffset;
+            uint64 start_point = INSTANCE_RESET_SCHEDULE_START_TIME + offset + diff;
+            uint64 newresettime = start_point + uint32((oldresettime - start_point) / DAY) * DAY;
             if(oldresettime != newresettime)
                 CharacterDatabase.DirectPExecute("UPDATE instance_reset SET resettime = '"UI64FMTD"' WHERE mapid = '%u' AND difficulty = '%u'", newresettime, mapid, difficulty);
 
@@ -244,20 +247,17 @@ void InstanceResetScheduler::LoadResetTimes()
 
         uint32 period = GetMaxResetTimeFor(mapDiff);
         time_t t = GetResetTimeFor(mapid,difficulty);
-        if(!t)
+        if(!t || t < now)
         {
-            // initialize the reset time
-            t = today + period + diff;
-            CharacterDatabase.DirectPExecute("INSERT INTO instance_reset VALUES ('%u','%u','"UI64FMTD"')", mapid, difficulty, (uint64)t);
-        }
+            bool existsInDB = bool(t);
+            uint32 offset = sMapStore.LookupEntry(mapid)->instanceResetOffset;
+            uint64 start_point = INSTANCE_RESET_SCHEDULE_START_TIME + offset + diff;
+            t = start_point + uint32(ceil(float(now - start_point) / period) * period);
 
-        if(t < now)
-        {
-            // assume that expired instances have already been cleaned
-            // calculate the next reset time
-            t = (t / DAY) * DAY;
-            t += ((today - t) / period + 1) * period + diff;
-            CharacterDatabase.DirectPExecute("UPDATE instance_reset SET resettime = '"UI64FMTD"' WHERE mapid = '%u' AND difficulty= '%u'", (uint64)t, mapid, difficulty);
+            if(existsInDB)
+                CharacterDatabase.DirectPExecute("UPDATE instance_reset SET resettime = '"UI64FMTD"' WHERE mapid = '%u' AND difficulty= '%u'", (uint64)t, mapid, difficulty);
+            else
+                CharacterDatabase.DirectPExecute("INSERT INTO instance_reset VALUES ('%u','%u','"UI64FMTD"')", mapid, difficulty, (uint64)t);
         }
 
         SetResetTimeFor(mapid,difficulty,t);
@@ -324,7 +324,7 @@ void InstanceResetScheduler::Update()
         {
             // global reset/warning for a certain map
             time_t resetTime = GetResetTimeFor(event.mapid,event.difficulty);
-            m_InstanceSaves._ResetOrWarnAll(event.mapid, event.difficulty, event.type != RESET_EVENT_INFORM_LAST, uint32(resetTime - now));
+            m_InstanceSaves._ResetOrWarnAll(event.mapid, event.difficulty, event.type != RESET_EVENT_INFORM_LAST, uint32(resetTime));
             if(event.type != RESET_EVENT_INFORM_LAST)
             {
                 // schedule the next warning/reset
@@ -610,7 +610,7 @@ void InstanceSaveManager::_ResetInstance(uint32 mapid, uint32 instanceId)
         sObjectMgr.DeleteRespawnTimeForInstance(instanceId);// even if map is not loaded
 }
 
-void InstanceSaveManager::_ResetOrWarnAll(uint32 mapid, Difficulty difficulty, bool warn, uint32 timeLeft)
+void InstanceSaveManager::_ResetOrWarnAll(uint32 mapid, Difficulty difficulty, bool warn, uint32 resetTime)
 {
     // global reset for all instances of the given map
     MapEntry const *mapEntry = sMapStore.LookupEntry(mapid);
@@ -618,6 +618,7 @@ void InstanceSaveManager::_ResetOrWarnAll(uint32 mapid, Difficulty difficulty, b
         return;
 
     time_t now = time(NULL);
+    uint32 timeLeft = resetTime - now;
 
     if (!warn)
     {
@@ -644,12 +645,12 @@ void InstanceSaveManager::_ResetOrWarnAll(uint32 mapid, Difficulty difficulty, b
         CharacterDatabase.PExecute("DELETE FROM instance WHERE map = '%u'", mapid);
         CharacterDatabase.CommitTransaction();
 
-        // calculate the next reset time
-        uint32 diff = sWorld.getConfig(CONFIG_UINT32_INSTANCE_RESET_TIME_HOUR) * HOUR;
-        uint32 period = InstanceResetScheduler::GetMaxResetTimeFor(mapDiff);
-        time_t next_reset = ((now + timeLeft + MINUTE) / DAY * DAY) + period + diff;
+        // all needed values are already in resetTime
+        uint32 next_reset = resetTime + InstanceResetScheduler::GetMaxResetTimeFor(mapDiff);
         // update it in the DB
-        CharacterDatabase.PExecute("UPDATE instance_reset SET resettime = '"UI64FMTD"' WHERE mapid = '%d' AND difficulty = '%d'", (uint64)next_reset, mapid, difficulty);
+        CharacterDatabase.PExecute("UPDATE instance_reset SET resettime = '%u' WHERE mapid = '%d' AND difficulty = '%d'", (uint64)next_reset, mapid, difficulty);
+        m_Scheduler.SetResetTimeFor(mapid,difficulty,(time_t)next_reset);
+        m_Scheduler.ScheduleReset(true, next_reset-3600, InstanceResetEvent(RESET_EVENT_INFORM_1, mapid, difficulty, 0));
     }
 
     // note: this isn't fast but it's meant to be executed very rarely

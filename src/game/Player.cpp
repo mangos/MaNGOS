@@ -2951,6 +2951,16 @@ void Player::SendInitialSpells()
     DETAIL_LOG( "CHARACTER: Sent Initial Spells" );
 }
 
+void Player::SendCalendarResult(CalendarResponseResult result, std::string str)
+{
+    WorldPacket data(SMSG_CALENDAR_COMMAND_RESULT, 200);
+    data << uint32(0);  // unused
+    data << uint8(0);   // std::string, currently unused
+    data << str;
+    data << uint32(result);
+    GetSession()->SendPacket(&data);
+}
+
 void Player::RemoveMail(uint32 id)
 {
     for(PlayerMails::iterator itr = m_mail.begin(); itr != m_mail.end();++itr)
