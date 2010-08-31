@@ -4161,7 +4161,7 @@ void Spell::DoSummon(SpellEffectIndex eff_idx)
     if(Player* modOwner = m_caster->GetSpellModOwner())
         modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_DURATION, duration);
 
-    int32 amount = damage;
+    uint32 amount = damage;
     Unit *summoner = m_caster;
     if (m_caster->GetTypeId()==TYPEID_PLAYER && spawnCreature->LoadPetFromDB((Player*)m_caster,pet_entry))
     {
@@ -4177,6 +4177,14 @@ void Spell::DoSummon(SpellEffectIndex eff_idx)
 
         if (pet_entry == 37994) // Mage: Water Elemental from Glyph
             duration = DAY*IN_MILLISECONDS;
+        else if (pet_entry == 89)           // Warlock Infernal spell has in DBC flags
+                                               // SUMMON_PROP_GROUP_PETS && SUMMON_PROP_TYPE_ARMY
+                                               // and value = 50+lvl 8-(---)
+                                               // also need add aura 39007 9thanks for boxa)
+        {
+            spawnCreature->_AddAura(39007,MINUTE*IN_MILLISECONDS);
+            amount = 1;
+        };
 
         // set timer for unsummon
         if (duration > 0)
@@ -4188,14 +4196,6 @@ void Spell::DoSummon(SpellEffectIndex eff_idx)
             summoner = spawnCreature;
         }
 
-        if (m_spellInfo->Id == 1122)           // Warlock Infernal spell has in DBC flags
-                                               // SUMMON_PROP_GROUP_PETS && SUMMON_PROP_TYPE_ARMY
-                                               // and value = 50+lvl 8-(---)
-                                               // also need add aura 39007 9thanks for boxa)
-        {
-            spawnCreature->_AddAura(39007,MINUTE*IN_MILLISECONDS);
-            return;
-        }
 
         if (!amount)
             return;
