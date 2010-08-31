@@ -1942,6 +1942,9 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                     if (!beacon)
                         return SPELL_AURA_PROC_FAILED;
 
+                    if (procSpell->Id == 20267)
+                        return SPELL_AURA_PROC_FAILED;
+
                     // find caster main aura at beacon
                     Aura* dummy = NULL;
                     Unit::AuraList const& baa = beacon->GetAurasByType(SPELL_AURA_PERIODIC_TRIGGER_SPELL);
