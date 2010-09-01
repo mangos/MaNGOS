@@ -1145,12 +1145,15 @@ void Pet::UpdateDamagePhysical(WeaponAttackType attType)
                 break;
             case 29264:
             // Feral spirit
-                float _k;
-                if (owner->HasAura(63271))     // Glyph of Feral Spirit
-                     _k = 0.6f;
-                else _k = 0.3f;
-                mindamage += owner->GetTotalAttackPowerValue(BASE_ATTACK) * _k;
-                maxdamage += owner->GetTotalAttackPowerValue(BASE_ATTACK) * _k;
+                if (owner)
+                {
+                    float _k;
+                    if (owner->HasAura(63271))     // Glyph of Feral Spirit
+                         _k = 0.6f;
+                    else _k = 0.3f;
+                    mindamage += owner->GetTotalAttackPowerValue(BASE_ATTACK) * _k;
+                    maxdamage += owner->GetTotalAttackPowerValue(BASE_ATTACK) * _k;
+                }
                 break;
            default:
                 break;

@@ -895,6 +895,9 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
                     }
                 }
             }
+
+            setPowerType(POWER_MANA);
+            break;
         }
         case HUNTER_PET:
         {
@@ -917,12 +920,18 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
             }
 
             SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, sObjectMgr.GetXPForPetLevel(petlevel));
+            setPowerType(POWER_MANA);
             break;
         }
         case GUARDIAN_PET:
         {
             SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
             SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, 1000);
+            // DK ghouls have energy
+            if (cinfo->family == CREATURE_FAMILY_GHOUL)
+                setPowerType(POWER_ENERGY);
+            else
+                setPowerType(POWER_MANA);
             break;
         }
         default:
@@ -969,7 +978,7 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
     UpdateAllStats();
 
     SetHealth(GetMaxHealth());
-    SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
+    SetPower(getPowerType(), GetMaxPower(getPowerType()));
 
     return true;
 }
@@ -1129,7 +1138,7 @@ void Pet::_SaveSpells()
 void Pet::_LoadAuras(uint32 timediff)
 {
     RemoveAllAuras();
-    
+
     QueryResult *result = CharacterDatabase.PQuery("SELECT caster_guid,item_guid,spell,stackcount,remaincharges,basepoints0,basepoints1,basepoints2,maxduration0,maxduration1,maxduration2,remaintime0,remaintime1,remaintime2,effIndexMask FROM pet_aura WHERE guid = '%u'",m_charmInfo->GetPetNumber());
 
     if(result)
@@ -1197,7 +1206,7 @@ void Pet::_LoadAuras(uint32 timediff)
                 aura->SetLoadedState(damage[i], maxduration[i], remaintime[i]);
                 holder->AddAura(aura, SpellEffectIndex(i));
             }
-            
+
             if (!holder->IsEmptyHolder())
             {
                 holder->SetLoadedState(caster_guid, ObjectGuid(HIGHGUID_ITEM, item_lowguid), stackcount, remaincharges);
@@ -1950,8 +1959,7 @@ void Pet::CastPetAura(PetAura const* aura)
         }
         default:
         {
-            if (owner) CastSpell(this, auraId, true, NULL, NULL, owner->GetGUID());
-            else CastSpell(this, auraId, true);
+            CastSpell(this, auraId, true);
             break;
         }
     }

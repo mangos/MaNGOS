@@ -4151,62 +4151,100 @@ void Spell::DoSummon(SpellEffectIndex eff_idx)
 
     if (!unitTarget)
         return;
+
     uint32 pet_entry = m_spellInfo->EffectMiscValue[eff_idx];
+
     if (!pet_entry)
         return;
+
     uint32 level = m_caster->getLevel();
-    Pet* spawnCreature = new Pet(SUMMON_PET);
 
     int32 duration = GetSpellDuration(m_spellInfo);
+    if (duration == 0)
+        duration = DAY*IN_MILLISECONDS;  // Infinity, by pets limitation.
+
     if(Player* modOwner = m_caster->GetSpellModOwner())
         modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_DURATION, duration);
 
     uint32 amount = damage;
-    Unit *summoner = m_caster;
-    if (m_caster->GetTypeId()==TYPEID_PLAYER && spawnCreature->LoadPetFromDB((Player*)m_caster,pet_entry))
+
+    if (amount > 3)
+        amount = 1;  // Don't find any cast, summons over 3 pet.
+
+    Unit* summoner = m_caster;
+
+    uint8 petindex = 0;
+
+    if (summoner->GetTypeId()==TYPEID_PLAYER)
     {
-        // Summon in dest location
-        float x, y, z;
-        if (m_targets.m_targetMask & TARGET_FLAG_DEST_LOCATION)
+        QueryResult* result = CharacterDatabase.PQuery("SELECT id FROM character_pet WHERE owner = '%u' AND AND entry = '%u'",
+            summoner->GetGUIDLow(), pet_entry);
+
+        std::vector<uint64> petnumber;
+
+        if (result)
         {
-            x = m_targets.m_destX;
-            y = m_targets.m_destY;
-            z = m_targets.m_destZ;
-            spawnCreature->Relocate(m_targets.m_destX, m_targets.m_destY, m_targets.m_destZ, -m_caster->GetOrientation());
+            do
+            {
+               Field* fields = result->Fetch();
+               uint64 petnum = fields[0].GetUInt64();
+               if (petnum) petnumber.push_back(petnum);
+            } while (result->NextRow());
+            delete result;
+
+            if (!petnumber.empty())
+            {
+                for(uint8 i = 0; i < petnumber.size(); ++i)
+                {
+                    if (petnumber[i])
+                    {
+                        Pet* creature = new Pet(SUMMON_PET);
+                        if (creature->LoadPetFromDB((Player*)summoner,pet_entry, petnumber[i]))
+                        {
+                            // Summon in dest location
+                            float x, y, z;
+                            if (m_targets.m_targetMask & TARGET_FLAG_DEST_LOCATION)
+                            {
+                                x = m_targets.m_destX;
+                                y = m_targets.m_destY;
+                                z = m_targets.m_destZ;
+                            }
+                            else
+                               summoner->GetClosePoint(x, y, z, creature->GetObjectBoundingRadius(), PET_FOLLOW_DIST, creature->GetPetFollowAngle());
+
+                            creature->Relocate(x, y, z, -summoner->GetOrientation());
+                            creature->SetSummonPoint(x, y, z, -summoner->GetOrientation());
+
+                            if (petindex == 0)
+                                creature->SetPetFollowAngle(PET_DEFAULT_FOLLOW_ANGLE);
+                            else if (petindex == 1)
+                                creature->SetPetFollowAngle(M_PI_F * 1.5f);
+                            else if (petindex == 2)
+                                creature->SetPetFollowAngle(M_PI_F);
+
+                            --amount;
+                            ++petindex;
+                            // set timer for unsummon
+                            if (duration > 0)
+                                creature->SetDuration(duration);
+                        }
+                        else
+                            delete creature;
+                    }
+                }
+            }
         }
-
-        if (pet_entry == 37994) // Mage: Water Elemental from Glyph
-            duration = DAY*IN_MILLISECONDS;
-        else if (pet_entry == 89)           // Warlock Infernal spell has in DBC flags
-                                               // SUMMON_PROP_GROUP_PETS && SUMMON_PROP_TYPE_ARMY
-                                               // and value = 50+lvl 8-(---)
-                                               // also need add aura 39007 9thanks for boxa)
-        {
-            spawnCreature->_AddAura(39007,MINUTE*IN_MILLISECONDS);
-            amount = 1;
-        };
-
-        // set timer for unsummon
-        if (duration > 0)
-            spawnCreature->SetDuration(duration);
-
-        if (amount)
-        {
-            --amount;
-            summoner = spawnCreature;
-        }
-
-
-        if (!amount)
-            return;
     }
-    else
-        delete spawnCreature;
 
     for (int32 count = 0; count < amount; ++count)
     {
-        Pet* creature = new Pet(SUMMON_PET);
-        Map *map = m_caster->GetMap();
+        Pet* creature;
+
+        if (duration == 0 || duration >= 60000)
+            creature = new Pet(SUMMON_PET);
+        else creature = new Pet(GUARDIAN_PET);
+
+        Map *map = summoner->GetMap();
         uint32 pet_number = sObjectMgr.GeneratePetNumber();
         if (!creature->Create(map->GenerateLocalLowGuid(HIGHGUID_PET), map, summoner->GetPhaseMask(),
             m_spellInfo->EffectMiscValue[eff_idx], pet_number))
@@ -4215,16 +4253,8 @@ void Spell::DoSummon(SpellEffectIndex eff_idx)
             delete creature;
             return;
         }
+        ++petindex;
 
-        // chained
-        if (summoner->GetTypeId() == TYPEID_UNIT && ((Creature*)summoner)->isPet() && ((Creature*)summoner)->GetEntry() == creature->GetEntry())
-        {
-            // todo: generic angle selection
-            if (((Pet*)summoner)->GetPetFollowAngle() == PET_DEFAULT_FOLLOW_ANGLE)
-                creature->SetPetFollowAngle(M_PI_F * 1.5f); // second on right
-            else
-                creature->SetPetFollowAngle(M_PI_F);        // third down (currently 3 chained max)
-        }
 
         // Summon in dest location
         float x, y, z;
@@ -4237,9 +4267,15 @@ void Spell::DoSummon(SpellEffectIndex eff_idx)
         else
             summoner->GetClosePoint(x, y, z, creature->GetObjectBoundingRadius(), PET_FOLLOW_DIST, creature->GetPetFollowAngle());
 
-        creature->Relocate(x, y, z, -m_caster->GetOrientation());
-        creature->SetSummonPoint(x, y, z, -m_caster->GetOrientation());
+        creature->Relocate(x, y, z, -summoner->GetOrientation());
+        creature->SetSummonPoint(x, y, z, -summoner->GetOrientation());
 
+        if (petindex == 0)
+            creature->SetPetFollowAngle(PET_DEFAULT_FOLLOW_ANGLE);
+        else if (petindex == 1)
+            creature->SetPetFollowAngle(M_PI_F * 1.5f);
+        else if (petindex == 2)
+            creature->SetPetFollowAngle(M_PI_F);
 
         if (!creature->IsPositionValid())
         {
@@ -4254,16 +4290,14 @@ void Spell::DoSummon(SpellEffectIndex eff_idx)
             creature->SetDuration(duration);
 
         creature->SetOwnerGUID(summoner->GetGUID());
+        creature->SetCreatorGUID(m_caster->GetGUID());
         creature->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
-        creature->setPowerType(POWER_MANA);
+//        creature->setPowerType(POWER_MANA);
         creature->setFaction(m_caster->getFaction());
         creature->SetUInt32Value(UNIT_FIELD_FLAGS, 0);
         creature->SetUInt32Value(UNIT_FIELD_BYTES_0, 2048);
         creature->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
         creature->SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, 0);
-        creature->SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
-        creature->SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, 1000);
-        creature->SetCreatorGUID(m_caster->GetGUID());
         creature->SetUInt32Value(UNIT_CREATED_BY_SPELL, m_spellInfo->Id);
 
         creature->InitStatsForLevel(level, m_caster);
@@ -4273,23 +4307,26 @@ void Spell::DoSummon(SpellEffectIndex eff_idx)
         creature->UpdateWalkMode(m_caster);
 
         creature->AIM_Initialize();
-        creature->InitPetCreateSpells();
-        creature->InitLevelupSpellsForLevel();
+
+        if (creature->getPetType() == SUMMON_PET)
+        {
+            creature->InitPetCreateSpells();
+            creature->InitLevelupSpellsForLevel();
+        }
 
         std::string name = m_caster->GetName();
         name.append(petTypeSuffix[creature->getPetType()]);
         creature->SetName( name );
 
         map->Add((Creature*)creature);
+        creature->LoadCreaturesAddon(true);
 
         // re-init stats because of GetOwner returning null before adding to map
         creature->InitStatsForLevel(level, m_caster);
-        creature->SetHealth(creature->GetMaxHealth());
-        creature->SetPower(POWER_MANA, creature->GetMaxPower(POWER_MANA));
 
         summoner->SetPet(creature);
 
-        if (m_caster->GetTypeId() == TYPEID_PLAYER && damage == amount && count == 0)
+        if (m_caster->GetTypeId() == TYPEID_PLAYER && creature->getPetType() == SUMMON_PET)
         {
             creature->GetCharmInfo()->SetReactState( REACT_DEFENSIVE );
             creature->SavePetToDB(PET_SAVE_AS_CURRENT);
@@ -4298,11 +4335,10 @@ void Spell::DoSummon(SpellEffectIndex eff_idx)
         else
             creature->SetNeedSave(false);
 
-        summoner = creature;
+        if (m_caster->GetTypeId() == TYPEID_UNIT && ((Creature*)m_caster)->AI())
+            ((Creature*)m_caster)->AI()->JustSummoned((Creature*)creature);
     }
 
-    if (m_caster->GetTypeId() == TYPEID_UNIT && ((Creature*)m_caster)->AI())
-        ((Creature*)m_caster)->AI()->JustSummoned((Creature*)spawnCreature);
 }
 
 void Spell::EffectLearnSpell(SpellEffectIndex eff_idx)
