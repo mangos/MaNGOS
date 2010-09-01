@@ -1130,7 +1130,7 @@ void ObjectMgr::LoadCreatureModelRace()
         if (raceData.creature_entry)
         {
             if (raceData.modelid_racial)
-                sLog.outErrorDb("Table `creature_model_race` modelid %u has modelid_racial for modelid %u but a creature_entry are already defined, modelid_racial will never be used.", raceData.modelid);
+                sLog.outErrorDb("Table `creature_model_race` modelid %u has modelid_racial for modelid %u but a creature_entry are already defined, modelid_racial will never be used.", raceData.modelid, raceData.modelid_racial);
 
             if (!sCreatureStorage.LookupEntry<CreatureInfo>(raceData.creature_entry))
             {
