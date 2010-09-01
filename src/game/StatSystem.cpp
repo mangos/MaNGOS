@@ -1023,14 +1023,15 @@ void Pet::UpdateAttackPowerAndDamage(bool ranged)
     if(ranged)
         return;
 
-    float val = 0.0f;
-    float bonusAP = 0.0f;
+    float baseAP       = 0.0f;
+    float bonusAP      = 0.0f;
+    float bonusDamage  = 0.0f;
     UnitMods unitMod = UNIT_MOD_ATTACK_POWER;
 
     if(GetEntry() == 416)                                   // imp's attack power
-        val = GetStat(STAT_STRENGTH) - 10.0f;
+        baseAP = GetStat(STAT_STRENGTH) - 10.0f;
     else
-        val = 2 * GetStat(STAT_STRENGTH) - 20.0f;
+        baseAP = 2 * GetStat(STAT_STRENGTH) - 20.0f;
 
     Unit* owner = GetOwner();
 
@@ -1044,13 +1045,13 @@ void Pet::UpdateAttackPowerAndDamage(bool ranged)
         if(getPetType() == HUNTER_PET)                      //hunter pets benefit from owner's attack power
         {
             bonusAP = owner->GetTotalAttackPowerValue(RANGED_ATTACK) * 0.22f;
-            SetBonusDamage( int32(owner->GetTotalAttackPowerValue(RANGED_ATTACK) * 0.1287f));
+            bonusDamage = owner->GetTotalAttackPowerValue(RANGED_ATTACK) * 0.1287f;
         }
         //ghouls benefit from deathknight's attack power
         else if(getPetType() == SUMMON_PET && owner->getClass() == CLASS_DEATH_KNIGHT)
         {
             bonusAP = owner->GetTotalAttackPowerValue(BASE_ATTACK) * 0.82f;
-            SetBonusDamage( int32(owner->GetTotalAttackPowerValue(BASE_ATTACK) * 0.8287f));
+            bonusDamage = int32(owner->GetTotalAttackPowerValue(BASE_ATTACK) * 0.8287f);
         }
         //demons benefit from warlocks shadow or fire damage
         else if(getPetType() == SUMMON_PET && owner->getClass() == CLASS_WARLOCK)
@@ -1060,7 +1061,7 @@ void Pet::UpdateAttackPowerAndDamage(bool ranged)
             int32 maximum  = (fire > shadow) ? fire : shadow;
             if(maximum < 0)
                 maximum = 0;
-            SetBonusDamage( int32(maximum * 0.15f));
+            bonusDamage = maximum * 0.15f;
             bonusAP = maximum * 0.57f;
         }
         //water elementals benefit from mage's frost damage
@@ -1069,11 +1070,12 @@ void Pet::UpdateAttackPowerAndDamage(bool ranged)
             int32 frost = int32(owner->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + SPELL_SCHOOL_FROST)) - owner->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_NEG + SPELL_SCHOOL_FROST);
             if(frost < 0)
                 frost = 0;
-            SetBonusDamage( int32(frost * 0.4f));
+            bonusDamage = frost * 0.4f;
         }
     }
 
-    SetModifierValue(UNIT_MOD_ATTACK_POWER, BASE_VALUE, val + bonusAP);
+    SetBonusDamage(int32(bonusDamage));
+    SetModifierValue(UNIT_MOD_ATTACK_POWER, BASE_VALUE, baseAP + bonusAP);
 
     //in BASE_VALUE of UNIT_MOD_ATTACK_POWER for creatures we store data of meleeattackpower field in DB
     float base_attPower  = GetModifierValue(unitMod, BASE_VALUE) * GetModifierValue(unitMod, BASE_PCT);

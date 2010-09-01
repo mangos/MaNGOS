@@ -2472,8 +2472,8 @@ void ObjectMgr::LoadPetLevelInfo()
 {
     // Loading levels data
     {
-        //                                                 0               1      2   3     4    5    6    7     8    9
-        QueryResult *result  = WorldDatabase.Query("SELECT creature_entry, level, hp, mana, str, agi, sta, inte, spi, armor FROM pet_levelstats");
+        //                                                 0               1      2   3     4    5    6    7     8    9      10      11      12
+        QueryResult *result  = WorldDatabase.Query("SELECT creature_entry, level, hp, mana, str, agi, sta, inte, spi, armor, mindmg, maxdmg, attackpower FROM pet_levelstats");
 
         uint32 count = 0;
 
@@ -2530,6 +2530,9 @@ void ObjectMgr::LoadPetLevelInfo()
             pLevelInfo->health = fields[2].GetUInt16();
             pLevelInfo->mana   = fields[3].GetUInt16();
             pLevelInfo->armor  = fields[9].GetUInt16();
+            pLevelInfo->mindmg = fields[10].GetUInt32();
+            pLevelInfo->maxdmg = fields[11].GetUInt32();
+            pLevelInfo->attackpower = fields[12].GetUInt32();
 
             for (int i = 0; i < MAX_STATS; i++)
             {
@@ -2565,9 +2568,30 @@ void ObjectMgr::LoadPetLevelInfo()
         {
             if(pInfo[level].health == 0)
             {
+                pInfo[level].health == uint16(pInfo[level-1].health * (level+1)/level +1);
                 sLog.outErrorDb("Creature %u has no data for Level %i pet stats data, using data of Level %i.",itr->first,level+1, level);
-                pInfo[level] = pInfo[level-1];
             }
+
+            if(pInfo[level].mana == 0)
+                pInfo[level].mana == uint16(pInfo[level-1].mana * (level+1)/level + 1);
+
+            if(pInfo[level].armor == 0)
+                pInfo[level].armor == uint16(pInfo[level-1].armor * (level+1)/level + 1);
+
+            if(pInfo[level].mindmg == 0)
+                pInfo[level].mindmg == uint32(pInfo[level-1].mindmg * (level+1)/level + 1);
+
+            if(pInfo[level].maxdmg == 0)
+                pInfo[level].maxdmg == uint32(pInfo[level-1].maxdmg * (level+1)/level + 1);
+
+            if(pInfo[level].attackpower == 0)
+                pInfo[level].attackpower == uint32(pInfo[level-1].attackpower * (level+1)/level + 1);
+
+            for (int i = 0; i < MAX_STATS; i++)
+            {
+                pInfo[level].stats[i] = uint16(pInfo[level-1].stats[i] * (level+1)/level + 1);
+            }
+
         }
     }
 }

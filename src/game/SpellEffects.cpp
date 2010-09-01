@@ -4122,7 +4122,7 @@ void Spell::EffectSummonType(SpellEffectIndex eff_idx)
             //1562 - force of nature  - sid 33831
             //1161 - feral spirit - sid 51533
             //89 - Infernal - sid 1122
-            DoSummon(eff_idx);
+            DoSummonGroupPets(eff_idx);
             break;
         }
         case SUMMON_PROP_GROUP_CONTROLLABLE:
@@ -4144,7 +4144,7 @@ void Spell::EffectSummonType(SpellEffectIndex eff_idx)
     }
 }
 
-void Spell::DoSummon(SpellEffectIndex eff_idx)
+void Spell::DoSummonGroupPets(SpellEffectIndex eff_idx)
 {
     if (m_caster->GetPetGUID())
         return;
@@ -4201,6 +4201,7 @@ void Spell::DoSummon(SpellEffectIndex eff_idx)
                         Pet* creature = new Pet(SUMMON_PET);
                         if (creature->LoadPetFromDB((Player*)summoner,pet_entry, petnumber[i]))
                         {
+
                             // Summon in dest location
                             float x, y, z;
                             if (m_targets.m_targetMask & TARGET_FLAG_DEST_LOCATION)
@@ -4212,15 +4213,16 @@ void Spell::DoSummon(SpellEffectIndex eff_idx)
                             else
                                summoner->GetClosePoint(x, y, z, creature->GetObjectBoundingRadius(), PET_FOLLOW_DIST, creature->GetPetFollowAngle());
 
-                            creature->Relocate(x, y, z, -summoner->GetOrientation());
-                            creature->SetSummonPoint(x, y, z, -summoner->GetOrientation());
-
                             if (petindex == 0)
                                 creature->SetPetFollowAngle(PET_DEFAULT_FOLLOW_ANGLE);
                             else if (petindex == 1)
                                 creature->SetPetFollowAngle(M_PI_F * 1.5f);
                             else if (petindex == 2)
                                 creature->SetPetFollowAngle(M_PI_F);
+
+                            creature->Relocate(x, y, z, -summoner->GetOrientation());
+                            creature->SetSummonPoint(x, y, z, -summoner->GetOrientation());
+
 
                             --amount;
                             ++petindex;
@@ -4240,7 +4242,7 @@ void Spell::DoSummon(SpellEffectIndex eff_idx)
     {
         Pet* creature;
 
-        if (duration == 0 || duration >= 60000)
+        if (duration == 0 || duration >= 60001)
             creature = new Pet(SUMMON_PET);
         else creature = new Pet(GUARDIAN_PET);
 
@@ -4249,7 +4251,7 @@ void Spell::DoSummon(SpellEffectIndex eff_idx)
         if (!creature->Create(map->GenerateLocalLowGuid(HIGHGUID_PET), map, summoner->GetPhaseMask(),
             m_spellInfo->EffectMiscValue[eff_idx], pet_number))
         {
-            sLog.outErrorDb("Spell::EffectSummon: no such creature entry %u",m_spellInfo->EffectMiscValue[eff_idx]);
+            sLog.outErrorDb("Spell::EffectSummonGroupPets: no such creature entry %u",m_spellInfo->EffectMiscValue[eff_idx]);
             delete creature;
             return;
         }
@@ -4267,15 +4269,15 @@ void Spell::DoSummon(SpellEffectIndex eff_idx)
         else
             summoner->GetClosePoint(x, y, z, creature->GetObjectBoundingRadius(), PET_FOLLOW_DIST, creature->GetPetFollowAngle());
 
-        creature->Relocate(x, y, z, -summoner->GetOrientation());
-        creature->SetSummonPoint(x, y, z, -summoner->GetOrientation());
-
         if (petindex == 0)
             creature->SetPetFollowAngle(PET_DEFAULT_FOLLOW_ANGLE);
         else if (petindex == 1)
             creature->SetPetFollowAngle(M_PI_F * 1.5f);
         else if (petindex == 2)
             creature->SetPetFollowAngle(M_PI_F);
+
+        creature->Relocate(x, y, z, -summoner->GetOrientation());
+        creature->SetSummonPoint(x, y, z, -summoner->GetOrientation());
 
         if (!creature->IsPositionValid())
         {
@@ -4292,7 +4294,6 @@ void Spell::DoSummon(SpellEffectIndex eff_idx)
         creature->SetOwnerGUID(summoner->GetGUID());
         creature->SetCreatorGUID(m_caster->GetGUID());
         creature->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
-//        creature->setPowerType(POWER_MANA);
         creature->setFaction(m_caster->getFaction());
         creature->SetUInt32Value(UNIT_FIELD_FLAGS, 0);
         creature->SetUInt32Value(UNIT_FIELD_BYTES_0, 2048);
@@ -4322,7 +4323,7 @@ void Spell::DoSummon(SpellEffectIndex eff_idx)
         creature->LoadCreaturesAddon(true);
 
         // re-init stats because of GetOwner returning null before adding to map
-        creature->InitStatsForLevel(level, m_caster);
+//        creature->InitStatsForLevel(level, m_caster);
 
         summoner->SetPet(creature);
 

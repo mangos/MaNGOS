@@ -222,6 +222,9 @@ struct PetLevelInfo
     uint16 health;
     uint16 mana;
     uint16 armor;
+    uint32 mindmg;
+    uint32 maxdmg;
+    uint32 attackpower;
 };
 
 struct MailLevelReward
