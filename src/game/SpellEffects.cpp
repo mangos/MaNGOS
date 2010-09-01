@@ -4160,8 +4160,9 @@ void Spell::DoSummonGroupPets(SpellEffectIndex eff_idx)
     uint32 level = m_caster->getLevel();
 
     int32 duration = GetSpellDuration(m_spellInfo);
-    if (duration == 0)
-        duration = DAY*IN_MILLISECONDS;  // Infinity, by pets limitation.
+
+    if (pet_entry == 37994)    // Mage: Water Elemental from Glyph
+        duration = 4294967294; // infinity
 
     if(Player* modOwner = m_caster->GetSpellModOwner())
         modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_DURATION, duration);
@@ -4229,6 +4230,7 @@ void Spell::DoSummonGroupPets(SpellEffectIndex eff_idx)
                             // set timer for unsummon
                             if (duration > 0)
                                 creature->SetDuration(duration);
+                            creature->LoadCreaturesAddon(true);
                         }
                         else
                             delete creature;
@@ -4240,11 +4242,7 @@ void Spell::DoSummonGroupPets(SpellEffectIndex eff_idx)
 
     for (int32 count = 0; count < amount; ++count)
     {
-        Pet* creature;
-
-        if (duration == 0 || duration >= 60001)
-            creature = new Pet(SUMMON_PET);
-        else creature = new Pet(GUARDIAN_PET);
+        Pet* creature = new Pet(SUMMON_PET);
 
         Map *map = summoner->GetMap();
         uint32 pet_number = sObjectMgr.GeneratePetNumber();
