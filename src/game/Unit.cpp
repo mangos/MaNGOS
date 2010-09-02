@@ -4212,6 +4212,12 @@ bool Unit::AddSpellAuraHolder(SpellAuraHolder *holder)
                     (*itr)->GetTarget()->RemoveSpellAuraHolder((*itr));
                     restart = true;
                     break;
+                }  
+                // Judgements are always single 
+                else if (GetSpellSpecific(holder->GetId()) == SPELL_JUDGEMENT)
+                {
+                    (*itr)->GetTarget()->RemoveSpellAuraHolder((*itr));
+                    break;
                 }
             }
 
