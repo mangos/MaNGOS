@@ -19,6 +19,7 @@
 #ifndef MANGOS_OBJECTACCESSOR_H
 #define MANGOS_OBJECTACCESSOR_H
 
+#include "Common.h"
 #include "Platform/Define.h"
 #include "Policies/Singleton.h"
 #include <ace/Thread_Mutex.h>

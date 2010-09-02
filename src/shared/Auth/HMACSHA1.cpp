@@ -49,7 +49,7 @@ void HMACSHA1::Finalize()
 {
     uint32 length = 0;
     HMAC_Final(&m_ctx, (uint8*)m_digest, &length);
-    ASSERT(length == SHA_DIGEST_LENGTH);
+    MANGOS_ASSERT(length == SHA_DIGEST_LENGTH);
 }
 
 uint8 *HMACSHA1::ComputeHash(BigNumber *bn)

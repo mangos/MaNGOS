@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "Common.h"
+#include "Unit.h"
 #include "Log.h"
 #include "Opcodes.h"
 #include "WorldPacket.h"
@@ -25,7 +25,6 @@
 #include "ObjectMgr.h"
 #include "ObjectGuid.h"
 #include "SpellMgr.h"
-#include "Unit.h"
 #include "QuestDef.h"
 #include "Player.h"
 #include "Creature.h"
@@ -271,10 +270,10 @@ Unit::~Unit()
         delete m_charmInfo;
 
     // those should be already removed at "RemoveFromWorld()" call
-    ASSERT(m_gameObj.size() == 0);
-    ASSERT(m_dynObjGUIDs.size() == 0);
-    ASSERT(m_deletedAuras.size() == 0);
-    ASSERT(m_deletedHolders.size() == 0);
+    MANGOS_ASSERT(m_gameObj.size() == 0);
+    MANGOS_ASSERT(m_dynObjGUIDs.size() == 0);
+    MANGOS_ASSERT(m_deletedAuras.size() == 0);
+    MANGOS_ASSERT(m_deletedHolders.size() == 0);
 }
 
 void Unit::Update( uint32 p_time )
@@ -571,7 +570,7 @@ void Unit::resetAttackTimer(WeaponAttackType type)
 
 bool Unit::canReachWithAttack(Unit *pVictim) const
 {
-    ASSERT(pVictim);
+    MANGOS_ASSERT(pVictim);
     float reach = GetFloatValue(UNIT_FIELD_COMBATREACH);
     if( reach <= 0.0f )
         reach = 1.0f;
@@ -1022,10 +1021,10 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
         // last damage from non duel opponent or opponent controlled creature
         if(duel_hasEnded)
         {
-            ASSERT(pVictim->GetTypeId()==TYPEID_PLAYER);
+            MANGOS_ASSERT(pVictim->GetTypeId()==TYPEID_PLAYER);
             Player *he = (Player*)pVictim;
 
-            ASSERT(he->duel);
+            MANGOS_ASSERT(he->duel);
 
             he->duel->opponent->CombatStopWithPets(true);
             he->CombatStopWithPets(true);
@@ -1198,10 +1197,10 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
         // last damage from duel opponent
         if(duel_hasEnded)
         {
-            ASSERT(pVictim->GetTypeId()==TYPEID_PLAYER);
+            MANGOS_ASSERT(pVictim->GetTypeId()==TYPEID_PLAYER);
             Player *he = (Player*)pVictim;
 
-            ASSERT(he->duel);
+            MANGOS_ASSERT(he->duel);
 
             he->SetHealth(1);
 
@@ -3663,7 +3662,7 @@ void Unit::_UpdateAutoRepeatSpell()
 
 void Unit::SetCurrentCastedSpell( Spell * pSpell )
 {
-    ASSERT(pSpell);                                         // NULL may be never passed here, use InterruptSpell or InterruptNonMeleeSpells
+    MANGOS_ASSERT(pSpell);                                  // NULL may be never passed here, use InterruptSpell or InterruptNonMeleeSpells
 
     CurrentSpellTypes CSpellType = pSpell->GetCurrentContainer();
 
@@ -3734,7 +3733,7 @@ void Unit::SetCurrentCastedSpell( Spell * pSpell )
 
 void Unit::InterruptSpell(CurrentSpellTypes spellType, bool withDelayed, bool sendAutoRepeatCancelToClient)
 {
-    ASSERT(spellType < CURRENT_MAX_SPELL);
+    MANGOS_ASSERT(spellType < CURRENT_MAX_SPELL);
 
     if (m_currentSpells[spellType] && (withDelayed || m_currentSpells[spellType]->getState() != SPELL_STATE_DELAYED) )
     {
@@ -5099,7 +5098,7 @@ GameObject* Unit::GetGameObject(uint32 spellId) const
 
 void Unit::AddGameObject(GameObject* gameObj)
 {
-    ASSERT(gameObj && gameObj->GetOwnerGUID()==0);
+    MANGOS_ASSERT(gameObj && gameObj->GetOwnerGUID()==0);
     m_gameObj.push_back(gameObj);
     gameObj->SetOwnerGUID(GetGUID());
 
@@ -5115,7 +5114,7 @@ void Unit::AddGameObject(GameObject* gameObj)
 
 void Unit::RemoveGameObject(GameObject* gameObj, bool del)
 {
-    ASSERT(gameObj && gameObj->GetOwnerGUID()==GetGUID());
+    MANGOS_ASSERT(gameObj && gameObj->GetOwnerGUID()==GetGUID());
 
     gameObj->SetOwnerGUID(0);
 
@@ -8693,7 +8692,7 @@ void Unit::DeleteThreatList()
 
 void Unit::TauntApply(Unit* taunter)
 {
-    ASSERT(GetTypeId()== TYPEID_UNIT);
+    MANGOS_ASSERT(GetTypeId()== TYPEID_UNIT);
 
     if(!taunter || (taunter->GetTypeId() == TYPEID_PLAYER && ((Player*)taunter)->isGameMaster()))
         return;
@@ -8716,7 +8715,7 @@ void Unit::TauntApply(Unit* taunter)
 
 void Unit::TauntFadeOut(Unit *taunter)
 {
-    ASSERT(GetTypeId()== TYPEID_UNIT);
+    MANGOS_ASSERT(GetTypeId()== TYPEID_UNIT);
 
     if(!taunter || (taunter->GetTypeId() == TYPEID_PLAYER && ((Player*)taunter)->isGameMaster()))
         return;
@@ -8758,7 +8757,7 @@ bool Unit::SelectHostileTarget()
     //next-victim-selection algorithm and evade mode are called
     //threat list sorting etc.
 
-    ASSERT(GetTypeId()== TYPEID_UNIT);
+    MANGOS_ASSERT(GetTypeId()== TYPEID_UNIT);
 
     if (!this->isAlive())
         return false;

@@ -68,9 +68,9 @@ if (!(CONDITION)) \
 #endif
 
 #ifdef MANGOS_DEBUG
-#  define ASSERT WPError
+#  define MANGOS_ASSERT WPError
 #else
-#  define ASSERT WPError // Error even if in release mode.
+#  define MANGOS_ASSERT WPError                             // Error even if in release mode.
 #endif
 
 #endif

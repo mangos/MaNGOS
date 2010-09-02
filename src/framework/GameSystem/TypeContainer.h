@@ -24,6 +24,7 @@
  * types of object at the same time.
  */
 
+#include <cassert>
 #include <map>
 #include <vector>
 #include "Platform/Define.h"
@@ -89,7 +90,7 @@ class TypeUnorderedMapContainer
             }
             else
             {
-                ASSERT(i->second == obj && "Object with certain key already in but objects are different!");
+                assert(i->second == obj && "Object with certain key already in but objects are different!");
                 return false;
             }
         }

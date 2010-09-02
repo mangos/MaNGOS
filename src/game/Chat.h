@@ -24,6 +24,7 @@
 #include "ObjectGuid.h"
 
 struct AchievementEntry;
+struct AchievementCriteriaEntry;
 struct AreaTrigger;
 struct AreaTriggerEntry;
 struct FactionEntry;

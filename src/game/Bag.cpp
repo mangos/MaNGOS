@@ -16,7 +16,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "Common.h"
 #include "Bag.h"
 #include "ObjectMgr.h"
 #include "Database/DatabaseEnv.h"
@@ -136,7 +135,7 @@ uint32 Bag::GetFreeSlots() const
 
 void Bag::RemoveItem( uint8 slot, bool /*update*/ )
 {
-    ASSERT(slot < MAX_BAG_SIZE);
+    MANGOS_ASSERT(slot < MAX_BAG_SIZE);
 
     if (m_bagslot[slot])
         m_bagslot[slot]->SetContainer(NULL);
@@ -147,7 +146,7 @@ void Bag::RemoveItem( uint8 slot, bool /*update*/ )
 
 void Bag::StoreItem( uint8 slot, Item *pItem, bool /*update*/ )
 {
-    ASSERT(slot < MAX_BAG_SIZE);
+    MANGOS_ASSERT(slot < MAX_BAG_SIZE);
 
     if( pItem )
     {

@@ -71,7 +71,7 @@ MotionMaster::UpdateMotion(uint32 diff)
         return;
   if ( !empty() )
   {
-    ASSERT( !empty() );
+    MANGOS_ASSERT( !empty() );
     m_cleanFlag |= MMCF_UPDATE;
     if (!top()->Update(*i_owner, diff))
     {

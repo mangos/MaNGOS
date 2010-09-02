@@ -19,13 +19,14 @@
 #ifndef DO_POSTGRESQL
 
 #include "DatabaseEnv.h"
+#include "Errors.h"
 
 QueryResultMysql::QueryResultMysql(MYSQL_RES *result, MYSQL_FIELD *fields, uint64 rowCount, uint32 fieldCount) :
     QueryResult(rowCount, fieldCount), mResult(result)
 {
 
     mCurrentRow = new Field[mFieldCount];
-    ASSERT(mCurrentRow);
+    MANGOS_ASSERT(mCurrentRow);
 
     for (uint32 i = 0; i < mFieldCount; i++)
         mCurrentRow[i].SetType(ConvertNativeType(fields[i].type));

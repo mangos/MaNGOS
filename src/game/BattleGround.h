@@ -393,7 +393,7 @@ class BattleGround
         void SetBgMap(BattleGroundMap* map) { m_Map = map; }
         BattleGroundMap* GetBgMap()
         {
-            ASSERT(m_Map);
+            MANGOS_ASSERT(m_Map);
             return m_Map;
         }
 

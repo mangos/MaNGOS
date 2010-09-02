@@ -19,6 +19,8 @@
 #if !defined(QUERYRESULT_H)
 #define QUERYRESULT_H
 
+#include "Errors.h"
+
 class MANGOS_DLL_SPEC QueryResult
 {
     public:
@@ -68,7 +70,7 @@ class MANGOS_DLL_SPEC QueryNamedResult
                 if(mFieldNames[idx] == name)
                     return idx;
             }
-            ASSERT(false && "unknown field name");
+            MANGOS_ASSERT(false && "unknown field name");
             return uint32(-1);
         }
 

@@ -16,14 +16,13 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "Common.h"
+#include "AuctionHouseMgr.h"
 #include "Database/DatabaseEnv.h"
 #include "Database/SQLStorage.h"
 #include "DBCStores.h"
 #include "ProgressBar.h"
 
 #include "AccountMgr.h"
-#include "AuctionHouseMgr.h"
 #include "Item.h"
 #include "Language.h"
 #include "Log.h"
@@ -439,8 +438,8 @@ void AuctionHouseMgr::LoadAuctions()
 
 void AuctionHouseMgr::AddAItem( Item* it )
 {
-    ASSERT( it );
-    ASSERT( mAitems.find(it->GetGUIDLow()) == mAitems.end());
+    MANGOS_ASSERT( it );
+    MANGOS_ASSERT( mAitems.find(it->GetGUIDLow()) == mAitems.end());
     mAitems[it->GetGUIDLow()] = it;
 }
 
