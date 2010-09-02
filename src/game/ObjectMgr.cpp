@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "Common.h"
+#include "ObjectMgr.h"
 #include "Database/DatabaseEnv.h"
 #include "Database/SQLStorage.h"
 #include "Database/SQLStorageImpl.h"
@@ -24,7 +24,6 @@
 
 #include "Log.h"
 #include "MapManager.h"
-#include "ObjectMgr.h"
 #include "ObjectGuid.h"
 #include "SpellMgr.h"
 #include "UpdateMask.h"
@@ -6106,10 +6105,10 @@ uint32 ObjectMgr::GenerateLowGuid(HighGuid guidhigh)
         case HIGHGUID_CORPSE:
             return m_CorpseGuids.Generate();
         default:
-            ASSERT(0);
+            MANGOS_ASSERT(0);
     }
 
-    ASSERT(0);
+    MANGOS_ASSERT(0);
     return 0;
 }
 

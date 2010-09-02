@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+
 #include "Camera.h"
 #include "GridNotifiersImpl.h"
 #include "CellImpl.h"
@@ -13,7 +31,7 @@ Camera::Camera(Player* pl) : m_owner(*pl), m_source(pl)
 Camera::~Camera()
 {
     // view of camera should be already reseted to owner (RemoveFromWorld -> Event_RemovedFromWorld -> ResetView)
-    ASSERT(m_source == &m_owner);	
+    MANGOS_ASSERT(m_source == &m_owner);	
 
     // for symmetry with constructor and way to make viewpoint's list empty
     m_source->GetViewPoint().Detach(this);
@@ -37,7 +55,7 @@ void Camera::UpdateForCurrentViewPoint()
 
 void Camera::SetView(WorldObject *obj)
 {
-    ASSERT(obj);
+    MANGOS_ASSERT(obj);
 
     if (m_source == obj)
         return;
@@ -83,7 +101,7 @@ void Camera::ResetView()
 void Camera::Event_AddedToWorld()
 {
     GridType* grid = m_source->GetViewPoint().m_grid;
-    ASSERT(grid);
+    MANGOS_ASSERT(grid);
     grid->AddWorldObject(this);
 
     UpdateVisibilityForOwner();

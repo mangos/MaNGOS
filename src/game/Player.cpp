@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "Common.h"
+#include "Player.h"
 #include "Language.h"
 #include "Database/DatabaseEnv.h"
 #include "Log.h"
@@ -26,7 +26,6 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include "UpdateMask.h"
-#include "Player.h"
 #include "Vehicle.h"
 #include "SkillDiscovery.h"
 #include "QuestDef.h"
@@ -4424,7 +4423,7 @@ void Player::BuildPlayerRepop()
     if(GetCorpse())
     {
         sLog.outError("BuildPlayerRepop: player %s(%d) already has a corpse", GetName(), GetGUIDLow());
-        ASSERT(false);
+        MANGOS_ASSERT(false);
     }
 
     // create a corpse and place it at the player's location
@@ -8572,7 +8571,7 @@ void Player::SendPetSkillWipeConfirm()
 
 void Player::SetVirtualItemSlot( uint8 i, Item* item)
 {
-    ASSERT(i < 3);
+    MANGOS_ASSERT(i < 3);
     if(i < 2 && item)
     {
         if(!item->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT))
@@ -12183,7 +12182,7 @@ void Player::UpdateEnchantTime(uint32 time)
 {
     for(EnchantDurationList::iterator itr = m_enchantDuration.begin(),next;itr != m_enchantDuration.end();itr=next)
     {
-        ASSERT(itr->item);
+        MANGOS_ASSERT(itr->item);
         next = itr;
         if (!itr->item->GetEnchantmentId(itr->slot))
         {
@@ -13088,7 +13087,7 @@ void Player::PrepareQuestMenu( uint64 guid )
         //we should obtain map pointer from GetMap() in 99% of cases. Special case
         //only for quests which cast teleport spells on player
         Map * _map = IsInWorld() ? GetMap() : sMapMgr.FindMap(GetMapId(), GetInstanceId());
-        ASSERT(_map);
+        MANGOS_ASSERT(_map);
         GameObject *pGameObject = _map->GetGameObject(guid);
         if( pGameObject )
         {
@@ -13255,7 +13254,7 @@ Quest const * Player::GetNextQuest( uint64 guid, Quest const *pQuest )
         //we should obtain map pointer from GetMap() in 99% of cases. Special case
         //only for quests which cast teleport spells on player
         Map * _map = IsInWorld() ? GetMap() : sMapMgr.FindMap(GetMapId(), GetInstanceId());
-        ASSERT(_map);
+        MANGOS_ASSERT(_map);
         GameObject *pGameObject = _map->GetGameObject(guid);
         if( pGameObject )
         {
@@ -13484,7 +13483,7 @@ void Player::SendPetTameFailure(PetTameFailureReason reason)
 void Player::AddQuest( Quest const *pQuest, Object *questGiver )
 {
     uint16 log_slot = FindQuestSlot( 0 );
-    ASSERT(log_slot < MAX_QUEST_LOG_SIZE);
+    MANGOS_ASSERT(log_slot < MAX_QUEST_LOG_SIZE);
 
     uint32 quest_id = pQuest->GetQuestId();
 
@@ -13870,7 +13869,7 @@ bool Player::SatisfyQuestPreviousQuest( Quest const* qInfo, bool msg ) const
                 ObjectMgr::ExclusiveQuestGroups::const_iterator iter2 = sObjectMgr.mExclusiveQuestGroups.lower_bound(qPrevInfo->GetExclusiveGroup());
                 ObjectMgr::ExclusiveQuestGroups::const_iterator end  = sObjectMgr.mExclusiveQuestGroups.upper_bound(qPrevInfo->GetExclusiveGroup());
 
-                ASSERT(iter2!=end);                         // always must be found if qPrevInfo->ExclusiveGroup != 0
+                MANGOS_ASSERT(iter2!=end);                  // always must be found if qPrevInfo->ExclusiveGroup != 0
 
                 for(; iter2 != end; ++iter2)
                 {
@@ -13904,7 +13903,7 @@ bool Player::SatisfyQuestPreviousQuest( Quest const* qInfo, bool msg ) const
                 ObjectMgr::ExclusiveQuestGroups::const_iterator iter2 = sObjectMgr.mExclusiveQuestGroups.lower_bound(qPrevInfo->GetExclusiveGroup());
                 ObjectMgr::ExclusiveQuestGroups::const_iterator end  = sObjectMgr.mExclusiveQuestGroups.upper_bound(qPrevInfo->GetExclusiveGroup());
 
-                ASSERT(iter2!=end);                         // always must be found if qPrevInfo->ExclusiveGroup != 0
+                MANGOS_ASSERT(iter2!=end);                  // always must be found if qPrevInfo->ExclusiveGroup != 0
 
                 for(; iter2 != end; ++iter2)
                 {
@@ -14003,7 +14002,7 @@ bool Player::SatisfyQuestExclusiveGroup( Quest const* qInfo, bool msg ) const
     ObjectMgr::ExclusiveQuestGroups::const_iterator iter = sObjectMgr.mExclusiveQuestGroups.lower_bound(qInfo->GetExclusiveGroup());
     ObjectMgr::ExclusiveQuestGroups::const_iterator end  = sObjectMgr.mExclusiveQuestGroups.upper_bound(qInfo->GetExclusiveGroup());
 
-    ASSERT(iter!=end);                                      // always must be found if qInfo->ExclusiveGroup != 0
+    MANGOS_ASSERT(iter!=end);                               // always must be found if qInfo->ExclusiveGroup != 0
 
     for(; iter != end; ++iter)
     {
@@ -14837,7 +14836,7 @@ void Player::SendQuestUpdateAddItem( Quest const* /*pQuest*/, uint32 /*item_idx*
 
 void Player::SendQuestUpdateAddCreatureOrGo( Quest const* pQuest, ObjectGuid guid, uint32 creatureOrGO_idx, uint32 old_count, uint32 add_count )
 {
-    ASSERT(old_count + add_count < 65536 && "mob/GO count store in 16 bits 2^16 = 65536 (0..65536)");
+    MANGOS_ASSERT(old_count + add_count < 65536 && "mob/GO count store in 16 bits 2^16 = 65536 (0..65536)");
 
     int32 entry = pQuest->ReqCreatureOrGOId[ creatureOrGO_idx ];
     if (entry < 0)
@@ -15507,7 +15506,7 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
     {
         // save source node as recall coord to prevent recall and fall from sky
         TaxiNodesEntry const* nodeEntry = sTaxiNodesStore.LookupEntry(node_id);
-        ASSERT(nodeEntry);                                  // checked in m_taxi.LoadTaxiDestinationsFromString
+        MANGOS_ASSERT(nodeEntry);                           // checked in m_taxi.LoadTaxiDestinationsFromString
         m_recallMap = nodeEntry->map_id;
         m_recallX = nodeEntry->x;
         m_recallY = nodeEntry->y;
@@ -16629,7 +16628,7 @@ void Player::ConvertInstancesToGroup(Player *player, Group *group, ObjectGuid pl
             group = player->GetGroup();
     }
 
-    ASSERT(!player_guid.IsEmpty());
+    MANGOS_ASSERT(!player_guid.IsEmpty());
 
     // copy all binds to the group, when changing leader it's assumed the character
     // will not have any solo binds
@@ -18467,7 +18466,7 @@ void Player::ProhibitSpellSchool(SpellSchoolMask idSchoolMask, uint32 unTimeMs )
         SpellEntry const *spellInfo = sSpellStore.LookupEntry(unSpellId);
         if (!spellInfo)
         {
-            ASSERT(spellInfo);
+            MANGOS_ASSERT(spellInfo);
             continue;
         }
 
@@ -19491,7 +19490,7 @@ void Player::SetGroup(Group *group, int8 subgroup)
     else
     {
         // never use SetGroup without a subgroup unless you specify NULL for group
-        ASSERT(subgroup >= 0);
+        MANGOS_ASSERT(subgroup >= 0);
         m_group.link(group, this);
         m_group.setSubGroup((uint8)subgroup);
     }
@@ -20642,7 +20641,7 @@ void Player::SetOriginalGroup(Group *group, int8 subgroup)
     else
     {
         // never use SetOriginalGroup without a subgroup unless you specify NULL for group
-        ASSERT(subgroup >= 0);
+        MANGOS_ASSERT(subgroup >= 0);
         m_originalGroup.link(group, this);
         m_originalGroup.setSubGroup((uint8)subgroup);
     }

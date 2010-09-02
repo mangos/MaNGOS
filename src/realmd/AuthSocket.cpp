@@ -451,7 +451,7 @@ bool AuthSocket::_HandleLogonChallenge()
                     BigNumber gmod = g.ModExp(b, N);
                     B = ((v * 3) + gmod) % N;
 
-                    ASSERT(gmod.GetNumBytes() <= 32);
+                    MANGOS_ASSERT(gmod.GetNumBytes() <= 32);
 
                     BigNumber unk3;
                     unk3.SetRand(16 * 8);

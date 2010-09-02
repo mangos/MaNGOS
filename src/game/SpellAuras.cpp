@@ -377,9 +377,9 @@ m_timeCla(1000), m_periodicTimer(0), m_periodicTick(0), m_removeMode(AURA_REMOVE
 m_effIndex(eff), m_spellAuraHolder(holder), m_isPersistent(false),
 m_positive(false), m_isPeriodic(false), m_isAreaAura(false), m_in_use(0)
 {
-    ASSERT(target);
+    MANGOS_ASSERT(target);
 
-    ASSERT(spellproto && spellproto == sSpellStore.LookupEntry( spellproto->Id ) && "`info` must be pointer to sSpellStore element");
+    MANGOS_ASSERT(spellproto && spellproto == sSpellStore.LookupEntry( spellproto->Id ) && "`info` must be pointer to sSpellStore element");
 
     m_currentBasePoints = currentBasePoints ? *currentBasePoints : spellproto->CalculateSimpleValue(eff);
 
@@ -503,7 +503,7 @@ Unit *caster, Item* castItem) : Aura(spellproto, eff, currentBasePoints, holder,
             break;
         default:
             sLog.outError("Wrong spell effect in AreaAura constructor");
-            ASSERT(false);
+            MANGOS_ASSERT(false);
             break;
     }
 }
@@ -7704,15 +7704,15 @@ m_castItemGuid(castItem?castItem->GetGUID():0), m_permanent(false),
 m_isRemovedOnShapeLost(true), m_in_use(0), m_deleted(false), m_removeMode(AURA_REMOVE_BY_DEFAULT), m_AuraDRGroup(DIMINISHING_NONE), m_auraSlot(MAX_AURAS),
 m_auraFlags(AFLAG_NONE), m_auraLevel(1), m_procCharges(0), m_stackAmount(1)
 {
-    ASSERT(target);
-    ASSERT(spellproto && spellproto == sSpellStore.LookupEntry( spellproto->Id ) && "`info` must be pointer to sSpellStore element");
+    MANGOS_ASSERT(target);
+    MANGOS_ASSERT(spellproto && spellproto == sSpellStore.LookupEntry( spellproto->Id ) && "`info` must be pointer to sSpellStore element");
 
     if(!caster)
         m_caster_guid = target->GetGUID();
     else
     {
         // remove this assert when not unit casters will be supported
-        ASSERT(caster->GetObjectGuid().IsUnit())
+        MANGOS_ASSERT(caster->GetObjectGuid().IsUnit())
         m_caster_guid = caster->GetGUID();
     }
 
@@ -8875,7 +8875,7 @@ void SpellAuraHolder::UnregisterSingleCastHolder()
         else
         {
             sLog.outError("Couldn't find the caster of the single target aura (SpellId %u), may crash later!", GetId());
-            ASSERT(false);
+            MANGOS_ASSERT(false);
         }
         m_isSingleTarget = false;
     }

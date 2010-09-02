@@ -16,13 +16,12 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "Common.h"
+#include "Pet.h"
 #include "Database/DatabaseEnv.h"
 #include "Log.h"
 #include "WorldPacket.h"
 #include "ObjectMgr.h"
 #include "SpellMgr.h"
-#include "Pet.h"
 #include "Formulas.h"
 #include "SpellAuras.h"
 #include "CreatureAI.h"
@@ -492,7 +491,7 @@ void Pet::Update(uint32 diff)
         {
             if( m_deathTimer <= diff )
             {
-                ASSERT(getPetType()!=SUMMON_PET && "Must be already removed.");
+                MANGOS_ASSERT(getPetType()!=SUMMON_PET && "Must be already removed.");
                 Remove(PET_SAVE_NOT_IN_SLOT);               //hunters' pets never get removed because of death, NEVER!
                 return;
             }
@@ -797,7 +796,7 @@ bool Pet::CreateBaseAtCreature(Creature* creature)
 bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
 {
     CreatureInfo const *cinfo = GetCreatureInfo();
-    ASSERT(cinfo);
+    MANGOS_ASSERT(cinfo);
 
     if(!owner)
     {

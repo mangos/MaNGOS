@@ -16,14 +16,13 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "Common.h"
+#include "Creature.h"
 #include "Database/DatabaseEnv.h"
 #include "WorldPacket.h"
 #include "World.h"
 #include "ObjectMgr.h"
 #include "ObjectGuid.h"
 #include "SpellMgr.h"
-#include "Creature.h"
 #include "QuestDef.h"
 #include "GossipDef.h"
 #include "Player.h"
@@ -686,7 +685,7 @@ bool Creature::AIM_Initialize()
 
 bool Creature::Create(uint32 guidlow, Map *map, uint32 phaseMask, uint32 Entry, uint32 team, const CreatureData *data)
 {
-    ASSERT(map);
+    MANGOS_ASSERT(map);
     SetMap(map);
     SetPhaseMask(phaseMask,false);
 

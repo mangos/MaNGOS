@@ -128,7 +128,7 @@ ObjectAccessor::GetCorpseForPlayerGUID(ObjectGuid guid)
     Player2CorpsesMapType::iterator iter = i_player2corpse.find(guid.GetRawValue());
     if( iter == i_player2corpse.end() ) return NULL;
 
-    ASSERT(iter->second->GetType() != CORPSE_BONES);
+    MANGOS_ASSERT(iter->second->GetType() != CORPSE_BONES);
 
     return iter->second;
 }
@@ -136,7 +136,7 @@ ObjectAccessor::GetCorpseForPlayerGUID(ObjectGuid guid)
 void
 ObjectAccessor::RemoveCorpse(Corpse *corpse)
 {
-    ASSERT(corpse && corpse->GetType() != CORPSE_BONES);
+    MANGOS_ASSERT(corpse && corpse->GetType() != CORPSE_BONES);
 
     Guard guard(i_corpseGuard);
     Player2CorpsesMapType::iterator iter = i_player2corpse.find(corpse->GetOwnerGUID());
@@ -156,10 +156,10 @@ ObjectAccessor::RemoveCorpse(Corpse *corpse)
 void
 ObjectAccessor::AddCorpse(Corpse *corpse)
 {
-    ASSERT(corpse && corpse->GetType() != CORPSE_BONES);
+    MANGOS_ASSERT(corpse && corpse->GetType() != CORPSE_BONES);
 
     Guard guard(i_corpseGuard);
-    ASSERT(i_player2corpse.find(corpse->GetOwnerGUID()) == i_player2corpse.end());
+    MANGOS_ASSERT(i_player2corpse.find(corpse->GetOwnerGUID()) == i_player2corpse.end());
     i_player2corpse[corpse->GetOwnerGUID()] = corpse;
 
     // build mapid*cellid -> guid_set map

@@ -103,9 +103,9 @@ Map* MapInstanced::CreateInstance(Player * player)
     {
         // find existing bg map for player
         NewInstanceId = player->GetBattleGroundId();
-        ASSERT(NewInstanceId);
+        MANGOS_ASSERT(NewInstanceId);
         map = _FindMap(NewInstanceId);
-        ASSERT(map);
+        MANGOS_ASSERT(map);
     }
     else if (InstanceSave* pSave = player->GetBoundInstanceSaveForSelfOrGroup(GetId()))
     {
@@ -138,12 +138,12 @@ InstanceMap* MapInstanced::CreateInstanceMap(uint32 InstanceId, Difficulty diffi
     if (!sMapStore.LookupEntry(GetId()))
     {
         sLog.outError("CreateInstanceMap: no entry for map %d", GetId());
-        ASSERT(false);
+        MANGOS_ASSERT(false);
     }
     if (!ObjectMgr::GetInstanceTemplate(GetId()))
     {
         sLog.outError("CreateInstanceMap: no instance template for map %d", GetId());
-        ASSERT(false);
+        MANGOS_ASSERT(false);
     }
 
     // some instances only have one difficulty
@@ -153,7 +153,7 @@ InstanceMap* MapInstanced::CreateInstanceMap(uint32 InstanceId, Difficulty diffi
     DEBUG_LOG("MapInstanced::CreateInstanceMap: %s map instance %d for %d created with difficulty %d", save?"":"new ", InstanceId, GetId(), difficulty);
 
     InstanceMap *map = new InstanceMap(GetId(), GetGridExpiry(), InstanceId, difficulty, this);
-    ASSERT(map->IsDungeon());
+    MANGOS_ASSERT(map->IsDungeon());
 
     bool load_data = save != NULL;
     map->CreateInstanceData(load_data);
@@ -174,7 +174,7 @@ BattleGroundMap* MapInstanced::CreateBattleGroundMap(uint32 InstanceId, BattleGr
     uint8 spawnMode = bracketEntry ? bracketEntry->difficulty : REGULAR_DIFFICULTY;
 
     BattleGroundMap *map = new BattleGroundMap(GetId(), GetGridExpiry(), InstanceId, this, spawnMode);
-    ASSERT(map->IsBattleGroundOrArena());
+    MANGOS_ASSERT(map->IsBattleGroundOrArena());
     map->SetBG(bg);
     bg->SetBgMap(map);
 

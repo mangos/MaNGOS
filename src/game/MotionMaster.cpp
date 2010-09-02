@@ -69,7 +69,7 @@ MotionMaster::UpdateMotion(uint32 diff)
 {
     if( i_owner->hasUnitState(UNIT_STAT_CAN_NOT_MOVE) )
         return;
-    ASSERT( !empty() );
+    MANGOS_ASSERT( !empty() );
     m_cleanFlag |= MMCF_UPDATE;
     if (!top()->Update(*i_owner, diff))
     {
@@ -116,7 +116,7 @@ MotionMaster::DirectClean(bool reset, bool all)
 
     if (!all && reset)
     {
-        ASSERT( !empty() );
+        MANGOS_ASSERT( !empty() );
         top()->Reset(*i_owner);
     }
 }
