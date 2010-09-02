@@ -4176,9 +4176,9 @@ void Spell::DoSummonGroupPets(SpellEffectIndex eff_idx)
 
     uint8 petindex = 0;
 
-    if (summoner->GetTypeId()==TYPEID_PLAYER)
+    if (false && summoner->GetTypeId()==TYPEID_PLAYER) // Temporary disabled
     {
-        QueryResult* result = CharacterDatabase.PQuery("SELECT id FROM character_pet WHERE owner = '%u' AND AND entry = '%u'",
+        QueryResult* result = CharacterDatabase.PQuery("SELECT id FROM character_pet WHERE owner = '%u' AND entry = '%u'",
             summoner->GetGUIDLow(), pet_entry);
 
         std::vector<uint64> petnumber;
@@ -4203,6 +4203,7 @@ void Spell::DoSummonGroupPets(SpellEffectIndex eff_idx)
                         if (creature->LoadPetFromDB((Player*)summoner,pet_entry, petnumber[i]))
                         {
 
+                            if (petindex) creature->SetNeedSave(false);
                             // Summon in dest location
                             float x, y, z;
                             if (m_targets.m_targetMask & TARGET_FLAG_DEST_LOCATION)
@@ -4253,7 +4254,6 @@ void Spell::DoSummonGroupPets(SpellEffectIndex eff_idx)
             delete creature;
             return;
         }
-        ++petindex;
 
 
         // Summon in dest location
@@ -4324,18 +4324,20 @@ void Spell::DoSummonGroupPets(SpellEffectIndex eff_idx)
 //        creature->InitStatsForLevel(level, m_caster);
 
         summoner->SetPet(creature);
+        creature->GetCharmInfo()->SetReactState( REACT_DEFENSIVE );
+        ((Player*)m_caster)->PetSpellInitialize();
 
-        if (m_caster->GetTypeId() == TYPEID_PLAYER && creature->getPetType() == SUMMON_PET)
+        if (m_caster->GetTypeId() == TYPEID_PLAYER && creature->getPetType() == SUMMON_PET && petindex == 0)
         {
-            creature->GetCharmInfo()->SetReactState( REACT_DEFENSIVE );
             creature->SavePetToDB(PET_SAVE_AS_CURRENT);
-            ((Player*)m_caster)->PetSpellInitialize();
         }
         else
             creature->SetNeedSave(false);
 
         if (m_caster->GetTypeId() == TYPEID_UNIT && ((Creature*)m_caster)->AI())
             ((Creature*)m_caster)->AI()->JustSummoned((Creature*)creature);
+
+        ++petindex;
     }
 
 }

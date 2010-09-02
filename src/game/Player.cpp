@@ -17993,6 +17993,7 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
         default:
             if (GetPetGUID() == pet->GetGUID())
                 SetPet(NULL);
+            RemovePetFromList(pet);
             break;
     }
 

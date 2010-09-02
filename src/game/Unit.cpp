@@ -5971,6 +5971,11 @@ Pet* Unit::GetPet() const
     return NULL;
 }
 
+Pet* Unit::GetPet(uint64 petGUID)
+{
+    return FindPetWithGUID(petGUID);
+}
+
 Pet* Unit::_GetPet(ObjectGuid guid) const
 {
     return GetMap()->GetPet(guid);
@@ -6011,10 +6016,11 @@ float Unit::GetCombatDistance( const Unit* target ) const
 
 void Unit::SetPet(Pet* pet)
 {
-    SetPetGUID(pet ? pet->GetGUID() : 0);
+    SetPetGUID(pet ? pet->GetGUID() : 0);  //Using last pet guid for player
 
     if(pet && GetTypeId() == TYPEID_PLAYER)
     {
+        AddPetToList(pet);
         ((Player*)this)->SendPetGUIDs();
         // set infinite cooldown for summon spell
         SpellEntry const *spellInfo = sSpellStore.LookupEntry(pet->GetUInt32Value(UNIT_CREATED_BY_SPELL));
@@ -6026,6 +6032,26 @@ void Unit::SetPet(Pet* pet)
 void Unit::SetCharm(Unit* pet)
 {
     SetCharmGUID(pet ? pet->GetGUID() : 0);
+}
+
+void Unit::AddPetToList(Pet* pet)
+{
+    if (pet)
+        m_groupPets.insert(pet->GetGUID());
+}
+
+void Unit::RemovePetFromList(Pet* pet)
+{
+    m_groupPets.erase(pet->GetGUID());
+}
+
+Pet* Unit::FindPetWithGUID(uint64 petGUID)
+{
+    for(GroupPetList::const_iterator itr = m_groupPets.begin(); itr != m_groupPets.end(); ++itr)
+        if(Pet* pet = GetMap()->GetPet(*itr))
+            return pet;
+
+    return NULL;
 }
 
 void Unit::AddGuardian( Pet* pet )
@@ -9827,23 +9853,11 @@ void CharmInfo::SetSpellAutocast( uint32 spell_id, bool state )
 
 void CharmInfo::SetActionBar( uint8 index, uint32 spellOrAction, ActiveStates type )
 {
-    // chained pets
-    if (m_unit->GetTypeId() == TYPEID_UNIT && ((Creature*)m_unit)->isPet())
-        if (Pet *chainedPet = m_unit->GetPet())
-            if (((Creature*)m_unit)->GetEntry() == chainedPet->GetEntry() && chainedPet->GetCharmInfo())
-                chainedPet->GetCharmInfo()->SetActionBar(index, spellOrAction, type);
-
     PetActionBar[index].SetActionAndType(spellOrAction,type);
 }
 
 void Unit::DoPetAction( Player* owner, uint8 flag, uint32 spellid, uint64 guid1, uint64 guid2 )
 {
-    // chained
-    if (GetTypeId() == TYPEID_UNIT && ((Creature*)this)->isPet())
-        if (Pet *chainedPet = GetPet())
-            if (((Creature*)this)->GetEntry() == chainedPet->GetEntry())
-                chainedPet->DoPetAction(owner, flag, spellid, guid1, guid2);
-
     switch(flag)
     {
         case ACT_COMMAND:                                   //0x07
@@ -10039,12 +10053,6 @@ void Unit::DoPetAction( Player* owner, uint8 flag, uint32 spellid, uint64 guid1,
 
 void Unit::DoPetCastSpell( Player *owner, uint8 cast_count, SpellCastTargets targets, SpellEntry const* spellInfo )
 {
-    // chained
-    if (GetTypeId() == TYPEID_UNIT && ((Creature*)this)->isPet())
-        if (Pet *chainedPet = GetPet())
-            if (((Creature*)this)->GetEntry() == chainedPet->GetEntry())
-                chainedPet->DoPetCastSpell(owner, cast_count, targets, spellInfo);
-
     Creature* pet = dynamic_cast<Creature*>(this);
 
     clearUnitState(UNIT_STAT_MOVING);

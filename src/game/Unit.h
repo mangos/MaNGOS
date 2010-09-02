@@ -1102,6 +1102,7 @@ enum ReactiveType
 #define MAX_REACTIVE 3
 
 typedef std::set<uint64> GuardianPetList;
+typedef std::set<uint64> GroupPetList;
 
 // delay time next attack to prevent client attack animation problems
 #define ATTACK_DISPLAY_DELAY 200
@@ -1489,6 +1490,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         Unit* GetOwner() const;
         Pet* GetPet() const;
+        Pet* GetPet(uint64 petGUID);
         Unit* GetCharmer() const;
         Unit* GetCharm() const;
         Unit* GetCreator() const;
@@ -1507,6 +1509,11 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         void SetPet(Pet* pet);
         void SetCharm(Unit* pet);
+
+        void AddPetToList(Pet* pet);
+        void RemovePetFromList(Pet* pet);
+        Pet* FindPetWithGUID(uint64 petGUID);
+        GroupPetList const& GetPets() const { return m_groupPets; }
 
         void AddGuardian(Pet* pet);
         void RemoveGuardian(Pet* pet);
@@ -2021,6 +2028,8 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         FollowerRefManager m_FollowingRefManager;
 
         ComboPointHolderSet m_ComboPointHolders;
+
+        GroupPetList m_groupPets;
 
         GuardianPetList m_guardianPets;
         uint32 m_ThreatRedirectionPercent;

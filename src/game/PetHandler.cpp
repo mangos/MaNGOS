@@ -79,7 +79,14 @@ void WorldSession::HandlePetAction( WorldPacket & recv_data )
         return;
     }
 
-    pet->DoPetAction(_player, flag, spellid, guid1, guid2);
+    GroupPetList m_groupPets = _player->GetPets();
+    if (!m_groupPets.empty())
+    {
+        for (GroupPetList::const_iterator itr = m_groupPets.begin(); itr != m_groupPets.end(); ++itr)
+            if (Pet* _pet = _player->GetPet(*itr))
+                _pet->DoPetAction(_player, flag, spellid, guid1, guid2);
+    }
+    else pet->DoPetAction(_player, flag, spellid, guid1, guid2);
 }
 
 void WorldSession::HandlePetNameQuery( WorldPacket & recv_data )
@@ -397,7 +404,16 @@ void WorldSession::HandlePetSpellAutocastOpcode( WorldPacket& recvPacket )
                                                             //state can be used as boolean
         pet->GetCharmInfo()->ToggleCreatureAutocast(spellid, state);
     else
-        ((Pet*)pet)->ToggleAutocast(spellid, state);
+    {
+        GroupPetList m_groupPets = _player->GetPets();
+        if (!m_groupPets.empty())
+        {
+            for (GroupPetList::const_iterator itr = m_groupPets.begin(); itr != m_groupPets.end(); ++itr)
+                if (Pet* _pet = _player->GetPet(*itr))
+                    _pet->ToggleAutocast(spellid, state);
+        }
+        else ((Pet*)pet)->ToggleAutocast(spellid, state);
+    }
 
     charmInfo->SetSpellAutocast(spellid,state);
 }
@@ -444,7 +460,15 @@ void WorldSession::HandlePetCastSpellOpcode( WorldPacket& recvPacket )
 
     recvPacket >> targets.ReadForCaster(pet);
 
-    pet->DoPetCastSpell( GetPlayer(), cast_count, targets, spellInfo );
+    GroupPetList m_groupPets = _player->GetPets();
+
+    if (!m_groupPets.empty())
+    {
+        for (GroupPetList::const_iterator itr = m_groupPets.begin(); itr != m_groupPets.end(); ++itr)
+            if (Pet* _pet = _player->GetPet(*itr))
+               _pet->DoPetCastSpell( GetPlayer(), cast_count, targets, spellInfo );
+    }
+    else pet->DoPetCastSpell( GetPlayer(), cast_count, targets, spellInfo );
 }
 
 void WorldSession::SendPetNameInvalid(uint32 error, const std::string& name, DeclinedName *declinedName)
