@@ -19,6 +19,7 @@
 #ifndef MANGOS_TRAVELLER_H
 #define MANGOS_TRAVELLER_H
 
+#include "Common.h"
 #include "Creature.h"
 #include "Player.h"
 #include <cassert>
@@ -48,7 +49,7 @@ struct MANGOS_DLL_DECL Traveller
     float GetPositionZ() const { return i_traveller.GetPositionZ(); }
     T& GetTraveller(void) { return i_traveller; }
 
-    float Speed(void) { ASSERT(false); return 0.0f; }
+    float Speed(void) { MANGOS_ASSERT(false); return 0.0f; }
     float GetMoveDestinationTo(float x, float y, float z);
     uint32 GetTotalTravelTimeTo(float x, float y, float z);
 

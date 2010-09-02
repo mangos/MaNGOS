@@ -854,7 +854,7 @@ MailReceiver::MailReceiver( Player* receiver ) : m_receiver(receiver), m_receive
  */
 MailReceiver::MailReceiver( Player* receiver,uint32 receiver_lowguid ) : m_receiver(receiver), m_receiver_lowguid(receiver_lowguid)
 {
-    ASSERT(!receiver || receiver->GetGUIDLow() == receiver_lowguid);
+    MANGOS_ASSERT(!receiver || receiver->GetGUIDLow() == receiver_lowguid);
 }
 
 /**

@@ -78,7 +78,7 @@ Some events such as EVENT_T_AGGRO, EVENT_T_DEATH, EVENT_T_SPAWNED, and EVENT_T_E
 13   EVENT_T_TARGET_CASTING         RepeatMin, RepeatatMax                                  Expires when the current target is casting a spell. Will repeat every (Param1) and (Param2).
 14   EVENT_T_FRIENDLY_HP            HPDeficit, Radius, RepeatMin, RepeatMax                 Expires when a friendly unit in radius has at least (Param1) HP missing. Will repeat every (Param3) and (Param4).
 15   EVENT_T_FRIENDLY_IS_CC         DispelType, Radius, RepeatMin, RepeatMax                Expires when a friendly unit is crowd controlled within the given radius (Param2). Will repeat every (Param3) and (Param4).
-16   EVENT_T_MISSING_BUFF           SpellId, Radius, RepeatMin, RepeatMax                   Expires when a friendly unit is missing aura(s) given by a spell (Param1) within radius (Param2). Will repeat every (Param3) and (Param4).
+16   EVENT_T_FRIENDLY_MISSING_BUFF  SpellId, Radius, RepeatMin, RepeatMax                   Expires when a friendly unit is missing aura(s) given by a spell (Param1) within radius (Param2). Will repeat every (Param3) and (Param4).
 17   EVENT_T_SUMMONED_UNIT          CreatureId, RepeatMin, RepeatMax                        Expires after creature with entry = (Param1) is spawned (Param1 = 0 means all spawns). Will repeat every (Param2) and (Param3).
 18   EVENT_T_TARGET_MANA            ManaMax%, ManaMin%, RepeatMin, RepeatMax                Expires when current target's Mana is between (Param1) and (Param2). Will repeat every (Param3) and (Param4).
 21   EVENT_T_REACHED_HOME           NONE                                                    Expires when a creature reaches it's home (spawn) location after evade.
@@ -87,6 +87,7 @@ Some events such as EVENT_T_AGGRO, EVENT_T_DEATH, EVENT_T_SPAWNED, and EVENT_T_E
 24   EVENT_T_TARGET_BUFFED          SpellID, AmmountInStack, RepeatMin, RepeatMax           Expires when a target unit has spell (Param1) auras applied in a stack greater or equal to value provided in (Param2). Will repeat every (Param3) and (Param4).
 25   EVENT_T_SUMMONED_JUST_DIED     CreatureId, RepeatMin, RepeatMax                        Expires after creature with entry = (Param1) is die (Param1 = 0 means all spawns). Will repeat every (Param2) and (Param3).
 26   EVENT_T_SUMMONED_JUST_DESPAWN  CreatureId, RepeatMin, RepeatMax                        Expires before creature with entry = (Param1) is despawn (Param1 = 0 means all spawns). Will repeat every (Param2) and (Param3).
+27   EVENT_T_MISSING_BUFF           SpellID, AmmountInStack, RepeatMin, RepeatMax           Expires when a creature not has spell (Param1) auras applied in a stack greater or equal to value provided in (Param2). Will repeat every (Param3) and (Param4).
 
 
 =========================================

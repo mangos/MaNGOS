@@ -385,7 +385,7 @@ struct Runes
 struct EnchantDuration
 {
     EnchantDuration() : item(NULL), slot(MAX_ENCHANTMENT_SLOT), leftduration(0) {};
-    EnchantDuration(Item * _item, EnchantmentSlot _slot, uint32 _leftduration) : item(_item), slot(_slot), leftduration(_leftduration) { ASSERT(item); };
+    EnchantDuration(Item * _item, EnchantmentSlot _slot, uint32 _leftduration) : item(_item), slot(_slot), leftduration(_leftduration) { MANGOS_ASSERT(item); };
 
     Item * item;
     EnchantmentSlot slot;
@@ -1621,7 +1621,7 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         void AddMItem(Item* it)
         {
-            ASSERT( it );
+            MANGOS_ASSERT( it );
             //ASSERT deleted, because items can be added before loading
             mMitems[it->GetGUIDLow()] = it;
         }

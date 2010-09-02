@@ -19,6 +19,7 @@
 #ifndef MANGOS_MAP_H
 #define MANGOS_MAP_H
 
+#include "Common.h"
 #include "Platform/Define.h"
 #include "Policies/ThreadingModel.h"
 #include "ace/RW_Thread_Mutex.h"
@@ -296,8 +297,8 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
 
         NGridType* getNGrid(uint32 x, uint32 y) const
         {
-            ASSERT(x < MAX_NUMBER_OF_GRIDS);
-            ASSERT(y < MAX_NUMBER_OF_GRIDS);
+            MANGOS_ASSERT(x < MAX_NUMBER_OF_GRIDS);
+            MANGOS_ASSERT(y < MAX_NUMBER_OF_GRIDS);
             return i_grids[x][y];
         }
 

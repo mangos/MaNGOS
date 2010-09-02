@@ -22,6 +22,7 @@
 // For static or at-server-startup loaded spell data
 // For more high level function for sSpellStore data
 
+#include "Common.h"
 #include "SharedDefines.h"
 #include "SpellAuraDefines.h"
 #include "DBCStructure.h"

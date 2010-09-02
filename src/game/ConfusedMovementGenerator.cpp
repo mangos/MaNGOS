@@ -16,10 +16,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include "ConfusedMovementGenerator.h"
 #include "Creature.h"
 #include "MapManager.h"
 #include "Opcodes.h"
-#include "ConfusedMovementGenerator.h"
 #include "DestinationHolderImp.h"
 
 template<class T>
@@ -140,7 +140,7 @@ bool ConfusedMovementGenerator<T>::Update(T &unit, const uint32 &diff)
         {
             // start moving
             unit.addUnitState(UNIT_STAT_CONFUSED_MOVE);
-            ASSERT( i_nextMove <= MAX_CONF_WAYPOINTS );
+            MANGOS_ASSERT( i_nextMove <= MAX_CONF_WAYPOINTS );
             const float x = i_waypoints[i_nextMove][0];
             const float y = i_waypoints[i_nextMove][1];
             const float z = i_waypoints[i_nextMove][2];

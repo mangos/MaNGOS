@@ -16,7 +16,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "Common.h"
 #include "Corpse.h"
 #include "Player.h"
 #include "UpdateMask.h"
@@ -74,7 +73,7 @@ bool Corpse::Create( uint32 guidlow )
 
 bool Corpse::Create( uint32 guidlow, Player *owner)
 {
-    ASSERT(owner);
+    MANGOS_ASSERT(owner);
 
     WorldObject::_Create(guidlow, HIGHGUID_CORPSE, owner->GetPhaseMask());
     Relocate(owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ(), owner->GetOrientation());
@@ -101,7 +100,7 @@ bool Corpse::Create( uint32 guidlow, Player *owner)
 void Corpse::SaveToDB()
 {
     // bones should not be saved to DB (would be deleted on startup anyway)
-    ASSERT(GetType() != CORPSE_BONES);
+    MANGOS_ASSERT(GetType() != CORPSE_BONES);
 
     // prevent DB data inconsistence problems and duplicates
     CharacterDatabase.BeginTransaction();
@@ -126,7 +125,7 @@ void Corpse::SaveToDB()
 
 void Corpse::DeleteBonesFromWorld()
 {
-    ASSERT(GetType() == CORPSE_BONES);
+    MANGOS_ASSERT(GetType() == CORPSE_BONES);
     Corpse* corpse = GetMap()->GetCorpse(GetGUID());
 
     if (!corpse)
@@ -141,7 +140,7 @@ void Corpse::DeleteBonesFromWorld()
 void Corpse::DeleteFromDB()
 {
     // bones should not be saved to DB (would be deleted on startup anyway)
-    ASSERT(GetType() != CORPSE_BONES);
+    MANGOS_ASSERT(GetType() != CORPSE_BONES);
 
     // all corpses (not bones)
     CharacterDatabase.PExecute("DELETE FROM corpse WHERE player = '%d' AND corpse_type <> '0'",  GUID_LOPART(GetOwnerGUID()));

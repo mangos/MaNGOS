@@ -19,6 +19,7 @@
 #ifndef MANGOSSERVER_PET_H
 #define MANGOSSERVER_PET_H
 
+#include "Common.h"
 #include "ObjectGuid.h"
 #include "Creature.h"
 #include "Unit.h"
@@ -261,11 +262,11 @@ class Pet : public Creature
 
         void SaveToDB(uint32, uint8)                        // overwrited of Creature::SaveToDB     - don't must be called
         {
-            ASSERT(false);
+            MANGOS_ASSERT(false);
         }
         void DeleteFromDB()                                 // overwrited of Creature::DeleteFromDB - don't must be called
         {
-            ASSERT(false);
+            MANGOS_ASSERT(false);
         }
 };
 #endif

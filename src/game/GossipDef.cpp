@@ -16,8 +16,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "QuestDef.h"
 #include "GossipDef.h"
+#include "QuestDef.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "WorldPacket.h"
@@ -37,7 +37,7 @@ GossipMenu::~GossipMenu()
 
 void GossipMenu::AddMenuItem(uint8 Icon, const std::string& Message, uint32 dtSender, uint32 dtAction, const std::string& BoxMessage, uint32 BoxMoney, bool Coded)
 {
-    ASSERT( m_gItems.size() <= GOSSIP_MAX_MENU_ITEMS  );
+    MANGOS_ASSERT( m_gItems.size() <= GOSSIP_MAX_MENU_ITEMS  );
 
     GossipMenuItem gItem;
 
@@ -363,7 +363,7 @@ void QuestMenu::AddMenuItem( uint32 QuestId, uint8 Icon)
     if (!qinfo)
         return;
 
-    ASSERT( m_qItems.size() <= GOSSIP_MAX_MENU_ITEMS  );
+    MANGOS_ASSERT( m_qItems.size() <= GOSSIP_MAX_MENU_ITEMS  );
 
     QuestMenuItem qItem;
 
