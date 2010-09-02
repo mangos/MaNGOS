@@ -135,7 +135,7 @@ bool VehicleKit::AddPassenger(Unit *unit, int8 seatId)
 
     if (seat->second.seatInfo->IsUsable())
     {
-        ASSERT(m_uiNumFreeSeats);
+        MANGOS_ASSERT(m_uiNumFreeSeats);
         --m_uiNumFreeSeats;
 
         if (!m_uiNumFreeSeats)
