@@ -76,8 +76,8 @@ DELETE FROM `spell_proc_event` WHERE entry = 70730;
 INSERT INTO `spell_proc_event` (`entry`, `SchoolMask`, `SpellFamilyName`, `SpellFamilyMaskA0`, `SpellFamilyMaskA1`, `SpellFamilyMaskA2`, `procFlags`, `procEx`, `ppmRate`, `CustomChance`, `Cooldown`) VALUES('70730','0','9',0x00004000,0x00001000,'0','0','0','0','0','0');
 
 /* Item - Priest T10 Healer 4P Bonus*/
-DELETE FROM `spell_proc_event` WHERE entry = 70799;
-INSERT INTO `spell_proc_event` (`entry`, `SchoolMask`, `SpellFamilyName`, `SpellFamilyMaskA0`, `SpellFamilyMaskA1`, `SpellFamilyMaskA2`, `procFlags`, `procEx`, `ppmRate`, `CustomChance`, `Cooldown`) VALUES('70799','0','6',0x00000800,'0','0','0','0','0','0','0');
+DELETE FROM `spell_proc_event` WHERE entry = 70798;
+INSERT INTO `spell_proc_event` (`entry`, `SchoolMask`, `SpellFamilyName`, `SpellFamilyMaskA0`, `SpellFamilyMaskA1`, `SpellFamilyMaskA2`, `procFlags`, `procEx`, `ppmRate`, `CustomChance`, `Cooldown`) VALUES('70798','0','6',0x00000800,'0','0','0','0','0','0','0');
 
 /*Item - Shaman T10 Restoration 4P Bonus*/
 DELETE FROM `spell_proc_event` WHERE entry = 70808;
