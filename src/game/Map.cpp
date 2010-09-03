@@ -1015,12 +1015,13 @@ float Map::GetHeight(float x, float y, float z, bool pUseVmaps, float maxSearchD
 {
     // find raw .map surface under Z coordinates
     float mapHeight;
+    float z2 = z + 2.f;
     if(GridMap *gmap = const_cast<Map*>(this)->GetGrid(x, y))
     {
         float _mapheight = gmap->getHeight(x,y);
 
         // look from a bit higher pos to find the floor, ignore under surface case
-        if(z + 2.0f > _mapheight)
+        if(z2 > _mapheight)
             mapHeight = _mapheight;
         else
             mapHeight = VMAP_INVALID_HEIGHT_VALUE;
@@ -1035,7 +1036,7 @@ float Map::GetHeight(float x, float y, float z, bool pUseVmaps, float maxSearchD
         if(vmgr->isHeightCalcEnabled())
         {
             // look from a bit higher pos to find the floor
-            vmapHeight = vmgr->getHeight(GetId(), x, y, z + 2.0f, maxSearchDist);
+            vmapHeight = vmgr->getHeight(GetId(), x, y, z2, maxSearchDist);
         }
         else
             vmapHeight = VMAP_INVALID_HEIGHT_VALUE;
@@ -1062,6 +1063,12 @@ float Map::GetHeight(float x, float y, float z, bool pUseVmaps, float maxSearchD
         }
         else
             return vmapHeight;                              // we have only vmapHeight (if have)
+    }
+    else if (pUseVmaps && z2 - mapHeight > maxSearchDist)
+    {
+        // with vmaps we can only give definite result up to maxSearchDist,
+        // in other cases mapHeight might or might not be the true height.
+        return VMAP_INVALID_HEIGHT_VALUE;
     }
 
     return mapHeight;
