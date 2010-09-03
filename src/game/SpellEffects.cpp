@@ -4149,6 +4149,9 @@ void Spell::DoSummonGroupPets(SpellEffectIndex eff_idx)
     if (m_caster->GetPetGUID())
         return;
 
+    if (m_caster->GetTypeId() != TYPEID_PLAYER)
+        return;
+
     if (!unitTarget)
         return;
 
@@ -4315,10 +4318,10 @@ void Spell::DoSummonGroupPets(SpellEffectIndex eff_idx)
 
         summoner->SetPet(creature);
         creature->GetCharmInfo()->SetReactState( REACT_DEFENSIVE );
-        ((Player*)m_caster)->PetSpellInitialize();
 
         if (m_caster->GetTypeId() == TYPEID_PLAYER && creature->getPetType() == SUMMON_PET)
         {
+            ((Player*)m_caster)->PetSpellInitialize();
             if (!creature->GetPetCounter())
                 creature->SavePetToDB(PET_SAVE_AS_CURRENT);
             else
