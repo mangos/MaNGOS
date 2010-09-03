@@ -2589,7 +2589,7 @@ void ObjectMgr::LoadPetLevelInfo()
             for (int i = 0; i < MAX_STATS; i++)
             {
                 if(pInfo[level].stats[i] == 0)
-                    pInfo[level].stats[i] = uint16(pInfo[level-1].stats[i] * (level+1)/level + 1);
+                    pInfo[level].stats[i] = uint16(float(pInfo[level-1].stats[i]) * (level+1)/level + 1);
             }
 
         }

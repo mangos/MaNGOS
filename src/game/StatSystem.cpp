@@ -874,9 +874,11 @@ bool Pet::UpdateStats(Stats stat)
     float fullvalue  = GetTotalStatValue(stat);
     float modvalue  = 0.0f;
 
-    UnitMods unitMod;
+    UnitMods unitMod = UnitMods(stat);
 
     Unit *owner = GetOwner();
+    SetModifierValue(unitMod, BASE_PCT, 1.0f);
+    SetModifierValue(unitMod, TOTAL_PCT, 1.0f);
 
     if (owner)
     {
@@ -885,39 +887,31 @@ bool Pet::UpdateStats(Stats stat)
         switch(stat)
         {
             case STAT_STAMINA:
-                unitMod = UNIT_MOD_STAT_STAMINA;
                 // warlock's pets gain 75% of owner's stamina
                 if (getPetType() == SUMMON_PET && owner->getClass() == CLASS_WARLOCK)
-                    modvalue += owner->GetStat(stat) * 0.75f;
+                    modvalue += float(owner->GetStat(stat)) * 0.75f;
                 else if (getPetType() == SUMMON_PET || getPetType() == HUNTER_PET)
-                    modvalue += owner->GetStat(stat) * 0.3f;
+                    modvalue += float(owner->GetStat(stat)) * 0.3f;
                 break;
             case STAT_INTELLECT:
-                unitMod = UNIT_MOD_STAT_INTELLECT;
                 // warlock's and mage's pets gain 30% of owner's intellect
                 if (getPetType() == SUMMON_PET && (owner->getClass() == CLASS_WARLOCK || owner->getClass() == CLASS_MAGE))
-                    modvalue += owner->GetStat(stat) * 0.3f;
+                    modvalue += float(owner->GetStat(stat)) * 0.3f;
                 break;
             case STAT_STRENGTH:
-                unitMod = UNIT_MOD_STAT_STRENGTH;
                 if (getPetType() == SUMMON_PET  && (owner->getClass() == CLASS_DEATH_KNIGHT))
                     modvalue += float(owner->GetStat(stat)) * 1.0f;
                 break;
             case STAT_AGILITY:
-                unitMod = UNIT_MOD_STAT_AGILITY;
                 break;
             case STAT_SPIRIT:
-                unitMod = UNIT_MOD_STAT_SPIRIT;
                 break;
             default:
                 unitMod = UNIT_MOD_END;
                 break;
         };
-
-       if (modvalue >= 1.0f )
            SetModifierValue(unitMod, BASE_VALUE, modvalue);
-
-        SetStat(stat, GetTotalStatValue(stat));
+           SetStat(stat, GetTotalStatValue(stat));
     }
     else
         SetStat(stat, int32(fullvalue));
@@ -964,7 +958,7 @@ void Pet::UpdateResistances(uint32 school)
 
         if (value < 1.0f ) 
             value = 0.0f;
-
+//        ApplyResistanceBuffModsMod(SpellSchools(school), true, value, true);
         SetResistance(SpellSchools(school), int32(value));
     }
     else
@@ -990,7 +984,6 @@ void Pet::UpdateArmor()
     value *= GetModifierValue(unitMod, BASE_PCT);
     value += GetModifierValue(unitMod, TOTAL_VALUE);
     value *= GetModifierValue(unitMod, TOTAL_PCT);
-
     SetArmor(int32(value));
 }
 
@@ -1017,7 +1010,7 @@ void Pet::UpdateMaxPower(Powers power)
     float addValue = (power == POWER_MANA) ? GetStat(STAT_INTELLECT) - GetCreateStat(STAT_INTELLECT) : 0.0f;
 
     if (addValue >= 1.0f)
-        SetModifierValue(unitMod, BASE_VALUE, addValue * 15.0f);
+        SetModifierValue(unitMod, TOTAL_VALUE, addValue * 15.0f);
 
     float value  = GetModifierValue(unitMod, BASE_VALUE) + GetCreatePowers(power);
     value *= GetModifierValue(unitMod, BASE_PCT);

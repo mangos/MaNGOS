@@ -4176,74 +4176,75 @@ void Spell::DoSummonGroupPets(SpellEffectIndex eff_idx)
 
     uint8 petindex = 0;
 
-    if (false && summoner->GetTypeId()==TYPEID_PLAYER) // Temporary disabled
+    if (summoner->GetTypeId()==TYPEID_PLAYER) // Temporary disabled
     {
         QueryResult* result = CharacterDatabase.PQuery("SELECT id FROM character_pet WHERE owner = '%u' AND entry = '%u'",
             summoner->GetGUIDLow(), pet_entry);
 
-        std::vector<uint64> petnumber;
+        std::vector<uint32> petnumber;
 
         if (result)
         {
             do
             {
                Field* fields = result->Fetch();
-               uint64 petnum = fields[0].GetUInt64();
+               uint32 petnum = fields[0].GetUInt32();
                if (petnum) petnumber.push_back(petnum);
-            } while (result->NextRow());
+            }
+            while (result->NextRow());
+
             delete result;
+        }
 
-            if (!petnumber.empty())
+        if (!petnumber.empty())
+        {
+            for(uint8 i = 0; i < petnumber.size() && amount > 0; ++i)
             {
-                for(uint8 i = 0; i < petnumber.size(); ++i)
+                if (petnumber[i])
                 {
-                    if (petnumber[i])
+                    Pet* creature = new Pet(SUMMON_PET);
+                    creature->SetPetCounter(amount-1);
+                    if (creature->LoadPetFromDB((Player*)summoner,pet_entry, petnumber[i]))
                     {
-                        Pet* creature = new Pet(SUMMON_PET);
-                        if (creature->LoadPetFromDB((Player*)summoner,pet_entry, petnumber[i]))
+                        creature->SetOwnerGUID(summoner->GetGUID());
+                        creature->SetCreatorGUID(m_caster->GetGUID());
+                        if (m_targets.m_targetMask & TARGET_FLAG_DEST_LOCATION)
                         {
-
-                            if (petindex) creature->SetNeedSave(false);
-                            // Summon in dest location
-                            float x, y, z;
-                            if (m_targets.m_targetMask & TARGET_FLAG_DEST_LOCATION)
+                            if (!creature->SetSummonPosition(m_targets.m_destX,m_targets.m_destY,m_targets.m_destZ))
                             {
-                                x = m_targets.m_destX;
-                                y = m_targets.m_destY;
-                                z = m_targets.m_destZ;
-                            }
-                            else
-                               summoner->GetClosePoint(x, y, z, creature->GetObjectBoundingRadius(), PET_FOLLOW_DIST, creature->GetPetFollowAngle());
-
-                            if (petindex == 0)
-                                creature->SetPetFollowAngle(PET_DEFAULT_FOLLOW_ANGLE);
-                            else if (petindex == 1)
-                                creature->SetPetFollowAngle(M_PI_F * 1.5f);
-                            else if (petindex == 2)
-                                creature->SetPetFollowAngle(M_PI_F);
-
-                            creature->Relocate(x, y, z, -summoner->GetOrientation());
-                            creature->SetSummonPoint(x, y, z, -summoner->GetOrientation());
-
-
-                            --amount;
-                            ++petindex;
-                            // set timer for unsummon
-                            if (duration > 0)
-                                creature->SetDuration(duration);
-                            creature->LoadCreaturesAddon(true);
-                        }
-                        else
-                            delete creature;
+                                sLog.outError("Pet (guidlow %d, entry %d) not summoned. Suggested coordinates isn't valid (X: %f Y: %f)",
+                                     creature->GetGUIDLow(), creature->GetEntry(), creature->GetPositionX(), creature->GetPositionY());
+                                delete creature;
+                                return;
+                             }
+                         }
+                         else if (!creature->SetSummonPosition())
+                         {
+                             sLog.outError("Pet (guidlow %d, entry %d) not summoned. Suggested coordinates isn't valid (X: %f Y: %f)",
+                                 creature->GetGUIDLow(), creature->GetEntry(), creature->GetPositionX(), creature->GetPositionY());
+                             delete creature;
+                             return;
+                         }
+                         --amount;
+                        // set timer for unsummon
+                        if (duration > 0)
+                            creature->SetDuration(duration);
+                        creature->LoadCreaturesAddon(true);
+                        DEBUG_LOG("Pet (guidlow %d, entry %d) summoned. Counter is %d ",
+                                     creature->GetGUIDLow(), creature->GetEntry(), creature->GetPetCounter());
                     }
+                    else
+                        delete creature;
                 }
             }
         }
     }
 
+    // Pet not found in database
     for (int32 count = 0; count < amount; ++count)
     {
         Pet* creature = new Pet(SUMMON_PET);
+        creature->SetPetCounter(amount - count - 1);
 
         Map *map = summoner->GetMap();
         uint32 pet_number = sObjectMgr.GeneratePetNumber();
@@ -4255,29 +4256,21 @@ void Spell::DoSummonGroupPets(SpellEffectIndex eff_idx)
             return;
         }
 
+        creature->SetOwnerGUID(summoner->GetGUID());
+        creature->SetCreatorGUID(m_caster->GetGUID());
+        creature->setFaction(m_caster->getFaction());
 
-        // Summon in dest location
-        float x, y, z;
         if (m_targets.m_targetMask & TARGET_FLAG_DEST_LOCATION)
         {
-            x = m_targets.m_destX;
-            y = m_targets.m_destY;
-            z = m_targets.m_destZ;
+            if (!creature->SetSummonPosition(m_targets.m_destX,m_targets.m_destY,m_targets.m_destZ))
+            {
+                sLog.outError("Pet (guidlow %d, entry %d) not summoned. Suggested coordinates isn't valid (X: %f Y: %f)",
+                    creature->GetGUIDLow(), creature->GetEntry(), creature->GetPositionX(), creature->GetPositionY());
+                delete creature;
+                return;
+            }
         }
-        else
-            summoner->GetClosePoint(x, y, z, creature->GetObjectBoundingRadius(), PET_FOLLOW_DIST, creature->GetPetFollowAngle());
-
-        if (petindex == 0)
-            creature->SetPetFollowAngle(PET_DEFAULT_FOLLOW_ANGLE);
-        else if (petindex == 1)
-            creature->SetPetFollowAngle(M_PI_F * 1.5f);
-        else if (petindex == 2)
-            creature->SetPetFollowAngle(M_PI_F);
-
-        creature->Relocate(x, y, z, -summoner->GetOrientation());
-        creature->SetSummonPoint(x, y, z, -summoner->GetOrientation());
-
-        if (!creature->IsPositionValid())
+        else if (!creature->SetSummonPosition())
         {
             sLog.outError("Pet (guidlow %d, entry %d) not summoned. Suggested coordinates isn't valid (X: %f Y: %f)",
                 creature->GetGUIDLow(), creature->GetEntry(), creature->GetPositionX(), creature->GetPositionY());
@@ -4289,10 +4282,7 @@ void Spell::DoSummonGroupPets(SpellEffectIndex eff_idx)
         if (duration > 0)
             creature->SetDuration(duration);
 
-        creature->SetOwnerGUID(summoner->GetGUID());
-        creature->SetCreatorGUID(m_caster->GetGUID());
         creature->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
-        creature->setFaction(m_caster->getFaction());
         creature->SetUInt32Value(UNIT_FIELD_FLAGS, 0);
         creature->SetUInt32Value(UNIT_FIELD_BYTES_0, 2048);
         creature->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
@@ -4327,9 +4317,12 @@ void Spell::DoSummonGroupPets(SpellEffectIndex eff_idx)
         creature->GetCharmInfo()->SetReactState( REACT_DEFENSIVE );
         ((Player*)m_caster)->PetSpellInitialize();
 
-        if (m_caster->GetTypeId() == TYPEID_PLAYER && creature->getPetType() == SUMMON_PET && petindex == 0)
+        if (m_caster->GetTypeId() == TYPEID_PLAYER && creature->getPetType() == SUMMON_PET)
         {
-            creature->SavePetToDB(PET_SAVE_AS_CURRENT);
+            if (!creature->GetPetCounter())
+                creature->SavePetToDB(PET_SAVE_AS_CURRENT);
+            else
+                creature->SavePetToDB(PET_SAVE_NOT_IN_SLOT);
         }
         else
             creature->SetNeedSave(false);

@@ -1072,7 +1072,10 @@ struct CharmInfo
         void LoadPetActionBar(const std::string& data);
         void BuildActionBar(WorldPacket* data);
         void SetSpellAutocast(uint32 spell_id, bool state);
-        void SetActionBar( uint8 index, uint32 spellOrAction, ActiveStates type );
+        void SetActionBar(uint8 index, uint32 spellOrAction,ActiveStates type)
+        {
+            PetActionBar[index].SetActionAndType(spellOrAction,type);
+        }
 
         UnitActionBarEntry const* GetActionBarEntry(uint8 index) const { return &(PetActionBar[index]); }
 
@@ -1490,7 +1493,6 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         Unit* GetOwner() const;
         Pet* GetPet() const;
-        Pet* GetPet(uint64 petGUID);
         Unit* GetCharmer() const;
         Unit* GetCharm() const;
         Unit* GetCreator() const;
@@ -1512,8 +1514,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         void AddPetToList(Pet* pet);
         void RemovePetFromList(Pet* pet);
-        Pet* FindPetWithGUID(uint64 petGUID);
-        GroupPetList const& GetPets() const { return m_groupPets; }
+        GroupPetList const& GetPets() { return m_groupPets; }
 
         void AddGuardian(Pet* pet);
         void RemoveGuardian(Pet* pet);

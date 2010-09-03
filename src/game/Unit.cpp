@@ -5971,11 +5971,6 @@ Pet* Unit::GetPet() const
     return NULL;
 }
 
-Pet* Unit::GetPet(uint64 petGUID)
-{
-    return FindPetWithGUID(petGUID);
-}
-
 Pet* Unit::_GetPet(ObjectGuid guid) const
 {
     return GetMap()->GetPet(guid);
@@ -6016,11 +6011,12 @@ float Unit::GetCombatDistance( const Unit* target ) const
 
 void Unit::SetPet(Pet* pet)
 {
-    SetPetGUID(pet ? pet->GetGUID() : 0);  //Using last pet guid for player
+    SetPetGUID(pet && !pet->GetPetCounter() ? pet->GetGUID() : 0);  //Using last pet guid for player
+
+    AddPetToList(pet);
 
     if(pet && GetTypeId() == TYPEID_PLAYER)
     {
-        AddPetToList(pet);
         ((Player*)this)->SendPetGUIDs();
         // set infinite cooldown for summon spell
         SpellEntry const *spellInfo = sSpellStore.LookupEntry(pet->GetUInt32Value(UNIT_CREATED_BY_SPELL));
@@ -6043,15 +6039,6 @@ void Unit::AddPetToList(Pet* pet)
 void Unit::RemovePetFromList(Pet* pet)
 {
     m_groupPets.erase(pet->GetGUID());
-}
-
-Pet* Unit::FindPetWithGUID(uint64 petGUID)
-{
-    for(GroupPetList::const_iterator itr = m_groupPets.begin(); itr != m_groupPets.end(); ++itr)
-        if(Pet* pet = GetMap()->GetPet(*itr))
-            return pet;
-
-    return NULL;
 }
 
 void Unit::AddGuardian( Pet* pet )
@@ -9849,11 +9836,6 @@ void CharmInfo::SetSpellAutocast( uint32 spell_id, bool state )
             break;
         }
     }
-}
-
-void CharmInfo::SetActionBar( uint8 index, uint32 spellOrAction, ActiveStates type )
-{
-    PetActionBar[index].SetActionAndType(spellOrAction,type);
 }
 
 void Unit::DoPetAction( Player* owner, uint8 flag, uint32 spellid, uint64 guid1, uint64 guid2 )

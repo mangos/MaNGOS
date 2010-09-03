@@ -247,6 +247,9 @@ class Pet : public Creature
 
         bool GetNeedSave() const { return m_needSave; }
         void SetNeedSave(bool needSave) { m_needSave = needSave; }
+        uint8 GetPetCounter() { return m_petCounter; }
+        void SetPetCounter(uint8 counter) { m_petCounter = counter; }
+        bool SetSummonPosition(float x = 0.0f, float y = 0.0f, float z = 0.0f);
 
         // overwrite Creature function for name localization back to WorldObject version without localization
         const char* GetNameForLocaleIdx(int32 locale_idx) const { return WorldObject::GetNameForLocaleIdx(locale_idx); }
@@ -263,6 +266,7 @@ class Pet : public Creature
         bool    m_loading;
         bool    m_needSave;                                 // is pet needed to be saved in DB (for chained - only originally first in chain)
         float   m_petFollowAngle;                           // follow angle for the pet
+        uint8   m_petCounter;
 
         DeclinedName *m_declinedname;
 

@@ -39,7 +39,7 @@ char const* petTypeSuffix[MAX_PET_TYPE] =
 Pet::Pet(PetType type) :
 Creature(CREATURE_SUBTYPE_PET), m_removed(false), m_petType(type), m_happinessTimer(7500), m_duration(0), m_resetTalentsCost(0),
 m_bonusdamage(0), m_resetTalentsTime(0), m_usedTalentCount(0), m_auraUpdateMask(0), m_loading(false),
-m_declinedname(NULL), m_petModeFlags(PET_MODE_DEFAULT),m_petFollowAngle(PET_DEFAULT_FOLLOW_ANGLE), m_needSave(true)
+m_declinedname(NULL), m_petModeFlags(PET_MODE_DEFAULT),m_petFollowAngle(PET_DEFAULT_FOLLOW_ANGLE), m_needSave(true), m_petCounter(0)
 {
     m_name = "Pet";
     m_regenTimer = 4000;
@@ -519,7 +519,6 @@ void Pet::Update(uint32 diff)
             // unsummon pet that lost owner
             Unit* owner = GetOwner();
 
-            if(m_duration == 0)
             if(!owner || (!IsWithinDistInMap(owner, GetMap()->GetVisibilityDistance()) && (owner->GetCharmGUID() && (owner->GetCharmGUID() != GetGUID()))) || (isControlled() && !owner->GetPetGUID()))
             {
                 Remove(PET_SAVE_NOT_IN_SLOT, true);
@@ -528,9 +527,20 @@ void Pet::Update(uint32 diff)
 
             if(isControlled())
             {
-                if( owner->GetPetGUID() != GetGUID())
+                bool needdelete = true;
+                GroupPetList m_groupPets = owner->GetPets();
+                if (!m_groupPets.empty())
                 {
-                    Remove(getPetType()==HUNTER_PET?PET_SAVE_AS_DELETED:PET_SAVE_NOT_IN_SLOT);
+                    for (GroupPetList::const_iterator itr = m_groupPets.begin(); itr != m_groupPets.end(); ++itr)
+                        if (GetGUID() == (*itr)) needdelete = false;
+                }
+                else
+                    if( owner->GetPetGUID() == GetGUID())
+                        needdelete = false;
+
+                if (needdelete)
+                {
+                    Remove(getPetType() == HUNTER_PET ? PET_SAVE_AS_DELETED : PET_SAVE_NOT_IN_SLOT);
                     return;
                 }
             }
@@ -964,15 +974,18 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
         else
             SetModifierValue(UNIT_MOD_ARMOR, BASE_VALUE,  float(cinfo->armor  * petlevel / cinfo->maxlevel));
 
-        SetModifierValue(UNIT_MOD_ARMOR, BASE_VALUE, float(ArmorAdd));
+        SetModifierValue(UNIT_MOD_ARMOR, TOTAL_VALUE, float(ArmorAdd));
 
         for( int i = STAT_STRENGTH; i < MAX_STATS; ++i)
         {
-            SetCreateStat(Stats(i),  float(pInfo->stats[i]));
+            if (pInfo->stats[i])
+               SetCreateStat(Stats(i), float(pInfo->stats[i]));
+            else
+               SetCreateStat(Stats(i), float(createStats[i]));
 
             SetModifierValue(UnitMods(i), BASE_VALUE, 0.0f);
-            SetModifierValue(UnitMods(i), BASE_PCT, 1.0f);
             SetModifierValue(UnitMods(i), TOTAL_VALUE, 0.0f);
+            SetModifierValue(UnitMods(i), BASE_PCT, 1.0f);
             SetModifierValue(UnitMods(i), TOTAL_PCT, 1.0f);
         }
 
@@ -1007,8 +1020,8 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
             SetCreateStat(Stats(i),float(createStats[i]));
 
             SetModifierValue(UnitMods(i), BASE_VALUE, 0.0f);
-            SetModifierValue(UnitMods(i), BASE_PCT, 1.0f);
             SetModifierValue(UnitMods(i), TOTAL_VALUE, 0.0f);
+            SetModifierValue(UnitMods(i), BASE_PCT, 1.0f);
             SetModifierValue(UnitMods(i), TOTAL_PCT, 1.0f);
         }
         SetCreateHealth(createStats[MAX_STATS]);
@@ -1030,17 +1043,17 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
     SetAttackTime(OFF_ATTACK, cinfo->baseattacktime);
     SetAttackTime(RANGED_ATTACK, cinfo->rangeattacktime);
 
-    SetFloatValue(UNIT_MOD_CAST_SPEED, 1.0);
+//    SetFloatValue(UNIT_MOD_CAST_SPEED, 1.0);
 
     for (int i = SPELL_SCHOOL_HOLY; i < MAX_SPELL_SCHOOL; ++i)
         if (ResistanceAdd[i] > 0)
             SetModifierValue(UnitMods(UNIT_MOD_RESISTANCE_START + i), BASE_VALUE, float(ResistanceAdd[i]));
         else SetModifierValue(UnitMods(UNIT_MOD_RESISTANCE_START + i), BASE_VALUE, 0);
 
-    UpdateAllStats();
-
     SetHealth(GetMaxHealth());
     SetPower(getPowerType(), GetMaxPower(getPowerType()));
+
+    UpdateAllStats();
 
     return true;
 }
@@ -2083,4 +2096,35 @@ void Pet::ApplyModeFlags(PetModeFlags mode, bool apply)
     data << GetObjectGuid();
     data << uint32(m_petModeFlags);
     ((Player*)owner)->GetSession()->SendPacket(&data);
+}
+
+bool Pet::SetSummonPosition(float x, float y, float z)
+{
+    Unit* owner = GetOwner();
+    if (!owner)
+        return false;
+
+    // Summon in dest location
+    if (GetPetCounter() == 1)
+        SetPetFollowAngle(M_PI_F * 1.5f);
+    else if (GetPetCounter() == 2)
+        SetPetFollowAngle(M_PI_F);
+    else
+        SetPetFollowAngle(PET_FOLLOW_ANGLE);
+
+
+    if (x != 0.0f && y != 0.0f && z != 0.0f)
+    {
+        Relocate(x, y, z, -owner->GetOrientation());
+        SetSummonPoint(x, y, z, -owner->GetOrientation());
+    }
+    else
+    {
+        owner->GetClosePoint(x, y, z, GetObjectBoundingRadius(), PET_FOLLOW_DIST, GetPetFollowAngle());
+        Relocate(x, y, z, -owner->GetOrientation());
+        SetSummonPoint(x, y, z, -owner->GetOrientation());
+    }
+
+    if (!IsPositionValid()) return false;
+        else return true;
 }
