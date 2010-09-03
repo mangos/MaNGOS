@@ -890,6 +890,8 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
 
         createStats[MAX_STATS]    = (uint32)((float)cinfo->maxhealth / cinfo->maxlevel / (1 +  cinfo->rank) * petlevel);
         createStats[MAX_STATS+1]  = (uint32)((float)cinfo->maxmana / cinfo->maxlevel / (1 +  cinfo->rank) * petlevel);
+        setPowerType(Powers(cinfo->powerType));
+
     }
 
     switch(getPetType())
@@ -910,8 +912,6 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
 
             if (cinfo->family == CREATURE_FAMILY_GHOUL)
                 setPowerType(POWER_ENERGY);
-            else
-                setPowerType(POWER_MANA);
             break;
         }
         case HUNTER_PET:
@@ -935,7 +935,7 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
             }
 
             SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, sObjectMgr.GetXPForPetLevel(petlevel));
-            setPowerType(POWER_MANA);
+            setPowerType(POWER_FOCUS);
             break;
         }
         case GUARDIAN_PET:
