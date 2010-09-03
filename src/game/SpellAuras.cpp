@@ -3936,7 +3936,7 @@ void Aura::HandleInvisibility(bool apply, bool Real)
         target->m_invisibilityMask = 0;
         Unit::AuraList const& auras = target->GetAurasByType(SPELL_AURA_MOD_INVISIBILITY);
         for(Unit::AuraList::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
-            target->m_invisibilityMask |= (1 << m_modifier.m_miscvalue);
+            target->m_invisibilityMask |= (1 << (*itr)->GetModifier()->m_miscvalue);
 
         // only at real aura remove and if not have different invisibility auras.
         if(Real && target->m_invisibilityMask == 0)
@@ -3970,7 +3970,7 @@ void Aura::HandleInvisibilityDetect(bool apply, bool Real)
         target->m_detectInvisibilityMask = 0;
         Unit::AuraList const& auras = target->GetAurasByType(SPELL_AURA_MOD_INVISIBILITY_DETECTION);
         for(Unit::AuraList::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
-            target->m_detectInvisibilityMask |= (1 << m_modifier.m_miscvalue);
+            target->m_detectInvisibilityMask |= (1 << (*itr)->GetModifier()->m_miscvalue);
     }
     if(Real && target->GetTypeId()==TYPEID_PLAYER)
         ((Player*)target)->GetCamera().UpdateVisibilityForOwner();
