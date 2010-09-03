@@ -867,7 +867,7 @@ void Creature::UpdateDamagePhysical(WeaponAttackType attType)
 
 bool Pet::UpdateStats(Stats stat)
 {
-    if(stat > STAT_SPIRIT)
+    if(stat > STAT_SPIRIT || stat < STAT_STRENGTH )
         return false;
 
     // value = ((base_value * base_pct) + total_value) * total_pct
@@ -876,7 +876,8 @@ bool Pet::UpdateStats(Stats stat)
 
     UnitMods unitMod = UnitMods(stat);
 
-    Unit *owner = GetOwner();
+    Unit* owner = GetOwner();
+
     SetModifierValue(unitMod, BASE_PCT, 1.0f);
     SetModifierValue(unitMod, TOTAL_PCT, 1.0f);
 
@@ -890,7 +891,7 @@ bool Pet::UpdateStats(Stats stat)
                 // warlock's pets gain 75% of owner's stamina
                 if (getPetType() == SUMMON_PET && owner->getClass() == CLASS_WARLOCK)
                     modvalue += float(owner->GetStat(stat)) * 0.75f;
-                else if (getPetType() == SUMMON_PET || getPetType() == HUNTER_PET)
+                else if (getPetType() == HUNTER_PET)
                     modvalue += float(owner->GetStat(stat)) * 0.3f;
                 break;
             case STAT_INTELLECT:
@@ -907,7 +908,6 @@ bool Pet::UpdateStats(Stats stat)
             case STAT_SPIRIT:
                 break;
             default:
-                unitMod = UNIT_MOD_END;
                 break;
         };
            SetModifierValue(unitMod, BASE_VALUE, modvalue);
