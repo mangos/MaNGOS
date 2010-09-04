@@ -6268,6 +6268,12 @@ uint32 Unit::SpellDamageBonusDone(Unit *pVictim, SpellEntry const *spellProto, u
                     }
                 }
             }
+            // Death Coil (bonus from Item - Death Knight T8 DPS Relic)
+            else if (spellProto->SpellFamilyFlags & UI64LIT(0x00002000))
+            {
+                 if (Aura* sigil = GetDummyAura(64962))
+                    DoneTotal += sigil->GetModifier()->m_amount;
+            }
             break;
         }
         default:
