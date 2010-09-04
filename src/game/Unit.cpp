@@ -9846,11 +9846,6 @@ void CharmInfo::BuildActionBar( WorldPacket* data )
 
 void CharmInfo::SetSpellAutocast( uint32 spell_id, bool state )
 {
-    // chained pets
-    if (m_unit->GetTypeId() == TYPEID_UNIT && ((Creature*)m_unit)->isPet())
-        if (Pet *chainedPet = m_unit->GetPet())
-            if (((Creature*)m_unit)->GetEntry() == chainedPet->GetEntry() && chainedPet->GetCharmInfo())
-                chainedPet->GetCharmInfo()->SetSpellAutocast(spell_id, state);
 
     for(int i = 0; i < MAX_UNIT_ACTION_BAR_INDEX; ++i)
     {

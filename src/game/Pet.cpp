@@ -662,21 +662,6 @@ void Pet::Remove(PetSaveMode mode, bool returnreagent)
         {
             ((Player*)owner)->RemovePet(this,mode,returnreagent);
 
-            // replace pet by next in chain only in case of death
-            if (Pet *pet = GetPet())
-            {
-                // can't use isAlive because of dismiss and maybe other cases
-                // pet needs to be replaced with chained only if original was killed through DealDamage
-                if (pet->GetEntry() == GetEntry() && mode != PET_SAVE_AS_DELETED)
-                {
-                    pet->SetOwnerGUID(owner->GetGUID());
-                    owner->SetPet(pet);
-                    if (owner->GetTypeId()==TYPEID_PLAYER)
-                        ((Player*)owner)->PetSpellInitialize();
-
-                    SetPet(0);
-                }
-            }
             return;
         }
 
@@ -1827,11 +1812,6 @@ void Pet::ToggleAutocast(uint32 spellid, bool apply)
     if(IsPassiveSpell(spellid))
         return;
 
-    // chained pets
-    if (Pet *chainedPet = GetPet())
-        if (GetEntry() == chainedPet->GetEntry())
-            chainedPet->ToggleAutocast(spellid, apply);
-
     PetSpellMap::iterator itr = m_spells.find(spellid);
 
     uint32 i;
@@ -1942,11 +1922,6 @@ void Pet::LearnPetPassives()
 void Pet::CastPetAuras(bool current)
 {
     Unit* owner = GetOwner();
-
-    // chained, use original owner instead
-    if (owner && owner->GetTypeId() == TYPEID_UNIT && ((Creature*)owner)->GetEntry() == GetEntry())
-        if (Unit *creator = GetCreator())
-            owner = creator;
 
     if(!owner || owner->GetTypeId()!=TYPEID_PLAYER)
         return;

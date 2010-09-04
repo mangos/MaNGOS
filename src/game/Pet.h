@@ -263,7 +263,7 @@ class Pet : public Creature
         int32   m_bonusdamage;
         uint64  m_auraUpdateMask;
         bool    m_loading;
-        bool    m_needSave;                                 // is pet needed to be saved in DB (for chained - only originally first in chain)
+        bool    m_needSave;                                 // is pet needed to be saved in DB
         float   m_petFollowAngle;                           // follow angle for the pet
         uint8   m_petCounter;
 
