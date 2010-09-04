@@ -18049,10 +18049,10 @@ void Player::RemoveSpellMods(Spell const* spell)
 }
 
 // send Proficiency
-void Player::SendProficiency(uint8 pr1, uint32 pr2)
+void Player::SendProficiency(ItemClass itemClass, uint32 itemSubclassMask)
 {
-    WorldPacket data(SMSG_SET_PROFICIENCY, 8);
-    data << uint8(pr1) << uint32(pr2);
+    WorldPacket data(SMSG_SET_PROFICIENCY, 1 + 4);
+    data << uint8(itemClass) << uint32(itemSubclassMask);
     GetSession()->SendPacket (&data);
 }
 
