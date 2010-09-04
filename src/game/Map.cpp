@@ -1015,12 +1015,13 @@ float Map::GetHeight(float x, float y, float z, bool pUseVmaps, float maxSearchD
 {
     // find raw .map surface under Z coordinates
     float mapHeight;
-    if(GridMap *gmap = const_cast<Map*>(this)->GetGrid(x, y))
+    float z2 = z + 2.f;
+    if (GridMap *gmap = const_cast<Map*>(this)->GetGrid(x, y))
     {
         float _mapheight = gmap->getHeight(x,y);
 
         // look from a bit higher pos to find the floor, ignore under surface case
-        if(z + 2.0f > _mapheight)
+        if (z2 > _mapheight)
             mapHeight = _mapheight;
         else
             mapHeight = VMAP_INVALID_HEIGHT_VALUE;
@@ -1029,13 +1030,19 @@ float Map::GetHeight(float x, float y, float z, bool pUseVmaps, float maxSearchD
         mapHeight = VMAP_INVALID_HEIGHT_VALUE;
 
     float vmapHeight;
-    if(pUseVmaps)
+    if (pUseVmaps)
     {
         VMAP::IVMapManager* vmgr = VMAP::VMapFactory::createOrGetVMapManager();
-        if(vmgr->isHeightCalcEnabled())
+        if (vmgr->isHeightCalcEnabled())
         {
+            // if mapHeight has been found search vmap height at least until mapHeight point
+            // this prevent case when original Z "too high above ground and vmap height search fail"
+            // this will not affect most normal cases (no map in instance, or stay at ground at continent)
+            if (mapHeight > INVALID_HEIGHT && z2 - mapHeight > maxSearchDist)
+                maxSearchDist = z2 - mapHeight + 1.0f;      // 1.0 make sure that we not fail for case when map height near but above for vamp height
+
             // look from a bit higher pos to find the floor
-            vmapHeight = vmgr->getHeight(GetId(), x, y, z + 2.0f, maxSearchDist);
+            vmapHeight = vmgr->getHeight(GetId(), x, y, z2, maxSearchDist);
         }
         else
             vmapHeight = VMAP_INVALID_HEIGHT_VALUE;
@@ -1046,15 +1053,15 @@ float Map::GetHeight(float x, float y, float z, bool pUseVmaps, float maxSearchD
     // mapHeight set for any above raw ground Z or <= INVALID_HEIGHT
     // vmapheight set for any under Z value or <= INVALID_HEIGHT
 
-    if( vmapHeight > INVALID_HEIGHT )
+    if (vmapHeight > INVALID_HEIGHT)
     {
-        if( mapHeight > INVALID_HEIGHT )
+        if (mapHeight > INVALID_HEIGHT)
         {
             // we have mapheight and vmapheight and must select more appropriate
 
             // we are already under the surface or vmap height above map heigt
             // or if the distance of the vmap height is less the land height distance
-            if( z < mapHeight || vmapHeight > mapHeight || fabs(mapHeight-z) > fabs(vmapHeight-z) )
+            if (z < mapHeight || vmapHeight > mapHeight || fabs(mapHeight-z) > fabs(vmapHeight-z))
                 return vmapHeight;
             else
                 return mapHeight;                           // better use .map surface height
