@@ -7858,9 +7858,8 @@ void Aura::HandleAuraControlVehicle(bool apply, bool Real)
         return;
 
     Unit* target = GetTarget();
-    if (target->GetTypeId() != TYPEID_UNIT || !((Creature*)target)->isVehicle())
+    if (target->GetTypeId() != TYPEID_UNIT || !target->GetObjectGuid().IsVehicle())
         return;
-    Vehicle* vehicle = (Vehicle*)target;
 
     Unit *player = GetCaster();
     if(!player || player->GetTypeId() != TYPEID_PLAYER)

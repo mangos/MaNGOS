@@ -6139,6 +6139,7 @@ uint32 ObjectMgr::GenerateLowGuid(HighGuid guidhigh)
         case HIGHGUID_ITEM:
             return m_ItemGuids.Generate();
         case HIGHGUID_UNIT:
+        case HIGHGUID_VEHICLE:
             return m_CreatureGuids.Generate();
         case HIGHGUID_PLAYER:
             return m_CharGuids.Generate();

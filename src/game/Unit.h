@@ -1062,6 +1062,7 @@ struct CharmInfo
         bool HasReactState(ReactStates state) { return (m_reactState == state); }
 
         void InitPossessCreateSpells();
+        void InitVehicleCreateSpells();
         void InitCharmCreateSpells();
         void InitPetActionBar();
         void InitEmptyActionBar();

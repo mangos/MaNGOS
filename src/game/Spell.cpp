@@ -3351,7 +3351,7 @@ void Spell::update(uint32 difftime)
                         for(std::list<TargetInfo>::iterator ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
                         {
                             TargetInfo* target = &*ihit;
-                            if(!target->targetGUID.IsCreature())
+                            if(!target->targetGUID.IsCreatureOrVehicle())
                                 continue;
 
                             Unit* unit = m_caster->GetObjectGuid() == target->targetGUID ? m_caster : ObjectAccessor::GetUnit(*m_caster, target->targetGUID);

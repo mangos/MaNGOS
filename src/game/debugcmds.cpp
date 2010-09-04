@@ -612,50 +612,6 @@ bool ChatHandler::HandleDebugArenaCommand(char* /*args*/)
     return true;
 }
 
-bool ChatHandler::HandleDebugSpawnVehicleCommand(char* args)
-{
-    uint32 entry;
-    if (!ExtractUInt32(&args, entry))
-        return false;
-
-    uint32 id;
-    if (!ExtractUInt32(&args, id))
-        return false;
-
-    CreatureInfo const *ci = ObjectMgr::GetCreatureTemplate(entry);
-    if (!ci)
-        return false;
-
-    VehicleEntry const *ve = sVehicleStore.LookupEntry(id);
-    if (!ve)
-        return false;
-
-    Vehicle *v = new Vehicle;
-    Map *map = m_session->GetPlayer()->GetMap();
-    if (!v->Create(map->GenerateLocalLowGuid(HIGHGUID_VEHICLE), map, entry, id, m_session->GetPlayer()->GetTeam()))
-    {
-        delete v;
-        return false;
-    }
-
-    float px, py, pz;
-    m_session->GetPlayer()->GetClosePoint(px, py, pz, m_session->GetPlayer()->GetObjectBoundingRadius());
-
-    v->Relocate(px, py, pz, m_session->GetPlayer()->GetOrientation());
-
-    if (!v->IsPositionValid())
-    {
-        sLog.outError("Vehicle (guidlow %d, entry %d) not created. Suggested coordinates isn't valid (X: %f Y: %f)",
-            v->GetGUIDLow(), v->GetEntry(), v->GetPositionX(), v->GetPositionY());
-        delete v;
-        return false;
-    }
-
-    map->Add((Creature*)v);
-
-    return true;
-}
-
 bool ChatHandler::HandleDebugSpellCheckCommand(char* /*args*/)
 {
     sLog.outString( "Check expected in code spell properties base at table 'spell_check' content...");

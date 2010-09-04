@@ -977,7 +977,7 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
             if (cVictim->isTemporarySummon())
             {
                 TemporarySummon* pSummon = (TemporarySummon*)cVictim;
-                if (pSummon->GetSummonerGuid().IsCreature())
+                if (pSummon->GetSummonerGuid().IsCreatureOrVehicle())
                     if(Creature* pSummoner = cVictim->GetMap()->GetCreature(pSummon->GetSummonerGuid()))
                         if (pSummoner->AI())
                             pSummoner->AI()->SummonedCreatureJustDied(cVictim);
@@ -5961,8 +5961,11 @@ Pet* Unit::GetPet() const
 {
     if(uint64 pet_guid = GetPetGUID())
     {
-        if(Pet* pet = GetMap()->GetPet(pet_guid))
-            return pet;
+        if (IsInWorld())
+        {
+            if (Pet* pet = GetMap()->GetPet(pet_guid))
+                return pet;
+        }
 
         sLog.outError("Unit::GetPet: Pet %u not exist.",GUID_LOPART(pet_guid));
         const_cast<Unit*>(this)->SetPet(0);
@@ -8663,10 +8666,6 @@ bool Unit::CanHaveThreatList() const
     if( ((Creature*)this)->isTotem() )
         return false;
 
-    // vehicles can not have threat list
-    if( ((Creature*)this)->isVehicle() )
-        return false;
-
     // pets can not have a threat list, unless they are controlled by a creature
     if( ((Creature*)this)->isPet() && IS_PLAYER_GUID(((Pet*)this)->GetOwnerGUID()) )
         return false;
@@ -9668,6 +9667,25 @@ void CharmInfo::InitPossessCreateSpells()
             m_unit->CastSpell(m_unit, ((Creature*)m_unit)->m_spells[x], true);
         else
             AddSpellToActionBar(((Creature*)m_unit)->m_spells[x], ACT_PASSIVE);
+    }
+}
+
+void CharmInfo::InitVehicleCreateSpells()
+{
+    for (uint32 x = ACTION_BAR_INDEX_START; x < ACTION_BAR_INDEX_END; ++x)
+        SetActionBar(x, 0, ActiveStates(0x8 + x));
+
+    for (uint32 x = 0; x < CREATURE_MAX_SPELLS; ++x)
+    {
+        uint32 spellId = ((Creature*)m_unit)->m_spells[x];
+
+        if (!spellId)
+            continue;
+
+        if (IsPassiveSpell(spellId))
+            m_unit->CastSpell(m_unit, spellId, true);
+        else
+            PetActionBar[x].SetAction(spellId);
     }
 }
 

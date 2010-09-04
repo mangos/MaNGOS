@@ -33,11 +33,11 @@ VehicleKit::VehicleKit(Unit* base, VehicleEntry const* vehicleInfo) : m_vehicleI
         if (!seatId)
             continue;
 
-        if (VehicleSeatEntry const *veSeat = sVehicleSeatStore.LookupEntry(seatId))
+        if (VehicleSeatEntry const *seatInfo = sVehicleSeatStore.LookupEntry(seatId))
         {
-            m_Seats.insert(std::make_pair(i, VehicleSeat(veSeat)));
+            m_Seats.insert(std::make_pair(i, VehicleSeat(seatInfo)));
 
-            if (veSeat->IsUsable())
+            if (seatInfo->IsUsable())
                 ++m_uiNumFreeSeats;
         }
     }
@@ -105,17 +105,15 @@ int8 VehicleKit::GetNextEmptySeat(int8 seatId, bool next) const
     return seat->first;
 }
 
-bool VehicleKit::AddPassenger(Unit *unit, int8 seatId)
+bool VehicleKit::AddPassenger(Unit *passenger, int8 seatId)
 {
     SeatMap::iterator seat;
 
     if (seatId < 0) // no specific seat requirement
     {
         for (seat = m_Seats.begin(); seat != m_Seats.end(); ++seat)
-        {
             if (!seat->second.passenger && seat->second.seatInfo->IsUsable())
                 break;
-        }
 
         if (seat == m_Seats.end()) // no available seat
             return false;
@@ -128,107 +126,129 @@ bool VehicleKit::AddPassenger(Unit *unit, int8 seatId)
             return false;
 
         if (seat->second.passenger)
-            seat->second.passenger->ExitVehicle();
+            return false;
     }
 
-    seat->second.passenger = unit;
+    seat->second.passenger = passenger;
+    passenger->addUnitState(UNIT_STAT_ON_VEHICLE);
 
-    if (seat->second.seatInfo->IsUsable())
+    VehicleSeatEntry const *seatInfo = seat->second.seatInfo;
+
+    passenger->m_movementInfo.AddMovementFlag(MOVEFLAG_ONTRANSPORT);
+    passenger->m_movementInfo.SetTransportData(m_pBase->GetGUID(),
+        seatInfo->m_attachmentOffsetX, seatInfo->m_attachmentOffsetY, seatInfo->m_attachmentOffsetZ,
+        seatInfo->m_passengerYaw, getMSTime(), seat->first, seatInfo);
+
+    if (seatInfo->m_flags & SEAT_FLAG_MAIN_RIDER)
     {
-        MANGOS_ASSERT(m_uiNumFreeSeats);
-        --m_uiNumFreeSeats;
+        passenger->SetCharm(m_pBase);
+        m_pBase->SetCharmerGUID(passenger->GetGUID());
+        m_pBase->addUnitState(UNIT_STAT_CONTROLLED);
 
-        if (!m_uiNumFreeSeats)
+        if (passenger->GetTypeId() == TYPEID_PLAYER)
         {
-            if (m_pBase->GetTypeId() == TYPEID_PLAYER)
-                m_pBase->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_PLAYER_VEHICLE);
-            else
-                m_pBase->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
+            m_pBase->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+
+            if (CharmInfo* charmInfo = m_pBase->InitCharmInfo(m_pBase))
+            {
+                charmInfo->InitVehicleCreateSpells();
+                charmInfo->SetReactState(REACT_PASSIVE);
+            }
+
+            Player* player = (Player*)passenger;
+            player->SetMover(m_pBase);
+            player->SetClientControl(m_pBase, 1);
+            player->VehicleSpellInitialize();
         }
     }
 
-    unit->addUnitState(UNIT_STAT_ON_VEHICLE);
-
-    VehicleSeatEntry const *veSeat = seat->second.seatInfo;
-
-    unit->m_movementInfo.AddMovementFlag(MOVEFLAG_ONTRANSPORT);
-    unit->m_movementInfo.SetTransportData(m_pBase->GetGUID(),
-        veSeat->m_attachmentOffsetX, veSeat->m_attachmentOffsetY, veSeat->m_attachmentOffsetZ,
-        veSeat->m_passengerYaw, getMSTime(), seat->first, veSeat);
-
-    if (unit->GetTypeId() == TYPEID_PLAYER)
+    if (passenger->GetTypeId() == TYPEID_PLAYER)
     {
-        ((Player*)unit)->GetCamera().SetView(m_pBase);
+        ((Player*)passenger)->GetCamera().SetView(m_pBase);
 
         WorldPacket data(SMSG_FORCE_MOVE_ROOT, 8+4);
-        data << unit->GetPackGUID();
-        data << uint32((unit->m_movementInfo.GetVehicleSeatFlags() & SEAT_FLAG_CAN_CAST) ? 2 : 0);
-        unit->SendMessageToSet(&data, true);
+        data << passenger->GetPackGUID();
+        data << uint32((passenger->m_movementInfo.GetVehicleSeatFlags() & SEAT_FLAG_CAN_CAST) ? 2 : 0);
+        passenger->SendMessageToSet(&data, true);
     }
 
-    unit->SendMonsterMoveTransport(m_pBase, SPLINETYPE_FACINGANGLE, SPLINEFLAG_UNKNOWN5, 0, 0.0f);
+    passenger->SendMonsterMoveTransport(m_pBase, SPLINETYPE_FACINGANGLE, SPLINEFLAG_UNKNOWN5, 0, 0.0f);
 
     if (m_pBase->GetTypeId() == TYPEID_UNIT)
         RelocatePassengers(m_pBase->GetPositionX(), m_pBase->GetPositionY(), m_pBase->GetPositionZ(), m_pBase->GetOrientation());
 
+    UpdateFreeSeatCount();
     return true;
 }
 
-void VehicleKit::RemovePassenger(Unit *unit)
+void VehicleKit::RemovePassenger(Unit *passenger)
 {
     SeatMap::iterator seat;
+
     for (seat = m_Seats.begin(); seat != m_Seats.end(); ++seat)
-    {
-        if (seat->second.passenger == unit)
+        if (seat->second.passenger == passenger)
             break;
-    }
 
     if (seat == m_Seats.end())
         return;
 
     seat->second.passenger = NULL;
+    passenger->clearUnitState(UNIT_STAT_ON_VEHICLE);
 
-    if (seat->second.seatInfo->IsUsable())
+    passenger->m_movementInfo.ClearTransportData();
+    passenger->m_movementInfo.RemoveMovementFlag(MOVEFLAG_ONTRANSPORT);
+
+    if (seat->second.seatInfo->m_flags & SEAT_FLAG_MAIN_RIDER)
     {
-        if (!m_uiNumFreeSeats)
-        {
-            if (m_pBase->GetTypeId() == TYPEID_PLAYER)
-                m_pBase->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_PLAYER_VEHICLE);
-            else
-                m_pBase->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
-        }
+        passenger->SetCharm(NULL);
+        passenger->RemoveSpellsCausingAura(SPELL_AURA_CONTROL_VEHICLE);
+        m_pBase->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+        m_pBase->SetCharmerGUID(NULL);
+        m_pBase->clearUnitState(UNIT_STAT_CONTROLLED);
 
-        ++m_uiNumFreeSeats;
+        if (passenger->GetTypeId() == TYPEID_PLAYER)
+        {
+            Player* player = (Player*)passenger;
+            player->SetMover(NULL);
+            player->SetClientControl(m_pBase, 0);
+            player->RemovePetActionBar();
+        }
     }
 
-    unit->clearUnitState(UNIT_STAT_ON_VEHICLE);
-
-    unit->m_movementInfo.ClearTransportData();
-    unit->m_movementInfo.RemoveMovementFlag(MOVEFLAG_ONTRANSPORT);
-
-    if (unit->GetTypeId() == TYPEID_PLAYER)
+    if (passenger->GetTypeId() == TYPEID_PLAYER)
     {
-        ((Player*)unit)->GetCamera().ResetView();
+        ((Player*)passenger)->GetCamera().ResetView();
 
         WorldPacket data(SMSG_FORCE_MOVE_UNROOT, 8+4);
-        data << unit->GetPackGUID();
+        data << passenger->GetPackGUID();
         data << uint32(0);
-        unit->SendMessageToSet(&data, true);
+        passenger->SendMessageToSet(&data, true);
     }
+
+    UpdateFreeSeatCount();
 }
 
 void VehicleKit::Reset()
 {
-    if (m_pBase->GetTypeId() == TYPEID_PLAYER)
+    UpdateFreeSeatCount();
+}
+
+void VehicleKit::UpdateFreeSeatCount()
+{
+    m_uiNumFreeSeats = 0;
+
+    for (SeatMap::const_iterator itr = m_Seats.begin(); itr != m_Seats.end(); ++itr)
     {
-        if (m_uiNumFreeSeats)
-            m_pBase->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_PLAYER_VEHICLE);
+        if (!itr->second.passenger && itr->second.seatInfo->IsUsable())
+            ++m_uiNumFreeSeats;
     }
+
+    uint32 flag = m_pBase->GetTypeId() == TYPEID_PLAYER ? UNIT_NPC_FLAG_PLAYER_VEHICLE : UNIT_NPC_FLAG_SPELLCLICK;
+
+    if (m_uiNumFreeSeats)
+        m_pBase->SetFlag(UNIT_NPC_FLAGS, flag);
     else
-    {
-        if (m_uiNumFreeSeats)
-            m_pBase->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
-    }
+        m_pBase->RemoveFlag(UNIT_NPC_FLAGS, flag);
 }
 
 void VehicleKit::RelocatePassengers(float x, float y, float z, float ang)
@@ -245,75 +265,4 @@ void VehicleKit::RelocatePassengers(float x, float y, float z, float ang)
             passenger->SetPosition(px, py, pz, po);
         }
     }
-}
-
-Vehicle::Vehicle() : Creature(CREATURE_SUBTYPE_VEHICLE), m_vehicleId(0)
-{
-    m_updateFlag = (UPDATEFLAG_LIVING | UPDATEFLAG_HAS_POSITION | UPDATEFLAG_VEHICLE);
-}
-
-Vehicle::~Vehicle()
-{
-}
-
-void Vehicle::AddToWorld()
-{
-    ///- Register the vehicle for guid lookup
-    if(!IsInWorld())
-        GetMap()->GetObjectsStore().insert<Vehicle>(GetGUID(), (Vehicle*)this);
-
-    Unit::AddToWorld();
-}
-
-void Vehicle::RemoveFromWorld()
-{
-    ///- Remove the vehicle from the accessor
-    if(IsInWorld())
-        GetMap()->GetObjectsStore().erase<Vehicle>(GetGUID(), (Vehicle*)NULL);
-
-    ///- Don't call the function for Creature, normal mobs + totems go in a different storage
-    Unit::RemoveFromWorld();
-}
-
-void Vehicle::setDeathState(DeathState s)                       // overwrite virtual Creature::setDeathState and Unit::setDeathState
-{
-    Creature::setDeathState(s);
-}
-
-void Vehicle::Update(uint32 diff)
-{
-    Creature::Update(diff);
-}
-
-bool Vehicle::Create(uint32 guidlow, Map *map, uint32 Entry, uint32 vehicleId, uint32 team)
-{
-    SetMap(map);
-
-    Object::_Create(guidlow, Entry, HIGHGUID_VEHICLE);
-
-    if(!InitEntry(Entry, team))
-        return false;
-
-    m_defaultMovementType = IDLE_MOTION_TYPE;
-
-    AIM_Initialize();
-
-    SetVehicleId(vehicleId);
-
-    SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
-    SetFloatValue(UNIT_FIELD_HOVERHEIGHT, 1.0f);
-
-    CreatureInfo const *ci = GetCreatureInfo();
-    setFaction(team == ALLIANCE ? ci->faction_A : ci->faction_H);
-
-    SelectLevel(ci);
-
-    return true;
-}
-
-void Vehicle::Dismiss()
-{
-    SendObjectDeSpawnAnim(GetGUID());
-    CombatStop();
-    AddObjectToRemoveList();
 }

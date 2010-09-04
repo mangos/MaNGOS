@@ -169,7 +169,6 @@ class Pet : public Creature
                 return m_autospells[pos];
         }
 
-        void Regenerate(Powers power);
         void LooseHappiness();
         HappinessState GetHappinessState();
         void GivePetXP(uint32 xp);

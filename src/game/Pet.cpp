@@ -592,43 +592,6 @@ void Pet::Update(uint32 diff)
     Creature::Update(diff);
 }
 
-void Pet::Regenerate(Powers power)
-{
-    uint32 curValue = GetPower(power);
-    uint32 maxValue = GetMaxPower(power);
-
-    if (curValue >= maxValue)
-        return;
-
-    float addvalue = 0.0f;
-
-    switch (power)
-    {
-        case POWER_FOCUS:
-        {
-            // For hunter pets.
-            addvalue = 24 * sWorld.getConfig(CONFIG_FLOAT_RATE_POWER_FOCUS);
-            break;
-        }
-        case POWER_ENERGY:
-        {
-            // For deathknight's ghoul.
-            addvalue = 20;
-            break;
-        }
-        default:
-            return;
-    }
-
-    // Apply modifiers (if any).
-    AuraList const& ModPowerRegenPCTAuras = GetAurasByType(SPELL_AURA_MOD_POWER_REGEN_PERCENT);
-    for(AuraList::const_iterator i = ModPowerRegenPCTAuras.begin(); i != ModPowerRegenPCTAuras.end(); ++i)
-        if ((*i)->GetModifier()->m_miscvalue == power)
-            addvalue *= ((*i)->GetModifier()->m_amount + 100) / 100.0f;
-
-    ModifyPower(power, (int32)addvalue);
-}
-
 void Pet::LooseHappiness()
 {
     uint32 curValue = GetPower(POWER_HAPPINESS);

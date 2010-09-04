@@ -378,7 +378,6 @@ enum CreatureSubtype
     CREATURE_SUBTYPE_GENERIC,                               // new Creature
     CREATURE_SUBTYPE_PET,                                   // new Pet
     CREATURE_SUBTYPE_TOTEM,                                 // new Totem
-    CREATURE_SUBTYPE_VEHICLE,                               // new Vehicle
     CREATURE_SUBTYPE_TEMPORARY_SUMMON,                      // new TemporarySummon
 };
 
@@ -408,7 +407,6 @@ class MANGOS_DLL_SPEC Creature : public Unit
 
         CreatureSubtype GetSubtype() const { return m_subtype; }
         bool isPet() const { return m_subtype == CREATURE_SUBTYPE_PET; }
-        bool isVehicle() const { return m_subtype == CREATURE_SUBTYPE_VEHICLE; }
         bool isTotem() const { return m_subtype == CREATURE_SUBTYPE_TOTEM; }
         bool isTemporarySummon() const { return m_subtype == CREATURE_SUBTYPE_TEMPORARY_SUMMON; }
 
@@ -654,7 +652,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
         float m_respawnradius;
 
         CreatureSubtype m_subtype;                          // set in Creatures subclasses for fast it detect without dynamic_cast use
-        void RegenerateMana();
+        void Regenerate(Powers power);
         void RegenerateHealth();
         MovementGeneratorType m_defaultMovementType;
         Cell m_currentCell;                                 // store current cell where creature listed
