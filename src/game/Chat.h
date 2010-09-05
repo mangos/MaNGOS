@@ -186,7 +186,6 @@ class ChatHandler
         bool HandleDebugSetAuraStateCommand(char* args);
         bool HandleDebugSetItemValueCommand(char* args);
         bool HandleDebugSetValueCommand(char* args);
-        bool HandleDebugSpawnVehicleCommand(char* args);
         bool HandleDebugSpellCheckCommand(char* args);
         bool HandleDebugSpellModsCommand(char* args);
         bool HandleDebugUpdateWorldStateCommand(char* args);
