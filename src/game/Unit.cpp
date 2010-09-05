@@ -3950,7 +3950,7 @@ bool Unit::AddSpellAuraHolder(SpellAuraHolder *holder)
         if (Unit* caster = holder->GetCaster())             // caster not in world
         {
             SingleCastSpellTargetMap& scTargets = caster->GetSingleCastSpellTargets();
-            for(SingleCastSpellTargetMap::const_iterator itr = scTargets.begin(); itr != scTargets.end();)
+            for(SingleCastSpellTargetMap::iterator itr = scTargets.begin(); itr != scTargets.end();)
             {
                 SpellEntry const* itr_spellEntry = itr->first;
                 ObjectGuid itr_targetGuid = itr->second;
