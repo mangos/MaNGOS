@@ -8365,9 +8365,17 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced, float ratio)
     switch(mtype)
     {
         case MOVE_WALK:
+            if (GetTypeId() == TYPEID_UNIT)
+            {
+                ratio *= ((Creature*)this)->GetCreatureInfo()->speed_walk;
+                SetSpeedRate(mtype, ratio, forced);
+            }
             return;
         case MOVE_RUN:
         {
+            if (GetTypeId() == TYPEID_UNIT)
+                ratio *= ((Creature*)this)->GetCreatureInfo()->speed_run;
+
             if (IsMounted()) // Use on mount auras
             {
                 main_speed_mod  = GetMaxPositiveAuraModifier(SPELL_AURA_MOD_INCREASE_MOUNTED_SPEED);
