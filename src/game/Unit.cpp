@@ -8624,14 +8624,13 @@ void Unit::setDeathState(DeathState s)
 {
     if (s != ALIVE && s!= JUST_ALIVED)
     {
+        ExitVehicle();
         CombatStop();
         DeleteThreatList();
         ClearComboPointHolders();                           // any combo points pointed to unit lost at it death
 
         if(IsNonMeleeSpellCasted(false))
             InterruptNonMeleeSpells(false);
-
-        ExitVehicle();
     }
 
     if (s == JUST_DIED)
