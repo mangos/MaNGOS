@@ -1439,8 +1439,8 @@ bool Creature::FallGround()
     float dz = tz - GetPositionZ();
     float distance = sqrt(dz*dz);
 
-    // flight speed * 2 explicit, not verified though but result looks proper
-    double speed = GetSpeed(MOVE_FLIGHT) * 2;
+    // default run speed * 2 explicit, not verified though but result looks proper
+    double speed = baseMoveSpeed[MOVE_RUN] * 2;
 
     speed *= 0.001;                                         // to milliseconds
 
